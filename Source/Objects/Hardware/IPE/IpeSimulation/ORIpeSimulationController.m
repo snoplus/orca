@@ -28,10 +28,10 @@
 #import "ORCompositePlotView.h"
 
 #if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-@implementation ORIpeSimulationController (private) 
+@interface ORIpeSimulationController (private) 
 - (void) openExecutableFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-- (void) openConfigFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;	
-- (void) saveConfigFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo	
+- (void) openConfigFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+- (void) saveConfigFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;	
 @end
 #endif
 
@@ -490,7 +490,7 @@
         }
     }];
 #else 	
-    [openPanel beginSheetForDirectory:startingDir
+    [openPanel beginSheetForDirectory:NSHomeDirectory()
                                  file:nil
                                 types:nil
                        modalForWindow:[self window]
@@ -528,7 +528,7 @@
         }
     }];
 #else 	
-    [openPanel beginSheetForDirectory:startingDir
+    [openPanel beginSheetForDirectory:NSHomeDirectory()
                                  file:nil
                                 types:nil
                        modalForWindow:[self window]
@@ -585,13 +585,12 @@
         }
     }];
 #else 	
-    [savePanel beginSheetForDirectory:startingDir
+    [savePanel beginSheetForDirectory:NSHomeDirectory()
                                  file:nil
-                                types:nil
                        modalForWindow:[self window]
                         modalDelegate:self
                        didEndSelector:@selector(saveConfigFileDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
+                          contextInfo:nil];
 #endif
 
 	
@@ -1203,11 +1202,9 @@ autoselect an edge, and we want this drawer to open only on specific edges. */
 }
 - (void)openConfigFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo	
 {
-	int retval;
-	retval = [op runModal];
-    if (retval == NSFileHandlingPanelOKButton)  //NSOKButton) NSFileWrapper
+    if (returnCode == NSFileHandlingPanelOKButton)  //NSOKButton) NSFileWrapper
     {
-        NSString *filename = [op filename];
+        NSString *filename = [sheet filename];
         
 		//  !this does not work as URLs start with "file://localhost" ... see comment above: APPLE needs to provide more convesion functions -tb-
 		
@@ -1221,8 +1218,8 @@ autoselect an edge, and we want this drawer to open only on specific edges. */
     if (returnCode == NSFileHandlingPanelOKButton) {
         NSString *filename = [sheet filename];
         NSLog( @"You selected the filename: %@\n",filename);
-        NSLog( @"You selected [op nameFieldStringValue]: %@\n",[op nameFieldLabel]);
-        NSLog( @"You selected [op directoryURL]: %@\n",[op URL]);
+        NSLog( @"You selected [op nameFieldStringValue]: %@\n",[sheet nameFieldLabel]);
+        NSLog( @"You selected [op directoryURL]: %@\n",[sheet URL]);
         //if (![textData writeToFile:[sp filename] atomically:YES])
 		BOOL saveOK;  
 		saveOK = [[configFileTextView string] writeToFile: filename atomically: YES encoding: NSASCIIStringEncoding error: NULL];
