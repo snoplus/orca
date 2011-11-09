@@ -29,6 +29,7 @@
 #import "ORTimeRate.h"
 
 #pragma mark •••External Strings
+NSString* ORPacModelAlarmLevelChanged = @"ORPacModelAlarmLevelChanged";
 NSString* ORPacModelRdacDisplayTypeChanged = @"ORPacModelRdacDisplayTypeChanged";
 NSString* ORPacModelSetAllRDacsChanged  = @"ORPacModelSetAllRDacsChanged";
 NSString* ORPacModelRdacChannelChanged  = @"ORPacModelRdacChannelChanged";
@@ -132,6 +133,35 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 }
 
 #pragma mark •••Accessors
+- (float) temperatureAlarmLevel:(int)index;
+{
+	if(index>=0 && index<8)return temperatureAlarmLevel[index];
+	else return 100;
+}
+
+- (void) setTemperatureAlarmLevel:(int)index value:(float)aTemperatureAlarmLevel;
+{
+	if(index>=0 && index<8){
+		[[[self undoManager] prepareWithInvocationTarget:self] setTemperatureAlarmLevel:index value:temperatureAlarmLevel[index]];
+		temperatureAlarmLevel[index] = aTemperatureAlarmLevel;
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelAlarmLevelChanged object:self];
+	}	
+}
+
+- (float) leakageAlarmLevel:(int)index;
+{
+	if(index>=0 && index<8) return leakageAlarmLevel[index];
+	else return 5;
+}
+
+- (void) setLeakageAlarmLevel:(int)index value:(float)aLeakageAlarmLevel;
+{
+	if(index>=0 && index<8){
+		[[[self undoManager] prepareWithInvocationTarget:self] setLeakageAlarmLevel:index value:leakageAlarmLevel[index]];
+		leakageAlarmLevel[index] = aLeakageAlarmLevel;
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelAlarmLevelChanged object:self];
+	}
+}
 
 - (NSString*) lastRdacFile
 {
@@ -467,6 +497,11 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 {
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
+	int i;
+	for(i=0;i<8;i++){
+		[self setTemperatureAlarmLevel:i	value:[decoder decodeFloatForKey:[NSString stringWithFormat:@"temperatureAlarmLevel%d",i]]];
+		[self setLeakageAlarmLevel:i		value:[decoder decodeFloatForKey:[NSString stringWithFormat:@"leakageAlarmLevel%d",i]]];
+	}
 	[self setLastRdacFile:	[decoder decodeObjectForKey:@"lastRdacFile"]];
 	[self setRdacDisplayType:[decoder decodeIntForKey:@"rdacDisplayType"]];
 	[self setSetAllRDacs:	[decoder decodeBoolForKey:		 @"ORPacModelSetAllRDacs"]];
@@ -482,7 +517,6 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
     [self setLogToFile:		[decoder decodeBoolForKey:	 @"logToFile"]];
 	
 
-	int i; 
 	for(i=0;i<8;i++){
 		timeRates[i] = [[ORTimeRate alloc] init];
 	}
@@ -498,6 +532,11 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+	int i;
+	for(i=0;i<8;i++){
+		[encoder encodeFloat:temperatureAlarmLevel[i] forKey:[NSString stringWithFormat:@"temperatureAlarmLevel%d",i]];
+		[encoder encodeFloat:leakageAlarmLevel[i]     forKey:[NSString stringWithFormat:@"leakageAlarmLevel%d",i]];
+	}
     [encoder encodeObject:lastRdacFile forKey:@"lastRdacFile"];
     [encoder encodeInt:rdacDisplayType forKey:@"rdacDisplayType"];
     [encoder encodeBool:setAllRDacs		forKey:@"ORPacModelSetAllRDacs"];
@@ -512,7 +551,6 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
     [encoder encodeObject:logFile		forKey:@"logFile"];
     [encoder encodeBool:logToFile		forKey:@"logToFile"];
 	
-	int i; 
 	for(i=0;i<148;i++){
 		[encoder encodeInt:rdac[i] forKey: [NSString stringWithFormat:@"rdac%d",i]];
 	}
@@ -928,7 +966,8 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 {
 	@synchronized(self){
 		*theLowLimit = -.001;
-		*theHighLimit =  100.0; //Is this really the max value
+		if([self lcmEnabled]) *theHighLimit = [self leakageAlarmLevel:channel]; 
+		else				  *theHighLimit = [self temperatureAlarmLevel:channel];
 	}		
 }
 

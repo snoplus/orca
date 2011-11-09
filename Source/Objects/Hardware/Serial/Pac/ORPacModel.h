@@ -82,6 +82,8 @@
 		int					rdacDisplayType;
 		NSString*			lastRdacFile;
         BOOL                readOnce;
+		float				leakageAlarmLevel[8];
+		float				temperatureAlarmLevel[8];
 }
 
 #pragma mark •••Initialization
@@ -91,6 +93,10 @@
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark •••Accessors
+- (float) temperatureAlarmLevel:(int)index;
+- (void) setTemperatureAlarmLevel:(int)index value:(float)aTemperatureAlarmLevel;
+- (float) leakageAlarmLevel:(int)index;
+- (void) setLeakageAlarmLevel:(int)index value:(float)aLeakageAlarmLevel;
 - (NSString*) lastRdacFile;
 - (void) setLastRdacFile:(NSString*)aLastRdacFile;
 - (int) rdacDisplayType;
@@ -181,6 +187,7 @@
 - (void) removeFrom:(NSMutableArray*)anArray;
 @end
 
+extern NSString* ORPacModelAlarmLevelChanged;
 extern NSString* ORPacModelRdacDisplayTypeChanged;
 extern NSString* ORPacModelSetAllRDacsChanged;
 extern NSString* ORPacModelRdacChannelChanged;

@@ -61,8 +61,8 @@
 	[numberFormatter setFormat:@"0.00"];
 	int i;
 	for(i=0;i<8;i++){
-		NSCell* theCell = [adcMatrix cellAtRow:i column:0];
-		[theCell setFormatter:numberFormatter];
+		[[adcMatrix cellAtRow:i column:0] setFormatter:numberFormatter];
+		[[alarmLevelMatrix cellAtRow:i column:0] setFormatter:numberFormatter];
 	}
 	
 	[[plotter0 yAxis] setRngLow:0.0 withHigh:6.];
@@ -213,6 +213,11 @@
                          name : ORPacModelRdacDisplayTypeChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(alarmLevelChanged:)
+                         name : ORPacModelAlarmLevelChanged
+						object: model];
+
 }
 
 - (void) setModel:(id)aModel
@@ -242,6 +247,19 @@
     [self miscAttributesChanged:nil];
 	[self queCountChanged:nil];
 	[self rdacDisplayTypeChanged:nil];
+	[self alarmLevelChanged:nil];
+}
+
+- (void) alarmLevelChanged:(NSNotification*)aNote
+{
+	BOOL lcm = [model lcmEnabled];
+	int i;
+	for(i=0;i<8;i++){
+		float theValue;
+		if(lcm)theValue = [model leakageAlarmLevel:i];
+		else theValue  =  [model temperatureAlarmLevel:i];
+		[[alarmLevelMatrix cellAtRow:i column:0] setFloatValue: theValue];
+	}
 }
 
 - (void) rdacDisplayTypeChanged:(NSNotification*)aNote
@@ -367,6 +385,9 @@
 - (void) lcmEnabledChanged:(NSNotification*)aNote
 {
 	[lcmEnabledMatrix selectCellWithTag: [model lcmEnabled]];
+	if([model lcmEnabled]) [alarmTypeText setStringValue:@"For Temperatures"];
+	else [alarmTypeText setStringValue:@"For Leakage Current"];
+	[self alarmLevelChanged:nil];
 }
 
 - (void) preAmpChanged:(NSNotification*)aNote
@@ -501,6 +522,18 @@
 }
 
 #pragma mark •••Actions
+
+- (IBAction) alarmLevelAction:(id)sender
+{
+	int index = [sender selectedRow];
+	float theValue = [[sender selectedCell] floatValue];
+	if([model lcmEnabled]){
+		[model setLeakageAlarmLevel:index value:theValue];	
+	}
+	else {
+		[model setLeakageAlarmLevel:index value:theValue];	
+	}
+}
 
 - (IBAction) rdacDisplayTypeAction:(id)sender
 {
