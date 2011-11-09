@@ -214,11 +214,11 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenterController);
 
 - (BOOL) control:(NSControl *)control textView:(NSTextView *)textView doCommandBySelector:(SEL)command
 {
-	if ((command == @selector(moveDown:))) {
+	if (command == @selector(moveDown:)) {
 		[[self commandCenter] moveInHistoryDown];
 		return YES;
 	}
-	if ((command == @selector(moveUp:))) {
+	if (command == @selector(moveUp:)) {
 		[[self commandCenter] moveInHistoryUp];	
 		return YES;
 	}

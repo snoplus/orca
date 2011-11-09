@@ -550,7 +550,7 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 	[invGet invoke];
 	float theValue = [[invGet returnValue] floatValue];
 	
-	if(running && dir<0 && downRampPath==0 || panic){
+	if((running && dir<0 && downRampPath==0) || panic){
 		[currentWayPoint setXyPosition:NSMakePoint([self timeAtValue:theValue],theValue)];
 	}
 	else {

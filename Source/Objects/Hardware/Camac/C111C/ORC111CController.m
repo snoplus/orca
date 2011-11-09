@@ -214,11 +214,11 @@
 
 - (BOOL) control:(NSControl *)control textView:(NSTextView *)textView doCommandBySelector:(SEL)command
 {
-	if ((command == @selector(moveDown:))) {
+	if (command == @selector(moveDown:)) {
 		[[model cmdHistory] moveInHistoryDown];
 		return YES;
 	}
-	if ((command == @selector(moveUp:))) {
+	if (command == @selector(moveUp:)) {
 		[[model cmdHistory] moveInHistoryUp];	
 		return YES;
 	}

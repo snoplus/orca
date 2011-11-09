@@ -372,7 +372,7 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 				lastFunctionLevel = functionLevel;
 				[self pauseScript];
 			}
-			else if((debugMode == kStepInto)) {
+			else if(debugMode == kStepInto) {
 				lastFunctionLevel = functionLevel;
 				[self pauseScript];
 			}

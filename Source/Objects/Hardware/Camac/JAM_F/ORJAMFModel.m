@@ -686,7 +686,7 @@ struct {
 		int i;
 		for(i=0;i<16;i++){
 			if(enabledMask & (1<<i)){
-				data[index++] = (i&0xff)<<16 | theRawValues[i] & 0xffff;
+				data[index++] = (i&0xff)<<16 | (theRawValues[i] & 0xffff);
 			}
 		}
 		data[0] = dataId | index;
