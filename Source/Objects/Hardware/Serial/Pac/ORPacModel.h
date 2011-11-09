@@ -124,6 +124,7 @@
 - (unsigned short) adc:(int)index;
 - (unsigned long) timeMeasured:(int)index;
 - (void) setAdc:(int)index value:(unsigned short)aValue;
+- (float) adcVoltage:(int)index;
 - (float) convertedAdc:(int)index;
 - (NSString*) logFile;
 - (void) setLogFile:(NSString*)aLogFile;

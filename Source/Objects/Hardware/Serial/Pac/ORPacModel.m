@@ -258,10 +258,38 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelDacValueChanged object:self];
 }
 
-- (float) convertedAdc:(int)index
+- (float) adcVoltage:(int)index
 {
 	if(index<0 && index>=8)return 0.0;
 	else return 5.0 * adc[index]/65535.0;
+}
+
+- (float) convertedAdc:(int)index
+{
+	if(index<0 && index>=8)return 0.0;
+	float temperatureConstants[8][2] = {
+		{100.0	,	-50.0},
+		{1.0	,	0.0},
+		{1.0	,	0.0},
+		{1.0	,	0.0},
+		{1.0	,	0.0},
+		{1.0	,	0.0},
+		{86.141	,	50.0},
+		{1.0	,	0.0},
+	};
+	float leakageCurrentConstants[8][2] = {
+		{1.0	,	0.0},
+		{1.0	,	0.0},
+		{1.0	,	0.0},
+		{1.0	,	0.0},
+		{1.0	,	0.0},
+		{1.0	,	0.0},
+		{1.0	,	0.0},
+		{1.0	,	0.0},
+	};
+	float voltage = [self adcVoltage:index];
+	if(lcmEnabled) return voltage * leakageCurrentConstants[index][0] + leakageCurrentConstants[index][1];
+	else		   return voltage * temperatureConstants[index][0] + temperatureConstants[index][1];
 }
 
 
@@ -886,7 +914,7 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 {
 	double theValue;
 	@synchronized(self){
-		theValue = (double)5.0; //just set to the max value for now
+		theValue = (double)100.0; //just set to the max value for now
 	}
 	return theValue;
 }
@@ -900,7 +928,7 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 {
 	@synchronized(self){
 		*theLowLimit = -.001;
-		*theHighLimit =  5.0; //Is this really the max value
+		*theHighLimit =  100.0; //Is this really the max value
 	}		
 }
 
