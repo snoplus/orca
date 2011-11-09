@@ -907,8 +907,10 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 {    
     if(!readOnce){
         @try { 
-            [self readAdcs]; 
-			readOnce = YES;
+			if([cmdQueue count] == 0) {
+				[self readAdcs]; 
+				readOnce = YES;
+			}
         }
 		@catch(NSException* localException) { 
 			//catch this here to prevent it from falling thru, but nothing to do.
