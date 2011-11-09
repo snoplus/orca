@@ -39,6 +39,11 @@
 	[super dealloc];
 }
 
+- (void) awakeFromNib
+{
+	//nothing to do
+}
+
 - (void) setPlotView:(ORPlotView*)aPlotView
 {
 	plotView = aPlotView; //don't retain

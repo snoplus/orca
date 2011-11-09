@@ -23,7 +23,10 @@
 	ORPlotView*			 plotView;
 	NSAttributedString*  legend;
 }
+
+- (void) awakeFromNib;
 - (void) setUpLegend;
+
 @property (nonatomic, assign) IBOutlet ORPlotView*  plotView;
 @property (retain) NSAttributedString*  legend;
 
