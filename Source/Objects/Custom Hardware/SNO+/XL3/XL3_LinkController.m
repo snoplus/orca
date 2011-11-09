@@ -661,21 +661,21 @@ static NSDictionary* xl3Ops;
 - (IBAction) compositeXl3RWModeAction:(id)sender
 {
 	unsigned long addressValue = [model xl3RWAddressValue];
-	addressValue = addressValue & 0x0FFFFFFF | [sender indexOfSelectedItem] << 28;
+	addressValue = (addressValue & 0x0FFFFFFF) | [sender indexOfSelectedItem] << 28;
 	[model setXl3RWAddressValue:addressValue];
 }
 
 - (IBAction) compositeXl3RWSelectAction:(id)sender
 {
 	unsigned long addressValue = [model xl3RWAddressValue];
-	addressValue = addressValue & 0xF00FFFFF | [[xl3RWSelects objectForKey:[[sender selectedItem] title]] intValue] << 20;
+	addressValue = (addressValue & 0xF00FFFFF) | [[xl3RWSelects objectForKey:[[sender selectedItem] title]] intValue] << 20;
 	[model setXl3RWAddressValue:addressValue];
 }
 
 - (IBAction) compositeXl3RWRegisterAction:(id)sender
 {
 	unsigned long addressValue = [model xl3RWAddressValue];
-	addressValue = addressValue & 0xFFF00000 | [[xl3RWAddresses objectForKey:[[sender selectedItem] title]] intValue];
+	addressValue = (addressValue & 0xFFF00000) | [[xl3RWAddresses objectForKey:[[sender selectedItem] title]] intValue];
 	[model setXl3RWAddressValue:addressValue];
 }
 

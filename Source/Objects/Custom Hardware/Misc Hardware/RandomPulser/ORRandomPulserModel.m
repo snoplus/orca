@@ -198,7 +198,7 @@ NSString* ORRandomPulserSettingsLock						= @"ORRandomPulserSettingsLock";
     unsigned long dataWord = (negPulserState&0x1)<<25   |
         (ttlPulserState&0x1)<<24    | 
         (pulserAmp&0xff)<<16		| 
-        pulserRate&0xfff; 
+        (pulserRate&0xfff); 
     //[self flipBits:pulserRate&0xfff]; 
     [the408 setOutputWithMask:0xffffffff value:dataWord];	//load the data
 }

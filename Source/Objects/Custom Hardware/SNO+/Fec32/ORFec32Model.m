@@ -1202,7 +1202,7 @@ const short kVoltageADCMaximumAttempts = 10;
 	NSTimeInterval timeDiff = [thisTime timeIntervalSinceDate:lastTime];
 	float sampleFreq;
     
-	if (calcRates && (timeDiff<0 || timeDiff>kMaxTimeDiff) || timeDiff==0) {
+	if ((calcRates && (timeDiff<0 || timeDiff>kMaxTimeDiff)) || timeDiff==0) {
 		calcRates = 0;	// don't calculate rates if time diff is silly
 	}
 	if(timeDiff){
