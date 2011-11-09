@@ -190,6 +190,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 {
 	self = [super init];
     [self registerNotificationObservers];
+	gotAtLeastOneRH = NO;
 	return self;
 }
 
@@ -791,6 +792,8 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 	[[self undoManager] enableUndoRegistration];
 	
     [self registerNotificationObservers];
+	
+	gotAtLeastOneRH = NO;
 
 	return self;
 }
@@ -900,6 +903,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 
 - (void) printDataInProgress
 {
+	tempVerbose = YES;
 	[self addCmdToQueue:@"TEST COM"];	
 }
 
@@ -1421,6 +1425,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 		}
 		
 		dataRecordCount++;
+		/*
 		ORRad7DataPt* aPt = [[[ORRad7DataPt alloc] init] autorelease];
 		[aPt setTime:[self convertTime:parts]];
 		[aPt setValue:[[parts objectAtIndex:20] doubleValue]];
@@ -1430,6 +1435,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 		if([dataPointArray count]>kMaxNumInHistory)[dataPointArray removeObjectsInRange:NSMakeRange(0,500)];
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelUpdatePlot 
 															object:self];
+		 */
 	}
 }
 
@@ -1550,8 +1556,9 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 						float lastUncertainty  = [[readingParts objectAtIndex:1] floatValue];
 						[statusDictionary setObject:[NSNumber numberWithFloat:lastRadon]  forKey:kRad7LastRadon];
 						[statusDictionary setObject:[NSNumber numberWithFloat:lastUncertainty]  forKey:kRad7LastRadonUncertainty];
+						[statusDictionary setObject:[parts objectAtIndex:2]  forKey:kRad7LastRadonUnits];
 
-						if(thisRunNum!=lastRunNum || thisCycleNum!=lastCycleNum){
+						if((thisRunNum!=lastRunNum || thisCycleNum!=lastCycleNum) && gotAtLeastOneRH){
 							if(!dataPointArray){
 								[self setDataPointArray:[NSMutableArray array]];
 							}
@@ -1569,8 +1576,8 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 																				object:self];
 							[self saveHistory];
 						}
+						
 					}
-					[statusDictionary setObject:[parts objectAtIndex:2]  forKey:kRad7LastRadonUnits];
 				}
 			}
 			else {
@@ -1594,6 +1601,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 			NSArray* temperatureParts = [[parts objectAtIndex:0] componentsSeparatedByString:@"`"];
 			if([temperatureParts count]==2)[statusDictionary setObject:[temperatureParts objectAtIndex:1] forKey:kRad7TempUnits];
 			else [statusDictionary setObject:@"" forKey:kRad7TempUnits];
+			gotAtLeastOneRH = YES; //prevents a zero rh at the start of ORCA
 		}
 		else {
 			[statusDictionary setObject:@"--" forKey:kRad7Temp];

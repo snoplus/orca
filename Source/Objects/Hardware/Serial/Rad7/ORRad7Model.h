@@ -143,7 +143,7 @@
 		BOOL			runEnded;
 		unsigned long	maxRadon;
 		unsigned long	alarmLimit;
-	float testValue;
+		BOOL			gotAtLeastOneRH;
 }
 
 #pragma mark ***Initialization

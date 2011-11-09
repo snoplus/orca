@@ -44,7 +44,6 @@
 	NSAssert([NSThread mainThread],@"ORTimeLinePlot drawing from non-gui thread");
 	
 	int numPoints = [dataSource numberPointsInPlot:self];
-    if(numPoints < 2) return;
 
 	ORTimeAxis* mXScale = [plotView xScale];
 	ORAxis*		mYScale = [plotView yScale];
