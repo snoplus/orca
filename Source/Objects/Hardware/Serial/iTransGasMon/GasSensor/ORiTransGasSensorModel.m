@@ -465,7 +465,7 @@ NSString* ORiTransGasDecimalPlacesChanged			= @"ORiTransGasDecimalPlacesChanged"
 		
 		unsigned long data[8];
 		data[0] = dataId | 8;
-		data[1] = (channel<<16) | [delegate uniqueIdNumber]&0xfff;
+		data[1] = (channel<<16) | ([delegate uniqueIdNumber]&0xfff);
 		
 		data[2] = timeMeasured;
 		

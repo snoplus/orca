@@ -472,7 +472,7 @@ NSString* ORModBusLock						= @"ORModBusLock";
 			int len = [theData length];
 			unsigned short theReceivedCRC = bytes[len-1]<<8 | bytes[len-2];
 			unsigned short actualCRC      = [self crc:bytes count:len-2];
-			if((theReceivedCRC == actualCRC)){
+			if(theReceivedCRC == actualCRC){
 				ORiTransGasSensorModel* aSensor;
 				for(aSensor in sensors){
 					if([aSensor baseAddress] == bytes[0]){

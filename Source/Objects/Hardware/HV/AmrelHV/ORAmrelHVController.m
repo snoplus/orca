@@ -460,7 +460,7 @@
 		}
 	}
 
-	[systemPanicBButton setEnabled: !locked && portOpen && ([model actVoltage:0]>0) || [model actVoltage:1]>0 && dataIsValid];
+	[systemPanicBButton setEnabled: (!locked && portOpen && ([model actVoltage:0]>0)) || [model actVoltage:1]>0 && dataIsValid];
 		
 }
 

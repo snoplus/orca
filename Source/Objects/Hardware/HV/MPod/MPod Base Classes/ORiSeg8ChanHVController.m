@@ -232,7 +232,7 @@
 	
 	if(!events && (state != kiSeg8ChanHVOutputSetEmergencyOff))eventString = @"No Events";
 	else {
-		if((state == kiSeg8ChanHVOutputSetEmergencyOff))	eventString = [eventString stringByAppendingString:@"Panicked\n"];
+		if(state == kiSeg8ChanHVOutputSetEmergencyOff)	eventString = [eventString stringByAppendingString:@"Panicked\n"];
 		if(events & outputFailureMinSenseVoltageMask)	eventString = [eventString stringByAppendingString:@"Min Voltage\n"];
 		if(events & outputFailureMaxSenseVoltageMask)	eventString = [eventString stringByAppendingString:@"Max Voltage\n"];
 		if(events & outputFailureMaxTerminalVoltageMask)eventString = [eventString stringByAppendingString:@"Term. Voltage\n"];
