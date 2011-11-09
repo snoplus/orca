@@ -351,7 +351,7 @@ NSString* ORL2551PollWhenRunningChangedNotification = @"ORL2551PollWhenRunningCh
     data[0] = dataId | 14;  //id and size
     data[1] = ([self crateNumber]&0xf)<<16 | ([self stationNumber]& 0x0000001f); //crate and card
     for(i=0;i<12;i++){
-        data[2+i] = ((i&0xf)<<28) | scalerCount[i]&0x00ffffff;
+        data[2+i] = ((i&0xf)<<28) | (scalerCount[i]&0x00ffffff);
     }
     [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
                                                         object:[NSData dataWithBytes:data length:sizeof(long)*14]];

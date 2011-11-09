@@ -4566,7 +4566,7 @@ clean_up_mark:
 							
 						}//END OF DEBUGGING PART
 #endif
-						if((fltRunMode == kKatrinFlt_Run_Mode)){
+						if(fltRunMode == kKatrinFlt_Run_Mode){
 							unsigned long totalLength = 2 + (sizeof(katrinEventDataStruct)/sizeof(long));
 							NSMutableData* theEnergyData = [NSMutableData dataWithCapacity:totalLength*sizeof(long)];
 							unsigned long header = dataId | totalLength;	//total event size + the two ORCA header words (in longs!).

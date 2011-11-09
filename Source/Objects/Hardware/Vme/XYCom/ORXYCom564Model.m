@@ -666,7 +666,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     int i;
     for(i=0;i<channelsToRead;i++){
         uint16_t val = [self getAdcValueAtChannel:i];
-        data[index++] = (i&0xff)<<16 | val & 0xffff;
+        data[index++] = (i&0xff)<<16 | (val & 0xffff);
     }
     data[0] = dataId | index;
     

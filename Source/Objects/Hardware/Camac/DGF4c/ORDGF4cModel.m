@@ -933,7 +933,7 @@ enum {
 	[controller camacShortNAF:[self stationNumber] a:0 f:0 data:&dataWord[0]];
 	[controller camacShortNAF:[self stationNumber] a:0 f:0 data:&dataWord[1]];
     
-	return dataWord[0]<<8 | dataWord[1]&0x00ff;
+	return dataWord[0]<<8 | (dataWord[1]&0x00ff);
 }
 
 - (void) writeDSPProgramWord:(unsigned long)data

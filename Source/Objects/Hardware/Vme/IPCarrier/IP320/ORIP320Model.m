@@ -1040,7 +1040,7 @@ static struct {
 		for(i=0;i<n;i++){
 			if([[chanObjs objectAtIndex:i] readEnabled]){
 				int val  = [[chanObjs objectAtIndex:i] rawValue];
-				data[index++] = (i&0xff)<<16 | val & 0xfff;
+				data[index++] = (i&0xff)<<16 | (val & 0xfff);
 			}
 		}
 		data[0] = dataId | index;
