@@ -106,6 +106,7 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
 - (void) sampleRateChanged:(NSNotification*)aNote
 {
 	[sampleRateField setFloatValue: [model sampleRate]];
+	[self updatePollingButton];
 }
 
 - (void) registerNotificationObservers
@@ -267,6 +268,23 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
 	else {
 		[startButton setTitle:@"Start"];
 		[statusTextField setStringValue:@"Process is Idle"];
+	}
+	[self updatePollingButton];
+}
+
+- (void) updatePollingButton
+{
+	if([model processRunning]){
+		float timeBetweenSamples = 1./[model sampleRate];
+		if(timeBetweenSamples>15){
+			[pollNowButton setEnabled:YES];
+		}
+		else {
+			[pollNowButton setEnabled:NO];
+		}
+	}
+	else {
+		[pollNowButton setEnabled:NO];
 	}
 }
 
@@ -443,6 +461,11 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
 - (IBAction) shortNameAction:(id)sender
 {
 	[model setShortName:[sender stringValue]];
+}
+
+- (IBAction) pollNow:(id)sender
+{
+	[model pollNow];
 }
 
 #pragma mark ¥¥¥Data Source

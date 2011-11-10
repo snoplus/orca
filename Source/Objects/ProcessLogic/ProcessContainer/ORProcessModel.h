@@ -51,6 +51,7 @@
 - (NSString*) report;
 
 #pragma mark ***Accessors
+- (void) pollNow;
 - (BOOL) sendOnStop;
 - (void) setSendOnStop:(BOOL)aSendOnStop;
 - (BOOL) sendOnStart;

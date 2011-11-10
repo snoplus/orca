@@ -567,11 +567,6 @@ NSString* ORProcessModelNextHeartBeatChanged			= @"ORProcessModelNextHeartBeatCh
     }
 }
 
-//- (BOOL) selectionAllowed
-//{
-//    return ![self processRunning];
-//}
-
 - (BOOL) changesAllowed
 {
     return ![gSecurity isLocked:ORDocumentLock] && ![self processRunning];
@@ -598,6 +593,13 @@ NSString* ORProcessModelNextHeartBeatChanged			= @"ORProcessModelNextHeartBeatCh
 
 
 #pragma mark ¥¥¥Sample Timing Control
+- (void) pollNow
+{
+	if(processRunning){
+		sampleGateOpen = YES;
+	}
+}
+
 - (BOOL) sampleGateOpen
 {
 	return sampleGateOpen;

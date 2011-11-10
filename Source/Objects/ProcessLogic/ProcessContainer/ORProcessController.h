@@ -43,6 +43,7 @@
 	IBOutlet NSButton* 	removeAddressButton;
 	IBOutlet NSTextField*   nextHeartbeatField;
     IBOutlet NSImageView*	heartbeatImage;
+    IBOutlet NSButton* pollNowButton;
 
     NSImage* descendingSortingImage;
     NSImage* ascendingSortingImage;
@@ -76,6 +77,7 @@
 - (void) doUpdate:(NSNotification*)aNote;
 - (void) nextHeartBeatChanged:(NSNotification*)aNote;
 - (void) setHeartbeatImage;
+- (void) updatePollingButton;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) sendOnStopAction:(id)sender;
@@ -92,6 +94,7 @@
 - (IBAction) viewProcessCenter:(id)sender;
 - (IBAction) addAddress:(id)sender;
 - (IBAction) removeAddress:(id)sender;
+- (IBAction) pollNow:(id)sender;
 
 #pragma mark ¥¥¥Data Source
 - (id)  tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex;
