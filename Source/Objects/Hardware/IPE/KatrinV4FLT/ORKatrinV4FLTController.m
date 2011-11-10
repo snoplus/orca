@@ -78,7 +78,7 @@
 	[(ORTimeAxis*)[timeRatePlot xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 	[aPlot release];
 
-	[rate0 setNumber:22 height:10 spacing:7.5];
+	[rate0 setNumber:24 height:10 spacing:6];
 
 	int i;
 	for(i=0;i<kNumV4FLTChannels;i++){
