@@ -69,6 +69,8 @@
 		[aPlot setLineColor:theColors[i]];
 		[plotter addPlot: aPlot];
 		[(ORTimeAxis*)[plotter xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
+		[[plotter yAxis] setInteger: NO];
+
 		[aPlot release]; 
 		[plotter setPlot:i name:[NSString stringWithFormat:@"#%d",i+1]];
 	}
