@@ -420,7 +420,7 @@ done_broad:
     id retVal = [[[ORVXI11IPDevice alloc] init] autorelease];
     if (retVal == nil) return retVal;
     NSArray* components = [astr componentsSeparatedByString:sep];
-    if ([components count] != 4) return nil;
+    if ([components count] != 4) return retVal;
     NSCharacterSet* trimSet = [NSCharacterSet whitespaceAndNewlineCharacterSet];
     [retVal setManufacturer:[[components objectAtIndex:0] stringByTrimmingCharactersInSet:trimSet]];
     [retVal setModel:[[components objectAtIndex:1] stringByTrimmingCharactersInSet:trimSet]];
