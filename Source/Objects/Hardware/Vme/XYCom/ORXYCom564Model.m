@@ -121,6 +121,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     [self setOperationMode:kAutoscanning];
     [self setAutoscanMode:k0to64];   
     [self _stopPolling];
+    [self setPollingState:0.0];
     [[self undoManager] enableUndoRegistration];    
     return self;
 }
@@ -240,7 +241,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 
 - (void) resetBoard
 {
-    uint8_t val = 0x11;
+    uint8_t val = 0x3;
     // reset the LEDs
     [self write:val atRegisterIndex:kStatusControl];
     // Reset the IRQs
@@ -267,7 +268,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
         output = [output stringByAppendingFormat:@"%c",(char)val];
         
     }
-    NSLog(@"VME-564 Crate %i: Slot: %i\n",[self crate],[self slot]);
+    NSLog(@"VME-564 Crate %i: Slot: %i\n",[self crateNumber],[self slot]);
     NSLog(@"  Module ID: %@\n",output);
 }
 
@@ -487,6 +488,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
         if (i>=channelsToRead) {
             [chanADCVals replaceObjectAtIndex:i withObject:[NSNumber numberWithShort:0]];
         } else {
+            readOut[i] = ((readOut[i] & 0xFF) << 8) | (readOut[i] >> 8);
             [chanADCVals replaceObjectAtIndex:i withObject:[NSNumber numberWithShort:readOut[i]]];            
         }
     }
@@ -605,7 +607,9 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_pollAllChannels) object:nil];
 	if(pollingState!=0){
 		[self performSelector:@selector(_pollAllChannels) withObject:nil afterDelay:pollingState];
-	}
+	} else {
+        [self _stopPolling];
+    }
 }
 - (BOOL) isPolling
 {
@@ -656,7 +660,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     int headernumber = 3;
     uint32_t data[headernumber+channelsToRead];
     
-    data[1] = (([self crateNumber]&0x01e)<<21) |  ([self slot]&0xf);
+    data[1] = (([self crateNumber]&0x01e)<<21) |  (([self slot]&0x1f) << 16);
     
     //get the time(UT!)
     time_t	ut_time;
@@ -684,7 +688,8 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     
     [[self undoManager] disableUndoRegistration];
     [self _setChannelGains:[decoder decodeObjectForKey:@"kORXYCom564chanGains"]];
-    [self _setChannelADCValues:[decoder decodeObjectForKey:@"kORXYCom564chanADCValues"]];    
+    [self _setChannelADCValues:[decoder decodeObjectForKey:@"kORXYCom564chanADCValues"]];
+    // The super decoder handles the address Modifier output
     if ([self addressModifier] == 0x29) {
         [self setReadoutMode:kA16];
     } else {
@@ -692,7 +697,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     }
     [self setOperationMode:[decoder decodeIntForKey:@"kORXYCom564OperationMode"]];    
     [self setAutoscanMode:[decoder decodeIntForKey:@"kORXYCom564AutoscanMode"]];
-    [self setPollingState:[decoder decodeIntForKey:@"kORXYCom564PollingState"]]; 
+    [self setPollingState:[decoder decodeDoubleForKey:@"kORXYCom564PollingState"]]; 
     [self setShipRecords:[decoder decodeBoolForKey:@"kORXYCom564ShipRecords"]];     
     [[self undoManager] enableUndoRegistration];
 		
@@ -705,7 +710,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     [encoder encodeObject:channelGains forKey:@"kORXYCom564chanGains"];
     [encoder encodeInt:[self operationMode] forKey:@"kORXYCom564OperationMode"];    
     [encoder encodeInt:[self autoscanMode] forKey:@"kORXYCom564AutoscanMode"];
-    [encoder encodeInt:pollingState forKey:@"kORXYCom564PollingState"];        
+    [encoder encodeDouble:pollingState forKey:@"kORXYCom564PollingState"];        
     [encoder encodeObject:chanADCVals forKey:@"kORXYCom564chanADCValues"]; 
     [encoder encodeBool:shipRecords forKey:@"kORXYCom564ShipRecords"];
 }

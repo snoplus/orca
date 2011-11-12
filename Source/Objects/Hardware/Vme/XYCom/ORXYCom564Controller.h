@@ -64,7 +64,7 @@
     
     IBOutlet NSTableView*   adcCountsAndChannels;
     
-    IBOutlet NSPopUpButton*	pollingState;
+    IBOutlet NSTextField*	pollingState;
 	 
 }
 

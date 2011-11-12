@@ -120,15 +120,18 @@
 - (void) updateWindow
 {
     [super updateWindow];
+    [self populatePopups];
     [self baseAddressChanged:nil];
     [self slotChanged:nil];
     [self lockChanged:nil];
     [self readoutModeChanged:nil];
     [self operationModeChanged:nil];    
-    [self autoscanModeChanged:nil];
     [self channelGainsChanged:nil]; 
     [self displayRawChanged:nil];
-    [self pollingActivityChanged:nil];    
+    [self pollingActivityChanged:nil]; 
+    [self pollingStateChanged:nil];
+    [self shipRecordsChanged:nil];    
+    [self autoscanModeChanged:nil];    
 }
 #pragma mark •••Interface Management
 
@@ -147,7 +150,7 @@
 
 - (void) pollingStateChanged:(NSNotification*)aNotification
 {
-	[pollingState selectItemAtIndex:[pollingState indexOfItemWithTag:[model pollingState]]];
+	[pollingState setFloatValue:[model pollingState]];
 }
 
 - (void) lockChanged:(NSNotification*)aNotification
@@ -335,7 +338,7 @@
 
 - (IBAction) setPollingAction:(id)sender
 {
-    [model setPollingState:(NSTimeInterval)[[sender selectedItem] tag]];
+    [model setPollingState:(NSTimeInterval)[sender floatValue]];
 }
 
 - (IBAction) read:(id) pSender
