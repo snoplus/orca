@@ -32,7 +32,8 @@
 
 {
 	IBOutlet NSTableView* availableHardware;
-	IBOutlet NSButton* refreshButton;    
+	IBOutlet NSButton* refreshButton;
+    IBOutlet NSProgressIndicator* refreshIndicate;
 }
 
 #pragma mark •••Initialization

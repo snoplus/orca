@@ -64,6 +64,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(VXI11HardwareFinderController);
 - (void) refreshHardwareAction:(id)sender
 {
     [[ORVXI11HardwareFinder sharedVXI11HardwareFinder] refresh];
+    [refreshButton setEnabled:NO];
+    [refreshIndicate startAnimation:self];
 }
 
 #pragma mark •••Interface Management
@@ -73,6 +75,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(VXI11HardwareFinderController);
 
 - (void) hardwareChanged:(NSNotification *)aNote
 {
+    [refreshIndicate stopAnimation:self];
+    [refreshButton setEnabled:YES];
     [availableHardware reloadData];
 }
 
