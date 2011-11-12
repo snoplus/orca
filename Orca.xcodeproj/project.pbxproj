@@ -2551,6 +2551,12 @@
 		9CF2C1BA0CC195E2002B279B /* ORL8013CrateModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CF2C1B00CC195E1002B279B /* ORL8013CrateModel.h */; };
 		9CF2C1BB0CC195E2002B279B /* ORL8013CrateModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CF2C1B10CC195E1002B279B /* ORL8013CrateModel.m */; };
 		B322A309146D64D000491347 /* ORTcpIpProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = B322A308146D64D000491347 /* ORTcpIpProtocol.h */; };
+		B33FBC9B146F35E90046A733 /* ORTTCPX400DPController.h in Headers */ = {isa = PBXBuildFile; fileRef = B33FBC95146F35E90046A733 /* ORTTCPX400DPController.h */; };
+		B33FBC9C146F35E90046A733 /* ORTTCPX400DPController.m in Sources */ = {isa = PBXBuildFile; fileRef = B33FBC96146F35E90046A733 /* ORTTCPX400DPController.m */; };
+		B33FBC9D146F35E90046A733 /* ORTTCPX400DPModel.h in Headers */ = {isa = PBXBuildFile; fileRef = B33FBC97146F35E90046A733 /* ORTTCPX400DPModel.h */; };
+		B33FBC9E146F35E90046A733 /* ORTTCPX400DPModel.m in Sources */ = {isa = PBXBuildFile; fileRef = B33FBC98146F35E90046A733 /* ORTTCPX400DPModel.m */; };
+		B33FBC9F146F35E90046A733 /* TTCPX400DP.nib in Resources */ = {isa = PBXBuildFile; fileRef = B33FBC99146F35E90046A733 /* TTCPX400DP.nib */; };
+		B33FBCA0146F35E90046A733 /* TTCPX400DP.tif in Resources */ = {isa = PBXBuildFile; fileRef = B33FBC9A146F35E90046A733 /* TTCPX400DP.tif */; };
 		CE0D70B4146812E000B241D8 /* hardwareFinder.tiff in Resources */ = {isa = PBXBuildFile; fileRef = CE0D70B3146812E000B241D8 /* hardwareFinder.tiff */; };
 		CE10F0111451674C0084C15D /* ORXYCom200Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = CE10F005145167450084C15D /* ORXYCom200Controller.h */; };
 		CE10F0121451674C0084C15D /* ORXYCom200Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = CE10F006145167460084C15D /* ORXYCom200Controller.m */; };
@@ -5247,6 +5253,12 @@
 		9CF2C1B00CC195E1002B279B /* ORL8013CrateModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORL8013CrateModel.h; path = "Source/Objects/Hardware/Camac/L8013 Crate/ORL8013CrateModel.h"; sourceTree = SOURCE_ROOT; };
 		9CF2C1B10CC195E1002B279B /* ORL8013CrateModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORL8013CrateModel.m; path = "Source/Objects/Hardware/Camac/L8013 Crate/ORL8013CrateModel.m"; sourceTree = SOURCE_ROOT; };
 		B322A308146D64D000491347 /* ORTcpIpProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORTcpIpProtocol.h; sourceTree = "<group>"; };
+		B33FBC95146F35E90046A733 /* ORTTCPX400DPController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORTTCPX400DPController.h; path = Source/Objects/Hardware/Internet/TTCPX400DP/ORTTCPX400DPController.h; sourceTree = SOURCE_ROOT; };
+		B33FBC96146F35E90046A733 /* ORTTCPX400DPController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORTTCPX400DPController.m; path = Source/Objects/Hardware/Internet/TTCPX400DP/ORTTCPX400DPController.m; sourceTree = SOURCE_ROOT; };
+		B33FBC97146F35E90046A733 /* ORTTCPX400DPModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORTTCPX400DPModel.h; path = Source/Objects/Hardware/Internet/TTCPX400DP/ORTTCPX400DPModel.h; sourceTree = SOURCE_ROOT; };
+		B33FBC98146F35E90046A733 /* ORTTCPX400DPModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORTTCPX400DPModel.m; path = Source/Objects/Hardware/Internet/TTCPX400DP/ORTTCPX400DPModel.m; sourceTree = SOURCE_ROOT; };
+		B33FBC99146F35E90046A733 /* TTCPX400DP.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = TTCPX400DP.nib; path = Source/Objects/Hardware/Internet/TTCPX400DP/TTCPX400DP.nib; sourceTree = SOURCE_ROOT; };
+		B33FBC9A146F35E90046A733 /* TTCPX400DP.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = TTCPX400DP.tif; path = Source/Objects/Hardware/Internet/TTCPX400DP/TTCPX400DP.tif; sourceTree = SOURCE_ROOT; };
 		CE0D70B3146812E000B241D8 /* hardwareFinder.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = hardwareFinder.tiff; path = "../Main Dialogs/HardwareFinder/hardwareFinder.tiff"; sourceTree = "<group>"; };
 		CE10F005145167450084C15D /* ORXYCom200Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORXYCom200Controller.h; path = Source/Objects/Hardware/Vme/XYCom/ORXYCom200Controller.h; sourceTree = SOURCE_ROOT; };
 		CE10F006145167460084C15D /* ORXYCom200Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORXYCom200Controller.m; path = Source/Objects/Hardware/Vme/XYCom/ORXYCom200Controller.m; sourceTree = SOURCE_ROOT; };
@@ -9289,6 +9301,7 @@
 		84B28D4C0F4C651C00E2B056 /* Internet */ = {
 			isa = PBXGroup;
 			children = (
+				B322A2E4146D642400491347 /* TTCPX400DP */,
 				8494C01C1316CEBA00151E7B /* BootBar */,
 				84BA5F240F70388C00CF92D6 /* ZupSupply */,
 				84B28D600F4C658400E2B056 /* NplPicoCoulombMeter */,
@@ -10924,6 +10937,20 @@
 			path = "Source/Objects/Hardware/Camac/L8013 Crate";
 			sourceTree = SOURCE_ROOT;
 		};
+		B322A2E4146D642400491347 /* TTCPX400DP */ = {
+			isa = PBXGroup;
+			children = (
+				B33FBC95146F35E90046A733 /* ORTTCPX400DPController.h */,
+				B33FBC96146F35E90046A733 /* ORTTCPX400DPController.m */,
+				B33FBC97146F35E90046A733 /* ORTTCPX400DPModel.h */,
+				B33FBC98146F35E90046A733 /* ORTTCPX400DPModel.m */,
+				B33FBC99146F35E90046A733 /* TTCPX400DP.nib */,
+				B33FBC9A146F35E90046A733 /* TTCPX400DP.tif */,
+			);
+			name = TTCPX400DP;
+			path = TTCDX400DP;
+			sourceTree = "<group>";
+		};
 		CE68866C0D0CE0E400FA4158 /* PlugIns */ = {
 			isa = PBXGroup;
 			children = (
@@ -12355,6 +12382,8 @@
 				CE6CCDD314672C670099238D /* vxi11_user.h in Headers */,
 				CE6CCDE2146732D90099238D /* vxi11.h in Headers */,
 				B322A309146D64D000491347 /* ORTcpIpProtocol.h in Headers */,
+				B33FBC9B146F35E90046A733 /* ORTTCPX400DPController.h in Headers */,
+				B33FBC9D146F35E90046A733 /* ORTTCPX400DPModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13139,6 +13168,8 @@
 				CE6CCDCF14672BD80099238D /* patch_vxi11_h.sh in Resources */,
 				CE6CCDD514672C670099238D /* vxi11.x in Resources */,
 				CE0D70B4146812E000B241D8 /* hardwareFinder.tiff in Resources */,
+				B33FBC9F146F35E90046A733 /* TTCPX400DP.nib in Resources */,
+				B33FBCA0146F35E90046A733 /* TTCPX400DP.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14029,6 +14060,8 @@
 				CE6CCDDE146732D90099238D /* vxi11_clnt.c in Sources */,
 				CE6CCDE1146732D90099238D /* vxi11_xdr.c in Sources */,
 				CEB1A5C514673AB6001381E6 /* vxi11_user.m in Sources */,
+				B33FBC9C146F35E90046A733 /* ORTTCPX400DPController.m in Sources */,
+				B33FBC9E146F35E90046A733 /* ORTTCPX400DPModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
