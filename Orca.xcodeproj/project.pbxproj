@@ -2551,6 +2551,7 @@
 		9CF2C1BA0CC195E2002B279B /* ORL8013CrateModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CF2C1B00CC195E1002B279B /* ORL8013CrateModel.h */; };
 		9CF2C1BB0CC195E2002B279B /* ORL8013CrateModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CF2C1B10CC195E1002B279B /* ORL8013CrateModel.m */; };
 		B322A309146D64D000491347 /* ORTcpIpProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = B322A308146D64D000491347 /* ORTcpIpProtocol.h */; };
+		B33FBC93146F2A6A0046A733 /* edu.washington.npl.orca.VXIHardware.plist in Resources */ = {isa = PBXBuildFile; fileRef = B33FBC92146F2A6A0046A733 /* edu.washington.npl.orca.VXIHardware.plist */; };
 		B33FBC9B146F35E90046A733 /* ORTTCPX400DPController.h in Headers */ = {isa = PBXBuildFile; fileRef = B33FBC95146F35E90046A733 /* ORTTCPX400DPController.h */; };
 		B33FBC9C146F35E90046A733 /* ORTTCPX400DPController.m in Sources */ = {isa = PBXBuildFile; fileRef = B33FBC96146F35E90046A733 /* ORTTCPX400DPController.m */; };
 		B33FBC9D146F35E90046A733 /* ORTTCPX400DPModel.h in Headers */ = {isa = PBXBuildFile; fileRef = B33FBC97146F35E90046A733 /* ORTTCPX400DPModel.h */; };
@@ -5253,6 +5254,7 @@
 		9CF2C1B00CC195E1002B279B /* ORL8013CrateModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORL8013CrateModel.h; path = "Source/Objects/Hardware/Camac/L8013 Crate/ORL8013CrateModel.h"; sourceTree = SOURCE_ROOT; };
 		9CF2C1B10CC195E1002B279B /* ORL8013CrateModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORL8013CrateModel.m; path = "Source/Objects/Hardware/Camac/L8013 Crate/ORL8013CrateModel.m"; sourceTree = SOURCE_ROOT; };
 		B322A308146D64D000491347 /* ORTcpIpProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORTcpIpProtocol.h; sourceTree = "<group>"; };
+		B33FBC92146F2A6A0046A733 /* edu.washington.npl.orca.VXIHardware.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = edu.washington.npl.orca.VXIHardware.plist; sourceTree = "<group>"; };
 		B33FBC95146F35E90046A733 /* ORTTCPX400DPController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORTTCPX400DPController.h; path = Source/Objects/Hardware/Internet/TTCPX400DP/ORTTCPX400DPController.h; sourceTree = SOURCE_ROOT; };
 		B33FBC96146F35E90046A733 /* ORTTCPX400DPController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORTTCPX400DPController.m; path = Source/Objects/Hardware/Internet/TTCPX400DP/ORTTCPX400DPController.m; sourceTree = SOURCE_ROOT; };
 		B33FBC97146F35E90046A733 /* ORTTCPX400DPModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORTTCPX400DPModel.h; path = Source/Objects/Hardware/Internet/TTCPX400DP/ORTTCPX400DPModel.h; sourceTree = SOURCE_ROOT; };
@@ -10966,6 +10968,7 @@
 				CE7328AA1466EEDE00A50AE9 /* ORVXI11HardwareFinder.m */,
 				CE7328AB1466EEDE00A50AE9 /* ORVXI11HardwareFinderController.h */,
 				CE7328AC1466EEDE00A50AE9 /* ORVXI11HardwareFinderController.m */,
+				B33FBC92146F2A6A0046A733 /* edu.washington.npl.orca.VXIHardware.plist */,
 				CE7328AD1466EEDE00A50AE9 /* VXI11HardwareFinder.nib */,
 			);
 			path = HardwareFinder;
@@ -13168,6 +13171,7 @@
 				CE6CCDCF14672BD80099238D /* patch_vxi11_h.sh in Resources */,
 				CE6CCDD514672C670099238D /* vxi11.x in Resources */,
 				CE0D70B4146812E000B241D8 /* hardwareFinder.tiff in Resources */,
+				B33FBC93146F2A6A0046A733 /* edu.washington.npl.orca.VXIHardware.plist in Resources */,
 				B33FBC9F146F35E90046A733 /* TTCPX400DP.nib in Resources */,
 				B33FBCA0146F35E90046A733 /* TTCPX400DP.tif in Resources */,
 			);

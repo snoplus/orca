@@ -22,6 +22,16 @@
 #import "ORVXI11HardwareFinderController.h"
 #import "ORVXI11HardwareFinder.h"
 #import "SynthesizeSingleton.h"
+#import "ORGroup.h"
+#import "ObjectFactory.h"
+
+#define ORVXI11SupportedHardwarePlist @"edu.washington.npl.orca.VXIHardware"
+
+@interface ORVXI11HardwareFinderController (private)
+- (void) _setCreatedObjects:(NSArray*)objs;
+- (void) _releaseCreatedObjects;
+- (NSString*) _stringOfClassToBuildOfDevice:(NSString*) manufacturer model:(NSString*) model;
+@end
 
 @implementation ORVXI11HardwareFinderController
 
@@ -37,6 +47,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(VXI11HardwareFinderController);
 - (void) dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [self _releaseCreatedObjects];
+    [supportedVXIObjects release];
     [super dealloc];
 }
 
@@ -45,6 +57,36 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(VXI11HardwareFinderController);
 	
     [self registerNotificationObservers];
     [self updateWindow];
+    
+    // Register the table view as being a drag source
+    [availableHardware setDraggingSourceOperationMask:NSDragOperationCopy forLocal:YES];
+    //[availableHardware registerForDraggedTypes:[NSArray arrayWithObject:ORGroupDragBoardItem] ];  
+}
+
+- (void) _setCreatedObjects:(NSArray *)objs
+{
+    [objs retain];
+    [createdObjects release];
+    createdObjects = objs;
+}
+
+- (void) _releaseCreatedObjects
+{
+    int i;
+    for (i=0; i<[createdObjects count]; i++) {
+        [(id)[[createdObjects objectAtIndex:i] intValue] release];
+    }
+    [self _setCreatedObjects:nil];
+}
+
+- (NSString*) _stringOfClassToBuildOfDevice:(NSString*) manufacturer model:(NSString*) model
+{
+    if (!supportedVXIObjects) {
+        // Get the dictionary from the plist file
+        NSString*   vxiSupportedDevicesPlistPath = [[NSBundle mainBundle] pathForResource:ORVXI11SupportedHardwarePlist ofType: @"plist"];
+        supportedVXIObjects = [[NSDictionary dictionaryWithContentsOfFile: vxiSupportedDevicesPlistPath] retain];
+    }
+    return [[supportedVXIObjects objectForKey:manufacturer] objectForKey:model];
 }
 
 #pragma mark •••Accessors
@@ -108,4 +150,74 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(VXI11HardwareFinderController);
 {
 }
 
+#pragma mark •••Drag and Drop Methods
+- (BOOL)tableView:(NSTableView *)aTableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pboard
+{
+
+    NSMutableArray* pointerArray = [NSMutableArray array];    
+    NSDictionary* aDict = [[ORVXI11HardwareFinder sharedVXI11HardwareFinder] availableHardware];    
+    NSArray* selectedObjects = [aDict objectsForKeys:[[aDict allKeys] objectsAtIndexes:rowIndexes]
+                                                                        notFoundMarker:[ORVXI11IPDevice deviceForString:@""]];
+    
+    //load the saved objects pointers into the paste board.    
+    int i;
+    for (i=0;i<[selectedObjects count];i++)
+    {
+        ORVXI11IPDevice* dev = [selectedObjects objectAtIndex:i];
+        NSString* className = [self _stringOfClassToBuildOfDevice:[dev manufacturer] model:[dev model]];
+        if (!className) continue;
+        id obj = [[ObjectFactory makeObject:className] retain];
+        if ([obj respondsToSelector:@selector(setIpAddress:)]) {
+            [obj setIpAddress:[dev ipAddress]];
+        }
+        NSNumber* num = [NSNumber numberWithLong:(unsigned long)obj];
+        [pointerArray addObject:num];
+    }
+    if ([pointerArray count] == 0) return NO;
+    
+    [pboard declareTypes:[NSArray arrayWithObjects:ORGroupDragBoardItem, nil] owner:self];
+    [pboard setData:[NSData data] forType:ORObjArrayPtrPBType];    
+    [self _setCreatedObjects:pointerArray];
+    return YES;
+}
+
+
+- (void)pasteboard:(NSPasteboard *)sender provideDataForType:(NSString *)type
+{
+	//load the saved objects pointers into the paste board.
+
+    NSMutableData *itemData = [NSMutableData data];
+    NSKeyedArchiver* archiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:itemData];
+    [archiver setOutputFormat:NSPropertyListXMLFormat_v1_0];
+    [archiver encodeObject:createdObjects forKey:ORObjArrayPtrPBType];
+    [archiver finishEncoding];
+    [archiver release];
+    
+    [sender setData:itemData forType:@"ORGroupDragBoardItem"];
+}
+
+- (void)draggingSession:(NSDraggingSession *)session endedAtPoint:(NSPoint)screenPoint operation:(NSDragOperation)operation
+{
+    // The dragging session has ended, we can release the objects we had.
+    [self _releaseCreatedObjects];
+}
+
 @end
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_7
+// This class is to get notification of the end of the drag.  It is only necessary
+// in versions < 10.7, because 10.7 has implemented a delegate call-back for NSTableView
+// Since for versions previous to 10.7, NSTableView implemented the informal NSDraggingSource
+// protocol, we can derive and overload the function that is called at the end of the 
+// dragging session.
+// M. Marino
+@implementation ORTableViewWithDropNotify
+- (void)draggingSession:(NSDraggingSession *)session endedAtPoint:(NSPoint)screenPoint operation:(NSDragOperation)operation
+{
+    [super draggingSession:session endedAtPoint:screenPoint operation:operation];
+    id deleg = [self delegate];
+    if ([deleg respondsToSelector:@selector(draggingSession:endedAtPoint:operation:)]) {
+        [deleg draggingSession:session endedAtPoint:screenPoint operation:operation];
+    }
+}
+@end
+#endif
