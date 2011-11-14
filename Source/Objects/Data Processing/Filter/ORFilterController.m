@@ -521,8 +521,8 @@
 {
 	id anArray;
     id ident = [aCol identifier];
-    if([ident isEqualToString:@"iValueHex"])ident = @"iValue"; //fixes an XCode 4 warning
-    else if([ident isEqualToString:@"valueHex"])ident = @"value"; //fixes an XCode 4 warning
+    if([ident isEqualToString:@"value"])ident = @"iValue"; //fixes an XCode 4 warning
+    else if([ident isEqualToString:@"valueHex"])ident = @"iValue"; //fixes an XCode 4 warning
 	if(aTable == inputVariablesTableView) anArray= [model inputValues];
 	else								  anArray= [model outputValues];
 	return [[anArray objectAtIndex:aRow] objectForKey:ident];
@@ -531,7 +531,10 @@
 - (void) tableView:(NSTableView*)aTable setObjectValue:(id)aData forTableColumn:(NSTableColumn*)aCol row:(int)aRow
 {
 	if(aTable == inputVariablesTableView) {
-		[[[model inputValues] objectAtIndex:aRow] setObject: aData forKey:[aCol identifier]];	
+		id ident = [aCol identifier];
+		if([ident isEqualToString:@"value"])ident = @"iValue"; //fixes an XCode 4 warning
+		else if([ident isEqualToString:@"valueHex"])ident = @"iValue"; //fixes an XCode 4 warning
+		[[[model inputValues] objectAtIndex:aRow] setObject: aData forKey:ident];	
 	}
 }
 
