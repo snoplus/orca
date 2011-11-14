@@ -24,6 +24,7 @@
 #import "SynthesizeSingleton.h"
 #import "ORGroup.h"
 #import "ObjectFactory.h"
+@class NSDraggingSession;
 
 #define ORVXI11SupportedHardwarePlist @"edu.washington.npl.orca.VXIHardware"
 
@@ -196,16 +197,18 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(VXI11HardwareFinderController);
     [sender setData:itemData forType:@"ORGroupDragBoardItem"];
 }
 
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+#if MAC_OS_X_VERSION_MIN_REQUIRED > MAC_OS_X_VERSION_10_6
 - (void)draggingSession:(NSDraggingSession *)session endedAtPoint:(NSPoint)screenPoint operation:(NSDragOperation)operation
+#else
+- (void)draggedImage:(NSImage *)anImage endedAt:(NSPoint)aPoint operation:(NSDragOperation)operation
+#endif
 {
     // The dragging session has ended, we can release the objects we had.
     [self _releaseCreatedObjects];
 }
-#endif
 
 @end
-#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_7
+
 // This class is to get notification of the end of the drag.  It is only necessary
 // in versions < 10.7, because 10.7 has implemented a delegate call-back for NSTableView
 // Since for versions previous to 10.7, NSTableView implemented the informal NSDraggingSource
@@ -213,7 +216,10 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(VXI11HardwareFinderController);
 // dragging session.
 // M. Marino
 @implementation ORTableViewWithDropNotify
+
+#if MAC_OS_X_VERSION_MIN_REQUIRED > MAC_OS_X_VERSION_10_6
 - (void)draggingSession:(NSDraggingSession *)session endedAtPoint:(NSPoint)screenPoint operation:(NSDragOperation)operation
+
 {
     [super draggingSession:session endedAtPoint:screenPoint operation:operation];
     id deleg = [self delegate];
@@ -221,5 +227,14 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(VXI11HardwareFinderController);
         [deleg draggingSession:session endedAtPoint:screenPoint operation:operation];
     }
 }
-@end
+#else
+- (void)draggedImage:(NSImage *)anImage endedAt:(NSPoint)aPoint operation:(NSDragOperation)operation
+{
+    [super draggedImage:anImage endedAt:aPoint operation:operation];    
+    id deleg = [self delegate];
+    if ([deleg respondsToSelector:@selector(draggedImage:endedAt:operation:)]) {
+        [deleg draggedImage:anImage endedAt:aPoint operation:operation];
+    }
+}
 #endif
+@end

@@ -24,7 +24,6 @@
 @class ORVXI11HardwareFinder;
 @class ORScriptView;
 
-#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_7
 // This class is to get notification of the end of the drag.  It is only necessary
 // in versions < 10.7, because 10.7 has implemented a delegate call-back for NSTableView
 // Since for versions previous to 10.7, NSTableView implemented the informal NSDraggingSource
@@ -35,7 +34,6 @@
 {
 }
 @end
-#endif
 
 #if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 @interface ORVXI11HardwareFinderController : NSWindowController <NSTableViewDataSource>
