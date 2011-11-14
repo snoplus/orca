@@ -21,6 +21,10 @@
 #import "ORTTCPX400DPController.h"
 #import "ORTTCPX400DPModel.h"
 
+@interface ORTTCPX400DPController (private)
+- (void) _buildPopUpButtons;
+@end
+
 @implementation ORTTCPX400DPController
 - (id) init
 {
@@ -52,12 +56,23 @@
     [notifyCenter addObserver : self
 					 selector : @selector(ipChanged:)
 						 name : ORTTCPX400DPIpHasChanged
-						object: nil];    
+						object: nil];  
+    
+    [notifyCenter addObserver : self
+					 selector : @selector(generalReadbackChanged:)
+						 name : ORTTCPX400DPGeneralReadbackHasChanged
+						object: nil];        
+    
+    [notifyCenter addObserver : self
+					 selector : @selector(connectionChanged:)
+						 name : ORTTCPX400DPConnectionHasChanged
+						object: nil];            
 }
 
 - (void) awakeFromNib
 {
 	[super awakeFromNib];
+    [self _buildPopUpButtons];
 //	[ipNumberComboBox reloadData];
 }
 
@@ -66,6 +81,19 @@
     [ super updateWindow ];
     [self lockChanged:nil];
     [self ipChanged:nil];
+    [self generalReadbackChanged:nil];
+    [self connectionChanged:nil];
+}
+
+- (void) _buildPopUpButtons
+{
+    if ([commandPopUp numberOfItems] == [model numberOfCommands]) return;
+    [commandPopUp removeAllItems];
+    int i;
+    for (i=0; i<[model numberOfCommands]; i++) {
+        [commandPopUp addItemWithTitle:[model commandName:i]];
+        [[commandPopUp itemAtIndex:i] setTag:i];
+    }
 }
 
 #pragma mark •••Notifications
@@ -80,6 +108,17 @@
     [ipAddressBox setStringValue:[model ipAddress]];
 }
 
+- (void) generalReadbackChanged:(NSNotification *)aNote
+{
+    [readBackText setStringValue:[model generalReadback]];
+    //[sendCommandButton setEnabled:YES];    
+}
+
+- (void) connectionChanged:(NSNotification *)aNote
+{
+    BOOL isConnected = [model isConnected];
+    [connectButton setEnabled:!isConnected];
+}
 
 #pragma mark •••Actions
 - (IBAction) lockAction:(id) sender
@@ -95,6 +134,27 @@
 	//[self updateButtons];
 }
 
+- (IBAction) commandPulldownAction:(id)sender
+{
+    int selectedRow = [[sender selectedItem] tag];
+    [inputValueText setEnabled:[model commandTakesInput:selectedRow]];
+    [outputNumberPopUp setEnabled:[model commandTakesOutputNumber:selectedRow ]];    
+}
+
+- (IBAction) sendCommandAction:(id)sender
+{
+    [self endEditing];
+    int cmd = [[commandPopUp selectedItem] tag];
+    int output = [[outputNumberPopUp selectedItem] tag];
+    float input = [inputValueText floatValue];
+    [model writeCommand:cmd withInput:input withOutputNumber:output];
+    //[sendCommandButton setEnabled:NO];
+}
+
+- (IBAction)connectAction:(id)sender
+{
+    [model connect];
+}
 @end
 
 

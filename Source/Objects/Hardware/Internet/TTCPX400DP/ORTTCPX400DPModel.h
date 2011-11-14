@@ -75,7 +75,7 @@ typedef enum {
   kSetSRE,
   kGetSRE,
   kGetSTB,
-  kWaitUntilComplete,
+  //kWaitUntilComplete,
   kGetID,
   kGetBusAddress,
   kNumTTCPX400Cmds
@@ -87,16 +87,29 @@ typedef enum {
 	BOOL isConnected;
 	id delegate;
     NSUInteger port;
-    NSString* mostRecentData;
+    NSString* generalReadback;
+    NSMutableArray* dataQueue;
 }
-@property (nonatomic, retain) NSString* mostRecentData;
+
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 
 - (NSString*) serialNumber;
+
+- (void) writeCommand:(ETTCPX400DPCmds)cmd withInput:(float)input withOutputNumber:(int)output;
+
+- (NSString*) commandStringForCommand:(ETTCPX400DPCmds)cmd withInput:(float)input withOutputNumber:(int)output;
+
+#pragma mark ***General Querying
+- (NSString*) generalReadback;
+- (int) numberOfCommands;
+- (NSString*) commandName:(ETTCPX400DPCmds)cmd;
+- (BOOL) commandTakesInput:(ETTCPX400DPCmds)cmd;
+- (BOOL) commandTakesOutputNumber:(ETTCPX400DPCmds)cmd;
 @end
 
 extern NSString* ORTTCPX400DPDataHasArrived;
 extern NSString* ORTTCPX400DPConnectionHasChanged;
 extern NSString* ORTTCPX400DPModelLock;
 extern NSString* ORTTCPX400DPIpHasChanged;
+extern NSString* ORTTCPX400DPGeneralReadbackHasChanged;

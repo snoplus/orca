@@ -24,7 +24,13 @@
 @interface ORTTCPX400DPController : OrcaObjectController 
 {
 	IBOutlet NSButton*		lockButton;
-    IBOutlet NSTextField*    ipAddressBox;
+    IBOutlet NSTextField*   ipAddressBox;
+    IBOutlet NSPopUpButton* commandPopUp;
+    IBOutlet NSPopUpButton* outputNumberPopUp;
+    IBOutlet NSTextField*   inputValueText;    
+    IBOutlet NSTextField*   readBackText;
+    IBOutlet NSButton*      sendCommandButton;    
+    IBOutlet NSButton*      connectButton;     
 }
 
 #pragma mark •••Initialization
@@ -36,10 +42,15 @@
 #pragma mark ***Interface Management
 - (void) lockChanged:(NSNotification*)aNote;
 - (void) ipChanged:(NSNotification*)aNote;
+- (void) connectionChanged:(NSNotification*)aNote;
+- (void) generalReadbackChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 //- (IBAction) passwordFieldAction:(id)sender;
 - (IBAction) lockAction:(id)sender;
+- (IBAction) commandPulldownAction:(id)sender;
+- (IBAction) connectAction:(id)sender;
+- (IBAction) sendCommandAction:(id)sender;
 @end
 
 
