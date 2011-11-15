@@ -138,6 +138,7 @@ static struct ORTTCPX400DPCmdInfo gORTTCPXCmds[kNumTTCPX400Cmds] = {
     [ipAddress release];
     [dataQueue release];
     [generalReadback release];
+	[super dealloc];
 }
 
 - (void) setUpImage
