@@ -1555,6 +1555,21 @@
 		848E3BC909DB0B3E0003F7A2 /* ORMailCenter.h in Headers */ = {isa = PBXBuildFile; fileRef = 848E3BC609DB0B3E0003F7A2 /* ORMailCenter.h */; };
 		848E3BCA09DB0B3E0003F7A2 /* ORMailCenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 848E3BC709DB0B3E0003F7A2 /* ORMailCenter.m */; };
 		848E3BCB09DB0B3E0003F7A2 /* MailCenter.nib in Resources */ = {isa = PBXBuildFile; fileRef = 848E3BC809DB0B3E0003F7A2 /* MailCenter.nib */; };
+		848E59171472B34400A70AB4 /* ORTTCPX400DPController.h in Headers */ = {isa = PBXBuildFile; fileRef = 848E59111472B34400A70AB4 /* ORTTCPX400DPController.h */; };
+		848E59181472B34400A70AB4 /* ORTTCPX400DPController.m in Sources */ = {isa = PBXBuildFile; fileRef = 848E59121472B34400A70AB4 /* ORTTCPX400DPController.m */; };
+		848E59191472B34400A70AB4 /* ORTTCPX400DPModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 848E59131472B34400A70AB4 /* ORTTCPX400DPModel.h */; };
+		848E591A1472B34400A70AB4 /* ORTTCPX400DPModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 848E59141472B34400A70AB4 /* ORTTCPX400DPModel.m */; };
+		848E591B1472B34400A70AB4 /* TTCPX400DP.nib in Resources */ = {isa = PBXBuildFile; fileRef = 848E59151472B34400A70AB4 /* TTCPX400DP.nib */; };
+		848E591C1472B34400A70AB4 /* TTCPX400DP.tif in Resources */ = {isa = PBXBuildFile; fileRef = 848E59161472B34400A70AB4 /* TTCPX400DP.tif */; };
+		848E59271472B35200A70AB4 /* LabJackUE9.nib in Resources */ = {isa = PBXBuildFile; fileRef = 848E591E1472B35200A70AB4 /* LabJackUE9.nib */; };
+		848E59281472B35200A70AB4 /* LabJackUE9.tif in Resources */ = {isa = PBXBuildFile; fileRef = 848E591F1472B35200A70AB4 /* LabJackUE9.tif */; };
+		848E59291472B35200A70AB4 /* NoLabJackUE9DriverHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 848E59201472B35200A70AB4 /* NoLabJackUE9DriverHelp.plist */; };
+		848E592A1472B35200A70AB4 /* ORLabJackUE9Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 848E59211472B35200A70AB4 /* ORLabJackUE9Controller.h */; };
+		848E592B1472B35200A70AB4 /* ORLabJackUE9Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 848E59221472B35200A70AB4 /* ORLabJackUE9Controller.m */; };
+		848E592C1472B35200A70AB4 /* ORLabJackUE9Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 848E59231472B35200A70AB4 /* ORLabJackUE9Decoders.h */; };
+		848E592D1472B35200A70AB4 /* ORLabJackUE9Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 848E59241472B35200A70AB4 /* ORLabJackUE9Decoders.m */; };
+		848E592E1472B35200A70AB4 /* ORLabJackUE9Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 848E59251472B35200A70AB4 /* ORLabJackUE9Model.h */; };
+		848E592F1472B35200A70AB4 /* ORLabJackUE9Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 848E59261472B35200A70AB4 /* ORLabJackUE9Model.m */; };
 		849013C410E27B13007591B5 /* ORPlotLinkController.h in Headers */ = {isa = PBXBuildFile; fileRef = 849013BE10E27B13007591B5 /* ORPlotLinkController.h */; };
 		849013C510E27B13007591B5 /* ORPlotLinkController.m in Sources */ = {isa = PBXBuildFile; fileRef = 849013BF10E27B13007591B5 /* ORPlotLinkController.m */; };
 		849013C610E27B13007591B5 /* ORPlotLinkModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 849013C010E27B13007591B5 /* ORPlotLinkModel.h */; };
@@ -2552,12 +2567,6 @@
 		9CF2C1BB0CC195E2002B279B /* ORL8013CrateModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CF2C1B10CC195E1002B279B /* ORL8013CrateModel.m */; };
 		B322A309146D64D000491347 /* ORTcpIpProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = B322A308146D64D000491347 /* ORTcpIpProtocol.h */; };
 		B33FBC93146F2A6A0046A733 /* edu.washington.npl.orca.VXIHardware.plist in Resources */ = {isa = PBXBuildFile; fileRef = B33FBC92146F2A6A0046A733 /* edu.washington.npl.orca.VXIHardware.plist */; };
-		B33FBC9B146F35E90046A733 /* ORTTCPX400DPController.h in Headers */ = {isa = PBXBuildFile; fileRef = B33FBC95146F35E90046A733 /* ORTTCPX400DPController.h */; };
-		B33FBC9C146F35E90046A733 /* ORTTCPX400DPController.m in Sources */ = {isa = PBXBuildFile; fileRef = B33FBC96146F35E90046A733 /* ORTTCPX400DPController.m */; };
-		B33FBC9D146F35E90046A733 /* ORTTCPX400DPModel.h in Headers */ = {isa = PBXBuildFile; fileRef = B33FBC97146F35E90046A733 /* ORTTCPX400DPModel.h */; };
-		B33FBC9E146F35E90046A733 /* ORTTCPX400DPModel.m in Sources */ = {isa = PBXBuildFile; fileRef = B33FBC98146F35E90046A733 /* ORTTCPX400DPModel.m */; };
-		B33FBC9F146F35E90046A733 /* TTCPX400DP.nib in Resources */ = {isa = PBXBuildFile; fileRef = B33FBC99146F35E90046A733 /* TTCPX400DP.nib */; };
-		B33FBCA0146F35E90046A733 /* TTCPX400DP.tif in Resources */ = {isa = PBXBuildFile; fileRef = B33FBC9A146F35E90046A733 /* TTCPX400DP.tif */; };
 		CE0D70B4146812E000B241D8 /* hardwareFinder.tiff in Resources */ = {isa = PBXBuildFile; fileRef = CE0D70B3146812E000B241D8 /* hardwareFinder.tiff */; };
 		CE10F0111451674C0084C15D /* ORXYCom200Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = CE10F005145167450084C15D /* ORXYCom200Controller.h */; };
 		CE10F0121451674C0084C15D /* ORXYCom200Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = CE10F006145167460084C15D /* ORXYCom200Controller.m */; };
@@ -4129,6 +4138,21 @@
 		848E3BC609DB0B3E0003F7A2 /* ORMailCenter.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORMailCenter.h; path = "Source/Main Dialogs/MailCenter/ORMailCenter.h"; sourceTree = SOURCE_ROOT; };
 		848E3BC709DB0B3E0003F7A2 /* ORMailCenter.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORMailCenter.m; path = "Source/Main Dialogs/MailCenter/ORMailCenter.m"; sourceTree = SOURCE_ROOT; };
 		848E3BC809DB0B3E0003F7A2 /* MailCenter.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = MailCenter.nib; sourceTree = "<group>"; };
+		848E59111472B34400A70AB4 /* ORTTCPX400DPController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORTTCPX400DPController.h; path = Source/Objects/Hardware/Internet/TTCPX400DP/ORTTCPX400DPController.h; sourceTree = SOURCE_ROOT; };
+		848E59121472B34400A70AB4 /* ORTTCPX400DPController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORTTCPX400DPController.m; path = Source/Objects/Hardware/Internet/TTCPX400DP/ORTTCPX400DPController.m; sourceTree = SOURCE_ROOT; };
+		848E59131472B34400A70AB4 /* ORTTCPX400DPModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORTTCPX400DPModel.h; path = Source/Objects/Hardware/Internet/TTCPX400DP/ORTTCPX400DPModel.h; sourceTree = SOURCE_ROOT; };
+		848E59141472B34400A70AB4 /* ORTTCPX400DPModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORTTCPX400DPModel.m; path = Source/Objects/Hardware/Internet/TTCPX400DP/ORTTCPX400DPModel.m; sourceTree = SOURCE_ROOT; };
+		848E59151472B34400A70AB4 /* TTCPX400DP.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = TTCPX400DP.nib; path = Source/Objects/Hardware/Internet/TTCPX400DP/TTCPX400DP.nib; sourceTree = SOURCE_ROOT; };
+		848E59161472B34400A70AB4 /* TTCPX400DP.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = TTCPX400DP.tif; path = Source/Objects/Hardware/Internet/TTCPX400DP/TTCPX400DP.tif; sourceTree = SOURCE_ROOT; };
+		848E591E1472B35200A70AB4 /* LabJackUE9.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = LabJackUE9.nib; path = Source/Objects/Hardware/USB/LabJackUE9/LabJackUE9.nib; sourceTree = SOURCE_ROOT; };
+		848E591F1472B35200A70AB4 /* LabJackUE9.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = LabJackUE9.tif; path = Source/Objects/Hardware/USB/LabJackUE9/LabJackUE9.tif; sourceTree = SOURCE_ROOT; };
+		848E59201472B35200A70AB4 /* NoLabJackUE9DriverHelp.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = NoLabJackUE9DriverHelp.plist; path = Source/Objects/Hardware/USB/LabJackUE9/NoLabJackUE9DriverHelp.plist; sourceTree = SOURCE_ROOT; };
+		848E59211472B35200A70AB4 /* ORLabJackUE9Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORLabJackUE9Controller.h; path = Source/Objects/Hardware/USB/LabJackUE9/ORLabJackUE9Controller.h; sourceTree = SOURCE_ROOT; };
+		848E59221472B35200A70AB4 /* ORLabJackUE9Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORLabJackUE9Controller.m; path = Source/Objects/Hardware/USB/LabJackUE9/ORLabJackUE9Controller.m; sourceTree = SOURCE_ROOT; };
+		848E59231472B35200A70AB4 /* ORLabJackUE9Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORLabJackUE9Decoders.h; path = Source/Objects/Hardware/USB/LabJackUE9/ORLabJackUE9Decoders.h; sourceTree = SOURCE_ROOT; };
+		848E59241472B35200A70AB4 /* ORLabJackUE9Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORLabJackUE9Decoders.m; path = Source/Objects/Hardware/USB/LabJackUE9/ORLabJackUE9Decoders.m; sourceTree = SOURCE_ROOT; };
+		848E59251472B35200A70AB4 /* ORLabJackUE9Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORLabJackUE9Model.h; path = Source/Objects/Hardware/USB/LabJackUE9/ORLabJackUE9Model.h; sourceTree = SOURCE_ROOT; };
+		848E59261472B35200A70AB4 /* ORLabJackUE9Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORLabJackUE9Model.m; path = Source/Objects/Hardware/USB/LabJackUE9/ORLabJackUE9Model.m; sourceTree = SOURCE_ROOT; };
 		849013BE10E27B13007591B5 /* ORPlotLinkController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPlotLinkController.h; path = "Source/Objects/Misc Objects/PlotLink/ORPlotLinkController.h"; sourceTree = SOURCE_ROOT; };
 		849013BF10E27B13007591B5 /* ORPlotLinkController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORPlotLinkController.m; path = "Source/Objects/Misc Objects/PlotLink/ORPlotLinkController.m"; sourceTree = SOURCE_ROOT; };
 		849013C010E27B13007591B5 /* ORPlotLinkModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPlotLinkModel.h; path = "Source/Objects/Misc Objects/PlotLink/ORPlotLinkModel.h"; sourceTree = SOURCE_ROOT; };
@@ -5255,12 +5279,6 @@
 		9CF2C1B10CC195E1002B279B /* ORL8013CrateModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORL8013CrateModel.m; path = "Source/Objects/Hardware/Camac/L8013 Crate/ORL8013CrateModel.m"; sourceTree = SOURCE_ROOT; };
 		B322A308146D64D000491347 /* ORTcpIpProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORTcpIpProtocol.h; sourceTree = "<group>"; };
 		B33FBC92146F2A6A0046A733 /* edu.washington.npl.orca.VXIHardware.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = edu.washington.npl.orca.VXIHardware.plist; sourceTree = "<group>"; };
-		B33FBC95146F35E90046A733 /* ORTTCPX400DPController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORTTCPX400DPController.h; path = Source/Objects/Hardware/Internet/TTCPX400DP/ORTTCPX400DPController.h; sourceTree = SOURCE_ROOT; };
-		B33FBC96146F35E90046A733 /* ORTTCPX400DPController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORTTCPX400DPController.m; path = Source/Objects/Hardware/Internet/TTCPX400DP/ORTTCPX400DPController.m; sourceTree = SOURCE_ROOT; };
-		B33FBC97146F35E90046A733 /* ORTTCPX400DPModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORTTCPX400DPModel.h; path = Source/Objects/Hardware/Internet/TTCPX400DP/ORTTCPX400DPModel.h; sourceTree = SOURCE_ROOT; };
-		B33FBC98146F35E90046A733 /* ORTTCPX400DPModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORTTCPX400DPModel.m; path = Source/Objects/Hardware/Internet/TTCPX400DP/ORTTCPX400DPModel.m; sourceTree = SOURCE_ROOT; };
-		B33FBC99146F35E90046A733 /* TTCPX400DP.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = TTCPX400DP.nib; path = Source/Objects/Hardware/Internet/TTCPX400DP/TTCPX400DP.nib; sourceTree = SOURCE_ROOT; };
-		B33FBC9A146F35E90046A733 /* TTCPX400DP.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = TTCPX400DP.tif; path = Source/Objects/Hardware/Internet/TTCPX400DP/TTCPX400DP.tif; sourceTree = SOURCE_ROOT; };
 		CE0D70B3146812E000B241D8 /* hardwareFinder.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = hardwareFinder.tiff; path = "../Main Dialogs/HardwareFinder/hardwareFinder.tiff"; sourceTree = "<group>"; };
 		CE10F005145167450084C15D /* ORXYCom200Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORXYCom200Controller.h; path = Source/Objects/Hardware/Vme/XYCom/ORXYCom200Controller.h; sourceTree = SOURCE_ROOT; };
 		CE10F006145167460084C15D /* ORXYCom200Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORXYCom200Controller.m; path = Source/Objects/Hardware/Vme/XYCom/ORXYCom200Controller.m; sourceTree = SOURCE_ROOT; };
@@ -8316,6 +8334,37 @@
 			path = "Source/Main Dialogs/MailCenter";
 			sourceTree = SOURCE_ROOT;
 		};
+		848E59101472B34400A70AB4 /* TTCPX400DP */ = {
+			isa = PBXGroup;
+			children = (
+				848E59111472B34400A70AB4 /* ORTTCPX400DPController.h */,
+				848E59121472B34400A70AB4 /* ORTTCPX400DPController.m */,
+				848E59131472B34400A70AB4 /* ORTTCPX400DPModel.h */,
+				848E59141472B34400A70AB4 /* ORTTCPX400DPModel.m */,
+				848E59151472B34400A70AB4 /* TTCPX400DP.nib */,
+				848E59161472B34400A70AB4 /* TTCPX400DP.tif */,
+			);
+			name = TTCPX400DP;
+			path = Source/Objects/Hardware/Internet/TTCPX400DP;
+			sourceTree = SOURCE_ROOT;
+		};
+		848E591D1472B35200A70AB4 /* LabJackUE9 */ = {
+			isa = PBXGroup;
+			children = (
+				848E591E1472B35200A70AB4 /* LabJackUE9.nib */,
+				848E591F1472B35200A70AB4 /* LabJackUE9.tif */,
+				848E59201472B35200A70AB4 /* NoLabJackUE9DriverHelp.plist */,
+				848E59211472B35200A70AB4 /* ORLabJackUE9Controller.h */,
+				848E59221472B35200A70AB4 /* ORLabJackUE9Controller.m */,
+				848E59231472B35200A70AB4 /* ORLabJackUE9Decoders.h */,
+				848E59241472B35200A70AB4 /* ORLabJackUE9Decoders.m */,
+				848E59251472B35200A70AB4 /* ORLabJackUE9Model.h */,
+				848E59261472B35200A70AB4 /* ORLabJackUE9Model.m */,
+			);
+			name = LabJackUE9;
+			path = Source/Objects/Hardware/USB/LabJackUE9;
+			sourceTree = SOURCE_ROOT;
+		};
 		849013BD10E27B13007591B5 /* PlotLink */ = {
 			isa = PBXGroup;
 			children = (
@@ -8902,6 +8951,7 @@
 				849E7C910B6956C800353D50 /* ADU200 */,
 				84A4E8950C287CA900CBC222 /* USBtoGPIB */,
 				84EBC519128887C800234313 /* LabJack */,
+				848E591D1472B35200A70AB4 /* LabJackUE9 */,
 				84B28E2A0F4C7FD400E2B056 /* LDA102 */,
 			);
 			path = USB;
@@ -9303,7 +9353,7 @@
 		84B28D4C0F4C651C00E2B056 /* Internet */ = {
 			isa = PBXGroup;
 			children = (
-				B322A2E4146D642400491347 /* TTCPX400DP */,
+				848E59101472B34400A70AB4 /* TTCPX400DP */,
 				8494C01C1316CEBA00151E7B /* BootBar */,
 				84BA5F240F70388C00CF92D6 /* ZupSupply */,
 				84B28D600F4C658400E2B056 /* NplPicoCoulombMeter */,
@@ -10939,20 +10989,6 @@
 			path = "Source/Objects/Hardware/Camac/L8013 Crate";
 			sourceTree = SOURCE_ROOT;
 		};
-		B322A2E4146D642400491347 /* TTCPX400DP */ = {
-			isa = PBXGroup;
-			children = (
-				B33FBC95146F35E90046A733 /* ORTTCPX400DPController.h */,
-				B33FBC96146F35E90046A733 /* ORTTCPX400DPController.m */,
-				B33FBC97146F35E90046A733 /* ORTTCPX400DPModel.h */,
-				B33FBC98146F35E90046A733 /* ORTTCPX400DPModel.m */,
-				B33FBC99146F35E90046A733 /* TTCPX400DP.nib */,
-				B33FBC9A146F35E90046A733 /* TTCPX400DP.tif */,
-			);
-			name = TTCPX400DP;
-			path = TTCDX400DP;
-			sourceTree = "<group>";
-		};
 		CE68866C0D0CE0E400FA4158 /* PlugIns */ = {
 			isa = PBXGroup;
 			children = (
@@ -12385,8 +12421,11 @@
 				CE6CCDD314672C670099238D /* vxi11_user.h in Headers */,
 				CE6CCDE2146732D90099238D /* vxi11.h in Headers */,
 				B322A309146D64D000491347 /* ORTcpIpProtocol.h in Headers */,
-				B33FBC9B146F35E90046A733 /* ORTTCPX400DPController.h in Headers */,
-				B33FBC9D146F35E90046A733 /* ORTTCPX400DPModel.h in Headers */,
+				848E59171472B34400A70AB4 /* ORTTCPX400DPController.h in Headers */,
+				848E59191472B34400A70AB4 /* ORTTCPX400DPModel.h in Headers */,
+				848E592A1472B35200A70AB4 /* ORLabJackUE9Controller.h in Headers */,
+				848E592C1472B35200A70AB4 /* ORLabJackUE9Decoders.h in Headers */,
+				848E592E1472B35200A70AB4 /* ORLabJackUE9Model.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13172,8 +13211,11 @@
 				CE6CCDD514672C670099238D /* vxi11.x in Resources */,
 				CE0D70B4146812E000B241D8 /* hardwareFinder.tiff in Resources */,
 				B33FBC93146F2A6A0046A733 /* edu.washington.npl.orca.VXIHardware.plist in Resources */,
-				B33FBC9F146F35E90046A733 /* TTCPX400DP.nib in Resources */,
-				B33FBCA0146F35E90046A733 /* TTCPX400DP.tif in Resources */,
+				848E591B1472B34400A70AB4 /* TTCPX400DP.nib in Resources */,
+				848E591C1472B34400A70AB4 /* TTCPX400DP.tif in Resources */,
+				848E59271472B35200A70AB4 /* LabJackUE9.nib in Resources */,
+				848E59281472B35200A70AB4 /* LabJackUE9.tif in Resources */,
+				848E59291472B35200A70AB4 /* NoLabJackUE9DriverHelp.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14064,8 +14106,11 @@
 				CE6CCDDE146732D90099238D /* vxi11_clnt.c in Sources */,
 				CE6CCDE1146732D90099238D /* vxi11_xdr.c in Sources */,
 				CEB1A5C514673AB6001381E6 /* vxi11_user.m in Sources */,
-				B33FBC9C146F35E90046A733 /* ORTTCPX400DPController.m in Sources */,
-				B33FBC9E146F35E90046A733 /* ORTTCPX400DPModel.m in Sources */,
+				848E59181472B34400A70AB4 /* ORTTCPX400DPController.m in Sources */,
+				848E591A1472B34400A70AB4 /* ORTTCPX400DPModel.m in Sources */,
+				848E592B1472B35200A70AB4 /* ORLabJackUE9Controller.m in Sources */,
+				848E592D1472B35200A70AB4 /* ORLabJackUE9Decoders.m in Sources */,
+				848E592F1472B35200A70AB4 /* ORLabJackUE9Model.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
