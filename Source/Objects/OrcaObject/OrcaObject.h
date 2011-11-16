@@ -183,6 +183,7 @@ extern NSString* ORObjArrayPtrPBType;
 - (void) connectionChanged;
 - (void) assumeDisplayOf:(ORConnector*)aConnector;
 - (void) removeDisplayOf:(ORConnector*)aConnector;
+- (id) connectorWithName:(id)aConnectorName;
 
 - (BOOL) aWake;
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;

@@ -124,6 +124,13 @@ NSString* ORMiscAttributeKey		= @"ORMiscAttributeKey";
 		}
 		if([decoders length])base = [base stringByAppendingFormat:@"\nDecoders:\n%@",decoders];
 	}
+	if([connectors count]){
+		base = [base stringByAppendingString:@"\nConnectors:\n"];
+		for(id aName in [connectors allKeys]){
+			base = [base stringByAppendingFormat:@"\"%@\"\n",aName];
+		}
+	}
+	
 	return base;
 }
 
@@ -829,6 +836,10 @@ static NSString* OROrcaObjectUniqueIDNumber = @"OROrcaObjectUniqueIDNumber";
     return [[connectors objectForKey:aConnectorName] connector];
 }
 
+- (id) connectorWithName:(id)aConnectorName
+{
+    return [connectors objectForKey:aConnectorName];
+}
 
 - (id) connectorAt:(NSPoint)aPoint
 {
