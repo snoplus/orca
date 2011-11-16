@@ -1057,6 +1057,7 @@
 		8446CE2407B847B8006CD9C4 /* ORAD413ADecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 8446CE1C07B847B8006CD9C4 /* ORAD413ADecoders.m */; };
 		8446CE2507B847B8006CD9C4 /* ORAD413AModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8446CE1D07B847B8006CD9C4 /* ORAD413AModel.m */; };
 		8446CE2607B847B8006CD9C4 /* ORAD413AModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8446CE1E07B847B8006CD9C4 /* ORAD413AModel.h */; };
+		84489D4E1473F5D90055A563 /* Bug.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84AC47601454BE5F009D6F83 /* Bug.tif */; };
 		8448E4FC09E5C4AC001B88B5 /* NSView+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 8448E4FA09E5C4AC001B88B5 /* NSView+Extensions.h */; };
 		8448E4FD09E5C4AC001B88B5 /* NSView+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 8448E4FB09E5C4AC001B88B5 /* NSView+Extensions.m */; };
 		844998640F1282E7004B855B /* SyntaxDefinition.plist in Resources */ = {isa = PBXBuildFile; fileRef = 844998630F1282E7004B855B /* SyntaxDefinition.plist */; };
@@ -13216,6 +13217,7 @@
 				848E59271472B35200A70AB4 /* LabJackUE9.nib in Resources */,
 				848E59281472B35200A70AB4 /* LabJackUE9.tif in Resources */,
 				848E59291472B35200A70AB4 /* NoLabJackUE9DriverHelp.plist in Resources */,
+				84489D4E1473F5D90055A563 /* Bug.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14294,7 +14296,7 @@
 					"-lnetsnmp",
 				);
 				PRODUCT_NAME = Orca;
-				SDKROOT = macosx;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wmost";
 				WRAPPER_EXTENSION = app;
@@ -14469,7 +14471,7 @@
 				MACOSX_DEPLOYMENT_TARGET = "";
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "";
-				SDKROOT = macosx;
+				SDKROOT = "";
 			};
 			name = Development;
 		};
