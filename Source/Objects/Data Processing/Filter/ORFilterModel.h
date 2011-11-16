@@ -38,39 +38,41 @@
 @interface ORFilterModel :  ORDataChainObject <ORDataProcessing>
 
 {
-    @private
+@private
 	
-		unsigned long dataId1D;
-		unsigned long dataId2D;
-		unsigned long dataIdStrip;
-
-		NSString*			lastFile;
-		NSString*			script;
-		NSString*			scriptName;
-		NSMutableArray*		inputValues;
-		NSMutableArray*		outputValues;
-		
-		BOOL				running;
-		BOOL				parsedOK;
-		unsigned			yaccInputPosition;
-		NSData*				expressionAsData;
-		BOOL				exitNow;
-		BOOL				firstTime;
-		ORDecoder*			currentDecoder;
-		ORQueue*			stacks[kNumFilterStacks];
-		unsigned long		processingTimeHist[kFilterTimeHistoSize];
-		NSLock*				timerLock;
-		BOOL				timerEnabled;
-		ORTimer*			mainTimer;
-		ORTimer*			runTimer;
-		unsigned long		lastRunTimeValue;
-		NSTimeInterval		lastOutputUpdateTimeRef;
-		NSString*			pluginPath;
-		BOOL				pluginValid;
-		id					pluginInstance;
-		BOOL				usePlugin;
-		id					thePassThruObject;  //cache the object on the other side of the pass thru connection
-		id					theFilteredObject;	//cache the object on the other side of the filter connection
+	unsigned long dataId1D;
+	unsigned long dataId2D;
+	unsigned long dataIdStrip;
+	
+	NSString*			lastFile;
+	NSString*			script;
+	NSString*			scriptName;
+	NSMutableArray*		inputValues;
+	NSMutableArray*		outputValues;
+	
+	BOOL				running;
+	BOOL				parsedOK;
+	unsigned			yaccInputPosition;
+	NSData*				expressionAsData;
+	BOOL				exitNow;
+	BOOL				firstTime;
+	ORDecoder*			currentDecoder;
+	ORQueue*			stacks[kNumFilterStacks];
+	unsigned long		processingTimeHist[kFilterTimeHistoSize];
+	NSLock*				timerLock;
+	BOOL				timerEnabled;
+	ORTimer*			mainTimer;
+	ORTimer*			runTimer;
+	unsigned long		lastRunTimeValue;
+	NSTimeInterval		lastOutputUpdateTimeRef;
+	NSString*			pluginPath;
+	BOOL				pluginValid;
+	id					pluginInstance;
+	BOOL				usePlugin;
+	id					thePassThruObject;  //cache the object on the other side of the pass thru connection
+	id					theFilteredObject;	//cache the object on the other side of the filter connection
+	NSMutableDictionary* stackIndexErrorReported;
+	NSMutableDictionary* stackPtrErrorReported;
 }
 
 - (id)   init;
@@ -137,7 +139,9 @@
 - (unsigned long) extractRecordLen:(unsigned long)aValue;
 - (unsigned long) extractValue:(unsigned long)aValue mask:(unsigned long)aMask thenShift:(unsigned long)shift;
 - (void) shipRecord:(unsigned long*)p length:(long)length;
-- (void) pushOntoStack:(int)i record:(unsigned long*)p;
+- (void) checkStackIndex:(int) i;
+- (void) checkStack:(int)index ptr:(unsigned long) ptr;
+- (void) pushOntoStack:(int)i ptrCheck:(unsigned long)ptrCheck record:(unsigned long*)p;
 - (unsigned long*) popFromStack:(int)i;
 - (unsigned long*) popFromStackBottom:(int)i;
 - (void) shipStack:(int)i;

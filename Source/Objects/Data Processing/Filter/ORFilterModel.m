@@ -110,6 +110,8 @@ int filterGraph(nodeType*);
 	[scriptName release];
 	[timerLock release];
 	[mainTimer release];
+	[stackIndexErrorReported release];
+	[stackPtrErrorReported release];
     [super dealloc];
 }
 
@@ -386,8 +388,11 @@ int filterGraph(nodeType*);
 					tempData.val.lValue = recordLen;
 					[symbolTable setData:tempData forKey:"CurrentRecordLen"];
 					
-					runFilterScript(self);
-					
+					@try {
+						runFilterScript(self);
+					}
+					@catch(NSException* e){
+					}
 				}
 				if(timerEnabled){
 					float delta = [mainTimer microseconds];
@@ -559,11 +564,18 @@ int filterGraph(nodeType*);
 	
 	[runTimer release];
 	runTimer = nil;
+	
 	[currentDecoder release];
 	currentDecoder = nil;
+	
 	[symbolTable release];
 	symbolTable = nil;
-
+	
+	[stackIndexErrorReported release];
+	stackIndexErrorReported = nil;
+	
+	[stackPtrErrorReported release];
+	stackPtrErrorReported = nil;
 }
 
 - (void) runTaskStarted:(id)userInfo
@@ -579,9 +591,9 @@ int filterGraph(nodeType*);
 	theFilteredObject = [self objectConnectedTo:ORFilterFilteredConnector];
 	
 	[thePassThruObject runTaskStarted:userInfo];
-
+	
 	[thePassThruObject setInvolvedInCurrentRun:YES];
-
+	
 	
 	NSMutableDictionary* infoCopy = [userInfo mutableCopy];
 	[infoCopy setObject:@"Filtered" forKey:kFileSuffix];
@@ -590,7 +602,7 @@ int filterGraph(nodeType*);
 	[infoCopy release];
 	[theFilteredObject setInvolvedInCurrentRun:YES];
 	
-
+	
 }
 
 - (void) subRunTaskStarted:(id)userInfo
@@ -606,7 +618,7 @@ int filterGraph(nodeType*);
 	[theFilteredObject runTaskStopped:userInfo];
 	[thePassThruObject setInvolvedInCurrentRun:NO];
 	[theFilteredObject setInvolvedInCurrentRun:NO];
-
+	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORFilterUpdateTiming object:self];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORFilterDisplayValuesChanged object:self];
 	
@@ -614,19 +626,19 @@ int filterGraph(nodeType*);
 
 - (void) closeOutRun:(id)userInfo
 {
-		
+	
 	if(usePlugin) [pluginInstance finish];
 	else		  finishFilterScript(self);
 	
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORFilterDisplayValuesChanged object:self];
-
+	
 	
 	[theFilteredObject closeOutRun:userInfo];
 	[thePassThruObject closeOutRun:userInfo];
 	
 	[self cleanUpFilter];
-
+	
 }
 
 - (void) setRunMode:(int)aMode
@@ -847,30 +859,57 @@ int filterGraph(nodeType*);
 	}
 }
 
-- (void) pushOntoStack:(int)i record:(unsigned long*)p
+- (void) checkStackIndex:(int) i
 {
-	if(!stacks[i])stacks[i] = [[ORQueue alloc] init];
+	if(i<0 || i>=kNumFilterStacks){
+		if(![stackIndexErrorReported objectForKey:[NSNumber numberWithInt:i]]){
+			if(!stackIndexErrorReported)stackIndexErrorReported = [[NSMutableDictionary dictionary] retain];
+			[stackIndexErrorReported setObject:@"dummy" forKey:[NSNumber numberWithInt:i]];
+			NSLog(@"Filter <%@>: Stack Index (%d) not greater than 0 and less than %d. Script behaviour is now undefined!! \n",scriptName,i,kNumFilterStacks);
+		}
+		[NSException raise:@"Filter Script Error" format:@"Stack Index out of bounds."];
+	}
+}
+
+- (void) checkStack:(int)i ptr:(unsigned long) ptr
+{
+	if(!ptr){
+		if(![stackPtrErrorReported objectForKey:[NSNumber numberWithInt:i]]){
+			if(!stackPtrErrorReported)stackPtrErrorReported = [[NSMutableDictionary dictionary] retain];
+			[stackPtrErrorReported setObject:@"dummy" forKey:[NSNumber numberWithInt:i]];
+			NSLog(@"Filter <%@>: Tried to put a nil pointer onto stack (%d). Script behaviour is now undefined!! \n",scriptName,i,kNumFilterStacks);
+		}
+		[NSException raise:@"Filter Script Error" format:@"Stack nil pointer."];
+	}
+}
+- (void) pushOntoStack:(int)i ptrCheck:(unsigned long)ptrCheck record:(unsigned long*)p
+{
+	[self checkStackIndex:i]; //can throw
+	[self checkStack:i ptr:ptrCheck]; //can throw
 	
-	NSData* data = [NSData dataWithBytes:p length:ExtractLength(*p)*sizeof(long)];
-	[stacks[i] enqueue:data];
+	if(!stacks[i])stacks[i] = [[ORQueue alloc] init];
+	NSData* theRecord = [NSData dataWithBytes:p length:ExtractLength(*p)*sizeof(long)];
+	[stacks[i] enqueue:theRecord];
 }
 
 - (unsigned long*) popFromStack:(int)i
 {
+	[self checkStackIndex:i]; //can throw
+	
 	NSData* data = [stacks[i] dequeue];
 	return (unsigned long*)[data bytes];
 }
 
 - (unsigned long*) popFromStackBottom:(int)i
 {
+	[self checkStackIndex:i]; //can throw
 	NSData* data = [stacks[i] dequeueFromBottom];
 	return (unsigned long*)[data bytes];
 }
 
-
 - (void) shipStack:(int)i
 {
-	
+	[self checkStackIndex:i]; //can throw
 	if(stacks[i] && ![stacks[i] isEmpty]) {
 		while(![stacks[i] isEmpty]){
 			NSArray* dataArray = [NSArray arrayWithObject:[stacks[i] dequeueFromBottom]];
@@ -883,11 +922,13 @@ int filterGraph(nodeType*);
 
 - (long) stackCount:(int)i
 {
+	[self checkStackIndex:i]; //can throw
 	return [stacks[i] count];
 }
 
 - (void) dumpStack:(int)i
 {
+	[self checkStackIndex:i]; //can throw
 	[stacks[i] release];
 	stacks[i] = nil;
 }
@@ -908,7 +949,7 @@ int filterGraph(nodeType*);
 	p[0] = dataId2D | 3;
 	p[1] = (i & 0xff) << 24 | (x & 0xffff);
 	p[2] = (y & 0xffff);
-
+	
 	//pass it on
 	NSArray* someData = [NSArray arrayWithObject:[NSData dataWithBytes:p length:3*sizeof(long)]];
 	[theFilteredObject processData:someData decoder:currentDecoder];
@@ -920,7 +961,7 @@ int filterGraph(nodeType*);
 	p[0] = dataIdStrip | 3;
 	p[1] = (i & 0xffff) << 16 | (aValue & 0xffff); 
 	p[2] = aTimeIndex;
-
+	
 	//pass it on
 	NSArray* someData = [NSArray arrayWithObject:[NSData dataWithBytes:p length:3*sizeof(long)]];
 	[theFilteredObject processData:someData decoder:currentDecoder];
@@ -1024,7 +1065,7 @@ int filterGraph(nodeType*);
 			[symbolTable setData:theDataType forKey:[decoderName cStringUsingEncoding:NSASCIIStringEncoding]];
 		} 
 	}
-		
+	
 	NSEnumerator* e = [inputValues objectEnumerator];
 	NSDictionary* anInputValueDictionary;
 	filterData tempData;

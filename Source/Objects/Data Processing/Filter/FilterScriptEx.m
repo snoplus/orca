@@ -476,7 +476,8 @@ filterData ex(nodeType *p,id delegate)
 				{
 					long stack = ex(p->opr.op[0],delegate).val.lValue;
 					unsigned long* ptr  = ex(p->opr.op[1],delegate).val.pValue;
-					if(ptr)[delegate pushOntoStack:stack record:ptr]; 
+					unsigned long ptrValue  = ex(p->opr.op[1],delegate).val.lValue;
+					[delegate pushOntoStack:stack ptrCheck:ptrValue record:ptr]; 
 				}
 					break;
 					
