@@ -35,27 +35,153 @@ struct ORTTCPX400DPCmdInfo;
 - (void) _connectIP;
 - (void) _mainThreadSocketSend:(NSString*) data;
 - (void) _setIsConnected:(BOOL)connected;
-- (void) _addCommandToDataProcessingQueue:(struct ORTTCPX400DPCmdInfo*)cmd;
-- (void)  _processNextCmdWithInputString:(NSString *)input withSelectorName:(NSString*)selName;
-- (void) _writeCommand:(ETTCPX400DPCmds)cmd withInput:(float)input withOutput:(int)output withSelectorName:(NSString*)selName;
+- (void) _addCommandToDataProcessingQueue:(struct ORTTCPX400DPCmdInfo*)theCmd 
+                           withSendString:(NSString*)cmdStr 
+                   withReturnSelectorName:(NSString*)selName
+                        withOutputNumber:(unsigned int)output;    
+- (void) _processNextReadCommandInQueueWithInputString:(NSString *)input;
+- (void) _processNextWriteCommandInQueue;
+- (void) _writeCommand:(ETTCPX400DPCmds)cmd withInput:(float)input withOutputNum:(int)output withSelectorName:(NSString*)selName;
 - (void) _processGeneralReadback:(NSNumber*)aFloat withOutputNum:(NSNumber*) anInt;
 - (void) _processGeneralReadback:(NSNumber*)aFloat;
 - (void) _setGeneralReadback:(NSString*)read;
+
 @end
+
+#define STRINGIFY2( x) #x
+#define STRINGIFY(x) STRINGIFY2(x)
+#define NSSTRINGIFY(b) @b
+
+#define ORTTCPX400DP_NOTIFY_STRING(X)     \
+NSString* X = NSSTRINGIFY( STRINGIFY(X));
+
+#define ORTTCPX_READ_IMPLEMENT_NOTIFY(CMD)  \
+ORTTCPX400DP_NOTIFY_STRING( ORTTCPX_NOTIFY_READ_FORM(CMD) )
+
+#define ORTTCPX_WRITE_IMPLEMENT_NOTIFY(CMD) \
+ORTTCPX400DP_NOTIFY_STRING( ORTTCPX_NOTIFY_WRITE_FORM(CMD) )
+
+#define ORTTCPX_GEN_IMPLEMENT(CMD, TYPE, PREPENDFUNC, UC, LC, PREPENDVAR)   \
+- (void) PREPENDFUNC##set##UC##PREPENDVAR##CMD:(TYPE)aVal                   \
+    withOutput:(unsigned int)output                                         \
+{                                                                           \
+    assert(output < kORTTCPX400DPOutputChannels);                           \
+    if (LC ## PREPENDVAR ## CMD[output] == aVal) return;                    \
+    [[[self undoManager] prepareWithInvocationTarget:self]                  \
+     PREPENDFUNC##set##UC##PREPENDVAR##CMD:LC ## PREPENDVAR ## CMD[output]  \
+     withOutput:output];                                                    \
+    LC ## PREPENDVAR ## CMD[output] = aVal;                                 \
+    [self sendCommand ## UC ## PREPENDVAR ## CMD ## WithOutput:output];     \
+    [[NSNotificationCenter defaultCenter]                                   \
+     postNotificationName:ORTTCPX400DP ##UC##PREPENDVAR ## CMD ## IsChanged \
+     object:self];                                                          \
+}                                                                           \
+                                                                            \
+- (void) _processCmd ## CMD ## WithFloat:(NSNumber*)theFloat                \
+   withOutput:(NSNumber*)theOutput                                          \
+{                                                                           \
+    assert(gORTTCPXCmds[k ## CMD].responds);                                \
+    [self PREPENDFUNC##set##UC##PREPENDVAR##CMD:[theFloat TYPE ## Value]    \
+        withOutput:([theOutput intValue]-1)];                               \
+}                                                                           \
+                                                                            \
+- (void) PREPENDFUNC ## write ## CMD ## WithOutput:(unsigned int)output     \
+{                                                                           \
+    assert(output < kORTTCPX400DPOutputChannels);                           \
+    NSString* temp = nil;                                                   \
+    if (gORTTCPXCmds[k ## CMD].responds) {                                  \
+        temp = NSStringFromSelector(                                        \
+                     @selector(_processCmd ## CMD ## WithFloat:withOutput:));\
+    }                                                                       \
+    [self _writeCommand:k ## CMD withInput:LC ## PREPENDVAR ## CMD[output]  \
+          withOutputNum:output+1                                            \
+       withSelectorName:temp];                                              \
+}                                                                           \
+                                                                            \
+- (TYPE) LC ## PREPENDVAR ## CMD ## WithOutput:(unsigned int)output         \
+{                                                                           \
+    return LC ## PREPENDVAR ## CMD[output];                                 \
+}                                                                           \
+- (void) sendCommand ## UC ## PREPENDVAR ## CMD ## WithOutput:              \
+    (unsigned int) output                                                   \
+{                                                                           \
+    [self PREPENDFUNC ## write ## CMD ## WithOutput:output];                \
+}                                                                           
+
+#define ORTTCPX_READ_IMPLEMENT(CMD, TYPE) ORTTCPX_GEN_IMPLEMENT(CMD, TYPE,_, R, r, eadBack)
+#define ORTTCPX_WRITE_IMPLEMENT(CMD, TYPE) ORTTCPX_GEN_IMPLEMENT(CMD, TYPE, , W, w, riteTo)
+                                                                 
+ 
+ORTTCPX_WRITE_IMPLEMENT_NOTIFY(SetVoltage)
+ORTTCPX_WRITE_IMPLEMENT_NOTIFY(SetVoltageAndVerify)
+ORTTCPX_WRITE_IMPLEMENT_NOTIFY(SetOverVoltageProtectionTripPoint)
+ORTTCPX_WRITE_IMPLEMENT_NOTIFY(SetCurrentLimit)
+ORTTCPX_WRITE_IMPLEMENT_NOTIFY(SetOverCurrentProtectionTripPoint)
+ORTTCPX_READ_IMPLEMENT_NOTIFY(GetVoltageSet)
+ORTTCPX_READ_IMPLEMENT_NOTIFY(GetCurrentSet)
+ORTTCPX_READ_IMPLEMENT_NOTIFY(GetVoltageTripSet)
+ORTTCPX_READ_IMPLEMENT_NOTIFY(GetCurrentTripSet)
+ORTTCPX_READ_IMPLEMENT_NOTIFY(GetVoltageReadback)
+ORTTCPX_READ_IMPLEMENT_NOTIFY(GetCurrentReadback)
+ORTTCPX_WRITE_IMPLEMENT_NOTIFY(SetVoltageStepSize)
+ORTTCPX_WRITE_IMPLEMENT_NOTIFY(SetCurrentStepSize)
+ORTTCPX_READ_IMPLEMENT_NOTIFY(GetVoltageStepSize)
+ORTTCPX_READ_IMPLEMENT_NOTIFY(GetCurrentStepSize)
+ORTTCPX_WRITE_IMPLEMENT_NOTIFY(SetOutput)
+ORTTCPX_READ_IMPLEMENT_NOTIFY(GetOutputStatus)
+
+//ORTTCPX_WRITE_IMPLEMENT_NOTIFY(IncrementVoltage)
+//ORTTCPX_WRITE_IMPLEMENT_NOTIFY(IncrementVoltageAndVerify)
+//ORTTCPX_WRITE_IMPLEMENT_NOTIFY(DecrementCurrent)
+//ORTTCPX_WRITE_IMPLEMENT_NOTIFY(DecrementVoltage)
+//ORTTCPX_WRITE_IMPLEMENT_NOTIFY(DecrementVoltageAndVerify)
+//ORTTCPX_WRITE_IMPLEMENT_NOTIFY(IncrementCurrent)
+//ORTTCPX_WRITE_IMPLEMENT_NOTIFY(SetAllOutput)
+//ORTTCPX_WRITE_IMPLEMENT_NOTIFY(ClearTrip)
+//ORTTCPX_WRITE_IMPLEMENT_NOTIFY(Local)
+//ORTTCPX_WRITE_IMPLEMENT_NOTIFY(RequestLock)
+//ORTTCPX_WRITE_IMPLEMENT_NOTIFY(CheckLock)
+//ORTTCPX_WRITE_IMPLEMENT_NOTIFY(ReleaseLock)
+//ORTTCPX_WRITE_IMPLEMENT_NOTIFY(QueryClearLSR)
+//ORTTCPX_WRITE_IMPLEMENT_NOTIFY(SetEventStatusRegister)
+//ORTTCPX_WRITE_IMPLEMENT_NOTIFY(GetEventStatusRegister)
+//ORTTCPX_WRITE_IMPLEMENT_NOTIFY(SaveCurrentSetup)
+//ORTTCPX_WRITE_IMPLEMENT_NOTIFY(RecallSetup)
+//ORTTCPX_WRITE_IMPLEMENT_NOTIFY(SetOperatingMode)
+//ORTTCPX_WRITE_IMPLEMENT_NOTIFY(GetOperatingMode)
+//ORTTCPX_WRITE_IMPLEMENT_NOTIFY(SetRatio)
+//ORTTCPX_WRITE_IMPLEMENT_NOTIFY(GetRatio)
+//ORTTCPX_WRITE_IMPLEMENT_NOTIFY(ClearStatus)
+//ORTTCPX_WRITE_IMPLEMENT_NOTIFY(QueryAndClearEER)
+//ORTTCPX_WRITE_IMPLEMENT_NOTIFY(SetESE)
+//ORTTCPX_WRITE_IMPLEMENT_NOTIFY(GetESE)
+//ORTTCPX_WRITE_IMPLEMENT_NOTIFY(GetESR)
+//ORTTCPX_WRITE_IMPLEMENT_NOTIFY(GetISTLocalMsg)
+//ORTTCPX_WRITE_IMPLEMENT_NOTIFY(SetOPCBit)
+//ORTTCPX_WRITE_IMPLEMENT_NOTIFY(GetOPCBit)
+//ORTTCPX_WRITE_IMPLEMENT_NOTIFY(SetParallelPollRegister)
+//ORTTCPX_WRITE_IMPLEMENT_NOTIFY(GetParallelPollRegister)
+//ORTTCPX_WRITE_IMPLEMENT_NOTIFY(QueryAndClearQER)
+//ORTTCPX_WRITE_IMPLEMENT_NOTIFY(ResetToRemoteDflt)
+//ORTTCPX_WRITE_IMPLEMENT_NOTIFY(SetSRE)
+//ORTTCPX_WRITE_IMPLEMENT_NOTIFY(GetSRE)
+//ORTTCPX_WRITE_IMPLEMENT_NOTIFY(GetSTB)
+//ORTTCPX_WRITE_IMPLEMENT_NOTIFY(GetID)
+//ORTTCPX_WRITE_IMPLEMENT_NOTIFY(GetBusAddress)
+
 
 @implementation ORTTCPX400DPModel
 
 struct ORTTCPX400DPCmdInfo {
-	NSString* name;
-	NSString* cmd;
-	BOOL responds;
-	BOOL takesOutputNum;
-	BOOL takesInput;
-	NSString* responseFormat;
+    NSString* name;
+    NSString* cmd;
+    BOOL responds;
+    BOOL takesOutputNum;
+    BOOL takesInput;
+    NSString* responseFormat;
 };
-
-//#define ORTTCPXFunctionsForCmd(cmd) \
-//- (void) 
+                                                                
+    
 static struct ORTTCPX400DPCmdInfo gORTTCPXCmds[kNumTTCPX400Cmds] = {
     {@"Set Voltage", @"V%i %f", NO, YES, YES, @""}, //kSetVoltage,
     {@"Set Voltage/Verify", @"V%iV %f", NO, YES, YES, @""}, //kSetVoltageAndVerify,
@@ -70,6 +196,7 @@ static struct ORTTCPX400DPCmdInfo gORTTCPXCmds[kNumTTCPX400Cmds] = {
     // But I have instead found them to be:
     {@"Get Voltage Trip Point", @"OVP%i?", YES, YES, NO, @"%f"}, //kGetVoltageTripSet,
     {@"Get Current Trip Point", @"OCP%i?", YES, YES, NO, @"%f"}, //kGetCurrentTripSet,
+    // This is a bit of a problem, because it means we have to specially handle these two cases.
     
     {@"Get Voltage Readback", @"V%iO?", YES, YES, NO, @"%fV"}, //kGetVoltageReadback,
     {@"Get Current Readback", @"I%iO?", YES, YES, NO, @"%fA"}, //kGetCurrentReadback,
@@ -120,6 +247,62 @@ static struct ORTTCPX400DPCmdInfo gORTTCPXCmds[kNumTTCPX400Cmds] = {
 };
 
 
+ORTTCPX_WRITE_IMPLEMENT(SetVoltage, float)
+ORTTCPX_WRITE_IMPLEMENT(SetVoltageAndVerify, float)
+ORTTCPX_WRITE_IMPLEMENT(SetOverVoltageProtectionTripPoint, float)
+ORTTCPX_WRITE_IMPLEMENT(SetCurrentLimit, float)
+ORTTCPX_WRITE_IMPLEMENT(SetOverCurrentProtectionTripPoint, float)
+ORTTCPX_READ_IMPLEMENT(GetVoltageSet, float)
+ORTTCPX_READ_IMPLEMENT(GetCurrentSet, float)
+ORTTCPX_READ_IMPLEMENT(GetVoltageTripSet, float)
+ORTTCPX_READ_IMPLEMENT(GetCurrentTripSet, float)
+ORTTCPX_READ_IMPLEMENT(GetVoltageReadback, float)
+ORTTCPX_READ_IMPLEMENT(GetCurrentReadback, float)
+ORTTCPX_WRITE_IMPLEMENT(SetVoltageStepSize, float)
+ORTTCPX_WRITE_IMPLEMENT(SetCurrentStepSize, float)
+ORTTCPX_READ_IMPLEMENT(GetVoltageStepSize, float)
+ORTTCPX_READ_IMPLEMENT(GetCurrentStepSize, float)
+ORTTCPX_WRITE_IMPLEMENT(SetOutput, int)
+ORTTCPX_READ_IMPLEMENT(GetOutputStatus, int)
+
+//ORTTCPX_WRITE_IMPLEMENT(IncrementVoltage, float)
+//ORTTCPX_WRITE_IMPLEMENT(IncrementVoltageAndVerify, float)
+//ORTTCPX_WRITE_IMPLEMENT(DecrementCurrent, float)
+//ORTTCPX_WRITE_IMPLEMENT(DecrementVoltage, float)
+//ORTTCPX_WRITE_IMPLEMENT(DecrementVoltageAndVerify, float)
+//ORTTCPX_WRITE_IMPLEMENT(IncrementCurrent, float)
+//ORTTCPX_WRITE_IMPLEMENT(SetAllOutput, float)
+//ORTTCPX_WRITE_IMPLEMENT(ClearTrip, float)
+//ORTTCPX_WRITE_IMPLEMENT(Local, float)
+//ORTTCPX_WRITE_IMPLEMENT(RequestLock, float)
+//ORTTCPX_WRITE_IMPLEMENT(CheckLock, float)
+//ORTTCPX_WRITE_IMPLEMENT(ReleaseLock, float)
+//ORTTCPX_WRITE_IMPLEMENT(QueryClearLSR, float)
+//ORTTCPX_WRITE_IMPLEMENT(SetEventStatusRegister, float)
+//ORTTCPX_WRITE_IMPLEMENT(GetEventStatusRegister, float)
+//ORTTCPX_WRITE_IMPLEMENT(SaveCurrentSetup, float)
+//ORTTCPX_WRITE_IMPLEMENT(RecallSetup, float)
+//ORTTCPX_WRITE_IMPLEMENT(SetOperatingMode, float)
+//ORTTCPX_WRITE_IMPLEMENT(GetOperatingMode, float)
+//ORTTCPX_WRITE_IMPLEMENT(SetRatio, float)
+//ORTTCPX_WRITE_IMPLEMENT(GetRatio, float)
+//ORTTCPX_WRITE_IMPLEMENT(ClearStatus, float)
+//ORTTCPX_WRITE_IMPLEMENT(QueryAndClearEER, float)
+//ORTTCPX_WRITE_IMPLEMENT(SetESE, float)
+//ORTTCPX_WRITE_IMPLEMENT(GetESE, float)
+//ORTTCPX_WRITE_IMPLEMENT(GetESR, float)
+//ORTTCPX_WRITE_IMPLEMENT(GetISTLocalMsg, float)
+//ORTTCPX_WRITE_IMPLEMENT(SetOPCBit, float)
+//ORTTCPX_WRITE_IMPLEMENT(GetOPCBit, float)
+//ORTTCPX_WRITE_IMPLEMENT(SetParallelPollRegister, float)
+//ORTTCPX_WRITE_IMPLEMENT(GetParallelPollRegister, float)
+//ORTTCPX_WRITE_IMPLEMENT(QueryAndClearQER, float)
+//ORTTCPX_WRITE_IMPLEMENT(ResetToRemoteDflt, float)
+//ORTTCPX_WRITE_IMPLEMENT(SetSRE, float)
+//ORTTCPX_WRITE_IMPLEMENT(GetSRE, float)
+//ORTTCPX_WRITE_IMPLEMENT(GetSTB, float)
+//ORTTCPX_WRITE_IMPLEMENT(GetID, float)
+//ORTTCPX_WRITE_IMPLEMENT(GetBusAddress, float)
 
 @synthesize socket;
 @synthesize ipAddress;
@@ -136,7 +319,7 @@ static struct ORTTCPX400DPCmdInfo gORTTCPXCmds[kNumTTCPX400Cmds] = {
 {
     [socket release];
     [ipAddress release];
-    [dataQueue release];
+    [dataQueue release];  
     [generalReadback release];
 	[super dealloc];
 }
@@ -173,6 +356,15 @@ static struct ORTTCPX400DPCmdInfo gORTTCPXCmds[kNumTTCPX400Cmds] = {
      object:self];   
 }
 
+- (void) toggleConnection 
+{
+    if (!isConnected) [self connect];
+    else {
+        [self setSocket:nil];
+        [self _setIsConnected:NO];
+    }
+}
+
 - (void) connect
 {
 	if(!isConnected && !socket) [self _connectIP]; 
@@ -198,26 +390,82 @@ static struct ORTTCPX400DPCmdInfo gORTTCPXCmds[kNumTTCPX400Cmds] = {
      object:self];
 }
 
-- (void) _addCommandToDataProcessingQueue:(struct ORTTCPX400DPCmdInfo *)cmd withSelectorName:(NSString*) selName;
+- (void) setAllOutputToBeOn:(BOOL)on
+{
+    [self writeCommand:kSetAllOutput withInput:on withOutputNumber:1];
+    writeToSetOutput[0] = on;
+    writeToSetOutput[1] = on;    
+    [[NSNotificationCenter defaultCenter]
+     postNotificationName:ORTTCPX400DPWriteToSetOutputIsChanged
+     object:self];      
+}
+- (void) setOutput:(unsigned int)output toBeOn:(BOOL)on
+{
+    [self setWriteToSetOutput:output withOutput:on];
+}
+
+- (void) _addCommandToDataProcessingQueue:(struct ORTTCPX400DPCmdInfo*)theCmd 
+   withSendString:(NSString*)cmdStr 
+   withReturnSelectorName:(NSString*)selName
+   withOutputNumber:(unsigned int)output
 {
     // We take pointers, but we know the pointers always exist.
-    if (selName == nil) selName = @"";
+
     @synchronized(self) {
         if (dataQueue == nil) {
             dataQueue = [[NSMutableArray array] retain];
         }
-        [dataQueue addObject:[NSArray arrayWithObjects:[NSNumber numberWithUnsignedLong:(unsigned long)cmd],selName,nil]];
+        // First add the write command
+        [dataQueue addObject:[NSArray arrayWithObjects:[NSNumber numberWithUnsignedLong:(unsigned long)theCmd],cmdStr,@"",[NSNumber numberWithUnsignedInt:output],nil]];        
+        // If there's a read command, add it as well.
+        if (selName != nil) {        
+            [dataQueue addObject:[NSArray arrayWithObjects:[NSNumber numberWithUnsignedLong:(unsigned long)theCmd],@"",selName,[NSNumber numberWithUnsignedInt:output],nil]];
+        }
     }
 }
 
-- (void) _processNextCmdWithInputString:(NSString *)input
+- (void) _processNextWriteCommandInQueue
+{
+    // This function processes the next write command in the queue.  It returns if the next command is a read command.
+    while (1) {
+        BOOL shouldContinue = NO;
+        NSString* nextCmdToWrite;
+        struct ORTTCPX400DPCmdInfo* theCmd = nil;
+        @synchronized(self) {
+            if ([dataQueue count] > 0 && [[[dataQueue objectAtIndex:0] objectAtIndex:1] length] != 0) {
+                // The queue to receive something is empty.
+                shouldContinue = YES;
+                // We have to copy it, because removing it gets rid of it.
+                nextCmdToWrite = [NSString stringWithString:[[dataQueue objectAtIndex:0] objectAtIndex:1]];
+                theCmd = (struct ORTTCPX400DPCmdInfo*)[[[dataQueue objectAtIndex:0] objectAtIndex:0] longValue];                
+                [dataQueue removeObjectAtIndex:0];
+            }
+        }
+        if (!shouldContinue) return;
+        if(!theCmd->responds) [self _setGeneralReadback:@"N/A"];
+        if([self isConnected]){
+            [self performSelectorOnMainThread:@selector(_mainThreadSocketSend:) withObject:nextCmdToWrite
+                                waitUntilDone:YES];
+        }
+        else {
+            NSString *errorMsg = @"Must establish IP connection prior to issuing command.\n";
+            NSLog(errorMsg);
+            return;
+        }     
+    }
+}
+
+- (void) _processNextReadCommandInQueueWithInputString:(NSString *)input
 {
     struct ORTTCPX400DPCmdInfo* cmd = nil;
     SEL callSelector = nil;    
+    int outputNum = 1;       
     @synchronized(self) {
-        if ([dataQueue count] > 0) {
+        if ([dataQueue count] > 0 && [[[dataQueue objectAtIndex:0] objectAtIndex:2] length] != 0) {
             cmd = (struct ORTTCPX400DPCmdInfo*)[[[dataQueue objectAtIndex:0] objectAtIndex:0] longValue];
-            callSelector = NSSelectorFromString([[dataQueue objectAtIndex:0] objectAtIndex:1]);
+            callSelector = NSSelectorFromString([[dataQueue objectAtIndex:0] objectAtIndex:2]);
+            // We unfortunately have to do this, because some output numbers are not set by the returned strings.
+            outputNum = [[[dataQueue objectAtIndex:0] objectAtIndex:3] unsignedIntValue];
             [dataQueue removeObjectAtIndex:0];
         }
     }
@@ -226,7 +474,7 @@ static struct ORTTCPX400DPCmdInfo gORTTCPXCmds[kNumTTCPX400Cmds] = {
     // This command absolutely needs to respond
     assert(cmd->responds);
     float readBackValue = 0;
-    int outputNum;   
+
     
     int numberOfOutputs = [[cmd->responseFormat componentsSeparatedByString:@"%"] count] - 1;
     switch (numberOfOutputs) {
@@ -236,9 +484,6 @@ static struct ORTTCPX400DPCmdInfo gORTTCPXCmds[kNumTTCPX400Cmds] = {
                 NSLog(@"Error parsing input string (%@) with format (%@)",input,cmd->responseFormat);
                 return;
             }        
-            if (callSelector) {
-                [self performSelector:callSelector withObject:[NSNumber numberWithFloat:readBackValue]];
-            } 
             break;
         case 2:
 
@@ -247,13 +492,24 @@ static struct ORTTCPX400DPCmdInfo gORTTCPXCmds[kNumTTCPX400Cmds] = {
                 NSLog(@"Error parsing input string (%@) with format (%@)\n",input,cmd->responseFormat);
                 return;
             }
-            if (callSelector) {
-                [self performSelector:callSelector withObject:[NSNumber numberWithFloat:readBackValue] withObject:[NSNumber numberWithInt:outputNum] ];
-            }
             break;
         default:
             assert((numberOfOutputs != 1 && numberOfOutputs != 2));
             break;
+    }
+    if (callSelector) {
+        numberOfOutputs = [[NSStringFromSelector(callSelector) componentsSeparatedByString:@":"] count] - 1;
+        switch (numberOfOutputs) {
+            case 1:
+                [self performSelector:callSelector withObject:[NSNumber numberWithFloat:readBackValue]];
+                break;
+            case 2:
+                [self performSelector:callSelector withObject:[NSNumber numberWithFloat:readBackValue] withObject:[NSNumber numberWithInt:outputNum] ];
+                break;
+            default:
+                assert((numberOfOutputs != 1 && numberOfOutputs != 2));
+                break;
+        }
     }
 }
 
@@ -317,7 +573,9 @@ static struct ORTTCPX400DPCmdInfo gORTTCPXCmds[kNumTTCPX400Cmds] = {
 {
 	if(inNetSocket != socket) return;
 	NSString* theString = [[inNetSocket readString:NSASCIIStringEncoding] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-	[self _processNextCmdWithInputString:theString];
+	[self _processNextReadCommandInQueueWithInputString:theString];
+    // Process any waiting write commands.
+    [self _processNextWriteCommandInQueue];
 }
 
 - (void) netsocketDisconnected:(NetSocket*)inNetSocket
@@ -340,10 +598,10 @@ static struct ORTTCPX400DPCmdInfo gORTTCPXCmds[kNumTTCPX400Cmds] = {
 
 - (void) writeCommand:(ETTCPX400DPCmds)cmd withInput:(float)input withOutputNumber:(int)output
 {
-    [self _writeCommand:cmd withInput:input withOutput:output withSelectorName:nil];
+    [self _writeCommand:cmd withInput:input withOutputNum:output withSelectorName:nil];
 }
 
-- (void) _writeCommand:(ETTCPX400DPCmds)cmd withInput:(float)input withOutput:(int)output withSelectorName:(NSString*)selName
+- (void) _writeCommand:(ETTCPX400DPCmds)cmd withInput:(float)input withOutputNum:(int)output withSelectorName:(NSString*)selName
 {
     NSString* cmdStr = [self commandStringForCommand:cmd withInput:input withOutputNumber:output];
     
@@ -366,10 +624,11 @@ static struct ORTTCPX400DPCmdInfo gORTTCPXCmds[kNumTTCPX400Cmds] = {
                     break;
             }
         }
-        [self _addCommandToDataProcessingQueue:theCmd withSelectorName:selName];
+        
     }
-    [self write:cmdStr];
-    if(!theCmd->responds) [self _setGeneralReadback:@"N/A"];
+    [self _addCommandToDataProcessingQueue:theCmd withSendString:cmdStr withReturnSelectorName:selName withOutputNumber:output];
+    [self _processNextWriteCommandInQueue];
+    //[self write:cmdStr];
 }
 
 - (NSString*) commandStringForCommand:(ETTCPX400DPCmds)cmd withInput:(float)input withOutputNumber:(int)output
@@ -407,14 +666,9 @@ static struct ORTTCPX400DPCmdInfo gORTTCPXCmds[kNumTTCPX400Cmds] = {
 
 - (void) write: (NSString*) aCommand
 {
-	if([self isConnected]){
-		[self performSelectorOnMainThread:@selector(_mainThreadSocketSend:) withObject:aCommand waitUntilDone:YES];
-	}
-	else {
-		NSString *errorMsg = @"Must establish IP connection prior to issuing command.\n";
-        NSLog(errorMsg);
-		
-	} 			
+    // This function is disable for now.
+    //[self _addCommandToDataProcessingQueue:<#(struct ORTTCPX400DPCmdInfo *)#> withSendString:<#(NSString *)#> withReturnSelectorName:<#(NSString *)#>];
+    //[self _processNextCmdInWriteQueue];
 }
 
 - (void) _mainThreadSocketSend:(NSString*)aCommand

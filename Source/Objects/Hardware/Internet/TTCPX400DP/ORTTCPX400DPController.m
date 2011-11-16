@@ -66,7 +66,43 @@
     [notifyCenter addObserver : self
 					 selector : @selector(connectionChanged:)
 						 name : ORTTCPX400DPConnectionHasChanged
-						object: nil];            
+						object: nil];
+    
+    [notifyCenter addObserver : self
+					 selector : @selector(readbackChanged:)
+						 name : ORTTCPX400DPReadBackGetCurrentReadbackIsChanged
+						object: nil];    
+    
+    [notifyCenter addObserver : self
+					 selector : @selector(readbackChanged:)
+						 name : ORTTCPX400DPReadBackGetVoltageTripSetIsChanged
+						object: nil];
+
+    [notifyCenter addObserver : self
+					 selector : @selector(setValuesChanged:)
+						 name : ORTTCPX_NOTIFY_WRITE_FORM(SetVoltage)
+						object: nil];    
+    
+    [notifyCenter addObserver : self
+					 selector : @selector(setValuesChanged:)
+						 name : ORTTCPX_NOTIFY_WRITE_FORM(SetCurrentLimit)
+						object: nil];    
+
+    [notifyCenter addObserver : self
+					 selector : @selector(setValuesChanged:)
+						 name : ORTTCPX_NOTIFY_WRITE_FORM(SetOverVoltageProtectionTripPoint)
+						object: nil];    
+    
+    [notifyCenter addObserver : self
+					 selector : @selector(setValuesChanged:)
+						 name : ORTTCPX_NOTIFY_WRITE_FORM(SetOverCurrentProtectionTripPoint)
+						object: nil];        
+
+    [notifyCenter addObserver : self
+					 selector : @selector(outputStatusChanged:)
+						 name : ORTTCPX_NOTIFY_WRITE_FORM(SetOutput)
+						object: nil];      
+    
 }
 
 - (void) awakeFromNib
@@ -83,6 +119,9 @@
     [self ipChanged:nil];
     [self generalReadbackChanged:nil];
     [self connectionChanged:nil];
+    [self readbackChanged:nil]; 
+    [self setValuesChanged:nil];
+    [self outputStatusChanged:nil];    
 }
 
 - (void) _buildPopUpButtons
@@ -117,7 +156,61 @@
 - (void) connectionChanged:(NSNotification *)aNote
 {
     BOOL isConnected = [model isConnected];
-    [connectButton setEnabled:!isConnected];
+    if (isConnected) {
+        [connectButton setTitle:@"Disconnect"];
+    } else {
+        [connectButton setTitle:@"Connect"];        
+    }
+    [[self window] setTitle:[NSString stringWithFormat:@"TT CPX400DP  %@",[model serialNumber]]];
+}
+
+- (void) readbackChanged:(NSNotification *)aNote
+{
+    [readBackVoltOne setFloatValue:[model readBackGetVoltageReadbackWithOutput:0]];
+    [readBackVoltTripOne setFloatValue:[model readBackGetVoltageTripSetWithOutput:0]];    
+    [readBackCurrentOne setFloatValue:[model readBackGetCurrentReadbackWithOutput:0]];
+    [readBackCurrentTripOne setFloatValue:[model readBackGetCurrentTripSetWithOutput:0]];   
+
+    [readBackVoltTwo setFloatValue:[model readBackGetVoltageReadbackWithOutput:1]];
+    [readBackVoltTripTwo setFloatValue:[model readBackGetVoltageTripSetWithOutput:1]];    
+    [readBackCurrentTwo setFloatValue:[model readBackGetCurrentReadbackWithOutput:1]];
+    [readBackCurrentTripTwo setFloatValue:[model readBackGetCurrentTripSetWithOutput:1]];    
+
+}
+
+- (void) setValuesChanged:(NSNotification*)aNote
+{
+    if (aNote == nil) {
+        [writeVoltOne setFloatValue:[model writeToSetVoltageWithOutput:0]];
+        [writeVoltTripOne setFloatValue:[model writeToSetOverVoltageProtectionTripPointWithOutput:0]];    
+        [writeCurrentOne setFloatValue:[model writeToSetCurrentLimitWithOutput:0]];
+        [writeCurrentTripOne setFloatValue:[model writeToSetOverCurrentProtectionTripPointWithOutput:0]];   
+        
+        [writeVoltTwo setFloatValue:[model writeToSetVoltageWithOutput:1]];
+        [writeVoltTripTwo setFloatValue:[model writeToSetOverVoltageProtectionTripPointWithOutput:1]];    
+        [writeCurrentTwo setFloatValue:[model writeToSetCurrentLimitWithOutput:1]];
+        [writeCurrentTripTwo setFloatValue:[model writeToSetOverCurrentProtectionTripPointWithOutput:1]];
+        return;
+    }
+    if ([[aNote name] isEqualToString:ORTTCPX_NOTIFY_WRITE_FORM(SetVoltage)]) {
+        [writeVoltOne setFloatValue:[model writeToSetVoltageWithOutput:0]];
+        [writeVoltTwo setFloatValue:[model writeToSetVoltageWithOutput:1]];        
+    } else if ([[aNote name] isEqualToString:ORTTCPX_NOTIFY_WRITE_FORM(SetOverVoltageProtectionTripPoint)]) {
+        [writeVoltTripOne setFloatValue:[model writeToSetOverVoltageProtectionTripPointWithOutput:0]];
+        [writeVoltTripTwo setFloatValue:[model writeToSetOverVoltageProtectionTripPointWithOutput:1]];        
+    } else if ([[aNote name] isEqualToString:ORTTCPX_NOTIFY_WRITE_FORM(SetOverCurrentProtectionTripPoint)]) {
+        [writeCurrentTripOne setFloatValue:[model writeToSetOverCurrentProtectionTripPointWithOutput:0]];
+        [writeCurrentTripTwo setFloatValue:[model writeToSetOverCurrentProtectionTripPointWithOutput:1]];        
+    } else if ([[aNote name] isEqualToString:ORTTCPX_NOTIFY_WRITE_FORM(SetCurrentLimit)]) {
+        [writeCurrentOne setFloatValue:[model writeToSetCurrentLimitWithOutput:0]];
+        [writeCurrentTwo setFloatValue:[model writeToSetCurrentLimitWithOutput:1]];        
+    }
+}
+
+- (void) outputStatusChanged:(NSNotification *)aNote
+{
+    [outputOnOne setState:[model writeToSetOutputWithOutput:0]];
+    [outputOnTwo setState:[model writeToSetOutputWithOutput:1]];    
 }
 
 #pragma mark •••Actions
@@ -153,8 +246,46 @@
 
 - (IBAction)connectAction:(id)sender
 {
-    [model connect];
+    [model toggleConnection];
 }
-@end
 
+- (IBAction)readBackAction:(id)sender
+{
+    int output;
+    for (output=0; output<kORTTCPX400DPOutputChannels; output++) {
+        [model sendCommandReadBackGetCurrentReadbackWithOutput:output];
+        [model sendCommandReadBackGetCurrentTripSetWithOutput:output];    
+        [model sendCommandReadBackGetVoltageReadbackWithOutput:output];
+        [model sendCommandReadBackGetVoltageTripSetWithOutput:output];
+    }
+}
+
+- (IBAction) writeVoltageAction:(id)sender
+{
+    [model setWriteToSetVoltage:[sender floatValue] withOutput:[sender tag]];
+}
+- (IBAction) writeVoltageTripAction:(id)sender
+{
+    [model setWriteToSetOverVoltageProtectionTripPoint:[sender floatValue] withOutput:[sender tag]];
+}
+- (IBAction) writeCurrentAction:(id)sender
+{
+    [model setWriteToSetCurrentLimit:[sender floatValue] withOutput:[sender tag]];
+}
+- (IBAction) writeCurrentTripAction:(id)sender
+{
+    [model setWriteToSetOverVoltageProtectionTripPoint:[sender floatValue] withOutput:[sender tag]];
+}
+
+- (IBAction) writeOutputStatusAction:(id)sender
+{
+    if ([outputOnOne state] == [outputOnTwo state]) {
+        [model setAllOutputToBeOn:[outputOnOne state]];
+    } else {
+        [model setOutput:0 toBeOn:[outputOnOne state]];
+        [model setOutput:1 toBeOn:[outputOnTwo state]];        
+    }
+}
+
+@end
 

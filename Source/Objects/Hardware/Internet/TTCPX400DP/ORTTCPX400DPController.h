@@ -30,7 +30,30 @@
     IBOutlet NSTextField*   inputValueText;    
     IBOutlet NSTextField*   readBackText;
     IBOutlet NSButton*      sendCommandButton;    
-    IBOutlet NSButton*      connectButton;     
+    IBOutlet NSButton*      connectButton; 
+    
+    IBOutlet NSTextField*   readBackVoltOne;
+    IBOutlet NSTextField*   readBackVoltTripOne;    
+    IBOutlet NSTextField*   readBackCurrentOne;
+    IBOutlet NSTextField*   readBackCurrentTripOne;   
+    
+    IBOutlet NSTextField*   readBackVoltTwo;
+    IBOutlet NSTextField*   readBackVoltTripTwo;    
+    IBOutlet NSTextField*   readBackCurrentTwo;
+    IBOutlet NSTextField*   readBackCurrentTripTwo;
+
+    IBOutlet NSTextField*   writeVoltOne;
+    IBOutlet NSTextField*   writeVoltTripOne;    
+    IBOutlet NSTextField*   writeCurrentOne;
+    IBOutlet NSTextField*   writeCurrentTripOne;   
+    
+    IBOutlet NSTextField*   writeVoltTwo;
+    IBOutlet NSTextField*   writeVoltTripTwo;    
+    IBOutlet NSTextField*   writeCurrentTwo;
+    IBOutlet NSTextField*   writeCurrentTripTwo; 
+    
+    IBOutlet NSButton*      outputOnOne;
+    IBOutlet NSButton*      outputOnTwo;    
 }
 
 #pragma mark •••Initialization
@@ -44,6 +67,9 @@
 - (void) ipChanged:(NSNotification*)aNote;
 - (void) connectionChanged:(NSNotification*)aNote;
 - (void) generalReadbackChanged:(NSNotification*)aNote;
+- (void) readbackChanged:(NSNotification*)aNote;
+- (void) setValuesChanged:(NSNotification*)aNote;
+- (void) outputStatusChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 //- (IBAction) passwordFieldAction:(id)sender;
@@ -51,6 +77,14 @@
 - (IBAction) commandPulldownAction:(id)sender;
 - (IBAction) connectAction:(id)sender;
 - (IBAction) sendCommandAction:(id)sender;
+- (IBAction) readBackAction:(id)sender;
+
+- (IBAction) writeVoltageAction:(id)sender;
+- (IBAction) writeVoltageTripAction:(id)sender;
+- (IBAction) writeCurrentAction:(id)sender;
+- (IBAction) writeCurrentTripAction:(id)sender;
+- (IBAction) writeOutputStatusAction:(id)sender;
+
 @end
 
 
