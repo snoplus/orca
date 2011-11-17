@@ -1,3 +1,4 @@
+#ifdef temporarilyRemoved
 //---------------------------------------------------------------------------
 //
 //  labjackusb.c
@@ -19,6 +20,7 @@
 #include <sys/stat.h>
 #include <sys/utsname.h>
 #include <fcntl.h>
+
 #include <errno.h>
 
 #include "libusb.h"
@@ -1194,3 +1196,4 @@ bool LJUSB_AbortPipe(HANDLE hDevice, unsigned long Pipe)
     errno = ENOSYS;
     return false;
 }
+#endif
