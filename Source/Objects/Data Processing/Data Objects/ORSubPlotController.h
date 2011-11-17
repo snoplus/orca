@@ -26,7 +26,6 @@
     @private
         IBOutlet NSView*		view;
         IBOutlet ORCompositePlotView*	plotView;
-        IBOutlet NSTextField*	title;
 }
 
 + (ORSubPlotController*) panel;

@@ -83,7 +83,7 @@
     
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [self registerNotificationObservers];
-    [title setStringValue:[aModel shortName]];
+    [plotView setPlotTitle:[aModel shortName]];
 }
 
 - (void) registerNotificationObservers
