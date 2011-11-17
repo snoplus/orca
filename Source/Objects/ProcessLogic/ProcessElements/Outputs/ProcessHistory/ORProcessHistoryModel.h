@@ -29,7 +29,12 @@
 	ORTimeRate* inputValue[4];
 	NSDate* lastEval;
 	int lastValue[4];	
+    BOOL showInAltView;
 }
+
+#pragma mark ***Accessors
+- (BOOL) showInAltView;
+- (void) setShowInAltView:(BOOL)aShowInAltView;
 
 - (void) dealloc;
 - (void)makeConnectors;
@@ -43,12 +48,20 @@
 #pragma mark ¥¥¥Plot Data Source
 - (int) numberPointsInPlot:(id)aPlotter;
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
+
+#pragma mark ¥¥¥Archival
+- (id)   initWithCoder:(NSCoder*)decoder;
+- (void) encodeWithCoder:(NSCoder*)encoder;
+
 @end
+
 
 @interface NSObject (ProcessHistory)
 -(float) evalAndReturnAnalogValue;
 @end
 
+extern NSString* ORProcessHistoryModelShowInAltViewChanged;
+extern NSString* ORProcessHistoryModelHistoryLabelChanged;
 extern NSString* ORHistoryElementIn1Connection;
 extern NSString* ORHistoryElementIn2Connection;
 extern NSString* ORHistoryElementIn3Connection;

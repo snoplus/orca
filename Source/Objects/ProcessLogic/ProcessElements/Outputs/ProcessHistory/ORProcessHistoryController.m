@@ -102,12 +102,29 @@
 						 name : ORMiscAttributesChanged
 					   object : model];
 	
+
+    [notifyCenter addObserver : self
+                     selector : @selector(showInAltViewChanged:)
+                         name : ORProcessHistoryModelShowInAltViewChanged
+						object: model];
+
 }
 
 - (void) updateWindow
 {
 	[super updateWindow];
 	[self miscAttributesChanged:nil];
+	[self showInAltViewChanged:nil];
+}
+
+- (void) showInAltViewChanged:(NSNotification*)aNote
+{
+	[showInAltViewCB setIntValue: [model showInAltView]];
+}
+
+- (void) showInAltViewAction:(id)sender
+{
+	[model setShowInAltView:[sender intValue]];	
 }
 
 - (void) scaleAction:(NSNotification*)aNotification
@@ -120,7 +137,6 @@
 	if(aNotification == nil || [aNotification object] == [plotter yAxis]){
 		[model setMiscAttributes:[(ORAxis*)[plotter yAxis]attributes] forKey:@"plotterYAttributes"];
 	};
-	
 }
 
 - (void) miscAttributesChanged:(NSNotification*)aNote

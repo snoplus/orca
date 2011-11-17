@@ -18,7 +18,6 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
 #pragma mark ¥¥¥Imported Files
 #import "ORProcessHwAccessorController.h"
 
@@ -27,26 +26,29 @@
 @interface ORProcessHistoryController : ORProcessHwAccessorController 
 {
 	IBOutlet ORCompositePlotView* plotter;
-    BOOL scheduledToUpdate;
+	IBOutlet NSButton* showInAltViewCB;
+    BOOL     scheduledToUpdate;
 }
 
 #pragma mark ¥¥¥Initialization
-- (id)init;
+- (id)   init;
 - (void) dealloc;
 - (void) awakeFromNib;
 
-#pragma mark ¥¥¥Notifications
+#pragma mark ***Interface Management
 - (void) registerNotificationObservers;
 - (void) updateWindow;
 - (void) dataChanged:(NSNotification*)aNote;
 - (void) doUpdate;
 - (void) miscAttributesChanged:(NSNotification*)aNote;
 - (void) scaleAction:(NSNotification*)aNote;
+- (void) showInAltViewChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Actions
+- (IBAction) showInAltViewAction:(id)sender;
 
 #pragma mark ¥¥¥Plot Data Source
 - (int) numberPointsInPlot:(id)aPlotter;
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
-
 @end
+

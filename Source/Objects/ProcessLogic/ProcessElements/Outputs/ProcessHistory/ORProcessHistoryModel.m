@@ -24,6 +24,8 @@
 #import "ORProcessInConnector.h"
 #import "ORTimeRate.h"
 
+NSString* ORProcessHistoryModelShowInAltViewChanged = @"ORProcessHistoryModelShowInAltViewChanged";
+NSString* ORProcessHistoryModelHistoryLabelChanged = @"ORProcessHistoryModelHistoryLabelChanged";
 NSString* ORHistoryElementIn1Connection   = @"ORHistoryElementInConnection1";
 NSString* ORHistoryElementIn2Connection   = @"ORHistoryElementInConnection2";
 NSString* ORHistoryElementIn3Connection   = @"ORHistoryElementInConnection3";
@@ -37,6 +39,11 @@ NSString* historyConnectors[4] = {
 	@"ORHistoryElementIn4Connection"
 };
 
+@interface ORProcessHistoryModel (private)
+- (NSImage*) composeIcon;
+- (NSImage*) composeLowLevelIcon;
+- (NSImage*) composeHighLevelIcon;
+@end
 
 @implementation ORProcessHistoryModel
 
@@ -50,7 +57,24 @@ NSString* historyConnectors[4] = {
 	[super dealloc];
 }
 
--(void)makeConnectors
+#pragma mark ***Accessors
+
+- (BOOL) showInAltView
+{
+    return showInAltView;
+}
+
+- (void) setShowInAltView:(BOOL)aShowInAltView
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setShowInAltView:showInAltView];
+    showInAltView = aShowInAltView;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORProcessHistoryModelShowInAltViewChanged object:self];
+
+	[self postStateChange];
+}
+
+
+- (void) makeConnectors
 {
 	ORProcessInConnector* inConnector;
 	
@@ -69,7 +93,7 @@ NSString* historyConnectors[4] = {
 
 - (void) setUpImage
 {
-    [self setImage:[NSImage imageNamed:@"ProcessHistory"]];
+	[self setImage:[self composeIcon]];
 }
 
 - (void) makeMainController
@@ -89,6 +113,10 @@ NSString* historyConnectors[4] = {
 					  object:self];
 }
 
+- (BOOL) canBeInAltView
+{
+	return showInAltView;
+}
 
 - (void) processIsStarting
 {
@@ -158,6 +186,87 @@ NSString* historyConnectors[4] = {
 	int index = count-i-1;
 	*yValue =  [inputValue[set] valueAtIndex:index];
 	*xValue =  [inputValue[set] timeSampledAtIndex:index];
+}
+
+
+#pragma mark ***Archival
+- (id)initWithCoder:(NSCoder*)decoder
+{
+    self = [super initWithCoder:decoder];
+    
+    [[self undoManager] disableUndoRegistration];
+    [self setShowInAltView:[decoder decodeBoolForKey:@"showInAltView"]];
+    [[self undoManager] enableUndoRegistration];    
+	
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder*)encoder
+{
+    [super encodeWithCoder:encoder];
+    [encoder encodeBool:showInAltView forKey:@"showInAltView"];
+}
+
+@end
+
+@implementation ORProcessHistoryModel (private)
+
+- (NSImage*) composeIcon
+{
+	if(![self useAltView])	return [self composeLowLevelIcon];
+	else					return [self composeHighLevelIcon];
+}
+
+- (NSImage*) composeLowLevelIcon
+{
+	
+	NSFont* theFont = [NSFont messageFontOfSize:9];
+	NSAttributedString* iconLabel =  [[[NSAttributedString alloc] 
+											initWithString:[NSString stringWithFormat:@"%d",[self processID]] 
+											attributes:[NSDictionary dictionaryWithObjectsAndKeys:theFont,NSFontAttributeName,[NSColor blackColor],NSForegroundColorAttributeName,nil]]autorelease];
+	NSSize textSize = [iconLabel size];
+	NSImage* anImage = [NSImage imageNamed:@"ProcessHistory"];
+	
+	NSSize theIconSize	= [anImage size];
+	
+    NSImage* finalImage = [[NSImage alloc] initWithSize:theIconSize];
+    [finalImage lockFocus];
+    [anImage compositeToPoint:NSMakePoint(0,0) operation:NSCompositeCopy];
+	
+	[iconLabel drawInRect:NSMakeRect(theIconSize.width - textSize.width - 2,theIconSize.height-textSize.height-3,textSize.width,textSize.height)];
+	
+    [finalImage unlockFocus];
+	return [finalImage autorelease];	
+}
+
+- (NSImage*) composeHighLevelIcon
+{
+	NSFont* theFont = [NSFont messageFontOfSize:10];
+	NSAttributedString* iconLabel;
+	if([[self customLabel] length]){
+		iconLabel =  [[[NSAttributedString alloc] 
+				 initWithString:[NSString stringWithFormat:@"%@",[self customLabel]]
+				 attributes:[NSDictionary dictionaryWithObjectsAndKeys:theFont,NSFontAttributeName,[NSColor blackColor],NSForegroundColorAttributeName,nil]]autorelease];
+	}
+	else {
+		iconLabel =  [[[NSAttributedString alloc] 
+					   initWithString:[NSString stringWithFormat:@"History %d",[self processID]] 
+					   attributes:[NSDictionary dictionaryWithObjectsAndKeys:theFont,NSFontAttributeName,[NSColor blackColor],NSForegroundColorAttributeName,nil]]autorelease];
+	}
+	NSSize textSize = [iconLabel size];
+	NSImage* anImage = [NSImage imageNamed:@"ProcessHistoryHL"];
+	
+	NSSize theIconSize	= [anImage size];
+	float textStart		= 60;
+		
+    NSImage* finalImage = [[NSImage alloc] initWithSize:theIconSize];
+    [finalImage lockFocus];
+    [anImage compositeToPoint:NSMakePoint(0,0) operation:NSCompositeCopy];
+	
+	[iconLabel drawInRect:NSMakeRect(textStart, 3 , MIN(textSize.width,theIconSize.width-textStart),textSize.height)];
+	
+    [finalImage unlockFocus];
+	return [finalImage autorelease];	
 }
 
 @end

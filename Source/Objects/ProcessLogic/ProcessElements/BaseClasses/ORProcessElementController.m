@@ -52,7 +52,7 @@
 - (void) setModel:(id)aModel
 {    
     [super setModel:aModel];
-    [[self window] setTitle:[NSString stringWithFormat:@"%@-%d",[model className],[model uniqueIdNumber]]];
+    [[self window] setTitle:[NSString stringWithFormat:@"%@-%d",[model className],[model processID]]];
     [self updateWindow];
 }
 
