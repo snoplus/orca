@@ -1058,6 +1058,7 @@
 		8446CE2507B847B8006CD9C4 /* ORAD413AModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8446CE1D07B847B8006CD9C4 /* ORAD413AModel.m */; };
 		8446CE2607B847B8006CD9C4 /* ORAD413AModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8446CE1E07B847B8006CD9C4 /* ORAD413AModel.h */; };
 		84489D4E1473F5D90055A563 /* Bug.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84AC47601454BE5F009D6F83 /* Bug.tif */; };
+		84489E0C147432390055A563 /* ProcessHistoryHL.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84489E0B147432390055A563 /* ProcessHistoryHL.tif */; };
 		8448E4FC09E5C4AC001B88B5 /* NSView+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 8448E4FA09E5C4AC001B88B5 /* NSView+Extensions.h */; };
 		8448E4FD09E5C4AC001B88B5 /* NSView+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 8448E4FB09E5C4AC001B88B5 /* NSView+Extensions.m */; };
 		844998640F1282E7004B855B /* SyntaxDefinition.plist in Resources */ = {isa = PBXBuildFile; fileRef = 844998630F1282E7004B855B /* SyntaxDefinition.plist */; };
@@ -3606,6 +3607,7 @@
 		8446CE1C07B847B8006CD9C4 /* ORAD413ADecoders.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORAD413ADecoders.m; sourceTree = "<group>"; };
 		8446CE1D07B847B8006CD9C4 /* ORAD413AModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORAD413AModel.m; sourceTree = "<group>"; };
 		8446CE1E07B847B8006CD9C4 /* ORAD413AModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORAD413AModel.h; sourceTree = "<group>"; };
+		84489E0B147432390055A563 /* ProcessHistoryHL.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = ProcessHistoryHL.tif; path = Source/Objects/ProcessLogic/ProcessElements/Outputs/ProcessHistory/ProcessHistoryHL.tif; sourceTree = SOURCE_ROOT; };
 		8448E4FA09E5C4AC001B88B5 /* NSView+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSView+Extensions.h"; sourceTree = "<group>"; };
 		8448E4FB09E5C4AC001B88B5 /* NSView+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSView+Extensions.m"; sourceTree = "<group>"; };
 		844998630F1282E7004B855B /* SyntaxDefinition.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = SyntaxDefinition.plist; path = "Source/Main Dialogs/CommandCenter/Scripting/SyntaxDefinition.plist"; sourceTree = SOURCE_ROOT; };
@@ -9899,6 +9901,7 @@
 				84C12E750993E3FA006F2901 /* ORProcessHistoryModel.m */,
 				84C12E760993E3FA006F2901 /* ProcessHistory.nib */,
 				84C12E770993E3FA006F2901 /* ProcessHistory.tif */,
+				84489E0B147432390055A563 /* ProcessHistoryHL.tif */,
 			);
 			name = ProcessHistory;
 			path = Source/Objects/ProcessLogic/ProcessElements/Outputs/ProcessHistory;
@@ -13218,6 +13221,7 @@
 				848E59281472B35200A70AB4 /* LabJackUE9.tif in Resources */,
 				848E59291472B35200A70AB4 /* NoLabJackUE9DriverHelp.plist in Resources */,
 				84489D4E1473F5D90055A563 /* Bug.tif in Resources */,
+				84489E0C147432390055A563 /* ProcessHistoryHL.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
