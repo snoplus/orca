@@ -12,7 +12,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="39"/>
+			<integer value="38"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -47,7 +47,7 @@
 				<string key="NSWindowClass">NSWindow</string>
 				<string key="NSViewClass">View</string>
 				<string key="NSWindowContentMaxSize">{1016, 1016}</string>
-				<string key="NSWindowContentMinSize">{445, 350}</string>
+				<string key="NSWindowContentMinSize">{529, 445}</string>
 				<object class="NSView" key="NSWindowView" id="239114689">
 					<reference key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
@@ -1540,7 +1540,7 @@
 					<reference key="NSSuperview"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
-				<string key="NSMinSize">{445, 372}</string>
+				<string key="NSMinSize">{529, 467}</string>
 				<string key="NSMaxSize">{1016, 1038}</string>
 				<string key="NSFrameAutosaveName">Container</string>
 			</object>
@@ -2974,7 +2974,7 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<object class="NSAffineTransform">
-						<bytes key="NSTransformStruct">P4AAAL+AAABDPAAAwnAAAA</bytes>
+						<bytes key="NSTransformStruct">P4AAAL+AAABDPAAAwlwAAA</bytes>
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -3033,7 +3033,7 @@
 					<boolean value="YES"/>
 					<boolean value="YES"/>
 					<string>{1016, 1016}</string>
-					<string>{445, 350}</string>
+					<string>{529, 445}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>ORPlacardScrollView</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
