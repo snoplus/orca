@@ -1355,6 +1355,7 @@
 		8475EC4B1475A66F003A165D /* ORLabJackUE9Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 8475EC391475A66F003A165D /* ORLabJackUE9Model.m */; };
 		8475EC511475A752003A165D /* labjackusb.c in Sources */ = {isa = PBXBuildFile; fileRef = 8475EC4F1475A752003A165D /* labjackusb.c */; };
 		8475EC521475A752003A165D /* labjackusb.h in Headers */ = {isa = PBXBuildFile; fileRef = 8475EC501475A752003A165D /* labjackusb.h */; };
+		8475EC8B147693E8003A165D /* libusb-1.0.a in Frameworks_Copy */ = {isa = PBXBuildFile; fileRef = 8475EC0714759D53003A165D /* libusb-1.0.a */; };
 		84760CC20B370E0A00512F67 /* ORExperimentModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84760CC00B370E0A00512F67 /* ORExperimentModel.h */; };
 		84760CC30B370E0A00512F67 /* ORExperimentModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84760CC10B370E0A00512F67 /* ORExperimentModel.m */; };
 		84760D350B3728DF00512F67 /* KatrinConstants.h in Resources */ = {isa = PBXBuildFile; fileRef = 84760D340B3728DF00512F67 /* KatrinConstants.h */; };
@@ -2819,6 +2820,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				8475EC8B147693E8003A165D /* libusb-1.0.a in Frameworks_Copy */,
 				EF3787A012DFFF90003C814E /* YAJL.framework in Frameworks_Copy */,
 			);
 			name = Frameworks_Copy;

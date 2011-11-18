@@ -1,4 +1,3 @@
-#ifdef temporarilyRemoved
 //---------------------------------------------------------------------------
 //
 //  labjackusb.c
@@ -1196,4 +1195,3 @@ bool LJUSB_AbortPipe(HANDLE hDevice, unsigned long Pipe)
     errno = ENOSYS;
     return false;
 }
-#endif
