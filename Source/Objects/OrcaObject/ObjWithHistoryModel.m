@@ -102,6 +102,7 @@
 		NSKeyedUnarchiver *unarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:theData];
 		id theHistory = [unarchiver decodeObjectForKey:@"ObjHistory"];
 		[self setHistory:theHistory];
+		[unarchiver release];
 	}
 }
 

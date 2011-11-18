@@ -64,8 +64,6 @@
 	float width		= [plotView bounds].size.width;
 	float height	= [plotView bounds].size.height;
 	float chanWidth = width / [mXScale valueRange];
-	float xl = 0;
-	float yl = 0;
 	float x,y;
 	double xValue,yValue;
 	
@@ -78,13 +76,9 @@
 		x = [mXScale getPixAbs:startTime - xValue]+chanWidth/2.;
 		if(i!=0){
 			[theDataPath lineToPoint:NSMakePoint(x,y)];
-			xl = x;
-			yl = y;
 		}
 		else {
 			[theDataPath moveToPoint:NSMakePoint(0,y)];
-			xl = 0;
-			yl = y;
 		}
 
 	}
