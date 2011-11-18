@@ -24,17 +24,17 @@
 #import "ORUSB.h"
 #import "ORAdcProcessing.h"
 #import "ORBitProcessing.h"
+#import "labjackusb.h"
+#import "ue9.h"
 
 @class ORUSBInterface;
-@class ORAlarm;
 
 
 @interface ORLabJackUE9Model : OrcaObject <USBDevice,ORAdcProcessing,ORBitProcessing> {
+    HANDLE hDevice;
 	NSLock* localLock;
 	ORUSBInterface* usbInterface;
     NSString* serialNumber;
-	ORAlarm*  noUSBAlarm;
-	ORAlarm*  noDriverAlarm;
 	int adc[8];
 	int gain[4];
 	float lowLimit[8];
@@ -161,8 +161,6 @@
 
 #pragma mark ***USB Stuff
 - (id) getUSBController;
-- (ORUSBInterface*) usbInterface;
-- (void) setUsbInterface:(ORUSBInterface*)anInterface;
 - (NSString*) serialNumber;
 - (void) setSerialNumber:(NSString*)aSerialNumber;
 - (unsigned long) vendorID;
@@ -170,7 +168,8 @@
 - (NSString*) usbInterfaceDescription;
 - (void) interfaceAdded:(NSNotification*)aNote;
 - (void) interfaceRemoved:(NSNotification*)aNote;
-- (void) checkUSBAlarm;
+- (void) checkDevices;
+- (void) setUsbInterface:(ORUSBInterface*)anInterface;
 
 #pragma mark •••Adc Processing Protocol
 - (void)processIsStarting;

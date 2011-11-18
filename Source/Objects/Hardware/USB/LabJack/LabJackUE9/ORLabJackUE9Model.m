@@ -100,35 +100,9 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 	for(i=0;i<8;i++)	[channelUnit[i] release];
 	for(i=0;i<16;i++)	[ioName[i] release];
 	for(i=0;i<4;i++)	[doName[i] release];
-	[noUSBAlarm clearAlarm];
-	[noUSBAlarm release];
-    [noDriverAlarm clearAlarm];
-    [noDriverAlarm release];
     [serialNumber release];
 	[super dealloc];
 }
-
-- (void) awakeAfterDocumentLoaded
-{
-	@try {
-		[self connectionChanged];		
-		//make sure the driver is installed.
-		NSFileManager* fm = [NSFileManager defaultManager];
-		if(![fm fileExistsAtPath:kLabJackUE9U12DriverPath]){
-			NSLogColor([NSColor redColor],@"*** Unable To Locate LabJackUE9 U12 Driver ***\n");
-			if(!noDriverAlarm){
-				noDriverAlarm = [[ORAlarm alloc] initWithName:@"No LabJackUE9 U12 Driver Found" severity:0];
-				[noDriverAlarm setSticky:NO];
-				[noDriverAlarm setHelpStringFromFile:@"kLabJackUE9U12DriverPath"];
-			}                      
-			[noDriverAlarm setAcknowledged:NO];
-			[noDriverAlarm postAlarm];
-		}
-	}
-	@catch(NSException* localException) {
-	}
-}
-
 
 - (void) makeConnectors
 {
@@ -163,20 +137,12 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 
 - (void) connectionChanged
 {
-	NSArray* interfaces = [[self getUSBController] interfacesForVender:[self vendorID] product:[self productID]];
-	NSString* sn = serialNumber;
-	if([interfaces count] == 1 && ![sn length]){
-		sn = [[interfaces objectAtIndex:0] serialNumber];
-	}
-	[self setSerialNumber:sn]; //to force usbinterface at doc startup
-	[self checkUSBAlarm];
 	[[self objectConnectedTo:ORLabJackUE9USBNextConnection] connectionChanged];
 }
 
 - (void) setGuardian:(id)aGuardian
 {
 	[super setGuardian:aGuardian];
-	[self checkUSBAlarm];
 
 }
 
@@ -839,58 +805,18 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackUE9SerialNumberChanged object:self];
 }
 
-- (ORUSBInterface*) usbInterface
-{
-	return usbInterface;
-}
-
-- (void) setUsbInterface:(ORUSBInterface*)anInterface
-{
-	
-	[usbInterface release];
-	usbInterface = anInterface;
-	[usbInterface retain];
-	[usbInterface setUsePipeType:kUSBBulk];
-	
-	[[NSNotificationCenter defaultCenter]
-	 postNotificationName: ORLabJackUE9USBInterfaceChanged
-	 object: self];
-	[self checkUSBAlarm];
-	[self firstWrite];
-}
-
-- (void) checkUSBAlarm
-{
-	if((usbInterface && [self getUSBController]) || !guardian){
-		[noUSBAlarm clearAlarm];
-		[noUSBAlarm release];
-		noUSBAlarm = nil;
-	}
-	else {
-		if(guardian){
-			if(!noUSBAlarm){
-				noUSBAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"No USB for LabJackUE9"] severity:kHardwareAlarm];
-				[noUSBAlarm setSticky:YES];		
-			}
-			[noUSBAlarm setAcknowledged:NO];
-			[noUSBAlarm postAlarm];
-		}
-	}
-	[self setUpImage];
-}
-
 - (void) interfaceAdded:(NSNotification*)aNote
 {
-	[[aNote object] claimInterfaceWithSerialNumber:[self serialNumber] for:self];
-	[self firstWrite];
+	[self checkDevices];
 }
 
 - (void) interfaceRemoved:(NSNotification*)aNote
 {
-	ORUSBInterface* theInterfaceRemoved = [[aNote userInfo] objectForKey:@"USBInterface"];
-	if((usbInterface == theInterfaceRemoved) && serialNumber){
-		[self setUsbInterface:nil];
-	}
+}
+
+- (void) setUsbInterface:(ORUSBInterface*)anInterface;
+{
+	//we don't need this since we are using libusb, but a stub is needed to conform to the usbuser protocol.
 }
 
 - (NSString*) usbInterfaceDescription
@@ -902,6 +828,21 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 - (void) registerWithUSB:(id)usb
 {
 	[usb registerForUSBNotifications:self];
+}
+
+- (void) checkDevices
+{
+	int numUE9s = LJUSB_GetDevCount(UE9_PRODUCT_ID);
+	NSLog(@"Number of LabJackkUE9 devices: %d\n",numUE9s);
+	HANDLE devHandles[256];
+	UINT productIds[256];
+	LJUSB_OpenAllDevices(devHandles,productIds,256);
+	int i;
+	for(i=0;i<256;i++){
+		if(productIds[i] == 0x9){
+			NSLog(@"Device Handle: %d Product ID: %d\n",devHandles[i],productIds[i]);
+		}
+	}
 }
 
 - (NSString*) hwName
@@ -1092,10 +1033,12 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 {
 	return maxValue[aChan];
 }
+
 - (double) minValueForChan:(int)aChan
 {
 	return minValue[aChan];
 }
+
 - (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit channel:(int)channel
 {
 	@synchronized(self){
@@ -1207,23 +1150,7 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 }
 - (void) readSerialNumber
 {
-	if(usbInterface && [self getUSBController]){
-		unsigned char sendBuff[18];
-		sendBuff[1] = (uint8)(0xF8);  //command byte
-		sendBuff[2] = (uint8)(0x06);  //number of data words
-		sendBuff[3] = (uint8)(0x08);  //extended command number
-		
-		//WriteMask, PowerLevel, FIODir, etc. are all passed a value of
-		//zero since we only want to read Control configuration settings,
-		//not change them
-		int i;
-		for(i = 6; i < 18; i++){
-			sendBuff[i] = (uint8)(0x00);
-		}
-		[self extendedChecksum:sendBuff len:18];
-		[self writeData:sendBuff];
-		[self readPipeThread];
-	}
+	
 }
 @end
 
@@ -1354,7 +1281,8 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 //	[self extendedChecksum:sendBuff len:18];	[usbInterface writeBytes:sendBuff length:8];
 //	[NSThread detachNewThreadSelector: @selector(readPipeThread) toTarget:self withObject: nil];
 //	[ORTimer delay:.02];
-	[self readSerialNumber];
+//[self readSerialNumber];
+	
 }
 
 - (void) writeData:(unsigned char*) data
