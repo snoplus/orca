@@ -31,6 +31,8 @@
 #import "ORCommandList.h"
 
 
+NSString* ORKatrinV4FLTModelReceivedHistoCounterChanged = @"ORKatrinV4FLTModelReceivedHistoCounterChanged";
+NSString* ORKatrinV4FLTModelReceivedHistoChanMapChanged = @"ORKatrinV4FLTModelReceivedHistoChanMapChanged";
 NSString* ORKatrinV4FLTModelFifoLengthChanged = @"ORKatrinV4FLTModelFifoLengthChanged";
 NSString* ORKatrinV4FLTModelNfoldCoincidenceChanged = @"ORKatrinV4FLTModelNfoldCoincidenceChanged";
 NSString* ORKatrinV4FLTModelVetoOverlapTimeChanged = @"ORKatrinV4FLTModelVetoOverlapTimeChanged";
@@ -243,6 +245,30 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (short) getNumberRegisters{ return kFLTV4NumRegs; }
 
 #pragma mark •••Accessors
+
+- (int) receivedHistoCounter
+{
+    return receivedHistoCounter;
+}
+
+- (void) setReceivedHistoCounter:(int)aReceivedHistoCounter
+{
+    receivedHistoCounter = aReceivedHistoCounter;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelReceivedHistoCounterChanged object:self];
+}
+
+- (int) receivedHistoChanMap
+{
+    return receivedHistoChanMap;
+}
+
+- (void) setReceivedHistoChanMap:(int)aReceivedHistoChanMap
+{
+    receivedHistoChanMap = aReceivedHistoChanMap;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelReceivedHistoChanMapChanged object:self];
+}
 - (BOOL) activateDebuggingDisplays {return activateDebuggingDisplays;}
 - (void) setActivateDebuggingDisplays:(BOOL)aState
 {
@@ -1564,6 +1590,28 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 		
 	return objDictionary;
 }
+
+
+
+- (BOOL) setFromDecodeStageReceivedHistoForChan:(short)aChan
+{
+    int map = receivedHistoChanMap;
+    if(aChan>=0 && aChan<kNumV4FLTChannels){
+		map |= 0x1<<aChan;
+		[self setReceivedHistoChanMap:map];
+		NSLog(@"Received histogram for chan:%i  (trigger mask: %i)\n",aChan,triggerEnabledMask);//DEBUG
+		if(triggerEnabledMask == map){
+		    //after all channels shipped histogram, increase counter
+		    map=0;
+			[self setReceivedHistoChanMap:map];
+			[self setReceivedHistoCounter: receivedHistoCounter+1];
+		}
+	}
+    return YES;
+}
+
+
+
 
 - (BOOL) bumpRateFromDecodeStage:(short)channel
 {

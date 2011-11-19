@@ -343,9 +343,29 @@
                          name : ORKatrinV4FLTModeFifoFlagsChanged
 						object: model];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(receivedHistoChanMapChanged:)
+                         name : ORKatrinV4FLTModelReceivedHistoChanMapChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(receivedHistoCounterChanged:)
+                         name : ORKatrinV4FLTModelReceivedHistoCounterChanged
+						object: model];
+
 }
 
 #pragma mark •••Interface Management
+
+- (void) receivedHistoCounterChanged:(NSNotification*)aNote
+{
+	[receivedHistoCounterTextField setIntValue: [model receivedHistoCounter]];
+}
+
+- (void) receivedHistoChanMapChanged:(NSNotification*)aNote
+{
+	[receivedHistoChanMapTextField setIntValue: [model receivedHistoChanMap]];
+}
 - (void) activateDebuggerDisplaysChanged:(NSNotification*)aNote
 {
 	[activateDebuggerCB setIntValue: [model activateDebuggingDisplays]];
@@ -551,6 +571,8 @@
 	[self fifoLengthChanged:nil];
 	[self activateDebuggerDisplaysChanged:nil];
 	[self fifoFlagsChanged:nil];
+	[self receivedHistoChanMapChanged:nil];
+	[self receivedHistoCounterChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -924,6 +946,16 @@
 }
 
 #pragma mark •••Actions
+
+- (void) receivedHistoCounterTextFieldAction:(id)sender
+{
+	[model setReceivedHistoCounter:[sender intValue]];	
+}
+
+- (void) receivedHistoChanMapTextFieldAction:(id)sender
+{
+	[model setReceivedHistoChanMap:[sender intValue]];	
+}
 
 - (IBAction) fifoLengthPUAction:(id)sender
 {

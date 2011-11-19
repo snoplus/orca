@@ -29,6 +29,8 @@
 @interface ORKatrinV4FLTController : OrcaObjectController {
 	@private
 		IBOutlet NSTabView*		tabView;	
+	IBOutlet   NSTextField* receivedHistoCounterTextField;
+	IBOutlet   NSTextField* receivedHistoChanMapTextField;
 		IBOutlet NSPopUpButton* fifoLengthPU;
 		IBOutlet NSTabView*		modeTabView;	
 		IBOutlet NSButton*		settingLockButton;
@@ -139,6 +141,8 @@
 - (void) updateButtons;
 
 #pragma mark •••Interface Management
+- (void) receivedHistoCounterChanged:(NSNotification*)aNote;
+- (void) receivedHistoChanMapChanged:(NSNotification*)aNote;
 - (void) activateDebuggerDisplaysChanged:(NSNotification*)aNote;
 - (void) fifoLengthChanged:(NSNotification*)aNote;
 - (void) nfoldCoincidenceChanged:(NSNotification*)aNote;
@@ -194,6 +198,8 @@
 - (void) fifoFlagsChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) receivedHistoCounterTextFieldAction:(id)sender;
+- (IBAction) receivedHistoChanMapTextFieldAction:(id)sender;
 - (IBAction) activateDebuggingDisplayAction:(id)sender;
 - (IBAction) fifoLengthPUAction:(id)sender;
 - (IBAction) nfoldCoincidencePUAction:(id)sender;

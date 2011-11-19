@@ -96,6 +96,8 @@
 							  //Denis enabled filterShapingLengthReg 1, so filterLength would become -1 (negative), so I invented filterShapingLenght as new variable -tb-
 	BOOL activateDebuggingDisplays;
 	unsigned char fifoFlags[kNumV4FLTChannels];
+    int receivedHistoChanMap;
+    int receivedHistoCounter;
 }
 
 #pragma mark •••Initialization
@@ -106,6 +108,10 @@
 - (short) getNumberRegisters;
 
 #pragma mark •••Accessors
+- (int) receivedHistoCounter;
+- (void) setReceivedHistoCounter:(int)aReceivedHistoCounter;
+- (int) receivedHistoChanMap;
+- (void) setReceivedHistoChanMap:(int)aReceivedHistoChanMap;
 - (BOOL) activateDebuggingDisplays;
 - (void) setActivateDebuggingDisplays:(BOOL)aState;
 - (int) fifoLength;
@@ -311,6 +317,9 @@
 - (BOOL) bumpRateFromDecodeStage:(short)channel;
 - (BOOL) setFromDecodeStage:(short)aChan fifoFlags:(unsigned char)flags;
 
+//for sync of HW histogramming with
+- (BOOL) setFromDecodeStageReceivedHistoForChan:(short)aChan;
+
 #pragma mark •••Archival
 - (id) initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
@@ -356,6 +365,8 @@
 				  n:(int) n;
 @end
 
+extern NSString* ORKatrinV4FLTModelReceivedHistoCounterChanged;
+extern NSString* ORKatrinV4FLTModelReceivedHistoChanMapChanged;
 extern NSString* ORKatrinV4FLTModelFifoLengthChanged;
 extern NSString* ORKatrinV4FLTModelNfoldCoincidenceChanged;
 extern NSString* ORKatrinV4FLTModelVetoOverlapTimeChanged;

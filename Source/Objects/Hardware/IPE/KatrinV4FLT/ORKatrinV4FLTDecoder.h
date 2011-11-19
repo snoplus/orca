@@ -55,6 +55,10 @@
 @end
 
 @interface ORKatrinV4FLTDecoderForHistogram : ORIpeCardDecoder {
+@protected
+	BOOL getHistoReceivedNoteFromDecodeStage;
+    unsigned char oldFifoFlags[kNumV4FLTChannels];
+	NSMutableDictionary* actualFlts;
 }
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
 - (NSString*) dataRecordDescription:(unsigned long*)ptr;

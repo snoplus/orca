@@ -143,8 +143,9 @@
 				getFifoFlagsFromDecodeStage = [obj setFromDecodeStage:chan fifoFlags:fifoFlags];
 				fifoFlags = oldFifoFlags[chan];
 			}
-	}	
-}
+	    }	
+    }
+	
     return length; //must return number of longs processed.
 }
 
@@ -748,6 +749,20 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx histogramInfo (some flags; some spare fo
   */
 //-------------------------------------------------------------
 
+- (id) init
+{
+NSLog(@"DEBUG: Calling %@ :: %@   <<<<------ wie oft?\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));// DEBUG -tb-
+    self = [super init];
+    getHistoReceivedNoteFromDecodeStage = YES;
+    return self;
+}
+
+- (void) dealloc
+{
+	[actualFlts release];
+    [super dealloc];
+}
+
 
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
@@ -916,6 +931,24 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx histogramInfo (some flags; some spare fo
         
     }
     #endif
+
+	//get the actual object
+	if(getHistoReceivedNoteFromDecodeStage){
+		NSString* fltKey = [crateKey stringByAppendingString:stationKey];
+		if(!actualFlts)actualFlts = [[NSMutableDictionary alloc] init];
+		ORKatrinV4FLTModel* obj = [actualFlts objectForKey:fltKey];
+		if(!obj){
+			NSArray* listOfFlts = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORKatrinV4FLTModel")];
+			for(ORKatrinV4FLTModel* aFlt in listOfFlts){
+				if(/*[aFlt crateNumber] == crate &&*/ [aFlt stationNumber] == card){ //TODO: we might have multiple crates in the future -tb-
+					[actualFlts setObject:aFlt forKey:fltKey];
+					obj = aFlt;
+					break;
+				}
+			}
+		}
+		if(getHistoReceivedNoteFromDecodeStage)    getHistoReceivedNoteFromDecodeStage  =  [obj setFromDecodeStageReceivedHistoForChan:chan ];
+    }
     
 
     return length; //must return number of longs processed.
