@@ -33,6 +33,7 @@
 	IBOutlet NSButton*		pauseButton;
     IBOutlet NSButton*		refreshButton;
 	IBOutlet id	plotView;
+	NSRect preTiledSize;
 }
 
 #pragma mark •••Accessors
@@ -67,10 +68,14 @@
 - (IBAction) refreshModeAction:(id)sender;
 - (IBAction) pauseAction:(id)sender;
 - (IBAction) tileWindows:(id)sender;
+- (IBAction) unTileWindows:(id)sender;
 - (IBAction) autoScale:(NSToolbarItem*)sender;	 
 //scripting helper
 - (void) savePlotToFile:(NSString*)aFile;
 - (id) curve:(int)c gate:(int)g; //for backward compatiblity with scripts
+
+@property (assign) NSRect preTiledSize;
+
 @end
 
 @interface NSObject (ORDataController_Cat)

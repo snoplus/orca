@@ -990,6 +990,15 @@
 									<reference key="NSOnImage" ref="452980312"/>
 									<reference key="NSMixedImage" ref="1069359491"/>
 								</object>
+								<object class="NSMenuItem" id="503638408">
+									<reference key="NSMenu" ref="538601274"/>
+									<string key="NSTitle">UnTile Plot Windows</string>
+									<string key="NSKeyEquiv">u</string>
+									<int key="NSKeyEquivModMask">1048576</int>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="452980312"/>
+									<reference key="NSMixedImage" ref="1069359491"/>
+								</object>
 								<object class="NSMenuItem" id="870422590">
 									<reference key="NSMenu" ref="538601274"/>
 									<bool key="NSIsDisabled">YES</bool>
@@ -1658,14 +1667,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">tileWindows:</string>
-						<reference key="source" ref="429477561"/>
-						<reference key="destination" ref="1051537372"/>
-					</object>
-					<int key="connectionID">467</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
 						<string key="label">showArchive:</string>
 						<reference key="source" ref="698043728"/>
 						<reference key="destination" ref="343589627"/>
@@ -1679,6 +1680,22 @@
 						<reference key="destination" ref="576505886"/>
 					</object>
 					<int key="connectionID">470</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">unTileWindows:</string>
+						<reference key="source" ref="429477561"/>
+						<reference key="destination" ref="503638408"/>
+					</object>
+					<int key="connectionID">474</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">tileWindows:</string>
+						<reference key="source" ref="429477561"/>
+						<reference key="destination" ref="1051537372"/>
+					</object>
+					<int key="connectionID">475</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -2268,6 +2285,7 @@
 							<reference ref="576505886"/>
 							<reference ref="1051537372"/>
 							<reference ref="343589627"/>
+							<reference ref="503638408"/>
 						</object>
 						<reference key="parent" ref="927200920"/>
 					</object>
@@ -2502,6 +2520,11 @@
 						<reference key="object" ref="343589627"/>
 						<reference key="parent" ref="538601274"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">471</int>
+						<reference key="object" ref="503638408"/>
+						<reference key="parent" ref="538601274"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -2719,6 +2742,8 @@
 					<string>465.ImportedFromIB2</string>
 					<string>468.IBPluginDependency</string>
 					<string>468.ImportedFromIB2</string>
+					<string>471.IBPluginDependency</string>
+					<string>471.ImportedFromIB2</string>
 					<string>56.IBPluginDependency</string>
 					<string>56.ImportedFromIB2</string>
 					<string>57.IBPluginDependency</string>
@@ -2862,7 +2887,7 @@
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
-					<string>{{443, 436}, {295, 453}}</string>
+					<string>{{443, 416}, {295, 473}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -2951,6 +2976,8 @@
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
@@ -3005,7 +3032,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">470</int>
+			<int key="maxID">475</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -5295,6 +5322,7 @@
 							<string>refreshModeAction:</string>
 							<string>tileWindows:</string>
 							<string>toggleRaw:</string>
+							<string>unTileWindows:</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
@@ -5307,6 +5335,7 @@
 							<string>id</string>
 							<string>id</string>
 							<string>NSToolbarItem</string>
+							<string>id</string>
 						</object>
 					</object>
 					<object class="NSMutableDictionary" key="actionInfosByName">
@@ -5322,6 +5351,7 @@
 							<string>refreshModeAction:</string>
 							<string>tileWindows:</string>
 							<string>toggleRaw:</string>
+							<string>unTileWindows:</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
@@ -5360,6 +5390,10 @@
 							<object class="IBActionInfo">
 								<string key="name">toggleRaw:</string>
 								<string key="candidateClassName">NSToolbarItem</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">unTileWindows:</string>
+								<string key="candidateClassName">id</string>
 							</object>
 						</object>
 					</object>
@@ -12881,10 +12915,6 @@
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDependencies">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.macosx</string>
 			<integer value="1050" key="NS.object.0"/>
-		</object>
-		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDependencyDefaults">
-			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.macosx</string>
-			<integer value="1060" key="NS.object.0"/>
 		</object>
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDevelopmentDependencies">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.InterfaceBuilder3</string>

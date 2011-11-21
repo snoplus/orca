@@ -34,6 +34,8 @@ int windowSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1 tit
 
 @implementation ORDataController
 
+@synthesize preTiledSize;
+
 - (id) init
 {
 	self = [super init];
@@ -372,14 +374,13 @@ int windowSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1 tit
 {
 	//get list of all plot windows
 	NSArray* windowList = [[NSApp windows] sortedArrayUsingFunction:windowSort context:nil];
-	NSMutableArray* plots = [NSMutableArray array];
+	NSMutableArray* plotWindows = [NSMutableArray array];
 	for(id aWindow in windowList){
-		id aController = [aWindow windowController];
-		if([aController isKindOfClass:[self class]]){
-			[plots addObject:aWindow];
+		if([[aWindow windowController] isKindOfClass:[self class]]){
+			[plotWindows addObject:aWindow];
 		}
 	}
-	int numWindows = [plots count];
+	int numWindows = [plotWindows count];
 	NSRect screenRect = [[NSScreen mainScreen] frame];
 	
 	if(numWindows>1){
@@ -396,11 +397,12 @@ int windowSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1 tit
 		
 		float x = 0;
 		float y= height - dy + 75;
-		for(id aWindow in [plots reverseObjectEnumerator]){
-			NSSize minSize = [aWindow minSize];
-			NSSize maxSize = [aWindow maxSize];
-			[aWindow  setFrame:NSMakeRect(x,y,MAX(MIN(dx,maxSize.width),minSize.width),MAX(MIN(dy,maxSize.height),minSize.height)) display:YES animate:YES];
-			[aWindow orderFront:self];
+		for(id aPlotWindow in [plotWindows reverseObjectEnumerator]){
+			[[aPlotWindow windowController] setPreTiledSize:[aPlotWindow frame]];
+			NSSize minSize = [aPlotWindow minSize];
+			NSSize maxSize = [aPlotWindow maxSize];
+			[aPlotWindow  setFrame:NSMakeRect(x,y,MAX(MIN(dx,maxSize.width),minSize.width),MAX(MIN(dy,maxSize.height),minSize.height)) display:YES animate:YES];
+			[aPlotWindow orderFront:self];
 			x += dx;
 			if(x+dx > width){
 				x = 0;
@@ -411,13 +413,33 @@ int windowSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1 tit
 	else {
 		float width = screenRect.size.width;
 		float height = screenRect.size.height;
-		for(id aWindow in plots){
-			NSSize minSize = [aWindow minSize];
-			NSSize maxSize = [aWindow maxSize];
+		for(id aPlotWindow in plotWindows){
+			[[aPlotWindow windowController] setPreTiledSize:[aPlotWindow frame]];
+			NSSize minSize = [aPlotWindow minSize];
+			NSSize maxSize = [aPlotWindow maxSize];
 			width = MAX(MIN(width,maxSize.width),minSize.width);
 			height = MAX(MIN(height,maxSize.height),minSize.height);
-			[aWindow  setFrame:NSMakeRect(0,150,width,height-150) display:YES animate:YES];
-			[aWindow orderFront:self];
+			[aPlotWindow  setFrame:NSMakeRect(0,150,width,height-150) display:YES animate:YES];
+			[aPlotWindow orderFront:self];
+		}
+	}
+}
+
+- (IBAction) unTileWindows:(id)sender
+{
+	//get list of all plot windows
+	NSArray* windowList = [[NSApp windows] sortedArrayUsingFunction:windowSort context:nil];
+	NSMutableArray* plotWindows = [NSMutableArray array];
+	for(id aWindow in windowList){
+		if([[aWindow windowController] isKindOfClass:[self class]]){
+			[plotWindows addObject:aWindow];
+		}
+	}
+	for(id aPlotWindow in [plotWindows reverseObjectEnumerator]){
+		NSRect oldRect = [[aPlotWindow windowController] preTiledSize];
+		if(oldRect.size.height!=0 && oldRect.size.width!=0){
+			[aPlotWindow setFrame:oldRect display:YES animate:YES];
+			[aPlotWindow orderFront:self];
 		}
 	}
 }
