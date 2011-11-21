@@ -30,6 +30,7 @@
 	NSDate* lastEval;
 	int lastValue[4];	
     BOOL showInAltView;
+	BOOL scheduledToRedraw;
 }
 
 #pragma mark ***Accessors
@@ -44,6 +45,9 @@
 - (void) processIsStarting;
 - (id) eval;
 - (void) postUpdate;
+- (void) updateIcon;
+
+- (NSColor*) plotColor:(int)plotIndex;
 
 #pragma mark ¥¥¥Plot Data Source
 - (int) numberPointsInPlot:(id)aPlotter;

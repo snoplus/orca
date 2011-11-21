@@ -26,10 +26,10 @@
 
 NSString* ORProcessHistoryModelShowInAltViewChanged = @"ORProcessHistoryModelShowInAltViewChanged";
 NSString* ORProcessHistoryModelHistoryLabelChanged = @"ORProcessHistoryModelHistoryLabelChanged";
-NSString* ORHistoryElementIn1Connection   = @"ORHistoryElementInConnection1";
-NSString* ORHistoryElementIn2Connection   = @"ORHistoryElementInConnection2";
-NSString* ORHistoryElementIn3Connection   = @"ORHistoryElementInConnection3";
-NSString* ORHistoryElementIn4Connection   = @"ORHistoryElementInConnection4";
+NSString* ORHistoryElementIn1Connection   = @"ORHistoryElementIn1Connection";
+NSString* ORHistoryElementIn2Connection   = @"ORHistoryElementIn2Connection";
+NSString* ORHistoryElementIn3Connection   = @"ORHistoryElementIn3Connection";
+NSString* ORHistoryElementIn4Connection   = @"ORHistoryElementIn4Connection";
 NSString* ORHistoryElementDataChanged = @"ORHistoryElementDataChanged";
 
 NSString* historyConnectors[4] = {
@@ -43,6 +43,7 @@ NSString* historyConnectors[4] = {
 - (NSImage*) composeIcon;
 - (NSImage*) composeLowLevelIcon;
 - (NSImage*) composeHighLevelIcon;
+- (void) drawPlotRepIntoRect:(NSRect)aRect maxPoints:(int)maxNumPoints;
 @end
 
 @implementation ORProcessHistoryModel
@@ -53,8 +54,16 @@ NSString* historyConnectors[4] = {
 {
 	int i;
 	for(i=0;i<4;i++)[inputValue[i] release];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[lastEval release];
 	[super dealloc];
+}
+
+- (void) sleep
+{
+	[super sleep];
+	scheduledToRedraw = NO;
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
 }
 
 #pragma mark ***Accessors
@@ -111,6 +120,17 @@ NSString* historyConnectors[4] = {
     [[NSNotificationCenter defaultCenter]
 		postNotificationName:ORHistoryElementDataChanged
 					  object:self];
+	
+	if(!scheduledToRedraw){
+        [self performSelector:@selector(updateIcon) withObject:nil afterDelay:5.0];
+        scheduledToRedraw = YES;
+    }
+}
+
+- (void) updateIcon
+{
+	scheduledToRedraw = NO;
+	[self setUpImage];
 }
 
 - (BOOL) canBeInAltView
@@ -188,6 +208,18 @@ NSString* historyConnectors[4] = {
 	*xValue =  [inputValue[set] timeSampledAtIndex:index];
 }
 
+- (NSColor*) plotColor:(int)plotIndex
+{
+	NSColor* theColors[4] = {
+		[NSColor redColor],
+		[NSColor blueColor],
+		[NSColor blackColor],
+		[NSColor greenColor],
+	};
+	
+	if(plotIndex<0 || plotIndex>=4)return theColors[0];
+	else return theColors[plotIndex];
+}
 
 #pragma mark ***Archival
 - (id)initWithCoder:(NSCoder*)decoder
@@ -233,14 +265,18 @@ NSString* historyConnectors[4] = {
     [finalImage lockFocus];
     [anImage compositeToPoint:NSMakePoint(0,0) operation:NSCompositeCopy];
 	
+	[self drawPlotRepIntoRect:NSMakeRect(25,12,theIconSize.width-35,theIconSize.height-18) maxPoints:250];
+	
 	[iconLabel drawInRect:NSMakeRect(theIconSize.width - textSize.width - 2,theIconSize.height-textSize.height-3,textSize.width,textSize.height)];
 	
     [finalImage unlockFocus];
 	return [finalImage autorelease];	
 }
 
+
 - (NSImage*) composeHighLevelIcon
 {
+	
 	NSFont* theFont = [NSFont messageFontOfSize:10];
 	NSAttributedString* iconLabel;
 	if([[self customLabel] length]){
@@ -255,18 +291,80 @@ NSString* historyConnectors[4] = {
 	}
 	NSSize textSize = [iconLabel size];
 	NSImage* anImage = [NSImage imageNamed:@"ProcessHistoryHL"];
-	
 	NSSize theIconSize	= [anImage size];
+	
 	float textStart		= 60;
-		
+	
     NSImage* finalImage = [[NSImage alloc] initWithSize:theIconSize];
     [finalImage lockFocus];
     [anImage compositeToPoint:NSMakePoint(0,0) operation:NSCompositeCopy];
+	[self drawPlotRepIntoRect:NSMakeRect(textStart,17,theIconSize.width-textStart-5,23) maxPoints:500];
 	
-	[iconLabel drawInRect:NSMakeRect(textStart, 3 , MIN(textSize.width,theIconSize.width-textStart),textSize.height)];
+	
+	[iconLabel drawInRect:NSMakeRect(textStart, 0 , MIN(textSize.width,theIconSize.width-textStart),textSize.height)];
 	
     [finalImage unlockFocus];
 	return [finalImage autorelease];	
 }
 
+- (void) drawPlotRepIntoRect:(NSRect)aRect maxPoints:(int)maxNumPoints
+{
+	float scaleFactorY = 0;
+	float scaleFactorX = 0;
+	int i,plot,numPoints;
+	float yValue,xValue;
+	int count = [inputValue[0] count];
+	if(aRect.size.width != 0 && aRect.size.height != 0){
+		[NSBezierPath setDefaultLineWidth:0];
+		[[NSColor colorWithCalibratedRed:.9 green:.9 blue:.9 alpha:1] set];
+		[NSBezierPath fillRect:aRect];
+		[[NSColor colorWithCalibratedRed:.8 green:.8 blue:.8 alpha:1] set];
+		[NSBezierPath strokeRect:aRect];
+		[[NSColor colorWithCalibratedRed:.8 green:.8 blue:.8 alpha:1] set];
+		yValue = aRect.origin.y;
+		for(i=0;i<3;i++){
+			[NSBezierPath strokeLineFromPoint:NSMakePoint(aRect.origin.x, yValue) toPoint:NSMakePoint(aRect.origin.x+aRect.size.width,yValue)];
+			yValue += aRect.size.height/3.;
+		}
+		xValue = aRect.origin.x;
+		for(i=0;i<10;i++){
+			[NSBezierPath strokeLineFromPoint:NSMakePoint(xValue,aRect.origin.y) toPoint:NSMakePoint(xValue,aRect.origin.y+aRect.size.height)];
+			xValue += aRect.size.width/10.;
+		}
+		//get the scaleFactors
+		numPoints = MIN(maxNumPoints,count);
+		float minY = 9.9E99;
+		float maxY = -9.9E99;
+		for(plot=0;plot<4;plot++){
+			if([[self connectorWithName:historyConnectors[plot]] isConnected]){
+				for(i=0;i<numPoints;i++){
+					int index = count-i-1;
+					yValue =  [inputValue[plot] valueAtIndex:index];
+					if(yValue<minY)minY = yValue;
+					if(yValue>maxY)maxY = yValue;
+				}
+			}
+		}
+		if(maxY!=minY){
+			scaleFactorY = aRect.size.height/fabs(maxY-minY);
+			scaleFactorX = aRect.size.width/(float)maxNumPoints;
+
+			//draw the last part of the plot into the icon
+			for(plot=0;plot<4;plot++){
+				if([[self connectorWithName:historyConnectors[plot]] isConnected]){
+					[[self plotColor:plot] set];
+					NSBezierPath* path = [NSBezierPath bezierPath];
+					for(i=0;i<numPoints;i++){
+						int index = count-i-1;
+						yValue =  [inputValue[plot] valueAtIndex:index];
+						if(i==0)[path moveToPoint:NSMakePoint(aRect.origin.x + scaleFactorX*i,aRect.origin.y + scaleFactorY*(yValue-minY))];
+						else	[path lineToPoint:NSMakePoint(aRect.origin.x + scaleFactorX*i,aRect.origin.y + scaleFactorY*(yValue-minY))];
+					}
+					[path setLineWidth:0];
+					[path stroke];
+				}
+			}
+		}
+	}
+}
 @end
