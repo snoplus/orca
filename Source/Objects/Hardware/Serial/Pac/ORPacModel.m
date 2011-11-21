@@ -296,30 +296,34 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 
 - (float) convertedAdc:(int)index
 {
-	if(index<0 && index>=8)return 0.0;
-	float temperatureConstants[8][2] = {
-		{100.0	,	-50.0},
-		{1.0	,	0.0},
-		{1.0	,	0.0},
-		{1.0	,	0.0},
-		{1.0	,	0.0},
-		{1.0	,	0.0},
-		{86.141	,	-100},
-		{1.0	,	0.0},
-	};
-	float leakageCurrentConstants[8][2] = {
-		{1.0	,	0.0},
-		{1.0	,	0.0},
-		{1.0	,	0.0},
-		{1.0	,	0.0},
-		{1.0	,	0.0},
-		{1.0	,	0.0},
-		{1.0	,	0.0},
-		{1.0	,	0.0},
-	};
-	float voltage = [self adcVoltage:index];
-	if(!lcmEnabled) return voltage * leakageCurrentConstants[index][0] + leakageCurrentConstants[index][1];
-	else		   return voltage * temperatureConstants[index][0] + temperatureConstants[index][1];
+	float theValue = 0.0;
+	@synchronized (self){
+		if(index<0 && index>=8)return 0.0;
+		float temperatureConstants[8][2] = {
+			{100.0	,	-50.0},
+			{1.0	,	0.0},
+			{1.0	,	0.0},
+			{1.0	,	0.0},
+			{1.0	,	0.0},
+			{1.0	,	0.0},
+			{86.141	,	-100},
+			{1.0	,	0.0},
+		};
+		float leakageCurrentConstants[8][2] = {
+			{1.0	,	0.0},
+			{1.0	,	0.0},
+			{1.0	,	0.0},
+			{1.0	,	0.0},
+			{1.0	,	0.0},
+			{1.0	,	0.0},
+			{1.0	,	0.0},
+			{1.0	,	0.0},
+		};
+		float voltage = [self adcVoltage:index];
+		if(!lcmEnabled) theValue = voltage * leakageCurrentConstants[index][0] + leakageCurrentConstants[index][1];
+		else		    theValue = voltage * temperatureConstants[index][0] + temperatureConstants[index][1];
+	}
+	return theValue;
 }
 
 
@@ -662,22 +666,24 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 
 - (void) readAdcs
 {
-	int i;
-	
-	//----------------------------
-	//temp for testing
-	//for(i=0;i<8;i++){
-	//	[self setAdc:[self adc:i]+1 value:65535./(float)i];
-	//}
-	//[self loadLogBuffer];
-	//----------------------------
-	
-	[self enqueLcmEnable];
-	[self enqueModuleSelect];
-	for(i=0;i<8;i++){
-		[self enqueReadADC:i];
+	@synchronized (self){
+		int i;
+		
+		//----------------------------
+		//temp for testing
+		//for(i=0;i<8;i++){
+		//	[self setAdc:[self adc:i]+1 value:65535./(float)i];
+		//}
+		//[self loadLogBuffer];
+		//----------------------------
+		
+		[self enqueLcmEnable];
+		[self enqueModuleSelect];
+		for(i=0;i<8;i++){
+			[self enqueReadADC:i];
+		}
+		[self enqueShipCmd];
 	}
-	[self enqueShipCmd];
 }
 
 - (void) writeDac
@@ -969,7 +975,7 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 	@synchronized(self){
 		*theLowLimit = -.001;
 		if(![self lcmEnabled]) *theHighLimit = [self leakageAlarmLevel:channel]; 
-		else				  *theHighLimit = [self temperatureAlarmLevel:channel];
+		else				   *theHighLimit = [self temperatureAlarmLevel:channel];
 	}		
 }
 
