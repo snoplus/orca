@@ -258,6 +258,12 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelReceivedHistoCounterChanged object:self];
 }
 
+- (void) clearReceivedHistoCounter
+{
+    [self setReceivedHistoCounter: 0];
+}
+
+
 - (int) receivedHistoChanMap
 {
     return receivedHistoChanMap;
@@ -1593,13 +1599,17 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 
 
 
+// set the bit according to aChan in a channel map when received the according HW histogram (histogram mode);
+// when all active channels sent the histogram, the histogram counter is incremented
+// this way we can delay a subrun start until all histograms have been received   -tb-
 - (BOOL) setFromDecodeStageReceivedHistoForChan:(short)aChan
 {
     int map = receivedHistoChanMap;
     if(aChan>=0 && aChan<kNumV4FLTChannels){
 		map |= 0x1<<aChan;
 		[self setReceivedHistoChanMap:map];
-		NSLog(@"Received histogram for chan:%i  (trigger mask: %i)\n",aChan,triggerEnabledMask);//DEBUG
+	    //NSLog(@"DEBUG: in %@::%@: Received histogram for chan:%i  (trigger mask: %i)    \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),aChan,triggerEnabledMask);//TODO: DEBUG testing ...-tb-
+		//NSLog(@"Received histogram for chan:%i  (trigger mask: %i)\n",aChan,triggerEnabledMask);//DEBUG
 		if(triggerEnabledMask == map){
 		    //after all channels shipped histogram, increase counter
 		    map=0;

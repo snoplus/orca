@@ -751,7 +751,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx histogramInfo (some flags; some spare fo
 
 - (id) init
 {
-NSLog(@"DEBUG: Calling %@ :: %@   <<<<------ wie oft?\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));// DEBUG -tb-
+    //NSLog(@"DEBUG: Calling %@ :: %@   <<<<------ wie oft?\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG init is called twice at run start and once at 'start subrun' ...-tb-
     self = [super init];
     getHistoReceivedNoteFromDecodeStage = YES;
     return self;

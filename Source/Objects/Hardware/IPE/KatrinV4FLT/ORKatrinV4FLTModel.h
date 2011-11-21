@@ -110,6 +110,7 @@
 #pragma mark •••Accessors
 - (int) receivedHistoCounter;
 - (void) setReceivedHistoCounter:(int)aReceivedHistoCounter;
+- (void) clearReceivedHistoCounter;
 - (int) receivedHistoChanMap;
 - (void) setReceivedHistoChanMap:(int)aReceivedHistoChanMap;
 - (BOOL) activateDebuggingDisplays;
