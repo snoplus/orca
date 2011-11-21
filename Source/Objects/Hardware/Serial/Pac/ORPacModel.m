@@ -304,7 +304,7 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 		{1.0	,	0.0},
 		{1.0	,	0.0},
 		{1.0	,	0.0},
-		{86.141	,	50.0},
+		{86.141	,	-100},
 		{1.0	,	0.0},
 	};
 	float leakageCurrentConstants[8][2] = {
