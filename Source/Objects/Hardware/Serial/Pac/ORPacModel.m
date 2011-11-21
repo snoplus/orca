@@ -318,7 +318,7 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 		{1.0	,	0.0},
 	};
 	float voltage = [self adcVoltage:index];
-	if(lcmEnabled) return voltage * leakageCurrentConstants[index][0] + leakageCurrentConstants[index][1];
+	if(!lcmEnabled) return voltage * leakageCurrentConstants[index][0] + leakageCurrentConstants[index][1];
 	else		   return voltage * temperatureConstants[index][0] + temperatureConstants[index][1];
 }
 
@@ -968,7 +968,7 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 {
 	@synchronized(self){
 		*theLowLimit = -.001;
-		if([self lcmEnabled]) *theHighLimit = [self leakageAlarmLevel:channel]; 
+		if(![self lcmEnabled]) *theHighLimit = [self leakageAlarmLevel:channel]; 
 		else				  *theHighLimit = [self temperatureAlarmLevel:channel];
 	}		
 }
