@@ -1366,8 +1366,7 @@
 		return [a compare:[NSDecimalNumber decimalNumberWithString:b]];
 	}
 	else if([[a className] isEqualToString:@"NSCFString"] && [[b className] isEqualToString:@"NSCFString"]){
-		if([a isEqualToString:b])return NSOrderedSame;
-		else return NSOrderedDescending;
+		return ([a compare:b]);
 	}
 	else if([a class] != [NSDecimalNumber class] && [b class] != [NSDecimalNumber class]){
 		return [[NSDecimalNumber decimalNumberWithString:a] compare:[NSDecimalNumber decimalNumberWithString:b]];
