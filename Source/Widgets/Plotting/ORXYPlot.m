@@ -142,7 +142,7 @@
 	//draw the roi bounds
 	if(roi && roiVisible){
 		float height	= [plotView bounds].size.height;
-		long minChan = MAX(0,[roi minChannel]);
+		long minChan = MAX([mXScale minLimit],[roi minChannel]);
 		long maxChan = MIN([roi maxChannel],[mXScale maxLimit]);
 		
 		[[NSColor redColor] set];

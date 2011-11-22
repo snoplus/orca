@@ -75,6 +75,8 @@ long roundToLong(double x);
 - (void) setIgnoreMouse:(BOOL) ignore;
 - (void) setAllowShifts:(BOOL) allow;
 - (BOOL) allowShifts;
+- (void) setAllowNegativeValues:(BOOL) allow;
+- (BOOL) allowNegativeValues;
 - (BOOL) oppositePosition;
 - (void) setOppositePosition:(BOOL)state;
 - (id)   calibration;
@@ -193,6 +195,7 @@ extern NSString* ORAxisTempLabel;
 extern NSString* ORAxisMarker;
 
 extern NSString* ORAxisAllowShifts;
+extern NSString* ORAxisAllowNegative;
 extern NSString* ORAxisFont;
 extern NSString* ORAxisIsOpposite;
 

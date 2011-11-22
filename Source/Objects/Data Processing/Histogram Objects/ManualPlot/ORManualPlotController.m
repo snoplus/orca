@@ -83,7 +83,7 @@
 	
 	[plotView setShowLegend:YES];
 	
-	
+	[self performSelector:@selector(deferredAxisSetup) withObject:nil afterDelay:0];
 	roiController = [[OR1dRoiController panel] retain];
 	[roiView addSubview:[roiController view]];
 	
@@ -91,6 +91,13 @@
 	[fitView addSubview:[fitController view]];
 	
 	[self plotOrderDidChange:plotView];
+}
+
+- (void) deferredAxisSetup
+{
+	[[plotView xAxis] setRngLimitsLow:-5E9 withHigh:5E9 withMinRng:25];
+	[[plotView xAxis] setRngDefaultsLow:-5E9 withHigh:5E9];
+	[[plotView xAxis] setAllowNegativeValues:YES];
 }
 
 - (void) registerNotificationObservers

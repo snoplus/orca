@@ -45,6 +45,7 @@
 
 #pragma mark •••Initialization
 - (id) init;
+- (void) deferredAxisSetup;
 
 #pragma mark •••Interface Management
 - (void) commentChanged:(NSNotification*)aNote;

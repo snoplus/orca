@@ -100,6 +100,8 @@ NSString* ORAxisPadding				= @"ORAxisPadding";
 NSString* ORAxisMinSave				= @"ORAxisMinSave";
 NSString* ORAxisMaxSave				= @"ORAxisMaxSave";
 NSString* ORAxisAllowShifts			= @"ORAxisAllowShifts";
+NSString* ORAxisAllowNegative		= @"ORAxisAllowNegative";
+
 NSString* ORAxisFont				= @"ORAxisFont";
 NSString* ORAxisLabel				= @"ORAxisLabel";
 NSString* ORAxisMarker				= @"kMarker";
@@ -189,6 +191,8 @@ enum {
     
     
     [self setAllowShifts:YES];
+    if([self isXAxis])[self setAllowShifts:NO];
+	else [self setAllowShifts:YES];
     [self setTextFont:[NSFont fontWithName:kDefFont size:kDefFontSize]];
     [self setInteger:YES];
     [self setIgnoreMouse:NO];
@@ -1003,6 +1007,16 @@ enum {
 -(BOOL)	allowShifts
 {
     return [[attributes objectForKey:ORAxisAllowShifts] boolValue];
+}
+
+-(void)	setAllowNegativeValues:(BOOL) allow
+{
+    [attributes setObject:[NSNumber numberWithBool:allow] forKey:ORAxisAllowNegative];
+}
+
+-(BOOL)	allowNegativeValues
+{
+    return [[attributes objectForKey:ORAxisAllowNegative] boolValue];
 }
 
 

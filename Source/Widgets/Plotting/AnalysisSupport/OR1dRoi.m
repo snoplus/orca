@@ -311,21 +311,21 @@ NSString* OR1dRoiCurveFitChanged = @"OR1dRoiCurveFitChanged";
         switch(dragType){
             case kInitialDrag:
                 gate2 = mouseChan;
-   				if(gate2<0) break;
+   				if(gate2<0 && ![xScale allowNegativeValues]) break;
 				[self setMinChannel:MIN(gate1,gate2)];
                 [self setMaxChannel:MAX(gate1,gate2)];
 				break;
 				
             case kMinDrag:
-                gate2 = mouseChan;
-   				if(gate2<0) break;
+				gate2 = mouseChan;
+   				if(gate2<0 && ![xScale allowNegativeValues]) break;
 				[self setMinChannel:MIN(gate1,gate2)];
                 [self setMaxChannel:MAX(gate1,gate2)];
 				break;
 				
             case kMaxDrag:
                 gate2 = mouseChan;
-   				if(gate2<0) break;
+   				if(gate2<0 && ![xScale allowNegativeValues]) break;
 				[self setMinChannel:MIN(gate1,gate2)];
                 [self setMaxChannel:MAX(gate1,gate2)];
 				break;
@@ -335,7 +335,9 @@ NSString* OR1dRoiCurveFitChanged = @"OR1dRoiCurveFitChanged";
                 int new1 = gate1 - delta;
                 int new2 = gate2 - delta;
                 //int w = abs(new1-new2-1);
- 				if(new1 < 0 || new2<0) break;
+				if(![xScale allowNegativeValues]){
+					if(new1 < 0 || new2<0) break;
+				}
 				startChan = mouseChan;
 				gate1 = new1;
 				gate2 = new2;
