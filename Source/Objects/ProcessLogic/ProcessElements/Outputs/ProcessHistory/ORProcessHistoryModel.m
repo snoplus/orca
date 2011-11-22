@@ -265,7 +265,7 @@ NSString* historyConnectors[4] = {
     [finalImage lockFocus];
     [anImage compositeToPoint:NSMakePoint(0,0) operation:NSCompositeCopy];
 	
-	[self drawPlotRepIntoRect:NSMakeRect(20,6,theIconSize.width-31,theIconSize.height-11) maxPoints:250];
+	[self drawPlotRepIntoRect:NSMakeRect(18,6,theIconSize.width-29,theIconSize.height-11) maxPoints:250];
 	
 	[iconLabel drawInRect:NSMakeRect(theIconSize.width - textSize.width - 2,theIconSize.height-textSize.height-3,textSize.width,textSize.height)];
 	
