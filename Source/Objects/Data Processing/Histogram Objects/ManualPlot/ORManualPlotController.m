@@ -26,7 +26,6 @@
 #import "ORXYPlot.h"
 #import "ORCalibration.h"
 #import "OR1dRoiController.h"
-#import "OR1dFitController.h"
 #import "ORCompositePlotView.h"
 #import "ORAxis.h"
 
@@ -48,7 +47,6 @@
 - (void) dealloc 
 {
 	[roiController release];
-	[fitController release];
 	
 	[super dealloc];
 }
@@ -87,8 +85,6 @@
 	roiController = [[OR1dRoiController panel] retain];
 	[roiView addSubview:[roiController view]];
 	
-	fitController = [[OR1dFitController panel] retain];
-	[fitView addSubview:[fitController view]];
 	
 	[self plotOrderDidChange:plotView];
 }
@@ -389,7 +385,6 @@
 {
 	id topRoi = [(ORPlotWithROI*)[aPlotView topPlot] roi];
 	[roiController setModel:topRoi];
-	[fitController setModel:[topRoi fit]];
 	int i;
 	for(i=0;i<3;i++){
 		id aPlot = [aPlotView plot:i];
