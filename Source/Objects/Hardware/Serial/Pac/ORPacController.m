@@ -63,6 +63,7 @@
 	for(i=0;i<8;i++){
 		[[adcMatrix cellAtRow:i column:0] setFormatter:numberFormatter];
 		[[alarmLevelMatrix cellAtRow:i column:0] setFormatter:numberFormatter];
+		[[alarmLevelMatrix cellAtRow:i column:0] setTag:i];
 	}
 	
 	[[plotter0 yAxis] setRngLow:0.0 withHigh:6.];
@@ -256,9 +257,9 @@
 	int i;
 	for(i=0;i<8;i++){
 		float theValue;
-		if(lcm)theValue = [model leakageAlarmLevel:i];
+		if(!lcm)theValue = [model leakageAlarmLevel:i]; //*** inverted logic
 		else theValue  =  [model temperatureAlarmLevel:i];
-		[[alarmLevelMatrix cellAtRow:i column:0] setFloatValue: theValue];
+		[[alarmLevelMatrix cellWithTag:i] setFloatValue: theValue];
 	}
 }
 
@@ -385,7 +386,7 @@
 - (void) lcmEnabledChanged:(NSNotification*)aNote
 {
 	[lcmEnabledMatrix selectCellWithTag: [model lcmEnabled]];
-	if([model lcmEnabled]) [alarmTypeText setStringValue:@"For Temperatures"];
+	if(![model lcmEnabled]) [alarmTypeText setStringValue:@"For Temperatures"]; //inverted logic
 	else [alarmTypeText setStringValue:@"For Leakage Current"];
 	[self alarmLevelChanged:nil];
 }
@@ -527,7 +528,7 @@
 {
 	int index = [sender selectedRow];
 	float theValue = [[sender selectedCell] floatValue];
-	if([model lcmEnabled]){
+	if(![model lcmEnabled]){ //***inverted logic
 		[model setLeakageAlarmLevel:index value:theValue];	
 	}
 	else {
