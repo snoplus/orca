@@ -632,7 +632,7 @@
 {
 	NSString* stringToInsert = @"";
 	switch ([codeHelperPU indexOfSelectedItem]) {
-		case 0: stringToInsert = @"function <name> {\n}";	break;
+		case 0: stringToInsert = @"function main() {\n}";	break;
 		case 1: stringToInsert = @"for(<var> = <start> ; <var> < <end> ; <var>++) {\n}";	break;
 		case 2: stringToInsert = @"while (<condition>) {\n}";	break;
 		case 3: stringToInsert = @"do {\n}while(<condition>);";	break;

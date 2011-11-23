@@ -570,7 +570,7 @@
 		case LOGFILE:		return [self openLogFile:p];
 		case kAppend:		return [[NSString stringWithFormat:@"%@",NodeValue(0)] stringByAppendingString:[@" " stringByAppendingFormat:@"%@",NodeValue(1)]];
 		case kTightAppend:	return [[NSString stringWithFormat:@"%@",NodeValue(0)] stringByAppendingString:[NSString stringWithFormat:@"%@",NodeValue(1)]];
-		case HEX:			return [NSString stringWithFormat:@"0x%x",[NodeValue(0) unsignedLongValue]];
+		case HEX:			return [NSString stringWithFormat:@"0x%x",(unsigned long)[NodeValue(0) longValue]];
 		case MAKEPOINT:		return [NSString stringWithFormat:@"@(%@,%@)",NodeValue(0),NodeValue(1)];
 		case MAKERECT:		return [NSString stringWithFormat:@"@(%@,%@,%@,%@)",NodeValue(0),NodeValue(1),NodeValue(2),NodeValue(3)];
 		case MAKERANGE:		return [NSString stringWithFormat:@"@(%@,%@)",NodeValue(0),NodeValue(1)];
@@ -607,7 +607,7 @@
 		case '&':			return [NSDecimalNumber numberWithLong:[NodeValue(0) longValue] & [NodeValue(1) longValue]];
 		case '|':			return [NSDecimalNumber numberWithLong:[NodeValue(0) longValue] | [NodeValue(1) longValue]];
 		case LEFT_OP:		return [NSDecimalNumber numberWithLong:[NodeValue(0) longValue] << [NodeValue(1) longValue]];
-		case RIGHT_OP:	return [NSDecimalNumber numberWithLong:[NodeValue(0) longValue] >> [NodeValue(1) longValue]];
+		case RIGHT_OP:		return [NSDecimalNumber numberWithLong:[NodeValue(0) longValue] >> [NodeValue(1) longValue]];
 		case '~':			return [NSDecimalNumber numberWithLong: ~[NodeValue(0) longValue]];
 		case '^':			return [NSDecimalNumber numberWithLong: [NodeValue(0) longValue] ^ [NodeValue(1) longValue]];
 			
