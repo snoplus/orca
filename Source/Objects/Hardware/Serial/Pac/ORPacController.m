@@ -251,6 +251,7 @@
 	[self alarmLevelChanged:nil];
 }
 
+
 - (void) alarmLevelChanged:(NSNotification*)aNote
 {
 	BOOL lcm = [model lcmEnabled];
