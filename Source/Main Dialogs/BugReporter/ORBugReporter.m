@@ -20,7 +20,8 @@
 #pragma mark •••Imported Files
 #import "ORBugReporter.h"
 #import "ORMailer.h"
-
+#import "ORAlarmCollection.h"
+#import "ORProcessModel.h"
 
 @implementation ORBugReporter
 
@@ -135,6 +136,102 @@
 {
 	NSLog(@"Bug report sent to: %@\n",to);
 	[[self window] performClose:self];
+}
+
+- (IBAction) startDebugging:(id)sender
+{
+     
+    NSString* body = [NSString stringWithString:   @"----------------------------------------------------------------------------------------------------\n"];
+    body           = [body stringByAppendingString:@"An ORCA debugging session has begun on\n"];
+    body           = [body stringByAppendingFormat:@"\n%@\n\n",computerName()];
+    body           = [body stringByAppendingString:@"If is possible that erroneous alarm emails may be generated during this process.\n"];
+    body           = [body stringByAppendingString:@"You should receive another email when normal operations resume.\n"];
+    body           = [body stringByAppendingString:@"----------------------------------------------------------------------------------------------------\n"];
+    body           = [body stringByAppendingString:@"This message has been sent to the following people:\n"];
+    NSArray* addresses = [self allEMailLists];
+    for(id anAddress in addresses){
+        body           = [body stringByAppendingFormat:@"%@\n",anAddress];
+    }
+
+    body           = [body stringByAppendingString:@"You have received this message because you are in one of ORCA's Alarm or Process email lists\n"];
+	
+    body           = [body stringByAppendingString:@"If you believe you have received this message in error, contact some of the other people in the list to be removed.\n"];
+    
+   body           = [body stringByAppendingString:@"----------------------------------------------------------------------------------------------------\n"];    
+    
+	NSMutableAttributedString* theContent = [[NSMutableAttributedString alloc] initWithString:body];
+    for(id anAddress in addresses){
+        ORMailer* mailer = [ORMailer mailer];
+        [mailer setTo:		anAddress];
+        [mailer setSubject:	@"ORCA Debugging Session In Progress"];
+        [mailer setBody:	theContent];
+        [mailer send:self];
+    }
+    [theContent release];
+}
+
+- (IBAction) stopDebugging:(id)sender
+{
+    
+    NSString* body = [NSString stringWithString:   @"----------------------------------------------------------------------------------------------------\n"];
+    body           = [body stringByAppendingString:@"An ORCA debugging session has ended on:\n"];
+    body           = [body stringByAppendingFormat:@"\n%@\n\n",computerName()];
+    body           = [body stringByAppendingString:@"Normal operations have resumed. You should pay full attention to all alarms.\n"];
+    body           = [body stringByAppendingString:@"----------------------------------------------------------------------------------------------------\n"];
+    body           = [body stringByAppendingString:@"This message has been sent to the following people:\n"];
+    NSArray* addresses = [self allEMailLists];
+    for(id anAddress in addresses){
+        body           = [body stringByAppendingFormat:@"%@\n",anAddress];
+    }
+    body           = [body stringByAppendingString:@"You have received this message because you are in one of ORCA's Alarm or Process email lists\n"];
+	
+    body           = [body stringByAppendingString:@"If you believe you have received this message in error, contact some of the other people in the list to be removed.\n"];
+    body           = [body stringByAppendingString:@"----------------------------------------------------------------------------------------------------\n"];  
+	NSMutableAttributedString* theContent = [[NSMutableAttributedString alloc] initWithString:body];
+    for(id anAddress in addresses){
+        ORMailer* mailer = [ORMailer mailer];
+        [mailer setTo:		anAddress];
+        [mailer setSubject:	@"ORCA Debugging Session Ended"];
+        [mailer setBody:	theContent];
+        [mailer send:self];
+    }
+    [theContent release];
+}
+
+- (NSArray*) allEMailLists
+{
+    NSMutableArray* allEMails = [NSMutableArray array];
+    [self putAlarmEMailsIntoArray:allEMails];
+        
+    NSArray* allProcesses = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORProcessModel")];
+    for(id aProcess in allProcesses){
+        [self putProcess:aProcess eMailsIntoArray:allEMails];
+    }
+    
+    return allEMails;
+}
+
+
+- (void) putAlarmEMailsIntoArray:(NSMutableArray*)anArray
+{
+    NSArray* eMails = [[ORAlarmCollection sharedAlarmCollection] eMailList];
+    for(id anEMail in eMails){
+        id address = [anEMail mailAddress];
+        if(![anArray containsObject:address]){
+            [anArray addObject:address];
+        }
+    }
+}
+
+- (void) putProcess:(id)aProcess eMailsIntoArray:(NSMutableArray*)anArray;
+{
+    NSArray* eMails = [aProcess emailList];
+
+    for(id anEMail in eMails){
+        if(![anArray containsObject:anEMail]){
+            [anArray addObject:anEMail];
+        }
+    }
 }
 
 @end

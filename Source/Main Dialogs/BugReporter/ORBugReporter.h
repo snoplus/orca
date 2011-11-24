@@ -22,13 +22,20 @@
 	IBOutlet NSForm* infoForm;
 	IBOutlet NSTextView* bodyField;
 	IBOutlet NSMatrix* categoryMatrix;
+    IBOutlet NSButton* startDebugging;
+    IBOutlet NSButton* stopDebugging;
 }
 
 - (id) init;
 - (NSUndoManager *) windowWillReturnUndoManager:(NSWindow*)window;
 - (void) mailSent:(NSString*)to;
+- (NSArray*) allEMailLists;
+- (void) putAlarmEMailsIntoArray:(NSMutableArray*)anArray;
+- (void) putProcess:(id)aProcess eMailsIntoArray:(NSMutableArray*)anArray;
 
 #pragma mark •••Actions
 - (IBAction) showBugReporter:(id)sender;
 - (IBAction) send:(id)sender;
+- (IBAction) startDebugging:(id)sender;
+- (IBAction) stopDebugging:(id)sender;
 @end
