@@ -533,7 +533,7 @@
 		[model setLeakageAlarmLevel:index value:theValue];	
 	}
 	else {
-		[model setLeakageAlarmLevel:index value:theValue];	
+		[model setTemperatureAlarmLevel:index value:theValue];	
 	}
 }
 
