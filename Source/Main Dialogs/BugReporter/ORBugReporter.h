@@ -32,6 +32,8 @@
 - (NSArray*) allEMailLists;
 - (void) putAlarmEMailsIntoArray:(NSMutableArray*)anArray;
 - (void) putProcess:(id)aProcess eMailsIntoArray:(NSMutableArray*)anArray;
+- (void) sendStartMessage:(NSString*)anAddress;
+- (void) sendStopMessage:(NSString*)anAddress;
 
 #pragma mark •••Actions
 - (IBAction) showBugReporter:(id)sender;

@@ -132,70 +132,94 @@
 
 }
 
-- (void) mailSent:(NSString*)to
-{
-	NSLog(@"Bug report sent to: %@\n",to);
-	[[self window] performClose:self];
-}
 
 - (IBAction) startDebugging:(id)sender
 {
-     
-    NSString* body = [NSString stringWithString:   @"----------------------------------------------------------------------------------------------------\n"];
-    body           = [body stringByAppendingString:@"An ORCA debugging session has begun on\n"];
-    body           = [body stringByAppendingFormat:@"\n%@\n\n",computerName()];
-    body           = [body stringByAppendingString:@"If is possible that erroneous alarm emails may be generated during this process.\n"];
-    body           = [body stringByAppendingString:@"You should receive another email when normal operations resume.\n"];
-    body           = [body stringByAppendingString:@"----------------------------------------------------------------------------------------------------\n"];
-    body           = [body stringByAppendingString:@"This message has been sent to the following people:\n"];
     NSArray* addresses = [self allEMailLists];
     for(id anAddress in addresses){
-        body           = [body stringByAppendingFormat:@"%@\n",anAddress];
-    }
 
-    body           = [body stringByAppendingString:@"You have received this message because you are in one of ORCA's Alarm or Process email lists\n"];
-	
-    body           = [body stringByAppendingString:@"If you believe you have received this message in error, contact some of the other people in the list to be removed.\n"];
-    
-   body           = [body stringByAppendingString:@"----------------------------------------------------------------------------------------------------\n"];    
-    
-	NSMutableAttributedString* theContent = [[NSMutableAttributedString alloc] initWithString:body];
+        [NSThread detachNewThreadSelector:@selector(sendStartMessage:) toTarget:self withObject:anAddress];
+    }
+}
+- (IBAction) stopDebugging:(id)sender
+{
+    NSArray* addresses = [self allEMailLists];
     for(id anAddress in addresses){
-        ORMailer* mailer = [ORMailer mailer];
-        [mailer setTo:		anAddress];
+        [NSThread detachNewThreadSelector:@selector(sendStopMessage:) toTarget:self withObject:anAddress];
+    }
+    
+}
+
+- (void) mailSent:(NSString*)to
+{
+	NSLog(@"EMail sent to: %@\n",to);
+	[[self window] performClose:self];
+}
+
+- (void) sendStartMessage:(NSString*)anAddress
+{
+	@synchronized([NSApp delegate]){
+        NSString* theAddress = [anAddress copy];
+        NSString* body = [NSString stringWithString:   @"----------------------------------------------------------------------------------------------------\n"];
+        body           = [body stringByAppendingString:@"An ORCA debugging session has begun on\n"];
+        body           = [body stringByAppendingFormat:@"\n%@\n\n",computerName()];
+        body           = [body stringByAppendingString:@"If is possible that erroneous alarm emails may be generated during this process.\n"];
+        body           = [body stringByAppendingString:@"You should receive another email when normal operations resume.\n"];
+        body           = [body stringByAppendingString:@"----------------------------------------------------------------------------------------------------\n"];
+        body           = [body stringByAppendingString:@"This message has been sent to the following people:\n"];
+        NSArray* addresses = [self allEMailLists];
+        for(id add in addresses){
+            body           = [body stringByAppendingFormat:@"%@\n",add];
+        }
+
+        body           = [body stringByAppendingString:@"You have received this message because you are in one of ORCA's Alarm or Process email lists\n"];
+        
+        body           = [body stringByAppendingString:@"If you believe you have received this message in error, contact some of the other people in the list to be removed.\n"];
+        
+       body           = [body stringByAppendingString:@"----------------------------------------------------------------------------------------------------\n"];    
+        
+        NSMutableAttributedString* theContent = [[NSMutableAttributedString alloc] initWithString:body];
+            ORMailer* mailer = [ORMailer mailer];
+        [mailer setTo:		theAddress];
         [mailer setSubject:	@"ORCA Debugging Session In Progress"];
         [mailer setBody:	theContent];
         [mailer send:self];
+        [theAddress release];
+        [theContent release];
     }
-    [theContent release];
 }
 
-- (IBAction) stopDebugging:(id)sender
+
+- (void) sendStopMessage:(NSString*)anAddress
 {
-    
-    NSString* body = [NSString stringWithString:   @"----------------------------------------------------------------------------------------------------\n"];
-    body           = [body stringByAppendingString:@"An ORCA debugging session has ended on:\n"];
-    body           = [body stringByAppendingFormat:@"\n%@\n\n",computerName()];
-    body           = [body stringByAppendingString:@"Normal operations have resumed. You should pay full attention to all alarms.\n"];
-    body           = [body stringByAppendingString:@"----------------------------------------------------------------------------------------------------\n"];
-    body           = [body stringByAppendingString:@"This message has been sent to the following people:\n"];
-    NSArray* addresses = [self allEMailLists];
-    for(id anAddress in addresses){
-        body           = [body stringByAppendingFormat:@"%@\n",anAddress];
-    }
-    body           = [body stringByAppendingString:@"You have received this message because you are in one of ORCA's Alarm or Process email lists\n"];
-	
-    body           = [body stringByAppendingString:@"If you believe you have received this message in error, contact some of the other people in the list to be removed.\n"];
-    body           = [body stringByAppendingString:@"----------------------------------------------------------------------------------------------------\n"];  
-	NSMutableAttributedString* theContent = [[NSMutableAttributedString alloc] initWithString:body];
-    for(id anAddress in addresses){
+	@synchronized([NSApp delegate]){
+        NSString* theAddress = [anAddress copy];
+        NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+
+        NSString* body = [NSString stringWithString:   @"----------------------------------------------------------------------------------------------------\n"];
+        body           = [body stringByAppendingString:@"An ORCA debugging session has ended on:\n"];
+        body           = [body stringByAppendingFormat:@"\n%@\n\n",computerName()];
+        body           = [body stringByAppendingString:@"Normal operations have resumed. You should pay full attention to all alarms.\n"];
+        body           = [body stringByAppendingString:@"----------------------------------------------------------------------------------------------------\n"];
+        body           = [body stringByAppendingString:@"This message has been sent to the following people:\n"];
+        NSArray* addresses = [self allEMailLists];
+        for(id add in addresses){
+            body           = [body stringByAppendingFormat:@"%@\n",add];
+        }
+        body           = [body stringByAppendingString:@"You have received this message because you are in one of ORCA's Alarm or Process email lists\n"];
+        
+        body           = [body stringByAppendingString:@"If you believe you have received this message in error, contact some of the other people in the list to be removed.\n"];
+        body           = [body stringByAppendingString:@"----------------------------------------------------------------------------------------------------\n"];  
+        NSMutableAttributedString* theContent = [[NSMutableAttributedString alloc] initWithString:body];
         ORMailer* mailer = [ORMailer mailer];
-        [mailer setTo:		anAddress];
+        [mailer setTo:		theAddress];
         [mailer setSubject:	@"ORCA Debugging Session Ended"];
         [mailer setBody:	theContent];
         [mailer send:self];
+        [theAddress release];
+        [theContent release];
+        [pool release];
     }
-    [theContent release];
 }
 
 - (NSArray*) allEMailLists
@@ -233,5 +257,51 @@
         }
     }
 }
+
+#pragma mark •••EMail Thread
+
+
+- (void) eMailThread:(id)userInfo
+{
+	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+	NSString* address =  [userInfo objectForKey:@"Address"];
+	NSString* content = [NSString string];
+	NSString* hostAddress = @"<Unable to get host address>";
+	NSArray* names =  [[NSHost currentHost] addresses];
+	for(id aName in names){
+		if([aName rangeOfString:@"::"].location == NSNotFound){
+			if([aName rangeOfString:@".0.0."].location == NSNotFound){
+				hostAddress = aName;
+				break;
+			}
+		}
+	}
+	content = [content stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
+	content = [content stringByAppendingFormat:@"ORCA Message From Host: %@\n",hostAddress];
+	content = [content stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n"];
+	NSString* theMessage = [userInfo objectForKey:@"Message"];
+	if(theMessage){
+		content = [content stringByAppendingString:theMessage];
+	}
+	NSString* shutDownWarning = [userInfo objectForKey:@"Shutdown"];
+	if(shutDownWarning){
+		//generated from a manual shutdown of the email system. 
+		//don't send out any other info.
+	}
+	@synchronized([NSApp delegate]){
+		
+		NSAttributedString* theContent = [[NSAttributedString alloc] initWithString:content];
+		ORMailer* mailer = [ORMailer mailer];
+		[mailer setTo:address];
+		[mailer setSubject:@"Orca Message"];
+		[mailer setBody:theContent];
+		[mailer send:self];
+		[theContent autorelease];
+	}
+	
+	[pool release];
+	
+}
+
 
 @end
