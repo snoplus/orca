@@ -307,8 +307,8 @@ static NSString *ORDataSetModelFullName         = @"ORDataSetModelFullName";
     [self setRefreshMode:[decoder decodeIntForKey:@"refreshMode"]];
     [self setKey:[decoder decodeObjectForKey:ORDataSetModelKey]];
     [self setFullName:[decoder decodeObjectForKey:ORDataSetModelFullName]];
-	[self setCalibration:[decoder decodeObjectForKey:@"calibration"]];
 	[self setDataSet:[decoder decodeObjectForKey:@"dataSet"]];
+	[self setCalibration:[decoder decodeObjectForKey:@"calibration"]];
     
     [[self undoManager] enableUndoRegistration];
 	scheduledForUpdate = NO;
