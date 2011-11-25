@@ -1094,14 +1094,8 @@ enum {
 {
 	self = [super initWithCoder:coder];
 
-	if([coder allowsKeyedCoding]){
-		[self setAttributes:[coder decodeObjectForKey:@"ORAxisAttributes"]];
-		[self setLabelAttributes:[coder decodeObjectForKey:@"ORAxisLabelAttributes"]];
-	}
-	else {
-		[self setAttributes:[[[coder decodeObject] mutableCopy]autorelease]];
-		[self setLabelAttributes:[[[coder decodeObject] mutableCopy]autorelease]];
-	}
+    [self setAttributes:[coder decodeObjectForKey:@"ORAxisAttributes"]];
+    [self setLabelAttributes:[coder decodeObjectForKey:@"ORAxisLabelAttributes"]];
 	if(!attributes) [self setDefaults];
 	[self calcFrameOffsets];
     
@@ -1111,14 +1105,8 @@ enum {
 -(void)	encodeWithCoder:(NSCoder*)coder
 {
     [super encodeWithCoder:coder];
-    if([coder allowsKeyedCoding]){
-        [coder encodeObject:attributes forKey:@"ORAxisAttributes"];
-        [coder encodeObject:labelAttributes forKey:@"ORAxisLabelAttributes"];
-    }
-    else {
-        [coder encodeObject:attributes];
-        [coder encodeObject:labelAttributes];
-    }
+    [coder encodeObject:attributes forKey:@"ORAxisAttributes"];
+    [coder encodeObject:labelAttributes forKey:@"ORAxisLabelAttributes"];
 }
 
 - (void) drawMarker:(float)val axisPosition:(int)axisPosition
