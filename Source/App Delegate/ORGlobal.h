@@ -137,3 +137,6 @@ extern NSString* ORRunVetosChanged;
 extern NSString* ORHardwareEnvironmentNoisy;
 extern NSString* ORHardwareEnvironmentQuiet;
 
+extern NSString* ORDebuggingSessionChanged;
+extern NSString* ORDebuggingSessionState;
+

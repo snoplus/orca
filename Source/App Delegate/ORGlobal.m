@@ -68,6 +68,9 @@ NSString* ORRunVetosChanged			= @"ORRunVetosChanged";
 NSString* ORHardwareEnvironmentNoisy = @"ORHardwareEnvironmentNoisy";
 NSString* ORHardwareEnvironmentQuiet = @"ORHardwareEnvironmentQuiet";
 
+NSString* ORDebuggingSessionChanged  = @"ORDebuggingSessionChanged";
+NSString* ORDebuggingSessionState    = @"ORDebuggingSessionState";
+
 
 ORGlobal* gOrcaGlobals = nil;
 

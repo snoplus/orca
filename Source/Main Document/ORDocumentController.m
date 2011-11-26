@@ -181,10 +181,16 @@ int sortListDnFunc(id element1,id element2, void* context){return [element2 comp
                                                  name : @"ORShowTemplates"
                                                 object: nil];
 	
-	[[NSNotificationCenter defaultCenter] addObserver : self
+	[[NSNotificationCenter defaultCenter]addObserver : self
                                              selector : @selector(postLogChanged:)
                                                  name : ORPrefPostLogEnabledChanged
                                                 object: nil];
+    
+	[[NSNotificationCenter defaultCenter] addObserver : self
+                                             selector : @selector(debuggingSessionChanged:)
+                                                 name : ORDebuggingSessionChanged
+                                               object : nil];	
+
 }
 
 - (void) updateWindow
@@ -194,6 +200,16 @@ int sortListDnFunc(id element1,id element2, void* context){return [element2 comp
     [self numberLockedPagesChanged:nil];
 	[self postLogChanged:nil];
     [outlineView reloadData];
+    [self debuggingSessionChanged:nil];
+}
+
+- (void) debuggingSessionChanged:(NSNotification*)aNotification
+{
+    NSUserDefaults* defaults 	= [NSUserDefaults standardUserDefaults];
+
+    BOOL state = [[defaults objectForKey: ORDebuggingSessionState] boolValue];
+    [debuggingStatusField setStringValue:state?@"Debugging Session":@""];
+    
 }
 
 - (void) securityStateChanged:(NSNotification*)aNotification

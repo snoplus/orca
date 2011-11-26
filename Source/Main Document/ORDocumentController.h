@@ -28,6 +28,7 @@
     IBOutlet NSOutlineView*    outlineView;
     IBOutlet NSTextField* scaleFactorField;
     IBOutlet NSTextField* logStatusField;
+    IBOutlet NSTextField* debuggingStatusField;
     IBOutlet NSButton* documentLockButton;    
 	IBOutlet id	templates;
 	
@@ -57,6 +58,7 @@
 - (void) windowOrderChanged:(NSNotification*)aNotification;
 - (void) showTemplates:(NSNotification*)aNotification;
 - (void) postLogChanged:(NSNotification*)aNotification;
+- (void) debuggingSessionChanged:(NSNotification*)aNotification;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) openArchive:(NSToolbarItem*)item;

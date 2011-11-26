@@ -24,6 +24,7 @@
 	IBOutlet NSMatrix* categoryMatrix;
     IBOutlet NSButton* startDebugging;
     IBOutlet NSButton* stopDebugging;
+    IBOutlet NSButton* clearDebugging;
 }
 
 - (id) init;
@@ -34,10 +35,12 @@
 - (void) putProcess:(id)aProcess eMailsIntoArray:(NSMutableArray*)anArray;
 - (void) sendStartMessage:(NSArray*)addresses;
 - (void) sendStopMessage:(NSArray*)addresses;
+- (void) setDebugging:(BOOL)state;
 
 #pragma mark •••Actions
 - (IBAction) showBugReporter:(id)sender;
 - (IBAction) send:(id)sender;
 - (IBAction) startDebugging:(id)sender;
 - (IBAction) stopDebugging:(id)sender;
+
 @end

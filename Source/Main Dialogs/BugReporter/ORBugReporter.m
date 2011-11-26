@@ -46,6 +46,11 @@
 	[categoryMatrix selectCellWithTag:3];
 	[bodyField setString:@""];
 
+    NSUserDefaults* defaults 	= [NSUserDefaults standardUserDefaults];
+    BOOL state = [[defaults objectForKey: ORDebuggingSessionState] boolValue];
+    [startDebugging setEnabled:!state];
+    [stopDebugging setEnabled:state];
+
 }
 
 //this method is needed so the global menu commands will be passes on correctly.
@@ -136,13 +141,32 @@
 - (IBAction) startDebugging:(id)sender
 {
     NSArray* addresses = [self allEMailLists];
-    if([addresses count]) [self sendStartMessage:addresses];
+    if([addresses count]){
+        [self sendStartMessage:addresses];
+        [self setDebugging:YES];
+    }
 }
+
 - (IBAction) stopDebugging:(id)sender
 {
     NSArray* addresses = [self allEMailLists];
-   if([addresses count]) [self sendStopMessage:addresses];
+    if([addresses count]){
+        [self sendStopMessage:addresses];
+    }
+    [self setDebugging:NO];
+}
+
+- (void) setDebugging:(BOOL)state
+{
+    NSUserDefaults* defaults 	= [NSUserDefaults standardUserDefaults];
+    [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:state] forKey:ORDebuggingSessionState];    
+    [defaults synchronize];
     
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDebuggingSessionChanged object:self]; 
+ 
+    [startDebugging setEnabled:!state];
+    [stopDebugging setEnabled:state];
+
 }
 
 - (void) mailSent:(NSString*)to
