@@ -1057,9 +1057,7 @@
 
 - (id) doLoop:(id) p
 {
-	
-	BOOL breakLoop		= NO;
-	BOOL continueLoop	= NO;
+	//eval do loop. do { loop guts }while(i<10);
 	do {
 		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 		if([delegate exitNow]){
@@ -1068,30 +1066,24 @@
 		}
 		else {
 			@try {
-				NodeValue(0);
+				NodeValue(0); //loop guts
+				if([NodeValue(1) isEqual:_zero]){ //end of loop check i.e. while(i<10)
+					[pool release];
+					break;
+				}
 			}
 			@catch(NSException* localException) {
 				if([[localException name] isEqualToString:@"continue"]){
-					continueLoop = YES;
+					[pool release];
+					continue;
 				}
 				else if([[localException name] isEqualToString:@"break"]){
-					breakLoop = YES;
+					[pool release];
+					break;
 				}
 				else [localException raise];
 			}
 		}
-		if(breakLoop){
-            [pool release];
-            break;
-        }
-		if(continueLoop){
-            [pool release];
-            continue;
-        }
-        if([NodeValue(1) isEqual:_zero]){
-            [pool release];
-            break;
-        }
         [pool release];
 
 	} while(1);
@@ -1101,45 +1093,43 @@
 
 - (id) whileLoop:(id)p
 {
-	BOOL breakLoop		= NO;
-	BOOL continueLoop	= NO;
+	//eval while loop. while(i<10) {loop guts}
 	while(1){ 
 		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-        if([NodeValue(0) isEqual:_zero]){
-			[pool release];
-            break;
-        }
 		if([self exitNow]){
 			[pool release];
 			break; 
 		}
 		else {
 			@try {
-				NodeValue(1);
+				if([NodeValue(0) isEqual:_zero]){ //end of loop check, i.e. while(i<10)
+					[pool release];
+					break;
+				}
+				NodeValue(1);	//guts of loop
 			}
 			@catch(NSException* localException) {
 				if([[localException name] isEqualToString:@"continue"]){
-					continueLoop = YES;
+					[pool release];
+					continue;
 				}
 				else if([[localException name] isEqualToString:@"break"]){
-					breakLoop = YES;
+					[pool release];
+					break;
 				}
 				else [localException raise];
 			}
 		}
 		[pool release];
-		if(breakLoop)	 break;
-		if(continueLoop) continue;
 	}
 	return nil;
 }
 
 - (id) forLoop:(id) p
-{
-	BOOL breakLoop		= NO;
-	BOOL continueLoop	= NO;
-        
-	for(NodeValue(0) ; ![NodeValue(1) isEqual: _zero] ; NodeValue(2)){
+{   
+	//eval for loop ,i.e. for(i=0;i<10;i++){ loop guts }
+	NodeValue(0); //loop init, i.e. i=0
+	do {
 		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 		if([self exitNow]){
 			[pool release];
@@ -1147,22 +1137,28 @@
 		}
 		else {
 			@try {
-				NodeValue(3);
+				NodeValue(3); //this is the loop guts
+				NodeValue(2); //this is the end of loop action, i.e. i++
+				if([NodeValue(1) isEqual: _zero]){ //the end of loop check, i.e. i<10
+					[pool release];
+					break;
+				}
 			}
 			@catch(NSException* localException) {
 				if([[localException name] isEqualToString:@"continue"]){
-					continueLoop = YES;
+					[pool release];
+					NodeValue(2); //this is the end of loop action, i.e. i++
+					continue;
 				}
 				else if([[localException name] isEqualToString:@"break"]){
-					breakLoop = YES;
+					[pool release];
+					break;
 				}
 				else [localException raise];
 			}
 		}
 		[pool release];
-		if(breakLoop)	 break;
-		if(continueLoop) continue;
-	};
+	} while(1);
         
 	return nil;
 }
