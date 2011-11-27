@@ -38,6 +38,7 @@ NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
     [task setDelegate:nil];
     [task release];
     task = nil;
+	[externVariablePool release];
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
     [super dealloc];
 }
@@ -177,6 +178,29 @@ NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
 	NSLog(@"Script sent mail to: %@\n",to);
 }
 
+- (void) setExternalVariable:(id)aKey to:(float)aValue
+{
+	@synchronized(self){
+		if(!externVariablePool)externVariablePool = [[NSMutableDictionary dictionary] retain];
+		if(aKey!=nil){
+			[externVariablePool setObject:[NSDecimalNumber numberWithFloat:aValue] forKey:aKey]; 
+		}
+		else {
+			NSException* e =  [NSException exceptionWithName:@"illegal variables" reason:@"The script external pool can not hold nil keys" userInfo:nil];
+			@throw(e);
+		}
+	}
+}
+
+- (id) externalVariable:(id)aKey
+{
+	id result = nil;
+	@synchronized(self){
+		result = [externVariablePool objectForKey:aKey];
+		if(!result)result = [NSDecimalNumber numberWithInt:0];
+	}
+	return result;
+}
 
 #pragma mark ¥¥¥Archival
 - (id)initWithCoder:(NSCoder*)decoder

@@ -28,6 +28,7 @@
 @interface ORScriptTaskModel : ORScriptIDEModel
 {
 	ORScriptInterface*		task;
+	NSMutableDictionary*	externVariablePool;
 }
 
 #pragma mark ***Initialization
@@ -48,6 +49,8 @@
 - (void) mailSent:(NSString*)to;
 - (void) sendStatusLogTo:(NSString*)receipients cc:(NSString*)cc subject:(NSString*)subject;
 - (void) sendStatusLogTo:(NSString*)receipients cc:(NSString*)cc subject:(NSString*)subject lastSeconds:(unsigned long)aDuration;
+- (void) setExternalVariable:(id)aKey to:(float)aValue;
+- (id) externalVariable:(id)aKey;
 
 #pragma mark ¥¥¥Archival
 - (id)initWithCoder:(NSCoder*)decoder;
