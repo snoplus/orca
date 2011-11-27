@@ -1385,6 +1385,9 @@
 	else if([[a className] isEqualToString:@"NSCFString"] && [[b className] isEqualToString:@"NSCFString"]){
 		return ([a compare:b]);
 	}
+	else if([[a className] isEqualToString:@"__NSCFString"] && [[b className] isEqualToString:@"__NSCFString"]){
+		return ([a compare:b]);
+	}
 	else if([a class] != [NSDecimalNumber class] && [b class] != [NSDecimalNumber class]){
 		return [[NSDecimalNumber decimalNumberWithString:a] compare:[NSDecimalNumber decimalNumberWithString:b]];
 	}
