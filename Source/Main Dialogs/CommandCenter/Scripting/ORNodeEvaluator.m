@@ -1080,10 +1080,21 @@
 				else [localException raise];
 			}
 		}
-		[pool release];
-		if(breakLoop)break;
-		if(continueLoop)continue;
-	} while(![NodeValue(1) isEqual:_zero]);
+		if(breakLoop){
+            [pool release];
+            break;
+        }
+		if(continueLoop){
+            [pool release];
+            continue;
+        }
+        if([NodeValue(1) isEqual:_zero]){
+            [pool release];
+            break;
+        }
+        [pool release];
+
+	} while(1);
 	
 	return nil;
 }
@@ -1092,8 +1103,12 @@
 {
 	BOOL breakLoop		= NO;
 	BOOL continueLoop	= NO;
-	while(![NodeValue(0) isEqual:_zero]){ 
+	while(1){ 
 		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+        if([NodeValue(0) isEqual:_zero]){
+			[pool release];
+            break;
+        }
 		if([self exitNow]){
 			[pool release];
 			break; 
@@ -1123,6 +1138,7 @@
 {
 	BOOL breakLoop		= NO;
 	BOOL continueLoop	= NO;
+        
 	for(NodeValue(0) ; ![NodeValue(1) isEqual: _zero] ; NodeValue(2)){
 		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 		if([self exitNow]){
@@ -1146,7 +1162,8 @@
 		[pool release];
 		if(breakLoop)	 break;
 		if(continueLoop) continue;
-	}
+	};
+        
 	return nil;
 }
 
