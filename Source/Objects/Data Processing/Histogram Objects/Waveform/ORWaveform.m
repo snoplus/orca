@@ -88,7 +88,12 @@ NSString* ORWaveformUseUnsignedChanged   = @"ORWaveformUseUnsignedChanged";
 
 -(long) value:(unsigned short)aChan
 {
-	[dataSetLock lock];
+  return [self value:aChan callerLockedMe:false];
+}
+
+-(long) value:(unsigned short)aChan callerLockedMe:(BOOL)callerLockedMe
+{
+    if(!callerLockedMe) [dataSetLock lock];
 
     long theValue = 0;
 	const char* cptr = (const char*)[waveform bytes];
@@ -122,8 +127,28 @@ NSString* ORWaveformUseUnsignedChanged   = @"ORWaveformUseUnsignedChanged";
 		else theValue =  0;
 	}
 
-	[dataSetLock unlock];
+	if(!callerLockedMe) [dataSetLock unlock];
 	return theValue;
+}
+
+- (double) getTrapezoidValue:(unsigned int)channel rampTime:(unsigned int)ramp gapTime:(unsigned int)gap
+{
+    // Average two regions of waveform, each of duration [ramp], separated
+    // by a region of duration [gap], with the first region starting at
+    // [channel], and return the difference divided by the ramp time.
+
+    if(channel < 0 || channel+2*ramp+gap >= [self numberBins]) return 0;
+
+    [dataSetLock lock];
+    double value = 0;
+    unsigned int ch;
+    for(ch = 0; ch < ramp; ch++) {
+      value += [self value:(channel + ch + ramp + gap) callerLockedMe:true];
+      value -= [self value:(channel + ch) callerLockedMe:true];
+    }
+    [dataSetLock unlock];
+
+    return value / ramp;
 }
 
 #pragma mark ¥¥¥Data Management

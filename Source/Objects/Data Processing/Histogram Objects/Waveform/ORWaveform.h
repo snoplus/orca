@@ -38,11 +38,13 @@
 - (void) setDataOffset:(unsigned long)newOffset;
 - (int)  numberBins;
 - (long) value:(unsigned short)channel;
+- (long) value:(unsigned short)channel callerLockedMe:(BOOL)callerLockedMe;
 - (void) setWaveform:(NSData*)aWaveform;
 - (BOOL) useUnsignedValues;
 - (void) setUseUnsignedValues:(BOOL)aState;
 - (NSMutableArray*) rois;
 - (NSData*) rawData;
+- (double) getTrapezoidValue:(unsigned int)channel rampTime:(unsigned int)ramp gapTime:(unsigned int)gap;
 
 #pragma mark ¥¥¥Data Management
 - (void) clear;
