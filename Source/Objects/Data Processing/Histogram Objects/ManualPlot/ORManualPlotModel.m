@@ -113,6 +113,49 @@ NSString* ORManualPlotDataChanged			= @"ORManualPlotDataChanged";
 	
 }
 
+- (void) setHistogramBins:(int)nBins xLow:(float)xLow xHigh:(float)xHigh
+{
+  [self clearData];
+  int i;
+  for(i=0; i<nBins+2; i++) {
+    [self addValue1:(xLow + (xHigh-xLow)*(i-1)/nBins) value2:0];
+  }
+}
+
+- (void) fillHistogram:(float)value
+{
+  [self fillHistogram:value weight:1];
+}
+
+- (void) fillHistogram:(float)value weight:(float)weight
+{
+  int nBins = [data count];
+  if(nBins == 0) {
+    NSLogColor([NSColor redColor],@"Must call setHistogramBins before filling!");
+    return;
+  }
+  float xLow = [[self dataAtRow:0 column:0] floatValue];
+  float xHigh = [[self dataAtRow:(nBins-1) column:0] floatValue];
+  int iBin;
+  if(value < xLow) iBin = 0;
+  else if(value >= xHigh) iBin = nBins+1;
+  else iBin = 1 + ((value - xLow)/(xHigh-xLow) * nBins);
+
+  float binX = [[self dataAtRow:iBin column:0] floatValue];
+  float currentCounts = [[self dataAtRow:iBin column:1] floatValue];
+
+  [dataSetLock lock];
+  [data replaceObjectAtIndex:iBin withObject:[NSArray arrayWithObjects:
+    [NSNumber numberWithFloat:binX],
+    [NSNumber numberWithFloat:(currentCounts+weight)],
+    [NSNumber numberWithFloat:0],
+    [NSNumber numberWithFloat:0],
+    nil]];
+  [dataSetLock unlock];	
+
+  [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORManualPlotDataChanged object:self];
+}
+
 
 #pragma mark ***Accessors
 

@@ -64,6 +64,9 @@
 - (void) addValue1:(float)v1 value2:(float)v2;
 - (void) addValue1:(float)v1 value2:(float)v2 value3:(float)v3;
 - (void) addValue1:(float)v1 value2:(float)v2 value3:(float)v3 value4:(float)v4;
+- (void) setHistogramBins:(int)nBins xLow:(float)xLow xHigh:(float)xHigh;
+- (void) fillHistogram:(float)value;
+- (void) fillHistogram:(float)value weight:(float)weight;
 - (id)   dataAtRow:(int)r column:(int)c;
 - (void) clearData;
 - (NSString*) fullName;
