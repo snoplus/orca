@@ -353,9 +353,19 @@
                          name : ORKatrinV4FLTModelReceivedHistoCounterChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(customVariableChanged:)
+                         name : ORKatrinV4FLTModelCustomVariableChanged
+						object: model];
+
 }
 
 #pragma mark •••Interface Management
+
+- (void) customVariableChanged:(NSNotification*)aNote
+{
+	[customVariableTextField setIntValue: [model customVariable]];
+}
 
 - (void) receivedHistoCounterChanged:(NSNotification*)aNote
 {
@@ -573,6 +583,7 @@
 	[self fifoFlagsChanged:nil];
 	[self receivedHistoChanMapChanged:nil];
 	[self receivedHistoCounterChanged:nil];
+	[self customVariableChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -946,6 +957,17 @@
 }
 
 #pragma mark •••Actions
+
+- (void) customVariableTextFieldAction:(id)sender
+{
+	[model setCustomVariable:[sender intValue]];	
+}
+
+- (IBAction) clearHistoCounterButtonAction:(id)sender
+{
+	[model clearReceivedHistoCounter];	
+}
+
 
 - (void) receivedHistoCounterTextFieldAction:(id)sender
 {

@@ -31,6 +31,7 @@
 #import "ORCommandList.h"
 
 
+NSString* ORKatrinV4FLTModelCustomVariableChanged = @"ORKatrinV4FLTModelCustomVariableChanged";
 NSString* ORKatrinV4FLTModelReceivedHistoCounterChanged = @"ORKatrinV4FLTModelReceivedHistoCounterChanged";
 NSString* ORKatrinV4FLTModelReceivedHistoChanMapChanged = @"ORKatrinV4FLTModelReceivedHistoChanMapChanged";
 NSString* ORKatrinV4FLTModelFifoLengthChanged = @"ORKatrinV4FLTModelFifoLengthChanged";
@@ -246,6 +247,20 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 #pragma mark •••Accessors
 
+- (int) customVariable
+{
+    return customVariable;
+}
+
+- (void) setCustomVariable:(int)aCustomVariable
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setCustomVariable:customVariable];
+    
+    customVariable = aCustomVariable;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelCustomVariableChanged object:self];
+}
+
 - (int) receivedHistoCounter
 {
     return receivedHistoCounter;
@@ -254,7 +269,6 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (void) setReceivedHistoCounter:(int)aReceivedHistoCounter
 {
     receivedHistoCounter = aReceivedHistoCounter;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelReceivedHistoCounterChanged object:self];
 }
 
@@ -1404,6 +1418,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 	
     [[self undoManager] disableUndoRegistration];
 	
+    [self setCustomVariable:[decoder decodeIntForKey:@"customVariable"]];
     [self setFifoLength:[decoder decodeIntForKey:@"fifoLength"]];
     [self setNfoldCoincidence:[decoder decodeIntForKey:@"nfoldCoincidence"]];
     [self setVetoOverlapTime:[decoder decodeIntForKey:@"vetoOverlapTime"]];
@@ -1436,6 +1451,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 {
     [super encodeWithCoder:encoder];
 	
+    [encoder encodeInt:customVariable forKey:@"customVariable"];
     [encoder encodeInt:fifoLength forKey:@"fifoLength"];
     [encoder encodeInt:nfoldCoincidence forKey:@"nfoldCoincidence"];
     [encoder encodeInt:vetoOverlapTime forKey:@"vetoOverlapTime"];
@@ -1610,7 +1626,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 		[self setReceivedHistoChanMap:map];
 	    //NSLog(@"DEBUG: in %@::%@: Received histogram for chan:%i  (trigger mask: %i)    \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),aChan,triggerEnabledMask);//TODO: DEBUG testing ...-tb-
 		//NSLog(@"Received histogram for chan:%i  (trigger mask: %i)\n",aChan,triggerEnabledMask);//DEBUG
-		if(triggerEnabledMask == map){
+		if(triggerEnabledMask == (map & triggerEnabledMask)){ // 'triggerEnabledMask == map' is sufficient, but in simulation mode we may receive histograms from inactive channels ... -tb-
 		    //after all channels shipped histogram, increase counter
 		    map=0;
 			[self setReceivedHistoChanMap:map];

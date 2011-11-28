@@ -98,6 +98,7 @@
 	unsigned char fifoFlags[kNumV4FLTChannels];
     int receivedHistoChanMap;
     int receivedHistoCounter;
+    int customVariable;
 }
 
 #pragma mark •••Initialization
@@ -108,6 +109,8 @@
 - (short) getNumberRegisters;
 
 #pragma mark •••Accessors
+- (int) customVariable;
+- (void) setCustomVariable:(int)aCustomVariable;
 - (int) receivedHistoCounter;
 - (void) setReceivedHistoCounter:(int)aReceivedHistoCounter;
 - (void) clearReceivedHistoCounter;
@@ -366,6 +369,7 @@
 				  n:(int) n;
 @end
 
+extern NSString* ORKatrinV4FLTModelCustomVariableChanged;
 extern NSString* ORKatrinV4FLTModelReceivedHistoCounterChanged;
 extern NSString* ORKatrinV4FLTModelReceivedHistoChanMapChanged;
 extern NSString* ORKatrinV4FLTModelFifoLengthChanged;
