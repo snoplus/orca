@@ -93,9 +93,12 @@
 - (id) executeWithArgs:(NSArray*)valueArray;
 @end
 
-@interface OrcaObject (ORNodeEvaluation)
-- (NSComparisonResult)compare:(NSNumber *)otherNumber;
-- (BOOL)	exitNow;
+@interface NSArray (ORNodeEvaluation)
+- (NSComparisonResult)compare:(NSArray *)otherNumber;
+@end
+
+@interface NSDictionary (ORNodeEvaluation)
+- (NSComparisonResult)compare:(NSDictionary *)otherNumber;
 @end
 
 @interface OrcaObjectController (ORNodeEvaluation)

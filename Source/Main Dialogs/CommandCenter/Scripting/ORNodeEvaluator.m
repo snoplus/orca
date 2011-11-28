@@ -1371,24 +1371,11 @@
 }
 - (NSComparisonResult) compare:(id)a to:(id)b
 {
-	if(([a class] == [b class]) && ([a class] == [NSDecimalNumber class]) && ([b class] == [NSDecimalNumber class])) return [a compare:b];
-	else if(([a class] != [NSDecimalNumber class]) && ([b class] == [NSDecimalNumber class])){
-		return [[NSDecimalNumber decimalNumberWithString:a] compare:b];
-	}
-	else if(([b class] != [NSDecimalNumber class]) && ([a class] == [NSDecimalNumber class])){
-		return [a compare:[NSDecimalNumber decimalNumberWithString:b]];
-	}
-	else if([[a className] isEqualToString:@"NSCFString"] && [[b className] isEqualToString:@"NSCFString"]){
-		return ([a compare:b]);
-	}
-	else if([[a className] isEqualToString:@"__NSCFString"] && [[b className] isEqualToString:@"__NSCFString"]){
-		return ([a compare:b]);
-	}
-	else if([a class] != [NSDecimalNumber class] && [b class] != [NSDecimalNumber class]){
-		return [[NSDecimalNumber decimalNumberWithString:a] compare:[NSDecimalNumber decimalNumberWithString:b]];
-	}
-	else return NSOrderedDescending;
-	[NSException raise:@"Run time" format:@"illegal Args to compare"];
+    if([a isKindOfClass:[b class]])return [a compare:b];
+    else {
+        [NSException raise:@"Run time" format:@"illegal to compare %@ to %@",[a className],[b className]];
+        return NO; //never get here... just to make compiler happy
+    }
 }
 @end
 
@@ -1614,16 +1601,19 @@
 }
 
 @end
-
-@implementation OrcaObject (ORNodeEvaluation)
-- (NSComparisonResult)compare:(NSNumber *)otherNumber
+@implementation NSArray (ORNodeEvaluation)
+- (NSComparisonResult)compare:(NSArray *)anOtherArray
 {
-	if( [self isEqual: otherNumber])return NSOrderedSame;
+	if( [self isEqual: anOtherArray])return NSOrderedSame;
 	else return NSOrderedDescending;
 }
-- (BOOL)	exitNow
+@end
+
+@implementation NSDictionary (ORNodeEvaluation)
+- (NSComparisonResult)compare:(NSDictionary *)anOtherDictionary
 {
-	return NO;
+	if( [self isEqual: anOtherDictionary])return NSOrderedSame;
+	else return NSOrderedDescending;
 }
 @end
 
