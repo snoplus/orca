@@ -138,7 +138,7 @@ NSString* ORManualPlotDataChanged			= @"ORManualPlotDataChanged";
   float xHigh = [[self dataAtRow:(nBins-1) column:0] floatValue];
   int iBin;
   if(value < xLow) iBin = 0;
-  else if(value >= xHigh) iBin = nBins+1;
+  else if(value >= xHigh) iBin = nBins-1;
   else iBin = 1 + ((value - xLow)/(xHigh-xLow) * nBins);
 
   float binX = [[self dataAtRow:iBin column:0] floatValue];
