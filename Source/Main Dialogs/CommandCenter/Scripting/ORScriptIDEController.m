@@ -699,7 +699,18 @@
 - (void) tableView:(NSTableView*)aTable setObjectValue:(id)aData forTableColumn:(NSTableColumn*)aCol row:(int)aRow
 {
 	if(aTable == inputVariablesTableView) {
-		[[[model inputValues] objectAtIndex:aRow] setObject: aData forKey:[aCol identifier]];	
+		if([[aCol identifier] isEqualToString:@"iValue"]){
+            if([aData hasPrefix:@"\""] && [aData hasSuffix:@"\""]) {
+                [[[model inputValues] objectAtIndex:aRow] setObject:aData forKey:[aCol identifier]];	
+            }
+            else {
+                NSDecimalNumber* asNumber = [NSDecimalNumber decimalNumberWithString:aData];
+                [[[model inputValues] objectAtIndex:aRow] setObject:asNumber forKey:[aCol identifier]];
+            }
+        }
+        else {
+            [[[model inputValues] objectAtIndex:aRow] setObject:aData forKey:[aCol identifier]];
+        }
 	}
 	else if(aTable == debuggerTableView) {
 		if([[aCol identifier] isEqualToString:@"Value"]){
