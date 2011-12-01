@@ -1372,6 +1372,12 @@
 - (NSComparisonResult) compare:(id)a to:(id)b
 {
     if([a isKindOfClass:[b class]])return [a compare:b];
+    else if([a isKindOfClass:NSClassFromString(@"NSString")] && [b isKindOfClass:NSClassFromString(@"NSDecimalNumber")]){
+        return [[NSDecimalNumber decimalNumberWithString:a] compare:b];
+    }
+    else if([b isKindOfClass:NSClassFromString(@"NSString")] && [a isKindOfClass:NSClassFromString(@"NSDecimalNumber")]){
+        return [[NSDecimalNumber decimalNumberWithString:b] compare:a];
+    }
     else {
         [NSException raise:@"Run time" format:@"illegal to compare %@ to %@",[a className],[b className]];
         return NO; //never get here... just to make compiler happy
