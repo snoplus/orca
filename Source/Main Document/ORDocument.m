@@ -267,6 +267,7 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 	NSMutableArray* dataChain		= [NSMutableArray array];
 	NSMutableArray* gpib			= [NSMutableArray array];
 	NSMutableArray* usb				= [NSMutableArray array];
+	NSMutableArray* serial			= [NSMutableArray array];
 	NSMutableArray* auxHw			= [NSMutableArray array];
 	NSMutableDictionary* exp		= [NSMutableDictionary dictionary];
 	NSEnumerator* e					= [allObjects objectEnumerator];
@@ -287,6 +288,11 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 				[anObj addObjectInfoToArray:gpib];
 			}
 		}
+		else if([anObj isKindOfClass:NSClassFromString(@"ORSerialDeviceModel")]){
+			if([anObj respondsToSelector:@selector(addObjectInfoToArray:)]){
+				[anObj addObjectInfoToArray:serial];
+			}
+		}
 		else if([anObj isKindOfClass:NSClassFromString(@"ORUsbDeviceModel")]){
 			if([anObj respondsToSelector:@selector(addObjectInfoToArray:)]){
 				[anObj addObjectInfoToArray:usb];
@@ -297,6 +303,7 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 				[anObj addParametersToDictionary:objectInfoDictionary];
 			}
 		}
+        
 		else if([anObj isKindOfClass:NSClassFromString(@"ORAuxHw")]){
 			if([anObj respondsToSelector:@selector(addObjectInfoToArray:)]){
 				[anObj addObjectInfoToArray:auxHw];
@@ -318,6 +325,9 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 	}
 	if([usb count]){
 		[objectInfoDictionary setObject:usb forKey:@"USB"];
+	}
+	if([serial count]){
+		[objectInfoDictionary setObject:usb forKey:@"Serial"];
 	}
 	if([auxHw count]){
 		[objectInfoDictionary setObject:auxHw forKey:@"AuxHw"];
