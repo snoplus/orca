@@ -661,9 +661,9 @@
 
 - (void) serialNumberChanged:(NSNotification*)aNote
 {
-	if(![model serialNumber] || ![model usbInterface])[serialNumberPopup selectItemAtIndex:0];
-	else [serialNumberPopup selectItemWithTitle:[model serialNumber]];
-	[[self window] setTitle:[model title]];
+//	if(![model serialNumber] || ![model usbInterface])[serialNumberPopup selectItemAtIndex:0];
+//	else [serialNumberPopup selectItemWithTitle:[model serialNumber]];
+//	[[self window] setTitle:[model title]];
 }
 
 #pragma mark •••Actions
