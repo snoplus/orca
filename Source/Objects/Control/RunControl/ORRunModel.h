@@ -267,3 +267,4 @@ extern NSString* ORRunOfflineRunNotification;
 extern NSString* ORRunNumberLock;
 extern NSString* ORRunTypeLock;
 extern NSString* ORRunRemoteInterfaceChangedNotification;
+extern NSString* ORRunModelRunHalted;

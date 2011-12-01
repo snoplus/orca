@@ -50,6 +50,7 @@ NSString* ORRunDefinitionsFileChangedNotification    = @"ORRunDefinitionsFileCha
 NSString* ORRunNumberLock						= @"ORRunNumberLock";
 NSString* ORRunTypeLock							= @"ORRunTypeLock";
 NSString* ORRunOfflineRunNotification			= @"ORRunOfflineRunNotification";
+NSString* ORRunModelRunHalted                   = @"ORRunModelRunHalted";
 
 static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
@@ -1071,6 +1072,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
 - (void) haltRun
 {
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRunModelRunHalted object: self];
     ignoreRepeat = YES;
 	[self stopRun];
 }
