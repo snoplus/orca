@@ -137,7 +137,7 @@ NSString* ORWaveformUseUnsignedChanged   = @"ORWaveformUseUnsignedChanged";
     // by a region of duration [gap], with the first region starting at
     // [channel], and return the difference divided by the ramp time.
 
-    if(channel < 0 || channel+2*ramp+gap >= [self numberBins]) return 0;
+    if(channel+2*ramp+gap >= [self numberBins]) return 0;
 
     [dataSetLock lock];
     double value = 0;
