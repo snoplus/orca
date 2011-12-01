@@ -26,13 +26,15 @@
 
 enum eRunListStates {
 	kStartup,
+    kWaitForRunToStop,
+    kReadyToStart,
 	kStartRun,
 	kStartSubRun,
 	kStartScript,
 	kWaitForScript,
 	kWaitForRunTime,
 	kRunFinished,
-	kFinishUp
+	kFinishUp,
 }eRunListStates;
 
 @interface ORRunListModel : OrcaObject  {
@@ -47,11 +49,15 @@ enum eRunListStates {
 	BOOL oldRepeatRun;
 	int oldRepeatTime;
 	int runListState;
+    int nextState; //used by some states to dynamically set the next state
 	float runLength;
 	NSMutableArray* orderArray;
     BOOL randomize;
 	NSString* lastFile;
 }
+
+- (void) registerNotificationObservers;
+- (void)runHalted:(NSNotification*)aNote;
 
 #pragma mark •••Accessors
 - (NSString*) lastFile;

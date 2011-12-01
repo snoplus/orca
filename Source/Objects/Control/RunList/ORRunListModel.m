@@ -57,8 +57,16 @@ static NSString* ORRunListDataOut	= @"ORRunListDataOut";
 @implementation ORRunListModel
 
 #pragma mark •••initialization
+- (id) init
+{
+    self = [super init];
+	[self registerNotificationObservers];
+    return self;
+}
+
 - (void) dealloc
 {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [lastFile release];
 	[runModel release];
 	[scriptModel release];
@@ -193,6 +201,23 @@ static NSString* ORRunListDataOut	= @"ORRunListDataOut";
 	return [items count];
 }
 
+- (void) registerNotificationObservers
+{
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(runHalted:)
+                         name : ORRunModelRunHalted
+                       object : nil];
+}
+
+- (void)runHalted:(NSNotification*)aNote
+{   
+    runListState = kFinishUp;
+}
+
 #pragma mark •••Archival
 - (id) initWithCoder:(NSCoder*)decoder
 {
@@ -206,7 +231,8 @@ static NSString* ORRunListDataOut	= @"ORRunListDataOut";
 		[anItem setObject:@"" forKey:@"RunState"];
 	}
 	
-	
+    [self registerNotificationObservers];
+
     [[self undoManager] enableUndoRegistration];
     
     return self;
@@ -262,6 +288,8 @@ static NSString* ORRunListDataOut	= @"ORRunListDataOut";
 {
 	switch(runListState){
 		case kStartup:			return @"Startup";
+		case kWaitForRunToStop:	return @"Run Wait";
+		case kReadyToStart:     return @"Ready";
 		case kStartRun:			return @"StartRun";
 		case kStartSubRun:		return @"StartSubRun";
 		case kStartScript:		return @"Starting Script";
@@ -334,6 +362,20 @@ static NSString* ORRunListDataOut	= @"ORRunListDataOut";
 			runModel     = [[runObjects objectAtIndex:0] retain];
 			scriptModel  = [[self objectConnectedTo:ORRunListDataOut] retain];
 			[self saveRunModelOptions];
+            if([runModel isRunning]){
+                [runModel stopRun];
+                runListState = kWaitForRunToStop;
+                nextState = kReadyToStart;
+            }
+            else   runListState = kReadyToStart;
+        break;
+            
+        case kWaitForRunToStop:
+			[self setWorkingItemState];
+            if(![runModel isRunning])runListState = kReadyToStart;
+        break;
+            
+        case kReadyToStart:
 			if(!scriptModel) runListState = kStartRun;
 			else			 runListState = kStartScript;
 			[self calcTotalExpectedTime];
