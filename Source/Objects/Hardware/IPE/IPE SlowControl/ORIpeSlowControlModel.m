@@ -896,12 +896,11 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 	[self setViewItemName:		[decoder decodeBoolForKey:	  @"viewItemName"]];
 	[self setPollTime:			[decoder decodeIntForKey:	  @"pollTime"]];
 	[self setIPNumber:			[decoder decodeObjectForKey:  @"IPNumber"]];
-	[self setItemTreeRoot:		[decoder decodeObjectForKey:  @"itemTreeRoot"]];
+	//[self setItemTreeRoot:		[decoder decodeObjectForKey:  @"itemTreeRoot"]]; //commented out: let the user load the tree
 	
 	requestCache =				[[decoder decodeObjectForKey: @"requestCache"]retain];
 	pollingLookUp =				[[decoder decodeObjectForKey: @"pollingLookUp"]retain];
 	[self makeChannelLookup];
-
 	[[self undoManager] enableUndoRegistration];
      
 	
@@ -919,7 +918,7 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 	[encoder encodeBool:viewItemName		forKey:@"viewItemName"];
 	[encoder encodeInt:pollTime				forKey:@"pollTime"];
  	[encoder encodeObject:IPNumber			forKey:@"IPNumber"];
- 	[encoder encodeObject:itemTreeRoot		forKey:@"itemTreeRoot"];
+ 	//[encoder encodeObject:itemTreeRoot		forKey:@"itemTreeRoot"];
  	[encoder encodeObject:pollingLookUp		forKey:@"pollingLookUp"];
 	//only store the part of the requestCache that is polled
 	NSMutableDictionary* itemsToStore = [NSMutableDictionary dictionary];
