@@ -85,6 +85,7 @@ NSString* ORTaskDidFinishNotification   = @"ORTaskDidFinishNotification";
 -(void)registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+    [notifyCenter removeObserver:self];
     [notifyCenter addObserver: self
                      selector: @selector(updateButtons)
                          name: ORRunStatusChangedNotification
@@ -320,9 +321,11 @@ NSString* ORTaskDidFinishNotification   = @"ORTaskDidFinishNotification";
 			[self performSelector:@selector(startTask) withObject:nil afterDelay:startIsDelayed?timeDelay:0.0];
 			if(startIsDelayed){
 				[nextRunTimeField setObjectValue:[[NSDate date] addTimeInterval:timeDelay]];
+                [self setMessage:@"Delaying"];
 			}
 			else {
 				[nextRunTimeField setStringValue:@"Now"];
+                [self setMessage:@"Running"];
 			}
 			
 		}
@@ -367,6 +370,7 @@ NSString* ORTaskDidFinishNotification   = @"ORTaskDidFinishNotification";
             [NSObject cancelPreviousPerformRequestsWithTarget:self];
             [self performSelector:@selector(continueTask) withObject:nil afterDelay:timeInterval];
             [nextRunTimeField setObjectValue:[[NSDate date] addTimeInterval:timeInterval]];
+            [self setMessage:@"Waiting"];
             [self cleanUp];
             NSLog(@"Task Finished: %@\n",[titleField stringValue]);
             [[NSNotificationCenter defaultCenter] postNotificationName:ORTaskDidFinishNotification object:self];
@@ -399,6 +403,7 @@ NSString* ORTaskDidFinishNotification   = @"ORTaskDidFinishNotification";
 		[startButton setTitle:@"Start"];
 		[self finishUp];
 		[nextRunTimeField setStringValue:@"Not Scheduled"];
+        [self setMessage:@"Idle"];
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORTaskDidFinishNotification object:self];
 	}
 	@catch(NSException* localException) {
