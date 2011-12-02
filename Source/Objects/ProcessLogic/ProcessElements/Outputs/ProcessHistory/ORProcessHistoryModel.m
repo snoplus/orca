@@ -346,6 +346,9 @@ NSString* historyConnectors[4] = {
 			}
 		}
 		if(maxY!=minY){
+            maxY = maxY + maxY*.1;
+            minY = minY - minY*.1;
+            
 			scaleFactorY = aRect.size.height/fabs(maxY-minY);
 			scaleFactorX = aRect.size.width/(float)maxNumPoints;
 
