@@ -294,8 +294,9 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 												   object : driverScriptFileMover];
 		
 		NSString* scriptRunPath = [NSString stringWithFormat:@"/home/%@/%@",userName,[delegate driverScriptName]];
+        NSString* pwd = [rootPwd length]?rootPwd:@"\n";
 		[aSequence addTask:[resourcePath stringByAppendingPathComponent:@"loginScript"] 
-				 arguments:[NSArray arrayWithObjects:@"root",rootPwd,IPNumber,scriptRunPath,nil]];
+				 arguments:[NSArray arrayWithObjects:@"root",pwd,IPNumber,scriptRunPath,nil]];
 		
 		[aSequence launch];
 	}
@@ -898,11 +899,12 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 		[self fillInScript:@"makeScript"];
 		[self fillInScript:@"goScript"];
 				 
+        NSString* pwd = [passWord length]?passWord:@"\n";
 		//ship the files from the staging area
 		ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
 		[aSequence setVerbose:verbose];
 		[aSequence addTask:[resourcePath stringByAppendingPathComponent:@"loginScript"] 
-				 arguments:[NSArray arrayWithObjects:userName,passWord,IPNumber,@"/bin/rm",@"-rf",@"ORCA",nil]];
+				 arguments:[NSArray arrayWithObjects:userName,pwd,IPNumber,@"/bin/rm",@"-rf",@"ORCA",nil]];
 		[aSequence setTextToDelegate:YES];
 		
 		SBCFileMover = [[ORFileMover alloc] init];
@@ -926,7 +928,7 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 						   object : SBCFileMover];
 		
 		[aSequence addTask:[resourcePath stringByAppendingPathComponent:@"loginScript"] 
-				 arguments:[NSArray arrayWithObjects:userName,passWord,IPNumber,@"~/ORCA/makeScript",nil]];
+				 arguments:[NSArray arrayWithObjects:userName,pwd,IPNumber,@"~/ORCA/makeScript",nil]];
 		
 		[aSequence launch];
 	}
@@ -945,8 +947,11 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 		
 	NSString* resourcePath = [[NSBundle mainBundle] resourcePath];
 	ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
+    
+    NSString* pwd = [passWord length]?passWord:@"\n";
+
 	[aSequence addTask:[resourcePath stringByAppendingPathComponent:@"loginScript"] 
-			 arguments:[NSArray arrayWithObjects:userName,passWord,IPNumber,@"~/ORCA/killScript",nil]];
+			 arguments:[NSArray arrayWithObjects:userName,pwd,IPNumber,@"~/ORCA/killScript",nil]];
 	
 	[aSequence setVerbose:verbose];
 	[aSequence setTextToDelegate:YES];
@@ -1038,8 +1043,9 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 	[self setGoScriptFailed:NO];
 	NSString* resourcePath = [[NSBundle mainBundle] resourcePath];
 	ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
+    NSString* pwd = [passWord length]?passWord:@"\n";
 	[aSequence addTask:[resourcePath stringByAppendingPathComponent:@"loginScript"] 
-			 arguments:[NSArray arrayWithObjects:userName,passWord,IPNumber,@"~/ORCA/goScript",nil]];
+			 arguments:[NSArray arrayWithObjects:userName,pwd,IPNumber,@"~/ORCA/goScript",nil]];
 
 	[aSequence setVerbose:verbose];
 	[aSequence setTextToDelegate:YES];
@@ -1053,13 +1059,14 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 	[self setGoScriptFailed:NO];
 	NSString* resourcePath = [[NSBundle mainBundle] resourcePath];
 	ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
+    NSString* pwd = [rootPwd length]?rootPwd:@"\n";
 	if(reboot){
 		[aSequence addTask:[resourcePath stringByAppendingPathComponent:@"loginScript"] 
-				 arguments:[NSArray arrayWithObjects:@"root",rootPwd,IPNumber,@"shutdown",@"-r",@"now",nil]];
+				 arguments:[NSArray arrayWithObjects:@"root",pwd,IPNumber,@"shutdown",@"-r",@"now",nil]];
 	}
 	else {
 		[aSequence addTask:[resourcePath stringByAppendingPathComponent:@"loginScript"] 
-				 arguments:[NSArray arrayWithObjects:@"root",rootPwd,IPNumber,@"shutdown",@"-h",@"now",nil]];
+				 arguments:[NSArray arrayWithObjects:@"root",pwd,IPNumber,@"shutdown",@"-h",@"now",nil]];
 	}
 	[aSequence setVerbose:verbose];
 	[aSequence setTextToDelegate:YES];
