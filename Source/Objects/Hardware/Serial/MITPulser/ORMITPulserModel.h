@@ -17,11 +17,13 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-#pragma mark ***Imported Files;
+#pragma mark ***Imported Files
+
+#import "ORAuxHw.h"
 
 @class ORSerialPort;
 
-@interface ORMITPulserModel : OrcaObject
+@interface ORMITPulserModel : ORAuxHw
 {
     @private
         NSString*        portName;
