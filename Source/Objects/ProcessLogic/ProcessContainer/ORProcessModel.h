@@ -113,6 +113,8 @@
 - (void) setNextHeartbeatString;
 - (NSDate*) nextHeartbeat;
 - (void) sendStartStopNotice:(BOOL)state;
+- (void) incrementProcessRunNumber;
+- (int) processRunNumber;
 
 #pragma mark ¥¥¥Archival
 - (id)initWithCoder:(NSCoder*)decoder;
@@ -126,6 +128,7 @@
 - (BOOL) isTrueEndNode;
 @end
 
+extern NSString* ORProcessModelRunNumberChanged;
 extern NSString* ORProcessModelNextHeartBeatChanged;
 extern NSString* ORProcessModelSendOnStopChanged;
 extern NSString* ORProcessModelSendOnStartChanged;

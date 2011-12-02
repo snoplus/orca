@@ -39,6 +39,7 @@ NSString* ORProcessModelCommentChangedNotification  = @"ORProcessModelCommentCha
 NSString* ORProcessModelShortNameChangedNotification= @"ORProcessModelShortNameChangedNotification";
 NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged";
 NSString* ORProcessModelNextHeartBeatChanged			= @"ORProcessModelNextHeartBeatChanged";
+NSString* ORProcessModelRunNumberChanged			= @"ORProcessModelRunNumberChanged";
 
 @interface ORProcessModel (private)
 - (void) setSendStartNoticeNextReadAfterDelay;
@@ -509,7 +510,7 @@ NSString* ORProcessModelNextHeartBeatChanged			= @"ORProcessModelNextHeartBeatCh
 {
 	writeHeader = YES;
 	NSArray* outputNodes = [self collectObjectsRespondingTo:@selector(isTrueEndNode)];
-    //NSArray* outputNodes = [self collectObjectsOfClass:NSClassFromString(@"ORProcessEndNode")];
+
 	if([outputNodes count] == 0){
 		NSLog(@"%@ has no output nodes. Process NOT started... nothing to do!\n",shortName);
 		return;
@@ -521,7 +522,9 @@ NSString* ORProcessModelNextHeartBeatChanged			= @"ORProcessModelNextHeartBeatCh
 		NSString* t = inTestMode?@"(Test Mode)":@"";
 		if([shortName length])NSLog(@"%@ Started %@\n",shortName,t);
 		else NSLog(@"Process %d Started %@\n",[self uniqueIdNumber],t);
-
+        
+        [self incrementProcessRunNumber];
+         
 		if(inTestMode){
 			[self postTestAlarm];
 		}
@@ -549,6 +552,23 @@ NSString* ORProcessModelNextHeartBeatChanged			= @"ORProcessModelNextHeartBeatCh
 			[self sendStartStopNotice:NO];
 		}
 	}
+}
+
+- (void) incrementProcessRunNumber
+{
+    NSUserDefaults* defaults 	= [NSUserDefaults standardUserDefaults];
+    NSString* aKey = [NSString stringWithFormat:@"Process%dRunNumber",[self uniqueIdNumber]];
+    int n = [[defaults objectForKey:aKey] intValue];
+    [defaults setObject:[NSNumber numberWithInt:n+1] forKey:aKey];
+    [defaults synchronize];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORProcessModelRunNumberChanged object: self];
+}
+
+- (int) processRunNumber
+{
+    NSUserDefaults* defaults 	= [NSUserDefaults standardUserDefaults];
+    NSString* aKey = [NSString stringWithFormat:@"Process%dRunNumber",[self uniqueIdNumber]];
+    return [[defaults  objectForKey:aKey] intValue];
 }
 
 - (void) startStopRun
@@ -642,11 +662,11 @@ NSString* ORProcessModelNextHeartBeatChanged			= @"ORProcessModelNextHeartBeatCh
 		sampleGateOpen = NO;
 		
 		if(keepHistory && [historyFile length]){
-			NSString* header = @"#";
+			NSString* header = @"# SampleTime";
 			if(writeHeader){
 				for(id anObj in [self orcaObjects]){
 					if([anObj isKindOfClass:NSClassFromString(@"ORAdcModel")]){
-						header = [header stringByAppendingFormat:@" SampleTime\t%@",[anObj iconLabel]];
+						header = [header stringByAppendingFormat:@"\t%@",[anObj iconLabel]];
 					}
 				}
 				header = [header stringByAppendingString:@"\n"];
@@ -669,7 +689,7 @@ NSString* ORProcessModelNextHeartBeatChanged			= @"ORProcessModelNextHeartBeatCh
 						finalString = [header stringByAppendingString:finalString];
 						writeHeader = NO;
 					}
-					NSString* fullPath = [historyFile stringByExpandingTildeInPath];
+					NSString* fullPath = [[historyFile stringByExpandingTildeInPath] stringByAppendingFormat:@"_%d",[self processRunNumber]];
 					NSFileManager* fm = [NSFileManager defaultManager];
 					if(![fm fileExistsAtPath: fullPath]){
 						[finalString writeToFile:fullPath atomically:NO encoding:NSASCIIStringEncoding error:nil];

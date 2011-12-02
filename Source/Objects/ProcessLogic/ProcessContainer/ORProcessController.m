@@ -202,6 +202,12 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
                      selector : @selector(nextHeartBeatChanged:)
                          name : ORProcessModelNextHeartBeatChanged
 						object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(processRunNumberChanged:)
+                         name : ORProcessModelRunNumberChanged
+						object: model];
+    
 }
 
 - (void) updateWindow
@@ -220,7 +226,14 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
 	[self sendOnStartChanged:nil];
 	[self sendOnStopChanged:nil];
 	[self nextHeartBeatChanged:nil];
+	[self processRunNumberChanged:nil];
 }
+
+- (void) processRunNumberChanged:(NSNotification*)aNote
+{
+    [processRunNumberField setIntValue:[model processRunNumber]];
+}
+
 
 - (void) setHeartbeatImage
 {

@@ -44,6 +44,7 @@
 	IBOutlet NSTextField*   nextHeartbeatField;
     IBOutlet NSImageView*	heartbeatImage;
     IBOutlet NSButton* pollNowButton;
+	IBOutlet NSTextField*   processRunNumberField;
 
     NSImage* descendingSortingImage;
     NSImage* ascendingSortingImage;
@@ -78,6 +79,7 @@
 - (void) nextHeartBeatChanged:(NSNotification*)aNote;
 - (void) setHeartbeatImage;
 - (void) updatePollingButton;
+- (void) processRunNumberChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) sendOnStopAction:(id)sender;
