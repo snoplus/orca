@@ -230,6 +230,7 @@
 - (void) setValue:(id)aValue forIndex:(int) anIndex
 {
 	[symbolTableLock lock];
+	if(!aValue)aValue = _zero;
 	NSArray* keys = [[[self minSymbolTable] allKeys] sortedArrayUsingSelector:@selector(compare:)];
 	[symbolTable setObject:aValue forKey:[keys objectAtIndex:anIndex]];
 	[symbolTableLock unlock];	
