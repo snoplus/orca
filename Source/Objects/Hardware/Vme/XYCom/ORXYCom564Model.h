@@ -20,6 +20,8 @@
 #pragma mark ***Imported Files
 #import "ORVmeIOCard.h"
 #import "ORAdcProcessing.h"
+#import "ORDataTaker.h"
+
 
 #pragma mark •••Register Definitions
 typedef enum {
@@ -68,7 +70,7 @@ typedef enum {
     kNumberOfAutoscanModes
 } EXyCom564AutoscanMode;
 
-@interface ORXYCom564Model : ORVmeIOCard <ORAdcProcessing>
+@interface ORXYCom564Model : ORVmeIOCard <ORDataTaker, ORAdcProcessing>
 {
     @protected
     unsigned long          dataId;
@@ -79,7 +81,8 @@ typedef enum {
     NSTimeInterval         pollingState;
     BOOL                   pollRunning;
     NSMutableArray*        channelGains;
-    NSMutableArray*        chanADCVals;    
+    NSMutableArray*        chanADCVals; 
+    BOOL                   isRunning;
 }
 #pragma mark ***Initialization
 - (id) init;
@@ -137,9 +140,12 @@ typedef enum {
 #pragma mark •••Data records
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherCard;
-- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (NSDictionary*) dataRecordDescription;
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;

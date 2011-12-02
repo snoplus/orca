@@ -40,8 +40,9 @@
 	
 	ptr++; //point to time
 	unsigned long theTime = *ptr;
+    ptr++; // skip the microseconds 
 
-	int n = length - 3;
+	int n = length - 4;
 	int i;
 	for(i=0;i<n;i++){
 		ptr++;	//channel

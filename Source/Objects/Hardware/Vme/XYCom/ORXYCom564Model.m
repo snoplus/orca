@@ -40,8 +40,8 @@ NSString* ORXYCom564ShipRecordsChanged      = @"ORXYCom564ShipRecordsChanged";
 - (void) _stopPolling;
 - (void) _startPolling;
 - (void) _pollAllChannels;
-- (void) _setChannelADCValues:(NSMutableArray*)vals;
-- (void) _shipRawValues;
+- (void) _setChannelADCValues:(NSMutableArray*)vals withNotify:(BOOL)notify;
+- (void) _shipRawValues:(ORDataPacket*)dataPacket;
 @end
 
 @implementation ORXYCom564Model
@@ -90,7 +90,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     
 }
 
-- (void) _setChannelADCValues:(NSMutableArray *)vals
+- (void) _setChannelADCValues:(NSMutableArray *)vals withNotify:(BOOL)notify
 {
     [vals retain];
     [chanADCVals release];
@@ -102,10 +102,12 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
             [chanADCVals addObject:[NSNumber numberWithInt:0]];
         }
     }
-    
-    [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORXYCom564ADCValuesChanged
-	 object:self];    
+    if (notify) {
+        [[NSNotificationCenter defaultCenter]
+         postNotificationName:ORXYCom564ADCValuesChanged
+         object:self];            
+    }
+
     
 }
 
@@ -116,7 +118,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     [[self undoManager] disableUndoRegistration];
     [self setAddressModifier:0x29];
     [self _setChannelGains:nil];
-    [self _setChannelADCValues:nil];
+    [self _setChannelADCValues:nil withNotify:YES];
     [self setShipRecords:NO];
     [self setOperationMode:kAutoscanning];
     [self setAutoscanMode:k0to64];   
@@ -473,7 +475,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 - (void) readAllAdcChannels
 {
     if (operationMode != kAutoscanning) {
-        NSLog(@"XVME not in autoscanning mode");   
+        NSLog(@"XVME not in autoscanning mode\n");   
         return;
     }
     int channelsToRead = kXVME564_NumAutoScanChannelsPerGroup << ([self autoscanMode]);
@@ -492,7 +494,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
             [chanADCVals replaceObjectAtIndex:i withObject:[NSNumber numberWithShort:readOut[i]]];            
         }
     }
-    [self _setChannelADCValues:chanADCVals];
+    [self _setChannelADCValues:chanADCVals withNotify:!isRunning];
     
 }
 
@@ -571,10 +573,14 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 {
 	
 	if(pollRunning && pollingState != 0)return;
-	
+    if (isRunning) {
+        if(verbose) NSLog(@"XVME564,%d,%d, can not poll while it is in the run loop\n",[self crateNumber],[self slot]);
+        return;
+    }
+    
     if(pollingState!=0){  
         if ([self operationMode] != kAutoscanning) {
-            if(verbose) NSLog(@"XVME564,%d,%d, must be in autoscan mode to poll",[self crateNumber],[self slot]);
+            if(verbose) NSLog(@"XVME564,%d,%d, must be in autoscan mode to poll\n",[self crateNumber],[self slot]);
             return;
         }
 		pollRunning = YES;
@@ -597,7 +603,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     @try { 
         [self readAllAdcChannels]; 
         if ([self shipRecords]) {
-            [self _shipRawValues];
+            [self _shipRawValues:nil];
         }
     }
 	@catch(NSException* localException) { 
@@ -635,7 +641,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"XyCom564"];
+    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORXYCom564Model"];
 }
 
 - (NSDictionary*) dataRecordDescription
@@ -651,21 +657,55 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     
     return dataDictionary;
 }
-- (void) _shipRawValues
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+    if(![[self adapter] controllerCard]){
+        [NSException raise:@"Not Connected" format:@"You must connect to a Controller."];
+    }
+    if ([self operationMode] != kAutoscanning) {
+        [NSException raise:@"Not in autoscanning mode" format:@"You must be in autoscanning mode to run in the loop."];
+    }
+    //----------------------------------------------------------------------------------------
+    // first add our description to the data description
+    isRunning = YES;
+    [self _stopPolling];
+    [self appendDataDescription:aDataPacket userInfo:userInfo];
+    
+    //cache some stuff
+    [self initBoard];
+}
+
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+    [self readAllAdcChannels];
+    [self _shipRawValues:aDataPacket];
+}
+
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+    isRunning = NO;
+}
+
+- (void) reset
+{
+}
+
+- (void) _shipRawValues:(ORDataPacket*)dataPacket
 {
     BOOL runInProgress = [gOrcaGlobals runInProgress];
 	
 	if(!runInProgress) return;
-    int channelsToRead = kXVME564_NumAutoScanChannelsPerGroup << ([self autoscanMode]);    
-    int headernumber = 3;
-    uint32_t data[headernumber+channelsToRead];
+    int channelsToRead =kXVME564_NumAutoScanChannelsPerGroup << ([self autoscanMode]);    
+    int headernumber = 4;
+    unsigned long data[headernumber+channelsToRead];
     
     data[1] = (([self crateNumber]&0x01e)<<21) |  (([self slot]&0x1f) << 16);
     
     //get the time(UT!)
-    time_t	ut_time;
-    time(&ut_time);
-    data[2] = ut_time;	//seconds since 1970
+    struct timeval ut_time;
+    gettimeofday(&ut_time, NULL);
+    data[2] = ut_time.tv_sec;	//seconds since 1970
+    data[3] = ut_time.tv_usec;	//seconds since 1970    
     int index = headernumber;
     int i;
     for(i=0;i<channelsToRead;i++){
@@ -674,7 +714,9 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     }
     data[0] = dataId | index;
     
-    if(index>3){
+    if(dataPacket != nil) {
+        [dataPacket addLongsToFrameBuffer:data length:index];
+    } else if(index>headernumber){
         //the full record goes into the data stream via a notification
         [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
                                                             object:[NSData dataWithBytes:data length:sizeof(data[0])*index]];
@@ -688,7 +730,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     
     [[self undoManager] disableUndoRegistration];
     [self _setChannelGains:[decoder decodeObjectForKey:@"kORXYCom564chanGains"]];
-    [self _setChannelADCValues:[decoder decodeObjectForKey:@"kORXYCom564chanADCValues"]];
+    [self _setChannelADCValues:[decoder decodeObjectForKey:@"kORXYCom564chanADCValues"] withNotify:YES];
     // The super decoder handles the address Modifier output
     if ([self addressModifier] == 0x29) {
         [self setReadoutMode:kA16];
