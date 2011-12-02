@@ -250,10 +250,12 @@ static NSString* ORRunListDataOut	= @"ORRunListDataOut";
 {
 	NSString* s = @"#Script Parameters:RunLength:SubRun\n";
 	for(id anItem in items){ 
+        if(![[anItem objectForKey:@"ScriptParameters"]length] && ![[anItem objectForKey:@"RunLength"]length] && ![[anItem objectForKey:@"SubRun"]length])continue;
+        id isSubRun = [anItem objectForKey:@"SubRun"];
+        if(!isSubRun)isSubRun = [NSNumber numberWithBool:NO];
 		s = [s stringByAppendingFormat:@"%@:%@:%@\n",
 			 [anItem objectForKey:@"ScriptParameters"],
-			 [anItem objectForKey:@"RunLength"],
-			 [anItem objectForKey:@"SubRun"]];
+			 [anItem objectForKey:@"RunLength"],isSubRun];
 	}
 	[s writeToFile:aPath atomically:YES encoding:NSASCIIStringEncoding error:nil];
 }
@@ -271,8 +273,10 @@ static NSString* ORRunListDataOut	= @"ORRunListDataOut";
 		if(![aLine hasPrefix:@"#"]){
 			NSArray* parts = [aLine componentsSeparatedByString:@":"];
 			if([parts count] == 3){
+                NSString* args = [[parts objectAtIndex:0] trimSpacesFromEnds];
+                if([args isEqualToString:@"(null)"])args = @"";
 				NSMutableDictionary* anItem = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-										[[parts objectAtIndex:0] trimSpacesFromEnds],@"ScriptParameters",
+										args,@"ScriptParameters",
 										[NSNumber numberWithFloat:[[[parts objectAtIndex:1] trimSpacesFromEnds]floatValue]],@"RunLength",
 										[NSNumber numberWithInt:[[[parts objectAtIndex:2] trimSpacesFromEnds]intValue]],@"SubRun",
 										@"",@"RunState",
