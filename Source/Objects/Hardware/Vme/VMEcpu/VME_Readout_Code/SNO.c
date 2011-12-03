@@ -51,7 +51,7 @@ void processSNOCommand(SBC_Packet* aPacket)
 		case kSNOMtcLoadXilinx: loadMtcXilinx(aPacket);				break;
 		case kSNOXL2LoadClocks: loadXL2Clocks(aPacket);				break;
 		case kSNOXL2LoadXilinx: startJob(&loadXL2Xilinx,aPacket);		break;
-		case kSNOMtcFirePedestalJobFixedTime: firePedestalJobFixedTime(aPacket);break;
+		case kSNOMtcFirePedestalJobFixedTime: startJob(&firePedestalJobFixedTime, aPacket); break;
 		case kSNOMtcEnablePedestalsFixedTime: enablePedestalsFixedTime(aPacket);break;			
 		case kSNOMtcFirePedestalsFixedTime: firePedestalsFixedTime(aPacket);	break;			
 		case kSNOMtcLoadMTCADacs: loadMTCADacs(aPacket);			break;
@@ -374,7 +374,7 @@ static double parse_cpu_freq(void) {
 	
 	if ((cpuinfo = fopen("/proc/cpuinfo", "r")) == NULL) {
 		// fixme!
-		printf("cpuinfo failed\n");
+		//printf("cpuinfo failed\n");
 		return 2166.957;
 	}
 	
@@ -397,7 +397,7 @@ static double parse_cpu_freq(void) {
 	return freq;
 }
 
-void fineSleep(const long ticks) {
+void fineSleep(const unsigned long long ticks) {
 	long long tim1, tim2;
 	tim1 = getticks();
 	do {
@@ -818,21 +818,6 @@ void loadXL2Xilinx_sharc(SBC_Packet* aPacket)
 	
 }
 
-void firePedestalJobFixedTime(SBC_Packet* aPacket)
-{
-        uint32_t* p = (uint32_t*) aPacket->payload;
-        if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
-	
-        //uint32_t pedestal_count = p[0];
-        //uint32_t pedestal_delay = p[1];
-        uint32_t error_code = 0;
-	
-	
-        p[0] = error_code;
-        if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
-        writeBuffer(aPacket);
-}
-
 #define kMtcControlReg		0x00007000
 #define kMtcSerialReg		0x00007004
 #define kMtcSoftGtReg		0x0000700c
@@ -906,11 +891,82 @@ void enablePedestalsFixedTime(SBC_Packet* aPacket)
         writeBuffer(aPacket);
 }
 
+
+void firePedestalJobFixedTime(SBC_Packet* aPacket)
+{
+        uint32_t* p = (uint32_t*) aPacket->payload;
+        if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
+
+        uint32_t pedestal_count = p[0];
+        //uint32_t pedestal_delay = p[1] * 1000 * nsec_to_ticks; //p[1] is the delay in [usec]
+        unsigned long long pedestal_delay = p[1] * 1000ULL * nsec_to_ticks; //p[1] is the delay in [usec]
+        uint32_t error_code = 0;
+	uint32_t aValue = 0;
+	short i = 0;
+	char  errorMessage[80];
+	memset(errorMessage,'\0',80);		
+	uint8_t  finalStatus = 0; //assume failure
+
+	TUVMEDevice* device = get_new_device(0x0, 0x29, 4, 0x10000);
+	if(device != 0){
+		//enable pedestals and pulser
+		aValue = 0x3;
+		if (write_device(device, (char*)(&aValue), 4, kMtcControlReg) != sizeof(aValue)) {
+			strcpy(errorMessage, "Error enabling pedestals and pulser.\n");
+			error_code = 2;
+			goto earlyExit;
+		}
+
+		aValue = 0; //doesn't matter
+		for (i = 0; i < pedestal_count; i++){
+			fineSleep(pedestal_delay);
+			if (write_device(device, (char*)(&aValue), 4, kMtcSoftGtReg) != sizeof(aValue)) {
+				strcpy(errorMessage, "Error firing pedestal.\n");
+				error_code = 4;
+				goto earlyExit;
+			}
+			pthread_mutex_lock (&jobInfoMutex);     //begin critical section
+			sbc_job.progress = 100 * (i + 1) / pedestal_count;	//percent done
+			pthread_mutex_unlock (&jobInfoMutex);   //end critical section
+		}
+	
+		//disable pedestals and pulser
+		aValue = 0;
+		if (write_device(device, (char*)(&aValue), 4, kMtcControlReg) != sizeof(aValue)) {
+			strcpy(errorMessage, "Error disabling pedestals and pulser.\n");
+			error_code = 6;
+			goto earlyExit;
+		}
+
+		finalStatus = 1; //success
+		
+	earlyExit:
+		;
+		//todo: get back into a well defined state
+	}
+	else {
+		strcpy(errorMessage, "VME device failed.\n");
+		error_code = 1;
+	}
+	
+	close_device(device);		
+
+	pthread_mutex_lock (&jobInfoMutex);     //begin critical section
+	sbc_job.progress    = 100;
+	sbc_job.running     = 0;
+	sbc_job.killJobNow  = 0;
+	sbc_job.finalStatus = finalStatus;
+	strncpy(sbc_job.message,errorMessage,255);
+	sbc_job.message[255] = '\0';
+	pthread_mutex_unlock (&jobInfoMutex);   //end critical section
+}
+
+
 void firePedestalsFixedTime(SBC_Packet* aPacket)
 {
         uint32_t* p = (uint32_t*) aPacket->payload;
         if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
-	
+
         uint32_t pedestal_count = p[0];
         uint32_t pedestal_delay = p[1] * 1000 * nsec_to_ticks; //p[1] is the delay in [usec]
         uint32_t error_code = 0;
@@ -982,6 +1038,7 @@ void firePedestalsFixedTime(SBC_Packet* aPacket)
         if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
         writeBuffer(aPacket);
 }
+
 
 #define kMtcDacCntReg		0x00007008
 #define kMtcMaskReg		0x00007034
