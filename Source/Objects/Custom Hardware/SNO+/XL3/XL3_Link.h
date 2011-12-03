@@ -34,9 +34,13 @@ eXL3_CrateStates;
 {
 	int		serverSocket;
 	int		workingSocket;
-	NSLock*		commandSocketLock;	//only one command to XL3 at the moment, to be released later
-	NSLock*		coreSocketLock;		//to synchronize both the threads touching the socket, with additional lockers to be removed later
-	NSLock*		cmdArrayLock;		//to synchronize the threaded worker pushing XL3 responses and XL3Model pulling the responses
+	NSLock*		commandSocketLock;	//avoids clashes between commands. Wrap an XL3 packet write,
+                                    //so you know a possible write error comes from your command.
+	NSLock*		coreSocketLock;		//protects the socket, to guarantee that full packet is read/written
+                                    //and that reads and writes do not clash.
+	NSLock*		cmdArrayLock;		//cmdArrayLock protects manipulations with the array of command responses
+                                    //received from an XL3, to synchronize the threaded worker pushing XL3 responses,
+                                    //and XL3Model pulling the responses
 	BOOL		needToSwap;
 	NSString*	IPNumber;
 	NSString*	crateName;

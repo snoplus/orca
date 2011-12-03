@@ -23,6 +23,7 @@
 @interface XL3_LinkController : OrcaObjectController
 {
 	NSView* blankView;
+    IBOutlet NSView* xl3View;
 	NSSize  basicSize;
 	NSSize  compositeSize;
 	IBOutlet NSTabView*		tabView;
@@ -147,7 +148,7 @@
 - (IBAction) compositeXl3RWSelectAction:(id)sender;
 - (IBAction) compositeXl3RWRegisterAction:(id)sender;
 - (IBAction) compositeXl3RWDataValueAction:(id)sender;
-- (IBAction) compositeXl3RWSend:(id)sender;
+//- (IBAction) compositeXl3RWSend:(id)sender;
 - (IBAction) compositeSetPedestalValue:(id)sender;
 //connection
 - (IBAction) toggleConnectAction:(id)sender;

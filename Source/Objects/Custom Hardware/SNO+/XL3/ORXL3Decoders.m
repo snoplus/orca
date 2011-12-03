@@ -64,32 +64,6 @@
 			ptr[2] = swapLong(ptr[2]);
 		}
 		
-		//look for a fake PMT bundle, XL3 does the following
-		/*
-		fake_bundle.word1=0x30303030;  // '0000'
-		fake_bundle.word2=0x5F46414B;  // '_FAK'
-		fake_bundle.word3=0x455F5F0A;  // 'E__\n'
-		
-		int i;
-		int inc, inc2, inc3;
-		for (i=0; i<MEGA_SIZE; i++){
-			if(pbq->count >0 )
-				mega_pmt_bundle[i]= pbq_pop(pbq);
-			else{ 
-				inc=i%10;
-				inc2=(i/10)%10;
-				inc3=(i/100)%10;
-				
-				
-				fake_bundle.word1 = (0x00000030+(inc));
-				fake_bundle.word1+= (0x00003000+(0x00000100*(inc2)));
-				fake_bundle.word1+= (0x00300000+(0x00010000*(inc3)));
-				fake_bundle.word1+= (0x30000000);
-				
-				mega_pmt_bundle[i]=fake_bundle;
-			}
-		 */			
-
 		if (ptr[1] == 0x5F46414B && ptr[2] == 0x455F5F0A) {
 			char fake_id[5];
 			if (0x0000ABCD != htonl(0x0000ABCD)) ptr[0] = swapLong(ptr[0]);

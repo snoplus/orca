@@ -1719,6 +1719,7 @@ kPEDCrateMask
 - (void) fireMTCPedestalsFixedTime
 {
 	if([self adapterIsSBC]){
+		[self enableSingleShotMTCPedestalsFixedTime];
 		[self fireMTCPedestalsFixedTimeSBC];
 	}
 	else {
@@ -1742,6 +1743,7 @@ kPEDCrateMask
 	if([self adapterIsSBC]){
 		@try {
 			[self enableSingleShotMTCPedestalsFixedTimeSBC];
+			[self setGlobalTriggerWordMask];
 		}
 		@catch (NSException * e) {
 			NSLog(@"Error enabling pedestals fixed time.!");
@@ -1756,8 +1758,7 @@ kPEDCrateMask
 //single shot blocking SBC command for ORCA macros only (no GUI)
 - (void) singleShotMTCPedestalsFixedTime
 {
-	//use the same model properties as the SBC job
-	//call the function below
+	[self singleShotMTCPedestalsFixedTime:[self fixedPulserRateCount] withDelay:([self fixedPulserRateDelay] * 1000)];
 }
 
 //single shot blocking SBC command for ORCA macros only (no GUI) returns GTID difference before - after from the MTC register
@@ -2269,24 +2270,25 @@ kPEDCrateMask
 - (void) stopMTCPedestalsFixedTimeSBC
 {
 	//kill job
-	
-	long errorCode = 0;
+
 	SBC_Packet aPacket;
-	aPacket.cmdHeader.destination		= kSNO;
-//	aPacket.cmdHeader.cmdID			= kSNOMtcStopPedestalsFixedTime;
-	aPacket.cmdHeader.numberBytesinPayload	= 1*sizeof(long);
-	
-	unsigned long* payloadPtr = (unsigned long*) aPacket.payload;
-	payloadPtr[0] = 0; //error code
+	aPacket.cmdHeader.destination		= kSBC_Process;
+	aPacket.cmdHeader.cmdID			= kSBC_KillJob;
+	aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_JobStatusStruct);
 	
 	@try {
-//		[[[self adapter] sbcLink] send:&aPacket receive:&aPacket];
-		unsigned long* responsePtr = (unsigned long*) aPacket.payload;
-		errorCode = responsePtr[0];
-		if(errorCode){
+//		[self send:&aPacket receive:&aPacket];
+		
+		SBC_JobStatusStruct* p	= (SBC_JobStatusStruct*)aPacket.payload;
+//		if([jobDelegate respondsToSelector:statusSelector]){
+//			ORSBCLinkJobStatus* aJobStatus = [ORSBCLinkJobStatus jobStatus:p message:aPacket.message];
+//			[self setJobStatus:aJobStatus];
+//			//NSLog(@"monitor job ok: job %s running with message: %s\n", [aJobStatus running]?"is":"is not", [aJobStatus message]);
+//			[jobDelegate performSelector:statusSelector withObject:jobStatus];
+//		}
+		if(p->running) { 
 			NSLog(@"SBC failed to stop firing pedestals fixed time.\n");
-		}
-		else {
+		} else {
 			NSLog(@"Pedestals stopped.\n");
 			//stop progress indicator
 		}
@@ -2294,7 +2296,7 @@ kPEDCrateMask
 	@catch(NSException* e) {
 		NSLog(@"SBC failed to stop firing pedestals fixed time.\n");
 		NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
-	}	
+	}
 }
 
 - (void) enableSingleShotMTCPedestalsFixedTimeSBC
@@ -2334,7 +2336,7 @@ kPEDCrateMask
 	
 	unsigned long* payloadPtr = (unsigned long*) aPacket.payload;
 	payloadPtr[0] = pedestalCount;
-	payloadPtr[1] = (unsigned long) (usecDelay * 1000); //usec between pedestals
+	payloadPtr[1] = (unsigned long) usecDelay; //usec between pedestals
 	
 	@try {
 		[[[self adapter] sbcLink] send:&aPacket receive:&aPacket];

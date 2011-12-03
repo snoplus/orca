@@ -1129,6 +1129,13 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 	[self setXl3OpsRunning:YES forKey:@"compositResetXL3StateMachine"];
 	NSLog(@"Reset XL3 State Machine.\n");
 
+	@try {
+		[[self xl3Link] sendCommand:STATE_MACHINE_RESET_ID expectResponse:YES];
+        //we don't care about the response, but clean it from the array
+	}
+	@catch (NSException* e) {
+		NSLog(@"Send XL3 command failed; error: %@ reason: %@\n", [e name], [e reason]);
+	}
 	[self setXl3OpsRunning:NO forKey:@"compositeResetXL3StateMachine"];
 }
 
@@ -1161,20 +1168,45 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 	
 }
 
+/*
 #define	PMTI_CLOCK_HIGH		0x00000001 			
 #define	PMTI_DATA_IN		0x00000002 			
 #define	PMTI_LOAD		0x00000004 			
 #define kFecHVCcsr		0x26
 #define kFecDACPrgReg		0x24
+*/
 
-- (void) enableChargeInjectionForSlot:(unsigned short) aSlot slotMask:(unsigned long) aSlotMask withDACValue:(unsigned short) aDACValue
+- (void) enableChargeInjectionForSlot:(unsigned short) aSlot slotMask:(unsigned long) aSlotMask
 {
-	unsigned long aValue = 0;
-	short index, aChannel;// j;
-	
+	XL3_PayloadStruct payload;
+	memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
+	payload.numberBytesinPayload = 8;
+	unsigned long* data = (unsigned long*) payload.payload;
+    
+    uint32_t slot = aSlot;
+    uint32_t mask = aSlotMask;
+    
+    if ([xl3Link needToSwap]) {
+        slot = swapLong(slot);
+        mask = swapLong(mask);
+    }
+
+    data[0] = slot;
+    data[1] = mask;
+    
+    [[self xl3Link] sendCommand:SETUP_CHARGE_INJ_ID withPayload:&payload expectResponse:YES];
+    if (*(unsigned int*)payload.payload != 0) {
+        NSLog(@"error during enableChargeInjectionForSlot.\n");
+    }
+
+    NSLog(@"%@: enabled charge injection for slot: %d, for channels: 0x%08x\n", [[self xl3Link] crateName], aSlot, aSlotMask);
+    
+    	
+/*
 	//step 1. clock in the enable mask
 	//step 1A. first 16 bits are zero
 	@try {
+        int index;
 		//[[self xl3Link] newMultiCmd];
 		for (index = 0; index < 16; index++){
 			usleep(10000);
@@ -1198,6 +1230,7 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 	//step1B. clock in the next 32 data bits
 	@try {
 		//[[self xl3Link] newMultiCmd];
+        int aChannel, aValue;
 		for (aChannel = 31; aChannel >= 0; aChannel--) {
 			if (aSlotMask & (1UL << aChannel)) aValue = PMTI_DATA_IN;
 			else aValue = 0;
@@ -1228,69 +1261,7 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 	@catch (NSException* e) {
 		NSLog(@"Enable charge injection failed; error: %@ reason: %@\n", [e name], [e reason]);
 	}
-	
-/*		
-	//step2 clock in the aDACValue into FEC
-	//theDAC = 136, the address value of dac is	
-	//channelIndex = ((theDAC % 8) == 0) ? 8 : theDAC % 8;	
-	//dacIndex = (unsigned long) (theDAC - channelIndex) / 8;
-	//addressVal |= ( 1UL<< (dacIndex + 2) ); // biuld the address word for this DAC and Channel	
-	unsigned short channelIndex = 8;
-	unsigned long addressVal = (1UL << 18); 
-	@try {
-		//[[self xl3Link] newMultiCmd];
-
-		//set DACSEL
-		//[[self xl3Link] addMultiCmdToAddress:(FEC_SEL*aSlot | kFecDACPrgReg | WRITE_REG) withValue:0UL];
-		usleep(100000);
-		[self writeHardwareRegister:(FEC_SEL*aSlot | kFecDACPrgReg) value:0UL];
-
-		// clock in the address values
-		for (j = 8; j>= 1; j--){					
-			if (j == channelIndex) aValue = addressVal;
-			else aValue = 0;
-			//[[self xl3Link] addMultiCmdToAddress:(FEC_SEL*aSlot | kFecDACPrgReg | WRITE_REG) withValue:aValue];
-			usleep(100000);
-			[self writeHardwareRegister:(FEC_SEL*aSlot | kFecDACPrgReg) value:aValue];
-
-			//[[self xl3Link] addMultiCmdToAddress:(FEC_SEL*aSlot | kFecDACPrgReg | WRITE_REG) withValue:(aValue + 1)];			
-			usleep(200000);
-			//sleep(1);
-			[self writeHardwareRegister:(FEC_SEL*aSlot | kFecDACPrgReg) value:(aValue + 1)];
-		}
-		
-		// load the data values
-		for (j = 8; j >= 1; j--){	// 8 bits of data per channel
-			if ((1UL << j-1 ) & aDACValue) aValue = (1UL << 18);
-			else aValue = 0;
-			
-			//[[self xl3Link] addMultiCmdToAddress:(FEC_SEL*aSlot | kFecDACPrgReg | WRITE_REG) withValue:aValue];			
-			usleep(200000);
-			//sleep(1);
-			[self writeHardwareRegister:(FEC_SEL*aSlot | kFecDACPrgReg) value:aValue];
-			//[[self xl3Link] addMultiCmdToAddress:(FEC_SEL*aSlot | kFecDACPrgReg | WRITE_REG) withValue:(aValue + 1)];			
-			usleep(200000);
-			//sleep(1);
-			[self writeHardwareRegister:(FEC_SEL*aSlot | kFecDACPrgReg) value:(aValue + 1)];
-		}
-
-		usleep(200000);
-		//sleep(1);
-		//remove DACSEL
-		//[[self xl3Link] addMultiCmdToAddress:(FEC_SEL*aSlot | kFecDACPrgReg | WRITE_REG) withValue:2UL];
-		[self writeHardwareRegister:(FEC_SEL*aSlot | kFecDACPrgReg) value:2UL];
-		//[[self xl3Link] executeMultiCmd];
-		
-		//if ([[self xl3Link] multiCmdFailed]) {
-		//	NSLog(@"Setting charge injection DAC failed: XL3 bus error.\n");
-		//	return;
-		//}
-	}
-	@catch (NSException* e) {
-		NSLog(@"Setting charge injection DAC failed; error: %@ reason: %@\n", [e name], [e reason]);
-	}	
-
-*/ 
+*/
 }
 
 @end

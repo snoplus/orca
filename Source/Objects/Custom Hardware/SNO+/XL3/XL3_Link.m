@@ -307,7 +307,7 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 
 - (void) newMultiCmd
 {
-	aMultiCmdPacket.cmdHeader.packet_type = MULTI_CMD_ID;
+	aMultiCmdPacket.cmdHeader.packet_type = MULTI_FAST_CMD_ID;
 	aMultiCmdPacket.cmdHeader.packet_num = (unsigned short) ++num_cmd_packets;
 	aMultiCmdPacket.cmdHeader.num_bundles = 0;
 	memset(aMultiCmdPacket.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
@@ -407,8 +407,7 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 	XL3_Packet aPacket;
 	memset(aPacket.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
 	unsigned char packetType = (unsigned char) aCmd;
-	//unsigned short packetNum = (unsigned short) ++num_cmd_packets;
-	unsigned short packetNum = 1;
+	unsigned short packetNum = (unsigned short) ++num_cmd_packets;
 	aPacket.cmdHeader.packet_num = (uint16_t) packetNum;
 	aPacket.cmdHeader.packet_type = (uint8_t) packetType;
 	aPacket.cmdHeader.num_bundles = 0;
@@ -418,13 +417,13 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 	@try {
 		[commandSocketLock lock]; //begin critical section
 		[self writePacket:(char*) &aPacket];
+		[commandSocketLock unlock]; //end critical section
 		
 		if(askForResponse){
 			[self readXL3Packet:&aPacket withPacketType:packetType andPacketNum:packetNum];
 			XL3_PayloadStruct* payloadPtr = (XL3_PayloadStruct*) aPacket.payload;
 			memcpy(payloadBlock->payload, payloadPtr, payloadBlock->numberBytesinPayload);
 		}
-		[commandSocketLock unlock]; //end critical section
 	}
 	@catch (NSException* localException) {
 		[commandSocketLock unlock]; //end critical section
@@ -454,7 +453,6 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 	XL3_PayloadStruct payload;
 	FECCommand* command = (FECCommand*) payload.payload;
 		
-//	command->cmdID = (uint16_t) aCmd;
 	command->cmd_num = aCmd;
 	command->packet_num = 0; // todo: figure out what are these two good for...
 	command->flags = 0;
@@ -470,7 +468,7 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 
 	payload.numberBytesinPayload = sizeof(FECCommand);
 	@try { 
-		[self sendCommand:SINGLE_CMD_ID withPayload:&payload expectResponse:YES];
+		[self sendCommand:FAST_CMD_ID withPayload:&payload expectResponse:YES];
 	}
 	@catch (NSException* e) {
 		NSLog(@"FECCommand error sending command\n");
@@ -478,7 +476,7 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 	}
 	//return the same packet!
 	if (command->flags != 0) {
-		NSLog(@"XL3 bus error\n");
+		NSLog(@"%@ bus error\n", [self crateName]);
 		@throw [NSException exceptionWithName:@"FECCommand error.\n" reason:@"XL3 bus error\n" userInfo:nil];
 	}	
 
@@ -486,21 +484,22 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 	if (needToSwap) *value = swapLong(*value);	
 }
 
-
 - (void) readXL3Packet:(XL3_Packet*)aPacket withPacketType:(unsigned char)packetType andPacketNum:(unsigned short)packetNum
 {
 	//look into the cmdArray
-	[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.02]];
+	[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.01]];
 	NSDictionary* aCmd;
 	NSMutableArray* foundCmds = [NSMutableArray array];
-	time_t t1 = time(0);
+	time_t xl3ReadTimer = time(0);
 
+    NSLog(@"waiting for response with packetType: %d and packetNum %d\n", packetType, packetNum);
+    
 	while(1) {
 		@try {
 			[cmdArrayLock lock];
 			for (aCmd in cmdArray) {
 				NSNumber* aPacketType = [aCmd objectForKey:@"packet_type"];
-				NSNumber* aPacketNum  = [aCmd objectForKey:@"packet_num"];
+				NSNumber* aPacketNum = [aCmd objectForKey:@"packet_num"];
 				
 				if ([aPacketType unsignedShortValue] == packetType && [aPacketNum unsignedCharValue] == packetNum) {
 					[foundCmds addObject:aCmd];
@@ -517,14 +516,14 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 		if ([foundCmds count]) {
 			break;
 		}
-		else if ([self errorTimeOutSeconds] && time(0) - t1 > [self errorTimeOutSeconds]) {
+		else if ([self errorTimeOutSeconds] && time(0) - xl3ReadTimer > [self errorTimeOutSeconds]) {
 			@throw [NSException exceptionWithName:@"ReadXL3Packet time out"
 				reason:[NSString stringWithFormat:@"Time out for %@ <%@> port: %d\n", [self crateName], IPNumber, portNumber]
 				userInfo:nil];
 		}
 		else {
-			[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.02]];
-		}
+            sleep(1);
+        }
 	}
 
 	if ([foundCmds count] > 1) {
@@ -548,7 +547,6 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 		@throw localException;
 	}
 } 
-
 
 - (void) connectSocket
 {
@@ -673,7 +671,7 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 	//[self getRunInfoBlock];
 	//[[delegate crate] performSelector:@selector(connected) withObject:nil afterDelay:1];			
 
-	NSLog(@"XL3 connected on local port %d\n", [self portNumber]);
+	NSLog(@"%@ connected on local port %d\n",[self crateName], [self portNumber]);
 
 	fd_set fds;
 	int selectionResult = 0;
@@ -682,13 +680,11 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 	tv.tv_usec = 10000;
 
 	char aPacket[XL3_PACKET_SIZE];
-	BOOL coreLocker = NO;
-	BOOL cmdLocker = NO;
 	unsigned long bundle_count = 0;
 	
 	while(1) {
 		if (!workingSocket) {
-			NSLog(@"XL3 not connected <%@> port: %d\n", IPNumber, portNumber);
+			NSLog(@"%@ not connected <%@> port: %d\n", [self crateName], IPNumber, portNumber);
 			break;
 		}
 				
@@ -696,79 +692,126 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 		FD_SET(workingSocket, &fds);
 		selectionResult = select(workingSocket + 1, &fds, NULL, NULL, &tv);
 		if (selectionResult == -1 && !(errno == EAGAIN || errno == EINTR)) {
-			[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:.1]];
+			[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:.01]];
 			if (workingSocket || serverSocket) {
 				NSLog(@"Error reading XL3 <%@> port: %d\n", IPNumber, portNumber);
 			}
 			break;
 		}
-			      
 		if (selectionResult > 0 && FD_ISSET(workingSocket, &fds)) {
 			@try {
 				[coreSocketLock lock];
-				coreLocker = YES;
 				[self readPacket:aPacket];
 				[coreSocketLock unlock];
-				coreLocker = NO;
-
-				//if ((!needToSwap && aPacket[0] == 'A') ||
-				if (((XL3_Packet*) aPacket)->cmdHeader.packet_type == 0xCC) { //PMT mega bundle
-					//packet_num?
-					[bundleBuffer writeBlock:((XL3_Packet*) aPacket)->payload length:((XL3_Packet*) aPacket)->cmdHeader.num_bundles * 12];
-					//if (((XL3_Packet*) aPacket)->cmdHeader.num_bundles * 12 != 1440) { //TODO: remove before deploynment
-					//	NSLog(@"XL3 Mega bundle num: %d with %d bundles\n", bundle_count, ((XL3_Packet*) aPacket)->cmdHeader.num_bundles * 12);
-					//}
-					bundle_count++;
-				}
-				else if (((XL3_Packet*) aPacket)->cmdHeader.packet_type == 0xEE) {
-					NSLog(@"XL3: %s\n", ((XL3_Packet*) aPacket)->payload);
-				}
-				else {	//cmd response
-					unsigned short packetNum = ((XL3_Packet*) aPacket)->cmdHeader.packet_num;
-					unsigned short packetType = ((XL3_Packet*) aPacket)->cmdHeader.packet_type;
-					
-					if (needToSwap) packetNum = swapShort(packetNum);
-					NSLog(@"XL3 packet type: %d and packetNum: %d, xl3 megabundle count: %d\n", packetType, packetNum, bundle_count);
-					
-					NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-									[NSNumber numberWithUnsignedShort:packetNum],		@"packet_num",
-									[NSNumber numberWithUnsignedChar:packetType],		@"packet_type",
-									[NSDate dateWithTimeIntervalSinceNow:0],		@"date",
-									[NSData dataWithBytes:aPacket length:XL3_PACKET_SIZE],	@"xl3Packet",
-									nil];
-					[cmdArrayLock lock];
-					cmdLocker = YES;
-					[cmdArray addObject:aDictionary];
-					[cmdArrayLock unlock];
-					cmdLocker = NO;
-					
-					NSLog(@"cmdArray includes %d cmd responses\n", [cmdArray count]);
-					
-					if ([cmdArray count] > kCmdArrayHighWater) {
-						//todo: post alarm
-						NSLog(@"Xl3 command array close to full for XL3 crate %@\n", [self crateName]);
-					}
-				}
-								
-				//aPacket[5] = '\0';
-				//NSLog(@"XL3 packet: %s, in dictionary of: %d\n", aPacket, [cmdArray count]);
-			}
+            }
 			@catch (NSException* localException) {
+                [coreSocketLock unlock];
 				if (serverSocket || workingSocket) {
 					NSLog(@"Couldn't read from XL3 <%@> port:%d\n", IPNumber, portNumber);
 				}
-				if (coreLocker == YES) {
-					[coreSocketLock unlock];
-					coreLocker = NO;
-				}
-				if (cmdLocker == YES) {
-					[cmdArrayLock unlock];
-					cmdLocker = NO;
-				}
 				break;
 			}
-		}
-        }
+
+            if (((XL3_Packet*) aPacket)->cmdHeader.packet_type == MEGA_BUNDLE_ID) {
+                //packet_num?
+                [bundleBuffer writeBlock:((XL3_Packet*) aPacket)->payload length:((XL3_Packet*) aPacket)->cmdHeader.num_bundles * 12];
+                bundle_count++;
+            }
+            else if (((XL3_Packet*) aPacket)->cmdHeader.packet_type == PING_ID) {
+                //NSLog(@"%@: received ping request\n", [self crateName]);
+                (((XL3_Packet*) aPacket)->cmdHeader.packet_type = PONG_ID);
+                @try {
+                    [commandSocketLock lock]; //begin critial section
+                    [self writePacket:(char*) aPacket];
+                    //NSLog(@"%@: Sending pong response\n", [self crateName]);
+                    [commandSocketLock unlock]; //end critial section
+                }
+                @catch (NSException* localException) {
+                    [commandSocketLock unlock]; //end critial section
+                    NSLog(@"%@: Sending pong response failed\n", [self crateName]);
+                }
+            }
+
+            else if (((XL3_Packet*) aPacket)->cmdHeader.packet_type == MESSAGE_ID) {
+                NSLog(@"%@ message: %s\n", [self crateName], ((XL3_Packet*) aPacket)->payload);
+            }
+
+            else if (((XL3_Packet*) aPacket)->cmdHeader.packet_type == ERROR_ID) {
+                NSLog(@"%@ error packet received:\n", [self crateName]);
+                int error;
+
+                error = ((error_packet_t*) ((XL3_Packet*) aPacket)->payload)->cmd_in_rejected;
+                if (needToSwap) error = swapLong(error);
+                NSLog(@"cmd_in_rejected: %d\n", error);
+ 
+                error = ((error_packet_t*) ((XL3_Packet *) aPacket)->payload)->transfer_error;
+                if (needToSwap) error = swapLong(error);
+                NSLog(@"transfer_errror: %d\n", error);
+
+                error = ((error_packet_t*) ((XL3_Packet *) aPacket)->payload)->xl3_data_avail_unknown;
+                if (needToSwap) error = swapLong(error);
+                NSLog(@"xl3_data_avail_unknown: %d\n", error);
+
+                error = ((error_packet_t*) ((XL3_Packet *) aPacket)->payload)->bundle_read_error;
+                if (needToSwap) error = swapLong(error);
+                NSLog(@"bundle_read_error: %d\n", error);
+
+                error = ((error_packet_t*) ((XL3_Packet *) aPacket)->payload)->bundle_resync_error;
+                if (needToSwap) error = swapLong(error);
+                NSLog(@"bundle_resync_error: %d\n", error);
+
+                NSLog(@"mem_level_unknown for slot:\n");
+                unsigned i = 0;
+                for (i = 0; i < 16; i++) {
+                    error = ((error_packet_t*) ((XL3_Packet *) aPacket)->payload)->mem_level_unknown[i];
+                    if (needToSwap) error = swapLong(error);
+                    NSLog(@"%2d: %d\n", i, error);
+                }
+            }
+
+            else if (((XL3_Packet*) aPacket)->cmdHeader.packet_type == SCREWED_ID) {
+                NSLog(@"%@ screwed for slot:%s\n", [self crateName]);
+                unsigned i, error;
+                for (i = 0; i < 16; i++) {
+                    error = ((screwed_packet_t*) ((XL3_Packet *) aPacket)->payload)->screwed[i];
+                    if (needToSwap) error = swapLong(error);
+                    NSLog(@"%2d: %d\n", i, error);
+                }
+            }
+
+            else {	//cmd response
+                unsigned short packetNum = ((XL3_Packet*) aPacket)->cmdHeader.packet_num;
+                unsigned short packetType = ((XL3_Packet*) aPacket)->cmdHeader.packet_type;
+                
+                if (needToSwap) packetNum = swapShort(packetNum);
+                NSLog(@"%@ packet type: %d and packetNum: %d, xl3 megabundle count: %d\n", [self crateName], packetType, packetNum, bundle_count);
+                
+                NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+                                [NSNumber numberWithUnsignedShort:packetNum],		@"packet_num",
+                                [NSNumber numberWithUnsignedChar:packetType],		@"packet_type",
+                                [NSDate dateWithTimeIntervalSinceNow:0],		@"date",
+                                [NSData dataWithBytes:aPacket length:XL3_PACKET_SIZE],	@"xl3Packet",
+                                nil];
+                @try {
+                    [cmdArrayLock lock];
+                    [cmdArray addObject:aDictionary];
+                    [cmdArrayLock unlock];
+                }
+                @catch (NSException* e) {
+                    NSLog(@"%@: Failed to add received command response into the command array\n", [self crateName]);
+                    [cmdArrayLock unlock];
+                }
+                
+                //NSLog(@"%@: cmdArray includes %d cmd responses\n", [self crateName], [cmdArray count]);
+                
+                if ([cmdArray count] > kCmdArrayHighWater) {
+                    //todo: post alarm
+                    NSLog(@"Xl3 command array close to full for XL3 crate %@\n", [self crateName]);
+                }
+            }
+
+        } //select
+    } //while
 
 	if (serverSocket || workingSocket) {
 		if (serverSocket) {
@@ -780,12 +823,11 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 			workingSocket = 0;
 		}
 	
-		NSLog(@"XL3 disconnected from local port %d\n", [self portNumber]);
+		NSLog(@"%@ disconnected from local port %d\n", [self crateName], [self portNumber]);
 		connectState = kDisconnected;
 		[[NSNotificationCenter defaultCenter] postNotificationName:XL3_LinkConnectStateChanged object: self];
 		[self setIsConnected:NO];
 	}
-	
 	[pool release];
 }
 
@@ -808,8 +850,8 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 	
 	time_t t1 = time(0);
 
-	[coreSocketLock lock];
 	@try {
+        [coreSocketLock lock];
 		while (numBytesToSend) {
 			// The loop is to ignore EAGAIN and EINTR errors as these are harmless 
 			do {
@@ -824,7 +866,7 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 			}
 			else if (selectionResult == 0 || ([self errorTimeOutSeconds] && time(0) - t1 > [self errorTimeOutSeconds])) {
 				[NSException raise:@"Connection time out" format:@"Write to %@ <%@> port: %d timed out",[self crateName], IPNumber, portNumber];
-			}   
+			}
 
 			do {
 				bytesWritten = write(workingSocket, aPacket, numBytesToSend);
@@ -842,23 +884,20 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 				[NSException raise:@"Write error" format:@"Write error(%s) %@ <%@> port: %d",strerror(errno),[self crateName],IPNumber,portNumber];
 			}
 		}
+        [coreSocketLock unlock];
 	}
 	@catch (NSException* localException) {
+		[coreSocketLock unlock];
 		if (serverSocket || workingSocket) {
 			NSLog(@"Couldn't write to XL3 <%@> port:%d\n", IPNumber, portNumber);
 		}
-		[coreSocketLock unlock];
 		@throw localException;
 	}
-	
-	[coreSocketLock unlock];
 }
-
 
 - (void) readPacket:(char*)aPacket
 {
 	//this is private method called from this object only, we lock the socket, and expect that xl3 thread is the only accessor
-
 	int n;			
 	int selectionResult = 0;
 	int numBytesToGet = XL3_PACKET_SIZE;

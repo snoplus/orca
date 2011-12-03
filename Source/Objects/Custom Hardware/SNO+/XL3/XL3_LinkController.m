@@ -48,8 +48,8 @@ static NSDictionary* xl3Ops;
 
 - (void) awakeFromNib
 {
-	basicSize	= NSMakeSize(452,290);
-	compositeSize	= NSMakeSize(452,510);
+	basicSize	= NSMakeSize(465,290);
+	compositeSize	= NSMakeSize(465,486);
 	blankView = [[NSView alloc] init];
 	[self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
 
@@ -206,22 +206,22 @@ static NSDictionary* xl3Ops;
 	if([tabView indexOfTabViewItem:item] == 0){
 		[[self window] setContentView:blankView];
 		[self resizeWindowToSize:basicSize];
-		[[self window] setContentView:tabView];
+		[[self window] setContentView:xl3View];
 	}
 	else if([tabView indexOfTabViewItem:item] == 1){
 		[[self window] setContentView:blankView];
 		[self resizeWindowToSize:compositeSize];
-		[[self window] setContentView:tabView];
+		[[self window] setContentView:xl3View];
 	}
 	else if([tabView indexOfTabViewItem:item] == 2){
 		[[self window] setContentView:blankView];
 		[self resizeWindowToSize:basicSize];
-		[[self window] setContentView:tabView];
+		[[self window] setContentView:xl3View];
 	}
 	else if([tabView indexOfTabViewItem:item] == 3){
 		[[self window] setContentView:blankView];
 		[self resizeWindowToSize:basicSize];
-		[[self window] setContentView:tabView];
+		[[self window] setContentView:xl3View];
 	}
 		
 	NSString* key = [NSString stringWithFormat: @"orca.ORXL3%d.selectedtab",[model crateNumber]];
@@ -684,10 +684,12 @@ static NSDictionary* xl3Ops;
 	[model setXl3RWDataValue:[sender intValue]];
 }
 
+/*
 - (IBAction) compositeXl3RWSend:(id)sender
 {
 	[model compositeXl3RW];
 }
+*/
 
 - (IBAction) compositeSetPedestalValue:(id)sender
 {
