@@ -91,6 +91,8 @@
 		int subRunNumber;
 		BOOL runModeCache;
 		NSThread* readoutThread;
+    
+        NSMutableArray* objectsRequestingStateChangeWait;
 }
 
 
@@ -183,7 +185,6 @@
 - (void) forceHalt;
 - (void) runAbortFromScript;
 
-- (void) startRun:(BOOL)doInit;
 - (void) startRun;
 - (void) restartRun;
 - (void) stopRun;
@@ -201,6 +202,8 @@
 - (void) incrementTime:(NSTimer*)aTimer;
 - (void) sendHeartBeat:(NSTimer*)aTimer;
 
+- (void) addRunStateChangeWait:(NSNotification*)aNote;
+- (void) releaseRunStateChangeWait:(NSNotification*)aNote;
 - (void) needMoreTimeToStopRun:(NSNotification*)aNotification;
 - (void) vetosChanged:(NSNotification*)aNotification;
 - (void) runModeChanged:(NSNotification*)aNotification;
@@ -217,7 +220,8 @@
 - (NSString*) endOfRunState;
 - (void) checkVetos;
 - (NSString*) fullRunNumberString;
-
+- (unsigned) waitRequestersCount;
+- (id) waitRequesterAtIdex:(unsigned)index;
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 
@@ -228,6 +232,8 @@
 - (void) setStartScriptName:(NSString*)aName;
 - (void) setShutDownScriptName:(NSString*)aName;
 
+#pragma mark ¥¥¥Script Helpers
+- (void) forceClearWaits;
 @end
 
 
@@ -255,7 +261,7 @@ extern NSString* ORRunStartTimeChangedNotification;
 extern NSString* ORRunTimeToGoChangedNotification;
 extern NSString* ORRunNumberChangedNotification;
 extern NSString* ORRunRemoteControlChangedNotification;
-
+extern NSString* ORRunModelNumberOfWaitsChanged;
 extern NSString* ORRunNumberDirChangedNotification;
 extern NSString* ORRunModelExceptionCountChangedNotification;
 extern NSString* ORRunMaskChangedNotification;

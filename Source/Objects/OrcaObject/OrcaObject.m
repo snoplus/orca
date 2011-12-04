@@ -918,6 +918,30 @@ static NSString* OROrcaObjectUniqueIDNumber = @"OROrcaObjectUniqueIDNumber";
 					object:self 
 					userInfo:[NSDictionary dictionaryWithObjectsAndKeys:warningString,@"WarningMessage",nil]];
 }
+
+#pragma mark ¥¥¥Access for RunControl Stuff
+- (void) addRunWaitWithReason:(NSString*)aReason
+{
+    NSNotification* aNote = [NSNotification notificationWithName:ORAddRunStateChangeWait object:self userInfo:[NSDictionary dictionaryWithObject:aReason forKey:@"Reason"]];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThread:aNote waitUntilDone:YES];
+}
+
+- (void) releaseRunWait
+{
+    NSNotification* aNote = [NSNotification notificationWithName:ORReleaseRunStateChangeWait object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThread:aNote waitUntilDone:YES];
+}
+- (void) addRunWaitFor:(id)anObject reason:(NSString*)aReason
+{
+    NSNotification* aNote = [NSNotification notificationWithName:ORAddRunStateChangeWait object:anObject userInfo:[NSDictionary dictionaryWithObject:aReason forKey:@"Reason"]];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThread:aNote waitUntilDone:YES];
+}
+
+- (void) releaseRunWaitFor:(id)anObject
+{
+    NSNotification* aNote = [NSNotification notificationWithName:ORReleaseRunStateChangeWait object:anObject];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThread:aNote waitUntilDone:YES];
+}
 @end
 
 @implementation OrcaObject (cardSupport)

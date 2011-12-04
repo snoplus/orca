@@ -201,6 +201,11 @@
                      selector: @selector(drawerDidClose:)
                          name: NSDrawerDidCloseNotification
                        object: nil];	
+    
+    [notifyCenter addObserver: self
+                     selector: @selector(numberOfWaitsChanged:)
+                         name: ORRunModelNumberOfWaitsChanged
+                       object: nil];    
 	
 }
 
@@ -230,6 +235,7 @@
 	[self shutDownScriptChanged:nil];
 	[self vetosChanged:nil];
 	[self timeLimitChanged:nil];
+    [self numberOfWaitsChanged:nil];
 }
 
 
@@ -260,48 +266,72 @@
     else {
 	
 		[quickStartCB setEnabled:YES];
-		
-        if([model runningState] == eRunInProgress){
+        int n = [model waitRequestersCount];
+        if(n>0){
             [startRunButton setEnabled:NO];
-            [endSubRunButton setEnabled:YES];
-            [startSubRunButton setEnabled:NO];
-            [restartRunButton setEnabled:YES];
-            [stopRunButton setEnabled:YES];
-            [timedRunCB setEnabled:NO];
-            [timeLimitField setEnabled:NO];
-            [repeatRunCB setEnabled:[model timedRun]];
-			[startUpScripts setEnabled:NO];
-			[shutDownScripts setEnabled:NO];
-        }
-        else if([model runningState] == eRunStopped){
-            [startRunButton setEnabled:anyVetos?NO:YES];
             [endSubRunButton setEnabled:NO];
-			[startSubRunButton setEnabled:NO];
-			[restartRunButton setEnabled:NO];
-			[stopRunButton setEnabled:NO];
-            [timedRunCB setEnabled:YES];
-            [timeLimitField setEnabled:[model timedRun]];
-            [repeatRunCB setEnabled:[model timedRun]];
-			[startUpScripts setEnabled:YES];
-			[shutDownScripts setEnabled:YES];
-        }
-        else if([model runningState] == eRunStarting || [model runningState] == eRunStopping){
-            [startRunButton setEnabled:NO];
-			[endSubRunButton setEnabled:NO];
             [startSubRunButton setEnabled:NO];
-			[restartRunButton setEnabled:NO];
+            [restartRunButton setEnabled:NO];
             [stopRunButton setEnabled:NO];
-            [timedRunCB setEnabled:NO];
-            [timeLimitField setEnabled:NO];
-            [repeatRunCB setEnabled:NO];
-			[startUpScripts setEnabled:NO];
-			[shutDownScripts setEnabled:NO];
+       
         }
-		else if([model runningState] == eRunBetweenSubRuns){
-			[endSubRunButton setEnabled:NO];
-            [startSubRunButton setEnabled:YES];
-		}
+        else {
+            if([model runningState] == eRunInProgress){
+                [startRunButton setEnabled:NO];
+                [endSubRunButton setEnabled:YES];
+                [startSubRunButton setEnabled:NO];
+                [restartRunButton setEnabled:YES];
+                [stopRunButton setEnabled:YES];
+                [timedRunCB setEnabled:NO];
+                [timeLimitField setEnabled:NO];
+                [repeatRunCB setEnabled:[model timedRun]];
+                [startUpScripts setEnabled:NO];
+                [shutDownScripts setEnabled:NO];
+            }
+            else if([model runningState] == eRunStopped){
+                [startRunButton setEnabled:anyVetos?NO:YES];
+                [endSubRunButton setEnabled:NO];
+                [startSubRunButton setEnabled:NO];
+                [restartRunButton setEnabled:NO];
+                [stopRunButton setEnabled:NO];
+                [timedRunCB setEnabled:YES];
+                [timeLimitField setEnabled:[model timedRun]];
+                [repeatRunCB setEnabled:[model timedRun]];
+                [startUpScripts setEnabled:YES];
+                [shutDownScripts setEnabled:YES];
+            }
+            else if([model runningState] == eRunStarting || [model runningState] == eRunStopping){
+                [startRunButton setEnabled:NO];
+                [endSubRunButton setEnabled:NO];
+                [startSubRunButton setEnabled:NO];
+                [restartRunButton setEnabled:NO];
+                [stopRunButton setEnabled:NO];
+                [timedRunCB setEnabled:NO];
+                [timeLimitField setEnabled:NO];
+                [repeatRunCB setEnabled:NO];
+                [startUpScripts setEnabled:NO];
+                [shutDownScripts setEnabled:NO];
+            }
+            else if([model runningState] == eRunBetweenSubRuns){
+                [endSubRunButton setEnabled:NO];
+                [startSubRunButton setEnabled:YES];
+                [restartRunButton setEnabled:YES];
+                [stopRunButton setEnabled:YES];
+            }
+        }
     }
+}
+
+- (void) numberOfWaitsChanged:(NSNotification*)aNote
+{
+    int n = [model waitRequestersCount];
+    [showWaitRequestersButton setHidden:n==0];
+    [forceClearWaitsButton setEnabled:n>0];
+    [waitCountField setIntValue:n];
+    [waitCountField1 setIntValue:n];
+    [waitCountField2 setStringValue:n==0?@"":@"Waits In Place"];
+    [waitRequestersTableView reloadData];
+    [self updateButtons];
 }
 
 - (void) timeLimitChanged:(NSNotification*)aNotification
@@ -360,10 +390,10 @@
 	}
 	else if([model runningState] == eRunStarting || [model runningState] == eRunStopping || [model runningState] == eRunBetweenSubRuns){
 		[runProgress startAnimation:self];
-		if([model runningState] == eRunStarting)[statusField setStringValue:@"Starting.."];
+		if([model runningState] == eRunStarting)[statusField setStringValue:[self getStartingString]];
 		else {
-			if([model runningState] == eRunBetweenSubRuns)	[statusField setStringValue:@"Between Sub Runs.."];
-			else											[statusField setStringValue:@"Stopping.."];
+			if([model runningState] == eRunBetweenSubRuns)	[statusField setStringValue:[self getBetweenSubrunsString]];
+			else											[statusField setStringValue:[self getStoppingString]];
 		}
 		[lightBoardView setState:kCautionLight];
 	}
@@ -567,10 +597,40 @@
 	else [self startRun];
 }
 
+- (NSString*) getStartingString
+{
+    NSString* s;
+    if([model waitRequestersCount]==0)s = @"Starting...";
+    else s = @"Starting (Waiting)";
+    return s;
+}
+
+- (NSString*) getRestartingString
+{
+    NSString* s;
+    if([model waitRequestersCount]==0)s = @"Restart...";
+    else s = @"Restarting (Waiting)";
+    return s;
+}
+- (NSString*) getStoppingString
+{
+    NSString* s;
+    if([model waitRequestersCount]==0)s = @"Stopping...";
+    else s = @"Stopping (Waiting)";
+    return s;
+}
+- (NSString*) getBetweenSubrunsString
+{
+    NSString* s;
+    if([model waitRequestersCount]==0)s = @"Between Sub Runs..";
+    else s = @"'TweenSubRuns (Waiting)";
+    return s;
+}
+
 - (void) startRun
 {
 	[self endEditing];
-	[statusField setStringValue:@"Starting..."];
+	[statusField setStringValue:[self getStartingString]];
 	[startRunButton setEnabled:NO];
 	[endSubRunButton setEnabled:NO];
 	[startSubRunButton setEnabled:NO];
@@ -582,7 +642,7 @@
 - (IBAction) newRunAction:(id)sender
 {
     [self endEditing];
-    [statusField setStringValue:@"Restart..."];
+    [statusField setStringValue:[self getRestartingString]];
     [startRunButton setEnabled:NO];
     [restartRunButton setEnabled:NO];
 	[stopRunButton setEnabled:NO];
@@ -595,7 +655,7 @@
 - (IBAction) stopRunAction:(id)sender
 {
     [self endEditing];
-    [statusField setStringValue:@"Stopping..."];
+    [statusField setStringValue:[self getStoppingString]];
     [model performSelector:@selector(haltRun)withObject:nil afterDelay:.1];
 }
 
@@ -803,6 +863,11 @@
 	[model setShutDownScript:selectedObj];
 }
 
+- (IBAction) forceClearWaitsAction:(id)sender
+{
+    [model forceClearWaits];
+}
+
 - (void) updateWithCurrentRunNumber
 {
     [model getCurrentRunNumber];
@@ -822,9 +887,12 @@
         [runNumberButton setTitle:@"Close"];
         [runTypeDrawer close];
     }
-    else {
+    else if([notification object] == runTypeDrawer){
         [runTypeButton setTitle:@"Close"];
         [runNumberDrawer close];
+    }
+    else if([notification object] == waitRequestersDrawer){
+        [showWaitRequestersButton setTitle:@"Close"];
     }
 }
 
@@ -833,8 +901,11 @@
     if([notification object] == runNumberDrawer){
         [runNumberButton setTitle:@"Run Number..."];
     }
-    else {
+    else if([notification object] == runTypeDrawer){
         [runTypeButton setTitle:@"Run Type..."];
+    }
+    else if([notification object] == waitRequestersDrawer){
+        [showWaitRequestersButton setTitle:@"Show Waits..."];
     }
 }
 
@@ -854,6 +925,26 @@
         }
     }
 }
+#pragma mark Data Source Methods
+- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
+{
+    
+	if(aTableView == waitRequestersTableView){
+		id addressObj = [model waitRequesterAtIdex:rowIndex];
+		return [addressObj valueForKey:[aTableColumn identifier]]; 
+	}
+	else return nil;
+}
+
+// just returns the number of items we have.
+- (int) numberOfRowsInTableView:(NSTableView *)aTableView
+{
+	if(aTableView == waitRequestersTableView){
+		return [model waitRequestersCount];
+	}
+	else return 0;
+}
+
 @end
 
 @implementation ORRunController (private)

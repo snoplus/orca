@@ -187,6 +187,13 @@ extern NSString* ORObjArrayPtrPBType;
 
 - (BOOL) aWake;
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
+
+#pragma mark ¥¥¥Run Management
+- (void) addRunWaitWithReason:(NSString*)aReason;
+- (void) releaseRunWait;
+- (void) addRunWaitFor:(id)anObject reason:(NSString*)aReason;
+- (void) releaseRunWaitFor:(id)anObject;
+
 @end
 
 #pragma mark ¥¥¥Compiler Warning Fixes

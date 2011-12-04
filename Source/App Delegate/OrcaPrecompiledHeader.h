@@ -29,6 +29,7 @@
 #import "NSScanner+Extensions.h"
 #import "NSImage+Extensions.h"
 #import "NSWindow+Extensions.h"
+#import "NSNotifications+Extensions.h"
 #import "Utilities.h"
 
 #import "OrcaObject.h"

@@ -51,13 +51,23 @@ NSString* ORRunNumberLock						= @"ORRunNumberLock";
 NSString* ORRunTypeLock							= @"ORRunTypeLock";
 NSString* ORRunOfflineRunNotification			= @"ORRunOfflineRunNotification";
 NSString* ORRunModelRunHalted                   = @"ORRunModelRunHalted";
+NSString* ORRunModelNumberOfWaitsChanged        = @"ORRunModelNumberOfWaitsChanged";
 
 static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
 #define kHeartBeatTime 30.0
 
 @interface ORRunModel (private)
-- (void) startRun1:(NSNumber*)doInit;
+- (void) startRun:(BOOL)doInit;
+- (void) startRunStage1:(NSNumber*)doInitBool;
+- (void) startRunStage2:(NSNumber*)doInitBool;
+- (void) startRunStage3:(NSNumber*)doInitBool;
+- (void) stopRunStage1;
+- (void) stopRunStage2;
+- (void) startNewSubRunStage1;
+- (void) startNewSubRunStage2;
+- (void) prepareForNewSubRunStage1;
+- (void) prepareForNewSubRunStage2;
 - (void) waitForRunToStop;
 - (void) finishRunStop;
 @end
@@ -84,6 +94,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
 - (void) dealloc
 {
+    [objectsRequestingStateChangeWait release];
     [shutDownScriptState release];
     [startScriptState release];
     [shutDownScript release];
@@ -843,6 +854,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     }    
 }
 
+
 - (void) prepareForNewSubRun
 {
 	if([self runningState] == eRunStarting){
@@ -851,41 +863,61 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
  	else if([self runningState] == eRunStopping){
 		NSLog(@"Prepare for new subrun ignored because run is stopping.\n");
 	}
-	else if(![self isRunning]){
+    else if([self runningState] == eRunBetweenSubRuns){
+		NSLog(@"Prepare for new subrun ignored because run is already between sub runs.\n");
+    }
+	else if(![self isRunning] ){
 		NSLog(@"Prepare for new subrun ignored -- no run in progress\n");
 	}
 	else {
-		[self setRunningState:eRunBetweenSubRuns];
-		[self setSubRunEndTime:[NSCalendarDate date]];
-		[self setElapsedBetweenSubRunTime:0];
-		//ship between sub run record
-		//get the time(UT!)
-		time_t	ut_time;
-		time(&ut_time);
-		//struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-		//time_t ut_time = mktime(theTimeGMTAsStruct);
-		
-		unsigned long data[4];
-		data[0] = dataId | 4;
-		data[1] = 0x10 | ([self subRunNumber]&0xffff)<<16;
-		data[2] = lastRunNumberShipped;
-		data[3] = ut_time;
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-															object:[NSData dataWithBytes:data length:4*sizeof(long)]];
-
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORRunBetweenSubRunsNotification
-															object: self
-														  userInfo: nil];
-		
-		
-		NSLog(@"Run %@ preparing for a new sub-run\n",[self fullRunNumberString]);
-	}
+        NSLog(@"Run %@ preparing for a new sub-run\n",[self fullRunNumberString]);
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORRunAboutToChangeState
+                                                            object: self
+                                                          userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:eRunBetweenSubRuns] forKey:@"State"]];
+        [self prepareForNewSubRunStage1];
+    }
 }
+- (void) prepareForNewSubRunStage1
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(prepareForNewSubRunStage1) object:nil];
+    if([objectsRequestingStateChangeWait count]==0){
+        [self prepareForNewSubRunStage2];
+    }
+    else {
+        [self performSelector:@selector(prepareForNewSubRunStage1) withObject:nil afterDelay:0];
+    }
 
+}
+- (void) prepareForNewSubRunStage2
+{
+    [self setRunningState:eRunBetweenSubRuns];
+    [self setSubRunEndTime:[NSCalendarDate date]];
+    [self setElapsedBetweenSubRunTime:0];
+    //ship between sub run record
+    //get the time(UT!)
+    time_t	ut_time;
+    time(&ut_time);
+    //struct tm* theTimeGMTAsStruct = gmtime(&theTime);
+    //time_t ut_time = mktime(theTimeGMTAsStruct);
+    
+    unsigned long data[4];
+    data[0] = dataId | 4;
+    data[1] = 0x10 | ([self subRunNumber]&0xffff)<<16;
+    data[2] = lastRunNumberShipped;
+    data[3] = ut_time;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
+                                                        object:[NSData dataWithBytes:data length:4*sizeof(long)]];
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRunBetweenSubRunsNotification
+                                                        object: self
+                                                      userInfo: nil];
+    
+    
+}
 - (void) startNewSubRun
 {
 	if([self runningState] == eRunStarting){
-		NSLog(@"Start new subrun ignored because run is still staring.\n");
+		NSLog(@"Start new subrun ignored because run is still starting.\n");
 	}
  	else if([self runningState] == eRunStopping){
 		NSLog(@"Start for new subrun ignored because run is stopping.\n");
@@ -894,44 +926,64 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 		NSLog(@"Start new subrun Ignored -- not between subruns\n");
 	}
 	else {
-		[self setSubRunNumber:[self subRunNumber]+1];
-		[self setRunningState:eRunInProgress];
-		[self setSubRunStartTime:[NSCalendarDate date]];
-		[self setElapsedSubRunTime:0];
-		//ship new sub run record
-		//get the time(UT!)
-		time_t	ut_time;
-		time(&ut_time);
-		
-		//insert a header before the start of sub-run record
-		[[self dataPacket] updateHeader];
-		
-		NSData* headerAsData = [ORDecoder convertHeaderToData:[[self dataPacket] fileHeader]];
-		NSMutableData* dataToBeInserted = [NSMutableData dataWithData:headerAsData];
-		
-		unsigned long data[4];
-		data[0] = dataId | 4;
-		data[1] = 0x20 | ([self subRunNumber]&0xffff)<<16;
-		data[2] = lastRunNumberShipped;
-		data[3] = ut_time;
-		
-		[dataToBeInserted appendData:[NSMutableData dataWithBytes:data length:4*sizeof(long)]];
-		
-		[dataPacket addData:dataToBeInserted];
-		
-		[runInfo setObject:[[self dataPacket]fileHeader]		  forKey:kHeader];
-		[runInfo setObject:[NSNumber numberWithLong:runNumber]	  forKey:kRunNumber];
-		[runInfo setObject:[NSNumber numberWithLong:subRunNumber] forKey:kSubRunNumber];
-		
-		id nextObject = [self objectConnectedTo:ORRunModelRunControlConnection];
-		[nextObject subRunTaskStarted:runInfo];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORRunAboutToChangeState
+                                                            object: self
+                                                          userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:eRunStarting] forKey:@"State"]];
+        [self startNewSubRunStage1];
+    }
+}
 
-		NSLog(@"Staring Run %@ (sub-run)\n",[self fullRunNumberString]);
-		
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORRunStartSubRunNotification
-															object: self
-														  userInfo: nil];
-	}
+- (void) startNewSubRunStage1
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(startNewSubRunStage1) object:nil];
+    if([objectsRequestingStateChangeWait count]==0){
+        [self startNewSubRunStage2];
+    }
+    else {
+        [self performSelector:@selector(startNewSubRun) withObject:nil afterDelay:0];
+    }
+}
+
+
+- (void) startNewSubRunStage2
+{
+    [self setSubRunNumber:[self subRunNumber]+1];
+    [self setRunningState:eRunInProgress];
+    [self setSubRunStartTime:[NSCalendarDate date]];
+    [self setElapsedSubRunTime:0];
+    //ship new sub run record
+    //get the time(UT!)
+    time_t	ut_time;
+    time(&ut_time);
+    
+    //insert a header before the start of sub-run record
+    [[self dataPacket] updateHeader];
+    
+    NSData* headerAsData = [ORDecoder convertHeaderToData:[[self dataPacket] fileHeader]];
+    NSMutableData* dataToBeInserted = [NSMutableData dataWithData:headerAsData];
+    
+    unsigned long data[4];
+    data[0] = dataId | 4;
+    data[1] = 0x20 | ([self subRunNumber]&0xffff)<<16;
+    data[2] = lastRunNumberShipped;
+    data[3] = ut_time;
+    
+    [dataToBeInserted appendData:[NSMutableData dataWithBytes:data length:4*sizeof(long)]];
+    
+    [dataPacket addData:dataToBeInserted];
+    
+    [runInfo setObject:[[self dataPacket]fileHeader]		  forKey:kHeader];
+    [runInfo setObject:[NSNumber numberWithLong:runNumber]	  forKey:kRunNumber];
+    [runInfo setObject:[NSNumber numberWithLong:subRunNumber] forKey:kSubRunNumber];
+    
+    id nextObject = [self objectConnectedTo:ORRunModelRunControlConnection];
+    [nextObject subRunTaskStarted:runInfo];
+
+    NSLog(@"Staring Run %@ (sub-run)\n",[self fullRunNumberString]);
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRunStartSubRunNotification
+                                                        object: self
+                                                      userInfo: nil];
 }
 
 - (void) startRun:(BOOL)doInit
@@ -943,8 +995,8 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
         NSLogColor([NSColor redColor],@"Start a run while one is already in progress.\n");
         return;
     }
-	
-	//movedfrom startrun1 06/29/05 MAH to test remote run stuff
+
+	//movedfrom startRunStage1 06/29/05 MAH to test remote run stuff
 	[self getCurrentRunNumber];
 	
 	if([[ORGlobal sharedGlobal] runMode] == kNormalRun && (!remoteControl || remoteInterface)){
@@ -954,16 +1006,33 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	[self setRunningState:eRunStarting];
 	//pass off to the next event cycle so the run starting state can be drawn on the screen
 	if(startScript){
-		[startScript setSelectorOK:@selector(startRun1:) bad:@selector(runAbortFromScript) withObject:[NSNumber numberWithBool:doInit] target:self];
+		[startScript setSelectorOK:@selector(startRunStage1:) bad:@selector(runAbortFromScript) withObject:[NSNumber numberWithBool:doInit] target:self];
 		[self setStartScriptState:@"Running"];
 		if(![startScript runScript]){
 			[self runAbortFromScript];
 		}
 	}
-	else [self performSelector:@selector(startRun1:) withObject:[NSNumber numberWithBool:doInit] afterDelay:0];
+	else [self performSelector:@selector(startRunStage1:) withObject:[NSNumber numberWithBool:doInit] afterDelay:0];
 }
 
-- (void) startRun1:(NSNumber*)doInitBool
+- (void) startRunStage1:(NSNumber*)doInitBool
+{
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRunAboutToChangeState
+                                                    object: self
+                                                  userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:eRunStarting] forKey:@"State"]];
+    [self startRunStage2:doInitBool];
+}
+
+- (void) startRunStage2:(NSNumber*)doInitBool
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(startRunStage2:) object:doInitBool];
+    if([objectsRequestingStateChangeWait count]==0)[self startRunStage3:doInitBool];
+    else {
+        [self performSelector:@selector(startRunStage2:) withObject:doInitBool afterDelay:0];
+    }
+}
+
+- (void) startRunStage3:(NSNumber*)doInitBool
 {
 	if(startScript){
 		[self setShutDownScriptState:@"---"];
@@ -1077,8 +1146,35 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	[self stopRun];
 }
 
-
 - (void) stopRun
+{
+    if([self runningState] == eRunStopping){
+		NSLog(@"Stop Run message received and ignored because run is already stopping.\n");
+	}
+	else if([self runningState] == eRunStarting && !startScript){
+		NSLog(@"Stop Run message received and ignored because run is starting.\n");
+	}
+	else if([self runningState] == eRunStopped){
+		NSLog(@"Stop Run message received and ignored because no run in progress.\n");
+	}
+	else {
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORRunAboutToChangeState
+                                                            object: self
+                                                          userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:eRunStopping] forKey:@"State"]];
+        [self stopRunStage1];
+    }
+}
+
+- (void) stopRunStage1
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(stopRunStage1) object:nil];
+    if([objectsRequestingStateChangeWait count]==0)[self stopRunStage2];
+    else {
+        [self performSelector:@selector(stopRunStage1) withObject:nil afterDelay:0];
+    }
+}
+
+- (void) stopRunStage2
 {
 	if([self runningState] == eRunStopping){
 		NSLog(@"Stop Run message received and ignored because run is already stopping.\n");
@@ -1535,7 +1631,84 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 					 selector:@selector(needMoreTimeToStopRun:) 
 						 name:ORNeedMoreTimeToStopRun 
 					   object:nil];
-	
+    
+    [notifyCenter addObserver:self 
+					 selector:@selector(addRunStateChangeWait:) 
+						 name:ORAddRunStateChangeWait 
+					   object:nil];
+
+    [notifyCenter addObserver:self 
+					 selector:@selector(releaseRunStateChangeWait:) 
+						 name:ORReleaseRunStateChangeWait 
+					   object:nil];
+
+}
+
+- (void) addRunStateChangeWait:(NSNotification*)aNote
+{
+	@synchronized (self){
+        if(!objectsRequestingStateChangeWait)objectsRequestingStateChangeWait = [[NSMutableArray array]retain];
+        id obj = [aNote object];
+        NSString* requester;
+        if([obj respondsToSelector:@selector(fullID)]) requester = [obj fullID];
+        else requester = [obj className];
+        if(requester){
+            NSString* reason = [[aNote userInfo] objectForKey:@"Reason"];
+            if([reason length]==0)reason = @"No Reason Given";
+            [objectsRequestingStateChangeWait addObject:[NSDictionary dictionaryWithObjectsAndKeys:requester,@"Requester",reason,@"Reason", nil]];
+        }
+    }
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORRunModelNumberOfWaitsChanged object:self];
+
+}
+
+- (void) releaseRunStateChangeWait:(NSNotification*)aNote
+{
+ 	@synchronized (self){
+        id obj = [aNote object];
+        NSString* requester;
+        if([obj respondsToSelector:@selector(fullID)]) requester = [obj fullID];
+        else requester = [obj className];
+        int i=0;
+        for(id anEntry in objectsRequestingStateChangeWait){
+            if([[anEntry objectForKey:@"Requester"] isEqualToString:requester]){
+                [objectsRequestingStateChangeWait removeObjectAtIndex:i]; //can't use the name here because one obj may have multiple entries
+                break;
+            }
+            i++;
+        }
+    }
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORRunModelNumberOfWaitsChanged object:self];
+
+}
+
+- (void) forceClearWaits
+{
+	@synchronized (self){
+        [objectsRequestingStateChangeWait removeAllObjects];
+    }
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORRunModelNumberOfWaitsChanged object:self];
+
+}
+
+- (unsigned) waitRequestersCount
+{
+    unsigned count;
+	@synchronized (self){
+        count = [objectsRequestingStateChangeWait count];
+    }
+    return count;
+}
+
+- (id) waitRequesterAtIdex:(unsigned)index
+{
+    id result = nil;
+	@synchronized (self){
+        if(index<[objectsRequestingStateChangeWait count]){
+            result = [objectsRequestingStateChangeWait objectAtIndex:index];
+        }
+    }
+    return result;
 }
 
 - (void) vetosChanged:(NSNotification*)aNotification
@@ -1851,6 +2024,8 @@ static NSString *ORRunTypeNames 	= @"ORRunTypeNames";
 	}
 	[[self undoManager] enableUndoRegistration];
 }
+
+
 @end
 
 

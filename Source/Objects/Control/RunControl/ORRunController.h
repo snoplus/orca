@@ -24,6 +24,8 @@
     
     IBOutlet NSDrawer*  runTypeDrawer;
     IBOutlet NSDrawer*  runNumberDrawer;
+    IBOutlet NSDrawer*  waitRequestersDrawer;
+    IBOutlet NSButton*  showWaitRequestersButton;
     IBOutlet NSButton*  runNumberButton;
     IBOutlet NSButton*  runTypeButton;
     
@@ -76,7 +78,12 @@
 	IBOutlet NSPopUpButton* shutDownScripts;
     IBOutlet NSTextField*   startUpScriptStateField;
     IBOutlet NSTextField*   shutDownScriptStateField;
-	
+    IBOutlet NSTextField*   waitCountField;
+    IBOutlet NSTextField*   waitCountField1;
+    IBOutlet NSTextField*   waitCountField2;
+    IBOutlet NSTableView*   waitRequestersTableView;
+    IBOutlet NSButton*      forceClearWaitsButton;
+
     BOOL retainingRunNotice;
 	BOOL wasInMaintenance;
     
@@ -106,6 +113,7 @@
 - (IBAction) openShutDownScript:(id)sender;
 - (IBAction) startNewSubRunAction:(id)sender;
 - (IBAction) prepareForSubRunAction:(id)sender;
+- (IBAction) forceClearWaitsAction:(id)sender;
 
 #pragma mark ¥¥¥Interface Management
 - (void) updateButtons;
@@ -132,7 +140,11 @@
 - (void) vetosChanged:(NSNotification*)aNote;
 - (void) startUpScriptChanged:(NSNotification*)aNote;
 - (void) shutDownScriptChanged:(NSNotification*)aNote;
-
+- (void) numberOfWaitsChanged:(NSNotification*)aNote;
+- (NSString*) getStartingString;
+- (NSString*) getRestartingString;
+- (NSString*) getStoppingString;
+- (NSString*) getBetweenSubrunsString;
 
 - (void) updateWithCurrentRunNumber;
 - (void) setupRunTypeNames;

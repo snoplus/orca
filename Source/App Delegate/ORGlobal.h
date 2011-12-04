@@ -123,6 +123,7 @@ extern ORGlobal* gOrcaGlobals;
 extern NSString* ORRunTypeMask;
 extern NSString* ORQueueRecordForShippingNotification;
 
+extern NSString* ORRunAboutToChangeState;
 extern NSString* ORRunAboutToStopNotification;
 extern NSString* ORRunFinalCallNotification;
 extern NSString* ORRunAboutToStartNotification;
@@ -133,6 +134,8 @@ extern NSString* ORRequestRunStop;
 extern NSString* ORRequestRunRestart;
 extern NSString* ORRequestRunHalt;
 extern NSString* ORRunVetosChanged;
+extern NSString* ORAddRunStateChangeWait;
+extern NSString* ORReleaseRunStateChangeWait;
 
 extern NSString* ORHardwareEnvironmentNoisy;
 extern NSString* ORHardwareEnvironmentQuiet;
