@@ -25,13 +25,13 @@
 {
 	IBOutlet NSTabView*		tabView;
 	IBOutlet NSTextField*   adcChannelField;
-	IBOutlet NSMatrix*		rdacDisplayTypeMatrix;
-	IBOutlet NSButton*		setAllRDacsButton;
+	IBOutlet NSMatrix*		gainDisplayTypeMatrix;
+	IBOutlet NSButton*		setAllGainsButton;
 	IBOutlet NSTextField*	cmdQueCountField;
-	IBOutlet NSTextField*	rdacChannelTextField;
+	IBOutlet NSTextField*	gainChannelTextField;
 	IBOutlet NSTextField*	preAmpTextField;
 	IBOutlet NSTextField*	moduleTextField;
-	IBOutlet NSTextField*	dacValueField;
+	IBOutlet NSTextField*	gainValueField;
     IBOutlet NSButton*      lockButton;
     IBOutlet NSTextField*   portStateField;
     IBOutlet NSPopUpButton* portListPopup;
@@ -41,8 +41,8 @@
     IBOutlet NSMatrix*      adcNameMatrix;
     IBOutlet NSMatrix*      adcMatrix;
     IBOutlet NSMatrix*      timeMatrix;
-    IBOutlet NSButton*      writeDacButton;
-    IBOutlet NSButton*      readDacButton;
+    IBOutlet NSButton*      writeGainButton;
+    IBOutlet NSButton*      readGainButton;
     IBOutlet NSButton*      selectModuleButton;
     IBOutlet NSMatrix*      lcmEnabledMatrix;
 
@@ -61,11 +61,11 @@
 	IBOutlet ORCompositeTimeLineView*   plotter0;
 	IBOutlet ORCompositeTimeLineView*   plotter1;
 	
-	IBOutlet NSButton*		readRdacButton;
-	IBOutlet NSButton*		writeRdacButton;
+	IBOutlet NSButton*		readGainFileButton;
+	IBOutlet NSButton*		writeGainFileButton;
 
-	IBOutlet NSTableView*	rdacTableView;
-	IBOutlet NSTableView*	rdacReadBackTableView;
+	IBOutlet NSTableView*	gainTableView;
+	IBOutlet NSTableView*	gainReadBackTableView;
     IBOutlet NSTableView*   processLimitsTableView;
 
     IBOutlet ORValueBarGroupView*  queueValueBar;
@@ -76,7 +76,7 @@
 
     NSSize					normalSize;
     NSSize					setUpSize;
-    NSSize					rdacSize;
+    NSSize					gainSize;
     NSSize					processLimitsSize;
     NSSize					trendSize;
     NSView*					blankView;
@@ -96,19 +96,19 @@
 - (void) adcChannelChanged:(NSNotification*)aNote;
 - (void) lcmChanged:(NSNotification*)aNote;
 - (void) processLimitsChanged:(NSNotification*)aNote;
-- (void) rdacDisplayTypeChanged:(NSNotification*)aNote;
+- (void) gainDisplayTypeChanged:(NSNotification*)aNote;
 - (void) scaleAction:(NSNotification*)aNotification;
 - (void) miscAttributesChanged:(NSNotification*)aNote;
 - (void) updateTimePlot:(NSNotification*)aNote;
 - (void) pollingStateChanged:(NSNotification*)aNote;
-- (void) rdacsChanged:(NSNotification*)aNote;
-- (void) rdacsReadBackChanged:(NSNotification*)aNote;
-- (void) setAllRDacsChanged:(NSNotification*)aNote;
-- (void) rdacChannelChanged:(NSNotification*)aNote;
+- (void) gainsChanged:(NSNotification*)aNote;
+- (void) gainsReadBackChanged:(NSNotification*)aNote;
+- (void) setAllGainsChanged:(NSNotification*)aNote;
+- (void) gainChannelChanged:(NSNotification*)aNote;
 - (void) lcmEnabledChanged:(NSNotification*)aNote;
 - (void) preAmpChanged:(NSNotification*)aNote;
 - (void) moduleChanged:(NSNotification*)aNote;
-- (void) dacValueChanged:(NSNotification*)aNote;
+- (void) gainValueChanged:(NSNotification*)aNote;
 - (void) lockChanged:(NSNotification*)aNote;
 - (void) portNameChanged:(NSNotification*)aNote;
 - (void) portStateChanged:(NSNotification*)aNote;
@@ -121,29 +121,29 @@
 
 #pragma mark •••Actions
 - (IBAction) adcChannelAction:(id)sender;
-- (IBAction) rdacDisplayTypeAction:(id)sender;
-- (IBAction) setAllRDacsAction:(id)sender;
-- (IBAction) rdacChannelAction:(id)sender;
+- (IBAction) gainDisplayTypeAction:(id)sender;
+- (IBAction) setAllGainsAction:(id)sender;
+- (IBAction) gainChannelAction:(id)sender;
 - (IBAction) writeLcmEnabledAction:(id)sender;
 - (IBAction) preAmpAction:(id)sender;
 - (IBAction) moduleAction:(id)sender;
-- (IBAction) dacValueAction:(id)sender;
+- (IBAction) gainValueAction:(id)sender;
 - (IBAction) lockAction:(id) sender;
 - (IBAction) portListAction:(id) sender;
 - (IBAction) openPortAction:(id)sender;
 - (IBAction) readAdcsAction:(id)sender;
-- (IBAction) writeDacAction:(id)sender;
-- (IBAction) readDacAction:(id)sender;
+- (IBAction) writeGainAction:(id)sender;
+- (IBAction) readGainAction:(id)sender;
 - (IBAction) lcmEnabledAction:(id)sender;
 - (IBAction) selectModuleAction:(id)sender;
-- (IBAction) loadRdcaAction:(id)sender;
-- (IBAction) readBackAllRDac:(id)sender;
+- (IBAction) loadGainAction:(id)sender;
+- (IBAction) readBackAllGains:(id)sender;
 
 - (IBAction) selectFileAction:(id)sender;
 - (IBAction) setPollingAction:(id)sender;
 - (IBAction) logToFileAction:(id)sender;
-- (IBAction) readRdacFileAction:(id)sender;
-- (IBAction) saveRdacFileAction:(id)sender;
+- (IBAction) readGainFileAction:(id)sender;
+- (IBAction) saveGainFileAction:(id)sender;
 
 - (void) tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;
 - (BOOL) tableView:(NSTableView *)tableView shouldSelectRow:(int)row;

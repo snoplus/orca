@@ -34,8 +34,8 @@
 - (void) populatePortListPopup;
 #if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 - (void) selectLogFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void*)contextInfo;
-- (void) readRdacFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void*)contextInfo;
-- (void) saveRdacFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void*)contextInfo;
+- (void) readGainFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void*)contextInfo;
+- (void) saveGainFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void*)contextInfo;
 #endif
 @end
 
@@ -102,11 +102,11 @@
     [[queueValueBar xAxis] setRngDefaultsLow:0 withHigh:300];
     
     blankView = [[NSView alloc] init];
-    setUpSize			= NSMakeSize(540,510);
-    normalSize			= NSMakeSize(400,510);
-    rdacSize			= NSMakeSize(655,510);
-    processLimitsSize	= NSMakeSize(480,510);
-    trendSize           = NSMakeSize(655,510);
+    setUpSize			= NSMakeSize(540,515);
+    normalSize			= NSMakeSize(400,515);
+    gainSize			= NSMakeSize(655,515);
+    processLimitsSize	= NSMakeSize(480,515);
+    trendSize           = NSMakeSize(555,515);
 
     NSString* key = [NSString stringWithFormat: @"orca.Pac%d.selectedtab",[model uniqueIdNumber]];
     int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
@@ -154,8 +154,8 @@
                        object : nil];
 		
     [notifyCenter addObserver : self
-                     selector : @selector(dacValueChanged:)
-                         name : ORPacModelDacValueChanged
+                     selector : @selector(gainValueChanged:)
+                         name : ORPacModelGainValueChanged
 						object: model];
 
     [notifyCenter addObserver : self
@@ -174,23 +174,23 @@
 						object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(rdacChannelChanged:)
-                         name : ORPacModelRdacChannelChanged
+                     selector : @selector(gainChannelChanged:)
+                         name : ORPacModelGainChannelChanged
 						object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(setAllRDacsChanged:)
-                         name : ORPacModelSetAllRDacsChanged
+                     selector : @selector(setAllGainsChanged:)
+                         name : ORPacModelSetAllGainsChanged
 						object: model];
 	
     [notifyCenter addObserver : self
-                     selector : @selector(rdacsChanged:)
-                         name : ORPacModelRDacsChanged
+                     selector : @selector(gainsChanged:)
+                         name : ORPacModelGainsChanged
 						object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(rdacsReadBackChanged:)
-                         name : ORPacModelRDacsReadBackChanged
+                     selector : @selector(gainsReadBackChanged:)
+                         name : ORPacModelGainsReadBackChanged
 						object: model];
 
     
@@ -225,8 +225,8 @@
 					   object : model];	
 	
     [notifyCenter addObserver : self
-                     selector : @selector(rdacDisplayTypeChanged:)
-                         name : ORPacModelRdacDisplayTypeChanged
+                     selector : @selector(gainDisplayTypeChanged:)
+                         name : ORPacModelGainDisplayTypeChanged
 						object: model];
 
     [notifyCenter addObserver : self
@@ -258,21 +258,21 @@
     [self lockChanged:nil];
     [self portStateChanged:nil];
     [self portNameChanged:nil];
-	[self dacValueChanged:nil];
+	[self gainValueChanged:nil];
 	[self moduleChanged:nil];
 	[self preAmpChanged:nil];
 	[self lcmEnabledChanged:nil];
-	[self rdacChannelChanged:nil];
-	[self setAllRDacsChanged:nil];
-	[self rdacsChanged:nil];
-	[self rdacsReadBackChanged:nil];
+	[self gainChannelChanged:nil];
+	[self setAllGainsChanged:nil];
+	[self gainsChanged:nil];
+	[self gainsReadBackChanged:nil];
     [self pollingStateChanged:nil];
 	[self logToFileChanged:nil];
 	[self logFileChanged:nil];
     [self pollingStateChanged:nil];
     [self miscAttributesChanged:nil];
 	[self queCountChanged:nil];
-	[self rdacDisplayTypeChanged:nil];
+	[self gainDisplayTypeChanged:nil];
 	[self processLimitsChanged:nil];
 	[self adcChanged:nil];
 	[self lcmChanged:nil];
@@ -284,27 +284,27 @@
     [processLimitsTableView reloadData];
 }
 
-- (void) rdacDisplayTypeChanged:(NSNotification*)aNote
+- (void) gainDisplayTypeChanged:(NSNotification*)aNote
 {
-	[rdacDisplayTypeMatrix selectCellWithTag : [model rdacDisplayType]];
+	[gainDisplayTypeMatrix selectCellWithTag : [model gainDisplayType]];
 	NSFormatter* aFormatter = nil;
-	if([model rdacDisplayType] == 0){
+	if([model gainDisplayType] == 0){
 		aFormatter = [[OHexFormatter alloc] init];
 	}
 
-	[[[rdacTableView tableColumnWithIdentifier:@"Board0"] dataCell] setFormatter:aFormatter];
-	[[[rdacTableView tableColumnWithIdentifier:@"Board1"] dataCell] setFormatter:aFormatter];
-	[[[rdacTableView tableColumnWithIdentifier:@"Board2"] dataCell] setFormatter:aFormatter];
-	[[[rdacTableView tableColumnWithIdentifier:@"Board3"] dataCell] setFormatter:aFormatter];
+	[[[gainTableView tableColumnWithIdentifier:@"Board0"] dataCell] setFormatter:aFormatter];
+	[[[gainTableView tableColumnWithIdentifier:@"Board1"] dataCell] setFormatter:aFormatter];
+	[[[gainTableView tableColumnWithIdentifier:@"Board2"] dataCell] setFormatter:aFormatter];
+	[[[gainTableView tableColumnWithIdentifier:@"Board3"] dataCell] setFormatter:aFormatter];
     
-    [[[rdacReadBackTableView tableColumnWithIdentifier:@"Board0"] dataCell] setFormatter:aFormatter];
-	[[[rdacReadBackTableView tableColumnWithIdentifier:@"Board1"] dataCell] setFormatter:aFormatter];
-	[[[rdacReadBackTableView tableColumnWithIdentifier:@"Board2"] dataCell] setFormatter:aFormatter];
-	[[[rdacReadBackTableView tableColumnWithIdentifier:@"Board3"] dataCell] setFormatter:aFormatter];
+    [[[gainReadBackTableView tableColumnWithIdentifier:@"Board0"] dataCell] setFormatter:aFormatter];
+	[[[gainReadBackTableView tableColumnWithIdentifier:@"Board1"] dataCell] setFormatter:aFormatter];
+	[[[gainReadBackTableView tableColumnWithIdentifier:@"Board2"] dataCell] setFormatter:aFormatter];
+	[[[gainReadBackTableView tableColumnWithIdentifier:@"Board3"] dataCell] setFormatter:aFormatter];
 
 	[aFormatter release];
-	[rdacTableView reloadData];
-	[rdacReadBackTableView reloadData];
+	[gainTableView reloadData];
+	[gainReadBackTableView reloadData];
 }
 
 - (void) scaleAction:(NSNotification*)aNotification
@@ -396,27 +396,27 @@
 	[logToFileButton setIntValue: [model logToFile]];
 }
 
-- (void) rdacsChanged:(NSNotification*)aNote
+- (void) gainsChanged:(NSNotification*)aNote
 {
-	[rdacTableView reloadData];
+	[gainTableView reloadData];
 }
 
-- (void) rdacsReadBackChanged:(NSNotification*)aNote
+- (void) gainsReadBackChanged:(NSNotification*)aNote
 {
-	[rdacReadBackTableView reloadData];
+	[gainReadBackTableView reloadData];
 }
 
 
-- (void) setAllRDacsChanged:(NSNotification*)aNote
+- (void) setAllGainsChanged:(NSNotification*)aNote
 {
-	[setAllRDacsButton setIntValue: [model setAllRDacs]];
-    if([model setAllRDacs]) [writeDacButton setTitle:@"Write To ALL"];
-    else [writeDacButton setTitle:@"Write To One"];
+	[setAllGainsButton setIntValue: [model setAllGains]];
+    if([model setAllGains]) [writeGainButton setTitle:@"Write To ALL"];
+    else [writeGainButton setTitle:@"Write To One"];
 }
 
-- (void) rdacChannelChanged:(NSNotification*)aNote
+- (void) gainChannelChanged:(NSNotification*)aNote
 {
-	[rdacChannelTextField setIntValue: [model rdacChannel]];
+	[gainChannelTextField setIntValue: [model gainChannel]];
 }
 
 - (void) lcmEnabledChanged:(NSNotification*)aNote
@@ -465,9 +465,9 @@
 	[adcChannelField setIntValue: [model adcChannel]];
 }
 
-- (void) dacValueChanged:(NSNotification*)aNote
+- (void) gainValueChanged:(NSNotification*)aNote
 {
-	[dacValueField setIntValue: [model dacValue]];
+	[gainValueField setIntValue: [model gainValue]];
 }
 
 - (void) lcmChanged:(NSNotification*)aNote
@@ -533,16 +533,16 @@
 
     [portListPopup setEnabled:!locked];
     [openPortButton setEnabled:!locked];
-    [dacValueField setEnabled:!locked];
-    [rdacChannelTextField setEnabled:!locked && ![model setAllRDacs]];
-    [readDacButton setEnabled:!locked];
-    [writeDacButton setEnabled:!locked];
-    [readDacButton setEnabled:!locked && ![model setAllRDacs]];
+    [gainValueField setEnabled:!locked];
+    [gainChannelTextField setEnabled:!locked && ![model setAllGains]];
+    [readGainButton setEnabled:!locked];
+    [writeGainButton setEnabled:!locked];
+    [readGainButton setEnabled:!locked && ![model setAllGains]];
     [readAdcsButton setEnabled:!locked];
     [selectModuleButton setEnabled:!locked];
     [loadButtonAll setEnabled:!locked];
-    [rdacTableView setEnabled:!locked];
-    [writeRdacButton setEnabled:!lockedOrRunningMaintenance];
+    [gainTableView setEnabled:!locked];
+    [writeGainButton setEnabled:!lockedOrRunningMaintenance];
     [loadButton0 setEnabled:!lockedOrRunningMaintenance];
     [loadButton1 setEnabled:!lockedOrRunningMaintenance];
     [loadButton2 setEnabled:!lockedOrRunningMaintenance];
@@ -603,27 +603,27 @@
 	[model setAdcChannel:[sender intValue]];	
 }
 
-- (IBAction) rdacDisplayTypeAction:(id)sender
+- (IBAction) gainDisplayTypeAction:(id)sender
 {
-	[model setRdacDisplayType:[[sender selectedCell] tag]];	
+	[model setGainDisplayType:[[sender selectedCell] tag]];	
 }
 
-- (IBAction) setAllRDacsAction:(id)sender
+- (IBAction) setAllGainsAction:(id)sender
 {
-	[model setSetAllRDacs:[sender intValue]];
+	[model setSetAllGains:[sender intValue]];
 	[self lockChanged:nil];
 }
 
-- (IBAction) rdacChannelAction:(id)sender
+- (IBAction) gainChannelAction:(id)sender
 {
-	[model setRdacChannel:[sender intValue]];
-	[model setDacValue: [model rdac:[sender intValue]]];
+	[model setGainChannel:[sender intValue]];
+	[model setGainValue: [model gain:[sender intValue]]];
 }
 
-- (IBAction) dacValueAction:(id)sender
+- (IBAction) gainValueAction:(id)sender
 {
-	[model setDacValue:[sender intValue]];	
-	[model setRdac:[model rdacChannel] withValue:[sender intValue]];
+	[model setGainValue:[sender intValue]];	
+	[model setGain:[model gainChannel] withValue:[sender intValue]];
 }
 
 - (IBAction) writeLcmEnabledAction:(id)sender
@@ -646,16 +646,16 @@
 	[model setModule:[sender intValue]];	
 }
 
-- (IBAction) writeDacAction:(id)sender
+- (IBAction) writeGainAction:(id)sender
 {
 	[self endEditing];
-	[model writeDac];
+	[model writeGain];
 }
 
-- (IBAction) readDacAction:(id)sender
+- (IBAction) readGainAction:(id)sender
 {
 	[self endEditing];
-	[model readDac];
+	[model readGain];
 }
 
 - (IBAction) lockAction:(id) sender
@@ -685,7 +685,7 @@
 	[model selectModule];
 }
 
-- (IBAction) loadRdcaAction:(id)sender
+- (IBAction) loadGainAction:(id)sender
 {
     [self endEditing];
     int start,end;
@@ -701,14 +701,14 @@
 
 	int i;
 	for(i=start;i<end;i++){
-		[model writeOneRdac:i];
+		[model writeOneGain:i];
 	}
 }
 
-- (IBAction) readBackAllRDac:(id)sender
+- (IBAction) readBackAllGains:(id)sender
 {
     if([sender tag] == 4){
-        [model readAllDacs];
+        [model readAllGains];
     }
 }
 
@@ -761,7 +761,7 @@
 #pragma mark •••Table Data Source
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
 {
-    if(rdacTableView == aTableView){
+    if(gainTableView == aTableView){
         if([[aTableColumn identifier] isEqualToString:@"Channel"]) return [NSNumber numberWithInt:rowIndex];
         else {
             int board;
@@ -769,10 +769,10 @@
             else if([[aTableColumn identifier] isEqualToString:@"Board1"])board = 1;
             else if([[aTableColumn identifier] isEqualToString:@"Board2"])board = 2;
             else board = 3;
-            return [NSNumber numberWithInt:[model rdac:rowIndex + board*37]];
+            return [NSNumber numberWithInt:[model gain:rowIndex + board*37]];
         }
     }
-    else if(rdacReadBackTableView == aTableView){
+    else if(gainReadBackTableView == aTableView){
         if([[aTableColumn identifier] isEqualToString:@"Channel"]) return [NSNumber numberWithInt:rowIndex];
         else {
             int board;
@@ -780,7 +780,7 @@
             else if([[aTableColumn identifier] isEqualToString:@"Board1"])board = 1;
             else if([[aTableColumn identifier] isEqualToString:@"Board2"])board = 2;
             else board = 3;
-            return [NSNumber numberWithInt:[model rdacReadBack:rowIndex + board*37]];
+            return [NSNumber numberWithInt:[model gainReadBack:rowIndex + board*37]];
         }
     }
 
@@ -800,8 +800,8 @@
 // just returns the number of items we have.
 - (int)numberOfRowsInTableView:(NSTableView *)aTableView
 {
-	if(rdacTableView == aTableView)return 37;
-	else if(rdacReadBackTableView == aTableView)return 37;
+	if(gainTableView == aTableView)return 37;
+	else if(gainReadBackTableView == aTableView)return 37;
     else if(processLimitsTableView == aTableView)return 8;
 	else return 0;
 }
@@ -810,19 +810,19 @@
 {
     if(anObject == nil)return;
     
-    if(rdacTableView == aTableView){
+    if(gainTableView == aTableView){
         if([[aTableColumn identifier] isEqualToString:@"Channel"]) return;
         int board;
         if([[aTableColumn identifier] isEqualToString:@"Board0"])board = 0;
         else if([[aTableColumn identifier] isEqualToString:@"Board1"])board = 1;
         else if([[aTableColumn identifier] isEqualToString:@"Board2"])board = 2;
         else board = 3;
-        [model setRdac:rowIndex+(board*37) withValue:[anObject intValue]];
-        if(rowIndex+(board*37) == [model rdacChannel]){
-            [model setDacValue:[anObject intValue]];
+        [model setGain:rowIndex+(board*37) withValue:[anObject intValue]];
+        if(rowIndex+(board*37) == [model gainChannel]){
+            [model setGainValue:[anObject intValue]];
         }
-        [model writeDac:rowIndex+(board*37) value:[anObject intValue]];
-        [model readAllDacs];
+        [model writeGain:rowIndex+(board*37) value:[anObject intValue]];
+        [model readAllGains];
 
     }
     else if(processLimitsTableView == aTableView){
@@ -840,7 +840,7 @@
     [[self window] setContentView:blankView];
     switch([tabView indexOfTabViewItem:item]){
 		case  0: [self resizeWindowToSize:setUpSize];	    break;
-		case  1: [self resizeWindowToSize:rdacSize];	    break;
+		case  1: [self resizeWindowToSize:gainSize];	    break;
 		case  2: [self resizeWindowToSize:trendSize];	    break;
 		case  3: [self resizeWindowToSize:processLimitsSize];	    break;
             
@@ -867,7 +867,7 @@
 	*xValue = [[model timeRate:set] timeSampledAtIndex:index];
 }
 
-- (IBAction) readRdacFileAction:(id)sender
+- (IBAction) readGainFileAction:(id)sender
 {
     NSOpenPanel *openPanel = [NSOpenPanel openPanel];
     [openPanel setCanChooseDirectories:NO];
@@ -875,7 +875,7 @@
     [openPanel setAllowsMultipleSelection:NO];
     [openPanel setPrompt:@"Choose"];
     NSString* startingDir;
-	NSString* fullPath = [[model lastRdacFile] stringByExpandingTildeInPath];
+	NSString* fullPath = [[model lastGainFile] stringByExpandingTildeInPath];
     if(fullPath){
         startingDir = [fullPath stringByDeletingLastPathComponent];
     }
@@ -887,7 +887,7 @@
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
-            [model readRdacFile:[[openPanel URL] path]];
+            [model readGainFile:[[openPanel URL] path]];
         }
     }];
 #else 	
@@ -896,12 +896,12 @@
                                 types:nil
                        modalForWindow:[self window]
                         modalDelegate:self
-                       didEndSelector:@selector(readRdacFilePanelDidEnd:returnCode:contextInfo:)
+                       didEndSelector:@selector(readGainFilePanelDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
 #endif
 }
 
-- (IBAction) saveRdacFileAction:(id)sender
+- (IBAction) saveGainFileAction:(id)sender
 {
     NSSavePanel *savePanel = [NSSavePanel savePanel];
     [savePanel setPrompt:@"Save As"];
@@ -910,14 +910,14 @@
     NSString* startingDir;
     NSString* defaultFile;
     
-	NSString* fullPath = [[model lastRdacFile] stringByExpandingTildeInPath];
+	NSString* fullPath = [[model lastGainFile] stringByExpandingTildeInPath];
     if(fullPath){
         startingDir = [fullPath stringByDeletingLastPathComponent];
         defaultFile = [fullPath lastPathComponent];
     }
     else {
         startingDir = NSHomeDirectory();
-        defaultFile = [model lastRdacFile];
+        defaultFile = [model lastGainFile];
         
     }
 #if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
@@ -925,7 +925,7 @@
     [savePanel setNameFieldLabel:defaultFile];
     [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
-            [model saveRdacFile:[[savePanel URL]path]];
+            [model saveGainFile:[[savePanel URL]path]];
         }
     }];
 #else 		
@@ -933,7 +933,7 @@
                                  file:defaultFile
                        modalForWindow:[self window]
                         modalDelegate:self
-                       didEndSelector:@selector(saveRdacFilePanelDidEnd:returnCode:contextInfo:)
+                       didEndSelector:@selector(saveGainFilePanelDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
 #endif
 }
@@ -964,18 +964,18 @@
 }
 
 #if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-- (void) readRdacFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+- (void) readGainFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode){
-		[model readRdacFile:[[sheet filenames] objectAtIndex:0]];
+		[model readGainFile:[[sheet filenames] objectAtIndex:0]];
 		
     }
 }
 
-- (void) saveRdacFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+- (void) saveGainFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode){
-        [model saveRdacFile:[sheet filename]];
+        [model saveGainFile:[sheet filename]];
     }
 }
 

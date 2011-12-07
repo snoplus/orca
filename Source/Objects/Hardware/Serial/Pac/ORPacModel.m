@@ -27,30 +27,31 @@
 #import "ORDataPacket.h"
 #import "ORDataSet.h"
 #import "ORTimeRate.h"
+#import "ORAlarm.h"
 
 #pragma mark •••External Strings
 NSString* ORPacModelAdcChannelChanged = @"ORPacModelAdcChannelChanged";
 NSString* ORPacModelLcmChanged = @"ORPacModelLcChanged";
 NSString* ORPacModelProcessLimitsChanged = @"ORPacModelProcessLimitsChanged";
-NSString* ORPacModelRdacDisplayTypeChanged = @"ORPacModelRdacDisplayTypeChanged";
-NSString* ORPacModelSetAllRDacsChanged  = @"ORPacModelSetAllRDacsChanged";
-NSString* ORPacModelRdacChannelChanged  = @"ORPacModelRdacChannelChanged";
+NSString* ORPacModelGainDisplayTypeChanged = @"ORPacModelGainDisplayTypeChanged";
+NSString* ORPacModelSetAllGainsChanged  = @"ORPacModelSetAllGainsChanged";
+NSString* ORPacModelGainChannelChanged  = @"ORPacModelGainChannelChanged";
 NSString* ORPacModelLcmEnabledChanged	= @"ORPacModelLcmEnabledChanged";
 NSString* ORPacModelPreAmpChanged		= @"ORPacModelPreAmpChanged";
 NSString* ORPacModelModuleChanged		= @"ORPacModelModuleChanged";
-NSString* ORPacModelDacValueChanged		= @"ORPacModelDacValueChanged";
+NSString* ORPacModelGainValueChanged		= @"ORPacModelGainValueChanged";
 NSString* ORPacModelSerialPortChanged	= @"ORPacModelSerialPortChanged";
 NSString* ORPacModelPortNameChanged		= @"ORPacModelPortNameChanged";
 NSString* ORPacModelPortStateChanged	= @"ORPacModelPortStateChanged";
 NSString* ORPacModelAdcChanged			= @"ORPacModelAdcChanged";
 NSString* ORPacLock						= @"ORPacLock";
-NSString* ORPacModelRDacsChanged		= @"ORPacModelRDacsChanged";
+NSString* ORPacModelGainsChanged		= @"ORPacModelGainsChanged";
 NSString* ORPacModelPollingStateChanged	= @"ORPacModelPollingStateChangedNotification";
 NSString* ORPacModelMultiPlotsChanged	= @"ORPacModelMultiPlotsChanged";
 NSString* ORPacModelLogToFileChanged	= @"ORPacModelLogToFileChanged";
 NSString* ORPacModelLogFileChanged		= @"ORPacModelLogFileChanged";
 NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
-NSString* ORPacModelRDacsReadBackChanged= @"ORPacModelRDacsReadBackChanged";
+NSString* ORPacModelGainsReadBackChanged= @"ORPacModelGainsReadBackChanged";
 
 @interface ORPacModel (private)
 - (void) timeout;
@@ -70,13 +71,13 @@ NSString* ORPacModelRDacsReadBackChanged= @"ORPacModelRDacsReadBackChanged";
 {
 	self = [super init];
     [self registerNotificationObservers];
-    rdacBuffer = nil;
+    gainBuffer = nil;
 	return self;
 }
 
 - (void) dealloc
 {
-    [lastRdacFile release];
+    [lastGainFile release];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
     [buffer release];
@@ -98,6 +99,9 @@ NSString* ORPacModelRDacsReadBackChanged= @"ORPacModelRDacsReadBackChanged";
 		[timeRates[i] release];
 	}
 	[processLimits release];
+    [lcmEnabledAlarm clearAlarm];
+	[lcmEnabledAlarm release];
+
 	[super dealloc];
 }
 
@@ -223,27 +227,27 @@ NSString* ORPacModelRDacsReadBackChanged= @"ORPacModelRDacsReadBackChanged";
     return processLimits;
 }
 
-- (NSString*) lastRdacFile
+- (NSString*) lastGainFile
 {
-    return lastRdacFile;
+    return lastGainFile;
 }
 
-- (void) setLastRdacFile:(NSString*)aLastRdacFile
+- (void) setLastGainFile:(NSString*)aLastGainFile
 {
-    [lastRdacFile autorelease];
-    lastRdacFile = [aLastRdacFile copy];    
+    [lastGainFile autorelease];
+    lastGainFile = [aLastGainFile copy];    
 }
 
-- (int) rdacDisplayType
+- (int) gainDisplayType
 {
-    return rdacDisplayType;
+    return gainDisplayType;
 }
 
-- (void) setRdacDisplayType:(int)aRdacDisplayType
+- (void) setGainDisplayType:(int)aGainDisplayType
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setRdacDisplayType:rdacDisplayType];
-    rdacDisplayType = aRdacDisplayType;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelRdacDisplayTypeChanged object:self];
+    [[[self undoManager] prepareWithInvocationTarget:self] setGainDisplayType:gainDisplayType];
+    gainDisplayType = aGainDisplayType;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelGainDisplayTypeChanged object:self];
 }
 
 - (int) queCount
@@ -261,60 +265,60 @@ NSString* ORPacModelRDacsReadBackChanged= @"ORPacModelRDacsReadBackChanged";
 	return timeRates[index];
 }
 
-- (int)  rdac:(int)index
+- (int)  gain:(int)index
 {
-	if(index>=0 && index<148)return rdac[index];
+	if(index>=0 && index<148)return gain[index];
 	else return 0;
 }
 
-- (void) setRdac:(int)index withValue:(int)aValue
+- (void) setGain:(int)index withValue:(int)aValue
 {
 	if(index>=0 && index<148){
-		[[[self undoManager] prepareWithInvocationTarget:self] setRdac:index withValue:rdac[index]];
-		rdac[index] = aValue;
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelRDacsChanged object:self];
+		[[[self undoManager] prepareWithInvocationTarget:self] setGain:index withValue:gain[index]];
+		gain[index] = aValue;
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelGainsChanged object:self];
 	}
 }
 
-- (int)  rdacReadBack:(int)index
+- (int)  gainReadBack:(int)index
 {
-	if(index>=0 && index<148)return rdacReadBack[index];
+	if(index>=0 && index<148)return gainReadBack[index];
 	else return 0;
 }
 
-- (void) setRdacReadBack:(int)index withValue:(int)aValue
+- (void) setGainReadBack:(int)index withValue:(int)aValue
 {
 	if(index>=0 && index<148){
-		rdacReadBack[index] = aValue;
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelRDacsReadBackChanged object:self];
+		gainReadBack[index] = aValue;
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelGainsReadBackChanged object:self];
 	}
 }
 
-- (BOOL) setAllRDacs
+- (BOOL) setAllGains
 {
-    return setAllRDacs;
+    return setAllGains;
 }
 
-- (void) setSetAllRDacs:(BOOL)aSetAllRDacs
+- (void) setSetAllGains:(BOOL)aSetAllGains
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setSetAllRDacs:setAllRDacs];
-    setAllRDacs = aSetAllRDacs;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelSetAllRDacsChanged object:self];
+    [[[self undoManager] prepareWithInvocationTarget:self] setSetAllGains:setAllGains];
+    setAllGains = aSetAllGains;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelSetAllGainsChanged object:self];
 }
 
-- (int) rdacChannel
+- (int) gainChannel
 {
-    return rdacChannel;
+    return gainChannel;
 }
 
-- (void) setRdacChannel:(int)aRdacChannel
+- (void) setGainChannel:(int)aGainChannel
 {
-	if(aRdacChannel<0)aRdacChannel=0;
-	if(aRdacChannel>147)aRdacChannel=147;
+	if(aGainChannel<0)aGainChannel=0;
+	if(aGainChannel>147)aGainChannel=147;
 	
-    [[[self undoManager] prepareWithInvocationTarget:self] setRdacChannel:rdacChannel];
-    rdacChannel = aRdacChannel;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelRdacChannelChanged object:self];
+    [[[self undoManager] prepareWithInvocationTarget:self] setGainChannel:gainChannel];
+    gainChannel = aGainChannel;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelGainChannelChanged object:self];
 }
 
 - (BOOL) lcmEnabled
@@ -330,25 +334,35 @@ NSString* ORPacModelRDacsReadBackChanged= @"ORPacModelRDacsReadBackChanged";
     if(![self readingTemperatures]){
         [[ORGlobal sharedGlobal] addRunVeto:@"LCM Enabled" comment:@"Leakage Current Measurement Enabled in PAC Board"];
         NSLog(@"%@ put run veto in place for leakage current measurement.\n",[self fullID]);
+        if(!lcmEnabledAlarm){
+            lcmEnabledAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Leakage Current Measurement"] severity:kInformationAlarm];
+            [lcmEnabledAlarm setSticky:YES];
+            [lcmEnabledAlarm setHelpString:@"The PAC board posted this informational alarm because it is set to measure leakage current."];
+        }
+        [lcmEnabledAlarm setAcknowledged:NO];
+        [lcmEnabledAlarm postAlarm];
     }
     else {
         [[ORGlobal sharedGlobal] removeRunVeto:@"LCM Enabled"];
         NSLog(@"%@ removed leakage current measurement veto.\n",[self fullID]);
+        [lcmEnabledAlarm clearAlarm];
+        [lcmEnabledAlarm release];
+        lcmEnabledAlarm = nil;
     }
 }
 
-- (int) dacValue
+- (int) gainValue
 {
-    return dacValue;
+    return gainValue;
 }
 
-- (void) setDacValue:(int)aDacValue
+- (void) setGainValue:(int)aGainValue
 {
-	if(aDacValue>256)aDacValue=255;
-    [[[self undoManager] prepareWithInvocationTarget:self] setDacValue:dacValue];
-    dacValue = aDacValue;
+	if(aGainValue>256)aGainValue=255;
+    [[[self undoManager] prepareWithInvocationTarget:self] setGainValue:gainValue];
+    gainValue = aGainValue;
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelDacValueChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelGainValueChanged object:self];
 }
 
 - (float) lcmVoltage
@@ -579,21 +593,21 @@ NSString* ORPacModelRDacsReadBackChanged= @"ORPacModelRDacsReadBackChanged";
 - (id) initWithCoder:(NSCoder*)decoder
 {
 	self = [super initWithCoder:decoder];
-    rdacBuffer = nil;
+    gainBuffer = nil;
 
 	[[self undoManager] disableUndoRegistration];
     
     processLimits = [[decoder decodeObjectForKey:@"processLimits"]retain];
     if(!processLimits)[self setProcessLimitDefaults];
     //--------------------------------------------------------------
-	[self setLastRdacFile:	[decoder decodeObjectForKey: @"lastRdacFile"]];
-	[self setRdacDisplayType:[decoder decodeIntForKey:   @"rdacDisplayType"]];
-	[self setSetAllRDacs:	[decoder decodeBoolForKey:	 @"ORPacModelSetAllRDacs"]];
-	[self setRdacChannel:	[decoder decodeIntForKey:	 @"ORPacModelRdacChannel"]];
+	[self setLastGainFile:	[decoder decodeObjectForKey: @"lastGainFile"]];
+	[self setGainDisplayType:[decoder decodeIntForKey:   @"gainDisplayType"]];
+	[self setSetAllGains:	[decoder decodeBoolForKey:	 @"ORPacModelSetAllGains"]];
+	[self setGainChannel:	[decoder decodeIntForKey:	 @"ORPacModelGainChannel"]];
 	[self setLcmEnabled:	[decoder decodeBoolForKey:	 @"ORPacModelLcmEnabled"]];
 	[self setPreAmp:		[decoder decodeIntForKey:	 @"ORPacModelPreAmp"]];
 	[self setModule:		[decoder decodeIntForKey:	 @"ORPacModelModule"]];
-	[self setDacValue:		[decoder decodeIntForKey:	 @"dacValue"]];
+	[self setGainValue:		[decoder decodeIntForKey:	 @"gainValue"]];
 	[self setPortWasOpen:	[decoder decodeBoolForKey:	 @"portWasOpen"]];
 	[self setPollingState:	[decoder decodeIntForKey:	 @"pollingState"]];
 	[self setLogFile:		[decoder decodeObjectForKey: @"logFile"]];
@@ -605,7 +619,7 @@ NSString* ORPacModelRDacsReadBackChanged= @"ORPacModelRDacsReadBackChanged";
 		timeRates[i] = [[ORTimeRate alloc] init];
 	}
 	for(i=0;i<148;i++){
-		[self setRdac:i withValue: [decoder decodeIntForKey:[NSString stringWithFormat:@"rdac%d",i]]];
+		[self setGain:i withValue: [decoder decodeIntForKey:[NSString stringWithFormat:@"gain%d",i]]];
 	}
     
     [self setPortName:		[decoder decodeObjectForKey: @"portName"]];
@@ -620,14 +634,14 @@ NSString* ORPacModelRDacsReadBackChanged= @"ORPacModelRDacsReadBackChanged";
 {
     [super encodeWithCoder:encoder];
     [encoder encodeObject:processLimits     forKey:@"processLimits"];
-    [encoder encodeObject:lastRdacFile  forKey:@"lastRdacFile"];
-    [encoder encodeInt:rdacDisplayType  forKey:@"rdacDisplayType"];
-    [encoder encodeBool:setAllRDacs		forKey:@"ORPacModelSetAllRDacs"];
-    [encoder encodeInt:rdacChannel		forKey:@"ORPacModelRdacChannel"];
+    [encoder encodeObject:lastGainFile  forKey:@"lastGainFile"];
+    [encoder encodeInt:gainDisplayType  forKey:@"gainDisplayType"];
+    [encoder encodeBool:setAllGains		forKey:@"ORPacModelSetAllGains"];
+    [encoder encodeInt:gainChannel		forKey:@"ORPacModelGainChannel"];
     [encoder encodeBool:lcmEnabled		forKey:@"ORPacModelLcmEnabled"];
     [encoder encodeInt:preAmp			forKey:@"ORPacModelPreAmp"];
     [encoder encodeInt:module			forKey:@"ORPacModelModule"];
-    [encoder encodeInt:dacValue			forKey:@"dacValue"];
+    [encoder encodeInt:gainValue			forKey:@"gainValue"];
     [encoder encodeBool:portWasOpen		forKey:@"portWasOpen"];
     [encoder encodeObject:portName		forKey:@"portName"];
     [encoder encodeInt:pollingState		forKey:@"pollingState"];
@@ -636,7 +650,7 @@ NSString* ORPacModelRDacsReadBackChanged= @"ORPacModelRDacsReadBackChanged";
     [encoder encodeInt:adcChannel       forKey:@"ORPacModelAdcChannel"];
 	int i;
 	for(i=0;i<148;i++){
-		[encoder encodeInt:rdac[i] forKey: [NSString stringWithFormat:@"rdac%d",i]];
+		[encoder encodeInt:gain[i] forKey: [NSString stringWithFormat:@"gain%d",i]];
 	}
 }
 
@@ -672,39 +686,39 @@ NSString* ORPacModelRDacsReadBackChanged= @"ORPacModelRDacsReadBackChanged";
 }
 
 
-- (void) writeOneRdac:(int)index
+- (void) writeOneGain:(int)index
 {
     if([serialPort isOpen]){ 
 		if(index>=0 && index<148){
 			char cmdData[5];
-			cmdData[0] = kPacRDacCmd;
-			cmdData[1] = kPacRDacWriteOneRDac;
+			cmdData[0] = kPacGainCmd;
+			cmdData[1] = kPacGainWriteOneGain;
 			cmdData[2] = index+1;
-			cmdData[3] = 0x10 | ((rdac[index] & 0xf0)>>4);
-			cmdData[4] = (rdac[index] & 0x0f)<<4;
+			cmdData[3] = 0x10 | ((gain[index] & 0xf0)>>4);
+			cmdData[4] = (gain[index] & 0x0f)<<4;
 			[self writeCmdData:[NSData dataWithBytes:cmdData length:5]];
 		}
 	}
 }
 
 
-- (void) writeReadDac
+- (void) writeReadGain
 {
     if([serialPort isOpen]){ 
 		char cmdData[3];
-		cmdData[0] = kPacRDacCmd;
-		cmdData[1] = kPacRDacReadOneRDac;
-		cmdData[2] = rdacChannel+1;
+		cmdData[0] = kPacGainCmd;
+		cmdData[1] = kPacGainReadOneGain;
+		cmdData[2] = gainChannel+1;
 		[self writeCmdData:[NSData dataWithBytes:cmdData length:3]];
 	}
 }
 
-- (void) writeReadAllDac
+- (void) writeReadAllGains
 {
     if([serialPort isOpen]){ 
 		char cmdData[3];
-		cmdData[0] = kPacRDacCmd;
-		cmdData[1] = kPacRDacReadAll;
+		cmdData[0] = kPacGainCmd;
+		cmdData[1] = kPacGainReadAll;
         
         
 		[self writeCmdData:[NSData dataWithBytes:cmdData length:2]];
@@ -747,57 +761,57 @@ NSString* ORPacModelRDacsReadBackChanged= @"ORPacModelRDacsReadBackChanged";
 	}
 }
 
-- (void) writeDac
+- (void) writeGain
 {
     if([serialPort isOpen]){ 
-		if([self setAllRDacs]){
+		if([self setAllGains]){
 			char cmdData[5];
-			cmdData[0] = kPacRDacCmd;
-			cmdData[1] = kPacRDacWriteAll;
-			cmdData[2] = 0x10 | ((dacValue & 0xf0)>>4);
-			cmdData[3] = (dacValue & 0x0f)<<4;
+			cmdData[0] = kPacGainCmd;
+			cmdData[1] = kPacGainWriteAll;
+			cmdData[2] = 0x10 | ((gainValue & 0xf0)>>4);
+			cmdData[3] = (gainValue & 0x0f)<<4;
 			[self writeCmdData:[NSData dataWithBytes:cmdData length:4]];
 		}
 		else {
 			char cmdData[5];
-			cmdData[0] = kPacRDacCmd;
-			cmdData[1] = kPacRDacWriteOneRDac;
-			cmdData[2] = rdacChannel+1;
-			cmdData[3] = 0x10 | ((dacValue & 0xf0)>>4);
-			cmdData[4] = (dacValue & 0x0f)<<4;
+			cmdData[0] = kPacGainCmd;
+			cmdData[1] = kPacGainWriteOneGain;
+			cmdData[2] = gainChannel+1;
+			cmdData[3] = 0x10 | ((gainValue & 0xf0)>>4);
+			cmdData[4] = (gainValue & 0x0f)<<4;
 			[self writeCmdData:[NSData dataWithBytes:cmdData length:5]];
 		}
         
-        [self readAllDacs];
+        [self readAllGains];
         
-        if(setAllRDacs){
+        if(setAllGains){
             int i;
             for(i=0;i<148;i++){
-                [self setRdac:i withValue:[self dacValue]];
+                [self setGain:i withValue:[self gainValue]];
             }
         }
     }
 }
 
-- (void) writeDac:(int)aChannel value:(int)aValue
+- (void) writeGain:(int)aChannel value:(int)aValue
 {
     char cmdData[5];
-    cmdData[0] = kPacRDacCmd;
-    cmdData[1] = kPacRDacWriteOneRDac;
+    cmdData[0] = kPacGainCmd;
+    cmdData[1] = kPacGainWriteOneGain;
     cmdData[2] = aChannel+1;
     cmdData[3] = 0x10 | ((aValue & 0xf0)>>4);
     cmdData[4] = (aValue & 0x0f)<<4;
     [self writeCmdData:[NSData dataWithBytes:cmdData length:5]];
 }
 
-- (void) readDac
+- (void) readGain
 {
-	[self writeReadDac];
+	[self writeReadGain];
 }
 
-- (void) readAllDacs
+- (void) readAllGains
 {
-	[self writeReadAllDac];
+	[self writeReadAllGains];
 }
 
 #pragma mark •••Data Records
@@ -874,8 +888,8 @@ NSString* ORPacModelRDacsReadBackChanged= @"ORPacModelRDacsReadBackChanged";
 				}
 			break;
 				
-			case kPacRDacCmd:
-				if(theCmd[1] == kPacRDacReadOneRDac){
+			case kPacGainCmd:
+				if(theCmd[1] == kPacGainReadOneGain){
 					if([inComingData length] >= 3) {
 						unsigned char* theData	 = (unsigned char*)[inComingData bytes];
 						short msb		 = (theData[0]&0xf)<<4;
@@ -885,7 +899,7 @@ NSString* ORPacModelRDacsReadBackChanged= @"ORPacModelRDacsReadBackChanged";
 						done = YES;
 					}
 				}
-				else if(theCmd[1] == kPacRDacReadAll){
+				else if(theCmd[1] == kPacGainReadAll){
                     unsigned char* ptr	 = (unsigned char*)[inComingData bytes];
                     int i;  
                     unsigned len = [inComingData length];
@@ -894,9 +908,9 @@ NSString* ORPacModelRDacsReadBackChanged= @"ORPacModelRDacsReadBackChanged";
                             for(i=0;i<len-1;i+=2){
                                 short msb		 = (ptr[i]&0xf)<<4;
                                 short lsb		 = (ptr[i+1]&0xf0)>>4;
-                                rdacReadBack[147-i/2] = msb|lsb;
+                                gainReadBack[147-i/2] = msb|lsb;
                             }
-                            [self setRdacReadBack:0 withValue:rdacReadBack[0]]; //side effect -- force refresh
+                            [self setGainReadBack:0 withValue:gainReadBack[0]]; //side effect -- force refresh
                         }
                         else if(ptr[296]==kPacErrorByte){
                             NSLogError(@"PAC",@"DAC !OK",nil);
@@ -904,14 +918,14 @@ NSString* ORPacModelRDacsReadBackChanged= @"ORPacModelRDacsReadBackChanged";
                         done = YES;
                     }
  				}
-				else if(theCmd[1] == kPacRDacWriteOneRDac){
+				else if(theCmd[1] == kPacGainWriteOneGain){
 					if([inComingData length] >= 1) {
 						unsigned char* theData	 = (unsigned char*)[inComingData bytes];
 						if(theData[0] != kPacOkByte) NSLogError(@"PAC",@"DAC !OK",nil);
 						done = YES;
 					}
 				}
-				else if(theCmd[1] == kPacRDacWriteAll){
+				else if(theCmd[1] == kPacGainWriteAll){
 					if([inComingData length] >= 1) {
 						unsigned char* theData	 = (unsigned char*)[inComingData bytes];
 						if(theData[0] != kPacOkByte) NSLogError(@"PAC",@"DAC !OK",nil);
@@ -958,15 +972,15 @@ NSString* ORPacModelRDacsReadBackChanged= @"ORPacModelRDacsReadBackChanged";
 {
     NSMutableDictionary* objDictionary = [NSMutableDictionary dictionary];
     [objDictionary setObject:NSStringFromClass([self class]) forKey:@"Class Name"];
-    if([lastRdacFile length])[objDictionary setObject:lastRdacFile forKey:@"RDAC File"];
+    if([lastGainFile length])[objDictionary setObject:lastGainFile forKey:@"RDAC File"];
 
-	NSMutableArray* rdacArray = [NSMutableArray array];
+	NSMutableArray* gainArray = [NSMutableArray array];
 	int i;
 	for(i=0;i<148;i++){
-		[rdacArray addObject:[NSNumber numberWithInt:rdac[i]]];
+		[gainArray addObject:[NSNumber numberWithInt:gain[i]]];
 	}
 	
-    [objDictionary setObject:rdacArray forKey:@"rdac"];
+    [objDictionary setObject:gainArray forKey:@"gain"];
 	
 	[dictionary setObject:objDictionary forKey:[self identifier]];
     	
@@ -989,7 +1003,7 @@ NSString* ORPacModelRDacsReadBackChanged= @"ORPacModelRDacsReadBackChanged";
     return pollingState;
 }
 
-- (void) readRdacFile:(NSString*) aPath
+- (void) readGainFile:(NSString*) aPath
 {
 	NSString* contents = [NSString stringWithContentsOfFile:[aPath stringByExpandingTildeInPath] encoding:NSASCIIStringEncoding error:nil];
 	contents = [contents stringByReplacingOccurrencesOfString:@"\r" withString:@"\n"];
@@ -1000,24 +1014,24 @@ NSString* ORPacModelRDacsReadBackChanged= @"ORPacModelRDacsReadBackChanged";
 		if([parts count] == 5){
 			int index = [[parts objectAtIndex:0] intValue];
 			if(index < 38){
-				rdac[index]			= [[parts objectAtIndex:1] intValue]; 
-				rdac[index+37]		= [[parts objectAtIndex:2] intValue]; 
-				rdac[index+2*37]	= [[parts objectAtIndex:3] intValue]; 
-				rdac[index+3*37]	= [[parts objectAtIndex:4] intValue]; 
+				gain[index]			= [[parts objectAtIndex:1] intValue]; 
+				gain[index+37]		= [[parts objectAtIndex:2] intValue]; 
+				gain[index+2*37]	= [[parts objectAtIndex:3] intValue]; 
+				gain[index+3*37]	= [[parts objectAtIndex:4] intValue]; 
 			}
 		}
 	}
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelRDacsChanged object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelGainsChanged object:self];
 }
 
-- (void) saveRdacFile:(NSString*) aPath
+- (void) saveGainFile:(NSString*) aPath
 {
 	NSString* fullFileName = [aPath stringByExpandingTildeInPath];
-	[self setLastRdacFile:aPath];
+	[self setLastGainFile:aPath];
 	int i;
 	NSString* s = @"";
 	for(i=0;i<37;i++){
-		s = [s stringByAppendingFormat:@"%d,%d,%d,%d,%d\n",i,rdac[i],rdac[i+37],rdac[i+2*37],rdac[i+3*37]];
+		s = [s stringByAppendingFormat:@"%d,%d,%d,%d,%d\n",i,gain[i],gain[i+37],gain[i+2*37],gain[i+3*37]];
 	}
 	
 	[s writeToFile:fullFileName atomically:NO encoding:NSASCIIStringEncoding error:nil];
@@ -1165,7 +1179,8 @@ NSString* ORPacModelRDacsReadBackChanged= @"ORPacModelRDacsReadBackChanged";
 {
 	BOOL r;
 	@synchronized(self){
-        if(channel==0)return [self isConnected];
+        if(channel==0)      return [self isConnected];
+        else if(channel==1) return ![self lcmEnabled];
         else return NO;
     }
 	return r;
@@ -1293,7 +1308,7 @@ NSString* ORPacModelRDacsReadBackChanged= @"ORPacModelRDacsReadBackChanged";
 	[cmdQueue removeAllObjects]; //if we timeout we just flush the queue
     [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelQueCountChanged object: self];
 	//[self processOneCommandFromQueue];	 //do the next command in the queue
-    rdacIndex = 0;
+    gainIndex = 0;
 }
 
 - (void) processOneCommandFromQueue

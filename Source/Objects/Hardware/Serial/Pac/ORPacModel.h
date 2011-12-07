@@ -24,6 +24,7 @@
 
 @class ORSerialPort;
 @class ORTimeRate;
+@class ORAlarm;
 
 #define kPacShipAdcs	0xff
 
@@ -31,7 +32,7 @@
 #define kPacADCmd		0x01    //--II.
 #define kPacSelCmd		0x02	//--III.
 #define kPacLcmEnaCmd	0x04	//-->IV.
-#define kPacRDacCmd		0x10	//-->V.
+#define kPacGainCmd		0x10	//-->V.
 //followed by zero or more bytes
 
 //Secondary Cmd Bytes
@@ -46,10 +47,10 @@
 #define kPacLcmEnaClr   0x02	
 
 //V.
-#define kPacRDacWriteAll		0x01 //write all with same value. 2 data words follow		
-#define kPacRDacReadAll			0x02 //Read all	
-#define kPacRDacWriteOneRDac    0x10 //Write One RDAC.  Position follows (1 Byte) Value Follows (two bytes)	
-#define kPacRDacReadOneRDac		0x20 //Read One RDAC.   Position follows (1 Byte) Output of two bytes	
+#define kPacGainWriteAll		0x01 //write all with same value. 2 data words follow		
+#define kPacGainReadAll			0x02 //Read all	
+#define kPacGainWriteOneGain    0x10 //Write One RDAC.  Position follows (1 Byte) Value Follows (two bytes)	
+#define kPacGainReadOneGain		0x20 //Read One RDAC.   Position follows (1 Byte) Output of two bytes	
 
 #define kPacOkByte				0xf0
 #define kPacErrorByte			0x0f
@@ -71,26 +72,27 @@
 		int					module;
 		int					preAmp;
 		BOOL				lcmEnabled;
-		int					rdacChannel;
-		int					dacValue;
-		BOOL				setAllRDacs;
-        int					rdac[148];
-        int					rdacReadBack[148];
+		int					gainChannel;
+		int					gainValue;
+		BOOL				setAllGains;
+        int					gain[148];
+        int					gainReadBack[148];
 		BOOL				pollRunning;
 		NSTimeInterval		pollingState;
 		BOOL				logToFile;
 		NSString*			logFile;
 		NSMutableArray*		logBuffer;
 		unsigned long		readCount;
-		int					rdacDisplayType;
-		NSString*			lastRdacFile;
+		int					gainDisplayType;
+		NSString*			lastGainFile;
         BOOL                readOnce;
         NSMutableArray*     processLimits;    
-        int                 rdacIndex;
-        NSMutableData*      rdacBuffer;
+        int                 gainIndex;
+        NSMutableData*      gainBuffer;
         unsigned short      lcm;
         unsigned short      lcmTimeMeasured;
         int                 adcChannel;
+        ORAlarm*            lcmEnabledAlarm;
 }
 
 #pragma mark •••Initialization
@@ -110,29 +112,29 @@
 - (void) setLcm:(unsigned short)aLc;
 - (BOOL) isConnected;
 - (BOOL) readingTemperatures;
-- (NSString*) lastRdacFile;
-- (void) setLastRdacFile:(NSString*)aLastRdacFile;
-- (int) rdacDisplayType;
-- (void) setRdacDisplayType:(int)aRdacDisplayType;
+- (NSString*) lastGainFile;
+- (void) setLastGainFile:(NSString*)aLastGainFile;
+- (int) gainDisplayType;
+- (void) setGainDisplayType:(int)aGainDisplayType;
 - (ORTimeRate*)timeRate:(int)index;
 - (void) setPollingState:(NSTimeInterval)aState;
 - (NSTimeInterval) pollingState;
-- (int)  rdac:(int)index;
-- (void) setRdac:(int)index withValue:(int)aValue;
-- (int)  rdacReadBack:(int)index;
-- (void) setRdacReadBack:(int)index withValue:(int)aValue;
-- (BOOL) setAllRDacs;
-- (void) setSetAllRDacs:(BOOL)aSetAllRDacs;
-- (int) rdacChannel;
-- (void) setRdacChannel:(int)aRdacChannel;
+- (int)  gain:(int)index;
+- (void) setGain:(int)index withValue:(int)aValue;
+- (int)  gainReadBack:(int)index;
+- (void) setGainReadBack:(int)index withValue:(int)aValue;
+- (BOOL) setAllGains;
+- (void) setSetAllGains:(BOOL)aSetAllGains;
+- (int) gainChannel;
+- (void) setGainChannel:(int)aGainChannel;
 - (BOOL) lcmEnabled;
 - (void) setLcmEnabled:(BOOL)aLcmEnabled;
 - (int) preAmp;
 - (void) setPreAmp:(int)aPreAmp;
 - (int) module;
 - (void) setModule:(int)aModule;
-- (int) dacValue;
-- (void) setDacValue:(int)aDacValue;
+- (int) gainValue;
+- (void) setGainValue:(int)aGainValue;
 - (ORSerialPort*) serialPort;
 - (void) setSerialPort:(ORSerialPort*)aSerialPort;
 - (BOOL) portWasOpen;
@@ -163,29 +165,29 @@
 - (void) setDataId: (unsigned long) DataId;
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherPac;
-- (void) writeDac;
-- (void) readDac;
-- (void) readAllDacs;
+- (void) writeGain;
+- (void) readGain;
+- (void) readAllGains;
 - (void) selectModule;
 - (void) writeLogBufferToFile;
 
 #pragma mark •••Commands
 - (void) writeCmdData:(NSData*)someData;
 - (void) writeReadADC:(int)aChannel;
-- (void) writeReadDac;
+- (void) writeReadGain;
 - (void) writeLcmEnable;
 - (void) writeModuleSelect;
-- (void) writeOneRdac:(int)index;
-- (void) writeReadAllDac;
-- (void) writeDac:(int)aChannel value:(int)aValue;
+- (void) writeOneGain:(int)index;
+- (void) writeReadAllGains;
+- (void) writeGain:(int)aChannel value:(int)aValue;
 - (void) writeShipCmd;
 - (void) readAdcs;
 
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 - (void) serialPortWriteProgress:(NSDictionary *)dataDictionary;
-- (void) readRdacFile:(NSString*) aPath;
-- (void) saveRdacFile:(NSString*) aPath;
+- (void) readGainFile:(NSString*) aPath;
+- (void) saveGainFile:(NSString*) aPath;
 - (NSMutableArray*) processLimits;
 - (NSString*)processName:(int)aChan;
 - (NSString*)adcName:(int)aChan;
@@ -210,24 +212,24 @@
 extern NSString* ORPacModelAdcChannelChanged;
 extern NSString* ORPacModelLcmChanged;
 extern NSString* ORPacModelProcessLimitsChanged;
-extern NSString* ORPacModelRdacDisplayTypeChanged;
-extern NSString* ORPacModelSetAllRDacsChanged;
-extern NSString* ORPacModelRdacChannelChanged;
+extern NSString* ORPacModelGainDisplayTypeChanged;
+extern NSString* ORPacModelSetAllGainsChanged;
+extern NSString* ORPacModelGainChannelChanged;
 extern NSString* ORPacModelLcmEnabledChanged;
 extern NSString* ORPacModelPreAmpChanged;
 extern NSString* ORPacModelModuleChanged;
-extern NSString* ORPacModelDacValueChanged;
+extern NSString* ORPacModelGainValueChanged;
 extern NSString* ORPacModelSerialPortChanged;
 extern NSString* ORPacLock;
 extern NSString* ORPacModelPortNameChanged;
 extern NSString* ORPacModelPortStateChanged;
 extern NSString* ORPacModelAdcChanged;
-extern NSString* ORPacModelRDacsChanged;
-extern NSString* ORPacModelRDacReadBacksChanged;
+extern NSString* ORPacModelGainsChanged;
+extern NSString* ORPacModelGainReadBacksChanged;
 extern NSString* ORPacModelMultiPlotsChanged;
 extern NSString* ORPacModelPollingStateChanged;
 extern NSString* ORPacModelLogToFileChanged;
 extern NSString* ORPacModelLogFileChanged;
 extern NSString* ORPacModelQueCountChanged;
-extern NSString* ORPacModelRDacsReadBackChanged;
+extern NSString* ORPacModelGainsReadBackChanged;
 
