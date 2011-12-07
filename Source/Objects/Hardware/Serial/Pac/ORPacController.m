@@ -28,6 +28,7 @@
 #import "ORSerialPort.h"
 #import "ORTimeRate.h"
 #import "OHexFormatter.h"
+#import "ORValueBarGroupView.h"
 
 @interface ORPacController (private)
 - (void) populatePortListPopup;
@@ -50,6 +51,7 @@
 
 - (void) dealloc
 {
+	[blankView release];
 	[super dealloc];
 }
 
@@ -57,14 +59,6 @@
 {
 		
     [self populatePortListPopup];
-	NSNumberFormatter *numberFormatter = [[[NSNumberFormatter alloc] init] autorelease];
-	[numberFormatter setFormat:@"0.00"];
-	int i;
-	for(i=0;i<8;i++){
-		[[adcMatrix cellAtRow:i column:0] setFormatter:numberFormatter];
-		[[alarmLevelMatrix cellAtRow:i column:0] setFormatter:numberFormatter];
-		[[alarmLevelMatrix cellAtRow:i column:0] setTag:i];
-	}
 	
 	[[plotter0 yAxis] setRngLow:0.0 withHigh:6.];
 	[[plotter0 yAxis] setRngLimitsLow:0.0 withHigh:6. withMinRng:1];
@@ -84,19 +78,19 @@
 		[NSColor blueColor],
 		[NSColor brownColor],
 	};
-
+    int i;
 	for(i=0;i<4;i++){
 		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:i andDataSource:self];
 		[plotter0 addPlot: aPlot];
 		[aPlot setLineColor:color[i]];
-		[aPlot setName:[NSString stringWithFormat:@"Adc %d",i]];
+		[aPlot setName:[model adcName:i]];
 		[(ORTimeAxis*)[plotter0 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 		[aPlot release];
 	}
 	for(i=0;i<4;i++){
 		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:i+4 andDataSource:self];
 		[plotter1 addPlot: aPlot];
-		[aPlot setName:[NSString stringWithFormat:@"Adc %d",i+4]];
+		[aPlot setName:[model adcName:i+4]];
 		[aPlot setLineColor:color[i]];
 		[(ORTimeAxis*)[plotter1 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 		[aPlot release];
@@ -104,6 +98,21 @@
 	[plotter0 setShowLegend:YES];
 	[plotter1 setShowLegend:YES];
 	
+    [[queueValueBar xAxis] setRngLimitsLow:0 withHigh:300 withMinRng:10];
+    [[queueValueBar xAxis] setRngDefaultsLow:0 withHigh:300];
+    
+    blankView = [[NSView alloc] init];
+    setUpSize			= NSMakeSize(540,510);
+    normalSize			= NSMakeSize(400,510);
+    rdacSize			= NSMakeSize(655,510);
+    processLimitsSize	= NSMakeSize(480,510);
+    trendSize           = NSMakeSize(655,510);
+
+    NSString* key = [NSString stringWithFormat: @"orca.Pac%d.selectedtab",[model uniqueIdNumber]];
+    int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
+    if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
+    [tabView selectTabViewItemAtIndex: index];
+    
 	[super awakeFromNib];
 }
 
@@ -178,7 +187,13 @@
                      selector : @selector(rdacsChanged:)
                          name : ORPacModelRDacsChanged
 						object: model];
-	
+
+    [notifyCenter addObserver : self
+                     selector : @selector(rdacsReadBackChanged:)
+                         name : ORPacModelRDacsReadBackChanged
+						object: model];
+
+    
     [notifyCenter addObserver : self
                      selector : @selector(logToFileChanged:)
                          name : ORPacModelLogToFileChanged
@@ -215,8 +230,18 @@
 						object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(alarmLevelChanged:)
-                         name : ORPacModelAlarmLevelChanged
+                     selector : @selector(processLimitsChanged:)
+                         name : ORPacModelProcessLimitsChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(lcmChanged:)
+                         name : ORPacModelLcmChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(adcChannelChanged:)
+                         name : ORPacModelAdcChannelChanged
 						object: model];
 
 }
@@ -233,7 +258,6 @@
     [self lockChanged:nil];
     [self portStateChanged:nil];
     [self portNameChanged:nil];
-	[self adcChanged:nil];
 	[self dacValueChanged:nil];
 	[self moduleChanged:nil];
 	[self preAmpChanged:nil];
@@ -241,6 +265,7 @@
 	[self rdacChannelChanged:nil];
 	[self setAllRDacsChanged:nil];
 	[self rdacsChanged:nil];
+	[self rdacsReadBackChanged:nil];
     [self pollingStateChanged:nil];
 	[self logToFileChanged:nil];
 	[self logFileChanged:nil];
@@ -248,20 +273,15 @@
     [self miscAttributesChanged:nil];
 	[self queCountChanged:nil];
 	[self rdacDisplayTypeChanged:nil];
-	[self alarmLevelChanged:nil];
+	[self processLimitsChanged:nil];
+	[self adcChanged:nil];
+	[self lcmChanged:nil];
+	[self adcChannelChanged:nil];
 }
 
-
-- (void) alarmLevelChanged:(NSNotification*)aNote
+- (void) processLimitsChanged:(NSNotification*)aNote
 {
-	BOOL lcm = [model lcmEnabled];
-	int i;
-	for(i=0;i<8;i++){
-		float theValue;
-		if(!lcm)theValue = [model leakageAlarmLevel:i]; //*** inverted logic
-		else theValue  =  [model temperatureAlarmLevel:i];
-		[[alarmLevelMatrix cellWithTag:i] setFloatValue: theValue];
-	}
+    [processLimitsTableView reloadData];
 }
 
 - (void) rdacDisplayTypeChanged:(NSNotification*)aNote
@@ -276,9 +296,15 @@
 	[[[rdacTableView tableColumnWithIdentifier:@"Board1"] dataCell] setFormatter:aFormatter];
 	[[[rdacTableView tableColumnWithIdentifier:@"Board2"] dataCell] setFormatter:aFormatter];
 	[[[rdacTableView tableColumnWithIdentifier:@"Board3"] dataCell] setFormatter:aFormatter];
+    
+    [[[rdacReadBackTableView tableColumnWithIdentifier:@"Board0"] dataCell] setFormatter:aFormatter];
+	[[[rdacReadBackTableView tableColumnWithIdentifier:@"Board1"] dataCell] setFormatter:aFormatter];
+	[[[rdacReadBackTableView tableColumnWithIdentifier:@"Board2"] dataCell] setFormatter:aFormatter];
+	[[[rdacReadBackTableView tableColumnWithIdentifier:@"Board3"] dataCell] setFormatter:aFormatter];
 
 	[aFormatter release];
 	[rdacTableView reloadData];
+	[rdacReadBackTableView reloadData];
 }
 
 - (void) scaleAction:(NSNotification*)aNotification
@@ -356,6 +382,7 @@
 - (void) queCountChanged:(NSNotification*)aNotification
 {
 	[cmdQueCountField setIntValue:[model queCount]];
+    [queueValueBar setNeedsDisplay:YES];
 }
 
 - (void) logFileChanged:(NSNotification*)aNote
@@ -374,9 +401,17 @@
 	[rdacTableView reloadData];
 }
 
+- (void) rdacsReadBackChanged:(NSNotification*)aNote
+{
+	[rdacReadBackTableView reloadData];
+}
+
+
 - (void) setAllRDacsChanged:(NSNotification*)aNote
 {
 	[setAllRDacsButton setIntValue: [model setAllRDacs]];
+    if([model setAllRDacs]) [writeDacButton setTitle:@"Write To ALL"];
+    else [writeDacButton setTitle:@"Write To One"];
 }
 
 - (void) rdacChannelChanged:(NSNotification*)aNote
@@ -386,25 +421,71 @@
 
 - (void) lcmEnabledChanged:(NSNotification*)aNote
 {
-	[lcmEnabledMatrix selectCellWithTag: [model lcmEnabled]];
-	if(![model lcmEnabled]) [alarmTypeText setStringValue:@"For Temperatures"]; //inverted logic
-	else [alarmTypeText setStringValue:@"For Leakage Current"];
-	[self alarmLevelChanged:nil];
+    BOOL state = [model lcmEnabled];
+	[lcmEnabledMatrix selectCellWithTag: state];
+    [adc0Line0 setHidden:state];
+    [adc0Line1 setHidden:state];
+    [adc0Line2 setHidden:!state];
+    
+    NSColor* enabledColor = [NSColor blackColor];
+    NSColor* disabledColor = [NSColor grayColor];
+    
+    [[channelMatrix cellAtRow:0 column:0] setTextColor:!state?enabledColor:disabledColor];
+    [[adcNameMatrix cellAtRow:0 column:0] setTextColor:!state?enabledColor:disabledColor];
+    [[adcMatrix cellAtRow:0 column:0] setTextColor:!state?enabledColor:disabledColor];
+    [[timeMatrix cellAtRow:0 column:0] setTextColor:!state?enabledColor:disabledColor];
+
+    
+    [[channelMatrix cellAtRow:1 column:0] setTextColor:state?enabledColor:disabledColor];
+    [[adcNameMatrix cellAtRow:1 column:0] setTextColor:state?enabledColor:disabledColor];
+    [[adcMatrix cellAtRow:1 column:0] setTextColor:state?enabledColor:disabledColor];
+    [[timeMatrix cellAtRow:1 column:0] setTextColor:state?enabledColor:disabledColor];
+    
+    if([model readingTemperatures])[lcmRunVetoWarning setStringValue:@""];
+    else [lcmRunVetoWarning setStringValue:@"Run is Vetoed because of the LCM setting!"];
+    
+}
+
+- (void) adcChannelChanged:(NSNotification*)aNote
+{
+	[adcChannelField setIntValue: [model adcChannel]];
+	[preAmpTextField setIntValue: [model preAmp]];
+	[moduleTextField setIntValue: [model module]];
 }
 
 - (void) preAmpChanged:(NSNotification*)aNote
 {
 	[preAmpTextField setIntValue: [model preAmp]];
+	[adcChannelField setIntValue: [model adcChannel]];
 }
 
 - (void) moduleChanged:(NSNotification*)aNote
 {
 	[moduleTextField setIntValue: [model module]];
+	[adcChannelField setIntValue: [model adcChannel]];
 }
 
 - (void) dacValueChanged:(NSNotification*)aNote
 {
 	[dacValueField setIntValue: [model dacValue]];
+}
+
+- (void) lcmChanged:(NSNotification*)aNote
+{
+    [self loadLcmTimeValues];
+}
+
+- (void) loadLcmTimeValues
+{
+	[[adcMatrix cellWithTag:0] setFloatValue:[model convertedLcm]];
+	unsigned long t = [model lcmTimeMeasured];
+	NSCalendarDate* theDate;
+	if(t){
+		theDate = [NSCalendarDate dateWithTimeIntervalSince1970:t];
+		[theDate setCalendarFormat:@"%m/%d %H:%M:%S"];
+		[[timeMatrix cellWithTag:0] setObjectValue:theDate];
+	}
+	else [[timeMatrix cellWithTag:0] setObjectValue:@"--"];
 }
 
 - (void) adcChanged:(NSNotification*)aNote
@@ -423,15 +504,15 @@
 
 - (void) loadAdcTimeValuesForIndex:(int)index
 {
-	[[adcMatrix cellWithTag:index] setFloatValue:[model convertedAdc:index]];
+	[[adcMatrix cellWithTag:index+1] setFloatValue:[model convertedAdc:index]];
 	unsigned long t = [model timeMeasured:index];
 	NSCalendarDate* theDate;
 	if(t){
 		theDate = [NSCalendarDate dateWithTimeIntervalSince1970:t];
 		[theDate setCalendarFormat:@"%m/%d %H:%M:%S"];
-		[[timeMatrix cellWithTag:index] setObjectValue:theDate];
+		[[timeMatrix cellWithTag:index+1] setObjectValue:theDate];
 	}
-	else [[timeMatrix cellWithTag:index] setObjectValue:@"--"];
+	else [[timeMatrix cellWithTag:index+1] setObjectValue:@"--"];
 }
 
 - (void) checkGlobalSecurity
@@ -455,28 +536,20 @@
     [dacValueField setEnabled:!locked];
     [rdacChannelTextField setEnabled:!locked && ![model setAllRDacs]];
     [readDacButton setEnabled:!locked];
-	[writeLcmButton setEnabled:!locked];
     [writeDacButton setEnabled:!locked];
     [readDacButton setEnabled:!locked && ![model setAllRDacs]];
     [readAdcsButton setEnabled:!locked];
-    [lcmEnabledMatrix setEnabled:!locked];
     [selectModuleButton setEnabled:!locked];
     [loadButtonAll setEnabled:!locked];
-    [loadButton0 setEnabled:!locked];
-    [loadButton1 setEnabled:!locked];
-    [loadButton2 setEnabled:!locked];
-    [loadButton3 setEnabled:!locked];
     [rdacTableView setEnabled:!locked];
-    [readRdacButton setEnabled:!locked];
-    [writeRdacButton setEnabled:!locked];
-	
-	
-	
-    NSString* s = @"";
-    if(lockedOrRunningMaintenance){
-        if(runInProgress && ![gSecurity isLocked:ORPacLock])s = @"Not in Maintenance Run.";
-    }
-    [lockDocField setStringValue:s];
+    [writeRdacButton setEnabled:!lockedOrRunningMaintenance];
+    [loadButton0 setEnabled:!lockedOrRunningMaintenance];
+    [loadButton1 setEnabled:!lockedOrRunningMaintenance];
+    [loadButton2 setEnabled:!lockedOrRunningMaintenance];
+    [loadButton3 setEnabled:!lockedOrRunningMaintenance];
+    [loadButtonAll setEnabled:!lockedOrRunningMaintenance];
+
+    [lcmEnabledMatrix setEnabled:!locked && !runInProgress];
 
 }
 
@@ -525,16 +598,9 @@
 
 #pragma mark •••Actions
 
-- (IBAction) alarmLevelAction:(id)sender
+- (void) adcChannelAction:(id)sender
 {
-	int index = [sender selectedRow];
-	float theValue = [[sender selectedCell] floatValue];
-	if(![model lcmEnabled]){ //***inverted logic
-		[model setLeakageAlarmLevel:index value:theValue];	
-	}
-	else {
-		[model setTemperatureAlarmLevel:index value:theValue];	
-	}
+	[model setAdcChannel:[sender intValue]];	
 }
 
 - (IBAction) rdacDisplayTypeAction:(id)sender
@@ -562,7 +628,7 @@
 
 - (IBAction) writeLcmEnabledAction:(id)sender
 {
-	[model enqueLcmEnable];	
+	[model writeLcmEnable];	
 }
 
 - (IBAction) lcmEnabledAction:(id)sender
@@ -621,21 +687,29 @@
 
 - (IBAction) loadRdcaAction:(id)sender
 {
-	int start,end;
+    [self endEditing];
+    int start,end;
 	int board = [sender tag];
-	if(board == 4){
+	if(board == 4){ //all
 		start = 0;
 		end = 148;
 	}
 	else {
-		start = board + board*37;
+		start = board + board*36;
 		end = start + 37;
 	}
 
 	int i;
 	for(i=start;i<end;i++){
-		[model enqueWriteRdac:i];
+		[model writeOneRdac:i];
 	}
+}
+
+- (IBAction) readBackAllRDac:(id)sender
+{
+    if([sender tag] == 4){
+        [model readAllDacs];
+    }
 }
 
 - (IBAction) selectFileAction:(id)sender
@@ -687,42 +761,95 @@
 #pragma mark •••Table Data Source
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
 {
-	if([[aTableColumn identifier] isEqualToString:@"Channel"]) return [NSNumber numberWithInt:rowIndex];
-	else {
-		int board;
-		if([[aTableColumn identifier] isEqualToString:@"Board0"])board = 0;
-		else if([[aTableColumn identifier] isEqualToString:@"Board1"])board = 1;
-		else if([[aTableColumn identifier] isEqualToString:@"Board2"])board = 2;
-		else board = 3;
-		return [NSNumber numberWithInt:[model rdac:rowIndex + board*37]];
-	}
+    if(rdacTableView == aTableView){
+        if([[aTableColumn identifier] isEqualToString:@"Channel"]) return [NSNumber numberWithInt:rowIndex];
+        else {
+            int board;
+            if([[aTableColumn identifier] isEqualToString:@"Board0"])board = 0;
+            else if([[aTableColumn identifier] isEqualToString:@"Board1"])board = 1;
+            else if([[aTableColumn identifier] isEqualToString:@"Board2"])board = 2;
+            else board = 3;
+            return [NSNumber numberWithInt:[model rdac:rowIndex + board*37]];
+        }
+    }
+    else if(rdacReadBackTableView == aTableView){
+        if([[aTableColumn identifier] isEqualToString:@"Channel"]) return [NSNumber numberWithInt:rowIndex];
+        else {
+            int board;
+            if([[aTableColumn identifier] isEqualToString:@"Board0"])board = 0;
+            else if([[aTableColumn identifier] isEqualToString:@"Board1"])board = 1;
+            else if([[aTableColumn identifier] isEqualToString:@"Board2"])board = 2;
+            else board = 3;
+            return [NSNumber numberWithInt:[model rdacReadBack:rowIndex + board*37]];
+        }
+    }
+
+    else if(processLimitsTableView == aTableView){
+        id columnId = [aTableColumn identifier];
+        if([columnId isEqualToString:@"Name"])return [model processName:rowIndex];
+        else if([columnId isEqualToString:@"ChannelNumber"])return [NSNumber numberWithInt:rowIndex];
+        else if([columnId isEqualToString:@"AdcNumber"])return [NSNumber numberWithInt:rowIndex];
+        else {
+            id obj = [[model processLimits] objectAtIndex:rowIndex];
+            return [obj objectForKey:columnId];
+        }
+    }
+    else return nil;
 }
 
 // just returns the number of items we have.
 - (int)numberOfRowsInTableView:(NSTableView *)aTableView
 {
 	if(rdacTableView == aTableView)return 37;
+	else if(rdacReadBackTableView == aTableView)return 37;
+    else if(processLimitsTableView == aTableView)return 8;
 	else return 0;
 }
 
 - (void)tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
 {
-	if([[aTableColumn identifier] isEqualToString:@"Channel"]) return;
-	int board;
-	if([[aTableColumn identifier] isEqualToString:@"Board0"])board = 0;
-	else if([[aTableColumn identifier] isEqualToString:@"Board1"])board = 1;
-	else if([[aTableColumn identifier] isEqualToString:@"Board2"])board = 2;
-	else board = 3;
-	[model setRdac:rowIndex+(board*37) withValue:[anObject intValue]];
-	if(rowIndex+(board*37) == [model rdacChannel]){
-		[model setDacValue:[anObject intValue]];
-	}
+    if(anObject == nil)return;
+    
+    if(rdacTableView == aTableView){
+        if([[aTableColumn identifier] isEqualToString:@"Channel"]) return;
+        int board;
+        if([[aTableColumn identifier] isEqualToString:@"Board0"])board = 0;
+        else if([[aTableColumn identifier] isEqualToString:@"Board1"])board = 1;
+        else if([[aTableColumn identifier] isEqualToString:@"Board2"])board = 2;
+        else board = 3;
+        [model setRdac:rowIndex+(board*37) withValue:[anObject intValue]];
+        if(rowIndex+(board*37) == [model rdacChannel]){
+            [model setDacValue:[anObject intValue]];
+        }
+        [model writeDac:rowIndex+(board*37) value:[anObject intValue]];
+        [model readAllDacs];
+
+    }
+    else if(processLimitsTableView == aTableView){
+        id obj = [[model processLimits] objectAtIndex:rowIndex];
+		[[[self undoManager] prepareWithInvocationTarget:self] tableView:aTableView setObjectValue:[obj objectForKey:[aTableColumn identifier]] forTableColumn:aTableColumn row:rowIndex];
+		[obj setObject:anObject forKey:[aTableColumn identifier]];
+		[aTableView reloadData];
+
+    }
 }
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item
 {	
+    
+    [[self window] setContentView:blankView];
+    switch([tabView indexOfTabViewItem:item]){
+		case  0: [self resizeWindowToSize:setUpSize];	    break;
+		case  1: [self resizeWindowToSize:rdacSize];	    break;
+		case  2: [self resizeWindowToSize:trendSize];	    break;
+		case  3: [self resizeWindowToSize:processLimitsSize];	    break;
+            
+		default: [self resizeWindowToSize:normalSize];	    break;
+    }
+
     int index = [tabView indexOfTabViewItem:item];
-    [[NSUserDefaults standardUserDefaults] setInteger:index forKey:@"orca.Pac.selectedtab"];
+    [[NSUserDefaults standardUserDefaults] setInteger:index forKey:[NSString stringWithFormat:@"orca.Pac%d.selectedtab",[model uniqueIdNumber]]];
+    [[self window] setContentView:totalView];
 }
 
 #pragma mark •••Data Source
@@ -738,16 +865,6 @@
 	int index = count-i-1;
 	*yValue = [[model timeRate:set] valueAtIndex:index];
 	*xValue = [[model timeRate:set] timeSampledAtIndex:index];
-}
-
-#pragma  mark •••Delegate Responsiblities
-- (BOOL) outlineView:(NSOutlineView *)outlineView shouldEditTableColumn:(NSTableColumn *)tableColumn item:(id)item
-{
-    return NO;
-}
-- (BOOL) tableView:(NSTableView *)tableView shouldSelectRow:(int)row
-{
-	return YES;
 }
 
 - (IBAction) readRdacFileAction:(id)sender
@@ -821,6 +938,16 @@
 #endif
 }
 
+#pragma  mark •••Delegate Responsiblities
+- (BOOL) outlineView:(NSOutlineView *)outlineView shouldEditTableColumn:(NSTableColumn *)tableColumn item:(id)item
+{
+    return NO;
+}
+
+- (BOOL) tableView:(NSTableView *)tableView shouldSelectRow:(int)row
+{
+	return YES;
+}
 @end
 
 @implementation ORPacController (private)

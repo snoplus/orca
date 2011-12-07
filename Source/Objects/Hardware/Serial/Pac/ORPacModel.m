@@ -29,7 +29,9 @@
 #import "ORTimeRate.h"
 
 #pragma mark •••External Strings
-NSString* ORPacModelAlarmLevelChanged = @"ORPacModelAlarmLevelChanged";
+NSString* ORPacModelAdcChannelChanged = @"ORPacModelAdcChannelChanged";
+NSString* ORPacModelLcmChanged = @"ORPacModelLcChanged";
+NSString* ORPacModelProcessLimitsChanged = @"ORPacModelProcessLimitsChanged";
 NSString* ORPacModelRdacDisplayTypeChanged = @"ORPacModelRdacDisplayTypeChanged";
 NSString* ORPacModelSetAllRDacsChanged  = @"ORPacModelSetAllRDacsChanged";
 NSString* ORPacModelRdacChannelChanged  = @"ORPacModelRdacChannelChanged";
@@ -48,6 +50,7 @@ NSString* ORPacModelMultiPlotsChanged	= @"ORPacModelMultiPlotsChanged";
 NSString* ORPacModelLogToFileChanged	= @"ORPacModelLogToFileChanged";
 NSString* ORPacModelLogFileChanged		= @"ORPacModelLogFileChanged";
 NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
+NSString* ORPacModelRDacsReadBackChanged= @"ORPacModelRDacsReadBackChanged";
 
 @interface ORPacModel (private)
 - (void) timeout;
@@ -58,13 +61,17 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 - (void) _pollAllChannels;
 - (void) shipAdcValues;
 - (void) loadLogBuffer;
+- (void) setProcessLimitDefaults;
 @end
+
+#define kBadPacValue -999
 
 @implementation ORPacModel
 - (id) init
 {
 	self = [super init];
     [self registerNotificationObservers];
+    rdacBuffer = nil;
 	return self;
 }
 
@@ -77,12 +84,12 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 	[cmdQueue release];
 	[lastRequest release];
     [portName release];
-	[inComingData release];
     if([serialPort isOpen]){
         [serialPort close];
     }
 	[serialPort setDelegate:nil];
 	[serialPort release];
+	[inComingData release];
 	
     [logFile release];
 	[self _stopPolling];
@@ -91,7 +98,7 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 	for(i=0;i<8;i++){
 		[timeRates[i] release];
 	}
-	
+	[processLimits release];
 	[super dealloc];
 }
 
@@ -133,34 +140,88 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 }
 
 #pragma mark •••Accessors
-- (float) temperatureAlarmLevel:(int)index;
+- (int) calculateAdcChannel
 {
-	if(index>=0 && index<8)return temperatureAlarmLevel[index];
-	else return 100;
+    return module*8 + preAmp; 
 }
 
-- (void) setTemperatureAlarmLevel:(int)index value:(float)aTemperatureAlarmLevel;
+- (int) calculateModule
 {
-	if(index>=0 && index<8){
-		[[[self undoManager] prepareWithInvocationTarget:self] setTemperatureAlarmLevel:index value:temperatureAlarmLevel[index]];
-		temperatureAlarmLevel[index] = aTemperatureAlarmLevel;
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelAlarmLevelChanged object:self];
-	}	
+    return adcChannel%8;
 }
 
-- (float) leakageAlarmLevel:(int)index;
+- (int) calculatePreamp
 {
-	if(index>=0 && index<8) return leakageAlarmLevel[index];
-	else return 5;
+    return adcChannel/8;
 }
 
-- (void) setLeakageAlarmLevel:(int)index value:(float)aLeakageAlarmLevel;
+- (int) adcChannel
 {
-	if(index>=0 && index<8){
-		[[[self undoManager] prepareWithInvocationTarget:self] setLeakageAlarmLevel:index value:leakageAlarmLevel[index]];
-		leakageAlarmLevel[index] = aLeakageAlarmLevel;
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelAlarmLevelChanged object:self];
-	}
+    return adcChannel;
+}
+
+- (void) setAdcChannel:(int)aAdcChannel
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setAdcChannel:adcChannel];
+    
+    adcChannel = aAdcChannel;
+    module = [self calculateModule];
+    preAmp = [self calculateModule];
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelAdcChannelChanged object:self];
+}
+
+- (int) preAmp
+{
+    return preAmp;
+}
+
+- (void) setPreAmp:(int)aPreAmp
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setPreAmp:preAmp];
+    preAmp = aPreAmp;
+    adcChannel = [self calculateAdcChannel];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelPreAmpChanged object:self];
+}
+
+- (int) module
+{
+    return module;
+}
+
+- (void) setModule:(int)aModule
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setModule:module];
+    module = aModule;
+    adcChannel = [self calculateAdcChannel];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelModuleChanged object:self];
+}
+
+- (unsigned short) lcmTimeMeasured
+{
+    return lcmTimeMeasured;
+}
+
+- (unsigned short) lcm
+{
+    return lcm;
+}
+
+- (void) setLcm:(unsigned short)aLcm
+{
+    lcm = aLcm;
+    //get the time(UT!)
+    time_t	ut_Time;
+    time(&ut_Time);
+    //struct tm* theTimeGMTAsStruct = gmtime(&theTime);
+    lcmTimeMeasured = ut_Time;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelLcmChanged object:self];
+}
+
+- (NSMutableArray*) processLimits
+{
+    return processLimits;
 }
 
 - (NSString*) lastRdacFile
@@ -191,6 +252,11 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 	return [cmdQueue count];
 }
 
+- (BOOL) readingTemperatures
+{
+    return [self lcmEnabled]; //the logic got inverted somewhere. 
+}
+
 - (ORTimeRate*)timeRate:(int)index
 {
 	return timeRates[index];
@@ -208,6 +274,20 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 		[[[self undoManager] prepareWithInvocationTarget:self] setRdac:index withValue:rdac[index]];
 		rdac[index] = aValue;
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelRDacsChanged object:self];
+	}
+}
+
+- (int)  rdacReadBack:(int)index
+{
+	if(index>=0 && index<148)return rdacReadBack[index];
+	else return 0;
+}
+
+- (void) setRdacReadBack:(int)index withValue:(int)aValue
+{
+	if(index>=0 && index<148){
+		rdacReadBack[index] = aValue;
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelRDacsReadBackChanged object:self];
 	}
 }
 
@@ -248,30 +328,14 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
     [[[self undoManager] prepareWithInvocationTarget:self] setLcmEnabled:lcmEnabled];
     lcmEnabled = aLcmEnabled;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelLcmEnabledChanged object:self];
-}
-
-- (int) preAmp
-{
-    return preAmp;
-}
-
-- (void) setPreAmp:(int)aPreAmp
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setPreAmp:preAmp];
-    preAmp = aPreAmp;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelPreAmpChanged object:self];
-}
-
-- (int) module
-{
-    return module;
-}
-
-- (void) setModule:(int)aModule
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setModule:module];
-    module = aModule;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelModuleChanged object:self];
+    if(![self readingTemperatures]){
+        [[ORGlobal sharedGlobal] addRunVeto:@"LCM Enabled" comment:@"Leakage Current Measurement Enabled in PAC Board"];
+        NSLog(@"%@ put run veto in place for leakage current measurement.\n",[self fullID]);
+    }
+    else {
+        [[ORGlobal sharedGlobal] removeRunVeto:@"LCM Enabled"];
+        NSLog(@"%@ removed leakage current measurement veto.\n",[self fullID]);
+    }
 }
 
 - (int) dacValue
@@ -288,17 +352,36 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelDacValueChanged object:self];
 }
 
+- (float) lcmVoltage
+{
+	return 5.0 * lcm/65535.0;
+}
+
 - (float) adcVoltage:(int)index
 {
 	if(index<0 && index>=8)return 0.0;
 	else return 5.0 * adc[index]/65535.0;
 }
 
+- (float) convertedLcm
+{
+ 	float theValue = kBadPacValue; //a 'bad' value as default
+	@synchronized (self){
+        if(![self readingTemperatures]){
+            float leakageCurrentConstants[2] = {1.0	,	0.0};
+            float voltage = [self lcmVoltage];
+            theValue = voltage * leakageCurrentConstants[0] + leakageCurrentConstants[1];
+        }
+    }
+    return theValue;
+}
+
 - (float) convertedAdc:(int)index
 {
-	float theValue = 0.0;
+	float theValue = kBadPacValue; //a 'bad' value as default
 	@synchronized (self){
-		if(index<0 && index>=8)return 0.0;
+		if(index<0 && index>8)return 0.0;
+                
 		float temperatureConstants[8][2] = {
 			{100.0	,	-50.0},
 			{1.0	,	0.0},
@@ -309,23 +392,15 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 			{86.141	,	-100},
 			{1.0	,	0.0},
 		};
-		float leakageCurrentConstants[8][2] = {
-			{1.0	,	0.0},
-			{1.0	,	0.0},
-			{1.0	,	0.0},
-			{1.0	,	0.0},
-			{1.0	,	0.0},
-			{1.0	,	0.0},
-			{1.0	,	0.0},
-			{1.0	,	0.0},
-		};
+        
 		float voltage = [self adcVoltage:index];
-		if(!lcmEnabled) theValue = voltage * leakageCurrentConstants[index][0] + leakageCurrentConstants[index][1];
-		else		    theValue = voltage * temperatureConstants[index][0] + temperatureConstants[index][1];
+		if(index>=0 && index<8) {
+            theValue = voltage * temperatureConstants[index][0] + temperatureConstants[index][1];
+            if(index==0 && ![self readingTemperatures]) theValue = kBadPacValue;
+        }
 	}
 	return theValue;
 }
-
 
 - (unsigned short) adc:(int)index
 {
@@ -346,7 +421,6 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelAdcChanged 
 															object:self 
 														userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:index] forKey:@"Index"]];
-
 
 		if(timeRates[index] == nil) timeRates[index] = [[ORTimeRate alloc] init];
 		[timeRates[index] addDataToTimeAverage:[self convertedAdc:index]];
@@ -436,7 +510,13 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
     }
     else      [serialPort close];
     portWasOpen = [serialPort isOpen];
+    
     [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelPortStateChanged object:self];
+}
+
+- (BOOL) isConnected
+{
+    return [serialPort isOpen];
 }
 
 - (NSString*) logFile
@@ -500,33 +580,37 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 - (id) initWithCoder:(NSCoder*)decoder
 {
 	self = [super initWithCoder:decoder];
+    rdacBuffer = nil;
+
 	[[self undoManager] disableUndoRegistration];
-	int i;
-	for(i=0;i<8;i++){
-		[self setTemperatureAlarmLevel:i	value:[decoder decodeFloatForKey:[NSString stringWithFormat:@"temperatureAlarmLevel%d",i]]];
-		[self setLeakageAlarmLevel:i		value:[decoder decodeFloatForKey:[NSString stringWithFormat:@"leakageAlarmLevel%d",i]]];
-	}
-	[self setLastRdacFile:	[decoder decodeObjectForKey:@"lastRdacFile"]];
-	[self setRdacDisplayType:[decoder decodeIntForKey:@"rdacDisplayType"]];
-	[self setSetAllRDacs:	[decoder decodeBoolForKey:		 @"ORPacModelSetAllRDacs"]];
+    
+    processLimits = [[decoder decodeObjectForKey:@"processLimits"]retain];
+    if(!processLimits)[self setProcessLimitDefaults];
+    //--------------------------------------------------------------
+	[self setLastRdacFile:	[decoder decodeObjectForKey: @"lastRdacFile"]];
+	[self setRdacDisplayType:[decoder decodeIntForKey:   @"rdacDisplayType"]];
+	[self setSetAllRDacs:	[decoder decodeBoolForKey:	 @"ORPacModelSetAllRDacs"]];
 	[self setRdacChannel:	[decoder decodeIntForKey:	 @"ORPacModelRdacChannel"]];
 	[self setLcmEnabled:	[decoder decodeBoolForKey:	 @"ORPacModelLcmEnabled"]];
 	[self setPreAmp:		[decoder decodeIntForKey:	 @"ORPacModelPreAmp"]];
 	[self setModule:		[decoder decodeIntForKey:	 @"ORPacModelModule"]];
 	[self setDacValue:		[decoder decodeIntForKey:	 @"dacValue"]];
 	[self setPortWasOpen:	[decoder decodeBoolForKey:	 @"portWasOpen"]];
-    [self setPortName:		[decoder decodeObjectForKey: @"portName"]];
 	[self setPollingState:	[decoder decodeIntForKey:	 @"pollingState"]];
 	[self setLogFile:		[decoder decodeObjectForKey: @"logFile"]];
     [self setLogToFile:		[decoder decodeBoolForKey:	 @"logToFile"]];
+	[self setAdcChannel:    [decoder decodeIntForKey:    @"ORPacModelAdcChannel"]];
 	
-
+    int i;
 	for(i=0;i<8;i++){
 		timeRates[i] = [[ORTimeRate alloc] init];
 	}
 	for(i=0;i<148;i++){
 		[self setRdac:i withValue: [decoder decodeIntForKey:[NSString stringWithFormat:@"rdac%d",i]]];
 	}
+    
+    [self setPortName:		[decoder decodeObjectForKey: @"portName"]];
+    
 	[[self undoManager] enableUndoRegistration];
     [self registerNotificationObservers];
 
@@ -536,25 +620,22 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-	int i;
-	for(i=0;i<8;i++){
-		[encoder encodeFloat:temperatureAlarmLevel[i] forKey:[NSString stringWithFormat:@"temperatureAlarmLevel%d",i]];
-		[encoder encodeFloat:leakageAlarmLevel[i]     forKey:[NSString stringWithFormat:@"leakageAlarmLevel%d",i]];
-	}
-    [encoder encodeObject:lastRdacFile forKey:@"lastRdacFile"];
-    [encoder encodeInt:rdacDisplayType forKey:@"rdacDisplayType"];
+    [encoder encodeObject:processLimits     forKey:@"processLimits"];
+    [encoder encodeObject:lastRdacFile  forKey:@"lastRdacFile"];
+    [encoder encodeInt:rdacDisplayType  forKey:@"rdacDisplayType"];
     [encoder encodeBool:setAllRDacs		forKey:@"ORPacModelSetAllRDacs"];
     [encoder encodeInt:rdacChannel		forKey:@"ORPacModelRdacChannel"];
     [encoder encodeBool:lcmEnabled		forKey:@"ORPacModelLcmEnabled"];
     [encoder encodeInt:preAmp			forKey:@"ORPacModelPreAmp"];
     [encoder encodeInt:module			forKey:@"ORPacModelModule"];
-    [encoder encodeInt:dacValue			forKey: @"dacValue"];
-    [encoder encodeBool:portWasOpen		forKey: @"portWasOpen"];
-    [encoder encodeObject:portName		forKey: @"portName"];
+    [encoder encodeInt:dacValue			forKey:@"dacValue"];
+    [encoder encodeBool:portWasOpen		forKey:@"portWasOpen"];
+    [encoder encodeObject:portName		forKey:@"portName"];
     [encoder encodeInt:pollingState		forKey:@"pollingState"];
     [encoder encodeObject:logFile		forKey:@"logFile"];
     [encoder encodeBool:logToFile		forKey:@"logToFile"];
-	
+    [encoder encodeInt:adcChannel       forKey:@"ORPacModelAdcChannel"];
+	int i;
 	for(i=0;i<148;i++){
 		[encoder encodeInt:rdac[i] forKey: [NSString stringWithFormat:@"rdac%d",i]];
 	}
@@ -562,59 +643,37 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 
 
 #pragma mark ••• Commands
-- (void) enqueLcmEnable
+- (void) writeLcmEnable
 {
     if([serialPort isOpen]){ 
 		char cmdData[2];
 		cmdData[0] = kPacLcmEnaCmd;
 		cmdData[1] = ([self lcmEnabled]?kPacLcmEnaSet:kPacLcmEnaClr);
-		[self enqueCmdData:[NSData dataWithBytes:cmdData length:2]];
+		[self writeCmdData:[NSData dataWithBytes:cmdData length:2]];
 	}
 }
-- (void) enqueModuleSelect
+- (void) writeModuleSelect
 {
     if([serialPort isOpen]){ 
 		char cmdData[2];
 		cmdData[0] = kPacSelCmd; //module select
 		cmdData[1] = (module << 3) | (preAmp & 0x7);
-		[self enqueCmdData:[NSData dataWithBytes:cmdData length:2]];
+		[self writeCmdData:[NSData dataWithBytes:cmdData length:2]];
 	}
 }
 
-- (void) enqueReadADC:(int)aChannel
+- (void) writeReadADC:(int)aChannel
 {
     if([serialPort isOpen]){ 
 		char cmdData[2];
 		cmdData[0] = kPacADCmd;		
 		cmdData[1] = aChannel;
-		[self enqueCmdData:[NSData dataWithBytes:cmdData length:2]];
+		[self writeCmdData:[NSData dataWithBytes:cmdData length:2]];
 	}
 }
 
-- (void) enqueWriteDac
-{
-    if([serialPort isOpen]){ 
-		if([self setAllRDacs]){
-			char cmdData[5];
-			cmdData[0] = kPacRDacCmd;
-			cmdData[1] = kPacRDacWriteAll;
-			cmdData[2] = 0x10 | ((dacValue & 0xf0)>>4);
-			cmdData[3] = (dacValue & 0x0f)<<4;
-			[self enqueCmdData:[NSData dataWithBytes:cmdData length:4]];
-		}
-		else {
-			char cmdData[5];
-			cmdData[0] = kPacRDacCmd;
-			cmdData[1] = kPacRDacWriteOneRDac;
-			cmdData[2] = rdacChannel+1;
-			cmdData[3] = 0x10 | ((dacValue & 0xf0)>>4);
-			cmdData[4] = (dacValue & 0x0f)<<4;
-			[self enqueCmdData:[NSData dataWithBytes:cmdData length:5]];
-		}
-	}
-}
 
-- (void) enqueWriteRdac:(int)index
+- (void) writeOneRdac:(int)index
 {
     if([serialPort isOpen]){ 
 		if(index>=0 && index<148){
@@ -624,34 +683,46 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 			cmdData[2] = index+1;
 			cmdData[3] = 0x10 | ((rdac[index] & 0xf0)>>4);
 			cmdData[4] = (rdac[index] & 0x0f)<<4;
-			[self enqueCmdData:[NSData dataWithBytes:cmdData length:5]];
+			[self writeCmdData:[NSData dataWithBytes:cmdData length:5]];
 		}
 	}
 }
 
 
-- (void) enqueReadDac
+- (void) writeReadDac
 {
     if([serialPort isOpen]){ 
-
 		char cmdData[3];
 		cmdData[0] = kPacRDacCmd;
 		cmdData[1] = kPacRDacReadOneRDac;
 		cmdData[2] = rdacChannel+1;
-		[self enqueCmdData:[NSData dataWithBytes:cmdData length:3]];
+		[self writeCmdData:[NSData dataWithBytes:cmdData length:3]];
 	}
 }
 
-- (void) enqueShipCmd
+- (void) writeReadAllDac
+{
+    if([serialPort isOpen]){ 
+		char cmdData[3];
+		cmdData[0] = kPacRDacCmd;
+		cmdData[1] = kPacRDacReadAll;
+        
+        
+		[self writeCmdData:[NSData dataWithBytes:cmdData length:2]];
+	}
+}
+
+
+- (void) writeShipCmd
 {
     if([serialPort isOpen]){ 
 		
 		char theCommand = kPacShipAdcs;
-		[self enqueCmdData:[NSData dataWithBytes:&theCommand length:1]];
+		[self writeCmdData:[NSData dataWithBytes:&theCommand length:1]];
 	}
 }
 
-- (void) enqueCmdData:(NSData*)someData
+- (void) writeCmdData:(NSData*)someData
 {
 	if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
 	[cmdQueue addObject:someData];
@@ -661,45 +732,73 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 
 - (void) selectModule
 {
-	[self enqueModuleSelect];
+	[self writeModuleSelect];
 }
 
 - (void) readAdcs
 {
 	@synchronized (self){
 		int i;
-		
-		//----------------------------
-		//temp for testing
-		//for(i=0;i<8;i++){
-		//	[self setAdc:[self adc:i]+1 value:65535./(float)i];
-		//}
-		//[self loadLogBuffer];
-		//----------------------------
-		
-		[self enqueLcmEnable];
-		[self enqueModuleSelect];
+		[self writeLcmEnable];
+		[self writeModuleSelect];
 		for(i=0;i<8;i++){
-			[self enqueReadADC:i];
+			[self writeReadADC:i];
 		}
-		[self enqueShipCmd];
+		[self writeShipCmd];
 	}
 }
 
 - (void) writeDac
 {
-	[self enqueWriteDac];
-	if(setAllRDacs){
-		int i;
-		for(i=0;i<148;i++){
-			[self setRdac:i withValue:[self dacValue]];
+    if([serialPort isOpen]){ 
+		if([self setAllRDacs]){
+			char cmdData[5];
+			cmdData[0] = kPacRDacCmd;
+			cmdData[1] = kPacRDacWriteAll;
+			cmdData[2] = 0x10 | ((dacValue & 0xf0)>>4);
+			cmdData[3] = (dacValue & 0x0f)<<4;
+			[self writeCmdData:[NSData dataWithBytes:cmdData length:4]];
 		}
-	}
+		else {
+			char cmdData[5];
+			cmdData[0] = kPacRDacCmd;
+			cmdData[1] = kPacRDacWriteOneRDac;
+			cmdData[2] = rdacChannel+1;
+			cmdData[3] = 0x10 | ((dacValue & 0xf0)>>4);
+			cmdData[4] = (dacValue & 0x0f)<<4;
+			[self writeCmdData:[NSData dataWithBytes:cmdData length:5]];
+		}
+        
+        [self readAllDacs];
+        
+        if(setAllRDacs){
+            int i;
+            for(i=0;i<148;i++){
+                [self setRdac:i withValue:[self dacValue]];
+            }
+        }
+    }
+}
+
+- (void) writeDac:(int)aChannel value:(int)aValue
+{
+    char cmdData[5];
+    cmdData[0] = kPacRDacCmd;
+    cmdData[1] = kPacRDacWriteOneRDac;
+    cmdData[2] = aChannel+1;
+    cmdData[3] = 0x10 | ((aValue & 0xf0)>>4);
+    cmdData[4] = (aValue & 0x0f)<<4;
+    [self writeCmdData:[NSData dataWithBytes:cmdData length:5]];
 }
 
 - (void) readDac
 {
-	[self enqueReadDac];
+	[self writeReadDac];
+}
+
+- (void) readAllDacs
+{
+	[self writeReadAllDac];
 }
 
 #pragma mark •••Data Records
@@ -751,19 +850,25 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 		char* theCmd = (char*)[lastRequest bytes];
 		switch (theCmd[0]){
 			case kPacADCmd:
-				if([inComingData length] == 3) {
+				if([inComingData length] >= 3) {
 					unsigned char* theData	 = (unsigned char*)[inComingData bytes];
 					short theChannel = theCmd[1] & 0x7;
 					short msb		 = theData[0];
 					short lsb		 = theData[1];
-					if(theData[2] == kPacOkByte) [self setAdc:theChannel value: msb<<8 | lsb];
-					else						 NSLogError(@"PAC",@"ADC !OK",nil);
+					if(theData[2] == kPacOkByte) {
+                        if(theChannel==0){
+                            if([self readingTemperatures])  [self setAdc:theChannel value: msb<<8 | lsb];
+                            else [self setLcm: msb<<8 | lsb];
+                        }
+                        else [self setAdc:theChannel value: msb<<8 | lsb];
+                    }
+					else NSLogError(@"PAC",@"ADC !OK",nil);
 					done = YES;
 				}
 			break;
 				
 			case kPacSelCmd:
-				if([inComingData length] == 1) {
+				if([inComingData length] >= 1) {
 					unsigned char* theData	 = (unsigned char*)[inComingData bytes];
 					if(theData[0] != kPacOkByte)  NSLogError(@"PAC",@"Port D !OK",nil);
 					done = YES;
@@ -772,44 +877,66 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 				
 			case kPacRDacCmd:
 				if(theCmd[1] == kPacRDacReadOneRDac){
-					if([inComingData length] == 3) {
+					if([inComingData length] >= 3) {
 						unsigned char* theData	 = (unsigned char*)[inComingData bytes];
 						short msb		 = (theData[0]&0xf)<<4;
 						short lsb		 = (theData[1]&0xf0)>>4;
 						if(theData[2] == kPacOkByte) NSLog(@"0x%x\n",msb | lsb);
-						else						 NSLogError(@"PAC",@"DAC !OK",nil);
+						else NSLogError(@"PAC",@"DAC !OK",nil);
 						done = YES;
 					}
 				}
+				else if(theCmd[1] == kPacRDacReadAll){
+                    unsigned char* ptr	 = (unsigned char*)[inComingData bytes];
+                    int i;  
+                    unsigned len = [inComingData length];
+                    if(len >= 297) {
+                        if(ptr[296] == kPacOkByte){
+                            for(i=0;i<len-1;i+=2){
+                                short msb		 = (ptr[i]&0xf)<<4;
+                                short lsb		 = (ptr[i+1]&0xf0)>>4;
+                                rdacReadBack[147-i/2] = msb|lsb;
+                            }
+                            [self setRdacReadBack:0 withValue:rdacReadBack[0]]; //side effect -- force refresh
+                        }
+                        else if(ptr[296]==kPacErrorByte){
+                            NSLogError(@"PAC",@"DAC !OK",nil);
+                        }
+                        done = YES;
+                    }
+ 				}
 				else if(theCmd[1] == kPacRDacWriteOneRDac){
-					if([inComingData length] == 1) {
+					if([inComingData length] >= 1) {
 						unsigned char* theData	 = (unsigned char*)[inComingData bytes];
 						if(theData[0] != kPacOkByte) NSLogError(@"PAC",@"DAC !OK",nil);
 						done = YES;
 					}
 				}
 				else if(theCmd[1] == kPacRDacWriteAll){
-					if([inComingData length] == 1) {
+					if([inComingData length] >= 1) {
 						unsigned char* theData	 = (unsigned char*)[inComingData bytes];
 						if(theData[0] != kPacOkByte) NSLogError(@"PAC",@"DAC !OK",nil);
 						done = YES;
 					}
 				}
-				
 			break;
 				
 			case kPacLcmEnaCmd:
-				if([inComingData length] == 1) {
+				if([inComingData length] >= 1) {
 					unsigned char* theData	 = (unsigned char*)[inComingData bytes];
 					if(theData[0] != kPacOkByte)  NSLogError(@"PAC",@"LCM ENA !OK",nil);
 					done = YES;
 				}
 			break;
+                
+            default:
+                done = YES;
+            break;
 		}
 		
 		if(done){
-			[inComingData release];
-			inComingData = nil;
+            [inComingData release];
+            inComingData = nil;
 			[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
 			[self setLastRequest:nil];			 //clear the last request
 			[self processOneCommandFromQueue];	 //do the next command in the queue
@@ -862,6 +989,7 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 {
     return pollingState;
 }
+
 - (void) readRdacFile:(NSString*) aPath
 {
 	NSString* contents = [NSString stringWithContentsOfFile:[aPath stringByExpandingTildeInPath] encoding:NSASCIIStringEncoding error:nil];
@@ -947,11 +1075,51 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 	return s;
 }
 
+- (NSString*)adcName:(int)aChan
+{
+    switch (aChan){
+        case 0: return @"Gen Temp"; 
+        case 1: return @"Bias V."; 
+        case 2: return @"Free"; 
+        case 3: return @"Free"; 
+        case 4: return @"Free"; 
+        case 5: return @"Free"; 
+        case 6: return @"PreAmp T"; 
+        case 7: return @"Carrousel T"; 
+        default: return @"";
+    }
+}
+
+- (NSString*)processName:(int)aChan
+{
+    switch (aChan){
+        case 0: return @"Gen Temp"; 
+        case 1: return @"Bias V."; 
+        case 2: return @"PreAmp T"; 
+        case 3: return @"Carrousel T"; 
+        case 4: return @"LCM"; 
+        case 5: return @"Module"; 
+        case 6: return @"PreAmp"; 
+        case 7: return @"Adc Chan"; 
+        default: return @"";
+    }
+}
+
 - (double) convertedValue:(int)aChan
 {
 	double theValue;
 	@synchronized(self){
-		theValue = 	[self convertedAdc:aChan];
+        switch (aChan){
+            case 0: theValue =  [self convertedAdc:0];  break;
+            case 1: theValue =  [self convertedAdc:1];  break;
+            case 2: theValue =  [self convertedAdc:6];  break;
+            case 3: theValue =  [self convertedAdc:7];  break;
+            case 4: theValue =  [self lcm];             break;
+            case 5: theValue =  [self module];          break;
+            case 6: theValue =  [self preAmp];          break;
+            case 7: theValue =  [self adcChannel];      break;
+            default:theValue = 0;                       break;
+        }
 	}
 	return theValue;
 }
@@ -960,22 +1128,37 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 {
 	double theValue;
 	@synchronized(self){
-		theValue = (double)100.0; //just set to the max value for now
+        if(aChan>=0 && aChan<8) theValue = [[[processLimits objectAtIndex:aChan] objectForKey:@"HiLimit"]doubleValue];
+		else         theValue = 100.0;
 	}
 	return theValue;
 }
 
 - (double) minValueForChan:(int)aChan
 {
-	return 0;
+	double theValue;
+	@synchronized(self){
+        if(aChan>=0 && aChan<8) theValue = [[[processLimits objectAtIndex:aChan] objectForKey:@"LoLimit"]doubleValue];
+		else         theValue = 100.0;
+	}
+	return theValue;
 }
 
-- (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit channel:(int)channel
+- (void) getAlarmRangeLow:(double*)theLoAlarm high:(double*)theHighAlarm channel:(int)aChan
 {
 	@synchronized(self){
-		*theLowLimit = -.001;
-		if(![self lcmEnabled]) *theHighLimit = [self leakageAlarmLevel:channel]; 
-		else				   *theHighLimit = [self temperatureAlarmLevel:channel];
+        if([self convertedValue:aChan] == kBadPacValue){
+            *theLoAlarm = -999;
+            *theHighAlarm = 999999;
+        }
+        else if(aChan>=0 && aChan<8) {
+            *theLoAlarm = [[[processLimits objectAtIndex:aChan] objectForKey:@"LoAlarm"]doubleValue];
+            *theHighAlarm = [[[processLimits objectAtIndex:aChan] objectForKey:@"HiAlarm"]doubleValue];
+        }
+        else {
+            *theHighAlarm = 100;
+            *theLoAlarm = -.001;
+        }
 	}		
 }
 
@@ -983,8 +1166,9 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 {
 	BOOL r;
 	@synchronized(self){
-		r = YES;    //temp -- figure out what the process bool for this object should be.
-	}
+        if(channel==0)return [self isConnected];
+        else return NO;
+    }
 	return r;
 }
 
@@ -996,6 +1180,77 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 @end
 
 @implementation ORPacModel (private)
+- (void) setProcessLimitDefaults
+{
+    [processLimits release];
+    processLimits = [[NSMutableArray array] retain];
+    NSMutableDictionary* entry;
+    //entry 0 Gen Temp
+    entry = [NSDictionary dictionaryWithObjectsAndKeys:
+             [NSNumber numberWithFloat:-50],@"LoAlarm",  
+             [NSNumber numberWithFloat:100],@"HiAlarm", 
+             [NSNumber numberWithFloat:-30],@"LoLimit",  
+             [NSNumber numberWithFloat:70], @"HiLimit", 
+             nil];
+    [processLimits addObject:entry];
+    //entry 1 Bias V
+    entry = [NSDictionary dictionaryWithObjectsAndKeys:
+             [NSNumber numberWithFloat:-50],@"LoAlarm",  
+             [NSNumber numberWithFloat:100],@"HiAlarm", 
+             [NSNumber numberWithFloat:-30],@"LoLimit",  
+             [NSNumber numberWithFloat:70], @"HiLimit", 
+             nil];
+    [processLimits addObject:entry];
+    //entry 2 PreAmp T
+    entry = [NSDictionary dictionaryWithObjectsAndKeys:
+             [NSNumber numberWithFloat:-50],@"LoAlarm",  
+             [NSNumber numberWithFloat:100],@"HiAlarm", 
+             [NSNumber numberWithFloat:-30],@"LoLimit",  
+             [NSNumber numberWithFloat:70], @"HiLimit", 
+             nil];
+    [processLimits addObject:entry];
+    //entry 3 Carrousel T
+    entry = [NSDictionary dictionaryWithObjectsAndKeys:
+             [NSNumber numberWithFloat:-50],@"LoAlarm",  
+             [NSNumber numberWithFloat:100],@"HiAlarm", 
+             [NSNumber numberWithFloat:-30],@"LoLimit",  
+             [NSNumber numberWithFloat:70], @"HiLimit", 
+             nil];
+    [processLimits addObject:entry];
+    //entry 4 LCM
+    entry = [NSDictionary dictionaryWithObjectsAndKeys:
+             [NSNumber numberWithFloat:-1],@"LoAlarm",  
+             [NSNumber numberWithFloat:5],@"HiAlarm", 
+             [NSNumber numberWithFloat:0],@"LoLimit",  
+             [NSNumber numberWithFloat:5], @"HiLimit", 
+             nil];
+    [processLimits addObject:entry];
+    //entry 5 Module
+    entry = [NSDictionary dictionaryWithObjectsAndKeys:
+             [NSNumber numberWithFloat:-1],@"LoAlarm",  
+             [NSNumber numberWithFloat:32],@"HiAlarm", 
+             [NSNumber numberWithFloat:0],@"LoLimit",  
+             [NSNumber numberWithFloat:31], @"HiLimit", 
+             nil];
+    [processLimits addObject:entry];
+    //entry 6 Preamp
+    entry = [NSDictionary dictionaryWithObjectsAndKeys:
+             [NSNumber numberWithFloat:-1],@"LoAlarm",  
+             [NSNumber numberWithFloat:8],@"HiAlarm", 
+             [NSNumber numberWithFloat:0],@"LoLimit",  
+             [NSNumber numberWithFloat:7], @"HiLimit", 
+             nil];
+    [processLimits addObject:entry];
+    //entry 7 Adc Chan
+    entry = [NSDictionary dictionaryWithObjectsAndKeys:
+             [NSNumber numberWithFloat:-1],@"LoAlarm",  
+             [NSNumber numberWithFloat:148],@"HiAlarm", 
+             [NSNumber numberWithFloat:0],@"LoLimit",  
+             [NSNumber numberWithFloat:147], @"HiLimit", 
+             nil];
+    [processLimits addObject:entry];
+}
+
 - (void) shipAdcValues
 {
     if([[ORGlobal sharedGlobal] runInProgress]){
@@ -1039,6 +1294,7 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 	[cmdQueue removeAllObjects]; //if we timeout we just flush the queue
     [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelQueCountChanged object: self];
 	//[self processOneCommandFromQueue];	 //do the next command in the queue
+    rdacIndex = 0;
 }
 
 - (void) processOneCommandFromQueue

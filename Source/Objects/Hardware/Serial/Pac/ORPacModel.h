@@ -19,6 +19,8 @@
 
 #pragma mark •••Imported Files
 #import "ORAdcProcessing.h"
+#import "ORBitProcessing.h"
+#import "ORSerialDeviceModel.h"
 
 @class ORSerialPort;
 @class ORTimeRate;
@@ -52,7 +54,7 @@
 #define kPacOkByte				0xf0
 #define kPacErrorByte			0x0f
 
-@interface ORPacModel : OrcaObject <ORAdcProcessing>
+@interface ORPacModel : ORSerialDeviceModel <ORAdcProcessing,ORBitProcessing>
 {
     @private
         NSString*			portName;
@@ -62,8 +64,8 @@
 		NSData*				lastRequest;
 		NSMutableArray*		cmdQueue;
 		NSMutableString*    buffer;
+        unsigned short		adc[8];
 		unsigned long		timeMeasured[8];
-		unsigned short		adc[8];
 		ORTimeRate*			timeRates[8];
 		NSMutableData*		inComingData;
 		int					module;
@@ -72,7 +74,8 @@
 		int					rdacChannel;
 		int					dacValue;
 		BOOL				setAllRDacs;
-		int					rdac[148];
+        int					rdac[148];
+        int					rdacReadBack[148];
 		BOOL				pollRunning;
 		NSTimeInterval		pollingState;
 		BOOL				logToFile;
@@ -82,8 +85,12 @@
 		int					rdacDisplayType;
 		NSString*			lastRdacFile;
         BOOL                readOnce;
-		float				leakageAlarmLevel[8];
-		float				temperatureAlarmLevel[8];
+        NSMutableArray*     processLimits;    
+        int                 rdacIndex;
+        NSMutableData*      rdacBuffer;
+        unsigned short      lcm;
+        unsigned short      lcmTimeMeasured;
+        int                 adcChannel;
 }
 
 #pragma mark •••Initialization
@@ -93,10 +100,16 @@
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark •••Accessors
-- (float) temperatureAlarmLevel:(int)index;
-- (void) setTemperatureAlarmLevel:(int)index value:(float)aTemperatureAlarmLevel;
-- (float) leakageAlarmLevel:(int)index;
-- (void) setLeakageAlarmLevel:(int)index value:(float)aLeakageAlarmLevel;
+- (int) calculateAdcChannel;
+- (int) calculateModule;
+- (int) calculatePreamp;
+- (int) adcChannel;
+- (void) setAdcChannel:(int)aAdcChannel;
+- (unsigned short) lcmTimeMeasured;
+- (unsigned short) lcm;
+- (void) setLcm:(unsigned short)aLc;
+- (BOOL) isConnected;
+- (BOOL) readingTemperatures;
 - (NSString*) lastRdacFile;
 - (void) setLastRdacFile:(NSString*)aLastRdacFile;
 - (int) rdacDisplayType;
@@ -106,6 +119,8 @@
 - (NSTimeInterval) pollingState;
 - (int)  rdac:(int)index;
 - (void) setRdac:(int)index withValue:(int)aValue;
+- (int)  rdacReadBack:(int)index;
+- (void) setRdacReadBack:(int)index withValue:(int)aValue;
 - (BOOL) setAllRDacs;
 - (void) setSetAllRDacs:(BOOL)aSetAllRDacs;
 - (int) rdacChannel;
@@ -130,7 +145,9 @@
 - (unsigned short) adc:(int)index;
 - (unsigned long) timeMeasured:(int)index;
 - (void) setAdc:(int)index value:(unsigned short)aValue;
+- (float) lcmVoltage;
 - (float) adcVoltage:(int)index;
+- (float) convertedLcm;
 - (float) convertedAdc:(int)index;
 - (NSString*) logFile;
 - (void) setLogFile:(NSString*)aLogFile;
@@ -147,19 +164,20 @@
 - (void) syncDataIdsWith:(id)anotherPac;
 - (void) writeDac;
 - (void) readDac;
+- (void) readAllDacs;
 - (void) selectModule;
 - (void) writeLogBufferToFile;
 
 #pragma mark •••Commands
-- (void) enqueCmdData:(NSData*)someData;
-- (void) enqueReadADC:(int)aChannel;
-- (void) enqueWriteDac;
-- (void) enqueReadDac;
-- (void) enqueLcmEnable;
-- (void) enqueModuleSelect;
-- (void) enqueWriteRdac:(int)index;
-
-- (void) enqueShipCmd;
+- (void) writeCmdData:(NSData*)someData;
+- (void) writeReadADC:(int)aChannel;
+- (void) writeReadDac;
+- (void) writeLcmEnable;
+- (void) writeModuleSelect;
+- (void) writeOneRdac:(int)index;
+- (void) writeReadAllDac;
+- (void) writeDac:(int)aChannel value:(int)aValue;
+- (void) writeShipCmd;
 - (void) readAdcs;
 
 - (id)   initWithCoder:(NSCoder*)decoder;
@@ -167,6 +185,9 @@
 - (void) serialPortWriteProgress:(NSDictionary *)dataDictionary;
 - (void) readRdacFile:(NSString*) aPath;
 - (void) saveRdacFile:(NSString*) aPath;
+- (NSMutableArray*) processLimits;
+- (NSString*)processName:(int)aChan;
+- (NSString*)adcName:(int)aChan;
 
 #pragma mark •••Adc Processing Protocol
 - (void)processIsStarting;
@@ -179,15 +200,15 @@
 - (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit  channel:(int)channel;
 - (double) convertedValue:(int)channel;
 - (double) maxValueForChan:(int)channel;
-
-
 @end
 
 @interface NSObject (ORHistModel)
 - (void) removeFrom:(NSMutableArray*)anArray;
 @end
 
-extern NSString* ORPacModelAlarmLevelChanged;
+extern NSString* ORPacModelAdcChannelChanged;
+extern NSString* ORPacModelLcmChanged;
+extern NSString* ORPacModelProcessLimitsChanged;
 extern NSString* ORPacModelRdacDisplayTypeChanged;
 extern NSString* ORPacModelSetAllRDacsChanged;
 extern NSString* ORPacModelRdacChannelChanged;
@@ -201,9 +222,11 @@ extern NSString* ORPacModelPortNameChanged;
 extern NSString* ORPacModelPortStateChanged;
 extern NSString* ORPacModelAdcChanged;
 extern NSString* ORPacModelRDacsChanged;
+extern NSString* ORPacModelRDacReadBacksChanged;
 extern NSString* ORPacModelMultiPlotsChanged;
 extern NSString* ORPacModelPollingStateChanged;
 extern NSString* ORPacModelLogToFileChanged;
 extern NSString* ORPacModelLogFileChanged;
 extern NSString* ORPacModelQueCountChanged;
+extern NSString* ORPacModelRDacsReadBackChanged;
 

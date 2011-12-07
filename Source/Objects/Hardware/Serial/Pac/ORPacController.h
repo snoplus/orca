@@ -19,14 +19,13 @@
 
 #pragma mark •••Imported Files
 @class ORCompositeTimeLineView;
+@class ORValueBarGroupView;
 
 @interface ORPacController : OrcaObjectController
 {
 	IBOutlet NSTabView*		tabView;
-	IBOutlet NSMatrix*		alarmLevelMatrix;
+	IBOutlet NSTextField*   adcChannelField;
 	IBOutlet NSMatrix*		rdacDisplayTypeMatrix;
-	IBOutlet NSTableView*	rdacTableView;
-    IBOutlet NSTextField*   lockDocField;
 	IBOutlet NSButton*		setAllRDacsButton;
 	IBOutlet NSTextField*	cmdQueCountField;
 	IBOutlet NSTextField*	rdacChannelTextField;
@@ -38,13 +37,16 @@
     IBOutlet NSPopUpButton* portListPopup;
     IBOutlet NSButton*      openPortButton;
     IBOutlet NSButton*      readAdcsButton;
-    IBOutlet NSButton*      writeLcmButton;
+    IBOutlet NSMatrix*      channelMatrix;
+    IBOutlet NSMatrix*      adcNameMatrix;
     IBOutlet NSMatrix*      adcMatrix;
     IBOutlet NSMatrix*      timeMatrix;
     IBOutlet NSButton*      writeDacButton;
     IBOutlet NSButton*      readDacButton;
     IBOutlet NSButton*      selectModuleButton;
     IBOutlet NSMatrix*      lcmEnabledMatrix;
+
+    IBOutlet NSButton*      readButtonAll;	
 
     IBOutlet NSButton*      loadButton0;
     IBOutlet NSButton*      loadButton1;
@@ -61,8 +63,24 @@
 	
 	IBOutlet NSButton*		readRdacButton;
 	IBOutlet NSButton*		writeRdacButton;
-	IBOutlet NSTextField*	alarmTypeText;
 
+	IBOutlet NSTableView*	rdacTableView;
+	IBOutlet NSTableView*	rdacReadBackTableView;
+    IBOutlet NSTableView*   processLimitsTableView;
+
+    IBOutlet ORValueBarGroupView*  queueValueBar;
+    IBOutlet NSBox*         adc0Line0;	
+    IBOutlet NSBox*         adc0Line1;	
+    IBOutlet NSBox*         adc0Line2;	
+    IBOutlet NSTextField*	lcmRunVetoWarning;
+
+    NSSize					normalSize;
+    NSSize					setUpSize;
+    NSSize					rdacSize;
+    NSSize					processLimitsSize;
+    NSSize					trendSize;
+    NSView*					blankView;
+    IBOutlet NSView*        totalView;
 }
 
 #pragma mark •••Initialization
@@ -75,13 +93,16 @@
 - (void) updateWindow;
 
 #pragma mark •••Interface Management
-- (void) alarmLevelChanged:(NSNotification*)aNote;
+- (void) adcChannelChanged:(NSNotification*)aNote;
+- (void) lcmChanged:(NSNotification*)aNote;
+- (void) processLimitsChanged:(NSNotification*)aNote;
 - (void) rdacDisplayTypeChanged:(NSNotification*)aNote;
 - (void) scaleAction:(NSNotification*)aNotification;
 - (void) miscAttributesChanged:(NSNotification*)aNote;
 - (void) updateTimePlot:(NSNotification*)aNote;
 - (void) pollingStateChanged:(NSNotification*)aNote;
 - (void) rdacsChanged:(NSNotification*)aNote;
+- (void) rdacsReadBackChanged:(NSNotification*)aNote;
 - (void) setAllRDacsChanged:(NSNotification*)aNote;
 - (void) rdacChannelChanged:(NSNotification*)aNote;
 - (void) lcmEnabledChanged:(NSNotification*)aNote;
@@ -94,11 +115,12 @@
 - (void) adcChanged:(NSNotification*)aNote;
 - (void) logToFileChanged:(NSNotification*)aNote;
 - (void) loadAdcTimeValuesForIndex:(int)index;
+- (void) loadLcmTimeValues;
 - (void) logFileChanged:(NSNotification*)aNote;
 - (void) queCountChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
-- (IBAction) alarmLevelAction:(id)sender;
+- (IBAction) adcChannelAction:(id)sender;
 - (IBAction) rdacDisplayTypeAction:(id)sender;
 - (IBAction) setAllRDacsAction:(id)sender;
 - (IBAction) rdacChannelAction:(id)sender;
@@ -115,6 +137,7 @@
 - (IBAction) lcmEnabledAction:(id)sender;
 - (IBAction) selectModuleAction:(id)sender;
 - (IBAction) loadRdcaAction:(id)sender;
+- (IBAction) readBackAllRDac:(id)sender;
 
 - (IBAction) selectFileAction:(id)sender;
 - (IBAction) setPollingAction:(id)sender;
@@ -123,7 +146,7 @@
 - (IBAction) saveRdacFileAction:(id)sender;
 
 - (void) tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;
-- (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(int)row;
+- (BOOL) tableView:(NSTableView *)tableView shouldSelectRow:(int)row;
 
 @end
 
