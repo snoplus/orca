@@ -93,6 +93,7 @@
         unsigned short      lcmTimeMeasured;
         int                 adcChannel;
         ORAlarm*            lcmEnabledAlarm;
+        NSDate*             lastGainRead;
 }
 
 #pragma mark •••Initialization
@@ -102,6 +103,8 @@
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark •••Accessors
+- (NSDate*) lastGainRead;
+- (void) setLastGainRead:(NSDate*)aLastGainRead;
 - (int) calculateAdcChannel;
 - (int) calculateModule;
 - (int) calculatePreamp;
@@ -209,6 +212,7 @@
 - (void) removeFrom:(NSMutableArray*)anArray;
 @end
 
+extern NSString* ORPacModelLastGainReadChanged;
 extern NSString* ORPacModelAdcChannelChanged;
 extern NSString* ORPacModelLcmChanged;
 extern NSString* ORPacModelProcessLimitsChanged;

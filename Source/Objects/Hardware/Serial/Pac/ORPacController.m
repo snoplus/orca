@@ -244,6 +244,11 @@
                          name : ORPacModelAdcChannelChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(lastGainReadChanged:)
+                         name : ORPacModelLastGainReadChanged
+						object: model];
+
 }
 
 - (void) setModel:(id)aModel
@@ -277,6 +282,14 @@
 	[self adcChanged:nil];
 	[self lcmChanged:nil];
 	[self adcChannelChanged:nil];
+	[self lastGainReadChanged:nil];
+}
+
+- (void) lastGainReadChanged:(NSNotification*)aNote
+{
+    NSDate* theLastRead = [model lastGainRead];
+    if(!theLastRead) [lastGainReadField setObjectValue: @"Gains not read since ORCA start"];
+    else             [lastGainReadField setObjectValue: [NSString stringWithFormat:@"Gains last read: %@",theLastRead]];
 }
 
 - (void) processLimitsChanged:(NSNotification*)aNote

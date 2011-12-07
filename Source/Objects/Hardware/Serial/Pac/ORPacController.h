@@ -24,6 +24,7 @@
 @interface ORPacController : OrcaObjectController
 {
 	IBOutlet NSTabView*		tabView;
+	IBOutlet NSTextField*   lastGainReadField;
 	IBOutlet NSTextField*   adcChannelField;
 	IBOutlet NSMatrix*		gainDisplayTypeMatrix;
 	IBOutlet NSButton*		setAllGainsButton;
@@ -93,6 +94,7 @@
 - (void) updateWindow;
 
 #pragma mark •••Interface Management
+- (void) lastGainReadChanged:(NSNotification*)aNote;
 - (void) adcChannelChanged:(NSNotification*)aNote;
 - (void) lcmChanged:(NSNotification*)aNote;
 - (void) processLimitsChanged:(NSNotification*)aNote;

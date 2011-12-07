@@ -30,8 +30,9 @@
 #import "ORAlarm.h"
 
 #pragma mark •••External Strings
-NSString* ORPacModelAdcChannelChanged = @"ORPacModelAdcChannelChanged";
-NSString* ORPacModelLcmChanged = @"ORPacModelLcChanged";
+NSString* ORPacModelLastGainReadChanged = @"ORPacModelLastGainReadChanged";
+NSString* ORPacModelAdcChannelChanged   = @"ORPacModelAdcChannelChanged";
+NSString* ORPacModelLcmChanged          = @"ORPacModelLcChanged";
 NSString* ORPacModelProcessLimitsChanged = @"ORPacModelProcessLimitsChanged";
 NSString* ORPacModelGainDisplayTypeChanged = @"ORPacModelGainDisplayTypeChanged";
 NSString* ORPacModelSetAllGainsChanged  = @"ORPacModelSetAllGainsChanged";
@@ -77,6 +78,7 @@ NSString* ORPacModelGainsReadBackChanged= @"ORPacModelGainsReadBackChanged";
 
 - (void) dealloc
 {
+    [lastGainRead release];
     [lastGainFile release];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
@@ -143,6 +145,19 @@ NSString* ORPacModelGainsReadBackChanged= @"ORPacModelGainsReadBackChanged";
 }
 
 #pragma mark •••Accessors
+- (NSDate*) lastGainRead
+{
+    return lastGainRead;
+}
+
+- (void) setLastGainRead:(NSDate*)aLastGainRead
+{
+    [aLastGainRead retain];
+    [lastGainRead release];
+    lastGainRead = aLastGainRead;    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelLastGainReadChanged object:self];
+}
 - (int) calculateAdcChannel
 {
     return module*8 + preAmp; 
@@ -911,6 +926,10 @@ NSString* ORPacModelGainsReadBackChanged= @"ORPacModelGainsReadBackChanged";
                                 gainReadBack[147-i/2] = msb|lsb;
                             }
                             [self setGainReadBack:0 withValue:gainReadBack[0]]; //side effect -- force refresh
+                            NSCalendarDate* theDate = [NSCalendarDate date];
+                            [theDate setCalendarFormat:@"%m/%d %H:%M:%S"];
+                            [self setLastGainRead: theDate];
+
                         }
                         else if(ptr[296]==kPacErrorByte){
                             NSLogError(@"PAC",@"DAC !OK",nil);
