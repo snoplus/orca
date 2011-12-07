@@ -711,12 +711,12 @@ NSString* ORProcessModelRunNumberChanged			= @"ORProcessModelRunNumberChanged";
 - (void) checkForAchival
 {
 	NSFileManager* fm = [NSFileManager defaultManager];
-	NSString* fullPath = [historyFile stringByExpandingTildeInPath];
+    NSString* fullPath = [[historyFile stringByExpandingTildeInPath] stringByAppendingFormat:@"_%d",[self processRunNumber]];
 	NSDictionary* attrib = [fm attributesOfItemAtPath:fullPath error:nil];
 	if(attrib){
 		NSDate* creationDate = [attrib objectForKey:NSFileCreationDate];
 		NSTimeInterval fileAge = fabs([creationDate timeIntervalSinceNow]);	
-		if(fileAge >= 60*60*24*7){
+        if(fileAge >= 60*60*24*7){
 			NSDate* now = [NSCalendarDate date];
 			NSDateFormatter* dateFormatter = [[[NSDateFormatter alloc] initWithDateFormat:@"%Y_%m_%d_%H_%M_%S" allowNaturalLanguage:NO] autorelease];
 			
@@ -730,6 +730,7 @@ NSString* ORProcessModelRunNumberChanged			= @"ORProcessModelRunNumberChanged";
 			newPath = [newPath stringByAppendingFormat:@"_%@",[dateFormatter stringFromDate:now]];
 			[fm moveItemAtPath:fullPath toPath:newPath error:nil];
 			writeHeader = YES;
+            [self incrementProcessRunNumber];
 		}
 	}
 }
