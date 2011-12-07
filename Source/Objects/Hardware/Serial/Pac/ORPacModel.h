@@ -154,6 +154,7 @@
 - (BOOL) logToFile;
 - (void) setLogToFile:(BOOL)aLogToFile;
 - (int) queCount;
+- (void) setProcessLimitDefaults;
 
 #pragma mark •••Data Records
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;

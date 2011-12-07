@@ -61,7 +61,6 @@ NSString* ORPacModelRDacsReadBackChanged= @"ORPacModelRDacsReadBackChanged";
 - (void) _pollAllChannels;
 - (void) shipAdcValues;
 - (void) loadLogBuffer;
-- (void) setProcessLimitDefaults;
 @end
 
 #define kBadPacValue -999
@@ -1176,17 +1175,13 @@ NSString* ORPacModelRDacsReadBackChanged= @"ORPacModelRDacsReadBackChanged";
 {
     //nothing to do. not used in adcs. really shouldn't be in the protocol
 }
-
-@end
-
-@implementation ORPacModel (private)
 - (void) setProcessLimitDefaults
 {
     [processLimits release];
     processLimits = [[NSMutableArray array] retain];
     NSMutableDictionary* entry;
     //entry 0 Gen Temp
-    entry = [NSDictionary dictionaryWithObjectsAndKeys:
+    entry = [NSMutableDictionary dictionaryWithObjectsAndKeys:
              [NSNumber numberWithFloat:-50],@"LoAlarm",  
              [NSNumber numberWithFloat:100],@"HiAlarm", 
              [NSNumber numberWithFloat:-30],@"LoLimit",  
@@ -1194,7 +1189,7 @@ NSString* ORPacModelRDacsReadBackChanged= @"ORPacModelRDacsReadBackChanged";
              nil];
     [processLimits addObject:entry];
     //entry 1 Bias V
-    entry = [NSDictionary dictionaryWithObjectsAndKeys:
+    entry = [NSMutableDictionary dictionaryWithObjectsAndKeys:
              [NSNumber numberWithFloat:-50],@"LoAlarm",  
              [NSNumber numberWithFloat:100],@"HiAlarm", 
              [NSNumber numberWithFloat:-30],@"LoLimit",  
@@ -1202,7 +1197,7 @@ NSString* ORPacModelRDacsReadBackChanged= @"ORPacModelRDacsReadBackChanged";
              nil];
     [processLimits addObject:entry];
     //entry 2 PreAmp T
-    entry = [NSDictionary dictionaryWithObjectsAndKeys:
+    entry = [NSMutableDictionary dictionaryWithObjectsAndKeys:
              [NSNumber numberWithFloat:-50],@"LoAlarm",  
              [NSNumber numberWithFloat:100],@"HiAlarm", 
              [NSNumber numberWithFloat:-30],@"LoLimit",  
@@ -1210,7 +1205,7 @@ NSString* ORPacModelRDacsReadBackChanged= @"ORPacModelRDacsReadBackChanged";
              nil];
     [processLimits addObject:entry];
     //entry 3 Carrousel T
-    entry = [NSDictionary dictionaryWithObjectsAndKeys:
+    entry = [NSMutableDictionary dictionaryWithObjectsAndKeys:
              [NSNumber numberWithFloat:-50],@"LoAlarm",  
              [NSNumber numberWithFloat:100],@"HiAlarm", 
              [NSNumber numberWithFloat:-30],@"LoLimit",  
@@ -1218,7 +1213,7 @@ NSString* ORPacModelRDacsReadBackChanged= @"ORPacModelRDacsReadBackChanged";
              nil];
     [processLimits addObject:entry];
     //entry 4 LCM
-    entry = [NSDictionary dictionaryWithObjectsAndKeys:
+    entry = [NSMutableDictionary dictionaryWithObjectsAndKeys:
              [NSNumber numberWithFloat:-1],@"LoAlarm",  
              [NSNumber numberWithFloat:5],@"HiAlarm", 
              [NSNumber numberWithFloat:0],@"LoLimit",  
@@ -1226,7 +1221,7 @@ NSString* ORPacModelRDacsReadBackChanged= @"ORPacModelRDacsReadBackChanged";
              nil];
     [processLimits addObject:entry];
     //entry 5 Module
-    entry = [NSDictionary dictionaryWithObjectsAndKeys:
+    entry = [NSMutableDictionary dictionaryWithObjectsAndKeys:
              [NSNumber numberWithFloat:-1],@"LoAlarm",  
              [NSNumber numberWithFloat:32],@"HiAlarm", 
              [NSNumber numberWithFloat:0],@"LoLimit",  
@@ -1234,7 +1229,7 @@ NSString* ORPacModelRDacsReadBackChanged= @"ORPacModelRDacsReadBackChanged";
              nil];
     [processLimits addObject:entry];
     //entry 6 Preamp
-    entry = [NSDictionary dictionaryWithObjectsAndKeys:
+    entry = [NSMutableDictionary dictionaryWithObjectsAndKeys:
              [NSNumber numberWithFloat:-1],@"LoAlarm",  
              [NSNumber numberWithFloat:8],@"HiAlarm", 
              [NSNumber numberWithFloat:0],@"LoLimit",  
@@ -1242,7 +1237,7 @@ NSString* ORPacModelRDacsReadBackChanged= @"ORPacModelRDacsReadBackChanged";
              nil];
     [processLimits addObject:entry];
     //entry 7 Adc Chan
-    entry = [NSDictionary dictionaryWithObjectsAndKeys:
+    entry = [NSMutableDictionary dictionaryWithObjectsAndKeys:
              [NSNumber numberWithFloat:-1],@"LoAlarm",  
              [NSNumber numberWithFloat:148],@"HiAlarm", 
              [NSNumber numberWithFloat:0],@"LoLimit",  
@@ -1250,6 +1245,10 @@ NSString* ORPacModelRDacsReadBackChanged= @"ORPacModelRDacsReadBackChanged";
              nil];
     [processLimits addObject:entry];
 }
+
+@end
+
+@implementation ORPacModel (private)
 
 - (void) shipAdcValues
 {
