@@ -72,6 +72,11 @@
 	[self removeSubPlotViews];
 	[[self window] setTitle:[model shortName]];
 	[self modelChanged:nil];
+    [maxXValueField setIntValue:[model maxX]];
+    [maxYValueField setIntValue:[model maxY]];
+    [minYValueField setIntValue:[model minY]];
+    [minXValueField setIntValue:[model minX]];
+    
 	[self setUpViews];
 }
 
@@ -97,6 +102,26 @@
                      selector : @selector(dataSetRemoved:)
                          name : ORDataSetRemoved
                        object : model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(forcedLimitsMaxXChanged:)
+                         name : ORForceLimitsMaxXChanged
+                       object : model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(forcedLimitsMinXChanged:)
+                         name : ORForceLimitsMinXChanged
+                       object : model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(forcedLimitsMaxYChanged:)
+                         name : ORForceLimitsMaxYChanged
+                       object : model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(forcedLimitsMinYChanged:)
+                         name : ORForceLimitsMinYChanged
+                       object : model];
 
 }
 
@@ -116,6 +141,28 @@
 		[[self window] close];
     }
 }
+
+- (void) forcedLimitsMaxXChanged:(NSNotification*)aNote
+{
+    [maxXValueField setIntValue:[model maxX]];
+    [self setXLimits];
+}
+- (void) forcedLimitsMinXChanged:(NSNotification*)aNote
+{
+    [minXValueField setIntValue:[model minX]];
+    [self setXLimits];
+}
+- (void) forcedLimitsMaxYChanged:(NSNotification*)aNote
+{
+    [maxYValueField setIntValue:[model maxY]];
+    [self setYLimits];
+}
+- (void) forcedLimitsMinYChanged:(NSNotification*)aNote
+{
+    [minYValueField setIntValue:[model minY]];
+    [self setYLimits];
+}
+
 
 #pragma mark ¥¥¥Accessors
 - (NSMutableArray*) subControllers
@@ -173,7 +220,49 @@
     }
 }
 
+- (IBAction) forceLimitsNowAction:(id)sender
+{
+    [model setMaxX:[maxXValueField floatValue]];
+    [model setMaxY:[maxYValueField floatValue]];
+    [model setMinX:[minXValueField floatValue]];
+    [model setMinY:[minYValueField floatValue]];
+}
 
+- (IBAction) forceLimitsAction:(id)sender
+{
+    [model setMaxX:[maxXValueField floatValue]];
+    [model setMaxY:[maxYValueField floatValue]];
+    [model setMinX:[minXValueField floatValue]];
+    [model setMinY:[minYValueField floatValue]];
+}
+
+- (void) setXLimits
+{
+    float maxXValue = [model maxX];
+    float minXValue = [model minX];
+    if((maxXValue!=0) && (maxXValue!=minXValue)){
+        float x1 = MIN(minXValue,maxXValue);
+        float x2 = MAX(minXValue,maxXValue);
+        
+        for(id obj in subControllers){
+            [[[obj plotView] xScale] setRngLimitsLow:x1 withHigh:x2 withMinRng:x2-x1];
+        }
+    }
+}
+
+- (void) setYLimits
+{
+    float maxYValue = [model maxY];
+    float minYValue = [model minY];
+    if((maxYValue !=0) && (maxYValue!=minYValue)){
+        float y1 = MIN(minYValue,maxYValue);
+        float y2 = MAX(minYValue,maxYValue);
+        
+        for(id obj in subControllers){
+            [[[obj plotView] yScale] setRngLimitsLow:y1 withHigh:y2 withMinRng:y2-y1];
+        }
+    }
+}
 #pragma mark ¥¥¥Private
 
 - (void) removeSubPlotViews

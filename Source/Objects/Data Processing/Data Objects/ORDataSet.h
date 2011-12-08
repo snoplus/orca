@@ -31,6 +31,7 @@
     unsigned long			totalCounts;
 	//NSLock*					dataSetLock;
 	long					runNumber;
+    float                   minX,maxX,minY,maxY;
 }
 
 #pragma mark •••Initialization
@@ -38,6 +39,15 @@
 - (void) dealloc;
 
 #pragma mark •••Accessors
+- (float) minX;
+- (float) maxX;
+- (float) minY;
+- (float) maxY;
+- (void) setMinX:(float)aValue;
+- (void) setMaxX:(float)aValue;
+- (void) setMinY:(float)aValue;
+- (void) setMaxY:(float)aValue;
+
 - (id) findObjectWithFullID:(NSString*)aFullID;
 - (NSArray*) collectObjectsOfClass:(Class)aClass;
 - (long) runNumber;
@@ -117,3 +127,8 @@
 extern NSString* ORDataSetRemoved;
 extern NSString* ORDataSetCleared;
 extern NSString* ORDataSetAdded;
+extern NSString* ORForceLimitsMinXChanged;
+extern NSString* ORForceLimitsMaxXChanged;
+extern NSString* ORForceLimitsMaxYChanged;
+extern NSString* ORForceLimitsMinYChanged;
+

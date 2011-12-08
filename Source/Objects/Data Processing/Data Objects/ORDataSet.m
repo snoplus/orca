@@ -35,6 +35,10 @@
 NSString* ORDataSetRemoved= @"ORDataSetRemoved";
 NSString* ORDataSetCleared= @"ORDataSetCleared";
 NSString* ORDataSetAdded  = @"ORDataSetAdded";
+NSString* ORForceLimitsMinXChanged = @"ORForceLimitsMinXChanged";
+NSString* ORForceLimitsMaxXChanged = @"ORForceLimitsMaxXChanged";
+NSString* ORForceLimitsMinYChanged = @"ORForceLimitsMinYChanged";
+NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
 
 @implementation ORDataSet
 
@@ -243,6 +247,38 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
 		return [[realDictionary objectForKey:aKey] objectForKeyArray:anArray];;
     }
 }
+
+- (float) minX { return minX;}
+- (float) maxX { return maxX;}
+- (float) minY { return minY;}
+- (float) maxY { return maxY;}
+- (void) setMinX:(float)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setMinX:minX];
+    minX = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORForceLimitsMinXChanged object:self];
+}
+
+- (void) setMaxX:(float)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setMaxX:maxX];
+    maxX = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORForceLimitsMaxXChanged object:self];
+}
+
+- (void) setMinY:(float)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setMinY:minY];
+    minY = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORForceLimitsMinYChanged object:self];
+}
+
+- (void) setMaxY:(float)aValue{
+    [[[self undoManager] prepareWithInvocationTarget:self] setMaxY:maxY];
+    maxY = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORForceLimitsMaxYChanged object:self];
+}
+
 
 #pragma mark •••Writing Data
 - (void) writeDataToFile:(FILE*)aFile
@@ -1591,6 +1627,9 @@ static NSString *ORDataKey 			= @"OR Data Key";
 {
     self = [super initWithCoder:decoder];
 //    dataSetLock = [[NSLock alloc] init];
+    
+    [[self undoManager] disableUndoRegistration];
+   
     realDictionary = [[decoder decodeObjectForKey:ORDataSetRealDictionary] retain];
     if(data == nil){
         [sortedArray release];
@@ -1598,6 +1637,12 @@ static NSString *ORDataKey 			= @"OR Data Key";
     }
     [self setData:[decoder decodeObjectForKey:ORDataData]];
     [self setKey:[decoder decodeObjectForKey:ORDataKey]];
+    [self setMinX:[decoder decodeFloatForKey:@"minX"]];
+    [self setMinY:[decoder decodeFloatForKey:@"minY"]];
+    [self setMaxX:[decoder decodeFloatForKey:@"maxX"]];
+    [self setMaxY:[decoder decodeFloatForKey:@"maxY"]];
+    [[self undoManager] enableUndoRegistration];
+
     return self;
 }
 
@@ -1608,6 +1653,9 @@ static NSString *ORDataKey 			= @"OR Data Key";
     [encoder encodeObject:realDictionary forKey:ORDataSetRealDictionary];
     [encoder encodeObject:data forKey:ORDataData];
     [encoder encodeObject:key forKey:ORDataKey];
+    [encoder encodeFloat:minX forKey:@"minX"];
+    [encoder encodeFloat:maxX forKey:@"maxX"];
+    [encoder encodeFloat:minY forKey:@"minY"];
+    [encoder encodeFloat:maxY forKey:@"maxY"];
 }
-
 @end

@@ -21,7 +21,11 @@
 
 @interface ORDataSetController : OrcaObjectController  {
     @private
-	IBOutlet NSView*    view;
+        IBOutlet NSView*    view;
+        IBOutlet NSTextField* maxXValueField;
+        IBOutlet NSTextField* minXValueField;
+        IBOutlet NSTextField* maxYValueField;
+        IBOutlet NSTextField* minYValueField;
         NSMutableArray* subControllers;
         BOOL inited;
 }
@@ -34,6 +38,12 @@
 - (void) registerNotificationObservers;
 - (void) modelChanged:(NSNotification*)aNotification;
 - (void) dataSetRemoved:(NSNotification*)aNote;
+- (void) forcedLimitsMinXChanged:(NSNotification*)aNote;
+- (void) forcedLimitsMinYChanged:(NSNotification*)aNote;
+- (void) forcedLimitsMaxXChanged:(NSNotification*)aNote;
+- (void) forcedLimitsMaxYChanged:(NSNotification*)aNote;
+- (void) setXLimits;
+- (void) setYLimits;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) reLoad:(id)sender;
@@ -41,4 +51,6 @@
 - (IBAction) toggleLog:(id)sender;
 - (IBAction) autoScaleX:(id)sender;
 - (IBAction) autoScaleY:(id)sender;
+- (IBAction) forceLimitsAction:(id)sender;
+- (IBAction) forceLimitsNowAction:(id)sender;
 @end
