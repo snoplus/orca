@@ -196,6 +196,8 @@ NSString* ORPacModelGainsReadBackChanged= @"ORPacModelGainsReadBackChanged";
 
 - (void) setPreAmp:(int)aPreAmp
 {
+    if(aPreAmp<0)aPreAmp = 0;
+    else if(aPreAmp > 0x7) aPreAmp = 0x7; //3 bits
     [[[self undoManager] prepareWithInvocationTarget:self] setPreAmp:preAmp];
     preAmp = aPreAmp;
     adcChannel = [self calculateAdcChannel];
@@ -209,6 +211,9 @@ NSString* ORPacModelGainsReadBackChanged= @"ORPacModelGainsReadBackChanged";
 
 - (void) setModule:(int)aModule
 {
+    if(aModule<0)aModule = 0;
+    else if(aModule > 0x1f) aModule = 0x1f; //five bits
+            
     [[[self undoManager] prepareWithInvocationTarget:self] setModule:module];
     module = aModule;
     adcChannel = [self calculateAdcChannel];
@@ -603,6 +608,7 @@ NSString* ORPacModelGainsReadBackChanged= @"ORPacModelGainsReadBackChanged";
 	}
 	[self performSelector:@selector(writeLogBufferToFile) withObject:nil afterDelay:60];
 }
+
 
 #pragma mark •••Archival
 - (id) initWithCoder:(NSCoder*)decoder

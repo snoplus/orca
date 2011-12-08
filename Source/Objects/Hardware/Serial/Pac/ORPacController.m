@@ -104,8 +104,8 @@
     blankView = [[NSView alloc] init];
     setUpSize			= NSMakeSize(540,515);
     normalSize			= NSMakeSize(400,515);
-    gainSize			= NSMakeSize(655,515);
-    processLimitsSize	= NSMakeSize(480,515);
+    gainSize			= NSMakeSize(695,515);
+    processLimitsSize	= NSMakeSize(470,515);
     trendSize           = NSMakeSize(555,515);
 
     NSString* key = [NSString stringWithFormat: @"orca.Pac%d.selectedtab",[model uniqueIdNumber]];
