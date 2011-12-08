@@ -86,7 +86,7 @@
     argIndex += 2; 
     const char *theArg = [[self methodSignature] getArgumentTypeAtIndex:argIndex];
     if(*theArg == 'c'){
-        char c = (char)[aVal intValue];
+        char c = [aVal charValue];
         [self setArgument:&c atIndex:argIndex];
     }
     else if(*theArg == 'i'){
@@ -94,27 +94,35 @@
         [self setArgument:&c atIndex:argIndex];
     }
     else if(*theArg == 's'){
-        short c = (short)[aVal intValue];
+        short c = [aVal shortValue];
         [self setArgument:&c atIndex:argIndex];
     }
     else if(*theArg == 'l'){
         long c = (long)[aVal intValue];
         [self setArgument:&c atIndex:argIndex];
     }
+    else if(*theArg == 'q'){
+        long long c = [aVal longLongValue];
+        [self setArgument:&c atIndex:argIndex];
+    }
     else if(*theArg == 'C'){
-        unsigned char c = (unsigned char)[aVal intValue];
+        unsigned char c = [aVal unsignedCharValue];
         [self setArgument:&c atIndex:argIndex];
     }
     else if(*theArg == 'I'){
-        unsigned int c = [aVal intValue];
+        unsigned int c = [aVal unsignedIntValue];
         [self setArgument:&c atIndex:argIndex];
     }
     else if(*theArg == 'S'){
-        unsigned short c = (unsigned short)[aVal intValue];
+        unsigned short c = [aVal unsignedShortValue];
         [self setArgument:&c atIndex:argIndex];
     }
     else if(*theArg == 'L'){
-        unsigned long c = [aVal intValue];
+        unsigned long c = [aVal unsignedLongValue];
+        [self setArgument:&c atIndex:argIndex];
+    }
+    else if(*theArg == 'Q'){
+        unsigned long long c = [aVal unsignedLongLongValue];
         [self setArgument:&c atIndex:argIndex];
     }
     else if(*theArg == 'f'){
