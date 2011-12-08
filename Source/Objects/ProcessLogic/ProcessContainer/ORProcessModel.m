@@ -508,32 +508,34 @@ NSString* ORProcessModelRunNumberChanged			= @"ORProcessModelRunNumberChanged";
 
 - (void) startRun
 {
-	writeHeader = YES;
-	NSArray* outputNodes = [self collectObjectsRespondingTo:@selector(isTrueEndNode)];
+	@synchronized(self){
+        NSArray* outputNodes = [self collectObjectsRespondingTo:@selector(isTrueEndNode)];
 
-	if([outputNodes count] == 0){
-		NSLog(@"%@ has no output nodes. Process NOT started... nothing to do!\n",shortName);
-		return;
-	}
-	
-    if(![[ORProcessThread  sharedProcessThread] nodesRunning:outputNodes]){
-		[[ORProcessThread  sharedProcessThread] startNodes:outputNodes];
-		[self setProcessRunning:YES];
-		NSString* t = inTestMode?@"(Test Mode)":@"";
-		if([shortName length])NSLog(@"%@ Started %@\n",shortName,t);
-		else NSLog(@"Process %d Started %@\n",[self uniqueIdNumber],t);
+        if([outputNodes count] == 0){
+            NSLog(@"%@ has no output nodes. Process NOT started... nothing to do!\n",shortName);
+            return;
+        }
         
-        [self incrementProcessRunNumber];
-         
-		if(inTestMode){
-			[self postTestAlarm];
-		}
-		else {
-			if(sendOnStart){
-				[self performSelector:@selector(setSendStartNoticeNextReadAfterDelay) withObject:nil afterDelay:20];
-			}
-		}
-	}
+        if(![[ORProcessThread  sharedProcessThread] nodesRunning:outputNodes]){
+            [[ORProcessThread  sharedProcessThread] startNodes:outputNodes];
+            [self setProcessRunning:YES];
+            NSString* t = inTestMode?@"(Test Mode)":@"";
+            if([shortName length])NSLog(@"%@ Started %@\n",shortName,t);
+            else NSLog(@"Process %d Started %@\n",[self uniqueIdNumber],t);
+            
+            writeHeader = YES;
+            [self incrementProcessRunNumber];
+            
+            if(inTestMode){
+                [self postTestAlarm];
+            }
+            else {
+                if(sendOnStart){
+                    [self performSelector:@selector(setSendStartNoticeNextReadAfterDelay) withObject:nil afterDelay:20];
+                }
+            }
+        }
+    }
 }
 
 - (void) stopRun
@@ -661,49 +663,56 @@ NSString* ORProcessModelRunNumberChanged			= @"ORProcessModelRunNumberChanged";
 		}
 		sampleGateOpen = NO;
 		
-		if(keepHistory && [historyFile length]){
-			NSString* header = @"# SampleTime";
-			if(writeHeader){
-				for(id anObj in [self orcaObjects]){
-					if([anObj isKindOfClass:NSClassFromString(@"ORAdcModel")]){
-						header = [header stringByAppendingFormat:@"\t%@",[anObj iconLabel]];
-					}
-				}
-				header = [header stringByAppendingString:@"\n"];
-			}
-			
-			NSString* s = @"";
-			for(id anObj in [self orcaObjects]){
-				if([anObj isKindOfClass:NSClassFromString(@"ORAdcModel")]){
-					s = [s stringByAppendingFormat:@"\t%@",[anObj iconValue] ];
-				}
-			}
-			if([s length]){
-				//get the time(UT!)
-				time_t	ut_Time;
-				time(&ut_Time);
-				if(ut_Time - lastHistorySample >= 10){
-					lastHistorySample = ut_Time;
-					NSString* finalString = [NSString stringWithFormat:@"%d%@\n",ut_Time,s];
-					if(writeHeader){
-						finalString = [header stringByAppendingString:finalString];
-						writeHeader = NO;
-					}
-					NSString* fullPath = [[historyFile stringByExpandingTildeInPath] stringByAppendingFormat:@"_%d",[self processRunNumber]];
-					NSFileManager* fm = [NSFileManager defaultManager];
-					if(![fm fileExistsAtPath: fullPath]){
-						[finalString writeToFile:fullPath atomically:NO encoding:NSASCIIStringEncoding error:nil];
-					}
-					else {
-						NSFileHandle* fh = [NSFileHandle fileHandleForUpdatingAtPath:fullPath];
-						[fh seekToEndOfFile];
-						[fh writeData:[finalString dataUsingEncoding:NSASCIIStringEncoding]];
-						[fh closeFile];
-						[self checkForAchival];
-					}
-				}
-			}
-		}
+        @synchronized(self){
+            if(keepHistory && [historyFile length]){
+                NSString* header = @"# SampleTime";
+                if(writeHeader){
+                    for(id anObj in [self orcaObjects]){
+                        if([anObj isKindOfClass:NSClassFromString(@"ORAdcModel")]){
+                            header = [header stringByAppendingFormat:@"\t%@",[anObj iconLabel]];
+                        }
+                    }
+                    header = [header stringByAppendingString:@"\n"];
+                }
+                
+                NSString* s = @"";
+                for(id anObj in [self orcaObjects]){
+                    if([anObj isKindOfClass:NSClassFromString(@"ORAdcModel")]){
+                        NSString* theValue = [anObj iconValue];
+                        theValue = [theValue trimSpacesFromEnds];
+                        int firstSpace = [theValue rangeOfString:@" "].location;
+                        if(firstSpace!=NSNotFound) theValue = [theValue substringToIndex:firstSpace];
+                        
+                        s = [s stringByAppendingFormat:@"\t%@",theValue ];
+                    }
+                }
+                if([s length]){
+                    //get the time(UT!)
+                    time_t	ut_Time;
+                    time(&ut_Time);
+                    if(ut_Time - lastHistorySample >= 10){
+                        lastHistorySample = ut_Time;
+                        NSString* finalString = [NSString stringWithFormat:@"%d%@\n",ut_Time,s];
+                        if(writeHeader){
+                            finalString = [header stringByAppendingString:finalString];
+                            writeHeader = NO;
+                        }
+                        NSString* fullPath = [[historyFile stringByExpandingTildeInPath] stringByAppendingFormat:@"_%d",[self processRunNumber]];
+                        NSFileManager* fm = [NSFileManager defaultManager];
+                        if(![fm fileExistsAtPath: fullPath]){
+                            [finalString writeToFile:fullPath atomically:NO encoding:NSASCIIStringEncoding error:nil];
+                        }
+                        else {
+                            NSFileHandle* fh = [NSFileHandle fileHandleForUpdatingAtPath:fullPath];
+                            [fh seekToEndOfFile];
+                            [fh writeData:[finalString dataUsingEncoding:NSASCIIStringEncoding]];
+                            [fh closeFile];
+                            [self checkForAchival];
+                        }
+                    }
+                }
+            }
+        }
 
 	}
 }
