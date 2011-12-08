@@ -1122,8 +1122,8 @@ NSString* ORPacModelGainsReadBackChanged= @"ORPacModelGainsReadBackChanged";
         case 3: return @"Free"; 
         case 4: return @"Free"; 
         case 5: return @"Free"; 
-        case 6: return @"PreAmp T"; 
-        case 7: return @"Carrousel T"; 
+        case 6: return @"Carousel T1"; 
+        case 7: return @"Carousel T2"; 
         default: return @"";
     }
 }
@@ -1133,8 +1133,8 @@ NSString* ORPacModelGainsReadBackChanged= @"ORPacModelGainsReadBackChanged";
     switch (aChan){
         case 0: return @"Gen Temp"; 
         case 1: return @"Bias V."; 
-        case 2: return @"PreAmp T"; 
-        case 3: return @"Carrousel T"; 
+        case 2: return @"Carousel T1"; 
+        case 3: return @"Carousel T2"; 
         case 4: return @"LCM"; 
         case 5: return @"Module"; 
         case 6: return @"PreAmp"; 
