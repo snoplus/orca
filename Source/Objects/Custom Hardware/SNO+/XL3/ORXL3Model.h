@@ -61,16 +61,21 @@ enum {
 	unsigned short	repeatDelay;
 	short		repeatOpCount;
 	BOOL		doReadOp;
-	unsigned long	workingCount;
-	unsigned long	writeValue;
-	unsigned int	xl3Mode;
-	unsigned long	slotMask;
-	BOOL		xl3ModeRunning;
-	unsigned long	xl3RWAddressValue;
-	unsigned long	xl3RWDataValue;
-	NSMutableDictionary*	xl3OpsRunning;
-	unsigned long	xl3PedestalMask;
+	unsigned long workingCount;
+	unsigned long writeValue;
+	unsigned int  xl3Mode;
+	unsigned long slotMask;
+	BOOL          xl3ModeRunning;
+	unsigned long xl3RWAddressValue;
+    unsigned long xl3RWDataValue;
+	NSMutableDictionary* xl3OpsRunning;
+	unsigned long xl3PedestalMask;
+    unsigned long xl3ChargeInjMask;
+    unsigned char xl3ChargeInjCharge;
 }
+
+@property (assign)	unsigned long    xl3ChargeInjMask;
+@property (assign)	unsigned char    xl3ChargeInjCharge;
 
 #pragma mark •••Initialization
 - (id)   init;
@@ -172,8 +177,9 @@ enum {
 - (void) compositeResetCrateAndXilinX;
 - (void) compositeResetFIFOAndSequencer;
 - (void) compositeResetXL3StateMachine;
+- (void) compositeEnableChargeInjection;
 - (void) reset;
-- (void) enableChargeInjectionForSlot:(unsigned short) aSlot slotMask:(unsigned long) aSlotMask;
+- (void) enableChargeInjectionForSlot:(unsigned short) aSlot channelMask:(unsigned long) aChannelMask;
 
 - (id) writeHardwareRegisterCmd:(unsigned long) aRegister value:(unsigned long) aBitPattern;
 - (id) readHardwareRegisterCmd:(unsigned long) regAddress;
@@ -195,3 +201,4 @@ extern NSString* ORXL3ModelXl3RWAddressValueChanged;
 extern NSString* ORXL3ModelXl3RWDataValueChanged;
 extern NSString* ORXL3ModelXl3OpsRunningChanged;
 extern NSString* ORXL3ModelXl3PedestalMaskChanged;
+extern NSString* ORXL3ModelXl3ChargeInjChanged;

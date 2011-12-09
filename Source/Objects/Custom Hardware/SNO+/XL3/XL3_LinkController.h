@@ -29,12 +29,12 @@
 	IBOutlet NSTabView*		tabView;
 	IBOutlet NSButton*		lockButton;
 	//basic
-	IBOutlet NSButton*		basicLockButton;
-	IBOutlet NSPopUpButton*		selectedRegisterPU;
-	IBOutlet NSButton*		basicReadButton;
-	IBOutlet NSButton*		basicWriteButton;
-	IBOutlet NSButton*		basicStopButton;
-	IBOutlet NSButton*		basicStatusButton;
+	IBOutlet NSButton*              basicLockButton;
+	IBOutlet NSPopUpButton*         selectedRegisterPU;
+	IBOutlet NSButton*              basicReadButton;
+	IBOutlet NSButton*              basicWriteButton;
+	IBOutlet NSButton*              basicStopButton;
+	IBOutlet NSButton*              basicStatusButton;
 	IBOutlet NSProgressIndicator*	basicOpsRunningIndicator;
 	IBOutlet NSButton*		autoIncrementCB;
 	IBOutlet NSTextField*		repeatDelayField;
@@ -44,41 +44,48 @@
 	IBOutlet NSTextField*		writeValueField;
 	IBOutlet NSStepper*		writeValueStepper;
 	//composite
-	IBOutlet NSButton*		compositeLockButton;
+	IBOutlet NSButton*              compositeLockButton;
 	IBOutlet NSProgressIndicator*	deselectCompositeRunningIndicator;
-	IBOutlet NSButton*		compositeDeselectButton;
-	IBOutlet NSMatrix*		compositeSlotMaskMatrix;
-	IBOutlet NSTextField*		compositeSlotMaskField;
-	IBOutlet NSPopUpButton*		compositeXl3ModePU;
-	IBOutlet NSButton*		compositeSetXl3ModeButton;
+	IBOutlet NSButton*              compositeDeselectButton;
+	IBOutlet NSMatrix*              compositeSlotMaskMatrix;
+	IBOutlet NSTextField*           compositeSlotMaskField;
+	IBOutlet NSPopUpButton*         compositeXl3ModePU;
+	IBOutlet NSButton*              compositeSetXl3ModeButton;
 	IBOutlet NSProgressIndicator*	compositeXl3ModeRunningIndicator;
-	IBOutlet NSTextField*		compositeXl3RWAddressValueField;
-	IBOutlet NSPopUpButton*		compositeXl3RWModePU;
-	IBOutlet NSPopUpButton*		compositeXl3RWSelectPU;
-	IBOutlet NSPopUpButton*		compositeXl3RWRegisterPU;
-	IBOutlet NSTextField*		compositeXl3RWDataValueField;	
-	IBOutlet NSButton*		compositeXl3RWButton;	
+	IBOutlet NSTextField*           compositeXl3RWAddressValueField;
+	IBOutlet NSPopUpButton*         compositeXl3RWModePU;
+	IBOutlet NSPopUpButton*         compositeXl3RWSelectPU;
+	IBOutlet NSPopUpButton*         compositeXl3RWRegisterPU;
+	IBOutlet NSTextField*           compositeXl3RWDataValueField;	
+	IBOutlet NSButton*              compositeXl3RWButton;	
 	IBOutlet NSProgressIndicator*	compositeXl3RWRunningIndicator;
-	IBOutlet NSButton*		compositeQuitButton;	
+	IBOutlet NSButton*              compositeQuitButton;	
 	IBOutlet NSProgressIndicator*	compositeQuitRunningIndicator;
-	IBOutlet NSTextField*		compositeSetPedestalField;	
-	IBOutlet NSButton*		compositeSetPedestalButton;	
+	IBOutlet NSTextField*           compositeSetPedestalField;	
+	IBOutlet NSButton*              compositeSetPedestalButton;	
 	IBOutlet NSProgressIndicator*	compositeSetPedestalRunningIndicator;
-	IBOutlet NSButton*		compositeBoardIDButton;	
+	IBOutlet NSButton*              compositeBoardIDButton;	
 	IBOutlet NSProgressIndicator*	compositeBoardIDRunningIndicator;
-	IBOutlet NSButton*		compositeResetCrateButton;	
+	IBOutlet NSButton*              compositeResetCrateButton;	
 	IBOutlet NSProgressIndicator*	compositeResetCrateRunningIndicator;
-	IBOutlet NSButton*		compositeResetCrateAndXilinXButton;	
+	IBOutlet NSButton*              compositeResetCrateAndXilinXButton;	
 	IBOutlet NSProgressIndicator*	compositeResetCrateAndXilinXRunningIndicator;
-	IBOutlet NSButton*		compositeResetFIFOAndSequencerButton;	
+	IBOutlet NSButton*              compositeResetFIFOAndSequencerButton;	
 	IBOutlet NSProgressIndicator*	compositeResetFIFOAndSequencerRunningIndicator;
-	IBOutlet NSButton*		compositeResetXL3StateMachineButton;	
+	IBOutlet NSButton*              compositeResetXL3StateMachineButton;	
 	IBOutlet NSProgressIndicator*	compositeResetXL3StateMachineRunningIndicator;
+	IBOutlet NSTextField*           compositeChargeInjMaskField;
+	IBOutlet NSTextField*           compositeChargeInjChargeField;
+	IBOutlet NSButton*              compositeChargeInjButton;
+	IBOutlet NSProgressIndicator*	compositeChargeRunningIndicator;
 	//connection
-	IBOutlet NSButton*		toggleConnectButton;
-	IBOutlet NSPopUpButton*		errorTimeOutPU;
-
-	
+	IBOutlet NSButton*              toggleConnectButton;
+	IBOutlet NSPopUpButton*         errorTimeOutPU;
+    IBOutlet NSTextField*           connectionIPAddressField;
+    IBOutlet NSTextField*           connectionIPPortField;
+    IBOutlet NSTextField*           connectionCrateNumberField;
+    IBOutlet NSButton*              connectionAutoConnectButton;
+    IBOutlet NSButton*              connectionAutoInitCrateButton;
 }	
 
 #pragma mark •••Initialization
@@ -111,12 +118,13 @@
 - (void) compositeXl3RWAddressChanged:(NSNotification*)aNote;
 - (void) compositeXL3RWDataChanged:(NSNotification*)aNote;
 - (void) compositeXl3PedestalMaskChanged:(NSNotification*)aNote;
+- (void) compositeXl3ChargeInjChanged:(NSNotification*)aNote;
 
 //ip connection
 - (void) connectStateChanged:(NSNotification*)aNote;
-- (void) ipNumberChanged:(NSNotification*)aNote;
 - (void) linkConnectionChanged:(NSNotification*)aNote;
 - (void) errorTimeOutChanged:(NSNotification*)aNote;
+- (void) connectionAutoConnectChanged:(NSNotification*)aNote;
 
 #pragma mark •••Helper
 - (void) populateOps;
@@ -148,10 +156,12 @@
 - (IBAction) compositeXl3RWSelectAction:(id)sender;
 - (IBAction) compositeXl3RWRegisterAction:(id)sender;
 - (IBAction) compositeXl3RWDataValueAction:(id)sender;
-//- (IBAction) compositeXl3RWSend:(id)sender;
 - (IBAction) compositeSetPedestalValue:(id)sender;
+- (IBAction) compositeXl3ChargeInjMaskAction:(id)sender;
+- (IBAction) compositeXl3ChargeInjChargeAction:(id)sender;
 //connection
 - (IBAction) toggleConnectAction:(id)sender;
 - (IBAction) errorTimeOutAction:(id)sender;
+- (IBAction) connectionAutoConnectAction:(id)sender;
 
 @end

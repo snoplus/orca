@@ -30,14 +30,27 @@
 #import <sys/errno.h>
 
 
-NSString* XL3_LinkConnectionChanged	= @"XL3_LinkConnectionChanged";
+NSString* XL3_LinkConnectionChanged     = @"XL3_LinkConnectionChanged";
 NSString* XL3_LinkTimeConnectedChanged	= @"XL3_LinkTimeConnectedChanged";
-NSString* XL3_LinkIPNumberChanged	= @"XL3_LinkIPNumberChanged";
+NSString* XL3_LinkIPNumberChanged       = @"XL3_LinkIPNumberChanged";
 NSString* XL3_LinkConnectStateChanged	= @"XL3_LinkConnectStateChanged";
 NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
+NSString* XL3_LinkAutoConnectChanged    = @"XL3_LinkAutoConnectChanged";
+
 
 #define kCmdArrayHighWater 1000
-#define kBundleBufferSize 10000*1440
+#define kBundleBufferSize 10000 //PMTMegaBundles
+
+
+@interface XL3_Link (private)
+- (void) allocBufferWithSize:(unsigned) aBufferSize;
+- (void) releaseBuffer;
+- (BOOL) writeBundle:(char*)someBytes length:(unsigned)numBytes;
+- (unsigned) bundleBufferSize;
+- (unsigned) bundleReadMark;
+- (unsigned) bundleWriteMark;
+@end
+
 
 @implementation XL3_Link
 
@@ -50,7 +63,8 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 	[self setNeedToSwap];
 	connectState = kDisconnected;
 	cmdArray = [[NSMutableArray alloc] init];
-	bundleBuffer = [[ORSafeCircularBuffer alloc] initWithBufferSize:kBundleBufferSize];
+	//bundleBuffer = [[ORSafeCircularBuffer alloc] initWithBufferSize:kBundleBufferSize];
+    [self allocBufferWithSize:kBundleBufferSize];
 	//[self initConnectionHistory];
 	num_cmd_packets = 0;
 	num_dat_packets = 0;
@@ -59,11 +73,6 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 
 - (void) dealloc
 {
-	@try {
-		//[self stopCrate];
-	}
-	@catch (NSException* localException) {
-	}
 	[commandSocketLock release];
 	[coreSocketLock release];
 	[cmdArrayLock release];
@@ -71,7 +80,11 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 		[cmdArray release];
 		cmdArray = nil;
 	}
-	[bundleBuffer release];
+	//[bundleBuffer release];
+    if (bundleBuffer) {
+        [self releaseBuffer];
+    }
+    
 	[super dealloc];
 }
 
@@ -87,20 +100,30 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 	//[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(calculateRates) object:nil];
 }
 
+- (void) awakeAfterDocumentLoaded
+{
+    if (autoConnect) [self connectSocket];
+}
+
 #pragma mark •••DataTaker Helpers
 - (BOOL) bundleAvailable
 {
-	return [bundleBuffer dataAvailable];
-}
-
-- (void) resetBundleBuffer
-{
-	return [bundleBuffer reset];
+	return bundleReadMark != bundleWriteMark || bundleFreeSpace == 0;
 }
 
 - (NSData*) readNextBundle
 {
-	return [bundleBuffer readNextBlock];
+    NSMutableData* theBlock = nil;
+
+    [bundleBufferLock lock];
+    if(bundleWriteMark != bundleReadMark || bundleFreeSpace == 0){
+        theBlock = (NSMutableData*)(*(dataPtr+bundleReadMark));
+        bundleReadMark = (bundleReadMark + 1) % bundleBufferSize;
+        bundleFreeSpace++; 
+    }
+    [bundleBufferLock unlock];
+    
+    return theBlock;
 }
 
 #pragma mark •••Archival
@@ -110,13 +133,14 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 	[[self undoManager] disableUndoRegistration];
 
 	[self setErrorTimeOut:  [decoder decodeIntForKey:   @"errorTimeOut"]];
+    [self setAutoConnect:   [decoder decodeBoolForKey:  @"autoConnect"]];
 	[self setNeedToSwap];
 
 	commandSocketLock = [[NSLock alloc] init];
 	coreSocketLock = [[NSLock alloc] init];
 	cmdArrayLock = [[NSLock alloc] init];
 	cmdArray = [[NSMutableArray alloc] init];
-	bundleBuffer = [[ORSafeCircularBuffer alloc] initWithBufferSize:kBundleBufferSize];
+    [self allocBufferWithSize:kBundleBufferSize];
 	
 	num_cmd_packets = 0;
 	num_dat_packets = 0;
@@ -129,6 +153,7 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 {
 	[super encodeWithCoder:encoder];
 	[encoder encodeInt:errorTimeOut		forKey:@"errorTimeOut"];
+    [encoder encodeBool:autoConnect     forKey:@"autoConnect"];
 }
 
 
@@ -165,6 +190,17 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 	isConnected = aNewIsConnected;
 	[[NSNotificationCenter defaultCenter] postNotificationName:XL3_LinkConnectionChanged object: self];
 	[self setTimeConnected:isConnected?[NSCalendarDate date]:nil];
+}
+
+- (BOOL) autoConnect
+{
+	return autoConnect;
+}
+
+- (void) setAutoConnect:(BOOL)anAutoConnect
+{
+	autoConnect = anAutoConnect;
+	[[NSNotificationCenter defaultCenter] postNotificationName:XL3_LinkAutoConnectChanged object: self];
 }
 
 - (int)  serverSocket
@@ -660,10 +696,6 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 		return;
 	}
 	
-	//parse their_addr
-	//if not correct swap the xl3Link with the correct crate
-	//NSLog(@"Connected to %@ <%@> port: %d\n",[self crateName], IPNumber, portNumber);
-
 	connectState = kConnected;
 	[[NSNotificationCenter defaultCenter] postNotificationName:XL3_LinkConnectStateChanged object: self];
 	[self setIsConnected:YES];
@@ -714,7 +746,7 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 
             if (((XL3_Packet*) aPacket)->cmdHeader.packet_type == MEGA_BUNDLE_ID) {
                 //packet_num?
-                [bundleBuffer writeBlock:((XL3_Packet*) aPacket)->payload length:((XL3_Packet*) aPacket)->cmdHeader.num_bundles * 12];
+                [self writeBundle:((XL3_Packet*) aPacket)->payload length:((XL3_Packet*) aPacket)->cmdHeader.num_bundles * 12];
                 bundle_count++;
             }
             else if (((XL3_Packet*) aPacket)->cmdHeader.packet_type == PING_ID) {
@@ -827,8 +859,14 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 		connectState = kDisconnected;
 		[[NSNotificationCenter defaultCenter] postNotificationName:XL3_LinkConnectStateChanged object: self];
 		[self setIsConnected:NO];
+        
 	}
+
 	[pool release];
+
+    if ([self autoConnect]) {
+        [self performSelectorOnMainThread:@selector(connectSocket) withObject:nil waitUntilDone:NO];
+    }
 }
 
 
@@ -907,6 +945,7 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 	struct timeval tv;
 	tv.tv_sec  = 0;
 	tv.tv_usec = 10000;
+	memset(aPacket, 0, XL3_PACKET_SIZE);
 	
 	while(numBytesToGet){
 		do {
@@ -970,6 +1009,61 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 	
 	int retval = select(aSocket + 1, NULL, &wfds, NULL, &tv);
 	return (retval > 0) && FD_ISSET(aSocket, &wfds);
+}
+
+@end
+
+
+@implementation XL3_Link (private)
+
+
+- (void) allocBufferWithSize:(unsigned) aBufferSize;
+{
+	bundleBufferSize = aBufferSize;
+	bundleBuffer	 = [[NSMutableData alloc] initWithLength:bundleBufferSize * sizeof(long)];
+	[bundleBuffer setLength:bundleBufferSize * sizeof(long)];
+	bundleBufferLock = [[NSLock alloc] init];
+	bundleFreeSpace	 = bundleBufferSize;
+	bundleReadMark	 = 0;
+	bundleWriteMark	 = 0;
+	dataPtr			 = (unsigned long*)[bundleBuffer mutableBytes];
+}
+
+- (void) releaseBuffer
+{
+	[bundleBuffer release]; bundleBuffer = nil;
+    [bundleBufferLock release];
+}
+
+- (unsigned) bundleBufferSize
+{
+	return bundleBufferSize;
+}
+
+- (unsigned) bundleReadMark
+{
+	return bundleReadMark;
+}
+
+- (unsigned) bundleWriteMark
+{
+	return bundleWriteMark;
+}
+
+- (BOOL) writeBundle:(char*)someBytes length:(unsigned)numBytes
+{
+    [bundleBufferLock lock];
+    BOOL full = NO;
+    if(bundleFreeSpace > 0){
+        NSMutableData* theData = [[NSMutableData alloc] initWithLength:numBytes + 8];
+        [theData replaceBytesInRange:NSMakeRange(8, numBytes) withBytes:someBytes length:numBytes];
+        *(dataPtr+bundleWriteMark) = (unsigned long)theData;
+        bundleWriteMark = (bundleWriteMark+1)%bundleBufferSize;	//move the write mark ahead 
+        bundleFreeSpace--; 
+    }
+    else full = YES;
+    [bundleBufferLock unlock];
+    return full;
 }
 
 @end

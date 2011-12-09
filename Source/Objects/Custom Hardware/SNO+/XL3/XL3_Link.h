@@ -32,29 +32,46 @@ eXL3_CrateStates;
 
 @interface XL3_Link : ORGroup
 {
-	int		serverSocket;
-	int		workingSocket;
+	int         serverSocket;
+	int         workingSocket;
 	NSLock*		commandSocketLock;	//avoids clashes between commands. Wrap an XL3 packet write,
                                     //so you know a possible write error comes from your command.
 	NSLock*		coreSocketLock;		//protects the socket, to guarantee that full packet is read/written
-                                    //and that reads and writes do not clash.
+                                    //and that reads and writes do not clash, XL3 is a fixed packet size protocol
 	NSLock*		cmdArrayLock;		//cmdArrayLock protects manipulations with the array of command responses
                                     //received from an XL3, to synchronize the threaded worker pushing XL3 responses,
-                                    //and XL3Model pulling the responses
+                                    //and XL3Model pulling/distributing the responses
 	BOOL		needToSwap;
 	NSString*	IPNumber;
 	NSString*	crateName;
 	unsigned long	portNumber;
 	BOOL		isConnected;
+    BOOL        autoConnect;
 	int		connectState;
 	int		errorTimeOut;
 	NSCalendarDate*	timeConnected;
 	NSMutableArray*	cmdArray;
-	ORSafeCircularBuffer* bundleBuffer;
 	unsigned long long num_cmd_packets;
 	unsigned long long num_dat_packets;
 	XL3_Packet	aMultiCmdPacket;
+    
+@private
+    //memory optimized circular buffer, motivated by ORSafeCirularBuffer. Thanks Mark.
+    //XL3_Link allocates and pushes megabundles as NSData, cb stores pointers to NSData*
+    //ORXL3_Model takeData memcopies into the data stream and releases
+    //it's not design to buffer, it's used to reverse the data stream direction
+    //if we went with ORSafeCircularBuffer the 20 pool releases caused noticable interruptions
+    NSMutableData*  bundleBuffer;
+    unsigned long*	dataPtr;
+    unsigned        bundleBufferSize;
+    unsigned        bundleReadMark;
+    unsigned        bundleWriteMark;
+    NSLock*         bundleBufferLock;
+    long            bundleFreeSpace;
 }
+
+@property (assign)	BOOL    isConnected;
+@property (assign)	BOOL    autoConnect;
 
 - (id)   init;
 - (void) dealloc;
@@ -63,8 +80,7 @@ eXL3_CrateStates;
 
 #pragma mark •••DataTaker Helpers
 - (BOOL) bundleAvailable;
-- (void) resetBundleBuffer;
-- (NSData*) readNextBundle;
+- (NSMutableData*) readNextBundle;
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;
@@ -78,8 +94,6 @@ eXL3_CrateStates;
 - (BOOL) needToSwap;
 - (void) setNeedToSwap;
 - (int)  connectState;
-- (BOOL) isConnected;
-- (void) setIsConnected:(BOOL)aNewIsConnected;
 - (void) setErrorTimeOut:(int)aValue;
 - (int) errorTimeOut;
 - (int) errorTimeOutSeconds;
@@ -119,3 +133,4 @@ extern NSString* XL3_LinkTimeConnectedChanged;
 extern NSString* XL3_LinkIPNumberChanged;
 extern NSString* XL3_LinkConnectStateChanged;
 extern NSString* XL3_LinkErrorTimeOutChanged;
+extern NSString* XL3_LinkAutoConnectChanged;

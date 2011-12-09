@@ -49,7 +49,7 @@ static NSDictionary* xl3Ops;
 - (void) awakeFromNib
 {
 	basicSize	= NSMakeSize(465,290);
-	compositeSize	= NSMakeSize(465,486);
+	compositeSize	= NSMakeSize(465,558);
 	blankView = [[NSView alloc] init];
 	[self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
 
@@ -68,8 +68,18 @@ static NSDictionary* xl3Ops;
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	if(aModel) [[self window] setTitle: [NSString stringWithFormat:@"XL3 Crate %d",[model crateNumber]]];
-	//[self setDriverInfo];
+	if(aModel) {
+        [[self window] setTitle: [NSString stringWithFormat:@"XL3 Crate %d",[model crateNumber]]];
+        [connectionIPAddressField setStringValue:[[model guardian] iPAddress]];
+        [connectionIPPortField setStringValue:[NSString stringWithFormat:@"%d", [[model guardian] portNumber]]];
+        [connectionCrateNumberField setStringValue:[NSString stringWithFormat:@"%d", [model crateNumber]]];
+    }
+    else {
+        [[self window] setTitle: [NSString stringWithFormat:@"XL3 Crate"]];
+        [connectionIPAddressField setStringValue:@"---"];
+        [connectionIPPortField setStringValue:@"---"];
+        [connectionCrateNumberField setStringValue:@"--"];
+    }
 }
 
 #pragma mark •••Notifications
@@ -147,21 +157,26 @@ static NSDictionary* xl3Ops;
 			 selector : @selector(compositeXl3PedestalMaskChanged:)
 			     name : ORXL3ModelXl3PedestalMaskChanged
 			   object : model];
-	
+		
 	[notifyCenter addObserver : self
-			 selector : @selector(ipNumberChanged:)
-			     name : XL3_LinkIPNumberChanged
-			   object : [model xl3Link]];
-	
-	[notifyCenter addObserver : self
-			 selector : @selector(connectStateChanged:)
-			     name : XL3_LinkConnectStateChanged
-			    object: [model xl3Link]];
+                     selector : @selector(connectStateChanged:)
+                         name : XL3_LinkConnectStateChanged
+                       object : [model xl3Link]];
 
 	[notifyCenter addObserver : self
-			 selector : @selector(errorTimeOutChanged:)
-			     name : XL3_LinkErrorTimeOutChanged
-			   object : [model xl3Link]];		
+                     selector : @selector(errorTimeOutChanged:)
+                         name : XL3_LinkErrorTimeOutChanged
+                       object : [model xl3Link]];		
+
+	[notifyCenter addObserver : self
+                     selector : @selector(connectionAutoConnectChanged:)
+                         name : XL3_LinkAutoConnectChanged
+                       object : [model xl3Link]];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(compositeXl3ChargeInjChanged:)
+                         name : ORXL3ModelXl3ChargeInjChanged
+                       object : [model xl3Link]];
 }
 
 - (void) updateWindow
@@ -184,14 +199,12 @@ static NSDictionary* xl3Ops;
 	[self compositeXl3PedestalMaskChanged:nil];
 	[self compositeXl3RWAddressChanged:nil];
 	[self compositeXL3RWDataChanged:nil];
+    [self compositeXl3ChargeInjChanged:nil];
+
 	//ip connection
 	[self errorTimeOutChanged:nil];
-
-/*
-	[self ipNumberChanged:nil];
-	[self portNumberChanged:nil];
-	[self initAfterConnectChanged:nil];
-*/
+    [self connectStateChanged:nil];
+    [self connectionAutoConnectChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -357,6 +370,12 @@ static NSDictionary* xl3Ops;
 	[compositeSetPedestalField setIntValue:[model xl3PedestalMask]];
 }
 
+- (void) compositeXl3ChargeInjChanged:(NSNotification*)aNote
+{
+    [compositeChargeInjChargeField setIntValue:[model xl3ChargeInjCharge]];
+    [compositeChargeInjMaskField setIntValue:[model xl3ChargeInjMask]];
+}
+
 #pragma mark •ip connection
 
 - (void) linkConnectionChanged:(NSNotification*)aNote
@@ -384,16 +403,15 @@ static NSDictionary* xl3Ops;
 	}	
 }
 
-- (void) ipNumberChanged:(NSNotification*)aNote;
-{
-	//todo
-}
-
 - (void) errorTimeOutChanged:(NSNotification*)aNote
 {
 	[errorTimeOutPU selectItemAtIndex:[[model xl3Link] errorTimeOut]];
 }
 
+- (void) connectionAutoConnectChanged:(NSNotification*)aNote;
+{
+    [connectionAutoConnectButton setIntValue:[[model xl3Link] autoConnect]];    
+}
 
 #pragma mark •••Helper
 - (void) populateOps
@@ -435,6 +453,10 @@ static NSDictionary* xl3Ops;
 									compositeResetXL3StateMachineRunningIndicator, @"spinner",
 									NSStringFromSelector(@selector(compositeResetXL3StateMachine)), @"selector",
 			 nil], @"compositeResetXL3StateMachine",
+              [NSDictionary dictionaryWithObjectsAndKeys: compositeChargeInjButton, @"button",
+               compositeChargeRunningIndicator, @"spinner",
+               NSStringFromSelector(@selector(compositeEnableChargeInjection)), @"selector",
+               nil], @"compositeEnableChargeInjection",
 		  nil];
 }
 
@@ -684,16 +706,19 @@ static NSDictionary* xl3Ops;
 	[model setXl3RWDataValue:[sender intValue]];
 }
 
-/*
-- (IBAction) compositeXl3RWSend:(id)sender
-{
-	[model compositeXl3RW];
-}
-*/
-
 - (IBAction) compositeSetPedestalValue:(id)sender
 {
 	[model setXl3PedestalMask:[sender intValue]];
+}
+
+- (IBAction) compositeXl3ChargeInjMaskAction:(id)sender
+{
+    [model setXl3ChargeInjMask:[sender intValue]];
+}
+
+- (IBAction) compositeXl3ChargeInjChargeAction:(id)sender
+{
+    [model setXl3ChargeInjCharge:[sender intValue]];
 }
 
 //connection
@@ -705,6 +730,11 @@ static NSDictionary* xl3Ops;
 - (IBAction) errorTimeOutAction:(id)sender
 {
 	[[model xl3Link] setErrorTimeOut:[sender indexOfSelectedItem]];
+}
+
+- (IBAction) connectionAutoConnectAction:(id)sender
+{
+    [[model xl3Link] setAutoConnect:[sender intValue]];
 }
 
 @end

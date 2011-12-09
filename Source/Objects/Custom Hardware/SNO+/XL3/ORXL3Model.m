@@ -20,6 +20,7 @@
 
 #pragma mark •••Imported Files
 #import "XL3_Link.h"
+#import "XL3_Cmds.h"
 #import "ORXL3Model.h"
 #import "ORSNOCrateModel.h"
 #import "ORSNOConstants.h"
@@ -59,6 +60,7 @@ NSString* ORXL3ModelXl3RWAddressValueChanged =		@"ORXL3ModelXl3RWAddressValueCha
 NSString* ORXL3ModelXl3RWDataValueChanged =		@"ORXL3ModelXl3RWDataValueChanged";
 NSString* ORXL3ModelXl3OpsRunningChanged =		@"ORXL3ModelXl3OpsRunningChanged";
 NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged";
+NSString* ORXL3ModelXl3ChargeInjChanged = @"ORXL3ModelXl3ChargeInjChanged";
 
 
 @interface ORXL3Model (private)
@@ -85,6 +87,11 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 	[xl3Link release];
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[super dealloc];
+}
+
+- (void) awakeAfterDocumentLoaded
+{
+    if (xl3Link) [xl3Link awakeAfterDocumentLoaded];
 }
 
 - (void) wakeUp 
@@ -137,7 +144,7 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 		if (!xl3Link) {
 			xl3Link = [[XL3_Link alloc] init];
 		}
-		[xl3Link setCrateName:[NSString stringWithFormat:@"XL3 crate %d", [self uniqueIdNumber] + 1]];
+		[xl3Link setCrateName:[NSString stringWithFormat:@"XL3 crate %d", [self crateNumber]]];
 		[xl3Link setIPNumber:[guardian iPAddress]];
 		[xl3Link setPortNumber:[guardian portNumber]];	
 	}
@@ -364,6 +371,33 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 	xl3PedestalMask = anXl3PedestalMask;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelXl3PedestalMaskChanged object:self];
 }
+ 
+
+- (unsigned long) xl3ChargeInjMask
+{
+    return xl3ChargeInjMask;
+}
+
+- (void) setXl3ChargeInjMask:(unsigned long)aXl3ChargeInjMask
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setXl3ChargeInjMask:xl3ChargeInjMask];
+	xl3ChargeInjMask = aXl3ChargeInjMask;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelXl3ChargeInjChanged object:self];
+    
+}
+
+- (unsigned char) xl3ChargeInjCharge
+{
+    return xl3ChargeInjCharge;
+}
+
+- (void) setXl3ChargeInjCharge:(unsigned char)aXl3ChargeInjCharge
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setXl3ChargeInjCharge:xl3ChargeInjCharge];
+	xl3ChargeInjCharge = aXl3ChargeInjCharge;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelXl3ChargeInjChanged object:self];
+    
+}
 
 - (int) slotConv
 {
@@ -554,20 +588,18 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-	[xl3Link resetBundleBuffer];
 	[aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORXL3Model"];	
 }
 
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-	//to be replaced with while...
-	if ([xl3Link bundleAvailable]) {
-		NSData* aBundle = [[xl3Link readNextBundle] retain]; //ORSafeCircularBuffer calls autorelease on the NSData
-		unsigned long data_length = 2 + [aBundle length] / 4;
-		unsigned long data[data_length];
-		data[0] = xl3MegaBundleDataId | data_length;
+	while ([xl3Link bundleAvailable]) {
+        NSMutableData* aBundle = [xl3Link readNextBundle];
+        unsigned long data_length = [aBundle length] / 4;
+        unsigned long* data = (unsigned long*)[aBundle mutableBytes];
+        data[0] = xl3MegaBundleDataId | data_length;
 		data[1] = 0; //packet count, maybe time, and crate ID in a meaningful way
-		memcpy(&data[2], [aBundle bytes], [aBundle length]);
+
 		[aDataPacket addLongsToFrameBuffer:data length:data_length];
 		[aBundle release]; aBundle = nil;
 	}
@@ -601,7 +633,9 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 	[self setXl3RWAddressValue:	[decoder decodeIntForKey:	@"ORXL3ModelXl3RWAddressValue"]];
 	[self setXl3RWDataValue:	[decoder decodeIntForKey:	@"ORXL3ModelXl3RWDataValue"]];
 	[self setXl3PedestalMask:	[decoder decodeIntForKey:	@"ORXL3ModelXl3PedestalMask"]];
-
+    [self setXl3ChargeInjMask: [decoder decodeIntForKey: @"ORXL3ModelXl3ChargeInjMask"]];
+    [self setXl3ChargeInjCharge: [decoder decodeIntForKey: @"ORXL3ModelXl3ChargeInjCharge"]];
+    
 	if (xl3Mode == 0) [self setXl3Mode: 1];
 	if (xl3OpsRunning == nil) xl3OpsRunning = [[NSMutableDictionary alloc] init];
 
@@ -623,6 +657,8 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 	[encoder encodeInt:xl3RWAddressValue	forKey:@"ORXL3ModelXl3RWAddressValue"];
 	[encoder encodeInt:xl3RWDataValue	forKey:@"ORXL3ModelXl3RWDataValue"];
 	[encoder encodeInt:xl3PedestalMask	forKey:@"ORXL3ModelXl3PedestalMask"];
+    [encoder encodeInt:xl3ChargeInjMask forKey:@"ORXL3ModelXl3ChargeInjMask"];
+    [encoder encodeInt:xl3ChargeInjCharge forKey:@"ORXL3ModelXl3ChargeInjCharge"];
 }
 
 #pragma mark •••Hardware Access
@@ -1118,7 +1154,7 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 - (void) compositeResetFIFOAndSequencer
 {
 	[self setXl3OpsRunning:YES forKey:@"compositResetFIFOAndSeuencer"];
-	NSLog(@"Reset FIFO and Sequencer.\n");
+	NSLog(@"Reset FIFO and Sequencer to be implemented.\n");
 	//slot mask?
 	
 	[self setXl3OpsRunning:NO forKey:@"compositeResetFIFOAndSequencer"];
@@ -1168,15 +1204,26 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 	
 }
 
-/*
-#define	PMTI_CLOCK_HIGH		0x00000001 			
-#define	PMTI_DATA_IN		0x00000002 			
-#define	PMTI_LOAD		0x00000004 			
-#define kFecHVCcsr		0x26
-#define kFecDACPrgReg		0x24
-*/
+- (void) compositeEnableChargeInjection
+{
+	[self setXl3OpsRunning:YES forKey:@"compositeEnableChargeInjection"];
 
-- (void) enableChargeInjectionForSlot:(unsigned short) aSlot slotMask:(unsigned long) aSlotMask
+    NSLog(@"%@, charge injection for slot: ", [[self xl3Link] crateName]);
+    unsigned int i;
+    unsigned long msk = [self xl3ChargeInjMask];
+    for (i=0; i < 16; i++) {
+		if (1 << i & msk) {
+            NSLog(@"%d ", i);
+            [self enableChargeInjectionForSlot:i channelMask:[self xl3ChargeInjMask]];
+        }
+    }    
+	NSLog(@"enabled.\n");
+    
+	[self setXl3OpsRunning:NO forKey:@"compositeEnableChargeInjection"];
+}
+
+
+- (void) enableChargeInjectionForSlot:(unsigned short) aSlot channelMask:(unsigned long) aChannelMask
 {
 	XL3_PayloadStruct payload;
 	memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
@@ -1184,7 +1231,7 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 	unsigned long* data = (unsigned long*) payload.payload;
     
     uint32_t slot = aSlot;
-    uint32_t mask = aSlotMask;
+    uint32_t mask = aChannelMask;
     
     if ([xl3Link needToSwap]) {
         slot = swapLong(slot);
@@ -1193,26 +1240,25 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 
     data[0] = slot;
     data[1] = mask;
-    
-    [[self xl3Link] sendCommand:SETUP_CHARGE_INJ_ID withPayload:&payload expectResponse:YES];
-    if (*(unsigned int*)payload.payload != 0) {
-        NSLog(@"error during enableChargeInjectionForSlot.\n");
+
+    @try {
+        [[self xl3Link] sendCommand:SETUP_CHARGE_INJ_ID withPayload:&payload expectResponse:YES];
+    }
+    @catch (NSException *exception) {
+        NSLog(@"error sending ChargeInjection command.\n");
     }
 
-    NSLog(@"%@: enabled charge injection for slot: %d, for channels: 0x%08x\n", [[self xl3Link] crateName], aSlot, aSlotMask);
-    
-    	
+    if (*(unsigned int*)payload.payload != 0) {
+        NSLog(@"XL3 error in enableChargeInjectionForSlot.\n");
+    }
+
+    //NSLog(@"%@: enabled charge injection for slot: %d, for channels: 0x%08x\n", [[self xl3Link] crateName], aSlot, aChannelMask);
+
 /*
-	//step 1. clock in the enable mask
-	//step 1A. first 16 bits are zero
 	@try {
         int index;
 		//[[self xl3Link] newMultiCmd];
 		for (index = 0; index < 16; index++){
-			usleep(10000);
-			[self writeHardwareRegister:(FEC_SEL*aSlot | kFecHVCcsr) value:0x0UL];
-			usleep(10000);
-			[self writeHardwareRegister:(FEC_SEL*aSlot | kFecHVCcsr) value:PMTI_CLOCK_HIGH];
 			//[[self xl3Link] addMultiCmdToAddress:(FEC_SEL*aSlot | kFecHVCcsr | WRITE_REG) withValue:0x0UL];
 			//[[self xl3Link] addMultiCmdToAddress:(FEC_SEL*aSlot | kFecHVCcsr | WRITE_REG) withValue:PMTI_CLOCK_HIGH];
 		}
@@ -1225,42 +1271,7 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 	}
 	@catch (NSException* e) {
 		NSLog(@"Enable charge injection failed; error: %@ reason: %@\n", [e name], [e reason]);
-	}
-		
-	//step1B. clock in the next 32 data bits
-	@try {
-		//[[self xl3Link] newMultiCmd];
-        int aChannel, aValue;
-		for (aChannel = 31; aChannel >= 0; aChannel--) {
-			if (aSlotMask & (1UL << aChannel)) aValue = PMTI_DATA_IN;
-			else aValue = 0;
-			usleep(10000);
-			[self writeHardwareRegister:(FEC_SEL*aSlot | kFecHVCcsr) value:aValue];
-			usleep(10000);
-			[self writeHardwareRegister:(FEC_SEL*aSlot | kFecHVCcsr) value:(aValue | PMTI_CLOCK_HIGH)];
-			
-			//[[self xl3Link] addMultiCmdToAddress:(FEC_SEL*aSlot | kFecHVCcsr | WRITE_REG) withValue:aValue];
-			//[[self xl3Link] addMultiCmdToAddress:(FEC_SEL*aSlot | kFecHVCcsr | WRITE_REG) withValue:(aValue | PMTI_CLOCK_HIGH)];
-		}
-
-		usleep(10000);		
-		[self writeHardwareRegister:(FEC_SEL*aSlot | kFecHVCcsr) value:0UL];
-		usleep(10000);
-		[self writeHardwareRegister:(FEC_SEL*aSlot | kFecHVCcsr) value:PMTI_LOAD];
-		//[[self xl3Link] addMultiCmdToAddress:(FEC_SEL*aSlot | kFecHVCcsr | WRITE_REG) withValue:0UL];
-		//[[self xl3Link] addMultiCmdToAddress:(FEC_SEL*aSlot | kFecHVCcsr | WRITE_REG) withValue:PMTI_LOAD];
-
-		
-		//[[self xl3Link] executeMultiCmd];
-		
-		//if ([[self xl3Link] multiCmdFailed]) {
-		//	NSLog(@"Enable charge injection failed: XL3 bus error.\n");
-		//	return;
-		//}
-	}
-	@catch (NSException* e) {
-		NSLog(@"Enable charge injection failed; error: %@ reason: %@\n", [e name], [e reason]);
-	}
+	}		
 */
 }
 
