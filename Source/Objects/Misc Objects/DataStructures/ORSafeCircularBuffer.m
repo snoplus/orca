@@ -119,7 +119,7 @@
 {
 	BOOL result;
 	[bufferLock lock];
-	result =  writeMark != readMark;
+	result =  writeMark != readMark || freeSpace == 0;
 	[bufferLock unlock];
 	return result;
 }
