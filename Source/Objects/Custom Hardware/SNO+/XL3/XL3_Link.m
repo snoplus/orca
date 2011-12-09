@@ -111,7 +111,7 @@ NSString* XL3_LinkAutoConnectChanged    = @"XL3_LinkAutoConnectChanged";
 	return bundleReadMark != bundleWriteMark || bundleFreeSpace == 0;
 }
 
-- (NSData*) readNextBundle
+- (NSMutableData*) readNextBundle
 {
     NSMutableData* theBlock = nil;
 
