@@ -43,7 +43,7 @@
 - (void) setDataId: (unsigned long) DataId;
 - (void)setNumberBins:(int)aNumberBins;
 - (int) numberBins;
-- (unsigned long)value:(unsigned short)aBin;
+- (unsigned long)value:(unsigned long)aBin;
 - (unsigned long) overFlow;
 - (NSMutableArray*) rois;
 - (NSData*) getNonZeroRawDataWithStart:(unsigned long*)start end:(unsigned long*)end;

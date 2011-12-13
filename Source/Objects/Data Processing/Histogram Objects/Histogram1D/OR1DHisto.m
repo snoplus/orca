@@ -97,7 +97,7 @@
 }
 
 
--(unsigned long)value:(unsigned short)aChan
+-(unsigned long)value:(unsigned long)aChan
 {
     unsigned long theValue;
 	[dataSetLock lock];

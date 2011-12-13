@@ -34,7 +34,7 @@
 	mask=aMask;
 }
 
--(long) value:(unsigned short)aChan
+-(long) value:(unsigned long)aChan
 {
 	if(!mask)return [super value:aChan];
 	return [super value:aChan] & mask;
@@ -77,7 +77,7 @@
 	return startIndex;
 }
 
--(long) value:(unsigned short)aChan
+-(long) value:(unsigned long)aChan
 {
 	aChan = (aChan + startIndex)%[self numberBins];;
 	if(!mask)return [super value:aChan];
@@ -152,7 +152,7 @@
 	return firstBitMask;
 }
 
--(long) value:(unsigned short)aChan
+-(long) value:(unsigned long)aChan
 {
 	aChan = (aChan + startIndex)%[self numberBins];;
 	return [self unMaskedValue:aChan];

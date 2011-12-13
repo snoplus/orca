@@ -37,8 +37,8 @@
 - (unsigned long) dataOffset;
 - (void) setDataOffset:(unsigned long)newOffset;
 - (int)  numberBins;
-- (long) value:(unsigned short)channel;
-- (long) value:(unsigned short)channel callerLockedMe:(BOOL)callerLockedMe;
+- (long) value:(unsigned long)channel;
+- (long) value:(unsigned long)channel callerLockedMe:(BOOL)callerLockedMe;
 - (void) setWaveform:(NSData*)aWaveform;
 - (BOOL) useUnsignedValues;
 - (void) setUseUnsignedValues:(BOOL)aState;

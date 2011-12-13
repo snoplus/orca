@@ -86,12 +86,12 @@ NSString* ORWaveformUseUnsignedChanged   = @"ORWaveformUseUnsignedChanged";
     else return 64*1024;
 }
 
--(long) value:(unsigned short)aChan
+-(long) value:(unsigned long)aChan
 {
   return [self value:aChan callerLockedMe:false];
 }
 
--(long) value:(unsigned short)aChan callerLockedMe:(BOOL)callerLockedMe
+-(long) value:(unsigned long)aChan callerLockedMe:(BOOL)callerLockedMe
 {
     if(!callerLockedMe) [dataSetLock lock];
 
