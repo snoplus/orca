@@ -324,7 +324,6 @@
  */
 @end
 
-
 @implementation ORSIS3302DecoderForMca
 
 //------------------------------------------------------------------
@@ -358,6 +357,103 @@
 					sender:self  
 				  withKeys:@"SIS3302",@"MCA",crateKey,cardKey,channelKey,nil];
 	
+    return length; //must return number of longs
+}
+
+- (NSString*) dataRecordDescription:(unsigned long*)ptr
+{
+	
+	//TODO ---- 
+	/*
+	 ptr++;
+	 NSString* title= @"SIS3302 Waveform Record\n\n";
+	 NSString* crate = [NSString stringWithFormat:@"Crate = %d\n",(*ptr&0x01e00000)>>21];
+	 NSString* card  = [NSString stringWithFormat:@"Card  = %d\n",(*ptr&0x001f0000)>>16];
+	 NSString* moduleID = (*ptr&0x1)?@"SIS3301":@"SIS3302";
+	 ptr++;
+	 NSString* triggerWord = [NSString stringWithFormat:@"TriggerWord  = 0x08%x\n",*ptr];
+	 ptr++;
+	 NSString* Event = [NSString stringWithFormat:@"Event  = 0x%08x\n",(*ptr>>24)&0xff];
+	 NSString* Time = [NSString stringWithFormat:@"Time Since Last Trigger  = 0x%08x\n",*ptr&0xffffff];
+	 
+	 return [NSString stringWithFormat:@"%@%@%@%@%@%@%@",title,crate,card,moduleID,triggerWord,Event,Time];       
+	 */
+	return @"Description not implemented yet";
+}
+
+@end
+
+
+@implementation ORSIS3302GenericDecoderForWaveform
+
+//------------------------------------------------------------------
+//xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+//^^^^ ^^^^ ^^^^ ^^-----------------------data id
+//                 ^^ ^^^^ ^^^^ ^^^^ ^^^^-length in longs
+
+//xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+//        ^ ^^^---------------------------crate
+//             ^ ^^^^---------------------card
+//                    ^^^^ ^^^^-----------channel
+
+//xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx-waveform piece tag
+//xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx-length of total waveform
+
+// ---- followed by the waveform data
+//------------------------------------------------------------------
+
+- (void) dealloc
+{
+	[currentWaveformCache release];
+    [super dealloc];
+}
+
+
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
+{
+    unsigned long* ptr = (unsigned long*)someData;
+	unsigned long length = ExtractLength(ptr[0]);
+	int crate	= ShiftAndExtract(ptr[1],21,0xf);
+	int card	= ShiftAndExtract(ptr[1],16,0x1f);
+	int channel = ShiftAndExtract(ptr[1],8,0xff);
+    //unsigned long wfTag = ptr[2];
+    unsigned long totalWFLength = ptr[3];
+	
+	NSString* crateKey		= [self getCrateKey: crate];
+	NSString* cardKey		= [self getCardKey: card];
+	NSString* channelKey	= [self getChannelKey: channel];
+    
+    
+    if(length > 4){
+        unsigned char* bPtr = (unsigned char*)&ptr[4];
+        NSMutableData* recordAsData = [NSMutableData dataWithBytes:bPtr length:(length-4)*sizeof(long)];
+        if ( length - 4 == totalWFLength ) {
+            [aDataSet loadWaveform:recordAsData 
+                            offset: 0
+                          unitSize: 2 //unit size in bytes!
+                            sender: self 						 
+                          withKeys: @"SIS3302Generic", @"Energy Waveform",crateKey,cardKey,channelKey,nil];	
+        } else {
+            NSString* astr = [NSString stringWithFormat:@"%@%@%@",crateKey,cardKey,channelKey];
+            if (currentWaveformCache == nil) currentWaveformCache = [[NSMutableDictionary alloc] init];
+            NSMutableData* oldData = [currentWaveformCache objectForKey:astr];
+            if (oldData == nil) {
+                [currentWaveformCache setObject:recordAsData forKey:astr];
+            } else {
+                [oldData appendData:recordAsData];
+                if ([oldData length]/4 == totalWFLength) {
+                    [aDataSet loadWaveform: oldData
+                                    offset: 0
+                                  unitSize: 2 //unit size in bytes!
+                                    sender: self 						 
+                                  withKeys: @"SIS3302Generic", @"Energy Waveform",crateKey,cardKey,channelKey,nil];	
+                    [currentWaveformCache removeObjectForKey:astr];
+                }
+                
+            }
+        }
+    }
+    
     return length; //must return number of longs
 }
 
