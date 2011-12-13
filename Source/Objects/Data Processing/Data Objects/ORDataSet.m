@@ -1047,6 +1047,8 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
 		}
 		
 		else {
+            [waveform setDataOffset:anOffset];
+			[waveform setUnitSize:aUnitSize];            
 			[waveform setWaveform:aWaveForm];
 		}
 		va_end(myArgs);
