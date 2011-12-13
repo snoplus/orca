@@ -25,6 +25,8 @@
 #import "ORAdeiLoader.h"
 
 #pragma mark •••Notification Strings
+NSString* ORIpeSlowControlModelManualTypeChanged = @"ORIpeSlowControlModelManualTypeChanged";
+NSString* ORIpeSlowControlModelManualPathChanged = @"ORIpeSlowControlModelManualPathChanged";
 NSString* ORIpeSlowControlModelShowDebugOutputChanged = @"ORIpeSlowControlModelShowDebugOutputChanged";
 NSString* ORIpeSlowControlModelShipRecordsChanged	= @"ORIpeSlowControlModelShipRecordsChanged";
 NSString* ORIpeSlowControlModelTotalRequestCountChanged = @"ORIpeSlowControlModelTotalRequestCountChanged";
@@ -82,6 +84,7 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 
 - (void) dealloc
 {
+    [manualPath release];
     [setpointRequestsQueue release];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[connectionHistory release];
@@ -147,6 +150,32 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 
 
 #pragma mark ***Accessors
+
+- (int) manualType
+{
+    return manualType;
+}
+
+- (void) setManualType:(int)aManualType
+{
+    manualType = aManualType;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlModelManualTypeChanged object:self];
+}
+
+- (NSString*) manualPath
+{
+    if(manualPath==nil) return @"";
+    return manualPath;
+}
+
+- (void) setManualPath:(NSString*)aManualPath
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setManualPath:manualPath];
+	if([aManualPath length]==0) aManualPath = @"";
+    [manualPath autorelease];
+    manualPath = [aManualPath copy];    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlModelManualPathChanged object:self];
+}
 
 - (NSMutableArray*) setpointRequestsQueue
 {
@@ -871,6 +900,15 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 	else return @"<Error: index out of bounds>";
 }
 
+- (void) manuallyCreateChannel
+{
+	NSLog(@"called %@::%@ \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: debug output -tb-
+	
+	NSLog(@"Create with: Url: %@  (%@),   Path:%@  , Type:%i  \n", IPNumber, [self ipNumberToURL]  ,manualPath, manualType);
+}
+
+
+
 - (NSString*) itemKey:aUrl:aPath
 {
     if(aUrl==nil || aPath==nil) return nil;
@@ -888,6 +926,8 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
  	[self initConnectionHistory];
    
     [self initBasics];
+	[self setManualType:[decoder decodeIntForKey:@"manualType"]];
+	[self setManualPath:[decoder decodeObjectForKey:@"manualPath"]];
 	[self setShowDebugOutput:	[decoder decodeBoolForKey:    @"showDebugOutput"]];
 	[self setShipRecords:		[decoder decodeBoolForKey:	  @"shipRecords"]];
 	[self setFastGenSetup:		[decoder decodeBoolForKey:	  @"fastGen"]];
@@ -910,6 +950,8 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];    
+	[encoder encodeInt:manualType forKey:@"manualType"];
+	[encoder encodeObject:manualPath forKey:@"manualPath"];
 	[encoder encodeBool:showDebugOutput		forKey:@"showDebugOutput"];
 	[encoder encodeBool:shipRecords			forKey:@"shipRecords"];
 	[encoder encodeBool:fastGenSetup		forKey:@"fastGen"];

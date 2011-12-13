@@ -183,6 +183,16 @@
                          name : ORIpeSlowControlSetpointRequestQueueChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(manualPathChanged:)
+                         name : ORIpeSlowControlModelManualPathChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(manualTypeChanged:)
+                         name : ORIpeSlowControlModelManualTypeChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -208,6 +218,18 @@
 	[self shipRecordsChanged:nil];
 	[self showDebugOutputChanged:nil];
 	[self setpointRequestQueueChanged:nil];
+	[self manualTypeChanged:nil];
+	[self manualPathChanged:nil];
+}
+
+- (void) manualTypeChanged:(NSNotification*)aNote
+{
+	[manualTypePopup selectItemAtIndex: [model manualType]];
+}
+
+- (void) manualPathChanged:(NSNotification*)aNote
+{
+	[manualPathTextField setStringValue: [model manualPath]];
 }
 
 - (void) setpointRequestQueueChanged:(NSNotification*)aNote
@@ -389,6 +411,20 @@
 }
 
 #pragma mark ***Actions
+- (IBAction) manuallyCreateChannelAction:(id)sender
+{
+	[model manuallyCreateChannel];	
+}
+
+- (void) manualTypePopupAction:(id)sender
+{
+	[model setManualType:[sender indexOfSelectedItem]];	
+}
+
+- (void) manualPathTextFieldAction:(id)sender
+{
+	[model setManualPath:[sender stringValue]];	
+}
 
 - (void) showDebugOutputAction:(id)sender
 {

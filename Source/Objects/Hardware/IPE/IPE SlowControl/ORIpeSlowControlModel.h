@@ -94,6 +94,8 @@
     BOOL shipRecords;
     BOOL showDebugOutput;
     NSMutableArray* setpointRequestsQueue;
+    NSString* manualPath;
+    int manualType;
 }
 
 #pragma mark ***Initialization
@@ -111,6 +113,10 @@
 - (void) setChannelDataId:(int) aValue;
 
 #pragma mark ***Accessors
+- (int) manualType;
+- (void) setManualType:(int)aManualType;
+- (NSString*) manualPath;
+- (void) setManualPath:(NSString*)aManualPath;
 - (NSMutableArray*) setpointRequestsQueue;
 - (void) setSetpointRequestsQueue:(NSMutableArray*)aSetpointRequestsQueue;
 - (int) setpointRequestsQueueCount;
@@ -151,6 +157,9 @@
 - (void)	      pollSlowControls;
 - (NSString*)     createWebRequestForItem:(int)aChannel;
 - (NSString*)	  itemDetails:(int)index;
+
+- (void)          manuallyCreateChannel;
+
 
 #pragma mark ***Polling Cache
 - (unsigned)  pollingLookUpCount;
@@ -233,6 +242,8 @@
 @end
 
 #pragma mark •••Notification Strings
+extern NSString* ORIpeSlowControlModelManualTypeChanged;
+extern NSString* ORIpeSlowControlModelManualPathChanged;
 extern NSString* ORIpeSlowControlModelShowDebugOutputChanged;
 extern NSString* ORIpeSlowControlModelShipRecordsChanged;
 extern NSString* ORIpeSlowControlModelTotalRequestCountChanged;

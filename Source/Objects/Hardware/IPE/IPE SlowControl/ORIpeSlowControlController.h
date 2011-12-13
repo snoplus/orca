@@ -27,6 +27,8 @@
 
 {
 	IBOutlet ORPlotView*		timingPlotter;   
+	IBOutlet NSPopUpButton*		manualTypePopup;
+	IBOutlet NSTextField*		manualPathTextField;
 	IBOutlet NSButton*			showDebugOutputCB;
 	IBOutlet NSButton*			shipRecordsCB;
 	IBOutlet NSTextField*		totalRequestCountField;
@@ -67,6 +69,8 @@
 - (id) init;
 
 #pragma mark ***Interface Management
+- (void) manualTypeChanged:(NSNotification*)aNote;
+- (void) manualPathChanged:(NSNotification*)aNote;
 - (void) setpointRequestQueueChanged:(NSNotification*)aNote;
 - (void) showDebugOutputChanged:(NSNotification*)aNote;
 - (void) shipRecordsChanged:(NSNotification*)aNote;
@@ -92,6 +96,9 @@
 - (void) drawDidClose:(NSNotification*)aNote;
 
 #pragma mark ***Actions
+- (IBAction) manuallyCreateChannelAction:(id)sender;
+- (IBAction) manualTypePopupAction:(id)sender;
+- (IBAction) manualPathTextFieldAction:(id)sender;
 - (IBAction) showDebugOutputAction:(id)sender;
 - (IBAction) shipRecordsAction:(id)sender;
 - (IBAction) fastGenSetupAction:(id)sender;
