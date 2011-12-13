@@ -149,6 +149,8 @@
 #pragma mark •••Actions
 
 - (IBAction) forceTriggerAction:(id)sender;
+- (IBAction) resetAction:(id)sender;
+
 - (IBAction) clockSourceAction:(id)sender;
 - (IBAction) baseAddressAction:(id)sender;
 - (IBAction) settingLockAction:(id) sender;

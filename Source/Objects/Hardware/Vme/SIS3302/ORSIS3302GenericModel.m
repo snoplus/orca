@@ -32,7 +32,6 @@
 
 ORSIS3302_IMPLEMENT_NOTIFY(FirmwareVersion);
 
-ORSIS3302_IMPLEMENT_NOTIFY(TriggerGateLength);
 ORSIS3302_IMPLEMENT_NOTIFY(PreTriggerDelay);
 
 ORSIS3302_IMPLEMENT_NOTIFY(SampleLength);
@@ -48,7 +47,7 @@ ORSIS3302_IMPLEMENT_NOTIFY(SettingsLock);
 ORSIS3302_IMPLEMENT_NOTIFY(RateGroup);
 ORSIS3302_IMPLEMENT_NOTIFY(SampleDone);
 ORSIS3302_IMPLEMENT_NOTIFY(ID);
-ORSIS3302_IMPLEMENT_NOTIFY(GateLength);
+
 ORSIS3302_IMPLEMENT_NOTIFY(PulseLength);
 ORSIS3302_IMPLEMENT_NOTIFY(SumG);
 ORSIS3302_IMPLEMENT_NOTIFY(PeakingTime);
@@ -80,7 +79,8 @@ ORSIS3302_IMPLEMENT_NOTIFY(CardInited);
 - (void) executeCommandList:(ORCommandList*) aList;
 - (void) writePageRegister:(int) aPage;
 - (void) writePreTriggerDelay;
-- (void) writeAcquistionRegister;
+- (void) writeDelaysAndMaxEvents;
+- (void) writeAcquisitionRegister:(BOOL)forceAutostartOff;
 - (void) writeEventConfiguration;
 - (void) writeAdcInputMode;
 - (void) writeThresholds;
@@ -195,7 +195,6 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302GenReadRe
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	
-	[gateLengths release];
 	[pulseLengths release];
 	[peakingTimes release];
  	[thresholds release];
@@ -351,7 +350,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302GenReadRe
 }
 
 - (short) gtMask { return gtMask; }
-- (BOOL) gt:(short)chan	 { return gtMask & (1<<chan); }
+- (BOOL) gt:(short)chan	 { return (gtMask & (1<<chan)) != 0; }
 - (void) setGtMask:(long)aMask	
 { 
 	[[[self undoManager] prepareWithInvocationTarget:self] setGtMask:gtMask];
@@ -371,7 +370,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302GenReadRe
 - (BOOL) useTrapTrigger:(short)chan
 {
     if (chan > kNumSIS3302Channels) return NO;
-    return (useTrapTriggerMask & (1<<chan));
+    return (useTrapTriggerMask & (1<<chan)) != 0 ;
 }
 - (void) setUseTrapTriggerMask:(short)aMask
 {
@@ -465,7 +464,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302GenReadRe
 {
     if(group>=4)return; 
     [[[self undoManager] prepareWithInvocationTarget:self] setSampleLength:group withValue:[self sampleLength:group]];
-	aValue = [self limitIntValue:aValue min:4 max:0xfffffc];
+	aValue = [self limitIntValue:aValue min:4 max:0x1ffffff];
 	aValue = (aValue/4)*4;
     [sampleLengths replaceObjectAtIndex:group withObject:[NSNumber numberWithInt:aValue]];
 	//[self calculateSampleValues];
@@ -486,7 +485,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302GenReadRe
 - (BOOL) stopEventAtLength:(short)group
 {
     if(group>=4)return 0; 
-    return (stopAtEventLengthMask & (1 << group)); 
+    return (stopAtEventLengthMask & (1 << group)) != 0; 
 }
 - (void) setStopEventAtLength:(long)aMask	
 { 
@@ -505,7 +504,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302GenReadRe
 - (BOOL) pageWrap:(short)group
 {
     if(group>=4)return 0; 
-    return (enablePageWrapMask & (1 << group)); 
+    return (enablePageWrapMask & (1 << group)) != 0; 
 }
 - (void) setPageWrap:(long)aMask	
 { 
@@ -538,7 +537,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302GenReadRe
 - (BOOL) enableTestData:(short)group
 {
     if(group>=4)return 0; 
-    return (enableTestDataMask & (1 << group)); 
+    return ((enableTestDataMask & (1 << group)) != 0); 
 }
 - (void) setEnableTestData:(long)aMask
 { 
@@ -693,6 +692,36 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302GenReadRe
 		case 5: return 	kSIS3302TriggerSetupAdc6;
 		case 6: return 	kSIS3302TriggerSetupAdc7;
 		case 7: return 	kSIS3302TriggerSetupAdc8;
+    }
+    return (unsigned long) -1;
+}
+
+- (unsigned long) getEventDirectoryForChannel:(int) channel 
+{
+    switch (channel) {
+		case 0: return 	kSIS3302GenericEventDirectoryAdc1;
+		case 1: return 	kSIS3302GenericEventDirectoryAdc2;
+		case 2: return 	kSIS3302GenericEventDirectoryAdc3;
+		case 3: return 	kSIS3302GenericEventDirectoryAdc4;
+		case 4: return 	kSIS3302GenericEventDirectoryAdc5;
+		case 5: return 	kSIS3302GenericEventDirectoryAdc6;
+		case 6: return 	kSIS3302GenericEventDirectoryAdc7;
+		case 7: return 	kSIS3302GenericEventDirectoryAdc8;
+    }
+    return (unsigned long) -1;
+}
+
+- (unsigned long) getNextSampleAddressForChannel:(int) channel 
+{
+    switch (channel) {
+		case 0: return 	kSIS3302ActualSampleAddressAdc1;
+		case 1: return 	kSIS3302ActualSampleAddressAdc2;
+		case 2: return 	kSIS3302ActualSampleAddressAdc3;
+		case 3: return 	kSIS3302ActualSampleAddressAdc4;
+		case 4: return 	kSIS3302ActualSampleAddressAdc5;
+		case 5: return 	kSIS3302ActualSampleAddressAdc6;
+		case 6: return 	kSIS3302ActualSampleAddressAdc7;
+		case 7: return 	kSIS3302ActualSampleAddressAdc8;
     }
     return (unsigned long) -1;
 }
@@ -957,15 +986,15 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302GenReadRe
 {  
 
 	[self readModuleID:NO];
+    [self writeAdcInputMode];    
 	[self writeEventConfiguration];
 	[self writePreTriggerDelay];
-    [self writeAdcInputMode];
 	[self writeTriggerSetups];
 	[self writeThresholds];
 	[self writeDacOffsets];
 	[self resetSamplingLogic];
-	
-	[self writeAcquistionRegister];			//set up the Acquisition Register
+	[self writeDelaysAndMaxEvents];
+	[self writeAcquisitionRegister:NO];			//set up the Acquisition Register
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302GenericCardInitedChanged object:self];
 	
@@ -999,13 +1028,13 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302GenReadRe
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
 	NSDictionary* aDictionary;
 	
-	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-				   @"ORSIS3302DecoderForLostData",			@"decoder",
-				   [NSNumber numberWithLong:lostDataId],	@"dataId",
-				   [NSNumber numberWithBool:NO],			@"variable",
-				   [NSNumber numberWithLong:3],				@"length",
+    aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+				   @"ORSIS3302GenericDecoderForWaveform",				@"decoder",
+				   [NSNumber numberWithLong:dataId],@"dataId",
+				   [NSNumber numberWithBool:YES],   @"variable",
+				   [NSNumber numberWithLong:-1],	@"length",
 				   nil];
-    [dataDictionary setObject:aDictionary forKey:@"LostData"];
+    [dataDictionary setObject:aDictionary forKey:@"Waveform"];    
 	
     return dataDictionary;
 }
@@ -1110,7 +1139,6 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302GenReadRe
 {
 	NSDictionary* cardDictionary = [self findCardDictionaryInHeader:fileHeader];
 	if([param isEqualToString:@"Threshold"])						return [[cardDictionary objectForKey:@"thresholds"] objectAtIndex:aChannel];
-	else if([param isEqualToString:@"GateLength"])					return [[cardDictionary objectForKey:@"gateLengths"] objectAtIndex:aChannel];
 	else if([param isEqualToString:@"PulseLength"])					return [[cardDictionary objectForKey:@"pulseLengths"] objectAtIndex:aChannel];
 	else if([param isEqualToString:@"SumG"])						return [[cardDictionary objectForKey:@"sumGs"] objectAtIndex:aChannel];
 	else if([param isEqualToString:@"PeakingTime"])					return [[cardDictionary objectForKey:@"peakingTimes"] objectAtIndex:aChannel];
@@ -1136,7 +1164,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302GenReadRe
     //----------------------------------------------------------------------------------------
     // first add our description to the data description
     
-    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORSIS3302"];    
+    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORSIS3302Generic"];    
     
     //cache some stuff
     location        = (([self crateNumber]&0x0000000f)<<21) | (([self slot]& 0x0000001f)<<16);
@@ -1148,22 +1176,109 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302GenReadRe
 	[self setLed:YES];
 	[self clearTimeStamp];
 	
-	firstTime	= YES;
 	isRunning	= NO;
 	count=0;
     [self startRates];
-	
-	int group;
-	for(group=0;group<4;group++){
-		dataRecord[group] = nil;
-	}
 }
 
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
 	//reading events from the mac is very, very slow. If the buffer is filling up, it can take a long time to readout all events.
 	//Because of this we limit the number of events from any one buffer read. The SBC should be used if possible.
+    const unsigned totalPageSize = 0x800000;
+    const unsigned totalPageNumberMask = totalPageSize - 1;
+    const unsigned maxSubWaveformLength = kMaxSIS3302SingleMaxRecord - 4;
     @try {
+        unsigned long check;
+        unsigned long checkTwo;
+        [theController readLongBlock:&check
+                            atAddress:[self baseAddress] + kSIS3302AcquisitionControl
+                            numToRead:1
+                           withAddMod:addressModifier
+                        usingAddSpace:0x01];
+        if ( (check & 0x10000) != 0 ) {
+            // this means we are sampling
+            // in principle, we should be able to read out, but we wait.
+            return;
+        }
+
+        // otherwise we have data, try to read it out.
+        int chan;
+        for (chan=0;chan<kNumSIS3302Channels;chan++) {
+            [theController readLongBlock:&checkTwo
+                               atAddress:[self baseAddress] + [self getNextSampleAddressForChannel:chan]
+                               numToRead:1
+                              withAddMod:addressModifier
+                           usingAddSpace:0x01];
+            
+            [theController readLongBlock:&check
+                                atAddress:[self baseAddress] + [self getEventDirectoryForChannel:chan]
+                                numToRead:1
+                               withAddMod:addressModifier
+                            usingAddSpace:0x01];            
+            // Total number of longs
+            check &= 0x1FFFFFC;            
+            if (checkTwo == 0 || checkTwo != check) return;
+        }
+        BOOL needsReset = NO;
+        for (chan=0;chan<kNumSIS3302Channels;chan++) {
+            
+            [theController readLongBlock:&check
+                               atAddress:[self baseAddress] + [self getEventDirectoryForChannel:chan]
+                               numToRead:1
+                              withAddMod:addressModifier
+                           usingAddSpace:0x01];            
+            // Total number of longs
+            check &= 0x1FFFFFC;            
+            if (check == 0) continue;
+            needsReset = YES;
+
+            unsigned long pageNumberTag = 0;
+            unsigned long readLongs = 0;
+            unsigned int readAtAddress = 0;
+            unsigned int longsToRead = check/2;
+            for (;readLongs < longsToRead;readLongs += maxSubWaveformLength) {
+                // Get the next number of longs to read
+                unsigned int nextToRead = (longsToRead - readLongs > maxSubWaveformLength) ? maxSubWaveformLength : (longsToRead - readLongs);
+ 
+                unsigned int tempToRead = nextToRead;
+                unsigned int ptrOffset = 0;
+                while (tempToRead > 0) {
+                    unsigned long pageNumber = (readAtAddress >> 23) & 0x7;
+                    [theController writeLongBlock:&pageNumber
+                                        atAddress:[self baseAddress] + kSIS3302AdcMemoryPageRegister
+                                        numToWrite:1
+                                       withAddMod:addressModifier
+                                    usingAddSpace:0x01];  
+                    unsigned int bytesToRead = (4*tempToRead & totalPageNumberMask);
+                    unsigned int addrToRead = [self baseAddress] + [self getAdcMemory:chan] + (readAtAddress & totalPageNumberMask);
+                    if (((bytesToRead + (readAtAddress & totalPageNumberMask)) > totalPageNumberMask)) {
+                        bytesToRead = totalPageNumberMask - (readAtAddress & totalPageNumberMask) + 1;
+                    }
+                    [theController readLongBlock:&dataRecord[4 + ptrOffset]
+                                        atAddress:addrToRead
+                                        numToRead:bytesToRead/4
+                                       withAddMod:0x8
+                                    usingAddSpace:0x01]; 
+                    readAtAddress += bytesToRead;
+                    ptrOffset += bytesToRead/4;                    
+                    tempToRead -= bytesToRead/4;
+
+                }
+                dataRecord[0] = dataId | nextToRead + 4;
+                dataRecord[1] =	location | ((chan & 0x000000ff)<<8);                
+                dataRecord[2] = pageNumberTag++;
+                dataRecord[3] = longsToRead;
+                
+                [aDataPacket addLongsToFrameBuffer:&dataRecord[0] length:(nextToRead+4)];
+            }
+             
+        }
+        
+        // reset the sampling logic, allow everything to go back to 0.
+        if (needsReset) [self resetSamplingLogic];
+        
+        
 	}
 	@catch(NSException* localException) {
 		[self incExceptionCount];
@@ -1183,14 +1298,6 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302GenReadRe
 
     [waveFormRateGroup stop];
 	[self setLed:NO];
-	
-	int group;
-	for(group=0;group<4;group++){
-		if(dataRecord){
-			free(dataRecord[group]);
-			dataRecord[group] = nil;
-		}
-	}
 	
 }
 
@@ -1233,12 +1340,29 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302GenReadRe
 
 - (void) resetSamplingLogic
 {
+    // First turn off autostart if it's on
+    [self writeAcquisitionRegister:YES];
+    
  	unsigned long aValue = 0; //value doesn't matter 
 	[[self adapter] writeLongBlock:&aValue
                          atAddress:[self baseAddress] + kSIS3302KeyDisarm
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
+    
+	[[self adapter] writeLongBlock:&aValue
+                         atAddress:[self baseAddress] + kSIS3302KeySampleLogicReset
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+    
+	[[self adapter] writeLongBlock:&aValue
+                         atAddress:[self baseAddress] + kSIS3302KeyDisarm
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];    
+    [self writeAcquisitionRegister:NO];
+    
 }
 
 - (BOOL) bumpRateFromDecodeStage:(short)channel
@@ -1279,12 +1403,25 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302GenReadRe
 
     [self setClockSource:				[decoder decodeIntForKey:@"clockSource"]];
 	[self setGtMask:					[decoder decodeIntForKey:@"gtMask"]];
+	[self setUseTrapTriggerMask:		[decoder decodeIntForKey:@"trapMask"]];    
     [self setWaveFormRateGroup:			[decoder decodeObjectForKey:@"waveFormRateGroup"]];
+    [self setStopEventAtLength:         [decoder decodeIntForKey:@"stopEventAtLength"]];
+    [self setPageWrap:                  [decoder decodeIntForKey:@"enablePageWrap"]];
+    [self setEnableTestData:            [decoder decodeIntForKey:@"enableTestData"]];    
+    [self setLemoTimestampEnabled:            [decoder decodeIntForKey:@"lemoTimestampEnabled"]];    
+    [self setLemoStartStopEnabled:            [decoder decodeIntForKey:@"lemoStartStopEnabled"]];    
+    [self setInternalTrigStartEnabled:        [decoder decodeIntForKey:@"internalTrigStartEnabled"]];    
+    [self setInternalTrigStopEnabled:         [decoder decodeIntForKey:@"internalTrigStopEnabled"]];    
+    [self setMultiEventModeEnabled:           [decoder decodeIntForKey:@"multiEventModeEnabled"]];    
+    [self setAutostartModeEnabled:            [decoder decodeIntForKey:@"autostartModeEnabled"]];    
+    [self setStartDelay:                      [decoder decodeIntForKey:@"startDelay"]];    
+    [self setStopDelay:                       [decoder decodeIntForKey:@"stopDelay"]];    
+    [self setMaxEvents:                       [decoder decodeIntForKey:@"maxEvents"]];    
 	
     sampleLengths = 			[[decoder decodeObjectForKey:@"sampleLengths"]retain];
+   
 	thresholds  =				[[decoder decodeObjectForKey:@"thresholds"] retain];
     dacOffsets  =				[[decoder decodeObjectForKey:@"dacOffsets"] retain];
-	gateLengths =				[[decoder decodeObjectForKey:@"gateLengths"] retain];
 	pulseLengths =				[[decoder decodeObjectForKey:@"pulseLengths"] retain];
 	sumGs =						[[decoder decodeObjectForKey:@"sumGs"] retain];
 	peakingTimes =				[[decoder decodeObjectForKey:@"peakingTimes"] retain];
@@ -1324,20 +1461,37 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302GenReadRe
 	[encoder encodeFloat:firmwareVersion		forKey:@"firmwareVersion"];
 
     [encoder encodeInt:gtMask					forKey:@"gtMask"];
+	[encoder encodeInt:useTrapTriggerMask       forKey:@"trapMask"];        
     [encoder encodeInt:clockSource				forKey:@"clockSource"];
+    
+    [encoder encodeInt:stopAtEventLengthMask    forKey:@"stopEventAtLength"];
+    [encoder encodeInt:enablePageWrapMask       forKey:@"enablePageWrap"];
+    [encoder encodeInt:enableTestDataMask       forKey:@"enableTestData"]; 
+    
     [encoder encodeObject:waveFormRateGroup		forKey:@"waveFormRateGroup"];
-	[encoder encodeObject:sampleLengths			forKey:@"sampleLengths"];
 	[encoder encodeObject:thresholds			forKey:@"thresholds"];
 	[encoder encodeObject:dacOffsets			forKey:@"dacOffsets"];
-	[encoder encodeObject:gateLengths			forKey:@"gateLengths"];
 	[encoder encodeObject:pulseLengths			forKey:@"pulseLengths"];
 	[encoder encodeObject:sumGs					forKey:@"sumGs"];
 	[encoder encodeObject:peakingTimes			forKey:@"peakingTimes"];
 	[encoder encodeObject:preTriggerDelays		forKey:@"preTriggerDelays"];
+	[encoder encodeObject:sampleLengths			forKey:@"sampleLengths"];    
+    
 
     [encoder encodeObject:averagingSettings forKey:@"averagingSettings"];	
     [encoder encodeObject:pageWrapSize forKey:@"pageWrapSize"];
     [encoder encodeObject:testDataType forKey:@"testDataType"];
+
+    [encoder encodeInt:lemoTimestampEnabled   forKey:@"lemoTimestampEnabled"];    
+    [encoder encodeInt:lemoStartStopEnabled   forKey:@"lemoStartStopEnabled"];    
+    [encoder encodeInt:internalTrigStartEnabled   forKey:@"internalTrigStartEnabled"];    
+    [encoder encodeInt:internalTrigStopEnabled   forKey:@"internalTrigStopEnabled"];    
+    [encoder encodeInt:multiEventModeEnabled   forKey:@"multiEventModeEnabled"];    
+    [encoder encodeInt:autostartModeEnabled   forKey:@"autostartModeEnabled"];    
+    [encoder encodeInt:startDelay   forKey:@"startDelay"];    
+    [encoder encodeInt:stopDelay   forKey:@"stopDelay"];    
+    [encoder encodeInt:maxEvents   forKey:@"maxEvents"];    
+	
 	
 }
 
@@ -1351,8 +1505,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302GenReadRe
 	
 	[objDictionary setObject:sampleLengths		forKey:@"sampleLengths"];
 	[objDictionary setObject: dacOffsets		forKey:@"dacOffsets"];
-    [objDictionary setObject: thresholds		forKey:@"thresholds"];	
-    [objDictionary setObject: gateLengths		forKey:@"gateLengths"];	
+    [objDictionary setObject: thresholds		forKey:@"thresholds"];		
     [objDictionary setObject: pulseLengths		forKey:@"pulseLengths"];	
     [objDictionary setObject: sumGs				forKey:@"sumGs"];	
     [objDictionary setObject: peakingTimes		forKey:@"peakingTimes"];	
@@ -1511,29 +1664,9 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302GenReadRe
 	}
 }
 
-- (void) writeAcquistionRegister
+- (void) writeDelaysAndMaxEvents
 {
-	// The register is set up as a J/K flip/flop -- 1 bit to set a function and 1 bit to disable.	
-	unsigned long aMask = 0x0;
-	aMask |= ((clockSource & 0x7)<< 12);
-	
-    aMask |= [self lemoTimestampEnabled] << 9;
-    aMask |= [self lemoStartStopEnabled] << 8;
-    aMask |= [self internalTrigStartEnabled] << 7;
-    aMask |= [self internalTrigStopEnabled] << 6;
-    aMask |= [self multiEventModeEnabled] << 5;
-    aMask |= [self autostartModeEnabled] << 4;    
-    
-	//put the inverse in the top bits to turn off everything else
-	aMask = ((~aMask & 0x0000ffff)<<16) | aMask;
-	
-	[[self adapter] writeLongBlock:&aMask
-                         atAddress:[self baseAddress] + kSIS3302AcquisitionControl
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-    
-    aMask = [self startDelay] & 0xFFFFFF;
+    unsigned long aMask = [self startDelay] & 0xFFFFFF;
 	[[self adapter] writeLongBlock:&aMask
                          atAddress:[self baseAddress] + kSIS3302GenericStartDelay
                         numToWrite:1
@@ -1551,7 +1684,37 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302GenReadRe
                          atAddress:[self baseAddress] + kSIS3302GenericMaximumNumberOfEvents
                         numToWrite:1
                         withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];       
+                     usingAddSpace:0x01];   
+}
+
+- (void) writeAcquisitionRegister:(BOOL)forceAutostartOff
+{
+	// The register is set up as a J/K flip/flop -- 1 bit to set a function and 1 bit to disable.	
+	unsigned long aMask = 0x0;
+	aMask |= ((clockSource & 0x7)<< 12);
+	
+    aMask |= [self lemoTimestampEnabled] << 9;
+    aMask |= [self lemoStartStopEnabled] << 8;
+    aMask |= [self internalTrigStartEnabled] << 7;
+    aMask |= [self internalTrigStopEnabled] << 6;
+    aMask |= [self multiEventModeEnabled] << 5;
+    if (!forceAutostartOff) {
+        // If we don't force the autostart to be off, then set it
+        aMask |= [self autostartModeEnabled] << 4;
+    }
+   
+    
+    //aMask |= (1 << 11); // Set it to be big endian
+    
+	//put the inverse in the top bits to turn off everything else
+	aMask = ((~aMask & 0x0000ffff)<<16) | aMask;
+	
+	[[self adapter] writeLongBlock:&aMask
+                         atAddress:[self baseAddress] + kSIS3302AcquisitionControl
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+        
 }
 
 - (void) writeThresholds
@@ -1595,7 +1758,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302GenReadRe
 	}
 	//extended length
 	for(i=0;i<kNumSIS3302Channels/2;i++){
-		unsigned long aValueMask = ([self sampleLength:i] & 0xFFFFFC);
+		unsigned long aValueMask = (([self sampleLength:i]-4) & 0xFFFFFFC);
 		[aList addCommand: [ORVmeReadWriteCommand writeLongBlock: &aValueMask
 													   atAddress: [self baseAddress] + [self getEventLengthOffsets:i]
 													  numToWrite: 1

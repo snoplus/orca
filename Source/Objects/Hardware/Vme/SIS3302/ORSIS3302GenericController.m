@@ -946,6 +946,11 @@
     [model forceTrigger];
 }
 
+- (IBAction) resetAction:(id)sender
+{
+    [model reset];
+}
+
 #pragma mark •••Data Source
 
 - (double) getBarValue:(int)tag

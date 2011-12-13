@@ -30,6 +30,8 @@
 @class ORAlarm;
 @class ORCommandList;
 
+#define kMaxSIS3302SingleMaxRecord 0x3FFFF
+
 #define ORCA_GEN_NOTIFY_FORM(PREPENDVAR, CMD) \
 PREPENDVAR ## CMD ## Changed
 
@@ -104,7 +106,6 @@ typedef enum {
 	short           useTrapTriggerMask;
 	NSMutableArray* thresholds;
     NSMutableArray* dacOffsets;
-	NSMutableArray* gateLengths;
 	NSMutableArray* pulseLengths;
 	NSMutableArray* sumGs;
 	NSMutableArray* peakingTimes;
@@ -135,12 +136,9 @@ typedef enum {
 	unsigned long location;
 	short wrapMaskForRun;
 	id theController;
-	int currentBank;
 	long count;
-	BOOL firstTime;
 
-	unsigned long* dataRecord[4];
-	unsigned long  dataRecordlength[4];
+	unsigned long  dataRecord[kMaxSIS3302SingleMaxRecord];
 	
     float			firmwareVersion;
 }
@@ -162,6 +160,8 @@ typedef enum {
 - (unsigned long) getEventLengthOffsets:(int)group;
 - (unsigned long) getSampleStartOffsets:(int)group;
 - (unsigned long) getAdcInputModeOffsets:(int)group;
+- (unsigned long) getEventDirectoryForChannel:(int) channel; 
+- (unsigned long) getNextSampleAddressForChannel:(int) channel;
 
 - (void) setDefaults;
 
@@ -294,7 +294,7 @@ ORSIS3302_NOTIFY_FORM(SettingsLock);
 ORSIS3302_NOTIFY_FORM(RateGroup);
 ORSIS3302_NOTIFY_FORM(SampleDone);
 ORSIS3302_NOTIFY_FORM(ID);
-ORSIS3302_NOTIFY_FORM(GateLength);
+
 ORSIS3302_NOTIFY_FORM(PulseLength);
 ORSIS3302_NOTIFY_FORM(SumG);
 ORSIS3302_NOTIFY_FORM(PeakingTime);

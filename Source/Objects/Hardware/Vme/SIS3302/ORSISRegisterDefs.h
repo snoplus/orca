@@ -137,12 +137,15 @@
 #define kSIS3302TriggerExtendedThresholdAdc1            	0x020000A0	  
 #define kSIS3302TriggerExtendedThresholdAdc2            	0x020000A4	  
 
+#define kSIS3302GenericEventDirectoryAdc1                   0x02010000      /* Generic */
+#define kSIS3302GenericEventDirectoryAdc2                   0x02018000      /* Generic */
+
 
 // ADC34 FPGA group
 #define kSIS3302EventConfigAdc34                			0x02800000 		/* Gamma */
 #define kSIS3302GenericSampleLengthAdc34                    0x02800004      /* Generic */
-#define kSIS3302GenericSampleStartAdc34                     0x02000008      /* Generic */
-#define kSIS3302GenericAdcInputModeAdc34                    0x0200000C      /* Generic */
+#define kSIS3302GenericSampleStartAdc34                     0x02800008      /* Generic */
+#define kSIS3302GenericAdcInputModeAdc34                    0x0280000C      /* Generic */
 #define kSIS3302EndAddressThresholdAdc34      	 			0x02800004	    /* Gamma */
 #define kSIS3302PreTriggerDelayTriggerGateLengthAdc34  		0x02800008	    /* Gamma */
 #define kSIS3302RawDataBufferConfigAdc34       				0x0280000C	    /* Gamma */
@@ -180,12 +183,14 @@
 #define kSIS3302TriggerExtendedThresholdAdc3            	0x028000A0	  
 #define kSIS3302TriggerExtendedThresholdAdc4            	0x028000A4	  
 
+#define kSIS3302GenericEventDirectoryAdc3                   0x02810000      /* Generic */
+#define kSIS3302GenericEventDirectoryAdc4                   0x02818000      /* Generic */
 
 // ADC56 FPGA group
 #define kSIS3302EventConfigAdc56                			0x03000000 		/* Gamma */
 #define kSIS3302GenericSampleLengthAdc56                    0x03000004      /* Generic */
-#define kSIS3302GenericSampleStartAdc56                     0x02000008      /* Generic */
-#define kSIS3302GenericAdcInputModeAdc56                    0x0200000C      /* Generic */
+#define kSIS3302GenericSampleStartAdc56                     0x03000008      /* Generic */
+#define kSIS3302GenericAdcInputModeAdc56                    0x0300000C      /* Generic */
 #define kSIS3302EndAddressThresholdAdc56      	 			0x03000004	    /* Gamma */
 #define kSIS3302PreTriggerDelayTriggerGateLengthAdc56  		0x03000008	    /* Gamma */
 #define kSIS3302RawDataBufferConfigAdc56       				0x0300000C	    /* Gamma */
@@ -223,12 +228,14 @@
 #define kSIS3302TriggerExtendedThresholdAdc5            	0x030000A0	  
 #define kSIS3302TriggerExtendedThresholdAdc6            	0x030000A4	  
 
+#define kSIS3302GenericEventDirectoryAdc5                   0x03010000      /* Generic */
+#define kSIS3302GenericEventDirectoryAdc6                   0x03018000      /* Generic */
 
 // ADC78 FPGA group
 #define kSIS3302EventConfigAdc78                			0x03800000 		/* Gamma */
 #define kSIS3302GenericSampleLengthAdc78                    0x03800004      /* Generic */
-#define kSIS3302GenericSampleStartAdc78                     0x02000008      /* Generic */
-#define kSIS3302GenericAdcInputModeAdc78                    0x0200000C      /* Generic */
+#define kSIS3302GenericSampleStartAdc78                     0x03800008      /* Generic */
+#define kSIS3302GenericAdcInputModeAdc78                    0x0380000C      /* Generic */
 #define kSIS3302EndAddressThresholdAdc78      	 			0x03800004	    /* Gamma */
 #define kSIS3302PreTriggerDelayTriggerGateLengthAdc78  		0x03800008	    /* Gamma */
 #define kSIS3302RawDataBufferConfigAdc78       				0x0380000C	    /* Gamma */
@@ -264,7 +271,10 @@
 #define kSIS3302TriggerExtendedSetupAdc8             		0x0380007C	  
 
 #define kSIS3302TriggerExtendedThresholdAdc7            	0x038000A0	  
-#define kSIS3302TriggerExtendedThresholdAdc8            	0x038000A4	  
+#define kSIS3302TriggerExtendedThresholdAdc8            	0x038000A4	 
+
+#define kSIS3302GenericEventDirectoryAdc7                   0x03810000      /* Generic */
+#define kSIS3302GenericEventDirectoryAdc8                   0x03818000      /* Generic */
 
 #define kSIS3302Adc1Offset                         			0x04000000	  
 #define kSIS3302Adc2Offset                         			0x04800000	  
