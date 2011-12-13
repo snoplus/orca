@@ -232,6 +232,7 @@
 	}
 	
 	if(requestString){
+	    if(showDebugOutput) NSLog(@"Request string:>>> %@ <<<\n",requestString);
 		dataFormat = kxmlFormat;
 		path = [aPath copy];
 		NSURL* furl = [NSURL URLWithString: requestString];
