@@ -440,8 +440,8 @@ long getTdacBinVoltCalibrated(ue9TdacCalibrationInfo *caliInfo, int dacNumber, d
     tBytesVolt = analogVolt*caliInfo->ccConstants[dacNumber*2] + caliInfo->ccConstants[dacNumber*2 + 1];
 
     //Checking to make sure bytesVolt will be a value between 0 and 65535.
-    if( tBytesVolt < 0 )
-        tBytesVolt = 0;
+    //if( tBytesVolt < 0 )
+    //    tBytesVolt = 0;
     if( tBytesVolt > 65535 )
         tBytesVolt = 65535;
 
