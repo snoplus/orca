@@ -548,6 +548,7 @@
 {
     if(returnCode){
         [[model segmentGroup:1] saveMapFileAs:[sheet filename]];
+		NSLog(@"Saved Veto HW Map: %@\n",[sheet filename]);
     }
 }
 @end

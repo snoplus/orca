@@ -582,6 +582,7 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 
 - (void) saveAuxFiles:(NSString*)aPath 
 {
+	NSLog(@"Saved FPD HW Map: %@\n",aPath);
 	aPath = [aPath stringByDeletingPathExtension];
 	NSFileManager* fm = [NSFileManager defaultManager];
 	NSMutableString* contents = [NSMutableString string];
@@ -590,6 +591,7 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 	for(id item in fltSNs)[contents appendFormat:@"%@,%@,%@\n",[item objectForKey:@"kFltSlot"],[item objectForKey:@"kFltSN"],[item objectForKey:@"kORBSN"]];
 	NSData* data = [contents dataUsingEncoding:NSASCIIStringEncoding];
 	[fm createFileAtPath:FLTORBSNFILE(aPath) contents:data attributes:nil];
+	NSLog(@"Saved FLT/ORB SerialNumbers: %@\n",FLTORBSNFILE(aPath));
 	
 	//save the OSB Serial Numbers
 	contents = [NSMutableString string];
@@ -597,6 +599,7 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 	for(id item in osbSNs)[contents appendFormat:@"%@,%@\n",[item objectForKey:@"kOSBSlot"],[item objectForKey:@"kOSBSN"]];
 	data = [contents dataUsingEncoding:NSASCIIStringEncoding];
 	[fm createFileAtPath:OSBSNFILE(aPath) contents:data attributes:nil];
+	NSLog(@"Saved OSB SerialNumbers: %@\n",OSBSNFILE(aPath));
 
 	//save the Preamp Serial Numbers
 	contents = [NSMutableString string];
@@ -604,6 +607,7 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 	for(id item in preAmpSNs)[contents appendFormat:@"%@,%@\n",[item objectForKey:@"kPreAmpMod"],[item objectForKey:@"kPreAmpSN"]];
 	data = [contents dataUsingEncoding:NSASCIIStringEncoding];
 	[fm createFileAtPath:PREAMPSNFILE(aPath) contents:data attributes:nil];
+	NSLog(@"Saved Preamp SerialNumbers: %@\n",PREAMPSNFILE(aPath));
 	
 	//save the Slt and Wafer Serial Numbers
 	contents = [NSMutableString string];
@@ -611,6 +615,7 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 	[contents appendFormat:@"%@,%@\n",[otherSNs objectForKey:@"kSltSN"],[otherSNs objectForKey:@"kWaferSN"]];
 	data = [contents dataUsingEncoding:NSASCIIStringEncoding];
 	[fm createFileAtPath:SLTWAFERSNFILE(aPath) contents:data attributes:nil];
+	NSLog(@"Saved Slt/Wafer SerialNumbers: %@\n",SLTWAFERSNFILE(aPath));
 	
 }
 
