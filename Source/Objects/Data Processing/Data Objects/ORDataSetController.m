@@ -245,7 +245,7 @@
         float x2 = MAX(minXValue,maxXValue);
         
         for(id obj in subControllers){
-            [[[obj plotView] xScale] setRngLimitsLow:x1 withHigh:x2 withMinRng:x2-x1];
+            [[[obj plotView] xScale] setRngLow:x1 withHigh:x2];
         }
     }
 }
@@ -259,7 +259,7 @@
         float y2 = MAX(minYValue,maxYValue);
         
         for(id obj in subControllers){
-            [[[obj plotView] yScale] setRngLimitsLow:y1 withHigh:y2 withMinRng:y2-y1];
+            [[[obj plotView] yScale] setRngLow:y1 withHigh:y2];
         }
     }
 }
