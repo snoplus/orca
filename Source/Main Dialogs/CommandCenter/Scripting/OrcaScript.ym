@@ -42,14 +42,14 @@
 %left  '%' '*' '/' ','
 %nonassoc NOT UMINUS INVERT
 
-%type <nPtr> program  functionCall statement arrayElement make_string  cat_string break_statement
+%type <nPtr> program  functionCall statement arrayElement make_string  cat_string break_statement 
 %type <nPtr> hex_str expr statement_list objC findObj makeObj selection_statement iteration_statement printfile_statement
 %type <nPtr> objVar objVar_list print_list log_list print_statement log_statement arg_list argName_list clear_statement
 %type <nPtr> compound_statement expression_statement jump_statement special_statement ns_object sci_statement fixed_statement
 %type <nPtr> case_statement case_list constant_expr point_str rect_str wait_statement alarm_statement
 %type <nPtr> primary_expr multiplicative_expr postfix_expr unary_expr  additive_expr time_statement
 %type <nPtr> shift_expr relational_expr equality_expr and_expr exclusive_or_expr inclusive_or_expr shell_statement
-%type <nPtr> logical_and_expr logical_or_expr conditional_expr assignment_expr leftArrayElement objectPtr rng_str file_str
+%type <nPtr> logical_and_expr logical_or_expr conditional_expr assignment_expr leftArrayElement objectPtr rng_str file_str writeLineToFile_statement
 
 %start program
 
@@ -87,17 +87,17 @@ statement
 
 special_statement 
 : objC ';'							 { $$ = $1; }
-| shell_statement					 { $$ = $1; }
-| print_statement					 { $$ = $1; }
-| printfile_statement				 { $$ = $1; }
+| shell_statement ';'				 { $$ = $1; }
+| print_statement ';'				 { $$ = $1; }
+| printfile_statement ';'				 { $$ = $1; }
 | log_statement ';' 				 { $$ = $1; }
 | wait_statement ';'				 { $$ = $1; }
 | alarm_statement ';'				 { $$ = $1; }
 | clear_statement ';'				 { $$ = $1; }
 | sci_statement ';'					 { $$ = $1; }
 | fixed_statement ';'				 { $$ = $1; }
+| writeLineToFile_statement ';'		 { $$ = $1; }
 | SLEEP '(' expr ')' ';'			 { $$ = executionNode(SLEEP,$3,nil);}
-| WRITELINETOFILE '(' expr ',' expr ')' ';' { $$ = executionNode(WRITELINETOFILE,$3,$5,nil);}
 | DELETEFILE '(' expr ')' ';'		 { $$ = executionNode(DELETEFILE,$3,nil);}
 | DISPLAY '(' STRING ',' expr ')' ';'{ $$ = executionNode(DISPLAY,stringNode($3),$5,nil);}
 | MAKEARRAY arrayElement ';'		 { $$ = $2; }
@@ -346,19 +346,26 @@ cat_string
 //ex: print "test:",i;
 //ex: print ("test:",i);
 print_statement
-: PRINT '(' print_list ')' ';'	{ $$ = executionNode(PRINT, $3,nil); }
-| PRINT  print_list  ';'		{ $$ = executionNode(PRINT, $2,nil); }
+: PRINT '(' print_list ')' 	{ $$ = executionNode(PRINT, $3,nil); }
+| PRINT  print_list  		{ $$ = executionNode(PRINT, $2,nil); }
+;
+
+//ex: writeLine ("test:",1,",",2,",",a);
+//ex: writeLine "test:",1,",",2,",",a;
+writeLineToFile_statement
+: WRITELINETOFILE '(' primary_expr ',' print_list ')'	{ $$ = executionNode(WRITELINETOFILE, $3,$5,nil); }
+| WRITELINETOFILE  primary_expr ',' print_list			{ $$ = executionNode(WRITELINETOFILE, $2,$4,nil); }
 ;
 
 //---shell stuff-----------------------------------------------------------
 shell_statement
-: SHELL  print_list  ';'		{ $$ = executionNode(SHELL, $2,nil); }
+: SHELL  print_list  		{ $$ = executionNode(SHELL, $2,nil); }
 ;
 
 
 printfile_statement
-: PRINTFILE '(' print_list ')' ';'	{ $$ = executionNode(PRINTFILE, $3,nil); }
-| PRINTFILE  print_list  ';'		{ $$ = executionNode(PRINTFILE, $2,nil); }
+: PRINTFILE '(' print_list ')' 	{ $$ = executionNode(PRINTFILE, $3,nil); }
+| PRINTFILE  print_list  		{ $$ = executionNode(PRINTFILE, $2,nil); }
 ;
 
 //the arguments for the print or string functions
