@@ -143,7 +143,8 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 	}
 	
 	NSString* rootMapFile = [[[segmentGroups objectAtIndex:0] mapFile] stringByExpandingTildeInPath];
-	
+	rootMapFile = [rootMapFile stringByDeletingPathExtension];
+
 	//add the FLT/ORB SN
 	NSString* contents = [NSString stringWithContentsOfFile:FLTORBSNFILE(rootMapFile) encoding:NSASCIIStringEncoding error:nil];
 	if(!contents)contents = @"NONE";

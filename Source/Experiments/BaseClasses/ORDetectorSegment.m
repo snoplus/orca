@@ -214,12 +214,11 @@ NSString* KSegmentChangedNotification	  =	@"KSegmentChangedNotification";
 		isValid = YES;
 	}
 	else {
-		if(count<=[mapEntries count]){
-			for(i=0;i<count;i++){
-				[params setObject:[items objectAtIndex:i] forKey:mapKey(i)];
-			}
-			isValid = YES;
+		int n = MIN(count,[mapEntries count]);
+		for(i=0;i<n;i++){
+			[params setObject:[items objectAtIndex:i] forKey:mapKey(i)];
 		}
+		isValid = YES;
     }
     
 }
