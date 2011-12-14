@@ -640,12 +640,14 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 - (void) dumpSensorlist
 {
 	NSLog(@"requestCache:\n%@\n",requestCache);
+	NSLog(@"channelLookup:\n%@\n",channelLookup);
+	NSLog(@"pollingLookUp:\n%@\n",pollingLookUp);
 }
 
 #pragma mark ***Polled Item via LookupTable index
 - (BOOL) itemExists:(int)anIndex
 {
-	return anIndex<[pollingLookUp count];
+	return anIndex<[pollingLookUp count];//TODO: this may be wrong as we can have gaps in the channel numbers? -tb-
 }
 
 - (BOOL) isControlItem:(int)anIndex
@@ -819,7 +821,9 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 			//item not in the list yet... add it
 			int aChannelNumber = [self nextUnusedChannelNumber]; //find an unused channel number in the polling List
 			NSMutableDictionary* topLevelDictionary = [self makeTopLevelDictionary];
-			[topLevelDictionary setObject:anItem forKey:itemKey];			
+			[topLevelDictionary setObject:anItem forKey:itemKey];		
+			//example of anItem: {    Date = "14-Dec-11 16:19:43.000000";    Name = " item1 [Temperatures]";    Path = "test_zeus/cfp_test/0/1";
+            //                        URL = "http://ipepdvadei2.ka.fzk.de/test/";    Value = " 8.0786074540863";  }	
 			[topLevelDictionary setObject:[NSNumber numberWithInt:aChannelNumber]	forKey:@"ChannelNumber"]; //channel number for access by the processing system
 			//or [self setChannelNumber:aChannelNumber  forItemKey:itemKey]; // with undo ...
             
@@ -886,7 +890,7 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 
 - (NSString*) itemDetails:(int)anIndex
 {
-	//anIndex in NOT channel number
+	//anIndex is NOT channel number
 	if(anIndex<[pollingLookUp count]){
 		NSString* itemKey = [pollingLookUp objectAtIndex:anIndex];
 		id topLevelDictionary = [requestCache objectForKey:itemKey];
@@ -900,11 +904,74 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 	else return @"<Error: index out of bounds>";
 }
 
+
+//create new channel item, return channel number or -1 for failure; if aChan==-1 choose first unused channel
+- (int)  createChannelWithUrl:(NSString*)aUrl path:(NSString*)aPath chan:(int)aChan controlType:(int)isControl
+{
+//input: URL, manual path, controlType, channelNumber
+
+	//CHECK WHETHER PATH has length 4 and URL not empty ...  -tb-
+	int componentCount = [[manualPath componentsSeparatedByString:@"/"] count];
+	if(componentCount!=4){
+	    NSLog(@"Path %@ needs to have 4 items, but has %i items!\n",manualPath,componentCount);
+	    return -1;
+	}
+
+	//convert a host name xxx.xxx.xxx to a url of form http://xxxx.xxx.xxx, see - (NSString*) ipNumberToURL
+	NSMutableString* goodUrl = [NSMutableString stringWithString: [self IPNumber]];
+	if([goodUrl length]){
+		if(![goodUrl hasPrefix:   @"http://"]) [goodUrl insertString: @"http://"  atIndex: 0];
+		if(![goodUrl hasSuffix:   @"/"]) [goodUrl appendString: @"/"];
+	}
+
+    NSString* itemKey = nil;
+    itemKey = [self itemKey:goodUrl:manualPath];
+	NSMutableDictionary* topLevelDictionary = [requestCache objectForKey:itemKey];
+	if(topLevelDictionary){//channel/item already exists
+	    //search the channel
+//		int ch = [self channelNumberForItemKey: itemKey];
+		int ch = [[topLevelDictionary objectForKey:@"ChannelNumber"] intValue];
+		if(ch == -1){
+	        //NSLog(@"Item %@ previously was removed!\n",itemKey);
+		}else{
+    	    NSLog(@"Item %@ already exists with channel %i!\n",itemKey,ch);
+	    	//TODO: search channel number and return it
+	        return ch;
+		}
+	}
+
+    //see - (void) addItems:(NSArray*)anItemArray
+	int aChannelNumber = aChan; 
+	if(aChan==-1) aChannelNumber = [self nextUnusedChannelNumber]; //find an unused channel number in the polling List
+	topLevelDictionary = [self makeTopLevelDictionary];
+	[topLevelDictionary setObject:[NSNumber numberWithInt:aChannelNumber]	forKey:@"ChannelNumber"]; //channel number for access by the processing system
+	//make second level dictionary (see requestCache) (( = itemDictionary))
+			//example of secondLevelDictionary: {    Date = "14-Dec-11 16:19:43.000000";    Name = " item1 [Temperatures]";    Path = "test_zeus/cfp_test/0/1";
+            //                                       URL = "http://ipepdvadei2.ka.fzk.de/test/";    Value = " 8.0786074540863";  }	
+	//NSMutableDictionary* secondLevelDictionary = [NSMutableDictionary dictionary];
+	NSMutableDictionary* secondLevelDictionary = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+	    @"yet unknown",    @"Name",
+		goodUrl,           @"URL",
+		manualPath,        @"Path",
+	    @"--",             @"Value",
+	nil ];
+	if(isControl==1) [secondLevelDictionary setValue:[NSNumber numberWithInt:1]  forKey:@"Control"];
+	[topLevelDictionary setObject:secondLevelDictionary	forKey:itemKey]; 
+
+	
+	[requestCache setObject:topLevelDictionary forKey:itemKey];
+	[self addItemKeyToPollingLookup:itemKey];
+	//return topLevelDictionary;
+
+    return aChannelNumber;
+}
+
 - (void) manuallyCreateChannel
 {
-	NSLog(@"called %@::%@ \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: debug output -tb-
-	
-	NSLog(@"Create with: Url: %@  (%@),   Path:%@  , Type:%i  \n", IPNumber, [self ipNumberToURL]  ,manualPath, manualType);
+	//NSLog(@"called %@::%@ \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: debug output -tb-
+	//NSLog(@"Create with: Url: %@  (%@),   Path:%@  , Type:%i  \n", IPNumber, [self ipNumberToURL]  ,manualPath, manualType);
+
+    [self createChannelWithUrl:[self ipNumberToURL] path:manualPath chan:-1 controlType:manualType];
 }
 
 
@@ -926,8 +993,8 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
  	[self initConnectionHistory];
    
     [self initBasics];
-	[self setManualType:[decoder decodeIntForKey:@"manualType"]];
-	[self setManualPath:[decoder decodeObjectForKey:@"manualPath"]];
+	[self setManualType:		[decoder decodeIntForKey:@"manualType"]];
+	[self setManualPath:		[decoder decodeObjectForKey:@"manualPath"]];
 	[self setShowDebugOutput:	[decoder decodeBoolForKey:    @"showDebugOutput"]];
 	[self setShipRecords:		[decoder decodeBoolForKey:	  @"shipRecords"]];
 	[self setFastGenSetup:		[decoder decodeBoolForKey:	  @"fastGen"]];
@@ -950,8 +1017,8 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];    
-	[encoder encodeInt:manualType forKey:@"manualType"];
-	[encoder encodeObject:manualPath forKey:@"manualPath"];
+	[encoder encodeInt:manualType			forKey:@"manualType"];
+	[encoder encodeObject:manualPath		forKey:@"manualPath"];
 	[encoder encodeBool:showDebugOutput		forKey:@"showDebugOutput"];
 	[encoder encodeBool:shipRecords			forKey:@"shipRecords"];
 	[encoder encodeBool:fastGenSetup		forKey:@"fastGen"];
@@ -1245,6 +1312,22 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 
 }
 
+//customn method to create a sensor (calling createChannelWithUrl:...)
+- (int) createSensorWithUrl:(NSString*)aUrl path:(NSString*)aPath
+{    [self  createChannelWithUrl:aUrl path:aPath chan:-1 controlType:0];      }
+
+//customn method to create a control (calling createChannelWithUrl:...)
+- (int) createControlWithUrl:(NSString*)aUrl path:(NSString*)aPath
+{    [self  createChannelWithUrl:aUrl path:aPath chan:-1 controlType:0];      }
+
+//customn method to create a sensor (calling createChannelWithUrl:...)
+- (int) createSensorWithUrl:(NSString*)aUrl path:(NSString*)aPath chan:(int)aChan
+{    [self  createChannelWithUrl:aUrl path:aPath chan:aChan controlType:0];      }
+
+//customn method to create a control (calling createChannelWithUrl:...)
+- (int) createControlWithUrl:(NSString*)aUrl path:(NSString*)aPath chan:(int)aChan
+{    [self  createChannelWithUrl:aUrl path:aPath chan:aChan controlType:0];      }
+
 
 - (int) findChanOfSensor:(NSString*)aUrl path:(NSString*)aPath
 {
@@ -1350,6 +1433,7 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 //TODO: control items are badly initialized under certain circumstances!! -tb-
 //TODO: after dragging a control into the list its "value" displays the ADEI item number, not the control value!! -tb-
 //TODO: better use new entries in the toplevel dictionary (?)
+// -> DONE: using DBValue and DBTimestamp -tb-
 - (double) valueForChan:(int)aChan
 {
     NSString* itemKey = [channelLookup objectForKey:[NSNumber numberWithInt:aChan]];
@@ -1547,6 +1631,7 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 	//
     //NSLog(@"polledItemResult: ... result is %@ \n",result);
 	for(id resultItem in result){
+	    //		NSLog(@"%@::%@   ResultItem is >>>%@<<<\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),resultItem);//DEBUG OUTPUT -tb-  
         int chan=-1;
 		NSString* itemKey = [self itemKey:[resultItem objectForKey:@"URL"]:[resultItem objectForKey:@"Path"]];
         if(!itemKey) continue; //avoid (null) item key; this may happen if there was a alarm message in the received xml structure (contains no path/url) -tb-
@@ -1558,7 +1643,9 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
             //NSArray* anItemArray = [NSArray arrayWithObject: [NSDictionary dictionaryWithObjectsAndKeys:
             //    [resultItem objectForKey:@"URL"],@"URL", [resultItem objectForKey:@"Path"],@"Path",nil         ] ];
             NSArray* anItemArray = [NSArray arrayWithObject: resultItem ];
-            [self addItems: anItemArray];
+			//TODO:
+            [self addItems: anItemArray];//TODO: this will silently add a item to the channel list: do we want to allow this? NO (to my opinion) -tb-
+			//TODO:
             topLevelDictionary = [requestCache objectForKey:itemKey];
             #if 0
 			topLevelDictionary = [self makeTopLevelDictionary];
@@ -1723,6 +1810,8 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 }
 
 //! Remove it from pollingLookup (and channelLookup) but keep it in requestCache ...
+// In topLevelDictionary of requestCache set ChannelNumber to -1 => it won't appear in the GUI any more;
+// purpose: for undo: just restore the channel number
 - (void) removeItemKeyFromPollingLookup:(NSString *)anItemKey
 {
     [[[self undoManager] prepareWithInvocationTarget:self] addItemKeyToPollingLookup:anItemKey];

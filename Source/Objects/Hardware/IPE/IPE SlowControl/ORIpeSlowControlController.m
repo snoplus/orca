@@ -874,6 +874,13 @@ autoselect an edge, and we want this drawer to open only on specific edges. */
 				}
 				else					 return  [itemDictionary objectForKey:@"Path"];
 			}
+			else if([theIdentifier isEqual:@"URL"]){
+                return [itemDictionary objectForKey:@"URL"];
+			}
+			else if([theIdentifier isEqual:@"Type"]){
+			    int type = [[itemDictionary objectForKey:@"Control"] intValue];
+                if(type) return @"Control"; else return @"Sensor";
+			}
 			else if([theIdentifier isEqual:@"Value"]){
                 //TODO: how can I control the rounding of NSNumber in the outline view cell?
                 // problem: NSNumber is rounded to 3 floating point digits, but we need all (or at least 4) digits! -tb-

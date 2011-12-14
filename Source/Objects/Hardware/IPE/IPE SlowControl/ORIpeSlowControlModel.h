@@ -60,8 +60,296 @@
   * the sensors listed in the #requestCache. So the requestCache can be saved in the .Orca file and used without tree.
   * The tree in fact is only necessary for defining the sensors in the "channel map".
   *
+  * <br>
+  * Updates and additional notes 2011-12-14:<br>
+  *
+  * Below are examples of the internal data structures  #pollingLookUp, #channelLookup, #requestCache and #itemTreeRoot.
+  *
+  * #itemTreeRoot contains all information of the ADEI tree and is displayed in the ADEI tree outline view.
+  *
+  * #pollingLookUp (array) contains a list of all available channels in short form i.e. each item may be described by its URL and PATH.
+  * Each list entry is a string and has the format 'URL/PATH'. This is called the #itemKey.
   * 
+  * #channelLookup (dictionary) assigns the channel numbers to the item keys.
+  *
+  * #requestCache (dictionary) holds a entry for each defined channel - it uses the itemKey as key for the according entry.
+  * Each toplevel object is again a dictionary which holds several standard keys like ChannelNumber, HiAlarm, LoAlarm, HiLimit, LoLimit.
+  * Further it contains again a dictionary as object with key 'itemKey' (the key also could be any constant name e.g. 'itemInfo' to make
+  * the access of its members easier) which holds further information, mainly the name, PATH, URL and for control items "Control = 1".
+  
+<pre>  
+  
+   Examples of the internal data structures (arrays, dictionarys):  pollingLookUp, channelLookup, requestCache, itemTreeRoot
+
+112609 19:25:01 pollingLookUp:
+ (
+    "http://ipepdvadei.ka.fzk.de/test//test_zeus/cfp_test/0/0",
+    "http://ipepdvadei.ka.fzk.de/test//test_zeus/cfp_test/3/2",
+    "http://ipepdvadei.ka.fzk.de/test//test_zeus/cfp_test/3/4",
+    "http://ipepdvadei.ka.fzk.de/test//test_zeus/cfp_test/3/6",
+    "http://ipepdvadei.ka.fzk.de/test//test_zeus/cfp_test/3/5",
+    "http://ipepdvadei.ka.fzk.de/test//test_zeus/cfp_test/3/3"
+)
+112609 19:25:01 channelLookup:
+ {
+    4 = "http://ipepdvadei.ka.fzk.de/test//test_zeus/cfp_test/3/5";
+    2 = "http://ipepdvadei.ka.fzk.de/test//test_zeus/cfp_test/3/6";
+    3 = "http://ipepdvadei.ka.fzk.de/test//test_zeus/cfp_test/3/4";
+    1 = "http://ipepdvadei.ka.fzk.de/test//test_zeus/cfp_test/3/2";
+    5 = "http://ipepdvadei.ka.fzk.de/test//test_zeus/cfp_test/3/3";
+    0 = "http://ipepdvadei.ka.fzk.de/test//test_zeus/cfp_test/0/0";
+}
+112609 19:25:01 requestCache:
+ {
+    "http://ipepdvadei.ka.fzk.de/test//test_zeus/cfp_test/0/0" =     {
+        ChannelNumber = 0;
+        HiAlarm = 100;
+        HiLimit = 100;
+        LoAlarm = 0;
+        LoLimit = 0;
+        "http://ipepdvadei.ka.fzk.de/test//test_zeus/cfp_test/0/0" =         {
+            Date = "26-Nov-09 11:06:47.000000";
+            Name = " item0 [Temperatures]";
+            Path = "test_zeus/cfp_test/0/0";
+            URL = "http://ipepdvadei.ka.fzk.de/test/";
+            Value = " 10";
+        };
+    };
+    "http://ipepdvadei.ka.fzk.de/test//test_zeus/cfp_test/3/2" =     {
+        ChannelNumber = 1;
+        HiAlarm = 100;
+        HiLimit = 100;
+        LoAlarm = 0;
+        LoLimit = 0;
+        "http://ipepdvadei.ka.fzk.de/test//test_zeus/cfp_test/3/2" =         {
+            Control = 1;
+            Path = "test_zeus/cfp_test/3/2";
+            URL = "http://ipepdvadei.ka.fzk.de/test/";
+            "db_group" = 3;
+            "db_name" = "cfp_test";
+            "db_server" = "test_zeus";
+            id = 2;
+            name = "HV Setpoint";
+            obtained = "1259259243.5455";
+            timestamp = "1259259241.875";
+            value = "8.5";
+            verified = "1259259242.375";
+            write = 1;
+        };
+    };
+    "http://ipepdvadei.ka.fzk.de/test//test_zeus/cfp_test/3/3" =     {
+        ChannelNumber = 5;
+        HiAlarm = 100;
+        HiLimit = 100;
+        LoAlarm = 0;
+        LoLimit = 0;
+        "http://ipepdvadei.ka.fzk.de/test//test_zeus/cfp_test/3/3" =         {
+            Control = 1;
+            Path = "test_zeus/cfp_test/3/3";
+            URL = "http://ipepdvadei.ka.fzk.de/test/";
+            "db_group" = 3;
+            "db_name" = "cfp_test";
+            "db_server" = "test_zeus";
+            id = 3;
+            name = Temp1;
+            obtained = "1259234761.5002";
+            timestamp = 1259234758;
+            value = 123;
+            verified = "1259234761.5";
+            write = 1;
+        };
+    };
+    "http://ipepdvadei.ka.fzk.de/test//test_zeus/cfp_test/3/4" =     {
+        ChannelNumber = 3;
+        HiAlarm = 100;
+        HiLimit = 100;
+        LoAlarm = 0;
+        LoLimit = 0;
+        "http://ipepdvadei.ka.fzk.de/test//test_zeus/cfp_test/3/4" =         {
+            Control = 1;
+            Path = "test_zeus/cfp_test/3/4";
+            URL = "http://ipepdvadei.ka.fzk.de/test/";
+            "db_group" = 3;
+            "db_name" = "cfp_test";
+            "db_server" = "test_zeus";
+            id = 4;
+            name = Temp2;
+            obtained = "1259234761.4031";
+            timestamp = 1259234758;
+            value = 4;
+            verified = "1259234759.9844";
+            write = 1;
+        };
+    };
+    "http://ipepdvadei.ka.fzk.de/test//test_zeus/cfp_test/3/5" =     {
+        ChannelNumber = 4;
+        HiAlarm = 100;
+        HiLimit = 100;
+        LoAlarm = 0;
+        LoLimit = 0;
+        "http://ipepdvadei.ka.fzk.de/test//test_zeus/cfp_test/3/5" =         {
+            Control = 1;
+            Path = "test_zeus/cfp_test/3/5";
+            URL = "http://ipepdvadei.ka.fzk.de/test/";
+            "db_group" = 3;
+            "db_name" = "cfp_test";
+            "db_server" = "test_zeus";
+            id = 5;
+            name = Temp3;
+            obtained = "1259234761.5942";
+            timestamp = 1259234758;
+            value = 10;
+            verified = "1259234761.5";
+            write = 1;
+        };
+    };
+    "http://ipepdvadei.ka.fzk.de/test//test_zeus/cfp_test/3/6" =     {
+        ChannelNumber = 2;
+        HiAlarm = 100;
+        HiLimit = 100;
+        LoAlarm = 0;
+        LoLimit = 0;
+        "http://ipepdvadei.ka.fzk.de/test//test_zeus/cfp_test/3/6" =         {
+            Control = 1;
+            Path = "test_zeus/cfp_test/3/6";
+            URL = "http://ipepdvadei.ka.fzk.de/test/";
+            "db_group" = 3;
+            "db_name" = "cfp_test";
+            "db_server" = "test_zeus";
+            id = 6;
+            name = Press1;
+            obtained = "1259234761.5694";
+            timestamp = 1259234758;
+            value = 10;
+            verified = "1259234761.5";
+            write = 1;
+        };
+    };
+}
+
+
+
+112609 19:25:01 itemTreeRoot:
+ (
+        {
+        Children =         (
+                        {
+                Children =                 (
+                                        {
+                        Children =                         (
+                                                        {
+                                Control = 1;
+                                Path = "test_zeus/cfp_test/2/0";
+                                URL = "http://ipepdvadei.ka.fzk.de/test/";
+                                name = item0;
+                                read = 1;
+                                value = 0;
+                            },
+                                                        {
+...
+...
+...
+                            },
+                                                        {
+                                Control = 1;
+                                Path = "test_zeus/cfp_test/2/5";
+                                URL = "http://ipepdvadei.ka.fzk.de/test/";
+                                name = item5;
+                                read = 1;
+                                value = 5;
+                            }
+                        );
+                        Name = 2;
+                        Path = "test_zeus/cfp_test/2";
+                        URL = "http://ipepdvadei.ka.fzk.de/test/";
+                    },
+                                        {
+                        Children =                         (
+                                                        {
+                                Control = 1;
+                                Path = "test_zeus/cfp_test/4/0";
+                                URL = "http://ipepdvadei.ka.fzk.de/test/";
+                                name = item0;
+                                read = 1;
+                                value = 0;
+                                write = 1;
+                            }
+                        );
+                        Name = 4;
+                        Path = "test_zeus/cfp_test/4";
+                        URL = "http://ipepdvadei.ka.fzk.de/test/";
+                    },
+...
+...
+...
+
+                                        {
+                        Children =                         (
+                                                        {
+                                Control = 1;
+                                Path = "test_zeus/cfp_test/6/0";
+                                URL = "http://ipepdvadei.ka.fzk.de/test/";
+                                name = item0;
+                                read = 1;
+                                value = 0;
+                            },
+                                                        {
+                                Control = 1;
+                                Path = "test_zeus/cfp_test/6/1";
+                                URL = "http://ipepdvadei.ka.fzk.de/test/";
+                                name = item1;
+                                read = 1;
+                                value = 1;
+                            },
+...
+...
+...
+                                                        {
+                                Control = 1;
+                                Path = "test_zeus/cfp_test/6/5";
+                                URL = "http://ipepdvadei.ka.fzk.de/test/";
+                                name = item5;
+                                read = 1;
+                                value = 5;
+                            }
+                        );
+                        Name = 6;
+                        Path = "test_zeus/cfp_test/6";
+                        URL = "http://ipepdvadei.ka.fzk.de/test/";
+                    },
+                                        {
+                        Children =                         (
+                                                        {
+                                Control = 1;
+                                Path = "test_zeus/cfp_test/0/0";
+                                URL = "http://ipepdvadei.ka.fzk.de/test/";
+                                name = item0;
+                                read = 1;
+                                value = 0;
+                            }
+                        );
+                        Name = 0;
+                        Path = "test_zeus/cfp_test/0";
+                        URL = "http://ipepdvadei.ka.fzk.de/test/";
+                    }
+                );
+                Name = "cfp_test";
+                Path = "test_zeus/cfp_test";
+                URL = "http://ipepdvadei.ka.fzk.de/test/";
+            }
+        );
+        Name = "test_zeus";
+        Path = "test_zeus";
+        URL = "http://ipepdvadei.ka.fzk.de/test/";
+    }
+)
+
+</pre>  
+  *
+  *
   */
+  
+  
 #define kResponseTimeHistogramSize 15000
 
 @interface ORIpeSlowControlModel : OrcaObject <ORAdcProcessing>
@@ -153,12 +441,13 @@
 - (unsigned) pendingRequestsCount;
 - (id) pendingRequest:(id)aKey forIndex:(int)anIndex;
 
-- (void)          dumpSensorlist;
-- (void)	      pollSlowControls;
-- (NSString*)     createWebRequestForItem:(int)aChannel;
-- (NSString*)	  itemDetails:(int)index;
+- (void)      dumpSensorlist;
+- (void)      pollSlowControls;
+- (NSString*) createWebRequestForItem:(int)aChannel;
+- (NSString*) itemDetails:(int)index;
 
-- (void)          manuallyCreateChannel;
+- (int)       createChannelWithUrl:(NSString*)aUrl path:(NSString*)aPath chan:(int)aChan controlType:(int)isControl;
+- (void)      manuallyCreateChannel;
 
 
 #pragma mark ***Polling Cache
@@ -205,6 +494,12 @@
 
 #pragma mark •••Main Scripting Methods
 //Scripts really shouldn't call any other methods unless you -REALLY- know what you're doing!
+- (int) createSensorWithUrl:(NSString*)aUrl path:(NSString*)aPath;
+- (int) createControlWithUrl:(NSString*)aUrl path:(NSString*)aPath;
+- (int) createSensorWithUrl:(NSString*)aUrl path:(NSString*)aPath chan:(int)aChan;
+- (int) createControlWithUrl:(NSString*)aUrl path:(NSString*)aPath chan:(int)aChan;
+
+
 - (int) findChanOfSensor:(NSString*)aUrl path:(NSString*)aPath;
 - (int) findChanOfControl:(NSString*)aUrl path:(NSString*)aPath;
 
