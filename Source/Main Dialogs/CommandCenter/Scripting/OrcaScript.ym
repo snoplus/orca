@@ -50,7 +50,6 @@
 %type <nPtr> primary_expr multiplicative_expr postfix_expr unary_expr  additive_expr time_statement
 %type <nPtr> shift_expr relational_expr equality_expr and_expr exclusive_or_expr inclusive_or_expr shell_statement
 %type <nPtr> logical_and_expr logical_or_expr conditional_expr assignment_expr leftArrayElement objectPtr rng_str file_str
-%type <nPtr> write_line delete_file
 
 %start program
 
@@ -425,13 +424,6 @@ file_str
 : STRINGFROMFILE '(' expr ')'			{ $$ = executionNode(STRINGFROMFILE,$3,nil);}
 ;
 
-write_line
-: WRITELINETOFILE '(' expr ',' expr ')'			{ $$ = executionNode(WRITELINETOFILE,$3,nil);}
-;
-
-delete_file
-: DELETEFILE '(' expr ')'			{ $$ = executionNode(DELETEFILE,$3,nil);}
-;
 
 
 //--------------------------------------------------------------------
