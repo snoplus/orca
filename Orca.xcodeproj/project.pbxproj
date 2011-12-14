@@ -205,8 +205,6 @@
 		840590EB0CCE5E9C0000DBF3 /* ORLevelMonitor.h in Headers */ = {isa = PBXBuildFile; fileRef = 840590E90CCE5E9C0000DBF3 /* ORLevelMonitor.h */; };
 		840590EC0CCE5E9C0000DBF3 /* ORLevelMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = 840590EA0CCE5E9C0000DBF3 /* ORLevelMonitor.m */; };
 		8405A459108C99A8001F43F1 /* ORDetectorSegment.m in Sources */ = {isa = PBXBuildFile; fileRef = 8405A458108C99A8001F43F1 /* ORDetectorSegment.m */; };
-		8405E9941485476000FFEFC4 /* ORSerialDeviceModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8405E9921485476000FFEFC4 /* ORSerialDeviceModel.h */; };
-		8405E9951485476000FFEFC4 /* ORSerialDeviceModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8405E9931485476000FFEFC4 /* ORSerialDeviceModel.m */; };
 		84065D961226B600004E8970 /* ORPxi8336MacController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84065D8D1226B600004E8970 /* ORPxi8336MacController.h */; };
 		84065D971226B600004E8970 /* ORPxi8336MacController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84065D8E1226B600004E8970 /* ORPxi8336MacController.m */; };
 		84065D981226B600004E8970 /* ORPxi8336MacModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84065D8F1226B600004E8970 /* ORPxi8336MacModel.h */; };
@@ -2322,6 +2320,10 @@
 		84DDEBA607BD3E080060D0B4 /* ORMultiPlot.m in Sources */ = {isa = PBXBuildFile; fileRef = 84DDEB9F07BD3E080060D0B4 /* ORMultiPlot.m */; };
 		84DDEBA707BD3E080060D0B4 /* ORMultiPlotController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84DDEBA007BD3E080060D0B4 /* ORMultiPlotController.h */; };
 		84DDEBA807BD3E080060D0B4 /* ORMultiPlotController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84DDEBA107BD3E080060D0B4 /* ORMultiPlotController.m */; };
+		84DEE4CE149794070092DB6C /* ORFPDSegmentGroup.h in Headers */ = {isa = PBXBuildFile; fileRef = 84DEE4CC149794070092DB6C /* ORFPDSegmentGroup.h */; };
+		84DEE4CF149794070092DB6C /* ORFPDSegmentGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 84DEE4CD149794070092DB6C /* ORFPDSegmentGroup.m */; };
+		84DEEBBD149916AD0092DB6C /* ORSerialDeviceModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84DEEBBB149916AD0092DB6C /* ORSerialDeviceModel.h */; };
+		84DEEBBE149916AD0092DB6C /* ORSerialDeviceModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84DEEBBC149916AD0092DB6C /* ORSerialDeviceModel.m */; };
 		84DF474A0962140800ABE071 /* ORDataExplorerController.h in Headers */ = {isa = PBXBuildFile; fileRef = 849F4C6E0768DA920087E9A8 /* ORDataExplorerController.h */; };
 		84E0968609F44E3200EFE044 /* ORTek754DModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C493B204059AEA005F64B1 /* ORTek754DModel.m */; };
 		84E099620CC934CC00EFBC8F /* play.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 84E099600CC934CB00EFBC8F /* play.tiff */; };
@@ -3018,8 +3020,6 @@
 		840590E90CCE5E9C0000DBF3 /* ORLevelMonitor.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORLevelMonitor.h; path = "Source/Widgets/Bar Graph/ORLevelMonitor.h"; sourceTree = SOURCE_ROOT; };
 		840590EA0CCE5E9C0000DBF3 /* ORLevelMonitor.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORLevelMonitor.m; path = "Source/Widgets/Bar Graph/ORLevelMonitor.m"; sourceTree = SOURCE_ROOT; };
 		8405A458108C99A8001F43F1 /* ORDetectorSegment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORDetectorSegment.m; path = Source/Experiments/BaseClasses/ORDetectorSegment.m; sourceTree = SOURCE_ROOT; };
-		8405E9921485476000FFEFC4 /* ORSerialDeviceModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSerialDeviceModel.h; path = "Source/Objects/Hardware/Serial/Serial Base Classes/ORSerialDeviceModel.h"; sourceTree = SOURCE_ROOT; };
-		8405E9931485476000FFEFC4 /* ORSerialDeviceModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSerialDeviceModel.m; path = "Source/Objects/Hardware/Serial/Serial Base Classes/ORSerialDeviceModel.m"; sourceTree = SOURCE_ROOT; };
 		84065D8D1226B600004E8970 /* ORPxi8336MacController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPxi8336MacController.h; path = Source/Objects/Hardware/Pci/Pxi8336Mac/ORPxi8336MacController.h; sourceTree = SOURCE_ROOT; };
 		84065D8E1226B600004E8970 /* ORPxi8336MacController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORPxi8336MacController.m; path = Source/Objects/Hardware/Pci/Pxi8336Mac/ORPxi8336MacController.m; sourceTree = SOURCE_ROOT; };
 		84065D8F1226B600004E8970 /* ORPxi8336MacModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPxi8336MacModel.h; path = Source/Objects/Hardware/Pci/Pxi8336Mac/ORPxi8336MacModel.h; sourceTree = SOURCE_ROOT; };
@@ -5019,6 +5019,10 @@
 		84DE5925051F7AF9005F64B1 /* ORCaen785Model.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORCaen785Model.h; sourceTree = "<group>"; };
 		84DE5926051F7AF9005F64B1 /* ORCaen785Model.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORCaen785Model.m; sourceTree = "<group>"; };
 		84DE5944051FB3D1005F64B1 /* Caen785.nib */ = {isa = PBXFileReference; explicitFileType = wrapper.nib; name = Caen785.nib; path = Source/Objects/Hardware/Vme/CAEN/CV785/Caen785.nib; sourceTree = SOURCE_ROOT; };
+		84DEE4CC149794070092DB6C /* ORFPDSegmentGroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORFPDSegmentGroup.h; path = Source/Experiments/Katrin/ORFPDSegmentGroup.h; sourceTree = SOURCE_ROOT; };
+		84DEE4CD149794070092DB6C /* ORFPDSegmentGroup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORFPDSegmentGroup.m; path = Source/Experiments/Katrin/ORFPDSegmentGroup.m; sourceTree = SOURCE_ROOT; };
+		84DEEBBB149916AD0092DB6C /* ORSerialDeviceModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSerialDeviceModel.h; path = "Source/Objects/Hardware/Serial/Serial Base Classes/ORSerialDeviceModel.h"; sourceTree = SOURCE_ROOT; };
+		84DEEBBC149916AD0092DB6C /* ORSerialDeviceModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSerialDeviceModel.m; path = "Source/Objects/Hardware/Serial/Serial Base Classes/ORSerialDeviceModel.m"; sourceTree = SOURCE_ROOT; };
 		84DF917204D6D53C005F64B1 /* ORFileMover.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORFileMover.h; sourceTree = "<group>"; };
 		84DF917304D6D53C005F64B1 /* ORFileMover.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORFileMover.m; sourceTree = "<group>"; };
 		84E099600CC934CB00EFBC8F /* play.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = play.tiff; path = Source/Objects/Control/RunControl/play.tiff; sourceTree = SOURCE_ROOT; };
@@ -5755,6 +5759,8 @@
 				54F5B6FD087206D9003AC228 /* KatrinController.h */,
 				844BF4980B1B85560047C9BF /* KatrinDetectorView.h */,
 				844BF4990B1B85560047C9BF /* KatrinDetectorView.m */,
+				84DEE4CC149794070092DB6C /* ORFPDSegmentGroup.h */,
+				84DEE4CD149794070092DB6C /* ORFPDSegmentGroup.m */,
 				842702800B5EE937009176B4 /* katrin.gif */,
 				54F5B6FC087206D9003AC228 /* Katrin.nib */,
 			);
@@ -5791,16 +5797,6 @@
 			name = CouchDB;
 			path = "Source/Objects/Misc Objects/CouchDB";
 			sourceTree = SOURCE_ROOT;
-		};
-		8405E990148546E100FFEFC4 /* Serial Base Classes */ = {
-			isa = PBXGroup;
-			children = (
-				8405E9921485476000FFEFC4 /* ORSerialDeviceModel.h */,
-				8405E9931485476000FFEFC4 /* ORSerialDeviceModel.m */,
-			);
-			name = "Serial Base Classes";
-			path = "Base Classes";
-			sourceTree = "<group>";
 		};
 		84065D8B1226B600004E8970 /* Pxi8336Mac */ = {
 			isa = PBXGroup;
@@ -7377,7 +7373,7 @@
 		84499B6D0F13BAB8004B855B /* Serial */ = {
 			isa = PBXGroup;
 			children = (
-				8405E990148546E100FFEFC4 /* Serial Base Classes */,
+				84DEEBBA149916AD0092DB6C /* Serial Base Classes */,
 				841C4DEE141FA72800F95B50 /* Met237 */,
 				847F947213D4AA31006B06B4 /* Rad7 */,
 				8435AAC110C6D0EF00E03F7F /* VarianTPS */,
@@ -10532,6 +10528,16 @@
 			path = Source/Objects/Hardware/Vme/CAEN/CV785;
 			sourceTree = SOURCE_ROOT;
 		};
+		84DEEBBA149916AD0092DB6C /* Serial Base Classes */ = {
+			isa = PBXGroup;
+			children = (
+				84DEEBBB149916AD0092DB6C /* ORSerialDeviceModel.h */,
+				84DEEBBC149916AD0092DB6C /* ORSerialDeviceModel.m */,
+			);
+			name = "Serial Base Classes";
+			path = "Source/Objects/Hardware/Serial/Serial Base Classes";
+			sourceTree = SOURCE_ROOT;
+		};
 		84DF917104D6D51E005F64B1 /* FileMover */ = {
 			isa = PBXGroup;
 			children = (
@@ -12510,9 +12516,10 @@
 				8475EC4A1475A66F003A165D /* ORLabJackUE9Model.h in Headers */,
 				8475EC521475A752003A165D /* labjackusb.h in Headers */,
 				8475ECF014769A84003A165D /* ue9.h in Headers */,
-				8405E9941485476000FFEFC4 /* ORSerialDeviceModel.h in Headers */,
 				CED29CFC1482B02200BD3AB2 /* ORSIS3302GenericModel.h in Headers */,
 				CE3E7A231482D940000F1708 /* ORSIS3302GenericController.h in Headers */,
+				84DEE4CE149794070092DB6C /* ORFPDSegmentGroup.h in Headers */,
+				84DEEBBD149916AD0092DB6C /* ORSerialDeviceModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14203,9 +14210,10 @@
 				8475EC4B1475A66F003A165D /* ORLabJackUE9Model.m in Sources */,
 				8475EC511475A752003A165D /* labjackusb.c in Sources */,
 				8475ECEF14769A84003A165D /* ue9.c in Sources */,
-				8405E9951485476000FFEFC4 /* ORSerialDeviceModel.m in Sources */,
 				CED29CFD1482B02200BD3AB2 /* ORSIS3302GenericModel.m in Sources */,
 				CE3E7A241482D940000F1708 /* ORSIS3302GenericController.m in Sources */,
+				84DEE4CF149794070092DB6C /* ORFPDSegmentGroup.m in Sources */,
+				84DEEBBE149916AD0092DB6C /* ORSerialDeviceModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
