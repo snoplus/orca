@@ -22,7 +22,7 @@
 #pragma mark ¥¥¥Imported Files
 #import "KatrinModel.h"
 #import "KatrinController.h"
-#import "ORSegmentGroup.h"
+#import "ORFPDSegmentGroup.h"
 #import "KatrinConstants.h"
 #import "ORSocketClient.h"
 #import "ORCommandCenter.h"
@@ -30,8 +30,12 @@
 NSString* KatrinModelSlowControlIsConnectedChanged = @"KatrinModelSlowControlIsConnectedChanged";
 NSString* KatrinModelSlowControlNameChanged			= @"KatrinModelSlowControlNameChanged";
 NSString* ORKatrinModelViewTypeChanged				= @"ORKatrinModelViewTypeChanged";
+NSString* ORKatrinModelSNTablesChanged				= @"ORKatrinModelSNTablesChanged";
 
 static NSString* KatrinDbConnector		= @"KatrinDbConnector";
+@interface KatrinModel (private)
+- (void) validateSNArrays;
+@end
 
 @implementation KatrinModel
 
@@ -127,12 +131,47 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 	
 }
 
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)aDictionary
+{
+	NSString* segmentGeometryName[2] = {@"FPDGeometry",@"VetoGeometry"};
+    NSMutableDictionary* objDictionary = [NSMutableDictionary dictionary];
+	int i;
+	int n = MIN(2,[segmentGroups count]);
+	for(i=0;i<n;i++){
+		ORSegmentGroup* aSegmentGroup = [segmentGroups objectAtIndex:i];
+		[aSegmentGroup addParametersToDictionary:objDictionary useName:segmentGeometryName[i]];
+	}
+	
+	NSString* rootMapFile = [[[segmentGroups objectAtIndex:0] mapFile] stringByExpandingTildeInPath];
+	
+	//add the FLT/ORB SN
+	NSString* contents = [NSString stringWithContentsOfFile:FLTORBSNFILE(rootMapFile) encoding:NSASCIIStringEncoding error:nil];
+	if(!contents)contents = @"NONE";
+    [objDictionary setObject:contents forKey:@"FltOrbSNs"];
+	
+	//add the Preamp SN
+	contents = [NSString stringWithContentsOfFile:PREAMPSNFILE(rootMapFile) encoding:NSASCIIStringEncoding error:nil];
+	if(!contents)contents = @"NONE";
+    [objDictionary setObject:contents forKey:@"PreampSNs"];
+	
+	//add the OSB SN
+	contents = [NSString stringWithContentsOfFile:OSBSNFILE(rootMapFile) encoding:NSASCIIStringEncoding error:nil];
+	if(!contents)contents = @"NONE";
+    [objDictionary setObject:contents forKey:@"OsbSNs"];
+
+	//add the SLT and Wafer SN
+	contents = [NSString stringWithContentsOfFile:SLTWAFERSNFILE(rootMapFile) encoding:NSASCIIStringEncoding error:nil];
+	if(!contents)contents = @"NONE";
+    [objDictionary setObject:contents forKey:@"SltWaferSNs"];
+		
+    [aDictionary setObject:objDictionary forKey:[self className]];
+    return aDictionary;
+}
 
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups
 {
-	
-    ORSegmentGroup* group = [[ORSegmentGroup alloc] initWithName:@"Focal Plane" numSegments:kNumFocalPlaneSegments mapEntries:[self initMapEntries:0]];
+    ORFPDSegmentGroup* group = [[ORFPDSegmentGroup alloc] initWithName:@"Focal Plane" numSegments:kNumFocalPlaneSegments mapEntries:[self initMapEntries:0]];
 	[self addGroup:group];
 	[group release];
 	
@@ -143,22 +182,22 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 
 - (NSMutableArray*) initMapEntries:(int)index
 {
-	if(index==1)return [super initMapEntries:0]; //default set
+	if(index==1){
+		NSMutableArray* mapEntries = [NSMutableArray array];
+		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kSegmentNumber",	@"key", [NSNumber numberWithInt:0], @"sortType", nil]];
+		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kFLTSlot",		@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kFLTChannel",	@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+		return mapEntries;
+	}
 	else {
 		NSMutableArray* mapEntries = [NSMutableArray array];
 		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kSegmentNumber",	@"key", [NSNumber numberWithInt:0], @"sortType", nil]];
-		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kCardSlot",		@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kChannel",		@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kName",			@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kQuadrant",		@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kCarouselSlot",	@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kModuleAddress",	@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kModuleChannel",	@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kPreampSerial",	@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kFLTSlot",		@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kFLTChannel",	@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kPreampModule",	@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kPreampChannel",	@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
 		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kOSBSlot",		@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
 		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kOSBChannel",	@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kORBCard",		@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kORBChannel",	@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
 		return mapEntries;
 	}
 }
@@ -176,23 +215,17 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 		NSString* finalString = @"";
 		NSArray* parts = [aString componentsSeparatedByString:@"\n"];
 		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Segment" parts:parts]];
-		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Quadrant" parts:parts]];
 		finalString = [finalString stringByAppendingString:@"-----------------------\n"];
 		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" CardSlot" parts:parts]];
 		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Channel" parts:parts]];
 		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Threshold" parts:parts]];
 		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Gain" parts:parts]];
 		finalString = [finalString stringByAppendingString:@"-----------------------\n"];
-		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" PreampSerial" parts:parts]];
-		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" CarouselSlot" parts:parts]];
 		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" ModuleAddress" parts:parts]];
 		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" ModuleChannel" parts:parts]];
 		finalString = [finalString stringByAppendingString:@"-----------------------\n"];
 		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" OSBSlot" parts:parts]];
 		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" OSBChannel" parts:parts]];
-		finalString = [finalString stringByAppendingString:@"-----------------------\n"];
-		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" ORBCard" parts:parts]];
-		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" ORBChannel" parts:parts]];
 		return finalString;
 	}
 	else {
@@ -295,26 +328,297 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 	return viewType;
 }
 
-- (id)initWithCoder:(NSCoder*)decoder
+- (id) initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
-    
+	//backward compatibility check
+    if([segmentGroups count]>1){
+		NSObject* firstSegmentGroup = [segmentGroups objectAtIndex:0];
+		if(![firstSegmentGroup isKindOfClass:NSClassFromString(@"ORFPDSegmentGroup")]){
+			ORFPDSegmentGroup* group = [[ORFPDSegmentGroup alloc] initWithName:@"Focal Plane" numSegments:kNumFocalPlaneSegments mapEntries:[self initMapEntries:0]];
+			[segmentGroups replaceObjectAtIndex:0 withObject:group];
+			[group release];
+		}
+	}
     [self setSlowControlName:[decoder decodeObjectForKey:@"slowControlName"]];
     [self setViewType:[decoder decodeIntForKey:@"viewType"]];
+	fltSNs		= [[decoder decodeObjectForKey:@"fltSNs"] retain];
+	preAmpSNs	= [[decoder decodeObjectForKey:@"preAmpSNs"] retain];
+	osbSNs		= [[decoder decodeObjectForKey:@"osbSNs"] retain];
+	otherSNs	= [[decoder decodeObjectForKey:@"otherSNs"] retain];
+	[self validateSNArrays];
 	[[self undoManager] enableUndoRegistration];
 
     return self;
 }
 
-- (void)encodeWithCoder:(NSCoder*)encoder
+- (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeObject:slowControlName forKey:@"slowControlName"];
-    [encoder encodeInt:viewType forKey:@"viewType"];
+	
+    [encoder encodeObject:slowControlName	forKey: @"slowControlName"];
+    [encoder encodeInt:viewType				forKey: @"viewType"];
+    [encoder encodeObject:fltSNs			forKey: @"fltSNs"];
+    [encoder encodeObject:preAmpSNs			forKey: @"preAmpSNs"];
+    [encoder encodeObject:osbSNs			forKey: @"osbSNs"];
+    [encoder encodeObject:otherSNs			forKey: @"otherSNs"];
 }
 
+
+#pragma mark ¥¥¥SN Access Methods
+- (id) fltSN:(int)i objectForKey:(id)aKey
+{
+	if(i>=0 && i<8){
+		return [[fltSNs objectAtIndex:i] objectForKey:aKey];
+	}
+	else return @"";
+}
+
+- (void) fltSN:(int)i setObject:(id)anObject forKey:(id)aKey
+{
+	if(i>=0 && i<8){
+		id entry = [fltSNs objectAtIndex:i];
+		id oldValue = [self fltSN:i objectForKey:aKey];
+		if(oldValue)[[[self undoManager] prepareWithInvocationTarget:self] fltSN:i setObject:oldValue forKey:aKey];
+		[entry setObject:anObject forKey:aKey];
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinModelSNTablesChanged object:self userInfo:nil];
+		
+	}
+}
+
+- (id) preAmpSN:(int)i objectForKey:(id)aKey
+{
+	if(i>=0 && i<24){
+		return [[preAmpSNs objectAtIndex:i] objectForKey:aKey];
+	}
+	else return @"";
+}
+- (void) preAmpSN:(int)i setObject:(id)anObject forKey:(id)aKey
+{
+	if(i>=0 && i<24){
+		id entry = [preAmpSNs objectAtIndex:i];
+		id oldValue = [self preAmpSN:i objectForKey:aKey];
+		if(oldValue)[[[self undoManager] prepareWithInvocationTarget:self] preAmpSN:i setObject:oldValue forKey:aKey];
+		[entry setObject:anObject forKey:aKey];
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinModelSNTablesChanged object:self userInfo:nil];
+	}
+}
+
+- (id) osbSN:(int)i objectForKey:(id)aKey
+{
+	if(i>=0 && i<4){
+		return [[osbSNs objectAtIndex:i] objectForKey:aKey];
+	}
+	else return @"";
+}
+- (void) osbSN:(int)i setObject:(id)anObject forKey:(id)aKey
+{
+	if(i>=0 && i<4){
+		id entry = [osbSNs objectAtIndex:i];
+		id oldValue = [self osbSN:i objectForKey:aKey];
+		if(oldValue)[[[self undoManager] prepareWithInvocationTarget:self] osbSN:i setObject:oldValue forKey:aKey];
+		[entry setObject:anObject forKey:aKey];
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinModelSNTablesChanged object:self userInfo:nil];
+	}
+}
+- (id) otherSNForKey:(id)aKey
+{
+	return [otherSNs objectForKey:aKey];
+}
+
+- (void) setOtherSNObject:(id)anObject forKey:(id)aKey
+{
+	id oldValue = [self otherSNForKey:aKey];
+	if(oldValue)[[[self undoManager] prepareWithInvocationTarget:self] setOtherSNObject:oldValue forKey:aKey];
+	[otherSNs setObject:anObject forKey:aKey];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinModelSNTablesChanged object:self userInfo:nil];
+}
+
+- (void) validateSNArrays
+{
+	if(!fltSNs){
+		fltSNs = [[NSMutableArray array] retain];
+		int i;
+		for(i=0;i<8;i++){
+			[fltSNs addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+							   [NSNumber numberWithInt:i+2], @"kFltSlot",
+							   @"-",						 @"kFltSN",
+							   @"-",						 @"kORBSN", nil]];
+		}
+	}
+	if(!preAmpSNs){
+		preAmpSNs = [[NSMutableArray array] retain];
+		int i;
+		for(i=0;i<24;i++){
+			[preAmpSNs addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+							   [NSNumber numberWithInt:i], @"kPreAmpMod",
+							   @"-",					   @"kPreAmpSN", nil]];
+		}
+	}
+	if(!osbSNs){
+		osbSNs = [[NSMutableArray array] retain];
+		int i;
+		for(i=0;i<4;i++){
+			[osbSNs addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+								 [NSNumber numberWithInt:i], @"kOSBSlot",
+								 @"-",						@"kOSBSN", nil]];
+		}
+	}
+	if(!otherSNs){
+		otherSNs = [[NSMutableDictionary dictionaryWithObjectsAndKeys:
+							  @"-",			@"kSltSN",
+							  @"-",			@"kWaferSN", nil] retain];
+	}
+}
+
+- (void) handleOldPrimaryMapFormats:(NSString*)aPath
+{
+	//the old format had the preamp s/n included.
+	NSString* contents = [NSString stringWithContentsOfFile:[aPath stringByExpandingTildeInPath] encoding:NSASCIIStringEncoding error:nil];
+	contents = [[contents componentsSeparatedByString:@"\r"] componentsJoinedByString:@"\n"];
+	contents = [[contents componentsSeparatedByString:@"\n\n"] componentsJoinedByString:@"\n"];
+    NSArray*  lines = [contents componentsSeparatedByString:@"\n"];
+    for(id aLine in lines){
+        aLine = [aLine stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        aLine = [aLine stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@","]];
+        if([aLine length] && [aLine characterAtIndex:0] != '#'){
+			NSArray* parts =  [aLine componentsSeparatedByString:@","];
+			if([parts count] != 13) break;
+			if(![aLine hasPrefix:@"--"]){
+				int preAmpModule = [[parts objectAtIndex:6] intValue];
+				NSString* preAmpSN = [parts objectAtIndex:8];
+				if(preAmpModule < [preAmpSNs count]){
+					id entry = [preAmpSNs objectAtIndex:preAmpModule];
+					[entry setObject:preAmpSN forKey:@"kPreAmpSN"];
+				}
+			}
+        }
+    }	
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSegmentGroupMapReadNotification object:self];
+}
+
+- (NSString*) validateHWMapPath:(NSString*)aPath
+{
+	if([aPath hasSuffix:@"_FltOrbSN"])	 return [aPath substringToIndex:[aPath length]-9];
+	if([aPath hasSuffix:@"_PreampSN"])	 return [aPath substringToIndex:[aPath length]-9];
+	if([aPath hasSuffix:@"_OsbSN"])		 return [aPath substringToIndex:[aPath length]-6];
+	if([aPath hasSuffix:@"_SltWaferSN"]) return [aPath substringToIndex:[aPath length]-11];
+	return aPath;
+}
+
+- (void) readAuxFiles:(NSString*)aPath 
+{
+	NSFileManager* fm = [NSFileManager defaultManager];
+	if([fm fileExistsAtPath:FLTORBSNFILE(aPath)]){
+		//read in the FLT/ORB Serial Numbers
+		NSArray* lines  = [self linesInFile:FLTORBSNFILE(aPath)];
+		for(id aLine in lines){
+			if([aLine length] && [aLine characterAtIndex:0] != '#'){ //skip comments
+				NSArray* parts =  [aLine componentsSeparatedByString:@","];
+				if([parts count]>=3){
+					int index = [[parts objectAtIndex:0] intValue]-2;
+					if(index<8){
+						NSMutableDictionary* dict = [fltSNs objectAtIndex:index];
+						[dict setObject:[parts objectAtIndex:0] forKey:@"kFltSlot"];
+						[dict setObject:[parts objectAtIndex:1] forKey:@"kFltSN"];
+						[dict setObject:[parts objectAtIndex:2] forKey:@"kORBSN"];
+					}
+				}
+			}
+		}
+	}
+	if([fm fileExistsAtPath:OSBSNFILE(aPath)]){
+		//read in the OSB Serial Numbers
+		NSArray* lines  = [self linesInFile:OSBSNFILE(aPath)];
+		for(id aLine in lines){
+			if([aLine length] && [aLine characterAtIndex:0] != '#'){ //skip comments
+				NSArray* parts =  [aLine componentsSeparatedByString:@","];
+				if([parts count]>=2){
+					int index = [[parts objectAtIndex:0] intValue];
+					if(index<4){
+						NSMutableDictionary* dict = [osbSNs objectAtIndex:index];
+						[dict setObject:[parts objectAtIndex:0] forKey:@"kOSBSlot"];
+						[dict setObject:[parts objectAtIndex:1] forKey:@"kOSBSN"];
+					}
+				}
+			}
+		}
+	}
+	if([fm fileExistsAtPath:PREAMPSNFILE(aPath)]){
+		//read in the PreAmp Serial Numbers
+		NSArray* lines  = [self linesInFile:PREAMPSNFILE(aPath)];
+		for(id aLine in lines){
+			if([aLine length] && [aLine characterAtIndex:0] != '#'){ //skip comments
+				NSArray* parts =  [aLine componentsSeparatedByString:@","];
+				if([parts count]>=2){
+					int index = [[parts objectAtIndex:0] intValue];
+					if(index<24){
+						NSMutableDictionary* dict = [preAmpSNs objectAtIndex:index];
+						[dict setObject:[parts objectAtIndex:0] forKey:@"kPreAmpMod"];
+						[dict setObject:[parts objectAtIndex:1] forKey:@"kPreAmpSN"];
+					}
+				}
+			}
+		}
+	}
+	if([fm fileExistsAtPath:SLTWAFERSNFILE(aPath)]){
+		//read in the Slt and Wafer Serial Numbers
+		NSArray* lines  = [self linesInFile:SLTWAFERSNFILE(aPath)];
+		for(id aLine in lines){
+			if([aLine length] && [aLine characterAtIndex:0] != '#'){ //skip comments
+				NSArray* parts =  [aLine componentsSeparatedByString:@","];
+				if([parts count]>=2){
+					[otherSNs setObject:[parts objectAtIndex:0] forKey:@"kSltSN"];
+					[otherSNs setObject:[parts objectAtIndex:1] forKey:@"kWaferSN"];
+				}
+			}
+		}
+	}
+}
+
+- (void) saveAuxFiles:(NSString*)aPath 
+{
+	aPath = [aPath stringByExpandingTildeInPath];
+	NSFileManager* fm = [NSFileManager defaultManager];
+	NSMutableString* contents = [NSMutableString string];
+	//save the FLT/ORB Serial Numbers
+	if([fm fileExistsAtPath: FLTORBSNFILE(aPath)])[fm removeItemAtPath:FLTORBSNFILE(aPath) error:nil];
+	for(id item in fltSNs)[contents appendFormat:@"%@,%@,%@\n",[item objectForKey:@"kFltSlot"],[item objectForKey:@"kFltSN"],[item objectForKey:@"kORBSN"]];
+	NSData* data = [contents dataUsingEncoding:NSASCIIStringEncoding];
+	[fm createFileAtPath:FLTORBSNFILE(aPath) contents:data attributes:nil];
+	
+	//save the OSB Serial Numbers
+	contents = [NSMutableString string];
+	if([fm fileExistsAtPath: OSBSNFILE(aPath)])[fm removeItemAtPath:OSBSNFILE(aPath) error:nil];
+	for(id item in osbSNs)[contents appendFormat:@"%@,%@\n",[item objectForKey:@"kOSBSlot"],[item objectForKey:@"kOSBSN"]];
+	data = [contents dataUsingEncoding:NSASCIIStringEncoding];
+	[fm createFileAtPath:OSBSNFILE(aPath) contents:data attributes:nil];
+
+	//save the Preamp Serial Numbers
+	contents = [NSMutableString string];
+	if([fm fileExistsAtPath: PREAMPSNFILE(aPath)])[fm removeItemAtPath:PREAMPSNFILE(aPath) error:nil];
+	for(id item in preAmpSNs)[contents appendFormat:@"%@,%@\n",[item objectForKey:@"kPreAmpMod"],[item objectForKey:@"kPreAmpSN"]];
+	data = [contents dataUsingEncoding:NSASCIIStringEncoding];
+	[fm createFileAtPath:PREAMPSNFILE(aPath) contents:data attributes:nil];
+	
+	//save the Slt and Wafer Serial Numbers
+	contents = [NSMutableString string];
+	if([fm fileExistsAtPath: SLTWAFERSNFILE(aPath)])[fm removeItemAtPath:SLTWAFERSNFILE(aPath) error:nil];
+	[contents appendFormat:@"%@,%@\n",[otherSNs objectForKey:@"kSltSN"],[otherSNs objectForKey:@"kWaferSN"]];
+	data = [contents dataUsingEncoding:NSASCIIStringEncoding];
+	[fm createFileAtPath:SLTWAFERSNFILE(aPath) contents:data attributes:nil];
+	
+}
+
+- (NSArray*) linesInFile:(NSString*)aPath
+{
+	NSString* contents = [NSString stringWithContentsOfFile:[aPath stringByExpandingTildeInPath] encoding:NSASCIIStringEncoding error:nil];
+	contents = [[contents componentsSeparatedByString:@"\r"] componentsJoinedByString:@"\n"];
+	contents = [[contents componentsSeparatedByString:@"\n\n"] componentsJoinedByString:@"\n"];
+    return [contents componentsSeparatedByString:@"\n"];
+}
 
 @end
 

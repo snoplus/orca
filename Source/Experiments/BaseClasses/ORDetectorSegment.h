@@ -101,3 +101,4 @@
 @end
 
 extern NSString* KSegmentRateChangedNotification;
+extern NSString* KSegmentChangedNotification;

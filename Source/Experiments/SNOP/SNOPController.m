@@ -25,9 +25,6 @@
 #import "ORColorScale.h"
 #import "ORAxis.h"
 #import "ORDetectorSegment.h"
-#import "ORSegmentGroup.h"
-
-
 
 @implementation SNOPController
 #pragma mark ¥¥¥Initialization
@@ -37,14 +34,6 @@
     return self;
 }
 
-- (void) loadSegmentGroups
-{
-	if(!segmentGroups)segmentGroups = [[NSMutableArray array] retain];
-	ORSegmentGroup* aGroup = [model segmentGroup:0];
-	if(![segmentGroups containsObject:aGroup]){
-		[segmentGroups addObject:aGroup];
-	}
-}
 
 - (NSString*) defaultPrimaryMapFilePath
 {

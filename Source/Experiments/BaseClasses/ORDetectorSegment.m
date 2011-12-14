@@ -27,6 +27,7 @@
 #define mapKey(A) [self mapEntry:A forKey:@"key"]
 
 NSString* KSegmentRateChangedNotification = @"KSegmentRateChangedNotification";
+NSString* KSegmentChangedNotification	  =	@"KSegmentChangedNotification";
 
 @implementation ORDetectorSegment
 
@@ -45,10 +46,8 @@ NSString* KSegmentRateChangedNotification = @"KSegmentRateChangedNotification";
 #pragma mark ¥¥¥Accessors
 - (void) setMapEntries:(NSArray*)someMapEntries
 {
-
 	[mapEntries autorelease];
     mapEntries = [someMapEntries retain];
-
 }
 
 - (NSArray*) mapEntries
@@ -301,11 +300,13 @@ NSString* KSegmentRateChangedNotification = @"KSegmentRateChangedNotification";
 
 -(void) setObject:(id)obj forKey:(id)key
 {
+	if(!obj)obj = @"";
     [[[self undoManager] prepareWithInvocationTarget:self] setObject:[params objectForKey:key] forKey:key];
-    
-	if(!params)[self setParams:[NSMutableDictionary dictionary]];
 
+	if(!params)[self setParams:[NSMutableDictionary dictionary]];
     [params setObject:obj forKey:key];
+	
+    [[NSNotificationCenter defaultCenter] postNotificationName:KSegmentChangedNotification object:self];
 }
 
 - (void) setSegmentNumber:(unsigned)index

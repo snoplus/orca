@@ -46,23 +46,6 @@
     return self;
 }
 
-- (void) loadSegmentGroups
-{
-	//primary group is the focal plane
-	if(!segmentGroups)segmentGroups = [[NSMutableArray array] retain];
-	ORSegmentGroup* aGroup = [model segmentGroup:0];
-	if(![segmentGroups containsObject:aGroup]){
-		[segmentGroups addObject:aGroup];
-	}
-	//secondary group is the veto
-	aGroup = [model segmentGroup:1];
-	if(![segmentGroups containsObject:aGroup]){
-		[segmentGroups addObject:aGroup];
-		secondaryGroup = aGroup;
-	}
-
-}
-
 - (NSString*) defaultPrimaryMapFilePath
 {
 	return @"~/FocalPlaneMap";
@@ -89,7 +72,7 @@
 	
     [super awakeFromNib];
 	
-	if([secondaryGroup colorAxisAttributes])[[secondaryColorScale colorAxis] setAttributes:[[[secondaryGroup colorAxisAttributes] mutableCopy] autorelease]];
+	if([[model segmentGroup:1] colorAxisAttributes])[[secondaryColorScale colorAxis] setAttributes:[[[[model segmentGroup:1] colorAxisAttributes] mutableCopy] autorelease]];
 
 	[[secondaryColorScale colorAxis] setRngLimitsLow:0 withHigh:128000000 withMinRng:5];
     [[secondaryColorScale colorAxis] setRngDefaultsLow:0 withHigh:128000000];
@@ -104,9 +87,6 @@
 	OR1DHistoPlot* aPlot1 = [[OR1DHistoPlot alloc] initWithTag:11 andDataSource:self];
 	[valueHistogramsPlot addPlot: aPlot1];
 	[aPlot1 release];
-	
-	
-		
 }
 
 
@@ -127,13 +107,12 @@
     [notifyCenter addObserver : self
                      selector : @selector(secondaryAdcClassNameChanged:)
                          name : ORSegmentGroupAdcClassNameChanged
-						object: secondaryGroup];
-
+						object: [model segmentGroup:1]];
 
     [notifyCenter addObserver : self
                      selector : @selector(secondaryMapFileChanged:)
                          name : ORSegmentGroupMapFileChanged
-						object: secondaryGroup];
+						object: [model segmentGroup:1]];
 	
     [notifyCenter addObserver : self
                      selector : @selector(slowControlIsConnectedChanged:)
@@ -150,7 +129,10 @@
                          name : ORKatrinModelViewTypeChanged
 						object: model];
 	
-	
+    [notifyCenter addObserver : self
+                     selector : @selector(snTablesChanged:)
+                         name : ORKatrinModelSNTablesChanged
+						object: model];
 }
 
 - (void) updateWindow
@@ -170,6 +152,45 @@
 	[self slowControlIsConnectedChanged:nil];
 	[self slowControlNameChanged:nil];
 	[self viewTypeChanged:nil];
+	[self snTablesChanged:nil];
+}
+
+- (void) primaryMapFileChanged:(NSNotification*)aNote
+{
+	[super primaryMapFileChanged:aNote];
+	NSString* s = [[[model segmentGroup:0] mapFile] stringByAbbreviatingWithTildeInPath];
+	if(s) {
+		[fltOrbSNField	 setStringValue:[FLTORBSNFILE(s) lastPathComponent]];
+		[osbSNField		 setStringValue:[OSBSNFILE(s) lastPathComponent]];
+		[preampSNField	 setStringValue:[PREAMPSNFILE(s) lastPathComponent]];
+		[sltWaferSNField setStringValue:[SLTWAFERSNFILE(s) lastPathComponent]];
+	}
+	else {
+		[fltOrbSNField setStringValue:@"--"];	
+		[osbSNField setStringValue:@"--"];	
+		[preampSNField setStringValue:@"--"];	
+		[sltWaferSNField setStringValue:@"--"];	
+	}
+}
+
+- (void) refreshSegmentTables:(NSNotification*)aNote
+{
+	[super refreshSegmentTables:aNote];
+	[secondaryTableView reloadData];
+}
+
+- (void) snTablesChanged:(NSNotification*)aNote
+{
+	[fltSNTableView reloadData];
+	[preAmpSNTableView reloadData];
+	[osbSNTableView reloadData];
+	[otherSNTableView reloadData];
+}
+
+- (void) mapFileRead:(NSNotification*)mapFileRead
+{
+	[super mapFileRead:mapFileRead];
+	[self snTablesChanged:nil];
 }
 
 - (void) viewTypeChanged:(NSNotification*)aNote
@@ -188,7 +209,7 @@
 
 - (IBAction) secondaryAdcClassNameAction:(id)sender
 {
-	[secondaryGroup setAdcClassName:[sender titleOfSelectedItem]];	
+	[[model segmentGroup:1] setAdcClassName:[sender titleOfSelectedItem]];	
 }
 
 - (IBAction) readSecondaryMapFileAction:(id)sender
@@ -199,7 +220,7 @@
     [openPanel setAllowsMultipleSelection:NO];
     [openPanel setPrompt:@"Choose"];
     NSString* startingDir;
-	NSString* fullPath = [[secondaryGroup mapFile] stringByExpandingTildeInPath];
+	NSString* fullPath = [[[model segmentGroup:1] mapFile] stringByExpandingTildeInPath];
     if(fullPath){
         startingDir = [fullPath stringByDeletingLastPathComponent];
     }
@@ -211,8 +232,7 @@
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
-            [secondaryGroup setMapFile:[[[openPanel URL] path] stringByAbbreviatingWithTildeInPath]];
-            [secondaryGroup readMap];
+            [[model segmentGroup:1] readMap:[[openPanel URL] path]];
             [secondaryTableView reloadData];
         }
     }];
@@ -236,7 +256,7 @@
     NSString* startingDir;
     NSString* defaultFile;
     
-	NSString* fullPath = [[secondaryGroup mapFile] stringByExpandingTildeInPath];
+	NSString* fullPath = [[[model segmentGroup:1] mapFile] stringByExpandingTildeInPath];
     if(fullPath){
         startingDir = [fullPath stringByDeletingLastPathComponent];
         defaultFile = [fullPath lastPathComponent];
@@ -251,7 +271,7 @@
     [savePanel setNameFieldLabel:defaultFile];
     [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
-            [secondaryGroup saveMapFileAs:[[savePanel URL]path]];
+            [[model segmentGroup:1] saveMapFileAs:[[savePanel URL]path]];
         }
     }];
 #else 
@@ -296,6 +316,7 @@
 - (void) specialUpdate:(NSNotification*)aNote
 {
 	[super specialUpdate:aNote];
+	[secondaryTableView reloadData];
 	[secondaryValuesView reloadData];
 	//if([model viewType] == kUseCrateView){
 		[detectorView makeAllSegments];
@@ -316,36 +337,27 @@
 - (void) newTotalRateAvailable:(NSNotification*)aNotification
 {
 	[super newTotalRateAvailable:aNotification];
-	[secondaryRateField setFloatValue:[secondaryGroup rate]];
+	[secondaryRateField setFloatValue:[[model segmentGroup:1] rate]];
 }
 
 - (void) secondaryColorAxisAttributesChanged:(NSNotification*)aNotification
 {
 	BOOL isLog = [[secondaryColorScale colorAxis] isLog];
 	[secondaryColorAxisLogCB setState:isLog];
-	[secondaryGroup setColorAxisAttributes:[[secondaryColorScale colorAxis] attributes]];
+	[[model segmentGroup:1] setColorAxisAttributes:[[secondaryColorScale colorAxis] attributes]];
 }
 
 #pragma mark ¥¥¥HW Map Interface Management
 - (void) secondaryAdcClassNameChanged:(NSNotification*)aNote
 {
-	[secondaryAdcClassNamePopup selectItemWithTitle: [secondaryGroup adcClassName]];
+	[secondaryAdcClassNamePopup selectItemWithTitle: [[model segmentGroup:1] adcClassName]];
 }
 
 - (void) secondaryMapFileChanged:(NSNotification*)aNote
 {
-	NSString* s = [secondaryGroup mapFile];
+	NSString* s = [[[model segmentGroup:1] mapFile]stringByAbbreviatingWithTildeInPath];
 	if(!s) s = @"--";
 	[secondaryMapFileTextField setStringValue: s];
-}
-
-- (void) mapFileRead:(NSNotification*)aNote
-{
-	[super mapFileRead:aNote];
-    if(aNote == nil || [aNote object] == model){
-        [secondaryTableView reloadData];
-        [secondaryValuesView reloadData];
-    }
 }
 
 - (void) mapLockChanged:(NSNotification*)aNotification
@@ -377,13 +389,24 @@
 	if(locked){
 		[secondaryValuesView deselectAll:self];
 	}
-
 }
 
 #pragma mark ¥¥¥Table Data Source
 - (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(int)row
 {
 	if(tableView == secondaryTableView){
+		return ![gSecurity isLocked:[model experimentMapLock]];
+	}
+	else if(tableView == fltSNTableView){
+		return ![gSecurity isLocked:[model experimentMapLock]];
+	}
+	else if(tableView == preAmpSNTableView){
+		return ![gSecurity isLocked:[model experimentMapLock]];
+	}
+	else if(tableView == osbSNTableView){
+		return ![gSecurity isLocked:[model experimentMapLock]];
+	}
+	else if(tableView == otherSNTableView){
 		return ![gSecurity isLocked:[model experimentMapLock]];
 	}
 	else if(tableView == secondaryValuesView){
@@ -395,7 +418,19 @@
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
 {
 	if(aTableView == secondaryTableView || aTableView == secondaryValuesView){
-		return [secondaryGroup segment:rowIndex objectForKey:[aTableColumn identifier]];
+		return [[model segmentGroup:1] segment:rowIndex objectForKey:[aTableColumn identifier]];
+	}
+	else if(aTableView == fltSNTableView){
+		return [model fltSN:rowIndex objectForKey:[aTableColumn identifier]];
+	}
+	else if(aTableView == preAmpSNTableView){
+		return [model preAmpSN:rowIndex objectForKey:[aTableColumn identifier]];
+	}
+	else if(aTableView == osbSNTableView){
+		return [model osbSN:rowIndex objectForKey:[aTableColumn identifier]];
+	}
+	else if(aTableView == otherSNTableView){
+		return [model otherSNForKey:[aTableColumn identifier]];
 	}
 	else return  [super tableView:aTableView objectValueForTableColumn:aTableColumn row:rowIndex];
 }
@@ -404,20 +439,24 @@
 - (int)numberOfRowsInTableView:(NSTableView *)aTableView
 {
 	if( aTableView == secondaryTableView || 
-		aTableView == secondaryValuesView)	return [secondaryGroup numSegments];
-	else								return [super numberOfRowsInTableView:aTableView];
+		aTableView == secondaryValuesView)    return [[model segmentGroup:1] numSegments];
+	else if(aTableView == fltSNTableView)     return 8; 
+	else if(aTableView == preAmpSNTableView)  return 24; 
+	else if(aTableView == osbSNTableView)     return 4; 
+	else if(aTableView == otherSNTableView)   return 1; 
+	else								      return [super numberOfRowsInTableView:aTableView];
 }
 
 - (void)tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
 {
 	ORDetectorSegment* aSegment;
 	if(aTableView == secondaryTableView){
-		aSegment = [secondaryGroup segment:rowIndex];
+		aSegment = [[model segmentGroup:1] segment:rowIndex];
 		[aSegment setObject:anObject forKey:[aTableColumn identifier]];
-		[secondaryGroup configurationChanged:nil];
+		[[model segmentGroup:1] configurationChanged:nil];
 	}
 	else if(aTableView == secondaryValuesView){
-		aSegment = [secondaryGroup segment:rowIndex];
+		aSegment = [[model segmentGroup:1] segment:rowIndex];
 		if([[aTableColumn identifier] isEqualToString:@"threshold"]){
 			[aSegment setThreshold:anObject];
 		}
@@ -425,47 +464,21 @@
 			[aSegment setGain:anObject];
 		}
 	}
+	
+	else if(aTableView == fltSNTableView){
+		[model fltSN:rowIndex setObject:anObject forKey:[aTableColumn identifier]];
+	}
+	else if(aTableView == preAmpSNTableView){
+		[model preAmpSN:rowIndex setObject:anObject forKey:[aTableColumn identifier]];
+	}
+	else if(aTableView == osbSNTableView){
+		[model osbSN:rowIndex setObject:anObject forKey:[aTableColumn identifier]];
+	}
+	else if(aTableView == otherSNTableView){
+		[model setOtherSNObject:anObject forKey:[aTableColumn identifier]];
+	}
 	else [super tableView:aTableView setObjectValue:anObject forTableColumn:aTableColumn row:rowIndex];
 }
-
-- (void) tableView:(NSTableView*)tv didClickTableColumn:(NSTableColumn *)tableColumn
-{
-//    NSImage *sortOrderImage = [tv indicatorImageInTableColumn:tableColumn];
-//    NSString *columnKey = [tableColumn identifier];
-    // If the user clicked the column which already has the sort indicator
-    // then just flip the sort order.
-    
-//    if (sortOrderImage || columnKey == [[Prespectrometer sharedInstance] sortColumn]) {
-//        [[Prespectrometer sharedInstance] setSortIsDescending:![[Prespectrometer sharedInstance] sortIsDescending]];
-//    }
-//    else {
-///        [[Prespectrometer sharedInstance] setSortColumn:columnKey];
-//    }
-  //  [self updateTableHeaderToMatchCurrentSort];
-    // now do it - doc calls us back when done
-//    [[Prespectrometer sharedInstance] sort];
-//    [tv reloadData];
-}
-
-//- (void) updateTableHeaderToMatchCurrentSort
-//{
-//    BOOL isDescending = [[Prespectrometer sharedInstance] sortIsDescending];
-//    NSString *key = [[Prespectrometer sharedInstance] sortColumn];
-//    NSArray *a = [focalPlaneTableView tableColumns];
-//    NSTableColumn *column = [focalPlaneTableView tableColumnWithIdentifier:key];
-//    unsigned i = [a count];
-    
-//    while (i-- > 0) [focalPlaneTableView setIndicatorImage:nil inTableColumn:[a objectAtIndex:i]];
-    
-//    if (key) {
-//        [focalPlaneTableView setIndicatorImage:(isDescending ? ascendingSortingImage:descendingSortingImage) inTableColumn:column];
-        
-//        [focalPlaneTableView setHighlightedTableColumn:column];
-//    }
-//    else {
-//        [focalPlaneTableView setHighlightedTableColumn:nil];
-//    }
-//}
 
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem
@@ -522,19 +535,18 @@
 
 #if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 @implementation KatrinController (Private)
-- (void)readSecondaryMapFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+- (void) readSecondaryMapFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode){
-        [secondaryGroup setMapFile:[[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath]];
-		[secondaryGroup readMap];
+		[[model segmentGroup:1] readMap:[[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath]];
 		[secondaryTableView reloadData];
-
     }
 }
-- (void)saveSecondaryMapFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+
+- (void) saveSecondaryMapFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode){
-        [secondaryGroup saveMapFileAs:[sheet filename]];
+        [[model segmentGroup:1] saveMapFileAs:[sheet filename]];
     }
 }
 @end

@@ -54,15 +54,11 @@
 	//items in the  details tab view
     IBOutlet NSTableView*	secondaryValuesView;
     IBOutlet NSTableView*	tertiaryValuesView;
-
-	ORSegmentGroup* secondaryGroup;
-	ORSegmentGroup* tertiaryGroup;
 }
 
 #pragma mark ¥¥¥Initialization
 - (void) registerNotificationObservers;
 - (void) updateWindow;
-- (void) loadSegmentGroups;
 
 #pragma mark ¥¥¥HW Map Actions
 - (IBAction) planeMaskAction:(id)sender;

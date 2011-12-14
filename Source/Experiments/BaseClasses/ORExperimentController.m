@@ -103,12 +103,10 @@
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[self loadSegmentGroups];
 	[detectorView setDelegate:model];	
 }
 
 #pragma mark •••Subclass responsibility
-- (void) loadSegmentGroups {;}
 - (NSString*) defaultPrimaryMapFilePath{return @"";}
 - (void) setDetectorTitle{;}
 
@@ -290,6 +288,10 @@
                          name : ORExperimentModelIgnoreHWChecksChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(refreshSegmentTables:)
+                         name : KSegmentChangedNotification
+						object: nil];	
 }
 
 - (void) updateWindow
@@ -302,7 +304,6 @@
     [self cardCheckChanged:nil];
     [self captureDateChanged:nil];
 	[self newTotalRateAvailable:nil];
-    [ratePlot setNeedsDisplay:YES];
 	[self selectionStringChanged:nil];
 	[self primaryMapFileChanged:nil];
 	[self displayTypeChanged:nil];	
@@ -320,10 +321,12 @@
 	[self histogramsUpdated:nil];
 	[self setValueHistogramTitle];
 	[self scaleValueHistogram];
-    [valueHistogramsPlot setNeedsDisplay:YES];
-	[primaryValuesView reloadData];
 	[self showNamesChanged:nil];
 	[self ignoreHWChecksChanged:nil];
+	
+    [valueHistogramsPlot setNeedsDisplay:YES];
+    [ratePlot setNeedsDisplay:YES];
+	[primaryValuesView reloadData];
 }
 
 - (void) findRunControl:(NSNotification*)aNote
@@ -483,7 +486,7 @@
 
 - (IBAction) primaryAdcClassNameAction:(id)sender
 {
-	[[segmentGroups objectAtIndex:0] setAdcClassName:[sender titleOfSelectedItem]];	
+	[[model segmentGroup:0] setAdcClassName:[sender titleOfSelectedItem]];	
 }
 
 - (IBAction) captureStateAction:(id)sender
@@ -505,7 +508,7 @@
     [openPanel setAllowsMultipleSelection:NO];
     [openPanel setPrompt:@"Choose"];
     NSString* startingDir;
-	NSString* fullPath = [[[segmentGroups objectAtIndex:0] mapFile] stringByExpandingTildeInPath];
+	NSString* fullPath = [[[model segmentGroup:0] mapFile] stringByExpandingTildeInPath];
     if(fullPath){
         startingDir = [fullPath stringByDeletingLastPathComponent];
     }
@@ -516,9 +519,11 @@
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
-            [[segmentGroups objectAtIndex:0] setMapFile:[[[openPanel URL] path]stringByAbbreviatingWithTildeInPath]];
-            [[segmentGroups objectAtIndex:0] readMap];
+			NSString* thePath = [model validateHWMapPath:[[openPanel URL] path]];
+            [[model segmentGroup:0] readMap:thePath];
+			[model readAuxFiles: thePath];
             [primaryTableView reloadData];
+			[model handleOldPrimaryMapFormats: thePath]; //backward compatibility (temp)
         }
     }];
 #else 	
@@ -542,7 +547,7 @@
     NSString* startingDir;
     NSString* defaultFile;
     
-	NSString* fullPath = [[[segmentGroups objectAtIndex:0] mapFile] stringByExpandingTildeInPath];
+	NSString* fullPath = [[[model segmentGroup:0] mapFile] stringByExpandingTildeInPath];
     if(fullPath){
         startingDir = [fullPath stringByDeletingLastPathComponent];
         defaultFile = [fullPath lastPathComponent];
@@ -554,10 +559,12 @@
     }
 #if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [savePanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
-    [savePanel setNameFieldLabel:defaultFile];
+    [savePanel setNameFieldLabel:@"HW Map File:"];
+	[savePanel setNameFieldStringValue:defaultFile];
     [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
-            [[segmentGroups objectAtIndex:0] saveMapFileAs:[[savePanel URL]path]];
+            [[model segmentGroup:0] saveMapFileAs:[[savePanel URL]path]];
+			[model saveAuxFiles: [[savePanel URL]path]];
         }
     }];
 #else 	
@@ -683,11 +690,17 @@
 	}
 }
 
+- (void) refreshSegmentTables:(NSNotification*)aNote
+{
+	[primaryTableView reloadData];	
+}
+
 - (void) specialUpdate:(NSNotification*)aNote
 {
 	[model compileHistograms];
 	[detectorView setNeedsDisplay:YES];	
 	[primaryValuesView reloadData];
+	[primaryTableView reloadData];
 	[valueHistogramsPlot setNeedsDisplay:YES];
 }
 
@@ -708,7 +721,7 @@
 
 - (void) primaryMapFileChanged:(NSNotification*)aNote
 {
-	NSString* s = [[segmentGroups objectAtIndex:0] mapFile];
+	NSString* s = [[[model segmentGroup:0] mapFile] stringByAbbreviatingWithTildeInPath];
 	if(s)[primaryMapFileTextField setStringValue: s];
 	else [primaryMapFileTextField setStringValue: @"--"];
 }
@@ -720,7 +733,7 @@
 
 - (void) primaryAdcClassNameChanged:(NSNotification*)aNote
 {
-	[primaryAdcClassNamePopup selectItemWithTitle: [[segmentGroups objectAtIndex:0] adcClassName]];
+	[primaryAdcClassNamePopup selectItemWithTitle: [[model segmentGroup:0] adcClassName]];
 }
 
 - (void) mapFileRead:(NSNotification*)aNote
@@ -732,7 +745,7 @@
 
 - (void) newTotalRateAvailable:(NSNotification*)aNotification
 {
-	[primaryRateField setFloatValue:[[segmentGroups objectAtIndex:0] rate]];
+	[primaryRateField setFloatValue:[[model segmentGroup:0] rate]];
 	[ratePlot setNeedsDisplay:YES];
 	[detectorView setNeedsDisplay:YES];
 	[valueHistogramsPlot setNeedsDisplay:YES];
@@ -887,13 +900,13 @@
 	int tag = [aPlotter tag];
 	if(tag < 10){ //rate plots
 		int set = tag;
-		return [[[segmentGroups objectAtIndex:set]  totalRate] count];
+		return [[[model segmentGroup:set]  totalRate] count];
 	}
 	else if(tag >= 10){ //value plots
 		int set = tag-10;
 		switch([model displayType]){
-			case kDisplayRates:			return [[segmentGroups objectAtIndex:set] numSegments];
-			case kDisplayTotalCounts:	return [[segmentGroups objectAtIndex:set] numSegments];
+			case kDisplayRates:			return [[model segmentGroup:set] numSegments];
+			case kDisplayTotalCounts:	return [[model segmentGroup:set] numSegments];
 			case kDisplayThresholds:	return 32*1024;
 			case kDisplayGains:			return 1024;
 			default:					return 0;
@@ -908,20 +921,20 @@
 	int tag = [aPlotter tag];
 	if(tag < 10){ //rate plots
 		int set = tag;
-		int count = [[[segmentGroups objectAtIndex:set] totalRate] count];
+		int count = [[[model segmentGroup:set] totalRate] count];
 		int index = count-i-1;
 		if(count==0) aValue = 0;
-		else		 aValue = [[[segmentGroups objectAtIndex:set] totalRate] valueAtIndex:index];
-		*xValue = [[[segmentGroups objectAtIndex:set] totalRate] timeSampledAtIndex:index];
+		else		 aValue = [[[model segmentGroup:set] totalRate] valueAtIndex:index];
+		*xValue = [[[model segmentGroup:set] totalRate] timeSampledAtIndex:index];
 		*yValue = aValue;
 	}
 	else if(tag >= 10){ //value plots
 		int set = tag-10;
 		switch([model displayType]){
-			case kDisplayThresholds:	aValue = [[segmentGroups objectAtIndex:set] thresholdHistogram:i];	break;
-			case kDisplayGains:			aValue = [[segmentGroups objectAtIndex:set] gainHistogram:i];		break;
-			case kDisplayRates:			aValue = [[segmentGroups objectAtIndex:set] getRate:i];				break;
-			case kDisplayTotalCounts:	aValue = [[segmentGroups objectAtIndex:set] totalCountsHistogram:i];break;
+			case kDisplayThresholds:	aValue = [[model segmentGroup:set] thresholdHistogram:i];	break;
+			case kDisplayGains:			aValue = [[model segmentGroup:set] gainHistogram:i];		break;
+			case kDisplayRates:			aValue = [[model segmentGroup:set] getRate:i];				break;
+			case kDisplayTotalCounts:	aValue = [[model segmentGroup:set] totalCountsHistogram:i];break;
 			default:	break;
 		}
 		*xValue = (double)i;
@@ -932,24 +945,30 @@
 #pragma mark •••Data Source For Tables
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
 {
-	return [[segmentGroups objectAtIndex:0] segment:rowIndex objectForKey:[aTableColumn identifier]];
+	if(aTableView == primaryTableView || aTableView == primaryValuesView){
+		return [[model segmentGroup:0] segment:rowIndex objectForKey:[aTableColumn identifier]];
+	}
+	else return nil;
 }
 
 - (int) numberOfRowsInTableView:(NSTableView *)aTableView
 {
-	return [[segmentGroups objectAtIndex:0] numSegments];
+	if(aTableView == primaryTableView || aTableView == primaryValuesView){
+		return [[model segmentGroup:0] numSegments];
+	}
+	else return 0;
 }
 
 - (void) tableView:(NSTableView *)aTableView setObjectValue:anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
 {
 	ORDetectorSegment* aSegment;
 	if(aTableView == primaryTableView){
-		aSegment = [[segmentGroups objectAtIndex:0] segment:rowIndex];
+		aSegment = [[model segmentGroup:0] segment:rowIndex];
 		[aSegment setObject:anObject forKey:[aTableColumn identifier]];
-		[[segmentGroups objectAtIndex:0] configurationChanged:nil];
+		[[model segmentGroup:0] configurationChanged:nil];
 	}
 	else if(aTableView == primaryValuesView){
-		aSegment = [[segmentGroups objectAtIndex:0] segment:rowIndex];
+		aSegment = [[model segmentGroup:0] segment:rowIndex];
 		if([[aTableColumn identifier] isEqualToString:@"threshold"]){
 			[aSegment setThreshold:anObject];
 		}
@@ -957,7 +976,6 @@
 			[aSegment setGain:anObject];
 		}
 	}
-
 }
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item
@@ -965,8 +983,8 @@
     int index = [tabView indexOfTabViewItem:item];
 	NSString* tabPrefName = [NSString stringWithFormat:@"orca.%@.selectedtab",[self className]];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:tabPrefName];
-    
 }
+
 - (void) populateClassNamePopup:(NSPopUpButton*)aPopup
 {
 	[aPopup removeAllItems];
@@ -981,6 +999,7 @@
 		}
 	}
 }
+
 @end
 
 @implementation ORExperimentController (private)
@@ -1000,19 +1019,21 @@
 }
 
 #if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-- (void)readPrimaryMapFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+- (void) readPrimaryMapFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode){
-        [[segmentGroups objectAtIndex:0] setMapFile:[[[sheet filenames] objectAtIndex:0]stringByAbbreviatingWithTildeInPath]];
-		[[segmentGroups objectAtIndex:0] readMap];
+		NSString* path = [model validateHWMapPath:[[openPanel URL] path]];
+		[[model segmentGroup:0] readMap:path];
+		[model readAuxFiles:path];
 		[primaryTableView reloadData];
     }
 }
 
-- (void)savePrimaryMapFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+- (void) savePrimaryMapFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode){
-        [[segmentGroups objectAtIndex:0] saveMapFileAs:[sheet filename]];
+        [[model segmentGroup:0] saveMapFileAs:[sheet filename]];
+		[model saveAuxFiles: [sheet filename]];
     }
 }
 #endif

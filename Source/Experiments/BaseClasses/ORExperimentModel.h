@@ -96,7 +96,11 @@
 #pragma mark •••Subclass Responsibility
 - (void) makeSegmentGroups;
 - (int)  maxNumSegments;
-
+- (void) handleOldPrimaryMapFormats:(NSString*)aPath;
+- (void) readAuxFiles:(NSString*)aPath; //subclasses can override
+- (void) saveAuxFiles:(NSString*)aPath; //subclasses can override
+- (NSString*) validateHWMapPath:(NSString*)aPath;//subclasses can override
+   
 #pragma mark •••Group Methods
 - (void) addGroup:(ORSegmentGroup*)aGroup;
 - (void) selectedSet:(int)aSet segment:(int)index;

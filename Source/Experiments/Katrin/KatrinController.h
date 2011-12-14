@@ -41,11 +41,21 @@
     IBOutlet NSButton*		saveSecondaryMapFileButton;
     IBOutlet NSTableView*	secondaryTableView;
 
+	//SN tables
+	IBOutlet NSTableView*	fltSNTableView;
+	IBOutlet NSTableView*	preAmpSNTableView;
+	IBOutlet NSTableView*	osbSNTableView;
+	IBOutlet NSTableView*	otherSNTableView;
+
 	//items in the  details tab view
     IBOutlet NSTableView*	secondaryValuesView;
     IBOutlet NSPopUpButton*	viewTypePU;
 
-	ORSegmentGroup* secondaryGroup;
+	IBOutlet NSTextField*	fltOrbSNField;
+	IBOutlet NSTextField*	osbSNField;
+	IBOutlet NSTextField*	preampSNField;
+	IBOutlet NSTextField*	sltWaferSNField;
+
 	NSView *blankView;
     NSSize detectorSize;
     NSSize slowControlsSize;
@@ -53,12 +63,13 @@
     NSSize focalPlaneSize;
     NSSize vetoSize;
 
+
+	
 }
 
 #pragma mark ¥¥¥Initialization
 - (void) registerNotificationObservers;
 - (void) updateWindow;
-- (void) loadSegmentGroups;
 
 #pragma mark ¥¥¥HW Map Actions
 - (IBAction) slowControlNameAction:(id)sender;
@@ -72,6 +83,7 @@
 - (void) slowControlNameChanged:(NSNotification*)aNote;
 - (void) slowControlIsConnectedChanged:(NSNotification*)aNote;
 - (void) secondaryColorAxisAttributesChanged:(NSNotification*)aNote;
+- (void) snTablesChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥HW Map Interface Management
 - (void) secondaryAdcClassNameChanged:(NSNotification*)aNote;
@@ -88,8 +100,6 @@
 - (int)numberOfRowsInTableView:(NSTableView *)aTableView;
 - (void)tableView:(NSTableView *)aTableView setObjectValue:anObject 
             forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex;
-- (void) tableView:(NSTableView*)tv didClickTableColumn:(NSTableColumn *)tableColumn;
-//- (void) updateTableHeaderToMatchCurrentSort;
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem;
 
 

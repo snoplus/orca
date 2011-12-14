@@ -382,10 +382,10 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 }
 
 #pragma mark •••Map Methods
-- (void) readMap
+- (void) readMap:(NSString*)aFileName
 {
-    
-    NSString* contents = [NSString stringWithContentsOfFile:[mapFile stringByExpandingTildeInPath] encoding:NSASCIIStringEncoding error:nil];
+	[self setMapFile:aFileName];
+    NSString* contents = [NSString stringWithContentsOfFile:aFileName encoding:NSASCIIStringEncoding error:nil];
 	contents = [[contents componentsSeparatedByString:@"\r"] componentsJoinedByString:@"\n"];
 	contents = [[contents componentsSeparatedByString:@"\n\n"] componentsJoinedByString:@"\n"];
     NSArray*  lines = [contents componentsSeparatedByString:@"\n"];
@@ -436,6 +436,8 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
         [theFileManager removeItemAtPath:newFileName error:nil];
     }
     [theFileManager createFileAtPath:newFileName contents:theContents attributes:nil];
+	[self setMapFile:newFileName];
+
 }
 
 - (NSString*) selectedSegementInfo:(int)index
@@ -448,15 +450,15 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 	}
 }
 
-- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary useName:(NSString*)aName
 {
     NSMutableDictionary* mapDictionary = [NSMutableDictionary dictionary];
 	NSString* contents = [NSString stringWithContentsOfFile:[mapFile stringByExpandingTildeInPath] encoding:NSASCIIStringEncoding error:nil];
 	if(contents){
-		[mapDictionary setObject:contents forKey:@"Geometry"];
+		[mapDictionary setObject:contents forKey:aName];
 	}
 	else {
-		[mapDictionary setObject:@"NONE" forKey:@"Geometry"];
+		[mapDictionary setObject:@"NONE" forKey:aName];
 	}
     [dictionary setObject:mapDictionary forKey:groupName];
     return dictionary;
@@ -469,31 +471,31 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
     
     [[self undoManager] disableUndoRegistration];
     
-    [self setGroupName:[decoder decodeObjectForKey:@"GroupName"]];
-    [self setMapFile:[decoder decodeObjectForKey:@"MapFile"]];
-    [self setAdcClassName:[decoder decodeObjectForKey:@"AdcClassName"]];
+    [self setGroupName:		[decoder decodeObjectForKey:@"GroupName"]];
+    [self setAdcClassName:	[decoder decodeObjectForKey:@"AdcClassName"]];
     [self setColorAxisAttributes:[decoder decodeObjectForKey:@"ColorAxisAttributes"]];
-    [self setTotalRate:[decoder decodeObjectForKey:@"TotalRate"]];
-	[self setMapEntries:[decoder decodeObjectForKey:@"mapEntries"]];
- 	[self setSegments:[decoder decodeObjectForKey:@"Segments"]];
+    [self setTotalRate:		[decoder decodeObjectForKey:@"TotalRate"]];
+ 	[self setSegments:		[decoder decodeObjectForKey:@"Segments"]];
+	[self setMapEntries:	[decoder decodeObjectForKey:@"mapEntries"]];
+    [self setMapFile:		[decoder decodeObjectForKey:@"MapFile"]];
+	
 	[[self undoManager] enableUndoRegistration];
     
 	if(!adcClassName)[self setAdcClassName:@"ORAugerFltModel"];
 	[segments makeObjectsPerformSelector:@selector(setMapEntries:) withObject:mapEntries];
 
-    //[self registerNotificationObservers];
     return self;
 }
 
 - (void)encodeWithCoder:(NSCoder*)encoder
 {        
-    [encoder encodeObject:groupName forKey:@"GroupName"];
-    [encoder encodeObject:mapFile forKey:@"MapFile"];
-    [encoder encodeObject:adcClassName forKey:@"AdcClassName"];
+    [encoder encodeObject:groupName		forKey:@"GroupName"];
+    [encoder encodeObject:adcClassName	forKey:@"AdcClassName"];
     [encoder encodeObject:colorAxisAttributes forKey:@"ColorAxisAttributes"];
-    [encoder encodeObject:totalRate forKey:@"TotalRate"];
-	[encoder encodeObject:mapEntries forKey:@"mapEntries"];
-    [encoder encodeObject:segments forKey:@"Segments"];
+    [encoder encodeObject:totalRate		forKey:@"TotalRate"];
+    [encoder encodeObject:mapFile		forKey:@"MapFile"];
+	[encoder encodeObject:mapEntries	forKey:@"mapEntries"];
+    [encoder encodeObject:segments		forKey:@"Segments"];
 }
 
 

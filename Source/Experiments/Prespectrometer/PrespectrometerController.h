@@ -23,7 +23,5 @@
 @interface PrespectrometerController : ORExperimentController {	
 }
 
-#pragma mark ¥¥¥Subclass responsibility
-- (void) loadSegmentGroups;
 - (NSString*) defaultPrimaryMapFilePath;
 @end

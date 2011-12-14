@@ -38,7 +38,6 @@
     IBOutlet NSButton*		primaryColorAxisLogCB;
     IBOutlet ORCompositeTimeLineView*	ratePlot;
     IBOutlet NSButton*		rateLogCB;
-    IBOutlet NSTableView*	primaryTableView;
     IBOutlet NSButton*		detectorLockButton;
     IBOutlet BiStateView*	hardwareCheckView;
     IBOutlet BiStateView*	cardCheckView;
@@ -67,13 +66,13 @@
     IBOutlet NSButton*		detailsLockButton;
 
 	//items in the  Map tab view
+    IBOutlet NSTableView*	primaryTableView;
 	IBOutlet NSTextField*	primaryMapFileTextField;
     IBOutlet NSButton*		readPrimaryMapFileButton;
     IBOutlet NSButton*		savePrimaryMapFileButton;
     IBOutlet NSButton*		mapLockButton;
 	IBOutlet NSPopUpButton* primaryAdcClassNamePopup;
    
-	NSMutableArray* segmentGroups;
 	ORRunModel*     runControl;
 }
 
@@ -81,7 +80,6 @@
 - (void) registerNotificationObservers;
 
 #pragma mark •••Subclass responsibility
-- (void) loadSegmentGroups;
 - (NSString*) defaultPrimaryMapFilePath;
 - (void) setDetectorTitle;
 
@@ -118,6 +116,7 @@
 - (IBAction) clearAction:(id)sender;
 
 #pragma mark •••Interface Management
+- (void) refreshSegmentTables:(NSNotification*)aNote;
 - (void) scaleAction:(NSNotification*)aNote;
 - (void) ignoreHWChecksChanged:(NSNotification*)aNote;
 - (void) showNamesChanged:(NSNotification*)aNote;

@@ -38,7 +38,6 @@
 #pragma mark ¥¥¥Initialization
 - (void) registerNotificationObservers;
 - (void) updateWindow;
-- (void) loadSegmentGroups;
 
 - (IBAction) viewTypeAction:(id)sender;
 

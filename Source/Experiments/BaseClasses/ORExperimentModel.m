@@ -234,7 +234,10 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
 #pragma mark •••Subclass Responsibility
 - (void) makeSegmentGroups{;} //subclasses must override
 - (int)  maxNumSegments{ return 0;} //subclasses must override
-
+- (void) handleOldPrimaryMapFormats:(NSString*)aPath {;}//subclasses can override
+- (void) readAuxFiles:(NSString*)aPath {;}//subclasses can override
+- (void) saveAuxFiles:(NSString*)aPath {;}//subclasses can override
+- (NSString*) validateHWMapPath:(NSString*)aPath{return aPath;}//subclasses can override
 #pragma mark •••Notifications
 - (void) registerNotificationObservers
 {
@@ -554,7 +557,7 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
 	id aSegmentGroup;
 	NSEnumerator* e = [segmentGroups objectEnumerator];
 	while(aSegmentGroup = [e nextObject]){
-		[aSegmentGroup addParametersToDictionary:objDictionary];
+		[aSegmentGroup addParametersToDictionary:objDictionary useName:@"Geometry"];
 	}
     [aDictionary setObject:objDictionary forKey:[self className]];
     return aDictionary;

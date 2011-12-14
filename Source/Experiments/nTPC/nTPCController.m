@@ -48,28 +48,6 @@
     return self;
 }
 
-- (void) loadSegmentGroups
-{
-	//primary group 
-	if(!segmentGroups)segmentGroups = [[NSMutableArray array] retain];
-	ORSegmentGroup* aGroup = [model segmentGroup:0];
-	if(![segmentGroups containsObject:aGroup]){
-		[segmentGroups addObject:aGroup];
-	}
-	//secondary group 
-	aGroup = [model segmentGroup:1];
-	if(![segmentGroups containsObject:aGroup]){
-		[segmentGroups addObject:aGroup];
-		secondaryGroup = aGroup;
-	}
-	//tertiary group 
-	aGroup = [model segmentGroup:2];
-	if(![segmentGroups containsObject:aGroup]){
-		[segmentGroups addObject:aGroup];
-		tertiaryGroup = aGroup;
-	}
-}
-
 - (NSString*) defaultPrimaryMapFilePath
 {
 	return @"~/PadPlane0WireMap";
@@ -109,24 +87,24 @@
     [notifyCenter addObserver : self
                      selector : @selector(secondaryAdcClassNameChanged:)
                          name : ORSegmentGroupAdcClassNameChanged
-						object: secondaryGroup];
+						object: [model segmentGroup:1]];
 
 
     [notifyCenter addObserver : self
                      selector : @selector(secondaryMapFileChanged:)
                          name : ORSegmentGroupMapFileChanged
-						object: secondaryGroup];
+						object: [model segmentGroup:1]];
 
     [notifyCenter addObserver : self
                      selector : @selector(tertiaryAdcClassNameChanged:)
                          name : ORSegmentGroupAdcClassNameChanged
-						object: tertiaryGroup];
+						object: [model segmentGroup:2]];
 	
 	
     [notifyCenter addObserver : self
                      selector : @selector(tertiaryMapFileChanged:)
                          name : ORSegmentGroupMapFileChanged
-						object: tertiaryGroup];
+						object: [model segmentGroup:2]];
 	
     [notifyCenter addObserver : self
                      selector : @selector(planeMaskChanged:)
@@ -178,7 +156,7 @@
 
 - (IBAction) secondaryAdcClassNameAction:(id)sender
 {
-	[secondaryGroup setAdcClassName:[sender titleOfSelectedItem]];	
+	[[model segmentGroup:1] setAdcClassName:[sender titleOfSelectedItem]];	
 }
 
 - (IBAction) readSecondaryMapFileAction:(id)sender
@@ -189,7 +167,7 @@
     [openPanel setAllowsMultipleSelection:NO];
     [openPanel setPrompt:@"Choose"];
     NSString* startingDir;
-	NSString* fullPath = [[secondaryGroup mapFile] stringByExpandingTildeInPath];
+	NSString* fullPath = [[[model segmentGroup:1] mapFile] stringByExpandingTildeInPath];
     if(fullPath){
         startingDir = [fullPath stringByDeletingLastPathComponent];
     }
@@ -200,8 +178,7 @@
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
-            [secondaryGroup setMapFile:[[[openPanel URL]path] stringByAbbreviatingWithTildeInPath]];
-            [secondaryGroup readMap];
+            [[model segmentGroup:1] readMap:[[openPanel URL]path]];
             [secondaryTableView reloadData];
        }
     }];
@@ -225,7 +202,7 @@
     NSString* startingDir;
     NSString* defaultFile;
     
-	NSString* fullPath = [[secondaryGroup mapFile] stringByExpandingTildeInPath];
+	NSString* fullPath = [[[model segmentGroup:1] mapFile] stringByExpandingTildeInPath];
     if(fullPath){
         startingDir = [fullPath stringByDeletingLastPathComponent];
         defaultFile = [fullPath lastPathComponent];
@@ -240,7 +217,7 @@
     [savePanel setNameFieldLabel:defaultFile];
     [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
-            [secondaryGroup saveMapFileAs:[[savePanel URL]path]];
+            [[model segmentGroup:1] saveMapFileAs:[[savePanel URL]path]];
         }
     }];
 #else 	
@@ -255,7 +232,7 @@
 
 - (IBAction) tertiaryAdcClassNameAction:(id)sender
 {
-	[tertiaryGroup setAdcClassName:[sender titleOfSelectedItem]];	
+	[[model segmentGroup:2] setAdcClassName:[sender titleOfSelectedItem]];	
 }
 
 - (IBAction) readTertiaryMapFileAction:(id)sender
@@ -266,7 +243,7 @@
     [openPanel setAllowsMultipleSelection:NO];
     [openPanel setPrompt:@"Choose"];
     NSString* startingDir;
-	NSString* fullPath = [[tertiaryGroup mapFile] stringByExpandingTildeInPath];
+	NSString* fullPath = [[[model segmentGroup:2] mapFile] stringByExpandingTildeInPath];
     if(fullPath){
         startingDir = [fullPath stringByDeletingLastPathComponent];
     }
@@ -277,8 +254,7 @@
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
-            [tertiaryGroup setMapFile:[[[openPanel URL]path] stringByAbbreviatingWithTildeInPath]];
-            [tertiaryGroup readMap];
+            [[model segmentGroup:2] readMap:[[openPanel URL]path]];
             [tertiaryTableView reloadData];
         }
     }];
@@ -302,7 +278,7 @@
     NSString* startingDir;
     NSString* defaultFile;
     
-	NSString* fullPath = [[tertiaryGroup mapFile] stringByExpandingTildeInPath];
+	NSString* fullPath = [[[model segmentGroup:2] mapFile] stringByExpandingTildeInPath];
     if(fullPath){
         startingDir = [fullPath stringByDeletingLastPathComponent];
         defaultFile = [fullPath lastPathComponent];
@@ -317,7 +293,7 @@
     [savePanel setNameFieldLabel:defaultFile];
     [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
-            [tertiaryGroup saveMapFileAs:[[savePanel URL]path]];
+            [[model segmentGroup:2] saveMapFileAs:[[savePanel URL]path]];
         }
     }];
 #else 	
@@ -366,8 +342,8 @@
 - (void) newTotalRateAvailable:(NSNotification*)aNotification
 {
 	[super newTotalRateAvailable:aNotification];
-	[secondaryRateField setFloatValue:[secondaryGroup rate]];
-	[tertiaryRateField setFloatValue:[tertiaryGroup rate]];
+	[secondaryRateField setFloatValue:[[model segmentGroup:1] rate]];
+	[tertiaryRateField setFloatValue:[[model segmentGroup:2] rate]];
 }
 
 #pragma mark ¥¥¥HW Map Interface Management
@@ -383,24 +359,24 @@
 
 - (void) secondaryAdcClassNameChanged:(NSNotification*)aNote
 {
-	[secondaryAdcClassNamePopup selectItemWithTitle: [secondaryGroup adcClassName]];
+	[secondaryAdcClassNamePopup selectItemWithTitle: [[model segmentGroup:1] adcClassName]];
 }
 
 - (void) secondaryMapFileChanged:(NSNotification*)aNote
 {
-	NSString* s = [secondaryGroup mapFile];
+	NSString* s = [[model segmentGroup:1] mapFile];
 	if(!s) s = @"--";
 	[secondaryMapFileTextField setStringValue: s];
 }
 
 - (void) tertiaryAdcClassNameChanged:(NSNotification*)aNote
 {
-	[tertiaryAdcClassNamePopup selectItemWithTitle: [tertiaryGroup adcClassName]];
+	[tertiaryAdcClassNamePopup selectItemWithTitle: [[model segmentGroup:2] adcClassName]];
 }
 
 - (void) tertiaryMapFileChanged:(NSNotification*)aNote
 {
-	NSString* s = [tertiaryGroup mapFile];
+	NSString* s = [[[model segmentGroup:2] mapFile] stringByAbbreviatingWithTildeInPath];
 	if(!s) s = @"--";
 	[tertiaryMapFileTextField setStringValue: s];
 }
@@ -475,21 +451,21 @@
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
 {
 	if(aTableView == secondaryTableView || aTableView == secondaryValuesView){
-		return [secondaryGroup segment:rowIndex objectForKey:[aTableColumn identifier]];
+		return [[model segmentGroup:1] segment:rowIndex objectForKey:[aTableColumn identifier]];
 	}
 	else if(aTableView == tertiaryTableView || aTableView == tertiaryValuesView){
-		return [tertiaryGroup segment:rowIndex objectForKey:[aTableColumn identifier]];
+		return [[model segmentGroup:2] segment:rowIndex objectForKey:[aTableColumn identifier]];
 	}
-	else return [[segmentGroups objectAtIndex:0] segment:rowIndex objectForKey:[aTableColumn identifier]];
+	else return [[model segmentGroup:0] segment:rowIndex objectForKey:[aTableColumn identifier]];
 }
 
 // just returns the number of items we have.
 - (int)numberOfRowsInTableView:(NSTableView *)aTableView
 {
 	if( aTableView == secondaryTableView || 
-		aTableView == secondaryValuesView)	return [secondaryGroup numSegments];
+	   aTableView == secondaryValuesView)	return [[model segmentGroup:1] numSegments];
 	else if( aTableView == tertiaryTableView || 
-	   aTableView == tertiaryValuesView)	return [tertiaryGroup numSegments];
+	   aTableView == tertiaryValuesView)	return [[model segmentGroup:2] numSegments];
 	else								return [super numberOfRowsInTableView:aTableView];
 }
 
@@ -497,12 +473,12 @@
 {
 	ORDetectorSegment* aSegment;
 	if(aTableView == secondaryTableView){
-		aSegment = [secondaryGroup segment:rowIndex];
+		aSegment = [[model segmentGroup:1] segment:rowIndex];
 		[aSegment setObject:anObject forKey:[aTableColumn identifier]];
-		[secondaryGroup configurationChanged:nil];
+		[[model segmentGroup:1] configurationChanged:nil];
 	}
 	else if(aTableView == secondaryValuesView){
-		aSegment = [secondaryGroup segment:rowIndex];
+		aSegment = [[model segmentGroup:1] segment:rowIndex];
 		if([[aTableColumn identifier] isEqualToString:@"threshold"]){
 			[aSegment setThreshold:anObject];
 		}
@@ -511,12 +487,12 @@
 		}
 	}
 	else if(aTableView == tertiaryTableView){
-		aSegment = [tertiaryGroup segment:rowIndex];
+		aSegment = [[model segmentGroup:2] segment:rowIndex];
 		[aSegment setObject:anObject forKey:[aTableColumn identifier]];
-		[tertiaryGroup configurationChanged:nil];
+		[[model segmentGroup:2] configurationChanged:nil];
 	}
 	else if(aTableView == tertiaryValuesView){
-		aSegment = [tertiaryGroup segment:rowIndex];
+		aSegment = [[model segmentGroup:2] segment:rowIndex];
 		if([[aTableColumn identifier] isEqualToString:@"threshold"]){
 			[aSegment setThreshold:anObject];
 		}
@@ -580,8 +556,8 @@
 - (void)readSecondaryMapFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode){
-        [secondaryGroup setMapFile:[[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath]];
-		[secondaryGroup readMap];
+        [[model segmentGroup:1] setMapFile:[[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath]];
+		[[model segmentGroup:1] readMap];
 		[secondaryTableView reloadData];
 
     }
@@ -589,14 +565,14 @@
 - (void)saveSecondaryMapFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode){
-        [secondaryGroup saveMapFileAs:[sheet filename]];
+        [[model segmentGroup:1] saveMapFileAs:[sheet filename]];
     }
 }
 - (void)readTertiaryMapFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode){
-        [tertiaryGroup setMapFile:[[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath]];
-		[tertiaryGroup readMap];
+        [[model segmentGroup:2] setMapFile:[[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath]];
+		[[model segmentGroup:2] readMap];
 		[tertiaryTableView reloadData];
     }
 }
@@ -604,7 +580,7 @@
 - (void)saveTertiaryMapFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode){
-        [tertiaryGroup saveMapFileAs:[sheet filename]];
+        [[model segmentGroup:2] saveMapFileAs:[sheet filename]];
     }
 }
 @end

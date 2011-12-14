@@ -85,7 +85,7 @@
 - (NSString*) selectedSegementInfo:(int)index;
 - (void) clearSegmentErrors;
 - (NSSet*) hwCards;
-- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary useName:(NSString*)aName;
 - (void) clearTotalCounts;
 
 #pragma mark •••Work Methods
@@ -94,7 +94,7 @@
 - (void) setSegmentErrorClassName:(NSString*)aClassName card:(int)card channel:(int)channel;
 
 #pragma mark •••Map Methods
-- (void) readMap;
+- (void) readMap:(NSString*)aFileName;
 - (void) saveMapFileAs:(NSString*)newFileName;
 
 #pragma mark •••Archival

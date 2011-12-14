@@ -26,11 +26,20 @@
 #define kUseCrateView 1
 #define kUsePreampView 2
 
+#define FLTORBSNFILE(aPath)		[NSString stringWithFormat:@"%@_FltOrbSN",	aPath]
+#define PREAMPSNFILE(aPath)		[NSString stringWithFormat:@"%@_PreampSN",	aPath]
+#define OSBSNFILE(aPath)		[NSString stringWithFormat:@"%@_OsbSN",		aPath]
+#define SLTWAFERSNFILE(aPath)	[NSString stringWithFormat:@"%@_SltWaferSN",aPath]
+
 @interface KatrinModel :  ORExperimentModel
 {
 	NSString* slowControlName;
 	int	      slowControlIsConnected;
 	int		  viewType;
+	NSMutableArray*		 fltSNs;
+	NSMutableArray*		 preAmpSNs;
+	NSMutableArray*		 osbSNs;
+	NSMutableDictionary* otherSNs;
 }
 #pragma mark ¥¥¥Accessors
 - (NSString*) slowControlName;
@@ -46,6 +55,19 @@
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups;
 
+#pragma mark ¥¥¥SN Access Methods
+- (id) fltSN:(int)i objectForKey:(id)aKey;
+- (void) fltSN:(int)i setObject:(id)anObject forKey:(id)aKey;
+- (id) preAmpSN:(int)i objectForKey:(id)aKey;
+- (void) preAmpSN:(int)i setObject:(id)anObject forKey:(id)aKey;
+- (id) osbSN:(int)i objectForKey:(id)aKey;
+- (void) osbSN:(int)i setObject:(id)anObject forKey:(id)aKey;
+- (id) otherSNForKey:(id)aKey;
+- (void) setOtherSNObject:(id)anObject forKey:(id)aKey;
+- (void) readAuxFiles:(NSString*)aPath;
+- (void) saveAuxFiles:(NSString*)aPath;
+- (NSArray*) linesInFile:(NSString*)aPath;
+
 #pragma mark ¥¥¥Specific Dialog Lock Methods
 - (NSString*) experimentMapLock;
 - (NSString*) experimentDetectorLock;
@@ -55,4 +77,5 @@
 extern NSString* KatrinModelSlowControlIsConnectedChanged;
 extern NSString* KatrinModelSlowControlNameChanged;
 extern NSString* ORKatrinModelViewTypeChanged;
+extern NSString* ORKatrinModelSNTablesChanged;
 

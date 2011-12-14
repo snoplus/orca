@@ -37,15 +37,6 @@
     return self;
 }
 
-- (void) loadSegmentGroups
-{
-	if(!segmentGroups)segmentGroups = [[NSMutableArray array] retain];
-	ORSegmentGroup* aGroup = [model segmentGroup:0];
-	if(![segmentGroups containsObject:aGroup]){
-		[segmentGroups addObject:aGroup];
-	}
-}
-
 - (NSString*) defaultPrimaryMapFilePath
 {
 	return @"~/Majorana";
