@@ -22,5 +22,5 @@
 @interface ORFPDSegmentGroup : ORSegmentGroup {
 }
 #pragma mark •••Map Methods
-- (void) readMap;
+- (void) readMap:(NSString*)aPath;
 @end

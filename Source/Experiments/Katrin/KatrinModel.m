@@ -510,6 +510,7 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 
 - (void) readAuxFiles:(NSString*)aPath 
 {
+	aPath = [aPath stringByDeletingPathExtension];
 	NSFileManager* fm = [NSFileManager defaultManager];
 	if([fm fileExistsAtPath:FLTORBSNFILE(aPath)]){
 		//read in the FLT/ORB Serial Numbers
@@ -580,7 +581,7 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 
 - (void) saveAuxFiles:(NSString*)aPath 
 {
-	aPath = [aPath stringByExpandingTildeInPath];
+	aPath = [aPath stringByDeletingPathExtension];
 	NSFileManager* fm = [NSFileManager defaultManager];
 	NSMutableString* contents = [NSMutableString string];
 	//save the FLT/ORB Serial Numbers

@@ -25,9 +25,10 @@
 @implementation ORFPDSegmentGroup
 
 #pragma mark •••Map Methods
-- (void) readMap
+- (void) readMap:(NSString*)aPath
 {
-    NSString* contents = [NSString stringWithContentsOfFile:[mapFile stringByExpandingTildeInPath] encoding:NSASCIIStringEncoding error:nil];
+ 	[self setMapFile:aPath];
+    NSString* contents = [NSString stringWithContentsOfFile:[aPath stringByExpandingTildeInPath] encoding:NSASCIIStringEncoding error:nil];
 	contents = [[contents componentsSeparatedByString:@"\r"] componentsJoinedByString:@"\n"];
 	contents = [[contents componentsSeparatedByString:@"\n\n"] componentsJoinedByString:@"\n"];
     NSArray*  lines = [contents componentsSeparatedByString:@"\n"];

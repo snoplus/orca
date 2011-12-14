@@ -522,8 +522,8 @@
 			NSString* thePath = [model validateHWMapPath:[[openPanel URL] path]];
             [[model segmentGroup:0] readMap:thePath];
 			[model readAuxFiles: thePath];
-            [primaryTableView reloadData];
 			[model handleOldPrimaryMapFormats: thePath]; //backward compatibility (temp)
+            [primaryTableView reloadData];
         }
     }];
 #else 	
@@ -1024,6 +1024,7 @@
     if(returnCode){
 		NSString* path = [model validateHWMapPath:[[openPanel URL] path]];
 		[[model segmentGroup:0] readMap:path];
+		[model handleOldPrimaryMapFormats: thePath]; //backward compatibility (temp)
 		[model readAuxFiles:path];
 		[primaryTableView reloadData];
     }

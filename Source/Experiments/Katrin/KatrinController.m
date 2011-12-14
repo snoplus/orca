@@ -160,6 +160,7 @@
 	[super primaryMapFileChanged:aNote];
 	NSString* s = [[[model segmentGroup:0] mapFile] stringByAbbreviatingWithTildeInPath];
 	if(s) {
+		s = [s stringByDeletingPathExtension];
 		[fltOrbSNField	 setStringValue:[FLTORBSNFILE(s) lastPathComponent]];
 		[osbSNField		 setStringValue:[OSBSNFILE(s) lastPathComponent]];
 		[preampSNField	 setStringValue:[PREAMPSNFILE(s) lastPathComponent]];
