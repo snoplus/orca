@@ -1314,19 +1314,19 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 
 //customn method to create a sensor (calling createChannelWithUrl:...)
 - (int) createSensorWithUrl:(NSString*)aUrl path:(NSString*)aPath
-{    [self  createChannelWithUrl:aUrl path:aPath chan:-1 controlType:0];      }
+{    return [self  createChannelWithUrl:aUrl path:aPath chan:-1 controlType:0];      }
 
 //customn method to create a control (calling createChannelWithUrl:...)
 - (int) createControlWithUrl:(NSString*)aUrl path:(NSString*)aPath
-{    [self  createChannelWithUrl:aUrl path:aPath chan:-1 controlType:0];      }
+{    return [self  createChannelWithUrl:aUrl path:aPath chan:-1 controlType:0];      }
 
 //customn method to create a sensor (calling createChannelWithUrl:...)
 - (int) createSensorWithUrl:(NSString*)aUrl path:(NSString*)aPath chan:(int)aChan
-{    [self  createChannelWithUrl:aUrl path:aPath chan:aChan controlType:0];      }
+{    return [self  createChannelWithUrl:aUrl path:aPath chan:aChan controlType:0];      }
 
 //customn method to create a control (calling createChannelWithUrl:...)
 - (int) createControlWithUrl:(NSString*)aUrl path:(NSString*)aPath chan:(int)aChan
-{    [self  createChannelWithUrl:aUrl path:aPath chan:aChan controlType:0];      }
+{    return [self  createChannelWithUrl:aUrl path:aPath chan:aChan controlType:0];      }
 
 
 - (int) findChanOfSensor:(NSString*)aUrl path:(NSString*)aPath
