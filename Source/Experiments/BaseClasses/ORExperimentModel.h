@@ -100,7 +100,8 @@
 - (void) readAuxFiles:(NSString*)aPath; //subclasses can override
 - (void) saveAuxFiles:(NSString*)aPath; //subclasses can override
 - (NSString*) validateHWMapPath:(NSString*)aPath;//subclasses can override
-   
+- (NSString*) mapFileHeader:(int)tag;//subclasses can override
+
 #pragma mark •••Group Methods
 - (void) addGroup:(ORSegmentGroup*)aGroup;
 - (void) selectedSet:(int)aSet segment:(int)index;

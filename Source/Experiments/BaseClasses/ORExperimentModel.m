@@ -238,6 +238,8 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
 - (void) readAuxFiles:(NSString*)aPath {;}//subclasses can override
 - (void) saveAuxFiles:(NSString*)aPath {;}//subclasses can override
 - (NSString*) validateHWMapPath:(NSString*)aPath{return aPath;}//subclasses can override
+- (NSString*) mapFileHeader:(int)tag{return nil;}//subclasses can override
+
 #pragma mark •••Notifications
 - (void) registerNotificationObservers
 {

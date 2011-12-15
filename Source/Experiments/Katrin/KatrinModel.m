@@ -140,7 +140,7 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 	int n = MIN(2,[segmentGroups count]);
 	for(i=0;i<n;i++){
 		ORSegmentGroup* aSegmentGroup = [segmentGroups objectAtIndex:i];
-		[aSegmentGroup addParametersToDictionary:objDictionary useName:segmentGeometryName[i]];
+		[aSegmentGroup addParametersToDictionary:objDictionary useName:segmentGeometryName[i] header:[self mapFileHeader:0]];
 	}
 	
 	NSString* rootMapFile = [[[segmentGroups objectAtIndex:0] mapFile] stringByExpandingTildeInPath];
@@ -180,11 +180,11 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 	contents = [[contents componentsSeparatedByString:@"\r"] componentsJoinedByString:@"\n"];
 	contents = [[contents componentsSeparatedByString:@"\n\n"] componentsJoinedByString:@"\n"];
     NSArray*  lines = [contents componentsSeparatedByString:@"\n"];
-	NSMutableString* result = [NSMutableString string];
+	NSMutableString* result = [NSMutableString stringWithString:@"Pixel,FLT Card,FLT Ch,kname,Quad,Carousel,Mod. Addr. ,Preamp,Preamp SN,OTB Card,OTB Ch,ORB Card,ORB Ch\n"];
 	for(id aLine in lines){
 		NSArray* parts = [aLine componentsSeparatedByString:@","];
 		if([parts count]>=7){
-			result = [result stringByAppendingFormat:@"%@,%@,%@,%@,%@,%d,%@,%@,%@,%@,%@,%@,%@\n",
+			[result appendFormat:@"%@,%@,%@,%@,%@,%d,%@,%@,%@,%@,%@,%@,%@\n",
 								 [parts objectAtIndex:0], //pixel
 								 [parts objectAtIndex:1], //FLT Card
 								 [parts objectAtIndex:2], //FLT Chan
@@ -663,6 +663,13 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 	contents = [[contents componentsSeparatedByString:@"\r"] componentsJoinedByString:@"\n"];
 	contents = [[contents componentsSeparatedByString:@"\n\n"] componentsJoinedByString:@"\n"];
     return [contents componentsSeparatedByString:@"\n"];
+}
+
+- (NSString*) mapFileHeader:(int)tag
+{
+	if(tag==0)return @"Pixel,FLTSlot,FLTChan,PreampMod,PreampChan,OSBSlot,OSBChan";
+	else if(tag==1)return @"Seg,FLTSlot,FLTChan";
+	else return nil;
 }
 
 @end

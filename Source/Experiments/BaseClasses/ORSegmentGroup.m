@@ -450,11 +450,13 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 	}
 }
 
-- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary useName:(NSString*)aName
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary useName:(NSString*)aName header:(NSString*)aHeader
 {
     NSMutableDictionary* mapDictionary = [NSMutableDictionary dictionary];
+	
 	NSString* contents = [NSString stringWithContentsOfFile:[mapFile stringByExpandingTildeInPath] encoding:NSASCIIStringEncoding error:nil];
-	if(contents){
+	if([contents length]){
+		if(aHeader)contents = [aHeader stringByAppendingFormat:@"\n%@",contents];
 		[mapDictionary setObject:contents forKey:aName];
 	}
 	else {
@@ -462,6 +464,11 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 	}
     [dictionary setObject:mapDictionary forKey:groupName];
     return dictionary;
+}
+
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary useName:(NSString*)aName 
+{
+	return [self addParametersToDictionary:dictionary useName:aName header:nil];	
 }
 
 #pragma mark •••Archival
