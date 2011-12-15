@@ -35,6 +35,7 @@ NSString* ORKatrinModelSNTablesChanged				= @"ORKatrinModelSNTablesChanged";
 static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 @interface KatrinModel (private)
 - (void) validateSNArrays;
+- (NSString*) addOldFPDMapFormat:(NSMutableDictionary*)aDictionary;
 @end
 
 @implementation KatrinModel
@@ -164,9 +165,46 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 	contents = [NSString stringWithContentsOfFile:SLTWAFERSNFILE(rootMapFile) encoding:NSASCIIStringEncoding error:nil];
 	if(!contents)contents = @"NONE";
     [objDictionary setObject:contents forKey:@"SltWaferSNs"];
-		
+
+	[objDictionary setObject:[self addOldFPDMapFormat:aDictionary] forKey:@"Geometry"];
+
     [aDictionary setObject:objDictionary forKey:[self className]];
     return aDictionary;
+}
+
+- (NSString*) addOldFPDMapFormat:(NSMutableDictionary*)aDictionary
+{
+	NSString* rootMapFile = [[[segmentGroups objectAtIndex:0] mapFile] stringByExpandingTildeInPath];
+	NSString* contents = [NSString stringWithContentsOfFile:rootMapFile encoding:NSASCIIStringEncoding error:nil];
+
+	contents = [[contents componentsSeparatedByString:@"\r"] componentsJoinedByString:@"\n"];
+	contents = [[contents componentsSeparatedByString:@"\n\n"] componentsJoinedByString:@"\n"];
+    NSArray*  lines = [contents componentsSeparatedByString:@"\n"];
+	NSMutableString* result = [NSMutableString string];
+	for(id aLine in lines){
+		NSArray* parts = [aLine componentsSeparatedByString:@","];
+		if([parts count]>=7){
+			result = [result stringByAppendingFormat:@"%@,%@,%@,%@,%@,%d,%@,%@,%@,%@,%@,%@,%@\n",
+								 [parts objectAtIndex:0], //pixel
+								 [parts objectAtIndex:1], //FLT Card
+								 [parts objectAtIndex:2], //FLT Chan
+								 @"",					  //kname
+								 [parts objectAtIndex:5], //Quad
+								 [[parts objectAtIndex:3]intValue]+1, //Carousel
+								 [parts objectAtIndex:3], //Module Address
+								 [parts objectAtIndex:4], //preamp
+								 @"",					  //preamp SN
+								 [parts objectAtIndex:5], //OTB Card
+								 [parts objectAtIndex:6], //OTB Chan
+								 [parts objectAtIndex:1], //ORB Card
+								 [parts objectAtIndex:2] //ORB Chan
+								 ];
+			
+			//new format: Pixel,FLT Slot, FLT Chan, Preamp Mod, Preamp Chan, OSB Slot, OSB Chan
+		}
+	}
+	if(result)return result;
+	else return @"NONE";
 }
 
 #pragma mark ¥¥¥Segment Group Methods
