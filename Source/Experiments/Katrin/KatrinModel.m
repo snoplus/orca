@@ -26,6 +26,7 @@
 #import "KatrinConstants.h"
 #import "ORSocketClient.h"
 #import "ORCommandCenter.h"
+#import "ORDetectorSegment.h"
 
 NSString* KatrinModelSlowControlIsConnectedChanged = @"KatrinModelSlowControlIsConnectedChanged";
 NSString* KatrinModelSlowControlNameChanged			= @"KatrinModelSlowControlNameChanged";
@@ -36,6 +37,8 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 @interface KatrinModel (private)
 - (void) validateSNArrays;
 - (NSString*) addOldFPDMapFormat:(NSMutableDictionary*)aDictionary;
+- (NSString*) auxParamsString:(NSArray*)auxArray keys:(NSArray*)keys;
+- (NSString*) mapFileHeader:(int)tag;
 @end
 
 @implementation KatrinModel
@@ -46,7 +49,6 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 	[super wakeUp];
 	BOOL exists = [[ORCommandCenter sharedCommandCenter] clientWithNameExists:slowControlName];
 	[self setSlowControlIsConnected: exists];
-
 }
 
 - (void) setUpImage
@@ -140,72 +142,42 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 	int n = MIN(2,[segmentGroups count]);
 	for(i=0;i<n;i++){
 		ORSegmentGroup* aSegmentGroup = [segmentGroups objectAtIndex:i];
-		[aSegmentGroup addParametersToDictionary:objDictionary useName:segmentGeometryName[i] header:[self mapFileHeader:0]];
+		[aSegmentGroup addParametersToDictionary:objDictionary useName:segmentGeometryName[i]];
 	}
 	
 	NSString* rootMapFile = [[[segmentGroups objectAtIndex:0] mapFile] stringByExpandingTildeInPath];
 	rootMapFile = [rootMapFile stringByDeletingPathExtension];
 
 	//add the FLT/ORB SN
-	NSString* contents = [NSString stringWithContentsOfFile:FLTORBSNFILE(rootMapFile) encoding:NSASCIIStringEncoding error:nil];
-	if(!contents)contents = @"NONE";
-    [objDictionary setObject:contents forKey:@"FltOrbSNs"];
+	NSArray* keys = [NSArray arrayWithObjects:@"kFltSlot",@"kFltSN",@"kORBSN",nil];
+	[objDictionary setObject:[self auxParamsString:fltSNs keys:keys] forKey:@"FltOrbSNs"];
 	
 	//add the Preamp SN
-	contents = [NSString stringWithContentsOfFile:PREAMPSNFILE(rootMapFile) encoding:NSASCIIStringEncoding error:nil];
-	if(!contents)contents = @"NONE";
-    [objDictionary setObject:contents forKey:@"PreampSNs"];
+	keys = [NSArray arrayWithObjects:@"kPreAmpMod",@"kPreAmpSN",nil];
+	[objDictionary setObject:[self auxParamsString:preAmpSNs keys:keys] forKey:@"PreampSNs"];
 	
 	//add the OSB SN
-	contents = [NSString stringWithContentsOfFile:OSBSNFILE(rootMapFile) encoding:NSASCIIStringEncoding error:nil];
-	if(!contents)contents = @"NONE";
-    [objDictionary setObject:contents forKey:@"OsbSNs"];
-
+	keys = [NSArray arrayWithObjects:@"kOSBSlot",@"kOSBSN",nil];
+	[objDictionary setObject:[self auxParamsString:osbSNs keys:keys] forKey:@"OsbSNs"];
+	
 	//add the SLT and Wafer SN
-	contents = [NSString stringWithContentsOfFile:SLTWAFERSNFILE(rootMapFile) encoding:NSASCIIStringEncoding error:nil];
-	if(!contents)contents = @"NONE";
-    [objDictionary setObject:contents forKey:@"SltWaferSNs"];
-
+	NSString* keySlt[2] = {@"kSltSN",@"kWaferSN"};
+	NSString* result = [NSString string];
+	for(i=0;i<2;i++){
+		id aParam = [otherSNs objectForKey:keySlt[i]];
+		if(aParam) result = [result stringByAppendingFormat:@"%@",aParam];
+		else result = [result stringByAppendingString:@"--"];
+		if(i<1)result = [result stringByAppendingString:@","];
+	}
+	result = [result stringByAppendingString:@"\n"];
+    [objDictionary setObject:result forKey:@"SltWaferSNs"];
+	
 	[objDictionary setObject:[self addOldFPDMapFormat:aDictionary] forKey:@"Geometry"];
 
     [aDictionary setObject:objDictionary forKey:[self className]];
     return aDictionary;
 }
 
-- (NSString*) addOldFPDMapFormat:(NSMutableDictionary*)aDictionary
-{
-	NSString* rootMapFile = [[[segmentGroups objectAtIndex:0] mapFile] stringByExpandingTildeInPath];
-	NSString* contents = [NSString stringWithContentsOfFile:rootMapFile encoding:NSASCIIStringEncoding error:nil];
-
-	contents = [[contents componentsSeparatedByString:@"\r"] componentsJoinedByString:@"\n"];
-	contents = [[contents componentsSeparatedByString:@"\n\n"] componentsJoinedByString:@"\n"];
-    NSArray*  lines = [contents componentsSeparatedByString:@"\n"];
-	NSMutableString* result = [NSMutableString stringWithString:@"Pixel,FLT Card,FLT Ch,kname,Quad,Carousel,Mod. Addr. ,Preamp,Preamp SN,OTB Card,OTB Ch,ORB Card,ORB Ch\n"];
-	for(id aLine in lines){
-		NSArray* parts = [aLine componentsSeparatedByString:@","];
-		if([parts count]>=7){
-			[result appendFormat:@"%@,%@,%@,%@,%@,%d,%@,%@,%@,%@,%@,%@,%@\n",
-								 [parts objectAtIndex:0], //pixel
-								 [parts objectAtIndex:1], //FLT Card
-								 [parts objectAtIndex:2], //FLT Chan
-								 @"",					  //kname
-								 [parts objectAtIndex:5], //Quad
-								 [[parts objectAtIndex:3]intValue]+1, //Carousel
-								 [parts objectAtIndex:3], //Module Address
-								 [parts objectAtIndex:4], //preamp
-								 @"",					  //preamp SN
-								 [parts objectAtIndex:5], //OTB Card
-								 [parts objectAtIndex:6], //OTB Chan
-								 [parts objectAtIndex:1], //ORB Card
-								 [parts objectAtIndex:2] //ORB Chan
-								 ];
-			
-			//new format: Pixel,FLT Slot, FLT Chan, Preamp Mod, Preamp Chan, OSB Slot, OSB Chan
-		}
-	}
-	if(result)return result;
-	else return @"NONE";
-}
 
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups
@@ -255,14 +227,13 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 		NSArray* parts = [aString componentsSeparatedByString:@"\n"];
 		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Segment" parts:parts]];
 		finalString = [finalString stringByAppendingString:@"-----------------------\n"];
-		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" CardSlot" parts:parts]];
-		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Channel" parts:parts]];
+		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" FLTSlot" parts:parts]];
+		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" FLTChannel" parts:parts]];
 		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Threshold" parts:parts]];
 		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Gain" parts:parts]];
 		finalString = [finalString stringByAppendingString:@"-----------------------\n"];
-		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" ModuleAddress" parts:parts]];
-		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" ModuleChannel" parts:parts]];
-		finalString = [finalString stringByAppendingString:@"-----------------------\n"];
+		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" PreampModule" parts:parts]];
+		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" PreampChannel" parts:parts]];
 		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" OSBSlot" parts:parts]];
 		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" OSBChannel" parts:parts]];
 		return finalString;
@@ -274,8 +245,8 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 		NSArray* parts = [aString componentsSeparatedByString:@"\n"];
 		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Segment" parts:parts]];
 		finalString = [finalString stringByAppendingString:@"-----------------------\n"];
-		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" CardSlot" parts:parts]];
-		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Channel" parts:parts]];
+		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" FLTSlot" parts:parts]];
+		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" FLTChannel" parts:parts]];
 		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Threshold" parts:parts]];
 		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Gain" parts:parts]];
 		finalString = [finalString stringByAppendingString:@"-----------------------\n"];
@@ -475,42 +446,6 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinModelSNTablesChanged object:self userInfo:nil];
 }
 
-- (void) validateSNArrays
-{
-	if(!fltSNs){
-		fltSNs = [[NSMutableArray array] retain];
-		int i;
-		for(i=0;i<8;i++){
-			[fltSNs addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
-							   [NSNumber numberWithInt:i+2], @"kFltSlot",
-							   @"-",						 @"kFltSN",
-							   @"-",						 @"kORBSN", nil]];
-		}
-	}
-	if(!preAmpSNs){
-		preAmpSNs = [[NSMutableArray array] retain];
-		int i;
-		for(i=0;i<24;i++){
-			[preAmpSNs addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
-							   [NSNumber numberWithInt:i], @"kPreAmpMod",
-							   @"-",					   @"kPreAmpSN", nil]];
-		}
-	}
-	if(!osbSNs){
-		osbSNs = [[NSMutableArray array] retain];
-		int i;
-		for(i=0;i<4;i++){
-			[osbSNs addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
-								 [NSNumber numberWithInt:i], @"kOSBSlot",
-								 @"-",						@"kOSBSN", nil]];
-		}
-	}
-	if(!otherSNs){
-		otherSNs = [[NSMutableDictionary dictionaryWithObjectsAndKeys:
-							  @"-",			@"kSltSN",
-							  @"-",			@"kWaferSN", nil] retain];
-	}
-}
 
 - (void) handleOldPrimaryMapFormats:(NSString*)aPath
 {
@@ -547,9 +482,18 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 	return aPath;
 }
 
+- (NSArray*) linesInFile:(NSString*)aPath
+{
+	NSString* contents = [NSString stringWithContentsOfFile:[aPath stringByExpandingTildeInPath] encoding:NSASCIIStringEncoding error:nil];
+	contents = [[contents componentsSeparatedByString:@"\r"] componentsJoinedByString:@"\n"];
+	contents = [[contents componentsSeparatedByString:@"\n\n"] componentsJoinedByString:@"\n"];
+    return [contents componentsSeparatedByString:@"\n"];
+}
+
 - (void) readAuxFiles:(NSString*)aPath 
 {
 	aPath = [aPath stringByDeletingPathExtension];
+		
 	NSFileManager* fm = [NSFileManager defaultManager];
 	if([fm fileExistsAtPath:FLTORBSNFILE(aPath)]){
 		//read in the FLT/ORB Serial Numbers
@@ -617,7 +561,6 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 		}
 	}
 }
-
 - (void) saveAuxFiles:(NSString*)aPath 
 {
 	NSLog(@"Saved FPD HW Map: %@\n",aPath);
@@ -638,7 +581,7 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 	data = [contents dataUsingEncoding:NSASCIIStringEncoding];
 	[fm createFileAtPath:OSBSNFILE(aPath) contents:data attributes:nil];
 	NSLog(@"Saved OSB SerialNumbers: %@\n",OSBSNFILE(aPath));
-
+	
 	//save the Preamp Serial Numbers
 	contents = [NSMutableString string];
 	if([fm fileExistsAtPath: PREAMPSNFILE(aPath)])[fm removeItemAtPath:PREAMPSNFILE(aPath) error:nil];
@@ -657,13 +600,9 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 	
 }
 
-- (NSArray*) linesInFile:(NSString*)aPath
-{
-	NSString* contents = [NSString stringWithContentsOfFile:[aPath stringByExpandingTildeInPath] encoding:NSASCIIStringEncoding error:nil];
-	contents = [[contents componentsSeparatedByString:@"\r"] componentsJoinedByString:@"\n"];
-	contents = [[contents componentsSeparatedByString:@"\n\n"] componentsJoinedByString:@"\n"];
-    return [contents componentsSeparatedByString:@"\n"];
-}
+@end
+
+@implementation KatrinModel (private)
 
 - (NSString*) mapFileHeader:(int)tag
 {
@@ -672,5 +611,94 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 	else return nil;
 }
 
-@end
 
+- (NSString*) auxParamsString:(NSArray*)auxArray keys:(NSArray*)keys
+{
+	NSString* result = [NSString string];
+	
+	for(id aKey in keys){
+		result = [result stringByAppendingFormat:@"%@,",aKey];
+	}
+	result = [result substringToIndex:[result length]-1];
+	result = [result stringByAppendingString:@"\n"];
+	for(id anItem in auxArray){
+		int n = [keys count];
+		int i;
+		for(i=0;i<n;i++){
+			id aParam = [anItem objectForKey:[keys objectAtIndex:i]];
+			if(aParam) result = [result stringByAppendingFormat:@"%@",aParam];
+			else result = [result stringByAppendingString:@"--"];
+			if(i<n-1)result = [result stringByAppendingString:@","];
+		}
+		result = [result stringByAppendingString:@"\n"];
+	}
+	return result;
+}
+
+- (NSString*) addOldFPDMapFormat:(NSMutableDictionary*)aDictionary
+{
+	NSMutableString* result = [NSMutableString stringWithString:@"Pixel,FLT Card,FLT Ch,kname,Quad,Carousel,Mod. Addr.,Preamp,Preamp SN,OTB Card,OTB Ch,ORB Card,ORB Ch\n"];
+	id segments = [[segmentGroups objectAtIndex:0] segments];
+	for(id segment in segments){
+		NSArray* parts = [[segment paramsAsString] componentsSeparatedByString:@","];
+		if([parts count]>=7){
+			[result appendFormat:@"%@,%@,%@,%@,%@,%d,%@,%@,%@,%@,%@,%@,%@\n",
+			 [parts objectAtIndex:0], //pixel
+			 [parts objectAtIndex:1], //FLT Card
+			 [parts objectAtIndex:2], //FLT Chan
+			 @"",					  //kname
+			 [parts objectAtIndex:5], //Quad
+			 [[parts objectAtIndex:3]intValue]+1, //Carousel
+			 [parts objectAtIndex:3], //Module Address
+			 [parts objectAtIndex:4], //preamp
+			 @"",					  //preamp SN
+			 [parts objectAtIndex:5], //OTB Card
+			 [parts objectAtIndex:6], //OTB Chan
+			 [parts objectAtIndex:1], //ORB Card
+			 [parts objectAtIndex:2] //ORB Chan
+			 ];
+			
+			//new format: Pixel,FLT Slot, FLT Chan, Preamp Mod, Preamp Chan, OSB Slot, OSB Chan
+		}
+	}
+	if(result)return result;
+	else return @"NONE";
+}
+- (void) validateSNArrays
+{
+	if(!fltSNs){
+		fltSNs = [[NSMutableArray array] retain];
+		int i;
+		for(i=0;i<8;i++){
+			[fltSNs addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+							   [NSNumber numberWithInt:i+2], @"kFltSlot",
+							   @"-",						 @"kFltSN",
+							   @"-",						 @"kORBSN", nil]];
+		}
+	}
+	if(!preAmpSNs){
+		preAmpSNs = [[NSMutableArray array] retain];
+		int i;
+		for(i=0;i<24;i++){
+			[preAmpSNs addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+								  [NSNumber numberWithInt:i], @"kPreAmpMod",
+								  @"-",					   @"kPreAmpSN", nil]];
+		}
+	}
+	if(!osbSNs){
+		osbSNs = [[NSMutableArray array] retain];
+		int i;
+		for(i=0;i<4;i++){
+			[osbSNs addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+							   [NSNumber numberWithInt:i], @"kOSBSlot",
+							   @"-",						@"kOSBSN", nil]];
+		}
+	}
+	if(!otherSNs){
+		otherSNs = [[NSMutableDictionary dictionaryWithObjectsAndKeys:
+					 @"-",			@"kSltSN",
+					 @"-",			@"kWaferSN", nil] retain];
+	}
+}
+
+@end

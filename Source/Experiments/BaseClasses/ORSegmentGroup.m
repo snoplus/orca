@@ -424,9 +424,7 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 - (void) saveMapFileAs:(NSString*)newFileName
 {
     NSMutableData* theContents = [NSMutableData data];
-    NSEnumerator* e = [segments objectEnumerator];
-    ORDetectorSegment* segment;
-    while(segment = [e nextObject]){
+    for(id segment in segments){
         [theContents appendData:[[segment paramsAsString] dataUsingEncoding:NSASCIIStringEncoding]];
         [theContents appendData:[@"\n" dataUsingEncoding:NSASCIIStringEncoding]];
     }
@@ -450,25 +448,26 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 	}
 }
 
-- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary useName:(NSString*)aName header:(NSString*)aHeader
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary useName:(NSString*)aName
 {
+    NSMutableString* theContents = [NSMutableString string];
+
+	BOOL putInHeader = NO;
+    for(id segment in segments){
+		if(!putInHeader){
+			[theContents appendString:[segment paramHeader]];
+			putInHeader = YES;
+		}
+        [theContents appendString:[segment paramsAsString]];
+        [theContents appendString:@"\n"];
+    }
     NSMutableDictionary* mapDictionary = [NSMutableDictionary dictionary];
 	
-	NSString* contents = [NSString stringWithContentsOfFile:[mapFile stringByExpandingTildeInPath] encoding:NSASCIIStringEncoding error:nil];
-	if([contents length]){
-		if(aHeader)contents = [aHeader stringByAppendingFormat:@"\n%@",contents];
-		[mapDictionary setObject:contents forKey:aName];
-	}
-	else {
-		[mapDictionary setObject:@"NONE" forKey:aName];
-	}
+	if([theContents length]) [mapDictionary setObject:theContents forKey:aName];
+	else					 [mapDictionary setObject:@"NONE" forKey:aName];
+	
     [dictionary setObject:mapDictionary forKey:groupName];
     return dictionary;
-}
-
-- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary useName:(NSString*)aName 
-{
-	return [self addParametersToDictionary:dictionary useName:aName header:nil];	
 }
 
 #pragma mark •••Archival

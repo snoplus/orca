@@ -61,6 +61,7 @@
 - (NSMutableDictionary *) params;
 - (void) setParams: (NSMutableDictionary *) aParams;
 - (void) decodeLine:(NSString*)aString;
+- (NSString*) paramHeader;
 - (NSString*) paramsAsString;
 - (NSUndoManager*) undoManager;
 - (id) objectForKey:(id)key;

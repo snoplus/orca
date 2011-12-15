@@ -86,7 +86,6 @@
 - (void) clearSegmentErrors;
 - (NSSet*) hwCards;
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary useName:(NSString*)aName;
-- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary useName:(NSString*)aName header:(NSString*)aHeader;
 - (void) clearTotalCounts;
 
 #pragma mark •••Work Methods

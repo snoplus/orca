@@ -223,6 +223,20 @@ NSString* KSegmentChangedNotification	  =	@"KSegmentChangedNotification";
     
 }
 
+- (NSString*) paramHeader
+{
+	NSMutableString* aHeader = [NSMutableString string];
+	int i;
+	for(i=0;i<[mapEntries count];i++){
+		[aHeader appendFormat:@"%@,",mapKey(i)];
+	}
+	if([aHeader length]>0){
+		[aHeader deleteCharactersInRange:NSMakeRange([aHeader length]-1,1)];
+		[aHeader appendString:@"\n"];
+	}
+	return aHeader;
+}
+
 - (NSString*) paramsAsString
 {
 	NSString* result = [NSString string];
