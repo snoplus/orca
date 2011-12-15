@@ -1312,6 +1312,36 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 
 }
 
+- (BOOL) loadChannelTableFile:(NSString*) filename
+{
+	NSLog(@"Called: %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: debug output -tb-
+	return FALSE;
+}
+
+- (BOOL) saveAsChannelTableFile:(NSString*) filename
+{
+	NSLog(@"Called: %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: debug output -tb-
+	
+	for(NSString* itemKey in pollingLookUp){
+	    NSLog(@"Write Item %@\n",itemKey);
+		NSDictionary* topLevelDictionary = [requestCache objectForKey:itemKey];
+		NSDictionary* itemDictionary = [topLevelDictionary objectForKey:itemKey];
+		
+		int isControlType = [[itemDictionary objectForKey:@"Control"] intValue];
+		NSLog(@"  Chan: %i\n",[[topLevelDictionary objectForKey:@"ChannelNumber"] intValue]);
+		if(isControlType) NSLog(@"  Name: %@\n",[itemDictionary objectForKey:@"name"]);
+		else NSLog(@"  Name: %@\n",[itemDictionary objectForKey:@"Name"]);
+		NSLog(@"  URL: %@\n",[itemDictionary objectForKey:@"URL"]);
+		NSLog(@"  Path: %@\n",[itemDictionary objectForKey:@"Path"]);
+		NSLog(@"  LoAlarm: %@\n",[topLevelDictionary objectForKey:@"LoAlarm"]);
+		NSLog(@"  HiAlarm: %@\n",[topLevelDictionary objectForKey:@"HiAlarm"]);
+		NSLog(@"  LoLimit: %@\n",[topLevelDictionary objectForKey:@"LoLimit"]);
+		NSLog(@"  HiLimit: %@\n",[topLevelDictionary objectForKey:@"HiLimit"]);
+		NSLog(@"  Type: %@\n", isControlType  == 1 ? @"Control" : @"Sensor");
+	}
+	return FALSE;
+}
+
 //customn method to create a sensor (calling createChannelWithUrl:...)
 - (int) createSensorWithUrl:(NSString*)aUrl path:(NSString*)aPath
 {    return [self  createChannelWithUrl:aUrl path:aPath chan:-1 controlType:0];      }
@@ -1845,6 +1875,84 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 			}
 		}
 	} while (swapped);
+}
+
+@end
+
+
+
+//from http://www.macresearch.org/cocoa-scientists-part-xxvi-parsing-csv-data
+//NSString category to read a CSV table from a given string and convert it to a array of arrays
+//-tb- 2011-12-15
+
+@implementation NSString (ParsingExtensions)
+
+-(NSArray *)csvRows {
+    NSMutableArray *rows = [NSMutableArray array];
+
+    // Get newline character set
+    NSMutableCharacterSet *newlineCharacterSet = (id)[NSMutableCharacterSet whitespaceAndNewlineCharacterSet];
+    [newlineCharacterSet formIntersectionWithCharacterSet:[[NSCharacterSet whitespaceCharacterSet] invertedSet]];
+
+    // Characters that are important to the parser
+    NSMutableCharacterSet *importantCharactersSet = (id)[NSMutableCharacterSet characterSetWithCharactersInString:@",\""];
+    [importantCharactersSet formUnionWithCharacterSet:newlineCharacterSet];
+
+    // Create scanner, and scan string
+    NSScanner *scanner = [NSScanner scannerWithString:self];
+    [scanner setCharactersToBeSkipped:nil];
+    while ( ![scanner isAtEnd] ) {        
+        BOOL insideQuotes = NO;
+        BOOL finishedRow = NO;
+        NSMutableArray *columns = [NSMutableArray arrayWithCapacity:10];
+        NSMutableString *currentColumn = [NSMutableString string];
+        while ( !finishedRow ) {
+            NSString *tempString;
+            if ( [scanner scanUpToCharactersFromSet:importantCharactersSet intoString:&tempString] ) {
+                [currentColumn appendString:tempString];
+            }
+
+            if ( [scanner isAtEnd] ) {
+                if ( ![currentColumn isEqualToString:@""] ) [columns addObject:currentColumn];
+                finishedRow = YES;
+            }
+            else if ( [scanner scanCharactersFromSet:newlineCharacterSet intoString:&tempString] ) {
+                if ( insideQuotes ) {
+                    // Add line break to column text
+                    [currentColumn appendString:tempString];
+                }
+                else {
+                    // End of row
+                    if ( ![currentColumn isEqualToString:@""] ) [columns addObject:currentColumn];
+                    finishedRow = YES;
+                }
+            }
+            else if ( [scanner scanString:@"\"" intoString:NULL] ) {
+                if ( insideQuotes && [scanner scanString:@"\"" intoString:NULL] ) {
+                    // Replace double quotes with a single quote in the column string.
+                    [currentColumn appendString:@"\""]; 
+                }
+                else {
+                    // Start or end of a quoted string.
+                    insideQuotes = !insideQuotes;
+                }
+            }
+            else if ( [scanner scanString:@"," intoString:NULL] ) {  
+                if ( insideQuotes ) {
+                    [currentColumn appendString:@","];
+                }
+                else {
+                    // This is a column separating comma
+                    [columns addObject:currentColumn];
+                    currentColumn = [NSMutableString string];
+                    [scanner scanCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:NULL];
+                }
+            }
+        }
+        if ( [columns count] > 0 ) [rows addObject:columns];
+    }
+
+    return rows;
 }
 
 @end
