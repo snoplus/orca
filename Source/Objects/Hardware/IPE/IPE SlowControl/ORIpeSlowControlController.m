@@ -26,6 +26,16 @@
 #import "ORAdeiLoader.h"
 #import "ORCompositePlotView.h"
 
+
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+@interface ORIpeSlowControlController (private) 
+- (void) openChannelTableFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+- (void) saveChannelTableFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+@end
+#endif
+
+
+
 @implementation ORIpeSlowControlController
 
 #pragma mark ***Initialization
@@ -411,6 +421,79 @@
 }
 
 #pragma mark ***Actions
+- (IBAction) openChannelTableFileAction:(id)sender
+{
+    NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+    [openPanel setCanChooseDirectories:NO];
+    [openPanel setCanChooseFiles:YES];
+    [openPanel setAllowsMultipleSelection:NO];
+    [openPanel setPrompt:@"Choose"];   
+    [openPanel setTitle: @"Open Config File"];
+    
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            NSString *filename = [[openPanel URL]path];
+            NSLog( @"You selected filename: %@\n",filename);
+            [model loadChannelTableFile: filename];	
+        }
+    }];
+#else 	
+    [openPanel beginSheetForDirectory:NSHomeDirectory()
+                                 file:nil
+                                types:nil
+                       modalForWindow:[self window]
+                        modalDelegate:self
+                       didEndSelector:@selector(openChannelTableFileDidEnd:returnCode:contextInfo:)
+                          contextInfo:NULL];
+#endif
+}
+
+
+- (IBAction) saveAsChannelTableFileAction:(id)sender
+{	
+    
+    NSSavePanel *savePanel = [NSSavePanel savePanel];
+	//[op setMessage: @"Save the Config File ..."];
+	[savePanel setNameFieldLabel: @"Save as:"];
+	//[op setNameFieldStringValue: @"config.txt"];
+	[savePanel setTitle: @"Save Config File"];
+	[savePanel setAllowedFileTypes: nil];
+	[savePanel setAllowsOtherFileTypes: YES];
+	[savePanel setCanSelectHiddenExtension: YES];
+    
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            NSString *filename = [[savePanel URL]path];
+            NSLog( @"You selected filename: %@\n",filename);
+
+            BOOL saveOK = [model saveAsChannelTableFile: filename];
+            if (saveOK) {
+                NSLog( @"Saved file: %@\n",filename);
+            }
+            else{
+                NSLog( @"ERROR: Could not save file: %@\n",filename);
+            }
+            
+        }
+    }];
+#else 	
+    [savePanel beginSheetForDirectory:NSHomeDirectory()
+                                 file:nil
+                       modalForWindow:[self window]
+                        modalDelegate:self
+                       didEndSelector:@selector(saveConfigFileDidEnd:returnCode:contextInfo:)
+                          contextInfo:nil];
+#endif
+
+	
+}
+
+
+
+
+
 - (IBAction) manuallyCreateChannelAction:(id)sender
 {
 	[model manuallyCreateChannel];	
@@ -1074,3 +1157,49 @@ autoselect an edge, and we want this drawer to open only on specific edges. */
 }
 @end
 
+
+
+@implementation ORIpeSlowControlController (private)  
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+- (void)openChannelTableFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo	
+{
+    if (returnCode == NSFileHandlingPanelOKButton)  //NSOKButton) NSFileWrapper
+    {
+        NSString *filename = [sheet filename];
+		//NSString *filename = [[openPanel URL]path];
+		NSLog( @"You selected filename: %@\n",filename);
+		[model loadChannelTableFile: filename];	
+        
+		//  !this does not work as URLs start with "file://localhost" ... see comment above: APPLE needs to provide more convesion functions -tb-
+		
+        //NSLog( @"Setting the filename to: %@\n",[model configFileName]);
+		//[configFileTextView setString: [NSString stringWithContentsOfFile: [model configFileName] encoding: NSASCIIStringEncoding error: NULL]];
+    }
+}
+
+- (void)saveChannelTableFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo	
+{
+    if (returnCode == NSFileHandlingPanelOKButton) {
+        NSString *filename = [sheet filename];
+        NSLog( @"You selected the filename: %@\n",filename);
+        NSLog( @"You selected [op nameFieldStringValue]: %@\n",[sheet nameFieldLabel]);
+        NSLog( @"You selected [op directoryURL]: %@\n",[sheet URL]);
+        //if (![textData writeToFile:[sp filename] atomically:YES])
+		
+		NSLog( @"You selected filename: %@\n",filename);
+		
+		BOOL saveOK = [model saveAsChannelTableFile: filename];
+		if (saveOK) {
+			NSLog( @"Saved file: %@\n",filename);
+		}
+		else{
+			NSLog( @"ERROR: Could not save file: %@\n",filename);
+		}
+        
+    }
+
+}
+
+#endif
+
+@end

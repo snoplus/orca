@@ -494,6 +494,9 @@
 
 #pragma mark •••Main Scripting Methods
 //Scripts really shouldn't call any other methods unless you -REALLY- know what you're doing!
+- (BOOL) loadChannelTableFile:(NSString*) filename;
+- (BOOL) saveAsChannelTableFile:(NSString*) filename;
+
 - (int) createSensorWithUrl:(NSString*)aUrl path:(NSString*)aPath;
 - (int) createControlWithUrl:(NSString*)aUrl path:(NSString*)aPath;
 - (int) createSensorWithUrl:(NSString*)aUrl path:(NSString*)aPath chan:(int)aChan;
@@ -581,3 +584,9 @@ extern NSString* ORIpeSlowControlSetpointRequestQueueChanged;
 #define    DebugMethCallsTB(x) 
 #endif
 
+
+//not necessary to declare ->							
+//#pragma mark •••Other Categories
+//@interface NSString (ParsingExtensions)
+//-(NSArray *)csvRows;
+//@end

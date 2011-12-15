@@ -96,6 +96,8 @@
 - (void) drawDidClose:(NSNotification*)aNote;
 
 #pragma mark ***Actions
+- (IBAction) openChannelTableFileAction:(id)sender;
+- (IBAction) saveAsChannelTableFileAction:(id)sender;
 - (IBAction) manuallyCreateChannelAction:(id)sender;
 - (IBAction) manualTypePopupAction:(id)sender;
 - (IBAction) manualPathTextFieldAction:(id)sender;
