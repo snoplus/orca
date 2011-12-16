@@ -1018,13 +1018,13 @@
 	}
 }
 
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre 10.6-specific
 - (void) readPrimaryMapFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode){
-		NSString* path = [model validateHWMapPath:[[openPanel URL] path]];
+		NSString* path = [model validateHWMapPath:[[sheet URL] path]];
 		[[model segmentGroup:0] readMap:path];
-		[model handleOldPrimaryMapFormats: thePath]; //backward compatibility (temp)
+		[model handleOldPrimaryMapFormats: path]; //backward compatibility (temp)
 		[model readAuxFiles:path];
 		[primaryTableView reloadData];
     }
