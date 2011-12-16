@@ -430,6 +430,20 @@ NSString* ORXL3ModelXl3ChargeInjChanged = @"ORXL3ModelXl3ChargeInjChanged";
 #define swapLong(x) (((uint32_t)(x) << 24) | (((uint32_t)(x) & 0x0000FF00) <<  8) | (((uint32_t)(x) & 0x00FF0000) >>  8) | ((uint32_t)(x) >> 24))
 #define swapShort(x) (((uint16_t)(x) <<  8) | ((uint16_t)(x)>>  8))
 
+void SwapLongBlock(void* p, int32_t n)
+{
+    int32_t* lp = (int32_t*)p;
+    int32_t i;
+    for(i=0;i<n;i++){
+        int32_t x = *lp;
+        *lp =  (((x) & 0x000000FF) << 24) |    
+        (((x) & 0x0000FF00) <<  8) |    
+        (((x) & 0x00FF0000) >>  8) |    
+        (((x) & 0xFF000000) >> 24);
+        lp++;
+    }
+}
+
 - (void) synthesizeDefaultsIntoBundle:(mb_t*)aBundle forSLot:(unsigned short)aSlot
 {
 	uint16_t s_mb_id[1] = {0x0000};
@@ -1273,6 +1287,460 @@ NSString* ORXL3ModelXl3ChargeInjChanged = @"ORXL3ModelXl3ChargeInjChanged";
 		NSLog(@"Enable charge injection failed; error: %@ reason: %@\n", [e name], [e reason]);
 	}		
 */
+}
+
+#pragma mark •••HV
+- (void) readCMOSCountForSlot:(unsigned short)aSlot counts:(check_total_count_results_t*)result
+{
+	XL3_PayloadStruct payload;
+	memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
+	payload.numberBytesinPayload = sizeof(check_total_count_results_t);
+    
+	check_total_count_args_t* data = (check_total_count_args_t*) payload.payload;
+
+    uint32_t slot = aSlot;
+    
+    if ([xl3Link needToSwap]) {
+        slot = swapLong(slot);
+    }
+    
+    data->slot_num = slot;
+    
+    @try {
+        [[self xl3Link] sendCommand:CHECK_TOTAL_COUNT_ID withPayload:&payload expectResponse:YES];
+    }
+    @catch (NSException *exception) {
+        NSLog(@"error sending readCMOSCountForSlot command.\n");
+        @throw exception;
+    }
+ 
+    if ([xl3Link needToSwap]) {
+        SwapLongBlock(data, sizeof(check_total_count_results_t)/4);
+    }
+    
+    memcpy(result, data, sizeof(check_total_count_results_t));
+}
+
+
+- (void) readCMOSCountForSlot:(unsigned short)aSlot
+{
+    check_total_count_results_t results;
+    
+    @try {
+        [self readCMOSCountForSlot:aSlot counts:&results];
+    }
+    @catch (NSException *exception) {
+        ;
+    }
+    
+    if (results.error_flags != 0) {
+        NSLog(@"XL3 error in readCMOSCountForSlot, error_flags: 0x%08x.\n", results.error_flags);
+    }
+    else{
+        NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ CMOS counts for slot: %d\n", [[self xl3Link] crateName], aSlot];
+        unsigned int i;
+        for (i=0; i<32; i++) {
+            [msg appendFormat:@"%d: %u\n", i, results.count[i]];
+        }
+        NSLog(msg);
+    }
+}
+
+- (void) readCMOSRateForSlot:(unsigned short)aSlot withChannelMask:(unsigned long)aChannelMask withDelay:(unsigned long)aDelay rates:(read_cmos_rate_results_t*)result;
+{
+	XL3_PayloadStruct payload;
+	memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
+	payload.numberBytesinPayload = sizeof(read_cmos_rate_results_t);
+    
+	read_cmos_rate_args_t* data = (read_cmos_rate_args_t*) payload.payload;
+    
+    data->slot_num = aSlot;
+    data->channel_mask = aChannelMask;
+    data->period = aDelay;
+    
+    if ([xl3Link needToSwap]) {
+        SwapLongBlock(data, 3);
+    }
+        
+    @try {
+        [[self xl3Link] sendCommand:SLOT_NOISE_RATE_ID withPayload:&payload expectResponse:YES];
+    }
+    @catch (NSException *exception) {
+        NSLog(@"error sending readCMOSCountForSlot command.\n");
+        @throw exception;
+    }
+    
+    if ([xl3Link needToSwap]) { //TODO understand why we have to swap floats!
+        SwapLongBlock(data, sizeof(read_cmos_rate_results_t)/4);
+    }
+        
+    memcpy(result, data, sizeof(read_cmos_rate_results_t));
+
+}
+
+- (void) readCMOSRateForSlot:(unsigned short) aSlot withChannelMask:(unsigned long) aChannelMask withDelay:(unsigned long) aDelay;
+{
+    read_cmos_rate_results_t results;
+    
+    @try {
+        [self readCMOSRateForSlot:aSlot withChannelMask:aChannelMask withDelay:aDelay rates:&results];
+    }
+    @catch (NSException *exception) {
+        ;
+    }
+    
+    if (results.error_flags != 0) {
+        NSLog(@"XL3 error in readCMOSCRateForSlot, error_flags: 0x%08x.\n", results.error_flags);
+    }
+    else{
+        NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ CMOS rates for slot: %d\n", [[self xl3Link] crateName], aSlot];
+        unsigned int i;
+        for (i=0; i<32; i++) {
+            if (aChannelMask & 1 << i) {
+                [msg appendFormat:@"%d: %f\n", i, results.rate[i]];
+            }
+        }
+        NSLog(msg);
+    }
+    
+}
+
+- (void) readPMTBaseCurrentsForSlot:(unsigned short)aSlot withChannelMask:(unsigned long)aChannelMask currents:(read_pmt_base_currents_results_t*)result 
+{
+	XL3_PayloadStruct payload;
+	memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
+	payload.numberBytesinPayload = sizeof(read_pmt_base_currents_results_t);
+    
+	read_pmt_base_currents_args_t* data = (read_pmt_base_currents_args_t*) payload.payload;
+    
+    data->slot_num = aSlot;
+    data->channel_mask = aChannelMask;
+    
+    if ([xl3Link needToSwap]) {
+        SwapLongBlock(data, 2);
+    }
+    
+    @try {
+        [[self xl3Link] sendCommand:READ_PMT_CURRENT_ID withPayload:&payload expectResponse:YES];
+    }
+    @catch (NSException *exception) {
+        NSLog(@"error sending readPMTBaseCurrentForSlot command.\n");
+        @throw exception;
+    }
+    
+    if ([xl3Link needToSwap]) {
+        SwapLongBlock(data, 1);
+    }
+    
+    memcpy(result, data, sizeof(read_cmos_rate_results_t));
+}
+
+- (void) readPMTBaseCurrentsForSlot:(unsigned short)aSlot withChannelMask:(unsigned long)aChannelMask
+{
+    read_pmt_base_currents_results_t results;
+    
+    @try {
+        [self readPMTBaseCurrentsForSlot:aSlot withChannelMask:aChannelMask currents:&results];
+    }
+    @catch (NSException *exception) {
+        ;
+    }
+/*    
+    if (results.error_flags != 0) {
+        NSLog(@"XL3 error in readPMTBaseCurrentsForSlot, error_flags: 0x%08x.\n", results.error_flags);
+    }
+    else{
+*/
+    NSLog(@"XL3 error in readPMTBaseCurrentsForSlot, error_flags: 0x%08x.\n", results.error_flags);
+        NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ PMT base currents for slot: %d\n", [[self xl3Link] crateName], aSlot];
+        unsigned int i;
+        for (i=0; i<32; i++) {
+            if (aChannelMask & 1 << i) {
+                [msg appendFormat:@"%d: %d\n", i, results.current_adc[i]];
+            }
+        }
+        NSLog(msg);
+    }
+//}
+
+- (void) readHVStatus:(hv_readback_results_t*)status
+{
+	XL3_PayloadStruct payload;
+	memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
+	payload.numberBytesinPayload = sizeof(hv_readback_results_t);
+        
+    @try {
+        [[self xl3Link] sendCommand:HV_READBACK_ID withPayload:&payload expectResponse:YES];
+    }
+    @catch (NSException *exception) {
+        NSLog(@"error sending readHVStatus command.\n");
+        @throw exception;
+    }
+
+    if ([xl3Link needToSwap]) { //TODO swap floats???
+        SwapLongBlock(payload.payload, sizeof(hv_readback_results_t)/4);
+        //status->error_flags = swapLong(status->error_flags);
+    }
+
+    memcpy(status, payload.payload, sizeof(hv_readback_results_t));
+}
+
+- (void) readHVStatus
+{
+    hv_readback_results_t status;
+    
+    @try {
+        [self readHVStatus:&status];
+    }
+    @catch (NSException *exception) {
+        ;
+    }
+    
+    NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ HV status: \n", [[self xl3Link] crateName]];
+    [msg appendFormat:@"voltage_top: %f\nvoltage_bot: %f\n", status.voltage_a, status.voltage_b];
+    //[msg appendFormat:@"voltage A: %f, ", status.voltage_a];
+    [msg appendFormat:@"current_top: %f\ncurrent_bot: %f\n", status.current_a, status.current_b];
+    //[msg appendFormat:@"current A: %f\n", status.current_a];
+    NSLog(msg);
+}
+
+- (void) setHVRelays:(unsigned long long)relayMask error:(unsigned long*)aError
+{
+	XL3_PayloadStruct payload;
+	memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
+	payload.numberBytesinPayload = 2;
+    
+    unsigned long* data = (unsigned long*)payload.payload;
+    data[0] = relayMask & 0xffffffffUL; //mask1 bottom
+    data[1] = relayMask >> 16;          //mask2 top
+
+    if ([xl3Link needToSwap]) {
+        SwapLongBlock(data, 2);
+    }
+
+    @try {
+        [[self xl3Link] sendCommand:SET_HV_RELAYS_ID withPayload:&payload expectResponse:YES];
+    }
+    @catch (NSException *exception) {
+        NSLog(@"error sending setHVRelays command.\n");
+        @throw exception;
+    }
+    
+    *aError = data[0];
+    
+    if ([xl3Link needToSwap]) {
+        *aError = swapLong(*aError);
+    }    
+}
+
+- (void) setHVRelays:(unsigned long long)relayMask
+{
+    unsigned long error;
+    
+    @try {
+        [self setHVRelays:relayMask error:&error];
+    }
+    @catch (NSException *exception) {
+        ;
+    }
+    
+    if (error != 0) {
+        NSLog(@"XL3 error in setHVRelays relays were NOT set\n");
+    }
+    else{
+        NSLog(@"HV relays set.\n");
+    }
+}
+
+- (void) setHVSwitchOnForTop:(BOOL)aIsOn forBottom:(BOOL)bIsOn
+{
+	unsigned long xl3Address = XL3_SEL | [self getRegisterAddress:kXl3HvCsReg] | WRITE_REG;
+	unsigned long aValue = 0UL;
+
+    if (aIsOn) aValue |= 1UL;
+    if (bIsOn) aValue |= 0x10000UL;
+    
+	@try {
+		[xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
+	}
+	@catch (NSException* e) {
+		NSLog(@"XL3 error writing XL3 HV CS register\n");
+        @throw e;
+	}
+}
+
+- (void) readHVSwitchOnForTop:(BOOL*)aIsOn forBottom:(BOOL*)bIsOn
+{
+	unsigned long xl3Address = XL3_SEL | [self getRegisterAddress:kXl3HvCsReg] | READ_REG;
+	unsigned long aValue = 0UL;
+    
+	@try {
+		[xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
+	}
+	@catch (NSException* e) {
+		NSLog(@"XL3 error reading XL3 HV CS register\n");
+        @throw e;
+	}
+    
+    *aIsOn = aValue & 0x1;
+    *bIsOn = aValue & 0x10000;
+}
+
+- (void) readHVSwitchOn
+{
+    BOOL switchAIsOn;
+    BOOL switchBIsOn;
+    
+    @try {
+        [self readHVSwitchOnForTop:&switchAIsOn forBottom:&switchBIsOn];
+    }
+    @catch (NSException *exception) {
+        NSLog(@"XL3 error in readHVSwitchOn\n");
+        return;
+    }
+
+    NSLog(@"switch A (top) is %@, switch B (bottom) is %@.\n", switchAIsOn?@"ON":@"OFF", switchBIsOn?@"ON":@"OFF");
+}
+
+- (void) readHVInterlockGood:(BOOL*)isGood
+{
+	unsigned long xl3Address = XL3_SEL | [self getRegisterAddress:kXl3HvCsReg] | READ_REG;
+	unsigned long aValue = 0UL;
+    
+	@try {
+		[xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
+	}
+	@catch (NSException* e) {
+		NSLog(@"XL3 error reading XL3 HV CS register\n");
+        @throw e;
+	}
+    
+    *isGood = aValue & 0x4;
+}
+
+- (void) readHVInterlock
+{
+    BOOL isGood;
+    
+    @try {
+        [self readHVInterlockGood:&isGood];
+    }
+    @catch (NSException *exception) {
+        NSLog(@"XL3 error in readHVSwitchOn\n");
+        return;
+    }
+    
+    NSLog(@"HV interlock is %@\n", isGood?@"GOOD":@"BAD");
+}
+
+- (void) setHVDacA:(unsigned short)aDac dacB:(unsigned short)bDac
+{
+ 	unsigned long xl3Address = XL3_SEL | [self getRegisterAddress:kXl3HvSetPointReg] | WRITE_REG;
+	unsigned long aValue = 0UL;
+    
+    aValue |= aDac & 0xFFFUL;
+    aValue |= (bDac & 0xFFFUL) << 16;
+    
+	@try {
+		[xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
+	}
+	@catch (NSException* e) {
+		NSLog(@"XL3 error writing XL3 HV CS register\n");
+	}
+}
+
+//TODO: pass erroflags
+- (void) loadSingleDacForSlot:(unsigned short)aSlot dacNum:(unsigned short)aDacNum dacVal:(unsigned char)aDacVal
+{
+ 	XL3_PayloadStruct payload;
+	memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
+	payload.numberBytesinPayload = sizeof(loadsdac_args_t);
+    
+    loadsdac_args_t* data = (loadsdac_args_t*)payload.payload;
+    loadsdac_results_t* result = (loadsdac_results_t*)payload.payload;
+    data->slot_num = aSlot;
+    data->dac_num = aDacNum;
+    data->dac_value = aDacVal;
+    
+    if ([xl3Link needToSwap]) {
+        SwapLongBlock(data, 3);
+    }
+    
+    @try {
+        [[self xl3Link] sendCommand:LOADSDAC_ID withPayload:&payload expectResponse:YES];
+    }
+    @catch (NSException *exception) {
+        NSLog(@"error sending loadSingleDac command.\n");
+        @throw exception;
+    }
+    
+    if ([xl3Link needToSwap]) {
+        result->error_flags = swapLong(result->error_flags);
+    }
+    
+    if (result->error_flags) {
+        NSLog(@"loadSingleDac failed with error_flags: 0x%x.\n", result->error_flags);
+    }
+}
+
+- (void) setVthrDACsForSlot:(unsigned short)aSlot withChannelMask:(unsigned long)aChannelMask dac:(unsigned char)aDac
+{
+    //setVthr loading single DAC at the time. works fine. takes 0.5 sec per DAC.
+/*
+    unsigned short i;
+    for (i=0; i<32; i++) {
+        if (aChannelMask & (1<<i)) {
+            @try {
+                [self loadSingleDacForSlot:aSlot dacNum:25+i dacVal:aDac]; 
+            }
+            @catch (NSException *exception) {
+                NSLog(@"Error in setVthrDACsFor slot: %d in channel: %d\n", aSlot, i);
+                return;
+            }
+        }
+    }
+    NSLog(@"Set VthrDACs for slot: %d\n", aSlot);
+*/
+
+ 	XL3_PayloadStruct payload;
+	memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
+	payload.numberBytesinPayload = sizeof(multi_loadsdac_args_t);
+    
+    multi_loadsdac_args_t* data = (multi_loadsdac_args_t*)payload.payload;
+    multi_loadsdac_results_t* result = (multi_loadsdac_results_t*)payload.payload;
+
+    unsigned short i;
+    for (i=0; i<32; i++) {
+        if (aChannelMask & (1<<i)) {
+            data->dacs[data->num_dacs].slot_num = aSlot;
+            data->dacs[data->num_dacs].dac_num = 25+i;
+            data->dacs[data->num_dacs].dac_value = aDac;
+            data->num_dacs++;
+        }
+    }
+
+    if ([xl3Link needToSwap]) {
+        SwapLongBlock(data, sizeof(multi_loadsdac_args_t)/4);
+    }
+    
+    @try {
+        [[self xl3Link] sendCommand:MULTI_LOADSDAC_ID withPayload:&payload expectResponse:YES];
+    }
+    @catch (NSException *exception) {
+        NSLog(@"Error in setVthrDACsFor slot: %d\n", aSlot);
+        return;
+    }
+        
+    if ([xl3Link needToSwap]) {
+        result->error_flags = swapLong(result->error_flags);
+    }
+    
+    if (result->error_flags) {
+        NSLog(@"set Vthr DACs for slot %d failed with error_flag:0x%x\n", aSlot, result->error_flags);
+    }
+    else {
+        NSLog(@"set Vthr DACs for slot %d\n", aSlot);
+    }
 }
 
 @end

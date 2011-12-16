@@ -415,6 +415,27 @@ typedef struct{
 } check_total_count_results_t;
 
 typedef struct{
+    uint32_t slot_num;
+    uint32_t channel_mask;
+    uint32_t period;
+} read_cmos_rate_args_t;
+
+typedef struct{
+    uint32_t error_flags;
+    float rate[32];
+} read_cmos_rate_results_t;
+
+typedef struct{
+    uint32_t slot_num;
+    uint32_t channel_mask;
+} read_pmt_base_currents_args_t;
+
+typedef struct{
+    uint32_t error_flags;
+    uint8_t current_adc[32];
+} read_pmt_base_currents_results_t;
+
+typedef struct{
     uint32_t cmd_in_rejected;
     uint32_t transfer_error;
     uint32_t xl3_data_avail_unknown;

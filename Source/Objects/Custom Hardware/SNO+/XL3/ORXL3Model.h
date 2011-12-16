@@ -179,7 +179,28 @@ enum {
 - (void) compositeResetXL3StateMachine;
 - (void) compositeEnableChargeInjection;
 - (void) reset;
-- (void) enableChargeInjectionForSlot:(unsigned short) aSlot channelMask:(unsigned long) aChannelMask;
+- (void) enableChargeInjectionForSlot:(unsigned short)aSlot channelMask:(unsigned long)aChannelMask;
+
+#pragma mark •••HV
+- (void) readCMOSCountForSlot:(unsigned short)aSlot counts:(check_total_count_results_t*)aCounts;
+- (void) readCMOSCountForSlot:(unsigned short)aSlot;
+- (void) readCMOSRateForSlot:(unsigned short)aSlot withChannelMask:(unsigned long)aChannelMask withDelay:(unsigned long)aDelay rates:(read_cmos_rate_results_t*)aRates;
+- (void) readCMOSRateForSlot:(unsigned short) aSlot withChannelMask:(unsigned long)aChannelMask withDelay:(unsigned long)aDelay;
+- (void) readPMTBaseCurrentsForSlot:(unsigned short)aSlot withChannelMask:(unsigned long)aChannelMask currents:(read_pmt_base_currents_results_t*)result;
+- (void) readPMTBaseCurrentsForSlot:(unsigned short)aSlot withChannelMask:(unsigned long)aChannelMask;
+- (void) readHVStatus:(hv_readback_results_t*)status;
+- (void) readHVStatus;
+- (void) setHVRelays:(unsigned long long)relayMask error:(unsigned long*)aError;
+- (void) setHVRelays:(unsigned long long)relayMask;
+- (void) setHVSwitchOnForTop:(BOOL)aIsOn forBottom:(BOOL)bIsOn;
+- (void) readHVSwitchOnForTop:(BOOL*)aIsOn forBottom:(BOOL*)bIsOn;
+- (void) readHVSwitchOn;
+- (void) readHVInterlockGood:(BOOL*)isGood;
+- (void) readHVInterlock;
+- (void) setHVDacA:(unsigned short)aDac dacB:(unsigned short)bDac;
+
+- (void) loadSingleDacForSlot:(unsigned short)aSlot dacNum:(unsigned short)aDacNum dacVal:(unsigned char)aDacVal;
+- (void) setVthrDACsForSlot:(unsigned short)aSlot withChannelMask:(unsigned long)aChannelMask dac:(unsigned char)aDac;
 
 - (id) writeHardwareRegisterCmd:(unsigned long) aRegister value:(unsigned long) aBitPattern;
 - (id) readHardwareRegisterCmd:(unsigned long) regAddress;
