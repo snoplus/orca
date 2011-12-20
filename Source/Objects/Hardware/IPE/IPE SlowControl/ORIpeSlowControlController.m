@@ -652,7 +652,7 @@
 
 - (IBAction) dumpSensorAction:(id)sender
 {
-    [model dumpSensorlist];// dumps the requestCache -tb-
+    [model dumpSensorlist];// dumps the requestCache and others  -tb-
 }
 
 //adei/ipe list view context menu

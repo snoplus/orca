@@ -476,6 +476,13 @@
 - (NSDictionary*) dataRecordDescription;
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 
+#pragma mark •••Related to Adc or Bit Processing Protocol
+// methods for setting LoAlarm, HiAlarm, LoLimit (=minValue), HiLimit (=maxValue)
+- (void) setLoAlarmForChan:(int)channel value:(double)aValue;
+- (void) setHiAlarmForChan:(int)channel value:(double)aValue;
+- (void) setLoLimitForChan:(int)channel value:(double)aValue;
+- (void) setHiLimitForChan:(int)channel value:(double)aValue;
+
 #pragma mark •••Adc or Bit Processing Protocol
 - (void)processIsStarting;
 - (void)processIsStopping;
@@ -505,6 +512,7 @@
 
 - (int) findChanOfSensor:(NSString*)aUrl path:(NSString*)aPath;
 - (int) findChanOfControl:(NSString*)aUrl path:(NSString*)aPath;
+- (int) findChanOfItem:(NSString*)aUrl path:(NSString*)aPath;
 
 - (void) sendControlSetpointForChan:(int)aChan value:(double)aValue;
 - (void) queueControlSetpointForChan:(int)aChan value:(double)aValue;

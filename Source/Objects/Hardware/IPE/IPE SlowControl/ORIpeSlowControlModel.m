@@ -50,6 +50,10 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 //Removed connector MAH May 18,2010
 //NSString* ORADEIInConnection						= @"ORADEIInConnection";
 
+@interface NSString (ParsingExtensions)
+-(NSArray *)csvRows;
+@end
+
 #define IPE_SLOW_CONTROL_SHORT_NAME @"IPE-ADEI"
 
 @interface ORIpeSlowControlModel (private)
@@ -79,6 +83,8 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 {
     //FZK-internal: [self setAdeiServiceUrl: @"http://ipepdvadei.ka.fzk.de/adei/services/"];//TODO: make attribute -tb-
     [self setIPNumber: @"fuzzy.fzk.de/adei"];
+	if(!requestCache)   requestCache = [[NSMutableDictionary dictionary] retain];
+	if(!pollingLookUp)  pollingLookUp = [[NSMutableArray array] retain];
 	return self;
 }
 
@@ -911,21 +917,21 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 //input: URL, manual path, controlType, channelNumber
 
 	//CHECK WHETHER PATH has length 4 and URL not empty ...  -tb-
-	int componentCount = [[manualPath componentsSeparatedByString:@"/"] count];
+	int componentCount = [[aPath componentsSeparatedByString:@"/"] count];
 	if(componentCount!=4){
 	    NSLog(@"Path %@ needs to have 4 items, but has %i items!\n",manualPath,componentCount);
 	    return -1;
 	}
 
 	//convert a host name xxx.xxx.xxx to a url of form http://xxxx.xxx.xxx, see - (NSString*) ipNumberToURL
-	NSMutableString* goodUrl = [NSMutableString stringWithString: [self IPNumber]];
+	NSMutableString* goodUrl = [NSMutableString stringWithString: aUrl];
 	if([goodUrl length]){
 		if(![goodUrl hasPrefix:   @"http://"]) [goodUrl insertString: @"http://"  atIndex: 0];
 		if(![goodUrl hasSuffix:   @"/"]) [goodUrl appendString: @"/"];
 	}
 
     NSString* itemKey = nil;
-    itemKey = [self itemKey:goodUrl:manualPath];
+    itemKey = [self itemKey:goodUrl:aPath];
 	NSMutableDictionary* topLevelDictionary = [requestCache objectForKey:itemKey];
 	if(topLevelDictionary){//channel/item already exists
 	    //search the channel
@@ -942,6 +948,7 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 
     //see - (void) addItems:(NSArray*)anItemArray
 	int aChannelNumber = aChan; 
+	if( nil != [channelLookup objectForKey:[NSNumber numberWithInt:aChan]]) aChan = -1; // if chan is already used, choose a other chan number
 	if(aChan==-1) aChannelNumber = [self nextUnusedChannelNumber]; //find an unused channel number in the polling List
 	topLevelDictionary = [self makeTopLevelDictionary];
 	[topLevelDictionary setObject:[NSNumber numberWithInt:aChannelNumber]	forKey:@"ChannelNumber"]; //channel number for access by the processing system
@@ -952,7 +959,7 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 	NSMutableDictionary* secondLevelDictionary = [NSMutableDictionary dictionaryWithObjectsAndKeys:
 	    @"yet unknown",    @"Name",
 		goodUrl,           @"URL",
-		manualPath,        @"Path",
+		aPath,			   @"Path",
 	    @"--",             @"Value",
 	nil ];
 	if(isControl==1) [secondLevelDictionary setValue:[NSNumber numberWithInt:1]  forKey:@"Control"];
@@ -1007,6 +1014,10 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 	
 	requestCache =				[[decoder decodeObjectForKey: @"requestCache"]retain];
 	pollingLookUp =				[[decoder decodeObjectForKey: @"pollingLookUp"]retain];
+
+	if(!requestCache)   requestCache = [[NSMutableDictionary dictionary] retain];
+	if(!pollingLookUp)  pollingLookUp = [[NSMutableArray array] retain];
+
 	[self makeChannelLookup];
 	[[self undoManager] enableUndoRegistration];
      
@@ -1069,6 +1080,37 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 {
     [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"IP320"];
 }
+
+#pragma mark •••Related to Adc or Bit Processing Protocol
+// methods for setting LoAlarm, HiAlarm, LoLimit (=minValue), HiLimit (=maxValue)
+- (void) setLoAlarmForChan:(int)channel value:(double)aValue
+{
+    NSString *itemKey = [channelLookup objectForKey:[NSNumber numberWithInt:channel]];
+	NSMutableDictionary* topLevelDictionary	= [requestCache objectForKey:itemKey];
+	[topLevelDictionary setObject: [NSString stringWithFormat:@"%f",aValue] forKey: @"LoAlarm"];
+}
+
+- (void) setHiAlarmForChan:(int)channel value:(double)aValue
+{
+    NSString *itemKey = [channelLookup objectForKey:[NSNumber numberWithInt:channel]];
+	NSMutableDictionary* topLevelDictionary	= [requestCache objectForKey:itemKey];
+	[topLevelDictionary setObject: [NSString stringWithFormat:@"%f",aValue] forKey: @"HiAlarm"];
+}
+
+- (void) setLoLimitForChan:(int)channel value:(double)aValue
+{
+    NSString *itemKey = [channelLookup objectForKey:[NSNumber numberWithInt:channel]];
+	NSMutableDictionary* topLevelDictionary	= [requestCache objectForKey:itemKey];
+	[topLevelDictionary setObject: [NSString stringWithFormat:@"%f",aValue] forKey: @"LoLimit"];
+}
+
+- (void) setHiLimitForChan:(int)channel value:(double)aValue
+{
+    NSString *itemKey = [channelLookup objectForKey:[NSNumber numberWithInt:channel]];
+	NSMutableDictionary* topLevelDictionary	= [requestCache objectForKey:itemKey];
+	[topLevelDictionary setObject: [NSString stringWithFormat:@"%f",aValue] forKey: @"HiLimit"];
+}
+
 
 #pragma mark •••Adc or Bit Processing Protocol
 /** This is called once per "processing" cycle and is called at the begin of the process cycle.
@@ -1312,15 +1354,154 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 
 }
 
+
+/*
+NSStringEncoding
+
+Type for string encoding.
+
+typedef NSUInteger NSStringEncoding;
+
+Discussion
+
+See “String Encodings” for possible values.
+Availability
+
+    * Available in Mac OS X v10.0 and later.
+
+Declared In
+NSString.h
+String Encodings
+
+The following constants are provided by NSString as possible string encodings.
+
+enum {
+   NSASCIIStringEncoding = 1,
+   NSNEXTSTEPStringEncoding = 2,
+   NSJapaneseEUCStringEncoding = 3,
+   NSUTF8StringEncoding = 4,
+   NSISOLatin1StringEncoding = 5,
+   NSSymbolStringEncoding = 6,
+   NSNonLossyASCIIStringEncoding = 7,
+   NSShiftJISStringEncoding = 8,
+   NSISOLatin2StringEncoding = 9,
+   NSUnicodeStringEncoding = 10,
+   NSWindowsCP1251StringEncoding = 11,
+   NSWindowsCP1252StringEncoding = 12,
+   NSWindowsCP1253StringEncoding = 13,
+   NSWindowsCP1254StringEncoding = 14,
+   NSWindowsCP1250StringEncoding = 15,
+   NSISO2022JPStringEncoding = 21,
+   NSMacOSRomanStringEncoding = 30,
+   NSUTF16StringEncoding = NSUnicodeStringEncoding,
+   NSUTF16BigEndianStringEncoding = 0x90000100,
+   NSUTF16LittleEndianStringEncoding = 0x94000100,
+   NSUTF32StringEncoding = 0x8c000100,
+   NSUTF32BigEndianStringEncoding = 0x98000100,
+   NSUTF32LittleEndianStringEncoding = 0x9c000100,
+   NSProprietaryStringEncoding = 65536
+};
+
+*/
 - (BOOL) loadChannelTableFile:(NSString*) filename
 {
 	NSLog(@"Called: %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: debug output -tb-
+
+    NSStringEncoding encoding=0;
+	
+    NSError* error=nil;
+    NSString* myString = [NSString stringWithContentsOfFile:filename usedEncoding:&encoding error:&error];
+	if(error) NSLog(@"Error >>>%@<<<\n",error);
+	if(!myString){
+	    NSLog(@"Could not read file!\n");
+	    return FALSE;
+	}
+	//NSLog(@"Encoding >>>%i<<<\n",encoding);
+	//NSLog(@"Read string >>>%@<<<\n",myString);
+    //NSLog(@"Read with encoding %@ string >>>%@<<<\n",&encoding,myString);
+
+    NSArray *csvtable = [myString csvRows];
+	if(!csvtable) return FALSE;
+	int nlines = [csvtable count];
+	//if(csvtable) NSLog(@"csvtable (%i lines) >>>%@<<<\n", nlines, csvtable);//TODO: enable with debug output setting??? -tb-
+	if(nlines<=1) return FALSE;
+	
+	int indexChan, indexName, indexURL, indexPath, indexLoAlarm, indexHiAlarm, indexLoLimit, indexHiLimit, indexType;
+	NSArray *colnames = [csvtable objectAtIndex: 0];
+	indexChan = [colnames indexOfObject: @"Chan"];
+	indexName = [colnames indexOfObject: @"Name"];
+	indexURL = [colnames indexOfObject: @"URL"];
+	indexPath = [colnames indexOfObject: @"Path"];
+	indexLoAlarm = [colnames indexOfObject: @"LoAlarm"];
+	indexHiAlarm = [colnames indexOfObject: @"HiAlarm"];
+	indexLoLimit = [colnames indexOfObject: @"LoLimit"];
+	indexHiLimit = [colnames indexOfObject: @"HiLimit"];
+	indexType = [colnames indexOfObject: @"Type"];
+	
+	
+	//NSLog(@"colnames >>>%@<<<\n", colnames);
+	//NSLog(@"indexChan, indexName, indexURL, indexPath, indexLoAlarm, indexHiAlarm, indexLoLimit, indexHiLimit, indexType is %i, %i, %i, %i, %i, %i, %i, %i, %i \n", 
+	//        indexChan, indexName, indexURL, indexPath, indexLoAlarm, indexHiAlarm, indexLoLimit, indexHiLimit, indexType);
+
+    //now create channels
+    NSArray *line;
+	int chan=0, chantest, newchan, controlType=0;
+	NSString *url;
+	NSString *path;
+	NSString *type;
+	NSString *itemKey;
+	int i;
+    for(i=1; i<nlines; i++){
+	    line = [csvtable objectAtIndex: i];
+		//NSLog(@"Scan line: %@  \n",line);
+	    chan = [[line  objectAtIndex: indexChan] intValue];
+		//NSLog(@"---> search chan: %i  \n",chan);
+//[self dumpSensorlist];// dumps the requestCache and others  -tb-
+
+        itemKey = [channelLookup objectForKey:[NSNumber numberWithInt:chan]];
+		if(itemKey) NSLog(@"The channel %i is already used by %@!\n",chan,itemKey);
+	    url =  [line  objectAtIndex: indexURL] ;
+	    path =  [line  objectAtIndex: indexPath] ;
+		chantest = [self findChanOfItem: url path: path];
+		if(chantest != -1){
+		    NSLog(@"This item already exists! (%@  ,  %@)\n",url,path);
+			continue;
+		}
+	    chan = [[line  objectAtIndex: indexChan] intValue];
+		type = [line  objectAtIndex: indexType] ;
+		controlType = 0; //Sensor
+		if([type isEqualToString:@"Control"]) controlType=1;
+		
+		//create new chan
+		//NSLog(@"Create: URL:%@  ,  path:%@  \n",url,path);
+		newchan = [self createChannelWithUrl:url path:path chan:chan controlType:controlType];// if chan already used, it will assign a free chan and return it
+		if(newchan != chan) NSLog(@"Created chan %i instead of chan %i with  URL:%@  ,  path:%@  \n",newchan, chan, url,path);
+        //... and make settings
+		itemKey = [channelLookup objectForKey:[NSNumber numberWithInt:chan]];
+	    NSMutableDictionary* topLevelDictionary	= [requestCache objectForKey:itemKey];
+		NSMutableDictionary* itemDictionary = [topLevelDictionary objectForKey:itemKey];
+		[topLevelDictionary setObject:[line objectAtIndex: indexLoAlarm]  forKey:@"LoAlarm"];
+		[topLevelDictionary setObject:[line objectAtIndex: indexHiAlarm]  forKey:@"HiAlarm"];
+		[topLevelDictionary setObject:[line objectAtIndex: indexLoLimit]  forKey:@"LoLimit"];
+		[topLevelDictionary setObject:[line objectAtIndex: indexHiLimit]  forKey:@"HiLimit"];
+		if(controlType) [itemDictionary setObject:[line objectAtIndex: indexName]  forKey:@"name"];
+		else  [itemDictionary setObject:[line objectAtIndex: indexName]  forKey:@"Name"];
+	}
+
 	return FALSE;
 }
 
 - (BOOL) saveAsChannelTableFile:(NSString*) filename
 {
 	NSLog(@"Called: %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: debug output -tb-
+	NSMutableString *csvtableString = [NSMutableString stringWithString: @"Chan,Name,URL,Path,LoAlarm,HiAlarm,LoLimit,HiLimit,Type\n"];
+	
+	int chan=0;
+	int LoAlarm,HiAlarm,LoLimit,HiLimit;
+	NSString *name;
+	NSString *url;
+	NSString *path;
+	NSString *type;
 	
 	for(NSString* itemKey in pollingLookUp){
 	    NSLog(@"Write Item %@\n",itemKey);
@@ -1328,6 +1509,9 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 		NSDictionary* itemDictionary = [topLevelDictionary objectForKey:itemKey];
 		
 		int isControlType = [[itemDictionary objectForKey:@"Control"] intValue];
+		
+		//output for testing
+		#if 0
 		NSLog(@"  Chan: %i\n",[[topLevelDictionary objectForKey:@"ChannelNumber"] intValue]);
 		if(isControlType) NSLog(@"  Name: %@\n",[itemDictionary objectForKey:@"name"]);
 		else NSLog(@"  Name: %@\n",[itemDictionary objectForKey:@"Name"]);
@@ -1338,8 +1522,29 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 		NSLog(@"  LoLimit: %@\n",[topLevelDictionary objectForKey:@"LoLimit"]);
 		NSLog(@"  HiLimit: %@\n",[topLevelDictionary objectForKey:@"HiLimit"]);
 		NSLog(@"  Type: %@\n", isControlType  == 1 ? @"Control" : @"Sensor");
+		#endif
+		
+		chan =[[topLevelDictionary objectForKey:@"ChannelNumber"] intValue];
+		if(isControlType) name = [itemDictionary objectForKey:@"name"];
+		else name = [itemDictionary objectForKey:@"Name"];
+		url = [itemDictionary objectForKey:@"URL"];
+		path = [itemDictionary objectForKey:@"Path"];
+		LoAlarm = [[topLevelDictionary objectForKey:@"LoAlarm"] doubleValue];
+		HiAlarm = [[topLevelDictionary objectForKey:@"HiAlarm"] doubleValue];
+		LoLimit = [[topLevelDictionary objectForKey:@"LoLimit"] doubleValue];
+		HiLimit = [[topLevelDictionary objectForKey:@"HiLimit"] doubleValue];
+		
+		if(isControlType) type = @"Control" ; else type = @"Sensor";
+		[csvtableString appendFormat: @"%i,\"%@\",\"%@\",\"%@\",%i,%i,%i,%i,\"%@\"\n",chan,name,url,path,LoAlarm,HiAlarm,LoLimit,HiLimit,type];
+		
 	}
-	return FALSE;
+	    
+	//NSLog(@"TABLE:>>>%@<<<\n",csvtableString);
+	BOOL success = [csvtableString writeToFile: filename atomically: YES encoding: NSASCIIStringEncoding  error: nil];
+	//could use [filename stringByExpandingTildeInPath] instead of filename -tb-
+	if(!success) NSLog(@"ERROR during writing the channel table to %@ ...\n",filename);
+	
+	return success;
 }
 
 //customn method to create a sensor (calling createChannelWithUrl:...)
@@ -1348,7 +1553,7 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 
 //customn method to create a control (calling createChannelWithUrl:...)
 - (int) createControlWithUrl:(NSString*)aUrl path:(NSString*)aPath
-{    return [self  createChannelWithUrl:aUrl path:aPath chan:-1 controlType:0];      }
+{    return [self  createChannelWithUrl:aUrl path:aPath chan:-1 controlType:1];      }
 
 //customn method to create a sensor (calling createChannelWithUrl:...)
 - (int) createSensorWithUrl:(NSString*)aUrl path:(NSString*)aPath chan:(int)aChan
@@ -1356,7 +1561,7 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 
 //customn method to create a control (calling createChannelWithUrl:...)
 - (int) createControlWithUrl:(NSString*)aUrl path:(NSString*)aPath chan:(int)aChan
-{    return [self  createChannelWithUrl:aUrl path:aPath chan:aChan controlType:0];      }
+{    return [self  createChannelWithUrl:aUrl path:aPath chan:aChan controlType:1];      }
 
 
 - (int) findChanOfSensor:(NSString*)aUrl path:(NSString*)aPath
@@ -1378,6 +1583,15 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 	NSDictionary* itemDictionary		= [topLevelDictionary objectForKey:itemKey];
 	if([itemDictionary objectForKey:@"Control"]) channelNumber = [[topLevelDictionary objectForKey:@"ChannelNumber"] intValue];
     else NSLog(@"%@: no Control channel found, is a non-Control channel!\n",NSStringFromClass([self class]));//-tb- warning output //is a Sensor, not a Control
+    return channelNumber;
+}
+
+- (int) findChanOfItem:(NSString*)aUrl path:(NSString*)aPath
+{
+    int channelNumber=-1;
+    NSString* itemKey = [self itemKey:aUrl :aPath];
+	NSDictionary* topLevelDictionary	= [requestCache objectForKey:itemKey];
+	if(topLevelDictionary) channelNumber = [[topLevelDictionary objectForKey:@"ChannelNumber"] intValue];
     return channelNumber;
 }
 
@@ -1829,7 +2043,11 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 //TODO: is this only for undo? who sets channel number? it is called only from addItems: and polledItemResult: -tb-
 - (void) addItemKeyToPollingLookup:(NSString *)anItemKey
 {
+	//NSLog(@"Called: %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: debug output -tb-
     [[[self undoManager] prepareWithInvocationTarget:self] removeItemKeyFromPollingLookup:anItemKey];
+
+    //WARNING: if pollingLookUp does not exist channel list handlich won't work! -tb- 
+	if(!pollingLookUp)  pollingLookUp = [[NSMutableArray array] retain];
 
 	[pollingLookUp addObject:anItemKey];
 
