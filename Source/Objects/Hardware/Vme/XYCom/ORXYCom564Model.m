@@ -490,7 +490,6 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
         if (i>=channelsToRead) {
             [chanADCVals replaceObjectAtIndex:i withObject:[NSNumber numberWithShort:0]];
         } else {
-            readOut[i] = ((readOut[i] & 0xFF) << 8) | (readOut[i] >> 8);
             [chanADCVals replaceObjectAtIndex:i withObject:[NSNumber numberWithShort:readOut[i]]];            
         }
     }

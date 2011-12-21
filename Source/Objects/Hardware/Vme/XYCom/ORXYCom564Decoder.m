@@ -48,6 +48,11 @@
 		ptr++;	//channel
 		int chan   = (*ptr>>16) & 0x000000ff;
 		long rawValue = (*ptr & 0x0000ffff);
+        if (rawValue < 32767) {
+            rawValue += 32767;
+        } else {
+            rawValue -= 32767;
+        }
 		[aDataSet loadTimeSeries:rawValue atTime:theTime sender:self withKeys:@"XYCom564",@"Time Series",crateKey,cardKey,[self getChannelKey:chan],nil];
         [aDataSet histogram:rawValue numBins:0xffff sender:self  withKeys:@"XYCom564", @"Hist",crateKey,cardKey,[self getChannelKey:chan],nil];
     }
