@@ -274,7 +274,7 @@
 }
 - (IBAction) writeCurrentTripAction:(id)sender
 {
-    [model setWriteToSetOverVoltageProtectionTripPoint:[sender floatValue] withOutput:[sender tag]];
+    [model setWriteToSetOverCurrentProtectionTripPoint:[sender floatValue] withOutput:[sender tag]];
 }
 
 - (IBAction) writeOutputStatusAction:(id)sender
