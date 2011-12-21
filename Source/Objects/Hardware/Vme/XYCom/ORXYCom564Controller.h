@@ -28,6 +28,9 @@
 #endif
 
 {	
+    
+    IBOutlet NSTabView* 	tabView;
+    
     // Register Box
 	IBOutlet NSTextField*   slotField;
 	IBOutlet NSTextField*   addressText;
@@ -61,10 +64,16 @@
     
     IBOutlet NSButton*      shipRecordsButton;
     IBOutlet NSButton*      pollButton;    
+    IBOutlet NSPopUpButton*	interpretADCAsPopUp;    
     
     IBOutlet NSTableView*   adcCountsAndChannels;
     
     IBOutlet NSTextField*	pollingState;
+    
+    NSView *blankView;
+    NSSize settingsSize;
+    NSSize gainsSize;
+    NSSize channelReadoutSize;    
 	 
 }
 
@@ -106,6 +115,9 @@
 - (IBAction) report:(id)sender;
 - (IBAction) setAllChannelGains:(id)sender;
 - (IBAction) setOneChannelGain:(id)sender;
+
+#pragma mark •••Data Source
+- (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;
 
 #pragma mark •••Misc Helpers
 - (void) populatePopups;
