@@ -28,6 +28,7 @@ typedef struct HPPulserCustomWaveformStruct {
 	NSString*       waveformName;
 	NSString*       storageName;
 	bool			tryToStore;
+    bool            builtInFunction;
 } HPPulserCustomWaveformStruct; 
 
 #define kCalibrationWidth 	7.8  //can't set exactly to 8 because of a bug in the HP pulser
@@ -63,6 +64,12 @@ typedef struct HPPulserCustomWaveformStruct {
     BOOL			negativePulse;
 	
 	enum {
+                kBuiltInSine,
+                kBuiltInSquare,
+                kBuiltInRamp,
+                kBuiltInPulse,
+                kBuiltInNoise,
+                kBuiltInDC,
 		kBuiltInSinc,
 		kBuiltInNegRamp,
 		kBuiltInExpRise,
@@ -89,7 +96,7 @@ typedef struct HPPulserCustomWaveformStruct {
     } userWaveformConsts;
 	
 	enum {
-		kNumBuiltInTypes = 5
+		kNumBuiltInTypes = 11
 	} numBuiltInTypes;
 	
 	enum {
@@ -221,6 +228,8 @@ typedef struct HPPulserCustomWaveformStruct {
 - (BOOL) inCustomList:(NSString*)aName;
 - (BOOL) inBuiltInList:(NSString*)aName;
 - (float) calculateFreq:(float)width;
+- (unsigned int) numberOfWaveforms;
+- (NSString*) nameOfWaveformAt:(unsigned int)position;
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)aDecoder;

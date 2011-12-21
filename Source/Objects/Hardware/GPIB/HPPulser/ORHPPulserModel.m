@@ -62,28 +62,34 @@ NSString* ORHPPulserMaxTimeChangedNotification		= @"ORHPPulserMaxTimeChangedNoti
 NSString* ORHPPulserRandomCountChangedNotification	= @"ORHPPulserRandomCountChangedNotification";
 
 static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
-{ @"Sinc Wave",         @"SINC",      NO },
-{ @"Negative Ramp",     @"NEG_RAMP",  NO },
-{ @"Exponential Rise",  @"EXP_RISE",  NO },
-{ @"Exponential Fall",  @"EXP_FALL",  NO },
-{ @"Cardiac Wave",      @"CARDIAC",   NO },
-{ @"Square Wave 1",     @"",          NO },
-{ @"Single Sin 1",      @"SGLSIN",    YES },
-{ @"Single Sin 2",      @"SGLSI2",    YES },
-{ @"Square Wave 2",     @"SQW2",      YES },
-{ @"Double Sin Wave",   @"DBLSIN",    YES },
-{ @"LogAmp Calib",      @"CALIB",     YES },
-{ @"LogAmp Calib/2",    @"CALI1",     NO },
-{ @"LogAmp Calib/4",    @"CALI2",     NO },
-{ @"Double LogAmp",     @"DBLLOG",    YES },
-{ @"Triple LogAmp",     @"TRPLOG",    YES },
-{ @"LogAmp Adj",        @"AMPADJ",    YES },
-{ @"Gaussian",          @"GSSIAN",    NO },
-{ @"Pin Diode",          @"PINDD",    NO },
-{ @"Needle",          @"NEEDLE",    NO },
-{ @"GermaniumHighE",    @"GEHIGHE",    NO },
-{ @"GermaniumLowE",     @"GELOWE",    NO },
-{ @"From File",         @"",          NO },
+{ @"Sine Wave",         @"SIN",      NO , YES },
+{ @"Square Wave",       @"SQU",      NO , YES },
+{ @"Ramp",              @"RAMP",     NO , YES },
+{ @"Pulse Wave",        @"PULS",     NO , YES },
+{ @"Noise",             @"NOIS",     NO , YES },
+{ @"DC Wave",           @"DC",       NO , YES },
+{ @"Built-in Sinc Wave",@"SINC",     NO , NO },
+{ @"Built-in Neg Ramp", @"NEG_RAMP", NO , NO },
+{ @"Built-in Exp Rise", @"EXP_RISE", NO , NO },
+{ @"Built-in Exp Fall", @"EXP_FALL", NO , NO },
+{ @"Cardiac Wave",      @"CARDIAC",  NO , NO },
+{ @"Square Wave 1",     @"",         NO , NO },
+{ @"Single Sin 1",      @"SGLSIN",   YES, NO },
+{ @"Single Sin 2",      @"SGLSI2",   YES, NO },
+{ @"Square Wave 2",     @"SQW2",     YES, NO },
+{ @"Double Sin Wave",   @"DBLSIN",   YES, NO },
+{ @"LogAmp Calib",      @"CALIB",    YES, NO },
+{ @"LogAmp Calib/2",    @"CALI1",    NO , NO },
+{ @"LogAmp Calib/4",    @"CALI2",    NO , NO },
+{ @"Double LogAmp",     @"DBLLOG",   YES, NO },
+{ @"Triple LogAmp",     @"TRPLOG",   YES, NO },
+{ @"LogAmp Adj",        @"AMPADJ",   YES, NO },
+{ @"Gaussian",          @"GSSIAN",   NO , NO },
+{ @"Pin Diode",         @"PINDD",    NO , NO },
+{ @"Needle",            @"NEEDLE",   NO , NO },
+{ @"GermaniumHighE",    @"GEHIGHE",  NO , NO },
+{ @"GermaniumLowE",     @"GELOWE",   NO , NO },
+{ @"From File",         @"",         NO , NO },
 };
 
 
@@ -811,7 +817,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 - (BOOL) inCustomList:(NSString*)aName
 {
     int i;
-    for(i=0;i<kNumWaveforms;i++){
+    for(i=kNumBuiltInTypes;i<kNumWaveforms;i++){
         if([waveformData[i].storageName isEqualToString:aName]) {
             return YES;
         }
@@ -910,10 +916,16 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 - (void) loadFromNonVolativeMemory
 {
     if([self isConnected]){
-        [self writeToGPIBDevice:[NSString stringWithFormat:@"FUNC:USER %@",waveformData[selectedWaveform].storageName]];
-        [self logSystemResponse];
-        [self writeToGPIBDevice:@"FUNC:SHAP USER"];
-        [self logSystemResponse];
+	if (waveformData[selectedWaveform].builtInFunction) {
+        	[self writeToGPIBDevice:[NSString stringWithFormat:@"FUNC %@",waveformData[selectedWaveform].storageName]];
+        	[self logSystemResponse];
+
+	} else {
+        	[self writeToGPIBDevice:[NSString stringWithFormat:@"FUNC:USER %@",waveformData[selectedWaveform].storageName]];
+        	[self logSystemResponse];
+        	[self writeToGPIBDevice:@"FUNC:SHAP USER"];
+        	[self logSystemResponse];
+	}
         [self outputWaveformParams];
     }
 }
@@ -1274,6 +1286,17 @@ static NSString* ORHPPulserMaxTime = @"ORHPPulserMaxTime";
     
 }
 
+- (unsigned int) numberOfWaveforms
+{
+	return kNumWaveforms;
+}
+
+- (NSString*) nameOfWaveformAt:(unsigned int)position
+{
+	if (position >= [self numberOfWaveforms]) return @"";
+	return waveformData[position].waveformName;
+}
+
 @end
 
 
@@ -1317,6 +1340,8 @@ static NSString* ORHPPulserMaxTime = @"ORHPPulserMaxTime";
 		[NSThread detachNewThreadSelector: @selector( downloadWaveformWorker ) toTarget:self withObject: nil];
 	}
 }
+
+
 
 @end
 

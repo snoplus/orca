@@ -781,6 +781,16 @@
 	
 }
 
+- (void) populatePullDownsGpibDevice
+{
+    [super populatePullDownsGpibDevice];
+    int i;
+    [selectionPopUpButton removeAllItems];
+    for(i=0;i<[model numberOfWaveforms];i++) {
+        [selectionPopUpButton addItemWithTitle:[model nameOfWaveformAt:i]];
+    }
+}
+
 @end
 
 @implementation ORHPPulserController (private)
