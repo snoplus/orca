@@ -688,7 +688,7 @@
 	
 	int daqMode = [model runMode];
 	//[histNofMeasField setEnabled: !locked & (daqMode == kIpeFltV4_Histogram_DaqMode)];
-	[histMeasTimeField setEnabled: !locked & (daqMode == kIpeFltV4_Histogram_DaqMode)];
+	[histMeasTimeField setEnabled: !lockedOrRunningMaintenance & (daqMode == kIpeFltV4_Histogram_DaqMode)];
 	[histEMinTextField setEnabled: !lockedOrRunningMaintenance & (daqMode == kIpeFltV4_Histogram_DaqMode)];
 	[histEBinPU setEnabled: !lockedOrRunningMaintenance & (daqMode == kIpeFltV4_Histogram_DaqMode)];
 	[syncWithRunControlButton setEnabled: !runInProgress & (daqMode == kIpeFltV4_Histogram_DaqMode)];
