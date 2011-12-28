@@ -31,6 +31,9 @@
 #import "ORCommandList.h"
 
 
+NSString* ORKatrinV4FLTModelSyncWithRunControlChanged = @"ORKatrinV4FLTModelSyncWithRunControlChanged";
+NSString* ORKatrinV4FLTModelDecayTimeChanged = @"ORKatrinV4FLTModelDecayTimeChanged";
+NSString* ORKatrinV4FLTModelPoleZeroCorrectionChanged = @"ORKatrinV4FLTModelPoleZeroCorrectionChanged";
 NSString* ORKatrinV4FLTModelCustomVariableChanged = @"ORKatrinV4FLTModelCustomVariableChanged";
 NSString* ORKatrinV4FLTModelReceivedHistoCounterChanged = @"ORKatrinV4FLTModelReceivedHistoCounterChanged";
 NSString* ORKatrinV4FLTModelReceivedHistoChanMapChanged = @"ORKatrinV4FLTModelReceivedHistoChanMapChanged";
@@ -187,6 +190,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     self = [super init];
 	ledOff = YES;
 	histMeasTime = 5;
+    [self registerNotificationObservers];
     return self;
 }
 
@@ -245,7 +249,267 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (ORTimeRate*) totalRate   { return totalRate; }
 - (short) getNumberRegisters{ return kFLTV4NumRegs; }
 
+
+#pragma mark •••Notifications
+- (void) registerNotificationObservers
+{
+    //NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
+	
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+    
+    //[super registerNotificationObservers]; ORIpeV4FLTModel does not implement it ... -tb-
+    
+	#if 0
+    [notifyCenter addObserver : self
+                     selector : @selector(XXXXsettingsLockChanged:)
+                         name : ORRunStatusChangedNotification
+                       object : nil];
+	#endif
+					   
+    [notifyCenter addObserver : self
+                     selector : @selector(runIsAboutToChangeState:)
+                         name : ORRunAboutToChangeState
+                       object : nil];
+					   
+    [notifyCenter addObserver : self
+                     selector : @selector(runIsAboutToStop:)
+                         name : ORRunAboutToStopNotification
+                       object : nil];
+					   
+					   
+}
+
+- (void) runIsAboutToStop:(NSNotification*)aNote
+{
+    //NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
+    //reset the 'sync with subruns' facility (should not be necessary without 'sending  eRunStarting twice' bug)
+	runControlState = eRunStopping;
+	syncWithRunControlCounterFlag = 0;
+}
+
+- (void) runIsAboutToChangeState:(NSNotification*)aNote
+{
+    if(!syncWithRunControl) return;//nothing to care about ...
+	
+	//we need to care about the following cases:
+	// 1. no run active, system going to start run:
+	//    do nothing
+    //    (old state: eRunStopping/0  , new state: eRunStarting)
+	// 2. run active, system going to change state:
+	//    start 'sync'ing'
+	//    possible cases:
+    //    old state: eRunStarting        , new state: eRunStopping ->stop run
+    //    old state: eRunBetweenSubRuns  , new state: eRunStopping ->stop run (from 'between subruns')
+    //    old state: eRunStarting        , new state: eRunBetweenSubRuns ->stop subrun, stay 'between subruns'
+    //    old state: eRunBetweenSubRuns  , new state: eRunStarting ->start new subrun (from 'between subruns')
+	//    
+	//    sync'ing: set 'run wait' (use internal counter); clear histogram counter; wait for next 1 histogram(s); if received: set 'run wait done', reset flag/counter
+    //
+	//TODO:    WARNING: I observed that I receive 'eRunStarting' after the same state 'eRunStarting', seems to me to be a bug -tb-
+	//    
+	
+    //NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
+    //NSLog(@"Called %@::%@   aNote:>>>%@<<<\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),aNote);//DEBUG -tb-
+	//aNote: >>>NSConcreteNotification 0x5a552d0 {name = ORRunAboutToChangeState; object = (ORRunModel,1) Decoders: ORRunDecoderForRun
+    // Connectors: "Run Control Connector"  ; userInfo = {State = 4;}}<<<
+	// states: 2,3,4: 2=starting, 3=stopping, 4=between subruns; see ORGlobal.h, enum 'eRunState'
+    int state = [[[aNote userInfo] objectForKey:@"State"] intValue];
+	/*
+	id rc =  [aNote object];
+    NSLog(@"Calling object %@\n",NSStringFromClass([rc class]));//DEBUG -tb-
+	switch (state) {
+		case eRunStarting://=2
+            NSLog(@"   Notification: go to  %@\n",@"eRunStarting");//DEBUG -tb-
+			break;
+		case eRunBetweenSubRuns://=4
+            NSLog(@"   Notification: go to  %@\n",@"eRunBetweenSubRuns");//DEBUG -tb-
+			break;
+		case eRunStopping://=3
+            NSLog(@"   Notification: go to  %@\n",@"eRunStopping");//DEBUG -tb-
+			break;
+		default:
+			break;
+	}
+	*/
+	int lastState = runControlState;
+	runControlState = state;
+		//NSLog(@"   lastState: %i,   newState: %i\n",lastState,runControlState);//DEBUG -tb-
+	if(runControlState==eRunStarting && (lastState==0 || lastState==eRunStopping)){
+	    // case 1.
+		//NSLog(@"   Case 1: do nothing\n");//DEBUG -tb-
+		return;
+	}else{
+	    //catch errors
+	    if(runControlState==eRunStarting && lastState==eRunStarting){//should not happen! bug? -tb-
+		    NSLog(@"   Case 2: ERROR - runControlState==eRunStarting && lastState==eRunStarting\n");//DEBUG -tb-
+		    return;
+		}
+	    if(syncWithRunControlCounterFlag>0){//should not happen! bug? -tb-
+		    NSLog(@"   Case 2: ERROR - syncWithRunControlCounterFlag>0\n");//DEBUG -tb-
+		    return;
+		}
+	    // case 2. (all other cases)
+		//NSLog(@"   Case 2: wait for 1 histogram\n");//DEBUG -tb-
+		[self syncWithRunControlStart: 1];
+	}
+}
+
+- (void) syncWithRunControlStart:(int)numHistograms
+{
+    //NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
+	[self clearReceivedHistoCounter];
+	syncWithRunControlCounterFlag = numHistograms;
+	[self addRunWaitWithReason:@"FLTv4: wait for next histogram."];
+}
+
+- (void) syncWithRunControlCheckStopCondition
+{
+    //NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
+    if(syncWithRunControlCounterFlag >= receivedHistoCounter){
+	    [self releaseRunWait]; 
+	    syncWithRunControlCounterFlag=0;
+	}
+}
+
 #pragma mark •••Accessors
+
+- (int) syncWithRunControl
+{
+    return syncWithRunControl;
+}
+
+- (void) setSyncWithRunControl:(int)aSyncWithRunControl
+{
+    //NSLog(@"Called %@::%@ - value %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd), aSyncWithRunControl);//DEBUG -tb-
+    [[[self undoManager] prepareWithInvocationTarget:self] setSyncWithRunControl:syncWithRunControl];
+    syncWithRunControl = aSyncWithRunControl;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelSyncWithRunControlChanged object:self];
+}
+
+- (double) decayTime
+{
+    return decayTime;
+}
+
+- (void) setDecayTime:(double)aDecayTime
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setDecayTime:decayTime];
+    
+    decayTime = aDecayTime;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelDecayTimeChanged object:self];
+}
+
+
+/*
+See FLT doc:
+attenuation <> poleZeroCorrection settings
+attenuation =  = (Decayzeit - Shapingzeit)/Decayzeit
+Beispiel:
+Decay-Zeit = 50us (so wie beim Monitorspektrometerdetektor)
+Shaping-Zeit (halbe Filterlänge) = 6us
+=> X = (50-6)/50 = 44/50 = 0,88  => setting 6
+Denis table:
+settings attenuation coeff_x_128
+15	0,695	89 
+14	0,719	92 
+13	0,734	94 
+12	0,758	97 
+11	0,773	99 
+10	0,797	102
+9	0,813	104 
+8	0,836	107 
+7	0,859	110 
+6	0,875	112 
+5	0,898	115 
+4	0,914	117 
+3	0,938	120 
+2	0,953	122 
+1	0,977	125 
+0	1,000	128
+none (default)
+*/
+- (int) poleZeroCorrection
+{
+    return poleZeroCorrection;
+}
+
+- (void) setPoleZeroCorrection:(int)aPoleZeroCorrection
+{
+    if(aPoleZeroCorrection<0 || aPoleZeroCorrection>15) aPoleZeroCorrection=0;//allowed range is 0..15, default: 0 -tb-
+    [[[self undoManager] prepareWithInvocationTarget:self] setPoleZeroCorrection:poleZeroCorrection];
+    
+    poleZeroCorrection = aPoleZeroCorrection;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelPoleZeroCorrectionChanged object:self];
+}
+
+/*
+See FLT doc:
+attenuation <> poleZeroCorrection settings
+attenuation =  = (Decayzeit - Shapingzeit)/Decayzeit
+Beispiel:
+Decay-Zeit = 50us (so wie beim Monitorspektrometerdetektor)
+Shaping-Zeit (halbe Filterlänge) = 6us
+=> X = (50-6)/50 = 44/50 = 0,88  => setting 6
+Denis table:
+settings attenuation coeff_x_128
+15	0,695	89 
+14	0,719	92 
+13	0,734	94 
+12	0,758	97 
+11	0,773	99 
+10	0,797	102
+9	0,813	104 
+8	0,836	107 
+7	0,859	110 
+6	0,875	112 
+5	0,898	115 
+4	0,914	117 
+3	0,938	120 
+2	0,953	122 
+1	0,977	125 
+0	1,000	128
+none (default)
+*/
+- (double) poleZeroCorrectionHint
+{
+    if(decayTime == 0.0 ) return 1.0;
+	double shaping = (0x1 << filterShapingLength) * 50.0 / 1000.0;
+	double pzch = (decayTime - shaping)/decayTime;
+    return pzch;
+}
+
+- (int) poleZeroCorrectionSettingHint:(double)attenuation
+{
+static double table[32]={
+15,	0.695	, 
+14,	0.719	, 
+13,	0.734	, 
+12,	0.758	, 
+11,	0.773	, 
+10,	0.797	,
+9,	0.813	, 
+8,	0.836	, 
+7,	0.859	, 
+6,	0.875	, 
+5,	0.898	, 
+4,	0.914	, 
+3,	0.938	, 
+2,	0.953	, 
+1,	0.977	, 
+0,	1.000	
+};
+    int i,hint=0;
+	double diff, mindiff=1.0;
+	for(i=0;i<16;i++){
+	    diff = fabs(attenuation - table[i*2+1]);
+		if(diff<mindiff){ mindiff=diff; hint = table[i*2]; }
+	}
+    return hint;
+}
+
+
 
 - (int) customVariable
 {
@@ -270,6 +534,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 {
     receivedHistoCounter = aReceivedHistoCounter;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelReceivedHistoCounterChanged object:self];
+	if(syncWithRunControl && syncWithRunControlCounterFlag>0) [self syncWithRunControlCheckStopCondition];
 }
 
 - (void) clearReceivedHistoCounter
@@ -878,6 +1143,20 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	[self setHistMeasTime:	5];
 }
 
+
+- (void) devTest1ButtonAction
+{
+    //NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
+	[self addRunWaitWithReason:@"A reason to delay"];
+}
+
+- (void) devTest2ButtonAction
+{
+	[self releaseRunWait]; 
+}
+
+
+
 #pragma mark •••HW Access
 - (unsigned long) readBoardIDLow
 {
@@ -1051,9 +1330,10 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (void) writeRunControl:(BOOL)startSampling
 {
 	unsigned long aValue = 
-	(((nfoldCoincidence) & 0xf)<<20)|		//nfoldCoincidence is stored as the popup index -- NEW since 2010-11-09 -tb-
-	(((vetoOverlapTime) & 0xf)<<16)	|		//vetoOverlapTime is stored as the popup index -- NEW since 2010-08-04 -tb-
-	//(((filterLength+2) & 0xf)<<8)	|		//filterLength is stored as the popup index -- convert to 2 to 6 [Note: in fact it is (((.+2) & 0x3f)<<8) but higher bits are unused -tb-]
+	(((poleZeroCorrection)  & 0xf)<<24) |		//poleZeroCorrection is stored as the popup index -- NEW since 2011-06-09 -tb-
+	(((nfoldCoincidence)    & 0xf)<<20) |		//nfoldCoincidence is stored as the popup index -- NEW since 2010-11-09 -tb-
+	(((vetoOverlapTime)     & 0xf)<<16)	|		//vetoOverlapTime is stored as the popup index -- NEW since 2010-08-04 -tb-
+	//(((filterLength+2)    & 0xf)<<8)	|		//filterLength is stored as the popup index -- convert to 2 to 6 [Note: in fact it is (((.+2) & 0x3f)<<8) but higher bits are unused -tb-]
 	(((filterShapingLength) & 0xf)<<8)	|		//filterShapingLength is the register value and the popup item tag -tb-
 	((gapLength & 0xf)<<4)			| 
 	// -tb- ((runBoxCarFilter & 0x1)<<2)	|
@@ -1418,6 +1698,9 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 	
     [[self undoManager] disableUndoRegistration];
 	
+    [self setSyncWithRunControl:[decoder decodeIntForKey:@"syncWithRunControl"]];
+    [self setDecayTime:[decoder decodeDoubleForKey:@"decayTime"]];
+    [self setPoleZeroCorrection:[decoder decodeIntForKey:@"poleZeroCorrection"]];
     [self setCustomVariable:[decoder decodeIntForKey:@"customVariable"]];
     [self setFifoLength:[decoder decodeIntForKey:@"fifoLength"]];
     [self setNfoldCoincidence:[decoder decodeIntForKey:@"nfoldCoincidence"]];
@@ -1443,6 +1726,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 	//TODO: many fields are  still in super class ORIpeV4FLTModel, some should move here (see ORIpeV4FLTModel::initWithCoder, see my comments in 2011-04-07-ORKatrinV4FLTModel.m) -tb-
 	
     [[self undoManager] enableUndoRegistration];
+    [self registerNotificationObservers];
 	
     return self;
 }
@@ -1451,6 +1735,9 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 {
     [super encodeWithCoder:encoder];
 	
+    [encoder encodeInt:syncWithRunControl forKey:@"syncWithRunControl"];
+    [encoder encodeDouble:decayTime forKey:@"decayTime"];
+    [encoder encodeInt:poleZeroCorrection forKey:@"poleZeroCorrection"];
     [encoder encodeInt:customVariable forKey:@"customVariable"];
     [encoder encodeInt:fifoLength forKey:@"fifoLength"];
     [encoder encodeInt:nfoldCoincidence forKey:@"nfoldCoincidence"];

@@ -29,26 +29,31 @@
 @interface ORKatrinV4FLTController : OrcaObjectController {
 	@private
 		IBOutlet NSTabView*		tabView;	
-	IBOutlet   NSTextField* customVariableTextField;
-	IBOutlet   NSTextField* receivedHistoCounterTextField;
-	IBOutlet   NSTextField* receivedHistoChanMapTextField;
+	    IBOutlet NSTextField*   decayTimeTextField;
+	    IBOutlet NSPopUpButton* poleZeroCorrectionPU;
+	    IBOutlet NSTextField*   recommendedPZCTextField;
+	    IBOutlet NSTextField*   customVariableTextField;
+	    IBOutlet NSButton*      clearReceivedHistoCounterButton;
+	    IBOutlet NSTextField*   receivedHistoCounterTextField;
+	    IBOutlet NSTextField*   receivedHistoChanMapTextField;
 		IBOutlet NSPopUpButton* fifoLengthPU;
 		IBOutlet NSTabView*		modeTabView;	
 		IBOutlet NSButton*		settingLockButton;
 		IBOutlet NSPopUpButton* nfoldCoincidencePU;
         IBOutlet NSButton*		vetoActiveButton;
 		IBOutlet NSPopUpButton* vetoOverlapTimePU;
-		IBOutlet NSPopUpButton* shipSumHistogramPU;
 		IBOutlet NSMatrix*		displayEventRateMatrix;
 		IBOutlet NSTextField*	targetRateField;
+        IBOutlet NSTextField*   fltSlotNumTextField;
+		IBOutlet NSPopUpButton* shipSumHistogramPU;
         IBOutlet NSTextField*   histMaxEnergyTextField;
         IBOutlet NSTextField*   histPageABTextField;
-        IBOutlet NSTextField*   fltSlotNumTextField;
 		IBOutlet NSTextField*	histLastEntryField;
 		IBOutlet NSTextField*	histFirstEntryField;
 		IBOutlet NSPopUpButton* histClrModePU;
 		IBOutlet NSPopUpButton* histModePU;
 		IBOutlet NSPopUpButton* histEBinPU;
+	    IBOutlet NSButton*      syncWithRunControlButton;
 		IBOutlet NSTextField*	histEMinTextField;
 		IBOutlet NSButton*		runBoxCarFilterCB;
 		IBOutlet NSButton*		storeDataInRamCB;
@@ -142,6 +147,10 @@
 - (void) updateButtons;
 
 #pragma mark •••Interface Management
+- (void) syncWithRunControlChanged:(NSNotification*)aNote;
+- (void) recommendedPZCChanged:(NSNotification*)aNote;
+- (void) decayTimeChanged:(NSNotification*)aNote;
+- (void) poleZeroCorrectionChanged:(NSNotification*)aNote;
 - (void) customVariableChanged:(NSNotification*)aNote;
 - (void) receivedHistoCounterChanged:(NSNotification*)aNote;
 - (void) receivedHistoChanMapChanged:(NSNotification*)aNote;
@@ -200,6 +209,9 @@
 - (void) fifoFlagsChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) syncWithRunControlButtonAction:(id)sender;
+- (IBAction) decayTimeTextFieldAction:(id)sender;
+- (IBAction) poleZeroCorrectionPUAction:(id)sender;
 - (IBAction) customVariableTextFieldAction:(id)sender;
 - (IBAction) clearHistoCounterButtonAction:(id)sender;
 - (IBAction) receivedHistoCounterTextFieldAction:(id)sender;
@@ -257,6 +269,8 @@
 - (IBAction) noiseFloorOffsetAction:(id)sender;
 
 - (IBAction) testButtonAction: (id) sender; //temp routine to hook up to any on a temp basis
+- (IBAction) devTest1ButtonAction: (id) sender; //temp routine to hook up to any on a temp basis
+- (IBAction) devTest2ButtonAction: (id) sender; //temp routine to hook up to any on a temp basis
 
 	
 #pragma mark •••Plot DataSource

@@ -99,6 +99,11 @@
     int receivedHistoChanMap;
     int receivedHistoCounter;
     int customVariable;
+    int poleZeroCorrection;
+    double decayTime;
+    int syncWithRunControl;
+    int syncWithRunControlCounterFlag;
+    int runControlState;
 }
 
 #pragma mark •••Initialization
@@ -108,7 +113,22 @@
 - (void) makeMainController;
 - (short) getNumberRegisters;
 
+#pragma mark •••Notifications
+- (void) registerNotificationObservers;
+- (void) runIsAboutToStop:(NSNotification*)aNote;
+- (void) runIsAboutToChangeState:(NSNotification*)aNote;
+- (void) syncWithRunControlStart:(int)numHistograms;
+- (void) syncWithRunControlCheckStopCondition;
+
 #pragma mark •••Accessors
+- (int) syncWithRunControl;
+- (void) setSyncWithRunControl:(int)aSyncWithRunControl;
+- (double) decayTime;
+- (void) setDecayTime:(double)aDecayTime;
+- (int) poleZeroCorrection;
+- (void) setPoleZeroCorrection:(int)aPoleZeroCorrection;
+- (double) poleZeroCorrectionHint;
+- (int) poleZeroCorrectionSettingHint:(double)attenuation;
 - (int) customVariable;
 - (void) setCustomVariable:(int)aCustomVariable;
 - (int) receivedHistoCounter;
@@ -235,6 +255,10 @@
 - (void) setSelectedChannelValue:(unsigned short) aValue;
 - (int) restrictIntValue:(int)aValue min:(int)aMinValue max:(int)aMaxValue;
 - (float) restrictFloatValue:(int)aValue min:(float)aMinValue max:(float)aMaxValue;
+
+- (void) devTest1ButtonAction;
+- (void) devTest2ButtonAction;
+
 
 #pragma mark •••HW Access
 //all can raise exceptions
@@ -369,6 +393,9 @@
 				  n:(int) n;
 @end
 
+extern NSString* ORKatrinV4FLTModelSyncWithRunControlChanged;
+extern NSString* ORKatrinV4FLTModelDecayTimeChanged;
+extern NSString* ORKatrinV4FLTModelPoleZeroCorrectionChanged;
 extern NSString* ORKatrinV4FLTModelCustomVariableChanged;
 extern NSString* ORKatrinV4FLTModelReceivedHistoCounterChanged;
 extern NSString* ORKatrinV4FLTModelReceivedHistoChanMapChanged;

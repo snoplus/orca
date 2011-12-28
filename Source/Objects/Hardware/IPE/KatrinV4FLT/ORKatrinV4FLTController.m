@@ -58,9 +58,9 @@
 	//[[filterShapingLengthPU itemAtIndex:0] setEnabled: NO];//TODO: remove this line to enable 100 nsec filter shaping length setting -tb-
 	
     settingSize			= NSMakeSize(670,720);
-    rateSize			= NSMakeSize(490,690);
-    testSize			= NSMakeSize(400,310);
-    lowlevelSize		= NSMakeSize(400,310);
+    rateSize			= NSMakeSize(500,690);
+    testSize			= NSMakeSize(610,410);
+    lowlevelSize		= NSMakeSize(610,510);
 	
 	rateFormatter = [[NSNumberFormatter alloc] init];
 	[rateFormatter setFormat:@"##0.00"];
@@ -358,9 +358,46 @@
                          name : ORKatrinV4FLTModelCustomVariableChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(poleZeroCorrectionChanged:)
+                         name : ORKatrinV4FLTModelPoleZeroCorrectionChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(decayTimeChanged:)
+                         name : ORKatrinV4FLTModelDecayTimeChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(syncWithRunControlChanged:)
+                         name : ORKatrinV4FLTModelSyncWithRunControlChanged
+						object: model];
+
 }
 
 #pragma mark •••Interface Management
+
+- (void) syncWithRunControlChanged:(NSNotification*)aNote
+{
+	[syncWithRunControlButton setIntValue: [model syncWithRunControl]];
+}
+
+- (void) recommendedPZCChanged:(NSNotification*)aNote
+{
+    double att = [model poleZeroCorrectionHint];
+	[recommendedPZCTextField setStringValue: [NSString stringWithFormat:@"%.3f -> %i",att,[model poleZeroCorrectionSettingHint:att]]];
+}
+
+- (void) decayTimeChanged:(NSNotification*)aNote
+{
+	[decayTimeTextField setDoubleValue: [model decayTime]];
+	[self recommendedPZCChanged:nil];
+}
+
+- (void) poleZeroCorrectionChanged:(NSNotification*)aNote
+{
+	[poleZeroCorrectionPU selectItemAtIndex: [model poleZeroCorrection]];
+}
 
 - (void) customVariableChanged:(NSNotification*)aNote
 {
@@ -465,6 +502,7 @@
 {
 	//[filterLengthPU selectItemAtIndex:[model filterLength]];
 	[filterShapingLengthPU selectItemWithTag:[model filterShapingLength]];
+	[self recommendedPZCChanged:nil];
 }
 
 - (void) gapLengthChanged:(NSNotification*)aNote
@@ -584,6 +622,10 @@
 	[self receivedHistoChanMapChanged:nil];
 	[self receivedHistoCounterChanged:nil];
 	[self customVariableChanged:nil];
+	[self poleZeroCorrectionChanged:nil];
+	[self decayTimeChanged:nil];
+	[self recommendedPZCChanged:nil];
+	[self syncWithRunControlChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -647,7 +689,14 @@
 	int daqMode = [model runMode];
 	//[histNofMeasField setEnabled: !locked & (daqMode == kIpeFltV4_Histogram_DaqMode)];
 	[histMeasTimeField setEnabled: !locked & (daqMode == kIpeFltV4_Histogram_DaqMode)];
-	[histEMinTextField setEnabled: !locked & (daqMode == kIpeFltV4_Histogram_DaqMode)];
+	[histEMinTextField setEnabled: !lockedOrRunningMaintenance & (daqMode == kIpeFltV4_Histogram_DaqMode)];
+	[histEBinPU setEnabled: !lockedOrRunningMaintenance & (daqMode == kIpeFltV4_Histogram_DaqMode)];
+	[syncWithRunControlButton setEnabled: !runInProgress & (daqMode == kIpeFltV4_Histogram_DaqMode)];
+	[shipSumHistogramPU setEnabled: !lockedOrRunningMaintenance & (daqMode == kIpeFltV4_Histogram_DaqMode)];
+	[histModePU setEnabled: !lockedOrRunningMaintenance & (daqMode == kIpeFltV4_Histogram_DaqMode)];
+	[histClrModePU setEnabled: !lockedOrRunningMaintenance & (daqMode == kIpeFltV4_Histogram_DaqMode)];
+	[clearReceivedHistoCounterButton setEnabled: !lockedOrRunningMaintenance & (daqMode == kIpeFltV4_Histogram_DaqMode)];
+	
 	[vetoActiveButton setState: !locked & ((daqMode == kIpeFltV4_VetoEnergyDaqMode)||(daqMode == kIpeFltV4_VetoEnergyTraceDaqMode))];
 
 	[startNoiseFloorButton setEnabled: runInProgress || [model noiseFloorRunning]];
@@ -957,6 +1006,21 @@
 }
 
 #pragma mark •••Actions
+
+- (void) syncWithRunControlButtonAction:(id)sender
+{
+	[model setSyncWithRunControl:[sender intValue]];	
+}
+
+- (void) decayTimeTextFieldAction:(id)sender
+{
+	[model setDecayTime:[sender doubleValue]];	
+}
+
+- (void) poleZeroCorrectionPUAction:(id)sender
+{
+	[model setPoleZeroCorrection:[poleZeroCorrectionPU indexOfSelectedItem]];	
+}
 
 - (void) customVariableTextFieldAction:(id)sender
 {
@@ -1446,6 +1510,21 @@
                         localException,[model stationNumber]);
 	}
 }
+
+
+- (IBAction) devTest1ButtonAction: (id) sender
+{
+    NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
+	//ORRunAboutToChangeState
+	[model devTest1ButtonAction];
+}
+
+- (IBAction) devTest2ButtonAction: (id) sender
+{
+    NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
+	[model devTest2ButtonAction];
+}
+
 
 #pragma mark •••Plot DataSource
 - (int) numberPointsInPlot:(id)aPlotter
