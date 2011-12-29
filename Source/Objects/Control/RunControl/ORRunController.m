@@ -325,7 +325,7 @@
 - (void) numberOfWaitsChanged:(NSNotification*)aNote
 {
     int n = [model waitRequestersCount];
-    [showWaitRequestersButton setHidden:n==0];
+    [showWaitRequestersButton setHidden:n==0 && ([waitRequestersDrawer state] == NSDrawerClosedState)];
     [forceClearWaitsButton setEnabled:n>0];
     [waitCountField setIntValue:n];
     [waitCountField1 setIntValue:n];
@@ -906,6 +906,7 @@
     }
     else if([notification object] == waitRequestersDrawer){
         [showWaitRequestersButton setTitle:@"Show Waits..."];
+        [self numberOfWaitsChanged:nil];
     }
 }
 
