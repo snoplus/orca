@@ -254,6 +254,7 @@ NSString* ORFolderTransferTypeChangedNotification	= @"ORFolderTransferTypeChange
 		path = [self directoryName];
 		if(defaultLastPathComponent) path = [path stringByAppendingPathComponent:defaultLastPathComponent];
 	}
+    [self ensureExists:path];
 	return path;
 }
 
@@ -469,13 +470,8 @@ NSString* ORFolderTransferTypeChangedNotification	= @"ORFolderTransferTypeChange
     
     NSString* tmpDir = [[folderName stringByExpandingTildeInPath] stringByAppendingPathComponent:subFolder];
     if(![fm fileExistsAtPath:tmpDir]){
-		if(![fm createDirectoryAtPath:tmpDir withIntermediateDirectories:NO attributes:nil error:nil]){
-            NSString* aFolder = [[folderName stringByExpandingTildeInPath] stringByDeletingLastPathComponent];
-            NSString* subFolder1 = [[folderName stringByExpandingTildeInPath] lastPathComponent];
-            [self ensureSubFolder:subFolder1 inFolder:aFolder];
-			[fm createDirectoryAtPath:tmpDir withIntermediateDirectories:NO attributes:nil error:nil];
-        }
-    }
+		[fm createDirectoryAtPath:tmpDir withIntermediateDirectories:YES attributes:nil error:nil];
+     }
     return tmpDir;
 }
 
@@ -485,12 +481,7 @@ NSString* ORFolderTransferTypeChangedNotification	= @"ORFolderTransferTypeChange
     
     NSString* tmpDir = [folderName stringByExpandingTildeInPath];
     if(![fm fileExistsAtPath:tmpDir]){
-		if(![fm createDirectoryAtPath:tmpDir withIntermediateDirectories:NO attributes:nil error:nil]){
-
-            NSString* aFolder = [[folderName stringByExpandingTildeInPath] stringByDeletingLastPathComponent];
-            [self ensureExists:aFolder];
-			[fm createDirectoryAtPath:tmpDir withIntermediateDirectories:NO attributes:nil error:nil];        
-		}
+		[fm createDirectoryAtPath:tmpDir withIntermediateDirectories:YES attributes:nil error:nil];
     }
     return tmpDir;
 }
