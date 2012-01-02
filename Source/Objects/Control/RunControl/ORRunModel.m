@@ -940,7 +940,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
         [self startNewSubRunStage2];
     }
     else {
-        [self performSelector:@selector(startNewSubRun) withObject:nil afterDelay:0];
+        [self performSelector:@selector(startNewSubRunStage1) withObject:nil afterDelay:0];
     }
 }
 
