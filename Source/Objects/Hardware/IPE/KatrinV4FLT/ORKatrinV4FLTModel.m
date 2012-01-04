@@ -205,6 +205,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	[gains release];
 	[totalRate release];
 #endif
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[super dealloc];
 }
 
@@ -256,7 +257,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     //NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
 	
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-    
+ 	[notifyCenter removeObserver:self]; //guard against a double register
+   
     //[super registerNotificationObservers]; ORIpeV4FLTModel does not implement it ... -tb-
     
 	#if 0
