@@ -196,15 +196,15 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 	if(index==1){
 		NSMutableArray* mapEntries = [NSMutableArray array];
 		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kSegmentNumber",	@"key", [NSNumber numberWithInt:0], @"sortType", nil]];
-		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kFLTSlot",		@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kFLTChannel",	@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kSlot",			@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kChannel",		@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
 		return mapEntries;
 	}
 	else {
 		NSMutableArray* mapEntries = [NSMutableArray array];
 		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kSegmentNumber",	@"key", [NSNumber numberWithInt:0], @"sortType", nil]];
-		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kFLTSlot",		@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kFLTChannel",	@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kSlot",			@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kChannel",		@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
 		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kPreampModule",	@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
 		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kPreampChannel",	@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
 		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kOSBSlot",		@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
