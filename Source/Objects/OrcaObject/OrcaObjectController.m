@@ -45,8 +45,10 @@ NSString* ORModelChangedNotification = @"ORModelChangedNotification";
 
 - (void) awakeFromNib
 {
-    [self registerNotificationObservers];
-    [self updateWindow];	
+	//   commented out this registerNotification because the registerNotification 
+	//   that is done in 'setMode' is sufficifient
+	//   [self registerNotificationObservers];
+     [self updateWindow];	
 }
 
 - (void) close
