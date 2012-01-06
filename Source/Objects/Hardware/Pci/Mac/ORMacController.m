@@ -74,10 +74,10 @@
     return [self groupView];
 }
 
-- (void) setModel:(id)aTag
+- (void) setModel:(id)aModel
 {
-    [super setModel:aTag];
-    [groupView setGroup:(ORGroup*)model];
+    [super setModel:aModel];
+    [groupView setGroup:(ORGroup*)aModel];
 }
 
 
@@ -120,11 +120,6 @@
     [notifyCenter addObserver : self
                      selector : @selector(updateWindow)
                          name : ORSerialPortStateChanged
-                       object : nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(dataReceived:)
-                         name : ORSerialPortDataReceived
                        object : nil];
 
     [notifyCenter addObserver : self
@@ -172,12 +167,20 @@
 
 - (void) tableViewSelectionDidChange:(NSNotification*)aNote
 {
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter]; 
+	[notifyCenter removeObserver:self name:ORSerialPortDataReceived object:nil];
 	if([aNote object] == serialPortView || !aNote){
 		int index = [serialPortView selectedRow];
 		if(index >= 0){
 			[selectedPortNameField setStringValue:[[model serialPort:index] name]];
 			[openPortButton setEnabled:YES];
 			ORSerialPort* thePort = [model serialPort:index];
+			
+			[notifyCenter addObserver : self
+							 selector : @selector(dataReceived:)
+								 name : ORSerialPortDataReceived
+							   object : thePort];
+			
 			if([thePort isOpen]){
 				[sendCmdButton setEnabled:YES];
 				[clearDisplayButton setEnabled:YES];
@@ -277,10 +280,10 @@
 			NSMutableData* theData = [NSMutableData dataWithData:[[note userInfo] objectForKey:@"data"]];
 			char* p = (char*)[theData bytes];
 			NSString* theString = @"<non ascii>";
-			if(p[0]>= 0x20){
+			if((p[0]>= 0x20) || (p[0]== 0xA) || (p[0]== 0xD)){
 				int i;
 				for(i=0;i<[theData length];i++){
-					if(p[i]< 0x20){
+					if((p[i]< 0x20) && (p[i]!= 0xA) && (p[i]!= 0xD)){
 						[theData setLength:i];
 						break;
 					}
@@ -288,8 +291,8 @@
 				theString = [[[NSString alloc] initWithData:theData encoding:NSASCIIStringEncoding] autorelease];
 			}
 
-            theString = [[theString componentsSeparatedByString:@"\r"] componentsJoinedByString:@""];
-            theString = [[theString componentsSeparatedByString:@"\n\n"] componentsJoinedByString:@"\n"];
+            theString = [theString stringByReplacingOccurrencesOfString:@"\r" withString:@"<CR>"];
+            theString = [theString stringByReplacingOccurrencesOfString:@"\n" withString:@"<LF>"];
             theString = [theString stringByAppendingString:@"\n"];
             [outputView replaceCharactersInRange:NSMakeRange([[outputView textStorage] length], 0) withString:theString];
             [outputView scrollRangeToVisible: NSMakeRange([[outputView textStorage] length], 0)];
