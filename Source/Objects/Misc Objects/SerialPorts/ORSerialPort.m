@@ -510,6 +510,8 @@ error:
 	if (tcsetattr(fileDescriptor, TCSANOW, options) == -1){
 		// something went wrong
 		lastError = errno;
+		NSLogColor([NSColor redColor],@"Serial port Error %s\n", strerror( errno ) );
+
 		return NO;
 	}
 	else {
