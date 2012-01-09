@@ -136,10 +136,15 @@
 
 - (void) fitTypeChanged:(NSNotification*)aNote
 {
-	int fitType = [model fitType];
-	[fitTypePopup selectItemAtIndex:[model fitType]];	
-	[polyOrderField setEnabled: fitType == 2];
-	[fitFunctionField setEnabled: fitType == 4];
+    int fitType = [model fitType];
+    [fitTypePopup selectItemAtIndex:[model fitType]];	
+    [polyOrderField setEnabled: fitType == 2];
+    [fitFunctionField setEnabled: fitType == 4];
+    if(fitType == 4) {
+        NSString* s = [model fitFunction];
+        if(s) [fitFunctionField setObjectValue:s];
+        else [fitFunctionField setObjectValue:@"format: function; parameterValues (parameters is a comma-deliminated list)"];
+    }
 }
 
 
