@@ -2070,6 +2070,14 @@
 		84B63CE809783832005B20A5 /* PushButton.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84B63CE109783832005B20A5 /* PushButton.nib */; };
 		84B63CE909783832005B20A5 /* PushButtonOff.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B63CE209783832005B20A5 /* PushButtonOff.tif */; };
 		84B63CEA09783832005B20A5 /* PushButtonOn.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B63CE309783832005B20A5 /* PushButtonOn.tif */; };
+		84B6CD4714B37E9700386BE1 /* ORRGA300Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B6CD3D14B37E9700386BE1 /* ORRGA300Controller.h */; };
+		84B6CD4814B37E9700386BE1 /* ORRGA300Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B6CD3E14B37E9700386BE1 /* ORRGA300Controller.m */; };
+		84B6CD4914B37E9700386BE1 /* ORRGA300Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B6CD3F14B37E9700386BE1 /* ORRGA300Decoders.h */; };
+		84B6CD4A14B37E9700386BE1 /* ORRGA300Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B6CD4014B37E9700386BE1 /* ORRGA300Decoders.m */; };
+		84B6CD4B14B37E9700386BE1 /* ORRGA300Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B6CD4114B37E9700386BE1 /* ORRGA300Model.h */; };
+		84B6CD4C14B37E9700386BE1 /* ORRGA300Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B6CD4214B37E9700386BE1 /* ORRGA300Model.m */; };
+		84B6CD4D14B37E9700386BE1 /* RGA300.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84B6CD4314B37E9700386BE1 /* RGA300.nib */; };
+		84B6CD4E14B37E9700386BE1 /* RGA300.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B6CD4414B37E9700386BE1 /* RGA300.tif */; };
 		84B74AD00FEAAB460033E658 /* ftpExpectScript in Resources */ = {isa = PBXBuildFile; fileRef = 84B74ACF0FEAAB460033E658 /* ftpExpectScript */; };
 		84B74CE70FEBE9B90033E658 /* Caen965.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84B74CE10FEBE9B90033E658 /* Caen965.gif */; };
 		84B74CE80FEBE9B90033E658 /* Caen965.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84B74CE20FEBE9B90033E658 /* Caen965.nib */; };
@@ -4697,6 +4705,14 @@
 		84B649B50406ECBA005F64B1 /* NcdMux.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = NcdMux.gif; path = "Source/Objects/Custom Hardware/Ncd Hardware/NcdMux/NcdMux.gif"; sourceTree = SOURCE_ROOT; };
 		84B649B70407013B005F64B1 /* NcdMuxHWModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NcdMuxHWModel.h; sourceTree = "<group>"; };
 		84B649B80407013B005F64B1 /* NcdMuxHWModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NcdMuxHWModel.m; sourceTree = "<group>"; };
+		84B6CD3D14B37E9700386BE1 /* ORRGA300Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORRGA300Controller.h; path = Source/Objects/Hardware/Serial/RGA300/ORRGA300Controller.h; sourceTree = SOURCE_ROOT; };
+		84B6CD3E14B37E9700386BE1 /* ORRGA300Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORRGA300Controller.m; path = Source/Objects/Hardware/Serial/RGA300/ORRGA300Controller.m; sourceTree = SOURCE_ROOT; };
+		84B6CD3F14B37E9700386BE1 /* ORRGA300Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORRGA300Decoders.h; path = Source/Objects/Hardware/Serial/RGA300/ORRGA300Decoders.h; sourceTree = SOURCE_ROOT; };
+		84B6CD4014B37E9700386BE1 /* ORRGA300Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORRGA300Decoders.m; path = Source/Objects/Hardware/Serial/RGA300/ORRGA300Decoders.m; sourceTree = SOURCE_ROOT; };
+		84B6CD4114B37E9700386BE1 /* ORRGA300Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORRGA300Model.h; path = Source/Objects/Hardware/Serial/RGA300/ORRGA300Model.h; sourceTree = SOURCE_ROOT; };
+		84B6CD4214B37E9700386BE1 /* ORRGA300Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORRGA300Model.m; path = Source/Objects/Hardware/Serial/RGA300/ORRGA300Model.m; sourceTree = SOURCE_ROOT; };
+		84B6CD4314B37E9700386BE1 /* RGA300.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = RGA300.nib; path = Source/Objects/Hardware/Serial/RGA300/RGA300.nib; sourceTree = SOURCE_ROOT; };
+		84B6CD4414B37E9700386BE1 /* RGA300.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = RGA300.tif; path = Source/Objects/Hardware/Serial/RGA300/RGA300.tif; sourceTree = SOURCE_ROOT; };
 		84B74ACF0FEAAB460033E658 /* ftpExpectScript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ftpExpectScript; sourceTree = "<group>"; };
 		84B74CE10FEBE9B90033E658 /* Caen965.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Caen965.gif; sourceTree = "<group>"; };
 		84B74CE20FEBE9B90033E658 /* Caen965.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Caen965.nib; path = Source/Objects/Hardware/Vme/CAEN/CV965/Caen965.nib; sourceTree = SOURCE_ROOT; };
@@ -7374,6 +7390,7 @@
 			isa = PBXGroup;
 			children = (
 				84DEEBBA149916AD0092DB6C /* Serial Base Classes */,
+				84B6CD3B14B37E9700386BE1 /* RGA300 */,
 				841C4DEE141FA72800F95B50 /* Met237 */,
 				847F947213D4AA31006B06B4 /* Rad7 */,
 				8435AAC110C6D0EF00E03F7F /* VarianTPS */,
@@ -9747,6 +9764,22 @@
 			);
 			name = PushButton;
 			path = Source/Objects/ProcessLogic/ProcessElements/Inputs/PushButton;
+			sourceTree = SOURCE_ROOT;
+		};
+		84B6CD3B14B37E9700386BE1 /* RGA300 */ = {
+			isa = PBXGroup;
+			children = (
+				84B6CD3D14B37E9700386BE1 /* ORRGA300Controller.h */,
+				84B6CD3E14B37E9700386BE1 /* ORRGA300Controller.m */,
+				84B6CD3F14B37E9700386BE1 /* ORRGA300Decoders.h */,
+				84B6CD4014B37E9700386BE1 /* ORRGA300Decoders.m */,
+				84B6CD4114B37E9700386BE1 /* ORRGA300Model.h */,
+				84B6CD4214B37E9700386BE1 /* ORRGA300Model.m */,
+				84B6CD4314B37E9700386BE1 /* RGA300.nib */,
+				84B6CD4414B37E9700386BE1 /* RGA300.tif */,
+			);
+			name = RGA300;
+			path = Source/Objects/Hardware/Serial/RGA300;
 			sourceTree = SOURCE_ROOT;
 		};
 		84B74CE00FEBE9B90033E658 /* CV965 */ = {
@@ -12520,6 +12553,9 @@
 				CE3E7A231482D940000F1708 /* ORSIS3302GenericController.h in Headers */,
 				84DEE4CE149794070092DB6C /* ORFPDSegmentGroup.h in Headers */,
 				84DEEBBD149916AD0092DB6C /* ORSerialDeviceModel.h in Headers */,
+				84B6CD4714B37E9700386BE1 /* ORRGA300Controller.h in Headers */,
+				84B6CD4914B37E9700386BE1 /* ORRGA300Decoders.h in Headers */,
+				84B6CD4B14B37E9700386BE1 /* ORRGA300Model.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13313,6 +13349,8 @@
 				8475EC441475A66F003A165D /* LabJackUE9.tif in Resources */,
 				8475EC451475A66F003A165D /* NoLabJackUE9DriverHelp.plist in Resources */,
 				CED29CFE1482B02200BD3AB2 /* SIS3302Generic.nib in Resources */,
+				84B6CD4D14B37E9700386BE1 /* RGA300.nib in Resources */,
+				84B6CD4E14B37E9700386BE1 /* RGA300.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14214,6 +14252,9 @@
 				CE3E7A241482D940000F1708 /* ORSIS3302GenericController.m in Sources */,
 				84DEE4CF149794070092DB6C /* ORFPDSegmentGroup.m in Sources */,
 				84DEEBBE149916AD0092DB6C /* ORSerialDeviceModel.m in Sources */,
+				84B6CD4814B37E9700386BE1 /* ORRGA300Controller.m in Sources */,
+				84B6CD4A14B37E9700386BE1 /* ORRGA300Decoders.m in Sources */,
+				84B6CD4C14B37E9700386BE1 /* ORRGA300Model.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
