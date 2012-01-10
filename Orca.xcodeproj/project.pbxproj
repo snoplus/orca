@@ -348,6 +348,8 @@
 		840D0ED014BBC56A008FAC82 /* snopluslogoreplay.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 840D0EC914BBC56A008FAC82 /* snopluslogoreplay.tiff */; };
 		840D0ED114BBC56A008FAC82 /* SNOSlowControl.h in Headers */ = {isa = PBXBuildFile; fileRef = 840D0ECA14BBC56A008FAC82 /* SNOSlowControl.h */; };
 		840D0ED214BBC56A008FAC82 /* SNOSlowControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 840D0ECB14BBC56A008FAC82 /* SNOSlowControl.m */; };
+		840D0ED514BBC5DD008FAC82 /* SNODetectorView.h in Headers */ = {isa = PBXBuildFile; fileRef = 840D0ED314BBC5DD008FAC82 /* SNODetectorView.h */; };
+		840D0ED614BBC5DD008FAC82 /* SNODetectorView.m in Sources */ = {isa = PBXBuildFile; fileRef = 840D0ED414BBC5DD008FAC82 /* SNODetectorView.m */; };
 		840D56E00F39E9BF00F9A274 /* ORPacController.h in Headers */ = {isa = PBXBuildFile; fileRef = 840D56D80F39E9BF00F9A274 /* ORPacController.h */; };
 		840D56E10F39E9BF00F9A274 /* ORPacController.m in Sources */ = {isa = PBXBuildFile; fileRef = 840D56D90F39E9BF00F9A274 /* ORPacController.m */; };
 		840D56E20F39E9BF00F9A274 /* ORPacDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 840D56DA0F39E9BF00F9A274 /* ORPacDecoders.h */; };
@@ -3185,6 +3187,8 @@
 		840D0EC914BBC56A008FAC82 /* snopluslogoreplay.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = snopluslogoreplay.tiff; sourceTree = "<group>"; };
 		840D0ECA14BBC56A008FAC82 /* SNOSlowControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SNOSlowControl.h; sourceTree = "<group>"; };
 		840D0ECB14BBC56A008FAC82 /* SNOSlowControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SNOSlowControl.m; sourceTree = "<group>"; };
+		840D0ED314BBC5DD008FAC82 /* SNODetectorView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SNODetectorView.h; sourceTree = "<group>"; };
+		840D0ED414BBC5DD008FAC82 /* SNODetectorView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SNODetectorView.m; sourceTree = "<group>"; };
 		840D56D80F39E9BF00F9A274 /* ORPacController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPacController.h; path = Source/Objects/Hardware/Serial/Pac/ORPacController.h; sourceTree = SOURCE_ROOT; };
 		840D56D90F39E9BF00F9A274 /* ORPacController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORPacController.m; path = Source/Objects/Hardware/Serial/Pac/ORPacController.m; sourceTree = SOURCE_ROOT; };
 		840D56DA0F39E9BF00F9A274 /* ORPacDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPacDecoders.h; path = Source/Objects/Hardware/Serial/Pac/ORPacDecoders.h; sourceTree = SOURCE_ROOT; };
@@ -10103,6 +10107,8 @@
 				84C37D280EF834DD00E77E09 /* SNOController.m */,
 				84C37D290EF834DD00E77E09 /* SNOModel.h */,
 				84C37D2A0EF834DD00E77E09 /* SNOModel.m */,
+				840D0ED314BBC5DD008FAC82 /* SNODetectorView.h */,
+				840D0ED414BBC5DD008FAC82 /* SNODetectorView.m */,
 				840D0EC514BBC56A008FAC82 /* SNOMonitoredHardware.h */,
 				840D0EC614BBC56A008FAC82 /* SNOMonitoredHardware.m */,
 				840D0EC714BBC56A008FAC82 /* snopluslogooff.tiff */,
@@ -12578,6 +12584,7 @@
 				84B6CD4B14B37E9700386BE1 /* ORRGA300Model.h in Headers */,
 				840D0ECC14BBC56A008FAC82 /* SNOMonitoredHardware.h in Headers */,
 				840D0ED114BBC56A008FAC82 /* SNOSlowControl.h in Headers */,
+				840D0ED514BBC5DD008FAC82 /* SNODetectorView.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14282,6 +14289,7 @@
 				84B6CD4C14B37E9700386BE1 /* ORRGA300Model.m in Sources */,
 				840D0ECD14BBC56A008FAC82 /* SNOMonitoredHardware.m in Sources */,
 				840D0ED214BBC56A008FAC82 /* SNOSlowControl.m in Sources */,
+				840D0ED614BBC5DD008FAC82 /* SNODetectorView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
