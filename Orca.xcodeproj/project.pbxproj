@@ -341,6 +341,13 @@
 		840B813F094E4D8D00B1B135 /* ORLabelModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 840B8139094E4D8D00B1B135 /* ORLabelModel.h */; };
 		840B8140094E4D8D00B1B135 /* ORLabelModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 840B813A094E4D8D00B1B135 /* ORLabelModel.m */; };
 		840B8141094E4D8D00B1B135 /* ORLabelController.h in Headers */ = {isa = PBXBuildFile; fileRef = 840B813B094E4D8D00B1B135 /* ORLabelController.h */; };
+		840D0ECC14BBC56A008FAC82 /* SNOMonitoredHardware.h in Headers */ = {isa = PBXBuildFile; fileRef = 840D0EC514BBC56A008FAC82 /* SNOMonitoredHardware.h */; };
+		840D0ECD14BBC56A008FAC82 /* SNOMonitoredHardware.m in Sources */ = {isa = PBXBuildFile; fileRef = 840D0EC614BBC56A008FAC82 /* SNOMonitoredHardware.m */; };
+		840D0ECE14BBC56A008FAC82 /* snopluslogooff.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 840D0EC714BBC56A008FAC82 /* snopluslogooff.tiff */; };
+		840D0ECF14BBC56A008FAC82 /* snopluslogoon.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 840D0EC814BBC56A008FAC82 /* snopluslogoon.tiff */; };
+		840D0ED014BBC56A008FAC82 /* snopluslogoreplay.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 840D0EC914BBC56A008FAC82 /* snopluslogoreplay.tiff */; };
+		840D0ED114BBC56A008FAC82 /* SNOSlowControl.h in Headers */ = {isa = PBXBuildFile; fileRef = 840D0ECA14BBC56A008FAC82 /* SNOSlowControl.h */; };
+		840D0ED214BBC56A008FAC82 /* SNOSlowControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 840D0ECB14BBC56A008FAC82 /* SNOSlowControl.m */; };
 		840D56E00F39E9BF00F9A274 /* ORPacController.h in Headers */ = {isa = PBXBuildFile; fileRef = 840D56D80F39E9BF00F9A274 /* ORPacController.h */; };
 		840D56E10F39E9BF00F9A274 /* ORPacController.m in Sources */ = {isa = PBXBuildFile; fileRef = 840D56D90F39E9BF00F9A274 /* ORPacController.m */; };
 		840D56E20F39E9BF00F9A274 /* ORPacDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 840D56DA0F39E9BF00F9A274 /* ORPacDecoders.h */; };
@@ -3171,6 +3178,13 @@
 		840B8139094E4D8D00B1B135 /* ORLabelModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORLabelModel.h; path = "Source/Objects/Misc Objects/Label/ORLabelModel.h"; sourceTree = SOURCE_ROOT; };
 		840B813A094E4D8D00B1B135 /* ORLabelModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORLabelModel.m; path = "Source/Objects/Misc Objects/Label/ORLabelModel.m"; sourceTree = SOURCE_ROOT; };
 		840B813B094E4D8D00B1B135 /* ORLabelController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORLabelController.h; sourceTree = "<group>"; };
+		840D0EC514BBC56A008FAC82 /* SNOMonitoredHardware.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SNOMonitoredHardware.h; sourceTree = "<group>"; };
+		840D0EC614BBC56A008FAC82 /* SNOMonitoredHardware.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SNOMonitoredHardware.m; sourceTree = "<group>"; };
+		840D0EC714BBC56A008FAC82 /* snopluslogooff.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = snopluslogooff.tiff; sourceTree = "<group>"; };
+		840D0EC814BBC56A008FAC82 /* snopluslogoon.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = snopluslogoon.tiff; sourceTree = "<group>"; };
+		840D0EC914BBC56A008FAC82 /* snopluslogoreplay.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = snopluslogoreplay.tiff; sourceTree = "<group>"; };
+		840D0ECA14BBC56A008FAC82 /* SNOSlowControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SNOSlowControl.h; sourceTree = "<group>"; };
+		840D0ECB14BBC56A008FAC82 /* SNOSlowControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SNOSlowControl.m; sourceTree = "<group>"; };
 		840D56D80F39E9BF00F9A274 /* ORPacController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPacController.h; path = Source/Objects/Hardware/Serial/Pac/ORPacController.h; sourceTree = SOURCE_ROOT; };
 		840D56D90F39E9BF00F9A274 /* ORPacController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORPacController.m; path = Source/Objects/Hardware/Serial/Pac/ORPacController.m; sourceTree = SOURCE_ROOT; };
 		840D56DA0F39E9BF00F9A274 /* ORPacDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPacDecoders.h; path = Source/Objects/Hardware/Serial/Pac/ORPacDecoders.h; sourceTree = SOURCE_ROOT; };
@@ -9844,9 +9858,8 @@
 				84C37D240EF834DD00E77E09 /* SNO */,
 				EFB39FC5130BA1C5001220AC /* SNOP */,
 			);
-			name = Experiments;
-			path = Source/Experiments;
-			sourceTree = SOURCE_ROOT;
+			path = Experiments;
+			sourceTree = "<group>";
 		};
 		84B8B99404DB33F8005F64B1 /* Ncd */ = {
 			isa = PBXGroup;
@@ -10090,6 +10103,13 @@
 				84C37D280EF834DD00E77E09 /* SNOController.m */,
 				84C37D290EF834DD00E77E09 /* SNOModel.h */,
 				84C37D2A0EF834DD00E77E09 /* SNOModel.m */,
+				840D0EC514BBC56A008FAC82 /* SNOMonitoredHardware.h */,
+				840D0EC614BBC56A008FAC82 /* SNOMonitoredHardware.m */,
+				840D0EC714BBC56A008FAC82 /* snopluslogooff.tiff */,
+				840D0EC814BBC56A008FAC82 /* snopluslogoon.tiff */,
+				840D0EC914BBC56A008FAC82 /* snopluslogoreplay.tiff */,
+				840D0ECA14BBC56A008FAC82 /* SNOSlowControl.h */,
+				840D0ECB14BBC56A008FAC82 /* SNOSlowControl.m */,
 			);
 			name = SNO;
 			path = Source/Experiments/SNO;
@@ -11179,16 +11199,16 @@
 		F51E693F03AE4775015F64B1 /* Source */ = {
 			isa = PBXGroup;
 			children = (
-				84B4329005E52B080084845B /* Security */,
-				84CDDA4504717079005F64B1 /* Misc */,
 				F51E695203AE4775015F64B1 /* App Delegate */,
-				F51E697003AE4775015F64B1 /* Main Document */,
-				F51E695A03AE4775015F64B1 /* Main Dialogs */,
-				84073A4C05E3F3D3003E62AA /* ValidatePassword */,
 				F51E695703AE4775015F64B1 /* Cocoa Extensions */,
+				F51E695A03AE4775015F64B1 /* Main Dialogs */,
+				F51E697003AE4775015F64B1 /* Main Document */,
+				84CDDA4504717079005F64B1 /* Misc */,
 				F51E697803AE4775015F64B1 /* Objects */,
-				84C2F03F041FB12C005F64B1 /* Widgets */,
+				84B4329005E52B080084845B /* Security */,
+				84073A4C05E3F3D3003E62AA /* ValidatePassword */,
 				84B8B99204DB32A6005F64B1 /* Experiments */,
+				84C2F03F041FB12C005F64B1 /* Widgets */,
 			);
 			path = Source;
 			sourceTree = SOURCE_ROOT;
@@ -12556,6 +12576,8 @@
 				84B6CD4714B37E9700386BE1 /* ORRGA300Controller.h in Headers */,
 				84B6CD4914B37E9700386BE1 /* ORRGA300Decoders.h in Headers */,
 				84B6CD4B14B37E9700386BE1 /* ORRGA300Model.h in Headers */,
+				840D0ECC14BBC56A008FAC82 /* SNOMonitoredHardware.h in Headers */,
+				840D0ED114BBC56A008FAC82 /* SNOSlowControl.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13351,6 +13373,9 @@
 				CED29CFE1482B02200BD3AB2 /* SIS3302Generic.nib in Resources */,
 				84B6CD4D14B37E9700386BE1 /* RGA300.nib in Resources */,
 				84B6CD4E14B37E9700386BE1 /* RGA300.tif in Resources */,
+				840D0ECE14BBC56A008FAC82 /* snopluslogooff.tiff in Resources */,
+				840D0ECF14BBC56A008FAC82 /* snopluslogoon.tiff in Resources */,
+				840D0ED014BBC56A008FAC82 /* snopluslogoreplay.tiff in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14255,6 +14280,8 @@
 				84B6CD4814B37E9700386BE1 /* ORRGA300Controller.m in Sources */,
 				84B6CD4A14B37E9700386BE1 /* ORRGA300Decoders.m in Sources */,
 				84B6CD4C14B37E9700386BE1 /* ORRGA300Model.m in Sources */,
+				840D0ECD14BBC56A008FAC82 /* SNOMonitoredHardware.m in Sources */,
+				840D0ED214BBC56A008FAC82 /* SNOSlowControl.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
