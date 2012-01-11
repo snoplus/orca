@@ -638,7 +638,7 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 - (NSString*) addOldFPDMapFormat:(NSMutableDictionary*)aDictionary
 {
 	//NSMutableString* result = [NSMutableString stringWithString:@"Pixel,FLT Card,FLT Ch,kname,Quad,Carousel,Mod. Addr.,Preamp,Preamp SN,OTB Card,OTB Ch,ORB Card,ORB Ch\n"];
-	NSMutableString* result = [NSString string];
+	NSMutableString* result = [NSMutableString string];
 	id segments = [[segmentGroups objectAtIndex:0] segments];
 	for(id segment in segments){
 		NSArray* parts = [[segment paramsAsString] componentsSeparatedByString:@","];
