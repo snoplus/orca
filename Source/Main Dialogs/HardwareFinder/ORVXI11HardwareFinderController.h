@@ -35,7 +35,8 @@
 }
 @end
 
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_6 
+// 10.6 or greater
 @interface ORVXI11HardwareFinderController : NSWindowController <NSTableViewDataSource>
 #else
 @interface ORVXI11HardwareFinderController : NSWindowController
@@ -64,12 +65,3 @@
 - (void) hardwareChanged:(NSNotification*)aNote;
 
 @end
-
-
-#if defined(MAC_OS_X_VERSION_10_6) && (MAC_OS_X_VERSION_MIN_REQUIRED > MAC_OS_X_VERSION_10_6)
-//get rid of compiler warning MAH 01/10/12
-@class NSDraggingSession;
-@interface NSObject (ORVXI11HardwareFinderController)
-- (void)draggingSession:(NSDraggingSession *)session endedAtPoint:(NSPoint)screenPoint operation:(NSDragOperation)operation;
-@end
-#endif

@@ -199,8 +199,10 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(VXI11HardwareFinderController);
 
 #if defined(MAC_OS_X_VERSION_10_6) && (MAC_OS_X_VERSION_MIN_REQUIRED > MAC_OS_X_VERSION_10_6)
 // Means compiling on 10.7 or greater
-- (void)draggingSession:(NSDraggingSession *)session endedAtPoint:(NSPoint)screenPoint operation:(NSDragOperation)operation
+- (void) tableView:(NSTableView*)tableView draggingSession:(NSDraggingSession *)session 
+      endedAtPoint:(NSPoint)screenPoint operation:(NSDragOperation)operation
 #else
+// Compiling on 10.6 or lower
 - (void)draggedImage:(NSImage *)anImage endedAt:(NSPoint)aPoint operation:(NSDragOperation)operation
 #endif
 {
@@ -218,22 +220,14 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(VXI11HardwareFinderController);
 // M. Marino
 @implementation ORTableViewWithDropNotify
 
-#if defined(MAC_OS_X_VERSION_10_6) && (MAC_OS_X_VERSION_MIN_REQUIRED > MAC_OS_X_VERSION_10_6)
-// Means compiling on 10.7 or greater
-- (void)draggingSession:(NSDraggingSession *)session endedAtPoint:(NSPoint)screenPoint operation:(NSDragOperation)operation
 
-{
-    [super draggingSession:session endedAtPoint:screenPoint operation:operation];
-    id deleg = [self delegate];
-    if ([deleg respondsToSelector:@selector(draggingSession:endedAtPoint:operation:)]) {
-        [deleg draggingSession:session endedAtPoint:screenPoint operation:operation];
-    }
-}
-#else
+
+#if !defined(MAC_OS_X_VERSION_10_6) || (MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_6)
+// Means compiling on 10.6 or lower 
 - (void)draggedImage:(NSImage *)anImage endedAt:(NSPoint)aPoint operation:(NSDragOperation)operation
 {
     [super draggedImage:anImage endedAt:aPoint operation:operation];    
-    id deleg = [self delegate];
+    id deleg = [self dataSource];
     if ([deleg respondsToSelector:@selector(draggedImage:endedAt:operation:)]) {
         [deleg draggedImage:anImage endedAt:aPoint operation:operation];
     }
