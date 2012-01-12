@@ -37,6 +37,7 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 @interface KatrinModel (private)
 - (void) validateSNArrays;
 - (NSString*) addOldFPDMapFormat:(NSMutableDictionary*)aDictionary;
+- (NSString*) addOldVetoMapFormat:(NSMutableDictionary*)aDictionary;
 - (NSString*) auxParamsString:(NSArray*)auxArray keys:(NSArray*)keys;
 - (NSString*) mapFileHeader:(int)tag;
 @end
@@ -136,14 +137,10 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)aDictionary
 {
-	NSString* segmentGeometryName[2] = {@"FPDGeometry",@"VetoGeometry"};
     NSMutableDictionary* objDictionary = [NSMutableDictionary dictionary];
-	int i;
-	int n = MIN(2,[segmentGroups count]);
-	for(i=0;i<n;i++){
-		ORSegmentGroup* aSegmentGroup = [segmentGroups objectAtIndex:i];
-		[aSegmentGroup addParametersToDictionary:objDictionary useName:segmentGeometryName[i]];
-	}
+	
+	[[segmentGroups objectAtIndex:0] addParametersToDictionary:objDictionary useName:@"FPDGeometry" addInGroupName:NO];
+	[[segmentGroups objectAtIndex:1] addParametersToDictionary:objDictionary useName:@"VetoGeometry" addInGroupName:NO];
 	
 	NSString* rootMapFile = [[[segmentGroups objectAtIndex:0] mapFile] stringByExpandingTildeInPath];
 	rootMapFile = [rootMapFile stringByDeletingPathExtension];
@@ -163,6 +160,7 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 	//add the SLT and Wafer SN
 	NSString* keySlt[2] = {@"kSltSN",@"kWaferSN"};
 	NSString* result = [NSString string];
+	int i;
 	for(i=0;i<2;i++){
 		id aParam = [otherSNs objectForKey:keySlt[i]];
 		if(aParam) result = [result stringByAppendingFormat:@"%@",aParam];
@@ -172,8 +170,17 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 	result = [result stringByAppendingString:@"\n"];
     [objDictionary setObject:result forKey:@"SltWaferSNs"];
 	
-	[objDictionary setObject:[self addOldFPDMapFormat:aDictionary] forKey:@"Focal Plane/Geometry"];
+	//for backward compatibility with the analysis code
+	
+	NSMutableDictionary* mapDictionary;
+	mapDictionary = [NSMutableDictionary dictionary];
+	[mapDictionary setObject:[self addOldFPDMapFormat:aDictionary] forKey:@"Geometry"];
+	[objDictionary setObject:mapDictionary forKey:@"Focal Plane"];
 
+	mapDictionary = [NSMutableDictionary dictionary];
+	[mapDictionary setObject:[self addOldVetoMapFormat:aDictionary] forKey:@"Geometry"];
+	[objDictionary setObject:mapDictionary forKey:@"Veto"];
+	
     [aDictionary setObject:objDictionary forKey:[self className]];
     return aDictionary;
 }
@@ -665,6 +672,26 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 	if(result)return result;
 	else return @"NONE";
 }
+
+- (NSString*) addOldVetoMapFormat:(NSMutableDictionary*)aDictionary
+{
+	NSMutableString* result = [NSMutableString string];
+	id segments = [[segmentGroups objectAtIndex:1] segments];
+	for(id segment in segments){
+		NSArray* parts = [[segment paramsAsString] componentsSeparatedByString:@","];
+		if([parts count]>=3){
+			[result appendFormat:@"%@,%@,%@,%@\n",
+				[parts objectAtIndex:0], //pixel
+				[parts objectAtIndex:1], //FLT Card
+				[parts objectAtIndex:2], //FLT Chan
+				@"-"
+			 ];			
+		}
+	}
+	if(result)return result;
+	else return @"NONE";
+}
+
 - (void) validateSNArrays
 {
 	if(!fltSNs){
