@@ -1483,7 +1483,8 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 - (void) executeCommandList:(ORCommandList*)aList
 {
 	@try {
-		SBC_Packet blockPacket = [aList SBCPacket];
+		SBC_Packet blockPacket;
+        [aList SBCPacket:&blockPacket];
 		
 		[socketLock lock]; //begin critical section
 		//Do NOT call the combo send:receive method here... we have the locks already in place

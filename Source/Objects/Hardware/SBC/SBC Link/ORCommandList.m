@@ -68,22 +68,25 @@
 	else return nil;
 }
 
-- (SBC_Packet) SBCPacket
+- (void) SBCPacket:(SBC_Packet*)blockPacket
 {
 	//make the main header
-	SBC_Packet blockPacket;
-	blockPacket.cmdHeader.destination			= kSBC_Process;
-	blockPacket.cmdHeader.cmdID					= kSBC_CmdBlock;
-	blockPacket.cmdHeader.numberBytesinPayload	= 0; //fill in as we go
-	char* blockPayloadPtr				= (char*)blockPacket.payload;
+	blockPacket->cmdHeader.destination			= kSBC_Process;
+	blockPacket->cmdHeader.cmdID				= kSBC_CmdBlock;
+	blockPacket->cmdHeader.numberBytesinPayload	= 0; //fill in as we go
+	char* blockPayloadPtr				= (char*)blockPacket->payload;
 	
 	for(id aCmd in commands){
-		SBC_Packet cmdPacket = [aCmd SBCPacket];
+        SBC_Packet cmdPacket;
+        [aCmd SBCPacket:&cmdPacket];
+        if (blockPacket->cmdHeader.numberBytesinPayload + cmdPacket.numBytes > kSBC_MaxPayloadSizeBytes) {
+            [NSException raise: @"SBC/VME access Error" format:@"Memory overflow on SBC_Packet"];
+        }
 		memcpy(blockPayloadPtr,&cmdPacket,cmdPacket.numBytes);
-		blockPacket.cmdHeader.numberBytesinPayload += cmdPacket.numBytes;
+
+		blockPacket->cmdHeader.numberBytesinPayload += cmdPacket.numBytes;
 		blockPayloadPtr += cmdPacket.numBytes;
 	}
-	return blockPacket;
 }
 
 - (void) extractData:(SBC_Packet*) aPacket

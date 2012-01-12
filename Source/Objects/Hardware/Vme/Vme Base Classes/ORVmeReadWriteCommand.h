@@ -81,7 +81,7 @@ for the use of this software.
 - (unsigned char*) bytes;
 - (NSMutableData*)	data;
 
-- (SBC_Packet) SBCPacket;
+- (void) SBCPacket:(SBC_Packet*)aPacket;
 - (void) extractData:(SBC_Packet*) aPacket;
 - (void) throwError:(int)anError;
 - (long) longValue;

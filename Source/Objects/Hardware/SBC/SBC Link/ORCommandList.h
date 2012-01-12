@@ -28,7 +28,7 @@
 - (NSMutableArray*) commands;
 - (int) addCommands:(ORCommandList*)anOtherList;
 - (id) command:(int)index;
-- (SBC_Packet) SBCPacket;
+- (void) SBCPacket:(SBC_Packet*)blockPacket;
 - (void) extractData:(SBC_Packet*) aPacket;
 - (long) longValueForCmd:(int)anIndex;
 - (short) shortValueForCmd:(int)anIndex;

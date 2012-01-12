@@ -137,15 +137,15 @@
 - (NSMutableData*) data		 { return data; }
 - (unsigned char*) bytes	 { return (unsigned char*)[data bytes];}
 
-- (SBC_Packet) SBCPacket
+- (void) SBCPacket:(SBC_Packet*)aPacket
 {
 	BOOL validOp = YES;
-	SBC_Packet aPacket;	
-	aPacket.cmdHeader.destination		= kSBC_Process;
+	aPacket->cmdHeader.destination		= kSBC_Process;
 	if(opType == kWriteOp){
-		aPacket.cmdHeader.cmdID			= kSBC_WriteBlock;
-		aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_VmeWriteBlockStruct) + numberItems*itemSize;
-		SBC_VmeWriteBlockStruct* writeBlockPtr = (SBC_VmeWriteBlockStruct*)aPacket.payload;
+		aPacket->cmdHeader.cmdID			= kSBC_WriteBlock;
+		aPacket->cmdHeader.numberBytesinPayload	= sizeof(SBC_VmeWriteBlockStruct) + numberItems*itemSize;
+        if (aPacket->cmdHeader.numberBytesinPayload > kSBC_MaxPayloadSizeBytes) [self throwError:ENOMEM];
+		SBC_VmeWriteBlockStruct* writeBlockPtr = (SBC_VmeWriteBlockStruct*)aPacket->payload;
 		writeBlockPtr->address			= vmeAddress;
 		writeBlockPtr->addressModifier	= addressModifier;
 		writeBlockPtr->addressSpace		= addressSpace;
@@ -156,9 +156,10 @@
 		memcpy(writeBlockPtr,p,numberItems*itemSize);		
 	}
 	else if(opType == kReadOp){
-		aPacket.cmdHeader.cmdID			= kSBC_ReadBlock;
-		aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_VmeReadBlockStruct) + numberItems*itemSize;
-		SBC_VmeReadBlockStruct* readBlockPtr = (SBC_VmeReadBlockStruct*)aPacket.payload;
+		aPacket->cmdHeader.cmdID			= kSBC_ReadBlock;
+		aPacket->cmdHeader.numberBytesinPayload	= sizeof(SBC_VmeReadBlockStruct) + numberItems*itemSize;
+        if (aPacket->cmdHeader.numberBytesinPayload > kSBC_MaxPayloadSizeBytes) [self throwError:ENOMEM];        
+		SBC_VmeReadBlockStruct* readBlockPtr = (SBC_VmeReadBlockStruct*)aPacket->payload;
 		readBlockPtr->address			= vmeAddress;
 		readBlockPtr->addressModifier	= addressModifier;
 		readBlockPtr->addressSpace		= addressSpace;
@@ -169,14 +170,13 @@
 		memset(readBlockPtr,0,numberItems*itemSize);
 	}
 	else if(opType == kDelayOp){
-		aPacket.cmdHeader.cmdID			= kSBC_TimeDelay;
-		aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_TimeDelay) + numberItems*itemSize;
-		SBC_TimeDelay* delayStructPtr = (SBC_TimeDelay*)aPacket.payload;
+		aPacket->cmdHeader.cmdID			= kSBC_TimeDelay;
+		aPacket->cmdHeader.numberBytesinPayload	= sizeof(SBC_TimeDelay);
+		SBC_TimeDelay* delayStructPtr = (SBC_TimeDelay*)aPacket->payload;
 		delayStructPtr->milliSecondDelay			= milliSecondDelay;
 	}
 	else validOp = NO;
-	if(validOp) aPacket.numBytes = sizeof(unsigned long) + sizeof(SBC_CommandHeader) + kSBC_MaxMessageSizeBytes + aPacket.cmdHeader.numberBytesinPayload;
-	return aPacket;
+	if(validOp) aPacket->numBytes = sizeof(unsigned long) + sizeof(SBC_CommandHeader) + kSBC_MaxMessageSizeBytes + aPacket->cmdHeader.numberBytesinPayload;
 }
 
 - (void) extractData:(SBC_Packet*) aPacket
