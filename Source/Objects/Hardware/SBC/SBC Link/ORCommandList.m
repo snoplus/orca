@@ -75,17 +75,20 @@
 	blockPacket->cmdHeader.cmdID				= kSBC_CmdBlock;
 	blockPacket->cmdHeader.numberBytesinPayload	= 0; //fill in as we go
 	char* blockPayloadPtr				= (char*)blockPacket->payload;
+    
+    // We use an NSData object so that if any exceptions are thrown, this will be cleaned up automatically.
+    NSData* tmpData = [NSMutableData dataWithLength:sizeof(SBC_Packet)];
+    SBC_Packet* cmdPacket = (SBC_Packet*)[tmpData bytes];
 	
 	for(id aCmd in commands){
-        SBC_Packet cmdPacket;
-        [aCmd SBCPacket:&cmdPacket];
-        if (blockPacket->cmdHeader.numberBytesinPayload + cmdPacket.numBytes > kSBC_MaxPayloadSizeBytes) {
+        [aCmd SBCPacket:cmdPacket];
+        if (blockPacket->cmdHeader.numberBytesinPayload + cmdPacket->numBytes > kSBC_MaxPayloadSizeBytes) {
             [NSException raise: @"SBC/VME access Error" format:@"Memory overflow on SBC_Packet"];
         }
-		memcpy(blockPayloadPtr,&cmdPacket,cmdPacket.numBytes);
+		memcpy(blockPayloadPtr,&cmdPacket,cmdPacket->numBytes);
 
-		blockPacket->cmdHeader.numberBytesinPayload += cmdPacket.numBytes;
-		blockPayloadPtr += cmdPacket.numBytes;
+		blockPacket->cmdHeader.numberBytesinPayload += cmdPacket->numBytes;
+		blockPayloadPtr += cmdPacket->numBytes;
 	}
 }
 

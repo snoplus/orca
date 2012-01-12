@@ -1483,16 +1483,17 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 - (void) executeCommandList:(ORCommandList*)aList
 {
 	@try {
-		SBC_Packet blockPacket;
-        [aList SBCPacket:&blockPacket];
+        NSData* tmpData = [NSMutableData dataWithLength:sizeof(SBC_Packet)];
+        SBC_Packet* blockPacket = (SBC_Packet*)[tmpData bytes];        
+        [aList SBCPacket:blockPacket];
 		
 		[socketLock lock]; //begin critical section
 		//Do NOT call the combo send:receive method here... we have the locks already in place
-		[self write:socketfd buffer:&blockPacket];	//write the packet
-		[self read:socketfd buffer:&blockPacket];	//read the response
+		[self write:socketfd buffer:blockPacket];	//write the packet
+		[self read:socketfd buffer:blockPacket];	//read the response
 		[socketLock unlock]; //end critical section
 		
-		[aList extractData:&blockPacket];
+		[aList extractData:blockPacket];
 	
 	}
 	@catch (NSException* localException) {
