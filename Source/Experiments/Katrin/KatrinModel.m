@@ -172,7 +172,7 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 	result = [result stringByAppendingString:@"\n"];
     [objDictionary setObject:result forKey:@"SltWaferSNs"];
 	
-	[objDictionary setObject:[self addOldFPDMapFormat:aDictionary] forKey:@"Geometry"];
+	[objDictionary setObject:[self addOldFPDMapFormat:aDictionary] forKey:@"Focal Plane/Geometry"];
 
     [aDictionary setObject:objDictionary forKey:[self className]];
     return aDictionary;
