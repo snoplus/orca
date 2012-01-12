@@ -85,7 +85,7 @@
         if (blockPacket->cmdHeader.numberBytesinPayload + cmdPacket->numBytes > kSBC_MaxPayloadSizeBytes) {
             [NSException raise: @"SBC/VME access Error" format:@"Memory overflow on SBC_Packet"];
         }
-		memcpy(blockPayloadPtr,&cmdPacket,cmdPacket->numBytes);
+		memcpy(blockPayloadPtr,cmdPacket,cmdPacket->numBytes);
 
 		blockPacket->cmdHeader.numberBytesinPayload += cmdPacket->numBytes;
 		blockPayloadPtr += cmdPacket->numBytes;
