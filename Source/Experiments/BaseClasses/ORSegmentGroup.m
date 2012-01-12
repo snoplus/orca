@@ -447,8 +447,11 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 		return [string stringByAppendingFormat:@"%@",[segments objectAtIndex:index]];
 	}
 }
-
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary useName:(NSString*)aName
+{
+	return [self addParametersToDictionary:dictionary useName:aName addInGroupName:YES];
+}
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary useName:(NSString*)aName addInGroupName:(BOOL)addInGroupName
 {
     NSMutableString* theContents = [NSMutableString string];
 
@@ -461,12 +464,18 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
         [theContents appendString:[segment paramsAsString]];
         [theContents appendString:@"\n"];
     }
-    NSMutableDictionary* mapDictionary = [NSMutableDictionary dictionary];
-	
-	if([theContents length]) [mapDictionary setObject:theContents forKey:aName];
-	else					 [mapDictionary setObject:@"NONE" forKey:aName];
-	
-    [dictionary setObject:mapDictionary forKey:groupName];
+	if(addInGroupName){
+		NSMutableDictionary* mapDictionary = [NSMutableDictionary dictionary];
+		
+		if([theContents length]) [mapDictionary setObject:theContents forKey:aName];
+		else					 [mapDictionary setObject:@"NONE" forKey:aName];
+		
+		[dictionary setObject:mapDictionary forKey:groupName];
+	}
+	else {
+		if([theContents length]) [dictionary setObject:theContents forKey:aName];
+		else					 [dictionary setObject:@"NONE" forKey:aName];
+	}
     return dictionary;
 }
 
