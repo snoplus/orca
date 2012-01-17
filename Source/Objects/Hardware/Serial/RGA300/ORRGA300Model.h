@@ -22,8 +22,6 @@
 #import "ORSerialPortModel.h"
 
 @class ORSafeQueue;
-@class ORTimeRate;
-@class ORAlarm;
 
 //Status Error Masks
 #define kRGACommStatusMask			0x01
@@ -34,13 +32,13 @@
 #define kRGA24VStatusMask			0x40
 
 //RS2323 Error Masks
-#define kRGABadCmd			0x01
-#define kRGABadParam		0x02
-#define kRGACmdTooLong		0x04
-#define kRGAOverWrite		0x08
-#define kRGATransOverWrite	0x10
-#define kRGAJumper			0x20
-#define kRGAParamConflict	0x40
+#define kRGABadCmd					0x01
+#define kRGABadParam				0x02
+#define kRGACmdTooLong				0x04
+#define kRGAOverWrite				0x08
+#define kRGATransOverWrite			0x10
+#define kRGAJumper					0x20
+#define kRGAParamConflict			0x40
 
 //CEM Masks
 #define kRGACEMNoElecMultiOption	0x10
@@ -48,17 +46,17 @@
 //FIL Masks
 #define kRGAFILSingleFilament		0x01
 #define kRGAFILPressureTooHigh		0x20
-#define kRGAFILCannotSetCurrent	0x40
+#define kRGAFILCannotSetCurrent		0x40
 #define kRGAFILNoFilament			0x80
 
 //QMG Masks
-#define kRGAQMFCurrentLimited	0x10
-#define kRGAQMFCurrentTooHigh	0x40
-#define kRGAQMFRF_CTTooHigh		0x80
+#define kRGAQMFCurrentLimited		0x10
+#define kRGAQMFCurrentTooHigh		0x40
+#define kRGAQMFRF_CTTooHigh			0x80
 
 //Power Supply Masks
-#define kRGAPSExtPowerTooLow  0x40
-#define kRGAPSExtPowerTooHigh 0x80
+#define kRGAPSExtPowerTooLow		0x40
+#define kRGAPSExtPowerTooHigh		0x80
 
 //Electrometer Masks
 #define kRGADetOpAmpOffset	0x02
@@ -68,16 +66,21 @@
 #define kRGADetDetPosInput  0x40
 #define kRGADetAdcFailure	0x80
 
+#define kRGAIdle			-999
+#define kRGAAnalogScan		0
+#define kRGATableScan		1
+#define kRGAHistogramScan   2
+
+#define kRGAAnalogMode		0
+#define kRGATableMode		1
+#define kRGAHistogramMode   2
 
 @interface ORRGA300Model : ORSerialPortModel
 {
     @private
-        unsigned long	dataId;
 		NSString*		lastRequest;
 		ORSafeQueue*	cmdQueue;
 		NSMutableData*	inComingData;
-		int				pollTime;
-		ORTimeRate*		timeRate;
 		int		modelNumber;
 		float	firmwareVersion;
 		int		serialNumber;
@@ -89,10 +92,9 @@
 		int		filErrWord;
 		int		rs232ErrWord;
 	
-		//ionizer
 		int		ionizerDegassTime;
 		int		ionizerElectronEnergy;
-		int		ionizerEmissionCurrent;
+		float	ionizerEmissionCurrent;
 		int		ionizerIonEnergy;
 		int		ionizerFocusPlateVoltage;
 		int		elecMultHVBias;
@@ -101,27 +103,63 @@
 		int		histoScanPoints;
 		int		finalMass;
 		int		initialMass;
-		int		singleMass;
 		int		stepsPerAmu;
-		int		numberAnalogScans;
-    int measuredIonCurrent;
-    BOOL electronMultiOption;
+		int		numberScans;
+		int		measuredIonCurrent;
+		BOOL	electronMultiOption;
+		float	elecMultGain;
+	
+		//readback values
+		float	ionizerFilamentCurrentRB;
+		int		ionizerElectronEnergyRB;
+		int		ionizerIonEnergyRB;
+		int		ionizerFocusPlateVoltageRB;
+		int		noiseFloorSettingRB;
+		int		elecMultHVBiasRB;
+		float	elecMultGainRB;
+		int		opMode;
+		int		currentActivity;
+	
+		//scan parameters and data
+		BOOL	expectingRawData;
+		unsigned long expectedRawDataLength;
+		float	scanProgress;
+		int		scanNumber;
+		NSData* scanData;
+		NSMutableDictionary* amuTableData;
+		NSMutableArray* amus;
+		int currentAmuIndex;
 }
 
 #pragma mark •••Initialization
 - (void) dealloc;
 
 #pragma mark •••Accessors
-- (BOOL) electronMultiOption;
-- (int) measuredIonCurrent;
-- (void) setMeasuredIonCurrent:(int)aMeasuredIonCurrent;
-//scanning
-- (int)		numberAnalogScans;
-- (void)	setNumberAnalogScans:(int)aNumberAnalogScans;
+- (int)		currentAmuIndex;
+- (NSData*) scanData;
+- (int)		scanNumber;
+- (void)	setScanNumber:(int)aScanNumber;
+- (float)	scanProgress;
+- (void)	setScanProgress:(float)aScanProgress;
+- (int)		currentActivity;
+- (int)		opMode;
+- (void)	setOpMode:(int)aOpMode;
+- (float)	elecMultGainRB;
+- (int)		elecMultHVBiasRB;
+- (int)		noiseFloorSettingRB;
+- (int)		ionizerFocusPlateVoltageRB;
+- (int)		ionizerIonEnergyRB;
+- (int)		ionizerElectronEnergyRB;
+- (float)	ionizerFilamentCurrentRB;
+- (float)	elecMultGain;
+- (void)	setElecMultGain:(float)aElecMultGain;
+- (BOOL)	electronMultiOption;
+- (int)		measuredIonCurrent;
+
+- (int)		numberScans;
+- (void)	setNumberScans:(int)aNumberScans;
 - (int)		stepsPerAmu;
 - (void)	setStepsPerAmu:(int)aStepsPerAmu;
-- (int)		singleMass;
-- (void)	setSingleMass:(int)aSingleMass;
 - (int)		histoScanPoints;
 - (int)		analogScanPoints;
 - (int)		noiseFloorSetting;
@@ -134,46 +172,34 @@
 - (int)		elecMultHVBias;
 - (void)	setElecMultHVBias:(int)aElecMultHVBias;
 
-//ionizer
 - (int)		ionizerFocusPlateVoltage;
 - (void)	setIonizerFocusPlateVoltage:(int)aIonizerFocusPlateVoltage;
 - (int)		ionizerIonEnergy;
 - (void)	setIonizerIonEnergy:(int)aIonizerIonEnergy;
-- (int)		ionizerEmissionCurrent;
-- (void)	setIonizerEmissionCurrent:(int)aIonizerEmissionCurrent;
+- (float)	ionizerEmissionCurrent;
+- (void)	setIonizerEmissionCurrent:(float)aIonizerEmissionCurrent;
 - (int)		ionizerElectronEnergy;
 - (void)	setIonizerElectronEnergy:(int)aIonizerElectronEnergy;
 - (int)		ionizerDegassTime;
 - (void)	setIonizerDegassTime:(int)aIonizerDegassTime;
 
-//status stuff
-- (int) rs232ErrWord;
-- (void) setRs232ErrWord:(int)aRs232ErrWord;
-- (int) filErrWord;
-- (void) setFilErrWord:(int)aFilErrWord;
-- (int) cemErrWord;
-- (void) setCemErrWord:(int)aCemErrWord;
-- (int) qmfErrWord;
-- (void) setQmfErrWord:(int)aQmfErrWord;
-- (int) detErrWord;
-- (void) setDetErrWord:(int)aDetErrWord;
-- (int) psErrWord;
-- (void) setPsErrWord:(int)aPsErrWord;
-
+- (int)		rs232ErrWord;
+- (int)		filErrWord;
+- (int)		cemErrWord;
+- (int)		qmfErrWord;
+- (int)		detErrWord;
+- (int)		psErrWord;
 - (int)		statusWord;
-- (void)	setStatusWord:(int)aStatusWord;
 - (int)		serialNumber;
 - (float)	firmwareVersion;
 - (int)		modelNumber;
 
-- (int)  pollTime;
-- (void) setPollTime:(int)aPollTime;
-- (ORTimeRate*)timeRate;
-- (NSString*) lastRequest;
-- (void) setLastRequest:(NSString*)aCmdString;
 - (void) openPort:(BOOL)state;
+- (void) dataReceived:(NSNotification*)note;
 
 #pragma mark •••Commands
+- (void) sendIDRequest;
+- (void) queryAll;
 - (void) syncWithHW;
 - (void) sendIDRequest;
 - (void) sendInitComm;
@@ -186,58 +212,68 @@
 - (void) sendEMErrQuery; 
 - (void) sendPowerErrQuery; 
 - (void) sendQMFErrQuery; 
+- (void) sendElecMultGainQuery;
 
+- (void) sendElecMultiGain;
 - (void) sendIonizerElectronEnergy;
-- (void) sendIonizerEmissionCurrent; 
 - (void) sendIonizerIonEnergy;
 - (void) sendIonizerFocusPlateVoltage;
 
 - (void) sendCalibrateAll;
 - (void) sendCalibrateElectrometerIVResponse;
-- (void) sendElecMultiHVBias;
 
 - (void) startDegassing;
 - (void) stopDegassing;
 
 - (void) sendInitialMass;
 - (void) sendFinalMass;
+- (void) sendStepsPerAmu; 
 
-
-- (void) startSingleMassMeasurement;
-- (void) stopSingleMassMeasurement;
 - (void) sendStepsPerAmuQuery;
-- (void) startAnalogScan;
-- (void) stopAnalogScan;
+- (void) turnHVBiasOFF;
+- (void) sendHVBias;
+- (void) turnFilamentOFF;
+- (void) sendFilamentCurrent;
+- (void) startMeasurement;
+- (void) stopMeasurement;
 
-#pragma mark •••Data Records
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (NSDictionary*) dataRecordDescription;
-- (unsigned long) dataId;
-- (void) setDataId: (unsigned long) DataId;
-- (void) setDataIds:(id)assigner;
-- (void) syncDataIdsWith:(id)anotherRGA300;
+- (void) addAmu;
+- (void) addAmu:(id)anAmu atIndex:(int)anIndex;
+- (void) removeAmuAtIndex:(int) anIndex;
+- (unsigned long) amuCount;
+- (id) amuAtIndex:(int)anIndex;
+- (void) replaceAmuAtIndex:(int)anIndex withAmu:(id)anObject;
 
 #pragma mark •••Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 
-#pragma mark •••Command Methods
-- (void) sendIDRequest;
 
 #pragma mark •••Port Methods
-- (void) dataReceived:(NSNotification*)note;
-
-#pragma mark •••HW Methods
-- (void) initUnit;
-- (void) updateAll;
+- (int) numberPointsInScan;
+- (int) scanValueAtIndex:(int)i;
+- (int) countsInAmuTableData:(int)i;
+- (int) amuTable:(int)anAmu valueAtIndex:(int)i;
 
 @end
 
+extern NSString* ORRGA300ModelScanDataChanged;
+extern NSString* ORRGA300ModelScanNumberChanged;
+extern NSString* ORRGA300ModelScanProgressChanged;
+extern NSString* ORRGA300ModelCurrentActivityChanged;
+extern NSString* ORRGA300ModelOpModeChanged;
+extern NSString* ORRGA300ModelElecMultGainRBChanged;
+extern NSString* ORRGA300ModelElecMultHVBiasRBChanged;
+extern NSString* ORRGA300ModelNoiseFloorSettingRBChanged;
+extern NSString* ORRGA300ModelIonizerFocusPlateVoltageRBChanged;
+extern NSString* ORRGA300ModelIonizerIonEnergyRBChanged;
+extern NSString* ORRGA300ModelIonizerElectronEnergyRBChanged;
+extern NSString* ORRGA300ModelIonizerFilamentCurrentRBChanged;
+extern NSString* ORRGA300ModelElecMultGainChanged;
 extern NSString* ORRGA300ModelElectronMultiOptionChanged;
 extern NSString* ORRGA300ModelMeasuredIonCurrentChanged;
-extern NSString* ORRGA300ModelNumberAnalogScansChanged;
+extern NSString* ORRGA300ModelNumberScansChanged;
 extern NSString* ORRGA300ModelStepsPerAmuChanged;
-extern NSString* ORRGA300ModelSingleMassChanged;
 extern NSString* ORRGA300ModelInitialMassChanged;
 extern NSString* ORRGA300ModelFinalMassChanged;
 extern NSString* ORRGA300ModelHistoScanPointsChanged;
@@ -259,6 +295,7 @@ extern NSString* ORRGA300ModelStatusWordChanged;
 extern NSString* ORRGA300ModelSerialNumberChanged;
 extern NSString* ORRGA300ModelFirmwareVersionChanged;
 extern NSString* ORRGA300ModelModelNumberChanged;
-
+extern NSString* ORRGA300ModelAmuAdded;
+extern NSString* ORRGA300ModelAmuRemoved;
+extern NSString* ORRGA300ModelCurrentAmuIndexChanged;
 extern NSString* ORRGA300Lock;
-extern NSString* ORRGA300ModelPollTimeChanged;

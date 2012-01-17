@@ -20,24 +20,37 @@
 #pragma mark •••Imported Files
 
 @class StopLightView;
-@class ORCompositeTimeLineView;
+@class ORCompositePlotView;
 @class ORSerialPortController;
 
 @interface ORRGA300Controller : OrcaObjectController
 {
 	IBOutlet NSTextField* serialNumberField;
-	IBOutlet NSTextField* electronMultiOptionTextField;
+	IBOutlet NSTextField* scanNumberField;
+	IBOutlet NSTextField* currentAmuIndexField;
+	IBOutlet NSTextField* currentActivityField;
+	IBOutlet NSPopUpButton* opModePU;
+	IBOutlet NSTextField* elecMultGainRBField;
+	IBOutlet NSTextField* elecMultHVBiasRBField;
+	IBOutlet NSTextField* noiseFloorSettingRBField;
+	
+	IBOutlet NSTextField* ionizerFocusPlateVoltageRBField;
+	IBOutlet NSTextField* ionizerIonEnergyRBField;
+	IBOutlet NSTextField* ionizerElectronEnergyRBField;
+	IBOutlet NSTextField* ionizerFilamentCurrentRBField;
+	
+	IBOutlet NSTextField* elecMultGainField;
+	IBOutlet NSTextField* electronMultiOptionField;
 	IBOutlet NSTextField* measuredIonCurrentField;
-	IBOutlet NSTextField* numberAnalogScansField;
+	IBOutlet NSTextField* numberScansField;
 	IBOutlet NSTextField* stepsPerAmuField;
-	IBOutlet NSTextField* singleMassField;
 	IBOutlet NSTextField* initialMassField;
 	IBOutlet NSTextField* finalMassField;
 	IBOutlet NSTextField* histoScanPointsField;
 	IBOutlet NSTextField* analogScanPointsField;
 	IBOutlet NSTextField* noiseFloorSettingField;
 	IBOutlet NSTextField* elecMultHVBiasField;
-	IBOutlet NSTextField* mMaxField;
+	
 	IBOutlet NSMatrix*		rs232ErrWordMatrix;
 	IBOutlet NSMatrix*		filErrWordMatrix;
 	IBOutlet NSMatrix*		cemErrWordMatrix;
@@ -48,18 +61,25 @@
 	IBOutlet NSTextField*	firmwareVersionField;
 	IBOutlet NSTextField*	modelNumberField;
     IBOutlet NSButton*		lockButton;
-    IBOutlet NSButton*		updateButton;
-    IBOutlet NSButton*		initButton;
-    IBOutlet ORCompositeTimeLineView*	plotter;
-    IBOutlet NSPopUpButton* pollTimePopup;
+    IBOutlet ORCompositePlotView*	plotter;
     IBOutlet ORSerialPortController* serialPortController;
 	
-	//ionizer
 	IBOutlet NSTextField*	ionizerFocusPlateVoltageField;
 	IBOutlet NSPopUpButton* ionizerIonEnergyPU;
 	IBOutlet NSTextField*	ionizerEmissionCurrentField;
 	IBOutlet NSTextField*	ionizerElectronEnergyField;
 	IBOutlet NSTextField*	ionizerDegassTimeField;
+
+    IBOutlet NSButton*		filamentOnOffButton;
+	IBOutlet NSButton*		elecMultHVBiasOnOffButton;
+	IBOutlet NSButton*		startMeasurementButton;
+	IBOutlet NSButton*		stopMeasurementButton;
+	IBOutlet NSProgressIndicator* scanProgressBar;
+	IBOutlet NSDrawer*		errorDrawer;
+	IBOutlet NSButton*		detailsButton;
+	IBOutlet NSTableView*	amuTable;
+    IBOutlet NSButton*      addAmuButton;
+    IBOutlet NSButton*      removeAmuButton;
 }
 
 #pragma mark •••Initialization
@@ -73,11 +93,25 @@
 - (void) updateButtons;
 
 #pragma mark •••Interface Management
+- (void) drawDidOpen:(NSNotification*)aNote;
+- (void) drawDidClose:(NSNotification*)aNote;
+- (void) scanDataChanged:(NSNotification*)aNote;
+- (void) scanNumberChanged:(NSNotification*)aNote;
+- (void) scanProgressChanged:(NSNotification*)aNote;
+- (void) currentActivityChanged:(NSNotification*)aNote;
+- (void) opModeChanged:(NSNotification*)aNote;
+- (void) elecMultGainRBChanged:(NSNotification*)aNote;
+- (void) elecMultHVBiasRBChanged:(NSNotification*)aNote;
+- (void) noiseFloorSettingRBChanged:(NSNotification*)aNote;
+- (void) ionizerFocusPlateVoltageRBChanged:(NSNotification*)aNote;
+- (void) ionizerIonEnergyRBChanged:(NSNotification*)aNote;
+- (void) ionizerElectronEnergyRBChanged:(NSNotification*)aNote;
+- (void) ionizerFilamentCurrentRBChanged:(NSNotification*)aNote;
+- (void) elecMultGainChanged:(NSNotification*)aNote;
 - (void) electronMultiOptionChanged:(NSNotification*)aNote;
 - (void) measuredIonCurrentChanged:(NSNotification*)aNote;
-- (void) numberAnalogScansChanged:(NSNotification*)aNote;
+- (void) numberScansChanged:(NSNotification*)aNote;
 - (void) stepsPerAmuChanged:(NSNotification*)aNote;
-- (void) singleMassChanged:(NSNotification*)aNote;
 - (void) initialMassChanged:(NSNotification*)aNote;
 - (void) finalMassChanged:(NSNotification*)aNote;
 - (void) histoScanPointsChanged:(NSNotification*)aNote;
@@ -100,17 +134,24 @@
 - (void) firmwareVersionChanged:(NSNotification*)aNote;
 - (void) modelNumberChanged:(NSNotification*)aNote;
 - (void) lockChanged:(NSNotification*)aNote;
-- (void) updateTimePlot:(NSNotification*)aNotification;
 - (void) scaleAction:(NSNotification*)aNotification;
 - (void) miscAttributesChanged:(NSNotification*)aNote;
-- (void) pollTimeChanged:(NSNotification*)aNote;
+- (void) amuCountChanged:(NSNotification*)aNote;
+- (void) currentAmuIndexChanged:(NSNotification*)aNote;
 - (BOOL) portLocked;
+- (void) setupPlotter;
+
+- (void) _syncSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 
 #pragma mark •••Actions
+- (IBAction) startMeasurementAction:(id)sender;
+- (IBAction) stopMeasurementAction:(id)sender;
+- (IBAction) opModeAction:(id)sender;
+- (IBAction) elecMultGainAction:(id)sender;
+- (IBAction) queryAllAction:(id)sender;
 - (IBAction) syncDialogAction:(id)sender;
-- (IBAction) numberAnalogScansAction:(id)sender;
+- (IBAction) numberScansAction:(id)sender;
 - (IBAction) stepsPerAmuAction:(id)sender;
-- (IBAction) singleMassAction:(id)sender;
 - (IBAction) initialMassAction:(id)sender;
 - (IBAction) finalMassAction:(id)sender;
 - (IBAction) noiseFloorSettingAction:(id)sender;
@@ -120,17 +161,17 @@
 - (IBAction) ionizerEmissionCurrentAction:(id)sender;
 - (IBAction) ionizerElectronEnergyAction:(id)sender;
 - (IBAction) ionizerDegassTimeAction:(id)sender;
-- (IBAction) pollTimeAction:(id)sender;
 - (IBAction) lockAction:(id) sender;
-- (IBAction) updateAllAction:(id)sender;
-- (IBAction) pollTimeAction:(id)sender;
-- (IBAction) initAction:(id)sender;
 - (IBAction) resetAction:(id)sender;
 - (IBAction) standByAction:(id)sender;
 - (IBAction) degassAction:(id)sender;
+- (IBAction) addAmuAction:(id)sender;
+- (IBAction) removeAmuAction:(id)sender;
 
 - (int) numberPointsInPlot:(id)aPlotter;
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
+- (int) numberOfRowsInTableView:(NSTableView *)tableView;
+- (id) tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(int)row;
 
 @end
 
