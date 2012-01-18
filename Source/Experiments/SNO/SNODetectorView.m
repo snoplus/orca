@@ -301,7 +301,7 @@ NSString* selectionStringChanged			 = @"selectionStringChanged";
 			for(card=0;card<kNumSNOCards;card++){
 				for(pmt=0;pmt<kNumSNOPmts;pmt++){
 					tubeIndex = kChannelsPerCrate * crate + kChannelsPerBoard* card + pmt;
-					[[pmtColorArray objectAtIndex:tubeIndex] set];
+					[(NSColor *)[pmtColorArray objectAtIndex:tubeIndex] set];
 					[[channelRectsInPSUPView objectAtIndex:tubeIndex] fill];
 					aPath  = [channelRectsInPSUPView objectAtIndex:tubeIndex];
 					[aPath setLineWidth:highlightLineWidth-2.5];
@@ -450,7 +450,7 @@ NSString* selectionStringChanged			 = @"selectionStringChanged";
 			for(card=0;card<kNumSNOCards;card++){
 				for(pmt=0;pmt<kNumSNOPmts;pmt++){
 					tubeIndex = kChannelsPerCrate * crate + kChannelsPerBoard* card + pmt;
-					[[pmtColorArray objectAtIndex:tubeIndex] set];
+					[(NSColor *)[pmtColorArray objectAtIndex:tubeIndex] set];
 					[[channelRectsInCrateView objectAtIndex:tubeIndex] fill];
 				}
 			}
