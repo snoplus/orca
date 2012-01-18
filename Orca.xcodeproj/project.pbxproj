@@ -196,6 +196,12 @@
 		8402797407397B8700972B07 /* ORBit3Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 8402796E07397B8700972B07 /* ORBit3Model.h */; };
 		8402797507397B8700972B07 /* ORBit3Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 8402796F07397B8700972B07 /* ORBit3Model.m */; };
 		84028033073BF49D00972B07 /* ORLAMhosting.h in Headers */ = {isa = PBXBuildFile; fileRef = 84028032073BF49D00972B07 /* ORLAMhosting.h */; };
+		8402B5B314C708A1007999C1 /* MJDPreAmp.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8402B5AD14C708A1007999C1 /* MJDPreAmp.gif */; };
+		8402B5B414C708A1007999C1 /* MJDPreAmp.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8402B5AE14C708A1007999C1 /* MJDPreAmp.nib */; };
+		8402B5B514C708A1007999C1 /* ORMJDPreAmpController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8402B5AF14C708A1007999C1 /* ORMJDPreAmpController.h */; };
+		8402B5B614C708A1007999C1 /* ORMJDPreAmpController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8402B5B014C708A1007999C1 /* ORMJDPreAmpController.m */; };
+		8402B5B714C708A1007999C1 /* ORMJDPreAmpModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8402B5B114C708A1007999C1 /* ORMJDPreAmpModel.h */; };
+		8402B5B814C708A1007999C1 /* ORMJDPreAmpModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8402B5B214C708A1007999C1 /* ORMJDPreAmpModel.m */; };
 		84052A2C13106B65007607A4 /* CouchDB.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84052A2613106B65007607A4 /* CouchDB.nib */; };
 		84052A2D13106B65007607A4 /* CouchDB.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84052A2713106B65007607A4 /* CouchDB.tif */; };
 		84052A2E13106B65007607A4 /* ORCouchDBController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84052A2813106B65007607A4 /* ORCouchDBController.h */; };
@@ -2081,8 +2087,6 @@
 		84B63CEA09783832005B20A5 /* PushButtonOn.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B63CE309783832005B20A5 /* PushButtonOn.tif */; };
 		84B6CD4714B37E9700386BE1 /* ORRGA300Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B6CD3D14B37E9700386BE1 /* ORRGA300Controller.h */; };
 		84B6CD4814B37E9700386BE1 /* ORRGA300Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B6CD3E14B37E9700386BE1 /* ORRGA300Controller.m */; };
-		84B6CD4914B37E9700386BE1 /* ORRGA300Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B6CD3F14B37E9700386BE1 /* ORRGA300Decoders.h */; };
-		84B6CD4A14B37E9700386BE1 /* ORRGA300Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B6CD4014B37E9700386BE1 /* ORRGA300Decoders.m */; };
 		84B6CD4B14B37E9700386BE1 /* ORRGA300Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B6CD4114B37E9700386BE1 /* ORRGA300Model.h */; };
 		84B6CD4C14B37E9700386BE1 /* ORRGA300Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B6CD4214B37E9700386BE1 /* ORRGA300Model.m */; };
 		84B6CD4D14B37E9700386BE1 /* RGA300.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84B6CD4314B37E9700386BE1 /* RGA300.nib */; };
@@ -3024,6 +3028,12 @@
 		8402796E07397B8700972B07 /* ORBit3Model.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORBit3Model.h; sourceTree = "<group>"; };
 		8402796F07397B8700972B07 /* ORBit3Model.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORBit3Model.m; sourceTree = "<group>"; };
 		84028032073BF49D00972B07 /* ORLAMhosting.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORLAMhosting.h; sourceTree = "<group>"; };
+		8402B5AD14C708A1007999C1 /* MJDPreAmp.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = MJDPreAmp.gif; path = "Source/Objects/Custom Hardware/Majorana Hardware/MJDPreAmp/MJDPreAmp.gif"; sourceTree = SOURCE_ROOT; };
+		8402B5AE14C708A1007999C1 /* MJDPreAmp.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = MJDPreAmp.nib; path = "Source/Objects/Custom Hardware/Majorana Hardware/MJDPreAmp/MJDPreAmp.nib"; sourceTree = SOURCE_ROOT; };
+		8402B5AF14C708A1007999C1 /* ORMJDPreAmpController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMJDPreAmpController.h; path = "Source/Objects/Custom Hardware/Majorana Hardware/MJDPreAmp/ORMJDPreAmpController.h"; sourceTree = SOURCE_ROOT; };
+		8402B5B014C708A1007999C1 /* ORMJDPreAmpController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMJDPreAmpController.m; path = "Source/Objects/Custom Hardware/Majorana Hardware/MJDPreAmp/ORMJDPreAmpController.m"; sourceTree = SOURCE_ROOT; };
+		8402B5B114C708A1007999C1 /* ORMJDPreAmpModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMJDPreAmpModel.h; path = "Source/Objects/Custom Hardware/Majorana Hardware/MJDPreAmp/ORMJDPreAmpModel.h"; sourceTree = SOURCE_ROOT; };
+		8402B5B214C708A1007999C1 /* ORMJDPreAmpModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMJDPreAmpModel.m; path = "Source/Objects/Custom Hardware/Majorana Hardware/MJDPreAmp/ORMJDPreAmpModel.m"; sourceTree = SOURCE_ROOT; };
 		840340260427CEEA005F64B1 /* ORDataSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORDataSet.h; sourceTree = "<group>"; };
 		840340270427CEEA005F64B1 /* ORDataSet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORDataSet.m; sourceTree = "<group>"; };
 		8403F4A50508F1BE005F64B1 /* ORGenericView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORGenericView.h; path = Source/Misc/ORGenericView.h; sourceTree = SOURCE_ROOT; };
@@ -4725,8 +4735,6 @@
 		84B649B80407013B005F64B1 /* NcdMuxHWModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NcdMuxHWModel.m; sourceTree = "<group>"; };
 		84B6CD3D14B37E9700386BE1 /* ORRGA300Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORRGA300Controller.h; path = Source/Objects/Hardware/Serial/RGA300/ORRGA300Controller.h; sourceTree = SOURCE_ROOT; };
 		84B6CD3E14B37E9700386BE1 /* ORRGA300Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORRGA300Controller.m; path = Source/Objects/Hardware/Serial/RGA300/ORRGA300Controller.m; sourceTree = SOURCE_ROOT; };
-		84B6CD3F14B37E9700386BE1 /* ORRGA300Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORRGA300Decoders.h; path = Source/Objects/Hardware/Serial/RGA300/ORRGA300Decoders.h; sourceTree = SOURCE_ROOT; };
-		84B6CD4014B37E9700386BE1 /* ORRGA300Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORRGA300Decoders.m; path = Source/Objects/Hardware/Serial/RGA300/ORRGA300Decoders.m; sourceTree = SOURCE_ROOT; };
 		84B6CD4114B37E9700386BE1 /* ORRGA300Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORRGA300Model.h; path = Source/Objects/Hardware/Serial/RGA300/ORRGA300Model.h; sourceTree = SOURCE_ROOT; };
 		84B6CD4214B37E9700386BE1 /* ORRGA300Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORRGA300Model.m; path = Source/Objects/Hardware/Serial/RGA300/ORRGA300Model.m; sourceTree = SOURCE_ROOT; };
 		84B6CD4314B37E9700386BE1 /* RGA300.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = RGA300.nib; path = Source/Objects/Hardware/Serial/RGA300/RGA300.nib; sourceTree = SOURCE_ROOT; };
@@ -5814,6 +5822,29 @@
 			);
 			name = "Bit3 Adaptor";
 			path = "Source/Objects/Hardware/Vme/Bit3 Adaptor";
+			sourceTree = SOURCE_ROOT;
+		};
+		8402B5AA14C70487007999C1 /* Majorana Hardware */ = {
+			isa = PBXGroup;
+			children = (
+				8402B5AB14C70522007999C1 /* MJDPreAmp */,
+			);
+			name = "Majorana Hardware";
+			path = "Source/Objects/Custom Hardware/Majorana Hardware";
+			sourceTree = SOURCE_ROOT;
+		};
+		8402B5AB14C70522007999C1 /* MJDPreAmp */ = {
+			isa = PBXGroup;
+			children = (
+				8402B5AD14C708A1007999C1 /* MJDPreAmp.gif */,
+				8402B5AE14C708A1007999C1 /* MJDPreAmp.nib */,
+				8402B5AF14C708A1007999C1 /* ORMJDPreAmpController.h */,
+				8402B5B014C708A1007999C1 /* ORMJDPreAmpController.m */,
+				8402B5B114C708A1007999C1 /* ORMJDPreAmpModel.h */,
+				8402B5B214C708A1007999C1 /* ORMJDPreAmpModel.m */,
+			);
+			name = MJDPreAmp;
+			path = "Source/Objects/Custom Hardware/Majorana Hardware/MJDPreAmp";
 			sourceTree = SOURCE_ROOT;
 		};
 		8405283D13102C96007607A4 /* CouchDB */ = {
@@ -9789,8 +9820,6 @@
 			children = (
 				84B6CD3D14B37E9700386BE1 /* ORRGA300Controller.h */,
 				84B6CD3E14B37E9700386BE1 /* ORRGA300Controller.m */,
-				84B6CD3F14B37E9700386BE1 /* ORRGA300Decoders.h */,
-				84B6CD4014B37E9700386BE1 /* ORRGA300Decoders.m */,
 				84B6CD4114B37E9700386BE1 /* ORRGA300Model.h */,
 				84B6CD4214B37E9700386BE1 /* ORRGA300Model.m */,
 				84B6CD4314B37E9700386BE1 /* RGA300.nib */,
@@ -10199,6 +10228,7 @@
 		84C4948A0405A0C0005F64B1 /* Custom Hardware */ = {
 			isa = PBXGroup;
 			children = (
+				8402B5AA14C70487007999C1 /* Majorana Hardware */,
 				84C4948C0405A0C0005F64B1 /* Ncd Hardware */,
 				847E6C120CFF4C3200E963C6 /* eGun */,
 				843CDF55071C9C0A009D7D30 /* RandomPulser */,
@@ -12580,11 +12610,12 @@
 				84DEE4CE149794070092DB6C /* ORFPDSegmentGroup.h in Headers */,
 				84DEEBBD149916AD0092DB6C /* ORSerialDeviceModel.h in Headers */,
 				84B6CD4714B37E9700386BE1 /* ORRGA300Controller.h in Headers */,
-				84B6CD4914B37E9700386BE1 /* ORRGA300Decoders.h in Headers */,
 				84B6CD4B14B37E9700386BE1 /* ORRGA300Model.h in Headers */,
 				840D0ECC14BBC56A008FAC82 /* SNOMonitoredHardware.h in Headers */,
 				840D0ED114BBC56A008FAC82 /* SNOSlowControl.h in Headers */,
 				840D0ED514BBC5DD008FAC82 /* SNODetectorView.h in Headers */,
+				8402B5B514C708A1007999C1 /* ORMJDPreAmpController.h in Headers */,
+				8402B5B714C708A1007999C1 /* ORMJDPreAmpModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13383,6 +13414,8 @@
 				840D0ECE14BBC56A008FAC82 /* snopluslogooff.tiff in Resources */,
 				840D0ECF14BBC56A008FAC82 /* snopluslogoon.tiff in Resources */,
 				840D0ED014BBC56A008FAC82 /* snopluslogoreplay.tiff in Resources */,
+				8402B5B314C708A1007999C1 /* MJDPreAmp.gif in Resources */,
+				8402B5B414C708A1007999C1 /* MJDPreAmp.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14285,11 +14318,12 @@
 				84DEE4CF149794070092DB6C /* ORFPDSegmentGroup.m in Sources */,
 				84DEEBBE149916AD0092DB6C /* ORSerialDeviceModel.m in Sources */,
 				84B6CD4814B37E9700386BE1 /* ORRGA300Controller.m in Sources */,
-				84B6CD4A14B37E9700386BE1 /* ORRGA300Decoders.m in Sources */,
 				84B6CD4C14B37E9700386BE1 /* ORRGA300Model.m in Sources */,
 				840D0ECD14BBC56A008FAC82 /* SNOMonitoredHardware.m in Sources */,
 				840D0ED214BBC56A008FAC82 /* SNOSlowControl.m in Sources */,
 				840D0ED614BBC5DD008FAC82 /* SNODetectorView.m in Sources */,
+				8402B5B614C708A1007999C1 /* ORMJDPreAmpController.m in Sources */,
+				8402B5B814C708A1007999C1 /* ORMJDPreAmpModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
