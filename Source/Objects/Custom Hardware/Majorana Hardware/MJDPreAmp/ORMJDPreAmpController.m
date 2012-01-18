@@ -40,6 +40,10 @@
 - (void)awakeFromNib
 {
     [super  awakeFromNib];
+	short chan;
+	for(chan=0;chan<kMJDPreAmpChannels;chan++){
+		[[gainsMatrix cellAtRow:chan column:0] setTag:chan];
+	}
 }
 
 
@@ -67,15 +71,26 @@
                      selector : @selector(settingsLockChanged:)
                          name : MJDPreAmpSettingsLock
                         object: nil];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(gainArrayChanged:)
+                         name : ORMJDPreAmpModelGainArrayChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+					 selector : @selector(gainChanged:)
+						 name : ORMJDPreAmpGainChangedNotification
+					   object : model];
 }
 
-#pragma mark ¥¥¥Interface Management
 - (void) updateWindow
 {
     [super updateWindow];
     [self settingsLockChanged:nil];
+	[self gainArrayChanged:nil];
 }
 
+#pragma mark ¥¥¥Interface Management
 - (void) checkGlobalSecurity
 {
     BOOL secure = [gSecurity globalSecurityEnabled];
@@ -93,7 +108,25 @@
     [settingsLockButton setState:locked];
 }
 
+- (void) gainChanged:(NSNotification*)aNotification
+{
+	int chan = [[[aNotification userInfo] objectForKey:@"Channel"] intValue];
+	[[gainsMatrix cellWithTag:chan] setIntValue: [model gain:chan]];
+}
+- (void) gainArrayChanged:(NSNotification*)aNotification
+{
+	short chan;
+	for(chan=0;chan<kMJDPreAmpChannels;chan++){
+		[[gainsMatrix cellWithTag:chan] setIntValue: [model gain:chan]];
+	}
+}
 #pragma mark ¥¥¥Actions
+
+- (void) gainsAction:(id)sender
+{
+	[model setGain:[[sender selectedCell] tag] withValue:[sender intValue]];
+}
+
 - (IBAction) settingsLockAction:(id)sender
 {
     [gSecurity tryToSetLock:MJDPreAmpSettingsLock to:[sender intValue] forWindow:[self window]];

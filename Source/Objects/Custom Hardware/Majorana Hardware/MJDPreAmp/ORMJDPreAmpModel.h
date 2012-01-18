@@ -21,10 +21,17 @@
 #import "ORHWWizard.h"
 #import "ThresholdCalibrationTask.h"
 
+#define kMJDPreAmpChannels 8
+
 @interface ORMJDPreAmpModel : OrcaObject {
+    NSMutableArray* gains;
 }
 
 #pragma mark ¥¥¥Accessors
+- (NSMutableArray*) gains;
+- (void) setGains:(NSMutableArray*)aGains;
+- (unsigned short) gain:(unsigned short) aChan;
+- (void) setGain:(unsigned short) aChan withValue:(unsigned short) aGain;
 
 #pragma mark ¥¥¥HW Access
 - (void) writeToHW;
@@ -36,7 +43,9 @@
 @end
 
 #pragma mark ¥¥¥External Strings
+extern NSString* ORMJDPreAmpModelGainArrayChanged;
 extern NSString* MJDPreAmpSettingsLock;
+extern NSString* ORMJDPreAmpGainChangedNotification;
 
 @interface NSObject (ORMJDPreAmpModel)
 - (void)    writeToSPI:(NSData*)someData;

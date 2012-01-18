@@ -22,7 +22,10 @@
 #import "ORMJDPreAmpModel.h"
 
 #pragma mark ¥¥¥Notification Strings
-NSString* MJDPreAmpSettingsLock		= @"MJDPreAmpSettingsLock";
+NSString* ORMJDPreAmpModelGainArrayChanged		= @"ORMJDPreAmpModelGainArrayChanged";
+NSString* ORMJDPreAmpGainChangedNotification	= @"ORMJDPreAmpGainChangedNotification";
+
+NSString* MJDPreAmpSettingsLock				= @"MJDPreAmpSettingsLock";
 
 #pragma mark ¥¥¥Local Strings
 static NSString* MJDPreAmpInputConnector      = @"MJDPreAmpInputConnector";
@@ -33,7 +36,13 @@ static NSString* MJDPreAmpInputConnector      = @"MJDPreAmpInputConnector";
 {
     self = [super init];
     [[self undoManager] disableUndoRegistration];
-     
+	
+	[self setGains:[NSMutableArray arrayWithCapacity:kMJDPreAmpChannels]];
+	int i;
+    for(i=0;i<kMJDPreAmpChannels;i++){
+        [gains addObject:[NSNumber numberWithInt:50]];
+    }
+	
     
     [[self undoManager] enableUndoRegistration];
     return self;
@@ -41,6 +50,7 @@ static NSString* MJDPreAmpInputConnector      = @"MJDPreAmpInputConnector";
 
 - (void) dealloc
 {
+    [gains release];
     [super dealloc];
 }
 
@@ -65,6 +75,40 @@ static NSString* MJDPreAmpInputConnector      = @"MJDPreAmpInputConnector";
 }
 
 #pragma mark ¥¥¥Accessors
+
+- (NSMutableArray*) gains
+{
+    return gains;
+}
+
+- (void) setGains:(NSMutableArray*)aGains
+{
+    [aGains retain];
+    [gains release];
+    gains = aGains;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpModelGainArrayChanged object:self];
+}
+
+-(unsigned short)gain:(unsigned short) aChan
+{
+    return [[gains objectAtIndex:aChan] shortValue];
+}
+- (void) setGain:(unsigned short) aChan withValue:(unsigned short) aGain
+{
+	if(aGain>255)aGain = 255;
+    [[[self undoManager] prepareWithInvocationTarget:self] setGain:aChan withValue:[self gain:aChan]];
+	[gains replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aGain]];
+	
+    NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+    [userInfo setObject:[NSNumber numberWithInt:aChan] forKey: @"Channel"];
+	
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpGainChangedNotification
+														object:self
+													  userInfo: userInfo];
+	
+}
+
 - (NSString*) helpURL
 {
 	return nil;
@@ -84,7 +128,7 @@ static NSString* MJDPreAmpInputConnector      = @"MJDPreAmpInputConnector";
 {
 	id connectedObj = [self objectConnectedTo:MJDPreAmpInputConnector];
 	if([connectedObj respondsToSelector:@selector(writeToSPI:)]){
-		long testValue = 0x666;
+		long testValue = [[gains objectAtIndex:0] longValue];
 		[connectedObj writeToSPI:[NSData dataWithBytes:&testValue length:sizeof(long)]];
 	}
 }
@@ -95,7 +139,7 @@ static NSString* MJDPreAmpInputConnector      = @"MJDPreAmpInputConnector";
     self = [super initWithCoder:decoder];
 	
     [[self undoManager] disableUndoRegistration];
-    
+    [self setGains:	[decoder decodeObjectForKey:@"gains"]];
     
     [[self undoManager] enableUndoRegistration];
     
@@ -105,7 +149,8 @@ static NSString* MJDPreAmpInputConnector      = @"MJDPreAmpInputConnector";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    
+	[encoder encodeObject:gains	forKey:@"gains"];
+  
 }
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
