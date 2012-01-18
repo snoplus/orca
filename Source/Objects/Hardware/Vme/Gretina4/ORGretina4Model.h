@@ -228,14 +228,23 @@ enum Gretina4FIFOStates {
 	
     unsigned long registerWriteValue;
     int registerIndex;
+	
+	NSString* spiConnectorName;
+	ORConnector*  spiConnector; //we won't draw this connector so we have to keep a reference to it
+
 }
 
 - (id) init;
 - (void) dealloc;
 - (void) setUpImage;
 - (void) makeMainController;
+- (void) guardian:(id)aGuardian positionConnectorsForCard:(id)aCard;
+- (void) guardianRemovingDisplayOfConnectors:(id)aGuardian;
+- (void) guardianAssumingDisplayOfConnectors:(id)aGuardian;
 
 #pragma mark ***Accessors
+- (ORConnector*) spiConnector;
+- (void) setSpiConnector:(ORConnector*)aConnector;
 - (int) downSample;
 - (void) setDownSample:(int)aDownSample;
 - (int) registerIndex;
@@ -402,6 +411,11 @@ enum Gretina4FIFOStates {
 
 #pragma mark ¥¥¥AutoTesting
 - (NSArray*) autoTests;
+
+#pragma mark ¥¥¥SPI Interface
+- (void)    writeToSPI:(NSData*)someData;
+- (NSData*) readFromSPI;
+
 @end
 
 extern NSString* ORGretina4ModelDownSampleChanged;

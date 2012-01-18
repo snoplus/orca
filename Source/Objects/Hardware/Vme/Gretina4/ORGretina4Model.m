@@ -229,6 +229,7 @@ static struct {
 
 - (void) dealloc 
 {
+    [spiConnector release];
     [mainFPGADownLoadState release];
     [fpgaFilePath release];
     [waveFormRateGroup release];
@@ -264,7 +265,80 @@ static struct {
 	return NSMakeRange(baseAddress,baseAddress+0x1000+0xffff);
 }
 
+- (void) makeConnectors
+{
+    //make and cache our connector. However this connector will be 'owned' by another object (the crate)
+    //so we don't add it to our list of connectors. It will be added to the true owner later.
+    [self setSpiConnector: [[[ORConnector alloc] initAt:NSZeroPoint withGuardian:self withObjectLink:self] autorelease]];
+    
+	[spiConnector setConnectorImageType:kSmallDot]; 
+	[spiConnector setConnectorType: 'SPIO' ];
+	[spiConnector addRestrictedConnectionType: 'SPII' ]; //can only connect to SPI inputs
+	[spiConnector setOffColor:[NSColor colorWithCalibratedRed:0 green:.68 blue:.65 alpha:1.]];
+}
+
+- (void) setSlot:(int)aSlot
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSlot:[self slot]];
+    [self setTag:aSlot];
+    [self guardian:guardian positionConnectorsForCard:self];
+    
+    [[NSNotificationCenter defaultCenter]
+	 postNotificationName:ORVmeCardSlotChangedNotification
+	 object: self];
+}
+
+- (void) positionConnector:(ORConnector*)aConnector
+{
+    NSRect aFrame = [aConnector localFrame];
+    float x =  17 + [self slot] * 16*.62 ;
+    float y =  75;
+    aFrame.origin = NSMakePoint(x,y);
+    [aConnector setLocalFrame:aFrame];
+}
+
+
+- (void) setGuardian:(id)aGuardian
+{
+    id oldGuardian = guardian;
+	
+	[super setGuardian:aGuardian];
+	
+    if(oldGuardian != aGuardian){
+        [oldGuardian removeDisplayOf:spiConnector];
+    }
+	
+    [aGuardian assumeDisplayOf:spiConnector];
+    [self guardian:aGuardian positionConnectorsForCard:self];
+}
+
+- (void) guardian:(id)aGuardian positionConnectorsForCard:(id)aCard
+{
+    [aGuardian positionConnector:spiConnector forCard:self];
+}
+
+- (void) guardianRemovingDisplayOfConnectors:(id)aGuardian
+{
+    [aGuardian removeDisplayOf:spiConnector];
+}
+
+- (void) guardianAssumingDisplayOfConnectors:(id)aGuardian
+{
+    [aGuardian assumeDisplayOf:spiConnector];
+}
+
 #pragma mark ***Accessors
+- (ORConnector*) spiConnector
+{
+    return spiConnector;
+}
+
+- (void) setSpiConnector:(ORConnector*)aConnector
+{
+    [aConnector retain];
+    [spiConnector release];
+    spiConnector = aConnector;
+}
 
 - (int) downSample
 {
@@ -1871,7 +1945,7 @@ static struct {
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
-    
+    [self setSpiConnector:			[decoder decodeObjectForKey:@"spiConnector"]];
     [self setDownSample:				[decoder decodeIntForKey:@"downSample"]];
     [self setRegisterIndex:				[decoder decodeIntForKey:@"registerIndex"]];
     [self setRegisterWriteValue:		[decoder decodeInt32ForKey:@"registerWriteValue"]];
@@ -1913,6 +1987,7 @@ static struct {
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeObject:spiConnector				forKey:@"spiConnector"];
     [encoder encodeInt:downSample					forKey:@"downSample"];
     [encoder encodeInt:registerIndex				forKey:@"registerIndex"];
     [encoder encodeInt32:registerWriteValue			forKey:@"registerWriteValue"];
@@ -1986,6 +2061,21 @@ static struct {
 	[myTests addObject:[ORVmeReadOnlyTest test:kBoardID wordSize:4 name:@"Board ID"]];
 	[myTests addObject:[ORVmeReadWriteTest test:kControlStatus wordSize:4 validMask:0x000000ff name:@"Control/Status"]];
 	return myTests;
+}
+
+
+#pragma mark ¥¥¥SPI Interface
+- (void)    writeToSPI:(NSData*)someData
+{
+	NSLog(@"Gretina4 writing To SPI\n");
+	NSLog(@"%@\n",someData);
+}
+
+- (NSData*) readFromSPI
+{
+	//temporary for testing
+	long testValue = 0x999;
+	return [NSData dataWithBytes:&testValue length:sizeof(long)];
 }
 
 @end
