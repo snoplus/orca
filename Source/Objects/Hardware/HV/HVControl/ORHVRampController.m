@@ -521,7 +521,7 @@
     [self endEditing];
     NSBeginAlertSheet(@"HV Panic",
 					  @"YES/Do it NOW",
-					  @"Canel",
+					  @"Cancel",
 					  nil,[self window],
 					  self,
 					  @selector(_panicRampSheetDidEnd:returnCode:contextInfo:),
@@ -537,7 +537,7 @@
     [self endEditing];
 	NSBeginAlertSheet(@"HV Panic",
 					  @"YES/Do it NOW",
-					  @"Canel",
+					  @"Cancel",
 					  nil,[self window],
 					  self,
 					  @selector(_systemPanicRampSheetDidEnd:returnCode:contextInfo:),
@@ -551,7 +551,7 @@
     [self endEditing];
 	NSBeginAlertSheet(@"Sync DACs to ADCs",
 					  @"YES",
-					  @"Canel",
+					  @"Cancel",
 					  nil,[self window],
 					  self,
 					  @selector(_syncActionSheetDidEnd:returnCode:contextInfo:),
