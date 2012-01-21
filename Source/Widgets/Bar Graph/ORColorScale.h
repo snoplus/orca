@@ -35,12 +35,15 @@
     NSColor* endColor;
     BOOL    scaleIsXAxis;
 	BOOL	makeColors;
+    BOOL    excludeZero;
 }
 
 - (id)initWithFrame:(NSRect)frame;
 - (void) dealloc;
 
 #pragma mark ¥¥¥Accessors
+- (BOOL) excludeZero;
+- (void) setExcludeZero:(BOOL)aFlag;
 - (void) setColorAxis:(ORAxis*)anAxis;
 - (ORAxis*) colorAxis;
 - (NSMutableArray*) colors;

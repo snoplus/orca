@@ -39,7 +39,9 @@
 		[self setEndColor:[NSColor redColor]];
         [self setUseRainBow:YES];
         
-		makeColors = YES;
+		makeColors  = YES;
+        excludeZero = NO;
+
     }
     return self;
 }
@@ -97,6 +99,17 @@
 	colorAxis = anAxis; //don't retain
 }
 
+- (BOOL) excludeZero
+{
+    return excludeZero;
+}
+
+- (void) setExcludeZero:(BOOL)aFlag
+{
+    excludeZero = aFlag;
+    [self setNeedsDisplay:YES];
+}
+
 - (BOOL) useRainBow
 {
 
@@ -151,8 +164,11 @@
 	if(w>h)i = aValue * numColors/w;
 	else   i = aValue * numColors/h;
 	
-	if(i>0 && i<numColors-1)return [colors objectAtIndex:(int)i];
-	else if(i<=0)return nil;
+	if(i>=0 && i<numColors-1){
+        if(i==0 && excludeZero) return nil;
+        else                    return [colors objectAtIndex:(int)i];
+    }
+	else if(i<0)return nil;
 	else return [colors lastObject];
 }
 - (NSColor*) getColorForIndex:(unsigned short)index
