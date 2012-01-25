@@ -48,6 +48,7 @@ NSString* ORGretina4ModelEnabledChanged			= @"ORGretina4ModelEnabledChanged";
 NSString* ORGretina4ModelCFDEnabledChanged		= @"ORGretina4ModelCFDEnabledChanged";
 NSString* ORGretina4ModelPoleZeroEnabledChanged	= @"ORGretina4ModelPoleZeroEnabledChanged";
 NSString* ORGretina4ModelPoleZeroMultChanged	= @"ORGretina4ModelPoleZeroMultChanged";
+NSString* ORGretina4ModelPZTraceEnabledChanged= @"ORGretina4ModelPZTraceEnabledChanged";
 NSString* ORGretina4ModelDebugChanged			= @"ORGretina4ModelDebugChanged";
 NSString* ORGretina4ModelPileUpChanged			= @"ORGretina4ModelPileUpChanged";
 NSString* ORGretina4ModelPolarityChanged		= @"ORGretina4ModelPolarityChanged";
@@ -600,7 +601,8 @@ static struct {
 		pileUp[i]			= NO;
         cfdEnabled[i]		= NO;
 		poleZeroEnabled[i]	= NO;
-		poleZeroMult[i]	= 0x600;
+		poleZeroMult[i]	    = 0x600;
+		pzTraceEnabled[i]	= NO;
 		polarity[i]			= 0x3;
 		triggerMode[i]		= 0x0;
 		ledThreshold[i]		= 0x1FFFF;
@@ -713,6 +715,13 @@ static struct {
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelPoleZeroMultChanged object:self];
 }
 
+- (void) setPZTraceEnabled:(short)chan withValue:(short)aValue		
+{ 
+    [[[self undoManager] prepareWithInvocationTarget:self] setPZTraceEnabled:chan withValue:pzTraceEnabled[chan]];
+	pzTraceEnabled[chan] = aValue;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelPZTraceEnabledChanged object:self];
+}
+
 - (void) setDebug:(short)chan withValue:(short)aValue	
 { 
     [[[self undoManager] prepareWithInvocationTarget:self] setDebug:chan withValue:debug[chan]];
@@ -812,6 +821,7 @@ static struct {
 - (int) cfdEnabled:(short)chan		{ return cfdEnabled[chan]; }
 - (int) poleZeroEnabled:(short)chan	{ return poleZeroEnabled[chan]; }
 - (int) poleZeroMult:(short)chan	{ return poleZeroMult[chan]; }
+- (int) pzTraceEnabled:(short)chan  { return pzTraceEnabled[chan]; }
 - (int) debug:(short)chan			{ return debug[chan]; }
 - (int) pileUp:(short)chan			{ return pileUp[chan];}
 - (int) polarity:(short)chan		{ return polarity[chan];}
@@ -1141,7 +1151,7 @@ static struct {
     if(forceEnable)	startStop= enabled[chan];
     else			startStop = NO;
 
-    unsigned long theValue = (poleZeroEnabled[chan] << 13) | (cfdEnabled[chan] << 12) | (polarity[chan] << 10) 
+    unsigned long theValue = (pzTraceEnabled[chan] << 14) | (poleZeroEnabled[chan] << 13) | (cfdEnabled[chan] << 12) | (polarity[chan] << 10) 
 	| (triggerMode[chan] << 3) | (pileUp[chan] << 2) | (debug[chan] << 1) | startStop;
     [[self adapter] writeLongBlock:&theValue
                          atAddress:[self baseAddress] + register_information[kControlStatus].offset + 4*chan
@@ -2016,6 +2026,7 @@ static struct {
 		[self setCFDEnabled:i 	withValue:[decoder decodeIntForKey:[@"cfdEnabled"   stringByAppendingFormat:@"%d",i]]];
 		[self setPoleZeroEnabled:i withValue:[decoder decodeIntForKey:[@"poleZeroEnabled" stringByAppendingFormat:@"%d",i]]];
 		[self setPoleZeroMultiplier:i withValue:[decoder decodeIntForKey:[@"poleZeroMult" stringByAppendingFormat:@"%d",i]]];
+		[self setPZTraceEnabled:i withValue:[decoder decodeIntForKey:[@"pzTraceEnabled" stringByAppendingFormat:@"%d",i]]];
 		[self setPolarity:i		withValue:[decoder decodeIntForKey:[@"polarity"     stringByAppendingFormat:@"%d",i]]];
 		[self setTriggerMode:i	withValue:[decoder decodeIntForKey:[@"triggerMode"	stringByAppendingFormat:@"%d",i]]];
 		[self setLEDThreshold:i withValue:[decoder decodeIntForKey:[@"ledThreshold" stringByAppendingFormat:@"%d",i]]];
@@ -2051,6 +2062,7 @@ static struct {
 		[encoder encodeInt:cfdEnabled[i]  	forKey:[@"cfdEnabled"  	stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:poleZeroEnabled[i] forKey:[@"poleZeroEnabled" stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:poleZeroMult[i]  forKey:[@"poleZeroMult" stringByAppendingFormat:@"%d",i]];
+		[encoder encodeInt:pzTraceEnabled[i] forKey:[@"pzTraceEnabled" stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:polarity[i]		forKey:[@"polarity"		stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:triggerMode[i]	forKey:[@"triggerMode"	stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:cfdFraction[i]	forKey:[@"cfdFraction"	stringByAppendingFormat:@"%d",i]];
@@ -2083,6 +2095,7 @@ static struct {
 	[self addCurrentState:objDictionary cArray:cfdEnabled forKey:@"CFD Enabled"];
 	[self addCurrentState:objDictionary cArray:poleZeroEnabled forKey:@"Pole Zero Enabled"];
 	[self addCurrentState:objDictionary cArray:poleZeroMult forKey:@"Pole Zero Multiplier"];
+	[self addCurrentState:objDictionary cArray:pzTraceEnabled forKey:@"PZ Trace Enabled"];
     
     NSMutableArray* ar = [NSMutableArray array];
 	for(i=0;i<kNumGretina4Channels;i++){

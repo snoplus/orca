@@ -178,15 +178,16 @@ enum Gretina4FIFOStates {
     short			pileUp[kNumGretina4Channels];
     short			polarity[kNumGretina4Channels];
     short			triggerMode[kNumGretina4Channels];
-    unsigned long   ledThreshold[kNumGretina4Channels];
+    unsigned long               ledThreshold[kNumGretina4Channels];
     short			cfdDelay[kNumGretina4Channels];
     short			cfdThreshold[kNumGretina4Channels];
     short			cfdFraction[kNumGretina4Channels];
-    short           dataDelay[kNumGretina4Channels];
-    short           dataLength[kNumGretina4Channels];
-    short           cfdEnabled[kNumGretina4Channels];
-    short           poleZeroEnabled[kNumGretina4Channels];
-    short           poleZeroMult[kNumGretina4Channels];
+    short                       dataDelay[kNumGretina4Channels];
+    short                       dataLength[kNumGretina4Channels];
+    short                       cfdEnabled[kNumGretina4Channels];
+    short                       poleZeroEnabled[kNumGretina4Channels];
+    short                       poleZeroMult[kNumGretina4Channels];
+    short			pzTraceEnabled[kNumGretina4Channels];
     int				downSample;
 	
 	ORRateGroup*	waveFormRateGroup;
@@ -309,6 +310,7 @@ enum Gretina4FIFOStates {
 - (void) setCFDEnabled:(short)chan withValue:(short)aValue;
 - (void) setPoleZeroEnabled:(short)chan withValue:(short)aValue;		
 - (void) setPoleZeroMultiplier:(short)chan withValue:(short)aValue;		
+- (void) setPZTraceEnabled:(short)chan withValue:(short)aValue;		
 - (void) setDebug:(short)chan withValue:(short)aValue;	
 - (void) setLEDThreshold:(short)chan withValue:(int)aValue;
 - (void) setCFDDelay:(short)chan withValue:(int)aValue;	
@@ -322,6 +324,7 @@ enum Gretina4FIFOStates {
 - (int) enabled:(short)chan;
 - (int) poleZeroEnabled:(short)chan;
 - (int) poleZeroMult:(short)chan;
+- (int) pzTraceEnabled:(short)chan;
 - (int) cfdEnabled:(short)chan;		
 - (int) debug:(short)chan;		
 - (int) pileUp:(short)chan;		
@@ -441,6 +444,7 @@ extern NSString* ORGretina4ModelPileUpChanged;
 extern NSString* ORGretina4ModelCFDEnabledChanged;
 extern NSString* ORGretina4ModelPoleZeroEnabledChanged;
 extern NSString* ORGretina4ModelPoleZeroMultChanged;
+extern NSString* ORGretina4ModelPZTraceEnabledChanged;
 extern NSString* ORGretina4ModelPolarityChanged;
 extern NSString* ORGretina4ModelTriggerModeChanged;
 extern NSString* ORGretina4ModelLEDThresholdChanged;

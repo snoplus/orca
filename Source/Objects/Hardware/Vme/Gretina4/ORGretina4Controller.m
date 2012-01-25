@@ -228,6 +228,11 @@
                        object : model];
 	
     [notifyCenter addObserver : self
+                     selector : @selector(pzTraceEnabledChanged:)
+                         name : ORGretina4ModelPZTraceEnabledChanged
+                       object : model];
+	
+    [notifyCenter addObserver : self
                      selector : @selector(debugChanged:)
                          name : ORGretina4ModelDebugChanged
                        object : model];
@@ -356,6 +361,7 @@
 	[self cfdEnabledChanged:nil];
 	[self poleZeroEnabledChanged:nil];
 	[self poleZeroTauChanged:nil];
+	[self pzTraceEnabledChanged:nil];
 	[self debugChanged:nil];
 	[self pileUpChanged:nil];
 	[self polarityChanged:nil];
@@ -458,6 +464,14 @@
 	short i;
 	for(i=0;i<kNumGretina4Channels;i++){
 		[[poleZeroTauMatrix cellWithTag:i] setFloatValue:[model poleZeroTauConverted:i]];
+	}
+}
+
+- (void) pzTraceEnabledChanged:(NSNotification*)aNote
+{
+	short i;
+	for(i=0;i<kNumGretina4Channels;i++){
+		[[pzTraceEnabledMatrix cellWithTag:i] setState:[model pzTraceEnabled:i]];
 	}
 }
 
@@ -616,6 +630,7 @@
 	[cfdEnabledMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[poleZeroEnabledMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[poleZeroTauMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
+	[pzTraceEnabledMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[debugMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[pileUpMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[ledThresholdMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
@@ -852,6 +867,12 @@
 {
 	if([sender intValue] != [model poleZeroTauConverted:[[sender selectedCell] tag]]){
 		[model setPoleZeroTauConverted:[[sender selectedCell] tag] withValue:[sender floatValue]];
+	}
+}
+- (IBAction) pzTraceEnabledAction:(id)sender
+{
+	if([sender intValue] != [model pzTraceEnabled:[[sender selectedCell] tag]]){
+		[model setPZTraceEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
 	}
 }
 - (IBAction) debugAction:(id)sender

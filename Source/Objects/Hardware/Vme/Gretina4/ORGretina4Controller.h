@@ -35,6 +35,7 @@
 	IBOutlet NSMatrix*		cfdEnabledMatrix;
 	IBOutlet NSMatrix*		poleZeroEnabledMatrix;
 	IBOutlet NSMatrix*		poleZeroTauMatrix;
+	IBOutlet NSMatrix*		pzTraceEnabledMatrix;
 	IBOutlet NSMatrix*		debugMatrix;
 	IBOutlet NSMatrix*		pileUpMatrix;
 	IBOutlet NSMatrix*		ledThresholdMatrix;
@@ -154,6 +155,7 @@
 - (void) cfdEnabledChanged:(NSNotification*)aNote;
 - (void) poleZeroEnabledChanged:(NSNotification*)aNote;
 - (void) poleZeroTauChanged:(NSNotification*)aNote;
+- (void) pzTraceEnabledChanged:(NSNotification*)aNote;
 - (void) debugChanged:(NSNotification*)aNote;
 - (void) pileUpChanged:(NSNotification*)aNote;
 - (void) polarityChanged:(NSNotification*)aNote;
@@ -196,6 +198,7 @@
 - (IBAction) cfdEnabledAction:(id)sender;
 - (IBAction) poleZeroEnabledAction:(id)sender;
 - (IBAction) poleZeroTauAction:(id)sender;
+- (IBAction) pzTraceEnabledAction:(id)sender;
 - (IBAction) debugAction:(id)sender;
 - (IBAction) pileUpAction:(id)sender;
 - (IBAction) polarityAction:(id)sender;
