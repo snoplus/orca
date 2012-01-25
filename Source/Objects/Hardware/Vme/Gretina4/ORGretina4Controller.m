@@ -619,7 +619,7 @@
 	[resetButton setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[loadMainFPGAButton setEnabled:!locked && !downloading];
 	[stopFPGALoadButton setEnabled:!locked && downloading];
-	[downSamplePU setEnabled:!lockedOrRunningMaintenance && downloading];
+	[downSamplePU setEnabled:!lockedOrRunningMaintenance && !downloading];
 	
 	int i;
 	for(i=0;i<kNumGretina4Channels;i++){
@@ -1047,7 +1047,7 @@
         unsigned short theID = [model readBoardID];
         NSLog(@"Gretina BoardID (slot %d): 0x%x\n",[model slot],theID);
         if(theID == ([model baseAddress]>>16))NSLog(@"Gretina BoardID looks correct\n");
-        else NSLogColor([NSColor redColor],@"Gretina BoardID doesn't match dip settings\n");
+        else NSLogColor([NSColor redColor],@"Gretina BoardID 0x%x doesn't match dip settings 0x%x\n", theID, [model baseAddress]>>16);
     }
 	@catch(NSException* localException) {
         NSLog(@"Probe Gretina4 Board FAILED.\n");
