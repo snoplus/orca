@@ -34,6 +34,7 @@
 	IBOutlet NSMatrix*		enabledMatrix;
 	IBOutlet NSMatrix*		cfdEnabledMatrix;
 	IBOutlet NSMatrix*		poleZeroEnabledMatrix;
+	IBOutlet NSMatrix*		poleZeroTauMatrix;
 	IBOutlet NSMatrix*		debugMatrix;
 	IBOutlet NSMatrix*		pileUpMatrix;
 	IBOutlet NSMatrix*		ledThresholdMatrix;
@@ -80,9 +81,8 @@
     IBOutlet NSButton*      statusButton;
     IBOutlet NSButton*      noiseFloorButton;
     IBOutlet NSTextField*   fifoState;
+
 	IBOutlet NSPopUpButton* downSamplePU;
-	
-	IBOutlet NSButton*      setEnableStatusOfChannelsWhileInitButton; //jing's code
 	
 	//FPGA download
 	IBOutlet NSTextField*			fpgaFilePathField;
@@ -153,6 +153,7 @@
 - (void) enabledChanged:(NSNotification*)aNote;
 - (void) cfdEnabledChanged:(NSNotification*)aNote;
 - (void) poleZeroEnabledChanged:(NSNotification*)aNote;
+- (void) poleZeroTauChanged:(NSNotification*)aNote;
 - (void) debugChanged:(NSNotification*)aNote;
 - (void) pileUpChanged:(NSNotification*)aNote;
 - (void) polarityChanged:(NSNotification*)aNote;
@@ -171,7 +172,6 @@
 - (void) noiseFloorIntegrationChanged:(NSNotification*)aNote;
 - (void) registerLockChanged:(NSNotification*)aNote;
 - (void) registerWriteValueChanged:(NSNotification*)aNote;
-- (void) setEnableStatusOfAllChannelsWhileInitChanged:(NSNotification*)aNote; 
 
 - (void) setRegisterDisplay:(unsigned int)index;
 
@@ -195,6 +195,7 @@
 - (IBAction) enabledAction:(id)sender;
 - (IBAction) cfdEnabledAction:(id)sender;
 - (IBAction) poleZeroEnabledAction:(id)sender;
+- (IBAction) poleZeroTauAction:(id)sender;
 - (IBAction) debugAction:(id)sender;
 - (IBAction) pileUpAction:(id)sender;
 - (IBAction) polarityAction:(id)sender;
@@ -213,8 +214,6 @@
 - (IBAction) writeRegisterAction:(id)sender;
 - (IBAction) registerLockAction:(id) sender;
 - (IBAction) registerWriteValueAction:(id)sender;
-
-- (IBAction) setEnableStatusOfAllChannelsWhileInitAction:(id)sender; //jing's code
 
 #pragma mark ¥¥¥Data Source
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;

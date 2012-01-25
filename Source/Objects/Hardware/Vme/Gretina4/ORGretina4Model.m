@@ -47,6 +47,7 @@ NSString* ORGretina4ModelFIFOCheckChanged		= @"ORGretina4ModelFIFOCheckChanged";
 NSString* ORGretina4ModelEnabledChanged			= @"ORGretina4ModelEnabledChanged";
 NSString* ORGretina4ModelCFDEnabledChanged		= @"ORGretina4ModelCFDEnabledChanged";
 NSString* ORGretina4ModelPoleZeroEnabledChanged	= @"ORGretina4ModelPoleZeroEnabledChanged";
+NSString* ORGretina4ModelPoleZeroMultChanged	= @"ORGretina4ModelPoleZeroMultChanged";
 NSString* ORGretina4ModelDebugChanged			= @"ORGretina4ModelDebugChanged";
 NSString* ORGretina4ModelPileUpChanged			= @"ORGretina4ModelPileUpChanged";
 NSString* ORGretina4ModelPolarityChanged		= @"ORGretina4ModelPolarityChanged";
@@ -599,6 +600,7 @@ static struct {
 		pileUp[i]			= NO;
         cfdEnabled[i]		= NO;
 		poleZeroEnabled[i]	= NO;
+		poleZeroMult[i]	= 0x600;
 		polarity[i]			= 0x3;
 		triggerMode[i]		= 0x0;
 		ledThreshold[i]		= 0x1FFFF;
@@ -671,7 +673,7 @@ static struct {
 #pragma mark ¥¥¥specific accessors
 - (void) setExternalWindow:(int)aValue { [self cardInfo:kExternalWindowIndex  setObject:[NSNumber numberWithInt:aValue]]; }
 - (void) setPileUpWindow:(int)aValue   { [self cardInfo:kPileUpWindowIndex    setObject:[NSNumber numberWithInt:aValue]]; }
-- (void) setNoiseWindow:(int)aValue    { [self cardInfo:kNoiseWindowIndex		setObject:[NSNumber numberWithInt:aValue]]; }
+- (void) setNoiseWindow:(int)aValue    { [self cardInfo:kNoiseWindowIndex     setObject:[NSNumber numberWithInt:aValue]]; }
 - (void) setExtTrigLength:(int)aValue  { [self cardInfo:kExtTrigLengthIndex   setObject:[NSNumber numberWithInt:aValue]]; }
 - (void) setCollectionTime:(int)aValue { [self cardInfo:kCollectionTimeIndex  setObject:[NSNumber numberWithInt:aValue]]; }
 - (void) setIntegrationTime:(int)aValue { [self cardInfo:kIntegrationTimeIndex setObject:[NSNumber numberWithInt:aValue]]; }
@@ -682,18 +684,6 @@ static struct {
 - (int) extTrigLengthAsInt		{ return [[self cardInfo:kExtTrigLengthIndex] intValue]; }
 - (int) collectionTimeAsInt		{ return [[self cardInfo:kCollectionTimeIndex] intValue]; }
 - (int) integrationTimeAsInt	{ return [[self cardInfo:kIntegrationTimeIndex] intValue]; }
-
-//jing's code 
-- (void) setEnableStatusOfChannelsWhileInit:(bool) aValue {
-    [[[self undoManager] prepareWithInvocationTarget:self] setEnableStatusOfChannelsWhileInit:doSetEnableStatusOfChannelsWhileInit];
-	doSetEnableStatusOfChannelsWhileInit = aValue;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelSetEnableStatusChanged object:self];
-}
-
-- (bool) doSetEnableStatusOfChannelsWhileInit {
-	return doSetEnableStatusOfChannelsWhileInit;
-}
-
 
 - (void) setEnabled:(short)chan withValue:(short)aValue		
 { 
@@ -714,6 +704,13 @@ static struct {
     [[[self undoManager] prepareWithInvocationTarget:self] setPoleZeroEnabled:chan withValue:poleZeroEnabled[chan]];
 	poleZeroEnabled[chan] = aValue;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelPoleZeroEnabledChanged object:self];
+}
+
+- (void) setPoleZeroMultiplier:(short)chan withValue:(short)aValue		
+{ 
+    [[[self undoManager] prepareWithInvocationTarget:self] setPoleZeroMultiplier:chan withValue:poleZeroMult[chan]];
+	poleZeroMult[chan] = aValue;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelPoleZeroMultChanged object:self];
 }
 
 - (void) setDebug:(short)chan withValue:(short)aValue	
@@ -814,6 +811,7 @@ static struct {
 - (int) enabled:(short)chan			{ return enabled[chan]; }
 - (int) cfdEnabled:(short)chan		{ return cfdEnabled[chan]; }
 - (int) poleZeroEnabled:(short)chan	{ return poleZeroEnabled[chan]; }
+- (int) poleZeroMult:(short)chan	{ return poleZeroMult[chan]; }
 - (int) debug:(short)chan			{ return debug[chan]; }
 - (int) pileUp:(short)chan			{ return pileUp[chan];}
 - (int) polarity:(short)chan		{ return polarity[chan];}
@@ -827,10 +825,17 @@ static struct {
 - (int) traceLength:(short)chan		{ return dataLength[chan]-2*kGretina4HeaderLengthLongs; }
 
 
+- (float) poleZeroTauConverted:(short)chan  { return poleZeroMult[chan]>0 ? 0.01*pow(2., 23)/poleZeroMult[chan] : 0; } //convert to us
 - (float) cfdDelayConverted:(short)chan		{ return cfdDelay[chan]*630./(float)0x3F; }						//convert to ns
 - (float) cfdThresholdConverted:(short)chan	{ return cfdThreshold[chan]*160./(float)0x10; }					//convert to kev
 - (float) dataDelayConverted:(short)chan	{ return dataDelay[chan]*4.5/(float)0x01C2; }					//convert to Â¬Âµs
 - (float) traceLengthConverted:(short)chan	{ return (dataLength[chan]-2*kGretina4HeaderLengthLongs)*10.0; }//convert to ns, making sure to remove header length
+
+- (void) setPoleZeroTauConverted:(short)chan withValue:(float)aValue 
+{
+    if(aValue > 0) aValue = 0.01*pow(2., 23)/aValue;
+	[self setPoleZeroMultiplier:chan withValue:aValue]; 	//us -> raw
+}
 
 - (void) setCFDDelayConverted:(short)chan withValue:(float)aValue
 {
@@ -866,7 +871,7 @@ static struct {
                         numToRead:1
 					   withAddMod:[self addressModifier]
 					usingAddSpace:0x01];
-    return theValue & 0xffff;
+    return theValue & 0xfff;
 }
 
 - (void) resetDCM
@@ -1044,7 +1049,7 @@ static struct {
 	
 }
 
-- (void) initBoard
+- (void) initBoard:(BOOL)doEnableChannels
 {
 	//find out the Main FPGA version
 	unsigned long mainVersion = 0x00;
@@ -1053,12 +1058,14 @@ static struct {
                         numToRead:1
 					   withAddMod:[self addressModifier]
 					usingAddSpace:0x01];
-	mainVersion = (mainVersion & 0xFFFF0000) >> 16;
+	//mainVersion = (mainVersion & 0xFFFF0000) >> 16;
+	mainVersion = (mainVersion & 0xFFFFF000) >> 12;
 	NSLog(@"Main FGPA version: 0x%x \n", mainVersion);
 	
-	if (mainVersion != 0x108)
+	//if (mainVersion != 0x108)
+	if (mainVersion != 0x105)
 	{
-		NSLog(@"Main FPGA version does not match: it should be 0x108, but now it is 0x%x \n", mainVersion);
+		NSLog(@"Main FPGA version does not match: it should be 0x105, but now it is 0x%x \n", mainVersion);
 		return;
 	}
 	
@@ -1089,7 +1096,7 @@ static struct {
 	}
 	
 	//write the channel level params
-	if ([self doSetEnableStatusOfChannelsWhileInit]) {
+	if (doEnableChannels) {
 		for(i=0;i<kNumGretina4Channels;i++) {
 			[self writeControlReg:i enabled:[self enabled:i]];
 			[self writeLEDThreshold:i];
@@ -1133,7 +1140,7 @@ static struct {
     BOOL startStop;
     if(forceEnable)	startStop= enabled[chan];
     else			startStop = NO;
-	
+
     unsigned long theValue = (poleZeroEnabled[chan] << 13) | (cfdEnabled[chan] << 12) | (polarity[chan] << 10) 
 	| (triggerMode[chan] << 3) | (pileUp[chan] << 2) | (debug[chan] << 1) | startStop;
     [[self adapter] writeLongBlock:&theValue
@@ -1149,7 +1156,8 @@ static struct {
 
 - (void) writeLEDThreshold:(int)channel
 {    
-    [[self adapter] writeLongBlock:&ledThreshold[channel]
+    unsigned long theValue = ((poleZeroMult[channel]) << 20) | (ledThreshold[channel]);
+    [[self adapter] writeLongBlock:&theValue
                          atAddress:[self baseAddress] + register_information[kLEDThreshold].offset + 4*channel
                         numToWrite:1
                         withAddMod:[self addressModifier]
@@ -1217,18 +1225,54 @@ static struct {
                     usingAddSpace:0x01];
 }
 
+- (int) readCardInfo:(int) index
+{
+    unsigned long theValue = 0;
+    [[self adapter] readLongBlock:&theValue
+                        atAddress:[self baseAddress] + cardConstants[index].regOffset
+                        numToRead:1
+                       withAddMod:[self addressModifier]
+                    usingAddSpace:0x01];
+    return theValue & cardConstants[index].mask;
+}
+
+- (int) readExternalWindow { return [self readCardInfo:kExternalWindowIndex]; }
+
+- (int) readPileUpWindow { return [self readCardInfo:kPileUpWindowIndex]; }
+
+- (int) readNoiseWindow { return [self readCardInfo:kNoiseWindowIndex]; }
+
+- (int) readExtTrigLength { return [self readCardInfo:kExtTrigLengthIndex]; }
+
+- (int) readCollectionTime { return [self readCardInfo:kCollectionTimeIndex]; }
+
+- (int) readIntegrationTime { return [self readCardInfo:kIntegrationTimeIndex]; }
+
+- (int) readDownSample 
+{
+    unsigned long theValue = 0 ;
+    [[self adapter] readLongBlock:&theValue
+                        atAddress:[self baseAddress] + register_information[kProgrammingDone].offset
+                        numToRead:1
+                       withAddMod:[self addressModifier]
+                    usingAddSpace:0x01];
+    return theValue >> 28;
+}
+
+
 - (int) clearFIFO
 {
     /* clearFIFO clears the FIFO and then resets the enabled flags on the board to whatever *
      * was currently set *ON THE BOARD*.                                                    */
 	int count = 0;
+
     fifoStateAddress  = [self baseAddress] + register_information[kProgrammingDone].offset;
     fifoAddress       = [self baseAddress] + 0x1000;
 	theController     = [self adapter];
 	unsigned long  dataDump[0xffff];
 	BOOL errorFound		  = NO;
 	//NSDate* startDate = [NSDate date];
-    
+
     short boardStateEnabled[kNumGretina4Channels];
     short modelStateEnabled[kNumGretina4Channels];
     int i;
@@ -1382,7 +1426,7 @@ static struct {
 		switch(noiseFloorState){
 			case 0: //init
 				//disable all channels
-				[self initBoard];
+				[self initBoard:true];
 				int i;
 				for(i=0;i<kNumGretina4Channels;i++){
 					oldEnabled[i] = [self enabled:i];
@@ -1482,7 +1526,7 @@ static struct {
 					[self setEnabled:i withValue:oldEnabled[i]];
 					[self setLEDThreshold:i withValue:newLEDThreshold[i]];
 				}
-				[self initBoard];
+				[self initBoard:true];
 				noiseFloorRunning = NO;
 				break;
 		}
@@ -1746,7 +1790,7 @@ static struct {
     dataBuffer = (unsigned long*)malloc(0xffff * sizeof(long));
     [self startRates];
     
-    [self initBoard];
+    [self initBoard:true];
     
 	[self performSelector:@selector(checkFifoAlarm) withObject:nil afterDelay:1];
 }
@@ -1966,10 +2010,13 @@ static struct {
 	
 	int i;
 	for(i=0;i<kNumGretina4Channels;i++){
-		[self setEnabled:i		withValue:[decoder decodeIntForKey:[@"enabled"	stringByAppendingFormat:@"%d",i]]];
-		[self setDebug:i		withValue:[decoder decodeIntForKey:[@"debug"	stringByAppendingFormat:@"%d",i]]];
-		[self setPileUp:i		withValue:[decoder decodeIntForKey:[@"pileUp"	stringByAppendingFormat:@"%d",i]]];
-		[self setPolarity:i		withValue:[decoder decodeIntForKey:[@"polarity" stringByAppendingFormat:@"%d",i]]];
+		[self setEnabled:i		withValue:[decoder decodeIntForKey:[@"enabled"	    stringByAppendingFormat:@"%d",i]]];
+		[self setDebug:i		withValue:[decoder decodeIntForKey:[@"debug"	    stringByAppendingFormat:@"%d",i]]];
+		[self setPileUp:i		withValue:[decoder decodeIntForKey:[@"pileUp"	    stringByAppendingFormat:@"%d",i]]];
+		[self setCFDEnabled:i 	withValue:[decoder decodeIntForKey:[@"cfdEnabled"   stringByAppendingFormat:@"%d",i]]];
+		[self setPoleZeroEnabled:i withValue:[decoder decodeIntForKey:[@"poleZeroEnabled" stringByAppendingFormat:@"%d",i]]];
+		[self setPoleZeroMultiplier:i withValue:[decoder decodeIntForKey:[@"poleZeroMult" stringByAppendingFormat:@"%d",i]]];
+		[self setPolarity:i		withValue:[decoder decodeIntForKey:[@"polarity"     stringByAppendingFormat:@"%d",i]]];
 		[self setTriggerMode:i	withValue:[decoder decodeIntForKey:[@"triggerMode"	stringByAppendingFormat:@"%d",i]]];
 		[self setLEDThreshold:i withValue:[decoder decodeIntForKey:[@"ledThreshold" stringByAppendingFormat:@"%d",i]]];
 		[self setCFDThreshold:i withValue:[decoder decodeIntForKey:[@"cfdThreshold" stringByAppendingFormat:@"%d",i]]];
@@ -2001,6 +2048,9 @@ static struct {
 		[encoder encodeInt:enabled[i]		forKey:[@"enabled"		stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:debug[i]			forKey:[@"debug"		stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:pileUp[i]		forKey:[@"pileUp"		stringByAppendingFormat:@"%d",i]];
+		[encoder encodeInt:cfdEnabled[i]  	forKey:[@"cfdEnabled"  	stringByAppendingFormat:@"%d",i]];
+		[encoder encodeInt:poleZeroEnabled[i] forKey:[@"poleZeroEnabled" stringByAppendingFormat:@"%d",i]];
+		[encoder encodeInt:poleZeroMult[i]  forKey:[@"poleZeroMult" stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:polarity[i]		forKey:[@"polarity"		stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:triggerMode[i]	forKey:[@"triggerMode"	stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:cfdFraction[i]	forKey:[@"cfdFraction"	stringByAppendingFormat:@"%d",i]];
@@ -2032,6 +2082,7 @@ static struct {
 	[self addCurrentState:objDictionary cArray:dataLength forKey:@"Data Length"];
 	[self addCurrentState:objDictionary cArray:cfdEnabled forKey:@"CFD Enabled"];
 	[self addCurrentState:objDictionary cArray:poleZeroEnabled forKey:@"Pole Zero Enabled"];
+	[self addCurrentState:objDictionary cArray:poleZeroMult forKey:@"Pole Zero Multiplier"];
     
     NSMutableArray* ar = [NSMutableArray array];
 	for(i=0;i<kNumGretina4Channels;i++){

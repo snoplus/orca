@@ -186,6 +186,7 @@ enum Gretina4FIFOStates {
     short           dataLength[kNumGretina4Channels];
     short           cfdEnabled[kNumGretina4Channels];
     short           poleZeroEnabled[kNumGretina4Channels];
+    short           poleZeroMult[kNumGretina4Channels];
     int				downSample;
 	
 	ORRateGroup*	waveFormRateGroup;
@@ -214,9 +215,6 @@ enum Gretina4FIFOStates {
 	int noiseFloorTestValue;
 	int noiseFloorOffset;
     float noiseFloorIntegrationTime;
-	
-	//jing's code:
-	BOOL doSetEnableStatusOfChannelsWhileInit;
 	
     NSString* mainFPGADownLoadState;
 	BOOL isFlashWriteEnabled;
@@ -297,10 +295,6 @@ enum Gretina4FIFOStates {
 - (void) setCollectionTime:(int)aValue;
 - (void) setIntegrationTime:(int)aValue;
 
-//@property BOOL enableAllChannelsWhileInit; //jing's code
-- (void) setEnableStatusOfChannelsWhileInit:(bool) aValue;
-- (bool) doSetEnableStatusOfChannelsWhileInit;
-
 - (int) externalWindowAsInt;
 - (int) pileUpWindowAsInt;
 - (int) noiseWindowAsInt;
@@ -314,6 +308,7 @@ enum Gretina4FIFOStates {
 - (void) setEnabled:(short)chan withValue:(short)aValue;
 - (void) setCFDEnabled:(short)chan withValue:(short)aValue;
 - (void) setPoleZeroEnabled:(short)chan withValue:(short)aValue;		
+- (void) setPoleZeroMultiplier:(short)chan withValue:(short)aValue;		
 - (void) setDebug:(short)chan withValue:(short)aValue;	
 - (void) setLEDThreshold:(short)chan withValue:(int)aValue;
 - (void) setCFDDelay:(short)chan withValue:(int)aValue;	
@@ -326,6 +321,7 @@ enum Gretina4FIFOStates {
 
 - (int) enabled:(short)chan;
 - (int) poleZeroEnabled:(short)chan;
+- (int) poleZeroMult:(short)chan;
 - (int) cfdEnabled:(short)chan;		
 - (int) debug:(short)chan;		
 - (int) pileUp:(short)chan;		
@@ -341,11 +337,13 @@ enum Gretina4FIFOStates {
 - (int) traceLength:(short)chan;
 
 //conversion methods
+- (float) poleZeroTauConverted:(short)chan;
 - (float) cfdDelayConverted:(short)chan;
 - (float) cfdThresholdConverted:(short)chan;
 - (float) dataDelayConverted:(short)chan;
 - (float) traceLengthConverted:(short)chan;
 
+- (void) setPoleZeroTauConverted:(short)chan withValue:(float)aValue;	
 - (void) setCFDDelayConverted:(short)chan withValue:(float)aValue;	
 - (void) setCFDThresholdConverted:(short)chan withValue:(float)aValue;
 // Data Length refers to total length of the record (w/ header), trace length refers to length of trace
@@ -358,7 +356,7 @@ enum Gretina4FIFOStates {
 - (void) resetDCM;
 - (void) setClockSource:(unsigned long) clocksource;
 - (void) resetMainFPGA;
-- (void) initBoard;
+- (void) initBoard:(BOOL)doEnableChannels;
 - (void) initSerDes;
 - (unsigned long) readControlReg:(int)channel;
 - (void) writeControlReg:(int)channel enabled:(BOOL)enabled;
@@ -373,6 +371,15 @@ enum Gretina4FIFOStates {
 - (void) stepNoiseFloor;
 - (BOOL) noiseFloorRunning;
 - (void) writeDownSample;
+
+- (int) readCardInfo:(int)index;
+- (int) readExternalWindow;
+- (int) readPileUpWindow;
+- (int) readNoiseWindow;
+- (int) readExtTrigLength;
+- (int) readCollectionTime;
+- (int) readIntegrationTime;
+- (int) readDownSample;
 
 
 #pragma mark ¥¥¥FPGA download
@@ -433,6 +440,7 @@ extern NSString* ORGretina4ModelDebugChanged;
 extern NSString* ORGretina4ModelPileUpChanged;
 extern NSString* ORGretina4ModelCFDEnabledChanged;
 extern NSString* ORGretina4ModelPoleZeroEnabledChanged;
+extern NSString* ORGretina4ModelPoleZeroMultChanged;
 extern NSString* ORGretina4ModelPolarityChanged;
 extern NSString* ORGretina4ModelTriggerModeChanged;
 extern NSString* ORGretina4ModelLEDThresholdChanged;

@@ -57,8 +57,7 @@
 
 - (void) awakeFromNib
 {
-	
-    settingSize     = NSMakeSize(790,500);
+    settingSize     = NSMakeSize(830,510);
     rateSize		= NSMakeSize(790,340);
     registerTabSize	= NSMakeSize(400,187);
 	firmwareTabSize = NSMakeSize(340,187);
@@ -87,7 +86,7 @@
 	triggerModePU[7] = triggerModePU7;
 	triggerModePU[8] = triggerModePU8;
 	triggerModePU[9] = triggerModePU9;
-	
+
 	// Setup register popup buttons
 	[registerIndexPU removeAllItems];
 	[registerIndexPU setAutoenablesItems:NO];
@@ -224,6 +223,11 @@
                        object : model];
 	
     [notifyCenter addObserver : self
+                     selector : @selector(poleZeroTauChanged:)
+                         name : ORGretina4ModelPoleZeroMultChanged
+                       object : model];
+	
+    [notifyCenter addObserver : self
                      selector : @selector(debugChanged:)
                          name : ORGretina4ModelDebugChanged
                        object : model];
@@ -313,11 +317,6 @@
                          name : ORGretina4ModelRegisterIndexChanged
 						object: model];
 
-	[notifyCenter addObserver : self
-                     selector : @selector(setEnableStatusOfAllChannelsWhileInitChanged:)
-                         name : ORGretina4ModelSetEnableStatusChanged
-						object: model];
-	
     [notifyCenter addObserver : self
                      selector : @selector(downSampleChanged:)
                          name : ORGretina4ModelDownSampleChanged
@@ -356,6 +355,7 @@
 	[self enabledChanged:nil];
 	[self cfdEnabledChanged:nil];
 	[self poleZeroEnabledChanged:nil];
+	[self poleZeroTauChanged:nil];
 	[self debugChanged:nil];
 	[self pileUpChanged:nil];
 	[self polarityChanged:nil];
@@ -386,14 +386,13 @@
 
 	[self registerIndexChanged:nil];
 	[self registerWriteValueChanged:nil];
-	[self setEnableStatusOfAllChannelsWhileInitChanged:nil];
 	[self downSampleChanged:nil];
 }
 
 #pragma mark ¥¥¥Interface Management
 - (void) downSampleChanged:(NSNotification*)aNote
 {
-	[downSamplePU selectItemAtIndex: [model downSample]];
+	[downSamplePU selectItemAtIndex:[model downSample]];
 }
 
 - (void) registerWriteValueChanged:(NSNotification*)aNote
@@ -453,6 +452,15 @@
 		[[poleZeroEnabledMatrix cellWithTag:i] setState:[model poleZeroEnabled:i]];
 	}
 }
+
+- (void) poleZeroTauChanged:(NSNotification*)aNote
+{
+	short i;
+	for(i=0;i<kNumGretina4Channels;i++){
+		[[poleZeroTauMatrix cellWithTag:i] setFloatValue:[model poleZeroTauConverted:i]];
+	}
+}
+
 
 - (void) debugChanged:(NSNotification*)aNote
 {
@@ -607,6 +615,7 @@
 	[enabledMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[cfdEnabledMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[poleZeroEnabledMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
+	[poleZeroTauMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[debugMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[pileUpMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[ledThresholdMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
@@ -640,11 +649,6 @@
     [registerIndexPU setEnabled:!lockedOrRunningMaintenance && !downloading];
     [readRegisterButton setEnabled:!lockedOrRunningMaintenance && !downloading];
     [writeRegisterButton setEnabled:!lockedOrRunningMaintenance && !downloading];
-}
-
-- (void) setEnableStatusOfAllChannelsWhileInitChanged:(NSNotification*)aNote
-{
-	[setEnableStatusOfChannelsWhileInitButton setState:[model doSetEnableStatusOfChannelsWhileInit]];
 }
 
 - (void) setFifoStateLabel
@@ -814,7 +818,9 @@
 #pragma mark ¥¥¥Actions
 - (void) downSampleAction:(id)sender
 {
-	[model setDownSample:[sender indexOfSelectedItem]];	
+	if([sender indexOfSelectedItem] != [model downSample]){
+		[model setDownSample:[sender indexOfSelectedItem]];
+	}
 }
 
 - (IBAction) registerIndexPUAction:(id)sender
@@ -840,6 +846,12 @@
 {
 	if([sender intValue] != [model poleZeroEnabled:[[sender selectedCell] tag]]){
 		[model setPoleZeroEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
+	}
+}
+- (IBAction) poleZeroTauAction:(id)sender
+{
+	if([sender intValue] != [model poleZeroTauConverted:[[sender selectedCell] tag]]){
+		[model setPoleZeroTauConverted:[[sender selectedCell] tag] withValue:[sender floatValue]];
 	}
 }
 - (IBAction) debugAction:(id)sender
@@ -992,16 +1004,11 @@
     }
 }
 
-- (IBAction) setEnableStatusOfAllChannelsWhileInitAction:(id)sender //jing's code
-{
-	[model setEnableStatusOfChannelsWhileInit:[sender state]];
-}
-
 - (IBAction) initBoard:(id)sender
 {
     @try {
         [self endEditing];
-        [model initBoard];		//initialize and load hardware
+        [model initBoard:false];		//initialize and load hardware, but don't enable channels
         NSLog(@"Initialized Gretina4 (Slot %d <%p>)\n",[model slot],[model baseAddress]);
         
     }
@@ -1107,12 +1114,13 @@
         else if(fifoStatus == kAlmostEmpty)	NSLog(@"FIFO = Almost Empty\n");
         else if(fifoStatus == kHalfFull)	NSLog(@"FIFO = Half Full\n");
 		
-		NSLog(@"External Window (us): %d \n", [model externalWindowAsInt]/100);
-		NSLog(@"Pileup Window (us): %d \n", [model pileUpWindowAsInt]/100);
-		NSLog(@"Noise Window (ns): %d \n", [model noiseWindowAsInt]*10);
-		NSLog(@"Ext Trig Length (us): %d \n", [model extTrigLengthAsInt]/100);
-		NSLog(@"Collection (us): %d \n", [model collectionTimeAsInt]/100);
-		NSLog(@"Integration Time (us):  %d \n", [model integrationTimeAsInt]/100);
+		NSLog(@"External Window: %g us\n", 0.01*[model readExternalWindow]);
+		NSLog(@"Pileup Window: %g us\n", 0.01*[model readPileUpWindow]);
+		NSLog(@"Noise Window: %g ns\n", 10.*[model readNoiseWindow]);
+		NSLog(@"Ext Trig Length: %g us\n", 0.01*[model readExtTrigLength]);
+		NSLog(@"Collection: %g us\n", 0.01*[model readCollectionTime]);
+		NSLog(@"Integration Time: %g us\n", 0.01*[model readIntegrationTime]);
+		NSLog(@"Down sample: x%d\n", (int) pow(2,[model readDownSample]));
         
     }
 	@catch(NSException* localException) {
