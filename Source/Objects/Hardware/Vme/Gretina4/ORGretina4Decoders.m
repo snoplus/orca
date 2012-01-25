@@ -83,10 +83,8 @@
 	NSString* cardKey	 = [self getCardKey: card];
 	NSString* channelKey = [self getChannelKey: channel];
 
-	//Jing comment out these two line
-	//int integrationTime = [[self objectForNestedKey:crateKey,cardKey,kIntegrationTimeKey,nil] intValue];
-	//if(integrationTime) energy /= integrationTime; 
-	energy/=50;
+	int integrationTime = [[self objectForNestedKey:crateKey,cardKey,kIntegrationTimeKey,nil] intValue];
+	if(integrationTime) energy /= integrationTime; 
 	
     [aDataSet histogram:energy numBins:0x1fff sender:self  withKeys:@"Gretina4", @"Energy",crateKey,cardKey,channelKey,nil];
 	
