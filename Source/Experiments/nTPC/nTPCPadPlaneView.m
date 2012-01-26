@@ -26,6 +26,7 @@
 @implementation nTPCPadPlaneView
 - (void) awakeFromNib
 {
+	[colorScale setExcludeZero:YES];
 	[super awakeFromNib];
 	[self performSelector:@selector(delayedSetup) withObject:nil afterDelay:.1];
 }
