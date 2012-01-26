@@ -44,6 +44,9 @@
 	[[focalPlaneColorScale colorAxis] setLabel:@"Main Focal Plane"];
 	[[vetoColorScale colorAxis] setLabel:@"Veto"];
 	[[vetoColorScale colorAxis] setOppositePosition:YES];
+	[focalPlaneColorScale setExcludeZero:YES];
+	[vetoColorScale setExcludeZero:YES];
+
 }
 
 - (void) setViewType:(int)aViewType
