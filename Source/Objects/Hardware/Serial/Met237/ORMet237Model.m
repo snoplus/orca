@@ -425,11 +425,12 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 - (void) openPort:(BOOL)state
 {
     if(state) {
+        [serialPort open];
 		[serialPort setSpeed:9600];
 		[serialPort setParityNone];
 		[serialPort setStopBits2:NO];
 		[serialPort setDataBits:8];
-        [serialPort open];
+		[serialPort commitChanges];
 		[self universalSelect];
 		if(wasRunning)[self startCycle];
     }

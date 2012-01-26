@@ -52,7 +52,6 @@
 {
     [self populatePortListPopup];
 
-	[self populatePortListPopup];
     [[plotter0 yAxis] setRngLow:0.0 withHigh:100.];
 	[[plotter0 yAxis] setRngLimitsLow:0 withHigh:1000. withMinRng:5];
 	
