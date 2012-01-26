@@ -1747,9 +1747,9 @@ static struct {
     [a addObject:p];
 	
     p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setUseValue:NO];
+    [p setUseValue:YES];
     [p setName:@"Init"];
-    [p setSetMethodSelector:@selector(initBoard)];
+    [p setSetMethodSelector:@selector(initBoard:)];
     [a addObject:p];
     
     return a;

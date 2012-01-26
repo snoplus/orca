@@ -185,7 +185,7 @@
 - (IBAction) probeBoard:(id)sender;
 - (IBAction) readStatus:(id)sender;
 - (IBAction) resetBoard:(id)sender;
-- (IBAction) initBoard:(id)sender;
+- (IBAction) initBoardAction:(id)sender;
 - (IBAction) clearFIFO:(id)sender;
 - (IBAction) integrationAction:(id)sender;
 - (IBAction) findNoiseFloors:(id)sender;

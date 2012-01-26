@@ -1025,7 +1025,7 @@
     }
 }
 
-- (IBAction) initBoard:(id)sender
+- (IBAction) initBoardAction:(id)sender
 {
     @try {
         [self endEditing];
