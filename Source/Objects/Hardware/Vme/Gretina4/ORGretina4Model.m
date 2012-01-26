@@ -1,5 +1,5 @@
 //-------------------------------------------------------------------------
-//  ORGretina4Model.h
+//  ORGretina4Model.m
 //
 //  Created by Mark A. Howe on Wednesday 02/07/2007.
 //  Copyright (c) 2007 CENPA. University of Washington. All rights reserved.
@@ -174,7 +174,8 @@ static Gretina4RegisterInformation register_information[kNumberOfGretina4Registe
 {0x864, @"self trigger period", YES, YES, NO, NO},             
 {0x868, @"self trigger count", YES, YES, NO, NO}, 
 {0x870, @"FIFOInterfaceSMReg", YES, YES, NO, NO}, 
-{0x874, @"Test signals register", YES, YES, NO, NO}
+{0x874, @"Test signals register", YES, YES, NO, NO},
+{0x1C0, @"Trapezoidal trigger settings", NO, YES, YES, YES}
 };
                                       
 static Gretina4RegisterInformation fpga_register_information[kNumberOfFPGARegisters] = {
@@ -747,8 +748,8 @@ static struct {
 
 - (void) setTriggerMode:(short)chan withValue:(int)aValue	
 { 
-	if(aValue<0)aValue=0;
-	else if(aValue>0x3)aValue= 0x3;
+	if(aValue<0) aValue=0;
+	else if(aValue>kTrapezoidalTriggerMode) aValue = kTrapezoidalTriggerMode;
     [[[self undoManager] prepareWithInvocationTarget:self] setTriggerMode:chan withValue:triggerMode[chan]];
 	triggerMode[chan] = aValue;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelTriggerModeChanged object:self];
@@ -756,8 +757,13 @@ static struct {
 
 - (void) setLEDThreshold:(short)chan withValue:(int)aValue 
 { 
-	if(aValue<0)aValue=0;
-	else if(aValue>0x1FFFF)aValue = 0x1FFFF;
+	if(aValue<0) aValue=0;
+	if(triggerMode[chan] == kTrapezoidalTriggerMode) {
+      if(aValue>0xFFFFFF) aValue = 0xFFFFFF;
+    }
+	else {
+      if(aValue>0x1FFFF) aValue = 0x1FFFF;
+    }
     [[[self undoManager] prepareWithInvocationTarget:self] setLEDThreshold:chan withValue:ledThreshold[chan]];
 	ledThreshold[chan] = aValue;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelLEDThresholdChanged object:self];
@@ -1152,7 +1158,7 @@ static struct {
     else			startStop = NO;
 
     unsigned long theValue = (pzTraceEnabled[chan] << 14) | (poleZeroEnabled[chan] << 13) | (cfdEnabled[chan] << 12) | (polarity[chan] << 10) 
-	| (triggerMode[chan] << 3) | (pileUp[chan] << 2) | (debug[chan] << 1) | startStop;
+	| ((triggerMode[chan] & 0x3) << 3) | (pileUp[chan] << 2) | (debug[chan] << 1) | startStop;
     [[self adapter] writeLongBlock:&theValue
                          atAddress:[self baseAddress] + register_information[kControlStatus].offset + 4*chan
                         numToWrite:1
@@ -1166,13 +1172,19 @@ static struct {
 
 - (void) writeLEDThreshold:(int)channel
 {    
-    unsigned long theValue = ((poleZeroMult[channel]) << 20) | (ledThreshold[channel]);
+    unsigned long theValue = ((poleZeroMult[channel]) << 20) | (ledThreshold[channel] & 0x1FFFF);
     [[self adapter] writeLongBlock:&theValue
                          atAddress:[self baseAddress] + register_information[kLEDThreshold].offset + 4*channel
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
-    
+    theValue = 0x0;
+    if(triggerMode[channel] == kTrapezoidalTriggerMode) theValue = (1 << 31) | ledThreshold[channel];
+    [[self adapter] writeLongBlock:&theValue
+                         atAddress:[self baseAddress] + register_information[kTrapezoidalTriggerReg].offset + 4*channel
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
 }
 
 - (void) writeCFDParameters:(int)channel

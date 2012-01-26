@@ -1,5 +1,5 @@
 //-------------------------------------------------------------------------
-//  ORGretina4Controller.h
+//  ORGretina4Controller.m
 //
 //  Created by Mark A. Howe on Wednesday 02/07/2007.
 //  Copyright (c) 2007 CENPA. University of Washington. All rights reserved.

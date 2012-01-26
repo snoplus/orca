@@ -61,6 +61,8 @@
 #define kGretina4ReloadMainFPGACmd	0x3
 #define kGretina4MainFPGAIsLoaded	0x41
 
+#define kTrapezoidalTriggerMode	0x4
+
 
 #pragma mark ¥¥¥Register Definitions
 enum {
@@ -140,6 +142,7 @@ enum {
 	kSelfTriggerCount,			//[72] self trigger count
 	kFIFOInterfaceSMReg,		//[73] FIFOInterfaceSMReg
 	kTestSignalReg,				//[74] Test Signals Register
+	kTrapezoidalTriggerReg,     //[75] Trapezoidal Trigger settings
 	kNumberOfGretina4Registers	//must be last
 };
 
