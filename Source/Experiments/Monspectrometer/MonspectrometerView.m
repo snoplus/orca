@@ -27,6 +27,7 @@
 {	
 	[theBackground release];
 	theBackground = [[NSImage imageNamed:@"monSpecHolder"] retain];
+	[prespecColorScale setExcludeZero:YES];
 }
 
 - (void) dealloc
