@@ -550,8 +550,7 @@ id executionNode(int oper, ...)
 	[leaf release];
 	
     va_end(ap);
-   // return [p autorelease];
-    return p;
+    return [p autorelease];
 }
 
 void addNode(id node)
