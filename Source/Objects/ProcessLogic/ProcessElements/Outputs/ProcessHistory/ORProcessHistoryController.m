@@ -50,7 +50,7 @@
 - (void) awakeFromNib
 {
 	[super awakeFromNib];
-	[[plotter yAxis] setRngLimitsLow:-1000 withHigh:1000 withMinRng:5];
+	[[plotter yAxis] setRngLimitsLow:-1000000 withHigh:1000000 withMinRng:5];
 	[[plotter yAxis] setRngDefaultsLow:0 withHigh:20];
 
 	[[plotter xAxis] setRngLimitsLow:0 withHigh:50000 withMinRng:3];
