@@ -235,6 +235,12 @@
 		84065F751226EBDE004E8970 /* PxiCrate6Small.png in Resources */ = {isa = PBXBuildFile; fileRef = 84065F741226EBDE004E8970 /* PxiCrate6Small.png */; };
 		84071B690D185E7F00FD6EFD /* ORDataChainObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 84071B670D185E7F00FD6EFD /* ORDataChainObject.h */; };
 		84071B6A0D185E7F00FD6EFD /* ORDataChainObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 84071B680D185E7F00FD6EFD /* ORDataChainObject.m */; };
+		8407398014CDD91F00BAD105 /* Met637.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8407397A14CDD91F00BAD105 /* Met637.nib */; };
+		8407398114CDD91F00BAD105 /* Met637.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8407397B14CDD91F00BAD105 /* Met637.tif */; };
+		8407398214CDD91F00BAD105 /* ORMet637Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 8407397C14CDD91F00BAD105 /* ORMet637Controller.h */; };
+		8407398314CDD91F00BAD105 /* ORMet637Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 8407397D14CDD91F00BAD105 /* ORMet637Controller.m */; };
+		8407398414CDD91F00BAD105 /* ORMet637Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 8407397E14CDD91F00BAD105 /* ORMet637Model.h */; };
+		8407398514CDD91F00BAD105 /* ORMet637Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 8407397F14CDD91F00BAD105 /* ORMet637Model.m */; };
 		84073A4F05E3F3D3003E62AA /* ORValidatePassword.h in Headers */ = {isa = PBXBuildFile; fileRef = 84073A4D05E3F3D3003E62AA /* ORValidatePassword.h */; };
 		84073A5005E3F3D3003E62AA /* ORValidatePassword.m in Sources */ = {isa = PBXBuildFile; fileRef = 84073A4E05E3F3D3003E62AA /* ORValidatePassword.m */; };
 		84073A5205E3F455003E62AA /* ValidatePassword.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84073A5105E3F455003E62AA /* ValidatePassword.nib */; };
@@ -1601,6 +1607,13 @@
 		848E591A1472B34400A70AB4 /* ORTTCPX400DPModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 848E59141472B34400A70AB4 /* ORTTCPX400DPModel.m */; };
 		848E591B1472B34400A70AB4 /* TTCPX400DP.nib in Resources */ = {isa = PBXBuildFile; fileRef = 848E59151472B34400A70AB4 /* TTCPX400DP.nib */; };
 		848E591C1472B34400A70AB4 /* TTCPX400DP.tif in Resources */ = {isa = PBXBuildFile; fileRef = 848E59161472B34400A70AB4 /* TTCPX400DP.tif */; };
+		848F6CAA14C75F690093E502 /* ORSIS3150Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 848F6CA414C75F690093E502 /* ORSIS3150Controller.h */; };
+		848F6CAB14C75F690093E502 /* ORSIS3150Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 848F6CA514C75F690093E502 /* ORSIS3150Controller.m */; };
+		848F6CAC14C75F690093E502 /* ORSIS3150Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 848F6CA614C75F690093E502 /* ORSIS3150Model.h */; };
+		848F6CAD14C75F690093E502 /* ORSIS3150Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 848F6CA714C75F690093E502 /* ORSIS3150Model.m */; };
+		848F6CAE14C75F690093E502 /* SIS3150.nib in Resources */ = {isa = PBXBuildFile; fileRef = 848F6CA814C75F690093E502 /* SIS3150.nib */; };
+		848F6CAF14C75F690093E502 /* SIS3150Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 848F6CA914C75F690093E502 /* SIS3150Card.gif */; };
+		848F6FE014C9B8FB0093E502 /* SIS3150Firmware in Resources */ = {isa = PBXBuildFile; fileRef = 848F6FDF14C9B8FB0093E502 /* SIS3150Firmware */; };
 		849013C410E27B13007591B5 /* ORPlotLinkController.h in Headers */ = {isa = PBXBuildFile; fileRef = 849013BE10E27B13007591B5 /* ORPlotLinkController.h */; };
 		849013C510E27B13007591B5 /* ORPlotLinkController.m in Sources */ = {isa = PBXBuildFile; fileRef = 849013BF10E27B13007591B5 /* ORPlotLinkController.m */; };
 		849013C610E27B13007591B5 /* ORPlotLinkModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 849013C010E27B13007591B5 /* ORPlotLinkModel.h */; };
@@ -3071,6 +3084,12 @@
 		84065F741226EBDE004E8970 /* PxiCrate6Small.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PxiCrate6Small.png; path = Source/Objects/Hardware/PXI/Crate6/PxiCrate6Small.png; sourceTree = SOURCE_ROOT; };
 		84071B670D185E7F00FD6EFD /* ORDataChainObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORDataChainObject.h; path = "Source/Objects/Data Processing/BaseClasses/ORDataChainObject.h"; sourceTree = SOURCE_ROOT; };
 		84071B680D185E7F00FD6EFD /* ORDataChainObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORDataChainObject.m; path = "Source/Objects/Data Processing/BaseClasses/ORDataChainObject.m"; sourceTree = SOURCE_ROOT; };
+		8407397A14CDD91F00BAD105 /* Met637.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Met637.nib; path = Source/Objects/Hardware/Serial/Met637/Met637.nib; sourceTree = SOURCE_ROOT; };
+		8407397B14CDD91F00BAD105 /* Met637.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Met637.tif; path = Source/Objects/Hardware/Serial/Met637/Met637.tif; sourceTree = SOURCE_ROOT; };
+		8407397C14CDD91F00BAD105 /* ORMet637Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMet637Controller.h; path = Source/Objects/Hardware/Serial/Met637/ORMet637Controller.h; sourceTree = SOURCE_ROOT; };
+		8407397D14CDD91F00BAD105 /* ORMet637Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMet637Controller.m; path = Source/Objects/Hardware/Serial/Met637/ORMet637Controller.m; sourceTree = SOURCE_ROOT; };
+		8407397E14CDD91F00BAD105 /* ORMet637Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMet637Model.h; path = Source/Objects/Hardware/Serial/Met637/ORMet637Model.h; sourceTree = SOURCE_ROOT; };
+		8407397F14CDD91F00BAD105 /* ORMet637Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMet637Model.m; path = Source/Objects/Hardware/Serial/Met637/ORMet637Model.m; sourceTree = SOURCE_ROOT; };
 		84073A4D05E3F3D3003E62AA /* ORValidatePassword.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORValidatePassword.h; sourceTree = "<group>"; };
 		84073A4E05E3F3D3003E62AA /* ORValidatePassword.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORValidatePassword.m; sourceTree = "<group>"; };
 		84073A5105E3F455003E62AA /* ValidatePassword.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = ValidatePassword.nib; sourceTree = "<group>"; };
@@ -4222,6 +4241,13 @@
 		848E59141472B34400A70AB4 /* ORTTCPX400DPModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORTTCPX400DPModel.m; path = Source/Objects/Hardware/Internet/TTCPX400DP/ORTTCPX400DPModel.m; sourceTree = SOURCE_ROOT; };
 		848E59151472B34400A70AB4 /* TTCPX400DP.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = TTCPX400DP.nib; path = Source/Objects/Hardware/Internet/TTCPX400DP/TTCPX400DP.nib; sourceTree = SOURCE_ROOT; };
 		848E59161472B34400A70AB4 /* TTCPX400DP.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = TTCPX400DP.tif; path = Source/Objects/Hardware/Internet/TTCPX400DP/TTCPX400DP.tif; sourceTree = SOURCE_ROOT; };
+		848F6CA414C75F690093E502 /* ORSIS3150Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSIS3150Controller.h; path = "Source/Objects/Hardware/Vme/SIS3150 Adapter/ORSIS3150Controller.h"; sourceTree = SOURCE_ROOT; };
+		848F6CA514C75F690093E502 /* ORSIS3150Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSIS3150Controller.m; path = "Source/Objects/Hardware/Vme/SIS3150 Adapter/ORSIS3150Controller.m"; sourceTree = SOURCE_ROOT; };
+		848F6CA614C75F690093E502 /* ORSIS3150Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSIS3150Model.h; path = "Source/Objects/Hardware/Vme/SIS3150 Adapter/ORSIS3150Model.h"; sourceTree = SOURCE_ROOT; };
+		848F6CA714C75F690093E502 /* ORSIS3150Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSIS3150Model.m; path = "Source/Objects/Hardware/Vme/SIS3150 Adapter/ORSIS3150Model.m"; sourceTree = SOURCE_ROOT; };
+		848F6CA814C75F690093E502 /* SIS3150.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = SIS3150.nib; path = "Source/Objects/Hardware/Vme/SIS3150 Adapter/SIS3150.nib"; sourceTree = SOURCE_ROOT; };
+		848F6CA914C75F690093E502 /* SIS3150Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = SIS3150Card.gif; path = "Source/Objects/Hardware/Vme/SIS3150 Adapter/SIS3150Card.gif"; sourceTree = SOURCE_ROOT; };
+		848F6FDF14C9B8FB0093E502 /* SIS3150Firmware */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SIS3150Firmware; sourceTree = "<group>"; };
 		849013BE10E27B13007591B5 /* ORPlotLinkController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPlotLinkController.h; path = "Source/Objects/Misc Objects/PlotLink/ORPlotLinkController.h"; sourceTree = SOURCE_ROOT; };
 		849013BF10E27B13007591B5 /* ORPlotLinkController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORPlotLinkController.m; path = "Source/Objects/Misc Objects/PlotLink/ORPlotLinkController.m"; sourceTree = SOURCE_ROOT; };
 		849013C010E27B13007591B5 /* ORPlotLinkModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPlotLinkModel.h; path = "Source/Objects/Misc Objects/PlotLink/ORPlotLinkModel.h"; sourceTree = SOURCE_ROOT; };
@@ -5943,6 +5969,20 @@
 			path = "Source/Objects/Data Processing/BaseClasses";
 			sourceTree = SOURCE_ROOT;
 		};
+		8407397914CDD91F00BAD105 /* Met637 */ = {
+			isa = PBXGroup;
+			children = (
+				8407397A14CDD91F00BAD105 /* Met637.nib */,
+				8407397B14CDD91F00BAD105 /* Met637.tif */,
+				8407397C14CDD91F00BAD105 /* ORMet637Controller.h */,
+				8407397D14CDD91F00BAD105 /* ORMet637Controller.m */,
+				8407397E14CDD91F00BAD105 /* ORMet637Model.h */,
+				8407397F14CDD91F00BAD105 /* ORMet637Model.m */,
+			);
+			name = Met637;
+			path = Source/Objects/Hardware/Serial/Met637;
+			sourceTree = SOURCE_ROOT;
+		};
 		84073A4C05E3F3D3003E62AA /* ValidatePassword */ = {
 			isa = PBXGroup;
 			children = (
@@ -7440,6 +7480,7 @@
 			children = (
 				84DEEBBA149916AD0092DB6C /* Serial Base Classes */,
 				84B6CD3B14B37E9700386BE1 /* RGA300 */,
+				8407397914CDD91F00BAD105 /* Met637 */,
 				841C4DEE141FA72800F95B50 /* Met237 */,
 				847F947213D4AA31006B06B4 /* Rad7 */,
 				8435AAC110C6D0EF00E03F7F /* VarianTPS */,
@@ -8517,6 +8558,21 @@
 			);
 			name = TTCPX400DP;
 			path = Source/Objects/Hardware/Internet/TTCPX400DP;
+			sourceTree = SOURCE_ROOT;
+		};
+		848F6CA314C75F690093E502 /* SIS3150 Adapter */ = {
+			isa = PBXGroup;
+			children = (
+				848F6CA414C75F690093E502 /* ORSIS3150Controller.h */,
+				848F6CA514C75F690093E502 /* ORSIS3150Controller.m */,
+				848F6CA614C75F690093E502 /* ORSIS3150Model.h */,
+				848F6CA714C75F690093E502 /* ORSIS3150Model.m */,
+				848F6FDF14C9B8FB0093E502 /* SIS3150Firmware */,
+				848F6CA814C75F690093E502 /* SIS3150.nib */,
+				848F6CA914C75F690093E502 /* SIS3150Card.gif */,
+			);
+			name = "SIS3150 Adapter";
+			path = "Source/Objects/Hardware/Vme/SIS3150 Adapter";
 			sourceTree = SOURCE_ROOT;
 		};
 		849013BD10E27B13007591B5 /* PlotLink */ = {
@@ -11454,6 +11510,7 @@
 				F51E69E003AE4776015F64B1 /* Vme Base Classes */,
 				8493CC790C99FA4B00B46CD4 /* VMEcpu */,
 				8402796907397B8700972B07 /* Bit3 Adaptor */,
+				848F6CA314C75F690093E502 /* SIS3150 Adapter */,
 				F5B1801F03B297FC015F64B1 /* CAEN */,
 				F51E69BE03AE4776015F64B1 /* Crate */,
 				84997E7B0CE37CBA002CFA70 /* VME64Crate */,
@@ -12616,6 +12673,10 @@
 				840D0ED514BBC5DD008FAC82 /* SNODetectorView.h in Headers */,
 				8402B5B514C708A1007999C1 /* ORMJDPreAmpController.h in Headers */,
 				8402B5B714C708A1007999C1 /* ORMJDPreAmpModel.h in Headers */,
+				848F6CAA14C75F690093E502 /* ORSIS3150Controller.h in Headers */,
+				848F6CAC14C75F690093E502 /* ORSIS3150Model.h in Headers */,
+				8407398214CDD91F00BAD105 /* ORMet637Controller.h in Headers */,
+				8407398414CDD91F00BAD105 /* ORMet637Model.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13416,6 +13477,11 @@
 				840D0ED014BBC56A008FAC82 /* snopluslogoreplay.tiff in Resources */,
 				8402B5B314C708A1007999C1 /* MJDPreAmp.gif in Resources */,
 				8402B5B414C708A1007999C1 /* MJDPreAmp.nib in Resources */,
+				848F6CAE14C75F690093E502 /* SIS3150.nib in Resources */,
+				848F6CAF14C75F690093E502 /* SIS3150Card.gif in Resources */,
+				848F6FE014C9B8FB0093E502 /* SIS3150Firmware in Resources */,
+				8407398014CDD91F00BAD105 /* Met637.nib in Resources */,
+				8407398114CDD91F00BAD105 /* Met637.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14324,6 +14390,10 @@
 				840D0ED614BBC5DD008FAC82 /* SNODetectorView.m in Sources */,
 				8402B5B614C708A1007999C1 /* ORMJDPreAmpController.m in Sources */,
 				8402B5B814C708A1007999C1 /* ORMJDPreAmpModel.m in Sources */,
+				848F6CAB14C75F690093E502 /* ORSIS3150Controller.m in Sources */,
+				848F6CAD14C75F690093E502 /* ORSIS3150Model.m in Sources */,
+				8407398314CDD91F00BAD105 /* ORMet637Controller.m in Sources */,
+				8407398514CDD91F00BAD105 /* ORMet637Model.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
