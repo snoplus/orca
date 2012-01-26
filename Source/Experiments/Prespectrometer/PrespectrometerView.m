@@ -17,6 +17,12 @@
 #import "ORColorScale.h"
 
 @implementation PrespectrometerView
+- (void) awakeFromNib
+{
+	[prespecColorScale setExcludeZero:YES];
+	[super awakeFromNib];
+}
+
 - (void) makeAllSegments
 {
 	[super makeAllSegments];
