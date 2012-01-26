@@ -66,6 +66,8 @@
 		int				holdTime;
 		BOOL			isLog;
 		BOOL			timedOut;
+		BOOL			dumpInProgress;
+		int				dumpCount;
 }
 
 #pragma mark ***Initialization
@@ -75,6 +77,10 @@
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark ***Accessors
+- (int) dumpCount;
+- (void) setDumpCount:(int)aDumpCount;
+- (BOOL) dumpInProgress;
+- (void) setDumpInProgress:(BOOL)aDumpInProgress;
 - (BOOL) timedOut;
 - (void) setTimedOut:(BOOL)aTimedOut;
 - (BOOL) isLog;
@@ -131,10 +137,8 @@
 - (void) stopCycle;
 
 #pragma mark ***Commands
-- (void) sendSettings;			
 - (void) sendAllData;
 - (void) sendNewData;
-- (void) sendLastData;
 - (void) setDate;
 - (void) sendClearData;
 - (void) sendStart;
@@ -169,6 +173,8 @@
 
 @end
 
+extern NSString* ORMet637ModelDumpCountChanged;
+extern NSString* ORMet637ModelDumpInProgressChanged;
 extern NSString* ORMet637ModelTimedOutChanged;
 extern NSString* ORMet637ModelIsLogChanged;
 extern NSString* ORMet637ModelHoldTimeChanged;

@@ -28,6 +28,8 @@
 #import "ORTimeRate.h"
 
 #pragma mark ***External Strings
+NSString* ORMet637ModelDumpCountChanged = @"ORMet637ModelDumpCountChanged";
+NSString* ORMet637ModelDumpInProgressChanged = @"ORMet637ModelDumpInProgressChanged";
 NSString* ORMet637ModelTimedOutChanged		  = @"ORMet637ModelTimedOutChanged";
 NSString* ORMet637ModelIsLogChanged			  = @"ORMet637ModelIsLogChanged";
 NSString* ORMet637ModelHoldTimeChanged		  = @"ORMet637ModelHoldTimeChanged";
@@ -60,6 +62,7 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 - (void) checkCycle;
 - (void) startTimeOut;
 - (void) timeout;
+- (void) dumpTimeout;
 @end
 
 @implementation ORMet637Model
@@ -159,6 +162,30 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 }
 
 #pragma mark ***Accessors
+
+- (int) dumpCount
+{
+    return dumpCount;
+}
+
+- (void) setDumpCount:(int)aDumpCount
+{
+    dumpCount = aDumpCount;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMet637ModelDumpCountChanged object:self];
+}
+
+- (BOOL) dumpInProgress
+{
+    return dumpInProgress;
+}
+
+- (void) setDumpInProgress:(BOOL)aDumpInProgress
+{
+    dumpInProgress = aDumpInProgress;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMet637ModelDumpInProgressChanged object:self];
+}
 
 - (BOOL) timedOut
 {
@@ -569,15 +596,29 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 	int i; 
 	for(i=0;i<6;i++){
 		[encoder encodeFloat:	countAlarmLimit[i] forKey: [NSString stringWithFormat:@"countAlarmLimit%d",i]];
-		[encoder encodeFloat:	maxCounts[i]		forKey: [NSString stringWithFormat:@"maxCounts%d",i]];
+		[encoder encodeFloat:	maxCounts[i]	   forKey: [NSString stringWithFormat:@"maxCounts%d",i]];
 
 	}
 }
 #pragma mark *** Commands
-- (void) sendSettings				{ [self addCmdToQueue:@"1"]; }
-- (void) sendAllData				{ [self addCmdToQueue:@"2"]; }
-- (void) sendNewData				{ [self addCmdToQueue:@"3"]; }
-- (void) sendLastData				{ [self addCmdToQueue:@"4"]; }
+- (void) sendNewData
+{
+	if([serialPort isOpen]){
+		NSLog(@"Met637 (%d): Starting dump of new data\n",[self uniqueIdNumber]);
+		NSLog(@"Any subsequent cmd will abort the dump\n");
+	}
+	[self addCmdToQueue:@"3"]; 
+}
+
+- (void) sendAllData 
+{ 
+	if([serialPort isOpen]){
+		NSLog(@"Met637 (%d): Starting dump of all data\n",[self uniqueIdNumber]);
+		NSLog(@"Any subsequent cmd will abort the dump\n");
+	}
+	[self addCmdToQueue:@"2"]; 
+}
+
 - (void) setDate
 { 
 	unsigned unitFlags = NSYearCalendarUnit | NSMonthCalendarUnit |  NSDayCalendarUnit | NSMinuteCalendarUnit | NSHourCalendarUnit;
@@ -737,45 +778,72 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 - (void) addCmdToQueue:(NSString*)aCmd
 {
 	if([serialPort isOpen]){ 
+		[self setDumpInProgress:NO];
 		aCmd = [aCmd stringByReplacingOccurrencesOfString:@"\n" withString:@""];
 		if(![aCmd hasSuffix:@"\r"])aCmd = [aCmd stringByAppendingFormat:@"\r"];
 		[serialPort writeString:[NSString stringWithFormat:@"%@",aCmd]];
 		[self startTimeOut];
 	}
+	else NSLog(@"Met637 (%d): Serial Port not open. Cmd Ignored.\n",[self uniqueIdNumber]);
+
 }
 
 - (void) process_response:(NSString*)theResponse
 {
 	theResponse = [theResponse stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 	NSArray* partsByComma = [theResponse componentsSeparatedByString:@","];
-	if([partsByComma count] >= 14){
-		[self setMeasurementDate: [partsByComma objectAtIndex:0]];
-	
-		[self setCount:0 value:[[partsByComma objectAtIndex:1] intValue]];
-		[self setCount:1 value:[[partsByComma objectAtIndex:2] intValue]];
-		[self setCount:2 value:[[partsByComma objectAtIndex:3] intValue]];
-		[self setCount:3 value:[[partsByComma objectAtIndex:4] intValue]];
-		[self setCount:4 value:[[partsByComma objectAtIndex:5] intValue]];
-		[self setCount:5 value:[[partsByComma objectAtIndex:6] intValue]];
+	if([partsByComma count] >= 14 && ![theResponse hasPrefix:@"TIME"]){
+		if(!dumpInProgress){
+			[self setMeasurementDate: [partsByComma objectAtIndex:0]];
 		
-		[self setTemperature:[[partsByComma objectAtIndex:7] floatValue]];
-		[self setHumidity:[[partsByComma objectAtIndex:8] floatValue]];
-		[self setLocation:[[partsByComma objectAtIndex:9] floatValue]];
-		[self setActualDuration:[[partsByComma objectAtIndex:10] intValue]];
-		
-		if(running){
-			if(countingMode == kMet637Manual){
-				[self stopCycle];
+			[self setCount:0 value:[[partsByComma objectAtIndex:1] intValue]];
+			[self setCount:1 value:[[partsByComma objectAtIndex:2] intValue]];
+			[self setCount:2 value:[[partsByComma objectAtIndex:3] intValue]];
+			[self setCount:3 value:[[partsByComma objectAtIndex:4] intValue]];
+			[self setCount:4 value:[[partsByComma objectAtIndex:5] intValue]];
+			[self setCount:5 value:[[partsByComma objectAtIndex:6] intValue]];
+			
+			[self setTemperature:[[partsByComma objectAtIndex:7] floatValue]];
+			[self setHumidity:[[partsByComma objectAtIndex:8] floatValue]];
+			[self setLocation:[[partsByComma objectAtIndex:9] floatValue]];
+			[self setActualDuration:[[partsByComma objectAtIndex:10] intValue]];
+			
+			if(running){
+				if(countingMode == kMet637Manual){
+					[self stopCycle];
+				}
+				else {
+					int theCount = [self cycleNumber];
+					[self setCycleNumber:theCount+1];
+					[self setCycleStarted:[NSDate date]];
+				}
 			}
-			else {
-				int theCount = [self cycleNumber];
-				[self setCycleNumber:theCount+1];
-				[self setCycleStarted:[NSDate date]];
-			}
+		}
+		else {
+			theResponse = [theResponse stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+			theResponse = [theResponse stringByReplacingOccurrencesOfString:@"\r" withString:@""];
+			//put in a unix time stamp for convenience
+			NSString* aDate = [partsByComma objectAtIndex:0];
+			
+			NSDateFormatter *dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
+			[dateFormatter setDateFormat:@"dd-MMM-yyyy HH:mm:ss"];
+			NSDate* gmtTime = [dateFormatter dateFromString:aDate];
+			NSNumber *timestamp=[[[NSNumber alloc] initWithDouble:[gmtTime timeIntervalSince1970]] autorelease];
+			
+			NSLog(@"%d, %@, %@\n",dumpCount,timestamp,theResponse);
+			[self setDumpCount:dumpCount+1];
+			[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(dumpTimeout) object:nil];
+			[self performSelector:@selector(dumpTimeout) withObject:nil afterDelay:.5];
 		}
 	}
 	else {
-		if([theResponse hasPrefix:@"CU"]){
+		if(([theResponse length]==1) && [theResponse hasPrefix:@"2"] || [theResponse hasPrefix:@"3"]){
+			[self setDumpInProgress:YES];
+			[self setDumpCount:0];
+			[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(dumpTimeout) object:nil];
+			[self performSelector:@selector(dumpTimeout) withObject:nil afterDelay:.5];
+		}
+		else if([theResponse hasPrefix:@"CU"]){
 			if([partsByComma count] == 2){
 				NSString* theUnits = [partsByComma objectAtIndex:1];
 				if([theUnits hasPrefix:@"CF"])[self setCountUnits:0];
@@ -825,5 +893,13 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 {
 	NSLogError(@"Met637",@"command timeout",nil);
 	[self setTimedOut:YES];
+}
+
+- (void) dumpTimeout
+{
+	[self setDumpInProgress:NO];
+	[self setDumpCount:0];
+	NSLog(@"Met637 (%d): Data dump finished\n",[self uniqueIdNumber]);
+
 }
 @end

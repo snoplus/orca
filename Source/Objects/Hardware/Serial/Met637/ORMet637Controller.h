@@ -23,6 +23,8 @@
 @interface ORMet637Controller : OrcaObjectController
 {
     IBOutlet NSTextField*	lockDocField;
+	IBOutlet NSTextField*	dumpCountField;
+	IBOutlet NSTextField*	dumpInProgressField;
 	IBOutlet NSTextField*	timedOutField;
 	IBOutlet NSButton*		isLogCB;
 	IBOutlet NSTextField*	holdTimeField;
@@ -69,6 +71,8 @@
 - (void) updateWindow;
 
 #pragma mark ***Interface Management
+- (void) dumpCountChanged:(NSNotification*)aNote;
+- (void) dumpInProgressChanged:(NSNotification*)aNote;
 - (void) timedOutChanged:(NSNotification*)aNote;
 - (void) actualDurationChanged:(NSNotification*)aNote;
 - (void) isLogChanged:(NSNotification*)aNote;
@@ -110,6 +114,8 @@
 - (IBAction) stopCycleAction:(id)sender;
 - (IBAction) countUnitsAction:(id)sender;
 - (IBAction) countingModeAction:(id)sender;
+- (IBAction) dumpAllDataAction:(id)sender;
+- (IBAction) dumpNewDataAction:(id)sender;
 
 
 #pragma mark ***Data Source

@@ -250,6 +250,16 @@
                          name : ORMet637ModelTimedOutChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(dumpInProgressChanged:)
+                         name : ORMet637ModelDumpInProgressChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(dumpCountChanged:)
+                         name : ORMet637ModelDumpCountChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -279,6 +289,18 @@
 	[self isLogChanged:nil];
 	[self actualDurationChanged:nil];
 	[self timedOutChanged:nil];
+	[self dumpInProgressChanged:nil];
+	[self dumpCountChanged:nil];
+}
+
+- (void) dumpCountChanged:(NSNotification*)aNote
+{
+	[dumpCountField setIntValue: [model dumpCount]];
+}
+
+- (void) dumpInProgressChanged:(NSNotification*)aNote
+{
+	[dumpInProgressField setStringValue: [model dumpInProgress]?@"Dumping":@"--"];
 }
 
 - (void) timedOutChanged:(NSNotification*)aNote
@@ -618,6 +640,16 @@
 - (IBAction) countUnitsAction:(id)sender
 {
 	[model setCountUnits:[sender indexOfSelectedItem]];
+}
+
+- (IBAction) dumpAllDataAction:(id)sender
+{
+	[model sendAllData];
+}
+
+- (IBAction) dumpNewDataAction:(id)sender
+{
+	[model sendNewData];
 }
 
 #pragma mark •••Data Source
