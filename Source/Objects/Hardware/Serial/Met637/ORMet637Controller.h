@@ -42,6 +42,9 @@
     IBOutlet NSTextField*   portStateField;
     IBOutlet NSPopUpButton* portListPopup;
     IBOutlet NSButton*      openPortButton;
+    IBOutlet NSButton*      clearAllButton;
+    IBOutlet NSButton*      dumpAllButton;
+    IBOutlet NSButton*      dumpRecentButton;
 
 	IBOutlet NSTextField*	cycleDurationField;
     IBOutlet NSButton*      startCycleButton;
@@ -116,6 +119,9 @@
 - (IBAction) countingModeAction:(id)sender;
 - (IBAction) dumpAllDataAction:(id)sender;
 - (IBAction) dumpNewDataAction:(id)sender;
+- (IBAction) clearAllAction:(id)sender;
+
+- (void) clearDataSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 
 
 #pragma mark ***Data Source

@@ -300,7 +300,7 @@
 
 - (void) dumpInProgressChanged:(NSNotification*)aNote
 {
-	[dumpInProgressField setStringValue: [model dumpInProgress]?@"Dumping":@"--"];
+	[dumpInProgressField setStringValue: [model dumpInProgress]?@"Printing":@"--"];
 }
 
 - (void) timedOutChanged:(NSNotification*)aNote
@@ -528,6 +528,10 @@
 	[countingModePU setEnabled:![model running] && !locked];
 	[countUnitsPU setEnabled:![model running] && !locked];
 	[tempUnitsPU setEnabled:![model running] && !locked];
+	[clearAllButton setEnabled:![model running] && !locked];
+	[dumpAllButton setEnabled:![model running]];
+	[dumpRecentButton setEnabled:![model running]];
+	
 }
 
 - (void) portStateChanged:(NSNotification*)aNotification
@@ -650,6 +654,26 @@
 - (IBAction) dumpNewDataAction:(id)sender
 {
 	[model sendNewData];
+}
+
+- (IBAction) clearAllAction:(id)sender
+{
+	NSBeginAlertSheet(@"Clearing all data!",
+                      @"Cancel",
+                      @"Yes, Clear All",
+                      nil,[self window],
+                      self,
+                      @selector(clearDataSheetDidEnd:returnCode:contextInfo:),
+                      nil,
+                      nil,@"Is this really what you want?");
+	
+}
+
+- (void) clearDataSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+    if(returnCode == NSAlertAlternateReturn){
+		[model sendClearData];	
+	}
 }
 
 #pragma mark •••Data Source

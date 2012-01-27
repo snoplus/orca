@@ -122,7 +122,10 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 {
 	[self linkToController:@"ORMet637Controller"];
 }
-
+- (NSString*) helpURL
+{
+	return @"Serial/Met637.html";
+}
 - (void) registerNotificationObservers
 {
 	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
@@ -604,8 +607,8 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 - (void) sendNewData
 {
 	if([serialPort isOpen]){
-		NSLog(@"Met637 (%d): Starting dump of new data\n",[self uniqueIdNumber]);
-		NSLog(@"Any subsequent cmd will abort the dump\n");
+		NSLog(@"Met637 (%d): Starting print of new data\n",[self uniqueIdNumber]);
+		NSLog(@"Any subsequent cmd will abort the print\n");
 	}
 	[self addCmdToQueue:@"3"]; 
 }
@@ -613,8 +616,8 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 - (void) sendAllData 
 { 
 	if([serialPort isOpen]){
-		NSLog(@"Met637 (%d): Starting dump of all data\n",[self uniqueIdNumber]);
-		NSLog(@"Any subsequent cmd will abort the dump\n");
+		NSLog(@"Met637 (%d): Starting print of all data\n",[self uniqueIdNumber]);
+		NSLog(@"Any subsequent cmd will abort the print\n");
 	}
 	[self addCmdToQueue:@"2"]; 
 }
@@ -878,6 +881,9 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 			}
 			[self setRunning:YES];
 		}
+		else if([theResponse hasPrefix:@"CLEAR"]){
+			NSLog(@"Met637(%d) Clearing ALL data.",[self uniqueIdNumber]);
+		}	
 	}
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
 }
@@ -899,7 +905,7 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 {
 	[self setDumpInProgress:NO];
 	[self setDumpCount:0];
-	NSLog(@"Met637 (%d): Data dump finished\n",[self uniqueIdNumber]);
+	NSLog(@"Met637 (%d): Data printout finished\n",[self uniqueIdNumber]);
 
 }
 @end
