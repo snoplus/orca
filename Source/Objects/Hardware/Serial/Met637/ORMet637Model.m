@@ -124,7 +124,7 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 }
 - (NSString*) helpURL
 {
-	return @"Serial/Met637.html";
+	return @"RS232/Met637.html";
 }
 - (void) registerNotificationObservers
 {

@@ -103,7 +103,10 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 {
 	[super wakeUp];
 }
-
+- (NSString*) helpURL
+{
+	return @"RS232/Met237.html";
+}
 - (void) setUpImage
 {
 	[self setImage:[NSImage imageNamed:@"Met237.tif"]];
