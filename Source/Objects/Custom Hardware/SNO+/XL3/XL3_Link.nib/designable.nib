@@ -2485,7 +2485,6 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOAA</bytes>
 										<nil key="NSNextResponder"/>
 										<int key="NSvFlags">256</int>
 										<string key="NSFrame">{{10, 19}, {435, 480}}</string>
-										<reference key="NSNextKeyView" ref="399296633"/>
 									</object>
 									<string key="NSLabel">HV</string>
 									<reference key="NSColor" ref="864569477"/>
@@ -2814,7 +2813,6 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOAA</bytes>
 												<string key="NSFrame">{{5, -148}, {34, 36}}</string>
 												<reference key="NSSuperview" ref="25021256"/>
 												<reference key="NSWindow"/>
-												<reference key="NSNextKeyView" ref="399296633"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="563422854">
 													<int key="NSCellFlags">67239424</int>
@@ -3740,22 +3738,6 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOAA</bytes>
 					<int key="connectionID">3871</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">incDialog:</string>
-						<reference key="source" ref="890317098"/>
-						<reference key="destination" ref="53951611"/>
-					</object>
-					<int key="connectionID">3874</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">decDialog:</string>
-						<reference key="source" ref="890317098"/>
-						<reference key="destination" ref="650582688"/>
-					</object>
-					<int key="connectionID">3875</int>
-				</object>
-				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">connectionCrateNumberField</string>
 						<reference key="source" ref="890317098"/>
@@ -3914,6 +3896,22 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOAA</bytes>
 						<reference key="destination" ref="909847946"/>
 					</object>
 					<int key="connectionID">3959</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">incXL3Action:</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="53951611"/>
+					</object>
+					<int key="connectionID">3960</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">decXL3Action:</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="650582688"/>
+					</object>
+					<int key="connectionID">3961</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -6250,7 +6248,7 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOAA</bytes>
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">3959</int>
+			<int key="maxID">3961</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -6397,7 +6395,9 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOAA</bytes>
 							<string>compositeXl3RWRegisterAction:</string>
 							<string>compositeXl3RWSelectAction:</string>
 							<string>connectionAutoConnectAction:</string>
+							<string>decXL3Action:</string>
 							<string>errorTimeOutAction:</string>
+							<string>incXL3Action:</string>
 							<string>lockAction:</string>
 							<string>opsAction:</string>
 							<string>repeatCountAction:</string>
@@ -6407,6 +6407,8 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOAA</bytes>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -6464,7 +6466,9 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOAA</bytes>
 							<string>compositeXl3RWRegisterAction:</string>
 							<string>compositeXl3RWSelectAction:</string>
 							<string>connectionAutoConnectAction:</string>
+							<string>decXL3Action:</string>
 							<string>errorTimeOutAction:</string>
+							<string>incXL3Action:</string>
 							<string>lockAction:</string>
 							<string>opsAction:</string>
 							<string>repeatCountAction:</string>
@@ -6563,7 +6567,15 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOAA</bytes>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
+								<string key="name">decXL3Action:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
 								<string key="name">errorTimeOutAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">incXL3Action:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">

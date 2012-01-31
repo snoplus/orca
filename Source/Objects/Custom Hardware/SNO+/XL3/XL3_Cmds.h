@@ -405,34 +405,39 @@ typedef struct{
     uint16_t adc3[100];
 } cald_response_results_t;
 
+//sweep slot from 0 to 15 and rates go to rates[bit_set_idx*32 + channel]
+//if slot 2 and 4 are masked in, slot 2 goes to rates[0-31], slot 4 [32-63]
 typedef struct{
-    uint32_t slot_num;
+    uint32_t slot_mask;
+    uint32_t channel_masks[16];
 } check_total_count_args_t;
 
 typedef struct{
     uint32_t error_flags;
-    uint32_t count[32];
+    uint32_t counts[8*32];
 } check_total_count_results_t;
 
+//same style as counts
 typedef struct{
-    uint32_t slot_num;
-    uint32_t channel_mask;
-    uint32_t period;
+    uint32_t slot_mask;
+    uint32_t channel_masks[16];
+    uint32_t period; //delay between reads [usec]
 } read_cmos_rate_args_t;
 
 typedef struct{
     uint32_t error_flags;
-    float rate[32];
+    float rates[8*32];
 } read_cmos_rate_results_t;
 
+//if slot and channel set then current goes to current_adc[slot*32 + channel]
 typedef struct{
-    uint32_t slot_num;
-    uint32_t channel_mask;
+    uint32_t slot_mask;
+    uint32_t channel_masks[16];
 } read_pmt_base_currents_args_t;
 
 typedef struct{
     uint32_t error_flags;
-    uint8_t current_adc[32];
+    uint8_t current_adc[16*32];
 } read_pmt_base_currents_results_t;
 
 typedef struct{

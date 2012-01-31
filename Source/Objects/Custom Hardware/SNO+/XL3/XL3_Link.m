@@ -169,7 +169,6 @@ NSString* XL3_LinkAutoConnectChanged    = @"XL3_LinkAutoConnectChanged";
 	//VME bus & ML403 are big-endian, ethernet as well
 	if (0x0000ABCD == htonl(0x0000ABCD)) needToSwap = NO;
 	else needToSwap = YES;
-	//NSLog(@"XL3_Link %@ swapping.\n", needToSwap?@"is":@"is not");
 }
 
 #define swapLong(x) (((uint32_t)(x) << 24) | (((uint32_t)(x) & 0x0000FF00) <<  8) | (((uint32_t)(x) & 0x00FF0000) >>  8) | ((uint32_t)(x) >> 24))
@@ -383,7 +382,7 @@ NSString* XL3_LinkAutoConnectChanged    = @"XL3_LinkAutoConnectChanged";
 		[self sendXL3Packet:&aMultiCmdPacket];
 	}
 	@catch (NSException* localException) {
-		NSLog(@"MultiCmd failed.\n");
+		NSLog(@"%@ MultiCmd failed.\n", [self crateName]);
 		//@throw localException;
 	}
 		
@@ -507,7 +506,7 @@ NSString* XL3_LinkAutoConnectChanged    = @"XL3_LinkAutoConnectChanged";
 		[self sendCommand:FAST_CMD_ID withPayload:&payload expectResponse:YES];
 	}
 	@catch (NSException* e) {
-		NSLog(@"FECCommand error sending command\n");
+		NSLog(@"%@ FECCommand error sending command\n", [self crateName]);
 		@throw e;
 	}
 	//return the same packet!
@@ -528,7 +527,7 @@ NSString* XL3_LinkAutoConnectChanged    = @"XL3_LinkAutoConnectChanged";
 	NSMutableArray* foundCmds = [NSMutableArray array];
 	time_t xl3ReadTimer = time(0);
 
-    NSLog(@"waiting for response with packetType: %d and packetNum %d\n", packetType, packetNum);
+    //NSLog(@"%@ waiting for response with packetType: %d and packetNum %d\n",[self crateName], packetType, packetNum);
     
 	while(1) {
 		@try {
@@ -628,6 +627,20 @@ NSString* XL3_LinkAutoConnectChanged    = @"XL3_LinkAutoConnectChanged";
 	[self setTimeConnected:nil];
 	NSLog(@"Disconnected %@ <%@> port: %d\n", [self crateName], IPNumber, portNumber);
 	//[[delegate crate] disconnected];	 
+}
+
+static void SwapLongBlock(void* p, int32_t n)
+{
+    int32_t* lp = (int32_t*)p;
+    int32_t i;
+    for(i=0;i<n;i++){
+        int32_t x = *lp;
+        *lp =  (((x) & 0x000000FF) << 24) |    
+        (((x) & 0x0000FF00) <<  8) |    
+        (((x) & 0x00FF0000) >>  8) |    
+        (((x) & 0xFF000000) >> 24);
+        lp++;
+    }
 }
 
 - (void) connectToPort
@@ -769,46 +782,39 @@ NSString* XL3_LinkAutoConnectChanged    = @"XL3_LinkAutoConnectChanged";
             }
 
             else if (((XL3_Packet*) aPacket)->cmdHeader.packet_type == ERROR_ID) {
-                NSLog(@"%@ error packet received:\n", [self crateName]);
+                NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ error packet received:\n", [self crateName]];
                 int error;
+                error_packet_t* data = (error_packet_t*)((XL3_Packet*)aPacket)->payload;
+                if (needToSwap) SwapLongBlock(data, sizeof(error_packet_t)/4);
 
-                error = ((error_packet_t*) ((XL3_Packet*) aPacket)->payload)->cmd_in_rejected;
-                if (needToSwap) error = swapLong(error);
-                NSLog(@"cmd_in_rejected: %d\n", error);
- 
-                error = ((error_packet_t*) ((XL3_Packet *) aPacket)->payload)->transfer_error;
-                if (needToSwap) error = swapLong(error);
-                NSLog(@"transfer_errror: %d\n", error);
+                error = data->cmd_in_rejected;
+                if (error) [msg appendFormat:@"cmd_in_rejected: %d\n", error];
+                error = data->transfer_error;
+                if (error) [msg appendFormat:@"transfer_error: %d\n", error];
+                error = data->xl3_data_avail_unknown;
+                if (error) [msg appendFormat:@"xl3_data_avail_unknown: %d\n", error];
+                error = data->bundle_read_error;
+                if (error) [msg appendFormat:@"bundle_read_error: %d\n", error];
+                error = data->bundle_resync_error;
+                if (error) [msg appendFormat:@"bundle_resync_error: %d\n", error];
 
-                error = ((error_packet_t*) ((XL3_Packet *) aPacket)->payload)->xl3_data_avail_unknown;
-                if (needToSwap) error = swapLong(error);
-                NSLog(@"xl3_data_avail_unknown: %d\n", error);
-
-                error = ((error_packet_t*) ((XL3_Packet *) aPacket)->payload)->bundle_read_error;
-                if (needToSwap) error = swapLong(error);
-                NSLog(@"bundle_read_error: %d\n", error);
-
-                error = ((error_packet_t*) ((XL3_Packet *) aPacket)->payload)->bundle_resync_error;
-                if (needToSwap) error = swapLong(error);
-                NSLog(@"bundle_resync_error: %d\n", error);
-
-                NSLog(@"mem_level_unknown for slot:\n");
-                unsigned i = 0;
+                unsigned char i = 0;
                 for (i = 0; i < 16; i++) {
-                    error = ((error_packet_t*) ((XL3_Packet *) aPacket)->payload)->mem_level_unknown[i];
-                    if (needToSwap) error = swapLong(error);
-                    NSLog(@"%2d: %d\n", i, error);
+                    error = data->mem_level_unknown[i];
+                    if (error) [msg appendFormat:@"mem_level_unknown for slot %2d: %d\n", i, error];
                 }
+                NSLog(msg);
             }
 
             else if (((XL3_Packet*) aPacket)->cmdHeader.packet_type == SCREWED_ID) {
-                NSLog(@"%@ screwed for slot:%s\n", [self crateName]);
+                NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ screwed for slot:\n", [self crateName]];
                 unsigned i, error;
                 for (i = 0; i < 16; i++) {
                     error = ((screwed_packet_t*) ((XL3_Packet *) aPacket)->payload)->screwed[i];
                     if (needToSwap) error = swapLong(error);
-                    NSLog(@"%2d: %d\n", i, error);
+                    [msg appendFormat:@"%2d: %d\n", i, error];
                 }
+                NSLog(msg);
             }
 
             else {	//cmd response
@@ -816,7 +822,7 @@ NSString* XL3_LinkAutoConnectChanged    = @"XL3_LinkAutoConnectChanged";
                 unsigned short packetType = ((XL3_Packet*) aPacket)->cmdHeader.packet_type;
                 
                 if (needToSwap) packetNum = swapShort(packetNum);
-                NSLog(@"%@ packet type: %d and packetNum: %d, xl3 megabundle count: %d\n", [self crateName], packetType, packetNum, bundle_count);
+                //NSLog(@"%@ packet type: %d and packetNum: %d, xl3 megabundle count: %d\n", [self crateName], packetType, packetNum, bundle_count);
                 
                 NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
                                 [NSNumber numberWithUnsignedShort:packetNum],		@"packet_num",
@@ -833,15 +839,13 @@ NSString* XL3_LinkAutoConnectChanged    = @"XL3_LinkAutoConnectChanged";
                     NSLog(@"%@: Failed to add received command response into the command array\n", [self crateName]);
                     [cmdArrayLock unlock];
                 }
-                
                 //NSLog(@"%@: cmdArray includes %d cmd responses\n", [self crateName], [cmdArray count]);
                 
                 if ([cmdArray count] > kCmdArrayHighWater) {
                     //todo: post alarm
-                    NSLog(@"Xl3 command array close to full for XL3 crate %@\n", [self crateName]);
+                    NSLog(@"%@ command array close to full.\n", [self crateName]);
                 }
             }
-
         } //select
     } //while
 
@@ -859,7 +863,6 @@ NSString* XL3_LinkAutoConnectChanged    = @"XL3_LinkAutoConnectChanged";
 		connectState = kDisconnected;
 		[[NSNotificationCenter defaultCenter] postNotificationName:XL3_LinkConnectStateChanged object: self];
 		[self setIsConnected:NO];
-        
 	}
 
 	[pool release];

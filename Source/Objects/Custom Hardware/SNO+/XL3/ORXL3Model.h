@@ -125,6 +125,7 @@ enum {
 - (int) selectedRegister;
 - (void) setSelectedRegister:(int)aSelectedRegister;
 - (NSString*) xl3LockName;
+- (NSComparisonResult) XL3NumberCompare:(id)aCard;
 
 #pragma mark •••DB Helpers
 - (void) synthesizeDefaultsIntoBundle:(mb_t*)aBundle forSLot:(unsigned short)aSlot;
@@ -182,12 +183,18 @@ enum {
 - (void) enableChargeInjectionForSlot:(unsigned short)aSlot channelMask:(unsigned long)aChannelMask;
 
 #pragma mark •••HV
-- (void) readCMOSCountForSlot:(unsigned short)aSlot counts:(check_total_count_results_t*)aCounts;
-- (void) readCMOSCountForSlot:(unsigned short)aSlot;
-- (void) readCMOSRateForSlot:(unsigned short)aSlot withChannelMask:(unsigned long)aChannelMask withDelay:(unsigned long)aDelay rates:(read_cmos_rate_results_t*)aRates;
-- (void) readCMOSRateForSlot:(unsigned short) aSlot withChannelMask:(unsigned long)aChannelMask withDelay:(unsigned long)aDelay;
-- (void) readPMTBaseCurrentsForSlot:(unsigned short)aSlot withChannelMask:(unsigned long)aChannelMask currents:(read_pmt_base_currents_results_t*)result;
+- (void) readCMOSCountWithArgs:(check_total_count_args_t*)aSlot counts:(check_total_count_results_t*)aCounts;
+- (void) readCMOSCountForSlot:(unsigned short)aSlot withChannelMask:(unsigned long)aChannelMask;
+- (void) readCMOSCount;
+
+- (void) readCMOSRateWithArgs:(read_cmos_rate_args_t*)aArgs rates:(read_cmos_rate_results_t*)aRates;
+- (void) readCMOSRateForSlot:(unsigned short)aSlot withChannelMask:(unsigned long)aChannelMask withDelay:(unsigned long)aDelay;
+- (void) readCMOSRateWithDelay:(unsigned long)aDelay;
+
+- (void) readPMTBaseCurrentsWithArgs:(read_pmt_base_currents_args_t*)aArg currents:(read_pmt_base_currents_results_t*)result;
 - (void) readPMTBaseCurrentsForSlot:(unsigned short)aSlot withChannelMask:(unsigned long)aChannelMask;
+- (void) readPMTBaseCurrents;
+
 - (void) readHVStatus:(hv_readback_results_t*)status;
 - (void) readHVStatus;
 - (void) setHVRelays:(unsigned long long)relayMask error:(unsigned long*)aError;

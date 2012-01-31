@@ -131,6 +131,8 @@
 - (void) populatePullDown;
 
 #pragma mark •••Actions
+- (IBAction) incXL3Action:(id)sender;
+- (IBAction) decXL3Action:(id)sender;
 - (IBAction) lockAction:(id)sender;
 - (IBAction) opsAction:(id)sender;
 //basic

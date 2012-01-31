@@ -216,22 +216,12 @@ static NSDictionary* xl3Ops;
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item
 {
-	if([tabView indexOfTabViewItem:item] == 0){
-		[[self window] setContentView:blankView];
-		[self resizeWindowToSize:basicSize];
-		[[self window] setContentView:xl3View];
-	}
-	else if([tabView indexOfTabViewItem:item] == 1){
+	if([tabView indexOfTabViewItem:item] == 1){
 		[[self window] setContentView:blankView];
 		[self resizeWindowToSize:compositeSize];
 		[[self window] setContentView:xl3View];
 	}
-	else if([tabView indexOfTabViewItem:item] == 2){
-		[[self window] setContentView:blankView];
-		[self resizeWindowToSize:basicSize];
-		[[self window] setContentView:xl3View];
-	}
-	else if([tabView indexOfTabViewItem:item] == 3){
+	else{
 		[[self window] setContentView:blankView];
 		[self resizeWindowToSize:basicSize];
 		[[self window] setContentView:xl3View];
@@ -553,14 +543,24 @@ static NSDictionary* xl3Ops;
 
 
 #pragma mark •••Actions
+- (IBAction) incXL3Action:(id)sender
+{
+	[self incModelSortedBy:@selector(XL3NumberCompare:)];
+}
+
+- (IBAction) decXL3Action:(id)sender
+{
+	[self decModelSortedBy:@selector(XL3NumberCompare:)];
+}
+
 - (IBAction) lockAction:(id)sender
 {
 	[gSecurity tryToSetLock:[model xl3LockName] to:[sender intValue] forWindow:[self window]];
 }
 
-
 - (IBAction) opsAction:(id)sender
 {
+    [self endEditing];
 	NSString* theKey = @"";
 	for (id key in xl3Ops) {
 		if ((id) [[xl3Ops objectForKey:key] objectForKey:@"button"] == sender) {
@@ -623,6 +623,7 @@ static NSDictionary* xl3Ops;
 //composite
 - (IBAction) compositeSlotMaskAction:(id) sender 
 {
+    [self endEditing];
 	unsigned long mask = 0;
 	int i;
 	for(i=0;i<16;i++){
@@ -635,6 +636,7 @@ static NSDictionary* xl3Ops;
 
 - (IBAction) compositeSlotMaskFieldAction:(id) sender
 {
+    [self endEditing];
 	unsigned long mask = [sender intValue];
 	if (mask > 0xFFFFUL) mask = 0xFFFF;
 	[model setSlotMask:mask];
@@ -677,11 +679,13 @@ static NSDictionary* xl3Ops;
 
 - (IBAction) compositeXl3RWAddressValueAction:(id)sender
 {
+    [self endEditing];
 	[model setXl3RWAddressValue:[sender intValue]];
 }	
 
 - (IBAction) compositeXl3RWModeAction:(id)sender
 {
+    [self endEditing];
 	unsigned long addressValue = [model xl3RWAddressValue];
 	addressValue = (addressValue & 0x0FFFFFFF) | [sender indexOfSelectedItem] << 28;
 	[model setXl3RWAddressValue:addressValue];
@@ -689,6 +693,7 @@ static NSDictionary* xl3Ops;
 
 - (IBAction) compositeXl3RWSelectAction:(id)sender
 {
+    [self endEditing];
 	unsigned long addressValue = [model xl3RWAddressValue];
 	addressValue = (addressValue & 0xF00FFFFF) | [[xl3RWSelects objectForKey:[[sender selectedItem] title]] intValue] << 20;
 	[model setXl3RWAddressValue:addressValue];
@@ -696,6 +701,7 @@ static NSDictionary* xl3Ops;
 
 - (IBAction) compositeXl3RWRegisterAction:(id)sender
 {
+    [self endEditing];
 	unsigned long addressValue = [model xl3RWAddressValue];
 	addressValue = (addressValue & 0xFFF00000) | [[xl3RWAddresses objectForKey:[[sender selectedItem] title]] intValue];
 	[model setXl3RWAddressValue:addressValue];
@@ -703,21 +709,25 @@ static NSDictionary* xl3Ops;
 
 - (IBAction) compositeXl3RWDataValueAction:(id)sender;
 {
+    [self endEditing];
 	[model setXl3RWDataValue:[sender intValue]];
 }
 
 - (IBAction) compositeSetPedestalValue:(id)sender
 {
+    [self endEditing];
 	[model setXl3PedestalMask:[sender intValue]];
 }
 
 - (IBAction) compositeXl3ChargeInjMaskAction:(id)sender
 {
+    [self endEditing];
     [model setXl3ChargeInjMask:[sender intValue]];
 }
 
 - (IBAction) compositeXl3ChargeInjChargeAction:(id)sender
 {
+    [self endEditing];
     [model setXl3ChargeInjCharge:[sender intValue]];
 }
 
