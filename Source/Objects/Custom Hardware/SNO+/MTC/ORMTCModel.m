@@ -1905,6 +1905,104 @@ kPEDCrateMask
 	}
 }
 
+
+- (void) mtcatResetMtcat:(unsigned char) mtcat
+{
+    if([self adapterIsSBC]){
+        long errorCode = 0;
+        SBC_Packet aPacket;
+        aPacket.cmdHeader.destination = kSNO;
+        aPacket.cmdHeader.cmdID = kSNOMtcatResetMtcat;
+        aPacket.cmdHeader.numberBytesinPayload	= 1*sizeof(long);
+        
+        unsigned long* payloadPtr = (unsigned long*) aPacket.payload;
+        payloadPtr[0] = mtcat;
+        
+        @try {
+            [[[self adapter] sbcLink] send:&aPacket receive:&aPacket];
+            unsigned long* responsePtr = (unsigned long*) aPacket.payload;
+            errorCode = responsePtr[0];
+            if(errorCode){
+                @throw [NSException exceptionWithName:@"Reset MTCA+ error" reason:@"SBC and/or LabJack failed.\n" userInfo:nil];
+            }
+        }
+        @catch(NSException* e) {
+            NSLog(@"SBC failed reset MTCA+ num: %d\n", mtcat);
+            NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
+            //@throw e;
+        }
+    }
+	else {
+        NSLog(@"Not implemented. Requires SBC with LabJack\n");
+	}
+}
+
+
+- (void) mtcatResetAll
+{
+    if([self adapterIsSBC]){
+        long errorCode = 0;
+        SBC_Packet aPacket;
+        aPacket.cmdHeader.destination = kSNO;
+        aPacket.cmdHeader.cmdID = kSNOMtcatResetAll;
+        aPacket.cmdHeader.numberBytesinPayload	= 1*sizeof(long);
+        
+        unsigned long* payloadPtr = (unsigned long*) aPacket.payload;
+        payloadPtr[0] = 0;
+        
+        @try {
+            [[[self adapter] sbcLink] send:&aPacket receive:&aPacket];
+            unsigned long* responsePtr = (unsigned long*) aPacket.payload;
+            errorCode = responsePtr[0];
+            if(errorCode){
+                @throw [NSException exceptionWithName:@"Reset All MTCA+ error" reason:@"SBC and/or LabJack failed.\n" userInfo:nil];
+            }
+        }
+        @catch(NSException* e) {
+            NSLog(@"SBC failed reset all MTCA+\n");
+            NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
+            //@throw e;
+        }
+    }
+	else {
+        NSLog(@"Not implemented. Requires SBC with LabJack\n");
+	}
+}
+
+
+- (void) mtcatLoadCrateMask:(unsigned long) mask toMtcat:(unsigned char) mtcat
+{
+    if([self adapterIsSBC]){
+        long errorCode = 0;
+        SBC_Packet aPacket;
+        aPacket.cmdHeader.destination = kSNO;
+        aPacket.cmdHeader.cmdID = kSNOMtcatLoadCrateMask;
+        aPacket.cmdHeader.numberBytesinPayload	= 2*sizeof(long);
+        
+        unsigned long* payloadPtr = (unsigned long*) aPacket.payload;
+        payloadPtr[0] = mask;
+        payloadPtr[1] = mtcat;
+        
+        @try {
+            [[[self adapter] sbcLink] send:&aPacket receive:&aPacket];
+            unsigned long* responsePtr = (unsigned long*) aPacket.payload;
+            errorCode = responsePtr[0];
+            if(errorCode){
+                @throw [NSException exceptionWithName:@"Load CrateMask to MTCA+ error" reason:@"SBC and/or LabJack failed.\n" userInfo:nil];
+            }
+        }
+        @catch(NSException* e) {
+            NSLog(@"SBC failed loading MTCA+ mask\n");
+            NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
+            //@throw e;
+        }
+    }
+	else {
+        NSLog(@"Not implemented. Requires SBC with LabJack\n");
+	}    
+}
+
+
 #pragma mark •••BasicOps
 - (void) readBasicOps
 {

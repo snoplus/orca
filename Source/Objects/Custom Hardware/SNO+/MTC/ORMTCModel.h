@@ -225,6 +225,10 @@
 - (void) setTubRegister;
 - (void) load10MHzClock;
 
+- (void) mtcatResetMtcat:(unsigned char) mtcat;
+- (void) mtcatResetAll;
+- (void) mtcatLoadCrateMask:(unsigned long) mask toMtcat:(unsigned char) mtcat;
+
 #pragma mark •••BasicOps
 - (void) readBasicOps;
 - (void) writeBasicOps;
