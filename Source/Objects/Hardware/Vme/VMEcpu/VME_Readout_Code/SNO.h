@@ -32,3 +32,6 @@ void firePedestalJobFixedTime(SBC_Packet* aPacket);
 void enablePedestalsFixedTime(SBC_Packet* aPacket);
 void firePedestalsFixedTime(SBC_Packet* aPacket);
 void loadMTCADacs(SBC_Packet* aPacket);
+void mtcatResetMtcat(SBC_Packet* aPacket);
+void mtcatResetAll(SBC_Packet* aPacket);
+void mtcatLoadCrateMask(SBC_Packet* aPacket);

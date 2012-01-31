@@ -31,6 +31,9 @@
 #define kSNOMtcEnablePedestalsFixedTime	0x05
 #define kSNOMtcFirePedestalsFixedTime	0x06
 #define kSNOMtcLoadMTCADacs		0x07
+#define kSNOMtcatResetMtcat     0x08
+#define kSNOMtcatResetAll       0x09
+#define kSNOMtcatLoadCrateMask  0x0a
 
 typedef struct {
 	int32_t baseAddress;

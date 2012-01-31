@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include <dlfcn.h>
 #include "SBC_Readout.h"
 #include "SNOCmds.h"
 #include "universe_api.h"
@@ -33,7 +34,6 @@
 #include "HW_Readout.h"
 #include "SNO.h"
 #include "SBC_Job.h"
-
 
 extern int32_t		dataIndex;
 extern int32_t*		data;
@@ -48,15 +48,19 @@ void loadXL2Xilinx_penn(SBC_Packet* aPacket);
 void processSNOCommand(SBC_Packet* aPacket)
 {
 	switch(aPacket->cmdHeader.cmdID){		
-		case kSNOMtcLoadXilinx: loadMtcXilinx(aPacket);				break;
-		case kSNOXL2LoadClocks: loadXL2Clocks(aPacket);				break;
-		case kSNOXL2LoadXilinx: startJob(&loadXL2Xilinx,aPacket);		break;
+		case kSNOMtcLoadXilinx: loadMtcXilinx(aPacket);	break;
+		case kSNOXL2LoadClocks: loadXL2Clocks(aPacket);	break;
+		case kSNOXL2LoadXilinx: startJob(&loadXL2Xilinx,aPacket); break;
 		case kSNOMtcFirePedestalJobFixedTime: startJob(&firePedestalJobFixedTime, aPacket); break;
-		case kSNOMtcEnablePedestalsFixedTime: enablePedestalsFixedTime(aPacket);break;			
-		case kSNOMtcFirePedestalsFixedTime: firePedestalsFixedTime(aPacket);	break;			
-		case kSNOMtcLoadMTCADacs: loadMTCADacs(aPacket);			break;
+		case kSNOMtcEnablePedestalsFixedTime: enablePedestalsFixedTime(aPacket); break;			
+		case kSNOMtcFirePedestalsFixedTime: firePedestalsFixedTime(aPacket); break;			
+		case kSNOMtcLoadMTCADacs: loadMTCADacs(aPacket); break;
+		case kSNOMtcatResetMtcat: mtcatResetMtcat(aPacket); break;
+		case kSNOMtcatResetAll:mtcatResetAll(aPacket); break;
+		case kSNOMtcatLoadCrateMask: mtcatLoadCrateMask(aPacket); break;
 	}
 }
+
 
 void loadMtcXilinx(SBC_Packet* aPacket)
 {
@@ -818,22 +822,22 @@ void loadXL2Xilinx_sharc(SBC_Packet* aPacket)
 	
 }
 
-#define kMtcControlReg		0x00007000
-#define kMtcSerialReg		0x00007004
-#define kMtcSoftGtReg		0x0000700c
-#define kMtcOcGtReg		0x00007080
-#define MTC_SERIAL_REG_SEN	0x00000001
-#define MTC_SERIAL_SHFTCLKPS	0x00000020
-#define MTC_CSR_LOAD_ENPS	0x00000008
+#define kMtcControlReg 0x00007000
+#define kMtcSerialReg 0x00007004
+#define kMtcSoftGtReg 0x0000700c
+#define kMtcOcGtReg 0x00007080
+#define MTC_SERIAL_REG_SEN 0x00000001
+#define MTC_SERIAL_SHFTCLKPS 0x00000020
+#define MTC_CSR_LOAD_ENPS 0x00000008
 
 static double nsec_to_ticks = 0;
 
 void enablePedestalsFixedTime(SBC_Packet* aPacket)
 {
-        uint32_t* p = (uint32_t*) aPacket->payload;
-        if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
+    uint32_t* p = (uint32_t*) aPacket->payload;
+    if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
 	
-        uint32_t error_code = 0;
+    uint32_t error_code = 0;
 	uint32_t aValue = 0;
 	short j;
 
@@ -894,18 +898,18 @@ void enablePedestalsFixedTime(SBC_Packet* aPacket)
 
 void firePedestalJobFixedTime(SBC_Packet* aPacket)
 {
-        uint32_t* p = (uint32_t*) aPacket->payload;
-        if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
+    uint32_t* p = (uint32_t*) aPacket->payload;
+    if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
 
-        uint32_t pedestal_count = p[0];
-        //uint32_t pedestal_delay = p[1] * 1000 * nsec_to_ticks; //p[1] is the delay in [usec]
-        unsigned long long pedestal_delay = p[1] * 1000ULL * nsec_to_ticks; //p[1] is the delay in [usec]
-        uint32_t error_code = 0;
+    uint32_t pedestal_count = p[0];
+    unsigned long long pedestal_delay = p[1] * 1000ULL * nsec_to_ticks; //p[1] is the delay in [usec]
+    uint32_t error_code = 0;
 	uint32_t aValue = 0;
 	short i = 0;
+
 	char  errorMessage[80];
 	memset(errorMessage,'\0',80);		
-	uint8_t  finalStatus = 0; //assume failure
+	uint8_t finalStatus = 0; //assume failure
 
 	TUVMEDevice* device = get_new_device(0x0, 0x29, 4, 0x10000);
 	if(device != 0){
@@ -961,15 +965,14 @@ void firePedestalJobFixedTime(SBC_Packet* aPacket)
 	pthread_mutex_unlock (&jobInfoMutex);   //end critical section
 }
 
-
 void firePedestalsFixedTime(SBC_Packet* aPacket)
 {
-        uint32_t* p = (uint32_t*) aPacket->payload;
-        if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
+    uint32_t* p = (uint32_t*) aPacket->payload;
+    if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
 
-        uint32_t pedestal_count = p[0];
-        uint32_t pedestal_delay = p[1] * 1000 * nsec_to_ticks; //p[1] is the delay in [usec]
-        uint32_t error_code = 0;
+    uint32_t pedestal_count = p[0];
+    uint32_t pedestal_delay = p[1] * 1000 * nsec_to_ticks; //p[1] is the delay in [usec]
+    uint32_t error_code = 0;
 	uint32_t gtidDiff = 0;
 	uint32_t aValue = 0;
 	uint32_t beforeGTId, afterGTId;
@@ -1033,24 +1036,24 @@ void firePedestalsFixedTime(SBC_Packet* aPacket)
 	
 	close_device(device);		
 	
-        p[0] = error_code;
+    p[0] = error_code;
 	p[1] = gtidDiff;
-        if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
-        writeBuffer(aPacket);
+    if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
+    writeBuffer(aPacket);
 }
 
 
 #define kMtcDacCntReg		0x00007008
-#define kMtcMaskReg		0x00007034
+#define kMtcMaskReg         0x00007034
 #define MTC_DAC_CNT_DACSEL	0x00004000
 #define MTC_DAC_CNT_DACCLK	0x00008000
 
 void loadMTCADacs(SBC_Packet* aPacket)
 {
-        uint32_t* p = (uint32_t*) aPacket->payload;
-        if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
+    uint32_t* p = (uint32_t*) aPacket->payload;
+    if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
 	
-        uint32_t error_code = 0;
+    uint32_t error_code = 0;
 	uint16_t index, dacIndex;
 	int16_t bitIndex = 0;
 	uint16_t dacValues[14];
@@ -1177,8 +1180,123 @@ void loadMTCADacs(SBC_Packet* aPacket)
 
 	close_device(device);
 	
-        p[0] = error_code;
-        if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
-        writeBuffer(aPacket);
+    p[0] = error_code;
+    if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
+    writeBuffer(aPacket);
 }
 
+void mtcatResetMtcat(SBC_Packet* aPacket)
+{
+    uint32_t* p = (uint32_t*) aPacket->payload;
+    if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
+    
+    unsigned char mtcat_id = p[0];
+    int32_t error_code = 0;
+ 
+    char* dl_err;
+    void* hdl = NULL;
+    int (*reset_mtcat) (unsigned char);
+
+    hdl = dlopen("libmtcat_lj.so", RTLD_LAZY);
+    if (hdl == NULL) {
+        error_code = 1;
+        LogError("libmtcat_lj.so not found\n");
+        goto exit;
+    }
+    dlerror();
+
+    reset_mtcat = dlsym(hdl, "reset_mtcat");
+    if ((dl_err = dlerror()) != NULL) {
+        LogError("%s, %d\n", dl_err, stderr);
+        error_code = 2;
+        goto early_exit;
+    }
+
+    error_code = reset_mtcat(mtcat_id);
+
+early_exit:    
+    dlclose(hdl);
+    
+exit:
+    p[0] = error_code;
+    if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
+    writeBuffer(aPacket);
+}
+
+void mtcatResetAll(SBC_Packet* aPacket)
+{
+    uint32_t* p = (uint32_t*) aPacket->payload;
+    if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
+    int32_t error_code = 0;
+
+    char* dl_err;
+    void* hdl = NULL;
+    int (*reset_all) ();
+
+    hdl = dlopen("libmtcat_lj.so", RTLD_LAZY);
+    if (hdl == NULL) {
+        error_code = 1;
+        LogError("libmtcat_lj.so not found\n");
+        goto exit;
+    }
+    dlerror();
+
+    reset_all = dlsym(hdl, "reset_all");
+    if ((dl_err = dlerror()) != NULL) {
+        LogError("%s, %d\n", dl_err, stderr);
+        error_code = 2;
+        goto early_exit;
+    }
+
+    error_code = reset_all();
+    
+early_exit:    
+    dlclose(hdl);
+    
+exit:
+    p[0] = error_code;
+    if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
+    writeBuffer(aPacket);
+}
+
+void mtcatLoadCrateMask(SBC_Packet* aPacket)
+{
+    uint32_t* p = (uint32_t*) aPacket->payload;
+    if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
+    
+    unsigned int crate_mask = p[0];
+    unsigned char mtcat_id = p[1];
+    uint32_t error_code = 0;
+
+    char* dl_err;
+    void* hdl = NULL;
+    int (*load_crate_mask) (unsigned int, unsigned char);
+    
+    printf("load crate mask 0x%08x to mtca+ %d\n", crate_mask, mtcat_id);
+
+    hdl = dlopen("libmtcat_lj.so", RTLD_LAZY);
+    if (hdl == NULL) {
+        error_code = 1;
+        LogError("libmtcat_lj.so not found\n");
+        goto exit;
+    }
+    dlerror();
+    
+    load_crate_mask = dlsym(hdl, "load_crate_mask");
+    if ((dl_err = dlerror()) != NULL) {
+        LogError("%s, %d\n", dl_err, stderr);
+        error_code = 2;
+        goto early_exit;
+    }
+    
+    error_code = load_crate_mask(crate_mask, mtcat_id);
+    printf("done with error_code: %d\n", error_code);
+    
+early_exit:    
+    dlclose(hdl);
+    
+exit:
+    p[0] = error_code;
+    if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
+    writeBuffer(aPacket);
+}
