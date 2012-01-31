@@ -59,7 +59,7 @@
 {
     settingSize     = NSMakeSize(830,510);
     rateSize		= NSMakeSize(790,340);
-    registerTabSize	= NSMakeSize(400,187);
+    registerTabSize	= NSMakeSize(400,287);
 	firmwareTabSize = NSMakeSize(340,187);
     
     blankView = [[NSView alloc] init];
@@ -323,6 +323,11 @@
 						object: model];
 
     [notifyCenter addObserver : self
+                     selector : @selector(spiWriteValueChanged:)
+                         name : ORGretina4ModelSPIWriteValueChanged
+						object: model];
+	
+    [notifyCenter addObserver : self
                      selector : @selector(downSampleChanged:)
                          name : ORGretina4ModelDownSampleChanged
 						object: model];
@@ -392,6 +397,7 @@
 
 	[self registerIndexChanged:nil];
 	[self registerWriteValueChanged:nil];
+	[self spiWriteValueChanged:nil];
 	[self downSampleChanged:nil];
 }
 
@@ -410,6 +416,11 @@
 {
 	[registerIndexPU selectItemAtIndex: [model registerIndex]];
 	[self setRegisterDisplay:[model registerIndex]];
+}
+
+- (void) spiWriteValueChanged:(NSNotification*)aNote
+{
+	[spiWriteValueField setIntValue: [model spiWriteValue]];
 }
 
 - (void) fpgaDownInProgressChanged:(NSNotification*)aNote
@@ -664,6 +675,8 @@
     [registerIndexPU setEnabled:!lockedOrRunningMaintenance && !downloading];
     [readRegisterButton setEnabled:!lockedOrRunningMaintenance && !downloading];
     [writeRegisterButton setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [spiWriteValueField setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [writeSPIButton setEnabled:!lockedOrRunningMaintenance && !downloading];
 }
 
 - (void) setFifoStateLabel
@@ -965,11 +978,6 @@
     }
 }
 
-- (IBAction) registerWriteValueAction:(id)sender
-{
-	[model setRegisterWriteValue:[sender intValue]];
-}
-
 - (IBAction) readRegisterAction:(id)sender
 {
 	[self endEditing];
@@ -1000,6 +1008,24 @@
 		[model writeFPGARegister:index withValue:aValue];	
 	}
 }
+
+- (IBAction) registerWriteValueAction:(id)sender
+{
+	[model setRegisterWriteValue:[sender intValue]];
+}
+
+- (IBAction) spiWriteValueAction:(id)sender
+{
+	[model setSPIWriteValue:[sender intValue]];
+}
+
+- (IBAction) writeSPIAction:(id)sender
+{
+	[self endEditing];
+	unsigned long aValue = [model spiWriteValue];
+	[model writeAuxIOSPI:aValue];
+}
+
 
 - (IBAction) settingLockAction:(id) sender
 {

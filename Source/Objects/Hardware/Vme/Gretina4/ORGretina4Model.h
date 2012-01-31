@@ -63,6 +63,9 @@
 
 #define kTrapezoidalTriggerMode	0x4
 
+#define kSPIData	    0x2
+#define kSPIClock	    0x4
+#define kSPIChipSelect	0x8
 
 #pragma mark ¥¥¥Register Definitions
 enum {
@@ -230,6 +233,7 @@ enum Gretina4FIFOStates {
 	
     unsigned long registerWriteValue;
     int registerIndex;
+    unsigned long spiWriteValue;
 	
 	NSString* spiConnectorName;
 	ORConnector*  spiConnector; //we won't draw this connector so we have to keep a reference to it
@@ -253,6 +257,8 @@ enum Gretina4FIFOStates {
 - (void) setRegisterIndex:(int)aRegisterIndex;
 - (unsigned long) registerWriteValue;
 - (void) setRegisterWriteValue:(unsigned long)aWriteValue;
+- (unsigned long) spiWriteValue;
+- (void) setSPIWriteValue:(unsigned long)aWriteValue;
 - (BOOL) downLoadMainFPGAInProgress;
 - (void) setDownLoadMainFPGAInProgress:(BOOL)aState;
 - (int) fpgaDownProgress;
@@ -377,6 +383,7 @@ enum Gretina4FIFOStates {
 - (void) stepNoiseFloor;
 - (BOOL) noiseFloorRunning;
 - (void) writeDownSample;
+- (void) writeAuxIOSPI:(unsigned long)spiData;
 
 - (int) readCardInfo:(int)index;
 - (int) readExternalWindow;
@@ -434,6 +441,7 @@ enum Gretina4FIFOStates {
 extern NSString* ORGretina4ModelDownSampleChanged;
 extern NSString* ORGretina4ModelRegisterIndexChanged;
 extern NSString* ORGretina4ModelRegisterWriteValueChanged;
+extern NSString* ORGretina4ModelSPIWriteValueChanged;
 extern NSString* ORGretina4ModelMainFPGADownLoadInProgressChanged;
 extern NSString* ORGretina4ModelFpgaDownProgressChanged;
 extern NSString* ORGretina4ModelMainFPGADownLoadStateChanged;

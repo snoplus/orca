@@ -33,6 +33,7 @@
 NSString* ORGretina4ModelDownSampleChanged			= @"ORGretina4ModelDownSampleChanged";
 NSString* ORGretina4ModelRegisterIndexChanged		= @"ORGretina4ModelRegisterIndexChanged";
 NSString* ORGretina4ModelRegisterWriteValueChanged	= @"ORGretina4ModelRegisterWriteValueChanged";
+NSString* ORGretina4ModelSPIWriteValueChanged	    = @"ORGretina4ModelSPIWriteValueChanged";
 NSString* ORGretina4ModelFpgaDownProgressChanged	= @"ORGretina4ModelFpgaDownProgressChanged";
 NSString* ORGretina4ModelMainFPGADownLoadStateChanged		= @"ORGretina4ModelMainFPGADownLoadStateChanged";
 NSString* ORGretina4ModelFpgaFilePathChanged				= @"ORGretina4ModelFpgaFilePathChanged";
@@ -379,6 +380,19 @@ static struct {
     [[[self undoManager] prepareWithInvocationTarget:self] setRegisterWriteValue:registerWriteValue];
     registerWriteValue = aWriteValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelRegisterWriteValueChanged object:self];
+}
+
+- (unsigned long) spiWriteValue
+{
+    return spiWriteValue;
+}
+
+
+- (void) setSPIWriteValue:(unsigned long)aWriteValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setRegisterWriteValue:spiWriteValue];
+    spiWriteValue = aWriteValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelSPIWriteValueChanged object:self];
 }
 
 - (NSString*) registerNameAt:(unsigned int)index
@@ -1247,6 +1261,30 @@ static struct {
                     usingAddSpace:0x01];
 }
 
+
+- (void) writeAuxIOSPI:(unsigned long)spiData
+{
+    // Set AuxIO to mode 3 and set bits 0-3 to OUT (bit 0 is under FPGA control)
+    [self writeRegister:kAuxIOConfig withValue:0x3005];
+    // Read kAuxIOWrite to preserve bit 0, and zero bits used in SPI protocol
+    unsigned long spiBase = [self readRegister:kAuxIOWrite] & ~(kSPIData | kSPIClock | kSPIChipSelect); 
+    unsigned long value;
+
+    // now write spiData starting from MSB on kSPIData, pulsing kSPIClock
+    // each iteration
+    int i;
+    for(i=0; i<32; i++) {
+        value = spiBase;
+        if( (spiData & 0x80000000) != 0) value |= kSPIData;
+        [self writeRegister:kAuxIOWrite withValue:value];
+        [self writeRegister:kAuxIOWrite withValue:value | kSPIClock];
+        spiData = spiData << 1;
+    }
+    // set kSPIChipSelect to signify that we are done
+    [self writeRegister:kAuxIOWrite withValue:kSPIChipSelect];
+}
+
+
 - (int) readCardInfo:(int) index
 {
     unsigned long theValue = 0;
@@ -2015,6 +2053,7 @@ static struct {
     [self setDownSample:				[decoder decodeIntForKey:@"downSample"]];
     [self setRegisterIndex:				[decoder decodeIntForKey:@"registerIndex"]];
     [self setRegisterWriteValue:		[decoder decodeInt32ForKey:@"registerWriteValue"]];
+    [self setSPIWriteValue:     		[decoder decodeInt32ForKey:@"spiWriteValue"]];
     [self setFpgaFilePath:				[decoder decodeObjectForKey:@"fpgaFilePath"]];
     [self setNoiseFloorIntegrationTime:	[decoder decodeFloatForKey:@"NoiseFloorIntegrationTime"]];
     [self setNoiseFloorOffset:			[decoder decodeIntForKey:@"NoiseFloorOffset"]];
@@ -2061,6 +2100,7 @@ static struct {
     [encoder encodeInt:downSample					forKey:@"downSample"];
     [encoder encodeInt:registerIndex				forKey:@"registerIndex"];
     [encoder encodeInt32:registerWriteValue			forKey:@"registerWriteValue"];
+    [encoder encodeInt32:spiWriteValue			    forKey:@"spiWriteValue"];
     [encoder encodeObject:fpgaFilePath				forKey:@"fpgaFilePath"];
     [encoder encodeFloat:noiseFloorIntegrationTime	forKey:@"NoiseFloorIntegrationTime"];
     [encoder encodeInt:noiseFloorOffset				forKey:@"NoiseFloorOffset"];

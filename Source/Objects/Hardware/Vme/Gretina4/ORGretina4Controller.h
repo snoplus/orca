@@ -112,6 +112,8 @@
 	IBOutlet NSButton*		writeRegisterButton;
 	IBOutlet NSButton*		readRegisterButton;
 	IBOutlet NSTextField*	registerStatusField;
+	IBOutlet NSTextField*	spiWriteValueField;
+	IBOutlet NSButton*		writeSPIButton;
 	
     //offset panel
     IBOutlet NSPanel*				noiseFloorPanel;
@@ -174,6 +176,7 @@
 - (void) noiseFloorIntegrationChanged:(NSNotification*)aNote;
 - (void) registerLockChanged:(NSNotification*)aNote;
 - (void) registerWriteValueChanged:(NSNotification*)aNote;
+- (void) spiWriteValueChanged:(NSNotification*)aNote;
 
 - (void) setRegisterDisplay:(unsigned int)index;
 
@@ -217,6 +220,8 @@
 - (IBAction) writeRegisterAction:(id)sender;
 - (IBAction) registerLockAction:(id) sender;
 - (IBAction) registerWriteValueAction:(id)sender;
+- (IBAction) spiWriteValueAction:(id)sender;
+- (IBAction) writeSPIAction:(id)sender;
 
 #pragma mark ¥¥¥Data Source
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;
