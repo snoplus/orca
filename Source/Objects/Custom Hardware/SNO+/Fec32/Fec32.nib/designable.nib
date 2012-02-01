@@ -67,7 +67,6 @@
 							<string key="NSFrame">{{-7, 144}, {469, 542}}</string>
 							<reference key="NSSuperview" ref="869177057"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="448207780"/>
 							<array class="NSMutableArray" key="NSTabViewItems">
 								<object class="NSTabViewItem" id="757425460">
 									<string key="NSIdentifier">1</string>
@@ -1313,7 +1312,6 @@
 												<string key="NSFrame">{{140, 1}, {304, 14}}</string>
 												<reference key="NSSuperview" ref="448207780"/>
 												<reference key="NSWindow"/>
-												<reference key="NSNextKeyView"/>
 												<bool key="NSEnabled">YES</bool>
 												<int key="NSNumRows">1</int>
 												<int key="NSNumCols">8</int>
@@ -2519,7 +2517,6 @@
 							<string key="NSFrame">{{45, 20}, {125, 13}}</string>
 							<reference key="NSSuperview" ref="869177057"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="531360345">
 								<int key="NSCellFlags">67239424</int>
@@ -2939,7 +2936,6 @@
 							<string key="NSFrame">{{474, 396}, {185, 234}}</string>
 							<reference key="NSSuperview" ref="869177057"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="314347429"/>
 							<array class="NSMutableArray" key="NSTabViewItems">
 								<object class="NSTabViewItem" id="51651668">
 									<string key="NSIdentifier">1</string>

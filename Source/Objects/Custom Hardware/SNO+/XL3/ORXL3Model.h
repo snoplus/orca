@@ -206,6 +206,10 @@ enum {
 - (void) readHVInterlock;
 - (void) setHVDacA:(unsigned short)aDac dacB:(unsigned short)bDac;
 
+#pragma mark •••tests
+- (void) readVMONForSlot:(unsigned short)aSlot voltages:(vmon_results_t*)aVoltages;
+- (void) readVMONForSlot:(unsigned short)aSlot;
+
 - (void) loadSingleDacForSlot:(unsigned short)aSlot dacNum:(unsigned short)aDacNum dacVal:(unsigned char)aDacVal;
 - (void) setVthrDACsForSlot:(unsigned short)aSlot withChannelMask:(unsigned long)aChannelMask dac:(unsigned char)aDac;
 

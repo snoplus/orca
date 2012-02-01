@@ -445,10 +445,9 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 	[aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORSNOCrateModel"];	
 }
 
-// XL3 only
+// never used, XL2 goes through SBC only, XL3 through XL3Model
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-	
 	//never called, data come from an SBC at VME_Readout_Code/ORSNOCrateReadout.cc
 }
 

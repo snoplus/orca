@@ -1805,6 +1805,75 @@ void SwapLongBlock(void* p, int32_t n)
 	}
 }
 
+
+#pragma mark •••tests
+- (void) readVMONForSlot:(unsigned short)aSlot voltages:(vmon_results_t*)aVoltages
+{
+    XL3_PayloadStruct payload;
+    memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
+    payload.numberBytesinPayload = sizeof(vmon_args_t);
+
+    vmon_args_t* data = (vmon_args_t*) payload.payload;
+    data->slot_num = aSlot;
+
+    if ([xl3Link needToSwap]) {
+        SwapLongBlock(data, sizeof(vmon_args_t)/4);
+    }
+
+    @try {
+        [[self xl3Link] sendCommand:VMON_ID withPayload:&payload expectResponse:YES];
+    }
+    @catch (NSException *exception) {
+        NSLog(@"%@ error sending VMON_ID command.\n",[[self xl3Link] crateName]);
+        @throw exception;
+    }
+
+    if ([xl3Link needToSwap]) {
+        SwapLongBlock(data, sizeof(vmon_results_t)/4);
+    }
+
+    memcpy(aVoltages, data, sizeof(vmon_results_t));
+}
+
+- (void) readVMONForSlot:(unsigned short)aSlot
+{
+    vmon_results_t result;
+        
+    @try {
+        [self readVMONForSlot:aSlot voltages:&result];
+    }
+    @catch (NSException *exception) {
+        ;
+    }
+
+    //it doesn't set error_flags
+    NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ voltages for slot: %d\n", [[self xl3Link] crateName], aSlot];
+    [msg appendFormat:@" -24V Sup: %f V\n", result.voltages[0]];
+    [msg appendFormat:@" -15V Sup: %f V\n", result.voltages[1]];
+    [msg appendFormat:@"  VEE Sup: %f V\n", result.voltages[2]];
+    [msg appendFormat:@"-3.3V Sup: %f V\n", result.voltages[3]];
+    [msg appendFormat:@"-2.0V Sup: %f V\n", result.voltages[4]];
+    [msg appendFormat:@" 3.3V Sup: %f V\n", result.voltages[5]];
+    [msg appendFormat:@" 4.0V Sup: %f V\n", result.voltages[6]];
+    [msg appendFormat:@"  VCC Sup: %f V\n", result.voltages[7]];
+    [msg appendFormat:@" 6.5V Sup: %f V\n", result.voltages[8]];
+    [msg appendFormat:@" 8.0V Sup: %f V\n", result.voltages[9]];
+    [msg appendFormat:@"  15V Sup: %f V\n", result.voltages[10]];
+    [msg appendFormat:@"  24V Sup: %f V\n", result.voltages[11]];
+    [msg appendFormat:@"-2.0V Ref: %f V\n", result.voltages[12]];
+    [msg appendFormat:@"-1.0V Ref: %f V\n", result.voltages[13]];
+    [msg appendFormat:@" 0.8V Ref: %f V\n", result.voltages[14]];
+    [msg appendFormat:@" 1.0V Ref: %f V\n", result.voltages[15]];
+    [msg appendFormat:@" 4.0V Ref: %f V\n", result.voltages[16]];
+    [msg appendFormat:@" 5.0V Ref: %f V\n", result.voltages[17]];
+    [msg appendFormat:@"    Temp.: %f degC\n", result.voltages[18]];
+    [msg appendFormat:@"  Cal DAC: %f V\n", result.voltages[19]];
+    [msg appendFormat:@"  HV Curr: %f mA\n", result.voltages[20]];
+
+    NSLog(msg);
+}
+
+
 //TODO: pass erroflags
 - (void) loadSingleDacForSlot:(unsigned short)aSlot dacNum:(unsigned short)aDacNum dacVal:(unsigned char)aDacVal
 {

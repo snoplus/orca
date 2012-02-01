@@ -22,6 +22,7 @@
 #import "ORFec32Model.h"
 #import "ORXL1Model.h"
 #import "ORXL2Model.h"
+#import "ORXL3Model.h"
 #import "ORSNOCrateModel.h"
 #import "ORFecDaughterCardModel.h"
 #import "ORSNOConstants.h"
@@ -73,6 +74,18 @@ NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageSt
 @interface ORFec32Model (LocalAdapter)
 - (void) loadAllDacsUsingLocalAdapter;
 - (NSString*) performBoardIDReadUsingLocalAdapter:(short) boardIndex;
+@end
+
+@interface ORFec32Model (XL2)
+-(BOOL) readVoltagesUsingXL2;
+-(short) readVoltageValue:(unsigned long) aMask;
+-(BOOL) readCMOSCountsUsingXL2:(BOOL)calcRates channelMask:(unsigned long) aChannelMask;
+@end
+
+@interface ORFec32Model (XL3)
+-(BOOL) readVoltagesUsingXL3;
+-(void) readCMOSCountsUsingXL3:(unsigned long)aChannelMask;
+-(void) readCMOSRatesUsingXL3:(unsigned long)aChannelMask;
 @end
 
 @implementation ORFec32Model
@@ -459,129 +472,57 @@ NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageSt
 //assumes that bus access has already been granted.
 -(void) readVoltages
 {	
-	@try {
-		
-		[[self xl2] select:self];
-		
-		bool statusChanged = false;
-		short whichADC;
-		for(whichADC=0;whichADC<kNumFecMonitorAdcs;whichADC++){
-			short theValue = [self readVoltageValue:fecVoltageAdc[whichADC].mask];
-			eFecMonitorState old_channel_status = [self adcVoltageStatus:whichADC];
-			eFecMonitorState new_channel_status;
-			if( theValue != -1) {
-				float convertedValue = ((float)theValue-128.0)*fecVoltageAdc[whichADC].multiplier;
-				[self setAdcVoltage:whichADC withValue:convertedValue];
-				if(fecVoltageAdc[whichADC].check_expected_value){
-					float expected = fecVoltageAdc[whichADC].expected_value;
-					float delta = fabs(expected*[[self xl1] adcAllowedError:whichADC]);
-					if(fabs(convertedValue-expected) < delta)	new_channel_status = kFecMonitorInRange;
-					else										new_channel_status = kFecMonitorOutOfRange;
-				}
-				else new_channel_status = kFecMonitorInRange;
-			}
-			else new_channel_status = kFecMonitorReadError;
-			
-			[self setAdcVoltageStatus:whichADC withValue:new_channel_status];
-			
-			if(old_channel_status != new_channel_status){
-				statusChanged = true;
-			}
-		}
-		if(statusChanged){
-			//sync up the card status
-			[self setAdcVoltageStatusOfCard:kFecMonitorInRange];
-			short whichADC;
-			for(whichADC=0;whichADC<kNumFecMonitorAdcs;whichADC++){
-				if([self adcVoltageStatus:whichADC] == kFecMonitorReadError){
-					[self setAdcVoltageStatusOfCard:kFecMonitorReadError];
-					break;
-				}
-				else if([self adcVoltageStatus:whichADC] == kFecMonitorOutOfRange){
-					[self setAdcVoltageStatusOfCard:kFecMonitorOutOfRange];
-					break;
-				}
-				
-			}
-			
-			//sync up the crate status
-			[[self crate] setVoltageStatus: kFecMonitorInRange];
-			unsigned short card;
-			for(card=0;card<16;card++){
-				if([self adcVoltageStatusOfCard] == kFecMonitorReadError){
-					[[self crate] setVoltageStatus:kFecMonitorReadError];
-					break;
-				}
-				else if([self adcVoltageStatusOfCard] == kFecMonitorOutOfRange){
-					[[self crate] setVoltageStatus:kFecMonitorOutOfRange];
-					break;
-				}
-			}
+    bool statusChanged = false;
+
+    if ([guardian adapterIsXL3]) statusChanged = [self readVoltagesUsingXL3];
+    else statusChanged = [self readVoltagesUsingXL2];
+            
+    if(statusChanged){
+        //sync up the card status
+        [self setAdcVoltageStatusOfCard:kFecMonitorInRange];
+        short whichADC;
+        for(whichADC=0;whichADC<kNumFecMonitorAdcs;whichADC++){
+            if([self adcVoltageStatus:whichADC] == kFecMonitorReadError){
+                [self setAdcVoltageStatusOfCard:kFecMonitorReadError];
+                break;
+            }
+            else if([self adcVoltageStatus:whichADC] == kFecMonitorOutOfRange){
+                [self setAdcVoltageStatusOfCard:kFecMonitorOutOfRange];
+                break;
+            }
+        }
+        
+        //sync up the crate status
+        [[self crate] setVoltageStatus: kFecMonitorInRange];
+        unsigned short card;
+        for(card=0;card<16;card++){
+            if([self adcVoltageStatusOfCard] == kFecMonitorReadError){
+                [[self crate] setVoltageStatus:kFecMonitorReadError];
+                break;
+            }
+            else if([self adcVoltageStatusOfCard] == kFecMonitorOutOfRange){
+                [[self crate] setVoltageStatus:kFecMonitorOutOfRange];
+                break;
+            }
+        }
 /*			//sync up the system status (TBD... 12/15/2008 MAH)
-			theConfigDB->VoltageStatusOfSystem(kFecMonitorInRange);
-			unsigned short crate;
-			for(crate=0;crate<kNumSCs;crate++){
-				if(theConfigDB->VoltageStatusOfCrate(theCrate)== kFecMonitorReadError){
-					theConfigDB->VoltageStatusOfSystem(kFecMonitorReadError);
-					break;
-				}
-				else if(theConfigDB->VoltageStatusOfCrate(theCrate) == kFecMonitorOutOfRange){
-					theConfigDB->VoltageStatusOfSystem(kFecMonitorOutOfRange);
-					break;
-				}
-			}
+        theConfigDB->VoltageStatusOfSystem(kFecMonitorInRange);
+        unsigned short crate;
+        for(crate=0;crate<kNumSCs;crate++){
+            if(theConfigDB->VoltageStatusOfCrate(theCrate)== kFecMonitorReadError){
+                theConfigDB->VoltageStatusOfSystem(kFecMonitorReadError);
+                break;
+            }
+            else if(theConfigDB->VoltageStatusOfCrate(theCrate) == kFecMonitorOutOfRange){
+                theConfigDB->VoltageStatusOfSystem(kFecMonitorOutOfRange);
+                break;
+            }
+        }
 */
-			
-		}
-		
-		
-	}
-	@catch(NSException* localException) {
-		short whichADC;
-		[self setAdcVoltageStatusOfCard:kFecMonitorReadError];
-		for(whichADC=0;whichADC<kNumFecMonitorAdcs;whichADC++){
-			[self setAdcVoltageStatus:whichADC withValue:kFecMonitorReadError];
-		}
-		[[self xl2] deselectCards];
-	}
-	[[self xl2] deselectCards];
-
-	
+        
+    }	
 }
 
-const short kVoltageADCMaximumAttempts = 10;
-
--(short) readVoltageValue:(unsigned long) aMask
-{
-	short theValue = -1;
-	
-	@try {
-		ORCommandList* aList = [ORCommandList commandList];
-		
-		// write the ADC mask keeping bits 14,15 high  i.e. CS,RD
-		[aList addCommand: [self writeToFec32RegisterCmd:FEC32_VOLTAGE_MONITOR_REG value:aMask | 0x0000C000UL]];
-		// write the ADC mask keeping bits 14,15 low -- this forces conversion
-		[aList addCommand:[self delayCmd:0.001]];
-		[aList addCommand: [self writeToFec32RegisterCmd:FEC32_VOLTAGE_MONITOR_REG value:aMask]];
-		[aList addCommand:[self delayCmd:0.002]];
-		int adcValueCmdIndex = [aList addCommand: [self readFromFec32RegisterCmd:FEC32_VOLTAGE_MONITOR_REG]];
-		
-		//MAH 8/30/99 leave the voltage register connected to a ground address.
-		[aList addCommand: [self writeToFec32RegisterCmd:FEC32_VOLTAGE_MONITOR_REG value:groundMask | 0x0000C000UL]];
-		[self executeCommandList:aList];
-	
-		//pull out the result
-		unsigned long adcReadValue = [aList longValueForCmd:adcValueCmdIndex];
-		if(adcReadValue & 0x100UL){
-			theValue = adcReadValue & 0x000000ff; //keep only the lowest 8 bits.
-		}
-	}
-	@catch(NSException* localException) {
-	}
-
-	
-	return theValue;
-}
 
 #pragma mark •••Archival
 - (id) initWithCoder:(NSCoder*)decoder
@@ -647,7 +588,6 @@ const short kVoltageADCMaximumAttempts = 10;
 	}
 }
 #pragma mark •••Hardware Access
-
 - (id) adapter
 {
 	id anAdapter = [[self guardian] adapter]; //should be the XL2 for this objects crate
@@ -1191,86 +1131,26 @@ const short kVoltageADCMaximumAttempts = 10;
 // returns true if rates were calculated
 - (BOOL) readCMOSCounts:(BOOL)calcRates channelMask:(unsigned long) aChannelMask
 {
-	long		   	theRate = kCMOSRateUnmeasured;
-	long		   	maxRate = kCMOSRateUnmeasured;
-	unsigned long  	theCount;
-	unsigned short 	channel;
-	unsigned short	maxRateChannel = 0;
-	
-	NSDate* lastTime = cmosCountTimeStamp;
-	NSDate* thisTime = [NSDate date];
-	NSTimeInterval timeDiff = [thisTime timeIntervalSinceDate:lastTime];
-	float sampleFreq;
     
-	if ((calcRates && (timeDiff<0 || timeDiff>kMaxTimeDiff)) || timeDiff==0) {
-		calcRates = 0;	// don't calculate rates if time diff is silly
-	}
-	if(timeDiff){
-        sampleFreq = 1 / timeDiff;
+    if ([guardian adapterIsXL3]) {
+        if (calcRates) {
+            [self readCMOSRatesUsingXL3:aChannelMask];
+        }
+        else {
+            [self readCMOSCountsUsingXL3:aChannelMask];            
+        }
     }
-	
-	[cmosCountTimeStamp release];
-	cmosCountTimeStamp = [thisTime retain];
-	
-	//unsigned long theOnlineMask = [self onlineMask];
-	
-	BOOL selected = NO;
-	@try {	
-		[[self xl2] select:self];
-		selected = YES;
-		
-		ORCommandList* aList = [ORCommandList commandList];
-		unsigned long resultIndex[32];
-		for (channel=0; channel<32; ++channel) {
-			if(aChannelMask & (1UL<<channel) && ![self cmosReadDisabled:channel]){
-				resultIndex[channel] = [aList addCommand:[self readFromFec32RegisterCmd:FEC32_CMOS_TOTALS_COUNTER_OFFSET+32*channel]];
-			}
-		}
-		[self executeCommandList:aList];
-		//pull the results
-		for (channel=0; channel<32; ++channel) {
-			if(aChannelMask & (1UL<<channel) && ![self cmosReadDisabled:channel]){
-				theCount = [aList longValueForCmd:resultIndex[channel]];
-				//if( (theCount & 0x80000000) == 0x80000000 ){
-				//busy... TBD put out error or something MAH 12/19/08
-				//}
-			}
-			else {
-				theCount = kCMOSRateUnmeasured;
-			}
-			
-			if (calcRates) {
-				if (aChannelMask & (1UL<<channel) && ![self cmosReadDisabled:channel]) {
-					// get value of last totals counter read
-					if ((theCount | cmosCount[channel]) & 0x80000000UL) {	// test for CMOS read error
-						if( (cmosCount[channel] == 0x8000deadUL) || (theCount == 0x8000deadUL) ) theRate = kCMOSRateBusError;
-						else															theRate = kCMOSRateBusyRead;
-					} 
-					else theRate = (theCount - cmosCount[channel]) * sampleFreq;
-					
-					// keep track of maximum count rate
-					if (maxRate < theRate) {
-						maxRate = theRate;
-						maxRateChannel = channel;
-					}
-					if (theRate > 1e9) theRate = kCMOSRateCorruptRead;			//MAH 3/19/98
-				} 
-				else theRate = kCMOSRateUnmeasured;								//PH 04/07/99
-			}
-			
-			cmosCount[channel] = theCount;	// save the new CMOS totals counter and rate
-			cmosRate[channel]  = theRate;	// this will be kCMOSRateUnmeasured if not calculating rates
-		}
-	}
-	@catch (NSException* localException){
-	}
+    else {
+        @try {
+            [self readCMOSCountsUsingXL2:calcRates channelMask:aChannelMask];
+        }
+        @catch (NSException *exception) {
+            NSLog(@"readCMOSCounts failed\n");
+        }
+    }
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:@"ORFec32ModelCmosRateChanged" object:self userInfo:nil];
 	
-	//	if (calcRates) {
-	// save maximum rate
-	//		theConfigDB->CardMaxCMOSRate(crate,slot,maxRateChannel,maxRate);
-	//	}
 	return calcRates;
 }
 
@@ -1932,3 +1812,250 @@ const short kVoltageADCMaximumAttempts = 10;
 	return hexToString(dataValue);
 }
 @end
+
+@implementation ORFec32Model (XL2)
+
+-(BOOL) readVoltagesUsingXL2
+{
+    short whichADC;
+    BOOL statusChanged = false;
+
+    @try {
+        [[self xl2] select:self];
+        
+        for(whichADC=0;whichADC<kNumFecMonitorAdcs;whichADC++){
+            short theValue = [self readVoltageValue:fecVoltageAdc[whichADC].mask];
+            eFecMonitorState old_channel_status = [self adcVoltageStatus:whichADC];
+            eFecMonitorState new_channel_status;
+            if( theValue != -1) {
+                float convertedValue = ((float)theValue-128.0)*fecVoltageAdc[whichADC].multiplier;
+                [self setAdcVoltage:whichADC withValue:convertedValue];
+                if(fecVoltageAdc[whichADC].check_expected_value){
+                    float expected = fecVoltageAdc[whichADC].expected_value;
+                    float delta = fabs(expected*[[self xl1] adcAllowedError:whichADC]);
+                    if(fabs(convertedValue-expected) < delta)	new_channel_status = kFecMonitorInRange;
+                    else										new_channel_status = kFecMonitorOutOfRange;
+                }
+                else new_channel_status = kFecMonitorInRange;
+            }
+            else new_channel_status = kFecMonitorReadError;
+            
+            [self setAdcVoltageStatus:whichADC withValue:new_channel_status];
+            
+            if(old_channel_status != new_channel_status){
+                statusChanged = true;
+            }
+        }
+    }
+    @catch(NSException* localException) {
+		short whichADC;
+		[self setAdcVoltageStatusOfCard:kFecMonitorReadError];
+		for(whichADC=0;whichADC<kNumFecMonitorAdcs;whichADC++){
+			[self setAdcVoltageStatus:whichADC withValue:kFecMonitorReadError];
+		}
+		[[self xl2] deselectCards];
+	}
+	[[self xl2] deselectCards];
+    return statusChanged;
+}
+
+const short kVoltageADCMaximumAttempts = 10;
+
+-(short) readVoltageValue:(unsigned long) aMask
+{
+	short theValue = -1;
+	
+	@try {
+		ORCommandList* aList = [ORCommandList commandList];
+		
+		// write the ADC mask keeping bits 14,15 high  i.e. CS,RD
+		[aList addCommand: [self writeToFec32RegisterCmd:FEC32_VOLTAGE_MONITOR_REG value:aMask | 0x0000C000UL]];
+		// write the ADC mask keeping bits 14,15 low -- this forces conversion
+		[aList addCommand:[self delayCmd:0.001]];
+		[aList addCommand: [self writeToFec32RegisterCmd:FEC32_VOLTAGE_MONITOR_REG value:aMask]];
+		[aList addCommand:[self delayCmd:0.002]];
+		int adcValueCmdIndex = [aList addCommand: [self readFromFec32RegisterCmd:FEC32_VOLTAGE_MONITOR_REG]];
+		
+		//MAH 8/30/99 leave the voltage register connected to a ground address.
+		[aList addCommand: [self writeToFec32RegisterCmd:FEC32_VOLTAGE_MONITOR_REG value:groundMask | 0x0000C000UL]];
+		[self executeCommandList:aList];
+        
+		//pull out the result
+		unsigned long adcReadValue = [aList longValueForCmd:adcValueCmdIndex];
+		if(adcReadValue & 0x100UL){
+			theValue = adcReadValue & 0x000000ff; //keep only the lowest 8 bits.
+		}
+	}
+	@catch(NSException* localException) {
+	}
+	return theValue;
+}
+
+- (BOOL) readCMOSCountsUsingXL2:(BOOL)calcRates channelMask:(unsigned long) aChannelMask
+{
+	long		   	theRate = kCMOSRateUnmeasured;
+	long		   	maxRate = kCMOSRateUnmeasured;
+	unsigned long  	theCount;
+	unsigned short 	channel;
+	unsigned short	maxRateChannel = 0;
+	
+	NSDate* lastTime = cmosCountTimeStamp;
+	NSDate* thisTime = [NSDate date];
+	NSTimeInterval timeDiff = [thisTime timeIntervalSinceDate:lastTime];
+	float sampleFreq;
+    
+	if ((calcRates && (timeDiff<0 || timeDiff>kMaxTimeDiff)) || timeDiff==0) {
+		calcRates = 0;	// don't calculate rates if time diff is silly
+	}
+	if(timeDiff){
+        sampleFreq = 1 / timeDiff;
+    }
+	
+	[cmosCountTimeStamp release];
+	cmosCountTimeStamp = [thisTime retain];
+	
+	//unsigned long theOnlineMask = [self onlineMask];
+	
+	BOOL selected = NO;
+	@try {	
+		[[self xl2] select:self];
+		selected = YES;
+		
+		ORCommandList* aList = [ORCommandList commandList];
+		unsigned long resultIndex[32];
+		for (channel=0; channel<32; ++channel) {
+			if(aChannelMask & (1UL<<channel) && ![self cmosReadDisabled:channel]){
+				resultIndex[channel] = [aList addCommand:[self readFromFec32RegisterCmd:FEC32_CMOS_TOTALS_COUNTER_OFFSET+32*channel]];
+			}
+		}
+		[self executeCommandList:aList];
+		//pull the results
+		for (channel=0; channel<32; ++channel) {
+			if(aChannelMask & (1UL<<channel) && ![self cmosReadDisabled:channel]){
+				theCount = [aList longValueForCmd:resultIndex[channel]];
+				//if( (theCount & 0x80000000) == 0x80000000 ){
+				//busy... TBD put out error or something MAH 12/19/08
+				//}
+			}
+			else {
+				theCount = kCMOSRateUnmeasured;
+			}
+			
+			if (calcRates) {
+				if (aChannelMask & (1UL<<channel) && ![self cmosReadDisabled:channel]) {
+					// get value of last totals counter read
+					if ((theCount | cmosCount[channel]) & 0x80000000UL) {	// test for CMOS read error
+						if( (cmosCount[channel] == 0x8000deadUL) || (theCount == 0x8000deadUL) ) theRate = kCMOSRateBusError;
+						else															theRate = kCMOSRateBusyRead;
+					} 
+					else theRate = (theCount - cmosCount[channel]) * sampleFreq;
+					
+					// keep track of maximum count rate
+					if (maxRate < theRate) {
+						maxRate = theRate;
+						maxRateChannel = channel;
+					}
+					if (theRate > 1e9) theRate = kCMOSRateCorruptRead;			//MAH 3/19/98
+				} 
+				else theRate = kCMOSRateUnmeasured;								//PH 04/07/99
+			}
+			
+			cmosCount[channel] = theCount;	// save the new CMOS totals counter and rate
+			cmosRate[channel]  = theRate;	// this will be kCMOSRateUnmeasured if not calculating rates
+		}
+	}
+	@catch (NSException* localException){
+	}	
+	return calcRates;
+}
+
+@end //ORFec32Model (XL2)
+
+
+@implementation ORFec32Model (XL3)
+
+-(BOOL) readVoltagesUsingXL3
+{
+    BOOL statusChanged = false;
+    short whichADC;
+    vmon_results_t result;
+    [[guardian adapter] readVMONForSlot:[self stationNumber] voltages:&result];
+
+    unsigned char sharc_to_xl3[21] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};
+    
+    for(whichADC=0;whichADC<kNumFecMonitorAdcs;whichADC++){
+        eFecMonitorState old_channel_status = [self adcVoltageStatus:whichADC];
+        eFecMonitorState new_channel_status;
+        float convertedValue = result.voltages[sharc_to_xl3[whichADC]];
+        [self setAdcVoltage:whichADC withValue:convertedValue];
+        if(fecVoltageAdc[whichADC].check_expected_value){
+            float expected = fecVoltageAdc[whichADC].expected_value;
+            //float delta = fabs(expected*[[self xl1] adcAllowedError:whichADC]);
+            float delta = fabs(expected * kAllowedFecMonitorError);
+            if(fabs(convertedValue-expected) < delta)	new_channel_status = kFecMonitorInRange;
+            else										new_channel_status = kFecMonitorOutOfRange;
+        }
+        else new_channel_status = kFecMonitorInRange;
+        //unless read error (XL3 doesn't provide)
+        //else new_channel_status = kFecMonitorReadError;
+        
+        [self setAdcVoltageStatus:whichADC withValue:new_channel_status];
+        if(old_channel_status != new_channel_status){
+            statusChanged = true;
+        }
+    }
+    return statusChanged;
+}
+
+-(void) readCMOSCountsUsingXL3:(unsigned long)aChannelMask
+{
+    check_total_count_args_t args;
+    check_total_count_results_t results;
+    
+    args.slot_mask |= 0x1 << [self stationNumber];
+    args.channel_masks[[self stationNumber]] = aChannelMask;
+    //what about disabled??? [self cmosReadDisabled:channel]
+    
+    @try {
+        [guardian readCMOSCountWithArgs:&args counts:&results];
+    }
+    @catch (NSException *exception) {
+        ;
+    }
+    
+    //if (results.error_flags != 0); ???
+    unsigned char ch;
+    for (ch=0; ch<32; ch++) {
+        cmosCount[ch]  = results.counts[ch];
+    }
+}
+
+-(void) readCMOSRatesUsingXL3:(unsigned long)aChannelMask
+{
+    read_cmos_rate_args_t args;
+    read_cmos_rate_results_t results;
+
+    args.slot_mask |= 0x1 << [self stationNumber];
+    args.channel_masks[[self stationNumber]] = aChannelMask;
+    args.period = 1; //usec according to doc, msec according to code
+    
+    @try {
+        [guardian readCMOSRateWithArgs:&args rates:&results];
+    }
+    @catch (NSException *exception) {
+        ;
+    }
+
+    //if (results.error_flags != 0) {    }
+    unsigned char ch;
+    for (ch=0; ch<32; ch++) {
+        cmosRate[ch]  = results.rates[ch];
+    }
+
+    //bizzarre rates are encoded:
+    //if (rates[j] < 0){rates[j] = -9999;} //unphysical result
+    //if (rates[j] > 3e6){rates[j] = -7777;} //unphysical result
+    //if (eflag[j] == 1){rates[j] = -5555;} //error flag set
+}
+
+@end //ORFec32Model (XL3)
