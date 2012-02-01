@@ -1981,7 +1981,7 @@ const short kVoltageADCMaximumAttempts = 10;
     vmon_results_t result;
     [[guardian adapter] readVMONForSlot:[self stationNumber] voltages:&result];
 
-    unsigned char sharc_to_xl3[21] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};
+    unsigned char sharc_to_xl3[21] = {20,13,12,3,2,4,1,0,19,18,14,15,5,16,6,17,9,10,11,7,8};
     
     for(whichADC=0;whichADC<kNumFecMonitorAdcs;whichADC++){
         eFecMonitorState old_channel_status = [self adcVoltageStatus:whichADC];

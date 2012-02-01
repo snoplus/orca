@@ -1307,8 +1307,8 @@ void SwapLongBlock(void* p, int32_t n)
     unsigned int v = data->slot_mask;
     unsigned int c;
     for (c = 0; v; c++) v &= v - 1;
-    if (c > 7) {
-        NSLog(@"%@ error in readCMOSCountWithArgs: more than 8 slots were masked in, ask less.\n");
+    if (c > 8) {
+        NSLog(@"%@ error in readCMOSCountWithArgs: more than 8 slots were masked in, ask less.\n", [[self xl3Link] crateName]);
         @throw [NSException exceptionWithName:@"readCMOSCount error" reason:@"More than 8 slots were masked in slot_mask" userInfo:nil];
     }
     
@@ -1354,7 +1354,7 @@ void SwapLongBlock(void* p, int32_t n)
         unsigned int i;
         for (i=0; i<32; i++) {
             if (aChannelMask & 1 << i) {
-                [msg appendFormat:@"%d: df\n", i, results.counts[i]];
+                [msg appendFormat:@"%d: %u\n", i, results.counts[i]];
             }
         }
         NSLog(msg);
@@ -1368,7 +1368,15 @@ void SwapLongBlock(void* p, int32_t n)
     check_total_count_args_t args_hi;
     check_total_count_results_t results_lo;
     check_total_count_results_t results_hi;
+    
+    memset(&args_lo, 0, sizeof(check_total_count_args_t));
+    memset(&args_hi, 0, sizeof(check_total_count_args_t));
+    memset(&results_lo, 0, sizeof(check_total_count_results_t));
+    memset(&results_hi, 0, sizeof(check_total_count_results_t));
+    
     unsigned char i;
+    NSLog(@"%@ error in readCMOSCount, error_flags_lo: 0x%08x, error_flags_hi: 0x%08x\n",
+          [[self xl3Link] crateName], results_lo.error_flags, results_hi.error_flags);
     
     args_lo.slot_mask = 0xff;
     for (i = 0; i < 8; i++) args_lo.channel_masks[i] = 0xffffffff;
@@ -1385,23 +1393,23 @@ void SwapLongBlock(void* p, int32_t n)
     }
     
     if (results_lo.error_flags != 0 || results_hi.error_flags != 0) {
-        NSLog(@"%@ error in readCMOSCountForSlot, error_flags_lo: 0x%08x, error_flags_hi: 0x%08x\n",
+        NSLog(@"%@ error in readCMOSCount, error_flags_lo: 0x%08x, error_flags_hi: 0x%08x\n",
               [[self xl3Link] crateName], results_lo.error_flags, results_hi.error_flags);
     }
     else{
-        NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ CMOS counts: %d\n", [[self xl3Link] crateName]];
+        NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ CMOS counts:\n", [[self xl3Link] crateName]];
         unsigned char j;
         for (i=0; i<32; i++) {
             [msg appendFormat:@"slot %d, ch%2d-%2d:", i/4, i%4 * 8, (i%4 + 1) * 8 - 1];
             for (j=0; j<8; j++) {
-                [msg appendFormat:@"%d ", results_lo.counts[i*8 + j]];
+                [msg appendFormat:@"%u ", results_lo.counts[i*8 + j]];
             }
             [msg appendFormat:@"\n"];
         }
         for (i=0; i<32; i++) {
             [msg appendFormat:@"slot %d, ch%2d-%2d:", i/4 + 8, i%4 * 8, (i%4 + 1) * 8 - 1];
             for (j=0; j<8; j++) {
-                [msg appendFormat:@"%d ", results_hi.counts[i*8 + j]];
+                [msg appendFormat:@"%u ", results_hi.counts[i*8 + j]];
             }
             [msg appendFormat:@"\n"];
         }
@@ -1422,8 +1430,8 @@ void SwapLongBlock(void* p, int32_t n)
     unsigned int v = data->slot_mask;
     unsigned int c;
     for (c = 0; v; c++) v &= v - 1;
-    if (c > 7) {
-        NSLog(@"%@ error in readCMOSRateWithArgs: more than 8 slots were masked in, ask less.\n");
+    if (c > 8) {
+        NSLog(@"%@ error in readCMOSRateWithArgs: more than 8 slots were masked in, ask less.\n", [[self xl3Link] crateName]);
         @throw [NSException exceptionWithName:@"readCMOSRate error" reason:@"More than 8 slots were masked in slot_mask" userInfo:nil];
     }
     
@@ -1811,7 +1819,7 @@ void SwapLongBlock(void* p, int32_t n)
 {
     XL3_PayloadStruct payload;
     memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
-    payload.numberBytesinPayload = sizeof(vmon_args_t);
+    payload.numberBytesinPayload = sizeof(vmon_results_t);
 
     vmon_args_t* data = (vmon_args_t*) payload.payload;
     data->slot_num = aSlot;
