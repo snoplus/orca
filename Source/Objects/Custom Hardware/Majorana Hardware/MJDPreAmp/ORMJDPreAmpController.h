@@ -22,7 +22,7 @@
 {
     @private
 		IBOutlet NSButton* settingsLockButton;
-		IBOutlet NSMatrix* gainsMatrix;
+		IBOutlet NSMatrix* dacsMatrix;
 }
 
 #pragma mark ¥¥¥Initialization
@@ -35,14 +35,14 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ¥¥¥Interface Management
-- (void) gainArrayChanged:(NSNotification*)aNote;
-- (void) gainChanged:(NSNotification*)aNote;
+- (void) dacArrayChanged:(NSNotification*)aNote;
+- (void) dacChanged:(NSNotification*)aNote;
 - (void) updateWindow;
 - (void) checkGlobalSecurity;
 - (void) settingsLockChanged:(NSNotification *)notification;
 
 #pragma mark ¥¥¥Actions
-- (IBAction) gainsAction:(id)sender;
+- (IBAction) dacsAction:(id)sender;
 - (IBAction) settingsLockAction:(id)sender;
 - (IBAction) readAction:(id)sender;
 - (IBAction) writeAction:(id)sender;

@@ -41,8 +41,12 @@
 {
     [super  awakeFromNib];
 	short chan;
-	for(chan=0;chan<kMJDPreAmpChannels;chan++){
-		[[gainsMatrix cellAtRow:chan column:0] setTag:chan];
+	NSNumberFormatter* aFormat = [[[NSNumberFormatter alloc] init] autorelease];
+	[aFormat setFormat:@"##0.00"];
+
+	for(chan=0;chan<kMJDPreAmpDacChannels;chan++){
+		[[dacsMatrix cellAtRow:chan column:0] setTag:chan];
+		[[dacsMatrix cellAtRow:chan column:0] setFormatter:aFormat];
 	}
 }
 
@@ -73,13 +77,13 @@
                         object: nil];
 	
     [notifyCenter addObserver : self
-                     selector : @selector(gainArrayChanged:)
-                         name : ORMJDPreAmpModelGainArrayChanged
+                     selector : @selector(dacArrayChanged:)
+                         name : ORMJDPreAmpModelDacArrayChanged
 						object: model];
 
     [notifyCenter addObserver : self
-					 selector : @selector(gainChanged:)
-						 name : ORMJDPreAmpGainChangedNotification
+					 selector : @selector(dacChanged:)
+						 name : ORMJDPreAmpDacChangedNotification
 					   object : model];
 }
 
@@ -87,7 +91,7 @@
 {
     [super updateWindow];
     [self settingsLockChanged:nil];
-	[self gainArrayChanged:nil];
+	[self dacArrayChanged:nil];
 }
 
 #pragma mark ¥¥¥Interface Management
@@ -108,23 +112,24 @@
     [settingsLockButton setState:locked];
 }
 
-- (void) gainChanged:(NSNotification*)aNotification
+- (void) dacChanged:(NSNotification*)aNotification
 {
 	int chan = [[[aNotification userInfo] objectForKey:@"Channel"] intValue];
-	[[gainsMatrix cellWithTag:chan] setIntValue: [model gain:chan]];
+	[[dacsMatrix cellWithTag:chan] setFloatValue: [model dac:chan]*4.1/65535.];
 }
-- (void) gainArrayChanged:(NSNotification*)aNotification
+
+- (void) dacArrayChanged:(NSNotification*)aNotification
 {
 	short chan;
-	for(chan=0;chan<kMJDPreAmpChannels;chan++){
-		[[gainsMatrix cellWithTag:chan] setIntValue: [model gain:chan]];
+	for(chan=0;chan<kMJDPreAmpDacChannels;chan++){
+		[[dacsMatrix cellWithTag:chan] setFloatValue: [model dac:chan]*4.1/65535.];
 	}
 }
-#pragma mark ¥¥¥Actions
 
-- (void) gainsAction:(id)sender
+#pragma mark ¥¥¥Actions
+- (void) dacsAction:(id)sender
 {
-	[model setGain:[[sender selectedCell] tag] withValue:[sender intValue]];
+	[model setDac:[[sender selectedCell] tag] withValue:[sender floatValue]*65535./4.1];
 }
 
 - (IBAction) settingsLockAction:(id)sender
@@ -135,13 +140,11 @@
 //test actions
 - (IBAction) readAction:(id)sender
 {
-	[model readFromHW];
 }
 
 - (IBAction) writeAction:(id)sender
 {
-	[model writeToHW];
-
+	[model writeDacValuesToHW];
 }
 
 @end

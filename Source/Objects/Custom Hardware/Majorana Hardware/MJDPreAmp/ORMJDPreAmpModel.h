@@ -21,21 +21,25 @@
 #import "ORHWWizard.h"
 #import "ThresholdCalibrationTask.h"
 
-#define kMJDPreAmpChannels 8
+#define kMJDPreAmpDacChannels 16
 
 @interface ORMJDPreAmpModel : OrcaObject {
-    NSMutableArray* gains;
+    NSMutableArray* dacs;
 }
 
+- (void) setUpArrays;
+
 #pragma mark ¥¥¥Accessors
-- (NSMutableArray*) gains;
-- (void) setGains:(NSMutableArray*)aGains;
-- (unsigned short) gain:(unsigned short) aChan;
-- (void) setGain:(unsigned short) aChan withValue:(unsigned short) aGain;
+- (NSMutableArray*) dacs;
+- (void) setDacs:(NSMutableArray*)anArray;
+- (unsigned long) dac:(unsigned short) aChan;
+- (void) setDac:(unsigned short) aChan withValue:(unsigned long) aValue;
 
 #pragma mark ¥¥¥HW Access
-- (void) writeToHW;
-- (void) readFromHW;
+- (void) writeDac:(int)index;
+- (void) writeDacValuesToHW;
+- (void) writeAuxIOSPI:(unsigned long)aValue;
+- (unsigned long) readAuxIOSPI;
 
 #pragma mark ¥¥¥Archival
 - (id)      initWithCoder:(NSCoder*)aDecoder;
@@ -43,11 +47,11 @@
 @end
 
 #pragma mark ¥¥¥External Strings
-extern NSString* ORMJDPreAmpModelGainArrayChanged;
+extern NSString* ORMJDPreAmpModelDacArrayChanged;
 extern NSString* MJDPreAmpSettingsLock;
-extern NSString* ORMJDPreAmpGainChangedNotification;
+extern NSString* ORMJDPreAmpDacChangedNotification;
 
 @interface NSObject (ORMJDPreAmpModel)
-- (void)    writeToSPI:(NSData*)someData;
-- (NSData*) readFromSPI;
+- (void) writeAuxIOSPI:(unsigned long)spiData;
+- (unsigned long) readAuxIOSPI;
 @end

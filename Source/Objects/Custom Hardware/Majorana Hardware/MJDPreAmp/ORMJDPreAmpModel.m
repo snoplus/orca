@@ -22,13 +22,16 @@
 #import "ORMJDPreAmpModel.h"
 
 #pragma mark ¥¥¥Notification Strings
-NSString* ORMJDPreAmpModelGainArrayChanged		= @"ORMJDPreAmpModelGainArrayChanged";
-NSString* ORMJDPreAmpGainChangedNotification	= @"ORMJDPreAmpGainChangedNotification";
+NSString* ORMJDPreAmpModelDacArrayChanged	= @"ORMJDPreAmpModelDacArrayChanged";
+NSString* ORMJDPreAmpDacChangedNotification	= @"ORMJDPreAmpDacChangedNotification";
 
 NSString* MJDPreAmpSettingsLock				= @"MJDPreAmpSettingsLock";
 
 #pragma mark ¥¥¥Local Strings
 static NSString* MJDPreAmpInputConnector      = @"MJDPreAmpInputConnector";
+
+#define kDacWriteMask 0x128
+
 
 @implementation ORMJDPreAmpModel
 #pragma mark ¥¥¥initialization
@@ -36,22 +39,26 @@ static NSString* MJDPreAmpInputConnector      = @"MJDPreAmpInputConnector";
 {
     self = [super init];
     [[self undoManager] disableUndoRegistration];
-	
-	[self setGains:[NSMutableArray arrayWithCapacity:kMJDPreAmpChannels]];
-	int i;
-    for(i=0;i<kMJDPreAmpChannels;i++){
-        [gains addObject:[NSNumber numberWithInt:50]];
-    }
-	
-    
+	[self setUpArrays];
     [[self undoManager] enableUndoRegistration];
     return self;
 }
 
 - (void) dealloc
 {
-    [gains release];
+    [dacs release];
     [super dealloc];
+}
+
+- (void) setUpArrays
+{
+	if(!dacs){
+		[self setDacs:[NSMutableArray arrayWithCapacity:kMJDPreAmpDacChannels]];
+		int i;
+		for(i=0;i<kMJDPreAmpDacChannels;i++){
+			[dacs addObject:[NSNumber numberWithInt:0]];
+		}	
+	}
 }
 
 - (void) makeConnectors
@@ -75,61 +82,93 @@ static NSString* MJDPreAmpInputConnector      = @"MJDPreAmpInputConnector";
 }
 
 #pragma mark ¥¥¥Accessors
-
-- (NSMutableArray*) gains
+- (NSMutableArray*) dacs
 {
-    return gains;
+    return dacs;
 }
 
-- (void) setGains:(NSMutableArray*)aGains
+- (void) setDacs:(NSMutableArray*)anArray
 {
-    [aGains retain];
-    [gains release];
-    gains = aGains;
+    [anArray retain];
+    [dacs release];
+    dacs = anArray;
 
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpModelGainArrayChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpModelDacArrayChanged object:self];
 }
 
--(unsigned short)gain:(unsigned short) aChan
+- (unsigned long) dac:(unsigned short) aChan
 {
-    return [[gains objectAtIndex:aChan] shortValue];
+    return [[dacs objectAtIndex:aChan] shortValue];
 }
-- (void) setGain:(unsigned short) aChan withValue:(unsigned short) aGain
+
+- (void) setDac:(unsigned short) aChan withValue:(unsigned long) aValue
 {
-	if(aGain>255)aGain = 255;
-    [[[self undoManager] prepareWithInvocationTarget:self] setGain:aChan withValue:[self gain:aChan]];
-	[gains replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aGain]];
+	if(aValue>0xffff) aValue = 0xffff;
+    [[[self undoManager] prepareWithInvocationTarget:self] setDac:aChan withValue:[self dac:aChan]];
+	[dacs replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
 	
     NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
     [userInfo setObject:[NSNumber numberWithInt:aChan] forKey: @"Channel"];
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpGainChangedNotification
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpDacChangedNotification
 														object:self
 													  userInfo: userInfo];
-	
 }
 
 - (NSString*) helpURL
 {
 	return nil;
 }
+#define kDAC1 0x80000000
+#define kDAC2 0x81000000
+#define kDAC3 0x82000000
+#define kDAC4 0x83000000
+
+#define kDACA_H_Base 0x00200000
 
 #pragma mark ¥¥¥HW Access
-- (void) readFromHW
+
+- (void) writeDacValuesToHW
 {
-	id connectedObj = [self objectConnectedTo:MJDPreAmpInputConnector];
-	if([connectedObj respondsToSelector:@selector(readFromSPI)]){
-		NSData* data = [connectedObj readFromSPI];
-		NSLog(@"MJD Preamp got: %@\n",data);
+	int i;
+	for(i=0;i<kMJDPreAmpDacChannels;i++){
+		[self writeDac:i];
 	}
 }
 
-- (void)  writeToHW
+- (void) writeDac:(int)index
+{
+	if(index>=0 && index<16){
+		unsigned long theValue;
+		//set up the Octal chip mask first
+		if(index<8)	theValue = kDAC3;
+		else		theValue = kDAC4;
+		
+		//set up which of eight DAC on that octal chip
+		theValue |= (kDACA_H_Base | (index%8 << 16));
+		
+		//set up the value
+		theValue |= [self dac:index];
+		[self writeAuxIOSPI:theValue];
+	}
+}
+
+- (unsigned long) readAuxIOSPI
+{
+	unsigned long aValue = 0;
+	id connectedObj = [self objectConnectedTo:MJDPreAmpInputConnector];
+	if([connectedObj respondsToSelector:@selector(readAuxIOSPI)]){
+		aValue = [connectedObj readAuxIOSPI];
+		NSLog(@"MJD Preamp got: 0x%x\n",aValue);
+	}
+	return aValue;
+}
+
+- (void)  writeAuxIOSPI:(unsigned long)aValue
 {
 	id connectedObj = [self objectConnectedTo:MJDPreAmpInputConnector];
-	if([connectedObj respondsToSelector:@selector(writeToSPI:)]){
-		long testValue = [[gains objectAtIndex:0] longValue];
-		[connectedObj writeToSPI:[NSData dataWithBytes:&testValue length:sizeof(long)]];
+	if([connectedObj respondsToSelector:@selector(writeAuxIOSPI:)]){
+		[connectedObj writeAuxIOSPI:aValue];
 	}
 }
 
@@ -139,8 +178,8 @@ static NSString* MJDPreAmpInputConnector      = @"MJDPreAmpInputConnector";
     self = [super initWithCoder:decoder];
 	
     [[self undoManager] disableUndoRegistration];
-    [self setGains:	[decoder decodeObjectForKey:@"gains"]];
-    
+    [self setDacs:	[decoder decodeObjectForKey:@"dacs"]];
+    if(!dacs)	[self setUpArrays];
     [[self undoManager] enableUndoRegistration];
     
     return self;
@@ -149,7 +188,7 @@ static NSString* MJDPreAmpInputConnector      = @"MJDPreAmpInputConnector";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-	[encoder encodeObject:gains	forKey:@"gains"];
+	[encoder encodeObject:dacs	forKey:@"dacs"];
   
 }
 
@@ -162,7 +201,4 @@ static NSString* MJDPreAmpInputConnector      = @"MJDPreAmpInputConnector";
     [dictionary setObject:objDictionary forKey:[self identifier]];
     return objDictionary;
 }
-
-
-
 @end
