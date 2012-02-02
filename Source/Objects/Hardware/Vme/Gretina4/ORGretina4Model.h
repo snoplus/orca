@@ -383,7 +383,6 @@ enum Gretina4FIFOStates {
 - (void) stepNoiseFloor;
 - (BOOL) noiseFloorRunning;
 - (void) writeDownSample;
-- (void) writeAuxIOSPI:(unsigned long)spiData;
 
 - (int) readCardInfo:(int)index;
 - (int) readExternalWindow;
@@ -433,8 +432,8 @@ enum Gretina4FIFOStates {
 - (NSArray*) autoTests;
 
 #pragma mark ¥¥¥SPI Interface
-- (void)    writeToSPI:(NSData*)someData;
-- (NSData*) readFromSPI;
+- (void) writeAuxIOSPI:(unsigned long)spiData;
+- (unsigned long) readAuxIOSPI;
 
 @end
 

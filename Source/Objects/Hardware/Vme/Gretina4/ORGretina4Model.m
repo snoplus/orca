@@ -1261,30 +1261,6 @@ static struct {
                     usingAddSpace:0x01];
 }
 
-
-- (void) writeAuxIOSPI:(unsigned long)spiData
-{
-    // Set AuxIO to mode 3 and set bits 0-3 to OUT (bit 0 is under FPGA control)
-    [self writeRegister:kAuxIOConfig withValue:0x3005];
-    // Read kAuxIOWrite to preserve bit 0, and zero bits used in SPI protocol
-    unsigned long spiBase = [self readRegister:kAuxIOWrite] & ~(kSPIData | kSPIClock | kSPIChipSelect); 
-    unsigned long value;
-
-    // now write spiData starting from MSB on kSPIData, pulsing kSPIClock
-    // each iteration
-    int i;
-    for(i=0; i<32; i++) {
-        value = spiBase;
-        if( (spiData & 0x80000000) != 0) value |= kSPIData;
-        [self writeRegister:kAuxIOWrite withValue:value];
-        [self writeRegister:kAuxIOWrite withValue:value | kSPIClock];
-        spiData = spiData << 1;
-    }
-    // set kSPIChipSelect to signify that we are done
-    [self writeRegister:kAuxIOWrite withValue:kSPIChipSelect];
-}
-
-
 - (int) readCardInfo:(int) index
 {
     unsigned long theValue = 0;
@@ -2181,17 +2157,32 @@ static struct {
 
 
 #pragma mark ¥¥¥SPI Interface
-- (void)    writeToSPI:(NSData*)someData
+- (void) writeAuxIOSPI:(unsigned long)spiData
 {
-	NSLog(@"Gretina4 writing To SPI\n");
-	NSLog(@"%@\n",someData);
+    // Set AuxIO to mode 3 and set bits 0-3 to OUT (bit 0 is under FPGA control)
+    [self writeRegister:kAuxIOConfig withValue:0x3005];
+    // Read kAuxIOWrite to preserve bit 0, and zero bits used in SPI protocol
+    unsigned long spiBase = [self readRegister:kAuxIOWrite] & ~(kSPIData | kSPIClock | kSPIChipSelect); 
+    unsigned long value;
+	
+    // now write spiData starting from MSB on kSPIData, pulsing kSPIClock
+    // each iteration
+    int i;
+    for(i=0; i<32; i++) {
+        value = spiBase;
+        if( (spiData & 0x80000000) != 0) value |= kSPIData;
+        [self writeRegister:kAuxIOWrite withValue:value];
+        [self writeRegister:kAuxIOWrite withValue:value | kSPIClock];
+        spiData = spiData << 1;
+    }
+    // set kSPIChipSelect to signify that we are done
+    [self writeRegister:kAuxIOWrite withValue:kSPIChipSelect];
 }
 
-- (NSData*) readFromSPI
+- (unsigned long) readAuxIOSPI
 {
-	//temporary for testing
-	long testValue = 0x999;
-	return [NSData dataWithBytes:&testValue length:sizeof(long)];
+	//TBD: Jason, fill in with actual code 
+	return 0;
 }
 
 @end
