@@ -161,7 +161,7 @@
 
 - (void) loopForeverChanged:(NSNotification*)aNote
 {
-	[loopForeverPU selectItemAtIndex: [model loopForever]];
+	[loopForeverPU selectItemAtIndex: ![model loopForever]];
 	[self updateButtons];
 }
 
@@ -285,7 +285,7 @@
 
 - (void) loopForeverAction:(id)sender
 {
-	[model setLoopForever:[sender indexOfSelectedItem]];	
+	[model setLoopForever:![sender indexOfSelectedItem]];	
 }
 
 - (void) pulseCountAction:(id)sender

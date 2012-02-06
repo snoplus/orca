@@ -322,6 +322,7 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 {
 	//write zeros to the pattern, the attenuators, and the enabled fields.
 	[self writeAuxIOSPI:kAttnPatternMask];
+	NSLog(@"PreAmp(%d) Disabled Pulser\n",[self uniqueIdNumber]);
 }	
 - (void) startPulser
 {
@@ -346,6 +347,8 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 	if(loopForever) aValue |= kPulserLoopForever;
 	else			aValue |= kPulserUseLoopCount;
 	[self writeAuxIOSPI:aValue];
+	NSLog(@"PreAmp(%d) Started Pulser\n",[self uniqueIdNumber]);
+
 }
 
 - (unsigned long) readAuxIOSPI
