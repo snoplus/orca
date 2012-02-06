@@ -92,6 +92,18 @@
 	[aPlot setLineColor:[NSColor orangeColor]];
 	[aPlot setName:@"5.0 µm"];
 	[aPlot release];
+
+	aPlot = [[ORTimeLinePlot alloc] initWithTag:6 andDataSource:self];
+	[plotter0 addPlot: aPlot];
+	[aPlot setLineColor:[NSColor brownColor]];
+	[aPlot setName:@"Temp"];
+	[aPlot release];
+	
+	aPlot = [[ORTimeLinePlot alloc] initWithTag:7 andDataSource:self];
+	[plotter0 addPlot: aPlot];
+	[aPlot setLineColor:[NSColor purpleColor]];
+	[aPlot setName:@"Humidity"];
+	[aPlot release];
 	
 	
 	[plotter0 setShowLegend:YES];
@@ -99,7 +111,7 @@
 	[(ORTimeAxis*)[plotter0 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 
 	int i;
-	for(i=0;i<6;i++){
+	for(i=0;i<8;i++){
 		[[countAlarmLimitMatrix cellAtRow:i column:0] setTag:i];
 		[[maxCountsMatrix cellAtRow:i column:0] setTag:i];
 	}
@@ -364,13 +376,13 @@
 {
 	if(!aNote){
 		int i;
-		for(i=0;i<6;i++){
+		for(i=0;i<8;i++){
 			[[countAlarmLimitMatrix cellWithTag:i] setIntValue:[model countAlarmLimit:i]];
 		}
 	}
 	else {
 		int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
-		if(chan<6){
+		if(chan<8){
 			[[countAlarmLimitMatrix cellWithTag:chan] setIntValue:[model countAlarmLimit:chan]];
 		}
 	}
@@ -380,13 +392,13 @@
 {
 	if(!aNote){
 		int i;
-		for(i=0;i<6;i++){
+		for(i=0;i<8;i++){
 			[[maxCountsMatrix cellWithTag:i] setFloatValue:[model maxCounts:i]];
 		}
 	}
 	else {
 		int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
-		if(chan<6){
+		if(chan<8){
 			[[maxCountsMatrix cellWithTag:chan] setFloatValue:[model maxCounts:chan]];
 		}
 	}

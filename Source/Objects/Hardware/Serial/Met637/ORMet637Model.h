@@ -42,10 +42,10 @@
 		unsigned int    waitTime;
 		unsigned int    expectedCount;
 		NSString*		measurementDate;
-		ORTimeRate*		timeRates[6];
+		ORTimeRate*		timeRates[8];
 		int				count[6];
-		float			maxCounts[6];
-		float			countAlarmLimit[6];
+		float			maxCounts[8];
+		float			countAlarmLimit[8];
 		int				countingMode;
 		int				cycleDuration;
 		BOOL			running;

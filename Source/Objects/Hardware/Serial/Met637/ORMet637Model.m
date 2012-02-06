@@ -285,6 +285,8 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 {
     humidity = aHumidity;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMet637ModelHumidityChanged object:self];
+	if(timeRates[7] == nil) timeRates[7] = [[ORTimeRate alloc] init];
+	[timeRates[7] addDataToTimeAverage:humidity];
 }
 
 - (float) temperature
@@ -296,6 +298,9 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 {
     temperature = aTemperature;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMet637ModelTemperatureChanged object:self];
+	if(timeRates[6] == nil) timeRates[6] = [[ORTimeRate alloc] init];
+	[timeRates[6] addDataToTimeAverage:temperature];
+
 }
 
 - (int) actualDuration
@@ -311,13 +316,13 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 
 - (float) countAlarmLimit:(int)index
 {
-	if(index>=0 && index<6) return countAlarmLimit[index];
+	if(index>=0 && index<8) return countAlarmLimit[index];
 	else return 0;
 }
 
 - (void) setIndex:(int)index countAlarmLimit:(float)aCountAlarmLimit
 {
-	if(index<0 || index>=6)return;
+	if(index<0 || index>=8)return;
 	[[[self undoManager] prepareWithInvocationTarget:self] setIndex:index countAlarmLimit:countAlarmLimit[index]];
     countAlarmLimit[index] = aCountAlarmLimit;
 	NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
@@ -328,13 +333,13 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 
 - (float) maxCounts:(int)index
 {
-	if(index>=0 && index<6) return maxCounts[index];
+	if(index>=0 && index<8) return maxCounts[index];
 	else return 0;
 }
 
 - (void) setIndex:(int)index maxCounts:(float)aMaxCounts
 {
-	if(index<0 || index>=6)return;
+	if(index<0 || index>=8)return;
 	[[[self undoManager] prepareWithInvocationTarget:self] setIndex:index maxCounts:maxCounts[index]];
 	maxCounts[index] = aMaxCounts;
 	NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
@@ -344,7 +349,8 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 
 - (ORTimeRate*)timeRate:(int)index
 {
-	return timeRates[index];
+	if(index>=0 && index<8) return timeRates[index];
+	else return nil;
 }
 
 - (int) cycleNumber
@@ -572,7 +578,7 @@ NSString* ORMet637Lock = @"ORMet637Lock";
     [self setPortName:			[decoder decodeObjectForKey:@"portName"]];
 
 	int i; 
-	for(i=0;i<6;i++){
+	for(i=0;i<8;i++){
 		timeRates[i] = [[ORTimeRate alloc] init];
 		[self setIndex:i countAlarmLimit:  	[decoder decodeFloatForKey: [NSString stringWithFormat:@"countAlarmLimit%d",i]]];
 		[self setIndex:i maxCounts:			[decoder decodeFloatForKey: [NSString stringWithFormat:@"maxCounts%d",i]]];
@@ -597,7 +603,7 @@ NSString* ORMet637Lock = @"ORMet637Lock";
     [encoder encodeObject:	portName		forKey: @"portName"];
     [encoder encodeBool:	wasRunning		forKey:	@"wasRunning"];
 	int i; 
-	for(i=0;i<6;i++){
+	for(i=0;i<8;i++){
 		[encoder encodeFloat:	countAlarmLimit[i] forKey: [NSString stringWithFormat:@"countAlarmLimit%d",i]];
 		[encoder encodeFloat:	maxCounts[i]	   forKey: [NSString stringWithFormat:@"maxCounts%d",i]];
 
@@ -725,7 +731,9 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 {
 	double theValue = 0;
 	@synchronized(self){
-		theValue = [self count:aChan];
+		if(aChan<6)			theValue = [self count:aChan];
+		else if(aChan==6)	theValue = [self temperature];
+		else if(aChan==7)	theValue = [self humidity];
 	}
 	return theValue;
 }
