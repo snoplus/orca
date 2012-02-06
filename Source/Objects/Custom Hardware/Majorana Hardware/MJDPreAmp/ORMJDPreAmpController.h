@@ -36,6 +36,8 @@
 		IBOutlet NSMatrix*		amplitudesMatrix;
 		IBOutlet NSMatrix*		pulserMaskMatrix;
 		IBOutlet NSTextField*   frequencyField;
+		IBOutlet NSButton*		startPulserButton;
+		IBOutlet NSButton*		stopPulserButton;
 }
 
 #pragma mark ¥¥¥Initialization
@@ -80,5 +82,6 @@
 - (IBAction) settingsLockAction:(id)sender;
 - (IBAction) readAction:(id)sender;
 - (IBAction) writeFetVdsAction:(id)sender;
-- (IBAction) writePulserDacAction:(id)sender;
+- (IBAction) startPulserAction:(id)sender;
+- (IBAction) stopPulserAction:(id)sender;
 @end

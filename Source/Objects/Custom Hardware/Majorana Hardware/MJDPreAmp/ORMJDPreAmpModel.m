@@ -318,8 +318,12 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 		[self writeAuxIOSPI:theValue];
 	}
 }
-
-- (void) writePulserValuesToHW
+- (void) stopPulser
+{
+	//write zeros to the pattern, the attenuators, and the enabled fields.
+	[self writeAuxIOSPI:kAttnPatternMask];
+}	
+- (void) startPulser
 {
 	unsigned long aValue = 0;
 	//set the high and low times

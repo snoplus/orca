@@ -65,7 +65,8 @@
 - (void) setAmplitude:(int) aChan withValue:(unsigned long) aValue;
 
 #pragma mark ¥¥¥HW Access
-- (void) writePulserValuesToHW;
+- (void) startPulser;
+- (void) stopPulser;
 - (void) writeFetVds:(int)index;
 - (void) writeFetVdsToHW;
 - (void) writeAuxIOSPI:(unsigned long)aValue;

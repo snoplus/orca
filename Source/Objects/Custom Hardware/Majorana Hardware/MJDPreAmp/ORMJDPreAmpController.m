@@ -235,17 +235,21 @@
 {
     //BOOL locked = [gSecurity isLocked:MJDPreAmpSettingsLock];
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:MJDPreAmpSettingsLock];
-	[loopForeverPU setEnabled:!lockedOrRunningMaintenance];
-	[pulseCountField setEnabled:!lockedOrRunningMaintenance && ![model loopForever]];
-	[enabled0PU setEnabled:!lockedOrRunningMaintenance];
-	[enabled1PU setEnabled:!lockedOrRunningMaintenance];
+	[loopForeverPU		setEnabled:!lockedOrRunningMaintenance];
+	[pulseCountField	setEnabled:!lockedOrRunningMaintenance && ![model loopForever]];
+	[enabled0PU			setEnabled:!lockedOrRunningMaintenance];
+	[enabled1PU			setEnabled:!lockedOrRunningMaintenance];
 	[finalAttenuated0PU setEnabled:!lockedOrRunningMaintenance];
 	[finalAttenuated1PU setEnabled:!lockedOrRunningMaintenance];
 	[pulseHighTimeField setEnabled:!lockedOrRunningMaintenance];
-	[pulseLowTimeField setEnabled:!lockedOrRunningMaintenance];
-	[dacsMatrix setEnabled:!lockedOrRunningMaintenance];
-	[amplitudesMatrix setEnabled:!lockedOrRunningMaintenance];
-	[pulserMaskMatrix setEnabled:!lockedOrRunningMaintenance];	
+	[pulseLowTimeField	setEnabled:!lockedOrRunningMaintenance];
+	[dacsMatrix			setEnabled:!lockedOrRunningMaintenance];
+	[amplitudesMatrix	setEnabled:!lockedOrRunningMaintenance];
+	[pulserMaskMatrix	setEnabled:!lockedOrRunningMaintenance];	
+	[startPulserButton	setEnabled:!lockedOrRunningMaintenance];	
+	[stopPulserButton	setEnabled:!lockedOrRunningMaintenance];	
+	
+	
 }
 
 - (void) dacChanged:(NSNotification*)aNotification
@@ -343,20 +347,19 @@
     [gSecurity tryToSetLock:MJDPreAmpSettingsLock to:[sender intValue] forWindow:[self window]];
 }
 
-//test actions
-- (IBAction) readAction:(id)sender
-{
-}
-
 - (IBAction) writeFetVdsAction:(id)sender
 {
 	[model writeFetVdsToHW];
 }
 
-- (IBAction) writePulserDacAction:(id)sender
+- (IBAction) startPulserAction:(id)sender
 {
-	[model writePulserValuesToHW];
+	[model startPulser];
 }
 
+- (IBAction) stopPulserAction:(id)sender
+{
+	[model stopPulser];
+}
 
 @end
