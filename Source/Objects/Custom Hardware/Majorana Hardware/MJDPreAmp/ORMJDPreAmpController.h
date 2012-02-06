@@ -2,7 +2,7 @@
 //  MJDPreAmpController.h
 //  Orca
 //
-//  Created by Mark Howe on Wed Jan 18 2012.
+//  Created by Mark Howe on Wed Jan 18 2012.TimeField
 //  Copyright © 2012 University of North Carolina. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
@@ -21,8 +21,21 @@
 @interface ORMJDPreAmpController : OrcaObjectController
 {
     @private
-		IBOutlet NSButton* settingsLockButton;
-		IBOutlet NSMatrix* dacsMatrix;
+		IBOutlet NSButton*		settingsLockButton;
+		IBOutlet NSPopUpButton* loopForeverPU;
+		IBOutlet NSTextField*	pulseCountField;
+		IBOutlet NSPopUpButton* enabled0PU;
+		IBOutlet NSPopUpButton* enabled1PU;
+		IBOutlet NSPopUpButton* attenuated0PU;
+		IBOutlet NSPopUpButton* attenuated1PU;
+		IBOutlet NSPopUpButton* finalAttenuated0PU;
+		IBOutlet NSPopUpButton* finalAttenuated1PU;
+		IBOutlet NSTextField*   pulseHighTimeField;
+		IBOutlet NSTextField*   pulseLowTimeField;
+		IBOutlet NSMatrix*		dacsMatrix;
+		IBOutlet NSMatrix*		amplitudesMatrix;
+		IBOutlet NSMatrix*		pulserMaskMatrix;
+		IBOutlet NSTextField*   frequencyField;
 }
 
 #pragma mark ¥¥¥Initialization
@@ -35,15 +48,37 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ¥¥¥Interface Management
+- (void) loopForeverChanged:(NSNotification*)aNote;
+- (void) pulseCountChanged:(NSNotification*)aNote;
+- (void) amplitudeChanged:(NSNotification*)aNote;
+- (void) amplitudeArrayChanged:(NSNotification*)aNote;
+- (void) enabledChanged:(NSNotification*)aNote;
+- (void) attenuatedChanged:(NSNotification*)aNote;
+- (void) finalAttenuatedChanged:(NSNotification*)aNote;
+- (void) pulserMaskChanged:(NSNotification*)aNote;
+- (void) pulseHighTimeChanged:(NSNotification*)aNote;
+- (void) pulseLowTimeChanged:(NSNotification*)aNote;
 - (void) dacArrayChanged:(NSNotification*)aNote;
 - (void) dacChanged:(NSNotification*)aNote;
 - (void) updateWindow;
 - (void) checkGlobalSecurity;
 - (void) settingsLockChanged:(NSNotification *)notification;
+- (void) updateButtons;
+- (void) displayFrequency;
 
 #pragma mark ¥¥¥Actions
+- (IBAction) amplitudesAction:(id)sender;
+- (IBAction) loopForeverAction:(id)sender;
+- (IBAction) pulseCountAction:(id)sender;
+- (IBAction) enabledAction:(id)sender;
+- (IBAction) finalAttenuatedAction:(id)sender;
+- (IBAction) attenuatedAction:(id)sender;
+- (IBAction) pulserMaskAction:(id)sender;
+- (IBAction) pulseHighTimeAction:(id)sender;
+- (IBAction) pulseLowTimeAction:(id)sender;
 - (IBAction) dacsAction:(id)sender;
 - (IBAction) settingsLockAction:(id)sender;
 - (IBAction) readAction:(id)sender;
-- (IBAction) writeAction:(id)sender;
+- (IBAction) writeFetVdsAction:(id)sender;
+- (IBAction) writePulserDacAction:(id)sender;
 @end

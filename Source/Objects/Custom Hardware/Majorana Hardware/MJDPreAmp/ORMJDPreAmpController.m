@@ -37,7 +37,7 @@
     [super dealloc];
 }
 
-- (void)awakeFromNib
+- (void) awakeFromNib
 {
     [super  awakeFromNib];
 	short chan;
@@ -47,6 +47,8 @@
 	for(chan=0;chan<kMJDPreAmpDacChannels;chan++){
 		[[dacsMatrix cellAtRow:chan column:0] setTag:chan];
 		[[dacsMatrix cellAtRow:chan column:0] setFormatter:aFormat];
+		[[amplitudesMatrix cellAtRow:chan column:0] setTag:chan];
+		[[pulserMaskMatrix cellAtRow:chan column:0] setTag:chan];
 	}
 }
 
@@ -78,13 +80,64 @@
 	
     [notifyCenter addObserver : self
                      selector : @selector(dacArrayChanged:)
-                         name : ORMJDPreAmpModelDacArrayChanged
+                         name : ORMJDPreAmpDacArrayChanged
 						object: model];
 
     [notifyCenter addObserver : self
 					 selector : @selector(dacChanged:)
-						 name : ORMJDPreAmpDacChangedNotification
+						 name : ORMJDPreAmpDacChanged
 					   object : model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(pulseLowTimeChanged:)
+                         name : ORMJDPreAmpPulseLowTimeChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(pulseHighTimeChanged:)
+                         name : ORMJDPreAmpPulseHighTimeChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(pulserMaskChanged:)
+                         name : ORMJDPreAmpPulserMaskChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(attenuatedChanged:)
+                         name : ORMJDPreAmpAttenuatedChanged
+						object: model];
+
+	[notifyCenter addObserver : self
+                     selector : @selector(finalAttenuatedChanged:)
+                         name : ORMJDPreAmpFinalAttenuatedChanged
+						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(enabledChanged:)
+                         name : ORMJDPreAmpEnabledChanged
+						object: model];
+
+	[notifyCenter addObserver : self
+                     selector : @selector(amplitudeArrayChanged:)
+                         name : ORMJDPreAmpAmplitudeArrayChanged
+						object: model];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(amplitudeChanged:)
+						 name : ORMJDPreAmpAmplitudeChanged
+					   object : model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(pulseCountChanged:)
+                         name : ORMJDPreAmpModelPulseCountChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(loopForeverChanged:)
+                         name : ORMJDPreAmpModelLoopForeverChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -92,9 +145,78 @@
     [super updateWindow];
     [self settingsLockChanged:nil];
 	[self dacArrayChanged:nil];
+	[self dacChanged:nil];
+	[self amplitudeArrayChanged:nil];
+	[self pulseLowTimeChanged:nil];
+	[self pulseHighTimeChanged:nil];
+	[self pulserMaskChanged:nil];
+	[self attenuatedChanged:nil];
+	[self finalAttenuatedChanged:nil];
+	[self enabledChanged:nil];
+	[self pulseCountChanged:nil];
+	[self loopForeverChanged:nil];
 }
 
 #pragma mark ⅴ쩒nterface Management
+
+- (void) loopForeverChanged:(NSNotification*)aNote
+{
+	[loopForeverPU selectItemAtIndex: [model loopForever]];
+	[self updateButtons];
+}
+
+- (void) pulseCountChanged:(NSNotification*)aNote
+{
+	[pulseCountField setIntValue: [model pulseCount]];
+}
+
+- (void) enabledChanged:(NSNotification*)aNote
+{
+	[enabled0PU selectItemAtIndex: [model enabled:0]];
+	[enabled1PU selectItemAtIndex: [model enabled:1]];
+}
+
+- (void) attenuatedChanged:(NSNotification*)aNote
+{
+	[attenuated0PU selectItemAtIndex: [model attenuated:0]];
+	[attenuated1PU selectItemAtIndex: [model attenuated:1]];
+}
+
+- (void) finalAttenuatedChanged:(NSNotification*)aNote
+{
+	[finalAttenuated0PU selectItemAtIndex: [model finalAttenuated:0]];
+	[finalAttenuated1PU selectItemAtIndex: [model finalAttenuated:1]];
+}
+
+- (void) pulserMaskChanged:(NSNotification*)aNote
+{
+	unsigned short aMask = [model pulserMask];
+	int i;
+	for(i=0;i<16;i++){
+		BOOL bitSet = (aMask&(1<<i))>0;
+		if(bitSet != [[pulserMaskMatrix cellWithTag:i] intValue]){
+			[[pulserMaskMatrix cellWithTag:i] setState:bitSet];
+		}
+	}
+}
+
+- (void) pulseHighTimeChanged:(NSNotification*)aNote
+{
+	[pulseHighTimeField setFloatValue: [model pulseHighTime]*2]; //convert to 탎econds
+	[self displayFrequency];
+}
+
+- (void) pulseLowTimeChanged:(NSNotification*)aNote
+{
+	[pulseLowTimeField setFloatValue: [model pulseLowTime]*2]; //convert to 탎econds
+	[self displayFrequency];
+}
+
+- (void) displayFrequency
+{
+	[frequencyField setFloatValue: 1/ (([model pulseLowTime] + [model pulseHighTime]) * 2.0E-6)];
+}
+
 - (void) checkGlobalSecurity
 {
     BOOL secure = [gSecurity globalSecurityEnabled];
@@ -103,33 +225,117 @@
 }
 
 - (void) settingsLockChanged:(NSNotification *)notification
-{
+{    
     BOOL locked = [gSecurity isLocked:MJDPreAmpSettingsLock];
-    //BOOL runInProgress = [gOrcaGlobals runInProgress];
-    //BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:MJDPreAmpSettingsLock];
-    //BOOL lockedOrRunning = [gSecurity runInProgressOrIsLocked:MJDPreAmpSettingsLock];
-    
     [settingsLockButton setState:locked];
+	[self updateButtons];
+}
+
+- (void) updateButtons
+{
+    //BOOL locked = [gSecurity isLocked:MJDPreAmpSettingsLock];
+    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:MJDPreAmpSettingsLock];
+	[loopForeverPU setEnabled:!lockedOrRunningMaintenance];
+	[pulseCountField setEnabled:!lockedOrRunningMaintenance && ![model loopForever]];
+	[enabled0PU setEnabled:!lockedOrRunningMaintenance];
+	[enabled1PU setEnabled:!lockedOrRunningMaintenance];
+	[finalAttenuated0PU setEnabled:!lockedOrRunningMaintenance];
+	[finalAttenuated1PU setEnabled:!lockedOrRunningMaintenance];
+	[pulseHighTimeField setEnabled:!lockedOrRunningMaintenance];
+	[pulseLowTimeField setEnabled:!lockedOrRunningMaintenance];
+	[dacsMatrix setEnabled:!lockedOrRunningMaintenance];
+	[amplitudesMatrix setEnabled:!lockedOrRunningMaintenance];
+	[pulserMaskMatrix setEnabled:!lockedOrRunningMaintenance];	
 }
 
 - (void) dacChanged:(NSNotification*)aNotification
 {
 	int chan = [[[aNotification userInfo] objectForKey:@"Channel"] intValue];
-	[[dacsMatrix cellWithTag:chan] setFloatValue: [model dac:chan]*4.1/65535.];
+	[[dacsMatrix cellWithTag:chan] setFloatValue: [model dac:chan]*4.1/65535.];		//convert to volts
 }
+
+- (void) amplitudeChanged:(NSNotification*)aNotification
+{
+	int chan = [[[aNotification userInfo] objectForKey:@"Channel"] intValue];
+	[[amplitudesMatrix cellWithTag:chan] setIntValue: [model amplitude:chan]];		//convert to volts
+}
+
 
 - (void) dacArrayChanged:(NSNotification*)aNotification
 {
 	short chan;
 	for(chan=0;chan<kMJDPreAmpDacChannels;chan++){
-		[[dacsMatrix cellWithTag:chan] setFloatValue: [model dac:chan]*4.1/65535.];
+		[[dacsMatrix cellWithTag:chan] setFloatValue: [model dac:chan]*4.1/65535.]; //convert to volts
+	}
+}
+- (void) amplitudeArrayChanged:(NSNotification*)aNotification
+{
+	short chan;
+	for(chan=0;chan<kMJDPreAmpDacChannels;chan++){
+		[[amplitudesMatrix cellWithTag:chan] setIntValue: [model amplitude:chan]]; //convert to volts
 	}
 }
 
+
 #pragma mark ⅴ쩇ctions
-- (void) dacsAction:(id)sender
+
+- (void) loopForeverAction:(id)sender
 {
-	[model setDac:[[sender selectedCell] tag] withValue:[sender floatValue]*65535./4.1];
+	[model setLoopForever:[sender indexOfSelectedItem]];	
+}
+
+- (void) pulseCountAction:(id)sender
+{
+	[model setPulseCount:[sender intValue]];	
+}
+
+- (IBAction) enabledAction:(id)sender
+{
+	int index = [sender tag];
+	[model setEnabled:index value:[sender indexOfSelectedItem]];	
+}
+
+- (IBAction) attenuatedAction:(id)sender
+{
+	int index = [sender tag];
+	[model setAttenuated:index value:[sender indexOfSelectedItem]];	
+}
+
+- (IBAction) finalAttenuatedAction:(id)sender
+{
+	int index = [sender tag];
+	[model setFinalAttenuated:index value:[sender indexOfSelectedItem]];	
+}
+
+- (IBAction) pulserMaskAction:(id)sender
+{
+	unsigned short mask = 0;
+	int i;
+	for(i=0;i<16;i++){
+		int theValue = [[pulserMaskMatrix cellWithTag:i] intValue];
+		if(theValue) mask |= (0x1<<i);
+	}
+	[model setPulserMask:mask];	
+}
+
+- (IBAction) pulseHighTimeAction:(id)sender
+{
+	[model setPulseHighTime:[sender intValue]/2]; //convert from 탎econds to hw value
+}
+
+- (IBAction) pulseLowTimeAction:(id)sender
+{
+	[model setPulseLowTime:[sender intValue]/2];	 //convert from 탎econds to hw value
+}
+
+- (IBAction) dacsAction:(id)sender
+{
+	[model setDac:[[sender selectedCell] tag] withValue:[sender floatValue]*65535./4.1]; //convert from volts to hw value
+}
+
+- (IBAction) amplitudesAction:(id)sender
+{
+	[model setAmplitude:[[sender selectedCell] tag] withValue:[sender intValue]]; 
 }
 
 - (IBAction) settingsLockAction:(id)sender
@@ -142,9 +348,15 @@
 {
 }
 
-- (IBAction) writeAction:(id)sender
+- (IBAction) writeFetVdsAction:(id)sender
 {
-	[model writeDacValuesToHW];
+	[model writeFetVdsToHW];
 }
+
+- (IBAction) writePulserDacAction:(id)sender
+{
+	[model writePulserValuesToHW];
+}
+
 
 @end
