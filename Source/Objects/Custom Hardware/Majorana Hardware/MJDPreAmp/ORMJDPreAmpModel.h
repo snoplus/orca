@@ -24,6 +24,7 @@
 #define kMJDPreAmpDacChannels 16
 
 @interface ORMJDPreAmpModel : OrcaObject {
+    NSMutableArray* adcs;
     NSMutableArray* dacs;
     NSMutableArray* amplitudes;
     unsigned short pulserMask;
@@ -32,6 +33,7 @@
     BOOL attenuated[2];
     BOOL finalAttenuated[2];
     BOOL enabled[2];
+    int adcRange[2];
     unsigned short pulseCount;
     BOOL loopForever;
 }
@@ -39,12 +41,19 @@
 - (void) setUpArrays;
 
 #pragma mark ¥¥¥Accessors
+- (NSMutableArray*) adcs;
+- (void) setAdcs:(NSMutableArray*)aAdcs;
+- (unsigned long) adc:(unsigned short) aChan;
+- (void) setAdc:(int) aChan withValue:(unsigned long) aValue;
 - (BOOL) loopForever;
 - (void) setLoopForever:(BOOL)aLoopForever;
 - (unsigned short) pulseCount;
 - (void) setPulseCount:(unsigned short)aPulseCount;
 - (BOOL) enabled:(int)index;
 - (void) setEnabled:(int)index value:(BOOL)aEnabled;
+- (int) adcRange:(int)index;
+- (void) setAdcRange:(int)index value:(int)aValue;
+
 - (BOOL) attenuated:(int)index;
 - (void) setAttenuated:(int)index value:(BOOL)aAttenuated;
 - (BOOL) finalAttenuated:(int)index;
@@ -72,14 +81,16 @@
 - (void) writeAuxIOSPI:(unsigned long)aValue;
 - (unsigned long) readAuxIOSPI;
 
+
 #pragma mark ¥¥¥Archival
 - (id)      initWithCoder:(NSCoder*)aDecoder;
 - (void)    encodeWithCoder:(NSCoder*)anEncoder;
 @end
 
 #pragma mark ¥¥¥External Strings
-extern NSString* ORMJDPreAmpModelLoopForeverChanged;
-extern NSString* ORMJDPreAmpModelPulseCountChanged;
+extern NSString* ORMJDPreAmpAdcArrayChanged;
+extern NSString* ORMJDPreAmpLoopForeverChanged;
+extern NSString* ORMJDPreAmpPulseCountChanged;
 extern NSString* ORMJDPreAmpEnabledChanged;
 extern NSString* ORMJDPreAmpAttenuatedChanged;
 extern NSString* ORMJDPreAmpFinalAttenuatedChanged;
@@ -91,6 +102,8 @@ extern NSString* ORMJDPreAmpAmplitudeArrayChanged;
 extern NSString* MJDPreAmpSettingsLock;
 extern NSString* ORMJDPreAmpDacChanged;
 extern NSString* ORMJDPreAmpAmplitudeChanged;
+extern NSString* ORMJDPreAmpAdcChanged;
+extern NSString* ORMJDPreAmpAdcRangeChanged;
 
 @interface NSObject (ORMJDPreAmpModel)
 - (void) writeAuxIOSPI:(unsigned long)spiData;

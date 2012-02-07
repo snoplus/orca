@@ -22,8 +22,9 @@
 #import "ORMJDPreAmpModel.h"
 
 #pragma mark ¥¥¥Notification Strings
-NSString* ORMJDPreAmpModelLoopForeverChanged = @"ORMJDPreAmpModelLoopForeverChanged";
-NSString* ORMJDPreAmpModelPulseCountChanged = @"ORMJDPreAmpModelPulseCountChanged";
+NSString* ORMJDPreAmpAdcArrayChanged	= @"ORMJDPreAmpAdcArrayChanged";
+NSString* ORMJDPreAmpLoopForeverChanged = @"ORMJDPreAmpLoopForeverChanged";
+NSString* ORMJDPreAmpPulseCountChanged = @"ORMJDPreAmpPulseCountChanged";
 NSString* ORMJDPreAmpEnabledChanged			= @"ORMJDPreAmpEnabledChanged";
 NSString* ORMJDPreAmpAttenuatedChanged		= @"ORMJDPreAmpAttenuatedChanged";
 NSString* ORMJDPreAmpFinalAttenuatedChanged	= @"ORMJDPreAmpFinalAttenuatedChanged";
@@ -35,6 +36,8 @@ NSString* ORMJDPreAmpDacChanged				= @"ORMJDPreAmpDacChanged";
 NSString* ORMJDPreAmpAmplitudeArrayChanged	= @"ORMJDPreAmpAmplitudeArrayChanged";
 NSString* ORMJDPreAmpAmplitudeChanged		= @"ORMJDPreAmpAmplitudeChanged";
 NSString* MJDPreAmpSettingsLock				= @"MJDPreAmpSettingsLock";
+NSString* ORMJDPreAmpAdcChanged				= @"ORMJDPreAmpAdcChanged";
+NSString* ORMJDPreAmpAdcRangeChanged		= @"ORMJDPreAmpAdcRangeChanged";
 
 #pragma mark ¥¥¥Local Strings
 static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
@@ -65,6 +68,7 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 
 - (void) dealloc
 {
+    [adcs release];
     [dacs release];
     [super dealloc];
 }
@@ -83,6 +87,13 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 		int i;
 		for(i=0;i<kMJDPreAmpDacChannels;i++){
 			[amplitudes addObject:[NSNumber numberWithInt:0]];
+		}	
+	}
+	if(!adcs){
+		[self setAdcs:[NSMutableArray arrayWithCapacity:kMJDPreAmpDacChannels]];
+		int i;
+		for(i=0;i<kMJDPreAmpDacChannels;i++){
+			[adcs addObject:[NSNumber numberWithInt:0]];
 		}	
 	}
 }
@@ -108,6 +119,54 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 }
 
 #pragma mark ¥¥¥Accessors
+- (int) adcRange:(int)index
+{
+	if(index>=0 && index<2) return adcRange[index];
+	else return 0;
+}
+
+- (void) setAdcRange:(int)index value:(int)aValue
+{	
+	if(index<0 || index>1) return;
+	[[[self undoManager] prepareWithInvocationTarget:self] setAdcRange:index value:[self adcRange:index]];
+	adcRange[index] = aValue;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpAdcRangeChanged
+															object:self];
+		
+}
+
+- (NSMutableArray*) adcs
+{
+    return adcs;
+}
+
+- (void) setAdcs:(NSMutableArray*)aAdcs
+{
+    [aAdcs retain];
+    [adcs release];
+    adcs = aAdcs;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpAdcArrayChanged object:self];
+}
+
+- (unsigned long) adc:(unsigned short) aChan
+{
+    return [[adcs objectAtIndex:aChan] unsignedLongValue];
+}
+
+- (void) setAdc:(int) aChan withValue:(unsigned long) aValue
+{
+	if(aValue>0xffff) aValue = 0xffff;
+    [[[self undoManager] prepareWithInvocationTarget:self] setAdc:aChan withValue:[self adc:aChan]];
+	[adcs replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
+	
+    NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+    [userInfo setObject:[NSNumber numberWithInt:aChan] forKey: @"Channel"];
+	
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpAdcChanged
+														object:self
+													  userInfo: userInfo];
+}
 
 - (BOOL) loopForever
 {
@@ -120,7 +179,7 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
     
     loopForever = aLoopForever;
 
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpModelLoopForeverChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpLoopForeverChanged object:self];
 }
 
 - (unsigned short) pulseCount
@@ -134,7 +193,7 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
     
     pulseCount = aPulseCount;
 
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpModelPulseCountChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpPulseCountChanged object:self];
 }
 
 - (BOOL) enabled:(int)index
@@ -388,6 +447,7 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 	[self setPulseLowTime:	[decoder decodeIntForKey:@"pulseLowTime"]];
 	[self setPulserMask:	[decoder decodeIntForKey:@"pulserMask"]];
     [self setDacs:			[decoder decodeObjectForKey:@"dacs"]];
+	[self setAdcs:			[decoder decodeObjectForKey:@"adcs"]];
     [self setAmplitudes:	[decoder decodeObjectForKey:@"amplitudes"]];
     if(!dacs || !amplitudes)	[self setUpArrays];
     [[self undoManager] enableUndoRegistration];
@@ -412,6 +472,7 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 	[encoder encodeInt:pulserMask		forKey:@"pulserMask"];
 	[encoder encodeObject:dacs			forKey:@"dacs"];
 	[encoder encodeObject:amplitudes	forKey:@"amplitudes"];
+	[encoder encodeObject:adcs			forKey:@"adcs"];
 }
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary

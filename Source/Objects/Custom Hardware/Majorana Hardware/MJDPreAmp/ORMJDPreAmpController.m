@@ -119,6 +119,12 @@
 						object: model];
 
 	[notifyCenter addObserver : self
+                     selector : @selector(adcRangeChanged:)
+                         name : ORMJDPreAmpAdcRangeChanged
+						object: model];
+	
+	
+	[notifyCenter addObserver : self
                      selector : @selector(amplitudeArrayChanged:)
                          name : ORMJDPreAmpAmplitudeArrayChanged
 						object: model];
@@ -130,14 +136,24 @@
 	
     [notifyCenter addObserver : self
                      selector : @selector(pulseCountChanged:)
-                         name : ORMJDPreAmpModelPulseCountChanged
+                         name : ORMJDPreAmpPulseCountChanged
 						object: model];
 
     [notifyCenter addObserver : self
                      selector : @selector(loopForeverChanged:)
-                         name : ORMJDPreAmpModelLoopForeverChanged
+                         name : ORMJDPreAmpLoopForeverChanged
 						object: model];
 
+	[notifyCenter addObserver : self
+                     selector : @selector(adcChanged:)
+                         name : ORMJDPreAmpAdcChanged
+						object: model];
+
+	[notifyCenter addObserver : self
+                     selector : @selector(adcArrayChanged:)
+                         name : ORMJDPreAmpAdcArrayChanged
+						object: model];
+	
 }
 
 - (void) updateWindow
@@ -153,11 +169,32 @@
 	[self attenuatedChanged:nil];
 	[self finalAttenuatedChanged:nil];
 	[self enabledChanged:nil];
+	[self adcRangeChanged:nil];
 	[self pulseCountChanged:nil];
 	[self loopForeverChanged:nil];
+	[self adcChanged:nil];
 }
 
 #pragma mark ¥¥¥Interface Management
+- (void) adcRangeChanged:(NSNotification*)aNote
+{
+	[adcRange0PU selectItemAtIndex: [model adcRange:0]];
+	[adcRange1PU selectItemAtIndex: [model adcRange:1]];
+}
+
+- (void) adcArrayChanged:(NSNotification*)aNote
+{
+	short chan;
+	for(chan=0;chan<kMJDPreAmpDacChannels;chan++){
+		[[adcMatrix cellWithTag:chan] setIntValue: [model adc:chan]]; //convert to volts
+	}
+}
+
+- (void) adcChanged:(NSNotification*)aNote
+{
+	int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+	[[adcMatrix cellWithTag:chan] setIntValue: [model adc:chan]];		//convert to volts
+}
 
 - (void) loopForeverChanged:(NSNotification*)aNote
 {
@@ -248,9 +285,8 @@
 	[pulserMaskMatrix	setEnabled:!lockedOrRunningMaintenance];	
 	[startPulserButton	setEnabled:!lockedOrRunningMaintenance];	
 	[stopPulserButton	setEnabled:!lockedOrRunningMaintenance];	
-	
-	
 }
+
 
 - (void) dacChanged:(NSNotification*)aNotification
 {
@@ -263,7 +299,6 @@
 	int chan = [[[aNotification userInfo] objectForKey:@"Channel"] intValue];
 	[[amplitudesMatrix cellWithTag:chan] setIntValue: [model amplitude:chan]];		//convert to volts
 }
-
 
 - (void) dacArrayChanged:(NSNotification*)aNotification
 {

@@ -22,6 +22,7 @@
 {
     @private
 		IBOutlet NSButton*		settingsLockButton;
+		IBOutlet NSMatrix*		adcMatrix;
 		IBOutlet NSPopUpButton* loopForeverPU;
 		IBOutlet NSTextField*	pulseCountField;
 		IBOutlet NSPopUpButton* enabled0PU;
@@ -38,6 +39,8 @@
 		IBOutlet NSTextField*   frequencyField;
 		IBOutlet NSButton*		startPulserButton;
 		IBOutlet NSButton*		stopPulserButton;
+		IBOutlet NSPopUpButton* adcRange0PU;
+		IBOutlet NSPopUpButton* adcRange1PU;
 }
 
 #pragma mark ¥¥¥Initialization
@@ -50,6 +53,7 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ¥¥¥Interface Management
+- (void) adcArrayChanged:(NSNotification*)aNote;
 - (void) loopForeverChanged:(NSNotification*)aNote;
 - (void) pulseCountChanged:(NSNotification*)aNote;
 - (void) amplitudeChanged:(NSNotification*)aNote;
@@ -67,6 +71,9 @@
 - (void) settingsLockChanged:(NSNotification *)notification;
 - (void) updateButtons;
 - (void) displayFrequency;
+- (void) adcArrayChanged:(NSNotification*)aNote;
+- (void) adcChanged:(NSNotification*)aNote;
+- (void) adcRangeChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) amplitudesAction:(id)sender;
@@ -80,7 +87,6 @@
 - (IBAction) pulseLowTimeAction:(id)sender;
 - (IBAction) dacsAction:(id)sender;
 - (IBAction) settingsLockAction:(id)sender;
-- (IBAction) readAction:(id)sender;
 - (IBAction) writeFetVdsAction:(id)sender;
 - (IBAction) startPulserAction:(id)sender;
 - (IBAction) stopPulserAction:(id)sender;
