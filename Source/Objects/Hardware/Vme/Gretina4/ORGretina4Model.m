@@ -2165,18 +2165,20 @@ static struct {
     unsigned long spiBase = [self readRegister:kAuxIOWrite] & ~(kSPIData | kSPIClock | kSPIChipSelect); 
     unsigned long value;
 	
+    // set kSPIChipSelect to signify that we are starting
+    [self writeRegister:kAuxIOWrite withValue:(kSPIChipSelect | kSPIClock | kSPIData)];
     // now write spiData starting from MSB on kSPIData, pulsing kSPIClock
     // each iteration
     int i;
     for(i=0; i<32; i++) {
-        value = spiBase;
-        if( (spiData & 0x80000000) != 0) value |= kSPIData;
-        [self writeRegister:kAuxIOWrite withValue:value];
+        value = spiBase | kSPIChipSelect | kSPIData;
+        if( (spiData & 0x80000000) != 0) value &= (~kSPIData);
         [self writeRegister:kAuxIOWrite withValue:value | kSPIClock];
+        [self writeRegister:kAuxIOWrite withValue:value];
         spiData = spiData << 1;
     }
-    // set kSPIChipSelect to signify that we are done
-    [self writeRegister:kAuxIOWrite withValue:kSPIChipSelect];
+    // unset kSPIChipSelect to signify that we are done
+    [self writeRegister:kAuxIOWrite withValue:(kSPIClock | kSPIData)];
 }
 
 - (unsigned long) readAuxIOSPI
