@@ -2614,6 +2614,12 @@
 		9CF2C1BB0CC195E2002B279B /* ORL8013CrateModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CF2C1B10CC195E1002B279B /* ORL8013CrateModel.m */; };
 		B322A309146D64D000491347 /* ORTcpIpProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = B322A308146D64D000491347 /* ORTcpIpProtocol.h */; };
 		B33FBC93146F2A6A0046A733 /* edu.washington.npl.orca.VXIHardware.plist in Resources */ = {isa = PBXBuildFile; fileRef = B33FBC92146F2A6A0046A733 /* edu.washington.npl.orca.VXIHardware.plist */; };
+		B38DEE4814E02B40003914FF /* ADVME1314.gif in Resources */ = {isa = PBXBuildFile; fileRef = B38DEE4214E02B40003914FF /* ADVME1314.gif */; };
+		B38DEE4914E02B40003914FF /* ADVME1314.nib in Resources */ = {isa = PBXBuildFile; fileRef = B38DEE4314E02B40003914FF /* ADVME1314.nib */; };
+		B38DEE4A14E02B40003914FF /* ORADVME1314Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = B38DEE4414E02B40003914FF /* ORADVME1314Controller.h */; };
+		B38DEE4B14E02B40003914FF /* ORADVME1314Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = B38DEE4514E02B40003914FF /* ORADVME1314Controller.m */; };
+		B38DEE4C14E02B40003914FF /* ORADVME1314Model.h in Headers */ = {isa = PBXBuildFile; fileRef = B38DEE4614E02B40003914FF /* ORADVME1314Model.h */; };
+		B38DEE4D14E02B40003914FF /* ORADVME1314Model.m in Sources */ = {isa = PBXBuildFile; fileRef = B38DEE4714E02B40003914FF /* ORADVME1314Model.m */; };
 		CE0D70B4146812E000B241D8 /* hardwareFinder.tiff in Resources */ = {isa = PBXBuildFile; fileRef = CE0D70B3146812E000B241D8 /* hardwareFinder.tiff */; };
 		CE10F0111451674C0084C15D /* ORXYCom200Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = CE10F005145167450084C15D /* ORXYCom200Controller.h */; };
 		CE10F0121451674C0084C15D /* ORXYCom200Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = CE10F006145167460084C15D /* ORXYCom200Controller.m */; };
@@ -5377,6 +5383,12 @@
 		9CF2C1B10CC195E1002B279B /* ORL8013CrateModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORL8013CrateModel.m; path = "Source/Objects/Hardware/Camac/L8013 Crate/ORL8013CrateModel.m"; sourceTree = SOURCE_ROOT; };
 		B322A308146D64D000491347 /* ORTcpIpProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORTcpIpProtocol.h; sourceTree = "<group>"; };
 		B33FBC92146F2A6A0046A733 /* edu.washington.npl.orca.VXIHardware.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = edu.washington.npl.orca.VXIHardware.plist; sourceTree = "<group>"; };
+		B38DEE4214E02B40003914FF /* ADVME1314.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = ADVME1314.gif; sourceTree = "<group>"; };
+		B38DEE4314E02B40003914FF /* ADVME1314.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = ADVME1314.nib; sourceTree = "<group>"; };
+		B38DEE4414E02B40003914FF /* ORADVME1314Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORADVME1314Controller.h; sourceTree = "<group>"; };
+		B38DEE4514E02B40003914FF /* ORADVME1314Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORADVME1314Controller.m; sourceTree = "<group>"; };
+		B38DEE4614E02B40003914FF /* ORADVME1314Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORADVME1314Model.h; sourceTree = "<group>"; };
+		B38DEE4714E02B40003914FF /* ORADVME1314Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORADVME1314Model.m; sourceTree = "<group>"; };
 		CE0D70B3146812E000B241D8 /* hardwareFinder.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = hardwareFinder.tiff; path = "../Main Dialogs/HardwareFinder/hardwareFinder.tiff"; sourceTree = "<group>"; };
 		CE10F005145167450084C15D /* ORXYCom200Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORXYCom200Controller.h; path = Source/Objects/Hardware/Vme/XYCom/ORXYCom200Controller.h; sourceTree = SOURCE_ROOT; };
 		CE10F006145167460084C15D /* ORXYCom200Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORXYCom200Controller.m; path = Source/Objects/Hardware/Vme/XYCom/ORXYCom200Controller.m; sourceTree = SOURCE_ROOT; };
@@ -11221,6 +11233,19 @@
 			path = "Source/Objects/Hardware/Camac/L8013 Crate";
 			sourceTree = SOURCE_ROOT;
 		};
+		B38DEE4114E02B40003914FF /* Advanet */ = {
+			isa = PBXGroup;
+			children = (
+				B38DEE4214E02B40003914FF /* ADVME1314.gif */,
+				B38DEE4314E02B40003914FF /* ADVME1314.nib */,
+				B38DEE4414E02B40003914FF /* ORADVME1314Controller.h */,
+				B38DEE4514E02B40003914FF /* ORADVME1314Controller.m */,
+				B38DEE4614E02B40003914FF /* ORADVME1314Model.h */,
+				B38DEE4714E02B40003914FF /* ORADVME1314Model.m */,
+			);
+			path = Advanet;
+			sourceTree = "<group>";
+		};
 		CE68866C0D0CE0E400FA4158 /* PlugIns */ = {
 			isa = PBXGroup;
 			children = (
@@ -11507,6 +11532,7 @@
 		F51E69A103AE4776015F64B1 /* Vme */ = {
 			isa = PBXGroup;
 			children = (
+				B38DEE4114E02B40003914FF /* Advanet */,
 				F51E69E003AE4776015F64B1 /* Vme Base Classes */,
 				8493CC790C99FA4B00B46CD4 /* VMEcpu */,
 				8402796907397B8700972B07 /* Bit3 Adaptor */,
@@ -12677,6 +12703,8 @@
 				848F6CAC14C75F690093E502 /* ORSIS3150Model.h in Headers */,
 				8407398214CDD91F00BAD105 /* ORMet637Controller.h in Headers */,
 				8407398414CDD91F00BAD105 /* ORMet637Model.h in Headers */,
+				B38DEE4A14E02B40003914FF /* ORADVME1314Controller.h in Headers */,
+				B38DEE4C14E02B40003914FF /* ORADVME1314Model.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13482,6 +13510,8 @@
 				848F6FE014C9B8FB0093E502 /* SIS3150Firmware in Resources */,
 				8407398014CDD91F00BAD105 /* Met637.nib in Resources */,
 				8407398114CDD91F00BAD105 /* Met637.tif in Resources */,
+				B38DEE4814E02B40003914FF /* ADVME1314.gif in Resources */,
+				B38DEE4914E02B40003914FF /* ADVME1314.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14394,6 +14424,8 @@
 				848F6CAD14C75F690093E502 /* ORSIS3150Model.m in Sources */,
 				8407398314CDD91F00BAD105 /* ORMet637Controller.m in Sources */,
 				8407398514CDD91F00BAD105 /* ORMet637Model.m in Sources */,
+				B38DEE4B14E02B40003914FF /* ORADVME1314Controller.m in Sources */,
+				B38DEE4D14E02B40003914FF /* ORADVME1314Model.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
