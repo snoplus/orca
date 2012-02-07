@@ -18,7 +18,6 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
 #pragma mark ¥¥¥Imported Files
 #import "ORMJDPreAmpController.h"
 #import "ORMJDPreAmpModel.h"
@@ -30,7 +29,6 @@
     self = [super initWithWindowNibName:@"MJDPreAmp"];
     return self;
 }
-
 
 - (void) dealloc
 {
@@ -49,9 +47,10 @@
 		[[dacsMatrix cellAtRow:chan column:0] setFormatter:aFormat];
 		[[amplitudesMatrix cellAtRow:chan column:0] setTag:chan];
 		[[pulserMaskMatrix cellAtRow:chan column:0] setTag:chan];
+		[[adcMatrix cellAtRow:chan column:0] setTag:chan];
+		[[adcMatrix cellAtRow:chan column:0] setFormatter:aFormat];
 	}
 }
-
 
 - (void) setModel:(id)aModel
 {
@@ -59,7 +58,6 @@
     [[self window] setTitle:[NSString stringWithFormat:@"PreAmp %d",[model uniqueIdNumber]]];
     [self settingsLockChanged:nil];
 }
-
 
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers
@@ -123,7 +121,6 @@
                          name : ORMJDPreAmpAdcRangeChanged
 						object: model];
 	
-	
 	[notifyCenter addObserver : self
                      selector : @selector(amplitudeArrayChanged:)
                          name : ORMJDPreAmpAmplitudeArrayChanged
@@ -172,7 +169,7 @@
 	[self adcRangeChanged:nil];
 	[self pulseCountChanged:nil];
 	[self loopForeverChanged:nil];
-	[self adcChanged:nil];
+	[self adcArrayChanged:nil];
 }
 
 #pragma mark ¥¥¥Interface Management
@@ -317,7 +314,6 @@
 
 
 #pragma mark ¥¥¥Actions
-
 - (void) loopForeverAction:(id)sender
 {
 	[model setLoopForever:![sender indexOfSelectedItem]];	
@@ -396,5 +392,16 @@
 {
 	[model stopPulser];
 }
+
+- (IBAction) adcRangeAction:(id)sender
+{
+	[model setAdcRange:[sender tag] value:[sender indexOfSelectedItem]]; 
+}
+
+- (IBAction) readAdcs:(id)sender
+{
+	[model readAdcs]; 
+}
+
 
 @end

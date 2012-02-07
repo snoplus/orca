@@ -47,10 +47,29 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 #define kDAC3 0x82000000
 #define kDAC4 0x83000000
 
+#define kAdcChannel0Sel 0x00803000
+#define kAdcChannel1Sel 0x00843000
+#define kAdcChannel2Sel 0x00883000
+#define kAdcChannel3Sel 0x008C3000
+#define kAdcChannel4Sel 0x00903000
+#define kAdcChannel5Sel 0x00943000
+#define kAdcChannel6Sel 0x00983000
+#define kAdcChannel7Sel 0x009C3000
+
+#define kADCRange10Reg1		0x00A000
+#define kADCRange5Reg1		0x00AAA0
+#define kADCRange2_5Reg1	0x00BA40
+
+#define kADCRange10Reg2		0x00C000
+#define kADCRange5Reg2		0x00CAA0
+#define kADCRange2_5Reg2	0x00DA40
+
+#define kADC1ReadWrite		0xE0000000
+#define kADC2ReadWrite		0xE1000000
 #define kDACA_H_Base		0x00200000
-#define kFrequencyMask		0xc0000000
-#define kAttnPatternMask	0xc1000000
-#define kAttnPulseCountMask	0xc2000000
+#define kFrequencyMask		0xC0000000
+#define kAttnPatternMask	0xC1000000
+#define kAttnPulseCountMask	0xC2000000
 #define kPulserLoopForever  (0x1<<23)
 #define kPulserUseLoopCount (0x1<<22)
 
@@ -128,6 +147,8 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 - (void) setAdcRange:(int)index value:(int)aValue
 {	
 	if(index<0 || index>1) return;
+	if(aValue<0)	  aValue = 0;
+	else if(aValue>2) aValue = 2;
 	[[[self undoManager] prepareWithInvocationTarget:self] setAdcRange:index value:[self adcRange:index]];
 	adcRange[index] = aValue;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpAdcRangeChanged
@@ -154,10 +175,10 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
     return [[adcs objectAtIndex:aChan] unsignedLongValue];
 }
 
-- (void) setAdc:(int) aChan withValue:(unsigned long) aValue
+- (void) setAdc:(int) aChan value:(unsigned long) aValue
 {
 	if(aValue>0xffff) aValue = 0xffff;
-    [[[self undoManager] prepareWithInvocationTarget:self] setAdc:aChan withValue:[self adc:aChan]];
+    [[[self undoManager] prepareWithInvocationTarget:self] setAdc:aChan value:[self adc:aChan]];
 	[adcs replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
 	
     NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
@@ -377,12 +398,73 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 		[self writeAuxIOSPI:theValue];
 	}
 }
+
+- (void) writeRangeForAdcChip:(int)index
+{
+	if(index>=0 && index<2){
+		unsigned long rangeValue[2][3] = {
+			{kADCRange10Reg1, kADCRange5Reg1, kADCRange2_5Reg1},
+			{kADCRange10Reg2, kADCRange5Reg2, kADCRange2_5Reg2}
+		};
+		unsigned long adcReadWriteBase[2] = { kADC1ReadWrite, kADC2ReadWrite };
+		
+		unsigned long aValue = adcReadWriteBase[index] | rangeValue[index][adcRange[index]];
+		[self writeAuxIOSPI:aValue];
+	}
+}
+
+- (void) writeAdcChipRanges
+{
+	[self writeRangeForAdcChip:0];
+	[self writeRangeForAdcChip:1];
+}
+
+- (void) selectAdcOnChip:(int) aChip channel:(int)aChannel
+{
+	if(aChip<0 || aChip>1)		 return;
+	if(aChannel<0 || aChannel>7) return;
+	
+	unsigned long adcReadWriteBase[2] = { kADC1ReadWrite, kADC2ReadWrite };
+	unsigned long channelSelect[8] = {
+		kAdcChannel0Sel,kAdcChannel1Sel,kAdcChannel2Sel,kAdcChannel3Sel,
+		kAdcChannel4Sel,kAdcChannel5Sel,kAdcChannel6Sel,kAdcChannel7Sel,
+	};
+	[self writeAuxIOSPI:adcReadWriteBase[aChip] | channelSelect[aChannel]];
+}
+
+- (void) readAdcsOnChip:(int)aChip
+{
+	//tricky -- have to select a channel to be digitized, then the next time a selection is done the last channel can be read
+	[self writeRangeForAdcChip:aChip ];
+	int i;
+	for(i=0;i<8;i++){
+		[self selectAdcOnChip:aChip channel:i];
+		if(i>0){
+			unsigned long aValue = [self readAuxIOSPI] & 0x1fff; //!!!!fix to put the sign in the right place and convert to a number
+			[self setAdc:(aChip*8)+i value:aValue];
+		}
+	}
+	//select the first one and then read the last one
+	[self selectAdcOnChip:aChip channel:0];
+	unsigned long aValue = [self readAuxIOSPI] & 0x1fff; //!!!!fix to put the sign in the right place and convert to a number
+	[self setAdc:(aChip*8)+7 value:aValue];	
+}
+
+- (void) readAdcs
+{
+	int i;
+	for(i=0;i<2;i++){
+		[self readAdcsOnChip:i];
+	}
+}
+
 - (void) stopPulser
 {
 	//write zeros to the pattern, the attenuators, and the enabled fields.
 	[self writeAuxIOSPI:kAttnPatternMask];
 	NSLog(@"PreAmp(%d) Disabled Pulser\n",[self uniqueIdNumber]);
 }	
+
 - (void) startPulser
 {
 	unsigned long aValue = 0;
@@ -440,6 +522,7 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 		[self setEnabled:i value:[decoder decodeBoolForKey:[NSString stringWithFormat:@"enabled%d",i]]];
 		[self setAttenuated:i value:[decoder decodeBoolForKey:[NSString stringWithFormat:@"attenuated%d",i]]];
 		[self setFinalAttenuated:i value:[decoder decodeBoolForKey:[NSString stringWithFormat:@"finalAttenuated%d",i]]];
+		[self setAdcRange:i value:[decoder decodeIntForKey:[NSString stringWithFormat:@"adcRange%d",i]]];
 	}
     [self setLoopForever:	[decoder decodeBoolForKey:@"loopForever"]];
     [self setPulseCount:	[decoder decodeIntForKey:@"pulseCount"]];
@@ -462,7 +545,8 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 	for(i=0;i<2;i++){
 		[encoder encodeBool:enabled[i]			forKey:[NSString stringWithFormat:@"enabled%d",i]];
 		[encoder encodeBool:attenuated[i]		forKey:[NSString stringWithFormat:@"attenuated%d",i]];
-		[encoder encodeBool:finalAttenuated[i]		forKey:[NSString stringWithFormat:@"finalAttenuated%d",i]];
+		[encoder encodeBool:finalAttenuated[i]	forKey:[NSString stringWithFormat:@"finalAttenuated%d",i]];
+		[encoder encodeInt:adcRange[i]			forKey:[NSString stringWithFormat:@"adcRange%d",i]];
 	}
 	
 	[encoder encodeBool:loopForever		forKey:@"loopForever"];

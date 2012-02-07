@@ -76,6 +76,7 @@
 - (void) adcRangeChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Actions
+- (IBAction) adcRangeAction:(id)sender;
 - (IBAction) amplitudesAction:(id)sender;
 - (IBAction) loopForeverAction:(id)sender;
 - (IBAction) pulseCountAction:(id)sender;
@@ -90,4 +91,5 @@
 - (IBAction) writeFetVdsAction:(id)sender;
 - (IBAction) startPulserAction:(id)sender;
 - (IBAction) stopPulserAction:(id)sender;
+- (IBAction) readAdcs:(id)sender;
 @end

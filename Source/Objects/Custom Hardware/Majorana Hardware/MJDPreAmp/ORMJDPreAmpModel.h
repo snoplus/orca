@@ -44,7 +44,7 @@
 - (NSMutableArray*) adcs;
 - (void) setAdcs:(NSMutableArray*)aAdcs;
 - (unsigned long) adc:(unsigned short) aChan;
-- (void) setAdc:(int) aChan withValue:(unsigned long) aValue;
+- (void) setAdc:(int) aChan value:(unsigned long) aValue;
 - (BOOL) loopForever;
 - (void) setLoopForever:(BOOL)aLoopForever;
 - (unsigned short) pulseCount;
@@ -78,6 +78,10 @@
 - (void) stopPulser;
 - (void) writeFetVds:(int)index;
 - (void) writeFetVdsToHW;
+- (void) writeRangeForAdcChip:(int)index;
+- (void) writeAdcChipRanges;
+- (void) readAdcsOnChip:(int)aChip;
+- (void) readAdcs;
 - (void) writeAuxIOSPI:(unsigned long)aValue;
 - (unsigned long) readAuxIOSPI;
 
