@@ -80,8 +80,8 @@ NSString* ORLabJackMaxValueChanged				= @"ORLabJackMaxValueChanged";
 		minValue[i] = -10;
 		maxValue[i]  = 10;
 		//default to range from -10 to +10 over adc range of 0 to 4095
-		slope[i] = 20./4095.;
-		intercept[i] = -10;
+		slope[i] = 1;
+		intercept[i] = 0;
 	}
 		
 	return self;	
