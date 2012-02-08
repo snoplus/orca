@@ -181,6 +181,17 @@ void registryChanged(
     lastStringReceived = [aLastStringReceived copy];    
 }
 
+- (NSString*) commandByAppendingEOL:(NSString*) aCmd
+{
+	NSString* theCmd  = [aCmd removeNLandCRs];
+	switch(eolType){
+		case 1: theCmd = [theCmd stringByAppendingString:@"\r"]; break;
+		case 2: theCmd = [theCmd stringByAppendingString:@"\n"]; break;
+		case 3: theCmd = [theCmd stringByAppendingString:@"\r\n"]; break;
+	}
+	return theCmd;
+}
+
 - (int) eolType
 {
     return eolType;

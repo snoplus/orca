@@ -38,6 +38,7 @@
 #pragma mark ¥¥¥Accessors
 - (NSString*) lastStringReceived;
 - (void) setLastStringReceived:(NSString*)aLastStringReceived;
+- (NSString*) commandByAppendingEOL:(NSString*) aCmd;
 - (int) eolType;
 - (void) setEolType:(int)aEolType;
 - (NSMutableArray*) serialPorts;
