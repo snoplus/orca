@@ -32,9 +32,12 @@
 	ORFireWireBus*	fwBus;
 	ORUSB*			usb;
     int				eolType;
+    NSString* lastStringReceived;
 }
 
 #pragma mark ¥¥¥Accessors
+- (NSString*) lastStringReceived;
+- (void) setLastStringReceived:(NSString*)aLastStringReceived;
 - (int) eolType;
 - (void) setEolType:(int)aEolType;
 - (NSMutableArray*) serialPorts;
