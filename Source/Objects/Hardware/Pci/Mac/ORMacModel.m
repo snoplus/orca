@@ -66,6 +66,7 @@ void registryChanged(
 	[fwBus release];
 	[usb release];
     [serialPorts release];
+    [lastStringReceived release];
     [super dealloc];
 }
 
@@ -168,6 +169,17 @@ void registryChanged(
 
 
 #pragma mark ¥¥¥Accessors
+
+- (NSString*) lastStringReceived
+{
+    return lastStringReceived;
+}
+
+- (void) setLastStringReceived:(NSString*)aLastStringReceived
+{
+    [lastStringReceived autorelease];
+    lastStringReceived = [aLastStringReceived copy];    
+}
 
 - (int) eolType
 {

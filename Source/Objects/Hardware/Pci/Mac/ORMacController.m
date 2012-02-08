@@ -294,6 +294,7 @@
             theString = [theString stringByReplacingOccurrencesOfString:@"\r" withString:@"<CR>"];
             theString = [theString stringByReplacingOccurrencesOfString:@"\n" withString:@"<LF>"];
             theString = [theString stringByAppendingString:@"\n"];
+			[model setLastStringReceived:theString];
             [outputView replaceCharactersInRange:NSMakeRange([[outputView textStorage] length], 0) withString:theString];
             [outputView scrollRangeToVisible: NSMakeRange([[outputView textStorage] length], 0)];
             
