@@ -168,6 +168,7 @@ HANDLE openUSBConnection(int localID)
                 
                 //Check serial number
                 serial = buffer[28] + buffer[29]*256 + buffer[30]*65536 + 0x10000000;
+				printf("serial number: %x\n",serial);
                 if( serial == localID )
                     return hDevice;
 
