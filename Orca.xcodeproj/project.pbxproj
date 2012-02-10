@@ -1374,11 +1374,7 @@
 		8475EC491475A66F003A165D /* ORLabJackUE9Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 8475EC371475A66F003A165D /* ORLabJackUE9Decoders.m */; };
 		8475EC4A1475A66F003A165D /* ORLabJackUE9Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 8475EC381475A66F003A165D /* ORLabJackUE9Model.h */; };
 		8475EC4B1475A66F003A165D /* ORLabJackUE9Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 8475EC391475A66F003A165D /* ORLabJackUE9Model.m */; };
-		8475EC511475A752003A165D /* labjackusb.c in Sources */ = {isa = PBXBuildFile; fileRef = 8475EC4F1475A752003A165D /* labjackusb.c */; };
-		8475EC521475A752003A165D /* labjackusb.h in Headers */ = {isa = PBXBuildFile; fileRef = 8475EC501475A752003A165D /* labjackusb.h */; };
 		8475EC8B147693E8003A165D /* libusb-1.0.a in Frameworks_Copy */ = {isa = PBXBuildFile; fileRef = 8475EC0714759D53003A165D /* libusb-1.0.a */; };
-		8475ECEF14769A84003A165D /* ue9.c in Sources */ = {isa = PBXBuildFile; fileRef = 8475ECED14769A84003A165D /* ue9.c */; };
-		8475ECF014769A84003A165D /* ue9.h in Headers */ = {isa = PBXBuildFile; fileRef = 8475ECEE14769A84003A165D /* ue9.h */; };
 		84760CC20B370E0A00512F67 /* ORExperimentModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84760CC00B370E0A00512F67 /* ORExperimentModel.h */; };
 		84760CC30B370E0A00512F67 /* ORExperimentModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84760CC10B370E0A00512F67 /* ORExperimentModel.m */; };
 		84760D350B3728DF00512F67 /* KatrinConstants.h in Resources */ = {isa = PBXBuildFile; fileRef = 84760D340B3728DF00512F67 /* KatrinConstants.h */; };
@@ -4011,10 +4007,6 @@
 		8475EC371475A66F003A165D /* ORLabJackUE9Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORLabJackUE9Decoders.m; path = Source/Objects/Hardware/USB/LabJack/LabJackUE9/ORLabJackUE9Decoders.m; sourceTree = SOURCE_ROOT; };
 		8475EC381475A66F003A165D /* ORLabJackUE9Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORLabJackUE9Model.h; path = Source/Objects/Hardware/USB/LabJack/LabJackUE9/ORLabJackUE9Model.h; sourceTree = SOURCE_ROOT; };
 		8475EC391475A66F003A165D /* ORLabJackUE9Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORLabJackUE9Model.m; path = Source/Objects/Hardware/USB/LabJack/LabJackUE9/ORLabJackUE9Model.m; sourceTree = SOURCE_ROOT; };
-		8475EC4F1475A752003A165D /* labjackusb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = labjackusb.c; path = Source/Objects/Hardware/USB/LabJack/LabJackUSB/labjackusb.c; sourceTree = SOURCE_ROOT; };
-		8475EC501475A752003A165D /* labjackusb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = labjackusb.h; path = Source/Objects/Hardware/USB/LabJack/LabJackUSB/labjackusb.h; sourceTree = SOURCE_ROOT; };
-		8475ECED14769A84003A165D /* ue9.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ue9.c; path = Source/Objects/Hardware/USB/LabJack/LabJackUSB/ue9.c; sourceTree = SOURCE_ROOT; };
-		8475ECEE14769A84003A165D /* ue9.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ue9.h; path = Source/Objects/Hardware/USB/LabJack/LabJackUSB/ue9.h; sourceTree = SOURCE_ROOT; };
 		84760CC00B370E0A00512F67 /* ORExperimentModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORExperimentModel.h; sourceTree = "<group>"; };
 		84760CC10B370E0A00512F67 /* ORExperimentModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORExperimentModel.m; sourceTree = "<group>"; };
 		84760D340B3728DF00512F67 /* KatrinConstants.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = KatrinConstants.h; sourceTree = "<group>"; };
@@ -8125,7 +8117,6 @@
 		8475EC251475A66F003A165D /* LabJack */ = {
 			isa = PBXGroup;
 			children = (
-				8475EC4E1475A752003A165D /* LabJackUSB */,
 				8475EC261475A66F003A165D /* LabJackU12 */,
 				8475EC301475A66F003A165D /* LabJackUE9 */,
 			);
@@ -8165,18 +8156,6 @@
 			);
 			name = LabJackUE9;
 			path = Source/Objects/Hardware/USB/LabJack/LabJackUE9;
-			sourceTree = SOURCE_ROOT;
-		};
-		8475EC4E1475A752003A165D /* LabJackUSB */ = {
-			isa = PBXGroup;
-			children = (
-				8475EC4F1475A752003A165D /* labjackusb.c */,
-				8475EC501475A752003A165D /* labjackusb.h */,
-				8475ECED14769A84003A165D /* ue9.c */,
-				8475ECEE14769A84003A165D /* ue9.h */,
-			);
-			name = LabJackUSB;
-			path = Source/Objects/Hardware/USB/LabJack/LabJackUSB;
 			sourceTree = SOURCE_ROOT;
 		};
 		84761FCF118CD53C00016A8D /* Plotting */ = {
@@ -12686,8 +12665,6 @@
 				8475EC461475A66F003A165D /* ORLabJackUE9Controller.h in Headers */,
 				8475EC481475A66F003A165D /* ORLabJackUE9Decoders.h in Headers */,
 				8475EC4A1475A66F003A165D /* ORLabJackUE9Model.h in Headers */,
-				8475EC521475A752003A165D /* labjackusb.h in Headers */,
-				8475ECF014769A84003A165D /* ue9.h in Headers */,
 				CED29CFC1482B02200BD3AB2 /* ORSIS3302GenericModel.h in Headers */,
 				CE3E7A231482D940000F1708 /* ORSIS3302GenericController.h in Headers */,
 				84DEE4CE149794070092DB6C /* ORFPDSegmentGroup.h in Headers */,
@@ -14407,8 +14384,6 @@
 				8475EC471475A66F003A165D /* ORLabJackUE9Controller.m in Sources */,
 				8475EC491475A66F003A165D /* ORLabJackUE9Decoders.m in Sources */,
 				8475EC4B1475A66F003A165D /* ORLabJackUE9Model.m in Sources */,
-				8475EC511475A752003A165D /* labjackusb.c in Sources */,
-				8475ECEF14769A84003A165D /* ue9.c in Sources */,
 				CED29CFD1482B02200BD3AB2 /* ORSIS3302GenericModel.m in Sources */,
 				CE3E7A241482D940000F1708 /* ORSIS3302GenericController.m in Sources */,
 				84DEE4CF149794070092DB6C /* ORFPDSegmentGroup.m in Sources */,
