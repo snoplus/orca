@@ -17,24 +17,22 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
 #pragma mark •••Imported Files
 
-#import "ORHPPulserModel.h"
-#import "ORUSB.h"
 #import "ORAdcProcessing.h"
 #import "ORBitProcessing.h"
-#import "labjackusb.h"
-#import "ue9.h"
 
-@class ORUSBInterface;
+@class NetSocket;
+@class ORLabJackUE9Cmd;
 
-
-@interface ORLabJackUE9Model : OrcaObject <USBDevice,ORAdcProcessing,ORBitProcessing> {
-    HANDLE hDevice;
-	NSLock* localLock;
-	ORUSBInterface* usbInterface;
-    NSString* serialNumber;
+@interface ORLabJackUE9Model : OrcaObject <ORAdcProcessing,ORBitProcessing> {
+	NSMutableArray*  cmdQueue;
+	ORLabJackUE9Cmd* lastRequest;
+	NSString*		 ipAddress;
+    BOOL			 isConnected;
+	NetSocket*		 socket;
+	NSLock*			 localLock;
+    NSString*		 serialNumber;
 	int adc[8];
 	int gain[4];
 	float lowLimit[8];
@@ -68,6 +66,23 @@
 	NSTimeInterval lastTime;
 	NSOperationQueue* queue;
 	
+	double unipolarSlope[4];
+	double unipolarOffset[4];
+	double bipolarSlope;
+	double bipolarOffset;
+	double DACSlope[2];
+	double DACOffset[2];
+	double tempSlope;
+	double tempSlopeLow;
+	double calTemp;
+	double Vref;
+	double VrefDiv2;
+	double VsSlope;
+	double hiResUnipolarSlope;
+	double hiResUnipolarOffset;
+	double hiResBipolarSlope;
+	double hiResBipolarOffset;
+	
 	//bit processing variables
 	unsigned long processInputValue;  //snapshot of the inputs at start of process cycle
 	unsigned long processOutputValue; //outputs to be written at end of process cycle
@@ -77,6 +92,8 @@
 }
 
 #pragma mark ***Accessors
+- (ORLabJackUE9Cmd*) lastRequest;
+- (void) setLastRequest:(ORLabJackUE9Cmd*)aRequest;
 - (unsigned long) deviceSerialNumber;
 - (void) setDeviceSerialNumber:(unsigned long)aDeviceSerialNumber;
 - (BOOL) involvedInProcess;
@@ -159,17 +176,17 @@
 - (void) syncDataIdsWith:(id)anotherLakeShore210;
 - (void) readSerialNumber;
 
-#pragma mark ***USB Stuff
-- (id) getUSBController;
-- (NSString*) serialNumber;
-- (void) setSerialNumber:(NSString*)aSerialNumber;
-- (unsigned long) vendorID;
-- (unsigned long) productID;
-- (NSString*) usbInterfaceDescription;
-- (void) interfaceAdded:(NSNotification*)aNote;
-- (void) interfaceRemoved:(NSNotification*)aNote;
-- (void) checkDevices;
-- (void) setUsbInterface:(ORUSBInterface*)anInterface;
+#pragma mark ***IP Stuff
+- (NSString*) ipAddress;
+- (void) setIpAddress:(NSString*)aIpAddress;
+- (NetSocket*) socket;
+- (void) setSocket:(NetSocket*)aSocket;
+- (BOOL) isConnected;
+- (void) setIsConnected:(BOOL)aFlag;
+- (void) connect;
+- (void) netsocketConnected:(NetSocket*)inNetSocket;
+- (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(unsigned)inAmount;
+- (void) netsocketDisconnected:(NetSocket*)inNetSocket;
 
 #pragma mark •••Adc Processing Protocol
 - (void)processIsStarting;
@@ -191,6 +208,15 @@
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 
+- (void) sendComCmd;
+- (void) getCalibrationInfo:(int)block;
+- (void) readSingleAdc:(int)aChan;
+- (void) feedBack;
+
+
+- (void) goToNextCommand;
+- (void) processOneCommandFromQueue;
+- (void) startTimeOut;
 
 @end
 
@@ -203,7 +229,6 @@ extern NSString* ORLabJackUE9PollTimeChanged;
 extern NSString* ORLabJackUE9DigitalOutputEnabledChanged;
 extern NSString* ORLabJackUE9CounterChanged;
 extern NSString* ORLabJackUE9SerialNumberChanged;
-extern NSString* ORLabJackUE9USBInterfaceChanged;
 extern NSString* ORLabJackUE9RelayChanged;
 extern NSString* ORLabJackUE9Lock;
 extern NSString* ORLabJackUE9ChannelNameChanged;
@@ -225,12 +250,14 @@ extern NSString* ORLabJackUE9SlopeChanged;
 extern NSString* ORLabJackUE9InterceptChanged;
 extern NSString* ORLabJackUE9MinValueChanged;
 extern NSString* ORLabJackUE9MaxValueChanged;
+extern NSString* ORLabJackUE9IpAddressChanged;
+extern NSString* ORLabJackUE9IsConnectedChanged;
 
-@interface ORLabJackUE9Query : NSOperation
+@interface ORLabJackUE9Cmd : NSObject
 {
-	id delegate;
+	int tag;
+	NSData* cmdData;
 }
-- (id) initWithDelegate:(id)aDelegate;
-- (void) main;
+@property (nonatomic,assign) int tag;
+@property (nonatomic,retain) NSData* cmdData;
 @end
-

@@ -17,14 +17,15 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-@class ORUSB;
 
 @interface ORLabJackUE9Controller : OrcaObjectController 
 {
+	IBOutlet NSTextField*	ipConnectedTextField;
+	IBOutlet NSTextField*	ipAddressTextField;
+	IBOutlet NSButton*		ipConnectButton;
 	IBOutlet NSTabView*		tabView;	
-	IBOutlet NSTextField* deviceSerialNumberField;
+	IBOutlet NSTextField*	deviceSerialNumberField;
 	IBOutlet NSView*		totalView;
-	IBOutlet NSPopUpButton* serialNumberPopup;
 	IBOutlet NSTextField*	aOut1Field;
 	IBOutlet NSTextField*	aOut0Field;
 	IBOutlet NSButton*		shipDataCB;
@@ -64,11 +65,12 @@
 }
 
 #pragma mark •••Notifications
-- (void) interfacesChanged:(NSNotification*)aNote;
 - (void) serialNumberChanged:(NSNotification*)aNote;
 - (void) lockChanged:(NSNotification*)aNote;
 
 #pragma mark ***Interface Management
+- (void) isConnectedChanged:(NSNotification*)aNote;
+- (void) ipAddressChanged:(NSNotification*)aNote;
 - (void) deviceSerialNumberChanged:(NSNotification*)aNote;
 - (void) involvedInProcessChanged:(NSNotification*)aNote;
 - (void) aOut1Changed:(NSNotification*)aNote;
@@ -81,8 +83,6 @@
 - (void) pollTimeChanged:(NSNotification*)aNote;
 - (void) digitalOutputEnabledChanged:(NSNotification*)aNote;
 - (void) counterChanged:(NSNotification*)aNote;
-- (void) populateInterfacePopup:(ORUSB*)usb;
-- (void) validateInterfacePopup;
 - (void) channelNameChanged:(NSNotification*)aNote;
 - (void) channelUnitChanged:(NSNotification*)aNote;
 - (void) doNameChanged:(NSNotification*)aNote;
@@ -102,6 +102,9 @@
 - (void) maxValueChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) testAction:(id)sender;
+- (IBAction) ipAddressAction:(id)sender;
+- (IBAction) connectAction:(id)sender;
 - (IBAction) probeAction:(id)sender;
 - (IBAction) aOut1Action:(id)sender;
 - (IBAction) aOut0Action:(id)sender;
@@ -109,7 +112,6 @@
 - (IBAction) shipDataAction:(id)sender;
 - (IBAction) pollTimeAction:(id)sender;
 - (IBAction) digitalOutputEnabledAction:(id)sender;
-- (IBAction) serialNumberAction:(id)sender;
 - (IBAction) settingLockAction:(id) sender;
 - (IBAction) channelNameAction:(id)sender;
 - (IBAction) channelUnitAction:(id)sender;

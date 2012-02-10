@@ -19,8 +19,6 @@
 
 #import "ORLabJackUE9Controller.h"
 #import "ORLabJackUE9Model.h"
-#import "ORUSB.h"
-#import "ORUSBInterface.h"
 
 @implementation ORLabJackUE9Controller
 - (id) init
@@ -39,27 +37,12 @@
 {
     NSNotificationCenter* notifyCenter = [ NSNotificationCenter defaultCenter ];    
     [ super registerNotificationObservers ];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(interfacesChanged:)
-                         name : ORUSBInterfaceAdded
-						object: nil];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(interfacesChanged:)
-                         name : ORUSBInterfaceRemoved
-						object: nil];
-	
+    	
     [notifyCenter addObserver : self
                      selector : @selector(serialNumberChanged:)
                          name : ORLabJackUE9SerialNumberChanged
 						object: nil];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(serialNumberChanged:)
-                         name : ORLabJackUE9USBInterfaceChanged
-						object: nil];
-		
+			
 	[notifyCenter addObserver : self
 					 selector : @selector(lockChanged:)
 						 name : ORRunStatusChangedNotification
@@ -204,11 +187,20 @@
                          name : ORLabJackUE9ModelDeviceSerialNumberChanged
 						object: model];
 
+	[notifyCenter addObserver : self
+                     selector : @selector(ipAddressChanged:)
+                         name : ORLabJackUE9IpAddressChanged
+						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(isConnectedChanged:)
+                         name : ORLabJackUE9IsConnectedChanged
+						object: model];
+	
 }
 
 - (void) awakeFromNib
 {
-	[self populateInterfacePopup:[model getUSBController]];
 	short i;
 	for(i=0;i<8;i++){	
 		[[nameMatrix cellAtRow:i column:0] setEditable:YES];
@@ -249,6 +241,8 @@
 - (void) updateWindow
 {
     [ super updateWindow ];
+	[self ipAddressChanged:nil];
+	[self isConnectedChanged:nil];
 	[self serialNumberChanged:nil];
 	[self channelNameChanged:nil];
 	[self channelUnitChanged:nil];
@@ -278,6 +272,17 @@
 	[self interceptChanged:nil];
 	[self involvedInProcessChanged:nil];
 	[self deviceSerialNumberChanged:nil];
+}
+
+- (void) isConnectedChanged:(NSNotification*)aNote
+{
+	[ipConnectedTextField setStringValue: [model isConnected]?@"Connected":@"Not Connected"];
+	[ipConnectButton setTitle:[model isConnected]?@"Disconnect":@"Connect"];
+}
+
+- (void) ipAddressChanged:(NSNotification*)aNote
+{
+	[ipAddressTextField setStringValue: [model ipAddress]];
 }
 
 - (void) deviceSerialNumberChanged:(NSNotification*)aNote
@@ -620,10 +625,6 @@
 
 
 #pragma mark •••Notifications
-- (void) interfacesChanged:(NSNotification*)aNote
-{
-	[self populateInterfacePopup:[aNote object]];
-}
 
 - (void) lockChanged:(NSNotification*)aNote
 {
@@ -631,7 +632,6 @@
     BOOL locked = [gSecurity isLocked:ORLabJackUE9Lock];
 	BOOL inProcess = [model involvedInProcess];
     [lockButton setState: locked];
-	[serialNumberPopup	setEnabled:!locked];
 	[nameMatrix			setEnabled:!locked];
 	[unitMatrix			setEnabled:!locked];
 	[doNameMatrix		setEnabled:!locked];
@@ -661,12 +661,20 @@
 
 - (void) serialNumberChanged:(NSNotification*)aNote
 {
-//	if(![model serialNumber] || ![model usbInterface])[serialNumberPopup selectItemAtIndex:0];
-//	else [serialNumberPopup selectItemWithTitle:[model serialNumber]];
-//	[[self window] setTitle:[model title]];
 }
 
 #pragma mark •••Actions
+- (IBAction) ipAddressAction:(id)sender
+{
+	[model setIpAddress:[sender stringValue]];	
+}
+
+- (IBAction) connectAction:(id)sender
+{
+	[self endEditing];
+	[model connect];
+}
+
 - (IBAction) probeAction:(id)sender
 {
 	[model readSerialNumber];
@@ -700,48 +708,6 @@
 - (IBAction) settingLockAction:(id) sender
 {
     [gSecurity tryToSetLock:ORLabJackUE9Lock to:[sender intValue] forWindow:[self window]];
-}
-
-- (void) populateInterfacePopup:(ORUSB*)usb
-{
-	NSArray* interfaces = [usb interfacesForVender:[model vendorID] product:[model productID]];
-	[serialNumberPopup removeAllItems];
-	[serialNumberPopup addItemWithTitle:@"N/A"];
-	NSEnumerator* e = [interfaces objectEnumerator];
-	ORUSBInterface* anInterface;
-	while(anInterface = [e nextObject]){
-		NSString* serialNumber = [anInterface serialNumber];
-		if([serialNumber length]){
-			[serialNumberPopup addItemWithTitle:serialNumber];
-		}
-	}
-	[self validateInterfacePopup];
-	if([model serialNumber])[serialNumberPopup selectItemWithTitle:[model serialNumber]];
-	else [serialNumberPopup selectItemAtIndex:0];
-}
-
-- (void) validateInterfacePopup
-{
-	NSArray* interfaces = [[model getUSBController] interfacesForVender:[model vendorID] product:[model productID]];
-	NSEnumerator* e = [interfaces objectEnumerator];
-	ORUSBInterface* anInterface;
-	while(anInterface = [e nextObject]){
-		NSString* serialNumber = [anInterface serialNumber];
-		if([anInterface registeredObject] == nil || [serialNumber isEqualToString:[model serialNumber]]){
-			[[serialNumberPopup itemWithTitle:serialNumber] setEnabled:YES];
-		}
-		else [[serialNumberPopup itemWithTitle:serialNumber] setEnabled:NO];
-	}
-}
-
-- (IBAction) serialNumberAction:(id)sender
-{
-	if([serialNumberPopup indexOfSelectedItem] == 0){
-		[model setSerialNumber:nil];
-	}
-	else {
-		[model setSerialNumber:[serialNumberPopup titleOfSelectedItem]];
-	}
 }
 
 - (IBAction) channelNameAction:(id)sender
@@ -835,6 +801,14 @@
 - (IBAction) interceptAction:(id)sender
 {
 	[model setIntercept:[[sender selectedCell] tag] withValue:[[sender selectedCell] floatValue]];	
+}
+
+- (IBAction) testAction:(id)sender
+{
+	[model sendComCmd];
+	[model feedBack];
+	int i;
+	for(i=0;i<80;i++)[model readSingleAdc:i];
 }
 
 @end
