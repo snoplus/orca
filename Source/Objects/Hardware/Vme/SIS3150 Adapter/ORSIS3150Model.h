@@ -20,12 +20,12 @@
 
 
 #pragma mark •••Imported Files
-#import "ORVmeCard.h"
+#import "ORVmeAdapter.h"
 #import "ORUSB.h"
 
 @class ORUSBInterface;
 
-@interface ORSIS3150Model :  ORVmeCard <USBDevice>
+@interface ORSIS3150Model :  ORVmeAdapter <USBDevice>
 {
 	ORUSBInterface* usbInterface;
     NSString* serialNumber;
@@ -123,6 +123,11 @@
 									withAddMod:(unsigned short) anAddressModifier
 						   usingAddSpace:(unsigned short) anAddressSpace;
 
+- (int) usbTransaction: (ORUSBInterface*) device
+			  outpacket: (void*)           outpacket
+			   outbytes: (unsigned int)    outbytes
+			   inpacket: (void*)           inpacket
+				inbytes: (unsigned int)    inbytes;
 
 #pragma mark •••Archival
 - (id)   initWithCoder:(NSCoder*)decoder;

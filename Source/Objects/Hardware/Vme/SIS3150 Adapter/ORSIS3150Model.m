@@ -23,13 +23,14 @@
 #import "ORSIS3150Model.h"
 #import "ORUSBInterface.h"
 #import "ORCrate.h"
+//#import "ezusb.h"
 
 NSString* ORSIS3150USBInterfaceChanged			= @"ORSIS3150USBInterfaceChanged";
 NSString* ORSIS3150USBInConnection				= @"ORSIS3150USBInConnection";
 NSString* ORSIS3150USBNextConnection			= @"ORSIS3150USBNextConnection";
 NSString* ORSIS3150SerialNumberChanged			= @"ORSIS3150SerialNumberChanged";
-NSString* ORSIS3150RangeChanged						= @"ORSIS3150RangeChanged";
-NSString* ORSIS3150DoRangeChanged						= @"ORSIS3150DoRangeChanged";
+NSString* ORSIS3150RangeChanged					= @"ORSIS3150RangeChanged";
+NSString* ORSIS3150DoRangeChanged				= @"ORSIS3150DoRangeChanged";
 NSString* ORSIS3150RWAddressChanged             = @"ORSIS3150RWAddressChanged";
 NSString* ORSIS3150WriteValueChanged            = @"ORSIS3150WriteValueChanged";
 NSString* ORSIS3150RWAddressModifierChanged     = @"ORSIS3150RWAddressModifierChanged";
@@ -40,6 +41,13 @@ NSString* ORSIS3150Lock							= @"ORSIS3150Lock";
 #define kRemoteIOAddressModifier		0x29
 #define kRemoteRAMAddressModifier		0x39
 #define kRemoteDualPortAddressModifier	0x09
+
+uint8_t verbose = 0;
+
+#define USB_MAX_NOF_BYTES    0xf800
+@interface ORSIS3150Model (private)
+- (int) loadFirmware:(IOUSBDeviceInterface**) dev;
+@end
 
 @implementation ORSIS3150Model
 
@@ -90,7 +98,7 @@ NSString* ORSIS3150Lock							= @"ORSIS3150Lock";
 	else {
 		[ self setImage: aCachedImage];
 	}
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORForceRedraw object: self];
+	[[NSNotificationCenter defaultCenter] postNotificationName:OROrcaObjectImageChanged object:self];
 }
 
 - (void) makeMainController
@@ -110,15 +118,16 @@ NSString* ORSIS3150Lock							= @"ORSIS3150Lock";
 
 - (unsigned long) productID
 {
-	return 0x1657;	
+	return 0x3150;	
 }
 
 - (id) getUSBController
 {
-	id obj = [self objectConnectedTo:ORSIS3150USBInConnection];
+	id obj = [[inConnector connector] objectLink];
 	id cont =  [ obj getUSBController ];
 	return cont;
 }
+
 - (NSString*) title 
 {
 	return [NSString stringWithFormat:@"SIS3150 (Serial# %@)",[usbInterface serialNumber]];
@@ -338,6 +347,11 @@ NSString* ORSIS3150Lock							= @"ORSIS3150Lock";
 }
 
 
+- (NSString*) hwName
+{
+	if(usbInterface)return [usbInterface deviceName];
+	else return @"?";
+}
 
 #pragma mark •••Hardware Access
 - (NSString*) serialNumber
@@ -347,19 +361,21 @@ NSString* ORSIS3150Lock							= @"ORSIS3150Lock";
 
 - (void) setSerialNumber:(NSString*)aSerialNumber
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setSerialNumber:serialNumber];
-    
-    [serialNumber autorelease];
-    serialNumber = [aSerialNumber copy];    
-	
-	
-	if(!serialNumber){
-		[[self getUSBController] releaseInterfaceFor:self];
+	if(![aSerialNumber isEqualToString:serialNumber]){
+		[[[self undoManager] prepareWithInvocationTarget:self] setSerialNumber:serialNumber];
+		
+		[serialNumber autorelease];
+		serialNumber = [aSerialNumber copy];    
+		
+		
+		if(!serialNumber){
+			[[self getUSBController] releaseInterfaceFor:self];
+		}
+		else {
+			[[self getUSBController] claimInterfaceWithSerialNumber:serialNumber for:self];
+		}
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3150SerialNumberChanged object:self];
 	}
-	else {
-		[[self getUSBController] claimInterfaceWithSerialNumber:serialNumber for:self];
-	}
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3150SerialNumberChanged object:self];
 }
 - (ORUSBInterface*) usbInterface
 {
@@ -372,7 +388,10 @@ NSString* ORSIS3150Lock							= @"ORSIS3150Lock";
 	[usbInterface release];
 	usbInterface = anInterface;
 	[usbInterface retain];
-	[usbInterface setUsePipeType:kUSBInterrupt];
+	[usbInterface setUsePipeType:kUSBBulk];
+	
+	if(anInterface)	[self loadFirmware:[usbInterface interface]];
+
 	
 	[[NSNotificationCenter defaultCenter]
 	 postNotificationName: ORSIS3150USBInterfaceChanged
@@ -428,26 +447,16 @@ NSString* ORSIS3150Lock							= @"ORSIS3150Lock";
 }
 - (id) controllerCard
 {
-	return [[self crate] controllerCard];
+	return self;
 }
 
 
 - (void) resetContrl
 {
-	id controller = [[self crate] controllerCard];
-	if(!controller){
-		[NSException raise:@"Not Connected" format:@"You must connect to a PCI Controller (i.e. a 617)."];
-	}
-	[controller resetContrl];
 }
 
 - (void) checkStatusErrors
 {
-	id controller = [[self crate] controllerCard];
-	if(!controller){
-		[NSException raise:@"Not Connected" format:@"You must connect to a PCI Controller (i.e. a 617)."];
-	}
-	[controller checkStatusErrors];
 }
 
 -(void) readLongBlock:(unsigned long *) readAddress
@@ -456,15 +465,7 @@ NSString* ORSIS3150Lock							= @"ORSIS3150Lock";
 		   withAddMod:(unsigned short) anAddressModifier
 					   usingAddSpace:(unsigned short) anAddressSpace
 {
-	id controller = [[self crate] controllerCard];
-	if(!controller){
-		[NSException raise:@"Not Connected" format:@"You must connect to a PCI Controller (i.e. a 617)."];
-	}
-	[controller readLongBlock:readAddress
-					atAddress:vmeAddress
-					numToRead:numberLongs
-				   withAddMod:anAddressModifier
-				usingAddSpace:anAddressSpace];
+	NSLog(@"readLongBlock\n");
 }
 
 -(void) writeLongBlock:(unsigned long *) writeAddress
@@ -473,15 +474,7 @@ NSString* ORSIS3150Lock							= @"ORSIS3150Lock";
 			withAddMod:(unsigned short) anAddressModifier
 						   usingAddSpace:(unsigned short) anAddressSpace
 {
-	id controller = [[self crate] controllerCard];
-	if(!controller){
-		[NSException raise:@"Not Connected" format:@"You must connect to a PCI Controller (i.e. a 617)."];
-	}
-	[controller writeLongBlock:writeAddress
-					 atAddress:vmeAddress
-					numToWrite:numberLongs
-					withAddMod:anAddressModifier
-				 usingAddSpace:anAddressSpace];
+	NSLog(@"writeLongBlock\n");
 	
 }
 
@@ -491,15 +484,7 @@ NSString* ORSIS3150Lock							= @"ORSIS3150Lock";
 	  withAddMod:(unsigned short) anAddressModifier
    usingAddSpace:(unsigned short) anAddressSpace
 {
-	id controller = [[self crate] controllerCard];
-	if(!controller){
-		[NSException raise:@"Not Connected" format:@"You must connect to a PCI Controller (i.e. a 617)."];
-	}
-	[controller readLong:readAddress
-			   atAddress:vmeAddress
-			 timesToRead:numberLongs
-			  withAddMod:anAddressModifier
-		   usingAddSpace:anAddressSpace];
+	NSLog(@"readLong\n");
 }
 
 -(void) readByteBlock:(unsigned char *) readAddress
@@ -508,16 +493,8 @@ NSString* ORSIS3150Lock							= @"ORSIS3150Lock";
 		   withAddMod:(unsigned short) anAddressModifier
 					   usingAddSpace:(unsigned short) anAddressSpace
 {
-	id controller = [[self crate] controllerCard];
-	if(!controller){
-		[NSException raise:@"Not Connected" format:@"You must connect to a PCI Controller (i.e. a 617)."];
-	}
-	[controller readByteBlock:readAddress
-					atAddress:vmeAddress
-					numToRead:numberBytes
-				   withAddMod:anAddressModifier
-				usingAddSpace:anAddressSpace];
 	
+	NSLog(@"readByteBlock\n");
 }
 
 -(void) writeByteBlock:(unsigned char *) writeAddress
@@ -526,35 +503,83 @@ NSString* ORSIS3150Lock							= @"ORSIS3150Lock";
 			withAddMod:(unsigned short) anAddressModifier
 						   usingAddSpace:(unsigned short) anAddressSpace
 {
-	id controller = [[self crate] controllerCard];
-	if(!controller){
-		[NSException raise:@"Not Connected" format:@"You must connect to a PCI Controller (i.e. a 617)."];
-	}
-	[controller writeByteBlock:writeAddress
-					 atAddress:vmeAddress
-					numToWrite:numberBytes
-					withAddMod:anAddressModifier
-				 usingAddSpace:anAddressSpace];
-	
+	NSLog(@"writeByteBlock\n");
 }
 
 
--(void) readWordBlock:(unsigned short *) readAddress
+-(void) readWordBlock:(unsigned short *) data
 			atAddress:(unsigned int) vmeAddress
 			numToRead:(unsigned int) numberWords
 		   withAddMod:(unsigned short) anAddressModifier
 					   usingAddSpace:(unsigned short) anAddressSpace
 {
-	id controller = [[self crate] controllerCard];
-	if(!controller){
-		[NSException raise:@"Not Connected" format:@"You must connect to a PCI Controller (i.e. a 617)."];
-	}
-	[controller readWordBlock:readAddress
-					atAddress:vmeAddress
-					numToRead:numberWords
-				   withAddMod:anAddressModifier
-				usingAddSpace:anAddressSpace];
+	unsigned int nBytes  = 0;
+	unsigned long req_nof_bytes = numberWords*sizeof(unsigned int);
+	char cUsbBuf[0x100 + USB_MAX_NOF_BYTES];
+	char cInPacket[0x100 + USB_MAX_NOF_BYTES];
+		
+	char cSize = 0x1 ; //  2 Bytes
+	char cFifoMode  = 0x0 ;
+	char* cUsbBuf_ptr = (char*) data ;
 	
+	//if(req_nof_bytes > USB_MAX_NOF_BYTES) {
+	//	return_code = sis3150usb_error_code_invalid_parameter ;
+	//	RETURN(return_code );
+	//}
+	
+	
+	cUsbBuf[0]  =   (char)  0x00 ;	                 	// header 7:0 	  ; :
+	cUsbBuf[1]  =   (char)  (0x40 + cSize + cFifoMode);	// header 15:8 	   Bit0 = 11 : not Write	/ D32
+	cUsbBuf[2]  =   (char)  0xaa ;	           			// header 23:16
+	cUsbBuf[3]  =   (char)  0xaa ;	           			// header 31:24
+	
+	cUsbBuf[4]  =   (char)  req_nof_bytes   ;       //length 7:0
+	cUsbBuf[5]  =   (char) (req_nof_bytes >> 8);    //length 15:8
+	cUsbBuf[6]  =   (char)  anAddressModifier ;   
+	cUsbBuf[7]  =   (char) (anAddressModifier >> 8);
+	
+	cUsbBuf[8]  =   (char)  vmeAddress   ;       //addr 7:0
+	cUsbBuf[9]  =   (char) (vmeAddress >> 8);    //addr 15:8
+	cUsbBuf[10] =   (char) (vmeAddress >> 16) ;  //addr 23:16 
+	cUsbBuf[11] =   (char) (vmeAddress >> 24);   //addr 31:24
+	
+	
+	unsigned long usb_wlength = 12;
+	unsigned long usb_rlength = (req_nof_bytes) ; // data: (req_nof_lwords * 4) Bytes; 
+	usb_rlength = (usb_rlength + 0x1ff) & 0xffffe00; // 512 byte boundary.
+	
+	
+
+	int return_code = [self usbTransaction: usbInterface
+							 outpacket: cUsbBuf
+							  outbytes: usb_wlength
+							  inpacket: cInPacket
+							   inbytes: usb_rlength];
+				   
+	if (return_code == -1) {
+		return;
+	}
+	//	RETURN(sis3150usb_error_code_usb_write_error);
+	//}
+	//if (return_code == -2) {
+	//	RETURN(sis3150usb_error_code_usb_read_error);
+	//}
+	
+	nBytes = return_code;
+	unsigned long got_nof_bytes = (unsigned long) (nBytes )  ;
+	
+	//if(nBytes != req_nof_bytes) {
+	//	return_code = sis3150usb_error_code_usb_read_length_error; 
+	//	RETURN(return_code);
+	//}
+	
+	if(nBytes > 0) {
+		memcpy(cUsbBuf_ptr, cInPacket, nBytes);	/* Clibs usually have good memcpy */
+	}
+	
+	
+	//return_code  = 0 ;
+	//return return_code ;
 }
 
 -(void) writeWordBlock:(unsigned short *) writeAddress
@@ -563,17 +588,41 @@ NSString* ORSIS3150Lock							= @"ORSIS3150Lock";
 			withAddMod:(unsigned short) anAddressModifier
 						   usingAddSpace:(unsigned short) anAddressSpace
 {
-	id controller = [[self crate] controllerCard];
-	if(!controller){
-		[NSException raise:@"Not Connected" format:@"You must connect to a PCI Controller (i.e. a 617)."];
-	}
-	[controller writeWordBlock:writeAddress
-					 atAddress:vmeAddress
-					numToWrite:numberWords
-					withAddMod:anAddressModifier
-				 usingAddSpace:anAddressSpace];
-	
+	NSLog(@"writeWordBlock\n");
 }
+
+- (int) usbTransaction: (ORUSBInterface*) device
+			 outpacket: (void*)           outpacket
+			  outbytes: (unsigned int)    outbytes
+			  inpacket: (void*)           inpacket
+			   inbytes: (unsigned int)    inbytes
+{
+	//void* usboutpacket;
+	int   status;
+	
+	/* Do the write and process the status:  */
+	
+	[device writeBytes:outpacket length:outbytes pipe:0];
+	//status = usb_bulk_write(device, USB_WRITE_ENDPOINT,
+	//						outpacket, outbytes, USB_TIMEOUT);
+	//if(status < 0) {
+	//	errno = -status;
+	//	perror("write");
+	//	return -1;
+	//}
+	/* Do the write, process status, and if ok, transform the read data. */
+	status = [device readBytes:inpacket length:inbytes pipe:1];
+
+	//status = usb_bulk_read(device, USB_READ_ENDPOINT,
+	//					   inpacket, inbytes, USB_TIMEOUT);
+	//if(status < 0) {
+	//	errno = -status;
+	//	perror("read");
+	//	return -2;
+	//}
+	return status;
+}
+
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder
@@ -582,6 +631,7 @@ NSString* ORSIS3150Lock							= @"ORSIS3150Lock";
     
     [[self undoManager] disableUndoRegistration];
     
+    [self setSerialNumber:	  [decoder decodeObjectForKey:@"serialNumber"]];
     [self setRangeToDo:			[decoder decodeIntForKey:	@"rangeToDo"]];
     [self setDoRange:			[decoder decodeBoolForKey:	@"doRange"]];
     [self setRwAddress:			[decoder decodeIntForKey:	@"rwAddress"]];
@@ -600,6 +650,7 @@ NSString* ORSIS3150Lock							= @"ORSIS3150Lock";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeObject:serialNumber		forKey:@"serialNumber"];
     [encoder encodeObject:inConnector		forKey:@"inConnector"];
     [encoder encodeObject:outConnector		forKey:@"outConnector"];
     [encoder encodeInt:rangeToDo			forKey:@"rangeToDo"];
@@ -679,16 +730,12 @@ return (code);
 
 /*  Constant definitions */
 
-#define USB_MAX_NOF_BYTES    0xf800
 #define USB_MAX_NOF_LWORDS   USB_MAX_NOF_BYTES/4
 
 #define sis3150usb_error_code_invalid_parameter  			0x110 
 #define sis3150usb_error_code_usb_write_error    			0x111 
 #define sis3150usb_error_code_usb_read_error     			0x112 
 #define sis3150usb_error_code_usb_read_length_error     	0x113 
-
-
-
 
 static const int    sisVendorId = 0x1657;          /* Vendor ID taken by SIS */
 static const int    productId   = 0x3150;          /* Product ID we are looking for */
@@ -2146,3 +2193,18 @@ int EXPORT sis3150Usb_TsBus_Dma_Write(HANDLE usbDevice, ULONG addr,
 	return error    ;
 }
 #endif
+
+
+@implementation ORSIS3150Model (private)
+- (int) loadFirmware:(IOUSBDeviceInterface**) dev
+{
+	NSString* resourcePath = [[[NSBundle mainBundle] resourcePath]stringByAppendingPathComponent:@"SIS3150Firmware"];
+
+/*	return ezusb_load_ram(dev,
+							   resourcePath,
+							   ptFX2,
+							   FALSE);
+*/
+	return 1;
+}
+@end

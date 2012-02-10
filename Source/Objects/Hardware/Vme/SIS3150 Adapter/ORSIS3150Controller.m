@@ -35,6 +35,11 @@
     self = [super initWithWindowNibName:@"SIS3150"];
 	return self;
 }
+- (void) awakeFromNib
+{
+	[self populateInterfacePopup:[model getUSBController]];
+	[super awakeFromNib];
+}
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers
