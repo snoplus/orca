@@ -43,6 +43,15 @@ typedef enum {
 - (BOOL) decode:(NSString*)aString intValue:(int*)aValue;
 - (NSString*) decodeString:(NSString*)aString;
 
+//number conversions needed by the command center
+- (char) charValue;
+- (unsigned char) unsignedCharValue;
+- (short) shortValue;
+- (unsigned short) unsignedShortValue;
+- (unsigned int) unsignedIntValue;
+- (unsigned long long) unsignedLongLongValue;
+- (unsigned long) unsignedLongValue;
+
 + (NSString*) stringWithUSBDesc:(char*)aDesc;
 @end
 

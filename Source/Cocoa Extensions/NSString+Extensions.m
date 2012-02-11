@@ -167,6 +167,41 @@
 	p[stringLength/2] = '\0';
 	return [NSString stringWithUTF8String:p];
 }
+
+- (char) charValue
+{
+    return [[NSDecimalNumber decimalNumberWithString:self] charValue];
+}
+
+- (unsigned char) unsignedCharValue
+{
+    return [[NSDecimalNumber decimalNumberWithString:self] unsignedCharValue];
+}
+
+- (short) shortValue
+{
+    return [[NSDecimalNumber decimalNumberWithString:self] shortValue];
+}
+
+- (unsigned short) unsignedShortValue
+{
+    return [[NSDecimalNumber decimalNumberWithString:self] unsignedShortValue];
+}
+- (unsigned int) unsignedIntValue
+{
+    return [[NSDecimalNumber decimalNumberWithString:self] unsignedIntValue];
+}
+
+- (unsigned long long) unsignedLongLongValue
+{
+    return [[NSDecimalNumber decimalNumberWithString:self] unsignedLongLongValue];
+}
+
+- (unsigned long) unsignedLongValue
+{
+    return [[NSDecimalNumber decimalNumberWithString:self] unsignedLongValue];
+}
+
 @end
 
 @implementation NSMutableString (NSStringWithExtensions)
