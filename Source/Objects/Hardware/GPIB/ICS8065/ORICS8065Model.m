@@ -109,7 +109,7 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
 - (void) setUpImage
 {
     NSImage* aCachedImage = [NSImage imageNamed:@"ICS8065Box"];
-    NSImage* i = [[NSImage alloc] initWithSize:[aCachedImage size]];
+    NSImage* i = [[[NSImage alloc] initWithSize:[aCachedImage size]]autorelease];
     [i lockFocus];
     [aCachedImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
     
