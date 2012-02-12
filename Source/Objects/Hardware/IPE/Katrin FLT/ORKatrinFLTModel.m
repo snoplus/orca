@@ -1058,7 +1058,7 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
 {
 	hitRateTotal = newTotalValue;
 	if(!totalRate){
-		[self setTotalRate:[[ORTimeRate alloc] init]];
+		[self setTotalRate:[[[ORTimeRate alloc] init]autorelease]];
 	}
 	[totalRate addDataToTimeAverage:hitRateTotal];
 }
