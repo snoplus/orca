@@ -68,7 +68,7 @@ NSString* ORPCICardSlotChangedNotification 	= @"ORPCICardSlotChangedNotification
     //---------------------------------------------------------------------------------------------------
     
     NSImage* aCachedImage = [NSImage imageNamed:anImageName];
-    NSImage* i = [[NSImage alloc] initWithSize:[aCachedImage size]];
+    NSImage* i = [[[NSImage alloc] initWithSize:[aCachedImage size]]autorelease];
     [i lockFocus];
     [aCachedImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
     
