@@ -450,14 +450,13 @@ NSString* morcaDBRead								= @"morcaDBRead";
 	
  	int i;
 	for(i=0;i<[tableEntries count];++i){
-        NSMutableDictionary *copiedFile; 
 		BOOL isSelected=[[[tableEntries objectAtIndex:i] valueForKey:@"parameterSelected"] boolValue];
 		if (isSelected){
 			NSString* urlName=[NSString stringWithFormat:@"http://localhost:5984/slow_control/%@",[[tableEntries objectAtIndex:i] parameterIoChannelDocId]];
 			NSMutableURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:urlName]];
 			NSData* responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&connectionError];
-			NSString *jsonStr1 = [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
-			copiedFile = [[(NSDictionary *)[jsonStr1 yajl_JSON] mutableCopy] autorelease];			
+			NSString *jsonStr1   = [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
+			NSMutableDictionary* copiedFile = [[(NSDictionary *)[jsonStr1 yajl_JSON] mutableCopy] autorelease];			
 			[jsonStr1 release];
 			
 			NSNumber *lothresholdValue = [[NSNumber alloc] initWithFloat:[[tableEntries objectAtIndex:i] parameterLoThreshold]];
@@ -521,7 +520,6 @@ NSString* morcaDBRead								= @"morcaDBRead";
 	
  	int i;
 	for(i=0;i<[tableEntries count];++i){
-        NSMutableDictionary *copiedFile; 
 		BOOL isSelected=[[[tableEntries objectAtIndex:i] valueForKey:@"parameterSelected"] boolValue];
 		if (isSelected){
 			NSString* channelName = [NSString stringWithFormat:@"channel%i",[[tableEntries objectAtIndex:i] parameterChannel]];
@@ -534,7 +532,7 @@ NSString* morcaDBRead								= @"morcaDBRead";
 			NSMutableURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:urlName]];
 			NSData* responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&connectionError];
 			NSString* jsonStr = [[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding] autorelease];
-			copiedFile = [[(NSDictionary *)[jsonStr yajl_JSON] mutableCopy] autorelease];			
+			NSMutableDictionary* copiedFile = [[(NSDictionary *)[jsonStr yajl_JSON] mutableCopy] autorelease];			
 			
 			NSNumber* gainValue = [[[NSNumber alloc] initWithFloat:[[tableEntries objectAtIndex:i] parameterGain]]autorelease];
 			[[[copiedFile objectForKey:cardName] objectForKey:channelName] setObject:gainValue forKey:@"gain"];
