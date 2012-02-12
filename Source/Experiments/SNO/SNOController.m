@@ -56,7 +56,6 @@
 	
 	SNOMonitoredHardware *db = [SNOMonitoredHardware sharedSNOMonitoredHardware];
 	[db readCableDBDocumentFromOrcaDB];
-	[db release];
 	
 	[self findRunControl];
     [super awakeFromNib];
