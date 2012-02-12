@@ -443,24 +443,21 @@ NSString* morcaDBRead								= @"morcaDBRead";
 
 - (void) setSlowControlParameterThresholds
 {
-	NSMutableURLRequest *request, *sendrequest;
-	NSHTTPURLResponse *response;
 	NSError *connectionError;
-	NSString *urlName, *uuidstr;
-	NSData *responseData, *postBody;
-	
+    NSHTTPURLResponse *response;
+
 	NSLog(@"setting thresholds\n");
-	NSMutableDictionary *copiedFile; 
 	
  	int i;
 	for(i=0;i<[tableEntries count];++i){
+        NSMutableDictionary *copiedFile; 
 		BOOL isSelected=[[[tableEntries objectAtIndex:i] valueForKey:@"parameterSelected"] boolValue];
 		if (isSelected){
-			urlName=[NSString stringWithFormat:@"http://localhost:5984/slow_control/%@",[[tableEntries objectAtIndex:i] parameterIoChannelDocId]];
-			request = [NSURLRequest requestWithURL:[NSURL URLWithString:urlName]];
-			responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&connectionError];
+			NSString* urlName=[NSString stringWithFormat:@"http://localhost:5984/slow_control/%@",[[tableEntries objectAtIndex:i] parameterIoChannelDocId]];
+			NSMutableURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:urlName]];
+			NSData* responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&connectionError];
 			NSString *jsonStr1 = [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
-			copiedFile = [(NSDictionary *)[jsonStr1 yajl_JSON] mutableCopy];			
+			copiedFile = [[(NSDictionary *)[jsonStr1 yajl_JSON] mutableCopy] autorelease];			
 			[jsonStr1 release];
 			
 			NSNumber *lothresholdValue = [[NSNumber alloc] initWithFloat:[[tableEntries objectAtIndex:i] parameterLoThreshold]];
@@ -484,7 +481,7 @@ NSString* morcaDBRead								= @"morcaDBRead";
 			NSDate *now = [NSDate date];
 			NSString *dateString = [dateFormatter stringFromDate:now];
 			[dateFormatter release];	
-			NSNumber *timestamp=[[NSNumber alloc] initWithInt:[now timeIntervalSince1970]];
+			NSNumber *timestamp=[[[NSNumber alloc] initWithInt:[now timeIntervalSince1970]] autorelease];
 			[copiedFile setObject:dateString forKey:@"datetime"];
 			[copiedFile setObject:timestamp forKey:@"timestamp"];
 			NSLog(@"%f %i\n",FLT_MAX, INT_MAX);
@@ -493,15 +490,14 @@ NSString* morcaDBRead								= @"morcaDBRead";
 			urlName=[NSString stringWithFormat:@"http://localhost:5984/_uuids"];
 			request = [NSURLRequest requestWithURL:[NSURL URLWithString:urlName]];
 			responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&connectionError];
-			NSString *jsonStr2 = [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
-			uuidstr=[NSString stringWithString:[[[jsonStr2 yajl_JSON] objectForKey:@"uuids"] objectAtIndex:0]];
+			NSString *jsonStr2 = [[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding] autorelease];
+			NSString* uuidstr=[NSString stringWithString:[[[jsonStr2 yajl_JSON] objectForKey:@"uuids"] objectAtIndex:0]];
 			[copiedFile setObject:uuidstr forKey:@"_id"];
 			jsonStr2=[copiedFile yajl_JSONString];
-			postBody=[jsonStr2 dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES];
-			[jsonStr2 release];
+			NSData* postBody=[jsonStr2 dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES];
 			
 			urlName=[NSString stringWithFormat:@"http://localhost:5984/slow_control/%@",uuidstr];
-			sendrequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:urlName]];
+			NSMutableURLRequest *sendrequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:urlName]];
 			[sendrequest setValue:@"application/json" forHTTPHeaderField: @"Content-Type"];
 			[sendrequest setValue:[NSString stringWithFormat:@"%d", [postBody length]] forHTTPHeaderField:@"Content-Length"];
 			[sendrequest setHTTPMethod:@"PUT"];
@@ -513,46 +509,40 @@ NSString* morcaDBRead								= @"morcaDBRead";
 		}
 	}
 	
-	[copiedFile release];
 	[[NSNotificationCenter defaultCenter] postNotificationName:slowControlTableChanged object:self];
 }
 
 - (void) setSlowControlChannelGain
 {
-	NSMutableURLRequest *request, *sendrequest;
 	NSHTTPURLResponse *response;
 	NSError *connectionError;
-	NSString *urlName, *jsonStr;
-	NSData *responseData, *postBody;
 	
 	NSLog(@"setting gain\n");
-	NSMutableDictionary *copiedFile; 
-	NSNumber *gainValue;
 	
-	NSString *channelName, *cardName;
  	int i;
 	for(i=0;i<[tableEntries count];++i){
+        NSMutableDictionary *copiedFile; 
 		BOOL isSelected=[[[tableEntries objectAtIndex:i] valueForKey:@"parameterSelected"] boolValue];
 		if (isSelected){
-			channelName = [NSString stringWithFormat:@"channel%i",[[tableEntries objectAtIndex:i] parameterChannel]];
-			cardName = [NSString stringWithFormat:@"card%@",[[tableEntries objectAtIndex:i] parameterCard]];
+			NSString* channelName = [NSString stringWithFormat:@"channel%i",[[tableEntries objectAtIndex:i] parameterChannel]];
+			NSString* cardName = [NSString stringWithFormat:@"card%@",[[tableEntries objectAtIndex:i] parameterCard]];
 			
-			urlName=[NSString stringWithFormat:@"http://%@:%i/config/card%@/",
+			NSString* urlName=[NSString stringWithFormat:@"http://%@:%i/config/card%@/",
 					 [[tableEntries objectAtIndex:i] IPAddress],
 					 [[tableEntries objectAtIndex:i] Port],
 					 [[tableEntries objectAtIndex:i] parameterCard]];
-			request = [NSURLRequest requestWithURL:[NSURL URLWithString:urlName]];
-			responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&connectionError];
-			jsonStr = [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
-			copiedFile = [(NSDictionary *)[jsonStr yajl_JSON] mutableCopy];			
+			NSMutableURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:urlName]];
+			NSData* responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&connectionError];
+			NSString* jsonStr = [[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding] autorelease];
+			copiedFile = [[(NSDictionary *)[jsonStr yajl_JSON] mutableCopy] autorelease];			
 			
-			gainValue = [[NSNumber alloc] initWithFloat:[[tableEntries objectAtIndex:i] parameterGain]];
+			NSNumber* gainValue = [[[NSNumber alloc] initWithFloat:[[tableEntries objectAtIndex:i] parameterGain]]autorelease];
 			[[[copiedFile objectForKey:cardName] objectForKey:channelName] setObject:gainValue forKey:@"gain"];
 			
 			jsonStr=[copiedFile yajl_JSONString];
-			postBody=[jsonStr dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES];
+			NSData* postBody=[jsonStr dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES];
 			
-			sendrequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:urlName]];
+			NSMutableURLRequest* sendrequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:urlName]];
 			[sendrequest setValue:@"application/json" forHTTPHeaderField: @"Content-Type"];
 			[sendrequest setValue:[NSString stringWithFormat:@"%d", [postBody length]] forHTTPHeaderField:@"Content-Length"];
 			[sendrequest setHTTPMethod:@"POST"];
@@ -585,7 +575,7 @@ NSString* morcaDBRead								= @"morcaDBRead";
 {
 	NSString *jsonStr = [NSString stringWithContentsOfFile:@"/Users/Wan/Orca/Source/Experiments/SNO/testCard.json" 
 												  encoding:NSUTF8StringEncoding error:nil];
-	NSMutableDictionary *copiedFile = [(NSDictionary *)[jsonStr yajl_JSON] mutableCopy];	
+	NSMutableDictionary *copiedFile = [[(NSDictionary *)[jsonStr yajl_JSON] mutableCopy] autorelease];	
 	
 	NSString *cardLetter;
 	NSMutableString *cardName, *channelName;
