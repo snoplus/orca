@@ -232,7 +232,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 	[openPanel setAllowsMultipleSelection:NO];
 	[openPanel setPrompt:@"Choose"];
 	
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.7-specific
+    [openPanel setDirectoryURL:[NSURL fileURLWithPath:[kOldBinaryPath stringByExpandingTildeInPath]]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
             [self performSelector:@selector(deferedStartOldOrca:) withObject:[[openPanel URL] path] afterDelay:0];
