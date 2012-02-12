@@ -856,7 +856,7 @@ NSString* ORXLGPSModelPpoRepeatsChanged		= @"ORXLGPSModelPpoRepeatsChanged";
 			}	
 			//first line is the acknowledged password
 			theString = [NSString stringWithString:gpsInBuffer];
-			NSMutableArray* mlines = [[theString componentsSeparatedByString:@"\n\r"] mutableCopy];
+			NSMutableArray* mlines = [[[theString componentsSeparatedByString:@"\n\r"] mutableCopy]autorelease];
 			if (![[mlines objectAtIndex:0] isEqualToString:password]) {
 				NSLog(@"GPS error: Password wasn't accepted.\n");
 				[gpsInBuffer setString:@""];
@@ -1102,7 +1102,7 @@ NSString* ORXLGPSModelPpoRepeatsChanged		= @"ORXLGPSModelPpoRepeatsChanged";
 		case 2:	//f119 resp
 			NSLog(@"GPS: %@\n", gpsInBuffer);
 			NSString* theString = [NSString stringWithString:gpsInBuffer];
-			NSMutableArray* mlines = [[theString componentsSeparatedByString:@"\n\r"] mutableCopy];
+			NSMutableArray* mlines = [[[theString componentsSeparatedByString:@"\n\r"] mutableCopy] autorelease];
 			if ([mlines objectAtIndex:3]){
 				if ([[mlines objectAtIndex:3] rangeOfString:@"LOCKED"].location == NSNotFound) {
 					NSLog(@"GPS isLocked error: lock information not found\n");
