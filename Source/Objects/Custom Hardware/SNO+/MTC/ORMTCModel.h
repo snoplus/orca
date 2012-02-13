@@ -35,7 +35,6 @@
 @interface ORMTCModel :  ORVmeIOCard <ORDataTaker>
 {
     @private
-		NSFileHandle*			xilinxFileHandle;
 		unsigned long			dataId;
 		NSMutableDictionary*	mtcDataBase;
 		
@@ -46,7 +45,6 @@
 		short					repeatOpCount;
 		unsigned short			repeatDelay;
 		int						useMemory;
-		unsigned long			workingOffset;
 		unsigned long			workingCount;
 		BOOL				doReadOp;
 		BOOL				autoIncrement;
