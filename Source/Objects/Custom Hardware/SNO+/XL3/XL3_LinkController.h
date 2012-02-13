@@ -78,6 +78,19 @@
 	IBOutlet NSTextField*           compositeChargeInjChargeField;
 	IBOutlet NSButton*              compositeChargeInjButton;
 	IBOutlet NSProgressIndicator*	compositeChargeRunningIndicator;
+    //mon
+    IBOutlet NSButton*              monIsPollingCMOSRatesButton;
+    IBOutlet NSButton*              monIsPollingPMTCurrentsButton;
+    IBOutlet NSButton*              monIsPollingFECVoltagesButton;
+    IBOutlet NSButton*              monIsPollingXl3VoltagesButton;
+    IBOutlet NSButton*              monIsPollingHVSupplyButton;
+    IBOutlet NSTextField*           monPollCMOSRatesMaskField; 
+    IBOutlet NSTextField*           monPollPMTCurrentsMaskField; 
+    IBOutlet NSTextField*           monPollFECVoltagesMaskField;
+    IBOutlet NSPopUpButton*         monPollingRatePU;
+    IBOutlet NSButton*              monIsPollingVerboseButton;
+    IBOutlet NSButton*              monIsPollingWithRunButton;
+    IBOutlet NSTextField*           monPollingStatusField;
 	//connection
 	IBOutlet NSButton*              toggleConnectButton;
 	IBOutlet NSPopUpButton*         errorTimeOutPU;
@@ -119,7 +132,19 @@
 - (void) compositeXL3RWDataChanged:(NSNotification*)aNote;
 - (void) compositeXl3PedestalMaskChanged:(NSNotification*)aNote;
 - (void) compositeXl3ChargeInjChanged:(NSNotification*)aNote;
-
+//mon
+- (void) monPollXl3TimeChanged:(NSNotification*)aNote;
+- (void) monIsPollingXl3Changed:(NSNotification*)aNote;
+- (void) monIsPollingCMOSRatesChanged:(NSNotification*)aNote;
+- (void) monPollCMOSRatesMaskChanged:(NSNotification*)aNote;
+- (void) monIsPollingPMTCurrentsChanged:(NSNotification*)aNote;
+- (void) monPollPMTCurrentsMaskChanged:(NSNotification*)aNote;
+- (void) monIsPollingFECVoltagesChanged:(NSNotification*)aNote;
+- (void) monPollFECVoltagesMaskChanged:(NSNotification*)aNote;
+- (void) monIsPollingXl3VoltagesChanged:(NSNotification*)aNote;
+- (void) monIsPollingHVSupplyChanged:(NSNotification*)aNote;
+- (void) monIsPollingXl3WithRunChanged:(NSNotification*)aNote;
+- (void) monPollStatusChanged:(NSNotification*)aNote;
 //ip connection
 - (void) connectStateChanged:(NSNotification*)aNote;
 - (void) linkConnectionChanged:(NSNotification*)aNote;
@@ -161,6 +186,21 @@
 - (IBAction) compositeSetPedestalValue:(id)sender;
 - (IBAction) compositeXl3ChargeInjMaskAction:(id)sender;
 - (IBAction) compositeXl3ChargeInjChargeAction:(id)sender;
+//mon
+- (IBAction) monIsPollingCMOSRatesAction:(id)sender;
+- (IBAction) monIsPollingPMTCurrentsAction:(id)sender;
+- (IBAction) monIsPollingFECVoltagesAction:(id)sender;
+- (IBAction) monIsPollingXl3VoltagesAction:(id)sender;
+- (IBAction) monIsPollingHVSupplyAction:(id)sender;
+- (IBAction) monPollCMOSRatesMaskAction:(id)sender;
+- (IBAction) monPollPMTCurrentsMaskAction:(id)sender;
+- (IBAction) monPollFECVoltagesMaskAction:(id)sender;
+- (IBAction) monPollingRateAction:(id)sender;
+- (IBAction) monIsPollingVerboseAction:(id)sender;
+- (IBAction) monIsPollingWithRunAction:(id)sender;
+- (IBAction) monPollNowAction:(id)sender;
+- (IBAction) monStartPollingAction:(id)sender;
+- (IBAction) monStopPollingAction:(id)sender;
 //connection
 - (IBAction) toggleConnectAction:(id)sender;
 - (IBAction) errorTimeOutAction:(id)sender;

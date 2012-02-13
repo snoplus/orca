@@ -52,30 +52,59 @@ enum {
 
 @interface ORXL3Model : ORSNOCard <ORDataTaker>
 {
-	XL3_Link*	xl3Link;
+	XL3_Link*       xl3Link;
 	unsigned long	xl3MegaBundleDataId;
 	unsigned long	cmosRateDataId;
-	short		selectedRegister;
-	BOOL		basicOpsRunning;
-	BOOL		autoIncrement;	
+	short           selectedRegister;
+	BOOL            basicOpsRunning;
+	BOOL            autoIncrement;	
 	unsigned short	repeatDelay;
-	short		repeatOpCount;
-	BOOL		doReadOp;
-	unsigned long workingCount;
-	unsigned long writeValue;
-	unsigned int  xl3Mode;
-	unsigned long slotMask;
-	BOOL          xl3ModeRunning;
-	unsigned long xl3RWAddressValue;
-    unsigned long xl3RWDataValue;
+	short           repeatOpCount;
+	BOOL            doReadOp;
+	unsigned long   workingCount;
+	unsigned long   writeValue;
+	unsigned int    xl3Mode;
+	unsigned long   slotMask;
+	BOOL            xl3ModeRunning;
+	unsigned long   xl3RWAddressValue;
+    unsigned long   xl3RWDataValue;
 	NSMutableDictionary* xl3OpsRunning;
-	unsigned long xl3PedestalMask;
-    unsigned long xl3ChargeInjMask;
-    unsigned char xl3ChargeInjCharge;
+	unsigned long   xl3PedestalMask;
+    unsigned long   xl3ChargeInjMask;
+    unsigned char   xl3ChargeInjCharge;
+    unsigned short  pollXl3Time;
+    BOOL            isPollingXl3;
+    BOOL            isPollingCMOSRates;
+    unsigned short  pollCMOSRatesMask;
+    BOOL            isPollingPMTCurrents;
+    unsigned short  pollPMTCurrentsMask;
+    BOOL            isPollingFECVoltages;
+    unsigned short  pollFECVoltagesMask;
+    BOOL            isPollingXl3Voltages;
+    BOOL            isPollingHVSupply;
+    BOOL            isPollingXl3WithRun;
+    BOOL            isPollingVerbose;
+    BOOL            isPollingForced;
+    NSString*       pollStatus;
+    NSThread*       pollThread;
+    NSMutableDictionary* pollDict;
 }
 
-@property (assign)	unsigned long    xl3ChargeInjMask;
-@property (assign)	unsigned char    xl3ChargeInjCharge;
+@property (assign)	unsigned long   xl3ChargeInjMask;
+@property (assign)	unsigned char   xl3ChargeInjCharge;
+@property (assign)	unsigned short  pollXl3Time;
+@property (assign)	BOOL            isPollingXl3;
+@property (assign)	BOOL            isPollingCMOSRates;
+@property (assign)	unsigned short  pollCMOSRatesMask;
+@property (assign)	BOOL            isPollingPMTCurrents;
+@property (assign)	unsigned short  pollPMTCurrentsMask;
+@property (assign)	BOOL            isPollingFECVoltages;
+@property (assign)	unsigned short  pollFECVoltagesMask;
+@property (assign)	BOOL            isPollingXl3Voltages;
+@property (assign)	BOOL            isPollingHVSupply;
+@property (assign)  BOOL            isPollingXl3WithRun;
+@property (assign)  BOOL            isPollingVerbose;
+@property (copy)    NSString*       pollStatus;
 
 #pragma mark •••Initialization
 - (id)   init;
@@ -209,6 +238,11 @@ enum {
 #pragma mark •••tests
 - (void) readVMONForSlot:(unsigned short)aSlot voltages:(vmon_results_t*)aVoltages;
 - (void) readVMONForSlot:(unsigned short)aSlot;
+- (void) readVMONWithMask:(unsigned short)aSlotMask;
+- (void) readVMONXL3:(vmon_xl3_results_t*)aVoltages;
+- (void) readVMONXL3;
+
+- (void) pollXl3:(BOOL)forceFlag;
 
 - (void) loadSingleDacForSlot:(unsigned short)aSlot dacNum:(unsigned short)aDacNum dacVal:(unsigned char)aDacVal;
 - (void) setVthrDACsForSlot:(unsigned short)aSlot withChannelMask:(unsigned long)aChannelMask dac:(unsigned char)aDac;
@@ -234,3 +268,16 @@ extern NSString* ORXL3ModelXl3RWDataValueChanged;
 extern NSString* ORXL3ModelXl3OpsRunningChanged;
 extern NSString* ORXL3ModelXl3PedestalMaskChanged;
 extern NSString* ORXL3ModelXl3ChargeInjChanged;
+extern NSString* ORXL3ModelPollXl3TimeChanged;
+extern NSString* ORXL3ModelIsPollingXl3Changed;
+extern NSString* ORXL3ModelIsPollingCMOSRatesChanged;
+extern NSString* ORXL3ModelPollCMOSRatesMaskChanged;
+extern NSString* ORXL3ModelIsPollingPMTCurrentsChanged;
+extern NSString* ORXL3ModelPollPMTCurrentsMaskChanged;
+extern NSString* ORXL3ModelIsPollingFECVoltagesChanged;
+extern NSString* ORXL3ModelPollFECVoltagesMaskChanged;
+extern NSString* ORXL3ModelIsPollingXl3VoltagesChanged;
+extern NSString* ORXL3ModelIsPollingHVSupplyChanged;
+extern NSString* ORXL3ModelIsPollingXl3WithRunChanged;
+extern NSString* ORXL3ModelPollStatusChanged;
+extern NSString* ORXL3ModelIsPollingVerboseChanged;

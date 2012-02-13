@@ -57,6 +57,7 @@
 #define ZDISC_ID                  (0x64) //zeroes discriminators
 #define CALD_TEST_ID              (0x65) //checks adcs with calibration dac
 #define SLOT_NOISE_RATE_ID        (0x66) //check the noise rate in a slot      
+#define VMON_XL3_ID               (0x68) //reads XL3 local voltages      
 
 #define CALD_RESPONSE_ID        (0xAA) // response from cald_test, contains dac ticks and adc values 
 #define PING_ID                 (0xBB) // check if daq is still connected
@@ -265,6 +266,10 @@ typedef struct{
 } vmon_results_t;
 
 typedef struct{
+    float voltages[8];
+} vmon_xl3_results_t;
+
+typedef struct{
     uint32_t slot;
     uint32_t chip;
     uint32_t reg;
@@ -421,7 +426,7 @@ typedef struct{
 typedef struct{
     uint32_t slot_mask;
     uint32_t channel_masks[16];
-    uint32_t period; //delay between reads [usec]
+    uint32_t period; //delay between reads [msec]
 } read_cmos_rate_args_t;
 
 typedef struct{

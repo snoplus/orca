@@ -970,7 +970,7 @@ static void SwapLongBlock(void* p, int32_t n)
 			NSLog(@"XL3 packet read incomplete??? numBytesToGet: %d n: %d\n", numBytesToGet, n);
 			aPacket[n] = '\0';
 			NSLog(@"Dumping the partial packet as a string: %s\n", aPacket);
-			numBytesToGet = 0;
+			//numBytesToGet = 0;
 			break;
 		}
 		else if(n==0){

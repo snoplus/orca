@@ -177,6 +177,66 @@ static NSDictionary* xl3Ops;
                      selector : @selector(compositeXl3ChargeInjChanged:)
                          name : ORXL3ModelXl3ChargeInjChanged
                        object : [model xl3Link]];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(monPollXl3TimeChanged:)
+                         name : ORXL3ModelPollXl3TimeChanged
+                       object : model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(monIsPollingXl3Changed:)
+                         name : ORXL3ModelIsPollingXl3Changed
+                       object : model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(monIsPollingCMOSRatesChanged:)
+                         name : ORXL3ModelIsPollingCMOSRatesChanged
+                       object : model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(monPollCMOSRatesMaskChanged:)
+                         name : ORXL3ModelPollCMOSRatesMaskChanged
+                       object : model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(monIsPollingPMTCurrentsChanged:)
+                         name : ORXL3ModelIsPollingPMTCurrentsChanged
+                       object : model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(monPollPMTCurrentsMaskChanged:)
+                         name : ORXL3ModelPollPMTCurrentsMaskChanged
+                       object : model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(monIsPollingFECVoltagesChanged:)
+                         name : ORXL3ModelIsPollingFECVoltagesChanged
+                       object : model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(monPollFECVoltagesMaskChanged:)
+                         name : ORXL3ModelPollFECVoltagesMaskChanged
+                       object : model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(monIsPollingXl3VoltagesChanged:)
+                         name : ORXL3ModelIsPollingXl3VoltagesChanged
+                       object : model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(monIsPollingHVSupplyChanged:)
+                         name : ORXL3ModelIsPollingHVSupplyChanged
+                       object : model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(monIsPollingXl3WithRunChanged:)
+                         name : ORXL3ModelIsPollingXl3WithRunChanged
+                       object : model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(monPollStatusChanged:)
+                         name : ORXL3ModelPollStatusChanged
+                       object : model];
 }
 
 - (void) updateWindow
@@ -200,7 +260,19 @@ static NSDictionary* xl3Ops;
 	[self compositeXl3RWAddressChanged:nil];
 	[self compositeXL3RWDataChanged:nil];
     [self compositeXl3ChargeInjChanged:nil];
-
+    //mon
+    [self monPollXl3TimeChanged:nil];
+    [self monIsPollingXl3Changed:nil];
+    [self monIsPollingCMOSRatesChanged:nil];
+    [self monPollCMOSRatesMaskChanged:nil];
+    [self monIsPollingPMTCurrentsChanged:nil];
+    [self monPollPMTCurrentsMaskChanged:nil];
+    [self monIsPollingFECVoltagesChanged:nil];
+    [self monPollFECVoltagesMaskChanged:nil];
+    [self monIsPollingXl3VoltagesChanged:nil];
+    [self monIsPollingHVSupplyChanged:nil];
+    [self monIsPollingXl3WithRunChanged:nil];
+    [self monPollStatusChanged:nil];
 	//ip connection
 	[self errorTimeOutChanged:nil];
     [self connectStateChanged:nil];
@@ -364,6 +436,68 @@ static NSDictionary* xl3Ops;
 {
     [compositeChargeInjChargeField setIntValue:[model xl3ChargeInjCharge]];
     [compositeChargeInjMaskField setIntValue:[model xl3ChargeInjMask]];
+}
+
+
+#pragma mark •mon
+- (void) monPollXl3TimeChanged:(NSNotification*)aNote
+{
+    [monPollingRatePU selectItemWithTag:[model pollXl3Time]];
+}
+
+- (void) monIsPollingXl3Changed:(NSNotification*)aNote
+{
+    [monPollingStatusField setStringValue:[model pollStatus]];
+}
+
+- (void) monIsPollingCMOSRatesChanged:(NSNotification*)aNote
+{
+    [monIsPollingCMOSRatesButton setIntValue:[model isPollingCMOSRates]];
+}
+
+- (void) monPollCMOSRatesMaskChanged:(NSNotification*)aNote
+{
+    [monPollCMOSRatesMaskField setIntValue:[model pollCMOSRatesMask]];
+}
+
+- (void) monIsPollingPMTCurrentsChanged:(NSNotification*)aNote
+{
+    [monIsPollingPMTCurrentsButton setIntValue:[model isPollingPMTCurrents]];
+}
+
+- (void) monPollPMTCurrentsMaskChanged:(NSNotification*)aNote
+{
+    [monPollPMTCurrentsMaskField setIntValue:[model pollPMTCurrentsMask]];
+}
+
+- (void) monIsPollingFECVoltagesChanged:(NSNotification*)aNote
+{
+    [monIsPollingFECVoltagesButton setIntValue:[model isPollingFECVoltages]];
+}
+
+- (void) monPollFECVoltagesMaskChanged:(NSNotification*)aNote
+{
+    [monPollFECVoltagesMaskField setIntValue:[model pollFECVoltagesMask]];    
+}
+
+- (void) monIsPollingXl3VoltagesChanged:(NSNotification*)aNote
+{
+    [monIsPollingXl3VoltagesButton setIntValue:[model isPollingXl3Voltages]];
+}
+
+- (void) monIsPollingHVSupplyChanged:(NSNotification*)aNote
+{
+    [monIsPollingHVSupplyButton setIntValue:[model isPollingHVSupply]];    
+}
+
+- (void) monIsPollingXl3WithRunChanged:(NSNotification*)aNote
+{
+    [monIsPollingWithRunButton setIntValue:[model isPollingXl3WithRun]];        
+}
+
+- (void) monPollStatusChanged:(NSNotification*)aNote
+{
+    [monPollingStatusField setStringValue:[model pollStatus]];
 }
 
 #pragma mark •ip connection
@@ -729,6 +863,88 @@ static NSDictionary* xl3Ops;
 {
     [self endEditing];
     [model setXl3ChargeInjCharge:[sender intValue]];
+}
+
+//mon
+- (IBAction) monIsPollingCMOSRatesAction:(id)sender
+{
+    [self endEditing];
+    [model setIsPollingCMOSRates:[sender intValue]];
+}
+
+- (IBAction) monIsPollingPMTCurrentsAction:(id)sender
+{
+    [self endEditing];
+    [model setIsPollingPMTCurrents:[sender intValue]];
+}
+
+- (IBAction) monIsPollingFECVoltagesAction:(id)sender
+{
+    [self endEditing];
+    [model setIsPollingFECVoltages:[sender intValue]];
+}
+
+- (IBAction) monIsPollingXl3VoltagesAction:(id)sender
+{
+    [self endEditing];
+    [model setIsPollingXl3Voltages:[sender intValue]];
+}
+
+- (IBAction) monIsPollingHVSupplyAction:(id)sender
+{
+    [self endEditing];
+    [model setIsPollingHVSupply:[sender intValue]];
+}
+
+- (IBAction) monPollCMOSRatesMaskAction:(id)sender
+{
+    [self endEditing];
+    [model setPollCMOSRatesMask:[sender intValue]];
+}
+
+- (IBAction) monPollPMTCurrentsMaskAction:(id)sender
+{   
+    [self endEditing];
+    [model setPollPMTCurrentsMask:[sender intValue]];
+}
+
+- (IBAction) monPollFECVoltagesMaskAction:(id)sender
+{
+    [self endEditing];
+    [model setPollFECVoltagesMask:[sender intValue]];
+}
+
+- (IBAction) monPollingRateAction:(id)sender
+{
+    [self endEditing];
+    [model setPollXl3Time:[[sender selectedItem] tag]];
+}
+
+- (IBAction) monIsPollingVerboseAction:(id)sender
+{
+    [self endEditing];
+    [model setIsPollingVerbose:[sender intValue]];
+}
+
+- (IBAction) monIsPollingWithRunAction:(id)sender
+{
+    [self endEditing];
+    [model setIsPollingXl3WithRun:[sender intValue]];
+}
+
+- (IBAction) monPollNowAction:(id)sender
+{
+    [model pollXl3:true];
+}
+
+- (IBAction) monStartPollingAction:(id)sender
+{
+    [model setIsPollingXl3:true];
+}
+
+- (IBAction) monStopPollingAction:(id)sender
+{
+    [model setIsPollingXl3:false];
 }
 
 //connection
