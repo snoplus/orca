@@ -19,6 +19,7 @@
 //-------------------------------------------------------------
 
 #import "ORSNOConstants.h"
+#import "Sno_Monitor_Adcs.h"
 
 #define kTubeTypeUnknown	0
 #define kTubeTypeNormal		1
@@ -44,9 +45,20 @@
 				NSString* paddleCardID;
 			} Pmt[kNumSNOPmts];
 			float fecFifo;
+            
+            struct {
+                float voltage;
+            } fecVoltage[kNumFecMonitorAdcs];
+            
 		} Card[kNumSNOCards];
 		float xl3PacketRate;
+        
+        struct{
+            float voltage;
+        } xl3Voltage[20];
 	} SNOCrate[kMaxSNOCrates+2];	// + two spares
+    
+    float currentValueForSelectedHardware;
 }
 
 + (SNOMonitoredHardware*) sharedSNOMonitoredHardware;
@@ -62,6 +74,14 @@
 - (float) xpos:(int)aCrate card:(int)aCard channel:(int)aChannel;
 - (float) ypos:(int)aCrate card:(int)aCard channel:(int)aChannel;
 - (float) zpos:(int)aCrate card:(int)aCard channel:(int)aChannel;
+- (float) fecVoltageValue:(int)aCrate card:(int)aCard voltage:(int)aVoltage;
+- (float) xl3VoltageValue:(int)aCrate voltage:(int)aVoltage;
 - (NSString*)  pmtID:(int)aCrate card:(int)aCard channel:(int)aChannel;
 - (NSColor*)  pmtColor:(int)aCrate card:(int)aCard channel:(int)aChannel;
+- (void) getXL3State:(NSString *) aString;
+- (void) getCableDocument:(NSString *) aString;
+- (void) setCurrentValueForSelectedHardware:(float)aValue;
+- (float) currentValueForSelectedHardware;
 @end
+
+extern NSString* morcaDBRead;

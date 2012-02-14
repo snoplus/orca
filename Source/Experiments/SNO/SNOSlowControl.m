@@ -231,7 +231,7 @@
 	return Card;
 }
 
-- (NSString *) parameterIos
+- (NSString *) parameterIOS
 { 
 	return iosName;
 }

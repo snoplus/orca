@@ -26,6 +26,11 @@
 #import "ORAxis.h"
 #import "ORSNOConstants.h"
 #import "ORRunModel.h"
+#import "ORCompositePlotView.h"
+#import "ORTimeLinePlot.h"
+#import "ORTimeAxis.h"
+#import "ORTimeRate.h"
+#import "SNOConnection.h"
 
 @implementation SNOController
 
@@ -44,32 +49,27 @@
 -(void) awakeFromNib
 {
 	runControlSize		= NSMakeSize(465,260);
-	detectorSize        = NSMakeSize(1121,734);
+	detectorSize        = NSMakeSize(1120,700);
 	slowControlSize		= NSMakeSize(600,650);
-	
+
 	[[self window] setContentSize:runControlSize];
-	
-//	[[self window] setAspectRatio:NSMakeSize(5,3)];
-//	[[self window] setMinSize:NSMakeSize(600,360)];	
     blankView = [[NSView alloc] init];
-//    [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
-	
-	SNOMonitoredHardware *db = [SNOMonitoredHardware sharedSNOMonitoredHardware];
-	[db readCableDBDocumentFromOrcaDB];
-	
+
+    ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:0 andDataSource:self];
+	[ratePlot addPlot: aPlot];
+	[(ORTimeAxis*)[ratePlot xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
+	[aPlot release];
+    
+    [[ratePlot yAxis] setRngLimitsLow:0 withHigh:5000000 withMinRng:1];
+    
+	[[SNOMonitoredHardware sharedSNOMonitoredHardware] readCableDBDocumentFromOrcaDB];
+
 	[self findRunControl];
     [super awakeFromNib];
-
-	/*[secondaryColorScale setSpectrumRange:0.7];
-	[[secondaryColorScale colorAxis] setRngLimitsLow:0 withHigh:20 withMinRng:1];
-    [[secondaryColorScale colorAxis] setRngDefaultsLow:0 withHigh:20];
-	[[secondaryColorScale colorAxis] setNeedsDisplay:YES];*/
-	
 	[selectionStringTextView setFont:[NSFont fontWithName:@"Monaco" size:9]];
 }
 
 #pragma mark •••Accessors
-
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers
@@ -83,11 +83,10 @@
                          name : ORSNORateColorBarChangedNotification
                        object : model];*/
     
-    //a fake action for the scale objects
-    /*[notifyCenter addObserver : self
-                     selector : @selector(scaleAction:)
+    [notifyCenter addObserver : self
+                     selector : @selector(secondaryColorAxisAttributesChanged:)
                          name : ORAxisRangeChangedNotification
-                       object : nil];*/
+                       object : [secondaryColorScale colorAxis]];
 
     [notifyCenter addObserver : self
 					 selector : @selector(updateRunInfo:)
@@ -117,32 +116,67 @@
 	[notifyCenter addObserver : self
 					 selector : @selector(morcaDBRead:)
 						 name : morcaDBRead
-					   object : model];
+					   object : [SNOMonitoredHardware sharedSNOMonitoredHardware]];
+    
+	[notifyCenter addObserver : self
+					 selector : @selector(updateRatePlot:)
+						 name : newValueAvailable
+					   object : detectorView];   
+    
+	[notifyCenter addObserver : self
+					 selector : @selector(disablePlotButton:)
+						 name : plotButtonDisabled
+					   object : detectorView];    
+}
+
+#pragma mark •••Data Source For Plots
+- (int) numberPointsInPlot:(id)aPlotter
+{
+	int tag = [aPlotter tag];
+	if(tag == 0){ 
+		return [[model parameterRate] count];
+	}
+	else return 0;
+}
+
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
+{
+	double aValue = 0;
+	int tag = [aPlotter tag];
+	if(tag == 0){ 
+		int count = [[model parameterRate] count];
+		int index = count-i-1;
+		if(count==0) aValue = 0;
+		else		 aValue = [[model parameterRate] valueAtIndex:index];
+		*xValue = [[model parameterRate] timeSampledAtIndex:index];
+		*yValue = aValue;
+	}
 }
 
 #pragma mark •••Actions
-//a fake action from the scale object
-/*
-- (void) scaleAction:(NSNotification*)aNotification
+- (void) secondaryColorAxisAttributesChanged:(NSNotification*)aNotification
 {
-    if(aNotification == nil || [aNotification object] == [detectorColorBar colorAxis]){
-        [[self undoManager] setActionName: @"Set Color Bar Attributes"];
-        [model setColorBarAttributes:[[detectorColorBar colorAxis]attributes]];
-    }
-}*/
+	//BOOL isLog = [[secondaryColorScale colorAxis] isLog];
+	//[secondaryColorAxisLogCB setState:isLog];
+    [detectorView setColorAxisChanged:YES];
+	[detectorView setColorBarAxisAttributes:[[secondaryColorScale colorAxis] attributes]];
+    [detectorView updateSNODetectorView];
+    //[detectorView setColorAxisChanged:NO];
+}
 
 //Run control action
 - (void) findRunControl
 {
 	runControl = [[[NSApp delegate] document] findObjectWithFullID:@"ORRunModel,1"];
-	//	if(!runControl){
-	//		runControl = [[[NSApp delegate] document] findObjectWithFullID:@"ORRemoteRunModel,1"];	
-	//	}
+	if(!runControl){
+        runControl = [[[NSApp delegate] document] findObjectWithFullID:@"ORRemoteRunModel,1"];	
+	}
 	[self updateRunInfo:nil];
+    [self getRunTypes];
 	//	[startRunButton setEnabled:runControl!=nil];
 	//	[timedRunCB setEnabled:runControl!=nil];
 	//	[runModeMatrix setEnabled:runControl!=nil];
-	
+    //[self updateWindow];
 }
 
 - (IBAction) startRunAction:(id) sender
@@ -155,7 +189,7 @@
 	}
 }
 
-- (IBAction) stopRunAction:(id) sender;
+- (IBAction) stopRunAction:(id) sender
 {
 	//if ([startRunButton state]==1) [startRunButton setState:0];
 	[runControl haltRun];
@@ -187,6 +221,36 @@
 		[runNumberField setStringValue:@"---"];
 		[elapsedTimeField setStringValue:@"---"];
 	}
+}
+
+- (void) getRunTypes
+{
+    NSMutableArray *runTypeList = [[NSMutableArray alloc] init];
+    [model getRunTypesFromOrcaDB:runTypeList];
+    int i;
+    for(i=0;i<[runTypeList count];++i){
+        NSMenuItem *runType = [[NSMenuItem alloc] initWithTitle:[runTypeList objectAtIndex:i] action:nil keyEquivalent:@""];
+        [[runTypeButton menu] addItem:runType];
+        [runType release];
+    }
+    [runTypeList release];
+}
+
+- (void) setRunTypeAction:(id)sender
+{
+    [model setRunTypeName:[[sender selectedItem] title]];
+    if ([[[sender selectedItem] title] isEqualToString:@"AmBe"]) {
+        [sourceNotesButton setEnabled:YES];
+    }else{
+        [sourceNotesButton setEnabled:NO];
+    }
+}
+
+- (IBAction) sourceNotesAction:(id)sender
+{
+    //NSLog(@"%@\n",[sourceNotesField stringValue]);
+//    [model writeNewRunTypeDocument:[sourceNotesField stringValue]];
+    [runNotesDrawer close];
 }
 
 -(void) elapsedTimeChanged:(NSNotification*)aNotification
@@ -226,9 +290,34 @@
 
 - (void) parameterDisplayAction:(id)sender
 {
+    if ([[[sender selectedItem] title] isEqualToString:@"FEC Voltages"] ||
+        [[[sender selectedItem] title] isEqualToString:@"XL3 Voltages"]){
+        [[selectionModeButton itemWithTitle:@"Tube"] setEnabled:NO];
+        [[selectionModeButton itemWithTitle:@"Card"] setEnabled:NO];
+        [[selectionModeButton itemWithTitle:@"Crate"] setEnabled:NO];
+        [[selectionModeButton itemWithTitle:@"Voltage"] setEnabled:YES];
+        [selectionModeButton selectItemWithTitle:@"Voltage"];
+        [[viewSelectionButton itemWithTitle:@"PSUP view"] setEnabled:NO];
+        [viewSelectionButton selectItemWithTitle:@"Crate view"];
+        [detectorView setViewType:NO];
+    }else if ([[[sender selectedItem] title] isEqualToString:@"Data Rates"]){
+        [[selectionModeButton itemWithTitle:@"Tube"] setEnabled:NO];
+        [[selectionModeButton itemWithTitle:@"Card"] setEnabled:NO];
+        [[selectionModeButton itemWithTitle:@"Crate"] setEnabled:YES];
+        [[selectionModeButton itemWithTitle:@"Voltage"] setEnabled:NO];
+        [selectionModeButton selectItemWithTitle:@"Crate"];
+        [[viewSelectionButton itemWithTitle:@"PSUP view"] setEnabled:YES];
+        [detectorView setSelectionMode:[[selectionModeButton itemWithTitle:@"Crate"] tag]];
+    }else {
+        [[selectionModeButton itemWithTitle:@"Tube"] setEnabled:YES];
+        [[selectionModeButton itemWithTitle:@"Card"] setEnabled:YES];
+        [[selectionModeButton itemWithTitle:@"Crate"] setEnabled:YES];
+        [[selectionModeButton itemWithTitle:@"Voltage"] setEnabled:NO];
+        [[viewSelectionButton itemWithTitle:@"PSUP view"] setEnabled:YES];
+    }
 	[detectorView setParameterToDisplay:[[sender selectedItem] tag]];
+    [detectorView setDetectorTitleString:[[sender selectedItem] title]];
 	[model getDataFromMorca];
-	[detectorView updateSNODetectorView];
 }
 
 - (void) selectionModeAction:(id)sender
@@ -241,7 +330,6 @@
 - (void) readMorca:(id)sender
 {
 	[model getDataFromMorca];
-	[detectorView updateSNODetectorView];
 }
 
 - (void) setXl3PollingAction:(id)sender
@@ -251,12 +339,19 @@
 
 - (void) startXl3PollingAction:(id)sender
 {
+    if ([[xl3PollingButton selectedItem] tag] > 0) [detectorView setPollingInProgress:YES];
 	[model startXl3Polling];
 }
 
 - (void) stopXl3PollingAction:(id)sender
 {
+    [detectorView setPollingInProgress:NO];
 	[model stopXl3Polling];
+}
+
+- (void) plotVariableAction:(id)sender
+{
+    if (![model isPlottingGraph]) [model collectSelectedVariable];
 }
 
 //slow control actions
@@ -267,17 +362,33 @@
 
 - (IBAction) startSlowControlPollingAction:(id)sender
 {
+    if ([slowControlPollingButton selectedTag] != 0) [connectToIOServerButton setEnabled:NO];
 	[model startSlowControlPolling];
 }
 
 - (IBAction) stopSlowControlPollingAction:(id)sender
 {
 	[model stopSlowControlPolling];
+    [connectToIOServerButton setEnabled:YES];
+}
+
+- (IBAction) setIosPasswd:(id)sender
+{
+    //NSLog(@"pw %@\n",[sender stringValue]);
+    [model setIoserverPasswd:[sender stringValue]];
+}
+
+- (IBAction) setIosUsername:(id)sender
+{
+    //NSLog(@"un %@\n",[sender stringValue]);
+    [model setIoserverUsername:[sender stringValue]];
 }
 
 - (IBAction) connectToIOServerAction:(id)sender
 {
 	[model connectToIOServer];
+    [startSlowControlMonitorButton setEnabled:YES];
+    [stopSlowControlMonitorButton setEnabled:YES];
 }
 
 - (IBAction) setSlowControlParameterThresholdsAction:(id)sender
@@ -304,21 +415,25 @@
 - (void) updateWindow
 {
     [super updateWindow];
-    //[self colorAttributesChanged:nil];
 }
-/*
-- (void) colorAttributesChanged:(NSNotification*)aNote
-{        
-	[[detectorColorBar colorAxis] setAttributes:[model colorBarAttributes]];
-	[detectorColorBar setNeedsDisplay:YES];
-	[[detectorColorBar colorAxis]setNeedsDisplay:YES];
-	
-	BOOL state = [[[model colorBarAttributes] objectForKey:ORAxisUseLog] boolValue];
-	[colorBarLogCB setState:state];
-}*/
+
+- (void) updateRatePlot:(NSNotification *)aNote
+{
+    if (![plotVariableButton isEnabled]){
+        [plotVariableButton setEnabled:YES];
+    } else {
+        [ratePlot setNeedsDisplay:YES];
+    }
+}
+
+- (void) disablePlotButton:(NSNotification *)aNote
+{
+    [plotVariableButton setEnabled:NO];
+}
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem
 {
+    /*
 	float toolBarOffset = 0;
 	BOOL toolBarVisible = [[monitorWindow toolbar] isVisible];
 	if(toolBarVisible){
@@ -327,7 +442,7 @@
 			case NSToolbarSizeModeSmall:	toolBarOffset = 50; break;
 			default:						toolBarOffset = 60; break;
 		}
-	}
+	}*/
 	if([tabView indexOfTabViewItem:tabViewItem] == 0){
 		[monitorWindow setContentView:blankView];
 		NSSize newSize = detectorSize;
@@ -450,7 +565,12 @@
 			[slowControlVariable setSlowControlParameterChanged:YES];
 		}		
 		[slowControlVariable setChannelGain:[anObject floatValue]];
-	}else if ([columnName isEqualToString:@"parameterCard"]) {
+	}else if ([columnName isEqualToString:@"parameterIOS"]){
+        if ([slowControlVariable parameterIOS] != anObject){
+            [slowControlVariable setSlowControlParameterChanged:YES];
+        }
+        [slowControlVariable setIosName:anObject];
+    }else if ([columnName isEqualToString:@"parameterCard"]) {
 		if ([slowControlVariable parameterCard] != anObject) {
 			[slowControlVariable setSlowControlParameterChanged:YES];
 		}	

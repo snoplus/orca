@@ -30,41 +30,58 @@
 @interface SNOModel :  OrcaObject
 {
     @private
-        NSMutableDictionary* colorBarAttributes;
         NSDictionary*       xAttributes;
         NSDictionary*       yAttributes;	 
 
 	NSMutableArray *tableEntries;
+    NSMutableDictionary *slowControlMap;
 	int slowControlPollingState;
 	int xl3PollingState;
 	BOOL pollXl3;
 	BOOL pollSlowControl;
+    BOOL isPlottingGraph;
 	NSString *slowControlMonitorStatusString;
+    NSString *runType;
+    NSString *iosUsername;
+    NSString *iosPasswd;
 	NSColor *slowControlMonitorStatusStringColor;
-	SNOMonitoredHardware *db;
+    NSArray *iosCards;
+    NSArray *ioServers;
+    ORTimeRate *parameterRate;
+//	SNOMonitoredHardware *db;
 }
 
 #pragma mark ¥¥¥Notifications
 - (void) runStatusChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Accessors
-- (NSMutableDictionary*) colorBarAttributes;
 - (NSDictionary*)   xAttributes;
 - (void) setYAttributes:(NSDictionary*)someAttributes;
 - (NSDictionary*)   yAttributes;
 - (void) setXAttributes:(NSDictionary*)someAttributes;
-- (void) setColorBarAttributes:(NSMutableDictionary*)newColorBarAttributes;
 - (void) runAboutToStart:(NSNotification*)aNote;
 - (void) runEnded:(NSNotification*)aNote;
+- (void) getRunTypesFromOrcaDB:(NSMutableArray *)runTypeList;
+- (void) setRunTypeName:(NSString *)aType;
+- (NSString *) getRunType;
+- (ORTimeRate *) parameterRate;
+- (BOOL) isPlottingGraph;
+//- (void) writeNewRunTypeDocument:(NSString *)runNotes;
+//- (NSString *) getSourceDocId;
 
 //monitor
 - (void) getDataFromMorca;
 - (void) setXl3Polling:(int)aState;
 - (void) startXl3Polling;
 - (void) stopXl3Polling;
+- (void) collectSelectedVariable;
+- (void) releaseParameterRate;
 
 //slow control
+- (void) forwardPorts;
 - (void) connectToIOServer;
+- (void) setIoserverUsername:(NSString*)aString;
+- (void) setIoserverPasswd:(NSString*)aString;
 - (void) setSlowControlPolling:(int)aState;
 - (void) startSlowControlPolling;
 - (void) stopSlowControlPolling;
@@ -79,12 +96,19 @@
 - (NSString*) getSlowControlMonitorStatusString;
 - (NSColor*) getSlowControlMonitorStatusStringColor;
 
+//ORTaskSequence delegate methods
+- (void) tasksCompleted:(id)sender;
+//connection delegate methods
+- (void) getSlowControlMap:(NSString *)aString;
+- (void) getIOSCards:(NSString *)aString;
+- (void) getIOS:(NSString *)aString;
+- (void) getAllChannelValues:(NSString *)aString withKey:(NSString*)aKey;
+- (void) getAllConfig:(NSString *)aString withKey:(NSString*)aKey;
+- (void) updateIOSChannelThresholds:(NSString *) aString ofChannel:(NSString *)aKey;
 @end
 
-extern NSString* ORSNORateColorBarChangedNotification;
 extern NSString* ORSNOChartXChangedNotification;
 extern NSString* ORSNOChartYChangedNotification;
 extern NSString* slowControlTableChanged;
 extern NSString* slowControlConnectionStatusChanged;
-extern NSString* morcaDBRead;
 

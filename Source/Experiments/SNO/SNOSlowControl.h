@@ -82,7 +82,7 @@
 - (float) parameterHiHiThreshold;
 - (float) parameterGain;
 - (NSString *) parameterCard;
-- (NSString *) parameterIos;
+- (NSString *) parameterIOS;
 - (int) parameterChannel;
 - (BOOL) parameterSelected;
 - (BOOL) parameterEnabled;

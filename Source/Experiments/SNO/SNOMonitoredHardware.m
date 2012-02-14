@@ -21,38 +21,110 @@
 
 #import "SNOMonitoredHardware.h"
 #import "SynthesizeSingleton.h"
+#import "SNOConnection.h"
 #import "YAJL/YAJL.h"
 #define TubeInRange(crate,card,channel) ((crate>=0) && (crate<kMaxSNOCrates) && (card>=0) && (card<kNumSNOCards) && (channel>=0) && (channel<kNumSNOPmts))
+#define VoltageInRange(crate,card,voltage) ((crate>=0) && (crate<kMaxSNOCrates) && (card>=0) && (card<kNumSNOCards) && (voltage>=0) && (voltage<kNumFecMonitorAdcs))
+#define xl3VoltageInRange(crate,voltage) ((crate>=0) && (crate<kMaxSNOCrates) && (voltage>=0) && (voltage<12))
 
 @implementation SNOMonitoredHardware
 
 SYNTHESIZE_SINGLETON_FOR_CLASS(SNOMonitoredHardware);
 
+NSString* morcaDBRead = @"morcaDBRead";
+
 - (void) readCableDBDocumentFromOrcaDB
 { 
-	NSURLRequest *request;
-	NSHTTPURLResponse *response;
-	NSError *connectionError;
-	NSString *urlName, *jsonStr;
-	NSData *responseData;
-	
-	//get the id of the cableDB document
-	urlName=[NSString stringWithFormat:@"http://localhost:5984/orca/_design/cable/_view/all"];	
-	request = [NSURLRequest requestWithURL:[NSURL URLWithString:urlName]];	
-	responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&connectionError];
-    jsonStr = [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
-	NSDictionary *jsonAllView = [jsonStr yajl_JSON];
-	[jsonStr release];
-	NSArray *allview = [jsonAllView objectForKey:@"rows"];
-	NSString *docid = [[allview objectAtIndex:0] objectForKey:@"id"];
-	
-	//get the cableDB document and store it in a dictionary
-	urlName=[NSString stringWithFormat:@"http://localhost:5984/orca/%@",docid];	
-	request = [NSURLRequest requestWithURL:[NSURL URLWithString:urlName]];	
-	responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&connectionError];
-    jsonStr = [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
-	NSDictionary *jsonCableDB = [jsonStr yajl_JSON];
-	[jsonStr release];
+    NSString *url = [NSString stringWithString:@"http://snoplus:scintillate@snotpenn01.snolab.ca:5984/orcatest/_design/cable/_view/all?include_docs=true"];
+    SNOConnection *connection = [[SNOConnection alloc] init];
+    [connection setDelegate:self];
+    [connection setDelegateAction:@"getCableDocument"];
+    [connection get:url];
+    [connection release];
+}
+
+-(void) readXL3StateDocumentFromMorca
+{	
+	//get the XL3 document and store it in a dictionary
+    
+    int ixl3;
+    for(ixl3=0;ixl3<kMaxSNOCrates-2;ixl3++){
+        SNOConnection *connection = [[SNOConnection alloc] init];
+        [connection setDelegate:self];
+        [connection setDelegateAction:@"getXL3State"];
+//        NSString *url= [NSString stringWithFormat:@"http://localhost:5984/morca/_design/xl3_status/_view/xl3_num?descending=True&key=%i&limit=1&include_docs=true",ixl3];
+        NSString *url= [NSString stringWithFormat:@"http://snoplus:scintillate@snotpenn01.snolab.ca:5984/morca/_design/xl3_status/_view/xl3_num?descending=True&key=%i&limit=1&include_docs=true",ixl3];
+        [connection get:url];
+        [connection release];
+    }
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:morcaDBRead object:self];
+}
+
+//---------------------------
+//SNOConnection delegate methods 
+
+-(void) getXL3State:(NSString *)aString
+{
+    NSArray *row = [[NSArray alloc] initWithArray:[[aString yajl_JSON] objectForKey:@"rows"]];
+    NSDictionary *jsonMorcaDB = [[NSDictionary alloc] initWithDictionary:[[row objectAtIndex:0] objectForKey:@"doc"]];
+
+    int crate;
+    
+    crate = [[jsonMorcaDB objectForKey:@"xl3_num"] intValue];
+    for(id key in jsonMorcaDB){
+        if([key isEqualToString:@"cmos_rt"]){
+            int cardindex;
+            for(cardindex=0;cardindex<kNumSNOCards;++cardindex){
+                int pmtindex;
+                for(pmtindex=0;pmtindex<kNumSNOPmts;++pmtindex){
+                    SNOCrate[crate].Card[cardindex].Pmt[pmtindex].cmosRate = 
+                    [[[[jsonMorcaDB objectForKey:key] objectAtIndex:cardindex] objectAtIndex:pmtindex] floatValue];
+                }
+            }
+        }else if ([key isEqualToString:@"pmt_base_i"]){
+            int cardindex;
+            for(cardindex=0;cardindex<kNumSNOCards;++cardindex){
+                int pmtindex;
+                for(pmtindex=0;pmtindex<kNumSNOPmts;++pmtindex){
+                    SNOCrate[crate].Card[cardindex].Pmt[pmtindex].pmtBaseCurrent = 
+                    [[[[jsonMorcaDB objectForKey:key] objectAtIndex:cardindex] objectAtIndex:pmtindex] floatValue];
+                } 
+            }
+        }else if ([key isEqualToString:@"fec_fifo"]){
+            int cardindex;
+            for(cardindex=0;cardindex<kNumSNOCards;++cardindex){
+                SNOCrate[crate].Card[cardindex].fecFifo = 
+                [[[jsonMorcaDB objectForKey:key] objectAtIndex:cardindex] floatValue];
+            }
+        }else if ([key isEqualToString:@"xl3_pckrt"]){
+            SNOCrate[crate].xl3PacketRate = [[jsonMorcaDB objectForKey:key] floatValue];
+        }else if ([key isEqualToString:@"fec_vlt"]){
+            int cardindex;
+            for (cardindex=0; cardindex<kNumSNOCards; ++cardindex) {
+                int iVoltage;
+                for (iVoltage=0; iVoltage<19; iVoltage++) {
+                    SNOCrate[crate].Card[cardindex].fecVoltage[iVoltage].voltage = 
+                    [[[[jsonMorcaDB objectForKey:key] objectAtIndex:cardindex] objectAtIndex:iVoltage] floatValue];
+                }
+            }
+        }else if ([key isEqualToString:@"xl3_vlt"]){
+            int iVoltage;
+            for (iVoltage=0;iVoltage<12;iVoltage++){
+                SNOCrate[crate].xl3Voltage[iVoltage].voltage = 
+                [[[jsonMorcaDB objectForKey:key] objectAtIndex:iVoltage] floatValue];
+            }
+        }
+    }
+    
+    [row release], row=nil;
+    [jsonMorcaDB release], jsonMorcaDB=nil;
+}
+
+-(void) getCableDocument:(NSString *)aString
+{
+    NSArray *row = [[NSArray alloc] initWithArray:[[aString yajl_JSON] objectForKey:@"rows"]];
+    NSDictionary *jsonCableDB = [[NSDictionary alloc] initWithDictionary:[[row objectAtIndex:0] objectForKey:@"doc"]];
 	
 	//init to defaults
 	int crate,card,channel;
@@ -100,90 +172,22 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(SNOMonitoredHardware);
 			
 		}
     }
-	
-	//NSLog(@"%i %i %i %i %i\n",kTubeTypeOwl, kTubeTypeLowGain, kTubeTypeButt, kTubeTypeNeck, kTubeTypeNormal);
-	
+    
+    [row release], row=nil;
+    [jsonCableDB release], jsonCableDB=nil;
 }
 
--(void) readXL3StateDocumentFromMorca
-{	
-	//initialize to zero first
-	int crate, card, pmt;
-	for (crate=0;crate<kMaxSNOCrates;crate++){
-		for(card=0;card<kNumSNOCards;card++){
-			for(pmt=0;pmt<kNumSNOPmts;pmt++){
-				SNOCrate[crate].Card[card].Pmt[pmt].cmosRate = 0.0;
-			}
-		}
-	}
-	
-	NSHTTPURLResponse *response = nil;
-	NSError *connectionError = [[NSError alloc] init];
-	
-	//get the id of the cableDB document
-	NSString *urlName=[[NSString alloc] initWithFormat:@"http://localhost:5984/morca/_design/timestamps/_view/all"];	
-	NSURLRequest *request = [[NSURLRequest alloc] initWithURL:[NSURL URLWithString:urlName]];	
-	NSData *responseData = [[NSData alloc] initWithData:[NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&connectionError]];
-    NSString *jsonStr = [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
-	NSDictionary *jsonAllView = [[NSDictionary alloc] initWithDictionary:[jsonStr yajl_JSON]];
-	NSArray *allview = [[NSArray alloc] initWithArray:[jsonAllView objectForKey:@"rows"]];
-	NSString *docid = [[allview objectAtIndex:0] objectForKey:@"id"];
-	[jsonStr release];
-	[responseData release];
-	[urlName release];
-	[request release];
-	
-	//get the XL3 document and store it in a dictionary
-	urlName=[[NSString alloc] initWithFormat:@"http://localhost:5984/morca/%@",docid];	
-	request = [[NSURLRequest alloc] initWithURL:[NSURL URLWithString:urlName]];	
-	responseData = [[NSData alloc] initWithData:[NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&connectionError]];
-    jsonStr = [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
-	NSDictionary *jsonMorcaDB = [[NSDictionary alloc] initWithDictionary:[jsonStr yajl_JSON]];
-
-	crate = [[jsonMorcaDB objectForKey:@"xl3_num"] intValue];
-	
-	for(id key in jsonMorcaDB){
-		if([key isEqualToString:@"cmos_rt"]){
-			int cardindex;
-			for(cardindex=0;cardindex<kNumSNOCards;++cardindex){
-				int pmtindex;
-				for(pmtindex=0;pmtindex<kNumSNOPmts;++pmtindex){
-					SNOCrate[crate].Card[cardindex].Pmt[pmtindex].cmosRate = 
-					    [[[[jsonMorcaDB objectForKey:key] objectAtIndex:cardindex] objectAtIndex:pmtindex] floatValue];
-				}
-			}
-		}else if ([key isEqualToString:@"pmt_base_i"]){
-			int cardindex;
-			for(cardindex=0;cardindex<kNumSNOCards;++cardindex){
-				int pmtindex;
-				for(pmtindex=0;pmtindex<kNumSNOPmts;++pmtindex){
-					SNOCrate[crate].Card[cardindex].Pmt[pmtindex].pmtBaseCurrent = 
-				    	[[[[jsonMorcaDB objectForKey:key] objectAtIndex:cardindex] objectAtIndex:pmtindex] floatValue];
-					//NSLog(@"%f %f\n",[self baseCurrent:crate card:cardindex channel:pmtindex],[[[[jsonMorcaDB objectForKey:key] objectAtIndex:cardindex] objectAtIndex:pmtindex] floatValue]);
-				} 
-			}
-		}else if ([key isEqualToString:@"fec_fifo"]){
-			int cardindex;
-			for(cardindex=0;cardindex<kNumSNOCards;++cardindex){
-				SNOCrate[crate].Card[cardindex].fecFifo = 
-					[[[jsonMorcaDB objectForKey:key] objectAtIndex:cardindex] floatValue];
-			}
-		}else if ([key isEqualToString:@"xl3_pckrt"]){
-			SNOCrate[crate].xl3PacketRate = [[jsonMorcaDB objectForKey:key] floatValue];
-		}
-    }
-	
-	[jsonStr release];
-	[responseData release];
-	[jsonMorcaDB release];
-	[jsonAllView release];
-	[allview release];
-	[urlName release];
-	[request release];
-	//[response release];
-	[connectionError release];
+- (void) setCurrentValueForSelectedHardware:(float)aValue
+{
+    currentValueForSelectedHardware = aValue;
 }
 
+- (float) currentValueForSelectedHardware
+{
+    return currentValueForSelectedHardware;
+}
+
+//----------------------
 
 -(void) decode:(NSString*)s crate:(int*)crate card:(int*)card channel:(int*) channel
 {
@@ -273,6 +277,23 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(SNOMonitoredHardware);
 		return SNOCrate[aCrate].Card[aCard].Pmt[aChannel].z;
 	}
 	else return 0;
+}
+
+- (float) fecVoltageValue:(int)aCrate card:(int)aCard voltage:(int)aVoltage
+{
+    if(VoltageInRange(aCrate,aCard,aVoltage)){
+        return SNOCrate[aCrate].Card[aCard].fecVoltage[aVoltage].voltage;
+
+    }
+    else return 0;
+}
+
+- (float) xl3VoltageValue:(int)aCrate voltage:(int)aVoltage
+{
+    if(xl3VoltageInRange(aCrate,aVoltage)){
+        return SNOCrate[aCrate].xl3Voltage[aVoltage].voltage;
+    }
+    else return 0;
 }
 
 - (NSString*)  pmtID:(int)aCrate card:(int)aCard channel:(int)aChannel

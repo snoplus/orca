@@ -25,14 +25,15 @@
 #import "ORDataPacket.h"
 #import "ORRunModel.h"
 #import "OrcaObject.h"
+#import "SNOConnection.h"
 #import "YAJL/YAJL.h"
+#import "ORTaskSequence.h"
+#import "ORTimeRate.h"
 
-NSString* ORSNORateColorBarChangedNotification      = @"ORSNORateColorBarChangedNotification";
 NSString* ORSNOChartXChangedNotification            = @"ORSNOChartXChangedNotification";
 NSString* ORSNOChartYChangedNotification            = @"ORSNOChartYChangedNotification";
 NSString* slowControlTableChanged					= @"slowControlTableChanged";
 NSString* slowControlConnectionStatusChanged		= @"slowControlConnectionStatusChanged";
-NSString* morcaDBRead								= @"morcaDBRead";
 
 @interface SNOModel (private)
 - (void) _setUpPolling;
@@ -45,12 +46,6 @@ NSString* morcaDBRead								= @"morcaDBRead";
 - (id) init //designated initializer
 {
     self = [super init];
-
-    colorBarAttributes = [[NSMutableDictionary dictionary] retain];
-    [colorBarAttributes setObject:[NSNumber numberWithDouble:0] forKey:ORAxisMinValue];
-    [colorBarAttributes setObject:[NSNumber numberWithDouble:10000] forKey:ORAxisMaxValue];
-    [colorBarAttributes setObject:[NSNumber numberWithBool:NO] forKey:ORAxisUseLog];
-    
     return self;
 }
 
@@ -58,10 +53,12 @@ NSString* morcaDBRead								= @"morcaDBRead";
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 	
-    [colorBarAttributes release];
     [xAttributes release];
     [yAttributes release];
-	[db release];
+    [tableEntries release];
+    [slowControlMap release];
+    [iosCards release];
+    [ioServers release];
     [super dealloc];
 }
 
@@ -121,26 +118,16 @@ NSString* morcaDBRead								= @"morcaDBRead";
     }
 }
 
+- (void) runAboutToStart:(NSNotification*)aNote
+{
+}
+
+- (void) runEnded:(NSNotification*)aNote
+{		
+}
+
 
 #pragma mark •••Accessors
-- (NSMutableDictionary*) colorBarAttributes
-{
-    return colorBarAttributes;
-}
-- (void) setColorBarAttributes:(NSMutableDictionary*)newColorBarAttributes
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setColorBarAttributes:colorBarAttributes];
-    
-    [newColorBarAttributes retain];
-    [colorBarAttributes release];
-    colorBarAttributes=newColorBarAttributes;
-    
-    [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORSNORateColorBarChangedNotification
-	 object:self];
-    
-}
-
 - (NSDictionary*)   xAttributes
 {
     return xAttributes;
@@ -163,54 +150,66 @@ NSString* morcaDBRead								= @"morcaDBRead";
     xAttributes = [someAttributes copy];
 }
 
-#pragma mark •••Archival
-- (id)initWithCoder:(NSCoder*)decoder
+- (ORTimeRate *) parameterRate
 {
-    self = [super initWithCoder:decoder];
-    
-    [[self undoManager] disableUndoRegistration];
-    
-    
-    [self setColorBarAttributes:[decoder decodeObjectForKey:@"colorBarAttributes"]];
-    [self setXAttributes:[decoder decodeObjectForKey:@"xAttributes"]];
-    [self setYAttributes:[decoder decodeObjectForKey:@"yAttributes"]];
-    
+    return parameterRate;
+}
 
+
+- (void) getRunTypesFromOrcaDB:(NSMutableArray *)runTypeList
+{
+    [runTypeList insertObject:@"---" atIndex:0];
+    
+    NSHTTPURLResponse *response = nil;
+	NSError *connectionError;
 	
-    [[self undoManager] enableUndoRegistration];
+	NSString *urlName=[[NSString alloc] initWithFormat:
+                       @"http://snoplus:scintillate@snotpenn01.snolab.ca:5984/orcatest/_design/run_type/_view/all?group=True&group_level=1"];
+	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:
+                                    [NSURL URLWithString:urlName] cachePolicy: NSURLRequestReloadIgnoringCacheData timeoutInterval:1];	
+	NSData *responseData = [[NSData alloc] initWithData:
+                            [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&connectionError]];
     
-    [self registerNotificationObservers];
-    return self;
+   // if (responseData!=nil){
+        NSString *jsonStr = [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
+        NSDictionary *runTypesView = [[NSDictionary alloc] initWithDictionary:[jsonStr yajl_JSON]];
+        NSArray *runTypes = [[NSArray alloc] initWithArray:[runTypesView objectForKey:@"rows"]];
+
+        int numtypes;
+        for(numtypes=0;numtypes<[runTypes count];numtypes++){
+            [runTypeList insertObject:[[[runTypes objectAtIndex:numtypes] objectForKey:@"key"] objectAtIndex:0] atIndex:numtypes+1];
+        }
+            
+        [runTypes release];
+        [jsonStr release];
+        [runTypesView release];
+  //  }
+    
+    [urlName release];
+    [responseData release];
 }
 
-- (void)encodeWithCoder:(NSCoder*)encoder
+- (void) setRunTypeName:(NSString *)aType
 {
-    [super encodeWithCoder:encoder];
-    
-    [encoder encodeObject:colorBarAttributes forKey:@"colorBarAttributes"];
-    [encoder encodeObject:xAttributes forKey:@"xAttributes"];
-    [encoder encodeObject:yAttributes forKey:@"yAttributes"];
-    
+    [aType retain];
+    [runType release];
+    runType = aType;
 }
 
-
-
-- (void) runAboutToStart:(NSNotification*)aNote
+- (NSString *) getRunType
 {
+    return runType;
 }
 
-- (void) runEnded:(NSNotification*)aNote
-{		
+- (BOOL) isPlottingGraph
+{
+    return isPlottingGraph;
 }
 
 //monitor
 - (void) getDataFromMorca
 {
-	if (db) [db release];
-	db = [SNOMonitoredHardware sharedSNOMonitoredHardware];
-	[db readXL3StateDocumentFromMorca];
-	NSLog(@"cmosrate polled %f\n",[db cmosRate:0 card:0 channel:0]);
-	[[NSNotificationCenter defaultCenter] postNotificationName:morcaDBRead object:self];
+	[[SNOMonitoredHardware sharedSNOMonitoredHardware] readXL3StateDocumentFromMorca];
 	
 	if (xl3PollingState !=0 && pollXl3) 
 		[self performSelector:@selector(getDataFromMorca) withObject:nil afterDelay:xl3PollingState];
@@ -229,6 +228,13 @@ NSString* morcaDBRead								= @"morcaDBRead";
 		[self getDataFromMorca];
 	} else if (xl3PollingState > 0 && !pollXl3){
 		NSLog(@"Polling from Morca database...\n");
+  
+        if (parameterRate) [parameterRate release], parameterRate = nil;
+        
+        isPlottingGraph = false;
+        parameterRate = [[ORTimeRate alloc] init];
+        [parameterRate setSampleTime:xl3PollingState];
+
 		pollXl3 = true;
 		[self performSelector:@selector(getDataFromMorca) withObject:nil afterDelay:xl3PollingState];
 	}
@@ -237,7 +243,24 @@ NSString* morcaDBRead								= @"morcaDBRead";
 - (void) stopXl3Polling
 {
 	pollXl3 = false;
+    isPlottingGraph = false;
 	NSLog(@"Stopped polling Morca database\n");
+}
+
+- (void) releaseParameterRate
+{
+    if (parameterRate) [parameterRate release];
+}
+
+- (void) collectSelectedVariable
+{
+    isPlottingGraph = true;
+    
+    if (pollXl3){
+        float value = [[SNOMonitoredHardware sharedSNOMonitoredHardware] currentValueForSelectedHardware] ;
+        [parameterRate addDataToTimeAverage:value];
+        [self performSelector:@selector(collectSelectedVariable) withObject:nil afterDelay:xl3PollingState];
+    }
 }
 
 //slow control
@@ -263,256 +286,170 @@ NSString* morcaDBRead								= @"morcaDBRead";
 	NSLog(@"Stopped monitoring slow control\n");
 }
 
+- (void) setIoserverPasswd:(NSString *)aString
+{
+    [aString retain];
+    [iosPasswd release];
+    iosPasswd = aString;
+}
+
+- (void) setIoserverUsername:(NSString *)aString
+{
+    [aString retain];
+    [iosUsername release];
+    iosUsername = aString;
+}
+
+- (void) forwardPorts
+{
+    //get all ios IP addresses
+    NSHTTPURLResponse *response = nil;
+    NSError *connectionError;
+    NSString *urlName=[[NSString alloc] initWithString:@"http://snoplus:scintillate@snotpenn01.snolab.ca:5984/slow_control/_design/testdesign/_view/ioserverview"];
+	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:urlName] cachePolicy: NSURLRequestReloadIgnoringCacheData timeoutInterval:1];
+    NSData *responseData = [[NSData alloc] initWithData:[NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&connectionError]];
+	NSString *jsonStr = [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
+	NSDictionary *jsonServer = [[NSDictionary alloc] initWithDictionary:[jsonStr yajl_JSON]];
+	NSArray *serverRows = [[NSArray alloc] initWithArray:[jsonServer objectForKey:@"rows"]];
+    
+    int i;
+    for(i=0;i<[[jsonServer objectForKey:@"total_rows"] intValue];++i){
+    
+        //loop through all ios IPs and forward local ports 8000, 8001 and 8002 to IOS0, IOS1 and IOS2 respectively
+        NSString* ipaddr=[[[serverRows objectAtIndex:i] objectForKey:@"value"] valueForKey:@"ipaddr"];
+        NSString* hostname=[[[serverRows objectAtIndex:i] objectForKey:@"value"] valueForKey:@"hostname"];
+        NSString* resourcePath = [[NSBundle mainBundle] resourcePath];
+        int wmport = [[[[serverRows objectAtIndex:i] objectForKey:@"value"] valueForKey:@"wmport"] intValue];
+        NSString* localport = [NSString stringWithFormat:@"%i",wmport+[[hostname substringWithRange:NSMakeRange(3,1)] intValue]];
+        
+        ORTaskSequence *aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
+        
+        if ([ipaddr length] != 0){
+            [aSequence addTask:[resourcePath stringByAppendingPathComponent:@"portForwardScript"] 
+                     arguments:[NSArray arrayWithObjects:iosUsername,iosPasswd,ipaddr,localport,nil]];    
+            //[aSequence setTextToDelegate:YES];
+            [aSequence launch];
+        }
+    }
+    
+    [jsonStr release];
+    [urlName release];
+    [responseData release];
+    [jsonServer release];
+    [serverRows release];
+}
+
 - (void) connectToIOServer
-{   
-	//NSLog(@"Connecting to IO servers...\n");
-	NSString *aString=[[NSString alloc] initWithString:@"Connecting..."];
+{ 
+    pollSlowControl=false;
+    
+    //forward local ports
+    [self forwardPorts];
+
+	NSString *aString=[NSString stringWithString:@"Connecting..."];
 	[self setSlowControlMonitorStatusString:aString];
 	[self setSlowControlMonitorStatusStringColor:[NSColor blackColor]];
 	[[NSNotificationCenter defaultCenter] postNotificationName:slowControlConnectionStatusChanged object:self];
 
-	if (tableEntries) [tableEntries release];
-	tableEntries = [[NSMutableArray alloc] initWithCapacity:kNumSlowControlParameters];	
+	if (tableEntries) [tableEntries release];	
+	tableEntries = [[NSMutableArray alloc] initWithCapacity:kNumSlowControlParameters];
+    
+    //get parameter name list, including units and display indices
+	
+    SNOConnection *connection = [[SNOConnection alloc] init];
+    [connection setDelegate:self];
+    [connection setDelegateAction:@"getSlowControlMap"];
+    [connection get:@"http://snoplus:scintillate@snotpenn01.snolab.ca:5984/slow_control/_design/testdesign/_list/testlist/collatedview?include_docs=true"];
+    [connection release];
 
-	pollSlowControl=false;
-	
-	//get parameter name list, including units and display indices
-	NSHTTPURLResponse *response = nil;
-	NSError *connectionError = [[NSError alloc] init];
-	
-	NSString *urlName=[[NSString alloc] initWithFormat:@"http://localhost:5984/slow_control/_design/testdesign/_list/testlist/collatedview?include_docs=true"];	
-	NSURLRequest *request = [[NSURLRequest alloc] initWithURL:[NSURL URLWithString:urlName]];	
-	NSData *responseData = [[NSData alloc] initWithData:[NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&connectionError]];
-    NSString *jsonStr = [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
-	NSDictionary *jsonSlowControlVariablesView = [[NSDictionary alloc] initWithDictionary:[jsonStr yajl_JSON]];
-	NSArray *slowControlVariablesView = [[NSArray alloc] initWithArray:[jsonSlowControlVariablesView objectForKey:@"rows"]];
-	
-	int i;
-	for(i=0;i<[[jsonSlowControlVariablesView objectForKey:@"total_rows"] intValue];++i){
-		SNOSlowControl *slowControlEntry = [[SNOSlowControl alloc] init];
-		[slowControlEntry setParameterNumber:[[[slowControlVariablesView objectAtIndex:i] objectForKey:@"key"] intValue]];
-	    [slowControlEntry setParameterName:[[[slowControlVariablesView objectAtIndex:i] objectForKey:@"value"] objectAtIndex:0]];
-		[slowControlEntry setUnits:[[[slowControlVariablesView objectAtIndex:i] objectForKey:@"value"] objectAtIndex:5]];
-		[slowControlEntry setLoThresh:[[[[slowControlVariablesView objectAtIndex:i] objectForKey:@"value"] objectAtIndex:7] floatValue]];
-		[slowControlEntry setHiThresh:[[[[slowControlVariablesView objectAtIndex:i] objectForKey:@"value"] objectAtIndex:8] floatValue]];
-		[slowControlEntry setLoLoThresh:[[[[slowControlVariablesView objectAtIndex:i] objectForKey:@"value"] objectAtIndex:6] floatValue]];
-		[slowControlEntry setHiHiThresh:[[[[slowControlVariablesView objectAtIndex:i] objectForKey:@"value"] objectAtIndex:9] floatValue]];	
-		[slowControlEntry setCardName:[[[slowControlVariablesView objectAtIndex:i] objectForKey:@"value"] objectAtIndex:2]];
-		[slowControlEntry setChannelNumber:[[[[slowControlVariablesView objectAtIndex:i] objectForKey:@"value"] objectAtIndex:3] intValue]];
-		[slowControlEntry setParameterEnabled:YES];
-		[slowControlEntry setParameterConnected:YES];
-		[slowControlEntry setIPAddress:[[[slowControlVariablesView objectAtIndex:i] objectForKey:@"value"] objectAtIndex:11]];
-		[slowControlEntry setPort:[[[[slowControlVariablesView objectAtIndex:i] objectForKey:@"value"] objectAtIndex:12] intValue]];
-		[slowControlEntry setIosName:[[[slowControlVariablesView objectAtIndex:i] objectForKey:@"value"] objectAtIndex:1]];
-		[slowControlEntry setIoChannelDocId:[[[slowControlVariablesView objectAtIndex:i] objectForKey:@"value"] objectAtIndex:4]];
-		[tableEntries insertObject:slowControlEntry atIndex:i];
-		[slowControlEntry release];
-	}
-	
-	[[NSNotificationCenter defaultCenter] postNotificationName:slowControlTableChanged object:self];
+    SNOConnection *connection2 = [[SNOConnection alloc] init];
+    [connection2 setDelegate:self];
+    [connection2 setDelegateAction:@"getIOSCards"];
+    [connection2 get:@"http://snoplus:scintillate@snotpenn01.snolab.ca:5984/slow_control/_design/testdesign/_view/iocardview"];
+    [connection2 release];
+    
+    SNOConnection *connection3 = [[SNOConnection alloc] init];
+    [connection3 setDelegate:self];
+    [connection3 setDelegateAction:@"getIOS"];
+    [connection3 get:@"http://snoplus:scintillate@snotpenn01.snolab.ca:5984/slow_control/_design/testdesign/_view/ioserverview"];
+    [connection3 release];
 
-	[aString release];
-	[jsonStr release];
-	[responseData release];
-	[slowControlVariablesView release];
-	[jsonSlowControlVariablesView release];
-	[urlName release];
-	[request release];
-	//[response release];
-	[connectionError release];
-	
-	// Now establish and monitor voltages according to polling frequency.
-	[self readAllVoltagesFromIOServers];
 }
 
 - (void) readAllVoltagesFromIOServers
 {
 	//read data from all IOS, cards and store in dictionary.
-	NSURLRequest *request;
-	NSHTTPURLResponse *response;
-	NSError *connectionError;
-	NSString *urlName, *keyname, *cardLetter;
-	NSData *responseData;
+    //IOS servers give data card-wise, therefore have to loop through all available cards via iocardview in the slow control DB.
+    //IOS server ips are stored in ioserver documents.
 	
-	urlName=[NSString stringWithFormat:@"http://localhost:5984/slow_control/_design/testdesign/_view/iocardview"];
-	request = [NSURLRequest requestWithURL:[NSURL URLWithString:urlName]];
-	responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&connectionError];
-	NSString *jsonStr1 = [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
-	NSDictionary *jsonCard = [jsonStr1 yajl_JSON];
-	[jsonStr1 release];
-	NSArray *cardRows = [jsonCard objectForKey:@"rows"]; 		
-	
-	urlName=[NSString stringWithFormat:@"http://localhost:5984/slow_control/_design/testdesign/_view/ioserverview"];
-	request = [NSURLRequest requestWithURL:[NSURL URLWithString:urlName]];
-	responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&connectionError];
-	NSString *jsonStr2 = [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
-	NSDictionary *jsonServer = [jsonStr2 yajl_JSON];
-	[jsonStr2 release];
-	NSArray *serverRows = [jsonServer objectForKey:@"rows"];
-	
-	NSMutableDictionary *allIosData = [[NSMutableDictionary alloc] init];
-	NSMutableDictionary *allIosConfig = [[NSMutableDictionary alloc] init];
-	
+    NSString *cardLetter, *url, *keyname;
+    
 	int i, j;
-	for(i=0;i<[[jsonCard objectForKey:@"total_rows"] intValue];++i){
+	for(i=0;i<[iosCards count];++i){
 		NSString *hostid, *hostname;
-		cardLetter=[[[cardRows objectAtIndex:i] objectForKey:@"value"] objectForKey:@"cardname"];
-		hostid=[[[cardRows objectAtIndex:i] objectForKey:@"value"] objectForKey:@"hostid"];
-		
-		for(j=0;j<[[jsonServer objectForKey:@"total_rows"] intValue];++j){
-			if([hostid isEqualToString:[[serverRows objectAtIndex:j] valueForKey:@"id"]]){
-				hostname=[[[serverRows objectAtIndex:j] objectForKey:@"value"] valueForKey:@"hostname"];
-				urlName=[NSString stringWithFormat:@"http://%@:%i/data/card%@/",
-						 [[[serverRows objectAtIndex:j] objectForKey:@"value"] valueForKey:@"ipaddr"],
-						 [[[[serverRows objectAtIndex:j] objectForKey:@"value"] valueForKey:@"wmport"] intValue],
-						 cardLetter];
-				request = [NSURLRequest requestWithURL:[NSURL URLWithString:urlName]];
-				responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&connectionError];
-				NSString *jsonStr3 = [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
-				keyname =[NSString stringWithFormat:@"%@%@",hostname,cardLetter];
-				NSDictionary *json = [jsonStr3 yajl_JSON];
-				[jsonStr3 release];
-				
-				if (json != nil) {
-					NSString *aString=[NSString stringWithString:@"Connection established."];
-					[self setSlowControlMonitorStatusString:aString];
-					[self setSlowControlMonitorStatusStringColor:[NSColor blueColor]];
-					[[NSNotificationCenter defaultCenter] postNotificationName:slowControlConnectionStatusChanged object:self];
-				} else if (json == nil) {
-					NSString *aString=[NSString stringWithString:@"Connection failed."];
-					[self setSlowControlMonitorStatusString:aString];	
-					[self setSlowControlMonitorStatusStringColor:[NSColor redColor]];
-					[[NSNotificationCenter defaultCenter] postNotificationName:slowControlConnectionStatusChanged object:self];
-				}					
-				
-				[allIosData setObject:json forKey:keyname];	
-				
-				urlName=[NSString stringWithFormat:@"http://%@:%i/config/card%@/",
-						 [[[serverRows objectAtIndex:j] objectForKey:@"value"] valueForKey:@"ipaddr"],
-						 [[[[serverRows objectAtIndex:j] objectForKey:@"value"] valueForKey:@"wmport"] intValue],
-						 cardLetter];
-				request = [NSURLRequest requestWithURL:[NSURL URLWithString:urlName]];
-				responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&connectionError];
-				NSString* jsonStr4 = [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];			
-				[allIosConfig setObject:[jsonStr4 yajl_JSON] forKey:keyname];
-				[jsonStr4 release];
+        int localport;
+		cardLetter=[[[iosCards objectAtIndex:i] objectForKey:@"value"] objectForKey:@"cardname"];
+		hostid=[[[iosCards objectAtIndex:i] objectForKey:@"value"] objectForKey:@"hostid"];
+		for(j=0;j<[ioServers count];++j){
+			if([hostid isEqualToString:[[ioServers objectAtIndex:j] valueForKey:@"id"]]){
+				hostname=[[[ioServers objectAtIndex:j] objectForKey:@"value"] valueForKey:@"hostname"];
+
+                localport = [[[[ioServers objectAtIndex:j] objectForKey:@"value"] valueForKey:@"wmport"] intValue]
+                            +[[hostname substringWithRange:NSMakeRange(3,1)] intValue];
+                
+                keyname =[NSString stringWithFormat:@"%@%@",hostname,cardLetter];
+                
+                SNOConnection *connection = [[SNOConnection alloc] init];
+                [connection setDelegate:self];
+                [connection setKey:keyname];
+                [connection setDelegateAction:@"getAllChannelValues"];
+                url = [NSString stringWithFormat:@"http://localhost:%i/data/card%@/",localport,cardLetter];
+                [connection get:url];
+                [connection release];
+                
+                SNOConnection *connection2 = [[SNOConnection alloc] init];
+                [connection2 setDelegate:self];
+                [connection2 setKey:keyname];
+                [connection2 setDelegateAction:@"getAllConfig"];
+                url = [NSString stringWithFormat:@"http://localhost:%i/config/card%@/",localport,cardLetter];
+                [connection2 get:url];
+                [connection2 release];
+                					
 			}			
 		}
 	}
-	
-	//now display the data into table entries
-	NSString *channelName, *cardName;
-	for(i=0;i<[tableEntries count];++i){
-		if ([[tableEntries objectAtIndex:i] parameterEnabled] && [[tableEntries objectAtIndex:i] parameterConnected]) {
-			channelName = [NSString stringWithFormat:@"channel%i",[[tableEntries objectAtIndex:i] parameterChannel]];
-			cardName = [NSString stringWithFormat:@"card%@",[[tableEntries objectAtIndex:i] parameterCard]];
-			keyname = [NSString stringWithFormat:@"%@%@",[[tableEntries objectAtIndex:i] parameterIos],[[tableEntries objectAtIndex:i] parameterCard]];
-			float channelVoltage = [[[[[allIosData objectForKey:keyname] objectForKey:cardName] objectForKey:channelName] objectForKey:@"voltage"] floatValue];
-			float channelGain = [[[[[allIosConfig objectForKey:keyname] objectForKey:cardName] objectForKey:channelName] objectForKey:@"gain"] floatValue];
-			[[tableEntries objectAtIndex:i] setParameterValue:channelVoltage];
-			[[tableEntries objectAtIndex:i] setChannelGain:channelGain];
-			
-			if (channelVoltage > [[tableEntries objectAtIndex:i] parameterLoThreshold] 
-				&& channelVoltage < [[tableEntries objectAtIndex:i] parameterHiThreshold]) {
-				[[tableEntries objectAtIndex:i] setStatus:@"OK"];
-			}else if (channelVoltage > [[tableEntries objectAtIndex:i] parameterHiThreshold] 
-					  && channelVoltage < [[tableEntries objectAtIndex:i] parameterHiHiThreshold]) {
-				[[tableEntries objectAtIndex:i] setStatus:@"Hi"];
-			}else if (channelVoltage > [[tableEntries objectAtIndex:i] parameterHiHiThreshold]) {
-				[[tableEntries objectAtIndex:i] setStatus:@"HiHi"];
-			}else if (channelVoltage < [[tableEntries objectAtIndex:i] parameterLoThreshold] 
-					  && channelVoltage > [[tableEntries objectAtIndex:i] parameterLoLoThreshold]) {
-				[[tableEntries objectAtIndex:i] setStatus:@"Lo"];
-			}else if (channelVoltage < [[tableEntries objectAtIndex:i] parameterLoLoThreshold]) {
-				[[tableEntries objectAtIndex:i] setStatus:@"LoLo"];
-			}			
-		}else{
-			[[tableEntries objectAtIndex:i] setParameterValue:nan("")];
-			[[tableEntries objectAtIndex:i] setStatus:@"disabled"];
-		}
-	}	
-	[[NSNotificationCenter defaultCenter] postNotificationName:slowControlTableChanged object:self];
-	
-	[allIosData release];
-	[allIosConfig release];
-	
+    [[NSNotificationCenter defaultCenter] postNotificationName:slowControlTableChanged object:self];
+    
 	//poll according to delay specified by user
 	if (slowControlPollingState !=0 && pollSlowControl) 
 		[self performSelector:@selector(readAllVoltagesFromIOServers) withObject:nil afterDelay:slowControlPollingState];	
 }
 
 - (void) setSlowControlParameterThresholds
-{
-	NSError *connectionError;
-    NSHTTPURLResponse *response;
-
+{	
 	NSLog(@"setting thresholds\n");
 	
  	int i;
 	for(i=0;i<[tableEntries count];++i){
 		BOOL isSelected=[[[tableEntries objectAtIndex:i] valueForKey:@"parameterSelected"] boolValue];
 		if (isSelected){
-			NSString* urlName=[NSString stringWithFormat:@"http://localhost:5984/slow_control/%@",[[tableEntries objectAtIndex:i] parameterIoChannelDocId]];
-			NSMutableURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:urlName]];
-			NSData* responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&connectionError];
-			NSString *jsonStr1   = [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
-			NSMutableDictionary* copiedFile = [[(NSDictionary *)[jsonStr1 yajl_JSON] mutableCopy] autorelease];			
-			[jsonStr1 release];
-			
-			NSNumber *lothresholdValue = [[NSNumber alloc] initWithFloat:[[tableEntries objectAtIndex:i] parameterLoThreshold]];
-			[copiedFile setObject:lothresholdValue forKey:@"lothresh"];
-			[lothresholdValue release];
-			NSNumber *hithresholdValue = [[NSNumber alloc] initWithFloat:[[tableEntries objectAtIndex:i] parameterHiThreshold]];					 
-			[copiedFile setObject:hithresholdValue forKey:@"hithresh"];
-			[hithresholdValue release];
-			NSNumber *lolothresholdValue = [[NSNumber alloc] initWithFloat:[[tableEntries objectAtIndex:i] parameterLoLoThreshold]];					 
-			[copiedFile setObject:lolothresholdValue forKey:@"lolothresh"];
-			[lolothresholdValue release];
-			NSNumber *hihithresholdValue = [[NSNumber alloc] initWithFloat:[[tableEntries objectAtIndex:i] parameterHiHiThreshold]];	
-			[copiedFile setObject:hihithresholdValue forKey:@"hihithresh"];
-			[hihithresholdValue release];
-			[copiedFile removeObjectForKey:@"_rev"];
-			
-			NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-			NSTimeZone *timeZone = [NSTimeZone timeZoneWithName:@"UTC"];
-			[dateFormatter setTimeZone:timeZone];
-			[dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss"];
-			NSDate *now = [NSDate date];
-			NSString *dateString = [dateFormatter stringFromDate:now];
-			[dateFormatter release];	
-			NSNumber *timestamp=[[[NSNumber alloc] initWithInt:[now timeIntervalSince1970]] autorelease];
-			[copiedFile setObject:dateString forKey:@"datetime"];
-			[copiedFile setObject:timestamp forKey:@"timestamp"];
-			NSLog(@"%f %i\n",FLT_MAX, INT_MAX);
-			
-			//get new id for doc with changed threshold
-			urlName=[NSString stringWithFormat:@"http://localhost:5984/_uuids"];
-			request = [NSURLRequest requestWithURL:[NSURL URLWithString:urlName]];
-			responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&connectionError];
-			NSString *jsonStr2 = [[[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding] autorelease];
-			NSString* uuidstr=[NSString stringWithString:[[[jsonStr2 yajl_JSON] objectForKey:@"uuids"] objectAtIndex:0]];
-			[copiedFile setObject:uuidstr forKey:@"_id"];
-			jsonStr2=[copiedFile yajl_JSONString];
-			NSData* postBody=[jsonStr2 dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES];
-			
-			urlName=[NSString stringWithFormat:@"http://localhost:5984/slow_control/%@",uuidstr];
-			NSMutableURLRequest *sendrequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:urlName]];
-			[sendrequest setValue:@"application/json" forHTTPHeaderField: @"Content-Type"];
-			[sendrequest setValue:[NSString stringWithFormat:@"%d", [postBody length]] forHTTPHeaderField:@"Content-Length"];
-			[sendrequest setHTTPMethod:@"PUT"];
-			[sendrequest setHTTPBody:postBody];
-			responseData=[NSURLConnection sendSynchronousRequest:sendrequest returningResponse:&response error:&connectionError];		
-			
-			//NSString *path = @"/Users/wan/Orca/dev/Orca/Source/Experiments/SNO/testchannelwrite.json";
-			//[jsonStr writeToFile:path atomically:YES];
+            NSString *url = [NSString stringWithFormat:@"http://snoplus:scintillate@snotpenn01.snolab.ca:5984/slow_control/%@",
+                             [[tableEntries objectAtIndex:i] parameterIoChannelDocId]];
+            NSString *key = [NSString stringWithFormat:@"%i",i];
+            SNOConnection *connection = [[SNOConnection alloc] init];
+            [connection setDelegateAction:@"updateIOSChannelThresholds"];
+            [connection setKey:key];
+            [connection setDelegate:self];
+            [connection get:url];
+            [connection release];
 		}
 	}
-	
+
 	[[NSNotificationCenter defaultCenter] postNotificationName:slowControlTableChanged object:self];
 }
 
 - (void) setSlowControlChannelGain
-{
+{/*
 	NSHTTPURLResponse *response;
 	NSError *connectionError;
 	
@@ -525,8 +462,8 @@ NSString* morcaDBRead								= @"morcaDBRead";
 			NSString* channelName = [NSString stringWithFormat:@"channel%i",[[tableEntries objectAtIndex:i] parameterChannel]];
 			NSString* cardName = [NSString stringWithFormat:@"card%@",[[tableEntries objectAtIndex:i] parameterCard]];
 			
-			NSString* urlName=[NSString stringWithFormat:@"http://%@:%i/config/card%@/",
-					 [[tableEntries objectAtIndex:i] IPAddress],
+			urlName=[NSString stringWithFormat:@"http://localhost:%i/config/card%@/",
+					 //[[tableEntries objectAtIndex:i] IPAddress],
 					 [[tableEntries objectAtIndex:i] Port],
 					 [[tableEntries objectAtIndex:i] parameterCard]];
 			NSMutableURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:urlName]];
@@ -553,7 +490,9 @@ NSString* morcaDBRead								= @"morcaDBRead";
 	}
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:slowControlTableChanged object:self];
+*/
 }
+
 
 - (void) enableSlowControlParameter
 {
@@ -568,9 +507,10 @@ NSString* morcaDBRead								= @"morcaDBRead";
 	}
 }
 
+
 //obsolete - has to be updated.
 - (void) setSlowControlMapping
-{
+{/*
 	NSString *jsonStr = [NSString stringWithContentsOfFile:@"/Users/Wan/Orca/Source/Experiments/SNO/testCard.json" 
 												  encoding:NSUTF8StringEncoding error:nil];
 	NSMutableDictionary *copiedFile = [[(NSDictionary *)[jsonStr yajl_JSON] mutableCopy] autorelease];	
@@ -666,7 +606,9 @@ NSString* morcaDBRead								= @"morcaDBRead";
 	
 	//NSString *path = @"/Users/wan/Orca/Source/Experiments/SNO/testCard.json";
 	//[[copiedFile yajl_JSONString] writeToFile:path atomically:YES];	
+*/
 }
+
 
 - (SNOSlowControl *) getSlowControlVariable:(int)index
 {
@@ -693,6 +635,207 @@ NSString* morcaDBRead								= @"morcaDBRead";
 - (NSColor *) getSlowControlMonitorStatusStringColor
 {
 	return slowControlMonitorStatusStringColor;
+}
+
+- (void) getSlowControlMap:(NSString *)aString
+{
+    NSDictionary *jsonSlowControlVariablesView = [[NSDictionary alloc] initWithDictionary:[aString yajl_JSON]];
+	NSArray *slowControlVariablesView = [[NSArray alloc] initWithArray:[jsonSlowControlVariablesView objectForKey:@"rows"]];
+
+	//slowcontrolmap stores the channel->parameter map in a dict. for quick access
+    if (slowControlMap) [slowControlMap release], slowControlMap=nil;
+    slowControlMap = [[NSMutableDictionary alloc] init];
+    
+    //tableEntries is the parameter->channel map
+	int i;
+	for(i=0;i<[[jsonSlowControlVariablesView objectForKey:@"total_rows"] intValue];++i){
+		SNOSlowControl *slowControlEntry = [[SNOSlowControl alloc] init];
+        NSArray *values = [[slowControlVariablesView objectAtIndex:i] objectForKey:@"value"];
+		[slowControlEntry setParameterNumber:[[[slowControlVariablesView objectAtIndex:i] objectForKey:@"key"] intValue]];
+	    [slowControlEntry setParameterName:[values objectAtIndex:0]];
+		[slowControlEntry setUnits:[values objectAtIndex:5]];
+		[slowControlEntry setLoThresh:[[values objectAtIndex:7] floatValue]];
+		[slowControlEntry setHiThresh:[[values objectAtIndex:8] floatValue]];
+		[slowControlEntry setLoLoThresh:[[values objectAtIndex:6] floatValue]];
+		[slowControlEntry setHiHiThresh:[[values objectAtIndex:9] floatValue]];	
+		[slowControlEntry setCardName:[values objectAtIndex:2]];
+		[slowControlEntry setChannelNumber:[[values objectAtIndex:3] intValue]];
+		[slowControlEntry setParameterEnabled:YES];
+		[slowControlEntry setParameterConnected:YES];
+		[slowControlEntry setIPAddress:[values objectAtIndex:11]];
+		[slowControlEntry setPort:[[values objectAtIndex:12] intValue]];
+		[slowControlEntry setIosName:[values objectAtIndex:1]];
+		[slowControlEntry setIoChannelDocId:[values objectAtIndex:4]];
+
+        [tableEntries insertObject:slowControlEntry atIndex:i];
+        
+        NSString *keyname = [NSString stringWithFormat:@"%@%@%i",[values objectAtIndex:1],[values objectAtIndex:2],[[values objectAtIndex:3] intValue]];
+        NSString *parNumber = [NSString stringWithFormat:@"%i",i];
+        [slowControlMap setObject:parNumber forKey:keyname];
+
+		[slowControlEntry release];
+	}
+    
+    [jsonSlowControlVariablesView release];
+    [slowControlVariablesView release];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:slowControlTableChanged object:self];
+    
+    NSString *status=[NSString stringWithString:@"Connected to snotpenn server."];
+    [self setSlowControlMonitorStatusString:status];	
+    [self setSlowControlMonitorStatusStringColor:[NSColor blueColor]];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:slowControlConnectionStatusChanged object:self];
+}
+
+//ORTaskSequence delegate method
+- (void) tasksCompleted:(id)sender
+{
+    NSLog(@"portForwardScript executed.\n");
+}
+
+//SNOConnection delegate methods
+
+- (void) getIOSCards:(NSString *) aString
+{
+    if (iosCards) [iosCards release];
+	iosCards = [[NSArray alloc] initWithArray:[[aString yajl_JSON] objectForKey:@"rows"]];
+}
+
+- (void) getIOS:(NSString *) aString
+{
+    if (ioServers) [ioServers release];
+    ioServers = [[NSArray alloc] initWithArray:[[aString yajl_JSON] objectForKey:@"rows"]];
+}
+
+- (void) getAllChannelValues:(NSString *) aString withKey:(NSString *)aKey
+{
+    NSDictionary *voltages = [aString yajl_JSON];
+ 
+    if (voltages != NULL) {
+        int i;
+        for (i=0;i<kMaxNumChannels;++i) {
+            NSString *channelName = [NSString stringWithFormat:@"channel%i",i+1];
+            NSString *cardName = [NSString stringWithFormat:@"card%@",[aKey substringWithRange:NSMakeRange(4, 1)]];
+        
+            float parValue = [[[[voltages objectForKey:cardName] objectForKey:channelName] objectForKey:@"voltage"] floatValue];
+            
+            NSString *fullKey = [NSString stringWithFormat:@"%@%i",aKey,i];
+            if ([slowControlMap objectForKey:fullKey] != NULL){
+                
+                int parIndex = [[slowControlMap objectForKey:fullKey] intValue];
+
+                if ([[tableEntries objectAtIndex:parIndex] parameterEnabled]){
+                    [[tableEntries objectAtIndex:parIndex] setParameterValue:parValue];
+                
+                    if (parValue > [[tableEntries objectAtIndex:parIndex] parameterLoThreshold] 
+                        && parValue < [[tableEntries objectAtIndex:parIndex] parameterHiThreshold]) {
+                        [[tableEntries objectAtIndex:parIndex] setStatus:@"OK"];
+                    }else if (parValue > [[tableEntries objectAtIndex:parIndex] parameterHiThreshold] 
+                          && parValue < [[tableEntries objectAtIndex:parIndex] parameterHiHiThreshold]) {
+                        [[tableEntries objectAtIndex:parIndex] setStatus:@"Hi"];
+                    }else if (parValue > [[tableEntries objectAtIndex:parIndex] parameterHiHiThreshold]) {
+                        [[tableEntries objectAtIndex:parIndex] setStatus:@"HiHi"];
+                    }else if (parValue < [[tableEntries objectAtIndex:parIndex] parameterLoThreshold] 
+                          && parValue > [[tableEntries objectAtIndex:parIndex] parameterLoLoThreshold]) {
+                        [[tableEntries objectAtIndex:parIndex] setStatus:@"Lo"];
+                    }else if (parValue < [[tableEntries objectAtIndex:parIndex] parameterLoLoThreshold]) {
+                        [[tableEntries objectAtIndex:parIndex] setStatus:@"LoLo"];
+                    }
+                }else{
+                    [[tableEntries objectAtIndex:parIndex] setParameterValue:nan("")];
+                    [[tableEntries objectAtIndex:parIndex] setStatus:@"disabled"];
+                }
+            }
+        }
+    } 
+    
+    //[[NSNotificationCenter defaultCenter] postNotificationName:slowControlTableChanged object:self];
+}
+
+- (void) getAllConfig:(NSString *)aString withKey:(NSString *)aKey
+{
+    NSDictionary *config= [aString yajl_JSON];
+    if (config != NULL) {
+        int i;
+        for (i=0;i<kMaxNumChannels;++i){
+            NSString *channelName = [NSString stringWithFormat:@"channel%i",i];
+            NSString *cardName = [NSString stringWithFormat:@"card%@",[aKey substringWithRange:NSMakeRange(4, 1)]];
+            
+            float gainValue = [[[[config objectForKey:cardName] objectForKey:channelName] objectForKey:@"gain"] floatValue];
+
+            NSString *fullKey = [NSString stringWithFormat:@"%@%i",aKey,i];
+            int parIndex = [[slowControlMap objectForKey:fullKey] intValue];
+            
+            if ([[tableEntries objectAtIndex:parIndex] parameterEnabled]){
+                [[tableEntries objectAtIndex:parIndex] setChannelGain:gainValue];
+            }else{
+                [[tableEntries objectAtIndex:parIndex] setParameterValue:nan("")];
+                [[tableEntries objectAtIndex:parIndex] setStatus:@"disabled"];
+            }    
+        }
+    } 
+    
+    //[[NSNotificationCenter defaultCenter] postNotificationName:slowControlTableChanged object:self];
+}
+
+- (void) updateIOSChannelThresholds:(NSString *)aString ofChannel:(NSString *)aKey
+{
+    //get channel document
+    NSMutableDictionary *channelDoc = [(NSMutableDictionary *)[[aString yajl_JSON] mutableCopy] autorelease];
+    
+    //mark document as unapproved since thresholds are being updated.
+    //update fields: approved -> false, 
+    //set timestamp, date to current
+    NSNumber *state = [NSNumber numberWithInt:0];
+    [channelDoc setValue:state forKey:@"approved"];
+    NSDateFormatter *dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
+    NSTimeZone *timeZone = [NSTimeZone timeZoneWithName:@"UTC"];
+    [dateFormatter setTimeZone:timeZone];
+    [dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss"];
+    NSDate *now = [NSDate date];
+    NSString *dateString = [dateFormatter stringFromDate:now];	
+    NSNumber *timestamp=[NSNumber numberWithInt:[now timeIntervalSince1970]];
+    [channelDoc setValue:dateString forKey:@"datetime"];
+    [channelDoc setValue:timestamp forKey:@"timestamp"];
+    
+    //save document in database with same docid but as new revision; remove _id field 
+    NSString *docid = [channelDoc objectForKey:@"_id"];
+    [channelDoc removeObjectForKey:@"_id"];
+    NSString *jsonStr=[channelDoc yajl_JSONString];
+    NSData *postBody=[NSData dataWithData:[jsonStr dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES]];
+    
+    NSString *url = [NSString stringWithFormat:@"http://snoplus:scintillate@snotpenn01.snolab.ca:5984/slow_control/%@",docid];
+    SNOConnection *connection2 = [[SNOConnection alloc] init];
+    [connection2 setDelegate:self];
+    [connection2 put:postBody atURL:url];
+    [connection2 release];
+    
+    //create new approved document with updated threshold values
+    state = [NSNumber numberWithInt:1];
+    [channelDoc setValue:state forKey:@"approved"];
+    [channelDoc removeObjectForKey:@"_rev"];
+    
+    int channel = [aKey intValue];
+    NSNumber *lothresholdValue = [NSNumber numberWithFloat:[[tableEntries objectAtIndex:channel] parameterLoThreshold]];
+    [channelDoc setObject:lothresholdValue forKey:@"lothresh"];
+    NSNumber *hithresholdValue = [NSNumber numberWithFloat:[[tableEntries objectAtIndex:channel] parameterHiThreshold]];					 
+    [channelDoc setObject:hithresholdValue forKey:@"hithresh"];
+    NSNumber *lolothresholdValue = [NSNumber numberWithFloat:[[tableEntries objectAtIndex:channel] parameterLoLoThreshold]];	
+    [channelDoc setObject:lolothresholdValue forKey:@"lolothresh"];
+    NSNumber *hihithresholdValue = [NSNumber numberWithFloat:[[tableEntries objectAtIndex:channel] parameterHiHiThreshold]];	
+    [channelDoc setObject:hihithresholdValue forKey:@"hihithresh"];
+    
+    jsonStr=[channelDoc yajl_JSONString];
+
+    postBody=[NSData dataWithData:[jsonStr dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES]];
+    
+    //post new document in database
+    url = [NSString stringWithFormat:@"http://snoplus:scintillate@snotpenn01.snolab.ca:5984/slow_control/"];
+    SNOConnection *connection3 = [[SNOConnection alloc] init];
+    [connection3 setDelegate:self];
+    [connection3 post:postBody atURL:url];
+    [connection3 release];
 }
 
 @end

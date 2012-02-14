@@ -21,6 +21,7 @@
 @class ORColorScale;
 #import "ORGenericView.h"
 #import "SNOMonitoredHardware.h"
+#import "Sno_Monitor_Adcs.h"
 #define highlightLineWidth			3
 #define kOnlineTubeDisplay			0
 #define kTubeTypeDisplay			1
@@ -42,10 +43,12 @@
 #define kBaseCurrentDisplay			17
 #define kCheckerMismatchesDisplay	18
 #define kRatesDisplay				19
-#define kCrateVoltagesDisplay		20
+#define kFECVoltagesDisplay         20
+#define kXL3VoltagesDisplay         21
 #define kTubeSelectionMode  0
 #define kCardSelectionMode  1
 #define kCrateSelectionMode 2
+#define kNumXL3Voltages 12
 
 @interface SNODetectorView : ORGenericView
 {	
@@ -55,16 +58,27 @@
 	NSMutableAttributedString* globalStatsString;
 	int selectionMode;
 	@private
+    NSMutableDictionary* colorBarAxisAttributes;
+    NSMutableArray* axisChanges;
 	NSMutableArray *crateRectsInCrateView;
 	NSMutableArray *cardRectsInCrateView;
 	NSMutableArray *channelRectsInCrateView;
 	NSMutableArray *channelRectsInPSUPView;
+    NSMutableArray *voltageRectsInCrateView;
+    NSMutableArray *xl3VoltageRectsInCrateView;
 	NSMutableArray *pmtColorArray;
+    NSMutableArray *voltageColorArray;
+    NSMutableArray *xl3VoltageColorArray;
+    NSMutableArray *crateColorArray;
+    BOOL pollingInProgress;
 	BOOL pickPSUPView;
 	int parameterToDisplay;
+    int previousParameterDisplayed;
 	int selectedCrate;
 	int selectedCard;
 	int selectedChannel;
+    int selectedVoltage;
+    int selectedXL3Voltage;
 	int numTubesOnline;
 	int numUnknownTubes;
 	int numOwlTubes;
@@ -73,15 +87,26 @@
 	int numNeckTubes;
 	SNOMonitoredHardware *db;
 }
+
 - (void) setViewType:(BOOL)aViewType;
 - (void) setParameterToDisplay:(int)aParameter;
 - (void) setSelectionMode:(int)aMode;
 - (void) updateSNODetectorView;
+- (void) iniAxisChanges;
 - (void) getRectPositions;
 - (void) formatGlobalStatsString;
-- (void) formatDetectorTitleString;
+//- (void) formatDetectorTitleString;
+- (void) setDetectorTitleString:(NSString *)aString;
 - (NSMutableString *) selectionString;
+- (NSString *) getCurrentDisplayValue;
+- (NSMutableDictionary*) colorBarAxisAttributes;
+- (void) setColorBarAxisAttributes:(NSMutableDictionary*)newColorBarAttributes;
+- (void) setColorAxisChanged:(BOOL)aBOOL;
+- (void) setPollingInProgress:(BOOL)aBOOL;
+
 
 @end
 
 extern NSString* selectionStringChanged;
+extern NSString* newValueAvailable;
+extern NSString* plotButtonDisabled;
