@@ -1831,6 +1831,7 @@ void SwapLongBlock(void* p, int32_t n)
         NSString* str = [iso stringFromDate:[NSDate date]];
         NSMutableArray* rates = [NSMutableArray arrayWithCapacity:16];
         NSMutableArray* slot_rates = [NSMutableArray arrayWithCapacity:32];
+        NSMutableArray* time_stamps = [NSMutableArray arrayWithCapacity:16];
         unsigned char ch, sl;
         unsigned char slot_idx = 0;
         for (sl = 0; sl < 16; sl++) {
@@ -1862,18 +1863,18 @@ void SwapLongBlock(void* p, int32_t n)
                     }
                     slot_idx++;
                 }
+                [time_stamps addObject:str];
+            }
+            else {
+                [time_stamps addObject:@""];
             }
             [rates addObject:slot_rates]; //yes, we may add an empty array
             [slot_rates removeAllObjects];
         }
         
-        NSDictionary* pmtCurrentsDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                                         str, @"time_stamp",
-                                         [NSDate date], @"date",
-                                         [NSNumber numberWithInt:msk], @"slot_mask",
-                                         rates, @"rates",
-                                         nil];
-        [pollDict setObject:pmtCurrentsDict forKey:@"cmos_rt"];
+        [pollDict setObject:slot_rates forKey:@"cmos_rt"];
+        [pollDict setObject:time_stamps forKey:@"cmos_rt_time_stamp"];
+        [pollDict setObject:[NSNumber numberWithInt:msk] forKey:@"cmos_rt_slot_mask"];
     }
 
 }
@@ -2008,12 +2009,9 @@ void SwapLongBlock(void* p, int32_t n)
             [slot_currents removeAllObjects];
         }
         
-        NSDictionary* pmtCurrentsDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                                         str, @"time_stamp",
-                                         [NSNumber numberWithInt:msk], @"slot_mask",
-                                         currents, @"currents",
-                                         nil];
-        [pollDict setObject:pmtCurrentsDict forKey:@"pmt_base_i"];
+        [pollDict setObject:currents forKey:@"pmt_base_i"];
+        [pollDict setObject:str forKey:@"pmt_base_i_time_stamp"];
+        [pollDict setObject:[NSNumber numberWithInt:msk] forKey:@"pmt_base_i_slot_mask"];
     }
 }
 
@@ -2309,26 +2307,34 @@ void SwapLongBlock(void* p, int32_t n)
             [number release];
         }
         
-        NSDictionary* vmonFECDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                                     str, @"time_stamp",
-                                     slot_voltages, @"voltages",
-                                     nil];
-
-        NSMutableArray* vlt_array;
+        NSMutableArray* vlt_array; //16 slots * 32 floats
         if ([pollDict objectForKey:@"fec_vlt"]) vlt_array = [[[pollDict objectForKey:@"fec_vlt"] mutableCopy] autorelease];
         else {
             vlt_array = [NSMutableArray arrayWithCapacity:16];
             unsigned char sl;
-            NSDictionary* emptyDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                                       @"", @"time_stamp",
-                                       [NSArray array], @"voltages",
-                                       nil];
             for (sl=0; sl<16; sl++) {
-                [vlt_array addObject:emptyDict];
+                [vlt_array addObject:[NSArray array]];
             }
         }
-        [vlt_array replaceObjectAtIndex:aSlot withObject:vmonFECDict];
+        NSMutableArray* vlt_time_stamp; //16 slot strings
+        if ([pollDict objectForKey:@"fec_vlt_time_stamp"]) vlt_time_stamp = [[[pollDict objectForKey:@"fec_vlt_time_stamp"] mutableCopy] autorelease];
+        else {
+            vlt_array = [NSMutableArray arrayWithCapacity:16];
+            unsigned char sl;
+            for (sl=0; sl<16; sl++) {
+                [vlt_array addObject:@""];
+            }
+        }
+        NSArray* fec_vlts_tags = [NSArray arrayWithObjects:@"VM24SUP", @"VM15SUP", @"VEE", @"VM3.3SUP",\
+                                  @"VM2.0SUP", @"VP3.3SUP", @"VP4.0SUP", @"VCC", @"VP6.5SUP", @"VP8.0SUP",
+                                  @"VP15SUP", @"VP24SUP", @"VM2.0REF", @"VM1.0REF", @"VP0.8REF", @"VP1.0REF",
+                                  @"VP4.0REF", @"VP5.0REF", @"TMP", @"CALDAC", @"HVCRR", nil];
+
+        [vlt_array replaceObjectAtIndex:aSlot withObject:slot_voltages];
+        [vlt_time_stamp replaceObjectAtIndex:aSlot withObject:str];
         [pollDict setObject:vlt_array forKey:@"fec_vlt"];
+        [pollDict setObject:vlt_time_stamp forKey:@"fec_vlt_time_stamp"];
+        [pollDict setObject:fec_vlts_tags forKey:@"fec_vlt_tag"];
     }
 }
 
@@ -2412,17 +2418,18 @@ void SwapLongBlock(void* p, int32_t n)
         iso.calendar = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
         iso.locale = [[[NSLocale alloc] initWithLocaleIdentifier:@"en_US"] autorelease];
         NSString* str = [iso stringFromDate:[NSDate date]];
-        NSDictionary* vmonXl3Dict = [NSDictionary dictionaryWithObjectsAndKeys:
-                                     str, @"time_stamp",
-                                     [NSNumber numberWithFloat:result.voltages[0]], @"VCC",
-                                     [NSNumber numberWithFloat:result.voltages[1]], @"VEE",
-                                     [NSNumber numberWithFloat:result.voltages[3]], @"VP24",
-                                     [NSNumber numberWithFloat:result.voltages[4]], @"VM24",
-                                     [NSNumber numberWithFloat:result.voltages[5]], @"TMP0",
-                                     [NSNumber numberWithFloat:result.voltages[6]], @"TMP1",
-                                     [NSNumber numberWithFloat:result.voltages[6]], @"TMP2",
-                                     nil];
-        [pollDict setObject:vmonXl3Dict forKey:@"xl3_voltages"];
+        NSMutableArray* xl3_vlts = [NSMutableArray arrayWithCapacity:7];
+        NSArray* xl3_vlts_tags = [NSArray arrayWithObjects:@"VCC", @"VEE", @"VP24", @"VM24", @"TMP0", @"TMP1", @"TMP2", nil];
+        unsigned char vlt;
+        for (vlt = 0; vlt < 8; vlt++) {
+            if (vlt==2) continue;
+            NSNumber *number = [[NSNumber alloc] initWithFloat:result.voltages[vlt]];
+            [xl3_vlts addObject:number];
+            [number release];
+        }
+        [pollDict setObject:xl3_vlts forKey:@"xl3_vlt"];
+        [pollDict setObject:xl3_vlts_tags forKey:@"xl3_vlt_tag"];
+        [pollDict setObject:str forKey:@"xl3_vlt_time_stamp"];
     }
 }
 
