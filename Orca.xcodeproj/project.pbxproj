@@ -17,6 +17,9 @@
 		1C50F9F708033CA9008D18EA /* ORADC2249Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C50F9EC08033CA9008D18EA /* ORADC2249Decoders.m */; };
 		1C50F9F808033CA9008D18EA /* ORADC2249Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C50F9ED08033CA9008D18EA /* ORADC2249Model.h */; };
 		1C50F9F908033CA9008D18EA /* ORADC2249Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C50F9EE08033CA9008D18EA /* ORADC2249Model.m */; };
+		225D4F4C14E9E4B3009FF60F /* portForwardScript in Resources */ = {isa = PBXBuildFile; fileRef = 225D4F4914E9E4B3009FF60F /* portForwardScript */; };
+		225D4F4D14E9E4B3009FF60F /* SNOConnection.h in Headers */ = {isa = PBXBuildFile; fileRef = 225D4F4A14E9E4B3009FF60F /* SNOConnection.h */; };
+		225D4F4E14E9E4B3009FF60F /* SNOConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 225D4F4B14E9E4B3009FF60F /* SNOConnection.m */; };
 		2A08E4C20CFB74B30090BF77 /* SBC_Readout.c in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = 8493CC400C99FA0700B46CD4 /* SBC_Readout.c */; };
 		2A08E4C30CFB74CF0090BF77 /* CircularBuffer.c in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = 8493CC3C0C99FA0700B46CD4 /* CircularBuffer.c */; };
 		2A08E4C40CFB74DF0090BF77 /* CircularBuffer.h in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = 8493CC3D0C99FA0700B46CD4 /* CircularBuffer.h */; };
@@ -2887,6 +2890,9 @@
 		1C50F9EC08033CA9008D18EA /* ORADC2249Decoders.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORADC2249Decoders.m; sourceTree = "<group>"; };
 		1C50F9ED08033CA9008D18EA /* ORADC2249Model.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORADC2249Model.h; sourceTree = "<group>"; };
 		1C50F9EE08033CA9008D18EA /* ORADC2249Model.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORADC2249Model.m; sourceTree = "<group>"; };
+		225D4F4914E9E4B3009FF60F /* portForwardScript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = portForwardScript; sourceTree = "<group>"; };
+		225D4F4A14E9E4B3009FF60F /* SNOConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SNOConnection.h; sourceTree = "<group>"; };
+		225D4F4B14E9E4B3009FF60F /* SNOConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SNOConnection.m; sourceTree = "<group>"; };
 		2A178E9A08DB3D91001D78BC /* ORCard.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORCard.h; sourceTree = "<group>"; };
 		2A178E9B08DB3D91001D78BC /* ORCard.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORCard.m; sourceTree = "<group>"; };
 		2A178E9C08DB3D91001D78BC /* ORCrate.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORCrate.h; sourceTree = "<group>"; };
@@ -10177,6 +10183,9 @@
 		84C37D240EF834DD00E77E09 /* SNO */ = {
 			isa = PBXGroup;
 			children = (
+				225D4F4914E9E4B3009FF60F /* portForwardScript */,
+				225D4F4A14E9E4B3009FF60F /* SNOConnection.h */,
+				225D4F4B14E9E4B3009FF60F /* SNOConnection.m */,
 				84C37D250EF834DD00E77E09 /* SNO.gif */,
 				84C37D260EF834DD00E77E09 /* SNO.nib */,
 				84C37D270EF834DD00E77E09 /* SNOController.h */,
@@ -12682,6 +12691,7 @@
 				8407398414CDD91F00BAD105 /* ORMet637Model.h in Headers */,
 				B38DEE4A14E02B40003914FF /* ORADVME1314Controller.h in Headers */,
 				B38DEE4C14E02B40003914FF /* ORADVME1314Model.h in Headers */,
+				225D4F4D14E9E4B3009FF60F /* SNOConnection.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13489,6 +13499,7 @@
 				8407398114CDD91F00BAD105 /* Met637.tif in Resources */,
 				B38DEE4814E02B40003914FF /* ADVME1314.gif in Resources */,
 				B38DEE4914E02B40003914FF /* ADVME1314.nib in Resources */,
+				225D4F4C14E9E4B3009FF60F /* portForwardScript in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14401,6 +14412,7 @@
 				8407398514CDD91F00BAD105 /* ORMet637Model.m in Sources */,
 				B38DEE4B14E02B40003914FF /* ORADVME1314Controller.m in Sources */,
 				B38DEE4D14E02B40003914FF /* ORADVME1314Model.m in Sources */,
+				225D4F4E14E9E4B3009FF60F /* SNOConnection.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
