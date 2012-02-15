@@ -730,6 +730,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 }
 - (void) processRemoteTaskList:(NSArray*)aList verbose:(BOOL)verbose
 {
+	if(!remoteHostName)return;
 	if([aList count] && verbose)NSLog(@"Couch Remote Tasks:\n");
 	for(id aTask in aList){
 		if([[aTask objectForKey:@"type"] isEqualToString:@"Replication"]){
