@@ -43,22 +43,22 @@ NSString* morcaDBRead = @"morcaDBRead";
     [connection release];
 }
 
--(void) readXL3StateDocumentFromMorca
+-(void) readXL3StateDocumentFromMorca:(NSString *) aString
 {	
-	//get the XL3 document and store it in a dictionary
+	//get the XL3 document 
     
     int ixl3;
-    for(ixl3=0;ixl3<kMaxSNOCrates-2;ixl3++){
+    for(ixl3=0;ixl3<kMaxSNOCrates-2;ixl3++){ //change this to kMaxSNOCrates-1 when Morca db is updated.
         SNOConnection *connection = [[SNOConnection alloc] init];
         [connection setDelegate:self];
-        [connection setDelegateAction:@"getXL3State"];
+        [connection setDelegateAction:aString];
 //        NSString *url= [NSString stringWithFormat:@"http://localhost:5984/morca/_design/xl3_status/_view/xl3_num?descending=True&key=%i&limit=1&include_docs=true",ixl3];
         NSString *url= [NSString stringWithFormat:@"http://snoplus:scintillate@snotpenn01.snolab.ca:5984/morca/_design/xl3_status/_view/xl3_num?descending=True&key=%i&limit=1&include_docs=true",ixl3];
         [connection get:url];
         [connection release];
     }
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:morcaDBRead object:self];
+    if ([aString isEqualToString:@"getXL3State"]) [[NSNotificationCenter defaultCenter] postNotificationName:morcaDBRead object:self];
 }
 
 //---------------------------
@@ -66,6 +66,7 @@ NSString* morcaDBRead = @"morcaDBRead";
 
 -(void) getXL3State:(NSString *)aString
 {
+    //store XL3 data in struct 
     NSArray *row = [[NSArray alloc] initWithArray:[[aString yajl_JSON] objectForKey:@"rows"]];
     NSDictionary *jsonMorcaDB = [[NSDictionary alloc] initWithDictionary:[[row objectAtIndex:0] objectForKey:@"doc"]];
 
@@ -97,7 +98,7 @@ NSString* morcaDBRead = @"morcaDBRead";
                 SNOCrate[crate].Card[cardindex].fecFifo = 
                 [[[jsonMorcaDB objectForKey:key] objectAtIndex:cardindex] floatValue];
             }
-        }else if ([key isEqualToString:@"xl3_pckrt"]){
+        }else if ([key isEqualToString:@"xl3_pckrt"] && !isCollectingXL3Rates){
             SNOCrate[crate].xl3PacketRate = [[jsonMorcaDB objectForKey:key] floatValue];
         }else if ([key isEqualToString:@"fec_vlt"]){
             int cardindex;
@@ -115,6 +116,23 @@ NSString* morcaDBRead = @"morcaDBRead";
                 [[[jsonMorcaDB objectForKey:key] objectAtIndex:iVoltage] floatValue];
             }
         }
+    }
+    
+    [row release], row=nil;
+    [jsonMorcaDB release], jsonMorcaDB=nil;
+}
+
+-(void) getXL3Rates:(NSString *)aString
+{
+    //store XL3 rates in struct 
+    NSArray *row = [[NSArray alloc] initWithArray:[[aString yajl_JSON] objectForKey:@"rows"]];
+    NSDictionary *jsonMorcaDB = [[NSDictionary alloc] initWithDictionary:[[row objectAtIndex:0] objectForKey:@"doc"]];
+    
+    int crate;
+    
+    crate = [[jsonMorcaDB objectForKey:@"xl3_num"] intValue];
+    for (id key in jsonMorcaDB){
+        if ([key isEqualToString:@"xl3_pckrt"]) SNOCrate[crate].xl3PacketRate = [[jsonMorcaDB objectForKey:key] floatValue];
     }
     
     [row release], row=nil;
@@ -255,6 +273,16 @@ NSString* morcaDBRead = @"morcaDBRead";
 	return SNOCrate[aCrate].xl3PacketRate;
 }
 
+- (float) xl3TotalRate
+{
+    float totalRate = 0;
+    int crate;
+    for (crate=0; crate<kMaxSNOCrates-2; crate++) { //change this to kMaxSNOCrates-1 when Morca db is updated.
+        totalRate += SNOCrate[crate].xl3PacketRate;
+    }
+    return totalRate;
+}
+
 - (float)  xpos:(int)aCrate card:(int)aCard channel:(int)aChannel
 {
 	if(TubeInRange(aCrate,aCard,aChannel)){
@@ -294,6 +322,11 @@ NSString* morcaDBRead = @"morcaDBRead";
         return SNOCrate[aCrate].xl3Voltage[aVoltage].voltage;
     }
     else return 0;
+}
+
+- (void) collectingXL3Rates:(BOOL)aBOOL
+{
+    isCollectingXL3Rates = aBOOL;
 }
 
 - (NSString*)  pmtID:(int)aCrate card:(int)aCard channel:(int)aChannel

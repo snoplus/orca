@@ -43,7 +43,11 @@
     IBOutlet NSPopUpButton* runTypeButton;
     IBOutlet NSButton* sourceNotesButton;
     IBOutlet NSTextField* sourceNotesField;
+    IBOutlet NSTextField* totalXL3RateField;
 	ORRunModel* runControl;
+    
+    //total data rate window
+    IBOutlet ORCompositeTimeLineView*	totalRatePlot;
 	
     //slow control tab
 	IBOutlet NSButton* connectToIOServerButton;
@@ -130,6 +134,7 @@
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem;
 - (void) morcaDBRead:(NSNotification *)aNote;
 - (void) updateRatePlot:(NSNotification *)aNote;
+- (void) updateTotalRatePlot:(NSNotification *)aNote;
 - (void) disablePlotButton:(NSNotification *)aNote;
 
 #pragma mark •••Data Source For Plots

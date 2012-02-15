@@ -34,6 +34,7 @@ NSString* ORSNOChartXChangedNotification            = @"ORSNOChartXChangedNotifi
 NSString* ORSNOChartYChangedNotification            = @"ORSNOChartYChangedNotification";
 NSString* slowControlTableChanged					= @"slowControlTableChanged";
 NSString* slowControlConnectionStatusChanged		= @"slowControlConnectionStatusChanged";
+NSString* totalRatePlotChanged                      = @"totalRatePlotChanged";
 
 @interface SNOModel (private)
 - (void) _setUpPolling;
@@ -155,6 +156,15 @@ NSString* slowControlConnectionStatusChanged		= @"slowControlConnectionStatusCha
     return parameterRate;
 }
 
+- (ORTimeRate *) totalDataRate
+{
+    return totalDataRate;
+}
+
+- (float) totalRate
+{
+    return [[SNOMonitoredHardware sharedSNOMonitoredHardware] xl3TotalRate];
+}
 
 - (void) getRunTypesFromOrcaDB:(NSMutableArray *)runTypeList
 {
@@ -209,10 +219,23 @@ NSString* slowControlConnectionStatusChanged		= @"slowControlConnectionStatusCha
 //monitor
 - (void) getDataFromMorca
 {
-	[[SNOMonitoredHardware sharedSNOMonitoredHardware] readXL3StateDocumentFromMorca];
+	[[SNOMonitoredHardware sharedSNOMonitoredHardware] readXL3StateDocumentFromMorca:@"getXL3State"];
 	
-	if (xl3PollingState !=0 && pollXl3) 
+	if (xl3PollingState > 0 && pollXl3) {
 		[self performSelector:@selector(getDataFromMorca) withObject:nil afterDelay:xl3PollingState];
+    }
+}
+
+- (void) getXl3Rates
+{
+    [[SNOMonitoredHardware sharedSNOMonitoredHardware] readXL3StateDocumentFromMorca:@"getXL3Rates"];
+    
+    if (isPollingXl3TotalRate) {
+        float totalRate = [[SNOMonitoredHardware sharedSNOMonitoredHardware] xl3TotalRate];
+        [totalDataRate addDataToTimeAverage:totalRate];
+        [[NSNotificationCenter defaultCenter] postNotificationName:totalRatePlotChanged object:self];
+        [self performSelector:@selector(getXl3Rates) withObject:nil afterDelay:2];
+    }
 }
 
 - (void) setXl3Polling:(int)aState
@@ -236,7 +259,7 @@ NSString* slowControlConnectionStatusChanged		= @"slowControlConnectionStatusCha
         [parameterRate setSampleTime:xl3PollingState];
 
 		pollXl3 = true;
-		[self performSelector:@selector(getDataFromMorca) withObject:nil afterDelay:xl3PollingState];
+        [self getDataFromMorca];
 	}
 }
 
@@ -260,7 +283,28 @@ NSString* slowControlConnectionStatusChanged		= @"slowControlConnectionStatusCha
         float value = [[SNOMonitoredHardware sharedSNOMonitoredHardware] currentValueForSelectedHardware] ;
         [parameterRate addDataToTimeAverage:value];
         [self performSelector:@selector(collectSelectedVariable) withObject:nil afterDelay:xl3PollingState];
+        //NSLog(@"value %f\n",value);
     }
+}
+
+- (void) startTotalXL3RatePoll
+{
+    if (!isPollingXl3TotalRate) {
+        isPollingXl3TotalRate = true;
+        if (totalDataRate) [totalDataRate release], totalDataRate = nil;
+        totalDataRate = [[ORTimeRate alloc] init];
+        [totalDataRate setSampleTime:2];
+        
+        [[SNOMonitoredHardware sharedSNOMonitoredHardware] collectingXL3Rates:YES];
+        [self getXl3Rates];
+    } 
+}
+
+- (void) stopTotalXL3RatePoll
+{
+    if (totalDataRate) [totalDataRate release], totalDataRate = nil;
+    isPollingXl3TotalRate = false;
+    [[SNOMonitoredHardware sharedSNOMonitoredHardware] collectingXL3Rates:NO];
 }
 
 //slow control

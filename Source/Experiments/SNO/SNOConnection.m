@@ -97,6 +97,9 @@
 - (void) getXL3State:(NSString *)aStr{
 }
 
+- (void) getXL3Rates:(NSString *)aStr{    
+}
+
 - (void) getCableDocument:(NSString *)aStr{
 }
 
@@ -162,7 +165,9 @@
     }else if([action isEqualToString:@"getXL3State"] && [delegate respondsToSelector:@selector(getXL3State:)]) {
  		//NSString* dataAsString = [[[NSString alloc] initWithData:receivedData encoding:NSUTF8StringEncoding] autorelease];
  		[delegate performSelector:@selector(getXL3State:) withObject: dataStr];
- 	}else if([action isEqualToString:@"getIOS"] && [delegate respondsToSelector:@selector(getIOS:)]){
+ 	}else if ([action isEqualToString:@"getXL3Rates"] && [delegate respondsToSelector:@selector(getXL3Rates:)]){
+        [delegate performSelector:@selector(getXL3Rates:) withObject: dataStr];
+    }else if([action isEqualToString:@"getIOS"] && [delegate respondsToSelector:@selector(getIOS:)]){
         [delegate performSelector:@selector(getIOS:) withObject: dataStr];
     }else if([action isEqualToString:@"getIOSCards"] && [delegate respondsToSelector:@selector(getIOSCards:)]){
         [delegate performSelector:@selector(getIOSCards:) withObject: dataStr];

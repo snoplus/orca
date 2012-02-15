@@ -59,11 +59,12 @@
 	} SNOCrate[kMaxSNOCrates+2];	// + two spares
     
     float currentValueForSelectedHardware;
+    BOOL isCollectingXL3Rates;
 }
 
 + (SNOMonitoredHardware*) sharedSNOMonitoredHardware;
 - (void) readCableDBDocumentFromOrcaDB;
-- (void) readXL3StateDocumentFromMorca;
+- (void) readXL3StateDocumentFromMorca:(NSString *) aString;
 - (void) decode:(NSString*)chanInfo crate:(int*)crate card:(int*)card channel:(int*) channel;
 - (BOOL) getCrate:(int)aCrate card:(int)aCard channel:(int)aChannel x:(float*)x y:(float*)y;
 - (int)  tubeTypeCrate:(int)aCrate card:(int)aCard channel:(int)aChannel;
@@ -71,6 +72,7 @@
 - (float) baseCurrent:(int)aCrate card:(int)aCard channel:(int)aChannel;
 - (float) fifo:(int)aCrate card:(int)aCard;
 - (float) xl3Rate:(int)aCrate;
+- (float) xl3TotalRate;
 - (float) xpos:(int)aCrate card:(int)aCard channel:(int)aChannel;
 - (float) ypos:(int)aCrate card:(int)aCard channel:(int)aChannel;
 - (float) zpos:(int)aCrate card:(int)aCard channel:(int)aChannel;
@@ -82,6 +84,7 @@
 - (void) getCableDocument:(NSString *) aString;
 - (void) setCurrentValueForSelectedHardware:(float)aValue;
 - (float) currentValueForSelectedHardware;
+- (void) collectingXL3Rates:(BOOL)aBOOL;
 @end
 
 extern NSString* morcaDBRead;

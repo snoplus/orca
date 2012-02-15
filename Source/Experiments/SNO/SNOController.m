@@ -62,6 +62,13 @@
     
     [[ratePlot yAxis] setRngLimitsLow:0 withHigh:5000000 withMinRng:1];
     
+    ORTimeLinePlot* dataPlot = [[ORTimeLinePlot alloc] initWithTag:1 andDataSource:self];
+	[totalRatePlot addPlot: dataPlot];
+	[(ORTimeAxis*)[totalRatePlot xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
+	[dataPlot release];    
+    
+    [[totalRatePlot yAxis] setRngLimitsLow:0 withHigh:5000000 withMinRng:1];
+    
 	[[SNOMonitoredHardware sharedSNOMonitoredHardware] readCableDBDocumentFromOrcaDB];
 
 	[self findRunControl];
@@ -123,6 +130,11 @@
 						 name : newValueAvailable
 					   object : detectorView];   
     
+    [notifyCenter addObserver : self
+					 selector : @selector(updateTotalRatePlot:)
+						 name : totalRatePlotChanged
+					   object : model];   
+    
 	[notifyCenter addObserver : self
 					 selector : @selector(disablePlotButton:)
 						 name : plotButtonDisabled
@@ -135,7 +147,9 @@
 	int tag = [aPlotter tag];
 	if(tag == 0){ 
 		return [[model parameterRate] count];
-	}
+	} else if (tag ==1){
+        return [[model totalDataRate] count];
+    }
 	else return 0;
 }
 
@@ -150,7 +164,14 @@
 		else		 aValue = [[model parameterRate] valueAtIndex:index];
 		*xValue = [[model parameterRate] timeSampledAtIndex:index];
 		*yValue = aValue;
-	}
+	} else if (tag == 1){
+		int count = [[model totalDataRate] count];
+		int index = count-i-1;
+		if(count==0) aValue = 0;
+		else		 aValue = [[model totalDataRate] valueAtIndex:index];
+		*xValue = [[model totalDataRate] timeSampledAtIndex:index];
+		*yValue = aValue;        
+    }
 }
 
 #pragma mark •••Actions
@@ -184,8 +205,11 @@
 	if([runControl isRunning]){
 		//if ([startRunButton state]==0) [startRunButton setState:1]; 
 		[runControl restartRun];
+        [model stopTotalXL3RatePoll];
+        [model startTotalXL3RatePoll];
 	}else{
 		[runControl startRun];
+        [model startTotalXL3RatePoll];
 	}
 }
 
@@ -193,6 +217,7 @@
 {
 	//if ([startRunButton state]==1) [startRunButton setState:0];
 	[runControl haltRun];
+    [model stopTotalXL3RatePoll];
 }
 
 - (void) updateRunInfo:(NSNotification*)aNote
@@ -424,6 +449,14 @@
     } else {
         [ratePlot setNeedsDisplay:YES];
     }
+}
+
+- (void) updateTotalRatePlot:(NSNotification *)aNote
+{
+    NSString *value = [NSString stringWithFormat:@"%f Hz",[model totalRate]];
+    [totalXL3RateField setStringValue:value];
+    [totalRatePlot setNeedsDisplay:YES];
+    [totalXL3RateField setNeedsDisplay:YES];
 }
 
 - (void) disablePlotButton:(NSNotification *)aNote

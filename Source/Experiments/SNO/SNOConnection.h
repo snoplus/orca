@@ -23,6 +23,7 @@
 - (void) setDelegateAction: (NSString *)aString;
 - (void) getSlowControlMap: (NSString *) aStr;
 - (void) getXL3State: (NSString *) aStr;
+- (void) getXL3Rates: (NSString *) aStr;
 - (void) getCableDocument: (NSString *) aStr;
 - (void) getIOSCards: (NSString *) aStr;
 - (void) getIOS: (NSString *) aStr;

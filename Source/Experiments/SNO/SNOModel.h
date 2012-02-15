@@ -40,6 +40,7 @@
 	BOOL pollXl3;
 	BOOL pollSlowControl;
     BOOL isPlottingGraph;
+    BOOL isPollingXl3TotalRate;
 	NSString *slowControlMonitorStatusString;
     NSString *runType;
     NSString *iosUsername;
@@ -48,6 +49,7 @@
     NSArray *iosCards;
     NSArray *ioServers;
     ORTimeRate *parameterRate;
+    ORTimeRate *totalDataRate;
 //	SNOMonitoredHardware *db;
 }
 
@@ -65,17 +67,22 @@
 - (void) setRunTypeName:(NSString *)aType;
 - (NSString *) getRunType;
 - (ORTimeRate *) parameterRate;
+- (ORTimeRate *) totalDataRate;
 - (BOOL) isPlottingGraph;
 //- (void) writeNewRunTypeDocument:(NSString *)runNotes;
 //- (NSString *) getSourceDocId;
 
 //monitor
 - (void) getDataFromMorca;
+- (void) getXl3Rates;
 - (void) setXl3Polling:(int)aState;
 - (void) startXl3Polling;
 - (void) stopXl3Polling;
 - (void) collectSelectedVariable;
 - (void) releaseParameterRate;
+- (void) startTotalXL3RatePoll;
+- (void) stopTotalXL3RatePoll;
+- (float) totalRate;
 
 //slow control
 - (void) forwardPorts;
@@ -111,4 +118,5 @@ extern NSString* ORSNOChartXChangedNotification;
 extern NSString* ORSNOChartYChangedNotification;
 extern NSString* slowControlTableChanged;
 extern NSString* slowControlConnectionStatusChanged;
+extern NSString* totalRatePlotChanged;
 
