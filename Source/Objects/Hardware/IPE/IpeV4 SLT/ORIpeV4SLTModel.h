@@ -291,6 +291,8 @@
 //- (void)		  dumpTriggerRAM:(int)aPageIndex;
 
 - (void)		  writeReg:(int)index value:(unsigned long)aValue;
+- (void)		  rawWriteReg:(unsigned long) address  value:(unsigned long)aValue;//TODO: FOR TESTING AND DEBUGGING ONLY -tb-
+- (unsigned long) rawReadReg:(unsigned long) address; //TODO: FOR TESTING AND DEBUGGING ONLY -tb-
 - (unsigned long) readReg:(int) index;
 - (id) writeHardwareRegisterCmd:(unsigned long)regAddress value:(unsigned long) aValue;
 - (id) readHardwareRegisterCmd:(unsigned long)regAddress;

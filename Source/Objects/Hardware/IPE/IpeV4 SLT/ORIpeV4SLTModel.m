@@ -942,6 +942,19 @@ NSLog(@"  arguments: %@ \n" , arguments);
 	[self write: [self getAddress:index] value:aValue];
 }
 
+- (void)		  rawWriteReg:(unsigned long) address  value:(unsigned long)aValue
+//TODO: FOR TESTING AND DEBUGGING ONLY -tb-
+{
+    [self write: address value: aValue];
+}
+
+- (unsigned long) rawReadReg:(unsigned long) address
+//TODO: FOR TESTING AND DEBUGGING ONLY -tb-
+{
+	return [self read: address];
+
+}
+
 - (unsigned long) readReg:(int) index
 {
 	return [self read: [self getAddress:index]];
