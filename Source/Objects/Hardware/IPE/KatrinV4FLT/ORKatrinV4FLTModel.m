@@ -135,6 +135,7 @@ enum IpeFLTV4Enum{
 	kFLTV4EventFifo4Reg,
 	kFLTV4HistPageNReg,
 	kFLTV4HistLastFirstReg,
+	kFLTV4TestPatternReg,
 	kFLTV4NumRegs //must be last
 };
 
@@ -174,6 +175,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	{@"Event FIFO4",		0x00180C>>2,		-1,				kIpeRegReadable | kIpeRegNeedsChannel},
 	{@"HistPageN",			0x00200C>>2,		-1,				kIpeRegReadable},
 	{@"HistLastFirst",		0x002044>>2,		-1,				kIpeRegReadable},
+	{@"TestPattern",		0x001400>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 };
 
 @interface ORKatrinV4FLTModel (private)
@@ -1155,6 +1157,171 @@ static double table[32]={
 - (void) devTest2ButtonAction
 {
 	[self releaseRunWait]; 
+}
+
+
+//Testpulser tests -tb-
+    //SLT registers
+	static const uint32_t SLTTPTimingRam     = 0xc80000 >> 2;
+	static const uint32_t SLTTPShapeRam      = 0xc81000 >> 2;
+	static const uint32_t SLTControlReg      = 0xa80000 >> 2;
+	static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
+
+- (void) testButtonLowLevelConfigTP
+{
+        NSLog(@"   configTPButton: Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
+	//[self releaseRunWait]; 
+	
+	//write TP shape ram
+	int i=0;
+	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x1f];
+	i++;
+	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x00];
+	i++;
+	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x3ff];
+	i++;
+	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x00];
+	i++;
+	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x2ff];
+	i++;
+	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x00];
+	i++;
+	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x2ff];
+	i++;
+	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x2ff];
+	i++;
+	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x2ff];
+	i++;
+	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x2ff];
+	i++;
+	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x00];
+	i++;
+	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x00];
+	i++;
+	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x00];
+	i++;
+	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x00];
+	i++;
+	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x2ff];
+	i++;
+	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x2ff];
+	i++;
+	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x2ff];
+	i++;
+	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x00];
+	i++;
+	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x2ff];
+	i++;
+	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x00];
+	i++;
+	
+	//write TP timing ram
+	uint32_t time      = 0x50; 
+	i=0;
+	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: time];
+	i++;
+	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: time];
+	i++;
+	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: time];
+	i++;
+	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: time];
+	i++;
+	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: time];
+	i++;
+	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: time];
+	i++;
+	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: time];
+	i++;
+	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: time];
+	i++;
+	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: time];
+	i++;
+	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: time];
+	i++;
+	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: time];
+	i++;
+	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: time];
+	i++;
+	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: time];
+	i++;
+	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: time];
+	i++;
+	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: 0];
+	i++;
+	
+	//set SLT control register
+	uint32_t control=	[[[self crate] adapter] rawReadReg: SLTControlReg ];
+	NSLog(@"control reg: 0x%x   ",control);
+	control = control & ~(0x7<<11);
+	NSLog(@"  -  after reset: control reg: 0x%x  \n",control);
+	control = (control | (0x01<<11)); //0x1 oder 0x5
+	[[[self crate] adapter] rawWriteReg: SLTControlReg value: control];
+	NSLog(@"  -  after write: control reg: 0x%x  \n",control);
+	
+	//write FLT test pattern ram
+	uint32_t address = [self regAddress: kFLTV4TestPatternReg];
+	uint32_t fltpattern = 0xfff0ff;  //0x111112;// 0xffffff = all
+	
+	[[[self crate] adapter] rawWriteReg: address   value: fltpattern];
+	[[[self crate] adapter] rawWriteReg: address+1 value: 0x0];
+	[[[self crate] adapter] rawWriteReg: address+2 value: fltpattern];
+	[[[self crate] adapter] rawWriteReg: address+3 value: fltpattern];
+	[[[self crate] adapter] rawWriteReg: address+4 value: 0x0];
+	[[[self crate] adapter] rawWriteReg: address+5 value: 0x0];
+	[[[self crate] adapter] rawWriteReg: address+6 value: fltpattern];
+	[[[self crate] adapter] rawWriteReg: address+7 value: fltpattern];
+	[[[self crate] adapter] rawWriteReg: address+8 value: 0x0];
+	[[[self crate] adapter] rawWriteReg: address+9 value: 0x0];
+	[[[self crate] adapter] rawWriteReg: address+10 value: fltpattern];
+	[[[self crate] adapter] rawWriteReg: address+11 value: fltpattern];
+	[[[self crate] adapter] rawWriteReg: address+12 value: fltpattern];
+	[[[self crate] adapter] rawWriteReg: address+13 value: 0x0];
+	[[[self crate] adapter] rawWriteReg: address+14 value: 0x0];
+	[[[self crate] adapter] rawWriteReg: address+15 value: 0x0];
+	[[[self crate] adapter] rawWriteReg: address+16 value: fltpattern];
+	[[[self crate] adapter] rawWriteReg: address+17 value: fltpattern];
+	[[[self crate] adapter] rawWriteReg: address+18 value: fltpattern];
+	[[[self crate] adapter] rawWriteReg: address+18 value: 0x1ffffff];
+	
+	//set FLT control register flag
+	uint32_t fltaddress = [self regAddress: kFLTV4ControlReg];
+	uint32_t fltcontrol=	[[[self crate] adapter] rawReadReg: fltaddress ];
+	NSLog(@"flt control reg: 0x%x   ",fltcontrol);
+	fltcontrol = fltcontrol | (0x10);//bit 4
+	[[[self crate] adapter] rawWriteReg: fltaddress value: fltcontrol];
+	NSLog(@"  -  after write: flt control reg: 0x%x  \n",fltcontrol);
+	
+	
+}
+
+- (void) testButtonLowLevelFireTP
+{
+        NSLog(@"   fireTPButton: Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
+	//[self releaseRunWait]; 
+	//write FLT test pattern ram
+	//uint32_t address = [self regAddress: kSLTV4CommandReg];
+	[[[self crate] adapter] rawWriteReg: SLTCommandReg   value: 0x8];
+}
+
+- (void) testButtonLowLevelResetTP
+{
+        NSLog(@"   resetTPButton: Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
+	//[self releaseRunWait]; 
+	uint32_t control=	[[[self crate] adapter] rawReadReg: SLTControlReg ];
+	NSLog(@"control reg: 0x%x   ",control);
+	control = control & ~(0x7<<11);
+	NSLog(@"  -  after reset: control reg: 0x%x  \n",control);
+	[[[self crate] adapter] rawWriteReg: SLTControlReg value: control];
+
+#if 0
+	//reset FLT control register flag
+	uint32_t address = [self regAddress: kFLTV4ControlReg];
+	uint32_t control=	[[[self crate] adapter] rawReadReg: address ];
+	NSLog(@"flt control reg: 0x%x   ",control);
+	control = control | (0x10);//bit 4
+	[[[self crate] adapter] rawWriteReg: address value: control];
+	NSLog(@"  -  after write: flt control reg: 0x%x  \n",control);
+#endif
 }
 
 

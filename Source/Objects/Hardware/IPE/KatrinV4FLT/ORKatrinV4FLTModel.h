@@ -259,6 +259,10 @@
 - (void) devTest1ButtonAction;
 - (void) devTest2ButtonAction;
 
+- (void) testButtonLowLevelConfigTP;
+- (void) testButtonLowLevelFireTP;
+- (void) testButtonLowLevelResetTP;
+
 
 #pragma mark •••HW Access
 //all can raise exceptions
