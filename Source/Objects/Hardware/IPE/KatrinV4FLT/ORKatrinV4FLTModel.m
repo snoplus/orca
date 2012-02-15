@@ -293,14 +293,14 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (void) runIsAboutToChangeState:(NSNotification*)aNote
 {
-    if(!syncWithRunControl) return;//nothing to care about ...
+    if(!syncWithRunControl) return;//nothing to care about ... Sync with run control not enabled in dialog ...
 	
 	//we need to care about the following cases:
 	// 1. no run active, system going to start run:
 	//    do nothing
     //    (old state: eRunStopping/0  , new state: eRunStarting)
 	// 2. run active, system going to change state:
-	//    start 'sync'ing'
+	//    then start 'sync'ing' (=waiting until currently recording histograms finished)
 	//    possible cases:
     //    old state: eRunStarting        , new state: eRunStopping ->stop run
     //    old state: eRunBetweenSubRuns  , new state: eRunStopping ->stop run (from 'between subruns')
@@ -309,14 +309,14 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	//    
 	//    sync'ing: set 'run wait' (use internal counter); clear histogram counter; wait for next 1 histogram(s); if received: set 'run wait done', reset flag/counter
     //
-	//TODO:    WARNING: I observed that I receive 'eRunStarting' after the same state 'eRunStarting', seems to me to be a bug -tb-
+	//TODO:    WARNING: I observed that I receive 'eRunStarting' after the same state 'eRunStarting', seems to me to be a bug -tb- OK I think this is fixed?
 	//    
 	
     //NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
     //NSLog(@"Called %@::%@   aNote:>>>%@<<<\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),aNote);//DEBUG -tb-
 	//aNote: >>>NSConcreteNotification 0x5a552d0 {name = ORRunAboutToChangeState; object = (ORRunModel,1) Decoders: ORRunDecoderForRun
     // Connectors: "Run Control Connector"  ; userInfo = {State = 4;}}<<<
-	// states: 2,3,4: 2=starting, 3=stopping, 4=between subruns; see ORGlobal.h, enum 'eRunState'
+	// states: 2,3,4: 2=starting, 3=stopping, 4=between subruns (0 = eRunStopped); see ORGlobal.h, enum 'eRunState'
     int state = [[[aNote userInfo] objectForKey:@"State"] intValue];
 	/*
 	id rc =  [aNote object];
@@ -349,7 +349,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 		    return;
 		}
 	    if(syncWithRunControlCounterFlag>0){//should not happen! bug? -tb-
-		    NSLog(@"   Case 2: ERROR - syncWithRunControlCounterFlag>0\n");//DEBUG -tb-
+		    NSLog(@"   Case 2: WARNING - syncWithRunControlCounterFlag>0 (%i) - did you send multiple stopRun commands?\n",syncWithRunControlCounterFlag);//DEBUG -tb-
 		    return;
 		}
 	    // case 2. (all other cases)
@@ -362,7 +362,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 {
     //NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
 	[self clearReceivedHistoCounter];
-	syncWithRunControlCounterFlag = numHistograms;
+	syncWithRunControlCounterFlag = numHistograms; //we set syncWithRunControlCounterFlag to the number of histograms we yet need to receive
 	[self addRunWaitWithReason:@"FLTv4: wait for next histogram."];
 }
 
