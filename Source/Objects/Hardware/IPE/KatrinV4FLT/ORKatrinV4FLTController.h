@@ -124,6 +124,11 @@
 		IBOutlet NSTextField* 	regWriteValueTextField;
 		IBOutlet NSButton*		regWriteButton;
 		IBOutlet NSButton*		regReadButton;
+
+		IBOutlet NSButton*		configTPButton;
+		IBOutlet NSButton*		fireTPButton;
+		IBOutlet NSButton*		resetTPButton;
+
 	
 		IBOutlet NSButton*      noiseFloorButton;
 		//offset panel
@@ -271,6 +276,8 @@
 - (IBAction) testButtonAction: (id) sender; //temp routine to hook up to any on a temp basis
 - (IBAction) devTest1ButtonAction: (id) sender; //temp routine to hook up to any on a temp basis
 - (IBAction) devTest2ButtonAction: (id) sender; //temp routine to hook up to any on a temp basis
+
+- (IBAction) testButtonLowLevelAction: (id) sender; //temp routine 
 
 	
 #pragma mark •••Plot DataSource

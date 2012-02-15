@@ -1526,6 +1526,28 @@
 }
 
 
+- (IBAction) testButtonLowLevelAction: (id) sender
+{
+    NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
+    if(sender==configTPButton){
+        NSLog(@"   configTPButton: Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
+	    [model testButtonLowLevelConfigTP];
+	}
+
+    if(sender==fireTPButton){
+        NSLog(@"   fireTPButton: Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
+	    [model testButtonLowLevelFireTP];
+	}
+
+    if(sender==resetTPButton){
+        NSLog(@"   resetTPButton: Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
+	    [model testButtonLowLevelResetTP];
+	}
+
+}
+
+
+
 #pragma mark •••Plot DataSource
 - (int) numberPointsInPlot:(id)aPlotter
 {
