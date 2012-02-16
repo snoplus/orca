@@ -46,7 +46,7 @@
 	detectorSize		= NSMakeSize(620,595);
 	detailsSize		= NSMakeSize(450,589);
 	focalPlaneSize		= NSMakeSize(450,589);
-	couchDBSize		= NSMakeSize(620,595);
+	couchDBSize		= NSMakeSize(450,500);
 	monitoringSize		= NSMakeSize(620,595);
 	slowControlSize		= NSMakeSize(620,595);
 	
@@ -83,11 +83,100 @@
 	[detectorView makeAllSegments];	
 }
 
-#pragma mark ¥¥¥Interface Management
+- (void) morcaUserNameChanged:(NSNotification*)aNote
+{
+    
+}
 
+- (void) morcaPasswordChanged:(NSNotification*)aNote
+{
+    
+}
+
+- (void) morcaDBNameChanged:(NSNotification*)aNote
+{
+    
+}
+
+- (void) morcaPortChanged:(NSNotification*)aNote
+{
+    
+}
+
+- (void) morcaIPAddressChanged:(NSNotification*)aNote
+{
+    
+}
+
+- (void) morcaIsVerboseChanged:(NSNotification*)aNote
+{
+    
+}
+
+- (void) morcaIsWithinRunChanged:(NSNotification*)aNote
+{
+    
+}
+
+- (void) morcaUpdateRateChanged:(NSNotification*)aNote
+{
+    
+}
+
+- (void) morcaStatusChanged:(NSNotification*)aNote
+{
+    
+}
+
+#pragma mark ¥¥¥Interface Management
 - (IBAction) viewTypeAction:(id)sender
 {
 	[model setViewType:[sender indexOfSelectedItem]];
+}
+
+- (IBAction)morcaUserNameAction:(id)sender {
+}
+
+- (IBAction)morcaPasswordAction:(id)sender {
+}
+
+- (IBAction)morcaDBNameAction:(id)sender {
+}
+
+- (IBAction)morcaPortAction:(id)sender {
+}
+
+- (IBAction)morcaIPAddressAction:(id)sender {
+}
+
+- (IBAction)morcaClearHistoryAction:(id)sender {
+}
+
+- (IBAction)morcaFutonAction:(id)sender {
+}
+
+- (IBAction)morcaTestAction:(id)sender {
+}
+
+- (IBAction)morcaPingAction:(id)sender {
+}
+
+- (IBAction)morcaUpdateNowAction:(id)sender {
+}
+
+- (IBAction)morcaStartAction:(id)sender {
+}
+
+- (IBAction)morcaStopAction:(id)sender {
+}
+
+- (IBAction)morcaIsVerboseAction:(id)sender {
+}
+
+- (IBAction)morcaUpdateRateAction:(id)sender {
+}
+
+- (IBAction)morcaUpdateWithinRunAction:(id)sender {
 }
 
 

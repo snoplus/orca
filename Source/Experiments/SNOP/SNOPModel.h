@@ -29,8 +29,30 @@
 
 @interface SNOPModel :  ORExperimentModel
 {
-	int		  viewType;
+	int             viewType;
+    NSString*       morcaUserName;
+    NSString*       morcaPassword;
+    NSString*       morcaDBName;
+    unsigned int    morcaPort;
+    NSString*       morcaIPAddress;
+    unsigned int    morcaUpdateTime;
+    BOOL            morcaIsVerbose;
+    BOOL            morcaIsWithinRun;
+    NSString*       morcaStatus;
+    BOOL            morcaIsUpdating;
 }
+
+@property (copy)    NSString* morcaUserName;
+@property (copy)    NSString* morcaPassword;
+@property (copy)    NSString* morcaDBName;
+@property (assign)  unsigned int morcaPort;
+@property (copy)    NSString* morcaIPAddress;
+@property (assign)  unsigned int morcaUpdateTime;
+@property (assign)  BOOL morcaIsVerbose;
+@property (assign)  BOOL morcaIsWithinRun;
+@property (copy)    NSString* morcaStatus;
+@property (assign)  BOOL morcaIsUpdating;
+
 #pragma mark ¥¥¥Accessors
 - (void) setViewType:(int)aViewType;
 - (int) viewType;
@@ -45,4 +67,13 @@
 @end
 
 extern NSString* ORSNOPModelViewTypeChanged;
-
+extern NSString* ORSNOPModelMorcaIsVerboseChanged;
+extern NSString* ORSNOPModelMorcaIsWithinRunChanged;
+extern NSString* ORSNOPModelMorcaUpdateTimeChanged;
+extern NSString* ORSNOPModelMorcaPortChanged;
+extern NSString* ORSNOPModelMorcaStatusChanged;
+extern NSString* ORSNOPModelMorcaUserNameChanged;
+extern NSString* ORSNOPModelMorcaPasswordChanged;
+extern NSString* ORSNOPModelMorcaDBNameChanged;
+extern NSString* ORSNOPModelMorcaIPAddressChanged;
+extern NSString* ORSNOPModelMorcaIsUpdatingChanged;

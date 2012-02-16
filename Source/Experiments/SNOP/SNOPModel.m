@@ -26,6 +26,16 @@
 
 NSString* ORSNOPModelViewTypeChanged	= @"ORSNOPModelViewTypeChanged";
 static NSString* SNOPDbConnector	= @"SNOPDbConnector";
+NSString* ORSNOPModelMorcaIsVerboseChanged = @"ORSNOPModelMorcaIsVerboseChanged";
+NSString* ORSNOPModelMorcaIsWithinRunChanged = @"ORSNOPModelMorcaIsWithinRunChanged";
+NSString* ORSNOPModelMorcaUpdateTimeChanged = @"ORSNOPModelMorcaUpdateTimeChanged";
+NSString* ORSNOPModelMorcaPortChanged = @"ORSNOPModelMorcaPortChanged";
+NSString* ORSNOPModelMorcaStatusChanged = @"ORSNOPModelMorcaStatusChanged";
+NSString* ORSNOPModelMorcaUserNameChanged = @"ORSNOPModelMorcaUserNameChanged";
+NSString* ORSNOPModelMorcaPasswordChanged = @"ORSNOPModelMorcaPasswordChanged";
+NSString* ORSNOPModelMorcaDBNameChanged = @"ORSNOPModelMorcaDBNameChanged";
+NSString* ORSNOPModelMorcaIPAddressChanged = @"ORSNOPModelMorcaIPAddressChanged";
+NSString* ORSNOPModelMorcaIsUpdatingChanged = @"ORSNOPModelMorcaIsUpdatingChanged";
 
 @implementation SNOPModel
 
@@ -52,12 +62,150 @@ static NSString* SNOPDbConnector	= @"SNOPDbConnector";
     [aConnector release];
 }
 
+- (void) dealloc
+{
+    [morcaUserName release];
+    [morcaPassword release];
+    [morcaDBName release];
+    [morcaIPAddress release];
+    if (morcaStatus) [morcaStatus release];
+    
+    [super dealloc];
+}
+
 //- (NSString*) helpURL
 //{
 //	return @"SNO/Index.html";
 //}
 
 #pragma mark ¥¥¥Accessors
+- (NSString*) morcaUserName
+{
+    return morcaUserName;
+}
+
+- (void) setMorcaUserName:(NSString *)aMorcaUserName
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setMorcaUserName:morcaUserName];
+    [morcaUserName autorelease];
+    morcaUserName = [aMorcaUserName copy];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelMorcaUserNameChanged object:self];
+}
+
+- (NSString*) morcaPassword
+{
+    return morcaPassword;
+}
+
+- (void) setMorcaPassword:(NSString *)aMorcaPassword
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setMorcaPassword:morcaPassword];
+    [morcaPassword autorelease];
+    morcaPassword = [aMorcaPassword copy];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelMorcaPasswordChanged object:self];        
+}
+
+- (NSString*) morcaDBName
+{
+    return morcaDBName;
+}
+
+- (void) setMorcaDBName:(NSString *)aMorcaDBName
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setMorcaDBName:morcaDBName];
+    [morcaDBName autorelease];
+    morcaDBName = [aMorcaDBName copy];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelMorcaDBNameChanged object:self];        
+}
+
+- (NSString*) morcaIPAddress
+{
+    return morcaIPAddress;
+}
+
+- (void) setMorcaIPAddress:(NSString *)aMorcaIPAddress
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setMorcaIPAddress:morcaIPAddress];
+    [morcaIPAddress autorelease];
+    morcaIPAddress = [aMorcaIPAddress copy];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelMorcaIPAddressChanged object:self];        
+}
+
+- (unsigned int) morcaPort;
+{
+    return morcaPort;
+}
+
+- (void) setMorcaPort:(unsigned int)aMorcaPort
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setMorcaPort:aMorcaPort];
+    morcaPort = aMorcaPort;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelMorcaPortChanged object:self];        
+}
+
+- (unsigned int) morcaUpdateTime;
+{
+    return morcaUpdateTime;
+}
+
+- (void) setMorcaUpdateTime:(unsigned int)aMorcaUpdateTime
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setMorcaUpdateTime:morcaUpdateTime];
+    morcaUpdateTime = aMorcaUpdateTime;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelMorcaUpdateTimeChanged object:self];        
+}
+
+- (BOOL) morcaIsVerbose
+{
+    return morcaIsVerbose;
+}
+
+- (void) setMorcaIsVerbose:(BOOL)aMorcaIsVerbose
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setMorcaIsVerbose:morcaIsVerbose];
+    morcaIsVerbose = aMorcaIsVerbose;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelMorcaIsVerboseChanged object:self];        
+}
+
+- (BOOL) morcaIsWithinRun
+{
+    return morcaIsWithinRun;
+}
+
+- (void) setMorcaIsWithinRun:(BOOL)aMorcaIsWithinRun
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setMorcaIsWithinRun:morcaIsWithinRun];
+    morcaIsWithinRun = aMorcaIsWithinRun;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelMorcaIsWithinRunChanged object:self];        
+}
+
+- (BOOL) morcaIsUpdating
+{
+    return morcaIsUpdating;
+}
+
+- (void) setMorcaIsUpdating:(BOOL)aMorcaIsUpdating
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setMorcaIsUpdating:morcaIsUpdating];
+    morcaIsUpdating = aMorcaIsUpdating;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelMorcaIsUpdatingChanged object:self];        
+}
+
+- (NSString*) morcaStatus
+{
+    if (!morcaStatus) {
+        return @"Status unknown";
+    }
+    return morcaStatus;
+}
+
+- (void) setMorcaStatus:(NSString*)aMorcaStatus
+{
+    if (morcaStatus) [morcaStatus autorelease];
+    if (aMorcaStatus) morcaStatus = [aMorcaStatus copy];
+    
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelMorcaStatusChanged object:self];        
+}
 
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups
@@ -138,12 +286,22 @@ static NSString* SNOPDbConnector	= @"SNOPDbConnector";
 - (id)initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
-    
     [[self undoManager] disableUndoRegistration];
     
     [self setViewType:[decoder decodeIntForKey:@"viewType"]];
-	[[self undoManager] enableUndoRegistration];
+    [self setMorcaUserName:         [decoder decodeObjectForKey:@"ORSNOPModelMorcaUserName"]];
+    [self setMorcaPassword:         [decoder decodeObjectForKey:@"ORSNOPModelMorcaPassword"]];
+    [self setMorcaDBName:           [decoder decodeObjectForKey:@"ORSNOPModelMorcaDBName"]];
+    [self setMorcaPort:             [decoder decodeIntForKey:@"ORSNOPModelMoraPort"]];
+    [self setMorcaIPAddress:        [decoder decodeObjectForKey:@"ORSNOPModelMorcaIPAddress"]];
+    [self setMorcaUpdateTime:       [decoder decodeIntForKey:@"ORSNOPModelMorcaUpdateTime"]];
+    [self setMorcaIsVerbose:        [decoder decodeBoolForKey:@"ORSNOPModelMorcaIsVerbose"]];
+    [self setMorcaIsWithinRun:      [decoder decodeBoolForKey:@"ORSNOPModelMorcaIsWithinRun"]];
+    [self setMorcaIsUpdating:       [decoder decodeBoolForKey:@"ORSNOPModelMorcaIsUpdating"]];
 
+    if (morcaIsUpdating == YES) [self setMorcaIsUpdating:NO];
+	
+    [[self undoManager] enableUndoRegistration];
     return self;
 }
 
@@ -151,6 +309,15 @@ static NSString* SNOPDbConnector	= @"SNOPDbConnector";
 {
     [super encodeWithCoder:encoder];
     [encoder encodeInt:viewType forKey:@"viewType"];
+    [encoder encodeObject:morcaUserName     forKey:@"ORSNOPModelMorcaUserName"];
+    [encoder encodeObject:morcaPassword     forKey:@"ORSNOPModelMorcaPassword"];
+    [encoder encodeObject:morcaDBName       forKey:@"ORSNOPModelMorcaDBName"];
+    [encoder encodeInt:morcaPort            forKey:@"ORSNOPModelMorcaPort"];
+    [encoder encodeObject:morcaIPAddress    forKey:@"ORSNOPModelMorcaIPAddress"];
+    [encoder encodeInt:morcaUpdateTime      forKey:@"ORSNOPModelMorcaUpdateTime"];
+    [encoder encodeBool:morcaIsVerbose      forKey:@"ORSNOPModelMorcaIsVerbose"];
+    [encoder encodeBool:morcaIsWithinRun    forKey:@"ORSNOPModelMorcaIsWithinRun"];
+    [encoder encodeBool:morcaIsUpdating     forKey:@"ORSNOPModelMorcaIsUpdating"];
 }
 
 - (NSString*) reformatSelectionString:(NSString*)aString forSet:(int)aSet

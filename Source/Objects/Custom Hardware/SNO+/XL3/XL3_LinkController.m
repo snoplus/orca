@@ -288,7 +288,7 @@ static NSDictionary* xl3Ops;
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item
 {
-	if([tabView indexOfTabViewItem:item] == 1){
+	if([tabView indexOfTabViewItem:item] == 1 || [tabView indexOfTabViewItem:item] == 3){
 		[[self window] setContentView:blankView];
 		[self resizeWindowToSize:compositeSize];
 		[[self window] setContentView:xl3View];
