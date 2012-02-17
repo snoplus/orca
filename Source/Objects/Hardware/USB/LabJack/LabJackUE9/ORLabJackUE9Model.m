@@ -24,6 +24,9 @@
 #import "ORDataPacket.h"
 #import "NetSocket.h"
 
+
+NSString* ORLabJackUE9CmdClockDivisorChanged = @"ORLabJackUE9CmdClockDivisorChanged";
+
 @implementation ORLabJackUE9Cmd
 
 @synthesize cmdData, tag;
@@ -36,43 +39,47 @@
 @end
 
 
+NSString* ORLabJackUE9ModelClockDivisorChanged		= @"ORLabJackUE9ModelClockDivisorChanged";
+NSString* ORLabJackUE9ModelClockSelectionChanged	= @"ORLabJackUE9ModelClockSelectionChanged";
 NSString* ORLabJackUE9IsConnectedChanged			= @"ORLabJackUE9IsConnectedChanged";
 NSString* ORLabJackUE9IpAddressChanged				= @"ORLabJackUE9IpAddressChanged";
-NSString* ORLabJackUE9ModelDeviceSerialNumberChanged = @"ORLabJackUE9ModelDeviceSerialNumberChanged";
 NSString* ORLabJackUE9ModelInvolvedInProcessChanged = @"ORLabJackUE9ModelInvolvedInProcessChanged";
 NSString* ORLabJackUE9ModelAOut1Changed				= @"ORLabJackUE9ModelAOut1Changed";
 NSString* ORLabJackUE9ModelAOut0Changed				= @"ORLabJackUE9ModelAOut0Changed";
 NSString* ORLabJackUE9ShipDataChanged				= @"ORLabJackUE9ShipDataChanged";
 NSString* ORLabJackUE9DigitalOutputEnabledChanged	= @"ORLabJackUE9DigitalOutputEnabledChanged";
 NSString* ORLabJackUE9CounterChanged				= @"ORLabJackUE9CounterChanged";
-NSString* ORLabJackUE9SerialNumberChanged			= @"ORLabJackUE9SerialNumberChanged";
 NSString* ORLabJackUE9Lock							= @"ORLabJackUE9Lock";
 NSString* ORLabJackUE9ChannelNameChanged			= @"ORLabJackUE9ChannelNameChanged";
 NSString* ORLabJackUE9ChannelUnitChanged			= @"ORLabJackUE9ChannelUnitChanged";
 NSString* ORLabJackUE9AdcChanged					= @"ORLabJackUE9AdcChanged";
 NSString* ORLabJackUE9GainChanged					= @"ORLabJackUE9GainChanged";
 NSString* ORLabJackUE9DoNameChanged					= @"ORLabJackUE9DoNameChanged";
-NSString* ORLabJackUE9IoNameChanged					= @"ORLabJackUE9IoNameChanged";
 NSString* ORLabJackUE9DoDirectionChanged			= @"ORLabJackUE9DoDirectionChanged";
-NSString* ORLabJackUE9IoDirectionChanged			= @"ORLabJackUE9IoDirectionChanged";
 NSString* ORLabJackUE9DoValueOutChanged				= @"ORLabJackUE9DoValueOutChanged";
-NSString* ORLabJackUE9IoValueOutChanged				= @"ORLabJackUE9IoValueOutChanged";
 NSString* ORLabJackUE9DoValueInChanged				= @"ORLabJackUE9DoValueInChanged";
 NSString* ORLabJackUE9IoValueInChanged				= @"ORLabJackUE9IoValueInChanged";
 NSString* ORLabJackUE9PollTimeChanged				= @"ORLabJackUE9PollTimeChanged";
 NSString* ORLabJackUE9HiLimitChanged				= @"ORLabJackUE9HiLimitChanged";
 NSString* ORLabJackUE9LowLimitChanged				= @"ORLabJackUE9LowLimitChanged";
-NSString* ORLabJackUE9AdcDiffChanged				= @"ORLabJackUE9AdcDiffChanged";
 NSString* ORLabJackUE9SlopeChanged					= @"ORLabJackUE9SlopeChanged";
 NSString* ORLabJackUE9InterceptChanged				= @"ORLabJackUE9InterceptChanged";
 NSString* ORLabJackUE9MinValueChanged				= @"ORLabJackUE9MinValueChanged";
 NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
+NSString* ORLabJackUE9TimerChanged					= @"ORLabJackUE9TimerChanged";
+NSString* ORLabJackUE9BipolarChanged				= @"ORLabJackUE9BipolarChanged";
+NSString* ORLabJackUE9ModelTimerOptionChanged		= @"ORLabJackUE9ModelTimerOptionChanged";
+NSString* ORLabJackUE9ModelTimerEnableMaskChanged	= @"ORLabJackUE9ModelTimerEnableMaskChanged";
+NSString* ORLabJackUE9ModelCounterEnableMaskChanged	= @"ORLabJackUE9ModelCounterEnableMaskChanged";
+NSString* ORLabJackUE9ModelTimerResultChanged		= @"ORLabJackUE9ModelTimerResultChanged";
 
-#define kUE9Idle		0
-#define kUE9ComCmd		1
-#define kUE9CalBlock	2
-#define kUE9SingleIO	3
-#define kUE9FeedBack	4
+#define kUE9Idle			0
+#define kUE9ComCmd			1
+#define kUE9CalBlock		2
+#define kUE9SingleIO		3
+#define kUE9ReadAllValues	4
+#define kUE9TimerCounter	5
+#define kUE9ControlConfig   6
 
 #define kUE9DigitalBitRead	0x0
 #define kUE9DigitalBitWrite	0x1
@@ -82,40 +89,39 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 #define kUE9AnalogOut		0x5
 
 @interface ORLabJackUE9Model (private)
-- (void) pollHardware;
-- (void) sendIoControl;
-- (void) readAdcValues;
 - (void) normalChecksum:(unsigned char*)b len:(int)n;
 - (void) extendedChecksum:(unsigned char*)b len:(int)n;
 - (unsigned char) normalChecksum8:(unsigned char*)b len:(int)n;
 - (unsigned short) extendedChecksum16:(unsigned char*)b len:(int) n;
 - (unsigned char) extendedChecksum8:(unsigned char*) b;
 - (double) bufferToDouble:(unsigned char*)buffer index:(int) startIndex;
+- (unsigned char) numberTimersEnabled;
 
 - (void) timeout;
 - (void) decodeComCmd:(NSData*) theData;
 - (void) decodeCalibData:(NSData*)theData;
 - (void) decodeSingleAdcRead:(NSData*) theData;
-- (void) decodeFeedBack:(NSData*) theData;
-- (long) convert:(unsigned long)rawAdc gainBip:(unsigned short)bipGain result:(double*)voltage;
-- (long) convert:(double) analogVoltage chan:(int) DACNumber result:(unsigned short*)rawDacValue;
+- (void) decodeReadAllValues:(NSData*) theData;
+- (void) decodeTimerCounter:(NSData*) theData;
+- (long) convert:(unsigned long)rawAdc gainBip:(unsigned short)bipGain result:(float*)voltage;
+- (long) convert:(float) analogVoltage chan:(int) DACNumber result:(unsigned short*)rawDacValue;
+- (unsigned char) gainBipWord:(int)channelPair;
 @end
 
-#define kLabJackUE9DataSize 17
+#define kLabJackUE9DataSize 26
 
 @implementation ORLabJackUE9Model
 - (id)init
 {
 	self = [super init];
 	int i;
-	for(i=0;i<8;i++){
+	for(i=0;i<kUE9NumAdcs;i++){
 		lowLimit[i] = -10;
 		hiLimit[i]  = 10;
 		minValue[i] = -10;
 		maxValue[i]  = 10;
-		//default to range from -10 to +10 over adc range of 0 to 4095
-		slope[i] = 20./4095.;
-		intercept[i] = -10;
+		slope[i] = 1;
+		intercept[i] = 0;
 	}
 		
 	return self;	
@@ -125,10 +131,9 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	int i;
-	for(i=0;i<8;i++)	[channelName[i] release];
-	for(i=0;i<8;i++)	[channelUnit[i] release];
-	for(i=0;i<16;i++)	[ioName[i] release];
-	for(i=0;i<4;i++)	[doName[i] release];
+	for(i=0;i<kUE9NumAdcs;i++)	[channelName[i] release];
+	for(i=0;i<kUE9NumAdcs;i++)	[channelUnit[i] release];
+	for(i=0;i<kUE9NumIO;i++)	[doName[i] release];
     [serialNumber release];
 	[cmdQueue release];
 	[lastRequest release];
@@ -153,6 +158,84 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 
 
 #pragma mark ***Accessors
+
+- (int) clockDivisor
+{
+    return clockDivisor;
+}
+
+- (void) setClockDivisor:(int)aClockDivisor
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setClockDivisor:clockDivisor];
+    clockDivisor = aClockDivisor;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackUE9CmdClockDivisorChanged object:self];
+}
+
+- (int) clockSelection
+{
+    return clockSelection;
+}
+
+- (void) setClockSelection:(int)aClockSelection
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setClockSelection:clockSelection];
+    clockSelection = aClockSelection;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackUE9ModelClockSelectionChanged object:self];
+}
+
+- (unsigned short) counterEnableMask
+{
+    return counterEnableMask;
+}
+
+- (void) setCounterEnableMask:(unsigned short)anEnableMask
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setCounterEnableMask:counterEnableMask];
+    counterEnableMask = anEnableMask;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackUE9ModelCounterEnableMaskChanged object:self];
+}
+- (void) setCounterEnableBit:(int)bit value:(BOOL)aValue
+{
+	unsigned long aMask = counterEnableMask;
+	if(aValue)aMask |= (1<<bit);
+	else aMask &= ~(1<<bit);
+	[self setCounterEnableMask:aMask];
+}
+- (unsigned short) timerEnableMask
+{
+    return timerEnableMask;
+}
+
+- (void) setTimerEnableMask:(unsigned short)aTimerEnableMask
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setTimerEnableMask:timerEnableMask];
+    timerEnableMask = aTimerEnableMask;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackUE9ModelTimerEnableMaskChanged object:self];
+}
+
+- (void) setTimerEnableBit:(int)bit value:(BOOL)aValue
+{
+	unsigned long aMask = timerEnableMask;
+	if(aValue)aMask |= (1<<bit);
+	else aMask &= ~(1<<bit);
+	[self setTimerEnableMask:aMask];
+}
+
+- (unsigned short) timerOption:(int)index
+{
+	if(index>=0 && index<kUE9NumTimers) return timerOption[index];
+	else return 0;
+}
+
+- (void) setTimer:(int)index option:(unsigned short)aTimerOption
+{
+	if(index>=0 && index<kUE9NumTimers){
+		[[[self undoManager] prepareWithInvocationTarget:self] setTimer:index option:timerOption[index]];
+		timerOption[index] = aTimerOption;
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackUE9ModelTimerOptionChanged object:self];
+	}
+}
+
 - (ORLabJackUE9Cmd*) lastRequest
 {
 	return lastRequest;
@@ -169,6 +252,7 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 {
 	return socket;
 }
+
 - (void) setSocket:(NetSocket*)aSocket
 {
 	if(aSocket != socket)[socket close];
@@ -177,6 +261,7 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 	socket = aSocket;
     [socket setDelegate:self];
 }
+
 - (void) setIsConnected:(BOOL)aFlag
 {
     isConnected = aFlag;
@@ -245,9 +330,18 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 				[self decodeSingleAdcRead:theData]; 
 			break;
 				
-			case kUE9FeedBack:
-				[self decodeFeedBack:theData]; 
+			case kUE9ReadAllValues:
+				[self decodeReadAllValues:theData]; 
 			break;
+				
+			case kUE9TimerCounter:
+				[self decodeTimerCounter:theData]; 
+			break;
+			case kUE9ControlConfig:
+				//don't need to handle this one. We only use it to ensure the power level gets
+				//set right for the 48 MHz clock
+			break;
+
 		}
 		
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
@@ -272,18 +366,6 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
     }
 }
 
-- (unsigned long) deviceSerialNumber
-{
-    return deviceSerialNumber;
-}
-
-- (void) setDeviceSerialNumber:(unsigned long)aDeviceSerialNumber
-{
-    deviceSerialNumber = aDeviceSerialNumber;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackUE9ModelDeviceSerialNumberChanged object:self];
-}
-
 - (BOOL) involvedInProcess
 {
     return involvedInProcess;
@@ -302,20 +384,10 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 
 - (void) setAOut1:(unsigned short)aValue
 {
-	if(aValue>1023)aValue=1023;
+	if(aValue>4095)aValue=4095;
     [[[self undoManager] prepareWithInvocationTarget:self] setAOut1:aOut1];
     aOut1 = aValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackUE9ModelAOut1Changed object:self];
-}
-
-- (void) setAOut0Voltage:(float)aValue
-{
-	[self setAOut0:aValue*255./5.1];
-}
-
-- (void) setAOut1Voltage:(float)aValue
-{
-	[self setAOut1:aValue*255./5.1];
 }
 		 
 - (unsigned short) aOut0
@@ -325,7 +397,7 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 
 - (void) setAOut0:(unsigned short)aValue
 {
-	if(aValue>1023)aValue=1023;
+	if(aValue>4095)aValue=4095;
     [[[self undoManager] prepareWithInvocationTarget:self] setAOut0:aOut0];
     aOut0 = aValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackUE9ModelAOut0Changed object:self];
@@ -333,14 +405,14 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 
 - (float) slope:(int)i
 {
-	if(i>=0 && i<8)return slope[i];
+	if(i>=0 && i<kUE9NumAdcs)return slope[i];
 	else return 20./4095.;
 }
 
-- (void) setSlope:(int)i withValue:(float)aValue
+- (void) setSlope:(int)i value:(float)aValue
 {
-	if(i>=0 && i<8){
-		[[[self undoManager] prepareWithInvocationTarget:self] setSlope:i withValue:slope[i]];
+	if(i>=0 && i<kUE9NumAdcs){
+		[[[self undoManager] prepareWithInvocationTarget:self] setSlope:i value:slope[i]];
 		
 		slope[i] = aValue; 
 		
@@ -354,14 +426,14 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 
 - (float) intercept:(int)i
 {
-	if(i>=0 && i<8)return intercept[i];
+	if(i>=0 && i<kUE9NumAdcs)return intercept[i];
 	else return -10;
 }
 
-- (void) setIntercept:(int)i withValue:(float)aValue
+- (void) setIntercept:(int)i value:(float)aValue
 {
-	if(i>=0 && i<8){
-		[[[self undoManager] prepareWithInvocationTarget:self] setIntercept:i withValue:intercept[i]];
+	if(i>=0 && i<kUE9NumAdcs){
+		[[[self undoManager] prepareWithInvocationTarget:self] setIntercept:i value:intercept[i]];
 		
 		intercept[i] = aValue; 
 		
@@ -375,14 +447,14 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 
 - (float) lowLimit:(int)i
 {
-	if(i>=0 && i<8)return lowLimit[i];
+	if(i>=0 && i<kUE9NumAdcs)return lowLimit[i];
 	else return 0;
 }
 
-- (void) setLowLimit:(int)i withValue:(float)aValue
+- (void) setLowLimit:(int)i value:(float)aValue
 {
-	if(i>=0 && i<8){
-		[[[self undoManager] prepareWithInvocationTarget:self] setLowLimit:i withValue:lowLimit[i]];
+	if(i>=0 && i<kUE9NumAdcs){
+		[[[self undoManager] prepareWithInvocationTarget:self] setLowLimit:i value:lowLimit[i]];
 		
 		lowLimit[i] = aValue; 
 		
@@ -396,14 +468,14 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 
 - (float) hiLimit:(int)i
 {
-	if(i>=0 && i<8)return hiLimit[i];
+	if(i>=0 && i<kUE9NumAdcs)return hiLimit[i];
 	else return 0;
 }
 
-- (void) setHiLimit:(int)i withValue:(float)aValue
+- (void) setHiLimit:(int)i value:(float)aValue
 {
-	if(i>=0 && i<8){
-		[[[self undoManager] prepareWithInvocationTarget:self] setHiLimit:i withValue:lowLimit[i]];
+	if(i>=0 && i<kUE9NumAdcs){
+		[[[self undoManager] prepareWithInvocationTarget:self] setHiLimit:i value:lowLimit[i]];
 		
 		hiLimit[i] = aValue; 
 		
@@ -417,14 +489,14 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 
 - (float) minValue:(int)i
 {
-	if(i>=0 && i<8)return minValue[i];
+	if(i>=0 && i<kUE9NumAdcs)return minValue[i];
 	else return 0;
 }
 
-- (void) setMinValue:(int)i withValue:(float)aValue
+- (void) setMinValue:(int)i value:(float)aValue
 {
-	if(i>=0 && i<8){
-		[[[self undoManager] prepareWithInvocationTarget:self] setMinValue:i withValue:minValue[i]];
+	if(i>=0 && i<kUE9NumAdcs){
+		[[[self undoManager] prepareWithInvocationTarget:self] setMinValue:i value:minValue[i]];
 		
 		minValue[i] = aValue; 
 		
@@ -437,14 +509,14 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 }
 - (float) maxValue:(int)i
 {
-	if(i>=0 && i<8)return maxValue[i];
+	if(i>=0 && i<kUE9NumAdcs)return maxValue[i];
 	else return 0;
 }
 
-- (void) setMaxValue:(int)i withValue:(float)aValue
+- (void) setMaxValue:(int)i value:(float)aValue
 {
-	if(i>=0 && i<8){
-		[[[self undoManager] prepareWithInvocationTarget:self] setMaxValue:i withValue:maxValue[i]];
+	if(i>=0 && i<kUE9NumAdcs){
+		[[[self undoManager] prepareWithInvocationTarget:self] setMaxValue:i value:maxValue[i]];
 		
 		maxValue[i] = aValue; 
 		
@@ -455,7 +527,6 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 		
 	}
 }
-
 
 - (BOOL) shipData
 {
@@ -494,20 +565,43 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackUE9DigitalOutputEnabledChanged object:self];
 }
 
-- (unsigned long) counter
+- (unsigned long) counter:(int)i
 {
-    return counter;
+	if(i>=0 && i<2)return counter[i];
+	else return 0;
 }
 
-- (void) setCounter:(unsigned long)aCounter
+- (void) setCounter:(int)i value:(unsigned long)aValue
 {
-    counter = aCounter;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackUE9CounterChanged object:self];
+	if(i>=0 && i<2){
+		counter[i] = aValue;
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackUE9CounterChanged object:self];
+	}
+}
+- (unsigned long) timerResult:(int)i
+{
+	if(i>=0 && i<6)return timerResult[i];
+	else return 0;
+}
+
+- (unsigned long) timer:(int)i
+{
+	if(i>=0 && i<6)return timer[i];
+	else return 0;
+}
+
+- (void) setTimer:(int)i value:(unsigned long)aValue
+{
+	if(i>=0 && i<6){
+		[[[self undoManager] prepareWithInvocationTarget:self] setTimer:i value:timer[i]];
+		timer[i] = aValue;
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackUE9TimerChanged object:self];
+	}
 }
 
 - (NSString*) channelName:(int)i
 {
-	if(i>=0 && i<8){
+	if(i>=0 && i<kUE9NumAdcs){
 		if([channelName[i] length])return channelName[i];
 		else return [NSString stringWithFormat:@"Chan %d",i];
 	}
@@ -516,7 +610,7 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 
 - (void) setChannel:(int)i name:(NSString*)aName
 {
-	if(i>=0 && i<8){
+	if(i>=0 && i<kUE9NumAdcs){
 		[[[self undoManager] prepareWithInvocationTarget:self] setChannel:i name:channelName[i]];
 		
 		[channelName[i] autorelease];
@@ -532,7 +626,7 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 
 - (NSString*) channelUnit:(int)i
 {
-	if(i>=0 && i<8){
+	if(i>=0 && i<kUE9NumAdcs){
 		if([channelUnit[i] length])return channelUnit[i];
 		else return @"V";
 	}
@@ -541,7 +635,7 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 
 - (void) setChannel:(int)i unit:(NSString*)aName
 {
-	if(i>=0 && i<8){
+	if(i>=0 && i<kUE9NumAdcs){
 		[[[self undoManager] prepareWithInvocationTarget:self] setChannel:i unit:channelUnit[i]];
 		
 		[channelUnit[i] autorelease];
@@ -555,36 +649,9 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 	}
 }
 
-
-
-- (NSString*) ioName:(int)i
-{
-	if(i>=0 && i<4){
-		if([ioName[i] length])return ioName[i];
-		else return [NSString stringWithFormat:@"IO%d",i];
-	}
-	else return @"";
-}
-
-- (void) setIo:(int)i name:(NSString*)aName
-{
-	if(i>=0 && i<4){
-		[[[self undoManager] prepareWithInvocationTarget:self] setIo:i name:ioName[i]];
-		
-		[ioName[i] autorelease];
-		ioName[i] = [aName copy]; 
-		
-		NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
-		[userInfo setObject:[NSNumber numberWithInt:i] forKey: @"Channel"];
-		
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackUE9IoNameChanged object:self userInfo:userInfo];
-		
-	}
-}
-
 - (NSString*) doName:(int)i
 {
-	if(i>=0 && i<16){
+	if(i>=0 && i<kUE9NumIO){
 		if([doName[i] length])return doName[i];
 		else return [NSString stringWithFormat:@"DO%d",i];
 	}
@@ -593,7 +660,7 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 
 - (void) setDo:(int)i name:(NSString*)aName
 {
-	if(i>=0 && i<16){
+	if(i>=0 && i<kUE9NumIO){
 		[[[self undoManager] prepareWithInvocationTarget:self] setDo:i name:doName[i]];
 		
 		[doName[i] autorelease];
@@ -603,25 +670,24 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 		[userInfo setObject:[NSNumber numberWithInt:i] forKey: @"Channel"];
 		
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackUE9DoNameChanged object:self userInfo:userInfo];
-		
 	}
 }
 
-- (int) adc:(int)i
+- (float) adc:(int)i
 {
 	unsigned short result = 0;
 	@synchronized(self){
-		if(i>=0 && i<8){
+		if(i>=0 && i<kUE9NumAdcs){
 			result =  adc[i];
 		}
 	}
 	return result;
 }
 
-- (void) setAdc:(int)i withValue:(int)aValue
+- (void) setAdc:(int)i value:(float)aValue
 {
 	@synchronized(self){
-		if(i>=0 && i<8){
+		if(i>=0 && i<kUE9NumAdcs){
 			adc[i] = aValue; 
 			
 			NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
@@ -635,18 +701,18 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 {
 	unsigned short result = 0;
 	@synchronized(self){
-		if(i>=0 && i<4){
+		if(i>=0 && i<kUE9NumAdcs){
 			result =  gain[i];
 		}
 	}
 	return result;
 }
 
-- (void) setGain:(int)i withValue:(int)aValue
+- (void) setGain:(int)i value:(int)aValue
 {
 	@synchronized(self){
-		if(i>=0 && i<4){
-			[[[self undoManager] prepareWithInvocationTarget:self] setGain:i withValue:gain[i]];
+		if(i>=0 && i<kUE9NumAdcs){
+			[[[self undoManager] prepareWithInvocationTarget:self] setGain:i value:gain[i]];
 			gain[i] = aValue; 
 			
 			NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
@@ -656,34 +722,37 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 		}	
 	}
 }
-
-- (unsigned short) adcDiff
+- (BOOL) bipolar:(int)i
 {
-	return adcDiff;
+	unsigned short result = 0;
+	@synchronized(self){
+		if(i>=0 && i<kUE9NumAdcs){
+			result =  bipolar[i];
+		}
+	}
+	return result;
 }
 
-- (void) setAdcDiff:(unsigned short)aMask
+- (void) setBipolar:(int)i value:(BOOL)aValue
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setAdcDiff:adcDiff];
-    adcDiff = aMask;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackUE9AdcDiffChanged object:self];
-	
+	@synchronized(self){
+		if(i>=0 && i<kUE9NumAdcs){
+			[[[self undoManager] prepareWithInvocationTarget:self] setBipolar:i value:bipolar[i]];
+			bipolar[i] = aValue; 
+			
+			NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+			[userInfo setObject:[NSNumber numberWithInt:i] forKey: @"Channel"];
+			
+			[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORLabJackUE9BipolarChanged object:self userInfo:userInfo];
+		}	
+	}
 }
-
-- (void) setAdcDiffBit:(int)bit withValue:(BOOL)aValue
-{
-	unsigned short aMask = adcDiff;
-	if(aValue)aMask |= (1<<bit);
-	else aMask &= ~(1<<bit);
-	[self setAdcDiff:aMask];
-}
-
-- (unsigned short) doDirection
+- (unsigned long) doDirection
 {
     return doDirection;
 }
 
-- (void) setDoDirection:(unsigned short)aMask
+- (void) setDoDirection:(unsigned long)aMask
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setDoDirection:doDirection];
     doDirection = aMask;
@@ -691,9 +760,9 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 }
 
 
-- (void) setDoDirectionBit:(int)bit withValue:(BOOL)aValue
+- (void) setDoDirectionBit:(int)bit value:(BOOL)aValue
 {
-	unsigned short aMask = doDirection;
+	unsigned long aMask = doDirection;
 	if(aValue)aMask |= (1<<bit);
 	else aMask &= ~(1<<bit);
 	[self setDoDirection:aMask];
@@ -701,35 +770,13 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 	//[self postAdcInfoProvidingValueChanged];
 }
 
-- (unsigned short) ioDirection
-{
-    return ioDirection;
-}
 
-- (void) setIoDirection:(unsigned short)aMask
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setIoDirection:ioDirection];
-    ioDirection = aMask;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackUE9IoDirectionChanged object:self];
-}
-
-- (void) setIoDirectionBit:(int)bit withValue:(BOOL)aValue
-{
-	unsigned short aMask = ioDirection;
-	if(aValue)aMask |= (1<<bit);
-	else aMask &= ~(1<<bit);
-	[self setIoDirection:aMask];
-	//ORAdcInfoProviding protocol requirement
-	//[self postAdcInfoProvidingValueChanged];
-}
-
-
-- (unsigned short) doValueOut
+- (unsigned long) doValueOut
 {
     return doValueOut;
 }
 
-- (void) setDoValueOut:(unsigned short)aMask
+- (void) setDoValueOut:(unsigned long)aMask
 {
 	@synchronized(self){
 		[[[self undoManager] prepareWithInvocationTarget:self] setDoValueOut:doValueOut];
@@ -738,75 +785,14 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 	}
 }
 
-- (void) setDoValueOutBit:(int)bit withValue:(BOOL)aValue
+- (void) setDoValueOutBit:(int)bit value:(BOOL)aValue
 {
-	unsigned short aMask = doValueOut;
+	unsigned long aMask = doValueOut;
 	if(aValue)aMask |= (1<<bit);
 	else aMask &= ~(1<<bit);
 	[self setDoValueOut:aMask];
 	//ORAdcInfoProviding protocol requirement
 	//[self postAdcInfoProvidingValueChanged];
-}
-
-- (unsigned short) ioValueOut
-{
-    return ioValueOut;
-}
-
-- (void) setIoValueOut:(unsigned short)aMask
-{
-	@synchronized(self){
-		[[[self undoManager] prepareWithInvocationTarget:self] setIoValueOut:ioValueOut];
-		ioValueOut = aMask;
-		[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORLabJackUE9IoValueOutChanged object:self];
-	}
-}
-
-- (void) setIoValueOutBit:(int)bit withValue:(BOOL)aValue
-{
-	unsigned short aMask = ioValueOut;
-	if(aValue)aMask |= (1<<bit);
-	else aMask &= ~(1<<bit);
-	[self setIoValueOut:aMask];
-	//ORAdcInfoProviding protocol requirement
-	//[self postAdcInfoProvidingValueChanged];
-}
-
-- (unsigned short) ioValueIn
-{
-    return ioValueIn;
-}
-
-- (void) setIoValueIn:(unsigned short)aMask
-{
-	@synchronized(self){
-		ioValueIn = aMask;
-		[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORLabJackUE9IoValueInChanged object:self];
-	}
-}
-
-- (void) setIoValueInBit:(int)bit withValue:(BOOL)aValue
-{
-	unsigned short aMask = ioValueIn;
-	if(aValue)aMask |= (1<<bit);
-	else aMask &= ~(1<<bit);
-	[self setIoValueIn:aMask];
-	//ORAdcInfoProviding protocol requirement
-	//[self postAdcInfoProvidingValueChanged];
-}
-
-- (NSString*) ioInString:(int)i
-{
-	if(ioDirection & (1L<<i) ) return (ioValueIn & 1L<<i) ? @"Hi":@"Lo";
-	else						 return @"";
-}
-
-- (NSColor*) ioInColor:(int)i
-{
-	if(ioDirection & (1L<<i) ) return (ioValueIn & 1L<<i) ? 
-		[NSColor colorWithCalibratedRed:0 green:.8 blue:0 alpha:1.0] :
-		[NSColor colorWithCalibratedRed:.8 green:0 blue:0 alpha:1.0];
-	else						 return [NSColor blackColor];
 }
 
 - (NSColor*) doInColor:(int)i
@@ -822,7 +808,7 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
     return doValueIn;
 }
 
-- (void) setDoValueIn:(unsigned short)aMask
+- (void) setDoValueIn:(unsigned long)aMask
 {
 	@synchronized(self){
 		doValueIn = aMask;
@@ -830,7 +816,7 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 	}
 }
 
-- (void) setDoValueInBit:(int)bit withValue:(BOOL)aValue
+- (void) setDoValueInBit:(int)bit value:(BOOL)aValue
 {
 	unsigned short aMask = doValueIn;
 	if(aValue)aMask |= (1<<bit);
@@ -846,29 +832,10 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 	else						 return @"";
 }
 
-- (NSString*) serialNumber
-{
-    return serialNumber;
-}
-
-- (void) setSerialNumber:(NSString*)aSerialNumber
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setSerialNumber:serialNumber];
-    
-    [serialNumber autorelease];
-    serialNumber = [aSerialNumber copy];    
-	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackUE9SerialNumberChanged object:self];
-}
-
 - (void) resetCounter
 {
-	doResetOfCounter = YES;
-	[self sendIoControl];
+	[self sendTimerCounter:kUE9ResetCounters];
 }
-
-#pragma mark ***HW Access
-
 
 #pragma mark ***Data Records
 - (unsigned long) dataId { return dataId; }
@@ -919,7 +886,7 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 		
 		unsigned long data[kLabJackUE9DataSize];
 		data[0] = dataId | kLabJackUE9DataSize;
-		data[1] = ((adcDiff & 0xf) << 16) | ([self uniqueIdNumber] & 0x0000fffff);
+		data[1] = ([self uniqueIdNumber] & 0x0000fffff);
 		
 		union {
 			float asFloat;
@@ -928,15 +895,16 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 		
 		int index = 2;
 		int i;
-		for(i=0;i<8;i++){
+		for(i=0;i<kUE9NumAdcs;i++){
 			theData.asFloat = [self convertedValue:i];
 			data[index] = theData.asLong;
 			index++;
 		}
-		data[index++] = counter;
-		data[index++] = ((ioDirection & 0xF) << 16) | (doDirection & 0xFFFF);
-		data[index++] = ((ioValueOut  & 0xF) << 16) | (doValueOut & 0xFFFF);
-		data[index++] = ((ioValueIn   & 0xF) << 16) | (doValueIn & 0xFFFF);
+		data[index++] = counter[0];
+		data[index++] = counter[1];
+		data[index++] = (doDirection & 0xFFFFFF);
+		data[index++] = (doValueOut  & 0xFFFFFF);
+		data[index++] = (doValueIn   & 0xFFFFFF);
 	
 		data[index++] = timeMeasured;
 		data[index++] = 0; //spares
@@ -979,8 +947,8 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 		
 		//grab the bit pattern at the start of the cycle. it
 		//will not be changed during the cycle.
-		processInputValue = (doValueIn | (ioValueIn & 0xf)<<16) & (~doDirection | (~ioDirection & 0xf)<<16);
-		processOutputMask = (doDirection | (ioDirection & 0xf)<<16);
+		processInputValue = doValueIn & ~doDirection;
+		processOutputMask = doDirection;
 		
     }
 }
@@ -989,8 +957,7 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 {
 	readOnce = NO;
 	//don't use the setter so the undo manager is bypassed
-	doValueOut = processOutputValue & 0xFFFF;
-	ioValueOut = (processOutputValue >> 16) & 0xF;
+	doValueOut = processOutputValue & 0xFFFFFF;
 }
 
 - (BOOL) processValue:(int)channel
@@ -1017,8 +984,7 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 
 - (double) convertedValue:(int)aChan
 {
-	double volts = 20.0/4095.*adc[aChan] - 10.;
-	if(aChan>=0 && aChan<8)return slope[aChan] * volts + intercept[aChan];
+	if(aChan>=0 && aChan<kUE9NumAdcs)return slope[aChan] * adc[aChan] + intercept[aChan];
 	else return 0;
 }
 
@@ -1035,7 +1001,7 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 - (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit channel:(int)channel
 {
 	@synchronized(self){
-		if(channel>=0 && channel<8){
+		if(channel>=0 && channel<kUE9NumAdcs){
 			*theLowLimit = lowLimit[channel];
 			*theHighLimit =  hiLimit[channel];
 		}
@@ -1052,46 +1018,48 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
+    [self setClockDivisor:[decoder decodeIntForKey:@"clockDivisor"]];
+    [self setClockSelection:[decoder decodeIntForKey:@"clockSelection"]];
+    [self setTimerEnableMask:[decoder decodeIntForKey:@"timerEnableMask"]];
+    [self setCounterEnableMask:[decoder decodeIntForKey:@"counterEnableMask"]];
   	[self setIpAddress:[decoder decodeObjectForKey:@"ipAddress"]];
 	[self setAOut1:[decoder decodeIntForKey:@"aOut1"]];
     [self setAOut0:[decoder decodeIntForKey:@"aOut0"]];
     [self setShipData:[decoder decodeBoolForKey:@"shipData"]];
     [self setDigitalOutputEnabled:[decoder decodeBoolForKey:@"digitalOutputEnabled"]];
-    [self setSerialNumber:	[decoder decodeObjectForKey:@"serialNumber"]];
 	int i;
-	for(i=0;i<8;i++) {
+	for(i=0;i<kUE9NumAdcs;i++) {
 		
 		NSString* aName = [decoder decodeObjectForKey:[NSString stringWithFormat:@"channelName%d",i]];
 		if(aName)[self setChannel:i name:aName];
-		else	 [self setChannel:i name:[NSString stringWithFormat:@"Chan %d",i]];
+		else	 [self setChannel:i name:[NSString stringWithFormat:@"Chan %2d",i]];
 		
 		NSString* aUnit = [decoder decodeObjectForKey:[NSString stringWithFormat:@"channelUnit%d",i]];
 		if(aUnit)[self setChannel:i unit:aName];
 		else	 [self setChannel:i unit:@"V"];
 		
-		[self setMinValue:i withValue:[decoder decodeFloatForKey:[NSString stringWithFormat:@"minValue%d",i]]];
-		[self setMaxValue:i withValue:[decoder decodeFloatForKey:[NSString stringWithFormat:@"maxValue%d",i]]];
-		[self setLowLimit:i withValue:[decoder decodeFloatForKey:[NSString stringWithFormat:@"lowLimit%d",i]]];
-		[self setHiLimit:i withValue:[decoder decodeFloatForKey:[NSString stringWithFormat:@"hiLimit%d",i]]];
-		[self setSlope:i withValue:[decoder decodeFloatForKey:[NSString stringWithFormat:@"slope%d",i]]];
-		[self setIntercept:i withValue:[decoder decodeFloatForKey:[NSString stringWithFormat:@"intercept%d",i]]];
+		[self setMinValue:i value:[decoder decodeFloatForKey:[NSString stringWithFormat:@"minValue%d",i]]];
+		[self setMaxValue:i value:[decoder decodeFloatForKey:[NSString stringWithFormat:@"maxValue%d",i]]];
+		[self setLowLimit:i value:[decoder decodeFloatForKey:[NSString stringWithFormat:@"lowLimit%d",i]]];
+		[self setHiLimit:i value:[decoder decodeFloatForKey:[NSString stringWithFormat:@"hiLimit%d",i]]];
+		[self setSlope:i value:[decoder decodeFloatForKey:[NSString stringWithFormat:@"slope%d",i]]];
+		[self setIntercept:i value:[decoder decodeFloatForKey:[NSString stringWithFormat:@"intercept%d",i]]];
 	}
 	
-	for(i=0;i<16;i++) {
+	for(i=0;i<kUE9NumIO;i++) {
 		NSString* aName = [decoder decodeObjectForKey:[NSString stringWithFormat:@"DO%d",i]];
 		if(aName)[self setDo:i name:aName];
 		else [self setDo:i name:[NSString stringWithFormat:@"DO%d",i]];
 	}
 	
-	for(i=0;i<4;i++) {
-		NSString* aName = [decoder decodeObjectForKey:[NSString stringWithFormat:@"IO%d",i]];
-		if(aName)[self setIo:i name:aName];
-		else [self setIo:i name:[NSString stringWithFormat:@"IO%d",i]];
-		[self setGain:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"gain%d",i]]];
+	for(i=0;i<kUE9NumAdcs;i++) {
+		[self setGain:i value:[decoder decodeIntForKey:[NSString stringWithFormat:@"gain%d",i]]];
 	}
-	[self setAdcDiff:	[decoder decodeIntForKey:@"adcDiff"]];
-	[self setDoDirection:	[decoder decodeIntForKey:@"doDirection"]];
-	[self setIoDirection:	[decoder decodeIntForKey:@"ioDirection"]];
+	
+	for(i=0;i<kUE9NumTimers;i++) {
+		[self setTimer:i option:[decoder decodeIntForKey:[NSString stringWithFormat:@"timerOption%d",i]]];
+	}
+	
     [self setPollTime:		[decoder decodeIntForKey:@"pollTime"]];
 
     [[self undoManager] enableUndoRegistration];    
@@ -1102,15 +1070,18 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+	[encoder encodeInt:clockDivisor forKey:@"clockDivisor"];
+	[encoder encodeInt:clockSelection forKey:@"clockSelection"];
+	[encoder encodeInt:timerEnableMask forKey:@"timerEnableMask"];
+	[encoder encodeInt:counterEnableMask forKey:@"counterEnableMask"];
 	[encoder encodeObject:ipAddress forKey:@"ipAddress"];
 	[encoder encodeInt:aOut1 forKey:@"aOut1"];
     [encoder encodeInt:aOut0 forKey:@"aOut0"];
     [encoder encodeBool:shipData forKey:@"shipData"];
     [encoder encodeInt:pollTime forKey:@"pollTime"];
     [encoder encodeBool:digitalOutputEnabled forKey:@"digitalOutputEnabled"];
-    [encoder encodeObject:serialNumber	forKey: @"serialNumber"];
 	int i;
-	for(i=0;i<8;i++) {
+	for(i=0;i<kUE9NumAdcs;i++) {
 		[encoder encodeObject:channelUnit[i] forKey:[NSString stringWithFormat:@"unitName%d",i]];
 		[encoder encodeObject:channelName[i] forKey:[NSString stringWithFormat:@"channelName%d",i]];
 		[encoder encodeFloat:lowLimit[i] forKey:[NSString stringWithFormat:@"lowLimit%d",i]];
@@ -1121,37 +1092,50 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 		[encoder encodeFloat:maxValue[i] forKey:[NSString stringWithFormat:@"maxValue%d",i]];
 	}
 	
-	for(i=0;i<16;i++) {
+	for(i=0;i<kUE9NumIO;i++) {
 		[encoder encodeObject:doName[i] forKey:[NSString stringWithFormat:@"DO%d",i]];
 	}
 	for(i=0;i<4;i++) {
-		[encoder encodeObject:ioName[i] forKey:[NSString stringWithFormat:@"IO%d",i]];
 		[encoder encodeInt:gain[i] forKey:[NSString stringWithFormat:@"gain%d",i]];
 	}
+	for(i=0;i<kUE9NumTimers;i++) {
+		[encoder encodeInt:timerOption[i] forKey:[NSString stringWithFormat:@"timerOption%d",i]];
+	}
 
-    [encoder encodeInt:adcDiff		forKey:@"adcDiff"];
-    [encoder encodeInt:doDirection	forKey:@"doDirection"];
-    [encoder encodeInt:ioDirection	forKey:@"ioDirection"];
 }
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
 	
-    [objDictionary setObject:[NSNumber numberWithInt:adcDiff] forKey:@"AdcDiffMask"];
+    //[objDictionary setObject:[NSNumber numberWithInt:adcDiff] forKey:@"AdcDiffMask"];
 	
     return objDictionary;
 }
 
-- (void) readSerialNumber
-{
-}
 - (void) queryAll
 {
+	[self readAllValues];
+	[self sendTimerCounter:kUE9ReadCounters];
+}
+
+- (void) pollHardware
+{
+	[self pollHardware:NO];
+}
+
+- (void) pollHardware:(BOOL)force
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	if(pollTime == 0 && !force)return;
+	[self queryAll];
+	if(pollTime == -1)[self performSelector:@selector(pollHardware) withObject:nil afterDelay:1/5.];
+	else if(pollTime!=0) [self performSelector:@selector(pollHardware) withObject:nil afterDelay:pollTime];
 }
 
 - (void) enqueCmd:(NSData*)cmdData tag:(int)aTag
 {
+	if(![self isConnected])return;
 	ORLabJackUE9Cmd* aCmd = [[[ORLabJackUE9Cmd alloc] init] autorelease];
 	aCmd.cmdData = cmdData;
 	aCmd.tag	 = aTag;
@@ -1163,6 +1147,11 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 }
 - (void) processOneCommandFromQueue
 {
+	if(![self isConnected]){
+		[cmdQueue removeAllObjects];
+		[self setLastRequest:nil];
+		return;
+	}
 	if([cmdQueue count] == 0) return;
 	ORLabJackUE9Cmd* aCmd = [[[cmdQueue objectAtIndex:0] retain] autorelease];
 	[cmdQueue removeObjectAtIndex:0];
@@ -1202,9 +1191,9 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 - (void) sendComCmd
 {		
 	unsigned char sendBuff[38];
-	sendBuff[1] = (unsigned char)(0x78);  //command bytes
-	sendBuff[2] = (unsigned char)(0x10);  //number of data words
-	sendBuff[3] = (unsigned char)(0x01);  //extended command number
+	sendBuff[1] = (unsigned char)0x78;  //command bytes
+	sendBuff[2] = (unsigned char)0x10;  //number of data words
+	sendBuff[3] = (unsigned char)0x01;  //extended command number
 								  //Rest of the command is zero'ed out. not used.
 	int i;
 	for(i = 6; i < 38; i++) sendBuff[i] = (unsigned char)(0x00);
@@ -1233,38 +1222,48 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 	[self enqueCmd:data tag:kUE9SingleIO];
 }
 
-- (void) feedBack
+- (void) readAllValues
 {	
 	unsigned char sendBuff[34];
 	int i;
 	unsigned short rawDacValue;
 	
 	unsigned char ainResolution = 12;
-	unsigned char gainBip = 0;  //(Gain = 1, Bipolar = 0)
 	
-	sendBuff[1] = (unsigned char)(0xF8);  //command byte
-	sendBuff[2] = (unsigned char)(0x0E);  //number of data words
-	sendBuff[3] = (unsigned char)(0x00);  //extended command number
+	sendBuff[1] = (unsigned char)0xF8;  //command byte
+	sendBuff[2] = (unsigned char)0x0E;  //number of data words
+	sendBuff[3] = (unsigned char)0x00;  //extended command number
 	
-	//all these bytes are set to zero since we are not changing
 	//the FIO, EIO, CIO and MIO directions and states
-	for(i = 6; i <= 15; i++)
-		sendBuff[i] = (unsigned char)(0x00);
+	unsigned long dirMask = ~doDirection; //*** backward from the U12. We invert here to be consistent
+	sendBuff[6]  = (unsigned char)0xFF;					 //FIOMask
+	sendBuff[7]  = (unsigned char)(dirMask & 0xFF);		 //FIODir
+	sendBuff[8]  = (unsigned char)(doValueOut & 0xFF);	 //FIOState
+	sendBuff[9]  = (unsigned char)0xFF;					 //MIOMask
+	sendBuff[10] = (unsigned char)((dirMask>>8) & 0xFF); //MIODir
+	sendBuff[11] = (unsigned char)((doValueOut>>8) & 0xFF); //MIOState
+	sendBuff[12] = (unsigned char)0xFF;					//CIOMask
+	sendBuff[13] = ((unsigned char)(((dirMask>>16) & 0xF)<<4) | (doValueOut>>16) & 0xF); //CIODirState: 7-4 Dir, 3-0 state
+
+	sendBuff[14] = 0x0; //MIOMask not used
+	sendBuff[15] = 0x0; //MIODirState not used
 	
-	if([self convert:2.5 chan:0 result:&rawDacValue]==0){
+	unsigned char outputEnabled = 0x0;
+	if(digitalOutputEnabled) outputEnabled = 0xC0;
+	if([self convert:aOut0*4.86/4096 chan:0 result:&rawDacValue]==0){
 		//setting the voltage of DAC0
 		sendBuff[16] = (unsigned char)( rawDacValue & (0x00FF) ); //low bits of voltage
-		sendBuff[17] = (unsigned char)( rawDacValue / 256 ) + 192; //high bits of voltage
+		sendBuff[17] = (unsigned char)( rawDacValue / 256 ) + outputEnabled; //high bits of voltage
 	}
 	else {
 		sendBuff[16] = 0; //low bits of voltage
 		sendBuff[17] = 0; //high bits of voltage
 	}
 	//(bit 7 : Enable, bit 6: Update)
-	if([self convert:3.5 chan:1 result:&rawDacValue]==0){	
+	if([self convert:aOut1*4.86/4096 chan:1 result:&rawDacValue]==0){	
 		//setting the voltage of DAC1
 		sendBuff[18] = (unsigned char)( rawDacValue & (0x00FF) ); //low bits of voltage
-		sendBuff[19] = (unsigned char)( rawDacValue / 256 ) + 192; //high bits of voltage
+		sendBuff[19] = (unsigned char)( rawDacValue / 256 ) + outputEnabled; //high bits of voltage
 																	//(bit 7 : Enable, bit 6: Update)
 	}
 	else {
@@ -1272,34 +1271,98 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 		sendBuff[19] = 0;
 	}
 	
-	sendBuff[20] = (unsigned char)(0xff);  //AINMask - reading AIN0 - AIN3, not AIN4 - AIN7
-	sendBuff[21] = (unsigned char)(0xff);  //AINMask - not reading AIN8 - AIN15
+	sendBuff[20] = (unsigned char)(0xff);  //AINMask AIN0-AIN7
+	sendBuff[21] = (unsigned char)(0xff);  //AINMask AIN8 - AIN15
 	sendBuff[22] = (unsigned char)(0x00);  //AIN14ChannelNumber - not using
 	sendBuff[23] = (unsigned char)(0x00);  //AIN15ChannelNumber - not using
-	sendBuff[24] = ainResolution;     //Resolution = 12
+	sendBuff[24] = ainResolution;			//Resolution = 12
+	sendBuff[25] = 0;						//SettlingTime
 	
-	//setting BipGains
-	for(i = 25; i < 34; i++) sendBuff[i] = gainBip;
-	
+	for(i = 26; i < 34; i++) sendBuff[i] = [self gainBipWord:i-6];
+
 	[self extendedChecksum:sendBuff len:34];
 	
-	
 	NSData* data = [NSData dataWithBytes:sendBuff length:34];
-	[self enqueCmd:data tag:kUE9FeedBack];
+	[self enqueCmd:data tag:kUE9ReadAllValues];
 }
+
+- (void) setPowerLevel
+{
+    unsigned char sendBuff[18];
+    int i;
+	
+    sendBuff[1] = (uint8)0xF8;  //Command byte
+    sendBuff[2] = (uint8)0x06;  //Number of data words
+    sendBuff[3] = (uint8)0x08;  //Extended command number
+	
+    for( i = 6; i < 18; i++ )sendBuff[i] = (uint8)(0x00);
+		
+	[self extendedChecksum:sendBuff len:18];
+	
+    //Sending command to UE9
+	NSData* data = [NSData dataWithBytes:sendBuff length:18];
+	[self enqueCmd:data tag:kUE9ControlConfig];
+}
+
+
+
+- (void) sendTimerCounter:(int) option
+{
+	if(clockSelection)[self setPowerLevel]; //have to do this first if the 48 MHz is used.
+
+	//Note: If using the quadrature input timer mode, the returned 32 bit
+    //      integer is signed
+    unsigned char sendBuff[30];
+	
+    //Enable timers and counters
+    sendBuff[1] = (unsigned char)0xF8;  //Command byte
+    sendBuff[2] = (unsigned char)0x0C;  //Number of data words
+    sendBuff[3] = (unsigned char)0x18;  //Extended command number
+    sendBuff[6] = (unsigned char)clockDivisor;  //TimerClockDivisor
+	
+	unsigned char enableMask = 0;
+	if(option & kUE9UpdateCounters){
+		enableMask |= 0x80;										//update Config
+		enableMask |= ((counterEnableMask & 0x3)<<3);			//counter enable bits
+		enableMask |= ([self numberTimersEnabled] & 0x7);		//number of timers enabled
+	}
+    sendBuff[7] = (unsigned char)enableMask;  
+										
+    sendBuff[8] = (unsigned char)(clockSelection & 0x3);	//0 = 750 kHz (if using system 
+															//clock, call ControlConfig first and set the 
+															//PowerLevel to a fixed state)
+	if(option & kUE9ResetCounters) sendBuff[9] = (unsigned char)0xFF;						//reset all the times and counters
+	else sendBuff[9] = 0x0;
+	
+	int i;
+	for(i=0;i<kUE9NumTimers;i++){
+		sendBuff[10+i*3] = (unsigned char)timerOption[i]; 
+		sendBuff[11+i*3] = (unsigned char) timer[i]&0x00FF;	  //Timer0Value (low byte)
+		sendBuff[12+i*3] = (unsigned char)(timer[i]&0xFF00)>>8;  //Timer0Value (high byte)
+	}
+	
+	sendBuff[28] = (unsigned char)0x00;  //Counter0Mode (always pass 0)
+    sendBuff[29] = (unsigned char)0x00;  //Counter1Mode (always pass 0) 
+	
+	[self extendedChecksum:sendBuff len:30];
+	
+    //Sending command to UE9
+	NSData* data = [NSData dataWithBytes:sendBuff length:30];
+	[self enqueCmd:data tag:kUE9TimerCounter];
+	
+}
+
 @end
 
 @implementation ORLabJackUE9Model (private)
-
-- (void) pollHardware
+- (unsigned char) numberTimersEnabled
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget:self];
-	if(pollTime == 0 )return;
-    [[self undoManager] disableUndoRegistration];
-	[self queryAll];
-    [[self undoManager] enableUndoRegistration];
-	if(pollTime == -1)[self performSelector:@selector(pollHardware) withObject:nil afterDelay:1/200.];
-	else [self performSelector:@selector(pollHardware) withObject:nil afterDelay:pollTime];
+	unsigned char count = 0;
+	int i;
+	for(i=0;i<kUE9NumTimers;i++){
+		if(timerEnableMask & (0x1<<i)) count++;
+	}
+	return count;
 }
 
 - (void) timeout
@@ -1308,14 +1371,25 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 	[cmdQueue removeAllObjects];
 	[self setLastRequest:nil];
 }
-		
-- (void) readAdcValues
+	
+- (unsigned char) gainBipWord:(int)channelPair
 {
+	//info for two channel packed into one byte
+	unsigned char gainBip = 0x00;
+	if(channelPair>=0 && channelPair<kUE9NumAdcs/2){
+		int chan = channelPair*2;
+		
+		//lower channel is in low nibble
+		if(bipolar[chan]) gainBip |= 0x08;
+		else gainBip |= gain[chan];
+		
+		//higer channel is in high nibble
+		chan++;
+		if(bipolar[chan]) gainBip |= 0x80;
+		else gainBip |= (gain[chan]<<4);
+	}
+	return gainBip;
 }
-
-- (void) sendIoControl
-{}
-
 
 #pragma mark ***Checksum Helpers
 - (void) normalChecksum:(unsigned char*)b len:(int)n
@@ -1423,58 +1497,84 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 {
 	unsigned char* recBuff = (unsigned char*)[theData bytes];
 	unsigned long rawAdc = recBuff[5] + recBuff[6] * 256;
-	double voltage;
+	float voltage;
 	if([self convert:rawAdc gainBip:recBuff[4] result:&voltage]==0){
 		NSLog(@"adc(%d): %f\n",recBuff[3],voltage);
 	}
-	else NSLog(@"error converting\n");
+	else NSLogError(@"LabJackUE9",@"Error converting ADC result",nil);
+
 }
 
-- (void) decodeFeedBack:(NSData*) theData
+- (void) decodeTimerCounter:(NSData*) theData
 {
 	int i;
 	unsigned char* recBuff = (unsigned char*)[theData bytes];
-	if(recBuff[1] != (uint8)(0xF8) || recBuff[2] != (uint8)(0x1D) || recBuff[3] != (uint8)(0x00))
-	{
-		printf("Error : received buffer has wrong command bytes \n");
+	unsigned long enabledMask = recBuff[7];
+	for( i = 0; i < kUE9NumTimers; i++ ){
+		unsigned long value = 0 ;
+		if(enabledMask & (0x1<<i)){
+			value =	 (unsigned long)recBuff[8 + 4*i]      | 
+			((unsigned long)recBuff[9 + 4*i]<<8)  | 
+			((unsigned long)recBuff[10 + 4*i]<<16) | 
+			((unsigned long)recBuff[11 + 4*i]<<24);
+		}
+		timerResult[i] = value;
+		
+    }
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackUE9ModelTimerResultChanged object:self];
+
+	for( i = 0; i < 2; i++ ){
+		unsigned long value = 0;
+		if(enabledMask & (0x40<<i)){
+			value =	 (unsigned long)recBuff[32 + 4*i]      | 
+					((unsigned long)recBuff[33 + 4*i]<<8)  | 
+					((unsigned long)recBuff[34 + 4*i]<<16) | 
+					((unsigned long)recBuff[35 + 4*i]<<24);
+		}
+        [self setCounter:i value:value];
+    }
+	
+}
+
+- (void) decodeReadAllValues:(NSData*) theData
+{
+	int i;
+	unsigned char* recBuff = (unsigned char*)[theData bytes];
+	if(recBuff[1] != (unsigned char)0xF8 || recBuff[2] != (unsigned char)0x1D || recBuff[3] != (unsigned char)0x00){
+		NSLogError(@"LabJackUE9",@"received buffer has wrong command bytes",nil);
 		return;
 	}
 	
-	printf("Set DAC0 to 2.500 volts and DAC1 to 3.500 volts.\n\n");
-	printf("Flexible digital I/O directions and states (FIO0 - FIO3):\n");
-	for(i = 0; i < 4; i++){
-		unsigned int tempDir = ( (uint32)(recBuff[6] / pow(2, i)) & 0x01 );
-		unsigned int tempState = ( (uint32)(recBuff[7] / pow(2, i)) & 0x01 );
-		printf("  FI%d: %d and %d\n", i, tempDir, tempState);
-	}
+	unsigned long dirMask = (recBuff[6] | (recBuff[8] << 8) | ((recBuff[10]&0xf) << 16));
+	[self setDoValueIn: ~dirMask & (recBuff[7] | (recBuff[9] << 8) | ((recBuff[11]&0xf) << 16))];
 	
-	double voltage;
-	printf("\nAnalog Inputs (AI0 - AI3):\n");
+	float voltage;
 	for(i = 0; i < 14; i++){
 		unsigned long rawAdc = recBuff[12 + 2*i] + recBuff[13 + 2*i] * 256;
 		
 		//getting analog voltage
-		if([self convert:rawAdc gainBip:0 result:&voltage]==0){
-			printf("  AI%d: %.6f V\n", i, voltage);
+		unsigned short gainBip = 0x00;
+		if(bipolar[i]) gainBip = 0x8;
+		else gainBip = gain[i];
+		if([self convert:rawAdc gainBip:gainBip result:&voltage]==0){
+			[self setAdc:i value:voltage];
 		}
 	}
-	printf("\n");
 }
 
 - (void) decodeCalibData:(NSData*)theData
 {
 
 	if( [theData length] < 136 ){
-		NSLog(@"getCalibrationInfo Error : did not read all of the buffer\n");
+		NSLogError(@"LabJackUE9",@"Calibration data incomplete",nil);
 		return;
 	}
 	unsigned char* recBuffer = (unsigned char*)[theData bytes];
-	if( recBuffer[1] != (unsigned char)(0xF8) || recBuffer[2] != (unsigned char)(0x41) || recBuffer[3] != (unsigned char)(0x2A) ){
-		NSLog(@"getCalibrationInfo error: incorrect command bytes for ReadMem response");
+	if( recBuffer[1] != (unsigned char)0xF8 || recBuffer[2] != (unsigned char)0x41 || recBuffer[3] != (unsigned char)0x2A ){
+		NSLogError(@"LabJackUE9",@"received buffer has wrong command bytes",nil);
 		return;
 	}
 	int i = recBuffer[7];
-	NSLog(@"got calib: %d\n",i);
 	
 	switch(i){
 		case 0:
@@ -1518,10 +1618,10 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 		break;
 	}
 }
-- (long) convert:(double) analogVoltage chan:(int) DACNumber result:(unsigned short*)rawDacValue
+- (long) convert:(float) analogVoltage chan:(int) DACNumber result:(unsigned short*)rawDacValue
 {
-	double internalSlope;
-	double internalOffset;
+	float internalSlope;
+	float internalOffset;
     
 	switch(DACNumber) {
 		case 0:
@@ -1536,7 +1636,7 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 			return -1;
 	}
 	
-	double tempBytesVoltage = internalSlope * analogVoltage + internalOffset;
+	float tempBytesVoltage = internalSlope * analogVoltage + internalOffset;
 	
 	//Checking to make sure bytesVoltage will be a value between 0 and 4095, 
 	//or that a unsigned short overflow does not occur.  A too high analogVoltage 
@@ -1550,10 +1650,10 @@ NSString* ORLabJackUE9MaxValueChanged				= @"ORLabJackUE9MaxValueChanged";
 	return 0;
 }
 
-- (long) convert:(unsigned long)rawAdc gainBip:(unsigned short)gainBip result:(double*)analogVoltage
+- (long) convert:(unsigned long)rawAdc gainBip:(unsigned short)gainBip result:(float*)analogVoltage
 {
-	double internalSlope;
-	double internalOffset;
+	float internalSlope;
+	float internalOffset;
 		
 	switch(gainBip ){
 		case 0:

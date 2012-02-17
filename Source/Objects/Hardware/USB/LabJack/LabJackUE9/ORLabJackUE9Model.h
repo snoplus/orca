@@ -25,6 +25,14 @@
 @class NetSocket;
 @class ORLabJackUE9Cmd;
 
+#define kUE9NumAdcs		14
+#define kUE9NumTimers	6
+#define kUE9NumIO		20
+
+#define kUE9ReadCounters	0x0
+#define kUE9UpdateCounters  0x1
+#define kUE9ResetCounters	0x2
+
 @interface ORLabJackUE9Model : OrcaObject <ORAdcProcessing,ORBitProcessing> {
 	NSMutableArray*  cmdQueue;
 	ORLabJackUE9Cmd* lastRequest;
@@ -33,36 +41,31 @@
 	NetSocket*		 socket;
 	NSLock*			 localLock;
     NSString*		 serialNumber;
-	int adc[8];
-	int gain[4];
-	float lowLimit[8];
-	float hiLimit[8];
-	float minValue[8];
-	float maxValue[8];
-	float slope[8];
-	float intercept[8];
-	NSString* channelName[8];   //adc names
-	NSString* channelUnit[8];   //adc names
+	float	adc[kUE9NumAdcs];
+	int		gain[kUE9NumAdcs];
+	BOOL	bipolar[kUE9NumAdcs];
+	float	lowLimit[kUE9NumAdcs];
+	float	hiLimit[kUE9NumAdcs];
+	float	minValue[kUE9NumAdcs];
+	float	maxValue[kUE9NumAdcs];
+	float	slope[kUE9NumAdcs];
+	float	intercept[kUE9NumAdcs];
+	NSString* channelName[kUE9NumAdcs];   //adc names
+	NSString* channelUnit[kUE9NumAdcs];   //adc names
 	unsigned long timeMeasured;
-	NSString* doName[16];		//the D connector on the side
-	NSString* ioName[4];		//on top
-	unsigned short adcDiff;
-	unsigned short doDirection;
-	unsigned short ioDirection;
-	unsigned short ioValueOut;
-	unsigned short doValueOut;
-	unsigned short ioValueIn;
-	unsigned short doValueIn;
+	NSString* doName[kUE9NumIO];		//the D connector on the side
+	unsigned long doDirection;
+	unsigned long doValueOut;
+	unsigned long doValueIn;
     unsigned short aOut0;
     unsigned short aOut1;
-	BOOL	led;
-	BOOL	doResetOfCounter;
-    unsigned long counter;
+    unsigned long counter[2];
+    unsigned long timer[kUE9NumTimers];
+    unsigned long timerResult[kUE9NumTimers];
     BOOL digitalOutputEnabled;
     int pollTime;
 	unsigned long	dataId;
     BOOL shipData;
-    BOOL readOnce;
 	NSTimeInterval lastTime;
 	NSOperationQueue* queue;
 	
@@ -84,22 +87,35 @@
 	double hiResBipolarOffset;
 	
 	//bit processing variables
+    BOOL readOnce;
 	unsigned long processInputValue;  //snapshot of the inputs at start of process cycle
 	unsigned long processOutputValue; //outputs to be written at end of process cycle
 	unsigned long processOutputMask;  //controlls which bits are written
     BOOL involvedInProcess;
-    unsigned long deviceSerialNumber;
+    unsigned long timerOption[kUE9NumTimers];
+    unsigned short timerEnableMask;
+    unsigned short counterEnableMask;
+    int clockSelection;
+    int clockDivisor;
 }
 
 #pragma mark ***Accessors
+- (int) clockDivisor;
+- (void) setClockDivisor:(int)aClockDivisor;
+- (int) clockSelection;
+- (void) setClockSelection:(int)aClockSelection;
+- (unsigned short) counterEnableMask;
+- (void) setCounterEnableMask:(unsigned short)anEnableMask;
+- (void) setCounterEnableBit:(int)bit value:(BOOL)aValue;
+- (unsigned short) timerEnableMask;
+- (void) setTimerEnableMask:(unsigned short)anEnableMask;
+- (void) setTimerEnableBit:(int)bit value:(BOOL)aValue;
+- (unsigned short) timerOption:(int)index;
+- (void) setTimer:(int)index option:(unsigned short)aTimerOption;
 - (ORLabJackUE9Cmd*) lastRequest;
 - (void) setLastRequest:(ORLabJackUE9Cmd*)aRequest;
-- (unsigned long) deviceSerialNumber;
-- (void) setDeviceSerialNumber:(unsigned long)aDeviceSerialNumber;
 - (BOOL) involvedInProcess;
 - (void) setInvolvedInProcess:(BOOL)aInvolvedInProcess;
-- (void) setAOut0Voltage:(float)aValue;
-- (void) setAOut1Voltage:(float)aValue;
 - (unsigned short) aOut1;
 - (void) setAOut1:(unsigned short)aAOut1;
 - (unsigned short) aOut0;
@@ -110,71 +126,56 @@
 - (void) setPollTime:(int)aPollTime;
 - (BOOL) digitalOutputEnabled;
 - (void) setDigitalOutputEnabled:(BOOL)aDigitalOutputEnabled;
-- (unsigned long) counter;
-- (void) setCounter:(unsigned long)aCounter;
+- (unsigned long) counter:(int)i;
+- (void) setCounter:(int)i value:(unsigned long)aValue;
+- (unsigned long) timer:(int)i;
+- (unsigned long) timerResult:(int)i;
+- (void) setTimer:(int)i value:(unsigned long)aValue;
 - (NSString*) channelName:(int)i;
 - (void) setChannel:(int)i name:(NSString*)aName;
 - (NSString*) channelUnit:(int)i;
 - (void) setChannel:(int)i unit:(NSString*)aName;
 - (NSString*) doName:(int)i;
 - (void) setDo:(int)i name:(NSString*)aName;
-- (NSString*) ioName:(int)i;
-- (void) setIo:(int)i name:(NSString*)aName;
-- (int) adc:(int)i;
-- (void) setAdc:(int)i withValue:(int)aValue;
+- (float) adc:(int)i;
+- (void) setAdc:(int)i value:(float)aValue;
 - (int) gain:(int)i;
-- (void) setGain:(int)i withValue:(int)aValue;
+- (void) setGain:(int)i value:(int)aValue;
+- (BOOL) bipolar:(int)i;
+- (void) setBipolar:(int)i value:(BOOL)aValue;
 - (float) lowLimit:(int)i;
-- (void) setLowLimit:(int)i withValue:(float)aValue;
+- (void) setLowLimit:(int)i value:(float)aValue;
 - (float) hiLimit:(int)i;
-- (void) setHiLimit:(int)i withValue:(float)aValue;
+- (void) setHiLimit:(int)i value:(float)aValue;
 - (float) slope:(int)i;
-- (void) setSlope:(int)i withValue:(float)aValue;
+- (void) setSlope:(int)i value:(float)aValue;
 - (float) intercept:(int)i;
-- (void) setIntercept:(int)i withValue:(float)aValue;
+- (void) setIntercept:(int)i value:(float)aValue;
 - (float) minValue:(int)i;
-- (void) setMinValue:(int)i withValue:(float)aValue;
+- (void) setMinValue:(int)i value:(float)aValue;
 - (float) maxValue:(int)i;
-- (void) setMaxValue:(int)i withValue:(float)aValue;
+- (void) setMaxValue:(int)i value:(float)aValue;
 
-- (unsigned short) adcDiff;
-- (void) setAdcDiff:(unsigned short)aMask;
-- (void) setAdcDiffBit:(int)bit withValue:(BOOL)aValue;
+- (unsigned long) doDirection;
+- (void) setDoDirection:(unsigned long)aMask;
+- (void) setDoDirectionBit:(int)bit value:(BOOL)aValue;
 
-- (unsigned short) doDirection;
-- (void) setDoDirection:(unsigned short)aMask;
-- (void) setDoDirectionBit:(int)bit withValue:(BOOL)aValue;
-
-- (unsigned short) ioDirection;
-- (void) setIoDirection:(unsigned short)aMask;
-- (void) setIoDirectionBit:(int)bit withValue:(BOOL)aValue;
-
-- (unsigned short) doValueOut;
-- (void) setDoValueOut:(unsigned short)aMask;
-- (void) setDoValueOutBit:(int)bit withValue:(BOOL)aValue;
-
-- (unsigned short) ioValueOut;
-- (void) setIoValueOut:(unsigned short)aMask;
-- (void) setIoValueOutBit:(int)bit withValue:(BOOL)aValue;
+- (unsigned long) doValueOut;
+- (void) setDoValueOut:(unsigned long)aMask;
+- (void) setDoValueOutBit:(int)bit value:(BOOL)aValue;
 
 - (unsigned short) doValueIn;
-- (void) setDoValueIn:(unsigned short)aMask;
-- (void) setDoValueInBit:(int)bit withValue:(BOOL)aValue;
+- (void) setDoValueIn:(unsigned long)aMask;
+- (void) setDoValueInBit:(int)bit value:(BOOL)aValue;
 - (NSString*) doInString:(int)bit;
 - (NSColor*) doInColor:(int)i;
 
-- (unsigned short) ioValueIn;
-- (void) setIoValueIn:(unsigned short)aMask;
-- (void) setIoValueInBit:(int)bit withValue:(BOOL)aValue;
-- (NSString*) ioInString:(int)bit;
-- (NSColor*) ioInColor:(int)i;
 - (unsigned long) timeMeasured;
 
 - (unsigned long) dataId;
 - (void) setDataId: (unsigned long) DataId;
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherLakeShore210;
-- (void) readSerialNumber;
 
 #pragma mark ***IP Stuff
 - (NSString*) ipAddress;
@@ -203,6 +204,8 @@
 #pragma mark ***HW Access
 - (void) resetCounter;
 - (void) queryAll;
+- (void) pollHardware;
+- (void) pollHardware:(BOOL)force;
 
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
@@ -211,16 +214,19 @@
 - (void) sendComCmd;
 - (void) getCalibrationInfo:(int)block;
 - (void) readSingleAdc:(int)aChan;
-- (void) feedBack;
-
+- (void) readAllValues;
+- (void) sendTimerCounter:(int)opt;
+- (void) setPowerLevel;
 
 - (void) goToNextCommand;
 - (void) processOneCommandFromQueue;
 - (void) startTimeOut;
-
 @end
 
-extern NSString* ORLabJackUE9ModelDeviceSerialNumberChanged;
+extern NSString* ORLabJackUE9ModelClockDivisorChanged;
+extern NSString* ORLabJackUE9ModelClockSelectionChanged;
+extern NSString* ORLabJackUE9ModelTimerEnableMaskChanged;
+extern NSString* ORLabJackUE9ModelTimerOptionChanged;
 extern NSString* ORLabJackUE9ModelInvolvedInProcessChanged;
 extern NSString* ORLabJackUE9ModelAOut1Changed;
 extern NSString* ORLabJackUE9ModelAOut0Changed;
@@ -228,23 +234,18 @@ extern NSString* ORLabJackUE9ShipDataChanged;
 extern NSString* ORLabJackUE9PollTimeChanged;
 extern NSString* ORLabJackUE9DigitalOutputEnabledChanged;
 extern NSString* ORLabJackUE9CounterChanged;
-extern NSString* ORLabJackUE9SerialNumberChanged;
 extern NSString* ORLabJackUE9RelayChanged;
 extern NSString* ORLabJackUE9Lock;
 extern NSString* ORLabJackUE9ChannelNameChanged;
 extern NSString* ORLabJackUE9ChannelUnitChanged;
 extern NSString* ORLabJackUE9AdcChanged;
 extern NSString* ORLabJackUE9DoNameChanged;
-extern NSString* ORLabJackUE9IoNameChanged;
 extern NSString* ORLabJackUE9DoDirectionChanged;
-extern NSString* ORLabJackUE9IoDirectionChanged;
 extern NSString* ORLabJackUE9DoValueOutChanged;
-extern NSString* ORLabJackUE9IoValueOutChanged;
 extern NSString* ORLabJackUE9DoValueInChanged;
 extern NSString* ORLabJackUE9IoValueInChanged;
 extern NSString* ORLabJackUE9HiLimitChanged;
 extern NSString* ORLabJackUE9LowLimitChanged;
-extern NSString* ORLabJackUE9AdcDiffChanged;
 extern NSString* ORLabJackUE9GainChanged;
 extern NSString* ORLabJackUE9SlopeChanged;
 extern NSString* ORLabJackUE9InterceptChanged;
@@ -252,6 +253,10 @@ extern NSString* ORLabJackUE9MinValueChanged;
 extern NSString* ORLabJackUE9MaxValueChanged;
 extern NSString* ORLabJackUE9IpAddressChanged;
 extern NSString* ORLabJackUE9IsConnectedChanged;
+extern NSString* ORLabJackUE9TimerChanged;
+extern NSString* ORLabJackUE9BipolarChanged;
+extern NSString* ORLabJackUE9ModelCounterEnableMaskChanged;
+extern NSString* ORLabJackUE9ModelTimerResultChanged;
 
 @interface ORLabJackUE9Cmd : NSObject
 {

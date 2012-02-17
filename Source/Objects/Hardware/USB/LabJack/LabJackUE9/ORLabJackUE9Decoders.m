@@ -38,6 +38,12 @@
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  adc chan 5 encoded as a float
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  adc chan 6 encoded as a float
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  adc chan 7 encoded as a float
+// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  adc chan 8 encoded as a float
+// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  adc chan 9 encoded as a float
+// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  adc chan 10 encoded as a float
+// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  adc chan 11 encoded as a float
+// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  adc chan 12 encoded as a float
+// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  adc chan 13 encoded as a float
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  counter
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  
 // --------------------^^^^ ^^^^ ^^^^ ^^^^  DO Direction Bits
@@ -78,7 +84,7 @@ static NSString* kLabJackUE9Unit[8] = {
 	int i;
 	int index = 2;
 	unsigned long theTime = dataPtr[14];
-	for(i=0;i<8;i++){
+	for(i=0;i<14;i++){
 		theAdcValue.asLong = dataPtr[index];									//encoded as float, use union to convert
 		[aDataSet loadTimeSeries:theAdcValue.asFloat										
 						  atTime:theTime
@@ -104,7 +110,7 @@ static NSString* kLabJackUE9Unit[8] = {
 	theString = [theString stringByAppendingFormat:@"HW ID = %d\n",dataPtr[1] & 0x0000ffff];
 	int i;
 	int index = 2;
-	for(i=0;i<8;i++){
+	for(i=0;i<14;i++){
 		theAdcValue.asLong = dataPtr[index];
 		theString = [theString stringByAppendingFormat:@"%d: %.3f\n",i,theAdcValue.asFloat];
 		index++;
