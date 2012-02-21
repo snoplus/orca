@@ -52,6 +52,7 @@
 	short			externalGateEnabledMask;
 	short			inputInvertedMask;
 	short			triggerOutEnabledMask;
+	short			highEnergySuppressMask;
 	short			adc50KTriggerEnabledMask;
 	short			gtMask;
 	bool			waitingForSomeChannels;
@@ -59,6 +60,7 @@
 	
 	NSMutableArray*	cfdControls;
 	NSMutableArray* thresholds;
+	NSMutableArray* highThresholds;
     NSMutableArray* dacOffsets;
 	NSMutableArray* gateLengths;
 	NSMutableArray* pulseLengths;
@@ -252,7 +254,6 @@
 - (BOOL) extendedThresholdEnabled:(short)chan;
 - (void) setExtendedThresholdEnabled:(short)chan withValue:(BOOL)aValue;
 
-
 - (short) internalGateEnabledMask;
 - (void) setInternalGateEnabledMask:(short)aMask;
 - (BOOL) internalGateEnabled:(short)chan;
@@ -272,6 +273,11 @@
 - (void) setTriggerOutEnabledMask:(short)aMask;
 - (BOOL) triggerOutEnabled:(short)chan;
 - (void) setTriggerOutEnabled:(short)chan withValue:(BOOL)aValue;
+
+- (short) highEnergySuppressMask;
+- (void) setHighEnergySuppressMask:(short)aMask;
+- (BOOL) highEnergySuppress:(short)chan;
+- (void) setHighEnergySuppress:(short)chan withValue:(BOOL)aValue;
 
 - (short) adc50KTriggerEnabledMask;
 - (void) setAdc50KTriggerEnabledMask:(short)aMask;
@@ -296,6 +302,8 @@
 
 - (int) threshold:(short)chan;
 - (void) setThreshold:(short)chan withValue:(int)aValue;
+- (int) highThreshold:(short)chan;
+- (void) setHighThreshold:(short)chan withValue:(int)aValue;
 - (unsigned short) dacOffset:(short)chan;
 - (void) setDacOffset:(short)aChan withValue:(int)aValue;
 - (void) setPulseLength:(short)aChan withValue:(short)aValue;
@@ -325,7 +333,9 @@
 - (void) writeAcquistionRegister;
 - (void) writeEventConfiguration;
 - (void) writeThresholds;
+- (void) writeHighThresholds;
 - (void) readThresholds:(BOOL)verbose;
+- (void) readHighThresholds:(BOOL)verbose;
 - (void) setLed:(BOOL)state;
 - (void) briefReport;
 - (void) regDump;
@@ -452,8 +462,11 @@ extern NSString* ORSIS3302EventConfigChanged;
 
 extern NSString* ORSIS3302ClockSourceChanged;
 extern NSString* ORSIS3302TriggerOutEnabledChanged;
+extern NSString* ORSIS3302HighEnergySuppressChanged;
 extern NSString* ORSIS3302ThresholdChanged;
 extern NSString* ORSIS3302ThresholdArrayChanged;
+extern NSString* ORSIS3302HighThresholdChanged;
+extern NSString* ORSIS3302HighThresholdArrayChanged;
 extern NSString* ORSIS3302GtChanged;
 
 extern NSString* ORSIS3302SettingsLock;

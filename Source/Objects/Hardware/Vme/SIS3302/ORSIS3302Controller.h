@@ -75,10 +75,12 @@
 
 	IBOutlet NSMatrix*		inputInvertedMatrix;
 	IBOutlet NSMatrix*		triggerOutEnabledMatrix;
+	IBOutlet NSMatrix*		highEnergySuppressMatrix;
 	IBOutlet NSMatrix*		adc50KTriggerEnabledMatrix;
 	IBOutlet NSMatrix*		gtMatrix;
 	IBOutlet NSMatrix*		dacOffsetMatrix;
 	IBOutlet NSMatrix*		thresholdMatrix;
+	IBOutlet NSMatrix*		highThresholdMatrix;
 	IBOutlet NSMatrix*		gateLengthMatrix;
 	IBOutlet NSMatrix*		pulseLengthMatrix;
 	IBOutlet NSMatrix*		sumGMatrix;
@@ -199,10 +201,12 @@
 - (void) totalRateChanged:(NSNotification*)aNote;
 - (void) miscAttributesChanged:(NSNotification*)aNote;
 - (void) triggerOutEnabledChanged:(NSNotification*)aNote;
+- (void) highEnergySuppressChanged:(NSNotification*)aNote;
 - (void) inputInvertedChanged:(NSNotification*)aNote;
 - (void) adc50KTriggerEnabledChanged:(NSNotification*)aNote;
 - (void) gtChanged:(NSNotification*)aNote;
 - (void) thresholdChanged:(NSNotification*)aNote;
+- (void) highThresholdChanged:(NSNotification*)aNote;
 - (void) gateLengthChanged:(NSNotification*)aNote;
 - (void) pulseLengthChanged:(NSNotification*)aNote;
 - (void) sumGChanged:(NSNotification*)aNote;
@@ -268,8 +272,10 @@
 - (IBAction) adc50KTriggerEnabledAction:(id)sender;
 - (IBAction) inputInvertedAction:(id)sender;
 - (IBAction) triggerOutEnabledAction:(id)sender;
+- (IBAction) highEnergySuppressAction:(id)sender;
 - (IBAction) gtAction:(id)sender;
 - (IBAction) thresholdAction:(id)sender;
+- (IBAction) highThresholdAction:(id)sender;
 - (IBAction) gateLengthAction:(id)sender;
 - (IBAction) pulseLengthAction:(id)sender;
 - (IBAction) sumGAction:(id)sender;

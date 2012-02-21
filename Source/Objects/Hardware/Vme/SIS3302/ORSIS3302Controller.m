@@ -49,7 +49,7 @@
 - (void) awakeFromNib
 {
 	
-    settingSize     = NSMakeSize(1190,620);
+    settingSize     = NSMakeSize(1267,620);
     rateSize		= NSMakeSize(790,300);
     
     blankView = [[NSView alloc] init];
@@ -69,6 +69,10 @@
 	int i;
 	for(i=0;i<8;i++){
 		NSCell* theCell = [thresholdMatrix cellAtRow:i column:0];
+		[theCell setFormatter:numberFormatter];
+	}
+	for(i=0;i<8;i++){
+		NSCell* theCell = [highThresholdMatrix cellAtRow:i column:0];
 		[theCell setFormatter:numberFormatter];
 	}
 	for(i=0;i<8;i++){
@@ -151,6 +155,11 @@
                        object : model];
 
 	[notifyCenter addObserver : self
+                     selector : @selector(highEnergySuppressChanged:)
+                         name : ORSIS3302HighEnergySuppressChanged
+                       object : model];
+	
+	[notifyCenter addObserver : self
                      selector : @selector(inputInvertedChanged:)
                          name : ORSIS3302InputInvertedChanged
                        object : model];
@@ -172,6 +181,11 @@
                        object : model];
 	
     [notifyCenter addObserver : self
+                     selector : @selector(highThresholdChanged:)
+                         name : ORSIS3302HighThresholdChanged
+                       object : model];	
+    
+	[notifyCenter addObserver : self
                      selector : @selector(clockSourceChanged:)
                          name : ORSIS3302ClockSourceChanged
 						object: model];
@@ -453,9 +467,11 @@
     [self settingsLockChanged:nil];
 	[self inputInvertedChanged:nil];
 	[self triggerOutEnabledChanged:nil];
+	[self highEnergySuppressChanged:nil];
 	[self adc50KTriggerEnabledChanged:nil];
 	[self gtChanged:nil];
 	[self thresholdChanged:nil];
+	[self highThresholdChanged:nil];
 	[self gateLengthChanged:nil];
 	[self pulseLengthChanged:nil];
 	[self sumGChanged:nil];
@@ -805,6 +821,14 @@
 		[[triggerOutEnabledMatrix cellWithTag:i] setState:[model triggerOutEnabled:i]];
 	}
 }
+- (void) highEnergySuppressChanged:(NSNotification*)aNote
+{
+	short i;
+	for(i=0;i<kNumSIS3302Channels;i++){
+		[[highEnergySuppressMatrix cellWithTag:i] setState:[model highEnergySuppress:i]];
+	}
+	[self settingsLockChanged:nil];
+}
 - (void) adc50KTriggerEnabledChanged:(NSNotification*)aNote
 {
 	short i;
@@ -839,6 +863,15 @@
 	}
 }
 
+- (void) highThresholdChanged:(NSNotification*)aNote
+{
+	short i;
+	for(i=0;i<kNumSIS3302Channels;i++){
+		//float volts = (0.0003*[model threshold:i])-5.0;
+		[[highThresholdMatrix cellWithTag:i] setIntValue:[model highThreshold:i]];
+	}
+}
+
 - (void) cfdControlChanged:(NSNotification*)aNote
 {
 	[cfdControl0 selectItemAtIndex:[model cfdControl:0]];
@@ -849,6 +882,8 @@
 	[cfdControl5 selectItemAtIndex:[model cfdControl:5]];
 	[cfdControl6 selectItemAtIndex:[model cfdControl:6]];
 	[cfdControl7 selectItemAtIndex:[model cfdControl:7]];
+	
+	[self settingsLockChanged:nil];
 }
 
 - (void) sampleLengthChanged:(NSNotification*)aNote
@@ -1079,11 +1114,22 @@
 	[bufferWrapEnabledMatrix		setEnabled:!locked && !runInProgress && firmwareGEV15xx];
 	
 	int i;
+	
+	for(i=0;i<kNumSIS3302Channels;i++){
+		if([model highEnergySuppress:i])[[highThresholdMatrix cellWithTag:i]setEnabled:!locked && !runInProgress];
+		else [[highThresholdMatrix cellWithTag:i]	setEnabled:NO];
+	}
+		
 	for(i=0;i<kNumSIS3302Groups;i++){
 		if([model bufferWrapEnabled:i])[[sampleStartIndexMatrix	cellWithTag:i]setEnabled:!locked && !runInProgress];
 		else [[sampleStartIndexMatrix cellWithTag:i]	setEnabled:NO];
 	}
 	
+	for(i=0;i<kNumSIS3302Channels;i++){
+		if([model cfdControl:i]!=0)[[highEnergySuppressMatrix cellWithTag:i]setEnabled:!locked && !runInProgress];
+		else [[highEnergySuppressMatrix cellWithTag:i]	setEnabled:NO];
+	}
+		
 	[cfdControl0					setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
 	[cfdControl1					setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
 	[cfdControl2					setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
@@ -1370,6 +1416,11 @@
 	[model setTriggerOutEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
+- (IBAction) highEnergySuppressAction:(id)sender
+{
+	[model setHighEnergySuppress:[[sender selectedCell] tag] withValue:[sender intValue]];
+}
+
 - (IBAction) inputInvertedAction:(id)sender
 {
 	[model setInputInverted:[[sender selectedCell] tag] withValue:[sender intValue]];
@@ -1408,6 +1459,13 @@
 {
     if([sender intValue] != [model threshold:[[sender selectedCell] tag]]){
 		[model setThreshold:[[sender selectedCell] tag] withValue:[sender intValue]];
+	}
+}
+
+- (IBAction) highThresholdAction:(id)sender
+{
+    if([sender intValue] != [model highThreshold:[[sender selectedCell] tag]]){
+		[model setHighThreshold:[[sender selectedCell] tag] withValue:[sender intValue]];
 	}
 }
 

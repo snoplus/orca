@@ -114,9 +114,11 @@
 #define kSIS3302BufferControlModeAdc12           			0x0200002C  
 
 #define kSIS3302TriggerSetupAdc1                  			0x02000030	  
-#define kSIS3302TriggerThresholdAdc1              			0x02000034	  
+#define kSIS3302TriggerThresholdAdc1              			0x02000034
+#define kSIS3302HighEnergyThresholdAdc1						0x020000A8		/* v1512 */
 #define kSIS3302TriggerSetupAdc2                  			0x02000038	  
 #define kSIS3302TriggerThresholdAdc2              			0x0200003C	  
+#define kSIS3302HighEnergyThresholdAdc2						0x020000AC		/* v1512 */
 
 #define kSIS3302EnergySetupGPAdc12   						0x02000040      /* Gamma */
 #define kSIS3302EnergyGateLengthAdc12						0x02000044      /* Gamma */
@@ -160,9 +162,11 @@
 #define kSIS3302BufferControlModeAdc34          			0x0280002C  
 
 #define kSIS3302TriggerSetupAdc3                  			0x02800030	  
-#define kSIS3302TriggerThresholdAdc3              			0x02800034	  
+#define kSIS3302TriggerThresholdAdc3              			0x02800034	
+#define kSIS3302HighEnergyThresholdAdc3						0x028000A8		/* v1512 */
 #define kSIS3302TriggerSetupAdc4                  			0x02800038	  
 #define kSIS3302TriggerThresholdAdc4              			0x0280003C	  
+#define kSIS3302HighEnergyThresholdAdc4						0x028000AC		/* v1512 */
 
 #define kSIS3302EnergySetupGPAdc34   						0x02800040      /* Gamma */
 #define kSIS3302EnergyGateLengthAdc34						0x02800044      /* Gamma */
@@ -205,9 +209,11 @@
 #define kSIS3302BufferControlModeAdc56           			0x0300002C  
 
 #define kSIS3302TriggerSetupAdc5                  			0x03000030	  
-#define kSIS3302TriggerThresholdAdc5              			0x03000034	  
+#define kSIS3302TriggerThresholdAdc5              			0x03000034	
+#define kSIS3302HighEnergyThresholdAdc5						0x030000A8		/* v1512 */
 #define kSIS3302TriggerSetupAdc6                  			0x03000038	  
-#define kSIS3302TriggerThresholdAdc6              			0x0300003C	  
+#define kSIS3302TriggerThresholdAdc6              			0x0300003C
+#define kSIS3302HighEnergyThresholdAdc6						0x030000AC		/* v1512 */
 
 #define kSIS3302EnergySetupGPAdc56   						0x03000040      /* Gamma */
 #define kSIS3302EnergyGateLengthAdc56						0x03000044      /* Gamma */
@@ -250,9 +256,11 @@
 #define kSIS3302BufferControlModeAdc78           			0x0380002C  
 
 #define kSIS3302TriggerSetupAdc7                  			0x03800030	  
-#define kSIS3302TriggerThresholdAdc7              			0x03800034	  
+#define kSIS3302TriggerThresholdAdc7              			0x03800034
+#define kSIS3302HighEnergyThresholdAdc7						0x038000A8		/* v1512 */
 #define kSIS3302TriggerSetupAdc8                  			0x03800038	  
 #define kSIS3302TriggerThresholdAdc8              			0x0380003C	  
+#define kSIS3302HighEnergyThresholdAdc8						0x038000AC		/* v1512 */
 
 #define kSIS3302EnergySetupGPAdc78   						0x03800040      /* Gamma */
 #define kSIS3302EnergyGateLengthAdc78						0x03800044      /* Gamma */
@@ -427,3 +435,4 @@
 
 #define kSIS3302AcqSetMcaMode								0x00000008  /* GAMMA, up V1205   */
 #define kSIS3302AcqClrMcaMode								0x00080000  /* GAMMA, up V1205   */
+

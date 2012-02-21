@@ -82,8 +82,11 @@ NSString* ORSIS3302RateGroupChangedNotification	= @"ORSIS3302RateGroupChangedNot
 NSString* ORSIS3302SettingsLock					= @"ORSIS3302SettingsLock";
 
 NSString* ORSIS3302TriggerOutEnabledChanged		= @"ORSIS3302TriggerOutEnabledChanged";
+NSString* ORSIS3302HighEnergySuppressChanged	= @"ORSIS3302HighEnergySuppressChanged";
 NSString* ORSIS3302ThresholdChanged				= @"ORSIS3302ThresholdChanged";
 NSString* ORSIS3302ThresholdArrayChanged		= @"ORSIS3302ThresholdArrayChanged";
+NSString* ORSIS3302HighThresholdChanged			= @"ORSIS3302HighThresholdChanged";
+NSString* ORSIS3302HighThresholdArrayChanged	= @"ORSIS3302HighThresholdArrayChanged";
 NSString* ORSIS3302GtChanged					= @"ORSIS3302GtChanged";
 NSString* ORSIS3302SampleDone					= @"ORSIS3302SampleDone";
 NSString* ORSIS3302IDChanged					= @"ORSIS3302IDChanged";
@@ -114,7 +117,7 @@ typedef struct {
 	NSString* name;
 } SIS3302GammaRegisterInformation;
 
-#define kNumSIS3302ReadRegs 177
+#define kNumSIS3302ReadRegs 185
 
 static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs] = {
 	{0x00000000,  @"Control/Status"},                         
@@ -150,8 +153,10 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	{0x0200002C,  @"Raw Buffer Wrap Mode (ADC1, ADC2)"},	//new with v15xx
 	{0x02000030,  @"Trigger Setup ADC1"},    
 	{0x02000034,  @"Trigger Threshold ADC1"},    //function changed with v15xx
+	{0x020000A8,  @"Trigger High Threshold ADC1"},	//new register with v1512
 	{0x02000038,  @"Trigger Setup ADC2"},    
 	{0x0200003C,  @"Trigger Threshold ADC2"},   //function changed with v15xx 
+	{0x020000AC,  @"Trigger High Threshold ADC2"},	//new register with v1512
 	{0x02000040,  @"Energy Setup GP (ADC1, ADC2)"},    
 	{0x02000044,  @"Energy Gate Length (ADC1, ADC2)"},    
 	{0x02000048,  @"Energy Sample Length (ADC1, ADC2)"},    
@@ -192,8 +197,10 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	{0x0200003C,  @"Raw Buffer Wrap Mode (ADC3, ADC4)" },		//new with v15xx
 	{0x02800030,  @"Trigger Setup ADC3"},    
 	{0x02800034,  @"Trigger Threshold ADC3"},    //function changed with v15xx
+	{0x028000A8,  @"Trigger High Threshold ADC3"},	//new register with v1512
 	{0x02800038,  @"Trigger Setup ADC4"},    
 	{0x0280003C,  @"Trigger Threshold ADC4"},    //function changed with v15xx
+	{0x028000AC,  @"Trigger High Threshold ADC4"},	//new register with v1512
 	{0x02800040,  @"Energy Setup GP (ADC3, ADC4)"},    
 	{0x02800044,  @"Energy Gate Length (ADC3, ADC4)"},    
 	{0x02800048,  @"Energy Sample Length (ADC3, ADC4)"},    
@@ -234,8 +241,10 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	{0x0300002C,  @"Raw Buffer Wrap Mode (ADC5, ADC6)"},	//new with v15xx
 	{0x03000030,  @"Trigger Setup ADC5"},    
 	{0x03000034,  @"Trigger Threshold ADC5"},    //function changed with v15xx
+	{0x030000A8,  @"Trigger High Threshold ADC5"},	//new register with v1512
 	{0x03000038,  @"Trigger Setup ADC6"},    
 	{0x0300003C,  @"Trigger Threshold ADC6"},    //function changed with v15xx
+	{0x030000AC,  @"Trigger High Threshold ADC6"},	//new register with v1512
 	{0x03000040,  @"Energy Setup GP (ADC5, ADC6)"},    
 	{0x03000044,  @"Energy Gate Length (ADC5, ADC6)"},    
 	{0x03000048,  @"Energy Sample Length (ADC5, ADC6)"},    
@@ -276,8 +285,10 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	{0x0380002C,  @"Raw Buffer Wrap Mode (ADC7, ADC8)"},	//new with v15xx
 	{0x03800030,  @"Trigger Setup ADC7"},    
 	{0x03800034,  @"Trigger Threshold ADC7"},    //function changed with v15xx
+	{0x038000A8,  @"Trigger High Threshold ADC7"},	//new register with v1512
 	{0x03800038,  @"Trigger Setup ADC8"},    
 	{0x0380003C,  @"Trigger Threshold ADC8"},    //function changed with v15xx
+	{0x038000AC,  @"Trigger High Threshold ADC8"},	//new register with v1512
 	{0x03800040,  @"Energy Setup GP (ADC7, ADC8)"},    
 	{0x03800044,  @"Energy Gate Length (ADC7, ADC8)"},    
 	{0x03800048,  @"Energy Sample Length (ADC7, ADC8)"},    
@@ -327,6 +338,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	[internalTriggerDelays release];
 	[endAddressThresholds release];
  	[thresholds release];
+	[highThresholds release];
 	
 	[cfdControls release];
     [dacOffsets release];
@@ -762,6 +774,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	int i;
 	for(i=0;i<8;i++){
 		[self setThreshold:i withValue:0x64];
+		[self setHighThreshold:i withValue:0x0];
 		[self setPeakingTime:i withValue:250];
 		[self setSumG:i withValue:263];
 		[self setInternalTriggerDelay:i withValue:0];
@@ -781,6 +794,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	[self setShipEnergyWaveform:NO];
 	[self setGtMask:0xff];
 	[self setTriggerOutEnabledMask:0x0];
+	[self setHighEnergySuppressMask:0x0];
 	[self setInputInvertedMask:0x0];
 	[self setAdc50KTriggerEnabledMask:0x00];
 	[self setInternalGateEnabledMask:0xff];
@@ -976,7 +990,6 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	[self setInputInvertedMask:aMask];
 }
 
-
 - (short) triggerOutEnabledMask { return triggerOutEnabledMask; }
 - (void) setTriggerOutEnabledMask:(short)aMask	
 { 
@@ -992,6 +1005,22 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	if(aValue)aMask |= (1<<chan);
 	else aMask &= ~(1<<chan);
 	[self setTriggerOutEnabledMask:aMask];
+}
+
+- (short) highEnergySuppressMask { return highEnergySuppressMask; }
+- (void) setHighEnergySuppressMask:(short)aMask
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setHighEnergySuppressMask:highEnergySuppressMask];
+	highEnergySuppressMask= aMask;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302HighEnergySuppressChanged object:self];
+}	
+- (BOOL) highEnergySuppress:(short)chan { return highEnergySuppressMask & (1<<chan); }
+- (void) setHighEnergySuppress:(short)chan withValue:(BOOL)aValue
+{
+	unsigned char aMask = highEnergySuppressMask;
+	if(aValue)aMask |= (1<<chan);
+	else aMask &= ~(1<<chan);
+	[self setHighEnergySuppressMask:aMask];
 }
 
 - (short) adc50KTriggerEnabledMask { return adc50KTriggerEnabledMask; }
@@ -1067,7 +1096,17 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	[self postAdcInfoProvidingValueChanged];
 }
 
-//ORAdcInfoProviding protocol requirement
+- (int) highThreshold:(short)aChan { return [[highThresholds objectAtIndex:aChan]intValue]; }
+- (void) setHighThreshold:(short)aChan withValue:(int)aValue
+{
+	aValue = [self limitIntValue:aValue min:0 max:0x1FFFF];
+	[[[self undoManager] prepareWithInvocationTarget:self] setHighThreshold:aChan withValue:[self highThreshold:aChan]];
+	[highThresholds replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302HighThresholdChanged object:self];
+	//ORAdcInfoProviding protocol requirement
+	[self postAdcInfoProvidingValueChanged];
+}
+
 - (unsigned short) gain:(unsigned short) aChan
 {
     return 0;
@@ -1407,6 +1446,21 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
     return (unsigned long) -1;
 }
 
+- (unsigned long) getHighThresholdRegOffsets:(int) channel 
+{
+    switch (channel) {
+        case 0: return 	kSIS3302HighEnergyThresholdAdc1;
+		case 1: return 	kSIS3302HighEnergyThresholdAdc2;
+		case 2: return 	kSIS3302HighEnergyThresholdAdc3;
+		case 3: return 	kSIS3302HighEnergyThresholdAdc4;
+		case 4:	return 	kSIS3302HighEnergyThresholdAdc5;
+		case 5: return 	kSIS3302HighEnergyThresholdAdc6;
+		case 6: return 	kSIS3302HighEnergyThresholdAdc7;
+		case 7: return 	kSIS3302HighEnergyThresholdAdc8;
+    }
+    return (unsigned long) -1;
+}
+
 - (unsigned long) getExtendedThresholdRegOffsets:(int) channel 
 {
     switch (channel) {
@@ -1654,6 +1708,12 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 		else if([self cfdControl:i] == 2) thresholdMask |= (0x3 & 0x3) << 20;
 		//------------------------------------------------
 		
+		//------------------------------------------------
+		//only firmware version >= 1512
+		BOOL hesEnabled = [self highEnergySuppress:i];
+		if (hesEnabled)						thresholdMask |= (1<<24);
+		//------------------------------------------------
+		
 		thresholdMask |= ([self threshold:i] & 0xffff)+ 0x10000;
 		
 		[aList addCommand: [ORVmeReadWriteCommand writeLongBlock: &thresholdMask
@@ -1669,8 +1729,31 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 														  withAddMod: [self addressModifier]
 													   usingAddSpace: 0x01]];
 		}
-		
-		
+	}
+	[self executeCommandList:aList];
+}
+
+-(void) writeHighThresholds
+{
+	ORCommandList* aList = [ORCommandList commandList];
+	int i;
+	for(i = 0; i < kNumSIS3302Channels; i++) {
+		if(![self extendedThresholdEnabled:i]){
+		unsigned long aThresholdValue = [self highThreshold:i]+0x10000;
+		[aList addCommand: [ORVmeReadWriteCommand writeLongBlock: &aThresholdValue
+													   atAddress: [self baseAddress] + [self getHighThresholdRegOffsets:i]
+													  numToWrite: 1
+													  withAddMod: [self addressModifier]
+												   usingAddSpace: 0x01]];
+		}
+		if([self extendedThresholdEnabled:i]){
+		unsigned long aThresholdValue = [self highThreshold:i]+0x2000000;
+		[aList addCommand: [ORVmeReadWriteCommand writeLongBlock: &aThresholdValue
+													   atAddress: [self baseAddress] + [self getHighThresholdRegOffsets:i]
+													  numToWrite: 1
+													  withAddMod: [self addressModifier]
+												   usingAddSpace: 0x01]];
+		}
 	}
 	[self executeCommandList:aList];
 }
@@ -1933,6 +2016,25 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	}
 }
 
+- (void) readHighThresholds:(BOOL)verbose
+{
+	int i;
+	if(verbose) NSLog(@"Reading High Thresholds:\n");
+	
+	for(i = 0; i < kNumSIS3302Channels; i++) {
+		unsigned long aValue;
+		[[self adapter] readLongBlock: &aValue
+							atAddress: [self baseAddress] + [self getHighThresholdRegOffsets:i]
+							numToRead: 1
+						   withAddMod: [self addressModifier]
+						usingAddSpace: 0x01];
+		if(verbose){
+			unsigned short thresh = (aValue&0xffff);
+			NSLog(@"%d: 0x%4x\n",i,thresh);
+		}
+	}
+}
+
 - (void) writeMcaLNESetupAndPrescalFactor
 {
 	
@@ -2141,7 +2243,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 - (void) briefReport
 {
 	[self readThresholds:YES];
-	
+	[self readHighThresholds:YES];
 	unsigned long EventConfig = 0;
 	[[self adapter] readLongBlock:&EventConfig
 						atAddress:[self baseAddress] +kSIS3302EventConfigAdc12
@@ -2356,6 +2458,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	[self writeEnergySampleStartIndexes];
 	[self writeTriggerSetups];
 	[self writeThresholds];
+	[self writeHighThresholds];
 	[self writeDacOffsets];
 	[self resetSamplingLogic];
 	[self writeBufferControl];
@@ -2769,6 +2872,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 {
 	NSDictionary* cardDictionary = [self findCardDictionaryInHeader:fileHeader];
 	if([param isEqualToString:@"Threshold"])						return [[cardDictionary objectForKey:@"thresholds"] objectAtIndex:aChannel];
+	else if([param isEqualToString:@"highThreshold"])				return [[cardDictionary objectForKey:@"highThresholds"] objectAtIndex:aChannel];
 	else if([param isEqualToString:@"CFD"])							return [[cardDictionary objectForKey:@"cfdControls"] objectAtIndex:aChannel];
 	else if([param isEqualToString:@"GateLength"])					return [[cardDictionary objectForKey:@"gateLengths"] objectAtIndex:aChannel];
 	else if([param isEqualToString:@"PulseLength"])					return [[cardDictionary objectForKey:@"pulseLengths"] objectAtIndex:aChannel];
@@ -3138,6 +3242,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	
     [self setClockSource:				[decoder decodeIntForKey:@"clockSource"]];
     [self setTriggerOutEnabledMask:		[decoder decodeInt32ForKey:@"triggerOutEnabledMask"]];
+	[self setHighEnergySuppressMask:	[decoder decodeInt32ForKey:@"highEnergySuppressMask"]];
     [self setInputInvertedMask:			[decoder decodeInt32ForKey:@"inputInvertedMask"]];
     [self setInternalTriggerEnabledMask:[decoder decodeInt32ForKey:@"internalTriggerEnabledMask"]];
     [self setExternalTriggerEnabledMask:[decoder decodeInt32ForKey:@"externalTriggerEnabledMask"]];
@@ -3151,6 +3256,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	
     sampleLengths = 			[[decoder decodeObjectForKey:@"sampleLengths"]retain];
 	thresholds  =				[[decoder decodeObjectForKey:@"thresholds"] retain];
+	highThresholds =			[[decoder decodeObjectForKey:@"highThresholds"] retain];
     dacOffsets  =				[[decoder decodeObjectForKey:@"dacOffsets"] retain];
 	gateLengths =				[[decoder decodeObjectForKey:@"gateLengths"] retain];
 	pulseLengths =				[[decoder decodeObjectForKey:@"pulseLengths"] retain];
@@ -3226,6 +3332,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	
 	[encoder encodeBool:internalExternalTriggersOred	forKey:@"internalExternalTriggersOred"];
 	[encoder encodeInt32:triggerOutEnabledMask			forKey:@"triggerOutEnabledMask"];
+	[encoder encodeInt32:highEnergySuppressMask			forKey:@"highEnergySuppressMask"];
 	[encoder encodeInt32:inputInvertedMask				forKey:@"inputInvertedMask"];
 	[encoder encodeInt32:internalTriggerEnabledMask		forKey:@"internalTriggerEnabledMask"];
 	[encoder encodeInt32:externalTriggerEnabledMask		forKey:@"externalTriggerEnabledMask"];
@@ -3240,6 +3347,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
     [encoder encodeObject:waveFormRateGroup		forKey:@"waveFormRateGroup"];
 	[encoder encodeObject:sampleLengths			forKey:@"sampleLengths"];
 	[encoder encodeObject:thresholds			forKey:@"thresholds"];
+	[encoder encodeObject:highThresholds		forKey:@"highThresholds"];
 	[encoder encodeObject:dacOffsets			forKey:@"dacOffsets"];
 	[encoder encodeObject:gateLengths			forKey:@"gateLengths"];
 	[encoder encodeObject:pulseLengths			forKey:@"pulseLengths"];
@@ -3265,6 +3373,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	[objDictionary setObject: [NSNumber numberWithInt:clockSource]					forKey:@"clockSource"];
 	[objDictionary setObject: [NSNumber numberWithLong:adc50KTriggerEnabledMask]	forKey:@"adc50KtriggerEnabledMask"];
 	[objDictionary setObject: [NSNumber numberWithLong:triggerOutEnabledMask]		forKey:@"triggerOutEnabledMask"];
+	[objDictionary setObject: [NSNumber numberWithLong:highEnergySuppressMask]		forKey:@"highEnergySuppressMask"];
 	[objDictionary setObject: [NSNumber numberWithLong:inputInvertedMask]			forKey:@"inputInvertedMask"];
 	[objDictionary setObject: [NSNumber numberWithLong:internalTriggerEnabledMask]	forKey:@"internalTriggerEnabledMask"];
 	[objDictionary setObject: [NSNumber numberWithLong:externalTriggerEnabledMask]	forKey:@"externalTriggerEnabledMask"];
@@ -3294,6 +3403,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	[objDictionary setObject:sampleLengths		forKey:@"sampleLengths"];
 	[objDictionary setObject: dacOffsets		forKey:@"dacOffsets"];
     [objDictionary setObject: thresholds		forKey:@"thresholds"];	
+    [objDictionary setObject: highThresholds	forKey:@"highThresholds"];	
     [objDictionary setObject: gateLengths		forKey:@"gateLengths"];	
     [objDictionary setObject: pulseLengths		forKey:@"pulseLengths"];	
     [objDictionary setObject: sumGs				forKey:@"sumGs"];	
@@ -3363,6 +3473,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 - (void) setUpArrays
 {
 	if(!thresholds)				thresholds			  = [[self arrayOfLength:kNumSIS3302Channels] retain];
+	if(!highThresholds)			highThresholds			  = [[self arrayOfLength:kNumSIS3302Channels] retain];
 	if(!dacOffsets)				dacOffsets			  = [[self arrayOfLength:kNumSIS3302Channels] retain];
 	if(!gateLengths)			gateLengths			  = [[self arrayOfLength:kNumSIS3302Channels] retain];
 	if(!pulseLengths)			pulseLengths		  = [[self arrayOfLength:kNumSIS3302Channels] retain];
