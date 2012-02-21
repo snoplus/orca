@@ -21,6 +21,7 @@
 
 #pragma mark ¥¥¥Imported Files
 #import "ORExperimentModel.h"
+@class ORCouchDB;
 
 #define kUseTubeView	0
 #define kUseCrateView	1
@@ -40,6 +41,10 @@
     BOOL            morcaIsWithinRun;
     NSString*       morcaStatus;
     BOOL            morcaIsUpdating;
+    NSMutableArray*		morcaConnectionHistory;
+    NSUInteger		morcaIPNumberIndex;
+    NSTask*			morcaPingTask;
+    NSMutableDictionary* morcaDBDict;
 }
 
 @property (copy)    NSString* morcaUserName;
@@ -52,6 +57,21 @@
 @property (assign)  BOOL morcaIsWithinRun;
 @property (copy)    NSString* morcaStatus;
 @property (assign)  BOOL morcaIsUpdating;
+
+- (void) initMorcaConnectionHistory;
+- (void) clearMorcaConnectionHistory;
+- (unsigned int) morcaConnectionHistoryCount;
+- (id) morcaConnectionHistoryItem:(unsigned int)index;
+- (void) morcaPing;
+- (void) taskFinished:(NSTask*)aTask;
+- (ORCouchDB*) morcaDBRef;
+- (void) morcaUpdateDB;
+- (void) morcaCompactDB;
+- (void) couchDBResult:(id)aResult tag:(NSString*)aTag;
+
+#pragma mark ¥¥¥Notifications
+- (void) registerNotificationObservers;
+- (void) runStateChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Accessors
 - (void) setViewType:(int)aViewType;

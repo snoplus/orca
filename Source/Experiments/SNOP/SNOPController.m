@@ -68,12 +68,71 @@
                      selector : @selector(viewTypeChanged:)
                          name : ORSNOPModelViewTypeChanged
 			object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(morcaIsVerboseChanged:)
+                         name : ORSNOPModelMorcaIsVerboseChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(morcaIsWithinRunChanged:)
+                         name : ORSNOPModelMorcaIsWithinRunChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(morcaUpdateRateChanged:)
+                         name : ORSNOPModelMorcaUpdateTimeChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(morcaPortChanged:)
+                         name : ORSNOPModelMorcaPortChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(morcaStatusChanged:)
+                         name : ORSNOPModelMorcaStatusChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(morcaUserNameChanged:)
+                         name : ORSNOPModelMorcaUserNameChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(morcaPasswordChanged:)
+                         name : ORSNOPModelMorcaPasswordChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(morcaDBNameChanged:)
+                         name : ORSNOPModelMorcaDBNameChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(morcaIPAddressChanged:)
+                         name : ORSNOPModelMorcaIPAddressChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(morcaIPAddressChanged:)
+                         name : ORSNOPModelMorcaIsUpdatingChanged
+                        object: model];
 }
 
 - (void) updateWindow
 {
 	[super updateWindow];
 	[self viewTypeChanged:nil];
+    [self morcaUserNameChanged:nil];
+    [self morcaPasswordChanged:nil];
+    [self morcaDBNameChanged:nil];
+    [self morcaPortChanged:nil];
+    [self morcaIPAddressChanged:nil];
+    [self morcaIsVerboseChanged:nil];
+    [self morcaIsWithinRunChanged:nil];
+    [self morcaUpdateRateChanged:nil];
+    [self morcaStatusChanged:nil];
 }
 
 - (void) viewTypeChanged:(NSNotification*)aNote
@@ -85,47 +144,47 @@
 
 - (void) morcaUserNameChanged:(NSNotification*)aNote
 {
-    
+    [morcaUserNameField setStringValue:[model morcaUserName]];
 }
 
 - (void) morcaPasswordChanged:(NSNotification*)aNote
 {
-    
+    [morcaPasswordField setStringValue:[model morcaPassword]];
 }
 
 - (void) morcaDBNameChanged:(NSNotification*)aNote
 {
-    
+    [morcaDBNameField setStringValue:[model morcaDBName]];
 }
 
 - (void) morcaPortChanged:(NSNotification*)aNote
 {
-    
+    [morcaPortField setStringValue:[NSString stringWithFormat:@"%d",[model morcaPort]]];
 }
 
 - (void) morcaIPAddressChanged:(NSNotification*)aNote
 {
-    
+    [morcaIPAddressPU setStringValue:[model morcaIPAddress]];
 }
 
 - (void) morcaIsVerboseChanged:(NSNotification*)aNote
 {
-    
+    [morcaIsVerboseButton setIntValue:[model morcaIsVerbose]];
 }
 
 - (void) morcaIsWithinRunChanged:(NSNotification*)aNote
 {
-    
+    [morcaIsWithinRunButton setIntValue:[model morcaIsWithinRun]];
 }
 
 - (void) morcaUpdateRateChanged:(NSNotification*)aNote
 {
-    
+    [morcaUpdateRatePU selectItemWithTag:[model morcaUpdateTime]];
 }
 
 - (void) morcaStatusChanged:(NSNotification*)aNote
 {
-    
+    [morcaStatusField setStringValue:[model morcaStatus]];
 }
 
 #pragma mark ¥¥¥Interface Management
@@ -135,48 +194,67 @@
 }
 
 - (IBAction)morcaUserNameAction:(id)sender {
+    [model setMorcaUserName:[sender stringValue]];
 }
 
 - (IBAction)morcaPasswordAction:(id)sender {
+    [model setMorcaPassword:[sender stringValue]];
 }
 
 - (IBAction)morcaDBNameAction:(id)sender {
+    [model setMorcaDBName:[sender stringValue]];
 }
 
 - (IBAction)morcaPortAction:(id)sender {
+    [model setMorcaPort:[sender intValue]];
 }
 
 - (IBAction)morcaIPAddressAction:(id)sender {
+    [model setMorcaIPAddress:[sender stringValue]];
 }
 
 - (IBAction)morcaClearHistoryAction:(id)sender {
+    [model clearMorcaConnectionHistory];
 }
 
-- (IBAction)morcaFutonAction:(id)sender {
+- (IBAction)morcaFutonAction:(id)sender {    
+    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://%@:%@@%@:%d/_utils/database.html?%@",
+        [model morcaUserName], [model morcaPassword], [model morcaIPAddress], [model morcaPort], [model morcaDBName]]]];
 }
 
 - (IBAction)morcaTestAction:(id)sender {
+    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://%@:%@@%@:%d",
+        [model morcaUserName], [model morcaPassword], [model morcaIPAddress], [model morcaPort]]]];
 }
 
 - (IBAction)morcaPingAction:(id)sender {
+    [model morcaPing];
 }
 
 - (IBAction)morcaUpdateNowAction:(id)sender {
+    [model morcaUpdateDB];
 }
 
 - (IBAction)morcaStartAction:(id)sender {
+    [model setMorcaIsUpdating:YES];
+    [model morcaCompactDB];
+    [model morcaUpdateDB];
 }
 
 - (IBAction)morcaStopAction:(id)sender {
+    [model setMorcaIsUpdating:NO];
 }
 
 - (IBAction)morcaIsVerboseAction:(id)sender {
+    [model setMorcaIsVerbose:[sender intValue]];
 }
 
 - (IBAction)morcaUpdateRateAction:(id)sender {
+    [model setMorcaUpdateTime:[[sender selectedItem] tag]];
 }
 
 - (IBAction)morcaUpdateWithinRunAction:(id)sender {
+    [model setMorcaIsWithinRun:[sender intValue]];
 }
 
 
@@ -247,5 +325,17 @@
 	int index = [tabView indexOfTabViewItem:tabViewItem];
 	[[NSUserDefaults standardUserDefaults] setInteger:index forKey:@"orca.SNOPController.selectedtab"];
 }
+
+#pragma mark ¥¥¥ComboBox Data Source
+- (NSInteger ) numberOfItemsInComboBox:(NSComboBox *)aComboBox
+{
+	return  [model morcaConnectionHistoryCount];
+}
+
+- (id)comboBox:(NSComboBox *)aComboBox objectValueForItemAtIndex:(NSInteger)index
+{
+	return [model morcaConnectionHistoryItem:index];
+}
+
 
 @end

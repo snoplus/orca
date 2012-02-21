@@ -23,6 +23,9 @@
 #import "SNOPModel.h"
 #import "SNOPController.h"
 #import "ORSegmentGroup.h"
+#import "ORTaskSequence.h"
+#import "ORCouchDB.h"
+#import "ORXL3Model.h"
 
 NSString* ORSNOPModelViewTypeChanged	= @"ORSNOPModelViewTypeChanged";
 static NSString* SNOPDbConnector	= @"SNOPDbConnector";
@@ -36,6 +39,17 @@ NSString* ORSNOPModelMorcaPasswordChanged = @"ORSNOPModelMorcaPasswordChanged";
 NSString* ORSNOPModelMorcaDBNameChanged = @"ORSNOPModelMorcaDBNameChanged";
 NSString* ORSNOPModelMorcaIPAddressChanged = @"ORSNOPModelMorcaIPAddressChanged";
 NSString* ORSNOPModelMorcaIsUpdatingChanged = @"ORSNOPModelMorcaIsUpdatingChanged";
+
+#define kMorcaDocumentAdded     @"kMorcaDocumentAdded"
+#define kMorcaDocumentGot       @"kMorcaDocumentGot"
+#define kMorcaCrateDocGot       @"kMorcaCrateDocGot"
+#define kMorcaCrateDocUpdated   @"kMorcaCrateDocUpdated"
+#define kMorcaCompactDB         @"kMorcaCompactDB"
+
+@interface SNOPModel (private)
+- (void) morcaUpdateDBDict;
+- (void) morcaUpdatePushDocs:(unsigned int) crate;
+@end
 
 @implementation SNOPModel
 
@@ -64,13 +78,32 @@ NSString* ORSNOPModelMorcaIsUpdatingChanged = @"ORSNOPModelMorcaIsUpdatingChange
 
 - (void) dealloc
 {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [morcaUserName release];
     [morcaPassword release];
     [morcaDBName release];
     [morcaIPAddress release];
     if (morcaStatus) [morcaStatus release];
+    if (morcaDBDict) [morcaDBDict release];
     
     [super dealloc];
+}
+
+- (void) sleep
+{
+    [super sleep];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(morcaUpdateDB) object:nil];
+}
+
+- (void) initMorcaConnectionHistory
+{
+	morcaIPNumberIndex = [[NSUserDefaults standardUserDefaults] integerForKey: [NSString stringWithFormat:@"orca.%@.morcaIPNumberIndex",[self className]]];
+	if(!morcaConnectionHistory){
+		NSArray* his = [[NSUserDefaults standardUserDefaults] objectForKey: [NSString stringWithFormat:@"orca.%@.morcaConnectionHistory",[self className]]];
+		morcaConnectionHistory = [his mutableCopy];
+	}
+	if(!morcaConnectionHistory) morcaConnectionHistory = [[NSMutableArray alloc] init];
 }
 
 //- (NSString*) helpURL
@@ -78,9 +111,38 @@ NSString* ORSNOPModelMorcaIsUpdatingChanged = @"ORSNOPModelMorcaIsUpdatingChange
 //	return @"SNO/Index.html";
 //}
 
+#pragma mark ¥¥¥Notifications
+- (void) registerNotificationObservers
+{
+    [super registerNotificationObservers];
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(runStateChanged:)
+                         name : ORRunStatusChangedNotification
+                       object : nil];    
+}
+
+- (void) runStateChanged:(NSNotification*)aNote
+{
+    int running = [[[aNote userInfo] objectForKey:ORRunStatusValue] intValue];
+    if(running == eRunStopped){
+        if (morcaIsWithinRun) {
+            [self setMorcaIsUpdating:NO];
+        }
+    }
+    else if(running == eRunStarting) {
+        if (morcaIsWithinRun) {
+            [self setMorcaIsUpdating:YES];
+            [self morcaUpdateDB];
+        }
+    }
+}
+
 #pragma mark ¥¥¥Accessors
 - (NSString*) morcaUserName
 {
+    if (!morcaUserName) return @"";
     return morcaUserName;
 }
 
@@ -94,6 +156,7 @@ NSString* ORSNOPModelMorcaIsUpdatingChanged = @"ORSNOPModelMorcaIsUpdatingChange
 
 - (NSString*) morcaPassword
 {
+    if (!morcaPassword) return @"";
     return morcaPassword;
 }
 
@@ -107,6 +170,7 @@ NSString* ORSNOPModelMorcaIsUpdatingChanged = @"ORSNOPModelMorcaIsUpdatingChange
 
 - (NSString*) morcaDBName
 {
+    if (!morcaDBName) return @"";
     return morcaDBName;
 }
 
@@ -118,17 +182,51 @@ NSString* ORSNOPModelMorcaIsUpdatingChanged = @"ORSNOPModelMorcaIsUpdatingChange
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelMorcaDBNameChanged object:self];        
 }
 
+- (void) clearMorcaConnectionHistory
+{
+	[morcaConnectionHistory release];
+	morcaConnectionHistory = nil;
+	
+	[self setMorcaIPAddress:[self morcaIPAddress]];
+}
+
+- (unsigned int) morcaConnectionHistoryCount
+{
+	return [morcaConnectionHistory count];
+}
+
+- (id) morcaConnectionHistoryItem:(unsigned int)index
+{
+	if(morcaConnectionHistory && index<[morcaConnectionHistory count])return [morcaConnectionHistory objectAtIndex:index];
+	else return nil;
+}
+
 - (NSString*) morcaIPAddress
 {
+    if (!morcaIPAddress) return @"";
     return morcaIPAddress;
 }
 
-- (void) setMorcaIPAddress:(NSString *)aMorcaIPAddress
+- (void) setMorcaIPAddress:(NSString*)aMorcaIPAddress
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setMorcaIPAddress:morcaIPAddress];
-    [morcaIPAddress autorelease];
-    morcaIPAddress = [aMorcaIPAddress copy];
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelMorcaIPAddressChanged object:self];        
+	if([aMorcaIPAddress length]){
+		
+		[[[self undoManager] prepareWithInvocationTarget:self] setMorcaIPAddress:morcaIPAddress];
+		
+		[morcaIPAddress autorelease];
+		morcaIPAddress = [aMorcaIPAddress copy];    
+		
+		if(!morcaConnectionHistory) morcaConnectionHistory = [[NSMutableArray alloc] init];
+		if(![morcaConnectionHistory containsObject:morcaIPAddress]){
+			[morcaConnectionHistory addObject:morcaIPAddress];
+		}
+		morcaIPNumberIndex = [morcaConnectionHistory indexOfObject:morcaIPAddress];
+		
+		[[NSUserDefaults standardUserDefaults] setObject:morcaConnectionHistory forKey:[NSString stringWithFormat:@"orca.%@.morcaConnectionHistory",[self className]]];
+		[[NSUserDefaults standardUserDefaults] setInteger:morcaIPNumberIndex forKey:[NSString stringWithFormat:@"orca.%@.morcaIPNumberIndex",[self className]]];
+		[[NSUserDefaults standardUserDefaults] synchronize];
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelMorcaIPAddressChanged object:self];
+	}
 }
 
 - (unsigned int) morcaPort;
@@ -206,6 +304,117 @@ NSString* ORSNOPModelMorcaIsUpdatingChanged = @"ORSNOPModelMorcaIsUpdatingChange
     
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelMorcaStatusChanged object:self];        
 }
+
+- (void) morcaPing
+{
+    if(!morcaPingTask){
+		ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
+		morcaPingTask = [[NSTask alloc] init];
+		
+		[morcaPingTask setLaunchPath:@"/sbin/ping"];
+		[morcaPingTask setArguments: [NSArray arrayWithObjects:@"-c",@"2",@"-t",@"5",@"-q",morcaIPAddress,nil]];
+		
+		[aSequence addTaskObj:morcaPingTask];
+		[aSequence setVerbose:YES];
+		[aSequence setTextToDelegate:YES];
+		[aSequence launch];
+	}
+	else {
+		[morcaPingTask terminate];
+	}
+}
+
+- (void) taskFinished:(NSTask*)aTask
+{
+	if(aTask == morcaPingTask){
+		[morcaPingTask release];
+		morcaPingTask = nil;
+	}
+}
+
+- (ORCouchDB*) morcaDBRef
+{
+	return [ORCouchDB couchHost:[self morcaIPAddress] port:[self morcaPort] username:[self morcaUserName]
+                            pwd:[self morcaPassword] database:[self morcaDBName] delegate:self];    
+}
+
+- (void) morcaUpdateDB {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(morcaUpdateDB) object:nil];
+    [self morcaUpdateDBDict];
+//    [self performSelector:@selector(morcaUpdatePushDocs) withObject:nil afterDelay:0.2];
+}
+
+- (void) morcaCompactDB {
+    [[self morcaDBRef] compactDatabase:self tag:kMorcaCompactDB];
+}
+
+- (void) couchDBResult:(id)aResult tag:(NSString*)aTag
+{
+	@synchronized(self){
+		if([aResult isKindOfClass:[NSDictionary class]]){
+			NSString* message = [aResult objectForKey:@"Message"];
+			if(message){
+				if([aTag isEqualToString:kMorcaCrateDocGot]){
+					NSLog(@"CouchDB Message getting a crate doc:");
+				}
+				[aResult prettyPrint:@"CouchDB Message:"];
+			}
+			else {
+				if([aTag isEqualToString:kMorcaDocumentAdded]){
+                    if ([self morcaIsVerbose]) {
+                        [aResult prettyPrint:@"CouchDB push doc to DB"];
+                    }
+					//ignore
+				}
+				else if([aTag isEqualToString:kMorcaDocumentGot]){
+					//[aResult prettyPrint:@"CouchDB Sent Doc:"];
+				}
+				else if([aTag rangeOfString:kMorcaCrateDocGot].location != NSNotFound){
+                    //int key = [[[aResult objectForKey:@"rows"] objectAtIndex:0] objectForKey:@"key"];
+                    if ([[aResult objectForKey:@"rows"] count] && [[[aResult objectForKey:@"rows"] objectAtIndex:0] objectForKey:@"key"]){
+                        [morcaDBDict setObject:[[[aResult objectForKey:@"rows"] objectAtIndex:0] objectForKey:@"doc"]
+                            forKey:[[[[aResult objectForKey:@"rows"] objectAtIndex:0] objectForKey:@"key"] stringValue]];
+                    }
+                    else {
+                        [morcaDBDict removeObjectForKey:[[aTag componentsSeparatedByString:@"."] objectAtIndex:1]];
+                    }
+                    if ([self morcaIsVerbose]) {
+                        [aResult prettyPrint:@"CouchDB pull doc from DB"];
+                    }
+                    [self morcaUpdatePushDocs:[[[aTag componentsSeparatedByString:@"."] objectAtIndex:1] intValue]];
+				}
+                else if([aTag isEqualToString:kMorcaCrateDocUpdated]){
+                    if ([self morcaIsVerbose]) {                    
+                        [aResult prettyPrint:@"CouchDB Compacted:"];
+                    }
+				}
+                else if([aTag isEqualToString:kMorcaCompactDB]){
+                    if ([self morcaIsVerbose]) {                    
+                        [aResult prettyPrint:@"CouchDB Compacted:"];
+                    }
+				}
+				else if([aTag isEqualToString:@"Message"]){
+					[aResult prettyPrint:@"CouchDB Message:"];
+				}
+				else {
+					[aResult prettyPrint:@"CouchDB"];
+				}
+			}
+		}
+		else if([aResult isKindOfClass:[NSArray class]]){
+            /*
+			if([aTag isEqualToString:kListDB]){
+				[aResult prettyPrint:@"CouchDB List:"];
+			else [aResult prettyPrint:@"CouchDB"];
+             */
+            [aResult prettyPrint:@"CouchDB"];
+		}
+		else {
+			NSLog(@"%@\n",aResult);
+		}
+	}
+}
+
 
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups
@@ -287,12 +496,13 @@ NSString* ORSNOPModelMorcaIsUpdatingChanged = @"ORSNOPModelMorcaIsUpdatingChange
 {
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
+	[self initMorcaConnectionHistory];
     
     [self setViewType:[decoder decodeIntForKey:@"viewType"]];
     [self setMorcaUserName:         [decoder decodeObjectForKey:@"ORSNOPModelMorcaUserName"]];
     [self setMorcaPassword:         [decoder decodeObjectForKey:@"ORSNOPModelMorcaPassword"]];
     [self setMorcaDBName:           [decoder decodeObjectForKey:@"ORSNOPModelMorcaDBName"]];
-    [self setMorcaPort:             [decoder decodeIntForKey:@"ORSNOPModelMoraPort"]];
+    [self setMorcaPort:             [decoder decodeIntForKey:@"ORSNOPModelMorcaPort"]];
     [self setMorcaIPAddress:        [decoder decodeObjectForKey:@"ORSNOPModelMorcaIPAddress"]];
     [self setMorcaUpdateTime:       [decoder decodeIntForKey:@"ORSNOPModelMorcaUpdateTime"]];
     [self setMorcaIsVerbose:        [decoder decodeBoolForKey:@"ORSNOPModelMorcaIsVerbose"]];
@@ -346,3 +556,74 @@ NSString* ORSNOPModelMorcaIsUpdatingChanged = @"ORSNOPModelMorcaIsUpdatingChange
 
 @end
 
+@implementation SNOPModel (private)
+- (void) morcaUpdateDBDict
+{
+    if (!morcaDBDict) morcaDBDict = [[NSMutableDictionary alloc] initWithCapacity:20];
+    NSArray* objs = [[self document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
+    ORXL3Model* xl3;
+    for (xl3 in objs) {
+        [[self morcaDBRef] getDocumentId:[NSString stringWithFormat:@"_design/xl3_status/_view/xl3_num?descending=True&start_key=%d&end_key=%d&limit=1&include_docs=True",[xl3 crateNumber], [xl3 crateNumber]]
+                                     tag:[NSString stringWithFormat:@"%@.%d", kMorcaCrateDocGot, [xl3 crateNumber]]];
+    }
+    //?
+    if ([self morcaIsUpdating]) {
+        if ([self morcaUpdateTime] == 0) {
+            [self performSelector:@selector(morcaUpdateDB) withObject:nil afterDelay:0.1];
+        }
+        else {
+            [self performSelector:@selector(morcaUpdateDB) withObject:nil afterDelay:[self morcaUpdateTime] - 0.2];
+        }
+    }
+}
+
+- (void) morcaUpdatePushDocs:(unsigned int) crate
+{
+    NSArray* objs = [[self document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
+    ORXL3Model* xl3;
+    for (xl3 in objs) {
+        if ([xl3 crateNumber] == crate) break;
+    }
+        
+    BOOL updateDoc = NO;
+    if ([[morcaDBDict objectForKey:[NSString stringWithFormat:@"%d",[xl3 crateNumber]]] objectForKey:@"_id"]){
+        [[xl3 pollDict] setObject:[[morcaDBDict objectForKey:[NSString stringWithFormat:@"%d",[xl3 crateNumber]]] objectForKey:@"_id"] forKey:@"_id"];
+        updateDoc = YES;
+    }
+    else {
+        if ([[xl3 pollDict] objectForKey:@"_id"]) {
+            [[xl3 pollDict] removeObjectForKey:@"_id"];
+        }
+        if ([[xl3 pollDict] objectForKey:@"_rev"]) {
+            [[xl3 pollDict] removeObjectForKey:@"_rev"];
+        }
+    }
+    if ([[morcaDBDict objectForKey:[NSString stringWithFormat:@"%d",[xl3 crateNumber]]] objectForKey:@"_rev"]){
+        [[xl3 pollDict] setObject:[[morcaDBDict objectForKey:[NSString stringWithFormat:@"%d",[xl3 crateNumber]]] objectForKey:@"_rev"] forKey:@"_rev"];
+    }
+    [[xl3 pollDict] setObject:[NSNumber numberWithInt:[xl3 crateNumber]] forKey:@"xl3_num"];
+    NSDateFormatter* iso = [[NSDateFormatter alloc] init];
+    [iso setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss'Z'"];
+    iso.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
+    iso.calendar = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
+    iso.locale = [[[NSLocale alloc] initWithLocaleIdentifier:@"en_US"] autorelease];
+    NSString* str = [iso stringFromDate:[NSDate date]];
+    [[xl3 pollDict] setObject:str forKey:@"time_stamp"];
+    if (updateDoc) {
+        [[self morcaDBRef] updateDocument:[xl3 pollDict] documentId:[[xl3 pollDict] objectForKey:@"_id"] tag:kMorcaCrateDocUpdated];
+    }
+    else{
+        [[self morcaDBRef] addDocument:[xl3 pollDict] tag:kMorcaCrateDocUpdated];
+    }
+    
+    if (xl3 == [objs lastObject] && [self morcaIsUpdating]) {
+        if ([self morcaUpdateTime] == 0) {
+            [self performSelector:@selector(morcaUpdateDB) withObject:nil afterDelay:0.2];
+        }
+        else {
+            [self performSelector:@selector(morcaUpdateDB) withObject:nil afterDelay:[self morcaUpdateTime] - 0.2];
+        }
+    }
+}
+
+@end
