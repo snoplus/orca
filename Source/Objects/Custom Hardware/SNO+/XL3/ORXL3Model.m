@@ -82,9 +82,9 @@ NSString* ORXL3ModelIsPollingVerboseChanged =       @"ORXL3ModelIsPollingVerbose
 @end
 
 @implementation ORXL3Model
+@synthesize pollDict;
 
 #pragma mark •••Initialization
-
 - (id) init
 {
 	self = [super init];
@@ -101,6 +101,7 @@ NSString* ORXL3ModelIsPollingVerboseChanged =       @"ORXL3ModelIsPollingVerbose
 	[xl3Link release];
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
     if (pollThread) [pollThread release];
+    [pollDict release];
 	[super dealloc];
 }
 
@@ -852,6 +853,9 @@ void SwapLongBlock(void* p, int32_t n)
 	if (xl3Mode == 0) [self setXl3Mode: 1];
 	if (xl3OpsRunning == nil) xl3OpsRunning = [[NSMutableDictionary alloc] init];
     if (isPollingXl3 == YES) [self setIsPollingXl3:NO];
+
+    pollDict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
+                @"XL3_status", @"doc_type", nil];
 
 	[[self undoManager] enableUndoRegistration];
 	return self;

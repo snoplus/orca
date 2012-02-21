@@ -54,6 +54,8 @@ eXL3_CrateStates;
 	unsigned long long num_cmd_packets;
 	unsigned long long num_dat_packets;
 	XL3_Packet	aMultiCmdPacket;
+    NSArray*    fifoStatus;         //array of 16 diffs between write and read FEC pointers
+    NSDate*     fifoTimeStamp;      //time stamp when fifoStatus received
     
 @private
     //memory optimized circular buffer, motivated by ORSafeCirularBuffer. Thanks Mark.
@@ -70,8 +72,10 @@ eXL3_CrateStates;
     long            bundleFreeSpace;
 }
 
-@property (assign)	BOOL    isConnected;
-@property (assign)	BOOL    autoConnect;
+@property (assign)	BOOL        isConnected;
+@property (assign)	BOOL        autoConnect;
+@property (copy)    NSArray*    fifoStatus;
+@property (copy)    NSDate*     fifoTimeStamp;
 
 - (id)   init;
 - (void) dealloc;

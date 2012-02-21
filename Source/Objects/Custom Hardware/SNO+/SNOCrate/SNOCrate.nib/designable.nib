@@ -50,7 +50,7 @@
 			<object class="NSWindowTemplate" id="716638356">
 				<int key="NSWindowStyleMask">7</int>
 				<int key="NSWindowBacking">2</int>
-				<string key="NSWindowRect">{{697, 396}, {316, 390}}</string>
+				<string key="NSWindowRect">{{88, 351}, {316, 390}}</string>
 				<int key="NSWTFlags">1886912512</int>
 				<string key="NSWindowTitle">SNO Crate</string>
 				<string key="NSWindowClass">NSWindow</string>
@@ -346,7 +346,7 @@
 										<object class="NSButton" id="527844002">
 											<reference key="NSNextResponder" ref="674872960"/>
 											<int key="NSvFlags">268</int>
-											<string key="NSFrame">{{53, 9}, {26, 26}}</string>
+											<string key="NSFrame">{{52, 7}, {28, 28}}</string>
 											<reference key="NSSuperview" ref="674872960"/>
 											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="260786490"/>
@@ -376,7 +376,7 @@
 										<object class="NSButton" id="172801433">
 											<reference key="NSNextResponder" ref="674872960"/>
 											<int key="NSvFlags">268</int>
-											<string key="NSFrame">{{8, 9}, {26, 26}}</string>
+											<string key="NSFrame">{{7, 7}, {28, 28}}</string>
 											<reference key="NSSuperview" ref="674872960"/>
 											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="292359928"/>
@@ -569,7 +569,6 @@
 											<string key="NSFrame">{{91, 14}, {182, 12}}</string>
 											<reference key="NSSuperview" ref="313501653"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView"/>
 											<int key="NSpiFlags">24840</int>
 											<double key="NSMaxValue">100</double>
 										</object>

@@ -80,9 +80,10 @@ NSString* XL3_LinkAutoConnectChanged    = @"XL3_LinkAutoConnectChanged";
 		[cmdArray release];
 		cmdArray = nil;
 	}
-	//[bundleBuffer release];
-    if (bundleBuffer) {
-        [self releaseBuffer];
+    if (bundleBuffer) [self releaseBuffer];
+    if (fifoStatus) {
+        [fifoStatus release];
+        fifoStatus = nil;
     }
     
 	[super dealloc];
@@ -340,6 +341,54 @@ NSString* XL3_LinkAutoConnectChanged    = @"XL3_LinkAutoConnectChanged";
 	}
 }	
 
+- (NSArray*) fifoStatus
+{
+    return fifoStatus; //may return nil
+}
+
+- (void) setFifoStatus:(NSArray *)aFifoStatus
+{
+    if (fifoStatus) [fifoStatus release];
+
+    fifoStatus = [aFifoStatus copy];
+    fifoTimeStamp = [NSDate date];
+}
+
+- (void) copyFifoStatus:(int32_t*)aStatus
+{
+    NSArray* fifo = [[NSArray alloc] initWithObjects:
+                     [NSNumber numberWithInt:aStatus[0]],
+                     [NSNumber numberWithInt:aStatus[1]],
+                     [NSNumber numberWithInt:aStatus[2]],
+                     [NSNumber numberWithInt:aStatus[3]],
+                     [NSNumber numberWithInt:aStatus[4]],
+                     [NSNumber numberWithInt:aStatus[5]],
+                     [NSNumber numberWithInt:aStatus[6]],
+                     [NSNumber numberWithInt:aStatus[7]],
+                     [NSNumber numberWithInt:aStatus[8]],
+                     [NSNumber numberWithInt:aStatus[9]],
+                     [NSNumber numberWithInt:aStatus[10]],
+                     [NSNumber numberWithInt:aStatus[11]],
+                     [NSNumber numberWithInt:aStatus[12]],
+                     [NSNumber numberWithInt:aStatus[13]],
+                     [NSNumber numberWithInt:aStatus[14]],
+                     [NSNumber numberWithInt:aStatus[15]],
+                     nil];
+
+    [self setFifoStatus:fifo];
+    [fifo release];
+    fifo = nil;
+}
+
+- (NSDate*) fifoTimeStamp
+{
+    return fifoTimeStamp;
+}
+
+- (void) setFifoTimeStamp:(NSDate *)fifoTimeStamp;
+{
+    
+}
 - (void) newMultiCmd
 {
 	aMultiCmdPacket.cmdHeader.packet_type = MULTI_FAST_CMD_ID;
@@ -765,6 +814,9 @@ static void SwapLongBlock(void* p, int32_t n)
             else if (((XL3_Packet*) aPacket)->cmdHeader.packet_type == PING_ID) {
                 //NSLog(@"%@: received ping request\n", [self crateName]);
                 (((XL3_Packet*) aPacket)->cmdHeader.packet_type = PONG_ID);
+                //get data
+                if (needToSwap) SwapLongBlock(((XL3_Packet*) aPacket)->payload, 16);
+                [self copyFifoStatus:(int32_t*)((XL3_Packet*) aPacket)->payload];
                 @try {
                     [commandSocketLock lock]; //begin critial section
                     [self writePacket:(char*) aPacket];

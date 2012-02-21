@@ -105,6 +105,7 @@ enum {
 @property (assign)  BOOL            isPollingXl3WithRun;
 @property (assign)  BOOL            isPollingVerbose;
 @property (copy)    NSString*       pollStatus;
+@property (readonly, nonatomic) NSMutableDictionary* pollDict;
 
 #pragma mark •••Initialization
 - (id)   init;

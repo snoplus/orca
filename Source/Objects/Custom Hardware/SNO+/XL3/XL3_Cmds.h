@@ -457,4 +457,3 @@ typedef struct{
 typedef struct{
     uint32_t screwed[16];
 } screwed_packet_t;
-
