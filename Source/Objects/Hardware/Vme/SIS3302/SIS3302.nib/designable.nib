@@ -12,7 +12,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="4343"/>
+			<integer value="2"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1604,9 +1604,9 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 																	<string key="NSKeyEquivalent"/>
 																	<int key="NSPeriodicDelay">400</int>
 																	<int key="NSPeriodicInterval">75</int>
-																	<object class="NSMenuItem" key="NSMenuItem" id="934919765">
+																	<object class="NSMenuItem" key="NSMenuItem" id="94663490">
 																		<reference key="NSMenu" ref="607901678"/>
-																		<string key="NSTitle">1 MHz</string>
+																		<string key="NSTitle">100 MHz (BAD)</string>
 																		<string key="NSKeyEquiv"/>
 																		<int key="NSKeyEquivModMask">1048576</int>
 																		<int key="NSMnemonicLoc">2147483647</int>
@@ -1614,7 +1614,7 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 																		<reference key="NSOnImage" ref="877952183"/>
 																		<reference key="NSMixedImage" ref="37987701"/>
 																		<string key="NSAction">_popUpItemAction:</string>
-																		<int key="NSTag">4</int>
+																		<int key="NSTag">5</int>
 																		<reference key="NSTarget" ref="485200201"/>
 																	</object>
 																	<bool key="NSMenuItemRespectAlignment">YES</bool>
@@ -1670,19 +1670,19 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 																				<int key="NSTag">3</int>
 																				<reference key="NSTarget" ref="485200201"/>
 																			</object>
-																			<reference ref="934919765"/>
-																			<object class="NSMenuItem" id="94663490">
+																			<object class="NSMenuItem" id="934919765">
 																				<reference key="NSMenu" ref="607901678"/>
-																				<string key="NSTitle">100 KHz</string>
+																				<string key="NSTitle">1 MHz</string>
 																				<string key="NSKeyEquiv"/>
 																				<int key="NSKeyEquivModMask">1048576</int>
 																				<int key="NSMnemonicLoc">2147483647</int>
 																				<reference key="NSOnImage" ref="877952183"/>
 																				<reference key="NSMixedImage" ref="37987701"/>
 																				<string key="NSAction">_popUpItemAction:</string>
-																				<int key="NSTag">5</int>
+																				<int key="NSTag">4</int>
 																				<reference key="NSTarget" ref="485200201"/>
 																			</object>
+																			<reference ref="94663490"/>
 																			<object class="NSMenuItem" id="650224594">
 																				<reference key="NSMenu" ref="607901678"/>
 																				<string key="NSTitle">External</string>
@@ -1709,7 +1709,7 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 																			</object>
 																		</object>
 																	</object>
-																	<int key="NSSelectedIndex">4</int>
+																	<int key="NSSelectedIndex">5</int>
 																	<int key="NSPreferredEdge">1</int>
 																	<bool key="NSUsesItemFromMenu">YES</bool>
 																	<bool key="NSAltersState">YES</bool>
@@ -6383,8 +6383,8 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 																	<reference key="NSBackgroundColor" ref="136485394"/>
 																	<reference key="NSTextColor" ref="1040937895"/>
 																</object>
-																<int key="NSSelectedRow">-1</int>
-																<int key="NSSelectedCol">-1</int>
+																<int key="NSSelectedRow">1</int>
+																<reference key="NSSelectedCell" ref="552619385"/>
 																<reference key="NSBackgroundColor" ref="252786761"/>
 																<reference key="NSCellBackgroundColor" ref="252786761"/>
 															</object>
@@ -7753,8 +7753,8 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 																	<int key="NSPeriodicDelay">200</int>
 																	<int key="NSPeriodicInterval">25</int>
 																</object>
-																<int key="NSSelectedRow">1</int>
-																<reference key="NSSelectedCell" ref="358809726"/>
+																<int key="NSSelectedRow">-1</int>
+																<int key="NSSelectedCol">-1</int>
 																<reference key="NSBackgroundColor" ref="252786761"/>
 																<reference key="NSCellBackgroundColor" ref="252786761"/>
 															</object>
@@ -9167,14 +9167,18 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 				<string key="NSClassName">OHexFormatter</string>
 			</object>
 			<object class="NSView" id="247092581">
-				<nil key="NSNextResponder"/>
+				<reference key="NSNextResponder"/>
 				<int key="NSvFlags">256</int>
 				<string key="NSFrameSize">{372, 1}</string>
+				<reference key="NSSuperview"/>
+				<reference key="NSWindow"/>
 			</object>
 			<object class="NSView" id="517310593">
-				<nil key="NSNextResponder"/>
+				<reference key="NSNextResponder"/>
 				<int key="NSvFlags">256</int>
 				<string key="NSFrameSize">{372, 1}</string>
+				<reference key="NSSuperview"/>
+				<reference key="NSWindow"/>
 			</object>
 		</object>
 		<object class="IBObjectContainer" key="IBDocument.Objects">
@@ -15694,10 +15698,12 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 					<string>1363.IBPluginDependency</string>
 					<string>1364.IBPluginDependency</string>
 					<string>1365.IBPluginDependency</string>
+					<string>1366.IBEditorWindowLastContentRect</string>
 					<string>1366.IBPluginDependency</string>
 					<string>1378.IBPluginDependency</string>
 					<string>1379.IBPluginDependency</string>
 					<string>1380.IBPluginDependency</string>
+					<string>1381.IBEditorWindowLastContentRect</string>
 					<string>1381.IBPluginDependency</string>
 					<string>1384.IBPluginDependency</string>
 					<string>1386.IBPluginDependency</string>
@@ -16432,10 +16438,12 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>{{63, 1075}, {372, 1}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>{{84, 1052}, {372, 1}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -16479,7 +16487,7 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 					<object class="NSAffineTransform">
 						<bytes key="NSTransformStruct">P4AAAL+AAABAwAAAwiwAAA</bytes>
 					</object>
-					<string>{{564, 847}, {141, 139}}</string>
+					<string>{{752, 471}, {141, 139}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -16500,9 +16508,9 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{301, -159}, {1273, 613}}</string>
+					<string>{{454, 55}, {1273, 613}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{301, -159}, {1273, 613}}</string>
+					<string>{{454, 55}, {1273, 613}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
