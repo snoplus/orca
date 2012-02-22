@@ -78,11 +78,10 @@ NSString* ORXL3ModelIsPollingVerboseChanged =       @"ORXL3ModelIsPollingVerbose
 @interface ORXL3Model (private)
 - (void) doBasicOp;
 - (void) _pollXl3;
-- (void) pollXl3Done:(NSNumber*)runTime;
 @end
 
 @implementation ORXL3Model
-@synthesize pollDict;
+@synthesize pollDict, isPollingForced;
 
 #pragma mark •••Initialization
 - (id) init
@@ -1824,6 +1823,7 @@ void SwapLongBlock(void* p, int32_t n)
             }
         }
         NSLog(msg);
+
     }
     //pollDict
     if (isPollingXl3) {
@@ -1838,6 +1838,7 @@ void SwapLongBlock(void* p, int32_t n)
         NSMutableArray* time_stamps = [NSMutableArray arrayWithCapacity:16];
         unsigned char ch, sl;
         unsigned char slot_idx = 0;
+
         for (sl = 0; sl < 16; sl++) {
             if ((msk >> sl) && 0x1) {
                 if (num_slots > 8) {
@@ -1874,13 +1875,11 @@ void SwapLongBlock(void* p, int32_t n)
             }
             [rates addObject:slot_rates]; //yes, we may add an empty array
             [slot_rates removeAllObjects];
-        }
-        
+        }      
         [pollDict setObject:slot_rates forKey:@"cmos_rt"];
         [pollDict setObject:time_stamps forKey:@"cmos_rt_time_stamp"];
         [pollDict setObject:[NSNumber numberWithInt:msk] forKey:@"cmos_rt_slot_mask"];
     }
-
 }
 
 - (void) readPMTBaseCurrentsWithArgs:(read_pmt_base_currents_args_t*)aArgs currents:(read_pmt_base_currents_results_t*)result
@@ -2002,8 +2001,8 @@ void SwapLongBlock(void* p, int32_t n)
         NSMutableArray* slot_currents = [NSMutableArray arrayWithCapacity:32];
         unsigned char ch, sl;
         for (sl = 0; sl < 16; sl++) {
-            if ((msk >> sl) && 0x1) {
-                for (ch = 0; ch < 32; sl++) {
+            if ((msk >> sl) & 0x1) {
+                for (ch = 0; ch < 32; ch++) {
                     NSNumber *number = [[NSNumber alloc] initWithInt:results.current_adc[sl*32 + ch]];
                     [slot_currents addObject:number];
                     [number release];
@@ -2351,12 +2350,12 @@ void SwapLongBlock(void* p, int32_t n)
 		msk |= 1 << [key stationNumber];
 	}
     if (isPollingXl3 || isPollingForced) {
-        msk &= pollFECVoltagesMask;
+        msk &= aSlotMask;
     }
 
     unsigned char slot;
     for (slot=0; slot<16; slot++) {
-        if ((msk >> slot) && 0x1) {
+        if ((msk >> slot) & 0x1) {
             [self readVMONForSlot:slot];
             if (pollThread && [pollThread isCancelled]) break;
         }
@@ -2407,8 +2406,8 @@ void SwapLongBlock(void* p, int32_t n)
         [msg appendFormat:@"VCC: %f V\n", result.voltages[0]];
         [msg appendFormat:@"VEE: %f V\n", result.voltages[1]];
         //[msg appendFormat:@"VP8: %f V\n", result.voltages[2]];
-        [msg appendFormat:@"VP24: %f degC\n", result.voltages[3]];
-        [msg appendFormat:@"VM24: %f degC\n", result.voltages[4]];
+        [msg appendFormat:@"VP24: %f V\n", result.voltages[3]];
+        [msg appendFormat:@"VM24: %f V\n", result.voltages[4]];
         [msg appendFormat:@"TMP0: %f degC\n", result.voltages[5]];
         [msg appendFormat:@"TMP1: %f degC\n", result.voltages[6]];
         [msg appendFormat:@"TMP2: %f degC\n", result.voltages[7]];
@@ -2586,44 +2585,49 @@ void SwapLongBlock(void* p, int32_t n)
 - (void) _pollXl3
 {
     NSAutoreleasePool* pollPool = [[NSAutoreleasePool alloc] init];
-    NSDate* pollStartDate = [NSDate date];
-    
-    if (isPollingCMOSRates && (![[NSThread currentThread] isCancelled] || isPollingForced)) {
-        [self readCMOSRateWithDelay:10]; //[msec]
-    }
-    
-    if (isPollingPMTCurrents && (![[NSThread currentThread] isCancelled] || isPollingForced)) {
-        [self readPMTBaseCurrents];
-    }
-    
-    if (isPollingFECVoltages && (![[NSThread currentThread] isCancelled] || isPollingForced)) {
-        sleep(0.4);
-    }
-    
-    if (isPollingXl3Voltages && (![[NSThread currentThread] isCancelled] || isPollingForced)) {
-        [self readVMONXL3];
-    }
-    
-    if (isPollingHVSupply && (![[NSThread currentThread] isCancelled] || isPollingForced)) {
-        [self readHVStatus];
-    }
-    
-    NSNumber* runTime = [NSNumber numberWithDouble:-[pollStartDate timeIntervalSinceNow]];
-    [self performSelectorOnMainThread:@selector(pollXl3Done:) withObject:runTime waitUntilDone:YES];
-    
-    [pollPool release];
-}
+    NSDate* pollStartDate;
+    NSDate* nextStartDate;
+    NSNumber* runTime;
+    NSTimeInterval startTime;
+    BOOL isTimeToQuit = NO;
 
-- (void) pollXl3Done:(NSNumber*)runTime
-{
-    NSLog(@"poll loop took %lf sec\n", [runTime floatValue]);
-    isPollingForced = NO;
-    if (isPollingXl3) {
-        NSTimeInterval startTime = pollXl3Time - [runTime floatValue];
-        if (startTime < 0.1) startTime = 0.1;
-        [self performSelector:@selector(pollXl3:) withObject:nil afterDelay:startTime];
+    while (!isTimeToQuit) {        
+        pollStartDate = [NSDate date];
+        if (isPollingCMOSRates && (![[NSThread currentThread] isCancelled] || isPollingForced)) {
+            [self readCMOSRateWithDelay:10]; //[msec]
+        }
+        
+        if (isPollingPMTCurrents && (![[NSThread currentThread] isCancelled] || isPollingForced)) {
+            [self readPMTBaseCurrents];
+        }
+        
+        if (isPollingFECVoltages && (![[NSThread currentThread] isCancelled] || isPollingForced)) {
+            [self readVMONWithMask:[self pollFECVoltagesMask]];
+        }
+        
+        if (isPollingXl3Voltages && (![[NSThread currentThread] isCancelled] || isPollingForced)) {
+            [self readVMONXL3];
+        }
+        
+        if (isPollingHVSupply && (![[NSThread currentThread] isCancelled] || isPollingForced)) {
+            [self readHVStatus];
+        }
+
+        if (isPollingForced || [[NSThread currentThread] isCancelled]) isTimeToQuit = YES;
+
+        runTime = [NSNumber numberWithDouble:-[pollStartDate timeIntervalSinceNow]];
+        startTime = pollXl3Time - [runTime floatValue];
+        if (startTime < 0.01) startTime = 0.01;
+        nextStartDate = [NSDate dateWithTimeIntervalSinceNow:startTime];
+        while (!isTimeToQuit && [nextStartDate timeIntervalSinceNow] > 0.) {
+            usleep(100000);
+            if ([[NSThread currentThread] isCancelled]) isTimeToQuit = YES;
+            if (![self isPollingXl3]) isTimeToQuit = YES;
+        }
+        
+        [self setIsPollingForced:NO];
     }
-    return;
+    [pollPool release];
 }
 
 @end

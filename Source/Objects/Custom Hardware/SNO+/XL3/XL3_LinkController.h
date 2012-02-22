@@ -145,6 +145,7 @@
 - (void) monIsPollingHVSupplyChanged:(NSNotification*)aNote;
 - (void) monIsPollingXl3WithRunChanged:(NSNotification*)aNote;
 - (void) monPollStatusChanged:(NSNotification*)aNote;
+- (void) monIsPollingVerboseChanged:(NSNotification*)aNote;
 //ip connection
 - (void) connectStateChanged:(NSNotification*)aNote;
 - (void) linkConnectionChanged:(NSNotification*)aNote;

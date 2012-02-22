@@ -106,6 +106,7 @@ enum {
 @property (assign)  BOOL            isPollingVerbose;
 @property (copy)    NSString*       pollStatus;
 @property (readonly, nonatomic) NSMutableDictionary* pollDict;
+@property (assign)  BOOL            isPollingForced;
 
 #pragma mark •••Initialization
 - (id)   init;

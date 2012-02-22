@@ -237,6 +237,11 @@ static NSDictionary* xl3Ops;
                      selector : @selector(monPollStatusChanged:)
                          name : ORXL3ModelPollStatusChanged
                        object : model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(monIsPollingVerboseChanged:)
+                         name : ORXL3ModelIsPollingVerboseChanged
+                       object : model];
 }
 
 - (void) updateWindow
@@ -273,6 +278,7 @@ static NSDictionary* xl3Ops;
     [self monIsPollingHVSupplyChanged:nil];
     [self monIsPollingXl3WithRunChanged:nil];
     [self monPollStatusChanged:nil];
+    [self monIsPollingVerboseChanged:nil];
 	//ip connection
 	[self errorTimeOutChanged:nil];
     [self connectStateChanged:nil];
@@ -498,6 +504,11 @@ static NSDictionary* xl3Ops;
 - (void) monPollStatusChanged:(NSNotification*)aNote
 {
     [monPollingStatusField setStringValue:[model pollStatus]];
+}
+
+- (void) monIsPollingVerboseChanged:(NSNotification*)aNote;
+{
+    [monIsPollingVerboseButton setIntValue:[model isPollingVerbose]];
 }
 
 #pragma mark •ip connection
