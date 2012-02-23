@@ -1888,7 +1888,7 @@ void SwapLongBlock(void* p, int32_t n)
         
         if ([[ORGlobal sharedGlobal] runInProgress]) {
             unsigned long data[21 + 8*32];
-            data[0] = cmosRateDataId | 5; 
+            data[0] = cmosRateDataId | (21+8*32); 
             data[1] = [self crateNumber];
             data[2] = args_lo.slot_mask;
             memcpy(data+3, args_lo.channel_masks, 16);
