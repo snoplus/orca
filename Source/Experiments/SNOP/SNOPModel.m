@@ -615,7 +615,8 @@ NSString* ORSNOPModelMorcaIsUpdatingChanged = @"ORSNOPModelMorcaIsUpdatingChange
     else{
         [[self morcaDBRef] addDocument:[xl3 pollDict] tag:kMorcaCrateDocUpdated];
     }
-    
+    [iso release];
+    iso = nil;
     if (xl3 == [objs lastObject] && [self morcaIsUpdating]) {
         if ([self morcaUpdateTime] == 0) {
             [self performSelector:@selector(morcaUpdateDB) withObject:nil afterDelay:0.2];

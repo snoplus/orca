@@ -837,7 +837,8 @@ void SwapLongBlock(void* p, int32_t n)
     [self setXl3ChargeInjCharge:    [decoder decodeIntForKey: @"ORXL3ModelXl3ChargeInjCharge"]];
 
     [self setPollXl3Time:           [decoder decodeIntForKey:@"ORXL3ModelPollXl3Time"]];
-    [self setIsPollingXl3:          [decoder decodeBoolForKey:@"ORXL3ModelIsPollingXl3"]];
+    //[self setIsPollingXl3:          [decoder decodeBoolForKey:@"ORXL3ModelIsPollingXl3"]];
+    [self setIsPollingXl3:NO];
     [self setIsPollingCMOSRates:    [decoder decodeBoolForKey:@"ORXL3ModelIsPollingCMOSRates"]];
     [self setPollCMOSRatesMask:     [decoder decodeIntForKey:@"ORXL3ModelPollCMOSRatesMask"]];
     [self setIsPollingPMTCurrents:  [decoder decodeBoolForKey:@"ORXL3ModelIsPollingPMTCurrents"]];
@@ -851,7 +852,7 @@ void SwapLongBlock(void* p, int32_t n)
 
 	if (xl3Mode == 0) [self setXl3Mode: 1];
 	if (xl3OpsRunning == nil) xl3OpsRunning = [[NSMutableDictionary alloc] init];
-    if (isPollingXl3 == YES) [self setIsPollingXl3:NO];
+    //if (isPollingXl3 == YES) [self setIsPollingXl3:NO];
 
     pollDict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
                 @"XL3_status", @"doc_type", nil];
@@ -1767,6 +1768,7 @@ void SwapLongBlock(void* p, int32_t n)
         NSLog(@"%@ error in readCMOSCRateForSlot, error_flags_lo: 0x%08x, error_flags_hi: 0x%08x\n",
               [[self xl3Link] crateName], results_lo.error_flags, results_hi.error_flags);
     }
+
     else if (!isPollingXl3 || isPollingVerbose) {
         NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ CMOS rates: %d\n", [[self xl3Link] crateName]];
         unsigned char slot_idx = 0;
@@ -1775,7 +1777,7 @@ void SwapLongBlock(void* p, int32_t n)
             slot_idx = 0;
             unsigned char j = 0;
             for (i=0; i<8; i++) {
-                if ((msk >> i) && 0x1) {
+                if ((msk >> i) & 0x1) {
                     [msg appendFormat:@"slot %2d, ch00-07:", i];
                     for (j=0; j<8; j++) [msg appendFormat:@"%3.1f ", results_lo.rates[slot_idx*32 + j]];
                     [msg appendFormat:@"\nslot %2d, ch08-15:", i];
@@ -1790,7 +1792,7 @@ void SwapLongBlock(void* p, int32_t n)
             }
             slot_idx=0;
             for (i=0; i<8; i++) {
-                if ((msk >> (i + 8)) && 0x1) {
+                if ((msk >> (i + 8)) & 0x1) {
                     [msg appendFormat:@"slot %2d, ch00-07:", i + 8];
                     for (j=0; j<8; j++) [msg appendFormat:@"%3.1f ", results_hi.rates[slot_idx*32 + j]];
                     [msg appendFormat:@"\nslot %2d, ch08-15:", i + 8];
@@ -1808,7 +1810,7 @@ void SwapLongBlock(void* p, int32_t n)
             slot_idx = 0;
             unsigned char j = 0;
             for (i=0; i<16; i++) {
-                 if ((msk >> i) && 0x1) {
+                 if ((msk >> i) & 0x1) {
                      [msg appendFormat:@"slot %2d, ch00-07:", i];
                      for (j=0; j<8; j++) [msg appendFormat:@"%3.1f ", results_lo.rates[slot_idx*32 + j]];
                      [msg appendFormat:@"\nslot %2d, ch08-15:", i];
@@ -1833,38 +1835,42 @@ void SwapLongBlock(void* p, int32_t n)
         iso.calendar = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
         iso.locale = [[[NSLocale alloc] initWithLocaleIdentifier:@"en_US"] autorelease];
         NSString* str = [iso stringFromDate:[NSDate date]];
-        NSMutableArray* rates = [NSMutableArray arrayWithCapacity:16];
-        NSMutableArray* slot_rates = [NSMutableArray arrayWithCapacity:32];
-        NSMutableArray* time_stamps = [NSMutableArray arrayWithCapacity:16];
+        NSMutableArray* rates = [[[NSMutableArray alloc] initWithCapacity:16] autorelease];
+        NSMutableArray* slot_rates;
+        NSMutableArray* time_stamps = [[[NSMutableArray alloc] initWithCapacity:16] autorelease];
         unsigned char ch, sl;
         unsigned char slot_idx = 0;
-
         for (sl = 0; sl < 16; sl++) {
-            if ((msk >> sl) && 0x1) {
+            slot_rates = [[[NSMutableArray alloc] initWithCapacity:32] autorelease];
+
+            if ((msk >> sl) & 0x1) {
                 if (num_slots > 8) {
                     if (sl==8) slot_idx = 0;
                     if (sl < 8) {
-                        for (ch = 0; ch < 32; sl++) {
+                        for (ch = 0; ch < 32; ch++) {
                             NSNumber *number = [[NSNumber alloc] initWithInt:results_lo.rates[slot_idx*32 + ch]];
                             [slot_rates addObject:number];
                             [number release];
+                            number = nil;
                         }
                         slot_idx++;
                     }
                     else {
-                        for (ch = 0; ch < 32; sl++) {
+                        for (ch = 0; ch < 32; ch++) {
                             NSNumber *number = [[NSNumber alloc] initWithInt:results_hi.rates[slot_idx*32 + ch]];
                             [slot_rates addObject:number];
                             [number release];
+                            number = nil;
                         }
                         slot_idx++;
                     }
                 }
                 else {
-                    for (ch = 0; ch < 32; sl++) {
+                    for (ch = 0; ch < 32; ch++) {
                         NSNumber *number = [[NSNumber alloc] initWithInt:results_lo.rates[slot_idx*32 + ch]];
                         [slot_rates addObject:number];
                         [number release];
+                        number = nil;
                     }
                     slot_idx++;
                 }
@@ -1874,11 +1880,11 @@ void SwapLongBlock(void* p, int32_t n)
                 [time_stamps addObject:@""];
             }
             [rates addObject:slot_rates]; //yes, we may add an empty array
-            [slot_rates removeAllObjects];
-        }      
-        [pollDict setObject:slot_rates forKey:@"cmos_rt"];
+        }
+        [pollDict setObject:rates forKey:@"cmos_rt"];
         [pollDict setObject:time_stamps forKey:@"cmos_rt_time_stamp"];
         [pollDict setObject:[NSNumber numberWithInt:msk] forKey:@"cmos_rt_slot_mask"];
+        [iso release]; iso = nil;
     }
 }
 
@@ -1998,23 +2004,26 @@ void SwapLongBlock(void* p, int32_t n)
         iso.locale = [[[NSLocale alloc] initWithLocaleIdentifier:@"en_US"] autorelease];
         NSString* str = [iso stringFromDate:[NSDate date]];
         NSMutableArray* currents = [NSMutableArray arrayWithCapacity:16];
-        NSMutableArray* slot_currents = [NSMutableArray arrayWithCapacity:32];
+        NSMutableArray* slot_currents;
         unsigned char ch, sl;
         for (sl = 0; sl < 16; sl++) {
+            slot_currents = [[[NSMutableArray alloc] initWithCapacity:32] autorelease];
             if ((msk >> sl) & 0x1) {
                 for (ch = 0; ch < 32; ch++) {
                     NSNumber *number = [[NSNumber alloc] initWithInt:results.current_adc[sl*32 + ch]];
                     [slot_currents addObject:number];
                     [number release];
+                    number = nil;
                 }
             }
             [currents addObject:slot_currents]; //yes, we may add an empty array
-            [slot_currents removeAllObjects];
         }
         
         [pollDict setObject:currents forKey:@"pmt_base_i"];
         [pollDict setObject:str forKey:@"pmt_base_i_time_stamp"];
         [pollDict setObject:[NSNumber numberWithInt:msk] forKey:@"pmt_base_i_slot_mask"];
+        [iso release];
+        iso = nil;
     }
 }
 
@@ -2076,6 +2085,8 @@ void SwapLongBlock(void* p, int32_t n)
                                      [NSNumber numberWithFloat:status.current_b], @"CRR_B",
                                      nil];
         [pollDict setObject:hvSupplyDict forKey:@"hv_supply"];
+        [iso release];
+        iso = nil;
     }
 }
 
@@ -2301,11 +2312,11 @@ void SwapLongBlock(void* p, int32_t n)
         iso.calendar = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
         iso.locale = [[[NSLocale alloc] initWithLocaleIdentifier:@"en_US"] autorelease];
         NSString* str = [iso stringFromDate:[NSDate date]];
-        NSMutableArray* slot_voltages = [NSMutableArray arrayWithCapacity:21];
+        NSMutableArray* slot_voltages = [[[NSMutableArray alloc] initWithCapacity:21] autorelease];
         
         unsigned char vlt;
         for (vlt = 0; vlt < 21; vlt++) {
-            NSNumber *number = [[NSNumber alloc] initWithInt:result.voltages[vlt]];
+            NSNumber *number = [[NSNumber alloc] initWithFloat:result.voltages[vlt]];
             [slot_voltages addObject:number];
             [number release];
         }
@@ -2322,10 +2333,10 @@ void SwapLongBlock(void* p, int32_t n)
         NSMutableArray* vlt_time_stamp; //16 slot strings
         if ([pollDict objectForKey:@"fec_vlt_time_stamp"]) vlt_time_stamp = [[[pollDict objectForKey:@"fec_vlt_time_stamp"] mutableCopy] autorelease];
         else {
-            vlt_array = [NSMutableArray arrayWithCapacity:16];
+            vlt_time_stamp = [NSMutableArray arrayWithCapacity:16];
             unsigned char sl;
             for (sl=0; sl<16; sl++) {
-                [vlt_array addObject:@""];
+                [vlt_time_stamp addObject:@""];
             }
         }
         NSArray* fec_vlts_tags = [NSArray arrayWithObjects:@"VM24SUP", @"VM15SUP", @"VEE", @"VM3.3SUP",\
@@ -2338,6 +2349,8 @@ void SwapLongBlock(void* p, int32_t n)
         [pollDict setObject:vlt_array forKey:@"fec_vlt"];
         [pollDict setObject:vlt_time_stamp forKey:@"fec_vlt_time_stamp"];
         [pollDict setObject:fec_vlts_tags forKey:@"fec_vlt_tag"];
+        [iso release];
+        iso = nil;
     }
 }
 
@@ -2433,6 +2446,8 @@ void SwapLongBlock(void* p, int32_t n)
         [pollDict setObject:xl3_vlts forKey:@"xl3_vlt"];
         [pollDict setObject:xl3_vlts_tags forKey:@"xl3_vlt_tag"];
         [pollDict setObject:str forKey:@"xl3_vlt_time_stamp"];
+        [iso release];
+        iso = nil;
     }
 }
 
@@ -2585,14 +2600,17 @@ void SwapLongBlock(void* p, int32_t n)
 - (void) _pollXl3
 {
     NSAutoreleasePool* pollPool = [[NSAutoreleasePool alloc] init];
-    NSDate* pollStartDate;
-    NSDate* nextStartDate;
-    NSNumber* runTime;
+    NSDate* pollStartDate = nil;
+    NSDate* nextStartDate = nil;
     NSTimeInterval startTime;
     BOOL isTimeToQuit = NO;
 
-    while (!isTimeToQuit) {        
-        pollStartDate = [NSDate date];
+    while (!isTimeToQuit) {
+        if (pollStartDate) {
+            [pollStartDate release];
+            pollStartDate = nil;
+        }
+        pollStartDate = [[NSDate alloc] init];
         if (isPollingCMOSRates && (![[NSThread currentThread] isCancelled] || isPollingForced)) {
             [self readCMOSRateWithDelay:10]; //[msec]
         }
@@ -2615,18 +2633,23 @@ void SwapLongBlock(void* p, int32_t n)
 
         if (isPollingForced || [[NSThread currentThread] isCancelled]) isTimeToQuit = YES;
 
-        runTime = [NSNumber numberWithDouble:-[pollStartDate timeIntervalSinceNow]];
-        startTime = pollXl3Time - [runTime floatValue];
-        if (startTime < 0.01) startTime = 0.01;
-        nextStartDate = [NSDate dateWithTimeIntervalSinceNow:startTime];
+        startTime = pollXl3Time + [pollStartDate timeIntervalSinceNow];
+        if (startTime < 0.1) startTime = -0.1;
+        nextStartDate = [[NSDate alloc] initWithTimeIntervalSinceNow:startTime];
         while (!isTimeToQuit && [nextStartDate timeIntervalSinceNow] > 0.) {
             usleep(100000);
             if ([[NSThread currentThread] isCancelled]) isTimeToQuit = YES;
             if (![self isPollingXl3]) isTimeToQuit = YES;
         }
-        
+        [nextStartDate release];
+        nextStartDate = nil;
         [self setIsPollingForced:NO];
     }
+    if (pollStartDate) {
+        [pollStartDate release];
+        pollStartDate = nil;
+    }
+
     [pollPool release];
 }
 

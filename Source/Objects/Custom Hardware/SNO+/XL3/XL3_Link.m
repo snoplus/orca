@@ -502,16 +502,21 @@ NSString* XL3_LinkAutoConnectChanged    = @"XL3_LinkAutoConnectChanged";
 		[commandSocketLock lock]; //begin critical section
 		[self writePacket:(char*) &aPacket];
 		[commandSocketLock unlock]; //end critical section
-		
-		if(askForResponse){
-			[self readXL3Packet:&aPacket withPacketType:packetType andPacketNum:packetNum];
-			XL3_PayloadStruct* payloadPtr = (XL3_PayloadStruct*) aPacket.payload;
-			memcpy(payloadBlock->payload, payloadPtr, payloadBlock->numberBytesinPayload);
-		}
 	}
 	@catch (NSException* localException) {
 		[commandSocketLock unlock]; //end critical section
 		@throw localException;
+	}
+    if(askForResponse){
+        @try {
+            //ßNSLog(@"wait for command response with packetType: 0x%x, packetNum: 0x%x\n", packetType, packetNum);
+			[self readXL3Packet:&aPacket withPacketType:packetType andPacketNum:packetNum];
+			XL3_PayloadStruct* payloadPtr = (XL3_PayloadStruct*) aPacket.payload;
+			memcpy(payloadBlock->payload, payloadPtr, payloadBlock->numberBytesinPayload);
+		}
+        @catch (NSException* localException) {
+            @throw localException;
+        }
 	}
 	if (! askForResponse) {
 		[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.02]];
@@ -584,8 +589,9 @@ NSString* XL3_LinkAutoConnectChanged    = @"XL3_LinkAutoConnectChanged";
 			for (aCmd in cmdArray) {
 				NSNumber* aPacketType = [aCmd objectForKey:@"packet_type"];
 				NSNumber* aPacketNum = [aCmd objectForKey:@"packet_num"];
-				
-				if ([aPacketType unsignedShortValue] == packetType && [aPacketNum unsignedCharValue] == packetNum) {
+				//NSLog(@"aPacketType: 0x%x, packetType: 0x%x, aPacketNum: 0x%x, packetNum: 0x%x\n",[aPacketType unsignedShortValue],packetType,[aPacketNum unsignedCharValue],packetNum); 
+
+				if ([aPacketType unsignedCharValue] == packetType && [aPacketNum unsignedShortValue] == packetNum) {
 					[foundCmds addObject:aCmd];
 				}
 			}
@@ -606,7 +612,7 @@ NSString* XL3_LinkAutoConnectChanged    = @"XL3_LinkAutoConnectChanged";
 				userInfo:nil];
 		}
 		else {
-            sleep(1);
+            usleep(10000);
         }
 	}
 
@@ -806,6 +812,8 @@ static void SwapLongBlock(void* p, int32_t n)
 				break;
 			}
 
+            //NSLog(@"Read packet:  packet_type: 0x%x, packet_num: 0x%x\n", ((XL3_Packet*) aPacket)->cmdHeader.packet_type, ((XL3_Packet*) aPacket)->cmdHeader.packet_num);
+
             if (((XL3_Packet*) aPacket)->cmdHeader.packet_type == MEGA_BUNDLE_ID) {
                 //packet_num?
                 [self writeBundle:((XL3_Packet*) aPacket)->payload length:((XL3_Packet*) aPacket)->cmdHeader.num_bundles * 12];
@@ -874,7 +882,7 @@ static void SwapLongBlock(void* p, int32_t n)
                 unsigned short packetType = ((XL3_Packet*) aPacket)->cmdHeader.packet_type;
                 
                 if (needToSwap) packetNum = swapShort(packetNum);
-                //NSLog(@"%@ packet type: %d and packetNum: %d, xl3 megabundle count: %d\n", [self crateName], packetType, packetNum, bundle_count);
+                //NSLog(@"%@ packet type: %d and packetNum: %d, xl3 megabundle count: %d, NSNumber value: %dß\n", [self crateName], packetType, packetNum, bundle_count, [[NSNumber numberWithUnsignedShort:packetType] unsignedShortValue]);
                 
                 NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
                                 [NSNumber numberWithUnsignedShort:packetNum],		@"packet_num",
@@ -932,6 +940,8 @@ static void SwapLongBlock(void* p, int32_t n)
 		[NSException raise:@"Write error" format:@"XL3 not connected %@ <%@> port: %d",[self crateName], IPNumber, portNumber];
 	}
 
+    //NSLog(@"Write packet: packet_type: 0x%x, packet_num: 0x%x\n", ((XL3_Packet*) aPacket)->cmdHeader.packet_type, ((XL3_Packet*) aPacket)->cmdHeader.packet_num);
+    
 	int bytesWritten;
 	int selectionResult = 0;
 	int numBytesToSend = XL3_PACKET_SIZE;
