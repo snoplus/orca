@@ -27,6 +27,7 @@
 #import "ORHWWizSelection.h"
 #import "ORRateGroup.h"
 #import "VME_HW_Definitions.h"
+#import "ORRunModel.h"
 
 
 // Address information for this unit.
@@ -115,6 +116,7 @@ NSString* ORCaen1720BasicLock                               = @"ORCaen1720BasicL
 NSString* ORCaen1720SettingsLock                            = @"ORCaen1720SettingsLock";
 NSString* ORCaen1720RateGroupChanged                        = @"ORCaen1720RateGroupChanged";
 NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelBufferCheckChanged";
+NSString* ORCaen1720ModelContinuousModeChanged              = @"ORCaen1720ModelContinuousModeChanged";
 
 @implementation ORCaen1720Model
 
@@ -466,6 +468,19 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
     [self linkToController:@"ORCaen1720Controller"];
 }
 
+- (BOOL) continuousMode
+{
+    return continuousMode;
+}
+
+- (void) setContinuousMode:(BOOL)aContinuousMode
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setContinuousMode:continuousMode];
+    
+    continuousMode = aContinuousMode;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1720ModelContinuousModeChanged object:self];    
+}
 
 #pragma mark ***Register - General routines
 - (short) getNumberRegisters
@@ -1205,15 +1220,20 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
 	isRunning		= NO;
     
     BOOL sbcRun = [[userInfo objectForKey:kSBCisDataTaker] boolValue];
-	
+
     [self startRates];
-    [self initBoard];
-    [self setNumberBLTEventsToReadout:1];  // Hardcode this for now
-    [self writeNumberBLTEvents:sbcRun];
-    [self writeEnableBerr:sbcRun];
+
+	if ([self continuousMode] && ![[userInfo objectForKey:@"doinit"] boolValue]) {
+        //??
+    }
+    else {
+        [self initBoard];
+        [self setNumberBLTEventsToReadout:1];  // Hardcode this for now
+        [self writeNumberBLTEvents:sbcRun];
+        [self writeEnableBerr:sbcRun];
+        [self writeAcquistionControl:YES];
+    }
 	
-	
-	[self writeAcquistionControl:YES];
 	[self performSelector:@selector(checkBufferAlarm) withObject:nil afterDelay:1];
 }
 
@@ -1271,9 +1291,18 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
 {
     isRunning = NO;
     [waveFormRateGroup stop];
-	[self writeAcquistionControl:NO];
 	short i;
     for(i=0;i<8;i++)waveFormCount[i] = 0;
+    
+    NSArray* objs = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunControl")];
+    ORRunModel* runControl;
+    if ([objs count]) {
+        runControl = [objs objectAtIndex:0];
+        if ([self continuousMode] && [runControl nextRunWillQuickStart]) {
+            return;
+        }
+    }
+    [self writeAcquistionControl:NO];
 }
 
 - (BOOL) bumpRateFromDecodeStage:(short)channel
@@ -1351,6 +1380,7 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
     [self setChannelConfigMask:[aDecoder decodeIntForKey:@"channelConfigMask"]];
     [self setWaveFormRateGroup:[aDecoder decodeObjectForKey:@"waveFormRateGroup"]];
     [self setNumberBLTEventsToReadout:[aDecoder decodeInt32ForKey:@"numberBLTEventsToReadout"]];
+    [self setContinuousMode:[aDecoder decodeBoolForKey:@"continuousMode"]];
     
     if(!waveFormRateGroup){
         [self setWaveFormRateGroup:[[[ORRateGroup alloc] initGroup:8 groupTag:0] autorelease]];
@@ -1388,6 +1418,7 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
 	[anEncoder encodeInt:channelConfigMask forKey:@"channelConfigMask"];
     [anEncoder encodeObject:waveFormRateGroup forKey:@"waveFormRateGroup"];
     [anEncoder encodeInt32:numberBLTEventsToReadout forKey:@"numberBLTEventsToReadout"];
+    [anEncoder encodeBool:continuousMode forKey:@"continuousMode"];
 	int i;
 	for (i = 0; i < [self numberOfChannels]; i++){
         [anEncoder encodeInt32:dac[i] forKey:[NSString stringWithFormat:@"CAENDacChnl%d", i]];

@@ -81,6 +81,7 @@
     IBOutlet NSButton*		initButton;
     IBOutlet NSButton*		reportButton;
     IBOutlet NSButton*		loadThresholdsButton;
+    IBOutlet NSButton *continousRunsButton;
 	
 	//rates page
 	IBOutlet NSMatrix*      rateTextFields;
@@ -146,6 +147,8 @@
 - (void) waveFormRateChanged:(NSNotification*)aNote;
 - (void) totalRateChanged:(NSNotification*)aNote;
 - (void) slotChanged:(NSNotification*)aNote;
+- (void) continousRunsChanged:(NSNotification*)aNote;
+
 - (void) setBufferStateLabel;
 
 #pragma mark •••Actions
@@ -182,6 +185,7 @@
 - (IBAction) dacAction: (id) aSender;
 - (IBAction) thresholdAction: (id) aSender;
 - (IBAction) overUnderAction: (id) aSender;
+- (IBAction)countinuousRunsAction:(id)sender;
 
 #pragma mark •••Misc Helpers
 - (void)    populatePullDown;

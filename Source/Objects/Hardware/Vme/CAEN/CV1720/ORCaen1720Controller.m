@@ -232,8 +232,12 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 					 selector : @selector(slotChanged:)
 						 name : ORVmeCardSlotChangedNotification
 					   object : model];
-	
-	
+
+    [notifyCenter addObserver : self
+					 selector : @selector(continousRunsChanged:)
+						 name : ORCaen1720ModelContinuousModeChanged
+					   object : model];
+
 	[self registerRates];
 	
 }
@@ -286,6 +290,7 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
     [self waveFormRateChanged:nil];
  	[self eventSizeChanged:nil];
  	[self slotChanged:nil];
+    [self continousRunsChanged:nil];
 	
 	[self settingsLockChanged:nil];
     [self basicLockChanged:nil];
@@ -541,6 +546,11 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 			[[overUnderMatrix cellWithTag:i] setIntValue:[model overUnderThreshold:i]];
 		}
 	}
+}
+
+- (void) continousRunsChanged:(NSNotification *)aNote
+{
+    [continousRunsButton setIntValue:[model continuousMode]];
 }
 
 - (void) basicLockChanged:(NSNotification*)aNotification
@@ -910,6 +920,11 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
         [[[model document] undoManager] setActionName:@"Set thresholds"]; // Set name of undo.
         [model setThreshold:[[aSender selectedCell] tag] withValue:[aSender intValue]]; // Set new value
     }
+}
+
+- (IBAction)countinuousRunsAction:(id)sender
+{
+    [model setContinuousMode:[sender intValue]];
 }
 
 #pragma mark ***Misc Helpers

@@ -126,6 +126,7 @@ enum {
 	BOOL			isRunning;
     int				eventSize;
     unsigned long   numberBLTEventsToReadout;
+    BOOL            continuousMode;
 	
 	//cached variables, valid only during running
 	unsigned int    statusReg;
@@ -133,6 +134,8 @@ enum {
 	unsigned long	eventSizeReg;
 	unsigned long	dataReg;
 }
+
+@property (assign, nonatomic)   BOOL    continuousMode;
 
 #pragma mark ***Accessors
 - (int)				eventSize;
@@ -276,7 +279,7 @@ extern NSString* ORCaen1720BasicLock;
 extern NSString* ORCaen1720SettingsLock;
 extern NSString* ORCaen1720RateGroupChanged;
 extern NSString* ORCaen1720ModelBufferCheckChanged;
-
+extern NSString* ORCaen1720ModelContinuousModeChanged;
 //the decoder concrete decoder class
 @interface ORCaen1720DecoderForCAEN : ORCaenDataDecoder
 {}
