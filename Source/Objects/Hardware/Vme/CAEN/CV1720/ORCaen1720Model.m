@@ -1294,7 +1294,7 @@ NSString* ORCaen1720ModelContinuousModeChanged              = @"ORCaen1720ModelC
 	short i;
     for(i=0;i<8;i++)waveFormCount[i] = 0;
     
-    NSArray* objs = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunControl")];
+    NSArray* objs = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     ORRunModel* runControl;
     if ([objs count]) {
         runControl = [objs objectAtIndex:0];

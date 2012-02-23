@@ -30,5 +30,12 @@
 
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
+@end
 
+@interface ORXL3DecoderForCmosRate : ORVmeCardDecoder {
+
+}
+
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
+- (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
 @end

@@ -694,7 +694,7 @@ kPEDCrateMask
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
 
-    NSArray* objs = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunControl")];
+    NSArray* objs = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     ORRunModel* runControl;
     if ([objs count]) {
         runControl = [objs objectAtIndex:0];
