@@ -32,6 +32,8 @@
 #import "SNOCmds.h"
 #import "SBC_Link.h"
 #import "ORSelectorSequence.h"
+#import "ORRunModel.h"
+#import "ORCaen1720Model.h"
 
 #pragma mark •••Definitions
 NSString* ORMTCModelESumViewTypeChanged		= @"ORMTCModelESumViewTypeChanged";
@@ -603,6 +605,10 @@ kPEDCrateMask
 	return [self mVoltsToRaw:mVolts];
 }
 
+#define uShortDBValue(A) [[mtcDataBase objectForNestedKey:[self getDBKeyByIndex: A]] unsignedShortValue]
+#define uLongDBValue(A)  [[mtcDataBase objectForNestedKey:[self getDBKeyByIndex: A]] unsignedLongValue]
+#define floatDBValue(A)  [[mtcDataBase objectForNestedKey:[self getDBKeyByIndex: A]] floatValue]
+
 #pragma mark •••Data Taker
 - (NSMutableArray*) children {
     //methods exists to give common interface across all objects for display in lists
@@ -648,6 +654,15 @@ kPEDCrateMask
 		[obj runTaskStarted:aDataPacket userInfo:userInfo];
     }
 	
+    if ([[userInfo objectForKey:@"doinit"] boolValue]) {
+        [self clearGlobalTriggerWordMask];
+        [self zeroTheGTCounter];
+        [self setGTCrateMask];
+        [self setSingleGTWordMask: uLongDBValue(kGtMask)];
+    }
+    else {
+        //soft start
+    }
 }
 
 //**************************************************************************************
@@ -678,6 +693,23 @@ kPEDCrateMask
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+
+    NSArray* objs = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunControl")];
+    ORRunModel* runControl;
+    if ([objs count]) {
+        runControl = [objs objectAtIndex:0];
+        if ([runControl nextRunWillQuickStart]) {
+            //keep it running
+        }
+        else {
+            [self clearGlobalTriggerWordMask];
+        }
+    }
+    else {
+        [self clearGlobalTriggerWordMask];
+    }
+    
+    
     NSEnumerator* e = [dataTakers objectEnumerator];
     id obj;
     while(obj = [e nextObject]){
@@ -1001,9 +1033,6 @@ kPEDCrateMask
 	}
 	
 }
-#define uShortDBValue(A) [[mtcDataBase objectForNestedKey:[self getDBKeyByIndex: A]] unsignedShortValue]
-#define uLongDBValue(A)  [[mtcDataBase objectForNestedKey:[self getDBKeyByIndex: A]] unsignedLongValue]
-#define floatDBValue(A)  [[mtcDataBase objectForNestedKey:[self getDBKeyByIndex: A]] floatValue]
 
 - (void) initializeMtc:(BOOL) loadTheMTCXilinxFile load10MHzClock:(BOOL) loadThe10MHzClock
 {
@@ -1101,7 +1130,8 @@ kPEDCrateMask
 - (void) clearSingleGTWordMask:(unsigned long) gtWordMask
 {
 	@try {
-		[self clrBits:kMtcGmskReg mask:gtWordMask];
+		//[self clrBits:kMtcGmskReg mask:gtWordMask];
+		[self clrBits:kMtcMaskReg mask:gtWordMask];
 		NSLog(@"Set GT Mask: 0x%08x\n",uLongDBValue(kGtMask));
 	}
 	@catch(NSException* localException) {
