@@ -775,13 +775,13 @@ void SwapLongBlock(void* p, int32_t n)
 				     nil];
 	[dataDictionary setObject:aDictionary forKey:@"Xl3MegaBundle"];
 
-//	NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-//				     @"ORXL3DecoderForCmosRate",	@"decoder",
-//				     [NSNumber numberWithLong:dataId],       @"dataId",
-//				     [NSNumber numberWithBool:YES],          @"variable",
-//				     [NSNumber numberWithLong:-1],			 @"length",
-//				     nil];
-//	[dataDictionary setObject:aDictionary forKey:@"Xl3CmosRate"];
+	NSDictionary* bDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+				     @"ORXL3DecoderForCmosRate",	@"decoder",
+				     [NSNumber numberWithLong:cmosRateDataId],       @"dataId",
+				     [NSNumber numberWithBool:NO],          @"variable",
+				     [NSNumber numberWithLong:21+8*32],		@"length",
+				     nil];
+	[dataDictionary setObject:bDictionary forKey:@"Xl3CmosRate"];
 	
 	return dataDictionary;
 }
@@ -1885,6 +1885,29 @@ void SwapLongBlock(void* p, int32_t n)
         [pollDict setObject:time_stamps forKey:@"cmos_rt_time_stamp"];
         [pollDict setObject:[NSNumber numberWithInt:msk] forKey:@"cmos_rt_slot_mask"];
         [iso release]; iso = nil;
+        
+        if ([[ORGlobal sharedGlobal] runInProgress]) {
+            unsigned long data[21 + 8*32];
+            data[0] = cmosRateDataId | 5; 
+            data[1] = [self crateNumber];
+            data[2] = args_lo.slot_mask;
+            memcpy(data+3, args_lo.channel_masks, 16);
+            data[19] = aDelay;
+            data[20] = results_lo.error_flags;
+            memcpy(data+21, results_lo.rates, 8*32);
+            
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
+                                                            object:[NSData dataWithBytes:data length:sizeof(long)*(21+8*32)]];
+
+            if (num_slots > 8) {
+                data[2] = args_hi.slot_mask;
+                data[20] = results_hi.error_flags;
+                memcpy(data+21, results_hi.rates, 8*32);
+                
+                [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
+                                                                    object:[NSData dataWithBytes:data length:sizeof(long)*(21+8*32)]];
+            }
+        }
     }
 }
 
