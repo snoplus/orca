@@ -242,6 +242,16 @@ static NSDictionary* xl3Ops;
                      selector : @selector(monIsPollingVerboseChanged:)
                          name : ORXL3ModelIsPollingVerboseChanged
                        object : model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(hvRelayStatusChanged:)
+                         name : ORXL3ModelRelayStatusChanged
+                       object : model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(hvRelayMaskChanged:)
+                         name : ORXL3ModelRelayMaskChanged
+                       object : model];
 }
 
 - (void) updateWindow
@@ -279,6 +289,9 @@ static NSDictionary* xl3Ops;
     [self monIsPollingXl3WithRunChanged:nil];
     [self monPollStatusChanged:nil];
     [self monIsPollingVerboseChanged:nil];
+    //hv
+    [self hvRelayMaskChanged:nil];
+    [self hvRelayStatusChanged:nil];
 	//ip connection
 	[self errorTimeOutChanged:nil];
     [self connectStateChanged:nil];
@@ -509,6 +522,29 @@ static NSDictionary* xl3Ops;
 - (void) monIsPollingVerboseChanged:(NSNotification*)aNote;
 {
     [monIsPollingVerboseButton setIntValue:[model isPollingVerbose]];
+}
+
+#pragma mark •hv
+
+- (void) hvRelayMaskChanged:(NSNotification*)aNote
+{
+    unsigned long long relayMask = [model relayMask];
+
+    [hvRelayMaskLowField setIntValue:relayMask & 0xffffffff];
+    [hvRelayMaskHighField setIntValue:relayMask >> 32];
+
+    unsigned char slot;
+    unsigned char db;
+    for (slot = 0; slot<16; slot++) {
+        for (db=0; db<4; db++) {
+            [[hvRelayMaskMatrix cellAtRow:3-db column:15-slot] setIntValue: (relayMask >> (slot*4 + db)) & 0x1];
+        }
+    }
+}
+
+- (void) hvRelayStatusChanged:(NSNotification*)aNote
+{
+    [hvRelayStatusField setStringValue:[model relayStatus]];
 }
 
 #pragma mark •ip connection
@@ -956,6 +992,52 @@ static NSDictionary* xl3Ops;
 - (IBAction) monStopPollingAction:(id)sender
 {
     [model setIsPollingXl3:false];
+}
+//hv
+- (IBAction)hvRelayMaskHighAction:(id)sender
+{
+    unsigned long long newRelayMask = [model relayMask] & 0xFFFFFFFFULL;
+    newRelayMask |= ((unsigned long long)[sender intValue]) << 32;
+    [model setRelayMask:newRelayMask];
+}
+
+- (IBAction)hvRelayMaskLowAction:(id)sender
+{
+    unsigned long long newRelayMask = [model relayMask] & (0xFFFFFFFFULL << 32);
+    newRelayMask |= [sender intValue];
+    [model setRelayMask:newRelayMask];    
+}
+
+- (IBAction)hvRelayMaskMatrixAction:(id)sender
+{
+    unsigned long long newRelayMask = 0ULL;
+    unsigned char slot;
+    unsigned char pmtic;
+    for (slot = 0; slot<16; slot++) {
+        for (pmtic=0; pmtic<4; pmtic++) {
+            NSLog(@"slot: %d, db: %d, value: %d\n",slot,pmtic,[[sender cellAtRow:(3-pmtic) column:(15-slot)] intValue]);
+            newRelayMask |= ([[sender cellAtRow:3-pmtic column:15-slot] intValue]?1ULL:0ULL) << (slot*4 + pmtic);
+        }
+    }
+    [model setRelayMask:newRelayMask];
+}
+
+- (IBAction)hvRelaySetAction:(id)sender
+{
+    [self endEditing];
+    [model closeHVRelays];
+}
+
+- (IBAction)hvRelayOpenAllAction:(id)sender
+{
+    [self endEditing];
+    [model openHVRelays];
+}
+
+- (IBAction)hvCheckInterlockAction:(id)sender
+{
+    [self endEditing];
+
 }
 
 //connection

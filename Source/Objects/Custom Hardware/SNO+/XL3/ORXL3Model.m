@@ -74,6 +74,8 @@ NSString* ORXL3ModelIsPollingHVSupplyChanged =      @"ORXL3ModelIsPollingHVSuppl
 NSString* ORXL3ModelIsPollingXl3WithRunChanged =    @"ORXL3ModelIsPollingXl3WithRunChanged";
 NSString* ORXL3ModelPollStatusChanged =             @"ORXL3ModelPollStatusChanged";
 NSString* ORXL3ModelIsPollingVerboseChanged =       @"ORXL3ModelIsPollingVerboseChanged";
+NSString* ORXL3ModelRelayMaskChanged = @"ORXL3ModelRelayMaskChanged";
+NSString* ORXL3ModelRelayStatusChanged = @"ORXL3ModelRelayStatusChanged";
 
 @interface ORXL3Model (private)
 - (void) doBasicOp;
@@ -581,6 +583,35 @@ NSString* ORXL3ModelIsPollingVerboseChanged =       @"ORXL3ModelIsPollingVerbose
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelPollStatusChanged object:self];        
 }
 
+- (unsigned long long) relayMask
+{
+    return relayMask;
+}
+
+- (void) setRelayMask:(unsigned long long)aRelayMask
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setRelayMask:relayMask];
+    relayMask = aRelayMask;
+    NSLog(@"relay mask:0x%016x",relayMask);
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelRelayMaskChanged object:self];        
+}
+
+- (NSString*) relayStatus
+{
+    if (!relayStatus) {
+        return @"status: UNKNOWN";
+    }
+    return relayStatus;
+}
+
+- (void) setRelayStatus:(NSString *)aRelayStatus
+{
+    if (relayStatus) [relayStatus autorelease];
+    if (aRelayStatus) relayStatus = [aRelayStatus copy];
+    
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelRelayStatusChanged object:self];        
+}
+
 - (int) slotConv
 {
     return [self slot];
@@ -849,7 +880,8 @@ void SwapLongBlock(void* p, int32_t n)
     [self setIsPollingHVSupply:     [decoder decodeBoolForKey:@"ORXL3ModelIsPollingHVSupply"]];
     [self setIsPollingXl3WithRun:   [decoder decodeBoolForKey:@"ORXL3ModelIsPollingXl3WithRun"]];
     [self setIsPollingVerbose:      [decoder decodeBoolForKey:@"ORXL3ModelIsPollingVerbose"]];
-
+    [self setRelayMask:[decoder decodeInt64ForKey:@"ORXL3ModelRelayMask"]];
+    
 	if (xl3Mode == 0) [self setXl3Mode: 1];
 	if (xl3OpsRunning == nil) xl3OpsRunning = [[NSMutableDictionary alloc] init];
     //if (isPollingXl3 == YES) [self setIsPollingXl3:NO];
@@ -890,6 +922,8 @@ void SwapLongBlock(void* p, int32_t n)
     [encoder encodeBool:isPollingHVSupply       forKey:@"ORXL3ModelIsPollingHVSupply"];
     [encoder encodeBool:isPollingXl3WithRun     forKey:@"ORXL3ModelIsPollingXl3WithRun"];
     [encoder encodeBool:isPollingVerbose        forKey:@"ORXL3ModelIsPollingVerbose"];
+    
+    [encoder encodeInt64:relayMask forKey:@"ORXL3ModelRelayMask"];
 }
 
 #pragma mark •••Hardware Access
@@ -1891,10 +1925,10 @@ void SwapLongBlock(void* p, int32_t n)
             data[0] = cmosRateDataId | (21+8*32); 
             data[1] = [self crateNumber];
             data[2] = args_lo.slot_mask;
-            memcpy(data+3, args_lo.channel_masks, 16);
+            memcpy(data+3, args_lo.channel_masks, 16*4);
             data[19] = aDelay;
             data[20] = results_lo.error_flags;
-            memcpy(data+21, results_lo.rates, 8*32);
+            memcpy(data+21, results_lo.rates, 8*32*4);
             
             [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
                                                             object:[NSData dataWithBytes:data length:sizeof(long)*(21+8*32)]];
@@ -2011,7 +2045,7 @@ void SwapLongBlock(void* p, int32_t n)
         for (ch=0; ch<32; ch++) {
             [msg appendFormat:@"ch %2d: ", ch];
             for (sl=0; sl<16; sl++) {
-                if ((msk >> sl) & 0x1) [msg appendFormat:@"%3d ", results.current_adc[sl*32 + ch]];
+                if ((msk >> sl) & 0x1) [msg appendFormat:@"%3d ", results.current_adc[sl*32 + ch] ^ (1UL << 7)];
                 else [msg appendFormat:@"--- "];
             }
             [msg appendFormat:@"\n"];
@@ -2033,7 +2067,7 @@ void SwapLongBlock(void* p, int32_t n)
             slot_currents = [[[NSMutableArray alloc] initWithCapacity:32] autorelease];
             if ((msk >> sl) & 0x1) {
                 for (ch = 0; ch < 32; ch++) {
-                    NSNumber *number = [[NSNumber alloc] initWithInt:results.current_adc[sl*32 + ch]];
+                    NSNumber *number = [[NSNumber alloc] initWithInt:results.current_adc[sl*32 + ch] ^ (1U << 7)];
                     [slot_currents addObject:number];
                     [number release];
                     number = nil;
@@ -2113,15 +2147,15 @@ void SwapLongBlock(void* p, int32_t n)
     }
 }
 
-- (void) setHVRelays:(unsigned long long)relayMask error:(unsigned long*)aError
+- (void) setHVRelays:(unsigned long long)aRelayMask error:(unsigned long*)aError
 {
 	XL3_PayloadStruct payload;
 	memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
 	payload.numberBytesinPayload = 2;
     
     unsigned long* data = (unsigned long*)payload.payload;
-    data[0] = relayMask & 0xffffffffUL; //mask1 bottom
-    data[1] = relayMask >> 16;          //mask2 top
+    data[0] = aRelayMask & 0xffffffffUL; //mask1 bottom
+    data[1] = aRelayMask >> 16;          //mask2 top
 
     if ([xl3Link needToSwap]) {
         SwapLongBlock(data, 2);
@@ -2142,12 +2176,12 @@ void SwapLongBlock(void* p, int32_t n)
     }    
 }
 
-- (void) setHVRelays:(unsigned long long)relayMask
+- (void) setHVRelays:(unsigned long long)aRelayMask
 {
     unsigned long error;
     
     @try {
-        [self setHVRelays:relayMask error:&error];
+        [self setHVRelays:aRelayMask error:&error];
     }
     @catch (NSException *exception) {
         ;
@@ -2158,6 +2192,48 @@ void SwapLongBlock(void* p, int32_t n)
     }
     else{
         NSLog(@"%@ HV relays set.\n",[[self xl3Link] crateName]);
+    }
+}
+
+- (void) closeHVRelays
+{
+    unsigned long error;
+    
+    @try {
+        [self setHVRelays:relayMask error:&error];
+    }
+    @catch (NSException *exception) {
+        [self setRelayStatus:@"status: UNKNOWN"];
+    }
+    
+    if (error != 0) {
+        NSLog(@"%@ error in setHVRelays relays were NOT set.\n",[[self xl3Link] crateName]);
+        [self setRelayStatus:@"status: UNKNOWN"];
+    }
+    else{
+        NSLog(@"%@ HV relays closed.\n",[[self xl3Link] crateName]);
+        [self setRelayStatus:@"relays CLOSED"];
+    }
+}
+
+- (void) openHVRelays
+{
+    unsigned long error;
+    
+    @try {
+        [self setHVRelays:0ULL error:&error];
+    }
+    @catch (NSException *exception) {
+        [self setRelayStatus:@"status: UNKNOWN"];
+    }
+    
+    if (error != 0) {
+        NSLog(@"%@ error in openHVRelays relays were NOT set.\n",[[self xl3Link] crateName]);
+        [self setRelayStatus:@"status: UNKNOWN"];
+    }
+    else{
+        NSLog(@"%@ HV relays open.\n",[[self xl3Link] crateName]);
+        [self setRelayStatus:@"relays OPENED"];
     }
 }
 

@@ -88,6 +88,9 @@ enum {
     NSString*       pollStatus;
     NSThread*       pollThread;
     NSMutableDictionary* pollDict;
+    
+    unsigned long long  relayMask;
+    NSString* relayStatus;
 }
 
 @property (assign)	unsigned long   xl3ChargeInjMask;
@@ -107,6 +110,10 @@ enum {
 @property (copy)    NSString*       pollStatus;
 @property (readonly, nonatomic) NSMutableDictionary* pollDict;
 @property (assign)  BOOL            isPollingForced;
+
+@property (assign) unsigned long long relayMask;
+@property (copy) NSString* relayStatus;
+
 
 #pragma mark •••Initialization
 - (id)   init;
@@ -228,8 +235,12 @@ enum {
 
 - (void) readHVStatus:(hv_readback_results_t*)status;
 - (void) readHVStatus;
+
 - (void) setHVRelays:(unsigned long long)relayMask error:(unsigned long*)aError;
 - (void) setHVRelays:(unsigned long long)relayMask;
+- (void) closeHVRelays;
+- (void) openHVRelays;
+
 - (void) setHVSwitchOnForTop:(BOOL)aIsOn forBottom:(BOOL)bIsOn;
 - (void) readHVSwitchOnForTop:(BOOL*)aIsOn forBottom:(BOOL*)bIsOn;
 - (void) readHVSwitchOn;
@@ -283,3 +294,5 @@ extern NSString* ORXL3ModelIsPollingHVSupplyChanged;
 extern NSString* ORXL3ModelIsPollingXl3WithRunChanged;
 extern NSString* ORXL3ModelPollStatusChanged;
 extern NSString* ORXL3ModelIsPollingVerboseChanged;
+extern NSString* ORXL3ModelRelayMaskChanged;
+extern NSString* ORXL3ModelRelayStatusChanged;

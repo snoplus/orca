@@ -129,7 +129,24 @@
 
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr
 {
-    return @"";
+    NSMutableString* dsc = [NSMutableString stringWithFormat: @"CMOS rates crate %d\n\nslot mask: 0x%x\n", dataPtr[1], dataPtr[2]];
+    unsigned char slot = 0;
+    for (slot=0; slot<16; slot++) {
+        [dsc appendFormat:@"ch mask slot %2d: 0x%08x\n", slot, dataPtr[3+slot]];
+    }
+    [dsc appendFormat:@"delay: %d ms\n\nerror flags: 0x%08x\n", dataPtr[19], dataPtr[20]];
+
+    unsigned char ch, slot_idx = 0;
+    for (slot=0; slot<16; slot++) {
+        if ((dataPtr[2] >> slot) & 0x1) {
+            [dsc appendFormat:@"\nslot %d\n", slot];
+            for (ch = 0; ch < 32; ch++) {
+                [dsc appendFormat:@"ch %2d: %f\n", ch, dataPtr[21 + slot_idx*32 + ch]];
+            }
+            slot_idx++;
+        }
+    }
+    return dsc;
 }
 
 @end

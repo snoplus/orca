@@ -91,7 +91,13 @@
     IBOutlet NSButton*              monIsPollingVerboseButton;
     IBOutlet NSButton*              monIsPollingWithRunButton;
     IBOutlet NSTextField*           monPollingStatusField;
-	//connection
+    //hv
+    IBOutlet NSTextField *hvRelayMaskLowField;
+    IBOutlet NSTextField *hvRelayMaskHighField;
+    IBOutlet NSTextField *hvRelayStatusField;
+    IBOutlet NSMatrix *hvRelayMaskMatrix;
+	
+    //connection
 	IBOutlet NSButton*              toggleConnectButton;
 	IBOutlet NSPopUpButton*         errorTimeOutPU;
     IBOutlet NSTextField*           connectionIPAddressField;
@@ -146,6 +152,9 @@
 - (void) monIsPollingXl3WithRunChanged:(NSNotification*)aNote;
 - (void) monPollStatusChanged:(NSNotification*)aNote;
 - (void) monIsPollingVerboseChanged:(NSNotification*)aNote;
+//hv
+- (void) hvRelayMaskChanged:(NSNotification*)aNote;
+- (void) hvRelayStatusChanged:(NSNotification*)aNote;
 //ip connection
 - (void) connectStateChanged:(NSNotification*)aNote;
 - (void) linkConnectionChanged:(NSNotification*)aNote;
@@ -202,6 +211,13 @@
 - (IBAction) monPollNowAction:(id)sender;
 - (IBAction) monStartPollingAction:(id)sender;
 - (IBAction) monStopPollingAction:(id)sender;
+//hv
+- (IBAction)hvRelayMaskHighAction:(id)sender;
+- (IBAction)hvRelayMaskLowAction:(id)sender;
+- (IBAction)hvRelayMaskMatrixAction:(id)sender;
+- (IBAction)hvRelaySetAction:(id)sender;
+- (IBAction)hvRelayOpenAllAction:(id)sender;
+- (IBAction)hvCheckInterlockAction:(id)sender;
 //connection
 - (IBAction) toggleConnectAction:(id)sender;
 - (IBAction) errorTimeOutAction:(id)sender;
