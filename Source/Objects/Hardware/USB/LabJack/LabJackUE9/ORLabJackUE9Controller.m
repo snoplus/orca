@@ -133,17 +133,18 @@
 		[[counterInputLineMatrix cellAtRow:i column:0] setTag:i];
 	}
 	
-	[super awakeFromNib];
 	
     blankView = [[NSView alloc] init];
-    ioSize			= NSMakeSize(400,815);
-    setupSize		= NSMakeSize(620,700);
-    timersSize		= NSMakeSize(570,620);
+    ioSize			= NSMakeSize(400,800);
+    setupSize		= NSMakeSize(620,650);
+    timersSize		= NSMakeSize(570,580);
+    mux80Size		= NSMakeSize(400,440);
 	
     NSString* key = [NSString stringWithFormat: @"orca.ORLabJac%d.selectedtab",[model uniqueIdNumber]];
     int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
+	[super awakeFromNib];
 }
 
 
@@ -318,6 +319,11 @@
                          name : ORLabJackUE9ModelClockDivisorChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(useMux80Changed:)
+                         name : ORLabJackUE9UseMux80Changed
+						object: model];
+
 }
 
 
@@ -356,6 +362,22 @@
 	[self timerChanged:nil];
 	[self timerResultChanged:nil];
 	[self clockDivisorChanged:nil];
+	[self useMux80Changed:nil];
+}
+
+- (void) useMux80Changed:(NSNotification*)aNote
+{
+	[useMux80CB setIntValue: [model useMux80]];
+    if([model useMux80]){
+        [[[self  window] contentView] addSubview:mux80View];
+        [mux80View setAutoresizingMask:NSViewMaxXMargin|NSViewMaxYMargin];
+        [mux80View setFrameOrigin:NSMakePoint(0,100)];
+    }
+    else {
+        [mux80View removeFromSuperview];   
+    }
+    [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
+
 }
 
 - (void) clockDivisorChanged:(NSNotification*)aNote
@@ -424,14 +446,22 @@
 
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
 {
-    [[self window] setContentView:blankView];
-    switch([tabView indexOfTabViewItem:tabViewItem]){
-        case  0: [self resizeWindowToSize:ioSize];     break;
-        case  1: [self resizeWindowToSize:timersSize];     break;
-		default: [self resizeWindowToSize:setupSize];	    break;
+    //[[self window] setContentView:blankView];
+    [tabView setHidden:YES];
+    if([model useMux80]){
+        [self resizeWindowToSize:mux80Size];
     }
-    [[self window] setContentView:totalView];
-	
+    else {
+        switch([tabView indexOfTabViewItem:tabViewItem]){
+            case  0: [self resizeWindowToSize:ioSize];     break;
+            case  1: [self resizeWindowToSize:timersSize];     break;
+            default: [self resizeWindowToSize:setupSize];	    break;
+        }
+    }
+
+    //[[self window] setContentView:totalView];
+	if(![model useMux80]) [tabView setHidden:NO];
+
     NSString* key = [NSString stringWithFormat: @"orca.ORLabJac%d.selectedtab",[model uniqueIdNumber]];
     int index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
@@ -940,6 +970,10 @@
 {
 	[self endEditing];
 	[model setTimer:[[sender selectedCell] tag] value:[sender intValue]];
+}
+- (IBAction) useMux80Action:(id)sender
+{
+    [model setUseMux80:[useMux80CB intValue]];
 }
 
 @end

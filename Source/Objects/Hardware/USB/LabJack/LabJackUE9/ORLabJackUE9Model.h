@@ -86,6 +86,7 @@
 	double hiResBipolarSlope;
 	double hiResBipolarOffset;
 	
+    BOOL useMux80;
 	//bit processing variables
     BOOL readOnce;
 	unsigned long processInputValue;  //snapshot of the inputs at start of process cycle
@@ -100,6 +101,8 @@
 }
 
 #pragma mark ***Accessors
+- (BOOL) useMux80;
+- (void) setUseMux80:(BOOL)aState;
 - (int) clockDivisor;
 - (void) setClockDivisor:(int)aClockDivisor;
 - (int) clockSelection;
@@ -257,6 +260,7 @@ extern NSString* ORLabJackUE9TimerChanged;
 extern NSString* ORLabJackUE9BipolarChanged;
 extern NSString* ORLabJackUE9ModelCounterEnableMaskChanged;
 extern NSString* ORLabJackUE9ModelTimerResultChanged;
+extern NSString* ORLabJackUE9UseMux80Changed;
 
 @interface ORLabJackUE9Cmd : NSObject
 {

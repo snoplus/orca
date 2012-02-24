@@ -20,6 +20,7 @@
 
 @interface ORLabJackUE9Controller : OrcaObjectController 
 {
+	IBOutlet NSButton*      useMux80CB;
 	IBOutlet NSTextField*	ipConnectedTextField;
 	IBOutlet NSTextField*	clockDivisorField;
 	IBOutlet NSMatrix*		clockSelectionMatrix;
@@ -98,6 +99,7 @@
 	IBOutlet NSPopUpButton*		timerOptionPU3;
 	IBOutlet NSPopUpButton*		timerOptionPU4;
 	IBOutlet NSPopUpButton*		timerOptionPU5;
+    IBOutlet NSView*                 mux80View;
 
 	NSPopUpButton* gainPU[kUE9NumAdcs];
 	NSPopUpButton* bipolarPU[kUE9NumAdcs];
@@ -106,6 +108,7 @@
 	NSSize					ioSize;
 	NSSize					timersSize;
 	NSSize					setupSize;
+	NSSize					mux80Size;
 	NSView*					blankView;
 }
 
@@ -114,6 +117,7 @@
 - (void) updateButtons;
 
 #pragma mark ***Interface Management
+- (void) useMux80Changed:(NSNotification*)aNote;
 - (void) clockDivisorChanged:(NSNotification*)aNote;
 - (void) counterEnableMaskChanged:(NSNotification*)aNote;
 - (void) clockSelectionChanged:(NSNotification*)aNote;
@@ -146,6 +150,7 @@
 - (void) minValueChanged:(NSNotification*)aNote;
 - (void) maxValueChanged:(NSNotification*)aNote;
 - (void) timerResultChanged:(NSNotification*)aNote;
+- (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;
 
 #pragma mark •••Actions
 - (IBAction) clockDivisorAction:(id)sender;
@@ -182,6 +187,7 @@
 - (IBAction) bipolarAction:(id)sender;
 - (IBAction) gainAction:(id)sender;
 - (IBAction) initTimersAction:(id)sender;
+- (IBAction) useMux80Action:(id)sender;
 
 @end
 
