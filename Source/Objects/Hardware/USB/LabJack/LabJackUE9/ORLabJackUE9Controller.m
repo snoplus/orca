@@ -320,8 +320,8 @@
 						object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(useMux80Changed:)
-                         name : ORLabJackUE9UseMux80Changed
+                     selector : @selector(expansionOptionChanged:)
+                         name : ORLabJackUE9ExpansionOptionChanged
 						object: model];
 
 }
@@ -362,13 +362,13 @@
 	[self timerChanged:nil];
 	[self timerResultChanged:nil];
 	[self clockDivisorChanged:nil];
-	[self useMux80Changed:nil];
+	[self expansionOptionChanged:nil];
 }
 
-- (void) useMux80Changed:(NSNotification*)aNote
+- (void) expansionOptionChanged:(NSNotification*)aNote
 {
-	[useMux80CB setIntValue: [model useMux80]];
-    if([model useMux80]){
+	[expansionOptionMatrix selectCellWithTag: [model expansionOption]];
+    if([model expansionOption] == kLabJackUE9Mux80Option){
         [[[self  window] contentView] addSubview:mux80View];
         [mux80View setAutoresizingMask:NSViewMaxXMargin|NSViewMaxYMargin];
         [mux80View setFrameOrigin:NSMakePoint(0,100)];
@@ -437,6 +437,7 @@
 {
 	[ipConnectedTextField setStringValue: [model isConnected]?@"Connected":@"Not Connected"];
 	[ipConnectButton setTitle:[model isConnected]?@"Disconnect":@"Connect"];
+    [self updateButtons];
 }
 
 - (void) ipAddressChanged:(NSNotification*)aNote
@@ -448,7 +449,7 @@
 {
     //[[self window] setContentView:blankView];
     [tabView setHidden:YES];
-    if([model useMux80]){
+    if([model expansionOption] == kLabJackUE9Mux80Option){
         [self resizeWindowToSize:mux80Size];
     }
     else {
@@ -460,7 +461,7 @@
     }
 
     //[[self window] setContentView:totalView];
-	if(![model useMux80]) [tabView setHidden:NO];
+	if([model expansionOption]==kLabJackUE9NoExpansion) [tabView setHidden:NO];
 
     NSString* key = [NSString stringWithFormat: @"orca.ORLabJac%d.selectedtab",[model uniqueIdNumber]];
     int index = [tabView indexOfTabViewItem:tabViewItem];
@@ -780,7 +781,9 @@
 	[aOut1Field			setEnabled:!lockedOrRunningMaintenance];
 	[initTimersButton	setEnabled:!lockedOrRunningMaintenance];
 	[clockDivisorField	setEnabled:!lockedOrRunningMaintenance];
-	
+	[changeIPNumberButton setEnabled:!locked && ![model isConnected]];
+	[expansionOptionMatrix setEnabled:!locked];
+    
 	int i;
 	for(i=0;i<kUE9NumAdcs;i++){
 		[bipolarPU[i] setEnabled:!locked];
@@ -971,9 +974,33 @@
 	[self endEditing];
 	[model setTimer:[[sender selectedCell] tag] value:[sender intValue]];
 }
-- (IBAction) useMux80Action:(id)sender
+
+- (IBAction) expansionOptionAction:(id)sender
 {
-    [model setUseMux80:[useMux80CB intValue]];
+    [model setExpansionOption:[[expansionOptionMatrix selectedCell]tag]];
 }
+
+- (IBAction) changeIPNumber:(id)sender
+{
+    [self endEditing];
+    NSBeginAlertSheet([NSString stringWithFormat:@"Change IP number to %@",[model ipAddress]],
+					  @"YES/Do it NOW",
+					  @"Canel",
+					  nil,
+					  [self window],
+					  self,
+					  @selector(_changeIPNumberDidEnd:returnCode:contextInfo:),
+					  nil,
+					  nil,
+					  @"Really Change the IP number?");
+}
+
+- (void) _changeIPNumberDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info
+{
+	if(returnCode == NSAlertDefaultReturn){
+        [model changeIPNumber];
+	}
+}
+
 
 @end

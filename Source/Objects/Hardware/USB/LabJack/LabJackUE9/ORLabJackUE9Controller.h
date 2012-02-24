@@ -20,7 +20,8 @@
 
 @interface ORLabJackUE9Controller : OrcaObjectController 
 {
-	IBOutlet NSButton*      useMux80CB;
+	IBOutlet NSMatrix*      expansionOptionMatrix;
+	IBOutlet NSButton*      changeIPNumberButton;
 	IBOutlet NSTextField*	ipConnectedTextField;
 	IBOutlet NSTextField*	clockDivisorField;
 	IBOutlet NSMatrix*		clockSelectionMatrix;
@@ -117,7 +118,7 @@
 - (void) updateButtons;
 
 #pragma mark ***Interface Management
-- (void) useMux80Changed:(NSNotification*)aNote;
+- (void) expansionOptionChanged:(NSNotification*)aNote;
 - (void) clockDivisorChanged:(NSNotification*)aNote;
 - (void) counterEnableMaskChanged:(NSNotification*)aNote;
 - (void) clockSelectionChanged:(NSNotification*)aNote;
@@ -151,6 +152,7 @@
 - (void) maxValueChanged:(NSNotification*)aNote;
 - (void) timerResultChanged:(NSNotification*)aNote;
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;
+- (void) _changeIPNumberDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info;
 
 #pragma mark •••Actions
 - (IBAction) clockDivisorAction:(id)sender;
@@ -187,7 +189,8 @@
 - (IBAction) bipolarAction:(id)sender;
 - (IBAction) gainAction:(id)sender;
 - (IBAction) initTimersAction:(id)sender;
-- (IBAction) useMux80Action:(id)sender;
+- (IBAction) expansionOptionAction:(id)sender;
+- (IBAction) changeIPNumber:(id)sender;
 
 @end
 

@@ -33,6 +33,9 @@
 #define kUE9UpdateCounters  0x1
 #define kUE9ResetCounters	0x2
 
+#define kLabJackUE9NoExpansion 0
+#define kLabJackUE9Mux80Option 1
+
 @interface ORLabJackUE9Model : OrcaObject <ORAdcProcessing,ORBitProcessing> {
 	NSMutableArray*  cmdQueue;
 	ORLabJackUE9Cmd* lastRequest;
@@ -86,7 +89,8 @@
 	double hiResBipolarSlope;
 	double hiResBipolarOffset;
 	
-    BOOL useMux80;
+    int expansionOption;
+    
 	//bit processing variables
     BOOL readOnce;
 	unsigned long processInputValue;  //snapshot of the inputs at start of process cycle
@@ -101,8 +105,8 @@
 }
 
 #pragma mark ***Accessors
-- (BOOL) useMux80;
-- (void) setUseMux80:(BOOL)aState;
+- (int) expansionOption;
+- (void) setExpansionOption:(int)aState;
 - (int) clockDivisor;
 - (void) setClockDivisor:(int)aClockDivisor;
 - (int) clockSelection;
@@ -203,6 +207,7 @@
 - (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit  channel:(int)channel;
 - (double) convertedValue:(int)channel;
 - (double) maxValueForChan:(int)channel;
+- (void) changeIPNumber;
 
 #pragma mark ***HW Access
 - (void) resetCounter;
@@ -260,7 +265,7 @@ extern NSString* ORLabJackUE9TimerChanged;
 extern NSString* ORLabJackUE9BipolarChanged;
 extern NSString* ORLabJackUE9ModelCounterEnableMaskChanged;
 extern NSString* ORLabJackUE9ModelTimerResultChanged;
-extern NSString* ORLabJackUE9UseMux80Changed;
+extern NSString* ORLabJackUE9ExpansionOptionChanged;
 
 @interface ORLabJackUE9Cmd : NSObject
 {

@@ -72,7 +72,7 @@ NSString* ORLabJackUE9ModelTimerOptionChanged		= @"ORLabJackUE9ModelTimerOptionC
 NSString* ORLabJackUE9ModelTimerEnableMaskChanged	= @"ORLabJackUE9ModelTimerEnableMaskChanged";
 NSString* ORLabJackUE9ModelCounterEnableMaskChanged	= @"ORLabJackUE9ModelCounterEnableMaskChanged";
 NSString* ORLabJackUE9ModelTimerResultChanged		= @"ORLabJackUE9ModelTimerResultChanged";
-NSString* ORLabJackUE9UseMux80Changed               = @"ORLabJackUE9UseMux80Changed";
+NSString* ORLabJackUE9ExpansionOptionChanged               = @"ORLabJackUE9ExpansionOptionChanged";
 
 #define kUE9Idle			0
 #define kUE9ComCmd			1
@@ -159,15 +159,15 @@ NSString* ORLabJackUE9UseMux80Changed               = @"ORLabJackUE9UseMux80Chan
 
 
 #pragma mark ***Accessors
-- (BOOL) useMux80
+- (int) expansionOption
 {
-    return useMux80;
+    return expansionOption;
 }
-- (void) setUseMux80:(BOOL)aState
+- (void) setExpansionOption:(int)aState
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setUseMux80:useMux80];
-    useMux80 = aState;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackUE9UseMux80Changed object:self];
+    [[[self undoManager] prepareWithInvocationTarget:self] setExpansionOption:expansionOption];
+    expansionOption = aState;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackUE9ExpansionOptionChanged object:self];
   
 }
 
@@ -1038,7 +1038,7 @@ NSString* ORLabJackUE9UseMux80Changed               = @"ORLabJackUE9UseMux80Chan
 	[self setAOut1:[decoder decodeIntForKey:@"aOut1"]];
     [self setAOut0:[decoder decodeIntForKey:@"aOut0"]];
     [self setShipData:[decoder decodeBoolForKey:@"shipData"]];
-    [self setUseMux80:[decoder decodeBoolForKey:@"useMux80"]];
+    [self setExpansionOption:[decoder decodeIntForKey:@"expansionOption"]];
     [self setDigitalOutputEnabled:[decoder decodeBoolForKey:@"digitalOutputEnabled"]];
 	int i;
 	for(i=0;i<kUE9NumAdcs;i++) {
@@ -1091,7 +1091,7 @@ NSString* ORLabJackUE9UseMux80Changed               = @"ORLabJackUE9UseMux80Chan
 	[encoder encodeInt:aOut1 forKey:@"aOut1"];
     [encoder encodeInt:aOut0 forKey:@"aOut0"];
     [encoder encodeBool:shipData forKey:@"shipData"];
-    [encoder encodeBool:useMux80 forKey:@"useMux80"];
+    [encoder encodeBool:expansionOption forKey:@"expansionOption"];
     [encoder encodeInt:pollTime forKey:@"pollTime"];
     [encoder encodeBool:digitalOutputEnabled forKey:@"digitalOutputEnabled"];
 	int i;
@@ -1364,6 +1364,10 @@ NSString* ORLabJackUE9UseMux80Changed               = @"ORLabJackUE9UseMux80Chan
 	NSData* data = [NSData dataWithBytes:sendBuff length:30];
 	[self enqueCmd:data tag:kUE9TimerCounter];
 	
+}
+- (void) changeIPNumber
+{
+    NSLog(@"Change LabJack (%d) to %@\n",[self uniqueIdNumber],[self ipAddress]);
 }
 
 @end
