@@ -91,6 +91,8 @@ enum {
     
     unsigned long long  relayMask;
     NSString* relayStatus;
+    BOOL hvASwitch;
+    BOOL hvBSwitch;
 }
 
 @property (assign)	unsigned long   xl3ChargeInjMask;
@@ -113,7 +115,8 @@ enum {
 
 @property (assign) unsigned long long relayMask;
 @property (copy) NSString* relayStatus;
-
+@property (assign) BOOL hvASwitch;
+@property (assign) BOOL hvBSwitch;
 
 #pragma mark •••Initialization
 - (id)   init;
@@ -241,9 +244,13 @@ enum {
 - (void) closeHVRelays;
 - (void) openHVRelays;
 
-- (void) setHVSwitchOnForTop:(BOOL)aIsOn forBottom:(BOOL)bIsOn;
-- (void) readHVSwitchOnForTop:(BOOL*)aIsOn forBottom:(BOOL*)bIsOn;
+- (void) setHVSwitchOnForA:(BOOL)aIsOn forB:(BOOL)bIsOn;
+- (void) readHVSwitchOnForA:(BOOL*)aIsOn forB:(BOOL*)bIsOn;
 - (void) readHVSwitchOn;
+
+- (void) setHVSwitch:(BOOL)aOn forPowerSupply:(unsigned char)sup;
+
+
 - (void) readHVInterlockGood:(BOOL*)isGood;
 - (void) readHVInterlock;
 - (void) setHVDacA:(unsigned short)aDac dacB:(unsigned short)bDac;
@@ -296,3 +303,4 @@ extern NSString* ORXL3ModelPollStatusChanged;
 extern NSString* ORXL3ModelIsPollingVerboseChanged;
 extern NSString* ORXL3ModelRelayMaskChanged;
 extern NSString* ORXL3ModelRelayStatusChanged;
+extern NSString* ORXL3ModelHvStatusChanged;

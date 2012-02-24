@@ -534,10 +534,10 @@ static NSDictionary* xl3Ops;
     [hvRelayMaskHighField setIntValue:relayMask >> 32];
 
     unsigned char slot;
-    unsigned char db;
+    unsigned char pmtic;
     for (slot = 0; slot<16; slot++) {
-        for (db=0; db<4; db++) {
-            [[hvRelayMaskMatrix cellAtRow:3-db column:15-slot] setIntValue: (relayMask >> (slot*4 + db)) & 0x1];
+        for (pmtic=0; pmtic<4; pmtic++) {
+            [[hvRelayMaskMatrix cellAtRow:pmtic column:15-slot] setIntValue: (relayMask >> (slot*4 + pmtic)) & 0x1];
         }
     }
 }
@@ -1015,8 +1015,8 @@ static NSDictionary* xl3Ops;
     unsigned char pmtic;
     for (slot = 0; slot<16; slot++) {
         for (pmtic=0; pmtic<4; pmtic++) {
-            NSLog(@"slot: %d, db: %d, value: %d\n",slot,pmtic,[[sender cellAtRow:(3-pmtic) column:(15-slot)] intValue]);
-            newRelayMask |= ([[sender cellAtRow:3-pmtic column:15-slot] intValue]?1ULL:0ULL) << (slot*4 + pmtic);
+            //NSLog(@"slot: %d, db: %d, value: %d\n",slot,pmtic,[[sender cellAtRow:(3-pmtic) column:(15-slot)] intValue]);
+            newRelayMask |= ([[sender cellAtRow:pmtic column:15-slot] intValue]?1ULL:0ULL) << (slot*4 + pmtic);
         }
     }
     [model setRelayMask:newRelayMask];
@@ -1037,7 +1037,23 @@ static NSDictionary* xl3Ops;
 - (IBAction)hvCheckInterlockAction:(id)sender
 {
     [self endEditing];
+    [model readHVInterlock];
 
+}
+
+- (IBAction)hvTurnOnAction:(id)sender
+{
+
+}
+
+- (IBAction)hvTurnOffAction:(id)sender
+{
+    
+}
+
+- (IBAction)hvGetStatusAction:(id)sender
+{
+    
 }
 
 //connection

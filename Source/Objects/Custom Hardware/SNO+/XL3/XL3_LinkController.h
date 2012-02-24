@@ -96,6 +96,10 @@
     IBOutlet NSTextField *hvRelayMaskHighField;
     IBOutlet NSTextField *hvRelayStatusField;
     IBOutlet NSMatrix *hvRelayMaskMatrix;
+    IBOutlet NSMatrix *hvPowerSupplyMatrix;
+    IBOutlet NSTextField *hvAOnStatusField;
+    IBOutlet NSTextField *hvBOnStatusField;
+    
 	
     //connection
 	IBOutlet NSButton*              toggleConnectButton;
@@ -218,6 +222,10 @@
 - (IBAction)hvRelaySetAction:(id)sender;
 - (IBAction)hvRelayOpenAllAction:(id)sender;
 - (IBAction)hvCheckInterlockAction:(id)sender;
+- (IBAction)hvTurnOnAction:(id)sender;
+- (IBAction)hvTurnOffAction:(id)sender;
+- (IBAction)hvGetStatusAction:(id)sender;
+
 //connection
 - (IBAction) toggleConnectAction:(id)sender;
 - (IBAction) errorTimeOutAction:(id)sender;

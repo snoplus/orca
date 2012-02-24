@@ -76,6 +76,7 @@ NSString* ORXL3ModelPollStatusChanged =             @"ORXL3ModelPollStatusChange
 NSString* ORXL3ModelIsPollingVerboseChanged =       @"ORXL3ModelIsPollingVerboseChanged";
 NSString* ORXL3ModelRelayMaskChanged = @"ORXL3ModelRelayMaskChanged";
 NSString* ORXL3ModelRelayStatusChanged = @"ORXL3ModelRelayStatusChanged";
+NSString* ORXL3ModelHvStatusChanged = @"ORXL3ModelHvStatusChanged";
 
 @interface ORXL3Model (private)
 - (void) doBasicOp;
@@ -583,6 +584,30 @@ NSString* ORXL3ModelRelayStatusChanged = @"ORXL3ModelRelayStatusChanged";
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelPollStatusChanged object:self];        
 }
 
+- (BOOL) hvASwitch
+{
+    return hvASwitch;
+}
+
+- (void) setHvASwitch:(BOOL)aHvASwitch
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setHvASwitch:hvASwitch];
+    hvASwitch = aHvASwitch;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];        
+}
+
+- (BOOL) hvBSwitch
+{
+    return hvBSwitch;
+}
+
+- (void) setHvBSwitch:(BOOL)aHvBSwitch
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setHvBSwitch:hvBSwitch];
+    hvASwitch = aHvBSwitch;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];        
+}
+
 - (unsigned long long) relayMask
 {
     return relayMask;
@@ -592,7 +617,7 @@ NSString* ORXL3ModelRelayStatusChanged = @"ORXL3ModelRelayStatusChanged";
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setRelayMask:relayMask];
     relayMask = aRelayMask;
-    NSLog(@"relay mask:0x%016x",relayMask);
+    //NSLog(@"relay mask:0x%016x",relayMask);
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelRelayMaskChanged object:self];        
 }
 
@@ -2092,6 +2117,7 @@ void SwapLongBlock(void* p, int32_t n)
         
     @try {
         [[self xl3Link] sendCommand:HV_READBACK_ID withPayload:&payload expectResponse:YES];
+        //[[self xl3Link] sendCommand:GET_HV_STATUS_ID withPayload:&payload expectResponse:YES];
     }
     @catch (NSException *exception) {
         NSLog(@"%@ error sending readHVStatus command.\n", [[self xl3Link] crateName]);
@@ -2101,7 +2127,6 @@ void SwapLongBlock(void* p, int32_t n)
     if ([xl3Link needToSwap]) {
         SwapLongBlock(payload.payload, sizeof(hv_readback_results_t)/4);
     }
-
     memcpy(status, payload.payload, sizeof(hv_readback_results_t));
 }
 
@@ -2123,7 +2148,7 @@ void SwapLongBlock(void* p, int32_t n)
     //unless (isPollingXl3 && !isPollingVerbose)
     if (!isPollingXl3 || isPollingVerbose) {    
         NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ HV status: \n", [[self xl3Link] crateName]];
-        [msg appendFormat:@"voltageA: %f\nvoltageB: %f\n", status.voltage_a, status.voltage_b];
+        [msg appendFormat:@"voltageA: %f\nvoltageB: %f\n", status.voltage_a * 300., status.voltage_b * 300.];
         [msg appendFormat:@"currentA: %f\ncurrentB: %f\n", status.current_a, status.current_b];
         NSLog(msg);
     }
@@ -2136,8 +2161,8 @@ void SwapLongBlock(void* p, int32_t n)
         NSString* str = [iso stringFromDate:[NSDate date]];
         NSDictionary* hvSupplyDict = [NSDictionary dictionaryWithObjectsAndKeys:
                                      str, @"time_stamp",
-                                     [NSNumber numberWithFloat:status.voltage_a], @"VLT_A",
-                                     [NSNumber numberWithFloat:status.voltage_b], @"VLT_B",
+                                     [NSNumber numberWithFloat:status.voltage_a * 300.], @"VLT_A",
+                                     [NSNumber numberWithFloat:status.voltage_b * 300.], @"VLT_B",
                                      [NSNumber numberWithFloat:status.current_a], @"CRR_A",
                                      [NSNumber numberWithFloat:status.current_b], @"CRR_B",
                                      nil];
@@ -2151,11 +2176,11 @@ void SwapLongBlock(void* p, int32_t n)
 {
 	XL3_PayloadStruct payload;
 	memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
-	payload.numberBytesinPayload = 2;
+	payload.numberBytesinPayload = 8;
     
     unsigned long* data = (unsigned long*)payload.payload;
     data[0] = aRelayMask & 0xffffffffUL; //mask1 bottom
-    data[1] = aRelayMask >> 16;          //mask2 top
+    data[1] = aRelayMask >> 32;          //mask2 top
 
     if ([xl3Link needToSwap]) {
         SwapLongBlock(data, 2);
@@ -2237,7 +2262,7 @@ void SwapLongBlock(void* p, int32_t n)
     }
 }
 
-- (void) setHVSwitchOnForTop:(BOOL)aIsOn forBottom:(BOOL)bIsOn
+- (void) setHVSwitchOnForA:(BOOL)aIsOn forB:(BOOL)bIsOn
 {
 	unsigned long xl3Address = XL3_SEL | [self getRegisterAddress:kXl3HvCsReg] | WRITE_REG;
 	unsigned long aValue = 0UL;
@@ -2254,7 +2279,7 @@ void SwapLongBlock(void* p, int32_t n)
 	}
 }
 
-- (void) readHVSwitchOnForTop:(BOOL*)aIsOn forBottom:(BOOL*)bIsOn
+- (void) readHVSwitchOnForA:(BOOL*)aIsOn forB:(BOOL*)bIsOn
 {
 	unsigned long xl3Address = XL3_SEL | [self getRegisterAddress:kXl3HvCsReg] | READ_REG;
 	unsigned long aValue = 0UL;
@@ -2277,15 +2302,97 @@ void SwapLongBlock(void* p, int32_t n)
     BOOL switchBIsOn;
     
     @try {
-        [self readHVSwitchOnForTop:&switchAIsOn forBottom:&switchBIsOn];
+        [self readHVSwitchOnForA:&switchAIsOn forB:&switchBIsOn];
     }
     @catch (NSException *exception) {
         NSLog(@"%@ error in readHVSwitchOn\n", [[self xl3Link] crateName]);
         return;
     }
 
-    NSLog(@"switch A (top) is %@, switch B (bottom) is %@.\n", switchAIsOn?@"ON":@"OFF", switchBIsOn?@"ON":@"OFF");
+    NSLog(@"%@ switch A is %@, switch B is %@.\n",[[self xl3Link] crateName], switchAIsOn?@"ON":@"OFF", switchBIsOn?@"ON":@"OFF");
 }
+
+- (void) setHVSwitch:(BOOL)aOn forPowerSupply:(unsigned char)sup
+{
+    BOOL xl3SwitchA, xl3SwitchB;
+    @try {
+        [self readHVSwitchOnForA:&xl3SwitchA forB:&xl3SwitchB];
+    }
+    @catch (NSException *exception) {
+        NSLog(@"%@ error in readHVSwitch\n", [[self xl3Link] crateName]);
+        return;
+    }
+    
+    if (xl3SwitchA != [self hvASwitch]) {
+        NSLog(@"%@ HV switch A is reported %@ by XL3 and expected to be %@ by ORCA.\n",[[self xl3Link] crateName], xl3SwitchA?@"ON":@"OFF", hvASwitch?@"ON":@"OFF");
+        [self setHvASwitch:xl3SwitchA];
+    }
+
+    if (xl3SwitchB != [self hvBSwitch]) {
+        NSLog(@"%@ HV switch B is reported %@ by XL3 and expected to be %@ by ORCA.\n",[[self xl3Link] crateName], xl3SwitchB?@"ON":@"OFF", hvBSwitch?@"ON":@"OFF");
+        [self setHvBSwitch:xl3SwitchB];
+    }
+
+    BOOL interlockIsGood;
+    
+    @try {
+        [self readHVInterlockGood:&interlockIsGood];
+    }
+    @catch (NSException *exception) {
+        NSLog(@"%@ error in readHVInterlock\n",[[self xl3Link] crateName]);
+        return;
+    }
+
+    if (!interlockIsGood) {
+        NSLog(@"%@ HV interlock BAD\n",[[self xl3Link] crateName]);
+        if (aOn) {
+            NSLog(@"%@ NOT turning ON the HV power supply.\n",[[self xl3Link] crateName]);
+            return;
+        }
+        else {
+            NSLog(@"%@ continuing to turn OFF the HV power supply.\n",[[self xl3Link] crateName]);            
+        }
+    }
+
+    @try {
+        if (sup == 0) { //A
+            [self setHVSwitchOnForA:aOn forB:hvBSwitch];
+        }
+        else {
+            [self setHVSwitchOnForA:hvASwitch forB:aOn];
+        }
+    }
+    @catch (NSException *exception) {
+        NSLog(@"%@ error in setting the HV switch.",[[self xl3Link] crateName]);
+        return;
+    }
+
+    @try {
+        [self readHVSwitchOnForA:&xl3SwitchA forB:&xl3SwitchB];
+    }
+    @catch (NSException *exception) {
+        NSLog(@"%@ error in readHVSwitch\n", [[self xl3Link] crateName]);
+        return;
+    }
+    
+    if (sup == 0 && xl3SwitchA != aOn) {
+        NSLog(@"%@ HV switch A is reported %@ by XL3 and expected to be %@ by ORCA.\n",[[self xl3Link] crateName], xl3SwitchA?@"ON":@"OFF", aOn?@"ON":@"OFF");
+        [self setHvASwitch:xl3SwitchA];
+    }
+    else if (sup == 1 && xl3SwitchA != [self hvASwitch]) {
+        NSLog(@"%@ HV switch A is reported %@ by XL3 and expected to be %@ by ORCA.\n",[[self xl3Link] crateName], xl3SwitchA?@"ON":@"OFF", aOn?@"ON":@"OFF");
+        [self setHvASwitch:xl3SwitchA];
+    }
+    else if (sup == 1 && xl3SwitchB != aOn) {
+        NSLog(@"%@ HV switch B is reported %@ by XL3 and expected to be %@ by ORCA.\n",[[self xl3Link] crateName], xl3SwitchB?@"ON":@"OFF", aOn?@"ON":@"OFF");
+        [self setHvBSwitch:xl3SwitchB];
+    }
+    else if (sup == 0 && xl3SwitchB != [self hvBSwitch]) {
+        NSLog(@"%@ HV switch B is reported %@ by XL3 and expected to be %@ by ORCA.\n",[[self xl3Link] crateName], xl3SwitchB?@"ON":@"OFF", aOn?@"ON":@"OFF");
+        [self setHvBSwitch:xl3SwitchB];
+    }
+}
+
 
 - (void) readHVInterlockGood:(BOOL*)isGood
 {
@@ -2311,7 +2418,7 @@ void SwapLongBlock(void* p, int32_t n)
         [self readHVInterlockGood:&isGood];
     }
     @catch (NSException *exception) {
-        NSLog(@"%@ error in readHVSwitchOn\n",[[self xl3Link] crateName]);
+        NSLog(@"%@ error in readHVInterlock\n",[[self xl3Link] crateName]);
         return;
     }
     
