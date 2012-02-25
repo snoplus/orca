@@ -1370,6 +1370,47 @@ NSString* ORLabJackUE9ExpansionOptionChanged               = @"ORLabJackUE9Expan
     NSLog(@"Change LabJack (%d) to %@\n",[self uniqueIdNumber],[self ipAddress]);
 }
 
+
+#pragma mark •••OROrderedObjHolding Protocol
+- (int) maxNumberOfObjects	{ return 4; }
+- (int) objWidth			{ return 20; }
+- (int) groupSeparation		{ return 20; }
+
+- (NSString*) nameForSlot:(int)aSlot	{ return [NSString stringWithFormat:@"Mux80 Slot %d",aSlot]; }
+
+- (BOOL) slot:(int)aSlot excludedFor:(id)anObj { return NO;}
+
+- (NSRange) legalSlotsForObj:(id)anObj
+{
+	return NSMakeRange(0,[self maxNumberOfObjects]);
+}
+
+- (int) slotAtPoint:(NSPoint)aPoint 
+{
+	return floor(((int)aPoint.y)/[self objWidth]);
+}
+
+- (NSPoint) pointForSlot:(int)aSlot 
+{
+	return NSMakePoint(0,aSlot*[self objWidth]);
+}
+
+- (void) place:(id)anObj intoSlot:(int)aSlot
+{
+//	[anObj setSlot: aSlot];//temp commented out until expansion cards implemented
+//	[anObj moveTo:[self pointForSlot:aSlot]];//temp commented out until expansion cards implemented
+}
+
+- (int) slotForObj:(id)anObj
+{
+//	return [anObj slot]; //temp commented out until expansion cards implemented
+    return 0;
+}
+
+- (int) numberSlotsNeededFor:(id)anObj
+{
+	return [anObj numberSlotsUsed];
+}
 @end
 
 @implementation ORLabJackUE9Model (private)
@@ -1696,13 +1737,12 @@ NSString* ORLabJackUE9ExpansionOptionChanged               = @"ORLabJackUE9Expan
 		break;
 		default:
 			return -1;
-
 	}
-	
 	*analogVoltage = (internalSlope * rawAdc) + internalOffset;
 	return 0;
 }
-
 @end
+
+
 
 

@@ -21,6 +21,8 @@
 
 #import "ORAdcProcessing.h"
 #import "ORBitProcessing.h"
+#import "OROrderedObjHolding.h"
+#import "ORGroup.h"
 
 @class NetSocket;
 @class ORLabJackUE9Cmd;
@@ -36,41 +38,47 @@
 #define kLabJackUE9NoExpansion 0
 #define kLabJackUE9Mux80Option 1
 
-@interface ORLabJackUE9Model : OrcaObject <ORAdcProcessing,ORBitProcessing> {
-	NSMutableArray*  cmdQueue;
-	ORLabJackUE9Cmd* lastRequest;
-	NSString*		 ipAddress;
-    BOOL			 isConnected;
-	NetSocket*		 socket;
-	NSLock*			 localLock;
-    NSString*		 serialNumber;
-	float	adc[kUE9NumAdcs];
-	int		gain[kUE9NumAdcs];
-	BOOL	bipolar[kUE9NumAdcs];
-	float	lowLimit[kUE9NumAdcs];
-	float	hiLimit[kUE9NumAdcs];
-	float	minValue[kUE9NumAdcs];
-	float	maxValue[kUE9NumAdcs];
-	float	slope[kUE9NumAdcs];
-	float	intercept[kUE9NumAdcs];
-	NSString* channelName[kUE9NumAdcs];   //adc names
-	NSString* channelUnit[kUE9NumAdcs];   //adc names
-	unsigned long timeMeasured;
-	NSString* doName[kUE9NumIO];		//the D connector on the side
-	unsigned long doDirection;
-	unsigned long doValueOut;
-	unsigned long doValueIn;
-    unsigned short aOut0;
-    unsigned short aOut1;
-    unsigned long counter[2];
-    unsigned long timer[kUE9NumTimers];
-    unsigned long timerResult[kUE9NumTimers];
-    BOOL digitalOutputEnabled;
-    int pollTime;
-	unsigned long	dataId;
-    BOOL shipData;
-	NSTimeInterval lastTime;
+@interface ORLabJackUE9Model : ORGroup <OROrderedObjHolding,ORAdcProcessing,ORBitProcessing> {
 	NSOperationQueue* queue;
+	NSMutableArray*   cmdQueue;
+	ORLabJackUE9Cmd*  lastRequest;
+	NSString*		  ipAddress;
+    BOOL			  isConnected;
+	NetSocket*		  socket;
+	NSLock*			  localLock;
+    NSString*		  serialNumber;
+	float             adc[kUE9NumAdcs];
+	int               gain[kUE9NumAdcs];
+	BOOL              bipolar[kUE9NumAdcs];
+	float             lowLimit[kUE9NumAdcs];
+	float             hiLimit[kUE9NumAdcs];
+	float             minValue[kUE9NumAdcs];
+	float             maxValue[kUE9NumAdcs];
+	float             slope[kUE9NumAdcs];
+	float             intercept[kUE9NumAdcs];
+	NSString*         channelName[kUE9NumAdcs];   //adc names
+	NSString*         channelUnit[kUE9NumAdcs];   //adc names
+	NSString*         doName[kUE9NumIO];		//the D connector on the side
+	unsigned long     timeMeasured;
+	unsigned long     doDirection;
+	unsigned long     doValueOut;
+	unsigned long     doValueIn;
+    unsigned short    aOut0;
+    unsigned short    aOut1;
+    unsigned long     counter[2];
+    unsigned long     timer[kUE9NumTimers];
+    unsigned long     timerResult[kUE9NumTimers];
+    BOOL              digitalOutputEnabled;
+    int               pollTime;
+	unsigned long	  dataId;
+    BOOL              shipData;
+	NSTimeInterval    lastTime;
+    unsigned long     timerOption[kUE9NumTimers];
+    unsigned short    timerEnableMask;
+    unsigned short    counterEnableMask;
+    int               clockSelection;
+    int               clockDivisor;
+    int               expansionOption;
 	
 	double unipolarSlope[4];
 	double unipolarOffset[4];
@@ -89,27 +97,21 @@
 	double hiResBipolarSlope;
 	double hiResBipolarOffset;
 	
-    int expansionOption;
     
 	//bit processing variables
-    BOOL readOnce;
-	unsigned long processInputValue;  //snapshot of the inputs at start of process cycle
-	unsigned long processOutputValue; //outputs to be written at end of process cycle
-	unsigned long processOutputMask;  //controlls which bits are written
-    BOOL involvedInProcess;
-    unsigned long timerOption[kUE9NumTimers];
-    unsigned short timerEnableMask;
-    unsigned short counterEnableMask;
-    int clockSelection;
-    int clockDivisor;
+    BOOL            readOnce;
+	unsigned long   processInputValue;  //snapshot of the inputs at start of process cycle
+	unsigned long   processOutputValue; //outputs to be written at end of process cycle
+	unsigned long   processOutputMask;  //controlls which bits are written
+    BOOL            involvedInProcess;
 }
 
 #pragma mark ***Accessors
-- (int) expansionOption;
+- (int)  expansionOption;
 - (void) setExpansionOption:(int)aState;
-- (int) clockDivisor;
+- (int)  clockDivisor;
 - (void) setClockDivisor:(int)aClockDivisor;
-- (int) clockSelection;
+- (int)  clockSelection;
 - (void) setClockSelection:(int)aClockSelection;
 - (unsigned short) counterEnableMask;
 - (void) setCounterEnableMask:(unsigned short)anEnableMask;
@@ -129,7 +131,7 @@
 - (void) setAOut0:(unsigned short)aAOut0;
 - (BOOL) shipData;
 - (void) setShipData:(BOOL)aShipData;
-- (int) pollTime;
+- (int)  pollTime;
 - (void) setPollTime:(int)aPollTime;
 - (BOOL) digitalOutputEnabled;
 - (void) setDigitalOutputEnabled:(BOOL)aDigitalOutputEnabled;
@@ -143,25 +145,25 @@
 - (NSString*) channelUnit:(int)i;
 - (void) setChannel:(int)i unit:(NSString*)aName;
 - (NSString*) doName:(int)i;
-- (void) setDo:(int)i name:(NSString*)aName;
+- (void)  setDo:(int)i name:(NSString*)aName;
 - (float) adc:(int)i;
-- (void) setAdc:(int)i value:(float)aValue;
-- (int) gain:(int)i;
-- (void) setGain:(int)i value:(int)aValue;
-- (BOOL) bipolar:(int)i;
-- (void) setBipolar:(int)i value:(BOOL)aValue;
+- (void)  setAdc:(int)i value:(float)aValue;
+- (int)   gain:(int)i;
+- (void)  setGain:(int)i value:(int)aValue;
+- (BOOL)  bipolar:(int)i;
+- (void)  setBipolar:(int)i value:(BOOL)aValue;
 - (float) lowLimit:(int)i;
-- (void) setLowLimit:(int)i value:(float)aValue;
+- (void)  setLowLimit:(int)i value:(float)aValue;
 - (float) hiLimit:(int)i;
-- (void) setHiLimit:(int)i value:(float)aValue;
+- (void)  setHiLimit:(int)i value:(float)aValue;
 - (float) slope:(int)i;
-- (void) setSlope:(int)i value:(float)aValue;
+- (void)  setSlope:(int)i value:(float)aValue;
 - (float) intercept:(int)i;
-- (void) setIntercept:(int)i value:(float)aValue;
+- (void)  setIntercept:(int)i value:(float)aValue;
 - (float) minValue:(int)i;
-- (void) setMinValue:(int)i value:(float)aValue;
+- (void)  setMinValue:(int)i value:(float)aValue;
 - (float) maxValue:(int)i;
-- (void) setMaxValue:(int)i value:(float)aValue;
+- (void)  setMaxValue:(int)i value:(float)aValue;
 
 - (unsigned long) doDirection;
 - (void) setDoDirection:(unsigned long)aMask;
@@ -195,18 +197,6 @@
 - (void) netsocketConnected:(NetSocket*)inNetSocket;
 - (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(unsigned)inAmount;
 - (void) netsocketDisconnected:(NetSocket*)inNetSocket;
-
-#pragma mark •••Adc Processing Protocol
-- (void)processIsStarting;
-- (void)processIsStopping;
-- (void) startProcessCycle;
-- (void) endProcessCycle;
-- (BOOL) processValue:(int)channel;
-- (void) setProcessOutput:(int)channel value:(int)value;
-- (NSString*) processingTitle;
-- (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit  channel:(int)channel;
-- (double) convertedValue:(int)channel;
-- (double) maxValueForChan:(int)channel;
 - (void) changeIPNumber;
 
 #pragma mark ***HW Access
@@ -229,6 +219,31 @@
 - (void) goToNextCommand;
 - (void) processOneCommandFromQueue;
 - (void) startTimeOut;
+
+#pragma mark •••Adc Processing Protocol
+- (void)processIsStarting;
+- (void)processIsStopping;
+- (void) startProcessCycle;
+- (void) endProcessCycle;
+- (BOOL) processValue:(int)channel;
+- (void) setProcessOutput:(int)channel value:(int)value;
+- (NSString*) processingTitle;
+- (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit  channel:(int)channel;
+- (double) convertedValue:(int)channel;
+- (double) maxValueForChan:(int)channel;
+
+#pragma mark •••OROrderedObjHolding Protocol
+- (int) maxNumberOfObjects;
+- (int) objWidth;
+- (BOOL) slot:(int)aSlot excludedFor:(id)anObj;
+- (NSString*) nameForSlot:(int)aSlot;
+- (NSRange) legalSlotsForObj:(id)anObj;
+- (int) slotAtPoint:(NSPoint)aPoint; 
+- (NSPoint) pointForSlot:(int)aSlot;
+- (void) place:(id)anObj intoSlot:(int)aSlot;
+- (int) slotForObj:(id)anObj;
+- (int) numberSlotsNeededFor:(id)anObj;
+
 @end
 
 extern NSString* ORLabJackUE9ModelClockDivisorChanged;
@@ -275,3 +290,4 @@ extern NSString* ORLabJackUE9ExpansionOptionChanged;
 @property (nonatomic,assign) int tag;
 @property (nonatomic,retain) NSData* cmdData;
 @end
+
