@@ -11389,6 +11389,14 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 				<int key="NSvFlags">268</int>
 				<object class="NSMutableArray" key="NSSubviews">
 					<bool key="EncodedWithXMLCoder">YES</bool>
+					<object class="NSCustomView" id="130546607">
+						<reference key="NSNextResponder" ref="881029778"/>
+						<int key="NSvFlags">256</int>
+						<string key="NSFrame">{{95, 10}, {172, 125}}</string>
+						<reference key="NSSuperview" ref="881029778"/>
+						<string key="NSClassName">ORCardContainerView</string>
+						<string key="NSExtension">NSView</string>
+					</object>
 					<object class="NSImageView" id="310552454">
 						<reference key="NSNextResponder" ref="881029778"/>
 						<int key="NSvFlags">268</int>
@@ -18273,6 +18281,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<reference ref="310552454"/>
+							<reference ref="130546607"/>
 						</object>
 						<reference key="parent" ref="0"/>
 					</object>
@@ -18338,6 +18347,11 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 						<int key="objectID">3499</int>
 						<reference key="object" ref="40414769"/>
 						<reference key="parent" ref="53010249"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">3504</int>
+						<reference key="object" ref="130546607"/>
+						<reference key="parent" ref="881029778"/>
 					</object>
 				</object>
 			</object>
@@ -19240,6 +19254,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					<string>3497.IBPluginDependency</string>
 					<string>3498.IBPluginDependency</string>
 					<string>3499.IBPluginDependency</string>
+					<string>3504.IBPluginDependency</string>
 					<string>5.IBPluginDependency</string>
 					<string>5.IBWindowTemplateEditedContentRect</string>
 					<string>6.IBPluginDependency</string>
@@ -20160,6 +20175,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>{{315, 411}, {401, 795}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -20194,7 +20210,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">3503</int>
+			<int key="maxID">3504</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes"/>
 		<int key="IBDocument.localizationMode">0</int>
