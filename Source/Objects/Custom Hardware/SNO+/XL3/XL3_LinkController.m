@@ -73,6 +73,14 @@ static NSDictionary* xl3Ops;
         [connectionIPAddressField setStringValue:[[model guardian] iPAddress]];
         [connectionIPPortField setStringValue:[NSString stringWithFormat:@"%d", [[model guardian] portNumber]]];
         [connectionCrateNumberField setStringValue:[NSString stringWithFormat:@"%d", [model crateNumber]]];
+        [hvPowerSupplyMatrix selectCellAtRow:0 column:0];
+        if ([model crateNumber] != 16) {
+            [[hvPowerSupplyMatrix cellAtRow:0 column:1] setEnabled:NO];
+        }
+        else {
+            [[hvPowerSupplyMatrix cellAtRow:0 column:1] setEnabled:YES];
+        }
+        [self hvChangePowerSupplyChanged:nil];
     }
     else {
         [[self window] setTitle: [NSString stringWithFormat:@"XL3 Crate"]];
@@ -252,6 +260,21 @@ static NSDictionary* xl3Ops;
                      selector : @selector(hvRelayMaskChanged:)
                          name : ORXL3ModelRelayMaskChanged
                        object : model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(hvStatusChanged:)
+                         name : ORXL3ModelHvStatusChanged
+                       object : model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(hvTriggerStatusChanged:)
+                         name : ORXL3ModelTriggerStatusChanged
+                       object : model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(hvTargetValueChanged:)
+                         name : ORXL3ModelHVTargetValueChanged
+                       object : model];
 }
 
 - (void) updateWindow
@@ -292,6 +315,10 @@ static NSDictionary* xl3Ops;
     //hv
     [self hvRelayMaskChanged:nil];
     [self hvRelayStatusChanged:nil];
+    [self hvStatusChanged:nil];
+    [self hvTriggerStatusChanged:nil];
+    [self hvTargetValueChanged:nil];
+    [self hvChangePowerSupplyChanged:nil];
 	//ip connection
 	[self errorTimeOutChanged:nil];
     [self connectStateChanged:nil];
@@ -545,6 +572,42 @@ static NSDictionary* xl3Ops;
 - (void) hvRelayStatusChanged:(NSNotification*)aNote
 {
     [hvRelayStatusField setStringValue:[model relayStatus]];
+}
+
+- (void) hvStatusChanged:(NSNotification*)aNote
+{
+    [hvAOnStatusField setStringValue:[model hvASwitch]?@"ON":@"OFF"];
+    [hvBOnStatusField setStringValue:[model hvBSwitch]?@"ON":@"OFF"];
+    [hvAVoltageSetField setStringValue:[NSString stringWithFormat:@"%d V",[model hvAVoltageDACSetValue]*3000/4096]];
+    [hvBVoltageSetField setStringValue:[NSString stringWithFormat:@"%d V",[model hvBVoltageDACSetValue]*3000/4096]];
+    [hvAVoltageReadField setStringValue:[NSString stringWithFormat:@"%d V",(unsigned int)[model hvAVoltageReadValue]]];
+    [hvBVoltageReadField setStringValue:[NSString stringWithFormat:@"%d V",(unsigned int)[model hvBVoltageReadValue]]];
+    [hvACurrentReadField setStringValue:[NSString stringWithFormat:@"%3.1f uA",[model hvACurrentReadValue]]];
+    [hvBCurrentReadField setStringValue:[NSString stringWithFormat:@"%3.1f uA",[model hvBCurrentReadValue]]];
+}
+
+- (void) hvTriggerStatusChanged:(NSNotification*)aNote
+{
+    [hvATriggerStatusField setStringValue:[model triggerStatus]];
+    [hvBTriggerStatusField setStringValue:[model triggerStatus]];
+}
+
+- (void) hvTargetValueChanged:(NSNotification*)aNote
+{
+    if ([hvPowerSupplyMatrix selectedColumn] == 0) { //A
+        [hvTargetValueField setFloatValue:[model hvAVoltageTargetValue] * 3000. / 4096.];
+        [hvTargetValueStepper setIntValue:[model hvAVoltageTargetValue]];
+    }
+    else {
+        [hvTargetValueField setFloatValue:[model hvBVoltageTargetValue] * 3000. / 4096.];
+        [hvTargetValueStepper setIntValue:[model hvBVoltageTargetValue]];
+    }
+}
+
+- (void) hvChangePowerSupplyChanged:(NSNotification*)aNote
+{
+
+    [self hvTargetValueChanged:aNote];
 }
 
 #pragma mark •ip connection
@@ -1004,7 +1067,7 @@ static NSDictionary* xl3Ops;
 - (IBAction)hvRelayMaskLowAction:(id)sender
 {
     unsigned long long newRelayMask = [model relayMask] & (0xFFFFFFFFULL << 32);
-    newRelayMask |= [sender intValue];
+    newRelayMask |= [sender intValue] & 0xFFFFFFFF;
     [model setRelayMask:newRelayMask];    
 }
 
@@ -1043,17 +1106,52 @@ static NSDictionary* xl3Ops;
 
 - (IBAction)hvTurnOnAction:(id)sender
 {
-
+    [model setHVSwitch:YES forPowerSupply:[hvPowerSupplyMatrix selectedColumn]];
 }
 
 - (IBAction)hvTurnOffAction:(id)sender
 {
-    
+    [model setHVSwitch:NO forPowerSupply:[hvPowerSupplyMatrix selectedColumn]];    
 }
 
 - (IBAction)hvGetStatusAction:(id)sender
 {
-    
+    [model readHVStatus];
+}
+
+- (IBAction)hvTargetValueAction:(id)sender
+{
+    int nextTargetValue;
+    if (sender == hvTargetValueField) {
+        nextTargetValue = (int) ([sender floatValue] * 4096 / 3000);
+        if (nextTargetValue < 0) nextTargetValue = 0;
+        if (nextTargetValue > 1800 / 3000. * 4096) nextTargetValue = 1800 * 4096 / 3000;
+    }
+    else if (sender == hvTargetValueStepper) {
+        nextTargetValue = [sender intValue];
+        if (nextTargetValue < 0) nextTargetValue = 0;
+        if (nextTargetValue > 1800 / 3000. * 4096) nextTargetValue = 1800 * 4096 / 3000;
+    }
+    if ([hvPowerSupplyMatrix selectedColumn] == 0) {
+        [model setHvAVoltageTargetValue:nextTargetValue];
+    }
+    else {
+        [model setHvBVoltageTargetValue:nextTargetValue];
+    }
+}
+
+- (IBAction)hvChangePowerSupplyAction:(id)sender
+{
+    if ([hvPowerSupplyMatrix selectedColumn] == 0) {
+        [[hvPowerSupplyMatrix cellAtRow:0 column:0] setIntValue:YES];
+        [[hvPowerSupplyMatrix cellAtRow:0 column:1] setIntValue:NO];
+    }
+    else {
+        [[hvPowerSupplyMatrix cellAtRow:0 column:0] setIntValue:NO];
+        [[hvPowerSupplyMatrix cellAtRow:0 column:1] setIntValue:YES];
+    }
+
+    [self hvChangePowerSupplyChanged:nil];
 }
 
 //connection

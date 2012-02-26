@@ -98,9 +98,17 @@
     IBOutlet NSMatrix *hvRelayMaskMatrix;
     IBOutlet NSMatrix *hvPowerSupplyMatrix;
     IBOutlet NSTextField *hvAOnStatusField;
-    IBOutlet NSTextField *hvBOnStatusField;
-    
-	
+    IBOutlet NSTextField *hvBOnStatusField;    
+    IBOutlet NSTextField *hvATriggerStatusField;
+    IBOutlet NSTextField *hvBTriggerStatusField;
+    IBOutlet NSTextField *hvAVoltageSetField;
+    IBOutlet NSTextField *hvBVoltageSetField;
+    IBOutlet NSTextField *hvAVoltageReadField;
+    IBOutlet NSTextField *hvBVoltageReadField;
+    IBOutlet NSTextField *hvACurrentReadField;
+    IBOutlet NSTextField *hvBCurrentReadField;
+    IBOutlet NSTextField *hvTargetValueField;
+    IBOutlet NSStepper *hvTargetValueStepper;
     //connection
 	IBOutlet NSButton*              toggleConnectButton;
 	IBOutlet NSPopUpButton*         errorTimeOutPU;
@@ -159,6 +167,10 @@
 //hv
 - (void) hvRelayMaskChanged:(NSNotification*)aNote;
 - (void) hvRelayStatusChanged:(NSNotification*)aNote;
+- (void) hvStatusChanged:(NSNotification*)aNote;
+- (void) hvTriggerStatusChanged:(NSNotification*)aNote;
+- (void) hvTargetValueChanged:(NSNotification*)aNote;
+- (void) hvChangePowerSupplyChanged:(NSNotification*)aNote;
 //ip connection
 - (void) connectStateChanged:(NSNotification*)aNote;
 - (void) linkConnectionChanged:(NSNotification*)aNote;
@@ -225,7 +237,8 @@
 - (IBAction)hvTurnOnAction:(id)sender;
 - (IBAction)hvTurnOffAction:(id)sender;
 - (IBAction)hvGetStatusAction:(id)sender;
-
+- (IBAction)hvTargetValueAction:(id)sender;
+- (IBAction)hvChangePowerSupplyAction:(id)sender;
 //connection
 - (IBAction) toggleConnectAction:(id)sender;
 - (IBAction) errorTimeOutAction:(id)sender;

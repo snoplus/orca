@@ -93,6 +93,15 @@ enum {
     NSString* relayStatus;
     BOOL hvASwitch;
     BOOL hvBSwitch;
+    NSString* triggerStatus;
+    unsigned long hvAVoltageDACSetValue;
+    unsigned long hvBVoltageDACSetValue;
+    float _hvAVoltageReadValue;
+    float _hvBVoltageReadValue;
+    float _hvACurrentReadValue;
+    float _hvBCurrentReadValue;
+    unsigned long _hvAVoltageTargetValue;
+    unsigned long _hvBVoltageTargetValue;
 }
 
 @property (assign)	unsigned long   xl3ChargeInjMask;
@@ -109,14 +118,23 @@ enum {
 @property (assign)	BOOL            isPollingHVSupply;
 @property (assign)  BOOL            isPollingXl3WithRun;
 @property (assign)  BOOL            isPollingVerbose;
-@property (copy)    NSString*       pollStatus;
+@property (copy) NSString* pollStatus;
 @property (readonly, nonatomic) NSMutableDictionary* pollDict;
-@property (assign)  BOOL            isPollingForced;
+@property (assign)  BOOL isPollingForced;
 
 @property (assign) unsigned long long relayMask;
 @property (copy) NSString* relayStatus;
 @property (assign) BOOL hvASwitch;
 @property (assign) BOOL hvBSwitch;
+@property (copy) NSString* triggerStatus;
+@property (assign) unsigned long hvAVoltageDACSetValue;
+@property (assign) unsigned long hvBVoltageDACSetValue;
+@property (assign) float hvAVoltageReadValue;
+@property (assign) float hvBVoltageReadValue;
+@property (assign) float hvACurrentReadValue;
+@property (assign) float hvBCurrentReadValue;
+@property (assign) unsigned long hvAVoltageTargetValue;
+@property (assign) unsigned long hvBVoltageTargetValue;
 
 #pragma mark •••Initialization
 - (id)   init;
@@ -304,3 +322,5 @@ extern NSString* ORXL3ModelIsPollingVerboseChanged;
 extern NSString* ORXL3ModelRelayMaskChanged;
 extern NSString* ORXL3ModelRelayStatusChanged;
 extern NSString* ORXL3ModelHvStatusChanged;
+extern NSString* ORXL3ModelTriggerStatusChanged;
+extern NSString* ORXL3ModelHVTargetValueChanged;
