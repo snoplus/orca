@@ -92,11 +92,13 @@
 	BOOL bankOneArmed;
 	BOOL firstTime;
 	BOOL shipEnergyWaveform;
+	BOOL shipSummedWaveform;
 	
     int energySampleLength;
     int energySampleStartIndex1;
     int energySampleStartIndex2;
     int energySampleStartIndex3;
+	int energyNumberToSum;
     int runMode;
     unsigned short lemoInEnabledMask;
     BOOL internalExternalTriggersOred;
@@ -185,6 +187,8 @@
 - (void) setEnergySampleStartIndex2:(int)aEnergySampleStartIndex2;
 - (int)  energySampleStartIndex1;
 - (void) setEnergySampleStartIndex1:(int)aEnergySampleStartIndex1;
+- (int)	 energyNumberToSum;
+- (void) setEnergyNumberToSum:(int)aNumberToSum;
 - (int)  energySampleLength;
 - (void) setEnergySampleLength:(int)aEnergySampleLength;
 - (int) energyGapTime:(short)aGroup;
@@ -287,6 +291,9 @@
 - (BOOL) shipEnergyWaveform;
 - (void) setShipEnergyWaveform:(BOOL)aState;
 
+- (BOOL) shipSummedWaveform;
+- (void) setShipSummedWaveform:(BOOL)aState;
+
 - (short) gtMask;
 - (void) setGtMask:(long)aMask;
 - (BOOL) gt:(short)chan;
@@ -350,6 +357,7 @@
 - (void) writeEnergyTauFactor;
 - (void) writeEnergySampleLength;
 - (void) writeEnergySampleStartIndexes;
+- (void) writeEnergyNumberToSum;
 - (void) writeBufferControl;
 
 - (void) disarmSampleLogic;
@@ -445,6 +453,7 @@ extern NSString* ORSIS3302ModelEnergySampleStartIndex3Changed;
 extern NSString* ORSIS3302ModelEnergyTauFactorChanged;
 extern NSString* ORSIS3302ModelEnergySampleStartIndex2Changed;
 extern NSString* ORSIS3302ModelEnergySampleStartIndex1Changed;
+extern NSString* ORSIS3302ModelEnergyNumberToSumChanged;
 extern NSString* ORSIS3302ModelEnergySampleLengthChanged;
 extern NSString* ORSIS3302ModelEnergyGapTimeChanged;
 extern NSString* ORSIS3302ModelEnergyPeakingTimeChanged;
@@ -481,6 +490,7 @@ extern NSString* ORSIS3302InternalTriggerDelayChanged;
 extern NSString* ORSIS3302TriggerDecimationChanged;
 extern NSString* ORSIS3302EnergyDecimationChanged;
 extern NSString* ORSIS3302SetShipWaveformChanged;
+extern NSString* ORSIS3302SetShipSummedWaveformChanged;
 extern NSString* ORSIS3302Adc50KTriggerEnabledChanged;
 extern NSString* ORSIS3302InputInvertedChanged;
 

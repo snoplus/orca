@@ -57,6 +57,7 @@ NSString* ORSIS3302ModelEnergySampleStartIndex3Changed	= @"ORSIS3302ModelEnergyS
 NSString* ORSIS3302ModelEnergyTauFactorChanged			= @"ORSIS3302ModelEnergyTauFactorChanged";
 NSString* ORSIS3302ModelEnergySampleStartIndex2Changed	= @"ORSIS3302ModelEnergySampleStartIndex2Changed";
 NSString* ORSIS3302ModelEnergySampleStartIndex1Changed	= @"ORSIS3302ModelEnergySampleStartIndex1Changed";
+NSString* ORSIS3302ModelEnergyNumberToSumChanged		= @"ORSIS3302ModelEnergyNumberToSumChanged";
 NSString* ORSIS3302ModelEnergySampleLengthChanged		= @"ORSIS3302ModelEnergySampleLengthChanged";
 NSString* ORSIS3302ModelEnergyGapTimeChanged	 = @"ORSIS3302ModelEnergyGapTimeChanged";
 NSString* ORSIS3302ModelEnergyPeakingTimeChanged = @"ORSIS3302ModelEnergyPeakingTimeChanged";
@@ -98,6 +99,7 @@ NSString* ORSIS3302InternalTriggerDelayChanged	= @"ORSIS3302InternalTriggerDelay
 NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChanged";
 NSString* ORSIS3302EnergyDecimationChanged		= @"ORSIS3302EnergyDecimationChanged";
 NSString* ORSIS3302SetShipWaveformChanged		= @"ORSIS3302SetShipWaveformChanged";
+NSString* ORSIS3302SetShipSummedWaveformChanged	= @"ORSIS3302SetShipSummedWaveformChanged";
 NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabledChanged";
 NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 NSString* ORSIS3302CardInited					= @"ORSIS3302CardInited";
@@ -581,6 +583,14 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleStartIndex1Changed object:self];
 }
 
+- (int) energyNumberToSum { return energyNumberToSum; }
+- (void) setEnergyNumberToSum:(int)aNumberToSum
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setEnergyNumberToSum:aNumberToSum];
+    energyNumberToSum = [self limitIntValue:aNumberToSum min:4 max:256];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergyNumberToSumChanged object:self];
+}	
+
 - (int) energySampleLength { return energySampleLength; }
 - (void) setEnergySampleLength:(int)aEnergySampleLength
 {
@@ -792,6 +802,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	}
 	
 	[self setShipEnergyWaveform:NO];
+	[self setShipSummedWaveform:NO];
 	[self setGtMask:0xff];
 	[self setTriggerOutEnabledMask:0x0];
 	[self setHighEnergySuppressMask:0x0];
@@ -1047,7 +1058,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	[[[self undoManager] prepareWithInvocationTarget:self] setShipEnergyWaveform:shipEnergyWaveform];
 	shipEnergyWaveform = aState;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302SetShipWaveformChanged object:self];
-	if (!shipEnergyWaveform) {
+	if (!shipEnergyWaveform && ![self shipSummedWaveform]) {
 		[self setEnergySampleLength:0];		
 	} 
 	else {
@@ -1058,6 +1069,29 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 		// at least span the max sample length.  (There's a check 
 		// in calculateSampleValues.)
 		[self setEnergySampleStartIndex2:1];
+	}
+}
+
+- (BOOL) shipSummedWaveform { return shipSummedWaveform;}
+- (void) setShipSummedWaveform:(BOOL)aState
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setShipSummedWaveform:shipSummedWaveform];
+	shipSummedWaveform = aState;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302SetShipSummedWaveformChanged object:self];
+	if (!shipSummedWaveform && ![self shipEnergyWaveform]) {
+		[self setEnergySampleLength:0];
+	} 
+	else {
+		[self setEnergySampleLength:kSIS3302MaxEnergyWaveform];
+		[self setEnergySampleStartIndex2:0];
+		[self setEnergySampleStartIndex3:0];
+		
+		// The following forces the start indices to calculate automatically.
+		// This could avoid some confusion about the special cases of 
+		// start indices 2 and 3 being 0.  This forces them to be
+		// at least span the max sample length.  (There's a check 
+		// in calculateSampleValues.)
+		//[self setEnergySampleStartIndex2:1];
 	}
 }
 
@@ -1341,23 +1375,26 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	// decimation.
 	int group;
 	for(group=0;group<4;group++){
-		//int preTriggerDelay = [self preTriggerDelay:group];
-		//unsigned int delayInDecimationClockTicks = preTriggerDelay >> [self energyDecimation:group];
+		int preTriggerDelay = [self preTriggerDelay:group];
+		unsigned int delayInDecimationClockTicks = preTriggerDelay >> [self energyDecimation:group];
 		if (energySampleLength == 0) {
 			// Means that we are not shipping an energy waveform.
 			// Make sure the gate length is long enough
 			//[self setEnergyGateLength:group withValue:delayInDecimationClockTicks + 600];
-			int theValue = 2 * [self energyPeakingTime:group] + [self energyGapTime:group] + 10; //perhaps the '10' should be user setable
+			int theValue = delayInDecimationClockTicks + 2 * [self energyPeakingTime:group] + [self energyGapTime:group] + 20; //perhaps the '20' should be user setable
 			[self setEnergyGateLength:group withValue:theValue];
 		} 
 		else {
 			//[self setEnergyGateLength:group withValue:(delayInDecimationClockTicks +
 			//									   2*[self energyPeakingTime:group] +
 			//									   [self energyGapTime:group] + 120)]; // Add the 20 ticks for safety
+			
+			int value1 = [self energySampleStartIndex3]+ delayInDecimationClockTicks + 20;
+			int value2 = 2 * [self energyPeakingTime:group] + [self energyGapTime:group] + delayInDecimationClockTicks + 20; //perhaps the '20' should be user setable
+			int value3 = [self energySampleStartIndex1]+ delayInDecimationClockTicks + 20; //handle the case where the summed waveform is shipped
 
-			int value1 = [self energySampleStartIndex3];
-			int value2 = 2 * [self energyPeakingTime:group] + [self energyGapTime:group] + 10; //perhaps the '10' should be user setable
-			int theValue = MAX(value1,value2);
+			int tempValue = MAX(value1,value2);
+			int theValue = MAX(tempValue,value3);
 			[self setEnergyGateLength:group withValue:theValue];
 
 		}
@@ -1883,9 +1920,18 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 - (void) writeEnergyGateLength
 {
 	int group;
+	unsigned long energyGateMask;
 	for(group=0;group<4;group++){
-		unsigned long aValue = [self energyGateLength:group];
-		[[self adapter] writeLongBlock:&aValue
+		energyGateMask = 0;
+		//--------------------------------------------------------------
+		//only firmware version >=1512
+		BOOL shipSummed = [self shipSummedWaveform];
+		if(shipSummed)					energyGateMask |= (0x3<<28);
+		//--------------------------------------------------------------
+		
+		energyGateMask |= [self energyGateLength:group];
+		
+		[[self adapter] writeLongBlock:&energyGateMask
 							 atAddress:[self baseAddress] + [self getEnergyGateLengthOffsets:group]
 							numToWrite:1
 							withAddMod:[self addressModifier]
@@ -1944,6 +1990,18 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
 	
+}
+
+-(void) writeEnergyNumberToSum
+{
+	unsigned long aValue;
+	aValue = (energyNumberToSum-1) << 16 | (energyNumberToSum-1);//the number of values summed over = number written to register + 1
+	
+	[[self adapter] writeLongBlock:&aValue
+						 atAddress:[self baseAddress] + kSIS3302EnergyNumberToSumAllAdc
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
 }
 
 - (void) writeTriggerSetups
@@ -2456,6 +2514,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	[self writeRawDataBufferConfiguration];
 	[self writeEnergySampleLength];
 	[self writeEnergySampleStartIndexes];
+	[self writeEnergyNumberToSum];
 	[self writeTriggerSetups];
 	[self writeThresholds];
 	[self writeHighThresholds];
@@ -2571,10 +2630,13 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 		if(tracesShipped) summary = [summary stringByAppendingString:@" + Traces"];
 		if(shipEnergyWaveform) summary = [summary stringByAppendingString:@" + Energy Filter"];
 		summary = [summary stringByAppendingString:@"\n"];
+		if(shipSummedWaveform) summary = [summary stringByAppendingString:@" + Summed Raw Trace"];
+		summary = [summary stringByAppendingString:@"\n"];
 		if(tracesShipped){
 			summary = [summary stringByAppendingFormat:@"Traces 0:%d  1:%d  2:%d  3:%d\n", [self sampleLength:0],[self sampleLength:1],[self sampleLength:2],[self sampleLength:3]];
 		}
 		if(shipEnergyWaveform) summary = [summary stringByAppendingFormat:@"Energy Filter: 510 values\n"];
+		if(shipSummedWaveform) summary = [summary stringByAppendingFormat:@"Summed Raw Trace: 510 values\n"];		
 		return summary;
 	}
 }
@@ -3236,6 +3298,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
     [self setEnergySampleStartIndex3:	[decoder decodeIntForKey:@"energySampleStartIndex3"]];
     [self setEnergySampleStartIndex2:	[decoder decodeIntForKey:@"energySampleStartIndex2"]];
     [self setEnergySampleStartIndex1:	[decoder decodeIntForKey:@"energySampleStartIndex1"]];
+	[self setEnergyNumberToSum:			[decoder decodeIntForKey:@"energyNumberToSum"]];
     [self setEnergySampleLength:		[decoder decodeIntForKey:@"energySampleLength"]];
     [self setLemoInMode:				[decoder decodeIntForKey:@"lemoInMode"]];
     [self setLemoOutMode:				[decoder decodeIntForKey:@"lemoOutMode"]];
@@ -3252,6 +3315,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
     [self setAdc50KTriggerEnabledMask:	[decoder decodeInt32ForKey:@"adc50KtriggerEnabledMask"]];
 	[self setGtMask:					[decoder decodeIntForKey:@"gtMask"]];
 	[self setShipEnergyWaveform:		[decoder decodeBoolForKey:@"shipEnergyWaveform"]];
+	[self setShipSummedWaveform:		[decoder decodeBoolForKey:@"shipSummedWaveform"]];
     [self setWaveFormRateGroup:			[decoder decodeObjectForKey:@"waveFormRateGroup"]];
 	
     sampleLengths = 			[[decoder decodeObjectForKey:@"sampleLengths"]retain];
@@ -3325,10 +3389,12 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	[encoder encodeInt:energySampleStartIndex3	forKey:@"energySampleStartIndex3"];
 	[encoder encodeInt:energySampleStartIndex2	forKey:@"energySampleStartIndex2"];
 	[encoder encodeInt:energySampleStartIndex1	forKey:@"energySampleStartIndex1"];
+	[encoder encodeInt:energyNumberToSum		forKey:@"energyNumberToSum"];
 	[encoder encodeInt:energySampleLength		forKey:@"energySampleLength"];
 	[encoder encodeInt:lemoInMode				forKey:@"lemoInMode"];
 	[encoder encodeInt:lemoOutMode				forKey:@"lemoOutMode"];
 	[encoder encodeBool:shipEnergyWaveform		forKey:@"shipEnergyWaveform"];
+	[encoder encodeBool:shipSummedWaveform		forKey:@"shipSummedWaveform"];
 	
 	[encoder encodeBool:internalExternalTriggersOred	forKey:@"internalExternalTriggersOred"];
 	[encoder encodeInt32:triggerOutEnabledMask			forKey:@"triggerOutEnabledMask"];
@@ -3388,10 +3454,12 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	[objDictionary setObject:[NSNumber numberWithInt:energySampleStartIndex3]		forKey:@"energySampleStartIndex3"];
 	[objDictionary setObject:[NSNumber numberWithInt:energySampleStartIndex2]		forKey:@"energySampleStartIndex2"];
 	[objDictionary setObject:[NSNumber numberWithInt:energySampleStartIndex1]		forKey:@"energySampleStartIndex1"];
+	[objDictionary setObject:[NSNumber numberWithInt:energyNumberToSum]				forKey:@"energyNumberToSum"];
 	[objDictionary setObject:[NSNumber numberWithInt:energySampleLength]			forKey:@"energySampleLength"];
 	[objDictionary setObject:[NSNumber numberWithInt:lemoInMode]					forKey:@"lemoInMode"];
 	[objDictionary setObject:[NSNumber numberWithInt:lemoOutMode]					forKey:@"lemoOutMode"];
 	[objDictionary setObject:[NSNumber numberWithBool:shipEnergyWaveform]			forKey:@"shipEnergyWaveform"];
+	[objDictionary setObject:[NSNumber numberWithBool:shipSummedWaveform]			forKey:@"shipSummedWaveform"];
 	[objDictionary setObject:[NSNumber numberWithBool:internalExternalTriggersOred]	forKey:@"internalExternalTriggersOred"];
 	[objDictionary setObject:[NSNumber numberWithBool:pulseMode]					forKey:@"pulseMode"];
 	

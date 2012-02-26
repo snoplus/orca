@@ -284,8 +284,13 @@
                      selector : @selector(energySampleStartIndex2Changed:)
                          name : ORSIS3302ModelEnergySampleStartIndex2Changed
 						object: model];
-
+	
     [notifyCenter addObserver : self
+                     selector : @selector(energyNumberToSumChanged:)
+                         name : ORSIS3302ModelEnergyNumberToSumChanged
+						object: model];	
+    
+	[notifyCenter addObserver : self
                      selector : @selector(energyTauFactorChanged:)
                          name : ORSIS3302ModelEnergyTauFactorChanged
 						object: model];
@@ -310,6 +315,11 @@
                          name : ORSIS3302SetShipWaveformChanged
 						object: model];
 
+	[notifyCenter addObserver : self
+                     selector : @selector(energySetShipSummedWaveformChanged:)
+                         name : ORSIS3302SetShipSummedWaveformChanged
+						object: model];
+	
     [notifyCenter addObserver : self
                      selector : @selector(lemoInEnabledMaskChanged:)
                          name : ORSIS3302ModelLemoInEnabledMaskChanged
@@ -498,9 +508,11 @@
 	[self energyGapTimeChanged:nil];
 	[self energySampleStartIndex1Changed:nil];
 	[self energySampleStartIndex2Changed:nil];
+	[self energyNumberToSumChanged:nil];
 	[self energyTauFactorChanged:nil];
 	[self energySampleStartIndex3Changed:nil];
 	[self energySetShipWaveformChanged:nil];
+	[self energySetShipSummedWaveformChanged:nil];
 	[self energyGateLengthChanged:nil];
 	[self lemoInEnabledMaskChanged:nil];
 	[self internalExternalTriggersOredChanged:nil];
@@ -770,6 +782,11 @@
 	[energySampleStartIndex1Field setIntValue: [model energySampleStartIndex1]];
 }
 
+- (void) energyNumberToSumChanged:(NSNotification *)aNote
+{
+	[energyNumberToSumField setIntValue: [model energyNumberToSum]];
+}
+
 
 - (void) energySetShipWaveformChanged:(NSNotification*)aNote
 {
@@ -785,7 +802,25 @@
 		[energySampleStartIndex2Field setEnabled:NO];
 		[energySampleStartIndex1Field setEnabled:NO];
 	}
-	
+	[self settingsLockChanged:nil];
+	[runSummaryField setStringValue: [model runSummary]];
+}
+
+- (void) energySetShipSummedWaveformChanged:(NSNotification *)aNote
+{
+	if ([energyShipSummedWaveformButton state] != [model shipSummedWaveform]) {
+		[energyShipSummedWaveformButton setState:[model shipSummedWaveform]];
+	}
+	if ([model shipSummedWaveform]) {
+		[energySampleStartIndex3Field setEnabled:NO];
+		[energySampleStartIndex2Field setEnabled:NO];
+		[energySampleStartIndex1Field setEnabled:YES];
+	} else {
+		[energySampleStartIndex3Field setEnabled:NO];
+		[energySampleStartIndex2Field setEnabled:NO];
+		[energySampleStartIndex1Field setEnabled:NO];
+	}
+	[self settingsLockChanged:nil];
 	[runSummaryField setStringValue: [model runSummary]];
 }
 
@@ -867,7 +902,6 @@
 {
 	short i;
 	for(i=0;i<kNumSIS3302Channels;i++){
-		//float volts = (0.0003*[model threshold:i])-5.0;
 		[[highThresholdMatrix cellWithTag:i] setIntValue:[model highThreshold:i]];
 	}
 }
@@ -1107,16 +1141,23 @@
 
 	//can't be changed during a run or the card and probably the sbc will be hosed.
 	[sampleLengthMatrix				setEnabled:!locked && !runInProgress];
-	[energyShipWaveformButton		setEnabled:!locked && !runInProgress];
-	[energySampleStartIndex3Field	setEnabled:!locked && !runInProgress];
-	[energySampleStartIndex2Field	setEnabled:!locked && !runInProgress];
-	[energySampleStartIndex1Field	setEnabled:!locked && !runInProgress];
 	[bufferWrapEnabledMatrix		setEnabled:!locked && !runInProgress && firmwareGEV15xx];
+	//	[energySampleStartIndex3Field	setEnabled:!locked && !runInProgress];
+	//	[energySampleStartIndex2Field	setEnabled:!locked && !runInProgress];
+	//	[energySampleStartIndex1Field	setEnabled:!locked && !runInProgress];
+	
+	
+	if(![model shipSummedWaveform])	[energyShipWaveformButton		setEnabled:!locked && !runInProgress];
+	else [energyShipWaveformButton			setEnabled:NO];
+	if(![model shipEnergyWaveform])	[energyShipSummedWaveformButton setEnabled:!locked && !runInProgress && firmwareGEV15xx];
+	else [energyShipSummedWaveformButton	setEnabled:NO];
+	if([model shipSummedWaveform]) [energyNumberToSumField			setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
+	else [energyNumberToSumField			setEnabled:NO];
 	
 	int i;
 	
 	for(i=0;i<kNumSIS3302Channels;i++){
-		if([model highEnergySuppress:i])[[highThresholdMatrix cellWithTag:i]setEnabled:!locked && !runInProgress];
+		if([model highEnergySuppress:i] && ([model cfdControl:i]!=0))[[highThresholdMatrix cellWithTag:i]setEnabled:!locked && !runInProgress];
 		else [[highThresholdMatrix cellWithTag:i]	setEnabled:NO];
 	}
 		
@@ -1129,7 +1170,7 @@
 		if([model cfdControl:i]!=0)[[highEnergySuppressMatrix cellWithTag:i]setEnabled:!locked && !runInProgress];
 		else [[highEnergySuppressMatrix cellWithTag:i]	setEnabled:NO];
 	}
-		
+	
 	[cfdControl0					setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
 	[cfdControl1					setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
 	[cfdControl2					setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
@@ -1367,6 +1408,11 @@
 	[model setEnergySampleStartIndex1:[sender intValue]];	
 }
 
+- (IBAction) energyNumberToSumAction:(id)sender
+{
+	[model setEnergyNumberToSum:[sender intValue]];
+}
+
 - (IBAction) energyShipWaveformAction:(id)sender
 {
 	if ([sender state] == 1) {
@@ -1382,6 +1428,20 @@
 	}
 }
 
+- (IBAction) energyShipSummedWaveformAction:(id)sender
+{
+	if ([sender state] == 1) {
+		[model setShipSummedWaveform:YES];
+		[energySampleStartIndex3Field setEnabled:NO];
+		[energySampleStartIndex2Field setEnabled:NO];
+		[energySampleStartIndex1Field setEnabled:YES];
+	} else {
+		[model setShipSummedWaveform:NO];
+		[energySampleStartIndex3Field setEnabled:NO];
+		[energySampleStartIndex2Field setEnabled:NO];
+		[energySampleStartIndex1Field setEnabled:NO];
+	}
+}
 
 - (IBAction) lemoInModeAction:(id)sender
 {

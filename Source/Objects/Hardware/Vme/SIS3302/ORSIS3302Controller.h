@@ -61,7 +61,9 @@
 	IBOutlet NSTextField*	energySampleStartIndex3Field;
 	IBOutlet NSTextField*	energySampleStartIndex2Field;
 	IBOutlet NSTextField*	energySampleStartIndex1Field;
+	IBOutlet NSTextField*	energyNumberToSumField;
 	IBOutlet NSButton*		energyShipWaveformButton;
+	IBOutlet NSButton*		energyShipSummedWaveformButton;
 	IBOutlet NSPopUpButton* lemoInModePU;
 	IBOutlet NSTextField*	lemoInAssignmentsField;
 	IBOutlet NSPopUpButton* lemoOutModePU;
@@ -179,9 +181,11 @@
 - (void) energySampleStartIndex3Changed:(NSNotification*)aNote;
 - (void) energySampleStartIndex2Changed:(NSNotification*)aNote;
 - (void) energySampleStartIndex1Changed:(NSNotification*)aNote;
+- (void) energyNumberToSumChanged:(NSNotification*)aNote;
 - (void) energyGapTimeChanged:(NSNotification*)aNote;
 - (void) energyPeakingTimeChanged:(NSNotification*)aNote;
 - (void) energySetShipWaveformChanged:(NSNotification*)aNote;
+- (void) energySetShipSummedWaveformChanged:(NSNotification*)aNote;
 - (void) triggerGateLengthChanged:(NSNotification*)aNote;
 - (void) preTriggerDelayChanged:(NSNotification*)aNote;
 - (void) sampleStartIndexChanged:(NSNotification*)aNote;
@@ -249,7 +253,9 @@
 - (IBAction) energyTauFactorAction:(id)sender;
 - (IBAction) energySampleStartIndex2Action:(id)sender;
 - (IBAction) energySampleStartIndex1Action:(id)sender;
+- (IBAction) energyNumberToSumAction:(id)sender;
 - (IBAction) energyShipWaveformAction:(id)sender;
+- (IBAction) energyShipSummedWaveformAction:(id)sender;
 - (IBAction) energyGapTimeAction:(id)sender;
 - (IBAction) energyPeakingTimeAction:(id)sender;
 - (IBAction) triggerGateLengthAction:(id)sender;

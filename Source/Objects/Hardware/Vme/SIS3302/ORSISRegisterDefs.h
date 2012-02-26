@@ -86,6 +86,7 @@
 #define kSIS3302EnergySampleStartIndex1AllAdc				0x0100004C      /* Gamma */
 #define kSIS3302EnergySampleStartIndex2AllAdc				0x01000050      /* Gamma */
 #define kSIS3302EnergySampleStartIndex3AllAdc				0x01000054      /* Gamma */
+#define kSIS3302EnergyNumberToSumAllAdc						0x01000060		/* v1512 */
 #define kSIS3302EnergyTauFactorAdc1357						0x01000058      /* Gamma */
 #define kSIS3302EnergyTauFactorAdc2468						0x0100005C      /* Gamma */
 
