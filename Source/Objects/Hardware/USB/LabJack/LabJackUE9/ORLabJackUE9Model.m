@@ -149,8 +149,14 @@ NSString* ORLabJackUE9ExpansionOptionChanged               = @"ORLabJackUE9Expan
 
 -(void) setUpImage
 {
-    [self setImage:[NSImage imageNamed:@"LabJackUE9"]];
-}
+    if(expansionOption == kLabJackUE9NoExpansion) {
+        [self setImage:[NSImage imageNamed:@"LabJackUE9"]];
+    }
+    else if(expansionOption == kLabJackUE9Mux80Option){
+        [self setImage:[NSImage imageNamed:@"LabJackUE9Mux80"]];
+    }
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORForceRedraw object: self];
+ }
 
 - (NSString*) title 
 {
@@ -168,6 +174,7 @@ NSString* ORLabJackUE9ExpansionOptionChanged               = @"ORLabJackUE9Expan
     [[[self undoManager] prepareWithInvocationTarget:self] setExpansionOption:expansionOption];
     expansionOption = aState;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackUE9ExpansionOptionChanged object:self];
+    [self setUpImage];
   
 }
 
@@ -1091,7 +1098,7 @@ NSString* ORLabJackUE9ExpansionOptionChanged               = @"ORLabJackUE9Expan
 	[encoder encodeInt:aOut1 forKey:@"aOut1"];
     [encoder encodeInt:aOut0 forKey:@"aOut0"];
     [encoder encodeBool:shipData forKey:@"shipData"];
-    [encoder encodeBool:expansionOption forKey:@"expansionOption"];
+    [encoder encodeInt:expansionOption forKey:@"expansionOption"];
     [encoder encodeInt:pollTime forKey:@"pollTime"];
     [encoder encodeBool:digitalOutputEnabled forKey:@"digitalOutputEnabled"];
 	int i;

@@ -371,7 +371,7 @@
     if([model expansionOption] == kLabJackUE9Mux80Option){
         [[[self  window] contentView] addSubview:mux80View];
         [mux80View setAutoresizingMask:NSViewMaxXMargin|NSViewMaxYMargin];
-        [mux80View setFrameOrigin:NSMakePoint(0,100)];
+        [mux80View setFrameOrigin:NSMakePoint(80,140)];
     }
     else {
         [mux80View removeFromSuperview];   
