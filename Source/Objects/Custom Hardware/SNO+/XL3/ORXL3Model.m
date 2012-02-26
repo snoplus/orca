@@ -744,7 +744,7 @@ NSString* ORXL3ModelHVTargetValueChanged = @"ORXL3ModelHVTargetValueChanged";
     if (!triggerStatus) {
         return @"OFF";
     }
-    return relayStatus;
+    return triggerStatus;
 }
 
 - (void) setTriggerStatus:(NSString *)aTriggerStatus
@@ -1962,7 +1962,7 @@ void SwapLongBlock(void* p, int32_t n)
         }
     }
     
-    if (results_lo.error_flags != 0 || results_hi.error_flags != 0) {
+    if (results_lo.error_flags != 0 || (num_slots > 8 &&  results_hi.error_flags != 0)) {
         NSLog(@"%@ error in readCMOSCRateForSlot, error_flags_lo: 0x%08x, error_flags_hi: 0x%08x\n",
               [[self xl3Link] crateName], results_lo.error_flags, results_hi.error_flags);
     }
