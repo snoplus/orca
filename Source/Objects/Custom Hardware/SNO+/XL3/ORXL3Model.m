@@ -1978,7 +1978,7 @@ void SwapLongBlock(void* p, int32_t n)
             }
             slot_idx=0;
             for (i=0; i<8; i++) {
-                if ((msk >> i) & 0x1) {
+                if ((msk >> (i + 8)) & 0x1) {
                     for (j=0; j<32; j++) {
                         counts[j] = results_hi.counts[slot_idx*32 + j];
                     }

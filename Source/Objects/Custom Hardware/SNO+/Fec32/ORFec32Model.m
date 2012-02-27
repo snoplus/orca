@@ -1200,7 +1200,7 @@ NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageSt
             cmosRate[ch] = kCMOSRateUnmeasured;
         }
     }
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelCmosRateChanged object:self];
+    //[[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelCmosRateChanged object:self];
     return calcRates;
 }
 
