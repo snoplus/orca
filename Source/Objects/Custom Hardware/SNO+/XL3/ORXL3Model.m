@@ -86,7 +86,8 @@ NSString* ORXL3ModelHVTargetValueChanged = @"ORXL3ModelHVTargetValueChanged";
 @end
 
 @implementation ORXL3Model
-@synthesize pollDict, isPollingForced;
+@synthesize pollDict, isPollingForced,
+    calcCMOSRatesFromCounts = _calcCMOSRatesFromCounts;
 
 #pragma mark •••Initialization
 - (id) init
@@ -444,6 +445,7 @@ NSString* ORXL3ModelHVTargetValueChanged = @"ORXL3ModelHVTargetValueChanged";
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelIsPollingXl3Changed object:self];
     if (isPollingXl3) {
         [self setPollStatus:@"Polling loop running"];
+        [self setCalcCMOSRatesFromCounts:NO];
         [self performSelector:@selector(pollXl3:) withObject:nil afterDelay:0.1];
     }    
     else {
@@ -1709,7 +1711,7 @@ void SwapLongBlock(void* p, int32_t n)
 {
 	XL3_PayloadStruct payload;
 	memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
-	payload.numberBytesinPayload = sizeof(read_cmos_rate_results_t);
+	payload.numberBytesinPayload = sizeof(check_total_count_results_t);
     
 	check_total_count_args_t* data = (check_total_count_args_t*) payload.payload;
     memcpy(data, aArgs, sizeof(check_total_count_args_t));
@@ -1739,7 +1741,7 @@ void SwapLongBlock(void* p, int32_t n)
         SwapLongBlock(data, sizeof(check_total_count_results_t)/4);
     }
     
-    memcpy(aCounts, data, sizeof(read_cmos_rate_results_t));
+    memcpy(aCounts, data, sizeof(check_total_count_results_t));
 }
 
 - (void) readCMOSCountForSlot:(unsigned short)aSlot withChannelMask:(unsigned long)aChannelMask
@@ -1896,12 +1898,12 @@ void SwapLongBlock(void* p, int32_t n)
     }
 }
 
-- (void) readCMOSRateWithDelay:(unsigned long)aDelay
+- (void) readCMOSRate
 {
-    read_cmos_rate_args_t args_lo;
-    read_cmos_rate_args_t args_hi;
-    read_cmos_rate_results_t results_lo;
-    read_cmos_rate_results_t results_hi;
+    check_total_count_args_t args_lo;
+    check_total_count_args_t args_hi;
+    check_total_count_results_t results_lo;
+    check_total_count_results_t results_hi;
     unsigned char i;
 
     NSArray* fecs = [guardian collectObjectsOfClass:NSClassFromString(@"ORFec32Model")];
@@ -1916,26 +1918,7 @@ void SwapLongBlock(void* p, int32_t n)
     unsigned int v = msk;
     unsigned int num_slots;
     for (num_slots = 0; v; num_slots++) v &= v - 1;
-
-    /*
-    unsigned char slot_idx = 0, slot_cnt = 0;
-    for (; slot_idx < 16 && slot_cnt < 8; slot_idx++) {
-        if ((msk >> slot_idx) && 0x1) {
-            args_lo.slot_mask |= 0x1 << slot_idx;
-            slot_cnt++;
-        }
-    }
-    if (slot_idx < 16) {
-        slot_cnt = 0;
-        for (; slot_idx < 16 && slot_cnt < 8; slot_idx++) {
-            if ((msk >> slot_idx) && 0x1) {
-                args_hi.slot_mask |= 0x1 << slot_idx;
-            }
-        }
-    }
-    */
     
-    //it doesn't matter how we break it down
     if (num_slots > 8) {
         args_lo.slot_mask = msk & 0xff;
         args_hi.slot_mask = msk & 0xff00;
@@ -1948,12 +1931,10 @@ void SwapLongBlock(void* p, int32_t n)
         args_lo.channel_masks[i] = 0xffffffff;
         args_hi.channel_masks[i] = 0xffffffff;
     }
-    args_lo.period = aDelay;
-    args_hi.period = aDelay;
 
     @try {
-        [self readCMOSRateWithArgs:&args_lo rates:&results_lo];
-        if (num_slots > 8) [self readCMOSRateWithArgs:&args_hi rates:&results_hi];
+        [self readCMOSCountWithArgs:&args_lo counts:&results_lo];
+        if (num_slots > 8) [self readCMOSCountWithArgs:&args_hi counts:&results_hi];
     }
     @catch (NSException *exception) {
         if (isPollingXl3) {
@@ -1963,43 +1944,55 @@ void SwapLongBlock(void* p, int32_t n)
     }
     
     if (results_lo.error_flags != 0 || (num_slots > 8 &&  results_hi.error_flags != 0)) {
-        NSLog(@"%@ error in readCMOSCRateForSlot, error_flags_lo: 0x%08x, error_flags_hi: 0x%08x\n",
+        NSLog(@"%@ error in readCMOSCountWithArgs, error_flags_lo: 0x%08x, error_flags_hi: 0x%08x\n",
               [[self xl3Link] crateName], results_lo.error_flags, results_hi.error_flags);
     }
-
-    else if (!isPollingXl3 || isPollingVerbose) {
-        NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ CMOS rates: %d\n", [[self xl3Link] crateName]];
+    else {
         unsigned char slot_idx = 0;
+        unsigned long counts[32];
+        
+        read_cmos_rate_results_t rates_lo;
+        read_cmos_rate_results_t rates_hi;
         
         if (num_slots > 8) {
             slot_idx = 0;
             unsigned char j = 0;
             for (i=0; i<8; i++) {
                 if ((msk >> i) & 0x1) {
-                    [msg appendFormat:@"slot %2d, ch00-07:", i];
-                    for (j=0; j<8; j++) [msg appendFormat:@"%3.1f ", results_lo.rates[slot_idx*32 + j]];
-                    [msg appendFormat:@"\nslot %2d, ch08-15:", i];
-                    for (j=8; j<16; j++) [msg appendFormat:@"%3.1f ", results_lo.rates[slot_idx*32 + j]];
-                    [msg appendFormat:@"\nslot %2d, ch16-23:", i];
-                    for (j=16; j<23; j++) [msg appendFormat:@"%3.1f ", results_lo.rates[slot_idx*32 + j]];
-                    [msg appendFormat:@"\nslot %2d, ch24-31:", i];
-                    for (j=24; j<32; j++) [msg appendFormat:@"%3.1f ", results_lo.rates[slot_idx*32 + j]];
-                    [msg appendFormat:@"\n"];
+                    for (j=0; j<32; j++) {
+                        counts[j] = results_lo.counts[slot_idx*32 + j];
+                    }
+                    ORFec32Model* fec;
+                    for (id key in fecs) {
+                        if ([key stationNumber] == i) {
+                            fec = key;
+                            break;
+                        }
+                    }
+                    [fec processCMOSCounts:counts calcRates:[self calcCMOSRatesFromCounts] withChannelMask:args_lo.channel_masks[i]];
+                    for (j=0; j<32; j++) {
+                        rates_lo.rates[slot_idx*32 + j] = [fec cmosRate:j];
+                    }                    
                     slot_idx++;
                 }
             }
             slot_idx=0;
             for (i=0; i<8; i++) {
-                if ((msk >> (i + 8)) & 0x1) {
-                    [msg appendFormat:@"slot %2d, ch00-07:", i + 8];
-                    for (j=0; j<8; j++) [msg appendFormat:@"%3.1f ", results_hi.rates[slot_idx*32 + j]];
-                    [msg appendFormat:@"\nslot %2d, ch08-15:", i + 8];
-                    for (j=8; j<16; j++) [msg appendFormat:@"%3.1f ", results_hi.rates[slot_idx*32 + j]];
-                    [msg appendFormat:@"\nslot %2d, ch16-23:", i + 8];
-                    for (j=16; j<23; j++) [msg appendFormat:@"%3.1f ", results_hi.rates[slot_idx*32 + j]];
-                    [msg appendFormat:@"\nslot %2d, ch24-31:", i + 8];
-                    for (j=24; j<32; j++) [msg appendFormat:@"%3.1f ", results_hi.rates[slot_idx*32 + j]];
-                    [msg appendFormat:@"\n"];
+                if ((msk >> i) & 0x1) {
+                    for (j=0; j<32; j++) {
+                        counts[j] = results_hi.counts[slot_idx*32 + j];
+                    }
+                    ORFec32Model* fec;
+                    for (id key in fecs) {
+                        if ([key stationNumber] == i + 8) {
+                            fec = key;
+                            break;
+                        }
+                    }
+                    [fec processCMOSCounts:counts calcRates:[self calcCMOSRatesFromCounts] withChannelMask:args_hi.channel_masks[i]];
+                    for (j=0; j<32; j++) {
+                        rates_hi.rates[slot_idx*32 + j] = [fec cmosRate:j];
+                    }                    
                     slot_idx++;
                 }
             }
@@ -2008,104 +2001,166 @@ void SwapLongBlock(void* p, int32_t n)
             slot_idx = 0;
             unsigned char j = 0;
             for (i=0; i<16; i++) {
-                 if ((msk >> i) & 0x1) {
-                     [msg appendFormat:@"slot %2d, ch00-07:", i];
-                     for (j=0; j<8; j++) [msg appendFormat:@"%3.1f ", results_lo.rates[slot_idx*32 + j]];
-                     [msg appendFormat:@"\nslot %2d, ch08-15:", i];
-                     for (j=8; j<16; j++) [msg appendFormat:@"%3.1f ", results_lo.rates[slot_idx*32 + j]];
-                     [msg appendFormat:@"\nslot %2d, ch16-23:", i];
-                     for (j=16; j<23; j++) [msg appendFormat:@"%3.1f ", results_lo.rates[slot_idx*32 + j]];
-                     [msg appendFormat:@"\nslot %2d, ch24-31:", i];
-                     for (j=24; j<32; j++) [msg appendFormat:@"%3.1f ", results_lo.rates[slot_idx*32 + j]];
-                     [msg appendFormat:@"\n"];
-                     slot_idx++;
-                 }
+                if ((msk >> i) & 0x1) {
+                    for (j=0; j<32; j++) {
+                        counts[j] = results_lo.counts[slot_idx*32 + j];
+                    }
+                    ORFec32Model* fec;
+                    for (id key in fecs) {
+                        if ([key stationNumber] == i) {
+                            fec = key;
+                            break;
+                        }
+                    }
+                    [fec processCMOSCounts:counts calcRates:[self calcCMOSRatesFromCounts] withChannelMask:args_lo.channel_masks[i]];
+                    for (j=0; j<32; j++) {
+                        rates_lo.rates[slot_idx*32 + j] = [fec cmosRate:j];
+                    }                    
+                    slot_idx++;
+                }
             }
         }
-        NSLog(msg);
-
-    }
-    //pollDict
-    if (isPollingXl3) {
-        NSDateFormatter* iso = [[NSDateFormatter alloc] init];
-        [iso setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss'Z'"];
-        iso.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
-        iso.calendar = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
-        iso.locale = [[[NSLocale alloc] initWithLocaleIdentifier:@"en_US"] autorelease];
-        NSString* str = [iso stringFromDate:[NSDate date]];
-        NSMutableArray* rates = [[[NSMutableArray alloc] initWithCapacity:16] autorelease];
-        NSMutableArray* slot_rates;
-        NSMutableArray* time_stamps = [[[NSMutableArray alloc] initWithCapacity:16] autorelease];
-        unsigned char ch, sl;
-        unsigned char slot_idx = 0;
-        for (sl = 0; sl < 16; sl++) {
-            slot_rates = [[[NSMutableArray alloc] initWithCapacity:32] autorelease];
-
-            if ((msk >> sl) & 0x1) {
-                if (num_slots > 8) {
-                    if (sl==8) slot_idx = 0;
-                    if (sl < 8) {
-                        for (ch = 0; ch < 32; ch++) {
-                            NSNumber *number = [[NSNumber alloc] initWithInt:results_lo.rates[slot_idx*32 + ch]];
-                            [slot_rates addObject:number];
-                            [number release];
-                            number = nil;
-                        }
+        
+        if ((!isPollingXl3 || isPollingVerbose) && [self calcCMOSRatesFromCounts]) {
+            NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ CMOS rates: %d\n", [[self xl3Link] crateName]];
+            unsigned char slot_idx = 0;
+            
+            if (num_slots > 8) {
+                slot_idx = 0;
+                unsigned char j = 0;
+                for (i=0; i<8; i++) {
+                    if ((msk >> i) & 0x1) {
+                        [msg appendFormat:@"slot %2d, ch00-07:", i];
+                        for (j=0; j<8; j++) [msg appendFormat:@"%3.1f ", rates_lo.rates[slot_idx*32 + j]];
+                        [msg appendFormat:@"\nslot %2d, ch08-15:", i];
+                        for (j=8; j<16; j++) [msg appendFormat:@"%3.1f ", rates_lo.rates[slot_idx*32 + j]];
+                        [msg appendFormat:@"\nslot %2d, ch16-23:", i];
+                        for (j=16; j<23; j++) [msg appendFormat:@"%3.1f ", rates_lo.rates[slot_idx*32 + j]];
+                        [msg appendFormat:@"\nslot %2d, ch24-31:", i];
+                        for (j=24; j<32; j++) [msg appendFormat:@"%3.1f ", rates_lo.rates[slot_idx*32 + j]];
+                        [msg appendFormat:@"\n"];
                         slot_idx++;
+                    }
+                }
+                slot_idx=0;
+                for (i=0; i<8; i++) {
+                    if ((msk >> (i + 8)) & 0x1) {
+                        [msg appendFormat:@"slot %2d, ch00-07:", i + 8];
+                        for (j=0; j<8; j++) [msg appendFormat:@"%3.1f ", rates_hi.rates[slot_idx*32 + j]];
+                        [msg appendFormat:@"\nslot %2d, ch08-15:", i + 8];
+                        for (j=8; j<16; j++) [msg appendFormat:@"%3.1f ", rates_hi.rates[slot_idx*32 + j]];
+                        [msg appendFormat:@"\nslot %2d, ch16-23:", i + 8];
+                        for (j=16; j<23; j++) [msg appendFormat:@"%3.1f ", rates_hi.rates[slot_idx*32 + j]];
+                        [msg appendFormat:@"\nslot %2d, ch24-31:", i + 8];
+                        for (j=24; j<32; j++) [msg appendFormat:@"%3.1f ", rates_hi.rates[slot_idx*32 + j]];
+                        [msg appendFormat:@"\n"];
+                        slot_idx++;
+                    }
+                }
+            }
+            else {
+                slot_idx = 0;
+                unsigned char j = 0;
+                for (i=0; i<16; i++) {
+                     if ((msk >> i) & 0x1) {
+                         [msg appendFormat:@"slot %2d, ch00-07:", i];
+                         for (j=0; j<8; j++) [msg appendFormat:@"%3.1f ", rates_lo.rates[slot_idx*32 + j]];
+                         [msg appendFormat:@"\nslot %2d, ch08-15:", i];
+                         for (j=8; j<16; j++) [msg appendFormat:@"%3.1f ", rates_lo.rates[slot_idx*32 + j]];
+                         [msg appendFormat:@"\nslot %2d, ch16-23:", i];
+                         for (j=16; j<23; j++) [msg appendFormat:@"%3.1f ", rates_lo.rates[slot_idx*32 + j]];
+                         [msg appendFormat:@"\nslot %2d, ch24-31:", i];
+                         for (j=24; j<32; j++) [msg appendFormat:@"%3.1f ", rates_lo.rates[slot_idx*32 + j]];
+                         [msg appendFormat:@"\n"];
+                         slot_idx++;
+                     }
+                }
+            }
+            NSLog(msg);
+        }
+        //pollDict
+        if (isPollingXl3 && [self calcCMOSRatesFromCounts]) {
+            NSDateFormatter* iso = [[NSDateFormatter alloc] init];
+            [iso setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss'Z'"];
+            iso.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
+            iso.calendar = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
+            iso.locale = [[[NSLocale alloc] initWithLocaleIdentifier:@"en_US"] autorelease];
+            NSString* str = [iso stringFromDate:[NSDate date]];
+            NSMutableArray* rates = [[[NSMutableArray alloc] initWithCapacity:16] autorelease];
+            NSMutableArray* slot_rates;
+            NSMutableArray* time_stamps = [[[NSMutableArray alloc] initWithCapacity:16] autorelease];
+            unsigned char ch, sl;
+            unsigned char slot_idx = 0;
+            for (sl = 0; sl < 16; sl++) {
+                slot_rates = [[[NSMutableArray alloc] initWithCapacity:32] autorelease];
+
+                if ((msk >> sl) & 0x1) {
+                    if (num_slots > 8) {
+                        if (sl==8) slot_idx = 0;
+                        if (sl < 8) {
+                            for (ch = 0; ch < 32; ch++) {
+                                NSNumber *number = [[NSNumber alloc] initWithInt:rates_lo.rates[slot_idx*32 + ch]];
+                                [slot_rates addObject:number];
+                                [number release];
+                                number = nil;
+                            }
+                            slot_idx++;
+                        }
+                        else {
+                            for (ch = 0; ch < 32; ch++) {
+                                NSNumber *number = [[NSNumber alloc] initWithInt:rates_hi.rates[slot_idx*32 + ch]];
+                                [slot_rates addObject:number];
+                                [number release];
+                                number = nil;
+                            }
+                            slot_idx++;
+                        }
                     }
                     else {
                         for (ch = 0; ch < 32; ch++) {
-                            NSNumber *number = [[NSNumber alloc] initWithInt:results_hi.rates[slot_idx*32 + ch]];
+                            NSNumber *number = [[NSNumber alloc] initWithInt:rates_lo.rates[slot_idx*32 + ch]];
                             [slot_rates addObject:number];
                             [number release];
                             number = nil;
                         }
                         slot_idx++;
                     }
+                    [time_stamps addObject:str];
                 }
                 else {
-                    for (ch = 0; ch < 32; ch++) {
-                        NSNumber *number = [[NSNumber alloc] initWithInt:results_lo.rates[slot_idx*32 + ch]];
-                        [slot_rates addObject:number];
-                        [number release];
-                        number = nil;
-                    }
-                    slot_idx++;
+                    [time_stamps addObject:@""];
                 }
-                [time_stamps addObject:str];
+                [rates addObject:slot_rates]; //yes, we may add an empty array
             }
-            else {
-                [time_stamps addObject:@""];
-            }
-            [rates addObject:slot_rates]; //yes, we may add an empty array
-        }
-        [pollDict setObject:rates forKey:@"cmos_rt"];
-        [pollDict setObject:time_stamps forKey:@"cmos_rt_time_stamp"];
-        [pollDict setObject:[NSNumber numberWithInt:msk] forKey:@"cmos_rt_slot_mask"];
-        [iso release]; iso = nil;
+            [pollDict setObject:rates forKey:@"cmos_rt"];
+            [pollDict setObject:time_stamps forKey:@"cmos_rt_time_stamp"];
+            [pollDict setObject:[NSNumber numberWithInt:msk] forKey:@"cmos_rt_slot_mask"];
+            [iso release]; iso = nil;
         
-        if ([[ORGlobal sharedGlobal] runInProgress]) {
-            unsigned long data[21 + 8*32];
-            data[0] = cmosRateDataId | (21+8*32); 
-            data[1] = [self crateNumber];
-            data[2] = args_lo.slot_mask;
-            memcpy(data+3, args_lo.channel_masks, 16*4);
-            data[19] = aDelay;
-            data[20] = results_lo.error_flags;
-            memcpy(data+21, results_lo.rates, 8*32*4);
-            
-            [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-                                                            object:[NSData dataWithBytes:data length:sizeof(long)*(21+8*32)]];
-
-            if (num_slots > 8) {
-                data[2] = args_hi.slot_mask;
-                data[20] = results_hi.error_flags;
-                memcpy(data+21, results_hi.rates, 8*32);
+            if ([[ORGlobal sharedGlobal] runInProgress]) {
+                unsigned long data[21 + 8*32];
+                data[0] = cmosRateDataId | (21+8*32); 
+                data[1] = [self crateNumber];
+                data[2] = args_lo.slot_mask;
+                memcpy(data+3, args_lo.channel_masks, 16*4);
+                data[19] = 0;
+                data[20] = results_lo.error_flags;
+                memcpy(data+21, rates_lo.rates, 8*32*4);
                 
                 [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-                                                                    object:[NSData dataWithBytes:data length:sizeof(long)*(21+8*32)]];
+                                                                object:[NSData dataWithBytes:data length:sizeof(long)*(21+8*32)]];
+
+                if (num_slots > 8) {
+                    data[2] = args_hi.slot_mask;
+                    data[20] = results_hi.error_flags;
+                    memcpy(data+21, rates_hi.rates, 8*32);
+                    
+                    [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
+                                                                        object:[NSData dataWithBytes:data length:sizeof(long)*(21+8*32)]];
+                }
             }
         }
+        [self setCalcCMOSRatesFromCounts:YES];
     }
 }
 
@@ -3000,7 +3055,7 @@ void SwapLongBlock(void* p, int32_t n)
         }
         pollStartDate = [[NSDate alloc] init];
         if (isPollingCMOSRates && (![[NSThread currentThread] isCancelled] || isPollingForced)) {
-            [self readCMOSRateWithDelay:10]; //[msec]
+            [self readCMOSRate]; //[msec]
         }
         
         if (isPollingPMTCurrents && (![[NSThread currentThread] isCancelled] || isPollingForced)) {

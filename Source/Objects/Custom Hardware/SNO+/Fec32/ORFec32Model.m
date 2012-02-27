@@ -1154,6 +1154,56 @@ NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageSt
 	return calcRates;
 }
 
+//XL3 reads the counts for half the crate and pushes them here
+//returns YES if the cmos rates were updated
+- (BOOL) processCMOSCounts:(unsigned long*)rates calcRates:(BOOL)aCalcRates withChannelMask:(unsigned long) aChannelMask
+{
+    
+    long		   	theRate = kCMOSRateUnmeasured;
+	unsigned long  	theCount;
+	
+	NSDate* lastTime = cmosCountTimeStamp;
+	NSDate* thisTime = [NSDate date];
+	NSTimeInterval timeDiff = [thisTime timeIntervalSinceDate:lastTime];
+
+	float sampleFreq;
+    BOOL calcRates = aCalcRates;
+    
+	if ((calcRates && (timeDiff<0 || timeDiff>kMaxTimeDiff)) || timeDiff==0) {
+		calcRates = 0;	// don't calculate rates if time diff is silly
+	}
+	if(timeDiff){
+        sampleFreq = 1 / timeDiff;
+    }
+	
+	[cmosCountTimeStamp release];
+	cmosCountTimeStamp = [thisTime retain];
+	
+	//unsigned long theOnlineMask = [self onlineMask];
+    //add disabled channels
+    unsigned char ch;
+    for (ch=0; ch<32; ch++) {
+        if (aChannelMask & 1UL << ch) {
+            theCount = rates[ch];
+			if (calcRates) { //only good CMOS count reads get here
+					theRate = (theCount - cmosCount[ch]) * sampleFreq;
+					if (theRate > 1e9) theRate = kCMOSRateCorruptRead;			//MAH 3/19/98
+			}
+            else {
+                theRate = kCMOSRateUnmeasured;
+            }
+            cmosCount[ch] = theCount;
+            cmosRate[ch] = theRate;
+        }
+        else {
+            cmosCount[ch] = 0;
+            cmosRate[ch] = kCMOSRateUnmeasured;
+        }
+    }
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelCmosRateChanged object:self];
+    return calcRates;
+}
+
 @end
 
 @implementation ORFec32Model (private)

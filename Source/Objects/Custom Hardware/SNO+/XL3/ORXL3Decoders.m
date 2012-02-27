@@ -141,7 +141,7 @@
         if ((dataPtr[2] >> slot) & 0x1) {
             [dsc appendFormat:@"\nslot %d\n", slot];
             for (ch = 0; ch < 32; ch++) {
-                [dsc appendFormat:@"ch %2d: %f\n", ch, dataPtr[21 + slot_idx*32 + ch]];
+                [dsc appendFormat:@"ch %2d: %f\n", ch, *(float*)&dataPtr[21 + slot_idx*32 + ch]];
             }
             slot_idx++;
         }

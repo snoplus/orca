@@ -102,6 +102,7 @@ enum {
     float _hvBCurrentReadValue;
     unsigned long _hvAVoltageTargetValue;
     unsigned long _hvBVoltageTargetValue;
+    BOOL _calcCMOSRatesFromCounts;
 }
 
 @property (assign)	unsigned long   xl3ChargeInjMask;
@@ -135,6 +136,7 @@ enum {
 @property (assign) float hvBCurrentReadValue;
 @property (assign) unsigned long hvAVoltageTargetValue;
 @property (assign) unsigned long hvBVoltageTargetValue;
+@property (assign) BOOL calcCMOSRatesFromCounts;
 
 #pragma mark •••Initialization
 - (id)   init;
@@ -248,7 +250,7 @@ enum {
 
 - (void) readCMOSRateWithArgs:(read_cmos_rate_args_t*)aArgs rates:(read_cmos_rate_results_t*)aRates;
 - (void) readCMOSRateForSlot:(unsigned short)aSlot withChannelMask:(unsigned long)aChannelMask withDelay:(unsigned long)aDelay;
-- (void) readCMOSRateWithDelay:(unsigned long)aDelay;
+- (void) readCMOSRate;
 
 - (void) readPMTBaseCurrentsWithArgs:(read_pmt_base_currents_args_t*)aArg currents:(read_pmt_base_currents_results_t*)result;
 - (void) readPMTBaseCurrentsForSlot:(unsigned short)aSlot withChannelMask:(unsigned long)aChannelMask;

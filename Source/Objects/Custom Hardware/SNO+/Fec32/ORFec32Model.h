@@ -261,6 +261,7 @@ typedef struct Fec32CmosShiftReg{
 - (eFecMonitorState)adcVoltageStatusOfCard;
 - (void)			setAdcVoltageStatusOfCard:(eFecMonitorState)aState;
 
+
 #pragma mark Converted Data Methods
 - (void)	setCmosVoltage:(short)anIndex withValue:(float) value;
 - (float)	cmosVoltage:(short) n;
@@ -295,6 +296,7 @@ typedef struct Fec32CmosShiftReg{
 - (void) scan:(SEL)aResumeSelectorInGuardian; 
 - (void) scanWorkingSlot;
 - (BOOL) readCMOSCounts:(BOOL)calcRates channelMask:(unsigned long) aChannelMask;
+- (BOOL) processCMOSCounts:(unsigned long*)rates calcRates:(BOOL)aCalcRates withChannelMask:(unsigned long) aChannelMask;
 
 #pragma mark •••Hw Access Helpers
 - (id) writeToFec32RegisterCmd:(unsigned long) aRegister value:(unsigned long) aBitPattern;
