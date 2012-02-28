@@ -1017,66 +1017,66 @@ static NSDictionary* xl3Ops;
 - (IBAction) monIsPollingCMOSRatesAction:(id)sender
 {
     [model setIsPollingCMOSRates:[sender intValue]];
-//    [self endEditing];
+    [self endEditing];
 }
 
 - (IBAction) monIsPollingPMTCurrentsAction:(id)sender
 {
     [model setIsPollingPMTCurrents:[sender intValue]];
-//    [self endEditing];
+    [self endEditing];
 }
 
 - (IBAction) monIsPollingFECVoltagesAction:(id)sender
 {
     [model setIsPollingFECVoltages:[sender intValue]];
-//    [self endEditing];
+    [self endEditing];
 }
 
 - (IBAction) monIsPollingXl3VoltagesAction:(id)sender
 {
     [model setIsPollingXl3Voltages:[sender intValue]];
-//    [self endEditing];
+    [self endEditing];
 }
 
 - (IBAction) monIsPollingHVSupplyAction:(id)sender
 {
     [model setIsPollingHVSupply:[sender intValue]];
-//    [self endEditing];
+    [self endEditing];
 }
 
 - (IBAction) monPollCMOSRatesMaskAction:(id)sender
 {
-//    [self endEditing];
+    [self endEditing];
     [model setPollCMOSRatesMask:[sender intValue]];
 }
 
 - (IBAction) monPollPMTCurrentsMaskAction:(id)sender
 {   
-//    [self endEditing];
+    [self endEditing];
     [model setPollPMTCurrentsMask:[sender intValue]];
 }
 
 - (IBAction) monPollFECVoltagesMaskAction:(id)sender
 {
-//    [self endEditing];
+    [self endEditing];
     [model setPollFECVoltagesMask:[sender intValue]];
 }
 
 - (IBAction) monPollingRateAction:(id)sender
 {
-//    [self endEditing];
+    [self endEditing];
     [model setPollXl3Time:[[sender selectedItem] tag]];
 }
 
 - (IBAction) monIsPollingVerboseAction:(id)sender
 {
-//    [self endEditing];
+    [self endEditing];
     [model setIsPollingVerbose:[sender intValue]];
 }
 
 - (IBAction) monIsPollingWithRunAction:(id)sender
 {
-//    [self endEditing];
+    [self endEditing];
     [model setIsPollingXl3WithRun:[sender intValue]];
 }
 
@@ -1222,36 +1222,66 @@ static NSDictionary* xl3Ops;
 
 - (IBAction)hvStepUpAction:(id)sender;
 {
-    unsigned long aVoltageValue;
+    unsigned long aVoltageDACValue;
     if ([hvPowerSupplyMatrix selectedColumn] == 0) {
-        aVoltageValue = [model hvANextStepValue];
-        aVoltageValue += 50;
-        if (aVoltageValue > [model hvAVoltageTargetValue]) aVoltageValue = [model hvAVoltageTargetValue];
-        [model setHvANextStepValue:aVoltageValue];
+        aVoltageDACValue = [model hvANextStepValue];
+        aVoltageDACValue += 50 * 4096/3000.;
+        if (aVoltageDACValue > [model hvAVoltageTargetValue]) aVoltageDACValue = [model hvAVoltageTargetValue];
+        [model setHvANextStepValue:aVoltageDACValue];
     }
     else {
-        aVoltageValue = [model hvBNextStepValue];
-        aVoltageValue += 50;
-        if (aVoltageValue > [model hvBVoltageTargetValue]) aVoltageValue = [model hvBVoltageTargetValue];
-        [model setHvBNextStepValue:aVoltageValue];
+        aVoltageDACValue = [model hvBNextStepValue];
+        aVoltageDACValue += 50 * 4096/3000.;
+        if (aVoltageDACValue > [model hvBVoltageTargetValue]) aVoltageDACValue = [model hvBVoltageTargetValue];
+        [model setHvBNextStepValue:aVoltageDACValue];
     }
 }
 
 - (IBAction)hvStepDownAction:(id)sender
 {
-    unsigned long aVoltageValue;
+    unsigned long aVoltageDACValue;
     if ([hvPowerSupplyMatrix selectedColumn] == 0) {
-        aVoltageValue = [model hvANextStepValue];
-        if (aVoltageValue < 50) aVoltageValue = 0;
-        else aVoltageValue -= 50;
-        [model setHvANextStepValue:aVoltageValue];
+        aVoltageDACValue = [model hvANextStepValue];
+        if (aVoltageDACValue < 50 * 4096/3000.) aVoltageDACValue = 0;
+        else aVoltageDACValue -= 50 * 4096/3000.;
+        [model setHvANextStepValue:aVoltageDACValue];
     }
     else {
-        aVoltageValue = [model hvBNextStepValue];
-        if (aVoltageValue < 50) aVoltageValue = 0;
-        else aVoltageValue -= 50;
-        [model setHvBNextStepValue:aVoltageValue];
+        aVoltageDACValue = [model hvBNextStepValue];
+        if (aVoltageDACValue < 50 * 4096/3000.) aVoltageDACValue = 0;
+        else aVoltageDACValue -= 50 * 4096/3000.;
+        [model setHvBNextStepValue:aVoltageDACValue];
     }    
+}
+
+- (IBAction)hvRampUpAction:(id)sender
+{
+        if ([hvPowerSupplyMatrix selectedColumn] == 0) {
+            [model setHvANextStepValue:[model hvAVoltageTargetValue]];
+        }
+        else {
+            [model setHvANextStepValue:[model hvBVoltageTargetValue]];
+        }
+}
+
+- (IBAction)hvRampDownAction:(id)sender
+{
+    if ([hvPowerSupplyMatrix selectedColumn] == 0) {
+        [model setHvANextStepValue:0];
+    }
+    else {
+        [model setHvANextStepValue:0];
+    }
+}
+
+- (IBAction)hvRampPauseAction:(id)sender
+{
+    if ([hvPowerSupplyMatrix selectedColumn] == 0) {
+        [model setHvANextStepValue:[model hvAVoltageDACSetValue]];
+    }
+    else {
+        [model setHvANextStepValue:[model hvBVoltageDACSetValue]];
+    }
 }
 
 //connection

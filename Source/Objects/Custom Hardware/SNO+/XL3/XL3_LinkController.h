@@ -249,6 +249,9 @@
 - (IBAction)hvChangePowerSupplyAction:(id)sender;
 - (IBAction)hvStepUpAction:(id)sender;
 - (IBAction)hvStepDownAction:(id)sender;
+- (IBAction)hvRampUpAction:(id)sender;
+- (IBAction)hvRampDownAction:(id)sender;
+- (IBAction)hvRampPauseAction:(id)sender;
 //connection
 - (IBAction) toggleConnectAction:(id)sender;
 - (IBAction) errorTimeOutAction:(id)sender;

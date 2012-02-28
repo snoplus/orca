@@ -2012,8 +2012,8 @@ void SwapLongBlock(void* p, int32_t n)
     }
 
     @try {
-        //[self readCMOSCountWithArgs:&args_lo counts:&results_lo];
-        //if (num_slots > 8) [self readCMOSCountWithArgs:&args_hi counts:&results_hi];
+        [self readCMOSCountWithArgs:&args_lo counts:&results_lo];
+        if (num_slots > 8) [self readCMOSCountWithArgs:&args_hi counts:&results_hi];
     }
     @catch (NSException *exception) {
         if (isPollingXl3) {
@@ -2430,50 +2430,49 @@ void SwapLongBlock(void* p, int32_t n)
 //used from polling loop and/or ORCA script
 - (void) readHVStatus
 {
-    hv_readback_results_t status;
-    
-    @try {
-        [self readHVStatus:&status];
-    }
-    @catch (NSException *exception) {
+    @synchronized(self) {
+        hv_readback_results_t status;
+        @try {
+            [self readHVStatus:&status];
+        }
+        @catch (NSException *exception) {
+            if (isPollingXl3) {
+                NSLog(@"%@ Polling loop stopped because reading XL3 local voltages failed\n", [[self xl3Link] crateName]);
+                [self setIsPollingXl3:NO];
+            }
+        }
+        [self setHvAVoltageReadValue:status.voltage_a * 300];
+        [self setHvBVoltageReadValue:status.voltage_b * 300];
+        [self setHvACurrentReadValue:status.current_a * 10];
+        [self setHvACurrentReadValue:status.current_a * 10];
+
+        //unless (isPollingXl3 && !isPollingVerbose)
+        if (!isPollingXl3 || isPollingVerbose) {    
+            NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ HV status: \n", [[self xl3Link] crateName]];
+            [msg appendFormat:@"voltageA: %f V\nvoltageB: %f V\n", status.voltage_a * 300., status.voltage_b * 300.];
+            [msg appendFormat:@"currentA: %f mA\ncurrentB: %f mA\n", status.current_a * 10, status.current_b * 10];
+            NSLog(msg);
+        }
         if (isPollingXl3) {
-            NSLog(@"%@ Polling loop stopped because reading XL3 local voltages failed\n", [[self xl3Link] crateName]);
-            [self setIsPollingXl3:NO];
+            NSDateFormatter* iso = [[NSDateFormatter alloc] init];
+            [iso setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss'Z'"];
+            iso.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
+            //iso.calendar = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
+            //iso.locale = [[[NSLocale alloc] initWithLocaleIdentifier:@"en_US"] autorelease];
+            NSString* str = [iso stringFromDate:[NSDate date]];
+            NSDictionary* hvSupplyDict = [[NSDictionary alloc] initWithObjectsAndKeys:
+                                         str, @"time_stamp",
+                                         [NSNumber numberWithFloat:status.voltage_a * 300.], @"VLT_A",
+                                         [NSNumber numberWithFloat:status.voltage_b * 300.], @"VLT_B",
+                                         [NSNumber numberWithFloat:status.current_a * 10], @"CRR_A",
+                                         [NSNumber numberWithFloat:status.current_b * 10], @"CRR_B",
+                                         nil];
+            [pollDict setObject:hvSupplyDict forKey:@"hv_supply"];
+            [hvSupplyDict release];
+            [iso release];
+            iso = nil;
         }
     }
-    
-    //unless (isPollingXl3 && !isPollingVerbose)
-    if (!isPollingXl3 || isPollingVerbose) {    
-        NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ HV status: \n", [[self xl3Link] crateName]];
-        [msg appendFormat:@"voltageA: %f V\nvoltageB: %f V\n", status.voltage_a * 300., status.voltage_b * 300.];
-        [msg appendFormat:@"currentA: %f mA\ncurrentB: %f mA\n", status.current_a * 10, status.current_b * 10];
-        NSLog(msg);
-    }
-    if (isPollingXl3) {
-        NSDateFormatter* iso = [[NSDateFormatter alloc] init];
-        [iso setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss'Z'"];
-        iso.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
-        //iso.calendar = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
-        //iso.locale = [[[NSLocale alloc] initWithLocaleIdentifier:@"en_US"] autorelease];
-        NSString* str = [iso stringFromDate:[NSDate date]];
-        NSDictionary* hvSupplyDict = [[NSDictionary alloc] initWithObjectsAndKeys:
-                                     str, @"time_stamp",
-                                     [NSNumber numberWithFloat:status.voltage_a * 300.], @"VLT_A",
-                                     [NSNumber numberWithFloat:status.voltage_b * 300.], @"VLT_B",
-                                     [NSNumber numberWithFloat:status.current_a * 10], @"CRR_A",
-                                     [NSNumber numberWithFloat:status.current_b * 10], @"CRR_B",
-                                     nil];
-        [pollDict setObject:hvSupplyDict forKey:@"hv_supply"];
-        [hvSupplyDict release];
-        [iso release];
-        iso = nil;
-    }
-    //save status
-    
-    [self setHvAVoltageReadValue:status.voltage_a * 300];
-    [self setHvBVoltageReadValue:status.voltage_b * 300];
-    [self setHvACurrentReadValue:status.current_a * 10];
-    [self setHvACurrentReadValue:status.current_a * 10];
 }
 
 - (void) setHVRelays:(unsigned long long)aRelayMask error:(unsigned long*)aError
@@ -2692,7 +2691,10 @@ void SwapLongBlock(void* p, int32_t n)
     }
 
     //check the hv thread is running
-    if (!hvASwitch && !hvBSwitch && aOn) {    
+    if (!hvASwitch && !hvBSwitch && aOn) {
+        [self setIsPollingHVSupply:YES];
+        [self setIsPollingXl3:YES];
+        
         if (hvThread) {
             if ([hvThread isFinished]) {
                 [hvThread release];
@@ -3236,9 +3238,9 @@ void SwapLongBlock(void* p, int32_t n)
         msk |= 1 << [key stationNumber];
     }
     
-    unsigned long channelsAboveLimit;
+    //unsigned long channelsAboveLimit;
     unsigned long lastCMOSCountProcessed;
-    unsigned long cmosLimit;
+    //unsigned long cmosLimit;
     
     while (!isTimeToQuit) {
         if ([self hvANextStepValue] != [self hvAVoltageDACSetValue]) {
@@ -3267,24 +3269,27 @@ void SwapLongBlock(void* p, int32_t n)
             [self setCalcCMOSRatesFromCounts:NO];
             [self setHvCMOSReadsCounter:0];
             lastCMOSCountProcessed = 0;
+            
+            usleep(200000);
+            [self readHVStatus];
         }
         
         //while ([self hvCMOSReadsCounter] < 3) { //or panic flag
         //    usleep(100000);
         //}
-        usleep(100000);
-        //read back voltage
+        
+        //monitoring loop updates
         if (fabs([self hvAVoltageReadValue] / 3000. * 4096 - [self hvAVoltageDACSetValue]) > 20) {
             NSLog(@"%@ read value differs from the set one. stopping!\n", [[self xl3Link] crateName]);
             usleep(100000);
             [self setHvANextStepValue:[self hvAVoltageDACSetValue]];
         }
         
-        //if set reset CMOS rates and wait for first two count measurements unless panicFlag
+        /*
         channelsAboveLimit = 0;
         cmosLimit = [self hvACMOSRateLimit];
         for (id key in fecs) {
-        //    channelsAboveLimit += [key channelsWithCMOSRateHigherThan:[self hvACMOSRateLimit]];
+            channelsAboveLimit += [key channelsWithCMOSRateHigherThan:[self hvACMOSRateLimit]];
         }
         
         if (channelsAboveLimit > [self hvACMOSRateIgnore]) {
@@ -3292,6 +3297,7 @@ void SwapLongBlock(void* p, int32_t n)
             usleep(100000);
             [self setHvANextStepValue:[self hvAVoltageDACSetValue]];
         }
+         */
 
         if (!hvASwitch && !hvBSwitch) isTimeToQuit = YES;
         usleep(100000);
