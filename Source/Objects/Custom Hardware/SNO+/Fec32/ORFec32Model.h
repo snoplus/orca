@@ -297,6 +297,8 @@ typedef struct Fec32CmosShiftReg{
 - (void) scanWorkingSlot;
 - (BOOL) readCMOSCounts:(BOOL)calcRates channelMask:(unsigned long) aChannelMask;
 - (BOOL) processCMOSCounts:(unsigned long*)rates calcRates:(BOOL)aCalcRates withChannelMask:(unsigned long) aChannelMask;
+- (unsigned long) channelsWithCMOSRateHigherThan:(unsigned long)cmosRateLimit;
+- (unsigned long) channelsWithErrorCMOSRate;
 
 #pragma mark •••Hw Access Helpers
 - (id) writeToFec32RegisterCmd:(unsigned long) aRegister value:(unsigned long) aBitPattern;

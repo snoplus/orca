@@ -1204,6 +1204,27 @@ NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageSt
     return calcRates;
 }
 
+- (unsigned long) channelsWithCMOSRateHigherThan:(unsigned long)cmosRateLimit
+{
+    //todo: add a goodforcmosrate mask on top
+    unsigned char ch;
+    unsigned long count = 0;
+    for (ch=0; ch<32; ch++) {
+        if (cmosRate[ch] > cmosRateLimit) count++;
+    }
+    return count;
+}
+
+- (unsigned long) channelsWithErrorCMOSRate
+{
+    unsigned char ch;
+    unsigned long count = 0;
+    for (ch=0; ch<32; ch++) {
+        if (cmosRate[ch] < 0) count++;
+    }
+    return count;    
+}
+
 @end
 
 @implementation ORFec32Model (private)

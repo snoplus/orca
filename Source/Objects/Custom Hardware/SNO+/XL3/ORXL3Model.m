@@ -79,15 +79,22 @@ NSString* ORXL3ModelRelayStatusChanged = @"ORXL3ModelRelayStatusChanged";
 NSString* ORXL3ModelHvStatusChanged = @"ORXL3ModelHvStatusChanged";
 NSString* ORXL3ModelTriggerStatusChanged = @"ORXL3ModelTriggerStatusChanged";
 NSString* ORXL3ModelHVTargetValueChanged = @"ORXL3ModelHVTargetValueChanged";
+NSString* ORXL3ModelHVCMOSRateLimitChanged = @"ORXL3ModelHVCMOSRateLimitChanged";
+NSString* ORXL3ModelHVCMOSRateIgnoreChanged = @"ORXL3ModelHVCMOSRateIgnoreChanged";
 
 @interface ORXL3Model (private)
 - (void) doBasicOp;
 - (void) _pollXl3;
+- (void) _hvXl3;
 @end
 
 @implementation ORXL3Model
 @synthesize pollDict, isPollingForced,
-    calcCMOSRatesFromCounts = _calcCMOSRatesFromCounts;
+    calcCMOSRatesFromCounts = _calcCMOSRatesFromCounts,
+    hvANextStepValue = _hvANextStepValue,
+    hvBNextStepValue = _hvBNextStepValue,
+    hvCMOSReadsCounter = _hvCMOSReadsCounter;
+
 
 #pragma mark •••Initialization
 - (id) init
@@ -106,6 +113,7 @@ NSString* ORXL3ModelHVTargetValueChanged = @"ORXL3ModelHVTargetValueChanged";
 	[xl3Link release];
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
     if (pollThread) [pollThread release];
+    if (hvThread) [hvThread release];
     [pollDict release];
     if (relayStatus) [relayStatus release];
     if (triggerStatus) [triggerStatus release];
@@ -461,9 +469,12 @@ NSString* ORXL3ModelHVTargetValueChanged = @"ORXL3ModelHVTargetValueChanged";
 
 - (void) setIsPollingCMOSRates:(BOOL)aIsPollingCMOSRates
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setIsPollingCMOSRates:isPollingCMOSRates];
-    isPollingCMOSRates = aIsPollingCMOSRates;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelIsPollingCMOSRatesChanged object:self];    
+    if (isPollingXl3Voltages != aIsPollingCMOSRates) {
+        [[[self undoManager] prepareWithInvocationTarget:self] setIsPollingCMOSRates:isPollingCMOSRates];
+        isPollingCMOSRates = aIsPollingCMOSRates;
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelIsPollingCMOSRatesChanged object:self];
+        [self setCalcCMOSRatesFromCounts:NO];
+    }
 }
 
 - (unsigned short) pollCMOSRatesMask
@@ -473,9 +484,12 @@ NSString* ORXL3ModelHVTargetValueChanged = @"ORXL3ModelHVTargetValueChanged";
 
 - (void) setPollCMOSRatesMask:(unsigned short)aPollCMOSRatesMask
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setPollCMOSRatesMask:pollCMOSRatesMask];
-    pollCMOSRatesMask = aPollCMOSRatesMask;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelPollCMOSRatesMaskChanged object:self];    
+    if (pollCMOSRatesMask != aPollCMOSRatesMask) {
+        [[[self undoManager] prepareWithInvocationTarget:self] setPollCMOSRatesMask:pollCMOSRatesMask];
+        pollCMOSRatesMask = aPollCMOSRatesMask;
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelPollCMOSRatesMaskChanged object:self];
+        [self setCalcCMOSRatesFromCounts:NO];
+    }
 }
 
 - (BOOL) isPollingPMTCurrents
@@ -702,6 +716,54 @@ NSString* ORXL3ModelHVTargetValueChanged = @"ORXL3ModelHVTargetValueChanged";
     [[[self undoManager] prepareWithInvocationTarget:self] setHvBVoltageTargetValue:_hvBVoltageTargetValue];
     _hvBVoltageTargetValue = hvBVoltageTargetValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHVTargetValueChanged object:self];        
+}
+
+- (unsigned long) hvACMOSRateLimit
+{
+    return _hvACMOSRateLimit;
+}
+
+- (void) setHvACMOSRateLimit:(unsigned long)hvACMOSRateLimit
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setHvACMOSRateLimit:_hvACMOSRateLimit];
+    _hvACMOSRateLimit = hvACMOSRateLimit;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHVCMOSRateLimitChanged object:self];            
+}
+
+- (unsigned long) hvBCMOSRateLimit
+{
+    return _hvBCMOSRateLimit;
+}
+
+- (void) setHvBCMOSRateLimit:(unsigned long)hvBCMOSRateLimit
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setHvBCMOSRateLimit:_hvBCMOSRateLimit];
+    _hvBCMOSRateLimit = hvBCMOSRateLimit;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHVCMOSRateLimitChanged object:self];            
+}
+
+- (unsigned long) hvACMOSRateIgnore
+{
+    return _hvACMOSRateIgnore;
+}
+
+- (void) setHvACMOSRateIgnore:(unsigned long)hvACMOSRateIgnore
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setHvACMOSRateIgnore:_hvACMOSRateIgnore];
+    _hvACMOSRateIgnore = hvACMOSRateIgnore;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHVCMOSRateIgnoreChanged object:self];            
+}
+
+- (unsigned long) hvBCMOSRateIgnore
+{
+    return _hvBCMOSRateIgnore;
+}
+
+- (void) setHvBCMOSRateIgnore:(unsigned long)hvBCMOSRateIgnore
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setHvBCMOSRateIgnore:_hvBCMOSRateIgnore];
+    _hvBCMOSRateIgnore = hvBCMOSRateIgnore;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHVCMOSRateIgnoreChanged object:self];            
 }
 
 - (unsigned long long) relayMask
@@ -1026,12 +1088,15 @@ void SwapLongBlock(void* p, int32_t n)
     [self setIsPollingXl3WithRun:   [decoder decodeBoolForKey:@"ORXL3ModelIsPollingXl3WithRun"]];
     [self setIsPollingVerbose:      [decoder decodeBoolForKey:@"ORXL3ModelIsPollingVerbose"]];
     [self setRelayMask:[decoder decodeInt64ForKey:@"ORXL3ModelRelayMask"]];
+    [self setHvAVoltageDACSetValue:[decoder decodeIntForKey:@"ORXL3ModelHvAVoltageDACSetValue"]];
+    [self setHvBVoltageDACSetValue:[decoder decodeIntForKey:@"ORXL3ModelHvBVoltageDACSetValue"]];
+    [self setHvAVoltageTargetValue:[decoder decodeIntForKey:@"ORXL3ModelhvAVoltageTargetValue"]];
+    [self setHvBVoltageTargetValue:[decoder decodeIntForKey:@"ORXL3ModelhvBVoltageTargetValue"]];
+    [self setHvACMOSRateLimit:[decoder decodeIntForKey:@"ORXL3ModelhvACMOSRateLimit"]];
+    [self setHvBCMOSRateLimit:[decoder decodeIntForKey:@"ORXL3ModelhvBCMOSRateLimit"]];
+    [self setHvACMOSRateIgnore:[decoder decodeIntForKey:@"ORXL3ModelhvACMOSRateIgnore"]];
+    [self setHvBCMOSRateIgnore:[decoder decodeIntForKey:@"ORXL3ModelhvBCMOSRateIgnore"]];
 
-    [self setHvAVoltageDACSetValue: [decoder decodeIntForKey:@"ORXL3ModelHvAVoltageDACSetValue"]];
-    [self setHvBVoltageDACSetValue: [decoder decodeIntForKey:@"ORXL3ModelHvBVoltageDACSetValue"]];
-    [self setHvAVoltageTargetValue: [decoder decodeIntForKey:@"ORXL3ModelhvAVoltageTargetValue"]];
-    [self setHvBVoltageTargetValue: [decoder decodeIntForKey:@"ORXL3ModelhvBVoltageTargetValue"]];
-    
 	if (xl3Mode == 0) [self setXl3Mode: 1];
 	if (xl3OpsRunning == nil) xl3OpsRunning = [[NSMutableDictionary alloc] init];
     //if (isPollingXl3 == YES) [self setIsPollingXl3:NO];
@@ -1077,6 +1142,10 @@ void SwapLongBlock(void* p, int32_t n)
     [encoder encodeInt:_hvAVoltageTargetValue forKey:@"ORXL3ModelhvAVoltageTargetValue"];
     [encoder encodeInt:_hvBVoltageTargetValue forKey:@"ORXL3ModelhvBVoltageTargetValue"];
     [encoder encodeInt64:relayMask forKey:@"ORXL3ModelRelayMask"];
+    [encoder encodeInt:_hvACMOSRateLimit forKey:@"ORXL3ModelhvACMOSRateLimit"];
+    [encoder encodeInt:_hvBCMOSRateLimit forKey:@"ORXL3ModelhvBCMOSRateLimit"];
+    [encoder encodeInt:_hvACMOSRateIgnore forKey:@"ORXL3ModelhvACMOSRateIgnore"];
+    [encoder encodeInt:_hvBCMOSRateIgnore forKey:@"ORXL3ModelhvBCMOSRateIgnore"];
 }
 
 #pragma mark •••Hardware Access
@@ -1906,11 +1975,21 @@ void SwapLongBlock(void* p, int32_t n)
     check_total_count_results_t results_hi;
     unsigned char i;
 
-    NSArray* fecs = [guardian collectObjectsOfClass:NSClassFromString(@"ORFec32Model")];
+    //NSArray* fecs = [guardian collectObjectsOfClass:NSClassFromString(@"ORFec32Model")];
 	unsigned int msk = 0UL;
-	for (id key in fecs) {
-		msk |= 1 << [key stationNumber];
+
+    NSEnumerator* e = [[[self guardian] objectEnumerator] retain];
+    id anObj;
+    while(anObj = [e nextObject]){
+        if ([anObj class] == NSClassFromString(@"ORFec32Model")) {
+            msk |= 1 << [anObj stationNumber];
+        }
 	}
+    [e release]; e=nil;
+
+	//for (id key in fecs) {
+	//	msk |= 1 << [key stationNumber];
+	//}
     if (isPollingXl3 || isPollingForced) {
         msk &= pollCMOSRatesMask;
     }
@@ -1933,8 +2012,8 @@ void SwapLongBlock(void* p, int32_t n)
     }
 
     @try {
-        [self readCMOSCountWithArgs:&args_lo counts:&results_lo];
-        if (num_slots > 8) [self readCMOSCountWithArgs:&args_hi counts:&results_hi];
+        //[self readCMOSCountWithArgs:&args_lo counts:&results_lo];
+        //if (num_slots > 8) [self readCMOSCountWithArgs:&args_hi counts:&results_hi];
     }
     @catch (NSException *exception) {
         if (isPollingXl3) {
@@ -1962,13 +2041,16 @@ void SwapLongBlock(void* p, int32_t n)
                     for (j=0; j<32; j++) {
                         counts[j] = results_lo.counts[slot_idx*32 + j];
                     }
+                    e = [[[self guardian] objectEnumerator] retain];
                     ORFec32Model* fec;
-                    for (id key in fecs) {
-                        if ([key stationNumber] == i) {
-                            fec = key;
+                    
+                    while(anObj = [e nextObject]){
+                        if ([anObj class] == NSClassFromString(@"ORFec32Model") && [anObj stationNumber] == i) {
+                            fec = anObj;
                             break;
                         }
                     }
+                    [e release]; e=nil;
                     [fec processCMOSCounts:counts calcRates:[self calcCMOSRatesFromCounts] withChannelMask:args_lo.channel_masks[i]];
                     for (j=0; j<32; j++) {
                         rates_lo.rates[slot_idx*32 + j] = [fec cmosRate:j];
@@ -1982,13 +2064,15 @@ void SwapLongBlock(void* p, int32_t n)
                     for (j=0; j<32; j++) {
                         counts[j] = results_hi.counts[slot_idx*32 + j];
                     }
+                    e = [[[self guardian] objectEnumerator] retain];
                     ORFec32Model* fec;
-                    for (id key in fecs) {
-                        if ([key stationNumber] == i + 8) {
-                            fec = key;
+                    while(anObj = [e nextObject]){
+                        if ([anObj class] == NSClassFromString(@"ORFec32Model") && [anObj stationNumber] == i + 8) {
+                            fec = anObj;
                             break;
                         }
                     }
+                    [e release]; e=nil;
                     [fec processCMOSCounts:counts calcRates:[self calcCMOSRatesFromCounts] withChannelMask:args_hi.channel_masks[i]];
                     for (j=0; j<32; j++) {
                         rates_hi.rates[slot_idx*32 + j] = [fec cmosRate:j];
@@ -2005,13 +2089,15 @@ void SwapLongBlock(void* p, int32_t n)
                     for (j=0; j<32; j++) {
                         counts[j] = results_lo.counts[slot_idx*32 + j];
                     }
+                    e = [[[self guardian] objectEnumerator] retain];
                     ORFec32Model* fec;
-                    for (id key in fecs) {
-                        if ([key stationNumber] == i) {
-                            fec = key;
+                    while(anObj = [e nextObject]){
+                        if ([anObj class] == NSClassFromString(@"ORFec32Model") && [anObj stationNumber] == i) {
+                            fec = anObj;
                             break;
                         }
                     }
+                    [e release]; e=nil;
                     [fec processCMOSCounts:counts calcRates:[self calcCMOSRatesFromCounts] withChannelMask:args_lo.channel_masks[i]];
                     for (j=0; j<32; j++) {
                         rates_lo.rates[slot_idx*32 + j] = [fec cmosRate:j];
@@ -2022,7 +2108,7 @@ void SwapLongBlock(void* p, int32_t n)
         }
         
         if ((!isPollingXl3 || isPollingVerbose) && [self calcCMOSRatesFromCounts]) {
-            NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ CMOS rates: %d\n", [[self xl3Link] crateName]];
+            NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ CMOS rates:\n", [[self xl3Link] crateName]];
             unsigned char slot_idx = 0;
             
             if (num_slots > 8) {
@@ -2083,16 +2169,16 @@ void SwapLongBlock(void* p, int32_t n)
             NSDateFormatter* iso = [[NSDateFormatter alloc] init];
             [iso setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss'Z'"];
             iso.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
-            iso.calendar = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
-            iso.locale = [[[NSLocale alloc] initWithLocaleIdentifier:@"en_US"] autorelease];
+            //iso.calendar = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
+            //iso.locale = [[[NSLocale alloc] initWithLocaleIdentifier:@"en_US"] autorelease];
             NSString* str = [iso stringFromDate:[NSDate date]];
-            NSMutableArray* rates = [[[NSMutableArray alloc] initWithCapacity:16] autorelease];
+            NSMutableArray* rates = [[NSMutableArray alloc] initWithCapacity:16];
             NSMutableArray* slot_rates;
-            NSMutableArray* time_stamps = [[[NSMutableArray alloc] initWithCapacity:16] autorelease];
+            NSMutableArray* time_stamps = [[NSMutableArray alloc] initWithCapacity:16];
             unsigned char ch, sl;
             unsigned char slot_idx = 0;
             for (sl = 0; sl < 16; sl++) {
-                slot_rates = [[[NSMutableArray alloc] initWithCapacity:32] autorelease];
+                slot_rates = [[NSMutableArray alloc] initWithCapacity:32];
 
                 if ((msk >> sl) & 0x1) {
                     if (num_slots > 8) {
@@ -2131,11 +2217,14 @@ void SwapLongBlock(void* p, int32_t n)
                     [time_stamps addObject:@""];
                 }
                 [rates addObject:slot_rates]; //yes, we may add an empty array
+                [slot_rates release]; slot_rates = nil;
             }
             [pollDict setObject:rates forKey:@"cmos_rt"];
             [pollDict setObject:time_stamps forKey:@"cmos_rt_time_stamp"];
             [pollDict setObject:[NSNumber numberWithInt:msk] forKey:@"cmos_rt_slot_mask"];
             [iso release]; iso = nil;
+            [time_stamps release]; time_stamps = nil;
+            [rates release]; rates = nil;
         
             if ([[ORGlobal sharedGlobal] runInProgress]) {
                 unsigned long data[21 + 8*32];
@@ -2145,7 +2234,11 @@ void SwapLongBlock(void* p, int32_t n)
                 memcpy(data+3, args_lo.channel_masks, 16*4);
                 data[19] = 0;
                 data[20] = results_lo.error_flags;
-                memcpy(data+21, rates_lo.rates, 8*32*4);
+                unsigned int idx = 0;
+                for (idx=0; idx < 8*32; idx++) {
+                    *(float*)&data[21 + idx] = rates_lo.rates[idx];
+                }
+                //memcpy(data+21, rates_lo.rates, 8*32*4);
                 
                 [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
                                                                 object:[NSData dataWithBytes:data length:sizeof(long)*(21+8*32)]];
@@ -2153,7 +2246,10 @@ void SwapLongBlock(void* p, int32_t n)
                 if (num_slots > 8) {
                     data[2] = args_hi.slot_mask;
                     data[20] = results_hi.error_flags;
-                    memcpy(data+21, rates_hi.rates, 8*32);
+                    for (idx=0; idx < 8*32; idx++) {
+                        *(float*)&data[21 + idx] = rates_hi.rates[idx];
+                    }
+                    //memcpy(data+21, rates_hi.rates, 8*32);
                     
                     [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
                                                                         object:[NSData dataWithBytes:data length:sizeof(long)*(21+8*32)]];
@@ -2161,6 +2257,7 @@ void SwapLongBlock(void* p, int32_t n)
             }
         }
         [self setCalcCMOSRatesFromCounts:YES];
+        [self setHvCMOSReadsCounter:[self hvCMOSReadsCounter]+1];
     }
 }
 
@@ -2231,11 +2328,16 @@ void SwapLongBlock(void* p, int32_t n)
     read_pmt_base_currents_results_t results;
     unsigned char i;
 
-	NSArray* fecs = [guardian collectObjectsOfClass:NSClassFromString(@"ORFec32Model")];
 	unsigned int msk = 0UL;
-	for (id key in fecs) {
-		msk |= 1 << [key stationNumber];
+    NSEnumerator* e = [[[self guardian] objectEnumerator] retain];
+    id anObj;
+    while(anObj = [e nextObject]){
+        if ([anObj class] == NSClassFromString(@"ORFec32Model")) {
+            msk |= 1 << [anObj stationNumber];
+        }
 	}
+    [e release]; e=nil;
+
     if (isPollingXl3 || isPollingForced) {
         msk &= pollPMTCurrentsMask;
     }
@@ -2276,14 +2378,14 @@ void SwapLongBlock(void* p, int32_t n)
         NSDateFormatter* iso = [[NSDateFormatter alloc] init];
         [iso setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss'Z'"];
         iso.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
-        iso.calendar = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
-        iso.locale = [[[NSLocale alloc] initWithLocaleIdentifier:@"en_US"] autorelease];
+        //iso.calendar = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
+        //iso.locale = [[[NSLocale alloc] initWithLocaleIdentifier:@"en_US"] autorelease];
         NSString* str = [iso stringFromDate:[NSDate date]];
-        NSMutableArray* currents = [NSMutableArray arrayWithCapacity:16];
+        NSMutableArray* currents = [[NSMutableArray alloc] initWithCapacity:16];
         NSMutableArray* slot_currents;
         unsigned char ch, sl;
         for (sl = 0; sl < 16; sl++) {
-            slot_currents = [[[NSMutableArray alloc] initWithCapacity:32] autorelease];
+            slot_currents = [[NSMutableArray alloc] initWithCapacity:32];
             if ((msk >> sl) & 0x1) {
                 for (ch = 0; ch < 32; ch++) {
                     NSNumber *number = [[NSNumber alloc] initWithInt:results.current_adc[sl*32 + ch] ^ (1U << 7)];
@@ -2293,13 +2395,14 @@ void SwapLongBlock(void* p, int32_t n)
                 }
             }
             [currents addObject:slot_currents]; //yes, we may add an empty array
+            [slot_currents release]; slot_currents = nil;
         }
         
         [pollDict setObject:currents forKey:@"pmt_base_i"];
         [pollDict setObject:str forKey:@"pmt_base_i_time_stamp"];
         [pollDict setObject:[NSNumber numberWithInt:msk] forKey:@"pmt_base_i_slot_mask"];
-        [iso release];
-        iso = nil;
+        [iso release]; iso = nil;
+        [currents release]; currents=nil;
     }
 }
 
@@ -2350,10 +2453,10 @@ void SwapLongBlock(void* p, int32_t n)
         NSDateFormatter* iso = [[NSDateFormatter alloc] init];
         [iso setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss'Z'"];
         iso.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
-        iso.calendar = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
-        iso.locale = [[[NSLocale alloc] initWithLocaleIdentifier:@"en_US"] autorelease];
+        //iso.calendar = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
+        //iso.locale = [[[NSLocale alloc] initWithLocaleIdentifier:@"en_US"] autorelease];
         NSString* str = [iso stringFromDate:[NSDate date]];
-        NSDictionary* hvSupplyDict = [NSDictionary dictionaryWithObjectsAndKeys:
+        NSDictionary* hvSupplyDict = [[NSDictionary alloc] initWithObjectsAndKeys:
                                      str, @"time_stamp",
                                      [NSNumber numberWithFloat:status.voltage_a * 300.], @"VLT_A",
                                      [NSNumber numberWithFloat:status.voltage_b * 300.], @"VLT_B",
@@ -2361,10 +2464,12 @@ void SwapLongBlock(void* p, int32_t n)
                                      [NSNumber numberWithFloat:status.current_b * 10], @"CRR_B",
                                      nil];
         [pollDict setObject:hvSupplyDict forKey:@"hv_supply"];
+        [hvSupplyDict release];
         [iso release];
         iso = nil;
     }
     //save status
+    
     [self setHvAVoltageReadValue:status.voltage_a * 300];
     [self setHvBVoltageReadValue:status.voltage_b * 300];
     [self setHvACurrentReadValue:status.current_a * 10];
@@ -2576,17 +2681,32 @@ void SwapLongBlock(void* p, int32_t n)
     @try {
         if (sup == 0) { //A
             [self setHVSwitchOnForA:aOn forB:hvBSwitch];
-            [self setHvASwitch:aOn];
         }
         else {
             [self setHVSwitchOnForA:hvASwitch forB:aOn];
-            [self setHvBSwitch:aOn];
         }
     }
     @catch (NSException *exception) {
         NSLog(@"%@ error in setting the HV switch.",[[self xl3Link] crateName]);
         return;
     }
+
+    //check the hv thread is running
+    if (!hvASwitch && !hvBSwitch && aOn) {    
+        if (hvThread) {
+            if ([hvThread isFinished]) {
+                [hvThread release];
+                hvThread = nil;
+            }
+        }
+        [self setHvANextStepValue:0];
+        [self setHvBNextStepValue:0];
+        if (!hvThread) {
+            hvThread = [[NSThread alloc] initWithTarget:self selector:@selector(_hvXl3) object:nil];
+            [hvThread start];
+        }
+    }
+
     //let's believe it worked
     if (sup == 0) { //A
         [self setHvASwitch:aOn];
@@ -2664,20 +2784,22 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (void) setHVDacA:(unsigned short)aDac dacB:(unsigned short)bDac
 {
- 	unsigned long xl3Address = XL3_SEL | [self getRegisterAddress:kXl3HvSetPointReg] | WRITE_REG;
-	unsigned long aValue = 0UL;
-    
-    aValue |= aDac & 0xFFFUL;
-    aValue |= (bDac & 0xFFFUL) << 16;
-    
-	@try {
-		[xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
-	}
-	@catch (NSException* e) {
-		NSLog(@"%@ error writing XL3 HV CS register\n",[[self xl3Link] crateName]);
-	}
+    //todo a dedicated HV lock
+    @synchronized (self) {
+        unsigned long xl3Address = XL3_SEL | [self getRegisterAddress:kXl3HvSetPointReg] | WRITE_REG;
+        unsigned long aValue = 0UL;
+        
+        aValue |= aDac & 0xFFFUL;
+        aValue |= (bDac & 0xFFFUL) << 16;
+        
+        @try {
+            [xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
+        }
+        @catch (NSException* e) {
+            NSLog(@"%@ error writing XL3 HV CS register\n",[[self xl3Link] crateName]);
+        }
+    }
 }
-
 
 #pragma mark •••tests
 - (void) readVMONForSlot:(unsigned short)aSlot voltages:(vmon_results_t*)aVoltages
@@ -2752,8 +2874,8 @@ void SwapLongBlock(void* p, int32_t n)
         NSDateFormatter* iso = [[NSDateFormatter alloc] init];
         [iso setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss'Z'"];
         iso.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
-        iso.calendar = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
-        iso.locale = [[[NSLocale alloc] initWithLocaleIdentifier:@"en_US"] autorelease];
+        //iso.calendar = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
+        //iso.locale = [[[NSLocale alloc] initWithLocaleIdentifier:@"en_US"] autorelease];
         NSString* str = [iso stringFromDate:[NSDate date]];
         NSMutableArray* slot_voltages = [[[NSMutableArray alloc] initWithCapacity:21] autorelease];
         
@@ -2800,11 +2922,16 @@ void SwapLongBlock(void* p, int32_t n)
 //used from polling loop and/or ORCA script
 - (void) readVMONWithMask:(unsigned short)aSlotMask
 {
-    NSArray* fecs = [guardian collectObjectsOfClass:NSClassFromString(@"ORFec32Model")];
-	unsigned int msk = 0UL;
-	for (id key in fecs) {
-		msk |= 1 << [key stationNumber];
-	}
+    unsigned int msk = 0UL;
+    
+    NSEnumerator* e = [[self guardian] objectEnumerator];
+    id anObj;
+    while(anObj = [e nextObject]){
+        if ([anObj class] == NSClassFromString(@"ORFec32Model")) {
+            msk |= 1 << [anObj stationNumber];
+        }
+    }
+
     if (isPollingXl3 || isPollingForced) {
         msk &= aSlotMask;
     }
@@ -2874,11 +3001,11 @@ void SwapLongBlock(void* p, int32_t n)
         NSDateFormatter* iso = [[NSDateFormatter alloc] init];
         [iso setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss'Z'"];
         iso.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
-        iso.calendar = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
-        iso.locale = [[[NSLocale alloc] initWithLocaleIdentifier:@"en_US"] autorelease];
+        //iso.calendar = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
+        //iso.locale = [[[NSLocale alloc] initWithLocaleIdentifier:@"en_US"] autorelease];
         NSString* str = [iso stringFromDate:[NSDate date]];
-        NSMutableArray* xl3_vlts = [NSMutableArray arrayWithCapacity:7];
-        NSArray* xl3_vlts_tags = [NSArray arrayWithObjects:@"VCC", @"VEE", @"VP24", @"VM24", @"TMP0", @"TMP1", @"TMP2", nil];
+        NSMutableArray* xl3_vlts = [[NSMutableArray alloc] initWithCapacity:7];
+        NSArray* xl3_vlts_tags = [[NSArray alloc] initWithObjects:@"VCC", @"VEE", @"VP24", @"VM24", @"TMP0", @"TMP1", @"TMP2", nil];
         unsigned char vlt;
         for (vlt = 0; vlt < 8; vlt++) {
             if (vlt==2) continue;
@@ -2890,6 +3017,8 @@ void SwapLongBlock(void* p, int32_t n)
         [pollDict setObject:xl3_vlts_tags forKey:@"xl3_vlt_tag"];
         [pollDict setObject:str forKey:@"xl3_vlt_time_stamp"];
         [iso release];
+        [xl3_vlts release];
+        [xl3_vlts_tags release];
         iso = nil;
     }
 }
@@ -3096,4 +3225,77 @@ void SwapLongBlock(void* p, int32_t n)
     [pollPool release];
 }
 
+- (void) _hvXl3
+{
+    NSAutoreleasePool* hvPool = [[NSAutoreleasePool alloc] init];
+    BOOL isTimeToQuit = NO;
+
+    unsigned int msk = 0UL;
+    NSArray* fecs = [guardian collectObjectsOfClass:NSClassFromString(@"ORFec32Model")];
+    for (id key in fecs) {
+        msk |= 1 << [key stationNumber];
+    }
+    
+    unsigned long channelsAboveLimit;
+    unsigned long lastCMOSCountProcessed;
+    unsigned long cmosLimit;
+    
+    while (!isTimeToQuit) {
+        if ([self hvANextStepValue] != [self hvAVoltageDACSetValue]) {
+            unsigned long aValueToSet = [self hvANextStepValue];
+            
+            if ([self hvANextStepValue] > [self hvAVoltageDACSetValue] + 10 / 3000. * 4096) {
+                aValueToSet = [self hvAVoltageDACSetValue] + 10 / 3000. * 4096;
+            }
+            if ([self hvANextStepValue] < [self hvAVoltageDACSetValue] - 10 / 3000. * 4096) {
+                aValueToSet = [self hvAVoltageDACSetValue] - 10 / 3000. * 4096;
+            }
+            if (aValueToSet > [self hvAVoltageTargetValue]) {
+                aValueToSet = [self hvAVoltageTargetValue];
+            }
+            if (aValueToSet > [self hvAVoltageDACSetValue] + 10 / 3000. * 4096) {
+                NSLog(@"%@ HV voltage calculation screwed. stopping\n", [[self xl3Link] crateName]);
+            }
+            @try {
+                [self setHVDacA:aValueToSet dacB:[self hvBVoltageDACSetValue]];
+                //assume it worked
+                [self setHvAVoltageDACSetValue:aValueToSet];
+            }
+            @catch (NSException *exception) {
+                NSLog(@"%@ HV failed to set HV!\n", [[self xl3Link] crateName]);
+            }
+            [self setCalcCMOSRatesFromCounts:NO];
+            [self setHvCMOSReadsCounter:0];
+            lastCMOSCountProcessed = 0;
+        }
+        
+        while ([self hvCMOSReadsCounter] < 3) { //or panic flag
+            usleep(100000);
+        }
+        
+        //read back voltage
+        if (fabs([self hvAVoltageReadValue] / 3000. * 4096 - [self hvAVoltageDACSetValue]) > 20) {
+            NSLog(@"%@ read value differs from the set one. stopping!", [[self xl3Link] crateName]);
+            usleep(100000);
+            [self setHvANextStepValue:[self hvAVoltageDACSetValue]];
+        }
+        
+        //if set reset CMOS rates and wait for first two count measurements unless panicFlag
+        channelsAboveLimit = 0;
+        cmosLimit = [self hvACMOSRateLimit];
+        for (id key in fecs) {
+            channelsAboveLimit += [key channelsWithCMOSRateHigherThan:[self hvACMOSRateLimit]];
+        }
+        
+        if (channelsAboveLimit > [self hvACMOSRateIgnore]) {
+            NSLog(@"%@ too many channels with high CMOS rate. stopping!", [[self xl3Link] crateName]);
+            usleep(100000);
+            [self setHvANextStepValue:[self hvAVoltageDACSetValue]];
+        }
+
+        if (!hvASwitch && !hvBSwitch) isTimeToQuit = YES;
+        usleep(100000);
+    }
+    [hvPool release];
+}
 @end

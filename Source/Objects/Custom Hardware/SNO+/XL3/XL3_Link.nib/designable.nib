@@ -585,7 +585,6 @@
 												<int key="NSvFlags">292</int>
 												<string key="NSFrame">{{10, -134}, {34, 36}}</string>
 												<reference key="NSSuperview" ref="804083207"/>
-												<reference key="NSNextKeyView" ref="399296633"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="95346501">
 													<int key="NSCellFlags">67239424</int>
@@ -1165,7 +1164,7 @@
 																<object class="NSPSMatrix" key="NSDrawMatrix"/>
 																<string key="NSFrame">{{183, 12}, {16, 16}}</string>
 																<reference key="NSSuperview" ref="700160924"/>
-																<reference key="NSNextKeyView" ref="399296633"/>
+																<reference key="NSNextKeyView" ref="27153167"/>
 																<int key="NSpiFlags">28938</int>
 																<double key="NSMaxValue">100</double>
 															</object>
@@ -2452,6 +2451,7 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOAA</bytes>
 												<int key="NSvFlags">292</int>
 												<string key="NSFrame">{{10, -134}, {34, 36}}</string>
 												<reference key="NSSuperview" ref="1069406222"/>
+												<reference key="NSNextKeyView" ref="27153167"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="471501780">
 													<int key="NSCellFlags">67239424</int>
@@ -3141,7 +3141,7 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOAA</bytes>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSTextFieldCell" key="NSCell" id="53598094">
 																	<int key="NSCellFlags">-1804468671</int>
-																	<int key="NSCellFlags2">272761856</int>
+																	<int key="NSCellFlags2">71435264</int>
 																	<reference key="NSSupport" ref="26"/>
 																	<object class="NSNumberFormatter" key="NSFormatter" id="1045943630">
 																		<object class="NSMutableDictionary" key="NS.attributes">
@@ -3149,28 +3149,38 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOAA</bytes>
 																			<object class="NSArray" key="dict.sortedKeys">
 																				<bool key="EncodedWithXMLCoder">YES</bool>
 																				<string>allowsFloats</string>
+																				<string>alwaysShowsDecimalSeparator</string>
 																				<string>formatterBehavior</string>
+																				<string>generatesDecimalNumbers</string>
 																				<string>locale</string>
+																				<string>maximumFractionDigits</string>
+																				<string>maximumIntegerDigits</string>
 																				<string>negativeInfinitySymbol</string>
 																				<string>nilSymbol</string>
 																				<string>numberStyle</string>
 																				<string>positiveInfinitySymbol</string>
+																				<string>usesGroupingSeparator</string>
 																			</object>
 																			<object class="NSArray" key="dict.values">
 																				<bool key="EncodedWithXMLCoder">YES</bool>
 																				<boolean value="YES"/>
+																				<boolean value="NO"/>
 																				<integer value="1040"/>
+																				<boolean value="YES"/>
 																				<object class="NSLocale" id="16761932">
 																					<string key="NS.identifier"/>
 																				</object>
+																				<integer value="0"/>
+																				<integer value="4"/>
 																				<string>-∞</string>
 																				<string/>
 																				<integer value="1"/>
 																				<string>+∞</string>
+																				<boolean value="NO"/>
 																			</object>
 																		</object>
-																		<string key="NS.positiveformat">#,##0.###</string>
-																		<string key="NS.negativeformat">#,##0.###</string>
+																		<string key="NS.positiveformat">#0</string>
+																		<string key="NS.negativeformat">#0</string>
 																		<nil key="NS.positiveattrs"/>
 																		<nil key="NS.negativeattrs"/>
 																		<nil key="NS.zero"/>
@@ -3204,7 +3214,7 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOAA</bytes>
 																		</object>
 																		<string key="NS.decimal">.</string>
 																		<string key="NS.thousand">,</string>
-																		<bool key="NS.hasthousands">YES</bool>
+																		<bool key="NS.hasthousands">NO</bool>
 																		<bool key="NS.localized">NO</bool>
 																		<bool key="NS.allowsfloats">YES</bool>
 																	</object>
@@ -3399,8 +3409,8 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOAA</bytes>
 																	<int key="NSCellFlags2">131072</int>
 																	<reference key="NSSupport" ref="26"/>
 																	<reference key="NSControlView" ref="731461425"/>
-																	<double key="NSMaxValue">100</double>
-																	<double key="NSIncrement">1</double>
+																	<double key="NSMaxValue">200</double>
+																	<double key="NSIncrement">2</double>
 																	<bool key="NSAutorepeat">YES</bool>
 																</object>
 															</object>
@@ -3486,7 +3496,7 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOAA</bytes>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSTextFieldCell" key="NSCell" id="913869235">
 																	<int key="NSCellFlags">-1804468671</int>
-																	<int key="NSCellFlags2">272761856</int>
+																	<int key="NSCellFlags2">71435264</int>
 																	<reference key="NSSupport" ref="26"/>
 																	<object class="NSNumberFormatter" key="NSFormatter" id="230749535">
 																		<object class="NSMutableDictionary" key="NS.attributes">
@@ -3495,25 +3505,33 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOAA</bytes>
 																				<bool key="EncodedWithXMLCoder">YES</bool>
 																				<string>allowsFloats</string>
 																				<string>formatterBehavior</string>
+																				<string>generatesDecimalNumbers</string>
 																				<string>locale</string>
+																				<string>maximumFractionDigits</string>
+																				<string>maximumIntegerDigits</string>
 																				<string>negativeInfinitySymbol</string>
 																				<string>nilSymbol</string>
 																				<string>numberStyle</string>
 																				<string>positiveInfinitySymbol</string>
+																				<string>usesGroupingSeparator</string>
 																			</object>
 																			<object class="NSArray" key="dict.values">
 																				<bool key="EncodedWithXMLCoder">YES</bool>
-																				<boolean value="YES"/>
+																				<boolean value="NO"/>
 																				<integer value="1040"/>
+																				<boolean value="YES"/>
 																				<reference ref="16761932"/>
+																				<integer value="0"/>
+																				<integer value="2"/>
 																				<string>-∞</string>
 																				<string/>
 																				<integer value="1"/>
 																				<string>+∞</string>
+																				<boolean value="NO"/>
 																			</object>
 																		</object>
-																		<string key="NS.positiveformat">#,##0.###</string>
-																		<string key="NS.negativeformat">#,##0.###</string>
+																		<string key="NS.positiveformat">#0</string>
+																		<string key="NS.negativeformat">#0</string>
 																		<nil key="NS.positiveattrs"/>
 																		<nil key="NS.negativeattrs"/>
 																		<nil key="NS.zero"/>
@@ -3534,9 +3552,9 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOAA</bytes>
 																		</object>
 																		<string key="NS.decimal">.</string>
 																		<string key="NS.thousand">,</string>
-																		<bool key="NS.hasthousands">YES</bool>
+																		<bool key="NS.hasthousands">NO</bool>
 																		<bool key="NS.localized">NO</bool>
-																		<bool key="NS.allowsfloats">YES</bool>
+																		<bool key="NS.allowsfloats">NO</bool>
 																	</object>
 																	<reference key="NSControlView" ref="882644162"/>
 																	<bool key="NSDrawsBackground">YES</bool>
@@ -3557,7 +3575,7 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOAA</bytes>
 																	<int key="NSCellFlags2">131072</int>
 																	<reference key="NSSupport" ref="26"/>
 																	<reference key="NSControlView" ref="928404200"/>
-																	<double key="NSMaxValue">100</double>
+																	<double key="NSMaxValue">20</double>
 																	<double key="NSIncrement">1</double>
 																	<bool key="NSAutorepeat">YES</bool>
 																</object>
@@ -5359,7 +5377,7 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOAA</bytes>
 												<string key="NSFrame">{{111, 174}, {101, 18}}</string>
 												<reference key="NSSuperview" ref="548190179"/>
 												<reference key="NSWindow"/>
-												<reference key="NSNextKeyView" ref="399296633"/>
+												<reference key="NSNextKeyView"/>
 												<bool key="NSEnabled">YES</bool>
 												<int key="NSNumRows">1</int>
 												<int key="NSNumCols">2</int>
@@ -6272,6 +6290,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 											<string key="NSFrame">{{53, 5}, {28, 28}}</string>
 											<reference key="NSSuperview" ref="105398756"/>
 											<reference key="NSWindow"/>
+											<reference key="NSNextKeyView"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSButtonCell" key="NSCell" id="906712911">
 												<int key="NSCellFlags">67239424</int>
@@ -7661,14 +7680,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					<object class="IBActionConnection" key="connection">
 						<string key="label">hvTargetValueAction:</string>
 						<reference key="source" ref="890317098"/>
-						<reference key="destination" ref="22173776"/>
-					</object>
-					<int key="connectionID">4502</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">hvTargetValueAction:</string>
-						<reference key="source" ref="890317098"/>
 						<reference key="destination" ref="639601230"/>
 					</object>
 					<int key="connectionID">4503</int>
@@ -7680,6 +7691,94 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 						<reference key="destination" ref="380159888"/>
 					</object>
 					<int key="connectionID">4504</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">hvCMOSRateLimitField</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="401656224"/>
+					</object>
+					<int key="connectionID">4505</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">hvCMOSRateLimitStepper</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="731461425"/>
+					</object>
+					<int key="connectionID">4506</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">hvTargetValueAction:</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="22173776"/>
+					</object>
+					<int key="connectionID">4508</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">hvCMOSRateLimitAction:</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="401656224"/>
+					</object>
+					<int key="connectionID">4509</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">hvCMOSRateLimitAction:</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="731461425"/>
+					</object>
+					<int key="connectionID">4510</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">hvCMOSRateIgnoreField</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="882644162"/>
+					</object>
+					<int key="connectionID">4511</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">hvCMOSRateIgnoreStepper</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="928404200"/>
+					</object>
+					<int key="connectionID">4512</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">hvCMOSRateIgnoreAction:</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="882644162"/>
+					</object>
+					<int key="connectionID">4513</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">hvCMOSRateIgnoreAction:</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="928404200"/>
+					</object>
+					<int key="connectionID">4514</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">hvStepUpAction:</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="587896178"/>
+					</object>
+					<int key="connectionID">4515</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">hvStepDownAction:</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="857671657"/>
+					</object>
+					<int key="connectionID">4516</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -12508,7 +12607,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<integer value="1041"/>
+					<integer value="1040"/>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -12539,7 +12638,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<integer value="1041"/>
+					<integer value="1040"/>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -12721,7 +12820,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">4504</int>
+			<int key="maxID">4516</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -12870,6 +12969,8 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<string>connectionAutoConnectAction:</string>
 							<string>decXL3Action:</string>
 							<string>errorTimeOutAction:</string>
+							<string>hvCMOSRateIgnoreAction:</string>
+							<string>hvCMOSRateLimitAction:</string>
 							<string>hvChangePowerSupplyAction:</string>
 							<string>hvCheckInterlockAction:</string>
 							<string>hvGetStatusAction:</string>
@@ -12878,6 +12979,8 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<string>hvRelayMaskMatrixAction:</string>
 							<string>hvRelayOpenAllAction:</string>
 							<string>hvRelaySetAction:</string>
+							<string>hvStepDownAction:</string>
+							<string>hvStepUpAction:</string>
 							<string>hvTargetValueAction:</string>
 							<string>hvTurnOffAction:</string>
 							<string>hvTurnOnAction:</string>
@@ -12905,6 +13008,10 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 						</object>
 						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -12991,6 +13098,8 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<string>connectionAutoConnectAction:</string>
 							<string>decXL3Action:</string>
 							<string>errorTimeOutAction:</string>
+							<string>hvCMOSRateIgnoreAction:</string>
+							<string>hvCMOSRateLimitAction:</string>
 							<string>hvChangePowerSupplyAction:</string>
 							<string>hvCheckInterlockAction:</string>
 							<string>hvGetStatusAction:</string>
@@ -12999,6 +13108,8 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<string>hvRelayMaskMatrixAction:</string>
 							<string>hvRelayOpenAllAction:</string>
 							<string>hvRelaySetAction:</string>
+							<string>hvStepDownAction:</string>
+							<string>hvStepUpAction:</string>
 							<string>hvTargetValueAction:</string>
 							<string>hvTurnOffAction:</string>
 							<string>hvTurnOnAction:</string>
@@ -13123,6 +13234,14 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
+								<string key="name">hvCMOSRateIgnoreAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">hvCMOSRateLimitAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
 								<string key="name">hvChangePowerSupplyAction:</string>
 								<string key="candidateClassName">id</string>
 							</object>
@@ -13152,6 +13271,14 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							</object>
 							<object class="IBActionInfo">
 								<string key="name">hvRelaySetAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">hvStepDownAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">hvStepUpAction:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
@@ -13313,6 +13440,10 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<string>hvBTriggerStatusField</string>
 							<string>hvBVoltageReadField</string>
 							<string>hvBVoltageSetField</string>
+							<string>hvCMOSRateIgnoreField</string>
+							<string>hvCMOSRateIgnoreStepper</string>
+							<string>hvCMOSRateLimitField</string>
+							<string>hvCMOSRateLimitStepper</string>
 							<string>hvPowerSupplyMatrix</string>
 							<string>hvRelayMaskHighField</string>
 							<string>hvRelayMaskLowField</string>
@@ -13403,6 +13534,10 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<string>NSTextField</string>
 							<string>NSTextField</string>
 							<string>NSTextField</string>
+							<string>NSTextField</string>
+							<string>NSStepper</string>
+							<string>NSTextField</string>
+							<string>NSStepper</string>
 							<string>NSMatrix</string>
 							<string>NSTextField</string>
 							<string>NSTextField</string>
@@ -13496,6 +13631,10 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<string>hvBTriggerStatusField</string>
 							<string>hvBVoltageReadField</string>
 							<string>hvBVoltageSetField</string>
+							<string>hvCMOSRateIgnoreField</string>
+							<string>hvCMOSRateIgnoreStepper</string>
+							<string>hvCMOSRateLimitField</string>
+							<string>hvCMOSRateLimitStepper</string>
 							<string>hvPowerSupplyMatrix</string>
 							<string>hvRelayMaskHighField</string>
 							<string>hvRelayMaskLowField</string>
@@ -13756,6 +13895,22 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<object class="IBToOneOutletInfo">
 								<string key="name">hvBVoltageSetField</string>
 								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">hvCMOSRateIgnoreField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">hvCMOSRateIgnoreStepper</string>
+								<string key="candidateClassName">NSStepper</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">hvCMOSRateLimitField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">hvCMOSRateLimitStepper</string>
+								<string key="candidateClassName">NSStepper</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">hvPowerSupplyMatrix</string>

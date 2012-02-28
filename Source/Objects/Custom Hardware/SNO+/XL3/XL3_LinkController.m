@@ -275,6 +275,16 @@ static NSDictionary* xl3Ops;
                      selector : @selector(hvTargetValueChanged:)
                          name : ORXL3ModelHVTargetValueChanged
                        object : model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(hvCMOSRateLimitChanged:)
+                         name : ORXL3ModelHVCMOSRateLimitChanged
+                       object : model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(hvCMOSRateIgnoreChanged:)
+                         name : ORXL3ModelHVCMOSRateIgnoreChanged
+                       object : model];
 }
 
 - (void) updateWindow
@@ -318,6 +328,8 @@ static NSDictionary* xl3Ops;
     [self hvStatusChanged:nil];
     [self hvTriggerStatusChanged:nil];
     [self hvTargetValueChanged:nil];
+    [self hvCMOSRateLimitChanged:nil];
+    [self hvCMOSRateIgnoreChanged:nil];
     [self hvChangePowerSupplyChanged:nil];
 	//ip connection
 	[self errorTimeOutChanged:nil];
@@ -604,10 +616,36 @@ static NSDictionary* xl3Ops;
     }
 }
 
+- (void) hvCMOSRateLimitChanged:(NSNotification *)aNote
+{
+    if ([hvPowerSupplyMatrix selectedColumn] == 0) { //A
+        [hvCMOSRateLimitField setIntValue:[model hvACMOSRateLimit]];
+        [hvCMOSRateLimitStepper setIntValue:[model hvACMOSRateLimit]];
+    }
+    else {
+        [hvCMOSRateLimitField setIntValue:[model hvBCMOSRateLimit]];
+        [hvCMOSRateLimitStepper setIntValue:[model hvBCMOSRateLimit]];
+    }    
+}
+
+- (void) hvCMOSRateIgnoreChanged:(NSNotification *)aNote
+{
+    if ([hvPowerSupplyMatrix selectedColumn] == 0) { //A
+        [hvCMOSRateIgnoreField setIntValue:[model hvACMOSRateIgnore]];
+        [hvCMOSRateIgnoreStepper setIntValue:[model hvACMOSRateIgnore]];
+    }
+    else {
+        [hvCMOSRateIgnoreField setIntValue:[model hvBCMOSRateIgnore]];
+        [hvCMOSRateIgnoreStepper setIntValue:[model hvBCMOSRateIgnore]];
+    }    
+}
+
 - (void) hvChangePowerSupplyChanged:(NSNotification*)aNote
 {
 
     [self hvTargetValueChanged:aNote];
+    [self hvCMOSRateLimitChanged:aNote];
+    [self hvCMOSRateIgnoreChanged:aNote];
 }
 
 #pragma mark •ip connection
@@ -1140,6 +1178,34 @@ static NSDictionary* xl3Ops;
     }
 }
 
+- (IBAction)hvCMOSRateLimitAction:(id)sender
+{
+    unsigned long nextCMOSRateLimit = [sender intValue];
+    if (nextCMOSRateLimit > 200) {
+        nextCMOSRateLimit = 200;
+    }
+    if ([hvPowerSupplyMatrix selectedColumn] == 0) {
+        [model setHvACMOSRateLimit:nextCMOSRateLimit];
+    }
+    else {
+        [model setHvBCMOSRateLimit:nextCMOSRateLimit];
+    }
+}
+
+- (IBAction)hvCMOSRateIgnoreAction:(id)sender
+{
+    unsigned long nextCMOSRateIgnore = [sender intValue];
+    if (nextCMOSRateIgnore > 20) {
+        nextCMOSRateIgnore = 20;
+    }
+    if ([hvPowerSupplyMatrix selectedColumn] == 0) {
+        [model setHvACMOSRateIgnore:nextCMOSRateIgnore];
+    }
+    else {
+        [model setHvBCMOSRateIgnore:nextCMOSRateIgnore];
+    }
+}
+
 - (IBAction)hvChangePowerSupplyAction:(id)sender
 {
     if ([hvPowerSupplyMatrix selectedColumn] == 0) {
@@ -1152,6 +1218,40 @@ static NSDictionary* xl3Ops;
     }
 
     [self hvChangePowerSupplyChanged:nil];
+}
+
+- (IBAction)hvStepUpAction:(id)sender;
+{
+    unsigned long aVoltageValue;
+    if ([hvPowerSupplyMatrix selectedColumn] == 0) {
+        aVoltageValue = [model hvANextStepValue];
+        aVoltageValue += 50;
+        if (aVoltageValue > [model hvAVoltageTargetValue]) aVoltageValue = [model hvAVoltageTargetValue];
+        [model setHvANextStepValue:aVoltageValue];
+    }
+    else {
+        aVoltageValue = [model hvBNextStepValue];
+        aVoltageValue += 50;
+        if (aVoltageValue > [model hvBVoltageTargetValue]) aVoltageValue = [model hvBVoltageTargetValue];
+        [model setHvBNextStepValue:aVoltageValue];
+    }
+}
+
+- (IBAction)hvStepDownAction:(id)sender
+{
+    unsigned long aVoltageValue;
+    if ([hvPowerSupplyMatrix selectedColumn] == 0) {
+        aVoltageValue = [model hvANextStepValue];
+        if (aVoltageValue < 50) aVoltageValue = 0;
+        else aVoltageValue -= 50;
+        [model setHvANextStepValue:aVoltageValue];
+    }
+    else {
+        aVoltageValue = [model hvBNextStepValue];
+        if (aVoltageValue < 50) aVoltageValue = 0;
+        else aVoltageValue -= 50;
+        [model setHvBNextStepValue:aVoltageValue];
+    }    
 }
 
 //connection

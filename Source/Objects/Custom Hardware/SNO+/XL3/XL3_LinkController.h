@@ -109,6 +109,10 @@
     IBOutlet NSTextField *hvBCurrentReadField;
     IBOutlet NSTextField *hvTargetValueField;
     IBOutlet NSStepper *hvTargetValueStepper;
+    IBOutlet NSTextField *hvCMOSRateLimitField;
+    IBOutlet NSStepper *hvCMOSRateLimitStepper;
+    IBOutlet NSTextField *hvCMOSRateIgnoreField;
+    IBOutlet NSStepper *hvCMOSRateIgnoreStepper;
     //connection
 	IBOutlet NSButton*              toggleConnectButton;
 	IBOutlet NSPopUpButton*         errorTimeOutPU;
@@ -170,6 +174,8 @@
 - (void) hvStatusChanged:(NSNotification*)aNote;
 - (void) hvTriggerStatusChanged:(NSNotification*)aNote;
 - (void) hvTargetValueChanged:(NSNotification*)aNote;
+- (void) hvCMOSRateLimitChanged:(NSNotification*)aNote;
+- (void) hvCMOSRateIgnoreChanged:(NSNotification*)aNote;
 - (void) hvChangePowerSupplyChanged:(NSNotification*)aNote;
 //ip connection
 - (void) connectStateChanged:(NSNotification*)aNote;
@@ -238,7 +244,11 @@
 - (IBAction)hvTurnOffAction:(id)sender;
 - (IBAction)hvGetStatusAction:(id)sender;
 - (IBAction)hvTargetValueAction:(id)sender;
+- (IBAction)hvCMOSRateLimitAction:(id)sender;
+- (IBAction)hvCMOSRateIgnoreAction:(id)sender;
 - (IBAction)hvChangePowerSupplyAction:(id)sender;
+- (IBAction)hvStepUpAction:(id)sender;
+- (IBAction)hvStepDownAction:(id)sender;
 //connection
 - (IBAction) toggleConnectAction:(id)sender;
 - (IBAction) errorTimeOutAction:(id)sender;

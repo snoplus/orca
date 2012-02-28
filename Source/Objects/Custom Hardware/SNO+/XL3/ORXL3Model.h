@@ -103,6 +103,14 @@ enum {
     unsigned long _hvAVoltageTargetValue;
     unsigned long _hvBVoltageTargetValue;
     BOOL _calcCMOSRatesFromCounts;
+    unsigned long _hvCMOSReadsCounter;
+    unsigned long _hvACMOSRateLimit;
+    unsigned long _hvBCMOSRateLimit;
+    unsigned long _hvACMOSRateIgnore;
+    unsigned long _hvBCMOSRateIgnore;
+    unsigned long _hvANextStepValue;
+    unsigned long _hvBNextStepValue;
+    NSThread* hvThread;
 }
 
 @property (assign)	unsigned long   xl3ChargeInjMask;
@@ -137,6 +145,13 @@ enum {
 @property (assign) unsigned long hvAVoltageTargetValue;
 @property (assign) unsigned long hvBVoltageTargetValue;
 @property (assign) BOOL calcCMOSRatesFromCounts;
+@property (assign) unsigned long hvACMOSRateLimit;
+@property (assign) unsigned long hvBCMOSRateLimit;
+@property (assign) unsigned long hvACMOSRateIgnore;
+@property (assign) unsigned long hvBCMOSRateIgnore;
+@property (assign) unsigned long hvANextStepValue;
+@property (assign) unsigned long hvBNextStepValue;
+@property (assign) unsigned long hvCMOSReadsCounter;
 
 #pragma mark •••Initialization
 - (id)   init;
@@ -326,3 +341,5 @@ extern NSString* ORXL3ModelRelayStatusChanged;
 extern NSString* ORXL3ModelHvStatusChanged;
 extern NSString* ORXL3ModelTriggerStatusChanged;
 extern NSString* ORXL3ModelHVTargetValueChanged;
+extern NSString* ORXL3ModelHVCMOSRateLimitChanged;
+extern NSString* ORXL3ModelHVCMOSRateIgnoreChanged;
