@@ -2445,8 +2445,8 @@ void SwapLongBlock(void* p, int32_t n)
     //unless (isPollingXl3 && !isPollingVerbose)
     if (!isPollingXl3 || isPollingVerbose) {    
         NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ HV status: \n", [[self xl3Link] crateName]];
-        [msg appendFormat:@"voltageA: %f\nvoltageB: %f\n", status.voltage_a * 300., status.voltage_b * 300.];
-        [msg appendFormat:@"currentA: %f\ncurrentB: %f\n", status.current_a, status.current_b];
+        [msg appendFormat:@"voltageA: %f V\nvoltageB: %f V\n", status.voltage_a * 300., status.voltage_b * 300.];
+        [msg appendFormat:@"currentA: %f mA\ncurrentB: %f mA\n", status.current_a * 10, status.current_b * 10];
         NSLog(msg);
     }
     if (isPollingXl3) {

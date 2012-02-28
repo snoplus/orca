@@ -594,8 +594,8 @@ static NSDictionary* xl3Ops;
     [hvBVoltageSetField setStringValue:[NSString stringWithFormat:@"%d V",[model hvBVoltageDACSetValue]*3000/4096]];
     [hvAVoltageReadField setStringValue:[NSString stringWithFormat:@"%d V",(unsigned int)[model hvAVoltageReadValue]]];
     [hvBVoltageReadField setStringValue:[NSString stringWithFormat:@"%d V",(unsigned int)[model hvBVoltageReadValue]]];
-    [hvACurrentReadField setStringValue:[NSString stringWithFormat:@"%3.1f uA",[model hvACurrentReadValue]]];
-    [hvBCurrentReadField setStringValue:[NSString stringWithFormat:@"%3.1f uA",[model hvBCurrentReadValue]]];
+    [hvACurrentReadField setStringValue:[NSString stringWithFormat:@"%3.1f mA",[model hvACurrentReadValue]]];
+    [hvBCurrentReadField setStringValue:[NSString stringWithFormat:@"%3.1f mA",[model hvBCurrentReadValue]]];
 }
 
 - (void) hvTriggerStatusChanged:(NSNotification*)aNote
