@@ -1016,67 +1016,67 @@ static NSDictionary* xl3Ops;
 //mon
 - (IBAction) monIsPollingCMOSRatesAction:(id)sender
 {
-    [self endEditing];
     [model setIsPollingCMOSRates:[sender intValue]];
+//    [self endEditing];
 }
 
 - (IBAction) monIsPollingPMTCurrentsAction:(id)sender
 {
-    [self endEditing];
     [model setIsPollingPMTCurrents:[sender intValue]];
+//    [self endEditing];
 }
 
 - (IBAction) monIsPollingFECVoltagesAction:(id)sender
 {
-    [self endEditing];
     [model setIsPollingFECVoltages:[sender intValue]];
+//    [self endEditing];
 }
 
 - (IBAction) monIsPollingXl3VoltagesAction:(id)sender
 {
-    [self endEditing];
     [model setIsPollingXl3Voltages:[sender intValue]];
+//    [self endEditing];
 }
 
 - (IBAction) monIsPollingHVSupplyAction:(id)sender
 {
-    [self endEditing];
     [model setIsPollingHVSupply:[sender intValue]];
+//    [self endEditing];
 }
 
 - (IBAction) monPollCMOSRatesMaskAction:(id)sender
 {
-    [self endEditing];
+//    [self endEditing];
     [model setPollCMOSRatesMask:[sender intValue]];
 }
 
 - (IBAction) monPollPMTCurrentsMaskAction:(id)sender
 {   
-    [self endEditing];
+//    [self endEditing];
     [model setPollPMTCurrentsMask:[sender intValue]];
 }
 
 - (IBAction) monPollFECVoltagesMaskAction:(id)sender
 {
-    [self endEditing];
+//    [self endEditing];
     [model setPollFECVoltagesMask:[sender intValue]];
 }
 
 - (IBAction) monPollingRateAction:(id)sender
 {
-    [self endEditing];
+//    [self endEditing];
     [model setPollXl3Time:[[sender selectedItem] tag]];
 }
 
 - (IBAction) monIsPollingVerboseAction:(id)sender
 {
-    [self endEditing];
+//    [self endEditing];
     [model setIsPollingVerbose:[sender intValue]];
 }
 
 - (IBAction) monIsPollingWithRunAction:(id)sender
 {
-    [self endEditing];
+//    [self endEditing];
     [model setIsPollingXl3WithRun:[sender intValue]];
 }
 

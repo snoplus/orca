@@ -469,7 +469,7 @@ NSString* ORXL3ModelHVCMOSRateIgnoreChanged = @"ORXL3ModelHVCMOSRateIgnoreChange
 
 - (void) setIsPollingCMOSRates:(BOOL)aIsPollingCMOSRates
 {
-    if (isPollingXl3Voltages != aIsPollingCMOSRates) {
+    if (isPollingCMOSRates != aIsPollingCMOSRates) {
         [[[self undoManager] prepareWithInvocationTarget:self] setIsPollingCMOSRates:isPollingCMOSRates];
         isPollingCMOSRates = aIsPollingCMOSRates;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelIsPollingCMOSRatesChanged object:self];
@@ -3183,27 +3183,27 @@ void SwapLongBlock(void* p, int32_t n)
             pollStartDate = nil;
         }
         pollStartDate = [[NSDate alloc] init];
-        if (isPollingCMOSRates && (![[NSThread currentThread] isCancelled] || isPollingForced)) {
+        if ([self isPollingCMOSRates] && (![[NSThread currentThread] isCancelled] || isPollingForced)) {
             [self readCMOSRate]; //[msec]
         }
         
-        if (isPollingPMTCurrents && (![[NSThread currentThread] isCancelled] || isPollingForced)) {
+        if ([self isPollingPMTCurrents] && (![[NSThread currentThread] isCancelled] || isPollingForced)) {
             [self readPMTBaseCurrents];
         }
         
-        if (isPollingFECVoltages && (![[NSThread currentThread] isCancelled] || isPollingForced)) {
+        if ([self isPollingFECVoltages] && (![[NSThread currentThread] isCancelled] || isPollingForced)) {
             [self readVMONWithMask:[self pollFECVoltagesMask]];
         }
         
-        if (isPollingXl3Voltages && (![[NSThread currentThread] isCancelled] || isPollingForced)) {
+        if ([self isPollingXl3Voltages] && (![[NSThread currentThread] isCancelled] || isPollingForced)) {
             [self readVMONXL3];
         }
         
-        if (isPollingHVSupply && (![[NSThread currentThread] isCancelled] || isPollingForced)) {
+        if ([self isPollingHVSupply] && (![[NSThread currentThread] isCancelled] || isPollingForced)) {
             [self readHVStatus];
         }
 
-        if (isPollingForced || [[NSThread currentThread] isCancelled]) isTimeToQuit = YES;
+        if ([self isPollingForced] || [[NSThread currentThread] isCancelled]) isTimeToQuit = YES;
 
         startTime = pollXl3Time + [pollStartDate timeIntervalSinceNow];
         if (startTime < 0.1) startTime = -0.1;
@@ -3269,13 +3269,13 @@ void SwapLongBlock(void* p, int32_t n)
             lastCMOSCountProcessed = 0;
         }
         
-        while ([self hvCMOSReadsCounter] < 3) { //or panic flag
-            usleep(100000);
-        }
-        
+        //while ([self hvCMOSReadsCounter] < 3) { //or panic flag
+        //    usleep(100000);
+        //}
+        usleep(100000);
         //read back voltage
         if (fabs([self hvAVoltageReadValue] / 3000. * 4096 - [self hvAVoltageDACSetValue]) > 20) {
-            NSLog(@"%@ read value differs from the set one. stopping!", [[self xl3Link] crateName]);
+            NSLog(@"%@ read value differs from the set one. stopping!\n", [[self xl3Link] crateName]);
             usleep(100000);
             [self setHvANextStepValue:[self hvAVoltageDACSetValue]];
         }
@@ -3284,11 +3284,11 @@ void SwapLongBlock(void* p, int32_t n)
         channelsAboveLimit = 0;
         cmosLimit = [self hvACMOSRateLimit];
         for (id key in fecs) {
-            channelsAboveLimit += [key channelsWithCMOSRateHigherThan:[self hvACMOSRateLimit]];
+        //    channelsAboveLimit += [key channelsWithCMOSRateHigherThan:[self hvACMOSRateLimit]];
         }
         
         if (channelsAboveLimit > [self hvACMOSRateIgnore]) {
-            NSLog(@"%@ too many channels with high CMOS rate. stopping!", [[self xl3Link] crateName]);
+            NSLog(@"%@ too many channels with high CMOS rate. stopping!\n", [[self xl3Link] crateName]);
             usleep(100000);
             [self setHvANextStepValue:[self hvAVoltageDACSetValue]];
         }
