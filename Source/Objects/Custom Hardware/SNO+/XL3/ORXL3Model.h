@@ -110,6 +110,7 @@ enum {
     unsigned long _hvBCMOSRateIgnore;
     unsigned long _hvANextStepValue;
     unsigned long _hvBNextStepValue;
+    BOOL _hvPanicFlag;
     NSThread* hvThread;
 }
 
@@ -152,6 +153,7 @@ enum {
 @property (assign) unsigned long hvANextStepValue;
 @property (assign) unsigned long hvBNextStepValue;
 @property (assign) unsigned long hvCMOSReadsCounter;
+@property (assign) BOOL hvPanicFlag;
 
 #pragma mark •••Initialization
 - (id)   init;

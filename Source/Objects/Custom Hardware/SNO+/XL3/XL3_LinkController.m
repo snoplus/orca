@@ -1149,7 +1149,21 @@ static NSDictionary* xl3Ops;
 
 - (IBAction)hvTurnOffAction:(id)sender
 {
-    [model setHVSwitch:NO forPowerSupply:[hvPowerSupplyMatrix selectedColumn]];    
+    unsigned int sup = [hvPowerSupplyMatrix selectedColumn];
+
+    if (sup == 0 && [model hvASwitch]) {
+        if ([model hvAVoltageDACSetValue] > 30) {
+            NSBeginAlertSheet (@"Not turning OFF",@"OK",nil,nil,[self window],self,nil,nil,nil,@"Voltage too high. Ramp down first.");
+            return;
+        }
+    }
+    else if (sup == 0 && [model hvBSwitch]) {
+        if ([model hvBVoltageDACSetValue] > 30) {
+            NSBeginAlertSheet (@"Not turning OFF",@"OK",nil,nil,[self window],self,nil,nil,nil,@"Voltage too high. Ramp down first.");
+            return;
+        }
+    }
+    [model setHVSwitch:NO forPowerSupply:sup ];    
 }
 
 - (IBAction)hvGetStatusAction:(id)sender
@@ -1282,6 +1296,13 @@ static NSDictionary* xl3Ops;
     else {
         [model setHvANextStepValue:[model hvBVoltageDACSetValue]];
     }
+}
+
+- (IBAction)hvPanicAction:(id)sender
+{
+    [model setHvPanicFlag:YES];
+    [model setHvANextStepValue:0];
+    [model setHvBNextStepValue:0];
 }
 
 //connection

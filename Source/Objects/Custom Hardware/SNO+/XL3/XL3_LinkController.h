@@ -252,6 +252,7 @@
 - (IBAction)hvRampUpAction:(id)sender;
 - (IBAction)hvRampDownAction:(id)sender;
 - (IBAction)hvRampPauseAction:(id)sender;
+- (IBAction)hvPanicAction:(id)sender;
 //connection
 - (IBAction) toggleConnectAction:(id)sender;
 - (IBAction) errorTimeOutAction:(id)sender;

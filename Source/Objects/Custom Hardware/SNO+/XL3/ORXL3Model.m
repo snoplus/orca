@@ -93,8 +93,8 @@ NSString* ORXL3ModelHVCMOSRateIgnoreChanged = @"ORXL3ModelHVCMOSRateIgnoreChange
     calcCMOSRatesFromCounts = _calcCMOSRatesFromCounts,
     hvANextStepValue = _hvANextStepValue,
     hvBNextStepValue = _hvBNextStepValue,
-    hvCMOSReadsCounter = _hvCMOSReadsCounter;
-
+    hvCMOSReadsCounter = _hvCMOSReadsCounter,
+    hvPanicFlag= _hvPanicFlag;
 
 #pragma mark •••Initialization
 - (id) init
@@ -2631,7 +2631,7 @@ void SwapLongBlock(void* p, int32_t n)
     }
     [self setHvASwitch:xl3SwitchA];
     [self setHvBSwitch:xl3SwitchB];
-    
+
 /*    
     if (xl3SwitchA != [self hvASwitch]) {
         NSLog(@"%@ HV switch A is reported %@ by XL3 and expected to be %@ by ORCA.\n",[[self xl3Link] crateName], xl3SwitchA?@"ON":@"OFF", hvASwitch?@"ON":@"OFF");
@@ -2663,7 +2663,7 @@ void SwapLongBlock(void* p, int32_t n)
             NSLog(@"%@ continuing to turn OFF the HV power supply.\n",[[self xl3Link] crateName]);            
         }
     }
-
+    
     @try {
         if (sup == 0 && ((!hvASwitch && aOn) || (hvASwitch && !aOn))) { //changing A from OFF to ON or ON to OFF
             [self setHVDacA:0 dacB:hvBVoltageDACSetValue];
@@ -3230,6 +3230,8 @@ void SwapLongBlock(void* p, int32_t n)
 - (void) _hvXl3
 {
     NSAutoreleasePool* hvPool = [[NSAutoreleasePool alloc] init];
+    [self setHvPanicFlag:NO];
+    
     BOOL isTimeToQuit = NO;
 
     unsigned int msk = 0UL;
@@ -3271,7 +3273,7 @@ void SwapLongBlock(void* p, int32_t n)
             lastCMOSCountProcessed = 0;
             
             usleep(200000);
-            [self readHVStatus];
+            if (![self hvPanicFlag]) [self readHVStatus];
         }
         
         //while ([self hvCMOSReadsCounter] < 3) { //or panic flag
@@ -3279,26 +3281,28 @@ void SwapLongBlock(void* p, int32_t n)
         //}
         
         //monitoring loop updates
-        if (fabs([self hvAVoltageReadValue] / 3000. * 4096 - [self hvAVoltageDACSetValue]) > 20) {
-            NSLog(@"%@ read value differs from the set one. stopping!\n", [[self xl3Link] crateName]);
-            usleep(100000);
-            [self setHvANextStepValue:[self hvAVoltageDACSetValue]];
+        if (![self hvPanicFlag]) {
+            if (fabs([self hvAVoltageReadValue] / 3000. * 4096 - [self hvAVoltageDACSetValue]) > 20) {
+                NSLog(@"%@ read value differs from the set one. stopping!\n", [[self xl3Link] crateName]);
+                usleep(100000);
+                [self setHvANextStepValue:[self hvAVoltageDACSetValue]];
+            }
+            
+            /*
+            channelsAboveLimit = 0;
+            cmosLimit = [self hvACMOSRateLimit];
+            for (id key in fecs) {
+                channelsAboveLimit += [key channelsWithCMOSRateHigherThan:[self hvACMOSRateLimit]];
+            }
+            
+            if (channelsAboveLimit > [self hvACMOSRateIgnore]) {
+                NSLog(@"%@ too many channels with high CMOS rate. stopping!\n", [[self xl3Link] crateName]);
+                usleep(100000);
+                [self setHvANextStepValue:[self hvAVoltageDACSetValue]];
+            }
+             */
         }
         
-        /*
-        channelsAboveLimit = 0;
-        cmosLimit = [self hvACMOSRateLimit];
-        for (id key in fecs) {
-            channelsAboveLimit += [key channelsWithCMOSRateHigherThan:[self hvACMOSRateLimit]];
-        }
-        
-        if (channelsAboveLimit > [self hvACMOSRateIgnore]) {
-            NSLog(@"%@ too many channels with high CMOS rate. stopping!\n", [[self xl3Link] crateName]);
-            usleep(100000);
-            [self setHvANextStepValue:[self hvAVoltageDACSetValue]];
-        }
-         */
-
         if (!hvASwitch && !hvBSwitch) isTimeToQuit = YES;
         usleep(100000);
     }
