@@ -586,7 +586,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 - (int) energyNumberToSum { return energyNumberToSum; }
 - (void) setEnergyNumberToSum:(int)aNumberToSum
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setEnergyNumberToSum:aNumberToSum];
+    [[[self undoManager] prepareWithInvocationTarget:self] setEnergyNumberToSum:energyNumberToSum];
     energyNumberToSum = [self limitIntValue:aNumberToSum min:4 max:256];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergyNumberToSumChanged object:self];
 }	
