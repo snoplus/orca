@@ -46,10 +46,6 @@ NSString* plotButtonDisabled                 = @"plotButtonDisabled";
         channelRectsInPSUPView = [[NSMutableArray alloc] init];
         voltageRectsInCrateView = [[NSMutableArray alloc] init];
         xl3VoltageRectsInCrateView = [[NSMutableArray alloc] init];
-        pmtColorArray = [[NSMutableArray alloc] init];
-        voltageColorArray = [[NSMutableArray alloc] init];
-        xl3VoltageColorArray = [[NSMutableArray alloc] init];
-        crateColorArray = [[NSMutableArray alloc] init];
         selectionMode = kTubeSelectionMode;
         [self iniAxisChanges];
         [self getRectPositions];
@@ -77,10 +73,6 @@ NSString* plotButtonDisabled                 = @"plotButtonDisabled";
 	[channelRectsInPSUPView release];
     [voltageRectsInCrateView release];
     [xl3VoltageRectsInCrateView release];
-    [crateColorArray release];
-	[pmtColorArray release];
-    [voltageColorArray release];
-    [xl3VoltageColorArray release];
 	[super dealloc];
 }
 
@@ -250,7 +242,7 @@ NSString* plotButtonDisabled                 = @"plotButtonDisabled";
 	//card areas
 	NSRect cardRect = NSMakeRect(xc,yc,segSize,segSize*32);
 	for (crate=0;crate<kMaxSNOCrates-1;crate++){
-		for(card=0;card<16;card++){
+		for(card=0;card<kNumSNOCards;card++){
 			int cardIndex = kCardsPerCrate * crate + card;
 			if (crate<10){
 				xOffset=card*segSize-5.5*segSize*16+crate*segSize*17.5;
@@ -347,16 +339,15 @@ NSString* plotButtonDisabled                 = @"plotButtonDisabled";
 	
 	[detectorTitle drawAtPoint:NSMakePoint([self bounds].size.width*0.42,5)];
 	
+    //black background
+    float x1 = [self bounds].size.width/60.;
+    float y1 = [self bounds].size.height/13.;
+
+    NSRect backRect = NSMakeRect(x1,y1,[self bounds].size.width*0.99,[self bounds].size.height*0.89);
+    [[NSColor blackColor] set];
+    [NSBezierPath fillRect:backRect];
+    
 	if (pickPSUPView){
-		
-		float xc = [self bounds].size.width/60.;
-		float yc = [self bounds].size.height/13.;
-		//float segSize = [self bounds].size.height/100.;
-		//xOffset=-5.5*segSize*16+crate*segSize*17.5;
-		//yOffset=-1.2*segSize*32;
-		NSRect backRect = NSMakeRect(xc,yc,[self bounds].size.width*0.99,[self bounds].size.height*0.89);
-		[[NSColor blackColor] set];
-		[NSBezierPath fillRect:backRect];
 		
 		//draw psup in grey
 		float scaleFactor = 1.005*([self bounds].size.width-20)/kPSUP_width;
@@ -378,7 +369,7 @@ NSString* plotButtonDisabled                 = @"plotButtonDisabled";
 			for(card=0;card<kNumSNOCards;card++){
 				for(pmt=0;pmt<kNumSNOPmts;pmt++){
 					tubeIndex = kChannelsPerCrate * crate + kChannelsPerBoard* card + pmt;
-					[(NSColor *)[pmtColorArray objectAtIndex:tubeIndex] set];
+					[[self getPMTColor:crate card:card pmt:pmt] set];
 					[[channelRectsInPSUPView objectAtIndex:tubeIndex] fill];
 					aPath  = [channelRectsInPSUPView objectAtIndex:tubeIndex];
 					[aPath setLineWidth:highlightLineWidth-2.5];
@@ -438,6 +429,7 @@ NSString* plotButtonDisabled                 = @"plotButtonDisabled";
 			[[NSNotificationCenter defaultCenter] postNotificationName:selectionStringChanged object:self userInfo:nil];
 		}
 
+        [self formatGlobalStatsString];
 		[globalStatsString drawAtPoint:NSMakePoint(30,[self bounds].size.height*0.97)];
 		
 	}else if (!pickPSUPView){
@@ -471,7 +463,7 @@ NSString* plotButtonDisabled                 = @"plotButtonDisabled";
 			
 			NSString *crateName=[NSString stringWithFormat:@"Crate %i",crate];
 			NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:[NSFont fontWithName:@"Lucida Grande" size:12], 
-										NSFontAttributeName,[NSColor blackColor], NSForegroundColorAttributeName, nil];
+										NSFontAttributeName,[NSColor whiteColor], NSForegroundColorAttributeName, nil];
 			NSAttributedString * currentText=[[NSAttributedString alloc] initWithString:crateName attributes: attributes];
 			[currentText drawAtPoint:NSMakePoint(xc+xOffset+20,yc+yOffset+180)];
 			[currentText release];
@@ -511,11 +503,12 @@ NSString* plotButtonDisabled                 = @"plotButtonDisabled";
                     if (card%4==0){
                         NSString *cardNum=[NSString stringWithFormat:@"%i",card];
                         NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:[NSFont fontWithName:@"Lucida Grande" size:9], 
-												NSFontAttributeName,[NSColor blackColor], NSForegroundColorAttributeName, nil];
+												NSFontAttributeName,[NSColor whiteColor], NSForegroundColorAttributeName, nil];
                         NSAttributedString * currentText=[[NSAttributedString alloc] initWithString:cardNum attributes: attributes];
                         [currentText drawAtPoint:NSMakePoint(xc+xOffset,yc+yOffset+172)];
                         [currentText release];
 					
+                        [[NSColor whiteColor] set];
                         [NSBezierPath strokeLineFromPoint:NSMakePoint(xc+xOffset+segSize*0.5,yc+yOffset+174) 
                                                 toPoint:NSMakePoint(xc+xOffset+segSize*0.5,yc+yOffset+168)];
                     }
@@ -523,13 +516,14 @@ NSString* plotButtonDisabled                 = @"plotButtonDisabled";
             }
         }
 		
-		if (parameterToDisplay != kFECVoltagesDisplay && parameterToDisplay != kXL3VoltagesDisplay && parameterToDisplay!=kRatesDisplay){
+		if (parameterToDisplay != kFECVoltagesDisplay && parameterToDisplay != kXL3VoltagesDisplay 
+            && parameterToDisplay!=kRatesDisplay && parameterToDisplay != kFifoDisplay){
             //draw Channels as filled circles with pre-determined colour
             for (crate=0;crate<kMaxSNOCrates-1;crate++){
                 for(card=0;card<kNumSNOCards;card++){
                     for(pmt=0;pmt<kNumSNOPmts;pmt++){
                         tubeIndex = kChannelsPerCrate * crate + kChannelsPerBoard* card + pmt;
-                        [(NSColor *)[pmtColorArray objectAtIndex:tubeIndex] set];
+                        [[self getPMTColor:crate card:card pmt:pmt] set];
                         [[channelRectsInCrateView objectAtIndex:tubeIndex] fill];
                     }
                 }
@@ -556,8 +550,8 @@ NSString* plotButtonDisabled                 = @"plotButtonDisabled";
                 }else if (selectionMode == kCrateSelectionMode) {
                     aPath  = [crateRectsInCrateView objectAtIndex:selectedCrate];
                     [aPath setLineWidth:highlightLineWidth-1];
-                    [[NSColor colorWithCalibratedRed:.7 green:.2 blue:.2 alpha:1] set];
-                    //[[NSColor whiteColor] set];
+                    //[[NSColor colorWithCalibratedRed:.7 green:.2 blue:.2 alpha:1] set];
+                    [[NSColor whiteColor] set];
                     [aPath stroke];
 				
                     selectionString = [NSMutableString stringWithFormat:@"Crate %i\n",selectedCrate];
@@ -570,6 +564,7 @@ NSString* plotButtonDisabled                 = @"plotButtonDisabled";
                 [[NSNotificationCenter defaultCenter] postNotificationName:selectionStringChanged object:self userInfo:nil];
             }
 		
+            [self formatGlobalStatsString];
             [globalStatsString drawAtPoint:NSMakePoint(10,[self bounds].size.height*0.97)];
      
         }else if (parameterToDisplay == kFECVoltagesDisplay){
@@ -579,7 +574,7 @@ NSString* plotButtonDisabled                 = @"plotButtonDisabled";
                     for(iVoltage=0;iVoltage<kNumFecMonitorAdcs;iVoltage++){
                         voltageIndex = (kNumFecMonitorAdcs*kNumSNOCards) * crate + kNumFecMonitorAdcs* card + iVoltage;
 
-                        [(NSColor *)[voltageColorArray objectAtIndex:voltageIndex] set];
+                        [[self getFECVoltageColor:crate card:card voltage:iVoltage] set];
                         [[voltageRectsInCrateView objectAtIndex:voltageIndex] fill];
                         
                         aPath = [voltageRectsInCrateView objectAtIndex:voltageIndex];
@@ -604,7 +599,7 @@ NSString* plotButtonDisabled                 = @"plotButtonDisabled";
                 }
                 
                 NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:[NSFont fontWithName:@"Lucida Grande" size:7], 
-                                        NSFontAttributeName,[NSColor blackColor], NSForegroundColorAttributeName, nil];
+                                        NSFontAttributeName,[NSColor whiteColor], NSForegroundColorAttributeName, nil];
                 NSAttributedString * currentText=[[NSAttributedString alloc] initWithString:voltageName attributes: attributes];
                     [currentText drawAtPoint:NSMakePoint(xc+xOffset,yc+yOffset)];
                     [currentText release];
@@ -623,6 +618,7 @@ NSString* plotButtonDisabled                 = @"plotButtonDisabled";
                 [[NSNotificationCenter defaultCenter] postNotificationName:selectionStringChanged object:self userInfo:nil];
             }
             
+            [self formatGlobalStatsString];
             [globalStatsString drawAtPoint:NSMakePoint(10,[self bounds].size.height*0.97)];
             
         }else if (parameterToDisplay == kXL3VoltagesDisplay){
@@ -631,7 +627,7 @@ NSString* plotButtonDisabled                 = @"plotButtonDisabled";
                 for(iVoltage=0;iVoltage<kNumXL3Voltages;iVoltage++){
                     voltageIndex = kNumXL3Voltages*crate + iVoltage;
                     
-                    [(NSColor *)[xl3VoltageColorArray objectAtIndex:voltageIndex] set];
+                    [[self getXL3VoltageColor:crate voltage:iVoltage] set];
                     [[xl3VoltageRectsInCrateView objectAtIndex:voltageIndex] fill];
                         
                     aPath = [xl3VoltageRectsInCrateView objectAtIndex:voltageIndex];
@@ -648,14 +644,26 @@ NSString* plotButtonDisabled                 = @"plotButtonDisabled";
                 float yOffset=-1*iVoltage*segSize*32/kNumXL3Voltages+1.2*(segSize*32/kNumXL3Voltages)*kNumXL3Voltages-segSize*32/kNumXL3Voltages;
                 
                 NSString *voltageName;
-                if (iVoltage < kNumXL3Voltages) {
-                    voltageName=[NSString stringWithString:@"Voltage name"];
-                }else{
+                if (iVoltage == 0) {
+                    voltageName=[NSString stringWithString:@"VCC"];
+                }else if (iVoltage == 1){
+                    voltageName=[NSString stringWithString:@"VEE"];
+                }else if (iVoltage == 2){
+                    voltageName=[NSString stringWithString:@"VP24"];
+                }else if (iVoltage == 3){
+                    voltageName=[NSString stringWithString:@"VM24"];
+                }else if (iVoltage == 4){
+                    voltageName=[NSString stringWithString:@"TMP0"];
+                }else if (iVoltage == 5){
+                    voltageName=[NSString stringWithString:@"TMP1"];
+                }else if (iVoltage == 6){
+                    voltageName=[NSString stringWithString:@"TMP2"];
+                }else if (iVoltage == kNumXL3Voltages) {
                     voltageName=[NSString stringWithFormat:@"INDEX"];
                 }
                 
                 NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:[NSFont fontWithName:@"Lucida Grande" size:10], 
-                                            NSFontAttributeName,[NSColor blackColor], NSForegroundColorAttributeName, nil];
+                                            NSFontAttributeName,[NSColor whiteColor], NSForegroundColorAttributeName, nil];
                 NSAttributedString * currentText=[[NSAttributedString alloc] initWithString:voltageName attributes: attributes];
                 [currentText drawAtPoint:NSMakePoint(xc+xOffset,yc+yOffset)];
                 [currentText release];
@@ -674,11 +682,12 @@ NSString* plotButtonDisabled                 = @"plotButtonDisabled";
                 [[NSNotificationCenter defaultCenter] postNotificationName:selectionStringChanged object:self userInfo:nil];
             }
             
+            [self formatGlobalStatsString];
             [globalStatsString drawAtPoint:NSMakePoint(10,[self bounds].size.height*0.97)];
             
         }else if (parameterToDisplay == kRatesDisplay){
             for (crate=0; crate<kMaxSNOCrates-1; crate++) {
-                [(NSColor *)[crateColorArray objectAtIndex:crate] set];
+                [[self getCrateColor:crate] set];
                 [[crateRectsInCrateView objectAtIndex:crate] fill];
                 
                 aPath  = [crateRectsInCrateView objectAtIndex:crate];
@@ -688,7 +697,8 @@ NSString* plotButtonDisabled                 = @"plotButtonDisabled";
             if (selectedCrate>=0){
                 aPath  = [crateRectsInCrateView objectAtIndex:selectedCrate];
                 [aPath setLineWidth:highlightLineWidth-1];
-                [[NSColor colorWithCalibratedRed:.7 green:.2 blue:.2 alpha:1] set];
+                //[[NSColor colorWithCalibratedRed:.7 green:.2 blue:.2 alpha:1] set];
+                [[NSColor whiteColor] set];
                 [aPath stroke];
 				
                 selectionString = [NSMutableString stringWithFormat:@"Crate %i\n",selectedCrate];
@@ -696,7 +706,32 @@ NSString* plotButtonDisabled                 = @"plotButtonDisabled";
                 [[NSNotificationCenter defaultCenter] postNotificationName:selectionStringChanged object:self userInfo:nil];
             }
             
+            [self formatGlobalStatsString];
             [globalStatsString drawAtPoint:NSMakePoint(10,[self bounds].size.height*0.97)];
+
+        }else if (parameterToDisplay == kFifoDisplay){
+            for (crate = 0; crate<kMaxSNOCrates-1; crate++){
+                for (card = 0; card<kNumSNOCards; card++){
+                    int iCard = kCardsPerCrate * crate + card;
+                    [[self getCardColor:crate card:card] set];
+                    [[cardRectsInCrateView objectAtIndex:iCard] fill];
+                    aPath = [cardRectsInCrateView objectAtIndex:iCard];
+                    [aPath stroke];
+                }
+            }
+            
+            if (selectedCrate>=0 && selectedCard>=0){
+                int iCard = kCardsPerCrate *selectedCrate + selectedCard;
+                aPath = [cardRectsInCrateView objectAtIndex:iCard];
+                [aPath setLineWidth:highlightLineWidth-1];
+                //[[NSColor colorWithCalibratedRed:.7 green:.2 blue:.2 alpha:1] set];
+                [[NSColor whiteColor] set];
+                [aPath stroke];
+				
+                selectionString = [NSMutableString stringWithFormat:@"Crate %i Card %i\n",selectedCrate,selectedCard];
+                [selectionString appendString:[self getCurrentDisplayValue]];
+                [[NSNotificationCenter defaultCenter] postNotificationName:selectionStringChanged object:self userInfo:nil];
+            }
         }
 	}
 }
@@ -802,196 +837,153 @@ NSString* plotButtonDisabled                 = @"plotButtonDisabled";
     return str;
 }
 
+- (NSColor *) getPMTColor:(int)aCrate card:(int)aCard pmt:(int)aPMT
+{
+    NSColor *tubeColor;
+    if (parameterToDisplay == kTubeTypeDisplay){
+        tubeColor = [db pmtColor:aCrate card:aCard channel:aPMT];
+        if ([NSColor greenColor]==tubeColor){
+            numTubesOnline++;
+        }else if ([NSColor blackColor]==tubeColor) {
+            numUnknownTubes++;
+        }else if ([NSColor blueColor]==tubeColor) {
+            numOwlTubes++;
+        }else if ([NSColor yellowColor]==tubeColor) {
+            numLowGainTubes++;
+        }else if ([NSColor brownColor]==tubeColor) {
+            numButtTubes++;
+        }else if ([NSColor cyanColor]==tubeColor) {
+            numNeckTubes++;
+        }
+    } else if (parameterToDisplay == kCmosRatesDisplay){
+
+        tubeColor = [detectorColorBar getColorForValue:[db cmosRate:aCrate card:aCard channel:aPMT]];
+        
+    } else if (parameterToDisplay == kBaseCurrentDisplay){
+
+        tubeColor = [detectorColorBar getColorForValue:[db baseCurrent:aCrate card:aCard channel:aPMT]];
+        
+    }  else if (parameterToDisplay == kFifoDisplay){
+
+        float fecfifo = [db fifo:aCrate card:aCard];
+        tubeColor = [detectorColorBar getColorForValue:fecfifo];
+        
+    }  else if (parameterToDisplay == kRatesDisplay){
+
+        float xl3rate = [db xl3Rate:aCrate]*1000.0;
+        tubeColor = [detectorColorBar getColorForValue:xl3rate];
+        
+    }
+    
+    return tubeColor;
+}
+
+- (NSColor *) getFECVoltageColor:(int)aCrate card:(int)aCard voltage:(int)aVoltage
+{
+    float fecVoltage = [db fecVoltageValue:aCrate card:aCard voltage:aVoltage];
+    NSColor *fecVoltageColor = [detectorColorBar getColorForValue:fabs(fecVoltage)];
+    return fecVoltageColor;
+}
+
+- (NSColor *) getXL3VoltageColor:(int)aCrate voltage:(int)aVoltage
+{
+    float xl3Voltage = [db xl3VoltageValue:aCrate voltage:aVoltage];
+    NSColor *xl3VoltageColor = [detectorColorBar getColorForValue:fabs(xl3Voltage)];
+    return xl3VoltageColor;
+}
+
+- (NSColor *) getCrateColor:(int)aCrate
+{
+    float xl3rate = [db xl3Rate:aCrate]*1000.0;
+    return [detectorColorBar getColorForValue:xl3rate];
+}
+
+- (NSColor *) getCardColor:(int)aCrate card:(int)aCard
+{
+    float fiforate = [db fifo:aCrate card:aCard];
+    return [detectorColorBar getColorForValue:fiforate];
+}
+
 //update display with respect to selected view (crate or PSUP), variable type, mousedown etc
 - (void)updateSNODetectorView
-{
-	if (pmtColorArray) [pmtColorArray release], pmtColorArray=nil;
-    if (crateColorArray) [crateColorArray release], crateColorArray=nil;
-	pmtColorArray = [[NSMutableArray alloc] init];
-    crateColorArray = [[NSMutableArray alloc] init];
-	//[self formatDetectorTitleString];
-	
-	int pmt,card,crate,tubeIndex,voltageIndex,iVoltage;
-	float fecfifo,xl3rate;
+{	
+    previousParameterDisplayed = parameterToDisplay;
+    [self updateAxes];
+    [self resetStats];
+	[self setNeedsDisplay:YES];
+}
 
-	//clear all colors first
-	for (crate=0;crate<kMaxSNOCrates-1;crate++){
-        [crateColorArray insertObject:[NSColor clearColor] atIndex:crate];
-		for(card=0;card<kNumSNOCards;card++){
-			for(pmt=0;pmt<kNumSNOPmts;pmt++){
-				tubeIndex = kChannelsPerCrate * crate + kChannelsPerBoard* card + pmt;
-				[pmtColorArray insertObject:[NSColor clearColor] atIndex:tubeIndex];
-			}
-		}
-	}
-    
+- (void) resetStats
+{
+    numTubesOnline=0;
+    numUnknownTubes=0;
+    numOwlTubes=0;
+    numLowGainTubes=0;
+    numButtTubes=0;
+    numNeckTubes=0;
+}
+
+- (void) updateAxes
+{
     [[detectorColorBar colorAxis] setAttributes:colorBarAxisAttributes];
 	
-		if (parameterToDisplay == kTubeTypeDisplay){
-			numTubesOnline=0,numUnknownTubes=0,numOwlTubes=0,numLowGainTubes=0,numButtTubes=0,numNeckTubes=0;
-			for (crate=0;crate<kMaxSNOCrates-1;crate++){
-				for(card=0;card<kNumSNOCards;card++){
-					for(pmt=0;pmt<kNumSNOPmts;pmt++){
-						tubeIndex = kChannelsPerCrate * crate + kChannelsPerBoard* card + pmt;
-						NSColor *tubeColor = [db pmtColor:crate card:card channel:pmt];
-						if ([NSColor greenColor]==tubeColor){
-							numTubesOnline++;
-						}else if ([NSColor blackColor]==tubeColor) {
-							numUnknownTubes++;
-						}else if ([NSColor blueColor]==tubeColor) {
-							numOwlTubes++;
-						}else if ([NSColor yellowColor]==tubeColor) {
-							numLowGainTubes++;
-						}else if ([NSColor brownColor]==tubeColor) {
-							numButtTubes++;
-						}else if ([NSColor cyanColor]==tubeColor) {
-							numNeckTubes++;
-						}
-						[pmtColorArray replaceObjectAtIndex:tubeIndex withObject:tubeColor];
-					}
-				}
-			}
-		} else if (parameterToDisplay == kCmosRatesDisplay){
-            if(![[axisChanges objectAtIndex:parameterToDisplay] boolValue] ||
-               previousParameterDisplayed != parameterToDisplay){
-                [[detectorColorBar colorAxis] setMinValue:0];
-                [[detectorColorBar colorAxis] setMaxValue:5000];
-                [[detectorColorBar colorAxis] setAxisMinLimit:0];
-                [[detectorColorBar colorAxis] setAxisMaxLimit:10000000];
-            }
-			
-			for (crate=0;crate<kMaxSNOCrates-1;crate++){
-				for(card=0;card<kNumSNOCards;card++){
-					for(pmt=0;pmt<kNumSNOPmts;pmt++){
-						tubeIndex = kChannelsPerCrate * crate + kChannelsPerBoard* card + pmt;
-                        NSColor *tubeColor = [detectorColorBar getColorForValue:[db cmosRate:crate card:card channel:pmt]];
-                        [pmtColorArray replaceObjectAtIndex:tubeIndex withObject:tubeColor];
-					}
-				}
-			}			
-		} else if (parameterToDisplay == kBaseCurrentDisplay){
-			if(![[axisChanges objectAtIndex:parameterToDisplay] boolValue] ||
-               previousParameterDisplayed != parameterToDisplay){
-                [[detectorColorBar colorAxis] setMinValue:0];
-                [[detectorColorBar colorAxis] setMaxValue:50];
-                [[detectorColorBar colorAxis] setAxisMinLimit:0];
-                [[detectorColorBar colorAxis] setAxisMaxLimit:10000000];
-            }
+    if (parameterToDisplay == kTubeTypeDisplay){
 
-			for (crate=0;crate<kMaxSNOCrates-1;crate++){
-				for(card=0;card<kNumSNOCards;card++){
-					for(pmt=0;pmt<kNumSNOPmts;pmt++){
-						tubeIndex = kChannelsPerCrate * crate + kChannelsPerBoard* card + pmt;
-                        NSColor *tubeColor = [detectorColorBar getColorForValue:[db baseCurrent:crate card:card channel:pmt]];
-                        [pmtColorArray replaceObjectAtIndex:tubeIndex withObject:tubeColor];
-					}
-				}
-			}
-		}  else if (parameterToDisplay == kFifoDisplay){
-			if(![[axisChanges objectAtIndex:parameterToDisplay] boolValue] ||
-               previousParameterDisplayed != parameterToDisplay){
-                [[detectorColorBar colorAxis] setMinValue:0];
-                [[detectorColorBar colorAxis] setMaxValue:1000000];
-                [[detectorColorBar colorAxis] setAxisMinLimit:0];
-                [[detectorColorBar colorAxis] setAxisMaxLimit:10000000];
-            }
-
-			for (crate=0;crate<kMaxSNOCrates-1;crate++){
-				for(card=0;card<kNumSNOCards;card++){
-					fecfifo = [db fifo:crate card:card];
-					NSColor *tubeColor = [detectorColorBar getColorForValue:fecfifo];
-					for(pmt=0;pmt<kNumSNOPmts;pmt++){
-						tubeIndex = kChannelsPerCrate * crate + kChannelsPerBoard* card + pmt;
-                        [pmtColorArray replaceObjectAtIndex:tubeIndex withObject:tubeColor];
-					}
-				}
-			}
-		}  else if (parameterToDisplay == kRatesDisplay){
-			if(![[axisChanges objectAtIndex:parameterToDisplay] boolValue] ||
-               previousParameterDisplayed != parameterToDisplay){
-                [[detectorColorBar colorAxis] setMinValue:0];
-                [[detectorColorBar colorAxis] setMaxValue:10000];
-                [[detectorColorBar colorAxis] setAxisMinLimit:0];
-                [[detectorColorBar colorAxis] setAxisMaxLimit:10000000];
-            }
-
-            for (crate=0;crate<kMaxSNOCrates-1;crate++){
-				xl3rate = [db xl3Rate:crate]*1000.0;
-				NSColor *tubeColor = [detectorColorBar getColorForValue:xl3rate];
-                [crateColorArray replaceObjectAtIndex:crate withObject:tubeColor];
-				for(card=0;card<kNumSNOCards;card++){
-					for(pmt=0;pmt<kNumSNOPmts;pmt++){
-						tubeIndex = kChannelsPerCrate * crate + kChannelsPerBoard* card + pmt;
-                        [pmtColorArray replaceObjectAtIndex:tubeIndex withObject:tubeColor];
-					}
-				}
-			}
-		}  else if (parameterToDisplay == kFECVoltagesDisplay){
-            if(![[axisChanges objectAtIndex:parameterToDisplay] boolValue] ||
-               previousParameterDisplayed != parameterToDisplay){
-                [[detectorColorBar colorAxis] setMinValue:0];
-                [[detectorColorBar colorAxis] setMaxValue:30];
-                [[detectorColorBar colorAxis] setAxisMinLimit:0];
-                [[detectorColorBar colorAxis] setAxisMaxLimit:10000000];
-            } 
-            
-            if (voltageColorArray) [voltageColorArray release], voltageColorArray=nil;
-            voltageColorArray = [[NSMutableArray alloc] init];
-            
-            //clear all colors first
-            for (crate=0;crate<kMaxSNOCrates-1;crate++){
-                for(card=0;card<kNumSNOCards;card++){
-                    for(iVoltage=0;iVoltage<kNumFecMonitorAdcs;iVoltage++){
-                        voltageIndex = (kNumFecMonitorAdcs*kNumSNOCards) * crate+ kNumFecMonitorAdcs*card + iVoltage;
-                        [voltageColorArray insertObject:[NSColor clearColor] atIndex:voltageIndex];
-                    }
-                }
-            }
-            
-            for (crate=0;crate<kMaxSNOCrates-1;crate++){
-                for (card=0;card<kNumSNOCards;card++){
-                    for (iVoltage=0; iVoltage<kNumFecMonitorAdcs; iVoltage++) {
-                        float fecVoltage = [db fecVoltageValue:crate card:card voltage:iVoltage];
-                        NSColor *voltageColor = [detectorColorBar getColorForValue:fabs(fecVoltage)];
-                        voltageIndex = (kNumFecMonitorAdcs*kNumSNOCards) * crate+ kNumFecMonitorAdcs*card + iVoltage;
-                        [voltageColorArray replaceObjectAtIndex:voltageIndex withObject:voltageColor];
-                    }
-                }
-            }
-            
-        } else if (parameterToDisplay == kXL3VoltagesDisplay){
-            if(![[axisChanges objectAtIndex:parameterToDisplay] boolValue] ||
-               previousParameterDisplayed != parameterToDisplay){
-                [[detectorColorBar colorAxis] setMinValue:0];
-                [[detectorColorBar colorAxis] setMaxValue:10];
-                [[detectorColorBar colorAxis] setAxisMinLimit:0];
-                [[detectorColorBar colorAxis] setAxisMaxLimit:1000];
-            } 
-            
-            if (xl3VoltageColorArray) [xl3VoltageColorArray release], xl3VoltageColorArray=nil;
-            xl3VoltageColorArray = [[NSMutableArray alloc] init];
-            
-            //clear all colors first
-            for (crate=0;crate<kMaxSNOCrates-1;crate++){
-                for(iVoltage=0;iVoltage<kNumXL3Voltages;iVoltage++){
-                    voltageIndex = kNumXL3Voltages*crate+iVoltage;
-                    [xl3VoltageColorArray insertObject:[NSColor clearColor] atIndex:voltageIndex];
-                }
-            }
-            
-            for (crate=0;crate<kMaxSNOCrates-1;crate++){
-                for (iVoltage=0;iVoltage<kNumXL3Voltages;iVoltage++){
-                    float xl3Voltage = [db xl3VoltageValue:crate voltage:iVoltage];
-                    NSColor *xl3VoltageColor = [detectorColorBar getColorForValue:fabs(xl3Voltage)];
-                    voltageIndex = kNumXL3Voltages*crate+iVoltage;
-                    [xl3VoltageColorArray replaceObjectAtIndex:voltageIndex withObject:xl3VoltageColor];
-                }
-            }
+    } else if (parameterToDisplay == kCmosRatesDisplay){
+        if(![[axisChanges objectAtIndex:parameterToDisplay] boolValue] ||
+           previousParameterDisplayed != parameterToDisplay){
+            [[detectorColorBar colorAxis] setMinValue:0];
+            [[detectorColorBar colorAxis] setMaxValue:5000];
+            [[detectorColorBar colorAxis] setAxisMinLimit:0];
+            [[detectorColorBar colorAxis] setAxisMaxLimit:10000000];
         }
-	
-    previousParameterDisplayed = parameterToDisplay;
-	[self formatGlobalStatsString];
-	[self setNeedsDisplay:YES];
+                
+    } else if (parameterToDisplay == kBaseCurrentDisplay){
+        if(![[axisChanges objectAtIndex:parameterToDisplay] boolValue] ||
+           previousParameterDisplayed != parameterToDisplay){
+            [[detectorColorBar colorAxis] setMinValue:0];
+            [[detectorColorBar colorAxis] setMaxValue:50];
+            [[detectorColorBar colorAxis] setAxisMinLimit:0];
+            [[detectorColorBar colorAxis] setAxisMaxLimit:10000000];
+        }
+        
+    }  else if (parameterToDisplay == kFifoDisplay){
+        if(![[axisChanges objectAtIndex:parameterToDisplay] boolValue] ||
+           previousParameterDisplayed != parameterToDisplay){
+            [[detectorColorBar colorAxis] setMinValue:0];
+            [[detectorColorBar colorAxis] setMaxValue:1000000];
+            [[detectorColorBar colorAxis] setAxisMinLimit:0];
+            [[detectorColorBar colorAxis] setAxisMaxLimit:10000000];
+        }
+        
+    }  else if (parameterToDisplay == kRatesDisplay){
+        if(![[axisChanges objectAtIndex:parameterToDisplay] boolValue] ||
+           previousParameterDisplayed != parameterToDisplay){
+            [[detectorColorBar colorAxis] setMinValue:0];
+            [[detectorColorBar colorAxis] setMaxValue:10000];
+            [[detectorColorBar colorAxis] setAxisMinLimit:0];
+            [[detectorColorBar colorAxis] setAxisMaxLimit:10000000];
+        }
+        
+    }  else if (parameterToDisplay == kFECVoltagesDisplay){
+        if(![[axisChanges objectAtIndex:parameterToDisplay] boolValue] ||
+           previousParameterDisplayed != parameterToDisplay){
+            [[detectorColorBar colorAxis] setMinValue:0];
+            [[detectorColorBar colorAxis] setMaxValue:30];
+            [[detectorColorBar colorAxis] setAxisMinLimit:0];
+            [[detectorColorBar colorAxis] setAxisMaxLimit:10000000];
+        } 
+        
+    } else if (parameterToDisplay == kXL3VoltagesDisplay){
+        if(![[axisChanges objectAtIndex:parameterToDisplay] boolValue] ||
+           previousParameterDisplayed != parameterToDisplay){
+            [[detectorColorBar colorAxis] setMinValue:0];
+            [[detectorColorBar colorAxis] setMaxValue:10];
+            [[detectorColorBar colorAxis] setAxisMinLimit:0];
+            [[detectorColorBar colorAxis] setAxisMaxLimit:1000];
+        } 
+
+    }
 }
 
 - (BOOL)isFlipped
@@ -1004,6 +996,7 @@ NSString* plotButtonDisabled                 = @"plotButtonDisabled";
 	selectedCrate = -1;
 	selectedCard = -1;
 	selectedChannel = -1;	
+    selectedVoltage = -1;
 	
     NSPoint localPoint = [self convertPoint:[anEvent locationInWindow] fromView:nil];
 	NSBezierPath *aPath;
@@ -1063,7 +1056,10 @@ NSString* plotButtonDisabled                 = @"plotButtonDisabled";
         }
     }
 
-	[self setNeedsDisplay:YES];
+    if (selectedCrate!=-1){
+        [self resetStats];
+        [self setNeedsDisplay:YES];
+    }
 }
 
 @end

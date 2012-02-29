@@ -58,7 +58,7 @@ if { $pid != ""} {
         }
       }
     }
-    "not known"{
+    "not known" {
     }
   }
 }

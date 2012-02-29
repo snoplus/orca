@@ -333,6 +333,14 @@
         [selectionModeButton selectItemWithTitle:@"Crate"];
         [[viewSelectionButton itemWithTitle:@"PSUP view"] setEnabled:YES];
         [detectorView setSelectionMode:[[selectionModeButton itemWithTitle:@"Crate"] tag]];
+    }else if ([[[sender selectedItem] title] isEqualToString:@"FIFO"]){
+        [[selectionModeButton itemWithTitle:@"Tube"] setEnabled:NO];
+        [[selectionModeButton itemWithTitle:@"Card"] setEnabled:YES];
+        [[selectionModeButton itemWithTitle:@"Crate"] setEnabled:NO];
+        [[selectionModeButton itemWithTitle:@"Voltage"] setEnabled:NO];
+        [selectionModeButton selectItemWithTitle:@"Card"];
+        [[viewSelectionButton itemWithTitle:@"PSUP view"] setEnabled:YES];
+        [detectorView setSelectionMode:[[selectionModeButton itemWithTitle:@"Card"] tag]];
     }else {
         [[selectionModeButton itemWithTitle:@"Tube"] setEnabled:YES];
         [[selectionModeButton itemWithTitle:@"Card"] setEnabled:YES];

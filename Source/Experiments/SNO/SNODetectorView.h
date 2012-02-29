@@ -48,7 +48,7 @@
 #define kTubeSelectionMode  0
 #define kCardSelectionMode  1
 #define kCrateSelectionMode 2
-#define kNumXL3Voltages 12
+#define kNumXL3Voltages 7
 
 @interface SNODetectorView : ORGenericView
 {	
@@ -66,10 +66,6 @@
 	NSMutableArray *channelRectsInPSUPView;
     NSMutableArray *voltageRectsInCrateView;
     NSMutableArray *xl3VoltageRectsInCrateView;
-	NSMutableArray *pmtColorArray;
-    NSMutableArray *voltageColorArray;
-    NSMutableArray *xl3VoltageColorArray;
-    NSMutableArray *crateColorArray;
     BOOL pollingInProgress;
 	BOOL pickPSUPView;
 	int parameterToDisplay;
@@ -92,8 +88,15 @@
 - (void) setParameterToDisplay:(int)aParameter;
 - (void) setSelectionMode:(int)aMode;
 - (void) updateSNODetectorView;
+- (void) updateAxes;
+- (void) resetStats;
 - (void) iniAxisChanges;
 - (void) getRectPositions;
+- (NSColor *) getPMTColor:(int)aCrate card:(int)aCard pmt:(int)aPMT;
+- (NSColor *) getFECVoltageColor:(int)aCrate card:(int)aCard voltage:(int)aVoltage;
+- (NSColor *) getXL3VoltageColor:(int)aCrate voltage:(int)aVoltage;
+- (NSColor *) getCrateColor:(int) aCrate;
+- (NSColor *) getCardColor:(int) aCrate card:(int)aCard;
 - (void) formatGlobalStatsString;
 //- (void) formatDetectorTitleString;
 - (void) setDetectorTitleString:(NSString *)aString;

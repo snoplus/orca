@@ -40,7 +40,7 @@
     NSURLRequest *request = [[NSURLRequest alloc]
  							 initWithURL: [NSURL URLWithString:urlString]
  							 cachePolicy: NSURLRequestReloadIgnoringLocalCacheData
- 							 timeoutInterval: 2
+ 							 timeoutInterval: 5
  							 ];
     
     NSURLConnection *connection = [[NSURLConnection alloc]

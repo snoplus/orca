@@ -58,7 +58,8 @@ NSString* morcaDBRead = @"morcaDBRead";
         [connection release];
     }
     
-    if ([aString isEqualToString:@"getXL3State"]) [[NSNotificationCenter defaultCenter] postNotificationName:morcaDBRead object:self];
+    if ([aString isEqualToString:@"getXL3State"]) 
+        [[NSNotificationCenter defaultCenter] postNotificationName:morcaDBRead object:self];
 }
 
 //---------------------------
@@ -73,12 +74,14 @@ NSString* morcaDBRead = @"morcaDBRead";
     int crate;
     
     crate = [[jsonMorcaDB objectForKey:@"xl3_num"] intValue];
+
     for(id key in jsonMorcaDB){
+        
         if([key isEqualToString:@"cmos_rt"]){
             int cardindex;
             for(cardindex=0;cardindex<kNumSNOCards;++cardindex){
                 int pmtindex;
-                for(pmtindex=0;pmtindex<kNumSNOPmts;++pmtindex){
+                for(pmtindex=0;pmtindex<[[[jsonMorcaDB objectForKey:key] objectAtIndex:cardindex] count];++pmtindex){
                     SNOCrate[crate].Card[cardindex].Pmt[pmtindex].cmosRate = 
                     [[[[jsonMorcaDB objectForKey:key] objectAtIndex:cardindex] objectAtIndex:pmtindex] floatValue];
                 }
@@ -87,7 +90,7 @@ NSString* morcaDBRead = @"morcaDBRead";
             int cardindex;
             for(cardindex=0;cardindex<kNumSNOCards;++cardindex){
                 int pmtindex;
-                for(pmtindex=0;pmtindex<kNumSNOPmts;++pmtindex){
+                for(pmtindex=0;pmtindex<[[[jsonMorcaDB objectForKey:key] objectAtIndex:cardindex] count];++pmtindex){
                     SNOCrate[crate].Card[cardindex].Pmt[pmtindex].pmtBaseCurrent = 
                     [[[[jsonMorcaDB objectForKey:key] objectAtIndex:cardindex] objectAtIndex:pmtindex] floatValue];
                 } 
@@ -111,10 +114,15 @@ NSString* morcaDBRead = @"morcaDBRead";
             }
         }else if ([key isEqualToString:@"xl3_vlt"]){
             int iVoltage;
-            for (iVoltage=0;iVoltage<12;iVoltage++){
+            for (iVoltage=0;iVoltage<7;iVoltage++){
                 SNOCrate[crate].xl3Voltage[iVoltage].voltage = 
                 [[[jsonMorcaDB objectForKey:key] objectAtIndex:iVoltage] floatValue];
             }
+        }else if ([key isEqualToString:@"xl3_vlt_tag"] || [key isEqualToString:@"xl3_vlt_time_stamp"] || 
+                  [key isEqualToString:@"cmos_rt_slot_mask"] || [key isEqualToString:@"cmos_rt_time_stamp"] || 
+                  [key isEqualToString:@"hv_supply"] || [key isEqualToString:@"pmt_base_i_slot_mask"] ||
+                  [key isEqualToString:@"pmt_base_i_time_stamp"]){
+        
         }
     }
     
