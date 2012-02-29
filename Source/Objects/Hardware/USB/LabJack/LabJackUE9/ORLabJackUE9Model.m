@@ -23,7 +23,8 @@
 #import "ORDataTypeAssigner.h"
 #import "ORDataPacket.h"
 #import "NetSocket.h"
-
+#import "ORCard.h"
+#import "ORCB37Model.h"
 
 NSString* ORLabJackUE9CmdClockDivisorChanged = @"ORLabJackUE9CmdClockDivisorChanged";
 
@@ -72,7 +73,6 @@ NSString* ORLabJackUE9ModelTimerOptionChanged		= @"ORLabJackUE9ModelTimerOptionC
 NSString* ORLabJackUE9ModelTimerEnableMaskChanged	= @"ORLabJackUE9ModelTimerEnableMaskChanged";
 NSString* ORLabJackUE9ModelCounterEnableMaskChanged	= @"ORLabJackUE9ModelCounterEnableMaskChanged";
 NSString* ORLabJackUE9ModelTimerResultChanged		= @"ORLabJackUE9ModelTimerResultChanged";
-NSString* ORLabJackUE9ExpansionOptionChanged               = @"ORLabJackUE9ExpansionOptionChanged";
 
 #define kUE9Idle			0
 #define kUE9ComCmd			1
@@ -109,7 +109,7 @@ NSString* ORLabJackUE9ExpansionOptionChanged               = @"ORLabJackUE9Expan
 - (unsigned char) gainBipWord:(int)channelPair;
 @end
 
-#define kLabJackUE9DataSize 26
+#define kLabJackUE9DataSize 100
 
 @implementation ORLabJackUE9Model
 - (id)init
@@ -149,13 +149,35 @@ NSString* ORLabJackUE9ExpansionOptionChanged               = @"ORLabJackUE9Expan
 
 -(void) setUpImage
 {
-    if(expansionOption == kLabJackUE9NoExpansion) {
+	int cb37count = [[self orcaObjects] count];
+    if(cb37count==0) {
         [self setImage:[NSImage imageNamed:@"LabJackUE9"]];
     }
-    else if(expansionOption == kLabJackUE9Mux80Option){
-        [self setImage:[NSImage imageNamed:@"LabJackUE9Mux80"]];
+    else {
+		NSImage* aCachedImage = [NSImage imageNamed:@"LabJackUE9Mux80"];
+		NSImage* i = [[NSImage alloc] initWithSize:[aCachedImage size]];
+		[i lockFocus];
+		[aCachedImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
+		
+		if([[self orcaObjects] count]){
+			NSAffineTransform* transform = [NSAffineTransform transform];
+			[transform translateXBy:50 yBy:20];
+			[transform scaleXBy:.3 yBy:.3];
+			[transform concat];
+			NSEnumerator* e  = [[self orcaObjects] objectEnumerator];
+			OrcaObject* anObject;
+			while(anObject = [e nextObject]){
+				BOOL oldHighlightState = [anObject highlighted];
+				[anObject setHighlighted:NO];
+				[anObject drawSelf:NSMakeRect(0,0,500,[[self image] size].height)];
+				[anObject setHighlighted:oldHighlightState];
+			}
+		}
+		[i unlockFocus];
+		[self setImage:i];
+		[i release];
     }
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORForceRedraw object: self];
+	[[NSNotificationCenter defaultCenter] postNotificationName:OROrcaObjectImageChanged object:self];
  }
 
 - (NSString*) title 
@@ -165,19 +187,6 @@ NSString* ORLabJackUE9ExpansionOptionChanged               = @"ORLabJackUE9Expan
 
 
 #pragma mark ***Accessors
-- (int) expansionOption
-{
-    return expansionOption;
-}
-- (void) setExpansionOption:(int)aState
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setExpansionOption:expansionOption];
-    expansionOption = aState;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackUE9ExpansionOptionChanged object:self];
-    [self setUpImage];
-  
-}
-
 - (int) clockDivisor
 {
     return clockDivisor;
@@ -602,6 +611,13 @@ NSString* ORLabJackUE9ExpansionOptionChanged               = @"ORLabJackUE9Expan
 	if(i>=0 && i<6)return timerResult[i];
 	else return 0;
 }
+- (void) setTimerResult:(int)i value:(unsigned long)aValue
+{
+	if(i>=0 && i<6){
+		timerResult[i] = aValue;
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackUE9ModelTimerResultChanged object:self];
+	}
+}
 
 - (unsigned long) timer:(int)i
 {
@@ -905,14 +921,15 @@ NSString* ORLabJackUE9ExpansionOptionChanged               = @"ORLabJackUE9Expan
 		
 		unsigned long data[kLabJackUE9DataSize];
 		data[0] = dataId | kLabJackUE9DataSize;
-		data[1] = ([self uniqueIdNumber] & 0x0000fffff);
-		
+		data[1] = ([self uniqueIdNumber] & 0x0000ffff);
+		data[2] = timeMeasured;
+	
 		union {
 			float asFloat;
 			unsigned long asLong;
 		} theData;
 		
-		int index = 2;
+		int index = 3;
 		int i;
 		for(i=0;i<kUE9NumAdcs;i++){
 			theData.asFloat = [self convertedValue:i];
@@ -921,11 +938,16 @@ NSString* ORLabJackUE9ExpansionOptionChanged               = @"ORLabJackUE9Expan
 		}
 		data[index++] = counter[0];
 		data[index++] = counter[1];
+		data[index++] = timerResult[0];
+		data[index++] = timerResult[1];
+		data[index++] = timerResult[2];
+		data[index++] = timerResult[3];
+		data[index++] = timerResult[4];
+		data[index++] = timerResult[5];
 		data[index++] = (doDirection & 0xFFFFFF);
 		data[index++] = (doValueOut  & 0xFFFFFF);
 		data[index++] = (doValueIn   & 0xFFFFFF);
 	
-		data[index++] = timeMeasured;
 		data[index++] = 0; //spares
 		data[index++] = 0;
 		
@@ -1045,7 +1067,6 @@ NSString* ORLabJackUE9ExpansionOptionChanged               = @"ORLabJackUE9Expan
 	[self setAOut1:[decoder decodeIntForKey:@"aOut1"]];
     [self setAOut0:[decoder decodeIntForKey:@"aOut0"]];
     [self setShipData:[decoder decodeBoolForKey:@"shipData"]];
-    [self setExpansionOption:[decoder decodeIntForKey:@"expansionOption"]];
     [self setDigitalOutputEnabled:[decoder decodeBoolForKey:@"digitalOutputEnabled"]];
 	int i;
 	for(i=0;i<kUE9NumAdcs;i++) {
@@ -1082,7 +1103,7 @@ NSString* ORLabJackUE9ExpansionOptionChanged               = @"ORLabJackUE9Expan
 	
     [self setPollTime:		[decoder decodeIntForKey:@"pollTime"]];
 
-    [[self undoManager] enableUndoRegistration];    
+    [[self undoManager] enableUndoRegistration]; 
 	
     return self;
 }
@@ -1098,7 +1119,6 @@ NSString* ORLabJackUE9ExpansionOptionChanged               = @"ORLabJackUE9Expan
 	[encoder encodeInt:aOut1 forKey:@"aOut1"];
     [encoder encodeInt:aOut0 forKey:@"aOut0"];
     [encoder encodeBool:shipData forKey:@"shipData"];
-    [encoder encodeInt:expansionOption forKey:@"expansionOption"];
     [encoder encodeInt:pollTime forKey:@"pollTime"];
     [encoder encodeBool:digitalOutputEnabled forKey:@"digitalOutputEnabled"];
 	int i;
@@ -1136,8 +1156,61 @@ NSString* ORLabJackUE9ExpansionOptionChanged               = @"ORLabJackUE9Expan
 
 - (void) queryAll
 {
-	[self readAllValues];
+	if([[self orcaObjects]count] == 0){
+		[self readAllValues];
+	}
+	else {
+		NSEnumerator* e  = [[self orcaObjects] objectEnumerator];
+        ORCB37Model* aCB37;
+        while(aCB37 = [e nextObject]){
+			[self readAdcsForMux:[aCB37 slot]];
+		}
+		[self readAllValues];
+	}
 	[self sendTimerCounter:kUE9ReadCounters];
+}
+
+- (void) readAdcsForMux:(int)aMuxSlot
+{
+	int i;
+	if(aMuxSlot == 0){
+		for(i=0;i<12;i++){
+			int muxIndex = [self muxIndexFromAdcIndex:i];
+			[self readSingleAdc:muxIndex];
+		}
+	}
+	else if(aMuxSlot >= 1){
+		for(i=0;i<24;i++){
+			int muxIndex = [self muxIndexFromAdcIndex:i + 12 + ((aMuxSlot-1)*24)];
+			[self readSingleAdc:muxIndex];
+		}
+	}
+}
+
+- (int) muxIndexFromAdcIndex:(int)adcIndex
+{
+	if([[self orcaObjects] count]==0)return adcIndex;
+	else {
+		if     (adcIndex >=  0 && adcIndex < 4)  return adcIndex;
+		else if(adcIndex >=  4 && adcIndex < 12) return 120 + (adcIndex -  4); //slot X2
+		else if(adcIndex >= 12 && adcIndex < 36) return  48 + (adcIndex - 12); //slot X3
+		else if(adcIndex >= 36 && adcIndex < 60) return  72 + (adcIndex - 36); //slot X4
+		else if(adcIndex >= 60 && adcIndex < 84) return  96 + (adcIndex - 60); //slot X5
+		else return 119;
+	}
+}
+
+- (int) adcIndexFromMuxIndex:(int)muxIndex
+{
+	if([[self orcaObjects] count]==0)return muxIndex;
+	else {
+		if     (muxIndex >= 0   && muxIndex <= 3)	return muxIndex;
+		else if(muxIndex >= 120 && muxIndex <= 127) return (muxIndex - 120) + 4; //slot X2
+		else if(muxIndex >=  48 && muxIndex <= 71)	return (muxIndex -  48) + 12; //slot X3
+		else if(muxIndex >=  72 && muxIndex <= 95)  return (muxIndex -  72) + 36; //slot X4
+		else if(muxIndex >=  96 && muxIndex <= 119) return (muxIndex -  96) + 60; //slot X5
+		else return 83;
+	}
 }
 
 - (void) pollHardware
@@ -1158,8 +1231,8 @@ NSString* ORLabJackUE9ExpansionOptionChanged               = @"ORLabJackUE9Expan
 {
 	if(![self isConnected])return;
 	ORLabJackUE9Cmd* aCmd = [[[ORLabJackUE9Cmd alloc] init] autorelease];
-	aCmd.cmdData = cmdData;
-	aCmd.tag	 = aTag;
+	aCmd.cmdData  = cmdData;
+	aCmd.tag	  = aTag;
 	if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
 	[cmdQueue addObject:aCmd];
 	if(!lastRequest){
@@ -1184,14 +1257,14 @@ NSString* ORLabJackUE9ExpansionOptionChanged               = @"ORLabJackUE9Expan
 		[socket write:sendBuffer length:[[aCmd cmdData] length]];
 	}
 	if(!lastRequest){
-		[self performSelector:@selector(processOneCommandFromQueue) withObject:nil afterDelay:.1];
+		[self processOneCommandFromQueue];
 	}
 }
 
 - (void) startTimeOut
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-	[self performSelector:@selector(timeout) withObject:nil afterDelay:3];
+	[self performSelector:@selector(timeout) withObject:nil afterDelay:10];
 }
 
 - (void) getCalibrationInfo:(int)block
@@ -1222,8 +1295,10 @@ NSString* ORLabJackUE9ExpansionOptionChanged               = @"ORLabJackUE9Expan
 	[self extendedChecksum:sendBuff len:38];
 	
 	NSData* data = [NSData dataWithBytes:sendBuff length:38];
-	[self enqueCmd:data tag:kUE9ComCmd]; //fix
+	[self enqueCmd:data tag:kUE9ComCmd];
 }
+
+
 
 - (void) readSingleAdc:(int)aChan
 {		
@@ -1232,11 +1307,11 @@ NSString* ORLabJackUE9ExpansionOptionChanged               = @"ORLabJackUE9Expan
 	sendBuff[1] = (unsigned char)0xA3;			//command byte
 	sendBuff[2] = (unsigned char)kUE9AnalogIn;  //IOType = 4 (adc)
 	sendBuff[3] = (unsigned char)aChan;			//Channel
-	sendBuff[4] = (unsigned char)0x00;			//BipGain (Bip = unipolar, Gain = 1)
+	sendBuff[4] = [self gainBipWord:[self adcIndexFromMuxIndex:aChan]/2];		//BipGain 
 	sendBuff[5] = ainResolution;				//Resolution = 12
 	sendBuff[6] = (unsigned char)0x00;			//SettlingTime = 0
 	sendBuff[7] = (unsigned char)0x00;			//Reserved
-	
+
 	[self normalChecksum:sendBuff len:8];
 	
 	NSData* data = [NSData dataWithBytes:sendBuff length:8];
@@ -1299,8 +1374,9 @@ NSString* ORLabJackUE9ExpansionOptionChanged               = @"ORLabJackUE9Expan
 	sendBuff[24] = ainResolution;			//Resolution = 12
 	sendBuff[25] = 0;						//SettlingTime
 	
-	for(i = 26; i < 34; i++) sendBuff[i] = [self gainBipWord:i-6];
-
+	for(i = 26; i < 34; i++) {
+		sendBuff[i] = [self gainBipWord:i-26];
+	}
 	[self extendedChecksum:sendBuff len:34];
 	
 	NSData* data = [NSData dataWithBytes:sendBuff length:34];
@@ -1316,8 +1392,9 @@ NSString* ORLabJackUE9ExpansionOptionChanged               = @"ORLabJackUE9Expan
     sendBuff[2] = (uint8)0x06;  //Number of data words
     sendBuff[3] = (uint8)0x08;  //Extended command number
 	
-    for( i = 6; i < 18; i++ )sendBuff[i] = (uint8)(0x00);
-		
+ 	sendBuff[6] = 0x01;
+    for( i = 7; i < 18; i++ )sendBuff[i] = (uint8)(0x00);
+	
 	[self extendedChecksum:sendBuff len:18];
 	
     //Sending command to UE9
@@ -1329,7 +1406,7 @@ NSString* ORLabJackUE9ExpansionOptionChanged               = @"ORLabJackUE9Expan
 
 - (void) sendTimerCounter:(int) option
 {
-	if(clockSelection)[self setPowerLevel]; //have to do this first if the 48 MHz is used.
+	//if(clockSelection)[self setPowerLevel]; //have to do this first if the 48 MHz is used.
 
 	//Note: If using the quadrature input timer mode, the returned 32 bit
     //      integer is signed
@@ -1370,20 +1447,14 @@ NSString* ORLabJackUE9ExpansionOptionChanged               = @"ORLabJackUE9Expan
     //Sending command to UE9
 	NSData* data = [NSData dataWithBytes:sendBuff length:30];
 	[self enqueCmd:data tag:kUE9TimerCounter];
-	
 }
-- (void) changeIPNumber
-{
-    NSLog(@"Change LabJack (%d) to %@\n",[self uniqueIdNumber],[self ipAddress]);
-}
-
 
 #pragma mark •••OROrderedObjHolding Protocol
 - (int) maxNumberOfObjects	{ return 4; }
-- (int) objWidth			{ return 20; }
-- (int) groupSeparation		{ return 20; }
-
-- (NSString*) nameForSlot:(int)aSlot	{ return [NSString stringWithFormat:@"Mux80 Slot %d",aSlot]; }
+- (int) objWidth			{ return 16; }
+- (int) groupSeparation		{ return 8; }
+- (int) crateNumber			{ return 0; }
+- (NSString*) nameForSlot:(int)aSlot	{ return [NSString stringWithFormat:@"Mux80 X%d",aSlot+2]; }
 
 - (BOOL) slot:(int)aSlot excludedFor:(id)anObj { return NO;}
 
@@ -1394,33 +1465,61 @@ NSString* ORLabJackUE9ExpansionOptionChanged               = @"ORLabJackUE9Expan
 
 - (int) slotAtPoint:(NSPoint)aPoint 
 {
-	return floor(((int)aPoint.y)/[self objWidth]);
+	return floor(((int)aPoint.x)/([self objWidth]+[self groupSeparation]));
 }
 
 - (NSPoint) pointForSlot:(int)aSlot 
 {
-	return NSMakePoint(0,aSlot*[self objWidth]);
+	return NSMakePoint(aSlot*([self objWidth]+[self groupSeparation]),0);
 }
 
 - (void) place:(id)anObj intoSlot:(int)aSlot
 {
-//	[anObj setSlot: aSlot];//temp commented out until expansion cards implemented
-//	[anObj moveTo:[self pointForSlot:aSlot]];//temp commented out until expansion cards implemented
+	[anObj setSlot: aSlot];
+	[anObj moveTo:[self pointForSlot:aSlot]];
 }
 
 - (int) slotForObj:(id)anObj
 {
-//	return [anObj slot]; //temp commented out until expansion cards implemented
-    return 0;
+	return [anObj slot];
 }
 
 - (int) numberSlotsNeededFor:(id)anObj
 {
 	return [anObj numberSlotsUsed];
 }
+
+- (void) changeIPAddress:(NSString*)aNewAddress
+{
+	NSArray* ipParts = [aNewAddress componentsSeparatedByString:@"."];
+	if([ipParts count]==4){
+		[self setIpAddress:aNewAddress];
+		unsigned char sendBuff[38];
+		sendBuff[1] = (unsigned char)0x78;  //command bytes
+		sendBuff[2] = (unsigned char)0x10;  //number of data words
+		sendBuff[3] = (unsigned char)0x01;  //extended command number
+											//Rest of the command is zero'ed out. not used.
+		sendBuff[6] = 0x04;					//mask set to write the IP number
+		int i;
+		for(i = 7; i < 38; i++) sendBuff[i] = (unsigned char)(0x00);
+		
+		sendBuff[10] = [[ipParts objectAtIndex:0] intValue];
+		sendBuff[11] = [[ipParts objectAtIndex:1] intValue];
+		sendBuff[12] = [[ipParts objectAtIndex:2] intValue];
+		sendBuff[13] = [[ipParts objectAtIndex:3] intValue];
+		
+		[self extendedChecksum:sendBuff len:38];
+		
+		NSData* data = [NSData dataWithBytes:sendBuff length:38];
+		[self enqueCmd:data tag:kUE9ComCmd];
+		NSLog(@"Change LabJack (%d) to %@\n",[self uniqueIdNumber],aNewAddress);
+	}
+}
+
 @end
 
 @implementation ORLabJackUE9Model (private)
+
 - (unsigned char) numberTimersEnabled
 {
 	unsigned char count = 0;
@@ -1559,13 +1658,14 @@ NSString* ORLabJackUE9ExpansionOptionChanged               = @"ORLabJackUE9Expan
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
 }
 
-- (void) decodeSingleAdcRead:(NSData*) theData
+- (void) decodeSingleAdcRead:(NSData*)theData
 {
 	unsigned char* recBuff = (unsigned char*)[theData bytes];
 	unsigned long rawAdc = recBuff[5] + recBuff[6] * 256;
 	float voltage;
 	if([self convert:rawAdc gainBip:recBuff[4] result:&voltage]==0){
-		NSLog(@"adc(%d): %f\n",recBuff[3],voltage);
+		int adcIndex = [self adcIndexFromMuxIndex:recBuff[3]];
+		[self setAdc:adcIndex value:voltage];
 	}
 	else NSLogError(@"LabJackUE9",@"Error converting ADC result",nil);
 
@@ -1584,10 +1684,8 @@ NSString* ORLabJackUE9ExpansionOptionChanged               = @"ORLabJackUE9Expan
 			((unsigned long)recBuff[10 + 4*i]<<16) | 
 			((unsigned long)recBuff[11 + 4*i]<<24);
 		}
-		timerResult[i] = value;
-		
+		[self setTimerResult:i value:value];
     }
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackUE9ModelTimerResultChanged object:self];
 
 	for( i = 0; i < 2; i++ ){
 		unsigned long value = 0;
@@ -1599,7 +1697,6 @@ NSString* ORLabJackUE9ExpansionOptionChanged               = @"ORLabJackUE9Expan
 		}
         [self setCounter:i value:value];
     }
-	
 }
 
 - (void) decodeReadAllValues:(NSData*) theData
@@ -1614,16 +1711,18 @@ NSString* ORLabJackUE9ExpansionOptionChanged               = @"ORLabJackUE9Expan
 	unsigned long dirMask = (recBuff[6] | (recBuff[8] << 8) | ((recBuff[10]&0xf) << 16));
 	[self setDoValueIn: ~dirMask & (recBuff[7] | (recBuff[9] << 8) | ((recBuff[11]&0xf) << 16))];
 	
-	float voltage;
-	for(i = 0; i < 14; i++){
-		unsigned long rawAdc = recBuff[12 + 2*i] + recBuff[13 + 2*i] * 256;
-		
-		//getting analog voltage
-		unsigned short gainBip = 0x00;
-		if(bipolar[i]) gainBip = 0x8;
-		else gainBip = gain[i];
-		if([self convert:rawAdc gainBip:gainBip result:&voltage]==0){
-			[self setAdc:i value:voltage];
+	if([[self orcaObjects] count]==0){
+		float voltage;
+		for(i = 0; i < 14; i++){
+			unsigned long rawAdc = recBuff[12 + 2*i] + recBuff[13 + 2*i] * 256;
+			
+			//getting analog voltage
+			unsigned short gainBip = 0x00;
+			if(bipolar[i]) gainBip = 0x8;
+			else gainBip = gain[i];
+			if([self convert:rawAdc gainBip:gainBip result:&voltage]==0){
+				[self setAdc:i value:voltage];
+			}
 		}
 	}
 }

@@ -82,15 +82,14 @@ static NSString* kLabJackUE9Unit[8] = {
 	}theAdcValue;
 	
 	int i;
-	int index = 2;
-	unsigned long theTime = dataPtr[14];
-	for(i=0;i<14;i++){
+	unsigned long theTime = dataPtr[2];
+	int index = 3;
+	for(i=0;i<84;i++){
 		theAdcValue.asLong = dataPtr[index];									//encoded as float, use union to convert
 		[aDataSet loadTimeSeries:theAdcValue.asFloat										
 						  atTime:theTime
 						  sender:self 
 						withKeys:@"LabJackUE9",
-								[self getUnitKey:dataPtr[1] & 0x0000ffff],
 								[self getChannelKey:i],
 								nil];
 		index++;
@@ -108,21 +107,31 @@ static NSString* kLabJackUE9Unit[8] = {
 		unsigned long asLong;
 	}theAdcValue;
 	theString = [theString stringByAppendingFormat:@"HW ID = %d\n",dataPtr[1] & 0x0000ffff];
+	
+	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[2]];
+	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
+	theString = [theString stringByAppendingFormat:@"%@\n",date];
+	
 	int i;
-	int index = 2;
-	for(i=0;i<14;i++){
+	int index = 3;
+	for(i=0;i<84;i++){
 		theAdcValue.asLong = dataPtr[index];
 		theString = [theString stringByAppendingFormat:@"%d: %.3f\n",i,theAdcValue.asFloat];
 		index++;
 	}
-	theString = [theString stringByAppendingFormat:@"Counter = 0x%08x\n",dataPtr[index++]];
+	theString = [theString stringByAppendingFormat:@"Counter1 = 0x%08x\n",dataPtr[index++]];
+	theString = [theString stringByAppendingFormat:@"Counter2 = 0x%08x\n",dataPtr[index++]];
+	theString = [theString stringByAppendingFormat:@"Timer1 = 0x%08x\n",dataPtr[index++]];
+	theString = [theString stringByAppendingFormat:@"Timer2 = 0x%08x\n",dataPtr[index++]];
+	theString = [theString stringByAppendingFormat:@"Timer3 = 0x%08x\n",dataPtr[index++]];
+	theString = [theString stringByAppendingFormat:@"Timer4 = 0x%08x\n",dataPtr[index++]];
+	theString = [theString stringByAppendingFormat:@"Timer5 = 0x%08x\n",dataPtr[index++]];
+	theString = [theString stringByAppendingFormat:@"Timer6 = 0x%08x\n",dataPtr[index++]];
+	theString = [theString stringByAppendingFormat:@"Counter2 = 0x%08x\n",dataPtr[index++]];
 	theString = [theString stringByAppendingFormat:@"I/O Dir = 0x%08x\n",dataPtr[index++] & 0x000fffff];
 	theString = [theString stringByAppendingFormat:@"I/O Out = 0x%08x\n",dataPtr[index++] & 0x000fffff];
 	theString = [theString stringByAppendingFormat:@"I/O In  = 0x%08x\n",dataPtr[index++] & 0x000fffff];
 	
-	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[index]];
-	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
-	theString = [theString stringByAppendingFormat:@"%@\n",date];
 	
 	return theString;
 }

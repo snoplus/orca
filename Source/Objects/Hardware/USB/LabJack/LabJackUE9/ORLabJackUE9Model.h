@@ -27,16 +27,13 @@
 @class NetSocket;
 @class ORLabJackUE9Cmd;
 
-#define kUE9NumAdcs		14
+#define kUE9NumAdcs		84
 #define kUE9NumTimers	6
 #define kUE9NumIO		20
 
 #define kUE9ReadCounters	0x0
 #define kUE9UpdateCounters  0x1
 #define kUE9ResetCounters	0x2
-
-#define kLabJackUE9NoExpansion 0
-#define kLabJackUE9Mux80Option 1
 
 @interface ORLabJackUE9Model : ORGroup <OROrderedObjHolding,ORAdcProcessing,ORBitProcessing> {
 	NSOperationQueue* queue;
@@ -78,7 +75,6 @@
     unsigned short    counterEnableMask;
     int               clockSelection;
     int               clockDivisor;
-    int               expansionOption;
 	
 	double unipolarSlope[4];
 	double unipolarOffset[4];
@@ -107,8 +103,6 @@
 }
 
 #pragma mark ***Accessors
-- (int)  expansionOption;
-- (void) setExpansionOption:(int)aState;
 - (int)  clockDivisor;
 - (void) setClockDivisor:(int)aClockDivisor;
 - (int)  clockSelection;
@@ -139,6 +133,7 @@
 - (void) setCounter:(int)i value:(unsigned long)aValue;
 - (unsigned long) timer:(int)i;
 - (unsigned long) timerResult:(int)i;
+- (void) setTimerResult:(int)i value:(unsigned long)aValue;
 - (void) setTimer:(int)i value:(unsigned long)aValue;
 - (NSString*) channelName:(int)i;
 - (void) setChannel:(int)i name:(NSString*)aName;
@@ -197,32 +192,32 @@
 - (void) netsocketConnected:(NetSocket*)inNetSocket;
 - (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(unsigned)inAmount;
 - (void) netsocketDisconnected:(NetSocket*)inNetSocket;
-- (void) changeIPNumber;
 
 #pragma mark ***HW Access
 - (void) resetCounter;
-- (void) queryAll;
-- (void) pollHardware;
-- (void) pollHardware:(BOOL)force;
-
-#pragma mark ***Archival
-- (id)   initWithCoder:(NSCoder*)decoder;
-- (void) encodeWithCoder:(NSCoder*)encoder;
-
 - (void) sendComCmd;
 - (void) getCalibrationInfo:(int)block;
 - (void) readSingleAdc:(int)aChan;
 - (void) readAllValues;
 - (void) sendTimerCounter:(int)opt;
 - (void) setPowerLevel;
+- (void) queryAll;
+- (void) pollHardware;
+- (void) pollHardware:(BOOL)force;
+- (void) changeIPAddress:(NSString*)aNewAddress;
+- (void) readAdcsForMux:(int)aMuxSlot;
+
+#pragma mark ***Archival
+- (id)   initWithCoder:(NSCoder*)decoder;
+- (void) encodeWithCoder:(NSCoder*)encoder;
 
 - (void) goToNextCommand;
 - (void) processOneCommandFromQueue;
 - (void) startTimeOut;
 
 #pragma mark •••Adc Processing Protocol
-- (void)processIsStarting;
-- (void)processIsStopping;
+- (void) processIsStarting;
+- (void) processIsStopping;
 - (void) startProcessCycle;
 - (void) endProcessCycle;
 - (BOOL) processValue:(int)channel;
@@ -232,14 +227,18 @@
 - (double) convertedValue:(int)channel;
 - (double) maxValueForChan:(int)channel;
 
+- (int) muxIndexFromAdcIndex:(int)adcIndex;
+- (int) adcIndexFromMuxIndex:(int)muxIndex;
+
 #pragma mark •••OROrderedObjHolding Protocol
 - (int) maxNumberOfObjects;
-- (int) objWidth;
-- (BOOL) slot:(int)aSlot excludedFor:(id)anObj;
+- (int) objWidth;	
+- (int) groupSeparation;
 - (NSString*) nameForSlot:(int)aSlot;
+- (BOOL) slot:(int)aSlot excludedFor:(id)anObj;
 - (NSRange) legalSlotsForObj:(id)anObj;
 - (int) slotAtPoint:(NSPoint)aPoint; 
-- (NSPoint) pointForSlot:(int)aSlot;
+- (NSPoint) pointForSlot:(int)aSlot; 
 - (void) place:(id)anObj intoSlot:(int)aSlot;
 - (int) slotForObj:(id)anObj;
 - (int) numberSlotsNeededFor:(id)anObj;
@@ -280,7 +279,6 @@ extern NSString* ORLabJackUE9TimerChanged;
 extern NSString* ORLabJackUE9BipolarChanged;
 extern NSString* ORLabJackUE9ModelCounterEnableMaskChanged;
 extern NSString* ORLabJackUE9ModelTimerResultChanged;
-extern NSString* ORLabJackUE9ExpansionOptionChanged;
 
 @interface ORLabJackUE9Cmd : NSObject
 {

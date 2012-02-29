@@ -18,9 +18,12 @@
 //-------------------------------------------------------------
 #import "ORLabJackUE9Model.h"
 
+@class ORCardContainerView;
+
 @interface ORLabJackUE9Controller : OrcaObjectController 
 {
-	IBOutlet NSMatrix*      expansionOptionMatrix;
+	IBOutlet ORCardContainerView* groupView;
+
 	IBOutlet NSButton*      changeIPNumberButton;
 	IBOutlet NSTextField*	ipConnectedTextField;
 	IBOutlet NSTextField*	clockDivisorField;
@@ -102,6 +105,9 @@
 	IBOutlet NSPopUpButton*		timerOptionPU5;
     IBOutlet NSView*                 mux80View;
 
+	IBOutlet NSPanel*				ipChangePanel;
+	IBOutlet NSTextField*			newIpAddressField;
+	
 	NSPopUpButton* gainPU[kUE9NumAdcs];
 	NSPopUpButton* bipolarPU[kUE9NumAdcs];
 	NSPopUpButton* timerOptionPU[kUE9NumTimers];
@@ -118,7 +124,7 @@
 - (void) updateButtons;
 
 #pragma mark ***Interface Management
-- (void) expansionOptionChanged:(NSNotification*)aNote;
+-(void) groupChanged:(NSNotification*)note;
 - (void) clockDivisorChanged:(NSNotification*)aNote;
 - (void) counterEnableMaskChanged:(NSNotification*)aNote;
 - (void) clockSelectionChanged:(NSNotification*)aNote;
@@ -151,8 +157,7 @@
 - (void) minValueChanged:(NSNotification*)aNote;
 - (void) maxValueChanged:(NSNotification*)aNote;
 - (void) timerResultChanged:(NSNotification*)aNote;
-- (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;
-- (void) _changeIPNumberDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info;
+- (void) tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;
 
 #pragma mark •••Actions
 - (IBAction) clockDivisorAction:(id)sender;
@@ -189,8 +194,10 @@
 - (IBAction) bipolarAction:(id)sender;
 - (IBAction) gainAction:(id)sender;
 - (IBAction) initTimersAction:(id)sender;
-- (IBAction) expansionOptionAction:(id)sender;
 - (IBAction) changeIPNumber:(id)sender;
+
+- (IBAction) openIPChangePanel:(id)sender;
+- (IBAction) closeIPChangePanel:(id)sender;
 
 @end
 

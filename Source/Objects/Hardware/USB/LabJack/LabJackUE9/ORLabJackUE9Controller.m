@@ -19,6 +19,7 @@
 
 #import "ORLabJackUE9Controller.h"
 #import "ORLabJackUE9Model.h"
+#import "ORCardContainerView.h"
 
 @implementation ORLabJackUE9Controller
 - (id) init
@@ -35,6 +36,8 @@
 
 - (void) awakeFromNib
 {
+	[groupView setGroup:model];
+
 	NSNumberFormatter *numberFormatter2 = [[[NSNumberFormatter alloc] init] autorelease];
 	[numberFormatter2 setFormat:@"#0.00"];
 	
@@ -319,11 +322,27 @@
                          name : ORLabJackUE9ModelClockDivisorChanged
 						object: model];
 
+	[notifyCenter addObserver : self
+                     selector : @selector(groupChanged:)
+                         name : ORGroupObjectsAdded
+                       object : nil];
+	
     [notifyCenter addObserver : self
-                     selector : @selector(expansionOptionChanged:)
-                         name : ORLabJackUE9ExpansionOptionChanged
-						object: model];
-
+                     selector : @selector(groupChanged:)
+                         name : ORGroupObjectsRemoved
+                       object : nil];
+	
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(groupChanged:)
+                         name : ORGroupSelectionChanged
+                       object : nil];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(groupChanged:)
+                         name : OROrcaObjectMoved
+                       object : nil];
+	
 }
 
 
@@ -362,22 +381,26 @@
 	[self timerChanged:nil];
 	[self timerResultChanged:nil];
 	[self clockDivisorChanged:nil];
-	[self expansionOptionChanged:nil];
+    [groupView setNeedsDisplay:YES];
 }
 
-- (void) expansionOptionChanged:(NSNotification*)aNote
+-(void) groupChanged:(NSNotification*)note
 {
-	[expansionOptionMatrix selectCellWithTag: [model expansionOption]];
-    if([model expansionOption] == kLabJackUE9Mux80Option){
-        [[[self  window] contentView] addSubview:mux80View];
-        [mux80View setAutoresizingMask:NSViewMaxXMargin|NSViewMaxYMargin];
-        [mux80View setFrameOrigin:NSMakePoint(80,140)];
-    }
-    else {
-        [mux80View removeFromSuperview];   
-    }
-    [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
+	if(note == nil || [note object] == model || [[note object] guardian] == model){
+		[model setUpImage];
+		[self updateWindow];
+	}
+}
 
+- (ORCardContainerView *)groupView
+{
+    return [self groupView];
+}
+
+- (void) setModel:(OrcaObject*)aModel
+{
+    [super setModel:aModel];
+    [groupView setGroup:(ORGroup*)model];
 }
 
 - (void) clockDivisorChanged:(NSNotification*)aNote
@@ -447,21 +470,13 @@
 
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
 {
-    //[[self window] setContentView:blankView];
-    [tabView setHidden:YES];
-    if([model expansionOption] == kLabJackUE9Mux80Option){
-        [self resizeWindowToSize:mux80Size];
-    }
-    else {
-        switch([tabView indexOfTabViewItem:tabViewItem]){
-            case  0: [self resizeWindowToSize:ioSize];     break;
-            case  1: [self resizeWindowToSize:timersSize];     break;
-            default: [self resizeWindowToSize:setupSize];	    break;
-        }
-    }
-
-    //[[self window] setContentView:totalView];
-	if([model expansionOption]==kLabJackUE9NoExpansion) [tabView setHidden:NO];
+    [[self window] setContentView:blankView];
+	switch([tabView indexOfTabViewItem:tabViewItem]){
+		case  0: [self resizeWindowToSize:ioSize];     break;
+		case  1: [self resizeWindowToSize:timersSize];     break;
+		default: [self resizeWindowToSize:setupSize];	    break;
+	}
+    [[self window] setContentView:totalView];
 
     NSString* key = [NSString stringWithFormat: @"orca.ORLabJac%d.selectedtab",[model uniqueIdNumber]];
     int index = [tabView indexOfTabViewItem:tabViewItem];
@@ -781,8 +796,7 @@
 	[aOut1Field			setEnabled:!lockedOrRunningMaintenance];
 	[initTimersButton	setEnabled:!lockedOrRunningMaintenance];
 	[clockDivisorField	setEnabled:!lockedOrRunningMaintenance];
-	[changeIPNumberButton setEnabled:!locked && ![model isConnected]];
-	[expansionOptionMatrix setEnabled:!locked];
+	//[changeIPNumberButton setEnabled:!locked && ![model isConnected]];
     
 	int i;
 	for(i=0;i<kUE9NumAdcs;i++){
@@ -975,31 +989,25 @@
 	[model setTimer:[[sender selectedCell] tag] value:[sender intValue]];
 }
 
-- (IBAction) expansionOptionAction:(id)sender
-{
-    [model setExpansionOption:[[expansionOptionMatrix selectedCell]tag]];
-}
-
 - (IBAction) changeIPNumber:(id)sender
 {
     [self endEditing];
-    NSBeginAlertSheet([NSString stringWithFormat:@"Change IP number to %@",[model ipAddress]],
-					  @"YES/Do it NOW",
-					  @"Canel",
-					  nil,
-					  [self window],
-					  self,
-					  @selector(_changeIPNumberDidEnd:returnCode:contextInfo:),
-					  nil,
-					  nil,
-					  @"Really Change the IP number?");
+	[model changeIPAddress:[newIpAddressField stringValue]];
+    [ipChangePanel orderOut:nil];
+    [NSApp endSheet:ipChangePanel];
 }
 
-- (void) _changeIPNumberDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info
+- (IBAction) openIPChangePanel:(id)sender
 {
-	if(returnCode == NSAlertDefaultReturn){
-        [model changeIPNumber];
-	}
+	[self endEditing];
+    [NSApp beginSheet:ipChangePanel modalForWindow:[self window]
+		modalDelegate:self didEndSelector:NULL contextInfo:nil];
+}
+
+- (IBAction) closeIPChangePanel:(id)sender
+{
+    [ipChangePanel orderOut:nil];
+    [NSApp endSheet:ipChangePanel];
 }
 
 
