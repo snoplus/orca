@@ -98,7 +98,7 @@
 
 - (void) slotChanged:(NSNotification*)aNotification
 {
-	[[self window] setTitle:[NSString stringWithFormat:@"ADVME1314 (%@)",[model identifier]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"ADVME1314 (Slot: %d)",[model slot]]];
 }
 
 -(void)writeMaskChanged:(NSNotification*)aNotification
@@ -181,7 +181,7 @@
 -(IBAction)writeMaskHexAction:(id)sender
 {
     ADVME1314ChannelDat dat = [model writeMask];
-    if([[sender selectedCell] intValue] != dat.channelDat[[sender tag]]){
+    if([[sender selectedCell] intValue] != dat.channelDat[[[sender selectedCell] tag]]){
         [[self undoManager] setActionName: @"Set ADVME 1314 Write Mask"];
         dat.channelDat[[[sender selectedCell] tag]] = [[sender selectedCell] intValue];
         [model setWriteMask:dat];
@@ -210,7 +210,7 @@
 -(IBAction)writeValueHexAction:(id)sender
 {
     ADVME1314ChannelDat dat = [model writeValue];
-    if([[sender selectedCell] intValue] != dat.channelDat[[sender tag]]){
+    if([[sender selectedCell] intValue] != dat.channelDat[[[sender selectedCell] tag]]){
         [[self undoManager] setActionName: @"Set ADVME 1314 Write Value"];
         dat.channelDat[[[sender selectedCell] tag]] = [[sender selectedCell] intValue];
         [model setWriteValue:dat];        

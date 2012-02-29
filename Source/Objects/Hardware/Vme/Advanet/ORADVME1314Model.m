@@ -1,5 +1,5 @@
 //
-//  ORADVME1314Model.cp
+//  ORADVME1314Model.m
 //  Orca
 //
 //  Created by Michael Marino on Mon 6 Feb 2012 
@@ -188,7 +188,7 @@ NSString* ORADVME1314WriteValueChangedNotification		= @"ADVME1314 WriteValue Cha
     for (chanBlock=0; chanBlock<kADVME1314Number32ChannelSets; chanBlock++) {    
         NSLogFont(font,@"  [0x%8x]: \n",writeMask.channelDat[chanBlock]);
     }    
-    NSLogFont(font,@"  I/O State:\n");    
+    NSLogFont(font,@"  I/O Hardware State:\n");    
     for (chanBlock=0; chanBlock<kADVME1314Number32ChannelSets; chanBlock++) {    
         NSLogFont(font,@"  [0x%8x]: \n",currentState.channelDat[chanBlock]);
     }
@@ -303,7 +303,7 @@ static NSString *ORADVME1314WriteValue 		= @"ADVME1314 WriteValue";
 
 - (NSString*) processingTitle
 {
-    return [NSString stringWithFormat:@"%d,%d,%@",[self crateNumber],[self slot],[self identifier]];
+    return [NSString stringWithFormat:@"ADVME 1314 %d,%d",[self crateNumber],[self slot]];
 }
 
 @end
