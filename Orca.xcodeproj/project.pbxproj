@@ -2298,6 +2298,14 @@
 		84D791420FFA4CD000DC81D2 /* ORKeithley6487Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D7913A0FFA4CD000DC81D2 /* ORKeithley6487Model.m */; };
 		84D79B860FFD347400DC81D2 /* leftBug.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84D79B850FFD347400DC81D2 /* leftBug.tif */; };
 		84D852E60BE171AF00290BDC /* ORCARootServiceDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D852E50BE171AE00290BDC /* ORCARootServiceDefs.h */; };
+		84D8554614FBDCF100C70A00 /* LabJackUE9Mux80Big.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84D8554514FBDCF100C70A00 /* LabJackUE9Mux80Big.tif */; };
+		84D8555F14FBDEDA00C70A00 /* CB37.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84D8555814FBDEDA00C70A00 /* CB37.nib */; };
+		84D8556014FBDEDA00C70A00 /* CB37.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84D8555914FBDEDA00C70A00 /* CB37.tif */; };
+		84D8556114FBDEDA00C70A00 /* CB37Big.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84D8555A14FBDEDA00C70A00 /* CB37Big.tif */; };
+		84D8556214FBDEDA00C70A00 /* ORCB37Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D8555B14FBDEDA00C70A00 /* ORCB37Controller.h */; };
+		84D8556314FBDEDA00C70A00 /* ORCB37Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D8555C14FBDEDA00C70A00 /* ORCB37Controller.m */; };
+		84D8556414FBDEDA00C70A00 /* ORCB37Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D8555D14FBDEDA00C70A00 /* ORCB37Model.h */; };
+		84D8556514FBDEDA00C70A00 /* ORCB37Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D8555E14FBDEDA00C70A00 /* ORCB37Model.m */; };
 		84D8565C12B1702400660530 /* edu.washington.npl.orca.Monspectrometer.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84D8565112B1702400660530 /* edu.washington.npl.orca.Monspectrometer.plist */; };
 		84D8565D12B1702400660530 /* monSpecHolder.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84D8565212B1702400660530 /* monSpecHolder.tif */; };
 		84D8565F12B1702400660530 /* Monspectrometer.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84D8565412B1702400660530 /* Monspectrometer.nib */; };
@@ -5026,6 +5034,14 @@
 		84D7913A0FFA4CD000DC81D2 /* ORKeithley6487Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORKeithley6487Model.m; path = Source/Objects/Hardware/Serial/Keithley6487/ORKeithley6487Model.m; sourceTree = SOURCE_ROOT; };
 		84D79B850FFD347400DC81D2 /* leftBug.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = leftBug.tif; path = "Source/Widgets/Bar Graph/leftBug.tif"; sourceTree = SOURCE_ROOT; };
 		84D852E50BE171AE00290BDC /* ORCARootServiceDefs.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORCARootServiceDefs.h; path = "Source/Main Dialogs/ORCARootService/ORCARootServiceDefs.h"; sourceTree = SOURCE_ROOT; };
+		84D8554514FBDCF100C70A00 /* LabJackUE9Mux80Big.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = LabJackUE9Mux80Big.tif; path = Source/Objects/Hardware/USB/LabJack/LabJackUE9/LabJackUE9Mux80Big.tif; sourceTree = SOURCE_ROOT; };
+		84D8555814FBDEDA00C70A00 /* CB37.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = CB37.nib; path = Source/Objects/Hardware/USB/LabJack/LabJackUE9/CB37/CB37.nib; sourceTree = SOURCE_ROOT; };
+		84D8555914FBDEDA00C70A00 /* CB37.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = CB37.tif; path = Source/Objects/Hardware/USB/LabJack/LabJackUE9/CB37/CB37.tif; sourceTree = SOURCE_ROOT; };
+		84D8555A14FBDEDA00C70A00 /* CB37Big.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = CB37Big.tif; path = Source/Objects/Hardware/USB/LabJack/LabJackUE9/CB37/CB37Big.tif; sourceTree = SOURCE_ROOT; };
+		84D8555B14FBDEDA00C70A00 /* ORCB37Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCB37Controller.h; path = Source/Objects/Hardware/USB/LabJack/LabJackUE9/CB37/ORCB37Controller.h; sourceTree = SOURCE_ROOT; };
+		84D8555C14FBDEDA00C70A00 /* ORCB37Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCB37Controller.m; path = Source/Objects/Hardware/USB/LabJack/LabJackUE9/CB37/ORCB37Controller.m; sourceTree = SOURCE_ROOT; };
+		84D8555D14FBDEDA00C70A00 /* ORCB37Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCB37Model.h; path = Source/Objects/Hardware/USB/LabJack/LabJackUE9/CB37/ORCB37Model.h; sourceTree = SOURCE_ROOT; };
+		84D8555E14FBDEDA00C70A00 /* ORCB37Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCB37Model.m; path = Source/Objects/Hardware/USB/LabJack/LabJackUE9/CB37/ORCB37Model.m; sourceTree = SOURCE_ROOT; };
 		84D8565112B1702400660530 /* edu.washington.npl.orca.Monspectrometer.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = edu.washington.npl.orca.Monspectrometer.plist; path = Source/Experiments/Monspectrometer/edu.washington.npl.orca.Monspectrometer.plist; sourceTree = SOURCE_ROOT; };
 		84D8565212B1702400660530 /* monSpecHolder.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = monSpecHolder.tif; path = Source/Experiments/Monspectrometer/monSpecHolder.tif; sourceTree = SOURCE_ROOT; };
 		84D8565412B1702400660530 /* Monspectrometer.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Monspectrometer.nib; path = Source/Experiments/Monspectrometer/Monspectrometer.nib; sourceTree = SOURCE_ROOT; };
@@ -8151,6 +8167,7 @@
 			isa = PBXGroup;
 			children = (
 				8475EC311475A66F003A165D /* LabJackUE9.nib */,
+				84D8554514FBDCF100C70A00 /* LabJackUE9Mux80Big.tif */,
 				84BF7EC414FA76BF00B6D3A3 /* LabJackUE9Mux80.tif */,
 				8475EC321475A66F003A165D /* LabJackUE9.tif */,
 				8475EC341475A66F003A165D /* ORLabJackUE9Controller.h */,
@@ -8159,6 +8176,7 @@
 				8475EC371475A66F003A165D /* ORLabJackUE9Decoders.m */,
 				8475EC381475A66F003A165D /* ORLabJackUE9Model.h */,
 				8475EC391475A66F003A165D /* ORLabJackUE9Model.m */,
+				84D8555714FBDEDA00C70A00 /* CB37 */,
 			);
 			name = LabJackUE9;
 			path = Source/Objects/Hardware/USB/LabJack/LabJackUE9;
@@ -10565,6 +10583,21 @@
 			path = Source/Objects/Hardware/Serial/Keithley6487;
 			sourceTree = SOURCE_ROOT;
 		};
+		84D8555714FBDEDA00C70A00 /* CB37 */ = {
+			isa = PBXGroup;
+			children = (
+				84D8555814FBDEDA00C70A00 /* CB37.nib */,
+				84D8555914FBDEDA00C70A00 /* CB37.tif */,
+				84D8555A14FBDEDA00C70A00 /* CB37Big.tif */,
+				84D8555B14FBDEDA00C70A00 /* ORCB37Controller.h */,
+				84D8555C14FBDEDA00C70A00 /* ORCB37Controller.m */,
+				84D8555D14FBDEDA00C70A00 /* ORCB37Model.h */,
+				84D8555E14FBDEDA00C70A00 /* ORCB37Model.m */,
+			);
+			name = CB37;
+			path = Source/Objects/Hardware/USB/LabJack/LabJackUE9/CB37;
+			sourceTree = SOURCE_ROOT;
+		};
 		84D8565012B1702400660530 /* Monspectrometer */ = {
 			isa = PBXGroup;
 			children = (
@@ -12692,6 +12725,8 @@
 				B38DEE4A14E02B40003914FF /* ORADVME1314Controller.h in Headers */,
 				B38DEE4C14E02B40003914FF /* ORADVME1314Model.h in Headers */,
 				225D4F4D14E9E4B3009FF60F /* SNOConnection.h in Headers */,
+				84D8556214FBDEDA00C70A00 /* ORCB37Controller.h in Headers */,
+				84D8556414FBDEDA00C70A00 /* ORCB37Model.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13500,6 +13535,10 @@
 				B38DEE4914E02B40003914FF /* ADVME1314.nib in Resources */,
 				225D4F4C14E9E4B3009FF60F /* portForwardScript in Resources */,
 				84BF7EC514FA76BF00B6D3A3 /* LabJackUE9Mux80.tif in Resources */,
+				84D8554614FBDCF100C70A00 /* LabJackUE9Mux80Big.tif in Resources */,
+				84D8555F14FBDEDA00C70A00 /* CB37.nib in Resources */,
+				84D8556014FBDEDA00C70A00 /* CB37.tif in Resources */,
+				84D8556114FBDEDA00C70A00 /* CB37Big.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14413,6 +14452,8 @@
 				B38DEE4B14E02B40003914FF /* ORADVME1314Controller.m in Sources */,
 				B38DEE4D14E02B40003914FF /* ORADVME1314Model.m in Sources */,
 				225D4F4E14E9E4B3009FF60F /* SNOConnection.m in Sources */,
+				84D8556314FBDEDA00C70A00 /* ORCB37Controller.m in Sources */,
+				84D8556514FBDEDA00C70A00 /* ORCB37Model.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
