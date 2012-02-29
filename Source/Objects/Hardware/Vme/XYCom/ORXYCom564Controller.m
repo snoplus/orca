@@ -56,7 +56,7 @@ typedef enum {
     
     settingsSize       = NSMakeSize(360,540);
     gainsSize          = NSMakeSize(440,550);
-    channelReadoutSize = NSMakeSize(540,450);    
+    channelReadoutSize = NSMakeSize(540,470);    
     
     blankView = [[NSView alloc] init];
     
@@ -139,7 +139,12 @@ typedef enum {
     [notifyCenter addObserver:self
 					 selector:@selector(shipRecordsChanged:)
 						 name:ORXYCom564ShipRecordsChanged
-					   object:model];         
+					   object:model];  
+    
+    [notifyCenter addObserver:self
+					 selector:@selector(averagingValueChanged:)
+						 name:ORXYCom564AverageValueNumberHasChanged
+					   object:model];      
 }
 
 
@@ -157,7 +162,8 @@ typedef enum {
     [self pollingActivityChanged:nil]; 
     [self pollingStateChanged:nil];
     [self shipRecordsChanged:nil];    
-    [self autoscanModeChanged:nil];    
+    [self autoscanModeChanged:nil]; 
+    [self averagingValueChanged:nil];
 }
 #pragma mark •••Interface Management
 
@@ -262,6 +268,11 @@ typedef enum {
 - (void) displayRawChanged:(NSNotification*)aNote
 {
     [adcCountsAndChannels reloadData];
+}
+
+- (void) averagingValueChanged:(NSNotification *)aNote
+{
+    [averagingValue setIntValue:[model averageValueNumber]];
 }
 
 #pragma mark •••Actions
@@ -407,6 +418,11 @@ typedef enum {
 - (IBAction) setShipRecordsAction:(id)sender
 {
     [model setShipRecords:[sender state]];
+}
+
+- (IBAction) setAverageValueAction:(id)sender
+{
+    [model setAverageValueNumber:[sender intValue]];
 }
 
 #pragma mark ***Misc Helpers

@@ -33,6 +33,7 @@ NSString* ORXYCom564PollingStateChanged     = @"ORXYCom564PollingStateChanged";
 NSString* ORXYCom564ADCValuesChanged        = @"ORXYCom564ADCValuesChanged";
 NSString* ORXYCom564PollingActivityChanged  = @"ORXYCom564PollingActivityChanged"; 
 NSString* ORXYCom564ShipRecordsChanged      = @"ORXYCom564ShipRecordsChanged";
+NSString* ORXYCom564AverageValueNumberHasChanged = @"ORXYCom564AverageValueNumberHasChanged";
 
 @interface ORXYCom564Model (private)
 - (void) _setChannelGains:(NSMutableArray*)gains;
@@ -42,6 +43,8 @@ NSString* ORXYCom564ShipRecordsChanged      = @"ORXYCom564ShipRecordsChanged";
 - (void) _pollAllChannels;
 - (void) _setChannelADCValues:(NSMutableArray*)vals withNotify:(BOOL)notify;
 - (void) _shipRawValues:(ORDataPacket*)dataPacket;
+- (void) _addAverageValues:(NSArray*)vals;
+- (void) _setAverageADCValues:(uint32_t*)array withLength:(int)length;
 @end
 
 @implementation ORXYCom564Model
@@ -71,6 +74,46 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 };
 
 #pragma mark ***Private
+- (void) _addAverageValues:(NSArray *)vals
+{
+    if (vals == nil) return;
+    uint32_t* averageValPtr = nil;
+    if (chanADCAverageValsCache == nil) chanADCAverageValsCache = [[NSMutableData data] retain];
+    if ([chanADCAverageValsCache length]/sizeof(*averageValPtr) != [vals count]) {
+        
+        [chanADCAverageValsCache setLength:[vals count]*sizeof(*averageValPtr)];
+        averageValPtr = (uint32_t*)[chanADCAverageValsCache mutableBytes];
+        memset(averageValPtr, 0, [chanADCAverageValsCache length]); 
+        currentAverageState = 0;
+    }
+    averageValPtr = (uint32_t*)[chanADCAverageValsCache mutableBytes];
+    int i;
+    for (i=0;i<[vals count];i++) {
+        averageValPtr[i] += (uint16_t)[[vals objectAtIndex:i] intValue];
+    }
+    currentAverageState++;
+    if (currentAverageState == averageValueNumber) {
+        for (i=0;i<[vals count];i++) {
+            averageValPtr[i] /= averageValueNumber;
+        }        
+        [self _setAverageADCValues:averageValPtr withLength:[vals count]];
+        memset(averageValPtr, 0, [chanADCAverageValsCache length]);
+        currentAverageState = 0;
+    }
+    
+    
+}
+
+- (void) _setAverageADCValues:(uint32_t *)array withLength:(int)length
+{
+    if (chanADCAverageVals == nil) chanADCAverageVals = [[NSMutableArray array] retain];
+    [chanADCAverageVals removeAllObjects];
+    int i;
+    for (i=0;i<length;i++) {
+        [chanADCAverageVals addObject:[NSNumber numberWithInt:array[i]]];
+    }
+}
+
 - (void) _setChannelGains:(NSMutableArray *)gains
 {
     [gains retain];
@@ -124,14 +167,17 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     [self setAutoscanMode:k0to64];   
     [self _stopPolling];
     [self setPollingState:0.0];
-    [[self undoManager] enableUndoRegistration];    
+    [[self undoManager] enableUndoRegistration]; 
+    [self setAverageValueNumber:1];
     return self;
 }
 
 - (void) dealloc 
 {
     [channelGains release];
-    [chanADCVals release];    
+    [chanADCVals release];
+    [chanADCAverageVals release];
+    [chanADCAverageValsCache release];  
 	[self _stopPolling];    
     [super dealloc];
 }
@@ -316,7 +362,22 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 {
     return [[channelGains objectAtIndex:aChannel] intValue];
 }
-    
+ 
+- (int) averageValueNumber
+{
+    return averageValueNumber;
+}
+
+- (void) setAverageValueNumber:(int)aValue
+{
+    if (aValue == averageValueNumber) return;
+    if (aValue < 1) aValue = 1;
+    averageValueNumber = aValue;
+    [chanADCAverageValsCache setLength:0];
+    [[NSNotificationCenter defaultCenter]
+	 postNotificationName:ORXYCom564AverageValueNumberHasChanged
+	 object:self];    
+}
     
 - (void) write:(uint8_t) aval atRegisterIndex:(EXyCom564Registers)index;
 {
@@ -415,6 +476,12 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     return [[chanADCVals objectAtIndex:chan] intValue];
 }
 
+- (uint16_t) getAdcAverageValueAtChannel:(int)chan
+{
+    if (chan >= [chanADCAverageVals count]) return 0;    
+    return [[chanADCAverageVals objectAtIndex:chan] intValue];    
+}
+
 - (EXyCom564ReadoutMode) readoutMode
 {
     assert([self addressModifier] == 0x29 || [self addressModifier] == 0x39);
@@ -493,6 +560,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
             [chanADCVals replaceObjectAtIndex:i withObject:[NSNumber numberWithShort:readOut[i]]];            
         }
     }
+    [self _addAverageValues:chanADCVals];
     [self _setChannelADCValues:chanADCVals withNotify:!isRunning];
     
 }
@@ -736,7 +804,8 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     } else {
         [self setReadoutMode:kA24];
     }
-    [self setOperationMode:[decoder decodeIntForKey:@"kORXYCom564OperationMode"]];    
+    [self setOperationMode:[decoder decodeIntForKey:@"kORXYCom564OperationMode"]];
+    [self setAverageValueNumber:[decoder decodeIntForKey:@"kORXYCom564AvgValNumber"]];    
     [self setAutoscanMode:[decoder decodeIntForKey:@"kORXYCom564AutoscanMode"]];
     [self setPollingState:[decoder decodeDoubleForKey:@"kORXYCom564PollingState"]]; 
     [self setShipRecords:[decoder decodeBoolForKey:@"kORXYCom564ShipRecords"]];     
@@ -751,6 +820,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     [encoder encodeObject:channelGains forKey:@"kORXYCom564chanGains"];
     [encoder encodeInt:[self operationMode] forKey:@"kORXYCom564OperationMode"];    
     [encoder encodeInt:[self autoscanMode] forKey:@"kORXYCom564AutoscanMode"];
+    [encoder encodeInt:[self averageValueNumber] forKey:@"kORXYCom564AvgValNumber"];        
     [encoder encodeDouble:pollingState forKey:@"kORXYCom564PollingState"];        
     [encoder encodeObject:chanADCVals forKey:@"kORXYCom564chanADCValues"]; 
     [encoder encodeBool:shipRecords forKey:@"kORXYCom564ShipRecords"];

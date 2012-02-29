@@ -80,9 +80,13 @@ typedef enum {
     BOOL                   shipRecords;    
     NSTimeInterval         pollingState;
     BOOL                   pollRunning;
+    BOOL                   isRunning;    
     NSMutableArray*        channelGains;
     NSMutableArray*        chanADCVals; 
-    BOOL                   isRunning;
+    NSMutableArray*        chanADCAverageVals;
+    NSMutableData*         chanADCAverageValsCache;
+    int                    averageValueNumber;
+    int                    currentAverageState;
 }
 #pragma mark ***Initialization
 - (id) init;
@@ -103,6 +107,8 @@ typedef enum {
 - (void)                    setPollingState:(NSTimeInterval)aState;
 - (BOOL)                    shipRecords;
 - (void)                    setShipRecords:(BOOL)ship;
+- (int) averageValueNumber;
+- (void) setAverageValueNumber:(int)aValue;
 
 #pragma mark •••Hardware Access
 - (void) read:(uint8_t*) aval atRegisterIndex:(EXyCom564Registers)index; 
@@ -113,6 +119,7 @@ typedef enum {
 - (EXyCom564ChannelGain) getGain:(unsigned short) aChannel;
 - (void) readAllAdcChannels;
 - (uint16_t) getAdcValueAtChannel:(int)chan;
+- (uint16_t) getAdcAverageValueAtChannel:(int)chan;
 - (BOOL) isPolling;
 
 - (void) initBoard;
@@ -162,3 +169,4 @@ extern NSString* ORXYCom564PollingStateChanged;
 extern NSString* ORXYCom564PollingActivityChanged;
 extern NSString* ORXYCom564ADCValuesChanged;
 extern NSString* ORXYCom564ShipRecordsChanged;
+extern NSString* ORXYCom564AverageValueNumberHasChanged;

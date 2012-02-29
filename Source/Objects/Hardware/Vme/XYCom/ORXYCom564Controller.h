@@ -69,6 +69,7 @@
     IBOutlet NSTableView*   adcCountsAndChannels;
     
     IBOutlet NSTextField*	pollingState;
+    IBOutlet NSTextField*	averagingValue;    
     
     NSView *blankView;
     NSSize settingsSize;
@@ -94,6 +95,7 @@
 - (void) pollingStateChanged:(NSNotification*)aNote;
 - (void) pollingActivityChanged:(NSNotification*)aNote;
 - (void) shipRecordsChanged:(NSNotification*)aNote;
+- (void) averagingValueChanged:(NSNotification*)aNote;
 - (void) updateRegisterDescription:(short) aRegisterIndex;
 
 #pragma mark •••Actions
@@ -106,6 +108,7 @@
 - (IBAction) selectAutoscanModeAction:(id) aSender;
 - (IBAction) setPollingAction:(id)sender;
 - (IBAction) startPollingActivityAction:(id)sender;
+- (IBAction) setAverageValueAction:(id)sender;
 - (IBAction) setShipRecordsAction:(id)sender;
 
 - (IBAction) read: (id) pSender;
