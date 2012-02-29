@@ -293,6 +293,7 @@
 
 - (BOOL) shipSummedWaveform;
 - (void) setShipSummedWaveform:(BOOL)aState;
+- (NSString*) energyBufferAssignment;
 
 - (short) gtMask;
 - (void) setGtMask:(long)aMask;

@@ -68,6 +68,7 @@
 	IBOutlet NSTextField*	lemoInAssignmentsField;
 	IBOutlet NSPopUpButton* lemoOutModePU;
 	IBOutlet NSTextField*	lemoOutAssignmentsField;
+	IBOutlet NSTextField*	energyBufferAssignmentField;
 	IBOutlet NSTextField*	runSummaryField;
 
 	//base address

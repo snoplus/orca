@@ -1094,6 +1094,15 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 		//[self setEnergySampleStartIndex2:1];
 	}
 }
+- (NSString*) energyBufferAssignment
+{
+	if(shipSummedWaveform == YES){
+		return @"Post-Trig Samples:";
+	}
+	else {
+		return @"Start Indexes:";
+	}
+}
 
 - (short) gtMask { return gtMask; }
 - (BOOL) gt:(short)chan	 { return gtMask & (1<<chan); }

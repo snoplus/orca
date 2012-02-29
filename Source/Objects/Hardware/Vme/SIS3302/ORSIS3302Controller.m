@@ -821,6 +821,7 @@
 		[energySampleStartIndex1Field setEnabled:NO];
 	}
 	[self settingsLockChanged:nil];
+	[energyBufferAssignmentField setStringValue: [model energyBufferAssignment]];
 	[runSummaryField setStringValue: [model runSummary]];
 }
 
