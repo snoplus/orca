@@ -22,6 +22,11 @@
 @class ORSerialPort;
 @class ORTimeRate;
 
+#define kLakeShore210Kelvin		0
+#define kLakeShore210Centigrade 1
+#define kLakeShore210Raw		2
+
+
 @interface ORLakeShore210Model : OrcaObject
 {
     @private
@@ -34,14 +39,13 @@
 		float		    temp[8];
 		unsigned long	timeMeasured[8];
 		int				pollTime;
-		BOOL			degreesInKelvin;
+		int				unitsType;
         NSMutableString*       buffer;
 		BOOL			shipTemperatures;
 		ORTimeRate*		timeRates[8];
 }
 
 #pragma mark ***Initialization
-
 - (id)   init;
 - (void) dealloc;
 
@@ -49,11 +53,11 @@
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark ***Accessors
+- (int) unitsType;
+- (void) setUnitsType:(int)aType;
 - (ORTimeRate*)timeRate:(int)index;
 - (BOOL) shipTemperatures;
 - (void) setShipTemperatures:(BOOL)aShipTemperatures;
-- (BOOL) degreesInKelvin;
-- (void) setDegreesInKelvin:(BOOL)aDegreesInKelvin;
 - (int) pollTime;
 - (void) setPollTime:(int)aPollTime;
 - (ORSerialPort*) serialPort;
@@ -91,7 +95,7 @@
 
 
 extern NSString* ORLakeShore210ModelShipTemperaturesChanged;
-extern NSString* ORLakeShore210ModelDegreesInKelvinChanged;
+extern NSString* ORLakeShore210ModelUnitsTypeChanged;
 extern NSString* ORLakeShore210ModelPollTimeChanged;
 extern NSString* ORLakeShore210ModelSerialPortChanged;
 extern NSString* ORLakeShore210Lock;

@@ -42,9 +42,9 @@ static NSString* kLakeShoreUnit[8] = {
     @"Unit 4",  @"Unit 5",  @"Unit 6",  @"Unit 7"
 
 };
-static NSString* kLakeShoreTempUnit[2] = {
+static NSString* kLakeShoreTempUnit[3] = {
     //pre-make some keys for speed.
-    @"Celsius",  @"Kelvin"
+    @"Celsius",  @"Kelvin", @"Raw"
 };
 
 @implementation ORLakeShore210DecoderForTemperature
@@ -72,7 +72,7 @@ static NSString* kLakeShoreTempUnit[2] = {
 						  sender:self 
 						withKeys:@"LakeShore218",
 								[self getUnitKey:dataPtr[1] & 0x0000ffff],
-								kLakeShoreTempUnit[((dataPtr[1]>>16) & 0x1)],		//Celsius,Kelvin
+								kLakeShoreTempUnit[((dataPtr[1]>>16) & 0x3)],		//Celsius,Kelvin,Raw
 								[self getChannelKey:i],
 								nil];
 		index+=2;
@@ -90,7 +90,7 @@ static NSString* kLakeShoreTempUnit[2] = {
 		unsigned long asLong;
 	}theData;
 	theString = [theString stringByAppendingFormat:@"HW ID = %d\n",dataPtr[1] & 0x0000ffff];
-	theString = [theString stringByAppendingFormat:@"Units = %@\n",((dataPtr[1]>>16) & 0x1) ? @"Kelvin":@"Celsius"];
+	theString = [theString stringByAppendingFormat:@"Units = %@\n",kLakeShoreTempUnit[((dataPtr[1]>>16) & 0x3)]];
 	int i;
 	int index = 2;
 	for(i=0;i<8;i++){

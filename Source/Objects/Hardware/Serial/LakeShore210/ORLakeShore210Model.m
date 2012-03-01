@@ -29,14 +29,14 @@
 #import "ORTimeRate.h"
 
 #pragma mark ***External Strings
-NSString* ORLakeShore210ModelShipTemperaturesChanged = @"ORLakeShore210ModelShipTemperaturesChanged";
-NSString* ORLakeShore210ModelDegreesInKelvinChanged = @"ORLakeShore210ModelDegreesInKelvinChanged";
-NSString* ORLakeShore210ModelPollTimeChanged	= @"ORLakeShore210ModelPollTimeChanged";
-NSString* ORLakeShore210ModelSerialPortChanged = @"ORLakeShore210ModelSerialPortChanged";
-NSString* ORLakeShore210ModelPortNameChanged   = @"ORLakeShore210ModelPortNameChanged";
-NSString* ORLakeShore210ModelPortStateChanged  = @"ORLakeShore210ModelPortStateChanged";
-NSString* ORLakeShore210TempArrayChanged	   = @"ORLakeShore210TempArrayChanged";
-NSString* ORLakeShore210TempChanged			   = @"ORLakeShore210TempChanged";
+NSString* ORLakeShore210ModelShipTemperaturesChanged	= @"ORLakeShore210ModelShipTemperaturesChanged";
+NSString* ORLakeShore210ModelUnitsTypeChanged			= @"ORLakeShore210ModelUnitsTypeChanged";
+NSString* ORLakeShore210ModelPollTimeChanged			= @"ORLakeShore210ModelPollTimeChanged";
+NSString* ORLakeShore210ModelSerialPortChanged			= @"ORLakeShore210ModelSerialPortChanged";
+NSString* ORLakeShore210ModelPortNameChanged			= @"ORLakeShore210ModelPortNameChanged";
+NSString* ORLakeShore210ModelPortStateChanged			= @"ORLakeShore210ModelPortStateChanged";
+NSString* ORLakeShore210TempArrayChanged				= @"ORLakeShore210TempArrayChanged";
+NSString* ORLakeShore210TempChanged						= @"ORLakeShore210TempChanged";
 
 NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 
@@ -134,7 +134,8 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 				NSArray* lastCmdParts = [lastRequest componentsSeparatedByString:@" "];
 				NSString* lastCmd = [lastCmdParts objectAtIndex:0];
 
-				if([lastCmd isEqualToString: @"KRDG?"])      [self process_xrdg_response:theResponse args:lastCmdParts];
+				if([lastCmd isEqualToString: @"SRDG?"])      [self process_xrdg_response:theResponse args:lastCmdParts];
+				else if([lastCmd isEqualToString: @"KRDG?"]) [self process_xrdg_response:theResponse args:lastCmdParts];
 				else if([lastCmd isEqualToString: @"CRDG?"]) [self process_xrdg_response:theResponse args:lastCmdParts];
 		
 				[self setLastRequest:nil];			 //clear the last request
@@ -151,7 +152,7 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 		
 		unsigned long data[18];
 		data[0] = dataId | 18;
-		data[1] = ((degreesInKelvin&0x1)<<16) | ([self uniqueIdNumber]&0x0000fffff);
+		data[1] = ((unitsType&0x3)<<16) | ([self uniqueIdNumber]&0x0000fffff);
 		
 		union {
 			float asFloat;
@@ -174,6 +175,7 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 
 
 #pragma mark ***Accessors
+
 - (ORTimeRate*)timeRate:(int)index
 {
 	return timeRates[index];
@@ -187,24 +189,20 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 - (void) setShipTemperatures:(BOOL)aShipTemperatures
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setShipTemperatures:shipTemperatures];
-    
     shipTemperatures = aShipTemperatures;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:ORLakeShore210ModelShipTemperaturesChanged object:self];
 }
 
-- (BOOL) degreesInKelvin
+- (int) unitsType
 {
-    return degreesInKelvin;
+    return unitsType;
 }
 
-- (void) setDegreesInKelvin:(BOOL)aDegreesInKelvin
+- (void) setUnitsType:(int)aType
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setDegreesInKelvin:degreesInKelvin];
-    
-    degreesInKelvin = aDegreesInKelvin;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORLakeShore210ModelDegreesInKelvinChanged object:self];
+    [[[self undoManager] prepareWithInvocationTarget:self] setUnitsType:unitsType];
+    unitsType = aType;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORLakeShore210ModelUnitsTypeChanged object:self];
 }
 
 - (int) pollTime
@@ -331,11 +329,12 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 - (void) openPort:(BOOL)state
 {
     if(state) {
+        [serialPort open];
 		[serialPort setSpeed:9600];
 		[serialPort setParityOdd];
 		[serialPort setStopBits2:1];
 		[serialPort setDataBits:7];
-        [serialPort open];
+		[serialPort commitChanges];
     }
     else      [serialPort close];
     portWasOpen = [serialPort isOpen];
@@ -349,11 +348,15 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 {
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
-	[self setShipTemperatures:[decoder decodeBoolForKey:@"ORLakeShore210ModelShipTemperatures"]];
-	[self setDegreesInKelvin:[decoder decodeBoolForKey:@"ORLakeShore210ModelDegreesInKelvin"]];
-	[self setPollTime:[decoder decodeIntForKey:@"ORLakeShore210ModelPollTime"]];
-	[self setPortWasOpen:[decoder decodeBoolForKey:@"ORLakeShore210ModelPortWasOpen"]];
-    [self setPortName:[decoder decodeObjectForKey: @"portName"]];
+	
+	BOOL oldUnits = [decoder containsValueForKey:	@"ORLakeShore210ModelDegreesInKelvin"];
+	if(oldUnits) [self setUnitsType: [decoder decodeBoolForKey: @"ORLakeShore210ModelDegreesInKelvin"]];
+	else		 [self setUnitsType: [decoder decodeIntForKey:	 @"unitsType"]];
+	
+	[self setShipTemperatures:	[decoder decodeBoolForKey:	@"ORLakeShore210ModelShipTemperatures"]];
+	[self setPollTime:			[decoder decodeIntForKey:	@"ORLakeShore210ModelPollTime"]];
+	[self setPortWasOpen:		[decoder decodeBoolForKey:	@"ORLakeShore210ModelPortWasOpen"]];
+    [self setPortName:			[decoder decodeObjectForKey:@"portName"]];
 	[[self undoManager] enableUndoRegistration];
 	int i;
 	for(i=0;i<8;i++)timeRates[i] = [[ORTimeRate alloc] init];
@@ -362,14 +365,15 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 
 	return self;
 }
+
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeBool:shipTemperatures forKey:@"ORLakeShore210ModelShipTemperatures"];
-    [encoder encodeBool:degreesInKelvin forKey:@"ORLakeShore210ModelDegreesInKelvin"];
-    [encoder encodeInt:pollTime forKey:@"ORLakeShore210ModelPollTime"];
-    [encoder encodeBool:portWasOpen forKey:@"ORLakeShore210ModelPortWasOpen"];
-    [encoder encodeObject:portName forKey: @"portName"];
+    [encoder encodeBool:shipTemperatures	forKey: @"ORLakeShore210ModelShipTemperatures"];
+    [encoder encodeBool:unitsType			forKey: @"unitsType"];
+    [encoder encodeInt: pollTime			forKey: @"ORLakeShore210ModelPollTime"];
+    [encoder encodeBool:portWasOpen			forKey: @"ORLakeShore210ModelPortWasOpen"];
+    [encoder encodeObject:portName			forKey: @"portName"];
 }
 
 #pragma mark *** Commands
@@ -386,8 +390,11 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 
 - (void) readTemps
 {
-	if(degreesInKelvin) [self addCmdToQueue:@"KRDG? 0"];
-	else				[self addCmdToQueue:@"CRDG? 0"];
+	switch(unitsType){
+		case kLakeShore210Kelvin:	  [self addCmdToQueue:@"KRDG? 0"]; break;
+		case kLakeShore210Centigrade: [self addCmdToQueue:@"CRDG? 0"]; break;
+		case kLakeShore210Raw:		  [self addCmdToQueue:@"SRDG? 0"]; break;
+	}
 }
 
 #pragma mark ***Data Records
@@ -471,6 +478,7 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 	}	
 	if(shipTemperatures) [self shipTemps];
 }
+
 - (void) pollTemps
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollTemps) object:nil];

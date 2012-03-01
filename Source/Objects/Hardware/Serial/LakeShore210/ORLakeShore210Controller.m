@@ -90,8 +90,21 @@
 	
 	[plotter0 setShowLegend:YES];
 	[plotter1 setShowLegend:YES];
-	
+		
     [super awakeFromNib];
+}
+
+- (void) setUpFormats
+{
+	NSNumberFormatter *numberFormatter = [[[NSNumberFormatter alloc] init] autorelease];
+	if([model unitsType] == kLakeShore210Raw) [numberFormatter setFormat:@"#0"];
+	else									  [numberFormatter setFormat:@"#0.00"];
+
+	int i;
+	for(i=0;i<8;i++){
+		[[tempMatrix cellAtRow:i column:0] setFormatter:numberFormatter];
+	}
+	[tempMatrix setNeedsDisplay:YES];
 }
 
 #pragma mark ***Notifications
@@ -129,11 +142,7 @@
                      selector : @selector(pollTimeChanged:)
                          name : ORLakeShore210ModelPollTimeChanged
                        object : nil];
-    [notifyCenter addObserver : self
-                     selector : @selector(degreesInKelvinChanged:)
-                         name : ORLakeShore210ModelDegreesInKelvinChanged
-						object: model];
-
+ 
     [notifyCenter addObserver : self
                      selector : @selector(shipTemperaturesChanged:)
                          name : ORLakeShore210ModelShipTemperaturesChanged
@@ -153,6 +162,12 @@
 					 selector : @selector(updateTimePlot:)
 						 name : ORRateAverageChangedNotification
 					   object : nil];
+ 
+	[notifyCenter addObserver : self
+                     selector : @selector(unitsTypeChanged:)
+                         name : ORLakeShore210ModelUnitsTypeChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -163,7 +178,7 @@
     [self portNameChanged:nil];
 	[self tempChanged:nil];
 	[self pollTimeChanged:nil];
-	[self degreesInKelvinChanged:nil];
+	[self unitsTypeChanged:nil];
 	[self shipTemperaturesChanged:nil];
 	[self updateTimePlot:nil];
     [self miscAttributesChanged:nil];
@@ -243,10 +258,16 @@
 	[shipTemperaturesButton setIntValue: [model shipTemperatures]];
 }
 
-- (void) degreesInKelvinChanged:(NSNotification*)aNote
+- (void) unitsTypeChanged:(NSNotification*)aNote
 {
-	[degreesInKelvinMatrix selectCellWithTag: [model degreesInKelvin]];
-	[tempUnitsField setStringValue:[model degreesInKelvin]?@"K":@"C"];
+	[self setUpFormats];
+
+	[unitsTypeMatrix selectCellWithTag: [model unitsType]];
+	switch([model unitsType]){
+		case  kLakeShore210Kelvin:		[tempUnitsField setStringValue:@"Temp(K)"]; break;
+		case  kLakeShore210Centigrade:	[tempUnitsField setStringValue:@"Temp(C)"]; break;
+		case  kLakeShore210Raw:			[tempUnitsField setStringValue:@"Raw"]; break;
+	}
 }
 
 - (void) tempChanged:(NSNotification*)aNote
@@ -355,15 +376,14 @@
 
 
 #pragma mark ***Actions
-
 - (void) shipTemperaturesAction:(id)sender
 {
 	[model setShipTemperatures:[sender intValue]];	
 }
 
-- (void) degreesInKelvinAction:(id)sender
+- (void) unitsTypeAction:(id)sender
 {
-	[model setDegreesInKelvin:[[sender selectedCell] tag]];	
+	[model setUnitsType:[[sender selectedCell] tag]];	
 	[model readTemps];
 }
 

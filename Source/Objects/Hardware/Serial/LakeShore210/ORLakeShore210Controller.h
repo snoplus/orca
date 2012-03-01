@@ -26,7 +26,7 @@
     IBOutlet NSTextField*   lockDocField;
 	IBOutlet NSButton*		shipTemperaturesButton;
     IBOutlet NSTextField*   tempUnitsField;
-	IBOutlet NSMatrix*		degreesInKelvinMatrix;
+	IBOutlet NSMatrix*		unitsTypeMatrix;
     IBOutlet NSButton*      lockButton;
     IBOutlet NSTextField*   portStateField;
     IBOutlet NSPopUpButton* portListPopup;
@@ -47,6 +47,7 @@
 #pragma mark ***Notifications
 - (void) registerNotificationObservers;
 - (void) updateWindow;
+- (void) setUpFormats;
 
 #pragma mark ***Interface Management
 - (void) updateTimePlot:(NSNotification*)aNotification;
@@ -57,14 +58,14 @@
 - (void) portStateChanged:(NSNotification*)aNotification;
 - (void) tempChanged:(NSNotification*)aNotification;
 - (void) pollTimeChanged:(NSNotification*)aNotification;
-- (void) degreesInKelvinChanged:(NSNotification*)aNotification;
+- (void) unitsTypeChanged:(NSNotification*)aNotification;
 - (void) miscAttributesChanged:(NSNotification*)aNotification;
 - (void) scaleAction:(NSNotification*)aNotification;
 - (void) loadTempTimeValuesForIndex:(int)index;
 
 #pragma mark ***Actions
 - (IBAction) shipTemperaturesAction:(id)sender;
-- (IBAction) degreesInKelvinAction:(id)sender;
+- (IBAction) unitsTypeAction:(id)sender;
 - (IBAction) lockAction:(id) sender;
 - (IBAction) portListAction:(id) sender;
 - (IBAction) openPortAction:(id)sender;
