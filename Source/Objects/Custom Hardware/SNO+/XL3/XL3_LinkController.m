@@ -1185,7 +1185,7 @@ static NSDictionary* xl3Ops;
         if (nextTargetValue < 0) nextTargetValue = 0;
         if (nextTargetValue > 1800 / 3000. * 4096) nextTargetValue = 1800 * 4096 / 3000;
     }
-    if ((sup == 0 && nextTargetValue < [model hvAVoltageDACSetValue]) || (sup == 1 && nextTargetValue < [model hvBVoltageDACSetValue])) {
+    if ((sup == 0 && nextTargetValue + 20 < [model hvAVoltageDACSetValue]) || (sup == 1 && nextTargetValue + 20 < [model hvBVoltageDACSetValue])) {
         [self hvTargetValueChanged:nil];
         NSBeginAlertSheet (@"HV target NOT changed.",@"OK",nil,nil,[self window],self,nil,nil,nil,
                            @"Can not set target value lower than the current HV. Ramp down first.");
