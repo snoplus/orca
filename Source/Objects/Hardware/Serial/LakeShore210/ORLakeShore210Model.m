@@ -370,7 +370,7 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 {
     [super encodeWithCoder:encoder];
     [encoder encodeBool:shipTemperatures	forKey: @"ORLakeShore210ModelShipTemperatures"];
-    [encoder encodeBool:unitsType			forKey: @"unitsType"];
+    [encoder encodeInt:unitsType			forKey: @"unitsType"];
     [encoder encodeInt: pollTime			forKey: @"ORLakeShore210ModelPollTime"];
     [encoder encodeBool:portWasOpen			forKey: @"ORLakeShore210ModelPortWasOpen"];
     [encoder encodeObject:portName			forKey: @"portName"];
