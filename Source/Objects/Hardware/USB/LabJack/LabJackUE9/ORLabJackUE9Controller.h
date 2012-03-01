@@ -64,6 +64,7 @@
 	IBOutlet NSMatrix*		timerInputLineMatrix;
 	IBOutlet NSButton*		initTimersButton;
 	IBOutlet NSMatrix*		timerResultMatrix;
+	IBOutlet NSMatrix*		adcEnabledMatrix;
 
 	//arggggg-- why oh why can't NSPopUpButtons live in NSMatrixes
 	IBOutlet NSPopUpButton*		gainPU0;
@@ -124,7 +125,8 @@
 - (void) updateButtons;
 
 #pragma mark ***Interface Management
--(void) groupChanged:(NSNotification*)note;
+- (void) groupChanged:(NSNotification*)note;
+- (void) adcEnabledChanged:(NSNotification*)aNote;
 - (void) clockDivisorChanged:(NSNotification*)aNote;
 - (void) counterEnableMaskChanged:(NSNotification*)aNote;
 - (void) clockSelectionChanged:(NSNotification*)aNote;
@@ -177,6 +179,7 @@
 - (IBAction) channelNameAction:(id)sender;
 - (IBAction) channelUnitAction:(id)sender;
 - (IBAction) timerAction:(id)sender;
+- (IBAction) adcEnabledAction:(id)sender;
 
 - (IBAction) doNameAction:(id)sender;
 - (IBAction) doDirectionBitAction:(id)sender;

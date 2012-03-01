@@ -73,6 +73,7 @@ NSString* ORLabJackUE9ModelTimerOptionChanged		= @"ORLabJackUE9ModelTimerOptionC
 NSString* ORLabJackUE9ModelTimerEnableMaskChanged	= @"ORLabJackUE9ModelTimerEnableMaskChanged";
 NSString* ORLabJackUE9ModelCounterEnableMaskChanged	= @"ORLabJackUE9ModelCounterEnableMaskChanged";
 NSString* ORLabJackUE9ModelTimerResultChanged		= @"ORLabJackUE9ModelTimerResultChanged";
+NSString* ORLabJackUE9ModelAdcEnableMaskChanged		= @"ORLabJackUE9ModelAdcEnableMaskChanged";
 
 #define kUE9Idle			0
 #define kUE9ComCmd			1
@@ -97,6 +98,8 @@ NSString* ORLabJackUE9ModelTimerResultChanged		= @"ORLabJackUE9ModelTimerResultC
 - (unsigned char) extendedChecksum8:(unsigned char*) b;
 - (double) bufferToDouble:(unsigned char*)buffer index:(int) startIndex;
 - (unsigned char) numberTimersEnabled;
+- (void) readAdcsForMux:(int)aMuxSlot;
+- (void) readSingleAdc:(int)aChan;
 
 - (void) timeout;
 - (void) decodeComCmd:(NSData*) theData;
@@ -187,6 +190,7 @@ NSString* ORLabJackUE9ModelTimerResultChanged		= @"ORLabJackUE9ModelTimerResultC
 
 
 #pragma mark ***Accessors
+
 - (int) clockDivisor
 {
     return clockDivisor;
@@ -229,6 +233,44 @@ NSString* ORLabJackUE9ModelTimerResultChanged		= @"ORLabJackUE9ModelTimerResultC
 	else aMask &= ~(1<<bit);
 	[self setCounterEnableMask:aMask];
 }
+
+- (BOOL) adcEnabled:(int)adcChan
+{
+	if(adcChan>=0 && adcChan<kUE9NumAdcs){
+		int group = adcChan/32;
+		int bit   = adcChan%32;
+		return (adcEnabledMask[group] >> bit) & 0x1;
+	}
+	else return 0;
+}
+
+- (unsigned long) adcEnabledMask:(int)aGroup
+{
+	if(aGroup>=0 && aGroup<3) return adcEnabledMask[aGroup];
+	else return 0;
+}
+
+- (void) setAdcEnabled:(int)aGroup mask:(unsigned long)anEnableMask
+{
+	if(aGroup>=0 && aGroup<3){
+		[[[self undoManager] prepareWithInvocationTarget:self] setAdcEnabled:aGroup mask:adcEnabledMask[aGroup]];
+		adcEnabledMask[aGroup] = anEnableMask;
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackUE9ModelAdcEnableMaskChanged object:self];
+	}
+}
+
+- (void) setAdcEnabled:(int)bit value:(BOOL)aValue
+{
+	int group = bit/32;
+	if(group<3){
+		unsigned long aMask = adcEnabledMask[group];
+		int subBit = bit%32;
+		if(aValue) aMask  |= (1<<subBit);
+		else	   aMask &= ~(1<<subBit);
+		[self setAdcEnabled:group mask:aMask];
+	}
+}
+
 - (unsigned short) timerEnableMask
 {
     return timerEnableMask;
@@ -317,11 +359,12 @@ NSString* ORLabJackUE9ModelTimerResultChanged		= @"ORLabJackUE9ModelTimerResultC
 {
 	if(!isConnected){
 		[self setSocket:[NetSocket netsocketConnectedToHost:ipAddress port:52360]];	
+		wasConnected = YES;
 	}
 	else {
-		//[self stop];
 		[self setSocket:nil];	
         [self setIsConnected:[socket isConnected]];
+		wasConnected = NO;
 	}
 }
 
@@ -1086,6 +1129,9 @@ NSString* ORLabJackUE9ModelTimerResultChanged		= @"ORLabJackUE9ModelTimerResultC
 		[self setSlope:i value:[decoder decodeFloatForKey:[NSString stringWithFormat:@"slope%d",i]]];
 		[self setIntercept:i value:[decoder decodeFloatForKey:[NSString stringWithFormat:@"intercept%d",i]]];
 	}
+	for(i=0;i<3;i++) {
+		[self setAdcEnabled:i mask:[decoder decodeInt32ForKey:[NSString stringWithFormat:@"adcEnabledMask%d",i]]];
+	}
 	
 	for(i=0;i<kUE9NumIO;i++) {
 		NSString* aName = [decoder decodeObjectForKey:[NSString stringWithFormat:@"DO%d",i]];
@@ -1101,8 +1147,13 @@ NSString* ORLabJackUE9ModelTimerResultChanged		= @"ORLabJackUE9ModelTimerResultC
 		[self setTimer:i option:[decoder decodeIntForKey:[NSString stringWithFormat:@"timerOption%d",i]]];
 	}
 	
+	wasConnected = [decoder decodeBoolForKey:@"wasConnected"];
+	if(wasConnected && !isConnected)[self connect];
+	
     [self setPollTime:		[decoder decodeIntForKey:@"pollTime"]];
 
+	
+	
     [[self undoManager] enableUndoRegistration]; 
 	
     return self;
@@ -1111,6 +1162,7 @@ NSString* ORLabJackUE9ModelTimerResultChanged		= @"ORLabJackUE9ModelTimerResultC
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+	[encoder encodeBool:wasConnected forKey:@"wasConnected"];
 	[encoder encodeInt:clockDivisor forKey:@"clockDivisor"];
 	[encoder encodeInt:clockSelection forKey:@"clockSelection"];
 	[encoder encodeInt:timerEnableMask forKey:@"timerEnableMask"];
@@ -1131,6 +1183,9 @@ NSString* ORLabJackUE9ModelTimerResultChanged		= @"ORLabJackUE9ModelTimerResultC
 		[encoder encodeFloat:intercept[i] forKey:[NSString stringWithFormat:@"intercept%d",i]];
 		[encoder encodeFloat:minValue[i] forKey:[NSString stringWithFormat:@"minValue%d",i]];
 		[encoder encodeFloat:maxValue[i] forKey:[NSString stringWithFormat:@"maxValue%d",i]];
+	}
+	for(i=0;i<3;i++) {
+		[encoder encodeInt32:adcEnabledMask[i] forKey:[NSString stringWithFormat:@"adcEnabledMask%d",i]];
 	}
 	
 	for(i=0;i<kUE9NumIO;i++) {
@@ -1168,23 +1223,6 @@ NSString* ORLabJackUE9ModelTimerResultChanged		= @"ORLabJackUE9ModelTimerResultC
 		[self readAllValues];
 	}
 	[self sendTimerCounter:kUE9ReadCounters];
-}
-
-- (void) readAdcsForMux:(int)aMuxSlot
-{
-	int i;
-	if(aMuxSlot == 0){
-		for(i=0;i<12;i++){
-			int muxIndex = [self muxIndexFromAdcIndex:i];
-			[self readSingleAdc:muxIndex];
-		}
-	}
-	else if(aMuxSlot >= 1){
-		for(i=0;i<24;i++){
-			int muxIndex = [self muxIndexFromAdcIndex:i + 12 + ((aMuxSlot-1)*24)];
-			[self readSingleAdc:muxIndex];
-		}
-	}
 }
 
 - (int) muxIndexFromAdcIndex:(int)adcIndex
@@ -1300,24 +1338,6 @@ NSString* ORLabJackUE9ModelTimerResultChanged		= @"ORLabJackUE9ModelTimerResultC
 
 
 
-- (void) readSingleAdc:(int)aChan
-{		
-	unsigned char ainResolution = 12;
-	unsigned char sendBuff[8];
-	sendBuff[1] = (unsigned char)0xA3;			//command byte
-	sendBuff[2] = (unsigned char)kUE9AnalogIn;  //IOType = 4 (adc)
-	sendBuff[3] = (unsigned char)aChan;			//Channel
-	sendBuff[4] = [self gainBipWord:[self adcIndexFromMuxIndex:aChan]/2];		//BipGain 
-	sendBuff[5] = ainResolution;				//Resolution = 12
-	sendBuff[6] = (unsigned char)0x00;			//SettlingTime = 0
-	sendBuff[7] = (unsigned char)0x00;			//Reserved
-
-	[self normalChecksum:sendBuff len:8];
-	
-	NSData* data = [NSData dataWithBytes:sendBuff length:8];
-	[self enqueCmd:data tag:kUE9SingleIO];
-}
-
 - (void) readAllValues
 {	
 	unsigned char sendBuff[34];
@@ -1367,12 +1387,20 @@ NSString* ORLabJackUE9ModelTimerResultChanged		= @"ORLabJackUE9ModelTimerResultC
 		sendBuff[19] = 0;
 	}
 	
-	sendBuff[20] = (unsigned char)(0xff);  //AINMask AIN0-AIN7
-	sendBuff[21] = (unsigned char)(0xff);  //AINMask AIN8 - AIN15
-	sendBuff[22] = (unsigned char)(0x00);  //AIN14ChannelNumber - not using
-	sendBuff[23] = (unsigned char)(0x00);  //AIN15ChannelNumber - not using
-	sendBuff[24] = ainResolution;			//Resolution = 12
-	sendBuff[25] = 0;						//SettlingTime
+	if([[self orcaObjects] count]==0){
+		//only read the adc if there is no mux80 board
+		sendBuff[20] = (unsigned char)(adcEnabledMask[0]&0xff);		  //AINMask AIN0-AIN7
+		sendBuff[21] = (unsigned char)((adcEnabledMask[0]>>8)&0xff);  //AINMask AIN8 - AIN15
+	}
+	else {
+		//there is at least one mux 80 so the adc reads will be done somewhere else
+		sendBuff[20] = 0;  //AINMask AIN0-AIN7
+		sendBuff[21] = 0;  //AINMask AIN8 - AIN15
+	}
+	sendBuff[22] = (unsigned char)(0x00);						  //AIN14ChannelNumber - not using
+	sendBuff[23] = (unsigned char)(0x00);						  //AIN15ChannelNumber - not using
+	sendBuff[24] = ainResolution;								  //Resolution = 12
+	sendBuff[25] = 1;											  //SettlingTime
 	
 	for(i = 26; i < 34; i++) {
 		sendBuff[i] = [self gainBipWord:i-26];
@@ -1401,8 +1429,6 @@ NSString* ORLabJackUE9ModelTimerResultChanged		= @"ORLabJackUE9ModelTimerResultC
 	NSData* data = [NSData dataWithBytes:sendBuff length:18];
 	[self enqueCmd:data tag:kUE9ControlConfig];
 }
-
-
 
 - (void) sendTimerCounter:(int) option
 {
@@ -1499,26 +1525,79 @@ NSString* ORLabJackUE9ModelTimerResultChanged		= @"ORLabJackUE9ModelTimerResultC
 		sendBuff[2] = (unsigned char)0x10;  //number of data words
 		sendBuff[3] = (unsigned char)0x01;  //extended command number
 											//Rest of the command is zero'ed out. not used.
-		sendBuff[6] = 0x04;					//mask set to write the IP number
+		sendBuff[6] = 0x0C;					//mask set to write the IP number
 		int i;
 		for(i = 7; i < 38; i++) sendBuff[i] = (unsigned char)(0x00);
 		
-		sendBuff[10] = [[ipParts objectAtIndex:0] intValue];
-		sendBuff[11] = [[ipParts objectAtIndex:1] intValue];
-		sendBuff[12] = [[ipParts objectAtIndex:2] intValue];
-		sendBuff[13] = [[ipParts objectAtIndex:3] intValue];
+		sendBuff[10] = [[ipParts objectAtIndex:3] intValue];
+		sendBuff[11] = [[ipParts objectAtIndex:2] intValue];
+		sendBuff[12] = [[ipParts objectAtIndex:1] intValue];
+		sendBuff[13] = [[ipParts objectAtIndex:0] intValue];
+
+		sendBuff[14] = 1;
+		sendBuff[15] = [[ipParts objectAtIndex:2] intValue];
+		sendBuff[16] = [[ipParts objectAtIndex:1] intValue];
+		sendBuff[17] = [[ipParts objectAtIndex:0] intValue];
+		
 		
 		[self extendedChecksum:sendBuff len:38];
 		
 		NSData* data = [NSData dataWithBytes:sendBuff length:38];
 		[self enqueCmd:data tag:kUE9ComCmd];
-		NSLog(@"Change LabJack (%d) to %@\n",[self uniqueIdNumber],aNewAddress);
+		NSLog(@"Change LabJack (%d) IP to %@\n",[self uniqueIdNumber],aNewAddress);
+		NSLog(@"Change LabJack (%d) GateWasy to %@.%@.%@.1\n",[self uniqueIdNumber],[ipParts objectAtIndex:0],[ipParts objectAtIndex:1],[ipParts objectAtIndex:2]);
+		NSLog(@"You must power cycle the UE9 before it takes effect\n");
+		NSLog(@"You should restart ORCA as well.\n");
+		[self connect]; //toggle the connection
+	}
+	else {
+		NSLog(@"Can NOT change LabJack (%d) IP to %@\n",[self uniqueIdNumber],aNewAddress);
 	}
 }
 
 @end
 
 @implementation ORLabJackUE9Model (private)
+
+- (void) readSingleAdc:(int)aChan
+{		
+	unsigned char ainResolution = 12;
+	unsigned char sendBuff[8];
+	sendBuff[1] = (unsigned char)0xA3;			//command byte
+	sendBuff[2] = (unsigned char)kUE9AnalogIn;  //IOType = 4 (adc)
+	sendBuff[3] = (unsigned char)aChan;			//Channel
+	sendBuff[4] = [self gainBipWord:[self adcIndexFromMuxIndex:aChan]/2];		//BipGain 
+	sendBuff[5] = ainResolution;				//Resolution = 12
+	sendBuff[6] = (unsigned char)0x00;			//SettlingTime = 0
+	sendBuff[7] = (unsigned char)0x00;			//Reserved
+	
+	[self normalChecksum:sendBuff len:8];
+	
+	NSData* data = [NSData dataWithBytes:sendBuff length:8];
+	[self enqueCmd:data tag:kUE9SingleIO];	
+}
+
+- (void) readAdcsForMux:(int)aMuxSlot
+{
+	int i;
+	if(aMuxSlot == 0){
+		for(i=0;i<24;i++){
+			int muxIndex = [self muxIndexFromAdcIndex:i];
+			if([self adcEnabled:i]){
+				[self readSingleAdc:muxIndex];
+			}
+		}
+	}
+	else if(aMuxSlot >= 1){
+		for(i=0;i<24;i++){
+			int adcIndex = i + 12 + ((aMuxSlot-1)*24);
+			int muxIndex = [self muxIndexFromAdcIndex:adcIndex];
+			if([self adcEnabled:adcIndex]){
+				[self readSingleAdc:muxIndex];
+			}
+		}
+	}
+}
 
 - (unsigned char) numberTimersEnabled
 {

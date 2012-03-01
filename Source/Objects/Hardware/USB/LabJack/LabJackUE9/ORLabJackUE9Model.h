@@ -62,6 +62,7 @@
 	unsigned long     doValueIn;
     unsigned short    aOut0;
     unsigned short    aOut1;
+    unsigned long     adcEnabledMask[3];
     unsigned long     counter[2];
     unsigned long     timer[kUE9NumTimers];
     unsigned long     timerResult[kUE9NumTimers];
@@ -100,6 +101,7 @@
 	unsigned long   processOutputValue; //outputs to be written at end of process cycle
 	unsigned long   processOutputMask;  //controlls which bits are written
     BOOL            involvedInProcess;
+    BOOL			wasConnected;
 }
 
 #pragma mark ***Accessors
@@ -174,6 +176,13 @@
 - (NSString*) doInString:(int)bit;
 - (NSColor*) doInColor:(int)i;
 
+- (unsigned long) adcEnabledMask:(int)aGroup;
+- (BOOL) adcEnabled:(int)adcChan;
+- (void) setAdcEnabled:(int)aGroup mask:(unsigned long)anEnableMask;
+- (void) setAdcEnabled:(int)bit value:(BOOL)aValue;
+- (int) muxIndexFromAdcIndex:(int)adcIndex;
+- (int) adcIndexFromMuxIndex:(int)muxIndex;
+
 - (unsigned long) timeMeasured;
 
 - (unsigned long) dataId;
@@ -197,7 +206,6 @@
 - (void) resetCounter;
 - (void) sendComCmd;
 - (void) getCalibrationInfo:(int)block;
-- (void) readSingleAdc:(int)aChan;
 - (void) readAllValues;
 - (void) sendTimerCounter:(int)opt;
 - (void) setPowerLevel;
@@ -205,7 +213,6 @@
 - (void) pollHardware;
 - (void) pollHardware:(BOOL)force;
 - (void) changeIPAddress:(NSString*)aNewAddress;
-- (void) readAdcsForMux:(int)aMuxSlot;
 
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
@@ -226,9 +233,6 @@
 - (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit  channel:(int)channel;
 - (double) convertedValue:(int)channel;
 - (double) maxValueForChan:(int)channel;
-
-- (int) muxIndexFromAdcIndex:(int)adcIndex;
-- (int) adcIndexFromMuxIndex:(int)muxIndex;
 
 #pragma mark •••OROrderedObjHolding Protocol
 - (int) maxNumberOfObjects;
@@ -279,6 +283,7 @@ extern NSString* ORLabJackUE9TimerChanged;
 extern NSString* ORLabJackUE9BipolarChanged;
 extern NSString* ORLabJackUE9ModelCounterEnableMaskChanged;
 extern NSString* ORLabJackUE9ModelTimerResultChanged;
+extern NSString* ORLabJackUE9ModelAdcEnableMaskChanged;
 
 @interface ORLabJackUE9Cmd : NSObject
 {

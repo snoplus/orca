@@ -86,7 +86,7 @@
 	timerOptionPU[5] = timerOptionPU5;
 	
 	short i;
-	for(i=0;i<kUE9NumAdcs;i++){	
+	for(i=0;i<14;i++){	
 		[gainPU[i] setTag:i];
 		[bipolarPU[i] setTag:i];
 		[[unitMatrix cellAtRow:i column:0] setEditable:YES];
@@ -101,6 +101,7 @@
 		[[interceptMatrix cellAtRow:i column:0] setTag:i];
 		[[lowLimitMatrix cellAtRow:i column:0]	setTag:i];
 		[[hiLimitMatrix cellAtRow:i column:0]	setTag:i];
+		[[adcEnabledMatrix cellAtRow:i column:0] setTag:i];
 
 		[[slopeMatrix cellAtRow:i column:0] setFormatter:numberFormatter4];
 		[[interceptMatrix cellAtRow:i column:0] setFormatter:numberFormatter4];
@@ -306,7 +307,6 @@
                          name : ORLabJackUE9ModelCounterEnableMaskChanged
 						object: model];
 
-	
 	[notifyCenter addObserver : self
                      selector : @selector(timerChanged:)
                          name : ORLabJackUE9TimerChanged
@@ -341,6 +341,11 @@
     [notifyCenter addObserver : self
                      selector : @selector(groupChanged:)
                          name : OROrcaObjectMoved
+                       object : nil];
+
+	[notifyCenter addObserver : self
+                     selector : @selector(adcEnabledChanged:)
+                         name : ORLabJackUE9ModelAdcEnableMaskChanged
                        object : nil];
 	
 }
@@ -381,6 +386,7 @@
 	[self timerChanged:nil];
 	[self timerResultChanged:nil];
 	[self clockDivisorChanged:nil];
+	[self adcEnabledChanged:nil];
     [groupView setNeedsDisplay:YES];
 }
 
@@ -407,6 +413,16 @@
 {
 	[clockDivisorField setIntValue: [model clockDivisor]];
 }
+
+- (void) adcEnabledChanged:(NSNotification*)aNote
+{
+	unsigned long aMask = [model adcEnabledMask:0];
+	int i;
+	for(i=0;i<14;i++){
+		[[adcEnabledMatrix cellWithTag:i] setIntValue:aMask& (1<<i)];
+	}	
+}
+
 
 - (void) timerChanged:(NSNotification*)aNote
 {
@@ -796,7 +812,7 @@
 	[aOut1Field			setEnabled:!lockedOrRunningMaintenance];
 	[initTimersButton	setEnabled:!lockedOrRunningMaintenance];
 	[clockDivisorField	setEnabled:!lockedOrRunningMaintenance];
-	//[changeIPNumberButton setEnabled:!locked && ![model isConnected]];
+	[changeIPNumberButton setEnabled:!locked && [model isConnected]];
     
 	int i;
 	for(i=0;i<kUE9NumAdcs;i++){
@@ -991,7 +1007,9 @@
 
 - (IBAction) changeIPNumber:(id)sender
 {
-    [self endEditing];
+	if(![[self window] makeFirstResponder:[self window]]){
+		[[self window] endEditingFor:nil];		
+	}
 	[model changeIPAddress:[newIpAddressField stringValue]];
     [ipChangePanel orderOut:nil];
     [NSApp endSheet:ipChangePanel];
@@ -1008,6 +1026,13 @@
 {
     [ipChangePanel orderOut:nil];
     [NSApp endSheet:ipChangePanel];
+}
+
+- (IBAction) adcEnabledAction:(id)sender
+{
+	int theBit = [[sender selectedCell] tag];
+	[model setAdcEnabled:theBit value:[sender intValue]];
+
 }
 
 
