@@ -1346,7 +1346,7 @@ void SwapLongBlock(void* p, int32_t n)
 		// ctc delay
 		aMbId[4] = 0;
 		// cmos shift regs only if != 0
-		aMbId[5] = 1;
+		aMbId[5] = 0;
 		
 		if ([xl3Link needToSwap]) {
 			for (i=0; i<6; i++) aMbId[i] = swapLong(aMbId[i]);
