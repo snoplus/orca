@@ -605,8 +605,8 @@ NSString* ORSNOPModelMorcaIsUpdatingChanged = @"ORSNOPModelMorcaIsUpdatingChange
     NSDateFormatter* iso = [[NSDateFormatter alloc] init];
     [iso setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss'Z'"];
     iso.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
-    iso.calendar = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
-    iso.locale = [[[NSLocale alloc] initWithLocaleIdentifier:@"en_US"] autorelease];
+    //iso.calendar = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
+    //iso.locale = [[[NSLocale alloc] initWithLocaleIdentifier:@"en_US"] autorelease];
     NSString* str = [iso stringFromDate:[NSDate date]];
     [[xl3 pollDict] setObject:str forKey:@"time_stamp"];
     if (updateDoc) {

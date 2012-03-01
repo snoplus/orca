@@ -1173,6 +1173,7 @@ static NSDictionary* xl3Ops;
 
 - (IBAction)hvTargetValueAction:(id)sender
 {
+    char sup = [hvPowerSupplyMatrix selectedColumn];
     int nextTargetValue;
     if (sender == hvTargetValueField) {
         nextTargetValue = (int) ([sender floatValue] * 4096 / 3000);
@@ -1184,7 +1185,13 @@ static NSDictionary* xl3Ops;
         if (nextTargetValue < 0) nextTargetValue = 0;
         if (nextTargetValue > 1800 / 3000. * 4096) nextTargetValue = 1800 * 4096 / 3000;
     }
-    if ([hvPowerSupplyMatrix selectedColumn] == 0) {
+    if ((sup == 0 && nextTargetValue < [model hvAVoltageDACSetValue]) || (sup == 1 && nextTargetValue < [model hvBVoltageDACSetValue])) {
+        [self hvTargetValueChanged:nil];
+        NSBeginAlertSheet (@"HV target NOT changed.",@"OK",nil,nil,[self window],self,nil,nil,nil,
+                           @"Can not set target value lower than the current HV. Ramp down first.");
+        return;
+    }
+    if (sup == 0) {
         [model setHvAVoltageTargetValue:nextTargetValue];
     }
     else {

@@ -1346,7 +1346,7 @@ void SwapLongBlock(void* p, int32_t n)
 		// ctc delay
 		aMbId[4] = 0;
 		// cmos shift regs only if != 0
-		aMbId[5] = 0;
+		aMbId[5] = 1;
 		
 		if ([xl3Link needToSwap]) {
 			for (i=0; i<6; i++) aMbId[i] = swapLong(aMbId[i]);
@@ -2440,11 +2440,12 @@ void SwapLongBlock(void* p, int32_t n)
                 NSLog(@"%@ Polling loop stopped because reading XL3 local voltages failed\n", [[self xl3Link] crateName]);
                 [self setIsPollingXl3:NO];
             }
+            return;
         }
         [self setHvAVoltageReadValue:status.voltage_a * 300];
         [self setHvBVoltageReadValue:status.voltage_b * 300];
         [self setHvACurrentReadValue:status.current_a * 10];
-        [self setHvACurrentReadValue:status.current_a * 10];
+        [self setHvBCurrentReadValue:status.current_a * 10];
 
         //unless (isPollingXl3 && !isPollingVerbose)
         if (!isPollingXl3 || isPollingVerbose) {    
@@ -2629,20 +2630,23 @@ void SwapLongBlock(void* p, int32_t n)
         NSLog(@"%@ error in readHVSwitch\n", [[self xl3Link] crateName]);
         return;
     }
+
+    //always trust the switch read?
+    /*    
+     if (xl3SwitchA != [self hvASwitch]) {
+     NSLog(@"%@ HV switch A is reported %@ by XL3 and expected to be %@ by ORCA.\n",[[self xl3Link] crateName], xl3SwitchA?@"ON":@"OFF", hvASwitch?@"ON":@"OFF");
+     [self setHvASwitch:xl3SwitchA];
+     }
+     
+     if (xl3SwitchB != [self hvBSwitch]) {
+     NSLog(@"%@ HV switch B is reported %@ by XL3 and expected to be %@ by ORCA.\n",[[self xl3Link] crateName], xl3SwitchB?@"ON":@"OFF", hvBSwitch?@"ON":@"OFF");
+     [self setHvBSwitch:xl3SwitchB];
+     }
+     */
+
     [self setHvASwitch:xl3SwitchA];
     [self setHvBSwitch:xl3SwitchB];
-
-/*    
-    if (xl3SwitchA != [self hvASwitch]) {
-        NSLog(@"%@ HV switch A is reported %@ by XL3 and expected to be %@ by ORCA.\n",[[self xl3Link] crateName], xl3SwitchA?@"ON":@"OFF", hvASwitch?@"ON":@"OFF");
-        [self setHvASwitch:xl3SwitchA];
-    }
-
-    if (xl3SwitchB != [self hvBSwitch]) {
-        NSLog(@"%@ HV switch B is reported %@ by XL3 and expected to be %@ by ORCA.\n",[[self xl3Link] crateName], xl3SwitchB?@"ON":@"OFF", hvBSwitch?@"ON":@"OFF");
-        [self setHvBSwitch:xl3SwitchB];
-    }
-*/
+        
     BOOL interlockIsGood;
     
     @try {
@@ -2664,16 +2668,37 @@ void SwapLongBlock(void* p, int32_t n)
         }
     }
     
+    
+    [self readHVStatus];
+
+    //XL3 reset button
+    if (fabs([self hvAVoltageReadValue] * 4096/3000. - [self hvAVoltageDACSetValue]) > 50) {
+        NSLog(@"%@ Mismatch between expected and read HV value for A supply, updating ORCA from the XL3 value",
+              [[self xl3Link] crateName]);
+        [self setHvAVoltageDACSetValue:[self hvAVoltageReadValue]* 4096/3000.];
+    }
+    
+    //even if it matches but the read switch position is OFF update to zero
+    //XL3 SW reset
+    if (sup == 0 && ![self hvASwitch] && [self hvAVoltageDACSetValue] > 0) [self setHvAVoltageDACSetValue:0];
+    if (sup == 1 && ![self hvBSwitch] && [self hvBVoltageDACSetValue] > 0) [self setHvBVoltageDACSetValue:0];
+
+    /*
+     //if B output not present there is mismatch expected
+    if (fabs([self hvAVoltageReadValue] * 4096/3000. - [self hvAVoltageDACSetValue]) > 50) {
+        NSLog(@"%@ Mismatch between expected and read HV value for A supply, updating ORCA from the XL3 value",
+              [[self xl3Link] crateName]);
+        [self setHvAVoltageDACSetValue:[self hvAVoltageReadValue]* 4096/3000.];
+    }
+     */
+
     @try {
-        if (sup == 0 && ((!hvASwitch && aOn) || (hvASwitch && !aOn))) { //changing A from OFF to ON or ON to OFF
-            [self setHVDacA:0 dacB:hvBVoltageDACSetValue];
-        }
-        else if (sup == 1 && ((!hvBSwitch && aOn) || (!hvBSwitch && aOn))) {
-            [self setHVDacA:hvBVoltageDACSetValue dacB:0];
+        if ((sup == 0 && hvASwitch != aOn) || (sup == 1 && hvBSwitch != aOn)) { //changing A from OFF to ON or ON to OFF
+            [self setHVDacA:[self hvAVoltageDACSetValue] dacB:[self hvBVoltageDACSetValue]];
         }
     }
     @catch (NSException *exception) {
-        NSLog(@"%@ error in setting HC DAC value to 0.",[[self xl3Link] crateName]);
+        NSLog(@"%@ error in setting HV DAC values.",[[self xl3Link] crateName]);
         return;
     }
 
@@ -2691,7 +2716,7 @@ void SwapLongBlock(void* p, int32_t n)
     }
 
     //check the hv thread is running
-    if (!hvASwitch && !hvBSwitch && aOn) {
+    if (hvASwitch || hvBSwitch || aOn) {
         [self setIsPollingHVSupply:YES];
         [self setIsPollingXl3:YES];
         
@@ -2701,8 +2726,8 @@ void SwapLongBlock(void* p, int32_t n)
                 hvThread = nil;
             }
         }
-        [self setHvANextStepValue:0];
-        [self setHvBNextStepValue:0];
+        [self setHvANextStepValue:[self hvAVoltageDACSetValue]];
+        [self setHvBNextStepValue:[self hvBVoltageDACSetValue]];
         if (!hvThread) {
             hvThread = [[NSThread alloc] initWithTarget:self selector:@selector(_hvXl3) object:nil];
             [hvThread start];
@@ -3282,10 +3307,11 @@ void SwapLongBlock(void* p, int32_t n)
         
         //monitoring loop updates
         if (![self hvPanicFlag]) {
-            if (fabs([self hvAVoltageReadValue] / 3000. * 4096 - [self hvAVoltageDACSetValue]) > 20) {
-                NSLog(@"%@ read value differs from the set one. stopping!\n", [[self xl3Link] crateName]);
+            if (fabs([self hvAVoltageReadValue] / 3000. * 4096 - [self hvAVoltageDACSetValue]) > 50) {
+                NSLog(@"%@ read value differs from the set one. stopping!\nPress HV ON to continue.", [[self xl3Link] crateName]);
                 usleep(100000);
                 [self setHvANextStepValue:[self hvAVoltageDACSetValue]];
+                isTimeToQuit = YES;
             }
             
             /*

@@ -446,12 +446,12 @@ typedef struct{
 } read_pmt_base_currents_results_t;
 
 typedef struct{
-    uint32_t cmd_in_rejected;
-    uint32_t transfer_error;
-    uint32_t xl3_data_avail_unknown;
-    uint32_t bundle_read_error;
-    uint32_t bundle_resync_error;
-    uint32_t mem_level_unknown[16];
+    uint32_t cmd_in_rejected_flag;
+    uint32_t transfer_error_flag;
+    uint32_t xl3_davail_unknown_flag;
+    uint32_t bundle_read_error_flag[16];
+    uint32_t bundle_resync_error_flag[16];
+    uint32_t mem_level_unknown_flag[16];
 } error_packet_t;
 
 typedef struct{

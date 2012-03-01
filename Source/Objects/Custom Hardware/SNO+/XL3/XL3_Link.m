@@ -847,21 +847,24 @@ static void SwapLongBlock(void* p, int32_t n)
                 error_packet_t* data = (error_packet_t*)((XL3_Packet*)aPacket)->payload;
                 if (needToSwap) SwapLongBlock(data, sizeof(error_packet_t)/4);
 
-                error = data->cmd_in_rejected;
-                if (error) [msg appendFormat:@"cmd_in_rejected: %d\n", error];
-                error = data->transfer_error;
-                if (error) [msg appendFormat:@"transfer_error: %d\n", error];
-                error = data->xl3_data_avail_unknown;
-                if (error) [msg appendFormat:@"xl3_data_avail_unknown: %d\n", error];
-                error = data->bundle_read_error;
-                if (error) [msg appendFormat:@"bundle_read_error: %d\n", error];
-                error = data->bundle_resync_error;
-                if (error) [msg appendFormat:@"bundle_resync_error: %d\n", error];
-
-                unsigned char i = 0;
-                for (i = 0; i < 16; i++) {
-                    error = data->mem_level_unknown[i];
-                    if (error) [msg appendFormat:@"mem_level_unknown for slot %2d: %d\n", i, error];
+                error = data->cmd_in_rejected_flag;
+                if (error) [msg appendFormat:@"cmd_in_rejected: 0x%x, ", error];
+                error = data->transfer_error_flag;
+                if (error) [msg appendFormat:@"transfer_error: 0x%x, ", error];
+                error = data->xl3_davail_unknown_flag;
+                if (error) [msg appendFormat:@"xl3_davail_unknown: 0x%x, ", error];
+                unsigned int slot;
+                for (slot=0; slot<16; slot++) {
+                    error = data->bundle_read_error_flag[slot];
+                    if (error) [msg appendFormat:@"bundle_read_error slot %2d: 0x%x, ", slot, error];
+                }
+                for (slot=0; slot<16; slot++) {
+                    error = data->bundle_resync_error_flag[slot];
+                    if (error) [msg appendFormat:@"bundle_resync_error slot %2d: 0x%x, ", slot, error];
+                }
+                for (slot=0; slot< 16; slot++) {
+                    error = data->mem_level_unknown_flag[slot];
+                    if (error) [msg appendFormat:@"mem_level_unknown slot %2d: 0x%x, ", slot, error];
                 }
                 NSLog(msg);
             }
@@ -872,7 +875,7 @@ static void SwapLongBlock(void* p, int32_t n)
                 for (i = 0; i < 16; i++) {
                     error = ((screwed_packet_t*) ((XL3_Packet *) aPacket)->payload)->screwed[i];
                     if (needToSwap) error = swapLong(error);
-                    [msg appendFormat:@"%2d: %d\n", i, error];
+                    [msg appendFormat:@"%2d: 0x%x\n", i, error];
                 }
                 NSLog(msg);
             }
