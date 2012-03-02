@@ -1510,7 +1510,25 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302GenReadRe
     [objDictionary setObject: sumGs				forKey:@"sumGs"];	
     [objDictionary setObject: peakingTimes		forKey:@"peakingTimes"];	
 	[objDictionary setObject: preTriggerDelays		forKey:@"preTriggerDelays"];
-	
+    
+    [objDictionary setObject:averagingSettings forKey:@"averagingSettings"];	
+    [objDictionary setObject:pageWrapSize forKey:@"pageWrapSize"];
+    [objDictionary setObject:testDataType forKey:@"testDataType"];	
+    
+    [objDictionary setObject:[NSNumber numberWithInt:lemoTimestampEnabled]  forKey:@"lemoTimestampEnabled"];    
+    [objDictionary setObject:[NSNumber numberWithInt:lemoStartStopEnabled]  forKey:@"lemoStartStopEnabled"];    
+    [objDictionary setObject:[NSNumber numberWithInt:internalTrigStartEnabled]  forKey:@"internalTrigStartEnabled"];    
+    [objDictionary setObject:[NSNumber numberWithInt:internalTrigStopEnabled]  forKey:@"internalTrigStopEnabled"];    
+    [objDictionary setObject:[NSNumber numberWithInt:multiEventModeEnabled]  forKey:@"multiEventModeEnabled"];    
+    [objDictionary setObject:[NSNumber numberWithInt:autostartModeEnabled]  forKey:@"autostartModeEnabled"];    
+    [objDictionary setObject:[NSNumber numberWithInt:startDelay]  forKey:@"startDelay"];    
+    [objDictionary setObject:[NSNumber numberWithInt:stopDelay]  forKey:@"stopDelay"];    
+    [objDictionary setObject:[NSNumber numberWithInt:maxEvents]  forKey:@"maxEvents"];  
+    
+    [objDictionary setObject:[NSNumber numberWithInt:stopAtEventLengthMask]   forKey:@"stopEventAtLength"];
+    [objDictionary setObject:[NSNumber numberWithInt:enablePageWrapMask]      forKey:@"enablePageWrap"];
+    [objDictionary setObject:[NSNumber numberWithInt:enableTestDataMask]      forKey:@"enableTestData"];
+    
     return objDictionary;
 }
 
