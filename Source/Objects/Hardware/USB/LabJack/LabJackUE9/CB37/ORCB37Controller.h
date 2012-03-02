@@ -18,6 +18,8 @@
 //-------------------------------------------------------------
 #import "ORCB37Model.h"
 
+#define kCB37NumAdcs 24
+
 @interface ORCB37Controller : OrcaObjectController 
 {
 	IBOutlet NSTabView*		tabView;	
@@ -34,6 +36,7 @@
 	IBOutlet NSMatrix*		minValueMatrix;
 	IBOutlet NSMatrix*		maxValueMatrix;
 	IBOutlet NSTextField*	slotField;
+	IBOutlet NSMatrix*		adcEnabledMatrix;
 
 	NSSize					ioSize;
 	NSSize					setupSize;
@@ -90,8 +93,8 @@
 	IBOutlet NSPopUpButton*		bipolarPU22;
 	IBOutlet NSPopUpButton*		bipolarPU23;
 	
-	NSPopUpButton* gainPU[24];
-	NSPopUpButton* bipolarPU[24];
+	NSPopUpButton* gainPU[kCB37NumAdcs];
+	NSPopUpButton* bipolarPU[kCB37NumAdcs];
 	
 }
 
@@ -101,11 +104,11 @@
 - (BOOL) legalAdcRange:(int)adcChan;
 - (int)  displayChanFromAdcChan:(int)adcChan;
 - (int) startChannel;
-- (int) numAdcChannels;
 - (int) tagToAdcIndex:(int)aTag;
 
 #pragma mark ***Interface Management
 - (void) slotChanged:(NSNotification*)aNote;
+- (void) adcEnabledChanged:(NSNotification*)aNote;
 - (void) lowLimitChanged:(NSNotification*)aNote;
 - (void) hiLimitChanged:(NSNotification*)aNote;
 - (void) channelNameChanged:(NSNotification*)aNote;
@@ -120,6 +123,7 @@
 - (void) tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;
 
 #pragma mark •••Actions
+- (IBAction) adcEnabledAction:(id)sender;
 - (IBAction) settingLockAction:(id) sender;
 - (IBAction) channelNameAction:(id)sender;
 - (IBAction) channelUnitAction:(id)sender;

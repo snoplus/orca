@@ -97,12 +97,13 @@
 	bipolarPU[23] = bipolarPU23;
 	
 	short i;
-	for(i=0;i<24;i++){	
+	for(i=0;i<kCB37NumAdcs;i++){	
 		[gainPU[i] setTag:i];
 		[bipolarPU[i] setTag:i];
 		[[unitMatrix cellAtRow:i column:0] setEditable:YES];
 		[[nameMatrix cellAtRow:i column:0] setEditable:YES];
 		
+		[[adcEnabledMatrix cellAtRow:i column:0]setTag:i];
 		[[nameMatrix cellAtRow:i column:0]		setTag:i];
 		[[unitMatrix cellAtRow:i column:0]		setTag:i];
 		[[adcMatrix cellAtRow:i column:0]		setTag:i];
@@ -125,6 +126,7 @@
 
 		[gainPU[i] setAutoresizingMask:NSViewMaxXMargin|NSViewMinYMargin];
 		[bipolarPU[i] setAutoresizingMask:NSViewMaxXMargin|NSViewMinYMargin];
+		[[adcMatrix cellAtRow:i column:0]		setTag:i];
 
 	}
 		
@@ -132,7 +134,7 @@
 	
     blankView = [[NSView alloc] init];
     ioSize			= NSMakeSize(300,500);
-    setupSize		= NSMakeSize(700,710);
+    setupSize		= NSMakeSize(700,700);
 	
     NSString* key = [NSString stringWithFormat: @"orca.ORCB37%d.selectedtab",[model uniqueIdNumber]];
     int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
@@ -212,6 +214,10 @@
                          name : ORLabJackUE9BipolarChanged
 						object: [model guardian]];		
 	
+	[notifyCenter addObserver : self
+                     selector : @selector(adcEnabledChanged:)
+                         name : ORLabJackUE9ModelAdcEnableMaskChanged
+                       object : [model guardian]];
 }
 
 
@@ -230,6 +236,7 @@
 	[self interceptChanged:nil];
 	[self gainChanged:nil];
 	[self bipolarChanged:nil];
+	[self adcEnabledChanged:nil];
 }
 
 - (void) setModel:(id)aModel
@@ -249,23 +256,35 @@
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
 {
     [[self window] setContentView:blankView];
+	NSSize newSize;
 	switch([tabView indexOfTabViewItem:tabViewItem]){
-		case  0: [self resizeWindowToSize:ioSize];      break;
-		default: [self resizeWindowToSize:setupSize];	break;
-	}
-
+		case  0: newSize = ioSize;      break;
+		default: newSize = setupSize;	break;
+	}	
+	[self resizeWindowToSize:newSize];
     [[self window] setContentView:totalView];
     NSString* key = [NSString stringWithFormat: @"orca.ORCB37%d.selectedtab",[[model guardian] uniqueIdNumber]];
     int index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
     
 }
+
+- (void) adcEnabledChanged:(NSNotification*)aNote
+{
+	int startChan = [self startChannel];
+	int i;
+	for(i=0;i<kCB37NumAdcs;i++){
+		int adcChan = i + startChan;
+		[[adcEnabledMatrix cellWithTag:i] setIntValue:[[model guardian] adcEnabled:adcChan]];
+	}	
+}
+
 - (void) gainChanged:(NSNotification*)aNotification
 {
 	if(!aNotification){
 		int startChan = [self startChannel];
 		int i;
-		for(i=0;i<24;i++){
+		for(i=0;i<kCB37NumAdcs;i++){
 			int adcChan = i + startChan;
 			[gainPU[i] selectItemAtIndex:[[model guardian] gain:adcChan]];
 		}
@@ -273,7 +292,7 @@
 	else {
 		int adcChan = [[[aNotification userInfo] objectForKey:@"Channel"] intValue];
 		int displayChan = [self displayChanFromAdcChan:adcChan];
-		if(displayChan<kUE9NumAdcs){
+		if(displayChan>=0 && displayChan < kCB37NumAdcs){
 			[gainPU[displayChan] selectItemAtIndex:[[model guardian] gain:adcChan]];
 		}
 	}
@@ -283,7 +302,7 @@
 	if(!aNotification){
 		int startChan = [self startChannel];
 		int i;
-		for(i=0;i<24;i++){
+		for(i=0;i<kCB37NumAdcs;i++){
 			int adcChan = i + startChan;
 			[bipolarPU[i] selectItemAtIndex:[[model guardian] bipolar:adcChan]];
 		}
@@ -291,7 +310,7 @@
 	else {
 		int adcChan = [[[aNotification userInfo] objectForKey:@"Channel"] intValue];
 		int displayChan = [self displayChanFromAdcChan:adcChan];
-		if(displayChan<kUE9NumAdcs){
+		if(displayChan>=0 && displayChan < kCB37NumAdcs){
 			[bipolarPU[displayChan] selectItemAtIndex:[[model guardian] bipolar:adcChan]];
 		}
 	}
@@ -305,11 +324,10 @@
 
 - (void) lowLimitChanged:(NSNotification*)aNotification
 {
-	int numAdcChans = [self numAdcChannels];
 	if(!aNotification){
 		int i;
 		int startChan = [self startChannel];
-		for(i=0;i<numAdcChans;i++){
+		for(i=0;i<kCB37NumAdcs;i++){
 			int adcChan = i + startChan;
 			[[lowLimitMatrix cellWithTag:i] setFloatValue:[[model guardian] lowLimit:adcChan]];
 		}
@@ -317,7 +335,7 @@
 	else {
 		int adcChan = [[[aNotification userInfo] objectForKey:@"Channel"] intValue];
 		int displayChan = [self displayChanFromAdcChan:adcChan];
-		if(displayChan>=0 && displayChan < numAdcChans){
+		if(displayChan>=0 && displayChan < kCB37NumAdcs){
 			[[lowLimitMatrix cellWithTag:displayChan] setFloatValue:[[model guardian] lowLimit:adcChan]];
 		}
 	}
@@ -325,11 +343,10 @@
 
 - (void) hiLimitChanged:(NSNotification*)aNotification
 {
-	int numAdcChans = [self numAdcChannels];
 	if(!aNotification){
 		int i;
 		int startChan = [self startChannel];
-		for(i=0;i<numAdcChans;i++){
+		for(i=0;i<kCB37NumAdcs;i++){
 			int adcChan = i + startChan;
 			[[hiLimitMatrix cellWithTag:i] setFloatValue:[[model guardian] hiLimit:adcChan]];
 		}
@@ -337,7 +354,7 @@
 	else {
 		int adcChan = [[[aNotification userInfo] objectForKey:@"Channel"] intValue];
 		int displayChan = [self displayChanFromAdcChan:adcChan];
-		if(displayChan>=0 && displayChan < numAdcChans){
+		if(displayChan>=0 && displayChan < kCB37NumAdcs){
 			[[hiLimitMatrix cellWithTag:displayChan] setFloatValue:[[model guardian] hiLimit:adcChan]];
 		}
 	}
@@ -345,11 +362,10 @@
 
 - (void) minValueChanged:(NSNotification*)aNotification
 {
-	int numAdcChans = [self numAdcChannels];
 	if(!aNotification){
 		int i;
 		int startChan = [self startChannel];
-		for(i=0;i<numAdcChans;i++){
+		for(i=0;i<kCB37NumAdcs;i++){
 			int adcChan = i + startChan;
 			[[minValueMatrix cellWithTag:i] setFloatValue:[[model guardian] minValue:adcChan]];
 		}
@@ -357,7 +373,7 @@
 	else {
 		int adcChan = [[[aNotification userInfo] objectForKey:@"Channel"] intValue];
 		int displayChan = [self displayChanFromAdcChan:adcChan];
-		if(displayChan>=0 && displayChan < numAdcChans){
+		if(displayChan>=0 && displayChan < kCB37NumAdcs){
 			[[minValueMatrix cellWithTag:displayChan] setFloatValue:[[model guardian] minValue:adcChan]];
 		}
 	}
@@ -365,11 +381,10 @@
 
 - (void) maxValueChanged:(NSNotification*)aNotification
 {
-	int numAdcChans = [self numAdcChannels];
 	if(!aNotification){
 		int i;
 		int startChan = [self startChannel];
-		for(i=0;i<numAdcChans;i++){
+		for(i=0;i<kCB37NumAdcs;i++){
 			int adcChan = i + startChan;
 			[[maxValueMatrix cellWithTag:i] setFloatValue:[[model guardian] maxValue:adcChan]];
 		}
@@ -377,7 +392,7 @@
 	else {
 		int adcChan = [[[aNotification userInfo] objectForKey:@"Channel"] intValue];
 		int displayChan = [self displayChanFromAdcChan:adcChan];
-		if(displayChan>=0 && displayChan < numAdcChans){
+		if(displayChan>=0 && displayChan < kCB37NumAdcs){
 			[[maxValueMatrix cellWithTag:displayChan] setFloatValue:[[model guardian] maxValue:adcChan]];
 		}
 	}
@@ -385,11 +400,10 @@
 
 - (void) slopeChanged:(NSNotification*)aNotification
 {
-	int numAdcChans = [self numAdcChannels];
 	if(!aNotification){
 		int i;
 		int startChan = [self startChannel];
-		for(i=0;i<numAdcChans;i++){
+		for(i=0;i<kCB37NumAdcs;i++){
 			int adcChan = i + startChan;
 			[[slopeMatrix cellWithTag:i] setFloatValue:[[model guardian] slope:adcChan]];
 		}
@@ -397,7 +411,7 @@
 	else {
 		int adcChan = [[[aNotification userInfo] objectForKey:@"Channel"] intValue];
 		int displayChan = [self displayChanFromAdcChan:adcChan];
-		if(displayChan>=0 && displayChan < numAdcChans){
+		if(displayChan>=0 && displayChan < kCB37NumAdcs){
 			[[slopeMatrix cellWithTag:displayChan] setFloatValue:[[model guardian] slope:adcChan]];
 		}
 	}
@@ -405,11 +419,10 @@
 
 - (void) interceptChanged:(NSNotification*)aNotification
 {
-	int numAdcChans = [self numAdcChannels];
 	if(!aNotification){
 		int i;
 		int startChan = [self startChannel];
-		for(i=0;i<numAdcChans;i++){
+		for(i=0;i<kCB37NumAdcs;i++){
 			int adcChan = i + startChan;
 			[[interceptMatrix cellWithTag:i] setFloatValue:[[model guardian] intercept:adcChan]];
 		}
@@ -417,7 +430,7 @@
 	else {
 		int adcChan = [[[aNotification userInfo] objectForKey:@"Channel"] intValue];
 		int displayChan = [self displayChanFromAdcChan:adcChan];
-		if(displayChan>=0 && displayChan < numAdcChans){
+		if(displayChan>=0 && displayChan < kCB37NumAdcs){
 			[[interceptMatrix cellWithTag:displayChan] setFloatValue:[[model guardian] intercept:adcChan]];
 		}
 	}
@@ -432,11 +445,10 @@
 
 - (void) channelNameChanged:(NSNotification*)aNotification
 {
-	int numAdcChans = [self numAdcChannels];
 	if(!aNotification){
 		int i;
 		int startChan = [self startChannel];
-		for(i=0;i<numAdcChans;i++){
+		for(i=0;i<kCB37NumAdcs;i++){
 			int adcChan = i + startChan;
 			[[nameMatrix cellWithTag:i] setStringValue:[[model guardian] channelName:adcChan]];
 		}
@@ -444,7 +456,7 @@
 	else {
 		int adcChan = [[[aNotification userInfo] objectForKey:@"Channel"] intValue];
 		int displayChan = [self displayChanFromAdcChan:adcChan];
-		if(displayChan>=0 && displayChan < numAdcChans){
+		if(displayChan>=0 && displayChan < kCB37NumAdcs){
 			[[nameMatrix cellWithTag:displayChan] setStringValue:[[model guardian] channelName:adcChan]];
 		}
 	}
@@ -452,11 +464,10 @@
 
 - (void) channelUnitChanged:(NSNotification*)aNotification
 {
-	int numAdcChans = [self numAdcChannels];
 	if(!aNotification){
 		int i;
 		int startChan = [self startChannel];
-		for(i=0;i<numAdcChans;i++){
+		for(i=0;i<kCB37NumAdcs;i++){
 			int adcChan = i + startChan;
 			[[unitMatrix cellWithTag:i] setStringValue:[[model guardian] channelUnit:adcChan]];
 		}
@@ -464,7 +475,7 @@
 	else {
 		int adcChan = [[[aNotification userInfo] objectForKey:@"Channel"] intValue];
 		int displayChan = [self displayChanFromAdcChan:adcChan];
-		if(displayChan>=0 && displayChan < numAdcChans){
+		if(displayChan>=0 && displayChan < kCB37NumAdcs){
 			[[unitMatrix cellWithTag:displayChan] setStringValue:[[model guardian] channelUnit:adcChan]];
 		}
 	}
@@ -472,11 +483,10 @@
 
 - (void) adcChanged:(NSNotification*)aNotification
 {
-	int numAdcChans = [self numAdcChannels];
 	if(!aNotification){
 		int i;
 		int startChan = [self startChannel];
-		for(i=0;i<numAdcChans;i++){
+		for(i=0;i<kCB37NumAdcs;i++){
 			int adcChan = i + startChan;
 			[[adcMatrix cellWithTag:i] setFloatValue:[[model guardian] convertedValue:adcChan]];
 		}
@@ -484,7 +494,7 @@
 	else {
 		int adcChan = [[[aNotification userInfo] objectForKey:@"Channel"] intValue];
 		int displayChan = [self displayChanFromAdcChan:adcChan];
-		if(displayChan>=0 && displayChan < numAdcChans){
+		if(displayChan>=0 && displayChan < kCB37NumAdcs){
 			[[adcMatrix cellWithTag:displayChan] setFloatValue:[[model guardian] convertedValue:adcChan]];
 		}
 	}
@@ -499,11 +509,6 @@
 		case 3: return 60;
 		default: return 0;
 	}
-}
-
-- (int) numAdcChannels
-{
-	return [model slot]==0?12:24;
 }
 
 - (int)  displayChanFromAdcChan:(int)adcChan
@@ -525,7 +530,7 @@
 {
 	int slot = [model slot];
 	switch(slot){
-		case 0:  return (adcChan>=0 && adcChan<=11);
+		case 0:  return (adcChan>=0 && adcChan<=24);
 		case 1:  return (adcChan>=12 && adcChan<=35);
 		case 2:  return (adcChan>=36 && adcChan<=59);
 		case 3:  return (adcChan>=60 && adcChan<=83);
@@ -547,7 +552,7 @@
 	[nameMatrix	setEnabled:!locked];
 	[unitMatrix	setEnabled:!locked];
 	int i;
-	for(i=0;i<24;i++){
+	for(i=0;i<kCB37NumAdcs;i++){
 		int adcChan = [self tagToAdcIndex:i];	
 		[bipolarPU[i] setEnabled:!locked];
 		[gainPU[i] setEnabled:![[model guardian] bipolar:adcChan] && !locked];
@@ -632,4 +637,12 @@
 	int adcChan = [self tagToAdcIndex:[sender tag]];
 	[[model guardian] setBipolar:adcChan value:[sender indexOfSelectedItem]];
 }
+
+- (IBAction) adcEnabledAction:(id)sender
+{
+	int adcChan = [self tagToAdcIndex:[[sender selectedCell] tag]];
+	[[model guardian] setAdcEnabled:adcChan value:[sender intValue]];
+	
+}
+
 @end
