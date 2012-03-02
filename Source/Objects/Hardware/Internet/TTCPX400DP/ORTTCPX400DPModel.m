@@ -401,7 +401,7 @@ ORTTCPX_READ_IMPLEMENT(GetOutputStatus, int)
 }
 - (void) setOutput:(unsigned int)output toBeOn:(BOOL)on
 {
-    [self setWriteToSetOutput:output withOutput:on];
+    [self setWriteToSetOutput:on withOutput:output];
 }
 
 - (void) _addCommandToDataProcessingQueue:(struct ORTTCPX400DPCmdInfo*)theCmd 
