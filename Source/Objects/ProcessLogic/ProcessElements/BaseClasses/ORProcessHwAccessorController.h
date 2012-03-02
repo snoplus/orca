@@ -25,7 +25,7 @@
 @interface ORProcessHwAccessorController : ORProcessElementController 
 {
     IBOutlet NSPopUpButton* interfaceObjPU;
-    IBOutlet NSPopUpButton* channelPU;
+    IBOutlet NSTextField*	channelField;
     IBOutlet NSTextField*   currentSourceField;
     IBOutlet NSTextField*   currentSourceStateField;
     IBOutlet NSButton*      hwAccessLockButton;
@@ -41,7 +41,6 @@
 - (void) awakeFromNib;
 - (void) registerNotificationObservers;
 - (void) populateObjPU;
-- (void) populateBitsPU;
 - (void) viewIconTypeChanged:(NSNotification*)aNote;
 - (void) labelTypeChanged:(NSNotification*)aNote;
 - (void) customLabelChanged:(NSNotification*)aNote;
@@ -61,7 +60,7 @@
 #pragma mark ¥¥¥Actions
 - (IBAction) hwAccessLockAction:(id)sender;
 - (IBAction) interfaceObjPUAction:(id)sender;
-- (IBAction) channelPUAction:(id)sender;
+- (IBAction) channelFieldAction:(id)sender;
 - (IBAction) viewSourceAction:(id)sender;
 - (IBAction) viewIconTypeAction:(id)sender;
 - (IBAction) labelTypeAction:(id)sender;

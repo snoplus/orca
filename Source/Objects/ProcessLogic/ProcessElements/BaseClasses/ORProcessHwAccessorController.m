@@ -31,7 +31,6 @@
 
 - (void) awakeFromNib
 {
-	[self populateBitsPU];
 	[super awakeFromNib];
 }
 
@@ -47,17 +46,6 @@
     }
     
 }
-
-- (void) populateBitsPU
-{
-    [channelPU removeAllItems];
-    int bit;
-    for(bit= 0;bit<32;bit++){
-        [channelPU insertItemWithTitle:[NSString stringWithFormat:@"%d",bit] atIndex:bit];
-    }
-    
-}
-
 
 
 #pragma mark ¥¥¥Notifications
@@ -162,7 +150,7 @@
     BOOL locked = [gSecurity isLocked:ORHWAccessLock];
     BOOL running = [ORProcessThread isRunning];
     [interfaceObjPU setEnabled: !locked && !running];
-    [channelPU setEnabled: !locked && !running];
+    [channelField setEnabled: !locked && !running];
 	[commentField setEnabled: !locked];
 	[displayFormatField setEnabled: !locked ];
 	[viewIconTypePU setEnabled: !locked ];
@@ -250,7 +238,7 @@
 
 - (void) bitChanged:(NSNotification*)aNotification
 {
-	[channelPU selectItemAtIndex:[model bit]];
+	[channelField setIntValue:[model bit]];
 }
 
 #pragma mark ¥¥¥Actions
@@ -264,9 +252,9 @@
     [model useHWObjectWithName:[sender titleOfSelectedItem]];
 }
 
-- (IBAction) channelPUAction:(id)sender
+- (IBAction) channelFieldAction:(id)sender
 {
-    [model setBit:[sender indexOfSelectedItem]];
+    [model setBit:[sender intValue]];
 }
 
 - (IBAction) viewSourceAction:(id)sender
