@@ -645,4 +645,8 @@
 	
 }
 
+- (IBAction) printChannelLocations:(id)sender
+{
+    [model printChannelLocations];
+}
 @end

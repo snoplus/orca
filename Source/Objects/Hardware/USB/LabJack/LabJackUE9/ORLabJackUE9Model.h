@@ -233,6 +233,8 @@
 - (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit  channel:(int)channel;
 - (double) convertedValue:(int)channel;
 - (double) maxValueForChan:(int)channel;
+- (BOOL) CB37Exists:(int)aSlot;
+- (void) printChannelLocations;
 
 #pragma mark •••OROrderedObjHolding Protocol
 - (int) maxNumberOfObjects;

@@ -1555,6 +1555,46 @@ NSString* ORLabJackUE9ModelAdcEnableMaskChanged		= @"ORLabJackUE9ModelAdcEnableM
 	}
 }
 
+- (BOOL) CB37Exists:(int)aSlot
+{
+    NSEnumerator* e = [[self orcaObjects] objectEnumerator];
+    ORCB37Model* anObject;
+    while(anObject = [e nextObject]){
+        if([anObject slot] == aSlot)return YES;
+    }
+    return NO;
+}
+
+- (void) printChannelLocations
+{
+    int CB37Pin[14] = {37,18,36,17,35,16,34,15,33,14,32,13,31,12};
+    int i;
+    NSFont* font = [NSFont fontWithName:@"Monaco" size:11];
+    NSLogFont(font, @"LabJackUE9 (%d) Channel Map\n",[self uniqueIdNumber]);
+    if([[self orcaObjects] count]==0){
+        //no CB37 attached
+        for(i=0;i<4;i++)  NSLogFont(font,@"%2d DB37 %2d and Terminal Block AIN%2d\n",i,CB37Pin[i],i);
+        for(i=4;i<14;i++) NSLogFont(font,@"%2d DB37 %2d\n",i,CB37Pin[i]);    
+    }
+    else {
+        for(i=0;i<4;i++)NSLogFont(font,@"%2d Terminal Block AIN%2d\n",i,i);
+        if([self CB37Exists:0] && [self CB37Exists:1]){
+            for(i=4;i<12;i++) NSLogFont(font,@"%2d X2 AIN%2d\n",i,i-4);
+            for(i=12;i<14;i++)NSLogFont(font,@"%2d X3 AIN%2d\n",i,i-12);
+        }
+        else if([self CB37Exists:0]  && ![self CB37Exists:1]){
+            for(i=4;i<12;i++) NSLogFont(font,@"%2d X2 AIN%2d\n",i,i-4);
+            for(i=12;i<14;i++)NSLogFont(font,@"%2d UnAvailable\n",i);       
+        }
+        else if(![self CB37Exists:0] && [self CB37Exists:1]){
+            for(i=4;i<12;i++) NSLogFont(font,@"%2d UnAvailable\n",i);
+            for(i=12;i<14;i++)NSLogFont(font,@"%2d X3 AIN%2d\n",i,i-12);       
+        }
+        else for(i=4;i<14;i++)NSLogFont(font,@"%2d UnAvailable\n",i);
+    }
+}
+
+
 @end
 
 @implementation ORLabJackUE9Model (private)

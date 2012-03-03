@@ -201,6 +201,7 @@
 
 - (IBAction) openIPChangePanel:(id)sender;
 - (IBAction) closeIPChangePanel:(id)sender;
+- (IBAction) printChannelLocations:(id)sender;
 
 @end
 

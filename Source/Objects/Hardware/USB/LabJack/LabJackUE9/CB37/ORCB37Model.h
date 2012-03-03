@@ -25,6 +25,8 @@
 @interface ORCB37Model : ORCard  {
 	NSLock*			  localLock;
 }
+- (void) printChannelLocations;
+
 @end
 
 extern NSString* ORCB37Lock;

@@ -136,6 +136,7 @@
 - (IBAction) showLabJackUE9:(id)sender;
 - (IBAction) bipolarAction:(id)sender;
 - (IBAction) gainAction:(id)sender;
+- (IBAction) printChannelLocations:(id)sender;
 
 @end
 

@@ -1034,6 +1034,10 @@
 	[model setAdcEnabled:theBit value:[sender intValue]];
 
 }
+- (IBAction) printChannelLocations:(id)sender
+{
+    [model printChannelLocations];
+}
 
 
 @end
