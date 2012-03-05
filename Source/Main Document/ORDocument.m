@@ -327,7 +327,7 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 		[objectInfoDictionary setObject:usb forKey:@"USB"];
 	}
 	if([serial count]){
-		[objectInfoDictionary setObject:usb forKey:@"Serial"];
+		[objectInfoDictionary setObject:serial forKey:@"Serial"];
 	}
 	if([auxHw count]){
 		[objectInfoDictionary setObject:auxHw forKey:@"AuxHw"];
