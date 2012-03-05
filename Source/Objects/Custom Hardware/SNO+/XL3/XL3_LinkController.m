@@ -652,11 +652,12 @@ static NSDictionary* xl3Ops;
 
 - (void) linkConnectionChanged:(NSNotification*)aNote
 {
-	
+    [self connectStateChanged:aNote];
 }
 
 - (void) connectStateChanged:(NSNotification*)aNote
 {
+    /*
 	BOOL runInProgress = [gOrcaGlobals runInProgress];
 	BOOL locked = [gSecurity isLocked:[model xl3LockName]];
 	if(runInProgress) {
@@ -672,7 +673,17 @@ static NSDictionary* xl3Ops;
 			[toggleConnectButton setTitle:@"Disconnect"];
 		}
 		[toggleConnectButton setEnabled:!locked];
-	}	
+	}
+     */
+    
+    //we need the control
+    if([[model xl3Link] connectState] == kDisconnected){
+        [toggleConnectButton setTitle:@"Connect"];
+        
+    }
+    else {
+        [toggleConnectButton setTitle:@"Disconnect"];
+    }
 }
 
 - (void) errorTimeOutChanged:(NSNotification*)aNote

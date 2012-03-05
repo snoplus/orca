@@ -21,6 +21,7 @@
 @interface ORMTCController : OrcaObjectController {
 
     IBOutlet NSTabView*		tabView;
+    IBOutlet NSTextField* lockDocField;
 	//basic Ops
 	IBOutlet NSProgressIndicator* basicOpsRunningIndicator;
 	IBOutlet NSButton*		autoIncrementCB;
@@ -138,6 +139,7 @@
 - (void) sequenceRunning:(NSNotification*)aNote;
 - (void) sequenceStopped:(NSNotification*)aNote;
 - (void) sequenceProgress:(NSNotification*)aNote;
+- (void) documentLockChanged:(NSNotification*)aNotification;
 
 #pragma mark •••Helper
 - (void) populatePullDown;

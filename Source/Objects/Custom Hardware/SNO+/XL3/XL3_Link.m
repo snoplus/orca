@@ -53,6 +53,8 @@ NSString* XL3_LinkAutoConnectChanged    = @"XL3_LinkAutoConnectChanged";
 
 
 @implementation XL3_Link
+@synthesize fifoTimeStamp = _fifoTimeStamp,
+readFifoFlag = _readFifoFlag;
 
 - (id) init
 {
@@ -81,11 +83,17 @@ NSString* XL3_LinkAutoConnectChanged    = @"XL3_LinkAutoConnectChanged";
 		cmdArray = nil;
 	}
     if (bundleBuffer) [self releaseBuffer];
+
     if (fifoStatus) {
         [fifoStatus release];
         fifoStatus = nil;
     }
-    
+
+    if (_fifoTimeStamp) {
+        [_fifoTimeStamp release];
+        _fifoTimeStamp = nil;
+    }
+
 	[super dealloc];
 }
 
@@ -349,9 +357,10 @@ NSString* XL3_LinkAutoConnectChanged    = @"XL3_LinkAutoConnectChanged";
 - (void) setFifoStatus:(NSArray *)aFifoStatus
 {
     if (fifoStatus) [fifoStatus release];
-
     fifoStatus = [aFifoStatus copy];
-    fifoTimeStamp = [NSDate date];
+    
+    if (_fifoTimeStamp) [_fifoTimeStamp release];
+    _fifoTimeStamp = [[NSDate alloc] init];
 }
 
 - (void) copyFifoStatus:(int32_t*)aStatus
@@ -378,17 +387,16 @@ NSString* XL3_LinkAutoConnectChanged    = @"XL3_LinkAutoConnectChanged";
     [self setFifoStatus:fifo];
     [fifo release];
     fifo = nil;
-}
-
-- (NSDate*) fifoTimeStamp
-{
-    return fifoTimeStamp;
-}
-
-- (void) setFifoTimeStamp:(NSDate *)fifoTimeStamp;
-{
     
+    memcpy(_fifoBundle, aStatus, 16*4);
+    [self setReadFifoFlag:YES];
 }
+
+- (unsigned long*) fifoBundle
+{
+    return _fifoBundle;
+}
+
 - (void) newMultiCmd
 {
 	aMultiCmdPacket.cmdHeader.packet_type = MULTI_FAST_CMD_ID;
@@ -793,6 +801,7 @@ static void SwapLongBlock(void* p, int32_t n)
 		selectionResult = select(workingSocket + 1, &fds, NULL, NULL, &tv);
 		if (selectionResult == -1 && !(errno == EAGAIN || errno == EINTR)) {
 			[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:.01]];
+            //check Timer
 			if (workingSocket || serverSocket) {
 				NSLog(@"Error reading XL3 <%@> port: %d\n", IPNumber, portNumber);
 			}
@@ -812,6 +821,8 @@ static void SwapLongBlock(void* p, int32_t n)
 				break;
 			}
 
+            //reset timer
+            
             //NSLog(@"Read packet:  packet_type: 0x%x, packet_num: 0x%x\n", ((XL3_Packet*) aPacket)->cmdHeader.packet_type, ((XL3_Packet*) aPacket)->cmdHeader.packet_num);
 
             if (((XL3_Packet*) aPacket)->cmdHeader.packet_type == MEGA_BUNDLE_ID) {
@@ -969,9 +980,11 @@ static void SwapLongBlock(void* p, int32_t n)
 			
 			if (selectionResult == -1){
 				[NSException raise:@"Write error" format:@"Write error %@ <%@>: %s",[self crateName], IPNumber, strerror(errno)];
+                    [self performSelector:@selector(disconnectSocket) withObject:nil afterDelay:0];
 			}
 			else if (selectionResult == 0 || ([self errorTimeOutSeconds] && time(0) - t1 > [self errorTimeOutSeconds])) {
 				[NSException raise:@"Connection time out" format:@"Write to %@ <%@> port: %d timed out",[self crateName], IPNumber, portNumber];
+                [self performSelector:@selector(disconnectSocket) withObject:nil afterDelay:0];
 			}
 
 			do {
@@ -984,8 +997,9 @@ static void SwapLongBlock(void* p, int32_t n)
 			} 
 			else if (bytesWritten < 0) {
 				if (errno == EPIPE) {
-					//[self disconnect];
+                    [self performSelector:@selector(disconnectSocket) withObject:nil afterDelay:0];
 					//what do we want to do?
+                    //not really used, SIGPIPE instead
 				}
 				[NSException raise:@"Write error" format:@"Write error(%s) %@ <%@> port: %d",strerror(errno),[self crateName],IPNumber,portNumber];
 			}

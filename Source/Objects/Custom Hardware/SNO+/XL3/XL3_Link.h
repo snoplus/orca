@@ -54,8 +54,10 @@ eXL3_CrateStates;
 	unsigned long long num_cmd_packets;
 	unsigned long long num_dat_packets;
 	XL3_Packet	aMultiCmdPacket;
-    NSArray*    fifoStatus;         //array of 16 diffs between write and read FEC pointers
-    NSDate*     fifoTimeStamp;      //time stamp when fifoStatus received
+    NSArray*    fifoStatus;         //array of 16 diffs between write and read FEC pointers, NSNumbers for MORCA
+    NSDate*     _fifoTimeStamp;     //time stamp when fifoStatus received
+    BOOL _readFifoFlag;             //a flag check by Xl3Model::takeData;
+    unsigned long _fifoBundle[16];  //an array to enter data stream
     
 @private
     //memory optimized circular buffer, motivated by ORSafeCirularBuffer. Thanks Mark.
@@ -76,6 +78,7 @@ eXL3_CrateStates;
 @property (assign)	BOOL        autoConnect;
 @property (copy)    NSArray*    fifoStatus;
 @property (copy)    NSDate*     fifoTimeStamp;
+@property (assign) BOOL readFifoFlag;
 
 - (id)   init;
 - (void) dealloc;
@@ -110,6 +113,7 @@ eXL3_CrateStates;
 - (void) setPortNumber:(unsigned long)aPortNumber;
 - (NSString*) crateName;
 - (void) setCrateName:(NSString*)aCrateName;
+- (unsigned long*) fifoBundle;
 
 - (void) newMultiCmd;
 - (void) addMultiCmdToAddress:(long)anAddress withValue:(long)aValue;

@@ -55,6 +55,7 @@ enum {
 	XL3_Link*       xl3Link;
 	unsigned long	xl3MegaBundleDataId;
 	unsigned long	cmosRateDataId;
+    unsigned long   xl3FifoDataId;
 	short           selectedRegister;
 	BOOL            basicOpsRunning;
 	BOOL            autoIncrement;	
@@ -215,6 +216,7 @@ enum {
 - (void) syncDataIdsWith:(id)anotherObj;
 @property unsigned long xl3MegaBundleDataId;
 @property unsigned long cmosRateDataId;
+@property unsigned long xl3FifoDataId;
 - (NSDictionary*) dataRecordDescription;
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;

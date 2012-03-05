@@ -150,3 +150,37 @@
 }
 
 @end
+
+@implementation ORXL3DecoderForFifo
+
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
+{
+	unsigned long* ptr = (unsigned long*)someData;
+	unsigned long length = ExtractLength(*ptr);
+    indexerSwaps = [aDecoder needToSwap];
+	return length; //must return number of bytes processed.    
+}
+
+- (NSString*) dataRecordDescription:(unsigned long*)dataPtr
+{
+    NSMutableString* dsc = [NSMutableString stringWithFormat: @"FIFO state crate %d\n\n", dataPtr[1]];
+    unsigned char slot = 0;
+
+    BOOL swapBundle = YES;
+	if (0x0000ABCD != htonl(0x0000ABCD) && indexerSwaps) swapBundle = NO;
+	if (0x0000ABCD == htonl(0x0000ABCD) && !indexerSwaps) swapBundle = NO;
+    
+    dataPtr += 2;
+
+    unsigned long fifo;
+    for (slot=0; slot<16; slot++) {
+        fifo = dataPtr[slot];
+		if (swapBundle) fifo = swapLong(fifo);
+        
+        [dsc appendFormat:@"slot %2d: 0x%08x\n", slot, fifo];
+    }
+
+    return dsc;
+}
+
+@end

@@ -204,6 +204,16 @@
                      selector : @selector(sequenceProgress:)
                          name : ORSequenceProgress
 						object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(documentLockChanged:)
+                         name : ORRunStatusChangedNotification
+                       object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(documentLockChanged:)
+                         name : ORDocumentLock
+                       object : nil];
 
 }
 
@@ -230,6 +240,7 @@
 	[self isPulserFixedRateChanged:nil];
 	[self fixedPulserRateCountChanged:nil];
 	[self fixedPulserRateDelayChanged:nil];
+    [self documentLockChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -255,17 +266,16 @@
 	[initNo10MHzButton			setEnabled: !lockedOrRunningMaintenance];
 	[initNoXilinxNo100MHzButton setEnabled: !lockedOrRunningMaintenance];
 	[makeCrateMaskButton		setEnabled: !lockedOrRunningMaintenance];
-	[load10MhzCounterButton		setEnabled: !lockedOrRunningMaintenance];
-	[loadOnlineMaskButton		setEnabled: !lockedOrRunningMaintenance];
-	[loadDacsButton				setEnabled: !lockedOrRunningMaintenance];
-	[firePedestalsButton		setEnabled: !lockedOrRunningMaintenance];
+	//[load10MhzCounterButton		setEnabled: !lockedOrRunningMaintenance];
+	//[loadOnlineMaskButton		setEnabled: !lockedOrRunningMaintenance];
+	//[loadDacsButton				setEnabled: !lockedOrRunningMaintenance];
+	//[firePedestalsButton		setEnabled: !lockedOrRunningMaintenance];
 	[triggerZeroMatrix			setEnabled: !lockedOrRunningMaintenance];
 	[findTriggerZerosButton		setEnabled: !lockedOrRunningMaintenance];
 	[continuousButton			setEnabled: !lockedOrRunningMaintenance];
 	[stopTriggerZeroButton		setEnabled: !lockedOrRunningMaintenance];
-	[stopTriggerZeroButton		setEnabled: !lockedOrRunningMaintenance];
 	[passiveOnlyButton			setEnabled: !lockedOrRunningMaintenance];
-	[setCoarseDelayButton		setEnabled: !lockedOrRunningMaintenance];
+	//[setCoarseDelayButton		setEnabled: !lockedOrRunningMaintenance];
 	
 	//we want to fire pedestals during runs
 	[firePedestalsButton		setEnabled: !sequenceRunning && [model isPulserFixedRate]];
@@ -275,6 +285,22 @@
 	[stopFixedTimePedestalsButton	setEnabled: !sequenceRunning && ![model isPulserFixedRate]];
 	[fixedTimePedestalsCountField	setEnabled: !sequenceRunning && ![model isPulserFixedRate]];
 	[fixedTimePedestalsDelayField	setEnabled: !sequenceRunning && ![model isPulserFixedRate]];	
+    //and set thresholds
+	[makeCrateMaskButton		setEnabled:YES];
+	[load10MhzCounterButton		setEnabled:YES];
+	[loadOnlineMaskButton		setEnabled:YES];
+	[loadDacsButton				setEnabled:YES];
+	[firePedestalsButton		setEnabled:YES];
+	[setCoarseDelayButton		setEnabled:YES];
+
+}
+
+- (void) documentLockChanged:(NSNotification*)aNotification
+{
+    if([gSecurity isLocked:ORDocumentLock]) [lockDocField setStringValue:@"Document is locked."];
+    else if([gOrcaGlobals runInProgress])   [lockDocField setStringValue:@"Run In Progress"];
+    else				    [lockDocField setStringValue:@""];
+    [self updateButtons];
 }
 
 - (void) sequenceRunning:(NSNotification*)aNote
@@ -285,10 +311,13 @@
 	[initProgressField setHidden:NO];
 	[initProgressField setDoubleValue:0];
 	[self updateButtons];
+    //hack to unlock UI if the sequence couldn't finish and didn't raise an exception (MTCD feature)
+    [self performSelector:@selector(sequenceStopped:) withObject:nil afterDelay:5];
 }
 
 - (void) sequenceStopped:(NSNotification*)aNote
 {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[initProgressField setHidden:YES];
 	[initProgressBar setDoubleValue:0];
 	[initProgressBar stopAnimation:self];

@@ -991,15 +991,17 @@ void SwapLongBlock(void* p, int32_t n)
 {
 	xl3MegaBundleDataId	= [assigner assignDataIds:kLongForm];
 	cmosRateDataId		= [assigner assignDataIds:kLongForm];
+    xl3FifoDataId = [assigner assignDataIds:kLongForm];
 }
 
 - (void) syncDataIdsWith:(id)anotherObj
 {
 	[self setXl3MegaBundleDataId:[anotherObj xl3MegaBundleDataId]];
 	[self setCmosRateDataId:[anotherObj cmosRateDataId]];
+    [self setXl3FifoDataId:[anotherObj xl3FifoDataId]];
 }	
 
-@synthesize xl3MegaBundleDataId, cmosRateDataId;
+@synthesize xl3MegaBundleDataId, cmosRateDataId, xl3FifoDataId;
 
 - (NSDictionary*) dataRecordDescription
 {
@@ -1020,7 +1022,15 @@ void SwapLongBlock(void* p, int32_t n)
 				     [NSNumber numberWithLong:21+8*32],		@"length",
 				     nil];
 	[dataDictionary setObject:bDictionary forKey:@"Xl3CmosRate"];
-	
+
+    NSDictionary* cDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+                                 @"ORXL3DecoderForFifo", @"decoder",
+                                 [NSNumber numberWithLong:xl3FifoDataId], @"dataId",
+                                 [NSNumber numberWithBool:NO], @"variable",
+                                 [NSNumber numberWithLong:18],	@"length",
+                                 nil];
+	[dataDictionary setObject:cDictionary forKey:@"Xl3Fifo"];
+
 	return dataDictionary;
 }
 
@@ -1036,11 +1046,21 @@ void SwapLongBlock(void* p, int32_t n)
         unsigned long data_length = [aBundle length] / 4;
         unsigned long* data = (unsigned long*)[aBundle mutableBytes];
         data[0] = xl3MegaBundleDataId | data_length;
-		data[1] = 0; //packet count, maybe time, and crate ID in a meaningful way
+		data[1] = [self crateNumber]; //packet count, maybe time, and crate ID in a meaningful way
 
 		[aDataPacket addLongsToFrameBuffer:data length:data_length];
 		[aBundle release]; aBundle = nil; //this is correct even if the analyzer doesn't agree
 	}
+    
+    if ([xl3Link readFifoFlag]) {
+        unsigned long data[18];
+        data[0] = xl3FifoDataId | 18;
+		data[1] = [self crateNumber];
+        memcpy(data+2, [xl3Link fifoBundle], 16*4);
+        
+		[aDataPacket addLongsToFrameBuffer:data length:18];                
+        [xl3Link setReadFifoFlag:NO];
+    }
 }
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
@@ -2020,11 +2040,13 @@ void SwapLongBlock(void* p, int32_t n)
             NSLog(@"%@ Polling loop stopped because reading CMOS rates failed\n", [[self xl3Link] crateName]);
             [self setIsPollingXl3:NO];
         }
+        return;
     }
     
     if (results_lo.error_flags != 0 || (num_slots > 8 &&  results_hi.error_flags != 0)) {
         NSLog(@"%@ error in readCMOSCountWithArgs, error_flags_lo: 0x%08x, error_flags_hi: 0x%08x\n",
               [[self xl3Link] crateName], results_lo.error_flags, results_hi.error_flags);
+        return;
     }
     else {
         unsigned char slot_idx = 0;
@@ -2355,10 +2377,12 @@ void SwapLongBlock(void* p, int32_t n)
             NSLog(@"%@ Polling loop stopped becaused reading PMT based currents failed\n", [[self xl3Link] crateName]);
             [self setIsPollingXl3:NO];
         }
+        return;
     }
     
     if (results.error_flags != 0) {
         NSLog(@"%@ error in readPMTBaseCurrentsForSlot, error_flags: 0x%08x.\n",[[self xl3Link] crateName], results.error_flags);
+        return;
     }
     else if (!isPollingXl3 || isPollingVerbose) {    
         NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ PMT base currents for crate:\n", [[self xl3Link] crateName]];
@@ -2869,6 +2893,7 @@ void SwapLongBlock(void* p, int32_t n)
             NSLog(@"Polling loop stopped because reading FEC local voltages failed\n");
             [self setIsPollingXl3:NO];
         }
+        return;
     }
     if (!isPollingXl3 || isPollingVerbose) {
         //it doesn't set error_flags
@@ -3007,6 +3032,7 @@ void SwapLongBlock(void* p, int32_t n)
             NSLog(@"Polling loop stopped becaused reading XL3 local voltages failed\n");
             [self setIsPollingXl3:NO];
         }
+        return;
     }
     
     //unless (isPollingXl3 && !isPollingVerbose)
