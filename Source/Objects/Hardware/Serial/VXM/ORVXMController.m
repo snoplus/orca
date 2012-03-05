@@ -153,6 +153,21 @@
                      selector : @selector(fullScaleChanged:)
                          name : ORVXMModelFullScaleChanged
                        object : model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(queryInProgressChanged:)
+                         name : ORVXMModelQueryInProgressChanged
+                       object : model];  
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(queryInProgressChanged:)
+                         name : ORVXMModelLastMotorQueryChanged
+                       object : model];  
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(speedChanged:)
+                         name : ORVXMModelMotorSpeedChanged
+                       object : model];      
 
 }
 
@@ -174,8 +189,17 @@
     [self conversionChanged:nil];
     [self fullScaleChanged:nil];
     [self enabledMaskChanged:nil];
+    [self queryInProgressChanged:nil];
+    [self speedChanged:nil];
 	
 }
+
+- (void) queryInProgressChanged:(NSNotification*)aNotification
+{
+	[queryInProgress1 setStringValue:([model queryInProgress] & [model lastMotorQuery]==0)?@"Query":@""];
+	[queryInProgress2 setStringValue:([model queryInProgress] & [model lastMotorQuery]==1)?@"Query":@""];
+}
+
 
 - (void) conversionChanged:(NSNotification*)aNotification
 {
@@ -189,6 +213,11 @@
 	[[fullScaleMatrix cellWithTag:1] setFloatValue:[model fullScale].y];
 }
 
+- (void) speedChanged:(NSNotification*)aNotification
+{
+	[[speedMatrix cellWithTag:0] setFloatValue:[model motorSpeed].x];
+	[[speedMatrix cellWithTag:1] setFloatValue:[model motorSpeed].y];
+}
 
 - (void) checkGlobalSecurity
 {
@@ -227,6 +256,7 @@
 	[[patternMatrix cellWithTag:2] setEnabled:!locked & motor0Enabled];
 	[[conversionMatrix cellWithTag:0] setEnabled:!locked & motor0Enabled];
 	[[fullScaleMatrix cellWithTag:0] setEnabled:!locked & motor0Enabled];
+	[[speedMatrix cellWithTag:0] setEnabled:!locked & motor0Enabled];
 
     [cmdYValueField setEnabled:!locked & motor1Enabled];
 	[[patternMatrix cellWithTag:3] setEnabled:!locked & motor1Enabled];
@@ -234,6 +264,7 @@
 	[[patternMatrix cellWithTag:5] setEnabled:!locked & motor1Enabled];
 	[[conversionMatrix cellWithTag:1] setEnabled:!locked & motor1Enabled];
 	[[fullScaleMatrix cellWithTag:1] setEnabled:!locked & motor1Enabled];
+	[[speedMatrix cellWithTag:1] setEnabled:!locked & motor1Enabled];
 
 
     NSString* s = @"";
@@ -488,6 +519,7 @@
 
 - (IBAction) patternAction:(id)sender
 {
+    [self endEditing];
     int  tag = [[sender selectedCell]tag];
     float value = [[sender selectedCell] floatValue];
     if(tag == 0) [model setStartPoint:NSMakePoint(value,[model startPoint].y)];
@@ -501,6 +533,7 @@
 
 - (IBAction) conversionAction:(id)sender
 {
+    [self endEditing];
     int  tag = [[sender selectedCell]tag];
 	float value = [[sender selectedCell] floatValue];
 
@@ -510,10 +543,21 @@
 
 - (IBAction) fullScaleAction:(id)sender
 {
+    [self endEditing];
     int  tag = [[sender selectedCell]tag];
 	float value = [[sender selectedCell] floatValue];
     if(tag == 0)[model setFullScale:NSMakePoint(value,[model fullScale].y)];
     else		[model setFullScale:NSMakePoint([model fullScale].x,value)];
+}
+
+- (IBAction) speedAction:(id)sender
+{
+    [self endEditing];
+    int  tag = [[sender selectedCell]tag];
+	int value = [[sender selectedCell] intValue];
+    if(tag == 0)[model setMotorSpeed:NSMakePoint(value,[model motorSpeed].y)];
+    else		[model setMotorSpeed:NSMakePoint([model motorSpeed].x,value)];
+
 }
 
 - (void) dwellTimeAction:(id)sender

@@ -50,10 +50,13 @@
     IBOutlet NSTextField*   dwellTimeField;
     IBOutlet NSMatrix*      conversionMatrix;
     IBOutlet NSMatrix*      fullScaleMatrix;
+    IBOutlet NSMatrix*      speedMatrix;
     IBOutlet NSMatrix*      enabledMaskMatrix;
 
 	IBOutlet SMPieChartView* motorPie1;
 	IBOutlet SMPieChartView* motorPie2;
+    IBOutlet NSTextField*   queryInProgress1;
+    IBOutlet NSTextField*   queryInProgress2;
 }
 
 #pragma mark ***Initialization
@@ -64,6 +67,7 @@
 #pragma mark ***Notifications
 - (void) registerNotificationObservers;
 - (void) updateWindow;
+- (void) speedChanged:(NSNotification*)aNotification;
 - (void) updateButtons:(NSNotification*)aNotification;
 - (void) portNameChanged:(NSNotification*)aNotification;
 - (void) portStateChanged:(NSNotification*)aNotification;
@@ -79,6 +83,7 @@
 - (void) conversionChanged:(NSNotification*)aNotification;
 - (void) fullScaleChanged:(NSNotification*)aNotification;
 - (void) enabledMaskChanged:(NSNotification*)aNotification;
+- (void) queryInProgressChanged:(NSNotification*)aNotification;
 
 #pragma mark ***Accessors
 
@@ -101,6 +106,7 @@
 - (IBAction) optionsAction:(id)sender;
 - (IBAction) conversionAction:(id)sender;
 - (IBAction) fullScaleAction:(id)sender;
+- (IBAction) speedAction:(id)sender;
 - (IBAction) enabledMaskAction:(id)sender;
 
 @end

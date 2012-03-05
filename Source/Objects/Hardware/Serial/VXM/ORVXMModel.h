@@ -21,7 +21,7 @@
 
 @class ORSerialPort;
 
-
+#define kNumVXMMotors  2
 enum {
 	kXYBackAndForth,
 	kXYRaster,
@@ -44,7 +44,6 @@ enum {
         ORSerialPort*   serialPort;
         NSPoint         xyPosition;
         NSPoint         oldXyPosition;
-        NSMutableString*       buffer;
         NSPoint         cmdPosition;
         BOOL            absMotion;
         BOOL            goingHome;
@@ -68,10 +67,12 @@ enum {
         NSTimeInterval  waitingStartTime;
 
 		NSPoint			fullScale;
-		NSPoint			conversion;
+        NSPoint			conversion;
+        NSPoint			motorSpeed;
 		unsigned short  enabledMask;
 	
-		char			queryInProgress;
+		BOOL			queryInProgress;
+        int             lastMotorQuery;
 
 }
 
@@ -84,6 +85,10 @@ enum {
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark ***Accessors
+- (int) lastMotorQuery;
+- (void) setLastMotorQuery:(int)aMotor;
+- (BOOL) queryInProgress;
+- (void) setQueryInProgress:(BOOL)state;
 - (unsigned short) enabledMask;
 - (void) setEnabledMask:(unsigned short)aEnabledMask;
 - (BOOL) isMotorEnabled:(unsigned short)aMotor;
@@ -131,10 +136,11 @@ enum {
 - (void) setPortWasOpen:(BOOL)aPortWasOpen;
 - (NSString*) portName;
 - (void) setPortName:(NSString*)aPortName;
+- (NSPoint) motorSpeed;
+- (void) setMotorSpeed:(NSPoint)aSpeed;
 
 - (void) openPort:(BOOL)state;
 - (void) resetTrack;
-
 
 #pragma mark ***Data Records
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
@@ -147,7 +153,6 @@ enum {
 - (void) shipMotorState:(BOOL)running;
 
 #pragma mark ***Motor Commands
-- (void) sendCmd:(NSString*)aCmd;
 - (void) queryPosition;
 - (void) goHome;
 - (void) go;
@@ -155,7 +160,12 @@ enum {
 - (void) move:(NSPoint)delta;
 - (void) stopMotion;
 - (void) runCmdFile;
+
 @end
+
+extern NSString* ORVXMModelMotorSpeedChanged;
+extern NSString* ORVXMModelLastMotorQueryChanged;
+extern NSString* ORVXMModelQueryInProgressChanged;
 extern NSString* ORVXMModelEnabledMaskChanged;
 extern NSString* ORVXMModelConversionChanged;
 extern NSString* ORVXMModelFullScaleChanged;

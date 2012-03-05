@@ -27,8 +27,8 @@
 #import "ORDataTypeAssigner.h"
 #import "ORDataPacket.h"
 
-#define kMotor0 0x1
-#define kMotor1 0x2
+#define kMotor0 0
+#define kMotor1 1
 
 #pragma mark ***External Strings
 NSString* ORVXMModelEnabledMaskChanged = @"ORVXMModelEnabledMaskChanged";
@@ -48,6 +48,10 @@ NSString* ORVXMModelPositionChanged   = @"ORVXMModelPositionChanged";
 NSString* ORVXMModelSerialPortChanged = @"ORVXMModelSerialPortChanged";
 NSString* ORVXMModelPortNameChanged   = @"ORVXMModelPortNameChanged";
 NSString* ORVXMModelPortStateChanged  = @"ORVXMModelPortStateChanged";
+NSString* ORVXMModelQueryInProgressChanged   = @"ORVXMModelQueryInProgressChanged";
+NSString* ORVXMModelLastMotorQueryChanged   = @"ORVXMModelLastMotorQueryChanged";
+NSString* ORVXMModelMotorSpeedChanged   = @"ORVXMModelMotorSpeedChanged";
+
 
 NSString* ORVXMLock = @"ORVXMLock";
 
@@ -57,7 +61,12 @@ NSString* ORVXMLock = @"ORVXMLock";
 - (void) startPattern;
 - (void) stopPattern;
 - (void) continuePattern;
+- (void) timeout;
+- (void) process_response:(NSString*)theResponse;
+- (void) startTimeOut;
+- (int)  getNextMotorToQuery;
 @end
+
 
 @implementation ORVXMModel
 - (id) init
@@ -79,7 +88,6 @@ NSString* ORVXMLock = @"ORVXMLock";
         [serialPort close];
     }
     [serialPort release];
-    [buffer release];
 	[super dealloc];
 }
 
@@ -119,55 +127,9 @@ NSString* ORVXMLock = @"ORVXMLock";
     if([[note userInfo] objectForKey:@"serialPort"] == serialPort){
         NSString* theString = [[[[NSString alloc] initWithData:[[note userInfo] objectForKey:@"data"] 
 													  encoding:NSASCIIStringEncoding] autorelease] uppercaseString];
-        if(!buffer){
-            buffer = [[NSMutableString string] retain];
-        }
-		
-		//remove the 'junk'
-		theString = [[theString componentsSeparatedByString:@"^"] componentsJoinedByString:@""];
-		
-        [buffer appendString:theString];
-        do {
-			//the strings echo'ed from the VXM controller should be delimited by <cr>
-            NSRange lineRange = [buffer rangeOfString:@"\r"];
-            if(lineRange.location!= NSNotFound){
-                NSMutableString* aCmd = [[[buffer substringToIndex:lineRange.location+1] mutableCopy] autorelease];
-                [buffer deleteCharactersInRange:NSMakeRange(0,lineRange.location+1)];      //take it out of the buffer
-                NSScanner* scanner = [NSScanner scannerWithString:aCmd];
-				if ( [self isMotorEnabled:0] && ( queryInProgress & kMotor0 ) ){
-					float xValue;
-					[scanner scanFloat: &xValue];
-					oldXyPosition.x = xyPosition.x;
-					xValue = xValue / conversion.x; //convert steps to mm
-					[self setXyPosition:NSMakePoint( xValue, xyPosition.y )];
-					queryInProgress ^= kMotor0;
-				}
-				
-				if ( [self isMotorEnabled:1] && ( queryInProgress & kMotor1 ) ){
-					float yValue;
-					[scanner scanFloat: &yValue];
-					oldXyPosition.y = xyPosition.y;
-					yValue = yValue / conversion.y; //convert steps to mm
-					[self setXyPosition:NSMakePoint( xyPosition.x, yValue )];
-					queryInProgress ^= kMotor1;
-				}
-					
-				if(!NSEqualPoints(oldXyPosition,xyPosition)){
-					[self performSelector:@selector(queryPosition) withObject:nil afterDelay:.3];
-					[self setMoving:YES];
-				}
-				else {
-					if(goingHome){
-						[serialPort writeString:@"F,N"]; //clear position regs
-						[self setGoingHome:NO];
-						validTrackCount = 0;
-						currentTrackIndex = 0;
-						[self performSelector:@selector(queryPosition) withObject:nil afterDelay:.3];
-					}
-					else [self setMoving:NO];
-				}
-			}
-        } while([buffer rangeOfString:@"\r"].location!= NSNotFound);
+		NSLog(@"got: %@\n",theString);
+        
+        [self process_response:theString];
     }
 }
 
@@ -205,6 +167,26 @@ NSString* ORVXMLock = @"ORVXMLock";
 
 
 #pragma mark ***Accessors
+- (int) lastMotorQuery
+{
+    return lastMotorQuery;
+}
+- (void) setLastMotorQuery:(int)aMotor
+{
+    lastMotorQuery = aMotor;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORVXMModelLastMotorQueryChanged object:self];
+
+}
+- (BOOL) queryInProgress;
+{
+    return queryInProgress;
+}
+- (void) setQueryInProgress:(BOOL)state
+{
+    queryInProgress = state;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORVXMModelQueryInProgressChanged object:self];
+   
+}
 
 - (unsigned short) enabledMask
 {
@@ -264,6 +246,24 @@ NSString* ORVXMLock = @"ORVXMLock";
     fullScale = aFullScale;
 	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORVXMModelFullScaleChanged object:self];
+}
+
+- (NSPoint) motorSpeed
+{
+    return motorSpeed;
+}
+
+- (void) setMotorSpeed:(NSPoint)aSpeed
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setMotorSpeed:motorSpeed];
+    
+	if(aSpeed.x <= 0)aSpeed.x = 1;
+	if(aSpeed.x >= 500)aSpeed.x = 500;
+	if(aSpeed.y <= 0)aSpeed.y = 1;
+	if(aSpeed.y >= 500)aSpeed.y = 500;
+    motorSpeed = aSpeed;
+	
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORVXMModelMotorSpeedChanged object:self];
 }
 
 
@@ -554,8 +554,14 @@ NSString* ORVXMLock = @"ORVXMLock";
 {
     if(state) {
         [serialPort open];
+		[serialPort setSpeed:9600];
+		[serialPort setParityNone];
+		[serialPort setStopBits2:1];
+		[serialPort setDataBits:8];
+ 		[serialPort commitChanges];
     }
     else      [serialPort close];
+    portWasOpen = [serialPort isOpen];
     portWasOpen = [serialPort isOpen];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORVXMModelPortStateChanged object:self];
     
@@ -582,6 +588,7 @@ NSString* ORVXMLock = @"ORVXMLock";
 	[self setDwellTime:[decoder decodeFloatForKey:@"ORVXMModelDwellPerPoint"]];
 	[self setEndPoint:[decoder decodePointForKey:@"ORVXMModelEnd"]];
 	[self setStartPoint:[decoder decodePointForKey:@"ORVXMModelStart"]];
+	[self setMotorSpeed:[decoder decodePointForKey:@"ORVXMModelSpeed"]];
 	
 	[[self undoManager] enableUndoRegistration];
 	
@@ -608,37 +615,49 @@ NSString* ORVXMLock = @"ORVXMLock";
     [encoder encodeFloat:dwellTime forKey:@"ORVXMModelDwellPerPoint"];
     [encoder encodePoint:endPoint forKey:@"ORVXMModelEnd"];
     [encoder encodePoint:startPoint forKey:@"ORVXMModelStart"];
+    [encoder encodePoint:motorSpeed forKey:@"ORVXMModelSpeed"];
 	
 }
 
 #pragma mark ***Motor Commands
+
 - (void) queryPosition
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(queryPosition) object:nil];
-    if([serialPort isOpen]){
-		queryInProgress = 0;
-        if([self isMotorEnabled:0])
-		{
-			[serialPort writeString:@"E,X"];
-			queryInProgress = kMotor0;
-		}
-        if([self isMotorEnabled:1])
-		{
-			[serialPort writeString:@"E,Y"];
-			queryInProgress += kMotor1;
-		}
+    if([serialPort isOpen] && !queryInProgress){
+        int motorToQuery = [self getNextMotorToQuery];
+        NSString* cmd = nil;
+        switch(motorToQuery){
+            case 0: 
+                cmd = @"E,X"; 
+            break;
+            case 1:
+                cmd = @"E,Y";
+            break;
+        }
+        if(cmd){
+            [self setQueryInProgress:YES];
+            [self setLastMotorQuery:motorToQuery];
+            [serialPort writeString:cmd];
+            [self startTimeOut];
+        }
+        else {
+            [self setQueryInProgress:NO];
+        }
     }
 }
+
 - (void) goHome
 {
     if([serialPort isOpen]){
         [self setGoingHome:YES];
-		NSMutableString* cmd = [NSMutableString string];
-		if([self isMotorEnabled:0])[cmd appendString:@"F,I1M-0"];
-		if([self isMotorEnabled:1])[cmd appendString:@"F,I2M-0"];
+		NSMutableString* cmd = [NSMutableString stringWithString:@"F,C,"];
+		if([self isMotorEnabled:0])[cmd appendString:@"I1M-0,"];
+        
+		if([self isMotorEnabled:1])[cmd appendString:@"I2M-0,"];
 		if([cmd length]){
-			[cmd appendString:@" R"];
-			[serialPort writeString:cmd];
+            [cmd appendString:@"R"];
+            [serialPort writeString:cmd];
 		}
 
 		[self performSelector:@selector(queryPosition) withObject:nil afterDelay:.3];
@@ -666,11 +685,11 @@ NSString* ORVXMLock = @"ORVXMLock";
 - (void) moveToPoint:(NSPoint)aPoint
 {
     if([serialPort isOpen]){        
-		NSMutableString* cmd = [NSMutableString string];
-		if([self isMotorEnabled:0])[cmd appendString:[NSString stringWithFormat:@"F,C,S2M250,IA1M%d",(int)aPoint.x*conversion.x]];
-		if([self isMotorEnabled:1])[cmd appendString:[NSString stringWithFormat:@"F,C,S2M250,IA2M%d",(int)aPoint.y*conversion.y]];
+		NSMutableString* cmd = [NSMutableString stringWithString:@"F,C,"];
+		if([self isMotorEnabled:0])[cmd appendString:[NSString stringWithFormat:@"S1M%.0f,IA1M%d,",motorSpeed.x,(int)aPoint.x*conversion.x]];
+		if([self isMotorEnabled:1])[cmd appendString:[NSString stringWithFormat:@"S1M%.0f,IA2M%d,",motorSpeed.y,(int)aPoint.y*conversion.y]];
 		if([cmd length]){
-			[cmd appendString:@",R"];
+			[cmd appendString:@"R"];
 			[serialPort writeString:cmd];
 		}
 		[self performSelector:@selector(queryPosition) withObject:nil afterDelay:.3];
@@ -680,23 +699,16 @@ NSString* ORVXMLock = @"ORVXMLock";
 - (void) move:(NSPoint)amount
 {
     if([serialPort isOpen]){        
-		NSMutableString* cmd = [NSMutableString string];
+		NSMutableString* cmd = [NSMutableString stringWithString:@"F,C,"];
 		int xPos = (int)(amount.x*conversion.x);
-		if([self isMotorEnabled:0])[cmd appendString:[NSString stringWithFormat:@"F,C,S2M250,I1M%d", xPos]];
+		if([self isMotorEnabled:0])[cmd appendString:[NSString stringWithFormat:@"S1M%.0f,I1M%d,", motorSpeed.x,xPos]];
 		int yPos = (int)(amount.y*conversion.y);
-		if([self isMotorEnabled:1])[cmd appendString:[NSString stringWithFormat:@"F,C,S2M250,I2M%d", yPos]];
+		if([self isMotorEnabled:1])[cmd appendString:[NSString stringWithFormat:@"S2M%.0f,I2M%d,", motorSpeed.x,yPos]];
 		if([cmd length]){
-			[cmd appendString:@",R"];
+			[cmd appendString:@"R"];
+            NSLog(@"write: %@\n",cmd);
 			[serialPort writeString:cmd];
 		}
-		[self performSelector:@selector(queryPosition) withObject:nil afterDelay:.3];
-    }
-}
-
-- (void) sendCmd:(NSString*)aCmd
-{
-    if([serialPort isOpen]){
-        [serialPort writeString:aCmd];
 		[self performSelector:@selector(queryPosition) withObject:nil afterDelay:.3];
     }
 }
@@ -709,23 +721,12 @@ NSString* ORVXMLock = @"ORVXMLock";
 	
     currentTrackIndex = 0;
     validTrackCount   = 0;
-	if ([self isMotorEnabled:0]) 
-	{
-		xPos = -1;
-	}
-	else
-	{
-		xPos = oldXyPosition.x;
-	}
+	if ([self isMotorEnabled:0]) xPos = -1;
+	else                         xPos = oldXyPosition.x;
 	
-	if ( [self isMotorEnabled:1])
-	{
-		yPos = -1;
-	}
-	else
-	{
-		yPos = oldXyPosition.y;
-	}
+	if ( [self isMotorEnabled:1]) yPos = -1;
+	else                          yPos = oldXyPosition.y;
+    
     oldXyPosition = NSMakePoint( xPos, yPos);
 }
 
@@ -739,7 +740,6 @@ NSString* ORVXMLock = @"ORVXMLock";
 		[self performSelector:@selector(queryPosition) withObject:nil afterDelay:2.];
     }
 }
-
 
 #pragma mark ***Data Records
 - (unsigned long) dataId { return dataId; }
@@ -778,9 +778,21 @@ NSString* ORVXMLock = @"ORVXMLock";
     return dataDictionary;
 }
 
+
 @end
 
 @implementation ORVXMModel (private)
+
+- (int) getNextMotorToQuery
+{
+    int i;
+    int nextMotor = lastMotorQuery;
+    for(i=0;i<kNumVXMMotors;i++){
+        nextMotor = (nextMotor+1)%kNumVXMMotors;
+        if([self isMotorEnabled:nextMotor]) return nextMotor;
+    }
+    return kMotor0;
+}
 
 - (void) runStarted:(NSNotification*)aNote
 {
@@ -840,7 +852,7 @@ NSString* ORVXMLock = @"ORVXMLock";
 					if([self isMotorEnabled:0])[cmd appendString:[NSString stringWithFormat:@"F IA1M%d",(int)x*conversion.x]];
 					if([self isMotorEnabled:1])[cmd appendString:[NSString stringWithFormat:@"F IA2M%d",(int)y*conversion.y]];
 					if([cmd length]){
-						[cmd appendString:@" R"];
+						[cmd appendString:@",R"];
 						[cmdList addObject:cmd];
 					}
                 }
@@ -860,7 +872,7 @@ NSString* ORVXMLock = @"ORVXMLock";
 						if([self isMotorEnabled:0])[cmd appendString:[NSString stringWithFormat:@"F IA1M%d",(int)x*conversion.x]];
 						if([self isMotorEnabled:1])[cmd appendString:[NSString stringWithFormat:@"F IA2M%d",(int)y*conversion.y]];
 						if([cmd length]){
-							[cmd appendString:@" R"];
+							[cmd appendString:@",R"];
 							[cmdList addObject:cmd];
 						}
                     }
@@ -871,7 +883,7 @@ NSString* ORVXMLock = @"ORVXMLock";
 						if([self isMotorEnabled:0])[cmd appendString:[NSString stringWithFormat:@"F IA1M%d",(int)x*conversion.x]];
 						if([self isMotorEnabled:1])[cmd appendString:[NSString stringWithFormat:@"F IA2M%d",(int)y*conversion.y]];
 						if([cmd length]){
-							[cmd appendString:@" R"];
+							[cmd appendString:@",R"];
 							[cmdList addObject:cmd];
 						}
                     }
@@ -917,7 +929,7 @@ NSString* ORVXMLock = @"ORVXMLock";
             if(firstPosition || [NSDate timeIntervalSinceReferenceDate] - waitingStartTime > dwellTime){
                 firstPosition = NO;
                 if([cmdList count]){
-                    [self sendCmd:[cmdList objectAtIndex:0]];
+                    [serialPort writeString:[cmdList objectAtIndex:0]];
                     [cmdList removeObjectAtIndex:0];    
                     dwelling = NO;
                 }
@@ -937,6 +949,63 @@ NSString* ORVXMLock = @"ORVXMLock";
         }
     }
     [self performSelector:@selector(continuePattern) withObject:nil afterDelay:.1];    
+}
+
+#pragma mark ***Command Handling
+- (void) timeout
+{
+	NSLogError(@"Met237",@"command timeout",nil);
+}
+
+- (void) startTimeOut
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+	[self performSelector:@selector(timeout) withObject:nil afterDelay:3];
+}
+
+- (void) process_response:(NSString*)aCmd
+{
+    if([aCmd hasPrefix:@"^"])return;
+    
+    if(queryInProgress){
+        switch (lastMotorQuery){
+            case kMotor0:
+            {
+                float xValue = [aCmd floatValue];
+                oldXyPosition.x = xyPosition.x;
+                xValue = xValue / conversion.x; //convert steps to mm
+                [self setXyPosition:NSMakePoint( xValue, xyPosition.y )];
+                [self setQueryInProgress:NO];
+            }
+            break;
+            case kMotor1:
+            {
+                float yValue = [aCmd floatValue];
+                oldXyPosition.y = xyPosition.y;
+                yValue = yValue / conversion.y; //convert steps to mm
+                [self setXyPosition:NSMakePoint( xyPosition.x, yValue )];
+                [self setQueryInProgress:NO];
+            }
+            break;
+        }
+    }
+    
+    if(!NSEqualPoints(oldXyPosition,xyPosition)){
+        [self setMoving:YES];
+        [self performSelector:@selector(queryPosition) withObject:nil afterDelay:.3];
+    }
+    else {
+        if(goingHome){
+            [serialPort writeString:@"F,N"];
+            [self setGoingHome:NO];
+            validTrackCount = 0;
+            currentTrackIndex = 0;
+            [self performSelector:@selector(queryPosition) withObject:nil afterDelay:.3];
+        }
+        else [self setMoving:NO];
+    }
+    
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
 }
 
 @end
