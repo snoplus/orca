@@ -45,6 +45,7 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply);
 void doGeneralWriteOp(SBC_Packet* aPacket,uint8_t reply);
 void doGeneralReadOp(SBC_Packet* aPacket,uint8_t reply);
 
+int getSltLinuxKernelDriverVersion(void);
 #ifdef __cplusplus
 }
 #endif

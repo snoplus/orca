@@ -660,6 +660,8 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 - (IBAction) reportAllAction:(id)sender
 {
 	NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
+	NSLogFont(aFont, @"SLT station# %d Report:\n",[model stationNumber]);
+
 	@try {
 		NSLogFont(aFont, @"Board ID: %lld\n",[model readBoardID]);
 		[model printStatusReg];
@@ -671,7 +673,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 		NSLogFont(aFont,@"Seconds    : %d\n",  [model getSeconds]);
 		[model printInterruptMask];
 		[model printInterruptRequests];
-	    long fdhwlibVersion = [model getFdhwlibVersion];
+	    long fdhwlibVersion = [model getFdhwlibVersion];  //TODO: write a method [model printFdhwlibVersion];
 	    int ver=(fdhwlibVersion>>16) & 0xff,maj =(fdhwlibVersion>>8) & 0xff,min = fdhwlibVersion & 0xff;
 	    NSLogFont(aFont,@"%@: SBC PrPMC running with fdhwlib version: %i.%i.%i (0x%08x)\n",[model fullID],ver,maj,min, fdhwlibVersion);
 	    NSLogFont(aFont,@"SBC PrPMC readout code version: %i \n", [model getSBCCodeVersion]);
@@ -681,6 +683,8 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
         NSRunAlertPanel([localException name], @"%@\nSLT%d Access failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
+	
+	[self hwVersionAction: self]; //display SLT firmware version, fdhwlib ver, SLT PCI driver ver
 }
 
 - (IBAction) settingLockAction:(id) sender
@@ -745,6 +749,12 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 		long fdhwlibVersion = [model getFdhwlibVersion];
 		int ver=(fdhwlibVersion>>16) & 0xff,maj =(fdhwlibVersion>>8) & 0xff,min = fdhwlibVersion & 0xff;
 	    NSLog(@"%@: SBC PrPMC running with fdhwlib version: %i.%i.%i (0x%08x)\n",[model fullID],ver,maj,min, fdhwlibVersion);
+		long SltPciDriverVersion = [model getSltPciDriverVersion];
+		//NSLog(@"%@: SLT PCI driver version: %i\n",[model fullID],SltPciDriverVersion);
+	    if(SltPciDriverVersion<0) NSLog(@"%@: unknown SLT PCI driver version: %i\n",[model fullID],SltPciDriverVersion);
+        else if(SltPciDriverVersion==0) NSLog(@"%@: SBC running with SLT PCI driver version: %i (fzk_ipe_slt)\n",[model fullID],SltPciDriverVersion);
+        else if(SltPciDriverVersion==1) NSLog(@"%@: SBC running with SLT PCI driver version: %i (fzk_ipe_slt_dma)\n",[model fullID],SltPciDriverVersion);
+        else NSLog(@"%@: SBC running with SLT PCI driver version: %i (fzk_ipe_slt%i)\n",[model fullID],SltPciDriverVersion,SltPciDriverVersion);
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception reading SLT HW Model Version\n");

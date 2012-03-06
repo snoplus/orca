@@ -1044,6 +1044,18 @@ NSLog(@"  arguments: %@ \n" , arguments);
 	return theVersion;
 }
 
+- (long) getSltPciDriverVersion
+{
+	long theVersion = 0;
+	if(![pmcLink isConnected]){
+		[NSException raise:@"Not Connected" format:@"Socket not connected."];
+	}
+	else {
+		[pmcLink readGeneral:&theVersion operation:kGetSltPciDriverVersion numToRead:1];
+	}
+	return theVersion;
+}
+
 
 - (void) readEventStatus:(unsigned long*)eventStatusBuffer
 {

@@ -456,6 +456,9 @@ void doGeneralReadOp(SBC_Packet* aPacket,uint8_t reply)
 			if(numLongs == 1) *lPtr = 0xffffffff; //we are probably in simulation mode and not linking with fdhwlib -tb-
 			#endif
 		break;
+		case kGetSltPciDriverVersion:
+			if(numLongs == 1) *lPtr = getSltLinuxKernelDriverVersion(); 
+		break;
 		default:
 			for(i=0;i<numLongs;i++)*lPtr++ = 0; //undefined operation so just return zeros
 		break;
@@ -465,3 +468,51 @@ void doGeneralReadOp(SBC_Packet* aPacket,uint8_t reply)
 	if(reply)writeBuffer(aPacket);
 }
 
+
+
+/*--------------------------------------------------------------------------------------
+ *int getSltLinuxKernelDriverVersion(): search string in /proc/devices, works only for Linux!!
+ *--------------------------------------------------------------------------------------
+ */
+//#include <stdlib.h>  //atioi, strtol
+//#include <stdio.h>
+//#include <string.h>  //strtstr
+
+//currently we have only Linux, but we want to run simulation mode on all OSs -tb-
+#ifdef __linux__
+#define DRIVERNAME "fzk_ipe_slt"
+int getSltLinuxKernelDriverVersion(void)
+{
+	char buf[1024 * 4];
+	char *cptr;
+	FILE *p;
+	int version = -2;
+	p = popen("cat /proc/devices | grep fzk_ipe_slt","r");
+	if(p==0){ fprintf(stderr, "could not start popen... -tb-\n"); return version; }
+	
+	while (!feof(p)){
+	    fscanf(p,"%s",buf);
+		if( cptr=strstr(buf, DRIVERNAME) ){  // dont use strncmp, it finds fzk_ipe_slt1, too, which does not exist -tb-
+		     version = -1;
+			 if( strlen(buf) == strlen(DRIVERNAME)){ version = 0; break; }   // v0, 1st version "fzk_ipe_slt"
+			 if( strstr(buf, DRIVERNAME "_dma") ){ version = 1; break;}      // v1, 2nd version "fzk_ipe_slt_dma"
+			 cptr = cptr + strlen(DRIVERNAME);                               // vX, (X+1)nd version "fzk_ipe_sltX" -> go to string after basename
+			 version = atoi(cptr);
+			 //alternative: version = strtol(cptr, (char **) NULL, 10);
+			 break;
+		}
+		if(feof(p)) break; //??? is this necessary??? -tb-
+	};
+
+	pclose(p);
+	//printf("version is: %i\n",version);
+	return version;
+}
+#else
+//non Linux version
+int getSltLinuxKernelDriverVersion(void)
+{
+	int version = -2;
+	return version;
+}
+#endif

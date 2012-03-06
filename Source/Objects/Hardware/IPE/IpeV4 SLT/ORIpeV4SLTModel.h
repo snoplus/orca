@@ -314,6 +314,7 @@
 - (void)		autoCalibrate;
 - (long)		getSBCCodeVersion;
 - (long)		getFdhwlibVersion;
+- (long)		getSltPciDriverVersion;
 
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
