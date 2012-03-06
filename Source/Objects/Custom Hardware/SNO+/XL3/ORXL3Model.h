@@ -288,8 +288,8 @@ enum {
 - (void) readHVSwitchOn;
 
 - (void) setHVSwitch:(BOOL)aOn forPowerSupply:(unsigned char)sup;
-
-
+- (void) hvPanicDown;
+- (void) hvMasterPanicDown;
 - (void) readHVInterlockGood:(BOOL*)isGood;
 - (void) readHVInterlock;
 - (void) setHVDacA:(unsigned short)aDac dacB:(unsigned short)bDac;

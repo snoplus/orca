@@ -2645,6 +2645,7 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (void) setHVSwitch:(BOOL)aOn forPowerSupply:(unsigned char)sup
 {
+    @synchronized(self) {
     BOOL xl3SwitchA, xl3SwitchB;
 
     @try {
@@ -2779,26 +2780,20 @@ void SwapLongBlock(void* p, int32_t n)
     [self setHvBSwitch:xl3SwitchB];
     
     [self readHVStatus];
-    
-    //reading the swich right after the change is not reliable
-    /*
-    if (sup == 0 && xl3SwitchA != aOn) {
-        NSLog(@"%@ HV switch A is reported %@ by XL3 and expected to be %@ by ORCA.\n",[[self xl3Link] crateName], xl3SwitchA?@"ON":@"OFF", aOn?@"ON":@"OFF");
-        [self setHvASwitch:xl3SwitchA];
-    }
-    else if (sup == 1 && xl3SwitchA != [self hvASwitch]) {
-        NSLog(@"%@ HV switch A is reported %@ by XL3 and expected to be %@ by ORCA.\n",[[self xl3Link] crateName], xl3SwitchA?@"ON":@"OFF", aOn?@"ON":@"OFF");
-        [self setHvASwitch:xl3SwitchA];
-    }
-    else if (sup == 1 && xl3SwitchB != aOn) {
-        NSLog(@"%@ HV switch B is reported %@ by XL3 and expected to be %@ by ORCA.\n",[[self xl3Link] crateName], xl3SwitchB?@"ON":@"OFF", aOn?@"ON":@"OFF");
-        [self setHvBSwitch:xl3SwitchB];
-    }
-    else if (sup == 0 && xl3SwitchB != [self hvBSwitch]) {
-        NSLog(@"%@ HV switch B is reported %@ by XL3 and expected to be %@ by ORCA.\n",[[self xl3Link] crateName], xl3SwitchB?@"ON":@"OFF", aOn?@"ON":@"OFF");
-        [self setHvBSwitch:xl3SwitchB];
-    }
-    */
+
+    }//synchronized
+}
+
+- (void) hvPanicDown
+{
+    [self setHvPanicFlag:YES];
+    [self setHvANextStepValue:0];
+    [self setHvBNextStepValue:0];   
+}
+
+- (void) hvMasterPanicDown
+{
+    [[[self document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")]makeObjectsPerformSelector:@selector(hvPanicDown)];
 }
 
 
@@ -3354,6 +3349,13 @@ void SwapLongBlock(void* p, int32_t n)
             }
              */
         }
+        
+        
+        //if panic mode switch off power supply when done
+        if ([self hvPanicFlag] && [self hvAVoltageDACSetValue] == 0){
+            [self setHVSwitch:NO forPowerSupply:0];
+        }
+        
         
         if (!hvASwitch && !hvBSwitch) isTimeToQuit = YES;
         usleep(100000);

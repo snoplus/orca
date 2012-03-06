@@ -596,6 +596,22 @@ static NSDictionary* xl3Ops;
     [hvBVoltageReadField setStringValue:[NSString stringWithFormat:@"%d V",(unsigned int)[model hvBVoltageReadValue]]];
     [hvACurrentReadField setStringValue:[NSString stringWithFormat:@"%3.1f mA",[model hvACurrentReadValue]]];
     [hvBCurrentReadField setStringValue:[NSString stringWithFormat:@"%3.1f mA",[model hvBCurrentReadValue]]];
+
+    //todo: add exception for OWLs
+    if ([hvPowerSupplyMatrix selectedColumn] == 0 && [model hvASwitch]) { //A ON
+        [hvRelayMaskHighField setEnabled:NO];
+        [hvRelayMaskLowField setEnabled:NO];
+        [hvRelayMaskMatrix setEnabled:NO];
+        [hvRelayOpenButton setEnabled:NO];
+        [hvRelayCloseButton setEnabled:NO];
+    }
+    else {
+        [hvRelayMaskHighField setEnabled:YES];
+        [hvRelayMaskLowField setEnabled:YES];
+        [hvRelayMaskMatrix setEnabled:YES];
+        [hvRelayOpenButton setEnabled:YES];
+        [hvRelayCloseButton setEnabled:YES];        
+    }
 }
 
 - (void) hvTriggerStatusChanged:(NSNotification*)aNote
@@ -1318,9 +1334,32 @@ static NSDictionary* xl3Ops;
 
 - (IBAction)hvPanicAction:(id)sender
 {
-    [model setHvPanicFlag:YES];
-    [model setHvANextStepValue:0];
-    [model setHvBNextStepValue:0];
+    [model hvPanicDown];
+}
+
+- (IBAction)hvTriggerOffAction:(id)sender
+{
+    
+}
+
+- (IBAction)hvTriggerOnAction:(id)sender
+{
+    
+}
+
+- (IBAction)hvMasterPanicAction:(id)sender
+{
+    [model hvMasterPanicDown];
+}
+
+- (IBAction)hvMasterTriggerOffAction:(id)sender
+{
+    
+}
+
+- (IBAction)hvMasterTriggerOnAction:(id)sender
+{
+    
 }
 
 //connection
