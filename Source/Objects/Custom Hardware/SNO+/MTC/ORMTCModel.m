@@ -691,9 +691,9 @@ kPEDCrateMask
 	
 }
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-
+	//subclasses can override
     NSArray* objs = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     ORRunModel* runControl;
     if ([objs count]) {
@@ -708,8 +708,11 @@ kPEDCrateMask
     else {
         [self clearGlobalTriggerWordMask];
     }
-    
-    
+}
+
+
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
     NSEnumerator* e = [dataTakers objectEnumerator];
     id obj;
     while(obj = [e nextObject]){
