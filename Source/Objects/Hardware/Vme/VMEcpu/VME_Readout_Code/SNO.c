@@ -1272,7 +1272,7 @@ void mtcatLoadCrateMask(SBC_Packet* aPacket)
     void* hdl = NULL;
     int (*load_crate_mask) (unsigned int, unsigned char);
     
-    printf("load crate mask 0x%08x to mtca+ %d\n", crate_mask, mtcat_id);
+    //printf("load crate mask 0x%08x to mtca+ %d\n", crate_mask, mtcat_id);
 
     hdl = dlopen("libmtcat_lj.so", RTLD_LAZY);
     if (hdl == NULL) {
@@ -1290,7 +1290,7 @@ void mtcatLoadCrateMask(SBC_Packet* aPacket)
     }
     
     error_code = load_crate_mask(crate_mask, mtcat_id);
-    printf("done with error_code: %d\n", error_code);
+    //printf("done with error_code: %d\n", error_code);
     
 early_exit:    
     dlclose(hdl);

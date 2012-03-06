@@ -2,6 +2,8 @@
 #include "readout_code.h" 
 #include <errno.h>
 #include <iostream>
+#include <unistd.h>
+
 using namespace std;
 
 uint32_t ORMTCReadout::last_mem_read_ptr = k_fifo_valid_mask;
@@ -28,8 +30,12 @@ bool ORMTCReadout::Start() {
 }
 
 bool ORMTCReadout::Stop() {
+    unsigned int sweep;
+    for (sweep=0; sweep<100; sweep++) {
+        usleep(10); // let the last MTC bundle propagate through MTCD
+        Readout(0);
+    }
 	return true;
-
 }
 
 bool ORMTCReadout::Readout(SBC_LAM_Data* /*lamData*/)
