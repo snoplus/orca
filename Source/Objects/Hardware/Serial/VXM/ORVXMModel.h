@@ -20,127 +20,48 @@
 #pragma mark ***Imported Files
 
 @class ORSerialPort;
+@class ORVXMMotor;
+@class ORVXMMotorCmd;
 
-#define kNumVXMMotors  2
-enum {
-	kXYBackAndForth,
-	kXYRaster,
-	kXYUseFile
-};
-
-enum {
-	kXYSyncWithRunOption  = 0,
-	kXYStopRunOption      = 1,
-	kXYShipPositionOption = 2
-};
-
-#define kNumTrackPoints 100
+#define kNumVXMMotors  4
 
 @interface ORVXMModel : OrcaObject
 {
     @private
+		NSMutableArray*	motors;
         NSString*       portName;
         BOOL            portWasOpen;
         ORSerialPort*   serialPort;
-        NSPoint         xyPosition;
-        NSPoint         oldXyPosition;
-        NSPoint         cmdPosition;
-        BOOL            absMotion;
-        BOOL            goingHome;
-        unsigned        currentTrackIndex;
-        unsigned        validTrackCount;
-        NSPoint         track[kNumTrackPoints];
-        NSString*       cmdFile;
-        NSPoint         startPoint;
-        NSPoint         endPoint;
-        NSPoint         delta;
-        float           dwellTime;
-        int             patternType;
-        unsigned long   optionMask;
-
         unsigned long	dataId;
-        BOOL            moving;
-
-        BOOL            firstPosition;
-        BOOL            dwelling;
-        NSMutableArray* cmdList;
-        NSTimeInterval  waitingStartTime;
-
-		NSPoint			fullScale;
-        NSPoint			conversion;
-        NSPoint			motorSpeed;
-		unsigned short  enabledMask;
-	
 		BOOL			queryInProgress;
         int             lastMotorQuery;
-
+		NSMutableArray* cmdQueue;
+    BOOL displayRaw;
 }
 
 #pragma mark ***Initialization
 
 - (id)   init;
 - (void) dealloc;
-
 - (void) registerNotificationObservers;
 - (void) dataReceived:(NSNotification*)note;
+- (void) openPort:(BOOL)state;
 
 #pragma mark ***Accessors
+- (BOOL) displayRaw;
+- (void) setDisplayRaw:(BOOL)aDisplayRaw;
+- (NSArray*) motors;
+- (ORVXMMotor*) motor:(int)aMotor;
 - (int) lastMotorQuery;
 - (void) setLastMotorQuery:(int)aMotor;
 - (BOOL) queryInProgress;
 - (void) setQueryInProgress:(BOOL)state;
-- (unsigned short) enabledMask;
-- (void) setEnabledMask:(unsigned short)aEnabledMask;
-- (BOOL) isMotorEnabled:(unsigned short)aMotor;
-- (void) enableMotor:(unsigned short)aMotor withValue:(BOOL)aState;
-- (NSPoint) conversion;
-- (void) setConversion:(NSPoint)aStepsPerMillimeter;
-- (NSPoint) fullScale;
-- (void) setFullScale:(NSPoint)aFullScale;
-- (NSMutableArray*) cmdList;
-- (void) setCmdList:(NSMutableArray*)aCmdList;
-- (BOOL) moving;
-- (void) setMoving:(BOOL)aMoving;
-- (unsigned long) optionMask;
-- (void) setOptionMask:(unsigned long)aOptionMask;
-- (void) setOption:(int)anOption; 
-- (void) clearOption:(int)anOption; 
-- (BOOL) optionSet:(int)anOption;
-- (int) patternType;
-- (void) setPatternType:(int)aPatternType;
-- (float) dwellTime;
-- (void) setDwellTime:(float)aDwellTime;
-- (NSPoint) delta;
-- (void) setDelta:(NSPoint)aDelta;
-- (NSPoint) endPoint;
-- (void) setEndPoint:(NSPoint)aEnd;
-- (NSPoint) startPoint;
-- (void) setStartPoint:(NSPoint)aStart;
-- (NSString*) cmdFile;
-- (void) setCmdFile:(NSString*)aCmdFile;
-- (unsigned)currentTrackIndex;
-- (unsigned)validTrackCount;
-- (NSPoint) track:(unsigned)i;
-
-- (BOOL) goingHome;
-- (void) setGoingHome:(BOOL)aGoingHome;
-- (BOOL) absMotion;
-- (void) setAbsMotion:(BOOL)aAbsMotion;
-- (NSPoint) cmdPosition;
-- (void) setCmdPosition:(NSPoint)aCmdPosition;
-- (NSPoint) xyPosition;
-- (void) setXyPosition:(NSPoint)aPosition;
 - (ORSerialPort*) serialPort;
 - (void) setSerialPort:(ORSerialPort*)aSerialPort;
 - (BOOL) portWasOpen;
 - (void) setPortWasOpen:(BOOL)aPortWasOpen;
 - (NSString*) portName;
 - (void) setPortName:(NSString*)aPortName;
-- (NSPoint) motorSpeed;
-- (void) setMotorSpeed:(NSPoint)aSpeed;
-
-- (void) openPort:(BOOL)state;
-- (void) resetTrack;
 
 #pragma mark ***Data Records
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
@@ -149,39 +70,45 @@ enum {
 - (void) setDataId: (unsigned long) DataId;
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherVXM;
-
 - (void) shipMotorState:(BOOL)running;
+- (unsigned) cmdQueueCount;
+- (NSString*) cmdQueueCommand:(int)index;
+- (NSString*) cmdQueueDescription:(int)index;
 
 #pragma mark ***Motor Commands
 - (void) queryPosition;
-- (void) goHome;
-- (void) go;
-- (void) moveToPoint:(NSPoint)aPoint;
-- (void) move:(NSPoint)delta;
-- (void) stopMotion;
-- (void) runCmdFile;
+- (void) goHomeAll;
+- (void) move:(int)motorIndex to:(float)aPosition speed:(int)aSpeed;
+- (void) move:(int)motorIndex dx:(float)aPosition;
+- (void) move:(int)motorIndex dx:(float)aPosition speed:(int)aSpeed;
+- (void) goHome:(int)motorIndex speed:(int)aSpeed;
+- (void) stopAllMotion;
+- (void) goToNexCommand;
+- (void) addCmdFromTableFor:(int)aMotorIndex;
+
+#pragma mark ***Archival
+- (id)   initWithCoder:(NSCoder*)decoder;
+- (void) encodeWithCoder:(NSCoder*)encoder;
 
 @end
 
-extern NSString* ORVXMModelMotorSpeedChanged;
+
+extern NSString* ORVXMModelDisplayRawChanged;
 extern NSString* ORVXMModelLastMotorQueryChanged;
 extern NSString* ORVXMModelQueryInProgressChanged;
-extern NSString* ORVXMModelEnabledMaskChanged;
-extern NSString* ORVXMModelConversionChanged;
-extern NSString* ORVXMModelFullScaleChanged;
-extern NSString* ORVXMModelEndEditing;
-extern NSString* ORVXMModelMovingChanged;
-extern NSString* ORVXMModelPatternChanged;
-extern NSString* ORVXMModelDwellTimeChanged;
-extern NSString* ORVXMModelOptionMaskChanged;
-extern NSString* ORVXMModelPatternTypeChanged;
-
-extern NSString* ORVXMModelCmdFileChanged;
-extern NSString* ORVXMModelGoingHomeChanged;
-extern NSString* ORVXMModelAbsMotionChanged;
-extern NSString* ORVXMModelCmdPositionChanged;
-extern NSString* ORVXMModelPositionChanged;
 extern NSString* ORVXMModelSerialPortChanged;
 extern NSString* ORVXMLock;
 extern NSString* ORVXMModelPortNameChanged;
 extern NSString* ORVXMModelPortStateChanged;
+extern NSString* ORVXMModelCmdQueueChanged;
+
+@interface ORVXMMotorCmd : NSObject
+{
+	BOOL waitToSendNextCmd;
+	NSString* cmd;
+	NSString* description;
+}
+@property (nonatomic,assign) BOOL waitToSendNextCmd;
+@property (nonatomic,retain) NSString* cmd;
+@property (nonatomic,retain) NSString* description;
+@end

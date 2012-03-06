@@ -24,16 +24,10 @@
 #import "ORAxis.h"
 #import "ORSerialPortList.h"
 #import "ORSerialPort.h"
-#import "SMPieChartView.h"
-
-#define __CARBONSOUND__ //temp until undated to >10.3
-#import <Carbon/Carbon.h>
+#import "ORVXMMotor.h"
 
 @interface ORVXMController (private)
 - (void) populatePortListPopup;
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-- (void)openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-#endif
 @end
 
 @implementation ORVXMController
@@ -56,10 +50,37 @@
 {
     [self populatePortListPopup];
 	
-	[motorPie1 refreshDisplay:self];
-	[motorPie2 refreshDisplay:self];
-	
+
+	NSNumberFormatter *numberFormatter = [[[NSNumberFormatter alloc] init] autorelease];
+	[numberFormatter setFormat:@"#0.00"];	
+	int i;
+	for(i=0;i<kNumVXMMotors;i++){
+		[[conversionMatrix cellAtRow:i column:0] setTag:i];
+		[[fullScaleMatrix cellAtRow:i column:0] setTag:i];
+		[[speedMatrix cellAtRow:i column:0] setTag:i];
+		[[motorEnabledMatrix cellAtRow:i column:0] setTag:i];
+		[[positionMatrix cellAtRow:i column:0] setTag:i];
+		[[targetMatrix cellAtRow:i column:0] setTag:i];
+		[[addButtonMatrix cellAtRow:i column:0] setTag:i];
+		[[absMotionMatrix cellAtRow:i column:0] setTag:i];
+		
+		[[conversionMatrix cellAtRow:i column:0]	setFormatter:numberFormatter];
+	}
+	[self setFormats];
     [super awakeFromNib];
+}
+
+- (void) setFormats
+{
+	int i;
+	NSNumberFormatter *numberFormatter = [[[NSNumberFormatter alloc] init] autorelease];
+	if([model displayRaw]) [numberFormatter setFormat:@"#0"];
+	else				   [numberFormatter setFormat:@"#0.00"];
+	for(i=0;i<kNumVXMMotors;i++){
+		[[fullScaleMatrix cellAtRow:i column:0]		setFormatter:numberFormatter];
+		[[positionMatrix cellAtRow:i column:0]		setFormatter:numberFormatter];
+		[[targetMatrix cellAtRow:i column:0]		setFormatter:numberFormatter];
+	}
 }
 
 #pragma mark ***Notifications
@@ -87,87 +108,51 @@
                      selector : @selector(portStateChanged:)
                          name : ORSerialPortStateChanged
                        object : nil];
-                                              
-    [notifyCenter addObserver : self
-                     selector : @selector(goingHomeChanged:)
-                         name : ORVXMModelGoingHomeChanged
-                       object : model];
-                       
+	
     [notifyCenter addObserver : self
                      selector : @selector(positionChanged:)
-                         name : ORVXMModelPositionChanged
-                       object : model];
-                       
-    [notifyCenter addObserver : self
-                     selector : @selector(cmdPositionChanged:)
-                         name : ORVXMModelCmdPositionChanged
-                       object : model];
-                       
-    [notifyCenter addObserver : self
-                     selector : @selector(absMotionChanged:)
-                         name : ORVXMModelAbsMotionChanged
-                       object : model];
-   [notifyCenter addObserver : self
-                     selector : @selector(cmdFileChanged:)
-                         name : ORVXMModelCmdFileChanged
-                       object : model];
-
-
-   [notifyCenter addObserver : self
-                     selector : @selector(patternChanged:)
-                         name : ORVXMModelPatternChanged
-                       object : model];
-
-   [notifyCenter addObserver : self
-                     selector : @selector(dwellTimeChanged:)
-                         name : ORVXMModelDwellTimeChanged
+                         name : ORVXMMotorPositionChanged
                        object : model];
                        
    [notifyCenter addObserver : self
-                     selector : @selector(optionsChanged:)
-                         name : ORVXMModelOptionMaskChanged
-                       object : model];
-                       
-   [notifyCenter addObserver : self
-                     selector : @selector(patternTypeChanged:)
-                         name : ORVXMModelPatternTypeChanged
+                     selector : @selector(motorEnabledChanged:)
+                         name : ORVXMMotorEnabledChanged
                        object : model];
 
-   [notifyCenter addObserver : self
-                     selector : @selector(endEditing)
-                         name : ORVXMModelEndEditing
-                       object : model];
-
-   [notifyCenter addObserver : self
-                     selector : @selector(enabledMaskChanged:)
-                         name : ORVXMModelEnabledMaskChanged
+	[notifyCenter addObserver : self
+                     selector : @selector(absoluteMotionChanged:)
+                         name : ORVXMMotorAbsMotionChanged
                        object : model];
 
    [notifyCenter addObserver : self
                      selector : @selector(conversionChanged:)
-                         name : ORVXMModelConversionChanged
+                         name : ORVXMMotorConversionChanged
                        object : model];
-
-
+	
    [notifyCenter addObserver : self
                      selector : @selector(fullScaleChanged:)
-                         name : ORVXMModelFullScaleChanged
+                         name : ORVXMMotorFullScaleChanged
                        object : model];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(queryInProgressChanged:)
-                         name : ORVXMModelQueryInProgressChanged
-                       object : model];  
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(queryInProgressChanged:)
-                         name : ORVXMModelLastMotorQueryChanged
-                       object : model];  
     
     [notifyCenter addObserver : self
                      selector : @selector(speedChanged:)
-                         name : ORVXMModelMotorSpeedChanged
+                         name : ORVXMMotorSpeedChanged
                        object : model];      
+
+	[notifyCenter addObserver : self
+                     selector : @selector(targetChanged:)
+                         name : ORVXMMotorTargetChanged
+                       object : model];      
+		
+	[notifyCenter addObserver : self
+                     selector : @selector(updateCmdTable:)
+                         name : ORVXMModelCmdQueueChanged
+                       object : model]; 	
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(displayRawChanged:)
+                         name : ORVXMModelDisplayRawChanged
+						object: model];
 
 }
 
@@ -178,45 +163,115 @@
     [self portStateChanged:nil];
     [self portNameChanged:nil];
     [self positionChanged:nil];
-    [self cmdPositionChanged:nil];
-    [self absMotionChanged:nil];
-    [self goingHomeChanged:nil];
-    [self cmdFileChanged:nil];
-    [self patternTypeChanged:nil];
-    [self optionsChanged:nil];
-    [self patternChanged:nil];
-    [self dwellTimeChanged:nil];
-    [self conversionChanged:nil];
+	[self conversionChanged:nil];
     [self fullScaleChanged:nil];
-    [self enabledMaskChanged:nil];
-    [self queryInProgressChanged:nil];
+    [self motorEnabledChanged:nil];
     [self speedChanged:nil];
-	
+    [self targetChanged:nil];
+    [self updateCmdTable:nil];
+	[self displayRawChanged:nil];
+	[self absoluteMotionChanged:nil];
 }
 
-- (void) queryInProgressChanged:(NSNotification*)aNotification
+- (void) displayRawChanged:(NSNotification*)aNote
 {
-	[queryInProgress1 setStringValue:([model queryInProgress] & [model lastMotorQuery]==0)?@"Query":@""];
-	[queryInProgress2 setStringValue:([model queryInProgress] & [model lastMotorQuery]==1)?@"Query":@""];
+	[displayRawMatrix selectCellWithTag: [model displayRaw]];
+	[self setFormats];
+	[self updateButtons:nil];
+	[self speedChanged:nil];
+	[self fullScaleChanged:nil];
+	[self positionChanged:nil];
+	[self targetChanged:nil];
 }
 
+- (void) updateCmdTable:(NSNotification*)aNotification
+{
+	[cmdQueueTable reloadData];
+}
 
 - (void) conversionChanged:(NSNotification*)aNotification
 {
-	[[conversionMatrix cellWithTag:0] setFloatValue:[model conversion].x];
-	[[conversionMatrix cellWithTag:1] setFloatValue:[model conversion].y];
+	if(aNotification){
+		ORVXMMotor* aMotor = [[aNotification userInfo] objectForKey:@"VMXMotor"];
+		[[conversionMatrix cellWithTag:[aMotor motorId]] setFloatValue: [aMotor conversion]];
+	}
+	else {
+		for(id aMotor in [model motors]){
+			[[conversionMatrix cellWithTag:[aMotor motorId]] setFloatValue:[aMotor conversion]];
+		}
+	}
+	[self speedChanged:nil];
 }
 
 - (void) fullScaleChanged:(NSNotification*)aNotification
 {
-	[[fullScaleMatrix cellWithTag:0] setFloatValue:[model fullScale].x];
-	[[fullScaleMatrix cellWithTag:1] setFloatValue:[model fullScale].y];
+	if(aNotification){
+		ORVXMMotor* aMotor = [[aNotification userInfo] objectForKey:@"VMXMotor"];
+		float conversion = 1.0;
+		if(![model displayRaw]) conversion = [aMotor conversion];
+		[[conversionMatrix cellWithTag:[aMotor motorId]] setFloatValue: [aMotor fullScale]/conversion];
+	}
+	else {
+		for(id aMotor in [model motors]){
+			float conversion = 1.0;
+			if(![model displayRaw]) conversion = [aMotor conversion];
+			[[fullScaleMatrix cellWithTag:[aMotor motorId]] setFloatValue:[aMotor fullScale]/conversion];
+		}
+	}
 }
 
 - (void) speedChanged:(NSNotification*)aNotification
 {
-	[[speedMatrix cellWithTag:0] setFloatValue:[model motorSpeed].x];
-	[[speedMatrix cellWithTag:1] setFloatValue:[model motorSpeed].y];
+	if(aNotification){
+		ORVXMMotor* aMotor = [[aNotification userInfo] objectForKey:@"VMXMotor"];
+		float conversion = 1.0;
+		if(![model displayRaw]) conversion = [aMotor conversion];
+		[[speedMatrix cellWithTag:[aMotor motorId]] setFloatValue: [aMotor motorSpeed]/conversion];
+
+	}
+	else {
+		for(id aMotor in [model motors]){
+			float conversion = 1.0;
+			if(![model displayRaw]) conversion = [aMotor conversion];
+			[[speedMatrix cellWithTag:[aMotor motorId]] setFloatValue:[aMotor motorSpeed]/conversion];
+		}
+	}
+}
+
+- (void) positionChanged:(NSNotification*)aNotification
+{
+	
+	if(aNotification){
+		ORVXMMotor* aMotor = [[aNotification userInfo] objectForKey:@"VMXMotor"];
+		float conversion = 1.0;
+		if(![model displayRaw]) conversion = [aMotor conversion];
+		[[positionMatrix cellWithTag:[aMotor motorId]] setFloatValue: [aMotor motorPosition]/conversion];
+	}
+	else {
+		for(id aMotor in [model motors]){
+			float conversion = 1.0;
+			if(![model displayRaw]) conversion = [aMotor conversion];
+			[[positionMatrix cellWithTag:[aMotor motorId]] setFloatValue:[aMotor motorPosition]/conversion];
+		}
+	}
+	
+}
+
+- (void) targetChanged:(NSNotification*)aNotification
+{
+	if(aNotification){
+		ORVXMMotor* aMotor = [[aNotification userInfo] objectForKey:@"VMXMotor"];
+		float conversion = 1.0;
+		if(![model displayRaw]) conversion = [aMotor conversion];
+		[[targetMatrix cellWithTag:[aMotor motorId]] setFloatValue: [aMotor targetPosition]/conversion];
+	}
+	else {
+		for(id aMotor in [model motors]){
+			float conversion = 1.0;
+			if(![model displayRaw]) conversion = [aMotor conversion];
+			[[targetMatrix cellWithTag:[aMotor motorId]] setFloatValue:[aMotor targetPosition]/conversion];
+		}
+	}
 }
 
 - (void) checkGlobalSecurity
@@ -232,40 +287,36 @@
     BOOL runInProgress = [gOrcaGlobals runInProgress];
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORVXMLock];
     BOOL locked = [gSecurity isLocked:ORVXMLock];
-	BOOL motor0Enabled = [model isMotorEnabled:0];
-	BOOL motor1Enabled = [model isMotorEnabled:1];
+	BOOL displayRaw = [model displayRaw];
 	
     [lockButton setState: locked];
 
     [portListPopup setEnabled:!locked];
     [openPortButton setEnabled:!locked];
     [getPositionButton setEnabled:!locked];
-    [getHomeButton setEnabled:!locked];
-    [absMatrix setEnabled:!locked];
-    [goButton setEnabled:!locked];
-    [selectCmdFileButton setEnabled:!locked];
-    [selectCmdFileButton1 setEnabled:!locked];
-    [runCmdFileButton setEnabled:!locked];
-    [patternTypeMatrix setEnabled:!locked];
-    [optionMatrix setEnabled:!locked];
-    [dwellTimeField setEnabled:!lockedOrRunningMaintenance];
-    
-    [cmdXValueField setEnabled:!locked & motor0Enabled];
-	[[patternMatrix cellWithTag:0] setEnabled:!locked & motor0Enabled];
-	[[patternMatrix cellWithTag:1] setEnabled:!locked & motor0Enabled];
-	[[patternMatrix cellWithTag:2] setEnabled:!locked & motor0Enabled];
-	[[conversionMatrix cellWithTag:0] setEnabled:!locked & motor0Enabled];
-	[[fullScaleMatrix cellWithTag:0] setEnabled:!locked & motor0Enabled];
-	[[speedMatrix cellWithTag:0] setEnabled:!locked & motor0Enabled];
 
-    [cmdYValueField setEnabled:!locked & motor1Enabled];
-	[[patternMatrix cellWithTag:3] setEnabled:!locked & motor1Enabled];
-	[[patternMatrix cellWithTag:4] setEnabled:!locked & motor1Enabled];
-	[[patternMatrix cellWithTag:5] setEnabled:!locked & motor1Enabled];
-	[[conversionMatrix cellWithTag:1] setEnabled:!locked & motor1Enabled];
-	[[fullScaleMatrix cellWithTag:1] setEnabled:!locked & motor1Enabled];
-	[[speedMatrix cellWithTag:1] setEnabled:!locked & motor1Enabled];
+	for(id aMotor in [model motors]){
+		int i = [aMotor motorId];
+		BOOL motorEnabled = [aMotor motorEnabled];
+		[[conversionMatrix cellWithTag:i] setEnabled:!locked & motorEnabled && !displayRaw];
+		[[fullScaleMatrix cellWithTag:i] setEnabled:!locked & motorEnabled];
+		[[speedMatrix cellWithTag:i] setEnabled:!locked & motorEnabled];
+		[[absMotionMatrix cellWithTag:i] setEnabled:!locked & motorEnabled];
+		[[addButtonMatrix cellWithTag:i] setEnabled:!locked & motorEnabled];
+	}
 
+	if([model displayRaw]){
+		[fullScaleLabelField setStringValue:@"(steps)"];
+		[speedLabelField setStringValue:@"(stps/sec)"];
+		[currentPositionLabelField setStringValue:@"(steps)"];
+		[targetLabelField setStringValue:@"(steps)"];
+	}
+	else {
+		[fullScaleLabelField setStringValue:@"(mm)"];
+		[speedLabelField setStringValue:@"(mm/sec)"];
+		[currentPositionLabelField setStringValue:@"(mm)"];
+		[targetLabelField setStringValue:@"(mm)"];
+	}	
 
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
@@ -273,55 +324,6 @@
     }
     [lockDocField setStringValue:s];
 
-}
-
-- (void) patternTypeChanged:(NSNotification*)aNotification
-{
-	[patternTypeMatrix selectCellWithTag:[model patternType]];
-}
-
-- (void) patternChanged:(NSNotification*)aNotification
-{
-	[[patternMatrix cellWithTag:0] setFloatValue:[model startPoint].x];
-	[[patternMatrix cellWithTag:1] setFloatValue:[model endPoint].x];
-	[[patternMatrix cellWithTag:2] setFloatValue:[model delta].x];
-
-	[[patternMatrix cellWithTag:3] setFloatValue:[model startPoint].y];
-	[[patternMatrix cellWithTag:4] setFloatValue:[model endPoint].y];
-	[[patternMatrix cellWithTag:5] setFloatValue:[model delta].y];
-}
-
-- (void) dwellTimeChanged:(NSNotification*)aNotification
-{
-	[dwellTimeField setFloatValue:[model dwellTime]];
-}
-
-
-- (void) optionsChanged:(NSNotification*)aNotification
-{
-	int i;
-	for(i=0;i<[optionMatrix numberOfRows];i++){
-		[[optionMatrix cellWithTag:i] setState: [model optionSet:i]];	
-	}
-}
-
-- (void) absMotionChanged:(NSNotification*)aNotification
-{
-    [absMatrix selectCellWithTag:[model absMotion]];
-    if([model absMotion]){
-        [moveLabelField setStringValue:@"Go To:"];
-        [goButton setTitle:@"Go To"];
-    }
-    else {
-        [moveLabelField setStringValue:@"Move:"];
-        [goButton setTitle:@"Move"];
-    }
-}
-
-- (void) cmdPositionChanged:(NSNotification*)aNotification
-{
-    [cmdXValueField setFloatValue: [model cmdPosition].x];
-    [cmdYValueField setFloatValue: [model cmdPosition].y];
 }
 
 - (void) portStateChanged:(NSNotification*)aNotification
@@ -367,65 +369,43 @@
     [self portStateChanged:nil];
 }
 
-- (void) positionChanged:(NSNotification*)aNotification
-{
-	[motorPie1 refreshDisplay:self];
-	[motorPie2 refreshDisplay:self];
-	if(![model goingHome]){
-		[xPositionField setFloatValue:[model xyPosition].x];
-		[yPositionField setFloatValue:[model xyPosition].y];
-	}
-}
 
-- (void) goingHomeChanged:(NSNotification*)aNotification
+- (void) absoluteMotionChanged:(NSNotification*)aNotification
 {
-	[motorPie1 refreshDisplay:self];
-	[motorPie2 refreshDisplay:self];
-	if([model goingHome]){
-		[goingHomeField setStringValue:@"Going Home"];
+	if(aNotification){
+		ORVXMMotor* aMotor = [[aNotification userInfo] objectForKey:@"VMXMotor"];
+		[[absMotionMatrix cellWithTag:[aMotor motorId]] setIntValue: [aMotor absoluteMotion]];
 	}
 	else {
-		[goingHomeField setStringValue:@""];
+		for(id aMotor in [model motors]){
+			[[absMotionMatrix cellWithTag:[aMotor motorId]] setIntValue:[aMotor absoluteMotion]];
+		}
 	}
 }
 
-
-
-- (void) cmdFileChanged:(NSNotification*)aNotification
+- (void) motorEnabledChanged:(NSNotification*)aNotification
 {
-    if([model cmdFile]){
-        [cmdFileField setStringValue:[[model cmdFile] stringByAbbreviatingWithTildeInPath]];
-        [cmdFileField1 setStringValue:[[model cmdFile] stringByAbbreviatingWithTildeInPath]];
-    }
-    else {
-        [cmdFileField setStringValue:@"--"];
-        [cmdFileField1 setStringValue:@"--"];
-    }
-}
-
-- (void) mousePositionReported: (NSNotification*)aNote
-{
-    if((GetCurrentKeyModifiers() & shiftKey)){
-        [model setCmdPosition:NSMakePoint([[[aNote userInfo] objectForKey:@"x"]floatValue],[[[aNote userInfo] objectForKey:@"y"]floatValue])];
-    }
-}
-
-- (void) enabledMaskChanged:(NSNotification*)aNotification
-{
-	short i;
-	unsigned char theMask = [model enabledMask];
-	for(i=0;i<2;i++){
-		BOOL bitSet = (theMask&(1<<i))>0;
-		if(bitSet != [[enabledMaskMatrix cellWithTag:i] intValue]){
-			[[enabledMaskMatrix cellWithTag:i] setState:bitSet];
+	if(aNotification){
+		ORVXMMotor* aMotor = [[aNotification userInfo] objectForKey:@"VMXMotor"];
+		[[motorEnabledMatrix cellWithTag:[aMotor motorId]] setIntValue: [aMotor motorEnabled]];
+	}
+	else {
+		for(id aMotor in [model motors]){
+			[[motorEnabledMatrix cellWithTag:[aMotor motorId]] setIntValue:[aMotor motorEnabled]];
 		}
-		
 	}
 	[self updateButtons:nil];
 }
 
 
 #pragma mark ***Actions
+
+- (IBAction) displayRawAction:(id)sender
+{
+	int tag = [[displayRawMatrix selectedCell] tag];
+	[model setDisplayRaw:tag];	
+}
+
 - (IBAction) lockAction:(id) sender
 {
     [gSecurity tryToSetLock:ORVXMLock to:[sender intValue] forWindow:[self window]];
@@ -443,154 +423,90 @@
 
 - (IBAction) getPositionAction:(id)sender
 {
-    [model queryPosition];
+	[model queryPosition];
+}
+
+- (IBAction) goAllHomeAction:(id)sender
+{
+	[self endEditing];
+	[model goHomeAll];
 }
 
 - (IBAction) goHomeAction:(id)sender
 {
-    [model goHome];
+	[self endEditing];
+	[model goHomeAll];
 }
 
-- (IBAction) cmdPositionAction:(id)sender
+- (IBAction) stopAllAction:(id)sender
 {
-    [model setCmdPosition:NSMakePoint([cmdXValueField floatValue],[cmdYValueField floatValue])];
+    [model stopAllMotion];
 }
 
-
-- (IBAction) absMotionAction:(id)sender
+- (IBAction) goToNextCommandAction:(id)sender
 {
-    [model setAbsMotion:[[absMatrix selectedCell] tag]];
+    [model goToNexCommand];
 }
-
-- (IBAction) goAction:(id)sender
-{
-    [self endEditing];
-    [model go];
-}
-
-- (IBAction) stopAction:(id)sender
-{
-    [model stopMotion];
-}
-
-- (IBAction) selectCmdFileAction:(id)sender
-{
-    NSString* startDir = NSHomeDirectory(); //default to home
-    if([model cmdFile]){
-        startDir = [[model cmdFile]stringByDeletingLastPathComponent];
-        if([startDir length] == 0){
-            startDir = NSHomeDirectory();
-        }
-    }
-    NSOpenPanel *openPanel = [NSOpenPanel openPanel];
-    [openPanel setCanChooseDirectories:NO];
-    [openPanel setCanChooseFiles:YES];
-    [openPanel setAllowsMultipleSelection:NO];
-    [openPanel setPrompt:@"Choose"];
-
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-    [openPanel setDirectoryURL:[NSURL fileURLWithPath:startDir]];
-    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
-        if (result == NSFileHandlingPanelOKButton){
-            NSString* fileName = [[[openPanel URL] path] stringByAbbreviatingWithTildeInPath];
-            [model setCmdFile:fileName];         
-        }
-    }];
-#else 	
-    [openPanel beginSheetForDirectory:startDir
-                                 file:nil
-                                types:nil
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(openPanelDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif
-}
-
-- (IBAction) runCmdFileAction:(id)sender
-{
-    [model runCmdFile];
-}
-
-- (IBAction) patternTypeAction:(id)sender
-{
-    [model setPatternType:[[patternTypeMatrix selectedCell] tag]];
-}
-
-- (IBAction) patternAction:(id)sender
-{
-    [self endEditing];
-    int  tag = [[sender selectedCell]tag];
-    float value = [[sender selectedCell] floatValue];
-    if(tag == 0) [model setStartPoint:NSMakePoint(value,[model startPoint].y)];
-    else if(tag == 1) [model setEndPoint:NSMakePoint(value,[model endPoint].y)];
-    else if(tag == 2) [model setDelta:NSMakePoint(value,[model delta].y)];
-    else if(tag == 3) [model setStartPoint:NSMakePoint([model startPoint].x,value)];
-    else if(tag == 4) [model setEndPoint:NSMakePoint([model endPoint].x,value)];
-    else if(tag == 5) [model setDelta:NSMakePoint([model delta].x,value)];
-}
-
 
 - (IBAction) conversionAction:(id)sender
 {
-    [self endEditing];
-    int  tag = [[sender selectedCell]tag];
-	float value = [[sender selectedCell] floatValue];
-
-    if(tag == 0)[model setConversion:NSMakePoint(value,[model conversion].y)];
-    else		[model setConversion:NSMakePoint([model conversion].x,value)];
+    [[model motor:[[sender selectedCell]tag]] setConversion:[[sender selectedCell] floatValue]];
 }
 
 - (IBAction) fullScaleAction:(id)sender
 {
-    [self endEditing];
-    int  tag = [[sender selectedCell]tag];
-	float value = [[sender selectedCell] floatValue];
-    if(tag == 0)[model setFullScale:NSMakePoint(value,[model fullScale].y)];
-    else		[model setFullScale:NSMakePoint([model fullScale].x,value)];
+	ORVXMMotor* aMotor = [model motor:[[sender selectedCell]tag]];
+	float conversion = 1.0;
+	if(![model displayRaw]) conversion = [aMotor conversion];
+	[aMotor setFullScale:(int)[[sender selectedCell] floatValue]*conversion];
 }
 
 - (IBAction) speedAction:(id)sender
 {
-    [self endEditing];
-    int  tag = [[sender selectedCell]tag];
-	int value = [[sender selectedCell] intValue];
-    if(tag == 0)[model setMotorSpeed:NSMakePoint(value,[model motorSpeed].y)];
-    else		[model setMotorSpeed:NSMakePoint([model motorSpeed].x,value)];
-
+	ORVXMMotor* aMotor = [model motor:[[sender selectedCell]tag]];
+	float conversion = 1.0;
+	if(![model displayRaw]) conversion = [aMotor conversion];
+	[aMotor setMotorSpeed:(int)[[sender selectedCell] floatValue]*conversion];
 }
 
-- (void) dwellTimeAction:(id)sender
+- (IBAction) targetPositionAction:(id)sender
 {
-    [model setDwellTime:[sender floatValue]];
+	ORVXMMotor* aMotor = [model motor:[[sender selectedCell]tag]];
+	float conversion = 1.0;
+	if(![model displayRaw]) conversion = [aMotor conversion];
+	[aMotor setTargetPosition:(int)[[sender selectedCell] floatValue]*conversion];
 }
 
-- (IBAction) optionsAction:(id)sender
+- (IBAction) motorEnabledAction:(id)sender
 {
-    int  whichOption = [[sender selectedCell]tag];
-    if([[sender cellWithTag:whichOption] state])[model setOption:whichOption];
-    else [model clearOption:whichOption];
+	[[model motor:[[sender selectedCell]tag]] setMotorEnabled:[[sender selectedCell] intValue]];
 }
 
-- (IBAction) enabledMaskAction:(id)sender
+- (IBAction) absoluteMotionAction:(id)sender
 {
-	[model enableMotor:[[sender selectedCell] tag] withValue:[sender intValue]];
+	[[model motor:[[sender selectedCell]tag]] setAbsoluteMotion:[[sender selectedCell] intValue]];
 }
 
+- (IBAction) addButtonAction:(id)sender
+{
+	[self endEditing];
+	[model addCmdFromTableFor:[[sender selectedCell]tag]];
+}
+
+#pragma mark •••Table Data Source
+- (int) numberOfRowsInTableView:(NSTableView *)aTableView
+{
+	return [model cmdQueueCount];
+}
+
+- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
+{
+	if([[aTableColumn identifier] isEqualToString:@"Command"]) return [model cmdQueueCommand:rowIndex];
+	else return  [model cmdQueueDescription:rowIndex];
+}
 @end
 
 @implementation ORVXMController (private)
-
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
--(void)openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        NSString* fileName = [[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath];
-        [model setCmdFile:fileName];
-    }
-}
-#endif
-
 - (void) populatePortListPopup
 {
 	NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
@@ -604,60 +520,4 @@
 }
 @end
 
-
-@implementation ORVXMController(SMPieChartDataSource)
-- (unsigned int)numberOfSlicesInPieChartView:(SMPieChartView *)inPieChartView
-{
-	if(inPieChartView == motorPie1)return 2;
-	else return 2;
-}
-- (double)pieChartView:(SMPieChartView *)inPieChartView dataForSliceIndex:(unsigned int)inSliceIndex
-{
-	double motorPosition = 0.0;
-	
-	if(inPieChartView == motorPie1){
-	
-		motorPosition = 100.*([model xyPosition].x)/[model fullScale].x;
-		
-		if(motorPosition > 100)motorPosition = 100;
-		else if(motorPosition < 0)motorPosition = 0;
-
-		if(inSliceIndex==1){
-			return motorPosition;
-		}
-		else {
-			return 100. - motorPosition;
-		}
-	}
-	else {
-		motorPosition = 100.*([model xyPosition].y)/[model fullScale].y;
-		
-		if(motorPosition > 100)motorPosition = 100;
-		if(motorPosition < 0)motorPosition = 0;
-		
-		if(inSliceIndex==1){
-			return motorPosition;
-		}
-		else {
-			return 100 - motorPosition;
-		}
-	}
-}
-
-- (NSDictionary *)pieChartView:(SMPieChartView *)inPieChartView attributesForSliceIndex:(unsigned int)inSliceIndex
-{
-	if(inSliceIndex == 1){
-		return [NSDictionary dictionaryWithObjectsAndKeys:[NSColor greenColor],NSBackgroundColorAttributeName,[NSColor blackColor],NSForegroundColorAttributeName,nil];
-	}
-	else {
-		return [NSDictionary dictionaryWithObjectsAndKeys:[NSColor clearColor],NSBackgroundColorAttributeName,[NSColor blackColor],NSForegroundColorAttributeName,nil];
-	}
-}
-
-@end
-
-@implementation ORVXMController(SMPieChartDelegate)
-//- (NSString *)pieChartView:(SMPieChartView *)inPieChartView labelForSliceIndex:(unsigned int)inSliceIndex;
-//- (void)pieChartView:(SMPieChartView *)inPieChartView didClickPoint:(NSPoint)inPoint;
-@end
 

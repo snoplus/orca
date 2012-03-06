@@ -19,108 +19,79 @@
 
 #pragma mark ***Imported Files
 
-@class SMPieChartView;
 
 @interface ORVXMController : OrcaObjectController
 {
     IBOutlet NSTextField*   lockDocField;
+	IBOutlet NSMatrix*		displayRawMatrix;
     IBOutlet NSTextField*   portStateField;
-    IBOutlet NSButton*      lockButton;
     IBOutlet NSPopUpButton* portListPopup;
     IBOutlet NSButton*      openPortButton;
-    IBOutlet NSButton*      getPositionButton;
-    IBOutlet NSButton*      getHomeButton;
-    IBOutlet NSTextField*   xPositionField;
-    IBOutlet NSTextField*   yPositionField;
-    IBOutlet NSTextField*   cmdXValueField;
-    IBOutlet NSTextField*   cmdYValueField;
-    IBOutlet NSMatrix*      absMatrix;
-    IBOutlet NSButton*      goButton;
-    IBOutlet NSButton*      stopButton;
-    IBOutlet NSTextField*   goingHomeField;
-    IBOutlet NSTextField*   moveLabelField;
-    IBOutlet NSTextField*   cmdFileField;
-    IBOutlet NSTextField*   cmdFileField1;
-    IBOutlet NSButton*      selectCmdFileButton;
-    IBOutlet NSButton*      selectCmdFileButton1;
-    IBOutlet NSButton*      runCmdFileButton;
-    IBOutlet NSMatrix*      patternTypeMatrix;
-    IBOutlet NSMatrix*      patternMatrix;
-    IBOutlet NSMatrix*      optionMatrix;
-    IBOutlet NSTextField*   dwellTimeField;
+	IBOutlet NSButton*      lockButton;
+	
+	IBOutlet NSButton*      getPositionButton;
     IBOutlet NSMatrix*      conversionMatrix;
     IBOutlet NSMatrix*      fullScaleMatrix;
     IBOutlet NSMatrix*      speedMatrix;
-    IBOutlet NSMatrix*      enabledMaskMatrix;
+    IBOutlet NSMatrix*      motorEnabledMatrix;
+    IBOutlet NSMatrix*		positionMatrix;
+    IBOutlet NSMatrix*		targetMatrix;
+    IBOutlet NSMatrix*		addButtonMatrix;
+    IBOutlet NSMatrix*		absMotionMatrix;
+    IBOutlet NSTableView*	cmdQueueTable;
+	
+	//unit labels
+    IBOutlet NSTextField*   fullScaleLabelField;
+    IBOutlet NSTextField*   speedLabelField;
+    IBOutlet NSTextField*   currentPositionLabelField;
+    IBOutlet NSTextField*   targetLabelField;
 
-	IBOutlet SMPieChartView* motorPie1;
-	IBOutlet SMPieChartView* motorPie2;
-    IBOutlet NSTextField*   queryInProgress1;
-    IBOutlet NSTextField*   queryInProgress2;
 }
 
 #pragma mark ***Initialization
 - (id) init;
 - (void) dealloc;
 - (void) awakeFromNib;
-
-#pragma mark ***Notifications
 - (void) registerNotificationObservers;
 - (void) updateWindow;
-- (void) speedChanged:(NSNotification*)aNotification;
+- (void) setFormats;
+
+#pragma mark ***Interface Management
+- (void) displayRawChanged:(NSNotification*)aNote;
 - (void) updateButtons:(NSNotification*)aNotification;
 - (void) portNameChanged:(NSNotification*)aNotification;
 - (void) portStateChanged:(NSNotification*)aNotification;
 - (void) positionChanged:(NSNotification*)aNotification;
-- (void) cmdPositionChanged:(NSNotification*)aNotification;
-- (void) absMotionChanged:(NSNotification*)aNotification;
-- (void) goingHomeChanged:(NSNotification*)aNotification;
-- (void) cmdFileChanged:(NSNotification*)aNotification;
-- (void) patternTypeChanged:(NSNotification*)aNotification;
-- (void) patternChanged:(NSNotification*)aNotification;
-- (void) dwellTimeChanged:(NSNotification*)aNotification;
-- (void) optionsChanged:(NSNotification*)aNotification;
 - (void) conversionChanged:(NSNotification*)aNotification;
 - (void) fullScaleChanged:(NSNotification*)aNotification;
-- (void) enabledMaskChanged:(NSNotification*)aNotification;
-- (void) queryInProgressChanged:(NSNotification*)aNotification;
-
-#pragma mark ***Accessors
-
+- (void) motorEnabledChanged:(NSNotification*)aNotification;
+- (void) speedChanged:(NSNotification*)aNotification;
+- (void) targetChanged:(NSNotification*)aNotification;
+- (void) updateCmdTable:(NSNotification*)aNotification;
+- (void) absoluteMotionChanged:(NSNotification*)aNotification;
 
 #pragma mark ***Actions
+- (IBAction) displayRawAction:(id)sender;
 - (IBAction) lockAction:(id) sender;
 - (IBAction) portListAction:(id) sender;
 - (IBAction) openPortAction:(id)sender;
 - (IBAction) getPositionAction:(id)sender;
-- (IBAction) goHomeAction:(id)sender;
-- (IBAction) cmdPositionAction:(id)sender;
-- (IBAction) absMotionAction:(id)sender;
-- (IBAction) goAction:(id)sender;
-- (IBAction) stopAction:(id)sender;
-- (IBAction) runCmdFileAction:(id)sender;
-- (IBAction) selectCmdFileAction:(id)sender;
-- (IBAction) patternTypeAction:(id)sender;
-- (IBAction) patternAction:(id)sender;
-- (IBAction) dwellTimeAction:(id)sender;
-- (IBAction) optionsAction:(id)sender;
+- (IBAction) goAllHomeAction:(id)sender;
+- (IBAction) stopAllAction:(id)sender;
 - (IBAction) conversionAction:(id)sender;
 - (IBAction) fullScaleAction:(id)sender;
 - (IBAction) speedAction:(id)sender;
-- (IBAction) enabledMaskAction:(id)sender;
+- (IBAction) motorEnabledAction:(id)sender;
+- (IBAction) targetPositionAction:(id)sender;
+- (IBAction) goToNextCommandAction:(id)sender;
+- (IBAction) addButtonAction:(id)sender;
+- (IBAction) absoluteMotionAction:(id)sender;
+
+#pragma mark •••Table Data Source
+- (int)numberOfRowsInTableView:(NSTableView *)aTableView;
+- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex;
 
 @end
 
 
-@interface ORVXMController(SMPieChartDataSource)
-- (unsigned int)numberOfSlicesInPieChartView:(SMPieChartView *)inPieChartView;
-- (double)pieChartView:(SMPieChartView *)inPieChartView dataForSliceIndex:(unsigned int)inSliceIndex;
-//- (NSDictionary *)pieChartView:(SMPieChartView *)inPieChartView attributesForSliceIndex:(unsigned int)inSliceIndex;
-
-@end
-
-@interface ORVXMController(SMPieChartDelegate)
-//- (NSString *)pieChartView:(SMPieChartView *)inPieChartView labelForSliceIndex:(unsigned int)inSliceIndex;
-//- (void)pieChartView:(SMPieChartView *)inPieChartView didClickPoint:(NSPoint)inPoint;
-@end
 

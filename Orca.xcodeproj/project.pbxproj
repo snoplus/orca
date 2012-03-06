@@ -1707,6 +1707,8 @@
 		849516BB10C95382001C8112 /* StateLabel.tif in Resources */ = {isa = PBXBuildFile; fileRef = 849516B510C95382001C8112 /* StateLabel.tif */; };
 		84954B8305C87518004EBD3D /* ORHWWizParam.h in Headers */ = {isa = PBXBuildFile; fileRef = 84954B8105C87518004EBD3D /* ORHWWizParam.h */; };
 		84954B8405C87518004EBD3D /* ORHWWizParam.m in Sources */ = {isa = PBXBuildFile; fileRef = 84954B8205C87518004EBD3D /* ORHWWizParam.m */; };
+		849740E2150531410004B444 /* ORVXMMotor.h in Headers */ = {isa = PBXBuildFile; fileRef = 849740E0150531410004B444 /* ORVXMMotor.h */; };
+		849740E3150531410004B444 /* ORVXMMotor.m in Sources */ = {isa = PBXBuildFile; fileRef = 849740E1150531410004B444 /* ORVXMMotor.m */; };
 		84978A290701F02000B7887E /* ORDataGenDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84978A270701F02000B7887E /* ORDataGenDecoders.h */; };
 		84978A2A0701F02000B7887E /* ORDataGenDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84978A280701F02000B7887E /* ORDataGenDecoders.m */; };
 		84978B4C0702190100B7887E /* ORDataTypeAssigner.h in Headers */ = {isa = PBXBuildFile; fileRef = 84978B4A0702190100B7887E /* ORDataTypeAssigner.h */; };
@@ -4356,6 +4358,8 @@
 		849516B510C95382001C8112 /* StateLabel.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = StateLabel.tif; path = "Source/Objects/Misc Objects/StateLabel/StateLabel.tif"; sourceTree = SOURCE_ROOT; };
 		84954B8105C87518004EBD3D /* ORHWWizParam.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORHWWizParam.h; sourceTree = "<group>"; };
 		84954B8205C87518004EBD3D /* ORHWWizParam.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORHWWizParam.m; sourceTree = "<group>"; };
+		849740E0150531410004B444 /* ORVXMMotor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORVXMMotor.h; path = Source/Objects/Hardware/Serial/VXM/ORVXMMotor.h; sourceTree = SOURCE_ROOT; };
+		849740E1150531410004B444 /* ORVXMMotor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORVXMMotor.m; path = Source/Objects/Hardware/Serial/VXM/ORVXMMotor.m; sourceTree = SOURCE_ROOT; };
 		84978A270701F02000B7887E /* ORDataGenDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORDataGenDecoders.h; sourceTree = "<group>"; };
 		84978A280701F02000B7887E /* ORDataGenDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORDataGenDecoders.m; sourceTree = "<group>"; };
 		84978B4A0702190100B7887E /* ORDataTypeAssigner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORDataTypeAssigner.h; sourceTree = "<group>"; };
@@ -9612,6 +9616,8 @@
 				84B28D870F4C66BE00E2B056 /* ORVXMDecoders.m */,
 				84B28D880F4C66BE00E2B056 /* ORVXMModel.h */,
 				84B28D890F4C66BE00E2B056 /* ORVXMModel.m */,
+				849740E0150531410004B444 /* ORVXMMotor.h */,
+				849740E1150531410004B444 /* ORVXMMotor.m */,
 				84B28D8A0F4C66BE00E2B056 /* VXM.nib */,
 				84B28D8B0F4C66BE00E2B056 /* VXM.tif */,
 			);
@@ -12727,6 +12733,7 @@
 				225D4F4D14E9E4B3009FF60F /* SNOConnection.h in Headers */,
 				84D8556214FBDEDA00C70A00 /* ORCB37Controller.h in Headers */,
 				84D8556414FBDEDA00C70A00 /* ORCB37Model.h in Headers */,
+				849740E2150531410004B444 /* ORVXMMotor.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14454,6 +14461,7 @@
 				225D4F4E14E9E4B3009FF60F /* SNOConnection.m in Sources */,
 				84D8556314FBDEDA00C70A00 /* ORCB37Controller.m in Sources */,
 				84D8556514FBDEDA00C70A00 /* ORCB37Model.m in Sources */,
+				849740E3150531410004B444 /* ORVXMMotor.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
