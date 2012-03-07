@@ -34,20 +34,16 @@
 {
     NSString* title= @"Motor Position Record\n\n";
 
-	NSString* motor   = [NSString stringWithFormat:@"Motor  = %d\n",(dataPtr[2]) & 0x0000ffff];
-    unsigned short optionMask = (dataPtr[2]>>16) & 0x0000ffff;
-    NSString* optionString;
-    if(optionMask == 0)optionString = @"stopped\n";
-    else optionString = @"moving\n";
+	NSString* motor   = [NSString stringWithFormat:@"Motor  = %d\n",(dataPtr[2]>>16) & 0x7];
     union {
         long theLong;
         float theFloat;
     }data;
     data.theLong = dataPtr[3];
-    NSString* xPosition = [NSString stringWithFormat:@"X = %.4f\n",data.theFloat];
+    NSString* position = [NSString stringWithFormat:@"Steps = %.0f\n",data.theFloat];
     data.theLong = dataPtr[4];
-    NSString* yPosition = [NSString stringWithFormat:@"Y = %.4f\n",data.theFloat];
-    return [NSString stringWithFormat:@"%@%s%@%@%@%@",title,ctime((const time_t *)(&dataPtr[1])),motor,optionString,xPosition,yPosition];               
+    NSString* conversion = [NSString stringWithFormat:@"Conversion = %.2f stps/mm\n",data.theFloat];
+    return [NSString stringWithFormat:@"%@%s%@%@%@",title,ctime((const time_t *)(&dataPtr[1])),motor,position,conversion];               
 }
 @end
 

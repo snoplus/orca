@@ -79,8 +79,13 @@
 	for(i=0;i<kNumVXMMotors;i++){
 		[[fullScaleMatrix cellAtRow:i column:0]		setFormatter:numberFormatter];
 		[[positionMatrix cellAtRow:i column:0]		setFormatter:numberFormatter];
+		[[speedMatrix cellAtRow:i column:0]		setFormatter:numberFormatter];
 		[[targetMatrix cellAtRow:i column:0]		setFormatter:numberFormatter];
 	}
+	[fullScaleMatrix setNeedsDisplay];
+	[speedMatrix setNeedsDisplay];
+	[positionMatrix setNeedsDisplay];
+	[targetMatrix setNeedsDisplay];
 }
 
 #pragma mark ***Notifications
@@ -154,6 +159,46 @@
                          name : ORVXMModelDisplayRawChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(syncWithRunChanged:)
+                         name : ORVXMModelSyncWithRunChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(repeatCmdsChanged:)
+                         name : ORVXMModelRepeatCmdsChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(repeatCountChanged:)
+                         name : ORVXMModelRepeatCountChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(stopRunWhenDoneChanged:)
+                         name : ORVXMModelStopRunWhenDoneChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(cmdIndexChanged:)
+                         name : ORVXMModelCmdIndexChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(numTimesToRepeatChanged:)
+                         name : ORVXMModelNumTimesToRepeatChanged
+						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(goingHomeChanged:)
+                         name : ORVXMModelAllGoingHomeChanged
+						object: model];	
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(shipRecordsChanged:)
+                         name : ORVXMModelShipRecordsChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -171,13 +216,63 @@
     [self updateCmdTable:nil];
 	[self displayRawChanged:nil];
 	[self absoluteMotionChanged:nil];
+	[self syncWithRunChanged:nil];
+	[self repeatCmdsChanged:nil];
+	[self repeatCountChanged:nil];
+	[self stopRunWhenDoneChanged:nil];
+	[self cmdIndexChanged:nil];
+	[self numTimesToRepeatChanged:nil];
+	[self goingHomeChanged:nil];
+	[self shipRecordsChanged:nil];
+}
+
+- (void) shipRecordsChanged:(NSNotification*)aNote
+{
+	[shipRecordsCB setIntValue: [model shipRecords]];
+}
+
+- (void) goingHomeChanged:(NSNotification*)aNote
+{
+	[self updateButtons:nil];
+}
+
+- (void) numTimesToRepeatChanged:(NSNotification*)aNote
+{
+	[numTimesToRepeatField setIntValue: [model numTimesToRepeat]];
+}
+
+- (void) cmdIndexChanged:(NSNotification*)aNote
+{
+	[cmdIndexField setIntValue: [model cmdIndex]];
+}
+
+- (void) stopRunWhenDoneChanged:(NSNotification*)aNote
+{
+	[stopRunWhenDoneCB setIntValue: [model stopRunWhenDone]];
+}
+
+- (void) repeatCountChanged:(NSNotification*)aNote
+{
+	[repeatCountField setIntValue: [model repeatCount]];
+}
+
+- (void) repeatCmdsChanged:(NSNotification*)aNote
+{
+	[repeatCmdsCB setIntValue: [model repeatCmds]];
+	[self updateButtons:nil];
+}
+
+- (void) syncWithRunChanged:(NSNotification*)aNote
+{
+	[syncWithRunCB setIntValue: [model syncWithRun]];
+	[self updateButtons:nil];
 }
 
 - (void) displayRawChanged:(NSNotification*)aNote
 {
 	[displayRawMatrix selectCellWithTag: [model displayRaw]];
-	[self setFormats];
 	[self updateButtons:nil];
+	[self setFormats];
 	[self speedChanged:nil];
 	[self fullScaleChanged:nil];
 	[self positionChanged:nil];
@@ -240,7 +335,6 @@
 
 - (void) positionChanged:(NSNotification*)aNotification
 {
-	
 	if(aNotification){
 		ORVXMMotor* aMotor = [[aNotification userInfo] objectForKey:@"VMXMotor"];
 		float conversion = 1.0;
@@ -254,7 +348,6 @@
 			[[positionMatrix cellWithTag:[aMotor motorId]] setFloatValue:[aMotor motorPosition]/conversion];
 		}
 	}
-	
 }
 
 - (void) targetChanged:(NSNotification*)aNotification
@@ -288,22 +381,31 @@
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORVXMLock];
     BOOL locked = [gSecurity isLocked:ORVXMLock];
 	BOOL displayRaw = [model displayRaw];
+	BOOL goingHome = [model allGoingHome];
+	BOOL syncWithRun = [model syncWithRun];
 	
     [lockButton setState: locked];
 
     [portListPopup setEnabled:!locked];
     [openPortButton setEnabled:!locked];
     [getPositionButton setEnabled:!locked];
-
+	[stopGoNextCmdButton setEnabled:!locked & !goingHome];
+	[manualStartButton setEnabled:!locked & !goingHome & !syncWithRun];
+	[syncWithRunCB setEnabled:!locked & !goingHome];
+	[stopWithRunButton setEnabled:!locked & !goingHome];
+	[repeatCmdsCB setEnabled:!locked & !goingHome];
+	[repeatCountField setEnabled:!locked & !goingHome & [model repeatCmds]];
+	 
 	for(id aMotor in [model motors]){
 		int i = [aMotor motorId];
 		BOOL motorEnabled = [aMotor motorEnabled];
         BOOL absMotion = [aMotor absoluteMotion];
 		[[conversionMatrix cellWithTag:i] setEnabled:!locked & motorEnabled && !displayRaw];
+		[[motorEnabledMatrix cellWithTag:i] setEnabled:!locked & !goingHome];
 		[[fullScaleMatrix cellWithTag:i] setEnabled:!locked & motorEnabled];
-		[[speedMatrix cellWithTag:i] setEnabled:!locked & motorEnabled];
-		[[absMotionMatrix cellWithTag:i] setEnabled:!locked & motorEnabled];
-		[[addButtonMatrix cellWithTag:i] setEnabled:!locked & motorEnabled];
+		[[speedMatrix cellWithTag:i] setEnabled:!locked & motorEnabled & !goingHome];
+		[[absMotionMatrix cellWithTag:i] setEnabled:!locked & motorEnabled & !goingHome];
+		[[addButtonMatrix cellWithTag:i] setEnabled:!locked & motorEnabled & !goingHome];
 		[[addButtonMatrix cellWithTag:i] setTitle:absMotion?@"Add Abs Cmd":@"Add Rel Cmd"];
 	}
 
@@ -371,7 +473,6 @@
     [self portStateChanged:nil];
 }
 
-
 - (void) absoluteMotionChanged:(NSNotification*)aNotification
 {
 	if(aNotification){
@@ -402,6 +503,46 @@
 
 
 #pragma mark ***Actions
+
+- (void) shipRecordsAction:(id)sender
+{
+	[model setShipRecords:[sender intValue]];	
+}
+
+- (IBAction) manualStateAction:(id)sender
+{
+	[model manualStart];
+}
+
+- (IBAction) removeAllAction:(id)sender
+{
+	[model removeAllCmds];
+}
+
+- (IBAction) numTimesToRepeatAction:(id)sender
+{
+	[model setNumTimesToRepeat:[sender intValue]];	
+}
+
+- (IBAction) stopRunWhenDoneAction:(id)sender
+{
+	[model setStopRunWhenDone:[sender intValue]];	
+}
+
+- (IBAction) repeatCmdsAction:(id)sender
+{
+	[model setRepeatCmds:[sender intValue]];	
+}
+
+- (IBAction) repeatCountAction:(id)sender
+{
+	[model setRepeatCount:[sender intValue]];	
+}
+
+- (IBAction) syncWithRunAction:(id)sender
+{
+	[model setSyncWithRun:[sender intValue]];	
+}
 
 - (IBAction) displayRawAction:(id)sender
 {
@@ -505,6 +646,10 @@
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
 {
 	if([[aTableColumn identifier] isEqualToString:@"Command"]) return [model cmdQueueCommand:rowIndex];
+	else if([[aTableColumn identifier] isEqualToString:@"CmdIndex"]) {
+		if(rowIndex == [model cmdIndex])return @"√";
+		else return @"";
+	}
 	else return  [model cmdQueueDescription:rowIndex];
 }
 @end

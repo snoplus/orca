@@ -33,35 +33,58 @@
         BOOL            portWasOpen;
         ORSerialPort*   serialPort;
         unsigned long	dataId;
-		BOOL			queryInProgress;
-        int             lastMotorQuery;
+		BOOL			forceResetQueryMaskOnce;
+		BOOL			repeatQuery;
+        int             motorQueryMask;
 		NSMutableArray* cmdQueue;
-    BOOL displayRaw;
+		BOOL			displayRaw;
+		int				syncWithRun;
+		BOOL			repeatCmds;
+		int				repeatCount;
+		BOOL			stopRunWhenDone;
+		int				cmdIndex;
+		int				numTimesToRepeat;
+		BOOL			allGoingHome;
+		BOOL			abortAllRepeats;
+    BOOL shipRecords;
 }
 
 #pragma mark ***Initialization
-
 - (id)   init;
 - (void) dealloc;
+
+#pragma mark ***Notifications
 - (void) registerNotificationObservers;
 - (void) dataReceived:(NSNotification*)note;
-- (void) openPort:(BOOL)state;
 
 #pragma mark ***Accessors
+- (BOOL) shipRecords;
+- (void) setShipRecords:(BOOL)aShipRecords;
+- (BOOL) allGoingHome;
+- (void) setAllGoingHome:(BOOL)aState;
+- (int) numTimesToRepeat;
+- (void) setNumTimesToRepeat:(int)aNumTimesToRepeat;
+- (int) cmdIndex;
+- (void) setCmdIndex:(int)aCmdIndex;
+- (BOOL) stopRunWhenDone;
+- (void) setStopRunWhenDone:(BOOL)aStopRunWhenDone;
+- (int) repeatCount;
+- (void) setRepeatCount:(int)aRepeatCount;
+- (BOOL) repeatCmds;
+- (void) setRepeatCmds:(BOOL)aRepeatCmds;
+- (int) syncWithRun;
+- (void) setSyncWithRun:(int)aSyncWithRun;
 - (BOOL) displayRaw;
 - (void) setDisplayRaw:(BOOL)aDisplayRaw;
 - (NSArray*) motors;
 - (ORVXMMotor*) motor:(int)aMotor;
-- (int) lastMotorQuery;
-- (void) setLastMotorQuery:(int)aMotor;
-- (BOOL) queryInProgress;
-- (void) setQueryInProgress:(BOOL)state;
 - (ORSerialPort*) serialPort;
 - (void) setSerialPort:(ORSerialPort*)aSerialPort;
 - (BOOL) portWasOpen;
 - (void) setPortWasOpen:(BOOL)aPortWasOpen;
 - (NSString*) portName;
 - (void) setPortName:(NSString*)aPortName;
+- (void) openPort:(BOOL)state;
 
 #pragma mark ***Data Records
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
@@ -70,13 +93,18 @@
 - (void) setDataId: (unsigned long) DataId;
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherVXM;
-- (void) shipMotorState:(BOOL)running;
-- (unsigned) cmdQueueCount;
+- (void) shipMotorState:(int)aMotorIndex;
+- (unsigned)  cmdQueueCount;
 - (NSString*) cmdQueueCommand:(int)index;
 - (NSString*) cmdQueueDescription:(int)index;
 
 #pragma mark ***Motor Commands
+- (void) manualStart;
+- (void) removeAllCmds;
+- (void) startRepeatingPositionQueries;
+- (void) stopPositionQueries;
 - (void) queryPosition;
+- (void) queryPositionOnce;
 - (void) goHomeAll;
 - (void) move:(int)motorIndex to:(float)aPosition speed:(int)aSpeed;
 - (void) move:(int)motorIndex dx:(float)aPosition;
@@ -89,13 +117,17 @@
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
-
 @end
 
-
+extern NSString* ORVXMModelShipRecordsChanged;
+extern NSString* ORVXMModelAllGoingHomeChanged;
+extern NSString* ORVXMModelNumTimesToRepeatChanged;
+extern NSString* ORVXMModelCmdIndexChanged;
+extern NSString* ORVXMModelStopRunWhenDoneChanged;
+extern NSString* ORVXMModelRepeatCountChanged;
+extern NSString* ORVXMModelRepeatCmdsChanged;
+extern NSString* ORVXMModelSyncWithRunChanged;
 extern NSString* ORVXMModelDisplayRawChanged;
-extern NSString* ORVXMModelLastMotorQueryChanged;
-extern NSString* ORVXMModelQueryInProgressChanged;
 extern NSString* ORVXMModelSerialPortChanged;
 extern NSString* ORVXMLock;
 extern NSString* ORVXMModelPortNameChanged;
@@ -108,6 +140,7 @@ extern NSString* ORVXMModelCmdQueueChanged;
 	NSString* cmd;
 	NSString* description;
 }
+
 @property (nonatomic,assign) BOOL waitToSendNextCmd;
 @property (nonatomic,retain) NSString* cmd;
 @property (nonatomic,retain) NSString* description;

@@ -177,12 +177,12 @@ NSString* ORVXMMotorAbsMotionChanged	= @"ORVXMMotorAbsMotionChanged";
 {
 	self = [super init];
 	[[owner undoManager] disableUndoRegistration];
-	[self setAbsoluteMotion:[decoder decodeBoolForKey:@"absoluteMotion"]];	
-	[self setMotorEnabled:[decoder decodeBoolForKey:@"motorEnabled"]];	
-	[self setConversion:[decoder decodeFloatForKey:@"conversion"]];
-	[self setFullScale:[decoder decodeIntForKey:@"fullScaleInt"]];
-	[self setMotorSpeed:[decoder decodeIntForKey:@"motorSpeedInt"]];
-	[self setTargetPosition:[decoder decodeIntForKey:@"targetPosition"]];
+	[self setAbsoluteMotion:[decoder decodeBoolForKey: @"absoluteMotion"]];	
+	[self setMotorEnabled:	[decoder decodeBoolForKey: @"motorEnabled"]];	
+	[self setConversion:	[decoder decodeFloatForKey:@"conversion"]];
+	[self setFullScale:		[decoder decodeIntForKey:  @"fullScaleInt"]];
+	[self setMotorSpeed:	[decoder decodeIntForKey:  @"motorSpeedInt"]];
+	[self setTargetPosition:[decoder decodeIntForKey:  @"targetPosition"]];
 	
 	[[owner undoManager] enableUndoRegistration];
 		
@@ -191,12 +191,12 @@ NSString* ORVXMMotorAbsMotionChanged	= @"ORVXMMotorAbsMotionChanged";
 
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
-    [encoder encodeBool:absoluteMotion forKey:@"absoluteMotion"];	
-    [encoder encodeBool:motorEnabled forKey:@"motorEnabled"];	
-    [encoder encodeFloat:conversion forKey:@"conversion"];
-    [encoder encodeInt:fullScale forKey:@"fullScaleInt"];
-    [encoder encodeInt:motorSpeed forKey:@"motorSpeedInt"];
-    [encoder encodeInt:targetPosition forKey:@"targetPosition"];
+    [encoder encodeBool:	absoluteMotion	forKey:@"absoluteMotion"];	
+    [encoder encodeBool:	motorEnabled	forKey:@"motorEnabled"];	
+    [encoder encodeFloat:	conversion		forKey:@"conversion"];
+    [encoder encodeInt:		fullScale		forKey:@"fullScaleInt"];
+    [encoder encodeInt:		motorSpeed		forKey:@"motorSpeedInt"];
+    [encoder encodeInt:		targetPosition	forKey:@"targetPosition"];
 }
 
 @end
