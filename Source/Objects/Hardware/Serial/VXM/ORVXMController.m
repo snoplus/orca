@@ -394,7 +394,7 @@
 	[syncWithRunCB setEnabled:!locked & !goingHome];
 	[stopWithRunButton setEnabled:!locked & !goingHome];
 	[repeatCmdsCB setEnabled:!locked & !goingHome];
-	[repeatCountField setEnabled:!locked & !goingHome & [model repeatCmds]];
+	[numTimesToRepeatField setEnabled:!locked & !goingHome & [model repeatCmds]];
 	 
 	for(id aMotor in [model motors]){
 		int i = [aMotor motorId];
