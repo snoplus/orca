@@ -298,11 +298,13 @@
 	for(id aMotor in [model motors]){
 		int i = [aMotor motorId];
 		BOOL motorEnabled = [aMotor motorEnabled];
+        BOOL absMotion = [aMotor absoluteMotion];
 		[[conversionMatrix cellWithTag:i] setEnabled:!locked & motorEnabled && !displayRaw];
 		[[fullScaleMatrix cellWithTag:i] setEnabled:!locked & motorEnabled];
 		[[speedMatrix cellWithTag:i] setEnabled:!locked & motorEnabled];
 		[[absMotionMatrix cellWithTag:i] setEnabled:!locked & motorEnabled];
 		[[addButtonMatrix cellWithTag:i] setEnabled:!locked & motorEnabled];
+		[[addButtonMatrix cellWithTag:i] setTitle:absMotion?@"Add Abs Cmd":@"Add Rel Cmd"];
 	}
 
 	if([model displayRaw]){
@@ -381,6 +383,7 @@
 			[[absMotionMatrix cellWithTag:[aMotor motorId]] setIntValue:[aMotor absoluteMotion]];
 		}
 	}
+    [self updateButtons:nil];
 }
 
 - (void) motorEnabledChanged:(NSNotification*)aNotification
