@@ -46,7 +46,9 @@
 		int				numTimesToRepeat;
 		BOOL			allGoingHome;
 		BOOL			abortAllRepeats;
-    BOOL shipRecords;
+        BOOL            shipRecords;
+        NSString*       cmdFile;
+
 }
 
 #pragma mark ***Initialization
@@ -58,6 +60,9 @@
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark ***Accessors
+- (void) saveCmdList;
+- (NSString*) cmdFile;
+- (void) setCmdFile:(NSString*)aFileName;
 - (BOOL) shipRecords;
 - (void) setShipRecords:(BOOL)aShipRecords;
 - (BOOL) allGoingHome;
@@ -119,6 +124,7 @@
 - (void) encodeWithCoder:(NSCoder*)encoder;
 @end
 
+extern NSString* ORVXMModelCmdFileChanged;
 extern NSString* ORVXMModelShipRecordsChanged;
 extern NSString* ORVXMModelAllGoingHomeChanged;
 extern NSString* ORVXMModelNumTimesToRepeatChanged;

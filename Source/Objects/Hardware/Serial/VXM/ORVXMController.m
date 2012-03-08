@@ -28,6 +28,9 @@
 
 @interface ORVXMController (private)
 - (void) populatePortListPopup;
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+- (void) saveCmdFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void*)contextInfo;
+#endif
 @end
 
 @implementation ORVXMController
@@ -253,7 +256,7 @@
 
 - (void) repeatCountChanged:(NSNotification*)aNote
 {
-	[repeatCountField setIntValue: [model repeatCount]];
+	[repeatCountField setIntValue: [(ORVXMModel*)model repeatCount]];
 }
 
 - (void) repeatCmdsChanged:(NSNotification*)aNote
@@ -536,7 +539,7 @@
 
 - (IBAction) repeatCountAction:(id)sender
 {
-	[model setRepeatCount:[sender intValue]];	
+	[(ORVXMModel*)model setRepeatCount:[sender intValue]];	
 }
 
 - (IBAction) syncWithRunAction:(id)sender
@@ -637,6 +640,44 @@
 	[model addCmdFromTableFor:[[sender selectedCell]tag]];
 }
 
+- (IBAction) saveCmdFileAction:(id)sender
+{
+	NSSavePanel *savePanel = [NSSavePanel savePanel];
+    [savePanel setPrompt:@"Save To File"];
+    [savePanel setCanCreateDirectories:YES];
+    
+    NSString* startingDir;
+    NSString* defaultFile;
+    
+	NSString* fullPath = [[model cmdFile] stringByExpandingTildeInPath];
+    if(fullPath){
+        startingDir = [fullPath stringByDeletingLastPathComponent];
+        defaultFile = [fullPath lastPathComponent];
+    }
+    else {
+        startingDir = NSHomeDirectory();
+        defaultFile = @"VXMCmdList";
+    }
+    
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [savePanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
+    [savePanel setNameFieldLabel:defaultFile];
+    [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            [model setCmdFile:[[savePanel URL] path]];
+            [model saveCmdList];
+        }
+    }];
+#else 		
+    [savePanel beginSheetForDirectory:startingDir
+                                 file:defaultFile
+                       modalForWindow:[self window]
+                        modalDelegate:self
+                       didEndSelector:@selector(saveCmdFileDidEnd:returnCode:contextInfo:)
+                          contextInfo:NULL];
+#endif	
+}
+
 #pragma mark •••Table Data Source
 - (int) numberOfRowsInTableView:(NSTableView *)aTableView
 {
@@ -666,6 +707,15 @@
         [portListPopup addItemWithTitle:[aPort name]];
 	}    
 }
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+- (void) saveCmdFileDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+{
+    if(returnCode){
+        [model setCmdFile:[[sheet filenames] objectAtIndex:0]];
+        [model saveCmdList];
+    }
+}
+#endif
 @end
 
 

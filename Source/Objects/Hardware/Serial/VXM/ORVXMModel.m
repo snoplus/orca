@@ -42,6 +42,7 @@ NSString* ORVXMModelPortNameChanged			= @"ORVXMModelPortNameChanged";
 NSString* ORVXMModelPortStateChanged		= @"ORVXMModelPortStateChanged";
 NSString* ORVXMModelCmdQueueChanged			= @"ORVXMModelCmdQueueChanged";
 NSString* ORVXMModelAllGoingHomeChanged		= @"ORVXMModelAllGoingHomeChanged";
+NSString* ORVXMModelCmdFileChanged		= @"ORVXMModelCmdFileChanged";
 
 NSString* ORVXMLock							= @"ORVXMLock";
 
@@ -87,6 +88,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 	for(id aMotor in motors)[aMotor setDelegate:nil];
 	[motors dealloc];
 	[cmdQueue release];
+    [cmdFile  release];
 	
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
@@ -170,6 +172,31 @@ NSString* ORVXMLock							= @"ORVXMLock";
 }
 
 #pragma mark ***Accessors
+- (void) saveCmdList
+{
+    NSMutableString* list = [NSMutableString string];
+    for(id aCmd in cmdQueue){
+        [list appendFormat:@"%@ # %@\n",[aCmd cmd],[aCmd description]];
+    }
+    NSString* s = [list stringByReplacingOccurrencesOfString:@"\r" withString:@""];
+    [s writeToFile:cmdFile atomically:NO encoding:NSASCIIStringEncoding error:nil];
+}
+
+- (NSString*) cmdFile
+{
+    return cmdFile;
+}
+
+- (void) setCmdFile:(NSString*)aFileName
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setCmdFile:cmdFile];
+    
+    [cmdFile autorelease];
+    cmdFile = [aFileName copy];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORVXMModelCmdFileChanged object:self];
+    
+}
 
 - (BOOL) shipRecords
 {
@@ -408,6 +435,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 	[self setDisplayRaw:	 [decoder decodeBoolForKey:	@"displayRaw"]];
 	[self setPortWasOpen:	 [decoder decodeBoolForKey:	@"portWasOpen"]];
     [self setPortName:		 [decoder decodeObjectForKey:@"portName"]];
+    [self setCmdFile:		 [decoder decodeObjectForKey:@"cmdFile"]];
 	
 	motors = [[decoder decodeObjectForKey:@"motors"] retain];
 	if(!motors)[self makeMotors];
@@ -438,6 +466,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
     [encoder encodeBool:portWasOpen		forKey: @"portWasOpen"];
     [encoder encodeObject:portName		forKey: @"portName"];
     [encoder encodeObject:motors		forKey: @"motors"];
+    [encoder encodeObject:cmdFile		forKey: @"cmdFile"];
 }
 
 #pragma mark ***Motor Commands
@@ -725,16 +754,14 @@ NSString* ORVXMLock							= @"ORVXMLock";
 
 - (void) addCmdToQueue:(NSString*)aCmdString description:(NSString*)aDescription waitToSend:(BOOL)waitToSendNextCmd
 {
-	if([serialPort isOpen]){ 
-		if(!cmdQueue)cmdQueue			= [[NSMutableArray array] retain];
-		ORVXMMotorCmd* aCmd		= [[ORVXMMotorCmd alloc] init];
-		aCmd.cmd				= aCmdString;
-		aCmd.description		= aDescription;
-		aCmd.waitToSendNextCmd	= waitToSendNextCmd;
-		[cmdQueue addObject:aCmd];
-		[aCmd release];
-		//if([cmdQueue count]==1 && !syncWithRun)[self processNextCommand];
-	}
+    if(!cmdQueue)cmdQueue			= [[NSMutableArray array] retain];
+    ORVXMMotorCmd* aCmd		= [[ORVXMMotorCmd alloc] init];
+    aCmd.cmd				= aCmdString;
+    aCmd.description		= aDescription;
+    aCmd.waitToSendNextCmd	= waitToSendNextCmd;
+    [cmdQueue addObject:aCmd];
+    [aCmd release];
+	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORVXMModelCmdQueueChanged object:self];
 }
 

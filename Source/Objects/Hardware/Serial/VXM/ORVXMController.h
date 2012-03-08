@@ -115,6 +115,7 @@
 - (IBAction) absoluteMotionAction:(id)sender;
 - (IBAction) removeAllAction:(id)sender;
 - (IBAction) manualStateAction:(id)sender;
+- (IBAction) saveCmdFileAction:(id)sender;
 
 #pragma mark •••Table Data Source
 - (int)numberOfRowsInTableView:(NSTableView *)aTableView;
