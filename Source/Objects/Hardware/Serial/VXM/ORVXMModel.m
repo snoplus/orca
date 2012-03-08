@@ -229,7 +229,12 @@ NSString* ORVXMLock							= @"ORVXMLock";
 	[self setListFile:aPath];
 	NSString* s = [NSString stringWithContentsOfFile:aPath encoding:NSASCIIStringEncoding error:nil];
 	[self removeAllCmds];
+	[self setCmdIndex:0];
+	[self setRepeatCount:0];
+	
 	NSArray* lines = [s componentsSeparatedByString:@"\n"];
+	BOOL saveUseCmdQueue = useCmdQueue;
+	useCmdQueue = YES;
 	for(id aLine in lines){
 		NSArray* parts = [aLine componentsSeparatedByString:@"#"];
 		if([parts count]>2){
@@ -239,6 +244,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 			
 		}
 	}
+	useCmdQueue = saveUseCmdQueue;
 }
 
 - (void) saveListTo:(NSString*)aPath
@@ -495,18 +501,18 @@ NSString* ORVXMLock							= @"ORVXMLock";
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
 	
-	[self setUseCmdQueue:[decoder decodeBoolForKey:@"useCmdQueue"]];
-	[self setCustomCmd:		 [decoder decodeObjectForKey:@"customCmd"]];
-	[self setShipRecords:	 [decoder decodeBoolForKey:@"shipRecords"]];
+	[self setUseCmdQueue:	  [decoder decodeBoolForKey:@"useCmdQueue"]];
+	[self setCustomCmd:		  [decoder decodeObjectForKey:@"customCmd"]];
+	[self setShipRecords:	  [decoder decodeBoolForKey:@"shipRecords"]];
 	[self setNumTimesToRepeat:[decoder decodeIntForKey:@"numTimesToRepeat"]];
-	[self setStopRunWhenDone:[decoder decodeBoolForKey:@"stopRunWhenDone"]];
-	[self setRepeatCmds:	 [decoder decodeBoolForKey:@"repeatCmds"]];
-	[self setRepeatCount:	 [decoder decodeIntForKey:@"repeatCount"]];
-	[self setSyncWithRun:	 [decoder decodeIntForKey:@"syncWithRun"]];
-	[self setDisplayRaw:	 [decoder decodeBoolForKey:	@"displayRaw"]];
-	[self setPortWasOpen:	 [decoder decodeBoolForKey:	@"portWasOpen"]];
-    [self setPortName:		 [decoder decodeObjectForKey:@"portName"]];
-    [self setListFile:		 [decoder decodeObjectForKey:@"listFile"]];
+	[self setStopRunWhenDone: [decoder decodeBoolForKey:@"stopRunWhenDone"]];
+	[self setRepeatCmds:	  [decoder decodeBoolForKey:@"repeatCmds"]];
+	[self setRepeatCount:	  [decoder decodeIntForKey:@"repeatCount"]];
+	[self setSyncWithRun:	  [decoder decodeIntForKey:@"syncWithRun"]];
+	[self setDisplayRaw:	  [decoder decodeBoolForKey:	@"displayRaw"]];
+	[self setPortWasOpen:	  [decoder decodeBoolForKey:	@"portWasOpen"]];
+    [self setPortName:		  [decoder decodeObjectForKey:@"portName"]];
+    [self setListFile:		  [decoder decodeObjectForKey:@"listFile"]];
 	
     cmdQueue = [[decoder decodeObjectForKey:@"cmdQueue"]retain];
 	motors   = [[decoder decodeObjectForKey:@"motors"] retain];
@@ -527,8 +533,8 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeBool:useCmdQueue forKey:@"useCmdQueue"];
-    [encoder encodeObject:customCmd forKey:@"customCmd"];
+    [encoder encodeBool:useCmdQueue		forKey:@"useCmdQueue"];
+    [encoder encodeObject:customCmd		forKey:@"customCmd"];
     [encoder encodeBool:shipRecords		forKey:@"shipRecords"];
     [encoder encodeInt:repeatCount		forKey:@"repeatCount"];
     [encoder encodeInt:numTimesToRepeat forKey:@"numTimesToRepeat"];
@@ -640,10 +646,12 @@ NSString* ORVXMLock							= @"ORVXMLock";
 
 - (void) addCustomCmd
 {	
-	if(![customCmd hasSuffix:@"\r"]) customCmd = [customCmd stringByAppendingString:@"\r"];
-	[self addCmdToQueue:customCmd 
-			description:@"Custom Cmd"
-			 waitToSend:YES];
+	if([customCmd length]>0){
+		if(![customCmd hasSuffix:@"\r"]) customCmd = [customCmd stringByAppendingString:@"\r"];
+		[self addCmdToQueue:customCmd 
+				description:@"Custom Cmd"
+				 waitToSend:YES];
+	}
 }
 
 - (void) addZeroCmdFor:(int)aMotorIndex
@@ -772,15 +780,19 @@ NSString* ORVXMLock							= @"ORVXMLock";
 		[self setCmdIndex:0];
 		[self setRepeatCount:0];
 		NSString* aCmd = @"F,K,C,";
+		BOOL atLeastOne = NO;
 		for(id aMotor in motors){
 			if([aMotor motorEnabled]){
 				int theMotorId = [aMotor motorId];
 				int speed = [aMotor motorSpeed];
 				aCmd = [aCmd stringByAppendingFormat:@"S%dM%d,I%dM-0,",theMotorId+1,speed,theMotorId+1];
+				atLeastOne = YES;
 			}
 		}
-		aCmd = [aCmd stringByAppendingString:@"R\r"];
-		[serialPort writeString:aCmd];
+		if(atLeastOne){
+			aCmd = [aCmd stringByAppendingString:@"R\r"];
+			[serialPort writeString:aCmd];
+		}
     }
 }
 
@@ -789,6 +801,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 	if([serialPort isOpen]){
 		[serialPort writeString:@"G\r"];
 		[self setWaiting:NO];
+		NSLog(@"sent 'Go' to VXM %d\n",[self uniqueIdNumber]);
 	}
 }
 
@@ -913,7 +926,6 @@ NSString* ORVXMLock							= @"ORVXMLock";
 
 - (void) addCmdToQueue:(NSString*)aCmdString description:(NSString*)aDescription waitToSend:(BOOL)waitToSendNextCmd
 {
-	
 	if(useCmdQueue){
 		if(!cmdQueue)cmdQueue	= [[NSMutableArray array] retain];
 		ORVXMMotorCmd* aCmd		= [[ORVXMMotorCmd alloc] init];
@@ -928,7 +940,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORVXMModelCmdQueueChanged object:self];
 	}
 	else {
-		if([serialPort isOpen] && cmdTypeExecuting == kVXMCmdIdle){
+		if([serialPort isOpen] && cmdTypeExecuting == kVXMCmdIdle && ([aCmdString length]>0)){
 			[self setCmdTypeExecuting:kVXMImmediateCmdExecuting];
 			abortAllRepeats = YES;
 			[self setCmdIndex:0];
