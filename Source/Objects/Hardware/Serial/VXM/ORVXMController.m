@@ -29,7 +29,8 @@
 @interface ORVXMController (private)
 - (void) populatePortListPopup;
 #if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-- (void) saveCmdFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void*)contextInfo;
+- (void) _saveListPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void*)contextInfo;
+- (void) _loadListPanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 #endif
 @end
 
@@ -66,6 +67,9 @@
 		[[targetMatrix cellAtRow:i column:0] setTag:i];
 		[[addButtonMatrix cellAtRow:i column:0] setTag:i];
 		[[absMotionMatrix cellAtRow:i column:0] setTag:i];
+		[[zeroCounterMatrix cellAtRow:i column:0] setTag:i];
+		[[homePlusMatrix cellAtRow:i column:0] setTag:i];
+		[[homeMinusMatrix cellAtRow:i column:0] setTag:i];
 		
 		[[conversionMatrix cellAtRow:i column:0]	setFormatter:numberFormatter];
 	}
@@ -202,6 +206,36 @@
                          name : ORVXMModelShipRecordsChanged
 						object: model];
 
+	[notifyCenter addObserver : self
+                     selector : @selector(itemsAdded:)
+                         name : ORVXMModelListItemsAdded
+                       object : model];	
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(itemsRemoved:)
+                         name : ORVXMModelListItemsRemoved
+                       object : model];	
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(cmdTypeExecutingChanged:)
+                         name : ORVXMModelCmdTypeExecutingChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(customCmdChanged:)
+                         name : ORVXMModelCustomCmdChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(waitingChanged:)
+                         name : ORVXMModelWaitingChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(useCmdQueueChanged:)
+                         name : ORVXMModelUseCmdQueueChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -227,6 +261,34 @@
 	[self numTimesToRepeatChanged:nil];
 	[self goingHomeChanged:nil];
 	[self shipRecordsChanged:nil];
+	[self cmdTypeExecutingChanged:nil];
+	[self customCmdChanged:nil];
+	[self waitingChanged:nil];
+	[self useCmdQueueChanged:nil];
+}
+
+- (void) useCmdQueueChanged:(NSNotification*)aNote
+{
+	[useCmdQueueMatrix selectCellWithTag: [model useCmdQueue]];
+	[self updateButtons:nil];
+}
+
+- (void) waitingChanged:(NSNotification*)aNote
+{
+	[waitingField setStringValue: [model waiting]?@"Waiting For Go":@""];
+	[sendGoButton setEnabled:[model waiting]];
+}
+
+- (void) customCmdChanged:(NSNotification*)aNote
+{
+	[customCmdField setStringValue: [model customCmd]];
+}
+
+- (void) cmdTypeExecutingChanged:(NSNotification*)aNote
+{
+	[cmdListExecutingField setStringValue: [model cmdTypeExecuting]==kVXMCmdListExecuting?@"List is Executing":@""];
+	[self repeatCountChanged:nil];
+	[self updateButtons:nil];
 }
 
 - (void) shipRecordsChanged:(NSNotification*)aNote
@@ -256,7 +318,12 @@
 
 - (void) repeatCountChanged:(NSNotification*)aNote
 {
-	[repeatCountField setIntValue: [(ORVXMModel*)model repeatCount]];
+	NSString* s = @"";
+	if([model cmdTypeExecuting] == kVXMCmdListExecuting){
+		if(![model repeatCmds] || ([model numTimesToRepeat] < 2))s = @"";
+		else s = [NSString stringWithFormat:@"(%d/%d)",[(ORVXMModel*)model repeatCount]+1,[model numTimesToRepeat]];
+	}
+	[repeatCountField setStringValue: s];
 }
 
 - (void) repeatCmdsChanged:(NSNotification*)aNote
@@ -380,36 +447,49 @@
 - (void) updateButtons:(NSNotification*)aNotification
 {
 
-    BOOL runInProgress = [gOrcaGlobals runInProgress];
+    BOOL runInProgress		= [gOrcaGlobals runInProgress];
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORVXMLock];
-    BOOL locked = [gSecurity isLocked:ORVXMLock];
-	BOOL displayRaw = [model displayRaw];
-	BOOL goingHome = [model allGoingHome];
-	BOOL syncWithRun = [model syncWithRun];
+    BOOL locked				= [gSecurity isLocked:ORVXMLock];
+	BOOL displayRaw			= [model displayRaw];
+	BOOL goingHome			= [model allGoingHome];
+	BOOL syncWithRun		= [model syncWithRun];
+	int cmdExecuting		= [model cmdTypeExecuting];
+	BOOL useCmdQueue		= [model useCmdQueue];
 	
     [lockButton setState: locked];
 
     [portListPopup setEnabled:!locked];
     [openPortButton setEnabled:!locked];
     [getPositionButton setEnabled:!locked];
-	[stopGoNextCmdButton setEnabled:!locked & !goingHome];
-	[manualStartButton setEnabled:!locked & !goingHome & !syncWithRun];
-	[syncWithRunCB setEnabled:!locked & !goingHome];
-	[stopWithRunButton setEnabled:!locked & !goingHome];
-	[repeatCmdsCB setEnabled:!locked & !goingHome];
-	[numTimesToRepeatField setEnabled:!locked & !goingHome & [model repeatCmds]];
-	 
+	
+	[manualStartButton setEnabled:!locked && !goingHome & !syncWithRun && !cmdExecuting && useCmdQueue];
+	[stopAllMotionButton setEnabled: cmdExecuting || goingHome];
+	[loadListButton setEnabled:!cmdExecuting && !goingHome];
+	[removeAllCmdsButton setEnabled:!cmdExecuting && !goingHome];
+
+	[syncWithRunCB setEnabled:!locked && !goingHome && !cmdExecuting && useCmdQueue];
+	[stopWithRunButton setEnabled:!locked && !goingHome && !cmdExecuting && useCmdQueue];
+	[repeatCmdsCB setEnabled:!locked && !goingHome && !cmdExecuting && useCmdQueue];
+	[numTimesToRepeatField setEnabled:!locked && !goingHome && [model repeatCmds] && !cmdExecuting && useCmdQueue];
+	[stopGoNextCmdButton setEnabled: cmdExecuting && useCmdQueue];
+	
+	[addCustomCmdButton setEnabled: !cmdExecuting && !goingHome];
+	[addCustomCmdButton setTitle:[model useCmdQueue]?@"Add Custom Cmd": @"Execute Cmd"];
+
 	for(id aMotor in [model motors]){
 		int i = [aMotor motorId];
 		BOOL motorEnabled = [aMotor motorEnabled];
         BOOL absMotion = [aMotor absoluteMotion];
-		[[conversionMatrix cellWithTag:i] setEnabled:!locked & motorEnabled && !displayRaw];
-		[[motorEnabledMatrix cellWithTag:i] setEnabled:!locked & !goingHome];
-		[[fullScaleMatrix cellWithTag:i] setEnabled:!locked & motorEnabled];
-		[[speedMatrix cellWithTag:i] setEnabled:!locked & motorEnabled & !goingHome];
-		[[absMotionMatrix cellWithTag:i] setEnabled:!locked & motorEnabled & !goingHome];
-		[[addButtonMatrix cellWithTag:i] setEnabled:!locked & motorEnabled & !goingHome];
-		[[addButtonMatrix cellWithTag:i] setTitle:absMotion?@"Add Abs Cmd":@"Add Rel Cmd"];
+		[[conversionMatrix cellWithTag:i] setEnabled:!locked && motorEnabled && !displayRaw && !cmdExecuting];
+		[[motorEnabledMatrix cellWithTag:i] setEnabled:!locked && !goingHome && !cmdExecuting];
+		[[fullScaleMatrix cellWithTag:i] setEnabled:!locked && motorEnabled && !cmdExecuting];
+		[[speedMatrix cellWithTag:i] setEnabled:!locked && motorEnabled && !goingHome && !cmdExecuting];
+		[[absMotionMatrix cellWithTag:i] setEnabled:!locked && motorEnabled && !goingHome && !cmdExecuting];
+		[[addButtonMatrix cellWithTag:i] setEnabled:!locked && motorEnabled && !goingHome && !cmdExecuting];
+		[[addButtonMatrix cellWithTag:i] setTitle:absMotion?@"Move Abs":@"Move Rel"];
+		[[zeroCounterMatrix cellWithTag:i] setEnabled:!locked && motorEnabled && !goingHome && !cmdExecuting];
+		[[homePlusMatrix cellWithTag:i] setEnabled:!locked && motorEnabled && !goingHome && !cmdExecuting];
+		[[homeMinusMatrix cellWithTag:i] setEnabled:!locked && motorEnabled && !goingHome && !cmdExecuting];
 	}
 
 	if([model displayRaw]){
@@ -504,10 +584,70 @@
 	[self updateButtons:nil];
 }
 
+- (BOOL) validateMenuItem:(NSMenuItem*)menuItem
+{
+    if ([menuItem action] == @selector(cut:)) {
+        return [cmdQueueTable selectedRow] >= 0 ;
+    }
+    else if ([menuItem action] == @selector(delete:)) {
+        return [cmdQueueTable selectedRow] >= 0;
+    }
+	[super validateMenuItem:menuItem];
+	return YES;
+}
+- (void) itemsAdded:(NSNotification*)aNote
+{
+	int index = [[[aNote userInfo] objectForKey:@"Index"] intValue];
+	index = MIN(index,[model cmdQueueCount]);
+	index = MAX(index,0);
+	[cmdQueueTable reloadData];
+	NSIndexSet* indexSet = [NSIndexSet indexSetWithIndex:index];
+	[cmdQueueTable selectRowIndexes:indexSet byExtendingSelection:NO];
+}
+
+- (void) itemsRemoved:(NSNotification*)aNote
+{
+	int index = [[[aNote userInfo] objectForKey:@"Index"] intValue];
+	index = MIN(index,[model cmdQueueCount]-1);
+	index = MAX(index,0);
+	[cmdQueueTable reloadData];
+	NSIndexSet* indexSet = [NSIndexSet indexSetWithIndex:index];
+	[cmdQueueTable selectRowIndexes:indexSet byExtendingSelection:NO];
+}
 
 #pragma mark ***Actions
+- (void) useCmdQueueAction:(id)sender
+{
+	int tag = [[useCmdQueueMatrix selectedCell] tag];
+	[model setUseCmdQueue:tag];	
+}
 
-- (void) shipRecordsAction:(id)sender
+- (IBAction) customCmdAction:(id)sender
+{
+	[model setCustomCmd:[sender stringValue]];	
+}
+
+- (IBAction) removeItemAction:(id)sender
+{
+	NSIndexSet* theSet = [cmdQueueTable selectedRowIndexes];
+	NSUInteger current_index = [theSet firstIndex];
+    if(current_index != NSNotFound){
+		[model removeItemAtIndex:current_index];
+	}
+	//[self setButtonStates];
+}
+
+- (IBAction) delete:(id)sender
+{
+    [self removeItemAction:nil];
+}
+
+- (IBAction) cut:(id)sender
+{
+    [self removeItemAction:nil];
+}
+
+- (IBAction) shipRecordsAction:(id)sender
 {
 	[model setShipRecords:[sender intValue]];	
 }
@@ -640,32 +780,50 @@
 	[model addCmdFromTableFor:[[sender selectedCell]tag]];
 }
 
-- (IBAction) saveCmdFileAction:(id)sender
+- (IBAction) addZeroCounterAction:(id)sender
+{
+	[model addZeroCmdFor:[[sender selectedCell]tag]];
+}
+
+- (IBAction) addHomePlusAction:(id)sender
+{
+	[model addHomePlusCmdFor:[[sender selectedCell]tag]];
+}
+
+- (IBAction) addHomeMinusAction:(id)sender
+{
+	[model addHomeMinusCmdFor:[[sender selectedCell]tag]];
+}
+
+- (IBAction) addCustomCmdAction:(id)sender
+{
+	[self endEditing];
+	[model addCustomCmd];
+}
+
+- (IBAction) sendGoAction:(id)sender
+{
+	[model sendGo];
+}
+
+- (IBAction) saveListAction:(id)sender
 {
 	NSSavePanel *savePanel = [NSSavePanel savePanel];
     [savePanel setPrompt:@"Save To File"];
     [savePanel setCanCreateDirectories:YES];
     
     NSString* startingDir;
-    NSString* defaultFile;
     
-	NSString* fullPath = [[model cmdFile] stringByExpandingTildeInPath];
-    if(fullPath){
-        startingDir = [fullPath stringByDeletingLastPathComponent];
-        defaultFile = [fullPath lastPathComponent];
-    }
-    else {
-        startingDir = NSHomeDirectory();
-        defaultFile = @"VXMCmdList";
-    }
+	NSString* fullPath = [[model listFile] stringByExpandingTildeInPath];
+    if(fullPath) startingDir = [fullPath stringByDeletingLastPathComponent];
+    else		 startingDir = NSHomeDirectory();
     
 #if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [savePanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
-    [savePanel setNameFieldLabel:defaultFile];
+    [savePanel setNameFieldLabel:@"Save to:"];
     [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
-            [model setCmdFile:[[savePanel URL] path]];
-            [model saveCmdList];
+            [model saveListTo:[[savePanel URL]path]];
         }
     }];
 #else 		
@@ -673,10 +831,41 @@
                                  file:defaultFile
                        modalForWindow:[self window]
                         modalDelegate:self
-                       didEndSelector:@selector(saveCmdFileDidEnd:returnCode:contextInfo:)
+                       didEndSelector:@selector(_saveListPanelDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
 #endif	
 }
+
+- (IBAction) loadListAction:(id)sender
+{
+    NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+    [openPanel setCanChooseDirectories:NO];
+    [openPanel setCanChooseFiles:YES];
+    [openPanel setAllowsMultipleSelection:NO];
+    [openPanel setPrompt:@"Choose"];
+    NSString* startingDir;
+    if([model listFile]) startingDir = [[model listFile] stringByDeletingLastPathComponent];
+    else				 startingDir = NSHomeDirectory();
+	
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [openPanel setDirectoryURL:[NSURL URLWithString:startingDir]];
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            [model loadListFrom:[[openPanel URL]path]];
+            [cmdQueueTable reloadData];
+        }
+    }];
+#else
+    [openPanel beginSheetForDirectory:startingDir
+                                 file:nil
+                                types:nil
+                       modalForWindow:[self window]
+                        modalDelegate:self
+                       didEndSelector:@selector(_loadListPanelDidEnd:returnCode:contextInfo:)
+                          contextInfo:NULL];
+#endif
+}
+
 
 #pragma mark •••Table Data Source
 - (int) numberOfRowsInTableView:(NSTableView *)aTableView
@@ -708,13 +897,20 @@
 	}    
 }
 #if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-- (void) saveCmdFileDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+- (void) _saveListPanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode){
-        [model setCmdFile:[[sheet filenames] objectAtIndex:0]];
-        [model saveCmdList];
+        [model saveListTo:[sheet filename]];
     }
 }
+- (void) _loadListPanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+{
+    if(returnCode){
+        [model loadListFrom:[sheet filename]];
+        [cmdQueueTable reloadData];
+    }
+}
+
 #endif
 @end
 

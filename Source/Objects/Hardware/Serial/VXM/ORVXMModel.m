@@ -29,6 +29,10 @@
 #import "ORDataPacket.h"
 
 #pragma mark ***External Strings
+NSString* ORVXMModelUseCmdQueueChanged		= @"ORVXMModelUseCmdQueueChanged";
+NSString* ORVXMModelWaitingChanged			= @"ORVXMModelWaitingChanged";
+NSString* ORVXMModelCustomCmdChanged		= @"ORVXMModelCustomCmdChanged";
+NSString* ORVXMModelCmdTypeExecutingChanged = @"ORVXMModelCmdTypeExecutingChanged";
 NSString* ORVXMModelShipRecordsChanged		= @"ORVXMModelShipRecordsChanged";
 NSString* ORVXMModelNumTimesToRepeatChanged = @"ORVXMModelNumTimesToRepeatChanged";
 NSString* ORVXMModelCmdIndexChanged			= @"ORVXMModelCmdIndexChanged";
@@ -42,19 +46,12 @@ NSString* ORVXMModelPortNameChanged			= @"ORVXMModelPortNameChanged";
 NSString* ORVXMModelPortStateChanged		= @"ORVXMModelPortStateChanged";
 NSString* ORVXMModelCmdQueueChanged			= @"ORVXMModelCmdQueueChanged";
 NSString* ORVXMModelAllGoingHomeChanged		= @"ORVXMModelAllGoingHomeChanged";
-NSString* ORVXMModelCmdFileChanged		= @"ORVXMModelCmdFileChanged";
+NSString* ORVXMModelListFileChanged			= @"ORVXMModelListFileChanged";
+NSString* ORVXMModelListItemsAdded			= @"ORVXMModelListItemsAdded";
+NSString* ORVXMModelListItemsRemoved		= @"ORVXMModelListItemsRemoved";
 
 NSString* ORVXMLock							= @"ORVXMLock";
 
-@implementation ORVXMMotorCmd
-@synthesize cmd, description,waitToSendNextCmd;
-- (void) dealloc
-{
-	self.description = nil;
-	self.cmd		 = nil;
-	[super dealloc];
-}
-@end
 
 @interface ORVXMModel (private)
 - (void) timeout;
@@ -88,8 +85,9 @@ NSString* ORVXMLock							= @"ORVXMLock";
 	for(id aMotor in motors)[aMotor setDelegate:nil];
 	[motors dealloc];
 	[cmdQueue release];
-    [cmdFile  release];
-	
+    [listFile  release];
+	[customCmd release];
+
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -172,29 +170,100 @@ NSString* ORVXMLock							= @"ORVXMLock";
 }
 
 #pragma mark ***Accessors
-- (void) saveCmdList
+
+- (BOOL) useCmdQueue
 {
+    return useCmdQueue;
+}
+
+- (void) setUseCmdQueue:(BOOL)aUseCmdQueue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setUseCmdQueue:useCmdQueue];
+    useCmdQueue = aUseCmdQueue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORVXMModelUseCmdQueueChanged object:self];
+}
+
+- (BOOL) waiting
+{
+    return waiting;
+}
+
+- (void) setWaiting:(BOOL)aWaiting
+{
+    waiting = aWaiting;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORVXMModelWaitingChanged object:self];
+}
+
+- (NSString*) customCmd
+{
+	if(customCmd) return customCmd;
+	else return @"";
+}
+
+- (void) setCustomCmd:(NSString*)aCustomCmd
+{
+	if(!aCustomCmd)aCustomCmd = @"";
+    [[[self undoManager] prepareWithInvocationTarget:self] setCustomCmd:customCmd];
+    
+    [customCmd autorelease];
+    customCmd = [aCustomCmd copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORVXMModelCustomCmdChanged object:self];
+}
+
+- (int) cmdTypeExecuting
+{
+    return cmdTypeExecuting;
+}
+
+- (void) setCmdTypeExecuting:(int)aCmdTypeExecuting
+{
+    cmdTypeExecuting = aCmdTypeExecuting;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORVXMModelCmdTypeExecutingChanged object:self];
+}
+
+- (void) loadListFrom:(NSString*)aPath
+{
+	[self setListFile:aPath];
+	NSString* s = [NSString stringWithContentsOfFile:aPath encoding:NSASCIIStringEncoding error:nil];
+	[self removeAllCmds];
+	NSArray* lines = [s componentsSeparatedByString:@"\n"];
+	for(id aLine in lines){
+		NSArray* parts = [aLine componentsSeparatedByString:@"#"];
+		if([parts count]>2){
+			[self addCmdToQueue:[[parts objectAtIndex:0] trimSpacesFromEnds] 
+					description:[[parts objectAtIndex:1] trimSpacesFromEnds] 
+					 waitToSend:[[[parts objectAtIndex:2] trimSpacesFromEnds] intValue]];
+			
+		}
+	}
+}
+
+- (void) saveListTo:(NSString*)aPath
+{
+	[self setListFile:aPath];
     NSMutableString* list = [NSMutableString string];
     for(id aCmd in cmdQueue){
-        [list appendFormat:@"%@ # %@\n",[aCmd cmd],[aCmd description]];
+        [list appendFormat:@"%@ # %@ # %d\n",[aCmd cmd],[aCmd description],[aCmd waitToSendNextCmd]];
     }
     NSString* s = [list stringByReplacingOccurrencesOfString:@"\r" withString:@""];
-    [s writeToFile:cmdFile atomically:NO encoding:NSASCIIStringEncoding error:nil];
+    [s writeToFile:listFile atomically:NO encoding:NSASCIIStringEncoding error:nil];
 }
 
-- (NSString*) cmdFile
+- (NSString*) listFile
 {
-    return cmdFile;
+    return listFile;
 }
 
-- (void) setCmdFile:(NSString*)aFileName
+- (void) setListFile:(NSString*)aFileName
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setCmdFile:cmdFile];
     
-    [cmdFile autorelease];
-    cmdFile = [aFileName copy];
+    [listFile autorelease];
+    listFile = [aFileName copy];
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORVXMModelCmdFileChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORVXMModelListFileChanged object:self];
     
 }
 
@@ -426,6 +495,8 @@ NSString* ORVXMLock							= @"ORVXMLock";
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
 	
+	[self setUseCmdQueue:[decoder decodeBoolForKey:@"useCmdQueue"]];
+	[self setCustomCmd:		 [decoder decodeObjectForKey:@"customCmd"]];
 	[self setShipRecords:	 [decoder decodeBoolForKey:@"shipRecords"]];
 	[self setNumTimesToRepeat:[decoder decodeIntForKey:@"numTimesToRepeat"]];
 	[self setStopRunWhenDone:[decoder decodeBoolForKey:@"stopRunWhenDone"]];
@@ -435,9 +506,10 @@ NSString* ORVXMLock							= @"ORVXMLock";
 	[self setDisplayRaw:	 [decoder decodeBoolForKey:	@"displayRaw"]];
 	[self setPortWasOpen:	 [decoder decodeBoolForKey:	@"portWasOpen"]];
     [self setPortName:		 [decoder decodeObjectForKey:@"portName"]];
-    [self setCmdFile:		 [decoder decodeObjectForKey:@"cmdFile"]];
+    [self setListFile:		 [decoder decodeObjectForKey:@"listFile"]];
 	
-	motors = [[decoder decodeObjectForKey:@"motors"] retain];
+    cmdQueue = [[decoder decodeObjectForKey:@"cmdQueue"]retain];
+	motors   = [[decoder decodeObjectForKey:@"motors"] retain];
 	if(!motors)[self makeMotors];
 	int i = 0;
 	for(id aMotor in motors){
@@ -455,18 +527,20 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeBool:useCmdQueue forKey:@"useCmdQueue"];
+    [encoder encodeObject:customCmd forKey:@"customCmd"];
     [encoder encodeBool:shipRecords		forKey:@"shipRecords"];
     [encoder encodeInt:repeatCount		forKey:@"repeatCount"];
     [encoder encodeInt:numTimesToRepeat forKey:@"numTimesToRepeat"];
     [encoder encodeBool:stopRunWhenDone forKey: @"stopRunWhenDone"];
     [encoder encodeBool:repeatCmds		forKey: @"repeatCmds"];
-    [encoder encodeInt:repeatCmds		forKey: @"repeatCount"];
     [encoder encodeInt:syncWithRun		forKey: @"syncWithRun"];
     [encoder encodeBool:displayRaw		forKey: @"displayRaw"];
     [encoder encodeBool:portWasOpen		forKey: @"portWasOpen"];
     [encoder encodeObject:portName		forKey: @"portName"];
     [encoder encodeObject:motors		forKey: @"motors"];
-    [encoder encodeObject:cmdFile		forKey: @"cmdFile"];
+    [encoder encodeObject:listFile		forKey: @"listFile"];
+    [encoder encodeObject:cmdQueue		forKey: @"cmdQueue"];
 }
 
 #pragma mark ***Motor Commands
@@ -514,10 +588,10 @@ NSString* ORVXMLock							= @"ORVXMLock";
 		if(motorToQuery>=0){
 			NSString* cmd = nil;
 			switch(motorToQuery){
-				case 0: cmd = @"E,X"; break;
-				case 1: cmd = @"E,Y"; break;
-				case 2: cmd = @"E,Z"; break;
-				case 3: cmd = @"E,T"; break;
+				case 0: cmd = @"E,X\r"; break;
+				case 1: cmd = @"E,Y\r"; break;
+				case 2: cmd = @"E,Z\r"; break;
+				case 3: cmd = @"E,T\r"; break;
 			}
 			if(cmd){
 				[serialPort writeString:cmd];
@@ -529,6 +603,26 @@ NSString* ORVXMLock							= @"ORVXMLock";
 			[self performSelector:@selector(queryPosition) withObject:nil afterDelay:.3];
 		}
     }
+}
+
+- (void) addItem:(id)anItem atIndex:(int)anIndex
+{
+	if(!cmdQueue) cmdQueue= [[NSMutableArray array] retain];
+	if([cmdQueue count] == 0)anIndex = 0;
+	anIndex = MIN(anIndex,[cmdQueue count]);
+	[[[self undoManager] prepareWithInvocationTarget:self] removeItemAtIndex:anIndex];
+	[cmdQueue insertObject:anItem atIndex:anIndex];
+	NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Index"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORVXMModelListItemsAdded object:self userInfo:userInfo];
+}
+
+- (void) removeItemAtIndex:(int) anIndex
+{
+	id anItem = [cmdQueue objectAtIndex:anIndex];
+	[[[self undoManager] prepareWithInvocationTarget:self] addItem:anItem atIndex:anIndex];
+	[cmdQueue removeObjectAtIndex:anIndex];
+	NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Index"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORVXMModelListItemsRemoved object:self userInfo:userInfo];
 }
 
 - (void) addCmdFromTableFor:(int)aMotorIndex
@@ -544,19 +638,66 @@ NSString* ORVXMLock							= @"ORVXMLock";
 	}
 }
 
+- (void) addCustomCmd
+{	
+	if(![customCmd hasSuffix:@"\r"]) customCmd = [customCmd stringByAppendingString:@"\r"];
+	[self addCmdToQueue:customCmd 
+			description:@"Custom Cmd"
+			 waitToSend:YES];
+}
+
+- (void) addZeroCmdFor:(int)aMotorIndex
+{
+	if(aMotorIndex>=0 && aMotorIndex<[motors count]){	
+		NSString* aCmd = [NSString stringWithFormat:@"N%d\r",aMotorIndex+1];
+		[self addCmdToQueue:aCmd 
+				description:[NSString stringWithFormat:@"Zero Counter For Motor %d",aMotorIndex]
+				 waitToSend:NO];
+		if(!useCmdQueue){
+			[self setCmdTypeExecuting:kVXMCmdIdle];
+			[self queryPositionOnce];
+		}
+	}
+}
+
+- (void) addHomePlusCmdFor:(int)aMotorIndex
+{
+	if(aMotorIndex>=0 && aMotorIndex<[motors count]){	
+		id aMotor = [motors objectAtIndex:aMotorIndex];
+		NSString* aCmd = [NSString stringWithFormat:@"F,C,S%dM%d,I%dM0,R\r",aMotorIndex+1,[aMotor motorSpeed],aMotorIndex+1];
+		[self addCmdToQueue:aCmd 
+				description:[NSString stringWithFormat:@"Move Motor %d to Pos Limit",aMotorIndex]
+				 waitToSend:YES];
+	}
+}
+
+- (void) addHomeMinusCmdFor:(int)aMotorIndex
+{
+	if(aMotorIndex>=0 && aMotorIndex<[motors count]){	
+		id aMotor = [motors objectAtIndex:aMotorIndex];
+		NSString* aCmd = [NSString stringWithFormat:@"F,C,S%dM%d,I%dM-0,R\r",aMotorIndex+1,[aMotor motorSpeed],aMotorIndex+1];
+		[self addCmdToQueue:aCmd 
+				description:[NSString stringWithFormat:@"Move Motor %d to Neg Limit",aMotorIndex]
+				 waitToSend:YES];
+	}
+}
+
 - (void) stopAllMotion
 {
     if([serialPort isOpen]){
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORVXMModelCmdQueueChanged object:self];
-        [serialPort writeString:@"F,K"];
+		abortAllRepeats = YES;
+		[NSObject cancelPreviousPerformRequestsWithTarget:self];
+        [serialPort writeString:@"F,K\r"];
 		[self queryPositionOnce];
+		[self setCmdTypeExecuting:kVXMCmdIdle];
+		[self setAllGoingHome:NO];
     }
 }
 
 - (void) goToNexCommand
 {
     if([serialPort isOpen]){
-        [serialPort writeString:@"F,K"]; //kill any existing program
+        [serialPort writeString:@"F,K\r"]; //kill any existing program
 		[self startRepeatingPositionQueries];
 	}
 }
@@ -643,6 +784,14 @@ NSString* ORVXMLock							= @"ORVXMLock";
     }
 }
 
+- (void) sendGo
+{
+	if([serialPort isOpen]){
+		[serialPort writeString:@"G\r"];
+		[self setWaiting:NO];
+	}
+}
+
 #pragma mark ***Data Records
 - (unsigned long) dataId { return dataId; }
 - (void) setDataId: (unsigned long) DataId
@@ -707,36 +856,46 @@ NSString* ORVXMLock							= @"ORVXMLock";
 
 - (void) process_response:(NSString*)aCmd
 {
-    if([aCmd rangeOfString:@"^"].location != NSNotFound){
-		//the '^' means a command is complete
-		aCmd = [aCmd substringFromIndex:1]; //might be more on this response, strip off the '^'
-		[self incrementCmdIndex];
-		[self processNextCommand];
-	}
-	if([aCmd hasPrefix:@"X"] || 
-	   [aCmd hasPrefix:@"Y"] || 
-	   [aCmd hasPrefix:@"Z"] || 
-	   [aCmd hasPrefix:@"T"] ){			
-		aCmd = [aCmd substringFromIndex:1];
-	}
-	if([aCmd length]>0 && motorQueryMask && [aCmd rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"+-.0123456789"]].location==0) {			
-		int motorIndex = [self motorToQuery];
-		ORVXMMotor* aMotor = [motors objectAtIndex:motorIndex];
-		float aValue = [aCmd floatValue];
-		[aMotor setMotorPosition:aValue];
-		if([aMotor hasMoved])[self shipMotorState:motorIndex];
-		motorQueryMask &= ~(0x1<<motorIndex);
-		[self queryPosition];
+	if([aCmd hasPrefix:@"W"]){
+		NSLog(@"VXM (%d) paused and waiting on a 'Go' cmd\n",[self uniqueIdNumber]);
+		[self setWaiting:YES];
 	}
 	else {
-		if(repeatQuery){
-			[self resetQueryMask];
-			[self performSelector:@selector(queryPosition) withObject:nil afterDelay:.3];
+		if([aCmd rangeOfString:@"^"].location != NSNotFound){
+			//the '^' means a command is complete
+			aCmd = [aCmd substringFromIndex:1]; //might be more on this response, strip off the '^'
+			if(useCmdQueue){
+				[self incrementCmdIndex];
+				[self processNextCommand];
+			}
+			else {
+				[self setCmdTypeExecuting:kVXMCmdIdle];
+				[self queryPositionOnce];
+			}
+		}
+		if([aCmd hasPrefix:@"X"] || 
+		   [aCmd hasPrefix:@"Y"] || 
+		   [aCmd hasPrefix:@"Z"] || 
+		   [aCmd hasPrefix:@"T"] ){			
+			aCmd = [aCmd substringFromIndex:1];
+		}
+		if([aCmd length]>0 && motorQueryMask && [aCmd rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"+-.0123456789"]].location==0) {			
+			int motorIndex = [self motorToQuery];
+			ORVXMMotor* aMotor = [motors objectAtIndex:motorIndex];
+			float aValue = [aCmd floatValue];
+			[aMotor setMotorPosition:aValue];
+			if([aMotor hasMoved])[self shipMotorState:motorIndex];
+			motorQueryMask &= ~(0x1<<motorIndex);
+			[self queryPosition];
+		}
+		else {
+			if(repeatQuery){
+				[self resetQueryMask];
+				[self performSelector:@selector(queryPosition) withObject:nil afterDelay:.3];
+			}
 		}
 	}
-		
-		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
 }
 
 - (void) makeMotors
@@ -754,15 +913,30 @@ NSString* ORVXMLock							= @"ORVXMLock";
 
 - (void) addCmdToQueue:(NSString*)aCmdString description:(NSString*)aDescription waitToSend:(BOOL)waitToSendNextCmd
 {
-    if(!cmdQueue)cmdQueue			= [[NSMutableArray array] retain];
-    ORVXMMotorCmd* aCmd		= [[ORVXMMotorCmd alloc] init];
-    aCmd.cmd				= aCmdString;
-    aCmd.description		= aDescription;
-    aCmd.waitToSendNextCmd	= waitToSendNextCmd;
-    [cmdQueue addObject:aCmd];
-    [aCmd release];
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORVXMModelCmdQueueChanged object:self];
+	if(useCmdQueue){
+		if(!cmdQueue)cmdQueue	= [[NSMutableArray array] retain];
+		ORVXMMotorCmd* aCmd		= [[ORVXMMotorCmd alloc] init];
+		aCmd.cmd				= aCmdString;
+		aCmd.description		= aDescription;
+		aCmd.waitToSendNextCmd	= waitToSendNextCmd;
+	 
+		[self  addItem:aCmd atIndex:[cmdQueue count]];
+
+		[aCmd release];
+		
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORVXMModelCmdQueueChanged object:self];
+	}
+	else {
+		if([serialPort isOpen] && cmdTypeExecuting == kVXMCmdIdle){
+			[self setCmdTypeExecuting:kVXMImmediateCmdExecuting];
+			abortAllRepeats = YES;
+			[self setCmdIndex:0];
+			[self setRepeatCount:0];
+			[serialPort writeString:aCmdString];
+			[self startRepeatingPositionQueries];
+		}
+	}
 }
 
 - (void) processNextCommand
@@ -776,7 +950,10 @@ NSString* ORVXMLock							= @"ORVXMLock";
 		else if([cmdQueue count]!=0 && !abortAllRepeats){
 			if(cmdIndex<[cmdQueue count]){
 				ORVXMMotorCmd* aCmd = [cmdQueue objectAtIndex:cmdIndex];
-				[serialPort writeString:aCmd.cmd];
+				[self setCmdTypeExecuting:kVXMCmdListExecuting];
+				NSString* theCmd = aCmd.cmd;
+				if(![theCmd hasSuffix:@"\r"]) theCmd = [theCmd stringByAppendingString:@"\r"];
+				[serialPort writeString:theCmd];
 				if(!aCmd.waitToSendNextCmd){
 					[self incrementCmdIndex];
 					[self processNextCommand];
@@ -793,10 +970,12 @@ NSString* ORVXMLock							= @"ORVXMLock";
 					}
 					else if(stopRunWhenDone){
 						[self stopRun];
+						[self setCmdTypeExecuting:kVXMCmdIdle];
 					}
 				}
-				else if(stopRunWhenDone){
-					[self stopRun];
+				else {
+					if(stopRunWhenDone)[self stopRun];
+					[self setCmdTypeExecuting:kVXMCmdIdle];
 				}
 			}
 		}
@@ -806,6 +985,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 	}
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORVXMModelCmdQueueChanged object:self];
 }
+
 - (void) resetQueryMask 
 {
 	forceResetQueryMaskOnce = NO;
@@ -819,6 +999,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 {
 	[self setCmdIndex:cmdIndex+1];
 }
+
 - (void) runStarting:(NSNotification*)aNote
 {
 	if(syncWithRun){
@@ -841,6 +1022,33 @@ NSString* ORVXMLock							= @"ORVXMLock";
 		id s = [NSString stringWithFormat:@"VXM %d Finished Pattern",[self uniqueIdNumber]];
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORRequestRunStop object:self userInfo:s];
 	}
+}
+
+@end
+
+@implementation ORVXMMotorCmd
+@synthesize cmd, description,waitToSendNextCmd;
+- (void) dealloc
+{
+	self.description = nil;
+	self.cmd		 = nil;
+	[super dealloc];
+}
+#pragma mark ***Archival
+- (id) initWithCoder:(NSCoder*)decoder
+{
+	self = [super init];
+	self.description		= [decoder decodeObjectForKey:	@"description"];	
+	self.cmd				= [decoder decodeObjectForKey:	@"cmd"];	
+	self.waitToSendNextCmd	= [decoder decodeIntForKey:		@"waitToSendNextCmd"];
+	return self;
+}
+
+- (void) encodeWithCoder:(NSCoder*)encoder
+{
+    [encoder encodeObject:	description			forKey:@"description"];	
+    [encoder encodeObject:	cmd					forKey:@"cmd"];	
+    [encoder encodeInt:		waitToSendNextCmd	forKey:@"waitToSendNextCmd"];
 }
 
 @end

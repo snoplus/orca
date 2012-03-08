@@ -23,6 +23,10 @@
 @interface ORVXMController : OrcaObjectController
 {
     IBOutlet NSTextField*   lockDocField;
+	IBOutlet NSMatrix*		useCmdQueueMatrix;
+	IBOutlet NSTextField*	waitingField;
+	IBOutlet NSTextField*	customCmdField;
+	IBOutlet NSTextField*	cmdListExecutingField;
 	IBOutlet NSButton*		shipRecordsCB;
 	IBOutlet NSTextField*	numTimesToRepeatField;
 	IBOutlet NSTextField*	cmdIndexField;
@@ -35,6 +39,11 @@
     IBOutlet NSPopUpButton* portListPopup;
     IBOutlet NSButton*      openPortButton;
 	IBOutlet NSButton*      lockButton;
+	IBOutlet NSButton*      loadListButton;
+	IBOutlet NSButton*      saveListButton;
+	IBOutlet NSButton*      addCustomCmdButton;
+	IBOutlet NSButton*		sendGoButton;
+	IBOutlet NSButton*		removeAllCmdsButton;
 	
 	IBOutlet NSButton*      getPositionButton;
     IBOutlet NSMatrix*      conversionMatrix;
@@ -45,6 +54,9 @@
     IBOutlet NSMatrix*		targetMatrix;
     IBOutlet NSMatrix*		addButtonMatrix;
     IBOutlet NSMatrix*		absMotionMatrix;
+    IBOutlet NSMatrix*		zeroCounterMatrix;
+    IBOutlet NSMatrix*		homePlusMatrix;
+    IBOutlet NSMatrix*		homeMinusMatrix;
     IBOutlet NSTableView*	cmdQueueTable;
 	
 	IBOutlet NSButton*      stopAllMotionButton;
@@ -70,6 +82,10 @@
 - (void) setFormats;
 
 #pragma mark ***Interface Management
+- (void) useCmdQueueChanged:(NSNotification*)aNote;
+- (void) waitingChanged:(NSNotification*)aNote;
+- (void) customCmdChanged:(NSNotification*)aNote;
+- (void) cmdTypeExecutingChanged:(NSNotification*)aNote;
 - (void) shipRecordsChanged:(NSNotification*)aNote;
 - (void) numTimesToRepeatChanged:(NSNotification*)aNote;
 - (void) cmdIndexChanged:(NSNotification*)aNote;
@@ -90,8 +106,12 @@
 - (void) updateCmdTable:(NSNotification*)aNote;
 - (void) absoluteMotionChanged:(NSNotification*)aNote;
 - (void) goingHomeChanged:(NSNotification*)aNote;
+- (void) itemsAdded:(NSNotification*)aNote;
+- (void) itemsRemoved:(NSNotification*)aNote;
 
 #pragma mark ***Actions
+- (IBAction) useCmdQueueAction:(id)sender;
+- (IBAction) customCmdAction:(id)sender;
 - (IBAction) shipRecordsAction:(id)sender;
 - (IBAction) numTimesToRepeatAction:(id)sender;
 - (IBAction) stopRunWhenDoneAction:(id)sender;
@@ -115,7 +135,16 @@
 - (IBAction) absoluteMotionAction:(id)sender;
 - (IBAction) removeAllAction:(id)sender;
 - (IBAction) manualStateAction:(id)sender;
-- (IBAction) saveCmdFileAction:(id)sender;
+- (IBAction) addZeroCounterAction:(id)sender;
+- (IBAction) addHomePlusAction:(id)sender;
+- (IBAction) addHomeMinusAction:(id)sender;
+- (IBAction) saveListAction:(id)sender;
+- (IBAction) loadListAction:(id)sender;
+- (IBAction) removeItemAction:(id)sender;
+- (IBAction) addCustomCmdAction:(id)sender;
+- (IBAction) delete:(id)sender;
+- (IBAction) cut:(id)sender;
+- (IBAction) sendGoAction:(id)sender;
 
 #pragma mark •••Table Data Source
 - (int)numberOfRowsInTableView:(NSTableView *)aTableView;

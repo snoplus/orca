@@ -119,7 +119,7 @@ NSString* ORVXMMotorAbsMotionChanged	= @"ORVXMMotorAbsMotionChanged";
     [[[owner undoManager] prepareWithInvocationTarget:self] setMotorSpeed:motorSpeed];
     
 	if(aSpeed <= 0)aSpeed = 1;
-	if(aSpeed >= 500)aSpeed = 500;
+	if(aSpeed >= 700)aSpeed = 700;
     motorSpeed = aSpeed;
 
 	NSMutableDictionary* userInfo = [NSMutableDictionary dictionaryWithObject:self forKey:@"VMXMotor"];
@@ -154,6 +154,7 @@ NSString* ORVXMMotorAbsMotionChanged	= @"ORVXMMotorAbsMotionChanged";
 
 - (void) setTargetPosition:(int)aPosition
 {
+	[[[owner undoManager] prepareWithInvocationTarget:self] setTargetPosition:targetPosition];
 	targetPosition = aPosition;
 	NSMutableDictionary* userInfo = [NSMutableDictionary dictionaryWithObject:self forKey:@"VMXMotor"];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORVXMMotorTargetChanged object:owner userInfo:userInfo];

@@ -25,6 +25,10 @@
 
 #define kNumVXMMotors  4
 
+#define kVXMCmdIdle				  0
+#define kVXMCmdListExecuting	  1 
+#define kVXMImmediateCmdExecuting 2
+
 @interface ORVXMModel : OrcaObject
 {
     @private
@@ -47,8 +51,11 @@
 		BOOL			allGoingHome;
 		BOOL			abortAllRepeats;
         BOOL            shipRecords;
-        NSString*       cmdFile;
-
+        NSString*       listFile;
+		int				cmdTypeExecuting;
+		NSString*		customCmd;
+		BOOL			waiting;
+		BOOL			useCmdQueue;
 }
 
 #pragma mark ***Initialization
@@ -60,9 +67,18 @@
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark ***Accessors
-- (void) saveCmdList;
-- (NSString*) cmdFile;
-- (void) setCmdFile:(NSString*)aFileName;
+- (BOOL) useCmdQueue;
+- (void) setUseCmdQueue:(BOOL)aUseCmdQueue;
+- (BOOL) waiting;
+- (void) setWaiting:(BOOL)aWaiting;
+- (NSString*) customCmd;
+- (void) setCustomCmd:(NSString*)aCustomCmd;
+- (int) cmdTypeExecuting;
+- (void) setCmdTypeExecuting:(int)aCmdTypeExecuting;
+- (void) saveListTo:(NSString*)aPath;
+- (void) loadListFrom:(NSString*)aPath;
+- (NSString*) listFile;
+- (void) setListFile:(NSString*)aFileName;
 - (BOOL) shipRecords;
 - (void) setShipRecords:(BOOL)aShipRecords;
 - (BOOL) allGoingHome;
@@ -90,6 +106,8 @@
 - (NSString*) portName;
 - (void) setPortName:(NSString*)aPortName;
 - (void) openPort:(BOOL)state;
+- (void) addItem:(id)anItem atIndex:(int)anIndex;
+- (void) removeItemAtIndex:(int) anIndex;
 
 #pragma mark ***Data Records
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
@@ -118,12 +136,21 @@
 - (void) stopAllMotion;
 - (void) goToNexCommand;
 - (void) addCmdFromTableFor:(int)aMotorIndex;
+- (void) addZeroCmdFor:(int)aMotorIndex;
+- (void) addHomePlusCmdFor:(int)aMotorIndex;
+- (void) addHomeMinusCmdFor:(int)aMotorIndex;
+- (void) addCustomCmd;
+- (void) sendGo;
 
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 @end
 
+extern NSString* ORVXMModelUseCmdQueueChanged;
+extern NSString* ORVXMModelWaitingChanged;
+extern NSString* ORVXMModelCustomCmdChanged;
+extern NSString* ORVXMModelCmdTypeExecutingChanged;
 extern NSString* ORVXMModelCmdFileChanged;
 extern NSString* ORVXMModelShipRecordsChanged;
 extern NSString* ORVXMModelAllGoingHomeChanged;
@@ -139,6 +166,8 @@ extern NSString* ORVXMLock;
 extern NSString* ORVXMModelPortNameChanged;
 extern NSString* ORVXMModelPortStateChanged;
 extern NSString* ORVXMModelCmdQueueChanged;
+extern NSString* ORVXMModelListItemsAdded;
+extern NSString* ORVXMModelListItemsRemoved;
 
 @interface ORVXMMotorCmd : NSObject
 {
