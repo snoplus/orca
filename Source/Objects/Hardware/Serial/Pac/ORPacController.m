@@ -248,6 +248,10 @@
                      selector : @selector(lastGainReadChanged:)
                          name : ORPacModelLastGainReadChanged
 						object: model];
+    [notifyCenter addObserver : self
+                     selector : @selector(vetoConditionChanged:)
+                         name : ORPacModelVetoChanged
+						object: model];	
 
 }
 
@@ -283,6 +287,13 @@
 	[self lcmChanged:nil];
 	[self adcChannelChanged:nil];
 	[self lastGainReadChanged:nil];
+	[self vetoConditionChanged:nil];
+}
+
+- (void) vetoConditionChanged:(NSNotification*)aNote
+{
+    if([model vetoInPlace])[ lcmRunVetoWarning setStringValue:@"Run is Vetoed because of the LCM setting!"];
+	else					[lcmRunVetoWarning setStringValue:@""];
 }
 
 - (void) lastGainReadChanged:(NSNotification*)aNote
@@ -453,10 +464,6 @@
     [[adcNameMatrix cellAtRow:1 column:0] setTextColor:state?enabledColor:disabledColor];
     [[adcMatrix cellAtRow:1 column:0] setTextColor:state?enabledColor:disabledColor];
     [[timeMatrix cellAtRow:1 column:0] setTextColor:state?enabledColor:disabledColor];
-    
-    if([model readingTemperatures])[lcmRunVetoWarning setStringValue:@""];
-    else [lcmRunVetoWarning setStringValue:@"Run is Vetoed because of the LCM setting!"];
-    
 }
 
 - (void) adcChannelChanged:(NSNotification*)aNote

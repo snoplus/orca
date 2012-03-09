@@ -103,6 +103,7 @@
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark •••Accessors
+- (BOOL) vetoInPlace;
 - (NSDate*) lastGainRead;
 - (void) setLastGainRead:(NSDate*)aLastGainRead;
 - (int) calculateAdcChannel;
@@ -236,4 +237,5 @@ extern NSString* ORPacModelLogToFileChanged;
 extern NSString* ORPacModelLogFileChanged;
 extern NSString* ORPacModelQueCountChanged;
 extern NSString* ORPacModelGainsReadBackChanged;
+extern NSString* ORPacModelVetoChanged;
 

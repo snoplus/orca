@@ -94,6 +94,7 @@
 - (void) updateWindow;
 
 #pragma mark •••Interface Management
+- (void) vetoConditionChanged:(NSNotification*)aNote;
 - (void) lastGainReadChanged:(NSNotification*)aNote;
 - (void) adcChannelChanged:(NSNotification*)aNote;
 - (void) lcmChanged:(NSNotification*)aNote;

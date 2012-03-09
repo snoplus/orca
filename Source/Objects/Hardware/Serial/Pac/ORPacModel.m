@@ -53,6 +53,7 @@ NSString* ORPacModelLogToFileChanged	= @"ORPacModelLogToFileChanged";
 NSString* ORPacModelLogFileChanged		= @"ORPacModelLogFileChanged";
 NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 NSString* ORPacModelGainsReadBackChanged= @"ORPacModelGainsReadBackChanged";
+NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 
 @interface ORPacModel (private)
 - (void) timeout;
@@ -63,6 +64,7 @@ NSString* ORPacModelGainsReadBackChanged= @"ORPacModelGainsReadBackChanged";
 - (void) _pollAllChannels;
 - (void) shipAdcValues;
 - (void) loadLogBuffer;
+- (void) checkVetoCondition;
 @end
 
 #define kBadPacValue -999
@@ -73,6 +75,7 @@ NSString* ORPacModelGainsReadBackChanged= @"ORPacModelGainsReadBackChanged";
 	self = [super init];
     [self registerNotificationObservers];
     gainBuffer = nil;
+	lcmEnabled = YES; //inverted in HW.
 	return self;
 }
 
@@ -103,7 +106,9 @@ NSString* ORPacModelGainsReadBackChanged= @"ORPacModelGainsReadBackChanged";
 	[processLimits release];
     [lcmEnabledAlarm clearAlarm];
 	[lcmEnabledAlarm release];
-
+	
+	[[ORGlobal sharedGlobal] removeRunVeto:@"LCM Enabled"];
+	
 	[super dealloc];
 }
 
@@ -115,11 +120,13 @@ NSString* ORPacModelGainsReadBackChanged= @"ORPacModelGainsReadBackChanged";
 			[self performSelector:@selector(writeLogBufferToFile) withObject:nil afterDelay:60];		
 		}
     }
+	[self checkVetoCondition];
     [super wakeUp];
 }
 
 - (void) sleep
 {
+	[[ORGlobal sharedGlobal] removeRunVeto:@"LCM Enabled"];
     [super sleep];
    // [NSObject cancelPreviousPerformRequestsWithTarget:self];
 }
@@ -351,25 +358,9 @@ NSString* ORPacModelGainsReadBackChanged= @"ORPacModelGainsReadBackChanged";
     [[[self undoManager] prepareWithInvocationTarget:self] setLcmEnabled:lcmEnabled];
     lcmEnabled = aLcmEnabled;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelLcmEnabledChanged object:self];
-    if(![self readingTemperatures]){
-        [[ORGlobal sharedGlobal] addRunVeto:@"LCM Enabled" comment:@"Leakage Current Measurement Enabled in PAC Board"];
-        NSLog(@"%@ put run veto in place for leakage current measurement.\n",[self fullID]);
-        if(!lcmEnabledAlarm){
-            lcmEnabledAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Leakage Current Measurement"] severity:kInformationAlarm];
-            [lcmEnabledAlarm setSticky:YES];
-            [lcmEnabledAlarm setHelpString:@"The PAC board posted this informational alarm because it is set to measure leakage current."];
-        }
-        [lcmEnabledAlarm setAcknowledged:NO];
-        [lcmEnabledAlarm postAlarm];
-    }
-    else {
-        [[ORGlobal sharedGlobal] removeRunVeto:@"LCM Enabled"];
-        NSLog(@"%@ removed leakage current measurement veto.\n",[self fullID]);
-        [lcmEnabledAlarm clearAlarm];
-        [lcmEnabledAlarm release];
-        lcmEnabledAlarm = nil;
-    }
+	[self checkVetoCondition];
 }
+
 
 - (int) gainValue
 {
@@ -543,7 +534,7 @@ NSString* ORPacModelGainsReadBackChanged= @"ORPacModelGainsReadBackChanged";
     }
     else      [serialPort close];
     portWasOpen = [serialPort isOpen];
-    
+    [self checkVetoCondition];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelPortStateChanged object:self];
 }
 
@@ -1289,6 +1280,33 @@ NSString* ORPacModelGainsReadBackChanged= @"ORPacModelGainsReadBackChanged";
 @end
 
 @implementation ORPacModel (private)
+- (void) checkVetoCondition
+{
+    if(![self readingTemperatures] && [self isConnected]){
+        [[ORGlobal sharedGlobal] addRunVeto:@"LCM Enabled" comment:@"Leakage Current Measurement Enabled in PAC Board"];
+        NSLog(@"%@ put run veto in place for leakage current measurement.\n",[self fullID]);
+        if(!lcmEnabledAlarm){
+            lcmEnabledAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Leakage Current Measurement"] severity:kInformationAlarm];
+            [lcmEnabledAlarm setSticky:YES];
+            [lcmEnabledAlarm setHelpString:@"The PAC board posted this informational alarm because it is set to measure leakage current."];
+        }
+        [lcmEnabledAlarm setAcknowledged:NO];
+        [lcmEnabledAlarm postAlarm];
+    }
+    else {
+        [[ORGlobal sharedGlobal] removeRunVeto:@"LCM Enabled"];
+        NSLog(@"%@ removed leakage current measurement veto.\n",[self fullID]);
+        [lcmEnabledAlarm clearAlarm];
+        [lcmEnabledAlarm release];
+        lcmEnabledAlarm = nil;
+    }
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelVetoChanged object:self];	
+}
+
+- (BOOL) vetoInPlace
+{
+	return lcmEnabledAlarm!=nil;
+}
 
 - (void) shipAdcValues
 {
