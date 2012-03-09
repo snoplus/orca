@@ -1277,6 +1277,11 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
     [processLimits addObject:entry];
 }
 
+- (BOOL) vetoInPlace
+{
+	return lcmEnabledAlarm!=nil;
+}
+
 @end
 
 @implementation ORPacModel (private)
@@ -1301,11 +1306,6 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
         lcmEnabledAlarm = nil;
     }
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelVetoChanged object:self];	
-}
-
-- (BOOL) vetoInPlace
-{
-	return lcmEnabledAlarm!=nil;
 }
 
 - (void) shipAdcValues
