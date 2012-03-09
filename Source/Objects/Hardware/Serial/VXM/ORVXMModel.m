@@ -868,12 +868,12 @@ NSString* ORVXMLock							= @"ORVXMLock";
 			motorQueryMask &= ~(0x1<<motorIndex);
 			[self performSelector:@selector(queryPosition) 
 					   withObject:nil 
-					   afterDelay:.3];
+					   afterDelay:.01];
 		}
 		else {
 			if(repeatQuery){
 				[self resetQueryMask];
-				[self performSelector:@selector(queryPosition) withObject:nil afterDelay:.3];
+				[self performSelector:@selector(queryPosition) withObject:nil afterDelay:.1];
 			}
 		}
 	}
