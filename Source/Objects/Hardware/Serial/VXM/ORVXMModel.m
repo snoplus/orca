@@ -411,6 +411,14 @@ NSString* ORVXMLock							= @"ORVXMLock";
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORVXMModelCmdQueueChanged object:self];
 }
 
+- (ORVXMMotorCmd*) motorCmd:(int)index
+{
+	if(index < [cmdQueue count]){
+		return [cmdQueue objectAtIndex:index];
+	}
+	else return nil;
+}
+
 - (unsigned) cmdQueueCount
 {
 	return [cmdQueue count];
@@ -647,32 +655,29 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (void) addCustomCmd
 {	
 	if([customCmd length]>0){
-		if(![customCmd hasSuffix:@"\r"]) customCmd = [customCmd stringByAppendingString:@"\r"];
 		[self addCmdToQueue:customCmd 
 				description:@"Custom Cmd"
 				 waitToSend:YES];
 	}
 }
 
-- (void) addZeroCmdFor:(int)aMotorIndex
+- (void) addZeroCmd
 {
-	if(aMotorIndex>=0 && aMotorIndex<[motors count]){	
-		NSString* aCmd = [NSString stringWithFormat:@"N%d\r",aMotorIndex+1];
-		[self addCmdToQueue:aCmd 
-				description:[NSString stringWithFormat:@"Zero Counter For Motor %d",aMotorIndex]
-				 waitToSend:NO];
-		if(!useCmdQueue){
-			[self setCmdTypeExecuting:kVXMCmdIdle];
-			[self queryPositionOnce];
-		}
-	}
+	NSString* aCmd = [NSString stringWithFormat:@"N"];
+	[self addCmdToQueue:aCmd 
+			description:[NSString stringWithFormat:@"Zero Counter"]
+			 waitToSend:NO];
+	if(!useCmdQueue){
+		[self setCmdTypeExecuting:kVXMCmdIdle];
+		[self queryPositionOnce];
+	}	
 }
 
 - (void) addHomePlusCmdFor:(int)aMotorIndex
 {
 	if(aMotorIndex>=0 && aMotorIndex<[motors count]){	
 		id aMotor = [motors objectAtIndex:aMotorIndex];
-		NSString* aCmd = [NSString stringWithFormat:@"F,C,S%dM%d,I%dM0,R\r",aMotorIndex+1,[aMotor motorSpeed],aMotorIndex+1];
+		NSString* aCmd = [NSString stringWithFormat:@"F,C,S%dM%d,I%dM0,R",aMotorIndex+1,[aMotor motorSpeed],aMotorIndex+1];
 		[self addCmdToQueue:aCmd 
 				description:[NSString stringWithFormat:@"Move Motor %d to Pos Limit",aMotorIndex]
 				 waitToSend:YES];
@@ -683,7 +688,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 {
 	if(aMotorIndex>=0 && aMotorIndex<[motors count]){	
 		id aMotor = [motors objectAtIndex:aMotorIndex];
-		NSString* aCmd = [NSString stringWithFormat:@"F,C,S%dM%d,I%dM-0,R\r",aMotorIndex+1,[aMotor motorSpeed],aMotorIndex+1];
+		NSString* aCmd = [NSString stringWithFormat:@"F,C,S%dM%d,I%dM-0,R",aMotorIndex+1,[aMotor motorSpeed],aMotorIndex+1];
 		[self addCmdToQueue:aCmd 
 				description:[NSString stringWithFormat:@"Move Motor %d to Neg Limit",aMotorIndex]
 				 waitToSend:YES];
@@ -705,7 +710,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (void) goToNexCommand
 {
     if([serialPort isOpen]){
-        [serialPort writeString:@"F,K\r"]; //kill any existing program
+        [serialPort writeString:@"F,K"]; //kill any existing program
 		[self startRepeatingPositionQueries];
 	}
 }
@@ -713,7 +718,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (void) move:(int)motorIndex dx:(float)aPosition
 {
 	if(motorIndex>=0 && motorIndex<[motors count]){	
-		NSString* aCmd = [NSString stringWithFormat:@"F,C,I%dM%.0f,R\r",motorIndex+1,aPosition];
+		NSString* aCmd = [NSString stringWithFormat:@"F,C,I%dM%.0f,R",motorIndex+1,aPosition];
 		float conversion = [[motors objectAtIndex:motorIndex] conversion];
 		NSString* units = displayRaw?@"stps":@"mm";
 		[self addCmdToQueue:aCmd 
@@ -725,7 +730,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (void) move:(int)motorIndex dx:(float)aPosition speed:(int)aSpeed
 {
 	if(motorIndex>=0 && motorIndex<[motors count]){	
-		NSString* aCmd = [NSString stringWithFormat:@"F,C,S%dM%d,I%dM%.0f,R\r",motorIndex+1,aSpeed,motorIndex+1,aPosition];
+		NSString* aCmd = [NSString stringWithFormat:@"F,C,S%dM%d,I%dM%.0f,R",motorIndex+1,aSpeed,motorIndex+1,aPosition];
 		float conversion = [[motors objectAtIndex:motorIndex] conversion];
 		NSString* units = displayRaw?@"stps":@"mm";
 		
@@ -738,7 +743,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (void) move:(int)motorIndex to:(float)aPosition speed:(int)aSpeed
 {
 	if(motorIndex>=0 && motorIndex<[motors count]){	
-		NSString* aCmd = [NSString stringWithFormat:@"F,C,S%dM%d,IA%dM%.0f,R\r",motorIndex+1,aSpeed,motorIndex+1,aPosition];
+		NSString* aCmd = [NSString stringWithFormat:@"F,C,S%dM%d,IA%dM%.0f,R",motorIndex+1,aSpeed,motorIndex+1,aPosition];
 		float conversion = [[motors objectAtIndex:motorIndex] conversion];
 		NSString* units = displayRaw?@"stps":@"mm";
 		[self addCmdToQueue:aCmd 
@@ -750,7 +755,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (void) move:(int)motorIndex to:(float)aPosition
 {
 	if(motorIndex>=0 && motorIndex<[motors count]){	
-		NSString* aCmd = [NSString stringWithFormat:@"F,C,IA%dM%.0f,R\r",motorIndex+1,aPosition];
+		NSString* aCmd = [NSString stringWithFormat:@"F,C,IA%dM%.0f,R",motorIndex+1,aPosition];
 		float conversion = [[motors objectAtIndex:motorIndex] conversion];
 		NSString* units = displayRaw?@"stps":@"mm";
 		[self addCmdToQueue:aCmd 
@@ -762,7 +767,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (void) goHome:(int)motorIndex speed:(int)aSpeed
 {
 	if([serialPort isOpen] && motorIndex>=0 && motorIndex<[motors count]){
-		NSString* aCmd = [NSString stringWithFormat:@"F,C,S%dM%d,I%dM-0,R\r",motorIndex+1,aSpeed,motorIndex+1];
+		NSString* aCmd = [NSString stringWithFormat:@"F,C,S%dM%d,I%dM-0,R",motorIndex+1,aSpeed,motorIndex+1];
 		[self addCmdToQueue:aCmd 
 				description:[NSString stringWithFormat:@"Move %d home at %dmm/s",motorIndex,aSpeed]
 				 waitToSend:YES];
@@ -882,8 +887,9 @@ NSString* ORVXMLock							= @"ORVXMLock";
 				[self processNextCommand];
 			}
 			else {
-				[self setCmdTypeExecuting:kVXMCmdIdle];
 				[self queryPositionOnce];
+				[self setCmdTypeExecuting:kVXMCmdIdle];
+				[self setAllGoingHome:NO];
 			}
 		}
 		if([aCmd hasPrefix:@"X"] || 

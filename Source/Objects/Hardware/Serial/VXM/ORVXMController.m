@@ -67,7 +67,6 @@
 		[[targetMatrix cellAtRow:i column:0] setTag:i];
 		[[addButtonMatrix cellAtRow:i column:0] setTag:i];
 		[[absMotionMatrix cellAtRow:i column:0] setTag:i];
-		[[zeroCounterMatrix cellAtRow:i column:0] setTag:i];
 		[[homePlusMatrix cellAtRow:i column:0] setTag:i];
 		[[homeMinusMatrix cellAtRow:i column:0] setTag:i];
 		
@@ -287,7 +286,6 @@
 - (void) cmdTypeExecutingChanged:(NSNotification*)aNote
 {
 	[cmdListExecutingField setStringValue: [model cmdTypeExecuting]==kVXMCmdListExecuting?@"List is Executing":@""];
-	[self repeatCountChanged:nil];
 	[self updateButtons:nil];
 }
 
@@ -475,7 +473,9 @@
 	
 	[addCustomCmdButton setEnabled: !cmdExecuting && !goingHome];
 	[addCustomCmdButton setTitle:[model useCmdQueue]?@"Add Custom Cmd": @"Execute Cmd"];
-
+	[zeroCounterButton setEnabled:!locked && !goingHome && !cmdExecuting];
+	[zeroCounterButton setTitle:[model useCmdQueue]?@"Add Zero Cmd": @"Execute Zero Cmd"];
+	
 	for(id aMotor in [model motors]){
 		int i = [aMotor motorId];
 		BOOL motorEnabled = [aMotor motorEnabled];
@@ -487,7 +487,6 @@
 		[[absMotionMatrix cellWithTag:i] setEnabled:!locked && motorEnabled && !goingHome && !cmdExecuting];
 		[[addButtonMatrix cellWithTag:i] setEnabled:!locked && motorEnabled && !goingHome && !cmdExecuting];
 		[[addButtonMatrix cellWithTag:i] setTitle:absMotion?@"Move Abs":@"Move Rel"];
-		[[zeroCounterMatrix cellWithTag:i] setEnabled:!locked && motorEnabled && !goingHome && !cmdExecuting];
 		[[homePlusMatrix cellWithTag:i] setEnabled:!locked && motorEnabled && !goingHome && !cmdExecuting];
 		[[homeMinusMatrix cellWithTag:i] setEnabled:!locked && motorEnabled && !goingHome && !cmdExecuting];
 	}
@@ -782,7 +781,7 @@
 
 - (IBAction) addZeroCounterAction:(id)sender
 {
-	[model addZeroCmdFor:[[sender selectedCell]tag]];
+	[model addZeroCmd];
 }
 
 - (IBAction) addHomePlusAction:(id)sender
@@ -882,6 +881,16 @@
 	}
 	else return  [model cmdQueueDescription:rowIndex];
 }
+
+- (void)tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+{
+	ORVXMMotorCmd* aCmd = [model motorCmd:rowIndex];
+	if(aCmd){
+		if([[aTableColumn identifier] isEqualToString:@"Command"])			aCmd.cmd         = anObject;
+		else if([[aTableColumn identifier] isEqualToString:@"Description"])	aCmd.description = anObject;
+	}
+}	
+
 @end
 
 @implementation ORVXMController (private)

@@ -117,9 +117,6 @@
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherVXM;
 - (void) shipMotorState:(int)aMotorIndex;
-- (unsigned)  cmdQueueCount;
-- (NSString*) cmdQueueCommand:(int)index;
-- (NSString*) cmdQueueDescription:(int)index;
 
 #pragma mark ***Motor Commands
 - (void) manualStart;
@@ -136,11 +133,15 @@
 - (void) stopAllMotion;
 - (void) goToNexCommand;
 - (void) addCmdFromTableFor:(int)aMotorIndex;
-- (void) addZeroCmdFor:(int)aMotorIndex;
+- (void) addZeroCmd;
 - (void) addHomePlusCmdFor:(int)aMotorIndex;
 - (void) addHomeMinusCmdFor:(int)aMotorIndex;
 - (void) addCustomCmd;
 - (void) sendGo;
+- (unsigned)  cmdQueueCount;
+- (NSString*) cmdQueueCommand:(int)index;
+- (NSString*) cmdQueueDescription:(int)index;
+- (ORVXMMotorCmd*) motorCmd:(int)index;
 
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;

@@ -54,7 +54,7 @@
     IBOutlet NSMatrix*		targetMatrix;
     IBOutlet NSMatrix*		addButtonMatrix;
     IBOutlet NSMatrix*		absMotionMatrix;
-    IBOutlet NSMatrix*		zeroCounterMatrix;
+    IBOutlet NSButton*		zeroCounterButton;
     IBOutlet NSMatrix*		homePlusMatrix;
     IBOutlet NSMatrix*		homeMinusMatrix;
     IBOutlet NSTableView*	cmdQueueTable;
@@ -149,6 +149,7 @@
 #pragma mark •••Table Data Source
 - (int)numberOfRowsInTableView:(NSTableView *)aTableView;
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex;
+- (void)tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex;
 
 @end
 
