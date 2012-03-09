@@ -144,6 +144,10 @@
 		unsigned long	maxRadon;
 		unsigned long	alarmLimit;
 		BOOL			gotAtLeastOneRH;
+		float			humidityAlarm;
+		float			pumpCurrentAlarm;
+		float			pumpCurrentMaxLimit;
+		float			humidityMaxLimit;
 }
 
 #pragma mark ***Initialization
@@ -153,6 +157,14 @@
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark ***Accessors
+- (float) humidityMaxLimit;
+- (void) setHumidityMaxLimit:(float)aHumidityMaxLimit;
+- (float) pumpCurrentMaxLimit;
+- (void) setPumpCurrentMaxLimit:(float)aPumpCurrentMaxLimit;
+- (float) pumpCurrentAlarm;
+- (void) setPumpCurrentAlarm:(float)aPumpCurrentAlarm;
+- (float) humidityAlarm;
+- (void) setHumidityAlarm:(float)aHumidityAlarm;
 - (unsigned long) alarmLimit;
 - (void) setAlarmLimit:(unsigned long)aAlarmLimit;
 - (unsigned long) maxRadon;
@@ -255,6 +267,10 @@
 - (double) maxValueForChan:(int)channel;
 @end
 
+extern NSString* ORRad7ModelHumidityMaxLimitChanged;
+extern NSString* ORRad7ModelPumpCurrentMaxLimitChanged;
+extern NSString* ORRad7ModelPumpCurrentAlarmChanged;
+extern NSString* ORRad7ModelHumidityAlarmChanged;
 extern NSString* ORRad7ModelAlarmLimitChanged;
 extern NSString* ORRad7ModelMaxRadonChanged;
 extern NSString* ORRad7ModelMakeFileChanged;

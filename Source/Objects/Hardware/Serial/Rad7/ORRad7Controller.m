@@ -239,6 +239,26 @@
 						object: model];
 	
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(humidityAlarmChanged:)
+                         name : ORRad7ModelHumidityAlarmChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(pumpCurrentAlarmChanged:)
+                         name : ORRad7ModelPumpCurrentAlarmChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(pumpCurrentMaxLimitChanged:)
+                         name : ORRad7ModelPumpCurrentMaxLimitChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(humidityMaxLimitChanged:)
+                         name : ORRad7ModelHumidityMaxLimitChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -269,6 +289,30 @@
 	[self makeFileChanged:nil];
 	[self maxRadonChanged:nil];
 	[self alarmLimitChanged:nil];
+	[self humidityAlarmChanged:nil];
+	[self pumpCurrentAlarmChanged:nil];
+	[self pumpCurrentMaxLimitChanged:nil];
+	[self humidityMaxLimitChanged:nil];
+}
+
+- (void) humidityMaxLimitChanged:(NSNotification*)aNote
+{
+	[humidityMaxLimitTextField setFloatValue: [model humidityMaxLimit]];
+}
+
+- (void) pumpCurrentMaxLimitChanged:(NSNotification*)aNote
+{
+	[pumpCurrentMaxLimitTextField setFloatValue: [model pumpCurrentMaxLimit]];
+}
+
+- (void) pumpCurrentAlarmChanged:(NSNotification*)aNote
+{
+	[pumpCurrentAlarmTextField setFloatValue: [model pumpCurrentAlarm]];
+}
+
+- (void) humidityAlarmChanged:(NSNotification*)aNote
+{
+	[humidityAlarmTextField setFloatValue: [model humidityAlarm]];
 }
 
 - (void) alarmLimitChanged:(NSNotification*)aNote
@@ -659,6 +703,26 @@
 
 
 #pragma mark ***Actions
+
+- (void) humidityMaxLimitTextFieldAction:(id)sender
+{
+	[model setHumidityMaxLimit:[sender floatValue]];	
+}
+
+- (void) pumpCurrentMaxLimitTextFieldAction:(id)sender
+{
+	[model setPumpCurrentMaxLimit:[sender floatValue]];	
+}
+
+- (void) pumpCurrentAlarmTextFieldAction:(id)sender
+{
+	[model setPumpCurrentAlarm:[sender floatValue]];	
+}
+
+- (void) humidityAlarmTextFieldAction:(id)sender
+{
+	[model setHumidityAlarm:[sender floatValue]];	
+}
 
 - (void) alarmLimitTextFieldAction:(id)sender
 {

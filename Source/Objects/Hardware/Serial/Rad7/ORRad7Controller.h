@@ -25,6 +25,10 @@
 @interface ORRad7Controller : ObjWithHistoryController
 {	
 	IBOutlet NSTextField*	alarmLimitTextField;
+	IBOutlet   NSTextField* humidityMaxLimitTextField;
+	IBOutlet   NSTextField* pumpCurrentMaxLimitTextField;
+	IBOutlet NSTextField*	pumpCurrentAlarmTextField;
+	IBOutlet NSTextField*	humidityAlarmTextField;
 	IBOutlet NSTextField*	maxRadonTextField;
 	IBOutlet NSButton*		makeFileCB;
 	IBOutlet NSButton*		verboseCB;
@@ -100,6 +104,10 @@
 - (void) updateWindow;
 
 #pragma mark ***Interface Management
+- (void) humidityMaxLimitChanged:(NSNotification*)aNote;
+- (void) pumpCurrentMaxLimitChanged:(NSNotification*)aNote;
+- (void) pumpCurrentAlarmChanged:(NSNotification*)aNote;
+- (void) humidityAlarmChanged:(NSNotification*)aNote;
 - (void) alarmLimitChanged:(NSNotification*)aNote;
 - (void) maxRadonChanged:(NSNotification*)aNote;
 - (void) makeFileChanged:(NSNotification*)aNote;
@@ -130,6 +138,10 @@
 - (void) updatePlot:(NSNotification*)aNote;
 
 #pragma mark ***Actions
+- (IBAction) humidityMaxLimitTextFieldAction:(id)sender;
+- (IBAction) pumpCurrentMaxLimitTextFieldAction:(id)sender;
+- (IBAction) pumpCurrentAlarmTextFieldAction:(id)sender;
+- (IBAction) humidityAlarmTextFieldAction:(id)sender;
 - (IBAction) alarmLimitTextFieldAction:(id)sender;
 - (IBAction) maxRadonTextFieldAction:(id)sender;
 - (IBAction) makeFileAction:(id)sender;

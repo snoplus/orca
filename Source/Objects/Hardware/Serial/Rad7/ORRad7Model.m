@@ -28,6 +28,10 @@
 #import "ORDataPacket.h"
 
 #pragma mark ***External Strings
+NSString* ORRad7ModelHumidityMaxLimitChanged = @"ORRad7ModelHumidityMaxLimitChanged";
+NSString* ORRad7ModelPumpCurrentMaxLimitChanged = @"ORRad7ModelPumpCurrentMaxLimitChanged";
+NSString* ORRad7ModelPumpCurrentAlarmChanged = @"ORRad7ModelPumpCurrentAlarmChanged";
+NSString* ORRad7ModelHumidityAlarmChanged = @"ORRad7ModelHumidityAlarmChanged";
 NSString* ORRad7ModelMaxRadonChanged	= @"ORRad7ModelMaxRadonChanged";
 NSString* ORRad7ModelAlarmLimitChanged	= @"ORRad7ModelAlarmLimitChanged";
 NSString* ORRad7ModelMakeFileChanged	= @"ORRad7ModelMakeFileChanged";
@@ -279,6 +283,62 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 }
 
 #pragma mark ***Accessors
+
+- (float) humidityMaxLimit
+{
+    return humidityMaxLimit;
+}
+
+- (void) setHumidityMaxLimit:(float)aHumidityMaxLimit
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setHumidityMaxLimit:humidityMaxLimit];
+    
+    humidityMaxLimit = aHumidityMaxLimit;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelHumidityMaxLimitChanged object:self];
+}
+
+- (float) pumpCurrentMaxLimit
+{
+    return pumpCurrentMaxLimit;
+}
+
+- (void) setPumpCurrentMaxLimit:(float)aPumpCurrentMaxLimit
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setPumpCurrentMaxLimit:pumpCurrentMaxLimit];
+    
+    pumpCurrentMaxLimit = aPumpCurrentMaxLimit;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelPumpCurrentMaxLimitChanged object:self];
+}
+
+- (float) pumpCurrentAlarm
+{
+    return pumpCurrentAlarm;
+}
+
+- (void) setPumpCurrentAlarm:(float)aPumpCurrentAlarm
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setPumpCurrentAlarm:pumpCurrentAlarm];
+    
+    pumpCurrentAlarm = aPumpCurrentAlarm;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelPumpCurrentAlarmChanged object:self];
+}
+
+- (float) humidityAlarm
+{
+    return humidityAlarm;
+}
+
+- (void) setHumidityAlarm:(float)aHumidityAlarm
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setHumidityAlarm:humidityAlarm];
+    
+    humidityAlarm = aHumidityAlarm;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelHumidityAlarmChanged object:self];
+}
 
 - (unsigned long) maxRadon
 {
@@ -748,11 +808,12 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 - (void) openPort:(BOOL)state
 {
     if(state) {
+        [serialPort open];
 		[serialPort setSpeed:9600];
 		[serialPort setParityNone];
 		[serialPort setStopBits2:NO];
 		[serialPort setDataBits:8];
-        [serialPort open];
+		[serialPort commitChanges];
     }
     else [serialPort close];
     portWasOpen = [serialPort isOpen];
@@ -770,6 +831,10 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 {
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
+	[self setHumidityMaxLimit:	[decoder decodeFloatForKey:@"humidityMaxLimit"]];
+	[self setPumpCurrentMaxLimit:[decoder decodeFloatForKey:@"pumpCurrentMaxLimit"]];
+	[self setPumpCurrentAlarm:	[decoder decodeFloatForKey:@"pumpCurrentAlarm"]];
+	[self setHumidityAlarm:		[decoder decodeFloatForKey:@"humidityAlarm"]];
 	[self setMaxRadon:			[decoder decodeInt32ForKey:@"maxRadon"]];
 	[self setAlarmLimit:		[decoder decodeInt32ForKey:@"alarmLimit"]];
 	[self setMakeFile:			[decoder decodeBoolForKey:	@"makeFile"]];
@@ -800,6 +865,10 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeFloat:	humidityMaxLimit	forKey:@"humidityMaxLimit"];
+    [encoder encodeFloat:	pumpCurrentMaxLimit forKey:@"pumpCurrentMaxLimit"];
+    [encoder encodeFloat:	pumpCurrentAlarm forKey:@"pumpCurrentAlarm"];
+    [encoder encodeFloat:	humidityAlarm	forKey:@"humidityAlarm"];
     [encoder encodeInt32:	maxRadon		forKey:@"maxRadon"];
     [encoder encodeInt32:	alarmLimit		forKey:@"alarmLimit"];
     [encoder encodeBool:	makeFile		forKey:@"makeFile"];
@@ -1126,18 +1195,26 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 
 - (double) convertedValue:(int)aChan
 {
-	double theValue;
+	double theValue = 0;
 	@synchronized(self){
-		theValue = 	[[statusDictionary objectForKey:kRad7LastRadon] doubleValue];
+		switch(aChan){
+			case 0: theValue = 	[[statusDictionary objectForKey:kRad7LastRadon]  doubleValue];	break;
+			case 1: theValue = 	[[statusDictionary objectForKey:kRad7RH]		  doubleValue];	break;
+			case 2: theValue = 	[[statusDictionary objectForKey:kRad7PumpCurrent] doubleValue];	break;
+		}
 	}
 	return theValue;
 }
 
 - (double) maxValueForChan:(int)aChan
 {
-	double theValue;
+	double theValue = 0;
 	@synchronized(self){
-		theValue = (double)[self maxRadon];
+		switch(aChan){
+			case 0: theValue = (double)[self maxRadon];				break;
+			case 1: theValue = (double)[self pumpCurrentMaxLimit];	break;
+			case 2: theValue = (double)[self pumpCurrentMaxLimit];	break;
+		}
 	}
 	return theValue;
 }
@@ -1147,11 +1224,17 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 	return 0;
 }
 
-- (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit channel:(int)channel
+- (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit channel:(int)aChan
 {
 	@synchronized(self){
 		*theLowLimit = -.001;
-		*theHighLimit =  [self alarmLimit];
+		
+		switch(aChan){
+			case 0: *theHighLimit =  [self alarmLimit];			break;
+			case 1: *theHighLimit =  [self humidityAlarm];		break;
+			case 2: *theHighLimit =  [self pumpCurrentAlarm];	break;
+			default: *theHighLimit = 1.0E20; //some random very large number
+		}
 	}		
 }
 
