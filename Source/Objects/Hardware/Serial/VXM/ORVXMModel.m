@@ -67,6 +67,10 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (void) runStopping:(NSNotification*)aNote;
 - (void) stopRun;
 - (void) delayedRunStop;
+- (void) startRepeatingPositionQueries;
+- (void) queryPositionOnce;
+- (void) stopPositionQueries;
+- (void) queryPosition;
 @end
 
 @implementation ORVXMModel
@@ -559,66 +563,18 @@ NSString* ORVXMLock							= @"ORVXMLock";
 }
 
 #pragma mark ***Motor Commands
+#define kDelay 0
 - (void) manualStart
 {
 	if(!syncWithRun){
 		abortAllRepeats = NO;
+        [serialPort writeString:@"F,K,C\r"];
 		[self setCmdIndex:0];
 		[self setRepeatCount:0];
-		[self processNextCommand];
+		[self performSelector:@selector(processNextCommand) withObject:nil afterDelay:kDelay];
 	}	
 }
 
-- (void) startRepeatingPositionQueries
-{
-	repeatQuery = YES;
-	if(motorQueryMask==0){
-		[self resetQueryMask];
-		[self performSelector:@selector(queryPosition) withObject:nil afterDelay:.3];
-	}
-}
-
-- (void) queryPositionOnce
-{
-	repeatQuery = NO;
-	forceResetQueryMaskOnce = YES;
-	[self performSelector:@selector(queryPosition) withObject:nil afterDelay:1];
-}
-
-- (void) resetAndQuery
-{
-}
-
-- (void) stopPositionQueries
-{
-	repeatQuery = NO;
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(queryPosition) object:nil];
-}
-
-- (void) queryPosition
-{
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(queryPosition) object:nil];
-    if([serialPort isOpen]){
-        int motorToQuery = [self motorToQuery];
-		if(motorToQuery>=0){
-			NSString* cmd = nil;
-			switch(motorToQuery){
-				case 0: cmd = @"E,X\r"; break;
-				case 1: cmd = @"E,Y\r"; break;
-				case 2: cmd = @"E,Z\r"; break;
-				case 3: cmd = @"E,T\r"; break;
-			}
-			if(cmd){
-				[serialPort writeString:cmd];
-				[self startTimeOut];
-			}
-		}
-		else if(repeatQuery || forceResetQueryMaskOnce){
-			[self resetQueryMask];
-			[self performSelector:@selector(queryPosition) withObject:nil afterDelay:.3];
-		}
-    }
-}
 
 - (void) addItem:(id)anItem atIndex:(int)anIndex
 {
@@ -651,6 +607,10 @@ NSString* ORVXMLock							= @"ORVXMLock";
 			[self move:aMotorIndex dx:(int)[aMotor targetPosition] speed:[aMotor motorSpeed]];
 		}
 	}
+}
+- (BOOL) isMoving
+{
+	return [self cmdTypeExecuting]!=0;
 }
 
 - (void) addCustomCmd
@@ -885,7 +845,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 			aCmd = [aCmd substringFromIndex:1]; //might be more on this response, strip off the '^'
 			if(useCmdQueue){
 				[self incrementCmdIndex];
-				[self processNextCommand];
+				[self performSelector:@selector(processNextCommand) withObject:nil afterDelay:kDelay];
 			}
 			else {
 				[self queryPositionOnce];
@@ -906,7 +866,9 @@ NSString* ORVXMLock							= @"ORVXMLock";
 			[aMotor setMotorPosition:aValue];
 			if([aMotor hasMoved])[self shipMotorState:motorIndex];
 			motorQueryMask &= ~(0x1<<motorIndex);
-			[self queryPosition];
+			[self performSelector:@selector(queryPosition) 
+					   withObject:nil 
+					   afterDelay:.3];
 		}
 		else {
 			if(repeatQuery){
@@ -960,6 +922,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 
 - (void) processNextCommand
 {
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	if([serialPort isOpen]){ 
 		if(allGoingHome){
 			[self setAllGoingHome:NO];
@@ -971,11 +934,11 @@ NSString* ORVXMLock							= @"ORVXMLock";
 				ORVXMMotorCmd* aCmd = [cmdQueue objectAtIndex:cmdIndex];
 				[self setCmdTypeExecuting:kVXMCmdListExecuting];
 				NSString* theCmd = aCmd.cmd;
-				if(![theCmd hasSuffix:@"\r"]) theCmd = [theCmd stringByAppendingString:@"\r"];
+				//if(![theCmd hasSuffix:@"\r"]) theCmd = [theCmd stringByAppendingString:@"\r"];
 				[serialPort writeString:theCmd];
 				if(!aCmd.waitToSendNextCmd){
 					[self incrementCmdIndex];
-					[self processNextCommand];
+					[self performSelector:@selector(processNextCommand) withObject:nil afterDelay:kDelay];
 				}
 				[self startRepeatingPositionQueries];
 			}
@@ -985,7 +948,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 					[self setCmdIndex:0];
 					[self setRepeatCount:repeatCount+1];
 					if(repeatCount < numTimesToRepeat){
-						[self processNextCommand];
+						[self performSelector:@selector(processNextCommand) withObject:nil afterDelay:kDelay];
 					}
 					else if(stopRunWhenDone){
 						[self stopRun];
@@ -1025,7 +988,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 		abortAllRepeats = NO;
 		[self setCmdIndex:0];
 		[self setRepeatCount:0];
-		[self processNextCommand];
+		[self performSelector:@selector(processNextCommand) withObject:nil afterDelay:kDelay];
 	}	
 }
 
@@ -1045,6 +1008,52 @@ NSString* ORVXMLock							= @"ORVXMLock";
 {
 	id s = [NSString stringWithFormat:@"VXM %d Finished Pattern",[self uniqueIdNumber]];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORRequestRunStop object:self userInfo:s];
+}
+- (void) startRepeatingPositionQueries
+{
+	repeatQuery = YES;
+	if(motorQueryMask==0){
+		[self resetQueryMask];
+		[self performSelector:@selector(queryPosition) withObject:nil afterDelay:.3];
+	}
+}
+
+- (void) queryPositionOnce
+{
+	repeatQuery = NO;
+	forceResetQueryMaskOnce = YES;
+	[self performSelector:@selector(queryPosition) withObject:nil afterDelay:1];
+}
+
+- (void) stopPositionQueries
+{
+	repeatQuery = NO;
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(queryPosition) object:nil];
+}
+
+- (void) queryPosition
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(queryPosition) object:nil];
+    if([serialPort isOpen]){
+        int motorToQuery = [self motorToQuery];
+		if(motorToQuery>=0){
+			NSString* cmd = nil;
+			switch(motorToQuery){
+				case 0: cmd = @"E,X"; break;
+				case 1: cmd = @"E,Y"; break;
+				case 2: cmd = @"E,Z"; break;
+				case 3: cmd = @"E,T"; break;
+			}
+			if(cmd){
+				[serialPort writeString:cmd];
+				[self startTimeOut];
+			}
+		}
+		else if(repeatQuery || forceResetQueryMaskOnce){
+			[self resetQueryMask];
+			[self performSelector:@selector(queryPosition) withObject:nil afterDelay:.3];
+		}
+    }
 }
 
 @end

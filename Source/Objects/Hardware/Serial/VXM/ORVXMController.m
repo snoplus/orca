@@ -60,7 +60,6 @@
 	int i;
 	for(i=0;i<kNumVXMMotors;i++){
 		[[conversionMatrix cellAtRow:i column:0] setTag:i];
-		[[fullScaleMatrix cellAtRow:i column:0] setTag:i];
 		[[speedMatrix cellAtRow:i column:0] setTag:i];
 		[[motorEnabledMatrix cellAtRow:i column:0] setTag:i];
 		[[positionMatrix cellAtRow:i column:0] setTag:i];
@@ -83,12 +82,10 @@
 	if([model displayRaw]) [numberFormatter setFormat:@"#0"];
 	else				   [numberFormatter setFormat:@"#0.00"];
 	for(i=0;i<kNumVXMMotors;i++){
-		[[fullScaleMatrix cellAtRow:i column:0]		setFormatter:numberFormatter];
 		[[positionMatrix cellAtRow:i column:0]		setFormatter:numberFormatter];
 		[[speedMatrix cellAtRow:i column:0]		setFormatter:numberFormatter];
 		[[targetMatrix cellAtRow:i column:0]		setFormatter:numberFormatter];
 	}
-	[fullScaleMatrix setNeedsDisplay];
 	[speedMatrix setNeedsDisplay];
 	[positionMatrix setNeedsDisplay];
 	[targetMatrix setNeedsDisplay];
@@ -140,11 +137,6 @@
                          name : ORVXMMotorConversionChanged
                        object : model];
 	
-   [notifyCenter addObserver : self
-                     selector : @selector(fullScaleChanged:)
-                         name : ORVXMMotorFullScaleChanged
-                       object : model];
-    
     [notifyCenter addObserver : self
                      selector : @selector(speedChanged:)
                          name : ORVXMMotorSpeedChanged
@@ -245,7 +237,6 @@
     [self portNameChanged:nil];
     [self positionChanged:nil];
 	[self conversionChanged:nil];
-    [self fullScaleChanged:nil];
     [self motorEnabledChanged:nil];
     [self speedChanged:nil];
     [self targetChanged:nil];
@@ -286,6 +277,7 @@
 - (void) cmdTypeExecutingChanged:(NSNotification*)aNote
 {
 	[cmdListExecutingField setStringValue: [model cmdTypeExecuting]==kVXMCmdListExecuting?@"List is Executing":@""];
+	[self repeatCountChanged:nil];
 	[self updateButtons:nil];
 }
 
@@ -342,7 +334,6 @@
 	[self updateButtons:nil];
 	[self setFormats];
 	[self speedChanged:nil];
-	[self fullScaleChanged:nil];
 	[self positionChanged:nil];
 	[self targetChanged:nil];
 }
@@ -364,23 +355,6 @@
 		}
 	}
 	[self speedChanged:nil];
-}
-
-- (void) fullScaleChanged:(NSNotification*)aNotification
-{
-	if(aNotification){
-		ORVXMMotor* aMotor = [[aNotification userInfo] objectForKey:@"VMXMotor"];
-		float conversion = 1.0;
-		if(![model displayRaw]) conversion = [aMotor conversion];
-		[[conversionMatrix cellWithTag:[aMotor motorId]] setFloatValue: [aMotor fullScale]/conversion];
-	}
-	else {
-		for(id aMotor in [model motors]){
-			float conversion = 1.0;
-			if(![model displayRaw]) conversion = [aMotor conversion];
-			[[fullScaleMatrix cellWithTag:[aMotor motorId]] setFloatValue:[aMotor fullScale]/conversion];
-		}
-	}
 }
 
 - (void) speedChanged:(NSNotification*)aNotification
@@ -482,7 +456,6 @@
         BOOL absMotion = [aMotor absoluteMotion];
 		[[conversionMatrix cellWithTag:i] setEnabled:!locked && motorEnabled && !displayRaw && !cmdExecuting];
 		[[motorEnabledMatrix cellWithTag:i] setEnabled:!locked && !goingHome && !cmdExecuting];
-		[[fullScaleMatrix cellWithTag:i] setEnabled:!locked && motorEnabled && !cmdExecuting];
 		[[speedMatrix cellWithTag:i] setEnabled:!locked && motorEnabled && !goingHome && !cmdExecuting];
 		[[absMotionMatrix cellWithTag:i] setEnabled:!locked && motorEnabled && !goingHome && !cmdExecuting];
 		[[addButtonMatrix cellWithTag:i] setEnabled:!locked && motorEnabled && !goingHome && !cmdExecuting];
@@ -492,13 +465,11 @@
 	}
 
 	if([model displayRaw]){
-		[fullScaleLabelField setStringValue:@"(steps)"];
 		[speedLabelField setStringValue:@"(stps/sec)"];
 		[currentPositionLabelField setStringValue:@"(steps)"];
 		[targetLabelField setStringValue:@"(steps)"];
 	}
 	else {
-		[fullScaleLabelField setStringValue:@"(mm)"];
 		[speedLabelField setStringValue:@"(mm/sec)"];
 		[currentPositionLabelField setStringValue:@"(mm)"];
 		[targetLabelField setStringValue:@"(mm)"];
@@ -707,11 +678,6 @@
     [model openPort:![[model serialPort] isOpen]];
 }
 
-- (IBAction) getPositionAction:(id)sender
-{
-	[model queryPosition];
-}
-
 - (IBAction) goAllHomeAction:(id)sender
 {
 	[self endEditing];
@@ -737,14 +703,6 @@
 - (IBAction) conversionAction:(id)sender
 {
     [[model motor:[[sender selectedCell]tag]] setConversion:[[sender selectedCell] floatValue]];
-}
-
-- (IBAction) fullScaleAction:(id)sender
-{
-	ORVXMMotor* aMotor = [model motor:[[sender selectedCell]tag]];
-	float conversion = 1.0;
-	if(![model displayRaw]) conversion = [aMotor conversion];
-	[aMotor setFullScale:(int)[[sender selectedCell] floatValue]*conversion];
 }
 
 - (IBAction) speedAction:(id)sender

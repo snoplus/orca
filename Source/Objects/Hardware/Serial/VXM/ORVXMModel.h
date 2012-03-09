@@ -108,6 +108,7 @@
 - (void) openPort:(BOOL)state;
 - (void) addItem:(id)anItem atIndex:(int)anIndex;
 - (void) removeItemAtIndex:(int) anIndex;
+- (BOOL) isMoving;
 
 #pragma mark ***Data Records
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
@@ -121,10 +122,6 @@
 #pragma mark ***Motor Commands
 - (void) manualStart;
 - (void) removeAllCmds;
-- (void) startRepeatingPositionQueries;
-- (void) stopPositionQueries;
-- (void) queryPosition;
-- (void) queryPositionOnce;
 - (void) goHomeAll;
 - (void) move:(int)motorIndex to:(float)aPosition speed:(int)aSpeed;
 - (void) move:(int)motorIndex dx:(float)aPosition;

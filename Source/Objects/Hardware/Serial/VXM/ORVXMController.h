@@ -47,7 +47,6 @@
 	
 	IBOutlet NSButton*      getPositionButton;
     IBOutlet NSMatrix*      conversionMatrix;
-    IBOutlet NSMatrix*      fullScaleMatrix;
     IBOutlet NSMatrix*      speedMatrix;
     IBOutlet NSMatrix*      motorEnabledMatrix;
     IBOutlet NSMatrix*		positionMatrix;
@@ -66,7 +65,6 @@
     IBOutlet NSTextField*   statusField;
 
 	//unit labels
-    IBOutlet NSTextField*   fullScaleLabelField;
     IBOutlet NSTextField*   speedLabelField;
     IBOutlet NSTextField*   currentPositionLabelField;
     IBOutlet NSTextField*   targetLabelField;
@@ -99,7 +97,6 @@
 - (void) portStateChanged:(NSNotification*)aNote;
 - (void) positionChanged:(NSNotification*)aNote;
 - (void) conversionChanged:(NSNotification*)aNote;
-- (void) fullScaleChanged:(NSNotification*)aNote;
 - (void) motorEnabledChanged:(NSNotification*)aNote;
 - (void) speedChanged:(NSNotification*)aNote;
 - (void) targetChanged:(NSNotification*)aNote;
@@ -122,11 +119,9 @@
 - (IBAction) lockAction:(id) sender;
 - (IBAction) portListAction:(id) sender;
 - (IBAction) openPortAction:(id)sender;
-- (IBAction) getPositionAction:(id)sender;
 - (IBAction) goAllHomeAction:(id)sender;
 - (IBAction) stopAllAction:(id)sender;
 - (IBAction) conversionAction:(id)sender;
-- (IBAction) fullScaleAction:(id)sender;
 - (IBAction) speedAction:(id)sender;
 - (IBAction) motorEnabledAction:(id)sender;
 - (IBAction) targetPositionAction:(id)sender;
