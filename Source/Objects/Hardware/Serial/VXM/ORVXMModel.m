@@ -66,6 +66,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (void) runStarting:(NSNotification*)aNote;
 - (void) runStopping:(NSNotification*)aNote;
 - (void) stopRun;
+- (void) delayedRunStop;
 @end
 
 @implementation ORVXMModel
@@ -1037,9 +1038,13 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (void) stopRun
 {
 	if(stopRunWhenDone && [[ORGlobal sharedGlobal] runInProgress]){
-		id s = [NSString stringWithFormat:@"VXM %d Finished Pattern",[self uniqueIdNumber]];
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORRequestRunStop object:self userInfo:s];
+		[self performSelector:@selector(delayedRunStop) withObject:nil afterDelay:1.5];
 	}
+}
+- (void) delayedRunStop
+{
+	id s = [NSString stringWithFormat:@"VXM %d Finished Pattern",[self uniqueIdNumber]];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORRequestRunStop object:self userInfo:s];
 }
 
 @end
