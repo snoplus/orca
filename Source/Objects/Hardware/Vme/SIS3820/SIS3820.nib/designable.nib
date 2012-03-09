@@ -12,7 +12,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="2"/>
+			<integer value="3724"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1030,7 +1030,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 										<object class="NSPopUpButton" id="697274871">
 											<reference key="NSNextResponder" ref="99682759"/>
 											<int key="NSvFlags">268</int>
-											<string key="NSFrame">{{61, 10}, {105, 22}}</string>
+											<string key="NSFrame">{{66, 10}, {112, 22}}</string>
 											<reference key="NSSuperview" ref="99682759"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSPopUpButtonCell" key="NSCell" id="773744431">
@@ -1734,7 +1734,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 								<string key="NSContents"/>
 								<reference key="NSSupport" ref="809912743"/>
 								<reference key="NSControlView" ref="1013489342"/>
-								<int key="NSButtonFlags">-938721025</int>
+								<int key="NSButtonFlags">-935051009</int>
 								<int key="NSButtonFlags2">2</int>
 								<object class="NSCustomResource" key="NSNormalImage">
 									<string key="NSClassName">NSImage</string>
@@ -3982,6 +3982,366 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 						<reference key="destination" ref="537025307"/>
 					</object>
 					<int key="connectionID">4002</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">addressText</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="230291726"/>
+					</object>
+					<int key="connectionID">4003</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">clearOverFlowButton</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="221014823"/>
+					</object>
+					<int key="connectionID">4004</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">countEnableMatrix0</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="809768877"/>
+					</object>
+					<int key="connectionID">4005</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">countEnableMatrix1</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="77366104"/>
+					</object>
+					<int key="connectionID">4006</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">countMatrix0</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="966915515"/>
+					</object>
+					<int key="connectionID">4007</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">countMatrix1</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="351411225"/>
+					</object>
+					<int key="connectionID">4008</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">deadTimeRefChannelField</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="679664228"/>
+					</object>
+					<int key="connectionID">4009</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">disableAllButton</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="984637992"/>
+					</object>
+					<int key="connectionID">4010</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">disableAllInGroupButton0</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="96666350"/>
+					</object>
+					<int key="connectionID">4011</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">disableAllInGroupButton1</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="762925816"/>
+					</object>
+					<int key="connectionID">4012</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">enable25MHzPulsesButton</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="984609705"/>
+					</object>
+					<int key="connectionID">4013</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">enableAllButton</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="820326869"/>
+					</object>
+					<int key="connectionID">4014</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">enableAllInGroupButton0</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="765247133"/>
+					</object>
+					<int key="connectionID">4015</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">enableAllInGroupButton1</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="1072693249"/>
+					</object>
+					<int key="connectionID">4016</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">enableReferencePulserButton</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="339834096"/>
+					</object>
+					<int key="connectionID">4017</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">enableCounterTestModeButton</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="22615827"/>
+					</object>
+					<int key="connectionID">4018</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">initButton</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="167414160"/>
+					</object>
+					<int key="connectionID">4019</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">invertLemoInButton</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="316215471"/>
+					</object>
+					<int key="connectionID">4020</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">invertLemoOutButton</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="335761047"/>
+					</object>
+					<int key="connectionID">4021</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">lemoInModePU</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="571422061"/>
+					</object>
+					<int key="connectionID">4022</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">lemoInText</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="371720243"/>
+					</object>
+					<int key="connectionID">4023</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">lemoOutModePU</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="54908749"/>
+					</object>
+					<int key="connectionID">4024</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">lemoOutText</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="984382504"/>
+					</object>
+					<int key="connectionID">4025</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">moduleIDField</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="56876904"/>
+					</object>
+					<int key="connectionID">4026</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">nameMatrix0</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="604768197"/>
+					</object>
+					<int key="connectionID">4027</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">nameMatrix1</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="836606697"/>
+					</object>
+					<int key="connectionID">4028</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">pollDescriptionTextField</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="684383112"/>
+					</object>
+					<int key="connectionID">4029</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">pollTimePU</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="697274871"/>
+					</object>
+					<int key="connectionID">4030</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">probeButton</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="391495471"/>
+					</object>
+					<int key="connectionID">4031</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">readAndClearButton</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="397581449"/>
+					</object>
+					<int key="connectionID">4032</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">readNow</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="439598087"/>
+					</object>
+					<int key="connectionID">4033</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">resetButton</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="738551445"/>
+					</object>
+					<int key="connectionID">4034</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">settingLockButton</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="1013489342"/>
+					</object>
+					<int key="connectionID">4035</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">shipAtRunEndOnlyCB</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="470239138"/>
+					</object>
+					<int key="connectionID">4036</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">showDeadTimeMatrix</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="200255522"/>
+					</object>
+					<int key="connectionID">4037</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">slotField</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="714321769"/>
+					</object>
+					<int key="connectionID">4038</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">startCountingButton</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="839143015"/>
+					</object>
+					<int key="connectionID">4039</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">stopCountingButton</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="588548351"/>
+					</object>
+					<int key="connectionID">4040</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">syncWithRunButton</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="917414201"/>
+					</object>
+					<int key="connectionID">4041</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">dumpButton</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="429249756"/>
+					</object>
+					<int key="connectionID">4042</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">count0DisplayTypeTextField</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="501272188"/>
+					</object>
+					<int key="connectionID">4043</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">count1DisplayTypeTextField</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="130966767"/>
+					</object>
+					<int key="connectionID">4044</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">clearAllButton</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="674196897"/>
+					</object>
+					<int key="connectionID">4045</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">clearOnRunStartButton</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="417590040"/>
+					</object>
+					<int key="connectionID">4046</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">statusText</string>
+						<reference key="source" ref="416549669"/>
+						<reference key="destination" ref="19402080"/>
+					</object>
+					<int key="connectionID">4047</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -6746,7 +7106,7 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">4002</int>
+			<int key="maxID">4047</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -6888,6 +7248,13 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">Source/Objects/Control/RunControl/ORRunModel.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Objects/Custom Hardware/Majorana Hardware/MJDPreAmp/ORMJDPreAmpModel.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -7407,6 +7774,20 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">Source/Widgets/Plotting/AnalysisSupport/ORFFTController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Widgets/Plotting/AnalysisSupport/ORTimeRoi.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Widgets/Plotting/AnalysisSupport/ORTimeRoiController.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
