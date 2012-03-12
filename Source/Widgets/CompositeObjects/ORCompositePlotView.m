@@ -98,7 +98,7 @@
 	[aTitleField setSelectable:NO];
 	[aTitleField setBordered:NO];
 	[aTitleField setAlignment:NSCenterTextAlignment];
-	[aTitleField setBackgroundColor:[NSColor clearColor]];
+	[aTitleField setBackgroundColor:[NSColor windowBackgroundColor]];
 	[aTitleField setAutoresizingMask:NSViewMinYMargin | NSViewMinXMargin | NSViewMaxXMargin];
 	[self addSubview:aTitleField];
 	self.titleField = aTitleField;
