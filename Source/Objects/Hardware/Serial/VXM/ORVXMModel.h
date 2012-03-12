@@ -81,6 +81,8 @@
 - (void) setListFile:(NSString*)aFileName;
 - (BOOL) shipRecords;
 - (void) setShipRecords:(BOOL)aShipRecords;
+- (void) goHomeAllNeg;
+- (void) goHomeAllPos;
 - (BOOL) allGoingHome;
 - (void) setAllGoingHome:(BOOL)aState;
 - (int) numTimesToRepeat;
@@ -122,11 +124,13 @@
 #pragma mark ***Motor Commands
 - (void) manualStart;
 - (void) removeAllCmds;
-- (void) goHomeAll;
+- (void) goHomeAllPos;
+- (void) goHomeAllNeg;
+- (void) goHomeAll:(BOOL)neg;
+
 - (void) move:(int)motorIndex to:(float)aPosition speed:(int)aSpeed;
 - (void) move:(int)motorIndex dx:(float)aPosition;
 - (void) move:(int)motorIndex dx:(float)aPosition speed:(int)aSpeed;
-- (void) goHome:(int)motorIndex speed:(int)aSpeed;
 - (void) stopAllMotion;
 - (void) goToNexCommand;
 - (void) addCmdFromTableFor:(int)aMotorIndex;

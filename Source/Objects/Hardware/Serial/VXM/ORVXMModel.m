@@ -388,6 +388,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 {
 	return motors;
 }
+
 - (ORVXMMotor*) motor:(int)aMotor
 {
 	if(aMotor>=0 && aMotor<[motors count]) return [motors objectAtIndex:aMotor];
@@ -563,7 +564,6 @@ NSString* ORVXMLock							= @"ORVXMLock";
 }
 
 #pragma mark ***Motor Commands
-#define kDelay 0
 - (void) manualStart
 {
 	if(!syncWithRun){
@@ -571,10 +571,9 @@ NSString* ORVXMLock							= @"ORVXMLock";
         [serialPort writeString:@"F,K,C\r"];
 		[self setCmdIndex:0];
 		[self setRepeatCount:0];
-		[self performSelector:@selector(processNextCommand) withObject:nil afterDelay:kDelay];
+		[self processNextCommand];
 	}	
 }
-
 
 - (void) addItem:(id)anItem atIndex:(int)anIndex
 {
@@ -725,20 +724,17 @@ NSString* ORVXMLock							= @"ORVXMLock";
 	}
 }
 
-- (void) goHome:(int)motorIndex speed:(int)aSpeed
+- (void) goHomeAllPos
 {
-	if([serialPort isOpen] && motorIndex>=0 && motorIndex<[motors count]){
-		NSString* aCmd = [NSString stringWithFormat:@"F,C,S%dM%d,I%dM-0,R",motorIndex+1,aSpeed,motorIndex+1];
-		[self addCmdToQueue:aCmd 
-				description:[NSString stringWithFormat:@"Move %d home at %dmm/s",motorIndex,aSpeed]
-				 waitToSend:YES];
-		[self performSelector:@selector(queryPosition) 
-				   withObject:nil 
-				   afterDelay:.3];
-    }
+	[self goHomeAll:NO];
 }
 
-- (void) goHomeAll
+- (void) goHomeAllNeg
+{
+	[self goHomeAll:YES];
+}
+
+- (void) goHomeAll:(BOOL)neg
 {
     if([serialPort isOpen]){
 		abortAllRepeats = YES;
@@ -751,7 +747,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 			if([aMotor motorEnabled]){
 				int theMotorId = [aMotor motorId];
 				int speed = [aMotor motorSpeed];
-				aCmd = [aCmd stringByAppendingFormat:@"S%dM%d,I%dM-0,",theMotorId+1,speed,theMotorId+1];
+				aCmd = [aCmd stringByAppendingFormat:@"S%dM%d,I%dM%@0,",theMotorId+1,speed,theMotorId+1,neg?@"-":@"+"];
 				atLeastOne = YES;
 			}
 		}
@@ -807,11 +803,9 @@ NSString* ORVXMLock							= @"ORVXMLock";
     
     return dataDictionary;
 }
-
 @end
 
 @implementation ORVXMModel (private)
-
 - (int) motorToQuery
 {
 	int i;
@@ -845,7 +839,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 			aCmd = [aCmd substringFromIndex:1]; //might be more on this response, strip off the '^'
 			if(useCmdQueue){
 				[self incrementCmdIndex];
-				[self performSelector:@selector(processNextCommand) withObject:nil afterDelay:kDelay];
+				[self processNextCommand];
 			}
 			else {
 				[self queryPositionOnce];
@@ -859,6 +853,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 		   [aCmd hasPrefix:@"T"] ){			
 			aCmd = [aCmd substringFromIndex:1];
 		}
+		
 		if([aCmd length]>0 && motorQueryMask && [aCmd rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"+-.0123456789"]].location==0) {			
 			int motorIndex = [self motorToQuery];
 			ORVXMMotor* aMotor = [motors objectAtIndex:motorIndex];
@@ -876,6 +871,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 				[self performSelector:@selector(queryPosition) withObject:nil afterDelay:.1];
 			}
 		}
+		
 	}
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
 }
@@ -938,7 +934,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 				[serialPort writeString:theCmd];
 				if(!aCmd.waitToSendNextCmd){
 					[self incrementCmdIndex];
-					[self performSelector:@selector(processNextCommand) withObject:nil afterDelay:kDelay];
+					[self processNextCommand];
 				}
 				[self startRepeatingPositionQueries];
 			}
@@ -948,10 +944,12 @@ NSString* ORVXMLock							= @"ORVXMLock";
 					[self setCmdIndex:0];
 					[self setRepeatCount:repeatCount+1];
 					if(repeatCount < numTimesToRepeat){
-						[self performSelector:@selector(processNextCommand) withObject:nil afterDelay:kDelay];
+						[self processNextCommand];
 					}
-					else if(stopRunWhenDone){
-						[self stopRun];
+					else {
+						if(stopRunWhenDone){
+							[self stopRun];
+						}
 						[self setCmdTypeExecuting:kVXMCmdIdle];
 					}
 				}
@@ -988,7 +986,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 		abortAllRepeats = NO;
 		[self setCmdIndex:0];
 		[self setRepeatCount:0];
-		[self performSelector:@selector(processNextCommand) withObject:nil afterDelay:kDelay];
+		[self processNextCommand];
 	}	
 }
 

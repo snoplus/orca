@@ -678,16 +678,16 @@
     [model openPort:![[model serialPort] isOpen]];
 }
 
-- (IBAction) goAllHomeAction:(id)sender
+- (IBAction) goAllHomeNegAction:(id)sender
 {
 	[self endEditing];
-	[model goHomeAll];
+	[model goHomeAllNeg];
 }
 
-- (IBAction) goHomeAction:(id)sender
+- (IBAction) goAllHomePosAction:(id)sender
 {
 	[self endEditing];
-	[model goHomeAll];
+	[model goHomeAllPos];
 }
 
 - (IBAction) stopAllAction:(id)sender

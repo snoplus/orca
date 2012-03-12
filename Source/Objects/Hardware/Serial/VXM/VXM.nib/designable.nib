@@ -11,7 +11,7 @@
 			<string key="NS.object.0">851</string>
 		</object>
 		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs">
-			<integer value="1751"/>
+			<integer value="6"/>
 		</array>
 		<array key="IBDocument.PluginDependencies">
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -51,7 +51,6 @@
 							<int key="NSvFlags">256</int>
 							<string key="NSFrame">{{22, 26}, {33, 36}}</string>
 							<reference key="NSSuperview" ref="107816523"/>
-							<reference key="NSNextKeyView"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="259454874">
 								<int key="NSCellFlags">67239424</int>
@@ -82,7 +81,7 @@
 						<object class="NSButton" id="477255791">
 							<reference key="NSNextResponder" ref="107816523"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{479, 245}, {170, 37}}</string>
+							<string key="NSFrame">{{543, 245}, {128, 37}}</string>
 							<reference key="NSSuperview" ref="107816523"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="77283304">
@@ -111,15 +110,36 @@
 						<object class="NSButton" id="402235650">
 							<reference key="NSNextResponder" ref="107816523"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{23, 245}, {128, 37}}</string>
+							<string key="NSFrame">{{12, 245}, {141, 37}}</string>
 							<reference key="NSSuperview" ref="107816523"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="140758343">
 								<int key="NSCellFlags">67239424</int>
 								<int key="NSCellFlags2">134217728</int>
-								<string key="NSContents">Send All Home</string>
+								<string key="NSContents">Send All Home Pos</string>
 								<reference key="NSSupport" ref="403730104"/>
 								<reference key="NSControlView" ref="402235650"/>
+								<int key="NSButtonFlags">-2038021889</int>
+								<int key="NSButtonFlags2">32</int>
+								<reference key="NSAlternateImage" ref="19218213"/>
+								<string key="NSAlternateContents"/>
+								<string key="NSKeyEquivalent"/>
+								<int key="NSPeriodicDelay">400</int>
+								<int key="NSPeriodicInterval">75</int>
+							</object>
+						</object>
+						<object class="NSButton" id="336894004">
+							<reference key="NSNextResponder" ref="107816523"/>
+							<int key="NSvFlags">268</int>
+							<string key="NSFrame">{{161, 245}, {147, 37}}</string>
+							<reference key="NSSuperview" ref="107816523"/>
+							<bool key="NSEnabled">YES</bool>
+							<object class="NSButtonCell" key="NSCell" id="1064169058">
+								<int key="NSCellFlags">67239424</int>
+								<int key="NSCellFlags2">134217728</int>
+								<string key="NSContents">Send All Home Neg</string>
+								<reference key="NSSupport" ref="403730104"/>
+								<reference key="NSControlView" ref="336894004"/>
 								<int key="NSButtonFlags">-2038021889</int>
 								<int key="NSButtonFlags2">32</int>
 								<reference key="NSAlternateImage" ref="19218213"/>
@@ -132,7 +152,7 @@
 						<object class="NSButton" id="443936814">
 							<reference key="NSNextResponder" ref="107816523"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{252, 245}, {156, 37}}</string>
+							<string key="NSFrame">{{353, 245}, {156, 37}}</string>
 							<reference key="NSSuperview" ref="107816523"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="477932124">
@@ -1679,8 +1699,8 @@ MDUAAAAAA</bytes>
 												<int key="NSPeriodicDelay">200</int>
 												<int key="NSPeriodicInterval">25</int>
 											</object>
-											<int key="NSSelectedRow">3</int>
-											<reference key="NSSelectedCell" ref="1013202503"/>
+											<int key="NSSelectedRow">-1</int>
+											<int key="NSSelectedCol">-1</int>
 											<reference key="NSBackgroundColor" ref="838527350"/>
 											<reference key="NSCellBackgroundColor" ref="838527350"/>
 										</object>
@@ -2651,7 +2671,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 						<object class="NSTextField" id="583352790">
 							<reference key="NSNextResponder" ref="107816523"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{242, 217}, {38, 14}}</string>
+							<string key="NSFrame">{{242, 217}, {66, 14}}</string>
 							<reference key="NSSuperview" ref="107816523"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="971023500">
@@ -3108,14 +3128,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">goAllHomeAction:</string>
-						<reference key="source" ref="867891782"/>
-						<reference key="destination" ref="402235650"/>
-					</object>
-					<int key="connectionID">1575</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
 						<string key="label">stopAllAction:</string>
 						<reference key="source" ref="867891782"/>
 						<reference key="destination" ref="477255791"/>
@@ -3482,6 +3494,22 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					</object>
 					<int key="connectionID">1750</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">goAllHomeNegAction:</string>
+						<reference key="source" ref="867891782"/>
+						<reference key="destination" ref="336894004"/>
+					</object>
+					<int key="connectionID">1760</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">goAllHomePosAction:</string>
+						<reference key="source" ref="867891782"/>
+						<reference key="destination" ref="402235650"/>
+					</object>
+					<int key="connectionID">1761</int>
+				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<array key="orderedObjects">
@@ -3526,8 +3554,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<reference ref="452108754"/>
 							<reference ref="272375728"/>
 							<reference ref="583352790"/>
-							<reference ref="443936814"/>
-							<reference ref="402235650"/>
 							<reference ref="575842066"/>
 							<reference ref="66290903"/>
 							<reference ref="631427269"/>
@@ -3535,10 +3561,13 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<reference ref="1000619949"/>
 							<reference ref="247533465"/>
 							<reference ref="656288006"/>
-							<reference ref="477255791"/>
 							<reference ref="580874497"/>
 							<reference ref="672850083"/>
 							<reference ref="853920303"/>
+							<reference ref="402235650"/>
+							<reference ref="477255791"/>
+							<reference ref="443936814"/>
+							<reference ref="336894004"/>
 						</array>
 						<reference key="parent" ref="1049576778"/>
 					</object>
@@ -4779,6 +4808,19 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 						<reference key="object" ref="1007864889"/>
 						<reference key="parent" ref="292281378"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">1752</int>
+						<reference key="object" ref="336894004"/>
+						<array class="NSMutableArray" key="children">
+							<reference ref="1064169058"/>
+						</array>
+						<reference key="parent" ref="107816523"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">1753</int>
+						<reference key="object" ref="1064169058"/>
+						<reference key="parent" ref="336894004"/>
+					</object>
 				</array>
 			</object>
 			<dictionary class="NSMutableDictionary" key="flattenedProperties">
@@ -4906,7 +4948,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 				<string key="1442.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="1446.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<object class="NSAffineTransform" key="1446.IBViewBoundsToFrameTransform">
-					<bytes key="NSTransformStruct">P4AAAL+AAABDvgAAw5qAAA</bytes>
+					<bytes key="NSTransformStruct">P4AAAL+AAABDoYAAw4wAAA</bytes>
 				</object>
 				<string key="1447.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="1450.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -4954,7 +4996,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 				<string key="1567.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="1572.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<object class="NSAffineTransform" key="1572.IBViewBoundsToFrameTransform">
-					<bytes key="NSTransformStruct">P4AAAL+AAABBuAAAw5oAAA</bytes>
+					<bytes key="NSTransformStruct">P4AAAL+AAABBsAAAw4wAAA</bytes>
 				</object>
 				<string key="1573.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="1577.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -5111,6 +5153,11 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 				<object class="NSAffineTransform" key="1751.IBViewBoundsToFrameTransform">
 					<bytes key="NSTransformStruct">AUP6gABCUAAAA</bytes>
 				</object>
+				<string key="1752.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<object class="NSAffineTransform" key="1752.IBViewBoundsToFrameTransform">
+					<bytes key="NSTransformStruct">P4AAAL+AAABDHwAAw4wAAA</bytes>
+				</object>
+				<string key="1753.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="5.IBEditorWindowLastContentRect">{{189, 581}, {681, 601}}</string>
 				<string key="5.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="5.IBWindowTemplateEditedContentRect">{{189, 581}, {681, 601}}</string>
@@ -5132,14 +5179,14 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 				<string key="892.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="949.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<object class="NSAffineTransform" key="949.IBViewBoundsToFrameTransform">
-					<bytes key="NSTransformStruct">P4AAAL+AAABD/YAAw4qAAA</bytes>
+					<bytes key="NSTransformStruct">P4AAAL+AAABD+oAAw4wAAA</bytes>
 				</object>
 			</dictionary>
 			<dictionary class="NSMutableDictionary" key="unlocalizedProperties"/>
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">1751</int>
+			<int key="maxID">1761</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -5877,9 +5924,8 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 						<string key="cut:">id</string>
 						<string key="delete:">id</string>
 						<string key="displayRawAction:">id</string>
-						<string key="fullScaleAction:">id</string>
-						<string key="getPositionAction:">id</string>
-						<string key="goAllHomeAction:">id</string>
+						<string key="goAllHomeNegAction:">id</string>
+						<string key="goAllHomePosAction:">id</string>
 						<string key="goToNextCommandAction:">id</string>
 						<string key="loadListAction:">id</string>
 						<string key="lockAction:">id</string>
@@ -5947,16 +5993,12 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<string key="name">displayRawAction:</string>
 							<string key="candidateClassName">id</string>
 						</object>
-						<object class="IBActionInfo" key="fullScaleAction:">
-							<string key="name">fullScaleAction:</string>
+						<object class="IBActionInfo" key="goAllHomeNegAction:">
+							<string key="name">goAllHomeNegAction:</string>
 							<string key="candidateClassName">id</string>
 						</object>
-						<object class="IBActionInfo" key="getPositionAction:">
-							<string key="name">getPositionAction:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="goAllHomeAction:">
-							<string key="name">goAllHomeAction:</string>
+						<object class="IBActionInfo" key="goAllHomePosAction:">
+							<string key="name">goAllHomePosAction:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="goToNextCommandAction:">
@@ -6055,8 +6097,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 						<string key="currentPositionLabelField">NSTextField</string>
 						<string key="customCmdField">NSTextField</string>
 						<string key="displayRawMatrix">NSMatrix</string>
-						<string key="fullScaleLabelField">NSTextField</string>
-						<string key="fullScaleMatrix">NSMatrix</string>
 						<string key="getPositionButton">NSButton</string>
 						<string key="homeMinusMatrix">NSMatrix</string>
 						<string key="homePlusMatrix">NSMatrix</string>
@@ -6129,14 +6169,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 						</object>
 						<object class="IBToOneOutletInfo" key="displayRawMatrix">
 							<string key="name">displayRawMatrix</string>
-							<string key="candidateClassName">NSMatrix</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="fullScaleLabelField">
-							<string key="name">fullScaleLabelField</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="fullScaleMatrix">
-							<string key="name">fullScaleMatrix</string>
 							<string key="candidateClassName">NSMatrix</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="getPositionButton">

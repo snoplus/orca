@@ -119,7 +119,8 @@
 - (IBAction) lockAction:(id) sender;
 - (IBAction) portListAction:(id) sender;
 - (IBAction) openPortAction:(id)sender;
-- (IBAction) goAllHomeAction:(id)sender;
+- (IBAction) goAllHomeNegAction:(id)sender;
+- (IBAction) goAllHomePosAction:(id)sender;
 - (IBAction) stopAllAction:(id)sender;
 - (IBAction) conversionAction:(id)sender;
 - (IBAction) speedAction:(id)sender;
