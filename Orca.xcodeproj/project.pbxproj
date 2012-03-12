@@ -1709,6 +1709,14 @@
 		84954B8405C87518004EBD3D /* ORHWWizParam.m in Sources */ = {isa = PBXBuildFile; fileRef = 84954B8205C87518004EBD3D /* ORHWWizParam.m */; };
 		849740E2150531410004B444 /* ORVXMMotor.h in Headers */ = {isa = PBXBuildFile; fileRef = 849740E0150531410004B444 /* ORVXMMotor.h */; };
 		849740E3150531410004B444 /* ORVXMMotor.m in Sources */ = {isa = PBXBuildFile; fileRef = 849740E1150531410004B444 /* ORVXMMotor.m */; };
+		84976E3D150E77F60004B444 /* Mks651c.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84976E35150E77F50004B444 /* Mks651c.nib */; };
+		84976E3E150E77F60004B444 /* Mks651c.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84976E36150E77F50004B444 /* Mks651c.tif */; };
+		84976E3F150E77F60004B444 /* ORMks651cController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84976E37150E77F50004B444 /* ORMks651cController.h */; };
+		84976E40150E77F60004B444 /* ORMks651cController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84976E38150E77F50004B444 /* ORMks651cController.m */; };
+		84976E41150E77F60004B444 /* ORMks651cDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84976E39150E77F50004B444 /* ORMks651cDecoders.h */; };
+		84976E42150E77F60004B444 /* ORMks651cDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84976E3A150E77F50004B444 /* ORMks651cDecoders.m */; };
+		84976E43150E77F60004B444 /* ORMks651cModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84976E3B150E77F50004B444 /* ORMks651cModel.h */; };
+		84976E44150E77F60004B444 /* ORMks651cModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84976E3C150E77F50004B444 /* ORMks651cModel.m */; };
 		84978A290701F02000B7887E /* ORDataGenDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84978A270701F02000B7887E /* ORDataGenDecoders.h */; };
 		84978A2A0701F02000B7887E /* ORDataGenDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84978A280701F02000B7887E /* ORDataGenDecoders.m */; };
 		84978B4C0702190100B7887E /* ORDataTypeAssigner.h in Headers */ = {isa = PBXBuildFile; fileRef = 84978B4A0702190100B7887E /* ORDataTypeAssigner.h */; };
@@ -4360,6 +4368,14 @@
 		84954B8205C87518004EBD3D /* ORHWWizParam.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORHWWizParam.m; sourceTree = "<group>"; };
 		849740E0150531410004B444 /* ORVXMMotor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORVXMMotor.h; path = Source/Objects/Hardware/Serial/VXM/ORVXMMotor.h; sourceTree = SOURCE_ROOT; };
 		849740E1150531410004B444 /* ORVXMMotor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORVXMMotor.m; path = Source/Objects/Hardware/Serial/VXM/ORVXMMotor.m; sourceTree = SOURCE_ROOT; };
+		84976E35150E77F50004B444 /* Mks651c.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Mks651c.nib; path = Source/Objects/Hardware/Serial/Mks651c/Mks651c.nib; sourceTree = SOURCE_ROOT; };
+		84976E36150E77F50004B444 /* Mks651c.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Mks651c.tif; path = Source/Objects/Hardware/Serial/Mks651c/Mks651c.tif; sourceTree = SOURCE_ROOT; };
+		84976E37150E77F50004B444 /* ORMks651cController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMks651cController.h; path = Source/Objects/Hardware/Serial/Mks651c/ORMks651cController.h; sourceTree = SOURCE_ROOT; };
+		84976E38150E77F50004B444 /* ORMks651cController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMks651cController.m; path = Source/Objects/Hardware/Serial/Mks651c/ORMks651cController.m; sourceTree = SOURCE_ROOT; };
+		84976E39150E77F50004B444 /* ORMks651cDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMks651cDecoders.h; path = Source/Objects/Hardware/Serial/Mks651c/ORMks651cDecoders.h; sourceTree = SOURCE_ROOT; };
+		84976E3A150E77F50004B444 /* ORMks651cDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMks651cDecoders.m; path = Source/Objects/Hardware/Serial/Mks651c/ORMks651cDecoders.m; sourceTree = SOURCE_ROOT; };
+		84976E3B150E77F50004B444 /* ORMks651cModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMks651cModel.h; path = Source/Objects/Hardware/Serial/Mks651c/ORMks651cModel.h; sourceTree = SOURCE_ROOT; };
+		84976E3C150E77F50004B444 /* ORMks651cModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMks651cModel.m; path = Source/Objects/Hardware/Serial/Mks651c/ORMks651cModel.m; sourceTree = SOURCE_ROOT; };
 		84978A270701F02000B7887E /* ORDataGenDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORDataGenDecoders.h; sourceTree = "<group>"; };
 		84978A280701F02000B7887E /* ORDataGenDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORDataGenDecoders.m; sourceTree = "<group>"; };
 		84978B4A0702190100B7887E /* ORDataTypeAssigner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORDataTypeAssigner.h; sourceTree = "<group>"; };
@@ -7509,6 +7525,7 @@
 			isa = PBXGroup;
 			children = (
 				84DEEBBA149916AD0092DB6C /* Serial Base Classes */,
+				84976E34150E77F50004B444 /* Mks651c */,
 				84B6CD3B14B37E9700386BE1 /* RGA300 */,
 				8407397914CDD91F00BAD105 /* Met637 */,
 				841C4DEE141FA72800F95B50 /* Met237 */,
@@ -8926,6 +8943,22 @@
 			);
 			name = StateLabel;
 			path = "Source/Objects/Misc Objects/StateLabel";
+			sourceTree = SOURCE_ROOT;
+		};
+		84976E34150E77F50004B444 /* Mks651c */ = {
+			isa = PBXGroup;
+			children = (
+				84976E35150E77F50004B444 /* Mks651c.nib */,
+				84976E36150E77F50004B444 /* Mks651c.tif */,
+				84976E37150E77F50004B444 /* ORMks651cController.h */,
+				84976E38150E77F50004B444 /* ORMks651cController.m */,
+				84976E39150E77F50004B444 /* ORMks651cDecoders.h */,
+				84976E3A150E77F50004B444 /* ORMks651cDecoders.m */,
+				84976E3B150E77F50004B444 /* ORMks651cModel.h */,
+				84976E3C150E77F50004B444 /* ORMks651cModel.m */,
+			);
+			name = Mks651c;
+			path = Source/Objects/Hardware/Serial/Mks651c;
 			sourceTree = SOURCE_ROOT;
 		};
 		8499148404BB3E05005F64B1 /* Dispatcher */ = {
@@ -12734,6 +12767,9 @@
 				84D8556214FBDEDA00C70A00 /* ORCB37Controller.h in Headers */,
 				84D8556414FBDEDA00C70A00 /* ORCB37Model.h in Headers */,
 				849740E2150531410004B444 /* ORVXMMotor.h in Headers */,
+				84976E3F150E77F60004B444 /* ORMks651cController.h in Headers */,
+				84976E41150E77F60004B444 /* ORMks651cDecoders.h in Headers */,
+				84976E43150E77F60004B444 /* ORMks651cModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13546,6 +13582,8 @@
 				84D8555F14FBDEDA00C70A00 /* CB37.nib in Resources */,
 				84D8556014FBDEDA00C70A00 /* CB37.tif in Resources */,
 				84D8556114FBDEDA00C70A00 /* CB37Big.tif in Resources */,
+				84976E3D150E77F60004B444 /* Mks651c.nib in Resources */,
+				84976E3E150E77F60004B444 /* Mks651c.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14462,6 +14500,9 @@
 				84D8556314FBDEDA00C70A00 /* ORCB37Controller.m in Sources */,
 				84D8556514FBDEDA00C70A00 /* ORCB37Model.m in Sources */,
 				849740E3150531410004B444 /* ORVXMMotor.m in Sources */,
+				84976E40150E77F60004B444 /* ORMks651cController.m in Sources */,
+				84976E42150E77F60004B444 /* ORMks651cDecoders.m in Sources */,
+				84976E44150E77F60004B444 /* ORMks651cModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
