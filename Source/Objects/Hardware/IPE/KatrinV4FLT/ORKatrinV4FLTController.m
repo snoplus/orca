@@ -663,6 +663,7 @@
     [gainTextFields setEnabled:!lockedOrRunningMaintenance];
     [thresholdTextFields setEnabled:!lockedOrRunningMaintenance];
     [triggerEnabledCBs setEnabled:!lockedOrRunningMaintenance];
+	[fireSoftwareTriggerButton  setEnabled: !lockedOrRunningMaintenance];
     [hitRateEnabledCBs setEnabled:!lockedOrRunningMaintenance];
     [vetoTriggerEnabledCBs setEnabled:!lockedOrRunningMaintenance];
     [vetoHitRateEnabledCBs setEnabled:!lockedOrRunningMaintenance];
@@ -1416,6 +1417,22 @@
 {
 	[model enableAllTriggers:NO];
 }
+
+- (IBAction) fireSoftwareTriggerAction: (id) sender
+{
+	NSLog(@"Fire Software Trigger!\n");
+	@try {
+	    [model fireSoftwareTrigger];
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Exception during FLT read status\n");
+        NSRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
+                        localException,[model stationNumber]);
+	}
+}
+
+
+
 
 - (IBAction) statusAction:(id)sender
 {

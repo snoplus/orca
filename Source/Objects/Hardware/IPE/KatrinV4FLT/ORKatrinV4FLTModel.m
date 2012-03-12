@@ -1169,12 +1169,84 @@ static double table[32]={
 
 - (void) testButtonLowLevelConfigTP
 {
-        NSLog(@"   configTPButton: Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
+        NSLog(@"n   configTPButton: Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
 	//[self releaseRunWait]; 
 	
-	//write TP shape ram
+	//write TP shape ram (if constant step height: set only the first AND TPShape bit=0)
 	int i=0;
-	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x1f];
+	static uint32_t shape =0x200;
+	shape +=0x10;
+	NSLog(@"shape is: 0x%x  (%i) ",shape);
+	//[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x80]; i++;
+	//[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x440]; i++;
+	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: shape]; i++;
+	
+	//write TP timing ram
+	i=0;
+	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: 0xa]; i++;
+	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: 0x1a]; i++; //0x64 = 100 (* 50/100 nanosec) //10 u sec
+	//[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: 0x64]; i++; //0x64 = 100 (* 50/100 nanosec) //10 u sec
+	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: 0x1a]; i++;
+	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: 0x1a]; i++;
+	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: 0x1a]; i++;
+	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: 0xa]; i++;
+	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: 0x0]; i++;
+	
+	//reset FLT TP pointer kFLTV4CommandReg
+#if 1
+    {
+	// 
+	uint32_t fltaddress = [self regAddress: kFLTV4CommandReg];
+	uint32_t rstTp = 0x10; //bit 4 
+	NSLog(@"flt kFLTV4CommandReg reg: 0x%x   ",fltaddress);
+	[[[self crate] adapter] rawWriteReg: fltaddress value: rstTp];
+	NSLog(@"  - wrote: flt command reg: 0x%x  \n",rstTp);
+	} 
+#endif
+	//write FLT test pattern ram
+	uint32_t address = [self regAddress: kFLTV4TestPatternReg];
+	uint32_t fltpattern = 0xff0f0f;  //0x111112;// 0xffffff = all
+	
+	[[[self crate] adapter] rawWriteReg: address   value: 0x0];  
+	[[[self crate] adapter] rawWriteReg: address+1 value: fltpattern];
+	[[[self crate] adapter] rawWriteReg: address+2 value: 0x0];
+	[[[self crate] adapter] rawWriteReg: address+3 value: fltpattern];
+	[[[self crate] adapter] rawWriteReg: address+4 value: 0x0];
+	#if 0
+	[[[self crate] adapter] rawWriteReg: address+5 value: 0x0];
+	[[[self crate] adapter] rawWriteReg: address+6 value: fltpattern];
+	[[[self crate] adapter] rawWriteReg: address+7 value: fltpattern];
+	[[[self crate] adapter] rawWriteReg: address+8 value: 0x0];
+	[[[self crate] adapter] rawWriteReg: address+9 value: 0x0];
+	[[[self crate] adapter] rawWriteReg: address+10 value: fltpattern];
+	#endif
+	
+	//set SLT control register
+	uint32_t control=	[[[self crate] adapter] rawReadReg: SLTControlReg ];
+	NSLog(@"control reg: 0x%x   ",control);
+	control = control & ~(0x7<<11);
+	NSLog(@"  -  after reset: control reg: 0x%x  \n",control);
+	control = (control | (0x01<<11)); //0x1 oder 0x5
+	// 0bXYZ is: TPShape X=0: constant DC level; X=1 shaped DC level; YZ= TP Enable: 00=no; 01=SW; 10=global(Lemo?); 11=FrontPanel
+	[[[self crate] adapter] rawWriteReg: SLTControlReg value: control];
+	NSLog(@"  -  after write: control reg: 0x%x  \n",control);
+	
+	//set FLT control register flag
+	uint32_t fltaddress = [self regAddress: kFLTV4ControlReg];
+	uint32_t fltcontrol=	[[[self crate] adapter] rawReadReg: fltaddress ];
+	NSLog(@"flt control reg: 0x%x   ",fltcontrol);
+	fltcontrol = fltcontrol | (0x10);//bit 4
+	[[[self crate] adapter] rawWriteReg: fltaddress value: fltcontrol];
+	NSLog(@"  -  after write: flt control reg: 0x%x  \n",fltcontrol);
+	
+	
+
+
+#if 0
+	//OLD VERSION (zu kompliziert)
+	//write TP shape ram (if constant step height: set only the first AND TPShape bit=0)
+	int i=0;
+	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x80];
 	i++;
 	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x00];
 	i++;
@@ -1214,8 +1286,11 @@ static double table[32]={
 	i++;
 	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x00];
 	i++;
+
 	
 	//write TP timing ram
+	i=0;
+	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: time];
 	uint32_t time      = 0x50; 
 	i=0;
 	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: time];
@@ -1248,6 +1323,8 @@ static double table[32]={
 	i++;
 	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: 0];
 	i++;
+
+	
 	
 	//set SLT control register
 	uint32_t control=	[[[self crate] adapter] rawReadReg: SLTControlReg ];
@@ -1255,6 +1332,7 @@ static double table[32]={
 	control = control & ~(0x7<<11);
 	NSLog(@"  -  after reset: control reg: 0x%x  \n",control);
 	control = (control | (0x01<<11)); //0x1 oder 0x5
+	// 0bXYZ is: TPShape X=0: constant DC level; X=1 shaped DC level; YZ= TP Enable: 00=no; 01=SW; 10=global(Lemo?); 11=FrontPanel
 	[[[self crate] adapter] rawWriteReg: SLTControlReg value: control];
 	NSLog(@"  -  after write: control reg: 0x%x  \n",control);
 	
@@ -1290,13 +1368,25 @@ static double table[32]={
 	fltcontrol = fltcontrol | (0x10);//bit 4
 	[[[self crate] adapter] rawWriteReg: fltaddress value: fltcontrol];
 	NSLog(@"  -  after write: flt control reg: 0x%x  \n",fltcontrol);
-	
+#endif
 	
 }
 
 - (void) testButtonLowLevelFireTP
 {
         NSLog(@"   fireTPButton: Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
+		
+	//reset FLT TP pointer kFLTV4CommandReg
+#if 1
+	// 
+	uint32_t fltaddress = [self regAddress: kFLTV4CommandReg];
+	uint32_t rstTp = 0x10; //bit 4 
+	NSLog(@"flt kFLTV4CommandReg reg: 0x%x   ",fltaddress);
+	[[[self crate] adapter] rawWriteReg: fltaddress value: rstTp];
+	NSLog(@"  - wrote: flt command reg: 0x%x  \n",rstTp);
+#endif
+	
+	//fire TP SLT command
 	//[self releaseRunWait]; 
 	//write FLT test pattern ram
 	//uint32_t address = [self regAddress: kSLTV4CommandReg];
@@ -1313,14 +1403,14 @@ static double table[32]={
 	NSLog(@"  -  after reset: control reg: 0x%x  \n",control);
 	[[[self crate] adapter] rawWriteReg: SLTControlReg value: control];
 
-#if 0
+#if 1
 	//reset FLT control register flag
-	uint32_t address = [self regAddress: kFLTV4ControlReg];
-	uint32_t control=	[[[self crate] adapter] rawReadReg: address ];
-	NSLog(@"flt control reg: 0x%x   ",control);
-	control = control | (0x10);//bit 4
-	[[[self crate] adapter] rawWriteReg: address value: control];
-	NSLog(@"  -  after write: flt control reg: 0x%x  \n",control);
+	uint32_t fltaddress = [self regAddress: kFLTV4ControlReg];
+	uint32_t fltcontrol=	[[[self crate] adapter] rawReadReg: fltaddress ];
+	NSLog(@"flt control reg: 0x%x   ",fltcontrol);
+	fltcontrol = fltcontrol & ~(0x10);//bit 4 to 0
+	[[[self crate] adapter] rawWriteReg: fltaddress value: fltcontrol];
+	NSLog(@"  -  after write: flt control reg: 0x%x  \n",fltcontrol);
 #endif
 }
 
@@ -1706,6 +1796,13 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 	[self writeReg:kFLTV4InterruptMaskReg value:interruptMask];
 }
 
+- (void) fireSoftwareTrigger
+{
+	//for TESTs: send a software trigger
+	[self writeReg:kFLTV4CommandReg value:kIpeFlt_SW_Trigger];
+}
+
+
 
 //TODO: TBD after firmware update -tb- 2010-01-28
 - (void) disableAllTriggers
@@ -1833,6 +1930,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 {
 	return [[[self crate] adapter] writeHardwareRegisterCmd:[self regAddress:aRegister] value:aValue];		
 }
+
 //------------------
 
 
@@ -1859,6 +1957,8 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 {
 	return ORKatrinV4FLTModelHitRateChanged;
 }
+
+
 
 #pragma mark •••archival
 - (id)initWithCoder:(NSCoder*)decoder
@@ -2528,8 +2628,6 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 		NSLog(@"%d: 0x%08x 0x%08x\n",i,first, last);
 	}
 
-	//TEST: send a software trigger
-	//[self writeReg:kFLTV4CommandReg value:kIpeFlt_SW_Trigger];
 
 }
 

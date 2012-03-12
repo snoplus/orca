@@ -84,6 +84,7 @@
 		IBOutlet NSButton*		hitRateNoneButton;
 		IBOutlet NSButton*		triggersAllButton;
 		IBOutlet NSButton*		triggersNoneButton;
+		IBOutlet NSButton*		fireSoftwareTriggerButton;
 		IBOutlet NSButton*		defaultsButton;
 		IBOutlet NSTextField*	group1NFoldField;
 		IBOutlet NSTextField*	group2NFoldField;
@@ -260,6 +261,7 @@
 - (IBAction) statusAction:(id)sender;
 - (IBAction) enableAllTriggersAction: (id) sender;
 - (IBAction) enableNoTriggersAction: (id) sender;
+- (IBAction) fireSoftwareTriggerAction: (id) sender;
 - (IBAction) readThresholdsGains:(id)sender;
 - (IBAction) writeThresholdsGains:(id)sender;
 - (IBAction) selectRegisterAction:(id) aSender;

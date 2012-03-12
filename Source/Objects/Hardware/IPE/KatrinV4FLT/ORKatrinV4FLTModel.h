@@ -219,6 +219,7 @@
 - (void) setGains:(NSMutableArray*)aGains;
 - (void) setThresholds:(NSMutableArray*)aThresholds;
 - (void) disableAllTriggers;
+- (void) fireSoftwareTrigger;
 
 - (BOOL) hitRateEnabled:(unsigned short) aChan;
 - (void) setHitRateEnabled:(unsigned short) aChan withValue:(BOOL) aState;
