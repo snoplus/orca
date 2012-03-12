@@ -188,11 +188,6 @@
 						object: model];
 	
     [notifyCenter addObserver : self
-                     selector : @selector(goingHomeChanged:)
-                         name : ORVXMModelAllGoingHomeChanged
-						object: model];	
-	
-    [notifyCenter addObserver : self
                      selector : @selector(shipRecordsChanged:)
                          name : ORVXMModelShipRecordsChanged
 						object: model];
@@ -249,7 +244,6 @@
 	[self stopRunWhenDoneChanged:nil];
 	[self cmdIndexChanged:nil];
 	[self numTimesToRepeatChanged:nil];
-	[self goingHomeChanged:nil];
 	[self shipRecordsChanged:nil];
 	[self cmdTypeExecutingChanged:nil];
 	[self customCmdChanged:nil];
@@ -286,10 +280,6 @@
 	[shipRecordsCB setIntValue: [model shipRecords]];
 }
 
-- (void) goingHomeChanged:(NSNotification*)aNote
-{
-	[self updateButtons:nil];
-}
 
 - (void) numTimesToRepeatChanged:(NSNotification*)aNote
 {
@@ -423,7 +413,6 @@
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORVXMLock];
     BOOL locked				= [gSecurity isLocked:ORVXMLock];
 	BOOL displayRaw			= [model displayRaw];
-	BOOL goingHome			= [model allGoingHome];
 	BOOL syncWithRun		= [model syncWithRun];
 	int cmdExecuting		= [model cmdTypeExecuting];
 	BOOL useCmdQueue		= [model useCmdQueue];
@@ -434,20 +423,20 @@
     [openPortButton setEnabled:!locked];
     [getPositionButton setEnabled:!locked];
 	
-	[manualStartButton setEnabled:!locked && !goingHome & !syncWithRun && !cmdExecuting && useCmdQueue];
-	[stopAllMotionButton setEnabled: cmdExecuting || goingHome];
-	[loadListButton setEnabled:!cmdExecuting && !goingHome];
-	[removeAllCmdsButton setEnabled:!cmdExecuting && !goingHome];
+	[manualStartButton setEnabled:!locked && !syncWithRun && !cmdExecuting && useCmdQueue];
+	[stopAllMotionButton setEnabled: cmdExecuting ];
+	[loadListButton setEnabled:!cmdExecuting ];
+	[removeAllCmdsButton setEnabled:!cmdExecuting];
 
-	[syncWithRunCB setEnabled:!locked && !goingHome && !cmdExecuting && useCmdQueue];
-	[stopWithRunButton setEnabled:!locked && !goingHome && !cmdExecuting && useCmdQueue];
-	[repeatCmdsCB setEnabled:!locked && !goingHome && !cmdExecuting && useCmdQueue];
-	[numTimesToRepeatField setEnabled:!locked && !goingHome && [model repeatCmds] && !cmdExecuting && useCmdQueue];
+	[syncWithRunCB setEnabled:!locked && !cmdExecuting && useCmdQueue];
+	[stopWithRunButton setEnabled:!locked && !cmdExecuting && useCmdQueue];
+	[repeatCmdsCB setEnabled:!locked && !cmdExecuting && useCmdQueue];
+	[numTimesToRepeatField setEnabled:!locked && [model repeatCmds] && !cmdExecuting && useCmdQueue];
 	[stopGoNextCmdButton setEnabled: cmdExecuting && useCmdQueue];
 	
-	[addCustomCmdButton setEnabled: !cmdExecuting && !goingHome];
+	[addCustomCmdButton setEnabled: !cmdExecuting];
 	[addCustomCmdButton setTitle:[model useCmdQueue]?@"Add Custom Cmd": @"Execute Cmd"];
-	[zeroCounterButton setEnabled:!locked && !goingHome && !cmdExecuting];
+	[zeroCounterButton setEnabled:!locked && !cmdExecuting];
 	[zeroCounterButton setTitle:[model useCmdQueue]?@"Add Zero Cmd": @"Execute Zero Cmd"];
 	
 	for(id aMotor in [model motors]){
@@ -455,13 +444,13 @@
 		BOOL motorEnabled = [aMotor motorEnabled];
         BOOL absMotion = [aMotor absoluteMotion];
 		[[conversionMatrix cellWithTag:i] setEnabled:!locked && motorEnabled && !displayRaw && !cmdExecuting];
-		[[motorEnabledMatrix cellWithTag:i] setEnabled:!locked && !goingHome && !cmdExecuting];
-		[[speedMatrix cellWithTag:i] setEnabled:!locked && motorEnabled && !goingHome && !cmdExecuting];
-		[[absMotionMatrix cellWithTag:i] setEnabled:!locked && motorEnabled && !goingHome && !cmdExecuting];
-		[[addButtonMatrix cellWithTag:i] setEnabled:!locked && motorEnabled && !goingHome && !cmdExecuting];
+		[[motorEnabledMatrix cellWithTag:i] setEnabled:!locked && !cmdExecuting];
+		[[speedMatrix cellWithTag:i] setEnabled:!locked && motorEnabled && !cmdExecuting];
+		[[absMotionMatrix cellWithTag:i] setEnabled:!locked && motorEnabled  && !cmdExecuting];
+		[[addButtonMatrix cellWithTag:i] setEnabled:!locked && motorEnabled && !cmdExecuting];
 		[[addButtonMatrix cellWithTag:i] setTitle:absMotion?@"Move Abs":@"Move Rel"];
-		[[homePlusMatrix cellWithTag:i] setEnabled:!locked && motorEnabled && !goingHome && !cmdExecuting];
-		[[homeMinusMatrix cellWithTag:i] setEnabled:!locked && motorEnabled && !goingHome && !cmdExecuting];
+		[[homePlusMatrix cellWithTag:i] setEnabled:!locked && motorEnabled && !cmdExecuting];
+		[[homeMinusMatrix cellWithTag:i] setEnabled:!locked && motorEnabled && !cmdExecuting];
 	}
 
 	if([model displayRaw]){
@@ -676,18 +665,6 @@
 - (IBAction) openPortAction:(id)sender
 {
     [model openPort:![[model serialPort] isOpen]];
-}
-
-- (IBAction) goAllHomeNegAction:(id)sender
-{
-	[self endEditing];
-	[model goHomeAllNeg];
-}
-
-- (IBAction) goAllHomePosAction:(id)sender
-{
-	[self endEditing];
-	[model goHomeAllPos];
 }
 
 - (IBAction) stopAllAction:(id)sender

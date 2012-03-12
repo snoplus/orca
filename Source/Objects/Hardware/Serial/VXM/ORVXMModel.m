@@ -45,7 +45,6 @@ NSString* ORVXMModelSerialPortChanged		= @"ORVXMModelSerialPortChanged";
 NSString* ORVXMModelPortNameChanged			= @"ORVXMModelPortNameChanged";
 NSString* ORVXMModelPortStateChanged		= @"ORVXMModelPortStateChanged";
 NSString* ORVXMModelCmdQueueChanged			= @"ORVXMModelCmdQueueChanged";
-NSString* ORVXMModelAllGoingHomeChanged		= @"ORVXMModelAllGoingHomeChanged";
 NSString* ORVXMModelListFileChanged			= @"ORVXMModelListFileChanged";
 NSString* ORVXMModelListItemsAdded			= @"ORVXMModelListItemsAdded";
 NSString* ORVXMModelListItemsRemoved		= @"ORVXMModelListItemsRemoved";
@@ -288,17 +287,6 @@ NSString* ORVXMLock							= @"ORVXMLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setShipRecords:shipRecords];
     shipRecords = aShipRecords;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORVXMModelShipRecordsChanged object:self];
-}
-
-- (BOOL) allGoingHome
-{
-	return allGoingHome;
-}
-
-- (void) setAllGoingHome:(BOOL)aState
-{
-	allGoingHome = aState;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORVXMModelAllGoingHomeChanged object:self];
 }
 
 - (int) numTimesToRepeat
@@ -663,7 +651,6 @@ NSString* ORVXMLock							= @"ORVXMLock";
         [serialPort writeString:@"F,K\r"];
 		[self queryPositionOnce];
 		[self setCmdTypeExecuting:kVXMCmdIdle];
-		[self setAllGoingHome:NO];
     }
 }
 
@@ -722,40 +709,6 @@ NSString* ORVXMLock							= @"ORVXMLock";
 				description:[NSString stringWithFormat:@"Move %d to %.2f%@",motorIndex,aPosition/conversion,units]
 				 waitToSend:YES];
 	}
-}
-
-- (void) goHomeAllPos
-{
-	[self goHomeAll:NO];
-}
-
-- (void) goHomeAllNeg
-{
-	[self goHomeAll:YES];
-}
-
-- (void) goHomeAll:(BOOL)neg
-{
-    if([serialPort isOpen]){
-		abortAllRepeats = YES;
-		[self setAllGoingHome:YES];
-		[self setCmdIndex:0];
-		[self setRepeatCount:0];
-		NSString* aCmd = @"F,K,C,";
-		BOOL atLeastOne = NO;
-		for(id aMotor in motors){
-			if([aMotor motorEnabled]){
-				int theMotorId = [aMotor motorId];
-				int speed = [aMotor motorSpeed];
-				aCmd = [aCmd stringByAppendingFormat:@"S%dM%d,I%dM%@0,",theMotorId+1,speed,theMotorId+1,neg?@"-":@"+"];
-				atLeastOne = YES;
-			}
-		}
-		if(atLeastOne){
-			aCmd = [aCmd stringByAppendingString:@"R\r"];
-			[serialPort writeString:aCmd];
-		}
-    }
 }
 
 - (void) sendGo
@@ -844,7 +797,6 @@ NSString* ORVXMLock							= @"ORVXMLock";
 			else {
 				[self queryPositionOnce];
 				[self setCmdTypeExecuting:kVXMCmdIdle];
-				[self setAllGoingHome:NO];
 			}
 		}
 		if([aCmd hasPrefix:@"X"] || 
@@ -920,12 +872,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	if([serialPort isOpen]){ 
-		if(allGoingHome){
-			[self setAllGoingHome:NO];
-			abortAllRepeats = YES;
-			[self queryPositionOnce];		
-		}
-		else if([cmdQueue count]!=0 && !abortAllRepeats){
+		if([cmdQueue count]!=0 && !abortAllRepeats){
 			if(cmdIndex<[cmdQueue count]){
 				ORVXMMotorCmd* aCmd = [cmdQueue objectAtIndex:cmdIndex];
 				[self setCmdTypeExecuting:kVXMCmdListExecuting];

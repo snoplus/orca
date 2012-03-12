@@ -48,7 +48,6 @@
 		BOOL			stopRunWhenDone;
 		int				cmdIndex;
 		int				numTimesToRepeat;
-		BOOL			allGoingHome;
 		BOOL			abortAllRepeats;
         BOOL            shipRecords;
         NSString*       listFile;
@@ -81,10 +80,6 @@
 - (void) setListFile:(NSString*)aFileName;
 - (BOOL) shipRecords;
 - (void) setShipRecords:(BOOL)aShipRecords;
-- (void) goHomeAllNeg;
-- (void) goHomeAllPos;
-- (BOOL) allGoingHome;
-- (void) setAllGoingHome:(BOOL)aState;
 - (int) numTimesToRepeat;
 - (void) setNumTimesToRepeat:(int)aNumTimesToRepeat;
 - (int) cmdIndex;
@@ -155,7 +150,6 @@ extern NSString* ORVXMModelCustomCmdChanged;
 extern NSString* ORVXMModelCmdTypeExecutingChanged;
 extern NSString* ORVXMModelCmdFileChanged;
 extern NSString* ORVXMModelShipRecordsChanged;
-extern NSString* ORVXMModelAllGoingHomeChanged;
 extern NSString* ORVXMModelNumTimesToRepeatChanged;
 extern NSString* ORVXMModelCmdIndexChanged;
 extern NSString* ORVXMModelStopRunWhenDoneChanged;

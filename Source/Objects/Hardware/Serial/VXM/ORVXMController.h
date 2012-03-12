@@ -102,7 +102,6 @@
 - (void) targetChanged:(NSNotification*)aNote;
 - (void) updateCmdTable:(NSNotification*)aNote;
 - (void) absoluteMotionChanged:(NSNotification*)aNote;
-- (void) goingHomeChanged:(NSNotification*)aNote;
 - (void) itemsAdded:(NSNotification*)aNote;
 - (void) itemsRemoved:(NSNotification*)aNote;
 
@@ -119,8 +118,6 @@
 - (IBAction) lockAction:(id) sender;
 - (IBAction) portListAction:(id) sender;
 - (IBAction) openPortAction:(id)sender;
-- (IBAction) goAllHomeNegAction:(id)sender;
-- (IBAction) goAllHomePosAction:(id)sender;
 - (IBAction) stopAllAction:(id)sender;
 - (IBAction) conversionAction:(id)sender;
 - (IBAction) speedAction:(id)sender;
