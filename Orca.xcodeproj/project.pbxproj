@@ -69,6 +69,36 @@
 		2ACEE0E40612266000CAD497 /* ThresholdCalibrationTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 2ACEE0E00612266000CAD497 /* ThresholdCalibrationTask.h */; };
 		2ACEE0E50612266000CAD497 /* ThresholdCalibrationTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 2ACEE0E10612266000CAD497 /* ThresholdCalibrationTask.m */; };
 		2AE87C600D6E636700A839FC /* libmysqlclient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2AE87BDD0D6E486900A839FC /* libmysqlclient.a */; };
+		2D12EDA6150FDD1300EBD8A2 /* EdelweissSLTv4_HW_Definitions.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D12EDA5150FDD1300EBD8A2 /* EdelweissSLTv4_HW_Definitions.h */; };
+		2D12EDA9150FDD6200EBD8A2 /* EdelweissSLTv4_HW_Definitions.h in EdelweissSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2D12EDA5150FDD1300EBD8A2 /* EdelweissSLTv4_HW_Definitions.h */; };
+		2D12EDCB150FE26600EBD8A2 /* HW_Readout.cc in EdelweissSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2D12EDB1150FE02A00EBD8A2 /* HW_Readout.cc */; };
+		2D12EE55150FE7C500EBD8A2 /* OREdelweissSLTv4Readout.cc in EdelweissSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2D12EE53150FE7B400EBD8A2 /* OREdelweissSLTv4Readout.cc */; };
+		2D12EE5A150FE80800EBD8A2 /* OREdelweissFLTv4Readout.cc in EdelweissSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2D12EE58150FE7F000EBD8A2 /* OREdelweissFLTv4Readout.cc */; };
+		2D12EE5E150FE83400EBD8A2 /* EdelweissSLTv4GeneralOperations.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D12EE5D150FE83400EBD8A2 /* EdelweissSLTv4GeneralOperations.h */; };
+		2D12EE5F150FE85000EBD8A2 /* EdelweissSLTv4GeneralOperations.h in EdelweissSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2D12EE5D150FE83400EBD8A2 /* EdelweissSLTv4GeneralOperations.h */; };
+		2D12EE6D150FE8B900EBD8A2 /* goScript in Resources */ = {isa = PBXBuildFile; fileRef = 2D12EE6C150FE8B900EBD8A2 /* goScript */; };
+		2D12EE6E150FE8BF00EBD8A2 /* goScript in EdelweissSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2D12EE6C150FE8B900EBD8A2 /* goScript */; };
+		2D12EE70150FE8D600EBD8A2 /* HW_Readout.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D12EE6F150FE8D600EBD8A2 /* HW_Readout.h */; };
+		2D12EE71150FE8DC00EBD8A2 /* HW_Readout.h in EdelweissSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2D12EE6F150FE8D600EBD8A2 /* HW_Readout.h */; };
+		2D12EE79150FE90300EBD8A2 /* HW_Specific.icc in Resources */ = {isa = PBXBuildFile; fileRef = 2D12EE78150FE90300EBD8A2 /* HW_Specific.icc */; };
+		2D12EE7A150FE90A00EBD8A2 /* HW_Specific.icc in EdelweissSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2D12EE78150FE90300EBD8A2 /* HW_Specific.icc */; };
+		2D12EE7C150FE91A00EBD8A2 /* HWMakefile.mk in Resources */ = {isa = PBXBuildFile; fileRef = 2D12EE7B150FE91A00EBD8A2 /* HWMakefile.mk */; };
+		2D12EE7D150FE91F00EBD8A2 /* HWMakefile.mk in EdelweissSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2D12EE7B150FE91A00EBD8A2 /* HWMakefile.mk */; };
+		2D12EE7F150FE93100EBD8A2 /* IpeEdelweissV4SLTScript in Resources */ = {isa = PBXBuildFile; fileRef = 2D12EE7E150FE93100EBD8A2 /* IpeEdelweissV4SLTScript */; };
+		2D12EE80150FE93700EBD8A2 /* IpeEdelweissV4SLTScript in EdelweissSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2D12EE7E150FE93100EBD8A2 /* IpeEdelweissV4SLTScript */; };
+		2D12EE82150FE94A00EBD8A2 /* OREdelweissFLTv4Readout.hh in Headers */ = {isa = PBXBuildFile; fileRef = 2D12EE81150FE94A00EBD8A2 /* OREdelweissFLTv4Readout.hh */; };
+		2D12EE83150FE95100EBD8A2 /* OREdelweissFLTv4Readout.hh in EdelweissSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2D12EE81150FE94A00EBD8A2 /* OREdelweissFLTv4Readout.hh */; };
+		2D12EE85150FE96200EBD8A2 /* OREdelweissSLTv4Readout.hh in Headers */ = {isa = PBXBuildFile; fileRef = 2D12EE84150FE96200EBD8A2 /* OREdelweissSLTv4Readout.hh */; };
+		2D12EE86150FE96900EBD8A2 /* OREdelweissSLTv4Readout.hh in EdelweissSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2D12EE84150FE96200EBD8A2 /* OREdelweissSLTv4Readout.hh */; };
+		2D12EEAD150FEB6600EBD8A2 /* EdelweissSLT.nib in Resources */ = {isa = PBXBuildFile; fileRef = 2D12EEA4150FEB6600EBD8A2 /* EdelweissSLT.nib */; };
+		2D12EEAE150FEB6600EBD8A2 /* EdelweissSLTCard.gif in Resources */ = {isa = PBXBuildFile; fileRef = 2D12EEA5150FEB6600EBD8A2 /* EdelweissSLTCard.gif */; };
+		2D12EEAF150FEB6600EBD8A2 /* OREdelweissSLTController.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D12EEA6150FEB6600EBD8A2 /* OREdelweissSLTController.h */; };
+		2D12EEB0150FEB6600EBD8A2 /* OREdelweissSLTController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D12EEA7150FEB6600EBD8A2 /* OREdelweissSLTController.m */; };
+		2D12EEB1150FEB6600EBD8A2 /* OREdelweissSLTDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D12EEA8150FEB6600EBD8A2 /* OREdelweissSLTDecoder.h */; };
+		2D12EEB2150FEB6600EBD8A2 /* OREdelweissSLTDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D12EEA9150FEB6600EBD8A2 /* OREdelweissSLTDecoder.m */; };
+		2D12EEB3150FEB6600EBD8A2 /* OREdelweissSLTDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D12EEAA150FEB6600EBD8A2 /* OREdelweissSLTDefs.h */; };
+		2D12EEB4150FEB6600EBD8A2 /* OREdelweissSLTModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D12EEAB150FEB6600EBD8A2 /* OREdelweissSLTModel.h */; };
+		2D12EEB5150FEB6600EBD8A2 /* OREdelweissSLTModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D12EEAC150FEB6600EBD8A2 /* OREdelweissSLTModel.m */; };
 		2D158EB511359F5800EA1552 /* KatrinV4FLT.nib in Resources */ = {isa = PBXBuildFile; fileRef = 2D158EAC11359F5800EA1552 /* KatrinV4FLT.nib */; };
 		2D158EB611359F5800EA1552 /* KatrinV4FLTCard.gif in Resources */ = {isa = PBXBuildFile; fileRef = 2D158EAD11359F5800EA1552 /* KatrinV4FLTCard.gif */; };
 		2D158EB711359F5800EA1552 /* ORKatrinV4FLTController.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D158EAE11359F5800EA1552 /* ORKatrinV4FLTController.h */; };
@@ -2733,6 +2763,37 @@
 /* End PBXBuildRule section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		2D12EDA3150FDCC500EBD8A2 /* EdelweissSLTv4_Copy */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = EdelweissSLTv4_Readout_Code;
+			dstSubfolderSpec = 7;
+			files = (
+				2D12EE86150FE96900EBD8A2 /* OREdelweissSLTv4Readout.hh in EdelweissSLTv4_Copy */,
+				2D12EE83150FE95100EBD8A2 /* OREdelweissFLTv4Readout.hh in EdelweissSLTv4_Copy */,
+				2D12EE80150FE93700EBD8A2 /* IpeEdelweissV4SLTScript in EdelweissSLTv4_Copy */,
+				2D12EE7D150FE91F00EBD8A2 /* HWMakefile.mk in EdelweissSLTv4_Copy */,
+				2D12EE7A150FE90A00EBD8A2 /* HW_Specific.icc in EdelweissSLTv4_Copy */,
+				2D12EE71150FE8DC00EBD8A2 /* HW_Readout.h in EdelweissSLTv4_Copy */,
+				2D12EE6E150FE8BF00EBD8A2 /* goScript in EdelweissSLTv4_Copy */,
+				2D12EE5F150FE85000EBD8A2 /* EdelweissSLTv4GeneralOperations.h in EdelweissSLTv4_Copy */,
+				2D12EE5A150FE80800EBD8A2 /* OREdelweissFLTv4Readout.cc in EdelweissSLTv4_Copy */,
+				2D12EE55150FE7C500EBD8A2 /* OREdelweissSLTv4Readout.cc in EdelweissSLTv4_Copy */,
+				2D12EDA9150FDD6200EBD8A2 /* EdelweissSLTv4_HW_Definitions.h in EdelweissSLTv4_Copy */,
+				2D12EDCB150FE26600EBD8A2 /* HW_Readout.cc in EdelweissSLTv4_Copy */,
+			);
+			name = EdelweissSLTv4_Copy;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2D12EE33150FE5D800EBD8A2 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = EW;
+			dstSubfolderSpec = 7;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		842241B00D85EA7F0048D331 /* SLTv4_Copy */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2958,6 +3019,27 @@
 		2ACEE0E00612266000CAD497 /* ThresholdCalibrationTask.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ThresholdCalibrationTask.h; sourceTree = "<group>"; };
 		2ACEE0E10612266000CAD497 /* ThresholdCalibrationTask.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ThresholdCalibrationTask.m; sourceTree = "<group>"; };
 		2AE87BDD0D6E486900A839FC /* libmysqlclient.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libmysqlclient.a; sourceTree = "<group>"; };
+		2D12EDA5150FDD1300EBD8A2 /* EdelweissSLTv4_HW_Definitions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EdelweissSLTv4_HW_Definitions.h; path = Source/Objects/Hardware/IPE/EdelweissSLT/EdelweissSLTv4_Readout_Code/EdelweissSLTv4_HW_Definitions.h; sourceTree = "<group>"; };
+		2D12EDB1150FE02A00EBD8A2 /* HW_Readout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = HW_Readout.cc; path = EdelweissSLT/EdelweissSLTv4_Readout_Code/HW_Readout.cc; sourceTree = "<group>"; };
+		2D12EE53150FE7B400EBD8A2 /* OREdelweissSLTv4Readout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OREdelweissSLTv4Readout.cc; path = Source/Objects/Hardware/IPE/EdelweissSLT/EdelweissSLTv4_Readout_Code/OREdelweissSLTv4Readout.cc; sourceTree = "<group>"; };
+		2D12EE58150FE7F000EBD8A2 /* OREdelweissFLTv4Readout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OREdelweissFLTv4Readout.cc; path = Source/Objects/Hardware/IPE/EdelweissSLT/EdelweissSLTv4_Readout_Code/OREdelweissFLTv4Readout.cc; sourceTree = "<group>"; };
+		2D12EE5D150FE83400EBD8A2 /* EdelweissSLTv4GeneralOperations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EdelweissSLTv4GeneralOperations.h; path = Source/Objects/Hardware/IPE/EdelweissSLT/EdelweissSLTv4_Readout_Code/EdelweissSLTv4GeneralOperations.h; sourceTree = "<group>"; };
+		2D12EE6C150FE8B900EBD8A2 /* goScript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = goScript; path = Source/Objects/Hardware/IPE/EdelweissSLT/EdelweissSLTv4_Readout_Code/goScript; sourceTree = "<group>"; };
+		2D12EE6F150FE8D600EBD8A2 /* HW_Readout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HW_Readout.h; path = Source/Objects/Hardware/IPE/EdelweissSLT/EdelweissSLTv4_Readout_Code/HW_Readout.h; sourceTree = "<group>"; };
+		2D12EE78150FE90300EBD8A2 /* HW_Specific.icc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = HW_Specific.icc; path = Source/Objects/Hardware/IPE/EdelweissSLT/EdelweissSLTv4_Readout_Code/HW_Specific.icc; sourceTree = "<group>"; };
+		2D12EE7B150FE91A00EBD8A2 /* HWMakefile.mk */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = HWMakefile.mk; path = Source/Objects/Hardware/IPE/EdelweissSLT/EdelweissSLTv4_Readout_Code/HWMakefile.mk; sourceTree = "<group>"; };
+		2D12EE7E150FE93100EBD8A2 /* IpeEdelweissV4SLTScript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = IpeEdelweissV4SLTScript; path = Source/Objects/Hardware/IPE/EdelweissSLT/EdelweissSLTv4_Readout_Code/IpeEdelweissV4SLTScript; sourceTree = "<group>"; };
+		2D12EE81150FE94A00EBD8A2 /* OREdelweissFLTv4Readout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = OREdelweissFLTv4Readout.hh; path = Source/Objects/Hardware/IPE/EdelweissSLT/EdelweissSLTv4_Readout_Code/OREdelweissFLTv4Readout.hh; sourceTree = "<group>"; };
+		2D12EE84150FE96200EBD8A2 /* OREdelweissSLTv4Readout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = OREdelweissSLTv4Readout.hh; path = Source/Objects/Hardware/IPE/EdelweissSLT/EdelweissSLTv4_Readout_Code/OREdelweissSLTv4Readout.hh; sourceTree = "<group>"; };
+		2D12EEA4150FEB6600EBD8A2 /* EdelweissSLT.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = EdelweissSLT.nib; path = EdelweissSLT/EdelweissSLT.nib; sourceTree = "<group>"; };
+		2D12EEA5150FEB6600EBD8A2 /* EdelweissSLTCard.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = EdelweissSLTCard.gif; path = EdelweissSLT/EdelweissSLTCard.gif; sourceTree = "<group>"; };
+		2D12EEA6150FEB6600EBD8A2 /* OREdelweissSLTController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OREdelweissSLTController.h; path = EdelweissSLT/OREdelweissSLTController.h; sourceTree = "<group>"; };
+		2D12EEA7150FEB6600EBD8A2 /* OREdelweissSLTController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OREdelweissSLTController.m; path = EdelweissSLT/OREdelweissSLTController.m; sourceTree = "<group>"; };
+		2D12EEA8150FEB6600EBD8A2 /* OREdelweissSLTDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OREdelweissSLTDecoder.h; path = EdelweissSLT/OREdelweissSLTDecoder.h; sourceTree = "<group>"; };
+		2D12EEA9150FEB6600EBD8A2 /* OREdelweissSLTDecoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OREdelweissSLTDecoder.m; path = EdelweissSLT/OREdelweissSLTDecoder.m; sourceTree = "<group>"; };
+		2D12EEAA150FEB6600EBD8A2 /* OREdelweissSLTDefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OREdelweissSLTDefs.h; path = EdelweissSLT/OREdelweissSLTDefs.h; sourceTree = "<group>"; };
+		2D12EEAB150FEB6600EBD8A2 /* OREdelweissSLTModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OREdelweissSLTModel.h; path = EdelweissSLT/OREdelweissSLTModel.h; sourceTree = "<group>"; };
+		2D12EEAC150FEB6600EBD8A2 /* OREdelweissSLTModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OREdelweissSLTModel.m; path = EdelweissSLT/OREdelweissSLTModel.m; sourceTree = "<group>"; };
 		2D158EAC11359F5800EA1552 /* KatrinV4FLT.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = KatrinV4FLT.nib; sourceTree = "<group>"; };
 		2D158EAD11359F5800EA1552 /* KatrinV4FLTCard.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = KatrinV4FLTCard.gif; sourceTree = "<group>"; };
 		2D158EAE11359F5800EA1552 /* ORKatrinV4FLTController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORKatrinV4FLTController.h; sourceTree = "<group>"; };
@@ -5675,6 +5757,17 @@
 		2A37F4AAFDCFA73011CA2CEA /* Orca */ = {
 			isa = PBXGroup;
 			children = (
+				2D12EE84150FE96200EBD8A2 /* OREdelweissSLTv4Readout.hh */,
+				2D12EE81150FE94A00EBD8A2 /* OREdelweissFLTv4Readout.hh */,
+				2D12EE7E150FE93100EBD8A2 /* IpeEdelweissV4SLTScript */,
+				2D12EE7B150FE91A00EBD8A2 /* HWMakefile.mk */,
+				2D12EE78150FE90300EBD8A2 /* HW_Specific.icc */,
+				2D12EE6F150FE8D600EBD8A2 /* HW_Readout.h */,
+				2D12EE6C150FE8B900EBD8A2 /* goScript */,
+				2D12EE5D150FE83400EBD8A2 /* EdelweissSLTv4GeneralOperations.h */,
+				2D12EE58150FE7F000EBD8A2 /* OREdelweissFLTv4Readout.cc */,
+				2D12EE53150FE7B400EBD8A2 /* OREdelweissSLTv4Readout.cc */,
+				2D12EDA5150FDD1300EBD8A2 /* EdelweissSLTv4_HW_Definitions.h */,
 				CE68866C0D0CE0E400FA4158 /* PlugIns */,
 				F5AD34B203A7AEB8015F64B1 /* Readme */,
 				F51E693F03AE4775015F64B1 /* Source */,
@@ -5793,6 +5886,31 @@
 				84F7FB550AE555C600A5AA4C /* mysql.h */,
 			);
 			path = libUniversal;
+			sourceTree = "<group>";
+		};
+		2D12EDC8150FE21A00EBD8A2 /* EdelweissSLT */ = {
+			isa = PBXGroup;
+			children = (
+				2D12EEA4150FEB6600EBD8A2 /* EdelweissSLT.nib */,
+				2D12EEA5150FEB6600EBD8A2 /* EdelweissSLTCard.gif */,
+				2D12EEA6150FEB6600EBD8A2 /* OREdelweissSLTController.h */,
+				2D12EEA7150FEB6600EBD8A2 /* OREdelweissSLTController.m */,
+				2D12EEA8150FEB6600EBD8A2 /* OREdelweissSLTDecoder.h */,
+				2D12EEA9150FEB6600EBD8A2 /* OREdelweissSLTDecoder.m */,
+				2D12EEAA150FEB6600EBD8A2 /* OREdelweissSLTDefs.h */,
+				2D12EEAB150FEB6600EBD8A2 /* OREdelweissSLTModel.h */,
+				2D12EEAC150FEB6600EBD8A2 /* OREdelweissSLTModel.m */,
+				2D12EEA1150FEB2F00EBD8A2 /* EdelweissSLTv4_Readout_Code */,
+			);
+			name = EdelweissSLT;
+			sourceTree = "<group>";
+		};
+		2D12EEA1150FEB2F00EBD8A2 /* EdelweissSLTv4_Readout_Code */ = {
+			isa = PBXGroup;
+			children = (
+				2D12EDB1150FE02A00EBD8A2 /* HW_Readout.cc */,
+			);
+			name = EdelweissSLTv4_Readout_Code;
 			sourceTree = "<group>";
 		};
 		2D158EAB11359F5800EA1552 /* KatrinV4FLT */ = {
@@ -10943,6 +11061,7 @@
 		84F46F090CA44255007EFADA /* IPE */ = {
 			isa = PBXGroup;
 			children = (
+				2D12EDC8150FE21A00EBD8A2 /* EdelweissSLT */,
 				2D1AB8070F1B9EBC00E6B850 /* IPE SlowControl */,
 				84F46F0A0CA44255007EFADA /* IPE Base Classes */,
 				84F46F110CA44255007EFADA /* IPE Crate */,
@@ -12770,6 +12889,15 @@
 				84976E3F150E77F60004B444 /* ORMks651cController.h in Headers */,
 				84976E41150E77F60004B444 /* ORMks651cDecoders.h in Headers */,
 				84976E43150E77F60004B444 /* ORMks651cModel.h in Headers */,
+				2D12EDA6150FDD1300EBD8A2 /* EdelweissSLTv4_HW_Definitions.h in Headers */,
+				2D12EE5E150FE83400EBD8A2 /* EdelweissSLTv4GeneralOperations.h in Headers */,
+				2D12EE70150FE8D600EBD8A2 /* HW_Readout.h in Headers */,
+				2D12EE82150FE94A00EBD8A2 /* OREdelweissFLTv4Readout.hh in Headers */,
+				2D12EE85150FE96200EBD8A2 /* OREdelweissSLTv4Readout.hh in Headers */,
+				2D12EEAF150FEB6600EBD8A2 /* OREdelweissSLTController.h in Headers */,
+				2D12EEB1150FEB6600EBD8A2 /* OREdelweissSLTDecoder.h in Headers */,
+				2D12EEB3150FEB6600EBD8A2 /* OREdelweissSLTDefs.h in Headers */,
+				2D12EEB4150FEB6600EBD8A2 /* OREdelweissSLTModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12793,6 +12921,8 @@
 				842241B00D85EA7F0048D331 /* SLTv4_Copy */,
 				8491DD760EB616630084BAD6 /* ShellScript */,
 				84C4CBA30FB0726500725AC3 /* CopyFiles */,
+				2D12EDA3150FDCC500EBD8A2 /* EdelweissSLTv4_Copy */,
+				2D12EE33150FE5D800EBD8A2 /* CopyFiles */,
 			);
 			buildRules = (
 				9C2595AC0D5171B90039C5DF /* PBXBuildRule */,
@@ -13584,6 +13714,12 @@
 				84D8556114FBDEDA00C70A00 /* CB37Big.tif in Resources */,
 				84976E3D150E77F60004B444 /* Mks651c.nib in Resources */,
 				84976E3E150E77F60004B444 /* Mks651c.tif in Resources */,
+				2D12EE6D150FE8B900EBD8A2 /* goScript in Resources */,
+				2D12EE79150FE90300EBD8A2 /* HW_Specific.icc in Resources */,
+				2D12EE7C150FE91A00EBD8A2 /* HWMakefile.mk in Resources */,
+				2D12EE7F150FE93100EBD8A2 /* IpeEdelweissV4SLTScript in Resources */,
+				2D12EEAD150FEB6600EBD8A2 /* EdelweissSLT.nib in Resources */,
+				2D12EEAE150FEB6600EBD8A2 /* EdelweissSLTCard.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14503,6 +14639,9 @@
 				84976E40150E77F60004B444 /* ORMks651cController.m in Sources */,
 				84976E42150E77F60004B444 /* ORMks651cDecoders.m in Sources */,
 				84976E44150E77F60004B444 /* ORMks651cModel.m in Sources */,
+				2D12EEB0150FEB6600EBD8A2 /* OREdelweissSLTController.m in Sources */,
+				2D12EEB2150FEB6600EBD8A2 /* OREdelweissSLTDecoder.m in Sources */,
+				2D12EEB5150FEB6600EBD8A2 /* OREdelweissSLTModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
