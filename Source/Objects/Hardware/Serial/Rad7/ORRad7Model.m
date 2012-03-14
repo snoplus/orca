@@ -1212,7 +1212,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 	@synchronized(self){
 		switch(aChan){
 			case 0: theValue = (double)[self maxRadon];				break;
-			case 1: theValue = (double)[self pumpCurrentMaxLimit];	break;
+			case 1: theValue = (double)[self humidityMaxLimit];     break;
 			case 2: theValue = (double)[self pumpCurrentMaxLimit];	break;
 		}
 	}
