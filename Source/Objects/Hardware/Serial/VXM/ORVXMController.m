@@ -56,7 +56,7 @@
 	
 
 	NSNumberFormatter *numberFormatter = [[[NSNumberFormatter alloc] init] autorelease];
-	[numberFormatter setFormat:@"#0.00"];	
+	[numberFormatter setFormat:@"#0.000"];	
 	int i;
 	for(i=0;i<kNumVXMMotors;i++){
 		[[conversionMatrix cellAtRow:i column:0] setTag:i];
@@ -80,7 +80,7 @@
 	int i;
 	NSNumberFormatter *numberFormatter = [[[NSNumberFormatter alloc] init] autorelease];
 	if([model displayRaw]) [numberFormatter setFormat:@"#0"];
-	else				   [numberFormatter setFormat:@"#0.00"];
+	else				   [numberFormatter setFormat:@"#0.000"];
 	for(i=0;i<kNumVXMMotors;i++){
 		[[positionMatrix cellAtRow:i column:0]		setFormatter:numberFormatter];
 		[[speedMatrix cellAtRow:i column:0]		setFormatter:numberFormatter];
@@ -695,7 +695,7 @@
 	ORVXMMotor* aMotor = [model motor:[[sender selectedCell]tag]];
 	float conversion = 1.0;
 	if(![model displayRaw]) conversion = [aMotor conversion];
-	[aMotor setTargetPosition:(int)[[sender selectedCell] floatValue]*conversion];
+	[aMotor setTargetPosition:[[sender selectedCell] floatValue]*conversion];
 }
 
 - (IBAction) motorEnabledAction:(id)sender
@@ -762,7 +762,7 @@
     }];
 #else 		
     [savePanel beginSheetForDirectory:startingDir
-                                 file:defaultFile
+                                 file:@"VXMCmdList"
                        modalForWindow:[self window]
                         modalDelegate:self
                        didEndSelector:@selector(_saveListPanelDidEnd:returnCode:contextInfo:)

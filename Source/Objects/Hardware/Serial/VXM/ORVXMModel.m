@@ -588,10 +588,10 @@ NSString* ORVXMLock							= @"ORVXMLock";
 	if(aMotorIndex>=0 && aMotorIndex<[motors count]){	
 		id aMotor = [motors objectAtIndex:aMotorIndex];
 		if([aMotor absoluteMotion]){
-			[self move:aMotorIndex to:(int)[aMotor targetPosition] speed:[aMotor motorSpeed]];
+			[self move:aMotorIndex to:[aMotor targetPosition] speed:[aMotor motorSpeed]];
 		}
 		else {
-			[self move:aMotorIndex dx:(int)[aMotor targetPosition] speed:[aMotor motorSpeed]];
+			[self move:aMotorIndex dx:[aMotor targetPosition] speed:[aMotor motorSpeed]];
 		}
 	}
 }
