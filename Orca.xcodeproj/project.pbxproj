@@ -2667,6 +2667,12 @@
 		B38DEE4B14E02B40003914FF /* ORADVME1314Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = B38DEE4514E02B40003914FF /* ORADVME1314Controller.m */; };
 		B38DEE4C14E02B40003914FF /* ORADVME1314Model.h in Headers */ = {isa = PBXBuildFile; fileRef = B38DEE4614E02B40003914FF /* ORADVME1314Model.h */; };
 		B38DEE4D14E02B40003914FF /* ORADVME1314Model.m in Sources */ = {isa = PBXBuildFile; fileRef = B38DEE4714E02B40003914FF /* ORADVME1314Model.m */; };
+		CE0216BC1512139A00456EB7 /* nEDMCoil.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE0216B71512139A00456EB7 /* nEDMCoil.nib */; };
+		CE0216BD1512139A00456EB7 /* ORnEDMCoilController.h in Headers */ = {isa = PBXBuildFile; fileRef = CE0216B81512139A00456EB7 /* ORnEDMCoilController.h */; };
+		CE0216BE1512139A00456EB7 /* ORnEDMCoilController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE0216B91512139A00456EB7 /* ORnEDMCoilController.m */; };
+		CE0216BF1512139A00456EB7 /* ORnEDMCoilModel.h in Headers */ = {isa = PBXBuildFile; fileRef = CE0216BA1512139A00456EB7 /* ORnEDMCoilModel.h */; };
+		CE0216C01512139A00456EB7 /* ORnEDMCoilModel.m in Sources */ = {isa = PBXBuildFile; fileRef = CE0216BB1512139A00456EB7 /* ORnEDMCoilModel.m */; };
+		CE0216C2151223DA00456EB7 /* nEDMCoil.gif in Resources */ = {isa = PBXBuildFile; fileRef = CE0216C1151223D900456EB7 /* nEDMCoil.gif */; };
 		CE0D70B4146812E000B241D8 /* hardwareFinder.tiff in Resources */ = {isa = PBXBuildFile; fileRef = CE0D70B3146812E000B241D8 /* hardwareFinder.tiff */; };
 		CE10F0111451674C0084C15D /* ORXYCom200Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = CE10F005145167450084C15D /* ORXYCom200Controller.h */; };
 		CE10F0121451674C0084C15D /* ORXYCom200Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = CE10F006145167460084C15D /* ORXYCom200Controller.m */; };
@@ -5505,6 +5511,12 @@
 		B38DEE4514E02B40003914FF /* ORADVME1314Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORADVME1314Controller.m; sourceTree = "<group>"; };
 		B38DEE4614E02B40003914FF /* ORADVME1314Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORADVME1314Model.h; sourceTree = "<group>"; };
 		B38DEE4714E02B40003914FF /* ORADVME1314Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORADVME1314Model.m; sourceTree = "<group>"; };
+		CE0216B71512139A00456EB7 /* nEDMCoil.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = nEDMCoil.nib; sourceTree = "<group>"; };
+		CE0216B81512139A00456EB7 /* ORnEDMCoilController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORnEDMCoilController.h; sourceTree = "<group>"; };
+		CE0216B91512139A00456EB7 /* ORnEDMCoilController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORnEDMCoilController.m; sourceTree = "<group>"; };
+		CE0216BA1512139A00456EB7 /* ORnEDMCoilModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORnEDMCoilModel.h; sourceTree = "<group>"; };
+		CE0216BB1512139A00456EB7 /* ORnEDMCoilModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORnEDMCoilModel.m; sourceTree = "<group>"; };
+		CE0216C1151223D900456EB7 /* nEDMCoil.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = nEDMCoil.gif; sourceTree = "<group>"; };
 		CE0D70B3146812E000B241D8 /* hardwareFinder.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = hardwareFinder.tiff; path = "../Main Dialogs/HardwareFinder/hardwareFinder.tiff"; sourceTree = "<group>"; };
 		CE10F005145167450084C15D /* ORXYCom200Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORXYCom200Controller.h; path = Source/Objects/Hardware/Vme/XYCom/ORXYCom200Controller.h; sourceTree = SOURCE_ROOT; };
 		CE10F006145167460084C15D /* ORXYCom200Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORXYCom200Controller.m; path = Source/Objects/Hardware/Vme/XYCom/ORXYCom200Controller.m; sourceTree = SOURCE_ROOT; };
@@ -10459,6 +10471,7 @@
 		84C4948A0405A0C0005F64B1 /* Custom Hardware */ = {
 			isa = PBXGroup;
 			children = (
+				CE0216B51512139A00456EB7 /* nEDM */,
 				8402B5AA14C70487007999C1 /* Majorana Hardware */,
 				84C4948C0405A0C0005F64B1 /* Ncd Hardware */,
 				847E6C120CFF4C3200E963C6 /* eGun */,
@@ -11423,6 +11436,27 @@
 				B38DEE4714E02B40003914FF /* ORADVME1314Model.m */,
 			);
 			path = Advanet;
+			sourceTree = "<group>";
+		};
+		CE0216B51512139A00456EB7 /* nEDM */ = {
+			isa = PBXGroup;
+			children = (
+				CE0216B61512139A00456EB7 /* nEDMCoil */,
+			);
+			path = nEDM;
+			sourceTree = "<group>";
+		};
+		CE0216B61512139A00456EB7 /* nEDMCoil */ = {
+			isa = PBXGroup;
+			children = (
+				CE0216C1151223D900456EB7 /* nEDMCoil.gif */,
+				CE0216B71512139A00456EB7 /* nEDMCoil.nib */,
+				CE0216B81512139A00456EB7 /* ORnEDMCoilController.h */,
+				CE0216B91512139A00456EB7 /* ORnEDMCoilController.m */,
+				CE0216BA1512139A00456EB7 /* ORnEDMCoilModel.h */,
+				CE0216BB1512139A00456EB7 /* ORnEDMCoilModel.m */,
+			);
+			path = nEDMCoil;
 			sourceTree = "<group>";
 		};
 		CE68866C0D0CE0E400FA4158 /* PlugIns */ = {
@@ -12898,6 +12932,8 @@
 				2D12EEB1150FEB6600EBD8A2 /* OREdelweissSLTDecoder.h in Headers */,
 				2D12EEB3150FEB6600EBD8A2 /* OREdelweissSLTDefs.h in Headers */,
 				2D12EEB4150FEB6600EBD8A2 /* OREdelweissSLTModel.h in Headers */,
+				CE0216BD1512139A00456EB7 /* ORnEDMCoilController.h in Headers */,
+				CE0216BF1512139A00456EB7 /* ORnEDMCoilModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13720,6 +13756,8 @@
 				2D12EE7F150FE93100EBD8A2 /* IpeEdelweissV4SLTScript in Resources */,
 				2D12EEAD150FEB6600EBD8A2 /* EdelweissSLT.nib in Resources */,
 				2D12EEAE150FEB6600EBD8A2 /* EdelweissSLTCard.gif in Resources */,
+				CE0216BC1512139A00456EB7 /* nEDMCoil.nib in Resources */,
+				CE0216C2151223DA00456EB7 /* nEDMCoil.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14642,6 +14680,8 @@
 				2D12EEB0150FEB6600EBD8A2 /* OREdelweissSLTController.m in Sources */,
 				2D12EEB2150FEB6600EBD8A2 /* OREdelweissSLTDecoder.m in Sources */,
 				2D12EEB5150FEB6600EBD8A2 /* OREdelweissSLTModel.m in Sources */,
+				CE0216BE1512139A00456EB7 /* ORnEDMCoilController.m in Sources */,
+				CE0216C01512139A00456EB7 /* ORnEDMCoilModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
