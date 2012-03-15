@@ -594,6 +594,19 @@ ORTTCPX_READ_IMPLEMENT(GetOutputStatus, int)
      */
 }
 
+#pragma mark ***Guardian
+- (BOOL) acceptsGuardian:(OrcaObject *)aGuardian
+{
+    return [super acceptsGuardian:aGuardian] || 
+    [aGuardian isKindOfClass:NSClassFromString(@"ORnEDMCoilModel")];
+}
+
+- (short) numberSlotsUsed
+{
+    // Allows us to use only one slot
+    return 1;
+}
+
 #pragma mark ***Comm methods
 
 - (void) writeCommand:(ETTCPX400DPCmds)cmd withInput:(float)input withOutputNumber:(int)output

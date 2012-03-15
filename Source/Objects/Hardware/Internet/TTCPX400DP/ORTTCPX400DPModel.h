@@ -191,6 +191,9 @@ ORTTCPX_GEN_DEFINE_VAR(writeTo, CMD, TYPE)
 
 - (NSString*) commandStringForCommand:(ETTCPX400DPCmds)cmd withInput:(float)input withOutputNumber:(int)output;
 
+#pragma mark ***Guardian
+- (BOOL) acceptsGuardian:(OrcaObject *)aGuardian;
+
 #pragma mark ***General Querying
 - (NSString*) generalReadback;
 - (int) numberOfCommands;
