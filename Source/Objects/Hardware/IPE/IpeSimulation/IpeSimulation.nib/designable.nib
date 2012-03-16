@@ -80,8 +80,8 @@
 			<object class="NSWindowTemplate" id="439472918">
 				<int key="NSWindowStyleMask">15</int>
 				<int key="NSWindowBacking">2</int>
-				<string key="NSWindowRect">{{454, 269}, {638, 511}}</string>
-				<int key="NSWTFlags">1881145344</int>
+				<string key="NSWindowRect">{{454, 200}, {638, 511}}</string>
+				<int key="NSWTFlags">1886912512</int>
 				<string key="NSWindowTitle">IPE KATRIN Simulation Interface</string>
 				<string key="NSWindowClass">NSWindow</string>
 				<object class="NSMutableString" key="NSViewClass">
@@ -372,7 +372,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 												<int key="NSvFlags">289</int>
 												<string key="NSFrame">{{456, 25}, {84, 28}}</string>
 												<reference key="NSSuperview" ref="378201856"/>
-												<reference key="NSNextKeyView" ref="902941054"/>
+												<reference key="NSNextKeyView"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="863839892">
 													<int key="NSCellFlags">67239424</int>
@@ -2331,7 +2331,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 												<int key="NSvFlags">292</int>
 												<string key="NSFrame">{{176, 47}, {88, 14}}</string>
 												<reference key="NSSuperview" ref="523679902"/>
-												<reference key="NSNextKeyView" ref="902941054"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSTextFieldCell" key="NSCell" id="482843624">
 													<int key="NSCellFlags">68288064</int>
@@ -2420,6 +2419,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					</object>
 					<string key="NSFrameSize">{638, 511}</string>
 					<reference key="NSSuperview"/>
+					<reference key="NSNextKeyView" ref="902941054"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1280, 778}}</string>
 				<string key="NSMinSize">{638, 433}</string>
@@ -5892,6 +5892,8 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					<string>458.IBPluginDependency</string>
 					<string>459.IBPluginDependency</string>
 					<string>465.IBPluginDependency</string>
+					<string>5.IBNSWindowAutoPositionCentersHorizontal</string>
+					<string>5.IBNSWindowAutoPositionCentersVertical</string>
 					<string>5.IBPluginDependency</string>
 					<string>5.IBWindowTemplateEditedContentRect</string>
 					<string>6.IBPluginDependency</string>
@@ -6114,6 +6116,8 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					<string>com.apple.WebKitIBPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="NO"/>
+					<boolean value="NO"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>{{381, 221}, {638, 511}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>

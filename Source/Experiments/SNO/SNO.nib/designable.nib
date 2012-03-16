@@ -63,7 +63,7 @@
 			<object class="NSWindowTemplate" id="783323658">
 				<int key="NSWindowStyleMask">7</int>
 				<int key="NSWindowBacking">2</int>
-				<string key="NSWindowRect">{{190, 76}, {1120, 700}}</string>
+				<string key="NSWindowRect">{{50, 40}, {1120, 700}}</string>
 				<int key="NSWTFlags">1618477056</int>
 				<string key="NSWindowTitle">SNO+ Monitoring</string>
 				<string key="NSWindowClass">NSWindow</string>
@@ -81,6 +81,7 @@
 							<string key="NSFrame">{{-2, -4}, {1124, 702}}</string>
 							<reference key="NSSuperview" ref="881684831"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="466072030"/>
 							<object class="NSMutableArray" key="NSTabViewItems">
 								<bool key="EncodedWithXMLCoder">YES</bool>
 								<object class="NSTabViewItem" id="352564840">
@@ -809,7 +810,7 @@
 																<string key="NSFrame">{{0, -6}, {203, 14}}</string>
 																<reference key="NSSuperview" ref="4222000"/>
 																<reference key="NSWindow"/>
-																<reference key="NSNextKeyView" ref="861677303"/>
+																<reference key="NSNextKeyView" ref="320092016"/>
 																<object class="NSTextContainer" key="NSTextContainer" id="497942184">
 																	<object class="NSLayoutManager" key="NSLayoutManager">
 																		<object class="NSTextStorage" key="NSTextStorage">
@@ -955,7 +956,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 												<string key="NSFrame">{{175, 6}, {205, 97}}</string>
 												<reference key="NSSuperview" ref="466072030"/>
 												<reference key="NSWindow"/>
-												<reference key="NSNextKeyView" ref="4222000"/>
+												<reference key="NSNextKeyView" ref="861677303"/>
 												<int key="NSsFlags">133650</int>
 												<reference key="NSVScroller" ref="735977885"/>
 												<reference key="NSHScroller" ref="861677303"/>
@@ -1111,6 +1112,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 												<string key="NSFrame">{{395, -3}, {712, 128}}</string>
 												<reference key="NSSuperview" ref="466072030"/>
 												<reference key="NSWindow"/>
+												<reference key="NSNextKeyView"/>
 												<string key="NSClassName">ORCompositeTimeLineView</string>
 											</object>
 										</object>

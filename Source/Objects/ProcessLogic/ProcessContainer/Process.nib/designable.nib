@@ -62,7 +62,7 @@
 			<object class="NSWindowTemplate" id="1050166968">
 				<int key="NSWindowStyleMask">15</int>
 				<int key="NSWindowBacking">2</int>
-				<string key="NSWindowRect">{{117, 381}, {529, 445}}</string>
+				<string key="NSWindowRect">{{117, 200}, {529, 445}}</string>
 				<int key="NSWTFlags">813170688</int>
 				<string key="NSWindowTitle">Window</string>
 				<string key="NSWindowClass">NSWindow</string>
@@ -129,7 +129,6 @@
 														<int key="NSvFlags">256</int>
 														<string key="NSFrame">{{510, 1}, {15, 259}}</string>
 														<reference key="NSSuperview" ref="366331146"/>
-														<reference key="NSNextKeyView" ref="522448855"/>
 														<reference key="NSTarget" ref="366331146"/>
 														<string key="NSAction">_doScroller:</string>
 														<double key="NSCurValue">0.69795918464660645</double>
@@ -200,11 +199,10 @@
 																			<reference key="NSNextKeyView" ref="193271396"/>
 																			<reference key="NSTableView" ref="665866028"/>
 																		</object>
-																		<object class="_NSCornerView" key="NSCornerView" id="52995645">
+																		<object class="_NSCornerView" key="NSCornerView">
 																			<nil key="NSNextResponder"/>
 																			<int key="NSvFlags">-2147483392</int>
 																			<string key="NSFrame">{{-22, 0}, {12, 17}}</string>
-																			<reference key="NSNextKeyView" ref="1016703083"/>
 																		</object>
 																		<object class="NSMutableArray" key="NSTableColumns">
 																			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -475,7 +473,7 @@
 																<int key="NSvFlags">-2147483392</int>
 																<string key="NSFrame">{{1, -22}, {437, 11}}</string>
 																<reference key="NSSuperview" ref="1057853994"/>
-																<reference key="NSNextKeyView" ref="52995645"/>
+																<reference key="NSNextKeyView" ref="1016703083"/>
 																<int key="NSsFlags">257</int>
 																<reference key="NSTarget" ref="1057853994"/>
 																<string key="NSAction">_doScroller:</string>
@@ -521,7 +519,7 @@
 																		<int key="NSvFlags">2322</int>
 																		<string key="NSFrameSize">{544, 56}</string>
 																		<reference key="NSSuperview" ref="305366739"/>
-																		<reference key="NSNextKeyView" ref="429824570"/>
+																		<reference key="NSNextKeyView" ref="522448855"/>
 																		<object class="NSTextContainer" key="NSTextContainer" id="19246664">
 																			<object class="NSLayoutManager" key="NSLayoutManager">
 																				<object class="NSTextStorage" key="NSTextStorage">
@@ -1262,7 +1260,7 @@
 											<boolean value="YES"/>
 											<object class="NSAttributedString" id="660805380">
 												<string key="NSString">0.0</string>
-												<object class="NSDictionary" key="NSAttributes" id="325376885">
+												<object class="NSDictionary" key="NSAttributes" id="197443607">
 													<bool key="EncodedWithXMLCoder">YES</bool>
 													<reference key="dict.sortedKeys" ref="0"/>
 													<reference key="dict.values" ref="0"/>
@@ -1286,7 +1284,7 @@
 									</object>
 									<object class="NSAttributedString" key="NS.nan">
 										<string key="NSString">NaN</string>
-										<reference key="NSAttributes" ref="325376885"/>
+										<reference key="NSAttributes" ref="197443607"/>
 									</object>
 									<object class="NSDecimalNumberPlaceholder" key="NS.min" id="209002004">
 										<int key="NS.exponent">0</int>
@@ -1349,6 +1347,7 @@
 							<int key="NSvFlags">289</int>
 							<string key="NSFrame">{{443, 5}, {71, 28}}</string>
 							<reference key="NSSuperview" ref="239114689"/>
+							<reference key="NSNextKeyView"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="545660961">
 								<int key="NSCellFlags">67239424</int>
@@ -1511,7 +1510,7 @@
 											<boolean value="YES"/>
 											<object class="NSAttributedString" id="113527276">
 												<string key="NSString">0%</string>
-												<reference key="NSAttributes" ref="325376885"/>
+												<reference key="NSAttributes" ref="197443607"/>
 											</object>
 											<string>.</string>
 											<integer value="1000"/>
@@ -1531,7 +1530,7 @@
 									</object>
 									<object class="NSAttributedString" key="NS.nan">
 										<string key="NSString">NaN</string>
-										<reference key="NSAttributes" ref="325376885"/>
+										<reference key="NSAttributes" ref="197443607"/>
 									</object>
 									<reference key="NS.min" ref="209002004"/>
 									<reference key="NS.max" ref="209002004"/>
