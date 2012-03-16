@@ -3,12 +3,12 @@
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
 		<string key="IBDocument.SystemVersion">11D50b</string>
-		<string key="IBDocument.InterfaceBuilderVersion">1938</string>
+		<string key="IBDocument.InterfaceBuilderVersion">1617</string>
 		<string key="IBDocument.AppKitVersion">1138.32</string>
 		<string key="IBDocument.HIToolboxVersion">568.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">1938</string>
+			<string key="NS.object.0">1617</string>
 		</object>
 		<object class="NSArray" key="IBDocument.IntegratedClassDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -36,8 +36,11 @@
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 		</object>
 		<object class="NSMutableDictionary" key="IBDocument.Metadata">
-			<string key="NS.key.0">PluginDependencyRecalculationVersion</string>
-			<integer value="1" key="NS.object.0"/>
+			<bool key="EncodedWithXMLCoder">YES</bool>
+			<object class="NSArray" key="dict.sortedKeys" id="0">
+				<bool key="EncodedWithXMLCoder">YES</bool>
+			</object>
+			<reference key="dict.values" ref="0"/>
 		</object>
 		<object class="NSMutableArray" key="IBDocument.RootObjects" id="804693372">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -53,7 +56,7 @@
 			<object class="NSWindowTemplate" id="14481702">
 				<int key="NSWindowStyleMask">7</int>
 				<int key="NSWindowBacking">2</int>
-				<string key="NSWindowRect">{{543, 817}, {288, 493}}</string>
+				<string key="NSWindowRect">{{543, 100}, {288, 493}}</string>
 				<int key="NSWTFlags">1886912512</int>
 				<string key="NSWindowTitle">CB37</string>
 				<string key="NSWindowClass">NSWindow</string>
@@ -468,11 +471,9 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<object class="NSDictionary" key="NSAttributes" id="1039697085">
+																<object class="NSDictionary" key="NSAttributes" id="383643063">
 																	<bool key="EncodedWithXMLCoder">YES</bool>
-																	<object class="NSArray" key="dict.sortedKeys" id="0">
-																		<bool key="EncodedWithXMLCoder">YES</bool>
-																	</object>
+																	<reference key="dict.sortedKeys" ref="0"/>
 																	<reference key="dict.values" ref="0"/>
 																</object>
 															</object>
@@ -540,7 +541,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -599,7 +600,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -658,7 +659,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -717,7 +718,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -776,7 +777,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -835,7 +836,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -894,7 +895,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -2245,7 +2246,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -2309,7 +2310,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -2370,7 +2371,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -2431,7 +2432,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -2492,7 +2493,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -2553,7 +2554,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -2614,7 +2615,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -2675,7 +2676,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -2925,7 +2926,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -2984,7 +2985,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -3045,7 +3046,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -3106,7 +3107,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -3167,7 +3168,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -3228,7 +3229,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -3289,7 +3290,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -3350,7 +3351,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -3600,7 +3601,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -3659,7 +3660,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -3720,7 +3721,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -3781,7 +3782,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -3842,7 +3843,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -3903,7 +3904,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -3964,7 +3965,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -4025,7 +4026,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -4275,7 +4276,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -4334,7 +4335,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -4395,7 +4396,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -4456,7 +4457,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -4517,7 +4518,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -4578,7 +4579,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -4639,7 +4640,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -4700,7 +4701,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -4950,7 +4951,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -5009,7 +5010,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -5070,7 +5071,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -5131,7 +5132,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -5192,7 +5193,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -5253,7 +5254,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -5314,7 +5315,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -5375,7 +5376,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -5625,7 +5626,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -5684,7 +5685,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -5745,7 +5746,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -5805,7 +5806,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -5866,7 +5867,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -5927,7 +5928,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -5988,7 +5989,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -6049,7 +6050,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="1039697085"/>
+																<reference key="NSAttributes" ref="383643063"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -9624,7 +9625,7 @@
 					<reference key="NSSuperview"/>
 					<reference key="NSNextKeyView" ref="47315084"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1280, 778}}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<bool key="NSWindowIsRestorable">YES</bool>
 			</object>
@@ -9639,6 +9640,14 @@
 						<reference key="destination" ref="14481702"/>
 					</object>
 					<int key="connectionID">7</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">delegate</string>
+						<reference key="source" ref="14481702"/>
+						<reference key="destination" ref="1067441431"/>
+					</object>
+					<int key="connectionID">8</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -9663,6 +9672,72 @@
 						<reference key="destination" ref="439690236"/>
 					</object>
 					<int key="connectionID">1039</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">formatter</string>
+						<object class="NSTextFieldCell" key="source" id="253486908">
+							<int key="NSCellFlags">68288064</int>
+							<int key="NSCellFlags2">71435264</int>
+							<real value="0.0" key="NSContents"/>
+							<reference key="NSSupport" ref="26"/>
+							<reference key="NSBackgroundColor" ref="464542227"/>
+							<reference key="NSTextColor" ref="158457908"/>
+						</object>
+						<object class="NSNumberFormatter" key="destination" id="113511585">
+							<object class="NSMutableDictionary" key="NS.attributes">
+								<bool key="EncodedWithXMLCoder">YES</bool>
+								<object class="NSArray" key="dict.sortedKeys">
+									<bool key="EncodedWithXMLCoder">YES</bool>
+									<string>allowsFloats</string>
+									<string>formatterBehavior</string>
+									<string>locale</string>
+									<string>negativeInfinitySymbol</string>
+									<string>nilSymbol</string>
+									<string>numberStyle</string>
+									<string>positiveFormat</string>
+									<string>positiveInfinitySymbol</string>
+								</object>
+								<object class="NSMutableArray" key="dict.values">
+									<bool key="EncodedWithXMLCoder">YES</bool>
+									<boolean value="YES"/>
+									<integer value="1040"/>
+									<reference ref="629644206"/>
+									<string>-∞</string>
+									<string/>
+									<integer value="0"/>
+									<string>#0.000</string>
+									<string>+∞</string>
+								</object>
+							</object>
+							<string key="NS.positiveformat">#0.000</string>
+							<string key="NS.negativeformat">#0.000</string>
+							<nil key="NS.positiveattrs"/>
+							<nil key="NS.negativeattrs"/>
+							<nil key="NS.zero"/>
+							<object class="NSAttributedString" key="NS.nil">
+								<string key="NSString"/>
+							</object>
+							<object class="NSAttributedString" key="NS.nan">
+								<string key="NSString">NaN</string>
+								<reference key="NSAttributes" ref="383643063"/>
+							</object>
+							<reference key="NS.min" ref="713202306"/>
+							<reference key="NS.max" ref="713202306"/>
+							<object class="NSDecimalNumberHandler" key="NS.rounding">
+								<int key="NS.roundingmode">3</int>
+								<bool key="NS.raise.overflow">YES</bool>
+								<bool key="NS.raise.underflow">YES</bool>
+								<bool key="NS.raise.dividebyzero">YES</bool>
+							</object>
+							<string key="NS.decimal">.</string>
+							<string key="NS.thousand">,</string>
+							<bool key="NS.hasthousands">NO</bool>
+							<bool key="NS.localized">NO</bool>
+							<bool key="NS.allowsfloats">YES</bool>
+						</object>
+					</object>
+					<int key="connectionID">1437</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -9695,6 +9770,14 @@
 						<reference key="destination" ref="277863887"/>
 					</object>
 					<int key="connectionID">1789</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">delegate</string>
+						<reference key="source" ref="841566815"/>
+						<reference key="destination" ref="1067441431"/>
+					</object>
+					<int key="connectionID">1790</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
@@ -10527,88 +10610,6 @@
 						<reference key="destination" ref="14892826"/>
 					</object>
 					<int key="connectionID">4033</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">delegate</string>
-						<reference key="source" ref="14481702"/>
-						<reference key="destination" ref="1067441431"/>
-					</object>
-					<int key="connectionID">8</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">formatter</string>
-						<object class="NSTextFieldCell" key="source" id="253486908">
-							<int key="NSCellFlags">68288064</int>
-							<int key="NSCellFlags2">71435264</int>
-							<real value="0.0" key="NSContents"/>
-							<reference key="NSSupport" ref="26"/>
-							<reference key="NSBackgroundColor" ref="464542227"/>
-							<reference key="NSTextColor" ref="158457908"/>
-						</object>
-						<object class="NSNumberFormatter" key="destination" id="113511585">
-							<object class="NSMutableDictionary" key="NS.attributes">
-								<bool key="EncodedWithXMLCoder">YES</bool>
-								<object class="NSArray" key="dict.sortedKeys">
-									<bool key="EncodedWithXMLCoder">YES</bool>
-									<string>allowsFloats</string>
-									<string>formatterBehavior</string>
-									<string>locale</string>
-									<string>negativeInfinitySymbol</string>
-									<string>nilSymbol</string>
-									<string>numberStyle</string>
-									<string>positiveFormat</string>
-									<string>positiveInfinitySymbol</string>
-								</object>
-								<object class="NSMutableArray" key="dict.values">
-									<bool key="EncodedWithXMLCoder">YES</bool>
-									<boolean value="YES"/>
-									<integer value="1040"/>
-									<reference ref="629644206"/>
-									<string>-∞</string>
-									<string/>
-									<integer value="0"/>
-									<string>#0.000</string>
-									<string>+∞</string>
-								</object>
-							</object>
-							<string key="NS.positiveformat">#0.000</string>
-							<string key="NS.negativeformat">#0.000</string>
-							<nil key="NS.positiveattrs"/>
-							<nil key="NS.negativeattrs"/>
-							<nil key="NS.zero"/>
-							<object class="NSAttributedString" key="NS.nil">
-								<string key="NSString"/>
-							</object>
-							<object class="NSAttributedString" key="NS.nan">
-								<string key="NSString">NaN</string>
-								<reference key="NSAttributes" ref="1039697085"/>
-							</object>
-							<reference key="NS.min" ref="713202306"/>
-							<reference key="NS.max" ref="713202306"/>
-							<object class="NSDecimalNumberHandler" key="NS.rounding">
-								<int key="NS.roundingmode">3</int>
-								<bool key="NS.raise.overflow">YES</bool>
-								<bool key="NS.raise.underflow">YES</bool>
-								<bool key="NS.raise.dividebyzero">YES</bool>
-							</object>
-							<string key="NS.decimal">.</string>
-							<string key="NS.thousand">,</string>
-							<bool key="NS.hasthousands">NO</bool>
-							<bool key="NS.localized">NO</bool>
-							<bool key="NS.allowsfloats">YES</bool>
-						</object>
-					</object>
-					<int key="connectionID">1437</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">delegate</string>
-						<reference key="source" ref="841566815"/>
-						<reference key="destination" ref="1067441431"/>
-					</object>
-					<int key="connectionID">1790</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
