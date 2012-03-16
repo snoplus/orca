@@ -82,7 +82,6 @@
 							<int key="NSvFlags">274</int>
 							<string key="NSFrame">{{-7, -10}, {592, 672}}</string>
 							<reference key="NSSuperview" ref="455481810"/>
-							<reference key="NSNextKeyView" ref="589667941"/>
 							<object class="NSMutableArray" key="NSTabViewItems">
 								<bool key="EncodedWithXMLCoder">YES</bool>
 								<object class="NSTabViewItem" id="712006160">
@@ -385,7 +384,7 @@
 																</object>
 																<string key="NSFrameSize">{187, 14}</string>
 																<reference key="NSSuperview" ref="830540017"/>
-																<reference key="NSNextKeyView" ref="1018150027"/>
+																<reference key="NSNextKeyView" ref="158248229"/>
 																<object class="NSTextContainer" key="NSTextContainer" id="797283874">
 																	<object class="NSLayoutManager" key="NSLayoutManager">
 																		<object class="NSTextStorage" key="NSTextStorage">
@@ -406,7 +405,7 @@
 																	<int key="NSTCFlags">1</int>
 																</object>
 																<object class="NSTextViewSharedData" key="NSSharedData">
-																	<int key="NSFlags">67111777</int>
+																	<int key="NSFlags">2913</int>
 																	<int key="NSTextCheckingTypes">0</int>
 																	<nil key="NSMarkedAttributes"/>
 																	<object class="NSColor" key="NSBackgroundColor" id="1012026070">
@@ -527,7 +526,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 												</object>
 												<string key="NSFrame">{{364, 501}, {189, 108}}</string>
 												<reference key="NSSuperview" ref="589667941"/>
-												<reference key="NSNextKeyView" ref="158248229"/>
+												<reference key="NSNextKeyView" ref="830540017"/>
 												<int key="NSsFlags">133650</int>
 												<reference key="NSVScroller" ref="516819701"/>
 												<reference key="NSHScroller" ref="158248229"/>
