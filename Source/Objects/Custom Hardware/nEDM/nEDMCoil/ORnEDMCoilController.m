@@ -75,7 +75,7 @@
 
 	[notifyCenter addObserver : self
 					 selector : @selector(runRateChanged:)
-						 name : ORnEDMCoilPollingStateChanged
+						 name : ORnEDMCoilPollingFrequencyChanged
 					   object : nil];    
     [notifyCenter addObserver : self
 					 selector : @selector(runStatusChanged:)
@@ -86,7 +86,7 @@
 
 - (void) runRateChanged:(NSNotification *)aNote
 {
-    [runRateField setFloatValue:[model pollingState]];
+    [runRateField setFloatValue:[model pollingFrequency]];
 }
 
 - (void) runStatusChanged:(NSNotification *)aNote
@@ -162,7 +162,7 @@
 
 - (void) runRateAction:(id)sender
 {
-    [model setPollingState:[sender floatValue]];
+    [model setPollingFrequency:[sender floatValue]];
 }
 
 //---------------------------------------------------------------

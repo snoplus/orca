@@ -25,15 +25,15 @@
 @interface ORnEDMCoilModel : ORGroup <OROrderedObjHolding> {
     NSMutableDictionary* objMap;
     BOOL isRunning;
-    float pollingState;
+    float pollingFrequency;
 }
 
 - (void) setUpImage;
 - (void) makeMainController;
 - (int) rackNumber;
 - (BOOL) isRunning;
-- (float) pollingState;
-- (void) setPollingState:(float)aState;
+- (float) pollingFrequency;
+- (void) setPollingFrequency:(float)aFrequency;
 - (void) toggleRunState;
 
 #pragma mark •••Notifications
@@ -56,4 +56,4 @@
 @end
 
 extern NSString* ORnEDMCoilPollingActivityChanged;
-extern NSString* ORnEDMCoilPollingStateChanged;
+extern NSString* ORnEDMCoilPollingFrequencyChanged;

@@ -23,7 +23,7 @@
 #import "ORTTCPX400DPModel.h"
 
 NSString* ORnEDMCoilPollingActivityChanged = @"ORnEDMCoilPollingActivityChanged";
-NSString* ORnEDMCoilPollingStateChanged    = @"ORnEDMCoilPollingStateChanged";
+NSString* ORnEDMCoilPollingFrequencyChanged    = @"ORnEDMCoilPollingFrequencyChanged";
 
 @interface ORnEDMCoilModel (private)
 // Private interface
@@ -55,8 +55,8 @@ NSString* ORnEDMCoilPollingStateChanged    = @"ORnEDMCoilPollingStateChanged";
 	}
 	
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_runProcess) object:nil];
-	if(pollingState!=0){
-		[self performSelector:@selector(_runProcess) withObject:nil afterDelay:pollingState];
+	if(pollingFrequency!=0){
+		[self performSelector:@selector(_runProcess) withObject:nil afterDelay:pollingFrequency];
 	} else {
         [self _stopRunning];
     }    
@@ -113,18 +113,18 @@ NSString* ORnEDMCoilPollingStateChanged    = @"ORnEDMCoilPollingStateChanged";
 - (void) _setUpRunning:(BOOL)verbose
 {
 	
-	if(isRunning && pollingState != 0)return;
+	if(isRunning && pollingFrequency != 0)return;
     
-    if(pollingState!=0){  
+    if(pollingFrequency!=0){  
 		isRunning = YES;
-        if(verbose) NSLog(@"Running nEDM Coil compensation every %.0f seconds.\n",1./pollingState);
+        if(verbose) NSLog(@"Running nEDM Coil compensation at a rate of %.2f Hs.\n",pollingFrequency);
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_runProcess) object:nil];
-        [self performSelector:@selector(_runProcess) withObject:self afterDelay:1./pollingState];
+        [self performSelector:@selector(_runProcess) withObject:self afterDelay:1./pollingFrequency];
         [self _runProcess];
     }
     else {
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_runProcess) object:nil];
-        if(verbose) NSLog(@"Not running nEDM Coil compensation\n");
+        if(verbose) NSLog(@"Not running nEDM Coil compensation, polling frequency set to 0\n");
     }
     [[NSNotificationCenter defaultCenter]
 	 postNotificationName:ORnEDMCoilPollingActivityChanged
@@ -170,17 +170,16 @@ NSString* ORnEDMCoilPollingStateChanged    = @"ORnEDMCoilPollingStateChanged";
     return isRunning;
 }
 
-- (float) pollingState
+- (float) pollingFrequency
 {
-    return pollingState;
+    return pollingFrequency;
 }
 
-- (void) setPollingState:(float)aState
+- (void) setPollingFrequency:(float)aFrequency
 {
-    if (pollingState == aState) return;
-    pollingState = aState;
+    pollingFrequency = aFrequency;
     [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORnEDMCoilPollingStateChanged
+	 postNotificationName:ORnEDMCoilPollingFrequencyChanged
 	 object: self];
 }
 
