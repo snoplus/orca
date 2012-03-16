@@ -282,7 +282,24 @@ NSString* ORnEDMCoilPollingFrequencyChanged    = @"ORnEDMCoilPollingFrequencyCha
 	return [anObj numberSlotsUsed];
 }
 
+#pragma mark •••Archival
+- (id)initWithCoder:(NSCoder*)decoder
+{
+    self = [super initWithCoder:decoder];
+    
+    [[self undoManager] disableUndoRegistration];
 
+    [self setPollingFrequency:[decoder decodeFloatForKey:@"kORnEDMCoilPollingFrequency"]];
+    [[self undoManager] enableUndoRegistration];
+    
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder*)encoder
+{
+    [super encodeWithCoder:encoder];
+    [encoder encodeFloat:pollingFrequency forKey:@"kORnEDMCoilPollingFrequency"];
+}
 
 @end
 
