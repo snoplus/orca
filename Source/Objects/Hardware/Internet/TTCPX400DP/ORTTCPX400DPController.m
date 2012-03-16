@@ -57,6 +57,11 @@
 					 selector : @selector(ipChanged:)
 						 name : ORTTCPX400DPIpHasChanged
 						object: nil];  
+
+    [notifyCenter addObserver : self
+					 selector : @selector(serialChanged:)
+						 name : ORTTCPX400DPSerialNumberHasChanged
+						object: nil];      
     
     [notifyCenter addObserver : self
 					 selector : @selector(generalReadbackChanged:)
@@ -117,6 +122,7 @@
     [ super updateWindow ];
     [self lockChanged:nil];
     [self ipChanged:nil];
+    [self serialChanged:nil];    
     [self generalReadbackChanged:nil];
     [self connectionChanged:nil];
     [self readbackChanged:nil]; 
@@ -145,6 +151,11 @@
 - (void) ipChanged:(NSNotification*)aNote
 {   
     [ipAddressBox setStringValue:[model ipAddress]];
+}
+
+- (void) serialChanged:(NSNotification*)aNote
+{   
+    [serialNumberBox setStringValue:[model serialNumber]];
 }
 
 - (void) generalReadbackChanged:(NSNotification *)aNote
@@ -247,6 +258,11 @@
 - (IBAction)connectAction:(id)sender
 {
     [model toggleConnection];
+}
+
+- (IBAction)setSerialNumberAction:(id)sender
+{
+    [model setSerialNumber:[serialNumberBox stringValue]];
 }
 
 - (IBAction)readBackAction:(id)sender

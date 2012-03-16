@@ -118,6 +118,7 @@ ORTTCPX_GEN_DEFINE_VAR(writeTo, CMD, TYPE)
 @interface ORTTCPX400DPModel : OrcaObject<ORTcpIpProtocol> {
 	NetSocket* socket;
 	NSString* ipAddress;
+    NSString* serialNumber;
 	BOOL isConnected;
 	id delegate;
     NSUInteger port;
@@ -185,6 +186,7 @@ ORTTCPX_GEN_DEFINE_VAR(writeTo, CMD, TYPE)
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 
+- (void) setSerialNumber:(NSString*)aSerial;
 - (NSString*) serialNumber;
 
 - (void) writeCommand:(ETTCPX400DPCmds)cmd withInput:(float)input withOutputNumber:(int)output;
@@ -267,6 +269,7 @@ extern NSString* ORTTCPX400DPDataHasArrived;
 extern NSString* ORTTCPX400DPConnectionHasChanged;
 extern NSString* ORTTCPX400DPModelLock;
 extern NSString* ORTTCPX400DPIpHasChanged;
+extern NSString* ORTTCPX400DPSerialNumberHasChanged;
 extern NSString* ORTTCPX400DPGeneralReadbackHasChanged;
 ORTTCPX_NOTIFY_WRITE_DEFINE(SetVoltage)
 ORTTCPX_NOTIFY_WRITE_DEFINE(SetVoltageAndVerify)

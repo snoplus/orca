@@ -20,12 +20,14 @@
 
 #import "ORTTCPX400DPModel.h"
 #import "NetSocket.h"
+#import "ORVXI11HardwareFinder.h"
 
 #define ORTTCPX400DPPort 9221
 
 NSString* ORTTCPX400DPDataHasArrived = @"ORTTCPX400DPDataHasArrived";
 NSString* ORTTCPX400DPConnectionHasChanged = @"ORTTCPX400DPConnectionHasChanged";
 NSString* ORTTCPX400DPIpHasChanged = @"ORTTCPX400DPIpHasChanged";
+NSString* ORTTCPX400DPSerialNumberHasChanged = @"ORTTCPX400DPSerialNumberHasChanged";
 NSString* ORTTCPX400DPModelLock = @"ORTTCPX400DPModelLock";
 NSString* ORTTCPX400DPGeneralReadbackHasChanged = @"ORTTCPX400DPGeneralReadbackHasChanged";
 
@@ -312,6 +314,7 @@ ORTTCPX_READ_IMPLEMENT(GetOutputStatus, int)
 {
     self = [super init];
     [self setIpAddress:@""];
+    [self setSerialNumber:@""];    
     return self;
 }
 
@@ -319,6 +322,7 @@ ORTTCPX_READ_IMPLEMENT(GetOutputStatus, int)
 {
     [socket release];
     [ipAddress release];
+    [serialNumber release];
     [dataQueue release];  
     [generalReadback release];
 	[super dealloc];
@@ -373,6 +377,15 @@ ORTTCPX_READ_IMPLEMENT(GetOutputStatus, int)
 - (void) _connectIP
 {
 	if(!isConnected){
+        NSDictionary* dict = [[ORVXI11HardwareFinder sharedVXI11HardwareFinder] availableHardware];
+        for (NSString* key in dict) {
+            ORVXI11IPDevice* dev = [dict objectForKey:key];
+            if ([[dev serialNumber] isEqualToString:serialNumber]) {
+                [self setIpAddress:[dev ipAddress]];
+                break;
+            }
+            // do stuff
+        }
 		[self setSocket:[NetSocket netsocketConnectedToHost:ipAddress port:ORTTCPX400DPPort]];	
 	}
 }
@@ -690,9 +703,22 @@ ORTTCPX_READ_IMPLEMENT(GetOutputStatus, int)
 	[socket writeString:aCommand encoding:NSASCIIStringEncoding];
 }
 
+- (void) setSerialNumber:(NSString *)aSerial
+{
+    [aSerial retain];
+    [serialNumber release];
+    serialNumber = aSerial;
+    
+    [[NSNotificationCenter defaultCenter] 
+     postNotificationName:ORTTCPX400DPSerialNumberHasChanged
+     object:self];      
+    
+}
+
 - (NSString*) serialNumber
 {
-    return @"";
+    if (serialNumber == nil) return @"";
+    return serialNumber;
 }
 
 #pragma mark ***Archival
@@ -702,6 +728,7 @@ ORTTCPX_READ_IMPLEMENT(GetOutputStatus, int)
 	[[self undoManager] disableUndoRegistration];
 	
 	[self setIpAddress:[decoder decodeObjectForKey:@"ipAddress"]];
+	[self setSerialNumber:[decoder decodeObjectForKey:@"serialNumber"]];    
     [self setPort:[decoder decodeIntForKey:@"portNumber"]];
 
 	[[self undoManager] enableUndoRegistration];
@@ -712,6 +739,7 @@ ORTTCPX_READ_IMPLEMENT(GetOutputStatus, int)
 {
 	[super encodeWithCoder:encoder];
  	[encoder encodeObject:ipAddress	forKey:@"ipAddress"];
+ 	[encoder encodeObject:serialNumber	forKey:@"serialNumber"];    
     [encoder encodeInt:port forKey:@"portNumber"];    
 }
 

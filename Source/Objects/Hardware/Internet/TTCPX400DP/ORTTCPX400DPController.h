@@ -25,6 +25,7 @@
 {
 	IBOutlet NSButton*		lockButton;
     IBOutlet NSTextField*   ipAddressBox;
+    IBOutlet NSTextField*   serialNumberBox;    
     IBOutlet NSPopUpButton* commandPopUp;
     IBOutlet NSPopUpButton* outputNumberPopUp;
     IBOutlet NSTextField*   inputValueText;    
@@ -65,6 +66,7 @@
 #pragma mark ***Interface Management
 - (void) lockChanged:(NSNotification*)aNote;
 - (void) ipChanged:(NSNotification*)aNote;
+- (void) serialChanged:(NSNotification*)aNote;
 - (void) connectionChanged:(NSNotification*)aNote;
 - (void) generalReadbackChanged:(NSNotification*)aNote;
 - (void) readbackChanged:(NSNotification*)aNote;
@@ -75,6 +77,7 @@
 //- (IBAction) passwordFieldAction:(id)sender;
 - (IBAction) lockAction:(id)sender;
 - (IBAction) commandPulldownAction:(id)sender;
+- (IBAction) setSerialNumberAction:(id)sender;
 - (IBAction) connectAction:(id)sender;
 - (IBAction) sendCommandAction:(id)sender;
 - (IBAction) readBackAction:(id)sender;
