@@ -1220,6 +1220,12 @@
                 NSPoint     anOffset = [anObject offset];
                 NSPoint		newPoint  = NSMakePoint(aPoint.x + anOffset.x,aPoint.y + anOffset.y);
                 if([self canAddObject:anObject atPoint:newPoint]){
+                    if([anObject guardian]!=group){
+                        [[anObject retain] autorelease];
+                        [[anObject guardian] removeObject:anObject];
+                        [group addObject:anObject];
+                        [anObject setGuardian:group];
+                    }
                     [self moveObject:anObject to:NSMakePoint(aPoint.x + anOffset.x,aPoint.y + anOffset.y)];
                 }
                 else {					
