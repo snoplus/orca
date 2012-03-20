@@ -156,8 +156,8 @@
 		[model initCrate:YES phase:0];
 	}
 	@catch (NSException* localException) {
-		NSBeginAlertSheet(@"Crate Init Xinlinix Failed",@"OK",nil,nil,[self window],self,nil,nil,nil, @"%@",localException);	
-		NSLog(@"Init Xilinix of Crate (%d) failed.\n",[model crateNumber]);
+		NSBeginAlertSheet(@"Crate Init Xilinx Failed",@"OK",nil,nil,[self window],self,nil,nil,nil, @"%@",localException);	
+		NSLog(@"Init Xilinx of Crate (%d) failed.\n",[model crateNumber]);
 	}
 }
 
@@ -168,9 +168,19 @@
 		[model initCrate:NO phase:0];
 	}
 	@catch (NSException* localException) {
-		NSBeginAlertSheet(@"Crate Init No Xinlinix Failed",@"OK",nil,nil,[self window],self,nil,nil,nil, @"%@",localException);	
-		NSLog(@"Init No Xilinix of Crate (%d) failed.\n",[model crateNumber]);
+		NSBeginAlertSheet(@"Crate Init No Xilinx Failed",@"OK",nil,nil,[self window],self,nil,nil,nil, @"%@",localException);	
+		NSLog(@"Init No Xilinx of Crate (%d) failed.\n",[model crateNumber]);
 	}
+}
+
+- (IBAction) ecalToOrcaAction:(id)sender
+{
+    [model ecalToOrca];
+}
+
+- (IBAction) orcaToHwAction:(id)sender
+{
+    [model orcaToHw];
 }
 
 @end

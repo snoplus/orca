@@ -45,7 +45,7 @@ NSString* XL3_LinkAutoConnectChanged    = @"XL3_LinkAutoConnectChanged";
 @interface XL3_Link (private)
 - (void) allocBufferWithSize:(unsigned) aBufferSize;
 - (void) releaseBuffer;
-- (BOOL) writeBundle:(char*)someBytes length:(unsigned)numBytes;
+- (BOOL) writeBundle:(char*)someBytes length:(unsigned)numBytes version:(unsigned)aRev;
 - (unsigned) bundleBufferSize;
 - (unsigned) bundleReadMark;
 - (unsigned) bundleWriteMark;
@@ -827,7 +827,12 @@ static void SwapLongBlock(void* p, int32_t n)
 
             if (((XL3_Packet*) aPacket)->cmdHeader.packet_type == MEGA_BUNDLE_ID) {
                 //packet_num?
-                [self writeBundle:((XL3_Packet*) aPacket)->payload length:((XL3_Packet*) aPacket)->cmdHeader.num_bundles * 12];
+                if (((XL3_Packet*) aPacket)->cmdHeader.num_bundles != 0) {
+                    [self writeBundle:((XL3_Packet*) aPacket)->payload length:((XL3_Packet*) aPacket)->cmdHeader.num_bundles * 12 version:0];
+                }
+                else {
+                    [self writeBundle:((XL3_Packet*) aPacket)->payload length:XL3_MAXPAYLOADSIZE_BYTES version:1];
+                }
                 bundle_count++;
             }
             else if (((XL3_Packet*) aPacket)->cmdHeader.packet_type == PING_ID) {
@@ -1132,12 +1137,14 @@ static void SwapLongBlock(void* p, int32_t n)
 	return bundleWriteMark;
 }
 
-- (BOOL) writeBundle:(char*)someBytes length:(unsigned)numBytes
+- (BOOL) writeBundle:(char*)someBytes length:(unsigned)numBytes version:(unsigned)aRev
 {
     [bundleBufferLock lock];
     BOOL full = NO;
     if(bundleFreeSpace > 0){
         NSMutableData* theData = [[NSMutableData alloc] initWithLength:numBytes + 8];
+        unsigned rev = aRev << 5;
+        [theData replaceBytesInRange:NSMakeRange(4, 4) withBytes:&rev length:4];
         [theData replaceBytesInRange:NSMakeRange(8, numBytes) withBytes:someBytes length:numBytes];
         *(dataPtr+bundleWriteMark) = (unsigned long)theData;
         bundleWriteMark = (bundleWriteMark+1)%bundleBufferSize;	//move the write mark ahead 

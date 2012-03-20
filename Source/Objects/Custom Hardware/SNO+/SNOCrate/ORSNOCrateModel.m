@@ -392,6 +392,18 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 	NSLog(@"Initialization of the crate %d done.\n", [self crateNumber]);
 }
 
+- (void) ecalToOrca
+{
+	if([self adapterIsXL3])	[[self adapter] ecalToOrca];
+	else NSLog(@"Requires XL3.");    
+}
+
+- (void) orcaToHw
+{
+	if([self adapterIsXL3])	[[self adapter] orcaToHw];
+	else NSLog(@"Requires XL3.");    
+}
+
 //get ready for the XL3 card
 - (void) resetCrate
 {

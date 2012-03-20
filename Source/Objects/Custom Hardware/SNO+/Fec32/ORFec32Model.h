@@ -219,6 +219,7 @@ typedef struct Fec32CmosShiftReg{
 - (id)				xl1;
 - (id)				xl2;
 - (BOOL)			dcPresent:(unsigned short)index;
+- (ORFecDaughterCardModel*) dc:(unsigned short)index;
 - (float)			baseCurrent:(short)index;
 - (void)			setBaseCurrent:(short)idex withValue:(float)aBaseCurrent;
 - (int)				variableDisplay;

@@ -3,12 +3,12 @@
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
 		<string key="IBDocument.SystemVersion">11D50</string>
-		<string key="IBDocument.InterfaceBuilderVersion">1617</string>
+		<string key="IBDocument.InterfaceBuilderVersion">2177</string>
 		<string key="IBDocument.AppKitVersion">1138.32</string>
 		<string key="IBDocument.HIToolboxVersion">568.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">1617</string>
+			<string key="NS.object.0">2177</string>
 		</object>
 		<object class="NSArray" key="IBDocument.IntegratedClassDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -30,11 +30,8 @@
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 		</object>
 		<object class="NSMutableDictionary" key="IBDocument.Metadata">
-			<bool key="EncodedWithXMLCoder">YES</bool>
-			<object class="NSArray" key="dict.sortedKeys" id="0">
-				<bool key="EncodedWithXMLCoder">YES</bool>
-			</object>
-			<reference key="dict.values" ref="0"/>
+			<string key="NS.key.0">PluginDependencyRecalculationVersion</string>
+			<integer value="1" key="NS.object.0"/>
 		</object>
 		<object class="NSMutableArray" key="IBDocument.RootObjects" id="980031841">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -82,7 +79,7 @@
 							<string key="NSFrame">{{10, 146}, {279, 159}}</string>
 							<reference key="NSSuperview" ref="897761821"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="654200406"/>
+							<reference key="NSNextKeyView" ref="260786490"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSImageCell" key="NSCell" id="923178188">
 								<int key="NSCellFlags">130560</int>
@@ -349,7 +346,7 @@
 											<string key="NSFrame">{{52, 7}, {28, 28}}</string>
 											<reference key="NSSuperview" ref="674872960"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="260786490"/>
+											<reference key="NSNextKeyView" ref="560488424"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSButtonCell" key="NSCell" id="905603706">
 												<int key="NSCellFlags">67239424</int>
@@ -484,7 +481,7 @@
 											<string key="NSFrame">{{76, 33}, {115, 28}}</string>
 											<reference key="NSSuperview" ref="313501653"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="257001088"/>
+											<reference key="NSNextKeyView" ref="910320847"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSButtonCell" key="NSCell" id="100162697">
 												<int key="NSCellFlags">67239424</int>
@@ -503,15 +500,15 @@
 										<object class="NSButton" id="257001088">
 											<reference key="NSNextResponder" ref="313501653"/>
 											<int key="NSvFlags">268</int>
-											<string key="NSFrame">{{190, 60}, {107, 28}}</string>
+											<string key="NSFrame">{{193, 60}, {102, 28}}</string>
 											<reference key="NSSuperview" ref="313501653"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="910320847"/>
+											<reference key="NSNextKeyView" ref="1046531073"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSButtonCell" key="NSCell" id="394617023">
 												<int key="NSCellFlags">67239424</int>
 												<int key="NSCellFlags2">134348800</int>
-												<string key="NSContents">Init: No Xlx, DB</string>
+												<string key="NSContents">ECAL to ORCA</string>
 												<reference key="NSSupport" ref="26"/>
 												<reference key="NSControlView" ref="257001088"/>
 												<int key="NSButtonFlags">-2038284033</int>
@@ -528,12 +525,12 @@
 											<string key="NSFrame">{{190, 33}, {107, 28}}</string>
 											<reference key="NSSuperview" ref="313501653"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="1046531073"/>
+											<reference key="NSNextKeyView" ref="257001088"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSButtonCell" key="NSCell" id="53748034">
 												<int key="NSCellFlags">67239424</int>
 												<int key="NSCellFlags2">134348800</int>
-												<string key="NSContents">Init: Xlx, DB</string>
+												<string key="NSContents">ORCA to XL3</string>
 												<reference key="NSSupport" ref="26"/>
 												<reference key="NSControlView" ref="910320847"/>
 												<int key="NSButtonFlags">-2038284033</int>
@@ -649,7 +646,7 @@
 					<string key="NSFrameSize">{316, 390}</string>
 					<reference key="NSSuperview"/>
 					<reference key="NSWindow"/>
-					<reference key="NSNextKeyView" ref="560488424"/>
+					<reference key="NSNextKeyView" ref="654200406"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1280, 778}}</string>
 				<string key="NSMinSize">{213, 129}</string>
@@ -670,14 +667,6 @@
 						<reference key="destination" ref="716638356"/>
 					</object>
 					<int key="connectionID">16</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">delegate</string>
-						<reference key="source" ref="716638356"/>
-						<reference key="destination" ref="309578201"/>
-					</object>
-					<int key="connectionID">24</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -702,22 +691,6 @@
 						<reference key="destination" ref="137623484"/>
 					</object>
 					<int key="connectionID">37</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">formatter</string>
-						<reference key="source" ref="337598896"/>
-						<reference key="destination" ref="808898124"/>
-					</object>
-					<int key="connectionID">75</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">formatter</string>
-						<reference key="source" ref="629164066"/>
-						<reference key="destination" ref="808898124"/>
-					</object>
-					<int key="connectionID">76</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -839,13 +812,55 @@
 					</object>
 					<int key="connectionID">209</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">ecalToOrcaAction:</string>
+						<reference key="source" ref="309578201"/>
+						<reference key="destination" ref="257001088"/>
+					</object>
+					<int key="connectionID">221</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">orcaToHwAction:</string>
+						<reference key="source" ref="309578201"/>
+						<reference key="destination" ref="910320847"/>
+					</object>
+					<int key="connectionID">222</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">delegate</string>
+						<reference key="source" ref="716638356"/>
+						<reference key="destination" ref="309578201"/>
+					</object>
+					<int key="connectionID">24</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">formatter</string>
+						<reference key="source" ref="337598896"/>
+						<reference key="destination" ref="808898124"/>
+					</object>
+					<int key="connectionID">75</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">formatter</string>
+						<reference key="source" ref="629164066"/>
+						<reference key="destination" ref="808898124"/>
+					</object>
+					<int key="connectionID">76</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
 					<bool key="EncodedWithXMLCoder">YES</bool>
 					<object class="IBObjectRecord">
 						<int key="objectID">0</int>
-						<reference key="object" ref="0"/>
+						<object class="NSArray" key="object" id="0">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
 						<reference key="children" ref="980031841"/>
 						<nil key="parent"/>
 					</object>
@@ -1272,7 +1287,7 @@
 					<string>80.IBPluginDependency</string>
 					<string>96.IBPluginDependency</string>
 				</object>
-				<object class="NSMutableArray" key="dict.values">
+				<object class="NSArray" key="dict.values">
 					<bool key="EncodedWithXMLCoder">YES</bool>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -1338,7 +1353,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">220</int>
+			<int key="maxID">222</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -1383,7 +1398,7 @@
 							<string>powerField</string>
 							<string>showLabelsButton</string>
 						</object>
-						<object class="NSMutableArray" key="dict.values">
+						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>ORGroupView</string>
 							<string>ORCrateLabelView</string>
@@ -1402,7 +1417,7 @@
 							<string>powerField</string>
 							<string>showLabelsButton</string>
 						</object>
-						<object class="NSMutableArray" key="dict.values">
+						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<object class="IBToOneOutletInfo">
 								<string key="name">groupView</string>
@@ -1467,12 +1482,16 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>autoInit:</string>
 							<string>decCrateAction:</string>
+							<string>ecalToOrcaAction:</string>
 							<string>incCrateAction:</string>
 							<string>initNoXilinx:</string>
 							<string>initXilinx:</string>
+							<string>orcaToHwAction:</string>
 						</object>
-						<object class="NSMutableArray" key="dict.values">
+						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -1486,11 +1505,13 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>autoInit:</string>
 							<string>decCrateAction:</string>
+							<string>ecalToOrcaAction:</string>
 							<string>incCrateAction:</string>
 							<string>initNoXilinx:</string>
 							<string>initXilinx:</string>
+							<string>orcaToHwAction:</string>
 						</object>
-						<object class="NSMutableArray" key="dict.values">
+						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<object class="IBActionInfo">
 								<string key="name">autoInit:</string>
@@ -1498,6 +1519,10 @@
 							</object>
 							<object class="IBActionInfo">
 								<string key="name">decCrateAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">ecalToOrcaAction:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
@@ -1510,6 +1535,10 @@
 							</object>
 							<object class="IBActionInfo">
 								<string key="name">initXilinx:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">orcaToHwAction:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 						</object>
@@ -1529,7 +1558,7 @@
 							<string>xilinixLoadProgress</string>
 							<string>xilinixStatusField</string>
 						</object>
-						<object class="NSMutableArray" key="dict.values">
+						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>NSButton</string>
 							<string>NSTextField</string>
@@ -1558,7 +1587,7 @@
 							<string>xilinixLoadProgress</string>
 							<string>xilinixStatusField</string>
 						</object>
-						<object class="NSMutableArray" key="dict.values">
+						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<object class="IBToOneOutletInfo">
 								<string key="name">autoInitButton</string>
@@ -1629,7 +1658,7 @@
 							<string>saveDocument:</string>
 							<string>saveDocumentAs:</string>
 						</object>
-						<object class="NSMutableArray" key="dict.values">
+						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>id</string>
 							<string>id</string>
@@ -1650,7 +1679,7 @@
 							<string>saveDocument:</string>
 							<string>saveDocumentAs:</string>
 						</object>
-						<object class="NSMutableArray" key="dict.values">
+						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<object class="IBActionInfo">
 								<string key="name">copy:</string>
@@ -1716,7 +1745,7 @@
 				<string>dec</string>
 				<string>inc</string>
 			</object>
-			<object class="NSMutableArray" key="dict.values">
+			<object class="NSArray" key="dict.values">
 				<bool key="EncodedWithXMLCoder">YES</bool>
 				<string>{159, 128}</string>
 				<string>{18, 18}</string>

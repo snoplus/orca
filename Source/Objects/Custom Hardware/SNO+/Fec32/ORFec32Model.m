@@ -239,6 +239,12 @@ NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageSt
 	else return NO;
 }
 
+- (ORFecDaughterCardModel*) dc:(unsigned short)index
+{
+    if (index<4) return dc[index];
+    else return nil;
+}
+
 - (BOOL) qllEnabled
 {
 	return qllEnabled;

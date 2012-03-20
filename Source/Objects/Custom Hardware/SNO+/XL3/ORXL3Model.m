@@ -25,7 +25,9 @@
 #import "ORSNOCrateModel.h"
 #import "ORSNOConstants.h"
 #import "ORFec32Model.h"
+#import "ORFecDaughterCardModel.h"
 #import "ORDataTypeAssigner.h"
+#import "ORCouchDB.h"
 
 static Xl3RegNamesStruct reg[kXl3NumRegisters] = {
 	{ @"SelectReg",		RESET_REG },
@@ -46,6 +48,8 @@ static Xl3RegNamesStruct reg[kXl3NumRegisters] = {
 
 
 #pragma mark •••Definitions
+
+#define kDebugDbEcalDocGot       @"kMorcaEcalDocGot"
 
 NSString* ORXL3ModelSelectedRegisterChanged =	@"ORXL3ModelSelectedRegisterChanged";
 NSString* ORXL3ModelRepeatCountChanged =		@"ORXL3ModelRepeatCountChanged";
@@ -868,6 +872,12 @@ void SwapLongBlock(void* p, int32_t n)
     }
 }
 
+- (ORCouchDB*) debugDBRef
+{
+	return [ORCouchDB couchHost:@"snotpenn01.snolab.ca" port:5498 username:@"snoplus"
+                            pwd:@"scintillate" database:@"debugdb" delegate:self];    
+}
+
 - (void) synthesizeDefaultsIntoBundle:(mb_t*)aBundle forSLot:(unsigned short)aSlot
 {
 	uint16_t s_mb_id[1] = {0x0000};
@@ -1046,10 +1056,10 @@ void SwapLongBlock(void* p, int32_t n)
         unsigned long data_length = [aBundle length] / 4;
         unsigned long* data = (unsigned long*)[aBundle mutableBytes];
         data[0] = xl3MegaBundleDataId | data_length;
-		data[1] = [self crateNumber]; //packet count, maybe time, and crate ID in a meaningful way
+		data[1] |= [self crateNumber]; //bits 0--4 crateNumber, bits 5-- version set by XL3_Link
 
 		[aDataPacket addLongsToFrameBuffer:data length:data_length];
-		[aBundle release]; aBundle = nil; //this is correct even if the analyzer doesn't agree
+		[aBundle release]; aBundle = nil; //this is correct even if the analyzer doesn't agree, see writeBundle in XL3_Link
 	}
     
     if ([xl3Link readFifoFlag]) {
@@ -1349,19 +1359,20 @@ void SwapLongBlock(void* p, int32_t n)
 		aMbId[2] = 0;
 		
 		// slot mask
+        unsigned int msk = 0;
 		if (anAutoInitFlag == YES) {
-			aMbId[3] = 0xFFFF;
+			msk = 0xFFFF;
 			NSLog(@"AutoInits not yet implemented, XL3 will freeze probably.\n");
 		}
 		else {
-			unsigned int msk = 0;
 			ORFec32Model* aFec;
+            msk = 0;
 			NSArray* fecs = [[self guardian] collectObjectsOfClass:NSClassFromString(@"ORFec32Model")];
 			for (aFec in fecs) {
 				msk |= 1 << [aFec stationNumber];
 			}
-			aMbId[3] = msk;
 		}
+        aMbId[3] = msk;
 
 		// ctc delay
 		aMbId[4] = 0;
@@ -1392,10 +1403,93 @@ void SwapLongBlock(void* p, int32_t n)
         
         NSLog(@"%@ init ok!\n",[[self xl3Link] crateName]);
         [self setTriggerStatus:@"ON"];
+        unsigned short* aId = (unsigned short*) payload.payload + 2; //hard to say what the first int should be
+        for (i=0; i<16*5; i++) {
+            aId[i] = swapShort(aId[i]);
+        }
+
+        
+        NSEnumerator* e = [[[self guardian] objectEnumerator] retain];
+        hware_vals_t* ids;
+        id anObj;
+        while(anObj = [e nextObject]){
+            if ([anObj class] == NSClassFromString(@"ORFec32Model") && (msk & 1 << [anObj stationNumber])) {
+                ids = (hware_vals_t*) aId;
+                ids += [anObj stationNumber];
+                [anObj setBoardID:[NSString stringWithFormat:@"%x", ids->mb_id]];
+                if ([anObj dcPresent:0]) [[anObj dc:0] setBoardID:[NSString stringWithFormat:@"%x", ids->dc_id[0]]];
+                if ([anObj dcPresent:1]) [[anObj dc:1] setBoardID:[NSString stringWithFormat:@"%x", ids->dc_id[1]]];
+                if ([anObj dcPresent:2]) [[anObj dc:2] setBoardID:[NSString stringWithFormat:@"%x", ids->dc_id[2]]];
+                if ([anObj dcPresent:3]) [[anObj dc:3] setBoardID:[NSString stringWithFormat:@"%x", ids->dc_id[3]]];
+                NSLog(@"slot: %2d, FEC: %4x, DB0: %4x, DB1: %4x, DB2: %4x, DB3: %4x\n",
+                      i, ids->mb_id, ids->dc_id[0], ids->dc_id[1], ids->dc_id[2], ids->dc_id[3]);
+            }
+        }
+        [e release]; e=nil;
 	}
 	else {
-		NSLog(@"%@ error loading config, init skipped\n",[[self xl3Link] crateName]);
+		NSLog(@"%@ error loading config, init skipped.\n",[[self xl3Link] crateName]);
 	}
+}
+
+- (void) ecalToOrca
+{
+    NSEnumerator* e = [[[self guardian] objectEnumerator] retain];
+    id anObj;
+    while(anObj = [e nextObject]){
+        if ([anObj class] == NSClassFromString(@"ORFec32Model")) {
+            [[self debugDBRef] getDocumentId:[NSString stringWithFormat:@"_design/penn_daq_views/_view/get_fec_by_generated?descending=True&start_key=[%d,%d,{}]&end_key=[%d,%d,\"\"]&limit=1",[self crateNumber], [anObj stationNumber], [self crateNumber], [anObj stationNumber]] tag:[NSString stringWithFormat:@"%@.%d", kDebugDbEcalDocGot, [self crateNumber], [anObj stationNumber]]];
+        }
+    }
+    [e release]; e=nil;
+}
+
+- (void) couchDBResult:(id)aResult tag:(NSString*)aTag
+{
+	@synchronized(self){
+		if([aResult isKindOfClass:[NSDictionary class]]){
+			NSString* message = [aResult objectForKey:@"Message"];
+			if(message){
+				if([aTag isEqualToString:kDebugDbEcalDocGot]){
+					NSLog(@"CouchDB Message getting a crate doc:");
+				}
+				[aResult prettyPrint:@"CouchDB Message:"];
+			}
+			else {
+				if([aTag rangeOfString:kDebugDbEcalDocGot].location != NSNotFound){
+                    //int key = [[[aResult objectForKey:@"rows"] objectAtIndex:0] objectForKey:@"key"];
+                    if ([[aResult objectForKey:@"rows"] count] && [[[aResult objectForKey:@"rows"] objectAtIndex:0] objectForKey:@"key"]){
+                        //parse ecal doc
+                    }
+                    else {
+                        //no ecal doc found
+                    }
+				}
+				else if([aTag isEqualToString:@"Message"]){
+					[aResult prettyPrint:@"CouchDB Message:"];
+				}
+				else {
+					[aResult prettyPrint:@"CouchDB"];
+				}
+			}
+		}
+		else if([aResult isKindOfClass:[NSArray class]]){
+            /*
+             if([aTag isEqualToString:kListDB]){
+             [aResult prettyPrint:@"CouchDB List:"];
+             else [aResult prettyPrint:@"CouchDB"];
+             */
+            [aResult prettyPrint:@"CouchDB"];
+		}
+		else {
+			NSLog(@"DebugDB %@ %@\n",[xl3Link crateName], aResult);
+		}
+	}
+}
+
+- (void) orcaToHw
+{
+    
 }
 
 #pragma mark •••Basic Ops

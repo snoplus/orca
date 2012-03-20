@@ -55,5 +55,7 @@
 - (IBAction) autoInit:(id)sender;
 - (IBAction) initXilinx:(id)sender;
 - (IBAction) initNoXilinx:(id)sender;
+- (IBAction) ecalToOrcaAction:(id)sender;
+- (IBAction) orcaToHwAction:(id)sender;
 
 @end

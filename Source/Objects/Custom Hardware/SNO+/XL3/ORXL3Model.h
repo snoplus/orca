@@ -49,6 +49,7 @@ enum {
 
 @class XL3_Link;
 @class ORCommandList;
+@class ORCouchDB;
 
 @interface ORXL3Model : ORSNOCard <ORDataTaker>
 {
@@ -210,6 +211,7 @@ enum {
 - (void) synthesizeDefaultsIntoBundle:(mb_t*)aBundle forSLot:(unsigned short)aSlot;
 - (void) byteSwapBundle:(mb_t*)aBundle;
 - (void) synthesizeFECIntoBundle:(mb_t*)aBundle forSLot:(unsigned short)aSlot;
+- (ORCouchDB*) debugDBRef;
 
 #pragma mark •••DataTaker
 - (void) setDataIds:(id)assigner;
@@ -239,6 +241,8 @@ enum {
 - (unsigned long) readXL3Register:(short)aRegister;
 
 - (void) initCrateWithXilinx:(BOOL)aXilinxFlag autoInit:(BOOL)anAutoInitFlag;
+- (void) ecalToOrca;
+- (void) orcaToHw;
 
 #pragma mark •••Basic Ops
 - (void) readBasicOps;

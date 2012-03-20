@@ -61,6 +61,8 @@
 - (BOOL) adapterIsXL3;
 - (void) initCrate:(BOOL) loadTheFEC32XilinxFile phase:(int) phase;
 - (void) initCrateDone;
+- (void) ecalToOrca;
+- (void) orcaToHw;
 - (void) resetCrate;
 - (eFecMonitorState) voltageStatus;
 - (void) setVoltageStatus:(eFecMonitorState)aState;
