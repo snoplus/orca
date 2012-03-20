@@ -31,9 +31,9 @@
 #import "TimedWorker.h"
 #import "ORDataTypeAssigner.h"
 #import "PMC_Link.h"               //this is taken from IpeV4 SLT !!  -tb-
-#import "SLTv4_HW_Definitions.h"
+#import "EdelweissSLTv4_HW_Definitions.h"
 #import "ORPMCReadWriteCommand.h"  //this is taken from IpeV4 SLT !!  -tb-
-#import "SLTv4GeneralOperations.h"
+#import "EdelweissSLTv4GeneralOperations.h"
 
 #import "ORTaskSequence.h"
 #import "ORFileMover.h"
@@ -1755,7 +1755,7 @@ NSLog(@"  arguments: %@ \n" , arguments);
 	NSEnumerator* e = [allFLTs objectEnumerator];
 	id aCard;
 	while(aCard = [e nextObject]){
-		if(![aCard isKindOfClass:NSClassFromString(@"ORIpeFireWireCard")]){
+		if(![aCard isKindOfClass:NSClassFromString(@"ORIpeFireWireCard")]){  //remained from V3 ??? -tb-
 			[aCard autoCalibrate];
 		}
 	}
@@ -1772,7 +1772,7 @@ NSLog(@"  arguments: %@ \n" , arguments);
 
 - (NSString*) cpuName
 {
-	return [NSString stringWithFormat:@"IPE-DAQ-V4 SLT Card (Crate %d)",[self crateNumber]];
+	return [NSString stringWithFormat:@"IPE-DAQ-V4 EDELWEISS SLT Card (Crate %d)",[self crateNumber]];
 }
 
 - (NSString*) sbcLockName
@@ -1782,7 +1782,7 @@ NSLog(@"  arguments: %@ \n" , arguments);
 
 - (NSString*) sbcLocalCodePath
 {
-	return @"Source/Objects/Hardware/IPE/IpeV4 SLT/SLTv4_Readout_Code";
+	return @"Source/Objects/Hardware/IPE/EdelweissSLT/EdelweissSLTv4_Readout_Code";
 }
 
 - (NSString*) codeResourcePath

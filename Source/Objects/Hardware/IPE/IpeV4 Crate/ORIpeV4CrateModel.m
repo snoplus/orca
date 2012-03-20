@@ -168,7 +168,7 @@ NSString* ORIpeV4CrateConnectedChanged = @"ORIpeV4CrateConnectedChanged";
 - (NSString*) nameForSlot:(int)aSlot	{ return [NSString stringWithFormat:@"Station %d",aSlot+1]; }
 - (NSRange) legalSlotsForObj:(id)anObj
 {
-	if( [anObj isKindOfClass:NSClassFromString(@"ORIpeV4SLTModel")]){
+	if( [anObj isKindOfClass:NSClassFromString(@"ORIpeV4SLTModel")] || [anObj isKindOfClass:NSClassFromString(@"OREdelweissSLTModel")] ){
 		return NSMakeRange(10,1);
 	}
 	else {
@@ -178,7 +178,7 @@ NSString* ORIpeV4CrateConnectedChanged = @"ORIpeV4CrateConnectedChanged";
 
 - (BOOL) slot:(int)aSlot excludedFor:(id)anObj 
 { 
-	if(![anObj isKindOfClass:NSClassFromString(@"ORIpeV4SLTModel")] && (aSlot==10)){
+	if( !([anObj isKindOfClass:NSClassFromString(@"ORIpeV4SLTModel")]  || [anObj isKindOfClass:NSClassFromString(@"OREdelweissSLTModel")]  )    && (aSlot==10)){
 		return YES;
 	}
 	else return NO;

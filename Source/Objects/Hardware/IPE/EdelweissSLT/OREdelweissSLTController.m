@@ -78,7 +78,7 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
     cpuManagementSize	= NSMakeSize(475,450);
     cpuTestsSize		= NSMakeSize(555,305);
 	
-	[[self window] setTitle:@"IPE-DAQ-V4 SLT"];	
+	[[self window] setTitle:@"IPE-DAQ-V4 EDELWEISS SLT"];	
 	
     [super awakeFromNib];
     [self updateWindow];
