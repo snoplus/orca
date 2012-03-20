@@ -859,9 +859,9 @@ NSString* ORMks651cLock = @"ORMks651cLock";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeFloat:spanCalibration forKey:@"spanCalibration"];
-    [encoder encodeFloat:specialZero forKey:@"specialZero"];
-    [encoder encodeInt:setPtSelection forKey:@"setPtSelection"];
+    [encoder encodeFloat:spanCalibration	forKey:@"spanCalibration"];
+    [encoder encodeFloat:specialZero		forKey:@"specialZero"];
+    [encoder encodeInt:setPtSelection		forKey:@"setPtSelection"];
     [encoder encodeBool:positionRange		forKey:@"positionRange"];
     [encoder encodeFloat:openSoftstart		forKey:@"openSoftstart"];
     [encoder encodeFloat:closeSoftstart		forKey:@"closeSoftstart"];
