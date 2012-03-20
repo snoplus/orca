@@ -900,7 +900,7 @@ NSString* ORMks651cLock = @"ORMks651cLock";
 {
     if([serialPort isOpen]){ 
 		if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
-		ORMks651cCmd* cmdObj	= [[ORMks651cCmd alloc] init];
+		ORMks651cCmd* cmdObj  = [[[ORMks651cCmd alloc] init] autorelease];
 		cmdObj.cmd = aCmd;
 		cmdObj.waitForResponse = waitForResponse;
 		
