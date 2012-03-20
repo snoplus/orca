@@ -22,12 +22,10 @@
 #import "ORMks651cController.h"
 #import "ORMks651cModel.h"
 #import "ORTimeLinePlot.h"
-#import "ORPlotView.h"
+#import "ORCompositePlotView.h"
 #import "ORTimeAxis.h"
 #import "ORSerialPortList.h"
 #import "ORSerialPort.h"
-#define __CARBONSOUND__ //temp until undated to >10.3
-#import <Carbon/Carbon.h>
 #import "ORTimeRate.h"
 
 @interface ORMks651cController (private)
@@ -53,24 +51,57 @@
 - (void) awakeFromNib
 {
     [self populatePortListPopup];
-    [[plotter0 yScale] setRngLow:0.0 withHigh:1000.];
-	[[plotter0 yScale] setRngLimitsLow:0.0 withHigh:100000 withMinRng:10];
+    [[plotter0 yAxis] setRngLow:-1000. withHigh:1000.];
+	[[plotter0 yAxis] setRngLimitsLow:-100000 withHigh:100000 withMinRng:10];
 	[plotter0 setUseGradient:YES];
 
-    [[plotter0 xScale] setRngLow:0.0 withHigh:10000];
-	[[plotter0 xScale] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
+    [[plotter0 xAxis] setRngLow:0.0 withHigh:10000];
+	[[plotter0 xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
 
 	ORTimeLinePlot* aPlot;
 	aPlot= [[ORTimeLinePlot alloc] initWithTag:0 andDataSource:self];
 	[plotter0 addPlot: aPlot];
-	[(ORTimeAxis*)[plotter0 xScale] setStartTime: [[NSDate date] timeIntervalSince1970]];
+	[aPlot setLineColor:[NSColor redColor]];
+	
+	[(ORTimeAxis*)[plotter0 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 	[aPlot release];
 	
+	NSNumberFormatter *numberFormatter = [[[NSNumberFormatter alloc] init] autorelease];
+	[numberFormatter setFormat:@"#0.0"];	
+
+	setPointTypePU[0] = setPointTypePU0;
+	setPointTypePU[1] = setPointTypePU1;
+	setPointTypePU[2] = setPointTypePU2;
+	setPointTypePU[3] = setPointTypePU3;
+	setPointTypePU[4] = setPointTypePU4;
+	
+	int i;
+	for(i=0;i<5;i++){
+		[[setPointMatrix cellAtRow:i column:0] setTag:i];
+		[[leadValueMatrix cellAtRow:i column:0] setTag:i];
+		[[gainValueMatrix cellAtRow:i column:0] setTag:i];
+		[[softstartRateMatrix cellAtRow:i column:0] setTag:i];
+		[[setPtSelectionMatrix cellAtRow:i column:0] setTag:i];
+
+		[setPointTypePU[i] setTag:i];
+		
+		[[gainValueMatrix cellAtRow:i column:0] setFormatter:numberFormatter];
+		[[leadValueMatrix cellAtRow:i column:0] setFormatter:numberFormatter];
+		[[setPointMatrix  cellAtRow:i column:0] setFormatter:numberFormatter];
+		[[softstartRateMatrix  cellAtRow:i column:0] setFormatter:numberFormatter];
+	}
+	
+	for(i=0;i<2;i++){
+		[[lowThresholdMatrix  cellAtRow:i column:0] setTag:i];
+		[[highThresholdMatrix cellAtRow:i column:0] setTag:i];
+		
+		[[lowThresholdMatrix  cellAtRow:i column:0] setFormatter:numberFormatter];
+		[[highThresholdMatrix cellAtRow:i column:0] setFormatter:numberFormatter];
+	}
 	[super awakeFromNib];
 }
 
 #pragma mark ***Notifications
-
 - (void) registerNotificationObservers
 {
 	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
@@ -87,7 +118,7 @@
 
     [notifyCenter addObserver : self
                      selector : @selector(portNameChanged:)
-                         name : ORMks651cModelPortNameChanged
+                         name : ORMks651cPortNameChanged
                         object: nil];
 
     [notifyCenter addObserver : self
@@ -99,15 +130,10 @@
                      selector : @selector(pressureChanged:)
                          name : ORMks651cPressureChanged
                        object : nil];
-    
+        
     [notifyCenter addObserver : self
                      selector : @selector(setPointChanged:)
                          name : ORMks651cSetPointChanged
-                       object : nil];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(setPointWriteValueChanged:)
-                         name : ORMks651cSetPointWriteValueChanged
                        object : nil];
     
     [notifyCenter addObserver : self
@@ -197,12 +223,12 @@
 
     [notifyCenter addObserver : self
                      selector : @selector(pollTimeChanged:)
-                         name : ORMks651cModelPollTimeChanged
+                         name : ORMks651cPollTimeChanged
                        object : nil];
 
     [notifyCenter addObserver : self
                      selector : @selector(shipPressuresChanged:)
-                         name : ORMks651cModelShipPressuresChanged
+                         name : ORMks651cShipPressuresChanged
 						object: model];
 
     [notifyCenter addObserver : self
@@ -222,12 +248,75 @@
 					   
     [notifyCenter addObserver : self
                      selector : @selector(pressureScaleChanged:)
-                         name : ORMks651cModelPressureScaleChanged
+                         name : ORMks651cPressureScaleChanged
 						object: model];
 
     [notifyCenter addObserver : self
                      selector : @selector(unitsChanged:)
-                         name : ORMks651cModelUnitsChanged
+                         name : ORMks651cUnitsChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(localChanged:)
+                         name : ORMks651cLocalChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(learningChanged:)
+                         name : ORMks651cLearningChanged
+						object: model];
+    [notifyCenter addObserver : self
+                     selector : @selector(analogFSLevelChanged:)
+                         name : ORMks651cAnalogFSLevelChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(analogSetPointChanged:)
+                         name : ORMks651cAnalogSetPointChanged
+						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(unitsChanged:)
+                         name : ORMks651cUnitsChanged
+						object: model];	
+
+    [notifyCenter addObserver : self
+                     selector : @selector(analogSoftstartChanged:)
+                         name : ORMks651cAnalogSoftstartChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(closeSoftstartChanged:)
+                         name : ORMks651cCloseSoftstartChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(openSoftstartChanged:)
+                         name : ORMks651cOpenSoftstartChanged
+						object: model];
+
+	[notifyCenter addObserver : self
+                     selector : @selector(lowThresholdChanged:)
+                         name : ORMks651cLowThresholdChanged
+						object: model];
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(highThresholdChanged:)
+                         name : ORMks651cHighThresholdChanged
+						object: model];
+    [notifyCenter addObserver : self
+                     selector : @selector(setPtSelectionChanged:)
+                         name : ORMks651cModelSetPtSelectionChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(specialZeroChanged:)
+                         name : ORMks651cModelSpecialZeroChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(spanCalibrationChanged:)
+                         name : ORMks651cModelSpanCalibrationChanged
 						object: model];
 
 }
@@ -269,11 +358,81 @@
     [self miscAttributesChanged:nil];
 	[self pressureScaleChanged:nil];
 	[self unitsChanged:nil];
+	[self localChanged:nil];
+	[self learningChanged:nil];
+	[self analogFSLevelChanged:nil];
+	[self analogSetPointChanged:nil];
+	[self unitsChanged:nil];
+	[self analogSoftstartChanged:nil];
+	[self closeSoftstartChanged:nil];
+	[self openSoftstartChanged:nil];
+	[self lowThresholdChanged:nil];
+	[self highThresholdChanged:nil];
+	[self setPtSelectionChanged:nil];
+	[self specialZeroChanged:nil];
+	[self spanCalibrationChanged:nil];
+}
+
+- (void) spanCalibrationChanged:(NSNotification*)aNote
+{
+	[spanCalibrationField setFloatValue: [model spanCalibration]];
+}
+
+- (void) specialZeroChanged:(NSNotification*)aNote
+{
+	[specialZeroField setFloatValue: [model specialZero]];
+}
+
+- (void) setPtSelectionChanged:(NSNotification*)aNote
+{
+	[setPtSelectionMatrix selectCellWithTag:[model setPtSelection]];
+}
+
+- (void) openSoftstartChanged:(NSNotification*)aNote
+{
+	[openSoftstartField setFloatValue: [model openSoftstart]];
+}
+
+- (void) closeSoftstartChanged:(NSNotification*)aNote
+{
+	[closeSoftstartField setFloatValue: [model closeSoftstart]];
+}
+
+- (void) analogSoftstartChanged:(NSNotification*)aNote
+{
+	[analogSoftstartField setFloatValue: [model analogSoftstart]];
+}
+
+- (void) analogSetPointChanged:(NSNotification*)aNote
+{
+	[analogSetPointField setFloatValue: [model analogSetPoint]];
 }
 
 - (void) unitsChanged:(NSNotification*)aNote
 {
-	[unitsTextField setStringValue:[model translateUnits:[(ORMks651cModel*)model units]]];
+	[unitsPU selectItemAtIndex: [model units]];
+	[unitsField setStringValue: [model unitsString]];
+}
+
+- (void) analogFSLevelChanged:(NSNotification*)aNote
+{
+	[analogFSLevelPU selectItemAtIndex: [model analogFSLevel]];
+}
+
+- (void) learningChanged:(NSNotification*)aNote
+{
+	NSString* s=@"?";
+	int learning = [model learning];
+	if(learning==0)		s = @"--";
+	else if(learning==1)s = @"System";
+	else if(learning==2)s = @"Valve";
+	
+	[learningField setStringValue: s];
+}
+
+- (void) localChanged:(NSNotification*)aNote
+{
+	[localField setStringValue: [model local]?@"Remote":@"Local"];
 }
 
 - (void) pressureScaleChanged:(NSNotification*)aNote
@@ -284,14 +443,13 @@
 
 - (void) scaleAction:(NSNotification*)aNotification
 {
-	if(aNotification == nil || [aNotification object] == [plotter0 xScale]){
-		[model setMiscAttributes:[(ORAxis*)[plotter0 xScale]attributes] forKey:@"XAttributes0"];
-	};
+	if(aNotification == nil || [aNotification object] == [plotter0 xAxis]){
+		[model setMiscAttributes:[(ORAxis*)[plotter0 xAxis]attributes] forKey:@"XAttributes0"];
+	}
 	
-	if(aNotification == nil || [aNotification object] == [plotter0 yScale]){
-		[model setMiscAttributes:[(ORAxis*)[plotter0 yScale]attributes] forKey:@"YAttributes0"];
-	};
-
+	if(aNotification == nil || [aNotification object] == [plotter0 yAxis]){
+		[model setMiscAttributes:[(ORAxis*)[plotter0 yAxis]attributes] forKey:@"YAttributes0"];
+	}
 }
 
 - (void) miscAttributesChanged:(NSNotification*)aNote
@@ -303,20 +461,19 @@
 	if(aNote == nil || [key isEqualToString:@"XAttributes0"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"XAttributes0"];
 		if(attrib){
-			[(ORAxis*)[plotter0 xScale] setAttributes:attrib];
+			[(ORAxis*)[plotter0 xAxis] setAttributes:attrib];
 			[plotter0 setNeedsDisplay:YES];
-			[[plotter0 xScale] setNeedsDisplay:YES];
+			[[plotter0 xAxis] setNeedsDisplay:YES];
 		}
 	}
 	if(aNote == nil || [key isEqualToString:@"YAttributes0"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"YAttributes0"];
 		if(attrib){
-			[(ORAxis*)[plotter0 yScale] setAttributes:attrib];
+			[(ORAxis*)[plotter0 yAxis] setAttributes:attrib];
 			[plotter0 setNeedsDisplay:YES];
-			[[plotter0 yScale] setNeedsDisplay:YES];
+			[[plotter0 yAxis] setNeedsDisplay:YES];
 		}
 	}
-
 }
 
 - (void) updateTimePlot:(NSNotification*)aNote
@@ -331,17 +488,33 @@
 	[shipPressuresButton setIntValue: [model shipPressures]];
 }
 
-- (void) setSetPointWriteValueChanged:(NSNotification*)aNote
+- (void) lowThresholdChanged:(NSNotification*)aNote
 {
     int i;
-    for(i=0;i<6;i++){
-	[setSetPointWriteValueButton setIntValue: [model setPointWriteValue:i]];
+    for(i=0;i<2;i++){
+		[[lowThresholdMatrix cellWithTag:i] setFloatValue: [model lowThreshold:i]];
+    }
+}
+
+- (void) highThresholdChanged:(NSNotification*)aNote
+{
+    int i;
+    for(i=0;i<2;i++){
+		[[highThresholdMatrix cellWithTag:i] setFloatValue: [model highThreshold:i]];
+    }
+}
+
+- (void) setPointChanged:(NSNotification*)aNote
+{
+    int i;
+    for(i=0;i<5;i++){
+		[[setPointMatrix cellWithTag:i] setFloatValue: [model setPoint:i]];
     }
 }
 
 - (void) pressureChanged:(NSNotification*)aNote
 {
-	NSString* pressureAsString = [NSString stringWithFormat:@"%.2E",[model pressure]];
+	NSString* pressureAsString = [NSString stringWithFormat:@"%.3E",[model pressure]];
 	[pressureField setStringValue:pressureAsString];
 	unsigned long t = [model timeMeasured];
 	NSCalendarDate* theDate;
@@ -353,286 +526,119 @@
 	else [timeField setObjectValue:@"--"];
 }
 
-- (void) setPointChanged:(NSNotification*)aNote
-{
-    int i;
-    for(i=0;i<6;i++){
-        NSString* setPointAsString = [NSString stringWithFormat:@"%.2E",[model setPoint:i]];
-    
-        [[setPointMatrix cellWithTag:i] setStringValue: setPointAsString];
-    }
-	unsigned long t = [model timeMeasured];
-	NSCalendarDate* theDate;
-	if(t){
-		theDate = [NSCalendarDate dateWithTimeIntervalSince1970:t];
-		[theDate setCalendarFormat:@"%m/%d %H:%M:%S"];
-		[timeField setObjectValue:theDate];
-	}
-	else [timeField setObjectValue:@"--"];
-}
-
-- (void) setPointWriteValueChanged:(NSNotification*)aNote
-{
-    int i;
-    for(i=0;i<6;i++){
-        NSString* setPointWriteValueAsString = [NSString stringWithFormat:@"%.2E",[model setPointWriteValue:i]];
-        
-        [[setPointWriteValueMatrix cellWithTag:i] setStringValue: setPointWriteValueAsString];
-    }
-}
-
 - (void) softstartRateChanged:(NSNotification*)aNote
 {
     int i;
-    for(i=0;i<8;i++){
-        NSString* softstartRateAsString = [NSString stringWithFormat:@"%.2E",[model softstartRate:i]];
-        
-        [[softstartRateMatrix cellWithTag:i] setStringValue: softstartRateAsString];
+    for(i=0;i<5;i++){
+        [[softstartRateMatrix cellWithTag:i] setFloatValue: [model softstartRate:i]];
     }
-	unsigned long t = [model timeMeasured];
-	NSCalendarDate* theDate;
-	if(t){
-		theDate = [NSCalendarDate dateWithTimeIntervalSince1970:t];
-		[theDate setCalendarFormat:@"%m/%d %H:%M:%S"];
-		[timeField setObjectValue:theDate];
-	}
-	else [timeField setObjectValue:@"--"];
 }
 
 - (void) valveTypeChanged:(NSNotification*)aNote
 {
-	NSString* valveTypeAsString = [NSString stringWithFormat:@"%.2E",[model valveType]];
-	[valveTypeField setStringValue:valveTypeAsString];
-	unsigned long t = [model timeMeasured];
-	NSCalendarDate* theDate;
-	if(t){
-		theDate = [NSCalendarDate dateWithTimeIntervalSince1970:t];
-		[theDate setCalendarFormat:@"%m/%d %H:%M:%S"];
-		[timeField setObjectValue:theDate];
-	}
-	else [timeField setObjectValue:@"--"];
+	[valveTypePU selectItemAtIndex:[model valveType]];
 }
 
 - (void) analogRangeChanged:(NSNotification*)aNote
 {
-	NSString* analogRangeAsString = [NSString stringWithFormat:@"%.2E",[model analogRange]];
-	[analogRangeField setStringValue:analogRangeAsString];
-	unsigned long t = [model timeMeasured];
-	NSCalendarDate* theDate;
-	if(t){
-		theDate = [NSCalendarDate dateWithTimeIntervalSince1970:t];
-		[theDate setCalendarFormat:@"%m/%d %H:%M:%S"];
-		[timeField setObjectValue:theDate];
-	}
-	else [timeField setObjectValue:@"--"];
+	[analogRangePU selectItemAtIndex:[model analogRange]];
 }
 
 - (void) setPointTypeChanged:(NSNotification*)aNote
 {
     int i;
-    for(i=0;i<6;i++){
-        NSString* setPointTypeAsString = [NSString stringWithFormat:@"%.2E",[model setPointType:i]];
-        
-        [[setPointTypeMatrix cellWithTag:i] setStringValue: setPointTypeAsString];
+    for(i=0;i<5;i++){
+        [setPointTypePU[i] selectItemAtIndex: [model setPointType:i]];
     }
-	unsigned long t = [model timeMeasured];
-	NSCalendarDate* theDate;
-	if(t){
-		theDate = [NSCalendarDate dateWithTimeIntervalSince1970:t];
-		[theDate setCalendarFormat:@"%m/%d %H:%M:%S"];
-		[timeField setObjectValue:theDate];
-	}
-	else [timeField setObjectValue:@"--"];
 }
 
 - (void) positionRangeChanged:(NSNotification*)aNote
 {
-	NSString* positionRangeAsString = [NSString stringWithFormat:@"%.2E",[model positionRange]];
-	[positionRangeField setStringValue:positionRangeAsString];
-	unsigned long t = [model timeMeasured];
-	NSCalendarDate* theDate;
-	if(t){
-		theDate = [NSCalendarDate dateWithTimeIntervalSince1970:t];
-		[theDate setCalendarFormat:@"%m/%d %H:%M:%S"];
-		[timeField setObjectValue:theDate];
-	}
-	else [timeField setObjectValue:@"--"];
+	[positionRangePU selectItemAtIndex:[model positionRange]];
 }
 
 - (void) controlDirectionChanged:(NSNotification*)aNote
 {
-	NSString* controlDirectionAsString = [NSString stringWithFormat:@"%.2E",[model controlDirection]];
-	[controlDirectionField setStringValue:controlDirectionAsString];
-	unsigned long t = [model timeMeasured];
-	NSCalendarDate* theDate;
-	if(t){
-		theDate = [NSCalendarDate dateWithTimeIntervalSince1970:t];
-		[theDate setCalendarFormat:@"%m/%d %H:%M:%S"];
-		[timeField setObjectValue:theDate];
-	}
-	else [timeField setObjectValue:@"--"];
+	[controlDirectionPU selectItemAtIndex:[model controlDirection]];
 }
 
 - (void) sensorRangeChanged:(NSNotification*)aNote
 {
-	NSString* sensorRangeAsString = [NSString stringWithFormat:@"%.2E",[model sensorRange]];
-	[sensorRangeField setStringValue:sensorRangeAsString];
-	unsigned long t = [model timeMeasured];
-	NSCalendarDate* theDate;
-	if(t){
-		theDate = [NSCalendarDate dateWithTimeIntervalSince1970:t];
-		[theDate setCalendarFormat:@"%m/%d %H:%M:%S"];
-		[timeField setObjectValue:theDate];
-	}
-	else [timeField setObjectValue:@"--"];
+	[sensorRangePU selectItemAtIndex:[model sensorRange]];
 }
 
 - (void) sensorVoltageRangeChanged:(NSNotification*)aNote
 {
-	NSString* sensorVoltageRangeAsString = [NSString stringWithFormat:@"%.2E",[model sensorVoltageRange]];
-	[sensorVoltageRangeField setStringValue:sensorVoltageRangeAsString];
-	unsigned long t = [model timeMeasured];
-	NSCalendarDate* theDate;
-	if(t){
-		theDate = [NSCalendarDate dateWithTimeIntervalSince1970:t];
-		[theDate setCalendarFormat:@"%m/%d %H:%M:%S"];
-		[timeField setObjectValue:theDate];
-	}
-	else [timeField setObjectValue:@"--"];
+	[sensorVoltageRangePU selectItemAtIndex:[model sensorVoltageRange]];
 }
 
 - (void) sensorTypeChanged:(NSNotification*)aNote
 {
-	NSString* sensorTypeAsString = [NSString stringWithFormat:@"%.2E",[model sensorType]];
-	[sensorTypeField setStringValue:sensorTypeAsString];
-	unsigned long t = [model timeMeasured];
-	NSCalendarDate* theDate;
-	if(t){
-		theDate = [NSCalendarDate dateWithTimeIntervalSince1970:t];
-		[theDate setCalendarFormat:@"%m/%d %H:%M:%S"];
-		[timeField setObjectValue:theDate];
-	}
-	else [timeField setObjectValue:@"--"];
+	[sensorTypePU selectItemAtIndex:[model sensorType]];
 }
 
 - (void) systemStatusChanged:(NSNotification*)aNote
 {
-	NSString* systemStatusAsString = [NSString stringWithFormat:@"%.2E",[model systemStatus]];
-	[systemStatusField setStringValue:systemStatusAsString];
-	unsigned long t = [model timeMeasured];
-	NSCalendarDate* theDate;
-	if(t){
-		theDate = [NSCalendarDate dateWithTimeIntervalSince1970:t];
-		[theDate setCalendarFormat:@"%m/%d %H:%M:%S"];
-		[timeField setObjectValue:theDate];
+	int val = [model systemStatus];
+	NSString* s = @"?";
+	switch(val){
+		case 0: s = @"open"; break;
+		case 1: s = @"close"; break;
+		case 2: s = @"stop"; break;
+		case 3: s = @"SetPt A"; break;
+		case 4: s = @"SetPt B"; break;
+		case 5: s = @"SetPt C"; break;
+		case 6: s = @"SetPt D"; break;
+		case 7: s = @"SetPt E"; break;
+		case 8: s = @"Analog SetPt"; break;
 	}
-	else [timeField setObjectValue:@"--"];
+	[systemStatusField setStringValue:s];
 }
 
 - (void) softwareVersionChanged:(NSNotification*)aNote
 {
-	NSString* softwareVersionAsString = [NSString stringWithFormat:@"%.2E",[model softwareVersion]];
-	[softwareVersionField setStringValue:softwareVersionAsString];
-	unsigned long t = [model timeMeasured];
-	NSCalendarDate* theDate;
-	if(t){
-		theDate = [NSCalendarDate dateWithTimeIntervalSince1970:t];
-		[theDate setCalendarFormat:@"%m/%d %H:%M:%S"];
-		[timeField setObjectValue:theDate];
-	}
-	else [timeField setObjectValue:@"--"];
+	[softwareVersionField setFloatValue:[model softwareVersion]];
 }
 
 - (void) batteryStatusChanged:(NSNotification*)aNote
 {
-	NSString* batteryStatusAsString = [NSString stringWithFormat:@"%.2E",[model batteryStatus]];
-	[batteryStatusField setStringValue:batteryStatusAsString];
-	unsigned long t = [model timeMeasured];
-	NSCalendarDate* theDate;
-	if(t){
-		theDate = [NSCalendarDate dateWithTimeIntervalSince1970:t];
-		[theDate setCalendarFormat:@"%m/%d %H:%M:%S"];
-		[timeField setObjectValue:theDate];
-	}
-	else [timeField setObjectValue:@"--"];
+	int state = [model batteryStatus];
+	NSString* s = @"?";
+	if(state == 0)		s = @"BAD";
+	else if(state == 1)	s = @"GOOD";
+	else if(state == 2)	s = @"N/A";
+	[batteryStatusField setStringValue:s];
 }
 
 - (void) valveResponseChanged:(NSNotification*)aNote
 {
-	NSString* valveResponseAsString = [NSString stringWithFormat:@"%.2E",[model valveResponse]];
-	[valveResponseField setStringValue:valveResponseAsString];
-	unsigned long t = [model timeMeasured];
-	NSCalendarDate* theDate;
-	if(t){
-		theDate = [NSCalendarDate dateWithTimeIntervalSince1970:t];
-		[theDate setCalendarFormat:@"%m/%d %H:%M:%S"];
-		[timeField setObjectValue:theDate];
-	}
-	else [timeField setObjectValue:@"--"];
+	[valveResponsePU selectItemAtIndex:[model valveResponse]];
 }
 
 - (void) leadValueChanged:(NSNotification*)aNote
 {
     int i;
-    for(i=0;i<5;i++){
-        NSString* leadValueAsString = [NSString stringWithFormat:@"%.2E",[model leadValue:i]];
-        
-        [[leadValueMatrix cellWithTag:i] setStringValue: leadValueAsString];
+    for(i=0;i<5;i++){        
+        [[leadValueMatrix cellWithTag:i] setFloatValue: [model leadValue:i]];
     }
-	unsigned long t = [model timeMeasured];
-	NSCalendarDate* theDate;
-	if(t){
-		theDate = [NSCalendarDate dateWithTimeIntervalSince1970:t];
-		[theDate setCalendarFormat:@"%m/%d %H:%M:%S"];
-		[timeField setObjectValue:theDate];
-	}
-	else [timeField setObjectValue:@"--"];
 }
 
 - (void) gainValueChanged:(NSNotification*)aNote
 {
     int i;
     for(i=0;i<5;i++){
-        NSString* gainValueAsString = [NSString stringWithFormat:@"%.2E",[model gainValue:i]];
-        
-        [[gainValueMatrix cellWithTag:i] setStringValue: gainValueAsString];
+        [[gainValueMatrix cellWithTag:i] setFloatValue: [model gainValue:i]];
     }
-	unsigned long t = [model timeMeasured];
-	NSCalendarDate* theDate;
-	if(t){
-		theDate = [NSCalendarDate dateWithTimeIntervalSince1970:t];
-		[theDate setCalendarFormat:@"%m/%d %H:%M:%S"];
-		[timeField setObjectValue:theDate];
-	}
-	else [timeField setObjectValue:@"--"];
 }
 
 - (void) controlTypeChanged:(NSNotification*)aNote
 {
-	NSString* controlTypeAsString = [NSString stringWithFormat:@"%.2E",[model controlType]];
-	[controlTypeField setStringValue:controlTypeAsString];
-	unsigned long t = [model timeMeasured];
-	NSCalendarDate* theDate;
-	if(t){
-		theDate = [NSCalendarDate dateWithTimeIntervalSince1970:t];
-		[theDate setCalendarFormat:@"%m/%d %H:%M:%S"];
-		[timeField setObjectValue:theDate];
-	}
-	else [timeField setObjectValue:@"--"];
+	[controlTypePU selectItemAtIndex:[model controlType]];
 }
 
 - (void) checksumChanged:(NSNotification*)aNote
 {
-	NSString* checksumAsString = [NSString stringWithFormat:@"%.2E",[model checksum]];
-	[checksumField setStringValue:checksumAsString];
-	unsigned long t = [model timeMeasured];
-	NSCalendarDate* theDate;
-	if(t){
-		theDate = [NSCalendarDate dateWithTimeIntervalSince1970:t];
-		[theDate setCalendarFormat:@"%m/%d %H:%M:%S"];
-		[timeField setObjectValue:theDate];
-	}
-	else [timeField setObjectValue:@"--"];
+	[checksumField setStringValue:[model checksum]==1?@"CheckSum Error":@""];
 }
 
 - (void) checkGlobalSecurity
@@ -655,8 +661,44 @@
     [openPortButton setEnabled:!locked];
     [pollTimePopup setEnabled:!locked];
     [shipPressuresButton setEnabled:!locked];
-    [setSetPointWriteValueButton setEnabled:!locked];
-    
+ 
+	[spanCalibrationField setEnabled:!locked];
+	[specialZeroField setEnabled:!locked];
+	[setPtSelectionMatrix setEnabled:!locked];
+	[openSoftstartField setEnabled:!locked];
+	[closeSoftstartField setEnabled:!locked];
+	[analogSoftstartField setEnabled:!locked];
+	[analogSetPointField setEnabled:!locked];
+	[analogFSLevelPU setEnabled:!locked];
+    [analogRangePU setEnabled:!locked];
+    [unitsPU setEnabled:!locked];
+    [initHardwareButton setEnabled:!locked];
+    [readPressuresButton setEnabled:!locked];
+    [softstartRateMatrix setEnabled:!locked];
+    [valveTypePU setEnabled:!locked];
+    [positionRangePU setEnabled:!locked];
+    [controlDirectionPU setEnabled:!locked];
+    [sensorRangePU setEnabled:!locked];
+    [sensorVoltageRangePU setEnabled:!locked];
+    [sensorTypePU setEnabled:!locked];
+    [systemStatusField setEnabled:!locked];
+    [valveResponsePU setEnabled:!locked];
+    [controlTypePU setEnabled:!locked];
+    [openValveButton setEnabled:!locked];
+    [closeValveButton setEnabled:!locked];
+    [holdValveButton setEnabled:!locked];
+	
+    [setPointMatrix setEnabled:!locked];
+    [leadValueMatrix setEnabled:!locked];
+    [gainValueMatrix setEnabled:!locked];
+	[lowThresholdMatrix setEnabled:!locked];
+	[highThresholdMatrix setEnabled:!locked];
+
+	int i;
+	for(i=0;i<5;i++){
+		[setPointTypePU[5] setEnabled:!locked];
+	}
+	
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
         if(runInProgress && ![gSecurity isLocked:ORMks651cLock])s = @"Not in Maintenance Run.";
@@ -713,15 +755,83 @@
     [self portStateChanged:nil];
 }
 
-
 #pragma mark ***Actions
+- (IBAction) loadDialogFromHW:(id)sender
+{
+    [self endEditing];
+	NSBeginAlertSheet(@"Transfer HW Settings To Dialog",
+					  @"YES/Do it",
+					  @"Canel",
+					  nil,[self window],
+					  self,
+					  @selector(loadDialogDidFinish:returnCode:contextInfo:),
+					  nil,
+					  nil,
+					  @"This will read the values that are in the hardware unit and put those values into the dialog.\n\nReally do this?");
+}
 
-- (void) pressureScaleAction:(id)sender
+- (void) loadDialogDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+	if(returnCode == NSAlertDefaultReturn){
+		[model readAndLoad];
+    }
+}
+
+- (void) spanCalibrationAction:(id)sender
+{
+	[self endEditing];
+	[model setSpanCalibration:[sender floatValue]];	
+}
+
+- (void) specialZeroAction:(id)sender
+{
+	[self endEditing];
+	[model setSpecialZero:[sender floatValue]];	
+}
+
+- (void) setPtSelectionAction:(id)sender
+{
+	[self endEditing];
+	[model setSetPtSelection:[[sender selectedCell ]tag]];	
+}
+
+- (void) openSoftstartAction:(id)sender
+{
+	[self endEditing];
+	[model setOpenSoftstart:[sender floatValue]];	
+}
+
+- (void) closeSoftstartAction:(id)sender
+{
+	[self endEditing];
+	[model setCloseSoftstart:[sender floatValue]];	
+}
+
+- (void) analogSoftstartAction:(id)sender
+{
+	[model setAnalogSoftstart:[sender floatValue]];	
+}
+
+- (void) analogFSLevelAction:(id)sender
+{
+	[model setAnalogFSLevel:[sender indexOfSelectedItem]];	
+}
+
+- (IBAction) pollNowAction:(id)sender
+{
+	[model pollHardware];	
+}
+- (IBAction) unitsAction:(id)sender
+{
+	[model setUnits:[sender indexOfSelectedItem]];	
+}
+
+- (IBAction) pressureScaleAction:(id)sender
 {
 	[model setPressureScale:[sender indexOfSelectedItem]];	
 }
 
-- (void) shipPressuresAction:(id)sender
+- (IBAction) shipPressuresAction:(id)sender
 {
 	[model setShipPressures:[sender intValue]];	
 }
@@ -746,84 +856,50 @@
 	[model readPressures];
 }
 
-- (IBAction) readSetPointAction:(id)sender
+- (IBAction) readHardware:(id)sender
 {
-	[model readSetPoints];
+	NSLog(@"MKS651(%d) Reading back all values. Any mismatches will follow.\n",[model uniqueIdNumber]);
+	[model readAndCompare];
 }
 
-- (IBAction) readSoftstartRateAction:(id)sender
+- (IBAction) valveTypeAction:(id)sender
 {
-	[model readSoftstartRates];
+	[model setValveType:[sender indexOfSelectedItem]];
 }
 
-- (IBAction) readValveTypeAction:(id)sender
+- (IBAction) analogRangeAction:(id)sender
 {
-	[model readValveType];
+	[model setAnalogRange:[sender indexOfSelectedItem]];
 }
 
-- (IBAction) readAnalogRangeAction:(id)sender
+- (IBAction) positionRangeAction:(id)sender
 {
-	[model readAnalogRange];
+	[model setPositionRange:[sender indexOfSelectedItem]];
 }
 
-- (IBAction) readSetPointTypeAction:(id)sender
+- (IBAction) controlDirectionAction:(id)sender
 {
-	[model readSetPointTypes];
+	[model setControlDirection:[sender indexOfSelectedItem]];
 }
 
-- (IBAction) readPositionRangeAction:(id)sender
+- (IBAction) sensorRangeAction:(id)sender;
 {
-	[model readPositionRange];
+	[model setSensorRange: [sender indexOfSelectedItem]];
 }
 
-- (IBAction) readControlDirectionAction:(id)sender
+- (IBAction) sensorVoltageRangeAction:(id)sender
 {
-	[model readControlDirection];
+	[model setSensorVoltageRange:[sender indexOfSelectedItem]];
 }
 
-- (IBAction) readSensorRangeAction:(id)sender
+- (IBAction) sensorTypeAction:(id)sender
 {
-	[model readSensorRange];
+	[model setSensorType:[sender indexOfSelectedItem]];
 }
 
-- (IBAction) readSensorVoltageRangeAction:(id)sender
+- (IBAction) valveResponseAction:(id)sender
 {
-	[model readSensorVoltageRange];
-}
-
-- (IBAction) readSensorTypeAction:(id)sender
-{
-	[model readSensorType];
-}
-
-- (IBAction) readSystemStatusAction:(id)sender
-{
-	[model readSystemStatus];
-}
-
-- (IBAction) readSoftwareVersionAction:(id)sender
-{
-	[model readSoftwareVersion];
-}
-
-- (IBAction) readBatteryStatusAction:(id)sender
-{
-	[model readBatteryStatus];
-}
-
-- (IBAction) readValveResponseAction:(id)sender
-{
-	[model readValveResponse];
-}
-
-- (IBAction) readLeadValueAction:(id)sender
-{
-	[model readLeadValue];
-}
-
-- (IBAction) readGainValueAction:(id)sender
-{
-	[model readGainValue];
+	[model setValveResponse:[sender intValue]];
 }
 
 - (IBAction) readChecksumAction:(id)sender
@@ -831,31 +907,127 @@
 	[model readChecksum];
 }
 
-- (IBAction) readControlTypeAction:(id)sender
+- (IBAction) controlTypeAction:(id)sender
 {
-	[model readControlType];
+	[model setControlType:[sender indexOfSelectedItem]];
 }
 
 - (IBAction) pollTimeAction:(id)sender
 {
 	[model setPollTime:[[sender selectedItem] tag]];
 }
-/*
-- (IBAction) setSetPointWriteValueAction:(id)sender
+
+- (IBAction) setPointTypeAction:(id)sender
 {
-	//int i=3;
-	//int	theValue = [[setPointWriteValueMatrix cellWithTag:i] intValue];
-	NSLog(@"theValue is: %f\n");//,theValue);
-	//[model writeSetPointToHardware:i withValue:theValue];
+	int theValue = [[sender selectedCell] intValue];
+	[model setSetPointType:[sender tag] withValue:theValue];
 }
-*/
-- (IBAction) setPointWriteValueMatrixAction:(id)sender
+
+- (IBAction) setPointAction:(id)sender;
 {
-	//int i=3;
-	//int theValue = [[setPointWriteValueMatrix cellWithTag:i] intValue];
-	NSLog(@"theValue is: \n");//,theValue);
-	//[model writeSetPointToHardware:i withValue:theValue];
-	
+	int index = [[sender selectedCell] tag];
+	float theValue = [[sender selectedCell] floatValue];
+	[model setSetPoint:index withValue:theValue];
+}
+
+- (IBAction) softstartRateAction:(id)sender
+{
+	int index = [[sender selectedCell] tag];
+	float theValue = [[sender selectedCell] floatValue];
+	[model setSoftstartRate:index withValue:theValue];
+}
+
+- (IBAction) lowThresholdAction:(id)sender
+{
+	[self endEditing];
+	int index = [[sender selectedCell] tag];
+	float theValue = [[sender selectedCell] floatValue];
+	[model setLowThreshold:index withValue:theValue];
+}
+
+- (IBAction) highThresholdAction:(id)sender
+{
+	[self endEditing];
+	int index = [[sender selectedCell] tag];
+	float theValue = [[sender selectedCell] floatValue];
+	[model setHighThreshold:index withValue:theValue];
+}
+
+- (IBAction) gainValueAction:(id)sender;
+{
+	[self endEditing];
+	int index = [[sender selectedCell] tag];
+	float theValue = [[sender selectedCell] floatValue];
+	[model setGainValue:index withValue:theValue];
+}
+
+- (IBAction) leadValueAction:(id)sender;
+{
+	[self endEditing];
+	int index = [[sender selectedCell] tag];
+	float theValue = [[sender selectedCell] floatValue];
+	[model setLeadValue:index withValue:theValue];
+}
+
+- (IBAction) openValveAction:(id)sender
+{
+	[model writeOpenValve];
+}
+
+- (IBAction) closeValveAction:(id)sender
+{
+	[model writeCloseValve];
+}
+
+- (IBAction) holdValveAction:(id)sender
+{
+	[model writeHoldValve];
+}
+
+- (IBAction) initHardwareAction:(id)sender;
+{
+	NSLog(@"MKS651 (%d) Loading and reading back all values. Any mismatches will be listed.\n",[model uniqueIdNumber]);
+	[model initHardware];
+}
+
+- (IBAction) writeZeroSensorAction:(id)sender
+{
+	[model writeZeroSensor];
+}
+
+- (IBAction) writeSpecialZeroAction:(id)sender
+{
+	[model writeSpecialZero];
+}
+
+- (IBAction) writeRemoveZeroCorrectionAction:(id)sender
+{
+	[model writeRemoveZeroCorrection];
+}
+
+- (IBAction) writeLearnAnalogZeroAction:(id)sender
+{
+	[model writeLearnAnalogZero];
+}
+
+- (IBAction) writeCalibrateSpanAction:(id)sender
+{
+	[model writeCalibrateSpan];
+}
+
+- (IBAction) writeLearnFullScaleAction:(id)sender
+{
+	[model writeLearnFullScale];
+}
+
+- (IBAction) writeLearnSystemAction:(id)sender
+{
+	[model writeLearnSystem];
+}
+
+- (IBAction) writeStopLearnAction:(id)sender
+{
+	[model writeStopLearn];
 }
 
 #pragma mark ***Data Source

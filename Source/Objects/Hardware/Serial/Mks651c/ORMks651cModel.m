@@ -29,33 +29,44 @@
 #import "ORTimeRate.h"
 
 #pragma mark •••External Strings
-NSString* ORMks651cModelUnitsChanged				= @"ORMks651cModelUnitsChanged";
-NSString* ORMks651cModelPressureScaleChanged		= @"ORMks651cModelPressureScaleChanged";
-NSString* ORMks651cModelShipPressuresChanged		= @"ORMks651cModelShipPressuresChanged";
-NSString* ORMks651cModelPollTimeChanged				= @"ORMks651cModelPollTimeChanged";
-NSString* ORMks651cModelSerialPortChanged			= @"ORMks651cModelSerialPortChanged";
-NSString* ORMks651cModelPortNameChanged				= @"ORMks651cModelPortNameChanged";
-NSString* ORMks651cModelPortStateChanged			= @"ORMks651cModelPortStateChanged";
-NSString* ORMks651cPressureChanged					= @"ORMks651cPressureChanged";
-NSString* ORMks651cSetPointChanged                  = @"ORMks651cSetPointChanged";
-NSString* ORMks651cSetPointWriteValueChanged        = @"ORMks651cSetPointWriteValueChanged";
-NSString* ORMks651cSoftstartRateChanged             = @"ORMks651cSoftstartRateChanged";
-NSString* ORMks651cValveTypeChanged                 = @"ORMks651cValveTypeChanged";
-NSString* ORMks651cAnalogRangeChanged               = @"ORMks651cAnalogRangeChanged";
-NSString* ORMks651cSetPointTypeChanged              = @"ORMks651cSetPointTypeChanged";
-NSString* ORMks651cPositionRangeChanged             = @"ORMks651cPositionRangeChanged";
-NSString* ORMks651cControlDirectionChanged          = @"ORMks651cControlDirectionChanged";
-NSString* ORMks651cSensorRangeChanged               = @"ORMks651cSensorRangeChanged";
-NSString* ORMks651cSensorVoltageRangeChanged        = @"ORMks651cSensorVoltageRangeChanged";
-NSString* ORMks651cSensorTypeChanged                = @"ORMks651cSensorTypeChanged";
-NSString* ORMks651cSystemStatusChanged              = @"ORMks651cSystemStatusChanged";
-NSString* ORMks651cSoftwareVersionChanged           = @"ORMks651cSoftwareVersionChanged";
-NSString* ORMks651cBatteryStatusChanged             = @"ORMks651cBatteryStatusChanged";
-NSString* ORMks651cValveResponseChanged             = @"ORMks651cValveResponseChanged";
-NSString* ORMks651cLeadValueChanged                 = @"ORMks651cLeadValueChanged";
-NSString* ORMks651cGainValueChanged                 = @"ORMks651cGainValueChanged";
-NSString* ORMks651cControlTypeChanged				= @"ORMks651cControlTypeChanged";
-NSString* ORMks651cChecksumChanged                  = @"ORMks651cChecksumChanged";
+NSString* ORMks651cModelSpanCalibrationChanged = @"ORMks651cModelSpanCalibrationChanged";
+NSString* ORMks651cModelSpecialZeroChanged = @"ORMks651cModelSpecialZeroChanged";
+NSString* ORMks651cModelSetPtSelectionChanged = @"ORMks651cModelSetPtSelectionChanged";
+NSString* ORMks651cLowThresholdChanged		= @"ORMks651cLowThresholdChanged";
+NSString* ORMks651cHighThresholdChanged		= @"ORMks651cHighThresholdChanged";
+NSString* ORMks651cOpenSoftstartChanged		= @"ORMks651cOpenSoftstartChanged";
+NSString* ORMks651cCloseSoftstartChanged	= @"ORMks651cCloseSoftstartChanged";
+NSString* ORMks651cAnalogSoftstartChanged	= @"ORMks651cAnalogSoftstartChanged";
+NSString* ORMks651cAnalogSetPointChanged	= @"ORMks651cAnalogSetPointChanged";
+NSString* ORMks651cAnalogFSLevelChanged		= @"ORMks651cAnalogFSLevelChanged";
+NSString* ORMks651cLearningChanged			= @"ORMks651cLearningChanged";
+NSString* ORMks651cLocalChanged				= @"ORMks651cLocalChanged";
+NSString* ORMks651cUnitsChanged				= @"ORMks651cUnitsChanged";
+NSString* ORMks651cPressureScaleChanged		= @"ORMks651cPressureScaleChanged";
+NSString* ORMks651cShipPressuresChanged		= @"ORMks651cShipPressuresChanged";
+NSString* ORMks651cPollTimeChanged			= @"ORMks651cPollTimeChanged";
+NSString* ORMks651cSerialPortChanged		= @"ORMks651cSerialPortChanged";
+NSString* ORMks651cPortNameChanged			= @"ORMks651cPortNameChanged";
+NSString* ORMks651cPortStateChanged			= @"ORMks651cPortStateChanged";
+NSString* ORMks651cPressureChanged			= @"ORMks651cPressureChanged";
+NSString* ORMks651cSetPointChanged          = @"ORMks651cSetPointChanged";
+NSString* ORMks651cSoftstartRateChanged     = @"ORMks651cSoftstartRateChanged";
+NSString* ORMks651cValveTypeChanged         = @"ORMks651cValveTypeChanged";
+NSString* ORMks651cAnalogRangeChanged       = @"ORMks651cAnalogRangeChanged";
+NSString* ORMks651cSetPointTypeChanged      = @"ORMks651cSetPointTypeChanged";
+NSString* ORMks651cPositionRangeChanged     = @"ORMks651cPositionRangeChanged";
+NSString* ORMks651cControlDirectionChanged  = @"ORMks651cControlDirectionChanged";
+NSString* ORMks651cSensorRangeChanged       = @"ORMks651cSensorRangeChanged";
+NSString* ORMks651cSensorVoltageRangeChanged= @"ORMks651cSensorVoltageRangeChanged";
+NSString* ORMks651cSensorTypeChanged        = @"ORMks651cSensorTypeChanged";
+NSString* ORMks651cSystemStatusChanged      = @"ORMks651cSystemStatusChanged";
+NSString* ORMks651cSoftwareVersionChanged   = @"ORMks651cSoftwareVersionChanged";
+NSString* ORMks651cBatteryStatusChanged     = @"ORMks651cBatteryStatusChanged";
+NSString* ORMks651cValveResponseChanged     = @"ORMks651cValveResponseChanged";
+NSString* ORMks651cLeadValueChanged         = @"ORMks651cLeadValueChanged";
+NSString* ORMks651cGainValueChanged         = @"ORMks651cGainValueChanged";
+NSString* ORMks651cControlTypeChanged		= @"ORMks651cControlTypeChanged";
+NSString* ORMks651cChecksumChanged          = @"ORMks651cChecksumChanged";
 
 NSString* ORMks651cLock = @"ORMks651cLock";
 
@@ -65,8 +76,32 @@ NSString* ORMks651cLock = @"ORMks651cLock";
 - (void) timeout;
 - (void) processOneCommandFromQueue;
 - (void) process_response:(NSString*)theResponse;
-- (void) writeSetPointToHardware:(int)index withValue:(float)aValue;
-- (void) pollHardware;
+- (BOOL) decodeValveResponseToPowerFail:(NSString*)theResponse;
+- (BOOL) decodeControlType:(NSString*)theResponse;
+- (BOOL) decodeGainValue:(NSString*)theResponse;
+- (BOOL) decodeLeadValue:(NSString*)theResponse;
+- (BOOL) decodeSetPoint:(NSString*)theResponse;
+- (BOOL) decodeSystemPressure:(NSString*)theResponse;
+- (BOOL) decodeAlternateSystemStatus:(NSString*)theResponse;
+- (BOOL) decodeThresholdLimits:(NSString*)theResponse;
+- (BOOL) decodeSoftStartRate:(NSString*)theResponse;
+- (BOOL) decodeValveType:(NSString*)theResponse;
+- (BOOL) decodeSetPointType:(NSString*)theResponse;
+- (BOOL) decodePositionIndicatorRange:(NSString*)theResponse;
+- (BOOL) decodeDirectReverse:(NSString*)theResponse;
+- (BOOL) decodeSensorRange:(NSString*)theResponse;
+- (BOOL) decodePressureUnits:(NSString*)theResponse;
+- (BOOL) decodeSensorVoltageRange:(NSString*)theResponse;
+- (BOOL) decodeSensorType:(NSString*)theResponse;
+- (BOOL) decodeSystemStatus:(NSString*)theResponse;
+- (BOOL) decodeSoftwareVersion:(NSString*)theResponse;
+- (BOOL) decodeBatteryStatus:(NSString*)theResponse;
+- (BOOL) decodeAnalogSetPoint:(NSString*)theResponse;
+- (BOOL) decodeAnalogRange:(NSString*)theResponse;
+- (BOOL) decodeAnalogSoftStart:(NSString*)theResponse;
+- (BOOL) decodeOpenSoftStart:(NSString*)theResponse;
+- (BOOL) decodeCloseSoftStart:(NSString*)theResponse;
+- (float) limitFloatValue:(float)aValue min:(float)aMin max:(float)aMax;
 @end
 
 @implementation ORMks651cModel
@@ -172,6 +207,7 @@ NSString* ORMks651cLock = @"ORMks651cLock";
 			float asFloat;
 			unsigned long asLong;
 		}theData;
+		
 		int index = 2;
 			theData.asFloat = pressure;
 			data[index] = theData.asLong;
@@ -186,17 +222,139 @@ NSString* ORMks651cLock = @"ORMks651cLock";
 
 
 #pragma mark •••Accessors
-- (NSString*) translateUnits:(int)rawUnitNumber
+
+- (float) spanCalibration
 {
-    switch(rawUnitNumber){
-        case 0: return @"Torr";
-        case 1: return @"mTorr";
-        case 2: return @"mBar";
-        case 3: return @"uBar";
-        case 4: return @"kPa";
-        case 5: return @"Pa";
-        case 6: return @"cmH2O";
-        case 7: return @"inH2O";    
+    return spanCalibration;
+}
+
+- (void) setSpanCalibration:(float)aSpanCalibration
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSpanCalibration:spanCalibration];
+    
+    spanCalibration = aSpanCalibration;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cModelSpanCalibrationChanged object:self];
+}
+
+- (float) specialZero
+{
+    return specialZero;
+}
+
+- (void) setSpecialZero:(float)aSpecialZero
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSpecialZero:specialZero];
+    
+    specialZero = aSpecialZero;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cModelSpecialZeroChanged object:self];
+}
+
+- (int) setPtSelection
+{
+    return setPtSelection;
+}
+
+- (void) setSetPtSelection:(int)aSetPtSelection
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSetPtSelection:setPtSelection];
+    setPtSelection = aSetPtSelection;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cModelSetPtSelectionChanged object:self];
+}
+
+- (float) openSoftstart
+{
+    return openSoftstart;
+}
+
+- (void) setOpenSoftstart:(float)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setOpenSoftstart:openSoftstart];
+    openSoftstart = [self limitFloatValue:aValue min:.1 max:100];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cOpenSoftstartChanged object:self];
+}
+
+- (float) closeSoftstart
+{
+    return closeSoftstart;
+}
+
+- (void) setCloseSoftstart:(float)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setCloseSoftstart:closeSoftstart];
+    closeSoftstart = [self limitFloatValue:aValue min:.1 max:100];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cCloseSoftstartChanged object:self];
+}
+
+- (float) analogSoftstart
+{
+    return analogSoftstart;
+}
+
+- (void) setAnalogSoftstart:(float)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setAnalogSoftstart:analogSoftstart];
+	analogSoftstart = [self limitFloatValue:aValue min:.1 max:100];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cAnalogSoftstartChanged object:self];
+}
+
+- (float) analogSetPoint
+{
+    return analogSetPoint;
+}
+
+- (void) setAnalogSetPoint:(float)aAnalogSetPoint
+{    
+    analogSetPoint = aAnalogSetPoint;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cAnalogSetPointChanged object:self];
+}
+
+- (int) analogFSLevel
+{
+    return analogFSLevel;
+}
+
+- (void) setAnalogFSLevel:(int)aAnalogFSLevel
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setAnalogFSLevel:analogFSLevel];
+    analogFSLevel = aAnalogFSLevel;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cAnalogFSLevelChanged object:self];
+}
+
+- (int) learning
+{
+    return learning;
+}
+
+- (void) setLearning:(int)aLearning
+{
+    learning = aLearning;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cLearningChanged object:self];
+}
+
+- (BOOL) local
+{
+    return local;
+}
+
+- (void) setLocal:(BOOL)aLocal
+{
+    local = aLocal;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cLocalChanged object:self];
+}
+
+- (NSString*) unitsString;
+{
+    switch(units){
+        case 0: return @"(Torr)";
+        case 1: return @"(mTorr)";
+        case 2: return @"(mBar)";
+        case 3: return @"(uBar)";
+        case 4: return @"(kPa)";
+        case 5: return @"(Pa)";
+        case 6: return @"(cmH2O)";
+        case 7: return @"(inH2O)";    
         default: return @"?";
     }
 }
@@ -210,8 +368,9 @@ NSString* ORMks651cLock = @"ORMks651cLock";
 {
     if(aUnits<0) aUnits=0;
     else if(aUnits>7) aUnits=7;
+    [[[self undoManager] prepareWithInvocationTarget:self] setUnits:units];
     units=aUnits;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cModelUnitsChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cUnitsChanged object:self];
 }
 
 - (float) pressureScaleValue
@@ -221,7 +380,7 @@ NSString* ORMks651cLock = @"ORMks651cLock";
 
 - (int) pressureScale
 {
-    return pressureScale;
+   return pressureScale;
 }
 
 - (void) setPressureScale:(int)aPressureScale
@@ -235,7 +394,7 @@ NSString* ORMks651cLock = @"ORMks651cLock";
 	
 	pressureScaleValue = powf(10.,(float)pressureScale);
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cModelPressureScaleChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cPressureScaleChanged object:self];
 }
 
 - (ORTimeRate*)timeRate
@@ -251,10 +410,8 @@ NSString* ORMks651cLock = @"ORMks651cLock";
 - (void) setShipPressures:(BOOL)aShipPressures
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setShipPressures:shipPressures];
-    
     shipPressures = aShipPressures;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cModelShipPressuresChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cShipPressuresChanged object:self];
 }
 
 - (int) pollTime
@@ -266,7 +423,7 @@ NSString* ORMks651cLock = @"ORMks651cLock";
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setPollTime:pollTime];
     pollTime = aPollTime;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cModelPollTimeChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cPollTimeChanged object:self];
 
 	if(pollTime){
 		[self performSelector:@selector(pollHardware) withObject:nil afterDelay:2];
@@ -275,6 +432,18 @@ NSString* ORMks651cLock = @"ORMks651cLock";
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
 	}
 }
+
+- (float) highThreshold:(int)index
+{
+    if(index>=0 && index<8)return highThreshold[index];
+	else return 0.0;
+} 
+
+- (float) lowThreshold:(int)index
+{
+    if(index>=0 && index<8)return lowThreshold[index];
+	else return 0.0;
+} 
 
 
 
@@ -285,13 +454,7 @@ NSString* ORMks651cLock = @"ORMks651cLock";
 
 - (float) setPoint:(int)index
 {
-    if(index>=0 && index<6)return setPoint[index];
-	else return 0.0;
-}
-
-- (float) setPointWriteValue:(int)index
-{
-    if(index>=0 && index<6)return setPoint[index];
+    if(index>=0 && index<5)return setPoint[index];
 	else return 0.0;
 }
 
@@ -301,43 +464,38 @@ NSString* ORMks651cLock = @"ORMks651cLock";
 	else return 0.0;
 } 
 
-- (float) valveType
+- (int) valveType
 {
 	return valveType;
 }
 
-- (float) analogRange
+- (int) analogRange
 {
 	return analogRange;
 }
 
-- (float) setPointType:(int)index
+- (int) setPointType:(int)index
 {
     if(index>=0 && index<6)return setPointType[index];
-	else return 0.0;
+	else return 0;
 }
 
-- (float) positionRange
+- (BOOL) positionRange
 {
 	return positionRange;
 }
 
-- (float) controlDirection
+- (BOOL) controlDirection
 {
 	return controlDirection;
 }
 
-- (float) sensorRange
-{
-	return sensorRange;
-}
-
-- (float) sensorVoltageRange
+- (int) sensorVoltageRange
 {
 	return sensorVoltageRange;
 }
 
-- (float) sensorType
+- (int) sensorType
 {
 	return sensorType;
 }
@@ -352,12 +510,12 @@ NSString* ORMks651cLock = @"ORMks651cLock";
 	return softwareVersion;
 }
 
-- (float) batteryStatus
+- (int) batteryStatus
 {
 	return batteryStatus;
 }
 
-- (float) valveResponse
+- (int) valveResponse
 {
 	return valveResponse;
 }
@@ -374,7 +532,7 @@ NSString* ORMks651cLock = @"ORMks651cLock";
 	else return 0.0;
 }
 
-- (float) controlType
+- (int) controlType
 {
 	return controlType;
 }
@@ -391,330 +549,178 @@ NSString* ORMks651cLock = @"ORMks651cLock";
 
 - (void) setPressure:(float)aValue
 {
-		pressure = aValue;
-		//get the time(UT!)
-		time_t	ut_Time;
-		time(&ut_Time);
-		//struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-		timeMeasured = ut_Time;
+	pressure = aValue;
+	//get the time(UT!)
+	time_t	ut_Time;
+	time(&ut_Time);
+	//struct tm* theTimeGMTAsStruct = gmtime(&theTime);
+	timeMeasured = ut_Time;
 
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cPressureChanged 
-															object:self];
 
-		if(timeRates == nil) timeRates = [[ORTimeRate alloc] init];
-		[timeRates addDataToTimeAverage:aValue];
+	if(timeRates == nil) timeRates = [[ORTimeRate alloc] init];
+	[timeRates addDataToTimeAverage:aValue];
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cPressureChanged 
+														object:self];
+}
+
+
+- (int) sensorRange
+{
+	return sensorRange;
+}
+
+- (void) setSensorRange:(int)aValue
+{
+ 	[[[self undoManager] prepareWithInvocationTarget:self] setSensorRange:sensorRange];
+    sensorRange = aValue;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cSensorRangeChanged object:self];
 }
 
 - (void) setSetPoint:(int)index withValue:(float)aValue;
 {
-    if(index>=0 && index<6){
-        setPoint[index] = aValue;
-        //get the time(UT!)
-        time_t	ut_Time;
-        time(&ut_Time);
-        //struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-        timeMeasured = ut_Time;
+    if(index>=0 && index<5){
+		[[[self undoManager] prepareWithInvocationTarget:self] setSetPoint:index withValue:setPoint[index]];
+		setPoint[index] = aValue;
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cSetPointChanged object:self];
         
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cSetPointChanged 
-                                                            object:self];
-        
-        if(timeRates == nil) timeRates = [[ORTimeRate alloc] init];
-        [timeRates addDataToTimeAverage:aValue];
-    }
-}
-
-- (void) setSetPointWriteValue:(int)index withValue:(float)aValue;
-{
-    if(index>=0 && index<6){
-        [[[self undoManager] prepareWithInvocationTarget:self] setSetPointWriteValue:index withValue:setPointWriteValue[index]];
-        
-        setPointWriteValue[index] = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cSetPointWriteValueChanged object:self];
-    }
-}
-- (float) readSetPointWriteValue:(int)index
-{
-	return setPointWriteValue[index];
-}
-
-- (void) setSoftstartRate:(int)index withValue:(float)aValue;
-{
-    if(index>=0 && index<8){
-        softstartRate[index] = aValue;
-        //get the time(UT!)
-        time_t	ut_Time;
-        time(&ut_Time);
-        //struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-        timeMeasured = ut_Time;
-        
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cSoftstartRateChanged 
-                                                            object:self];
-        
-        if(timeRates == nil) timeRates = [[ORTimeRate alloc] init];
-        [timeRates addDataToTimeAverage:aValue];
-    }
-}
-
-- (void) setValveType:(float)aValue
-{
-    valveType = aValue;
-    //get the time(UT!)
-    time_t	ut_Time;
-    time(&ut_Time);
-    //struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-    timeMeasured = ut_Time;
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cValveTypeChanged 
-                                                        object:self];
-    
-    if(timeRates == nil) timeRates = [[ORTimeRate alloc] init];
-    [timeRates addDataToTimeAverage:aValue];
-}
-
-- (void) setAnalogRange:(float)aValue
-{
-    analogRange = aValue;
-    //get the time(UT!)
-    time_t	ut_Time;
-    time(&ut_Time);
-    //struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-    timeMeasured = ut_Time;
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cAnalogRangeChanged 
-                                                        object:self];
-    
-    if(timeRates == nil) timeRates = [[ORTimeRate alloc] init];
-    [timeRates addDataToTimeAverage:aValue];
-}
-
-- (void) setSetPointType:(int)index withValue:(float)aValue;
-{
-    if(index>=0 && index<6){
-        setPointType[index] = aValue;
-        //get the time(UT!)
-        time_t	ut_Time;
-        time(&ut_Time);
-        //struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-        timeMeasured = ut_Time;
-        
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cSetPointTypeChanged 
-                                                            object:self];
-        
-        if(timeRates == nil) timeRates = [[ORTimeRate alloc] init];
-        [timeRates addDataToTimeAverage:aValue];
-    }
-}
-
-- (void) setPositionRange:(float)aValue
-{
-    positionRange = aValue;
-    //get the time(UT!)
-    time_t	ut_Time;
-    time(&ut_Time);
-    //struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-    timeMeasured = ut_Time;
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cPositionRangeChanged 
-                                                        object:self];
-    
-    if(timeRates == nil) timeRates = [[ORTimeRate alloc] init];
-    [timeRates addDataToTimeAverage:aValue];
-}
-
-- (void) setControlDirection:(float)aValue
-{
-    controlDirection = aValue;
-    //get the time(UT!)
-    time_t	ut_Time;
-    time(&ut_Time);
-    //struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-    timeMeasured = ut_Time;
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cControlDirectionChanged 
-                                                        object:self];
-    
-    if(timeRates == nil) timeRates = [[ORTimeRate alloc] init];
-    [timeRates addDataToTimeAverage:aValue];
-}
-
-- (void) setSensorRange:(float)aValue
-{
-    sensorRange = aValue;
-    //get the time(UT!)
-    time_t	ut_Time;
-    time(&ut_Time);
-    //struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-    timeMeasured = ut_Time;
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cSensorRangeChanged 
-                                                        object:self];
-    
-    if(timeRates == nil) timeRates = [[ORTimeRate alloc] init];
-    [timeRates addDataToTimeAverage:aValue];
-}
-
-- (void) setSensorVoltageRange:(float)aValue
-{
-    sensorVoltageRange = aValue;
-    //get the time(UT!)
-    time_t	ut_Time;
-    time(&ut_Time);
-    //struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-    timeMeasured = ut_Time;
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cSensorVoltageRangeChanged 
-                                                        object:self];
-    
-    if(timeRates == nil) timeRates = [[ORTimeRate alloc] init];
-    [timeRates addDataToTimeAverage:aValue];
-}
-
-- (void) setSensorType:(float)aValue
-{
-    sensorType = aValue;
-    //get the time(UT!)
-    time_t	ut_Time;
-    time(&ut_Time);
-    //struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-    timeMeasured = ut_Time;
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cSensorTypeChanged 
-                                                        object:self];
-    
-    if(timeRates == nil) timeRates = [[ORTimeRate alloc] init];
-    [timeRates addDataToTimeAverage:aValue];
-}
-
-- (void) setSystemStatus:(float)aValue
-{
-    systemStatus = aValue;
-    //get the time(UT!)
-    time_t	ut_Time;
-    time(&ut_Time);
-    //struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-    timeMeasured = ut_Time;
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cSystemStatusChanged 
-                                                        object:self];
-    
-    if(timeRates == nil) timeRates = [[ORTimeRate alloc] init];
-    [timeRates addDataToTimeAverage:aValue];
-}
-
-- (void) setSoftwareVersion:(float)aValue
-{
-    softwareVersion = aValue;
-    //get the time(UT!)
-    time_t	ut_Time;
-    time(&ut_Time);
-    //struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-    timeMeasured = ut_Time;
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cSoftwareVersionChanged 
-                                                        object:self];
-    
-    if(timeRates == nil) timeRates = [[ORTimeRate alloc] init];
-    [timeRates addDataToTimeAverage:aValue];
-}
-
-- (void) setBatteryStatus:(float)aValue
-{
-    batteryStatus = aValue;
-    //get the time(UT!)
-    time_t	ut_Time;
-    time(&ut_Time);
-    //struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-    timeMeasured = ut_Time;
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cBatteryStatusChanged 
-                                                        object:self];
-    
-    if(timeRates == nil) timeRates = [[ORTimeRate alloc] init];
-    [timeRates addDataToTimeAverage:aValue];
-}
-
-- (void) setValveResponse:(float)aValue
-{
-    valveResponse = aValue;
-    //get the time(UT!)
-    time_t	ut_Time;
-    time(&ut_Time);
-    //struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-    timeMeasured = ut_Time;
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cValveResponseChanged 
-                                                        object:self];
-    
-    if(timeRates == nil) timeRates = [[ORTimeRate alloc] init];
-    [timeRates addDataToTimeAverage:aValue];
+	}
 }
 
 - (void) setLeadValue:(int)index withValue:(float)aValue;
 {
     if(index>=0 && index<5){
+		[[[self undoManager] prepareWithInvocationTarget:self] setLeadValue:index withValue:leadValue[index]];
         leadValue[index] = aValue;
-        //get the time(UT!)
-        time_t	ut_Time;
-        time(&ut_Time);
-        //struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-        timeMeasured = ut_Time;
-        
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cLeadValueChanged 
-                                                            object:self];
-        
-        if(timeRates == nil) timeRates = [[ORTimeRate alloc] init];
-        [timeRates addDataToTimeAverage:aValue];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cLeadValueChanged object:self];
     }
 }
 
 - (void) setGainValue:(int)index withValue:(float)aValue;
 {
     if(index>=0 && index<5){
-        gainValue[index] = aValue;
-        //get the time(UT!)
-        time_t	ut_Time;
-        time(&ut_Time);
-        //struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-        timeMeasured = ut_Time;
-        
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cGainValueChanged 
-                                                            object:self];
-        
-        if(timeRates == nil) timeRates = [[ORTimeRate alloc] init];
-        [timeRates addDataToTimeAverage:aValue];
+		[[[self undoManager] prepareWithInvocationTarget:self] setGainValue:index withValue:gainValue[index]];
+        gainValue[index] = aValue;        
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cGainValueChanged object:self];
+	}
+}
+
+- (void) setAnalogRange:(int)aValue
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setAnalogRange:analogRange];
+    analogRange = aValue;    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cAnalogRangeChanged object:self];
+}
+
+
+- (void) setSetPointType:(int)index withValue:(int)aValue;
+{
+    if(index>=0 && index<5){
+		[[[self undoManager] prepareWithInvocationTarget:self] setSetPointType:index withValue:setPointType[index]];
+        setPointType[index] = aValue;
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cSetPointTypeChanged object:self];
     }
 }
 
-- (void) setControlType:(float)aValue
+- (void) setLowThreshold:(int)index withValue:(float)aValue;
 {
-    controlType = aValue;
-    //get the time(UT!)
-    time_t	ut_Time;
-    time(&ut_Time);
-    //struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-    timeMeasured = ut_Time;
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cControlTypeChanged 
+    if(index>=0 && index<2){
+		[[[self undoManager] prepareWithInvocationTarget:self] setLowThreshold:index withValue:lowThreshold[index]];
+        lowThreshold[index] = [self limitFloatValue:aValue min:.1 max:100];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cLowThresholdChanged object:self];
+    }
+}
+
+- (void) setHighThreshold:(int)index withValue:(float)aValue;
+{
+    if(index>=0 && index<2){
+  		[[[self undoManager] prepareWithInvocationTarget:self] setHighThreshold:index withValue:highThreshold[index]];
+		highThreshold[index] = [self limitFloatValue:aValue min:.1 max:100];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cHighThresholdChanged object:self];
+    }
+}
+
+- (void) setSoftstartRate:(int)index withValue:(float)aValue;
+{
+    if(index>=0 && index<5){
+        softstartRate[index] = [self limitFloatValue:aValue min:.1 max:100];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cSoftstartRateChanged object:self];
+    }
+}
+
+- (void) setValveResponse:(int)aValue
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setValveResponse:valveResponse];
+    valveResponse = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cValveResponseChanged object:self];
+}
+
+- (void) setValveType:(int)aValue
+{
+ 	[[[self undoManager] prepareWithInvocationTarget:self] setValveType:valveType];
+    valveType = [self limitFloatValue:aValue min:0 max:2];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cValveTypeChanged object:self];
+}
+
+- (void) setPositionRange:(BOOL)aValue
+{
+ 	[[[self undoManager] prepareWithInvocationTarget:self] setPositionRange:positionRange];
+    positionRange = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cPositionRangeChanged object:self];
+}
+
+- (void) setControlDirection:(BOOL)aValue
+{
+ 	[[[self undoManager] prepareWithInvocationTarget:self] setControlDirection:controlDirection];
+    controlDirection = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cControlDirectionChanged  object:self];
+}
+
+- (void) setSensorVoltageRange:(int)aValue
+{
+ 	[[[self undoManager] prepareWithInvocationTarget:self] setSensorVoltageRange:sensorVoltageRange];
+    sensorVoltageRange = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cSensorVoltageRangeChanged object:self];
+}
+
+- (void) setSensorType:(int)aValue
+{
+ 	[[[self undoManager] prepareWithInvocationTarget:self] setSensorType:sensorType];
+    sensorType = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cSensorTypeChanged object:self];
+}
+
+- (void) setSystemStatus:(float)aValue
+{
+    systemStatus = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cSystemStatusChanged object:self];
+}
+
+- (void) setSoftwareVersion:(float)aValue
+{
+    softwareVersion = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cSoftwareVersionChanged 
                                                         object:self];
-    
-    if(timeRates == nil) timeRates = [[ORTimeRate alloc] init];
-    [timeRates addDataToTimeAverage:aValue];
+}
+
+- (void) setBatteryStatus:(int)aValue
+{
+    batteryStatus = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cBatteryStatusChanged object:self];
+}
+
+- (void) setControlType:(int)aValue
+{
+ 	[[[self undoManager] prepareWithInvocationTarget:self] setControlType:controlType];
+    controlType = aValue;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cControlTypeChanged object:self];    
 }
 
 - (void) setChecksum:(float)aValue
 {
     checksum = aValue;
-    //get the time(UT!)
-    time_t	ut_Time;
-    time(&ut_Time);
-    //struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-    timeMeasured = ut_Time;
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cControlTypeChanged 
-                                                        object:self];
-    
-    if(timeRates == nil) timeRates = [[ORTimeRate alloc] init];
-    [timeRates addDataToTimeAverage:aValue];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cControlTypeChanged object:self];
 }
 
 - (NSString*) lastRequest
@@ -769,7 +775,7 @@ NSString* ORMks651cLock = @"ORMks651cLock";
         }       
     }
 
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cModelPortNameChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cPortNameChanged object:self];
 }
 
 - (ORSerialPort*) serialPort
@@ -783,7 +789,7 @@ NSString* ORMks651cLock = @"ORMks651cLock";
     [serialPort release];
     serialPort = aSerialPort;
 
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cModelSerialPortChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cSerialPortChanged object:self];
 }
 
 - (void) openPort:(BOOL)state
@@ -797,8 +803,7 @@ NSString* ORMks651cLock = @"ORMks651cLock";
     }
     else      [serialPort close];
     portWasOpen = [serialPort isOpen];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cModelPortStateChanged object:self];
-    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cPortStateChanged object:self];
 }
 
 
@@ -807,35 +812,99 @@ NSString* ORMks651cLock = @"ORMks651cLock";
 {
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
-	[self setUnits:			[decoder decodeIntForKey:@"units"]];
-	[self setShipPressures:	[decoder decodeBoolForKey:	 @"shipPressures"]];
-	[self setPollTime:		[decoder decodeIntForKey:	 @"pollTime"]];
-	[self setPortWasOpen:	[decoder decodeBoolForKey:	 @"portWasOpen"]];
-    [self setPortName:		[decoder decodeObjectForKey: @"portName"]];
-    [self setPressureScale:	[decoder decodeIntForKey:    @"pressureScale"]];
+	[self setSpanCalibration:[decoder decodeFloatForKey:@"spanCalibration"]];
+	[self setSpecialZero:[decoder decodeFloatForKey:@"specialZero"]];
+	[self setSetPtSelection:[decoder decodeIntForKey:@"setPtSelection"]];
+	[self setPositionRange:		[decoder decodeBoolForKey:	@"positionRange"]];
+	[self setOpenSoftstart:		[decoder decodeFloatForKey:	 @"openSoftstart"]];
+	[self setCloseSoftstart:	[decoder decodeFloatForKey:	 @"closeSoftstart"]];
+	[self setAnalogSoftstart:	[decoder decodeFloatForKey:	 @"analogSoftstart"]];
+	[self setAnalogSetPoint:	[decoder decodeFloatForKey:	 @"analogSetPoint"]];
+	[self setAnalogRange:		[decoder decodeIntForKey:	 @"analogRange"]];
+	[self setSensorRange:		[decoder decodeIntForKey:	 @"sensorRange"]];
+	[self setSensorVoltageRange:[decoder decodeIntForKey:	 @"sensorVoltageRange"]];
+	[self setAnalogFSLevel:		[decoder decodeIntForKey:	 @"analogFSLevel"]];
+	[self setUnits:				[decoder decodeIntForKey:    @"units"]];
+	[self setShipPressures:		[decoder decodeBoolForKey:	 @"shipPressures"]];
+	[self setPollTime:			[decoder decodeIntForKey:	 @"pollTime"]];
+	[self setPortWasOpen:		[decoder decodeBoolForKey:	 @"portWasOpen"]];
+    [self setPortName:			[decoder decodeObjectForKey: @"portName"]];
+	[self setPressureScale:		[decoder decodeIntForKey:    @"pressureScale"]];
+    [self setValveResponse:		[decoder decodeIntForKey:    @"valveResponse"]];
+    [self setSensorType:		[decoder decodeIntForKey:    @"sensorType"]];
+    [self setControlType:		[decoder decodeIntForKey:    @"controlType"]];
+    [self setValveType:			[decoder decodeIntForKey:    @"valveType"]];
+	
+	int i;
+	for(i=0;i<5;i++){
+		[self setSetPoint:i      withValue:	[decoder decodeFloatForKey: [NSString stringWithFormat:@"setPoint%d",i]]];
+		[self setLeadValue:i     withValue:	[decoder decodeFloatForKey: [NSString stringWithFormat:@"leadValue%d",i]]];
+		[self setGainValue:i     withValue:	[decoder decodeFloatForKey: [NSString stringWithFormat:@"gainValue%d",i]]];
+		[self setSetPointType:i  withValue:	[decoder decodeIntForKey: [NSString stringWithFormat:@"setPointType%d",i]]];
+		[self setSoftstartRate:i withValue:	[decoder decodeFloatForKey: [NSString stringWithFormat:@"softstartRate%d",i]]];
+	}
+	
+	for(i=0;i<2;i++){
+		[self setLowThreshold:i withValue:	[decoder decodeFloatForKey: [NSString stringWithFormat:@"lowThreshold%d",i]]];
+		[self setHighThreshold:i withValue:	[decoder decodeFloatForKey: [NSString stringWithFormat:@"highThreshold%d",i]]];
+	}
+	
 	[[self undoManager] enableUndoRegistration];
 	timeRates = [[ORTimeRate alloc] init];
     [self registerNotificationObservers];
 
 	return self;
 }
+
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt:units			forKey:@"units"];
-    [encoder encodeBool:shipPressures	forKey: @"shipPressures"];
-    [encoder encodeInt: pollTime		forKey: @"pollTime"];
-    [encoder encodeBool:portWasOpen		forKey: @"portWasOpen"];
-    [encoder encodeObject:portName		forKey: @"portName"];
-	[encoder encodeInt:pressureScale   forKey:@"pressureScale"];
+    [encoder encodeFloat:spanCalibration forKey:@"spanCalibration"];
+    [encoder encodeFloat:specialZero forKey:@"specialZero"];
+    [encoder encodeInt:setPtSelection forKey:@"setPtSelection"];
+    [encoder encodeBool:positionRange		forKey:@"positionRange"];
+    [encoder encodeFloat:openSoftstart		forKey:@"openSoftstart"];
+    [encoder encodeFloat:closeSoftstart		forKey:@"closeSoftstart"];
+    [encoder encodeFloat:analogSoftstart	forKey:@"analogSoftstart"];
+    [encoder encodeFloat:analogSetPoint		forKey:@"analogSetPoint"];
+    [encoder encodeInt:sensorRange			forKey:@"sensorRange"];
+    [encoder encodeInt:sensorVoltageRange	forKey:@"sensorVoltageRange"];
+    [encoder encodeInt:analogRange			forKey:@"analogRange"];
+    [encoder encodeInt:analogFSLevel		forKey:@"analogFSLevel"];
+    [encoder encodeInt:units				forKey: @"units"];
+    [encoder encodeBool:shipPressures		forKey: @"shipPressures"];
+    [encoder encodeInt: pollTime			forKey: @"pollTime"];
+    [encoder encodeBool:portWasOpen			forKey: @"portWasOpen"];
+    [encoder encodeObject:portName			forKey: @"portName"];
+	[encoder encodeInt:pressureScale		forKey: @"pressureScale"];
+	[encoder encodeInt:valveResponse		forKey: @"valveResponse"];
+	[encoder encodeInt:sensorType			forKey: @"sensorType"];
+	[encoder encodeInt:controlType			forKey: @"controlType"];
+	[encoder encodeInt:valveType			forKey: @"valveType"];
+	int i;
+	for(i=0;i<5;i++){
+		[encoder encodeFloat:setPoint[i]	  forKey: [NSString stringWithFormat:@"setPoint%d",i]];
+		[encoder encodeFloat:leadValue[i]	  forKey: [NSString stringWithFormat:@"leadValue%d",i]];
+		[encoder encodeFloat:gainValue[i]	  forKey: [NSString stringWithFormat:@"gainValue%d",i]];
+		[encoder encodeFloat:softstartRate[i] forKey: [NSString stringWithFormat:@"softstartRate%d",i]];
+		[encoder encodeInt:setPointType[i]	  forKey: [NSString stringWithFormat:@"setPointType%d",i]];
+	}
+	for(i=0;i<2;i++){
+		[encoder encodeFloat:lowThreshold[i]  forKey: [NSString stringWithFormat:@"lowThreshold%d",i]];
+		[encoder encodeFloat:highThreshold[i] forKey: [NSString stringWithFormat:@"highThreshold%d",i]];
+	}
 }
 
 #pragma mark ••• Commands
-- (void) addCmdToQueue:(NSString*)aCmd
+- (void) addCmdToQueue:(NSString*)aCmd waitForResponse:(BOOL)waitForResponse
 {
     if([serialPort isOpen]){ 
 		if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
-		[cmdQueue addObject:aCmd];
+		ORMks651cCmd* cmdObj	= [[ORMks651cCmd alloc] init];
+		cmdObj.cmd = aCmd;
+		cmdObj.waitForResponse = waitForResponse;
+		
+		[cmdQueue addObject:cmdObj];
 		if(!lastRequest){
 			[self processOneCommandFromQueue];
 		}
@@ -844,136 +913,328 @@ NSString* ORMks651cLock = @"ORMks651cLock";
 
 - (void) readPressures
 {
-	[self addCmdToQueue:@"R5"];
-	//[self addCmdToQueue:@"++ShipRecords"];
+	[self addCmdToQueue:@"R5" waitForResponse:YES];
+	[self addCmdToQueue:@"++ShipRecords" waitForResponse:NO];
 }
 
 - (void) readSetPoints
 {
-    [self addCmdToQueue:@"R1"];
-	[self addCmdToQueue:@"R2"];
-    [self addCmdToQueue:@"R3"];
-    [self addCmdToQueue:@"R4"];
-    [self addCmdToQueue:@"R10"];
-    [self addCmdToQueue:@"R0"];
+    [self addCmdToQueue:@"R0" waitForResponse:YES];
+    [self addCmdToQueue:@"R1" waitForResponse:YES];
+	[self addCmdToQueue:@"R2" waitForResponse:YES];
+    [self addCmdToQueue:@"R3" waitForResponse:YES];
+    [self addCmdToQueue:@"R4" waitForResponse:YES];
+    [self addCmdToQueue:@"R10" waitForResponse:YES];
 }
+
+
 
 - (void) readThresholds
 {
-	[self addCmdToQueue:@"R11"];
-    [self addCmdToQueue:@"R12"];
-    [self addCmdToQueue:@"R13"];
-    [self addCmdToQueue:@"R14"];
+	[self addCmdToQueue:@"R11" waitForResponse:YES];
+    [self addCmdToQueue:@"R12" waitForResponse:YES];
+    [self addCmdToQueue:@"R13" waitForResponse:YES];
+    [self addCmdToQueue:@"R14" waitForResponse:YES];
 }
 
 - (void) readSoftstartRates
 {
-	[self addCmdToQueue:@"R15"];
-	[self addCmdToQueue:@"R16"];
-    [self addCmdToQueue:@"R17"];
-    [self addCmdToQueue:@"R18"];
-    [self addCmdToQueue:@"R19"];
-    [self addCmdToQueue:@"R20"];
-    [self addCmdToQueue:@"R21"];
-    [self addCmdToQueue:@"R22"];
+	[self addCmdToQueue:@"R15" waitForResponse:YES];
+	[self addCmdToQueue:@"R16" waitForResponse:YES];
+    [self addCmdToQueue:@"R17" waitForResponse:YES];
+    [self addCmdToQueue:@"R18" waitForResponse:YES];
+    [self addCmdToQueue:@"R19" waitForResponse:YES];
+	
+    [self addCmdToQueue:@"R20" waitForResponse:YES];
+    [self addCmdToQueue:@"R21" waitForResponse:YES];
+    [self addCmdToQueue:@"R22" waitForResponse:YES];
 }
 
-- (void) readValveType
-{
-	[self addCmdToQueue:@"R23"];
-}
-
-- (void) readAnalogRange
-{
-	[self addCmdToQueue:@"R24"];
-}
+- (void) readValveType		{ [self addCmdToQueue:@"R23" waitForResponse:YES]; } 
+- (void) readAnalogRange	{ [self addCmdToQueue:@"R24" waitForResponse:YES]; }
 
 - (void) readSetPointTypes
 {
-	[self addCmdToQueue:@"R25"];
-	[self addCmdToQueue:@"R26"];
-    [self addCmdToQueue:@"R27"];
-    [self addCmdToQueue:@"R28"];
-    [self addCmdToQueue:@"R29"];
-    [self addCmdToQueue:@"R30"];
+	[self addCmdToQueue:@"R25" waitForResponse:YES];
+	[self addCmdToQueue:@"R26" waitForResponse:YES];
+    [self addCmdToQueue:@"R27" waitForResponse:YES];
+    [self addCmdToQueue:@"R28" waitForResponse:YES];
+    [self addCmdToQueue:@"R29" waitForResponse:YES];
+    [self addCmdToQueue:@"R30" waitForResponse:YES];
 }
 
-- (void) readPositionRange
+- (void) readPositionRange		{ [self addCmdToQueue:@"R31" waitForResponse:YES]; }
+- (void) readControlDirection	{ [self addCmdToQueue:@"R32" waitForResponse:YES]; }
+- (void) readSensorRange		{ [self addCmdToQueue:@"R33" waitForResponse:YES]; }
+- (void) readUnits				{ [self addCmdToQueue:@"R34" waitForResponse:YES]; }
+- (void) readSensorVoltageRange	{ [self addCmdToQueue:@"R35" waitForResponse:YES]; }
+- (void) readSensorType			{ [self addCmdToQueue:@"R36" waitForResponse:YES]; }
+- (void) readSystemStatus		{ [self addCmdToQueue:@"R37" waitForResponse:YES]; }
+- (void) readSoftwareVersion	{ [self addCmdToQueue:@"R38" waitForResponse:YES]; }
+- (void) readBatteryStatus		{ [self addCmdToQueue:@"R39" waitForResponse:YES]; }
+- (void) readValveResponse		{ [self addCmdToQueue:@"R40" waitForResponse:YES]; }
+
+- (void) readLeadValues
 {
-	[self addCmdToQueue:@"R31"];
+	[self addCmdToQueue:@"R41" waitForResponse:YES];
+	[self addCmdToQueue:@"R42" waitForResponse:YES];
+    [self addCmdToQueue:@"R43" waitForResponse:YES];
+    [self addCmdToQueue:@"R44" waitForResponse:YES];
+    [self addCmdToQueue:@"R45" waitForResponse:YES];
 }
 
-- (void) readControlDirection
+- (void) readGainValues
 {
-	[self addCmdToQueue:@"R32"];
+	[self addCmdToQueue:@"R46" waitForResponse:YES];
+	[self addCmdToQueue:@"R47" waitForResponse:YES];
+    [self addCmdToQueue:@"R48" waitForResponse:YES];
+    [self addCmdToQueue:@"R49" waitForResponse:YES];
+    [self addCmdToQueue:@"R50" waitForResponse:YES];
 }
 
-- (void) readSensorRange
+- (void) readControlType		{ [self addCmdToQueue:@"R51" waitForResponse:YES]; }
+- (void) readChecksum			{ [self addCmdToQueue:@"R52" waitForResponse:YES]; }
+
+- (void) initHardware
 {
-	[self addCmdToQueue:@"R33"];
+	[self writeSetPtSelection];
+	[self writeAnalogRange];
+	[self writeSetPoints];
+	[self writeGainValues];
+	[self writeLeadValues];
+	[self writeSensorRange];	
+	[self writeSensorVoltageRange];	
+	[self writeUnits];	
+	[self writeSetPointTypes];	
+	[self writeValveResponse];	
+	[self writeControlType];	
+	[self writeSoftStartRates];	
+	[self writeValveType];
+	[self writeThresholds];
+	[self writePositionRange];
+	[self writeControlDirection];
 }
 
-- (void) readUnits
+- (void) readAndCompare
 {
-	[self addCmdToQueue:@"R34"];
+	[self readSetPoints];
+	[self readGainValues];
+	[self readLeadValues];
+	[self readAnalogRange];
+	[self readSensorRange];
+	[self readSensorVoltageRange];
+	[self readUnits];
+	[self readSetPointTypes];
+	[self readValveResponse];
+	[self readBatteryStatus];
+	[self readSoftwareVersion];
+    [self readSystemStatus];
+    [self readSensorType];
+	[self readControlType];
+    [self readSoftstartRates];
+    [self readValveType];
+	[self readThresholds];
+	[self readPositionRange];
+    [self readControlDirection];
 }
 
-- (void) readSensorVoltageRange
+- (void) readAndLoad
 {
-	[self addCmdToQueue:@"R35"];
+	[self addCmdToQueue:@"++StartDialogLoad" waitForResponse:NO];	
+	[self readAndCompare];
+	[self addCmdToQueue:@"++EndDialogLoad" waitForResponse:NO];	
 }
 
-- (void) readSensorType
+- (void) writeSetPoints
 {
-	[self addCmdToQueue:@"R36"];
+	int i;
+	for(i=0;i<5;i++){
+        NSString* theCmd = [NSString stringWithFormat:@"S%d%05.1f",i+1, setPoint[i]];
+        [self addCmdToQueue:theCmd waitForResponse:NO];
+	}
+	
+	NSString* theCmd = [NSString stringWithFormat:@"S6%d",analogFSLevel];
+	[self addCmdToQueue:theCmd waitForResponse:NO];
+	[self readSetPoints];
 }
 
-- (void) readSystemStatus
+- (void) writeSetPtSelection
 {
-	[self addCmdToQueue:@"R37"];
+	[self addCmdToQueue:[NSString stringWithFormat:@"D%d", setPtSelection+1] waitForResponse:NO];
 }
 
-- (void) readSoftwareVersion
+- (void) writeZeroSensor
 {
-	[self addCmdToQueue:@"R38"];
+	[self addCmdToQueue:@"Z1" waitForResponse:NO];
 }
 
-- (void) readBatteryStatus
+- (void) writeSpecialZero
 {
-	[self addCmdToQueue:@"R39"];
+	[self addCmdToQueue:@"Z2" waitForResponse:NO];
 }
 
-- (void) readValveResponse
+- (void) writeRemoveZeroCorrection
 {
-	[self addCmdToQueue:@"R40"];
+	[self addCmdToQueue:@"Z3" waitForResponse:NO];
 }
 
-- (void) readLeadValue
+- (void) writeLearnAnalogZero
 {
-	[self addCmdToQueue:@"R41"];
-	[self addCmdToQueue:@"R42"];
-    [self addCmdToQueue:@"R43"];
-    [self addCmdToQueue:@"R44"];
-    [self addCmdToQueue:@"R45"];
+	[self addCmdToQueue:@"Z4" waitForResponse:NO];
 }
 
-- (void) readGainValue
+- (void) writeCalibrateSpan
 {
-	[self addCmdToQueue:@"R46"];
-	[self addCmdToQueue:@"R47"];
-    [self addCmdToQueue:@"R48"];
-    [self addCmdToQueue:@"R49"];
-    [self addCmdToQueue:@"R50"];
+	[self addCmdToQueue:@"Y1" waitForResponse:NO];
 }
 
-- (void) readControlType
+- (void) writeLearnFullScale
 {
-	[self addCmdToQueue:@"R51"];	
+	[self addCmdToQueue:@"Y2" waitForResponse:NO];
 }
 
-- (void) readChecksum
+- (void) writeLearnSystem
 {
-	[self addCmdToQueue:@"R52"];	
+	[self addCmdToQueue:@"L" waitForResponse:NO];
+}
+
+- (void) writeStopLearn
+{
+	[self addCmdToQueue:@"Q" waitForResponse:NO];
+}
+
+
+- (void) writeSetPointTypes
+{
+	int i;
+	for(i=0;i<5;i++){
+        NSString* theCmd = [NSString stringWithFormat:@"T%d%d",i+1, setPointType[i]];
+        [self addCmdToQueue:theCmd waitForResponse:NO];
+	}
+	[self readSetPointTypes];
+}
+
+- (void) writeSoftStartRates
+{
+	int i;
+	for(i=0;i<5;i++){
+        NSString* theCmd = [NSString stringWithFormat:@"I%d%05.1f",i+1, softstartRate[i]];
+        [self addCmdToQueue:theCmd waitForResponse:NO];
+	}
+	[self addCmdToQueue:[NSString stringWithFormat:@"I6%05.1f",analogSoftstart] waitForResponse:NO];
+	[self addCmdToQueue:[NSString stringWithFormat:@"I7%05.1f",openSoftstart] waitForResponse:NO];
+	[self addCmdToQueue:[NSString stringWithFormat:@"I8%05.1f",closeSoftstart] waitForResponse:NO];
+
+	[self readSoftstartRates];
+}
+
+- (void) writeGainValues
+{
+	int i;
+	for(i=0;i<5;i++){
+        NSString* theCmd = [NSString stringWithFormat:@"M%d%05.1f",i+1, gainValue[i]];
+        [self addCmdToQueue:theCmd waitForResponse:NO];
+	}
+	[self readGainValues];
+}
+
+- (void) writeLeadValues
+{
+	int i;
+	for(i=0;i<5;i++){
+        NSString* theCmd = [NSString stringWithFormat:@"X%d%05.1f",i+1, leadValue[i]];
+        [self addCmdToQueue:theCmd waitForResponse:NO];
+	}
+	[self readLeadValues];
+}
+
+- (void) writeThresholds
+{
+	[self addCmdToQueue:[NSString stringWithFormat:@"P1%05.1f",lowThreshold[0]] waitForResponse:NO];
+	[self addCmdToQueue:[NSString stringWithFormat:@"P2%05.1f",highThreshold[0]] waitForResponse:NO];
+	[self addCmdToQueue:[NSString stringWithFormat:@"P3%05.1f",lowThreshold[1]] waitForResponse:NO];
+	[self addCmdToQueue:[NSString stringWithFormat:@"P4%05.1f",highThreshold[1]] waitForResponse:NO];
+	[self readThresholds];
+}
+
+- (void) writeOpenValve
+{
+	[self addCmdToQueue:@"O" waitForResponse:NO];
+	[self readSystemStatus];
+}
+
+- (void) writeCloseValve
+{
+	[self addCmdToQueue:@"C" waitForResponse:NO];
+	[self readSystemStatus];
+}
+
+- (void) writeHoldValve
+{
+	[self addCmdToQueue:@"H" waitForResponse:NO];
+	[self readSystemStatus];
+}
+
+- (void) writeControlDirection
+{
+	[self addCmdToQueue:[NSString stringWithFormat:@"N%d",controlDirection] waitForResponse:NO];
+	[self readControlDirection];
+}
+
+- (void) writeAnalogRange
+{
+	NSString* theCmd = [NSString stringWithFormat:@"A%d",analogRange];
+	[self addCmdToQueue:theCmd waitForResponse:NO];
+	[self readAnalogRange];
+}
+
+- (void) writeValveType
+{
+	NSString* theCmd = [NSString stringWithFormat:@"J%d",valveType];
+	[self addCmdToQueue:theCmd waitForResponse:NO];
+	[self readValveType];
+}
+
+- (void) writePositionRange
+{
+	NSString* theCmd = [NSString stringWithFormat:@"B%d",positionRange];
+	[self addCmdToQueue:theCmd waitForResponse:NO];
+	[self readPositionRange];
+}
+
+- (void) writeValveResponse
+{
+	NSString* theCmd = [NSString stringWithFormat:@"K%d",valveResponse];
+	[self addCmdToQueue:theCmd waitForResponse:NO];
+	[self readValveResponse];
+}
+
+- (void) writeControlType
+{
+	NSString* theCmd = [NSString stringWithFormat:@"V%d",controlType];
+	[self addCmdToQueue:theCmd waitForResponse:NO];
+	[self readControlType];
+}
+
+- (void) writeSensorRange
+{
+	NSString* theCmd = [NSString stringWithFormat:@"E%d",sensorRange];
+	[self addCmdToQueue:theCmd waitForResponse:NO];
+	[self readSensorRange];
+}
+
+- (void) writeSensorVoltageRange
+{
+	NSString* theCmd = [NSString stringWithFormat:@"G%d",sensorVoltageRange];
+	[self addCmdToQueue:theCmd waitForResponse:NO];
+	[self readSensorVoltageRange];
+}
+
+- (void) writeUnits
+{
+	NSString* theCmd = [NSString stringWithFormat:@"F%d",units];
+	[self addCmdToQueue:theCmd waitForResponse:NO];
+	[self readUnits];
 }
 
 #pragma mark •••Data Records
@@ -1013,15 +1274,20 @@ NSString* ORMks651cLock = @"ORMks651cLock";
     return dataDictionary;
 }
 
-/*- (void) writeSetPointToHardware:(int)index withValue:(float)aValue
+- (void) pollHardware
 {
-	if(index>=1 && index<=6){
-	NSString* theCmd = [NSString stringWithFormat:@"S%d %f",index,aValue];
-	NSLog(@"Sending command: %@",theCmd);
-	[self addCmdToQueue:theCmd];
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
+	
+	[self readPressures];
+    [self readBatteryStatus];
+    [self readSystemStatus];
+	
+    [self readChecksum];
+	
+	if(pollTime!=0){
+		[self performSelector:@selector(pollHardware) withObject:nil afterDelay:pollTime];
 	}
 }
-*/
 
 @end
 
@@ -1037,147 +1303,501 @@ NSString* ORMks651cLock = @"ORMks651cLock";
 - (void) timeout
 {
 	NSLogError(@"MKS 651c",@"command timeout",nil);
+	[cmdQueue removeAllObjects];
 	[self setLastRequest:nil];
-	[self processOneCommandFromQueue];	 //do the next command in the queue
 }
 
 - (void) processOneCommandFromQueue
 {
 	
 	if([cmdQueue count] == 0) return;
-	NSString* aCmd = [[[cmdQueue objectAtIndex:0] retain] autorelease];
+	ORMks651cCmd* cmdObj = [[[cmdQueue objectAtIndex:0] retain] autorelease];
 	[cmdQueue removeObjectAtIndex:0];
+	NSString* aCmd = cmdObj.cmd;
 	if([aCmd isEqualToString:@"++ShipRecords"]){
 		if(shipPressures) [self shipPressureValues];
+		[self processOneCommandFromQueue];
+	}
+	else if([aCmd isEqualToString:@"++StartDialogLoad"]){
+		loadDialog = YES;
+	}
+	else if([aCmd isEqualToString:@"++EndDialogLoad"]){
+		loadDialog = NO;
 	}
 	else {
-		[self setLastRequest:aCmd];
-		[self performSelector:@selector(timeout) withObject:nil afterDelay:3];
+		if(cmdObj.waitForResponse) {
+			[self performSelector:@selector(timeout) withObject:nil afterDelay:3];
+			[self setLastRequest:aCmd];
+		}
+		else [self setLastRequest:nil];
 		if(![aCmd hasSuffix:@"\r\n"]) aCmd = [aCmd stringByAppendingString:@"\r\n"];
 		[serialPort writeString:aCmd];
 		if(!lastRequest){
-			[self performSelector:@selector(processOneCommandFromQueue) withObject:nil afterDelay:.01];
+			[self processOneCommandFromQueue];
 		}
 	}
 }
 
 - (void) process_response:(NSString*)theResponse
 {	
-    if ([theResponse hasPrefix:@"P"]){
-        float theValue = [[theResponse substringFromIndex:1] floatValue];
-        [self setPressure:theValue];
-    }
+	if(!lastRequest)return;
+	
+	int lastRequestNumber = [[lastRequest substringFromIndex:1] intValue];
+	
+	BOOL status = NO;
+	switch(lastRequestNumber){
+		case 0: status = [self decodeAnalogSetPoint:theResponse];			break;
+			
+		case 1:
+		case 2:
+		case 3:
+		case 4:
+		case 10:
+					status = [self decodeSetPoint:theResponse]; 
+		break;
+			
+		case 5:		status = [self decodeSystemPressure:theResponse];			break;
+		case 7:		status = [self decodeAlternateSystemStatus:theResponse];	break;
+			
+		case 11:	
+		case 12:	
+		case 13:	
+		case 14:	
+			status = [self decodeThresholdLimits:theResponse];		break;
+	
+		case 15:
+		case 16:
+		case 17:
+		case 18:
+		case 19:
+			status = [self decodeSoftStartRate:theResponse]; 
+		break;
+			
+		case 20:	status = [self decodeAnalogSoftStart:theResponse];			break;
+		case 21:	status = [self decodeOpenSoftStart:theResponse];			break;
+		case 22:	status = [self decodeCloseSoftStart:theResponse];			break;
+			
+		case 23:	status = [self decodeValveType:theResponse];				break;
+		case 24:	status = [self decodeAnalogRange:theResponse];				break;
+			
+		case 25:
+		case 26:
+		case 27:
+		case 28:
+		case 29:
+		case 30:
+					status = [self decodeSetPointType:theResponse]; 
+		break;
+			
+		case 31:	status = [self decodePositionIndicatorRange:theResponse];	break;
+		case 32:	status = [self decodeDirectReverse:theResponse];			break;
+		case 33:	status = [self decodeSensorRange:theResponse];				break;
+		case 34:	status = [self decodePressureUnits:theResponse];			break;
+		case 35:	status = [self decodeSensorVoltageRange:theResponse];		break;
+		case 36:	status = [self decodeSensorType:theResponse];				break;
+		case 37:	status = [self decodeSystemStatus:theResponse];				break;
+		case 38:	status = [self decodeSoftwareVersion:theResponse];			break;
+		case 39:	status = [self decodeBatteryStatus:theResponse];			break;
+		case 40:	status = [self decodeValveResponseToPowerFail:theResponse];	break;
+			
+		case 41:
+		case 42:
+		case 43:
+		case 44:
+		case 45:
+			status = [self decodeLeadValue:theResponse];			
+		break;
 
-    else if ([theResponse hasPrefix:@"F0"]){
-        NSString* su = [theResponse substringFromIndex:2];
-        int n = [su intValue];
-        [self setUnits:n];
-    }
-
-    else if([theResponse hasPrefix:@"S"]){
-        int   index    = [[theResponse substringWithRange:NSMakeRange(1,1)] intValue];
-        float theValue = [[theResponse substringFromIndex:2] floatValue];
-        [self setSetPoint:index withValue:theValue];
-    }
-    else if([theResponse hasPrefix:@"I"]){
-        int   index    = [[theResponse substringWithRange:NSMakeRange(1,1)] intValue] - 1;
-        float theValue = [[theResponse substringFromIndex:2] floatValue];
-        [self setSoftstartRate:index withValue:theValue];
-    }
-    else if([theResponse hasPrefix:@"J"]){
-        float theValue = [[theResponse substringFromIndex:1] floatValue];
-        [self setValveType:theValue];
-    }
-    else if([theResponse hasPrefix:@"A"]){
-        float theValue = [[theResponse substringFromIndex:1] floatValue];
-        [self setAnalogRange:theValue];
-    }
-    else if([theResponse hasPrefix:@"T"]){
-        int   index    = [[theResponse substringWithRange:NSMakeRange(1,1)] intValue];
-        float theValue = [[theResponse substringFromIndex:2] floatValue];
-        [self setSetPointType:index withValue:theValue];
-    }
-    else if([theResponse hasPrefix:@"B"]){
-        float theValue = [[theResponse substringFromIndex:1] floatValue];
-        [self setPositionRange:theValue];
-    }
-    else if([theResponse hasPrefix:@"N"]){
-        float theValue = [[theResponse substringFromIndex:1] floatValue];
-        [self setControlDirection:theValue];
-    }
-    else if([theResponse hasPrefix:@"E"]){
-        float theValue = [[theResponse substringFromIndex:1] floatValue];
-        [self setSensorRange:theValue];
-    }
-    else if([theResponse hasPrefix:@"G"]){
-        float theValue = [[theResponse substringFromIndex:1] floatValue];
-        [self setSensorVoltageRange:theValue];
-    }
-    else if([theResponse hasPrefix:@"U"]){
-        float theValue = [[theResponse substringFromIndex:1] floatValue];
-        [self setSensorType:theValue];
-    }
-    else if([theResponse hasPrefix:@"HVERSION"]){
-        float theValue = [[theResponse substringFromIndex:8] floatValue];
-        [self setSoftwareVersion:theValue];
-    }
-    else if([theResponse hasPrefix:@"K"]){
-        float theValue = [[theResponse substringFromIndex:1] floatValue];
-        [self setValveResponse:theValue];
-    }
-    else if([theResponse hasPrefix:@"X"]){
-        int   index    = [[theResponse substringWithRange:NSMakeRange(1,1)] intValue] - 1;
-        float theValue = [[theResponse substringFromIndex:2] floatValue];
-        [self setLeadValue:index withValue:theValue];
-    }
-    else if([theResponse hasPrefix:@"M"]){
-        int   index    = [[theResponse substringWithRange:NSMakeRange(1,1)] intValue] - 1;
-        float theValue = [[theResponse substringFromIndex:2] floatValue];
-        [self setGainValue:index withValue:theValue];
-    }
-    else if([theResponse hasPrefix:@"V"]){
-        float theValue = [[theResponse substringFromIndex:1] floatValue];
-        [self setControlType:theValue];
-    }
-    else if([theResponse hasPrefix:@"CS"]){
-        float theValue = [[theResponse substringFromIndex:2] floatValue];
-        [self setChecksum:theValue];
-    }
-    
+		case 46:
+		case 47:
+		case 48:
+		case 49:
+		case 50:
+			status = [self decodeGainValue:theResponse];			
+		break;
+	
+		case 51:
+			status = [self decodeControlType:theResponse];			
+		break;
+			
+	}
 }
 
-- (void) writeSetPointToHardware:(int)index withValue:(float)aValue
+- (BOOL) decodeAnalogSoftStart:(NSString*)theResponse
 {
-    if(index>=1 && index<=6){
-        NSString* theCmd = [NSString stringWithFormat:@"S%d+%.2f",index, aValue];
-        [self addCmdToQueue:theCmd];
-    }
+	if([theResponse hasPrefix:@"I6"]){
+		float theValue = [[theResponse substringFromIndex:2] floatValue];
+		if(loadDialog){
+			[self setAnalogSoftstart:theValue];
+			return YES;
+		}
+		if(fabs(analogSoftstart - theValue) < 0.1)return YES;
+		else NSLogColor([NSColor redColor], @"MKS651 (%d) Analog Softstart ReadBack mismatch (%.1f != %.1f)\n",[self uniqueIdNumber],analogSoftstart,theValue);
+	}
+	return NO;	
 }
 
-- (void) pollHardware
+- (BOOL) decodeOpenSoftStart:(NSString*)theResponse
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
-	[self readPressures];
-	[self readUnits];
-    [self readSetPoints];
-    [self readSoftstartRates];
-    [self readValveType];
-    [self readAnalogRange];
-    [self readSetPointTypes];
-    [self readPositionRange];
-    [self readControlDirection];
-    [self readSensorRange];
-    [self readSensorVoltageRange];
-    [self readSensorType];
-    [self readSystemStatus];
-    [self readSoftwareVersion];
-    [self readBatteryStatus];
-    [self readValveResponse];
-    [self readLeadValue];
-    [self readGainValue];
-    [self readControlType];
-    [self readChecksum];
-	[self performSelector:@selector(pollHardware) withObject:nil afterDelay:pollTime];
-   
+	if([theResponse hasPrefix:@"I7"]){
+		float theValue = [[theResponse substringFromIndex:2] floatValue];
+		if(loadDialog){
+			[self setOpenSoftstart:theValue];
+			return YES;
+		}
+		if(fabs(openSoftstart - theValue) < 0.1)return YES;
+		else NSLogColor([NSColor redColor], @"MKS651 (%d) Open Softstart ReadBack mismatch (%.1f != %.1f)\n",[self uniqueIdNumber],openSoftstart,theValue);
+	}
+	return NO;	
+}
+
+- (BOOL) decodeCloseSoftStart:(NSString*)theResponse
+{
+	if([theResponse hasPrefix:@"I7"]){
+		float theValue = [[theResponse substringFromIndex:2] floatValue];
+		if(loadDialog){
+			[self setCloseSoftstart:theValue];
+			return YES;
+		}
+		if(fabs(closeSoftstart - theValue) < 0.1)return YES;
+		else NSLogColor([NSColor redColor], @"MKS651 (%d) Close Softstart ReadBack mismatch (%.1f != %.1f)\n",[self uniqueIdNumber],closeSoftstart,theValue);
+	}
+	return NO;	
+}
+
+- (BOOL) decodeAnalogSetPoint:(NSString*)theResponse
+{
+	if([theResponse hasPrefix:@"S"]){
+		int   index    = [[theResponse substringWithRange:NSMakeRange(1,1)] intValue];
+		if(index==0){
+			float theValue = [[theResponse substringFromIndex:2] floatValue];
+			[self setAnalogSetPoint:theValue];
+		}
+    }
+	return NO;	
+}
+
+- (BOOL) decodeSetPoint:(NSString*)theResponse
+{
+	if([theResponse hasPrefix:@"S"]){
+		//zero is the analog setpoint
+		int   index    = [[theResponse substringWithRange:NSMakeRange(1,1)] intValue];
+		if(index>=1 && index<=5){
+			float theValue = [[theResponse substringFromIndex:2] floatValue];
+			if(loadDialog){
+				[self setSetPoint:index withValue:theValue];
+				return YES;
+			}
+			if(fabs(setPoint[index-1] - theValue) < 0.1)return YES;
+			else NSLogColor([NSColor redColor], @"MKS651 (%d) SetPoint %c ReadBack mismatch (%.1f != %.1f)\n",[self uniqueIdNumber],'A'+index,setPoint[index-1],theValue);
+		}
+    }
+	return NO;	
+}
+
+- (BOOL) decodeGainValue:(NSString*)theResponse
+{
+    if([theResponse hasPrefix:@"M"]){
+        int   index    = [[theResponse substringWithRange:NSMakeRange(1,1)] intValue] - 1;
+ 		if(index>=0 && index<5){
+			float theValue = [[theResponse substringFromIndex:2] floatValue];
+			if(loadDialog){
+				[self setGainValue:index withValue:theValue];
+				return YES;
+			}
+			if(fabs(gainValue[index] - theValue) < 0.1)return YES;
+			else NSLogColor([NSColor redColor], @"MKS651 (%d) Gain %c ReadBack mismatch (%.1f != %.1f)\n",[self uniqueIdNumber],'A'+index,gainValue[index],theValue);
+		}
+    }
+	return NO;	
+}
+
+- (BOOL) decodeLeadValue:(NSString*)theResponse
+{
+    if([theResponse hasPrefix:@"X"]){
+        int   index    = [[theResponse substringWithRange:NSMakeRange(1,1)] intValue] - 1;
+ 		if(index>=0 && index<5){
+			float theValue = [[theResponse substringFromIndex:2] floatValue];
+			if(loadDialog){
+				[self setLeadValue:index withValue:theValue];
+				return YES;
+			}
+			if(fabs(leadValue[index] - theValue) < 0.1)return YES;
+			else NSLogColor([NSColor redColor], @"MKS651 (%d) Lead %c ReadBack mismatch (%.1f != %.1f)\n",[self uniqueIdNumber],'A'+index,leadValue[index],theValue);
+		}
+    }
+	return NO;	
+}
+
+- (BOOL) decodeAnalogRange:(NSString*)theResponse
+{
+    if([theResponse hasPrefix:@"A"]){
+        int theValue = [[theResponse substringFromIndex:1] intValue];
+		if(loadDialog){
+			[self setAnalogRange:theValue];
+			return YES;
+		}
+		if(theValue == analogRange)return YES;
+		else NSLogColor([NSColor redColor], @"MKS651 (%d) Analog Range ReadBack mismatch (%d != %d)\n",[self uniqueIdNumber],analogRange,theValue);
+	}
+	return NO;
+}
+
+- (BOOL) decodeSensorVoltageRange:(NSString*)theResponse
+{
+    if([theResponse hasPrefix:@"G"]){
+        int theValue = [[theResponse substringFromIndex:1] intValue];
+		if(loadDialog){
+			[self setSensorVoltageRange:theValue];
+			return YES;
+		}
+		if(theValue == sensorVoltageRange)return YES;
+		else NSLogColor([NSColor redColor], @"MKS651 (%d) Sensor Voltage Range ReadBack mismatch (%d != %d)\n",[self uniqueIdNumber],sensorVoltageRange,theValue);
+	}
+	return NO;
+}
+
+- (BOOL) decodeSensorRange:(NSString*)theResponse
+{
+    if([theResponse hasPrefix:@"E"]){
+		int theValue = [[theResponse substringFromIndex:1] intValue];
+		if(loadDialog){
+			[self setSensorRange:theValue];
+			return YES;
+		}
+		if(theValue == sensorRange)return YES;
+		else NSLogColor([NSColor redColor], @"MKS651 (%d) Sensor Range ReadBack mismatch (%d != %d)\n",[self uniqueIdNumber],sensorRange,theValue);
+	}
+	return NO;
+}
+
+- (BOOL) decodePressureUnits:(NSString*)theResponse
+{
+	if ([theResponse hasPrefix:@"F"]){
+		int theValue = [[theResponse substringFromIndex:1] intValue];
+		if(loadDialog){
+			[self setUnits:theValue];
+			return YES;
+		}
+		if(theValue == units)return YES;
+		else NSLogColor([NSColor redColor], @"MKS651 (%d) Unit ReadBack mismatch (%d != %d)\n",[self uniqueIdNumber],units,theValue);
+	}
+	return NO;
+}
+
+- (BOOL) decodeSetPointType:(NSString*)theResponse
+{
+    if([theResponse hasPrefix:@"T"]){
+        int index    = [[theResponse substringWithRange:NSMakeRange(1,1)] intValue]-1;
+  		if(index>=0 && index<5){
+			int theValue = [[theResponse substringFromIndex:2] intValue];
+			if(loadDialog){
+				[self setSetPointType:index withValue:theValue];
+				return YES;
+			}
+			if(setPointType[index] == theValue)return YES;
+			else NSLogColor([NSColor redColor], @"MKS651 (%d) SetPointType %c ReadBack mismatch (%d != %d)\n",[self uniqueIdNumber],'A'+index,setPointType[index],theValue);
+		}
+	}
+	return NO;
+}
+
+- (BOOL) decodeSoftStartRate:(NSString*)theResponse
+{
+    if([theResponse hasPrefix:@"I"]){
+        int   index    = [[theResponse substringWithRange:NSMakeRange(1,1)] intValue] - 1;
+   		if(index>=0 && index<5){
+			float theValue = [[theResponse substringFromIndex:2] floatValue];
+			if(loadDialog){
+				[self setSoftstartRate:index withValue:theValue];
+				return YES;
+			}
+			if(fabs(softstartRate[index]-theValue)<.1)return YES;
+			else NSLogColor([NSColor redColor], @"MKS651 (%d) Softstart %c ReadBack mismatch (%.1f != %.1f)\n",[self uniqueIdNumber],'A'+index,softstartRate[index],theValue);
+		}
+	}
+	return NO;
+}
+
+- (BOOL) decodeValveResponseToPowerFail:(NSString*)theResponse
+{
+	if([theResponse hasPrefix:@"K"]){
+		int theValue = [[theResponse substringFromIndex:1] intValue];
+		if(loadDialog){
+			[self setValveResponse:theValue];
+			return YES;
+		}
+		if(valveResponse == theValue)return YES;
+		else NSLogColor([NSColor redColor], @"MKS651 (%d) Valve response ReadBack mismatch (%d != %d)\n",[self uniqueIdNumber],valveResponse,theValue);
+	}
+	return NO;
+}
+
+- (BOOL) decodeSensorType:(NSString*)theResponse
+{
+    if([theResponse hasPrefix:@"U"]){
+		int theValue = [[theResponse substringFromIndex:1] intValue];
+		if(loadDialog){
+			[self setSensorType:theValue];
+			return YES;
+		}
+		if(sensorType == theValue)return YES;
+		else NSLogColor([NSColor redColor], @"MKS651 (%d) Sensor type ReadBack mismatch (%d != %d)\n",[self uniqueIdNumber],sensorType,theValue);
+	}
+	return NO;
+}
+
+- (BOOL) decodeControlType:(NSString*)theResponse
+{
+	if([theResponse hasPrefix:@"V"]){
+		int theValue = [[theResponse substringFromIndex:1] intValue];
+		if(loadDialog){
+			[self setControlType:theValue];
+			return YES;
+		}
+		if(controlType == theValue)return YES;
+		else NSLogColor([NSColor redColor], @"MKS651 (%d) Control Type ReadBack mismatch (%d != %d)\n",[self uniqueIdNumber],controlType,theValue);
+    }
+	return NO;	
+}
+
+- (BOOL) decodeValveType:(NSString*)theResponse
+{
+    if([theResponse hasPrefix:@"J"]){
+		int theValue = [[theResponse substringFromIndex:1] intValue];
+		if(loadDialog){
+			[self setValveType:theValue];
+			return YES;
+		}
+		if(valveType == theValue)return YES;
+		else NSLogColor([NSColor redColor], @"MKS651 (%d) Valve Type ReadBack mismatch (%d != %d)\n",[self uniqueIdNumber],valveType,theValue);
+    }
+	return NO;	
+}
+
+- (BOOL) decodeSystemPressure:(NSString*)theResponse
+{
+    if([theResponse hasPrefix:@"P"]){
+		float theValue = [[theResponse substringFromIndex:1] floatValue];
+		[self setPressure:theValue];
+	}
+	return NO;
+}
+
+- (BOOL) decodeAlternateSystemStatus:(NSString*)theResponse
+{
+	return NO;
+}
+
+- (BOOL) decodeThresholdLimits:(NSString*)theResponse
+{	
+    if([theResponse hasPrefix:@"P"]){
+        int   index    = [[theResponse substringWithRange:NSMakeRange(1,1)] intValue];
+		float theValue = [[theResponse substringFromIndex:2] floatValue];
+		if(index==1){
+			if(loadDialog)[self setLowThreshold:0 withValue:theValue];	
+			else {
+				if(fabs(theValue-lowThreshold[0])<.1)return YES;
+				else NSLogColor([NSColor redColor], @"MKS651 (%d) Low Threshold 1 mismatch (%d != %d)\n",[self uniqueIdNumber],lowThreshold[0],theValue);
+			}
+		}
+		else if(index==2){
+			if(loadDialog)[self setHighThreshold:0 withValue:theValue];	
+			else {
+				if(fabs(theValue-highThreshold[0])<.1)return YES;
+				else NSLogColor([NSColor redColor], @"MKS651 (%d) High Threshold 1 mismatch (%d != %d)\n",[self uniqueIdNumber],highThreshold[0],theValue);
+			}
+		}
+		else if(index==3){
+			if(loadDialog)[self setLowThreshold:1 withValue:theValue];	
+			else {
+				if(fabs(theValue-lowThreshold[1])<.1)return YES;
+				else NSLogColor([NSColor redColor], @"MKS651 (%d) Low Threshold 1 mismatch (%d != %d)\n",[self uniqueIdNumber],lowThreshold[1],theValue);
+			}
+		}
+		else if(index==4){
+			if(loadDialog)[self setHighThreshold:1 withValue:theValue];	
+			else {
+				if(fabs(theValue-highThreshold[1])<.1)return YES;
+				else NSLogColor([NSColor redColor], @"MKS651 (%d) High Threshold 1 mismatch (%d != %d)\n",[self uniqueIdNumber],highThreshold[1],theValue);
+			}
+		}
+		if(loadDialog)return YES;
+    }
+	return NO;	
+}
+
+- (BOOL) decodePositionIndicatorRange:(NSString*)theResponse
+{
+	if([theResponse hasPrefix:@"B"]){
+		int theValue = [[theResponse substringFromIndex:1] intValue];
+		if(loadDialog){
+			[self setPositionRange:theValue];
+			return YES;
+		}
+		if(positionRange == theValue)return YES;
+		else NSLogColor([NSColor redColor], @"MKS651 (%d) Valve Position Range ReadBack mismatch (%d != %d)\n",[self uniqueIdNumber],positionRange,theValue);
+    }
+	return NO;	
+}
+
+- (BOOL) decodeDirectReverse:(NSString*)theResponse
+{
+    if([theResponse hasPrefix:@"N"]){
+		int theValue = [[theResponse substringFromIndex:1] intValue];
+		if(loadDialog){
+			[self setControlDirection:theValue];
+			return YES;
+		}
+		if(controlDirection == theValue)return YES;
+		else NSLogColor([NSColor redColor], @"MKS651 (%d) Valve Control Direction ReadBack mismatch (%d != %d)\n",[self uniqueIdNumber],controlDirection,theValue);
+    }
+	return NO;	
+}
+
+- (BOOL) decodeSystemStatus:(NSString*)theResponse
+{
+	if([theResponse hasPrefix:@"M"]){
+		[self setLocal:			[[theResponse substringWithRange:NSMakeRange(1,1)] intValue]];
+		[self setLearning:		[[theResponse substringWithRange:NSMakeRange(2,1)] intValue]];
+		[self setSystemStatus:	[[theResponse substringWithRange:NSMakeRange(3,1)] intValue]];
+		return YES;
+	}
+	else return NO;
+}
+
+- (BOOL) decodeSoftwareVersion:(NSString*)theResponse
+{
+    if([theResponse hasPrefix:@"H"]){
+        [self setSoftwareVersion:[[theResponse substringFromIndex:8] floatValue]];
+		return YES;
+    }
+	else return NO;
+}
+
+- (BOOL) decodeBatteryStatus:(NSString*)theResponse
+{
+	if([theResponse hasPrefix:@"BT"]){		
+		int theValue = [[theResponse substringFromIndex:2] intValue];
+		[self setBatteryStatus:theValue];
+		return YES;
+	}
+	else return NO;
+}
+- (float) limitFloatValue:(float)aValue min:(float)aMin max:(float)aMax
+{
+	if(aValue<aMin)return aMin;
+	else if(aValue>aMax)return aMax;
+	else return aValue;
+}
+
+@end
+
+@implementation ORMks651cCmd
+@synthesize cmd,waitForResponse;
+- (void) dealloc
+{
+	self.cmd		 = nil;
+	[super dealloc];
 }
 @end

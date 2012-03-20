@@ -32,24 +32,29 @@
         NSString*			lastRequest;
         NSMutableArray*		cmdQueue;
 		float				pressure;
-        float				setPoint[6];
-        float				setPointWriteValue[6];
-        float               softstartRate[8];
-        float               valveType;
-        float               analogRange;
-        float				setPointType[6];
-        float               positionRange;
-        float               controlDirection;
-        float               sensorRange;
-        float               sensorVoltageRange;
-        float               sensorType;
+		float				setPoint[4];
+		float               leadValue[5];
+		float               gainValue[5];
+		int					setPointType[5];
+		float               softstartRate[5];
+		float               highThreshold[2];
+		float               lowThreshold[2];
+	
+		int					analogRange;
+		int					sensorRange;
+		int					sensorVoltageRange;
+		int                 units;
+
+		int					analogFSLevel;
+        int					valveType;
+        BOOL				positionRange;
+        BOOL				controlDirection;
+        int					sensorType;
         float               softwareVersion;
         float               systemStatus;
-        float               valveResponse;
-        float               batteryStatus;
-        float               leadValue[5];
-        float               gainValue[5];
-        float               controlType;
+        int					valveResponse;
+        int					batteryStatus;
+        int					controlType;
         float               checksum;
 		unsigned long		timeMeasured;
 		int					pollTime;
@@ -58,18 +63,45 @@
 		ORTimeRate*			timeRates;
 		int					pressureScale;
 		float				pressureScaleValue;
-        int                 units;
+		BOOL				local;
+		int					learning;
+		float				analogSetPoint;
+		float				analogSoftstart;
+		float				closeSoftstart;
+		float				openSoftstart;
+		int					setPtSelection;
+		float				specialZero;
+		float				spanCalibration;
+		BOOL				loadDialog;
 }
 
 #pragma mark •••Initialization
-
 - (id)   init;
 - (void) dealloc;
-
 - (void) registerNotificationObservers;
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark •••Accessors
+- (float) spanCalibration;
+- (void) setSpanCalibration:(float)aSpanCalibration;
+- (float) specialZero;
+- (void) setSpecialZero:(float)aSpecialZero;
+- (int) setPtSelection;
+- (void) setSetPtSelection:(int)aSetPtSelection;
+- (float) openSoftstart;
+- (void) setOpenSoftstart:(float)aOpenSoftstart;
+- (float) closeSoftstart;
+- (void) setCloseSoftstart:(float)aCloseSoftstart;
+- (float) analogSoftstart;
+- (void) setAnalogSoftstart:(float)aAnalogSoftstart;
+- (float) analogSetPoint;
+- (void) setAnalogSetPoint:(float)aAnalogSetPoint;
+- (int) analogFSLevel;
+- (void) setAnalogFSLevel:(int)aAnalogFSLevel;
+- (int) learning;
+- (void) setLearning:(int)aLearning;
+- (BOOL) local;
+- (void) setLocal:(BOOL)aLocal;
 - (int) units;
 - (void) setUnits:(int)aUnits;
 - (float) pressureScaleValue;
@@ -91,45 +123,47 @@
 - (unsigned long) timeMeasured;
 - (void) setPressure:(float)aValue;
 - (void) setSetPoint:(int)index withValue:(float)aValue;
-- (float)readSetPointWriteValue:(int)index;
-- (void) setSetPointWriteValue:(int)index withValue:(float)aValue;
-- (void) setSoftstartRate:(int)index withValue:(float)aValue;
-- (void) setValveType:(float)aValue;
-- (void) setAnalogRange:(float)aValue;
-- (void) setSetPointType:(int)index withValue:(float)aValue;
-- (void) setPositionRange:(float)aValue;
-- (void) setControlDirection:(float)aValue;
-- (void) setSensorRange:(float)aValue;
-- (void) setSensorVoltageRange:(float)aValue;
-- (void) setSensorType:(float)aValue;
-- (void) setSoftwareVersion:(float)aValue;
-- (void) setSystemStatus:(float)aValue;
-- (void) setValveResponse:(float)aValue;
-- (void) setBatteryStatus:(float)aValue;
 - (void) setLeadValue:(int)index withValue:(float)aValue;
 - (void) setGainValue:(int)index withValue:(float)aValue;
-- (void) setControlType:(float)aValue;
+
+- (void) setHighThreshold:(int)index withValue:(float)aValue;
+- (void) setLowThreshold:(int)index withValue:(float)aValue;
+- (void) setSoftstartRate:(int)index withValue:(float)aValue;
+- (void) setValveType:(int)aValue;
+- (void) setAnalogRange:(int)aValue;
+- (void) setSetPointType:(int)index withValue:(int)aValue;
+- (void) setPositionRange:(BOOL)aValue;
+- (void) setControlDirection:(BOOL)aValue;
+- (void) setSensorRange:(int)aValue;
+- (void) setSensorVoltageRange:(int)aValue;
+- (void) setSensorType:(int)aValue;
+- (void) setSoftwareVersion:(float)aValue;
+- (void) setSystemStatus:(float)aValue;
+- (void) setValveResponse:(int)aValue;
+- (void) setBatteryStatus:(int)aValue;
+- (void) setControlType:(int)aValue;
 - (void) setChecksum:(float)aValue;
-//- (void) writeSetPointToHardware:(int)index withValue:(float)aValue;
-- (NSString*) translateUnits:(int)index;
+
 - (float) setPoint:(int)index;
-- (float) setPointWriteValue:(int)index;
-- (float) softstartRate:(int)index;
-- (float) valveType;
-- (float) analogRange;
-- (float) setPointType:(int)index;
-- (float) positionRange;
-- (float) controlDirection;
-- (float) sensorRange;
-- (float) sensorVoltageRange;
-- (float) sensorType;
-- (float) systemStatus;
-- (float) softwareVersion;
-- (float) batteryStatus;
-- (float) valveResponse;
 - (float) leadValue:(int)index;
 - (float) gainValue:(int)index;
-- (float) controlType;
+- (int)	  sensorRange;
+- (int)	  sensorVoltageRange;
+
+- (float) lowThreshold:(int)index;
+- (float) highThreshold:(int)index;
+- (float) softstartRate:(int)index;
+- (int)	  valveType;
+- (int)	  analogRange;
+- (int)   setPointType:(int)index;
+- (BOOL)  positionRange;
+- (BOOL)  controlDirection;
+- (int)	  sensorType;
+- (float) systemStatus;
+- (float) softwareVersion;
+- (int)   batteryStatus;
+- (int)	  valveResponse;
+- (int)   controlType;
 - (float) checksum;
 - (NSString*) lastRequest;
 - (void) setLastRequest:(NSString*)aRequest;
@@ -142,7 +176,7 @@
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherMks651c;
 - (void) shipPressureValues;
-- (void) addCmdToQueue:(NSString*)aCmd;
+- (void) addCmdToQueue:(NSString*)aCmd waitForResponse:(BOOL)waitForResponse;
 
 #pragma mark •••Commands
 - (void) readPressures;
@@ -155,7 +189,6 @@
 - (void) readPositionRange;
 - (void) readControlDirection;
 - (void) readSensorRange;
-- (void) readUnits;
 - (void) readSoftstartRates;
 - (void) readSensorVoltageRange;
 - (void) readSensorType;
@@ -166,29 +199,84 @@
 - (void) readSoftwareVersion;
 - (void) readValveResponse;
 - (void) readBatteryStatus;
-- (void) readValveResponse;
-- (void) readLeadValue;
-- (void) readGainValue;
+- (void) readLeadValues;
+- (void) readGainValues;
 - (void) readControlType;
 - (void) readChecksum;
+- (void) readUnits;
+- (void) pollHardware;
+- (void) writeThresholds;
+- (void) writeSetPointTypes;
+- (void) writeSetPoints;
+- (void) writeGainValues;
+- (void) writeLeadValues;
+- (void) writeAnalogRange;
+- (void) writeSensorRange;
+- (void) writeSensorVoltageRange;
+- (void) writeValveResponse;
+- (void) writeControlType;
+- (void) writeUnits;
+- (void) writeOpenValve;
+- (void) writeCloseValve;
+- (void) writeHoldValve;
+- (void) writeSoftStartRates;
+- (void) writeValveType;
+- (void) writePositionRange;
+- (void) writeControlDirection;
+- (void) writeSetPtSelection;
+- (void) writeZeroSensor;
+- (void) writeSpecialZero;
+- (void) writeRemoveZeroCorrection;
+- (void) writeLearnAnalogZero;
+- (void) writeCalibrateSpan;
+- (void) writeLearnFullScale;
+- (void) writeLearnSystem;
+- (void) writeStopLearn;
+- (void) readAndLoad;
+
+- (void) writeStopLearn;
+- (void) initHardware;
+- (void) readAndCompare;
+- (NSString*) unitsString;
 
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 
 @end
 
+@interface ORMks651cCmd : NSObject
+{
+	BOOL waitForResponse;
+	NSString* cmd;
+}
 
-extern NSString* ORMks651cModelUnitsChanged;
-extern NSString* ORMks651cModelPressureScaleChanged;
-extern NSString* ORMks651cModelShipPressuresChanged;
-extern NSString* ORMks651cModelPollTimeChanged;
-extern NSString* ORMks651cModelSerialPortChanged;
+@property (nonatomic,assign) BOOL waitForResponse;
+@property (nonatomic,copy) NSString* cmd;
+@end
+
+
+extern NSString* ORMks651cModelSpanCalibrationChanged;
+extern NSString* ORMks651cModelSpecialZeroChanged;
+extern NSString* ORMks651cModelSetPtSelectionChanged;
+extern NSString* ORMks651cLowThresholdChanged;
+extern NSString* ORMks651cHighThresholdChanged;
+extern NSString* ORMks651cOpenSoftstartChanged;
+extern NSString* ORMks651cCloseSoftstartChanged;
+extern NSString* ORMks651cAnalogSoftstartChanged;
+extern NSString* ORMks651cAnalogSetPointChanged;
+extern NSString* ORMks651cAnalogFSLevelChanged;
+extern NSString* ORMks651cLearningChanged;
+extern NSString* ORMks651cLocalChanged;
+extern NSString* ORMks651cUnitsChanged;
+extern NSString* ORMks651cPressureScaleChanged;
+extern NSString* ORMks651cShipPressuresChanged;
+extern NSString* ORMks651cPollTimeChanged;
+extern NSString* ORMks651cSerialPortChanged;
 extern NSString* ORMks651cLock;
-extern NSString* ORMks651cModelPortNameChanged;
-extern NSString* ORMks651cModelPortStateChanged;
+extern NSString* ORMks651cPortNameChanged;
+extern NSString* ORMks651cPortStateChanged;
 extern NSString* ORMks651cPressureChanged;
 extern NSString* ORMks651cSetPointChanged;
-extern NSString* ORMks651cSetPointWriteValueChanged;
 extern NSString* ORMks651cSoftstartRateChanged;
 extern NSString* ORMks651cValveTypeChanged;
 extern NSString* ORMks651cAnalogRangeChanged;
