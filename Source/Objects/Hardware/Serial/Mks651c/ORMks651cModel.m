@@ -795,12 +795,13 @@ NSString* ORMks651cLock = @"ORMks651cLock";
 - (void) openPort:(BOOL)state
 {
     if(state) {
+        [serialPort open];
 		[serialPort setSpeed:9600];
 		[serialPort setParityNone];
 		[serialPort setStopBits2:1];
 		[serialPort setDataBits:8];
-        [serialPort open];
-    }
+		[serialPort commitChanges];
+   }
     else      [serialPort close];
     portWasOpen = [serialPort isOpen];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMks651cPortStateChanged object:self];
