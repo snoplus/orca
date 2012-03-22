@@ -1776,6 +1776,15 @@
 		84997E8B0CE37CBA002CFA70 /* Vme64Crate.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84997E820CE37CBA002CFA70 /* Vme64Crate.gif */; };
 		84997E8C0CE37CBA002CFA70 /* Vme64Crate.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84997E830CE37CBA002CFA70 /* Vme64Crate.nib */; };
 		84997E8D0CE37CBA002CFA70 /* Vme64CrateSmall.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84997E840CE37CBA002CFA70 /* Vme64CrateSmall.gif */; };
+		8499A7561518D85800CD7AAC /* CP8Cryopump.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8499A74E1518D85800CD7AAC /* CP8Cryopump.nib */; };
+		8499A7571518D85800CD7AAC /* CP8Cryopump.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8499A74F1518D85800CD7AAC /* CP8Cryopump.tif */; };
+		8499A7581518D85800CD7AAC /* ORCP8CryopumpController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8499A7501518D85800CD7AAC /* ORCP8CryopumpController.h */; };
+		8499A7591518D85800CD7AAC /* ORCP8CryopumpController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8499A7511518D85800CD7AAC /* ORCP8CryopumpController.m */; };
+		8499A75A1518D85800CD7AAC /* ORCP8CryopumpDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 8499A7521518D85800CD7AAC /* ORCP8CryopumpDecoders.h */; };
+		8499A75B1518D85800CD7AAC /* ORCP8CryopumpDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 8499A7531518D85800CD7AAC /* ORCP8CryopumpDecoders.m */; };
+		8499A75C1518D85800CD7AAC /* ORCP8CryopumpModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8499A7541518D85800CD7AAC /* ORCP8CryopumpModel.h */; };
+		8499A75D1518D85800CD7AAC /* ORCP8CryopumpModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8499A7551518D85800CD7AAC /* ORCP8CryopumpModel.m */; };
+		8499A95A151B594300CD7AAC /* NoMPodCratePowerHelp in Resources */ = {isa = PBXBuildFile; fileRef = 8499A959151B594300CD7AAC /* NoMPodCratePowerHelp */; };
 		8499FE8D0DC8E9B700E82DB4 /* NoSNOCratePowerHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8499FE840DC8E9B700E82DB4 /* NoSNOCratePowerHelp.plist */; };
 		8499FE8E0DC8E9B700E82DB4 /* ORSNOCrateController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8499FE850DC8E9B700E82DB4 /* ORSNOCrateController.h */; };
 		8499FE8F0DC8E9B700E82DB4 /* ORSNOCrateController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8499FE860DC8E9B700E82DB4 /* ORSNOCrateController.m */; };
@@ -4498,6 +4507,15 @@
 		84997E820CE37CBA002CFA70 /* Vme64Crate.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Vme64Crate.gif; path = Source/Objects/Hardware/Vme/VME64Crate/Vme64Crate.gif; sourceTree = SOURCE_ROOT; };
 		84997E830CE37CBA002CFA70 /* Vme64Crate.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Vme64Crate.nib; path = Source/Objects/Hardware/Vme/VME64Crate/Vme64Crate.nib; sourceTree = SOURCE_ROOT; };
 		84997E840CE37CBA002CFA70 /* Vme64CrateSmall.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Vme64CrateSmall.gif; path = Source/Objects/Hardware/Vme/VME64Crate/Vme64CrateSmall.gif; sourceTree = SOURCE_ROOT; };
+		8499A74E1518D85800CD7AAC /* CP8Cryopump.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = CP8Cryopump.nib; path = Source/Objects/Hardware/Serial/CP8Cryopump/CP8Cryopump.nib; sourceTree = SOURCE_ROOT; };
+		8499A74F1518D85800CD7AAC /* CP8Cryopump.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = CP8Cryopump.tif; path = Source/Objects/Hardware/Serial/CP8Cryopump/CP8Cryopump.tif; sourceTree = SOURCE_ROOT; };
+		8499A7501518D85800CD7AAC /* ORCP8CryopumpController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCP8CryopumpController.h; path = Source/Objects/Hardware/Serial/CP8Cryopump/ORCP8CryopumpController.h; sourceTree = SOURCE_ROOT; };
+		8499A7511518D85800CD7AAC /* ORCP8CryopumpController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCP8CryopumpController.m; path = Source/Objects/Hardware/Serial/CP8Cryopump/ORCP8CryopumpController.m; sourceTree = SOURCE_ROOT; };
+		8499A7521518D85800CD7AAC /* ORCP8CryopumpDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCP8CryopumpDecoders.h; path = Source/Objects/Hardware/Serial/CP8Cryopump/ORCP8CryopumpDecoders.h; sourceTree = SOURCE_ROOT; };
+		8499A7531518D85800CD7AAC /* ORCP8CryopumpDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCP8CryopumpDecoders.m; path = Source/Objects/Hardware/Serial/CP8Cryopump/ORCP8CryopumpDecoders.m; sourceTree = SOURCE_ROOT; };
+		8499A7541518D85800CD7AAC /* ORCP8CryopumpModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCP8CryopumpModel.h; path = Source/Objects/Hardware/Serial/CP8Cryopump/ORCP8CryopumpModel.h; sourceTree = SOURCE_ROOT; };
+		8499A7551518D85800CD7AAC /* ORCP8CryopumpModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCP8CryopumpModel.m; path = Source/Objects/Hardware/Serial/CP8Cryopump/ORCP8CryopumpModel.m; sourceTree = SOURCE_ROOT; };
+		8499A959151B594300CD7AAC /* NoMPodCratePowerHelp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = NoMPodCratePowerHelp; sourceTree = "<group>"; };
 		8499FE840DC8E9B700E82DB4 /* NoSNOCratePowerHelp.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = NoSNOCratePowerHelp.plist; path = "Source/Objects/Custom Hardware/SNO+/SNOCrate/NoSNOCratePowerHelp.plist"; sourceTree = SOURCE_ROOT; };
 		8499FE850DC8E9B700E82DB4 /* ORSNOCrateController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSNOCrateController.h; path = "Source/Objects/Custom Hardware/SNO+/SNOCrate/ORSNOCrateController.h"; sourceTree = SOURCE_ROOT; };
 		8499FE860DC8E9B700E82DB4 /* ORSNOCrateController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSNOCrateController.m; path = "Source/Objects/Custom Hardware/SNO+/SNOCrate/ORSNOCrateController.m"; sourceTree = SOURCE_ROOT; };
@@ -7655,6 +7673,7 @@
 			isa = PBXGroup;
 			children = (
 				84DEEBBA149916AD0092DB6C /* Serial Base Classes */,
+				8499A74D1518D85700CD7AAC /* CP8Cryopump */,
 				84976E34150E77F50004B444 /* Mks651c */,
 				84B6CD3B14B37E9700386BE1 /* RGA300 */,
 				8407397914CDD91F00BAD105 /* Met637 */,
@@ -8186,6 +8205,7 @@
 				8457D25412F9986E00D3E3B4 /* ORiSeg8ChanHVController.m */,
 				8457D37512F9AB8A00D3E3B4 /* ORiSeg8ChanHVDecoders.h */,
 				8457D37612F9AB8A00D3E3B4 /* ORiSeg8ChanHVDecoders.m */,
+				8499A959151B594300CD7AAC /* NoMPodCratePowerHelp */,
 			);
 			name = "MPod Base Classes";
 			path = "Source/Objects/Hardware/HV/MPod/MPod Base Classes";
@@ -9151,6 +9171,22 @@
 			);
 			name = VME64Crate;
 			path = Source/Objects/Hardware/Vme/VME64Crate;
+			sourceTree = SOURCE_ROOT;
+		};
+		8499A74D1518D85700CD7AAC /* CP8Cryopump */ = {
+			isa = PBXGroup;
+			children = (
+				8499A74E1518D85800CD7AAC /* CP8Cryopump.nib */,
+				8499A74F1518D85800CD7AAC /* CP8Cryopump.tif */,
+				8499A7501518D85800CD7AAC /* ORCP8CryopumpController.h */,
+				8499A7511518D85800CD7AAC /* ORCP8CryopumpController.m */,
+				8499A7521518D85800CD7AAC /* ORCP8CryopumpDecoders.h */,
+				8499A7531518D85800CD7AAC /* ORCP8CryopumpDecoders.m */,
+				8499A7541518D85800CD7AAC /* ORCP8CryopumpModel.h */,
+				8499A7551518D85800CD7AAC /* ORCP8CryopumpModel.m */,
+			);
+			name = CP8Cryopump;
+			path = Source/Objects/Hardware/Serial/CP8Cryopump;
 			sourceTree = SOURCE_ROOT;
 		};
 		8499FE810DC8E86800E82DB4 /* SNO+ */ = {
@@ -12934,6 +12970,9 @@
 				2D12EEB4150FEB6600EBD8A2 /* OREdelweissSLTModel.h in Headers */,
 				CE0216BD1512139A00456EB7 /* ORnEDMCoilController.h in Headers */,
 				CE0216BF1512139A00456EB7 /* ORnEDMCoilModel.h in Headers */,
+				8499A7581518D85800CD7AAC /* ORCP8CryopumpController.h in Headers */,
+				8499A75A1518D85800CD7AAC /* ORCP8CryopumpDecoders.h in Headers */,
+				8499A75C1518D85800CD7AAC /* ORCP8CryopumpModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13758,6 +13797,9 @@
 				2D12EEAE150FEB6600EBD8A2 /* EdelweissSLTCard.gif in Resources */,
 				CE0216BC1512139A00456EB7 /* nEDMCoil.nib in Resources */,
 				CE0216C2151223DA00456EB7 /* nEDMCoil.gif in Resources */,
+				8499A7561518D85800CD7AAC /* CP8Cryopump.nib in Resources */,
+				8499A7571518D85800CD7AAC /* CP8Cryopump.tif in Resources */,
+				8499A95A151B594300CD7AAC /* NoMPodCratePowerHelp in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14682,6 +14724,9 @@
 				2D12EEB5150FEB6600EBD8A2 /* OREdelweissSLTModel.m in Sources */,
 				CE0216BE1512139A00456EB7 /* ORnEDMCoilController.m in Sources */,
 				CE0216C01512139A00456EB7 /* ORnEDMCoilModel.m in Sources */,
+				8499A7591518D85800CD7AAC /* ORCP8CryopumpController.m in Sources */,
+				8499A75B1518D85800CD7AAC /* ORCP8CryopumpDecoders.m in Sources */,
+				8499A75D1518D85800CD7AAC /* ORCP8CryopumpModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
