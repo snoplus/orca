@@ -152,7 +152,7 @@
     if([aNotification object] == [self controllerCard]){
         [self setPowerOff:YES];
 		if(!cratePowerAlarm){
-			cratePowerAlarm = [[ORAlarm alloc] initWithName:@"No MPod Crate Power" severity:0];
+			cratePowerAlarm = [[ORAlarm alloc] initWithName:@"No MPod Communication" severity:0];
 			[cratePowerAlarm setSticky:YES];
 			[cratePowerAlarm setHelpStringFromFile:@"NoMPodCratePowerHelp"];
 			[cratePowerAlarm postAlarm];
