@@ -306,15 +306,18 @@
         }
     }
     else {
+		NSColor* s = [startColor colorUsingColorSpaceName:NSDeviceRGBColorSpace];
+		NSColor* e = [endColor colorUsingColorSpaceName:NSDeviceRGBColorSpace];
+
         short i;
-        float startRed      = [startColor redComponent];
-        float startGreen    = [startColor greenComponent];
-        float startBlue     = [startColor blueComponent];
-        float startAlpha    = [startColor alphaComponent];
-        float endRed        = [endColor redComponent];
-        float endGreen      = [endColor greenComponent];
-        float endBlue       = [endColor blueComponent];
-        float endAlpha      = [endColor alphaComponent];
+        float startRed      = [s redComponent];
+        float startGreen    = [s greenComponent];
+        float startBlue     = [s blueComponent];
+        float startAlpha    = [s alphaComponent];
+        float endRed        = [e redComponent];
+        float endGreen      = [e greenComponent];
+        float endBlue       = [e blueComponent];
+        float endAlpha      = [e alphaComponent];
         float red,green,blue,alpha;
         if(numColors==0)numColors = 256;
         for (i=0; i<numColors; i++){
