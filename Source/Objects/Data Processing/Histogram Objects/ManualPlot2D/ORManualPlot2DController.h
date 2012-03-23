@@ -25,6 +25,7 @@
 {
 	IBOutlet NSView*		roiView;
     OR2dRoiController*		roiController;
+	BOOL					scheduledToUpdate;
 }
 
 #pragma mark •••Initialization
@@ -40,6 +41,7 @@
 - (NSMutableArray*) roiArrayForPlotter:(id)aPlot;
 - (void) plotOrderDidChange:(id)aPlotView;
 - (BOOL) plotterShouldShowRoi:(id)aPlot;
+- (void) scheduledUpdate;
 
 #pragma mark •••Actions
 - (IBAction) refreshPlot:(id)sender;

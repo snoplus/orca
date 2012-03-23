@@ -22,6 +22,7 @@
 #import "ORManualPlot2DModel.h"
 #import "OR2DHistoPlot.h"
 #import "ORPlotView.h"
+#import "ORColorScale.h"
 #import "OR2DRoiController.h"
 #import "ORComposite2DPlotView.h"
 #import "ORAxis.h"
@@ -36,6 +37,7 @@
 - (void) dealloc 
 {
 	[roiController release];
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[super dealloc];
 }
 
@@ -48,7 +50,9 @@
     [[plotView yAxis] setLog:NO];
 	
 	[plotView setBackgroundColor:[NSColor colorWithCalibratedRed:1. green:1. blue:1. alpha:1]];
-	
+	//[[(ORComposite2DPlotView*)plotView colorScale] setUseRainBow:NO];
+	//[[(ORComposite2DPlotView*)plotView colorScale] setStartColor:[NSColor greenColor]];
+	//[[(ORComposite2DPlotView*)plotView colorScale] setEndColor:[NSColor redColor]];
     NSSize minSize = [[self window] minSize];
     minSize.width = 335;
     minSize.height = 335;
@@ -62,6 +66,8 @@
 	
 	roiController = [[OR2dRoiController panel] retain];
 	[roiView addSubview:[roiController view]];
+	
+	scheduledToUpdate = NO;
 	
 	[self plotOrderDidChange:plotView];
 }
@@ -137,7 +143,17 @@
 
 - (void) dataChanged:(NSNotification*)aNotification
 {
+	if(!scheduledToUpdate){
+		scheduledToUpdate = YES;
+		[self performSelector:@selector(scheduledUpdate) withObject:nil afterDelay:.2];
+	}
+}
+
+
+- (void) scheduledUpdate
+{
 	[plotView setNeedsDisplay:YES];
+	scheduledToUpdate = NO;
 }
 
 - (void) refreshModeChanged:(NSNotification*)aNotification
