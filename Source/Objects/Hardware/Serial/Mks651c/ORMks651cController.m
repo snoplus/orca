@@ -761,7 +761,7 @@
     [self endEditing];
 	NSBeginAlertSheet(@"Transfer HW Settings To Dialog",
 					  @"YES/Do it",
-					  @"Canel",
+					  @"Cancel",
 					  nil,[self window],
 					  self,
 					  @selector(loadDialogDidFinish:returnCode:contextInfo:),
