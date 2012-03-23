@@ -366,11 +366,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 			//NSLog(@"location: 0x%0x\n",locationID);
 			// Save the device's name to our private data.        
 			[ usbCallbackData setDeviceName:deviceNameAsString];
-			
-			unsigned char theSpeed;
-			kr = (*deviceInterface)->GetDeviceSpeed(deviceInterface, &theSpeed);
-			//if(kr == KERN_SUCCESS)NSLog(@"Device Speed: %d\n",theSpeed);
-			
+						
 			UInt8 snsi;
 			kr = (*deviceInterface)->USBGetSerialNumberStringIndex(deviceInterface, &snsi);
 			char serialString[128];
@@ -559,7 +555,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 		
 		//kr = (*intf)->GetInterfaceClass(intf, &intfClass);
 		//kr = (*intf)->GetInterfaceSubClass(intf, &intfSubClass);
-		
+
 		//NSLog(@"Interface class %d, subclass %d\n", intfClass, intfSubClass);
 		
 		// Now open the interface. This will cause the pipes to be instantiated that are
