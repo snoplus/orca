@@ -49,13 +49,9 @@
 		int					powerFailureRecovery;
 		int					powerFailureRecoveryStatus;
 		int					pumpStatus;
-		int					pumpQuery;
 		int					purgeStatus;
-		int					regeneration;
 		int					regenerationCycles;
 		int					regenerationError;
-		int					regenerationParameter;
-		int					regenerationType;
 		char				regenerationSequence;
 		int					regenerationStartDelay;
 		int					regenerationStepTimer;
@@ -73,10 +69,12 @@
 		int					rateOfRise;
 		int					rateOfRiseCycles;
 		int					restartTemperature;
-		BOOL				roughingInterlock;
+		int					roughingInterlockStatus;
 		int					pumpsPerCompressor;
 		int					repurgeTime;
 		BOOL				standbyMode;
+		BOOL				roughingInterlock;
+		int					secondStageTempControl;
 }
 
 #pragma mark •••Initialization
@@ -86,6 +84,10 @@
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark •••Accessors
+- (int)		secondStageTempControl;
+- (void)	setSecondStageTempControl:(int)aSecondStageTempControl;
+- (BOOL)	roughingInterlock;
+- (void)	setRoughingInterlock:(BOOL)aRoughingInterlock;
 - (BOOL)	standbyMode;
 - (void)	setStandbyMode:(BOOL)aStandbyMode;
 - (int)		repurgeTime;
@@ -94,8 +96,8 @@
 - (void)	setPumpsPerCompressor:(int)aPumpsPerCompressor;
 - (int)		pumpsPerCompressor;
 - (void)	setPumpsPerCompressor:(int)aPumpsPerCompressor;
-- (BOOL)	roughingInterlock;
-- (void)	setRoughingInterlock:(BOOL)aRoughingInterlock;
+- (int)		roughingInterlockStatus;
+- (void)	setRoughingInterlockStatus:(int)aRoughingInterlock;
 - (int)		restartTemperature;
 - (void)	setRestartTemperature:(int)aRestartTemperature;
 - (int)		rateOfRiseCycles;
@@ -130,20 +132,12 @@
 - (void)	setRegenerationStartDelay:(int)aRegenerationStartDelay;
 - (int)		regenerationSequence;
 - (void)	setRegenerationSequence:(int)aRegenerationSequence;
-- (int)		regenerationType;
-- (void)	setRegenerationType:(int)aRegenerationType;
-- (int)		regenerationParameter;
-- (void)	setRegenerationParameter:(int)aRegenerationParameter;
 - (int)		regenerationError;
 - (void)	setRegenerationError:(int)aRegenerationError;
 - (int)		regenerationCycles;
 - (void)	setRegenerationCycles:(int)aRegenerationCycles;
-- (int)		regeneration;
-- (void)	setRegeneration:(int)aRegeneration;
 - (int)		purgeStatus;
 - (void)	setPurgeStatus:(int)aPurgeStatus;
-- (int)		pumpQuery;
-- (void)	setPumpQuery:(int)aPumpQuery;
 - (int)		pumpStatus;
 - (void)	setPumpStatus:(int)aPumpStatus;
 - (int)		powerFailureRecoveryStatus;
@@ -215,7 +209,6 @@
 - (void) readPurgeStatus;
 - (void) readRegenerationCycles;
 - (void) readRegenerationError;
-- (void) readRegenerationParameters;
 - (void) readRegenerationSequence;
 - (void) readRegenerationStartDelay;
 - (void) readRegenerationStepTimer;
@@ -230,14 +223,14 @@
 #pragma mark •••HW Writes
 - (void) writeFirstStageTempControl;
 - (void) writePowerFailureRecoveryMode;
-- (void) writePumpOnOff;
-- (void) writePurgeOnOff;
+- (void) writeCryoPumpOn:(BOOL)aState;
+- (void) writePurgeValveOpen:(BOOL)aState;
+- (void) writeRoughValveOpen:(BOOL)aState;
+- (void) writeThermocoupleOn:(BOOL)aState;
 - (void) writeRegenerationCycleParameters;
 - (void) writeRegenerationStartDelay:(int)aDelay;
-- (void) writeRoughValve:(BOOL)aState;
 - (void) writeRoughValveInterlockPermissionYes;
 - (void) writeSecondStageControlTemp:(int)aTemp;
-- (void) writeThermocoupleOnOff:(BOOL)aState;
 
 #pragma mark •••Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
@@ -254,10 +247,12 @@
 @property (nonatomic,copy) NSString* cmd;
 @end
 
+extern NSString* ORCP8CryopumpModelSecondStageTempControlChanged;
+extern NSString* ORCP8CryopumpModelRoughingInterlockChanged;
 extern NSString* ORCP8CryopumpModelStandbyModeChanged;
 extern NSString* ORCP8CryopumpModelRepurgeTimeChanged;
 extern NSString* ORCP8CryopumpModelPumpsPerCompressorChanged;
-extern NSString* ORCP8CryopumpModelRoughingInterlockChanged;
+extern NSString* ORCP8CryopumpModelRoughingInterlockStatusChanged;
 extern NSString* ORCP8CryopumpModelRestartTemperatureChanged;
 extern NSString* ORCP8CryopumpModelRateOfRiseCyclesChanged;
 extern NSString* ORCP8CryopumpModelRateOfRiseChanged;
@@ -275,13 +270,10 @@ extern NSString* ORCP8CryopumpModelRegenerationTimeChanged;
 extern NSString* ORCP8CryopumpModelRegenerationStepTimerChanged;
 extern NSString* ORCP8CryopumpModelRegenerationStartDelayChanged;
 extern NSString* ORCP8CryopumpModelRegenerationSequenceChanged;
-extern NSString* ORCP8CryopumpModelRegenerationTypeChanged;
-extern NSString* ORCP8CryopumpModelRegenerationParameterChanged;
 extern NSString* ORCP8CryopumpModelRegenerationErrorChanged;
 extern NSString* ORCP8CryopumpModelRegenerationCyclesChanged;
 extern NSString* ORCP8CryopumpModelRegenerationChanged;
 extern NSString* ORCP8CryopumpModelPurgeStatusChanged;
-extern NSString* ORCP8CryopumpModelPumpQueryChanged;
 extern NSString* ORCP8CryopumpModelPumpStatusChanged;
 extern NSString* ORCP8CryopumpModelPowerFailureRecoveryStatusChanged;
 extern NSString* ORCP8CryopumpModelPowerFailureRecoveryChanged;

@@ -19,15 +19,18 @@
 #pragma mark ***Imported Files
 
 @class ORCompositePlotView;
+@class BiStateView;
 
 @interface ORCP8CryopumpController : OrcaObjectController
 {
     IBOutlet NSTextField*	lockDocField;
+	IBOutlet NSTextField*	secondStageTempControlField;
+	IBOutlet NSPopUpButton* roughingInterlockPU;
+    IBOutlet NSButton*      lockButton;
 	IBOutlet NSPopUpButton*	standbyModePU;
 	IBOutlet NSTextField*	repurgeTimeField;
 	IBOutlet NSTextField*	pumpsPerCompressorField;
-	IBOutlet NSPopUpButton*	pumpsPerCompressorPU;
-	IBOutlet NSPopUpButton*	roughingInterlockPU;
+	IBOutlet NSTextField*	roughingInterlockStatusField;
 	IBOutlet NSTextField*	restartTemperatureField;
 	IBOutlet NSTextField*	rateOfRiseCyclesField;
 	IBOutlet NSTextField*	rateOfRiseField;
@@ -36,45 +39,66 @@
 	IBOutlet NSTextField*	extendedPurgeTimeField;
 	IBOutlet NSTextField*	pumpRestartDelayField;
 	IBOutlet NSTextField*	thermocouplePressureField;
-	IBOutlet NSTextField*	thermocoupleStatusField;
-	IBOutlet NSTextField*	statusField;
-	IBOutlet NSTextField*	secondStageTempField;
 	IBOutlet NSTextField*	roughValveInterlockField;
-	IBOutlet NSTextField*	roughValveStatusField;
 	IBOutlet NSTextField*	regenerationTimeField;
 	IBOutlet NSTextField*	regenerationStepTimerField;
 	IBOutlet NSTextField*	regenerationStartDelayField;
 	IBOutlet NSTextField*	regenerationSequenceField;
-	IBOutlet NSPopUpButton* regenerationTypePU;
-	IBOutlet NSPopUpButton* regenerationParameterPU;
 	IBOutlet NSTextField*	regenerationErrorField;
 	IBOutlet NSTextField*	regenerationCyclesField;
-	IBOutlet NSPopUpButton* regenerationPU;
-	IBOutlet NSTextField*	purgeStatusField;
-	IBOutlet NSTextField*	pumpQueryField;
-	IBOutlet NSTextField*	pumpStatusField;
 	IBOutlet NSTextField*	powerFailureRecoveryStatusField;
 	IBOutlet NSPopUpButton* powerFailureRecoveryPU;
 	IBOutlet NSTextField*	moduleVersionField;
 	IBOutlet NSTextField*	lastRateOfRaiseField;
 	IBOutlet NSPopUpButton* firstStageControlMethodPU;
 	IBOutlet NSTextField*	firstStageControlTempField;
-	IBOutlet NSTextField*	firstStageTempField;
 	IBOutlet NSTextField*	failedRepurgeCyclesField;
 	IBOutlet NSTextField*	failedRateRiseCyclesField;
 	IBOutlet NSTextField*	elapsedTimeField;
 	IBOutlet NSTextField*	dutyCycleField;
 	IBOutlet NSButton*		shipTemperaturesButton;
-    IBOutlet NSButton*      lockButton;
     IBOutlet NSButton*		initHardwareButton;
     IBOutlet NSTextField*   portStateField;
     IBOutlet NSPopUpButton* portListPopup;
     IBOutlet NSPopUpButton* pollTimePopup;
     IBOutlet NSButton*      openPortButton;
-    IBOutlet NSButton*      readTemperaturesButton;
-    IBOutlet NSTextField*   temperatureField;
-	IBOutlet NSTextField*   timeField;
+    IBOutlet NSButton*      pollNowButton;
 	IBOutlet ORCompositePlotView*    plotter0;
+
+	IBOutlet NSTextField*	firstStageTempField;
+	IBOutlet NSTextField*	secondStageTempField;
+	IBOutlet NSTextField*   timeField;
+
+	IBOutlet NSButton*      pumpOnButton;
+	IBOutlet NSButton*      pumpOffButton;
+	IBOutlet NSTextField*	pumpStatusField;
+
+	IBOutlet NSButton*      purgeOnButton;
+	IBOutlet NSButton*      purgeOffButton;
+	IBOutlet NSTextField*	purgeStatusField;
+
+	IBOutlet NSButton*      roughingValveOpenButton;
+	IBOutlet NSButton*      roughingValveClosedButton;
+	IBOutlet NSTextField*	roughValveStatusField;
+
+	IBOutlet NSButton*      thermocoupleOnButton;
+	IBOutlet NSButton*      thermocoupleOffButton;
+	IBOutlet NSTextField*	thermocoupleStatusField;
+	
+	
+	IBOutlet NSButton*      regenAbortButton;
+	IBOutlet NSButton*      regenStartFullButton;
+	IBOutlet NSButton*      regenStartFastButton;
+	IBOutlet NSButton*      regenActivateNormalPumpingButton;
+	IBOutlet NSButton*      regenWarmAndStopButton;
+	
+	IBOutlet NSButton*      roughValveInterlockButton;
+	IBOutlet BiStateView*   pumpOnBiStateView;
+	IBOutlet BiStateView*   roughOpenBiStateView;
+	IBOutlet BiStateView*   purgeOpenBiStateView;
+	IBOutlet BiStateView*   thermocoupleOnBiStateView;
+	IBOutlet BiStateView*   powerFailureOccurredBiStateView;
+
 }
 
 #pragma mark ***Initialization
@@ -87,11 +111,12 @@
 - (void) updateWindow;
 
 #pragma mark ***Interface Management
+- (void) secondStageTempControlChanged:(NSNotification*)aNote;
+- (void) roughingInterlockChanged:(NSNotification*)aNote;
 - (void) standbyModeChanged:(NSNotification*)aNote;
 - (void) repurgeTimeChanged:(NSNotification*)aNote;
 - (void) pumpsPerCompressorChanged:(NSNotification*)aNote;
-- (void) pumpsPerCompressorChanged:(NSNotification*)aNote;
-- (void) roughingInterlockChanged:(NSNotification*)aNote;
+- (void) roughingInterlockStatusChanged:(NSNotification*)aNote;
 - (void) restartTemperatureChanged:(NSNotification*)aNote;
 - (void) rateOfRiseCyclesChanged:(NSNotification*)aNote;
 - (void) rateOfRiseChanged:(NSNotification*)aNote;
@@ -99,7 +124,6 @@
 - (void) repurgeCyclesChanged:(NSNotification*)aNote;
 - (void) extendedPurgeTimeChanged:(NSNotification*)aNote;
 - (void) pumpRestartDelayChanged:(NSNotification*)aNote;
-- (void) thermocouplePressureChanged:(NSNotification*)aNote;
 - (void) thermocouplePressureChanged:(NSNotification*)aNote;
 - (void) thermocoupleStatusChanged:(NSNotification*)aNote;
 - (void) statusChanged:(NSNotification*)aNote;
@@ -110,13 +134,9 @@
 - (void) regenerationStepTimerChanged:(NSNotification*)aNote;
 - (void) regenerationStartDelayChanged:(NSNotification*)aNote;
 - (void) regenerationSequenceChanged:(NSNotification*)aNote;
-- (void) regenerationTypeChanged:(NSNotification*)aNote;
-- (void) regenerationParameterChanged:(NSNotification*)aNote;
 - (void) regenerationErrorChanged:(NSNotification*)aNote;
 - (void) regenerationCyclesChanged:(NSNotification*)aNote;
-- (void) regenerationChanged:(NSNotification*)aNote;
 - (void) purgeStatusChanged:(NSNotification*)aNote;
-- (void) pumpQueryChanged:(NSNotification*)aNote;
 - (void) pumpStatusChanged:(NSNotification*)aNote;
 - (void) powerFailureRecoveryStatusChanged:(NSNotification*)aNote;
 - (void) powerFailureRecoveryChanged:(NSNotification*)aNote;
@@ -141,10 +161,10 @@
 - (void) scaleAction:(NSNotification*)aNote;
 
 #pragma mark ***Actions
+- (IBAction) secondStageTempControlAction:(id)sender;
 - (IBAction) standbyModeAction:(id)sender;
 - (IBAction) repurgeTimeAction:(id)sender;
 - (IBAction) pumpsPerCompressorAction:(id)sender;
-- (IBAction) roughingInterlockAction:(id)sender;
 - (IBAction) restartTemperatureAction:(id)sender;
 - (IBAction) rateOfRiseCyclesAction:(id)sender;
 - (IBAction) rateOfRiseAction:(id)sender;
@@ -152,38 +172,44 @@
 - (IBAction) repurgeCyclesAction:(id)sender;
 - (IBAction) extendedPurgeTimeAction:(id)sender;
 - (IBAction) pumpRestartDelayAction:(id)sender;
-- (IBAction) thermocoupleStatusAction:(id)sender;
 - (IBAction) statusAction:(id)sender;
-- (IBAction) secondStageTempAction:(id)sender;
 - (IBAction) roughValveInterlockAction:(id)sender;
 - (IBAction) roughValveStatusAction:(id)sender;
 - (IBAction) regenerationTimeAction:(id)sender;
 - (IBAction) regenerationStepTimerAction:(id)sender;
 - (IBAction) regenerationStartDelayAction:(id)sender;
-- (IBAction) regenerationSequenceAction:(id)sender;
-- (IBAction) regenerationTypeAction:(id)sender;
-- (IBAction) regenerationParameterAction:(id)sender;
-- (IBAction) regenerationErrorAction:(id)sender;
-- (IBAction) regenerationCyclesAction:(id)sender;
-- (IBAction) regenerationAction:(id)sender;
-- (IBAction) purgeStatusAction:(id)sender;
-- (IBAction) pumpQueryAction:(id)sender;
-- (IBAction) pumpStatusAction:(id)sender;
 - (IBAction) powerFailureRecoveryAction:(id)sender;
-- (IBAction) moduleVersionAction:(id)sender;
 - (IBAction) firstStageControlMethodAction:(id)sender;
 - (IBAction) firstStageControlTempAction:(id)sender;
-- (IBAction) firstStageTempAction:(id)sender;
-- (IBAction) elapsedTimeAction:(id)sender;
-- (IBAction) dutyCycleAction:(id)sender;
 - (IBAction) initHardwareAction:(id)sender;
 - (IBAction) shipTemperaturesAction:(id)sender;
 - (IBAction) lockAction:(id) sender;
 - (IBAction) portListAction:(id) sender;
 - (IBAction) openPortAction:(id)sender;
-- (IBAction) readTemperaturesAction:(id)sender;
 - (IBAction) pollTimeAction:(id)sender;
 - (IBAction) pollNowAction:(id)sender;
+- (IBAction) roughingInterlockAction:(id)sender;
+
+- (IBAction) turnCryoPumpOnAction:(id)sender;
+- (IBAction) turnCryoPumpOffAction:(id)sender;
+- (void) turnOnCryoPumpDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) turnOffCryoPumpDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+
+- (IBAction) openPurgeValveAction:(id)sender;
+- (IBAction) closePurgeValveAction:(id)sender;
+- (void) openPurgeValveDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) closePurgeValveDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+
+- (IBAction) openRoughingValveAction:(id)sender;
+- (IBAction) closeRoughingValveAction:(id)sender;
+- (void) openRoughingValveDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) closeRoughingValveDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+
+- (IBAction) turnThermocoupleOnAction:(id)sender;
+- (IBAction) turnThermocoupleOffAction:(id)sender;
+- (void) turnOnThermocoupleDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) turnOffThermocoupleDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+
 
 - (int) numberPointsInPlot:(id)aPlotter;
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;

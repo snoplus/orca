@@ -28,10 +28,12 @@
 #import "ORTimeRate.h"
 
 #pragma mark •••External Strings
+NSString* ORCP8CryopumpModelSecondStageTempControlChanged	= @"ORCP8CryopumpModelSecondStageTempControlChanged";
+NSString* ORCP8CryopumpModelRoughingInterlockChanged		= @"ORCP8CryopumpModelRoughingInterlockChanged";
 NSString* ORCP8CryopumpModelStandbyModeChanged				= @"ORCP8CryopumpModelStandbyModeChanged";
 NSString* ORCP8CryopumpModelRepurgeTimeChanged				= @"ORCP8CryopumpModelRepurgeTimeChanged";
 NSString* ORCP8CryopumpModelPumpsPerCompressorChanged		= @"ORCP8CryopumpModelPumpsPerCompressorChanged";
-NSString* ORCP8CryopumpModelRoughingInterlockChanged		= @"ORCP8CryopumpModelRoughingInterlockChanged";
+NSString* ORCP8CryopumpModelRoughingInterlockStatusChanged	= @"ORCP8CryopumpModelRoughingInterlockStatusChanged";
 NSString* ORCP8CryopumpModelRestartTemperatureChanged		= @"ORCP8CryopumpModelRestartTemperatureChanged";
 NSString* ORCP8CryopumpModelRateOfRiseCyclesChanged			= @"ORCP8CryopumpModelRateOfRiseCyclesChanged";
 NSString* ORCP8CryopumpModelRateOfRiseChanged				= @"ORCP8CryopumpModelRateOfRiseChanged";
@@ -49,13 +51,10 @@ NSString* ORCP8CryopumpModelRegenerationTimeChanged			= @"ORCP8CryopumpModelRege
 NSString* ORCP8CryopumpModelRegenerationStepTimerChanged	= @"ORCP8CryopumpModelRegenerationStepTimerChanged";
 NSString* ORCP8CryopumpModelRegenerationStartDelayChanged	= @"ORCP8CryopumpModelRegenerationStartDelayChanged";
 NSString* ORCP8CryopumpModelRegenerationSequenceChanged		= @"ORCP8CryopumpModelRegenerationSequenceChanged";
-NSString* ORCP8CryopumpModelRegenerationTypeChanged			= @"ORCP8CryopumpModelRegenerationTypeChanged";
-NSString* ORCP8CryopumpModelRegenerationParameterChanged	= @"ORCP8CryopumpModelRegenerationParameterChanged";
 NSString* ORCP8CryopumpModelRegenerationErrorChanged		= @"ORCP8CryopumpModelRegenerationErrorChanged";
 NSString* ORCP8CryopumpModelRegenerationCyclesChanged		= @"ORCP8CryopumpModelRegenerationCyclesChanged";
 NSString* ORCP8CryopumpModelRegenerationChanged				= @"ORCP8CryopumpModelRegenerationChanged";
 NSString* ORCP8CryopumpModelPurgeStatusChanged				= @"ORCP8CryopumpModelPurgeStatusChanged";
-NSString* ORCP8CryopumpModelPumpQueryChanged				= @"ORCP8CryopumpModelPumpQueryChanged";
 NSString* ORCP8CryopumpModelPumpStatusChanged				= @"ORCP8CryopumpModelPumpStatusChanged";
 NSString* ORCP8CryopumpModelPowerFailureRecoveryStatusChanged = @"ORCP8CryopumpModelPowerFailureRecoveryStatusChanged";
 NSString* ORCP8CryopumpModelPowerFailureRecoveryChanged		= @"ORCP8CryopumpModelPowerFailureRecoveryChanged";
@@ -201,6 +200,32 @@ NSString* ORCP8CryopumpLock									= @"ORCP8CryopumpLock";
 
 #pragma mark •••Accessors
 
+- (int) secondStageTempControl
+{
+    return secondStageTempControl;
+}
+
+- (void) setSecondStageTempControl:(int)aSecondStageTempControl
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSecondStageTempControl:secondStageTempControl];
+    secondStageTempControl = aSecondStageTempControl;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpModelSecondStageTempControlChanged object:self];
+}
+
+- (BOOL) roughingInterlock
+{
+    return roughingInterlock;
+}
+
+- (void) setRoughingInterlock:(BOOL)aRoughingInterlock
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setRoughingInterlock:roughingInterlock];
+    
+    roughingInterlock = aRoughingInterlock;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpModelRoughingInterlockChanged object:self];
+}
+
 - (BOOL) standbyMode
 {
     return standbyMode;
@@ -237,16 +262,15 @@ NSString* ORCP8CryopumpLock									= @"ORCP8CryopumpLock";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpModelPumpsPerCompressorChanged object:self];
 }
 
-- (BOOL) roughingInterlock
+- (int) roughingInterlockStatus
 {
-    return roughingInterlock;
+    return roughingInterlockStatus;
 }
 
-- (void) setRoughingInterlock:(BOOL)aRoughingInterlock
+- (void) setRoughingInterlockStatus:(int)aStatus
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setRoughingInterlock:roughingInterlock];
-    roughingInterlock = aRoughingInterlock;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpModelRoughingInterlockChanged object:self];
+    roughingInterlockStatus = aStatus;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpModelRoughingInterlockStatusChanged object:self];
 }
 
 - (int) restartTemperature
@@ -445,30 +469,6 @@ NSString* ORCP8CryopumpLock									= @"ORCP8CryopumpLock";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpModelRegenerationSequenceChanged object:self];
 }
 
-- (int) regenerationType
-{
-    return regenerationType;
-}
-
-- (void) setRegenerationType:(int)aRegenerationType
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setRegenerationType:regenerationType];
-    regenerationType = aRegenerationType;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpModelRegenerationTypeChanged object:self];
-}
-
-- (int) regenerationParameter
-{
-    return regenerationParameter;
-}
-
-- (void) setRegenerationParameter:(int)aRegenerationParameter
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setRegenerationParameter:regenerationParameter];
-    regenerationParameter = aRegenerationParameter;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpModelRegenerationParameterChanged object:self];
-}
-
 - (int) regenerationError
 {
     return regenerationError;
@@ -491,18 +491,6 @@ NSString* ORCP8CryopumpLock									= @"ORCP8CryopumpLock";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpModelRegenerationCyclesChanged object:self];
 }
 
-- (int) regeneration
-{
-    return regeneration;
-}
-
-- (void) setRegeneration:(int)aRegeneration
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setRegeneration:regeneration];
-    regeneration = aRegeneration;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpModelRegenerationChanged object:self];
-}
-
 - (int) purgeStatus
 {
     return purgeStatus;
@@ -512,17 +500,6 @@ NSString* ORCP8CryopumpLock									= @"ORCP8CryopumpLock";
 {
     purgeStatus = aPurgeStatus;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpModelPurgeStatusChanged object:self];
-}
-
-- (int) pumpQuery
-{
-    return pumpQuery;
-}
-
-- (void) setPumpQuery:(int)aPumpQuery
-{
-    pumpQuery = aPumpQuery;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpModelPumpQueryChanged object:self];
 }
 
 - (int) pumpStatus
@@ -562,7 +539,8 @@ NSString* ORCP8CryopumpLock									= @"ORCP8CryopumpLock";
 
 - (NSString*) moduleVersion
 {
-    return moduleVersion;
+	if([moduleVersion length])return moduleVersion;
+	else return @"--";
 }
 
 - (void) setModuleVersion:(NSString*)aModuleVersion
@@ -756,7 +734,8 @@ NSString* ORCP8CryopumpLock									= @"ORCP8CryopumpLock";
 
 - (NSString*) portName
 {
-    return portName;
+	if([portName length])return portName;
+	return @"-";
 }
 
 - (void) setPortName:(NSString*)aPortName
@@ -823,9 +802,10 @@ NSString* ORCP8CryopumpLock									= @"ORCP8CryopumpLock";
 {
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
+	[self setSecondStageTempControl:	[decoder decodeIntForKey:@"secondStageTempControl"]];
+	[self setRoughingInterlock:[		decoder decodeBoolForKey:@"roughingInterlock"]];
 	[self setStandbyMode:				[decoder decodeBoolForKey:@"standbyMode"]];
 	[self setRepurgeTime:				[decoder decodeIntForKey:@"repurgeTime"]];
-	[self setPumpsPerCompressor:		[decoder decodeIntForKey:@"pumpsPerCompressor"]];
 	[self setPumpsPerCompressor:		[decoder decodeIntForKey:@"pumpsPerCompressor"]];
 	[self setRoughingInterlock:			[decoder decodeBoolForKey:@"roughingInterlock"]];
 	[self setRestartTemperature:		[decoder decodeIntForKey:@"restartTemperature"]];
@@ -837,9 +817,6 @@ NSString* ORCP8CryopumpLock									= @"ORCP8CryopumpLock";
 	[self setPumpRestartDelay:			[decoder decodeIntForKey:@"pumpRestartDelay"]];
 	[self setRegenerationStepTimer:		[decoder decodeIntForKey:@"regenerationStepTimer"]];
 	[self setRegenerationStartDelay:	[decoder decodeIntForKey:@"regenerationStartDelay"]];
-	[self setRegenerationType:			[decoder decodeIntForKey:@"regenerationType"]];
-	[self setRegenerationParameter:		[decoder decodeIntForKey:@"regenerationParameter"]];
-	[self setRegeneration:				[decoder decodeIntForKey:@"regeneration"]];
 	[self setPumpStatus:				[decoder decodeIntForKey:@"pumpStatus"]];
 	[self setPowerFailureRecovery:		[decoder decodeIntForKey:@"powerFailureRecovery"]];
 	[self setLastRateOfRaise:			[decoder decodeIntForKey:@"lastRateOfRaise"]];
@@ -863,9 +840,10 @@ NSString* ORCP8CryopumpLock									= @"ORCP8CryopumpLock";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeInt:secondStageTempControl	forKey:@"secondStageTempControl"];
+    [encoder encodeBool:roughingInterlock		forKey:@"roughingInterlock"];
     [encoder encodeBool:standbyMode				forKey:@"standbyMode"];
     [encoder encodeInt:repurgeTime				forKey:@"repurgeTime"];
-    [encoder encodeInt:pumpsPerCompressor		forKey:@"pumpsPerCompressor"];
     [encoder encodeInt:pumpsPerCompressor		forKey:@"pumpsPerCompressor"];
     [encoder encodeBool:roughingInterlock		forKey:@"roughingInterlock"];
     [encoder encodeInt:restartTemperature		forKey:@"restartTemperature"];
@@ -877,9 +855,6 @@ NSString* ORCP8CryopumpLock									= @"ORCP8CryopumpLock";
     [encoder encodeInt:pumpRestartDelay			forKey:@"pumpRestartDelay"];
     [encoder encodeInt:regenerationStepTimer	forKey: @"regenerationStepTimer"];
     [encoder encodeInt:regenerationStartDelay	forKey: @"regenerationStartDelay"];
-    [encoder encodeInt:regenerationType			forKey: @"regenerationType"];
-    [encoder encodeInt:regenerationParameter	forKey: @"regenerationParameter"];
-    [encoder encodeInt:regeneration				forKey: @"regeneration"];
     [encoder encodeInt:pumpStatus				forKey: @"pumpStatus"];
     [encoder encodeInt:powerFailureRecovery		forKey: @"powerFailureRecovery"];
     [encoder encodeInt:firstStageControlMethod	forKey:@"firstStageControlMethod"];
@@ -942,7 +917,7 @@ NSString* ORCP8CryopumpLock									= @"ORCP8CryopumpLock";
 - (void) readRegenerationCycles			{ [self addCmdToQueue: @"Z?"	waitForResponse:YES]; }
 - (void) readRegenerationError			{ [self addCmdToQueue: @"e"		waitForResponse:YES]; }
 
-- (void) readRegenerationParameters
+- (void) readgs
 {
 	[self addCmdToQueue:@"P0?" waitForResponse:YES];
 	[self addCmdToQueue:@"P1?" waitForResponse:YES];
@@ -980,14 +955,14 @@ NSString* ORCP8CryopumpLock									= @"ORCP8CryopumpLock";
 	[self addCmdToQueue: [NSString stringWithFormat:@"i%d",powerFailureRecovery]	waitForResponse:YES];
 }
 
-- (void) writePumpOnOff
+- (void) writeCryoPumpOn:(BOOL)aState
 {
-	[self addCmdToQueue: [NSString stringWithFormat:@"A%d",pumpStatus]	waitForResponse:YES];
+	[self addCmdToQueue: [NSString stringWithFormat:@"A%d",aState]	waitForResponse:YES];
 }
 
-- (void) writePurgeOnOff
+- (void) writePurgeValveOpen:(BOOL)aState
 {
-	[self addCmdToQueue: [NSString stringWithFormat:@"E%d",purgeStatus]	waitForResponse:YES];
+	[self addCmdToQueue: [NSString stringWithFormat:@"E%d",aState]	waitForResponse:YES];
 }
 
 - (void) writeRegenerationCycleParameters
@@ -1010,7 +985,7 @@ NSString* ORCP8CryopumpLock									= @"ORCP8CryopumpLock";
 	[self addCmdToQueue: [NSString stringWithFormat:@"j%d",aDelay] waitForResponse:YES];
 }
 
-- (void) writeRoughValve:(BOOL)aState
+- (void) writeRoughValveOpen:(BOOL)aState
 {
 	[self addCmdToQueue: [NSString stringWithFormat:@"D%d",aState] waitForResponse:YES];
 }
@@ -1025,7 +1000,7 @@ NSString* ORCP8CryopumpLock									= @"ORCP8CryopumpLock";
 	[self addCmdToQueue: [NSString stringWithFormat:@"I%d",aTemp]	waitForResponse:YES];
 }
 
-- (void) writeThermocoupleOnOff:(BOOL)aState
+- (void) writeThermocoupleOn:(BOOL)aState
 {
 	[self addCmdToQueue: [NSString stringWithFormat:@"B%d",aState]	waitForResponse:YES];
 }

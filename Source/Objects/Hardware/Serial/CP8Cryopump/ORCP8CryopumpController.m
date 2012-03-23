@@ -26,6 +26,7 @@
 #import "ORSerialPortList.h"
 #import "ORSerialPort.h"
 #import "ORTimeRate.h"
+#import "BiStateView.h"
 
 @interface ORCP8CryopumpController (private)
 - (void) populatePortListPopup;
@@ -185,18 +186,8 @@
 						object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(pumpQueryChanged:)
-                         name : ORCP8CryopumpModelPumpQueryChanged
-						object: model];
-
-    [notifyCenter addObserver : self
                      selector : @selector(purgeStatusChanged:)
                          name : ORCP8CryopumpModelPurgeStatusChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(regenerationChanged:)
-                         name : ORCP8CryopumpModelRegenerationChanged
 						object: model];
 
     [notifyCenter addObserver : self
@@ -207,16 +198,6 @@
     [notifyCenter addObserver : self
                      selector : @selector(regenerationErrorChanged:)
                          name : ORCP8CryopumpModelRegenerationErrorChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(regenerationParameterChanged:)
-                         name : ORCP8CryopumpModelRegenerationParameterChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(regenerationTypeChanged:)
-                         name : ORCP8CryopumpModelRegenerationTypeChanged
 						object: model];
 
     [notifyCenter addObserver : self
@@ -310,8 +291,8 @@
 						object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(roughingInterlockChanged:)
-                         name : ORCP8CryopumpModelRoughingInterlockChanged
+                     selector : @selector(roughingInterlockStatusChanged:)
+                         name : ORCP8CryopumpModelRoughingInterlockStatusChanged
 						object: model];
 
     [notifyCenter addObserver : self
@@ -327,6 +308,16 @@
     [notifyCenter addObserver : self
                      selector : @selector(standbyModeChanged:)
                          name : ORCP8CryopumpModelStandbyModeChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(roughingInterlockChanged:)
+                         name : ORCP8CryopumpModelRoughingInterlockChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(secondStageTempControlChanged:)
+                         name : ORCP8CryopumpModelSecondStageTempControlChanged
 						object: model];
 
 }
@@ -360,13 +351,9 @@
 	[self powerFailureRecoveryChanged:nil];
 	[self powerFailureRecoveryStatusChanged:nil];
 	[self pumpStatusChanged:nil];
-	[self pumpQueryChanged:nil];
 	[self purgeStatusChanged:nil];
-	[self regenerationChanged:nil];
 	[self regenerationCyclesChanged:nil];
 	[self regenerationErrorChanged:nil];
-	[self regenerationParameterChanged:nil];
-	[self regenerationTypeChanged:nil];
 	[self regenerationSequenceChanged:nil];
 	[self regenerationStartDelayChanged:nil];
 	[self regenerationStepTimerChanged:nil];
@@ -385,10 +372,22 @@
 	[self rateOfRiseChanged:nil];
 	[self rateOfRiseCyclesChanged:nil];
 	[self restartTemperatureChanged:nil];
-	[self roughingInterlockChanged:nil];
+	[self roughingInterlockStatusChanged:nil];
 	[self pumpsPerCompressorChanged:nil];
 	[self repurgeTimeChanged:nil];
 	[self standbyModeChanged:nil];
+	[self roughingInterlockChanged:nil];
+	[self secondStageTempControlChanged:nil];
+}
+
+- (void) secondStageTempControlChanged:(NSNotification*)aNote
+{
+	[secondStageTempControlField setIntValue: [model secondStageTempControl]];
+}
+
+- (void) roughingInterlockChanged:(NSNotification*)aNote
+{
+	[roughingInterlockPU selectItemAtIndex: [model roughingInterlock]];
 }
 
 - (void) standbyModeChanged:(NSNotification*)aNote
@@ -406,9 +405,17 @@
 	[pumpsPerCompressorField setIntValue: [model pumpsPerCompressor]];
 }
 
-- (void) roughingInterlockChanged:(NSNotification*)aNote
+- (void) roughingInterlockStatusChanged:(NSNotification*)aNote
 {
-	[roughingInterlockPU selectItemAtIndex: [model roughingInterlock]];
+	NSString* s = @"?";
+	switch([model roughingInterlockStatus]){
+		case 0: s = @"No Permission"; break;
+		case 1: s = @"Has Roughing Permission"; break;
+		case 2: s = @"Needs Roughing Permission"; break;
+		case 4: s = @"Cryopump is Running"; break;
+			
+	}
+	[roughingInterlockStatusField setStringValue: s];
 }
 
 - (void) restartTemperatureChanged:(NSNotification*)aNote
@@ -448,17 +455,22 @@
 
 - (void) thermocouplePressureChanged:(NSNotification*)aNote
 {
-	[thermocouplePressureField setIntValue: [model thermocouplePressure]];
+	[thermocouplePressureField setFloatValue: [model thermocouplePressure]];
 }
 
 - (void) thermocoupleStatusChanged:(NSNotification*)aNote
 {
-	[thermocoupleStatusField setIntValue: [model thermocoupleStatus]];
+	[thermocoupleStatusField setStringValue: [model thermocoupleStatus]?@"On":@"Off"];
 }
 
 - (void) statusChanged:(NSNotification*)aNote
 {
-	[statusField setIntValue: [model status]];
+	int mask = [model status];
+	[pumpOnBiStateView				 setState: mask & (0x1<<0)];
+	[roughOpenBiStateView			 setState: mask & (0x1<<1)];
+	[purgeOpenBiStateView			 setState: mask & (0x1<<2)];
+	[thermocoupleOnBiStateView		 setState: mask & (0x1<<3)];
+	[powerFailureOccurredBiStateView setState: !(mask & (0x1<<4))];
 }
 
 - (void) secondStageTempChanged:(NSNotification*)aNote
@@ -493,17 +505,28 @@
 
 - (void) regenerationSequenceChanged:(NSNotification*)aNote
 {
-	[regenerationSequenceField setIntValue: [model regenerationSequence]];
-}
-
-- (void) regenerationTypeChanged:(NSNotification*)aNote
-{
-	[regenerationTypePU selectItemAtIndex: [model regenerationType]];
-}
-
-- (void) regenerationParameterChanged:(NSNotification*)aNote
-{
-	[regenerationParameterPU selectItemAtIndex: [model regenerationParameter]];
+	NSString* s = @"?";
+	switch([model regenerationSequence]){
+		case 'Z': s = @"Start Delay";						break;
+		case 'A': s = @"20s cancelation delay";				break;
+		case 'B': 
+		case 'C': 
+		case 'D': 
+		case 'E': 
+			s = [NSString stringWithFormat:@"Cryopump Warm up: %c",	(char)[model regenerationSequence]];		
+		break;
+		case 'H': s = @"Extended Purge/Repurge Cycle";		break;
+		case 'J': s = @"Waiting for Roughing Clearance";	break;
+		case 'L': s = @"Rate of Rise";						break;
+		case 'M': s = @"Cool Down";							break;
+		case 'P': s = @"Regen Completed";					break;
+		case 'T': s = @"Roughging";							break;
+		case 'W': s = @"Restart Delay";						break;
+		case 'V': s = @"Regen Aborted";						break;
+		case 'z': s = @"Pump Ready in Standby Mode";		break;
+		case 's': s = @"Cryopump Stopped After Warmup";		break;
+	}
+	[regenerationSequenceField setStringValue: s];
 }
 
 - (void) regenerationErrorChanged:(NSNotification*)aNote
@@ -516,19 +539,9 @@
 	[regenerationCyclesField setIntValue: [model regenerationCycles]];
 }
 
-- (void) regenerationChanged:(NSNotification*)aNote
-{
-	[regenerationPU selectItemAtIndex: [model regeneration]];
-}
-
 - (void) purgeStatusChanged:(NSNotification*)aNote
 {
 	[purgeStatusField setIntValue: [model purgeStatus]];
-}
-
-- (void) pumpQueryChanged:(NSNotification*)aNote
-{
-	[pumpQueryField setIntValue: [model pumpQuery]];
 }
 
 - (void) pumpStatusChanged:(NSNotification*)aNote
@@ -640,7 +653,8 @@
 
 - (void) temperatureChanged:(NSNotification*)aNote
 {
-	[temperatureField setFloatValue:[model temperature]];
+	[firstStageTempField setFloatValue:[model firstStageTemp]];
+	[secondStageTempField setFloatValue:[model secondStageTemp]];
 	unsigned long t = [model timeMeasured];
 	NSCalendarDate* theDate;
 	if(t){
@@ -674,7 +688,7 @@
     [shipTemperaturesButton setEnabled:!locked];
  
 	[initHardwareButton setEnabled:!locked];
-    [readTemperaturesButton setEnabled:!locked];
+    [pollNowButton setEnabled:!locked];
 		
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
@@ -733,220 +747,191 @@
 }
 
 #pragma mark ***Actions
+- (IBAction) roughingInterlockAction:(id)sender		  { [model setRoughingInterlock:		[sender indexOfSelectedItem]]; }
+- (IBAction) standbyModeAction:(id)sender			  { [model setStandbyMode:				[sender indexOfSelectedItem]]; }
+- (IBAction) secondStageTempControlAction:(id)sender  { [model setSecondStageTempControl:	[sender intValue]]; }
+- (IBAction) repurgeTimeAction:(id)sender			  { [model setRepurgeTime:				[sender intValue]]; }
+- (IBAction) pumpsPerCompressorAction:(id)sender	  { [model setPumpsPerCompressor:		[sender intValue]]; }
+- (IBAction) restartTemperatureAction:(id)sender	  { [model setRestartTemperature:		[sender intValue]]; }
+- (IBAction) rateOfRiseCyclesAction:(id)sender		  { [model setRateOfRiseCycles:			[sender intValue]]; }
+- (IBAction) rateOfRiseAction:(id)sender			  { [model setRateOfRise:				[sender intValue]]; }
+- (IBAction) roughToPressureAction:(id)sender		  { [model setRoughToPressure:			[sender intValue]]; }
+- (IBAction) repurgeCyclesAction:(id)sender			  { [model setRepurgeCycles:			[sender intValue]]; }
+- (IBAction) extendedPurgeTimeAction:(id)sender		  { [model setExtendedPurgeTime:		[sender intValue]]; }
+- (IBAction) pumpRestartDelayAction:(id)sender		  { [model setPumpRestartDelay:			[sender intValue]]; }
+- (IBAction) thermocoupleStatusAction:(id)sender	  { [model setThermocoupleStatus:		[sender intValue]]; }
+- (IBAction) statusAction:(id)sender				  { [model setStatus:					[sender intValue]]; }
+- (IBAction) roughValveInterlockAction:(id)sender	  { [model setRoughValveInterlock:		[sender intValue]]; }
+- (IBAction) roughValveStatusAction:(id)sender		  { [model setRoughValveStatus:			[sender intValue]]; }
+- (IBAction) regenerationTimeAction:(id)sender		  { [model setRegenerationTime:			[sender intValue]]; }
+- (IBAction) regenerationStepTimerAction:(id)sender   { [model setRegenerationStepTimer:	[sender intValue]]; }
+- (IBAction) regenerationStartDelayAction:(id)sender  { [model setRegenerationStartDelay:	[sender intValue]]; }
+- (IBAction) powerFailureRecoveryAction:(id)sender	  { [model setPowerFailureRecovery:		[sender intValue]]; }
+- (IBAction) firstStageControlMethodAction:(id)sender { [model setFirstStageControlMethod:	[sender intValue]]; }
+- (IBAction) firstStageControlTempAction:(id)sender   { [model setFirstStageControlTemp:	[sender intValue]]; }
+- (IBAction) shipTemperaturesAction:(id)sender		  { [model setShipTemperatures:			[sender intValue]]; }
 
-- (IBAction) standbyModeAction:(id)sender
-{
-	[model setStandbyMode:[sender indexOfSelectedItem]];	
-}
+- (IBAction) lockAction:(id) sender					  { [gSecurity tryToSetLock:ORCP8CryopumpLock to:[sender intValue] forWindow:[self window]];}
+- (IBAction) portListAction:(id) sender				  { [model setPortName:	[portListPopup titleOfSelectedItem]];}
+- (IBAction) openPortAction:(id)sender				  { [model openPort:![[model serialPort] isOpen]];}
+- (IBAction) readTemperaturesAction:(id)sender		  { [model pollHardware];}
+- (IBAction) pollTimeAction:(id)sender				  { [model setPollTime:[[sender selectedItem] tag]];}
+- (IBAction) pollNowAction:(id)sender				  { [model pollHardware]; }
 
-- (IBAction) repurgeTimeAction:(id)sender
-{
-	[model setRepurgeTime:[sender intValue]];	
-}
+- (IBAction) initHardwareAction:(id)sender			  { [model initHardware];}
 
-- (IBAction) pumpsPerCompressorAction:(id)sender
+- (IBAction) turnCryoPumpOnAction:(id)sender
 {
-	[model setPumpsPerCompressor:[sender intValue]];	
-}
-
-- (IBAction) roughingInterlockAction:(id)sender
-{
-	[model setRoughingInterlock:[sender indexOfSelectedItem]];	
-}
-
-- (IBAction) restartTemperatureAction:(id)sender
-{
-	[model setRestartTemperature:[sender intValue]];	
-}
-
-- (IBAction) rateOfRiseCyclesAction:(id)sender
-{
-	[model setRateOfRiseCycles:[sender intValue]];	
-}
-
-- (IBAction) rateOfRiseAction:(id)sender
-{
-	[model setRateOfRise:[sender intValue]];	
-}
-
-- (IBAction) roughToPressureAction:(id)sender
-{
-	[model setRoughToPressure:[sender intValue]];	
-}
-
-- (IBAction) repurgeCyclesAction:(id)sender
-{
-	[model setRepurgeCycles:[sender intValue]];	
-}
-
-- (IBAction) extendedPurgeTimeAction:(id)sender
-{
-	[model setExtendedPurgeTime:[sender intValue]];	
+    [self endEditing];
+	NSBeginAlertSheet(@"Turn ON Cryo Pump",
+					  @"YES/Turn ON Cryopump",
+					  @"Cancel",
+					  nil,[self window],
+					  self,
+					  @selector(turnOnCryoPumpDidFinish:returnCode:contextInfo:),
+					  nil,
+					  nil,
+					  @"Really turn ON the cryopump?");
 }
 
-- (IBAction) pumpRestartDelayAction:(id)sender
+- (void) turnOnCryoPumpDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
-	[model setPumpRestartDelay:[sender intValue]];	
-}
-- (IBAction) thermocoupleStatusAction:(id)sender
-{
-	[model setThermocoupleStatus:[sender intValue]];	
+	if(returnCode == NSAlertDefaultReturn)[model writeCryoPumpOn:YES];
 }
 
-- (IBAction) statusAction:(id)sender
+- (IBAction) turnCryoPumpOffAction:(id)sender
 {
-	[model setStatus:[sender intValue]];	
+    [self endEditing];
+	NSBeginAlertSheet(@"Turn OFF Cryo Pump",
+					  @"YES/Turn OFF Cryopump",
+					  @"Cancel",
+					  nil,[self window],
+					  self,
+					  @selector(turnOnCryoPumpDidFinish:returnCode:contextInfo:),
+					  nil,
+					  nil,
+					  @"Really turn OFF the cryopump?");
 }
 
-- (IBAction) secondStageTempAction:(id)sender
+- (void) turnOffCryoPumpDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
-	[model setSecondStageTemp:[sender floatValue]];	
+	if(returnCode == NSAlertDefaultReturn)[model writeCryoPumpOn:NO];
 }
 
-- (IBAction) roughValveInterlockAction:(id)sender
+- (IBAction) openPurgeValveAction:(id)sender
 {
-	[model setRoughValveInterlock:[sender intValue]];	
+    [self endEditing];
+	NSBeginAlertSheet(@"Open Purge Valve",
+					  @"YES/OPEN Purge Valve",
+					  @"Cancel",
+					  nil,[self window],
+					  self,
+					  @selector(openPurgeValveDidFinish:returnCode:contextInfo:),
+					  nil,
+					  nil,
+					  @"Really OPEN the purge valve?");
 }
 
-- (IBAction) roughValveStatusAction:(id)sender
+- (void) openPurgeValveDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
-	[model setRoughValveStatus:[sender intValue]];	
+	if(returnCode == NSAlertDefaultReturn)[model writePurgeValveOpen:YES];
 }
 
-- (IBAction) regenerationTimeAction:(id)sender
+- (IBAction) closePurgeValveAction:(id)sender
 {
-	[model setRegenerationTime:[sender intValue]];	
+    [self endEditing];
+	NSBeginAlertSheet(@"Close Purge Valve",
+					  @"YES/CLOSE Purge Valve",
+					  @"Cancel",
+					  nil,[self window],
+					  self,
+					  @selector(closePurgeValveDidFinish:returnCode:contextInfo:),
+					  nil,
+					  nil,
+					  @"Really CLOSE the purge valve?");
 }
 
-- (IBAction) regenerationStepTimerAction:(id)sender
+- (void) closePurgeValveDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
-	[model setRegenerationStepTimer:[sender intValue]];	
+	if(returnCode == NSAlertDefaultReturn)[model writePurgeValveOpen:NO];
 }
 
-- (IBAction) regenerationStartDelayAction:(id)sender
+- (IBAction) openRoughingValveAction:(id)sender
 {
-	[model setRegenerationStartDelay:[sender intValue]];	
+    [self endEditing];
+	NSBeginAlertSheet(@"Open Roughing Valve",
+					  @"YES/OPEN Roughing Valve",
+					  @"Cancel",
+					  nil,[self window],
+					  self,
+					  @selector(openRoughingValveDidFinish:returnCode:contextInfo:),
+					  nil,
+					  nil,
+					  @"Really OPEN the Roughing valve?");
 }
 
-- (IBAction) regenerationSequenceAction:(id)sender
+- (void) openRoughingValveDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
-	[model setRegenerationSequence:[sender intValue]];	
+	if(returnCode == NSAlertDefaultReturn)[model writeRoughValveOpen:YES];
 }
 
-- (IBAction) regenerationTypeAction:(id)sender
+- (IBAction) closeRoughingValveAction:(id)sender
 {
-	[model setRegenerationType:[sender intValue]];	
+    [self endEditing];
+	NSBeginAlertSheet(@"Close Roughing Valve",
+					  @"YES/CLOSE Roughing Valve",
+					  @"Cancel",
+					  nil,[self window],
+					  self,
+					  @selector(closeRoughingValveDidFinish:returnCode:contextInfo:),
+					  nil,
+					  nil,
+					  @"Really CLOSE the Roughing valve?");
 }
 
-- (IBAction) regenerationParameterAction:(id)sender
+- (void) closeRoughingValveDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
-	[model setRegenerationParameter:[sender intValue]];	
+	if(returnCode == NSAlertDefaultReturn)[model writeRoughValveOpen:NO];
 }
 
-- (IBAction) regenerationErrorAction:(id)sender
+- (IBAction) turnThermocoupleOnAction:(id)sender
 {
-	[model setRegenerationError:[sender intValue]];	
+    [self endEditing];
+	NSBeginAlertSheet(@"Turn ON Cryo Pump",
+					  @"YES/Turn ON Thermocouple",
+					  @"Cancel",
+					  nil,[self window],
+					  self,
+					  @selector(turnOnThermocoupleDidFinish:returnCode:contextInfo:),
+					  nil,
+					  nil,
+					  @"Really turn ON the Thermocouple?");
 }
 
-- (IBAction) regenerationCyclesAction:(id)sender
+- (void) turnOnThermocoupleDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
-	[model setRegenerationCycles:[sender intValue]];	
+	if(returnCode == NSAlertDefaultReturn)[model writeThermocoupleOn:YES];
 }
 
-- (IBAction) regenerationAction:(id)sender
+- (IBAction) turnThermocoupleOffAction:(id)sender
 {
-	[model setRegeneration:[sender intValue]];	
+    [self endEditing];
+	NSBeginAlertSheet(@"Turn OFF Cryo Pump",
+					  @"YES/Turn OFF Thermocouple",
+					  @"Cancel",
+					  nil,[self window],
+					  self,
+					  @selector(turnOnThermocoupleDidFinish:returnCode:contextInfo:),
+					  nil,
+					  nil,
+					  @"Really turn OFF the Thermocouple?");
 }
 
-- (IBAction) purgeStatusAction:(id)sender
+- (void) turnOffThermocoupleDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
-	[model setPurgeStatus:[sender intValue]];	
+	if(returnCode == NSAlertDefaultReturn)[model writeThermocoupleOn:NO];
 }
 
-- (IBAction) pumpQueryAction:(id)sender
-{
-	[model setPumpQuery:[sender intValue]];	
-}
-
-- (IBAction) pumpStatusAction:(id)sender
-{
-	[model setPumpStatus:[sender intValue]];	
-}
-
-- (IBAction) powerFailureRecoveryAction:(id)sender
-{
-	[model setPowerFailureRecovery:[sender intValue]];	
-}
-
-- (IBAction) moduleVersionAction:(id)sender
-{
-	[model setModuleVersion:[sender stringValue]];	
-}
-
-- (IBAction) firstStageControlMethodAction:(id)sender
-{
-	[model setFirstStageControlMethod:[sender intValue]];	
-}
-
-- (IBAction) firstStageControlTempAction:(id)sender
-{
-	[model setFirstStageControlTemp:[sender intValue]];	
-}
-
-- (IBAction) firstStageTempAction:(id)sender
-{
-	[model setFirstStageTemp:[sender floatValue]];	
-}
-
-- (IBAction) elapsedTimeAction:(id)sender
-{
-	[model setElapsedTime:[sender intValue]];	
-}
-
-- (IBAction) dutyCycleAction:(id)sender
-{
-	[model setDutyCycle:[sender intValue]];	
-}
-
-- (IBAction) pollNowAction:(id)sender
-{
-	[model pollHardware];	
-}
-
-- (IBAction) shipTemperaturesAction:(id)sender
-{
-	[model setShipTemperatures:[sender intValue]];	
-}
-
-- (IBAction) lockAction:(id) sender
-{
-    [gSecurity tryToSetLock:ORCP8CryopumpLock to:[sender intValue] forWindow:[self window]];
-}
-
-- (IBAction) portListAction:(id) sender
-{
-    [model setPortName: [portListPopup titleOfSelectedItem]];
-}
-
-- (IBAction) openPortAction:(id)sender
-{
-    [model openPort:![[model serialPort] isOpen]];
-}
-
-- (IBAction) readTemperaturesAction:(id)sender
-{
-	[model pollHardware];
-}
-
-- (IBAction) pollTimeAction:(id)sender
-{
-	[model setPollTime:[[sender selectedItem] tag]];
-}
-
-- (IBAction) initHardwareAction:(id)sender;
-{
-	[model initHardware];
-}
 
 #pragma mark ***Data Source
 - (int) numberPointsInPlot:(id)aPlotter
