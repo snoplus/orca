@@ -4810,18 +4810,18 @@
 													<int key="NSPeriodicInterval">75</int>
 												</object>
 											</object>
-											<object class="NSButton" id="69900621">
+											<object class="NSButton" id="542840333">
 												<reference key="NSNextResponder" ref="96996822"/>
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{464, 96}, {90, 83}}</string>
 												<reference key="NSSuperview" ref="96996822"/>
 												<bool key="NSEnabled">YES</bool>
-												<object class="NSButtonCell" key="NSCell" id="829273737">
+												<object class="NSButtonCell" key="NSCell" id="1023294838">
 													<int key="NSCellFlags">-2080244224</int>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">CP8 Cryopump</string>
 													<reference key="NSSupport" ref="24"/>
-													<reference key="NSControlView" ref="69900621"/>
+													<reference key="NSControlView" ref="542840333"/>
 													<int key="NSButtonFlags">-2046017281</int>
 													<int key="NSButtonFlags2">2</int>
 													<object class="NSCustomResource" key="NSNormalImage">
@@ -5373,7 +5373,7 @@ ZSBjb250cm9sbGVyLg</string>
 											<object class="NSButton" id="948699281">
 												<reference key="NSNextResponder" ref="626387338"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{275, 166}, {69, 71}}</string>
+												<string key="NSFrame">{{275, 199}, {69, 57}}</string>
 												<reference key="NSSuperview" ref="626387338"/>
 												<reference key="NSNextKeyView" ref="136475591"/>
 												<bool key="NSEnabled">YES</bool>
@@ -5388,6 +5388,30 @@ ZSBjb250cm9sbGVyLg</string>
 													<object class="NSCustomResource" key="NSNormalImage">
 														<string key="NSClassName">NSImage</string>
 														<string key="NSResourceName">ManualPlot</string>
+													</object>
+													<string key="NSAlternateContents"/>
+													<string key="NSKeyEquivalent"/>
+													<int key="NSPeriodicDelay">400</int>
+													<int key="NSPeriodicInterval">75</int>
+												</object>
+											</object>
+											<object class="NSButton" id="221145215">
+												<reference key="NSNextResponder" ref="626387338"/>
+												<int key="NSvFlags">268</int>
+												<string key="NSFrame">{{272, 135}, {75, 53}}</string>
+												<reference key="NSSuperview" ref="626387338"/>
+												<bool key="NSEnabled">YES</bool>
+												<object class="NSButtonCell" key="NSCell" id="423471676">
+													<int key="NSCellFlags">-2080244224</int>
+													<int key="NSCellFlags2">134217728</int>
+													<string key="NSContents">Manual 2DPlot</string>
+													<reference key="NSSupport" ref="24"/>
+													<reference key="NSControlView" ref="221145215"/>
+													<int key="NSButtonFlags">-2046017281</int>
+													<int key="NSButtonFlags2">2</int>
+													<object class="NSCustomResource" key="NSNormalImage">
+														<string key="NSClassName">NSImage</string>
+														<string key="NSResourceName">ManualPlot2D</string>
 													</object>
 													<string key="NSAlternateContents"/>
 													<string key="NSKeyEquivalent"/>
@@ -7664,7 +7688,6 @@ ZSBjb250cm9sbGVyLg</string>
 							<reference ref="1038434180"/>
 							<reference ref="69494696"/>
 							<reference ref="669896133"/>
-							<reference ref="948699281"/>
 							<reference ref="136475591"/>
 							<reference ref="567803050"/>
 							<reference ref="368921636"/>
@@ -7672,6 +7695,8 @@ ZSBjb250cm9sbGVyLg</string>
 							<reference ref="513099843"/>
 							<reference ref="195366079"/>
 							<reference ref="558403749"/>
+							<reference ref="221145215"/>
+							<reference ref="948699281"/>
 						</object>
 						<reference key="parent" ref="99778089"/>
 					</object>
@@ -8248,7 +8273,7 @@ ZSBjb250cm9sbGVyLg</string>
 							<reference ref="424487477"/>
 							<reference ref="101794142"/>
 							<reference ref="834239523"/>
-							<reference ref="69900621"/>
+							<reference ref="542840333"/>
 						</object>
 						<reference key="parent" ref="334999773"/>
 					</object>
@@ -11945,17 +11970,31 @@ ZSBjb250cm9sbGVyLg</string>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">26965</int>
-						<reference key="object" ref="69900621"/>
+						<reference key="object" ref="542840333"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="829273737"/>
+							<reference ref="1023294838"/>
 						</object>
 						<reference key="parent" ref="96996822"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">26966</int>
-						<reference key="object" ref="829273737"/>
-						<reference key="parent" ref="69900621"/>
+						<reference key="object" ref="1023294838"/>
+						<reference key="parent" ref="542840333"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">26967</int>
+						<reference key="object" ref="221145215"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="423471676"/>
+						</object>
+						<reference key="parent" ref="626387338"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">26968</int>
+						<reference key="object" ref="423471676"/>
+						<reference key="parent" ref="221145215"/>
 					</object>
 				</object>
 			</object>
@@ -12785,6 +12824,7 @@ ZSBjb250cm9sbGVyLg</string>
 					<string>26836.CustomClassName</string>
 					<string>26836.IBAttributePlaceholdersKey</string>
 					<string>26836.IBPluginDependency</string>
+					<string>26836.IBViewBoundsToFrameTransform</string>
 					<string>26837.IBPluginDependency</string>
 					<string>26838.CustomClassName</string>
 					<string>26838.IBAttributePlaceholdersKey</string>
@@ -12998,6 +13038,11 @@ ZSBjb250cm9sbGVyLg</string>
 					<string>26965.IBPluginDependency</string>
 					<string>26965.IBViewBoundsToFrameTransform</string>
 					<string>26966.IBPluginDependency</string>
+					<string>26967.CustomClassName</string>
+					<string>26967.IBAttributePlaceholdersKey</string>
+					<string>26967.IBPluginDependency</string>
+					<string>26967.IBViewBoundsToFrameTransform</string>
+					<string>26968.IBPluginDependency</string>
 					<string>2717.IBAttributePlaceholdersKey</string>
 					<string>2717.IBPluginDependency</string>
 					<string>2718.IBAttributePlaceholdersKey</string>
@@ -15203,6 +15248,9 @@ ZSBjb250cm9sbGVyLg</string>
 						</object>
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<object class="NSAffineTransform">
+						<bytes key="NSTransformStruct">P4AAAL+AAABDiYAAw3UAAA</bytes>
+					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>ObjectFactory</string>
 					<object class="NSMutableDictionary">
@@ -15766,13 +15814,27 @@ ZSBjb250cm9sbGVyLg</string>
 						<string key="NS.key.0">ToolTip</string>
 						<object class="IBToolTipAttribute" key="NS.object.0">
 							<string key="name">ToolTip</string>
-							<reference key="object" ref="69900621"/>
-							<string key="toolTip">ORVarianTPSModel</string>
+							<reference key="object" ref="542840333"/>
+							<string key="toolTip">ORCP8CryopumpModel</string>
 						</object>
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<object class="NSAffineTransform">
 						<bytes key="NSTransformStruct">P4AAAL+AAABD7AAAwykAAA</bytes>
+					</object>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>ObjectFactory</string>
+					<object class="NSMutableDictionary">
+						<string key="NS.key.0">ToolTip</string>
+						<object class="IBToolTipAttribute" key="NS.object.0">
+							<string key="name">ToolTip</string>
+							<reference key="object" ref="221145215"/>
+							<string key="toolTip">ORManualPlot2DModel</string>
+						</object>
+					</object>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<object class="NSAffineTransform">
+						<bytes key="NSTransformStruct">P4AAAL+AAABDiAAAwygAAA</bytes>
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<object class="NSMutableDictionary">
@@ -15893,7 +15955,7 @@ ZSBjb250cm9sbGVyLg</string>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">26966</int>
+			<int key="maxID">26968</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -17439,6 +17501,7 @@ ZSBjb250cm9sbGVyLg</string>
 				<string>Mac</string>
 				<string>Majorana</string>
 				<string>ManualPlot</string>
+				<string>ManualPlot2D</string>
 				<string>Met237</string>
 				<string>Met637</string>
 				<string>Mks651c</string>
@@ -17669,6 +17732,7 @@ ZSBjb250cm9sbGVyLg</string>
 				<string>{75, 86}</string>
 				<string>{200, 106}</string>
 				<string>{50, 42}</string>
+				<string>{50, 38}</string>
 				<string>{75, 56}</string>
 				<string>{75, 75}</string>
 				<string>{100, 51}</string>
