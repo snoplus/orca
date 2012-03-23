@@ -25,7 +25,7 @@
 #import "ORPlotAttributeStrings.h"
 #import "ORColorScale.h"
 
-#define kMaxNumRects 100
+#define kMaxNumRects kNumColors
 
 @implementation OR2DHistoPlot
 
@@ -37,7 +37,6 @@
 	}
 	dataSource = ds;
 }
-
 
 #pragma mark ***Drawing
 - (void) drawData
@@ -73,9 +72,9 @@
     float yinc = ywidth / [mYScale valueRange];
 	
     /* loop through all data in plot window */
-    short rectCount[256];
-    memset(rectCount,0,256*sizeof(short));
-    NSRect rectList[256][kMaxNumRects];
+    short rectCount[kNumColors];
+    memset(rectCount,0,kNumColors*sizeof(short));
+    NSRect rectList[kNumColors][kMaxNumRects];
 	
 	BOOL aLog       = [[colorScale colorAxis] isLog];
 	BOOL aInt       = [[colorScale colorAxis] integer];
@@ -94,7 +93,7 @@
             if(z){
                 int colorIndex = [colorScale getFastColorIndexForValue:z log:aLog integer:aInt minPad:aMinPad];
 				if(colorIndex<0)colorIndex = 0;
-				else if(colorIndex>255)colorIndex=255;
+				else if(colorIndex>kNumColors-1)colorIndex=kNumColors-1;
                 rectList[colorIndex][rectCount[colorIndex]] = NSMakeRect(x-.5,y-.5,xinc+1,yinc+1);
                 ++rectCount[colorIndex];
 				if(rectCount[colorIndex]>=kMaxNumRects){
@@ -107,7 +106,7 @@
     }	
     //flush rectsplotView
     long i;
-    for(i=0;i<256;i++){
+    for(i=0;i<kNumColors;i++){
         if(rectCount[i]){
             [[colorScale getColorForIndex:i] set];
             NSRectFillList(rectList[i],rectCount[i]);

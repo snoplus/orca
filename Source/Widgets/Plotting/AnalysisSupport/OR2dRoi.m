@@ -36,13 +36,15 @@ NSString* OR2dRoiCurveFitChanged = @"OR2dRoiCurveFitChanged";
 {
 	self = [super init];
 	[self setPoints:[NSMutableArray array]];
-	float x = aPoint.x;
-	float y = aPoint.y;
-	
-	[points addObject: [ORPoint point:NSMakePoint(x-50,y-50)]];
-	[points addObject: [ORPoint point:NSMakePoint(x-50,y+50)]];
-	[points addObject: [ORPoint point:NSMakePoint(x+50,y+50)]];
-	[points addObject: [ORPoint point:NSMakePoint(x+50,y-50)]];
+	float x1 = MAX(0,aPoint.x-25);
+	float y1 = MAX(0,aPoint.y-25);
+	float x2 = aPoint.x+25;
+	float y2 = aPoint.y+25;
+
+	[points addObject: [ORPoint point:NSMakePoint(x1,y1)]];
+	[points addObject: [ORPoint point:NSMakePoint(x1,y2)]];
+	[points addObject: [ORPoint point:NSMakePoint(x2,y2)]];
+	[points addObject: [ORPoint point:NSMakePoint(x2,y1)]];
 	drawControlPoints = NO;
 	return self;
 

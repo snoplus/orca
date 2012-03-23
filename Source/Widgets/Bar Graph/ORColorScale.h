@@ -23,6 +23,8 @@
 
 @class ORAxis;
 
+#define kNumColors 128
+
 
 @interface ORColorScale : NSView {
     IBOutlet ORAxis* colorAxis;

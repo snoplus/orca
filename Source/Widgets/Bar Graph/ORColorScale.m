@@ -33,7 +33,7 @@
 {
     self = [super initWithFrame:frame];
     if (self) {
-		[self setNumColors:512];
+		[self setNumColors:kNumColors];
 		[self setSpectrumRange:0.7];
 		[self setStartColor:[NSColor blueColor]];
 		[self setEndColor:[NSColor redColor]];
