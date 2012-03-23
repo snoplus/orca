@@ -1785,6 +1785,13 @@
 		8499A75C1518D85800CD7AAC /* ORCP8CryopumpModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8499A7541518D85800CD7AAC /* ORCP8CryopumpModel.h */; };
 		8499A75D1518D85800CD7AAC /* ORCP8CryopumpModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8499A7551518D85800CD7AAC /* ORCP8CryopumpModel.m */; };
 		8499A95A151B594300CD7AAC /* NoMPodCratePowerHelp in Resources */ = {isa = PBXBuildFile; fileRef = 8499A959151B594300CD7AAC /* NoMPodCratePowerHelp */; };
+		8499AB8B151CA3B000CD7AAC /* edu.washington.npl.orca.ManualPlot2D.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8499AB84151CA3B000CD7AAC /* edu.washington.npl.orca.ManualPlot2D.plist */; };
+		8499AB8C151CA3B000CD7AAC /* ManualPlot2D.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8499AB85151CA3B000CD7AAC /* ManualPlot2D.nib */; };
+		8499AB8D151CA3B000CD7AAC /* ManualPlot2D.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8499AB86151CA3B000CD7AAC /* ManualPlot2D.tif */; };
+		8499AB8E151CA3B000CD7AAC /* ORManualPlot2DController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8499AB87151CA3B000CD7AAC /* ORManualPlot2DController.h */; };
+		8499AB8F151CA3B000CD7AAC /* ORManualPlot2DController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8499AB88151CA3B000CD7AAC /* ORManualPlot2DController.m */; };
+		8499AB90151CA3B000CD7AAC /* ORManualPlot2DModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8499AB89151CA3B000CD7AAC /* ORManualPlot2DModel.h */; };
+		8499AB91151CA3B000CD7AAC /* ORManualPlot2DModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8499AB8A151CA3B000CD7AAC /* ORManualPlot2DModel.m */; };
 		8499FE8D0DC8E9B700E82DB4 /* NoSNOCratePowerHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8499FE840DC8E9B700E82DB4 /* NoSNOCratePowerHelp.plist */; };
 		8499FE8E0DC8E9B700E82DB4 /* ORSNOCrateController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8499FE850DC8E9B700E82DB4 /* ORSNOCrateController.h */; };
 		8499FE8F0DC8E9B700E82DB4 /* ORSNOCrateController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8499FE860DC8E9B700E82DB4 /* ORSNOCrateController.m */; };
@@ -4516,6 +4523,13 @@
 		8499A7541518D85800CD7AAC /* ORCP8CryopumpModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCP8CryopumpModel.h; path = Source/Objects/Hardware/Serial/CP8Cryopump/ORCP8CryopumpModel.h; sourceTree = SOURCE_ROOT; };
 		8499A7551518D85800CD7AAC /* ORCP8CryopumpModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCP8CryopumpModel.m; path = Source/Objects/Hardware/Serial/CP8Cryopump/ORCP8CryopumpModel.m; sourceTree = SOURCE_ROOT; };
 		8499A959151B594300CD7AAC /* NoMPodCratePowerHelp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = NoMPodCratePowerHelp; sourceTree = "<group>"; };
+		8499AB84151CA3B000CD7AAC /* edu.washington.npl.orca.ManualPlot2D.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = edu.washington.npl.orca.ManualPlot2D.plist; path = "Source/Objects/Data Processing/Histogram Objects/ManualPlot2D/edu.washington.npl.orca.ManualPlot2D.plist"; sourceTree = SOURCE_ROOT; };
+		8499AB85151CA3B000CD7AAC /* ManualPlot2D.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ManualPlot2D.nib; path = "Source/Objects/Data Processing/Histogram Objects/ManualPlot2D/ManualPlot2D.nib"; sourceTree = SOURCE_ROOT; };
+		8499AB86151CA3B000CD7AAC /* ManualPlot2D.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = ManualPlot2D.tif; path = "Source/Objects/Data Processing/Histogram Objects/ManualPlot2D/ManualPlot2D.tif"; sourceTree = SOURCE_ROOT; };
+		8499AB87151CA3B000CD7AAC /* ORManualPlot2DController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORManualPlot2DController.h; path = "Source/Objects/Data Processing/Histogram Objects/ManualPlot2D/ORManualPlot2DController.h"; sourceTree = SOURCE_ROOT; };
+		8499AB88151CA3B000CD7AAC /* ORManualPlot2DController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORManualPlot2DController.m; path = "Source/Objects/Data Processing/Histogram Objects/ManualPlot2D/ORManualPlot2DController.m"; sourceTree = SOURCE_ROOT; };
+		8499AB89151CA3B000CD7AAC /* ORManualPlot2DModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORManualPlot2DModel.h; path = "Source/Objects/Data Processing/Histogram Objects/ManualPlot2D/ORManualPlot2DModel.h"; sourceTree = SOURCE_ROOT; };
+		8499AB8A151CA3B000CD7AAC /* ORManualPlot2DModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORManualPlot2DModel.m; path = "Source/Objects/Data Processing/Histogram Objects/ManualPlot2D/ORManualPlot2DModel.m"; sourceTree = SOURCE_ROOT; };
 		8499FE840DC8E9B700E82DB4 /* NoSNOCratePowerHelp.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = NoSNOCratePowerHelp.plist; path = "Source/Objects/Custom Hardware/SNO+/SNOCrate/NoSNOCratePowerHelp.plist"; sourceTree = SOURCE_ROOT; };
 		8499FE850DC8E9B700E82DB4 /* ORSNOCrateController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSNOCrateController.h; path = "Source/Objects/Custom Hardware/SNO+/SNOCrate/ORSNOCrateController.h"; sourceTree = SOURCE_ROOT; };
 		8499FE860DC8E9B700E82DB4 /* ORSNOCrateController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSNOCrateController.m; path = "Source/Objects/Custom Hardware/SNO+/SNOCrate/ORSNOCrateController.m"; sourceTree = SOURCE_ROOT; };
@@ -9189,6 +9203,21 @@
 			path = Source/Objects/Hardware/Serial/CP8Cryopump;
 			sourceTree = SOURCE_ROOT;
 		};
+		8499AB83151CA3B000CD7AAC /* ManualPlot2D */ = {
+			isa = PBXGroup;
+			children = (
+				8499AB84151CA3B000CD7AAC /* edu.washington.npl.orca.ManualPlot2D.plist */,
+				8499AB85151CA3B000CD7AAC /* ManualPlot2D.nib */,
+				8499AB86151CA3B000CD7AAC /* ManualPlot2D.tif */,
+				8499AB89151CA3B000CD7AAC /* ORManualPlot2DModel.h */,
+				8499AB8A151CA3B000CD7AAC /* ORManualPlot2DModel.m */,
+				8499AB87151CA3B000CD7AAC /* ORManualPlot2DController.h */,
+				8499AB88151CA3B000CD7AAC /* ORManualPlot2DController.m */,
+			);
+			name = ManualPlot2D;
+			path = "Source/Objects/Data Processing/Histogram Objects/ManualPlot2D";
+			sourceTree = SOURCE_ROOT;
+		};
 		8499FE810DC8E86800E82DB4 /* SNO+ */ = {
 			isa = PBXGroup;
 			children = (
@@ -10597,6 +10626,7 @@
 				841DA0D50781F0740099BBF6 /* Histogram2D */,
 				9CD6DD800BE83F1B007096CE /* PlotFFT */,
 				840973550F81136F00036BE8 /* ManualPlot */,
+				8499AB83151CA3B000CD7AAC /* ManualPlot2D */,
 			);
 			name = "Histogram Objects";
 			path = "Source/Objects/Data Processing/Histogram Objects";
@@ -12973,6 +13003,8 @@
 				8499A7581518D85800CD7AAC /* ORCP8CryopumpController.h in Headers */,
 				8499A75A1518D85800CD7AAC /* ORCP8CryopumpDecoders.h in Headers */,
 				8499A75C1518D85800CD7AAC /* ORCP8CryopumpModel.h in Headers */,
+				8499AB8E151CA3B000CD7AAC /* ORManualPlot2DController.h in Headers */,
+				8499AB90151CA3B000CD7AAC /* ORManualPlot2DModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13800,6 +13832,9 @@
 				8499A7561518D85800CD7AAC /* CP8Cryopump.nib in Resources */,
 				8499A7571518D85800CD7AAC /* CP8Cryopump.tif in Resources */,
 				8499A95A151B594300CD7AAC /* NoMPodCratePowerHelp in Resources */,
+				8499AB8B151CA3B000CD7AAC /* edu.washington.npl.orca.ManualPlot2D.plist in Resources */,
+				8499AB8C151CA3B000CD7AAC /* ManualPlot2D.nib in Resources */,
+				8499AB8D151CA3B000CD7AAC /* ManualPlot2D.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14727,6 +14762,8 @@
 				8499A7591518D85800CD7AAC /* ORCP8CryopumpController.m in Sources */,
 				8499A75B1518D85800CD7AAC /* ORCP8CryopumpDecoders.m in Sources */,
 				8499A75D1518D85800CD7AAC /* ORCP8CryopumpModel.m in Sources */,
+				8499AB8F151CA3B000CD7AAC /* ORManualPlot2DController.m in Sources */,
+				8499AB91151CA3B000CD7AAC /* ORManualPlot2DModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
