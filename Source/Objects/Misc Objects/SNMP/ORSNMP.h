@@ -46,3 +46,47 @@
 - (unsigned long) convertBitString:(NSString*)s;
 
 @end
+
+
+//a thin wrapper around NSOperationQueue to make a shared queue for SNMP access
+@interface ORSNMPQueue : NSObject {
+    NSOperationQueue* queue;
+}
++ (ORSNMPQueue*) sharedSNMPQueue;
++ (void) addOperation:(NSOperation*)anOp;
++ (NSOperationQueue*) queue;
++ (NSUInteger) operationCount;
+- (void) addOperation:(NSOperation*)anOp;
+- (NSOperationQueue*) queue;
+- (NSInteger) operationCount;
+@end
+
+@interface ORSNMPOperation : NSOperation
+{
+	NSString*	mib;
+	NSString*	ipNumber;
+	SEL			selector;
+	id			delegate;
+	id			target;
+	NSArray*	cmds;
+}
+
+- (id)	 initWithDelegate:(id)aDelegate;
+- (void) dealloc;
+- (void) main;
+@property (nonatomic,copy)		NSString*	mib;
+@property (nonatomic,copy)		NSString*	ipNumber;
+@property (nonatomic,retain)	NSArray*	cmds;
+@property (nonatomic,retain)	id			target;
+@property (nonatomic,assign)	SEL			selector;
+@end
+
+@interface ORSNMPWriteOperation : ORSNMPOperation
+- (void) main;
+@end
+
+@interface ORSNMPReadOperation : ORSNMPOperation
+- (void) main;
+@end
+
+

@@ -20,6 +20,7 @@
 
 #import "ORSNMP.h"
 #import "NSString+Extensions.h"
+#import "SynthesizeSingleton.h"
 
 @implementation ORSNMP
 - (id) initWithMib:(NSString*)aMibName
@@ -73,50 +74,52 @@
 - (NSArray*) readValues:(NSArray*)someObjIds
 {
 	NSMutableArray* resultArray = [NSMutableArray array];
-	if(sessionHandle){
+	@synchronized(self){
+		if(sessionHandle){
 
-		size_t id_len = MAX_OID_LEN;
-		oid id_oid[MAX_OID_LEN];
-		
-		for(id anObjID in someObjIds){
-			anObjID = [mibName stringByAppendingFormat:@"::%@",anObjID];
-			struct snmp_pdu* pdu = snmp_pdu_create(SNMP_MSG_GET);
-			const char* obj_id = [anObjID cStringUsingEncoding:NSASCIIStringEncoding];
-			read_objid(obj_id, id_oid, &id_len);
-			snmp_add_null_var(pdu, id_oid, id_len);
-			NSMutableDictionary* responseDictionary = [NSMutableDictionary dictionary];
-			struct snmp_pdu* response;
-			int status = snmp_synch_response(sessionHandle, pdu, &response);
-			if(status == STAT_SUCCESS){
-				if (response->errstat == SNMP_ERR_NOERROR){
-					struct variable_list* vars;   
-					for(vars = response->variables; vars; vars = vars->next_variable){
-						char buf[1024];
-						snprint_variable(buf, sizeof(buf), vars->name, vars->name_length,vars);
-						NSString* s = [NSString stringWithUTF8String:buf];
-						[self topLevelParse:s intoDictionary:responseDictionary];
+			size_t id_len = MAX_OID_LEN;
+			oid id_oid[MAX_OID_LEN];
+			
+			for(id anObjID in someObjIds){
+				anObjID = [mibName stringByAppendingFormat:@"::%@",anObjID];
+				struct snmp_pdu* pdu = snmp_pdu_create(SNMP_MSG_GET);
+				const char* obj_id = [anObjID cStringUsingEncoding:NSASCIIStringEncoding];
+				read_objid(obj_id, id_oid, &id_len);
+				snmp_add_null_var(pdu, id_oid, id_len);
+				NSMutableDictionary* responseDictionary = [NSMutableDictionary dictionary];
+				struct snmp_pdu* response;
+				int status = snmp_synch_response(sessionHandle, pdu, &response);
+				if(status == STAT_SUCCESS){
+					if (response->errstat == SNMP_ERR_NOERROR){
+						struct variable_list* vars;   
+						for(vars = response->variables; vars; vars = vars->next_variable){
+							char buf[1024];
+							snprint_variable(buf, sizeof(buf), vars->name, vars->name_length,vars);
+							NSString* s = [NSString stringWithUTF8String:buf];
+							[self topLevelParse:s intoDictionary:responseDictionary];
+						}
+					}
+					else {
+						[responseDictionary setObject:[NSString stringWithFormat:@"Error in packet.\nReason: %s\n",snmp_errstring(response->errstat)] forKey:@"Error"];
+						[resultArray addObject:responseDictionary];
+						break;
 					}
 				}
-				else {
-					[responseDictionary setObject:[NSString stringWithFormat:@"Error in packet.\nReason: %s\n",snmp_errstring(response->errstat)] forKey:@"Error"];
+				else if (status == STAT_TIMEOUT){
+					[responseDictionary setObject:[NSString stringWithFormat:@"SNMP Timeout: No Response from %s\n",sessionHandle->peername] forKey:@"Error"];
 					[resultArray addObject:responseDictionary];
 					break;
 				}
+				else {
+					[responseDictionary setObject:@"SNMP response error" forKey:@"Error"];
+					[resultArray addObject:responseDictionary];
+					break;
+				}
+				
+				if(responseDictionary)[resultArray addObject:responseDictionary];
+				
+				if (response)snmp_free_pdu(response);				
 			}
-			else if (status == STAT_TIMEOUT){
-				[responseDictionary setObject:[NSString stringWithFormat:@"SNMP Timeout: No Response from %s\n",sessionHandle->peername] forKey:@"Error"];
-				[resultArray addObject:responseDictionary];
-				break;
-			}
-			else {
-				[responseDictionary setObject:@"SNMP response error" forKey:@"Error"];
-				[resultArray addObject:responseDictionary];
-				break;
-			}
-			
-			if(responseDictionary)[resultArray addObject:responseDictionary];
-			
-			if (response)snmp_free_pdu(response);				
 		}
 	}
 	return resultArray;
@@ -133,58 +136,60 @@
 
 - (NSArray*) writeValues:(NSArray*)someObjIds
 {
-	//the objID must have the form param.i t val
-	//example: outputSwitch.u7 i 1
 	NSMutableArray* resultArray = [NSMutableArray array];
-	if (sessionHandle){
-		struct snmp_pdu* response = nil;
-				
-		oid    anOID[MAX_OID_LEN];
-		size_t anOID_len = MAX_OID_LEN;
-		
-		for(id anObjID in someObjIds){
-			NSMutableDictionary* responseDictionary = [NSMutableDictionary dictionary];
-			anObjID = [mibName stringByAppendingFormat:@"::%@",anObjID];
-			struct snmp_pdu* pdu = snmp_pdu_create(SNMP_MSG_SET);
-			NSArray* parts = [anObjID tokensSeparatedByCharactersFromSet:[NSCharacterSet whitespaceCharacterSet]];
-			if([parts count] == 3){
-				const char* intoid = [[parts objectAtIndex:0] cStringUsingEncoding:NSASCIIStringEncoding];
-				const char type    = [[parts objectAtIndex:1] characterAtIndex:0];
-				const char* val    = [[parts objectAtIndex:2] cStringUsingEncoding:NSASCIIStringEncoding];
+	@synchronized(self){
+		//the objID must have the form param.i t val
+		//example: outputSwitch.u7 i 1
+		if (sessionHandle){
+			struct snmp_pdu* response = nil;
+					
+			oid    anOID[MAX_OID_LEN];
+			size_t anOID_len = MAX_OID_LEN;
+			
+			for(id anObjID in someObjIds){
+				NSMutableDictionary* responseDictionary = [NSMutableDictionary dictionary];
+				anObjID = [mibName stringByAppendingFormat:@"::%@",anObjID];
+				struct snmp_pdu* pdu = snmp_pdu_create(SNMP_MSG_SET);
+				NSArray* parts = [anObjID tokensSeparatedByCharactersFromSet:[NSCharacterSet whitespaceCharacterSet]];
+				if([parts count] == 3){
+					const char* intoid = [[parts objectAtIndex:0] cStringUsingEncoding:NSASCIIStringEncoding];
+					const char type    = [[parts objectAtIndex:1] characterAtIndex:0];
+					const char* val    = [[parts objectAtIndex:2] cStringUsingEncoding:NSASCIIStringEncoding];
 
-				if (snmp_parse_oid(intoid, anOID, &anOID_len) == NULL){
-					[responseDictionary setObject:@"snmp_parse_oid reports bad parameter" forKey:@"Error"];
-					[resultArray addObject:responseDictionary];
-					break;
-				}
-				if (snmp_add_var(pdu, anOID, anOID_len, type, val)){
-					[responseDictionary setObject:@"snmp_add_var reports error" forKey:@"Error"];
-					[resultArray addObject:responseDictionary];
-					break;
-				}
-				
-				int status = snmp_synch_response(sessionHandle, pdu, &response);
-				
-				if (status == STAT_SUCCESS){
-					if (response->errstat != SNMP_ERR_NOERROR){
-						[responseDictionary setObject:[NSString stringWithFormat:@"Error in packet: %s",snmp_errstring(response->errstat)] forKey:@"Error"];
+					if (snmp_parse_oid(intoid, anOID, &anOID_len) == NULL){
+						[responseDictionary setObject:@"snmp_parse_oid reports bad parameter" forKey:@"Error"];
+						[resultArray addObject:responseDictionary];
+						break;
+					}
+					if (snmp_add_var(pdu, anOID, anOID_len, type, val)){
+						[responseDictionary setObject:@"snmp_add_var reports error" forKey:@"Error"];
+						[resultArray addObject:responseDictionary];
+						break;
+					}
+					
+					int status = snmp_synch_response(sessionHandle, pdu, &response);
+					
+					if (status == STAT_SUCCESS){
+						if (response->errstat != SNMP_ERR_NOERROR){
+							[responseDictionary setObject:[NSString stringWithFormat:@"Error in packet: %s",snmp_errstring(response->errstat)] forKey:@"Error"];
+							[resultArray addObject:responseDictionary];
+							break;
+						}
+					}
+					else if (status == STAT_TIMEOUT){
+						[responseDictionary setObject:[NSString stringWithFormat:@"SNMP Timeout: No Response from %s\n",sessionHandle->peername] forKey:@"Error"];
+						[resultArray addObject:responseDictionary];
+						break;
+					}
+					else {
+						[responseDictionary setObject:@"SNMP response error" forKey:@"Error"];
 						[resultArray addObject:responseDictionary];
 						break;
 					}
 				}
-				else if (status == STAT_TIMEOUT){
-					[responseDictionary setObject:[NSString stringWithFormat:@"SNMP Timeout: No Response from %s\n",sessionHandle->peername] forKey:@"Error"];
-					[resultArray addObject:responseDictionary];
-					break;
-				}
-				else {
-					[responseDictionary setObject:@"SNMP response error" forKey:@"Error"];
-					[resultArray addObject:responseDictionary];
-					break;
-				}
+				if(responseDictionary)[resultArray addObject:responseDictionary];
+				if (response)snmp_free_pdu(response);				
 			}
-			if(responseDictionary)[resultArray addObject:responseDictionary];
-			if (response)snmp_free_pdu(response);				
 		}
 	}
 	return resultArray;
@@ -336,3 +341,92 @@
 	return finalReversedValue;
 }
 @end
+
+//-----------------------------------------------------------
+//ORSqlQueue: A shared queue for SNMP access. You should 
+//never have to use this object directly. It will be created
+//on demand when a SNMP op is called.
+//-----------------------------------------------------------
+@implementation ORSNMPQueue
+SYNTHESIZE_SINGLETON_FOR_ORCLASS(SNMPQueue);
++ (NSOperationQueue*) queue				 { return [[ORSNMPQueue sharedSNMPQueue] queue]; }
++ (void) addOperation:(NSOperation*)anOp { return [[ORSNMPQueue sharedSNMPQueue] addOperation:anOp]; }
++ (NSUInteger) operationCount			 { return 	[[ORSNMPQueue sharedSNMPQueue] operationCount]; }
+
+//don't call this unless you're using this class in a special, non-global way.
+- (id) init
+{
+	self = [super init];
+	queue = [[NSOperationQueue alloc] init];
+	[queue setMaxConcurrentOperationCount:1];
+    return self;
+}
+
+- (NSOperationQueue*) queue					{ return queue; }
+- (void) addOperation:(NSOperation*)anOp	{ [queue addOperation:anOp]; }
+- (NSInteger) operationCount				{ return [[queue operations]count]; }
+
+@end
+
+//-----------------------------------------------------------
+// Generic SNMP Operation. Does nothing. Subclasses to actual work
+//-----------------------------------------------------------
+@implementation ORSNMPOperation
+
+@synthesize cmds,selector,ipNumber,mib,target;
+
+- (id)	 initWithDelegate:(id)aDelegate
+{
+	self = [super init];
+	delegate = aDelegate;
+	return self;
+}
+
+- (void) dealloc
+{
+	self.target		= nil;
+	self.ipNumber	= nil;
+	self.mib		= nil;
+	self.cmds		= nil;
+	[super dealloc];
+}
+
+- (void) main
+{
+	//do nothing... subclasses must override to get anything done.
+}
+@end
+
+//-----------------------------------------------------------
+// An SNMP Write OP
+//-----------------------------------------------------------
+@implementation ORSNMPWriteOperation
+- (void) main
+{
+	if([self isCancelled]) return;
+	
+	ORSNMP* ss = [[ORSNMP alloc] initWithMib:mib];
+	[ss openGuruSession:ipNumber];
+	NSArray* response = [ss writeValues:cmds];
+	[delegate performSelectorOnMainThread:selector withObject:response waitUntilDone:YES];
+	[ss release];
+}
+
+@end
+
+
+//-----------------------------------------------------------
+// An SNMP Read OP
+//-----------------------------------------------------------
+@implementation ORSNMPReadOperation
+- (void) main
+{	
+	if([self isCancelled]) return;
+	ORSNMP* ss = [[ORSNMP alloc] initWithMib:mib];
+	[ss openPublicSession:ipNumber];
+	NSArray* response = [ss readValues:cmds];
+	[delegate performSelectorOnMainThread:selector withObject:response waitUntilDone:YES];
+	[ss release];
+}
+@end
+
