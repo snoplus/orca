@@ -234,6 +234,7 @@
 
 #pragma mark ¥¥¥Script Helpers
 - (void) forceClearWaits;
+- (NSString*) commonScriptMethods;
 @end
 
 

@@ -2025,6 +2025,28 @@ static NSString *ORRunTypeNames 	= @"ORRunTypeNames";
 	[[self undoManager] enableUndoRegistration];
 }
 
+- (NSString*) commonScriptMethods
+{
+	NSArray* selectorArray = [NSArray arrayWithObjects:
+		@"isRunning",
+		@"startRun",
+		@"restartRun",
+		@"stopRun",
+		@"prepareForNewSubRun",
+		@"startNewSubRun",
+		@"timedRun",
+		@"repeatRun",
+		@"runNumber",
+		@"runType",
+		@"timeLimit",
+		@"setRepeatRun:(BOOL)",
+		@"setTimedRun:(BOOL)",
+		@"setRunType:(unsigned long)",
+		@"setTimeLimit:(NSTimeInterval)",
+		nil];
+	
+	return [selectorArray componentsJoinedByString:@"\n"];
+}
 
 @end
 
