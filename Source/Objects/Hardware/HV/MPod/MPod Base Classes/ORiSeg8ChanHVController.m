@@ -298,7 +298,7 @@
 	//float voltDiff  = fabs(voltage - hwGoal);
 	BOOL cratePower = YES;
 	if([[model adapter] respondsToSelector:@selector(power)])cratePower = [[model adapter] power];
-	if(!cratePower){ //temp reversed logic for testing.... change back!!!!
+	if(cratePower){ 
 		//the details buttons
 		if(state == kiSeg8ChanHVOutputOff){
 			//channel is off
