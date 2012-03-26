@@ -248,4 +248,22 @@ NSString* ORManualPlot2DModelPlotTitleChanged	= @"ORManualPlot2DModelPlotTitleCh
     *aMinY = minY;
     *aMaxY = maxY;
 }
+
+- (NSString*) commonScriptMethods
+{
+	NSArray* selectorArray = [NSArray arrayWithObjects:
+							  @"clear",
+							  @"numberBinsPerSide",
+							  @"setNumberBinsPerSide:(unsigned short)",
+							  @"valueAtX:(unsigned short) y:(unsigned short)",
+							  @"setBinAtX:(int) y:(int) to:(unsigned long)",
+							  @"incrementBinAtX:(int) y:(int) by:(unsigned long)",
+							  @"setXTitle:(NSString*)",
+							  @"setYTitle:(NSString*)",
+							  @"setPlotTitle:(NSString*)",
+							  nil];
+	
+	return [selectorArray componentsJoinedByString:@"\n"];
+}
+
 @end

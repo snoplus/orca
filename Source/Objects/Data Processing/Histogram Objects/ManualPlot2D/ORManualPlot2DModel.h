@@ -15,7 +15,7 @@
 //University of North Carolina, or U.S. Government make any warranty, 
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
-//-------------------------------------------------------------#define kManualPlot2DMacol0Keys 3
+//-------------------------------------------------------------
 
 @interface ORManualPlot2DModel : OrcaObject  
 {
@@ -45,6 +45,8 @@
 - (NSString*)		plotTitle;
 - (void)			setPlotTitle:(NSString*)aString;
 - (NSMutableArray*) rois;
+- (NSString*)		
+commonScriptMethods;
 
 #pragma mark •••Archival
 - (id)   initWithCoder:(NSCoder*)decoder;

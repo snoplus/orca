@@ -63,7 +63,7 @@ NSString* ORManualPlotDataChanged			= @"ORManualPlotDataChanged";
     [super dealloc];
 }
 
-- (void) clearData
+- (void) clear
 {
 	[dataSetLock lock];
 	[data release];
@@ -336,7 +336,7 @@ NSString* ORManualPlotDataChanged			= @"ORManualPlotDataChanged";
     [encoder encodeObject:roiSet		forKey:@"roiSet"];
 }
 
--(void)clear
+-(void)clearData
 {
 	[dataSetLock lock];
 	[data release];
@@ -433,6 +433,27 @@ NSString* ORManualPlotDataChanged			= @"ORManualPlotDataChanged";
 	}
 	[dataSetLock unlock];
     return valid;    
+}
+- (NSString*) commonScriptMethods
+{
+	
+	NSArray* selectorArray = [NSArray arrayWithObjects:
+							  @"comment",
+							  @"clearData",
+							  @"setHistogramBins:(int) xLow:(float) xHigh:(float)",
+							  @"setComment:(NSString*)",
+							  @"setCol0Title:(NSString*)",
+							  @"setCol1Title:(NSString*)",
+							  @"setCol2Title:(NSString*)",
+							  @"setCol3Title:(NSString*)",
+							  @"addValue1:(float) value2:(float)",
+							  @"addValue1:(float) value2:(float) value3:(float)",
+							  @"addValue1:(float) value2:(float) value3:(float) value4:(float)",
+							  @"fillHistogram:(float)",
+							  @"fillHistogram:(float) weight:(float)",
+							  nil];
+	
+	return [selectorArray componentsJoinedByString:@"\n"];
 }
 
 #pragma mark •••Data Source

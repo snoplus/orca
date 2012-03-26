@@ -70,6 +70,7 @@
 - (id)   dataAtRow:(int)r column:(int)c;
 - (void) clearData;
 - (NSString*) fullName;
+- (NSString*) commonScriptMethods;
 
 #pragma mark •••Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
