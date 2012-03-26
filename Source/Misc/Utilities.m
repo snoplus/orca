@@ -172,7 +172,7 @@ NSString* listMethods(Class aClass)
 	return listMethodWithOptions(aClass,YES,YES); 
 }
 
-NSString* listMethodWithOptions(Class aClass,BOOL verbose,BOOL showSuperClass)
+NSString* listMethodWithOptions(Class aClass,BOOL verbose,BOOL includeSuperClass)
 {
 NSMutableString* resultString = [NSMutableString stringWithString:@""];
 
@@ -204,11 +204,11 @@ NSMutableString* resultString = [NSMutableString stringWithString:@""];
         }
     } while ( mlist = class_nextMethodList(aClass, &iterator) );
     
-	if(showSuperClass){
+	if(includeSuperClass){
 		if (class->super_class == nil && verbose) [resultString appendFormat: @"%s has no superclass\n", name];
 		else {
 			if(verbose)[resultString appendFormat: @"\n%s superclass: %s\n", name, class->super_class->name];
-			[resultString appendString: listMethodWithOptions( class->super_class,verbose,showSuperClass)];
+			[resultString appendString: listMethodWithOptions( class->super_class,verbose,includeSuperClass)];
 		}
 	 }
 
@@ -240,7 +240,7 @@ NSMutableString* resultString = [NSMutableString stringWithString:@""];
 	free(methods);
 	[methodNames sortUsingSelector:@selector(caseInsensitiveCompare:)];
 	[resultString appendString:[methodNames componentsJoinedByString:@"\n"]];
-	if(showSuperClass){
+	if(includeSuperClass){
 		Class superClass = class_getSuperclass(aClass);
 		NSString* superClassName = [NSString stringWithUTF8String:class_getName(superClass)];
 		if (superClass == nil && verbose) {
@@ -249,7 +249,7 @@ NSMutableString* resultString = [NSMutableString stringWithString:@""];
 		else {
 			if(![superClassName hasPrefix:@"NS"]){
 				if(verbose)[resultString appendFormat: @"\n-------------------\n%s superclass: %@\n", name, superClassName];
-					[resultString appendString: listMethodWithOptions( superClass,verbose,showSuperClass)];
+					[resultString appendString: listMethodWithOptions( superClass,verbose,includeSuperClass)];
 				}
 		}
 	 }
@@ -287,6 +287,37 @@ const char* decodeType(const char* aType)
 	else return aType;
 	
 }
+
+NSString* commonScriptMethodsByClass(Class aClass,BOOL includeSuperClass)
+{
+	return commonScriptMethodsByObj([[[aClass alloc] init] autorelease],includeSuperClass);
+	
+}	
+
+NSString* commonScriptMethodsByObj(id anObj,BOOL includeSuperClass)
+{
+	NSMutableString* resultString = [NSMutableString stringWithString:@""];
+	if([anObj respondsToSelector:@selector(commonScriptMethods)]){
+		NSString* list = [[[anObj commonScriptMethods] mutableCopy] autorelease];
+		[resultString appendString:list];
+	}
+	else [resultString appendString:@"No common methods defined\n"];
+	
+	if(includeSuperClass){
+		Class superClass = [anObj superclass];
+		if (superClass==nil) [resultString appendFormat: @"%@ has no superclass\n", [anObj className]];
+		else {
+			NSString* superClassName = [superClass className];
+			if(![superClassName hasPrefix:@"NS"]){
+				[resultString appendFormat: @"\n-------------------\n%@ superclass: %@\n", [anObj className], superClassName];
+				[resultString appendString: commonScriptMethodsByObj( [anObj superclass],includeSuperClass)];
+			}
+		}
+	}
+	
+	return resultString;
+}
+
 
 NSString* computerName()
 {

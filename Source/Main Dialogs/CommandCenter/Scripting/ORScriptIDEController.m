@@ -61,7 +61,10 @@
 {
 	NSString* theClassName = [classNameField stringValue];
 	if([theClassName length]){
-		[helpView setString:listMethodWithOptions(NSClassFromString(theClassName),YES,[model showSuperClass])];
+		NSString* list = nil;
+		if([model showCommonOnly]) list = commonScriptMethodsByClass(NSClassFromString(theClassName),[model showSuperClass]);
+		if(!list)				   list = listMethodWithOptions(NSClassFromString(theClassName),YES,[model showSuperClass]);
+		[helpView setString:list];
 	}
 }
 
@@ -134,12 +137,7 @@
                      selector : @selector(lastFileChanged:)
                          name : ORScriptIDEModelLastFileChangedChanged
 						object: model];	
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(showSuperClassChanged:)
-                         name : ORScriptIDEModelShowSuperClassChanged
-						object: model];
-		
+			
     [notifyCenter addObserver : self
                      selector : @selector(debuggingChanged:)
                          name : ORScriptRunnerDebuggingChanged
@@ -193,6 +191,16 @@
                          name : ORScriptIDEModelAutoStopWithRunChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(showSuperClassChanged:)
+                         name : ORScriptIDEModelShowSuperClassChanged
+						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(showCommonOnlyChanged:)
+                         name : ORScriptIDEModelShowCommonOnlyChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -203,7 +211,6 @@
 	[self runningChanged:nil];
 	[self nameChanged:nil];
 	[self lastFileChanged:nil];
-	[self showSuperClassChanged:nil];
 	[self debuggingChanged:nil];
 	[self breakpointsChanged:nil];
 	[self breakChainChanged:nil];
@@ -211,6 +218,8 @@
 	[self autoStartWithDocumentChanged:nil];
 	[self autoStartWithRunChanged:nil];
 	[self autoStopWithRunChanged:nil];
+	[self showSuperClassChanged:nil];
+	[self showCommonOnlyChanged:nil];
 	[codeHelperPU selectItemAtIndex:0];
 }
 
@@ -223,6 +232,11 @@
 }
 
 #pragma mark •••Interface Management
+
+- (void) showCommonOnlyChanged:(NSNotification*)aNote
+{
+	[showCommonOnlyCB setIntValue: [model showCommonOnly]];
+}
 
 - (void) autoStopWithRunChanged:(NSNotification*)aNote
 {
@@ -404,18 +418,28 @@
 }
 
 #pragma mark •••Actions
+- (IBAction) classNameAction:(id)sender
+{
+	[self loadClassMethods];
+}
 
-- (void) autoStopWithRunAction:(id)sender
+- (IBAction) showCommonOnlyAction:(id)sender
+{
+	[model setShowCommonOnly:[sender intValue]];	
+	[self loadClassMethods];
+}
+
+- (IBAction) autoStopWithRunAction:(id)sender
 {
 	[model setAutoStopWithRun:[sender intValue]];	
 }
 
-- (void) autoStartWithRunAction:(id)sender
+- (IBAction) autoStartWithRunAction:(id)sender
 {
 	[model setAutoStartWithRun:[sender intValue]];	
 }
 
-- (void) autoStartWithDocumentAction:(id)sender
+- (IBAction) autoStartWithDocumentAction:(id)sender
 {
 	[model setAutoStartWithDocument:[sender intValue]];	
 }
@@ -441,9 +465,10 @@
     [gSecurity tryToSetLock:ORScriptIDEModelLock to:[sender intValue] forWindow:[self window]];
 }
 
-- (void) showSuperClassAction:(id)sender
+- (IBAction) showSuperClassAction:(id)sender
 {
 	[model setShowSuperClass:[sender intValue]];	
+	[self loadClassMethods];
 }
 
 - (IBAction) listMethodsAction:(id) sender

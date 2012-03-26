@@ -33,8 +33,10 @@ void	convertTimeLongToChar( time_t aTime, char *pTime );
 id		ORKeyFromId(id anObj);
 int		random_range(int lowest_number, int highest_number);
 io_service_t rootService();
+NSString* commonScriptMethodsByClass(Class aClass,BOOL includeSuperClass);
+NSString* commonScriptMethodsByObj(id anObj,BOOL includeSuperClass);
 NSString* listMethods(Class aClass);
-NSString* listMethodWithOptions(Class aClass,BOOL verbose,BOOL showSuperClass);
+NSString* listMethodWithOptions(Class aClass,BOOL verbose,BOOL includeSuperClass);
 NSString* hexToString(unsigned long aHexValue);
 const char* decodeType(const char* aType);
 NSString* macAddress();
@@ -47,4 +49,6 @@ NSString* fullVersion();
 kern_return_t findEthernetInterfaces(io_iterator_t *matchingServices);
 kern_return_t getMACAddress(io_iterator_t intfIterator, UInt8 *MACAddress, UInt8 bufferSize);
 
-
+@interface NSObject (scriptExtensions)
+- (NSString*) commonScriptMethods;
+@end

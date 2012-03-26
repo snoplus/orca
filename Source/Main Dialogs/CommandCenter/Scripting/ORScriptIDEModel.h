@@ -33,7 +33,6 @@
 	BOOL					parsedOK;
 	BOOL					scriptExists;
 	NSString*				lastFile;
-    BOOL					showSuperClass;
 	id						inputValue;
 	NSMutableArray*			inputValues;
     NSString*				comments;
@@ -43,6 +42,8 @@
     BOOL					autoStartWithDocument;
     BOOL					autoStartWithRun;
     BOOL					autoStopWithRun;
+    BOOL					showSuperClass;
+    BOOL					showCommonOnly;
 }
 
 #pragma mark ***Initialization
@@ -56,6 +57,8 @@
 - (void) runEnded:(NSNotification*)aNote;
 
 #pragma mark ***Accessors
+- (BOOL) showCommonOnly;
+- (void) setShowCommonOnly:(BOOL)aShowCommonOnly;
 - (BOOL) autoStopWithRun;
 - (void) setAutoStopWithRun:(BOOL)aAutoStopWithRun;
 - (BOOL) autoStartWithRun;
@@ -130,6 +133,7 @@
 
 @end
 
+extern NSString* ORScriptIDEModelShowCommonOnlyChanged;
 extern NSString* ORScriptIDEModelAutoStopWithRunChanged;
 extern NSString* ORScriptIDEModelAutoStartWithRunChanged;
 extern NSString* ORScriptIDEModelAutoStartWithDocumentChanged;

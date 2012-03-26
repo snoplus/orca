@@ -29,18 +29,19 @@
 #import "ORDataPacket.h"
 #import "ORDataSet.h"
 
-NSString* ORScriptIDEModelAutoStopWithRunChanged = @"ORScriptIDEModelAutoStopWithRunChanged";
-NSString* ORScriptIDEModelAutoStartWithRunChanged = @"ORScriptIDEModelAutoStartWithRunChanged";
+NSString* ORScriptIDEModelShowCommonOnlyChanged		= @"ORScriptIDEModelShowCommonOnlyChanged";
+NSString* ORScriptIDEModelAutoStopWithRunChanged	= @"ORScriptIDEModelAutoStopWithRunChanged";
+NSString* ORScriptIDEModelAutoStartWithRunChanged	= @"ORScriptIDEModelAutoStartWithRunChanged";
 NSString* ORScriptIDEModelAutoStartWithDocumentChanged = @"ORScriptIDEModelAutoStartWithDocumentChanged";
-NSString* ORScriptIDEModelCommentsChanged		 = @"ORScriptIDEModelCommentsChanged";
-NSString* ORScriptIDEModelShowSuperClassChanged	 = @"ORScriptIDEModelShowSuperClassChanged";
-NSString* ORScriptIDEModelScriptChanged			 = @"ORScriptIDEModelScriptChanged";
-NSString* ORScriptIDEModelNameChanged			 = @"ORScriptIDEModelNameChanged";
-NSString* ORScriptIDEModelLastFileChangedChanged = @"ORScriptIDEModelLastFileChangedChanged";
-NSString* ORScriptIDEModelLock					 = @"ORScriptIDEModelLock";
-NSString* ORScriptIDEModelBreakpointsChanged	 = @"ORScriptIDEModelBreakpointsChanged";
-NSString* ORScriptIDEModelBreakChainChanged		 = @"ORScriptIDEModelBreakChainChanged";
-NSString* ORScriptIDEModelGlobalsChanged		= @"ORScriptIDEModelGlobalsChanged";
+NSString* ORScriptIDEModelCommentsChanged			= @"ORScriptIDEModelCommentsChanged";
+NSString* ORScriptIDEModelShowSuperClassChanged		= @"ORScriptIDEModelShowSuperClassChanged";
+NSString* ORScriptIDEModelScriptChanged				= @"ORScriptIDEModelScriptChanged";
+NSString* ORScriptIDEModelNameChanged				= @"ORScriptIDEModelNameChanged";
+NSString* ORScriptIDEModelLastFileChangedChanged	= @"ORScriptIDEModelLastFileChangedChanged";
+NSString* ORScriptIDEModelLock						= @"ORScriptIDEModelLock";
+NSString* ORScriptIDEModelBreakpointsChanged		= @"ORScriptIDEModelBreakpointsChanged";
+NSString* ORScriptIDEModelBreakChainChanged			= @"ORScriptIDEModelBreakChainChanged";
+NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 
 @implementation ORScriptIDEModel
 
@@ -139,6 +140,20 @@ NSString* ORScriptIDEModelGlobalsChanged		= @"ORScriptIDEModelGlobalsChanged";
 }
 
 #pragma mark ***Accessors
+
+- (BOOL) showCommonOnly
+{
+    return showCommonOnly;
+}
+
+- (void) setShowCommonOnly:(BOOL)aShowCommonOnly
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setShowCommonOnly:showCommonOnly];
+    
+    showCommonOnly = aShowCommonOnly;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORScriptIDEModelShowCommonOnlyChanged object:self];
+}
 
 - (BOOL) autoStopWithRun
 {
@@ -269,9 +284,7 @@ NSString* ORScriptIDEModelGlobalsChanged		= @"ORScriptIDEModelGlobalsChanged";
 - (void) setShowSuperClass:(BOOL)aShowSuperClass
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setShowSuperClass:showSuperClass];
-    
     showSuperClass = aShowSuperClass;
-	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORScriptIDEModelShowSuperClassChanged object:self];
 }
 
@@ -704,16 +717,17 @@ NSString* ORScriptIDEModelGlobalsChanged		= @"ORScriptIDEModelGlobalsChanged";
     
     [[self undoManager] disableUndoRegistration];
 	
-    [self setAutoStopWithRun:[decoder decodeBoolForKey:@"autoStopWithRun"]];
-    [self setAutoStartWithRun:[decoder decodeBoolForKey:@"autoStartWithRun"]];
-    [self setAutoStartWithDocument:[decoder decodeBoolForKey:@"autoStartWithDocument"]];
-	[self setBreakChain:[decoder decodeBoolForKey:@"breakChain"]];
-	[self setComments:[decoder decodeObjectForKey:@"comments"]];
-    [self setShowSuperClass:[decoder decodeBoolForKey:@"showSuperClass"]];
-    [self setScript:[decoder decodeObjectForKey:@"script"]];
-    [self setScriptName:[decoder decodeObjectForKey:@"scriptName"]];
-    [self setLastFile:[decoder decodeObjectForKey:@"lastFile"]];
-	[self setBreakpoints:[decoder decodeObjectForKey:@"breakpoints"]];
+    [self setShowCommonOnly:		[decoder decodeBoolForKey:@"showCommonOnly"]];
+    [self setShowSuperClass:		[decoder decodeBoolForKey:@"showSuperClass"]];
+    [self setAutoStopWithRun:		[decoder decodeBoolForKey:@"autoStopWithRun"]];
+    [self setAutoStartWithRun:		[decoder decodeBoolForKey:@"autoStartWithRun"]];
+    [self setAutoStartWithDocument:	[decoder decodeBoolForKey:@"autoStartWithDocument"]];
+	[self setBreakChain:			[decoder decodeBoolForKey:@"breakChain"]];
+	[self setComments:				[decoder decodeObjectForKey:@"comments"]];
+    [self setScript:				[decoder decodeObjectForKey:@"script"]];
+    [self setScriptName:			[decoder decodeObjectForKey:@"scriptName"]];
+    [self setLastFile:				[decoder decodeObjectForKey:@"lastFile"]];
+	[self setBreakpoints:			[decoder decodeObjectForKey:@"breakpoints"]];
     inputValues = [[decoder decodeObjectForKey:@"inputValues"] retain];	
     [[self undoManager] enableUndoRegistration];
 	
@@ -725,17 +739,18 @@ NSString* ORScriptIDEModelGlobalsChanged		= @"ORScriptIDEModelGlobalsChanged";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeBool:autoStopWithRun forKey:@"autoStopWithRun"];
-    [encoder encodeBool:autoStartWithRun forKey:@"autoStartWithRun"];
-    [encoder encodeBool:autoStartWithDocument forKey:@"autoStartWithDocument"];
-    [encoder encodeBool:breakChain forKey:@"breakChain"];
-    [encoder encodeObject:comments forKey:@"comments"];
-    [encoder encodeBool:showSuperClass forKey:@"showSuperClass"];
-    [encoder encodeObject:script forKey:@"script"];
-    [encoder encodeObject:scriptName forKey:@"scriptName"];
-    [encoder encodeObject:inputValues forKey:@"inputValues"];
-    [encoder encodeObject:lastFile forKey:@"lastFile"];
-    [encoder encodeObject:breakpoints forKey:@"breakpoints"];
+    [encoder encodeBool:showCommonOnly			forKey:@"showCommonOnly"];
+    [encoder encodeBool:showSuperClass			forKey:@"showSuperClass"];
+    [encoder encodeBool:autoStopWithRun			forKey:@"autoStopWithRun"];
+    [encoder encodeBool:autoStartWithRun		forKey:@"autoStartWithRun"];
+    [encoder encodeBool:autoStartWithDocument	forKey:@"autoStartWithDocument"];
+    [encoder encodeBool:breakChain				forKey:@"breakChain"];
+    [encoder encodeObject:comments				forKey:@"comments"];
+    [encoder encodeObject:script				forKey:@"script"];
+    [encoder encodeObject:scriptName			forKey:@"scriptName"];
+    [encoder encodeObject:inputValues			forKey:@"inputValues"];
+    [encoder encodeObject:lastFile				forKey:@"lastFile"];
+    [encoder encodeObject:breakpoints			forKey:@"breakpoints"];
 }
 
 - (unsigned long) currentTime
