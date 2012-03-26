@@ -25,6 +25,7 @@
 #import "ORTimeAxis.h"
 #import "ORTimeRate.h"
 #import "ORTimeLinePlot.h"
+#import "ORTimedTextField.h"
 
 @interface ORiSeg8ChanHVController (private)
 - (void) _panicRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info;
@@ -141,6 +142,11 @@
                          name : ORiSeg8ChanHVShipRecordsChanged
 						object: model];
 
+	[notifyCenter addObserver : self
+                     selector : @selector(timeoutHappened:)
+                         name : @"Timeout"
+						object: nil];
+	
 }
 
 - (void) updateWindow
@@ -159,6 +165,10 @@
 }
 
 #pragma mark •••Interface Management
+- (void) timeoutHappened:(NSNotification*)aNote
+{
+	if([aNote object] ==model || [aNote object]==[model adapter])[timeoutField setStringValue:@"Timeout -- Cmds Flushed!"];
+}
 
 - (void) shipRecordsChanged:(NSNotification*)aNote
 {
@@ -256,6 +266,7 @@
 {
 	int selectedChannel = [model selectedChannel];
 	[targetField setIntValue:[model target:selectedChannel]];
+	[hvTableView reloadData];
 }
 
 - (void) checkGlobalSecurity
@@ -287,7 +298,7 @@
 	//float voltDiff  = fabs(voltage - hwGoal);
 	BOOL cratePower = YES;
 	if([[model adapter] respondsToSelector:@selector(power)])cratePower = [[model adapter] power];
-	if(cratePower){
+	if(!cratePower){ //temp reversed logic for testing.... change back!!!!
 		//the details buttons
 		if(state == kiSeg8ChanHVOutputOff){
 			//channel is off
@@ -550,6 +561,20 @@
 		return @"--";
 	}
 	else return @"";
+}
+
+- (void) tableView: (NSTableView*) aTableView setObjectValue: (id) anObject forTableColumn: (NSTableColumn*) aTableColumn row: (int) aRowIndex
+{
+	if(aTableView == hvTableView){
+		NSParameterAssert(aRowIndex >= 0 && aRowIndex < 8);
+		NSString* colIdentifier = [aTableColumn identifier];
+		if([colIdentifier isEqualToString:@"target"]){
+			[model setTarget:aRowIndex withValue:[anObject floatValue]];
+		}
+		else 	if([colIdentifier isEqualToString:@"maxCurrent"]){
+			[model setMaxCurrent:aRowIndex withValue:[anObject floatValue]];
+		}
+	}
 }
 
 - (int) numberOfRowsInTableView:(NSTableView *)aTableView

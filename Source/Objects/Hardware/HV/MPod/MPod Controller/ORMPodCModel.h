@@ -29,8 +29,8 @@
 	NSString*		IPNumber;
 	NSTask*			pingTask;
 	NSMutableDictionary* systemParams;
-	NSOperationQueue* queue;
 	BOOL			oldPower;
+	double			queueCount;
 }
 
 #pragma mark ***Accessors
@@ -48,6 +48,7 @@
 - (int) systemParamAsInt:(NSString*)name;
 - (id) systemParam:(NSString*)name;
 - (void) togglePower;
+- (void) setQueCount:(NSNumber*)n;
 
 #pragma mark ¥¥¥Hardware Access
 - (id) controllerCard;
@@ -68,18 +69,10 @@ extern NSString* MPodCIPNumberChanged;
 extern NSString* ORMPodCModelSystemParamsChanged;
 extern NSString* MPodPowerFailedNotification;
 extern NSString* MPodPowerRestoredNotification;
+extern NSString* ORMPodCQueueCountChanged;
 
 @interface NSObject (ORMpodCModel)
 - (void) precessReadResponseArray:(NSArray*)response;
 - (void) processSystemResponseArray:(NSArray*)response;
 
-@end
-
-@interface ORMPodCUpdateOp : NSOperation
-{
-	id delegate;
-}
-- (id) initWithDelegate:(id)aDelegate;
-- (void) dealloc;
-- (void) main;
 @end

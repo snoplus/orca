@@ -21,6 +21,7 @@
 #import "OrcaObjectController.h"
 
 @class ORCompositeTimeLineView;
+@class ORTimedTextField;
 
 @interface ORiSeg8ChanHVController : OrcaObjectController 
 {
@@ -62,6 +63,7 @@
 	
 	IBOutlet ORCompositeTimeLineView*   currentPlotter;
 	IBOutlet ORCompositeTimeLineView*   voltagePlotter;
+	IBOutlet ORTimedTextField*    timeoutField;
 }
 
 - (void) registerNotificationObservers;
@@ -69,6 +71,7 @@
 - (void) updateButtons;
 
 #pragma mark •••Interface Management
+- (void) timeoutHappened:(NSNotification*)aNote;
 - (void) shipRecordsChanged:(NSNotification*)aNote;
 - (void) maxCurrentChanged:(NSNotification*)aNote;
 - (void) selectedChannelChanged:(NSNotification*)aNote;
@@ -108,10 +111,13 @@
 - (IBAction) clearAllPanicAction:(id)sender;
 - (IBAction) loadAllAction:(id)sender;
 
-#pragma mark •••ata Source
+#pragma mark •••Table Data Source Methods
+- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex;
+- (void) tableView: (NSTableView*) aTableView setObjectValue: (id) anObject forTableColumn: (NSTableColumn*) aTableColumn row: (int) aRowIndex;
+
+#pragma mark •••Plot Data Source
 - (int)	numberPointsInPlot:(id)aPlotter;
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
-
 @end
 
 @interface NSObject (ORiSeg8ChanHVController)

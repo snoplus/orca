@@ -217,6 +217,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 		if([anError length]){
 			if([anError rangeOfString:@"Timeout"].location != NSNotFound){
 				NSLogError(@"TimeOut",[NSString stringWithFormat:@"MPod Crate %d\n",[self crateNumber]],[NSString stringWithFormat:@"HV Card %d\n",[self slot]],nil);
+				[[NSNotificationCenter defaultCenter] postNotificationName:@"MPodTimeout" object:self];
 				break;
 			}
 		}
@@ -565,6 +566,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 		if([anError length]){
 			if([anError rangeOfString:@"Timeout"].location != NSNotFound){
 				NSLogError(@"TimeOut",[NSString stringWithFormat:@"MPod Crate %d\n",[self crateNumber]],[NSString stringWithFormat:@"HV Card %d\n",[self slot]],nil);
+				[[NSNotificationCenter defaultCenter] postNotificationName:@"Timeout" object:self];
 				break;
 			}
 		}

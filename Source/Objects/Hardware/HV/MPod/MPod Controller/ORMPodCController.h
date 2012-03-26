@@ -21,6 +21,9 @@
 #import "OrcaObjectController.h"
 #import "ORMPodCController.h"
 
+@class ORValueBarGroupView;
+@class ORTimedTextField;
+
 @interface ORMPodCController : OrcaObjectController 
 {
 	IBOutlet NSButton*			  lockButton;
@@ -28,10 +31,13 @@
 	IBOutlet NSTextField*		  serialNumberField;
 	IBOutlet NSTextField*		  crateStatusField;
 	IBOutlet NSTextField*		  cratePowerStateField;
+	IBOutlet NSTextField*		  queueCountField;
 	IBOutlet NSComboBox*		  ipNumberComboBox;
 	IBOutlet NSButton*			  pingButton;
 	IBOutlet NSProgressIndicator* pingTaskProgress;
 	IBOutlet NSButton*			  cratePowerButton;
+    IBOutlet ORValueBarGroupView* queueValueBar;
+	IBOutlet ORTimedTextField*    timeoutField;
 }
 
 #pragma mark •••Initialization
@@ -41,6 +47,8 @@
 - (void) updateWindow;
 
 #pragma mark ***Interface Management
+- (void) timeoutHappened:(NSNotification*)aNote;
+- (void) queueCountChanged:(NSNotification*)aNote;
 - (void) systemStateChanged:(NSNotification*)aNote;
 - (void) lockChanged:(NSNotification*)aNote;
 - (void) pingTaskChanged:(NSNotification*)aNote;
@@ -54,5 +62,4 @@
 - (IBAction) updateAction:(id)sender;
 - (IBAction) clearHistoryAction:(id)sender;
 - (IBAction) powerAction:(id)sender;
-
 @end

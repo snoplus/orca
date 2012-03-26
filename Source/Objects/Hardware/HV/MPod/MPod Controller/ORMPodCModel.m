@@ -31,17 +31,17 @@ NSString* MPodCIPNumberChanged				 = @"MPodCIPNumberChanged";
 NSString* ORMPodCModelSystemParamsChanged	 = @"ORMPodCModelSystemParamsChanged";
 NSString* MPodPowerFailedNotification		 = @"MPodPowerFailedNotification";
 NSString* MPodPowerRestoredNotification		 = @"MPodPowerRestoredNotification";
+NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 
 @implementation ORMPodCModel
 
 - (void) dealloc
 {
-	[queue cancelAllOperations];
-	[queue release];
+	[[ORSNMPQueue queue] cancelAllOperations];
 	[systemParams release];
 	[connectionHistory release];
     [IPNumber release];
-	[queue removeObserver:self forKeyPath:@"operations"];
+	[[ORSNMPQueue queue] removeObserver:self forKeyPath:@"operationCount"];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[super dealloc];
 }
@@ -50,21 +50,15 @@ NSString* MPodPowerRestoredNotification		 = @"MPodPowerRestoredNotification";
 {
     if([self aWake])return;
     [super wakeUp];
-	if(!queue){
-		queue = [[NSOperationQueue alloc] init];
-		[queue setMaxConcurrentOperationCount:1]; //can only do one at a time
-		[queue addObserver:self forKeyPath:@"operations" options:0 context:NULL];
-	}
+	[[ORSNMPQueue queue] addObserver:self forKeyPath:@"operationCount" options:0 context:NULL];
 	[self pollHardwareAfterDelay];
 }
 
 - (void) sleep
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
-	[queue removeObserver:self forKeyPath:@"operations"];
-	[queue cancelAllOperations];
-	[queue release];
-	queue = nil;
+	[[ORSNMPQueue queue] removeObserver:self forKeyPath:@"operationCount"];
+	[[ORSNMPQueue queue] cancelAllOperations];
 	[super sleep];
 }
 - (NSString*) helpURL
@@ -177,9 +171,7 @@ NSString* MPodPowerRestoredNotification		 = @"MPodPowerRestoredNotification";
 - (void) pollHardware
 {
 	for(id aCard in [[self crate] orcaObjects]){
-		ORMPodCUpdateOp* anUpdateOp = [[ORMPodCUpdateOp alloc] initWithDelegate:aCard];
-		[queue addOperation:anUpdateOp];
-		[anUpdateOp release];
+		[aCard updateAllValues];
 	}
 }
 
@@ -189,20 +181,6 @@ NSString* MPodPowerRestoredNotification		 = @"MPodPowerRestoredNotification";
 	[self performSelector:@selector(pollHardware) withObject:nil afterDelay:2];
 }
 
-- (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object 
-                         change:(NSDictionary *)change context:(void *)context
-{
-    if (object == queue && [keyPath isEqual:@"operations"]) {
-        if ([[queue operations] count] == 0) {
-			[self performSelectorOnMainThread:@selector(pollHardwareAfterDelay) withObject:nil waitUntilDone:NO];
-        }
-		
-    }
-    else {
-        [super observeValueForKeyPath:keyPath ofObject:object 
-                               change:change context:context];
-    }
-}
 - (void) updateAllValues
 {
 	[self getValues: [self systemUpdateList]  target:self selector:@selector(processSystemResponseArray:)];
@@ -232,9 +210,10 @@ NSString* MPodPowerRestoredNotification		 = @"MPodPowerRestoredNotification";
 			if([error rangeOfString:@"Timeout"].location != NSNotFound){
 				[systemParams release];
 				systemParams = nil; 
-				//time so flush the queue
-				[queue cancelAllOperations];
+				//time out so flush the queue
+				[[ORSNMPQueue queue] cancelAllOperations];
 				NSLogError(@"TimeOut",[NSString stringWithFormat:@"MPod Crate %d\n",[self crateNumber]],@"HV Controller",nil);
+				[[NSNotificationCenter defaultCenter] postNotificationName:@"Timeout" object:self];
 			}
 		}
 		else {
@@ -279,11 +258,13 @@ NSString* MPodPowerRestoredNotification		 = @"MPodPowerRestoredNotification";
 
 - (void) getValues:(NSArray*)cmds target:(id)aTarget selector:(SEL)aSelector
 {
-	ORSNMP* ss = [[ORSNMP alloc] initWithMib:@"WIENER-CRATE-MIB"];
-	[ss openPublicSession:IPNumber];
-	NSArray* response = [ss readValues:cmds];
-	[aTarget performSelectorOnMainThread:aSelector withObject:response waitUntilDone:YES];
-	[ss release];
+	ORSNMPReadOperation* aReadOp = [[ORSNMPReadOperation alloc] initWithDelegate:aTarget];
+	aReadOp.mib			= @"WIENER-CRATE-MIB";
+	aReadOp.ipNumber	= IPNumber;
+	aReadOp.selector	= aSelector;
+	aReadOp.cmds		= cmds;
+	[ORSNMPQueue addOperation:aReadOp];
+	[aReadOp release];
 }
 
 - (void) writeValue:(NSString*)aCmd target:(id)aTarget selector:(SEL)aSelector
@@ -293,11 +274,14 @@ NSString* MPodPowerRestoredNotification		 = @"MPodPowerRestoredNotification";
 
 - (void) writeValues:(NSArray*)cmds target:(id)aTarget selector:(SEL)aSelector
 {
-	ORSNMP* ss = [[ORSNMP alloc] initWithMib:@"WIENER-CRATE-MIB"];
-	[ss openGuruSession:IPNumber];
-	NSArray* response = [ss writeValues:cmds];
-	[aTarget performSelectorOnMainThread:aSelector withObject:response waitUntilDone:YES];
-	[ss release];
+	ORSNMPWriteOperation* aWriteOP = [[ORSNMPWriteOperation alloc] initWithDelegate:self];
+	aWriteOP.mib		= @"WIENER-CRATE-MIB";
+	aWriteOP.target		= aTarget;
+	aWriteOP.ipNumber	= IPNumber;
+	aWriteOP.selector	= aSelector;
+	aWriteOP.cmds		= cmds;
+	[ORSNMPQueue addOperation:aWriteOP];
+	[aWriteOP release];
 }
 
 #pragma mark ¥¥¥Tasks
@@ -334,12 +318,35 @@ NSString* MPodPowerRestoredNotification		 = @"MPodPowerRestoredNotification";
 {
 	return pingTask != nil;
 }
+
 - (void) tasksCompleted:(id)sender
 {
 }
 
 - (void) taskData:(NSString*)text
 {
+}
+
+- (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object 
+                         change:(NSDictionary *)change context:(void *)context
+{
+	NSOperationQueue* queue = [[ORSNMPQueue sharedSNMPQueue] queue];
+    if (object == queue && [keyPath isEqual:@"operationCount"]) {
+		NSNumber* n = [NSNumber numberWithInt:[[[ORSNMPQueue queue] operations] count]];
+		[self performSelectorOnMainThread:@selector(setQueCount:) withObject:n waitUntilDone:NO];
+		if ([[queue operations] count] == 0) {
+			[self performSelectorOnMainThread:@selector(pollHardwareAfterDelay) withObject:nil waitUntilDone:NO];
+		}
+	}
+    else {
+        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+    }
+}
+
+- (void) setQueCount:(NSNumber*)n
+{
+	queueCount = [n intValue];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORMPodCQueueCountChanged object:self];
 }
 
 #pragma mark ***Archival
@@ -363,26 +370,3 @@ NSString* MPodPowerRestoredNotification		 = @"MPodPowerRestoredNotification";
 
 @end
 
-@implementation ORMPodCUpdateOp
-- (id) initWithDelegate:(id)aDelegate
-{
-	self = [super init];
-	delegate = [aDelegate retain];
-    return self;
-}
-
-- (void) dealloc
-{
-	[delegate release];
-	[super dealloc];
-}
-
-- (void) main
-{
-	@try {
-		[delegate updateAllValues];
-	}
-	@catch(NSException* e){
-	}
-}
-@end

@@ -20,6 +20,9 @@
 
 #import "ORMPodCController.h"
 #import "ORMPodCModel.h"
+#import "ORValueBarGroupView.h"
+#import "ORSNMP.h"
+#import "ORTimedTextField.h"
 
 @interface ORMPodCController (private)
 - (void) _powerSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info;
@@ -61,12 +64,25 @@
                      selector : @selector(systemStateChanged:)
                          name : ORMPodCModelSystemParamsChanged
 						object: model];
+
+	[notifyCenter addObserver : self
+                     selector : @selector(queueCountChanged:)
+                         name : ORMPodCQueueCountChanged
+						object: model];
+
+	[notifyCenter addObserver : self
+                     selector : @selector(timeoutHappened:)
+                         name : @"Timeout"
+						object: model];
+	
+	
 }
 
 - (void) awakeFromNib
 {
 	[super awakeFromNib];
 	[ipNumberComboBox reloadData];
+	[timeoutField setTimeOut:5];
 }
 
 - (void) updateWindow
@@ -76,7 +92,19 @@
     [self lockChanged:nil];
     [self pingTaskChanged:nil];
 	[self systemStateChanged:nil];
+	[self queueCountChanged:nil];
 }
+
+- (void) timeoutHappened:(NSNotification*)aNote
+{
+	[timeoutField setStringValue:@"Timeout -- Cmds Flushed!"];
+}
+
+- (void) queueCountChanged:(NSNotification*)aNote
+{
+	[queueCountField setIntValue: [ORSNMPQueue operationCount]];
+	[queueValueBar setNeedsDisplay:YES];
+}	
 
 - (void) systemStateChanged:(NSNotification*)aNote
 {
