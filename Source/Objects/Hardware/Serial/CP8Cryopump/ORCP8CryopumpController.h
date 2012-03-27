@@ -159,6 +159,7 @@
 - (void) pollTimeChanged:(NSNotification*)aNote;
 - (void) miscAttributesChanged:(NSNotification*)aNote;
 - (void) scaleAction:(NSNotification*)aNote;
+- (void) updateButtons;
 
 #pragma mark ***Actions
 - (IBAction) secondStageTempControlAction:(id)sender;

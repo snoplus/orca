@@ -803,7 +803,7 @@ NSString* ORCP8CryopumpLock									= @"ORCP8CryopumpLock";
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
 	[self setSecondStageTempControl:	[decoder decodeIntForKey:@"secondStageTempControl"]];
-	[self setRoughingInterlock:[		decoder decodeBoolForKey:@"roughingInterlock"]];
+	[self setRoughingInterlock:			[decoder decodeBoolForKey:@"roughingInterlock"]];
 	[self setStandbyMode:				[decoder decodeBoolForKey:@"standbyMode"]];
 	[self setRepurgeTime:				[decoder decodeIntForKey:@"repurgeTime"]];
 	[self setPumpsPerCompressor:		[decoder decodeIntForKey:@"pumpsPerCompressor"]];

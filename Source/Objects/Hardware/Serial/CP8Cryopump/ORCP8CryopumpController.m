@@ -409,10 +409,10 @@
 {
 	NSString* s = @"?";
 	switch([model roughingInterlockStatus]){
-		case 0: s = @"No Permission"; break;
-		case 1: s = @"Has Roughing Permission"; break;
-		case 2: s = @"Needs Roughing Permission"; break;
-		case 4: s = @"Cryopump is Running"; break;
+		case 0: s = @"No Permission";				break;
+		case 1: s = @"Has Roughing Permission";		break;
+		case 2: s = @"Needs Roughing Permission";	break;
+		case 4: s = @"Cryopump is Running";			break;
 			
 	}
 	[roughingInterlockStatusField setStringValue: s];
@@ -460,7 +460,8 @@
 
 - (void) thermocoupleStatusChanged:(NSNotification*)aNote
 {
-	[thermocoupleStatusField setStringValue: [model thermocoupleStatus]?@"On":@"Off"];
+	[thermocoupleStatusField setStringValue: [model thermocoupleStatus]?@"ON":@"OFF"];
+	[self updateButtons];
 }
 
 - (void) statusChanged:(NSNotification*)aNote
@@ -485,7 +486,8 @@
 
 - (void) roughValveStatusChanged:(NSNotification*)aNote
 {
-	[roughValveStatusField setIntValue: [model roughValveStatus]];
+	[roughValveStatusField setStringValue: [model roughValveStatus]?@"OPEN":@"CLOSED"];
+	[self updateButtons];
 }
 
 - (void) regenerationTimeChanged:(NSNotification*)aNote
@@ -505,7 +507,7 @@
 
 - (void) regenerationSequenceChanged:(NSNotification*)aNote
 {
-	NSString* s = @"?";
+	NSString* s = @"--";
 	switch([model regenerationSequence]){
 		case 'Z': s = @"Start Delay";						break;
 		case 'A': s = @"20s cancelation delay";				break;
@@ -516,7 +518,7 @@
 			s = [NSString stringWithFormat:@"Cryopump Warm up: %c",	(char)[model regenerationSequence]];		
 		break;
 		case 'H': s = @"Extended Purge/Repurge Cycle";		break;
-		case 'J': s = @"Waiting for Roughing Clearance";	break;
+		case 'J': s = @"Waiting on Roughing Clearance";		break;
 		case 'L': s = @"Rate of Rise";						break;
 		case 'M': s = @"Cool Down";							break;
 		case 'P': s = @"Regen Completed";					break;
@@ -527,11 +529,23 @@
 		case 's': s = @"Cryopump Stopped After Warmup";		break;
 	}
 	[regenerationSequenceField setStringValue: s];
+	[self updateButtons];
 }
 
 - (void) regenerationErrorChanged:(NSNotification*)aNote
 {
-	[regenerationErrorField setIntValue: [model regenerationError]];
+	NSString* s = @"--";
+	switch([model regenerationError]){
+		case '@': s = @"No Error";					break;
+		case 'B': s = @"Warm up Timeout";			break;
+		case 'C': s = @"Cool Down Timeout";			break;
+		case 'D': s = @"Roughing Error";			break;
+		case 'E': s = @"Rate of Rise Limit";		break;
+		case 'F': s = @"Manual Abort";				break;
+		case 'G': s = @"Rough Valve Timeout";		break;
+		case 'H': s = @"Illegal State";				break;
+	}
+	[regenerationErrorField setStringValue: s];
 }
 
 - (void) regenerationCyclesChanged:(NSNotification*)aNote
@@ -541,17 +555,28 @@
 
 - (void) purgeStatusChanged:(NSNotification*)aNote
 {
-	[purgeStatusField setIntValue: [model purgeStatus]];
+	[purgeStatusField setStringValue: [model purgeStatus]?@"OPEN":@"CLOSED"];
+	[self updateButtons];
 }
 
 - (void) pumpStatusChanged:(NSNotification*)aNote
 {
-	[pumpStatusField setIntValue: [model pumpStatus]];
+	[pumpStatusField setStringValue: [model pumpStatus]?@"ON":@"OFF"];
+	[self updateButtons];
 }
 
 - (void) powerFailureRecoveryStatusChanged:(NSNotification*)aNote
 {
-	[powerFailureRecoveryStatusField setIntValue: [model powerFailureRecoveryStatus]];
+	NSString* s = @"Status: --";
+	switch([model powerFailureRecoveryStatus]){
+		case 0: s = @"Status: No pwr fail recovery in progress"; break;
+		case 1: s = @"Status: Cool down in progress";			 break;
+		case 2: s = @"Status: Regeneration in progress";		 break;
+		case 3: s = @"Status: Attempting to cool to 17K";		 break;
+		case 4: s = @"Status: Recoverd pump to < 17K";			 break;
+		case 5: s = @"Status: 2nd stage not recovering";		 break;
+	}
+	[powerFailureRecoveryStatusField setStringValue: s];
 }
 
 - (void) powerFailureRecoveryChanged:(NSNotification*)aNote
@@ -676,26 +701,58 @@
 - (void) lockChanged:(NSNotification*)aNotification
 {
 
-    BOOL runInProgress = [gOrcaGlobals runInProgress];
-    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORCP8CryopumpLock];
     BOOL locked = [gSecurity isLocked:ORCP8CryopumpLock];
 
     [lockButton setState: locked];
+	[self updateButtons];
+}
 
-    [portListPopup setEnabled:!locked];
-    [openPortButton setEnabled:!locked];
-    [pollTimePopup setEnabled:!locked];
-    [shipTemperaturesButton setEnabled:!locked];
+- (void) updateButtons
+{
+    BOOL locked = [gSecurity isLocked:ORCP8CryopumpLock];
+	
+    [portListPopup					setEnabled:!locked];
+    [openPortButton					setEnabled:!locked];
+    [pollTimePopup					setEnabled:!locked];
+    [shipTemperaturesButton			setEnabled:!locked];
  
-	[initHardwareButton setEnabled:!locked];
-    [pollNowButton setEnabled:!locked];
-		
-    NSString* s = @"";
-    if(lockedOrRunningMaintenance){
-        if(runInProgress && ![gSecurity isLocked:ORCP8CryopumpLock])s = @"Not in Maintenance Run.";
-    }
-    [lockDocField setStringValue:s];
+	[secondStageTempControlField	setEnabled:!locked];
+	[roughingInterlockPU			setEnabled:!locked];
+	[standbyModePU					setEnabled:!locked];
+	[repurgeTimeField				setEnabled:!locked];
+	[pumpsPerCompressorField		setEnabled:!locked];
+	[restartTemperatureField		setEnabled:!locked];
+	[rateOfRiseCyclesField			setEnabled:!locked];
+	[rateOfRiseField				setEnabled:!locked];
+	[roughToPressureField			setEnabled:!locked];
+	[repurgeCyclesField				setEnabled:!locked];
+	[extendedPurgeTimeField			setEnabled:!locked];
+	[pumpRestartDelayField			setEnabled:!locked];
+	[regenerationTimeField			setEnabled:!locked];
+	[regenerationStepTimerField		setEnabled:!locked];
+	[regenerationStartDelayField	setEnabled:!locked];
+	[powerFailureRecoveryPU			setEnabled:!locked];
+	[firstStageControlMethodPU		setEnabled:!locked];
+	[firstStageControlTempField		setEnabled:!locked];
+    [initHardwareButton				setEnabled:!locked];
+	[regenAbortButton				setEnabled:!locked];
+	[regenStartFullButton			setEnabled:!locked];
+	[regenStartFastButton			setEnabled:!locked];
+	[regenActivateNormalPumpingButton setEnabled:!locked];
+	[regenWarmAndStopButton			setEnabled:!locked];
+	[initHardwareButton				setEnabled:!locked];
+	
+	[roughValveInterlockButton		setEnabled:!locked && [model regenerationSequence] == 'J'];
 
+	[pumpOnButton					setEnabled:!locked && [model pumpStatus]==NO];
+	[pumpOffButton					setEnabled:!locked && [model pumpStatus]==YES];
+	[purgeOnButton					setEnabled:!locked && [model purgeStatus]==NO];
+	[purgeOffButton					setEnabled:!locked && [model purgeStatus]==YES];
+	[roughingValveOpenButton		setEnabled:!locked && [model roughValveStatus]==NO];
+	[roughingValveClosedButton		setEnabled:!locked && [model roughValveStatus]==YES];
+	[thermocoupleOnButton			setEnabled:!locked  && [model thermocoupleStatus]==NO];
+	[thermocoupleOffButton			setEnabled:!locked  && [model thermocoupleStatus]==YES];
+	
 }
 
 - (void) portStateChanged:(NSNotification*)aNotification
