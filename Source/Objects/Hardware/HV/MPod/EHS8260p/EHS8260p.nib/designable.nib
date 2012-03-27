@@ -12,7 +12,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="3729"/>
+			<integer value="3588"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1797,7 +1797,7 @@
 																			<reference key="NSTextColor" ref="1001528900"/>
 																		</object>
 																		<object class="NSTextFieldCell" key="NSDataCell" id="1032071727">
-																			<int key="NSCellFlags">337772096</int>
+																			<int key="NSCellFlags">67239488</int>
 																			<int key="NSCellFlags2">134350848</int>
 																			<string key="NSContents">Text Cell</string>
 																			<reference key="NSSupport" ref="26"/>
@@ -1826,7 +1826,7 @@
 																			<reference key="NSTextColor" ref="1001528900"/>
 																		</object>
 																		<object class="NSTextFieldCell" key="NSDataCell" id="134322170">
-																			<int key="NSCellFlags">67239488</int>
+																			<int key="NSCellFlags">337772096</int>
 																			<int key="NSCellFlags2">67246080</int>
 																			<string key="NSContents">Text Cell</string>
 																			<reference key="NSSupport" ref="26"/>
@@ -1853,7 +1853,7 @@
 																			<reference key="NSTextColor" ref="1001528900"/>
 																		</object>
 																		<object class="NSTextFieldCell" key="NSDataCell" id="1009767875">
-																			<int key="NSCellFlags">337772096</int>
+																			<int key="NSCellFlags">67239488</int>
 																			<int key="NSCellFlags2">-2080241664</int>
 																			<string key="NSContents">Text Cell</string>
 																			<reference key="NSSupport" ref="26"/>
@@ -1931,7 +1931,7 @@
 																			<reference key="NSTextColor" ref="1001528900"/>
 																		</object>
 																		<object class="NSTextFieldCell" key="NSDataCell" id="623659519">
-																			<int key="NSCellFlags">337772096</int>
+																			<int key="NSCellFlags">67239488</int>
 																			<int key="NSCellFlags2">67241984</int>
 																			<string key="NSContents">Text Cell</string>
 																			<reference key="NSSupport" ref="26"/>
@@ -2057,7 +2057,7 @@
 																			<reference key="NSTextColor" ref="1001528900"/>
 																		</object>
 																		<object class="NSTextFieldCell" key="NSDataCell" id="325622098">
-																			<int key="NSCellFlags">337772096</int>
+																			<int key="NSCellFlags">67239488</int>
 																			<int key="NSCellFlags2">134350848</int>
 																			<string key="NSContents">Text Cell</string>
 																			<reference key="NSSupport" ref="26"/>
