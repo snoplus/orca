@@ -397,6 +397,8 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 
 - (void) turnChannelOn:(int)channel
 {    
+	[self setHwGoal:channel withValue:0];
+	[self writeVoltage:channel];
 	NSString* cmd = [NSString stringWithFormat:@"outputSwitch.u%d i %d",[self slotChannelValue:channel],kiSeg8ChanHVOutputOn];
 	[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:)];
 }
