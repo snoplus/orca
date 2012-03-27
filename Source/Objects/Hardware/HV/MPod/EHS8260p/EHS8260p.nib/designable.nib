@@ -2280,7 +2280,7 @@
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSTextFieldCell" key="NSCell" id="348250942">
 													<int key="NSCellFlags">68288064</int>
-													<int key="NSCellFlags2">272761856</int>
+													<int key="NSCellFlags2">71435264</int>
 													<string type="base64-UTF8" key="NSContents">IA</string>
 													<reference key="NSSupport" ref="26"/>
 													<reference key="NSControlView" ref="52519845"/>

@@ -441,13 +441,13 @@
 						<object class="NSTextField" id="315333033">
 							<reference key="NSNextResponder" ref="699451514"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{38, 53}, {73, 14}}</string>
+							<string key="NSFrame">{{38, 53}, {97, 14}}</string>
 							<reference key="NSSuperview" ref="699451514"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="791269422">
 								<int key="NSCellFlags">68288064</int>
 								<int key="NSCellFlags2">4326400</int>
-								<string key="NSContents">Cmds in Que</string>
+								<string key="NSContents">Command Queue</string>
 								<reference key="NSSupport" ref="26"/>
 								<reference key="NSControlView" ref="315333033"/>
 								<reference key="NSBackgroundColor" ref="248319977"/>
@@ -480,12 +480,12 @@
 						<object class="NSTextField" id="492033639">
 							<reference key="NSNextResponder" ref="699451514"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{113, 53}, {258, 14}}</string>
+							<string key="NSFrame">{{38, 2}, {258, 14}}</string>
 							<reference key="NSSuperview" ref="699451514"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="751093729">
 								<int key="NSCellFlags">68288064</int>
-								<int key="NSCellFlags2">272761856</int>
+								<int key="NSCellFlags2">4326400</int>
 								<string type="base64-UTF8" key="NSContents">IA</string>
 								<reference key="NSSupport" ref="26"/>
 								<reference key="NSControlView" ref="492033639"/>
@@ -742,8 +742,8 @@
 							<reference ref="445175631"/>
 							<reference ref="1043723855"/>
 							<reference ref="315333033"/>
-							<reference ref="492033639"/>
 							<reference ref="328287763"/>
+							<reference ref="492033639"/>
 						</object>
 						<reference key="parent" ref="981993721"/>
 					</object>
@@ -1144,7 +1144,7 @@
 					<string>ORTimedTextField</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<object class="NSAffineTransform">
-						<bytes key="NSTransformStruct">P4AAAL+AAABC8gAAwoIAAA</bytes>
+						<bytes key="NSTransformStruct">P4AAAL+AAABDCQAAwWAAAA</bytes>
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>{{289, 730}, {425, 228}}</string>

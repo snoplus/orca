@@ -258,13 +258,15 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 
 - (void) getValues:(NSArray*)cmds target:(id)aTarget selector:(SEL)aSelector
 {
-	ORSNMPReadOperation* aReadOp = [[ORSNMPReadOperation alloc] initWithDelegate:aTarget];
-	aReadOp.mib			= @"WIENER-CRATE-MIB";
-	aReadOp.ipNumber	= IPNumber;
-	aReadOp.selector	= aSelector;
-	aReadOp.cmds		= cmds;
-	[ORSNMPQueue addOperation:aReadOp];
-	[aReadOp release];
+	for(id aCmd in cmds){
+		ORSNMPReadOperation* aReadOp = [[ORSNMPReadOperation alloc] initWithDelegate:aTarget];
+		aReadOp.mib			= @"WIENER-CRATE-MIB";
+		aReadOp.ipNumber	= IPNumber;
+		aReadOp.selector	= aSelector;
+		aReadOp.cmds		= [NSArray arrayWithObject:aCmd];
+		[ORSNMPQueue addOperation:aReadOp];
+		[aReadOp release];
+	}
 }
 
 - (void) writeValue:(NSString*)aCmd target:(id)aTarget selector:(SEL)aSelector
@@ -274,14 +276,16 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 
 - (void) writeValues:(NSArray*)cmds target:(id)aTarget selector:(SEL)aSelector
 {
-	ORSNMPWriteOperation* aWriteOP = [[ORSNMPWriteOperation alloc] initWithDelegate:self];
-	aWriteOP.mib		= @"WIENER-CRATE-MIB";
-	aWriteOP.target		= aTarget;
-	aWriteOP.ipNumber	= IPNumber;
-	aWriteOP.selector	= aSelector;
-	aWriteOP.cmds		= cmds;
-	[ORSNMPQueue addOperation:aWriteOP];
-	[aWriteOP release];
+	for(id aCmd in cmds){
+		ORSNMPWriteOperation* aWriteOP = [[ORSNMPWriteOperation alloc] initWithDelegate:self];
+		aWriteOP.mib		= @"WIENER-CRATE-MIB";
+		aWriteOP.target		= aTarget;
+		aWriteOP.ipNumber	= IPNumber;
+		aWriteOP.selector	= aSelector;
+		aWriteOP.cmds		= [NSArray arrayWithObject:aCmd];
+		[ORSNMPQueue addOperation:aWriteOP];
+		[aWriteOP release];
+	}
 }
 
 #pragma mark ¥¥¥Tasks

@@ -22,6 +22,7 @@
 #import "ORMPodCModel.h"
 #import "ORValueBarGroupView.h"
 #import "ORSNMP.h"
+#import "ORAxis.h"
 #import "ORTimedTextField.h"
 
 @interface ORMPodCController (private)
@@ -82,7 +83,8 @@
 {
 	[super awakeFromNib];
 	[ipNumberComboBox reloadData];
-	[timeoutField setTimeOut:5];
+	[timeoutField setTimeOut:1.5];
+	[[queueValueBar xAxis] setRngLimitsLow:0 withHigh:500 withMinRng:10];
 }
 
 - (void) updateWindow
