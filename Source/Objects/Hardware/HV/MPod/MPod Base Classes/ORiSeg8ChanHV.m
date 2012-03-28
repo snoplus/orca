@@ -216,8 +216,10 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 		NSString* anError = [anEntry objectForKey:@"Error"];
 		if([anError length]){
 			if([anError rangeOfString:@"Timeout"].location != NSNotFound){
+				//time out so flush the queue
+				[[ORSNMPQueue queue] cancelAllOperations];
 				NSLogError(@"TimeOut",[NSString stringWithFormat:@"MPod Crate %d\n",[self crateNumber]],[NSString stringWithFormat:@"HV Card %d\n",[self slot]],nil);
-				[[NSNotificationCenter defaultCenter] postNotificationName:@"MPodTimeout" object:self];
+				[[NSNotificationCenter defaultCenter] postNotificationName:@"Timeout" object:self];
 				break;
 			}
 		}
@@ -264,7 +266,10 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 		NSString* anError = [anEntry objectForKey:@"Error"];
 		if([anError length]){
 			if([anError rangeOfString:@"Timeout"].location != NSNotFound){
+				//time out so flush the queue
+				[[ORSNMPQueue queue] cancelAllOperations];
 				NSLogError(@"TimeOut",[NSString stringWithFormat:@"MPod Crate %d\n",[self crateNumber]],[NSString stringWithFormat:@"HV Card %d\n",[self slot]],nil);
+				[[NSNotificationCenter defaultCenter] postNotificationName:@"Timeout" object:self];
 				break;
 			}
 		}
@@ -567,6 +572,8 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 		NSString* anError = [anEntry objectForKey:@"Error"];
 		if([anError length]){
 			if([anError rangeOfString:@"Timeout"].location != NSNotFound){
+				//time out so flush the queue
+				[[ORSNMPQueue queue] cancelAllOperations];
 				NSLogError(@"TimeOut",[NSString stringWithFormat:@"MPod Crate %d\n",[self crateNumber]],[NSString stringWithFormat:@"HV Card %d\n",[self slot]],nil);
 				[[NSNotificationCenter defaultCenter] postNotificationName:@"Timeout" object:self];
 				break;
