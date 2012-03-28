@@ -278,8 +278,11 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 }
 
 - (int) queCount
-{
-	return [cmdQueue count];
+{	unsigned theCount;
+	@synchronized (self){
+		theCount =  [cmdQueue count];
+	}
+	return theCount;
 }
 
 - (BOOL) readingTemperatures
@@ -731,8 +734,6 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 		char cmdData[3];
 		cmdData[0] = kPacGainCmd;
 		cmdData[1] = kPacGainReadAll;
-        
-        
 		[self writeCmdData:[NSData dataWithBytes:cmdData length:2]];
 	}
 }
@@ -741,7 +742,6 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 - (void) writeShipCmd
 {
     if([serialPort isOpen]){ 
-		
 		char theCommand = kPacShipAdcs;
 		[self writeCmdData:[NSData dataWithBytes:&theCommand length:1]];
 	}
@@ -749,10 +749,12 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 
 - (void) writeCmdData:(NSData*)someData
 {
-	if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
-	[cmdQueue addObject:someData];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelQueCountChanged object: self];
-	if(!lastRequest)[self processOneCommandFromQueue];
+	@synchronized (self){
+		if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
+		[cmdQueue addObject:someData];
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelQueCountChanged object: self];
+		if(!lastRequest)[self processOneCommandFromQueue];
+	}
 }
 
 - (void) selectModule
@@ -1068,17 +1070,19 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 //note that everything called by these routines MUST be threadsafe
 - (void) startProcessCycle
 {    
-    if(!readOnce){
-        @try { 
-			if([cmdQueue count] == 0) {
-				[self readAdcs]; 
-				readOnce = YES;
+	@synchronized (self){
+		if(!readOnce){
+			@try { 
+				if([cmdQueue count] == 0) {
+					[self readAdcs]; 
+					readOnce = YES;
+				}
 			}
-        }
-		@catch(NSException* localException) { 
-			//catch this here to prevent it from falling thru, but nothing to do.
-        }
-    }
+			@catch(NSException* localException) { 
+				//catch this here to prevent it from falling thru, but nothing to do.
+			}
+		}
+	}
 }
 
 - (void) endProcessCycle
@@ -1345,32 +1349,37 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 }
 - (void) timeout
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-	NSLogError(@"PAC",@"command timeout",nil);
-	[self setLastRequest:nil];
-	[cmdQueue removeAllObjects]; //if we timeout we just flush the queue
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelQueCountChanged object: self];
-	//[self processOneCommandFromQueue];	 //do the next command in the queue
-    gainIndex = 0;
+	@synchronized (self){
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+		NSLogError(@"PAC",@"command timeout",nil);
+		[self setLastRequest:nil];
+		[cmdQueue removeAllObjects]; //if we timeout we just flush the queue
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelQueCountChanged object: self];
+		//[self processOneCommandFromQueue];	 //do the next command in the queue
+		gainIndex = 0;
+	}
 }
 
 - (void) processOneCommandFromQueue
 {
-	if([cmdQueue count] == 0) return;
-	NSData* cmdData = [[[cmdQueue objectAtIndex:0] retain] autorelease];
-	[cmdQueue removeObjectAtIndex:0];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelQueCountChanged object: self];
-	unsigned char* cmd = (unsigned char*)[cmdData bytes];
-	if(cmd[0] == kPacShipAdcs){
-		[self setLastRequest:nil];
-		[self shipAdcValues];
-		[self loadLogBuffer];
-		[self processOneCommandFromQueue];
-	}
-	else {
-		[self setLastRequest:cmdData];
-		[serialPort writeDataInBackground:cmdData];
-		[self performSelector:@selector(timeout) withObject:nil afterDelay:1];
+	@synchronized (self){
+		if([cmdQueue count] > 0){
+			NSData* cmdData = [[[cmdQueue objectAtIndex:0] retain] autorelease];
+			[cmdQueue removeObjectAtIndex:0];
+			[[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelQueCountChanged object: self];
+			unsigned char* cmd = (unsigned char*)[cmdData bytes];
+			if(cmd[0] == kPacShipAdcs){
+				[self setLastRequest:nil];
+				[self shipAdcValues];
+				[self loadLogBuffer];
+				[self processOneCommandFromQueue];
+			}
+			else {
+				[self setLastRequest:cmdData];
+				[serialPort writeDataInBackground:cmdData];
+				[self performSelector:@selector(timeout) withObject:nil afterDelay:1];
+			}
+		}
 	}
 }
 
@@ -1404,8 +1413,10 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 {
 	float nextTry = pollingState;
     @try { 
-		if([cmdQueue count] == 0)[self readAdcs];
-		else nextTry = .5;
+		@synchronized (self){
+			if([cmdQueue count] == 0)[self readAdcs];
+			else nextTry = .5;
+		}
     }
 	@catch(NSException* localException) { 
 		//catch this here to prevent it from falling thru, but nothing to do.
