@@ -25,6 +25,7 @@
 #import "ORTimeRate.h"
 #import "ORHWWizParam.h"
 #import "ORHWWizSelection.h"
+#import "ORSNMP.h"
 
 NSString* ORiSeg8ChanHVShipRecordsChanged		= @"ORiSeg8ChanHVShipRecordsChanged";
 NSString* ORiSeg8ChanHVMaxCurrentChanged		= @"ORiSeg8ChanHVMaxCurrentChanged";
