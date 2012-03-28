@@ -58,6 +58,11 @@
                          name : ORAdcModelHighTextChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(trackMaxMinChanged:)
+                         name : ORAdcModelTrackMaxMinChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -67,6 +72,12 @@
 	[self lowTextChanged:nil];
 	[self inRangeTextChanged:nil];
 	[self highTextChanged:nil];
+	[self trackMaxMinChanged:nil];
+}
+
+- (void) trackMaxMinChanged:(NSNotification*)aNote
+{
+	[trackMaxMinCB setIntValue: [model trackMaxMin]];
 }
 
 - (void) highTextChanged:(NSNotification*)aNote
@@ -95,6 +106,11 @@
 - (void) minChangeChanged:(NSNotification*)aNote
 {
 	[minChangeField setFloatValue:[model minChange]];
+}
+
+- (void) trackMaxMinAction:(id)sender
+{
+	[model setTrackMaxMin:[sender intValue]];	
 }
 
 - (void) highTextAction:(id)sender

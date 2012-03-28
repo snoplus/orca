@@ -126,6 +126,7 @@
 - (void) askForProcessID:(id)fromObj;
 - (id)valueDictionary;
 - (BOOL) isTrueEndNode;
+- (void) resetReportValues;
 @end
 
 extern NSString* ORProcessModelRunNumberChanged;

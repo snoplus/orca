@@ -42,9 +42,18 @@
     NSString* lowText;
     NSString* inRangeText;
     NSString* highText;
+	
+	NSDate* resetDate;
+	NSDate* highDate;
+	NSDate* lowDate;
+	double  highestValue;
+	double	lowestValue;
+    BOOL	trackMaxMin;
 }
 
 #pragma mark ***Accessors
+- (BOOL) trackMaxMin;
+- (void) setTrackMaxMin:(BOOL)aTrackMaxMin;
 - (NSString*) highText;
 - (void) setHighText:(NSString*)aHighText;
 - (NSString*) inRangeText;
@@ -65,12 +74,16 @@
 - (double) maxValue;
 - (void) viewSource;
 
+- (void) checkMaxMinValues;
+- (void) resetReportValues;
+
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 
 @end
 
 
+extern NSString* ORAdcModelTrackMaxMinChanged;
 extern NSString* ORAdcModelHighTextChanged;
 extern NSString* ORAdcModelInRangeTextChanged;
 extern NSString* ORAdcModelLowTextChanged;

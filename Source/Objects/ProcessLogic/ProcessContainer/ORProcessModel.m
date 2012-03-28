@@ -795,6 +795,7 @@ NSString* ORProcessModelRunNumberChanged			= @"ORProcessModelRunNumberChanged";
 				for(id anObj in [self orcaObjects]){
 					if([anObj isKindOfClass:NSClassFromString(@"ORAdcModel")]){
 						s = [s stringByAppendingFormat:@"%@\n",[anObj report]];
+						[anObj resetReportValues];
 					}
 				}
 				s= [s stringByAppendingString:@"\n"];

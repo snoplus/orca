@@ -22,21 +22,24 @@
 
 @interface ORAdcController : ORProcessHwAccessorController {
 	IBOutlet NSTextField*	minChangeField;
-	IBOutlet   NSTextField* highTextField;
-	IBOutlet   NSTextField* inRangeTextField;
-	IBOutlet   NSTextField* lowTextField;
+	IBOutlet NSButton*		trackMaxMinCB;
+	IBOutlet NSTextField*	highTextField;
+	IBOutlet NSTextField*	inRangeTextField;
+	IBOutlet NSTextField*	lowTextField;
 }
 
 #pragma mark ¥¥¥Initialization
 - (id)init;
 
 #pragma mark ***Interface Management
+- (void) trackMaxMinChanged:(NSNotification*)aNote;
 - (void) highTextChanged:(NSNotification*)aNote;
 - (void) inRangeTextChanged:(NSNotification*)aNote;
 - (void) lowTextChanged:(NSNotification*)aNote;
 - (void) minChangeChanged:(NSNotification*)aNote;
 
 #pragma mark ***Actions
+- (IBAction) trackMaxMinAction:(id)sender;
 - (IBAction) highTextAction:(id)sender;
 - (IBAction) inRangeTextAction:(id)sender;
 - (IBAction) lowTextAction:(id)sender;

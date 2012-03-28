@@ -25,13 +25,14 @@
 #import "ORProcessThread.h"
 #import "ORAdcProcessing.h"
 
+NSString* ORAdcModelTrackMaxMinChanged	= @"ORAdcModelTrackMaxMinChanged";
 NSString* ORAdcModelHighTextChanged		= @"ORAdcModelHighTextChanged";
 NSString* ORAdcModelInRangeTextChanged	= @"ORAdcModelInRangeTextChanged";
 NSString* ORAdcModelLowTextChanged		= @"ORAdcModelLowTextChanged";
-NSString* ORAdcModelMinChangeChanged = @"ORAdcModelMinChangeChanged";
-NSString* ORAdcModelOKConnection     = @"ORAdcModelOKConnection";
-NSString* ORAdcModelLowConnection    = @"ORAdcModelLowConnection";
-NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
+NSString* ORAdcModelMinChangeChanged	= @"ORAdcModelMinChangeChanged";
+NSString* ORAdcModelOKConnection		= @"ORAdcModelOKConnection";
+NSString* ORAdcModelLowConnection		= @"ORAdcModelLowConnection";
+NSString* ORAdcModelHighConnection		= @"ORAdcModelHighConnection";
 
 @interface ORAdcModel (private)
 - (NSImage*) composeIcon;
@@ -54,10 +55,26 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 	[highLimitNub release];
 	[normalGradient release];
 	[alarmGradient release];
+	[resetDate release];
+	[lowDate release];
+	[resetDate release];
+
 	[super dealloc];
 }
 
 #pragma mark ***Accessors
+
+- (BOOL) trackMaxMin
+{
+    return trackMaxMin;
+}
+
+- (void) setTrackMaxMin:(BOOL)aTrackMaxMin
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setTrackMaxMin:trackMaxMin];
+    trackMaxMin = aTrackMaxMin;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAdcModelTrackMaxMinChanged object:self];
+}
 
 - (NSString*) highText
 {
@@ -253,7 +270,8 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 
 			valueTooLow  = hwValue<lowLimit;
 			valueTooHigh = hwValue>highLimit;
-
+			
+			if(trackMaxMin)[self checkMaxMinValues];
 		}
 		BOOL newState = !(valueTooLow || valueTooHigh);
 		
@@ -266,7 +284,6 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 	}
 	return [ORProcessResult processState:evaluatedState value:hwValue];
 }
-
 
 //--------------------------------
 - (NSString*) iconValue 
@@ -283,11 +300,55 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 
 - (NSString*) report
 {	
-	NSString* s =  [NSString stringWithFormat:@"%@: %@ ",[self iconLabel],[self iconValue]];
+	NSString* s =  [NSString stringWithFormat:@"%@: %@ ", [self iconLabel],[self iconValue]];
+	
 	if(valueTooLow)		  s =  [s stringByAppendingString:@" [LOW ALARM POSTED] "];
 	else if(valueTooHigh) s =  [s stringByAppendingString:@" [HIGH ALARM POSTED]"];
+	
+	if(trackMaxMin){
+		NSString* theFormat = @"%.1f";
+		if([displayFormat length] != 0)									theFormat = displayFormat;
+		if([theFormat rangeOfString:@"%@"].location !=NSNotFound)		theFormat = @"%.1f";
+		else if([theFormat rangeOfString:@"%d"].location !=NSNotFound)	theFormat = @"%.0f";
+		NSString* highestValueString =  [NSString stringWithFormat:theFormat,highestValue];
+		NSString* lowestValueString  =  [NSString stringWithFormat:theFormat,lowestValue];
+		
+		
+		s =  [s stringByAppendingFormat:@" [Lowest %@ at %@]  [Highest %@ at %@] ",
+			  lowestValueString, lowDate, highestValueString, highDate];
+	}
 	return s;
 	
+}
+
+- (void) checkMaxMinValues
+{
+	double theHWValue = [self hwValue];
+	if(theHWValue>highestValue){
+		highestValue = theHWValue;
+		[highDate release];
+		highDate = [[NSDate date] retain];		
+	}
+	if(theHWValue<lowestValue){
+		lowestValue = theHWValue;
+		[lowDate release];
+		lowDate = [[NSDate date] retain];		
+	}
+}
+
+- (void) resetReportValues
+{
+	double theHWValue = [self hwValue];
+	[resetDate release];
+	resetDate = [[NSDate date] retain];
+	
+	[highDate release];
+	highDate = [[NSDate date] retain];
+	highestValue = theHWValue;
+	
+	[lowDate release];
+	lowDate = [[NSDate date] retain];
+	lowestValue = theHWValue;
 }
 
 - (id) description
@@ -308,6 +369,7 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
+    [self setTrackMaxMin:	[decoder decodeBoolForKey:@"trackMaxMin"]];
     [self setHighText:		[decoder decodeObjectForKey:@"highText"]];
     [self setInRangeText:	[decoder decodeObjectForKey:@"inRangeText"]];
     [self setLowText:		[decoder decodeObjectForKey:@"lowText;"]];
@@ -320,6 +382,7 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeBool:trackMaxMin		forKey:@"trackMaxMin"];
     [encoder encodeObject:highText		forKey:@"highText"];
     [encoder encodeObject:inRangeText	forKey:@"inRangeText"];
     [encoder encodeObject:lowText		forKey:@"lowText;"];
