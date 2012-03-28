@@ -407,7 +407,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SNMPQueue);
 	
 	ORSNMP* ss = [[ORSNMP alloc] initWithMib:mib];
 	[ss openGuruSession:ipNumber];
-	if(verbose)for(id aCmd in cmds) NSLog(@"Writing: %@\n",aCmd);
+	if(verbose)for(id aCmd in cmds) NSLog(@"Sending 'Set' cmd: %@\n",aCmd);
 	NSArray* response = [ss writeValues:cmds];
 	if(verbose)for(id anEntry in response) NSLog(@"Reponse: %@\n",anEntry);
 	[delegate performSelectorOnMainThread:selector withObject:response waitUntilDone:YES];
@@ -426,7 +426,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SNMPQueue);
 	if([self isCancelled]) return;
 	ORSNMP* ss = [[ORSNMP alloc] initWithMib:mib];
 	[ss openPublicSession:ipNumber];
-	if(verbose)for(id aCmd in cmds) NSLog(@"Writing: %@\n",aCmd);
+	if(verbose)for(id aCmd in cmds) NSLog(@"Sending 'Get' cmd: %@\n",aCmd);
 	NSArray* response = [ss readValues:cmds];
 	if(verbose)for(id anEntry in response) NSLog(@"Reponse: %@\n",anEntry);
 	[delegate performSelectorOnMainThread:selector withObject:response waitUntilDone:YES];
