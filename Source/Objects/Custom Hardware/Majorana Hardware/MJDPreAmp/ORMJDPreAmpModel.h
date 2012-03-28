@@ -78,6 +78,8 @@
 - (void) stopPulser;
 - (void) writeFetVds:(int)index;
 - (void) writeFetVdsToHW;
+- (void) writeAmplitude:(int)index;
+- (void) writeAmplitudes;
 - (void) writeRangeForAdcChip:(int)index;
 - (void) writeAdcChipRanges;
 - (void) readAdcsOnChip:(int)aChip;

@@ -67,9 +67,10 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 #define kADC1ReadWrite		0xE0000000
 #define kADC2ReadWrite		0xE1000000
 #define kDACA_H_Base		0x00200000
-#define kFrequencyMask		0xC0000000
-#define kAttnPatternMask	0xC1000000
-#define kAttnPulseCountMask	0xC2000000
+#define kPulserLowTimeMask	0xC0000000
+#define kPulserHighTimeMask	0xC1000000
+#define kAttnPatternMask	0xC2000000
+#define kPulserStartMask	0xC3000000
 #define kPulserLoopForever  (0x1<<23)
 #define kPulserUseLoopCount (0x1<<22)
 
@@ -280,7 +281,7 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 - (void) setPulseHighTime:(int)aPulseHighTime
 {
 	if(aPulseHighTime<1)			aPulseHighTime=1;
-	else if(aPulseHighTime>4095)	aPulseHighTime = 4095;
+	else if(aPulseHighTime>0xFFFF)	aPulseHighTime = 0xFFFF;
 	[[[self undoManager] prepareWithInvocationTarget:self] setPulseHighTime:pulseHighTime];
     pulseHighTime = aPulseHighTime;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpPulseHighTimeChanged object:self];
@@ -294,7 +295,7 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 - (void) setPulseLowTime:(int)aPulseLowTime
 {
 	if(aPulseLowTime<1)			aPulseLowTime=1;
-	else if(aPulseLowTime>4095)	aPulseLowTime = 4095;
+	else if(aPulseLowTime>0xFFFF)	aPulseLowTime = 0xFFFF;
 	
 	[[[self undoManager] prepareWithInvocationTarget:self] setPulseLowTime:pulseLowTime];
     pulseLowTime = aPulseLowTime;
@@ -317,7 +318,7 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 
 - (unsigned long) dac:(unsigned short) aChan
 {
-    return [[dacs objectAtIndex:aChan] shortValue];
+    return [[dacs objectAtIndex:aChan] unsignedShortValue];
 }
 
 - (void) setDac:(unsigned short) aChan withValue:(unsigned long) aValue
@@ -350,7 +351,7 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 
 - (unsigned long) amplitude:(int) aChan
 {
-    return [[amplitudes objectAtIndex:aChan] shortValue];
+    return [[amplitudes objectAtIndex:aChan] unsignedShortValue];
 }
 
 - (void) setAmplitude:(int) aChan withValue:(unsigned long) aValue
@@ -395,6 +396,31 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 		
 		//set up the value
 		theValue |= [self dac:index];
+		[self writeAuxIOSPI:theValue];
+	}
+}
+
+- (void) writeAmplitudes
+{
+	int i;
+	for(i=0;i<kMJDPreAmpDacChannels;i++){
+		[self writeAmplitude:i];
+	}
+}
+
+- (void) writeAmplitude:(int)index
+{
+	if(index>=0 && index<16){
+		unsigned long theValue;
+		//set up the Octal chip mask first
+		if(index<8)	theValue = kDAC1;
+		else		theValue = kDAC2;
+		
+		//set up which of eight DAC on that octal chip
+		theValue |= (kDACA_H_Base | (index%8 << 16));
+		
+		//set up the value
+		theValue |= [self amplitude:index];
 		[self writeAuxIOSPI:theValue];
 	}
 }
@@ -460,36 +486,47 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 
 - (void) stopPulser
 {
-	//write zeros to the pattern, the attenuators, and the enabled fields.
-	[self writeAuxIOSPI:kAttnPatternMask];
+	//write zeros to the pattern, enable the attenuators, and disable the pulser outputs
+	[self writeAuxIOSPI:(kAttnPatternMask | 0x22)];
+	[self writeAuxIOSPI:(kPulserStartMask | kPulserUseLoopCount)];
 	NSLog(@"PreAmp(%d) Disabled Pulser\n",[self uniqueIdNumber]);
 }	
 
 - (void) startPulser
 {
+    if(pulseCount == 0 && !loopForever) {
+	  NSLog(@"PreAmp(%d)::startPulser() -- pulseCount = 0 but not looping forever, returning...\n",[self uniqueIdNumber]);
+      return;
+    }
+
+	//set the pulser amplitudes
+    [self writeAmplitudes];
+
 	unsigned long aValue = 0;
-	//set the high and low times
-	aValue = kFrequencyMask | ((pulseLowTime&0xFFF)<<12) | (pulseHighTime&0xFFF);
+	//set the high and low times (frequency)
+	aValue = kPulserLowTimeMask | ((pulseLowTime&0xFFFF)<<8);
+	[self writeAuxIOSPI:aValue];
+	aValue = kPulserHighTimeMask | ((pulseHighTime&0xFFFF)<<8);
 	[self writeAuxIOSPI:aValue];
 	
-	//set the frequency
+	//set the bit pattern and global attenuators / enables
 	aValue =  kAttnPatternMask | 
-		((pulserMask		 & 0xFFFF) << 8) | 
+		((pulserMask		 & 0xFF00)) | 
+		((pulserMask		 & 0x00FF) << 16) | 
 		((attenuated[0]      & 0x1) << 7)  |
 		((finalAttenuated[0] & 0x1) << 6)  | 
-		((!enabled[0]        & 0x1) << 5) |
+		((enabled[0]         & 0x1) << 5) |
 		((attenuated[1]	     & 0x1) << 3)  | 
 		((finalAttenuated[1] & 0x1) << 2)  | 
-		((!enabled[1]        & 0x1) << 1) ;
-	
+		((enabled[1]         & 0x1) << 1) ;
 	[self writeAuxIOSPI:aValue];
 	
-	aValue = kAttnPulseCountMask | (pulseCount & 0xffff);
+    // start pulsing
+	aValue = kPulserStartMask | ((pulseCount-1) & 0xffff);
 	if(loopForever) aValue |= kPulserLoopForever;
 	else			aValue |= kPulserUseLoopCount;
 	[self writeAuxIOSPI:aValue];
 	NSLog(@"PreAmp(%d) Started Pulser\n",[self uniqueIdNumber]);
-
 }
 
 - (unsigned long) readAuxIOSPI
