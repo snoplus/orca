@@ -27,6 +27,7 @@
 @interface ORMPodCController : OrcaObjectController 
 {
 	IBOutlet NSButton*			  lockButton;
+	IBOutlet NSButton*			  verboseCB;
 	IBOutlet NSTextField*		  opTimeField;
 	IBOutlet NSTextField*		  serialNumberField;
 	IBOutlet NSTextField*		  crateStatusField;
@@ -47,6 +48,7 @@
 - (void) updateWindow;
 
 #pragma mark ***Interface Management
+- (void) verboseChanged:(NSNotification*)aNote;
 - (void) timeoutHappened:(NSNotification*)aNote;
 - (void) queueCountChanged:(NSNotification*)aNote;
 - (void) systemStateChanged:(NSNotification*)aNote;
@@ -56,6 +58,7 @@
 - (void) updateButtons;
 
 #pragma mark •••Actions
+- (IBAction) verboseAction:(id)sender;
 - (IBAction) ping:(id)sender;
 - (IBAction) ipNumberAction:(id)sender;
 - (IBAction) lockAction:(id) sender;

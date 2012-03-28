@@ -24,6 +24,7 @@
 #import "ORTaskSequence.h"
 #import "ORSNMP.h"
 
+NSString* ORMPodCModelVerboseChanged		 = @"ORMPodCModelVerboseChanged";
 NSString* ORMPodCModelCrateStatusChanged	 = @"ORMPodCModelCrateStatusChanged";
 NSString* ORMPodCModelLock					 = @"ORMPodCModelLock";
 NSString* ORMPodCPingTask					 = @"ORMPodCPingTask";
@@ -99,6 +100,19 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 }
 
 #pragma mark ***Accessors
+
+- (BOOL) verbose
+{
+    return verbose;
+}
+
+- (void) setVerbose:(BOOL)aVerbose
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setVerbose:verbose];
+    verbose = aVerbose;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMPodCModelVerboseChanged object:self];
+}
+
 - (BOOL) power
 {
     return [[[systemParams objectForKey:@"sysMainSwitch"] objectForKey:@"Value"] boolValue];
@@ -264,6 +278,7 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 		aReadOp.ipNumber	= IPNumber;
 		aReadOp.selector	= aSelector;
 		aReadOp.cmds		= [NSArray arrayWithObject:aCmd];
+		aReadOp.verbose	= verbose;
 		[ORSNMPQueue addOperation:aReadOp];
 		[aReadOp release];
 	}
@@ -283,6 +298,7 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 		aWriteOP.ipNumber	= IPNumber;
 		aWriteOP.selector	= aSelector;
 		aWriteOP.cmds		= [NSArray arrayWithObject:aCmd];
+		aWriteOP.verbose	= verbose;
 		[ORSNMPQueue addOperation:aWriteOP];
 		[aWriteOP release];
 	}
@@ -360,7 +376,6 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 	[[self undoManager] disableUndoRegistration];
 	
 	[self initConnectionHistory];
-	
 	[self setIPNumber:		[decoder decodeObjectForKey:@"IPNumber"]];
 	[[self undoManager] enableUndoRegistration];
 	return self;

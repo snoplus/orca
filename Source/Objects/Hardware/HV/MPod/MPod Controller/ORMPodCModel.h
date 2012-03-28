@@ -31,9 +31,12 @@
 	NSMutableDictionary* systemParams;
 	BOOL			oldPower;
 	double			queueCount;
+    BOOL			verbose;
 }
 
 #pragma mark ***Accessors
+- (BOOL) verbose;
+- (void) setVerbose:(BOOL)aVerbose;
 - (BOOL) power;
 - (void) initConnectionHistory;
 - (void) clearHistory;
@@ -60,8 +63,15 @@
 - (void) writeValues:(NSArray*)cmds target:(id)aTarget selector:(SEL)aSelector;
 - (void) pollHardware;
 - (void) pollHardwareAfterDelay;
+
+#pragma mark ¥¥¥Archival
+- (id)   initWithCoder:(NSCoder*)decoder;
+- (void) encodeWithCoder:(NSCoder*)encoder;
+
 @end
 
+
+extern NSString* ORMPodCModelVerboseChanged;
 extern NSString* ORMPodCModelCrateStatusChanged;
 extern NSString* ORMPodCModelLock;
 extern NSString* ORMPodCPingTask;

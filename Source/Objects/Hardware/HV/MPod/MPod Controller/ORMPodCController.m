@@ -76,7 +76,11 @@
                          name : @"Timeout"
 						object: model];
 	
-	
+    [notifyCenter addObserver : self
+                     selector : @selector(verboseChanged:)
+                         name : ORMPodCModelVerboseChanged
+						object: model];
+
 }
 
 - (void) awakeFromNib
@@ -95,6 +99,12 @@
     [self pingTaskChanged:nil];
 	[self systemStateChanged:nil];
 	[self queueCountChanged:nil];
+	[self verboseChanged:nil];
+}
+
+- (void) verboseChanged:(NSNotification*)aNote
+{
+	[verboseCB setIntValue: [model verbose]];
 }
 
 - (void) timeoutHappened:(NSNotification*)aNote
@@ -159,6 +169,11 @@
 }
 
 #pragma mark •••Actions
+
+- (void) verboseAction:(id)sender
+{
+	[model setVerbose:[sender intValue]];	
+}
 
 - (IBAction) lockAction:(id) sender
 {

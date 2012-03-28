@@ -65,6 +65,7 @@
 {
 	NSString*	mib;
 	NSString*	ipNumber;
+	BOOL		verbose;
 	SEL			selector;
 	id			delegate;
 	id			target;
@@ -79,6 +80,7 @@
 @property (nonatomic,retain)	NSArray*	cmds;
 @property (nonatomic,retain)	id			target;
 @property (nonatomic,assign)	SEL			selector;
+@property (nonatomic,assign)	BOOL		verbose;
 @end
 
 @interface ORSNMPWriteOperation : ORSNMPOperation

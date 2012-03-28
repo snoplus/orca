@@ -373,7 +373,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SNMPQueue);
 //-----------------------------------------------------------
 @implementation ORSNMPOperation
 
-@synthesize cmds,selector,ipNumber,mib,target;
+@synthesize cmds,selector,ipNumber,mib,target,verbose;
 
 - (id)	 initWithDelegate:(id)aDelegate
 {
@@ -407,7 +407,9 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SNMPQueue);
 	
 	ORSNMP* ss = [[ORSNMP alloc] initWithMib:mib];
 	[ss openGuruSession:ipNumber];
+	if(verbose)for(id aCmd in cmds) NSLog(@"Writing: %@\n",aCmd);
 	NSArray* response = [ss writeValues:cmds];
+	if(verbose)for(id anEntry in response) NSLog(@"Reponse: %@\n",anEntry);
 	[delegate performSelectorOnMainThread:selector withObject:response waitUntilDone:YES];
 	[ss release];
 }
@@ -424,7 +426,9 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SNMPQueue);
 	if([self isCancelled]) return;
 	ORSNMP* ss = [[ORSNMP alloc] initWithMib:mib];
 	[ss openPublicSession:ipNumber];
+	if(verbose)for(id aCmd in cmds) NSLog(@"Writing: %@\n",aCmd);
 	NSArray* response = [ss readValues:cmds];
+	if(verbose)for(id anEntry in response) NSLog(@"Reponse: %@\n",anEntry);
 	[delegate performSelectorOnMainThread:selector withObject:response waitUntilDone:YES];
 	[ss release];
 }
