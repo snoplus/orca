@@ -31,6 +31,7 @@
 #import "ORCommandList.h"
 
 
+NSString* ORKatrinV4FLTModelUseDmaBlockReadChanged = @"ORKatrinV4FLTModelUseDmaBlockReadChanged";
 NSString* ORKatrinV4FLTModelSyncWithRunControlChanged = @"ORKatrinV4FLTModelSyncWithRunControlChanged";
 NSString* ORKatrinV4FLTModelDecayTimeChanged = @"ORKatrinV4FLTModelDecayTimeChanged";
 NSString* ORKatrinV4FLTModelPoleZeroCorrectionChanged = @"ORKatrinV4FLTModelPoleZeroCorrectionChanged";
@@ -377,6 +378,44 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 #pragma mark •••Accessors
 
+/** Used to open the alarm view only once if there are the same alarms from several FLTs.
+  */  //-tb-
+- (ORAlarm*) fltV4useDmaBlockReadAlarm
+{
+    return fltV4useDmaBlockReadAlarm;
+}
+
+- (void) setFltV4useDmaBlockReadAlarm:(ORAlarm*) aAlarm
+{    fltV4useDmaBlockReadAlarm = aAlarm;   }
+
+
+- (int) useDmaBlockRead
+{
+    return useDmaBlockRead;
+}
+
+- (void) setUseDmaBlockRead:(int)aUseDmaBlockRead
+{
+    NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
+
+    if((!useDmaBlockRead) && aUseDmaBlockRead){//at change from "no" to "yes" post alarm -tb-
+            ORAlarm *alarm = [self fltV4useDmaBlockReadAlarm];
+            //
+            if(!alarm){
+			    alarm = [[ORAlarm alloc] initWithName:@"FLT V4: using DMA mode is still experimental." severity:kInformationAlarm];
+			    [alarm setSticky:NO];
+                [alarm setHelpString:@"See Status Log for details."];
+                [self setFltV4useDmaBlockReadAlarm: alarm];
+		    }
+            [alarm setAcknowledged:NO];
+		    [alarm postAlarm];
+            NSLog(@"%@::%@  ALARM: You selected to use DMA mode. This mode is still experimental and should not yet used for important measurements! It is currently available for Energy+Trace (sync) mode only!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
+	}
+    useDmaBlockRead = aUseDmaBlockRead;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelUseDmaBlockReadChanged object:self];
+}
+
 - (int) syncWithRunControl
 {
     return syncWithRunControl;
@@ -411,7 +450,7 @@ attenuation <> poleZeroCorrection settings
 attenuation =  = (Decayzeit - Shapingzeit)/Decayzeit
 Beispiel:
 Decay-Zeit = 50us (so wie beim Monitorspektrometerdetektor)
-Shaping-Zeit (halbe Filterlänge) = 6us
+Shaping-Zeit (halbe Filterlaenge) = 6us
 => X = (50-6)/50 = 44/50 = 0,88  => setting 6
 Denis table:
 settings attenuation coeff_x_128
@@ -454,7 +493,7 @@ attenuation <> poleZeroCorrection settings
 attenuation =  = (Decayzeit - Shapingzeit)/Decayzeit
 Beispiel:
 Decay-Zeit = 50us (so wie beim Monitorspektrometerdetektor)
-Shaping-Zeit (halbe Filterlänge) = 6us
+Shaping-Zeit (halbe Filterlaenge) = 6us
 => X = (50-6)/50 = 44/50 = 0,88  => setting 6
 Denis table:
 settings attenuation coeff_x_128
@@ -1174,8 +1213,8 @@ static double table[32]={
 	
 	//write TP shape ram (if constant step height: set only the first AND TPShape bit=0)
 	int i=0;
-	static uint32_t shape =0x200;
-	shape +=0x10;
+	static uint32_t shape =0x210;
+	//shape +=0x10;
 	NSLog(@"shape is: 0x%x  (%i) ",shape);
 	//[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x80]; i++;
 	//[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x440]; i++;
@@ -1183,14 +1222,18 @@ static double table[32]={
 	
 	//write TP timing ram
 	i=0;
-	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: 0xa]; i++;
-	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: 0x1a]; i++; //0x64 = 100 (* 50/100 nanosec) //10 u sec
+	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: 0x164]; i++;   // das gehoert zum FLT pattern mit index 1 (?)
+	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: 0x0]; i++; //0x64 = 100 (* 50/100 nanosec) //10 u sec; das ist die erste Luecke
 	//[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: 0x64]; i++; //0x64 = 100 (* 50/100 nanosec) //10 u sec
-	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: 0x1a]; i++;
-	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: 0x1a]; i++;
-	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: 0x1a]; i++;
-	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: 0xa]; i++;
+	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: 0x50]; i++;
 	[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: 0x0]; i++;
+	//ein oder zwei Pulse: hier konfigurieren (0x0 frueher oder spaeter ...), fltpattern unten immer gleich lassen: 0x0, fltpattern, ... immer abwechselnd
+	
+	
+	//[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: 0x1a]; i++;
+	//[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: 0x1a]; i++;
+	//[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: 0xa]; i++;
+	//[[[self crate] adapter] rawWriteReg: SLTTPTimingRam+i value: 0x0]; i++;
 	
 	//reset FLT TP pointer kFLTV4CommandReg
 #if 1
@@ -1205,11 +1248,12 @@ static double table[32]={
 #endif
 	//write FLT test pattern ram
 	uint32_t address = [self regAddress: kFLTV4TestPatternReg];
-	uint32_t fltpattern = 0xff0f0f;  //0x111112;// 0xffffff = all
+	uint32_t fltpattern = 0xffffff;  //0x111112;// 0xffffff = all
 	
 	[[[self crate] adapter] rawWriteReg: address   value: 0x0];  
 	[[[self crate] adapter] rawWriteReg: address+1 value: fltpattern];
-	[[[self crate] adapter] rawWriteReg: address+2 value: 0x0];
+	[[[self crate] adapter] rawWriteReg: address+2 value: 0x2000000];
+	//[[[self crate] adapter] rawWriteReg: address+3 value: 0x0];
 	[[[self crate] adapter] rawWriteReg: address+3 value: fltpattern];
 	[[[self crate] adapter] rawWriteReg: address+4 value: 0x0];
 	#if 0
@@ -1338,7 +1382,7 @@ static double table[32]={
 	
 	//write FLT test pattern ram
 	uint32_t address = [self regAddress: kFLTV4TestPatternReg];
-	uint32_t fltpattern = 0xfff0ff;  //0x111112;// 0xffffff = all
+	uint32_t fltpattern = 0xffffff;  //0x111112;// 0xffffff = all
 	
 	[[[self crate] adapter] rawWriteReg: address   value: fltpattern];
 	[[[self crate] adapter] rawWriteReg: address+1 value: 0x0];
@@ -1668,6 +1712,7 @@ static double table[32]={
 - (unsigned long) readReg:(int)aReg
 {
 #if 0
+	NSLog(@"%@::%@:  0x%x\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),aReg);//-tb-NSLog-tb-
 //TODO: DEBUG output for crashed SLT 2010-08 -tb-
     NSLog(@"debug-output: read reg addr is %i (0x%x)\n", [self regAddress:aReg], [self regAddress:aReg]);  //TODO: DEBUG-OUTPUT -tb-
 	unsigned long tmp = [self read: [self regAddress:aReg]];
@@ -1685,6 +1730,11 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 
 - (void) writeReg:(int)aReg value:(unsigned long)aValue
 {
+#if 0
+	NSLog(@"%@::%@:  val %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),aValue);//-tb-NSLog-tb-
+    NSLog(@"debug-output: read reg addr is %i (0x%x)\n", [self regAddress:aReg], [self regAddress:aReg]);  //TODO: DEBUG-OUTPUT -tb-
+#endif
+
 	[self write:[self regAddress:aReg] value:aValue];
 }
 
@@ -1967,6 +2017,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 	
     [[self undoManager] disableUndoRegistration];
 	
+    [self setUseDmaBlockRead:[decoder decodeIntForKey:@"useDmaBlockRead"]];
     [self setSyncWithRunControl:[decoder decodeIntForKey:@"syncWithRunControl"]];
     [self setDecayTime:[decoder decodeDoubleForKey:@"decayTime"]];
     [self setPoleZeroCorrection:[decoder decodeIntForKey:@"poleZeroCorrection"]];
@@ -2004,6 +2055,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 {
     [super encodeWithCoder:encoder];
 	
+    [encoder encodeInt:useDmaBlockRead forKey:@"useDmaBlockRead"];
     [encoder encodeInt:syncWithRunControl forKey:@"syncWithRunControl"];
     [encoder encodeDouble:decayTime forKey:@"decayTime"];
     [encoder encodeInt:poleZeroCorrection forKey:@"poleZeroCorrection"];
@@ -2406,6 +2458,8 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 	configStruct->card_info[index].deviceSpecificData[8] = versionFPGA8;		//FPGA8 version 0xPDDDVVRR //V=version, R=revision
 	  //history: 2.1.1.4 added veto+redesign of FIFO
 	configStruct->card_info[index].deviceSpecificData[9] = [self filterShapingLength];		////replaces filterShapingLength -tb- 2011-04
+
+	configStruct->card_info[index].deviceSpecificData[10] = [self useDmaBlockRead];		////enables DMA access //TODO: - no plausibility checks yet!!! -tb- 2012-03
 
 	configStruct->card_info[index].num_Trigger_Indexes = 0;					//we can't have children
 	configStruct->card_info[index].next_Card_Index 	= index+1;	

@@ -104,6 +104,8 @@
     int syncWithRunControl;
     int syncWithRunControlCounterFlag;
     int runControlState;
+	ORAlarm* fltV4useDmaBlockReadAlarm;
+    int useDmaBlockRead;
 }
 
 #pragma mark •••Initialization
@@ -121,6 +123,10 @@
 - (void) syncWithRunControlCheckStopCondition;
 
 #pragma mark •••Accessors
+- (ORAlarm*) fltV4useDmaBlockReadAlarm;
+- (void) setFltV4useDmaBlockReadAlarm:(ORAlarm*) aAlarm;
+- (int) useDmaBlockRead;
+- (void) setUseDmaBlockRead:(int)aUseDmaBlockRead;
 - (int) syncWithRunControl;
 - (void) setSyncWithRunControl:(int)aSyncWithRunControl;
 - (double) decayTime;
@@ -398,6 +404,7 @@
 				  n:(int) n;
 @end
 
+extern NSString* ORKatrinV4FLTModelUseDmaBlockReadChanged;
 extern NSString* ORKatrinV4FLTModelSyncWithRunControlChanged;
 extern NSString* ORKatrinV4FLTModelDecayTimeChanged;
 extern NSString* ORKatrinV4FLTModelPoleZeroCorrectionChanged;
