@@ -71,12 +71,14 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
     uint32_t versionCFPGA = GetDeviceSpecificData()[7];
     uint32_t versionFPGA8 = GetDeviceSpecificData()[8];
     uint32_t filterShapingLength = GetDeviceSpecificData()[9];//TODO: need to change in the code below! -tb- 2011-04-01
+    uint32_t useDmaBlockRead = GetDeviceSpecificData()[10];//TODO: need to change in the code below! -tb- 2011-04-01
 	
 	uint32_t location   = ((crate & 0x01e)<<21) | (((col+1) & 0x0000001f)<<16) | ((filterIndex & 0xf)<<4)  | (filterShapingLength & 0xf)  ;
 
 	//for backward compatibility (before FLT versions2.1.1.4); shall be removed Jan. 2011 -tb-
 	//===========================================================================================
 	if((versionCFPGA>0x20010100 && versionCFPGA<0x20010104) || (versionFPGA8>0x20010100  && versionFPGA8<0x20010104) ){
+	//this is for FPGA config. before FIFO redesign and 'sync' mode -tb-
     if(srack->theFlt[col]->isPresent()){
     
         #if 0
@@ -545,6 +547,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
 
 	//this handles FLT firmware starting from CFPGA-FPGA8 version 0x20010104-0x20010104 (both 2.1.1.4) and newer 2010-11-08  -tb-
 	// (mainly from 2.1.1.4 - 2.1.2.1 -tb-)((but both 2.1.1.4 will work, too)
+	// new in FPGA config:  FIFO redesign and new 'sync' mode -tb-
 	//===================================================================================================================
     if(srack->theFlt[col]->isPresent()){
 		
@@ -793,7 +796,28 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                                 
                                 srack->theSlt->pageSelect->write(0x100 | pagenr);
                                 
-								//read raw trace (use two loops as otherwise the FLT maybe has not yet written 'postTrigTIme' traces ... then we would read old data - see Elog XXX Florian)
+								//read the raw trace
+								if(useDmaBlockRead){
+								    //DMA: readBlock
+								    //srack->theFlt[col]->ramData->readBlock(eventchan,(long unsigned int*)adctrace32[col][eventchan],1024); //memcopy w/o libPCIDMA
+								    srack->theFlt[col]->ramData->readBlock(eventchan,(long unsigned int*)adctrace32[col][eventchan],1024); //DMA with libPCIDMA, memcopy without
+								}else{
+								    //single access mode
+								    //read raw trace (use two loops as otherwise the FLT maybe has not yet written 'postTrigTIme' traces ... then we would read old data - see Elog XXX Florian)
+                                    uint32_t adccount, trigSlot;
+								    trigSlot = adcoffset/2;
+								    for(adccount=trigSlot; adccount<1024;adccount++){
+									    adctrace32[col][eventchan][adccount]= srack->theFlt[col]->ramData->read(eventchan,adccount);
+									    //shipWaveformBuffer32[adccount]= adctrace32[col][eventchan][adccount]; //TODO: not necessary any more? -tb-
+								    }
+								    for(adccount=0; adccount<trigSlot;adccount++){
+									    adctrace32[col][eventchan][adccount]= srack->theFlt[col]->ramData->read(eventchan,adccount);
+									    //shipWaveformBuffer32[adccount]= adctrace32[col][eventchan][adccount]; //TODO: not necessary any more? -tb-
+								    }
+								}
+								
+								//this was the old code (before 2012-03, DMA):
+							   #if 0
 								#if 1
                                 uint32_t adccount, trigSlot;
 								trigSlot = adcoffset/2;
@@ -810,13 +834,14 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
 								#pragma message Using DMA mode!
 								;
 								//srack->theFlt[col]->ramData->readBlock(eventchan,(long unsigned int*)adctrace32[col][eventchan],1024); //memcopy w/o libPCIDMA
-								//srack->theFlt[col]->ramData->readBlock(eventchan,(long unsigned int*)adctrace32[col][eventchan],1024); //DMA with libPCIDMA
-								srack->theFlt[col]->histogramData->readBlock(eventchan,(long unsigned int*)adctrace32[col][eventchan],1024); //PCI burst  w/o libPCIDMA
+								srack->theFlt[col]->ramData->readBlock(eventchan,(long unsigned int*)adctrace32[col][eventchan],1024); //DMA with libPCIDMA
+								//srack->theFlt[col]->histogramData->readBlock(eventchan,(long unsigned int*)adctrace32[col][eventchan],1024); //PCI burst  w/o libPCIDMA
 								#endif
 								/* old version; 2010-10-gap-in-trace-bug: PMC was reading too fast, so data was read faster than FLT could write -tb-
 								for(adccount=0; adccount<1024;adccount++){
 									shipWaveformBuffer32[adccount]= srack->theFlt[col]->ramData->read(eventchan,adccount);
 								}*/
+							   #endif
 							}
 						}
 						//if FIFO is full this (reading FIFO4) will release the current entry in the FIFO to allow the HW to record the next event -tb-

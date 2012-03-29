@@ -1,5 +1,6 @@
 #this configures the make process (-include will silently skip if the file does not exist -tb-):
 -include simulationmode.mk
+-include linkwithdmalib.mk
 
 
 # RECOMMENDED SETUP:
@@ -30,7 +31,14 @@ else
   defflags='-DPMC_COMPILE_IN_SIMULATION_MODE=0'
 endif
 
-UCFLAGS =  -g -Wall  -gstabs+ -I ~/src/v4/fdhwlib/src  $(defflags)
+#-tb- Conditional compiling (with pci dma library or with standard pci lib):
+ifeq ($(PMC_LINK_WITH_DMA_LIB),1)
+  defflags2='-DPMC_LINK_WITH_DMA_LIB=1'
+else
+  defflags2='-DPMC_LINK_WITH_DMA_LIB=0'
+endif
+
+UCFLAGS =  -g -Wall  -gstabs+ -I ~/src/v4/fdhwlib/src  $(defflags)  $(defflags2)
 #Note: -Wno-sign-compare supresses 'comparison int with unsigned int' compiler warning -tb-
 #LFLAGS  = -fexceptions -lpbusaccess -lPbus1394 -lakutil -lpthread -lstdc++ \
 #                                /System/Library/Frameworks/CoreFoundation.framework/CoreFoundation \
@@ -50,12 +58,18 @@ UCFLAGS =  -g -Wall  -gstabs+ -I ~/src/v4/fdhwlib/src  $(defflags)
 
 
 #-tb- Conditional compiling (with hardware library or with hardware simulation):
+#without DMA:  LFLAGS  =  -fexceptions -lPbusPCI  -lkatrinhw4 -lhw4 -lakutil -lpthread -lstdc++
+#for DMA:    LFLAGS  =  -fexceptions -lPbusPCIDMA  -lkatrinhw4 -lhw4 -lakutil -lpthread -lstdc++
 ifeq ($(PMC_COMPILE_IN_SIMULATION_MODE),1)
   LFLAGS  =  -fexceptions -lpthread -lstdc++
 else
-  LFLAGS  =  -fexceptions -lPbusPCI  -lkatrinhw4 -lhw4 -lakutil -lpthread -lstdc++
-#for DMA:    LFLAGS  =  -fexceptions -lPbusPCIDMA  -lkatrinhw4 -lhw4 -lakutil -lpthread -lstdc++
+  ifeq ($(PMC_LINK_WITH_DMA_LIB),1)
+    LFLAGS  =  -fexceptions -lPbusPCIDMA  -lkatrinhw4 -lhw4 -lakutil -lpthread -lstdc++
+  else
+    LFLAGS  =  -fexceptions -lPbusPCI  -lkatrinhw4 -lhw4 -lakutil -lpthread -lstdc++
+  endif
 
 endif
+
 #LFLAGS  =  -fexceptions -lPbusPCI  -lkatrinhw4 -lhw4 -lakutil -lpthread -lstdc++
 LIBs    = 
