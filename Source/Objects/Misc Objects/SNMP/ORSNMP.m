@@ -412,6 +412,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SNMPQueue);
 	if(verbose)for(id anEntry in response) NSLog(@"Reponse: %@\n",anEntry);
 	[delegate performSelectorOnMainThread:selector withObject:response waitUntilDone:YES];
 	[ss release];
+	[ORTimer delay:.1];
 }
 
 @end
@@ -431,6 +432,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SNMPQueue);
 	if(verbose)for(id anEntry in response) NSLog(@"Reponse: %@\n",anEntry);
 	[delegate performSelectorOnMainThread:selector withObject:response waitUntilDone:YES];
 	[ss release];
+	[ORTimer delay:.1];
 }
 @end
 
