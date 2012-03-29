@@ -824,6 +824,82 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	NSLog(@"Sending simulation-mode-off script is still under development. If it fails just stop and force-reload-start the crate.\n");
 }
 
+
+
+- (IBAction) sendLinkWithDmaLibConfigScriptON:(id)sender
+{
+	//[self killCrateAction: nil];//TODO: this seems not to be modal ??? -tb- 2010-04-27
+    NSBeginAlertSheet(@"This will KILL the crate process before compiling and starting using DMA mode. "
+						"There may be other ORCAs connected to the crate. You need to do a 'Force reload' before.",
+                      @"Cancel",
+                      @"Yes, Kill Crate",
+                      nil,[self window],
+                      self,
+                      @selector(_SLTv4killCrateAndStartLinkWithDMADidEnd:returnCode:contextInfo:),
+                      nil,
+                      nil,@"Is this really what you want?");
+}
+
+- (void) _SLTv4killCrateAndStartLinkWithDMADidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+//NSLog(@"This is my _killCrateDidEnd: -tb-\n");
+	//called
+	if(returnCode == NSAlertAlternateReturn){		
+		[[model sbcLink] killCrate]; //XCode says "No '-killCrate' method found!" but it is found during runtime!! -tb- How to get rid of this warning?
+		BOOL rememberState = [[model sbcLink] forceReload];
+		if(rememberState) [[model sbcLink] setForceReload: NO];
+		[model sendLinkWithDmaLibConfigScriptON];  
+		//[self connectionAction: nil];
+		//[self toggleCrateAction: nil];
+		//[[model sbcLink] startCrate]; //If "Force reload" is checked the readout code will be loaded again and overwrite the simulation mode! -tb-
+		//   [[model sbcLink] startCrateProcess]; //If "Force reload" is checked the readout code will be loaded again and overwrite the simulation mode! -tb-
+		[[model sbcLink] startCrate];
+		if(rememberState !=[[model sbcLink] forceReload]) [[model sbcLink] setForceReload: rememberState];
+	}
+}
+
+
+- (IBAction) sendLinkWithDmaLibConfigScriptOFF:(id)sender
+{
+#if 0
+  //TODO: in fact I would like to run the script and recompile the code without reload; but I did not mane it up to now -tb-
+	[model sendLinkWithDmaLibConfigScriptOFF];  
+	NSLog(@"Sending link-with-dma-lib script is still under development. If it fails just stop and force-reload-start the crate.\n");
+#else
+    NSBeginAlertSheet(@"This will KILL the crate process before compiling and starting without DMA mode. "
+						"There may be other ORCAs connected to the crate. You need to do a 'Force reload' before.",
+                      @"Cancel",
+                      @"Yes, Kill Crate",
+                      nil,[self window],
+                      self,
+                      @selector(_SLTv4killCrateAndStartLinkWithoutDMADidEnd:returnCode:contextInfo:),
+                      nil,
+                      nil,@"Is this really what you want?");
+#endif
+}
+
+- (void) _SLTv4killCrateAndStartLinkWithoutDMADidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+//NSLog(@"This is my _killCrateDidEnd: -tb-\n");
+	//called
+	if(returnCode == NSAlertAlternateReturn){		
+		[[model sbcLink] killCrate]; //XCode says "No '-killCrate' method found!" but it is found during runtime!! -tb- How to get rid of this warning?
+		BOOL rememberState = [[model sbcLink] forceReload];
+		if(rememberState) [[model sbcLink] setForceReload: NO];
+	    [model sendLinkWithDmaLibConfigScriptOFF];  
+		//[self connectionAction: nil];
+		//[self toggleCrateAction: nil];
+		//[[model sbcLink] startCrate]; //If "Force reload" is checked the readout code will be loaded again and overwrite the simulation mode! -tb-
+		//   [[model sbcLink] startCrateProcess]; //If "Force reload" is checked the readout code will be loaded again and overwrite the simulation mode! -tb-
+		[[model sbcLink] startCrate];
+		if(rememberState !=[[model sbcLink] forceReload]) [[model sbcLink] setForceReload: rememberState];
+	}
+}
+
+
+
+
+
 - (IBAction) pulserAmpAction: (id) sender
 {
 	[model setPulserAmp:[sender floatValue]];

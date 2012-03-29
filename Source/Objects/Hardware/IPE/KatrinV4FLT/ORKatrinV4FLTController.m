@@ -59,7 +59,7 @@
 	
     settingSize			= NSMakeSize(670,720);
     rateSize			= NSMakeSize(500,690);
-    testSize			= NSMakeSize(610,410);
+    testSize			= NSMakeSize(610,510);
     lowlevelSize		= NSMakeSize(610,510);
 	
 	rateFormatter = [[NSNumberFormatter alloc] init];
@@ -373,9 +373,19 @@
                          name : ORKatrinV4FLTModelSyncWithRunControlChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(useDmaBlockReadChanged:)
+                         name : ORKatrinV4FLTModelUseDmaBlockReadChanged
+						object: model];
+
 }
 
 #pragma mark •••Interface Management
+
+- (void) useDmaBlockReadChanged:(NSNotification*)aNote
+{
+	[useDmaBlockReadButton setIntValue: [model useDmaBlockRead]];
+}
 
 - (void) syncWithRunControlChanged:(NSNotification*)aNote
 {
@@ -626,6 +636,7 @@
 	[self decayTimeChanged:nil];
 	[self recommendedPZCChanged:nil];
 	[self syncWithRunControlChanged:nil];
+	[self useDmaBlockReadChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -1007,6 +1018,11 @@
 }
 
 #pragma mark •••Actions
+
+- (void) useDmaBlockReadButtonAction:(id)sender
+{
+	[model setUseDmaBlockRead:[sender intValue]];	
+}
 
 - (void) syncWithRunControlButtonAction:(id)sender
 {

@@ -768,6 +768,19 @@ NSLog(@"  scriptRunPath: %@ \n" , scriptRunPath);
 	[self sendPMCCommandScript: @"SimulationConfigScriptOFF"];
 }
 
+- (void) sendLinkWithDmaLibConfigScriptON
+{
+	NSLog(@"%@::%@: invoked.\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));
+	//example code to send a script:  SBC_Link.m: - (void) installDriver:(NSString*)rootPwd 
+	
+	[self sendPMCCommandScript: @"LinkWithDMALibConfigScriptON"];
+}
+
+- (void) sendLinkWithDmaLibConfigScriptOFF
+{
+	[self sendPMCCommandScript: @"LinkWithDMALibConfigScriptOFF"];
+}
+
 /*! Send a script to the PrPMC which will configure the PrPMC.
  *
  */

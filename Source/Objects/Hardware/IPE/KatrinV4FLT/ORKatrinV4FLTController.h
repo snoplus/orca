@@ -29,6 +29,7 @@
 @interface ORKatrinV4FLTController : OrcaObjectController {
 	@private
 		IBOutlet NSTabView*		tabView;	
+	    IBOutlet NSButton*      useDmaBlockReadButton;
 	    IBOutlet NSTextField*   decayTimeTextField;
 	    IBOutlet NSPopUpButton* poleZeroCorrectionPU;
 	    IBOutlet NSTextField*   recommendedPZCTextField;
@@ -153,6 +154,7 @@
 - (void) updateButtons;
 
 #pragma mark •••Interface Management
+- (void) useDmaBlockReadChanged:(NSNotification*)aNote;
 - (void) syncWithRunControlChanged:(NSNotification*)aNote;
 - (void) recommendedPZCChanged:(NSNotification*)aNote;
 - (void) decayTimeChanged:(NSNotification*)aNote;
@@ -215,6 +217,7 @@
 - (void) fifoFlagsChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) useDmaBlockReadButtonAction:(id)sender;
 - (IBAction) syncWithRunControlButtonAction:(id)sender;
 - (IBAction) decayTimeTextFieldAction:(id)sender;
 - (IBAction) poleZeroCorrectionPUAction:(id)sender;

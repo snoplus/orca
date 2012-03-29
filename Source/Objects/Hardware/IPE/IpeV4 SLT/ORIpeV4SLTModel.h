@@ -245,6 +245,11 @@
 - (void) setPageSize: (unsigned long) pageSize;   
 - (void) sendSimulationConfigScriptON;
 - (void) sendSimulationConfigScriptOFF;
+- (void) sendLinkWithDmaLibConfigScriptON;
+- (void) sendLinkWithDmaLibConfigScriptOFF;
+
+
+
 - (void) sendPMCCommandScript: (NSString*)aString;
 
 #pragma mark ***Polling

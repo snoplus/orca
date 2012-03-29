@@ -195,4 +195,9 @@
 - (IBAction) sendSimulationConfigScriptOFF:(id)sender;
 - (void) _SLTv4killCrateAndStartSimDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 
+- (IBAction) sendLinkWithDmaLibConfigScriptON:(id)sender;
+- (void) _SLTv4killCrateAndStartLinkWithDMADidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) _SLTv4killCrateAndStartLinkWithoutDMADidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (IBAction) sendLinkWithDmaLibConfigScriptOFF:(id)sender;
+
 @end
