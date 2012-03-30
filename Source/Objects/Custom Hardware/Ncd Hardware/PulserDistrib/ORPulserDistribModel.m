@@ -53,7 +53,7 @@ NSString* ORPulserDisableForPulserChangedNotification = @"ORPulserDisableForPuls
 						   [NSNumber numberWithLong:0],
 						   [NSNumber numberWithLong:0],
 						   nil]];
-    [self setNoisyEnvBroadcastEnabled:YES];
+    [self setNoisyEnvBroadcastEnabled:NO];
     [[self undoManager] enableUndoRegistration];
     return self;
 }
