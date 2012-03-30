@@ -500,6 +500,9 @@
 - (NSMutableDictionary*) makeTopLevelDictionary;
 
 #pragma mark •••Main Scripting Methods
+- (NSString*) commonScriptMethods;
+- (NSArray*) commonScriptMethodSectionBegin;
+
 //Scripts really shouldn't call any other methods unless you -REALLY- know what you're doing!
 - (BOOL) loadChannelTableFile:(NSString*) filename;
 - (BOOL) saveAsChannelTableFile:(NSString*) filename;
@@ -540,6 +543,9 @@
 - (BOOL) requestIsPending:(NSString*)aUrl path:(NSString*)aPath;
 - (BOOL) requestIsPending:(NSString*)itemKey;
 - (double) valueForUrl:(NSString*)aUrl path:(NSString*)aPath;
+
+
+- (void) commonScriptMethodSectionEnd;
 
 //dont use in scripts:
 - (void) writeSetPoint:(int)anIndex value:(double)aValue;
