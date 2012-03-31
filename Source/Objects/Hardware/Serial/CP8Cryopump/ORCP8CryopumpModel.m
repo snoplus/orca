@@ -879,7 +879,7 @@ NSString* ORCP8CryopumpLock									= @"ORCP8CryopumpLock";
 			aCmd = [aCmd stringByReplacingOccurrencesOfString:@"$" withString:@""];
 		}
 		if(!cmdQueue)cmdQueue	 = [[NSMutableArray array] retain];
-		ORCP8CryopumpCmd* cmdObj = [[ORCP8CryopumpCmd alloc] init];
+		ORCP8CryopumpCmd* cmdObj = [[[ORCP8CryopumpCmd alloc] init] autorelease];
 		cmdObj.cmd = [NSString stringWithFormat:@"$%@%@\r",aCmd,[self checkSum:aCmd]];
 		cmdObj.waitForResponse = waitForResponse;
 		
