@@ -38,6 +38,7 @@ NSString* commonScriptMethodsByObj(id anObj,BOOL includeSuperClass);
 NSString* methodsInCommonSection(id anObj);
 NSString* listMethods(Class aClass);
 NSString* listMethodWithOptions(Class aClass,BOOL verbose,BOOL includeSuperClass);
+NSString* listMethodWithExtendedOptions(Class aClass,BOOL verbose,BOOL includeSuperClass,BOOL sort);
 NSString* hexToString(unsigned long aHexValue);
 const char* decodeType(const char* aType);
 NSString* macAddress();

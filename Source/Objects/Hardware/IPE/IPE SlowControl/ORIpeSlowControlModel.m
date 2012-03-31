@@ -1292,16 +1292,12 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 	// 2. all methods between methods commonScriptMethodSectionBegin and commonScriptMethodSectionBegin
     [methods appendString: methodsInCommonSection(self)];
 
-    return methods;
+    return [methods autorelease];
 }
 
 
-//return array of method names between methods commonScriptMethodSectionBegin and commonScriptMethodSectionEnd
-- (void) commonScriptMethodSectionBegin
-{
-}
-
-
+//-------------Methode to flag beginning of common script methods---------------------------------
+- (void) commonScriptMethodSectionBegin { }
 
 //Send the request,  wait for response.
 - (void) postSensorRequest:(NSString*)aUrl path:(NSString*)aPath
@@ -1787,10 +1783,8 @@ enum {
     return [self valueForItemKey: itemKey];
 }
 
-- (void) commonScriptMethodSectionEnd
-{
-}
-//-------------end of script methods---------------------------------
+- (void) commonScriptMethodSectionEnd { }
+//-------------end of common script methods---------------------------------
 
 - (void) histogram:(int)milliSecs
 {
