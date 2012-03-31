@@ -35,6 +35,7 @@ int		random_range(int lowest_number, int highest_number);
 io_service_t rootService();
 NSString* commonScriptMethodsByClass(Class aClass,BOOL includeSuperClass);
 NSString* commonScriptMethodsByObj(id anObj,BOOL includeSuperClass);
+NSString* methodsInCommonSection(id anObj);
 NSString* listMethods(Class aClass);
 NSString* listMethodWithOptions(Class aClass,BOOL verbose,BOOL includeSuperClass);
 NSString* hexToString(unsigned long aHexValue);

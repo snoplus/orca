@@ -259,6 +259,62 @@ NSMutableString* resultString = [NSMutableString stringWithString:@""];
 	return resultString;
 }
 
+NSString* methodsInCommonSection(id anObj)
+{
+	int startFlag = 0;
+#if MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_4
+	NSLog(@"ERROR: listCommonScriptMethods not supported for OSX < 10.5!\n");
+    return scriptMethodSection;
+#endif
+    Class aClass = [anObj class];
+	const char *name = class_getName(aClass);
+	//if(!name)return @"Class Not Found!\n";
+	if(!name) NSLog(@"Class Not Found!\n");
+    
+    unsigned int methodCount=0;
+	Method* methods = class_copyMethodList(aClass, &methodCount);
+	int i;
+	NSMutableArray* methodNames = [NSMutableArray array];
+    //DEBUG NSLog(@"Method count: %i names: >>%@<<\n",methodCount,methodNames);
+	for(i=0;i<methodCount;i++){
+		NSString* aName = NSStringFromSelector(method_getName(methods[i]));
+		NSArray* parts = [aName componentsSeparatedByString:@":"];
+		NSMethodSignature* sig = [aClass instanceMethodSignatureForSelector:method_getName(methods[i])];
+		int n = [sig numberOfArguments];
+		int j;
+		NSString* finalName = @"";
+		if(n==2){
+			finalName = [finalName stringByAppendingFormat:@"%@",[parts objectAtIndex:0]];
+		}
+		else {
+			for(j=0;j<n-2;j++){
+				const char* theType = decodeType([sig getArgumentTypeAtIndex:j+2]);
+				finalName = [finalName stringByAppendingFormat:@"%@:(%s) ",[parts objectAtIndex:j],theType];
+			}
+		}
+        //DEBUG NSLog(@"name: >>%@<<\n",finalName);
+        //this finds myself ... if( [finalName hasPrefix: NSStringFromSelector(_cmd)] ) NSLog(@"=========================================\n");
+        if( [finalName hasPrefix: @"commonScriptMethodSection"] ){// begin or end of section
+            //DEBUG NSLog(@"=========================================\n");
+            if(startFlag){
+                //we found the second occurence: we are done
+                break;
+            }else{
+                //found the first occurence of 'commonScriptMethodSection...' (... is Begin or End)
+                startFlag=1;
+                continue; //skip myself
+            }
+        }
+        if(startFlag && [finalName length] > 1)[methodNames insertObject:finalName atIndex: 0];//I want reverse the order ...[methodNames addObject:finalName];
+        
+	}
+	free(methods);
+    //DEBUG NSLog(@"Method count: %i names: >>%@<<\n",methodCount,methodNames);
+    
+	return [methodNames componentsJoinedByString:@"\n"];
+}
+
+
 NSString* hexToString(unsigned long aHexValue)
 {
 	return [NSString stringWithFormat:@"%x",aHexValue];

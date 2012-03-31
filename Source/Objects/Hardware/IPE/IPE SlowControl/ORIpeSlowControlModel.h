@@ -501,7 +501,7 @@
 
 #pragma mark •••Main Scripting Methods
 - (NSString*) commonScriptMethods;
-- (NSArray*) commonScriptMethodSectionBegin;
+- (void) commonScriptMethodSectionBegin;
 
 //Scripts really shouldn't call any other methods unless you -REALLY- know what you're doing!
 - (BOOL) loadChannelTableFile:(NSString*) filename;
