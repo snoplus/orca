@@ -348,6 +348,11 @@
                          name : ORLabJackUE9ModelAdcEnableMaskChanged
                        object : nil];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(localIDChanged:)
+                         name : ORLabJackUE9ModelLocalIDChanged
+						object: model];
+
 }
 
 
@@ -388,6 +393,12 @@
 	[self clockDivisorChanged:nil];
 	[self adcEnabledChanged:nil];
     [groupView setNeedsDisplay:YES];
+	[self localIDChanged:nil];
+}
+
+- (void) localIDChanged:(NSNotification*)aNote
+{
+	[localIDField setIntValue: [model localID]];
 }
 
 -(void) groupChanged:(NSNotification*)note
@@ -813,6 +824,7 @@
 	[initTimersButton	setEnabled:!lockedOrRunningMaintenance];
 	[clockDivisorField	setEnabled:!lockedOrRunningMaintenance];
 	[changeIPNumberButton setEnabled:!locked && [model isConnected]];
+	[changeIDNumberButton setEnabled:!locked && [model isConnected]];
     
 	int i;
 	for(i=0;i<kUE9NumAdcs;i++){
@@ -838,6 +850,27 @@
 
 #pragma mark •••Actions
 
+- (IBAction) changeLocalIDAction:(id)sender
+{
+	if(![[self window] makeFirstResponder:[self window]]){
+		[[self window] endEditingFor:nil];		
+	}
+	[model changeLocalID:[newLocalIDField intValue]];
+	[idChangePanel orderOut:nil];
+	[NSApp endSheet:idChangePanel];	
+}
+- (IBAction) openIDChangePanel:(id)sender
+{
+	[self endEditing];
+    [NSApp beginSheet:idChangePanel modalForWindow:[self window]
+		modalDelegate:self didEndSelector:NULL contextInfo:nil];
+	[newLocalIDField setIntValue:[model localID]];
+}
+- (IBAction) closeIDChangePanel:(id)sender
+{
+    [idChangePanel orderOut:nil];
+    [NSApp endSheet:idChangePanel];
+}
 - (void) clockDivisorAction:(id)sender
 {
 	[model setClockDivisor:[sender intValue]];	

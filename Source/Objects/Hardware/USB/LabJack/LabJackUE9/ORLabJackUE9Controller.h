@@ -23,8 +23,10 @@
 @interface ORLabJackUE9Controller : OrcaObjectController 
 {
 	IBOutlet ORCardContainerView* groupView;
+	IBOutlet NSTextField*	localIDField;
 
 	IBOutlet NSButton*      changeIPNumberButton;
+	IBOutlet NSButton*      changeIDNumberButton;
 	IBOutlet NSTextField*	ipConnectedTextField;
 	IBOutlet NSTextField*	clockDivisorField;
 	IBOutlet NSMatrix*		clockSelectionMatrix;
@@ -104,10 +106,12 @@
 	IBOutlet NSPopUpButton*		timerOptionPU3;
 	IBOutlet NSPopUpButton*		timerOptionPU4;
 	IBOutlet NSPopUpButton*		timerOptionPU5;
-    IBOutlet NSView*                 mux80View;
+    IBOutlet NSView*            mux80View;
 
 	IBOutlet NSPanel*				ipChangePanel;
 	IBOutlet NSTextField*			newIpAddressField;
+	IBOutlet NSPanel*				idChangePanel;
+	IBOutlet NSTextField*			newLocalIDField;
 	
 	NSPopUpButton* gainPU[kUE9NumAdcs];
 	NSPopUpButton* bipolarPU[kUE9NumAdcs];
@@ -125,6 +129,7 @@
 - (void) updateButtons;
 
 #pragma mark ***Interface Management
+- (void) localIDChanged:(NSNotification*)aNote;
 - (void) groupChanged:(NSNotification*)note;
 - (void) adcEnabledChanged:(NSNotification*)aNote;
 - (void) clockDivisorChanged:(NSNotification*)aNote;
@@ -162,6 +167,9 @@
 - (void) tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;
 
 #pragma mark •••Actions
+- (IBAction) openIDChangePanel:(id)sender;
+- (IBAction) closeIDChangePanel:(id)sender;
+- (IBAction) changeLocalIDAction:(id)sender;
 - (IBAction) clockDivisorAction:(id)sender;
 - (IBAction) counterEnableMaskAction:(id)sender;
 - (IBAction) clockSelectionAction:(id)sender;

@@ -76,6 +76,7 @@
     unsigned short    counterEnableMask;
     int               clockSelection;
     int               clockDivisor;
+    int				  localID;
 	
 	double unipolarSlope[4];
 	double unipolarOffset[4];
@@ -93,7 +94,7 @@
 	double hiResUnipolarOffset;
 	double hiResBipolarSlope;
 	double hiResBipolarOffset;
-	
+	BOOL verbose;
     
 	//bit processing variables
     BOOL            readOnce;
@@ -105,6 +106,8 @@
 }
 
 #pragma mark ***Accessors
+- (int) localID;
+- (void) setLocalID:(int)aLocalID;
 - (int)  clockDivisor;
 - (void) setClockDivisor:(int)aClockDivisor;
 - (int)  clockSelection;
@@ -204,15 +207,15 @@
 
 #pragma mark ***HW Access
 - (void) resetCounter;
-- (void) sendComCmd;
+- (void) sendComCmd:(BOOL)aVerbose;
 - (void) getCalibrationInfo:(int)block;
 - (void) readAllValues;
 - (void) sendTimerCounter:(int)opt;
-- (void) setPowerLevel;
 - (void) queryAll;
 - (void) pollHardware;
 - (void) pollHardware:(BOOL)force;
 - (void) changeIPAddress:(NSString*)aNewAddress;
+- (void) changeLocalID:(unsigned char)newLocalID;
 
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
@@ -251,6 +254,7 @@
 
 @end
 
+extern NSString* ORLabJackUE9ModelLocalIDChanged;
 extern NSString* ORLabJackUE9ModelClockDivisorChanged;
 extern NSString* ORLabJackUE9ModelClockSelectionChanged;
 extern NSString* ORLabJackUE9ModelTimerEnableMaskChanged;

@@ -26,6 +26,7 @@
 #import "ORCard.h"
 #import "ORCB37Model.h"
 
+NSString* ORLabJackUE9CmdLocalIDChanged = @"ORLabJackUE9CmdLocalIDChanged";
 NSString* ORLabJackUE9CmdClockDivisorChanged = @"ORLabJackUE9CmdClockDivisorChanged";
 
 @implementation ORLabJackUE9Cmd
@@ -40,6 +41,7 @@ NSString* ORLabJackUE9CmdClockDivisorChanged = @"ORLabJackUE9CmdClockDivisorChan
 @end
 
 
+NSString* ORLabJackUE9ModelLocalIDChanged			= @"ORLabJackUE9ModelLocalIDChanged";
 NSString* ORLabJackUE9ModelClockDivisorChanged		= @"ORLabJackUE9ModelClockDivisorChanged";
 NSString* ORLabJackUE9ModelClockSelectionChanged	= @"ORLabJackUE9ModelClockSelectionChanged";
 NSString* ORLabJackUE9IsConnectedChanged			= @"ORLabJackUE9IsConnectedChanged";
@@ -190,6 +192,17 @@ NSString* ORLabJackUE9ModelAdcEnableMaskChanged		= @"ORLabJackUE9ModelAdcEnableM
 
 
 #pragma mark ***Accessors
+
+- (int) localID
+{
+    return localID;
+}
+
+- (void) setLocalID:(int)aLocalID
+{
+    localID = aLocalID;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackUE9ModelLocalIDChanged object:self];
+}
 
 - (int) clockDivisor
 {
@@ -360,6 +373,7 @@ NSString* ORLabJackUE9ModelAdcEnableMaskChanged		= @"ORLabJackUE9ModelAdcEnableM
 	if(!isConnected){
 		[self setSocket:[NetSocket netsocketConnectedToHost:ipAddress port:52360]];	
 		wasConnected = YES;
+
 	}
 	else {
 		[self setSocket:nil];	
@@ -381,6 +395,7 @@ NSString* ORLabJackUE9ModelAdcEnableMaskChanged		= @"ORLabJackUE9ModelAdcEnableM
 		[self getCalibrationInfo:2];
 		[self getCalibrationInfo:3];
 		[self getCalibrationInfo:4];
+		[self sendComCmd:NO];
     }
 }
 
@@ -1320,8 +1335,9 @@ NSString* ORLabJackUE9ModelAdcEnableMaskChanged		= @"ORLabJackUE9ModelAdcEnableM
 	}
 }
 
-- (void) sendComCmd
+- (void) sendComCmd:(BOOL)aVerbose
 {		
+	verbose = aVerbose;
 	unsigned char sendBuff[38];
 	sendBuff[1] = (unsigned char)0x78;  //command bytes
 	sendBuff[2] = (unsigned char)0x10;  //number of data words
@@ -1335,8 +1351,6 @@ NSString* ORLabJackUE9ModelAdcEnableMaskChanged		= @"ORLabJackUE9ModelAdcEnableM
 	NSData* data = [NSData dataWithBytes:sendBuff length:38];
 	[self enqueCmd:data tag:kUE9ComCmd];
 }
-
-
 
 - (void) readAllValues
 {	
@@ -1411,28 +1425,8 @@ NSString* ORLabJackUE9ModelAdcEnableMaskChanged		= @"ORLabJackUE9ModelAdcEnableM
 	[self enqueCmd:data tag:kUE9ReadAllValues];
 }
 
-- (void) setPowerLevel
-{
-    unsigned char sendBuff[18];
-    int i;
-	
-    sendBuff[1] = (uint8)0xF8;  //Command byte
-    sendBuff[2] = (uint8)0x06;  //Number of data words
-    sendBuff[3] = (uint8)0x08;  //Extended command number
-	
- 	sendBuff[6] = 0x01;
-    for( i = 7; i < 18; i++ )sendBuff[i] = (uint8)(0x00);
-	
-	[self extendedChecksum:sendBuff len:18];
-	
-    //Sending command to UE9
-	NSData* data = [NSData dataWithBytes:sendBuff length:18];
-	[self enqueCmd:data tag:kUE9ControlConfig];
-}
-
 - (void) sendTimerCounter:(int) option
 {
-	//if(clockSelection)[self setPowerLevel]; //have to do this first if the 48 MHz is used.
 
 	//Note: If using the quadrature input timer mode, the returned 32 bit
     //      integer is signed
@@ -1519,6 +1513,7 @@ NSString* ORLabJackUE9ModelAdcEnableMaskChanged		= @"ORLabJackUE9ModelAdcEnableM
 {
 	NSArray* ipParts = [aNewAddress componentsSeparatedByString:@"."];
 	if([ipParts count]==4){
+		verbose = YES;
 		[self setIpAddress:aNewAddress];
 		unsigned char sendBuff[38];
 		sendBuff[1] = (unsigned char)0x78;  //command bytes
@@ -1554,6 +1549,28 @@ NSString* ORLabJackUE9ModelAdcEnableMaskChanged		= @"ORLabJackUE9ModelAdcEnableM
 		NSLog(@"Can NOT change LabJack (%d) IP to %@\n",[self uniqueIdNumber],aNewAddress);
 	}
 }
+
+- (void) changeLocalID:(unsigned char)newLocalID
+{
+	unsigned char sendBuff[38];
+	sendBuff[1] = (unsigned char)0x78;  //command bytes
+	sendBuff[2] = (unsigned char)0x10;  //number of data words
+	sendBuff[3] = (unsigned char)0x01;  //extended command number
+	sendBuff[6] = 0x01;					//mask set to write the LocalID number
+	int i;
+	for(i = 7; i < 38; i++) sendBuff[i] = (unsigned char)(0x00);
+	
+	sendBuff[8] = newLocalID;
+	
+	[self extendedChecksum:sendBuff len:38];
+	
+	NSData* data = [NSData dataWithBytes:sendBuff length:38];
+	verbose = NO;
+	[self enqueCmd:data tag:kUE9ComCmd];
+	NSLog(@"Change LabJack (%d) LocalID to %d\n",[self uniqueIdNumber],newLocalID);
+	NSLog(@"You must power cycle the UE9 before it takes effect\n");
+}
+
 
 - (BOOL) CB37Exists:(int)aSlot
 {
@@ -1756,24 +1773,28 @@ NSString* ORLabJackUE9ModelAdcEnableMaskChanged		= @"ORLabJackUE9ModelAdcEnableM
 - (void) decodeComCmd:(NSData*) theData
 {
 	unsigned char* recBuff = (unsigned char*)[theData bytes];
-	NSLog(@"LocalID (byte 8): %d\n", recBuff[8]);
-	NSLog(@"PowerLevel (byte 9): %d\n", recBuff[9]);
-	NSLog(@"ipAddress (bytes 10-13): %d.%d.%d.%d\n", recBuff[13], recBuff[12], recBuff[11], recBuff[10]);
-	NSLog(@"Gateway (bytes 14 - 17): %d.%d.%d.%d\n", recBuff[17], recBuff[16], recBuff[15], recBuff[14]);
-	NSLog(@"Subnet (bytes 18 - 21): %d.%d.%d.%d\n", recBuff[21], recBuff[20], recBuff[19], recBuff[18]);
-	NSLog(@"PortA (bytes 22 - 23): %d\n", recBuff[22] + (recBuff[23] * 256 ));
-	NSLog(@"PortB (bytes 24 - 25): %d\n", recBuff[24] + (recBuff[25] * 256 ));
-	NSLog(@"DHCPEnabled (byte 26): %d\n", recBuff[26]);
-	NSLog(@"ProductID (byte 27): %d\n", recBuff[27]);
-	int i;
-	NSString* s = @"MACAddress (bytes 28 - 33): ";
-	for(i = 5; i >= 0  ; i--){
-		s = [s stringByAppendingFormat:@"%02x",recBuff[i+28]];
-		if(i !=0)s = [s stringByAppendingString:@"."];
+	if(verbose){
+		NSLog(@"LocalID (byte 8): %d\n", recBuff[8]);
+		NSLog(@"PowerLevel (byte 9): %d\n", recBuff[9]);
+		NSLog(@"ipAddress (bytes 10-13): %d.%d.%d.%d\n", recBuff[13], recBuff[12], recBuff[11], recBuff[10]);
+		NSLog(@"Gateway (bytes 14 - 17): %d.%d.%d.%d\n", recBuff[17], recBuff[16], recBuff[15], recBuff[14]);
+		NSLog(@"Subnet (bytes 18 - 21): %d.%d.%d.%d\n", recBuff[21], recBuff[20], recBuff[19], recBuff[18]);
+		NSLog(@"PortA (bytes 22 - 23): %d\n", recBuff[22] + (recBuff[23] * 256 ));
+		NSLog(@"PortB (bytes 24 - 25): %d\n", recBuff[24] + (recBuff[25] * 256 ));
+		NSLog(@"DHCPEnabled (byte 26): %d\n", recBuff[26]);
+		NSLog(@"ProductID (byte 27): %d\n", recBuff[27]);
+		int i;
+		NSString* s = @"MACAddress (bytes 28 - 33): ";
+		for(i = 5; i >= 0  ; i--){
+			s = [s stringByAppendingFormat:@"%02x",recBuff[i+28]];
+			if(i !=0)s = [s stringByAppendingString:@"."];
+		}
+		NSLog(@"%@\n",s);
+		NSLog(@"HWVersion (bytes 34-35): %.3f\n", (unsigned int)recBuff[35]  + (double)recBuff[34]/100.0);
+		NSLog(@"CommFWVersion (bytes 36-37): %.3f\n\n", (unsigned int)recBuff[37] + (double)recBuff[36]/100.0);
+		verbose = NO;
 	}
-	NSLog(@"%@\n",s);
-	NSLog(@"HWVersion (bytes 34-35): %.3f\n", (unsigned int)recBuff[35]  + (double)recBuff[34]/100.0);
-	NSLog(@"CommFWVersion (bytes 36-37): %.3f\n\n", (unsigned int)recBuff[37] + (double)recBuff[36]/100.0);
+	[self setLocalID:recBuff[8]];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
 }
 
