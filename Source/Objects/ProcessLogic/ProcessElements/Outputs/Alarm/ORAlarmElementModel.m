@@ -37,15 +37,44 @@ NSString* ORAlarmElementSeverityChangedNotification = @"ORAlarmElementSeverityCh
 @implementation ORAlarmElementModel
 
 #pragma mark ¥¥¥Initialization
+- (id)init //designated initializer
+{
+    self = [super init];
+ 	[self registerNotificationObservers];
+    return self;
+}
 
 - (void) dealloc
 {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [noAlarmName release];
     [alarm clearAlarm];
     [alarm release];
     [alarmName release];
     [alarmHelp release];
     [super dealloc];
+}
+
+- (void) registerNotificationObservers
+{
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+	[notifyCenter removeObserver:self];
+	
+    [notifyCenter addObserver: self
+                     selector: @selector(alarmsChanged:)
+                         name: ORAlarmWasPostedNotification
+                       object: nil];
+	
+	[notifyCenter addObserver: self
+                     selector: @selector(alarmsChanged:)
+                         name: ORAlarmWasClearedNotification
+                       object: nil];
+	
+}
+
+- (void) alarmsChanged:(NSNotification*)aNote
+{
+	[alarm setAdditionalInfoString:[self alarmContentString]];
 }
 
 #pragma mark ***Accessors
@@ -256,7 +285,8 @@ NSString* ORAlarmElementSeverityChangedNotification = @"ORAlarmElementSeverityCh
     [self setAlarmHelp:[decoder decodeObjectForKey: @"alarmHelp"]];
     
     [[self undoManager] enableUndoRegistration];
-    
+	[self registerNotificationObservers];
+  
     return self;
 }
 

@@ -32,6 +32,8 @@
     int alarmSeverity;
     NSString* noAlarmName;
 }
+- (void) registerNotificationObservers;
+- (void) alarmsChanged:(NSNotification*)aNote;
 
 #pragma mark ***Accessors
 - (NSString*) noAlarmName;
