@@ -365,29 +365,23 @@ readFifoFlag = _readFifoFlag;
 
 - (void) copyFifoStatus:(int32_t*)aStatus
 {
-    NSArray* fifo = [[NSArray alloc] initWithObjects:
-                     [NSNumber numberWithInt:aStatus[0]],
-                     [NSNumber numberWithInt:aStatus[1]],
-                     [NSNumber numberWithInt:aStatus[2]],
-                     [NSNumber numberWithInt:aStatus[3]],
-                     [NSNumber numberWithInt:aStatus[4]],
-                     [NSNumber numberWithInt:aStatus[5]],
-                     [NSNumber numberWithInt:aStatus[6]],
-                     [NSNumber numberWithInt:aStatus[7]],
-                     [NSNumber numberWithInt:aStatus[8]],
-                     [NSNumber numberWithInt:aStatus[9]],
-                     [NSNumber numberWithInt:aStatus[10]],
-                     [NSNumber numberWithInt:aStatus[11]],
-                     [NSNumber numberWithInt:aStatus[12]],
-                     [NSNumber numberWithInt:aStatus[13]],
-                     [NSNumber numberWithInt:aStatus[14]],
-                     [NSNumber numberWithInt:aStatus[15]],
-                     nil];
+    NSNumber* nStatus[16];
+    unsigned char i = 0;
+    NSMutableArray* fifo = [[NSMutableArray alloc] initWithCapacity:16];
+    for (i = 0; i < 16; i++) {
+        nStatus[i] = [[NSNumber alloc] initWithInt:aStatus[i]];
+        [fifo addObject:nStatus[i]];
+    }
 
     [self setFifoStatus:fifo];
     [fifo release];
     fifo = nil;
-    
+
+    for (i = 0; i < 16; i++) {
+        [nStatus[i] release];
+        nStatus[i] = nil;
+    }
+
     memcpy(_fifoBundle, aStatus, 16*4);
     [self setReadFifoFlag:YES];
 }
@@ -586,7 +580,7 @@ readFifoFlag = _readFifoFlag;
 	//look into the cmdArray
 	[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.01]];
 	NSDictionary* aCmd;
-	NSMutableArray* foundCmds = [NSMutableArray array];
+	NSMutableArray* foundCmds = [[NSMutableArray alloc] initWithCapacity:1];
 	time_t xl3ReadTimer = time(0);
 
     //NSLog(@"%@ waiting for response with packetType: %d and packetNum %d\n",[self crateName], packetType, packetNum);
@@ -620,7 +614,7 @@ readFifoFlag = _readFifoFlag;
 				userInfo:nil];
 		}
 		else {
-            usleep(10000);
+            usleep(1000);
         }
 	}
 
@@ -644,6 +638,10 @@ readFifoFlag = _readFifoFlag;
 		NSLog(@"%@ %@\n", [localException name], [localException reason]);
 		@throw localException;
 	}
+    @finally {
+        [foundCmds release];
+        foundCmds = nil;
+    }
 } 
 
 - (void) connectSocket
@@ -903,12 +901,16 @@ static void SwapLongBlock(void* p, int32_t n)
                 if (needToSwap) packetNum = swapShort(packetNum);
                 //NSLog(@"%@ packet type: %d and packetNum: %d, xl3 megabundle count: %d, NSNumber value: %dß\n", [self crateName], packetType, packetNum, bundle_count, [[NSNumber numberWithUnsignedShort:packetType] unsignedShortValue]);
                 
-                NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-                                [NSNumber numberWithUnsignedShort:packetNum],		@"packet_num",
-                                [NSNumber numberWithUnsignedChar:packetType],		@"packet_type",
-                                [NSDate dateWithTimeIntervalSinceNow:0],		@"date",
-                                [NSData dataWithBytes:aPacket length:XL3_PACKET_SIZE],	@"xl3Packet",
-                                nil];
+                NSData* packetData = [[NSData alloc] initWithBytes:aPacket length:XL3_PACKET_SIZE];
+                NSNumber* packetNNum = [[NSNumber alloc] initWithUnsignedShort:packetNum];
+                NSNumber* packetNType = [[NSNumber alloc] initWithUnsignedChar:packetType];
+                NSDate* packetDate = [[NSDate alloc] init];
+                NSDictionary* aDictionary = [[NSDictionary alloc] initWithObjectsAndKeys:
+                                             packetNNum, @"packet_num",
+                                             packetNType, @"packet_type",
+                                             packetDate, @"date",
+                                             packetData, @"xl3Packet",
+                                             nil];
                 @try {
                     [cmdArrayLock lock];
                     [cmdArray addObject:aDictionary];
@@ -918,6 +920,16 @@ static void SwapLongBlock(void* p, int32_t n)
                     NSLog(@"%@: Failed to add received command response into the command array\n", [self crateName]);
                     [cmdArrayLock unlock];
                 }
+
+                [aDictionary release];
+                aDictionary = nil;
+                [packetData release];
+                packetData = nil;
+                [packetNNum release];
+                packetNNum = nil;
+                [packetNType release];
+                packetNType = nil;
+
                 //NSLog(@"%@: cmdArray includes %d cmd responses\n", [self crateName], [cmdArray count]);
                 
                 if ([cmdArray count] > kCmdArrayHighWater) {

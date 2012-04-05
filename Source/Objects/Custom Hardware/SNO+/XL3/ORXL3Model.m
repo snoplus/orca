@@ -2355,9 +2355,10 @@ void SwapLongBlock(void* p, int32_t n)
                     *(float*)&data[21 + idx] = rates_lo.rates[idx];
                 }
                 //memcpy(data+21, rates_lo.rates, 8*32*4);
-                
-                [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-                                                                object:[NSData dataWithBytes:data length:sizeof(long)*(21+8*32)]];
+                NSData* cmosData = [[NSData alloc] initWithBytes:data length:sizeof(long)*(21+8*32)];
+                [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification object:cmosData];
+                [cmosData release];
+                cmosData = nil;
 
                 if (num_slots > 8) {
                     data[2] = args_hi.slot_mask;
@@ -2366,9 +2367,10 @@ void SwapLongBlock(void* p, int32_t n)
                         *(float*)&data[21 + idx] = rates_hi.rates[idx];
                     }
                     //memcpy(data+21, rates_hi.rates, 8*32);
-                    
-                    [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-                                                                        object:[NSData dataWithBytes:data length:sizeof(long)*(21+8*32)]];
+                    cmosData = [[NSData alloc] initWithBytes:data length:sizeof(long)*(21+8*32)];
+                    [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification object:cmosData];
+                    [cmosData release];
+                    cmosData = nil;
                 }
             }
         }
@@ -3018,34 +3020,38 @@ void SwapLongBlock(void* p, int32_t n)
         //iso.calendar = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
         //iso.locale = [[[NSLocale alloc] initWithLocaleIdentifier:@"en_US"] autorelease];
         NSString* str = [iso stringFromDate:[NSDate date]];
-        NSMutableArray* slot_voltages = [[[NSMutableArray alloc] initWithCapacity:21] autorelease];
+        NSMutableArray* slot_voltages = [[NSMutableArray alloc] initWithCapacity:21];
         
         unsigned char vlt;
+        NSNumber *number;
         for (vlt = 0; vlt < 21; vlt++) {
-            NSNumber *number = [[NSNumber alloc] initWithFloat:result.voltages[vlt]];
+            number = [[NSNumber alloc] initWithFloat:result.voltages[vlt]];
             [slot_voltages addObject:number];
             [number release];
+            number = nil;
         }
         
         NSMutableArray* vlt_array; //16 slots * 32 floats
-        if ([pollDict objectForKey:@"fec_vlt"]) vlt_array = [[[pollDict objectForKey:@"fec_vlt"] mutableCopy] autorelease];
+        if ([pollDict objectForKey:@"fec_vlt"]) vlt_array = [[pollDict objectForKey:@"fec_vlt"] mutableCopy];
         else {
-            vlt_array = [NSMutableArray arrayWithCapacity:16];
+            vlt_array = [[NSMutableArray alloc] initWithCapacity:16];
             unsigned char sl;
             for (sl=0; sl<16; sl++) {
                 [vlt_array addObject:[NSArray array]];
             }
         }
         NSMutableArray* vlt_time_stamp; //16 slot strings
-        if ([pollDict objectForKey:@"fec_vlt_time_stamp"]) vlt_time_stamp = [[[pollDict objectForKey:@"fec_vlt_time_stamp"] mutableCopy] autorelease];
+        if ([pollDict objectForKey:@"fec_vlt_time_stamp"]) {
+            vlt_time_stamp = [[pollDict objectForKey:@"fec_vlt_time_stamp"] mutableCopy];
+        }
         else {
-            vlt_time_stamp = [NSMutableArray arrayWithCapacity:16];
+            vlt_time_stamp = [[NSMutableArray alloc] initWithCapacity:16];
             unsigned char sl;
             for (sl=0; sl<16; sl++) {
                 [vlt_time_stamp addObject:@""];
             }
         }
-        NSArray* fec_vlts_tags = [NSArray arrayWithObjects:@"VM24SUP", @"VM15SUP", @"VEE", @"VM3.3SUP",\
+        NSArray* fec_vlts_tags = [[NSArray alloc] initWithObjects:@"VM24SUP", @"VM15SUP", @"VEE", @"VM3.3SUP",
                                   @"VM2.0SUP", @"VP3.3SUP", @"VP4.0SUP", @"VCC", @"VP6.5SUP", @"VP8.0SUP",
                                   @"VP15SUP", @"VP24SUP", @"VM2.0REF", @"VM1.0REF", @"VP0.8REF", @"VP1.0REF",
                                   @"VP4.0REF", @"VP5.0REF", @"TMP", @"CALDAC", @"HVCRR", nil];
@@ -3055,6 +3061,15 @@ void SwapLongBlock(void* p, int32_t n)
         [pollDict setObject:vlt_array forKey:@"fec_vlt"];
         [pollDict setObject:vlt_time_stamp forKey:@"fec_vlt_time_stamp"];
         [pollDict setObject:fec_vlts_tags forKey:@"fec_vlt_tag"];
+
+        [slot_voltages release];
+        slot_voltages = nil;
+        [vlt_array release];
+        vlt_array = nil;
+        [vlt_time_stamp release];
+        vlt_time_stamp = nil;
+        [fec_vlts_tags release];
+        fec_vlts_tags = nil;
         [iso release];
         iso = nil;
     }
