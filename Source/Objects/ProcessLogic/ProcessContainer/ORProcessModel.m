@@ -93,7 +93,7 @@ NSString* ORProcessModelRunNumberChanged			= @"ORProcessModelRunNumberChanged";
 {
 	[super awakeAfterDocumentLoaded];
 	if(wasRunning){
-		[self startRun];
+		[self performSelector:@selector(startRun) withObject:nil afterDelay:3];
 	}
 }
 
@@ -795,7 +795,6 @@ NSString* ORProcessModelRunNumberChanged			= @"ORProcessModelRunNumberChanged";
 				for(id anObj in [self orcaObjects]){
 					if([anObj isKindOfClass:NSClassFromString(@"ORAdcModel")]){
 						s = [s stringByAppendingFormat:@"%@\n",[anObj report]];
-						[anObj resetReportValues];
 					}
 				}
 				s= [s stringByAppendingString:@"\n"];
@@ -949,6 +948,12 @@ NSString* ORProcessModelRunNumberChanged			= @"ORProcessModelRunNumberChanged";
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(sendHeartbeat) object:nil];
 	}
 	[self setNextHeartbeatString];
+	
+	for(id anObj in [self orcaObjects]){
+		if([anObj isKindOfClass:NSClassFromString(@"ORAdcModel")]){
+			[anObj resetReportValues];
+		}
+	}
 }
 
 - (void) sendStartStopNotice:(BOOL)state
