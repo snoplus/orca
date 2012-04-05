@@ -235,6 +235,7 @@ NSString* ORAdcModelHighConnection		= @"ORAdcModelHighConnection";
 
 - (void) processIsStarting
 {
+	[self resetReportValues];
     [super processIsStarting];
     [ORProcessThread registerInputObject:self];
 }
@@ -313,7 +314,6 @@ NSString* ORAdcModelHighConnection		= @"ORAdcModelHighConnection";
 		NSString* highestValueString =  [NSString stringWithFormat:theFormat,highestValue];
 		NSString* lowestValueString  =  [NSString stringWithFormat:theFormat,lowestValue];
 		
-		
 		s =  [s stringByAppendingFormat:@" [Lowest %@ at %@]  [Highest %@ at %@] ",
 			  lowestValueString, lowDate, highestValueString, highDate];
 	}
@@ -338,17 +338,16 @@ NSString* ORAdcModelHighConnection		= @"ORAdcModelHighConnection";
 
 - (void) resetReportValues
 {
-	double theHWValue = [self hwValue];
 	[resetDate release];
 	resetDate = [[NSDate date] retain];
 	
 	[highDate release];
 	highDate = [[NSDate date] retain];
-	highestValue = theHWValue;
+	highestValue = -1E99;
 	
 	[lowDate release];
 	lowDate = [[NSDate date] retain];
-	lowestValue = theHWValue;
+	lowestValue = 1E99;
 }
 
 - (id) description
