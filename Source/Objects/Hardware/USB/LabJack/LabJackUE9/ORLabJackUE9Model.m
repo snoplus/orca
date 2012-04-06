@@ -1083,8 +1083,14 @@ NSString* ORLabJackUE9ModelAdcEnableMaskChanged		= @"ORLabJackUE9ModelAdcEnableM
 
 - (double) convertedValue:(int)aChan
 {
-	if(aChan>=0 && aChan<kUE9NumAdcs)return slope[aChan] * adc[aChan] + intercept[aChan];
-	else return 0;
+    if(aChan>=0 && aChan<kUE9NumAdcs){
+        if([self adcEnabled:aChan])return slope[aChan] * adc[aChan] + intercept[aChan];
+        else {
+            maxValue[aChan] = 0; 
+            minValue[aChan] = 0; 
+        }
+    }
+	return 0;
 }
 
 - (double) maxValueForChan:(int)aChan
