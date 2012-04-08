@@ -115,9 +115,7 @@ NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageSt
 		dc[i] = nil;
 	}
 	
-	id aCard;
-	NSEnumerator* e = [self objectEnumerator];
-	while(aCard = [e nextObject]){
+    for (id aCard in [self orcaObjects]) { 
 		if([aCard isKindOfClass:[ORFecDaughterCardModel class]]){
 			dcPresent[[(ORFecDaughterCardModel*)aCard slot]] = YES;
 			dc[[(ORFecDaughterCardModel*)aCard slot]] = aCard;
@@ -620,9 +618,7 @@ NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageSt
 		[xl2 select:self];
 		
 		// Read the Daughter Cards for their ids
-		NSEnumerator* e = [self objectEnumerator];
-		id aCard;
-		while(aCard = [e nextObject]){
+        for (id aCard in [[self guardian] orcaObjects]) { 
 			if([aCard isKindOfClass:[ORSNOCard class]]){
 				[aCard readBoardIds];
 			}
@@ -1168,11 +1164,10 @@ NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageSt
     long		   	theRate = kCMOSRateUnmeasured;
 	unsigned long  	theCount;
 	
-	NSDate* lastTime = cmosCountTimeStamp;
-	NSDate* thisTime = [NSDate date];
-	NSTimeInterval timeDiff = [thisTime timeIntervalSinceDate:lastTime];
-
-	float sampleFreq;
+	NSDate* thisTime = [[NSDate alloc] init];
+	NSTimeInterval timeDiff = [thisTime timeIntervalSinceDate:cmosCountTimeStamp];
+    
+	float sampleFreq = 0.;
     BOOL calcRates = aCalcRates;
     
 	if ((calcRates && (timeDiff<0 || timeDiff>kMaxTimeDiff)) || timeDiff==0) {
@@ -1183,7 +1178,9 @@ NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageSt
     }
 	
 	[cmosCountTimeStamp release];
-	cmosCountTimeStamp = [thisTime retain];
+	cmosCountTimeStamp = [thisTime copy];
+    [thisTime release];
+    thisTime = nil;
 	
 	//unsigned long theOnlineMask = [self onlineMask];
     //add disabled channels
@@ -1977,7 +1974,7 @@ const short kVoltageADCMaximumAttempts = 10;
 	unsigned short	maxRateChannel = 0;
 	
 	NSDate* lastTime = cmosCountTimeStamp;
-	NSDate* thisTime = [NSDate date];
+	NSDate* thisTime = [[NSDate alloc] init];
 	NSTimeInterval timeDiff = [thisTime timeIntervalSinceDate:lastTime];
 	float sampleFreq;
     
@@ -1989,7 +1986,9 @@ const short kVoltageADCMaximumAttempts = 10;
     }
 	
 	[cmosCountTimeStamp release];
-	cmosCountTimeStamp = [thisTime retain];
+	cmosCountTimeStamp = [thisTime copy];
+    [thisTime release];
+    thisTime = nil;
 	
 	//unsigned long theOnlineMask = [self onlineMask];
 	

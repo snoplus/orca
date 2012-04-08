@@ -1201,7 +1201,7 @@ static NSDictionary* xl3Ops;
 - (IBAction)hvTargetValueAction:(id)sender
 {
     char sup = [hvPowerSupplyMatrix selectedColumn];
-    int nextTargetValue;
+    int nextTargetValue = 0;
     if (sender == hvTargetValueField) {
         nextTargetValue = (int) ([sender floatValue] * 4096 / 3000);
         if (nextTargetValue < 0) nextTargetValue = 0;
@@ -1211,6 +1211,9 @@ static NSDictionary* xl3Ops;
         nextTargetValue = [sender intValue];
         if (nextTargetValue < 0) nextTargetValue = 0;
         if (nextTargetValue > 1800 / 3000. * 4096) nextTargetValue = 1800 * 4096 / 3000;
+    }
+    else {
+        return;
     }
     if ((sup == 0 && nextTargetValue + 20 < [model hvAVoltageDACSetValue]) || (sup == 1 && nextTargetValue + 20 < [model hvBVoltageDACSetValue])) {
         [self hvTargetValueChanged:nil];

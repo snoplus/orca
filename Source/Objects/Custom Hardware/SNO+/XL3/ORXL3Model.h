@@ -114,6 +114,7 @@ enum {
     unsigned long _hvBNextStepValue;
     BOOL _hvPanicFlag;
     NSThread* hvThread;
+    NSDateFormatter* xl3DateFormatter;
 }
 
 @property (assign)	unsigned long   xl3ChargeInjMask;

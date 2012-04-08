@@ -578,10 +578,16 @@ readFifoFlag = _readFifoFlag;
 - (void) readXL3Packet:(XL3_Packet*)aPacket withPacketType:(unsigned char)packetType andPacketNum:(unsigned short)packetNum
 {
 	//look into the cmdArray
-	[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.01]];
+    NSDate* sleepDate = [[NSDate alloc] initWithTimeIntervalSinceNow:0.01];
+	[NSThread sleepUntilDate:sleepDate];
+    [sleepDate release];
+    sleepDate = nil;
+    
 	NSDictionary* aCmd;
 	NSMutableArray* foundCmds = [[NSMutableArray alloc] initWithCapacity:1];
 	time_t xl3ReadTimer = time(0);
+    NSNumber* aPacketType;
+    NSNumber* aPacketNum;
 
     //NSLog(@"%@ waiting for response with packetType: %d and packetNum %d\n",[self crateName], packetType, packetNum);
     
@@ -589,8 +595,8 @@ readFifoFlag = _readFifoFlag;
 		@try {
 			[cmdArrayLock lock];
 			for (aCmd in cmdArray) {
-				NSNumber* aPacketType = [aCmd objectForKey:@"packet_type"];
-				NSNumber* aPacketNum = [aCmd objectForKey:@"packet_num"];
+				aPacketType = [aCmd objectForKey:@"packet_type"];
+				aPacketNum = [aCmd objectForKey:@"packet_num"];
 				//NSLog(@"aPacketType: 0x%x, packetType: 0x%x, aPacketNum: 0x%x, packetNum: 0x%x\n",[aPacketType unsignedShortValue],packetType,[aPacketNum unsignedCharValue],packetNum); 
 
 				if ([aPacketType unsignedCharValue] == packetType && [aPacketNum unsignedShortValue] == packetNum) {
@@ -929,6 +935,8 @@ static void SwapLongBlock(void* p, int32_t n)
                 packetNNum = nil;
                 [packetNType release];
                 packetNType = nil;
+                [packetDate release];
+                packetDate = nil;
 
                 //NSLog(@"%@: cmdArray includes %d cmd responses\n", [self crateName], [cmdArray count]);
                 
