@@ -66,6 +66,7 @@
 #define kSPIData	    0x2
 #define kSPIClock	    0x4
 #define kSPIChipSelect	0x8
+#define kSPIRead        0x10
 
 #pragma mark ¥¥¥Register Definitions
 enum {
@@ -432,8 +433,7 @@ enum Gretina4FIFOStates {
 - (NSArray*) autoTests;
 
 #pragma mark ¥¥¥SPI Interface
-- (void) writeAuxIOSPI:(unsigned long)spiData;
-- (unsigned long) readAuxIOSPI;
+- (unsigned long) writeAuxIOSPI:(unsigned long)spiData;
 
 @end
 

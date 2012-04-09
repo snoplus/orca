@@ -1093,9 +1093,10 @@ static struct {
 	NSLog(@"Main FGPA version: 0x%x \n", mainVersion);
 	
 	//if (mainVersion != 0x108)
-	if (mainVersion != 0x105)
+	//if (mainVersion != 0x105)
+	if (mainVersion != 0x106)
 	{
-		NSLog(@"Main FPGA version does not match: it should be 0x105, but now it is 0x%x \n", mainVersion);
+		NSLog(@"Main FPGA version does not match: it should be 0x106, but now it is 0x%x \n", mainVersion);
 		return;
 	}
 	
@@ -2157,34 +2158,33 @@ static struct {
 
 
 #pragma mark ¥¥¥SPI Interface
-- (void) writeAuxIOSPI:(unsigned long)spiData
+- (unsigned long) writeAuxIOSPI:(unsigned long)spiData
 {
     // Set AuxIO to mode 3 and set bits 0-3 to OUT (bit 0 is under FPGA control)
-    [self writeRegister:kAuxIOConfig withValue:0x3005];
+    [self writeRegister:kAuxIOConfig withValue:0x3025];
     // Read kAuxIOWrite to preserve bit 0, and zero bits used in SPI protocol
     unsigned long spiBase = [self readRegister:kAuxIOWrite] & ~(kSPIData | kSPIClock | kSPIChipSelect); 
     unsigned long value;
+    unsigned long readBack = 0;
 	
     // set kSPIChipSelect to signify that we are starting
     [self writeRegister:kAuxIOWrite withValue:(kSPIChipSelect | kSPIClock | kSPIData)];
     // now write spiData starting from MSB on kSPIData, pulsing kSPIClock
     // each iteration
     int i;
+    //NSLog(@"writing 0x%x\n", spiData);
     for(i=0; i<32; i++) {
         value = spiBase | kSPIChipSelect | kSPIData;
         if( (spiData & 0x80000000) != 0) value &= (~kSPIData);
         [self writeRegister:kAuxIOWrite withValue:value | kSPIClock];
         [self writeRegister:kAuxIOWrite withValue:value];
+        readBack |= (([self readRegister:kAuxIORead] & kSPIRead) > 0) << (31-i);
         spiData = spiData << 1;
     }
     // unset kSPIChipSelect to signify that we are done
     [self writeRegister:kAuxIOWrite withValue:(kSPIClock | kSPIData)];
-}
-
-- (unsigned long) readAuxIOSPI
-{
-	//TBD: Jason, fill in with actual code 
-	return 0;
+    //NSLog(@"readBack=%u (0x%x)\n", readBack, readBack);
+    return readBack;
 }
 
 @end
