@@ -47,14 +47,16 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 #define kDAC3 0x82000000
 #define kDAC4 0x83000000
 
-#define kAdcChannel0Sel 0x00803000
-#define kAdcChannel1Sel 0x00843000
-#define kAdcChannel2Sel 0x00883000
-#define kAdcChannel3Sel 0x008C3000
-#define kAdcChannel4Sel 0x00903000
-#define kAdcChannel5Sel 0x00943000
-#define kAdcChannel6Sel 0x00983000
-#define kAdcChannel7Sel 0x009C3000
+#define kDACA_H_Base		0x00200000
+#define kPulserLowTimeMask	0xC0000000
+#define kPulserHighTimeMask	0xC1000000
+#define kAttnPatternMask	0xC2000000
+#define kPulserStartMask	0xC3000000
+#define kPulserLoopForever  (0x1<<23)
+#define kPulserUseLoopCount (0x1<<22)
+
+#define kADC1		0xE0000000
+#define kADC2		0xE1000000
 
 #define kADCRange10Reg1		0x00A000
 #define kADCRange5Reg1		0x00AAA0
@@ -64,15 +66,16 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 #define kADCRange5Reg2		0x00CAA0
 #define kADCRange2_5Reg2	0x00DA40
 
-#define kADC1ReadWrite		0xE0000000
-#define kADC2ReadWrite		0xE1000000
-#define kDACA_H_Base		0x00200000
-#define kPulserLowTimeMask	0xC0000000
-#define kPulserHighTimeMask	0xC1000000
-#define kAttnPatternMask	0xC2000000
-#define kPulserStartMask	0xC3000000
-#define kPulserLoopForever  (0x1<<23)
-#define kPulserUseLoopCount (0x1<<22)
+#define kReadAdcChannel0 0x00801000
+#define kReadAdcChannel1 0x00841000
+#define kReadAdcChannel2 0x00881000
+#define kReadAdcChannel3 0x008C1000
+#define kReadAdcChannel4 0x00901000
+#define kReadAdcChannel5 0x00941000
+#define kReadAdcChannel6 0x00981000
+#define kReadAdcChannel7 0x009C1000
+
+
 
 
 @implementation ORMJDPreAmpModel
@@ -171,19 +174,18 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpAdcArrayChanged object:self];
 }
 
-- (unsigned long) adc:(unsigned short) aChan
+- (float) adc:(unsigned short) aChan
 {
-    return [[adcs objectAtIndex:aChan] unsignedLongValue];
+    return [[adcs objectAtIndex:aChan] floatValue];
 }
 
-- (void) setAdc:(int) aChan value:(unsigned long) aValue
+- (void) setAdc:(int) aChan value:(float) aValue
 {
-	if(aValue>0xffff) aValue = 0xffff;
     [[[self undoManager] prepareWithInvocationTarget:self] setAdc:aChan value:[self adc:aChan]];
-	[adcs replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
+	[adcs replaceObjectAtIndex:aChan withObject:[NSNumber numberWithFloat:aValue]];
 	
     NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
-    [userInfo setObject:[NSNumber numberWithInt:aChan] forKey: @"Channel"];
+    [userInfo setObject:[NSNumber numberWithFloat:aChan] forKey: @"Channel"];
 	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpAdcChanged
 														object:self
@@ -425,6 +427,14 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 	}
 }
 
+- (void) zeroAmplitudes
+{
+    unsigned long zeroAllOctalChips = 0x2F0000;
+	[self writeAuxIOSPI:(kDAC1 | zeroAllOctalChips)];
+	[self writeAuxIOSPI:(kDAC2 | zeroAllOctalChips)];
+}
+
+
 - (void) writeRangeForAdcChip:(int)index
 {
 	if(index>=0 && index<2){
@@ -432,9 +442,9 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 			{kADCRange10Reg1, kADCRange5Reg1, kADCRange2_5Reg1},
 			{kADCRange10Reg2, kADCRange5Reg2, kADCRange2_5Reg2}
 		};
-		unsigned long adcReadWriteBase[2] = { kADC1ReadWrite, kADC2ReadWrite };
+		unsigned long adcBase[2] = {kADC1, kADC2};
 		
-		unsigned long aValue = adcReadWriteBase[index] | rangeValue[index][adcRange[index]];
+		unsigned long aValue = adcBase[index] | rangeValue[index][adcRange[index]];
 		[self writeAuxIOSPI:aValue];
 	}
 }
@@ -445,50 +455,63 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 	[self writeRangeForAdcChip:1];
 }
 
-- (void) selectAdcOnChip:(int) aChip channel:(int)aChannel
-{
-	if(aChip<0 || aChip>1)		 return;
-	if(aChannel<0 || aChannel>7) return;
-	
-	unsigned long adcReadWriteBase[2] = { kADC1ReadWrite, kADC2ReadWrite };
-	unsigned long channelSelect[8] = {
-		kAdcChannel0Sel,kAdcChannel1Sel,kAdcChannel2Sel,kAdcChannel3Sel,
-		kAdcChannel4Sel,kAdcChannel5Sel,kAdcChannel6Sel,kAdcChannel7Sel,
-	};
-	[self writeAuxIOSPI:adcReadWriteBase[aChip] | channelSelect[aChannel]];
-}
-
 - (void) readAdcsOnChip:(int)aChip
 {
-	//tricky -- have to select a channel to be digitized, then the next time a selection is done the last channel can be read
+	if(aChip<0 || aChip>1) return;
+
 	[self writeRangeForAdcChip:aChip ];
+    float voltageMultiplier = 10./pow(2.,adcRange[aChip]+12);
+
+	unsigned long adcBase = kADC1;
+    if(aChip) adcBase = kADC2;
+	unsigned long channelSelect[8] = {
+		kReadAdcChannel0,kReadAdcChannel1,kReadAdcChannel2,kReadAdcChannel3,
+		kReadAdcChannel4,kReadAdcChannel5,kReadAdcChannel6,kReadAdcChannel7,
+	};
+
+	//have to select a channel to be digitized, then the next time a selection is done the last channel can be read
 	int i;
+    unsigned long readBack;
 	for(i=0;i<8;i++){
-		[self selectAdcOnChip:aChip channel:i];
-		if(i>0){
-			unsigned long aValue = [self readAuxIOSPI] & 0x1fff; //!!!!fix to put the sign in the right place and convert to a number
-			[self setAdc:(aChip*8)+i value:aValue];
-		}
+	    int j;
+        for(j=0;j<4;j++) readBack = [self writeAuxIOSPI:adcBase | channelSelect[i]];
+		//if(i>0){
+			//readBack = readBack & 0x1fff; //!!!!fix to put the sign in the right place and convert to a number
+            readBack = ~readBack;
+            int channelReadBack = (readBack & 0xE000) >> 13;
+            //if(channelReadBack != i-1) {
+            if(channelReadBack != i) {
+              NSLog(@"Warning! channelReadBack = %d, not %d\n", channelReadBack, i);
+            }
+            int voltage = readBack & 0xfff;
+            if(readBack & 0x1000) voltage |= 0xfffff000;
+            //NSLog(@"Got voltage %f*%d=%f for channel %d\n", voltageMultiplier, voltage, voltageMultiplier*voltage, i);
+			//[self setAdc:(aChip*8)+i-1 value:voltage];
+			[self setAdc:(aChip*8)+i value:voltageMultiplier*voltage];
+		//}
 	}
-	//select the first one and then read the last one
-	[self selectAdcOnChip:aChip channel:0];
-	unsigned long aValue = [self readAuxIOSPI] & 0x1fff; //!!!!fix to put the sign in the right place and convert to a number
-	[self setAdc:(aChip*8)+7 value:aValue];	
+	//select the first one and to readBack the last one
+	readBack = [self writeAuxIOSPI:adcBase | channelSelect[0]];
+	//readBack = readBack & 0x1fff; //!!!!fix to put the sign in the right place and convert to a number
+	[self setAdc:(aChip*8)+7 value:readBack];
 }
 
 - (void) readAdcs
 {
-	int i;
-	for(i=0;i<2;i++){
-		[self readAdcsOnChip:i];
-	}
+	[self readAdcsOnChip:0];
+	[self readAdcsOnChip:1];
 }
 
 - (void) stopPulser
 {
+    // stop pulsing: write nothing to kPulserStartMask
+	[self writeAuxIOSPI:kPulserStartMask];
+	//[self writeAuxIOSPI:(kPulserStartMask | kPulserUseLoopCount)];
+
+    //Now park it! First zero all pulse amplitudes
+    [self zeroAmplitudes];
 	//write zeros to the pattern, enable the attenuators, and disable the pulser outputs
 	[self writeAuxIOSPI:(kAttnPatternMask | 0x22)];
-	[self writeAuxIOSPI:(kPulserStartMask | kPulserUseLoopCount)];
 	NSLog(@"PreAmp(%d) Disabled Pulser\n",[self uniqueIdNumber]);
 }	
 
@@ -529,23 +552,13 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 	NSLog(@"PreAmp(%d) Started Pulser\n",[self uniqueIdNumber]);
 }
 
-- (unsigned long) readAuxIOSPI
-{
-	unsigned long aValue = 0;
-	id connectedObj = [self objectConnectedTo:MJDPreAmpInputConnector];
-	if([connectedObj respondsToSelector:@selector(readAuxIOSPI)]){
-		aValue = [connectedObj readAuxIOSPI];
-		NSLog(@"MJD Preamp got: 0x%x\n",aValue);
-	}
-	return aValue;
-}
-
-- (void)  writeAuxIOSPI:(unsigned long)aValue
+- (unsigned long)  writeAuxIOSPI:(unsigned long)aValue
 {
 	id connectedObj = [self objectConnectedTo:MJDPreAmpInputConnector];
 	if([connectedObj respondsToSelector:@selector(writeAuxIOSPI:)]){
-		[connectedObj writeAuxIOSPI:aValue];
+		return [connectedObj writeAuxIOSPI:aValue];
 	}
+    return 0;
 }
 
 #pragma mark ¥¥¥Archival

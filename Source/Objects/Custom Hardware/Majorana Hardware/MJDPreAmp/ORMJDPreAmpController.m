@@ -183,14 +183,14 @@
 {
 	short chan;
 	for(chan=0;chan<kMJDPreAmpDacChannels;chan++){
-		[[adcMatrix cellWithTag:chan] setIntValue: [model adc:chan]]; //convert to volts
+		[[adcMatrix cellWithTag:chan] setFloatValue: [model adc:chan]]; 
 	}
 }
 
 - (void) adcChanged:(NSNotification*)aNote
 {
 	int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
-	[[adcMatrix cellWithTag:chan] setIntValue: [model adc:chan]];		//convert to volts
+	[[adcMatrix cellWithTag:chan] setFloatValue: [model adc:chan]];
 }
 
 - (void) loopForeverChanged:(NSNotification*)aNote

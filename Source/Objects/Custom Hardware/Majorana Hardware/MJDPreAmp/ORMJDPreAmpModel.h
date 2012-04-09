@@ -43,8 +43,8 @@
 #pragma mark ¥¥¥Accessors
 - (NSMutableArray*) adcs;
 - (void) setAdcs:(NSMutableArray*)aAdcs;
-- (unsigned long) adc:(unsigned short) aChan;
-- (void) setAdc:(int) aChan value:(unsigned long) aValue;
+- (float) adc:(unsigned short) aChan;
+- (void) setAdc:(int) aChan value:(float) aValue;
 - (BOOL) loopForever;
 - (void) setLoopForever:(BOOL)aLoopForever;
 - (unsigned short) pulseCount;
@@ -80,12 +80,12 @@
 - (void) writeFetVdsToHW;
 - (void) writeAmplitude:(int)index;
 - (void) writeAmplitudes;
+- (void) zeroAmplitudes;
 - (void) writeRangeForAdcChip:(int)index;
 - (void) writeAdcChipRanges;
 - (void) readAdcsOnChip:(int)aChip;
 - (void) readAdcs;
-- (void) writeAuxIOSPI:(unsigned long)aValue;
-- (unsigned long) readAuxIOSPI;
+- (unsigned long) writeAuxIOSPI:(unsigned long)aValue;
 
 
 #pragma mark ¥¥¥Archival
@@ -112,6 +112,5 @@ extern NSString* ORMJDPreAmpAdcChanged;
 extern NSString* ORMJDPreAmpAdcRangeChanged;
 
 @interface NSObject (ORMJDPreAmpModel)
-- (void) writeAuxIOSPI:(unsigned long)spiData;
-- (unsigned long) readAuxIOSPI;
+- (unsigned long) writeAuxIOSPI:(unsigned long)spiData;
 @end
