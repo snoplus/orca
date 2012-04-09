@@ -1046,8 +1046,8 @@ NSString* ORLabJackUE9ModelAdcEnableMaskChanged		= @"ORLabJackUE9ModelAdcEnableM
 		
 		//grab the bit pattern at the start of the cycle. it
 		//will not be changed during the cycle.
-		processInputValue = doValueIn & ~doDirection;
-		processOutputMask = doDirection;
+		processInputValue = doValueIn & doDirection;
+		processOutputMask = ~doDirection;
 		
     }
 }
@@ -1125,6 +1125,7 @@ NSString* ORLabJackUE9ModelAdcEnableMaskChanged		= @"ORLabJackUE9ModelAdcEnableM
     [[self undoManager] disableUndoRegistration];
     [self setClockDivisor:[decoder decodeIntForKey:@"clockDivisor"]];
     [self setClockSelection:[decoder decodeIntForKey:@"clockSelection"]];
+    [self setDoDirection:[decoder decodeInt32ForKey:@"doDirection"]];
     [self setTimerEnableMask:[decoder decodeIntForKey:@"timerEnableMask"]];
     [self setCounterEnableMask:[decoder decodeIntForKey:@"counterEnableMask"]];
   	[self setIpAddress:[decoder decodeObjectForKey:@"ipAddress"]];
@@ -1193,6 +1194,7 @@ NSString* ORLabJackUE9ModelAdcEnableMaskChanged		= @"ORLabJackUE9ModelAdcEnableM
     [encoder encodeInt:aOut0 forKey:@"aOut0"];
     [encoder encodeBool:shipData forKey:@"shipData"];
     [encoder encodeInt:pollTime forKey:@"pollTime"];
+    [encoder encodeInt32:doDirection forKey:@"doDirection"];
     [encoder encodeBool:digitalOutputEnabled forKey:@"digitalOutputEnabled"];
 	int i;
 	for(i=0;i<kUE9NumAdcs;i++) {
