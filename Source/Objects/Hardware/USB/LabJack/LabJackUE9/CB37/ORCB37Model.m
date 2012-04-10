@@ -60,7 +60,7 @@ NSString* ORCB37SlotChangedNotification = @"ORCB37SlotChangedNotification";
 
     if([self slot]==0){
         for(i=0;i<4;i++)  NSLogFont(font,@"%2d Terminal Block AIN%d\n",i,i); 
-        for(i=4;i<12;i++) NSLogFont(font,@"%2d X2 AIN%d\n",i,i-4);
+        for(i=0;i<12;i++) NSLogFont(font,@"%2d X2 AIN%d\n",i,i);
         if([[self guardian] CB37Exists:1]){
             for(i=12;i<24;i++) NSLogFont(font,@"%2d X3 %s\n",i,CB37Name[i-12]);
         }

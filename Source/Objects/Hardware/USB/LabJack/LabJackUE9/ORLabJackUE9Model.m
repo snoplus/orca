@@ -1602,15 +1602,15 @@ NSString* ORLabJackUE9ModelAdcEnableMaskChanged		= @"ORLabJackUE9ModelAdcEnableM
     else {
         for(i=0;i<4;i++)NSLogFont(font,@"%2d Terminal Block AIN%2d\n",i,i);
         if([self CB37Exists:0] && [self CB37Exists:1]){
-            for(i=4;i<12;i++) NSLogFont(font,@"%2d X2 AIN%2d\n",i,i-4);
+            for(i=0;i<12;i++) NSLogFont(font,@"%2d X2 AIN%2d\n",i,i);
             for(i=12;i<14;i++)NSLogFont(font,@"%2d X3 AIN%2d\n",i,i-12);
         }
         else if([self CB37Exists:0]  && ![self CB37Exists:1]){
-            for(i=4;i<12;i++) NSLogFont(font,@"%2d X2 AIN%2d\n",i,i-4);
+            for(i=0;i<12;i++) NSLogFont(font,@"%2d X2 AIN%2d\n",i,i);
             for(i=12;i<14;i++)NSLogFont(font,@"%2d UnAvailable\n",i);       
         }
         else if(![self CB37Exists:0] && [self CB37Exists:1]){
-            for(i=4;i<12;i++) NSLogFont(font,@"%2d UnAvailable\n",i);
+            for(i=0;i<12;i++) NSLogFont(font,@"%2d UnAvailable\n",i);
             for(i=12;i<14;i++)NSLogFont(font,@"%2d X3 AIN%2d\n",i,i-12);       
         }
         else for(i=4;i<14;i++)NSLogFont(font,@"%2d UnAvailable\n",i);
