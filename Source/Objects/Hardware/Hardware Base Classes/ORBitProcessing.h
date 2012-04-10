@@ -35,3 +35,12 @@
 - (void) setProcessOutput:(int)channel value:(int)value;
 - (NSString*) processingTitle;
 @end
+
+@protocol ORBitProcessor
+- (void) startProcessCycle;
+- (void) endProcessCycle;
+- (void) startProcessCycle;
+- (void) endProcessCycle;
+- (BOOL) setProcessBit:(int)channel value:(int)value;
+- (NSString*) processingTitle;
+@end
