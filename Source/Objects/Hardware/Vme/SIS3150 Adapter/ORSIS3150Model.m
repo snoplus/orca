@@ -390,7 +390,7 @@ uint8_t verbose = 0;
 	[usbInterface retain];
 	[usbInterface setUsePipeType:kUSBBulk];
 	
-	if(anInterface)	[self loadFirmware:[usbInterface interface]];
+	//if(anInterface)	[self loadFirmware:[usbInterface interface]];
 
 	
 	[[NSNotificationCenter defaultCenter]
@@ -566,7 +566,7 @@ uint8_t verbose = 0;
 	//}
 	
 	nBytes = return_code;
-	unsigned long got_nof_bytes = (unsigned long) (nBytes )  ;
+	//unsigned long got_nof_bytes = (unsigned long) (nBytes )  ;
 	
 	//if(nBytes != req_nof_bytes) {
 	//	return_code = sis3150usb_error_code_usb_read_length_error; 
@@ -2198,7 +2198,7 @@ int EXPORT sis3150Usb_TsBus_Dma_Write(HANDLE usbDevice, ULONG addr,
 @implementation ORSIS3150Model (private)
 - (int) loadFirmware:(IOUSBDeviceInterface**) dev
 {
-	NSString* resourcePath = [[[NSBundle mainBundle] resourcePath]stringByAppendingPathComponent:@"SIS3150Firmware"];
+//	NSString* resourcePath = [[[NSBundle mainBundle] resourcePath]stringByAppendingPathComponent:@"SIS3150Firmware"];
 
 /*	return ezusb_load_ram(dev,
 							   resourcePath,
