@@ -1020,6 +1020,7 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 
 - (void) readGainFile:(NSString*) aPath
 {
+	[self setLastGainFile:aPath];
 	NSString* contents = [NSString stringWithContentsOfFile:[aPath stringByExpandingTildeInPath] encoding:NSASCIIStringEncoding error:nil];
 	contents = [contents stringByReplacingOccurrencesOfString:@"\r" withString:@"\n"];
 	NSArray* lines = [contents componentsSeparatedByString:@"\n"];
@@ -1042,7 +1043,6 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 - (void) saveGainFile:(NSString*) aPath
 {
 	NSString* fullFileName = [aPath stringByExpandingTildeInPath];
-	[self setLastGainFile:aPath];
 	int i;
 	NSString* s = @"";
 	for(i=0;i<37;i++){
