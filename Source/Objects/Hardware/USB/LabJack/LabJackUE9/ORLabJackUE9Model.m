@@ -25,6 +25,7 @@
 #import "NetSocket.h"
 #import "ORCard.h"
 #import "ORCB37Model.h"
+#import "ORSafeQueue.h"
 
 NSString* ORLabJackUE9CmdLocalIDChanged = @"ORLabJackUE9CmdLocalIDChanged";
 NSString* ORLabJackUE9CmdClockDivisorChanged = @"ORLabJackUE9CmdClockDivisorChanged";
@@ -1035,9 +1036,7 @@ NSString* ORLabJackUE9ModelAdcEnableMaskChanged		= @"ORLabJackUE9ModelAdcEnableM
     if(!readOnce){
         @try { 
             [self queryAll]; 
-            if(shipData){
-                [self shipIOData]; 
-            }
+			if(shipData) [self performSelectorOnMainThread:@selector(shipIOData) withObject:nil waitUntilDone:NO];
             readOnce = YES;
         }
 		@catch(NSException* localException) { 
@@ -1073,7 +1072,7 @@ NSString* ORLabJackUE9ModelAdcEnableMaskChanged		= @"ORLabJackUE9ModelAdcEnableM
 
 - (NSString*) identifier
 {
-    return [NSString stringWithFormat:@"LabJackUE9,%d",[self uniqueIdNumber]];
+    return [NSString stringWithFormat:@"LJUE9,%d",[self uniqueIdNumber]];
 }
 
 - (NSString*) processingTitle
@@ -1294,8 +1293,8 @@ NSString* ORLabJackUE9ModelAdcEnableMaskChanged		= @"ORLabJackUE9ModelAdcEnableM
 	ORLabJackUE9Cmd* aCmd = [[[ORLabJackUE9Cmd alloc] init] autorelease];
 	aCmd.cmdData  = cmdData;
 	aCmd.tag	  = aTag;
-	if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
-	[cmdQueue addObject:aCmd];
+	if(!cmdQueue)cmdQueue = [[ORSafeQueue alloc] init];
+	[cmdQueue enqueue:aCmd];
 	if(!lastRequest){
 		[self processOneCommandFromQueue];
 	}
@@ -1308,8 +1307,7 @@ NSString* ORLabJackUE9ModelAdcEnableMaskChanged		= @"ORLabJackUE9ModelAdcEnableM
 		return;
 	}
 	if([cmdQueue count] == 0) return;
-	ORLabJackUE9Cmd* aCmd = [[[cmdQueue objectAtIndex:0] retain] autorelease];
-	[cmdQueue removeObjectAtIndex:0];
+	ORLabJackUE9Cmd* aCmd = [cmdQueue dequeue];
 	[self setLastRequest:aCmd];
 	
 	if(aCmd){

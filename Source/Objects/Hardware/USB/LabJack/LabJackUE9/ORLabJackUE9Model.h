@@ -24,6 +24,7 @@
 #import "OROrderedObjHolding.h"
 #import "ORGroup.h"
 
+@class ORSafeQueue;
 @class NetSocket;
 @class ORLabJackUE9Cmd;
 
@@ -37,7 +38,7 @@
 
 @interface ORLabJackUE9Model : ORGroup <OROrderedObjHolding,ORAdcProcessing,ORBitProcessing> {
 	NSOperationQueue* queue;
-	NSMutableArray*   cmdQueue;
+	ORSafeQueue*   cmdQueue;
 	ORLabJackUE9Cmd*  lastRequest;
 	NSString*		  ipAddress;
     BOOL			  isConnected;
