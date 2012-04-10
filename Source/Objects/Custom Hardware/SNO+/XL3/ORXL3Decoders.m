@@ -18,16 +18,64 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
 #import "ORXL3Decoders.h"
-#import "ORDataPacket.h"
-#import "ORDataSet.h"
-#import "ORSNOCrateModel.h"
-#import "ORDataTypeAssigner.h"
+#import "XL3_Cmds.h"
 
 @implementation ORXL3DecoderForXL3MegaBundle
 
 #define swapLong(x) (((uint32_t)(x) << 24) | (((uint32_t)(x) & 0x0000FF00) <<  8) | (((uint32_t)(x) & 0x00FF0000) >>  8) | ((uint32_t)(x) >> 24))
+
+- (NSString*) decodePMTBundle:(unsigned long*)ptr
+{
+	BOOL swapBundle = YES;
+	if (0x0000ABCD != htonl(0x0000ABCD) && indexerSwaps) swapBundle = NO;
+	if (0x0000ABCD == htonl(0x0000ABCD) && !indexerSwaps) swapBundle = NO;
+
+    NSMutableString* dsc = [NSMutableString string];
+    
+    if (ptr[1] == 0x5F46414B && ptr[2] == 0x455F5F0A) {
+        char fake_id[5];
+        if (0x0000ABCD != htonl(0x0000ABCD)) ptr[0] = swapLong(ptr[0]);
+        memcpy(fake_id, ptr, 4);
+        fake_id[4] = '\0';
+        [dsc appendFormat:@"XL3 fake id: %s\n", fake_id];
+        if (0x0000ABCD != htonl(0x0000ABCD)) ptr[0] = swapLong(ptr[0]);
+    }
+    else {
+        if (swapBundle) {
+            ptr[0] = swapLong(ptr[0]);
+            ptr[1] = swapLong(ptr[1]);
+            ptr[2] = swapLong(ptr[2]);
+        }
+        
+        [dsc appendFormat:@"GTId = 0x%06x\n", (*ptr & 0x0000ffff) | ((ptr[2] << 4) & 0x000f0000) | ((ptr[2] >> 8) & 0x00f00000)];
+        [dsc appendFormat:@"CCCC: %d, %d, ", (*ptr >> 21) & 0x1fUL, (*ptr >> 26) & 0x0fUL];
+        [dsc appendFormat:@"%d, %d\n", (*ptr >> 16) & 0x1fUL, (ptr[1] >> 12) & 0x0fUL];
+        [dsc appendFormat:@"QHL = 0x%03x\n", ptr[2] & 0x0fffUL ^ 0x0800UL];
+        [dsc appendFormat:@"QHS = 0x%03x\n", (ptr[1] >> 16) & 0x0fffUL ^ 0x0800UL];
+        [dsc appendFormat:@"QLX = 0x%03x\n", ptr[1] & 0x0fffUL ^ 0x0800UL];
+        [dsc appendFormat:@"TAC = 0x%03x\n", (ptr[2] >> 16) & 0x0fffUL ^ 0x0800UL];
+        [dsc appendFormat:@"Sync errors CGT16: %@,\n", ((*ptr >> 30) & 0x1UL) ? @"Yes" : @"No"];
+        [dsc appendFormat:@"CGT24: %@, ", ((*ptr >> 31) & 0x1UL) ? @"Yes" : @"No"];
+        [dsc appendFormat:@"CMOS16: %@\n", ((ptr[1] >> 31) & 0x1UL) ? @"Yes" : @"No"];
+        [dsc appendFormat:@"Missed count error: %@\n", ((ptr[1] >> 28) & 0x1UL) ? @"Yes" : @"No"];
+        [dsc appendFormat:@"NC/CC: %@, ", ((ptr[1] >> 29) & 0x1UL) ? @"CC" : @"NC"];
+        [dsc appendFormat:@"LGI: %@\n", ((ptr[1] >> 30) & 0x1UL) ? @"Long" : @"Short"];
+        [dsc appendFormat:@"Wrd0 = 0x%08x\n", *ptr];
+        [dsc appendFormat:@"Wrd1 = 0x%08x\n", ptr[1]];
+        [dsc appendFormat:@"Wrd2 = 0x%08x\n\n", ptr[2]];
+
+        //swap back the PMT bundle 
+        if (swapBundle) {
+            ptr[0] = swapLong(ptr[0]);
+            ptr[1] = swapLong(ptr[1]);
+            ptr[2] = swapLong(ptr[2]);
+        }
+    }
+    
+    return [[dsc retain] autorelease];
+}
+
 
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
@@ -36,6 +84,8 @@
 	indexerSwaps = [aDecoder needToSwap]; //won't work for multicatalogs with mixed endianness
 	return length; //must return number of bytes processed.
 }
+
+
 
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
@@ -52,68 +102,108 @@
 	if (0x0000ABCD == htonl(0x0000ABCD) && !indexerSwaps) swapBundle = NO;
 
 	unsigned long length = ExtractLength(*ptr);
-	
-	ptr += 2;
 	unsigned short i = 0;
+    unsigned short version = 0;
 	NSMutableString* dsc = [NSMutableString string];
-	
-	for (i=0; i<length/3; i++) {
-		if (swapBundle) {
-			ptr[0] = swapLong(ptr[0]);
-			ptr[1] = swapLong(ptr[1]);
-			ptr[2] = swapLong(ptr[2]);
-		}
-		
-		if (ptr[1] == 0x5F46414B && ptr[2] == 0x455F5F0A) {
-			char fake_id[5];
-			if (0x0000ABCD != htonl(0x0000ABCD)) ptr[0] = swapLong(ptr[0]);
-			memcpy(fake_id, ptr, 4);
-			fake_id[4] = '\0';
-			[dsc appendFormat:@"XL3 fake id: %s\n", fake_id];
-			if (0x0000ABCD != htonl(0x0000ABCD)) ptr[0] = swapLong(ptr[0]);
-		}
-		else {
-			NSString* sGTId = [NSString stringWithFormat:@"GTId = 0x%06x\n",
-				(*ptr & 0x0000ffff) | ((ptr[2] << 4) & 0x000f0000) | ((ptr[2] >> 8) & 0x00f00000)];
-			NSString* sCrate = [NSString stringWithFormat:@"CCCC: %d, ", (*ptr >> 21) & 0x1fUL];
-			NSString* sBoard = [NSString stringWithFormat:@"%d, ", (*ptr >> 26) & 0x0fUL];
-			NSString* sChannel = [NSString stringWithFormat:@"%d, ", (*ptr >> 16) & 0x1fUL];
-			NSString* sCell = [NSString stringWithFormat:@"%d\n", (ptr[1] >> 12) & 0x0fUL];
-			NSString* sQHL = [NSString stringWithFormat:@"QHL = 0x%03x\n", ptr[2] & 0x0fffUL ^ 0x0800UL];
-			NSString* sQHS = [NSString stringWithFormat:@"QHS = 0x%03x\n", (ptr[1] >> 16) & 0x0fffUL ^ 0x0800UL];
-			NSString* sQLX = [NSString stringWithFormat:@"QLX = 0x%03x\n", ptr[1] & 0x0fffUL ^ 0x0800UL];
-			NSString* sTAC = [NSString stringWithFormat:@"TAC = 0x%03x\n", (ptr[2] >> 16) & 0x0fffUL ^ 0x0800UL];
-			NSString* sCGT16 = [NSString stringWithFormat:@"Sync errors CGT16: %@,\n",
-				((*ptr >> 30) & 0x1UL) ? @"Yes" : @"No"];
-			NSString* sCGT24 = [NSString stringWithFormat:@"CGT24: %@, ",
-				((*ptr >> 31) & 0x1UL) ? @"Yes" : @"No"];
-			NSString* sES16 = [NSString stringWithFormat:@"CMOS16: %@\n",
-				((ptr[1] >> 31) & 0x1UL) ? @"Yes" : @"No"];
-			NSString* sMissed = [NSString stringWithFormat:@"Missed count error: %@\n",
-				((ptr[1] >> 28) & 0x1UL) ? @"Yes" : @"No"];
-			NSString* sNC = [NSString stringWithFormat:@"NC/CC: %@, ",
-				((ptr[1] >> 29) & 0x1UL) ? @"CC" : @"NC"];
-			NSString* sLGI = [NSString stringWithFormat:@"LGI: %@\n",
-				((ptr[1] >> 30) & 0x1UL) ? @"Long" : @"Short"];
-			NSString* sWrd0 = [NSString stringWithFormat:@"Wrd0 = 0x%08x\n", *ptr];
-			NSString* sWrd1 = [NSString stringWithFormat:@"Wrd1 = 0x%08x\n", ptr[1]];
-			NSString* sWrd2 = [NSString stringWithFormat:@"Wrd2 = 0x%08x\n\n", ptr[2]];
 
-			[dsc appendFormat:@"%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@", 
-				sGTId, sCrate, sBoard, sChannel, sCell, sQHL, sQHS, sQLX, sTAC, sCGT16,
-				sCGT24, sES16, sMissed, sNC, sLGI, sWrd0, sWrd1, sWrd2];
-		}
+    ptr += 1;
+    version = ptr[0] >> 5 & 0x7;
+    [dsc appendFormat:@"packet_num: %d\ncrate_num: %d\nversion: %d\n", ptr[0] >> 16, ptr[0] & 0x1f, version];
+    ptr += 1;
 
-		//swap back the PMT bundle 
-		if (swapBundle) {
-			ptr[0] = swapLong(ptr[0]);
-			ptr[1] = swapLong(ptr[1]);
-			ptr[2] = swapLong(ptr[2]);
-		}
-		
-		ptr += 3;
-	}
-	return dsc;
+    switch (version) {
+        case 0:
+            for (i=0; i<length/3; i++) {
+                [dsc appendString:[self decodePMTBundle:ptr]];
+                ptr += 3;
+            }
+            break;
+            
+        case 1:
+            if (swapBundle) {
+                ptr[0] = swapLong(ptr[0]); ptr[1] = swapLong(ptr[1]); ptr[2] = swapLong(ptr[2]);
+            }
+            unsigned int num_longs = ptr[0] & 0xffffff;
+            [dsc appendFormat:@"\ncrate_num: %u\nnum_longs: %u\npass_min: %u\nxl3_clock: %u\n",
+             ptr[0] >> 24, num_longs, ptr[1], ptr[2]];
+            [dsc appendFormat:@"pass_min: 0x%08x\nxl3_clock: 0x%08x\n\n", ptr[1], ptr[2]];
+            if (swapBundle) {
+                ptr[0] = swapLong(ptr[0]); ptr[1] = swapLong(ptr[1]); ptr[2] = swapLong(ptr[2]);
+            }
+            
+            if (num_longs * 4 > XL3_MAXPAYLOADSIZE_BYTES) {
+                [dsc appendFormat:@"num longs > XL3_MAXPAYLOADSIZE_BYTES,\ntrimming to continue\n"];
+                num_longs = XL3_MAXPAYLOADSIZE_BYTES / 4;
+            }
+            if (num_longs > length - 1) {
+                [dsc appendFormat:@"num longs > orca packet length,\ntrimming to continue\n"];
+                num_longs = length - 1;
+            }
+            
+            ptr += 3; num_longs -= 2;
+            
+            unsigned int mini_header = 0;
+            while (num_longs != 0) {
+                mini_header = ptr[0];
+                if (swapBundle) {
+                    mini_header = swapLong(mini_header);
+                }
+                
+                unsigned int mini_num_longs = mini_header & 0xffffff;
+                unsigned char mini_card = mini_header >> 24 & 0xf;
+                unsigned char mini_type = mini_header >> 31;
+                
+                [dsc appendFormat:@"\n---\nmini bundle\ncard: %d\ntype: %@\nnum_longs: %u\nhex: 0x%08x\n\n",
+                 mini_card, mini_type?@"pass cur":@"pmt bundles", mini_num_longs, mini_header];
+                ptr +=1;
+                
+                switch (mini_type) {
+                    case 0:
+                        //pmt bundles
+                        if (mini_num_longs % 3 || num_longs < mini_num_longs) {
+                            [dsc appendFormat:@"mini bundle header\ncorrupted, quit.\n"];
+                            num_longs = 0;
+                            break;
+                        }
+
+                        for (i = 0; i < mini_num_longs / 3; i++) {
+                            [dsc appendString:[self decodePMTBundle:ptr]];
+                            ptr += 3;
+                        }
+
+                        num_longs -= mini_num_longs + 1;
+                        if (mini_num_longs != 0) {
+                            ptr -= 2;   
+                        }
+                        break;
+                        
+                    case 1:
+                        //pass cur
+                        if (mini_num_longs != 1 || num_longs < 2) {
+                            [dsc appendFormat:@"mini bundle header\ncorrupted, quit.\n"];
+                            num_longs = 0;
+                            break;
+                        }
+                        unsigned int pass_cur = ptr[0];
+                        if (swapBundle) {
+                            pass_cur = swapLong(pass_cur);
+                        }
+                        [dsc appendFormat:@"pass_cur: %u,\nhex: 0x%08x\n", pass_cur, pass_cur];
+                        num_longs -= 2;
+                        ptr += 1;
+                        break;
+                        
+                    default:
+                        break;
+                }
+            }
+            break;
+
+        default:
+            [dsc appendFormat:@"\nnot implemented.\n"];
+            break;
+    }
+	return [[dsc retain] autorelease];
 }
 
 @end
@@ -146,7 +236,7 @@
             slot_idx++;
         }
     }
-    return dsc;
+    return [[dsc retain] autorelease];
 }
 
 @end
@@ -175,12 +265,11 @@
     unsigned long fifo;
     for (slot=0; slot<16; slot++) {
         fifo = dataPtr[slot];
-		if (swapBundle) fifo = swapLong(fifo);
-        
+		if (swapBundle) fifo = swapLong(fifo);        
         [dsc appendFormat:@"slot %2d: 0x%08x\n", slot, fifo];
     }
 
-    return dsc;
+    return [[dsc retain] autorelease];
 }
 
 @end

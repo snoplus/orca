@@ -835,7 +835,14 @@ static void SwapLongBlock(void* p, int32_t n)
                     [self writeBundle:((XL3_Packet*) aPacket)->payload length:((XL3_Packet*) aPacket)->cmdHeader.num_bundles * 12 version:0];
                 }
                 else {
-                    [self writeBundle:((XL3_Packet*) aPacket)->payload length:XL3_MAXPAYLOADSIZE_BYTES version:1];
+                    unsigned int num_bytes = *(unsigned int*)(((XL3_Packet*)aPacket)->payload);
+                    if (needToSwap) num_bytes = swapLong(num_bytes);
+                    num_bytes &= 0xffffff;
+                    num_bytes = (num_bytes + 1) * 4;
+                    if (num_bytes > XL3_MAXPAYLOADSIZE_BYTES) {
+                        num_bytes = XL3_MAXPAYLOADSIZE_BYTES;
+                    }
+                    [self writeBundle:((XL3_Packet*) aPacket)->payload length:num_bytes version:1];
                 }
                 bundle_count++;
             }
@@ -886,6 +893,7 @@ static void SwapLongBlock(void* p, int32_t n)
                     error = data->mem_level_unknown_flag[slot];
                     if (error) [msg appendFormat:@"mem_level_unknown slot %2d: 0x%x, ", slot, error];
                 }
+                [msg appendFormat:@"\n"];
                 NSLog(msg);
             }
 
@@ -1163,7 +1171,10 @@ static void SwapLongBlock(void* p, int32_t n)
     BOOL full = NO;
     if(bundleFreeSpace > 0){
         NSMutableData* theData = [[NSMutableData alloc] initWithLength:numBytes + 8];
-        unsigned rev = aRev << 5;
+        unsigned int rev = aRev << 5;
+        unsigned short packet_num = ((XL3_Packet*) someBytes)->cmdHeader.packet_num;
+        if (needToSwap) packet_num = swapShort(packet_num);
+        rev |= packet_num << 16;
         [theData replaceBytesInRange:NSMakeRange(4, 4) withBytes:&rev length:4];
         [theData replaceBytesInRange:NSMakeRange(8, numBytes) withBytes:someBytes length:numBytes];
         *(dataPtr+bundleWriteMark) = (unsigned long)theData;
