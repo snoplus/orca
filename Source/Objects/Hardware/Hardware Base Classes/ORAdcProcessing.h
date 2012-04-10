@@ -35,6 +35,13 @@
 - (double) maxValueForChan:(int)channel;
 - (double) minValueForChan:(int)channel;
 - (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit  channel:(int)channel;
+@end
 
-
+@protocol ORAdcProcessor
+- (void) startProcessCycle;
+- (void) endProcessCycle;
+- (void) startProcessCycle;
+- (void) endProcessCycle;
+- (double) setProcessAdc:(int)channel value:(double)value isLow:(BOOL*)isLow isHigh:(BOOL*)isHigh;
+- (NSString*) processingTitle;
 @end
