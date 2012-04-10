@@ -25,6 +25,7 @@
 @class ORSerialPort;
 @class ORTimeRate;
 @class ORAlarm;
+@class ORSafeQueue;
 
 #define kPacShipAdcs	0xff
 
@@ -63,7 +64,7 @@
         ORSerialPort*		serialPort;
         unsigned long		dataId;
 		NSData*				lastRequest;
-		NSMutableArray*		cmdQueue;
+		ORSafeQueue*		cmdQueue;
 		NSMutableString*    buffer;
         unsigned short		adc[8];
 		unsigned long		timeMeasured[8];
