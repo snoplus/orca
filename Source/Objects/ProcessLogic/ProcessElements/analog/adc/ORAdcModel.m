@@ -301,21 +301,24 @@ NSString* ORAdcModelHighConnection		= @"ORAdcModelHighConnection";
 
 - (NSString*) report
 {	
-	NSString* s =  [NSString stringWithFormat:@"%@: %@ ", [self iconLabel],[self iconValue]];
-	
-	if(valueTooLow)		  s =  [s stringByAppendingString:@" [LOW ALARM POSTED] "];
-	else if(valueTooHigh) s =  [s stringByAppendingString:@" [HIGH ALARM POSTED]"];
-	
-	if(trackMaxMin){
-		NSString* theFormat = @"%.1f";
-		if([displayFormat length] != 0)									theFormat = displayFormat;
-		if([theFormat rangeOfString:@"%@"].location !=NSNotFound)		theFormat = @"%.1f";
-		else if([theFormat rangeOfString:@"%d"].location !=NSNotFound)	theFormat = @"%.0f";
-		NSString* highestValueString =  [NSString stringWithFormat:theFormat,highestValue];
-		NSString* lowestValueString  =  [NSString stringWithFormat:theFormat,lowestValue];
+	NSString* s = @"";
+	@synchronized(self){
+		s =  [NSString stringWithFormat:@"%@: %@ ", [self iconLabel],[self iconValue]];
 		
-		s =  [s stringByAppendingFormat:@" [Lowest %@ at %@]  [Highest %@ at %@] ",
-			  lowestValueString, lowDate, highestValueString, highDate];
+		if(valueTooLow)		  s =  [s stringByAppendingString:@" [LOW ALARM POSTED] "];
+		else if(valueTooHigh) s =  [s stringByAppendingString:@" [HIGH ALARM POSTED]"];
+		
+		if(trackMaxMin){
+			NSString* theFormat = @"%.1f";
+			if([displayFormat length] != 0)									theFormat = displayFormat;
+			if([theFormat rangeOfString:@"%@"].location !=NSNotFound)		theFormat = @"%.1f";
+			else if([theFormat rangeOfString:@"%d"].location !=NSNotFound)	theFormat = @"%.0f";
+			NSString* highestValueString =  [NSString stringWithFormat:theFormat,highestValue];
+			NSString* lowestValueString  =  [NSString stringWithFormat:theFormat,lowestValue];
+			
+			s =  [s stringByAppendingFormat:@" [Lowest %@ at %@]  [Highest %@ at %@] ",
+				  lowestValueString, lowDate, highestValueString, highDate];
+		}
 	}
 	return s;
 	
@@ -323,31 +326,35 @@ NSString* ORAdcModelHighConnection		= @"ORAdcModelHighConnection";
 
 - (void) checkMaxMinValues
 {
-	double theHWValue = [self hwValue];
-	if(theHWValue>highestValue){
-		highestValue = theHWValue;
-		[highDate release];
-		highDate = [[NSDate date] retain];		
-	}
-	if(theHWValue<lowestValue){
-		lowestValue = theHWValue;
-		[lowDate release];
-		lowDate = [[NSDate date] retain];		
+	@synchronized(self){
+		double theHWValue = [self hwValue];
+		if(theHWValue>highestValue){
+			highestValue = theHWValue;
+			[highDate release];
+			highDate = [[NSDate date] retain];		
+		}
+		if(theHWValue<lowestValue){
+			lowestValue = theHWValue;
+			[lowDate release];
+			lowDate = [[NSDate date] retain];		
+		}
 	}
 }
 
 - (void) resetReportValues
 {
-	[resetDate release];
-	resetDate = [[NSDate date] retain];
-	
-	[highDate release];
-	highDate = [[NSDate date] retain];
-	highestValue = -1E99;
-	
-	[lowDate release];
-	lowDate = [[NSDate date] retain];
-	lowestValue = 1E99;
+	@synchronized(self){
+		[resetDate release];
+		resetDate = [[NSDate date] retain];
+		
+		[highDate release];
+		highDate = [[NSDate date] retain];
+		highestValue = -1E99;
+		
+		[lowDate release];
+		lowDate = [[NSDate date] retain];
+		lowestValue = 1E99;
+	}
 }
 
 - (id) description
