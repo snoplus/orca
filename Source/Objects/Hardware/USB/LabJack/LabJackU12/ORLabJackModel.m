@@ -1029,9 +1029,6 @@ NSString* ORLabJackMaxValueChanged				= @"ORLabJackMaxValueChanged";
     if(!readOnce){
         @try { 
             [self queryAll]; 
-            if(shipData){
-                [self shipIOData]; 
-            }
             readOnce = YES;
         }
 		@catch(NSException* localException) { 
