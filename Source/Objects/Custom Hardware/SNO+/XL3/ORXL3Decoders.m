@@ -126,7 +126,6 @@
             unsigned int num_longs = ptr[0] & 0xffffff;
             [dsc appendFormat:@"\ncrate_num: %u\nnum_longs: %u\npass_min: %u\nxl3_clock: %u\n",
              ptr[0] >> 24, num_longs, ptr[1], ptr[2]];
-            [dsc appendFormat:@"pass_min: 0x%08x\nxl3_clock: 0x%08x\n\n", ptr[1], ptr[2]];
             if (swapBundle) {
                 ptr[0] = swapLong(ptr[0]); ptr[1] = swapLong(ptr[1]); ptr[2] = swapLong(ptr[2]);
             }
@@ -140,8 +139,7 @@
                 num_longs = length - 1;
             }
             
-            ptr += 3; num_longs -= 2;
-            
+            ptr += 3;            
             unsigned int mini_header = 0;
             while (num_longs != 0) {
                 mini_header = ptr[0];
@@ -153,8 +151,8 @@
                 unsigned char mini_card = mini_header >> 24 & 0xf;
                 unsigned char mini_type = mini_header >> 31;
                 
-                [dsc appendFormat:@"\n---\nmini bundle\ncard: %d\ntype: %@\nnum_longs: %u\nhex: 0x%08x\n\n",
-                 mini_card, mini_type?@"pass cur":@"pmt bundles", mini_num_longs, mini_header];
+                [dsc appendFormat:@"\n---\nmini bundle\ncard: %d\ntype: %@\nnum_longs: %u\n\n",
+                 mini_card, mini_type?@"pass cur":@"pmt bundles", mini_num_longs];
                 ptr +=1;
                 
                 switch (mini_type) {
@@ -163,6 +161,7 @@
                         if (mini_num_longs % 3 || num_longs < mini_num_longs) {
                             [dsc appendFormat:@"mini bundle header\ncorrupted, quit.\n"];
                             num_longs = 0;
+                            [dsc appendFormat:@"0x%08x\n0x%08x\n0x%08x\n0x%08x\n", ptr[0], ptr[1], ptr[2], ptr[3]];
                             break;
                         }
 
@@ -170,11 +169,7 @@
                             [dsc appendString:[self decodePMTBundle:ptr]];
                             ptr += 3;
                         }
-
                         num_longs -= mini_num_longs + 1;
-                        if (mini_num_longs != 0) {
-                            ptr -= 2;   
-                        }
                         break;
                         
                     case 1:
@@ -188,7 +183,7 @@
                         if (swapBundle) {
                             pass_cur = swapLong(pass_cur);
                         }
-                        [dsc appendFormat:@"pass_cur: %u,\nhex: 0x%08x\n", pass_cur, pass_cur];
+                        [dsc appendFormat:@"pass_cur: %u\n", pass_cur];
                         num_longs -= 2;
                         ptr += 1;
                         break;
