@@ -219,7 +219,9 @@ NSString* ORAlarmElementSeverityChangedNotification = @"ORAlarmElementSeverityCh
 - (NSString*) alarmContentString
 {
 	NSString* s = @"Alarm was generated from a Slow Controls Process.\n";
-	s = [s stringByAppendingString:[[self guardian] report]];
+	NSString* alarmString = [[self guardian] report];
+	if([alarmString length] == 0)alarmString = @"No additional information available";
+	s = [s stringByAppendingString:alarmString];
 	return s;
 }
 
