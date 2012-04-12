@@ -21,7 +21,8 @@
 #import "ORHWWizard.h"
 #import "ThresholdCalibrationTask.h"
 
-#define kMJDPreAmpDacChannels 16
+#define kMJDPreAmpDacChannels   16	//if this ever changes, change the record length also
+#define kMJDPreAmpDataRecordLen 21
 
 @interface ORMJDPreAmpModel : OrcaObject {
     NSMutableArray* adcs;
@@ -36,11 +37,22 @@
     int adcRange[2];
     unsigned short pulseCount;
     BOOL loopForever;
+    int pollTime;
+    BOOL shipValues;
+	unsigned long	dataId;
+	unsigned long timeMeasured[2];
+    unsigned long adcEnabledMask;
 }
 
 - (void) setUpArrays;
 
 #pragma mark ¥¥¥Accessors
+- (unsigned long) adcEnabledMask;
+- (void) setAdcEnabledMask:(unsigned long)aAdcEnabledMask;
+- (BOOL) shipValues;
+- (void) setShipValues:(BOOL)aShipValues;
+- (int) pollTime;
+- (void) setPollTime:(int)aPollTime;
 - (NSMutableArray*) adcs;
 - (void) setAdcs:(NSMutableArray*)aAdcs;
 - (float) adc:(unsigned short) aChan;
@@ -53,6 +65,7 @@
 - (void) setEnabled:(int)index value:(BOOL)aEnabled;
 - (int) adcRange:(int)index;
 - (void) setAdcRange:(int)index value:(int)aValue;
+- (unsigned long) timeMeasured:(int)index;
 
 - (BOOL) attenuated:(int)index;
 - (void) setAttenuated:(int)index value:(BOOL)aAttenuated;
@@ -73,6 +86,16 @@
 - (unsigned long) amplitude:(int) aChan;
 - (void) setAmplitude:(int) aChan withValue:(unsigned long) aValue;
 
+#pragma mark ¥¥¥Data Records
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (NSDictionary*) dataRecordDescription;
+- (unsigned long) dataId;
+- (void) setDataId: (unsigned long) DataId;
+- (void) setDataIds:(id)assigner;
+- (void) syncDataIdsWith:(id)anotherObject;
+- (void) shipRecords;
+
+
 #pragma mark ¥¥¥HW Access
 - (void) startPulser;
 - (void) stopPulser;
@@ -85,6 +108,7 @@
 - (void) writeAdcChipRanges;
 - (void) readAdcsOnChip:(int)aChip;
 - (void) readAdcs;
+- (void) pollValues;
 - (unsigned long) writeAuxIOSPI:(unsigned long)aValue;
 
 
@@ -94,6 +118,9 @@
 @end
 
 #pragma mark ¥¥¥External Strings
+extern NSString* ORMJDPreAmpModelAdcEnabledMaskChanged;
+extern NSString*  ORMJDPreAmpModelPollTimeChanged;
+extern NSString* ORMJDPreAmpModelShipValuesChanged;
 extern NSString* ORMJDPreAmpAdcArrayChanged;
 extern NSString* ORMJDPreAmpLoopForeverChanged;
 extern NSString* ORMJDPreAmpPulseCountChanged;

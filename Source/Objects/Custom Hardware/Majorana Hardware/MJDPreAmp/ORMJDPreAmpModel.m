@@ -17,14 +17,18 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
 #pragma mark ¥¥¥Imported Files
 #import "ORMJDPreAmpModel.h"
+#import "ORDataTypeAssigner.h"
+#import "ORDataPacket.h"
 
 #pragma mark ¥¥¥Notification Strings
-NSString* ORMJDPreAmpAdcArrayChanged	= @"ORMJDPreAmpAdcArrayChanged";
-NSString* ORMJDPreAmpLoopForeverChanged = @"ORMJDPreAmpLoopForeverChanged";
-NSString* ORMJDPreAmpPulseCountChanged = @"ORMJDPreAmpPulseCountChanged";
+NSString* ORMJDPreAmpModelAdcEnabledMaskChanged = @"ORMJDPreAmpModelAdcEnabledMaskChanged";
+NSString* ORMJDPreAmpModelPollTimeChanged	= @"ORMJDPreAmpModelPollTimeChanged";
+NSString* ORMJDPreAmpModelShipValuesChanged = @"ORMJDPreAmpModelShipValuesChanged";
+NSString* ORMJDPreAmpAdcArrayChanged		= @"ORMJDPreAmpAdcArrayChanged";
+NSString* ORMJDPreAmpLoopForeverChanged		= @"ORMJDPreAmpLoopForeverChanged";
+NSString* ORMJDPreAmpPulseCountChanged		= @"ORMJDPreAmpPulseCountChanged";
 NSString* ORMJDPreAmpEnabledChanged			= @"ORMJDPreAmpEnabledChanged";
 NSString* ORMJDPreAmpAttenuatedChanged		= @"ORMJDPreAmpAttenuatedChanged";
 NSString* ORMJDPreAmpFinalAttenuatedChanged	= @"ORMJDPreAmpFinalAttenuatedChanged";
@@ -96,6 +100,20 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
     [super dealloc];
 }
 
+- (void) sleep
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	[super sleep];
+}
+
+- (void) wakeUp
+{
+	[super wakeUp];
+	if(pollTime){
+		[self pollValues];
+	}
+}
+
 - (void) setUpArrays
 {
 	if(!dacs){
@@ -142,6 +160,54 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 }
 
 #pragma mark ¥¥¥Accessors
+
+- (unsigned long) adcEnabledMask
+{
+    return adcEnabledMask;
+}
+
+- (void) setAdcEnabledMask:(unsigned long)aAdcEnabledMask
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setAdcEnabledMask:adcEnabledMask];
+    
+    adcEnabledMask = aAdcEnabledMask;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpModelAdcEnabledMaskChanged object:self];
+}
+
+- (BOOL) shipValues
+{
+    return shipValues;
+}
+
+- (void) setShipValues:(BOOL)aShipValues
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setShipValues:shipValues];
+    
+    shipValues = aShipValues;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpModelShipValuesChanged object:self];
+}
+
+- (int) pollTime
+{
+    return pollTime;
+}
+
+- (void) setPollTime:(int)aPollTime
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setPollTime:aPollTime];
+    pollTime = aPollTime;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpModelPollTimeChanged object:self];
+	
+	if(pollTime){
+		[self performSelector:@selector(pollValues) withObject:nil afterDelay:2];
+	}
+	else {
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollValues) object:nil];
+	}
+}
+
 - (int) adcRange:(int)index
 {
 	if(index>=0 && index<2) return adcRange[index];
@@ -176,20 +242,28 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 
 - (float) adc:(unsigned short) aChan
 {
-    return [[adcs objectAtIndex:aChan] floatValue];
+	if(aChan<[adcs count]){
+		if(adcEnabledMask & (0x1<<aChan)){
+		return [[adcs objectAtIndex:aChan] floatValue];
+		}
+		else return 0.0;
+	}
+	else return 0.0;
 }
 
 - (void) setAdc:(int) aChan value:(float) aValue
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setAdc:aChan value:[self adc:aChan]];
-	[adcs replaceObjectAtIndex:aChan withObject:[NSNumber numberWithFloat:aValue]];
+	if(aChan<[adcs count]){
+		[[[self undoManager] prepareWithInvocationTarget:self] setAdc:aChan value:[self adc:aChan]];
+		[adcs replaceObjectAtIndex:aChan withObject:[NSNumber numberWithFloat:aValue]];
 	
-    NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
-    [userInfo setObject:[NSNumber numberWithFloat:aChan] forKey: @"Channel"];
+		NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+		[userInfo setObject:[NSNumber numberWithFloat:aChan] forKey: @"Channel"];
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpAdcChanged
-														object:self
-													  userInfo: userInfo];
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpAdcChanged
+															object:self
+														  userInfo: userInfo];
+	}
 }
 
 - (BOOL) loopForever
@@ -337,6 +411,11 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 													  userInfo: userInfo];
 }
 
+- (unsigned long) timeMeasured:(int)index
+{
+	if(index>=0 && index<2)return timeMeasured[index];
+	else return 0;
+}
 - (NSMutableArray*) amplitudes
 {
     return amplitudes;
@@ -473,27 +552,47 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 	int i;
     unsigned long readBack;
 	for(i=0;i<8;i++){
-	    int j;
-        for(j=0;j<4;j++) readBack = [self writeAuxIOSPI:adcBase | channelSelect[i]];
-		//if(i>0){
-			//readBack = readBack & 0x1fff; //!!!!fix to put the sign in the right place and convert to a number
-            readBack = ~readBack;
-            int channelReadBack = (readBack & 0xE000) >> 13;
-            //if(channelReadBack != i-1) {
-            if(channelReadBack != i) {
-              NSLog(@"Warning! channelReadBack = %d, not %d\n", channelReadBack, i);
-            }
-            int voltage = readBack & 0xfff;
-            if(readBack & 0x1000) voltage |= 0xfffff000;
-            //NSLog(@"Got voltage %f*%d=%f for channel %d\n", voltageMultiplier, voltage, voltageMultiplier*voltage, i);
-			//[self setAdc:(aChip*8)+i-1 value:voltage];
-			[self setAdc:(aChip*8)+i value:voltageMultiplier*voltage];
-		//}
+		if(adcEnabledMask&(0x1<<((aChip*8)+i))){
+			int j;
+			for(j=0;j<4;j++) readBack = [self writeAuxIOSPI:adcBase | channelSelect[i]];
+			//if(i>0){
+				//readBack = readBack & 0x1fff; //!!!!fix to put the sign in the right place and convert to a number
+				readBack = ~readBack;
+				int channelReadBack = (readBack & 0xE000) >> 13;
+				//if(channelReadBack != i-1) {
+				if(channelReadBack != i) {
+				  NSLog(@"Warning! channelReadBack = %d, not %d\n", channelReadBack, i);
+				}
+				int voltage = readBack & 0xfff;
+				if(readBack & 0x1000) voltage |= 0xfffff000;
+				//NSLog(@"Got voltage %f*%d=%f for channel %d\n", voltageMultiplier, voltage, voltageMultiplier*voltage, i);
+				//[self setAdc:(aChip*8)+i-1 value:voltage];
+				[self setAdc:(aChip*8)+i value:voltageMultiplier*voltage];
+			//}
+		}
+		else [self setAdc:(aChip*8)+i value:0.0];
 	}
-	//select the first one and to readBack the last one
-	readBack = [self writeAuxIOSPI:adcBase | channelSelect[0]];
-	//readBack = readBack & 0x1fff; //!!!!fix to put the sign in the right place and convert to a number
-	[self setAdc:(aChip*8)+7 value:readBack];
+	
+	if(adcEnabledMask & (0x1<<(aChip*8))){
+		//select the first one and to readBack the last one
+		readBack = [self writeAuxIOSPI:adcBase | channelSelect[0]];
+		//readBack = readBack & 0x1fff; //!!!!fix to put the sign in the right place and convert to a number
+		[self setAdc:(aChip*8)+7 value:readBack];
+	}
+	else [self setAdc:(aChip*8)+7 value:0.0];
+	
+	
+	//get the time(UT!) for the data record. 
+	time_t	ut_Time;
+	time(&ut_Time);
+	timeMeasured[aChip] = ut_Time;
+}
+
+- (void) pollValues
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollValues) object:nil];
+	[self readAdcs];
+	if(pollTime)[self performSelector:@selector(pollValues) withObject:nil afterDelay:pollTime];
 }
 
 - (void) readAdcs
@@ -567,21 +666,27 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
     self = [super initWithCoder:decoder];
 	
     [[self undoManager] disableUndoRegistration];
+    [self setAdcEnabledMask:[decoder decodeInt32ForKey:@"adcEnabledMask"]];
+    [self setShipValues:	[decoder decodeBoolForKey: @"shipValues"]];
+	[self setPollTime:		[decoder decodeIntForKey:  @"pollTime"]];
+	
 	int i;
 	for(i=0;i<2;i++){
-		[self setEnabled:i value:[decoder decodeBoolForKey:[NSString stringWithFormat:@"enabled%d",i]]];
-		[self setAttenuated:i value:[decoder decodeBoolForKey:[NSString stringWithFormat:@"attenuated%d",i]]];
-		[self setFinalAttenuated:i value:[decoder decodeBoolForKey:[NSString stringWithFormat:@"finalAttenuated%d",i]]];
-		[self setAdcRange:i value:[decoder decodeIntForKey:[NSString stringWithFormat:@"adcRange%d",i]]];
+		[self setEnabled:i		   value:[decoder decodeBoolForKey:[NSString stringWithFormat: @"enabled%d",i]]];
+		[self setAttenuated:i      value:[decoder decodeBoolForKey:[NSString stringWithFormat: @"attenuated%d",i]]];
+		[self setFinalAttenuated:i value:[decoder decodeBoolForKey:[NSString stringWithFormat: @"finalAttenuated%d",i]]];
+		[self setAdcRange:i        value:[decoder decodeIntForKey: [NSString stringWithFormat: @"adcRange%d",i]]];
 	}
-    [self setLoopForever:	[decoder decodeBoolForKey:@"loopForever"]];
-    [self setPulseCount:	[decoder decodeIntForKey:@"pulseCount"]];
-	[self setPulseHighTime:	[decoder decodeIntForKey:@"pulseHighTime"]];
-	[self setPulseLowTime:	[decoder decodeIntForKey:@"pulseLowTime"]];
-	[self setPulserMask:	[decoder decodeIntForKey:@"pulserMask"]];
-    [self setDacs:			[decoder decodeObjectForKey:@"dacs"]];
-	[self setAdcs:			[decoder decodeObjectForKey:@"adcs"]];
-    [self setAmplitudes:	[decoder decodeObjectForKey:@"amplitudes"]];
+	
+    [self setLoopForever:	[decoder decodeBoolForKey:   @"loopForever"]];
+    [self setPulseCount:	[decoder decodeIntForKey:    @"pulseCount"]];
+	[self setPulseHighTime:	[decoder decodeIntForKey:    @"pulseHighTime"]];
+	[self setPulseLowTime:	[decoder decodeIntForKey:    @"pulseLowTime"]];
+	[self setPulserMask:	[decoder decodeIntForKey:    @"pulserMask"]];
+    [self setDacs:			[decoder decodeObjectForKey: @"dacs"]];
+	[self setAdcs:			[decoder decodeObjectForKey: @"adcs"]];
+    [self setAmplitudes:	[decoder decodeObjectForKey: @"amplitudes"]];
+	
     if(!dacs || !amplitudes)	[self setUpArrays];
     [[self undoManager] enableUndoRegistration];
     
@@ -591,6 +696,9 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+	[encoder encodeInt32:adcEnabledMask forKey:@"adcEnabledMask"];
+	[encoder encodeBool:shipValues		forKey:@"shipValues"];
+	[encoder encodeInt:pollTime			forKey:@"pollTime"];
 	int i;
 	for(i=0;i<2;i++){
 		[encoder encodeBool:enabled[i]			forKey:[NSString stringWithFormat:@"enabled%d",i]];
@@ -618,4 +726,64 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
     [dictionary setObject:objDictionary forKey:[self identifier]];
     return objDictionary;
 }
+
+#pragma mark ¥¥¥Data Records
+- (unsigned long) dataId					{ return dataId;   }
+- (void) setDataId: (unsigned long) DataId	{ dataId = DataId; }
+- (void) setDataIds:(id)assigner			{ dataId = [assigner assignDataIds:kLongForm]; }
+- (void) syncDataIdsWith:(id)anotherTPG262	{ [self setDataId:[anotherTPG262 dataId]]; }
+
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+    //----------------------------------------------------------------------------------------
+    // first add our description to the data description
+    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"MJDPreAmpModel"];
+}
+
+- (NSDictionary*) dataRecordDescription
+{
+    NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
+    NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+								 @"ORMJDPreAmpDecoderForAdc",						@"decoder",
+								 [NSNumber numberWithLong:dataId],					@"dataId",
+								 [NSNumber numberWithBool:NO],						@"variable",
+								 [NSNumber numberWithLong:kMJDPreAmpDataRecordLen],	@"length",
+								 nil];
+	
+    [dataDictionary setObject:aDictionary forKey:@"Adcs"];
+    
+    return dataDictionary;
+}
+
+- (void) shipRecords
+{
+	
+    if([[ORGlobal sharedGlobal] runInProgress]){
+		
+		unsigned long data[kMJDPreAmpDataRecordLen];
+		
+		data[0] = dataId | kMJDPreAmpDataRecordLen;
+		data[1] = [self uniqueIdNumber]&0xfff;
+		data[2] = timeMeasured[0];
+		data[3] = timeMeasured[1];
+		data[4] = adcEnabledMask;
+		
+		union {
+			float asFloat;
+			unsigned long asLong;
+		} theData;
+		
+		int index = 5;
+		int i;
+		for(i=0;i<kMJDPreAmpDacChannels;i++){
+			theData.asFloat = [self adc:i];
+			data[index]     = theData.asLong;
+			index++;
+		}
+		
+		[[NSNotificationCenter defaultCenter] postNotificationName: ORQueueRecordForShippingNotification 
+															object: [NSData dataWithBytes:data length:sizeof(long)*kMJDPreAmpDataRecordLen]];
+	}
+}
+
 @end

@@ -49,6 +49,7 @@
 		[[pulserMaskMatrix cellAtRow:chan column:0] setTag:chan];
 		[[adcMatrix cellAtRow:chan column:0] setTag:chan];
 		[[adcMatrix cellAtRow:chan column:0] setFormatter:aFormat];
+		[[adcEnabledMaskMatrix cellAtRow:chan column:0] setTag:chan];
 	}
 }
 
@@ -151,6 +152,22 @@
                          name : ORMJDPreAmpAdcArrayChanged
 						object: model];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(shipValuesChanged:)
+                         name : ORMJDPreAmpModelShipValuesChanged
+						object: model];
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(pollTimeChanged:)
+                         name : ORMJDPreAmpModelPollTimeChanged
+                       object : model];
+	
+
+    [notifyCenter addObserver : self
+                     selector : @selector(adcEnabledMaskChanged:)
+                         name : ORMJDPreAmpModelAdcEnabledMaskChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -170,9 +187,35 @@
 	[self pulseCountChanged:nil];
 	[self loopForeverChanged:nil];
 	[self adcArrayChanged:nil];
+	[self shipValuesChanged:nil];
+	[self pollTimeChanged:nil];
+	[self adcEnabledMaskChanged:nil];
 }
 
 #pragma mark ¥¥¥Interface Management
+- (void) adcEnabledMaskChanged:(NSNotification*)aNote
+{
+
+	unsigned short aMask = [model adcEnabledMask];
+	int i;
+	for(i=0;i<kMJDPreAmpDacChannels;i++){
+		BOOL bitSet = (aMask&(1<<i))>0;
+		if(bitSet != [[adcEnabledMaskMatrix cellWithTag:i] intValue]){
+			[[adcEnabledMaskMatrix cellWithTag:i] setState:bitSet];
+		}
+	}
+}
+
+- (void) pollTimeChanged:(NSNotification*)aNotification
+{
+	[pollTimePU selectItemWithTag:[model pollTime]];
+}
+
+- (void) shipValuesChanged:(NSNotification*)aNote
+{
+	[shipValuesCB setIntValue: [model shipValues]];
+}
+
 - (void) adcRangeChanged:(NSNotification*)aNote
 {
 	[adcRange0PU selectItemAtIndex: [model adcRange:0]];
@@ -267,7 +310,7 @@
 
 - (void) updateButtons
 {
-    //BOOL locked = [gSecurity isLocked:MJDPreAmpSettingsLock];
+    BOOL locked = [gSecurity isLocked:MJDPreAmpSettingsLock];
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:MJDPreAmpSettingsLock];
 	[loopForeverPU		setEnabled:!lockedOrRunningMaintenance];
 	[pulseCountField	setEnabled:!lockedOrRunningMaintenance && ![model loopForever]];
@@ -282,8 +325,8 @@
 	[pulserMaskMatrix	setEnabled:!lockedOrRunningMaintenance];	
 	[startPulserButton	setEnabled:!lockedOrRunningMaintenance];	
 	[stopPulserButton	setEnabled:!lockedOrRunningMaintenance];	
+	[pollTimePU			setEnabled:!locked];	
 }
-
 
 - (void) dacChanged:(NSNotification*)aNotification
 {
@@ -304,6 +347,7 @@
 		[[dacsMatrix cellWithTag:chan] setFloatValue: [model dac:chan]*4.1/65535.]; //convert to volts
 	}
 }
+
 - (void) amplitudeArrayChanged:(NSNotification*)aNotification
 {
 	short chan;
@@ -312,8 +356,28 @@
 	}
 }
 
-
 #pragma mark ¥¥¥Actions
+- (void) adcEnabledMaskAction:(id)sender
+{
+	unsigned short mask = 0;
+	int i;
+	for(i=0;i<16;i++){
+		int theValue = [[adcEnabledMaskMatrix cellWithTag:i] intValue];
+		if(theValue) mask |= (0x1<<i);
+	}
+	[model setAdcEnabledMask:mask];	
+}
+
+- (void) shipValuesAction:(id)sender
+{
+	[model setShipValues:[sender intValue]];	
+}
+
+- (void) pollTimeAction:(id)sender
+{
+	[model setPollTime:[[sender selectedItem] tag]];
+}
+
 - (void) loopForeverAction:(id)sender
 {
 	[model setLoopForever:![sender indexOfSelectedItem]];	
@@ -403,5 +467,9 @@
 	[model readAdcs]; 
 }
 
+- (IBAction) pollNowAction:(id)sender
+{
+	[model pollValues];
+}
 
 @end

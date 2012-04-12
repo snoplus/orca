@@ -22,6 +22,9 @@
 {
     @private
 		IBOutlet NSButton*		settingsLockButton;
+		IBOutlet NSMatrix*		adcEnabledMaskMatrix;
+		IBOutlet NSButton*		shipValuesCB;
+		IBOutlet NSPopUpButton* pollTimePU;
 		IBOutlet NSMatrix*		adcMatrix;
 		IBOutlet NSPopUpButton* loopForeverPU;
 		IBOutlet NSTextField*	pulseCountField;
@@ -41,6 +44,7 @@
 		IBOutlet NSButton*		stopPulserButton;
 		IBOutlet NSPopUpButton* adcRange0PU;
 		IBOutlet NSPopUpButton* adcRange1PU;
+		IBOutlet NSButton*		pollNowButton;
 }
 
 #pragma mark ¥¥¥Initialization
@@ -53,6 +57,9 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ¥¥¥Interface Management
+- (void) adcEnabledMaskChanged:(NSNotification*)aNote;
+- (void) shipValuesChanged:(NSNotification*)aNote;
+- (void) pollTimeChanged:(NSNotification*)aNote;
 - (void) adcArrayChanged:(NSNotification*)aNote;
 - (void) loopForeverChanged:(NSNotification*)aNote;
 - (void) pulseCountChanged:(NSNotification*)aNote;
@@ -76,6 +83,10 @@
 - (void) adcRangeChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Actions
+- (IBAction) adcEnabledMaskAction:(id)sender;
+- (IBAction) pollNowAction:(id)sender;
+- (IBAction) shipValuesAction:(id)sender;
+- (IBAction) pollTimeAction:(id)sender;
 - (IBAction) adcRangeAction:(id)sender;
 - (IBAction) amplitudesAction:(id)sender;
 - (IBAction) loopForeverAction:(id)sender;
