@@ -30,7 +30,9 @@
 	IBOutlet NSTextField*   gvControlField;
 	IBOutlet NSTextField*   gvControlValveState;
 	IBOutlet NSTextField*   gvControlPressureSide1;
+	IBOutlet NSTextField*   gvOpenToText1;
 	IBOutlet NSTextField*   gvControlPressureSide2;
+	IBOutlet NSTextField*   gvOpenToText2;
 	IBOutlet NSTableView*   adcTableView;
 	IBOutlet NSTableView*   gvTableView;
 }
@@ -39,8 +41,6 @@
 - (void) awakeFromNib;
 
 #pragma mark *Accessors
-- (int) stateOfRegion:(int)aTag;
-- (int) stateOfGateValve:(int)aTag;
 - (BOOL) showGrid;
 
 #pragma mark •••Notifications

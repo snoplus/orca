@@ -21,6 +21,7 @@
 #import "ORBitProcessing.h"
 
 @class ORVacuumGateValve;
+@class ORVacuumPipe;
 @class ORLabJackUE9Model;
 
 @interface ORMJDVacuumModel : OrcaObject <ORAdcProcessor,ORBitProcessor>
@@ -38,12 +39,17 @@
 - (BOOL) showGrid;
 - (void) setShowGrid:(BOOL)aState;
 - (void) toggleGrid;
-- (int) stateOfRegion:(int)aTag;
 - (int) stateOfGateValve:(int)aTag;
 - (NSArray*) pipesForRegion:(int)aTag;
+- (ORVacuumPipe*) onePipeFromRegion:(int)aTag;
 - (NSArray*) gateValves;
 - (ORVacuumGateValve*) gateValve:(int)aTag;
 - (NSArray*) dynamicLabels;
+- (NSArray*) staticLabels;
+- (NSArray*) gateValvesConnectedTo:(int)aRegion;
+- (NSColor*) colorOfRegion:(int)aRegion;
+- (NSString*) namesOfRegionsWithColor:(NSColor*)aColor;
+- (NSString*) dynamicLabel:(int)region;
 
 #pragma mark ***Archival
 - (id)initWithCoder:(NSCoder*)decoder;

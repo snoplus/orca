@@ -26,10 +26,13 @@
 @interface ORMJDVacuumModel (private)
 - (void) makeParts;
 - (void) makeLines:(VacuumLineInfo*)lineItems num:(int)numItems;
-- (void) makePipes:(VacuumPipeInfo*)pipeList num:(int)numItems goodColor:(NSColor*)aGoodColor badColor:(NSColor*)aBadColor;
+- (void) makePipes:(VacuumPipeInfo*)pipeList num:(int)numItems;
 - (void) makeGateValves:(VacuumGVInfo*)pipeList num:(int)numItems;
 - (void) makeStaticLabels:(VacuumStaticLabelInfo*)labelItems num:(int)numItems;
 - (void) makeDynamicLabels:(VacuumDynamicLabelInfo*)labelItems num:(int)numItems;
+- (void) colorRegionsConnectedTo:(int)aRegion withColor:(NSColor*)aColor;
+- (void) recursizelyColorRegionsConnectedTo:(int)aRegion withColor:(NSColor*)aColor;
+- (void) resetVisitationFlag;
 @end
 
 
@@ -106,24 +109,16 @@ NSString* ORMJDVacuumModelShowGridChanged = @"ORMJDVacuumModelShowGridChanged";
 	return parts;
 }
 
-- (int) stateOfRegion:(int)aTag
+- (NSArray*) gateValvesConnectedTo:(int)aRegion
 {
-	switch(aTag){
-		case 0: return YES;
-		case 1: return NO;
-		case 2: return YES;
-		case 3: return NO;
-		case 4: return NO;
-		case 5: return NO;
-		case 6: return NO;
-		case 7: return NO;
-		case 8: return NO; //N2 Supply Side
-		case 9: return YES;
-		case 10: return YES;
-			
-			
-		default: return NO;
+	NSMutableArray* gateValves	= [NSMutableArray array];
+	NSArray* allGateValves		= [self gateValves];
+	for(id aGateValve in allGateValves){
+		if([aGateValve connectingRegion1] == aRegion || [aGateValve connectingRegion2] == aRegion){
+			[gateValves addObject:aGateValve];
+		}
 	}
+	return gateValves;
 }
 
 - (int) stateOfGateValve:(int)aTag
@@ -134,6 +129,13 @@ NSString* ORMJDVacuumModelShowGridChanged = @"ORMJDVacuumModelShowGridChanged";
 - (NSArray*) pipesForRegion:(int)aTag
 {
 	return [[partDictionary objectForKey:@"Regions"] objectForKey:[NSNumber numberWithInt:aTag]];
+}
+
+- (ORVacuumPipe*) onePipeFromRegion:(int)aTag
+{
+	NSArray* pipes = [[partDictionary objectForKey:@"Regions"] objectForKey:[NSNumber numberWithInt:aTag]];
+	if([pipes count])return [pipes objectAtIndex:0];
+	else return nil;
 }
 
 - (NSArray*) gateValves
@@ -150,10 +152,52 @@ NSString* ORMJDVacuumModelShowGridChanged = @"ORMJDVacuumModelShowGridChanged";
 	else return nil;
 }
 
-
 - (NSArray*) dynamicLabels
 {
 	return [partDictionary objectForKey:@"DynamicLabels"];
+}
+
+- (NSString*) dynamicLabel:(int)region
+{
+	NSArray* labels = [partDictionary objectForKey:@"DynamicLabels"];
+	if(region < [labels count]) {
+		ORVacuumDynamicLabel* theLabel = [labels objectAtIndex:region];
+		float theValue = [theLabel value];
+		return [NSString stringWithFormat:@"%.2E",theValue];
+	}
+	else return @"No Value Available";
+}
+
+
+- (NSArray*) staticLabels
+{
+	return [partDictionary objectForKey:@"StaticLabels"];
+}
+
+- (NSColor*) colorOfRegion:(int)aRegion
+{
+	return [[self onePipeFromRegion:aRegion] regionColor];
+}
+
+- (NSString*) namesOfRegionsWithColor:(NSColor*)aColor
+{
+	NSMutableString* theRegions = [NSMutableString string];
+	NSArray* allLabels = [self staticLabels];
+	int count = 0;
+	for(ORVacuumStaticLabel* aLabel in allLabels){
+		int region = [aLabel partTag];
+		if([aColor isEqual:[self colorOfRegion:region]]){
+			[theRegions appendFormat:@"%@%@,",count!=0?@" ":@"",[[aLabel label] stringByReplacingOccurrencesOfString:@"\n" withString:@" "]];
+			count++;
+		}
+	}
+	
+	//special case: the cryostat has no label
+	if([aColor isEqual:[self colorOfRegion:2]])[theRegions appendString:@" Cryostat,"];
+	
+	if([theRegions hasSuffix:@","]) return [theRegions substringToIndex:[theRegions length]-1];
+	else return theRegions;
+	
 }
 
 #pragma mark ***AdcProcessor Protocol
@@ -216,7 +260,6 @@ NSString* ORMJDVacuumModelShowGridChanged = @"ORMJDVacuumModelShowGridChanged";
 	return @"MJD Vac";
 }
 
-
 @end
 
 
@@ -224,11 +267,11 @@ NSString* ORMJDVacuumModelShowGridChanged = @"ORMJDVacuumModelShowGridChanged";
 - (void) makeParts
 {
 	
-#define kNumVacPipes		43
+#define kNumVacPipes		52
 	VacuumPipeInfo vacPipeList[kNumVacPipes] = {
 		//region 0 pipes
-		{ kVacVPipe,  0,	 50,			 200+kPipeRadius,	50,					450 }, 
-		{ kVacHPipe,  0,	 50+kPipeRadius, 400,				150+kPipeRadius,	400 },
+		{ kVacVPipe,  0, 50,			 200+kPipeRadius,	50,					450 }, 
+		{ kVacHPipe,  0, 50+kPipeRadius, 400,				150+kPipeRadius,	400 },
 		{ kVacVPipe,  0, 100,			 400-kPipeRadius,	100,				300 },
 		//region 1 pipes
 		{ kVacVPipe,  1, 500,			  150,				500,				250 },
@@ -237,7 +280,7 @@ NSString* ORMJDVacuumModelShowGridChanged = @"ORMJDVacuumModelShowGridChanged";
 		{ kVacVPipe,  1, 240,			  200+kPipeRadius,	240,				400-kPipeRadius },
 		{ kVacVPipe,  1, 240,			  400+kPipeRadius,	240,				420 },
 		{ kVacVPipe,  1, 200,			  400+kPipeRadius,	200,				450 },
-		//region 2 pipes
+		//region 2 pipes (cyrostat)
 		{ kVacBox,	  2, 475,			  500,				525,				550 },
 		{ kVacBox,	  2, 600,			  450,				680,				560 },
 		{ kVacBigHPipe,2,525,			  525,		        600,				525 },
@@ -260,7 +303,16 @@ NSString* ORMJDVacuumModelShowGridChanged = @"ORMJDVacuumModelShowGridChanged";
 		{ kVacVPipe,  3, 600,			  70,				600,				170 },
 		{ kVacHPipe,  3, 500+kPipeRadius, 100,				600-kPipeRadius,	100 },
 		{ kVacHPipe,  3, 600+kPipeRadius, 100,				620,				100 },
-		//region 4 is done separately for cryo so a diff color can be used.
+		//region 4 pipes
+		{ kVacBox,	  4, 470,			  570,				530,				620 },
+		{ kVacBox,	  4, 270,			  570,				330,				620 },
+		{ kVacCorner, 4, 500,			  525,				kNA,				kNA },
+		{ kVacCorner, 4, 650,			  525,				kNA,				kNA },
+		{ kVacHPipe,  4, 500+kPipeRadius, 525,				650-kPipeRadius,	525 },
+		{ kVacVPipe,  4, 500,			  525+kPipeRadius,	500,				570 },
+		{ kVacHPipe,  4, 330,			  600,				400,				600 },
+		{ kVacHPipe,  4, 400,			  600,				470,				600 },
+		{ kVacVPipe,  4, 360,			  550,				360,				600-kPipeRadius },
 		//region 5 pipes
 		{ kVacCorner, 5, 100,			  30,				kNA,				kNA },
 		{ kVacCorner, 5, 700,			  30,				kNA,				kNA },
@@ -272,25 +324,25 @@ NSString* ORMJDVacuumModelShowGridChanged = @"ORMJDVacuumModelShowGridChanged";
 		{ kVacCorner, 5, 300,			  80,				kNA,				kNA },
 		{ kVacVPipe,  5, 300,			  30+kPipeRadius,	300,				80-kPipeRadius },
 		{ kVacHPipe,  5, 280,			  80,				300-kPipeRadius,	80 },
+		{ kVacHPipe,  5, 250,			  80,				280,				80 },
 		//region 6 pipes
 		{ kVacVPipe,  6, 500,			  250,				500,				350 },
 		{ kVacHPipe,  6, 460,			  300,				500-kPipeRadius,	300 },
-		//region 7 pipes (N2 side)
-		{ kVacHPipe,  7, 250,			  80,				280,				80 },
 	};
 		
 #define kNumStaticVacLabelItems	7
 	VacuumStaticLabelInfo staticLabelItems[kNumStaticVacLabelItems] = {
-		{kVacStaticLabel,  8, @"Dry N2\nSupply",	150,  60,	250, 100},
-		{kVacStaticLabel, 10, @"Turbo",				20,	 260,	80,	 290},
-		{kVacStaticLabel, 10, @"Vacuum\nSentry",	20,	 220,	80,	 250},
-		{kVacStaticLabel, 10, @"Diaphragm\nPump",	20,	 180,	80,	 210},
-		{kVacStaticLabel, 10, @"RGA",				220, 420,	260, 440},
-		{kVacStaticLabel, 10, @"NEG Pump",			400, 290,	460, 310},
-		{kVacStaticLabel, 10, @"Cryo Pump",			570, 155,	630, 185},
+		{kVacStaticLabel, 0, @"Turbo",			20,	 260,	80,	 290},
+		{kVacStaticLabel, 0, @"Vacuum\nSentry",	20,	 220,	80,	 250},
+		{kVacStaticLabel, 0, @"Diaphragm\nPump",20,	 180,	80,	 210},
+		{kVacStaticLabel, 1, @"RGA",			220, 420,	260, 440},
+		{kVacStaticLabel, 3, @"Cryo Pump",		570, 155,	630, 185},
+		{kVacStaticLabel, 5, @"Dry N2\nSupply",	150,  60,	250, 100},
+		{kVacStaticLabel, 6, @"NEG Pump",		400, 285,	460, 315},
 	};	
 	
 #define kNumDynamicVacLabelItems	5
+	//the parttags are equal to the index numbers are equal to the region
 	VacuumDynamicLabelInfo dynamicLabelItems[kNumDynamicVacLabelItems] = {
 		{kVacDynamicLabel, 0, @"PKR G1",	20,	 450,	80,	 490},
 		{kVacDynamicLabel, 1, @"PKR G2",	170, 450,	230, 490},
@@ -298,35 +350,21 @@ NSString* ORMJDVacuumModelShowGridChanged = @"ORMJDVacuumModelShowGridChanged";
 		{kVacDynamicLabel, 3, @"PKR G4",	620, 280,	680, 320},
 		{kVacDynamicLabel, 4, @"Baratron",	330, 520,	390, 550},
 	};	
-	
-#define kNumCryoPipes		9
-	VacuumPipeInfo cryoPipes[kNumCryoPipes] = {
-		//region 9 pipes
-		{ kVacBox,	  4, 470,			  570,				530,				620 },
-		{ kVacBox,	  4, 270,			  570,				330,				620 },
-		{ kVacCorner, 4, 500,			  525,				kNA,				kNA },
-		{ kVacCorner, 4, 650,			  525,				kNA,				kNA },
-		{ kVacHPipe,  4, 500+kPipeRadius, 525,				650-kPipeRadius,	525 },
-		{ kVacVPipe,  4, 500,			  525+kPipeRadius,	500,				570 },
-		{ kVacHPipe,  4, 330,			  600,				400,				600 },
-		{ kVacHPipe,  4, 400,			  600,				470,				600 },
-		{ kVacVPipe,  4, 360,			  550,				360,				600-kPipeRadius },
-	};
-		
+			
 	
 #define kNumVacLines 10
 	VacuumLineInfo vacLines[kNumVacLines] = {
-		{kVacLine, 150,400,150,430},  //V1
-		{kVacLine, 300,400,300,430},  //V2
+		{kVacLine, 150,400,150,420},  //V1
+		{kVacLine, 300,400,300,420},  //V2
 		{kVacLine, 600,350,620,350},  //V3
-		{kVacLine, 450,350,500,350},  //V4
-		{kVacLine, 450,250,500,250},  //V5
-		{kVacLine, 450,150,500,150},  //V6
+		{kVacLine, 480,350,500,350},  //V4
+		{kVacLine, 480,250,500,250},  //V5
+		{kVacLine, 480,150,500,150},  //V6
 	
 		{kVacLine, 100,300,120,300},  //Bellows
-		{kVacLine, 150,200,150,230},  //Bellows
-		{kVacLine, 550,70,600,70},  //Bellows
-		{kVacLine, 650,70,700,70},  //Bellows
+		{kVacLine, 150,200,150,220},  //Bellows
+		{kVacLine, 580,70,600,70},  //Bellows
+		{kVacLine, 680,70,700,70},  //Bellows
 	};
 
 #define kNumVacGVs			15
@@ -343,26 +381,21 @@ NSString* ORMJDVacuumModelShowGridChanged = @"ORMJDVacuumModelShowGridChanged";
 		{kVacHGateV, 8,		@"B3",			kControlOnly,	600, 70,	3,5,	kControlLeft},	//Control only 
 		{kVacHGateV, 9,		@"B4",			kControlOnly,	700, 70,	2,5,	kControlLeft},	//Control only 
 		
-		{kVacVGateV, 10,	@"Burst",		kManualOnly,	300, 300,	2,kUpToAir,	kControlNone},	//burst
-		{kVacVGateV, 11,	@"N2 Manual",	kManualOnly,	280, 80,	5,kUpToAir,	kControlNone},	//Manual N2 supply
-		{kVacVGateV, 12,	@"PRV",			kManualOnly,	620, 100,	3,kUpToAir,	kControlNone},	//PRV
-		{kVacVGateV, 13,	@"PRV",			kManualOnly,	300, 350,	2,kUpToAir,	kControlNone},	//PRV
-		{kVacVGateV, 14,	@"C1",			kManualOnly,    400, 600,	4,4,		kControlNone},	//Manual only
+		{kVacVGateV, 10,	@"Burst",		kManualOnlyShowClosed,		300, 300,	2,kUpToAir,	kControlNone},	//burst
+		{kVacVGateV, 11,	@"N2 Manual",	kManualOnlyShowChanging,	280, 80,	5,kUpToAir,	kControlNone},	//Manual N2 supply
+		{kVacVGateV, 12,	@"PRV",			kManualOnlyShowClosed,		620, 100,	3,kUpToAir,	kControlNone},	//PRV
+		{kVacVGateV, 13,	@"PRV",			kManualOnlyShowClosed,		300, 350,	2,kUpToAir,	kControlNone},	//PRV
+		{kVacVGateV, 14,	@"C1",			kManualOnlyShowChanging,	400, 600,	4,4,		kControlNone},	//Manual only
 	};
 	
-	
-	NSColor* cryoColor = [NSColor colorWithCalibratedRed:.6 green:.6 blue:1 alpha:1];
-	NSColor* badVacColor = [NSColor colorWithCalibratedRed:1 green:.4 blue:.4 alpha:1];
-	
 	[self makeLines:vacLines					num:kNumVacLines];
-	[self makePipes:vacPipeList					num:kNumVacPipes	goodColor:[NSColor greenColor] badColor:badVacColor];
-	[self makePipes:cryoPipes					num:kNumCryoPipes	goodColor:cryoColor badColor:badVacColor];
+	[self makePipes:vacPipeList					num:kNumVacPipes];
 	[self makeGateValves:gvList					num:kNumVacGVs];
 	[self makeStaticLabels:staticLabelItems		num:kNumStaticVacLabelItems];
 	[self makeDynamicLabels:dynamicLabelItems	num:kNumDynamicVacLabelItems];
 }
 
-- (void) makePipes:(VacuumPipeInfo*)pipeList num:(int)numItems goodColor:(NSColor*)aGoodColor badColor:(NSColor*)aBadColor
+- (void) makePipes:(VacuumPipeInfo*)pipeList num:(int)numItems
 {
 	int i;
 	for(i=0;i<numItems;i++){
@@ -388,8 +421,6 @@ NSString* ORMJDVacuumModelShowGridChanged = @"ORMJDVacuumModelShowGridChanged";
 				aPipe = [[[ORVacuumBox alloc] initWithDelegate:self partTag:pipeList[i].partTag bounds:NSMakeRect(pipeList[i].x1, pipeList[i].y1,pipeList[i].x2-pipeList[i].x1,pipeList[i].y2-pipeList[i].y1)] autorelease];
 				break;
 		}
-		if(aGoodColor)	aPipe.goodColor = aGoodColor;
-		if(aBadColor)	aPipe.badColor = aBadColor;
 	}
 }
 
@@ -438,6 +469,67 @@ NSString* ORMJDVacuumModelShowGridChanged = @"ORMJDVacuumModelShowGridChanged";
 	}
 }
 
+
+
+- (void) colorRegions
+{
+	#define kNumberPriorityRegions 7
+	int regionPriority[kNumberPriorityRegions] = {4,6,1,0,3,2,5}; //lowest to highest
+					
+	NSColor* regionColor[kNumberPriorityRegions] = {
+		[NSColor colorWithCalibratedRed:1.0 green:1.0 blue:0.7 alpha:1.0], //Region 0 Turbo
+		[NSColor colorWithCalibratedRed:1.0 green:0.7 blue:1.0 alpha:1.0], //Region 1 RGA
+		[NSColor colorWithCalibratedRed:0.8 green:0.8 blue:1.0 alpha:1.0], //Region 2 Cryostat
+		[NSColor colorWithCalibratedRed:0.7 green:1.0 blue:0.7 alpha:1.0], //Region 3 Cryo pump
+		[NSColor colorWithCalibratedRed:0.6 green:0.6 blue:1.0 alpha:1.0], //Region 4 Thermosyphon
+		[NSColor colorWithCalibratedRed:1.0 green:0.5 blue:0.5 alpha:1.0], //Region 5 N2
+		[NSColor colorWithCalibratedRed:0.8 green:0.8 blue:0.4 alpha:1.0], //Region 6 NEG Pump
+	};
+	int i;
+	for(i=0;i<kNumberPriorityRegions;i++){
+		int region = regionPriority[i];
+		[self colorRegionsConnectedTo:region withColor:regionColor[region]];
+	}
+	
+	NSArray* staticLabels = [self staticLabels];
+	for(ORVacuumStaticLabel* aLabel in staticLabels){
+		int region = [aLabel partTag];
+		if(region<kNumberPriorityRegions){
+			[aLabel setControlColor:regionColor[region]];
+		}
+	}
+}
+
+- (void) colorRegionsConnectedTo:(int)aRegion withColor:(NSColor*)aColor
+{
+	[self resetVisitationFlag];
+	[self recursizelyColorRegionsConnectedTo:aRegion withColor:aColor];
+}
+
+- (void) recursizelyColorRegionsConnectedTo:(int)aRegion withColor:(NSColor*)aColor
+{
+	//this routine is called recursively, so do not reset the colorizationflag in this routine.
+	NSArray* pipes = [self pipesForRegion:aRegion];
+	for(id aPipe in pipes){
+		if([aPipe visited])return;
+		[aPipe setRegionColor:aColor];
+		[aPipe setVisited:YES];
+	}
+	NSArray* gateValves = [self gateValvesConnectedTo:(int)aRegion];
+	for(id aGateValve in gateValves){
+		int state = [aGateValve state];
+		if(state>0 && state!=kGVClosed){
+			if([aGateValve connectingRegion1]!=aRegion)[self recursizelyColorRegionsConnectedTo:[aGateValve connectingRegion1] withColor:aColor];
+			if([aGateValve connectingRegion2]!=aRegion)[self recursizelyColorRegionsConnectedTo:[aGateValve connectingRegion2] withColor:aColor];
+		}
+	}
+}
+
+- (void) resetVisitationFlag
+{
+	for(id aPart in parts)[aPart setVisited:NO];
+}
+
 - (void) addPart:(id)aPart
 {
 	//the parts array contains all parts
@@ -450,6 +542,7 @@ NSString* ORMJDVacuumModelShowGridChanged = @"ORMJDVacuumModelShowGridChanged";
 		[partDictionary setObject:[NSMutableDictionary dictionary] forKey:@"Regions"];
 		[partDictionary setObject:[NSMutableArray array] forKey:@"GateValves"];		
 		[partDictionary setObject:[NSMutableArray array] forKey:@"DynamicLabels"];		
+		[partDictionary setObject:[NSMutableArray array] forKey:@"StaticLabels"];		
 	}
 	NSNumber* thePartKey = [NSNumber numberWithInt:[aPart partTag]];
 	if([aPart isKindOfClass:NSClassFromString(@"ORVacuumPipe")]){
@@ -463,6 +556,9 @@ NSString* ORMJDVacuumModelShowGridChanged = @"ORMJDVacuumModelShowGridChanged";
 	}
 	else if([aPart isKindOfClass:NSClassFromString(@"ORVacuumDynamicLabel")]){
 		[[partDictionary objectForKey:@"DynamicLabels"] addObject:aPart];
+	}
+	else if([aPart isKindOfClass:NSClassFromString(@"ORVacuumStaticLabel")]){
+		[[partDictionary objectForKey:@"StaticLabels"] addObject:aPart];
 	}
 }
 

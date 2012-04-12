@@ -18,24 +18,27 @@
 //-------------------------------------------------------------
 
 #import "ORVacuumParts.h"
+#import "ORAlarm.h"
 
 NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
 @implementation ORVacuumPart
-@synthesize dataSource,partTag,state,value;
+@synthesize dataSource,partTag,state,value,visited;
 - (id) initWithDelegate:(id)aDelegate partTag:(int)aTag
 {
 	self = [super init];
 	self.partTag = aTag;
-	if([aDelegate respondsToSelector:@selector(addPart:)]){
+	if([aDelegate respondsToSelector:@selector(addPart:)] && [aDelegate respondsToSelector:@selector(colorRegions)]){
 		self.dataSource = aDelegate;
 		self.state = 0;
 		self.value = 0.0;
+		self.visited = NO;
 		[aDelegate addPart:self];
 	}
 	return self;
 }
+
 - (void) normalize { /*do nothing subclasses must override*/ }
 - (void) draw { }
 - (void) setState:(int)aState
@@ -59,23 +62,32 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
 @implementation ORVacuumPipe
-@synthesize startPt,endPt,goodColor,badColor;
+@synthesize startPt,endPt,regionColor;
 - (id) initWithDelegate:(id)aDelegate partTag:(int)aTag startPt:(NSPoint)aStartPt endPt:(NSPoint)anEndPt
 {
 	self = [super initWithDelegate:aDelegate partTag:aTag];
-	self.startPt	= aStartPt;
-	self.endPt		= anEndPt;
-	self.goodColor	= [NSColor greenColor]; //default
-	self.badColor	= [NSColor redColor]; //default
+	self.startPt		 = aStartPt;
+	self.endPt			 = anEndPt;
+	self.regionColor = [NSColor lightGrayColor]; //default
 	[self normalize];
 	return self;
 }
 
 - (void) dealloc
 {
-	self.goodColor = nil;
-	self.badColor = nil;
+	self.regionColor = nil;
 	[super dealloc];
+}
+
+- (void) setRegionColor:(NSColor*)aColor
+{
+	if(![aColor isEqual: regionColor]){
+		[aColor retain];
+		[regionColor release];
+		regionColor = aColor;
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORVacuumPartChanged object:dataSource];
+	}
+	
 }
 
 - (void) draw 
@@ -113,8 +125,7 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 	[PIPECOLOR set];
 	float length = endPt.x - startPt.x;
 	[NSBezierPath fillRect:NSMakeRect(startPt.x,startPt.y-kPipeRadius,length,kPipeDiameter)];
-	if([self state]) [goodColor set];
-	else			 [badColor set];
+	[regionColor set];
 	[NSBezierPath fillRect:NSMakeRect(startPt.x-kPipeThickness,startPt.y-kPipeRadius+kPipeThickness,length+2*kPipeThickness,kPipeDiameter-2*kPipeThickness)];
 	[[NSColor blackColor] set];
 	[super draw];
@@ -129,8 +140,7 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 	[PIPECOLOR set];
 	float length = endPt.x - startPt.x;
 	[NSBezierPath fillRect:NSMakeRect(startPt.x,startPt.y-2*kPipeRadius,length,2*kPipeDiameter)];
-	if([self state]) [goodColor set];
-	else			 [badColor set];
+	[regionColor set];
 	[NSBezierPath fillRect:NSMakeRect(startPt.x-kPipeThickness,startPt.y-2*kPipeRadius+kPipeThickness,length+2*kPipeThickness,2*kPipeDiameter-2*kPipeThickness)];
 	[[NSColor blackColor] set];
 	[super draw];
@@ -152,8 +162,7 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 	[PIPECOLOR set];
 	float length = endPt.y - startPt.y;
 	[NSBezierPath fillRect:NSMakeRect(startPt.x-kPipeRadius,startPt.y,kPipeDiameter,length)];
-	if([self state]) [goodColor set];
-	else			 [badColor set];
+	[regionColor set];
 	[NSBezierPath fillRect:NSMakeRect(startPt.x-kPipeRadius+kPipeThickness,startPt.y-kPipeThickness,kPipeDiameter-2*kPipeThickness,length+2*kPipeThickness)];
 	[[NSColor blackColor] set];
 	[super draw];
@@ -169,6 +178,7 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 {
 	self = [super initWithDelegate:aDelegate partTag:aTag];
 	self.location = aPoint;
+	self.regionColor = [NSColor lightGrayColor]; //default
 	return self;			
 }
 
@@ -176,8 +186,7 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 {
 	[PIPECOLOR set];
 	[NSBezierPath fillRect:NSMakeRect(location.x-kPipeRadius,location.y-kPipeRadius,kPipeDiameter,kPipeDiameter)];
-	if([self state]) [goodColor set];
-	else			 [badColor set];
+	[regionColor set];
 	[NSBezierPath fillRect:NSMakeRect(location.x-kPipeRadius+kPipeThickness,location.y-kPipeRadius+kPipeThickness,kPipeDiameter-2*kPipeThickness,kPipeDiameter-2*kPipeThickness)];
 	[[NSColor blackColor] set];
 	[super draw];
@@ -192,6 +201,7 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 {
 	self = [super initWithDelegate:aDelegate partTag:aTag];
 	self.bounds = aRect;
+	self.regionColor = [NSColor lightGrayColor]; //default
 	return self;			
 }
 
@@ -199,8 +209,7 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 {
 	[PIPECOLOR set];
 	[NSBezierPath fillRect:bounds];
-	if([self state]) [goodColor set];
-	else			 [badColor set];
+	[regionColor set];
 	[NSBezierPath fillRect:NSInsetRect(bounds, kPipeThickness, kPipeThickness)];
 	[[NSColor blackColor] set];
 	[super draw];
@@ -211,7 +220,7 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
 @implementation ORVacuumGateValve
-@synthesize location,connectingRegion1,connectingRegion2,controlPreference,label,controlType;
+@synthesize location,connectingRegion1,connectingRegion2,controlPreference,label,controlType,valveAlarm;
 - (id) initWithDelegate:(id)aDelegate partTag:(int)aTag label:(NSString*)aLabel controlType:(int)aControlType at:(NSPoint)aPoint connectingRegion1:(int)aRegion1 connectingRegion2:(int)aRegion2
 {
 	self = [super initWithDelegate:aDelegate partTag:aTag];
@@ -220,13 +229,66 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 	self.connectingRegion2	= aRegion2;
 	self.label				= aLabel;
 	self.controlType		= aControlType;
+	firstTime = YES;
 	return self;
 }
+		
 - (void) dealloc
 {
-	self.label = nil;
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+	self.label		= nil;
+	[valveAlarm clearAlarm];
+	self.valveAlarm = nil;
 	[super dealloc];
 }
+		
+- (void) setState:(int)aState
+{
+	if(aState != state || firstTime){
+		firstTime = NO;
+		state = aState;
+		[dataSource colorRegions];
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORVacuumPartChanged object:dataSource];
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+		if(controlType==k2BitReadBack){
+			if(state == kGVImpossible || state == kGVChanging){
+				[self performSelectorOnMainThread:@selector(startStuckValveTimer) withObject:nil waitUntilDone:NO];
+			}
+			else {
+				if(valveAlarm){
+					[self performSelectorOnMainThread:@selector(clearAlarmState) withObject:nil waitUntilDone:NO];
+				}
+			}
+		}
+	}
+}
+
+- (void) startStuckValveTimer
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+	[self performSelector:@selector(timeout) withObject:nil afterDelay:10];
+}
+
+- (void) clearAlarmState
+{
+	[valveAlarm clearAlarm];
+	self.valveAlarm = nil;
+}
+
+- (void) timeout
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+	if(!valveAlarm){
+		NSString* s = [NSString stringWithFormat:@"%@ Valve Alarm",self.label];
+		ORAlarm* anAlarm = [[ORAlarm alloc] initWithName:s severity:kHardwareAlarm];
+		self.valveAlarm = anAlarm;
+		[anAlarm release];
+		[valveAlarm setSticky:YES];
+		[valveAlarm setHelpString:@"This valve is either stuck or the command state does not match the actual state."];
+	}
+	[valveAlarm postAlarm];
+}
+
 @end
 
 //----------------------------------------------------------------------------------------------------
@@ -244,7 +306,8 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 	[NSBezierPath fillRect:NSMakeRect(location.x-kPipeThickness,location.y+kPipeRadius-kPipeThickness,2*kPipeThickness,2*kPipeThickness)];
 
 	int theState;
-	if(controlType == kManualOnly)	 theState = kGVClosed;
+	if(controlType == kManualOnlyShowClosed)	  theState = kGVClosed;
+	else if(controlType == kManualOnlyShowChanging) theState = kGVChanging;
 	else theState = state;
 	switch(theState){
 		case kGVOpen: break; //open
@@ -293,7 +356,8 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 	[[NSColor blackColor] set];
 
 	int theState;
-	if(controlType == kManualOnly)	 theState = kGVClosed;
+	if(controlType == kManualOnlyShowClosed)	  theState = kGVClosed;
+	else if(controlType == kManualOnlyShowChanging) theState = kGVChanging;
 	else theState = state;
 	
 	switch(theState){
@@ -333,31 +397,46 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
 @implementation ORVacuumStaticLabel
-@synthesize label,bounds,gradient;
+@synthesize label,bounds,gradient,controlColor;
 - (id) initWithDelegate:(id)aDelegate partTag:(int)aTag label:(NSString*)aLabel bounds:(NSRect)aRect
 {
 	self = [super initWithDelegate:aDelegate partTag:aTag];
-	self.bounds = aRect;
-	self.label = aLabel;
+	self.bounds       = aRect;
+	self.label        = aLabel;
+	self.controlColor = [NSColor colorWithCalibratedRed:.75 green:.75 blue:.75 alpha:1];
 	return self;
 }
 
 - (void) dealloc
 {
-	self.label = nil;
-	self.gradient = nil;
+	self.label			= nil;
+	self.gradient		= nil;
+	self.controlColor	= nil;
 	[super dealloc];
+}
+
+- (void) setControlColor:(NSColor*)aColor
+{
+	self.gradient		= nil;
+	[aColor retain];
+	[controlColor release];
+	controlColor = aColor;
+
+	float red,green,blue,alpha;
+		
+	[controlColor getRed:&red green:&green blue:&blue alpha:&alpha];
+	red = MIN(1.0,red*1.5);
+	green = MIN(1.0,green*1.5);
+	blue = MIN(1.0,blue*1.5);
+	NSColor* endingColor = [NSColor colorWithCalibratedRed:red green:green blue:blue alpha:1];
+	self.gradient = [[NSGradient alloc] initWithStartingColor:controlColor endingColor:endingColor];
+	
 }
 
 - (void) draw 
 {
 	[[NSColor blackColor] set];
 	[NSBezierPath strokeRect:bounds];
- 	if(!gradient){
-		NSColor* startingColor = [NSColor colorWithCalibratedRed:.75 green:.75 blue:.75 alpha:1];
-		NSColor* endingColor = [NSColor colorWithCalibratedRed:.9 green:.9 blue:.9 alpha:1];
-		self.gradient = [[NSGradient alloc] initWithStartingColor:startingColor endingColor:endingColor];
-	}
 	[gradient drawInRect:bounds angle:90.];
 	
 	if([label length]){
@@ -375,19 +454,22 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 	[[NSColor blackColor] set];
 }
 @end
+
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
 @implementation ORVacuumDynamicLabel
+- (id) initWithDelegate:(id)aDelegate partTag:(int)aTag label:(NSString*)aLabel bounds:(NSRect)aRect
+{
+	self = [super initWithDelegate:aDelegate partTag:aTag label:aLabel bounds:aRect];
+	self.controlColor = [NSColor colorWithCalibratedRed:.5 green:.75 blue:.5 alpha:1];
+	return self;
+}
+
 - (void) draw 
 {
 	[[NSColor blackColor] set];
 	[NSBezierPath strokeRect:bounds];
- 	if(!gradient){
-		NSColor* startingColor = [NSColor colorWithCalibratedRed:.5 green:.75 blue:.5 alpha:1];
-		NSColor* endingColor = [NSColor colorWithCalibratedRed:.9 green:1 blue:.9 alpha:1];
-		self.gradient = [[NSGradient alloc] initWithStartingColor:startingColor endingColor:endingColor];
-	}
-	[gradient drawInRect:bounds angle:90.];
+ 	[gradient drawInRect:bounds angle:90.];
 	
 	if([label length]){
 		
@@ -429,6 +511,7 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 	[[NSColor blackColor] set];
 }
 @end
+
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
 @implementation ORVacuumLine

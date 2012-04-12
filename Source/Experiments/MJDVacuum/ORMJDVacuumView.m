@@ -22,6 +22,8 @@
 #import "ORMJDVacuumModel.h"
 #import "ORVacuumParts.h"
 
+NSString* ORMJCVacuumLock = @"ORMJCVacuumLock";
+
 @implementation ORMJDVacuumView
 - (void) awakeFromNib
 {
@@ -33,13 +35,13 @@
 		NSRect theControlRect;
 		float x1 = baseX+aValve.location.x;
 		float y1 = baseY+aValve.location.y;
-		float w  = 70; //button width
-		float h  = 25; //button height
+		float w  = 75; //button width
+		float h  = 26; //button height
 		switch(aValve.controlPreference){
 			case kControlAbove: theControlRect = NSMakeRect(x1-w/2.,y1+kPipeRadius+2*kPipeThickness+5,w,h);		break;
 			case kControlBelow: theControlRect = NSMakeRect(x1-w/2.,y1-h-kPipeRadius+2*kPipeThickness-5,w,h);	break;
-			case kControlRight: theControlRect = NSMakeRect(x1+kPipeRadius+2*kPipeThickness+5,y1-h/2.-2,w,h);	break;
-			case kControlLeft:  theControlRect = NSMakeRect(x1-kPipeRadius-2*kPipeThickness-w-5,y1-h/2.-2,w,h);	break;
+			case kControlRight: theControlRect = NSMakeRect(x1+kPipeRadius+2*kPipeThickness+5,y1-h/2.,w,h);	break;
+			case kControlLeft:  theControlRect = NSMakeRect(x1-kPipeRadius-2*kPipeThickness-w,y1-h/2.,w,h);	break;
 		}
 		
 		if(aValve.controlPreference != kControlNone){
@@ -47,6 +49,8 @@
 			NSButton *button = [[NSButton alloc] initWithFrame:theControlRect]; 
 			[button setBezelStyle:NSRoundedBezelStyle];
 			[button setTag:gateValveTag]; 
+			[button setTitle:@"Toggle..."]; 
+
 			[self addSubview:button];
 			
 			//keep a list of gv buttons so can update them easier
@@ -58,6 +62,14 @@
 			[button release];
 		}
 	}
+	
+	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+	[notifyCenter addObserver : self
+                     selector : @selector(lockChanged:)
+                         name : ORMJCVacuumLock
+                        object: nil];
+
+	[self lockChanged:nil];
 }
 
 - (void) dealloc
@@ -81,19 +93,26 @@
 	}
 }
 
+- (void) lockChanged:(NSNotification*)aNotification
+{
+    BOOL locked = [gSecurity isLocked:ORMJCVacuumLock];
+    [lockButton setState: locked];
+	
+	[self updateButtons];
+}
+
 - (void) drawRect:(NSRect)dirtyRect 
 {
 	if([delegate showGrid]) [self drawGrid];
 	NSArray* parts = [[delegate model] parts];
 	for(ORVacuumPart* aPart in parts)[aPart draw];
-	[self updateButtons];
 }
 
 - (void) updateButtons
 {
+    BOOL locked = [gSecurity isLocked:ORMJCVacuumLock];
 	for(id aButton in gvButtons){
-		int currentState = [[delegate model] stateOfGateValve:[aButton tag]];
-		[aButton setTitle:currentState == kGVOpen?@"Close...":(currentState==kGVClosed?@"Open...":@"---")]; 
+		[aButton setEnabled:!locked];
 	}
 }
 
@@ -120,4 +139,17 @@
 		count++;
 	}
 }
+
+- (void) checkGlobalSecurity
+{
+    BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
+    [gSecurity setLock:ORMJCVacuumLock to:secure];
+    [lockButton setEnabled:secure];
+}
+
+- (IBAction) lockAction:(id) sender
+{
+    [gSecurity tryToSetLock:ORMJCVacuumLock to:[sender intValue] forWindow:[self window]];
+}
+
 @end

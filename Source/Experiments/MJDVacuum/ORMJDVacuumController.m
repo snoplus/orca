@@ -87,14 +87,9 @@
 	return [model showGrid];
 }
 
-- (int) stateOfRegion:(int)aTag
+- (void) checkGlobalSecurity
 {
-	return [model stateOfRegion:aTag];
-}
-
-- (int) stateOfGateValve:(int)aTag
-{
-	return [model stateOfGateValve:aTag];
+	[(ORMJDVacuumView*)groupView checkGlobalSecurity];
 }
 
 #pragma mark •••Actions
@@ -106,42 +101,60 @@
 - (IBAction) openGVControlPanel:(id)sender
 {
 	[self endEditing];
-	[gvControlButton setTag:[sender tag]];
-	int gateValveTag = [sender tag];
+	
+	int gateValveTag	  = [sender tag];
 	int currentValveState = [model stateOfGateValve:gateValveTag];
 	ORVacuumGateValve* gv = [model gateValve:gateValveTag];
+	
 	if(gv){
-		int s1 = [model stateOfRegion:[gv connectingRegion1]];
-		int s2 = [model stateOfRegion:[gv connectingRegion2]];
-		[gvControlValveState setStringValue:currentValveState==kGVOpen?@"OPEN":(currentValveState==kGVClosed?@"CLOSED":@"CHANGING")];
-		[gvControlPressureSide1 setStringValue:s1?@"VACUUM":@"UP TO AIR"];
-		[gvControlPressureSide2 setStringValue:s2?@"VACUUM":@"UP TO AIR"];
-		NSString* s;
+		[gvControlValveState setStringValue:currentValveState==kGVOpen?@"OPEN":(currentValveState==kGVClosed?@"CLOSED":@"UnKnown")];
+		int region1		= [gv connectingRegion1];
+		int region2		= [gv connectingRegion2];
+		NSColor* c1		= [model colorOfRegion:region1];
+		NSColor* c2		= [model colorOfRegion:region2];
+		
+		[gvControlPressureSide1 setStringValue:[model dynamicLabel:region1]];
+		[gvControlPressureSide2 setStringValue:[model dynamicLabel:region2]];
+		
+		
+		NSString* s = @"";
+		
 		switch(currentValveState){
 			case kGVOpen:
-				s = @"The valve is currently shown as open.\n\nAre you sure you want to CLOSE it?";
+				[gvOpenToText1 setStringValue:[model namesOfRegionsWithColor:c1]];
+				[gvOpenToText2 setStringValue:@"Each side appears connected now so closing the valve may isolate some regions."];
+				s = @"Are you sure you want to CLOSE it and potentially isolate some regions?";
 				[gvControlButton setTitle:@"YES - CLOSE it"];
 				[gvControlButton setEnabled:YES];
-				break;
+			break;
+				
 			case kGVClosed:
-				if(s1 == s2){
-					s = @"The valve is currently shown as Closed.\n\nAre you sure you want to OPEN it?";
-					[gvControlButton setTitle:@"YES - OPEN it"];
-					[gvControlButton setEnabled:YES];
+				if([c1 isEqual:c2]){
+					[gvOpenToText1 setStringValue:[model namesOfRegionsWithColor:c1]];
+					[gvOpenToText2 setStringValue:@"Each Side Appears Connected now so opening the valve may be OK."];
+					s = @"Are you sure you want to OPEN it?";
 				}
 				else {
-					s = @"The valve is currently shown as Closed with	DIFFERENT PRESSURES on each side.\nAre you sure you want to OPEN it?";
-					[gvControlButton setTitle:@"YES - OPEN it anyway"];
-					[gvControlButton setEnabled:YES];
-				}
-				break;
-			case kGVChanging:
-				s = @"The valve is currently shown as Changing State.\n\n";
+					[gvOpenToText1 setStringValue:[model namesOfRegionsWithColor:c1]];
+					[gvOpenToText2 setStringValue:[model namesOfRegionsWithColor:c2]];
+					s = @"Are you sure you want to OPEN it and join isolated regions?";
+			}
+				[gvControlButton setTitle:@"YES - OPEN it"];
+				[gvControlButton setEnabled:YES];
+			break;
+				
+			default:
+				s = @"The valve is currently shown in an unknown state.";
+				[gvOpenToText1 setStringValue:[model namesOfRegionsWithColor:c1]];
+				[gvOpenToText2 setStringValue:[model namesOfRegionsWithColor:c2]];
 				[gvControlButton setTitle:@"---"];
 				[gvControlButton setEnabled:NO];
-				break;
+			break;
 		}
+		
+		[gvControlButton setTag:gateValveTag];
 		[gvControlField setStringValue:s];
+		
 		[NSApp beginSheet:gvControlPanel modalForWindow:[self window]
 			modalDelegate:self didEndSelector:NULL contextInfo:nil];
 	}
@@ -203,7 +216,8 @@
 				return [gv label];
 			}
 			else  if([[aTableColumn identifier] isEqualToString:@"state"]){
-				if([gv controlType] == kManualOnly) return @"Manual Valve";
+				if([gv controlType]      == kManualOnlyShowClosed) return @"Manual-Closed??";
+				else if([gv controlType] == kManualOnlyShowChanging) return @"Manual-Open??";
 				else {
 					int currentValveState = [gv state];
 					if([gv controlType] == kControlOnly){

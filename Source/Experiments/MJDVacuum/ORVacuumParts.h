@@ -16,6 +16,9 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
+
+@class ORAlarm;
+
 typedef struct  {
 	int type;
 	int partTag;
@@ -67,10 +70,10 @@ typedef struct  {
 #define kVacLine		9
 #define kGVControl		10
 
+#define kGVImpossible				0
 #define kGVOpen					    1
 #define	kGVClosed					2	
 #define kGVChanging					3
-#define kGVImpossible				4
 
 
 #define PIPECOLOR [NSColor darkGrayColor]
@@ -87,6 +90,7 @@ typedef struct  {
 	int partTag;
 	int state;
 	float value;
+	BOOL visited;
 }
 - (id) initWithDelegate:(id)aDelegate partTag:(int)aTag;
 - (void) normalize; 
@@ -95,8 +99,9 @@ typedef struct  {
 - (void) setValue:(float)aState;
 @property (nonatomic,assign) id dataSource;
 @property (nonatomic,assign) int partTag;
-@property (nonatomic,assign) int state;
-@property (nonatomic,assign) float value;
+@property (nonatomic,assign) BOOL visited;
+@property (assign) int state;
+@property (assign) float value;
 @end
 
 //----------------------------------------------------------------------------------------------------
@@ -105,13 +110,11 @@ typedef struct  {
 {
 	NSPoint startPt;
 	NSPoint endPt;
-	NSColor* goodColor;
-	NSColor* badColor;
+	NSColor* regionColor;
 }
 @property (nonatomic,assign) NSPoint startPt;
 @property (nonatomic,assign) NSPoint endPt;
-@property (nonatomic,retain) NSColor* goodColor;
-@property (nonatomic,retain) NSColor* badColor;
+@property (retain) NSColor* regionColor;
 - (id) initWithDelegate:(id)aDelegate partTag:(int)aTag startPt:(NSPoint)aStartPt endPt:(NSPoint)anEndPt;
 @end
 
@@ -146,10 +149,12 @@ typedef struct  {
 	NSString* label;
 	NSRect	  bounds;
 	NSGradient* gradient;
+	NSColor* controlColor;
 }
 - (id) initWithDelegate:(id)aDelegate partTag:(int)aTag label:(NSString*)label bounds:(NSRect)aRect;
 @property (nonatomic,assign) NSRect bounds;
 @property (nonatomic,retain) NSGradient* gradient;
+@property (nonatomic,retain) NSColor* controlColor;
 @property (nonatomic,copy) NSString* label;
 @end
 //----------------------------------------------------------------------------------------------------
@@ -164,9 +169,10 @@ typedef struct  {
 #define kControlLeft  4
 #define kControlNone  5
 
-#define kManualOnly	  0
-#define k2BitReadBack 1
-#define kControlOnly  2
+#define kManualOnlyShowClosed	  0
+#define kManualOnlyShowChanging	  1
+#define k2BitReadBack			  2
+#define kControlOnly			  3
 
 @interface ORVacuumGateValve : ORVacuumPart
 {
@@ -176,6 +182,8 @@ typedef struct  {
 	int connectingRegion1;
 	int connectingRegion2;
 	int	controlPreference;
+	ORAlarm* valveAlarm;
+	BOOL firstTime;
 }
 @property (nonatomic,copy)   NSString* label;
 @property (nonatomic,assign) NSPoint   location;
@@ -183,8 +191,14 @@ typedef struct  {
 @property (nonatomic,assign) int controlType;
 @property (nonatomic,assign) int connectingRegion2;
 @property (nonatomic,assign) int controlPreference;
+@property (nonatomic,retain) ORAlarm* valveAlarm;
+
 - (id) initWithDelegate:(id)aDelegate partTag:(int)aTag label:(NSString*)label controlType:(int)aControlType at:(NSPoint)aPoint connectingRegion1:(int)aRegion1 connectingRegion2:(int)aRegion2;
+- (void) startStuckValveTimer;
+- (void) clearAlarmState;
+- (void) timeout;
 @end
+
 @interface ORVacuumVGateValve	: ORVacuumGateValve { } @end;
 @interface ORVacuumHGateValve	: ORVacuumGateValve { } @end;
 
@@ -216,5 +230,6 @@ extern NSString* ORVacuumPartChanged;
 @interface NSObject (VacuumParts)
 - (BOOL) showGrid;
 - (void) addPart:(id)aPart;
+- (void) colorRegions;
 @end
 
