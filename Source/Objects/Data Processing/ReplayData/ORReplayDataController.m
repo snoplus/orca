@@ -485,9 +485,9 @@
         [fm fileExistsAtPath:fileName isDirectory:&isDirectory];
         if(!isDirectory){
             //just a file
-            if([fileName rangeOfString:@"Run"].location != NSNotFound){
+            //if([fileName rangeOfString:@"Run"].location != NSNotFound){
                 [theFinalList addObject:fileName];
-            }
+           // }
         }
         else {
             //it's a directory
@@ -511,9 +511,9 @@
             [fm fileExistsAtPath:file isDirectory:&isDirectory];
             if(!isDirectory){
                 //just a file
-                if([file rangeOfString:@"Run"].location != NSNotFound){
+                //if([file rangeOfString:@"Run"].location != NSNotFound){
                     [anArray addObject:[NSString stringWithFormat:@"%@/%@",aPath,file]];
-                }
+                //}
             }
             else {
                 //it's a directory
