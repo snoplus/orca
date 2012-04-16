@@ -1680,6 +1680,13 @@
 		8491303C15334EAA00597004 /* TwoBitProcessor.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8491303015334EAA00597004 /* TwoBitProcessor.tif */; };
 		84913AC515376BBF00597004 /* ORMJDPreAmpDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84913AC315376BBF00597004 /* ORMJDPreAmpDecoders.h */; };
 		84913AC615376BBF00597004 /* ORMJDPreAmpDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84913AC415376BBF00597004 /* ORMJDPreAmpDecoders.m */; };
+		84913CA21538698000597004 /* OROutputCallBackController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84913C9C1538698000597004 /* OROutputCallBackController.h */; };
+		84913CA31538698000597004 /* OROutputCallBackController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84913C9D1538698000597004 /* OROutputCallBackController.m */; };
+		84913CA41538698000597004 /* OROutputCallBackModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84913C9E1538698000597004 /* OROutputCallBackModel.h */; };
+		84913CA51538698000597004 /* OROutputCallBackModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84913C9F1538698000597004 /* OROutputCallBackModel.m */; };
+		84913CA61538698000597004 /* OutputCallBack.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84913CA01538698000597004 /* OutputCallBack.nib */; };
+		84913CA71538698000597004 /* OutputCallBack.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84913CA11538698000597004 /* OutputCallBack.tif */; };
+		84914473153C665500597004 /* OutputCallBackVeto.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84914472153C665500597004 /* OutputCallBackVeto.tif */; };
 		8491917F0725B43500F454F1 /* ORToolbarFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 8491917D0725B43400F454F1 /* ORToolbarFactory.m */; };
 		849191800725B43500F454F1 /* ORToolbarFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 8491917E0725B43500F454F1 /* ORToolbarFactory.h */; };
 		849191C70725B5DE00F454F1 /* edu.washington.npl.orca.Document.plist in Resources */ = {isa = PBXBuildFile; fileRef = 849191C60725B5DE00F454F1 /* edu.washington.npl.orca.Document.plist */; };
@@ -4441,6 +4448,13 @@
 		8491303015334EAA00597004 /* TwoBitProcessor.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = TwoBitProcessor.tif; path = Source/Objects/ProcessLogic/ProcessElements/Outputs/TwoBitProcessor/TwoBitProcessor.tif; sourceTree = SOURCE_ROOT; };
 		84913AC315376BBF00597004 /* ORMJDPreAmpDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMJDPreAmpDecoders.h; path = "Source/Objects/Custom Hardware/Majorana Hardware/MJDPreAmp/ORMJDPreAmpDecoders.h"; sourceTree = SOURCE_ROOT; };
 		84913AC415376BBF00597004 /* ORMJDPreAmpDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMJDPreAmpDecoders.m; path = "Source/Objects/Custom Hardware/Majorana Hardware/MJDPreAmp/ORMJDPreAmpDecoders.m"; sourceTree = SOURCE_ROOT; };
+		84913C9C1538698000597004 /* OROutputCallBackController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OROutputCallBackController.h; path = Source/Objects/ProcessLogic/ProcessElements/Outputs/OutputCallBack/OROutputCallBackController.h; sourceTree = SOURCE_ROOT; };
+		84913C9D1538698000597004 /* OROutputCallBackController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OROutputCallBackController.m; path = Source/Objects/ProcessLogic/ProcessElements/Outputs/OutputCallBack/OROutputCallBackController.m; sourceTree = SOURCE_ROOT; };
+		84913C9E1538698000597004 /* OROutputCallBackModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OROutputCallBackModel.h; path = Source/Objects/ProcessLogic/ProcessElements/Outputs/OutputCallBack/OROutputCallBackModel.h; sourceTree = SOURCE_ROOT; };
+		84913C9F1538698000597004 /* OROutputCallBackModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OROutputCallBackModel.m; path = Source/Objects/ProcessLogic/ProcessElements/Outputs/OutputCallBack/OROutputCallBackModel.m; sourceTree = SOURCE_ROOT; };
+		84913CA01538698000597004 /* OutputCallBack.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = OutputCallBack.nib; path = Source/Objects/ProcessLogic/ProcessElements/Outputs/OutputCallBack/OutputCallBack.nib; sourceTree = SOURCE_ROOT; };
+		84913CA11538698000597004 /* OutputCallBack.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = OutputCallBack.tif; path = Source/Objects/ProcessLogic/ProcessElements/Outputs/OutputCallBack/OutputCallBack.tif; sourceTree = SOURCE_ROOT; };
+		84914472153C665500597004 /* OutputCallBackVeto.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = OutputCallBackVeto.tif; path = Source/Objects/ProcessLogic/ProcessElements/Outputs/OutputCallBack/OutputCallBackVeto.tif; sourceTree = SOURCE_ROOT; };
 		8491917D0725B43400F454F1 /* ORToolbarFactory.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORToolbarFactory.m; path = Source/Misc/ORToolbarFactory.m; sourceTree = SOURCE_ROOT; };
 		8491917E0725B43500F454F1 /* ORToolbarFactory.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORToolbarFactory.h; path = Source/Misc/ORToolbarFactory.h; sourceTree = SOURCE_ROOT; };
 		849191C60725B5DE00F454F1 /* edu.washington.npl.orca.Document.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = edu.washington.npl.orca.Document.plist; path = "Source/Main Document/edu.washington.npl.orca.Document.plist"; sourceTree = SOURCE_ROOT; };
@@ -6827,6 +6841,7 @@
 				84C12E710993E3FA006F2901 /* ProcessHistory */,
 				8491302315334EAA00597004 /* BitProcessor */,
 				8491302A15334EAA00597004 /* TwoBitProcessor */,
+				84913C9B1538698000597004 /* OutputCallBack */,
 			);
 			name = Outputs;
 			path = Source/Objects/ProcessLogic/ProcessElements/Outputs;
@@ -8910,6 +8925,21 @@
 			);
 			name = TwoBitProcessor;
 			path = Source/Objects/ProcessLogic/ProcessElements/Outputs/TwoBitProcessor;
+			sourceTree = SOURCE_ROOT;
+		};
+		84913C9B1538698000597004 /* OutputCallBack */ = {
+			isa = PBXGroup;
+			children = (
+				84913C9C1538698000597004 /* OROutputCallBackController.h */,
+				84913C9D1538698000597004 /* OROutputCallBackController.m */,
+				84913C9E1538698000597004 /* OROutputCallBackModel.h */,
+				84913C9F1538698000597004 /* OROutputCallBackModel.m */,
+				84914472153C665500597004 /* OutputCallBackVeto.tif */,
+				84913CA01538698000597004 /* OutputCallBack.nib */,
+				84913CA11538698000597004 /* OutputCallBack.tif */,
+			);
+			name = OutputCallBack;
+			path = Source/Objects/ProcessLogic/ProcessElements/Outputs/OutputCallBack;
 			sourceTree = SOURCE_ROOT;
 		};
 		8491F4730EC0CDEF0084BAD6 /* pmtImage */ = {
@@ -13142,6 +13172,8 @@
 				8491303715334EAA00597004 /* ORTwoBitProcessorController.h in Headers */,
 				8491303915334EAA00597004 /* ORTwoBitProcessorModel.h in Headers */,
 				84913AC515376BBF00597004 /* ORMJDPreAmpDecoders.h in Headers */,
+				84913CA21538698000597004 /* OROutputCallBackController.h in Headers */,
+				84913CA41538698000597004 /* OROutputCallBackModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13980,6 +14012,9 @@
 				8491303215334EAA00597004 /* BitProcessor.tif in Resources */,
 				8491303B15334EAA00597004 /* TwoBitProcessor.nib in Resources */,
 				8491303C15334EAA00597004 /* TwoBitProcessor.tif in Resources */,
+				84913CA61538698000597004 /* OutputCallBack.nib in Resources */,
+				84913CA71538698000597004 /* OutputCallBack.tif in Resources */,
+				84914473153C665500597004 /* OutputCallBackVeto.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14920,6 +14955,8 @@
 				8491303815334EAA00597004 /* ORTwoBitProcessorController.m in Sources */,
 				8491303A15334EAA00597004 /* ORTwoBitProcessorModel.m in Sources */,
 				84913AC615376BBF00597004 /* ORMJDPreAmpDecoders.m in Sources */,
+				84913CA31538698000597004 /* OROutputCallBackController.m in Sources */,
+				84913CA51538698000597004 /* OROutputCallBackModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
