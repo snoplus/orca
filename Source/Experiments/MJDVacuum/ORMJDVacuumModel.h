@@ -24,15 +24,18 @@
 @class ORVacuumPipe;
 @class ORLabJackUE9Model;
 
-@interface ORMJDVacuumModel : OrcaObject <ORAdcProcessor,ORBitProcessor>
+@interface ORMJDVacuumModel : OrcaObject <ORAdcProcessor,ORBitProcessor,ORCallBackBitProcessor>
 {
 	NSMutableDictionary* partDictionary;
-	NSMutableArray* parts;
-	BOOL			showGrid;
-	NSMutableArray* adcMapArray;
+	NSMutableArray*		 parts;
+	BOOL				 showGrid;
+	NSMutableArray*		 adcMapArray;
+    unsigned long		 vetoMask;
 }
 
 #pragma mark ***Accessors
+- (unsigned long) vetoMask;
+- (void) setVetoMask:(unsigned long)aVetoMask;
 - (void) setUpImage;
 - (void) makeMainController;
 - (NSArray*) parts;
@@ -62,8 +65,22 @@
 #pragma mark ***BitProcessor Protocol
 - (BOOL) setProcessBit:(int)channel value:(int)value;
 
+#pragma mark ***CallBackBitProcessor Protocol
+- (void) mapChannel:(int)aChannel toHWObject:(NSString*)objIdentifier hwChannel:(int)objChannel;
+- (void) unMapChannel:(int)aChannel fromHWObject:(NSString*)objIdentifier hwChannel:(int)aHWChannel;
+- (void) vetoChangesOnChannel:(int)aChannel state:(BOOL)aState;
+
 @end
 
+extern NSString* ORMJDVacuumModelVetoMaskChanged;
 extern NSString* ORMJDVacuumModelPollTimeChanged;
 extern NSString* ORMJDVacuumModelShowGridChanged;
+
+
+@interface ORMJDVacuumModel (hidden)
+//we don't want scripts calling these -- too dangerous
+- (void) closeGateValve:(int)aGateValveTag;
+- (void) openGateValve:(int)aGateValveTag;
+- (id) findGateValveControlObj:(ORVacuumGateValve*)aGateValve;
+@end
 

@@ -38,7 +38,11 @@
 }
 
 #pragma mark •••Accessors
-
+- (void) setModel:(id)aModel
+{
+	[super setModel:aModel];
+	[[self window] setTitle:[NSString stringWithFormat:@"MJD Vacuum (Cryostat %d)",[model uniqueIdNumber]]];
+}
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers
@@ -55,15 +59,30 @@
                          name : ORVacuumPartChanged
 						object: model];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(stateChanged:)
+                         name : ORMJDVacuumModelVetoMaskChanged
+						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(vetoMaskChanged:)
+                         name : ORMJDVacuumModelVetoMaskChanged
+						object: model];
+
 }
 - (void) updateWindow
 {
     [super updateWindow];
 	[self showGridChanged:nil];
 	[self stateChanged:nil];
+	[self vetoMaskChanged:nil];
 }
 
 #pragma mark •••Interface Management
+- (void) vetoMaskChanged:(NSNotification*)aNote
+{
+}
+
 - (void) stateChanged:(NSNotification*)aNote
 {
 	[groupView setNeedsDisplay:YES];
@@ -105,7 +124,7 @@
 	int gateValveTag	  = [sender tag];
 	int currentValveState = [model stateOfGateValve:gateValveTag];
 	ORVacuumGateValve* gv = [model gateValve:gateValveTag];
-	
+	unsigned long changesVetoed = ([model vetoMask] & (0x1>>gateValveTag)) != 0;
 	if(gv){
 		[gvControlValveState setStringValue:currentValveState==kGVOpen?@"OPEN":(currentValveState==kGVClosed?@"CLOSED":@"UnKnown")];
 		int region1		= [gv connectingRegion1];
@@ -115,46 +134,70 @@
 		
 		[gvControlPressureSide1 setStringValue:[model dynamicLabel:region1]];
 		[gvControlPressureSide2 setStringValue:[model dynamicLabel:region2]];
-		
-		
 		NSString* s = @"";
+		if([gv controlObj]){
+			[gvHwObjectName setStringValue:[NSString stringWithFormat:@"%@,%d",[gv controlObj],[gv controlChannel]]]; 
 		
-		switch(currentValveState){
-			case kGVOpen:
-				[gvOpenToText1 setStringValue:[model namesOfRegionsWithColor:c1]];
-				[gvOpenToText2 setStringValue:@"Each side appears connected now so closing the valve may isolate some regions."];
-				s = @"Are you sure you want to CLOSE it and potentially isolate some regions?";
-				[gvControlButton setTitle:@"YES - CLOSE it"];
-				[gvControlButton setEnabled:YES];
-			break;
-				
-			case kGVClosed:
-				if([c1 isEqual:c2]){
+			
+			switch(currentValveState){
+				case kGVOpen:
 					[gvOpenToText1 setStringValue:[model namesOfRegionsWithColor:c1]];
-					[gvOpenToText2 setStringValue:@"Each Side Appears Connected now so opening the valve may be OK."];
-					s = @"Are you sure you want to OPEN it?";
-				}
-				else {
+					[gvOpenToText2 setStringValue:@"Each side appears connected now so closing the valve may isolate some regions."];
+					if(!changesVetoed){
+						s = @"Are you sure you want to CLOSE it and potentially isolate some regions?";
+						[gvControlButton setTitle:@"YES - CLOSE it"];
+						[gvControlButton setEnabled:YES];
+					}
+					else {
+						s = @"Changes to this valve have been vetoed. Probably by the process controller.";
+						[gvControlButton setTitle:@"---"];
+						[gvControlButton setEnabled:NO];
+					}
+			
+				break;
+					
+				case kGVClosed:
+					if(!changesVetoed){
+
+						if([c1 isEqual:c2]){
+							[gvOpenToText1 setStringValue:[model namesOfRegionsWithColor:c1]];
+							[gvOpenToText2 setStringValue:@"Each Side Appears Connected now so opening the valve may be OK."];
+							s = @"Are you sure you want to OPEN it?";
+						}
+						else {
+							[gvOpenToText1 setStringValue:[model namesOfRegionsWithColor:c1]];
+							[gvOpenToText2 setStringValue:[model namesOfRegionsWithColor:c2]];
+							s = @"Are you sure you want to OPEN it and join isolated regions?";
+						}
+					
+						[gvControlButton setTitle:@"YES - OPEN it"];
+						[gvControlButton setEnabled:YES];
+					}
+					else {
+						s = @"Changes to this valve have been vetoed. Probably by the process controller.";
+						[gvControlButton setTitle:@"---"];
+						[gvControlButton setEnabled:NO];
+					}
+					break;
+					
+				default:
+					s = @"The valve is currently shown in an unknown state.";
 					[gvOpenToText1 setStringValue:[model namesOfRegionsWithColor:c1]];
 					[gvOpenToText2 setStringValue:[model namesOfRegionsWithColor:c2]];
-					s = @"Are you sure you want to OPEN it and join isolated regions?";
+					[gvControlButton setTitle:@"---"];
+					[gvControlButton setEnabled:NO];
+				break;
 			}
-				[gvControlButton setTitle:@"YES - OPEN it"];
-				[gvControlButton setEnabled:YES];
-			break;
-				
-			default:
-				s = @"The valve is currently shown in an unknown state.";
-				[gvOpenToText1 setStringValue:[model namesOfRegionsWithColor:c1]];
-				[gvOpenToText2 setStringValue:[model namesOfRegionsWithColor:c2]];
-				[gvControlButton setTitle:@"---"];
-				[gvControlButton setEnabled:NO];
-			break;
+			
+			[gvControlButton setTag:gateValveTag];
 		}
-		
-		[gvControlButton setTag:gateValveTag];
+		else {
+			s = @"Not mapped to HW! Valve can NOT be controlled!";
+			[gvHwObjectName setStringValue:@"--"];
+			[gvControlButton setTitle:@"---"];
+			[gvControlButton setEnabled:NO];
+		}
 		[gvControlField setStringValue:s];
-		
 		[NSApp beginSheet:gvControlPanel modalForWindow:[self window]
 			modalDelegate:self didEndSelector:NULL contextInfo:nil];
 	}
@@ -164,14 +207,18 @@
 {
     [gvControlPanel orderOut:nil];
     [NSApp endSheet:gvControlPanel];
-	NSLog(@"got cancel\n");
 }
 
 - (IBAction) changeGVAction:(id)sender
 {
     [gvControlPanel orderOut:nil];
     [NSApp endSheet:gvControlPanel];
-	NSLog(@"got changeit for %d\n",[gvControlButton tag]);
+	int gateValveTag = [gvControlButton tag];
+	int currentValveState = [model stateOfGateValve:gateValveTag];
+	
+	if(currentValveState == kGVOpen)       [model closeGateValve:gateValveTag];
+	else if(currentValveState == kGVClosed)[model openGateValve:gateValveTag];
+	else NSLog(@"GateValve %d in unknown state. Command ignored.\n",gateValveTag);
 }
 
 
@@ -215,12 +262,24 @@
 			else if([[aTableColumn identifier] isEqualToString:@"label"]){
 				return [gv label];
 			}
+			else if([[aTableColumn identifier] isEqualToString:@"vetoed"]){
+				if([gv controlType] == k2BitReadBack || [gv controlType] == k1BitReadBack) return [gv vetoed]?@"Vetoed":@" ";
+				else return @" ";
+			}
+			else if([[aTableColumn identifier] isEqualToString:@"controlObj"]){
+				if([gv controlObj]) return [gv controlObj];
+				else return @" ";
+			}
+			else if([[aTableColumn identifier] isEqualToString:@"controlChannel"]){
+				if([gv controlObj])return [NSNumber numberWithInt:[gv controlChannel]];
+				else return @" ";
+			}
 			else  if([[aTableColumn identifier] isEqualToString:@"state"]){
 				if([gv controlType]      == kManualOnlyShowClosed) return @"Manual-Closed??";
 				else if([gv controlType] == kManualOnlyShowChanging) return @"Manual-Open??";
 				else {
 					int currentValveState = [gv state];
-					if([gv controlType] == kControlOnly){
+					if([gv controlType] == k1BitReadBack){
 						return currentValveState==kGVOpen?@"OPEN":@"CLOSED";
 					}
 					else {

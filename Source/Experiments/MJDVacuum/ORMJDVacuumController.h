@@ -35,6 +35,7 @@
 	IBOutlet NSTextField*   gvOpenToText2;
 	IBOutlet NSTableView*   adcTableView;
 	IBOutlet NSTableView*   gvTableView;
+	IBOutlet NSTextField*   gvHwObjectName;
 }
 
 - (id) init;
@@ -49,6 +50,7 @@
 - (void) toggleGrid;
 
 #pragma mark ***Interface Management
+- (void) vetoMaskChanged:(NSNotification*)aNote;
 - (void) stateChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions

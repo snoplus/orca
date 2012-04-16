@@ -36,6 +36,7 @@
 @end
 
 
+NSString* ORMJDVacuumModelVetoMaskChanged = @"ORMJDVacuumModelVetoMaskChanged";
 NSString* ORMJDVacuumModelShowGridChanged = @"ORMJDVacuumModelShowGridChanged";
 
 @implementation ORMJDVacuumModel
@@ -67,6 +68,23 @@ NSString* ORMJDVacuumModelShowGridChanged = @"ORMJDVacuumModelShowGridChanged";
 }
 
 #pragma mark ***Accessors
+
+- (unsigned long) vetoMask
+{
+    return vetoMask;
+}
+
+- (void) setVetoMask:(unsigned long)aVetoMask
+{
+    vetoMask = aVetoMask;
+	NSArray* gateValves = [self gateValves];
+	for(ORVacuumGateValve* aGateValve in gateValves){
+		int tag = [aGateValve partTag];
+		if(vetoMask & (0x1<<tag))aGateValve.vetoed = YES;
+		else aGateValve.vetoed = NO;
+	}
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDVacuumModelVetoMaskChanged object:self];
+}
 
 - (BOOL) showGrid
 {
@@ -203,10 +221,12 @@ NSString* ORMJDVacuumModelShowGridChanged = @"ORMJDVacuumModelShowGridChanged";
 #pragma mark ***AdcProcessor Protocol
 - (void)processIsStarting
 {
+	[self setVetoMask:0xffffffff];
 }
 
 - (void)processIsStopping
 {
+	[self setVetoMask:0xffffffff];
 }
 
 - (void) startProcessCycle
@@ -242,7 +262,7 @@ NSString* ORMJDVacuumModelShowGridChanged = @"ORMJDVacuumModelShowGridChanged";
 - (BOOL) setProcessBit:(int)channel value:(int)value
 {
 	ORVacuumGateValve* gv = [self gateValve:(int)channel];
-	if([gv controlType] == kControlOnly){
+	if([gv controlType] == k1BitReadBack){
 		if(value==1)[gv setState:kGVClosed];
 		else		[gv setState:kGVOpen];
 	}
@@ -257,7 +277,30 @@ NSString* ORMJDVacuumModelShowGridChanged = @"ORMJDVacuumModelShowGridChanged";
 
 - (NSString*) processingTitle
 {
-	return @"MJD Vac";
+	return [NSString stringWithFormat:@"MJD Vac,%d",[self uniqueIdNumber]];
+}
+
+- (void) mapChannel:(int)aChannel toHWObject:(NSString*)objIdentifier hwChannel:(int)hwChannel;
+{
+	ORVacuumGateValve* aGateValve = [self gateValve:aChannel];
+	aGateValve.controlObj		  = objIdentifier;
+	aGateValve.controlChannel	  = hwChannel;
+}
+
+- (void) unMapChannel:(int)aChannel fromHWObject:(NSString*)objIdentifier hwChannel:(int)aHWChannel;
+{
+	ORVacuumGateValve* aGateValve = [self gateValve:aChannel];
+	aGateValve.controlObj		  = nil;
+}
+
+- (void) vetoChangesOnChannel:(int)aChannel state:(BOOL)aState
+{
+	if(aChannel>=0 && aChannel<32){
+		unsigned long newMask = vetoMask;
+		if(aState) newMask |= (0x1<<aChannel);
+		else newMask &= ~(0x1<<aChannel);
+		if(newMask != vetoMask)[self setVetoMask:newMask];
+	}
 }
 
 @end
@@ -376,10 +419,10 @@ NSString* ORMJDVacuumModelShowGridChanged = @"ORMJDVacuumModelShowGridChanged";
 		{kVacHGateV, 4,		@"V5",			k2BitReadBack,	500, 250,	1,6,	kControlLeft},	//V5. Control + read back
 		{kVacHGateV, 5,		@"V6",			k2BitReadBack,	500, 150,	1,3,	kControlLeft},   //V6. Control + read back
 		
-		{kVacVGateV, 6,		@"B1",			kControlOnly,	150, 200,	1,5,	kControlAbove},	//Control only
-		{kVacHGateV, 7,		@"B2",			kControlOnly,	100, 300,	0,5,	kControlRight},	//Control only
-		{kVacHGateV, 8,		@"B3",			kControlOnly,	600, 70,	3,5,	kControlLeft},	//Control only 
-		{kVacHGateV, 9,		@"B4",			kControlOnly,	700, 70,	2,5,	kControlLeft},	//Control only 
+		{kVacVGateV, 6,		@"B1",			k1BitReadBack,	150, 200,	1,5,	kControlAbove},	//Control only
+		{kVacHGateV, 7,		@"B2",			k1BitReadBack,	100, 300,	0,5,	kControlRight},	//Control only
+		{kVacHGateV, 8,		@"B3",			k1BitReadBack,	600, 70,	3,5,	kControlLeft},	//Control only 
+		{kVacHGateV, 9,		@"B4",			k1BitReadBack,	700, 70,	2,5,	kControlLeft},	//Control only 
 		
 		{kVacVGateV, 10,	@"Burst",		kManualOnlyShowClosed,		300, 300,	2,kUpToAir,	kControlNone},	//burst
 		{kVacVGateV, 11,	@"N2 Manual",	kManualOnlyShowChanging,	280, 80,	5,kUpToAir,	kControlNone},	//Manual N2 supply
@@ -518,7 +561,7 @@ NSString* ORMJDVacuumModelShowGridChanged = @"ORMJDVacuumModelShowGridChanged";
 	NSArray* gateValves = [self gateValvesConnectedTo:(int)aRegion];
 	for(id aGateValve in gateValves){
 		int state = [aGateValve state];
-		if(state>0 && state!=kGVClosed){
+		if(state!=kGVClosed){
 			if([aGateValve connectingRegion1]!=aRegion)[self recursizelyColorRegionsConnectedTo:[aGateValve connectingRegion1] withColor:aColor];
 			if([aGateValve connectingRegion2]!=aRegion)[self recursizelyColorRegionsConnectedTo:[aGateValve connectingRegion2] withColor:aColor];
 		}
@@ -562,5 +605,36 @@ NSString* ORMJDVacuumModelShowGridChanged = @"ORMJDVacuumModelShowGridChanged";
 	}
 }
 
+- (void) closeGateValve:(int)aGateValveTag
+{
+	if((vetoMask & (0x1<<aGateValveTag)) == 0 ){
+		ORVacuumGateValve* aGateValve = [self gateValve:aGateValveTag];
+		id aController = [self findGateValveControlObj:aGateValve];
+		[aController setOutputBit:aGateValve.controlChannel value:0];
+		[aGateValve setCommandedState:kGVCommandClosed];
+	}
+}
 
+- (void) openGateValve:(int)aGateValveTag
+{
+	if((vetoMask & (0x1<<aGateValveTag)) == 0 ){
+		ORVacuumGateValve* aGateValve = [self gateValve:aGateValveTag];
+		id aController = [self findGateValveControlObj:aGateValve];
+		[aController setOutputBit:aGateValve.controlChannel value:1];
+		[aGateValve setCommandedState:kGVCommandOpen];
+	}
+}
+
+- (id) findGateValveControlObj:(ORVacuumGateValve*)aGateValve
+{
+	NSArray* objs = [[self document] collectObjectsConformingTo:@protocol(ORBitProcessing)];
+	NSString* objLabel	= aGateValve.controlObj;
+	
+	for(id anObj in objs){
+		if([[anObj processingTitle] isEqualToString:objLabel]){
+			return anObj;
+		}
+	}
+	return nil;
+}
 @end
