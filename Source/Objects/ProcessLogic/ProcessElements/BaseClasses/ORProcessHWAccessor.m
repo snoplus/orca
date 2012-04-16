@@ -113,7 +113,7 @@ NSString* ORHWAccessLock									= @"ORHWAccessLock";
 
 - (void) viewSource
 {
-	//subclasses can override
+	[[self hwObject] showMainInterface];
 }
 
 - (void) objectsRemoved:(NSNotification*) aNote
