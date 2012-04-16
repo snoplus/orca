@@ -44,3 +44,19 @@
 - (BOOL) setProcessBit:(int)channel value:(int)value;
 - (NSString*) processingTitle;
 @end
+
+@protocol ORCallBackBitProcessor
+- (void) startProcessCycle;
+- (void) endProcessCycle;
+- (void) startProcessCycle;
+- (void) endProcessCycle;
+- (void) mapChannel:(int)aChannel toHWObject:(NSString*)objIdentifier hwChannel:(int)objChannel;
+- (void) unMapChannel:(int)aChannel fromHWObject:(NSString*)objIdentifier hwChannel:(int)aHWChannel;
+- (void) vetoChangesOnChannel:(int)aChannel state:(BOOL)aState;
+- (NSString*) processingTitle;
+@end
+
+@interface NSObject (ORCallBackBitProcessor)
+- (void) setOutputBit:(int)bit value:(BOOL) aValue;
+- (void) vetoChangesOnChannel:(int)aChannel state:(BOOL)aState;
+@end
