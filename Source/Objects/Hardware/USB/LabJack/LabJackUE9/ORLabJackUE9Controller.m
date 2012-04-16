@@ -814,7 +814,7 @@
 	
 	[resetCounterButton setEnabled:!locked];
 	
-	[pollTimePopup		setEnabled:!lockedOrRunningMaintenance];
+	[pollTimePopup		setEnabled:!lockedOrRunningMaintenance  && !inProcess];
 	
 	[aOut0Slider		setEnabled:!lockedOrRunningMaintenance];
 	[aOut1Slider		setEnabled:!lockedOrRunningMaintenance];

@@ -879,6 +879,11 @@ NSString* ORLabJackUE9ModelAdcEnableMaskChanged		= @"ORLabJackUE9ModelAdcEnableM
 	}
 }
 
+- (void) setOutputBit:(int)bit value:(BOOL) aValue
+{
+	[self setDoValueOutBit:bit value:aValue];
+}
+
 - (void) setDoValueOutBit:(int)bit value:(BOOL)aValue
 {
 	unsigned long aMask = doValueOut;
@@ -1055,7 +1060,8 @@ NSString* ORLabJackUE9ModelAdcEnableMaskChanged		= @"ORLabJackUE9ModelAdcEnableM
 {
 	readOnce = NO;
 	//don't use the setter so the undo manager is bypassed
-	doValueOut = processOutputValue & 0xFFFFFF;
+	unsigned long newOutputValue = processOutputMask & processOutputValue & 0xFFFFFF;
+	doValueOut |= newOutputValue;
 }
 
 - (BOOL) processValue:(int)channel

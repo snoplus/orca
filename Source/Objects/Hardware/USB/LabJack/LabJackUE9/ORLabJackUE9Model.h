@@ -173,6 +173,7 @@
 - (unsigned long) doValueOut;
 - (void) setDoValueOut:(unsigned long)aMask;
 - (void) setDoValueOutBit:(int)bit value:(BOOL)aValue;
+- (void) setOutputBit:(int)bit value:(BOOL) aValue;
 
 - (unsigned short) doValueIn;
 - (void) setDoValueIn:(unsigned long)aMask;
