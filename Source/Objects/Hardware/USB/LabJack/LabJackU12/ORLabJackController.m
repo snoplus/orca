@@ -651,7 +651,7 @@
 	[gainPU1			setEnabled:!lockedOrRunningMaintenance && (adcDiff&0x02)];
 	[gainPU2			setEnabled:!lockedOrRunningMaintenance && (adcDiff&0x04)];
 	[gainPU3			setEnabled:!lockedOrRunningMaintenance && (adcDiff&0x08)];
-	[pollTimePopup		setEnabled:!lockedOrRunningMaintenance];
+	[pollTimePopup		setEnabled:!lockedOrRunningMaintenance && !inProcess];
 	
 	[aOut0Slider		setEnabled:!lockedOrRunningMaintenance];
 	[aOut1Slider		setEnabled:!lockedOrRunningMaintenance];
