@@ -31,8 +31,8 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 	self.partTag = aTag;
 	if([aDelegate respondsToSelector:@selector(addPart:)] && [aDelegate respondsToSelector:@selector(colorRegions)]){
 		self.dataSource = aDelegate;
-		self.state = 0;
-		self.value = 0.0;
+		self.state   = 0;
+		self.value   = 0.0;
 		self.visited = NO;
 		[aDelegate addPart:self];
 	}
@@ -45,14 +45,14 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 {
 	if(aState != state){
 		state = aState;
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORVacuumPartChanged object:dataSource];
+		[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORVacuumPartChanged object:dataSource];
 	}
 }
 - (void) setValue:(float)aValue
 {
-	if(aValue != value){
+	if(fabs(aValue-value) > 1.0E-8){
 		value = aValue;
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORVacuumPartChanged object:dataSource];
+		[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORVacuumPartChanged object:dataSource];
 	}
 	
 }
@@ -85,7 +85,7 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 		[aColor retain];
 		[regionColor release];
 		regionColor = aColor;
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORVacuumPartChanged object:dataSource];
+		[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORVacuumPartChanged object:dataSource];
 	}
 	
 }
@@ -221,6 +221,8 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 //----------------------------------------------------------------------------------------------------
 @implementation ORVacuumGateValve
 @synthesize location,connectingRegion1,connectingRegion2,controlPreference,label,controlType,valveAlarm;
+@synthesize controlObj,controlChannel,vetoed,commandedState;
+
 - (id) initWithDelegate:(id)aDelegate partTag:(int)aTag label:(NSString*)aLabel controlType:(int)aControlType at:(NSPoint)aPoint connectingRegion1:(int)aRegion1 connectingRegion2:(int)aRegion2
 {
 	self = [super initWithDelegate:aDelegate partTag:aTag];
@@ -241,25 +243,49 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 	self.valveAlarm = nil;
 	[super dealloc];
 }
-		
+
+- (void) setVetoed:(BOOL)aState
+{
+	vetoed = aState;
+	[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORVacuumPartChanged object:dataSource];
+}
+
+- (void) setCommandedState:(int)aState
+{
+	commandedState = aState;
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+	[self checkState];
+}
+
+- (void) checkState
+{
+	if(commandedState == kGVNoCommandedState){
+		[self performSelectorOnMainThread:@selector(clearAlarmState) withObject:nil waitUntilDone:NO];
+	}
+	else {
+		if(commandedState == kGVCommandOpen && state == kGVOpen){
+			[self performSelectorOnMainThread:@selector(clearAlarmState) withObject:nil waitUntilDone:NO];
+		}
+		else if(commandedState == kGVCommandClosed && state == kGVClosed){
+			[self performSelectorOnMainThread:@selector(clearAlarmState) withObject:nil waitUntilDone:NO];
+		}
+		else {
+			[self performSelectorOnMainThread:@selector(startStuckValveTimer) withObject:nil waitUntilDone:NO];
+		}
+	}
+}
+
 - (void) setState:(int)aState
 {
 	if(aState != state || firstTime){
-		firstTime = NO;
 		state = aState;
+		
 		[dataSource colorRegions];
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORVacuumPartChanged object:dataSource];
+		[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORVacuumPartChanged object:dataSource];
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-		if(controlType==k2BitReadBack){
-			if(state == kGVImpossible || state == kGVChanging){
-				[self performSelectorOnMainThread:@selector(startStuckValveTimer) withObject:nil waitUntilDone:NO];
-			}
-			else {
-				if(valveAlarm){
-					[self performSelectorOnMainThread:@selector(clearAlarmState) withObject:nil waitUntilDone:NO];
-				}
-			}
-		}
+		
+		[self checkState];
+		firstTime = NO;
 	}
 }
 
@@ -300,15 +326,19 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 	[PIPECOLOR set];
 	[NSBezierPath fillRect:NSMakeRect(location.x-kGateValveHousingWidth/2.,location.y+kPipeRadius,kGateValveHousingWidth,2*kPipeThickness)]; //above pipe part
 	[NSBezierPath fillRect:NSMakeRect(location.x-kGateValveHousingWidth/2.,location.y-kPipeRadius-2*kPipeThickness,kGateValveHousingWidth,2*kPipeThickness)]; //below pipe part
-	[[NSColor blackColor] set];
+	[[NSColor blackColor] set];	
+	
+	int theState;
+	if(controlType == kManualOnlyShowClosed)	  theState   = kGVClosed;
+	else if(controlType == kManualOnlyShowChanging) theState = kGVChanging;
+	else {
+		if(self.vetoed)[[NSColor redColor] set];
+		theState = state;
+	}
 	
 	[NSBezierPath fillRect:NSMakeRect(location.x-kPipeThickness,location.y-kPipeRadius-kPipeThickness,2*kPipeThickness,2*kPipeThickness)];
 	[NSBezierPath fillRect:NSMakeRect(location.x-kPipeThickness,location.y+kPipeRadius-kPipeThickness,2*kPipeThickness,2*kPipeThickness)];
-
-	int theState;
-	if(controlType == kManualOnlyShowClosed)	  theState = kGVClosed;
-	else if(controlType == kManualOnlyShowChanging) theState = kGVChanging;
-	else theState = state;
+	
 	switch(theState){
 		case kGVOpen: break; //open
 		case kGVClosed: //closed
@@ -340,7 +370,6 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 		[s drawAtPoint:NSMakePoint(location.x + x_pos+2, location.y + y_pos - 3)];
 	}
 	[[NSColor blackColor] set];
-	
 }
 
 @end
@@ -353,13 +382,19 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 	[PIPECOLOR set];
 	[NSBezierPath fillRect:NSMakeRect(location.x-kPipeRadius - 2*kPipeThickness,location.y-kGateValveHousingWidth/2.,2*kPipeThickness,kGateValveHousingWidth)]; //left of pipe part
 	[NSBezierPath fillRect:NSMakeRect(location.x+kPipeRadius,location.y-kGateValveHousingWidth/2.,2*kPipeThickness,kGateValveHousingWidth)]; //below pipe part
-	[[NSColor blackColor] set];
 
 	int theState;
+	[[NSColor blackColor] set];	
 	if(controlType == kManualOnlyShowClosed)	  theState = kGVClosed;
 	else if(controlType == kManualOnlyShowChanging) theState = kGVChanging;
-	else theState = state;
+	else {
+		if(self.vetoed)[[NSColor redColor] set];
+		theState = state;
+	}
 	
+	[NSBezierPath fillRect:NSMakeRect(location.x-kPipeRadius-kPipeThickness,location.y-kPipeThickness,2*kPipeThickness,2*kPipeThickness)];
+	[NSBezierPath fillRect:NSMakeRect(location.x+kPipeRadius-kPipeThickness,location.y-kPipeThickness,2*kPipeThickness,2*kPipeThickness)];
+
 	switch(theState){
 		case kGVOpen: break; //open
 		case kGVClosed: //closed

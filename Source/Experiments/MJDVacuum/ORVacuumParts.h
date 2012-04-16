@@ -75,6 +75,11 @@ typedef struct  {
 #define	kGVClosed					2	
 #define kGVChanging					3
 
+#define kGVNoCommandedState			0
+#define kGVCommandOpen				1
+#define kGVCommandClosed			2
+
+
 
 #define PIPECOLOR [NSColor darkGrayColor]
 #define kPipeDiameter				12
@@ -172,7 +177,7 @@ typedef struct  {
 #define kManualOnlyShowClosed	  0
 #define kManualOnlyShowChanging	  1
 #define k2BitReadBack			  2
-#define kControlOnly			  3
+#define k1BitReadBack			  3
 
 @interface ORVacuumGateValve : ORVacuumPart
 {
@@ -184,16 +189,25 @@ typedef struct  {
 	int	controlPreference;
 	ORAlarm* valveAlarm;
 	BOOL firstTime;
+	NSString* controlObj;
+	int controlChannel;
+	BOOL vetoed;
+	int commandedState;
 }
+@property (nonatomic,copy)   NSString* controlObj;
+@property (nonatomic,assign) int controlChannel;
 @property (nonatomic,copy)   NSString* label;
 @property (nonatomic,assign) NSPoint   location;
+@property (nonatomic,assign) int commandedState;
 @property (nonatomic,assign) int connectingRegion1;
 @property (nonatomic,assign) int controlType;
 @property (nonatomic,assign) int connectingRegion2;
 @property (nonatomic,assign) int controlPreference;
+@property (nonatomic,assign) BOOL vetoed;
 @property (nonatomic,retain) ORAlarm* valveAlarm;
 
 - (id) initWithDelegate:(id)aDelegate partTag:(int)aTag label:(NSString*)label controlType:(int)aControlType at:(NSPoint)aPoint connectingRegion1:(int)aRegion1 connectingRegion2:(int)aRegion2;
+- (void) checkState;
 - (void) startStuckValveTimer;
 - (void) clearAlarmState;
 - (void) timeout;
