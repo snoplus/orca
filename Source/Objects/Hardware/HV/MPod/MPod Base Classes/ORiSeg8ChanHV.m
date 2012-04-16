@@ -362,8 +362,8 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 	if([self channelInBounds:channel]){
 		[self commitTargetToHwGoal:selectedChannel];
 		[self writeRiseTime];
-		[self writeVoltage:channel];
 		[self writeMaxCurrent:channel];
+		[self writeVoltage:channel];
 	}
 }
 

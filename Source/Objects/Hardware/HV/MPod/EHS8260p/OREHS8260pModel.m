@@ -207,8 +207,8 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 - (void) loadValues:(int)channel
 {
 	[super loadValues:channel];
-	[self writeTripTime:channel];
-	[self writeSupervisorBehaviour:channel];
+	//[self writeTripTime:channel];
+	//[self writeSupervisorBehaviour:channel];
 }
 
 #pragma mark •••Archival
