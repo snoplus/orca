@@ -48,7 +48,10 @@ NSString* ORMotionNodeModelLock							= @"ORMotionNodeModelLock";
 NSString* ORMotionNodeModelSerialNumberChanged			= @"ORMotionNodeModelSerialNumberChanged";
 NSString* ORMotionNodeModelUpdateLongTermTrace			= @"ORMotionNodeModelUpdateLongTermTrace";
 
-#define kMotionNodeDriverPath @"/System/Library/Extensions/SLAB_USBtoUART.kext"
+#define kMotionNodeDriverPath1 @"/System/Library/Extensions/SiLabsUSBDriver.kext"
+#define kMotionNodeDriverPath2 @"/System/Library/Extensions/SiLabsUSBDriver64.kext"
+#define kMotionNodeDriverPath3 @"/System/Library/Extensions/SLAB_USBtoUART.kext"
+
 #define kMotionNodeAveN (2/(100.+1.))
 
 #define kSlope		 (4.0/4095.0)
@@ -987,10 +990,12 @@ static MotionNodeCalibrations motionNodeCalibration[3] = {
 {
 	//make sure the driver is installed.
 	NSFileManager* fm = [NSFileManager defaultManager];
-	if(![fm fileExistsAtPath:kMotionNodeDriverPath]){
-		NSLogColor([NSColor redColor],@"*** Unable To Locate MotionNode Driver ***\n");
+	if(![fm fileExistsAtPath:kMotionNodeDriverPath1] &&
+	   ![fm fileExistsAtPath:kMotionNodeDriverPath2] && 
+	   ![fm fileExistsAtPath:kMotionNodeDriverPath3]){
+		NSLogColor([NSColor redColor],@"*** Unable To Locate a MotionNode Driver ***\n");
 		if(!noDriverAlarm){
-			noDriverAlarm = [[ORAlarm alloc] initWithName:@"No MotionNode Driver Found" severity:0];
+			noDriverAlarm = [[ORAlarm alloc] initWithName:@"No MotionNode Drivers Found" severity:0];
 			[noDriverAlarm setSticky:NO];
 			[noDriverAlarm setHelpStringFromFile:@"NoMotionNodeDriverHelp"];
 		}                      
