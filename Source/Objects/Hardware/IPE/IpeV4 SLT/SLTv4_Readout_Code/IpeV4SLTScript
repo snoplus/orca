@@ -65,13 +65,14 @@ then
 		#touch ORSLTv4Readout.cc
 		#touch ORFLTv4Readout.cc
 		make -B
-		if [ x"$2" = x"" ] ; then
-			echo Start OrcaReadout with standard port 44667 ...
-			~/ORCA/OrcaReadout 44667 &
-		else
-			echo Start OrcaReadout with port $2 ...
-			~/ORCA/OrcaReadout $2 &
-		fi
+		#I commented out the following as Orca seems to start the OrcaReadout a second time -tb-
+		#if [ x"$2" = x"" ] ; then
+		#	echo Start OrcaReadout with standard port 44667 ...
+		#	~/ORCA/OrcaReadout 44667 &
+		#else
+		#	echo Start OrcaReadout with port $2 ...
+		#	~/ORCA/OrcaReadout $2 &
+		#fi
 	else 
 		echo Directory ORCA does not exist: upload readout code, send ON again and recompile!
 	fi

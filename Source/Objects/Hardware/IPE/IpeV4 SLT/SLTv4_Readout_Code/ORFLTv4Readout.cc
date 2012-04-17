@@ -752,11 +752,30 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
 						//uint32_t f3            = srack->theFlt[col]->eventFIFO3->read(eventchan);//TODO: for blocking trace mode (FW 2.1.1.4 and larger) this need to be moved to the end -tb-
 						//uint32_t f3            = srack->theFlt[col]->eventFIFO3->read(0);//TODO: for blocking trace mode (FW 2.1.1.4 and larger) this need to be moved to the end -tb-
                         //uint32_t chmap = f1 >> 8;
+                        uint32_t evsubsec   = eventFIFO2->subSec->getCache();//(f2 >> 2) & 0x1ffffff; // 25 bit
+                        uint32_t adcoffset  = evsubsec & 0x7ff; // cut 11 ls bits (equal to % 2048)                                //evsubsec   = srack->theSlt->subSecCounter->read();
+						//if in DMA mode we need to leave some time (postTriggerTime) until the ADC trace is written to the FLT RAM
+						#if 1
+						if(useDmaBlockRead){//we poll the FIFO; typically we detect a event after 200 subsecs (=10 micro sec/usec) (150-250 subsec) (sometimes 1200-4000 subsec=60-200 usec - is Orca busy here?)
+						                    //as the HW is still recording the ADC trace (post trigg part with typically 1024 and up to 2048 subsec = 51,2-102,4 usec)
+							uint32_t sltsubseccount,sltsubsec1,sltsubsec2,sltsubsec;
+							int32_t diffsubsec;
+							sltsubseccount   = srack->theSlt->subSecCounter->read();
+							sltsubsec1 = sltsubseccount & 0x7ff;
+							sltsubsec2 = (sltsubseccount>>11) & 0x3fff;
+							sltsubsec   =  sltsubsec2 * 2000 + sltsubsec1;
+							diffsubsec = (sltsubsec-evsubsec+20000000) % 20000000;
+//							if(evsubsec>sltsubsec) fprintf(stderr,"---==============-------------------==============================_-----------------______________===========================\n");
+//							fprintf(stderr,"---  diffsubsec is %i\n",diffsubsec);
+//							fprintf(stderr,"---  diffsubsec is %i, post trigg: %i  (  ((0x%08x=%i))  sltsubsec %i, evsubsec %i)\n",diffsubsec,postTriggerTime,sltsubseccount,sltsubseccount,sltsubsec,evsubsec);
+//							if(diffsubsec<postTriggerTime) fprintf(stderr,"---=============break\n");
+							if(diffsubsec<postTriggerTime) break; //FLT still recording ADC trace -> leave for(eventN ...)-loop -tb-
+						}
+						#endif
+						
                         uint32_t chmap = eventFIFO1->channelMap->getCache();
                         uint32_t fifoEventID      = ((f1&0xff)<<4) | (f2>>28);//( (f1 & 0xff) <<5 )  |  (f2 >>28);  //12 bit
                         //uint32_t evsec      = (eventFIFO1->sec12downto5->getCache()<<5) | (eventFIFO2->sec4downto0->getCache());//( (f1 & 0xff) <<5 )  |  (f2 >>27);  //13 bit
-                        uint32_t evsubsec   = eventFIFO2->subSec->getCache();//(f2 >> 2) & 0x1ffffff; // 25 bit
-                        uint32_t adcoffset  = evsubsec & 0x7ff; // cut 11 ls bits (equal to % 2048)                                //evsubsec   = srack->theSlt->subSecCounter->read();
 						uint32_t traceStart16;//start of trace in short array
                                 //if(wfRecordVersion == 0x2){ 
                                     traceStart16 = (adcoffset + postTriggerTime + 1) % 2048;  //TODO: take this as standard from FW 2.1.1.4 on -tb-

@@ -812,7 +812,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 		//[self toggleCrateAction: nil];
 		//[[model sbcLink] startCrate]; //If "Force reload" is checked the readout code will be loaded again and overwrite the simulation mode! -tb-
 		//   [[model sbcLink] startCrateProcess]; //If "Force reload" is checked the readout code will be loaded again and overwrite the simulation mode! -tb-
-		[[model sbcLink] startCrate];
+		//[[model sbcLink] startCrate];
 		if(rememberState !=[[model sbcLink] forceReload]) [[model sbcLink] setForceReload: rememberState];
 	}
 }
@@ -848,12 +848,14 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 		[[model sbcLink] killCrate]; //XCode says "No '-killCrate' method found!" but it is found during runtime!! -tb- How to get rid of this warning?
 		BOOL rememberState = [[model sbcLink] forceReload];
 		if(rememberState) [[model sbcLink] setForceReload: NO];
-		[model sendLinkWithDmaLibConfigScriptON];  
+		//if(rememberState) [[model sbcLink] reloadClient];
+		//sleep(2);
+		[model sendLinkWithDmaLibConfigScriptON];  //this is not blocking but the script will run for several seconds so all subsequent commands shouldn't rely on the script! -tb-
 		//[self connectionAction: nil];
 		//[self toggleCrateAction: nil];
 		//[[model sbcLink] startCrate]; //If "Force reload" is checked the readout code will be loaded again and overwrite the simulation mode! -tb-
 		//   [[model sbcLink] startCrateProcess]; //If "Force reload" is checked the readout code will be loaded again and overwrite the simulation mode! -tb-
-		[[model sbcLink] startCrate];
+		//[[model sbcLink] startCrate];
 		if(rememberState !=[[model sbcLink] forceReload]) [[model sbcLink] setForceReload: rememberState];
 	}
 }
@@ -891,7 +893,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 		//[self toggleCrateAction: nil];
 		//[[model sbcLink] startCrate]; //If "Force reload" is checked the readout code will be loaded again and overwrite the simulation mode! -tb-
 		//   [[model sbcLink] startCrateProcess]; //If "Force reload" is checked the readout code will be loaded again and overwrite the simulation mode! -tb-
-		[[model sbcLink] startCrate];
+		//[[model sbcLink] startCrate];
 		if(rememberState !=[[model sbcLink] forceReload]) [[model sbcLink] setForceReload: rememberState];
 	}
 }
