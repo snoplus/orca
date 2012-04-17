@@ -2250,6 +2250,14 @@
 		84BB920507E210090092B367 /* ORMotorSweeper.m in Sources */ = {isa = PBXBuildFile; fileRef = 84BB920307E210090092B367 /* ORMotorSweeper.m */; };
 		84BB97FB07E613B50092B367 /* ORMotorPattern.m in Sources */ = {isa = PBXBuildFile; fileRef = 84BB97F907E613B50092B367 /* ORMotorPattern.m */; };
 		84BB97FC07E613B50092B367 /* ORMotorPattern.h in Headers */ = {isa = PBXBuildFile; fileRef = 84BB97FA07E613B50092B367 /* ORMotorPattern.h */; };
+		84BBE097153CB5110084E6B1 /* ORTPG256AController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84BBE08F153CB5110084E6B1 /* ORTPG256AController.h */; };
+		84BBE098153CB5110084E6B1 /* ORTPG256AController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84BBE090153CB5110084E6B1 /* ORTPG256AController.m */; };
+		84BBE099153CB5110084E6B1 /* ORTPG256ADecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84BBE091153CB5110084E6B1 /* ORTPG256ADecoders.h */; };
+		84BBE09A153CB5110084E6B1 /* ORTPG256ADecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84BBE092153CB5110084E6B1 /* ORTPG256ADecoders.m */; };
+		84BBE09B153CB5110084E6B1 /* ORTPG256AModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84BBE093153CB5110084E6B1 /* ORTPG256AModel.h */; };
+		84BBE09C153CB5110084E6B1 /* ORTPG256AModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84BBE094153CB5110084E6B1 /* ORTPG256AModel.m */; };
+		84BBE09D153CB5110084E6B1 /* TPG256A.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84BBE095153CB5110084E6B1 /* TPG256A.nib */; };
+		84BBE09E153CB5110084E6B1 /* TPG256A.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84BBE096153CB5110084E6B1 /* TPG256A.tif */; };
 		84BC16550DA14F3600D3935C /* Caen1720.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84BC164F0DA14F3600D3935C /* Caen1720.nib */; };
 		84BC16560DA14F3600D3935C /* ORCaen1720Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84BC16500DA14F3600D3935C /* ORCaen1720Controller.h */; };
 		84BC16580DA14F3600D3935C /* ORCaen1720Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84BC16520DA14F3600D3935C /* ORCaen1720Model.h */; };
@@ -5060,6 +5068,14 @@
 		84BB920307E210090092B367 /* ORMotorSweeper.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORMotorSweeper.m; sourceTree = "<group>"; };
 		84BB97F907E613B50092B367 /* ORMotorPattern.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORMotorPattern.m; path = "Source/Objects/Misc Objects/Workers/MotorWorker/ORMotorPattern.m"; sourceTree = SOURCE_ROOT; };
 		84BB97FA07E613B50092B367 /* ORMotorPattern.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORMotorPattern.h; path = "Source/Objects/Misc Objects/Workers/MotorWorker/ORMotorPattern.h"; sourceTree = SOURCE_ROOT; };
+		84BBE08F153CB5110084E6B1 /* ORTPG256AController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORTPG256AController.h; path = Source/Objects/Hardware/Serial/TPG256A/ORTPG256AController.h; sourceTree = SOURCE_ROOT; };
+		84BBE090153CB5110084E6B1 /* ORTPG256AController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORTPG256AController.m; path = Source/Objects/Hardware/Serial/TPG256A/ORTPG256AController.m; sourceTree = SOURCE_ROOT; };
+		84BBE091153CB5110084E6B1 /* ORTPG256ADecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORTPG256ADecoders.h; path = Source/Objects/Hardware/Serial/TPG256A/ORTPG256ADecoders.h; sourceTree = SOURCE_ROOT; };
+		84BBE092153CB5110084E6B1 /* ORTPG256ADecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORTPG256ADecoders.m; path = Source/Objects/Hardware/Serial/TPG256A/ORTPG256ADecoders.m; sourceTree = SOURCE_ROOT; };
+		84BBE093153CB5110084E6B1 /* ORTPG256AModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORTPG256AModel.h; path = Source/Objects/Hardware/Serial/TPG256A/ORTPG256AModel.h; sourceTree = SOURCE_ROOT; };
+		84BBE094153CB5110084E6B1 /* ORTPG256AModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORTPG256AModel.m; path = Source/Objects/Hardware/Serial/TPG256A/ORTPG256AModel.m; sourceTree = SOURCE_ROOT; };
+		84BBE095153CB5110084E6B1 /* TPG256A.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = TPG256A.nib; path = Source/Objects/Hardware/Serial/TPG256A/TPG256A.nib; sourceTree = SOURCE_ROOT; };
+		84BBE096153CB5110084E6B1 /* TPG256A.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = TPG256A.tif; path = Source/Objects/Hardware/Serial/TPG256A/TPG256A.tif; sourceTree = SOURCE_ROOT; };
 		84BC164F0DA14F3600D3935C /* Caen1720.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = Caen1720.nib; sourceTree = "<group>"; };
 		84BC16500DA14F3600D3935C /* ORCaen1720Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORCaen1720Controller.h; sourceTree = "<group>"; };
 		84BC16520DA14F3600D3935C /* ORCaen1720Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORCaen1720Model.h; sourceTree = "<group>"; };
@@ -7803,6 +7819,7 @@
 				84D258590FA7340B00626276 /* MotionNode */,
 				84A240521032ED28002AFA0B /* MITPulser */,
 				841224CE132E6638001AC05B /* TPG262 */,
+				84BBE08E153CB5110084E6B1 /* TPG256A */,
 				84AB0F331056DA4E0069D5E2 /* ModBus */,
 			);
 			name = Serial;
@@ -10457,6 +10474,22 @@
 			);
 			name = MotorWorker;
 			path = "Source/Objects/Misc Objects/Workers/MotorWorker";
+			sourceTree = SOURCE_ROOT;
+		};
+		84BBE08E153CB5110084E6B1 /* TPG256A */ = {
+			isa = PBXGroup;
+			children = (
+				84BBE08F153CB5110084E6B1 /* ORTPG256AController.h */,
+				84BBE090153CB5110084E6B1 /* ORTPG256AController.m */,
+				84BBE091153CB5110084E6B1 /* ORTPG256ADecoders.h */,
+				84BBE092153CB5110084E6B1 /* ORTPG256ADecoders.m */,
+				84BBE093153CB5110084E6B1 /* ORTPG256AModel.h */,
+				84BBE094153CB5110084E6B1 /* ORTPG256AModel.m */,
+				84BBE095153CB5110084E6B1 /* TPG256A.nib */,
+				84BBE096153CB5110084E6B1 /* TPG256A.tif */,
+			);
+			name = TPG256A;
+			path = Source/Objects/Hardware/Serial/TPG256A;
 			sourceTree = SOURCE_ROOT;
 		};
 		84BC164D0DA14F3600D3935C /* CV1720 */ = {
@@ -13174,6 +13207,9 @@
 				84913AC515376BBF00597004 /* ORMJDPreAmpDecoders.h in Headers */,
 				84913CA21538698000597004 /* OROutputCallBackController.h in Headers */,
 				84913CA41538698000597004 /* OROutputCallBackModel.h in Headers */,
+				84BBE097153CB5110084E6B1 /* ORTPG256AController.h in Headers */,
+				84BBE099153CB5110084E6B1 /* ORTPG256ADecoders.h in Headers */,
+				84BBE09B153CB5110084E6B1 /* ORTPG256AModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14015,6 +14051,8 @@
 				84913CA61538698000597004 /* OutputCallBack.nib in Resources */,
 				84913CA71538698000597004 /* OutputCallBack.tif in Resources */,
 				84914473153C665500597004 /* OutputCallBackVeto.tif in Resources */,
+				84BBE09D153CB5110084E6B1 /* TPG256A.nib in Resources */,
+				84BBE09E153CB5110084E6B1 /* TPG256A.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14957,6 +14995,9 @@
 				84913AC615376BBF00597004 /* ORMJDPreAmpDecoders.m in Sources */,
 				84913CA31538698000597004 /* OROutputCallBackController.m in Sources */,
 				84913CA51538698000597004 /* OROutputCallBackModel.m in Sources */,
+				84BBE098153CB5110084E6B1 /* ORTPG256AController.m in Sources */,
+				84BBE09A153CB5110084E6B1 /* ORTPG256ADecoders.m in Sources */,
+				84BBE09C153CB5110084E6B1 /* ORTPG256AModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
