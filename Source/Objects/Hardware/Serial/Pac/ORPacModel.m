@@ -173,12 +173,12 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 
 - (int) calculateModule
 {
-    return adcChannel%8;
+    return adcChannel/8;
 }
 
 - (int) calculatePreamp
 {
-    return adcChannel/8;
+    return adcChannel%8;
 }
 
 - (int) adcChannel
@@ -192,7 +192,7 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
     
     adcChannel = aAdcChannel;
     module = [self calculateModule];
-    preAmp = [self calculateModule];
+    preAmp = [self calculatePreamp];
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelAdcChannelChanged object:self];
 }
