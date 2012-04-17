@@ -22,7 +22,6 @@
 #import "ORTPG256AModel.h"
 #import "ORSerialPort.h"
 #import "ORSerialPortList.h"
-#import "ORSerialPort.h"
 #import "ORSerialPortAdditions.h"
 #import "ORDataTypeAssigner.h"
 #import "ORDataPacket.h"
@@ -30,6 +29,7 @@
 #import "ORSafeQueue.h"
 
 #pragma mark •••External Strings
+NSString* ORTPG256AModelUnitsChanged = @"ORTPG256AModelUnitsChanged";
 NSString* ORTPG256AModelPressureScaleChanged = @"ORTPG256AModelPressureScaleChanged";
 NSString* ORTPG256AModelShipPressuresChanged = @"ORTPG256AModelShipPressuresChanged";
 NSString* ORTPG256AModelPollTimeChanged		 = @"ORTPG256AModelPollTimeChanged";
@@ -218,6 +218,20 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 
 #pragma mark •••Accessors
 
+- (int) units
+{
+    return units;
+}
+
+- (void) setUnits:(int)aUnits
+{
+	if(aUnits>=0 && aUnits<=2){
+		[[[self undoManager] prepareWithInvocationTarget:self] setUnits:units];
+		units = aUnits;
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORTPG256AModelUnitsChanged object:self];
+	}
+}
+
 - (int) measurementState:(int)index
 {
 	if(index>=0 && index<6)return measurementState[index];
@@ -405,8 +419,10 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
     }
     else      [serialPort close];
     portWasOpen = [serialPort isOpen];
+	if([serialPort isOpen])[self sendUnits];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTPG256AModelPortStateChanged object:self];
 }
+
 - (double) lowLimit:(int)aChan
 {
 	if(aChan>=0 && aChan<6)return lowLimit[aChan];
@@ -470,12 +486,14 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 {
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
+	[self setUnits:			[decoder decodeIntForKey:	 @"units"]];
 	[self setPressureScale:	[decoder decodeIntForKey:	 @"pressureScale"]];
 	[self setShipPressures:	[decoder decodeBoolForKey:	 @"shipPressures"]];
 	[self setPollTime:		[decoder decodeIntForKey:	 @"pollTime"]];
 	[self setPortWasOpen:	[decoder decodeBoolForKey:	 @"portWasOpen"]];
     [self setPortName:		[decoder decodeObjectForKey: @"portName"]];
 	[[self undoManager] enableUndoRegistration];
+	
 	int i;
 	for(i=0;i<6;i++){
 		timeRates[i] = [[ORTimeRate alloc] init];
@@ -490,11 +508,13 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeInt:units			forKey: @"units"];
     [encoder encodeInt:pressureScale	forKey: @"pressureScale"];
     [encoder encodeBool:shipPressures	forKey: @"shipPressures"];
     [encoder encodeInt:pollTime			forKey: @"pollTime"];
     [encoder encodeBool:portWasOpen		forKey: @"portWasOpen"];
     [encoder encodeObject:portName		forKey: @"portName"];
+	
 	int i;
 	for(i=0;i<6;i++){
 		[encoder encodeDouble:highAlarm[i] forKey: [NSString stringWithFormat:@"highAlarm%d",i]];
@@ -521,6 +541,11 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 		[self addCmdToQueue:[NSString stringWithFormat:@"PR%d",i]];
 	}
 	[self addCmdToQueue:@"++ShipRecords"];
+}
+
+- (void) sendUnits
+{
+	[self addCmdToQueue:[NSString stringWithFormat:@"UNI,%d",units]];
 }
 
 #pragma mark •••Data Records
@@ -725,6 +750,9 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 				[self setPressure:channel value:thePressure];
 			}
 		}
+	}
+	else if([lastRequest hasPrefix:@"UNI"]){
+		//for now just ignore and let the select by the user stand....
 	}
 }
 

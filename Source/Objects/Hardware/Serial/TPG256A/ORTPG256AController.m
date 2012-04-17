@@ -143,6 +143,11 @@
                          name : ORTPG256AModelHighAlarmChanged
 						object: model];	
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(unitsChanged:)
+                         name : ORTPG256AModelUnitsChanged
+						object: model];
+
 }
 
 - (void) setModel:(id)aModel
@@ -165,6 +170,12 @@
 	[self pressureScaleChanged:nil];
 	[self highLimitChanged:nil];
 	[self highAlarmChanged:nil];
+	[self unitsChanged:nil];
+}
+
+- (void) unitsChanged:(NSNotification*)aNote
+{
+	[unitsPU selectItemAtIndex: [model units]];
 }
 
 - (void) highLimitChanged:(NSNotification*)aNote
@@ -318,6 +329,12 @@
 
 
 #pragma mark ***Actions
+
+- (void) unitsAction:(id)sender
+{
+	[model setUnits:[sender indexOfSelectedItem]];	
+	[model sendUnits];
+}
 
 - (void) pressureScaleAction:(id)sender
 {

@@ -24,6 +24,7 @@
 @interface ORTPG256AController : OrcaObjectController
 {
     IBOutlet NSTextField*   lockDocField;
+	IBOutlet NSPopUpButton* unitsPU;
 	IBOutlet NSPopUpButton*	pressureScalePU;
 	IBOutlet NSButton*		shipPressuresButton;
     IBOutlet NSButton*      lockButton;
@@ -48,6 +49,7 @@
 - (void) updateWindow;
 
 #pragma mark ***Interface Management
+- (void) unitsChanged:(NSNotification*)aNote;
 - (void) highLimitChanged:(NSNotification*)aNote;
 - (void) highAlarmChanged:(NSNotification*)aNote;
 - (void) pressureScaleChanged:(NSNotification*)aNote;
@@ -63,6 +65,7 @@
 - (NSString*) pressureValuesForIndex:(int)index;
 
 #pragma mark ***Actions
+- (IBAction) unitsAction:(id)sender;
 - (IBAction) pressureScaleAction:(id)sender;
 - (IBAction) shipPressuresAction:(id)sender;
 - (IBAction) lockAction:(id) sender;

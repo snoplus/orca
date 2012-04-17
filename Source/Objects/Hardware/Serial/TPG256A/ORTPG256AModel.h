@@ -58,6 +58,7 @@
 		float			pressureScaleValue;
 		int				portDataState;
 		BOOL			readOnce;
+    int units;
 }
 
 #pragma mark •••Initialization
@@ -68,6 +69,8 @@
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark •••Accessors
+- (int) units;
+- (void) setUnits:(int)aUnits;
 - (int) measurementState:(int)index;
 - (void) setMeasurementState:(int)index value:(int)aMeasurementState;
 - (float) pressureScaleValue;
@@ -111,6 +114,7 @@
 #pragma mark •••Commands
 - (void) addCmdToQueue:(NSString*)aCmd;
 - (void) readPressures;
+- (void) sendUnits;
 
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
@@ -130,6 +134,7 @@
 - (void) setProcessOutput:(int)channel value:(int)value;
 @end
 
+extern NSString* ORTPG256AModelUnitsChanged;
 extern NSString* ORTPG256AModelLowLimitChanged;
 extern NSString* ORTPG256AModelLowAlarmChanged;
 extern NSString* ORTPG256AModelHighLimitChanged;
