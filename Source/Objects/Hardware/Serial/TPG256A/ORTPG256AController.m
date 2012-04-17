@@ -266,9 +266,10 @@
 
     [lockButton setState: locked];
 
-    [portListPopup setEnabled:!locked];
+    [portListPopup	setEnabled:!locked];
     [openPortButton setEnabled:!locked];
-    [pollTimePopup setEnabled:!locked];
+    [pollTimePopup	setEnabled:!locked];
+    [unitsPU		setEnabled:!locked];
     [shipPressuresButton setEnabled:!locked];
     
     NSString* s = @"";
