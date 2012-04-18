@@ -190,28 +190,30 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 
 - (void) shipPressureValues
 {
-    if([[ORGlobal sharedGlobal] runInProgress]){
-		
-		unsigned long data[kTPG256ARecordLength];
-		data[0] = dataId | kTPG256ARecordLength;
-		data[1] = [self uniqueIdNumber]&0xfff;
-		
-		union {
-			float asFloat;
-			unsigned long asLong;
-		}theData;
-		int index = 2;
-		int i;
-		for(i=0;i<6;i++){
-			theData.asFloat = pressure[i];
-			data[index] = theData.asLong;
-			index++;
+	if(shipPressures) {
+		if([[ORGlobal sharedGlobal] runInProgress]){
 			
-			data[index] = timeMeasured[i];
-			index++;
+			unsigned long data[kTPG256ARecordLength];
+			data[0] = dataId | kTPG256ARecordLength;
+			data[1] = [self uniqueIdNumber]&0xfff;
+			
+			union {
+				float asFloat;
+				unsigned long asLong;
+			}theData;
+			int index = 2;
+			int i;
+			for(i=0;i<6;i++){
+				theData.asFloat = pressure[i];
+				data[index] = theData.asLong;
+				index++;
+				
+				data[index] = timeMeasured[i];
+				index++;
+			}
+			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
+																object:[NSData dataWithBytes:data length:sizeof(long)*kTPG256ARecordLength]];
 		}
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-															object:[NSData dataWithBytes:data length:sizeof(long)*kTPG256ARecordLength]];
 	}
 }
 
@@ -325,7 +327,6 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 		//get the time(UT!)
 		time_t	ut_Time;
 		time(&ut_Time);
-		//struct tm* theTimeGMTAsStruct = gmtime(&theTime);
 		timeMeasured[index] = ut_Time;
 
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORTPG256APressureChanged 
@@ -487,11 +488,11 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
 	[self setUnits:			[decoder decodeIntForKey:	 @"units"]];
+	[self setPortWasOpen:	[decoder decodeBoolForKey:	 @"portWasOpen"]];
+    [self setPortName:		[decoder decodeObjectForKey: @"portName"]];
 	[self setPressureScale:	[decoder decodeIntForKey:	 @"pressureScale"]];
 	[self setShipPressures:	[decoder decodeBoolForKey:	 @"shipPressures"]];
 	[self setPollTime:		[decoder decodeIntForKey:	 @"pollTime"]];
-	[self setPortWasOpen:	[decoder decodeBoolForKey:	 @"portWasOpen"]];
-    [self setPortName:		[decoder decodeObjectForKey: @"portName"]];
 	[[self undoManager] enableUndoRegistration];
 	
 	int i;
@@ -536,11 +537,13 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 
 - (void) readPressures
 {
-	int i;
-	for(i=1;i<=6;i++){
-		[self addCmdToQueue:[NSString stringWithFormat:@"PR%d",i]];
+	@synchronized(self) {
+		int i;
+		for(i=0;i<6;i++){
+			[self addCmdToQueue:[NSString stringWithFormat:@"PR%d",i+1]];
+		}
+		[self addCmdToQueue:@"++ShipRecords"];
 	}
-	[self addCmdToQueue:@"++ShipRecords"];
 }
 
 - (void) sendUnits
@@ -715,7 +718,7 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 	if([cmdQueue count] == 0) return;
 	NSString* aCmd = [cmdQueue dequeue];
 	if([aCmd isEqualToString:@"++ShipRecords"]){
-		if(shipPressures) [self shipPressureValues];
+		[self shipPressureValues];
 	}
 	else {
 		if(![aCmd hasSuffix:@"\r\n"]) {
