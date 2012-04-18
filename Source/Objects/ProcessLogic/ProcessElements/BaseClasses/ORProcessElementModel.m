@@ -263,32 +263,44 @@ NSString* ORProcessElementForceUpdateNotification   = @"ORProcessElementForceUpd
 
 - (NSRect) frame
 {
-	if(![self useAltView] || ![self canBeInAltView])	return [super frame];
-	else					return altFrame;
+	if(![self useAltView])			return [super frame];
+	else {
+		if([self canBeInAltView])	return altFrame;
+		else						return NSZeroRect;
+	}
 }
 
 - (void) setBounds:(NSRect)aValue
 {
-	if(![self useAltView] || ![self canBeInAltView])	[super setBounds:aValue];
-	else					altBounds = aValue;
+	if(![self useAltView])	[super setBounds:aValue];
+	else if([self canBeInAltView]) altBounds = aValue;
 }
 
 - (NSRect) bounds
 {
-	if(![self useAltView] || ![self canBeInAltView])	return [super bounds];
-    else					return altBounds;
+	if(![self useAltView])			return [super bounds];
+    else {
+		if([self canBeInAltView])	return altBounds;
+		else						return NSZeroRect;
+	}
 }
 
 - (void) setOffset:(NSPoint)aPoint
 {
-	if(![self useAltView] || ![self canBeInAltView])	[super setOffset:aPoint];
-	else					altOffset = aPoint;
+	if(![self useAltView])	[super setOffset:aPoint];
+	else {
+		if([self canBeInAltView]) altOffset = aPoint;
+		else					  altOffset = NSZeroPoint;
+	}
 }
 
 - (NSPoint)offset
 {
-    if(![self useAltView] || ![self canBeInAltView])	return [super offset];
-	else					return altOffset;
+    if(![self useAltView])			return [super offset];
+	else {
+		 if([self canBeInAltView])	return altOffset;
+		 else						return NSZeroPoint;
+	}
 }
 
 - (void) setGuardian:(id)aGuardian
