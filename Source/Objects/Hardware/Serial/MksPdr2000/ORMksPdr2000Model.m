@@ -362,11 +362,12 @@ NSString* ORMksPdr2000Lock = @"ORMksPdr2000Lock";
 - (void) openPort:(BOOL)state
 {
     if(state) {
+        [serialPort open];
 		[serialPort setSpeed:9600];
 		[serialPort setParityOdd];
 		[serialPort setStopBits2:1];
 		[serialPort setDataBits:7];
-        [serialPort open];
+		[serialPort commitChanges];
     }
     else      [serialPort close];
     portWasOpen = [serialPort isOpen];

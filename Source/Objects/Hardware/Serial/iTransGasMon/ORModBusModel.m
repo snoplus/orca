@@ -250,11 +250,12 @@ NSString* ORModBusLock						= @"ORModBusLock";
 - (void) openPort:(BOOL)state
 {
     if(state) {
+        [serialPort open];
 		[serialPort setSpeed:9600];
 		[serialPort setParityNone];
 		[serialPort setStopBits2:NO];
 		[serialPort setDataBits:8];
-        [serialPort open];
+		[serialPort commitChanges];
 		[serialPort setDelegate:self];
 		for(id aSensor in sensors)[(ORiTransGasSensorModel*)aSensor setFullRead:YES];
     }

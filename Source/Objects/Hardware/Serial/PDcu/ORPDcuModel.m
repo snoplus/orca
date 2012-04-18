@@ -351,13 +351,13 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 - (void) openPort:(BOOL)state
 {
     if(state) {
+        [serialPort open];
 		[serialPort setSpeed:9600];
 		[serialPort setParityNone];
 		[serialPort setStopBits2:NO];
 		[serialPort setDataBits:8];
 		[serialPort commitChanges];
 
-        [serialPort open];
 		[serialPort setDelegate:self];
     }
     else {
