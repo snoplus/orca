@@ -33,7 +33,6 @@
     IBOutlet NSPopUpButton* pollTimePopup;
     IBOutlet NSButton*      openPortButton;
     IBOutlet NSButton*      readPressuresButton;
-    IBOutlet NSMatrix*      pressure1Matrix;
 	IBOutlet ORCompositeTimeLineView*   plotter0;
 	IBOutlet NSTableView*	pressureTableView;
 	IBOutlet NSTableView*	processLimitTableView;
