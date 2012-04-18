@@ -12,7 +12,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="1199"/>
+			<integer value="6"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -247,7 +247,7 @@
 									<string>NeXT TIFF v4.0 pasteboard type</string>
 								</object>
 							</object>
-							<string key="NSFrame">{{20, 595}, {122, 46}}</string>
+							<string key="NSFrame">{{20, 590}, {95, 61}}</string>
 							<reference key="NSSuperview" ref="584450007"/>
 							<reference key="NSNextKeyView" ref="941040055"/>
 							<bool key="NSEnabled">YES</bool>
@@ -256,10 +256,10 @@
 								<int key="NSCellFlags2">33554432</int>
 								<object class="NSCustomResource" key="NSContents">
 									<string key="NSClassName">NSImage</string>
-									<string key="NSResourceName">Mks651c</string>
+									<string key="NSResourceName">CP8Cryopump</string>
 								</object>
 								<int key="NSAlign">0</int>
-								<int key="NSScale">1</int>
+								<int key="NSScale">3</int>
 								<int key="NSStyle">0</int>
 								<bool key="NSAnimates">NO</bool>
 							</object>
@@ -2666,7 +2666,7 @@
 						<object class="NSTextField" id="53305426">
 							<reference key="NSNextResponder" ref="584450007"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{67, 570}, {95, 17}}</string>
+							<string key="NSFrame">{{67, 565}, {95, 17}}</string>
 							<reference key="NSSuperview" ref="584450007"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="430997170">
@@ -2682,7 +2682,7 @@
 						<object class="NSTextField" id="170203691">
 							<reference key="NSNextResponder" ref="584450007"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{17, 573}, {48, 14}}</string>
+							<string key="NSFrame">{{17, 568}, {48, 14}}</string>
 							<reference key="NSSuperview" ref="584450007"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="243939192">
@@ -3708,9 +3708,6 @@
 							<reference ref="559351166"/>
 							<reference ref="129077670"/>
 							<reference ref="1043570393"/>
-							<reference ref="435822873"/>
-							<reference ref="170203691"/>
-							<reference ref="53305426"/>
 							<reference ref="558323932"/>
 							<reference ref="680788371"/>
 							<reference ref="617056162"/>
@@ -3722,6 +3719,9 @@
 							<reference ref="396197416"/>
 							<reference ref="438382728"/>
 							<reference ref="396616344"/>
+							<reference ref="435822873"/>
+							<reference ref="53305426"/>
+							<reference ref="170203691"/>
 						</object>
 						<reference key="parent" ref="261041963"/>
 					</object>
@@ -6214,7 +6214,7 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<object class="NSAffineTransform">
-						<bytes key="NSTransformStruct">AUGgAABEP8AAA</bytes>
+						<bytes key="NSTransformStruct">AUGgAABEFMAAA</bytes>
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<object class="NSAffineTransform">
@@ -6289,7 +6289,7 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<object class="NSAffineTransform">
-						<bytes key="NSTransformStruct">P4AAAL+AAABCpAAAxD8AAA</bytes>
+						<bytes key="NSTransformStruct">P4AAAL+AAABChgAAxBJAAA</bytes>
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -6302,7 +6302,7 @@
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<object class="NSAffineTransform">
-						<bytes key="NSTransformStruct">P4AAAL+AAABA4AAAxD8AAA</bytes>
+						<bytes key="NSTransformStruct">P4AAAL+AAABBiAAAxBJAAA</bytes>
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -6933,6 +6933,20 @@
 					<string key="className">NSObject</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Experiments/MJDVacuum/ORMJDVacuumView.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Experiments/MJDVacuum/ORVacuumParts.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">Source/Experiments/Ncd/Detector/NcdDetector.h</string>
 					</object>
 				</object>
@@ -7186,6 +7200,13 @@
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">Source/Objects/Hardware/HV/MPod/MPod Controller/ORMPodCModel.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Objects/Hardware/Hardware Base Classes/ORBitProcessing.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -9389,16 +9410,16 @@
 			<bool key="EncodedWithXMLCoder">YES</bool>
 			<object class="NSArray" key="dict.sortedKeys">
 				<bool key="EncodedWithXMLCoder">YES</bool>
+				<string>CP8Cryopump</string>
 				<string>Locked</string>
-				<string>Mks651c</string>
 				<string>NSMenuCheckmark</string>
 				<string>NSMenuMixedState</string>
 				<string>Unlocked</string>
 			</object>
 			<object class="NSMutableArray" key="dict.values">
 				<bool key="EncodedWithXMLCoder">YES</bool>
+				<string>{65, 63}</string>
 				<string>{33, 36}</string>
-				<string>{100, 51}</string>
 				<string>{9, 8}</string>
 				<string>{7, 2}</string>
 				<string>{33, 36}</string>
