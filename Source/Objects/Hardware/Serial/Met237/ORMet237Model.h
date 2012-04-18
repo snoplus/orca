@@ -33,14 +33,10 @@
         NSString*       portName;
         BOOL            portWasOpen;
         ORSerialPort*   serialPort;
-        unsigned long	dataId;
 		NSString*		lastRequest;
 		NSMutableArray* cmdQueue;
 		unsigned long	timeMeasured;
         NSMutableString* buffer;
-		unsigned int    currentRequest;
-		unsigned int    waitTime;
-		unsigned int    expectedCount;
 		NSString* measurementDate;
 		float size1;
 		float size2;
@@ -56,8 +52,8 @@
 		BOOL statusComingIn;
 		ORTimeRate*			timeRates[2];
 		BOOL	wasRunning;
-    float maxCounts;
-    float countAlarmLimit;
+		float maxCounts;
+		float countAlarmLimit;
 }
 
 #pragma mark ***Initialization

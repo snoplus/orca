@@ -482,11 +482,6 @@ NSString* ORMet637Lock = @"ORMet637Lock";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMet637ModelMeasurementDateChanged object:self];
 }
 
-- (unsigned long) timeMeasured
-{
-	return timeMeasured;
-}
-
 - (BOOL) portWasOpen
 {
     return portWasOpen;

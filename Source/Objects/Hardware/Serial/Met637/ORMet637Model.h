@@ -34,13 +34,7 @@
         NSString*       portName;
         BOOL            portWasOpen;
         ORSerialPort*   serialPort;
-        unsigned long	dataId;
-		NSString*		lastRequest;
-		unsigned long	timeMeasured;
         NSMutableString* buffer;
-		unsigned int    currentRequest;
-		unsigned int    waitTime;
-		unsigned int    expectedCount;
 		NSString*		measurementDate;
 		ORTimeRate*		timeRates[8];
 		int				count[6];
@@ -52,8 +46,6 @@
 		NSDate*			cycleStarted;
 		NSDate*			cycleWillEnd;
 		int				cycleNumber;
-		BOOL			recordComingIn;
-		BOOL			statusComingIn;
 		BOOL			wasRunning;
 		int				actualDuration;
 		float			temperature;
@@ -125,7 +117,6 @@
 - (NSString*) portName;
 - (void) setPortName:(NSString*)aPortName;
 - (void) openPort:(BOOL)state;
-- (unsigned long) timeMeasured;
 - (NSString*) countingModeString;
 - (float) countAlarmLimit:(int)index;
 - (void) setIndex:(int)index countAlarmLimit:(float)aCountAlarmLimit;
