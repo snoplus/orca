@@ -325,7 +325,7 @@
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[[self window] setTitle:[NSString stringWithFormat:@"<aratjpm CP-8 (Unit %d)",[model uniqueIdNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"CP-8 (Unit %d)",[model uniqueIdNumber]]];
 }
 
 - (void) updateWindow
