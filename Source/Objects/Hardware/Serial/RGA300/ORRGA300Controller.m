@@ -300,7 +300,17 @@
                      selector : @selector(currentAmuIndexChanged:)
                          name : ORRGA300ModelCurrentAmuIndexChanged
                        object : model];	
-	
+    
+	[notifyCenter addObserver : self
+                     selector : @selector(useIonizerDefaultsChanged:)
+                         name : ORRGA300ModelUseIonizerDefaultsChanged
+                       object : model];	    
+
+    [notifyCenter addObserver : self
+                     selector : @selector(useDetectorDefaultsChanged:)
+                         name : ORRGA300ModelUseDetectorDefaultsChanged
+                       object : model];	    
+
 }
 - (void) amuCountChanged:(NSNotification*)aNote
 {
@@ -371,7 +381,22 @@
 	[self scanDataChanged:nil];
 	[self amuCountChanged:nil];
 	[self currentAmuIndexChanged:nil];
+    [self useIonizerDefaultsChanged:nil];
+    [self useDetectorDefaultsChanged:nil];
 }
+
+- (void) useIonizerDefaultsChanged:(NSNotification*)aNote
+{
+    [useIonizerDefaultsMatrix selectCellWithTag:[model useIonizerDefaults]];
+    [self updateButtons];
+}
+
+- (void) useDetectorDefaultsChanged:(NSNotification*)aNote
+{
+    [useDetectorDefaultsMatrix selectCellWithTag:[model useDetectorDefaults]];
+    [self updateButtons];
+}
+
 
 - (void) scanDataChanged:(NSNotification*)aNote
 {
@@ -417,8 +442,26 @@
 	float hvBias = [model elecMultHVBiasRB];
 	if(hvBias==0){
 		[elecMultHVBiasRBField setStringValue:@"OFF"];
+        [elecMultHVBiasOnOffButton setTitle:@"Turn On"];
 	}
-	else [elecMultHVBiasRBField setFloatValue: [model elecMultHVBiasRB]];
+	else {
+        [elecMultHVBiasRBField setFloatValue: [model elecMultHVBiasRB]];
+        [elecMultHVBiasOnOffButton setTitle:@"Turn Off"];
+    }
+	[self updateButtons];
+}
+
+- (void) ionizerFilamentCurrentRBChanged:(NSNotification*)aNote
+{
+	float filamentCurrent = [model ionizerFilamentCurrentRB];
+	if(filamentCurrent==0){
+		[ionizerFilamentCurrentRBField setStringValue:@"OFF"];
+        [filamentOnOffButton setTitle:@"Turn On"];
+	}
+	else {
+        [ionizerFilamentCurrentRBField setFloatValue: [model ionizerFilamentCurrentRB]];
+        [filamentOnOffButton setTitle:@"Turn Off"];
+    }
 	[self updateButtons];
 }
 
@@ -442,16 +485,6 @@
 	[ionizerElectronEnergyRBField setIntValue: [model ionizerElectronEnergyRB]];
 }
 
-- (void) ionizerFilamentCurrentRBChanged:(NSNotification*)aNote
-{
-	float filamentCurrent = [model ionizerFilamentCurrentRB];
-	if(filamentCurrent==0){
-		[ionizerFilamentCurrentRBField setStringValue:@"OFF"];
-	}
-	else [ionizerFilamentCurrentRBField setFloatValue: [model ionizerFilamentCurrentRB]];
-	[self updateButtons];
-}
-
 - (void) elecMultGainChanged:(NSNotification*)aNote
 {
 	[elecMultGainField setFloatValue: [model elecMultGain]];
@@ -459,7 +492,7 @@
 
 - (void) electronMultiOptionChanged:(NSNotification*)aNote
 {
-	[electronMultiOptionField setStringValue: [model electronMultiOption]?@"":@"NO CDEM Option"];
+	[electronMultiOptionField setStringValue: [model electronMultiOption]?@"":@"NO EM Option"];
 	[self updateButtons];
 }
 
@@ -736,20 +769,22 @@
 	BOOL opIsRunning = [model currentActivity] != kRGAIdle;
     [lockButton setState: locked];
 	[serialPortController updateButtons:locked];
-	[elecMultHVBiasField		setEnabled: [model electronMultiOption] && !locked];
+    BOOL useDetectorDefaults = [model useDetectorDefaults];
+	[noiseFloorSettingField		setEnabled: !useDetectorDefaults && !locked];
+	[elecMultHVBiasField		setEnabled: !useDetectorDefaults && [model electronMultiOption] && !locked];
 	[elecMultGainField			setEnabled: [model electronMultiOption] && !locked];
 	[elecMultHVBiasOnOffButton	setEnabled: [model electronMultiOption] && !locked];
 	
-	[ionizerIonEnergyPU				setEnabled:!locked];
-	[ionizerElectronEnergyField		setEnabled:!locked];
-	[ionizerFocusPlateVoltageField	setEnabled:!locked];
-	[ionizerEmissionCurrentField	setEnabled:!locked];
+    BOOL useIonizerDefaults = [model useIonizerDefaults];
+	[ionizerIonEnergyPU				setEnabled:!useIonizerDefaults && !locked];
+	[ionizerElectronEnergyField		setEnabled:!useIonizerDefaults && !locked];
+	[ionizerFocusPlateVoltageField	setEnabled:!useIonizerDefaults && !locked];
+	[ionizerEmissionCurrentField	setEnabled:!useIonizerDefaults && !locked];
 
-	[noiseFloorSettingField			setEnabled:!locked];
 	[filamentOnOffButton			setEnabled:!locked];
 
-	[filamentOnOffButton		setTitle:[model ionizerFilamentCurrentRB] ? @"Turn OFF" : @"Turn ON"];
-	[elecMultHVBiasOnOffButton	setTitle:[model elecMultHVBiasRB]		  ? @"Turn OFF" : @"Turn ON"];
+	[useIonizerDefaultsMatrix       setEnabled: [model ionizerFilamentCurrentRB]==0 && !locked];
+	[useDetectorDefaultsMatrix      setEnabled: [model elecMultHVBiasRB] ==0 && !locked];
 
 	[initialMassField setEnabled:	[model opMode] != kRGATableMode];
 	[finalMassField setEnabled:		[model opMode] != kRGATableMode];
@@ -775,10 +810,16 @@
 - (IBAction) ionizerEmissionCurrentAction:(id)sender	{ [model setIonizerEmissionCurrent:		[sender floatValue]]; }
 - (IBAction) ionizerElectronEnergyAction:(id)sender		{ [model setIonizerElectronEnergy:		[sender intValue]]; }
 
-- (IBAction) toggleHVBias:(id)sender		
+- (IBAction) toggleHVBiasAction:(id)sender		
 { 
-	if([model elecMultHVBiasRB]>0) [model turnHVBiasOFF];
-	else [model sendHVBias];
+	if([model elecMultHVBiasRB]>0) [model turnDetectorOff];
+	else [model sendDetectorParameters];
+}
+
+- (IBAction) toggleIonizerAction:(id)sender		
+{ 
+	if([model ionizerFilamentCurrentRB]>0) [model turnIonizerOff];
+	else [model sendIonizerParameters];
 }
 
 - (IBAction) lockAction:(id) sender						
@@ -853,6 +894,16 @@
 	[self updateButtons];
 }
 
+- (IBAction) useDectorDefaultsAction:(id)sender
+{
+    [model setUseDetectorDefaults:[[sender selectedCell] tag]];
+}
+
+- (IBAction) useIonizerDefaultsAction:(id)sender
+{
+    [model setUseIonizerDefaults:[[sender selectedCell] tag]];
+}
+
 #pragma mark •••Data Source
 - (int) numberPointsInPlot:(id)aPlot
 {
@@ -878,8 +929,6 @@
 		*xValue = i;
 		*yValue = [model scanValueAtIndex:i];
 	}
-
-	
 }
 
 - (int) numberOfRowsInTableView:(NSTableView *)tableView

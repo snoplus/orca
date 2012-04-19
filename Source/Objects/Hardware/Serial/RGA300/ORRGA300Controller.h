@@ -71,7 +71,9 @@
 	IBOutlet NSTextField*	ionizerDegassTimeField;
 
     IBOutlet NSButton*		filamentOnOffButton;
+    IBOutlet NSMatrix*		useIonizerDefaultsMatrix;
 	IBOutlet NSButton*		elecMultHVBiasOnOffButton;
+	IBOutlet NSMatrix*		useDetectorDefaultsMatrix;
 	IBOutlet NSButton*		startMeasurementButton;
 	IBOutlet NSButton*		stopMeasurementButton;
 	IBOutlet NSProgressIndicator* scanProgressBar;
@@ -138,6 +140,8 @@
 - (void) miscAttributesChanged:(NSNotification*)aNote;
 - (void) amuCountChanged:(NSNotification*)aNote;
 - (void) currentAmuIndexChanged:(NSNotification*)aNote;
+- (void) useIonizerDefaultsChanged:(NSNotification*)aNote;
+- (void) useDetectorDefaultsChanged:(NSNotification*)aNote;
 - (BOOL) portLocked;
 - (void) setupPlotter;
 
@@ -167,6 +171,10 @@
 - (IBAction) degassAction:(id)sender;
 - (IBAction) addAmuAction:(id)sender;
 - (IBAction) removeAmuAction:(id)sender;
+- (IBAction) toggleHVBiasAction:(id)sender;	
+- (IBAction) toggleIonizerAction:(id)sender;	
+- (IBAction) useIonizerDefaultsAction:(id)sender;
+- (IBAction) useDectorDefaultsAction:(id)sender;
 
 - (int) numberPointsInPlot:(id)aPlotter;
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;

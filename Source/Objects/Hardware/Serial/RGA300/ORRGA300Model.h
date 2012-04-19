@@ -108,7 +108,9 @@
 		int		measuredIonCurrent;
 		BOOL	electronMultiOption;
 		float	elecMultGain;
-	
+        BOOL    useIonizerDefaults;
+        BOOL    useDetectorDefaults;
+
 		//readback values
 		float	ionizerFilamentCurrentRB;
 		int		ionizerElectronEnergyRB;
@@ -183,6 +185,11 @@
 - (int)		ionizerDegassTime;
 - (void)	setIonizerDegassTime:(int)aIonizerDegassTime;
 
+- (BOOL)    useIonizerDefaults;
+- (void)    setUseIonizerDefaults:(BOOL)aState;
+- (BOOL)    useDetectorDefaults;
+- (void)    setUseDetectorDefaults:(BOOL)aState;
+
 - (int)		rs232ErrWord;
 - (int)		filErrWord;
 - (int)		cemErrWord;
@@ -230,10 +237,11 @@
 - (void) sendStepsPerAmu; 
 
 - (void) sendStepsPerAmuQuery;
-- (void) turnHVBiasOFF;
-- (void) sendHVBias;
-- (void) turnFilamentOFF;
-- (void) sendFilamentCurrent;
+- (void) turnDetectorOff;
+- (void) sendDetectorParameters;
+- (void) turnIonizerOff;
+- (void) sendIonizerParameters; 
+
 - (void) startMeasurement;
 - (void) stopMeasurement;
 
@@ -299,3 +307,6 @@ extern NSString* ORRGA300ModelAmuAdded;
 extern NSString* ORRGA300ModelAmuRemoved;
 extern NSString* ORRGA300ModelCurrentAmuIndexChanged;
 extern NSString* ORRGA300Lock;
+extern NSString* ORRGA300ModelUseIonizerDefaultsChanged;
+extern NSString* ORRGA300ModelUseDetectorDefaultsChanged;
+

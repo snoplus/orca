@@ -67,6 +67,8 @@ NSString* ORRGA300ModelModelNumberChanged			= @"ORRGA300ModelModelNumberChanged"
 NSString* ORRGA300ModelAmuAdded						= @"ORRGA300ModelAmuAdded";
 NSString* ORRGA300ModelAmuRemoved					= @"ORRGA300ModelAmuRemoved";
 NSString* ORRGA300ModelCurrentAmuIndexChanged		= @"ORRGA300ModelCurrentAmuIndexChanged";
+NSString* ORRGA300ModelUseIonizerDefaultsChanged	= @"ORRGA300ModelUseIonizerDefaultsChanged";
+NSString* ORRGA300ModelUseDetectorDefaultsChanged	= @"ORRGA300ModelUseDetectorDefaultsChanged";
 
 NSString* ORRGA300ModelSerialPortChanged			= @"ORRGA300ModelSerialPortChanged";
 NSString* ORRGA300ModelPortNameChanged				= @"ORRGA300ModelPortNameChanged";
@@ -355,6 +357,34 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRGA300ModelIonizerDegassTimeChanged object:self];
 }
 
+- (BOOL)    useIonizerDefaults
+{
+    return useIonizerDefaults;
+}
+
+- (void)    setUseIonizerDefaults:(BOOL)aState
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setUseIonizerDefaults:useIonizerDefaults];
+    useIonizerDefaults = aState;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRGA300ModelUseIonizerDefaultsChanged object:self];
+    
+}
+
+- (BOOL)    useDetectorDefaults
+{
+    return useDetectorDefaults;
+}
+
+- (void)    setUseDetectorDefaults:(BOOL)aState
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setUseDetectorDefaults:useDetectorDefaults];
+    useDetectorDefaults = aState;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRGA300ModelUseDetectorDefaultsChanged object:self];
+    
+}
+
+
+
 - (void) openPort:(BOOL)state
 {
     if(state) {
@@ -521,36 +551,60 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 	[self setIonizerIonEnergy:			ionizerIonEnergyRB];
 	[self setIonizerFocusPlateVoltage:	ionizerFocusPlateVoltageRB];
 	[self setNoiseFloorSetting:			noiseFloorSettingRB];
-	[self setElecMultHVBias:			elecMultHVBias];
+	[self setElecMultHVBias:			elecMultHVBiasRB];
 	[self setElecMultGain:				elecMultGainRB];
 }	
 
-- (void) turnHVBiasOFF
+- (void) turnDetectorOff
 {
 	[self enqueCmdString:@"HV0"];
 	[self enqueCmdString:@"HV?"];
 }
 
-- (void) sendHVBias 
+- (void) sendDetectorParameters 
 {
 	if(electronMultiOption){
-		[self enqueCmdString:[NSString stringWithFormat:@"HV%d",elecMultHVBias]];
-		[self enqueCmdString:@"HV?"];
+        if(!useDetectorDefaults){
+            [self enqueCmdString:[NSString stringWithFormat:@"HV%d",elecMultHVBias]];
+            [self sendNoiseFloorSetting];
+        }
+        else {
+            [self enqueCmdString:@"HV*"];
+            [self enqueCmdString:@"NF*"];
+
+        }
+        [self enqueCmdString:@"HV?"];
+        [self enqueCmdString:@"NF?"];
 	}
 }
 
-- (void) turnFilamentOFF
+- (void) turnIonizerOff
 {
 	[self enqueCmdString:@"FL0"];
 	[self enqueCmdString:@"FL?"];
 }
 
-- (void) sendFilamentCurrent 
+- (void) sendIonizerParameters 
 {
 	if(electronMultiOption){
-		[self enqueCmdString:[NSString stringWithFormat:@"FL%d",ionizerEmissionCurrent]];
-		[self enqueCmdString:@"FL?"];
-	}
+        if(!useDetectorDefaults){
+            [self enqueCmdString:[NSString stringWithFormat:@"FL%0.2f",ionizerEmissionCurrent]];
+            [self sendIonizerElectronEnergy];	 
+            [self sendIonizerIonEnergy];		 
+            [self sendIonizerFocusPlateVoltage];
+        }
+        else {
+            [self enqueCmdString:@"FL*"];
+            [self enqueCmdString:@"IE*"];
+            [self enqueCmdString:@"EE*"];
+            [self enqueCmdString:@"VF*"];        
+        }
+            
+        [self enqueCmdString:@"EE?"];
+        [self enqueCmdString:@"FL?"];
+        [self enqueCmdString:@"IE?"];
+        [self enqueCmdString:@"VF?"];
+    }
 }
 
 - (void) dataReceived:(NSNotification*)note
@@ -664,6 +718,7 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 }
 
 
+
 @end
 
 @implementation ORRGA300Model (private)
@@ -710,7 +765,7 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 		else if([aCmdString hasPrefix:@"NF"]) return NO;
 		else if([aCmdString hasPrefix:@"SA"]) return NO;
 		else if([aCmdString hasPrefix:@"MG"]) return NO;
-		else if([aCmdString hasPrefix:@"HS"] || [aCmdString hasPrefix:@"AS"]){
+		else if([aCmdString hasPrefix:@"HS"] || [aCmdString hasPrefix:@"SC"]){
 			expectingRawData = YES;
 			expectedRawDataLength = (finalMass-initialMass + 1 + 1)*4;
 			return NO; //so we don't load a lastRequest
@@ -771,6 +826,7 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 		else if([lastRequest hasPrefix:@"MI?"]) [self setInitialMass:[aString intValue]];
 		else if([lastRequest hasPrefix:@"SA?"]) [self setStepsPerAmu:[aString intValue]];
 		else if([lastRequest hasPrefix:@"TP?"]) [self setMeasuredIonCurrent:[aString intValue]];
+		else if([lastRequest hasPrefix:@"MO?"]) [self setElectronMultiOption:[aString intValue]];
 		
 		else if([lastRequest hasPrefix:@"HV?"]) [self setElecMultHVBiasRB:			[aString intValue]];
 		else if([lastRequest hasPrefix:@"NF?"]) [self setNoiseFloorSettingRB:		[aString intValue]];
@@ -1015,13 +1071,13 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 	[self sendNoiseFloorSetting];
 	[self sendStepsPerAmu];
 	[self sendAnalogScanPointsQuery];
-	[self enqueCmdString:[NSString stringWithFormat:@"AS%d",numberScans]];
+	[self enqueCmdString:[NSString stringWithFormat:@"SC%d",numberScans]];
 } 
 
 - (void) stopAnalogScan	
 { 
 	[self setCurrentActivity:kRGAIdle];
-	[self enqueCmdString:@"AS0"];
+	[self enqueCmdString:@"SC0"];
 }
 
 - (void) setCurrentActivity:(int)aCurrentActivity
