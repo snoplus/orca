@@ -22,6 +22,7 @@
 
 @class ORSerialPort;
 @class ORTimeRate;
+@class ORSafeQueue;
 
 #define kMet237Counting  0
 #define kMet237Holding   1
@@ -34,7 +35,7 @@
         BOOL            portWasOpen;
         ORSerialPort*   serialPort;
 		NSString*		lastRequest;
-		NSMutableArray* cmdQueue;
+		ORSafeQueue*    cmdQueue;
 		unsigned long	timeMeasured;
         NSMutableString* buffer;
 		NSString* measurementDate;
