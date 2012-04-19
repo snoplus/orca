@@ -49,7 +49,7 @@
 - (void) mailSent:(NSString*)to;
 - (void) sendStatusLogTo:(NSString*)receipients cc:(NSString*)cc subject:(NSString*)subject;
 - (void) sendStatusLogTo:(NSString*)receipients cc:(NSString*)cc subject:(NSString*)subject lastSeconds:(unsigned long)aDuration;
-- (void) setExternalVariable:(id)aKey to:(float)aValue;
+- (void) setExternalVariable:(id)aKey to:(id)aValue;
 - (id) externalVariable:(id)aKey;
 
 #pragma mark ¥¥¥Archival

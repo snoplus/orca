@@ -178,12 +178,12 @@ NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
 	NSLog(@"Script sent mail to: %@\n",to);
 }
 
-- (void) setExternalVariable:(id)aKey to:(float)aValue
+- (void) setExternalVariable:(id)aKey to:(id)aValue
 {
 	@synchronized(self){
 		if(!externVariablePool)externVariablePool = [[NSMutableDictionary dictionary] retain];
 		if(aKey!=nil){
-			[externVariablePool setObject:[NSDecimalNumber numberWithFloat:aValue] forKey:aKey]; 
+			[externVariablePool setObject:aValue forKey:aKey]; 
 		}
 		else {
 			NSException* e =  [NSException exceptionWithName:@"illegal variables" reason:@"The script external pool can not hold nil keys" userInfo:nil];
