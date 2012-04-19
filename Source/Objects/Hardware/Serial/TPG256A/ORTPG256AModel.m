@@ -710,6 +710,7 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 {
 	NSLogError(@"TGP262",@"command timeout",nil);
 	[self setLastRequest:nil];
+	[cmdQueue removeAllObjects];
 	[self processOneCommandFromQueue];	 //do the next command in the queue
 }
 

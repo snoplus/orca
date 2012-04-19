@@ -27,6 +27,7 @@
 #import "ORDataTypeAssigner.h"
 #import "ORDataPacket.h"
 #import "ORTimeRate.h"
+#import "ORSafeQueue.h"
 
 #pragma mark •••External Strings
 NSString* ORTPG262ModelPressureScaleChanged = @"ORTPG262ModelPressureScaleChanged";
@@ -417,8 +418,8 @@ NSString* ORTPG262Lock = @"ORTPG262Lock";
 - (void) addCmdToQueue:(NSString*)aCmd
 {
     if([serialPort isOpen]){ 
-		if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
-		[cmdQueue addObject:aCmd];
+		if(!cmdQueue)cmdQueue = [[ORSafeQueue alloc] init];
+		[cmdQueue enqueue:aCmd];
 		if(!lastRequest){
 			[self processOneCommandFromQueue];
 		}
@@ -483,14 +484,14 @@ NSString* ORTPG262Lock = @"ORTPG262Lock";
 {
 	NSLogError(@"TGP262",@"command timeout",nil);
 	[self setLastRequest:nil];
+	[cmdQueue removeAllObjects];
 	[self processOneCommandFromQueue];	 //do the next command in the queue
 }
 
 - (void) processOneCommandFromQueue
 {
 	if([cmdQueue count] == 0) return;
-	NSString* aCmd = [[[cmdQueue objectAtIndex:0] retain] autorelease];
-	[cmdQueue removeObjectAtIndex:0];
+	NSString* aCmd = [cmdQueue dequeue];
 	if([aCmd isEqualToString:@"++ShipRecords"]){
 		if(shipPressures) [self shipPressureValues];
 	}

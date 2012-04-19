@@ -175,7 +175,7 @@
 
 - (void) unitsChanged:(NSNotification*)aNote
 {
-	[unitsPU selectItemAtIndex: [model units]];
+	[unitsPU selectItemAtIndex: [(ORTPG256AModel*)model units]];
 }
 
 - (void) highLimitChanged:(NSNotification*)aNote

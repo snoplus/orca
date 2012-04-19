@@ -21,6 +21,7 @@
 
 @class ORSerialPort;
 @class ORTimeRate;
+@class ORSafeQueue;
 
 #define kTPG262MeasurementOK			0
 #define kTPG262MeasurementUnderRange	1
@@ -38,7 +39,7 @@
         ORSerialPort*   serialPort;
         unsigned long	dataId;
 		NSString*		lastRequest;
-		NSMutableArray* cmdQueue;
+		ORSafeQueue*	cmdQueue;
 		float		    pressure[2];
 		unsigned long	timeMeasured[2];
 		int				pollTime;
