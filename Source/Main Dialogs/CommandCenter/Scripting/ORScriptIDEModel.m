@@ -127,15 +127,15 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 
 - (void) runStarted:(NSNotification*)aNote
 {
-	if(autoStartWithRun){
+	if(autoStartWithRun && ![scriptRunner running]){
 		[self runScript];
 	}
 }
 
 - (void) runEnded:(NSNotification*)aNote
 {		
-	if(autoStopWithRun){
-		[self stopScript];
+	if(autoStopWithRun && [scriptRunner running]){
+		[self runScript]; //this actuall will stop a running script
 	}
 }
 
@@ -445,9 +445,9 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 
 - (void) stopScript
 {
-	[scriptRunner stop];
-	[scriptRunner release];
-	scriptRunner = nil;
+	if([scriptRunner running]){
+		[self runScript]; //actually this toggles the run state....
+	}
 }
 
 - (id) nextScriptConnector
