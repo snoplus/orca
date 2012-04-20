@@ -20,8 +20,11 @@
 
 @interface ORRunListController : OrcaObjectController {
     IBOutlet NSTableView*	itemsListView;
-	IBOutlet   NSTextField* lastFileTextField;
-	IBOutlet NSButton* randomizeCB;
+	IBOutlet NSTextField*	executionCountField;
+	IBOutlet NSTextField*	timesToRepeatField;
+	IBOutlet NSTextField*	lastFileTextField;
+	IBOutlet NSTextField*	runCountField;
+	IBOutlet NSButton*		randomizeCB;
     IBOutlet NSButton*      listLockButton;
     IBOutlet NSButton*      addItemButton;
     IBOutlet NSButton*      removeItemButton;
@@ -37,6 +40,7 @@
 - (void) forceReload;
 
 #pragma mark •••Actions
+- (IBAction) timesToRepeatAction:(id)sender;
 - (IBAction) lastFileTextFieldAction:(id)sender;
 - (IBAction) randomizeAction:(id)sender;
 - (IBAction) removeItemAction:(id)sender;
@@ -49,6 +53,7 @@
 - (IBAction) saveFileAction:(id) sender;
 
 #pragma mark •••Interface Management
+- (void) timesToRepeatChanged:(NSNotification*)aNote;
 - (void) lastFileChanged:(NSNotification*)aNote;
 - (void) randomizeChanged:(NSNotification*)aNote;
 - (void) updateProgressBar:(NSNotification*)aNote;

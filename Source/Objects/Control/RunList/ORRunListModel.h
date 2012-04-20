@@ -34,6 +34,7 @@ enum eRunListStates {
 	kWaitForScript,
 	kWaitForRunTime,
 	kRunFinished,
+	kCheckForRepeat,
 	kFinishUp,
 }eRunListStates;
 
@@ -54,12 +55,17 @@ enum eRunListStates {
 	NSMutableArray* orderArray;
     BOOL randomize;
 	NSString* lastFile;
+    int timesToRepeat;
+    int executionCount;
 }
 
 - (void) registerNotificationObservers;
 - (void)runHalted:(NSNotification*)aNote;
 
 #pragma mark •••Accessors
+- (int) executionCount;
+- (int) timesToRepeat;
+- (void) setTimesToRepeat:(int)aTimesToRepeat;
 - (NSString*) lastFile;
 - (void) setLastFile:(NSString*)aLastFile;
 - (float) totalExpectedTime;
@@ -86,6 +92,7 @@ enum eRunListStates {
 - (void) encodeWithCoder:(NSCoder*)encoder;
 @end
 
+extern NSString* ORRunListModelTimesToRepeatChanged;
 extern NSString* ORRunListModelLastFileChanged;
 extern NSString* ORRunListModelRandomizeChanged;
 extern NSString* ORRunListModelWorkingItemIndexChanged;

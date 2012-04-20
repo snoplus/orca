@@ -30,8 +30,9 @@
 #define kTimeDelta 1
 
 #pragma mark •••Local Strings
-NSString* ORRunListModelLastFileChanged = @"ORRunListModelLastFileChanged";
-NSString* ORRunListModelRandomizeChanged = @"ORRunListModelRandomizeChanged";
+NSString* ORRunListModelTimesToRepeatChanged	= @"ORRunListModelTimesToRepeatChanged";
+NSString* ORRunListModelLastFileChanged			= @"ORRunListModelLastFileChanged";
+NSString* ORRunListModelRandomizeChanged		= @"ORRunListModelRandomizeChanged";
 NSString* ORRunListModelWorkingItemIndexChanged = @"ORRunListModelWorkingItemIndexChanged";
 NSString* ORRunListItemsAdded		= @"ORRunListItemsAdded";
 NSString* ORRunListItemsRemoved		= @"ORRunListItemsRemoved";
@@ -108,6 +109,26 @@ static NSString* ORRunListDataOut	= @"ORRunListDataOut";
 
 #pragma mark ***Accessors
 
+- (int) executionCount
+{
+    return executionCount;
+}
+
+- (int) timesToRepeat
+{
+    return timesToRepeat;
+}
+
+- (void) setTimesToRepeat:(int)aTimesToRepeat
+{
+	if(aTimesToRepeat<1)aTimesToRepeat=1;
+    [[[self undoManager] prepareWithInvocationTarget:self] setTimesToRepeat:timesToRepeat];
+    
+    timesToRepeat = aTimesToRepeat;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRunListModelTimesToRepeatChanged object:self];
+}
+
 - (NSString*) lastFile
 {
 	if(![lastFile length]) return @"--";
@@ -160,6 +181,7 @@ static NSString* ORRunListDataOut	= @"ORRunListDataOut";
 	timedWorker = [[TimedWorker TimeWorkerWithInterval:kTimeDelta] retain]; 
 	[timedWorker runWithTarget:self selector:@selector(checkStatus)];
 	runListState = kStartup;
+	executionCount = 0;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORRunListRunStateChanged object:self];
 }
 
@@ -223,6 +245,7 @@ static NSString* ORRunListDataOut	= @"ORRunListDataOut";
 {
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
+    [self setTimesToRepeat:[decoder decodeIntForKey:@"timesToRepeat"]];
     [self setLastFile:[decoder decodeObjectForKey:@"lastFile"]];
     [self setRandomize:[decoder decodeBoolForKey:@"randomize"]];
 	items = [[decoder decodeObjectForKey:@"items"] retain];
@@ -241,6 +264,7 @@ static NSString* ORRunListDataOut	= @"ORRunListDataOut";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+	[encoder encodeInt:timesToRepeat forKey:@"timesToRepeat"];
 	[encoder encodeObject:lastFile forKey:@"lastFile"];
 	[encoder encodeBool:randomize forKey:@"randomize"];
 	[encoder encodeObject:items			forKey:@"items"];
@@ -300,6 +324,7 @@ static NSString* ORRunListDataOut	= @"ORRunListDataOut";
 		case kWaitForScript:	return @"Script Wait";
 		case kWaitForRunTime:	return [NSString stringWithFormat:@"%.0f",runLength];
 		case kRunFinished:		return @"Done";
+		case kCheckForRepeat:	return @"Repeat Check";
 		case kFinishUp:			return @"Manual Quit";
 		default:			    return @"-";
 	}
@@ -428,7 +453,7 @@ static NSString* ORRunListDataOut	= @"ORRunListDataOut";
 		case kRunFinished:
 			[self setWorkingItemState];
 			[self incWorkingIndex];
-			if(workingItemIndex >= [items count]) runListState = kFinishUp;
+			if(workingItemIndex >= [items count]) runListState = kCheckForRepeat;
 			else {
 				doSubRun = [[[self objectAtWorkingIndex] objectForKey:@"SubRun"] intValue];
 				if(doSubRun){
@@ -442,6 +467,17 @@ static NSString* ORRunListDataOut	= @"ORRunListDataOut";
 					else runListState = kStartScript;
 				}
 			}
+		break;
+			
+		case kCheckForRepeat:
+			executionCount++;
+			if(executionCount>=timesToRepeat){
+				runListState = kFinishUp;
+			}
+			else {
+				runListState = kStartup;
+			}
+			[[NSNotificationCenter defaultCenter] postNotificationName:ORRunListRunStateChanged object:self];
 		break;
 			
 		case kFinishUp:
@@ -458,6 +494,7 @@ static NSString* ORRunListDataOut	= @"ORRunListDataOut";
 			timedWorker = nil;
 			[orderArray release];
 			orderArray = nil;
+					
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORRunListRunStateChanged object:self];
 		break;
 	}

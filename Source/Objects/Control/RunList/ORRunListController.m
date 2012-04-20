@@ -118,6 +118,10 @@
                          name : ORRunListModelLastFileChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(timesToRepeatChanged:)
+                         name : ORRunListModelTimesToRepeatChanged
+						object: model];
 }
 
 - (void) updateWindow
@@ -129,6 +133,7 @@
 	[self runStateChanged:nil];
 	[self randomizeChanged:nil];
 	[self lastFileChanged:nil];
+	[self timesToRepeatChanged:nil];
 }
 
 - (void) forceReload
@@ -207,6 +212,10 @@
 }
 
 #pragma mark •••Interface Management
+- (void) timesToRepeatChanged:(NSNotification*)aNote
+{
+	[timesToRepeatField setIntValue: [model timesToRepeat]];
+}
 
 - (void) lastFileChanged:(NSNotification*)aNote
 {
@@ -230,6 +239,18 @@
 	if(isRunning)[progressBar startAnimation:self];
 	else [progressBar stopAnimation:self];
 	[startStopButton setTitle:isRunning?@"Stop":@"Start"];
+	if(isRunning){
+		int n		= [model timesToRepeat];
+		int count	= [model executionCount]+1;
+		
+		if(n==0)  [runCountField setStringValue:@"Sequence will run once and then stop"];
+		else   { 
+			if(count<=n)[runCountField setStringValue:[NSString stringWithFormat:@"Execution count %d of %d",count,n]];
+			else [runCountField setStringValue:@""];
+		}
+	}
+	else [runCountField setStringValue:@""];
+				
 	[self setButtonStates];
 }
 
@@ -241,6 +262,11 @@
 }
 
 #pragma mark •••Actions
+
+- (void) timesToRepeatAction:(id)sender
+{
+	[model setTimesToRepeat:[sender intValue]];	
+}
 
 - (IBAction) lastFileTextFieldAction:(id)sender
 {
