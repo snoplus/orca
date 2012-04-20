@@ -243,7 +243,7 @@
 		int n		= [model timesToRepeat];
 		int count	= [model executionCount]+1;
 		
-		if(n==0)  [runCountField setStringValue:@"Sequence will run once and then stop"];
+		if(n==1)  [runCountField setStringValue:@"Sequence will run once and then stop"];
 		else   { 
 			if(count<=n)[runCountField setStringValue:[NSString stringWithFormat:@"Execution count %d of %d",count,n]];
 			else [runCountField setStringValue:@""];
