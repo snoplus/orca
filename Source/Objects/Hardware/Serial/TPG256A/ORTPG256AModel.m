@@ -507,14 +507,16 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 	[self setPressureScale:	[decoder decodeIntForKey:	 @"pressureScale"]];
 	[self setShipPressures:	[decoder decodeBoolForKey:	 @"shipPressures"]];
 	[self setPollTime:		[decoder decodeIntForKey:	 @"pollTime"]];
-	[[self undoManager] enableUndoRegistration];
 	
 	int i;
 	for(i=0;i<6;i++){
 		timeRates[i] = [[ORTimeRate alloc] init];
+		[self setLowAlarm:i value:[decoder decodeDoubleForKey: [NSString stringWithFormat:@"lowAlarm%d",i]]];
 		[self setHighAlarm:i value:[decoder decodeDoubleForKey: [NSString stringWithFormat:@"highAlarm%d",i]]];
+		[self setLowLimit:i value:[decoder decodeDoubleForKey: [NSString stringWithFormat:@"lowLimit%d",i]]];
 		[self setHighLimit:i value:[decoder decodeDoubleForKey: [NSString stringWithFormat:@"highLimit%d",i]]];
 	}
+	[[self undoManager] enableUndoRegistration];
     [self registerNotificationObservers];
 
 	return self;
@@ -532,6 +534,8 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 	
 	int i;
 	for(i=0;i<6;i++){
+		[encoder encodeDouble:lowAlarm[i] forKey: [NSString stringWithFormat:@"lowAlarm%d",i]];
+		[encoder encodeDouble:lowLimit[i] forKey: [NSString stringWithFormat:@"lowLimit%d",i]];
 		[encoder encodeDouble:highAlarm[i] forKey: [NSString stringWithFormat:@"highAlarm%d",i]];
 		[encoder encodeDouble:highLimit[i] forKey: [NSString stringWithFormat:@"highLimit%d",i]];
 	}
