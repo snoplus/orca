@@ -27,6 +27,7 @@
 #import "ORDataTypeAssigner.h"
 #import "ORDataPacket.h"
 #import "ORTimeRate.h"
+#import "ORSafeQueue.h"
 
 #pragma mark •••External Strings
 NSString* ORMks651cModelSpanCalibrationChanged = @"ORMks651cModelSpanCalibrationChanged";
@@ -900,12 +901,12 @@ NSString* ORMks651cLock = @"ORMks651cLock";
 - (void) addCmdToQueue:(NSString*)aCmd waitForResponse:(BOOL)waitForResponse
 {
     if([serialPort isOpen]){ 
-		if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
+		if(!cmdQueue)cmdQueue = [[ORSafeQueue alloc] init];
 		ORMks651cCmd* cmdObj  = [[[ORMks651cCmd alloc] init] autorelease];
 		cmdObj.cmd = aCmd;
 		cmdObj.waitForResponse = waitForResponse;
 		
-		[cmdQueue addObject:cmdObj];
+		[cmdQueue enqueue:cmdObj];
 		if(!lastRequest){
 			[self processOneCommandFromQueue];
 		}
@@ -1311,30 +1312,30 @@ NSString* ORMks651cLock = @"ORMks651cLock";
 - (void) processOneCommandFromQueue
 {
 	
-	if([cmdQueue count] == 0) return;
-	ORMks651cCmd* cmdObj = [[[cmdQueue objectAtIndex:0] retain] autorelease];
-	[cmdQueue removeObjectAtIndex:0];
-	NSString* aCmd = cmdObj.cmd;
-	if([aCmd isEqualToString:@"++ShipRecords"]){
-		if(shipPressures) [self shipPressureValues];
-		[self processOneCommandFromQueue];
-	}
-	else if([aCmd isEqualToString:@"++StartDialogLoad"]){
-		loadDialog = YES;
-	}
-	else if([aCmd isEqualToString:@"++EndDialogLoad"]){
-		loadDialog = NO;
-	}
-	else {
-		if(cmdObj.waitForResponse) {
-			[self performSelector:@selector(timeout) withObject:nil afterDelay:3];
-			[self setLastRequest:aCmd];
-		}
-		else [self setLastRequest:nil];
-		if(![aCmd hasSuffix:@"\r\n"]) aCmd = [aCmd stringByAppendingString:@"\r\n"];
-		[serialPort writeString:aCmd];
-		if(!lastRequest){
+	ORMks651cCmd* cmdObj = [cmdQueue dequeue];
+	if(cmdObj){
+		NSString* aCmd = cmdObj.cmd;
+		if([aCmd isEqualToString:@"++ShipRecords"]){
+			if(shipPressures) [self shipPressureValues];
 			[self processOneCommandFromQueue];
+		}
+		else if([aCmd isEqualToString:@"++StartDialogLoad"]){
+			loadDialog = YES;
+		}
+		else if([aCmd isEqualToString:@"++EndDialogLoad"]){
+			loadDialog = NO;
+		}
+		else {
+			if(cmdObj.waitForResponse) {
+				[self performSelector:@selector(timeout) withObject:nil afterDelay:3];
+				[self setLastRequest:aCmd];
+			}
+			else [self setLastRequest:nil];
+			if(![aCmd hasSuffix:@"\r\n"]) aCmd = [aCmd stringByAppendingString:@"\r\n"];
+			[serialPort writeString:aCmd];
+			if(!lastRequest){
+				[self processOneCommandFromQueue];
+			}
 		}
 	}
 }

@@ -21,6 +21,7 @@
 
 @class ORSerialPort;
 @class ORTimeRate;
+@class ORSafeQueue;
 
 @interface ORMks651cModel : OrcaObject
 {
@@ -30,7 +31,7 @@
         ORSerialPort*		serialPort;
         unsigned long		dataId;
         NSString*			lastRequest;
-        NSMutableArray*		cmdQueue;
+        ORSafeQueue*		cmdQueue;
 		float				pressure;
 		float				setPoint[4];
 		float               leadValue[5];
