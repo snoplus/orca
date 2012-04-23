@@ -20,6 +20,7 @@
 
 @class ORSerialPort;
 @class ORTimeRate;
+@class ORSafeQueue;
 
 @interface ORCP8CryopumpModel : OrcaObject
 {
@@ -29,7 +30,7 @@
         ORSerialPort*		serialPort;
         unsigned long		dataId;
         NSString*			lastRequest;
-        NSMutableArray*		cmdQueue;
+        ORSafeQueue*		cmdQueue;
 	
 		float				temperature;
 		unsigned long		timeMeasured;

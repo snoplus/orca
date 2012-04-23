@@ -689,11 +689,9 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 
 - (void) processOneCommandFromQueue
 {
-	if([cmdQueue count] == 0) return;
-	NSString* aCmd = [cmdQueue dequeue];
-	[self setLastRequest:aCmd];
-	
+	NSString* aCmd = [cmdQueue dequeue];	
 	if(aCmd){
+		[self setLastRequest:aCmd];
 		[self startTimeOut];
 		[serialPort writeString:[NSString stringWithFormat:@"%@",aCmd]];
 	}

@@ -26,6 +26,7 @@
 #import "ORSerialPortAdditions.h"
 #import "ORDataTypeAssigner.h"
 #import "ORDataPacket.h"
+#import "ORSafeQueue.h"
 
 #pragma mark ***External Strings
 NSString* ORRad7ModelHumidityMaxLimitChanged = @"ORRad7ModelHumidityMaxLimitChanged";
@@ -912,8 +913,8 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 - (void) addCmdToQueue:(NSString*)aCmd
 {
     if([serialPort isOpen]){ 
-		if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
-		[cmdQueue addObject:aCmd];
+		if(!cmdQueue)cmdQueue = [[ORSafeQueue alloc] init];
+		[cmdQueue enqueue:aCmd];
 		if(!lastRequest){
 			[self processOneCommandFromQueue];
 		}
@@ -1285,63 +1286,64 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 - (void) processOneCommandFromQueue
 {
 	if([cmdQueue count] == 0) return;
-	NSString* aCmd = [[[cmdQueue objectAtIndex:0] retain] autorelease];
-	[cmdQueue removeObjectAtIndex:0];
-	if([aCmd isEqualToString:@"++StartHWInit"]){
-		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
-		[self setOperationState:kRad7Initializing];
-		[self goToNextCommand];
-	}
-	else if([aCmd isEqualToString:@"++StartGroup"]){
-		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
-		[self setOperationState:kRad7ExecutingGroup];
-		[self goToNextCommand];
-	}
-	else if([aCmd isEqualToString:@"++HWInitDone"] || 
-			[aCmd isEqualToString:@"++HWReviewDone"]){
-		if(pollTime)[self performSelector:@selector(pollHardware) withObject:nil afterDelay:pollTime];
-		[self setOperationState:kRad7Idle];
-		[self goToNextCommand];
-	}
-	else if([aCmd isEqualToString:@"++EndGroup"]){
-		id runStateString = [statusDictionary objectForKey:kRad7RunStatus];
-		
-		if(!runStateString)								 [self setRunState:kRad7RunStateUnKnown];
-		else if([runStateString isEqualToString:@"LIVE"])[self setRunState:kRad7RunStateCounting];
-		else											 [self setRunState:kRad7RunStateStopped];
-		[self setOperationState:kRad7Idle];
-		if(pollTime)[self performSelector:@selector(pollHardware) withObject:nil afterDelay:pollTime];
-		
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelStatusChanged object:self];
-		[self goToNextCommand];
-	}
-	else {
-		[self setLastRequest:aCmd];
-		if([aCmd isEqualToString:@"++DumpUser"])aCmd = @"SETUP REVIEW";
-		else if(currentRequest == kSpecialStart){
-			id runStatus = [statusDictionary objectForKey:kRad7RunStatus];
-			if(!runStatus){
-				aCmd = nil;
-				[self setLastRequest:nil];
-				NSLog(@"Rad7 start command ignored -- status is unknown\n");
-			}
-			else if(![runStatus isEqualToString:@"IDLE"]){
-				aCmd = nil;
-				[self setLastRequest:nil];
-				NSLog(@"Rad7 start command ignored -- already counting\n");
-			}
+	NSString* aCmd = [cmdQueue dequeue];
+	if(aCmd){
+		if([aCmd isEqualToString:@"++StartHWInit"]){
+			[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
+			[self setOperationState:kRad7Initializing];
+			[self goToNextCommand];
 		}
-		if(aCmd){
-			aCmd = [aCmd stringByReplacingOccurrencesOfString:@"\n" withString:@""];
-			aCmd = [aCmd stringByReplacingOccurrencesOfString:@"\r" withString:@""];
-			aCmd = [aCmd stringByAppendingString:@"\r\n"];
+		else if([aCmd isEqualToString:@"++StartGroup"]){
+			[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
+			[self setOperationState:kRad7ExecutingGroup];
+			[self goToNextCommand];
+		}
+		else if([aCmd isEqualToString:@"++HWInitDone"] || 
+				[aCmd isEqualToString:@"++HWReviewDone"]){
+			if(pollTime)[self performSelector:@selector(pollHardware) withObject:nil afterDelay:pollTime];
+			[self setOperationState:kRad7Idle];
+			[self goToNextCommand];
+		}
+		else if([aCmd isEqualToString:@"++EndGroup"]){
+			id runStateString = [statusDictionary objectForKey:kRad7RunStatus];
 			
-			//NSLog(@"Rad7: writing: %@\n",aCmd);
-			[self startTimeOut];
-			[serialPort writeString:aCmd];
+			if(!runStateString)								 [self setRunState:kRad7RunStateUnKnown];
+			else if([runStateString isEqualToString:@"LIVE"])[self setRunState:kRad7RunStateCounting];
+			else											 [self setRunState:kRad7RunStateStopped];
+			[self setOperationState:kRad7Idle];
+			if(pollTime)[self performSelector:@selector(pollHardware) withObject:nil afterDelay:pollTime];
+			
+			[[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelStatusChanged object:self];
+			[self goToNextCommand];
 		}
-		if(!lastRequest){
-			[self performSelector:@selector(processOneCommandFromQueue) withObject:nil afterDelay:1];
+		else {
+			[self setLastRequest:aCmd];
+			if([aCmd isEqualToString:@"++DumpUser"])aCmd = @"SETUP REVIEW";
+			else if(currentRequest == kSpecialStart){
+				id runStatus = [statusDictionary objectForKey:kRad7RunStatus];
+				if(!runStatus){
+					aCmd = nil;
+					[self setLastRequest:nil];
+					NSLog(@"Rad7 start command ignored -- status is unknown\n");
+				}
+				else if(![runStatus isEqualToString:@"IDLE"]){
+					aCmd = nil;
+					[self setLastRequest:nil];
+					NSLog(@"Rad7 start command ignored -- already counting\n");
+				}
+			}
+			if(aCmd){
+				aCmd = [aCmd stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+				aCmd = [aCmd stringByReplacingOccurrencesOfString:@"\r" withString:@""];
+				aCmd = [aCmd stringByAppendingString:@"\r\n"];
+				
+				//NSLog(@"Rad7: writing: %@\n",aCmd);
+				[self startTimeOut];
+				[serialPort writeString:aCmd];
+			}
+			if(!lastRequest){
+				[self performSelector:@selector(processOneCommandFromQueue) withObject:nil afterDelay:1];
+			}
 		}
 	}
 }

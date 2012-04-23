@@ -490,23 +490,24 @@ NSString* ORTPG262Lock = @"ORTPG262Lock";
 
 - (void) processOneCommandFromQueue
 {
-	if([cmdQueue count] == 0) return;
 	NSString* aCmd = [cmdQueue dequeue];
-	if([aCmd isEqualToString:@"++ShipRecords"]){
-		if(shipPressures) [self shipPressureValues];
-	}
-	else {
-		if(![aCmd hasSuffix:@"\r\n"]) {
-			aCmd = [aCmd stringByReplacingOccurrencesOfString:@"\n" withString:@""];
-			aCmd = [aCmd stringByReplacingOccurrencesOfString:@"\r" withString:@""];
-			aCmd = [aCmd stringByAppendingString:@"\r\n"];
+	if(aCmd){
+		if([aCmd isEqualToString:@"++ShipRecords"]){
+			if(shipPressures) [self shipPressureValues];
 		}
-		[self setLastRequest:aCmd];
-		[self performSelector:@selector(timeout) withObject:nil afterDelay:3];
-		//just sent a command so the first thing received should be an ACK
-		//enter that state and send the command
-		portDataState = kWaitingForACK;
-		[serialPort writeString:aCmd];
+		else {
+			if(![aCmd hasSuffix:@"\r\n"]) {
+				aCmd = [aCmd stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+				aCmd = [aCmd stringByReplacingOccurrencesOfString:@"\r" withString:@""];
+				aCmd = [aCmd stringByAppendingString:@"\r\n"];
+			}
+			[self setLastRequest:aCmd];
+			[self performSelector:@selector(timeout) withObject:nil afterDelay:3];
+			//just sent a command so the first thing received should be an ACK
+			//enter that state and send the command
+			portDataState = kWaitingForACK;
+			[serialPort writeString:aCmd];
+		}
 	}
 }
 

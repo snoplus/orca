@@ -102,6 +102,7 @@
 #define kRad7SignalVoltage		@"signalVoltage"
 
 @class ORRad7DataPt;
+@class ORSafeQueue;
 
 @interface ORRad7Model : ObjWithHistoryModel <ORAdcProcessing>
 {
@@ -110,7 +111,7 @@
         BOOL            portWasOpen;
         ORSerialPort*   serialPort;
 		NSString*		lastRequest;
-		NSMutableArray* cmdQueue;
+		ORSafeQueue* cmdQueue;
 		unsigned long	timeMeasured;
 		int				pollTime;
         NSMutableString* buffer;

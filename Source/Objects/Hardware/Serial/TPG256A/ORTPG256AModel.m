@@ -29,6 +29,7 @@
 #import "ORSafeQueue.h"
 
 #pragma mark •••External Strings
+NSString* ORTPG256AModelInvolvedInProcessChanged = @"ORTPG256AModelInvolvedInProcessChanged";
 NSString* ORTPG256AModelUnitsChanged = @"ORTPG256AModelUnitsChanged";
 NSString* ORTPG256AModelPressureScaleChanged = @"ORTPG256AModelPressureScaleChanged";
 NSString* ORTPG256AModelShipPressuresChanged = @"ORTPG256AModelShipPressuresChanged";
@@ -162,7 +163,8 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 				if([buffer characterAtIndex:0] == kNAK){
 					//error in transimission
 					//flush and go to next command
-					NSLogError(@"TGP262",@"Transmission Error",nil);
+					NSLogError(@"TGP256A",@"Transmission Error",nil);
+					[cmdQueue removeAllObjects];
 					[self setLastRequest:nil];			 //clear the last request
 					[self processOneCommandFromQueue];	 //do the next command in the queue
 				}
@@ -175,8 +177,8 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 			}
 			else if(portDataState == kProcessData){
 				//OK, should be valid data. Process and continue with the que
-				[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
 				[self process_response:buffer];
+				[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
 				[self setLastRequest:nil];			 //clear the last request
 				[self processOneCommandFromQueue];	 //do the next command in the queue
 			}
@@ -219,6 +221,18 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 
 
 #pragma mark •••Accessors
+
+- (BOOL) involvedInProcess
+{
+    return involvedInProcess;
+}
+
+- (void) setInvolvedInProcess:(BOOL)aInvolvedInProcess
+{
+    involvedInProcess = aInvolvedInProcess;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORTPG256AModelInvolvedInProcessChanged object:self];
+}
 
 - (int) units
 {
@@ -299,7 +313,7 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
     pollTime = aPollTime;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTPG256AModelPollTimeChanged object:self];
 
-	if(pollTime){
+	if(pollTime && !involvedInProcess){
 		[self performSelector:@selector(pollPressures) withObject:nil afterDelay:2];
 	}
 	else {
@@ -347,7 +361,7 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 - (void) setLastRequest:(NSString*)aRequest
 {
 	[lastRequest autorelease];
-	lastRequest = [aRequest copy];    
+	lastRequest = [aRequest copy]; 
 }
 
 - (BOOL) portWasOpen
@@ -537,7 +551,7 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 
 - (void) readPressures
 {
-	@synchronized(self) {
+	@synchronized(self){
 		int i;
 		for(i=0;i<6;i++){
 			[self addCmdToQueue:[NSString stringWithFormat:@"PR%d",i+1]];
@@ -592,10 +606,12 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollPressures) object:nil];
     readOnce = NO;
+	[self setInvolvedInProcess:YES];
 }
 
 - (void) processIsStopping
 {
+	[self setInvolvedInProcess:NO];
 	[self pollPressures];
 }
 
@@ -604,10 +620,8 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 {    
 	if(!readOnce){
 		@try { 
-			if([cmdQueue count] == 0) {
-				[self readPressures]; 
-				readOnce = YES;
-			}
+			[self readPressures]; 
+			readOnce = YES;
 		}
 		@catch(NSException* localException) { 
 			//catch this here to prevent it from falling thru, but nothing to do.
@@ -642,7 +656,7 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 {
 	double theValue = 0;
 	@synchronized(self){
-		if(aChan>=0 && aChan<6)return pressure[aChan];
+		if(aChan>=0 && aChan<6)theValue =  pressure[aChan];
  	}
 	return theValue;
 }
@@ -708,7 +722,7 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 
 - (void) timeout
 {
-	NSLogError(@"TGP262",@"command timeout",nil);
+	NSLogError(@"TGP256A",@"command timeout",nil);
 	[self setLastRequest:nil];
 	[cmdQueue removeAllObjects];
 	[self processOneCommandFromQueue];	 //do the next command in the queue
@@ -716,30 +730,24 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 
 - (void) processOneCommandFromQueue
 {
-	if([cmdQueue count] == 0) return;
 	NSString* aCmd = [cmdQueue dequeue];
-	if([aCmd isEqualToString:@"++ShipRecords"]){
-		[self shipPressureValues];
-	}
-	else {
-		if(![aCmd hasSuffix:@"\r\n"]) {
-			aCmd = [aCmd stringByReplacingOccurrencesOfString:@"\n" withString:@""];
-			aCmd = [aCmd stringByReplacingOccurrencesOfString:@"\r" withString:@""];
-			aCmd = [aCmd stringByAppendingString:@"\r\n"];
+	if(aCmd){
+		if([aCmd isEqualToString:@"++ShipRecords"])[self shipPressureValues];
+		else {
+			if(![aCmd hasSuffix:@"\r\n"]) aCmd = [aCmd stringByAppendingString:@"\r\n"];
+			
+			[self setLastRequest:aCmd];
+			[self performSelector:@selector(timeout) withObject:nil afterDelay:3];
+			//just sent a command so the first thing received should be an ACK
+			//enter that state and send the command
+			portDataState = kWaitingForACK;
+			[serialPort writeString:aCmd];
 		}
-		[self setLastRequest:aCmd];
-		[self performSelector:@selector(timeout) withObject:nil afterDelay:3];
-		//just sent a command so the first thing received should be an ACK
-		//enter that state and send the command
-		portDataState = kWaitingForACK;
-		[serialPort writeString:aCmd];
 	}
 }
 
 - (void) process_response:(NSString*)theResponse
 {
-	theResponse = [theResponse stringByReplacingOccurrencesOfString:@"\n" withString:@""];
-	theResponse = [theResponse stringByReplacingOccurrencesOfString:@"\r" withString:@""];
 	if([lastRequest hasPrefix:@"PR"]){
 		int channel = [[lastRequest substringWithRange:NSMakeRange(2,1)] intValue]-1;
 		if(channel>=0 && channel<6){
@@ -762,10 +770,12 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 
 - (void) pollPressures
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollPressures) object:nil];
-	if(pollTime){
-		[self readPressures];
-		[self performSelector:@selector(pollPressures) withObject:nil afterDelay:pollTime];
+	if(!involvedInProcess){
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollPressures) object:nil];
+		if(pollTime){
+			[self readPressures];
+			[self performSelector:@selector(pollPressures) withObject:nil afterDelay:pollTime];
+		}
 	}
 }
 

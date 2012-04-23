@@ -26,6 +26,7 @@
 #import "ORDataTypeAssigner.h"
 #import "ORDataPacket.h"
 #import "ORTimeRate.h"
+#import "ORSafeQueue.h"
 
 #pragma mark •••External Strings
 NSString* ORCP8CryopumpModelSecondStageTempControlChanged	= @"ORCP8CryopumpModelSecondStageTempControlChanged";
@@ -876,12 +877,12 @@ NSString* ORCP8CryopumpLock									= @"ORCP8CryopumpLock";
 			aCmd = [aCmd stringByReplacingOccurrencesOfString:@"\r" withString:@""];
 			aCmd = [aCmd stringByReplacingOccurrencesOfString:@"$" withString:@""];
 		}
-		if(!cmdQueue)cmdQueue	 = [[NSMutableArray array] retain];
+		if(!cmdQueue)cmdQueue	 = [[ORSafeQueue alloc] init];
 		ORCP8CryopumpCmd* cmdObj = [[[ORCP8CryopumpCmd alloc] init] autorelease];
 		cmdObj.cmd = [NSString stringWithFormat:@"$%@%@\r",aCmd,[self checkSum:aCmd]];
 		cmdObj.waitForResponse = waitForResponse;
 		
-		[cmdQueue addObject:cmdObj];
+		[cmdQueue enqueue:cmdObj];
 		if(!lastRequest){
 			[self processOneCommandFromQueue];
 		}
@@ -1073,24 +1074,24 @@ NSString* ORCP8CryopumpLock									= @"ORCP8CryopumpLock";
 - (void) processOneCommandFromQueue
 {
 	
-	if([cmdQueue count] == 0) return;
-	ORCP8CryopumpCmd* cmdObj = [[[cmdQueue objectAtIndex:0] retain] autorelease];
-	[cmdQueue removeObjectAtIndex:0];
-	NSString* aCmd = cmdObj.cmd;
-	if([aCmd isEqualToString:@"++ShipRecords"]){
-		if(shipTemperatures) [self shipTemperatureValues];
-		[self processOneCommandFromQueue];
-	}
-	else {
-		if(cmdObj.waitForResponse) {
-			[self performSelector:@selector(timeout) withObject:nil afterDelay:3];
-			[self setLastRequest:aCmd];
-		}
-		else [self setLastRequest:nil];
-		if(![aCmd hasSuffix:@"\r\n"]) aCmd = [aCmd stringByAppendingString:@"\r\n"];
-		[serialPort writeString:aCmd];
-		if(!lastRequest){
+	ORCP8CryopumpCmd* cmdObj = [cmdQueue dequeue];
+	if(cmdObj){
+		NSString* aCmd = cmdObj.cmd;
+		if([aCmd isEqualToString:@"++ShipRecords"]){
+			if(shipTemperatures) [self shipTemperatureValues];
 			[self processOneCommandFromQueue];
+		}
+		else {
+			if(cmdObj.waitForResponse) {
+				[self performSelector:@selector(timeout) withObject:nil afterDelay:3];
+				[self setLastRequest:aCmd];
+			}
+			else [self setLastRequest:nil];
+			if(![aCmd hasSuffix:@"\r\n"]) aCmd = [aCmd stringByAppendingString:@"\r\n"];
+			[serialPort writeString:aCmd];
+			if(!lastRequest){
+				[self processOneCommandFromQueue];
+			}
 		}
 	}
 }
