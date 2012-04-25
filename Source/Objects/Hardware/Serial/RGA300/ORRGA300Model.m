@@ -1086,11 +1086,31 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRGA300ModelCurrentActivityChanged object:self];
 }
 
-- (void) setScanData:(NSData*)aScanData
+- (void) setScanData:(NSData*)someData
 {
-	[scanData autorelease];
-    scanData = [aScanData copy];
+// swap 16 bit quantities in 32 bit value ( |2| |1| -> |1| |2| )
+#define Swap16Bits(x)    ((((x) & 0xffff0000) >> 16) | (((x) & 0x0000ffff) << 16))
 	
+// swap 8 bit quantities in 32 bit value ( |4| |3| |2| |1| -> |1| |2| |3| |4| )
+#define Swap8Bits(x)	((((Swap16Bits(x) & 0x0000ff00) >> 8) | ((Swap16Bits(x) & 0x000000ff) << 8)) \
+| (((Swap16Bits(x) & 0xff000000) >> 8) | ((Swap16Bits(x) & 0x00ff0000) << 8)))
+	
+	NSMutableData* processedData = [[NSMutableData alloc] initWithLength:[someData length]];
+	int numInts = [someData length]/4;
+	int* old = (int*)[someData bytes];
+	int* new = (int*)[processedData bytes];
+	
+	int i;
+	for(i=0;i<numInts;i++){
+		int oldValue = *old;
+		*new = Swap8Bits(oldValue);
+		new++;
+		old++;
+	}
+	
+	[scanData release];
+    scanData = processedData;
+		
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRGA300ModelScanDataChanged object:self];
 }
 
