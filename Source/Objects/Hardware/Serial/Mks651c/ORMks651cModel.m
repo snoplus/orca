@@ -200,8 +200,8 @@ NSString* ORMks651cLock = @"ORMks651cLock";
 {
     if([[ORGlobal sharedGlobal] runInProgress]){
 		
-		unsigned long data[6];
-		data[0] = dataId | 6;
+		unsigned long data[4];
+		data[0] = dataId | 4;
 		data[1] = ([self units]<<16) | ([self uniqueIdNumber]&0xfff);
 		
 		union {
@@ -209,15 +209,12 @@ NSString* ORMks651cLock = @"ORMks651cLock";
 			unsigned long asLong;
 		}theData;
 		
-		int index = 2;
-			theData.asFloat = pressure;
-			data[index] = theData.asLong;
-			index++;
-			
-			data[index] = timeMeasured;
-			index++;
+		theData.asFloat = pressure;
+		data[2] = theData.asLong;			
+		data[3] = timeMeasured;
+		
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-															object:[NSData dataWithBytes:data length:sizeof(long)*6]];
+															object:[NSData dataWithBytes:data length:sizeof(long)*4]];
 	}
 }
 
@@ -1269,7 +1266,7 @@ NSString* ORMks651cLock = @"ORMks651cLock";
         @"ORMks651cDecoderForPressure",     @"decoder",
         [NSNumber numberWithLong:dataId],   @"dataId",
         [NSNumber numberWithBool:NO],       @"variable",
-        [NSNumber numberWithLong:8],        @"length",
+        [NSNumber numberWithLong:4],        @"length",
         nil];
     [dataDictionary setObject:aDictionary forKey:@"Pressures"];
     
