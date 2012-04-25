@@ -107,14 +107,14 @@ NSString* ORRateAverageChangedNotification 	= @"ORRateAverageChangedNotification
 
 - (double)valueAtIndex:(unsigned)index
 {
-	NSAssert(index>=0 && index < kTimeAverageBufferSize,@"Time Average Index Out Of Bounds");
-	return timeAverage[(timeAverageRead+index)%kTimeAverageBufferSize];
+	if(index < kTimeAverageBufferSize) return timeAverage[(timeAverageRead+index)%kTimeAverageBufferSize];
+	else return 0.0;
 }
 
 - (NSTimeInterval)timeSampledAtIndex:(unsigned)index
 {
-	NSAssert(index>=0 && index < kTimeAverageBufferSize,@"Time Average Index Out Of Bounds");
-	return timeSampled[(timeAverageRead+index)%kTimeAverageBufferSize];
+	if(index < kTimeAverageBufferSize)return timeSampled[(timeAverageRead+index)%kTimeAverageBufferSize];
+	else return 0.0;
 }
 
 #pragma mark •••Archival
