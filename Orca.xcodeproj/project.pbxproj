@@ -2547,6 +2547,14 @@
 		84F03E6705A0995400275624 /* muxBoxSmall.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84F03E6605A0995400275624 /* muxBoxSmall.gif */; };
 		84F18E6705AF49A8001799E6 /* ORHeartBeat.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F18E6505AF49A8001799E6 /* ORHeartBeat.h */; };
 		84F18E6805AF49A8001799E6 /* ORHeartBeat.m in Sources */ = {isa = PBXBuildFile; fileRef = 84F18E6605AF49A8001799E6 /* ORHeartBeat.m */; };
+		84F3085015483A4000663573 /* Mks660B.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84F3084815483A4000663573 /* Mks660B.nib */; };
+		84F3085115483A4000663573 /* Mks660B.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84F3084915483A4000663573 /* Mks660B.tif */; };
+		84F3085215483A4000663573 /* ORMks660BController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F3084A15483A4000663573 /* ORMks660BController.h */; };
+		84F3085315483A4000663573 /* ORMks660BController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84F3084B15483A4000663573 /* ORMks660BController.m */; };
+		84F3085415483A4000663573 /* ORMks660BDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F3084C15483A4000663573 /* ORMks660BDecoders.h */; };
+		84F3085515483A4000663573 /* ORMks660BDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84F3084D15483A4000663573 /* ORMks660BDecoders.m */; };
+		84F3085615483A4000663573 /* ORMks660BModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F3084E15483A4000663573 /* ORMks660BModel.h */; };
+		84F3085715483A4000663573 /* ORMks660BModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84F3084F15483A4000663573 /* ORMks660BModel.m */; };
 		84F46F370CA44255007EFADA /* ORIpeCard.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F46F0B0CA44255007EFADA /* ORIpeCard.h */; };
 		84F46F380CA44255007EFADA /* ORIpeCard.m in Sources */ = {isa = PBXBuildFile; fileRef = 84F46F0C0CA44255007EFADA /* ORIpeCard.m */; };
 		84F46F390CA44255007EFADA /* ORIpeCardDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F46F0D0CA44255007EFADA /* ORIpeCardDecoder.h */; };
@@ -5446,6 +5454,14 @@
 		84F03E6605A0995400275624 /* muxBoxSmall.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = muxBoxSmall.gif; path = Source/Experiments/Ncd/Detector/muxBoxSmall.gif; sourceTree = SOURCE_ROOT; };
 		84F18E6505AF49A8001799E6 /* ORHeartBeat.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORHeartBeat.h; sourceTree = "<group>"; };
 		84F18E6605AF49A8001799E6 /* ORHeartBeat.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORHeartBeat.m; sourceTree = "<group>"; };
+		84F3084815483A4000663573 /* Mks660B.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Mks660B.nib; path = Source/Objects/Hardware/Serial/Mks660B/Mks660B.nib; sourceTree = SOURCE_ROOT; };
+		84F3084915483A4000663573 /* Mks660B.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Mks660B.tif; path = Source/Objects/Hardware/Serial/Mks660B/Mks660B.tif; sourceTree = SOURCE_ROOT; };
+		84F3084A15483A4000663573 /* ORMks660BController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMks660BController.h; path = Source/Objects/Hardware/Serial/Mks660B/ORMks660BController.h; sourceTree = SOURCE_ROOT; };
+		84F3084B15483A4000663573 /* ORMks660BController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMks660BController.m; path = Source/Objects/Hardware/Serial/Mks660B/ORMks660BController.m; sourceTree = SOURCE_ROOT; };
+		84F3084C15483A4000663573 /* ORMks660BDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMks660BDecoders.h; path = Source/Objects/Hardware/Serial/Mks660B/ORMks660BDecoders.h; sourceTree = SOURCE_ROOT; };
+		84F3084D15483A4000663573 /* ORMks660BDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMks660BDecoders.m; path = Source/Objects/Hardware/Serial/Mks660B/ORMks660BDecoders.m; sourceTree = SOURCE_ROOT; };
+		84F3084E15483A4000663573 /* ORMks660BModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMks660BModel.h; path = Source/Objects/Hardware/Serial/Mks660B/ORMks660BModel.h; sourceTree = SOURCE_ROOT; };
+		84F3084F15483A4000663573 /* ORMks660BModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMks660BModel.m; path = Source/Objects/Hardware/Serial/Mks660B/ORMks660BModel.m; sourceTree = SOURCE_ROOT; };
 		84F46F0B0CA44255007EFADA /* ORIpeCard.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORIpeCard.h; path = "Source/Objects/Hardware/IPE/IPE Base Classes/ORIpeCard.h"; sourceTree = SOURCE_ROOT; };
 		84F46F0C0CA44255007EFADA /* ORIpeCard.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORIpeCard.m; path = "Source/Objects/Hardware/IPE/IPE Base Classes/ORIpeCard.m"; sourceTree = SOURCE_ROOT; };
 		84F46F0D0CA44255007EFADA /* ORIpeCardDecoder.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORIpeCardDecoder.h; path = "Source/Objects/Hardware/IPE/IPE Base Classes/ORIpeCardDecoder.h"; sourceTree = SOURCE_ROOT; };
@@ -7798,6 +7814,7 @@
 			children = (
 				84DEEBBA149916AD0092DB6C /* Serial Base Classes */,
 				8499A74D1518D85700CD7AAC /* CP8Cryopump */,
+				84F3084715483A4000663573 /* Mks660B */,
 				84976E34150E77F50004B444 /* Mks651c */,
 				84B6CD3B14B37E9700386BE1 /* RGA300 */,
 				8407397914CDD91F00BAD105 /* Met637 */,
@@ -11326,6 +11343,22 @@
 			path = "Source/Objects/Misc Objects/HeartBeat";
 			sourceTree = SOURCE_ROOT;
 		};
+		84F3084715483A4000663573 /* Mks660B */ = {
+			isa = PBXGroup;
+			children = (
+				84F3084815483A4000663573 /* Mks660B.nib */,
+				84F3084915483A4000663573 /* Mks660B.tif */,
+				84F3084A15483A4000663573 /* ORMks660BController.h */,
+				84F3084B15483A4000663573 /* ORMks660BController.m */,
+				84F3084C15483A4000663573 /* ORMks660BDecoders.h */,
+				84F3084D15483A4000663573 /* ORMks660BDecoders.m */,
+				84F3084E15483A4000663573 /* ORMks660BModel.h */,
+				84F3084F15483A4000663573 /* ORMks660BModel.m */,
+			);
+			name = Mks660B;
+			path = Source/Objects/Hardware/Serial/Mks660B;
+			sourceTree = SOURCE_ROOT;
+		};
 		84F46F090CA44255007EFADA /* IPE */ = {
 			isa = PBXGroup;
 			children = (
@@ -13210,6 +13243,9 @@
 				84BBE097153CB5110084E6B1 /* ORTPG256AController.h in Headers */,
 				84BBE099153CB5110084E6B1 /* ORTPG256ADecoders.h in Headers */,
 				84BBE09B153CB5110084E6B1 /* ORTPG256AModel.h in Headers */,
+				84F3085215483A4000663573 /* ORMks660BController.h in Headers */,
+				84F3085415483A4000663573 /* ORMks660BDecoders.h in Headers */,
+				84F3085615483A4000663573 /* ORMks660BModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14053,6 +14089,8 @@
 				84914473153C665500597004 /* OutputCallBackVeto.tif in Resources */,
 				84BBE09D153CB5110084E6B1 /* TPG256A.nib in Resources */,
 				84BBE09E153CB5110084E6B1 /* TPG256A.tif in Resources */,
+				84F3085015483A4000663573 /* Mks660B.nib in Resources */,
+				84F3085115483A4000663573 /* Mks660B.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14998,6 +15036,9 @@
 				84BBE098153CB5110084E6B1 /* ORTPG256AController.m in Sources */,
 				84BBE09A153CB5110084E6B1 /* ORTPG256ADecoders.m in Sources */,
 				84BBE09C153CB5110084E6B1 /* ORTPG256AModel.m in Sources */,
+				84F3085315483A4000663573 /* ORMks660BController.m in Sources */,
+				84F3085515483A4000663573 /* ORMks660BDecoders.m in Sources */,
+				84F3085715483A4000663573 /* ORMks660BModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
