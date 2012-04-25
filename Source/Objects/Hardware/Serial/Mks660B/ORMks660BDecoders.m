@@ -31,6 +31,7 @@
 //
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 //                          ^^^^ ^^^^ ^^^^--device id
+//                ^^^^----------------------decimal pt position 1=X.XXXX, 2=XX.XXX, .... 5=XXXXX
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  pressure 
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  time pressure taken in seconds since Jan 1, 1970
 //-----------------------------------------------------------------------------------------------

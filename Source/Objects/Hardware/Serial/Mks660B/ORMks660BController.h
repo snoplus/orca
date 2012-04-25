@@ -23,7 +23,10 @@
 @interface ORMks660BController : OrcaObjectController
 {
     IBOutlet NSTextField*   lockDocField;
-	IBOutlet   NSTextField* fullScaleRBTextField;
+	IBOutlet NSTextField*	lowAlarmTextField;
+	IBOutlet NSTextField*	highLimitTextField;
+	IBOutlet NSTextField*	highAlarmTextField;
+	IBOutlet NSTextField*	fullScaleRBTextField;
 	IBOutlet NSTextField*	calibrationNumberTextField;
 	IBOutlet NSTextField*	lowHysteresisTextField;
 	IBOutlet NSTextField*	highHysteresisTextField;
@@ -54,6 +57,9 @@
 - (void) updateWindow;
 
 #pragma mark ***Interface Management
+- (void) lowAlarmChanged:(NSNotification*)aNote;
+- (void) highLimitChanged:(NSNotification*)aNote;
+- (void) highAlarmChanged:(NSNotification*)aNote;
 - (void) fullScaleRBChanged:(NSNotification*)aNote;
 - (void) calibrationNumberChanged:(NSNotification*)aNote;
 - (void) lowHysteresisChanged:(NSNotification*)aNote;
@@ -73,9 +79,12 @@
 - (void) scaleAction:(NSNotification*)aNote;
 
 #pragma mark ***Actions
-- (IBAction) calibrationNumberTextFieldAction:(id)sender;
-- (IBAction) lowHysteresisTextFieldAction:(id)sender;
-- (IBAction) highHysteresisTextFieldAction:(id)sender;
+- (IBAction) lowAlarmAction:(id)sender;
+- (IBAction) highLimitAction:(id)sender;
+- (IBAction) highAlarmAction:(id)sender;
+- (IBAction) calibrationNumberAction:(id)sender;
+- (IBAction) lowHysteresisAction:(id)sender;
+- (IBAction) highHysteresisAction:(id)sender;
 - (IBAction) decimalPtPositionAction:(id)sender;
 - (IBAction) initHardwareAction:(id)sender;
 - (IBAction) readHardware:(id)sender;

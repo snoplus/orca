@@ -167,6 +167,21 @@
                          name : ORMks660BModelFullScaleRBChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(highAlarmChanged:)
+                         name : ORMks660BModelHighAlarmChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(highLimitChanged:)
+                         name : ORMks660BModelHighLimitChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(lowAlarmChanged:)
+                         name : ORMks660BModelLowAlarmChanged
+						object: model];
+
 }
 
 - (void) setModel:(id)aModel
@@ -193,6 +208,24 @@
 	[self lowHysteresisChanged:nil];
 	[self calibrationNumberChanged:nil];
 	[self fullScaleRBChanged:nil];
+	[self highAlarmChanged:nil];
+	[self highLimitChanged:nil];
+	[self lowAlarmChanged:nil];
+}
+
+- (void) lowAlarmChanged:(NSNotification*)aNote
+{
+	[lowAlarmTextField setFloatValue: [model lowAlarm]];
+}
+
+- (void) highLimitChanged:(NSNotification*)aNote
+{
+	[highLimitTextField setFloatValue: [model highLimit]];
+}
+
+- (void) highAlarmChanged:(NSNotification*)aNote
+{
+	[highAlarmTextField setFloatValue: [model highAlarm]];
 }
 
 - (void) fullScaleRBChanged:(NSNotification*)aNote
@@ -286,8 +319,7 @@
 
 - (void) pressureChanged:(NSNotification*)aNote
 {
-	NSString* pressureAsString = [NSString stringWithFormat:@"%.3E",[model pressure]];
-	[pressureField setStringValue:pressureAsString];
+	[pressureField setFloatValue:[model convertedPressure]];
 	unsigned long t = [model timeMeasured];
 	NSCalendarDate* theDate;
 	if(t){
@@ -326,6 +358,16 @@
     [lowSetPointMatrix setEnabled:!locked];
     [highSetPointMatrix setEnabled:!locked];
 
+	[lowAlarmTextField setEnabled:!locked];
+	[highAlarmTextField setEnabled:!locked];
+	[highLimitTextField setEnabled:!locked];
+	[calibrationNumberTextField setEnabled:!locked];
+	[highHysteresisTextField setEnabled:!locked];
+	[lowHysteresisTextField setEnabled:!locked];
+	[decimalPtPositionPU setEnabled:!locked];
+	[lowSetPointMatrix setEnabled:!locked];
+	[highSetPointMatrix setEnabled:!locked];
+	
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
         if(runInProgress && ![gSecurity isLocked:ORMks660BLock])s = @"Not in Maintenance Run.";
@@ -383,25 +425,40 @@
 }
 
 #pragma mark ***Actions
+- (void) lowAlarmAction:(id)sender
+{
+	[model setLowAlarm:[sender floatValue]];	
+}
 
-- (void) calibrationNumberTextFieldAction:(id)sender
+- (void) highLimitAction:(id)sender
+{
+	[model setHighLimit:[sender floatValue]];	
+}
+
+- (void) highAlarmAction:(id)sender
+{
+	[model setHighAlarm:[sender floatValue]];	
+}
+
+- (void) calibrationNumberAction:(id)sender
 {
 	[model setCalibrationNumber:[sender intValue]];	
 }
 
-- (void) lowHysteresisTextFieldAction:(id)sender
+- (void) lowHysteresisAction:(id)sender
 {
 	[model setLowHysteresis:[sender intValue]];	
 }
 
-- (void) highHysteresisTextFieldAction:(id)sender
+- (void) highHysteresisAction:(id)sender
 {
 	[model setHighHysteresis:[sender intValue]];	
 }
 
 - (void) decimalPtPositionAction:(id)sender
 {
-	[model setDecimalPtPosition:[sender indexOfSelectedItem]];	
+	[model setDecimalPtPosition:[sender indexOfSelectedItem]];
+	[model writeDecimalPtPosition];
 }
 
 - (IBAction) loadDialogFromHW:(id)sender

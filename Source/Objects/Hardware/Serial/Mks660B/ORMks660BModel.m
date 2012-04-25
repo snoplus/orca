@@ -29,6 +29,9 @@
 #import "ORSafeQueue.h"
 
 #pragma mark •••External Strings
+NSString* ORMks660BModelLowAlarmChanged = @"ORMks660BModelLowAlarmChanged";
+NSString* ORMks660BModelHighLimitChanged = @"ORMks660BModelHighLimitChanged";
+NSString* ORMks660BModelHighAlarmChanged = @"ORMks660BModelHighAlarmChanged";
 NSString* ORMks660BModelFullScaleRBChanged = @"ORMks660BModelFullScaleRBChanged";
 NSString* ORMks660BModelCalibrationNumberChanged = @"ORMks660BModelCalibrationNumberChanged";
 NSString* ORMks660BModelLowHysteresisChanged = @"ORMks660BModelLowHysteresisChanged";
@@ -156,7 +159,7 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 		
 		unsigned long data[4];
 		data[0] = dataId | 4;
-		data[1] = ([self uniqueIdNumber]&0xfff);
+		data[1] = (([self decimalPtPosition]&0xf)<<16) | ([self uniqueIdNumber]&0xfff);
 		data[2] = pressure;		
 		data[3] = timeMeasured;
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
@@ -165,6 +168,48 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 }
 
 #pragma mark •••Accessors
+
+- (float) lowAlarm
+{
+    return lowAlarm;
+}
+
+- (void) setLowAlarm:(float)aLowAlarm
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setLowAlarm:lowAlarm];
+    
+    lowAlarm = aLowAlarm;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks660BModelLowAlarmChanged object:self];
+}
+
+- (float) highLimit
+{
+    return highLimit;
+}
+
+- (void) setHighLimit:(float)aHighLimit
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setHighLimit:highLimit];
+    
+    highLimit = aHighLimit;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks660BModelHighLimitChanged object:self];
+}
+
+- (float) highAlarm
+{
+    return highAlarm;
+}
+
+- (void) setHighAlarm:(float)aHighAlarm
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setHighAlarm:highAlarm];
+    
+    highAlarm = aHighAlarm;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks660BModelHighAlarmChanged object:self];
+}
 
 - (int) fullScaleRB
 {
@@ -216,6 +261,8 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 
 - (int) decimalPtPosition
 {
+	if(decimalPtPosition<1)			return 1;
+	else if(decimalPtPosition>5)	return 5;
     return decimalPtPosition;
 }
 
@@ -293,13 +340,17 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 		[[[self undoManager] prepareWithInvocationTarget:self] setHighSetPoint:index withValue:highSetPoint[index]];
 		highSetPoint[index] = aValue;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORMks660BHighSetPointChanged object:self];
-        
 	}
 }
 
 - (unsigned long) timeMeasured
 {
 	return timeMeasured;
+}
+
+- (float) convertedPressure
+{
+	return pressure/powf(10.0,5 - decimalPtPosition);
 }
 
 - (int) pressure
@@ -316,7 +367,7 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 	timeMeasured = ut_Time;
 
 	if(timeRates == nil) timeRates = [[ORTimeRate alloc] init];
-	[timeRates addDataToTimeAverage:aValue];
+	[timeRates addDataToTimeAverage:[self convertedPressure]];
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORMks660BPressureChanged object:self];
 }
@@ -411,6 +462,9 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 {
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
+	[self setLowAlarm:			[decoder decodeFloatForKey:@"lowAlarm"]];
+	[self setHighLimit:			[decoder decodeFloatForKey:	 @"highLimit"]];
+	[self setHighAlarm:			[decoder decodeFloatForKey:	 @"highAlarm"]];
 	[self setCalibrationNumber:	[decoder decodeIntForKey:	 @"calibrationNumber"]];
 	[self setLowHysteresis:		[decoder decodeIntForKey:	 @"lowHysteresis"]];
 	[self setHighHysteresis:	[decoder decodeIntForKey:	 @"highHysteresis"]];
@@ -436,6 +490,9 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+	[encoder encodeFloat:lowAlarm			forKey:@"lowAlarm"];
+	[encoder encodeFloat:highLimit			forKey:@"highLimit"];
+	[encoder encodeFloat:highAlarm			forKey:@"highAlarm"];
 	[encoder encodeInt:calibrationNumber	forKey:@"calibrationNumber"];
 	[encoder encodeInt:lowHysteresis		forKey:@"lowHysteresis"];
 	[encoder encodeInt:highHysteresis		forKey:@"highHysteresis"];
@@ -505,11 +562,10 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 
 - (void) writeHysteresis
 {
-	NSString* theCmd;
-	theCmd = [NSString stringWithFormat:@"H1%06d",highHysteresis];
-	[self addCmdToQueue:theCmd waitForResponse:NO];
-	theCmd = [NSString stringWithFormat:@"H2%06d",lowHysteresis];
-	[self addCmdToQueue:theCmd waitForResponse:NO];
+	[self addCmdToQueue:[NSString stringWithFormat:@"H1%06d",highHysteresis] waitForResponse:NO];
+	[self addCmdToQueue:[NSString stringWithFormat:@"H2%06d",lowHysteresis] waitForResponse:NO];
+	
+	[self readHysteresis];
 }
 
 - (void) readPressure
@@ -545,6 +601,8 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 - (void) initHardware
 {
 	[self writeSetPoints];
+	[self writeHysteresis];
+	[self writeDecimalPtPosition];
 }
 
 - (void) readAndCompare
@@ -607,6 +665,79 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 		[self performSelector:@selector(pollHardware) withObject:nil afterDelay:pollTime];
 	}
 }
+#pragma mark •••Adc Processing Protocol
+- (void) processIsStarting
+{
+}
+
+- (void) processIsStopping
+{
+}
+
+//note that everything called by these routines MUST be threadsafe
+- (void) startProcessCycle
+{    
+}
+
+- (void) endProcessCycle
+{
+}
+
+- (NSString*) identifier
+{
+	NSString* s;
+ 	@synchronized(self){
+		s= [NSString stringWithFormat:@"MKS660,%d",[self uniqueIdNumber]];
+	}
+	return s;
+}
+
+- (NSString*) processingTitle
+{
+	NSString* s;
+ 	@synchronized(self){
+		s= [self identifier];
+	}
+	return s;
+}
+
+- (double) convertedValue:(int)aChan
+{
+	double theValue = 0;
+	@synchronized(self){
+		theValue = [self convertedPressure];
+	}
+	return theValue;
+}
+
+- (double) maxValueForChan:(int)aChan
+{
+	return highLimit;
+}
+
+- (double) minValueForChan:(int)aChan
+{
+	return 0;
+}
+
+- (void) getAlarmRangeLow:(double*)theLowAlarm high:(double*)theHighAlarm channel:(int)aChan
+{
+	@synchronized(self){
+		*theLowAlarm  = lowAlarm;
+		*theHighAlarm = highAlarm;
+	}		
+}
+
+- (BOOL) processValue:(int)channel
+{
+	return NO;
+}
+
+- (void) setProcessOutput:(int)channel value:(int)value
+{
+    //nothing to do
+}
+
 
 @end
 
@@ -628,7 +759,6 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 
 - (void) processOneCommandFromQueue
 {
-	
 	ORMks660BCmd* cmdObj = [cmdQueue dequeue];
 	if(cmdObj){
 		NSString* aCmd = cmdObj.cmd;

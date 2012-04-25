@@ -17,12 +17,13 @@
 //-------------------------------------------------------------
 
 #pragma mark •••Imported Files
+#import "ORAdcProcessing.h"
 
 @class ORSerialPort;
 @class ORTimeRate;
 @class ORSafeQueue;
 
-@interface ORMks660BModel : OrcaObject
+@interface ORMks660BModel : OrcaObject <ORAdcProcessing>
 {
     @private
         NSString*			portName;
@@ -49,6 +50,9 @@
 		int					lowHysteresis;
 		int					calibrationNumber;
 		int					fullScaleRB;
+    float highAlarm;
+    float highLimit;
+    float lowAlarm;
 }
 
 #pragma mark •••Initialization
@@ -58,6 +62,12 @@
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark •••Accessors
+- (float) lowAlarm;
+- (void) setLowAlarm:(float)aLowAlarm;
+- (float) highLimit;
+- (void) setHighLimit:(float)aHighLimit;
+- (float) highAlarm;
+- (void) setHighAlarm:(float)aHighAlarm;
 - (int) fullScaleRB;
 - (void) setFullScaleRB:(int)aFullScaleRB;
 - (int) calibrationNumber;
@@ -82,6 +92,7 @@
 - (void) openPort:(BOOL)state;
 - (int) pressure;
 - (unsigned long) timeMeasured;
+- (float) convertedPressure;
 - (void) setPressure:(int)aValue;
 - (float) lowSetPoint:(int)index;
 - (float) highSetPoint:(int)index;
@@ -90,6 +101,7 @@
 
 - (float) lowSetPoint:(int)index;
 - (float) highSetPoint:(int)index;
+- (float) convertedPressure;
 
 - (NSString*) lastRequest;
 - (void) setLastRequest:(NSString*)aRequest;
@@ -118,6 +130,7 @@
 - (void) writeSetPoints;
 - (void) writeHysteresis;
 - (void) writeCalibrationNumber;
+- (void) writeDecimalPtPosition;
 
 - (void) pollHardware;
 - (void) initHardware;
@@ -125,6 +138,19 @@
 
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
+#pragma mark •••Adc Processing Protocol
+- (void) processIsStarting;
+- (void) processIsStopping;
+- (void) startProcessCycle;
+- (void) endProcessCycle;
+- (NSString*) identifier;
+- (NSString*) processingTitle;
+- (double) convertedValue:(int)aChan;
+- (double) maxValueForChan:(int)aChan;
+- (double) minValueForChan:(int)aChan;
+- (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit channel:(int)aChan;
+- (BOOL) processValue:(int)channel;
+- (void) setProcessOutput:(int)channel value:(int)value;
 
 @end
 
@@ -138,6 +164,9 @@
 @property (nonatomic,copy) NSString* cmd;
 @end
 
+extern NSString* ORMks660BModelLowAlarmChanged;
+extern NSString* ORMks660BModelHighLimitChanged;
+extern NSString* ORMks660BModelHighAlarmChanged;
 extern NSString* ORMks660BModelFullScaleRBChanged;
 extern NSString* ORMks660BModelCalibrationNumberChanged;
 extern NSString* ORMks660BModelLowHysteresisChanged;
