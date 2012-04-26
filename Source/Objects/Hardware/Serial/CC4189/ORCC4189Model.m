@@ -346,12 +346,11 @@ NSString* ORCC4189Lock = @"ORCC4189Lock";
 - (void) openPort:(BOOL)state
 {
     if(state) {
-        [serialPort open];
 		[serialPort setSpeed:9600];
 		[serialPort setParityOdd];
 		[serialPort setStopBits2:1];
 		[serialPort setDataBits:7];
-		[serialPort commitChanges];
+        [serialPort open];
     }
     else      [serialPort close];
     portWasOpen = [serialPort isOpen];
