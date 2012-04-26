@@ -29,15 +29,14 @@
 #import "ORSafeQueue.h"
 
 #pragma mark •••External Strings
-NSString* ORMks660BModelLowAlarmChanged = @"ORMks660BModelLowAlarmChanged";
-NSString* ORMks660BModelHighLimitChanged = @"ORMks660BModelHighLimitChanged";
-NSString* ORMks660BModelHighAlarmChanged = @"ORMks660BModelHighAlarmChanged";
-NSString* ORMks660BModelFullScaleRBChanged = @"ORMks660BModelFullScaleRBChanged";
+NSString* ORMks660BModelLowAlarmChanged		= @"ORMks660BModelLowAlarmChanged";
+NSString* ORMks660BModelHighLimitChanged	= @"ORMks660BModelHighLimitChanged";
+NSString* ORMks660BModelHighAlarmChanged	= @"ORMks660BModelHighAlarmChanged";
+NSString* ORMks660BModelFullScaleRBChanged	= @"ORMks660BModelFullScaleRBChanged";
 NSString* ORMks660BModelCalibrationNumberChanged = @"ORMks660BModelCalibrationNumberChanged";
-NSString* ORMks660BModelLowHysteresisChanged = @"ORMks660BModelLowHysteresisChanged";
-NSString* ORMks660BModelHighHysteresisChanged = @"ORMks660BModelHighHysteresisChanged";
+NSString* ORMks660BModelLowHysteresisChanged	 = @"ORMks660BModelLowHysteresisChanged";
+NSString* ORMks660BModelHighHysteresisChanged	 = @"ORMks660BModelHighHysteresisChanged";
 NSString* ORMks660BModelDecimalPtPositionChanged = @"ORMks660BModelDecimalPtPositionChanged";
-NSString* ORMks660BPressureScaleChanged		= @"ORMks660BPressureScaleChanged";
 NSString* ORMks660BShipPressuresChanged		= @"ORMks660BShipPressuresChanged";
 NSString* ORMks660BPollTimeChanged			= @"ORMks660BPollTimeChanged";
 NSString* ORMks660BSerialPortChanged		= @"ORMks660BSerialPortChanged";
@@ -46,6 +45,7 @@ NSString* ORMks660BPortStateChanged			= @"ORMks660BPortStateChanged";
 NSString* ORMks660BPressureChanged			= @"ORMks660BPressureChanged";
 NSString* ORMks660BLowSetPointChanged       = @"ORMks660BLowSetPointChanged";
 NSString* ORMks660BHighSetPointChanged      = @"ORMks660BHighSetPointChanged";
+NSString* ORMks660BInvolvedInProcessChanged = @"ORMks660BInvolvedInProcessChanged";
 
 NSString* ORMks660BLock = @"ORMks660BLock";
 
@@ -136,7 +136,6 @@ NSString* ORMks660BLock = @"ORMks660BLock";
         theString = [[theString componentsSeparatedByString:@"\n"] componentsJoinedByString:@""];
         if(!buffer)buffer = [[NSMutableString string] retain];
         [buffer appendString:theString];					
-		
         do {
             NSRange lineRange = [buffer rangeOfString:@"\r"];
             if(lineRange.location!= NSNotFound){
@@ -160,7 +159,14 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 		unsigned long data[4];
 		data[0] = dataId | 4;
 		data[1] = (([self decimalPtPosition]&0xf)<<16) | ([self uniqueIdNumber]&0xfff);
-		data[2] = pressure;		
+
+		union {
+			float asFloat;
+			unsigned long asLong;
+		}theData;
+		
+		theData.asFloat = pressure;
+		data[2] = theData.asLong;			
 		data[3] = timeMeasured;
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
 															object:[NSData dataWithBytes:data length:sizeof(long)*4]];
@@ -168,6 +174,16 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 }
 
 #pragma mark •••Accessors
+- (BOOL) involvedInProcess
+{
+    return involvedInProcess;
+}
+
+- (void) setInvolvedInProcess:(BOOL)aInvolvedInProcess
+{
+    involvedInProcess = aInvolvedInProcess;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks660BInvolvedInProcessChanged object:self];
+}
 
 - (float) lowAlarm
 {
@@ -177,9 +193,7 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 - (void) setLowAlarm:(float)aLowAlarm
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setLowAlarm:lowAlarm];
-    
     lowAlarm = aLowAlarm;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMks660BModelLowAlarmChanged object:self];
 }
 
@@ -191,9 +205,7 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 - (void) setHighLimit:(float)aHighLimit
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setHighLimit:highLimit];
-    
     highLimit = aHighLimit;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMks660BModelHighLimitChanged object:self];
 }
 
@@ -205,9 +217,7 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 - (void) setHighAlarm:(float)aHighAlarm
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setHighAlarm:highAlarm];
-    
     highAlarm = aHighAlarm;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMks660BModelHighAlarmChanged object:self];
 }
 
@@ -230,11 +240,10 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 - (void) setCalibrationNumber:(int)aCalibrationNumber
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setCalibrationNumber:calibrationNumber];
-    
     calibrationNumber = aCalibrationNumber;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMks660BModelCalibrationNumberChanged object:self];
 }
+
 - (int) lowHysteresis
 {
     return lowHysteresis;
@@ -242,6 +251,8 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 
 - (void) setLowHysteresis:(int)aLowHysteresis
 {
+	if(aLowHysteresis<0)aLowHysteresis=0;
+	else if(aLowHysteresis>99)aLowHysteresis=99;
     [[[self undoManager] prepareWithInvocationTarget:self] setLowHysteresis:lowHysteresis];
     lowHysteresis = aLowHysteresis;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMks660BModelLowHysteresisChanged object:self];
@@ -249,11 +260,14 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 
 - (int) highHysteresis
 {
+	
     return highHysteresis;
 }
 
 - (void) setHighHysteresis:(int)aHighHysteresis
 {
+	if(aHighHysteresis<0)aHighHysteresis=0;
+	else if(aHighHysteresis>99)aHighHysteresis=99;
     [[[self undoManager] prepareWithInvocationTarget:self] setHighHysteresis:highHysteresis];
     highHysteresis = aHighHysteresis;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMks660BModelHighHysteresisChanged object:self];
@@ -261,15 +275,15 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 
 - (int) decimalPtPosition
 {
-	if(decimalPtPosition<1)			return 1;
-	else if(decimalPtPosition>5)	return 5;
+	if(decimalPtPosition<1)			return 0;
+	else if(decimalPtPosition>5)	return 4;
     return decimalPtPosition;
 }
 
 - (void) setDecimalPtPosition:(int)aDecimalPtPosition
 {
-	if(aDecimalPtPosition<1)		aDecimalPtPosition=1;
-	else if(aDecimalPtPosition>5)	aDecimalPtPosition=5;
+	if(aDecimalPtPosition<1)		aDecimalPtPosition=0;
+	else if(aDecimalPtPosition>5)	aDecimalPtPosition=4;
 	
     [[[self undoManager] prepareWithInvocationTarget:self] setDecimalPtPosition:decimalPtPosition];
     decimalPtPosition = aDecimalPtPosition;
@@ -312,13 +326,13 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 	}
 }
 
-- (float) lowSetPoint:(int)index
+- (int) lowSetPoint:(int)index
 {
     if(index>=0 && index<2)return lowSetPoint[index];
-	else return 0.0;
+	else return 0;
 }
 
-- (void) setLowSetPoint:(int)index withValue:(float)aValue;
+- (void) setLowSetPoint:(int)index withValue:(int)aValue;
 {
     if(index>=0 && index<2){
 		[[[self undoManager] prepareWithInvocationTarget:self] setLowSetPoint:index withValue:lowSetPoint[index]];
@@ -328,13 +342,13 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 	}
 }
 
-- (float) highSetPoint:(int)index
+- (int) highSetPoint:(int)index
 {
     if(index>=0 && index<2)return highSetPoint[index];
 	else return 0.0;
 }
 
-- (void) setHighSetPoint:(int)index withValue:(float)aValue;
+- (void) setHighSetPoint:(int)index withValue:(int)aValue;
 {
     if(index>=0 && index<2){
 		[[[self undoManager] prepareWithInvocationTarget:self] setHighSetPoint:index withValue:highSetPoint[index]];
@@ -348,17 +362,12 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 	return timeMeasured;
 }
 
-- (float) convertedPressure
-{
-	return pressure/powf(10.0,5 - decimalPtPosition);
-}
-
-- (int) pressure
+- (float) pressure
 {
 	return pressure;
 }
 
-- (void) setPressure:(int)aValue
+- (void) setPressure:(float)aValue
 {
 	pressure = aValue;
 	//get the time(UT!)
@@ -367,7 +376,7 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 	timeMeasured = ut_Time;
 
 	if(timeRates == nil) timeRates = [[ORTimeRate alloc] init];
-	[timeRates addDataToTimeAverage:[self convertedPressure]];
+	[timeRates addDataToTimeAverage:pressure];
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORMks660BPressureChanged object:self];
 }
@@ -476,8 +485,8 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 	
 	int i;
 	for(i=0;i<2;i++){
-		[self setLowSetPoint:i   withValue:	[decoder decodeInt32ForKey: [NSString stringWithFormat:@"lowSetPoint%d",i]]];
-		[self setHighSetPoint:i   withValue:	[decoder decodeInt32ForKey: [NSString stringWithFormat:@"highSetPoint%d",i]]];
+		[self setLowSetPoint:i   withValue:	[decoder decodeIntForKey: [NSString stringWithFormat:@"lowSetPoint%d",i]]];
+		[self setHighSetPoint:i  withValue: [decoder decodeIntForKey: [NSString stringWithFormat:@"highSetPoint%d",i]]];
 	}
 	
 	[[self undoManager] enableUndoRegistration];
@@ -503,8 +512,8 @@ NSString* ORMks660BLock = @"ORMks660BLock";
     [encoder encodeObject:portName			forKey: @"portName"];
 	int i;
 	for(i=0;i<2;i++){
-		[encoder encodeInt32:lowSetPoint[i]	  forKey: [NSString stringWithFormat:@"lowSetPoint%d",i]];
-		[encoder encodeInt32:highSetPoint[i]  forKey: [NSString stringWithFormat:@"highSetPoint%d",i]];
+		[encoder encodeInt:lowSetPoint[i]	forKey: [NSString stringWithFormat:@"lowSetPoint%d",i]];
+		[encoder encodeInt:highSetPoint[i]  forKey: [NSString stringWithFormat:@"highSetPoint%d",i]];
 	}
 }
 
@@ -536,7 +545,7 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 
 - (void) writeCalibrationNumber
 {
-	[self addCmdToQueue:[NSString stringWithFormat:@"S%06d",calibrationNumber] waitForResponse:NO];
+	[self addCmdToQueue:[NSString stringWithFormat:@"S%05d",calibrationNumber] waitForResponse:NO];
 }
 
 - (void) writeDecimalPtPosition
@@ -546,24 +555,32 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 
 - (void) writeSetPoints
 {
-	NSString* theCmd;
-	theCmd = [NSString stringWithFormat:@"P1%06d",highSetPoint[0]>=0?@"+":@"-",highSetPoint[0]];
-	[self addCmdToQueue:theCmd waitForResponse:NO];
-	theCmd = [NSString stringWithFormat:@"P2%06d",lowSetPoint[0]>=0?@"+":@"-",lowSetPoint[0]];
-	[self addCmdToQueue:theCmd waitForResponse:NO];
-	
-	theCmd = [NSString stringWithFormat:@"P3%06d",highSetPoint[1]>=0?@"+":@"-",highSetPoint[1]];
-	[self addCmdToQueue:theCmd waitForResponse:NO];
-	theCmd = [NSString stringWithFormat:@"P4%02d",lowSetPoint[1]>=0?@"+":@"-",lowSetPoint[1]];
-	[self addCmdToQueue:theCmd waitForResponse:NO];
-	
-	[self readSetPoints];
+	[self addCmdToQueue:[NSString stringWithFormat:@"P1%@%05d",highSetPoint[0]>=0?@"+":@"-",abs(highSetPoint[0])] waitForResponse:NO];
+	[self addCmdToQueue:@"++Delay" waitForResponse:YES];
+	[self addCmdToQueue:@"R1" waitForResponse:YES];
+
+	[self addCmdToQueue:[NSString stringWithFormat:@"P2%@%05d",lowSetPoint[0]>=0?@"+":@"-",abs(lowSetPoint[0])] waitForResponse:NO];
+	[self addCmdToQueue:@"++Delay" waitForResponse:YES];
+    [self addCmdToQueue:@"R2" waitForResponse:YES];
+ 
+	[self addCmdToQueue:[NSString stringWithFormat:@"P3%@%05d",highSetPoint[1]>=0?@"+":@"-",abs(highSetPoint[1])] waitForResponse:NO];
+	[self addCmdToQueue:@"++Delay" waitForResponse:YES];
+    [self addCmdToQueue:@"R3" waitForResponse:YES];
+
+	[self addCmdToQueue:[NSString stringWithFormat:@"P4%@%05d",lowSetPoint[1]>=0?@"+":@"-",abs(lowSetPoint[1])] waitForResponse:NO];
+	[self addCmdToQueue:@"++Delay" waitForResponse:YES];
+    [self addCmdToQueue:@"R4" waitForResponse:YES];
 }
 
 - (void) writeHysteresis
 {
-	[self addCmdToQueue:[NSString stringWithFormat:@"H1%06d",highHysteresis] waitForResponse:NO];
-	[self addCmdToQueue:[NSString stringWithFormat:@"H2%06d",lowHysteresis] waitForResponse:NO];
+	[self addCmdToQueue:[NSString stringWithFormat:@"H1%02d",highHysteresis] waitForResponse:NO];
+	[self addCmdToQueue:@"++Delay" waitForResponse:YES];
+    [self addCmdToQueue:@"R6" waitForResponse:YES];
+	
+	[self addCmdToQueue:[NSString stringWithFormat:@"H2%02d",lowHysteresis] waitForResponse:NO];
+	[self addCmdToQueue:@"++Delay" waitForResponse:YES];
+	[self addCmdToQueue:@"R7" waitForResponse:YES];
 	
 	[self readHysteresis];
 }
@@ -571,6 +588,7 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 - (void) readPressure
 {
 	[self addCmdToQueue:@"R5" waitForResponse:YES];
+	[self addCmdToQueue:@"R8" waitForResponse:YES];
 	[self addCmdToQueue:@"++ShipRecords" waitForResponse:NO];
 }
 
@@ -600,9 +618,10 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 
 - (void) initHardware
 {
-	[self writeSetPoints];
-	[self writeHysteresis];
 	[self writeDecimalPtPosition];
+	[self addCmdToQueue:@"++Delay" waitForResponse:YES];
+	[self writeHysteresis];
+	[self writeSetPoints];
 }
 
 - (void) readAndCompare
@@ -668,19 +687,37 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 #pragma mark •••Adc Processing Protocol
 - (void) processIsStarting
 {
+	//we will control the polling loop
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
+    readOnce = NO;
+	[self setInvolvedInProcess:YES];
 }
 
 - (void) processIsStopping
 {
+	//return control to the normal loop
+	[self setPollTime:pollTime];
+	[self setInvolvedInProcess:NO];
 }
 
 //note that everything called by these routines MUST be threadsafe
 - (void) startProcessCycle
 {    
+    if(!readOnce){
+        @try { 
+            [self readPressure]; 
+			if(shipPressures) [self performSelectorOnMainThread:@selector(shipPressures) withObject:nil waitUntilDone:NO];
+            readOnce = YES;
+        }
+		@catch(NSException* localException) { 
+			//catch this here to prevent it from falling thru, but nothing to do.
+        }
+    }
 }
 
 - (void) endProcessCycle
 {
+	readOnce = NO;
 }
 
 - (NSString*) identifier
@@ -705,7 +742,7 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 {
 	double theValue = 0;
 	@synchronized(self){
-		theValue = [self convertedPressure];
+		theValue = [self pressure];
 	}
 	return theValue;
 }
@@ -757,12 +794,25 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 	[self setLastRequest:nil];
 }
 
+- (void) clearDelay
+{
+	delay = NO;
+	[self processOneCommandFromQueue];
+}
+
 - (void) processOneCommandFromQueue
 {
+	if(delay)return;
+	
 	ORMks660BCmd* cmdObj = [cmdQueue dequeue];
 	if(cmdObj){
 		NSString* aCmd = cmdObj.cmd;
-		if([aCmd isEqualToString:@"++ShipRecords"]){
+		if([aCmd isEqualToString:@"++Delay"]){
+			delay = YES;
+			[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(clearDelay) object:nil];
+			[self performSelector:@selector(clearDelay) withObject:nil afterDelay:.1];
+		}
+		else if([aCmd isEqualToString:@"++ShipRecords"]){
 			if(shipPressures) [self shipPressureValues];
 			[self processOneCommandFromQueue];
 		}
@@ -810,15 +860,16 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 	if([theResponse hasPrefix:@"P"]){
 		int index = [[theResponse substringWithRange:NSMakeRange(1,1)] intValue];
 		if(index==2 || index==4){
-			int theValue = [[theResponse substringFromIndex:2] intValue];
+			float scaleFactor = powf(10.,4-decimalPtPosition);
+			float theValue = [[theResponse substringFromIndex:2] floatValue];
 			int i = 0;
 			if(index == 4) i = 1;
 			if(loadDialog){
-				[self setLowSetPoint:i withValue:theValue];
+				[self setLowSetPoint:i withValue:theValue * scaleFactor];
 				return YES;
 			}
-			if(fabs(lowSetPoint[i] - theValue) == 0)return YES;
-			else NSLogColor([NSColor redColor], @"MKS660B (%d) LowSetPoint[%d] ReadBack mismatch (%d != %d)\n",[self uniqueIdNumber],i,lowSetPoint[i],theValue);
+			if(fabs(lowSetPoint[i]/scaleFactor - theValue) < 0.001)return YES;
+			else NSLogColor([NSColor redColor], @"MKS660B (%d) LowSetPoint[%d] ReadBack mismatch (%.4f != %.4f)\n",[self uniqueIdNumber],i+1,lowSetPoint[i]/scaleFactor,theValue);
 		}
 		else return NO;
     }
@@ -830,15 +881,16 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 	if([theResponse hasPrefix:@"P"]){
 		int index = [[theResponse substringWithRange:NSMakeRange(1,1)] intValue];
 		if(index==1 || index==3){
-			int theValue = [[theResponse substringFromIndex:2] intValue];
+			float scaleFactor = powf(10.,4-decimalPtPosition);
+			float theValue = [[theResponse substringFromIndex:2] floatValue];
 			int i = 0;
 			if(index == 3) i = 1;
 			if(loadDialog){
-				[self setHighSetPoint:i withValue:theValue];
+				[self setHighSetPoint:i withValue:theValue * scaleFactor];
 				return YES;
 			}
-			if(fabs(highSetPoint[i] - theValue) == 0)return YES;
-			else NSLogColor([NSColor redColor], @"MKS660B (%d) HighSetPoint[%d] ReadBack mismatch (%d != %d)\n",[self uniqueIdNumber],i,highSetPoint[i],theValue);
+			if(fabs(highSetPoint[i]/scaleFactor - theValue) < 0.001)return YES;
+			else NSLogColor([NSColor redColor], @"MKS660B (%d) HighSetPoint[%d] ReadBack mismatch (%.4f != %.4f)\n",[self uniqueIdNumber],i+1,highSetPoint[i]/scaleFactor,theValue);
 		}
 		else return NO;
     }
@@ -858,7 +910,7 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 - (BOOL) decodePressure:(NSString*)theResponse
 {
     if([theResponse hasPrefix:@"P"]){
-		int theValue = [[theResponse substringFromIndex:1] intValue];
+		float theValue = [[theResponse substringFromIndex:1] floatValue];
 		[self setPressure:theValue];
 		return YES;
 	}

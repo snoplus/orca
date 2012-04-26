@@ -31,8 +31,7 @@
 //
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 //                          ^^^^ ^^^^ ^^^^--device id
-//                ^^^^----------------------decimal pt position 1=X.XXXX, 2=XX.XXX, .... 5=XXXXX
-// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  pressure 
+// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  pressure encoded as a float
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  time pressure taken in seconds since Jan 1, 1970
 //-----------------------------------------------------------------------------------------------
 @implementation ORMks660BDecoderForPressure
@@ -65,8 +64,15 @@
 
     NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[3]];
     [date setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
-		
-    theString = [theString stringByAppendingFormat:@"Gauge %d: %.2E %@\n",ident,dataPtr[2],date];
+	
+	union {
+		float asFloat;
+		unsigned long asLong;
+	}theData;
+    theData.asLong = dataPtr[2];
+	
+	
+    theString = [theString stringByAppendingFormat:@"Gauge %d: %.4 %@\n",ident,dataPtr[2],date];
 	return theString;
 }
 @end

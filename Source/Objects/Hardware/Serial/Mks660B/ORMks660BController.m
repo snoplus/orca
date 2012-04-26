@@ -181,7 +181,18 @@
                      selector : @selector(lowAlarmChanged:)
                          name : ORMks660BModelLowAlarmChanged
 						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(involvedInProcessChanged:)
+                         name : ORMks660BInvolvedInProcessChanged
+						object: model];
+	
 
+}
+
+- (void) involvedInProcessChanged:(NSNotification*)aNote
+{
+	[self lockChanged:nil];
 }
 
 - (void) setModel:(id)aModel
@@ -251,6 +262,7 @@
 - (void) decimalPtPositionChanged:(NSNotification*)aNote
 {
 	[decimalPtPositionPU selectItemAtIndex: [model decimalPtPosition]];
+	[self setUpFormats];
 }
 
 - (void) scaleAction:(NSNotification*)aNotification
@@ -305,21 +317,25 @@
 {
     int i;
     for(i=0;i<2;i++){
-		[[lowSetPointMatrix cellWithTag:i] setIntValue: [model lowSetPoint:i]];
+		float theConvertedValue = [model lowSetPoint:i]/powf(10.,4-[model decimalPtPosition]);
+		[[lowSetPointMatrix cellWithTag:i] setFloatValue: theConvertedValue];
     }
 }
 - (void) highSetPointChanged:(NSNotification*)aNote
 {
     int i;
     for(i=0;i<2;i++){
-		[[highSetPointMatrix cellWithTag:i] setIntValue: [model highSetPoint:i]];
+		float theConvertedValue = [model highSetPoint:i]/powf(10.,4-[model decimalPtPosition]);
+		[[highSetPointMatrix cellWithTag:i] setFloatValue: theConvertedValue];
     }
 }
 
 
 - (void) pressureChanged:(NSNotification*)aNote
 {
-	[pressureField setFloatValue:[model convertedPressure]];
+	NSString* format = [NSString stringWithFormat:@"%%.%df",4 - [model decimalPtPosition]];
+	NSString* theValue = [NSString stringWithFormat:format,[model pressure]];
+	[pressureField setStringValue:theValue];
 	unsigned long t = [model timeMeasured];
 	NSCalendarDate* theDate;
 	if(t){
@@ -344,12 +360,13 @@
     BOOL runInProgress = [gOrcaGlobals runInProgress];
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORMks660BLock];
     BOOL locked = [gSecurity isLocked:ORMks660BLock];
+	BOOL inProcess = [model involvedInProcess];
 
     [lockButton setState: locked];
 
     [portListPopup setEnabled:!locked];
     [openPortButton setEnabled:!locked];
-    [pollTimePopup setEnabled:!locked];
+    [pollTimePopup setEnabled:!locked && !inProcess];
     [shipPressuresButton setEnabled:!locked];
  
     [initHardwareButton setEnabled:!locked];
@@ -374,6 +391,27 @@
     }
     [lockDocField setStringValue:s];
 
+}
+
+- (void) setUpFormats
+{
+	NSNumberFormatter *numberFormatter = [[[NSNumberFormatter alloc] init] autorelease];
+	int n = [model decimalPtPosition];
+	if(n==0)	 [numberFormatter setFormat:@"#0.0000"];
+	else if(n==1)[numberFormatter setFormat:@"#0.000"];
+	else if(n==2)[numberFormatter setFormat:@"#0.00"];
+	else if(n==3)[numberFormatter setFormat:@"#0.0"];
+	else if(n==4)[numberFormatter setFormat:@"#0"];
+	
+	[pressureField setFormatter:numberFormatter];
+	int i;
+	for(i=0;i<2;i++){
+		[[lowSetPointMatrix cellAtRow:i column:0] setFormatter:numberFormatter];
+		[[highSetPointMatrix cellAtRow:i column:0] setFormatter:numberFormatter];
+	}
+	[pressureField setNeedsDisplay:YES];
+	[self lowSetPointChanged:nil];
+	[self highSetPointChanged:nil];
 }
 
 - (void) portStateChanged:(NSNotification*)aNotification
@@ -459,6 +497,7 @@
 {
 	[model setDecimalPtPosition:[sender indexOfSelectedItem]];
 	[model writeDecimalPtPosition];
+	[model performSelector:@selector(readPressure) withObject:nil afterDelay:.1];
 }
 
 - (IBAction) loadDialogFromHW:(id)sender
@@ -515,6 +554,7 @@
 - (IBAction) readHardware:(id)sender
 {
 	NSLog(@"MKS651(%d) Reading back all values. Any mismatches will follow.\n",[model uniqueIdNumber]);
+	[self endEditing];
 	[model readAndCompare];
 }
 
@@ -526,14 +566,14 @@
 - (IBAction) lowSetPointAction:(id)sender;
 {
 	int index = [[sender selectedCell] tag];
-	float theValue = [[sender selectedCell] intValue];
+	float theValue = [[sender selectedCell] floatValue] * powf(10.,4-[model decimalPtPosition]);;
 	[model setLowSetPoint:index withValue:theValue];
 }
 
 - (IBAction) highSetPointAction:(id)sender;
 {
 	int index = [[sender selectedCell] tag];
-	float theValue = [[sender selectedCell] intValue];
+	float theValue = [[sender selectedCell] floatValue] * powf(10.,4-[model decimalPtPosition]);
 	[model setHighSetPoint:index withValue:theValue];
 }
 
@@ -541,6 +581,7 @@
 - (IBAction) initHardwareAction:(id)sender;
 {
 	NSLog(@"MKS660B (%d) Loading and reading back all values. Any mismatches will be listed.\n",[model uniqueIdNumber]);
+	[self endEditing];
 	[model initHardware];
 }
 

@@ -57,6 +57,7 @@
 - (void) updateWindow;
 
 #pragma mark ***Interface Management
+- (void) setUpFormats;
 - (void) lowAlarmChanged:(NSNotification*)aNote;
 - (void) highLimitChanged:(NSNotification*)aNote;
 - (void) highAlarmChanged:(NSNotification*)aNote;
@@ -77,6 +78,7 @@
 - (void) pollTimeChanged:(NSNotification*)aNote;
 - (void) miscAttributesChanged:(NSNotification*)aNote;
 - (void) scaleAction:(NSNotification*)aNote;
+- (void) involvedInProcessChanged:(NSNotification*)aNote;
 
 #pragma mark ***Actions
 - (IBAction) lowAlarmAction:(id)sender;

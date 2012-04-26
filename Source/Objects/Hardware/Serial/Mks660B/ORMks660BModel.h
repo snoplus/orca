@@ -33,16 +33,14 @@
         NSString*			lastRequest;
         ORSafeQueue*		cmdQueue;
 		float				pressure;
-		float				lowSetPoint[2];
-		float				highSetPoint[2];
+		int					lowSetPoint[2];
+		int					highSetPoint[2];
 	
 		unsigned long		timeMeasured;
 		int					pollTime;
         NSMutableString*    buffer;
 		BOOL				shipPressures;
 		ORTimeRate*			timeRates;
-		int					pressureScale;
-		float				pressureScaleValue;
 
 		BOOL				loadDialog;
 		int					decimalPtPosition;
@@ -50,9 +48,12 @@
 		int					lowHysteresis;
 		int					calibrationNumber;
 		int					fullScaleRB;
-    float highAlarm;
-    float highLimit;
-    float lowAlarm;
+		float				highAlarm;
+		float				highLimit;
+		float				lowAlarm;
+		BOOL				delay;
+		BOOL				readOnce;
+		BOOL				involvedInProcess;
 }
 
 #pragma mark •••Initialization
@@ -62,6 +63,8 @@
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark •••Accessors
+- (BOOL) involvedInProcess;
+- (void) setInvolvedInProcess:(BOOL)aInvolvedInProcess;
 - (float) lowAlarm;
 - (void) setLowAlarm:(float)aLowAlarm;
 - (float) highLimit;
@@ -90,18 +93,14 @@
 - (NSString*) portName;
 - (void) setPortName:(NSString*)aPortName;
 - (void) openPort:(BOOL)state;
-- (int) pressure;
+- (float) pressure;
 - (unsigned long) timeMeasured;
-- (float) convertedPressure;
-- (void) setPressure:(int)aValue;
-- (float) lowSetPoint:(int)index;
-- (float) highSetPoint:(int)index;
-- (void) setLowSetPoint:(int)index withValue:(float)aValue;
-- (void) setHighSetPoint:(int)index withValue:(float)aValue;
+- (void) setPressure:(float)aValue;
+- (int) lowSetPoint:(int)index;
+- (int) highSetPoint:(int)index;
+- (void) setLowSetPoint:(int)index withValue:(int)aValue;
+- (void) setHighSetPoint:(int)index withValue:(int)aValue;
 
-- (float) lowSetPoint:(int)index;
-- (float) highSetPoint:(int)index;
-- (float) convertedPressure;
 
 - (NSString*) lastRequest;
 - (void) setLastRequest:(NSString*)aRequest;
@@ -172,13 +171,13 @@ extern NSString* ORMks660BModelCalibrationNumberChanged;
 extern NSString* ORMks660BModelLowHysteresisChanged;
 extern NSString* ORMks660BModelHighHysteresisChanged;
 extern NSString* ORMks660BModelDecimalPtPositionChanged;
-extern NSString* ORMks660BPressureScaleChanged;
 extern NSString* ORMks660BShipPressuresChanged;
 extern NSString* ORMks660BPollTimeChanged;
 extern NSString* ORMks660BSerialPortChanged;
 extern NSString* ORMks660BPortNameChanged;
 extern NSString* ORMks660BPortStateChanged;
 extern NSString* ORMks660BPressureChanged;
-extern NSString* ORMks660BLowSetPointChanged ;
-extern NSString* ORMks660BHighSetPointChanged ;
-extern NSString* ORMks660BLock ;
+extern NSString* ORMks660BLowSetPointChanged;
+extern NSString* ORMks660BHighSetPointChanged;
+extern NSString* ORMks660BInvolvedInProcessChanged;
+extern NSString* ORMks660BLock;
