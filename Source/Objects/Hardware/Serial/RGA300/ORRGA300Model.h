@@ -22,6 +22,7 @@
 #import "ORSerialPortModel.h"
 
 @class ORSafeQueue;
+@class ORRGA300Cmd;
 
 //Status Error Masks
 #define kRGACommStatusMask			0x01
@@ -78,7 +79,7 @@
 @interface ORRGA300Model : ORSerialPortModel
 {
     @private
-		NSString*		lastRequest;
+		ORRGA300Cmd*		lastRequest;
 		ORSafeQueue*	cmdQueue;
 		NSMutableData*	inComingData;
 		int		modelNumber;
@@ -262,7 +263,20 @@
 - (int) scanValueAtIndex:(int)i;
 - (int) countsInAmuTableData:(int)i;
 - (int) amuTable:(int)anAmu valueAtIndex:(int)i;
+@end
 
+@interface ORRGA300Cmd : NSObject
+{
+	BOOL waitForResponse;
+	BOOL dataExpected;
+	unsigned long expectedDataLength;
+	NSString* cmd;
+}
+
+@property (nonatomic,assign) BOOL waitForResponse;
+@property (nonatomic,assign) BOOL dataExpected;
+@property (nonatomic,assign) unsigned long expectedDataLength;
+@property (nonatomic,copy) NSString* cmd;
 @end
 
 extern NSString* ORRGA300ModelScanDataChanged;

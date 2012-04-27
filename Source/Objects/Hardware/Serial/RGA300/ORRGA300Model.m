@@ -76,14 +76,14 @@ NSString* ORRGA300ModelPortStateChanged				= @"ORRGA300ModelPortStateChanged";
 NSString* ORRGA300Lock								= @"ORRGA300Lock";
 
 @interface ORRGA300Model (private)
-- (NSString*) lastRequest;
-- (void) setLastRequest:(NSString*)aCmdString;
+- (ORRGA300Cmd*) lastRequest;
+- (void) setLastRequest:(ORRGA300Cmd*)aCmdString;
 - (void) send:(NSString*)aCmd withInt:(int)aValue;
 - (int) limitInt:(int)aValue min:(int)aMin max:(int)aMax;
 - (float) limitFloat:(float)aValue min:(float)aMin max:(float)aMax;
-- (BOOL) expectResponseFrom:(NSString*)aCmdString;
+- (void) setExpectations:(ORRGA300Cmd*)aCmd;
 - (void) processOneCommandFromQueue;
-- (void) enqueCmdString:(NSString*)aString;
+- (void) addCmdToQueue:(NSString*)aString;
 - (void) processReceivedString:(NSString*)aCommand;
 - (void) setRs232ErrWord:(int)aRs232ErrWord;
 - (void) setFilErrWord:(int)aFilErrWord;
@@ -119,6 +119,7 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 - (void) setCurrentAmuIndex:(int)aValue;
 - (void) setScanData:(NSData*)aScanData;
 - (void) addTableData:(NSData*)data;
+- (void) timeout;
 @end
 
 @implementation ORRGA300Model
@@ -452,31 +453,31 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 }
 
 #pragma mark •••Commands
-- (void) sendIDRequest				{ [self enqueCmdString:@"ID?"]; }
-- (void) sendInitComm				{ [self enqueCmdString:@"IN0"]; }	//Init communications and check HW
+- (void) sendIDRequest				{ [self addCmdToQueue:@"ID?"]; }
+- (void) sendInitComm				{ [self addCmdToQueue:@"IN0"]; }	//Init communications and check HW
 - (void) sendReset	
 {  
 	//Reset to factory settings
 	[self setLastRequest:nil];
 	[cmdQueue removeAllObjects];
-	[self enqueCmdString:@"IN1"]; 
+	[self addCmdToQueue:@"IN1"]; 
 	[self queryAll]; 
 }
-- (void) sendStandBy				{ [self enqueCmdString:@"IN2"]; }  //activate standby mode
-- (void) sendErrQuery				{ [self enqueCmdString:@"ER?"]; }  //returns status byte
-- (void) sendRS232ErrQuery			{ [self enqueCmdString:@"EC?"]; } 
-- (void) sendDetErrQuery			{ [self enqueCmdString:@"ED?"]; } 
-- (void) sendFilamentErrQuery		{ [self enqueCmdString:@"EF?"]; } 
-- (void) sendEMErrQuery				{ [self enqueCmdString:@"EM?"]; } 
-- (void) sendPowerErrQuery			{ [self enqueCmdString:@"EP?"]; } 
-- (void) sendQMFErrQuery			{ [self enqueCmdString:@"EQ?"]; } 
-- (void) sendCalibrateAll			{ [self enqueCmdString:@"CA"];  } 
-- (void) sendElecMultiOptionQuery	{ [self enqueCmdString:@"MO?"]; } 
-- (void) sendNoiseFloorQuery		{ [self enqueCmdString:@"NF?"]; } 
-- (void) sendAnalogScanPointsQuery	{ [self enqueCmdString:@"AP?"]; } 
-- (void) sendHistoScanPointsQuery	{ [self enqueCmdString:@"HP?"]; } 
-- (void) sendStepsPerAmuQuery		{ [self enqueCmdString:@"SA?"]; } 
-- (void) sendElecMultGainQuery		{ [self enqueCmdString:@"MG?"]; } 
+- (void) sendStandBy				{ [self addCmdToQueue:@"IN2"]; }  //activate standby mode
+- (void) sendErrQuery				{ [self addCmdToQueue:@"ER?"]; }  //returns status byte
+- (void) sendRS232ErrQuery			{ [self addCmdToQueue:@"EC?"]; } 
+- (void) sendDetErrQuery			{ [self addCmdToQueue:@"ED?"]; } 
+- (void) sendFilamentErrQuery		{ [self addCmdToQueue:@"EF?"]; } 
+- (void) sendEMErrQuery				{ [self addCmdToQueue:@"EM?"]; } 
+- (void) sendPowerErrQuery			{ [self addCmdToQueue:@"EP?"]; } 
+- (void) sendQMFErrQuery			{ [self addCmdToQueue:@"EQ?"]; } 
+- (void) sendCalibrateAll			{ [self addCmdToQueue:@"CA"];  } 
+- (void) sendElecMultiOptionQuery	{ [self addCmdToQueue:@"MO?"]; } 
+- (void) sendNoiseFloorQuery		{ [self addCmdToQueue:@"NF?"]; } 
+- (void) sendAnalogScanPointsQuery	{ [self addCmdToQueue:@"AP?"]; } 
+- (void) sendHistoScanPointsQuery	{ [self addCmdToQueue:@"HP?"]; } 
+- (void) sendStepsPerAmuQuery		{ [self addCmdToQueue:@"SA?"]; } 
+- (void) sendElecMultGainQuery		{ [self addCmdToQueue:@"MG?"]; } 
 
 - (void) sendNoiseFloorSetting		 { [self send:@"NF" withInt:noiseFloorSetting];		}
 - (void) sendIonizerElectronEnergy	 { [self send:@"EE" withInt:ionizerElectronEnergy]; }
@@ -486,17 +487,17 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 - (void) sendFinalMass				 { [self send:@"MF" withInt:finalMass];				}
 - (void) sendStepsPerAmu			 { [self send:@"SA" withInt:stepsPerAmu];			}
 
-- (void) sendCalibrateElectrometerIVResponse { [self enqueCmdString:@"CL"]; } 
+- (void) sendCalibrateElectrometerIVResponse { [self addCmdToQueue:@"CL"]; } 
 
 - (void) sendElecMultiGain
 {
-	[self enqueCmdString:[NSString stringWithFormat:@"MG%.4f",elecMultGain]];
+	[self addCmdToQueue:[NSString stringWithFormat:@"MG%.4f",elecMultGain]];
 }
 
 - (void) startDegassing
 {
 	if(ionizerDegassTime>0){
-		[self enqueCmdString:[NSString stringWithFormat:@"DG%d",ionizerDegassTime]];
+		[self addCmdToQueue:[NSString stringWithFormat:@"DG%d",ionizerDegassTime]];
 	}
 	else {
 	}
@@ -532,16 +533,16 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 
 - (void) queryAll
 {
-	[self enqueCmdString:@"EE?"];
-	[self enqueCmdString:@"FL?"];
-	[self enqueCmdString:@"IE?"];
-	[self enqueCmdString:@"VF?"];
-	[self enqueCmdString:@"HV?"];
-	[self enqueCmdString:@"MO?"];
-	[self enqueCmdString:@"NF?"];
-	[self enqueCmdString:@"AP?"];
-	[self enqueCmdString:@"HP?"];
-	[self enqueCmdString:@"MG?"];
+	[self addCmdToQueue:@"EE?"];
+	[self addCmdToQueue:@"FL?"];
+	[self addCmdToQueue:@"IE?"];
+	[self addCmdToQueue:@"VF?"];
+	[self addCmdToQueue:@"HV?"];
+	[self addCmdToQueue:@"MO?"];
+	[self addCmdToQueue:@"NF?"];
+	[self addCmdToQueue:@"AP?"];
+	[self addCmdToQueue:@"HP?"];
+	[self addCmdToQueue:@"MG?"];
 }
 
 - (void) syncWithHW
@@ -557,76 +558,82 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 
 - (void) turnDetectorOff
 {
-	[self enqueCmdString:@"HV0"];
-	[self enqueCmdString:@"HV?"];
+	[self addCmdToQueue:@"HV0"];
+	[self addCmdToQueue:@"HV?"];
 }
 
 - (void) sendDetectorParameters 
 {
 	if(electronMultiOption){
         if(!useDetectorDefaults){
-            [self enqueCmdString:[NSString stringWithFormat:@"HV%d",elecMultHVBias]];
+            [self addCmdToQueue:[NSString stringWithFormat:@"HV%d",elecMultHVBias]];
             [self sendNoiseFloorSetting];
         }
         else {
-            [self enqueCmdString:@"HV*"];
-            [self enqueCmdString:@"NF*"];
+            [self addCmdToQueue:@"HV*"];
+            [self addCmdToQueue:@"NF*"];
 
         }
-        [self enqueCmdString:@"HV?"];
-        [self enqueCmdString:@"NF?"];
+        [self addCmdToQueue:@"HV?"];
+        [self addCmdToQueue:@"NF?"];
 	}
 }
 
 - (void) turnIonizerOff
 {
-	[self enqueCmdString:@"FL0"];
-	[self enqueCmdString:@"FL?"];
+	[self addCmdToQueue:@"FL0"];
+	[self addCmdToQueue:@"FL?"];
 }
 
 - (void) sendIonizerParameters 
 {
 	if(electronMultiOption){
         if(!useDetectorDefaults){
-            [self enqueCmdString:[NSString stringWithFormat:@"FL%0.2f",ionizerEmissionCurrent]];
+            [self addCmdToQueue:[NSString stringWithFormat:@"FL%0.2f",ionizerEmissionCurrent]];
             [self sendIonizerElectronEnergy];	 
             [self sendIonizerIonEnergy];		 
             [self sendIonizerFocusPlateVoltage];
         }
         else {
-            [self enqueCmdString:@"FL*"];
-            [self enqueCmdString:@"IE*"];
-            [self enqueCmdString:@"EE*"];
-            [self enqueCmdString:@"VF*"];        
+            [self addCmdToQueue:@"FL*"];
+            [self addCmdToQueue:@"IE*"];
+            [self addCmdToQueue:@"EE*"];
+            [self addCmdToQueue:@"VF*"];        
         }
             
-        [self enqueCmdString:@"EE?"];
-        [self enqueCmdString:@"FL?"];
-        [self enqueCmdString:@"IE?"];
-        [self enqueCmdString:@"VF?"];
+        [self addCmdToQueue:@"EE?"];
+        [self addCmdToQueue:@"FL?"];
+        [self addCmdToQueue:@"IE?"];
+        [self addCmdToQueue:@"VF?"];
     }
 }
 
 - (void) dataReceived:(NSNotification*)note
 {	
     if([[note userInfo] objectForKey:@"serialPort"] == serialPort){
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
 		if(!inComingData)inComingData = [[NSMutableData data] retain];
 		[inComingData appendData:[[note userInfo] objectForKey:@"data"]];
-		if(expectingRawData){
+		if([lastRequest dataExpected]){
+			unsigned long expectedDataLength = [lastRequest expectedDataLength];
 			if(currentActivity == kRGATableScan){
-				if([inComingData length] >= expectedRawDataLength){
+				if([inComingData length] >= expectedDataLength){
 					//set data
 					[self addTableData:inComingData];
 					[inComingData setLength:0];
 					[self performSelectorOnMainThread:@selector(continueSingleMassMeasurement) withObject:nil waitUntilDone:YES ];
+					[self setLastRequest:nil];
+					[self processOneCommandFromQueue];	 //do the next command in the queue
 				}
 			}
 			else {
-				if(expectedRawDataLength)[self setScanProgress:100*[inComingData length]/(float)expectedRawDataLength];
-				if([inComingData length] >= expectedRawDataLength){
+				if(expectedDataLength)[self setScanProgress:100*[inComingData length]/(float)expectedDataLength];
+				if([inComingData length] >= expectedDataLength){
 					[self setScanData:inComingData];
 					[inComingData setLength:0];
 					[self setScanNumber:scanNumber+1];
+					[self setLastRequest:nil];
+					 [self processOneCommandFromQueue];	 //do the next command in the queue
 				}
 			}
 		}
@@ -636,6 +643,8 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 			if(endOfLine != NSNotFound){
 				[self processReceivedString:[s substringToIndex:endOfLine]];
 				[inComingData setLength:0];
+				[self setLastRequest:nil];
+				[self processOneCommandFromQueue];	 //do the next command in the queue
 			}
 		}
 	}
@@ -722,6 +731,14 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 @end
 
 @implementation ORRGA300Model (private)
+
+- (void) timeout
+{
+	NSLogError(@"RGA300",@"command timeout",nil);
+	[cmdQueue removeAllObjects];
+	[self setLastRequest:nil];
+}
+
 - (void) setCurrentAmuIndex:(int)aValue
 {
 	currentAmuIndex = aValue;
@@ -729,11 +746,12 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 
 }
 
-- (NSString*) lastRequest { return lastRequest; }
-- (void) setLastRequest:(NSString*)aCmdString
+- (ORRGA300Cmd*) lastRequest { return lastRequest; }
+- (void) setLastRequest:(ORRGA300Cmd*)aCmd
 {
-	[lastRequest autorelease];
-	lastRequest = [aCmdString copy];    
+	[aCmd retain];
+	[lastRequest release];
+	lastRequest = aCmd;    
 }
 
 - (int) limitInt:(int)aValue min:(int)aMin max:(int)aMax
@@ -750,98 +768,106 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 	return aValue;
 }
 
-- (BOOL) expectResponseFrom:(NSString*)aCmdString
+- (void) setExpectations:(ORRGA300Cmd*)aCmd
 {
 	expectingRawData = NO;
-
+	NSString* aCmdString = aCmd.cmd;
+	
 	//some commands do not have a response
-	if([aCmdString hasPrefix:@"DG0"]) return NO;
-	else if([aCmdString hasPrefix:@"HS0"]) return NO;
-	else if([aCmdString hasPrefix:@"MR0"]) return NO;
-	else if([aCmdString hasPrefix:@"SC0"]) return NO;
+	if([aCmdString hasPrefix:@"DG0"])		[aCmd setWaitForResponse:NO];
+	else if([aCmdString hasPrefix:@"HS0"])	[aCmd setWaitForResponse:NO];
+	else if([aCmdString hasPrefix:@"MR0"])	[aCmd setWaitForResponse:NO];
+	else if([aCmdString hasPrefix:@"SC0"])	[aCmd setWaitForResponse:NO];
 	else if([aCmdString rangeOfString:@"?"].location == NSNotFound){
-		if([aCmdString hasPrefix:@"MI"]) return NO;
-		else if([aCmdString hasPrefix:@"MF"]) return NO;
-		else if([aCmdString hasPrefix:@"NF"]) return NO;
-		else if([aCmdString hasPrefix:@"SA"]) return NO;
-		else if([aCmdString hasPrefix:@"MG"]) return NO;
+		if([aCmdString hasPrefix:@"MI"])		[aCmd setWaitForResponse:NO];
+		else if([aCmdString hasPrefix:@"MF"])	[aCmd setWaitForResponse:NO];
+		else if([aCmdString hasPrefix:@"NF"])	[aCmd setWaitForResponse:NO];
+		else if([aCmdString hasPrefix:@"SA"])	[aCmd setWaitForResponse:NO];
+		else if([aCmdString hasPrefix:@"MG"])	[aCmd setWaitForResponse:NO];
 		else if([aCmdString hasPrefix:@"HS"] || [aCmdString hasPrefix:@"SC"]){
-			expectingRawData = YES;
-			expectedRawDataLength = (finalMass-initialMass + 1 + 1)*4;
-			return NO; //so we don't load a lastRequest
+			[aCmd setDataExpected:YES];
+			[aCmd setExpectedDataLength:(finalMass-initialMass + 1 + 1)*4];
 		}
 		else if([aCmdString hasPrefix:@"MR"]){
-			expectingRawData = YES;
-			expectedRawDataLength = 4;
-			return NO; //so we don't load a lastRequest
+			[aCmd setDataExpected:YES];
+			[aCmd setExpectedDataLength:4];
 		}
 	}
-	return YES;
 }
 
 - (void) processOneCommandFromQueue
 {
-	while([cmdQueue count] > 0){
-		NSString* cmdString = [cmdQueue dequeue];
-		[serialPort writeDataInBackground:[cmdString dataUsingEncoding:NSASCIIStringEncoding]];
-		if([self expectResponseFrom:cmdString]){
-			[self setLastRequest:cmdString];
-			break; //have to wait for a response
+	ORRGA300Cmd* cmdObj = [cmdQueue dequeue];
+	if(cmdObj){
+		NSString* aCmd = cmdObj.cmd;
+
+		if(cmdObj.waitForResponse) {
+			[self performSelector:@selector(timeout) withObject:nil afterDelay:3];
+			[self setLastRequest:cmdObj];
 		}
+		else [self setLastRequest:nil];
+		[serialPort writeString:aCmd];
+		
+		if(!lastRequest){
+			[self processOneCommandFromQueue];
+		}
+		
 	}
 }
 
 - (void) send:(NSString*)aCmd withInt:(int)aValue
 {
-	[self enqueCmdString:[NSString stringWithFormat:@"%@%d",aCmd,aValue]];
+	[self addCmdToQueue:[NSString stringWithFormat:@"%@%d",aCmd,aValue]];
 }
 
-- (void) enqueCmdString:(NSString*)aString
+- (void) addCmdToQueue:(NSString*)aString
 {
 	if([serialPort isOpen]){
 		if(!cmdQueue) cmdQueue = [[ORSafeQueue alloc] init];
 		if(![aString hasSuffix:@"\r"])aString = [aString stringByAppendingString:@"\r"];
+		
+		ORRGA300Cmd* cmdObj = [[[ORRGA300Cmd alloc] init] autorelease];
+		cmdObj.cmd = aString;
+		[self setExpectations:cmdObj];
+		
 		[cmdQueue enqueue:aString];
-		if(!lastRequest)[self processOneCommandFromQueue];
+		if(!lastRequest){
+			[self processOneCommandFromQueue];
+		}
 	}
 }
 
 - (void) processReceivedString:(NSString*)aString
 {		
-	if(lastRequest) {
-		if([lastRequest hasPrefix:@"ID?"])		[self processIDResponse:aString];
-		else if([lastRequest hasPrefix:@"ER?"])	[self processStatusWord:aString];
-		else if([lastRequest hasPrefix:@"EC?"])	[self setRs232ErrWord:	[aString intValue]];
-		else if([lastRequest hasPrefix:@"ED?"])	[self setDetErrWord:	[aString intValue]];
-		else if([lastRequest hasPrefix:@"EF?"])	[self setFilErrWord:	[aString intValue]];
-		else if([lastRequest hasPrefix:@"EM?"])	[self setCemErrWord:	[aString intValue]];
-		else if([lastRequest hasPrefix:@"EP?"])	[self setPsErrWord:		[aString intValue]];
-		else if([lastRequest hasPrefix:@"EQ?"])	[self setQmfErrWord:	[aString intValue]];
-		else if([lastRequest hasPrefix:@"AP?"]) [self setAnalogScanPoints:	[aString intValue]];
-		else if([lastRequest hasPrefix:@"HP?"]) [self setHistoScanPoints:	[aString intValue]];
-		else if([lastRequest hasPrefix:@"DG?"]) [self setIonizerDegassTime:	[aString intValue]];
-		else if([lastRequest hasPrefix:@"AP?"]) [self setAnalogScanPoints:[aString intValue]];
-		else if([lastRequest hasPrefix:@"HP?"]) [self setHistoScanPoints:[aString intValue]];
-		else if([lastRequest hasPrefix:@"MF?"]) [self setFinalMass:[aString intValue]];
-		else if([lastRequest hasPrefix:@"MI?"]) [self setInitialMass:[aString intValue]];
-		else if([lastRequest hasPrefix:@"SA?"]) [self setStepsPerAmu:[aString intValue]];
-		else if([lastRequest hasPrefix:@"TP?"]) [self setMeasuredIonCurrent:[aString intValue]];
-		else if([lastRequest hasPrefix:@"MO?"]) [self setElectronMultiOption:[aString intValue]];
-		
-		else if([lastRequest hasPrefix:@"HV?"]) [self setElecMultHVBiasRB:			[aString intValue]];
-		else if([lastRequest hasPrefix:@"NF?"]) [self setNoiseFloorSettingRB:		[aString intValue]];
-		else if([lastRequest hasPrefix:@"MG?"]) [self setElecMultGainRB:			[aString floatValue]];
-		else if([lastRequest hasPrefix:@"EE?"]) [self setIonizerElectronEnergyRB:	[aString intValue]];
-		else if([lastRequest hasPrefix:@"FL?"]) [self setIonizerFilamentCurrentRB:	[aString floatValue]];
-		else if([lastRequest hasPrefix:@"IE?"]) [self setIonizerIonEnergyRB:		[aString intValue]];
-		else if([lastRequest hasPrefix:@"VF?"]) [self setIonizerFocusPlateVoltageRB:[aString intValue]];
-		
-		else if([lastRequest rangeOfString:@"?"].location == NSNotFound)	[self processStatusWord:aString];
-		
-		[self setLastRequest:nil];			 //clear the last request
-	}
-
-	[self processOneCommandFromQueue];	 //do the next command in the queue
+	NSString* theLastRequest = lastRequest.cmd;
+	if([theLastRequest hasPrefix:@"ID?"])		[self processIDResponse:aString];
+	else if([theLastRequest hasPrefix:@"ER?"])	[self processStatusWord:aString];
+	else if([theLastRequest hasPrefix:@"EC?"])	[self setRs232ErrWord:	[aString intValue]];
+	else if([theLastRequest hasPrefix:@"ED?"])	[self setDetErrWord:	[aString intValue]];
+	else if([theLastRequest hasPrefix:@"EF?"])	[self setFilErrWord:	[aString intValue]];
+	else if([theLastRequest hasPrefix:@"EM?"])	[self setCemErrWord:	[aString intValue]];
+	else if([theLastRequest hasPrefix:@"EP?"])	[self setPsErrWord:		[aString intValue]];
+	else if([theLastRequest hasPrefix:@"EQ?"])	[self setQmfErrWord:	[aString intValue]];
+	else if([theLastRequest hasPrefix:@"AP?"]) [self setAnalogScanPoints:	[aString intValue]];
+	else if([theLastRequest hasPrefix:@"HP?"]) [self setHistoScanPoints:	[aString intValue]];
+	else if([theLastRequest hasPrefix:@"DG?"]) [self setIonizerDegassTime:	[aString intValue]];
+	else if([theLastRequest hasPrefix:@"AP?"]) [self setAnalogScanPoints:[aString intValue]];
+	else if([theLastRequest hasPrefix:@"HP?"]) [self setHistoScanPoints:[aString intValue]];
+	else if([theLastRequest hasPrefix:@"MF?"]) [self setFinalMass:[aString intValue]];
+	else if([theLastRequest hasPrefix:@"MI?"]) [self setInitialMass:[aString intValue]];
+	else if([theLastRequest hasPrefix:@"SA?"]) [self setStepsPerAmu:[aString intValue]];
+	else if([theLastRequest hasPrefix:@"TP?"]) [self setMeasuredIonCurrent:[aString intValue]];
+	else if([theLastRequest hasPrefix:@"MO?"]) [self setElectronMultiOption:[aString intValue]];
+	
+	else if([theLastRequest hasPrefix:@"HV?"]) [self setElecMultHVBiasRB:			[aString intValue]];
+	else if([theLastRequest hasPrefix:@"NF?"]) [self setNoiseFloorSettingRB:		[aString intValue]];
+	else if([theLastRequest hasPrefix:@"MG?"]) [self setElecMultGainRB:			[aString floatValue]];
+	else if([theLastRequest hasPrefix:@"EE?"]) [self setIonizerElectronEnergyRB:	[aString intValue]];
+	else if([theLastRequest hasPrefix:@"FL?"]) [self setIonizerFilamentCurrentRB:	[aString floatValue]];
+	else if([theLastRequest hasPrefix:@"IE?"]) [self setIonizerIonEnergyRB:		[aString intValue]];
+	else if([theLastRequest hasPrefix:@"VF?"]) [self setIonizerFocusPlateVoltageRB:[aString intValue]];
+	
+	else if([theLastRequest rangeOfString:@"?"].location == NSNotFound)	[self processStatusWord:aString];
 }
 
 - (void) processIDResponse:(NSString*)aString
@@ -997,13 +1023,13 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 	[self sendFinalMass];
 	[self sendNoiseFloorSetting];
 	[self sendHistoScanPointsQuery];
-	[self enqueCmdString:[NSString stringWithFormat:@"HS%d",numberScans]];
+	[self addCmdToQueue:[NSString stringWithFormat:@"HS%d",numberScans]];
 }
 
 - (void) stopHistogramScan
 {
 	[self setCurrentActivity:kRGAIdle];
-	[self enqueCmdString:@"HS0"];
+	[self addCmdToQueue:@"HS0"];
 	[self setScanProgress:0];
 }
 
@@ -1018,7 +1044,7 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 		[self setScanProgress:0];
 		int anAmu = [[amus objectAtIndex:currentAmuIndex] intValue];
 		if(anAmu>0 && anAmu<modelNumber){
-			[self enqueCmdString:[NSString stringWithFormat:@"MR%d",anAmu]];
+			[self addCmdToQueue:[NSString stringWithFormat:@"MR%d",anAmu]];
 		}
 		else {
 			NSLog(@"RGA: AMU in table (entry %d:%d) <0 or >%@\n",modelNumber,currentAmuIndex, [amus objectAtIndex:currentAmuIndex]);
@@ -1041,7 +1067,7 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 	if(scanNumber != 0 ){
 		int anAmu = [[amus objectAtIndex:currentAmuIndex] intValue];
 		if(anAmu>0 && anAmu<modelNumber){
-			[self enqueCmdString:[NSString stringWithFormat:@"MR%d",anAmu]];
+			[self addCmdToQueue:[NSString stringWithFormat:@"MR%d",anAmu]];
 		}
 		else {
 			NSLog(@"RGA: AMU in table (entry %d:%d) <0 or >%@\n",modelNumber,currentAmuIndex, [amus objectAtIndex:currentAmuIndex]);
@@ -1058,7 +1084,7 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 - (void) stopSingleMassMeasurement	
 { 
 	[self setCurrentActivity:kRGAIdle];
-	[self enqueCmdString:@"MR0\r"];
+	[self addCmdToQueue:@"MR0\r"];
 	[self setCurrentAmuIndex:0];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORRGA300ModelScanDataChanged object:self];
 } 
@@ -1071,13 +1097,13 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 	[self sendNoiseFloorSetting];
 	[self sendStepsPerAmu];
 	[self sendAnalogScanPointsQuery];
-	[self enqueCmdString:[NSString stringWithFormat:@"SC%d",numberScans]];
+	[self addCmdToQueue:[NSString stringWithFormat:@"SC%d",numberScans]];
 } 
 
 - (void) stopAnalogScan	
 { 
 	[self setCurrentActivity:kRGAIdle];
-	[self enqueCmdString:@"SC0"];
+	[self addCmdToQueue:@"SC0"];
 }
 
 - (void) setCurrentActivity:(int)aCurrentActivity
@@ -1130,4 +1156,22 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORRGA300ModelScanDataChanged object:self];
 }
 
+@end
+
+@implementation ORRGA300Cmd
+@synthesize cmd,waitForResponse,dataExpected,expectedDataLength;
+- (id) init
+{
+	self = [super init];
+	self.waitForResponse = YES;
+	self.dataExpected = NO;
+	self.expectedDataLength = 0;
+	return self;
+}
+- (void) dealloc
+{
+	self.cmd		 = nil;
+	
+	[super dealloc];
+}
 @end
