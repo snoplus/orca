@@ -677,6 +677,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	    int ver=(fdhwlibVersion>>16) & 0xff,maj =(fdhwlibVersion>>8) & 0xff,min = fdhwlibVersion & 0xff;
 	    NSLogFont(aFont,@"%@: SBC PrPMC running with fdhwlib version: %i.%i.%i (0x%08x)\n",[model fullID],ver,maj,min, fdhwlibVersion);
 	    NSLogFont(aFont,@"SBC PrPMC readout code version: %i \n", [model getSBCCodeVersion]);
+	    NSLogFont(aFont,@"SBC PrPMC is using DMA lib (0=no/1=yes): %i \n", [model getSltkGetIsLinkedWithPCIDMALib]);
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception reading SLT status\n");

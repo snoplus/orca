@@ -1069,6 +1069,18 @@ NSLog(@"  arguments: %@ \n" , arguments);
 	return theVersion;
 }
 
+- (long) getSltkGetIsLinkedWithPCIDMALib  //TODO: write a all purpose method for generalRead!!! -tb-
+{
+	long theVersion = 0;
+	if(![pmcLink isConnected]){
+		[NSException raise:@"Not Connected" format:@"Socket not connected."];
+	}
+	else {
+		[pmcLink readGeneral:&theVersion operation:kGetIsLinkedWithPCIDMALib numToRead:1];
+	}
+	return theVersion;
+}
+
 
 - (void) readEventStatus:(unsigned long*)eventStatusBuffer
 {
@@ -1189,7 +1201,7 @@ NSLog(@"  arguments: %@ \n" , arguments);
 		if(data & (1<<13))s = [s stringByAppendingString:@" Page Ready |"];
 		if(data & (1<<14))s = [s stringByAppendingString:@" Page Full |"];
 		if(data & (1<<15))s = [s stringByAppendingString:@" Flt Timeout |"];
-		NSLogFont(aFont,@"%@",[s substringToIndex:[s length]-1]);
+		NSLogFont(aFont,@"%@\n",[s substringToIndex:[s length]-1]);
 	}
 }
 

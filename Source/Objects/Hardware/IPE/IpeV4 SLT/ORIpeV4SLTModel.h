@@ -320,6 +320,7 @@
 - (long)		getSBCCodeVersion;
 - (long)		getFdhwlibVersion;
 - (long)		getSltPciDriverVersion;
+- (long)		getSltkGetIsLinkedWithPCIDMALib;
 
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
