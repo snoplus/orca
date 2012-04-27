@@ -29,6 +29,12 @@
 //#define kCodeVersion     2
 #define kCodeVersion     3 //code version/release 3 is DMA ready -tb-
 #define kFdhwLibVersion  2 //2011-06-16 currently not necessary as it is now fetched dirctly from fdhwlib -tb-
+#if PMC_LINK_WITH_DMA_LIB
+  #define kLinkedWithPCIDMALib  1 //2012-04-16 DMA or not? -tb-
+#else
+  #define kLinkedWithPCIDMALib  0 //2012-04-16 DMA or not? -tb-
+#endif
+
 
 //history and description
 //
@@ -205,11 +211,11 @@ void doWriteBlock(SBC_Packet* aPacket,uint8_t reply)
 		    pbus->write(startAddress, *lptr);
 			{
 			
-    int32_t val = pbus->read(startAddress);
+//TODO: DEBUGGING sim mode+PCIe issue -tb-    int32_t val = pbus->read(startAddress);
 			
 			
-            fprintf(stdout, "PrPMC: doReadBlock: read back  adr 0x%08x , val %i (0x%08x) \n",startAddress,val,val);
-            fflush(stdout);  
+//TODO: DEBUGGING sim mode+PCIe issue -tb-            fprintf(stdout, "PrPMC: doReadBlock: read back  adr 0x%08x , val %i (0x%08x) \n",startAddress,val,val);
+//TODO: DEBUGGING sim mode+PCIe issue -tb-            fflush(stdout);  
 
 			}
 		}
@@ -279,8 +285,8 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply)
 		    *lPtr = pbus->read(startAddress);
 			
 			
-            fprintf(stdout, "PrPMC: doReadBlock: adr 0x%08x , val %i (0x%08x) \n",startAddress,*lPtr,*lPtr);
-            fflush(stdout);  
+//TODO: DEBUGGING sim mode+PCIe issue -tb-            fprintf(stdout, "PrPMC: doReadBlock: adr 0x%08x , val %i (0x%08x) \n",startAddress,*lPtr,*lPtr);
+//TODO: DEBUGGING sim mode+PCIe issue -tb-            fflush(stdout);  
 		}
         else                pbus->readBlock(startAddress, (unsigned long *) lPtr, numItems);
     }catch(PbusError &e){
@@ -490,6 +496,9 @@ void doGeneralReadOp(SBC_Packet* aPacket,uint8_t reply)
 		break;
 		case kGetSltPciDriverVersion:
 			if(numLongs == 1) *lPtr = getSltLinuxKernelDriverVersion(); 
+		break;
+		case kGetIsLinkedWithPCIDMALib:
+			if(numLongs == 1) *lPtr = kLinkedWithPCIDMALib; 
 		break;
 		default:
 			for(i=0;i<numLongs;i++)*lPtr++ = 0; //undefined operation so just return zeros
