@@ -73,8 +73,9 @@ NSString* ORCP8CryopumpPollTimeChanged						= @"ORCP8CryopumpPollTimeChanged";
 NSString* ORCP8CryopumpSerialPortChanged					= @"ORCP8CryopumpSerialPortChanged";
 NSString* ORCP8CryopumpPortNameChanged						= @"ORCP8CryopumpPortNameChanged";
 NSString* ORCP8CryopumpPortStateChanged						= @"ORCP8CryopumpPortStateChanged";
-NSString* ORCP8CryopumpTemperatureChanged					= @"ORCP8CryopumpTemperatureChanged";
 NSString* ORCP8CryopumpLock									= @"ORCP8CryopumpLock";
+NSString* ORCP8CryopumpModelCmdErrorChanged					= @"ORCP8CryopumpModelCmdErrorChanged";
+NSString* ORCP8CryopumpModelWasPowerFailireChanged          = @"ORCP8CryopumpModelWasPowerFailireChanged";
 
 @interface ORCP8CryopumpModel (private)
 - (void) runStarted:(NSNotification*)aNote;
@@ -82,7 +83,8 @@ NSString* ORCP8CryopumpLock									= @"ORCP8CryopumpLock";
 - (void) timeout;
 - (void) processOneCommandFromQueue;
 - (void) process_response:(NSString*)theResponse;
-- (NSString*) checkSum:(NSString*)aCmd;
+- (unsigned char) checkSum:(NSString*)aCmd;
+- (void) clearDelay;
 @end
 
 @implementation ORCP8CryopumpModel
@@ -106,7 +108,8 @@ NSString* ORCP8CryopumpLock									= @"ORCP8CryopumpLock";
         [serialPort close];
     }
     [serialPort release];
-	[timeRates release];
+	[timeRates[0] release];
+	[timeRates[1] release];
     [moduleVersion release];
 
 	[super dealloc];
@@ -170,7 +173,7 @@ NSString* ORCP8CryopumpLock									= @"ORCP8CryopumpLock";
 				[self setLastRequest:nil];			 //clear the last request
 				[self processOneCommandFromQueue];	 //do the next command in the queue
             }
-        } while([buffer rangeOfString:@"\r\n"].location!= NSNotFound);
+        } while([buffer rangeOfString:@"\r"].location!= NSNotFound);
 	}
 }
 
@@ -200,6 +203,29 @@ NSString* ORCP8CryopumpLock									= @"ORCP8CryopumpLock";
 }
 
 #pragma mark •••Accessors
+
+
+- (BOOL)    wasPowerFailure
+{
+    return wasPowerFailure;
+}
+
+- (void)    setWasPowerFailure:(BOOL)aState
+{
+    wasPowerFailure = aState;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpModelWasPowerFailireChanged object:self];
+
+}
+
+- (int)     cmdError
+{
+    return cmdError;
+}
+- (void)    incrementCmdError
+{
+    cmdError++;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpModelCmdErrorChanged object:self];
+}
 
 - (int) secondStageTempControl
 {
@@ -399,6 +425,11 @@ NSString* ORCP8CryopumpLock									= @"ORCP8CryopumpLock";
 - (void) setSecondStageTemp:(float)aSecondStageTemp
 {
     secondStageTemp = aSecondStageTemp;
+    
+    //it is assumed that the temps are always measured together. We'll use the time stamp from the first stage
+    if(timeRates[1] == nil) timeRates[1] = [[ORTimeRate alloc] init];
+	[timeRates[1] addDataToTimeAverage:secondStageTemp];
+
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpModelSecondStageTempChanged object:self];
 }
 
@@ -596,6 +627,15 @@ NSString* ORCP8CryopumpLock									= @"ORCP8CryopumpLock";
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setFirstStageTemp:firstStageTemp];
     firstStageTemp = aFirstStageTemp;
+    
+    //get the time(UT!)
+	time_t	ut_Time;
+	time(&ut_Time);
+	timeMeasured = ut_Time;
+    
+	if(timeRates[0] == nil) timeRates[0] = [[ORTimeRate alloc] init];
+	[timeRates[0] addDataToTimeAverage:firstStageTemp];
+
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpModelFirstStageTempChanged object:self];
 }
 
@@ -649,9 +689,10 @@ NSString* ORCP8CryopumpLock									= @"ORCP8CryopumpLock";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpModelDutyCycleChanged object:self];
 }
 
-- (ORTimeRate*)timeRate
+- (ORTimeRate*)timeRate:(int)index
 {
-	return timeRates;
+	if(index<2)return timeRates[index];
+    else return nil;
 }
 
 - (BOOL) shipTemperatures
@@ -695,22 +736,6 @@ NSString* ORCP8CryopumpLock									= @"ORCP8CryopumpLock";
 	return timeMeasured;
 }
 
-- (void) setTemperature:(float)aValue
-{
-	temperature = aValue;
-	//get the time(UT!)
-	time_t	ut_Time;
-	time(&ut_Time);
-	//struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-	timeMeasured = ut_Time;
-
-
-	if(timeRates == nil) timeRates = [[ORTimeRate alloc] init];
-	[timeRates addDataToTimeAverage:aValue];
-	
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpTemperatureChanged 
-														object:self];
-}
 
 - (NSString*) lastRequest
 {
@@ -791,6 +816,7 @@ NSString* ORCP8CryopumpLock									= @"ORCP8CryopumpLock";
 		[serialPort setStopBits2:0];
 		[serialPort setDataBits:7];
 		[serialPort commitChanges];
+        [self readModuleVersion];
     }
     else      [serialPort close];
     portWasOpen = [serialPort isOpen];
@@ -831,7 +857,6 @@ NSString* ORCP8CryopumpLock									= @"ORCP8CryopumpLock";
     [self setPortName:					[decoder decodeObjectForKey: @"portName"]];
 	
 	[[self undoManager] enableUndoRegistration];
-	timeRates = [[ORTimeRate alloc] init];
     [self registerNotificationObservers];
 
 	return self;
@@ -870,31 +895,36 @@ NSString* ORCP8CryopumpLock									= @"ORCP8CryopumpLock";
 #pragma mark ••• Commands
 - (void) addCmdToQueue:(NSString*)aCmd waitForResponse:(BOOL)waitForResponse
 {
-    //if([serialPort isOpen]){ 
+    if([serialPort isOpen]){ 
 		if(![aCmd hasPrefix:@"++"]){
 			//make sure the someone didn't add stuff that we are going to add.
-			aCmd = [aCmd stringByReplacingOccurrencesOfString:@"\n" withString:@""];
-			aCmd = [aCmd stringByReplacingOccurrencesOfString:@"\r" withString:@""];
 			aCmd = [aCmd stringByReplacingOccurrencesOfString:@"$" withString:@""];
 		}
 		if(!cmdQueue)cmdQueue	 = [[ORSafeQueue alloc] init];
 		ORCP8CryopumpCmd* cmdObj = [[[ORCP8CryopumpCmd alloc] init] autorelease];
-		cmdObj.cmd = [NSString stringWithFormat:@"$%@%@\r",aCmd,[self checkSum:aCmd]];
+		cmdObj.cmd = [NSString stringWithFormat:@"$%@%c\r",aCmd,[self checkSum:aCmd]];
 		cmdObj.waitForResponse = waitForResponse;
 		
 		[cmdQueue enqueue:cmdObj];
+        
+		cmdObj = [[[ORCP8CryopumpCmd alloc] init] autorelease];
+		cmdObj.cmd = @"++Delay";
+		cmdObj.waitForResponse = NO;
+        [cmdQueue enqueue:cmdObj]; //arggg -- appears we need a delay between all commands
+
 		if(!lastRequest){
 			[self processOneCommandFromQueue];
 		}
-	//}
+	}
 }
 
 - (void) readTemperatures
 {
 	[self readFirstStageTemp];
 	[self readSecondStageTemp];
-	[self addCmdToQueue:@"++ShipRecords" waitForResponse:NO];
+	if(shipTemperatures)[self addCmdToQueue:@"++ShipRecords" waitForResponse:NO];
 }
+
 
 - (void) initHardware
 {
@@ -1045,14 +1075,39 @@ NSString* ORCP8CryopumpLock									= @"ORCP8CryopumpLock";
 - (void) pollHardware
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
-	
-	[self readTemperatures];
-		
+
+	[self readAllHardware];
+
 	if(pollTime!=0){
 		[self performSelector:@selector(pollHardware) withObject:nil afterDelay:pollTime];
 	}
 }
+- (void) readAllHardware
+{
+ /*   [self readTemperatures];
+    [self readStatus];
+    [self readRegenerationSequence];
+    [self readRegenerationStartDelay];
+    [self readRegenerationStepTimer];
+    [self readRoughValveStatus];
+    [self readRoughValveInterlock];
+    [self readSecondStageTempControl];
+    [self readThermocoupleStatus];
+    [self readThermocouplePressure];
+    
+    [self readDutyCycle];
+    [self readElapsedTime];	
+    [self readFailedRateRiseCycles];
+    [self readFirstStageControlTemp];
+    [self readLastRateOfRaise];
+    [self readPowerFailureRecoveryStatus];
+    [self readPumpStatus];	
+    [self readPurgeStatus];
+    [self readRegenerationCycles];	
+    [self readRegenerationError];*/	
+    [self readFailedPurgeCycles];
 
+}
 @end
 
 @implementation ORCP8CryopumpModel (private)
@@ -1071,13 +1126,26 @@ NSString* ORCP8CryopumpLock									= @"ORCP8CryopumpLock";
 	[self setLastRequest:nil];
 }
 
+- (void) clearDelay
+{
+	delay = NO;
+	[self processOneCommandFromQueue];
+}
+
 - (void) processOneCommandFromQueue
 {
-	
+    if(delay)return;
+
 	ORCP8CryopumpCmd* cmdObj = [cmdQueue dequeue];
 	if(cmdObj){
 		NSString* aCmd = cmdObj.cmd;
-		if([aCmd isEqualToString:@"++ShipRecords"]){
+        NSLog(@"processing: %@\n",aCmd);
+		if([aCmd isEqualToString:@"++Delay"]){
+			delay = YES;
+			[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(clearDelay) object:nil];
+			[self performSelector:@selector(clearDelay) withObject:nil afterDelay:0];
+		}
+		else if([aCmd isEqualToString:@"++ShipRecords"]){
 			if(shipTemperatures) [self shipTemperatureValues];
 			[self processOneCommandFromQueue];
 		}
@@ -1087,7 +1155,7 @@ NSString* ORCP8CryopumpLock									= @"ORCP8CryopumpLock";
 				[self setLastRequest:aCmd];
 			}
 			else [self setLastRequest:nil];
-			if(![aCmd hasSuffix:@"\r\n"]) aCmd = [aCmd stringByAppendingString:@"\r\n"];
+			if(![aCmd hasSuffix:@"\r"]) aCmd = [aCmd stringByAppendingString:@"\r"];
 			[serialPort writeString:aCmd];
 			if(!lastRequest){
 				[self processOneCommandFromQueue];
@@ -1119,8 +1187,11 @@ NSString* ORCP8CryopumpLock									= @"ORCP8CryopumpLock";
 - (void) process_response:(NSString*)theResponse
 {	
 	if(!lastRequest)return;
-	if([theResponse hasPrefix:@"$A"]){
-		switch([[lastRequest substringWithRange:NSMakeRange(1,1)] intValue]){
+    NSLog(@"got %@ from %@\n",theResponse,lastRequest);
+	if([theResponse hasPrefix:@"$A"] || [theResponse hasPrefix:@"$B"]){
+        [self setWasPowerFailure:[theResponse hasPrefix:@"$B"]];
+        char cmdChar = [[lastRequest substringWithRange:NSMakeRange(1,1)] characterAtIndex:0];
+		switch(cmdChar){
 			case 'X': [self setDutyCycle: [self responseAsInt:theResponse]];			 break;
 			case 'Y': [self setElapsedTime: [self responseAsInt:theResponse]];			 break;
 			case 'm': [self setFailedRateRiseCycles:[self responseAsInt:theResponse]];	 break;
@@ -1173,7 +1244,7 @@ NSString* ORCP8CryopumpLock									= @"ORCP8CryopumpLock";
 			case 'k': [self setRegenerationStepTimer:	[self responseAsInt:theResponse]];			break;
 			case 'a': [self setRegenerationTime:		[self responseAsInt:theResponse]];			break;
 			case 'D': [self setRoughValveStatus:		[self responseAsBool:theResponse]];			break;
-			case 'Q': [self setRoughingInterlock:		[self responseAsInt:theResponse] - 0x30];	break;
+			case 'Q': [self setRoughingInterlockStatus:	[self responseAsInt:theResponse] - 0x30];	break;
 			case 'K': [self setSecondStageTemp:			[self responseAsFloat:theResponse]];		break;
 			//case 'I': [self setSecondStageTempControl:	[self responseAsInt:theResponse]];			break;
 			case 'S': [self setStatus:					[self responseAsInt:theResponse] - 0x20];	break;
@@ -1181,35 +1252,25 @@ NSString* ORCP8CryopumpLock									= @"ORCP8CryopumpLock";
 			case 'L': [self setThermocouplePressure:	[self responseAsFloat:theResponse]];		break;
 		}
 	}
+    else 	if([theResponse hasPrefix:@"$E"] || [theResponse hasPrefix:@"$F"]){
+        [self incrementCmdError];
+        [self setWasPowerFailure:[theResponse hasPrefix:@"$F"]];
+
+    }
 }
 
-- (NSString*) checkSum:(NSString*)aCmd
+- (unsigned char) checkSum:(NSString*)aCmd
 {
 	//calculate the mod 256 of the character sum 
 	int i;
 	unsigned char charSum = 0;
 	for(i=0 ; i<[aCmd length] ; i++) {
-		charSum+=[aCmd characterAtIndex:i]; //add up each character value adding it to the total
+		charSum+=[aCmd characterAtIndex:i]&0x7f; //add up each character value adding it to the total
 	}
 	
-	//now that the characters are added XOR bits
-	//get the bit values of the sum 
-	BOOL D0 = charSum&0x01;	//and the sum with the zero bit 
-	BOOL D1 = charSum&0x02;	//and the sum with the first bit 
-	BOOL D6 = charSum&0x40;	//and the sum with the sixth bit 
-	BOOL D7 = charSum&0x80;	//and the sum with the seventh bit 
-						//calculate XORs to strip bits 6&7
-	D1 = D1^D7;			//D1 XOR D7 
-	D0 = D0^D6;			//D0 XOR D6 
-						//strip out old bits D0-D1, D6-D7 
-	charSum &= 0x3C;	//and the sum with 0x3C 
-						//replace bits D0-D1 with the results 
-	charSum |= D0;		//OR in the resultant zero bit 
-	charSum |= D1*0x02;	//OR in the resultant one bit
-						//now add the '0' character to the result 
-	charSum += '0';		//so the final outcome is a character from '0' to '??' 
-	
-	return [NSString stringWithFormat:@"%c",charSum];
+    charSum = 0x3f & (charSum ^ (charSum>>6));
+    charSum = (0x30+charSum) & 0x7f;
+	return charSum;
 }
 
 @end
@@ -1219,6 +1280,7 @@ NSString* ORCP8CryopumpLock									= @"ORCP8CryopumpLock";
 - (void) dealloc
 {
 	self.cmd		 = nil;
+
 	[super dealloc];
 }
 @end

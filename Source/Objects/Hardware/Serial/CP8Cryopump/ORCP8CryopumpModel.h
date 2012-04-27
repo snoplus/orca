@@ -37,7 +37,7 @@
 		int					pollTime;
         NSMutableString*    buffer;
 		BOOL				shipTemperatures;
-		ORTimeRate*			timeRates;
+		ORTimeRate*			timeRates[2];
 		int					dutyCycle;
 		int					elapsedTime;
 		int					failedRateRiseCycles;
@@ -76,6 +76,10 @@
 		BOOL				standbyMode;
 		BOOL				roughingInterlock;
 		int					secondStageTempControl;
+        int                 cmdError;
+        BOOL                wasPowerFailure;
+        BOOL                delay;
+
 }
 
 #pragma mark •••Initialization
@@ -85,6 +89,10 @@
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark •••Accessors
+- (BOOL)    wasPowerFailure;
+- (void)    setWasPowerFailure:(BOOL)aState;
+- (int)     cmdError;
+- (void)    incrementCmdError;
 - (int)		secondStageTempControl;
 - (void)	setSecondStageTempControl:(int)aSecondStageTempControl;
 - (BOOL)	roughingInterlock;
@@ -163,7 +171,7 @@
 - (void)	setElapsedTime:(int)aElapsedTime;
 - (int)		dutyCycle;
 - (void)	setDutyCycle:(int)aDutyCycle;
-- (ORTimeRate*)timeRate;
+- (ORTimeRate*)timeRate:(int)index;
 - (BOOL)	shipTemperatures;
 - (void)	setShipTemperatures:(BOOL)aShipPressures;
 - (int)		pollTime;
@@ -177,7 +185,6 @@
 - (void) openPort:(BOOL)state;
 - (float) temperature;
 - (unsigned long) timeMeasured;
-- (void)	setTemperature:(float)aValue;
 - (NSString*) lastRequest;
 - (void) setLastRequest:(NSString*)aRequest;
 
@@ -197,6 +204,7 @@
 - (void) initHardware;
 
 #pragma mark •••Queries
+- (void) readAllHardware;
 - (void) readDutyCycle;
 - (void) readElapsedTime;
 - (void) readFailedRateRiseCycles;
@@ -293,4 +301,6 @@ extern NSString* ORCP8CryopumpSerialPortChanged;
 extern NSString* ORCP8CryopumpLock;
 extern NSString* ORCP8CryopumpPortNameChanged;
 extern NSString* ORCP8CryopumpPortStateChanged;
-extern NSString* ORCP8CryopumpTemperatureChanged;
+extern NSString* ORCP8CryopumpModelCmdErrorChanged;
+extern NSString* ORCP8CryopumpModelWasPowerFailireChanged;
+

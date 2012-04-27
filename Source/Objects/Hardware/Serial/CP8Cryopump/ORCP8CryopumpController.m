@@ -61,8 +61,18 @@
 	ORTimeLinePlot* aPlot;
 	aPlot= [[ORTimeLinePlot alloc] initWithTag:0 andDataSource:self];
 	[plotter0 addPlot: aPlot];
+    [aPlot setName:@"First Stage"];
 	[aPlot setLineColor:[NSColor redColor]];
-	
+
+	aPlot= [[ORTimeLinePlot alloc] initWithTag:1 andDataSource:self];
+	[plotter0 addPlot: aPlot];
+    [aPlot setName:@"Second Stage"];
+	[aPlot setLineColor:[NSColor blueColor]];
+    
+	[plotter0 setPlotTitle:@"Temperatures"];
+	[plotter0 setShowLegend:YES];
+
+    
 	[(ORTimeAxis*)[plotter0 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 	[aPlot release];
 	
@@ -95,12 +105,7 @@
                      selector : @selector(portStateChanged:)
                          name : ORSerialPortStateChanged
                        object : nil];
-                                              
-    [notifyCenter addObserver : self
-                     selector : @selector(temperatureChanged:)
-                         name : ORCP8CryopumpTemperatureChanged
-                       object : nil];
-     
+                                                   
     [notifyCenter addObserver : self
                      selector : @selector(pollTimeChanged:)
                          name : ORCP8CryopumpPollTimeChanged
@@ -320,6 +325,17 @@
                          name : ORCP8CryopumpModelSecondStageTempControlChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(cmdErrorChanged:)
+                         name : ORCP8CryopumpModelCmdErrorChanged
+						object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(wasPowerFailureChanged:)
+                         name : ORCP8CryopumpModelWasPowerFailireChanged
+						object: model];
+   
+    
 }
 
 - (void) setModel:(id)aModel
@@ -331,10 +347,11 @@
 - (void) updateWindow
 {
     [super updateWindow];
+    [self wasPowerFailureChanged:nil];
+    [self cmdErrorChanged:nil];
     [self lockChanged:nil];
     [self portStateChanged:nil];
     [self portNameChanged:nil];
-	[self temperatureChanged:nil];
 	[self pollTimeChanged:nil];
 	[self shipTemperaturesChanged:nil];
 	[self updateTimePlot:nil];
@@ -378,6 +395,16 @@
 	[self standbyModeChanged:nil];
 	[self roughingInterlockChanged:nil];
 	[self secondStageTempControlChanged:nil];
+}
+
+- (void) wasPowerFailureChanged:(NSNotification*)aNote
+{
+	[wasPowerFailureField setStringValue: [model wasPowerFailure]?@"There was a Power Failure":@"" ];
+}
+
+- (void) cmdErrorChanged:(NSNotification*)aNote
+{
+	[cmdErrorField setIntValue: [model cmdError]];
 }
 
 - (void) secondStageTempControlChanged:(NSNotification*)aNote
@@ -607,6 +634,14 @@
 - (void) firstStageTempChanged:(NSNotification*)aNote
 {
 	[firstStageTempField setFloatValue: [model firstStageTemp]];
+	unsigned long t = [model timeMeasured];
+	NSCalendarDate* theDate;
+	if(t){
+		theDate = [NSCalendarDate dateWithTimeIntervalSince1970:t];
+		[theDate setCalendarFormat:@"%m/%d %H:%M:%S"];
+		[timeField setObjectValue:theDate];
+	}
+	else [timeField setObjectValue:@"--"];
 }
 
 - (void) failedRepurgeCyclesChanged:(NSNotification*)aNote
@@ -666,7 +701,7 @@
 
 - (void) updateTimePlot:(NSNotification*)aNote
 {
-	if(!aNote || ([aNote object] == [model timeRate])){
+	if(!aNote || ([aNote object] == [model timeRate:0])){
 		[plotter0 setNeedsDisplay:YES];
 	}
 }
@@ -674,20 +709,6 @@
 - (void) shipTemperaturesChanged:(NSNotification*)aNote
 {
 	[shipTemperaturesButton setIntValue: [model shipTemperatures]];
-}
-
-- (void) temperatureChanged:(NSNotification*)aNote
-{
-	[firstStageTempField setFloatValue:[model firstStageTemp]];
-	[secondStageTempField setFloatValue:[model secondStageTemp]];
-	unsigned long t = [model timeMeasured];
-	NSCalendarDate* theDate;
-	if(t){
-		theDate = [NSCalendarDate dateWithTimeIntervalSince1970:t];
-		[theDate setCalendarFormat:@"%m/%d %H:%M:%S"];
-		[timeField setObjectValue:theDate];
-	}
-	else [timeField setObjectValue:@"--"];
 }
 
 
@@ -993,15 +1014,17 @@
 #pragma mark ***Data Source
 - (int) numberPointsInPlot:(id)aPlotter
 {
-	return [[model timeRate] count];
+	int set = [aPlotter tag];
+	return [[model timeRate:set] count];
 }
 
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
-	int count = [[model timeRate] count];
+	int set = [aPlotter tag];
+	int count = [[model timeRate:set] count];
 	int index = count-i-1;
-	*xValue = [[model timeRate]timeSampledAtIndex:index];
-	*yValue = [[model timeRate] valueAtIndex:index];
+	*xValue = [[model timeRate:set]timeSampledAtIndex:index];
+	*yValue = [[model timeRate:set] valueAtIndex:index];
 }
 @end
 

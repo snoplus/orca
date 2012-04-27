@@ -64,6 +64,8 @@
     IBOutlet NSButton*      openPortButton;
     IBOutlet NSButton*      pollNowButton;
 	IBOutlet ORCompositePlotView*    plotter0;
+    IBOutlet NSTextField*   cmdErrorField;
+    IBOutlet NSTextField*   wasPowerFailureField;
 
 	IBOutlet NSTextField*	firstStageTempField;
 	IBOutlet NSTextField*	secondStageTempField;
@@ -111,6 +113,8 @@
 - (void) updateWindow;
 
 #pragma mark ***Interface Management
+- (void) wasPowerFailureChanged:(NSNotification*)aNote;
+- (void) cmdErrorChanged:(NSNotification*)aNote;
 - (void) secondStageTempControlChanged:(NSNotification*)aNote;
 - (void) roughingInterlockChanged:(NSNotification*)aNote;
 - (void) standbyModeChanged:(NSNotification*)aNote;
@@ -155,7 +159,6 @@
 - (void) lockChanged:(NSNotification*)aNote;
 - (void) portNameChanged:(NSNotification*)aNote;
 - (void) portStateChanged:(NSNotification*)aNote;
-- (void) temperatureChanged:(NSNotification*)aNote;
 - (void) pollTimeChanged:(NSNotification*)aNote;
 - (void) miscAttributesChanged:(NSNotification*)aNote;
 - (void) scaleAction:(NSNotification*)aNote;
