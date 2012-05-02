@@ -38,6 +38,7 @@
 
 NSString* ORMJDVacuumModelVetoMaskChanged = @"ORMJDVacuumModelVetoMaskChanged";
 NSString* ORMJDVacuumModelShowGridChanged = @"ORMJDVacuumModelShowGridChanged";
+NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 
 @implementation ORMJDVacuumModel
 
@@ -133,7 +134,9 @@ NSString* ORMJDVacuumModelShowGridChanged = @"ORMJDVacuumModelShowGridChanged";
 	NSArray* allGateValves		= [self gateValves];
 	for(id aGateValve in allGateValves){
 		if([aGateValve connectingRegion1] == aRegion || [aGateValve connectingRegion2] == aRegion){
-			[gateValves addObject:aGateValve];
+			if([aGateValve controlType] != kManualOnlyShowClosed && [aGateValve controlType] != kManualOnlyShowChanging){
+				[gateValves addObject:aGateValve];
+			}
 		}
 	}
 	return gateValves;
@@ -373,15 +376,28 @@ NSString* ORMJDVacuumModelShowGridChanged = @"ORMJDVacuumModelShowGridChanged";
 		{ kVacHPipe,  6, 460,			  300,				500-kPipeRadius,	300 },
 	};
 		
-#define kNumStaticVacLabelItems	7
+#define kNumStaticVacLabelItems	17
 	VacuumStaticLabelInfo staticLabelItems[kNumStaticVacLabelItems] = {
-		{kVacStaticLabel, 0, @"Turbo",			20,	 260,	80,	 290},
-		{kVacStaticLabel, 0, @"Vacuum\nSentry",	20,	 220,	80,	 250},
-		{kVacStaticLabel, 0, @"Diaphragm\nPump",20,	 180,	80,	 210},
-		{kVacStaticLabel, 1, @"RGA",			220, 420,	260, 440},
-		{kVacStaticLabel, 3, @"Cryo Pump",		570, 155,	630, 185},
-		{kVacStaticLabel, 5, @"Dry N2\nSupply",	150,  60,	250, 100},
-		{kVacStaticLabel, 6, @"NEG Pump",		400, 285,	460, 315},
+		{kVacStaticLabel, 0, @"Turbo",			20,	 260,	80,	 290, YES},
+		{kVacStaticLabel, 0, @"Vacuum\nSentry",	20,	 220,	80,	 250, YES},
+		{kVacStaticLabel, 0, @"Diaphragm\nPump",20,	 180,	80,	 210, YES},
+		{kVacStaticLabel, 1, @"RGA",			220, 420,	260, 440, YES},
+		{kVacStaticLabel, 3, @"Cryo Pump",		570, 155,	630, 185, YES},
+		{kVacStaticLabel, 5, @"Dry N2\nSupply",	150,  60,	250, 100, YES},
+		{kVacStaticLabel, 6, @"NEG Pump",		400, 285,	460, 315, YES},
+		
+		{kVacStaticLabel, 99, @"V1",			145, 375,	155, 385, NO},
+		{kVacStaticLabel, 99, @"V2",			285, 375,	315, 385, NO},
+		{kVacStaticLabel, 99, @"V3",			515, 345,	525, 355, NO},
+		{kVacStaticLabel, 99, @"V4",			575, 345,	585, 355, NO},
+		{kVacStaticLabel, 99, @"V5",			515, 245,	525, 255, NO},
+		{kVacStaticLabel, 99, @"V6",			515, 145,	525, 155, NO},
+		
+		{kVacStaticLabel, 99, @"B1",			145, 175,	155, 185, NO},
+		{kVacStaticLabel, 99, @"B2",			70,	 295,	 85, 305, NO},
+		{kVacStaticLabel, 99, @"B3",			580,  45,	590,  55, NO},
+		{kVacStaticLabel, 99, @"B4",			680,  45,	690,  55, NO},
+
 	};	
 	
 #define kNumDynamicVacLabelItems	5
@@ -414,8 +430,8 @@ NSString* ORMJDVacuumModelShowGridChanged = @"ORMJDVacuumModelShowGridChanged";
 	VacuumGVInfo gvList[kNumVacGVs] = {
 		{kVacVGateV, 0,		@"V1",			k2BitReadBack,	150, 400,	0,1,	kControlAbove},	//V1. Control + read back
 		{kVacVGateV, 1,		@"V2",			k2BitReadBack,	300, 400,	1,2,	kControlAbove},	//V2. Control + read back
-		{kVacHGateV, 2,		@"V3",			k2BitReadBack,	600, 350,	2,3,	kControlRight},	//V3. Control + read back
-		{kVacHGateV, 3,		@"V4",			k2BitReadBack,	500, 350,	2,6,	kControlLeft},	//V4. Control + read back
+		{kVacHGateV, 2,		@"V3",			k2BitReadBack,	500, 350,	2,6,	kControlLeft},	//V4. Control + read back
+		{kVacHGateV, 3,		@"V4",			k2BitReadBack,	600, 350,	2,3,	kControlRight},	//V3. Control + read back
 		{kVacHGateV, 4,		@"V5",			k2BitReadBack,	500, 250,	1,6,	kControlLeft},	//V5. Control + read back
 		{kVacHGateV, 5,		@"V6",			k2BitReadBack,	500, 150,	1,3,	kControlLeft},   //V6. Control + read back
 		
@@ -491,7 +507,9 @@ NSString* ORMJDVacuumModelShowGridChanged = @"ORMJDVacuumModelShowGridChanged";
 	int i;
 	for(i=0;i<numItems;i++){
 		NSRect theBounds = NSMakeRect(labelItems[i].x1,labelItems[i].y1,labelItems[i].x2-labelItems[i].x1,labelItems[i].y2-labelItems[i].y1);
-		[[ORVacuumStaticLabel alloc] initWithDelegate:self partTag: labelItems[i].partTag label:labelItems[i].label bounds:theBounds];
+		ORVacuumStaticLabel* aLabel = [[ORVacuumStaticLabel alloc] initWithDelegate:self partTag: labelItems[i].partTag label:labelItems[i].label bounds:theBounds];
+		aLabel.drawBox = labelItems[i].drawBox;
+		[aLabel release];
 	}
 }
 
@@ -500,7 +518,7 @@ NSString* ORMJDVacuumModelShowGridChanged = @"ORMJDVacuumModelShowGridChanged";
 	int i;
 	for(i=0;i<numItems;i++){
 		NSRect theBounds = NSMakeRect(labelItems[i].x1,labelItems[i].y1,labelItems[i].x2-labelItems[i].x1,labelItems[i].y2-labelItems[i].y1);
-		[[ORVacuumDynamicLabel alloc] initWithDelegate:self partTag: labelItems[i].partTag label:labelItems[i].label bounds:theBounds];
+		[[[ORVacuumDynamicLabel alloc] initWithDelegate:self partTag: labelItems[i].partTag label:labelItems[i].label bounds:theBounds] autorelease];
 	}
 }
 
@@ -508,7 +526,7 @@ NSString* ORMJDVacuumModelShowGridChanged = @"ORMJDVacuumModelShowGridChanged";
 {
 	int i;
 	for(i=0;i<numItems;i++){
-		[[ORVacuumLine alloc] initWithDelegate:self partTag:0 startPt:NSMakePoint(lineItems[i].x1, lineItems[i].y1) endPt:NSMakePoint(lineItems[i].x2, lineItems[i].y2)];
+		[[[ORVacuumLine alloc] initWithDelegate:self partTag:0 startPt:NSMakePoint(lineItems[i].x1, lineItems[i].y1) endPt:NSMakePoint(lineItems[i].x2, lineItems[i].y2)] autorelease];
 	}
 }
 
@@ -551,7 +569,7 @@ NSString* ORMJDVacuumModelShowGridChanged = @"ORMJDVacuumModelShowGridChanged";
 
 - (void) recursizelyColorRegionsConnectedTo:(int)aRegion withColor:(NSColor*)aColor
 {
-	//this routine is called recursively, so do not reset the colorizationflag in this routine.
+	//this routine is called recursively, so do not reset the visitation flag in this routine.
 	NSArray* pipes = [self pipesForRegion:aRegion];
 	for(id aPipe in pipes){
 		if([aPipe visited])return;
@@ -562,8 +580,14 @@ NSString* ORMJDVacuumModelShowGridChanged = @"ORMJDVacuumModelShowGridChanged";
 	for(id aGateValve in gateValves){
 		int state = [aGateValve state];
 		if(state!=kGVClosed){
-			if([aGateValve connectingRegion1]!=aRegion)[self recursizelyColorRegionsConnectedTo:[aGateValve connectingRegion1] withColor:aColor];
-			if([aGateValve connectingRegion2]!=aRegion)[self recursizelyColorRegionsConnectedTo:[aGateValve connectingRegion2] withColor:aColor];
+			int r1 = [aGateValve connectingRegion1];
+			int r2 = [aGateValve connectingRegion2];
+			if(r1!=aRegion){
+				[self recursizelyColorRegionsConnectedTo:r1 withColor:aColor];
+			}
+			if(r2!=aRegion){
+				[self recursizelyColorRegionsConnectedTo:r2 withColor:aColor];
+			}
 		}
 	}
 }

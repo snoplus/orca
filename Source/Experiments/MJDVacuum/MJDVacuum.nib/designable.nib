@@ -11,8 +11,8 @@
 			<string key="NS.object.0">851</string>
 		</object>
 		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs">
-			<integer value="136"/>
 			<integer value="82"/>
+			<integer value="136"/>
 		</array>
 		<array key="IBDocument.PluginDependencies">
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -288,6 +288,7 @@
 														</array>
 														<string key="NSFrame">{{1, 17}, {293, 95}}</string>
 														<reference key="NSSuperview" ref="191728339"/>
+														<reference key="NSNextKeyView" ref="757207806"/>
 														<reference key="NSDocView" ref="757207806"/>
 														<object class="NSColor" key="NSBGColor">
 															<int key="NSColorSpace">1</int>
@@ -322,6 +323,7 @@
 														</array>
 														<string key="NSFrame">{{1, 0}, {293, 17}}</string>
 														<reference key="NSSuperview" ref="191728339"/>
+														<reference key="NSNextKeyView" ref="566337180"/>
 														<reference key="NSDocView" ref="566337180"/>
 														<reference key="NSBGColor" ref="822607656"/>
 														<int key="NScvFlags">4</int>
@@ -330,6 +332,7 @@
 												</array>
 												<string key="NSFrame">{{43, 480}, {295, 113}}</string>
 												<reference key="NSSuperview" ref="734652764"/>
+												<reference key="NSNextKeyView" ref="420793840"/>
 												<int key="NSsFlags">562</int>
 												<reference key="NSVScroller" ref="447952099"/>
 												<reference key="NSHScroller" ref="473699642"/>
@@ -553,6 +556,7 @@
 														</array>
 														<string key="NSFrame">{{1, 17}, {601, 285}}</string>
 														<reference key="NSSuperview" ref="54866154"/>
+														<reference key="NSNextKeyView" ref="1018003149"/>
 														<reference key="NSDocView" ref="1018003149"/>
 														<object class="NSColor" key="NSBGColor">
 															<int key="NSColorSpace">1</int>
@@ -588,6 +592,7 @@
 														</array>
 														<string key="NSFrame">{{1, 0}, {601, 17}}</string>
 														<reference key="NSSuperview" ref="54866154"/>
+														<reference key="NSNextKeyView" ref="188182684"/>
 														<reference key="NSDocView" ref="188182684"/>
 														<reference key="NSBGColor" ref="822607656"/>
 														<int key="NScvFlags">4</int>
@@ -596,6 +601,7 @@
 												</array>
 												<string key="NSFrame">{{43, 119}, {603, 303}}</string>
 												<reference key="NSSuperview" ref="734652764"/>
+												<reference key="NSNextKeyView" ref="1010230570"/>
 												<int key="NSsFlags">562</int>
 												<reference key="NSVScroller" ref="806855609"/>
 												<reference key="NSHScroller" ref="731034350"/>
@@ -774,7 +780,7 @@
 						<object class="NSTextField" id="470435430">
 							<reference key="NSNextResponder" ref="357027253"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{163, 273}, {88, 22}}</string>
+							<string key="NSFrame">{{163, 273}, {197, 22}}</string>
 							<reference key="NSSuperview" ref="357027253"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="141696471">
@@ -1148,22 +1154,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">lockButton</string>
-						<reference key="source" ref="926429161"/>
-						<reference key="destination" ref="663491425"/>
-					</object>
-					<int key="connectionID">170</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">lockAction:</string>
-						<reference key="source" ref="926429161"/>
-						<reference key="destination" ref="663491425"/>
-					</object>
-					<int key="connectionID">171</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
 						<string key="label">gvOpenToText1</string>
 						<reference key="source" ref="53635385"/>
 						<reference key="destination" ref="101375618"/>
@@ -1201,6 +1191,22 @@
 						<reference key="destination" ref="219922918"/>
 					</object>
 					<int key="connectionID">211</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">lockButton</string>
+						<reference key="source" ref="53635385"/>
+						<reference key="destination" ref="663491425"/>
+					</object>
+					<int key="connectionID">212</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">lockAction:</string>
+						<reference key="source" ref="53635385"/>
+						<reference key="destination" ref="663491425"/>
+					</object>
+					<int key="connectionID">213</int>
 				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -1892,9 +1898,9 @@
 					<bytes key="NSTransformStruct">P4AAAL+AAABDPAAAwxcAAA</bytes>
 				</object>
 				<string key="208.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="38.IBEditorWindowLastContentRect">{{816, 577}, {754, 683}}</string>
+				<string key="38.IBEditorWindowLastContentRect">{{321, 584}, {754, 683}}</string>
 				<string key="38.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="38.IBWindowTemplateEditedContentRect">{{816, 577}, {754, 683}}</string>
+				<string key="38.IBWindowTemplateEditedContentRect">{{321, 584}, {754, 683}}</string>
 				<boolean value="NO" key="38.windowTemplate.hasMaxSize"/>
 				<boolean value="NO" key="38.windowTemplate.hasMinSize"/>
 				<string key="38.windowTemplate.maxSize">{761, 710}</string>
@@ -1925,7 +1931,7 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">211</int>
+			<int key="maxID">213</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -2674,6 +2680,7 @@
 					<dictionary class="NSMutableDictionary" key="actions">
 						<string key="changeGVAction:">id</string>
 						<string key="closeGVChangePanel:">id</string>
+						<string key="lockAction:">id</string>
 						<string key="openGVControlPanel:">id</string>
 						<string key="showGridAction:">id</string>
 					</dictionary>
@@ -2684,6 +2691,10 @@
 						</object>
 						<object class="IBActionInfo" key="closeGVChangePanel:">
 							<string key="name">closeGVChangePanel:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="lockAction:">
+							<string key="name">lockAction:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="openGVControlPanel:">
@@ -2708,6 +2719,7 @@
 						<string key="gvOpenToText1">NSTextField</string>
 						<string key="gvOpenToText2">NSTextField</string>
 						<string key="gvTableView">NSTableView</string>
+						<string key="lockButton">NSButton</string>
 						<string key="setShowGridCB">NSButton</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
@@ -2759,6 +2771,10 @@
 							<string key="name">gvTableView</string>
 							<string key="candidateClassName">NSTableView</string>
 						</object>
+						<object class="IBToOneOutletInfo" key="lockButton">
+							<string key="name">lockButton</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
 						<object class="IBToOneOutletInfo" key="setShowGridCB">
 							<string key="name">setShowGridCB</string>
 							<string key="candidateClassName">NSButton</string>
@@ -2772,31 +2788,17 @@
 				<object class="IBPartialClassDescription">
 					<string key="className">ORMJDVacuumView</string>
 					<string key="superclassName">NSView</string>
-					<object class="NSMutableDictionary" key="actions">
-						<string key="NS.key.0">lockAction:</string>
+					<object class="NSMutableDictionary" key="outlets">
+						<string key="NS.key.0">delegate</string>
 						<string key="NS.object.0">id</string>
 					</object>
-					<object class="NSMutableDictionary" key="actionInfosByName">
-						<string key="NS.key.0">lockAction:</string>
-						<object class="IBActionInfo" key="NS.object.0">
-							<string key="name">lockAction:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-					</object>
-					<dictionary class="NSMutableDictionary" key="outlets">
-						<string key="delegate">id</string>
-						<string key="lockButton">NSButton</string>
-					</dictionary>
-					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
-						<object class="IBToOneOutletInfo" key="delegate">
+					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<string key="NS.key.0">delegate</string>
+						<object class="IBToOneOutletInfo" key="NS.object.0">
 							<string key="name">delegate</string>
 							<string key="candidateClassName">id</string>
 						</object>
-						<object class="IBToOneOutletInfo" key="lockButton">
-							<string key="name">lockButton</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-					</dictionary>
+					</object>
 					<reference key="sourceIdentifier" ref="245793709"/>
 				</object>
 				<object class="IBPartialClassDescription">

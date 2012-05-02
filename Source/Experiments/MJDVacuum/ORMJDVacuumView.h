@@ -19,20 +19,14 @@
 
 @interface ORMJDVacuumView : NSView {
 	IBOutlet id delegate;
-    IBOutlet NSButton*      lockButton;
 	NSMutableArray* gvButtons;
 }
 - (void) drawGrid;
 - (void) keyDown:(NSEvent *)theEvent;
 - (void) updateButtons;
-- (void) checkGlobalSecurity;
-- (void) lockChanged:(NSNotification*)aNote;
-
-- (IBAction) lockAction:(id) sender;
 
 @end
 
-extern NSString* ORMJCVacuumLock;
 
 @interface NSObject (VacuumView)
 - (int) stateOfRegion:(int)aTag;

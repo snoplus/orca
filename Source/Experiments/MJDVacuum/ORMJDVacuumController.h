@@ -36,6 +36,7 @@
 	IBOutlet NSTableView*   adcTableView;
 	IBOutlet NSTableView*   gvTableView;
 	IBOutlet NSTextField*   gvHwObjectName;
+    IBOutlet NSButton*      lockButton;
 }
 
 - (id) init;
@@ -47,6 +48,7 @@
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
 - (void) showGridChanged:(NSNotification*)aNote;
+- (void) lockChanged:(NSNotification*)aNote;
 - (void) toggleGrid;
 
 #pragma mark ***Interface Management
@@ -58,6 +60,7 @@
 - (IBAction) openGVControlPanel:(id)sender;
 - (IBAction) closeGVChangePanel:(id)sender;
 - (IBAction) changeGVAction:(id)sender;
+- (IBAction) lockAction:(id) sender;
 
 #pragma mark •••Data Source For Tables
 - (int)numberOfRowsInTableView:(NSTableView *)aTableView;

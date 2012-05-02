@@ -75,6 +75,7 @@
 extern NSString* ORMJDVacuumModelVetoMaskChanged;
 extern NSString* ORMJDVacuumModelPollTimeChanged;
 extern NSString* ORMJDVacuumModelShowGridChanged;
+extern NSString* ORMJCVacuumLock;
 
 
 @interface ORMJDVacuumModel (hidden)

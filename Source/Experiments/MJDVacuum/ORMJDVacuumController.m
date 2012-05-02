@@ -69,18 +69,32 @@
                          name : ORMJDVacuumModelVetoMaskChanged
 						object: model];
 
+	[notifyCenter addObserver : self
+                     selector : @selector(lockChanged:)
+                         name : ORMJCVacuumLock
+                        object: nil];
 }
+
 - (void) updateWindow
 {
     [super updateWindow];
 	[self showGridChanged:nil];
 	[self stateChanged:nil];
 	[self vetoMaskChanged:nil];
+	[self lockChanged:nil];
 }
 
 #pragma mark •••Interface Management
 - (void) vetoMaskChanged:(NSNotification*)aNote
 {
+}
+
+- (void) lockChanged:(NSNotification*)aNotification
+{
+    BOOL locked = [gSecurity isLocked:ORMJCVacuumLock];
+    [lockButton setState: locked];
+	
+	[groupView updateButtons];
 }
 
 - (void) stateChanged:(NSNotification*)aNote
@@ -108,7 +122,9 @@
 
 - (void) checkGlobalSecurity
 {
-	[(ORMJDVacuumView*)groupView checkGlobalSecurity];
+    BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
+    [gSecurity setLock:ORMJCVacuumLock to:secure];
+    [lockButton setEnabled:secure];
 }
 
 #pragma mark •••Actions
@@ -126,7 +142,8 @@
 	ORVacuumGateValve* gv = [model gateValve:gateValveTag];
 	unsigned long changesVetoed = ([model vetoMask] & (0x1>>gateValveTag)) != 0;
 	if(gv){
-		[gvControlValveState setStringValue:currentValveState==kGVOpen?@"OPEN":(currentValveState==kGVClosed?@"CLOSED":@"UnKnown")];
+		NSString* statusString = [NSString stringWithFormat:@"%@ is now %@",[gv label],currentValveState==kGVOpen?@"OPEN":(currentValveState==kGVClosed?@"CLOSED":@"UnKnown")];
+		[gvControlValveState setStringValue:statusString];
 		int region1		= [gv connectingRegion1];
 		int region2		= [gv connectingRegion2];
 		NSColor* c1		= [model colorOfRegion:region1];
@@ -142,7 +159,7 @@
 			switch(currentValveState){
 				case kGVOpen:
 					[gvOpenToText1 setStringValue:[model namesOfRegionsWithColor:c1]];
-					[gvOpenToText2 setStringValue:@"Each side appears connected now so closing the valve may isolate some regions."];
+					[gvOpenToText2 setStringValue:@"Valve is open. Closing it may isolate some regions."];
 					if(!changesVetoed){
 						s = @"Are you sure you want to CLOSE it and potentially isolate some regions?";
 						[gvControlButton setTitle:@"YES - CLOSE it"];
@@ -219,6 +236,12 @@
 	if(currentValveState == kGVOpen)       [model closeGateValve:gateValveTag];
 	else if(currentValveState == kGVClosed)[model openGateValve:gateValveTag];
 	else NSLog(@"GateValve %d in unknown state. Command ignored.\n",gateValveTag);
+}
+
+
+- (IBAction) lockAction:(id) sender
+{
+    [gSecurity tryToSetLock:ORMJCVacuumLock to:[sender intValue] forWindow:[self window]];
 }
 
 

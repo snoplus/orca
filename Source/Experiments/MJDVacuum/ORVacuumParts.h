@@ -40,6 +40,7 @@ typedef struct  {
 	int partTag;
 	NSString* label;
 	float x1,y1,x2,y2;
+	BOOL drawBox;
 } VacuumStaticLabelInfo;
 
 typedef struct  {
@@ -155,8 +156,10 @@ typedef struct  {
 	NSRect	  bounds;
 	NSGradient* gradient;
 	NSColor* controlColor;
+	BOOL  drawBox;
 }
 - (id) initWithDelegate:(id)aDelegate partTag:(int)aTag label:(NSString*)label bounds:(NSRect)aRect;
+@property (nonatomic,assign) BOOL drawBox;
 @property (nonatomic,assign) NSRect bounds;
 @property (nonatomic,retain) NSGradient* gradient;
 @property (nonatomic,retain) NSColor* controlColor;

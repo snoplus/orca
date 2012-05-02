@@ -22,7 +22,6 @@
 #import "ORMJDVacuumModel.h"
 #import "ORVacuumParts.h"
 
-NSString* ORMJCVacuumLock = @"ORMJCVacuumLock";
 
 @implementation ORMJDVacuumView
 - (void) awakeFromNib
@@ -62,14 +61,6 @@ NSString* ORMJCVacuumLock = @"ORMJCVacuumLock";
 			[button release];
 		}
 	}
-	
-	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-	[notifyCenter addObserver : self
-                     selector : @selector(lockChanged:)
-                         name : ORMJCVacuumLock
-                        object: nil];
-
-	[self lockChanged:nil];
 }
 
 - (void) dealloc
@@ -93,13 +84,7 @@ NSString* ORMJCVacuumLock = @"ORMJCVacuumLock";
 	}
 }
 
-- (void) lockChanged:(NSNotification*)aNotification
-{
-    BOOL locked = [gSecurity isLocked:ORMJCVacuumLock];
-    [lockButton setState: locked];
-	
-	[self updateButtons];
-}
+
 
 - (void) drawRect:(NSRect)dirtyRect 
 {
@@ -138,18 +123,6 @@ NSString* ORMJCVacuumLock = @"ORMJCVacuumLock";
 		[NSBezierPath strokeLineFromPoint:NSMakePoint(0,i) toPoint:NSMakePoint(width,i)];
 		count++;
 	}
-}
-
-- (void) checkGlobalSecurity
-{
-    BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
-    [gSecurity setLock:ORMJCVacuumLock to:secure];
-    [lockButton setEnabled:secure];
-}
-
-- (IBAction) lockAction:(id) sender
-{
-    [gSecurity tryToSetLock:ORMJCVacuumLock to:[sender intValue] forWindow:[self window]];
 }
 
 @end

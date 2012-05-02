@@ -432,12 +432,13 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
 @implementation ORVacuumStaticLabel
-@synthesize label,bounds,gradient,controlColor;
+@synthesize label,bounds,gradient,controlColor,drawBox;
 - (id) initWithDelegate:(id)aDelegate partTag:(int)aTag label:(NSString*)aLabel bounds:(NSRect)aRect
 {
 	self = [super initWithDelegate:aDelegate partTag:aTag];
 	self.bounds       = aRect;
 	self.label        = aLabel;
+	self.drawBox	  = YES;
 	self.controlColor = [NSColor colorWithCalibratedRed:.75 green:.75 blue:.75 alpha:1];
 	return self;
 }
@@ -470,12 +471,15 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 
 - (void) draw 
 {
-	[[NSColor blackColor] set];
-	[NSBezierPath strokeRect:bounds];
-	[gradient drawInRect:bounds angle:90.];
+	if(drawBox){
+		[[NSColor blackColor] set];
+		[NSBezierPath strokeRect:bounds];
+		[gradient drawInRect:bounds angle:90.];
+	}
 	
 	if([label length]){
 		
+		[[NSColor blackColor] set];
 		NSAttributedString* s = [[[NSAttributedString alloc] initWithString:label
 																 attributes:[NSDictionary dictionaryWithObjectsAndKeys:
 																			 [NSColor blackColor],NSForegroundColorAttributeName,
