@@ -313,42 +313,43 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 - (void) makeParts
 {
 	
-#define kNumVacPipes		52
+#define kNumVacPipes		55
 	VacuumPipeInfo vacPipeList[kNumVacPipes] = {
 		//region 0 pipes
-		{ kVacVPipe,  0, 50,			 200+kPipeRadius,	50,					450 }, 
-		{ kVacHPipe,  0, 50+kPipeRadius, 400,				150+kPipeRadius,	400 },
-		{ kVacVPipe,  0, 100,			 400-kPipeRadius,	100,				300 },
+		{ kVacVPipe,  0, 50,			 200,				50,					450 }, 
+		{ kVacHPipe,  0, 50+kPipeRadius, 400,				180+kPipeRadius,	400 },
+		{ kVacVPipe,  0, 150,			 400-kPipeRadius,	150,				300 },
 		//region 1 pipes
-		{ kVacVPipe,  1, 500,			  150,				500,				250 },
-		{ kVacHPipe,  1, 150,			  400,				300,				400 },
-		{ kVacHPipe,  1, 150,			  200,				500-kPipeRadius,	200 },
-		{ kVacVPipe,  1, 240,			  200+kPipeRadius,	240,				400-kPipeRadius },
-		{ kVacVPipe,  1, 240,			  400+kPipeRadius,	240,				420 },
-		{ kVacVPipe,  1, 200,			  400+kPipeRadius,	200,				450 },
+		{ kVacCorner, 1, 500,			  200,				kNA,				kNA },
+		{ kVacVPipe,  1, 500,			  200+kPipeRadius,	 500,				250 },
+		{ kVacHPipe,  1, 180,			  400,				350,				400 },
+		{ kVacHPipe,  1, 200,			  200,				500-kPipeRadius,	200 },
+		{ kVacVPipe,  1, 280,			  200+kPipeRadius,	280,				400-kPipeRadius },
+		{ kVacVPipe,  1, 280,			  400+kPipeRadius,	280,				420 },
+		{ kVacVPipe,  1, 230,			  400+kPipeRadius,	230,				450 },
 		//region 2 pipes (cyrostat)
 		{ kVacBox,	  2, 475,			  500,				525,				550 },
 		{ kVacBox,	  2, 600,			  450,				680,				560 },
 		{ kVacBigHPipe,2,525,			  525,		        600,				525 },
 		{ kVacCorner, 2, 700,			  400,				kNA,				kNA },
 		{ kVacVPipe,  2, 700,			   70,				700,				400-kPipeRadius },
-		{ kVacHPipe,  2, 300,			  400,				700-kPipeRadius,	400 },
+		{ kVacHPipe,  2, 350,			  400,				700-kPipeRadius,	400 },
 		{ kVacVPipe,  2, 600,			  350,				600,				400-kPipeRadius },
 		{ kVacVPipe,  2, 500,			  350,				500,				400-kPipeRadius },
-		{ kVacCorner, 2, 350,			  300,				kNA,				kNA },
-		{ kVacVPipe,  2, 350,			  300+kPipeRadius,	350,				400-kPipeRadius },
-		{ kVacHPipe,  2, 300,			  300,				350-kPipeRadius,	300 },
-		{ kVacHPipe,  2, 300,			  350,				350-kPipeRadius,	350 },
+		{ kVacCorner, 2, 400,			  300,				kNA,				kNA },
+		{ kVacVPipe,  2, 400,			  300+kPipeRadius,	400,				400-kPipeRadius },
+		{ kVacHPipe,  2, 350,			  300,				400-kPipeRadius,	300 },
+		{ kVacHPipe,  2, 350,			  350,				400-kPipeRadius,	350 },
 		{ kVacVPipe,  2, 400,			  400+kPipeRadius,	400,				450 },
 		{ kVacVPipe,  2, 500,			  400+kPipeRadius,	500,				500 },
 		//region 3 pipes
-		{ kVacVPipe,  3, 600,			  170,				600,				350 },
+		{ kVacVPipe,  3, 600,			  230,				600,				350 },
 		{ kVacHPipe,  3, 600+kPipeRadius, 300,				620,				300 },
-		{ kVacCorner, 3, 500,			  100,				kNA,				kNA },
-		{ kVacVPipe,  3, 500,			  100+kPipeRadius,	500,				150 },
-		{ kVacVPipe,  3, 600,			  70,				600,				170 },
-		{ kVacHPipe,  3, 500+kPipeRadius, 100,				600-kPipeRadius,	100 },
-		{ kVacHPipe,  3, 600+kPipeRadius, 100,				620,				100 },
+		{ kVacVPipe,  3, 580,			  70,				580,				200 },
+		{ kVacHPipe,  3, 530,			  150,				580-kPipeRadius,	150 },
+		{ kVacCorner, 3, 620,			  150,				kNA,				kNA },
+		{ kVacVPipe,  3, 620,			  150+kPipeRadius,	620,				200 },
+		{ kVacHPipe,  3, 620+kPipeRadius, 150,				640,				150 },
 		//region 4 pipes
 		{ kVacBox,	  4, 470,			  570,				530,				620 },
 		{ kVacBox,	  4, 270,			  570,				330,				620 },
@@ -360,43 +361,46 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 		{ kVacHPipe,  4, 400,			  600,				470,				600 },
 		{ kVacVPipe,  4, 360,			  550,				360,				600-kPipeRadius },
 		//region 5 pipes
-		{ kVacCorner, 5, 100,			  30,				kNA,				kNA },
+		{ kVacCorner, 5, 150,			  30,				kNA,				kNA },
 		{ kVacCorner, 5, 700,			  30,				kNA,				kNA },
-		{ kVacVPipe,  5, 100,			  30+kPipeRadius,	100,				300 },
-		{ kVacHPipe,  5, 100+kPipeRadius, 30,				700-kPipeRadius,	30 },
-		{ kVacHPipe,  5, 100+kPipeRadius, 200,				150,				200 },
+		{ kVacVPipe,  5, 150,			  30+kPipeRadius,	150,				300 },
+		{ kVacHPipe,  5, 150+kPipeRadius, 30,				700-kPipeRadius,	30 },
+		{ kVacHPipe,  5, 150+kPipeRadius, 200,				200,				200 },
 		{ kVacVPipe,  5, 700,			  30+kPipeRadius,	700,				70 },
-		{ kVacVPipe,  5, 600,			  30+kPipeRadius,	600,				70 },
-		{ kVacCorner, 5, 300,			  80,				kNA,				kNA },
-		{ kVacVPipe,  5, 300,			  30+kPipeRadius,	300,				80-kPipeRadius },
-		{ kVacHPipe,  5, 280,			  80,				300-kPipeRadius,	80 },
-		{ kVacHPipe,  5, 250,			  80,				280,				80 },
+		{ kVacVPipe,  5, 580,			  30+kPipeRadius,	580,				70 },
+		{ kVacCorner, 5, 350,			  80,				kNA,				kNA },
+		{ kVacVPipe,  5, 350,			  30+kPipeRadius,	350,				80-kPipeRadius },
+		{ kVacHPipe,  5, 330,			  80,				350-kPipeRadius,	80 },
+		{ kVacHPipe,  5, 300,			  80,				330,				80 },
 		//region 6 pipes
 		{ kVacVPipe,  6, 500,			  250,				500,				350 },
 		{ kVacHPipe,  6, 460,			  300,				500-kPipeRadius,	300 },
+		//region 7 pipes
+		{ kVacVPipe,  7, 50,			 100,				50,					200 }, 
+		{ kVacHPipe,  7, 50+kPipeRadius,  150,				530,				150 },
 	};
 		
 #define kNumStaticVacLabelItems	17
 	VacuumStaticLabelInfo staticLabelItems[kNumStaticVacLabelItems] = {
-		{kVacStaticLabel, 0, @"Turbo",			20,	 260,	80,	 290, YES},
-		{kVacStaticLabel, 0, @"Vacuum\nSentry",	20,	 220,	80,	 250, YES},
-		{kVacStaticLabel, 0, @"Diaphragm\nPump",20,	 180,	80,	 210, YES},
-		{kVacStaticLabel, 1, @"RGA",			220, 420,	260, 440, YES},
-		{kVacStaticLabel, 3, @"Cryo Pump",		570, 155,	630, 185, YES},
-		{kVacStaticLabel, 5, @"Dry N2\nSupply",	150,  60,	250, 100, YES},
-		{kVacStaticLabel, 6, @"NEG Pump",		400, 285,	460, 315, YES},
+		{kVacStaticLabel, 0, @"Turbo",			20,	 240,	80,	 270, YES},
+		{kVacStaticLabel, 1, @"RGA",			260, 420,	300, 440, YES},
+		{kVacStaticLabel, 3, @"Cryo Pump",		560, 200,	640, 230, YES},
+		{kVacStaticLabel, 5, @"Dry N2\nSupply",	200,  60,	300, 100, YES},
+		{kVacStaticLabel, 6, @"NEG Pump",		420, 285,	480, 315, YES},
+		{kVacStaticLabel, 7, @"Diaphragm\nPump",20,	 80,	80,	 110, YES},
 		
-		{kVacStaticLabel, 99, @"V1",			145, 375,	155, 385, NO},
-		{kVacStaticLabel, 99, @"V2",			285, 375,	315, 385, NO},
+		{kVacStaticLabel, 99, @"V1",			175, 375,	185, 385, NO},
+		{kVacStaticLabel, 99, @"V2",			335, 375,	365, 385, NO},
 		{kVacStaticLabel, 99, @"V3",			515, 345,	525, 355, NO},
 		{kVacStaticLabel, 99, @"V4",			575, 345,	585, 355, NO},
 		{kVacStaticLabel, 99, @"V5",			515, 245,	525, 255, NO},
-		{kVacStaticLabel, 99, @"V6",			515, 145,	525, 155, NO},
+		{kVacStaticLabel, 99, @"V6",			510, 160,	525, 170, NO},
 		
-		{kVacStaticLabel, 99, @"B1",			145, 175,	155, 185, NO},
-		{kVacStaticLabel, 99, @"B2",			70,	 295,	 85, 305, NO},
-		{kVacStaticLabel, 99, @"B3",			580,  45,	590,  55, NO},
+		{kVacStaticLabel, 99, @"B1",			195, 175,	205, 185, NO},
+		{kVacStaticLabel, 99, @"B2",			120, 295,	135, 305, NO},
+		{kVacStaticLabel, 99, @"B3",			560,  45,	570,  55, NO},
 		{kVacStaticLabel, 99, @"B4",			680,  45,	690,  55, NO},
+		{kVacStaticLabel, 99, @"B5",			25,  195,	35,  205, NO},
 
 	};	
 	
@@ -404,47 +408,49 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 	//the parttags are equal to the index numbers are equal to the region
 	VacuumDynamicLabelInfo dynamicLabelItems[kNumDynamicVacLabelItems] = {
 		{kVacDynamicLabel, 0, @"PKR G1",	20,	 450,	80,	 490},
-		{kVacDynamicLabel, 1, @"PKR G2",	170, 450,	230, 490},
+		{kVacDynamicLabel, 1, @"PKR G2",	200, 450,	260, 490},
 		{kVacDynamicLabel, 2, @"PKR G3",	370, 450,	430, 490},
 		{kVacDynamicLabel, 3, @"PKR G4",	620, 280,	680, 320},
 		{kVacDynamicLabel, 4, @"Baratron",	330, 520,	390, 550},
 	};	
 			
 	
-#define kNumVacLines 10
+#define kNumVacLines 11
 	VacuumLineInfo vacLines[kNumVacLines] = {
-		{kVacLine, 150,400,150,420},  //V1
-		{kVacLine, 300,400,300,420},  //V2
+		{kVacLine, 180,400,180,420},  //V1
+		{kVacLine, 350,400,350,420},  //V2
 		{kVacLine, 600,350,620,350},  //V3
 		{kVacLine, 480,350,500,350},  //V4
 		{kVacLine, 480,250,500,250},  //V5
-		{kVacLine, 480,150,500,150},  //V6
+		{kVacLine, 530,130,530,140},  //V6
 	
-		{kVacLine, 100,300,120,300},  //Bellows
-		{kVacLine, 150,200,150,220},  //Bellows
-		{kVacLine, 580,70,600,70},  //Bellows
-		{kVacLine, 680,70,700,70},  //Bellows
+		{kVacLine, 200,200,200,220},  //B1
+		{kVacLine, 150,300,170,300},  //B2
+		{kVacLine, 560,70,580,70},  //B3
+		{kVacLine, 680,70,700,70},  //B4
+		{kVacLine, 60,200,70,200},  //B5
 	};
 
-#define kNumVacGVs			15
+#define kNumVacGVs			16
 	VacuumGVInfo gvList[kNumVacGVs] = {
-		{kVacVGateV, 0,		@"V1",			k2BitReadBack,	150, 400,	0,1,	kControlAbove},	//V1. Control + read back
-		{kVacVGateV, 1,		@"V2",			k2BitReadBack,	300, 400,	1,2,	kControlAbove},	//V2. Control + read back
+		{kVacVGateV, 0,		@"V1",			k2BitReadBack,	180, 400,	0,1,	kControlAbove},	//V1. Control + read back
+		{kVacVGateV, 1,		@"V2",			k2BitReadBack,	350, 400,	1,2,	kControlAbove},	//V2. Control + read back
 		{kVacHGateV, 2,		@"V3",			k2BitReadBack,	500, 350,	2,6,	kControlLeft},	//V4. Control + read back
 		{kVacHGateV, 3,		@"V4",			k2BitReadBack,	600, 350,	2,3,	kControlRight},	//V3. Control + read back
 		{kVacHGateV, 4,		@"V5",			k2BitReadBack,	500, 250,	1,6,	kControlLeft},	//V5. Control + read back
-		{kVacHGateV, 5,		@"V6",			k2BitReadBack,	500, 150,	1,3,	kControlLeft},   //V6. Control + read back
+		{kVacVGateV, 5,		@"V6",			k2BitReadBack,	530, 150,	7,3,	kControlBelow},   //V6. Control + read back
 		
-		{kVacVGateV, 6,		@"B1",			k1BitReadBack,	150, 200,	1,5,	kControlAbove},	//Control only
-		{kVacHGateV, 7,		@"B2",			k1BitReadBack,	100, 300,	0,5,	kControlRight},	//Control only
-		{kVacHGateV, 8,		@"B3",			k1BitReadBack,	600, 70,	3,5,	kControlLeft},	//Control only 
+		{kVacVGateV, 6,		@"B1",			k1BitReadBack,	200, 200,	1,5,	kControlAbove},	//Control only
+		{kVacHGateV, 7,		@"B2",			k1BitReadBack,	150, 300,	0,5,	kControlRight},	//Control only
+		{kVacHGateV, 8,		@"B3",			k1BitReadBack,	580, 70,	3,5,	kControlLeft},	//Control only 
 		{kVacHGateV, 9,		@"B4",			k1BitReadBack,	700, 70,	2,5,	kControlLeft},	//Control only 
 		
-		{kVacVGateV, 10,	@"Burst",		kManualOnlyShowClosed,		300, 300,	2,kUpToAir,	kControlNone},	//burst
-		{kVacVGateV, 11,	@"N2 Manual",	kManualOnlyShowChanging,	280, 80,	5,kUpToAir,	kControlNone},	//Manual N2 supply
-		{kVacVGateV, 12,	@"PRV",			kManualOnlyShowClosed,		620, 100,	3,kUpToAir,	kControlNone},	//PRV
-		{kVacVGateV, 13,	@"PRV",			kManualOnlyShowClosed,		300, 350,	2,kUpToAir,	kControlNone},	//PRV
+		{kVacVGateV, 10,	@"Burst",		kManualOnlyShowClosed,		350, 300,	2,kUpToAir,	kControlNone},	//burst
+		{kVacVGateV, 11,	@"N2 Manual",	kManualOnlyShowChanging,	330, 80,	5,kUpToAir,	kControlNone},	//Manual N2 supply
+		{kVacVGateV, 12,	@"PRV",			kManualOnlyShowClosed,		640, 150,	3,kUpToAir,	kControlNone},	//PRV
+		{kVacVGateV, 13,	@"PRV",			kManualOnlyShowClosed,		350, 350,	2,kUpToAir,	kControlNone},	//PRV
 		{kVacVGateV, 14,	@"C1",			kManualOnlyShowChanging,	400, 600,	4,4,		kControlNone},	//Manual only
+		{kVacHGateV, 15,	@"B5",			k1BitReadBack,				50, 200,	0,7,		kControlRight},	//future control
 	};
 	
 	[self makeLines:vacLines					num:kNumVacLines];
@@ -534,8 +540,8 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 
 - (void) colorRegions
 {
-	#define kNumberPriorityRegions 7
-	int regionPriority[kNumberPriorityRegions] = {4,6,1,0,3,2,5}; //lowest to highest
+	#define kNumberPriorityRegions 8
+	int regionPriority[kNumberPriorityRegions] = {4,6,1,0,3,7,2,5}; //lowest to highest
 					
 	NSColor* regionColor[kNumberPriorityRegions] = {
 		[NSColor colorWithCalibratedRed:1.0 green:1.0 blue:0.7 alpha:1.0], //Region 0 Turbo
@@ -545,6 +551,7 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 		[NSColor colorWithCalibratedRed:0.6 green:0.6 blue:1.0 alpha:1.0], //Region 4 Thermosyphon
 		[NSColor colorWithCalibratedRed:1.0 green:0.5 blue:0.5 alpha:1.0], //Region 5 N2
 		[NSColor colorWithCalibratedRed:0.8 green:0.8 blue:0.4 alpha:1.0], //Region 6 NEG Pump
+		[NSColor colorWithCalibratedRed:0.4 green:0.6 blue:0.7 alpha:1.0], //Region 7 Diaphragm pump
 	};
 	int i;
 	for(i=0;i<kNumberPriorityRegions;i++){

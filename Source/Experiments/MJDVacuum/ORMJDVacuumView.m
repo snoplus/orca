@@ -38,7 +38,7 @@
 		float h  = 26; //button height
 		switch(aValve.controlPreference){
 			case kControlAbove: theControlRect = NSMakeRect(x1-w/2.,y1+kPipeRadius+2*kPipeThickness+5,w,h);		break;
-			case kControlBelow: theControlRect = NSMakeRect(x1-w/2.,y1-h-kPipeRadius+2*kPipeThickness-5,w,h);	break;
+			case kControlBelow: theControlRect = NSMakeRect(x1-w/2.,y1-h-kPipeRadius-2*kPipeThickness-5,w,h);	break;
 			case kControlRight: theControlRect = NSMakeRect(x1+kPipeRadius+2*kPipeThickness+5,y1-h/2.,w,h);	break;
 			case kControlLeft:  theControlRect = NSMakeRect(x1-kPipeRadius-2*kPipeThickness-w,y1-h/2.,w,h);	break;
 		}
