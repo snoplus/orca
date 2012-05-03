@@ -1084,7 +1084,7 @@ NSString* ORCP8CryopumpModelWasPowerFailireChanged          = @"ORCP8CryopumpMod
 }
 - (void) readAllHardware
 {
- /*   [self readTemperatures];
+    [self readTemperatures];
     [self readStatus];
     [self readRegenerationSequence];
     [self readRegenerationStartDelay];
@@ -1104,8 +1104,8 @@ NSString* ORCP8CryopumpModelWasPowerFailireChanged          = @"ORCP8CryopumpMod
     [self readPumpStatus];	
     [self readPurgeStatus];
     [self readRegenerationCycles];	
-    [self readRegenerationError];*/	
-    [self readFailedPurgeCycles];
+    [self readRegenerationError];	
+    //[self readFailedPurgeCycles];
 
 }
 @end
@@ -1139,7 +1139,6 @@ NSString* ORCP8CryopumpModelWasPowerFailireChanged          = @"ORCP8CryopumpMod
 	ORCP8CryopumpCmd* cmdObj = [cmdQueue dequeue];
 	if(cmdObj){
 		NSString* aCmd = cmdObj.cmd;
-        NSLog(@"processing: %@\n",aCmd);
 		if([aCmd isEqualToString:@"++Delay"]){
 			delay = YES;
 			[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(clearDelay) object:nil];
@@ -1187,7 +1186,6 @@ NSString* ORCP8CryopumpModelWasPowerFailireChanged          = @"ORCP8CryopumpMod
 - (void) process_response:(NSString*)theResponse
 {	
 	if(!lastRequest)return;
-    NSLog(@"got %@ from %@\n",theResponse,lastRequest);
 	if([theResponse hasPrefix:@"$A"] || [theResponse hasPrefix:@"$B"]){
         [self setWasPowerFailure:[theResponse hasPrefix:@"$B"]];
         char cmdChar = [[lastRequest substringWithRange:NSMakeRange(1,1)] characterAtIndex:0];
@@ -1244,10 +1242,11 @@ NSString* ORCP8CryopumpModelWasPowerFailireChanged          = @"ORCP8CryopumpMod
 			case 'k': [self setRegenerationStepTimer:	[self responseAsInt:theResponse]];			break;
 			case 'a': [self setRegenerationTime:		[self responseAsInt:theResponse]];			break;
 			case 'D': [self setRoughValveStatus:		[self responseAsBool:theResponse]];			break;
-			case 'Q': [self setRoughingInterlockStatus:	[self responseAsInt:theResponse] - 0x30];	break;
+			case 'Q': [self setRoughingInterlockStatus:	[theResponse characterAtIndex:2] - 0x30];	break;
 			case 'K': [self setSecondStageTemp:			[self responseAsFloat:theResponse]];		break;
 			//case 'I': [self setSecondStageTempControl:	[self responseAsInt:theResponse]];			break;
-			case 'S': [self setStatus:					[self responseAsInt:theResponse] - 0x20];	break;
+			case 'S': [self setStatus:					 [theResponse characterAtIndex:2] - 0x30];	
+            break;
 			case 'B': [self setThermocoupleStatus:		[self responseAsBool:theResponse]];			break;
 			case 'L': [self setThermocouplePressure:	[self responseAsFloat:theResponse]];		break;
 		}

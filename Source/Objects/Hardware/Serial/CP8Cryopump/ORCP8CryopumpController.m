@@ -885,7 +885,7 @@
 					  @"Cancel",
 					  nil,[self window],
 					  self,
-					  @selector(turnOnCryoPumpDidFinish:returnCode:contextInfo:),
+					  @selector(turnOffCryoPumpDidFinish:returnCode:contextInfo:),
 					  nil,
 					  nil,
 					  @"Really turn OFF the cryopump?");
