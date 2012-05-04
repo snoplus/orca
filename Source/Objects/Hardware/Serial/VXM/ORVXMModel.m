@@ -490,7 +490,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
     else      [serialPort close];
     portWasOpen = [serialPort isOpen];
 	if([serialPort isOpen]){
-		[self queryPositionOnce];
+        [self performSelector:@selector(queryPositionOnce) withObject:nil afterDelay:2];
 	}
 	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORVXMModelPortStateChanged object:self];
@@ -556,9 +556,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 {
 	if(!syncWithRun){
 		abortAllRepeats = NO;
-		@synchronized(self){
-			[serialPort writeString:@"F,K,C\r"];
-		}
+        [serialPort writeString:@"F,K,C\r"];
 		[self setCmdIndex:0];
 		[self setRepeatCount:0];
 		[self processNextCommand];
@@ -656,9 +654,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
     if([serialPort isOpen]){
 		abortAllRepeats = YES;
 		[NSObject cancelPreviousPerformRequestsWithTarget:self];
-		@synchronized(self){
-			[serialPort writeString:@"F,K\r"];
-		}
+        [serialPort writeString:@"F,K\r"];
 		[self queryPositionOnce];
 		[self setCmdTypeExecuting:kVXMCmdIdle];
     }
@@ -667,9 +663,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (void) goToNexCommand
 {
     if([serialPort isOpen]){
-		@synchronized(self){
-			[serialPort writeString:@"F,K"]; //kill any existing program
-		}
+        [serialPort writeString:@"F,K"]; //kill any existing program
 		[self startRepeatingPositionQueries];
 	}
 }
@@ -726,9 +720,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (void) sendGo
 {
 	if([serialPort isOpen]){
-		@synchronized(self){
-			[serialPort writeString:@"G\r"];
-		}
+        [serialPort writeString:@"G\r"];
 		[self setWaiting:NO];
 		NSLog(@"sent 'Go' to VXM %d\n",[self uniqueIdNumber]);
 	}
@@ -802,6 +794,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 	}
 	else {
 		if([aCmd rangeOfString:@"^"].location != NSNotFound){
+            [NSObject cancelPreviousPerformRequestsWithTarget:self];
 			//the '^' means a command is complete
 			aCmd = [aCmd substringFromIndex:1]; //might be more on this response, strip off the '^'
 			if(useCmdQueue){
@@ -829,7 +822,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 			motorQueryMask &= ~(0x1<<motorIndex);
 			[self performSelector:@selector(queryPosition) 
 					   withObject:nil 
-					   afterDelay:1];
+					   afterDelay:.1];
 		}
 		else {
 			if(repeatQuery){
@@ -876,9 +869,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 			abortAllRepeats = YES;
 			[self setCmdIndex:0];
 			[self setRepeatCount:0];
-			@synchronized(self){
-				[serialPort writeString:aCmdString];
-			}
+            [serialPort writeString:aCmdString];
 			[self startRepeatingPositionQueries];
 		}
 	}
@@ -894,9 +885,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 				[self setCmdTypeExecuting:kVXMCmdListExecuting];
 				NSString* theCmd = aCmd.cmd;
 				//if(![theCmd hasSuffix:@"\r"]) theCmd = [theCmd stringByAppendingString:@"\r"];
-				@synchronized(self){
-					[serialPort writeString:theCmd];
-				}
+                [serialPort writeString:theCmd];
 				if(!aCmd.waitToSendNextCmd){
 					[self incrementCmdIndex];
 					[self processNextCommand];
@@ -977,7 +966,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 	repeatQuery = YES;
 	if(motorQueryMask==0){
 		[self resetQueryMask];
-		[self performSelector:@selector(queryPosition) withObject:nil afterDelay:1];
+		[self performSelector:@selector(queryPosition) withObject:nil afterDelay:.3];
 	}
 }
 
@@ -985,7 +974,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 {
 	repeatQuery = NO;
 	forceResetQueryMaskOnce = YES;
-	[self performSelector:@selector(queryPosition) withObject:nil afterDelay:1];
+	[self performSelector:@selector(queryPosition) withObject:nil afterDelay:.3];
 }
 
 - (void) stopPositionQueries
@@ -1008,15 +997,13 @@ NSString* ORVXMLock							= @"ORVXMLock";
 				case 3: cmd = @"E,T"; break;
 			}
 			if(cmd){
-				@synchronized(self){
-					[serialPort writeString:cmd];
-				}
+                [serialPort writeString:cmd];
 				[self startTimeOut];
 			}
 		}
 		else if(repeatQuery || forceResetQueryMaskOnce){
 			[self resetQueryMask];
-			[self performSelector:@selector(queryPosition) withObject:nil afterDelay:1];
+			[self performSelector:@selector(queryPosition) withObject:nil afterDelay:.3];
 		}
     }
 }
