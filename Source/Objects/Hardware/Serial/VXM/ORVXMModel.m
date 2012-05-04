@@ -694,7 +694,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 		float conversion = [[motors objectAtIndex:motorIndex] conversion];
 		NSString* units = displayRaw?@"stps":@"mm";
 		[self addCmdToQueue:aCmd 
-				description:[NSString stringWithFormat:@"Move %d to %.2f%@ to %.2f%@/s",motorIndex,aPosition/conversion,units,aSpeed/conversion,units]
+				description:[NSString stringWithFormat:@"Move %d to %.2f%@ at %.2f%@/s",motorIndex,aPosition/conversion,units,aSpeed/conversion,units]
 				 waitToSend:YES];
 	}
 }
@@ -872,7 +872,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	if([serialPort isOpen]){ 
-		if([cmdQueue count]!=0 && !abortAllRepeats){
+		if(!abortAllRepeats){
 			if(cmdIndex<[cmdQueue count]){
 				ORVXMMotorCmd* aCmd = [cmdQueue objectAtIndex:cmdIndex];
 				[self setCmdTypeExecuting:kVXMCmdListExecuting];
