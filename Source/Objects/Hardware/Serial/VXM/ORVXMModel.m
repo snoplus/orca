@@ -556,7 +556,9 @@ NSString* ORVXMLock							= @"ORVXMLock";
 {
 	if(!syncWithRun){
 		abortAllRepeats = NO;
-        [serialPort writeString:@"F,K,C\r"];
+		@synchronized(self){
+			[serialPort writeString:@"F,K,C\r"];
+		}
 		[self setCmdIndex:0];
 		[self setRepeatCount:0];
 		[self processNextCommand];
@@ -621,6 +623,12 @@ NSString* ORVXMLock							= @"ORVXMLock";
 	}	
 }
 
+- (void) goHome:(int)aMotorIndex plusDirection:(BOOL)yesOrNo
+{
+	if(yesOrNo == YES)	[self addHomePlusCmdFor:aMotorIndex];
+	else				[self addHomeMinusCmdFor:aMotorIndex];
+}
+
 - (void) addHomePlusCmdFor:(int)aMotorIndex
 {
 	if(aMotorIndex>=0 && aMotorIndex<[motors count]){	
@@ -648,7 +656,9 @@ NSString* ORVXMLock							= @"ORVXMLock";
     if([serialPort isOpen]){
 		abortAllRepeats = YES;
 		[NSObject cancelPreviousPerformRequestsWithTarget:self];
-        [serialPort writeString:@"F,K\r"];
+		@synchronized(self){
+			[serialPort writeString:@"F,K\r"];
+		}
 		[self queryPositionOnce];
 		[self setCmdTypeExecuting:kVXMCmdIdle];
     }
@@ -657,7 +667,9 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (void) goToNexCommand
 {
     if([serialPort isOpen]){
-        [serialPort writeString:@"F,K"]; //kill any existing program
+		@synchronized(self){
+			[serialPort writeString:@"F,K"]; //kill any existing program
+		}
 		[self startRepeatingPositionQueries];
 	}
 }
@@ -714,7 +726,9 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (void) sendGo
 {
 	if([serialPort isOpen]){
-		[serialPort writeString:@"G\r"];
+		@synchronized(self){
+			[serialPort writeString:@"G\r"];
+		}
 		[self setWaiting:NO];
 		NSLog(@"sent 'Go' to VXM %d\n",[self uniqueIdNumber]);
 	}
@@ -862,7 +876,9 @@ NSString* ORVXMLock							= @"ORVXMLock";
 			abortAllRepeats = YES;
 			[self setCmdIndex:0];
 			[self setRepeatCount:0];
-			[serialPort writeString:aCmdString];
+			@synchronized(self){
+				[serialPort writeString:aCmdString];
+			}
 			[self startRepeatingPositionQueries];
 		}
 	}
@@ -878,7 +894,9 @@ NSString* ORVXMLock							= @"ORVXMLock";
 				[self setCmdTypeExecuting:kVXMCmdListExecuting];
 				NSString* theCmd = aCmd.cmd;
 				//if(![theCmd hasSuffix:@"\r"]) theCmd = [theCmd stringByAppendingString:@"\r"];
-				[serialPort writeString:theCmd];
+				@synchronized(self){
+					[serialPort writeString:theCmd];
+				}
 				if(!aCmd.waitToSendNextCmd){
 					[self incrementCmdIndex];
 					[self processNextCommand];
@@ -990,7 +1008,9 @@ NSString* ORVXMLock							= @"ORVXMLock";
 				case 3: cmd = @"E,T"; break;
 			}
 			if(cmd){
-				[serialPort writeString:cmd];
+				@synchronized(self){
+					[serialPort writeString:cmd];
+				}
 				[self startTimeOut];
 			}
 		}

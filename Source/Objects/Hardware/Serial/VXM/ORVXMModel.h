@@ -127,6 +127,7 @@
 - (void) goToNexCommand;
 - (void) addCmdFromTableFor:(int)aMotorIndex;
 - (void) addZeroCmd;
+- (void) goHome:(int)aMotorIndex plusDirection:(BOOL)yesOrNo;
 - (void) addHomePlusCmdFor:(int)aMotorIndex;
 - (void) addHomeMinusCmdFor:(int)aMotorIndex;
 - (void) addCustomCmd;
