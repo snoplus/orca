@@ -829,12 +829,12 @@ NSString* ORVXMLock							= @"ORVXMLock";
 			motorQueryMask &= ~(0x1<<motorIndex);
 			[self performSelector:@selector(queryPosition) 
 					   withObject:nil 
-					   afterDelay:.01];
+					   afterDelay:1];
 		}
 		else {
 			if(repeatQuery){
 				[self resetQueryMask];
-				[self performSelector:@selector(queryPosition) withObject:nil afterDelay:.1];
+				[self performSelector:@selector(queryPosition) withObject:nil afterDelay:1];
 			}
 		}
 		
@@ -977,7 +977,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 	repeatQuery = YES;
 	if(motorQueryMask==0){
 		[self resetQueryMask];
-		[self performSelector:@selector(queryPosition) withObject:nil afterDelay:.3];
+		[self performSelector:@selector(queryPosition) withObject:nil afterDelay:1];
 	}
 }
 
@@ -1016,7 +1016,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 		}
 		else if(repeatQuery || forceResetQueryMaskOnce){
 			[self resetQueryMask];
-			[self performSelector:@selector(queryPosition) withObject:nil afterDelay:.3];
+			[self performSelector:@selector(queryPosition) withObject:nil afterDelay:1];
 		}
     }
 }
