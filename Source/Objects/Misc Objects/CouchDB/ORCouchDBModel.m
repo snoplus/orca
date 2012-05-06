@@ -32,6 +32,9 @@
 #import "ORStatusController.h"
 #import "ORProcessModel.h"
 #import "ORProcessElementModel.h"
+#import <sys/socket.h>
+#import <ifaddrs.h>
+#import <arpa/inet.h>
 
 NSString* ORCouchDBModelReplicationRunningChanged = @"ORCouchDBModelReplicationRunningChanged";
 NSString* ORCouchDBModelKeepHistoryChanged	= @"ORCouchDBModelKeepHistoryChanged";
@@ -519,29 +522,44 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 	if(!stealthMode){
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateMachineRecord) object:nil];
 		
-		
-		NSString* thisHostAdress = @"";
-		NSArray* names =  [[NSHost currentHost] addresses];
-		NSEnumerator* e = [names objectEnumerator];
-		id aName;
-		while(aName = [e nextObject]){
-			if([aName rangeOfString:@"::"].location == NSNotFound){
-				if([aName rangeOfString:@".0.0."].location == NSNotFound){
-					thisHostAdress = aName;
-					break;
-				}
-			}
+		struct ifaddrs *ifaddr, *ifa;
+        if (getifaddrs(&ifaddr) == 0) {
+            // Successfully received the structs of addresses.
+            NSString* thisHostAdress = @"";
+            char tempInterAddr[INET_ADDRSTRLEN];
+            NSMutableArray* names = [NSMutableArray array];
+            // The following is a replacement for [[NSHost currentHost] addresses].  The problem is
+            // that the NSHost call can do reverse DNS calls which block and are *very* slow.  The 
+            // following is much faster.
+            for (ifa = ifaddr; ifa != nil; ifa = ifa->ifa_next) {
+                // skip IPv6 addresses
+                if (ifa->ifa_addr->sa_family != AF_INET) continue;
+                inet_ntop(AF_INET, 
+                          &((struct sockaddr_in *)ifa->ifa_addr)->sin_addr,
+                          tempInterAddr,
+                          sizeof(tempInterAddr));
+                [names addObject:[NSString stringWithCString:tempInterAddr encoding:NSASCIIStringEncoding]];
+            }
+            freeifaddrs(ifaddr);
+            // Now enumerate and find the first non-loop-back address.
+            NSEnumerator* e = [names objectEnumerator];
+            id aName;
+            while(aName = [e nextObject]){
+                if([aName rangeOfString:@".0.0."].location == NSNotFound){
+                    thisHostAdress = aName;
+                    break;
+                }
+            }
+            NSDictionary* machineInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                                         @"machineinfo",@"type",
+                                         [NSNumber numberWithLong:[[[NSApp delegate] memoryWatcher] accurateUptime]], @"uptime",
+                                          computerName(),@"name",
+                                          macAddress(),@"hw_address",
+                                          thisHostAdress,@"ip_address",
+                                          fullVersion(),@"version",nil];	
+                
+            [[self statusDBRef] updateDocument:machineInfo documentId:@"machineinfo" tag:kDocumentUpdated];
 		}
-		NSDictionary* machineInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-									 @"machineinfo",@"type",
-									 [NSNumber numberWithLong:[[[NSApp delegate] memoryWatcher] accurateUptime]], @"uptime",
-									  computerName(),@"name",
-									  macAddress(),@"hw_address",
-									  thisHostAdress,@"ip_address",
-									  fullVersion(),@"version",nil];	
-			
-		[[self statusDBRef] updateDocument:machineInfo documentId:@"machineinfo" tag:kDocumentUpdated];
-		
 		[self performSelector:@selector(updateMachineRecord) withObject:nil afterDelay:5];	
 	}
 }
