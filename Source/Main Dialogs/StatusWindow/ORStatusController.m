@@ -702,6 +702,15 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 	
 }
 
+- (IBAction) userInputAction:(id)sender
+{
+    NSString* s = [userInputField stringValue];
+    if([s length]){
+        NSLog(@"%@\n",s);
+        [userInputField setStringValue:@""];
+    }
+}
+
 
 #pragma  mark ¥¥¥Delegate Responsiblities
 - (BOOL)outlineView:(NSOutlineView *)outlineView shouldEditTableColumn:(NSTableColumn *)tableColumn item:(id)item

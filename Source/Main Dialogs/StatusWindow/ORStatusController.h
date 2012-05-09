@@ -39,6 +39,7 @@
     IBOutlet NSTextField*   errorTextField;
     IBOutlet NSTextView*    logBookField;
     IBOutlet NSTextField*   logBookPathField;
+    IBOutlet NSTextField*   userInputField;
 
     IBOutlet NSButton*      saveLogBookButton;
 
@@ -47,6 +48,7 @@
 	BOOL					logBookDirty;
 	NSString*				logBookFile;
 	NSDate*					lastSnapShot;
+
 }
 
 #pragma mark ¥¥¥Accessors
@@ -102,6 +104,7 @@
 - (IBAction) mailContent:(id)sender;
 - (IBAction) clearAlarmHistoryAction:(id)sender;
 - (IBAction) alarmFilterAction:(id)sender;
+- (IBAction) userInputAction:(id)sender;
 
 - (void) loadCurrentLogBook;
 
