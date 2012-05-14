@@ -438,7 +438,7 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 		{kVacHGateV, 2,		@"V3",			k2BitReadBack,	500, 350,	2,6,	kControlLeft},	//V4. Control + read back
 		{kVacHGateV, 3,		@"V4",			k2BitReadBack,	600, 350,	2,3,	kControlRight},	//V3. Control + read back
 		{kVacHGateV, 4,		@"V5",			k2BitReadBack,	500, 250,	1,6,	kControlLeft},	//V5. Control + read back
-		{kVacVGateV, 5,		@"V6",			k2BitReadBack,	530, 150,	7,3,	kControlBelow},   //V6. Control + read back
+		{kVacVGateV, 5,		@"V6",			k1BitReadBack,	530, 150,	7,3,	kControlBelow},   //V6. Control + read back
 		
 		{kVacVGateV, 6,		@"B1",			k1BitReadBack,	200, 200,	1,5,	kControlAbove},	//Control only
 		{kVacHGateV, 7,		@"B2",			k1BitReadBack,	150, 300,	0,5,	kControlRight},	//Control only
