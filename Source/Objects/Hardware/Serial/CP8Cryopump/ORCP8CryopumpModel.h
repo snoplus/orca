@@ -17,12 +17,13 @@
 //-------------------------------------------------------------
 
 #pragma mark •••Imported Files
+#import "ORBitProcessing.h"
 
 @class ORSerialPort;
 @class ORTimeRate;
 @class ORSafeQueue;
 
-@interface ORCP8CryopumpModel : OrcaObject
+@interface ORCP8CryopumpModel : OrcaObject <ORBitProcessing>
 {
     @private
         NSString*			portName;
@@ -79,7 +80,8 @@
         int                 cmdError;
         BOOL                wasPowerFailure;
         BOOL                delay;
-
+		BOOL				readOnce;
+		BOOL				involvedInProcess;
 }
 
 #pragma mark •••Initialization
@@ -89,6 +91,8 @@
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark •••Accessors
+- (BOOL)	involvedInProcess;
+- (void)	setInvolvedInProcess:(BOOL)aInvolvedInProcess;
 - (BOOL)    wasPowerFailure;
 - (void)    setWasPowerFailure:(BOOL)aState;
 - (int)     cmdError;
@@ -244,6 +248,15 @@
 #pragma mark •••Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
+
+#pragma mark •••Adc Processing Protocol
+- (void) processIsStarting;
+- (void) processIsStopping; 
+- (void) startProcessCycle;
+- (void) endProcessCycle;
+- (BOOL) processValue:(int)channel;
+- (void) setProcessOutput:(int)channel value:(int)value;
+- (NSString*) processingTitle;
 @end
 
 @interface ORCP8CryopumpCmd : NSObject
@@ -303,4 +316,5 @@ extern NSString* ORCP8CryopumpPortNameChanged;
 extern NSString* ORCP8CryopumpPortStateChanged;
 extern NSString* ORCP8CryopumpModelCmdErrorChanged;
 extern NSString* ORCP8CryopumpModelWasPowerFailireChanged;
+extern NSString* ORCP8CryopumpModelInvolvedInProcessChanged;
 

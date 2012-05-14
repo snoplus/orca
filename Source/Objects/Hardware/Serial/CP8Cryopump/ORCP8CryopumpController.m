@@ -335,7 +335,16 @@
                          name : ORCP8CryopumpModelWasPowerFailireChanged
 						object: model];
    
-    
+	[notifyCenter addObserver : self
+                     selector : @selector(involvedInProcessChanged:)
+                         name : ORCP8CryopumpModelInvolvedInProcessChanged
+						object: model];
+	
+}
+
+- (void) involvedInProcessChanged:(NSNotification*)aNote
+{
+	[self lockChanged:nil];
 }
 
 - (void) setModel:(id)aModel
@@ -731,10 +740,11 @@
 - (void) updateButtons
 {
     BOOL locked = [gSecurity isLocked:ORCP8CryopumpLock];
+	BOOL inProcess = [model involvedInProcess];
 	
+    [pollTimePopup					setEnabled:!locked && !inProcess];
     [portListPopup					setEnabled:!locked];
     [openPortButton					setEnabled:!locked];
-    [pollTimePopup					setEnabled:!locked];
     [shipTemperaturesButton			setEnabled:!locked];
  
 	[secondStageTempControlField	setEnabled:!locked];
