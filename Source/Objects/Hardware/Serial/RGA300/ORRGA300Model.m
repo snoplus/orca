@@ -652,9 +652,7 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 
 - (int)  numberPointsInScan
 {
-	int n = [scanData length]/4;
-	if(n > 1) n = n-1;
-	return n;
+	return [scanData length]/4;
 }
 - (int)  scanValueAtIndex:(int)i
 {
@@ -778,21 +776,25 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 	else if([aCmdString hasPrefix:@"HS0"])	[aCmd setWaitForResponse:NO];
 	else if([aCmdString hasPrefix:@"MR0"])	[aCmd setWaitForResponse:NO];
 	else if([aCmdString hasPrefix:@"SC0"])	[aCmd setWaitForResponse:NO];
+    else if([aCmdString hasPrefix:@"HS"]){
+        [aCmd setDataExpected:YES];
+        [aCmd setExpectedDataLength:(finalMass-initialMass + 1)*4];           
+    }
+    else if([aCmdString hasPrefix:@"SC"]){
+        [aCmd setDataExpected:YES];
+        [aCmd setExpectedDataLength:((finalMass-initialMass) * stepsPerAmu + 1)*4];
+    }
+    else if([aCmdString hasPrefix:@"MR"]){
+        [aCmd setDataExpected:YES];
+        [aCmd setExpectedDataLength:4];
+    }
 	else if([aCmdString rangeOfString:@"?"].location == NSNotFound){
 		if([aCmdString hasPrefix:@"MI"])		[aCmd setWaitForResponse:NO];
 		else if([aCmdString hasPrefix:@"MF"])	[aCmd setWaitForResponse:NO];
 		else if([aCmdString hasPrefix:@"NF"])	[aCmd setWaitForResponse:NO];
 		else if([aCmdString hasPrefix:@"SA"])	[aCmd setWaitForResponse:NO];
 		else if([aCmdString hasPrefix:@"MG"])	[aCmd setWaitForResponse:NO];
-		else if([aCmdString hasPrefix:@"HS"] || [aCmdString hasPrefix:@"SC"]){
-			[aCmd setDataExpected:YES];
-			[aCmd setExpectedDataLength:(finalMass-initialMass + 1 + 1)*4];
-		}
-		else if([aCmdString hasPrefix:@"MR"]){
-			[aCmd setDataExpected:YES];
-			[aCmd setExpectedDataLength:4];
-		}
-	}
+    }
 }
 
 - (void) processOneCommandFromQueue
@@ -830,7 +832,7 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 		cmdObj.cmd = aString;
 		[self setExpectations:cmdObj];
 		
-		[cmdQueue enqueue:aString];
+		[cmdQueue enqueue:cmdObj];
 		if(!lastRequest){
 			[self processOneCommandFromQueue];
 		}
@@ -840,32 +842,31 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 - (void) processReceivedString:(NSString*)aString
 {		
 	NSString* theLastRequest = lastRequest.cmd;
-	if([theLastRequest hasPrefix:@"ID?"])		[self processIDResponse:aString];
-	else if([theLastRequest hasPrefix:@"ER?"])	[self processStatusWord:aString];
-	else if([theLastRequest hasPrefix:@"EC?"])	[self setRs232ErrWord:	[aString intValue]];
-	else if([theLastRequest hasPrefix:@"ED?"])	[self setDetErrWord:	[aString intValue]];
-	else if([theLastRequest hasPrefix:@"EF?"])	[self setFilErrWord:	[aString intValue]];
-	else if([theLastRequest hasPrefix:@"EM?"])	[self setCemErrWord:	[aString intValue]];
-	else if([theLastRequest hasPrefix:@"EP?"])	[self setPsErrWord:		[aString intValue]];
-	else if([theLastRequest hasPrefix:@"EQ?"])	[self setQmfErrWord:	[aString intValue]];
-	else if([theLastRequest hasPrefix:@"AP?"]) [self setAnalogScanPoints:	[aString intValue]];
-	else if([theLastRequest hasPrefix:@"HP?"]) [self setHistoScanPoints:	[aString intValue]];
-	else if([theLastRequest hasPrefix:@"DG?"]) [self setIonizerDegassTime:	[aString intValue]];
-	else if([theLastRequest hasPrefix:@"AP?"]) [self setAnalogScanPoints:[aString intValue]];
-	else if([theLastRequest hasPrefix:@"HP?"]) [self setHistoScanPoints:[aString intValue]];
-	else if([theLastRequest hasPrefix:@"MF?"]) [self setFinalMass:[aString intValue]];
-	else if([theLastRequest hasPrefix:@"MI?"]) [self setInitialMass:[aString intValue]];
-	else if([theLastRequest hasPrefix:@"SA?"]) [self setStepsPerAmu:[aString intValue]];
-	else if([theLastRequest hasPrefix:@"TP?"]) [self setMeasuredIonCurrent:[aString intValue]];
-	else if([theLastRequest hasPrefix:@"MO?"]) [self setElectronMultiOption:[aString intValue]];
+	if([theLastRequest hasPrefix:@"ID?"])       [self processIDResponse:    aString];
+	else if([theLastRequest hasPrefix:@"ER?"])	[self processStatusWord:    aString];
+	else if([theLastRequest hasPrefix:@"EC?"])	[self setRs232ErrWord:      [aString intValue]];
+	else if([theLastRequest hasPrefix:@"ED?"])	[self setDetErrWord:        [aString intValue]];
+	else if([theLastRequest hasPrefix:@"EF?"])	[self setFilErrWord:        [aString intValue]];
+	else if([theLastRequest hasPrefix:@"EM?"])	[self setCemErrWord:        [aString intValue]];
+	else if([theLastRequest hasPrefix:@"EP?"])	[self setPsErrWord:         [aString intValue]];
+	else if([theLastRequest hasPrefix:@"EQ?"])	[self setQmfErrWord:        [aString intValue]];
+	else if([theLastRequest hasPrefix:@"AP?"])  [self setAnalogScanPoints:	[aString intValue]];
+	else if([theLastRequest hasPrefix:@"HP?"])  [self setHistoScanPoints:	[aString intValue]];
+	else if([theLastRequest hasPrefix:@"DG?"])  [self setIonizerDegassTime:	[aString intValue]];
+	else if([theLastRequest hasPrefix:@"HP?"])  [self setHistoScanPoints:   [aString intValue]];
+	else if([theLastRequest hasPrefix:@"MF?"])  [self setFinalMass:         [aString intValue]];
+	else if([theLastRequest hasPrefix:@"MI?"])  [self setInitialMass:       [aString intValue]];
+	else if([theLastRequest hasPrefix:@"SA?"])  [self setStepsPerAmu:       [aString intValue]];
+	else if([theLastRequest hasPrefix:@"TP?"])  [self setMeasuredIonCurrent:[aString intValue]];
+	else if([theLastRequest hasPrefix:@"MO?"])  [self setElectronMultiOption:[aString intValue]];
 	
-	else if([theLastRequest hasPrefix:@"HV?"]) [self setElecMultHVBiasRB:			[aString intValue]];
-	else if([theLastRequest hasPrefix:@"NF?"]) [self setNoiseFloorSettingRB:		[aString intValue]];
-	else if([theLastRequest hasPrefix:@"MG?"]) [self setElecMultGainRB:			[aString floatValue]];
-	else if([theLastRequest hasPrefix:@"EE?"]) [self setIonizerElectronEnergyRB:	[aString intValue]];
-	else if([theLastRequest hasPrefix:@"FL?"]) [self setIonizerFilamentCurrentRB:	[aString floatValue]];
-	else if([theLastRequest hasPrefix:@"IE?"]) [self setIonizerIonEnergyRB:		[aString intValue]];
-	else if([theLastRequest hasPrefix:@"VF?"]) [self setIonizerFocusPlateVoltageRB:[aString intValue]];
+	else if([theLastRequest hasPrefix:@"HV?"])  [self setElecMultHVBiasRB:			[aString intValue]];
+	else if([theLastRequest hasPrefix:@"NF?"])  [self setNoiseFloorSettingRB:		[aString intValue]];
+	else if([theLastRequest hasPrefix:@"MG?"])  [self setElecMultGainRB:			[aString floatValue]];
+	else if([theLastRequest hasPrefix:@"EE?"])  [self setIonizerElectronEnergyRB:	[aString intValue]];
+	else if([theLastRequest hasPrefix:@"FL?"])  [self setIonizerFilamentCurrentRB:	[aString floatValue]];
+	else if([theLastRequest hasPrefix:@"IE?"])  [self setIonizerIonEnergyRB:		[aString intValue]];
+	else if([theLastRequest hasPrefix:@"VF?"])  [self setIonizerFocusPlateVoltageRB:[aString intValue]];
 	
 	else if([theLastRequest rangeOfString:@"?"].location == NSNotFound)	[self processStatusWord:aString];
 }
@@ -917,13 +918,13 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 
 - (void) setHistoScanPoints:(int)aHistoScanPoints
 {	
-    histoScanPoints = [self limitInt:aHistoScanPoints min:1 max:255];
+    histoScanPoints = aHistoScanPoints;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRGA300ModelHistoScanPointsChanged object:self];
 }
 
 - (void) setAnalogScanPoints:(int)aAnalogScanPoints
 {
-    analogScanPoints = [self limitInt:analogScanPoints min:1 max:255];
+    analogScanPoints = aAnalogScanPoints;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRGA300ModelAnalogScanPointsChanged object:self];
 }
 
@@ -1114,28 +1115,8 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 
 - (void) setScanData:(NSData*)someData
 {
-// swap 16 bit quantities in 32 bit value ( |2| |1| -> |1| |2| )
-#define Swap16Bits(x)    ((((x) & 0xffff0000) >> 16) | (((x) & 0x0000ffff) << 16))
-	
-// swap 8 bit quantities in 32 bit value ( |4| |3| |2| |1| -> |1| |2| |3| |4| )
-#define Swap8Bits(x)	((((Swap16Bits(x) & 0x0000ff00) >> 8) | ((Swap16Bits(x) & 0x000000ff) << 8)) \
-| (((Swap16Bits(x) & 0xff000000) >> 8) | ((Swap16Bits(x) & 0x00ff0000) << 8)))
-	
-	NSMutableData* processedData = [[NSMutableData alloc] initWithLength:[someData length]];
-	int numInts = [someData length]/4;
-	int* old = (int*)[someData bytes];
-	int* new = (int*)[processedData bytes];
-	
-	int i;
-	for(i=0;i<numInts;i++){
-		int oldValue = *old;
-		*new = Swap8Bits(oldValue);
-		new++;
-		old++;
-	}
-	
 	[scanData release];
-    scanData = processedData;
+    scanData = [someData copy];
 		
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRGA300ModelScanDataChanged object:self];
 }

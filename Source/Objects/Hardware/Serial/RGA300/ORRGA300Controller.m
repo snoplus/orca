@@ -424,12 +424,15 @@
 
 - (void) currentActivityChanged:(NSNotification*)aNote
 {
+    [self updateButtons];
 }
 
 - (void) opModeChanged:(NSNotification*)aNote
 {
 	[opModePU selectItemAtIndex: [model opMode]];
 	[self updateButtons];
+	[self setupPlotter];
+    [plotter setNeedsDisplay:YES];
 }
 
 - (void) elecMultGainRBChanged:(NSNotification*)aNote
@@ -767,6 +770,7 @@
     BOOL locked = [gSecurity isLocked:ORRGA300Lock];
 	//BOOL portOpen = [[model serialPort] isOpen];
 	BOOL opIsRunning = [model currentActivity] != kRGAIdle;
+	BOOL opModeIsTable = [model opMode] == 1;
     [lockButton setState: locked];
 	[serialPortController updateButtons:locked];
     BOOL useDetectorDefaults = [model useDetectorDefaults];
@@ -790,8 +794,8 @@
 	[finalMassField setEnabled:		[model opMode] != kRGATableMode];
 	[stepsPerAmuField setEnabled:	[model opMode] != kRGATableMode];
 	
-	[addAmuButton    setEnabled:!locked && !opIsRunning];
-	[removeAmuButton setEnabled:!locked && !opIsRunning];
+	[addAmuButton    setEnabled:!locked && !opIsRunning && opModeIsTable];
+	[removeAmuButton setEnabled:!locked && !opIsRunning && opModeIsTable];
 }
 
 #pragma mark •••Actions
