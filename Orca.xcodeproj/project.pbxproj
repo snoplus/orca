@@ -515,6 +515,12 @@
 		84178D500923C4B100C15D2B /* ORSocketClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 84178D4E0923C4B100C15D2B /* ORSocketClient.h */; };
 		84178D510923C4B100C15D2B /* ORSocketClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 84178D4F0923C4B100C15D2B /* ORSocketClient.m */; };
 		84178E0C0923F60F00C15D2B /* ORCommandClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 8434A3E4055C223A002D3102 /* ORCommandClient.m */; };
+		8418301D156153D2004EC81F /* ORTM700Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84183013156153D2004EC81F /* ORTM700Controller.h */; };
+		8418301E156153D2004EC81F /* ORTM700Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84183014156153D2004EC81F /* ORTM700Controller.m */; };
+		84183021156153D2004EC81F /* ORTM700Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84183017156153D2004EC81F /* ORTM700Model.h */; };
+		84183022156153D2004EC81F /* ORTM700Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84183018156153D2004EC81F /* ORTM700Model.m */; };
+		84183023156153D2004EC81F /* TM700.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84183019156153D2004EC81F /* TM700.nib */; };
+		84183024156153D2004EC81F /* TM700.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8418301A156153D2004EC81F /* TM700.tif */; };
 		8419221F0F0BBE8000EF1C1C /* ORScriptIDEModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8419221D0F0BBE8000EF1C1C /* ORScriptIDEModel.h */; };
 		841922200F0BBE8000EF1C1C /* ORScriptIDEModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8419221E0F0BBE8000EF1C1C /* ORScriptIDEModel.m */; };
 		8419227E0F0BC18800EF1C1C /* ORScriptIDEController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8419227C0F0BC18800EF1C1C /* ORScriptIDEController.m */; };
@@ -3524,6 +3530,12 @@
 		84167115104C04D400E47227 /* ORAutoTestUnit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORAutoTestUnit.m; sourceTree = "<group>"; };
 		84178D4E0923C4B100C15D2B /* ORSocketClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSocketClient.h; sourceTree = "<group>"; };
 		84178D4F0923C4B100C15D2B /* ORSocketClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORSocketClient.m; sourceTree = "<group>"; };
+		84183013156153D2004EC81F /* ORTM700Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORTM700Controller.h; path = Source/Objects/Hardware/Serial/TM700/ORTM700Controller.h; sourceTree = SOURCE_ROOT; };
+		84183014156153D2004EC81F /* ORTM700Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORTM700Controller.m; path = Source/Objects/Hardware/Serial/TM700/ORTM700Controller.m; sourceTree = SOURCE_ROOT; };
+		84183017156153D2004EC81F /* ORTM700Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORTM700Model.h; path = Source/Objects/Hardware/Serial/TM700/ORTM700Model.h; sourceTree = SOURCE_ROOT; };
+		84183018156153D2004EC81F /* ORTM700Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORTM700Model.m; path = Source/Objects/Hardware/Serial/TM700/ORTM700Model.m; sourceTree = SOURCE_ROOT; };
+		84183019156153D2004EC81F /* TM700.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = TM700.nib; path = Source/Objects/Hardware/Serial/TM700/TM700.nib; sourceTree = SOURCE_ROOT; };
+		8418301A156153D2004EC81F /* TM700.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = TM700.tif; path = Source/Objects/Hardware/Serial/TM700/TM700.tif; sourceTree = SOURCE_ROOT; };
 		8418DC4D0531EF7A005F64B1 /* ORPulserDistrib.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = ORPulserDistrib.gif; sourceTree = "<group>"; };
 		8418DC4E0531EF7A005F64B1 /* ORPulserDistribController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORPulserDistribController.h; sourceTree = "<group>"; };
 		8418DC4F0531EF7A005F64B1 /* ORPulserDistribController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORPulserDistribController.m; sourceTree = "<group>"; };
@@ -6998,6 +7010,20 @@
 			path = Source/Objects/ProcessLogic/ProcessElements/analog/AdcProcessor;
 			sourceTree = SOURCE_ROOT;
 		};
+		84183011156153D2004EC81F /* TM700 */ = {
+			isa = PBXGroup;
+			children = (
+				84183013156153D2004EC81F /* ORTM700Controller.h */,
+				84183014156153D2004EC81F /* ORTM700Controller.m */,
+				84183017156153D2004EC81F /* ORTM700Model.h */,
+				84183018156153D2004EC81F /* ORTM700Model.m */,
+				84183019156153D2004EC81F /* TM700.nib */,
+				8418301A156153D2004EC81F /* TM700.tif */,
+			);
+			name = TM700;
+			path = Source/Objects/Hardware/Serial/TM700;
+			sourceTree = SOURCE_ROOT;
+		};
 		8418DC4C0531EF7A005F64B1 /* PulserDistrib */ = {
 			isa = PBXGroup;
 			children = (
@@ -7813,6 +7839,7 @@
 			isa = PBXGroup;
 			children = (
 				84DEEBBA149916AD0092DB6C /* Serial Base Classes */,
+				84183011156153D2004EC81F /* TM700 */,
 				8499A74D1518D85700CD7AAC /* CP8Cryopump */,
 				84F3084715483A4000663573 /* Mks660B */,
 				84976E34150E77F50004B444 /* Mks651c */,
@@ -13246,6 +13273,8 @@
 				84F3085215483A4000663573 /* ORMks660BController.h in Headers */,
 				84F3085415483A4000663573 /* ORMks660BDecoders.h in Headers */,
 				84F3085615483A4000663573 /* ORMks660BModel.h in Headers */,
+				8418301D156153D2004EC81F /* ORTM700Controller.h in Headers */,
+				84183021156153D2004EC81F /* ORTM700Model.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14091,6 +14120,8 @@
 				84BBE09E153CB5110084E6B1 /* TPG256A.tif in Resources */,
 				84F3085015483A4000663573 /* Mks660B.nib in Resources */,
 				84F3085115483A4000663573 /* Mks660B.tif in Resources */,
+				84183023156153D2004EC81F /* TM700.nib in Resources */,
+				84183024156153D2004EC81F /* TM700.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -15039,6 +15070,8 @@
 				84F3085315483A4000663573 /* ORMks660BController.m in Sources */,
 				84F3085515483A4000663573 /* ORMks660BDecoders.m in Sources */,
 				84F3085715483A4000663573 /* ORMks660BModel.m in Sources */,
+				8418301E156153D2004EC81F /* ORTM700Controller.m in Sources */,
+				84183022156153D2004EC81F /* ORTM700Model.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
