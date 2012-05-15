@@ -504,10 +504,10 @@
 {
 	int mask = [model status];
 	[pumpOnBiStateView				 setState: mask & (0x1<<0)];
-	[roughOpenBiStateView			 setState: mask & (0x1<<1)];
-	[purgeOpenBiStateView			 setState: mask & (0x1<<2)];
-	[thermocoupleOnBiStateView		 setState: mask & (0x1<<3)];
-	[powerFailureOccurredBiStateView setState: !(mask & (0x1<<4))];
+	[roughOpenBiStateView			 setState: (mask & (0x1<<1))>0];
+	[purgeOpenBiStateView			 setState: (mask & (0x1<<2))>0];
+	[thermocoupleOnBiStateView		 setState: (mask & (0x1<<3))>0];
+	[powerFailureOccurredBiStateView setState: (mask & (0x1<<4))>0];
 }
 
 - (void) secondStageTempChanged:(NSNotification*)aNote

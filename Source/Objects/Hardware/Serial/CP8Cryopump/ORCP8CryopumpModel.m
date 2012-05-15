@@ -1315,7 +1315,6 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
 					case 'G': [self setRepurgeTime:			[self responseAsInt:theResponse]];  break;
 					case 'z': [self setStandbyMode:			[self responseAsBool:theResponse]]; break;
 				}
-					
 			}
 			break;
 				
@@ -1327,8 +1326,7 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
 			case 'Q': [self setRoughingInterlockStatus:	[theResponse characterAtIndex:2] - 0x30];	break;
 			case 'K': [self setSecondStageTemp:			[self responseAsFloat:theResponse]];		break;
 			//case 'I': [self setSecondStageTempControl:	[self responseAsInt:theResponse]];			break;
-			case 'S': [self setStatus:					 [theResponse characterAtIndex:2] - 0x30];	
-            break;
+			case 'S': [self setStatus:					 [theResponse characterAtIndex:2] - 0x30];	break;
 			case 'B': [self setThermocoupleStatus:		[self responseAsBool:theResponse]];			break;
 			case 'L': [self setThermocouplePressure:	[self responseAsFloat:theResponse]];		break;
 		}
