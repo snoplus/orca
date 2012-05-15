@@ -69,6 +69,7 @@
 		[aPlot release];
 	}
 	[plotter0 setShowLegend:YES];
+    [plotter0 setPlotTitle:@"Pressures"];
 	[super awakeFromNib];
 }
 
@@ -152,7 +153,6 @@
                      selector : @selector(involvedInProcessChanged:)
                          name : ORTPG256AModelInvolvedInProcessChanged
 						object: model];
-
 }
 
 - (void) setModel:(id)aModel
@@ -237,6 +237,7 @@
 			[(ORAxis*)[plotter0 yAxis] setAttributes:attrib];
 			[plotter0 setNeedsDisplay:YES];
 			[[plotter0 yAxis] setNeedsDisplay:YES];
+            [yAxisLogCB setState:[[plotter0 yAxis] isLog]];
 		}
 	}
 

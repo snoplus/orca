@@ -36,6 +36,7 @@
 	IBOutlet ORCompositeTimeLineView*   plotter0;
 	IBOutlet NSTableView*	pressureTableView;
 	IBOutlet NSTableView*	processLimitTableView;
+    IBOutlet NSButton*		yAxisLogCB;
 }
 
 #pragma mark ***Initialization

@@ -30,18 +30,18 @@
 
 #pragma mark •••External Strings
 NSString* ORTPG256AModelInvolvedInProcessChanged = @"ORTPG256AModelInvolvedInProcessChanged";
-NSString* ORTPG256AModelUnitsChanged = @"ORTPG256AModelUnitsChanged";
-NSString* ORTPG256AModelPressureScaleChanged = @"ORTPG256AModelPressureScaleChanged";
-NSString* ORTPG256AModelShipPressuresChanged = @"ORTPG256AModelShipPressuresChanged";
-NSString* ORTPG256AModelPollTimeChanged		 = @"ORTPG256AModelPollTimeChanged";
-NSString* ORTPG256AModelSerialPortChanged	 = @"ORTPG256AModelSerialPortChanged";
-NSString* ORTPG256AModelPortNameChanged		 = @"ORTPG256AModelPortNameChanged";
-NSString* ORTPG256AModelPortStateChanged	 = @"ORTPG256AModelPortStateChanged";
-NSString* ORTPG256APressureChanged			 = @"ORTPG256APressureChanged";
-NSString* ORTPG256AModelHighLimitChanged	 = @"ORTPG256AModelHighLimitChanged";
-NSString* ORTPG256AModelHighAlarmChanged	 = @"ORTPG256AModelHighAlarmChanged";
-NSString* ORTPG256AModelLowLimitChanged		 = @"ORTPG256AModelLowLimitChanged";
-NSString* ORTPG256AModelLowAlarmChanged		 = @"ORTPG256AModelLowAlarmChanged";
+NSString* ORTPG256AModelUnitsChanged             = @"ORTPG256AModelUnitsChanged";
+NSString* ORTPG256AModelPressureScaleChanged     = @"ORTPG256AModelPressureScaleChanged";
+NSString* ORTPG256AModelShipPressuresChanged     = @"ORTPG256AModelShipPressuresChanged";
+NSString* ORTPG256AModelPollTimeChanged          = @"ORTPG256AModelPollTimeChanged";
+NSString* ORTPG256AModelSerialPortChanged        = @"ORTPG256AModelSerialPortChanged";
+NSString* ORTPG256AModelPortNameChanged          = @"ORTPG256AModelPortNameChanged";
+NSString* ORTPG256AModelPortStateChanged         = @"ORTPG256AModelPortStateChanged";
+NSString* ORTPG256APressureChanged               = @"ORTPG256APressureChanged";
+NSString* ORTPG256AModelHighLimitChanged         = @"ORTPG256AModelHighLimitChanged";
+NSString* ORTPG256AModelHighAlarmChanged         = @"ORTPG256AModelHighAlarmChanged";
+NSString* ORTPG256AModelLowLimitChanged          = @"ORTPG256AModelLowLimitChanged";
+NSString* ORTPG256AModelLowAlarmChanged          = @"ORTPG256AModelLowAlarmChanged";
 
 NSString* ORTPG256ALock = @"ORTPG256ALock";
 
