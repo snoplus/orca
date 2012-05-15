@@ -313,10 +313,10 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 - (void) makeParts
 {
 	
-#define kNumVacPipes		55
+#define kNumVacPipes		57
 	VacuumPipeInfo vacPipeList[kNumVacPipes] = {
 		//region 0 pipes
-		{ kVacVPipe,  0, 50,			 200,				50,					450 }, 
+		{ kVacVPipe,  0, 50,			 260,				50,					450 }, 
 		{ kVacHPipe,  0, 50+kPipeRadius, 400,				180+kPipeRadius,	400 },
 		{ kVacVPipe,  0, 150,			 400-kPipeRadius,	150,				300 },
 		//region 1 pipes
@@ -327,6 +327,7 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 		{ kVacVPipe,  1, 280,			  200+kPipeRadius,	280,				400-kPipeRadius },
 		{ kVacVPipe,  1, 280,			  400+kPipeRadius,	280,				420 },
 		{ kVacVPipe,  1, 230,			  400+kPipeRadius,	230,				450 },
+		{ kVacHPipe,  1, 230,			  350,				280-kPipeRadius,	350 },
 		//region 2 pipes (cyrostat)
 		{ kVacBox,	  2, 475,			  500,				525,				550 },
 		{ kVacBox,	  2, 600,			  450,				680,				560 },
@@ -378,17 +379,21 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 		//region 7 pipes
 		{ kVacVPipe,  7, 50,			 100,				50,					200 }, 
 		{ kVacHPipe,  7, 50+kPipeRadius,  150,				530,				150 },
+		//region 8 pipes
+		{ kVacVPipe,  8, 50,			 200,				50,					260 }, 
+
 	};
 		
-#define kNumStaticVacLabelItems	17
+#define kNumStaticVacLabelItems	18
 	VacuumStaticLabelInfo staticLabelItems[kNumStaticVacLabelItems] = {
-		{kVacStaticLabel, 0, @"Turbo",			20,	 240,	80,	 270, YES},
+		{kVacStaticLabel, 0, @"Turbo",			20,	 245,	80,	 265, YES},
 		{kVacStaticLabel, 1, @"RGA",			260, 420,	300, 440, YES},
 		{kVacStaticLabel, 3, @"Cryo Pump",		560, 200,	640, 230, YES},
 		{kVacStaticLabel, 5, @"Dry N2\nSupply",	200,  60,	300, 100, YES},
 		{kVacStaticLabel, 6, @"NEG Pump",		420, 285,	480, 315, YES},
 		{kVacStaticLabel, 7, @"Diaphragm\nPump",20,	 80,	80,	 110, YES},
-		
+		{kVacStaticLabel, 8, @"Below Turbo",	 0,	  0,	 0,	   0, NO},
+
 		{kVacStaticLabel, 99, @"V1",			175, 375,	185, 385, NO},
 		{kVacStaticLabel, 99, @"V2",			335, 375,	365, 385, NO},
 		{kVacStaticLabel, 99, @"V3",			515, 345,	525, 355, NO},
@@ -431,7 +436,7 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 		{kVacLine, 60,200,70,200},  //B5
 	};
 
-#define kNumVacGVs			16
+#define kNumVacGVs			18
 	VacuumGVInfo gvList[kNumVacGVs] = {
 		{kVacVGateV, 0,		@"V1",			k2BitReadBack,	180, 400,	0,1,	kControlAbove},	//V1. Control + read back
 		{kVacVGateV, 1,		@"V2",			k2BitReadBack,	350, 400,	1,2,	kControlAbove},	//V2. Control + read back
@@ -450,7 +455,9 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 		{kVacVGateV, 12,	@"PRV",			kManualOnlyShowClosed,		640, 150,	3,kUpToAir,	kControlNone},	//PRV
 		{kVacVGateV, 13,	@"PRV",			kManualOnlyShowClosed,		350, 350,	2,kUpToAir,	kControlNone},	//PRV
 		{kVacVGateV, 14,	@"C1",			kManualOnlyShowChanging,	400, 600,	4,4,		kControlNone},	//Manual only
-		{kVacHGateV, 15,	@"B5",			k1BitReadBack,				50, 200,	0,7,		kControlRight},	//future control
+		{kVacHGateV, 15,	@"B5",			k1BitReadBack,				50, 200,	7,8,		kControlRight},	//future control
+		{kVacHGateV, 16,	@"Turbo",		k1BitReadBack,				50, 260,	0,8,		kControlNone},	//this is a virtual valve-- really the turbo on/off
+		{kVacVGateV, 17,	@"PRV",			kManualOnlyShowClosed,		230, 350,	1,kUpToAir,	kControlNone},	//PRV
 	};
 	
 	[self makeLines:vacLines					num:kNumVacLines];
@@ -540,11 +547,11 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 
 - (void) colorRegions
 {
-	#define kNumberPriorityRegions 8
-	int regionPriority[kNumberPriorityRegions] = {4,6,1,0,3,7,2,5}; //lowest to highest
+	#define kNumberPriorityRegions 9
+	int regionPriority[kNumberPriorityRegions] = {4,6,1,0,3,8,7,2,5}; //lowest to highest
 					
 	NSColor* regionColor[kNumberPriorityRegions] = {
-		[NSColor colorWithCalibratedRed:1.0 green:1.0 blue:0.7 alpha:1.0], //Region 0 Turbo
+		[NSColor colorWithCalibratedRed:1.0 green:1.0 blue:0.7 alpha:1.0], //Region 0 Above Turbo
 		[NSColor colorWithCalibratedRed:1.0 green:0.7 blue:1.0 alpha:1.0], //Region 1 RGA
 		[NSColor colorWithCalibratedRed:0.8 green:0.8 blue:1.0 alpha:1.0], //Region 2 Cryostat
 		[NSColor colorWithCalibratedRed:0.7 green:1.0 blue:0.7 alpha:1.0], //Region 3 Cryo pump
@@ -552,6 +559,7 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 		[NSColor colorWithCalibratedRed:1.0 green:0.5 blue:0.5 alpha:1.0], //Region 5 N2
 		[NSColor colorWithCalibratedRed:0.8 green:0.8 blue:0.4 alpha:1.0], //Region 6 NEG Pump
 		[NSColor colorWithCalibratedRed:0.4 green:0.6 blue:0.7 alpha:1.0], //Region 7 Diaphragm pump
+		[NSColor colorWithCalibratedRed:0.5 green:0.9 blue:0.3 alpha:1.0], //Region 8 Below Turbo
 	};
 	int i;
 	for(i=0;i<kNumberPriorityRegions;i++){

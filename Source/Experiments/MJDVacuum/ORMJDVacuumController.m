@@ -32,6 +32,12 @@
     return self;
 }
 
+- (void) dealloc
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	[super dealloc];
+}
+
 - (void) awakeFromNib
 {
     [super awakeFromNib];
@@ -99,6 +105,15 @@
 
 - (void) stateChanged:(NSNotification*)aNote
 {
+	if(!updateScheduled){
+		updateScheduled = YES;
+		[self performSelector:@selector(delayedRefresh) withObject:nil afterDelay:.5];
+	}
+}
+
+- (void) delayedRefresh
+{
+	updateScheduled = NO;
 	[groupView setNeedsDisplay:YES];
 	[adcTableView reloadData];
 	[gvTableView reloadData];

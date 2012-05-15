@@ -135,12 +135,16 @@
                      selector : @selector(runUpTimeChanged:)
                          name : ORTM700ModelRunUpTimeChanged
 						object: model];
-    
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(involvedInProcessChanged:)
+                         name : ORTM700ModelInvolvedInProcessChanged
+						object: model];
+	    
     [notifyCenter addObserver : self
                      selector : @selector(errorCodeChanged:)
                          name : ORTM700ModelErrorCodeChanged
 						object: model];
-
     
 }
 
@@ -148,6 +152,11 @@
 {
 	[super setModel:aModel];
 	[[self window] setTitle:[NSString stringWithFormat:@"TM700 (%d)",[model uniqueIdNumber]]];
+}
+
+- (void) involvedInProcessChanged:(NSNotification*)aNote
+{
+	[self lockChanged:nil];
 }
 
 - (void) updateWindow
@@ -269,6 +278,8 @@
     BOOL locked = [gSecurity isLocked:ORTM700Lock];
 	BOOL portOpen = [[model serialPort] isOpen];
 	BOOL stationOn = [model stationPower] && [model motorPower];
+	BOOL inProcess = [model involvedInProcess];
+
     NSString* errorCode = [(ORTM700Model*)model errorCode];
     BOOL errExists = [errorCode isEqualToString:@"000000"]?NO:YES;
     
@@ -281,7 +292,7 @@
 	[tmpRotSetField setEnabled:!locked && portOpen];
     [updateButton setEnabled:portOpen];
     [ackErrorButton setEnabled:errExists && portOpen];
-    [pollTimePopup setEnabled:!locked && portOpen];
+    [pollTimePopup	setEnabled:!locked && !inProcess];
 	[initButton  setEnabled:!locked && portOpen];
 }
 

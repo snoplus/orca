@@ -37,6 +37,8 @@
 	IBOutlet NSTableView*   gvTableView;
 	IBOutlet NSTextField*   gvHwObjectName;
     IBOutlet NSButton*      lockButton;
+	
+	BOOL					updateScheduled;
 }
 
 - (id) init;
@@ -54,6 +56,7 @@
 #pragma mark ***Interface Management
 - (void) vetoMaskChanged:(NSNotification*)aNote;
 - (void) stateChanged:(NSNotification*)aNote;
+- (void) delayedRefresh;
 
 #pragma mark •••Actions
 - (IBAction) showGridAction:(id)sender;

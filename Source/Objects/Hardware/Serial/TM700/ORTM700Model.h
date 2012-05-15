@@ -17,10 +17,11 @@
 //-------------------------------------------------------------
 #pragma mark •••Imported Files
 #import "ORSerialPortModel.h"
+#import "ORBitProcessing.h"
 
 @class ORSafeQueue;
 
-@interface ORTM700Model : ORSerialPortModel
+@interface ORTM700Model : ORSerialPortModel <ORBitProcessing>
 {
     @private
 		NSString*		lastRequest;
@@ -40,13 +41,19 @@
 		BOOL			stationPower;
 		BOOL			runUpTimeCtrl;
 		int				runUpTime;
-        NSString*       errorCode;
+		BOOL			readOnce;
+		BOOL			involvedInProcess;
+		NSString*		errorCode;
 }
 
 #pragma mark •••Initialization
 - (void) dealloc;
 
 #pragma mark •••Accessors
+- (NSString*) errorCode;
+- (void) setErrorCode:(NSString *)aCode;
+- (BOOL) involvedInProcess;
+- (void) setInvolvedInProcess:(BOOL)aInvolvedInProcess;
 - (int) runUpTime;
 - (void) setRunUpTime:(int)aRunUpTime;
 - (BOOL) runUpTimeCtrl;
@@ -78,8 +85,6 @@
 - (NSString*) lastRequest;
 - (void) setLastRequest:(NSString*)aCmdString;
 - (void) openPort:(BOOL)state;
-- (NSString*) errorCode;
-- (void) setErrorCode:(NSString*)aCode;
 
 #pragma mark •••Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
@@ -98,7 +103,6 @@
 
 #pragma mark •••HW Methods
 - (void) initUnit;
-- (void) getErrorCode;
 - (void) getDeviceAddress;
 - (void) getTurboTemp;
 - (void) getDriveTemp;
@@ -117,13 +121,23 @@
 - (void) sendRunUpTimeCtrl:(BOOL)aState;
 - (void) sendTmpRotSet:(int)aValue;
 - (void) sendRunUpTime:(int)aValue;
+- (void) sendErrorAck;
 - (void) turnStationOn;
 - (void) turnStationOff;
-- (void) sendErrorAck;
+
+#pragma mark •••Adc Processing Protocol
+- (void) processIsStarting;
+- (void) processIsStopping; 
+- (void) startProcessCycle;
+- (void) endProcessCycle;
+- (BOOL) processValue:(int)channel;
+- (void) setProcessOutput:(int)channel value:(int)value;
+- (NSString*) processingTitle;
 
 @end
 
 extern NSString* ORTM700ModelErrorCodeChanged;
+extern NSString* ORTM700ModelInvolvedInProcessChanged;
 extern NSString* ORTM700ModelRunUpTimeChanged;
 extern NSString* ORTM700ModelRunUpTimeCtrlChanged;
 extern NSString* ORTM700ModelTmpRotSetChanged;

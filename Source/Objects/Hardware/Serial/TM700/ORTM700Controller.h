@@ -35,13 +35,13 @@
 	IBOutlet NSTextField*	turboPumpOverTempField;
 	IBOutlet NSTextField*	driveUnitOverTempField;
 	IBOutlet NSTextField*	deviceAddressField;
-	IBOutlet NSTextField*	errorCodeField;
     IBOutlet NSButton*		lockButton;
     IBOutlet NSButton*		stationOnButton;
     IBOutlet NSButton*		stationOffButton;
     IBOutlet NSButton*		updateButton;
     IBOutlet NSButton*		initButton;
-    IBOutlet NSButton*		ackErrorButton;
+	IBOutlet NSButton*		ackErrorButton;
+	IBOutlet NSTextField*   errorCodeField;
     IBOutlet StopLightView* lightBoardView;
     IBOutlet NSPopUpButton* pollTimePopup;
     IBOutlet ORSerialPortController* serialPortController;
@@ -58,7 +58,7 @@
 - (void) updateButtons;
 
 #pragma mark •••Interface Management
-- (void) errorCodeChanged:(NSNotification*)aNote;
+- (void) involvedInProcessChanged:(NSNotification*)aNote;
 - (void) runUpTimeChanged:(NSNotification*)aNote;
 - (void) runUpTimeCtrlChanged:(NSNotification*)aNote;
 - (void) tmpRotSetChanged:(NSNotification*)aNote;
@@ -80,6 +80,7 @@
 - (void) unitOverTempChanged:(NSNotification*)aNote;
 - (void) updateStopLight;
 - (void) pollTimeChanged:(NSNotification*)aNote;
+- (void) errorCodeChanged:(NSNotification*)aNote;
 - (BOOL) portLocked;
 
 #pragma mark •••Actions
