@@ -25,6 +25,7 @@
     IBOutlet NSButton* startDebugging;
     IBOutlet NSButton* stopDebugging;
     IBOutlet NSButton* clearDebugging;
+    IBOutlet NSTextField* debugMessageField;
 }
 
 - (id) init;

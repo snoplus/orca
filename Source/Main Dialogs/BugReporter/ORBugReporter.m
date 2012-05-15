@@ -193,12 +193,17 @@
             addList = [addList stringByAppendingFormat:@"%@,",add];
         }
         addList = [addList substringToIndex:[addList length]-1];
-
+		
+		if([[debugMessageField stringValue] length]){
+			body      = [body stringByAppendingString:@"----------------------------------------------------------------------------------------------------\n\n"];
+			body	  = [body stringByAppendingString:[debugMessageField stringValue]];
+			body      = [body stringByAppendingString:@"\n\n----------------------------------------------------------------------------------------------------\n"];
+			[debugMessageField setStringValue:@""];
+		}
+		
         body           = [body stringByAppendingString:@"You have received this message because you are in one of ORCA's Alarm or Process email lists\n"];
-        
         body           = [body stringByAppendingString:@"If you believe you have received this message in error, contact some of the other people in the list to be removed.\n"];
-        
-       body           = [body stringByAppendingString:@"----------------------------------------------------------------------------------------------------\n"];    
+        body           = [body stringByAppendingString:@"----------------------------------------------------------------------------------------------------\n"];    
         
         NSMutableAttributedString* theContent = [[NSMutableAttributedString alloc] initWithString:body];
         ORMailer* mailer = [ORMailer mailer];
@@ -229,8 +234,15 @@
             addList = [addList stringByAppendingFormat:@"%@,",add];
         }
         addList = [addList substringToIndex:[addList length]-1];
+		
+		if([[debugMessageField stringValue] length]){
+			body      = [body stringByAppendingString:@"----------------------------------------------------------------------------------------------------\n\n"];
+			body	  = [body stringByAppendingString:[debugMessageField stringValue]];
+			body      = [body stringByAppendingString:@"\n\n----------------------------------------------------------------------------------------------------\n"];
+			[debugMessageField setStringValue:@""];
+		}
+		
         body           = [body stringByAppendingString:@"You have received this message because you are in one of ORCA's Alarm or Process email lists\n"];
-        
         body           = [body stringByAppendingString:@"If you believe you have received this message in error, contact some of the other people in the list to be removed.\n"];
         body           = [body stringByAppendingString:@"----------------------------------------------------------------------------------------------------\n"];  
         NSMutableAttributedString* theContent = [[NSMutableAttributedString alloc] initWithString:body];
