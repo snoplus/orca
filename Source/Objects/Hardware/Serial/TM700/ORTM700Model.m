@@ -25,7 +25,7 @@
 
 #pragma mark •••External Strings
 NSString* ORTM700ModelRunUpTimeChanged		= @"ORTM700ModelRunUpTimeChanged";
-NSString* ORTM700ModelRunUpTimeCtrlChanged		= @"ORTM700ModelRunUpTimeCtrlChanged";
+NSString* ORTM700ModelRunUpTimeCtrlChanged	= @"ORTM700ModelRunUpTimeCtrlChanged";
 NSString* ORTM700ModelTmpRotSetChanged		= @"ORTM700ModelTmpRotSetChanged";
 NSString* ORTM700ModelStationPowerChanged	= @"ORTM700ModelStationPowerChanged";
 NSString* ORTM700ModelMotorPowerChanged		= @"ORTM700ModelMotorPowerChanged";
@@ -42,6 +42,8 @@ NSString* ORTM700TurboAcceleratingChanged	= @"ORTM700TurboAcceleratingChanged";
 NSString* ORTM700TurboSpeedAttainedChanged	= @"ORTM700TurboSpeedAttainedChanged";
 NSString* ORTM700TurboOverTempChanged		= @"ORTM700TurboOverTempChanged";
 NSString* ORTM700DriveOverTempChanged		= @"ORTM700DriveOverTempChanged";
+NSString* ORTM700ModelErrorCodeChanged		= @"ORTM700ModelErrorCodeChanged";
+
 NSString* ORTM700Lock						= @"ORTM700Lock";
 
 #pragma mark •••Status Parameters
@@ -49,8 +51,10 @@ NSString* ORTM700Lock						= @"ORTM700Lock";
 #define kStandby		2
 #define kRunUpTimeCtrl	4
 #define kMotorPower		23
+#define kErrorAck       9
 #define kStationPower	10
 
+#define kErrorCode      303
 #define kTempDriveUnit	304
 #define kTempTurbo		305
 #define kSpeedAttained	306
@@ -120,6 +124,19 @@ NSString* ORTM700Lock						= @"ORTM700Lock";
 }
 
 #pragma mark •••Accessors
+- (NSString*) errorCode
+{
+    if(!errorCode)return @"";
+    else return errorCode;
+}
+
+- (void) setErrorCode:(NSString *)aCode
+{
+    if(!aCode)aCode= @"";
+    [errorCode autorelease];
+    errorCode = [aCode copy];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORTM700ModelErrorCodeChanged object:self];
+}
 
 - (int) runUpTime
 {
@@ -332,7 +349,7 @@ NSString* ORTM700Lock						= @"ORTM700Lock";
 {
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
-	[self setRunUpTime:[decoder decodeIntForKey:@"runUpTime"]];
+	[self setRunUpTime:     [decoder decodeIntForKey:   @"runUpTime"]];
 	[self setTmpRotSet:		[decoder decodeIntForKey:	@"tmpRotSet"]];
 	[self setPollTime:		[decoder decodeIntForKey:	@"pollTime"]];
 	[self setDeviceAddress:	[decoder decodeIntForKey:	@"deviceAddress"]];
@@ -345,8 +362,8 @@ NSString* ORTM700Lock						= @"ORTM700Lock";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt:runUpTime forKey:@"runUpTime"];
-    [encoder encodeInt:tmpRotSet		forKey:@"tmpRotSet"];
+    [encoder encodeInt:runUpTime        forKey: @"runUpTime"];
+    [encoder encodeInt:tmpRotSet		forKey: @"tmpRotSet"];
     [encoder encodeInt:deviceAddress	forKey: @"deviceAddress"];
     [encoder encodeInt:pollTime			forKey: @"pollTime"];
 }
@@ -378,6 +395,7 @@ NSString* ORTM700Lock						= @"ORTM700Lock";
 - (void) getStandby			{ [self sendDataRequest:kStandby]; }
 - (void) getRunUpTimeCtrl	{ [self sendDataRequest:kRunUpTimeCtrl]; }
 - (void) getRunUpTime		{ [self sendDataRequest:kRunUpTime]; }
+- (void) getErrorCode		{ [self sendDataRequest:kErrorCode]; }
 
 - (void) updateAll
 {
@@ -391,6 +409,13 @@ NSString* ORTM700Lock						= @"ORTM700Lock";
 	[self getStationPower];
 	[self getMotorPower];
 	[self getRunUpTimeCtrl];
+	[self getErrorCode];
+}
+
+- (void) sendErrorAck
+{
+	[self sendDataSet:kErrorAck bool:1];
+    [self getErrorCode];
 }
 
 - (void) sendTmpRotSet:(int)aValue
@@ -530,7 +555,7 @@ NSString* ORTM700Lock						= @"ORTM700Lock";
 				numCharsProcessed += [cmd length];
 				[cmd setLength:0];
 				if([s rangeOfString:@"=?"].location == NSNotFound){
-					NSLog(@"received: %@\n",s);
+					//NSLog(@"received: %@\n",s);
 					[self processReceivedString:s];
 				}
 			}
@@ -553,6 +578,7 @@ NSString* ORTM700Lock						= @"ORTM700Lock";
 		case kSpeedAttained: [self setSpeedAttained:	[self extractBool:aCommand]]; break;
 		case kAccelerating:  [self setTurboAccelerating:[self extractBool:aCommand]]; break;
 		case kRunUpTimeCtrl: [self setRunUpTimeCtrl:	[self extractBool:aCommand]]; break;
+		case kErrorCode:     [self setErrorCode:        [self extractString:aCommand]]; break;
 
 		case kSetSpeed:		[self setSetRotorSpeed:		[self extractInt:aCommand]];   break;
 		case kActualSpeed:  [self setActualRotorSpeed:	[self extractInt:aCommand]];   break;
@@ -587,7 +613,7 @@ NSString* ORTM700Lock						= @"ORTM700Lock";
 	if([cmdQueue count] == 0) return;
 	NSString* cmdString = [cmdQueue dequeue];
 	[self setLastRequest:cmdString];
-	NSLog(@"send: %@\n",cmdString);
+	//NSLog(@"send: %@\n",cmdString);
 	[serialPort writeDataInBackground:[cmdString dataUsingEncoding:NSASCIIStringEncoding]];
 	[self performSelector:@selector(timeout) withObject:nil afterDelay:.3];
 }

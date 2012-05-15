@@ -135,7 +135,13 @@
                      selector : @selector(runUpTimeChanged:)
                          name : ORTM700ModelRunUpTimeChanged
 						object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(errorCodeChanged:)
+                         name : ORTM700ModelErrorCodeChanged
+						object: model];
 
+    
 }
 
 - (void) setModel:(id)aModel
@@ -148,6 +154,7 @@
 {
     [super updateWindow];
     [self lockChanged:nil];
+	[self errorCodeChanged:nil];
 	[self deviceAddressChanged:nil];
 	[self setRotorSpeedChanged:nil];
 	[self actualRotorSpeedChanged:nil];
@@ -162,6 +169,15 @@
 	[self tmpRotSetChanged:nil];
 	[self runUpTimeCtrlChanged:nil];
 	[self runUpTimeChanged:nil];
+    [self updateButtons];
+}
+
+- (void) errorCodeChanged:(NSNotification*)aNote
+{
+    NSString* errorCode = [(ORTM700Model*)model errorCode];
+    if([errorCode isEqualToString:@"000000"])errorCode = @"";
+	[errorCodeField setStringValue: errorCode];
+    [self updateButtons];
 }
 
 - (void) runUpTimeChanged:(NSNotification*)aNote
@@ -253,6 +269,9 @@
     BOOL locked = [gSecurity isLocked:ORTM700Lock];
 	BOOL portOpen = [[model serialPort] isOpen];
 	BOOL stationOn = [model stationPower] && [model motorPower];
+    NSString* errorCode = [(ORTM700Model*)model errorCode];
+    BOOL errExists = [errorCode isEqualToString:@"000000"]?NO:YES;
+    
     [lockButton setState: locked];
 	
 	[serialPortController updateButtons:locked];
@@ -261,9 +280,9 @@
     [stationOffButton setEnabled:!locked && portOpen && stationOn];
 	[tmpRotSetField setEnabled:!locked && portOpen];
     [updateButton setEnabled:portOpen];
-
+    [ackErrorButton setEnabled:errExists && portOpen];
     [pollTimePopup setEnabled:!locked && portOpen];
-	//[initButton  setEnabled:!locked && portOpen && stationOn];
+	[initButton  setEnabled:!locked && portOpen];
 }
 
 - (void) pollTimeChanged:(NSNotification*)aNotification
@@ -272,6 +291,11 @@
 }
 
 #pragma mark •••Actions
+- (IBAction) acknowledgeErrorAction:(id)sender
+{
+    [model sendErrorAck];
+}
+
 - (IBAction) runUpTimeAction:(id)sender
 {
 	[model setRunUpTime:[sender intValue]];	

@@ -40,6 +40,7 @@
 		BOOL			stationPower;
 		BOOL			runUpTimeCtrl;
 		int				runUpTime;
+        NSString*       errorCode;
 }
 
 #pragma mark •••Initialization
@@ -77,6 +78,8 @@
 - (NSString*) lastRequest;
 - (void) setLastRequest:(NSString*)aCmdString;
 - (void) openPort:(BOOL)state;
+- (NSString*) errorCode;
+- (void) setErrorCode:(NSString*)aCode;
 
 #pragma mark •••Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
@@ -95,6 +98,7 @@
 
 #pragma mark •••HW Methods
 - (void) initUnit;
+- (void) getErrorCode;
 - (void) getDeviceAddress;
 - (void) getTurboTemp;
 - (void) getDriveTemp;
@@ -115,9 +119,11 @@
 - (void) sendRunUpTime:(int)aValue;
 - (void) turnStationOn;
 - (void) turnStationOff;
+- (void) sendErrorAck;
 
 @end
 
+extern NSString* ORTM700ModelErrorCodeChanged;
 extern NSString* ORTM700ModelRunUpTimeChanged;
 extern NSString* ORTM700ModelRunUpTimeCtrlChanged;
 extern NSString* ORTM700ModelTmpRotSetChanged;
