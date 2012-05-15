@@ -552,7 +552,6 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
 
 - (void) setPumpStatus:(int)aPumpStatus
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setPumpStatus:pumpStatus];
     pumpStatus = aPumpStatus;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpModelPumpStatusChanged object:self];
 }
