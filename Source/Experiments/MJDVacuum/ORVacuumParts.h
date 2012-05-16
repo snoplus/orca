@@ -152,18 +152,21 @@ typedef struct  {
 //----------------------------------------------------------------------------------------------------
 @interface ORVacuumStaticLabel : ORVacuumPart
 {
-	NSString* label;
-	NSRect	  bounds;
+	NSString*	label;
+	NSRect		bounds;
 	NSGradient* gradient;
-	NSColor* controlColor;
-	BOOL  drawBox;
+	NSColor*	controlColor;
+	BOOL		drawBox;
+	NSString*	dialogIdentifier;
 }
 - (id) initWithDelegate:(id)aDelegate partTag:(int)aTag label:(NSString*)label bounds:(NSRect)aRect;
+- (void) openDialog;
 @property (nonatomic,assign) BOOL drawBox;
 @property (nonatomic,assign) NSRect bounds;
 @property (nonatomic,retain) NSGradient* gradient;
 @property (nonatomic,retain) NSColor* controlColor;
 @property (nonatomic,copy) NSString* label;
+@property (nonatomic,copy) NSString* dialogIdentifier;
 @end
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------

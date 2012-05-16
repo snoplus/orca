@@ -35,6 +35,7 @@
 	IBOutlet NSTextField*   gvOpenToText2;
 	IBOutlet NSTableView*   adcTableView;
 	IBOutlet NSTableView*   gvTableView;
+	IBOutlet NSTableView*   miscTableView;
 	IBOutlet NSTextField*   gvHwObjectName;
     IBOutlet NSButton*      lockButton;
 	
@@ -69,6 +70,7 @@
 - (int)numberOfRowsInTableView:(NSTableView *)aTableView;
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn 
 			 row:(int) rowIndex;
+- (void)tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex;
 
 @end
 

@@ -61,6 +61,10 @@
 			[button release];
 		}
 	}
+	NSArray* labels = [[delegate model] staticLabels];
+	for(ORVacuumStaticLabel* aLable in labels){
+		
+	}
 }
 
 - (void) dealloc
@@ -84,13 +88,28 @@
 	}
 }
 
-
-
 - (void) drawRect:(NSRect)dirtyRect 
 {
 	if([delegate showGrid]) [self drawGrid];
 	NSArray* parts = [[delegate model] parts];
 	for(ORVacuumPart* aPart in parts)[aPart draw];
+}
+
+- (void) resetCursorRects
+{
+	NSArray* dynamicLabels = [[delegate model] dynamicLabels];
+	for(ORVacuumDynamicLabel* aDynamicLabel in dynamicLabels){	
+		if([aDynamicLabel.dialogIdentifier length]){
+			[self addCursorRect:aDynamicLabel.bounds cursor:[NSCursor pointingHandCursor]];
+		}
+	}
+	NSArray* staticLabels = [[delegate model] staticLabels];
+	for(ORVacuumStaticLabel* aStaticLabel in staticLabels){	
+		if([aStaticLabel.dialogIdentifier length]){
+			[self addCursorRect:aStaticLabel.bounds cursor:[NSCursor pointingHandCursor]];
+		}
+	}
+	
 }
 
 - (void) updateButtons
@@ -122,6 +141,31 @@
 		else [[NSColor lightGrayColor] set];
 		[NSBezierPath strokeLineFromPoint:NSMakePoint(0,i) toPoint:NSMakePoint(width,i)];
 		count++;
+	}
+}
+
+- (void) mouseDown:(NSEvent*) anEvent
+{
+	if ([anEvent clickCount] > 1) {
+		BOOL handledEvent = NO;
+		NSPoint localPoint = [self convertPoint:[anEvent locationInWindow] fromView:nil];
+		NSArray* dynamicLabels = [[delegate model] dynamicLabels];
+		for(ORVacuumDynamicLabel* aDynamicLabel in dynamicLabels){	
+			if(NSPointInRect(localPoint, [aDynamicLabel bounds])){
+				handledEvent = YES;
+				[aDynamicLabel openDialog];
+				break;
+			}
+		} 
+		if(!handledEvent){
+			NSArray* staticLabels = [[delegate model] staticLabels];
+			for(ORVacuumStaticLabel* aStaticLabel in staticLabels){	
+				if(NSPointInRect(localPoint, [aStaticLabel bounds])){
+					[aStaticLabel openDialog];
+					break;
+				}
+			} 
+		}
 	}
 }
 

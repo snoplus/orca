@@ -92,7 +92,7 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 
 - (void) draw 
 { 
-	if([dataSource showGrid]){
+/*	if([dataSource showGrid]){
 		NSAttributedString* s = [[[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%d",partTag]
 																 attributes:[NSDictionary dictionaryWithObjectsAndKeys:
 																			 [NSColor blackColor],NSForegroundColorAttributeName,
@@ -104,6 +104,7 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 		
 		[s drawAtPoint:NSMakePoint(startPt.x + x_pos, startPt.y + y_pos)];
 	}
+ */
 }
 
 @end
@@ -432,7 +433,7 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
 @implementation ORVacuumStaticLabel
-@synthesize label,bounds,gradient,controlColor,drawBox;
+@synthesize label,bounds,gradient,controlColor,drawBox,dialogIdentifier;
 - (id) initWithDelegate:(id)aDelegate partTag:(int)aTag label:(NSString*)aLabel bounds:(NSRect)aRect
 {
 	self = [super initWithDelegate:aDelegate partTag:aTag];
@@ -448,6 +449,7 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 	self.label			= nil;
 	self.gradient		= nil;
 	self.controlColor	= nil;
+	self.dialogIdentifier = nil;
 	[super dealloc];
 }
 
@@ -475,22 +477,41 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 		[[NSColor blackColor] set];
 		[NSBezierPath strokeRect:bounds];
 		[gradient drawInRect:bounds angle:90.];
-	}
-	
-	if([label length]){
+
 		
+		if([label length]){
+			
+			[[NSColor blackColor] set];
+			NSAttributedString* s = [[[NSAttributedString alloc] initWithString:label
+																	 attributes:[NSDictionary dictionaryWithObjectsAndKeys:
+																				 [NSColor blackColor],NSForegroundColorAttributeName,
+																				 [NSFont fontWithName:@"Geneva" size:10],NSFontAttributeName,
+																				 nil]] autorelease]; 
+			NSSize size = [s size];   
+			float x_pos = (bounds.size.width - size.width) / 2; 
+			float y_pos = (bounds.size.height - size.height) /2; 
+			[s drawAtPoint:NSMakePoint(bounds.origin.x + x_pos, bounds.origin.y + y_pos)];
+		}
 		[[NSColor blackColor] set];
-		NSAttributedString* s = [[[NSAttributedString alloc] initWithString:label
-																 attributes:[NSDictionary dictionaryWithObjectsAndKeys:
-																			 [NSColor blackColor],NSForegroundColorAttributeName,
-																			 [NSFont fontWithName:@"Geneva" size:10],NSFontAttributeName,
-																			 nil]] autorelease]; 
-		NSSize size = [s size];   
-		float x_pos = (bounds.size.width - size.width) / 2; 
-		float y_pos = (bounds.size.height - size.height) /2; 
-		[s drawAtPoint:NSMakePoint(bounds.origin.x + x_pos, bounds.origin.y + y_pos)];
 	}
-	[[NSColor blackColor] set];
+}
+
+- (void) openDialog
+{
+	if([dialogIdentifier length]){
+		NSArray* parts = [dialogIdentifier componentsSeparatedByString:@","];
+		if([parts count]==2){
+			Class theClass = NSClassFromString([parts objectAtIndex:0]);
+			NSArray* objects = [[[NSApp delegate]  document] collectObjectsOfClass:theClass];
+			for(OrcaObject* anObj in objects){
+				if([[anObj fullID] isEqualToString:dialogIdentifier]){
+					[anObj showMainInterface];
+					[NSCursor pop];
+					break;
+				}
+			}
+		}
+	}
 }
 @end
 

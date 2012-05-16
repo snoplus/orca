@@ -117,6 +117,7 @@
 	[groupView setNeedsDisplay:YES];
 	[adcTableView reloadData];
 	[gvTableView reloadData];
+	[miscTableView reloadData];
 }
 
 - (void) showGridChanged:(NSNotification*)aNote
@@ -269,6 +270,9 @@
 	else if(aTableView == gvTableView){
 		return [[model gateValves] count];
 	}
+	else if(aTableView == miscTableView){
+		return [[model dynamicLabels] count];
+	}
 	else return 0;
 }
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
@@ -283,8 +287,31 @@
 			else if([[aTableColumn identifier] isEqualToString:@"label"]){
 				return [theDynamicLabel label];
 			}
+			else if([[aTableColumn identifier] isEqualToString:@"dialogIdentifier"]){
+				return [theDynamicLabel dialogIdentifier];
+			}
 			else  if([[aTableColumn identifier] isEqualToString:@"value"]){
 				return [NSString stringWithFormat:@"%.2E",[theDynamicLabel value]];
+			}
+			else return @"--";
+		}
+		else return @"";
+	}
+	if(aTableView == miscTableView ){
+		NSArray* theLabels = [model staticLabels];
+		if(rowIndex < [theLabels count]){
+			ORVacuumStaticLabel* theStaticLabel = [theLabels objectAtIndex:rowIndex];
+			if([[aTableColumn identifier] isEqualToString:@"partTag"]){
+				return [NSNumber numberWithInt:rowIndex];
+			}
+			else if([[aTableColumn identifier] isEqualToString:@"label"]){
+				return [theStaticLabel label];
+			}
+			else if([[aTableColumn identifier] isEqualToString:@"dialogIdentifier"]){
+				return [theStaticLabel dialogIdentifier];
+			}
+			else  if([[aTableColumn identifier] isEqualToString:@"value"]){
+				return [NSString stringWithFormat:@"%.2E",[theStaticLabel value]];
 			}
 			else return @"--";
 		}
@@ -332,7 +359,23 @@
 	return @"";
 }
 
-
+- (void)tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+{
+	if(aTableView == adcTableView ){
+		NSArray* theLabels = [model dynamicLabels];
+		if(rowIndex < [theLabels count]){
+			ORVacuumDynamicLabel* theDynamicLabel = [theLabels objectAtIndex:rowIndex];
+			theDynamicLabel.dialogIdentifier = anObject;
+		}
+	}
+	else if(aTableView == miscTableView ){
+		NSArray* theLabels = [model staticLabels];
+		if(rowIndex < [theLabels count]){
+			ORVacuumStaticLabel* theStaticLabel = [theLabels objectAtIndex:rowIndex];
+			theStaticLabel.dialogIdentifier = anObject;
+		}
+	}
+}
 
 
 @end

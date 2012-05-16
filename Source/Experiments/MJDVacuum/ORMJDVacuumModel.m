@@ -110,7 +110,29 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 	
     [[self undoManager] disableUndoRegistration];
 	[self setShowGrid:	[decoder decodeBoolForKey:	@"showGrid"]];
+	
+	
 	[self makeParts];
+
+	NSArray* staticLabelDialogLinks	 = [decoder decodeObjectForKey:	@"staticLabelDialogLinks"];
+	int i=0;
+	NSArray* allLabels = [self staticLabels];
+	for(ORVacuumStaticLabel* aLabel in allLabels){
+		if(i < [staticLabelDialogLinks count]){
+			aLabel.dialogIdentifier = [staticLabelDialogLinks objectAtIndex:i];
+			i++;
+		}
+	}
+
+	NSArray* dynamicLabelDialogLinks	 = [decoder decodeObjectForKey:	@"dynamicLabelDialogLinks"];
+	i=0;
+	allLabels = [self dynamicLabels];
+	for(ORVacuumDynamicLabel* aLabel in allLabels){
+		if(i < [dynamicLabelDialogLinks count]){
+			aLabel.dialogIdentifier = [dynamicLabelDialogLinks objectAtIndex:i];
+			i++;
+		}
+	}
 	
 	[[self undoManager] enableUndoRegistration];
 	
@@ -120,7 +142,35 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeBool:showGrid	forKey: @"showGrid"];
+    [encoder encodeBool:showGrid					forKey: @"showGrid"];
+	
+	
+	NSMutableArray* staticLabelDialogLinks	 = [NSMutableArray array];
+	NSArray* allLabels = [self staticLabels];
+	int i=0;
+	for(ORVacuumStaticLabel* aLabel in allLabels){
+		if([aLabel.dialogIdentifier length]>0){
+			[staticLabelDialogLinks addObject:aLabel.dialogIdentifier];
+		}
+		else {
+			[staticLabelDialogLinks addObject:@""];
+		}
+	}
+	[encoder encodeObject:staticLabelDialogLinks	forKey: @"staticLabelDialogLinks"];
+
+	
+	NSMutableArray* dynamicLabelDialogLinks	 = [NSMutableArray array];
+	i=0;
+	allLabels = [self dynamicLabels];
+	for(ORVacuumDynamicLabel* aLabel in allLabels){
+		if([aLabel.dialogIdentifier length]>0){
+			[dynamicLabelDialogLinks addObject:aLabel.dialogIdentifier];
+		}
+		else {
+			[dynamicLabelDialogLinks addObject:@""];
+		}
+	}
+    [encoder encodeObject:dynamicLabelDialogLinks	forKey: @"dynamicLabelDialogLinks"];
 }
 
 - (NSArray*) parts
@@ -386,6 +436,7 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 		
 #define kNumStaticVacLabelItems	18
 	VacuumStaticLabelInfo staticLabelItems[kNumStaticVacLabelItems] = {
+		//the parttags are equal to the index numbers of the regions
 		{kVacStaticLabel, 0, @"Turbo",			20,	 245,	80,	 265, YES},
 		{kVacStaticLabel, 1, @"RGA",			260, 420,	300, 440, YES},
 		{kVacStaticLabel, 3, @"Cryo Pump",		560, 200,	640, 230, YES},
@@ -393,24 +444,23 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 		{kVacStaticLabel, 6, @"NEG Pump",		420, 285,	480, 315, YES},
 		{kVacStaticLabel, 7, @"Diaphragm\nPump",20,	 80,	80,	 110, YES},
 		{kVacStaticLabel, 8, @"Below Turbo",	 0,	  0,	 0,	   0, NO},
-
+		
 		{kVacStaticLabel, 99, @"V1",			175, 375,	185, 385, NO},
 		{kVacStaticLabel, 99, @"V2",			335, 375,	365, 385, NO},
 		{kVacStaticLabel, 99, @"V3",			515, 345,	525, 355, NO},
 		{kVacStaticLabel, 99, @"V4",			575, 345,	585, 355, NO},
 		{kVacStaticLabel, 99, @"V5",			515, 245,	525, 255, NO},
-		{kVacStaticLabel, 99, @"V6",			510, 160,	525, 170, NO},
+		{kVacStaticLabel, 99, @"Roughing",		485, 165,	530, 175, NO},
 		
 		{kVacStaticLabel, 99, @"B1",			195, 175,	205, 185, NO},
 		{kVacStaticLabel, 99, @"B2",			120, 295,	135, 305, NO},
-		{kVacStaticLabel, 99, @"B3",			560,  45,	570,  55, NO},
+		{kVacStaticLabel, 99, @"Purge",			550,  45,	560,  55, NO},
 		{kVacStaticLabel, 99, @"B4",			680,  45,	690,  55, NO},
 		{kVacStaticLabel, 99, @"B5",			25,  195,	35,  205, NO},
 
 	};	
 	
 #define kNumDynamicVacLabelItems	5
-	//the parttags are equal to the index numbers are equal to the region
 	VacuumDynamicLabelInfo dynamicLabelItems[kNumDynamicVacLabelItems] = {
 		{kVacDynamicLabel, 0, @"PKR G1",	20,	 450,	80,	 490},
 		{kVacDynamicLabel, 1, @"PKR G2",	200, 450,	260, 490},
@@ -443,11 +493,11 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 		{kVacHGateV, 2,		@"V3",			k2BitReadBack,	500, 350,	2,6,	kControlLeft},	//V4. Control + read back
 		{kVacHGateV, 3,		@"V4",			k2BitReadBack,	600, 350,	2,3,	kControlRight},	//V3. Control + read back
 		{kVacHGateV, 4,		@"V5",			k2BitReadBack,	500, 250,	1,6,	kControlLeft},	//V5. Control + read back
-		{kVacVGateV, 5,		@"V6",			k1BitReadBack,	530, 150,	7,3,	kControlBelow},   //V6. Control + read back
+		{kVacVGateV, 5,		@"Roughing",	k1BitReadBack,	530, 150,	7,3,	kControlBelow},   //V6. Control + read back
 		
 		{kVacVGateV, 6,		@"B1",			k1BitReadBack,	200, 200,	1,5,	kControlAbove},	//Control only
 		{kVacHGateV, 7,		@"B2",			k1BitReadBack,	150, 300,	0,5,	kControlRight},	//Control only
-		{kVacHGateV, 8,		@"B3",			k1BitReadBack,	580, 70,	3,5,	kControlLeft},	//Control only 
+		{kVacHGateV, 8,		@"Purge",			k1BitReadBack,	580, 70,	3,5,	kControlLeft},	//Control only 
 		{kVacHGateV, 9,		@"B4",			k1BitReadBack,	700, 70,	2,5,	kControlLeft},	//Control only 
 		
 		{kVacVGateV, 10,	@"Burst",		kManualOnlyShowClosed,		350, 300,	2,kUpToAir,	kControlNone},	//burst
@@ -465,6 +515,8 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 	[self makeGateValves:gvList					num:kNumVacGVs];
 	[self makeStaticLabels:staticLabelItems		num:kNumStaticVacLabelItems];
 	[self makeDynamicLabels:dynamicLabelItems	num:kNumDynamicVacLabelItems];
+	
+	
 }
 
 - (void) makePipes:(VacuumPipeInfo*)pipeList num:(int)numItems
@@ -542,8 +594,6 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 		[[[ORVacuumLine alloc] initWithDelegate:self partTag:0 startPt:NSMakePoint(lineItems[i].x1, lineItems[i].y1) endPt:NSMakePoint(lineItems[i].x2, lineItems[i].y2)] autorelease];
 	}
 }
-
-
 
 - (void) colorRegions
 {

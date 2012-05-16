@@ -1185,8 +1185,16 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
 }
 
 - (void) setProcessOutput:(int)channel value:(int)value
+{	
+}
+- (void) setOutputBit:(int)channel value:(int)value
 {
-    //nothing to do
+	@synchronized(self){
+		switch(channel){
+			case 0: [self writeRoughValveOpen:value];	break;
+			case 1: [self writePurgeValveOpen:value];	break;
+		}
+	}
 }
 
 @end

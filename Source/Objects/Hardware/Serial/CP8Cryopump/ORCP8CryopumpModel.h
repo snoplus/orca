@@ -256,6 +256,7 @@
 - (void) endProcessCycle;
 - (BOOL) processValue:(int)channel;
 - (void) setProcessOutput:(int)channel value:(int)value;
+- (void) setOutputBit:(int)channel value:(int)value;
 - (NSString*) processingTitle;
 @end
 

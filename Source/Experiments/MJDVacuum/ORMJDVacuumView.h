@@ -24,7 +24,7 @@
 - (void) drawGrid;
 - (void) keyDown:(NSEvent *)theEvent;
 - (void) updateButtons;
-
+- (void) mouseDown:(NSEvent *) inEvent;
 @end
 
 
