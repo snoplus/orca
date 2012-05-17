@@ -55,6 +55,7 @@
 		BOOL	wasRunning;
 		float maxCounts;
 		float countAlarmLimit;
+        BOOL dataValid;
 }
 
 #pragma mark ***Initialization
@@ -62,6 +63,7 @@
 - (void) dealloc;
 - (void) registerNotificationObservers;
 - (void) dataReceived:(NSNotification*)note;
+- (BOOL) dataForChannelValid:(int)aChannel;
 
 #pragma mark ***Accessors
 - (float) countAlarmLimit;

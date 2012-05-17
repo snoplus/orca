@@ -132,6 +132,9 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 {
     if([[note userInfo] objectForKey:@"serialPort"] == serialPort){
 		
+        dataValid = YES;
+
+        
         NSString* theString = [[[[NSString alloc] initWithData:[[note userInfo] objectForKey:@"data"] 
 												      encoding:NSASCIIStringEncoding] autorelease] uppercaseString];
 		
@@ -164,6 +167,10 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 }
 
 #pragma mark ***Accessors
+- (BOOL) dataForChannelValid:(int)aChannel
+{
+    return dataValid;
+}
 
 - (float) countAlarmLimit
 {
@@ -678,6 +685,7 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 	[self setLastRequest:nil];
 	recordComingIn = NO;
 	statusComingIn = NO;
+    dataValid      = NO;
 	//[self universalSelect];
 }
 

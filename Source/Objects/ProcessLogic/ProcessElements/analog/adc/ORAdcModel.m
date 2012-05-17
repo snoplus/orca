@@ -303,22 +303,29 @@ NSString* ORAdcModelHighConnection		= @"ORAdcModelHighConnection";
 {	
 	NSString* s = @"";
 	@synchronized(self){
-		s =  [NSString stringWithFormat:@"%@: %@ ", [self iconLabel],[self iconValue]];
-		
-		if(valueTooLow)		  s =  [s stringByAppendingString:@" [LOW ALARM POSTED] "];
-		else if(valueTooHigh) s =  [s stringByAppendingString:@" [HIGH ALARM POSTED]"];
-		
-		if(trackMaxMin){
-			NSString* theFormat = @"%.1f";
-			if([displayFormat length] != 0)									theFormat = displayFormat;
-			if([theFormat rangeOfString:@"%@"].location !=NSNotFound)		theFormat = @"%.1f";
-			else if([theFormat rangeOfString:@"%d"].location !=NSNotFound)	theFormat = @"%.0f";
-			NSString* highestValueString =  [NSString stringWithFormat:theFormat,highestValue];
-			NSString* lowestValueString  =  [NSString stringWithFormat:theFormat,lowestValue];
-			
-			s =  [s stringByAppendingFormat:@" [Lowest %@ at %@]  [Highest %@ at %@] ",
-				  lowestValueString, lowDate, highestValueString, highDate];
-		}
+        BOOL isValid = YES;
+        if([hwObject respondsToSelector:@selector(dataForChannelValid:)]){
+            isValid = [hwObject dataForChannelValid:[self bit]];
+        }
+        if(isValid){
+            s =  [NSString stringWithFormat:@"%@: %@ ", [self iconLabel],[self iconValue]];
+            
+            if(valueTooLow)		  s =  [s stringByAppendingString:@" [LOW ALARM POSTED] "];
+            else if(valueTooHigh) s =  [s stringByAppendingString:@" [HIGH ALARM POSTED]"];
+            
+            if(trackMaxMin){
+                NSString* theFormat = @"%.1f";
+                if([displayFormat length] != 0)									theFormat = displayFormat;
+                if([theFormat rangeOfString:@"%@"].location !=NSNotFound)		theFormat = @"%.1f";
+                else if([theFormat rangeOfString:@"%d"].location !=NSNotFound)	theFormat = @"%.0f";
+                NSString* highestValueString =  [NSString stringWithFormat:theFormat,highestValue];
+                NSString* lowestValueString  =  [NSString stringWithFormat:theFormat,lowestValue];
+                
+                s =  [s stringByAppendingFormat:@" [Lowest %@ at %@]  [Highest %@ at %@] ",
+                      lowestValueString, lowDate, highestValueString, highDate];
+            }
+        }
+        else s =  [NSString stringWithFormat:@"%@: Data Unavailable ", [self iconLabel]];
 	}
 	return s;
 	

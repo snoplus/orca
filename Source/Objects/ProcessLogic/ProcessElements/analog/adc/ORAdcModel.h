@@ -98,3 +98,7 @@ extern NSString* ORAdcModelMinChangeChanged;
 - (id) eval;
 - (int) evaluatedState;
 @end
+
+@interface NSObject (ORAdcModel)
+-(BOOL) dataForChannelValid:(int)aChannel;
+@end
