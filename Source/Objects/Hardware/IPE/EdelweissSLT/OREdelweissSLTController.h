@@ -27,6 +27,19 @@
 @interface OREdelweissSLTController : SBC_LinkController {
 	@private
 	
+	    //udp connection
+		//listener (server)
+	    IBOutlet NSTextField*   crateUDPReplyPortTextField;
+		IBOutlet NSButton*		startListeningForReplyButton;
+		IBOutlet NSButton*		stopListeningForReplyButton;
+	    IBOutlet NSProgressIndicator*   listeningForReplyIndicator;
+		//command sender (client)
+		IBOutlet NSButton*		openCommandSocketButton;
+		IBOutlet NSButton*		closeCommandSocketButton;
+	    IBOutlet   NSTextField* crateUDPCommandTextField;
+	    IBOutlet NSTextField*   crateUDPCommandIPTextField;
+	    IBOutlet NSTextField*   crateUDPCommandPortTextField;
+		
 		IBOutlet NSTextField*	hwVersionField;
 		IBOutlet NSTextField*	sltScriptArgumentsTextField;
 		IBOutlet NSMatrix*		countersMatrix;
@@ -92,6 +105,7 @@
 		NSSize					lowLevelSize;
 		NSSize					cpuManagementSize;
 		NSSize					cpuTestsSize;
+		NSSize					udpSize;
 };
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
@@ -104,6 +118,11 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+- (void) isListeningOnServerSocketChanged:(NSNotification*)aNote;
+- (void) crateUDPCommandChanged:(NSNotification*)aNote;
+- (void) crateUDPCommandIPChanged:(NSNotification*)aNote;
+- (void) crateUDPCommandPortChanged:(NSNotification*)aNote;
+- (void) crateUDPReplyPortChanged:(NSNotification*)aNote;
 - (void) secondsSetInitWithHostChanged:(NSNotification*)aNote;
 - (void) sltScriptArgumentsChanged:(NSNotification*)aNote;
 - (void) countersEnabledChanged:(NSNotification*)aNote;
@@ -140,6 +159,16 @@
 - (void) enableRegControls;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+- (IBAction) startListeningForReplyButtonAction:(id)sender;
+- (IBAction) stopListeningForReplyButtonAction:(id)sender;
+- (IBAction) crateUDPReplyPortTextFieldAction:(id)sender;
+
+- (IBAction) crateUDPCommandTextFieldAction:(id)sender;
+- (IBAction) crateUDPCommandIPTextFieldAction:(id)sender;
+- (IBAction) crateUDPCommandPortTextFieldAction:(id)sender;
+- (IBAction) openCommandSocketButtonAction:(id)sender;
+- (IBAction) closeCommandSocketButtonAction:(id)sender;
+
 - (IBAction) secondsSetInitWithHostButtonAction:(id)sender;
 - (IBAction) sltScriptArgumentsTextFieldAction:(id)sender;
 - (IBAction) enableDisableCounterAction:(id)sender;

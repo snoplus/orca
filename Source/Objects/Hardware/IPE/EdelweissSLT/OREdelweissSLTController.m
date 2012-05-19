@@ -75,8 +75,9 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	controlSize			= NSMakeSize(555,670);
     statusSize			= NSMakeSize(555,480);
     lowLevelSize		= NSMakeSize(555,400);
-    cpuManagementSize	= NSMakeSize(475,450);
-    cpuTestsSize		= NSMakeSize(555,305);
+    cpuManagementSize	= NSMakeSize(485,450);
+    cpuTestsSize		= NSMakeSize(555,315);
+    udpSize		        = NSMakeSize(555,670);
 	
 	[[self window] setTitle:@"IPE-DAQ-V4 EDELWEISS SLT"];	
 	
@@ -208,9 +209,62 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
                          name : OREdelweissSLTModelSecondsSetInitWithHostChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(crateUDPCommandPortChanged:)
+                         name : OREdelweissSLTModelCrateUDPCommandPortChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(crateUDPCommandIPChanged:)
+                         name : OREdelweissSLTModelCrateUDPCommandIPChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(crateUDPReplyPortChanged:)
+                         name : OREdelweissSLTModelCrateUDPReplyPortChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(crateUDPCommandChanged:)
+                         name : OREdelweissSLTModelCrateUDPCommandChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(isListeningOnServerSocketChanged:)
+                         name : OREdelweissSLTModelIsListeningOnServerSocketChanged
+						object: model];
+
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+
+- (void) isListeningOnServerSocketChanged:(NSNotification*)aNote
+{
+    if([model isListeningOnServerSocket])
+	    [listeningForReplyIndicator  startAnimation: nil];
+    else
+	    [listeningForReplyIndicator  stopAnimation: nil];
+}
+
+- (void) crateUDPCommandChanged:(NSNotification*)aNote
+{
+	[crateUDPCommandTextField setStringValue: [model crateUDPCommand]];
+}
+
+- (void) crateUDPReplyPortChanged:(NSNotification*)aNote
+{
+	[crateUDPReplyPortTextField setIntValue: [model crateUDPReplyPort]];
+}
+
+- (void) crateUDPCommandIPChanged:(NSNotification*)aNote
+{
+	[crateUDPCommandIPTextField setStringValue: [model crateUDPCommandIP]];
+}
+
+- (void) crateUDPCommandPortChanged:(NSNotification*)aNote
+{
+	[crateUDPCommandPortTextField setIntValue: [model crateUDPCommandPort]];
+}
 
 - (void) secondsSetInitWithHostChanged:(NSNotification*)aNote
 {
@@ -286,7 +340,8 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 		case  1: [self resizeWindowToSize:statusSize];			break;
 		case  2: [self resizeWindowToSize:lowLevelSize];	    break;
 		case  3: [self resizeWindowToSize:cpuManagementSize];	break;
-		default: [self resizeWindowToSize:cpuTestsSize];	    break;
+		case  4: [self resizeWindowToSize:cpuTestsSize];	    break;
+		default: [self resizeWindowToSize:udpSize];	            break;
     }
 }
 
@@ -361,6 +416,11 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	[self countersEnabledChanged:nil];
 	[self sltScriptArgumentsChanged:nil];
 	[self secondsSetInitWithHostChanged:nil];
+	[self crateUDPCommandPortChanged:nil];
+	[self crateUDPCommandIPChanged:nil];
+	[self crateUDPReplyPortChanged:nil];
+	[self crateUDPCommandChanged:nil];
+	[self isListeningOnServerSocketChanged:nil];
 }
 
 
@@ -508,6 +568,67 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 }
 
 #pragma mark ***Actions
+//reply socket (server)
+- (IBAction) startListeningForReplyButtonAction:(id)sender
+{
+	NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+	[model startListeningServerSocket];	
+}
+
+
+- (IBAction) stopListeningForReplyButtonAction:(id)sender
+{
+	NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+	[model stopListeningServerSocket];	
+}
+
+- (void) crateUDPCommandPortTextFieldAction:(id)sender
+{
+	[model setCrateUDPCommandPort:[sender intValue]];	
+}
+
+
+
+
+//command socket (client)
+- (void) crateUDPCommandSendButtonAction:(id)sender
+{
+	//NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+	[model sendUDPCommand];	
+}
+
+- (void) crateUDPCommandTextFieldAction:(id)sender
+{
+	[model setCrateUDPCommand:[sender stringValue]];	
+}
+
+- (void) crateUDPReplyPortTextFieldAction:(id)sender
+{
+	[model setCrateUDPReplyPort:[sender intValue]];	
+}
+
+- (void) crateUDPCommandIPTextFieldAction:(id)sender
+{
+	[model setCrateUDPCommandIP:[sender stringValue]];	
+}
+
+- (IBAction) openCommandSocketButtonAction:(id)sender
+{
+	NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+	[model openCommandSocket];	
+}
+
+- (IBAction) closeCommandSocketButtonAction:(id)sender
+{
+	NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+	[model closeCommandSocket];	
+}
+
+
+
+
+
+
 
 - (void) secondsSetInitWithHostButtonAction:(id)sender
 {

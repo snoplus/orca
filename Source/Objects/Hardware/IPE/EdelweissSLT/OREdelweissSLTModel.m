@@ -134,6 +134,11 @@ static IpeRegisterNamesStruct regV4[kSltV4NumRegs] = {
 
 #pragma mark ***External Strings
 
+NSString* OREdelweissSLTModelIsListeningOnServerSocketChanged = @"OREdelweissSLTModelIsListeningOnServerSocketChanged";
+NSString* OREdelweissSLTModelCrateUDPCommandChanged = @"OREdelweissSLTModelCrateUDPCommandChanged";
+NSString* OREdelweissSLTModelCrateUDPReplyPortChanged = @"OREdelweissSLTModelCrateUDPReplyPortChanged";
+NSString* OREdelweissSLTModelCrateUDPCommandIPChanged = @"OREdelweissSLTModelCrateUDPCommandIPChanged";
+NSString* OREdelweissSLTModelCrateUDPCommandPortChanged = @"OREdelweissSLTModelCrateUDPCommandPortChanged";
 NSString* OREdelweissSLTModelSecondsSetInitWithHostChanged = @"OREdelweissSLTModelSecondsSetInitWithHostChanged";
 NSString* OREdelweissSLTModelSltScriptArgumentsChanged = @"OREdelweissSLTModelSltScriptArgumentsChanged";
 NSString* OREdelweissSLTModelCountersEnabledChanged = @"OREdelweissSLTModelCorntersEnabledChanged";
@@ -186,11 +191,16 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 	pmcLink = [[PMC_Link alloc] initWithDelegate:self];
 	[self setSecondsSetInitWithHost: YES];
 	[self registerNotificationObservers];
+	crateUDPCommandPort = 9940;
+	crateUDPCommandIP = @"localhost";
+	crateUDPReplyPort = 9940;
     return self;
 }
 
 -(void) dealloc
 {
+    [crateUDPCommand release];
+    [crateUDPCommandIP release];
     [sltScriptArguments release];
     [patternFilePath release];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -278,6 +288,79 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+
+- (int) isListeningOnServerSocket
+{
+    return isListeningOnServerSocket;
+}
+
+- (void) setIsListeningOnServerSocket:(int)aIsListeningOnServerSocket
+{
+    isListeningOnServerSocket = aIsListeningOnServerSocket;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelIsListeningOnServerSocketChanged object:self];
+}
+
+- (NSString*) crateUDPCommand
+{
+	if(!crateUDPCommand) return @"";
+    return crateUDPCommand;
+}
+
+- (void) setCrateUDPCommand:(NSString*)aCrateUDPCommand
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setCrateUDPCommand:crateUDPCommand];
+    
+    [crateUDPCommand autorelease];
+    crateUDPCommand = [aCrateUDPCommand copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelCrateUDPCommandChanged object:self];
+}
+
+- (int) crateUDPReplyPort
+{
+    return crateUDPReplyPort;
+}
+
+- (void) setCrateUDPReplyPort:(int)aCrateUDPReplyPort
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setCrateUDPReplyPort:crateUDPReplyPort];
+    
+    crateUDPReplyPort = aCrateUDPReplyPort;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelCrateUDPReplyPortChanged object:self];
+}
+
+- (NSString*) crateUDPCommandIP
+{
+	if(!crateUDPCommandIP) return @"";
+    return crateUDPCommandIP;
+}
+
+- (void) setCrateUDPCommandIP:(NSString*)aCrateUDPCommandIP
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setCrateUDPCommandIP:crateUDPCommandIP];
+    
+    //crateUDPCommandIP = aCrateUDPCommandIP;
+    [crateUDPCommandIP autorelease];
+    crateUDPCommandIP = [aCrateUDPCommandIP copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelCrateUDPCommandIPChanged object:self];
+}
+
+- (int) crateUDPCommandPort
+{
+    return crateUDPCommandPort;
+}
+
+- (void) setCrateUDPCommandPort:(int)aCrateUDPCommandPort
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setCrateUDPCommandPort:crateUDPCommandPort];
+    
+    crateUDPCommandPort = aCrateUDPCommandPort;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelCrateUDPCommandPortChanged object:self];
+}
 - (BOOL) secondsSetInitWithHost
 {
     return secondsSetInitWithHost;
@@ -823,6 +906,219 @@ NSLog(@"  arguments: %@ \n" , arguments);
 
 }
 
+
+
+
+
+#pragma mark ***UDP Communication
+//reply socket (server)
+- (int) startListeningServerSocket
+{
+	NSLog(@"Called %@::%@!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
+
+    int status, retval=0;
+
+	UDP_REPLY_SERVER_SOCKET = socket ( AF_INET, SOCK_DGRAM, IPPROTO_UDP );
+	if (UDP_REPLY_SERVER_SOCKET==-1){
+        //fprintf(stderr, "initUDPServerSocket: socket(...) failed\n");
+	    NSLog(@" %@::%@  socket(...) failed!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
+        //diep("socket");
+	    return 1;
+    }
+	//fprintf(stderr, "initGlobalUDPServerSocket: socket(...) created socket %i\n",GLOBAL_UDP_SERVER_SOCKET);
+	NSLog(@" %@::%@  created socket %i  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) ,UDP_REPLY_SERVER_SOCKET);//TODO: DEBUG -tb-
+
+
+	UDP_REPLY_servaddr.sin_family = AF_INET; 
+	UDP_REPLY_servaddr.sin_port = htons (crateUDPReplyPort);
+
+	char  GLOBAL_UDP_SERVER_IP_ADDR[1024]="0.0.0.0";//TODO: this might be necessary for hosts with several network adapters -tb-
+
+
+	retval=inet_aton(GLOBAL_UDP_SERVER_IP_ADDR,&UDP_REPLY_servaddr.sin_addr);
+	int GLOBAL_UDP_SERVER_IP = UDP_REPLY_servaddr.sin_addr.s_addr;//this is already in network byte order!!!
+	printf("  inet_aton: retval: %i,IP_ADDR: %s, IP %i (0x%x)\n",retval,GLOBAL_UDP_SERVER_IP_ADDR,crateUDPReplyPort,GLOBAL_UDP_SERVER_IP);
+	//GLOBAL_servaddr.sin_addr.s_addr =  htonl(GLOBAL_UDP_SERVER_IP);// INADDR_ANY = 0x00000000 = 0  ;   192.168.1.9  = 0xc0a80109  ;   192.168.1.34   = 0xc0a80122
+	status = bind(UDP_REPLY_SERVER_SOCKET,(struct sockaddr *) &UDP_REPLY_servaddr,sizeof(UDP_REPLY_servaddr));
+	if (status==-1) {
+		printf("    ERROR starting UDP server .. -tb- continue, ignore error -tb-\n");
+	    NSLog(@"    ERROR starting UDP server (bind: err %i) .. probably port already used ! (-tb- continue, ignore error -tb-)\n", status);//TODO: DEBUG -tb-
+		//return 2 ; //-tb- continue, ignore error -tb-
+	}
+	printf("  serveur udp ouvert avec servaddr.sin_addr.s_addr=%s \n",inet_ntoa(UDP_REPLY_servaddr.sin_addr));
+	listen(UDP_REPLY_SERVER_SOCKET,5);  //TODO: is this necessary? what does it mean exactly? -tb-
+	                                    //TODO: is this necessary? what does it mean exactly? -tb-
+ printf("  UDP SERVER is listening for K command reply on port %u\n",crateUDPReplyPort);
+   if(crateUDPReplyPort<1024) printf("  NOTE,WARNING: initUDPServerSocket: UDP SERVER is listening on port %u, using ports below 1024 requires to run as 'root'!\n",crateUDPReplyPort);
+
+
+    retval=0;//no error
+
+
+	[self setIsListeningOnServerSocket: 1];
+	//start polling
+	if(	[self isListeningOnServerSocket]) [self performSelector:@selector(receiveFromReplyServer) withObject:nil afterDelay: 0];
+
+    return retval;//retval=0: OK, else error
+	
+	return 0;
+}
+
+- (void) stopListeningServerSocket
+{
+	NSLog(@"Called %@::%@!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
+    if(UDP_REPLY_SERVER_SOCKET>-1) close(UDP_REPLY_SERVER_SOCKET);
+    UDP_REPLY_SERVER_SOCKET = -1;
+	
+	[self setIsListeningOnServerSocket: 0];
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(receiveFromReplyServer) object:nil];
+}
+
+- (int) openServerSocket
+{
+	NSLog(@"Called %@::%@!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
+	
+	return 0;
+}
+
+- (void) closeServerSocket
+{
+	NSLog(@"Called %@::%@!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
+}
+
+
+
+- (int) receiveFromReplyServer
+{
+
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(receiveFromReplyServer) object:nil];
+
+    const int maxSizeOfReadbuffer=4096;
+    char readBuffer[maxSizeOfReadbuffer];
+
+	int retval=-1;
+    sockaddr_fromLength = sizeof(sockaddr_from);
+    //while( (retval = recvfrom(MY_UDP_SERVER_SOCKET, (char*)InBuffer,sizeof(InBuffer) , MSG_DONTWAIT,(struct sockaddr *) &servaddr, &AddrLength)) >0 ){
+    retval = recvfrom(UDP_REPLY_SERVER_SOCKET, readBuffer, maxSizeOfReadbuffer, MSG_DONTWAIT,(struct sockaddr *) &sockaddr_from, &sockaddr_fromLength);
+	    //printf("recvfromGlobalServer retval:  %i, maxSize %i\n",retval,maxSizeOfReadbuffer);
+	    if(retval>=0){
+	        //printf("recvfromGlobalServer retval:  %i (bytes), maxSize %i, from IP %s\n",retval,maxSizeOfReadbuffer,inet_ntoa(sockaddr_from.sin_addr));
+			//printf("Got UDP data from %s\n", inet_ntoa(sockaddr_from.sin_addr));
+			//NSLog(@"Got UDP data from %s\n", inet_ntoa(sockaddr_from.sin_addr));
+	        NSLog(@" %@::%@ Got UDP data from %s!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) ,inet_ntoa(sockaddr_from.sin_addr));//TODO: DEBUG -tb-
+
+	    }
+	//handle K commands
+	if(retval>0){
+	    switch(readBuffer[0]){
+	    case 'K':
+	        readBuffer[retval]='\0';//make null terminated string for printf
+	        //printf("Received reply to K command: >%s<\n",readBuffer);
+	        NSLog(@"    Received reply to K command: >%s<\n", readBuffer);//TODO: DEBUG -tb-
+	        //handleKCommand(readBuffer, retval, &sockaddr_from);
+	        break;
+	    default:
+	        readBuffer[retval]='\0';//make null terminated string for printf
+	        //printf("Received unknown command: >%s<\n",readBuffer);
+	        NSLog(@"    Received unknown message: >%s<\n", readBuffer);//TODO: DEBUG -tb-
+	        break;
+	    }
+	}
+	
+	if(	[self isListeningOnServerSocket]) [self performSelector:@selector(receiveFromReplyServer) withObject:nil afterDelay: 0];
+
+    return retval;
+}
+
+
+
+//command socket (client)
+- (int) openCommandSocket
+{
+	NSLog(@"Called %@::%@!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
+	//[model setCrateUDPCommand:[sender stringValue]];	
+	
+	if(UDP_COMMAND_CLIENT_SOCKET>0) [self closeCommandSocket];//still open, first close the socket
+	
+	//almost a copy from ipe4reader6.cpp
+    int retval=0;
+    if ((UDP_COMMAND_CLIENT_SOCKET=socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP))==-1){
+        //fprintf(stderr, "initGlobalUDPClientSocket: socket(...) failed\n");
+	    NSLog(@" %@::%@  socket(...) failed!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
+        //diep("socket");
+	    return 1;
+    }
+	NSLog(@" %@::%@  created socket %i  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) ,UDP_COMMAND_CLIENT_SOCKET);//TODO: DEBUG -tb-
+	
+  #if 1 //do it in sendToGlobalClient3 again?
+    sockaddrin_to_len=sizeof(UDP_COMMAND_sockaddrin_to);
+  memset((char *) &UDP_COMMAND_sockaddrin_to, 0, sizeof(UDP_COMMAND_sockaddrin_to));
+  UDP_COMMAND_sockaddrin_to.sin_family = AF_INET;
+  UDP_COMMAND_sockaddrin_to.sin_port = htons(crateUDPCommandPort); //take global variable MY_UDP_CLIENT_PORT //TODO: was PORT, remove PORT
+  if (inet_aton([crateUDPCommandIP cStringUsingEncoding:NSASCIIStringEncoding], &UDP_COMMAND_sockaddrin_to.sin_addr)==0) {
+	NSLog(@" %@::%@  inet_aton() failed \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
+    //fprintf(stderr, "inet_aton() failed\n");
+	return 2;
+    //exit(1);
+  }
+	NSLog(@" %@::%@  UDP Client: IP: %s, port: %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) ,[crateUDPCommandIP cStringUsingEncoding:NSASCIIStringEncoding] /*crateUDPCommandIP oder %@ benutzen*/,	crateUDPCommandPort);//TODO: DEBUG -tb-
+    //fprintf(stderr, "    initGlobalUDPClientSocket: UDP Client: IP: %s, port: %i\n",[crateUDPCommandIP cStringUsingEncoding:NSASCIIStringEncoding] /*crateUDPCommandIP oder %@ benutzen*/,	crateUDPCommandPort);
+  #endif
+  
+	
+	
+	return retval;
+}
+
+- (void) closeCommandSocket
+{
+	NSLog(@"Called %@::%@!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
+	//[model setCrateUDPCommand:[sender stringValue]];	
+      if(UDP_COMMAND_CLIENT_SOCKET>-1) close(UDP_COMMAND_CLIENT_SOCKET);
+      UDP_COMMAND_CLIENT_SOCKET = -1;
+}
+
+
+
+
+
+
+- (int) sendUDPCommand
+{
+    //taken from ipe4reader6.cpp, function int sendtoGlobalClient3(const void *buffer, size_t length, char* receiverIPAddr, uint32_t port)
+	NSLog(@"Called %@::%@! Send string: >%@<\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),  [self crateUDPCommand]);//TODO: DEBUG -tb-
+	//[model setCrateUDPCommand:[sender stringValue]];	
+    if(UDP_COMMAND_CLIENT_SOCKET<=0){ NSLog(@"   socket not open\n"); return 1;}
+
+
+    //const char *buffer   = [crateUDPCommand cStringUsingEncoding: NSASCIIStringEncoding];  //TODO: maybe use NSData and NSString::dataUsingEncoding:allowLossyConversion: ??? -tb-
+    const void *buffer   = [[crateUDPCommand dataUsingEncoding: NSASCIIStringEncoding allowLossyConversion: YES] bytes];  //TODO: maybe use NSData and NSString::dataUsingEncoding:allowLossyConversion: ??? -tb-
+	size_t length        = [crateUDPCommand lengthOfBytesUsingEncoding: NSASCIIStringEncoding];
+	const char* receiverIPAddr = [crateUDPCommandIP cStringUsingEncoding: NSASCIIStringEncoding];;
+
+	int retval=0;
+	
+  //	if(port==0) port = GLOBAL_UDP_CLIENT_PORT;//use default port
+	
+  memset((char *) &UDP_COMMAND_sockaddrin_to, 0, sizeof(UDP_COMMAND_sockaddrin_to));
+  UDP_COMMAND_sockaddrin_to.sin_family = AF_INET;
+  UDP_COMMAND_sockaddrin_to.sin_port = htons(crateUDPCommandPort);
+  if (inet_aton([crateUDPCommandIP cStringUsingEncoding:NSASCIIStringEncoding], &UDP_COMMAND_sockaddrin_to.sin_addr)==0) {
+	NSLog(@" %@::%@  inet_aton() failed \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
+    //fprintf(stderr, "ERROR: sendtoGlobalClient3: inet_aton() failed\n");
+	return 2;
+    //exit(1);
+  }
+    fprintf(stderr, "    sendtoGlobalClient3: UDP Client: IP: %s, port: %i\n",receiverIPAddr,crateUDPCommandPort);
+    //TODO: only recommended when using a char buffer ...  ((char*)buffer)[length]=0;    fprintf(stderr, "    sendtoGlobalClient3: %s\n",buffer); //DEBUG
+	
+	retval = sendto(UDP_COMMAND_CLIENT_SOCKET, buffer, length, 0 /*flags*/, (struct sockaddr *)&UDP_COMMAND_sockaddrin_to, sockaddrin_to_len);
+    return retval;
+
+}
+
+
+
 #pragma mark ***HW Access
 - (void) checkPresence
 {
@@ -1355,6 +1651,10 @@ NSLog(@"  arguments: %@ \n" , arguments);
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
 	
+	[self setCrateUDPCommand:[decoder decodeObjectForKey:@"crateUDPCommand"]];
+	[self setCrateUDPReplyPort:[decoder decodeIntForKey:@"crateUDPReplyPort"]];
+	[self setCrateUDPCommandIP:[decoder decodeObjectForKey:@"crateUDPCommandIP"]];
+	[self setCrateUDPCommandPort:[decoder decodeIntForKey:@"crateUDPCommandPort"]];
 	[self setSltScriptArguments:[decoder decodeObjectForKey:@"sltScriptArguments"]];
 	pmcLink = [[decoder decodeObjectForKey:@"PMC_Link"] retain];
 	if(!pmcLink)pmcLink = [[PMC_Link alloc] initWithDelegate:self];
@@ -1404,6 +1704,10 @@ NSLog(@"  arguments: %@ \n" , arguments);
 {
 	[super encodeWithCoder:encoder];
 	
+	[encoder encodeObject:crateUDPCommand forKey:@"crateUDPCommand"];
+	[encoder encodeInt:crateUDPReplyPort forKey:@"crateUDPReplyPort"];
+	[encoder encodeObject:crateUDPCommandIP forKey:@"crateUDPCommandIP"];
+	[encoder encodeInt:crateUDPCommandPort forKey:@"crateUDPCommandPort"];
 	[encoder encodeBool:secondsSetInitWithHost forKey:@"secondsSetInitWithHost"];
 	[encoder encodeObject:sltScriptArguments forKey:@"sltScriptArguments"];
 	[encoder encodeBool:countersEnabled forKey:@"countersEnabled"];

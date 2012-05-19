@@ -25,6 +25,14 @@
 #import "SBC_Linking.h"
 #import "SBC_Config.h"
 
+//for UDP sockets
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <unistd.h>
+
+
 @class ORReadOutList;
 @class ORDataPacket;
 @class TimedWorker;
@@ -169,8 +177,29 @@
 		unsigned long long runTime;
 		unsigned long clockTime;
 		BOOL countersEnabled;
-    NSString* sltScriptArguments;
-    BOOL secondsSetInitWithHost;
+		
+        NSString* sltScriptArguments;
+        BOOL secondsSetInitWithHost;
+	
+    	//UDP
+		    //vars in GUI
+        int crateUDPCommandPort;
+        NSString* crateUDPCommandIP;
+        int crateUDPReplyPort;
+        NSString* crateUDPCommand;
+		    //sender connection (client)
+	    int      UDP_COMMAND_CLIENT_SOCKET;
+	    uint32_t UDP_COMMAND_CLIENT_IP;
+        struct sockaddr_in UDP_COMMAND_sockaddrin_to;
+        socklen_t  sockaddrin_to_len;//=sizeof(GLOBAL_sockin_to);
+        struct sockaddr sock_to;
+        int sock_to_len;//=sizeof(si_other);
+		    //reply connection (server/listener)
+	    int                UDP_REPLY_SERVER_SOCKET;//=-1;
+        struct sockaddr_in UDP_REPLY_servaddr;
+        struct sockaddr_in sockaddr_from;
+        socklen_t sockaddr_fromLength;
+		int isListeningOnServerSocket;
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
@@ -188,6 +217,16 @@
 - (void) runIsStartingSubRun:(NSNotification*)aNote;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+- (int) isListeningOnServerSocket;
+- (void) setIsListeningOnServerSocket:(int)aIsListeningOnServerSocket;
+- (NSString*) crateUDPCommand;
+- (void) setCrateUDPCommand:(NSString*)aCrateUDPCommand;
+- (int) crateUDPReplyPort;
+- (void) setCrateUDPReplyPort:(int)aCrateUDPReplyPort;
+- (NSString*) crateUDPCommandIP;
+- (void) setCrateUDPCommandIP:(NSString*)aCrateUDPCommandIP;
+- (int) crateUDPCommandPort;
+- (void) setCrateUDPCommandPort:(int)aCrateUDPCommandPort;
 - (BOOL) secondsSetInitWithHost;
 - (void) setSecondsSetInitWithHost:(BOOL)aSecondsSetInitWithHost;
 - (NSString*) sltScriptArguments;
@@ -252,6 +291,19 @@
 - (void) setPoller: (TimedWorker *) aPoller;
 - (void) setPollingInterval:(float)anInterval;
 - (void) makePoller:(float)anInterval;
+
+#pragma mark ***UDP Communication
+//reply socket (server)
+- (int) startListeningServerSocket;
+- (void) stopListeningServerSocket;
+- (int) openServerSocket;
+- (void) closeServerSocket;
+- (int) receiveFromReplyServer;
+
+//command socket (client)
+- (int) openCommandSocket;
+- (void) closeCommandSocket;
+- (int) sendUDPCommand;
 
 #pragma mark ***HW Access
 //note that most of these method can raise 
@@ -355,6 +407,11 @@
 
 @end
 
+extern NSString* OREdelweissSLTModelIsListeningOnServerSocketChanged;
+extern NSString* OREdelweissSLTModelCrateUDPCommandChanged;
+extern NSString* OREdelweissSLTModelCrateUDPReplyPortChanged;
+extern NSString* OREdelweissSLTModelCrateUDPCommandIPChanged;
+extern NSString* OREdelweissSLTModelCrateUDPCommandPortChanged;
 extern NSString* OREdelweissSLTModelSecondsSetInitWithHostChanged;
 extern NSString* OREdelweissSLTModelSltScriptArgumentsChanged;
 extern NSString* OREdelweissSLTModelCountersEnabledChanged;
