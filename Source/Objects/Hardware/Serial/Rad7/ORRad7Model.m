@@ -1253,7 +1253,10 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
     //nothing to do
 }
 
-
+- (BOOL) dataForChannelValid:(int)aChannel
+{
+    return dataValid && [serialPort isOpen];
+}
 @end
 
 @implementation ORRad7Model (private)
@@ -1266,6 +1269,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 
 - (void) timeout
 {
+    dataValid = YES;
 	//NSLog(@"Rad7 timeout: %@\n",lastRequest);
 	NSLogError(@"Rad7",@"command timeout",nil);
 	[cmdQueue removeAllObjects];
@@ -1350,6 +1354,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 
 - (void) process_response:(NSString*)theResponse
 {	
+    dataValid = YES;
 	theResponse = [theResponse removeExtraSpaces];
 	//NSLog(@"(%d) %@\n",requestCount,theResponse);
 	if([theResponse rangeOfString:@"DURRIDGE"].location != NSNotFound){

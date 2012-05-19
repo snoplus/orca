@@ -149,6 +149,7 @@
 		float			pumpCurrentAlarm;
 		float			pumpCurrentMaxLimit;
 		float			humidityMaxLimit;
+        BOOL            dataValid;  
 }
 
 #pragma mark ***Initialization
@@ -266,6 +267,7 @@
 - (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit  channel:(int)channel;
 - (double) convertedValue:(int)channel;
 - (double) maxValueForChan:(int)channel;
+- (BOOL) dataForChannelValid:(int)aChannel;
 @end
 
 extern NSString* ORRad7ModelHumidityMaxLimitChanged;

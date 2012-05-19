@@ -132,8 +132,6 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 {
     if([[note userInfo] objectForKey:@"serialPort"] == serialPort){
 		
-        dataValid = YES;
-
         
         NSString* theString = [[[[NSString alloc] initWithData:[[note userInfo] objectForKey:@"data"] 
 												      encoding:NSASCIIStringEncoding] autorelease] uppercaseString];
@@ -169,7 +167,7 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 #pragma mark ***Accessors
 - (BOOL) dataForChannelValid:(int)aChannel
 {
-    return dataValid;
+    return dataValid && [serialPort isOpen];
 }
 
 - (float) countAlarmLimit
@@ -711,6 +709,8 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 - (void) process_response:(NSString*)theResponse
 {
 	//NSLog(@"response: %@\n",theResponse);
+    dataValid = YES;
+
 	if (recordComingIn){
 		if([theResponse rangeOfString:@"#"].location != NSNotFound){	//no records
 			recordComingIn = NO;

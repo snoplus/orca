@@ -60,6 +60,7 @@
 		BOOL			timedOut;
 		BOOL			dumpInProgress;
 		int				dumpCount;
+        BOOL            dataValid;  
 }
 
 #pragma mark ***Initialization
@@ -157,6 +158,7 @@
 - (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit  channel:(int)channel;
 - (double) convertedValue:(int)channel;
 - (double) maxValueForChan:(int)channel;
+- (BOOL) dataForChannelValid:(int)aChannel;
 
 #pragma mark •••Archival
 - (id)   initWithCoder:(NSCoder*)decoder;

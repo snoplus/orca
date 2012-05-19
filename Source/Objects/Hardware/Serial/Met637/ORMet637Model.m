@@ -769,6 +769,11 @@ NSString* ORMet637Lock = @"ORMet637Lock";
     //nothing to do. not used in adcs. really shouldn't be in the protocol
 }
 
+- (BOOL) dataForChannelValid:(int)aChannel
+{
+    return dataValid && [serialPort isOpen];
+}
+
 @end
 
 @implementation ORMet637Model (private)
@@ -796,6 +801,8 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 
 - (void) process_response:(NSString*)theResponse
 {
+    dataValid = YES;
+
 	theResponse = [theResponse stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 	NSArray* partsByComma = [theResponse componentsSeparatedByString:@","];
 	if([partsByComma count] >= 14 && ![theResponse hasPrefix:@"TIME"]){
@@ -902,6 +909,7 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 {
 	NSLogError(@"Met637",@"command timeout",nil);
 	[self setTimedOut:YES];
+    dataValid = NO;
 }
 
 - (void) dumpTimeout
