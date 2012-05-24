@@ -137,6 +137,7 @@ typedef enum eSBC_ThrottleConsts{
 	unsigned 		ipNumberIndex;
 	NSString*		mainStagingFolder;
 	long			sbcCodeVersion;
+    NSDate*         lastRateUpdate;
 }
 
 - (id)   initWithDelegate:(ORCard*)anDelegate;
