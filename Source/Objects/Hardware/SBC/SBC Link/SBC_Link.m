@@ -112,6 +112,7 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 	[eCpuCBLostDataAlarm release];
 
     
+    [lastRateUpdate release];
 	[timeConnected release];
 	[connectionHistory release];
     [filePath release];
@@ -602,11 +603,20 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 - (void) calculateRates
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(calculateRates) object:nil];
-	[self setByteRateSent: bytesSent/kSBCRateIntegrationTime];
-	[self setByteRateReceived: bytesReceived/kSBCRateIntegrationTime];
-	bytesReceived = 0;
-	bytesSent = 0;
-    [[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkByteRateChanged object:self];
+    NSDate* now = [NSDate date];
+     if(lastRateUpdate){
+        NSTimeInterval deltaTime = [now timeIntervalSinceDate:lastRateUpdate];
+        if(deltaTime>0){
+            [self setByteRateSent: bytesSent/deltaTime];
+            [self setByteRateReceived: bytesReceived/deltaTime];
+            bytesReceived = 0;
+            bytesSent = 0;
+            [[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkByteRateChanged object:self];
+        }
+    }
+    [lastRateUpdate release];
+    lastRateUpdate = [now retain];
+
 	[self performSelector:@selector(calculateRates) withObject:nil afterDelay:kSBCRateIntegrationTime];
 }
 
