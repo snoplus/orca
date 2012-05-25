@@ -349,7 +349,7 @@ NSString* totalRatePlotChanged                      = @"totalRatePlotChanged";
     //get all ios IP addresses
     NSHTTPURLResponse *response = nil;
     NSError *connectionError;
-    NSString *urlName=[[NSString alloc] initWithString:@"http://snoplus:scintillate@snotpenn01.snolab.ca:5984/slow_control/_design/testdesign/_view/ioserverview"];
+    NSString *urlName=[[NSString alloc] initWithString:@"http://snoplus:scintillate@snotpenn01.snolab.ca:5984/slow_control/_design/hwinfo/_view/ios"];
 	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:urlName] cachePolicy: NSURLRequestReloadIgnoringCacheData timeoutInterval:1];
     NSData *responseData = [[NSData alloc] initWithData:[NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&connectionError]];
 	NSString *jsonStr = [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
@@ -403,19 +403,19 @@ NSString* totalRatePlotChanged                      = @"totalRatePlotChanged";
     SNOConnection *connection = [[SNOConnection alloc] init];
     [connection setDelegate:self];
     [connection setDelegateAction:@"getSlowControlMap"];
-    [connection get:@"http://snoplus:scintillate@snotpenn01.snolab.ca:5984/slow_control/_design/testdesign/_list/testlist/collatedview?include_docs=true"];
+    [connection get:@"http://snoplus:scintillate@snotpenn01.snolab.ca:5984/slow_control/_design/hwinfo/_list/hwmap/mapgen?include_docs=true"];
     [connection release];
 
     SNOConnection *connection2 = [[SNOConnection alloc] init];
     [connection2 setDelegate:self];
     [connection2 setDelegateAction:@"getIOSCards"];
-    [connection2 get:@"http://snoplus:scintillate@snotpenn01.snolab.ca:5984/slow_control/_design/testdesign/_view/iocardview"];
+    [connection2 get:@"http://snoplus:scintillate@snotpenn01.snolab.ca:5984/slow_control/_design/hwinfo/_view/card"];
     [connection2 release];
     
     SNOConnection *connection3 = [[SNOConnection alloc] init];
     [connection3 setDelegate:self];
     [connection3 setDelegateAction:@"getIOS"];
-    [connection3 get:@"http://snoplus:scintillate@snotpenn01.snolab.ca:5984/slow_control/_design/testdesign/_view/ioserverview"];
+    [connection3 get:@"http://snoplus:scintillate@snotpenn01.snolab.ca:5984/slow_control/_design/hwinfo/_view/ios"];
     [connection3 release];
 
 }
