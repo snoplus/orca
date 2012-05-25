@@ -521,6 +521,8 @@
 		84183022156153D2004EC81F /* ORTM700Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84183018156153D2004EC81F /* ORTM700Model.m */; };
 		84183023156153D2004EC81F /* TM700.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84183019156153D2004EC81F /* TM700.nib */; };
 		84183024156153D2004EC81F /* TM700.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8418301A156153D2004EC81F /* TM700.tif */; };
+		8418376C156FC7AF004EC81F /* ORDetectorRamper.h in Headers */ = {isa = PBXBuildFile; fileRef = 8418376A156FC7AF004EC81F /* ORDetectorRamper.h */; };
+		8418376D156FC7AF004EC81F /* ORDetectorRamper.m in Sources */ = {isa = PBXBuildFile; fileRef = 8418376B156FC7AF004EC81F /* ORDetectorRamper.m */; };
 		8419221F0F0BBE8000EF1C1C /* ORScriptIDEModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8419221D0F0BBE8000EF1C1C /* ORScriptIDEModel.h */; };
 		841922200F0BBE8000EF1C1C /* ORScriptIDEModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8419221E0F0BBE8000EF1C1C /* ORScriptIDEModel.m */; };
 		8419227E0F0BC18800EF1C1C /* ORScriptIDEController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8419227C0F0BC18800EF1C1C /* ORScriptIDEController.m */; };
@@ -3536,6 +3538,8 @@
 		84183018156153D2004EC81F /* ORTM700Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORTM700Model.m; path = Source/Objects/Hardware/Serial/TM700/ORTM700Model.m; sourceTree = SOURCE_ROOT; };
 		84183019156153D2004EC81F /* TM700.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = TM700.nib; path = Source/Objects/Hardware/Serial/TM700/TM700.nib; sourceTree = SOURCE_ROOT; };
 		8418301A156153D2004EC81F /* TM700.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = TM700.tif; path = Source/Objects/Hardware/Serial/TM700/TM700.tif; sourceTree = SOURCE_ROOT; };
+		8418376A156FC7AF004EC81F /* ORDetectorRamper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORDetectorRamper.h; sourceTree = "<group>"; };
+		8418376B156FC7AF004EC81F /* ORDetectorRamper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORDetectorRamper.m; sourceTree = "<group>"; };
 		8418DC4D0531EF7A005F64B1 /* ORPulserDistrib.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = ORPulserDistrib.gif; sourceTree = "<group>"; };
 		8418DC4E0531EF7A005F64B1 /* ORPulserDistribController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORPulserDistribController.h; sourceTree = "<group>"; };
 		8418DC4F0531EF7A005F64B1 /* ORPulserDistribController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORPulserDistribController.m; sourceTree = "<group>"; };
@@ -8374,6 +8378,8 @@
 				8457D25412F9986E00D3E3B4 /* ORiSeg8ChanHVController.m */,
 				8457D37512F9AB8A00D3E3B4 /* ORiSeg8ChanHVDecoders.h */,
 				8457D37612F9AB8A00D3E3B4 /* ORiSeg8ChanHVDecoders.m */,
+				8418376A156FC7AF004EC81F /* ORDetectorRamper.h */,
+				8418376B156FC7AF004EC81F /* ORDetectorRamper.m */,
 				8499A959151B594300CD7AAC /* NoMPodCratePowerHelp */,
 			);
 			name = "MPod Base Classes";
@@ -13275,6 +13281,7 @@
 				84F3085615483A4000663573 /* ORMks660BModel.h in Headers */,
 				8418301D156153D2004EC81F /* ORTM700Controller.h in Headers */,
 				84183021156153D2004EC81F /* ORTM700Model.h in Headers */,
+				8418376C156FC7AF004EC81F /* ORDetectorRamper.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -15072,6 +15079,7 @@
 				84F3085715483A4000663573 /* ORMks660BModel.m in Sources */,
 				8418301E156153D2004EC81F /* ORTM700Controller.m in Sources */,
 				84183022156153D2004EC81F /* ORTM700Model.m in Sources */,
+				8418376D156FC7AF004EC81F /* ORDetectorRamper.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
