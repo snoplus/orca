@@ -24,6 +24,7 @@
 #import "ORTimeRate.h"
 #import "ORHWWizSelection.h"
 #import "ORHWWizParam.h"
+#import "ORDetectorRamper.h"
 
 NSString* OREHS8260pModelOutputFailureBehaviorChanged = @"OREHS8260pModelOutputFailureBehaviorChanged";
 NSString* OREHS8260pModelCurrentTripBehaviorChanged = @"OREHS8260pModelCurrentTripBehaviorChanged";
@@ -43,6 +44,7 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 {
     [self linkToController:@"OREHS8260pController"];
 }
+
 - (NSString*) settingsLock
 {
 	 return OREHS8260pSettingsLock;

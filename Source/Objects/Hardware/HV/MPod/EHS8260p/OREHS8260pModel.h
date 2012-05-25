@@ -22,12 +22,15 @@
 
 #import "ORiSeg8ChanHV.h"
 
+@class ORDetectorRamper;
+
 @interface OREHS8260pModel : ORiSeg8ChanHV
 {
   @private
     short		tripTime[8];
     short		currentTripBehavior[8];
     short		outputFailureBehavior[8];
+	ORDetectorRamper* ramper[8];
 }
 
 #pragma mark ***Initialization
@@ -35,9 +38,9 @@
 - (void) makeMainController;
 
 #pragma mark ***Accessors
-- (short)		outputFailureBehavior:(short)chan;
+- (short)	outputFailureBehavior:(short)chan;
 - (void)	setOutputFailureBehavior:(short)chan withValue:(short)aValue;
-- (short)		currentTripBehavior:(short)chan;
+- (short)	currentTripBehavior:(short)chan;
 - (void)	setCurrentTripBehavior:(short)chan withValue:(short)aValue;
 - (short)	tripTime:(short)chan;
 - (void)	setTripTime:(short)chan withValue:(short)aValue;
