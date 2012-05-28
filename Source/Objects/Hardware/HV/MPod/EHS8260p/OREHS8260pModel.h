@@ -57,6 +57,22 @@
 
 #pragma mark •••Hardware Wizard
 - (NSArray*) wizardSelections;
+- (void) setStepWait:(int)i withValue:(int)aValue;
+- (int) stepWait:(int)i;
+- (void) setLowVoltageWait:(int)i withValue:(int)aValue;
+- (int) lowVoltageWait:(int)i;
+- (void) setLowVoltageThreshold:(int)i withValue:(int)aValue;
+- (int) lowVoltageThreshold:(int)i;
+- (void) setLowVoltageStep:(int)i withValue:(int)aValue;
+- (int) lowVoltagestep:(int)i;
+- (void) setVoltageStep:(int)i withValue:(int)aValue;
+- (int) voltagestep:(int)i;
+- (void) setMaxVoltage:(int)i withValue:(int)aValue;
+- (int) maxVoltage:(int)i;
+- (void) setMinVoltage:(int)i withValue:(int)aValue;
+- (int) minVoltage:(int)i;
+- (void) setStepRampEnabled:(int)i withValue:(int)aValue;
+- (int) stepRampEnabled:(int)i;
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;

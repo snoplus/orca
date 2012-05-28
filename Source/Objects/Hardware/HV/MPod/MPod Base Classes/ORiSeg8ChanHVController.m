@@ -203,7 +203,7 @@
 {
 	if([aNote object] == hvTableView || !aNote){
 		int index = [hvTableView selectedRow];
-		NSParameterAssert(index >= 0 && index < 8);
+        if(index<0 || index>8)index=0;
 		[model setSelectedChannel:index];
 	}
 }

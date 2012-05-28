@@ -19,7 +19,9 @@
 
 @interface ORDetectorRamper : NSObject {
 	OrcaObject*	  delegate;
-	short channel;
+	short         channel;
+    
+    //user parameters
 	short stepWait;
 	float lowVoltageThreshold;
 	float voltageStep;
@@ -28,29 +30,44 @@
 	float maxVoltage;
 	float minVoltage;
 	BOOL  enabled;
+    
 	//ramp state variables
-	float  currentStep;
-	float nextVoltage;
-	BOOL  running;
-	int   state;
+	float   target;
+	BOOL    running;
+	int     state;
 	NSDate* lastWaitTime;
 }
 
 - (id) initWithDelegate:(OrcaObject*)aDelegate channel:(int)aChannel;
+- (void) startRamping;
+- (void) stopRamping;
+- (void) emergencyOff;
+- (void) setStepWait:(short)aValue;
+- (void) setLowVoltageWait:(short)aValue;
+- (void) setLowVoltageThreshold:(float)aValue;
+- (void) setLowVoltageStep:(float)aValue;
+- (void) setMaxVoltage:(float)aValue;
+- (void) setMinVoltage:(float)aValue;
+- (void) setVoltageStep:(float)aValue;
+- (void) setEnabled:(BOOL)aValue;
+- (NSString*) stateString;
+- (id)   initWithCoder:(NSCoder*)decoder;
+- (void) encodeWithCoder:(NSCoder*)encoder;
 
-@property (assign) OrcaObject* delegate;
-@property (assign) short channel;
-@property (assign) short stepWait;
-@property (assign) float lowVoltageThreshold;
-@property (assign) float voltageStep;
-@property (assign) short lowVoltageWait;
-@property (assign) float lowVoltageStep;
-@property (assign) float maxVoltage;
-@property (assign) float minVoltage;
-@property (assign) BOOL enabled;
-@property (assign) BOOL running;
-@property (assign) int state;
-@property (retain) NSDate* lastWaitTime;
+@property (nonatomic,assign) OrcaObject* delegate;
+@property (nonatomic,assign) short channel;
+@property (nonatomic,assign) short stepWait;
+@property (nonatomic,assign) float target;
+@property (nonatomic,assign) float lowVoltageThreshold;
+@property (nonatomic,assign) float voltageStep;
+@property (nonatomic,assign) short lowVoltageWait;
+@property (nonatomic,assign) float lowVoltageStep;
+@property (nonatomic,assign) float maxVoltage;
+@property (nonatomic,assign) float minVoltage;
+@property (nonatomic,assign) BOOL enabled;
+@property (nonatomic,assign) BOOL running;
+@property (nonatomic,assign) int state;
+@property (nonatomic,retain) NSDate* lastWaitTime;
 @end
 
 extern NSString* ORDetectorRamperStepWaitChanged;
@@ -69,5 +86,6 @@ extern NSString* ORDetectorRamperRunningChanged;
 - (float) hwGoal:(int)aChannel;
 - (void) setHwGoal:(int)aChannel withValue:(float)aValue;
 - (float) voltage:(int)aChannel;
+- (float) target:(int)aChannel;
 - (float) writeVoltage:(int)aChannel;
 @end

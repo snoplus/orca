@@ -114,6 +114,8 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 
 - (void) setSelectedChannel:(int)aSelectedChannel
 {
+    if(aSelectedChannel<0)aSelectedChannel=0;
+    else if(aSelectedChannel>8)aSelectedChannel=8;
     selectedChannel = aSelectedChannel;
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORiSeg8ChanHVSelectedChannelChanged object:self];
