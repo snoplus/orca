@@ -523,6 +523,7 @@
 		84183024156153D2004EC81F /* TM700.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8418301A156153D2004EC81F /* TM700.tif */; };
 		8418376C156FC7AF004EC81F /* ORDetectorRamper.h in Headers */ = {isa = PBXBuildFile; fileRef = 8418376A156FC7AF004EC81F /* ORDetectorRamper.h */; };
 		8418376D156FC7AF004EC81F /* ORDetectorRamper.m in Sources */ = {isa = PBXBuildFile; fileRef = 8418376B156FC7AF004EC81F /* ORDetectorRamper.m */; };
+		8418383A157504CA004EC81F /* EHS8260p.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84183839157504CA004EC81F /* EHS8260p.nib */; };
 		8419221F0F0BBE8000EF1C1C /* ORScriptIDEModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8419221D0F0BBE8000EF1C1C /* ORScriptIDEModel.h */; };
 		841922200F0BBE8000EF1C1C /* ORScriptIDEModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8419221E0F0BBE8000EF1C1C /* ORScriptIDEModel.m */; };
 		8419227E0F0BC18800EF1C1C /* ORScriptIDEController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8419227C0F0BC18800EF1C1C /* ORScriptIDEController.m */; };
@@ -1242,7 +1243,6 @@
 		8457BE3C11B0183500C4082D /* SIS3820Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8457BE3411B0183500C4082D /* SIS3820Card.gif */; };
 		8457C2DE11B59DEC00C4082D /* ORCaen785Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 8457C2DC11B59DEC00C4082D /* ORCaen785Decoders.h */; };
 		8457C2DF11B59DEC00C4082D /* ORCaen785Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 8457C2DD11B59DEC00C4082D /* ORCaen785Decoders.m */; };
-		8457D11E12F8816900D3E3B4 /* EHS8260p.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8457D11612F8816900D3E3B4 /* EHS8260p.nib */; };
 		8457D11F12F8816900D3E3B4 /* EHS8260p.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8457D11712F8816900D3E3B4 /* EHS8260p.tif */; };
 		8457D12012F8816900D3E3B4 /* OREHS8260pController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8457D11812F8816900D3E3B4 /* OREHS8260pController.h */; };
 		8457D12112F8816900D3E3B4 /* OREHS8260pController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8457D11912F8816900D3E3B4 /* OREHS8260pController.m */; };
@@ -3540,6 +3540,7 @@
 		8418301A156153D2004EC81F /* TM700.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = TM700.tif; path = Source/Objects/Hardware/Serial/TM700/TM700.tif; sourceTree = SOURCE_ROOT; };
 		8418376A156FC7AF004EC81F /* ORDetectorRamper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORDetectorRamper.h; sourceTree = "<group>"; };
 		8418376B156FC7AF004EC81F /* ORDetectorRamper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORDetectorRamper.m; sourceTree = "<group>"; };
+		84183839157504CA004EC81F /* EHS8260p.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = EHS8260p.nib; path = Source/Objects/Hardware/HV/MPod/EHS8260p/EHS8260p.nib; sourceTree = SOURCE_ROOT; };
 		8418DC4D0531EF7A005F64B1 /* ORPulserDistrib.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = ORPulserDistrib.gif; sourceTree = "<group>"; };
 		8418DC4E0531EF7A005F64B1 /* ORPulserDistribController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORPulserDistribController.h; sourceTree = "<group>"; };
 		8418DC4F0531EF7A005F64B1 /* ORPulserDistribController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORPulserDistribController.m; sourceTree = "<group>"; };
@@ -4027,7 +4028,6 @@
 		8457BE3411B0183500C4082D /* SIS3820Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = SIS3820Card.gif; path = Source/Objects/Hardware/Vme/SIS3820/SIS3820Card.gif; sourceTree = SOURCE_ROOT; };
 		8457C2DC11B59DEC00C4082D /* ORCaen785Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCaen785Decoders.h; path = Source/Objects/Hardware/Vme/CAEN/CV785/ORCaen785Decoders.h; sourceTree = SOURCE_ROOT; };
 		8457C2DD11B59DEC00C4082D /* ORCaen785Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen785Decoders.m; path = Source/Objects/Hardware/Vme/CAEN/CV785/ORCaen785Decoders.m; sourceTree = SOURCE_ROOT; };
-		8457D11612F8816900D3E3B4 /* EHS8260p.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = EHS8260p.nib; path = Source/Objects/Hardware/HV/MPod/EHS8260p/EHS8260p.nib; sourceTree = SOURCE_ROOT; };
 		8457D11712F8816900D3E3B4 /* EHS8260p.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = EHS8260p.tif; path = Source/Objects/Hardware/HV/MPod/EHS8260p/EHS8260p.tif; sourceTree = SOURCE_ROOT; };
 		8457D11812F8816900D3E3B4 /* OREHS8260pController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OREHS8260pController.h; path = Source/Objects/Hardware/HV/MPod/EHS8260p/OREHS8260pController.h; sourceTree = SOURCE_ROOT; };
 		8457D11912F8816900D3E3B4 /* OREHS8260pController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OREHS8260pController.m; path = Source/Objects/Hardware/HV/MPod/EHS8260p/OREHS8260pController.m; sourceTree = SOURCE_ROOT; };
@@ -8146,7 +8146,7 @@
 		8457D11512F8816900D3E3B4 /* EHS8260p */ = {
 			isa = PBXGroup;
 			children = (
-				8457D11612F8816900D3E3B4 /* EHS8260p.nib */,
+				84183839157504CA004EC81F /* EHS8260p.nib */,
 				8457D11712F8816900D3E3B4 /* EHS8260p.tif */,
 				8457D11812F8816900D3E3B4 /* OREHS8260pController.h */,
 				8457D11912F8816900D3E3B4 /* OREHS8260pController.m */,
@@ -14023,7 +14023,6 @@
 				842544EA12F1FF9F00472314 /* BamDetector.nib in Resources */,
 				842544EB12F1FF9F00472314 /* BamDetector.tif in Resources */,
 				842544F312F1FF9F00472314 /* edu.washington.npl.orca.BamDetector.plist in Resources */,
-				8457D11E12F8816900D3E3B4 /* EHS8260p.nib in Resources */,
 				8457D11F12F8816900D3E3B4 /* EHS8260p.tif in Resources */,
 				84258D8D12FDAA0E00A15D82 /* Heartbeat.tif in Resources */,
 				EFB39FCE130BA1C5001220AC /* SNOP.gif in Resources */,
@@ -14129,6 +14128,7 @@
 				84F3085115483A4000663573 /* Mks660B.tif in Resources */,
 				84183023156153D2004EC81F /* TM700.nib in Resources */,
 				84183024156153D2004EC81F /* TM700.tif in Resources */,
+				8418383A157504CA004EC81F /* EHS8260p.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
