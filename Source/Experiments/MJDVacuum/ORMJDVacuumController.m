@@ -110,7 +110,6 @@
 		[self performSelector:@selector(delayedRefresh) withObject:nil afterDelay:.5];
 	}
 }
-
 - (void) delayedRefresh
 {
 	updateScheduled = NO;
@@ -288,7 +287,12 @@
 				return [theDynamicLabel label];
 			}
 			else if([[aTableColumn identifier] isEqualToString:@"dialogIdentifier"]){
-				return [theDynamicLabel dialogIdentifier];
+				if([aTableView currentEditor]){
+					return [[aTableView currentEditor] string];
+				}
+				else {
+					return [theDynamicLabel dialogIdentifier];
+				}
 			}
 			else  if([[aTableColumn identifier] isEqualToString:@"value"]){
 				return [NSString stringWithFormat:@"%.2E",[theDynamicLabel value]];
