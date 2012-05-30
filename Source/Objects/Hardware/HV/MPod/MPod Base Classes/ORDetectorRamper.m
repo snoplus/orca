@@ -150,7 +150,6 @@ NSString* ORDetectorRamperRunningChanged				= @"ORDetectorRamperRunningChanged";
 	int v1 = [delegate hwGoal:channel];
 	int v2 = [delegate voltage:channel];
 	int diff = abs(v2 - v1);
-	NSLog(@"%d %d %d\n",v1,v2,diff);
 	return diff < kTolerance;
 }
 
@@ -319,7 +318,7 @@ NSString* ORDetectorRamperRunningChanged				= @"ORDetectorRamperRunningChanged";
             
         case kDetRamperStepWaitForVoltage:
 			if(lastVoltageWaitTime) {
-				if([[NSDate date] timeIntervalSinceDate:lastVoltageWaitTime] >= 10){
+				if([[NSDate date] timeIntervalSinceDate:lastVoltageWaitTime] >= 60){
 					NSLog(@"%@ channel %d not ramping.\n",[delegate fullID],channel);
 					self.state = kDetRamperNoChangeError;
 				}
