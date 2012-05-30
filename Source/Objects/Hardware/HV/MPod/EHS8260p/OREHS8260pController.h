@@ -25,6 +25,7 @@
 	IBOutlet   NSPopUpButton*	outputFailureBehaviorPU;
 	IBOutlet   NSPopUpButton*	currentTripBehaviorPU;
 	IBOutlet   NSTextField*		tripTimeTextField;
+	IBOutlet   NSTextField*		rampTypeField;
 	IBOutlet   NSTableView*		ramperTableView;
 	IBOutlet   NSDrawer*		ramperDrawer;
 }
@@ -38,6 +39,7 @@
 - (void) ramperEnabledChanged:(NSNotification*)aNote;
 - (void) ramperParameterChanged:(NSNotification*)aNote;
 - (void) ramperStateChanged:(NSNotification*)aNote;
+- (void) setRampTypeField;
 
 #pragma mark •••Actions
 - (IBAction) outputFailureBehaviorAction:(id)sender;

@@ -112,12 +112,25 @@
 {
 	[hvTableView reloadData];
 	[self outputStatusChanged:aNote];
+	[self setRampTypeField];
 }
 
 - (void) ramperStateChanged:(NSNotification*)aNote
 {
 	[hvTableView reloadData];
 	[self outputStatusChanged:aNote];
+}
+
+- (void) selectedChannelChanged:(NSNotification*)aNote
+{
+	[super selectedChannelChanged:aNote];
+	[self setRampTypeField];
+}
+
+- (void) setRampTypeField
+{
+	int chan = [model selectedChannel];
+	[rampTypeField setStringValue:[[model ramper:chan] enabled]?@"Staged Ramp":@""];
 }
 
 - (void) ramperParameterChanged:(NSNotification*)aNote
