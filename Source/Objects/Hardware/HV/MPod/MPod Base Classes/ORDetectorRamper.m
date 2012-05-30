@@ -312,13 +312,19 @@ NSString* ORDetectorRamperRunningChanged				= @"ORDetectorRamperRunningChanged";
 			else {
 				[delegate setHwGoal:channel withValue:[self nextVoltage]];
 				[delegate writeVoltage:channel];
+				if([delegate riseRate]>0){
+					int diff = abs([delegate hwGoal:channel] - [delegate voltage:channel]);
+					expectedTimeToReachVoltage = MIN(45,diff/[delegate riseRate]);
+				}
+				else expectedTimeToReachVoltage = 120;
+				
 				self.state = kDetRamperStepWaitForVoltage;	
 			}
         break;
             
         case kDetRamperStepWaitForVoltage:
 			if(lastVoltageWaitTime) {
-				if([[NSDate date] timeIntervalSinceDate:lastVoltageWaitTime] >= 60){
+				if([[NSDate date] timeIntervalSinceDate:lastVoltageWaitTime] >= expectedTimeToReachVoltage){
 					NSLog(@"%@ channel %d not ramping.\n",[delegate fullID],channel);
 					self.state = kDetRamperNoChangeError;
 				}
