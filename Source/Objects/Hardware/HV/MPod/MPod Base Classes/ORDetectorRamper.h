@@ -34,7 +34,7 @@
     ORAlarm* rampFailedAlarm;
 	
 	//ramp state variables
-	int		expectedTimeToReachVoltage.
+	int		expectedTimeToReachVoltage;
 	int		target;
 	BOOL    running;
 	int     state;
