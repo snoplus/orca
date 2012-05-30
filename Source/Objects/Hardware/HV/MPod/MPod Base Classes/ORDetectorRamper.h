@@ -93,5 +93,6 @@ extern NSString* ORDetectorRamperRunningChanged;
 - (void) setHwGoal:(int)aChannel withValue:(int)aValue;
 - (int) voltage:(int)aChannel;
 - (int) target:(short)aChannel;
+- (float) riseRate;
 - (void) writeVoltage:(int)aChannel;
 @end
