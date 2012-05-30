@@ -47,6 +47,7 @@
 - (NSString*) settingsLock;
 - (NSString*) name;
 - (NSString*) behaviourString:(int)channel;
+- (ORDetectorRamper*) ramper:(int)channel;
 
 #pragma mark •••Hardware Access
 - (void) writeTripTime:(int)channel;

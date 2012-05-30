@@ -18,6 +18,7 @@
 //-------------------------------------------------------------
 
 #import "ORDetectorRamper.h"
+#import "ORAlarm.h"
 
 NSString* ORDetectorRamperStepWaitChanged				= @"ORDetectorRamperStepWaitChanged";
 NSString* ORDetectorRamperLowVoltageWaitChanged			= @"ORDetectorRamperLowVoltageWaitChanged";
@@ -40,9 +41,9 @@ NSString* ORDetectorRamperRunningChanged				= @"ORDetectorRamperRunningChanged";
 
 @synthesize delegate, channel, stepWait, lowVoltageThreshold, enabled, state;
 @synthesize voltageStep, lowVoltageWait, lowVoltageStep, maxVoltage, minVoltage;
-@synthesize lastWaitTime, running, target;
+@synthesize lastStepWaitTime, running, target, lastVoltageWaitTime;
 
-#define kTolerance				1 //Volts
+#define kTolerance				2 //Volts
 
 #define kDetRamperIdle                  0
 #define kDetRamperStartRamp				1
@@ -51,6 +52,7 @@ NSString* ORDetectorRamperRunningChanged				= @"ORDetectorRamperRunningChanged";
 #define kDetRamperStepToNextVoltage		4
 #define kDetRamperStepWait              5
 #define kDetRamperDone                  6
+#define kDetRamperNoChangeError         7
 
 
 - (id) initWithDelegate:(OrcaObject*)aDelegate channel:(int)aChannel
@@ -68,7 +70,10 @@ NSString* ORDetectorRamperRunningChanged				= @"ORDetectorRamperRunningChanged";
 - (void) dealloc
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
-	self.lastWaitTime = nil;
+	self.lastStepWaitTime = nil;
+	self.lastVoltageWaitTime = nil;
+	[rampFailedAlarm clearAlarm];
+	[rampFailedAlarm release];
 	[super dealloc];
 }
 
@@ -81,59 +86,59 @@ NSString* ORDetectorRamperRunningChanged				= @"ORDetectorRamperRunningChanged";
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setStepWait:stepWait];
 	stepWait = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDetectorRamperStepWaitChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDetectorRamperStepWaitChanged object:delegate];
 }
 
 - (void) setLowVoltageWait:(short)aValue
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setLowVoltageWait:lowVoltageWait];
 	lowVoltageWait = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDetectorRamperLowVoltageWaitChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDetectorRamperLowVoltageWaitChanged object:delegate];
 }
 
-- (void) setLowVoltageThreshold:(float)aValue
+- (void) setLowVoltageThreshold:(int)aValue
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setLowVoltageThreshold:lowVoltageThreshold];
 	lowVoltageThreshold = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDetectorRamperLowVoltageThresholdChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDetectorRamperLowVoltageThresholdChanged object:delegate];
 }
 
-- (void) setLowVoltageStep:(float)aValue
+- (void) setLowVoltageStep:(int)aValue
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setLowVoltageStep:lowVoltageStep];
 	lowVoltageStep = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDetectorRamperLowVoltageStepChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDetectorRamperLowVoltageStepChanged object:delegate];
 }
 
-- (void) setMaxVoltage:(float)aValue
+- (void) setMaxVoltage:(int)aValue
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setMaxVoltage:maxVoltage];
 	maxVoltage = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDetectorRamperMaxVoltageChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDetectorRamperMaxVoltageChanged object:delegate];
 }
 
-- (void) setMinVoltage:(float)aValue
+- (void) setMinVoltage:(int)aValue
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setMinVoltage:minVoltage];
 	minVoltage = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDetectorRamperMinVoltageChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDetectorRamperMinVoltageChanged object:delegate];
 }
 
-- (void) setVoltageStep:(float)aValue
+- (void) setVoltageStep:(int)aValue
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setVoltageStep:voltageStep];
 	voltageStep = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDetectorRamperVoltageStepChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDetectorRamperVoltageStepChanged object:delegate];
 }
 
 - (void) setEnabled:(BOOL)aValue
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setEnabled:enabled];
 	enabled = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDetectorRamperEnabledChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDetectorRamperEnabledChanged object:delegate];
 }
 
-- (void) setTarget:(float)aTarget    
+- (void) setTarget:(int)aTarget    
 {
     if(aTarget > maxVoltage)      target = maxVoltage;
     else if(aTarget < minVoltage) target = minVoltage;
@@ -142,15 +147,19 @@ NSString* ORDetectorRamperRunningChanged				= @"ORDetectorRamperRunningChanged";
 
 - (BOOL) atIntermediateGoal
 {
-	return fabs([delegate voltage:channel] - [delegate hwGoal:channel]) < kTolerance;
+	int v1 = [delegate hwGoal:channel];
+	int v2 = [delegate voltage:channel];
+	int diff = abs(v2 - v1);
+	NSLog(@"%d %d %d\n",v1,v2,diff);
+	return diff < kTolerance;
 }
 
 - (BOOL) atTarget
 {
-	return fabs([delegate voltage:channel] - target) < kTolerance;
+	return abs([delegate voltage:channel] - target) < kTolerance;
 }
 
-- (float) stepSize
+- (int) stepSize
 {
     if([delegate voltage:channel]<lowVoltageThreshold)return lowVoltageStep;
     else return voltageStep;
@@ -162,19 +171,20 @@ NSString* ORDetectorRamperRunningChanged				= @"ORDetectorRamperRunningChanged";
     else return stepWait;    
 }
 
-- (float) nextVoltage
+- (int) nextVoltage
 {
-    if([delegate voltage:channel] < [delegate hwGoal:channel]){
-        return MIN(maxVoltage,MAX(target+[self stepSize],target));  
+	int currentVoltage = [delegate voltage:channel];
+    if(currentVoltage <= target){
+        return MIN(maxVoltage,MIN(currentVoltage+[self stepSize],target));  
     }
     else {
-       return MAX(minVoltage,MIN(target-[self stepSize],target));
+       return MAX(minVoltage,MAX(currentVoltage-[self stepSize],target));
     }
 }
 
 - (void) startRamping
 {
-	if([self atTarget]){
+	if(![self atTarget]){
 		if(!running) {
 			if([delegate isOn:channel]){
 				[NSObject cancelPreviousPerformRequestsWithTarget:self];
@@ -199,27 +209,45 @@ NSString* ORDetectorRamperRunningChanged				= @"ORDetectorRamperRunningChanged";
 		[self performSelector:@selector(execute) withObject:nil afterDelay:1.0];
 	}
     else NSLog(@"%@ channel %d not on. EmergencyOff not executed.\n",[delegate fullID],channel);
-
 }
 
 - (void) stopRamping
 {
 	self.state = kDetRamperDone;
-    [self execute];
+	self.running = NO;
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 }
 
 - (NSString*) stateString
 {
-    switch(state){
-        case kDetRamperIdle:                return @"Idle";
-        case kDetRamperStartRamp:           return @"Starting";
-        case kDetRamperEmergencyOff:        return @"EmergencyOff";
-        case kDetRamperStepWaitForVoltage:  return @"Waiting on Voltage";
-        case kDetRamperStepToNextVoltage:   return @"Stepping";
-        case kDetRamperStepWait:            return @"Waiting at Ste";
-        case kDetRamperDone:                return @"Done";    
-        default:                            return @"?";
-    }
+	if(!enabled)return @"--";
+	else switch(state){
+		case kDetRamperIdle:                return @"Idle";
+		case kDetRamperStartRamp:           return @"Starting";
+		case kDetRamperEmergencyOff:        return @"EmergencyOff";
+		case kDetRamperStepWaitForVoltage:  return @"Waiting on Voltage";
+		case kDetRamperStepToNextVoltage:   return @"Stepping";
+		case kDetRamperStepWait:            return @"Waiting at Step";
+		case kDetRamperDone:                return @"Done";    
+		case kDetRamperNoChangeError:       return @"Ramp Failed";    
+		default:                            return @"?";
+	}
+}
+
+- (NSString*) hwGoalString
+{
+	if(!enabled)return @"--";
+	else switch(state){
+		case kDetRamperIdle:                return @"Idle";
+		case kDetRamperStartRamp:           return @"Starting";
+		case kDetRamperEmergencyOff:        return @"EmergencyOff";
+		case kDetRamperStepWaitForVoltage:  return [NSString stringWithFormat:@"Waiting for %d",[delegate hwGoal:channel]];
+		case kDetRamperStepToNextVoltage:   return @"Stepping";
+		case kDetRamperStepWait:            return [NSString stringWithFormat:@"Waiting at %d",[delegate hwGoal:channel]];
+		case kDetRamperDone:                return @"At Target";    
+		case kDetRamperNoChangeError:       return @"Failed";    
+		default:                            return @"?";
+	}
 }
 
 - (id)initWithCoder:(NSCoder*)decoder
@@ -228,14 +256,15 @@ NSString* ORDetectorRamperRunningChanged				= @"ORDetectorRamperRunningChanged";
     
     [[self undoManager] disableUndoRegistration];
 			
-    //[self setStepWait:				[decoder decodeIntForKey:   @"stepWait"]];
-   // [self setLowVoltageWait:		[decoder decodeIntForKey:   @"lowVoltageWait"]];
-   // [self setLowVoltageThreshold:	[decoder decodeFloatForKey: @"lowVoltageThreshold"]];
-   // [self setLowVoltageStep:		[decoder decodeFloatForKey: @"lowVoltageStep"]];
-   // [self setMaxVoltage:			[decoder decodeFloatForKey: @"maxVoltage"]];
-   // [self setMinVoltage:			[decoder decodeFloatForKey: @"minVoltage"]];
-   // [self setVoltageStep:			[decoder decodeFloatForKey: @"voltageStep"]];
-   // [self setEnabled:				[decoder decodeBoolForKey: @"enabled"]];
+	[self setChannel:				[decoder decodeIntForKey: @"channel"]];
+	[self setStepWait:				[decoder decodeIntForKey: @"stepWait"]];
+    [self setLowVoltageWait:		[decoder decodeIntForKey: @"lowVoltageWait"]];
+    [self setLowVoltageThreshold:	[decoder decodeIntForKey: @"lowVoltageThreshold"]];
+    [self setLowVoltageStep:		[decoder decodeIntForKey: @"lowVoltageStep"]];
+    [self setMaxVoltage:			[decoder decodeIntForKey: @"maxVoltage"]];
+    [self setMinVoltage:			[decoder decodeIntForKey: @"minVoltage"]];
+    [self setVoltageStep:			[decoder decodeIntForKey: @"voltageStep"]];
+    [self setEnabled:				[decoder decodeBoolForKey:@"enabled"]];
 	
  	[[self undoManager] enableUndoRegistration];
     
@@ -244,14 +273,15 @@ NSString* ORDetectorRamperRunningChanged				= @"ORDetectorRamperRunningChanged";
 
 - (void)encodeWithCoder:(NSCoder*)encoder
 {	
-	[encoder encodeInt:stepWait                 forKey:@"stepWait"];
-	[encoder encodeInt:lowVoltageWait			forKey:@"lowVoltageWait"];
-	[encoder encodeFloat:lowVoltageThreshold	forKey:@"lowVoltageThreshold"];
-	[encoder encodeFloat:lowVoltageStep			forKey:@"lowVoltageStep"];
-	[encoder encodeFloat:maxVoltage				forKey:@"maxVoltage"];
-	[encoder encodeFloat:minVoltage				forKey:@"minVoltage"];
-	[encoder encodeFloat:voltageStep			forKey:@"voltageStep"];
-	[encoder encodeBool:enabled					forKey:@"enabled"];
+	[encoder encodeInt:channel              forKey:@"channel"];
+	[encoder encodeInt:stepWait             forKey:@"stepWait"];
+	[encoder encodeInt:lowVoltageWait		forKey:@"lowVoltageWait"];
+	[encoder encodeInt:lowVoltageThreshold	forKey:@"lowVoltageThreshold"];
+	[encoder encodeInt:lowVoltageStep		forKey:@"lowVoltageStep"];
+	[encoder encodeInt:maxVoltage			forKey:@"maxVoltage"];
+	[encoder encodeInt:minVoltage			forKey:@"minVoltage"];
+	[encoder encodeInt:voltageStep			forKey:@"voltageStep"];
+	[encoder encodeBool:enabled				forKey:@"enabled"];
 }
 @end
 
@@ -259,8 +289,12 @@ NSString* ORDetectorRamperRunningChanged				= @"ORDetectorRamperRunningChanged";
 
 - (void) execute
 {
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	
 	if(!enabled)                 return;	//must be enabled
 	if(![delegate isOn:channel]) return;	//channel must be on
+	
+	[self performSelector:@selector(execute) withObject:nil afterDelay:1.0];
 			
 	switch (state) {
 			
@@ -275,46 +309,80 @@ NSString* ORDetectorRamperRunningChanged				= @"ORDetectorRamperRunningChanged";
 		break;
 												
 		case kDetRamperStepToNextVoltage:
-			[delegate setHwGoal:channel withValue:[self nextVoltage]];
-			[delegate writeVoltage:channel];
-			self.state = kDetRamperStepWaitForVoltage;	
+            if([self atTarget])                self.state = kDetRamperDone;
+			else {
+				[delegate setHwGoal:channel withValue:[self nextVoltage]];
+				[delegate writeVoltage:channel];
+				self.state = kDetRamperStepWaitForVoltage;	
+			}
         break;
             
         case kDetRamperStepWaitForVoltage:
-            if([self atTarget])                self.state = kDetRamperDone;
-			else if([self atIntermediateGoal]) self.state = kDetRamperStepWait;	
+			if(lastVoltageWaitTime) {
+				if([[NSDate date] timeIntervalSinceDate:lastVoltageWaitTime] >= 10){
+					NSLog(@"%@ channel %d not ramping.\n",[delegate fullID],channel);
+					self.state = kDetRamperNoChangeError;
+				}
+				else {
+					if([self atTarget])                self.state = kDetRamperDone;
+					else if([self atIntermediateGoal]) self.state = kDetRamperStepWait;
+				}
+			}
+			else {
+				self.lastVoltageWaitTime = [NSDate date];
+                [self execute];
+			}
         break;
 
         case kDetRamperStepWait:
-			if(lastWaitTime) {
-				if([[NSDate date] timeIntervalSinceDate:lastWaitTime] >= [self timeToWait]){
-					self.lastWaitTime = nil;
-					self.state	      = kDetRamperStepToNextVoltage;
+			if(lastStepWaitTime) {
+				if([[NSDate date] timeIntervalSinceDate:lastStepWaitTime] >= [self timeToWait]){
+					self.lastStepWaitTime = nil;
+					self.state	          = kDetRamperStepToNextVoltage;
 				}
 			}
             else {
-                self.lastWaitTime = [NSDate date];
+                self.lastStepWaitTime = [NSDate date];
                 [self execute];
             }
         break;
             
 		case kDetRamperDone:
 			self.running = NO;
-            self.lastWaitTime = nil;
 			[NSObject cancelPreviousPerformRequestsWithTarget:self];
         break;
+			
+		case kDetRamperNoChangeError:
+			self.running = NO;
+			
+			if(!rampFailedAlarm){
+				NSString* s = [NSString stringWithFormat:@"%@,%d Ramp Failed",[delegate fullID],channel];
+				rampFailedAlarm = [[ORAlarm alloc] initWithName:s severity:3];
+				[rampFailedAlarm setSticky:NO];
+				[rampFailedAlarm setHelpString:@"There was no change in the HV voltage during ramping. The ramping process was flagged as failed. Check the channel manually. Acknowledge the alarm to clear it."];
+			}                      
+			[rampFailedAlarm setAcknowledged:NO];
+			[rampFailedAlarm postAlarm];
+			
+			[NSObject cancelPreviousPerformRequestsWithTarget:self];
+		break;
 	}
 }
 
 - (void) setRunning:(BOOL)aValue
 {
 	running = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDetectorRamperRunningChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDetectorRamperRunningChanged object:delegate];
 }
 
 - (void) setState:(int)aValue
 {
 	state = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDetectorRamperStateChanged object:self];
+	
+	//reset timers as needed.
+	if(state == kDetRamperStepWait)					self.lastStepWaitTime = nil;
+	else if(state == kDetRamperStepWaitForVoltage)	self.lastVoltageWaitTime = nil;
+	
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDetectorRamperStateChanged object:delegate];
 }
 @end

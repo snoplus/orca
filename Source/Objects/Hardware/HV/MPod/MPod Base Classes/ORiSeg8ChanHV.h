@@ -98,6 +98,7 @@ enum {
 - (void)	setRiseRate:(float)aValue;
 - (int)		hwGoal:(short)chan;	
 - (void)	setHwGoal:(short)chan withValue:(int)aValue;
+- (NSString*) hwGoalString:(short)chan;
 - (int)		target:(short)chan;	
 - (void)	setTarget:(short)chan withValue:(int)aValue;
 - (void)	syncDialog;

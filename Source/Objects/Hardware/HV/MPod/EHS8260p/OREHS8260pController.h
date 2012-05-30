@@ -22,9 +22,11 @@
 
 @interface OREHS8260pController : ORiSeg8ChanHVController 
 {
-	IBOutlet   NSPopUpButton* outputFailureBehaviorPU;
-	IBOutlet   NSPopUpButton* currentTripBehaviorPU;
-	IBOutlet   NSTextField* tripTimeTextField;
+	IBOutlet   NSPopUpButton*	outputFailureBehaviorPU;
+	IBOutlet   NSPopUpButton*	currentTripBehaviorPU;
+	IBOutlet   NSTextField*		tripTimeTextField;
+	IBOutlet   NSTableView*		ramperTableView;
+	IBOutlet   NSDrawer*		ramperDrawer;
 }
 
 - (id)   init;
@@ -33,6 +35,9 @@
 - (void) outputFailureBehaviorChanged:(NSNotification*)aNote;
 - (void) currentTripBehaviorChanged:(NSNotification*)aNote;
 - (void) tripTimeChanged:(NSNotification*)aNote;
+- (void) ramperEnabledChanged:(NSNotification*)aNote;
+- (void) ramperParameterChanged:(NSNotification*)aNote;
+- (void) ramperStateChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) outputFailureBehaviorAction:(id)sender;
@@ -41,5 +46,6 @@
 
 #pragma mark •••Data Source
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex;
+- (void)tableView:(NSTableView *)aTableView willDisplayCell:(id)aCell forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex;
 
 @end

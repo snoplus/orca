@@ -550,19 +550,20 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 { 
 	int outputSwitch = [self channel:channel readParamAsInt:@"outputSwitch"];
 	int outputStatus = [self channel:channel readParamAsInt:@"outputStatus"];
+	
 	if(outputSwitch == kiSeg8ChanHVOutputSetEmergencyOff)	return @"PANICKED";
 	else {
 		if(outputStatus & kiSeg8ChanHVProblemMask)			return @"PROBLEM";
-		else if(outputStatus & outputRampUpMask)		return @"RAMP UP";
-		else if(outputStatus & outputRampDownMask)		return @"RAMP DN";
+		else if(outputStatus & outputRampUpMask)			return @"RAMP UP";
+		else if(outputStatus & outputRampDownMask)			return @"RAMP DN";
 		else {
 			switch(outputSwitch){
-				case kiSeg8ChanHVOutputOff:				return @"OFF";
+				case kiSeg8ChanHVOutputOff:					return @"OFF";
 				case kiSeg8ChanHVOutputOn:					return @"ON";
-				case kiSeg8ChanHVOutputResetEmergencyOff:  return @"PANIC CLR";
-				case kiSeg8ChanHVOutputSetEmergencyOff:	return @"PANICKED";
-				case kiSeg8ChanHVOutputClearEvents:		return @"EVENT CLR";
-				default: return @"?";
+				case kiSeg8ChanHVOutputResetEmergencyOff:	return @"PANIC CLR";
+				case kiSeg8ChanHVOutputSetEmergencyOff:		return @"PANICKED";
+				case kiSeg8ChanHVOutputClearEvents:			return @"EVENT CLR";
+				default:									return @"?";
 			}
 		}
 	}
@@ -616,6 +617,15 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORiSeg8ChanHVHwGoalChanged object:self];
 	}
 }
+
+- (NSString*) hwGoalString:(short)chan
+{
+	if([self channelInBounds:chan]){
+		return [NSString stringWithFormat:@"Goal: %d",hwGoal[chan]];
+	}
+	else return @"";
+}
+
 - (float) maxCurrent:(short)chan 
 { 
 	if([self channelInBounds:chan])return maxCurrent[chan]; 
@@ -655,8 +665,8 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 {
 	[self commitTargetsToHwGoals];
 	[self writeRiseTime];
-	[self writeVoltages];
 	[self writeMaxCurrents];
+	[self writeVoltages];
 }
 
 - (void) writeVoltages

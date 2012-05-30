@@ -441,7 +441,7 @@
 	if(state & outputOnMask){
 		
 		int selectedChannel = [model selectedChannel];
-		[hwGoalField setStringValue:[NSString stringWithFormat:@"Goal: %d",[model hwGoal:selectedChannel]]];
+		[hwGoalField setStringValue:[model hwGoalString:selectedChannel]];
 
 		if(state & outputRampUpMask)		[hvStatusImage setImage:[NSImage imageNamed:@"upRamp"]];
 		else if(state & outputRampDownMask)	[hvStatusImage setImage:[NSImage imageNamed:@"downRamp"]];
