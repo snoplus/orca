@@ -129,6 +129,28 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 	NSArray* cmds = [self addChannelNumbersToParams:channelReadParams];
 	return cmds;
 }
+- (void) updateAllValues
+{
+	[super updateAllValues];
+
+	int i;
+	for(i=0;i<8;i++){
+		if([ramper[i] enabled]){
+			[[self adapter] callBackToTarget:self selector:@selector(checkRamperCallBack:) userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:i] forKey:@"Channel"]];
+		}
+	}
+	
+	if(shipRecords) [self shipDataRecords];
+}
+
+- (void) checkRamperCallBack:(id)userInfo
+{
+	int aChannel = [[userInfo objectForKey:@"Channel"] intValue];
+	if([self channelInBounds:aChannel]){
+		[ramper[aChannel] execute];
+	}
+}
+
 
 - (NSArray*) commonChannelUpdateList
 {

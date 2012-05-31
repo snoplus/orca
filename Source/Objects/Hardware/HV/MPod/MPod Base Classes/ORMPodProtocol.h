@@ -22,5 +22,6 @@
 
 - (void) getValues:(NSArray*)cmds target:(id)aTarget selector:(SEL)aSelector;
 - (void) writeValue:(NSString*)aCmd target:(id)aTarget selector:(SEL)aSelector;
+- (void) callBackToTarget:(id)aTarget selector:(SEL)aSelector userInfo:(id)userInfo;
 
 @end

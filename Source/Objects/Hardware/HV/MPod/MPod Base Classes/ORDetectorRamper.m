@@ -33,7 +33,6 @@ NSString* ORDetectorRamperRunningChanged				= @"ORDetectorRamperRunningChanged";
 
 @interface ORDetectorRamper (private)
 - (void) setRunning:(BOOL)aValue;
-- (void) execute;
 - (void) setState:(int)aValue;
 @end
 
@@ -69,7 +68,6 @@ NSString* ORDetectorRamperRunningChanged				= @"ORDetectorRamperRunningChanged";
 
 - (void) dealloc
 {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self];
 	self.lastStepWaitTime = nil;
 	self.lastVoltageWaitTime = nil;
 	[rampFailedAlarm clearAlarm];
@@ -147,10 +145,7 @@ NSString* ORDetectorRamperRunningChanged				= @"ORDetectorRamperRunningChanged";
 
 - (BOOL) atIntermediateGoal
 {
-	int v1 = [delegate hwGoal:channel];
-	int v2 = [delegate voltage:channel];
-	int diff = abs(v2 - v1);
-	return diff < kTolerance;
+	return abs([delegate voltage:channel] - [delegate hwGoal:channel]) < kTolerance;
 }
 
 - (BOOL) atTarget
@@ -183,38 +178,33 @@ NSString* ORDetectorRamperRunningChanged				= @"ORDetectorRamperRunningChanged";
 
 - (void) startRamping
 {
-	if(![self atTarget]){
-		if(!running) {
-			if([delegate isOn:channel]){
-				[NSObject cancelPreviousPerformRequestsWithTarget:self];
-				self.running = YES;
-				self.state = kDetRamperStartRamp;
-				[self performSelector:@selector(execute) withObject:nil afterDelay:1.0];
-			}
-			else NSLog(@"%@ channel %d not on. HV ramp not started.\n",[delegate fullID],channel);
-		}
-		else NSLog(@"%@ HV already ramping.\n",[delegate fullID]);
+	if([delegate isOn:channel]){
+		self.running = YES;
+		self.state = kDetRamperStartRamp;
 	}
-	else NSLog(@"%@ HV already at %.2f.\n",[delegate fullID],[delegate voltage:channel]);
+	else {
+		NSLog(@"%@ channel %d not on. HV ramp not started.\n",[delegate fullID],channel);
+		self.running = NO;
+	}
 
 }
 
 - (void) emergencyOff
 {
 	if([delegate isOn:channel]){
-		[NSObject cancelPreviousPerformRequestsWithTarget:self];
 		self.running = YES;
 		self.state = kDetRamperEmergencyOff;
-		[self performSelector:@selector(execute) withObject:nil afterDelay:1.0];
 	}
-    else NSLog(@"%@ channel %d not on. EmergencyOff not executed.\n",[delegate fullID],channel);
+    else {
+		self.running = NO;
+		NSLog(@"%@ channel %d not on. EmergencyOff not executed.\n",[delegate fullID],channel);
+	}
 }
 
 - (void) stopRamping
 {
 	self.state = kDetRamperDone;
 	self.running = NO;
-	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 }
 
 - (NSString*) stateString
@@ -282,31 +272,25 @@ NSString* ORDetectorRamperRunningChanged				= @"ORDetectorRamperRunningChanged";
 	[encoder encodeInt:voltageStep			forKey:@"voltageStep"];
 	[encoder encodeBool:enabled				forKey:@"enabled"];
 }
-@end
-
-@implementation ORDetectorRamper (private)
 
 - (void) execute
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	
 	if(!enabled)                 return;	//must be enabled
 	if(![delegate isOn:channel]) return;	//channel must be on
-	
-	[self performSelector:@selector(execute) withObject:nil afterDelay:1.0];
-			
+		
 	switch (state) {
 			
 		case kDetRamperStartRamp:
             self.target = [delegate target:channel];
             self.state  = kDetRamperStepToNextVoltage;
-        break;
+			break;
 			
 		case kDetRamperEmergencyOff:
             self.target = 0;
             self.state  = kDetRamperStepToNextVoltage;			
-		break;
-												
+			break;
+			
 		case kDetRamperStepToNextVoltage:
             if([self atTarget])                self.state = kDetRamperDone;
 			else {
@@ -320,7 +304,7 @@ NSString* ORDetectorRamperRunningChanged				= @"ORDetectorRamperRunningChanged";
 				
 				self.state = kDetRamperStepWaitForVoltage;	
 			}
-        break;
+			break;
             
         case kDetRamperStepWaitForVoltage:
 			if(lastVoltageWaitTime) {
@@ -337,12 +321,11 @@ NSString* ORDetectorRamperRunningChanged				= @"ORDetectorRamperRunningChanged";
 				self.lastVoltageWaitTime = [NSDate date];
                 [self execute];
 			}
-        break;
-
+			break;
+			
         case kDetRamperStepWait:
 			if(lastStepWaitTime) {
 				if([[NSDate date] timeIntervalSinceDate:lastStepWaitTime] >= [self timeToWait]){
-					self.lastStepWaitTime = nil;
 					self.state	          = kDetRamperStepToNextVoltage;
 				}
 			}
@@ -350,12 +333,11 @@ NSString* ORDetectorRamperRunningChanged				= @"ORDetectorRamperRunningChanged";
                 self.lastStepWaitTime = [NSDate date];
                 [self execute];
             }
-        break;
+			break;
             
 		case kDetRamperDone:
 			self.running = NO;
-			[NSObject cancelPreviousPerformRequestsWithTarget:self];
-        break;
+			break;
 			
 		case kDetRamperNoChangeError:
 			self.running = NO;
@@ -369,10 +351,14 @@ NSString* ORDetectorRamperRunningChanged				= @"ORDetectorRamperRunningChanged";
 			[rampFailedAlarm setAcknowledged:NO];
 			[rampFailedAlarm postAlarm];
 			
-			[NSObject cancelPreviousPerformRequestsWithTarget:self];
-		break;
+			break;
 	}
 }
+
+@end
+
+@implementation ORDetectorRamper (private)
+
 
 - (void) setRunning:(BOOL)aValue
 {

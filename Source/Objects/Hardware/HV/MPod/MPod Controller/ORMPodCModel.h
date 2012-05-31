@@ -63,6 +63,7 @@
 - (void) writeValues:(NSArray*)cmds target:(id)aTarget selector:(SEL)aSelector;
 - (void) pollHardware;
 - (void) pollHardwareAfterDelay;
+- (void) callBackToTarget:(id)aTarget selector:(SEL)aSelector userInfo:(id)userInfo;
 
 #pragma mark ¥¥¥Archival
 - (id)   initWithCoder:(NSCoder*)decoder;

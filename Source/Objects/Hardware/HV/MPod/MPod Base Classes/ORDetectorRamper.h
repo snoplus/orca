@@ -58,6 +58,7 @@
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 - (NSString*) hwGoalString;
+- (void) execute;
 
 @property (nonatomic,assign) OrcaObject* delegate;
 @property (nonatomic,assign) short channel;

@@ -304,6 +304,19 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 	}
 }
 
+- (void) callBackToTarget:(id)aTarget selector:(SEL)aSelector userInfo:(id)userInfo
+{
+	//just a fancy way to sync something back in the target with activities in the queue
+	ORSNMPCallBackOperation* anOP = [[ORSNMPCallBackOperation alloc] initWithDelegate:self];
+	anOP.target		= aTarget;
+	anOP.userInfo	= userInfo;
+	anOP.selector	= aSelector;
+	anOP.verbose	= verbose;
+	[ORSNMPQueue addOperation:anOP];
+	[anOP release];
+	
+}
+
 #pragma mark ¥¥¥Tasks
 - (void) taskFinished:(NSTask*)aTask
 {
