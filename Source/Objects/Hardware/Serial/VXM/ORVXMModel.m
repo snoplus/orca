@@ -818,7 +818,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 			ORVXMMotor* aMotor = [motors objectAtIndex:motorIndex];
 			float aValue = [aCmd floatValue];
 			[aMotor setMotorPosition:aValue];
-			if([aMotor hasMoved])[self shipMotorState:motorIndex];
+			if([aMotor hasMoved] && shipRecords)[self shipMotorState:motorIndex];
 			motorQueryMask &= ~(0x1<<motorIndex);
 			[self performSelector:@selector(queryPosition) 
 					   withObject:nil 
