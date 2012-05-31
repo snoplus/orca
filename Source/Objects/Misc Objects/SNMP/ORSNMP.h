@@ -91,4 +91,12 @@
 - (void) main;
 @end
 
+@interface ORSNMPCallBackOperation : ORSNMPOperation
+{
+	id			userInfo;
+}
+- (void) main;
+@property (nonatomic,retain)	id			userInfo;
+@end
+
 

@@ -436,3 +436,20 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SNMPQueue);
 }
 @end
 
+//-----------------------------------------------------------
+// An SNMP Callback OP
+//-----------------------------------------------------------
+@implementation ORSNMPCallBackOperation
+
+@synthesize userInfo;
+
+- (void) main
+{	
+	if([self isCancelled]) return;
+	if(verbose)NSLog(@"CallBack to %@: %@ with %@\n",[target className], NSStringFromSelector(selector),userInfo);
+	[target performSelectorOnMainThread:selector withObject:userInfo waitUntilDone:YES];
+	[ORTimer delay:.1];
+}
+@end
+
+
