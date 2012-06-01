@@ -64,6 +64,8 @@
 	IBOutlet ORCompositeTimeLineView*   currentPlotter;
 	IBOutlet ORCompositeTimeLineView*   voltagePlotter;
 	IBOutlet ORTimedTextField*    timeoutField;
+	
+	BOOL scheduledForUpdate;
 }
 
 - (void) registerNotificationObservers;
@@ -84,6 +86,7 @@
 - (void) powerRestored:(NSNotification*)aNote;
 - (void) updateHistoryPlots:(NSNotification*)aNote;
 - (void) outputStatusChanged:(NSNotification*)aNote;
+- (void) deferedReadParamsUpdate:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) shipRecordsAction:(id)sender;

@@ -37,6 +37,11 @@
 @end
 
 @implementation ORiSeg8ChanHVController
+- (void) dealloc
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	[super dealloc];
+}
 
 - (void) awakeFromNib
 {	
@@ -226,6 +231,16 @@
 
 - (void) channelReadParamsChanged:(NSNotification*)aNote
 {
+	if(!scheduledForUpdate){
+		scheduledForUpdate = YES;
+		[NSObject cancelPreviousPerformRequestsWithTarget:self];
+		[self performSelector:@selector(deferedReadParamsUpdate:) withObject:aNote afterDelay:1];
+	}
+}
+- (void) deferedReadParamsUpdate:(NSNotification*)aNote
+{
+	scheduledForUpdate = NO;
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[hvTableView reloadData];
 	[self updateButtons];
 	int selectedChannel = [model selectedChannel];
