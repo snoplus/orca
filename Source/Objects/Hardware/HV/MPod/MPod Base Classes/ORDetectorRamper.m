@@ -54,7 +54,7 @@ NSString* ORDetectorRamperRunningChanged				= @"ORDetectorRamperRunningChanged";
 #define kDetRamperNoChangeError         7
 
 
-- (id) initWithDelegate:(OrcaObject*)aDelegate channel:(int)aChannel
+- (id) initWithDelegate:(id)aDelegate channel:(int)aChannel
 {
 	self = [super init];
 	if([aDelegate respondsToSelector:@selector(hwGoal:)]  &&

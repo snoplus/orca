@@ -19,18 +19,18 @@
 @class ORAlarm;
 
 @interface ORDetectorRamper : NSObject {
-	OrcaObject*	  delegate;
-	short         channel;
+	id			delegate;
+	short       channel;
     
     //user parameters
-	short stepWait;
-	short lowVoltageWait;
-	int lowVoltageThreshold;
-	int voltageStep;
-	int lowVoltageStep;
-	int maxVoltage;
-	int minVoltage;
-	BOOL  enabled;
+	short	stepWait;
+	short	lowVoltageWait;
+	int		lowVoltageThreshold;
+	int		voltageStep;
+	int		lowVoltageStep;
+	int		maxVoltage;
+	int		minVoltage;
+	BOOL	enabled;
     ORAlarm* rampFailedAlarm;
 	
 	//ramp state variables
@@ -42,7 +42,7 @@
 	NSDate* lastVoltageWaitTime;
 }
 
-- (id) initWithDelegate:(OrcaObject*)aDelegate channel:(int)aChannel;
+- (id) initWithDelegate:(id)aDelegate channel:(int)aChannel;
 - (void) startRamping;
 - (void) stopRamping;
 - (void) emergencyOff;
@@ -60,7 +60,7 @@
 - (NSString*) hwGoalString;
 - (void) execute;
 
-@property (nonatomic,assign) OrcaObject* delegate;
+@property (nonatomic,assign) id delegate;
 @property (nonatomic,assign) short channel;
 @property (nonatomic,assign) short stepWait;
 @property (nonatomic,assign) int target;
@@ -89,11 +89,11 @@ extern NSString* ORDetectorRamperStateChanged;
 extern NSString* ORDetectorRamperRunningChanged;
 
 @interface NSObject (ORDetectorRamper)
-- (BOOL) isOn:(int)aChannel;
-- (int) hwGoal:(int)aChannel;
-- (void) setHwGoal:(int)aChannel withValue:(int)aValue;
-- (int) voltage:(int)aChannel;
+- (BOOL) isOn:(short)aChannel;
+- (short) hwGoal:(short)aChannel;
+- (void) setHwGoal:(short)aChannel withValue:(int)aValue;
+- (int) voltage:(short)aChannel;
 - (int) target:(short)aChannel;
 - (float) riseRate;
-- (void) writeVoltage:(int)aChannel;
+- (void) writeVoltage:(short)aChannel;
 @end
