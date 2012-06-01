@@ -131,6 +131,7 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 }
 - (void) updateAllValues
 {
+	[super updateAllValues];
 	int i;
 	for(i=0;i<8;i++){
 		if([ramper[i] enabled]){
