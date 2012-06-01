@@ -446,7 +446,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SNMPQueue);
 - (void) main
 {	
 	if([self isCancelled]) return;
-	if(verbose)NSLog(@"CallBack to %@: %@ with %@\n",[target className], NSStringFromSelector(selector,userInfo);
+	if(verbose)NSLog(@"CallBack to %@: %@ with %@\n",[target className], NSStringFromSelector(selector),userInfo);
 	[target performSelectorOnMainThread:selector withObject:userInfo waitUntilDone:YES];
 	[ORTimer delay:.1];
 }
