@@ -131,8 +131,6 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 }
 - (void) updateAllValues
 {
-	[super updateAllValues];
-
 	int i;
 	for(i=0;i<8;i++){
 		if([ramper[i] enabled]){
@@ -372,6 +370,10 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 		[encoder encodeInt:outputFailureBehavior[i]		forKey: [@"outputFailureBehavior" stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:currentTripBehavior[i]		forKey: [@"currentTripBehavior" stringByAppendingFormat:@"%d",i]];
         [encoder encodeObject:ramper[i]					forKey: [@"ramper%d" stringByAppendingFormat:@"%d",i]];
+		
+		NSMutableDictionary* aValue = [[NSMutableDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithFloat:123.1],@"Value",nil];
+		rdParams[i] = [[NSMutableDictionary alloc] initWithObjectsAndKeys:aValue,@"outputMeasurementSenseVoltage",nil];
+		
 	}
 }
 

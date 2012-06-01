@@ -57,11 +57,7 @@ NSString* ORDetectorRamperRunningChanged				= @"ORDetectorRamperRunningChanged";
 - (id) initWithDelegate:(id)aDelegate channel:(int)aChannel
 {
 	self = [super init];
-	if([aDelegate respondsToSelector:@selector(hwGoal:)]  &&
-	   [aDelegate respondsToSelector:@selector(voltage:)] &&
-	   [aDelegate respondsToSelector:@selector(isOn:)]){
-			self.delegate = aDelegate;
-	}
+	self.delegate = aDelegate;
 	self.channel = aChannel;
 	return self;
 }
@@ -73,6 +69,20 @@ NSString* ORDetectorRamperRunningChanged				= @"ORDetectorRamperRunningChanged";
 	[rampFailedAlarm clearAlarm];
 	[rampFailedAlarm release];
 	[super dealloc];
+}
+
+- (void) setDelegate:(id)aDelegate
+{
+	if([aDelegate respondsToSelector:@selector(hwGoal:)]  &&
+	   [aDelegate respondsToSelector:@selector(voltage:)] &&
+	   [aDelegate respondsToSelector:@selector(target:)] &&
+	   [aDelegate respondsToSelector:@selector(riseRate)] &&
+	   [aDelegate respondsToSelector:@selector(writeVoltage:)] &&
+	   [aDelegate respondsToSelector:@selector(setHwGoal:withValue:)] &&
+	   [aDelegate respondsToSelector:@selector(isOn:)]){
+		delegate = aDelegate;
+	}
+	else delegate = nil;
 }
 
 - (NSUndoManager*) undoManager
@@ -150,6 +160,7 @@ NSString* ORDetectorRamperRunningChanged				= @"ORDetectorRamperRunningChanged";
 
 - (BOOL) atTarget
 {
+	NSLog(@"voltage: %f\n",[delegate voltage:channel]);
 	return abs([delegate voltage:channel] - [delegate target:channel]) < kTolerance;
 }
 
@@ -298,7 +309,7 @@ NSString* ORDetectorRamperRunningChanged				= @"ORDetectorRamperRunningChanged";
 				[delegate writeVoltage:channel];
 				if([delegate riseRate]>0){
 					int diff = abs([delegate hwGoal:channel] - [delegate voltage:channel]);
-					expectedTimeToReachVoltage = MIN(45,diff/[delegate riseRate]);
+					expectedTimeToReachVoltage = MIN(45,5*diff/[delegate riseRate]);
 				}
 				else expectedTimeToReachVoltage = 120;
 				
