@@ -332,7 +332,8 @@
 		else {
 			//channel is on
 			[powerOnButton setEnabled:NO];
-			[powerOffButton setEnabled:YES];
+			if([model voltage:selectedChannel]<10 && ![model channelIsRamping:selectedChannel]) [powerOffButton setEnabled:YES];
+			else [powerOffButton setEnabled:NO];
 			[panicButton setEnabled:YES];
 			[loadButton setEnabled:YES];
 			[stopRampButton setEnabled:[model channelIsRamping:selectedChannel]];

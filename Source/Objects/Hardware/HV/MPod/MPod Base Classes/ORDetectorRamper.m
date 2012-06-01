@@ -44,6 +44,7 @@ NSString* ORDetectorRamperRunningChanged				= @"ORDetectorRamperRunningChanged";
 @synthesize lastStepWaitTime, running, target, lastVoltageWaitTime;
 
 #define kTolerance				2 //Volts
+#define kCheckTime				20
 
 #define kDetRamperIdle                  0
 #define kDetRamperStartRamp				1
@@ -161,7 +162,6 @@ NSString* ORDetectorRamperRunningChanged				= @"ORDetectorRamperRunningChanged";
 
 - (BOOL) atTarget
 {
-	NSLog(@"voltage: %f\n",[delegate voltage:channel]);
 	return abs([delegate voltage:channel] - [delegate target:channel]) < kTolerance;
 }
 
@@ -308,21 +308,20 @@ NSString* ORDetectorRamperRunningChanged				= @"ORDetectorRamperRunningChanged";
 			else {
 				[delegate setHwGoal:channel withValue:[self nextVoltage]];
 				[delegate writeVoltage:channel];
-				if([delegate riseRate]>0){
-					int diff = abs([delegate hwGoal:channel] - [delegate voltage:channel]);
-					expectedTimeToReachVoltage = MIN(45,5*diff/[delegate riseRate]);
-				}
-				else expectedTimeToReachVoltage = 120;
-				
+				lastVoltage = [delegate voltage:channel];
 				self.state = kDetRamperStepWaitForVoltage;	
 			}
 			break;
             
         case kDetRamperStepWaitForVoltage:
 			if(lastVoltageWaitTime) {
-				if([[NSDate date] timeIntervalSinceDate:lastVoltageWaitTime] >= expectedTimeToReachVoltage){
-					NSLog(@"%@ channel %d not ramping.\n",[delegate fullID],channel);
-					self.state = kDetRamperNoChangeError;
+				if([[NSDate date] timeIntervalSinceDate:lastVoltageWaitTime] >= kCheckTime){
+					float voltage = [delegate voltage:channel];
+					if(fabs(voltage-lastVoltage)<kTolerance){
+						NSLog(@"%@ channel %d not ramping.\n",[delegate fullID],channel);
+						self.state = kDetRamperNoChangeError;
+					}
+					lastVoltage = voltage;
 				}
 				else {
 					if([self atTarget])                self.state = kDetRamperDone;
