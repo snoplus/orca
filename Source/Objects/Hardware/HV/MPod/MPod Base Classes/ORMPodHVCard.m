@@ -64,23 +64,6 @@ NSString* ORMPodHVCardExceptionCountChanged 		= @"ORMPodHVCardExceptionCountChan
 					   object:self]; 
 }
 
-- (void) processReadResponseArray:(NSArray*)reponse
-{
-	//nothing to do. subclasses should override and call this in case something is added
-}
-
-- (void) processSystemResponseArray:(NSArray*)reponse
-{
-	//nothing to do. subclasses should override and call this in case something is added
-}
-- (void) processSyncResponseArray:(NSArray*)response
-{
-	//nothing to do. subclasses should override and call this in case something is added
-}
-- (void) processWriteResponseArray:(NSArray*)response
-{
-	//nothing to do. subclasses should override and call this in case something is added
-}
 
 
 #pragma mark ¥¥¥Archival

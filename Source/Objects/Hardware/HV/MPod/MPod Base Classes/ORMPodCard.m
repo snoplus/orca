@@ -44,4 +44,22 @@ NSString* ORMPodCardSlotChangedNotification 	= @"ORMPodCardSlotChangedNotificati
 	else [NSException raise:@"No adapter" format:@"You must place a MPod adaptor card into the crate."];
 	return nil;
 }
+- (void) processReadResponseArray:(NSArray*)reponse
+{
+	//nothing to do. subclasses should override and call this in case something is added
+}
+
+- (void) processSystemResponseArray:(NSArray*)reponse
+{
+	//nothing to do. subclasses should override and call this in case something is added
+}
+- (void) processSyncResponseArray:(NSArray*)response
+{
+	//nothing to do. subclasses should override and call this in case something is added
+}
+- (void) processWriteResponseArray:(NSArray*)response
+{
+	//nothing to do. subclasses should override and call this in case something is added
+}
+
 @end

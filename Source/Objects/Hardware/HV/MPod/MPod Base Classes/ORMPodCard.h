@@ -25,13 +25,15 @@
 #import "ORCard.h"
 
 @interface ORMPodCard : ORCard {
-	@private
 }
-
 #pragma mark ¥¥¥Accessors
 - (NSString*) cardSlotChangedNotification;
 - (Class)	guardianClass;
-- (id)	adapter;
+- (id)		adapter;
+- (void)	processReadResponseArray:(NSArray*)reponse;
+- (void)	processSystemResponseArray:(NSArray*)reponse;
+- (void)	processSyncResponseArray:(NSArray*)response;
+- (void)	processWriteResponseArray:(NSArray*)response;
 
 @end
 
