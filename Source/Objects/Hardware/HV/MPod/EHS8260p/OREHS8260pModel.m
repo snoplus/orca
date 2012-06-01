@@ -32,19 +32,28 @@ NSString* OREHS8260pModelSupervisorMaskChanged	= @"OREHS8260pModelSupervisorMask
 NSString* OREHS8260pModelTripTimeChanged		= @"OREHS8260pModelTripTimeChanged";
 NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 
+@interface OREHS8260pModel (private)
+- (void) makeRampers;
+@end
+
 @implementation OREHS8260pModel
 #pragma mark ***Initialization
+- (id) init {
+	self = [super init];
+	[self makeRampers];
+	return self;
+}
 - (void) dealloc
 {
-    int i;
-    for(i=0;i<8;i++)[ramper[i] release];
+	[rampers release];
     [super dealloc];
 }
 
 - (void) sleep
 {
-    int i;
-    for(i=0;i<8;i++)[ramper[i] stopRamping];
+	for(ORDetectorRamper* aRamper in rampers){
+		[aRamper stopRamping];
+	}
     [super sleep];
 }
 
@@ -74,6 +83,24 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 }
 
 #pragma mark ***Accessors
+- (ORDetectorRamper*) ramper:(int)channel
+{
+	if([self channelInBounds:channel]){
+		return [rampers objectAtIndex:channel];
+	}
+	else return nil;
+}
+- (void) setRampers:(NSMutableArray*)someRampers
+{
+    [someRampers retain];
+    [rampers release];
+    rampers = someRampers;
+}
+
+- (NSMutableArray*)rampers
+{	
+    return rampers;
+}
 
 - (short) outputFailureBehavior:(short)chan
 {
@@ -129,12 +156,13 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 	NSArray* cmds = [self addChannelNumbersToParams:channelReadParams];
 	return cmds;
 }
+
 - (void) updateAllValues
 {
 	[super updateAllValues];
-	int i;
+	int i;	
 	for(i=0;i<8;i++){
-		if([ramper[i] enabled]){
+		if([[self ramper:i] enabled]){
 			[[self adapter] callBackToTarget:self selector:@selector(checkRamperCallBack:) userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:i] forKey:@"Channel"]];
 		}
 	}
@@ -146,7 +174,7 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 {
 	int aChannel = [[userInfo objectForKey:@"Channel"] intValue];
 	if([self channelInBounds:aChannel]){
-		[ramper[aChannel] execute];
+		[[self ramper:aChannel] execute];
 	}
 }
 
@@ -235,7 +263,7 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 }
 
 #pragma mark •••Hardware Access
-- (void) loadValues:(int)channel
+- (void) loadValues:(short)channel
 {
 	if([self channelInBounds:channel]){
 		
@@ -244,13 +272,13 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 		[self writeRiseTime];
 		[self writeMaxCurrent:channel];
 		
-		if(![ramper[channel] enabled]){
+		if(![[self ramper:channel] enabled]){
 			[self commitTargetToHwGoal:channel];
 			[self writeVoltage:channel];
 		}
 		else {
-			[ramper[channel] setTarget:[self target:channel]];
-			if(![ramper[channel] running])[ramper[channel] startRamping];
+			[[self ramper:channel] setTarget:[self target:channel]];
+			if(![[self ramper:channel] running])[[self ramper:channel] startRamping];
 		}
 	}
 }
@@ -263,22 +291,22 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 		[self writeTripTime:i];
 		[self writeSupervisorBehaviour:i];
 		[self writeMaxCurrent:i];
-		if(![ramper[i] enabled]){
+		if(![[self ramper:i] enabled]){
 			[self commitTargetToHwGoal:i];
 			[self writeVoltage:i];
 		}
 		else {
-			[ramper[i] setTarget:[self target:i]];
-			if(![ramper[i] running])[ramper[i] startRamping];
+			[[self ramper:i] setTarget:[self target:i]];
+			if(![[self ramper:i] running])[[self ramper:i] startRamping];
 		}
 	}
 }
 
-- (void) rampToZero:(int)channel
+- (void) rampToZero:(short)channel
 {
 	if([self channelInBounds:channel]){
-		if([ramper[channel] enabled]){
-			[ramper[channel] emergencyOff];			
+		if([[self ramper:channel] enabled]){
+			[[self ramper:channel] emergencyOff];			
 		}
 		else {
 			[self setHwGoal:channel withValue:0];
@@ -287,58 +315,33 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 	}
 }
 
-- (void) panic:(int)channel
+- (void) panic:(short)channel
 {
 	if([self channelInBounds:channel]){
-		if([ramper[channel] enabled]){
-			[ramper[channel] stopRamping];
+		if([[self ramper:channel] enabled]){
+			[[self ramper:channel] stopRamping];
 		}
 		[super panic:channel];
 	}
 }
 
-- (void) makeRamper:(int)i
-{
-    [[self undoManager] disableUndoRegistration];
-	if(!ramper[i]){
-		
-		ramper[i] = [[ORDetectorRamper alloc] initWithDelegate:self channel:i];
-		
-		//defaults
-		ramper[i].maxVoltage    = 3300;
-		ramper[i].minVoltage    = 0;
-		ramper[i].voltageStep   = 150;
-		ramper[i].stepWait      = 10;
-		
-		ramper[i].lowVoltageThreshold   = 500;
-		ramper[i].lowVoltageStep        = 75;
-		ramper[i].lowVoltageWait        = 30;
-	}
-  
-	[[self undoManager] enableUndoRegistration];
-}
 
-- (ORDetectorRamper*) ramper:(int)channel
-{
-	if(channel>=0 && channel<8)return ramper[channel];
-	else return nil;
-}
 
 - (NSString*) hwGoalString:(short)chan
 {
 	if([self channelInBounds:chan]){
-		if([ramper[chan] enabled]){
-			return [ramper[chan] hwGoalString];
+		if([[self ramper:chan] enabled]){
+			return [[self ramper:chan] hwGoalString];
 		}
 		else return [NSString stringWithFormat:@"Goal: %d",hwGoal[chan]];
 	}
 	else return @"";
 }
 
-- (void) stopRamping:(int)channel
+- (void) stopRamping:(short)channel
 {
-	if([ramper[channel] enabled]){
-		[ramper[channel] stopRamping];
+	if([[self ramper:channel] enabled]){
+		[[self ramper:channel] stopRamping];
 	}
 	[super stopRamping:channel];
 }
@@ -348,14 +351,14 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 {
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
+	//[self setRampers:[decoder decodeObjectForKey:@"rampers"]];
+	if(!rampers)[self makeRampers];
 	int i;
 	for(i=0;i<8;i++){
+		//[[self ramper:i] setDelegate:self];
 		[self setTripTime:i withValue:[decoder decodeIntForKey: [@"tripTime" stringByAppendingFormat:@"%d",i]]];
 		[self setOutputFailureBehavior:i withValue:[decoder decodeIntForKey: [@"outputFailureBehavior" stringByAppendingFormat:@"%d",i]]];
 		[self setCurrentTripBehavior:i withValue:[decoder decodeIntForKey: [@"currentTripBehavior" stringByAppendingFormat:@"%d",i]]];
-        ramper[i] = [[decoder decodeObjectForKey:[@"ramper%d" stringByAppendingFormat:@"%d",i]] retain];
-		if(ramper[i])	[ramper[i] setDelegate:self];
-		else			[self makeRamper:i];
 	}
 	[[self undoManager] enableUndoRegistration];
     
@@ -365,12 +368,12 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeObject:rampers forKey:@"rampers"];
 	int i;
  	for(i=0;i<8;i++){
 		[encoder encodeInt:tripTime[i]					forKey: [@"tripTime" stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:outputFailureBehavior[i]		forKey: [@"outputFailureBehavior" stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:currentTripBehavior[i]		forKey: [@"currentTripBehavior" stringByAppendingFormat:@"%d",i]];
-        [encoder encodeObject:ramper[i]					forKey: [@"ramper%d" stringByAppendingFormat:@"%d",i]];
 		
 		NSMutableDictionary* aValue = [[NSMutableDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithFloat:123.1],@"Value",nil];
 		rdParams[i] = [[NSMutableDictionary alloc] initWithObjectsAndKeys:aValue,@"outputMeasurementSenseVoltage",nil];
@@ -478,22 +481,22 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 
 //----------------------------------------------------------------------------------------------
 //call thrus just for using the wizard.
-- (void) setStepWait:(int)i withValue:(int)aValue { ramper[i].stepWait = aValue; }
-- (int) stepWait:(int)i { return ramper[i].stepWait; }
-- (void) setLowVoltageWait:(int)i withValue:(int)aValue { ramper[i].lowVoltageWait = aValue; }
-- (int) lowVoltageWait:(int)i { return ramper[i].lowVoltageWait; }
-- (void) setLowVoltageThreshold:(int)i withValue:(int)aValue { ramper[i].lowVoltageThreshold = aValue; }
-- (int) lowVoltageThreshold:(int)i { return ramper[i].lowVoltageThreshold; }
-- (void) setLowVoltageStep:(int)i withValue:(int)aValue { ramper[i].lowVoltageStep = aValue; }
-- (int) lowVoltagestep:(int)i { return ramper[i].lowVoltageStep; }
-- (void) setVoltageStep:(int)i withValue:(int)aValue { ramper[i].voltageStep = aValue; }
-- (int) voltagestep:(int)i { return ramper[i].voltageStep; }
-- (void) setMaxVoltage:(int)i withValue:(int)aValue { ramper[i].maxVoltage = aValue; }
-- (int) maxVoltage:(int)i { return ramper[i].maxVoltage; }
-- (void) setMinVoltage:(int)i withValue:(int)aValue { ramper[i].minVoltage = aValue; }
-- (int) minVoltage:(int)i { return ramper[i].minVoltage; }
-- (void) setStepRampEnabled:(int)i withValue:(int)aValue { ramper[i].enabled = aValue; }
-- (int) stepRampEnabled:(int)i { return ramper[i].enabled; }
+- (void) setStepWait:(int)i withValue:(int)aValue { [self ramper:i].stepWait = aValue; }
+- (int) stepWait:(int)i { return [self ramper:i].stepWait; }
+- (void) setLowVoltageWait:(int)i withValue:(int)aValue { [self ramper:i].lowVoltageWait = aValue; }
+- (int) lowVoltageWait:(int)i { return [self ramper:i].lowVoltageWait; }
+- (void) setLowVoltageThreshold:(int)i withValue:(int)aValue { [self ramper:i].lowVoltageThreshold = aValue; }
+- (int) lowVoltageThreshold:(int)i { return [self ramper:i].lowVoltageThreshold; }
+- (void) setLowVoltageStep:(int)i withValue:(int)aValue { [self ramper:i].lowVoltageStep = aValue; }
+- (int) lowVoltagestep:(int)i { return [self ramper:i].lowVoltageStep; }
+- (void) setVoltageStep:(int)i withValue:(int)aValue { [self ramper:i].voltageStep = aValue; }
+- (int) voltagestep:(int)i { return [self ramper:i].voltageStep; }
+- (void) setMaxVoltage:(int)i withValue:(int)aValue { [self ramper:i].maxVoltage = aValue; }
+- (int) maxVoltage:(int)i { return [self ramper:i].maxVoltage; }
+- (void) setMinVoltage:(int)i withValue:(int)aValue { [self ramper:i].minVoltage = aValue; }
+- (int) minVoltage:(int)i { return [self ramper:i].minVoltage; }
+- (void) setStepRampEnabled:(int)i withValue:(int)aValue { [self ramper:i].enabled = aValue; }
+- (int) stepRampEnabled:(int)i { return [self ramper:i].enabled; }
 //----------------------------------------------------------------------------------------------
 
 - (NSNumber*) extractParam:(NSString*)param from:(NSDictionary*)fileHeader forChannel:(int)aChannel
@@ -507,5 +510,33 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 		else if([param isEqualToString:@"Failure Behavior"])return [[cardDictionary objectForKey:@"outputFailureBehavior"] objectAtIndex:aChannel];
 		else return nil;
 	}
+}
+@end
+
+@implementation OREHS8260pModel (private)
+- (void) makeRampers
+{
+    [[self undoManager] disableUndoRegistration];
+	[self setRampers:[NSMutableArray arrayWithCapacity:8]];
+	int i;
+	for(i=0;i<8;i++){
+		ORDetectorRamper* aRamper = [[ORDetectorRamper alloc] initWithDelegate:self channel:i];
+		
+		//defaults
+		aRamper.maxVoltage    = 3300;
+		aRamper.minVoltage    = 0;
+		aRamper.voltageStep   = 150;
+		aRamper.stepWait      = 10;
+		
+		aRamper.lowVoltageThreshold   = 500;
+		aRamper.lowVoltageStep        = 75;
+		aRamper.lowVoltageWait        = 30;
+		
+		[rampers addObject:aRamper];
+		
+		[aRamper release];
+	}
+	
+	[[self undoManager] enableUndoRegistration];
 }
 @end

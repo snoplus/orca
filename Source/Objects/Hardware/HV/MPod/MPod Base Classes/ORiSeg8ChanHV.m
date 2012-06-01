@@ -101,7 +101,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
     [[NSNotificationCenter defaultCenter] postNotificationName:ORiSeg8ChanHVShipRecordsChanged object:self];
 }
 
-- (BOOL) channelInBounds:(int)aChan
+- (BOOL) channelInBounds:(short)aChan
 {
 	if(aChan>=0 && aChan<8)return YES;
 	else return NO;
@@ -121,7 +121,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
     [[NSNotificationCenter defaultCenter] postNotificationName:ORiSeg8ChanHVSelectedChannelChanged object:self];
 }
 
-- (int) channel:(int)i readParamAsInt:(NSString*)name
+- (int) channel:(short)i readParamAsInt:(NSString*)name
 {
 	if([self channelInBounds:i]){
 		return [[[rdParams[i] objectForKey:name] objectForKey:@"Value"] intValue];
@@ -129,7 +129,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 	else return 0;
 }
 
-- (float) channel:(int)i readParamAsFloat:(NSString*)name
+- (float) channel:(short)i readParamAsFloat:(NSString*)name
 {
 	if([self channelInBounds:i]){
 		return [[[rdParams[i] objectForKey:name] objectForKey:@"Value"] floatValue];
@@ -137,7 +137,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 	else return 0;
 }
 
-- (id) channel:(int)i readParamAsValue:(NSString*)name
+- (id) channel:(short)i readParamAsValue:(NSString*)name
 {
 	if([self channelInBounds:i]){
 		return [[rdParams[i] objectForKey:name] objectForKey:@"Value"];
@@ -145,7 +145,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 	else return nil;
 }
 
-- (id) channel:(int)i readParamAsObject:(NSString*)name
+- (id) channel:(short)i readParamAsObject:(NSString*)name
 {
 	if([self channelInBounds:i]){
 		return [rdParams[i] objectForKey:name];
@@ -302,7 +302,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 	return mask;
 }
 
-- (BOOL) channelIsRamping:(int)chan
+- (BOOL) channelIsRamping:(short)chan
 {
 	int state = [self channel:chan readParamAsInt:@"outputStatus"];
 	if(state & outputOnMask){
@@ -351,7 +351,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 	}
 }
 
-- (void) commitTargetToHwGoal:(int)channel
+- (void) commitTargetToHwGoal:(short)channel
 {
 	if([self channelInBounds:channel]){
 		hwGoal[channel] = target[channel];
@@ -359,7 +359,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORiSeg8ChanHVHwGoalChanged object:self];
 	}
 }
-- (void) loadValues:(int)channel
+- (void) loadValues:(short)channel
 {
 	if([self channelInBounds:channel]){
 		[self commitTargetToHwGoal:selectedChannel];
@@ -381,7 +381,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 	[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:)];
 }
 
-- (void) writeVoltage:(int)channel
+- (void) writeVoltage:(short)channel
 {    
 	if([self channelInBounds:channel]){
 		NSString* cmd = [NSString stringWithFormat:@"outputVoltage.u%d F %f",[self slotChannelValue:channel],(float)hwGoal[channel]];
@@ -389,7 +389,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 	}
 }
 
-- (void) writeMaxCurrent:(int)channel
+- (void) writeMaxCurrent:(short)channel
 {    
 	if([self channelInBounds:channel]){
 		NSString* cmd = [NSString stringWithFormat:@"outputCurrent.u%d F %f",[self slotChannelValue:channel],maxCurrent[channel]/1000.];
@@ -397,13 +397,13 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 	}
 }
 
-- (void) setPowerOn:(int)channel withValue:(BOOL)aValue
+- (void) setPowerOn:(short)channel withValue:(BOOL)aValue
 {
 	if(aValue) [self turnChannelOn:channel];
 	else [self turnChannelOff:channel];
 }
 
-- (void) turnChannelOn:(int)channel
+- (void) turnChannelOn:(short)channel
 {    
 	[self setHwGoal:channel withValue:0];
 	[self writeVoltage:channel];
@@ -411,7 +411,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 	[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:)];
 }
 
-- (void) turnChannelOff:(int)channel
+- (void) turnChannelOff:(short)channel
 {    
 	[self setHwGoal:channel withValue:0];
 	[self writeVoltage:channel];
@@ -419,25 +419,25 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 	[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:)];
 }
 
-- (void) panicChannel:(int)channel
+- (void) panicChannel:(short)channel
 {    
 	NSString* cmd = [NSString stringWithFormat:@"outputSwitch.u%d i %d",[self slotChannelValue:channel],kiSeg8ChanHVOutputSetEmergencyOff];
 	[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:)];
 }
 
-- (void) clearPanicChannel:(int)channel
+- (void) clearPanicChannel:(short)channel
 {    
 	NSString* cmd = [NSString stringWithFormat:@"outputSwitch.u%d i %d",[self slotChannelValue:channel],kiSeg8ChanHVOutputResetEmergencyOff];
 	[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:)];
 }
 
-- (void) clearEventsChannel:(int)channel
+- (void) clearEventsChannel:(short)channel
 {    
 	NSString* cmd = [NSString stringWithFormat:@"outputSwitch.u%d i %d",[self slotChannelValue:channel],kiSeg8ChanHVOutputClearEvents];
 	[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:)];
 }
 
-- (void) stopRamping:(int)channel
+- (void) stopRamping:(short)channel
 {
 	if([self channelInBounds:channel]){
 		//the only way to stop a ramp is to change the hwGoal to be the actual voltage
@@ -449,7 +449,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 	}
 }
 
-- (void) rampToZero:(int)channel
+- (void) rampToZero:(short)channel
 {
 	if([self channelInBounds:channel]){
 		[self setHwGoal:channel withValue:0];
@@ -457,7 +457,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 	}
 }
 
-- (void) panic:(int)channel
+- (void) panic:(short)channel
 {
 	if([self channelInBounds:channel]){
 		[self setHwGoal:channel withValue:0];
@@ -466,7 +466,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 	}
 }
 
-- (BOOL) isOn:(int)aChannel
+- (BOOL) isOn:(short)aChannel
 {
 	if([self channelInBounds:aChannel]){
 		int outputSwitch = [self channel:aChannel readParamAsInt:@"outputSwitch"];
@@ -525,7 +525,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 	for(i=0;i<8;i++)[self panic:i];
 }
 
-- (unsigned long) failureEvents:(int)channel
+- (unsigned long) failureEvents:(short)channel
 {
 	int events = [self channel:selectedChannel readParamAsInt:@"outputStatus"];
 	events &= (outputFailureMinSenseVoltageMask    | outputFailureMaxSenseVoltageMask | 
@@ -546,7 +546,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 	return failEvents;
 }
 
-- (NSString*) channelState:(int)channel
+- (NSString*) channelState:(short)channel
 { 
 	int outputSwitch = [self channel:channel readParamAsInt:@"outputSwitch"];
 	int outputStatus = [self channel:channel readParamAsInt:@"outputStatus"];
@@ -797,12 +797,12 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 }
 
 #pragma mark ¥¥¥Trends
-- (ORTimeRate*) voltageHistory:(int)index
+- (ORTimeRate*) voltageHistory:(short)index
 {
 	return voltageHistory[index];
 }
 
-- (ORTimeRate*) currentHistory:(int)index
+- (ORTimeRate*) currentHistory:(short)index
 {
 	return currentHistory[index];
 }
@@ -839,7 +839,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 	}	
 }
 #pragma mark ¥¥¥Convenience Methods
-- (float) voltage:(int)aChannel
+- (float) voltage:(short)aChannel
 {
 	if([self channelInBounds:aChannel]){
 		return [self channel:aChannel readParamAsFloat:@"outputMeasurementSenseVoltage"];
@@ -847,7 +847,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 	else return 0;
 }
 
-- (float) current:(int)aChannel
+- (float) current:(short)aChannel
 {
 	if([self channelInBounds:aChannel]){
 		return [self channel:aChannel readParamAsFloat:@"outputMeasurementCurrent"];

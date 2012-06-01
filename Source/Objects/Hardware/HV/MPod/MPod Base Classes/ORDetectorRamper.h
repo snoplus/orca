@@ -1,5 +1,5 @@
 //
-//  OReRamper.h
+//  ODetectorRamper.h
 //  Orca
 //
 //  Created by Mark Howe on Friday May 25,2012
@@ -17,10 +17,11 @@
 //for the use of this software.
 //-------------------------------------------------------------
 @class ORAlarm;
+@class ORiSeg8ChanHV;
 
 @interface ORDetectorRamper : NSObject {
-	id			delegate;
-	short       channel;
+	ORiSeg8ChanHV*		delegate;
+	short				channel;
     
     //user parameters
 	short	stepWait;
@@ -60,7 +61,7 @@
 - (NSString*) hwGoalString;
 - (void) execute;
 
-@property (nonatomic,assign) id delegate;
+@property (nonatomic,assign) ORiSeg8ChanHV* delegate;
 @property (nonatomic,assign) short channel;
 @property (nonatomic,assign) short stepWait;
 @property (nonatomic,assign) int target;
@@ -88,12 +89,3 @@ extern NSString* ORDetectorRamperEnabledChanged;
 extern NSString* ORDetectorRamperStateChanged;
 extern NSString* ORDetectorRamperRunningChanged;
 
-@interface NSObject (ORDetectorRamper)
-- (BOOL) isOn:(short)aChannel;
-- (short) hwGoal:(short)aChannel;
-- (void) setHwGoal:(short)aChannel withValue:(int)aValue;
-- (int) voltage:(short)aChannel;
-- (int) target:(short)aChannel;
-- (float) riseRate;
-- (void) writeVoltage:(short)aChannel;
-@end

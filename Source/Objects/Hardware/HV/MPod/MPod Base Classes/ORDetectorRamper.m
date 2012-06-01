@@ -19,6 +19,7 @@
 
 #import "ORDetectorRamper.h"
 #import "ORAlarm.h"
+#import "ORiSeg8ChanHV.h"
 
 NSString* ORDetectorRamperStepWaitChanged				= @"ORDetectorRamperStepWaitChanged";
 NSString* ORDetectorRamperLowVoltageWaitChanged			= @"ORDetectorRamperLowVoltageWaitChanged";
@@ -71,7 +72,7 @@ NSString* ORDetectorRamperRunningChanged				= @"ORDetectorRamperRunningChanged";
 	[super dealloc];
 }
 
-- (void) setDelegate:(id)aDelegate
+- (void) setDelegate:(ORiSeg8ChanHV*)aDelegate
 {
 	if([aDelegate respondsToSelector:@selector(hwGoal:)]  &&
 	   [aDelegate respondsToSelector:@selector(voltage:)] &&

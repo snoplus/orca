@@ -27,10 +27,10 @@
 @interface OREHS8260pModel : ORiSeg8ChanHV
 {
   @private
+	NSMutableArray* rampers;
     short		tripTime[8];
     short		currentTripBehavior[8];
     short		outputFailureBehavior[8];
-	ORDetectorRamper* ramper[8];
 }
 
 #pragma mark ***Initialization
@@ -38,6 +38,7 @@
 - (void) makeMainController;
 
 #pragma mark ***Accessors
+- (void) setRampers:(NSMutableArray*)someRampers;
 - (short)	outputFailureBehavior:(short)chan;
 - (void)	setOutputFailureBehavior:(short)chan withValue:(short)aValue;
 - (short)	currentTripBehavior:(short)chan;

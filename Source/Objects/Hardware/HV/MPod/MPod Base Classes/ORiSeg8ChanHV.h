@@ -90,10 +90,10 @@ enum {
 - (int)		selectedChannel;
 - (void)	setSelectedChannel:(int)aSelectedChannel;
 - (int)		slotChannelValue:(int)aChannel;
-- (int)		channel:(int)i readParamAsInt:(NSString*)name;
-- (float)	channel:(int)i readParamAsFloat:(NSString*)name;
-- (id)		channel:(int)i readParamAsObject:(NSString*)name;
-- (id)		channel:(int)i readParamAsValue:(NSString*)name;
+- (int)		channel:(short)i readParamAsInt:(NSString*)name;
+- (float)	channel:(short)i readParamAsFloat:(NSString*)name;
+- (id)		channel:(short)i readParamAsObject:(NSString*)name;
+- (id)		channel:(short)i readParamAsValue:(NSString*)name;
 - (float)	riseRate;	
 - (void)	setRiseRate:(float)aValue;
 - (int)		hwGoal:(short)chan;	
@@ -103,17 +103,18 @@ enum {
 - (void)	setTarget:(short)chan withValue:(int)aValue;
 - (void)	syncDialog;
 - (void)	commitTargetsToHwGoals;
-- (void)	commitTargetToHwGoal:(int)channel;
-- (NSString*) channelState:(int)channel;
+- (void)	commitTargetToHwGoal:(short)channel;
+- (NSString*) channelState:(short)channel;
 - (int)		numberChannelsOn;
 - (unsigned long) channelStateMask;
 - (int)		numberChannelsRamping;
 - (int)		numberChannelsWithNonZeroVoltage;
 - (int)		numberChannelsWithNonZeroHwGoal;
-- (BOOL)	channelIsRamping:(int)chan;
-- (unsigned long) failureEvents:(int)channel;
+- (BOOL)	channelIsRamping:(short)chan;
+- (unsigned long) failureEvents:(short)channel;
 - (unsigned long) failureEvents;
-- (BOOL) channelInBounds:(int)aChan;
+- (BOOL) channelInBounds:(short)aChan;
+- (BOOL) isOn:(short)aChannel;
 
 #pragma mark ¥¥¥Data Records
 - (unsigned long) dataId;
@@ -133,22 +134,22 @@ enum {
 - (void) processWriteResponseArray:(NSArray*)response;
 
 #pragma mark ¥¥¥Hardware Access
-- (void) loadValues:(int)channel;
-- (void) writeVoltage:(int)channel;
+- (void) loadValues:(short)channel;
+- (void) writeVoltage:(short)channel;
 - (void) writeVoltages;
 - (void) writeMaxCurrents;
-- (void) writeMaxCurrent:(int)channel;
+- (void) writeMaxCurrent:(short)channel;
 - (void) writeRiseTime;
 - (void) writeRiseTime:(float)aValue;
-- (void) setPowerOn:(int)channel withValue:(BOOL)aValue;
-- (void) turnChannelOn:(int)channel;
-- (void) turnChannelOff:(int)channel;
-- (void) panicChannel:(int)channel;
-- (void) clearPanicChannel:(int)channel;
-- (void) clearEventsChannel:(int)channel;
-- (void) stopRamping:(int)channel;
-- (void) rampToZero:(int)channel;
-- (void) panic:(int)channel;
+- (void) setPowerOn:(short)channel withValue:(BOOL)aValue;
+- (void) turnChannelOn:(short)channel;
+- (void) turnChannelOff:(short)channel;
+- (void) panicChannel:(short)channel;
+- (void) clearPanicChannel:(short)channel;
+- (void) clearEventsChannel:(short)channel;
+- (void) stopRamping:(short)channel;
+- (void) rampToZero:(short)channel;
+- (void) panic:(short)channel;
 
 - (void) loadAllValues;
 - (void) turnAllChannelsOn;
@@ -161,13 +162,13 @@ enum {
 - (void) panicAll;
 
 #pragma mark ¥¥¥Trends
-- (ORTimeRate*) voltageHistory:(int)index;
-- (ORTimeRate*) currentHistory:(int)index;
+- (ORTimeRate*) voltageHistory:(short)index;
+- (ORTimeRate*) currentHistory:(short)index;
 - (void) shipDataRecords;
 
 #pragma mark ¥¥¥Convenience Methods
-- (float) voltage:(int)aChannel;
-- (float) current:(int)aChannel;
+- (float) voltage:(short)aChannel;
+- (float) current:(short)aChannel;
 
 #pragma mark ¥¥¥Archival
 - (id)initWithCoder:(NSCoder*)decoder;
