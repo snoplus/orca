@@ -80,6 +80,12 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 			numChans++;
 		}
 	}
+    
+    //event may be empty if triggered by EXT trigger and no channel is selected
+    if (numChans == 0) {
+        return length;
+    }
+    
 	eventSize -= 4;
 	eventSize = eventSize/numChans;
     int j;
