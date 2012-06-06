@@ -162,7 +162,7 @@ NSString* ORDetectorRamperRunningChanged				= @"ORDetectorRamperRunningChanged";
 
 - (BOOL) atTarget
 {
-	return abs([delegate voltage:channel] - [delegate target:channel]) < kTolerance;
+	return abs([delegate voltage:channel] - target) < kTolerance;
 }
 
 - (int) stepSize
@@ -225,7 +225,7 @@ NSString* ORDetectorRamperRunningChanged				= @"ORDetectorRamperRunningChanged";
 	else switch(state){
 		case kDetRamperIdle:                return @"Idle";
 		case kDetRamperStartRamp:           return @"Starting";
-		case kDetRamperEmergencyOff:        return @"EmergencyOff";
+		case kDetRamperEmergencyOff:        return @"Ramp to zero";
 		case kDetRamperStepWaitForVoltage:  return @"Waiting on Voltage";
 		case kDetRamperStepToNextVoltage:   return @"Stepping";
 		case kDetRamperStepWait:            return @"Waiting at Step";
@@ -241,7 +241,7 @@ NSString* ORDetectorRamperRunningChanged				= @"ORDetectorRamperRunningChanged";
 	else switch(state){
 		case kDetRamperIdle:                return @"Idle";
 		case kDetRamperStartRamp:           return @"Starting";
-		case kDetRamperEmergencyOff:        return @"EmergencyOff";
+		case kDetRamperEmergencyOff:        return @"Ramp to Zero";
 		case kDetRamperStepWaitForVoltage:  return [NSString stringWithFormat:@"Waiting for %d",[delegate hwGoal:channel]];
 		case kDetRamperStepToNextVoltage:   return @"Stepping";
 		case kDetRamperStepWait:            return [NSString stringWithFormat:@"Waiting at %d",[delegate hwGoal:channel]];
@@ -321,6 +321,7 @@ NSString* ORDetectorRamperRunningChanged				= @"ORDetectorRamperRunningChanged";
 						NSLog(@"%@ channel %d not ramping.\n",[delegate fullID],channel);
 						self.state = kDetRamperNoChangeError;
 					}
+					self.lastVoltageWaitTime = [NSDate date];
 					lastVoltage = voltage;
 				}
 				else {

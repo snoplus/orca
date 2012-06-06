@@ -262,6 +262,11 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 	else return @"--";
 }
 
+- (BOOL) channelIsRamping:(short)chan
+{
+	return [super channelIsRamping:chan] || [[self ramper:chan] running];
+}
+
 #pragma mark •••Hardware Access
 - (void) loadValues:(short)channel
 {
