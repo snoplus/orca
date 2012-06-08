@@ -40,5 +40,6 @@
 #define kCaen775   18 
 #define kCaen260   19
 #define kCaen1724  20
-
+#define kCaen1724  20
+#define kCaen830   21
 #endif
