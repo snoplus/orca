@@ -524,6 +524,14 @@
 		8418376C156FC7AF004EC81F /* ORDetectorRamper.h in Headers */ = {isa = PBXBuildFile; fileRef = 8418376A156FC7AF004EC81F /* ORDetectorRamper.h */; };
 		8418376D156FC7AF004EC81F /* ORDetectorRamper.m in Sources */ = {isa = PBXBuildFile; fileRef = 8418376B156FC7AF004EC81F /* ORDetectorRamper.m */; };
 		8418383A157504CA004EC81F /* EHS8260p.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84183839157504CA004EC81F /* EHS8260p.nib */; };
+		8418481D157FA478004EC81F /* CV830.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84184815157FA478004EC81F /* CV830.gif */; };
+		8418481E157FA478004EC81F /* CV830.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84184816157FA478004EC81F /* CV830.nib */; };
+		8418481F157FA478004EC81F /* ORCV830Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84184817157FA478004EC81F /* ORCV830Controller.h */; };
+		84184820157FA478004EC81F /* ORCV830Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84184818157FA478004EC81F /* ORCV830Controller.m */; };
+		84184821157FA478004EC81F /* ORCV830Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84184819157FA478004EC81F /* ORCV830Decoders.h */; };
+		84184822157FA478004EC81F /* ORCV830Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 8418481A157FA478004EC81F /* ORCV830Decoders.m */; };
+		84184823157FA478004EC81F /* ORCV830Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 8418481B157FA478004EC81F /* ORCV830Model.h */; };
+		84184824157FA478004EC81F /* ORCV830Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 8418481C157FA478004EC81F /* ORCV830Model.m */; };
 		8419221F0F0BBE8000EF1C1C /* ORScriptIDEModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8419221D0F0BBE8000EF1C1C /* ORScriptIDEModel.h */; };
 		841922200F0BBE8000EF1C1C /* ORScriptIDEModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8419221E0F0BBE8000EF1C1C /* ORScriptIDEModel.m */; };
 		8419227E0F0BC18800EF1C1C /* ORScriptIDEController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8419227C0F0BC18800EF1C1C /* ORScriptIDEController.m */; };
@@ -1194,6 +1202,9 @@
 		844E5CD806236ACD0051849B /* TaskMaster.gif in Resources */ = {isa = PBXBuildFile; fileRef = 844E5CD606236ACD0051849B /* TaskMaster.gif */; };
 		844EAEED12D8B4FB00B550FB /* BlankGreen.tif in Resources */ = {isa = PBXBuildFile; fileRef = 844EAEEC12D8B4FB00B550FB /* BlankGreen.tif */; };
 		844EAEEF12D8B7BF00B550FB /* BlankRed.tif in Resources */ = {isa = PBXBuildFile; fileRef = 844EAEEE12D8B7BF00B550FB /* BlankRed.tif */; };
+		844EEAB215827AA100E1D7C1 /* ORCAEN830Readout.hh in Headers */ = {isa = PBXBuildFile; fileRef = 844EEAB115827AA100E1D7C1 /* ORCAEN830Readout.hh */; };
+		844EEAB315827AD800E1D7C1 /* ORCAEN830Readout.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 844EEAAF15827A7200E1D7C1 /* ORCAEN830Readout.cc */; };
+		844EEAB415827AF600E1D7C1 /* ORCAEN830Readout.hh in VME_Copy */ = {isa = PBXBuildFile; fileRef = 844EEAB115827AA100E1D7C1 /* ORCAEN830Readout.hh */; };
 		844FD9DC1180E89B00FD5A46 /* KJL2200IonGauge.nib in Resources */ = {isa = PBXBuildFile; fileRef = 844FD9D31180E89B00FD5A46 /* KJL2200IonGauge.nib */; };
 		844FD9DD1180E89B00FD5A46 /* KJL2200IonGauge.tif in Resources */ = {isa = PBXBuildFile; fileRef = 844FD9D41180E89B00FD5A46 /* KJL2200IonGauge.tif */; };
 		844FD9DF1180E89B00FD5A46 /* ORKJL2200IonGaugeController.h in Headers */ = {isa = PBXBuildFile; fileRef = 844FD9D61180E89B00FD5A46 /* ORKJL2200IonGaugeController.h */; };
@@ -2940,6 +2951,8 @@
 				84550CB310D03476008A019C /* ORCAEN965Readout.hh in VME_Copy */,
 				4398E6C211B7E3BB00FC4DDE /* ORCAEN785Readout.cc in VME_Copy */,
 				4398E6C311B7E3BB00FC4DDE /* ORCAEN785Readout.hh in VME_Copy */,
+				844EEAB415827AF600E1D7C1 /* ORCAEN830Readout.hh in VME_Copy */,
+				844EEAB315827AD800E1D7C1 /* ORCAEN830Readout.cc in VME_Copy */,
 				43ADFEBB10B6E2090044617C /* ORCAEN419Readout.cc in VME_Copy */,
 				43ADFEBC10B6E2090044617C /* ORCAEN419Readout.hh in VME_Copy */,
 				43ADFEBD10B6E2090044617C /* ORCAEN1720Readout.cc in VME_Copy */,
@@ -3541,6 +3554,14 @@
 		8418376A156FC7AF004EC81F /* ORDetectorRamper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORDetectorRamper.h; sourceTree = "<group>"; };
 		8418376B156FC7AF004EC81F /* ORDetectorRamper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORDetectorRamper.m; sourceTree = "<group>"; };
 		84183839157504CA004EC81F /* EHS8260p.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = EHS8260p.nib; path = Source/Objects/Hardware/HV/MPod/EHS8260p/EHS8260p.nib; sourceTree = SOURCE_ROOT; };
+		84184815157FA478004EC81F /* CV830.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = CV830.gif; sourceTree = "<group>"; };
+		84184816157FA478004EC81F /* CV830.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = CV830.nib; path = Source/Objects/Hardware/Vme/CAEN/CV830/CV830.nib; sourceTree = SOURCE_ROOT; };
+		84184817157FA478004EC81F /* ORCV830Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCV830Controller.h; path = Source/Objects/Hardware/Vme/CAEN/CV830/ORCV830Controller.h; sourceTree = SOURCE_ROOT; };
+		84184818157FA478004EC81F /* ORCV830Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCV830Controller.m; path = Source/Objects/Hardware/Vme/CAEN/CV830/ORCV830Controller.m; sourceTree = SOURCE_ROOT; };
+		84184819157FA478004EC81F /* ORCV830Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCV830Decoders.h; path = Source/Objects/Hardware/Vme/CAEN/CV830/ORCV830Decoders.h; sourceTree = SOURCE_ROOT; };
+		8418481A157FA478004EC81F /* ORCV830Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCV830Decoders.m; path = Source/Objects/Hardware/Vme/CAEN/CV830/ORCV830Decoders.m; sourceTree = SOURCE_ROOT; };
+		8418481B157FA478004EC81F /* ORCV830Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCV830Model.h; path = Source/Objects/Hardware/Vme/CAEN/CV830/ORCV830Model.h; sourceTree = SOURCE_ROOT; };
+		8418481C157FA478004EC81F /* ORCV830Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCV830Model.m; path = Source/Objects/Hardware/Vme/CAEN/CV830/ORCV830Model.m; sourceTree = SOURCE_ROOT; };
 		8418DC4D0531EF7A005F64B1 /* ORPulserDistrib.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = ORPulserDistrib.gif; sourceTree = "<group>"; };
 		8418DC4E0531EF7A005F64B1 /* ORPulserDistribController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORPulserDistribController.h; sourceTree = "<group>"; };
 		8418DC4F0531EF7A005F64B1 /* ORPulserDistribController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORPulserDistribController.m; sourceTree = "<group>"; };
@@ -3959,6 +3980,8 @@
 		844E6B7003C27B28005F64B1 /* Histo.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Histo.gif; path = "Source/Objects/Data Processing/Histogram Objects/Histogrammer/Histo.gif"; sourceTree = SOURCE_ROOT; };
 		844EAEEC12D8B4FB00B550FB /* BlankGreen.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = BlankGreen.tif; path = Source/Objects/ProcessLogic/ProcessElements/BaseClasses/BlankGreen.tif; sourceTree = SOURCE_ROOT; };
 		844EAEEE12D8B7BF00B550FB /* BlankRed.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = BlankRed.tif; path = Source/Objects/ProcessLogic/ProcessElements/BaseClasses/BlankRed.tif; sourceTree = SOURCE_ROOT; };
+		844EEAAF15827A7200E1D7C1 /* ORCAEN830Readout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ORCAEN830Readout.cc; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAEN830Readout.cc; sourceTree = SOURCE_ROOT; };
+		844EEAB115827AA100E1D7C1 /* ORCAEN830Readout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ORCAEN830Readout.hh; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAEN830Readout.hh; sourceTree = SOURCE_ROOT; };
 		844FD9D31180E89B00FD5A46 /* KJL2200IonGauge.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = KJL2200IonGauge.nib; path = Source/Objects/Hardware/Serial/KJL220IonGauge/KJL2200IonGauge.nib; sourceTree = SOURCE_ROOT; };
 		844FD9D41180E89B00FD5A46 /* KJL2200IonGauge.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = KJL2200IonGauge.tif; path = Source/Objects/Hardware/Serial/KJL220IonGauge/KJL2200IonGauge.tif; sourceTree = SOURCE_ROOT; };
 		844FD9D61180E89B00FD5A46 /* ORKJL2200IonGaugeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORKJL2200IonGaugeController.h; path = Source/Objects/Hardware/Serial/KJL220IonGauge/ORKJL2200IonGaugeController.h; sourceTree = SOURCE_ROOT; };
@@ -7028,6 +7051,22 @@
 			path = Source/Objects/Hardware/Serial/TM700;
 			sourceTree = SOURCE_ROOT;
 		};
+		84184814157FA478004EC81F /* CV830 */ = {
+			isa = PBXGroup;
+			children = (
+				84184815157FA478004EC81F /* CV830.gif */,
+				84184816157FA478004EC81F /* CV830.nib */,
+				84184817157FA478004EC81F /* ORCV830Controller.h */,
+				84184818157FA478004EC81F /* ORCV830Controller.m */,
+				84184819157FA478004EC81F /* ORCV830Decoders.h */,
+				8418481A157FA478004EC81F /* ORCV830Decoders.m */,
+				8418481B157FA478004EC81F /* ORCV830Model.h */,
+				8418481C157FA478004EC81F /* ORCV830Model.m */,
+			);
+			name = CV830;
+			path = Source/Objects/Hardware/Vme/CAEN/CV830;
+			sourceTree = SOURCE_ROOT;
+		};
 		8418DC4C0531EF7A005F64B1 /* PulserDistrib */ = {
 			isa = PBXGroup;
 			children = (
@@ -9167,6 +9206,8 @@
 				849E7493132E5466001BF64C /* ORCAEN1724Readout.hh */,
 				4342D59211ECB8AD007EFFB1 /* ORCAEN775Readout.cc */,
 				4342D59311ECB8AD007EFFB1 /* ORCAEN775Readout.hh */,
+				844EEAB115827AA100E1D7C1 /* ORCAEN830Readout.hh */,
+				844EEAAF15827A7200E1D7C1 /* ORCAEN830Readout.cc */,
 				43ADFE5C10B6DBCF0044617C /* ORCAENReadout.cc */,
 				43ADFE5D10B6DBCF0044617C /* ORCAENReadout.hh */,
 				43ADFE5F10B6DBCF0044617C /* ORDataGenReadout.hh */,
@@ -12220,6 +12261,7 @@
 			isa = PBXGroup;
 			children = (
 				F5B1802103B297FD015F64B1 /* Base */,
+				84184814157FA478004EC81F /* CV830 */,
 				84BF43C3118793FA00F55216 /* CV1785 */,
 				84EBBEDE0F52D9A700F57BDD /* CV419 */,
 				84FFCA9F0636D5B10069432F /* CV792 */,
@@ -13282,6 +13324,10 @@
 				8418301D156153D2004EC81F /* ORTM700Controller.h in Headers */,
 				84183021156153D2004EC81F /* ORTM700Model.h in Headers */,
 				8418376C156FC7AF004EC81F /* ORDetectorRamper.h in Headers */,
+				8418481F157FA478004EC81F /* ORCV830Controller.h in Headers */,
+				84184821157FA478004EC81F /* ORCV830Decoders.h in Headers */,
+				84184823157FA478004EC81F /* ORCV830Model.h in Headers */,
+				844EEAB215827AA100E1D7C1 /* ORCAEN830Readout.hh in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14129,6 +14175,8 @@
 				84183023156153D2004EC81F /* TM700.nib in Resources */,
 				84183024156153D2004EC81F /* TM700.tif in Resources */,
 				8418383A157504CA004EC81F /* EHS8260p.nib in Resources */,
+				8418481D157FA478004EC81F /* CV830.gif in Resources */,
+				8418481E157FA478004EC81F /* CV830.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -15080,6 +15128,9 @@
 				8418301E156153D2004EC81F /* ORTM700Controller.m in Sources */,
 				84183022156153D2004EC81F /* ORTM700Model.m in Sources */,
 				8418376D156FC7AF004EC81F /* ORDetectorRamper.m in Sources */,
+				84184820157FA478004EC81F /* ORCV830Controller.m in Sources */,
+				84184822157FA478004EC81F /* ORCV830Decoders.m in Sources */,
+				84184824157FA478004EC81F /* ORCV830Model.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
