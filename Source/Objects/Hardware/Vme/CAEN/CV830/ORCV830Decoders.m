@@ -109,7 +109,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  counter 31 //note that only enabled cha
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
  --------^-^^^--------------------------- Crate number
  -------------^-^^^^--------------------- Card number
- --------------------^^^^ ^^^^ ^^^^ ^^^^- enabled mask
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  enabled mask
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  UT time of last read
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  counter 0
  ..

@@ -114,7 +114,7 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
 - (void) _startPolling;
 - (void) _pollAllChannels;
 - (void) _shipValues;
-- (void) _shipAllVaues;
+- (void) _shipAllValues;
 - (void) _postAllScalersUpdateOnMainThread;
 @end
 
@@ -357,10 +357,10 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
 
 - (void) _shipValues
 {
-	[self _shipAllVaues];
+	[self _shipAllValues];
 }
 
-- (void) _shipAllVaues
+- (void) _shipAllValues
 {
 	BOOL runInProgress = [gOrcaGlobals runInProgress];
 	
@@ -472,10 +472,10 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
 - (void) initBoard
 {
 	@try {
-		[self softwareClear];
+		[self softwareReset];
 		[self writeEnabledMask];
 		[self writeControlReg];
-		[self writeDwellTime];
+		if(testMode)[self writeDwellTime];
 	}
 	@catch(NSException* localException){
 		NSLogColor([NSColor redColor],@"unable to init HW for CV830,%d,%d\n",[self crateNumber],[self slot]);
@@ -658,6 +658,7 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
+	[self readScalers];
 	
 }
 
@@ -670,6 +671,7 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
 	
+	[self readScalers];
 }
 
 
