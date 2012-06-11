@@ -247,13 +247,13 @@
 									<object class="NSTextField" id="815532552">
 										<reference key="NSNextResponder" ref="547287345"/>
 										<int key="NSvFlags">268</int>
-										<string key="NSFrame">{{40, -2}, {41, 26}}</string>
+										<string key="NSFrame">{{42, 6}, {82, 17}}</string>
 										<reference key="NSSuperview" ref="547287345"/>
 										<bool key="NSEnabled">YES</bool>
 										<object class="NSTextFieldCell" key="NSCell" id="987469802">
 											<int key="NSCellFlags">67239424</int>
 											<int key="NSCellFlags2">4194304</int>
-											<string type="base64-UTF8" key="NSContents">MC4wL3NlYwo</string>
+											<string key="NSContents">0.0/sec</string>
 											<reference key="NSSupport" ref="621658618"/>
 											<reference key="NSControlView" ref="815532552"/>
 											<reference key="NSBackgroundColor" ref="86625207"/>
@@ -880,12 +880,12 @@
 							<reference ref="1003257671"/>
 							<reference ref="1027541423"/>
 							<reference ref="894213046"/>
-							<reference ref="815532552"/>
 							<reference ref="529858691"/>
 							<reference ref="370365177"/>
 							<reference ref="185378844"/>
 							<reference ref="264751941"/>
 							<reference ref="484880744"/>
+							<reference ref="815532552"/>
 						</object>
 						<reference key="parent" ref="1063882322"/>
 					</object>
@@ -1308,6 +1308,7 @@
 					<string>431.IBPluginDependency</string>
 					<string>432.IBPluginDependency</string>
 					<string>447.IBPluginDependency</string>
+					<string>447.IBViewBoundsToFrameTransform</string>
 					<string>447.ImportedFromIB2</string>
 					<string>448.IBPluginDependency</string>
 					<string>452.IBPluginDependency</string>
@@ -1391,6 +1392,9 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<object class="NSAffineTransform">
+						<bytes key="NSTransformStruct">P4AAAL+AAABCIAAAwYAAAA</bytes>
+					</object>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -1463,6 +1467,20 @@
 					<string key="className">NSObject</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Experiments/MJDVacuum/ORMJDVacuumView.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Experiments/MJDVacuum/ORVacuumParts.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">Source/Experiments/Ncd/Detector/NcdDetector.h</string>
 					</object>
 				</object>
@@ -1519,6 +1537,13 @@
 					<string key="className">NSObject</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Misc/Utilities.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">Source/Objects/Container/ORContainerModel.h</string>
 					</object>
 				</object>
@@ -1548,6 +1573,13 @@
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">Source/Objects/Control/RunControl/ORRunModel.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Objects/Custom Hardware/Majorana Hardware/MJDPreAmp/ORMJDPreAmpModel.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -1702,6 +1734,13 @@
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">Source/Objects/Hardware/HV/MPod/MPod Controller/ORMPodCModel.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Objects/Hardware/Hardware Base Classes/ORBitProcessing.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -1997,6 +2036,13 @@
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">Source/Objects/ProcessLogic/ProcessElements/Outputs/ProcessHistory/ORProcessHistoryModel.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Objects/ProcessLogic/ProcessElements/analog/adc/ORAdcModel.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -2759,6 +2805,13 @@
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBFrameworkSource</string>
 						<string key="minorKey">WebKit.framework/Headers/WebUIDelegate.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBFrameworkSource</string>
+						<string key="minorKey">YAJL.framework/Headers/NSObject+YAJL.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
