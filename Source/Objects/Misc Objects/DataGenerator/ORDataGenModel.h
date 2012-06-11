@@ -25,6 +25,7 @@
 
 @interface ORDataGenModel :  OrcaObject <ORDataTaker,ORAdcProcessing>
 {
+    unsigned long burstDataId;
     unsigned long dataId1D;
     unsigned long dataId2D;
     unsigned long dataIdWaveform;
@@ -34,12 +35,16 @@
 	int theta;
 	NSDate* lastTime;
 	float   timeIndex;
+	ORTimer* burstTimer;
+	unsigned long nextBurst;
 }
 - (unsigned long) timeSeriesId;
+- (unsigned long) burstDataId;
 - (unsigned long) dataId1D;
 - (unsigned long) dataId2D;
 - (unsigned long) dataIdWaveform;
 - (void) setTimeSeriesId: (unsigned long) aDataId;
+- (void) setBurstDataId: (unsigned long) aDataId;
 - (void) setDataId1D: (unsigned long) aDataId;
 - (void) setDataId2D: (unsigned long) aDataId;
 - (void) setDataIdWaveform: (unsigned long) aDataId;

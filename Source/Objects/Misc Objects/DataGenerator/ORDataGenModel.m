@@ -51,12 +51,19 @@
 {
     timeSeriesId = aDataId;
 }
-- (unsigned long) dataId1D { return dataId1D; }
 
+- (unsigned long) burstDataId { return burstDataId; }
+- (void) setBurstDataId: (unsigned long) aDataId
+{
+    burstDataId = aDataId;
+}
+
+- (unsigned long) dataId1D { return dataId1D; }
 - (void) setDataId1D: (unsigned long) aDataId
 {
     dataId1D = aDataId;
 }
+
 - (unsigned long) dataId2D { return dataId2D; }
 - (void) setDataId2D: (unsigned long) aDataId
 {
@@ -73,13 +80,15 @@
 {
     dataId1D       = [assigner assignDataIds:kLongForm];
     dataId2D       = [assigner assignDataIds:kLongForm];
+    burstDataId    = [assigner assignDataIds:kLongForm];
 	dataIdWaveform = [assigner assignDataIds:kLongForm];
-	timeSeriesId	= [assigner assignDataIds:kLongForm];
+	timeSeriesId= [assigner assignDataIds:kLongForm];
 }
 
 
 - (void) syncDataIdsWith:(id)anotherObj
 {
+    [self setBurstDataId:[anotherObj burstDataId]];
     [self setDataId1D:[anotherObj dataId1D]];
     [self setDataId2D:[anotherObj dataId2D]];
     [self setDataIdWaveform:[anotherObj dataIdWaveform]];
@@ -113,6 +122,15 @@
         nil];
     [dataDictionary setObject:aDictionary forKey:@"TestData2D"];
 	
+	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+				   @"ORDataGenDecoderForBurstData",       @"decoder",
+				   [NSNumber numberWithLong:burstDataId],     @"dataId",
+				   [NSNumber numberWithBool:NO],           @"variable",
+				   [NSNumber numberWithLong:3],            @"length",
+				   nil];
+    [dataDictionary setObject:aDictionary forKey:@"BurstTestData"];
+	
+	
     aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
         @"ORDataGenDecoderForTestDataWaveform",		@"decoder",
         [NSNumber numberWithLong:dataIdWaveform],   @"dataId",
@@ -131,6 +149,9 @@
     [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORDataGenModel"];  
 	first = YES; 
 	lastTime = [[NSDate date]retain];
+	burstTimer = [[ORTimer alloc] init];
+	[burstTimer start];
+	nextBurst = random_range(1,1000000);
 	timeIndex = 0;
 }
 
@@ -141,6 +162,29 @@
 
 -(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+	//check for burst first
+	if([burstTimer microseconds] >= nextBurst){
+		short card = 0;
+        short chan = 0;
+		int i;
+		unsigned long burstCount = random_range(1,10);
+		for(i=0;i<burstCount;i++){
+			unsigned long aValue = ((random()%500 + random()%500 + random()%500+ random()%500)/4);
+			unsigned long data[3];
+			data[0] = burstDataId | 3;
+			data[1] = (card<<16) | (chan << 12) | (aValue & 0x0fff);
+			
+			union {
+				float asFloat;
+				unsigned long asLong;
+			}theData;
+			theData.asFloat = [burstTimer microseconds];
+			data[2] = theData.asLong;			 
+			
+			[aDataPacket addLongsToFrameBuffer:data length:3];	
+		}
+		nextBurst = [burstTimer microseconds] + random_range(1,1000000);
+	}
 	
      if(random()%500 > 480 ){
         
@@ -230,7 +274,12 @@
 	}
 }
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo  {}
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo  
+{
+	[burstTimer release];
+	burstTimer = nil;
+}
+	   
 - (void)reset  {}
 
 
@@ -241,6 +290,7 @@
 	configStruct->card_info[index].hw_mask[0] = dataId1D; 
 	configStruct->card_info[index].hw_mask[1] = dataId2D; 
 	configStruct->card_info[index].hw_mask[2] = dataIdWaveform; 
+	configStruct->card_info[index].hw_mask[3] = burstDataId; 
 	configStruct->card_info[index].num_Trigger_Indexes = 0;	
 	configStruct->card_info[index].next_Card_Index 	= index+1;	
 	return index+1;

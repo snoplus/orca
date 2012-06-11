@@ -229,3 +229,48 @@ static NSString* kCardKey[8] = {
 	return theString;
 }
 @end
+
+@implementation ORDataGenDecoderForBurstData
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
+{
+	unsigned long *dataPtr = (unsigned long*)someData;
+	union {
+		float asFloat;
+		unsigned long asLong;
+	}theTemp;
+	theTemp.asLong = dataPtr[2];									//encoded as float, use union to convert
+    unsigned long* ptr = (unsigned long*)someData;
+	unsigned short card  = ShiftAndExtract(ptr[1],16,0xf);
+	unsigned short chan  = ShiftAndExtract(ptr[1],12,0xf);
+	unsigned short value = ShiftAndExtract(ptr[1],0,0xfff);
+	
+    [aDataSet histogram:value numBins:4096  sender:self  withKeys:@"DataGenBurst",
+	 kCardKey[card],
+	 kChanKey[chan],
+	 nil];	
+	return ExtractLength(dataPtr[0]);
+}
+
+- (NSString*) dataRecordDescription:(unsigned long*)dataPtr
+{
+    NSString* title		= @"DataGenBurst\n\n";
+    NSString* theString =  [NSString stringWithFormat:@"%@\n",title];               
+
+	unsigned short card  = ShiftAndExtract(dataPtr[1],16,0xf);
+	unsigned short chan  = ShiftAndExtract(dataPtr[1],12,0xf);
+	unsigned short value = ShiftAndExtract(dataPtr[1],0,0xfff);
+	
+	union {
+		float asFloat;
+		unsigned long asLong;
+	}theData;
+	
+	theData.asLong = dataPtr[2];
+	
+	theString = [theString stringByAppendingFormat:@"card: %d channel: %d value: %d\n",card,chan,value];
+	theString = [theString stringByAppendingFormat:@"%.6f\n",theData.asFloat];
+	
+	return theString;
+}
+@end
+

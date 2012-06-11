@@ -26,6 +26,13 @@
 @class ORDataSet;
 
 
+
+@interface ORDataGenDecoderForBurstData : ORBaseDecoder
+{}
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
+- (NSString*) dataRecordDescription:(unsigned long*)ptr;
+@end
+
 @interface ORDataGenDecoderForTestData1D : ORBaseDecoder
 {}
 - (NSString*) getChannelKey:(unsigned short)aChan;
