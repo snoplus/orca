@@ -173,13 +173,7 @@
 			unsigned long data[3];
 			data[0] = burstDataId | 3;
 			data[1] = (card<<16) | (chan << 12) | (aValue & 0x0fff);
-			
-			union {
-				float asFloat;
-				unsigned long asLong;
-			}theData;
-			theData.asFloat = [burstTimer microseconds];
-			data[2] = theData.asLong;			 
+			data[2] = [burstTimer microseconds];			 
 			
 			[aDataPacket addLongsToFrameBuffer:data length:3];	
 		}
