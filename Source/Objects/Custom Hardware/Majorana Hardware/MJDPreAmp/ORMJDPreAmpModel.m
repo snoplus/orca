@@ -573,6 +573,7 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 		else [self setAdc:(aChip*8)+i value:0.0];
 	}
 	
+    /*
 	if(adcEnabledMask & (0x1<<(aChip*8))){
 		//select the first one and to readBack the last one
 		readBack = [self writeAuxIOSPI:adcBase | channelSelect[0]];
@@ -580,7 +581,7 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 		[self setAdc:(aChip*8)+7 value:readBack];
 	}
 	else [self setAdc:(aChip*8)+7 value:0.0];
-	
+	*/
 	
 	//get the time(UT!) for the data record. 
 	time_t	ut_Time;
