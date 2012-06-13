@@ -592,6 +592,7 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollValues) object:nil];
 	[self readAdcs];
+	if(shipValues)[self shipRecords];
 	if(pollTime)[self performSelector:@selector(pollValues) withObject:nil afterDelay:pollTime];
 }
 
