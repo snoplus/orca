@@ -1023,7 +1023,8 @@
 {
 	[self endEditing];
 	unsigned long aValue = [model spiWriteValue];
-	[model writeAuxIOSPI:aValue];
+	unsigned long readback = [model writeAuxIOSPI:aValue];
+	NSLog(@"Gretina4(%d,%d) writeSPI(%u) readback: (0x%0x)\n",[model crateNumber],[model slot], aValue, readback);
 }
 
 
