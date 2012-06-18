@@ -1231,7 +1231,7 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
 		if([aCmd isEqualToString:@"++Delay"]){
 			delay = YES;
 			[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(clearDelay) object:nil];
-			[self performSelector:@selector(clearDelay) withObject:nil afterDelay:0];
+			[self performSelector:@selector(clearDelay) withObject:nil afterDelay:.05];
 		}
 		else if([aCmd isEqualToString:@"++ShipRecords"]){
 			if(shipTemperatures) [self shipTemperatureValues];
