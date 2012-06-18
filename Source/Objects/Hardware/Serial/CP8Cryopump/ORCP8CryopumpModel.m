@@ -134,6 +134,8 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
 - (void) registerNotificationObservers
 {
 	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+    
+    [notifyCenter removeObserver:self];
 
     [notifyCenter addObserver : self
                      selector : @selector(dataReceived:)
