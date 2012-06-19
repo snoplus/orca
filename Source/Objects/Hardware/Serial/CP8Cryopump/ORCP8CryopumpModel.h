@@ -82,6 +82,7 @@
         BOOL                delay;
 		BOOL				readOnce;
 		BOOL				involvedInProcess;
+		int					firstStageControlMethodRB;
 }
 
 #pragma mark •••Initialization
@@ -91,6 +92,9 @@
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark •••Accessors
+- (int)		firstStageControlMethodRB;
+- (void)	setFirstStageControlMethodRB:(int)aFirstStageControlMethodRB;
+- (NSString*) firstStageControlMethodString;
 - (BOOL)	involvedInProcess;
 - (void)	setInvolvedInProcess:(BOOL)aInvolvedInProcess;
 - (BOOL)    wasPowerFailure;
@@ -271,6 +275,7 @@
 @property (nonatomic,copy) NSString* cmd;
 @end
 
+extern NSString* ORCP8CryopumpModelFirstStageControlMethodRBChanged;
 extern NSString* ORCP8CryopumpModelSecondStageTempControlChanged;
 extern NSString* ORCP8CryopumpModelRoughingInterlockChanged;
 extern NSString* ORCP8CryopumpModelStandbyModeChanged;

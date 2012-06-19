@@ -340,6 +340,11 @@
                          name : ORCP8CryopumpModelInvolvedInProcessChanged
 						object: model];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(firstStageControlMethodRBChanged:)
+                         name : ORCP8CryopumpModelFirstStageControlMethodRBChanged
+						object: model];
+
 }
 
 - (void) involvedInProcessChanged:(NSNotification*)aNote
@@ -404,6 +409,12 @@
 	[self standbyModeChanged:nil];
 	[self roughingInterlockChanged:nil];
 	[self secondStageTempControlChanged:nil];
+	[self firstStageControlMethodRBChanged:nil];
+}
+
+- (void) firstStageControlMethodRBChanged:(NSNotification*)aNote
+{
+	[firstStageControlMethodRBField setStringValue: [model firstStageControlMethodString]];
 }
 
 - (void) wasPowerFailureChanged:(NSNotification*)aNote

@@ -24,6 +24,7 @@
 @interface ORCP8CryopumpController : OrcaObjectController
 {
     IBOutlet NSTextField*	lockDocField;
+	IBOutlet NSTextField*	firstStageControlMethodRBField;
 	IBOutlet NSTextField*	secondStageTempControlField;
 	IBOutlet NSPopUpButton* roughingInterlockPU;
     IBOutlet NSButton*      lockButton;
@@ -113,6 +114,7 @@
 - (void) updateWindow;
 
 #pragma mark ***Interface Management
+- (void) firstStageControlMethodRBChanged:(NSNotification*)aNote;
 - (void) wasPowerFailureChanged:(NSNotification*)aNote;
 - (void) cmdErrorChanged:(NSNotification*)aNote;
 - (void) secondStageTempControlChanged:(NSNotification*)aNote;

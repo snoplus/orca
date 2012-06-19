@@ -29,6 +29,7 @@
 #import "ORSafeQueue.h"
 
 #pragma mark •••External Strings
+NSString* ORCP8CryopumpModelFirstStageControlMethodRBChanged = @"ORCP8CryopumpModelFirstStageControlMethodRBChanged";
 NSString* ORCP8CryopumpModelSecondStageTempControlChanged	= @"ORCP8CryopumpModelSecondStageTempControlChanged";
 NSString* ORCP8CryopumpModelRoughingInterlockChanged		= @"ORCP8CryopumpModelRoughingInterlockChanged";
 NSString* ORCP8CryopumpModelStandbyModeChanged				= @"ORCP8CryopumpModelStandbyModeChanged";
@@ -206,6 +207,28 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
 }
 
 #pragma mark •••Accessors
+- (int) firstStageControlMethodRB
+{
+    return firstStageControlMethodRB;
+}
+
+- (void) setFirstStageControlMethodRB:(int)aFirstStageControlMethodRB
+{
+    firstStageControlMethodRB = aFirstStageControlMethodRB;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpModelFirstStageControlMethodRBChanged object:self];
+}
+
+- (NSString*) firstStageControlMethodString
+{
+	switch(firstStageControlMethodRB){
+		case 0: return @"Ext Heater";
+		case 1: return @"1st Stage Spd";
+		case 2: return @"2nd Stage Spd";
+		case 3: return @"Dual Stage";
+		default: return @"?";
+	}
+}
+
 - (BOOL) involvedInProcess
 {
     return involvedInProcess;
@@ -1312,7 +1335,7 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
 			case 'J': [self setFirstStageTemp:		[self responseAsFloat:theResponse]]; break;
 			case 'H': 
 				[self setFirstStageControlTemp:		[self responseAsInt:theResponse]%400];	
-				[self setFirstStageControlMethod:	[self responseAsInt:theResponse]/400];	
+				[self setFirstStageControlMethodRB:	[self responseAsInt:theResponse]/400];	
 			break;
 			case 'n': [self setLastRateOfRaise:		[self responseAsInt:theResponse]];			break;
 			case '@': [self setModuleVersion:		[self responseAsString:theResponse]];		break;
