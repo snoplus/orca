@@ -527,7 +527,6 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
 
 - (void) setRegenerationStepTimer:(int)aRegenerationStepTimer
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setRegenerationStepTimer:regenerationStepTimer];
     regenerationStepTimer = aRegenerationStepTimer;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpModelRegenerationStepTimerChanged object:self];
 }
@@ -678,7 +677,6 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
 
 - (void) setFirstStageTemp:(float)aFirstStageTemp
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setFirstStageTemp:firstStageTemp];
     firstStageTemp = aFirstStageTemp;
     
     //get the time(UT!)
@@ -699,7 +697,6 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
 
 - (void) setFailedRepurgeCycles:(int)aFailedRepurgeCycles
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setFailedRepurgeCycles:failedRepurgeCycles];
     failedRepurgeCycles = aFailedRepurgeCycles;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpModelFailedRepurgeCyclesChanged object:self];
 }
@@ -711,7 +708,6 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
 
 - (void) setFailedRateRiseCycles:(int)aFailedRateRiseCycles
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setFailedRateRiseCycles:failedRateRiseCycles];
     failedRateRiseCycles = aFailedRateRiseCycles;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpModelFailedRateRiseCyclesChanged object:self];
 }
@@ -722,11 +718,8 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
 }
 
 - (void) setElapsedTime:(int)aElapsedTime
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setElapsedTime:elapsedTime];
-    
+{    
     elapsedTime = aElapsedTime;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpModelElapsedTimeChanged object:self];
 }
 
@@ -737,7 +730,6 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
 
 - (void) setDutyCycle:(int)aDutyCycle
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setDutyCycle:dutyCycle];
     dutyCycle = aDutyCycle;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpModelDutyCycleChanged object:self];
 }
@@ -1145,7 +1137,7 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
     [self readTemperatures];
     [self readStatus];
     [self readRegenerationSequence];
-    [self readRegenerationStartDelay];
+    //[self readRegenerationStartDelay];
     [self readRegenerationStepTimer];
     [self readRoughValveStatus];
     [self readRoughValveInterlock];
