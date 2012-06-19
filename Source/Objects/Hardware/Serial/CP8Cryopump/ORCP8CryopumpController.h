@@ -180,8 +180,6 @@
 - (IBAction) statusAction:(id)sender;
 - (IBAction) roughValveInterlockAction:(id)sender;
 - (IBAction) roughValveStatusAction:(id)sender;
-- (IBAction) regenerationTimeAction:(id)sender;
-- (IBAction) regenerationStepTimerAction:(id)sender;
 - (IBAction) regenerationStartDelayAction:(id)sender;
 - (IBAction) powerFailureRecoveryAction:(id)sender;
 - (IBAction) firstStageControlMethodAction:(id)sender;

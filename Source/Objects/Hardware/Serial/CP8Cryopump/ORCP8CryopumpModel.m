@@ -940,7 +940,10 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
 
 - (void) initHardware
 {
-
+	[self writeRegenerationCycleParameters];
+	[self writeFirstStageTempControl];
+	[self writePowerFailureRecoveryMode];
+	[self addCmdToQueue: [NSString stringWithFormat:@"I%d",secondStageTempControl]	waitForResponse:YES];
 }
 
 #pragma mark •••Queries
@@ -1008,6 +1011,7 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
 
 - (void) writeRegenerationCycleParameters
 {
+	[self addCmdToQueue: [NSString stringWithFormat:@"j%d",regenerationStartDelay] waitForResponse:YES];
 	[self addCmdToQueue: [NSString stringWithFormat:@"P0%d",pumpRestartDelay]	waitForResponse:YES];
 	[self addCmdToQueue: [NSString stringWithFormat:@"P1%d",extendedPurgeTime]	waitForResponse:YES];
 	[self addCmdToQueue: [NSString stringWithFormat:@"P2%d",repurgeCycles]		waitForResponse:YES];
@@ -1015,9 +1019,9 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
 	[self addCmdToQueue: [NSString stringWithFormat:@"P4%d",rateOfRise]			waitForResponse:YES];
 	[self addCmdToQueue: [NSString stringWithFormat:@"P5%d",rateOfRiseCycles]	waitForResponse:YES];
 	[self addCmdToQueue: [NSString stringWithFormat:@"P6%d",restartTemperature]	waitForResponse:YES];
-	[self addCmdToQueue: [NSString stringWithFormat:@"PA%d",roughingInterlock]	waitForResponse:YES];
 	[self addCmdToQueue: [NSString stringWithFormat:@"PC%d",pumpsPerCompressor]	waitForResponse:YES];
 	[self addCmdToQueue: [NSString stringWithFormat:@"PG%d",repurgeTime]		waitForResponse:YES];
+	[self addCmdToQueue: [NSString stringWithFormat:@"PA%d",roughingInterlock]	waitForResponse:YES];
 	[self addCmdToQueue: [NSString stringWithFormat:@"Pz%d",standbyMode]		waitForResponse:YES];
 }
 
