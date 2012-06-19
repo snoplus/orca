@@ -32,6 +32,8 @@
 	IBOutlet NSTextField*	repurgeTimeField;
 	IBOutlet NSTextField*	pumpsPerCompressorField;
 	IBOutlet NSTextField*	roughingInterlockStatusField;
+	IBOutlet NSTextField*	roughingInterlockStatusField1;
+	IBOutlet NSTextField*	roughingInterlockStatusField2;
 	IBOutlet NSTextField*	restartTemperatureField;
 	IBOutlet NSTextField*	rateOfRiseCyclesField;
 	IBOutlet NSTextField*	rateOfRiseField;

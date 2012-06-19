@@ -454,15 +454,10 @@
 
 - (void) roughingInterlockStatusChanged:(NSNotification*)aNote
 {
-	NSString* s = @"?";
-	switch([model roughingInterlockStatus]){
-		case 0: s = @"No Permission";				break;
-		case 1: s = @"Has Roughing Permission";		break;
-		case 2: s = @"Needs Roughing Permission";	break;
-		case 4: s = @"Cryopump is Running";			break;
-			
-	}
-	[roughingInterlockStatusField setStringValue: s];
+	int mask = [model roughingInterlockStatus];
+	[roughingInterlockStatusField setStringValue: (mask & 0x1)?@"":@"Not Using/No Permission"];
+	[roughingInterlockStatusField1 setStringValue: (mask & 0x2)?@"Needs Permission":@""];	
+	[roughingInterlockStatusField2 setStringValue: (mask & 0x4)?@"Cryopump running":@""];
 }
 
 - (void) restartTemperatureChanged:(NSNotification*)aNote
@@ -784,7 +779,9 @@
 	[regenWarmAndStopButton			setEnabled:!locked];
 	[initHardwareButton				setEnabled:!locked];
 	
-	[roughValveInterlockButton		setEnabled:!locked && [model regenerationSequence] == 'J'];
+	int mask = [model roughingInterlockStatus];
+	
+	[roughValveInterlockButton		setEnabled:!locked && (mask & 0x2)];
 
 	[pumpOnButton					setEnabled:!locked && [model pumpStatus]==NO];
 	[pumpOffButton					setEnabled:!locked && [model pumpStatus]==YES];
