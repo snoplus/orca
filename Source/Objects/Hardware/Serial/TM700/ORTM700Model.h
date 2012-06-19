@@ -44,6 +44,7 @@
 		BOOL			readOnce;
 		BOOL			involvedInProcess;
 		NSString*		errorCode;
+		BOOL            delay;
 }
 
 #pragma mark •••Initialization

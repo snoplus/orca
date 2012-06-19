@@ -79,6 +79,7 @@ NSString* ORTM700Lock						= @"ORTM700Lock";
 - (float)	extractFloat:(NSString*)aCommand;
 - (NSString*) extractString:(NSString*)aCommand;
 - (void)	pollHardware;
+- (void)	clearDelay;
 @end
 
 @implementation ORTM700Model
@@ -689,14 +690,30 @@ NSString* ORTM700Lock						= @"ORTM700Lock";
 	[self processOneCommandFromQueue];	 //do the next command in the queue
 }
 
+- (void) clearDelay
+{
+	delay = NO;
+	[self processOneCommandFromQueue];
+}
+
+
 - (void) processOneCommandFromQueue
 {
-	if([cmdQueue count] == 0) return;
+    if(delay) return;
+	
 	NSString* cmdString = [cmdQueue dequeue];
-	[self setLastRequest:cmdString];
-	//NSLog(@"send: %@\n",cmdString);
-	[serialPort writeDataInBackground:[cmdString dataUsingEncoding:NSASCIIStringEncoding]];
-	[self performSelector:@selector(timeout) withObject:nil afterDelay:.3];
+	if([cmdString isEqualToString:@"++Delay"]){
+		delay = YES;
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(clearDelay) object:nil];
+		[self performSelector:@selector(clearDelay) withObject:nil afterDelay:.1];
+	}
+	else {
+		[self setLastRequest:cmdString];
+		//NSLog(@"send: %@\n",cmdString);
+		[serialPort writeDataInBackground:[cmdString dataUsingEncoding:NSASCIIStringEncoding]];
+		[self performSelector:@selector(timeout) withObject:nil afterDelay:.3];
+	}
+
 }
 
 - (int) checkSum:(NSString*)aString
@@ -713,6 +730,7 @@ NSString* ORTM700Lock						= @"ORTM700Lock";
 {
 	if([serialPort isOpen]){
 		[cmdQueue enqueue:aString];
+		[cmdQueue enqueue:@"++Delay"];
 		if(!lastRequest)[self processOneCommandFromQueue];
 	}
 }
