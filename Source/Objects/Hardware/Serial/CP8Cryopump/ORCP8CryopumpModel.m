@@ -325,6 +325,8 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
 
 - (void) setRestartTemperature:(int)aRestartTemperature
 {
+	if(aRestartTemperature<0)		 aRestartTemperature=0;
+	else if(aRestartTemperature>80) aRestartTemperature=80;
     [[[self undoManager] prepareWithInvocationTarget:self] setRestartTemperature:restartTemperature];
     restartTemperature = aRestartTemperature;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpModelRestartTemperatureChanged object:self];
