@@ -677,7 +677,6 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
 
 - (void) setFirstStageTemp:(float)aFirstStageTemp
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setFirstStageTemp:firstStageTemp];
     firstStageTemp = aFirstStageTemp;
     
     //get the time(UT!)
@@ -1327,7 +1326,7 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
 			case 'I': [self setFailedRepurgeCycles: [self responseAsInt:theResponse]];	 break;
 			case 'J': [self setFirstStageTemp:		[self responseAsFloat:theResponse]]; break;
 			case 'H': 
-				[self setFirstStageControlTemp:		[self responseAsInt:theResponse]%400];	
+				//[self setFirstStageControlTemp:		[self responseAsInt:theResponse]%400];	
 				[self setFirstStageControlMethodRB:	[self responseAsInt:theResponse]/400];	
 			break;
 			case 'n': [self setLastRateOfRaise:		[self responseAsInt:theResponse]];			break;
@@ -1368,7 +1367,7 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
 			break;
 				
 			case 'O': [self setRegenerationSequence:	[self responseAsInt:theResponse]];			break;
-			case 'j': [self setRegenerationStartDelay:	[self responseAsInt:theResponse]];			break;
+			//case 'j': [self setRegenerationStartDelay:	[self responseAsInt:theResponse]];			break;
 			case 'k': [self setRegenerationStepTimer:	[self responseAsInt:theResponse]];			break;
 			case 'a': [self setRegenerationTime:		[self responseAsInt:theResponse]];			break;
 			case 'D': [self setRoughValveStatus:		[self responseAsBool:theResponse]];			break;
