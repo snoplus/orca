@@ -12,7 +12,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="2840"/>
+			<integer value="2845"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1211,24 +1211,6 @@
 																	<reference key="NSTextColor" ref="152911849"/>
 																</object>
 															</object>
-															<object class="NSTextField" id="645047523">
-																<reference key="NSNextResponder" ref="822945976"/>
-																<int key="NSvFlags">268</int>
-																<string key="NSFrame">{{148, 290}, {43, 19}}</string>
-																<reference key="NSSuperview" ref="822945976"/>
-																<reference key="NSNextKeyView" ref="455110675"/>
-																<bool key="NSEnabled">YES</bool>
-																<object class="NSTextFieldCell" key="NSCell" id="795926380">
-																	<int key="NSCellFlags">-1804468671</int>
-																	<int key="NSCellFlags2">71435264</int>
-																	<string key="NSContents">59994</string>
-																	<reference key="NSSupport" ref="26"/>
-																	<reference key="NSControlView" ref="645047523"/>
-																	<bool key="NSDrawsBackground">YES</bool>
-																	<reference key="NSBackgroundColor" ref="800530977"/>
-																	<reference key="NSTextColor" ref="483653873"/>
-																</object>
-															</object>
 															<object class="NSTextField" id="173204085">
 																<reference key="NSNextResponder" ref="822945976"/>
 																<int key="NSvFlags">268</int>
@@ -1274,7 +1256,7 @@
 																<object class="NSTextFieldCell" key="NSCell" id="167993717">
 																	<int key="NSCellFlags">68288064</int>
 																	<int key="NSCellFlags2">272761856</int>
-																	<string key="NSContents">min</string>
+																	<string key="NSContents">hrs</string>
 																	<reference key="NSSupport" ref="26"/>
 																	<reference key="NSControlView" ref="965330518"/>
 																	<reference key="NSBackgroundColor" ref="990794132"/>
@@ -1284,14 +1266,14 @@
 															<object class="NSTextField" id="793850650">
 																<reference key="NSNextResponder" ref="822945976"/>
 																<int key="NSvFlags">268</int>
-																<string key="NSFrame">{{67, 269}, {78, 14}}</string>
+																<string key="NSFrame">{{21, 269}, {124, 14}}</string>
 																<reference key="NSSuperview" ref="822945976"/>
-																<reference key="NSNextKeyView" ref="702487878"/>
+																<reference key="NSNextKeyView"/>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSTextFieldCell" key="NSCell" id="864473555">
 																	<int key="NSCellFlags">68288064</int>
 																	<int key="NSCellFlags2">71435264</int>
-																	<string key="NSContents">Time</string>
+																	<string key="NSContents">Time Since Last Regen</string>
 																	<reference key="NSSupport" ref="26"/>
 																	<reference key="NSControlView" ref="793850650"/>
 																	<reference key="NSBackgroundColor" ref="990794132"/>
@@ -1315,22 +1297,36 @@
 																	<reference key="NSTextColor" ref="152911849"/>
 																</object>
 															</object>
-															<object class="NSTextField" id="702487878">
+															<object class="NSTextField" id="993504548">
 																<reference key="NSNextResponder" ref="822945976"/>
 																<int key="NSvFlags">268</int>
-																<string key="NSFrame">{{148, 267}, {43, 19}}</string>
+																<string key="NSFrame">{{147, 291}, {45, 14}}</string>
 																<reference key="NSSuperview" ref="822945976"/>
-																<reference key="NSNextKeyView" ref="965330518"/>
 																<bool key="NSEnabled">YES</bool>
-																<object class="NSTextFieldCell" key="NSCell" id="936784535">
-																	<int key="NSCellFlags">-1804468671</int>
+																<object class="NSTextFieldCell" key="NSCell" id="444166288">
+																	<int key="NSCellFlags">68288064</int>
 																	<int key="NSCellFlags2">71435264</int>
-																	<string key="NSContents">59994</string>
+																	<string key="NSContents">1</string>
 																	<reference key="NSSupport" ref="26"/>
-																	<reference key="NSControlView" ref="702487878"/>
-																	<bool key="NSDrawsBackground">YES</bool>
-																	<reference key="NSBackgroundColor" ref="800530977"/>
-																	<reference key="NSTextColor" ref="483653873"/>
+																	<reference key="NSControlView" ref="993504548"/>
+																	<reference key="NSBackgroundColor" ref="990794132"/>
+																	<reference key="NSTextColor" ref="152911849"/>
+																</object>
+															</object>
+															<object class="NSTextField" id="777404021">
+																<reference key="NSNextResponder" ref="822945976"/>
+																<int key="NSvFlags">268</int>
+																<string key="NSFrame">{{147, 269}, {45, 14}}</string>
+																<reference key="NSSuperview" ref="822945976"/>
+																<bool key="NSEnabled">YES</bool>
+																<object class="NSTextFieldCell" key="NSCell" id="572758482">
+																	<int key="NSCellFlags">68288064</int>
+																	<int key="NSCellFlags2">71435264</int>
+																	<string key="NSContents">1</string>
+																	<reference key="NSSupport" ref="26"/>
+																	<reference key="NSControlView" ref="777404021"/>
+																	<reference key="NSBackgroundColor" ref="990794132"/>
+																	<reference key="NSTextColor" ref="152911849"/>
 																</object>
 															</object>
 															<object class="NSTextField" id="38832928">
@@ -1338,7 +1334,7 @@
 																<int key="NSvFlags">268</int>
 																<string key="NSFrame">{{67, 292}, {78, 14}}</string>
 																<reference key="NSSuperview" ref="822945976"/>
-																<reference key="NSNextKeyView" ref="645047523"/>
+																<reference key="NSNextKeyView"/>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSTextFieldCell" key="NSCell" id="812934957">
 																	<int key="NSCellFlags">68288064</int>
@@ -3563,44 +3559,12 @@
 					<int key="connectionID">2641</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">regenerationStepTimerField</string>
-						<reference key="source" ref="517113374"/>
-						<reference key="destination" ref="645047523"/>
-					</object>
-					<int key="connectionID">2642</int>
-				</object>
-				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">regenerationStartDelayAction:</string>
 						<reference key="source" ref="517113374"/>
 						<reference key="destination" ref="660819459"/>
 					</object>
 					<int key="connectionID">2643</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">regenerationStepTimerAction:</string>
-						<reference key="source" ref="517113374"/>
-						<reference key="destination" ref="645047523"/>
-					</object>
-					<int key="connectionID">2644</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">regenerationTimeAction:</string>
-						<reference key="source" ref="517113374"/>
-						<reference key="destination" ref="702487878"/>
-					</object>
-					<int key="connectionID">2652</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">regenerationTimeField</string>
-						<reference key="source" ref="517113374"/>
-						<reference key="destination" ref="702487878"/>
-					</object>
-					<int key="connectionID">2653</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -3649,14 +3613,6 @@
 						<reference key="destination" ref="602551525"/>
 					</object>
 					<int key="connectionID">2675</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">roughValveInterlockField</string>
-						<reference key="source" ref="517113374"/>
-						<reference key="destination" ref="898671717"/>
-					</object>
-					<int key="connectionID">2676</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -3897,6 +3853,22 @@
 						<reference key="destination" ref="957312749"/>
 					</object>
 					<int key="connectionID">2860</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">regenerationStepTimerField</string>
+						<reference key="source" ref="517113374"/>
+						<reference key="destination" ref="993504548"/>
+					</object>
+					<int key="connectionID">2871</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">regenerationTimeField</string>
+						<reference key="source" ref="517113374"/>
+						<reference key="destination" ref="777404021"/>
+					</object>
+					<int key="connectionID">2872</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -4549,10 +4521,8 @@
 							<reference ref="33578736"/>
 							<reference ref="911617306"/>
 							<reference ref="157912666"/>
-							<reference ref="702487878"/>
 							<reference ref="455110675"/>
 							<reference ref="965330518"/>
-							<reference ref="645047523"/>
 							<reference ref="660819459"/>
 							<reference ref="793850650"/>
 							<reference ref="38832928"/>
@@ -4563,6 +4533,8 @@
 							<reference ref="411230442"/>
 							<reference ref="479792268"/>
 							<reference ref="13454227"/>
+							<reference ref="993504548"/>
+							<reference ref="777404021"/>
 						</object>
 						<reference key="parent" ref="132292912"/>
 					</object>
@@ -4937,20 +4909,6 @@
 						<reference key="parent" ref="911617306"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">2636</int>
-						<reference key="object" ref="645047523"/>
-						<object class="NSMutableArray" key="children">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="795926380"/>
-						</object>
-						<reference key="parent" ref="139628346"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">2637</int>
-						<reference key="object" ref="795926380"/>
-						<reference key="parent" ref="645047523"/>
-					</object>
-					<object class="IBObjectRecord">
 						<int key="objectID">2628</int>
 						<reference key="object" ref="173204085"/>
 						<object class="NSMutableArray" key="children">
@@ -5019,20 +4977,6 @@
 						<int key="objectID">2639</int>
 						<reference key="object" ref="240771136"/>
 						<reference key="parent" ref="455110675"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">2647</int>
-						<reference key="object" ref="702487878"/>
-						<object class="NSMutableArray" key="children">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="936784535"/>
-						</object>
-						<reference key="parent" ref="139628346"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">2648</int>
-						<reference key="object" ref="936784535"/>
-						<reference key="parent" ref="702487878"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">2635</int>
@@ -6097,6 +6041,34 @@
 						<reference key="object" ref="633969566"/>
 						<reference key="parent" ref="786530998"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2867</int>
+						<reference key="object" ref="993504548"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="444166288"/>
+						</object>
+						<reference key="parent" ref="139628346"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2868</int>
+						<reference key="object" ref="444166288"/>
+						<reference key="parent" ref="993504548"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2869</int>
+						<reference key="object" ref="777404021"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="572758482"/>
+						</object>
+						<reference key="parent" ref="139628346"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2870</int>
+						<reference key="object" ref="572758482"/>
+						<reference key="parent" ref="777404021"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -6293,15 +6265,12 @@
 					<string>2631.IBPluginDependency</string>
 					<string>2632.IBPluginDependency</string>
 					<string>2634.IBPluginDependency</string>
+					<string>2634.IBViewBoundsToFrameTransform</string>
 					<string>2635.IBPluginDependency</string>
-					<string>2636.IBPluginDependency</string>
-					<string>2637.IBPluginDependency</string>
 					<string>2638.IBPluginDependency</string>
 					<string>2639.IBPluginDependency</string>
 					<string>2645.IBPluginDependency</string>
 					<string>2646.IBPluginDependency</string>
-					<string>2647.IBPluginDependency</string>
-					<string>2648.IBPluginDependency</string>
 					<string>2649.IBPluginDependency</string>
 					<string>2650.IBPluginDependency</string>
 					<string>2656.IBPluginDependency</string>
@@ -6385,6 +6354,12 @@
 					<string>2864.IBPluginDependency</string>
 					<string>2864.IBViewBoundsToFrameTransform</string>
 					<string>2865.IBPluginDependency</string>
+					<string>2867.IBPluginDependency</string>
+					<string>2867.IBViewBoundsToFrameTransform</string>
+					<string>2868.IBPluginDependency</string>
+					<string>2869.IBPluginDependency</string>
+					<string>2869.IBViewBoundsToFrameTransform</string>
+					<string>2870.IBPluginDependency</string>
 					<string>5.IBEditorWindowLastContentRect</string>
 					<string>5.IBPluginDependency</string>
 					<string>5.IBWindowTemplateEditedContentRect</string>
@@ -6594,10 +6569,9 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<object class="NSAffineTransform">
+						<bytes key="NSTransformStruct">P4AAAL+AAABDQgAAw5iAAA</bytes>
+					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -6692,9 +6666,19 @@
 						<bytes key="NSTransformStruct">P4AAAL+AAABBoAAAwjAAAA</bytes>
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{1360, 651}, {816, 656}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{1360, 651}, {816, 656}}</string>
+					<object class="NSAffineTransform">
+						<bytes key="NSTransformStruct">P4AAAL+AAABDEwAAw5eAAA</bytes>
+					</object>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<object class="NSAffineTransform">
+						<bytes key="NSTransformStruct">P4AAAL+AAABDGAAAw5UAAA</bytes>
+					</object>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>{{1532, 680}, {816, 656}}</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>{{1532, 680}, {816, 656}}</string>
 					<boolean value="YES"/>
 					<string>{213, 107}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -6726,7 +6710,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">2866</int>
+			<int key="maxID">2872</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -7529,14 +7513,11 @@
 							<string>rateOfRiseAction:</string>
 							<string>rateOfRiseCyclesAction:</string>
 							<string>regenerationStartDelayAction:</string>
-							<string>regenerationStepTimerAction:</string>
-							<string>regenerationTimeAction:</string>
 							<string>repurgeCyclesAction:</string>
 							<string>repurgeTimeAction:</string>
 							<string>restartTemperatureAction:</string>
 							<string>roughToPressureAction:</string>
 							<string>roughValveInterlockAction:</string>
-							<string>roughValvePermissionAction:</string>
 							<string>roughValveStatusAction:</string>
 							<string>roughingInterlockAction:</string>
 							<string>secondStageTempControlAction:</string>
@@ -7550,9 +7531,6 @@
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -7612,14 +7590,11 @@
 							<string>rateOfRiseAction:</string>
 							<string>rateOfRiseCyclesAction:</string>
 							<string>regenerationStartDelayAction:</string>
-							<string>regenerationStepTimerAction:</string>
-							<string>regenerationTimeAction:</string>
 							<string>repurgeCyclesAction:</string>
 							<string>repurgeTimeAction:</string>
 							<string>restartTemperatureAction:</string>
 							<string>roughToPressureAction:</string>
 							<string>roughValveInterlockAction:</string>
-							<string>roughValvePermissionAction:</string>
 							<string>roughValveStatusAction:</string>
 							<string>roughingInterlockAction:</string>
 							<string>secondStageTempControlAction:</string>
@@ -7710,14 +7685,6 @@
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
-								<string key="name">regenerationStepTimerAction:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">regenerationTimeAction:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
 								<string key="name">repurgeCyclesAction:</string>
 								<string key="candidateClassName">id</string>
 							</object>
@@ -7735,10 +7702,6 @@
 							</object>
 							<object class="IBActionInfo">
 								<string key="name">roughValveInterlockAction:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">roughValvePermissionAction:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
