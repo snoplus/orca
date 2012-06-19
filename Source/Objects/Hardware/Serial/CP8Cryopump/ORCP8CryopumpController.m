@@ -455,9 +455,9 @@
 - (void) roughingInterlockStatusChanged:(NSNotification*)aNote
 {
 	int mask = [model roughingInterlockStatus];
-	[roughingInterlockStatusField setStringValue: (mask & 0x1)?@"":@"Not Using/No Permission"];
-	[roughingInterlockStatusField1 setStringValue: (mask & 0x2)?@"Needs Permission":@""];	
-	[roughingInterlockStatusField2 setStringValue: (mask & 0x4)?@"Cryopump running":@""];
+	[roughingInterlockStatusField setStringValue:  (mask & 0x1) ? @"Has Permission"         : @"Not Using/No Permission"];
+	[roughingInterlockStatusField1 setStringValue: (mask & 0x2) ? @"Needs Roughing Manifold": @""];	
+	[roughingInterlockStatusField2 setStringValue: (mask & 0x4) ? @"Cryopump running"       : @""];
 }
 
 - (void) restartTemperatureChanged:(NSNotification*)aNote
