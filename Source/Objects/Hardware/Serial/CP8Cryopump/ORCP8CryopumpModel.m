@@ -285,6 +285,9 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
 
 - (void) setRepurgeTime:(int)aRepurgeTime
 {
+	if(aRepurgeTime<0)		    aRepurgeTime=0;
+	else if(aRepurgeTime>9999)	aRepurgeTime=9999;
+	
     [[[self undoManager] prepareWithInvocationTarget:self] setRepurgeTime:repurgeTime];
     repurgeTime = aRepurgeTime;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpModelRepurgeTimeChanged object:self];
@@ -297,6 +300,8 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
 
 - (void) setPumpsPerCompressor:(int)aPumpsPerCompressor
 {
+	if(aPumpsPerCompressor<1)		aPumpsPerCompressor=1;
+	else if(aPumpsPerCompressor>3)	aPumpsPerCompressor=3;
     [[[self undoManager] prepareWithInvocationTarget:self] setPumpsPerCompressor:pumpsPerCompressor];
     pumpsPerCompressor = aPumpsPerCompressor;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpModelPumpsPerCompressorChanged object:self];
@@ -344,6 +349,9 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
 
 - (void) setRateOfRise:(int)aRateOfRise
 {
+	if(aRateOfRise<1)		 aRateOfRise=1;
+	else if(aRateOfRise>100) aRateOfRise=100;
+	
     [[[self undoManager] prepareWithInvocationTarget:self] setRateOfRise:rateOfRise];
     rateOfRise = aRateOfRise;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpModelRateOfRiseChanged object:self];
@@ -356,6 +364,8 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
 
 - (void) setRoughToPressure:(int)aRoughToPressure
 {
+	if(aRoughToPressure<25)		 aRoughToPressure=25;
+	else if(aRoughToPressure>200) aRoughToPressure=200;
     [[[self undoManager] prepareWithInvocationTarget:self] setRoughToPressure:roughToPressure];
     roughToPressure = aRoughToPressure;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpModelRoughToPressureChanged object:self];
@@ -368,6 +378,8 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
 
 - (void) setRepurgeCycles:(int)aRepurgeCycles
 {
+	if(aRepurgeCycles<0)		 aRepurgeCycles=0;
+	else if(aRepurgeCycles>200) aRepurgeCycles=200;
     [[[self undoManager] prepareWithInvocationTarget:self] setRepurgeCycles:repurgeCycles];
     repurgeCycles = aRepurgeCycles;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpModelRepurgeCyclesChanged object:self];
@@ -380,6 +392,8 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
 
 - (void) setExtendedPurgeTime:(int)aExtendedPurgeTime
 {
+	if(aExtendedPurgeTime<0)		 aExtendedPurgeTime=0;
+	else if(aExtendedPurgeTime>9990) aExtendedPurgeTime=9990;
     [[[self undoManager] prepareWithInvocationTarget:self] setExtendedPurgeTime:extendedPurgeTime];
     extendedPurgeTime = aExtendedPurgeTime;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpModelExtendedPurgeTimeChanged object:self];
@@ -392,6 +406,8 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
 
 - (void) setPumpRestartDelay:(int)aPumpRestartDelay
 {
+	if(aPumpRestartDelay<0)		 aPumpRestartDelay=0;
+	else if(aPumpRestartDelay>59994) aPumpRestartDelay=59994;
     [[[self undoManager] prepareWithInvocationTarget:self] setPumpRestartDelay:pumpRestartDelay];
     pumpRestartDelay = aPumpRestartDelay;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpModelPumpRestartDelayChanged object:self];
@@ -958,6 +974,7 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
 - (void) readPowerFailureRecoveryStatus	{ [self addCmdToQueue: @"t?"	waitForResponse:YES]; }  
 - (void) readPumpStatus					{ [self addCmdToQueue: @"A?"	waitForResponse:YES]; }
 - (void) readPurgeStatus				{ [self addCmdToQueue: @"E?"	waitForResponse:YES]; }
+- (void) readRegenerationTime			{ [self addCmdToQueue: @"a"		waitForResponse:YES]; }
 - (void) readRegenerationCycles			{ [self addCmdToQueue: @"Z?"	waitForResponse:YES]; }
 - (void) readRegenerationError			{ [self addCmdToQueue: @"e"		waitForResponse:YES]; }
 
@@ -1121,6 +1138,7 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
     [self readPurgeStatus];
     [self readRegenerationCycles];	
     [self readRegenerationError];	
+	[self readRegenerationTime];
     //[self readFailedPurgeCycles];
 
 }

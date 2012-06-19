@@ -225,6 +225,7 @@
 - (void) readRegenerationSequence;
 - (void) readRegenerationStartDelay;
 - (void) readRegenerationStepTimer;
+- (void) readRegenerationTime;
 - (void) readRoughValveStatus;
 - (void) readRoughValveInterlock;
 - (void) readSecondStageTemp;
