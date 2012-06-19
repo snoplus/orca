@@ -63,7 +63,7 @@
 	slowControlsSize    = NSMakeSize(525,157);
 	detailsSize			= NSMakeSize(655,589);
 	focalPlaneSize		= NSMakeSize(827,589);
-	vetoSize			= NSMakeSize(463,589);
+	vetoSize			= NSMakeSize(663,589);
 	
     blankView = [[NSView alloc] init];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];

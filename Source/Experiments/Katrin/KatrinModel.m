@@ -205,6 +205,10 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kSegmentNumber",	@"key", [NSNumber numberWithInt:0], @"sortType", nil]];
 		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kSlot",			@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
 		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kChannel",		@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"PanelSN",		@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"VetoSumChannel",	@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"AmpBoardNum",	@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"AmpChannel",		@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
 		return mapEntries;
 	}
 	else {
