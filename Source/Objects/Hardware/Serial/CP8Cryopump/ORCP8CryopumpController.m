@@ -852,8 +852,8 @@
 - (IBAction) roughValveInterlockAction:(id)sender	  { [model setRoughValveInterlock:		[sender intValue]]; }
 - (IBAction) roughValveStatusAction:(id)sender		  { [model setRoughValveStatus:			[sender intValue]]; }
 - (IBAction) regenerationStartDelayAction:(id)sender  { [model setRegenerationStartDelay:	[sender intValue]]; }
-- (IBAction) powerFailureRecoveryAction:(id)sender	  { [model setPowerFailureRecovery:		[sender intValue]]; }
-- (IBAction) firstStageControlMethodAction:(id)sender { [model setFirstStageControlMethod:	[sender intValue]]; }
+- (IBAction) powerFailureRecoveryAction:(id)sender	  { [model setPowerFailureRecovery:		[sender indexOfSelectedItem]]; }
+- (IBAction) firstStageControlMethodAction:(id)sender { [model setFirstStageControlMethod:	[sender indexOfSelectedItem]]; }
 - (IBAction) firstStageControlTempAction:(id)sender   { [model setFirstStageControlTemp:	[sender intValue]]; }
 - (IBAction) shipTemperaturesAction:(id)sender		  { [model setShipTemperatures:			[sender intValue]]; }
 
