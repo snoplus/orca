@@ -875,7 +875,11 @@
 - (IBAction) pollTimeAction:(id)sender				  { [model setPollTime:[[sender selectedItem] tag]];}
 - (IBAction) pollNowAction:(id)sender				  { [model pollHardware]; }
 
-- (IBAction) initHardwareAction:(id)sender			  { [model initHardware];}
+- (IBAction) initHardwareAction:(id)sender			  
+{ 
+	[self endEditing];
+	[model initHardware];
+}
 
 - (IBAction) turnCryoPumpOnAction:(id)sender
 {
