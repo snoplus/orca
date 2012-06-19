@@ -204,7 +204,7 @@
 	[tmpRotSetField setIntValue: [model tmpRotSet]];
 }
 
-- (void) motorCurrentChanged:(NSNotification*)aNote		{ [motorCurrentField		setFloatValue:	[model motorCurrent]]; }
+- (void) motorCurrentChanged:(NSNotification*)aNote		{ [motorCurrentField		setFloatValue:	[model motorCurrent]/100.]; }
 - (void) actualRotorSpeedChanged:(NSNotification*)aNote	{ [actualRotorSpeedField	setIntValue:	[model actualRotorSpeed]]; }
 - (void) setRotorSpeedChanged:(NSNotification*)aNote	{ [setRotorSpeedField		setIntValue:	[model setRotorSpeed]]; }
 - (void) deviceAddressChanged:(NSNotification*)aNote	{ [deviceAddressField		setIntValue:	[model deviceAddress]]; }
