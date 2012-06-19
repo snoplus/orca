@@ -677,6 +677,7 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
 
 - (void) setFirstStageTemp:(float)aFirstStageTemp
 {
+    [[[self undoManager] prepareWithInvocationTarget:self] setFirstStageTemp:firstStageTemp];
     firstStageTemp = aFirstStageTemp;
     
     //get the time(UT!)
@@ -1137,7 +1138,7 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
     [self readTemperatures];
     [self readStatus];
     [self readRegenerationSequence];
-    //[self readRegenerationStartDelay];
+    [self readRegenerationStartDelay];
     [self readRegenerationStepTimer];
     [self readRoughValveStatus];
     [self readRoughValveInterlock];
