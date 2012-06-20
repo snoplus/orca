@@ -886,16 +886,11 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
 	[self setRepurgeCycles:				[decoder decodeIntForKey:@"repurgeCycles"]];
 	[self setExtendedPurgeTime:			[decoder decodeIntForKey:@"extendedPurgeTime"]];
 	[self setPumpRestartDelay:			[decoder decodeIntForKey:@"pumpRestartDelay"]];
-	[self setRegenerationStepTimer:		[decoder decodeIntForKey:@"regenerationStepTimer"]];
 	[self setRegenerationStartDelay:	[decoder decodeIntForKey:@"regenerationStartDelay"]];
-	[self setPumpStatus:				[decoder decodeIntForKey:@"pumpStatus"]];
 	[self setPowerFailureRecovery:		[decoder decodeIntForKey:@"powerFailureRecovery"]];
 	[self setLastRateOfRaise:			[decoder decodeIntForKey:@"lastRateOfRaise"]];
 	[self setFirstStageControlMethod:	[decoder decodeIntForKey:@"firstStageControlMethod"]];
 	[self setFirstStageControlTemp:		[decoder decodeIntForKey:@"firstStageControlTemp"]];
-	[self setFirstStageTemp:			[decoder decodeFloatForKey:@"firstStageTemp"]];
-	[self setElapsedTime:				[decoder decodeIntForKey:@"elapsedTime"]];
-	[self setDutyCycle:					[decoder decodeIntForKey:@"dutyCycle"]];
 	[self setShipTemperatures:			[decoder decodeBoolForKey:	 @"shipTemperatures"]];
 	[self setPollTime:					[decoder decodeIntForKey:	 @"pollTime"]];
 	[self setPortWasOpen:				[decoder decodeBoolForKey:	 @"portWasOpen"]];
@@ -922,15 +917,10 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
     [encoder encodeInt:repurgeCycles			forKey:@"repurgeCycles"];
     [encoder encodeInt:extendedPurgeTime		forKey:@"extendedPurgeTime"];
     [encoder encodeInt:pumpRestartDelay			forKey:@"pumpRestartDelay"];
-    [encoder encodeInt:regenerationStepTimer	forKey: @"regenerationStepTimer"];
     [encoder encodeInt:regenerationStartDelay	forKey: @"regenerationStartDelay"];
-    [encoder encodeInt:pumpStatus				forKey: @"pumpStatus"];
     [encoder encodeInt:powerFailureRecovery		forKey: @"powerFailureRecovery"];
     [encoder encodeInt:firstStageControlMethod	forKey:@"firstStageControlMethod"];
     [encoder encodeInt:firstStageControlTemp	forKey:@"firstStageControlTemp"];
-    [encoder encodeFloat:firstStageTemp			forKey:@"firstStageTemp"];
-    [encoder encodeInt:elapsedTime				forKey:@"elapsedTime"];
-    [encoder encodeInt:dutyCycle				forKey:@"dutyCycle"];
     [encoder encodeBool:shipTemperatures		forKey: @"shipTemperatures"];
     [encoder encodeInt: pollTime				forKey: @"pollTime"];
     [encoder encodeBool:portWasOpen				forKey: @"portWasOpen"];
@@ -1354,6 +1344,8 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
 				}
 			}
 			break;
+                
+            /*    
 			case 'P': 
 			{
 				switch([[theResponse substringWithRange:NSMakeRange(2,1)]intValue]){
@@ -1371,7 +1363,8 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
 				}
 			}
 			break;
-				
+			*/
+                
 			case 'O': [self setRegenerationSequence:	[self responseAsInt:theResponse]];			break;
 			//case 'j': [self setRegenerationStartDelay:	[self responseAsInt:theResponse]];			break;
 			case 'k': [self setRegenerationStepTimer:	[self responseAsInt:theResponse]];			break;
