@@ -1680,7 +1680,7 @@ NSString* ORLabJackUE9ModelAdcEnableMaskChanged		= @"ORLabJackUE9ModelAdcEnableM
 
 - (void) timeout
 {
-	NSLogError(@"LabJackUE9",@"command timeout",nil);
+	NSLogError(@"command timeout",@"LabJackUE9",nil);
 	[cmdQueue removeAllObjects];
 	[self setLastRequest:nil];
 }
@@ -1819,7 +1819,7 @@ NSString* ORLabJackUE9ModelAdcEnableMaskChanged		= @"ORLabJackUE9ModelAdcEnableM
 		int adcIndex = [self adcIndexFromMuxIndex:recBuff[3]];
 		[self setAdc:adcIndex value:voltage];
 	}
-	else NSLogError(@"LabJackUE9",@"Error converting ADC result",nil);
+	else NSLogError(@"Error converting ADC result",@"LabJackUE9",nil);
 
 }
 
@@ -1856,7 +1856,7 @@ NSString* ORLabJackUE9ModelAdcEnableMaskChanged		= @"ORLabJackUE9ModelAdcEnableM
 	int i;
 	unsigned char* recBuff = (unsigned char*)[theData bytes];
 	if(recBuff[1] != (unsigned char)0xF8 || recBuff[2] != (unsigned char)0x1D || recBuff[3] != (unsigned char)0x00){
-		NSLogError(@"LabJackUE9",@"received buffer has wrong command bytes",nil);
+		NSLogError(@"received buffer has wrong command bytes",@"LabJackUE9",nil);
 		return;
 	}
 	
@@ -1883,12 +1883,12 @@ NSString* ORLabJackUE9ModelAdcEnableMaskChanged		= @"ORLabJackUE9ModelAdcEnableM
 {
 
 	if( [theData length] < 136 ){
-		NSLogError(@"LabJackUE9",@"Calibration data incomplete",nil);
+		NSLogError(@"Calibration data incomplete",@"LabJackUE9",nil);
 		return;
 	}
 	unsigned char* recBuffer = (unsigned char*)[theData bytes];
 	if( recBuffer[1] != (unsigned char)0xF8 || recBuffer[2] != (unsigned char)0x41 || recBuffer[3] != (unsigned char)0x2A ){
-		NSLogError(@"LabJackUE9",@"received buffer has wrong command bytes",nil);
+		NSLogError(@"received buffer has wrong command bytes",@"LabJackUE9",nil);
 		return;
 	}
 	int i = recBuffer[7];

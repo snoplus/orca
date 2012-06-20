@@ -404,7 +404,7 @@ NSString* ORCTITempLock = @"ORCTITempLock";
 
 - (void) timeout
 {
-	NSLogError(@"CTI Temperature",@"command timeout",nil);
+	NSLogError(@"command timeout",@"CTI Temperature",nil);
 	[self setLastRequest:nil];
 	[self processOneCommandFromQueue];	 //do the next command in the queue
 }

@@ -729,7 +729,7 @@ NSString* ORKJL2200IonGaugeModelQueCountChanged			= @"ORKJL2200IonGaugeModelQueC
 - (void) timeout
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-	NSLogError(@"KJL IonGauge",@"command timeout",nil);
+	NSLogError(@"command timeout",@"KJL IonGauge",nil);
 	[self setLastRequest:nil];
 	[cmdQueue removeAllObjects]; //if we timeout we just flush the queue
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKJL2200IonGaugeModelQueCountChanged object: self];

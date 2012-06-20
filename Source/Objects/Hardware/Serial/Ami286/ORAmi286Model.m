@@ -1025,7 +1025,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 
 - (void) timeout
 {
-	NSLogError(@"AMI 286",@"command timeout",nil);
+	NSLogError(@"command timeout",@"AMI 286",nil);
 	[self setLastRequest:nil];
 	[self processOneCommandFromQueue];	 //do the next command in the queue
 }

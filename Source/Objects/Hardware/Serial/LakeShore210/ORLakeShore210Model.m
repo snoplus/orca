@@ -447,7 +447,7 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 
 - (void) timeout
 {
-	NSLogError(@"Lake Shore 210",@"command timeout",nil);
+	NSLogError(@"command timeout",@"Lake Shore 210",nil);
 	[self setLastRequest:nil];
 	[self processOneCommandFromQueue];	 //do the next command in the queue
 }

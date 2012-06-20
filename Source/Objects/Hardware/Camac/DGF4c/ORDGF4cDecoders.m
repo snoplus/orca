@@ -165,7 +165,7 @@
 							dataPtr += chanNData-9;				//move the dataPtr ahead. Note it was moved to the start of waveform already
 						}
 						else {
-							NSLogError(@"DGF4",@"Bad Data Record Length",nil);
+							NSLogError(@"Bad Data Record Length",@"DGF4",nil);
 							break;
 						}
 					}

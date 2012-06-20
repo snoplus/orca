@@ -623,7 +623,7 @@ NSString* ORZupModelPortStateChanged		= @"ORZupModelPortStateChanged";
 - (void) timeout
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-	NSLogError(@"ZUP",@"command timeout",nil);
+	NSLogError(@"command timeout",@"ZUP",nil);
 	[self setLastRequest:nil];
 	[cmdQueue removeAllObjects];
 	sentAddress = NO;

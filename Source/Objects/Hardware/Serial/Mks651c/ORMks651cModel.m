@@ -1301,7 +1301,7 @@ NSString* ORMks651cLock = @"ORMks651cLock";
 
 - (void) timeout
 {
-	NSLogError(@"MKS 651c",@"command timeout",nil);
+	NSLogError(@"command timeout",@"MKS 651c",nil);
 	[cmdQueue removeAllObjects];
 	[self setLastRequest:nil];
 }

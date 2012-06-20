@@ -342,7 +342,7 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
 		[self readScalers]; 
 	}
 	@catch(NSException* localException) { 
-		NSLogError(@"CV830",@"Polling Error",nil);
+		NSLogError(@"Polling Error",@"CV830",nil);
 	}
 	
 	if(shipRecords){

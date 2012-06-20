@@ -294,7 +294,7 @@ NSString* ORNHQ226LModelTimeout				= @"ORNHQ226LModelTimeout";
 	}
 	@catch(NSException* e){
 		[self setPollingError:YES];
-		NSLogError(@"",@"NHQ226L",@"Polling Error",nil);
+		NSLogError(@"Polling Error",@"NHQ226L",nil);
 	}
 	
     [[self undoManager] enableUndoRegistration];
@@ -689,7 +689,7 @@ return NO; /////////ToDo
 	doSync[1] = NO;
 	
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-	NSLogError(@"NHQ226L",@"command timeout",nil);
+	NSLogError(@"command timeout",@"NHQ226L",nil);
     [[NSNotificationCenter defaultCenter] postNotificationName:ORNHQ226LModelTimeout object:self];
 	[self setLastRequest:nil];
 	[cmdQueue removeAllObjects];

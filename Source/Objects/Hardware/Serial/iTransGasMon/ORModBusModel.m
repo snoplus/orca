@@ -431,7 +431,7 @@ NSString* ORModBusLock						= @"ORModBusLock";
 - (void) timeout
 {	
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-	NSLogError(@"ModBus",@"command timeout",nil);
+	NSLogError(@"command timeout",@"ModBus",nil);
     [[NSNotificationCenter defaultCenter] postNotificationName:ORModBusModelTimeout object:self];
 	[self setLastRequest:nil];
 	[cmdQueue removeAllObjects];

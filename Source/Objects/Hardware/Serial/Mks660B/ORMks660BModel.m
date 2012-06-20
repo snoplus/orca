@@ -789,7 +789,7 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 
 - (void) timeout
 {
-	NSLogError(@"MKS660B",@"command timeout",nil);
+	NSLogError(@"command timeout",@"MKS660B",nil);
 	[cmdQueue removeAllObjects];
 	[self setLastRequest:nil];
 }

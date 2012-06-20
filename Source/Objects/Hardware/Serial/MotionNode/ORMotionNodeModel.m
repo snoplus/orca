@@ -818,7 +818,7 @@ static MotionNodeCalibrations motionNodeCalibration[3] = {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
 	[self setLastRequest:nil];
 	if(!okToTimeOut) {
-		NSLogError(@"Motion Node",@"command timeout",nil);
+		NSLogError(@"command timeout",@"Motion Node",nil);
 		[cmdQueue removeAllObjects];
 	}
 	[self processOneCommandFromQueue];	 //do the next command in the queue

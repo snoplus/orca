@@ -139,7 +139,7 @@ NSString* ORTPG262Lock = @"ORTPG262Lock";
 				if([buffer characterAtIndex:0] == kNAK){
 					//error in transimission
 					//flush and go to next command
-					NSLogError(@"TGP262",@"Transmission Error",nil);
+					NSLogError(@"Transmission Error",@"TGP262",nil);
 					[self setLastRequest:nil];			 //clear the last request
 					[self processOneCommandFromQueue];	 //do the next command in the queue
 				}
@@ -482,7 +482,7 @@ NSString* ORTPG262Lock = @"ORTPG262Lock";
 
 - (void) timeout
 {
-	NSLogError(@"TGP262",@"command timeout",nil);
+	NSLogError(@"command timeout",@"TGP262",nil);
 	[self setLastRequest:nil];
 	[cmdQueue removeAllObjects];
 	[self processOneCommandFromQueue];	 //do the next command in the queue

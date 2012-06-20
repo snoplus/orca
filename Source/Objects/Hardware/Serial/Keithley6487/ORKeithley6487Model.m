@@ -409,7 +409,7 @@ NSString* ORKeithley6487Lock = @"ORKeithley6487Lock";
 
 - (void) timeout
 {
-	NSLogError(@"Keithley 6487",@"command timeout",nil);
+	NSLogError(@"command timeout",@"Keithley 6487",nil);
 	[self setLastRequest:nil];
 	[self processOneCommandFromQueue];	 //do the next command in the queue
 }

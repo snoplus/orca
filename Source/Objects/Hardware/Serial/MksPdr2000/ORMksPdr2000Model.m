@@ -476,7 +476,7 @@ NSString* ORMksPdr2000Lock = @"ORMksPdr2000Lock";
 
 - (void) timeout
 {
-	NSLogError(@"MKS PDR2000",@"command timeout",nil);
+	NSLogError(@"command timeout",@"MKS PDR2000",nil);
 	[self setLastRequest:nil];
 	[self processOneCommandFromQueue];	 //do the next command in the queue
 }

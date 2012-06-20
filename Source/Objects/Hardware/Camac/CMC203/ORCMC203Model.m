@@ -389,7 +389,7 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 		[[self adapter] camacShortNAF:[self stationNumber] a:1 f:16 data:&controlReg];  
 	}
 	@catch(NSException* localException) {
-		NSLogError(@"CMC203",@"InitBoard",nil);
+		NSLogError(@"InitBoard",@"CMC203",nil);
 		@throw;
 	}
 }

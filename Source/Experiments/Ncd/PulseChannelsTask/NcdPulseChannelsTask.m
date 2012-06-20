@@ -523,7 +523,7 @@ enum {
 				[thePulserModel trigger];
 			}
 			@catch(NSException* localException) {
-				NSLogError(@"Pulse Channels Task",@"Pulser Trigger Error",nil);
+				NSLogError(@"Pulser Trigger Error",@"Pulse Channels Task",nil);
 			}
 			tubeIndex = (tubeIndex + 1)%[onlineTubes count];
 		}

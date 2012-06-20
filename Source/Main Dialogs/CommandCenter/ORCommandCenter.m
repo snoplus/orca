@@ -454,7 +454,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
 						[embeddedPLists addObject:anObj];
 					}
 					else {
-						NSLogError(@"Command Center",@"Invalid plist",nil);
+						NSLogError(@"Invalid plist",@"Command Center",nil);
 						return;
 					}
 				}

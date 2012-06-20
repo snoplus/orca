@@ -276,7 +276,7 @@ NSString* ORCaen260ModelAllScalerValuesChanged= @"ORCaen260ModelAllScalerValuesC
 			[self readScalers]; 
 		}
 		@catch(NSException* localException) { 
-			NSLogError(@"CV260",@"Polling Error",nil);
+			NSLogError(@"Polling Error",@"CV260",nil);
 		}
 		
 		if(shipRecords){

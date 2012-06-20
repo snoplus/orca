@@ -650,7 +650,7 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 - (void) timeout
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-	NSLogError(@"PAC",@"command timeout",nil);
+	NSLogError(@"command timeout",@"PAC",nil);
 	[self setLastRequest:nil];
 	[cmdQueue removeAllObjects];
 	[self processOneCommandFromQueue];	 //do the next command in the queue

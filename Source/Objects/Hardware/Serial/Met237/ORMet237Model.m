@@ -678,7 +678,7 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 
 - (void) timeout
 {
-	NSLogError(@"Met237",@"command timeout",nil);
+	NSLogError(@"command timeout",@"Met237",nil);
 	[cmdQueue removeAllObjects];
 	[self setLastRequest:nil];
 	recordComingIn = NO;

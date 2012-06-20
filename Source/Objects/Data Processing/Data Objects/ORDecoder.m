@@ -156,7 +156,7 @@
 			}
 			else {
 				if(![dataObjKey isEqual:@"ResponsePacket"]){ //don't complain for this special case
-					NSLogError(decoderName,@"Data Description Item",@"Programming Error (no Object)",nil);
+					NSLogError(@"Programming Error (no Object)",decoderName,@"Data Description Item",nil);
 				}
 			}
 		}

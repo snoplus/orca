@@ -1888,9 +1888,9 @@ static struct {
                 [aDataPacket addLongsToFrameBuffer:dataBuffer length:totalNumLongs];
             } else {
                 //oops... the buffer read is out of sequence
-                NSLogError(@"Gretina4",[NSString stringWithFormat:@"slot %d",[self slot]],@"Packet Sequence Error -- Looking for next event",nil);
+                NSLogError([NSString stringWithFormat:@"slot %d",[self slot]],@"Packet Sequence Error -- Looking for next event",@"Gretina4",nil);
                 fifoLostEvents += [self findNextEventInTheFIFO];
-                NSLogError(@"Gretina4",[NSString stringWithFormat:@"slot %d",[self slot]],@"Packet Sequence Error -- Next event found",nil);
+                NSLogError(@"Packet Sequence Error -- Next event found",@"Gretina4",[NSString stringWithFormat:@"slot %d",[self slot]],nil);
             }
         }
 		
@@ -1922,8 +1922,8 @@ static struct {
     }
     free(dataBuffer);
     if ( fifoLostEvents != 0 ) {
-        NSLogError( @"Gretina4 ",[NSString stringWithFormat:@"(slot %d):",[self slot]],
-				   [NSString stringWithFormat:@" lost events due to buffer corruption: %d",fifoLostEvents],nil);
+        NSLogError( [NSString stringWithFormat:@" lost events due to buffer corruption: %d",fifoLostEvents],@"Gretina4 ",[NSString stringWithFormat:@"(slot %d):",[self slot]],
+				   nil);
     }
 }
 

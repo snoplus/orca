@@ -886,7 +886,7 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
                         }
                         else [self setAdc:theChannel value: msb<<8 | lsb];
                     }
-					else NSLogError(@"PAC",@"ADC !OK",nil);
+					else NSLogError(@"ADC !OK",@"PAC",nil);
 					done = YES;
 				}
 			break;
@@ -894,7 +894,7 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 			case kPacSelCmd:
 				if([inComingData length] >= 1) {
 					unsigned char* theData	 = (unsigned char*)[inComingData bytes];
-					if(theData[0] != kPacOkByte)  NSLogError(@"PAC",@"Port D !OK",nil);
+					if(theData[0] != kPacOkByte)  NSLogError(@"Port D !OK",@"PAC",nil);
 					done = YES;
 				}
 			break;
@@ -906,7 +906,7 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 						short msb		 = (theData[0]&0xf)<<4;
 						short lsb		 = (theData[1]&0xf0)>>4;
 						if(theData[2] == kPacOkByte) NSLog(@"0x%x\n",msb | lsb);
-						else NSLogError(@"PAC",@"DAC !OK",nil);
+						else NSLogError(@"DAC !OK",@"PAC",nil);
 						done = YES;
 					}
 				}
@@ -928,7 +928,7 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 
                         }
                         else if(ptr[296]==kPacErrorByte){
-                            NSLogError(@"PAC",@"DAC !OK",nil);
+                            NSLogError(@"DAC !OK",@"PAC",nil);
                         }
                         done = YES;
                     }
@@ -936,14 +936,14 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 				else if(theCmd[1] == kPacGainWriteOneGain){
 					if([inComingData length] >= 1) {
 						unsigned char* theData	 = (unsigned char*)[inComingData bytes];
-						if(theData[0] != kPacOkByte) NSLogError(@"PAC",@"DAC !OK",nil);
+						if(theData[0] != kPacOkByte) NSLogError(@"DAC !OK",@"PAC",nil);
 						done = YES;
 					}
 				}
 				else if(theCmd[1] == kPacGainWriteAll){
 					if([inComingData length] >= 1) {
 						unsigned char* theData	 = (unsigned char*)[inComingData bytes];
-						if(theData[0] != kPacOkByte) NSLogError(@"PAC",@"DAC !OK",nil);
+						if(theData[0] != kPacOkByte) NSLogError(@"DAC !OK",@"PAC",nil);
 						done = YES;
 					}
 				}
@@ -952,7 +952,7 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 			case kPacLcmEnaCmd:
 				if([inComingData length] >= 1) {
 					unsigned char* theData	 = (unsigned char*)[inComingData bytes];
-					if(theData[0] != kPacOkByte)  NSLogError(@"PAC",@"LCM ENA !OK",nil);
+					if(theData[0] != kPacOkByte)  NSLogError(@"LCM ENA !OK",@"PAC",nil);
 					done = YES;
 				}
 			break;
@@ -1346,7 +1346,7 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 {
 	@synchronized (self){
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-		NSLogError(@"PAC",@"command timeout",nil);
+		NSLogError(@"command timeout",@"PAC",nil);
 		[self setLastRequest:nil];
 		[cmdQueue removeAllObjects]; //if we timeout we just flush the queue
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelQueCountChanged object: self];

@@ -191,7 +191,7 @@ NSString* ORIP220SettingsLock			= @"ORIP220SettingsLock";
 			[[self undoManager] enableUndoRegistration];
 		}
 		@catch(NSException* localException) {
-			NSLogError(@"IP220",@"Read Exception",nil);
+			NSLogError(@"Read Exception",@"IP220",nil);
 		}
 	}
 }

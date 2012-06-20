@@ -476,7 +476,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 - (void) logQueryException:(NSException*)e
 {
 	//assert(![NSThread isMainThread]);
-	NSLogError(@"SQL",@"Query Problem",[e reason],nil);
+	NSLogError([e reason],@"SQL",@"Query Problem",nil);
 	[sqlConnection release];
 	sqlConnection = nil;
 }

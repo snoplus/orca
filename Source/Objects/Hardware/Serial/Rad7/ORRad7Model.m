@@ -1271,7 +1271,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 {
     dataValid = YES;
 	//NSLog(@"Rad7 timeout: %@\n",lastRequest);
-	NSLogError(@"Rad7",@"command timeout",nil);
+	NSLogError(@"command timeout",@"Rad7",nil);
 	[cmdQueue removeAllObjects];
 	[self setOperationState:kRad7Idle];
 	[self setLastRequest:nil];

@@ -450,7 +450,7 @@ NSString* ORBocTIC3Lock = @"ORBocTIC3Lock";
 
 - (void) timeout
 {
-	NSLogError(@"BOC TIC 3",@"command timeout",nil);
+	NSLogError(@"command timeout",@"BOC TIC 3",nil);
 	[self setLastRequest:nil];
 	[self processOneCommandFromQueue];	 //do the next command in the queue
 }
