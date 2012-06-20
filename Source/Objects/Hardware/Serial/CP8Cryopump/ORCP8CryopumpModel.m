@@ -1254,6 +1254,8 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
 	NSLogError(@"CP8Cryopump",@"command timeout",nil);
 	[cmdQueue removeAllObjects];
 	[self setLastRequest:nil];
+	[self clearDelay];
+	[self processOneCommandFromQueue];
 }
 
 - (void) clearDelay
