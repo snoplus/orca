@@ -621,7 +621,7 @@ NSString* ORTM700Lock						= @"ORTM700Lock";
 {    
     if(!readOnce){
         @try { 
-            [self pollHardware]; 
+            [self performSelectorOnMainThread:@selector(pollHardware) withObject:nil waitUntilDone:NO]; 
             readOnce = YES;
         }
 		@catch(NSException* localException) { 
@@ -684,10 +684,9 @@ NSString* ORTM700Lock						= @"ORTM700Lock";
 - (void) timeout
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-	NSLogError(@"TM700",@"command timeout",nil);
+	NSLogError(@"command timeout",@"TM700",nil);
 	[self setLastRequest:nil];
 	[cmdQueue removeAllObjects];
-	[self processOneCommandFromQueue];	 //do the next command in the queue
 }
 
 - (void) clearDelay

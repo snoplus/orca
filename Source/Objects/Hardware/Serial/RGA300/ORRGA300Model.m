@@ -732,7 +732,7 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 
 - (void) timeout
 {
-	NSLogError(@"RGA300",@"command timeout",nil);
+	NSLogError(@"command timeout",@"RGA300",nil);
 	[cmdQueue removeAllObjects];
 	[self setLastRequest:nil];
 }

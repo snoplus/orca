@@ -938,6 +938,11 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
 }
 
 #pragma mark ••• Commands
+- (void) addCmdToQueue:(NSString *)aCmd
+{
+    [self addCmdToQueue:aCmd waitForResponse:YES];
+}
+
 - (void) addCmdToQueue:(NSString*)aCmd waitForResponse:(BOOL)waitForResponse
 {
     if([serialPort isOpen]){ 
@@ -976,24 +981,24 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
 	[self writeRegenerationCycleParameters];
 	[self writeFirstStageTempControl];
 	[self writePowerFailureRecoveryMode];
-	[self addCmdToQueue: [NSString stringWithFormat:@"I%d",secondStageTempControl]	waitForResponse:YES];
+	[self addCmdToQueue: [NSString stringWithFormat:@"I%d",secondStageTempControl]];
 }
 
 #pragma mark •••Queries
-- (void) readDutyCycle					{ [self addCmdToQueue: @"XOI??"	waitForResponse:YES]; }
-- (void) readElapsedTime				{ [self addCmdToQueue: @"Y?"	waitForResponse:YES]; }
-- (void) readFailedRateRiseCycles		{ [self addCmdToQueue: @"m"		waitForResponse:YES]; }
-- (void) readFailedPurgeCycles			{ [self addCmdToQueue: @"I"		waitForResponse:YES]; }
-- (void) readFirstStageTemp				{ [self addCmdToQueue: @"J"		waitForResponse:YES]; }
-- (void) readFirstStageControlTemp		{ [self addCmdToQueue: @"H?"	waitForResponse:YES]; }
-- (void) readLastRateOfRaise			{ [self addCmdToQueue: @"n"		waitForResponse:YES]; } 
-- (void) readModuleVersion				{ [self addCmdToQueue: @"@"		waitForResponse:YES]; } 
-- (void) readPowerFailureRecoveryStatus	{ [self addCmdToQueue: @"t?"	waitForResponse:YES]; }  
-- (void) readPumpStatus					{ [self addCmdToQueue: @"A?"	waitForResponse:YES]; }
-- (void) readPurgeStatus				{ [self addCmdToQueue: @"E?"	waitForResponse:YES]; }
-- (void) readRegenerationTime			{ [self addCmdToQueue: @"a"		waitForResponse:YES]; }
-- (void) readRegenerationCycles			{ [self addCmdToQueue: @"Z?"	waitForResponse:YES]; }
-- (void) readRegenerationError			{ [self addCmdToQueue: @"e"		waitForResponse:YES]; }
+- (void) readDutyCycle					{ [self addCmdToQueue: @"XOI??"]; }
+- (void) readElapsedTime				{ [self addCmdToQueue: @"Y?"]; }
+- (void) readFailedRateRiseCycles		{ [self addCmdToQueue: @"m"	]; }
+- (void) readFailedPurgeCycles			{ [self addCmdToQueue: @"I"	]; }
+- (void) readFirstStageTemp				{ [self addCmdToQueue: @"J"	]; }
+- (void) readFirstStageControlTemp		{ [self addCmdToQueue: @"H?"]; }
+- (void) readLastRateOfRaise			{ [self addCmdToQueue: @"n"	]; } 
+- (void) readModuleVersion				{ [self addCmdToQueue: @"@"	]; } 
+- (void) readPowerFailureRecoveryStatus	{ [self addCmdToQueue: @"t?"]; }  
+- (void) readPumpStatus					{ [self addCmdToQueue: @"A?"]; }
+- (void) readPurgeStatus				{ [self addCmdToQueue: @"E?"]; }
+- (void) readRegenerationTime			{ [self addCmdToQueue: @"a"	]; }
+- (void) readRegenerationCycles			{ [self addCmdToQueue: @"Z?"]; }
+- (void) readRegenerationError			{ [self addCmdToQueue: @"e"	]; }
 
 - (void) readgs
 {
@@ -1011,52 +1016,52 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
 	[self addCmdToQueue:@"Pz?" waitForResponse:YES];
 	
 }
-- (void) readRegenerationSequence		{ [self addCmdToQueue: @"O"		waitForResponse:YES]; }
-- (void) readRegenerationStartDelay		{ [self addCmdToQueue: @"j?"	waitForResponse:YES]; }
-- (void) readRegenerationStepTimer		{ [self addCmdToQueue: @"k"		waitForResponse:YES]; }
-- (void) readRoughValveStatus			{ [self addCmdToQueue: @"D?"	waitForResponse:YES]; }
-- (void) readRoughValveInterlock		{ [self addCmdToQueue: @"Q?"	waitForResponse:YES]; }
-- (void) readSecondStageTemp			{ [self addCmdToQueue: @"K"		waitForResponse:YES]; }
-- (void) readSecondStageTempControl		{ [self addCmdToQueue: @"I?"	waitForResponse:YES]; }
-- (void) readStatus						{ [self addCmdToQueue: @"S1"	waitForResponse:YES]; }
-- (void) readThermocoupleStatus			{ [self addCmdToQueue: @"B?"	waitForResponse:YES]; }
-- (void) readThermocouplePressure		{ [self addCmdToQueue: @"L"		waitForResponse:YES]; }
+- (void) readRegenerationSequence		{ [self addCmdToQueue: @"O"	]; }
+- (void) readRegenerationStartDelay		{ [self addCmdToQueue: @"j?"]; }
+- (void) readRegenerationStepTimer		{ [self addCmdToQueue: @"k"	]; }
+- (void) readRoughValveStatus			{ [self addCmdToQueue: @"D?"]; }
+- (void) readRoughValveInterlock		{ [self addCmdToQueue: @"Q?"]; }
+- (void) readSecondStageTemp			{ [self addCmdToQueue: @"K"	]; }
+- (void) readSecondStageTempControl		{ [self addCmdToQueue: @"I?"]; }
+- (void) readStatus						{ [self addCmdToQueue: @"S1"]; }
+- (void) readThermocoupleStatus			{ [self addCmdToQueue: @"B?"]; }
+- (void) readThermocouplePressure		{ [self addCmdToQueue: @"L"	]; }
 
 #pragma mark •••HW Writes
 - (void) writeFirstStageTempControl
 {
-	[self addCmdToQueue: [NSString stringWithFormat:@"H%d,%d",firstStageControlTemp, firstStageControlMethod]	waitForResponse:YES];
+	[self addCmdToQueue: [NSString stringWithFormat:@"H%d,%d",firstStageControlTemp, firstStageControlMethod]];
 }
 
 - (void) writePowerFailureRecoveryMode
 {
-	[self addCmdToQueue: [NSString stringWithFormat:@"i%d",powerFailureRecovery]	waitForResponse:YES];
+	[self addCmdToQueue: [NSString stringWithFormat:@"i%d",powerFailureRecovery]];
 }
 
 - (void) writeCryoPumpOn:(BOOL)aState
 {
-	[self addCmdToQueue: [NSString stringWithFormat:@"A%d",aState]	waitForResponse:YES];
+	[self addCmdToQueue: [NSString stringWithFormat:@"A%d",aState]];
 }
 
 - (void) writePurgeValveOpen:(BOOL)aState
 {
-	[self addCmdToQueue: [NSString stringWithFormat:@"E%d",aState]	waitForResponse:YES];
+	[self addCmdToQueue: [NSString stringWithFormat:@"E%d",aState]];
 }
 
 - (void) writeRegenerationCycleParameters
 {
 	[self addCmdToQueue: [NSString stringWithFormat:@"j%d",regenerationStartDelay] waitForResponse:YES];
-	[self addCmdToQueue: [NSString stringWithFormat:@"P0%d",pumpRestartDelay]	waitForResponse:YES];
-	[self addCmdToQueue: [NSString stringWithFormat:@"P1%d",extendedPurgeTime]	waitForResponse:YES];
-	[self addCmdToQueue: [NSString stringWithFormat:@"P2%d",repurgeCycles]		waitForResponse:YES];
-	[self addCmdToQueue: [NSString stringWithFormat:@"P3%d",roughToPressure]	waitForResponse:YES];
-	[self addCmdToQueue: [NSString stringWithFormat:@"P4%d",rateOfRise]			waitForResponse:YES];
-	[self addCmdToQueue: [NSString stringWithFormat:@"P5%d",rateOfRiseCycles]	waitForResponse:YES];
-	[self addCmdToQueue: [NSString stringWithFormat:@"P6%d",restartTemperature]	waitForResponse:YES];
-	[self addCmdToQueue: [NSString stringWithFormat:@"PC%d",pumpsPerCompressor]	waitForResponse:YES];
-	[self addCmdToQueue: [NSString stringWithFormat:@"PG%d",repurgeTime]		waitForResponse:YES];
-	[self addCmdToQueue: [NSString stringWithFormat:@"PA%d",roughingInterlock]	waitForResponse:YES];
-	[self addCmdToQueue: [NSString stringWithFormat:@"Pz%d",standbyMode]		waitForResponse:YES];
+	[self addCmdToQueue: [NSString stringWithFormat:@"P0%d",pumpRestartDelay]];
+	[self addCmdToQueue: [NSString stringWithFormat:@"P1%d",extendedPurgeTime]];
+	[self addCmdToQueue: [NSString stringWithFormat:@"P2%d",repurgeCycles]	];
+	[self addCmdToQueue: [NSString stringWithFormat:@"P3%d",roughToPressure]];
+	[self addCmdToQueue: [NSString stringWithFormat:@"P4%d",rateOfRise]		];
+	[self addCmdToQueue: [NSString stringWithFormat:@"P5%d",rateOfRiseCycles]];
+	[self addCmdToQueue: [NSString stringWithFormat:@"P6%d",restartTemperature]];
+	[self addCmdToQueue: [NSString stringWithFormat:@"PC%d",pumpsPerCompressor]];
+	[self addCmdToQueue: [NSString stringWithFormat:@"PG%d",repurgeTime]	];
+	[self addCmdToQueue: [NSString stringWithFormat:@"PA%d",roughingInterlock]];
+	[self addCmdToQueue: [NSString stringWithFormat:@"Pz%d",standbyMode]	];
 }
 
 - (void) writeRegenerationStartDelay:(int)aDelay
@@ -1076,12 +1081,12 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
 
 - (void) writeSecondStageControlTemp:(int)aTemp
 {
-	[self addCmdToQueue: [NSString stringWithFormat:@"I%d",aTemp]	waitForResponse:YES];
+	[self addCmdToQueue: [NSString stringWithFormat:@"I%d",aTemp]];
 }
 
 - (void) writeThermocoupleOn:(BOOL)aState
 {
-	[self addCmdToQueue: [NSString stringWithFormat:@"B%d",aState]	waitForResponse:YES];
+	[self addCmdToQueue: [NSString stringWithFormat:@"B%d",aState]];
 }
 
 #pragma mark •••Data Records
@@ -1181,7 +1186,7 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
 {    
     if(!readOnce){
         @try { 
-            [self pollHardware]; 
+            [self performSelectorOnMainThread:@selector(pollHardware) withObject:nil waitUntilDone:NO]; 
             readOnce = YES;
         }
 		@catch(NSException* localException) { 
@@ -1251,11 +1256,10 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
 
 - (void) timeout
 {
-	NSLogError(@"CP8Cryopump",@"command timeout",nil);
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+	NSLogError(@"command timeout",@"CP8Cryopump",nil);
 	[cmdQueue removeAllObjects];
 	[self setLastRequest:nil];
-	[self clearDelay];
-	[self processOneCommandFromQueue];
 }
 
 - (void) clearDelay

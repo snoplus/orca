@@ -204,6 +204,7 @@
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherCP8Cryopump;
 - (void) shipTemperatureValues;
+- (void) addCmdToQueue:(NSString *)aCmd;
 - (void) addCmdToQueue:(NSString*)aCmd waitForResponse:(BOOL)waitForResponse;
 
 #pragma mark •••Commands

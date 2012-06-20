@@ -163,7 +163,7 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 				if([buffer characterAtIndex:0] == kNAK){
 					//error in transimission
 					//flush and go to next command
-					NSLogError(@"TGP256A",@"Transmission Error",nil);
+					NSLogError(@"Transmission Error",@"TGP256A",nil);
 					[cmdQueue removeAllObjects];
 					[self setLastRequest:nil];			 //clear the last request
 					[self processOneCommandFromQueue];	 //do the next command in the queue

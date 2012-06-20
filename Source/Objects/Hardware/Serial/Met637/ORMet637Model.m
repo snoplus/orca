@@ -907,7 +907,7 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 
 - (void) timeout
 {
-	NSLogError(@"Met637",@"command timeout",nil);
+	NSLogError(@"command timeout",@"Met637",nil);
 	[self setTimedOut:YES];
     dataValid = NO;
 }
