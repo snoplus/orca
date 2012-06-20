@@ -705,7 +705,7 @@ NSString* ORTM700Lock						= @"ORTM700Lock";
 	if([cmdString isEqualToString:@"++Delay"]){
 		delay = YES;
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(clearDelay) object:nil];
-		[self performSelector:@selector(clearDelay) withObject:nil afterDelay:.1];
+		[self performSelector:@selector(clearDelay) withObject:nil afterDelay:.2];
 	}
 	else {
 		[self setLastRequest:cmdString];
