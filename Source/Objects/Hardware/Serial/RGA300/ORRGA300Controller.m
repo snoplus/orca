@@ -46,16 +46,17 @@
 
 - (void) awakeFromNib
 {	
+ 	[super awakeFromNib];	
     [[plotter yAxis] setRngLow:0.0 withHigh:1000.];
 	[[plotter yAxis] setRngLimitsLow:0.0 withHigh:1000000000 withMinRng:10];
-	[plotter setUseGradient:YES];
 	
-    [[plotter xAxis] setRngLow:0.0 withHigh:300];
-	[[plotter xAxis] setRngLimitsLow:0.0 withHigh:300 withMinRng:10];
+    [[plotter xAxis] setRngLow:0.0 withHigh:3000.];
+	[[plotter xAxis] setRngLimitsLow:0.0 withHigh:3000. withMinRng:10];
+    
+	[plotter setUseGradient:YES];
 	
 	[detailsButton setTitle:@"Show Details"];
 	
-	[super awakeFromNib];	
 	//[model getPressure];
 }
 
@@ -330,7 +331,7 @@
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[[self window] setTitle:[NSString stringWithFormat:@"DCU (%d)",[model uniqueIdNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"RGA300 (%d)",[model uniqueIdNumber]]];
 }
 
 - (void) updateWindow
@@ -400,7 +401,12 @@
 
 - (void) scanDataChanged:(NSNotification*)aNote
 {
-	[plotter setNeedsDisplay:YES];;
+    float maxValue = [model numberPointsInScan];
+    if(maxValue!=0){
+        [[plotter xAxis] setRngLow:0.0 withHigh:maxValue];
+        [[plotter xAxis] setRngLimitsLow:0.0 withHigh:maxValue withMinRng:20];
+    }
+	[plotter setNeedsDisplay:YES];
 }
 
 - (void) currentAmuIndexChanged:(NSNotification*)aNote
