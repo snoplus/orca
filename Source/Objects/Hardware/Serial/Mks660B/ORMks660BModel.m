@@ -705,7 +705,7 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 {    
     if(!readOnce){
         @try { 
-            [self readPressure]; 
+			[self performSelectorOnMainThread:@selector(readPressure) withObject:nil waitUntilDone:NO]; 
 			if(shipPressures) [self performSelectorOnMainThread:@selector(shipPressures) withObject:nil waitUntilDone:NO];
             readOnce = YES;
         }

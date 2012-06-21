@@ -624,7 +624,7 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 {    
 	if(!readOnce){
 		@try { 
-			[self readPressures]; 
+			[self performSelectorOnMainThread:@selector(readPressures) withObject:nil waitUntilDone:NO]; 
 			readOnce = YES;
 		}
 		@catch(NSException* localException) { 

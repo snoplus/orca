@@ -1070,7 +1070,7 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 	if(!readOnce){
 		@try { 
 			if([cmdQueue count] == 0) {
-				[self readAdcs]; 
+				[self performSelectorOnMainThread:@selector(readAdcs) withObject:nil waitUntilDone:NO]; 
 				readOnce = YES;
 			}
 		}

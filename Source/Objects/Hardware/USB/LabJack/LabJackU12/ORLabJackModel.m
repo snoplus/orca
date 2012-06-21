@@ -1028,7 +1028,7 @@ NSString* ORLabJackMaxValueChanged				= @"ORLabJackMaxValueChanged";
 {
     if(!readOnce){
         @try { 
-            [self queryAll]; 
+            [self performSelectorOnMainThread:@selector(queryAll) withObject:nil waitUntilDone:NO]; 
             readOnce = YES;
         }
 		@catch(NSException* localException) { 

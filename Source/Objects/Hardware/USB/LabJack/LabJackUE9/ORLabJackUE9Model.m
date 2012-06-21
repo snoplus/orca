@@ -1040,7 +1040,7 @@ NSString* ORLabJackUE9ModelAdcEnableMaskChanged		= @"ORLabJackUE9ModelAdcEnableM
 {
     if(!readOnce){
         @try { 
-            [self queryAll]; 
+            [self performSelectorOnMainThread:@selector(queryAll) withObject:nil waitUntilDone:NO]; 
 			if(shipData) [self performSelectorOnMainThread:@selector(shipIOData) withObject:nil waitUntilDone:NO];
             readOnce = YES;
         }
