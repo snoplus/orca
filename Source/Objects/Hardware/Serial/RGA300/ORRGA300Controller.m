@@ -213,11 +213,6 @@
 						object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(elecMultGainChanged:)
-                         name : ORRGA300ModelElecMultGainChanged
-						object: model];
-
-    [notifyCenter addObserver : self
                      selector : @selector(ionizerFilamentCurrentRBChanged:)
                          name : ORRGA300ModelIonizerFilamentCurrentRBChanged
 						object: model];
@@ -245,11 +240,6 @@
     [notifyCenter addObserver : self
                      selector : @selector(elecMultHVBiasRBChanged:)
                          name : ORRGA300ModelElecMultHVBiasRBChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(elecMultGainRBChanged:)
-                         name : ORRGA300ModelElecMultGainRBChanged
 						object: model];
 
     [notifyCenter addObserver : self
@@ -366,7 +356,6 @@
 	[self numberScansChanged:nil];
 	[self measuredIonCurrentChanged:nil];
 	[self electronMultiOptionChanged:nil];
-	[self elecMultGainChanged:nil];
 	
 	[self ionizerFilamentCurrentRBChanged:nil];
 	[self ionizerElectronEnergyRBChanged:nil];
@@ -374,7 +363,6 @@
 	[self ionizerFocusPlateVoltageRBChanged:nil];
 	[self noiseFloorSettingRBChanged:nil];
 	[self elecMultHVBiasRBChanged:nil];
-	[self elecMultGainRBChanged:nil];
 	[self opModeChanged:nil];
 	[self currentActivityChanged:nil];
 	[self scanProgressChanged:nil];
@@ -441,11 +429,6 @@
     [plotter setNeedsDisplay:YES];
 }
 
-- (void) elecMultGainRBChanged:(NSNotification*)aNote
-{
-	[elecMultGainRBField setFloatValue: [model elecMultGainRB]];
-}
-
 - (void) elecMultHVBiasRBChanged:(NSNotification*)aNote
 {
 	float hvBias = [model elecMultHVBiasRB];
@@ -492,11 +475,6 @@
 - (void) ionizerElectronEnergyRBChanged:(NSNotification*)aNote
 {
 	[ionizerElectronEnergyRBField setIntValue: [model ionizerElectronEnergyRB]];
-}
-
-- (void) elecMultGainChanged:(NSNotification*)aNote
-{
-	[elecMultGainField setFloatValue: [model elecMultGain]];
 }
 
 - (void) electronMultiOptionChanged:(NSNotification*)aNote
@@ -782,7 +760,6 @@
     BOOL useDetectorDefaults = [model useDetectorDefaults];
 	[noiseFloorSettingField		setEnabled: !useDetectorDefaults && !locked];
 	[elecMultHVBiasField		setEnabled: !useDetectorDefaults && [model electronMultiOption] && !locked];
-	[elecMultGainField			setEnabled: [model electronMultiOption] && !locked];
 	[elecMultHVBiasOnOffButton	setEnabled: [model electronMultiOption] && !locked];
 	
     BOOL useIonizerDefaults = [model useIonizerDefaults];
@@ -808,7 +785,6 @@
 - (IBAction) queryAllAction:(id)sender					{ [model queryAll]; }
 - (IBAction) opModeAction:(id)sender					{ [model setOpMode:						[sender indexOfSelectedItem]];	}
 - (IBAction) ionizerIonEnergyAction:(id)sender			{ [model setIonizerIonEnergy:			[sender indexOfSelectedItem]]; }
-- (IBAction) elecMultGainAction:(id)sender				{ [model setElecMultGain:				[sender floatValue]];	}
 - (IBAction) numberScansAction:(id)sender				{ [model setNumberScans:				[sender intValue]]; }
 - (IBAction) stepsPerAmuAction:(id)sender				{ [model setStepsPerAmu:				[sender intValue]]; }
 - (IBAction) initialMassAction:(id)sender				{ [model setInitialMass:				[sender intValue]]; }

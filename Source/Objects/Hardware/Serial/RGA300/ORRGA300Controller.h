@@ -30,7 +30,6 @@
 	IBOutlet NSTextField* currentAmuIndexField;
 	IBOutlet NSTextField* currentActivityField;
 	IBOutlet NSPopUpButton* opModePU;
-	IBOutlet NSTextField* elecMultGainRBField;
 	IBOutlet NSTextField* elecMultHVBiasRBField;
 	IBOutlet NSTextField* noiseFloorSettingRBField;
 	
@@ -39,7 +38,6 @@
 	IBOutlet NSTextField* ionizerElectronEnergyRBField;
 	IBOutlet NSTextField* ionizerFilamentCurrentRBField;
 	
-	IBOutlet NSTextField* elecMultGainField;
 	IBOutlet NSTextField* electronMultiOptionField;
 	IBOutlet NSTextField* measuredIonCurrentField;
 	IBOutlet NSTextField* numberScansField;
@@ -102,14 +100,12 @@
 - (void) scanProgressChanged:(NSNotification*)aNote;
 - (void) currentActivityChanged:(NSNotification*)aNote;
 - (void) opModeChanged:(NSNotification*)aNote;
-- (void) elecMultGainRBChanged:(NSNotification*)aNote;
 - (void) elecMultHVBiasRBChanged:(NSNotification*)aNote;
 - (void) noiseFloorSettingRBChanged:(NSNotification*)aNote;
 - (void) ionizerFocusPlateVoltageRBChanged:(NSNotification*)aNote;
 - (void) ionizerIonEnergyRBChanged:(NSNotification*)aNote;
 - (void) ionizerElectronEnergyRBChanged:(NSNotification*)aNote;
 - (void) ionizerFilamentCurrentRBChanged:(NSNotification*)aNote;
-- (void) elecMultGainChanged:(NSNotification*)aNote;
 - (void) electronMultiOptionChanged:(NSNotification*)aNote;
 - (void) measuredIonCurrentChanged:(NSNotification*)aNote;
 - (void) numberScansChanged:(NSNotification*)aNote;
@@ -151,7 +147,6 @@
 - (IBAction) startMeasurementAction:(id)sender;
 - (IBAction) stopMeasurementAction:(id)sender;
 - (IBAction) opModeAction:(id)sender;
-- (IBAction) elecMultGainAction:(id)sender;
 - (IBAction) queryAllAction:(id)sender;
 - (IBAction) syncDialogAction:(id)sender;
 - (IBAction) numberScansAction:(id)sender;
