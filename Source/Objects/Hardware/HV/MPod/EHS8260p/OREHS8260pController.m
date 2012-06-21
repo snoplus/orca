@@ -142,6 +142,13 @@
 {
 	int chan = [model selectedChannel];
 	[outputFailureBehaviorPU selectItemAtIndex: [model outputFailureBehavior:chan]];
+	if(([model outputFailureBehavior:chan] & 0x3) == 0){
+		[hwKillStatusField setStringValue:@"HW Kill Disabled"];
+	}
+	else {
+		[hwKillStatusField setStringValue:@""];
+	}
+
     [self channelReadParamsChanged:nil]; //force reload of table
 }
 

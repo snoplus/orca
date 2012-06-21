@@ -218,6 +218,12 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 		short aValue = ((currentTripBehavior[channel] & 0x3)<<6) | ((outputFailureBehavior[channel] & 0x3)<<12);
 		NSString* cmd = [NSString stringWithFormat:@"outputSupervisionBehavior.u%d i %d",[self slotChannelValue:channel],aValue];
 		[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:)];
+		
+		//disable the hw kill if the supervisor behaviour is set to ignore
+		if((outputFailureBehavior[channel] & 0x3) == 0){
+			NSString* cmd = [NSString stringWithFormat:@"outputSwitch.u%d i 4",[self slotChannelValue:channel]];
+			[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:)];
+		}
 	}
 }
 

@@ -28,6 +28,7 @@
 	IBOutlet   NSTextField*		rampTypeField;
 	IBOutlet   NSTableView*		ramperTableView;
 	IBOutlet   NSDrawer*		ramperDrawer;
+	IBOutlet   NSTextField*		hwKillStatusField;
 }
 
 - (id)   init;
