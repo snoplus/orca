@@ -44,7 +44,9 @@
 	IBOutlet NSTextField*   errorCodeField;
     IBOutlet StopLightView* lightBoardView;
     IBOutlet NSPopUpButton* pollTimePopup;
-    IBOutlet ORSerialPortController* serialPortController;
+    IBOutlet NSPopUpButton* portListPopup;
+    IBOutlet NSTextField*   portStateField;
+    IBOutlet NSButton*      openPortButton;
 }
 
 #pragma mark •••Initialization
@@ -82,8 +84,11 @@
 - (void) pollTimeChanged:(NSNotification*)aNote;
 - (void) errorCodeChanged:(NSNotification*)aNote;
 - (BOOL) portLocked;
+- (void) portNameChanged:(NSNotification*)aNote;
+- (void) portStateChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) openPortAction:(id)sender;		  
 - (IBAction) acknowledgeErrorAction:(id)sender;
 - (IBAction) runUpTimeAction:(id)sender;
 - (IBAction) tmpRotSetAction:(id)sender;
@@ -95,6 +100,7 @@
 - (IBAction) updateAllAction:(id)sender;
 - (IBAction) pollTimeAction:(id)sender;
 - (IBAction) initAction:(id)sender;
+- (IBAction) portListAction:(id) sender;
 
 @end
 

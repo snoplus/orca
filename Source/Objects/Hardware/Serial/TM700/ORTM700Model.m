@@ -21,6 +21,7 @@
 #import "ORTM700Model.h"
 #import "ORSerialPort.h"
 #import "ORSerialPortAdditions.h"
+#import "ORSerialPortList.h"
 #import "ORSafeQueue.h"
 
 #pragma mark •••External Strings
@@ -88,16 +89,24 @@ NSString* ORTM700Lock						= @"ORTM700Lock";
 	self = [super init];
 	
 	runUpTime = 8; //default
+    [self registerNotificationObservers];
 	
 	return self;
 }
 
 - (void) dealloc
 {
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[cmdQueue release];
 	[lastRequest release];
 	[inComingData release];
+	[portName release];
+    if([serialPort isOpen]){
+        [serialPort close];
+    }
+	
+    [serialPort release];
 	
 	[super dealloc];
 }
@@ -123,6 +132,18 @@ NSString* ORTM700Lock						= @"ORTM700Lock";
 {
 	[self linkToController:@"ORTM700Controller"];
 }
+
+- (void) registerNotificationObservers
+{
+	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+    
+    [notifyCenter removeObserver:self];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(dataReceived:)
+                         name : ORSerialPortDataReceived
+                       object : nil];
+ }
 
 #pragma mark •••Accessors
 - (BOOL) involvedInProcess
@@ -335,6 +356,65 @@ NSString* ORTM700Lock						= @"ORTM700Lock";
 	[lastRequest autorelease];
 	lastRequest = [aCmdString copy];    
 }
+- (BOOL) portWasOpen
+{
+    return portWasOpen;
+}
+
+- (void) setPortWasOpen:(BOOL)aPortWasOpen
+{
+    portWasOpen = aPortWasOpen;
+}
+
+- (NSString*) portName
+{
+	if([portName length])return portName;
+	return @"-";
+}
+
+- (void) setPortName:(NSString*)aPortName
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setPortName:portName];
+    
+    if(![aPortName isEqualToString:portName]){
+        [portName autorelease];
+        portName = [aPortName copy];    
+		
+        BOOL valid = NO;
+        NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
+        ORSerialPort *aPort;
+        while (aPort = [enumerator nextObject]) {
+            if([portName isEqualToString:[aPort name]]){
+                [self setSerialPort:aPort];
+                if(portWasOpen){
+                    [self openPort:YES];
+				}
+                valid = YES;
+                break;
+            }
+        } 
+        if(!valid){
+            [self setSerialPort:nil];
+        }       
+    }
+	
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORTM700ModelPortNameChanged object:self];
+}
+
+- (ORSerialPort*) serialPort
+{
+    return serialPort;
+}
+
+- (void) setSerialPort:(ORSerialPort*)aSerialPort
+{
+    [aSerialPort retain];
+    [serialPort release];
+    serialPort = aSerialPort;
+	
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORTM700ModelSerialPortChanged object:self];
+}
+
 
 - (void) openPort:(BOOL)state
 {
@@ -352,7 +432,7 @@ NSString* ORTM700Lock						= @"ORTM700Lock";
 		[serialPort close];
 	}
     portWasOpen = [serialPort isOpen];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSerialPortModelPortStateChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORTM700ModelPortStateChanged object:self];
     
 }
 
@@ -365,8 +445,12 @@ NSString* ORTM700Lock						= @"ORTM700Lock";
 	[self setTmpRotSet:		[decoder decodeIntForKey:	@"tmpRotSet"]];
 	[self setPollTime:		[decoder decodeIntForKey:	@"pollTime"]];
 	[self setDeviceAddress:	[decoder decodeIntForKey:	@"deviceAddress"]];
+	[self setPortWasOpen:	[decoder decodeBoolForKey:	 @"portWasOpen"]];
+    [self setPortName:		[decoder decodeObjectForKey: @"portName"]];
+
 	[[self undoManager] enableUndoRegistration];
 	cmdQueue = [[ORSafeQueue alloc] init];
+    [self registerNotificationObservers];
 	
 	return self;
 }
@@ -378,6 +462,8 @@ NSString* ORTM700Lock						= @"ORTM700Lock";
     [encoder encodeInt:tmpRotSet		forKey: @"tmpRotSet"];
     [encoder encodeInt:deviceAddress	forKey: @"deviceAddress"];
     [encoder encodeInt:pollTime			forKey: @"pollTime"];
+    [encoder encodeBool:portWasOpen		forKey: @"portWasOpen"];
+    [encoder encodeObject:portName		forKey: @"portName"];
 }
 
 #pragma mark •••HW Methods

@@ -20,12 +20,14 @@
 #import "ORTM700Controller.h"
 #import "ORTM700Model.h"
 #import "ORSerialPort.h"
+#import "ORSerialPortList.h"
 #import "OHexFormatter.h"
 #import "StopLightView.h"
 #import "ORSerialPortController.h"
 
 @interface ORTM700Controller (private)
 - (void) _turnOffSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) populatePortListPopup;
 @end
 
 @implementation ORTM700Controller
@@ -46,6 +48,7 @@
 
 - (void) awakeFromNib
 {	
+    [self populatePortListPopup];
  	[super awakeFromNib];	
 }
 
@@ -146,6 +149,17 @@
                          name : ORTM700ModelErrorCodeChanged
 						object: model];
     
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(portNameChanged:)
+                         name : ORTM700ModelPortNameChanged
+                        object: nil];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(portStateChanged:)
+                         name : ORTM700ModelPortStateChanged
+                       object : nil];
+	
 }
 
 - (void) setModel:(id)aModel
@@ -178,7 +192,53 @@
 	[self tmpRotSetChanged:nil];
 	[self runUpTimeCtrlChanged:nil];
 	[self runUpTimeChanged:nil];
+	[self portStateChanged:nil];
+    [self portNameChanged:nil];
+
     [self updateButtons];
+}
+
+- (void) portNameChanged:(NSNotification*)aNotification
+{
+    NSString* portName = [model portName];
+    
+	NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
+	ORSerialPort *aPort;
+	
+    [portListPopup selectItemAtIndex:0]; //the default
+    while (aPort = [enumerator nextObject]) {
+        if([portName isEqualToString:[aPort name]]){
+            [portListPopup selectItemWithTitle:portName];
+            break;
+        }
+	}  
+    [self portStateChanged:nil];
+}
+
+- (void) portStateChanged:(NSNotification*)aNotification
+{
+    if(aNotification == nil || [aNotification object] == [model serialPort]){
+        if([model serialPort]){
+            [openPortButton setEnabled:YES];
+			
+            if([[model serialPort] isOpen]){
+                [openPortButton setTitle:@"Close"];
+                [portStateField setTextColor:[NSColor colorWithCalibratedRed:0.0 green:.8 blue:0.0 alpha:1.0]];
+                [portStateField setStringValue:@"Open"];
+            }
+            else {
+                [openPortButton setTitle:@"Open"];
+                [portStateField setStringValue:@"Closed"];
+                [portStateField setTextColor:[NSColor redColor]];
+            }
+        }
+        else {
+            [openPortButton setEnabled:NO];
+            [portStateField setTextColor:[NSColor blackColor]];
+            [portStateField setStringValue:@"---"];
+            [openPortButton setTitle:@"---"];
+        }
+    }
 }
 
 - (void) errorCodeChanged:(NSNotification*)aNote
@@ -285,7 +345,7 @@
     
     [lockButton setState: locked];
 	
-	[serialPortController updateButtons:locked];
+    [openPortButton					setEnabled:!locked];
 	
     [stationOnButton setEnabled:!locked && portOpen && !stationOn];
     [stationOffButton setEnabled:!locked && portOpen && stationOn];
@@ -359,6 +419,8 @@
 	[self endEditing];
 	[model initUnit];
 }
+- (IBAction) openPortAction:(id)sender	{ [model openPort:![[model serialPort] isOpen]]; }
+- (IBAction) portListAction:(id) sender	{ [model setPortName:	[portListPopup titleOfSelectedItem]];}
 
 
 @end
@@ -369,6 +431,18 @@
     if(returnCode == NSAlertAlternateReturn){
 		[model turnStationOff];
     }    
+}
+
+- (void) populatePortListPopup
+{
+	NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
+	ORSerialPort *aPort;
+    [portListPopup removeAllItems];
+    [portListPopup addItemWithTitle:@"--"];
+	
+	while (aPort = [enumerator nextObject]) {
+        [portListPopup addItemWithTitle:[aPort name]];
+	}    
 }
 
 @end
