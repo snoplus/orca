@@ -314,13 +314,13 @@ NSString* ORTM700Lock						= @"ORTM700Lock";
 
 - (void) setDeviceAddress:(int)aDeviceAddress
 {
-	//if(aDeviceAddress<1)aDeviceAddress = 1;
-	//else if(aDeviceAddress>255)aDeviceAddress= 255;
+	if(aDeviceAddress<1)aDeviceAddress = 1;
+	else if(aDeviceAddress>255)aDeviceAddress= 255;
 	
     [[[self undoManager] prepareWithInvocationTarget:self] setDeviceAddress:deviceAddress];
-	if([serialPort isOpen]){
+	//if([serialPort isOpen]){
 		//[self sendDataSet:kDeviceAddress integer:aDeviceAddress];
-	}
+		//}
     deviceAddress = aDeviceAddress;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTM700ModelDeviceAddressChanged object:self];
 }
