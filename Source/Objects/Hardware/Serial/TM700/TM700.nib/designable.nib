@@ -202,16 +202,16 @@
 												<int key="NSTitlePosition">2</int>
 												<bool key="NSTransparent">NO</bool>
 											</object>
-											<object class="NSBox" id="578171782">
+											<object class="NSBox" id="608423771">
 												<reference key="NSNextResponder" ref="268031613"/>
 												<int key="NSvFlags">268</int>
 												<object class="NSMutableArray" key="NSSubviews">
 													<bool key="EncodedWithXMLCoder">YES</bool>
-													<object class="NSView" id="333818544">
-														<reference key="NSNextResponder" ref="578171782"/>
+													<object class="NSView" id="742805669">
+														<reference key="NSNextResponder" ref="608423771"/>
 														<int key="NSvFlags">274</int>
 														<string key="NSFrame">{{3, 3}, {210, 66}}</string>
-														<reference key="NSSuperview" ref="578171782"/>
+														<reference key="NSSuperview" ref="608423771"/>
 													</object>
 												</object>
 												<string key="NSFrame">{{107, 245}, {216, 84}}</string>
@@ -228,7 +228,7 @@
 														<bytes key="NSWhite">MCAwLjgwMDAwMDAxAA</bytes>
 													</object>
 												</object>
-												<reference key="NSContentView" ref="333818544"/>
+												<reference key="NSContentView" ref="742805669"/>
 												<int key="NSBorderType">2</int>
 												<int key="NSBoxType">0</int>
 												<int key="NSTitlePosition">2</int>
@@ -1540,6 +1540,14 @@
 					</object>
 					<int key="connectionID">3055</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">portControlsView</string>
+						<reference key="source" ref="321269314"/>
+						<reference key="destination" ref="608423771"/>
+					</object>
+					<int key="connectionID">3056</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -1623,7 +1631,7 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<reference ref="608086021"/>
 							<reference ref="961066953"/>
-							<reference ref="578171782"/>
+							<reference ref="608423771"/>
 						</object>
 						<reference key="parent" ref="356570504"/>
 					</object>
@@ -2360,7 +2368,7 @@
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">3053</int>
-						<reference key="object" ref="578171782"/>
+						<reference key="object" ref="608423771"/>
 						<reference key="parent" ref="268031613"/>
 					</object>
 					<object class="IBObjectRecord">
@@ -2636,7 +2644,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">3055</int>
+			<int key="maxID">3056</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
