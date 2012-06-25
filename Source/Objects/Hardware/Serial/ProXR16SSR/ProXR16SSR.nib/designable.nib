@@ -55,7 +55,6 @@
 							<int key="NSvFlags">256</int>
 							<string key="NSFrame">{{62, 767}, {126, 15}}</string>
 							<reference key="NSSuperview" ref="724346688"/>
-							<reference key="NSNextKeyView"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSPopUpButtonCell" key="NSCell" id="309458802">
 								<int key="NSCellFlags">-2076049856</int>
@@ -173,7 +172,6 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{285, 764}, {50, 20}}</string>
 							<reference key="NSSuperview" ref="724346688"/>
-							<reference key="NSNextKeyView"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="1065098255">
 								<int key="NSCellFlags">67239424</int>
@@ -1480,6 +1478,14 @@
 					</object>
 					<int key="connectionID">1595</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">portListAction:</string>
+						<reference key="source" ref="568860147"/>
+						<reference key="destination" ref="586627564"/>
+					</object>
+					<int key="connectionID">1618</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -2405,7 +2411,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">1617</int>
+			<int key="maxID">1618</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">

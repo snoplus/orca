@@ -22,8 +22,8 @@
 @class ORSerialPort;
 
 #define kProXR16SSRCmdStart			0xFE
-#define kProXR16SSRRelayOnStart		0x64
-#define kProXR16SSRRelayOffStart	0x6C
+#define kProXR16SSRRelayOff			0x2F
+#define kProXR16SSRRelayOn			0x30
 #define kProXR16SSRCmdResponse		0x55
 #define kProXR16SSRAllRelayStatus	0x7C
 
@@ -36,8 +36,8 @@
     unsigned long	dataId;
     NSData*			lastRequest;
     NSMutableArray* cmdQueue;
-	
-    BOOL			relayState[16];
+	NSMutableData*	inBuffer;
+    BOOL			relayState[16]; //we will ignore the banks out of our hardware range
 	NSMutableArray* outletNames;
 }
 

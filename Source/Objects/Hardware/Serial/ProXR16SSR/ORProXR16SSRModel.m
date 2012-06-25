@@ -123,29 +123,37 @@ NSString* ORProXR16SSRLock							= @"ORProXR16SSRLock";
 - (void) dataReceived:(NSNotification*)note
 {
     if([[note userInfo] objectForKey:@"serialPort"] == serialPort){
-		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
 		NSData* theResponse = [[note userInfo] objectForKey:@"data"];
+		NSLog(@"received: %@\n",theResponse);
 		NSUInteger responseLength    = [theResponse length];
 		unsigned char* responseBytes = (unsigned char*)[theResponse bytes];
 		if(responseLength>=1){
 			if(responseBytes[0] == kProXR16SSRCmdResponse){
+				[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
 				[self setLastRequest:nil];			 //clear the last request
 				[self processOneCommandFromQueue];	 //do the next command in the queue
 			}
 			else {
-				NSUInteger lastRequestLength    = [lastRequest length];
-				unsigned char* lastCmdBytes = (unsigned char*)[lastRequest bytes];
+				NSUInteger lastRequestLength = [lastRequest length];
+				unsigned char* lastCmdBytes  = (unsigned char*)[lastRequest bytes];
 				if(lastRequestLength>=2){
 					switch(lastCmdBytes[1]){
 						case kProXR16SSRAllRelayStatus:
-							if(lastRequestLength >=3){
-								[self setRelayMask:responseBytes[0] bank:lastCmdBytes[2]];
+							if(!inBuffer)inBuffer = [[NSMutableData data] retain];
+							[inBuffer appendData:theResponse];
+							if([inBuffer length] >=32){
+								[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+								unsigned char* p = (unsigned char*)[inBuffer bytes];
+								int i;
+								for(i=0;i<32;i++)[self setRelayMask:p[i] bank:i];
+								[inBuffer release];
+								inBuffer = nil;
+								[self setLastRequest:nil];			 //clear the last request
+								[self processOneCommandFromQueue];	 //do the next command in the queue
 							}
 						break;
 					}
 				}
-				[self setLastRequest:nil];			 //clear the last request
-				[self processOneCommandFromQueue];	 //do the next command in the queue
 			}
 		}
 	}
@@ -185,22 +193,22 @@ NSString* ORProXR16SSRLock							= @"ORProXR16SSRLock";
 
 -  (void) turnRelayOn:(int) aChan
 {    
-	int bank = aChan/8 + 1;
 	unsigned char cmdArray[3];
 	cmdArray[0] = kProXR16SSRCmdStart;
-	cmdArray[1] = kProXR16SSRRelayOnStart + aChan%8;
-	cmdArray[2] = bank;
+	cmdArray[1] = kProXR16SSRRelayOn;
+	cmdArray[2] = aChan;
     [self addCmdToQueue:[NSData dataWithBytes:cmdArray length:3]];
+	[self readAllRelayStates];
 }
 
 -  (void) turnRelayOff:(int) aChan
 {
-	int bank = aChan/8 + 1;
 	unsigned char cmdArray[3];
 	cmdArray[0] = kProXR16SSRCmdStart;
-	cmdArray[1] = kProXR16SSRRelayOffStart + aChan%8;
-	cmdArray[2] = bank;
-    [self addCmdToQueue:[NSData dataWithBytes:cmdArray length:3]];
+	cmdArray[1] = kProXR16SSRRelayOff;
+ 	cmdArray[2] = aChan;
+   [self addCmdToQueue:[NSData dataWithBytes:cmdArray length:3]];
+	[self readAllRelayStates];
 }
 
 -  (void) readAllRelayStates
@@ -208,10 +216,7 @@ NSString* ORProXR16SSRLock							= @"ORProXR16SSRLock";
 	unsigned char cmdArray[3];
 	cmdArray[0] = kProXR16SSRCmdStart;
 	cmdArray[1] = kProXR16SSRAllRelayStatus;
-	cmdArray[2] = 0; //bank
-    [self addCmdToQueue:[NSData dataWithBytes:cmdArray length:3]];
-	
-	cmdArray[2] = 1; //bank
+	cmdArray[2] = 0;
     [self addCmdToQueue:[NSData dataWithBytes:cmdArray length:3]];
 }
 
@@ -282,7 +287,7 @@ NSString* ORProXR16SSRLock							= @"ORProXR16SSRLock";
 {
     if(state) {
         [serialPort open];
-		[serialPort setSpeed:115200];
+		[serialPort setSpeed:38400];
 		[serialPort setParityNone];
 		[serialPort setStopBits2:NO];
 		[serialPort setDataBits:8];
@@ -412,7 +417,7 @@ NSString* ORProXR16SSRLock							= @"ORProXR16SSRLock";
 
 - (void) timeout
 {
-	NSLogError(@"command timeout","ProXR16SSR",nil);
+	NSLogError(@"command timeout",@"ProXR16SSR",nil);
 	[self setLastRequest:nil];
 	[cmdQueue removeAllObjects];
 }
@@ -425,8 +430,8 @@ NSString* ORProXR16SSRLock							= @"ORProXR16SSRLock";
 	
 	[self setLastRequest:aCmd];
 	[self performSelector:@selector(timeout) withObject:nil afterDelay:3];
-	NSString* s = [[NSString alloc] initWithData:aCmd encoding:NSASCIIStringEncoding];
-	[serialPort writeString:s];
+	//NSString* s = [[NSString alloc] initWithData:aCmd encoding:NSUTF8StringEncoding];
+	[serialPort writeDataInBackgroundThread:aCmd];
 	if(!lastRequest){
 		[self performSelector:@selector(processOneCommandFromQueue) withObject:nil afterDelay:.01];
 	}
@@ -436,9 +441,7 @@ NSString* ORProXR16SSRLock							= @"ORProXR16SSRLock";
 {
 	if(aBank>=0 && aBank<2){
 		int i;
-		for(i=0;i<8;i++){
-			relayState[i + aBank*8] = ((mask & (0x1<<i)) > 0);
-		}
+		for(i=0;i<8;i++) relayState[aBank*8 + i] = (mask & (1<<i))>0;
 		[self setUpImage];
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORProXR16SSRModelUpdateAllRelaysChanged object:self];
 	}

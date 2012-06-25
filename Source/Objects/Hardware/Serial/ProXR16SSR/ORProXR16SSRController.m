@@ -169,7 +169,7 @@
 	int i;
 	for(i=0;i<16;i++){
 		[[stateMatrix cellWithTag:i] setStringValue:[model relayState:i]?@"Open":@"Closed"];
-		[[turnOnOffMatrix cellWithTag:i] setTitle:![model relayState:i]?@"Open":@"Closed"];
+		[[turnOnOffMatrix cellWithTag:i] setTitle:![model relayState:i]?@"Open":@"Close"];
     }
 	[self setStateViews];
 }
@@ -196,13 +196,13 @@
         NSDictionary* userInfo = [aNote userInfo];
         int chan = [[userInfo objectForKey:@"Channel"] intValue];
         [[stateMatrix cellWithTag:chan] setStringValue:[model relayState:chan]?@"Open":@"Closed"];
- 		[[turnOnOffMatrix cellWithTag:chan] setTitle:![model relayState:chan]?@"Open":@"Closed"];
+ 		[[turnOnOffMatrix cellWithTag:chan] setTitle:![model relayState:chan]?@"Open":@"Close"];
    }
     else {
         int i;
         for(i=0;i<16;i++){
             [[stateMatrix cellWithTag:i] setStringValue:[model relayState:i]?@"Open":@"Closed"];
-			[[turnOnOffMatrix cellWithTag:i] setTitle:![model relayState:i]?@"Open":@"Closed"];
+			[[turnOnOffMatrix cellWithTag:i] setTitle:![model relayState:i]?@"Open":@"Close"];
        }
     }
 	[self setStateViews];
