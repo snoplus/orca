@@ -2694,6 +2694,13 @@
 		84FDF5550D7F084E003AE119 /* ORIpeV4CrateModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FDF54C0D7F084E003AE119 /* ORIpeV4CrateModel.m */; };
 		84FE07D007B403ED00E2CB0E /* NSString+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FE07CE07B403ED00E2CB0E /* NSString+Extensions.m */; };
 		84FE07D107B403ED00E2CB0E /* NSString+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FE07CF07B403ED00E2CB0E /* NSString+Extensions.h */; };
+		84FEAD1C15939393005D798C /* ORProXR16SSRController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FEAD1615939393005D798C /* ORProXR16SSRController.h */; };
+		84FEAD1D15939394005D798C /* ORProXR16SSRController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FEAD1715939393005D798C /* ORProXR16SSRController.m */; };
+		84FEAD1E15939394005D798C /* ORProXR16SSRModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FEAD1815939393005D798C /* ORProXR16SSRModel.h */; };
+		84FEAD1F15939394005D798C /* ORProXR16SSRModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FEAD1915939393005D798C /* ORProXR16SSRModel.m */; };
+		84FEAD2015939394005D798C /* ProXR16SSR.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84FEAD1A15939393005D798C /* ProXR16SSR.nib */; };
+		84FEAD2115939394005D798C /* ProXR16SSR.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84FEAD1B15939393005D798C /* ProXR16SSR.tif */; };
+		84FEAD6D1594A4DF005D798C /* ProXR16SSRBig.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84FEAD6C1594A4DF005D798C /* ProXR16SSRBig.tif */; };
 		84FFCAA60636D5B10069432F /* C792.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84FFCAA00636D5B10069432F /* C792.gif */; };
 		84FFCAA70636D5B10069432F /* Caen792.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84FFCAA10636D5B10069432F /* Caen792.nib */; };
 		84FFCAA80636D5B10069432F /* ORCaen792Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FFCAA20636D5B10069432F /* ORCaen792Controller.h */; };
@@ -5632,6 +5639,13 @@
 		84FDF54C0D7F084E003AE119 /* ORIpeV4CrateModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORIpeV4CrateModel.m; path = "Source/Objects/Hardware/IPE/IpeV4 Crate/ORIpeV4CrateModel.m"; sourceTree = SOURCE_ROOT; };
 		84FE07CE07B403ED00E2CB0E /* NSString+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = "NSString+Extensions.m"; path = "Source/Cocoa Extensions/NSString+Extensions.m"; sourceTree = SOURCE_ROOT; };
 		84FE07CF07B403ED00E2CB0E /* NSString+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = "NSString+Extensions.h"; path = "Source/Cocoa Extensions/NSString+Extensions.h"; sourceTree = SOURCE_ROOT; };
+		84FEAD1615939393005D798C /* ORProXR16SSRController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORProXR16SSRController.h; path = Source/Objects/Hardware/Serial/ProXR16SSR/ORProXR16SSRController.h; sourceTree = SOURCE_ROOT; };
+		84FEAD1715939393005D798C /* ORProXR16SSRController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORProXR16SSRController.m; path = Source/Objects/Hardware/Serial/ProXR16SSR/ORProXR16SSRController.m; sourceTree = SOURCE_ROOT; };
+		84FEAD1815939393005D798C /* ORProXR16SSRModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORProXR16SSRModel.h; path = Source/Objects/Hardware/Serial/ProXR16SSR/ORProXR16SSRModel.h; sourceTree = SOURCE_ROOT; };
+		84FEAD1915939393005D798C /* ORProXR16SSRModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORProXR16SSRModel.m; path = Source/Objects/Hardware/Serial/ProXR16SSR/ORProXR16SSRModel.m; sourceTree = SOURCE_ROOT; };
+		84FEAD1A15939393005D798C /* ProXR16SSR.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ProXR16SSR.nib; path = Source/Objects/Hardware/Serial/ProXR16SSR/ProXR16SSR.nib; sourceTree = SOURCE_ROOT; };
+		84FEAD1B15939393005D798C /* ProXR16SSR.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = ProXR16SSR.tif; path = Source/Objects/Hardware/Serial/ProXR16SSR/ProXR16SSR.tif; sourceTree = SOURCE_ROOT; };
+		84FEAD6C1594A4DF005D798C /* ProXR16SSRBig.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = ProXR16SSRBig.tif; path = Source/Objects/Hardware/Serial/ProXR16SSR/ProXR16SSRBig.tif; sourceTree = SOURCE_ROOT; };
 		84FFCAA00636D5B10069432F /* C792.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = C792.gif; sourceTree = "<group>"; };
 		84FFCAA10636D5B10069432F /* Caen792.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = Caen792.nib; sourceTree = "<group>"; };
 		84FFCAA20636D5B10069432F /* ORCaen792Controller.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORCaen792Controller.h; sourceTree = "<group>"; };
@@ -7895,6 +7909,7 @@
 			isa = PBXGroup;
 			children = (
 				84DEEBBA149916AD0092DB6C /* Serial Base Classes */,
+				84FEAD1515939393005D798C /* ProXR16SSR */,
 				84183011156153D2004EC81F /* TM700 */,
 				8499A74D1518D85700CD7AAC /* CP8Cryopump */,
 				84F3084715483A4000663573 /* Mks660B */,
@@ -11713,6 +11728,21 @@
 			path = "Source/Objects/Hardware/IPE/IpeV4 Crate";
 			sourceTree = SOURCE_ROOT;
 		};
+		84FEAD1515939393005D798C /* ProXR16SSR */ = {
+			isa = PBXGroup;
+			children = (
+				84FEAD1615939393005D798C /* ORProXR16SSRController.h */,
+				84FEAD1715939393005D798C /* ORProXR16SSRController.m */,
+				84FEAD1815939393005D798C /* ORProXR16SSRModel.h */,
+				84FEAD1915939393005D798C /* ORProXR16SSRModel.m */,
+				84FEAD1A15939393005D798C /* ProXR16SSR.nib */,
+				84FEAD6C1594A4DF005D798C /* ProXR16SSRBig.tif */,
+				84FEAD1B15939393005D798C /* ProXR16SSR.tif */,
+			);
+			name = ProXR16SSR;
+			path = Source/Objects/Hardware/Serial/ProXR16SSR;
+			sourceTree = SOURCE_ROOT;
+		};
 		84FFCA9F0636D5B10069432F /* CV792 */ = {
 			isa = PBXGroup;
 			children = (
@@ -13357,6 +13387,8 @@
 				844EEAB215827AA100E1D7C1 /* ORCAEN830Readout.hh in Headers */,
 				8471D4791588DF3C0039894D /* ORRemoteSocketController.h in Headers */,
 				8471D47B1588DF3C0039894D /* ORRemoteSocketModel.h in Headers */,
+				84FEAD1C15939393005D798C /* ORProXR16SSRController.h in Headers */,
+				84FEAD1E15939394005D798C /* ORProXR16SSRModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14208,6 +14240,9 @@
 				8418481E157FA478004EC81F /* CV830.nib in Resources */,
 				8471D47D1588DF3C0039894D /* RemoteSocket.nib in Resources */,
 				8471D47E1588DF3C0039894D /* RemoteSocket.tif in Resources */,
+				84FEAD2015939394005D798C /* ProXR16SSR.nib in Resources */,
+				84FEAD2115939394005D798C /* ProXR16SSR.tif in Resources */,
+				84FEAD6D1594A4DF005D798C /* ProXR16SSRBig.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -15164,6 +15199,8 @@
 				84184824157FA478004EC81F /* ORCV830Model.m in Sources */,
 				8471D47A1588DF3C0039894D /* ORRemoteSocketController.m in Sources */,
 				8471D47C1588DF3C0039894D /* ORRemoteSocketModel.m in Sources */,
+				84FEAD1D15939394005D798C /* ORProXR16SSRController.m in Sources */,
+				84FEAD1F15939394005D798C /* ORProXR16SSRModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
