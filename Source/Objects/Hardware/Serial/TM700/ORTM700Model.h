@@ -21,12 +21,9 @@
 
 @class ORSafeQueue;
 
-@interface ORTM700Model : OrcaObject <ORBitProcessing>
+@interface ORTM700Model : ORSerialPortModel <ORBitProcessing>
 {
     @private
-		NSString*		portName;
-		BOOL			portWasOpen;
-		ORSerialPort*	serialPort;
 		NSString*		lastRequest;
 		ORSafeQueue*	cmdQueue;
 		NSMutableData*	inComingData;
@@ -52,15 +49,8 @@
 
 #pragma mark •••Initialization
 - (void) dealloc;
-- (void) registerNotificationObservers;
 
 #pragma mark •••Accessors
-- (ORSerialPort*) serialPort;
-- (void) setSerialPort:(ORSerialPort*)aSerialPort;
-- (BOOL) portWasOpen;
-- (void) setPortWasOpen:(BOOL)aPortWasOpen;
-- (NSString*) portName;
-- (void) setPortName:(NSString*)aPortName;
 - (NSString*) errorCode;
 - (void) setErrorCode:(NSString *)aCode;
 - (BOOL) involvedInProcess;
@@ -166,6 +156,3 @@ extern NSString* ORTM700TurboStateChanged;
 extern NSString* ORTM700ModelDeviceAddressChanged;
 extern NSString* ORTM700Lock;
 extern NSString* ORTM700ModelPollTimeChanged;
-extern NSString* ORTM700ModelSerialPortChanged;
-extern NSString* ORTM700ModelPortNameChanged;
-extern NSString* ORTM700ModelPortStateChanged;
