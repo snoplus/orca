@@ -1904,11 +1904,17 @@ static struct {
 
 - (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-    /* Disable all channels.  The remaining buffer should be readout. */
-    int i;
-    for(i=0;i<kNumGretina4Channels;i++){					
-        [self writeControlReg:i enabled:NO];
-    }
+    @try {
+		/* Disable all channels.  The remaining buffer should be readout. */
+		int i;
+		for(i=0;i<kNumGretina4Channels;i++){					
+			[self writeControlReg:i enabled:NO];
+		}
+	}
+	@catch(NSException* e){
+        [self incExceptionCount];
+        NSLogError(@"",@"Gretina4 Card Error",nil);
+	}
 }
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
