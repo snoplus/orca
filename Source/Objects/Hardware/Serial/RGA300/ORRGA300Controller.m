@@ -983,7 +983,7 @@
 		[aPlot release];
 		[plotter setShowLegend:NO];
 		[plotter setXLabel:@"AMU"];
-		[plotter setYLabel:@"Pressure (Torr) x 10E-13"];
+		[plotter setYLabel:@"Pressure (Torr) x 10E13"];
 	}	
 }
 

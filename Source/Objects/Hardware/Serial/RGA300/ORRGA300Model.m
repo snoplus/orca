@@ -1131,10 +1131,13 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 
 - (void) setScanData:(NSData*)someData
 {
-	[scanData release];
-    scanData = [someData copy];
+	if([someData length]>4){
+		[scanData release];
+		unsigned char* p = (unsigned char*)[someData bytes];
+		scanData = [NSData dataWithBytes:&p[4] length:[scanData length]-4];
 		
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORRGA300ModelScanDataChanged object:self];
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORRGA300ModelScanDataChanged object:self];
+	}
 }
 
 - (void) addTableData:(NSData*)data
