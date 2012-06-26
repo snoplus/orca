@@ -2217,7 +2217,11 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 	[objDictionary setObject:[NSNumber numberWithInt:histClrMode]			forKey:@"histClrMode"];
 	[objDictionary setObject:[NSNumber numberWithInt:histEBin]				forKey:@"histEBin"];
 	//------------------
-		
+	//added MAH 06/26/12	
+	[objDictionary setObject:[NSNumber numberWithLong:[self readVersion]]				forKey:@"CFPGAFirmwareVersion"];
+	[objDictionary setObject:[NSNumber numberWithLong:[self readpVersion]]				forKey:@"FPGA8FirmwareVersion"];
+	//------------------
+	
 	return objDictionary;
 }
 
