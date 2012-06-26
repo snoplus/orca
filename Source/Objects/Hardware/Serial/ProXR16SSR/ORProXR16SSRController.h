@@ -20,13 +20,11 @@
 @class ProXR16SSRStateView;
 @class ProXR16SSRStateViewSmall;
 @class ORDotImage;
+@class ORSerialPortController;
 
 @interface ORProXR16SSRController : OrcaObjectController
 {
     IBOutlet NSButton*      lockButton;
-    IBOutlet NSTextField*   portStateField;
-    IBOutlet NSPopUpButton* portListPopup;
-    IBOutlet NSButton*      openPortButton;
 	IBOutlet ProXR16SSRStateView* stateView0_7;
 	IBOutlet ProXR16SSRStateView* stateView8_15;
  	IBOutlet ProXR16SSRStateViewSmall* stateViewSmall0_7;
@@ -34,6 +32,7 @@
     IBOutlet NSMatrix*		outletNameMatrix;
     IBOutlet NSMatrix*		stateMatrix;
     IBOutlet NSMatrix*		turnOnOffMatrix;
+    IBOutlet ORSerialPortController* serialPortController;
 }
 
 #pragma mark ***Initialization
@@ -44,20 +43,18 @@
 #pragma mark ***Notifications
 - (void) registerNotificationObservers;
 - (void) updateWindow;
+- (BOOL) portLocked;
 
 #pragma mark ***Interface Management
 - (void) lockChanged:(NSNotification*)aNote;
-- (void) portNameChanged:(NSNotification*)aNote;
-- (void) portStateChanged:(NSNotification*)aNote;
 - (void) relayChanged:(NSNotification*)aNote;
 - (void) allRelaysChanged:(NSNotification*)aNote;
 - (void) outletNameChanged:(NSNotification*)aNote;
 - (void) setStateViews;
+- (void) setTitles:(int)i;
 
 #pragma mark ***Actions
 - (IBAction) lockAction:(id) sender;
-- (IBAction) portListAction:(id) sender;
-- (IBAction) openPortAction:(id)sender;
 - (IBAction) outletNameAction:(id)sender;
 - (IBAction) turnOnOffAction:(id)sender;
 @end

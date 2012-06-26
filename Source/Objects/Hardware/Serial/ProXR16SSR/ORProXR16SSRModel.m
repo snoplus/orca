@@ -19,15 +19,10 @@
 #pragma mark •••Imported Files
 
 #import "ORProXR16SSRModel.h"
-#import "ORSerialPortList.h"
 #import "ORSerialPort.h"
 #import "ORSerialPortAdditions.h"
 
 #pragma mark •••External Strings
-NSString* ORProXR16SSRModelPollTimeChanged			= @"ORProXR16SSRModelPollTimeChanged";
-NSString* ORProXR16SSRModelSerialPortChanged		= @"ORProXR16SSRModelSerialPortChanged";
-NSString* ORProXR16SSRModelPortNameChanged			= @"ORProXR16SSRModelPortNameChanged";
-NSString* ORProXR16SSRModelPortStateChanged			= @"ORProXR16SSRModelPortStateChanged";
 NSString* ORProXR16SSRModelRelayStateChanged		= @"ORProXR16SSRModelRelayStateChanged";
 NSString* ORProXR16SSRModelUpdateAllRelaysChanged	= @"ORProXR16SSRModelUpdateAllRelaysChanged";
 NSString* ORProXR16SSRModelOutletNameChanged		= @"ORProXR16SSRModelOutletNameChanged";
@@ -44,16 +39,9 @@ NSString* ORProXR16SSRLock							= @"ORProXR16SSRLock";
 @end
 
 @implementation ORProXR16SSRModel
-- (id) init
-{
-	self = [super init];
-    [self registerNotificationObservers];
-	return self;
-}
 
 - (void) dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[cmdQueue release];
 	[lastRequest release];
@@ -81,14 +69,14 @@ NSString* ORProXR16SSRLock							= @"ORProXR16SSRLock";
 	int relay;
 	for(relay=0;relay<8;relay++){
 		NSBezierPath* circle = [NSBezierPath bezierPathWithOvalInRect:NSMakeRect(6+relay*8, imageSize.height-15,7,7)];
-		if(relayState[relay]) [[NSColor greenColor] set];
-		else			        [[NSColor lightGrayColor] set];
+		if(relayState[relay]) [[NSColor redColor] set];
+		else			      [[NSColor lightGrayColor] set];
 		[circle fill];
 	}
 	
 	for(relay=0;relay<8;relay++){
 		NSBezierPath* circle = [NSBezierPath bezierPathWithOvalInRect:NSMakeRect(6+relay*8, 7,7,7)];
-		if(relayState[relay+8]) [[NSColor greenColor] set];
+		if(relayState[relay+8]) [[NSColor redColor] set];
 		else			        [[NSColor lightGrayColor] set];
 		[circle fill];
 	}
@@ -110,21 +98,10 @@ NSString* ORProXR16SSRLock							= @"ORProXR16SSRLock";
 	return @"RS232/ProXR16SSR.html";
 }
 
-- (void) registerNotificationObservers
-{
-	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(dataReceived:)
-                         name : ORSerialPortDataReceived
-                       object : nil];
-}
-
 - (void) dataReceived:(NSNotification*)note
 {
     if([[note userInfo] objectForKey:@"serialPort"] == serialPort){
 		NSData* theResponse = [[note userInfo] objectForKey:@"data"];
-		NSLog(@"received: %@\n",theResponse);
 		NSUInteger responseLength    = [theResponse length];
 		unsigned char* responseBytes = (unsigned char*)[theResponse bytes];
 		if(responseLength>=1){
@@ -191,7 +168,7 @@ NSString* ORProXR16SSRLock							= @"ORProXR16SSRLock";
     else return NO;
 }
 
--  (void) turnRelayOn:(int) aChan
+-  (void) closeRelay:(int) aChan
 {    
 	unsigned char cmdArray[3];
 	cmdArray[0] = kProXR16SSRCmdStart;
@@ -201,7 +178,7 @@ NSString* ORProXR16SSRLock							= @"ORProXR16SSRLock";
 	[self readAllRelayStates];
 }
 
--  (void) turnRelayOff:(int) aChan
+-  (void) openRelay:(int) aChan
 {
 	unsigned char cmdArray[3];
 	cmdArray[0] = kProXR16SSRCmdStart;
@@ -223,66 +200,6 @@ NSString* ORProXR16SSRLock							= @"ORProXR16SSRLock";
 - (void) commonScriptMethodSectionEnd { }
 //-------------end of common script methods---------------------------------
 
-
-- (BOOL) portWasOpen
-{
-    return portWasOpen;
-}
-
-- (void) setPortWasOpen:(BOOL)aPortWasOpen
-{
-    portWasOpen = aPortWasOpen;
-}
-
-- (NSString*) portName
-{
-    return portName;
-}
-
-- (void) setPortName:(NSString*)aPortName
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setPortName:portName];
-    
-    if(![aPortName isEqualToString:portName]){
-        [portName autorelease];
-        portName = [aPortName copy];    
-        
-        BOOL valid = NO;
-        NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
-        ORSerialPort *aPort;
-        while (aPort = [enumerator nextObject]) {
-            if([portName isEqualToString:[aPort name]]){
-                [self setSerialPort:aPort];
-                if(portWasOpen){
-                    [self openPort:YES];
-					[self readAllRelayStates];
-                }
-                valid = YES;
-                break;
-            }
-        } 
-        if(!valid){
-            [self setSerialPort:nil];
-        }       
-    }
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORProXR16SSRModelPortNameChanged object:self];
-}
-
-- (ORSerialPort*) serialPort
-{
-    return serialPort;
-}
-
-- (void) setSerialPort:(ORSerialPort*)aSerialPort
-{
-    [aSerialPort retain];
-    [serialPort release];
-    serialPort = aSerialPort;
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORProXR16SSRModelSerialPortChanged object:self];
-}
-
 - (void) openPort:(BOOL)state
 {
     if(state) {
@@ -292,10 +209,11 @@ NSString* ORProXR16SSRLock							= @"ORProXR16SSRLock";
 		[serialPort setStopBits2:NO];
 		[serialPort setDataBits:8];
 		[serialPort commitChanges];
+		[self readAllRelayStates];
     }
     else      [serialPort close];
     portWasOpen = [serialPort isOpen];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORProXR16SSRModelPortStateChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSerialPortModelPortStateChanged object:self];
 }
 
 
@@ -304,12 +222,7 @@ NSString* ORProXR16SSRLock							= @"ORProXR16SSRLock";
 {
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
-    
-	[self setPortWasOpen:[decoder decodeBoolForKey:@"ORProXR16SSRModelPortWasOpen"]];
-    [self setPortName:[decoder decodeObjectForKey: @"portName"]];
 	[[self undoManager] enableUndoRegistration];
-    
-	[self registerNotificationObservers];
     
 	return self;
 }
@@ -317,8 +230,6 @@ NSString* ORProXR16SSRLock							= @"ORProXR16SSRLock";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeBool:portWasOpen forKey:@"ORProXR16SSRModelPortWasOpen"];
-    [encoder encodeObject:portName forKey: @"portName"];
 }
 
 #pragma mark ••• Commands
@@ -390,8 +301,8 @@ NSString* ORProXR16SSRLock							= @"ORProXR16SSRLock";
 - (void) setOutputBit:(int)channel value:(int)value
 {
 	@synchronized(self){
-		if(value==1)	  [self turnRelayOn:channel];
-		else if(value==0) [self turnRelayOff:channel];
+		if(value==1)	  [self closeRelay:channel];
+		else if(value==0) [self openRelay:channel];
 	}
 }
 @end
@@ -430,7 +341,6 @@ NSString* ORProXR16SSRLock							= @"ORProXR16SSRLock";
 	
 	[self setLastRequest:aCmd];
 	[self performSelector:@selector(timeout) withObject:nil afterDelay:3];
-	//NSString* s = [[NSString alloc] initWithData:aCmd encoding:NSUTF8StringEncoding];
 	[serialPort writeDataInBackgroundThread:aCmd];
 	if(!lastRequest){
 		[self performSelector:@selector(processOneCommandFromQueue) withObject:nil afterDelay:.01];

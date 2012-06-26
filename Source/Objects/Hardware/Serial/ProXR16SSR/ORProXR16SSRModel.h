@@ -18,8 +18,7 @@
 
 #pragma mark •••Imported Files
 #import "ORBitProcessing.h"
-
-@class ORSerialPort;
+#import "ORSerialPortModel.h"
 
 #define kProXR16SSRCmdStart			0xFE
 #define kProXR16SSRRelayOff			0x2F
@@ -27,13 +26,9 @@
 #define kProXR16SSRCmdResponse		0x55
 #define kProXR16SSRAllRelayStatus	0x7C
 
-@interface ORProXR16SSRModel : OrcaObject <ORBitProcessing>
+@interface ORProXR16SSRModel : ORSerialPortModel <ORBitProcessing>
 {
 @private
-    NSString*       portName;
-    BOOL            portWasOpen;
-    ORSerialPort*   serialPort;
-    unsigned long	dataId;
     NSData*			lastRequest;
     NSMutableArray* cmdQueue;
 	NSMutableData*	inBuffer;
@@ -42,18 +37,9 @@
 }
 
 #pragma mark •••Initialization
-- (id)   init;
 - (void) dealloc;
 
-- (void) registerNotificationObservers;
-
 #pragma mark •••Accessors
-- (ORSerialPort*) serialPort;
-- (void) setSerialPort:(ORSerialPort*)aSerialPort;
-- (BOOL) portWasOpen;
-- (void) setPortWasOpen:(BOOL)aPortWasOpen;
-- (NSString*) portName;
-- (void) setPortName:(NSString*)aPortName;
 - (void) openPort:(BOOL)state;
 - (NSString*) outletName:(int)index;
 - (void) setOutlet:(int)index name:(NSString*)aName;
@@ -61,8 +47,8 @@
 #pragma mark •••Main Scripting Methods
 - (NSString*) commonScriptMethods;
 - (void) commonScriptMethodSectionBegin;
-- (void) turnRelayOn:(int) index;
-- (void) turnRelayOff:(int) index;
+- (void) closeRelay:(int) index;
+- (void) openRelay:(int) index;
 - (void) readAllRelayStates;
 - (BOOL) relayState:(int) index;
 - (void) commonScriptMethodSectionEnd;
@@ -87,11 +73,7 @@
 
 @end
 
-extern NSString* ORProXR16SSRModelPollTimeChanged;
-extern NSString* ORProXR16SSRModelSerialPortChanged;
 extern NSString* ORProXR16SSRLock;
-extern NSString* ORProXR16SSRModelPortNameChanged;
-extern NSString* ORProXR16SSRModelPortStateChanged;
 extern NSString* ORProXR16SSRModelRelayStateChanged;
 extern NSString* ORProXR16SSRModelUpdateAllRelaysChanged;
 extern NSString* ORProXR16SSRModelOutletNameChanged;

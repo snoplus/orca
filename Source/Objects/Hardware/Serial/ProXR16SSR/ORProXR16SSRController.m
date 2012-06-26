@@ -23,10 +23,7 @@
 #import "ORSerialPortList.h"
 #import "ORSerialPort.h"
 #import "ORDotImage.h"
-
-@interface ORProXR16SSRController (private)
-- (void) populatePortListPopup;
-@end
+#import "ORSerialPortController.h"
 
 @implementation ORProXR16SSRController
 
@@ -45,7 +42,6 @@
 
 - (void) awakeFromNib
 {
-    [self populatePortListPopup];
     int i;
 	for(i=0;i<16;i++){
         [[outletNameMatrix cellAtRow:i column:0] setTag:i];
@@ -70,17 +66,7 @@
                      selector : @selector(lockChanged:)
                          name : ORProXR16SSRLock
                         object: nil];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(portNameChanged:)
-                         name : ORProXR16SSRModelPortNameChanged
-                        object: nil];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(portStateChanged:)
-                         name : ORSerialPortStateChanged
-                       object : nil];
-
+        
     [notifyCenter addObserver: self
                      selector:@selector(relayChanged:)
                          name:ORProXR16SSRModelRelayStateChanged
@@ -96,6 +82,11 @@
                          name : ORProXR16SSRModelOutletNameChanged
 						object: model];	
 	
+	[notifyCenter addObserver : self
+                     selector : @selector(lockChanged:)
+                         name : ORSerialPortStateChanged
+                       object : nil];
+	
 }
 
 - (void) setModel:(id)aModel
@@ -108,12 +99,14 @@
 {
     [super updateWindow];
     [self lockChanged:nil];
-    [self portStateChanged:nil];
-    [self portNameChanged:nil];
     [self allRelaysChanged:nil];
 	[self outletNameChanged:nil];
 }
 
+- (BOOL) portLocked
+{
+	return [gSecurity isLocked:ORProXR16SSRLock];;
+}
 
 - (void) checkGlobalSecurity
 {
@@ -125,38 +118,13 @@
 - (void) lockChanged:(NSNotification*)aNotification
 {
     BOOL locked = [gSecurity isLocked:ORProXR16SSRLock];
+ 	BOOL portOpen = [[model serialPort] isOpen];
     [lockButton setState:			locked];
-    [portListPopup setEnabled:		!locked];
-    [openPortButton setEnabled:		!locked];    
-    [turnOnOffMatrix setEnabled:	!locked];    
+    [turnOnOffMatrix setEnabled:	!locked && portOpen];    
     [outletNameMatrix setEnabled:	!locked];    
+	[serialPortController updateButtons:locked];
 }
 
-- (void) portStateChanged:(NSNotification*)aNotification
-{
-    if(aNotification == nil || [aNotification object] == [model serialPort]){
-        if([model serialPort]){
-            [openPortButton setEnabled:YES];
-            
-            if([[model serialPort] isOpen]){
-                [openPortButton setTitle:@"Close"];
-                [portStateField setTextColor:[NSColor colorWithCalibratedRed:0.0 green:.8 blue:0.0 alpha:1.0]];
-                [portStateField setStringValue:@"Open"];
-            }
-            else {
-                [openPortButton setTitle:@"Open"];
-                [portStateField setStringValue:@"Closed"];
-                [portStateField setTextColor:[NSColor redColor]];
-            }
-        }
-        else {
-            [openPortButton setEnabled:NO];
-            [portStateField setTextColor:[NSColor blackColor]];
-            [portStateField setStringValue:@"---"];
-            [openPortButton setTitle:@"---"];
-        }
-    }
-}
 - (void) outletNameChanged:(NSNotification*)aNote
 {
 	short i;
@@ -168,8 +136,7 @@
 {
 	int i;
 	for(i=0;i<16;i++){
-		[[stateMatrix cellWithTag:i] setStringValue:[model relayState:i]?@"Open":@"Closed"];
-		[[turnOnOffMatrix cellWithTag:i] setTitle:![model relayState:i]?@"Open":@"Close"];
+		[self setTitles:i];
     }
 	[self setStateViews];
 }
@@ -195,50 +162,30 @@
     if(aNote){
         NSDictionary* userInfo = [aNote userInfo];
         int chan = [[userInfo objectForKey:@"Channel"] intValue];
-        [[stateMatrix cellWithTag:chan] setStringValue:[model relayState:chan]?@"Open":@"Closed"];
- 		[[turnOnOffMatrix cellWithTag:chan] setTitle:![model relayState:chan]?@"Open":@"Close"];
+		[self setTitles:chan];
    }
     else {
         int i;
         for(i=0;i<16;i++){
-            [[stateMatrix cellWithTag:i] setStringValue:[model relayState:i]?@"Open":@"Closed"];
-			[[turnOnOffMatrix cellWithTag:i] setTitle:![model relayState:i]?@"Open":@"Close"];
+			[self setTitles:i];
        }
     }
 	[self setStateViews];
 }
 
-- (void) portNameChanged:(NSNotification*)aNote
+- (void) setTitles:(int)i
 {
-    NSString* portName = [model portName];
-    
-	NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
-	ORSerialPort *aPort;
-    
-    [portListPopup selectItemAtIndex:0]; //the default
-    while (aPort = [enumerator nextObject]) {
-        if([portName isEqualToString:[aPort name]]){
-            [portListPopup selectItemWithTitle:portName];
-            break;
-        }
-	}  
-    [self portStateChanged:nil];
+	BOOL state = [model relayState:i];
+	[[stateMatrix cellWithTag:i] setStringValue:state?@"Closed":@"Open"];
+	if(state)	[[stateMatrix cellWithTag:i] setTextColor:[NSColor colorWithCalibratedRed:0.7 green:0 blue:0 alpha:1]];
+	else		[[stateMatrix cellWithTag:i] setTextColor:[NSColor blackColor]];
+	[[turnOnOffMatrix cellWithTag:i] setTitle:!state?@"Close It":@"Open It"];
 }
 
 #pragma mark ***Actions
 - (IBAction) lockAction:(id) sender
 {
     [gSecurity tryToSetLock:ORProXR16SSRLock to:[sender intValue] forWindow:[self window]];
-}
-
-- (IBAction) portListAction:(id) sender
-{
-    [model setPortName: [portListPopup titleOfSelectedItem]];
-}
-
-- (IBAction) openPortAction:(id)sender
-{
-    [model openPort:![[model serialPort] isOpen]];
 }
 
 -(IBAction) outletNameAction:(id)sender
@@ -251,24 +198,10 @@
 {
 	int chan = [[turnOnOffMatrix selectedCell] tag];
 	int state = [model relayState:chan];
-	if(state)[model turnRelayOff:chan];
-	else     [model turnRelayOn:chan];
+	if(!state)[model closeRelay:chan];
+	else     [model openRelay:chan];
 }
 
-@end
-
-@implementation ORProXR16SSRController (private)
-- (void) populatePortListPopup
-{
-	NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
-	ORSerialPort *aPort;
-    [portListPopup removeAllItems];
-    [portListPopup addItemWithTitle:@"--"];
-    
-	while (aPort = [enumerator nextObject]) {
-        [portListPopup addItemWithTitle:[aPort name]];
-	}    
-}
 @end
 
 @implementation ProXR16SSRStateView
@@ -287,7 +220,7 @@
 
 - (void) setUpLights
 {
-	onLight = [[ORDotImage bigDotWithColor:[NSColor greenColor]] retain];
+	onLight = [[ORDotImage bigDotWithColor:[NSColor redColor]] retain];
 	[onLight setScalesWhenResized:YES];
 	[onLight setSize:NSMakeSize(20,20)];
 	offLight = [[ORDotImage bigDotWithColor:[NSColor lightGrayColor]] retain];
@@ -324,7 +257,7 @@
 @implementation ProXR16SSRStateViewSmall
 - (void) setUpLights
 {
-	onLight = [[ORDotImage vRectWithColor:[NSColor greenColor]] retain];
+	onLight = [[ORDotImage vRectWithColor:[NSColor redColor]] retain];
 	[onLight setScalesWhenResized:YES];
 	[onLight setSize:NSMakeSize(5,17)];
 	offLight = [[ORDotImage vRectWithColor:[NSColor lightGrayColor]] retain];
