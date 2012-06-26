@@ -49,7 +49,6 @@
  	[super awakeFromNib];	
     [[plotter yAxis] setRngLow:0.0 withHigh:1000.];
 	[[plotter yAxis] setRngLimitsLow:0.0 withHigh:1000000000 withMinRng:10];
-	
     [[plotter xAxis] setRngLow:0.0 withHigh:3000.];
 	[[plotter xAxis] setRngLimitsLow:0.0 withHigh:3000. withMinRng:10];
     
@@ -400,11 +399,11 @@
 
 - (void) scanDataChanged:(NSNotification*)aNote
 {
-    float maxValue = [model numberPointsInScan];
-    if(maxValue!=0){
-        [[plotter xAxis] setRngLow:0.0 withHigh:maxValue];
-        [[plotter xAxis] setRngLimitsLow:0.0 withHigh:maxValue withMinRng:20];
-    }
+//    float maxValue = [model numberPointsInScan];
+//    if(maxValue!=0){
+//        [[plotter yAxis] setRngLow:0.0 withHigh:maxValue];
+//        [[plotter xAxis] setRngLimitsLow:0.0 withHigh:maxValue withMinRng:20];
+//    }
 	[plotter setNeedsDisplay:YES];
 }
 
@@ -419,7 +418,12 @@
 - (void) scanNumberChanged:(NSNotification*)aNote
 {
 	if([model currentActivity]==kRGAIdle)[scanNumberField setStringValue:@"Idle"];
-	else [scanNumberField setStringValue: [NSString stringWithFormat:@"Scan %d/%d",[model scanNumber],[model numberScans]]];
+	else {
+        if([model currentActivity] != kRGATableMode){
+          [scanNumberField setStringValue: @"Running" ];  
+        }
+        else [scanNumberField setStringValue: [NSString stringWithFormat:@"Scan %d/%d",[model scanNumber],[model numberScans]]];
+    }
 }
 
 - (void) scanProgressChanged:(NSNotification*)aNote
@@ -429,6 +433,7 @@
 
 - (void) currentActivityChanged:(NSNotification*)aNote
 {
+    [self scanNumberChanged:aNote];
     [self updateButtons];
 }
 
@@ -785,12 +790,18 @@
 	[useIonizerDefaultsMatrix       setEnabled: [model ionizerFilamentCurrentRB]==0 && !locked];
 	[useDetectorDefaultsMatrix      setEnabled: [model elecMultHVBiasRB] ==0 && !locked];
 
-	[initialMassField setEnabled:	[model opMode] != kRGATableMode];
-	[finalMassField setEnabled:		[model opMode] != kRGATableMode];
-	[stepsPerAmuField setEnabled:	[model opMode] != kRGATableMode];
-	
-	[addAmuButton    setEnabled:!locked && !opIsRunning && opModeIsTable];
-	[removeAmuButton setEnabled:!locked && !opIsRunning && opModeIsTable];
+	[initialMassField   setEnabled:	!opIsRunning && [model opMode] != kRGATableMode];
+	[finalMassField     setEnabled:	!opIsRunning && [model opMode] != kRGATableMode];
+	[stepsPerAmuField   setEnabled:	!opIsRunning && [model opMode] != kRGATableMode];
+	[opModePU           setEnabled: !opIsRunning];
+    [numberScansField   setEnabled: !opIsRunning]; 
+	[addAmuButton       setEnabled: !locked && !opIsRunning && opModeIsTable];
+	[removeAmuButton    setEnabled: !locked && !opIsRunning && opModeIsTable];
+    [amuTable           setEnabled: !locked && !opIsRunning && opModeIsTable];
+    [startMeasurementButton setEnabled:!locked && !opIsRunning];
+    [stopMeasurementButton  setEnabled:!locked && opIsRunning];
+    
+    
 }
 
 #pragma mark •••Actions
@@ -868,6 +879,7 @@
 
 - (IBAction) startMeasurementAction:(id)sender
 { 
+    [self endEditing];
 	[model startMeasurement];
 	[self setupPlotter];
 }
@@ -927,7 +939,7 @@
 		int stepsPerAmu = [model stepsPerAmu];
 		if(stepsPerAmu==0)stepsPerAmu=1;
 		*xValue = i/stepsPerAmu;
-		*yValue = [model scanValueAtIndex:i+1]; //first value is pressure .. skip it
+		*yValue = [model scanValueAtIndex:i]; //first value is pressure .. skip it
 	}
 }
 
@@ -974,7 +986,7 @@
 			[aPlot release];
 		}
 		[plotter setXLabel:@"Scan"];
-		[plotter setYLabel:@"AMU"];
+		[plotter setYLabel:@"Pressure (Torr) x 10E13"];
 		[plotter setShowLegend:YES];
 	}
 	else {

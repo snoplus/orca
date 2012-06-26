@@ -131,7 +131,6 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 	[cmdQueue release];
 	[lastRequest release];
 	[inComingData release];
-	[scanData release];
 	[amus release];
 	[amuTableData release];
 	[super dealloc];
@@ -178,7 +177,10 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 
 - (void) setScanNumber:(int)aScanNumber
 {
-	if(aScanNumber>numberScans)aScanNumber=0;
+	if(aScanNumber>numberScans){
+        aScanNumber=0;
+        [self setCurrentActivity:kRGAIdle];
+    }
     scanNumber = aScanNumber;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRGA300ModelScanNumberChanged object:self];
 }
@@ -441,6 +443,9 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 	[self setIonizerElectronEnergy:		[decoder decodeIntForKey:@"ionizerElectronEnergy"]];
 	[self setIonizerDegassTime:			[decoder decodeIntForKey:@"ionizerDegassTime"]];
 	amus = [[decoder decodeObjectForKey:@"amus"] retain];
+    
+    [self setCurrentActivity:kRGAIdle];
+
 	[[self undoManager] enableUndoRegistration];
 	
 	return self;
@@ -647,7 +652,7 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 					[inComingData setLength:0];
 					[self setScanNumber:scanNumber+1];
 					[self setLastRequest:nil];
-					 [self processOneCommandFromQueue];	 //do the next command in the queue
+                    [self processOneCommandFromQueue];	 //do the next command in the queue
 				}
 			}
 		}
@@ -1077,8 +1082,10 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 
 	if(currentAmuIndex>[amus count]-1){
 		[self setScanNumber:scanNumber+1];
+        [self setScanProgress:100*scanNumber/numberScans];
+
 		[self setCurrentAmuIndex:0];
-		[self setScanProgress:0];
+		//[self setScanProgress:0];
 	}
 	
 	if(scanNumber != 0 ){
@@ -1091,7 +1098,6 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 			NSLog(@"Scan Stopped\n");
 			[self stopSingleMassMeasurement];
 		}
-		if([amus count] )[self setScanProgress:100*currentAmuIndex/[amus count]];
 	}
 	else [self stopSingleMassMeasurement];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORRGA300ModelScanDataChanged object:self];
@@ -1134,7 +1140,7 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 	if([someData length]>4){
 		[scanData release];
 		unsigned char* p = (unsigned char*)[someData bytes];
-		scanData = [NSData dataWithBytes:&p[4] length:[scanData length]-4];
+		scanData = [[NSData dataWithBytes:&p[4] length:[someData length]-4] retain];
 		
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORRGA300ModelScanDataChanged object:self];
 	}
