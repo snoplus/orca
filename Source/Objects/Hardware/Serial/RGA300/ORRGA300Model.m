@@ -41,7 +41,6 @@ NSString* ORRGA300ModelIonizerFilamentCurrentRBChanged	 = @"ORRGA300ModelIonizer
 NSString* ORRGA300ModelElecMultGainChanged			= @"ORRGA300ModelElecMultGainChanged";
 NSString* ORRGA300ModelElectronMultiOptionChanged	= @"ORRGA300ModelElectronMultiOptionChanged";
 NSString* ORRGA300ModelMeasuredIonCurrentChanged	= @"ORRGA300ModelMeasuredIonCurrentChanged";
-NSString* ORRGA300ModelNumberScansChanged			= @"ORRGA300ModelNumberScansChanged";
 NSString* ORRGA300ModelStepsPerAmuChanged			= @"ORRGA300ModelStepsPerAmuChanged";
 NSString* ORRGA300ModelSingleMassChanged			= @"ORRGA300ModelSingleMassChanged";
 NSString* ORRGA300ModelInitialMassChanged			= @"ORRGA300ModelInitialMassChanged";
@@ -177,10 +176,6 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 
 - (void) setScanNumber:(int)aScanNumber
 {
-	if(aScanNumber>numberScans){
-        aScanNumber=0;
-        [self setCurrentActivity:kRGAIdle];
-    }
     scanNumber = aScanNumber;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRGA300ModelScanNumberChanged object:self];
 }
@@ -243,18 +238,6 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
     [[[self undoManager] prepareWithInvocationTarget:self] setElecMultGain:elecMultGain];
     elecMultGain = [self limitFloat:aElecMultGain min:0 max:2000.];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRGA300ModelElecMultGainChanged object:self];
-}
-
-- (int) numberScans
-{
-    return numberScans;
-}
-
-- (void) setNumberScans:(int)aNumberScans
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setNumberScans:numberScans];
-    numberScans = [self limitInt:aNumberScans min:1 max:255];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORRGA300ModelNumberScansChanged object:self];
 }
 
 - (int) stepsPerAmu
@@ -431,7 +414,6 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 	[[self undoManager] disableUndoRegistration];
 	[self setOpMode:					[decoder decodeIntForKey:@"opMode"]];
 	[self setElecMultGain:				[decoder decodeFloatForKey:@"elecMultGain"]];
-	[self setNumberScans:				[decoder decodeIntForKey:@"numberScans"]];
 	[self setStepsPerAmu:				[decoder decodeIntForKey:@"stepsPerAmu"]];
 	[self setInitialMass:				[decoder decodeIntForKey:@"initialMass"]];
 	[self setFinalMass:					[decoder decodeIntForKey:@"finalMass"]];
@@ -456,7 +438,6 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
     [super encodeWithCoder:encoder];
     [encoder encodeInt:opMode				forKey:@"opMode"];
     [encoder encodeFloat:elecMultGain		forKey:@"elecMultGain"];
-    [encoder encodeInt:numberScans			forKey:@"numberScans"];
     [encoder encodeInt:stepsPerAmu			forKey:@"stepsPerAmu"];
     [encoder encodeInt:initialMass			forKey:@"initialMass"];
     [encoder encodeInt:finalMass			forKey:@"finalMass"];
@@ -1045,7 +1026,7 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 	[self sendFinalMass];
 	[self sendNoiseFloorSetting];
 	[self sendHistoScanPointsQuery];
-	[self addCmdToQueue:[NSString stringWithFormat:@"HS%d",numberScans]];
+	[self addCmdToQueue:[NSString stringWithFormat:@"HS%d",1]];
 }
 
 - (void) stopHistogramScan
@@ -1082,24 +1063,18 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 
 	if(currentAmuIndex>[amus count]-1){
 		[self setScanNumber:scanNumber+1];
-        [self setScanProgress:100*scanNumber/numberScans];
-
 		[self setCurrentAmuIndex:0];
-		//[self setScanProgress:0];
 	}
 	
-	if(scanNumber != 0 ){
-		int anAmu = [[amus objectAtIndex:currentAmuIndex] intValue];
-		if(anAmu>0 && anAmu<modelNumber){
-			[self addCmdToQueue:[NSString stringWithFormat:@"MR%d",anAmu]];
-		}
-		else {
-			NSLog(@"RGA: AMU in table (entry %d:%d) <0 or >%@\n",modelNumber,currentAmuIndex, [amus objectAtIndex:currentAmuIndex]);
-			NSLog(@"Scan Stopped\n");
-			[self stopSingleMassMeasurement];
-		}
-	}
-	else [self stopSingleMassMeasurement];
+    int anAmu = [[amus objectAtIndex:currentAmuIndex] intValue];
+    if(anAmu>0 && anAmu<modelNumber){
+        [self addCmdToQueue:[NSString stringWithFormat:@"MR%d",anAmu]];
+    }
+    else {
+        NSLog(@"RGA: AMU in table (entry %d:%d) <0 or >%@\n",modelNumber,currentAmuIndex, [amus objectAtIndex:currentAmuIndex]);
+        NSLog(@"Scan Stopped\n");
+        [self stopSingleMassMeasurement];
+    }
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORRGA300ModelScanDataChanged object:self];
 
 }
@@ -1120,7 +1095,7 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 	[self sendNoiseFloorSetting];
 	[self sendStepsPerAmu];
 	[self sendAnalogScanPointsQuery];
-	[self addCmdToQueue:[NSString stringWithFormat:@"SC%d",numberScans]];
+	[self addCmdToQueue:[NSString stringWithFormat:@"SC%d",1]];
 } 
 
 - (void) stopAnalogScan	
@@ -1158,7 +1133,14 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 		[amuData addObject:dataAsInt];
 		[amuTableData setObject:amuData forKey:amuKey];
 	}
-	else [amuData addObject:dataAsInt];
+	else {
+        if([amuData count]>=1000){
+            [amuData removeObjectAtIndex:0];
+        }
+        [amuData addObject:dataAsInt];
+    }
+
+    
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORRGA300ModelScanDataChanged object:self];
 }
 

@@ -27,6 +27,7 @@
 #import "ORSerialPortController.h"
 #import "ORAxis.h"
 #import "ORPlot.h"
+#import "ORXYPlot.h"
 
 @implementation ORRGA300Controller
 
@@ -51,7 +52,6 @@
 	[[plotter yAxis] setRngLimitsLow:0.0 withHigh:1000000000 withMinRng:10];
     [[plotter xAxis] setRngLow:0.0 withHigh:3000.];
 	[[plotter xAxis] setRngLimitsLow:0.0 withHigh:3000. withMinRng:10];
-    
 	[plotter setUseGradient:YES];
 	
 	[detailsButton setTitle:@"Show Details"];
@@ -195,12 +195,6 @@
                      selector : @selector(stepsPerAmuChanged:)
                          name : ORRGA300ModelStepsPerAmuChanged
 						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(numberScansChanged:)
-                         name : ORRGA300ModelNumberScansChanged
-						object: model];
-
     [notifyCenter addObserver : self
                      selector : @selector(measuredIonCurrentChanged:)
                          name : ORRGA300ModelMeasuredIonCurrentChanged
@@ -257,11 +251,6 @@
 						object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(scanNumberChanged:)
-                         name : ORRGA300ModelScanNumberChanged
-						object: model];
-
-    [notifyCenter addObserver : self
                      selector : @selector(scanDataChanged:)
                          name : ORRGA300ModelScanDataChanged
 						object: model];
@@ -305,6 +294,12 @@
                      selector : @selector(sensitivityFactorChanged:)
                          name : ORRGA300ModelSensitivityFactorChanged
 						object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(scanNumberChanged:)
+                         name : ORRGA300ModelScanNumberChanged
+						object: model];
+
 
 }
 - (void) amuCountChanged:(NSNotification*)aNote
@@ -357,7 +352,6 @@
 	[self finalMassChanged:nil];
 	[self initialMassChanged:nil];
 	[self stepsPerAmuChanged:nil];
-	[self numberScansChanged:nil];
 	[self measuredIonCurrentChanged:nil];
 	[self electronMultiOptionChanged:nil];
 	
@@ -370,7 +364,6 @@
 	[self opModeChanged:nil];
 	[self currentActivityChanged:nil];
 	[self scanProgressChanged:nil];
-	[self scanNumberChanged:nil];
 	[self scanDataChanged:nil];
 	[self amuCountChanged:nil];
 	[self currentAmuIndexChanged:nil];
@@ -422,18 +415,32 @@
         if([model currentActivity] != kRGATableMode){
           [scanNumberField setStringValue: @"Running" ];  
         }
-        else [scanNumberField setStringValue: [NSString stringWithFormat:@"Scan %d/%d",[model scanNumber],[model numberScans]]];
+        else [scanNumberField setStringValue: [NSString stringWithFormat:@"Scan %d",[model scanNumber]]];
     }
 }
 
 - (void) scanProgressChanged:(NSNotification*)aNote
 {
-	[scanProgressBar setDoubleValue: [model scanProgress]];
+    if([model currentActivity] != kRGATableScan){
+        [scanProgressBar setDoubleValue: [model scanProgress]];
+    }
 }
 
 - (void) currentActivityChanged:(NSNotification*)aNote
 {
     [self scanNumberChanged:aNote];
+    if([model currentActivity] == kRGATableScan){
+        [scanProgressBar setIndeterminate:YES];
+        if([model currentActivity] == kRGAIdle){
+            [scanProgressBar stopAnimation:self];
+        }
+        else {
+            [scanProgressBar startAnimation:self];
+        }
+    }
+    else {
+        [scanProgressBar setIndeterminate:NO];
+    }
     [self updateButtons];
 }
 
@@ -502,11 +509,6 @@
 - (void) measuredIonCurrentChanged:(NSNotification*)aNote
 {
 	[measuredIonCurrentField setIntValue: [model measuredIonCurrent]];
-}
-
-- (void) numberScansChanged:(NSNotification*)aNote
-{
-	[numberScansField setIntValue: [model numberScans]];
 }
 
 - (void) stepsPerAmuChanged:(NSNotification*)aNote
@@ -794,7 +796,6 @@
 	[finalMassField     setEnabled:	!opIsRunning && [model opMode] != kRGATableMode];
 	[stepsPerAmuField   setEnabled:	!opIsRunning && [model opMode] != kRGATableMode];
 	[opModePU           setEnabled: !opIsRunning];
-    [numberScansField   setEnabled: !opIsRunning]; 
 	[addAmuButton       setEnabled: !locked && !opIsRunning && opModeIsTable];
 	[removeAmuButton    setEnabled: !locked && !opIsRunning && opModeIsTable];
     [amuTable           setEnabled: !locked && !opIsRunning && opModeIsTable];
@@ -808,7 +809,6 @@
 - (IBAction) queryAllAction:(id)sender					{ [model queryAll]; }
 - (IBAction) opModeAction:(id)sender					{ [model setOpMode:						[sender indexOfSelectedItem]];	}
 - (IBAction) ionizerIonEnergyAction:(id)sender			{ [model setIonizerIonEnergy:			[sender indexOfSelectedItem]]; }
-- (IBAction) numberScansAction:(id)sender				{ [model setNumberScans:				[sender intValue]]; }
 - (IBAction) stepsPerAmuAction:(id)sender				{ [model setStepsPerAmu:				[sender intValue]]; }
 - (IBAction) initialMassAction:(id)sender				{ [model setInitialMass:				[sender intValue]]; }
 - (IBAction) finalMassAction:(id)sender					{ [model setFinalMass:					[sender intValue]]; }
@@ -938,8 +938,8 @@
 	else {
 		int stepsPerAmu = [model stepsPerAmu];
 		if(stepsPerAmu==0)stepsPerAmu=1;
-		*xValue = i/stepsPerAmu;
-		*yValue = [model scanValueAtIndex:i]; //first value is pressure .. skip it
+		*xValue = i/(double)stepsPerAmu;
+		*yValue = [model scanValueAtIndex:i];
 	}
 }
 
@@ -984,18 +984,20 @@
 			[aPlot setLineColor:theColor];
 			[plotter setPlot:i name:[NSString stringWithFormat:@"%d",[[model amuAtIndex:i]intValue]]];
 			[aPlot release];
+            //[[plotter xAxis] setInteger:YES];
 		}
 		[plotter setXLabel:@"Scan"];
 		[plotter setYLabel:@"Pressure (Torr) x 10E13"];
 		[plotter setShowLegend:YES];
 	}
 	else {
-		OR1DHistoPlot* aPlot = [[OR1DHistoPlot alloc] initWithTag:0 andDataSource:self];
+		ORXYPlot* aPlot = [[ORXYPlot alloc] initWithTag:0 andDataSource:self];
 		[plotter addPlot: aPlot];
 		[aPlot release];
 		[plotter setShowLegend:NO];
 		[plotter setXLabel:@"AMU"];
 		[plotter setYLabel:@"Pressure (Torr) x 10E13"];
+        //[[plotter xAxis] setInteger:NO];
 	}	
 }
 

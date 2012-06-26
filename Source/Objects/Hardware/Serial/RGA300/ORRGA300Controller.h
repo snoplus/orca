@@ -25,14 +25,14 @@
 
 @interface ORRGA300Controller : OrcaObjectController
 {
-	IBOutlet NSTextField* serialNumberField;
-	IBOutlet   NSTextField* sensitivityFactorTextField;
-	IBOutlet NSTextField* scanNumberField;
-	IBOutlet NSTextField* currentAmuIndexField;
-	IBOutlet NSTextField* currentActivityField;
+	IBOutlet NSTextField*  serialNumberField;
+	IBOutlet  NSTextField* sensitivityFactorTextField;
+	IBOutlet NSTextField*  scanNumberField;
+	IBOutlet NSTextField*  currentAmuIndexField;
+	IBOutlet NSTextField*  currentActivityField;
 	IBOutlet NSPopUpButton* opModePU;
-	IBOutlet NSTextField* elecMultHVBiasRBField;
-	IBOutlet NSTextField* noiseFloorSettingRBField;
+	IBOutlet NSTextField*  elecMultHVBiasRBField;
+	IBOutlet NSTextField*  noiseFloorSettingRBField;
 	
 	IBOutlet NSTextField* ionizerFocusPlateVoltageRBField;
 	IBOutlet NSTextField* ionizerIonEnergyRBField;
@@ -41,7 +41,6 @@
 	
 	IBOutlet NSTextField* electronMultiOptionField;
 	IBOutlet NSTextField* measuredIonCurrentField;
-	IBOutlet NSTextField* numberScansField;
 	IBOutlet NSTextField* stepsPerAmuField;
 	IBOutlet NSTextField* initialMassField;
 	IBOutlet NSTextField* finalMassField;
@@ -111,7 +110,6 @@
 - (void) ionizerFilamentCurrentRBChanged:(NSNotification*)aNote;
 - (void) electronMultiOptionChanged:(NSNotification*)aNote;
 - (void) measuredIonCurrentChanged:(NSNotification*)aNote;
-- (void) numberScansChanged:(NSNotification*)aNote;
 - (void) stepsPerAmuChanged:(NSNotification*)aNote;
 - (void) initialMassChanged:(NSNotification*)aNote;
 - (void) finalMassChanged:(NSNotification*)aNote;
@@ -152,7 +150,6 @@
 - (IBAction) opModeAction:(id)sender;
 - (IBAction) queryAllAction:(id)sender;
 - (IBAction) syncDialogAction:(id)sender;
-- (IBAction) numberScansAction:(id)sender;
 - (IBAction) stepsPerAmuAction:(id)sender;
 - (IBAction) initialMassAction:(id)sender;
 - (IBAction) finalMassAction:(id)sender;

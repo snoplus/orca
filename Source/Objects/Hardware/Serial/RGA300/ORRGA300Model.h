@@ -105,7 +105,6 @@
 		int		finalMass;
 		int		initialMass;
 		int		stepsPerAmu;
-		int		numberScans;
 		int		measuredIonCurrent;
 		BOOL	electronMultiOption;
 		float	elecMultGain;
@@ -131,8 +130,8 @@
 		NSData* scanData;
 		NSMutableDictionary* amuTableData;
 		NSMutableArray* amus;
-		int currentAmuIndex;
-    float sensitivityFactor;
+		int     currentAmuIndex;
+        float   sensitivityFactor;
 }
 
 #pragma mark •••Initialization
@@ -162,8 +161,6 @@
 - (BOOL)	electronMultiOption;
 - (int)		measuredIonCurrent;
 
-- (int)		numberScans;
-- (void)	setNumberScans:(int)aNumberScans;
 - (int)		stepsPerAmu;
 - (void)	setStepsPerAmu:(int)aStepsPerAmu;
 - (int)		histoScanPoints;
@@ -299,7 +296,6 @@ extern NSString* ORRGA300ModelIonizerFilamentCurrentRBChanged;
 extern NSString* ORRGA300ModelElecMultGainChanged;
 extern NSString* ORRGA300ModelElectronMultiOptionChanged;
 extern NSString* ORRGA300ModelMeasuredIonCurrentChanged;
-extern NSString* ORRGA300ModelNumberScansChanged;
 extern NSString* ORRGA300ModelStepsPerAmuChanged;
 extern NSString* ORRGA300ModelInitialMassChanged;
 extern NSString* ORRGA300ModelFinalMassChanged;
