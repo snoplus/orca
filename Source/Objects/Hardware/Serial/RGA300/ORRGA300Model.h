@@ -132,12 +132,15 @@
 		NSMutableDictionary* amuTableData;
 		NSMutableArray* amus;
 		int currentAmuIndex;
+    float sensitivityFactor;
 }
 
 #pragma mark •••Initialization
 - (void) dealloc;
 
 #pragma mark •••Accessors
+- (float) sensitivityFactor;
+- (void) setSensitivityFactor:(float)aSensitivityFactor;
 - (int)		currentAmuIndex;
 - (NSData*) scanData;
 - (int)		scanNumber;
@@ -221,6 +224,7 @@
 - (void) sendPowerErrQuery; 
 - (void) sendQMFErrQuery; 
 - (void) sendElecMultGainQuery;
+- (void) sendSensitivityQuery;
 
 - (void) sendElecMultiGain;
 - (void) sendIonizerElectronEnergy;
@@ -279,6 +283,7 @@
 @property (nonatomic,copy) NSString* cmd;
 @end
 
+extern NSString* ORRGA300ModelSensitivityFactorChanged;
 extern NSString* ORRGA300ModelScanDataChanged;
 extern NSString* ORRGA300ModelScanNumberChanged;
 extern NSString* ORRGA300ModelScanProgressChanged;

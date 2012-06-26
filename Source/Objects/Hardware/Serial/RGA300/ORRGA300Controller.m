@@ -302,6 +302,11 @@
                          name : ORRGA300ModelUseDetectorDefaultsChanged
                        object : model];	    
 
+    [notifyCenter addObserver : self
+                     selector : @selector(sensitivityFactorChanged:)
+                         name : ORRGA300ModelSensitivityFactorChanged
+						object: model];
+
 }
 - (void) amuCountChanged:(NSNotification*)aNote
 {
@@ -372,6 +377,12 @@
 	[self currentAmuIndexChanged:nil];
     [self useIonizerDefaultsChanged:nil];
     [self useDetectorDefaultsChanged:nil];
+	[self sensitivityFactorChanged:nil];
+}
+
+- (void) sensitivityFactorChanged:(NSNotification*)aNote
+{
+	[sensitivityFactorTextField setFloatValue: [model sensitivityFactor]];
 }
 
 - (void) useIonizerDefaultsChanged:(NSNotification*)aNote
@@ -727,6 +738,7 @@
 			[(ORAxis*)[plotter yAxis] setAttributes:attrib];
 			[plotter setNeedsDisplay:YES];
 			[[plotter yAxis] setNeedsDisplay:YES];
+			[plotLogCB setState:[[plotter yAxis] isLog]];
 		}
 	}
 	
@@ -912,8 +924,10 @@
 		*yValue = [model amuTable:[aPlot tag] valueAtIndex:i];
 	}
 	else {
-		*xValue = i;
-		*yValue = [model scanValueAtIndex:i];
+		int stepsPerAmu = [model stepsPerAmu];
+		if(stepsPerAmu==0)stepsPerAmu=1;
+		*xValue = i/stepsPerAmu;
+		*yValue = [model scanValueAtIndex:i+1]; //first value is pressure .. skip it
 	}
 }
 
@@ -936,7 +950,6 @@
 {
 	[plotter removeAllPlots];
 	if([model opMode] == kRGATableMode){
-		[plotter setXLabel:@"Scan"];
 		int i;
 		for(i=0;i<[model amuCount];i++){
 			NSColor* theColor;
@@ -960,6 +973,8 @@
 			[plotter setPlot:i name:[NSString stringWithFormat:@"%d",[[model amuAtIndex:i]intValue]]];
 			[aPlot release];
 		}
+		[plotter setXLabel:@"Scan"];
+		[plotter setYLabel:@"AMU"];
 		[plotter setShowLegend:YES];
 	}
 	else {
@@ -968,6 +983,7 @@
 		[aPlot release];
 		[plotter setShowLegend:NO];
 		[plotter setXLabel:@"AMU"];
+		[plotter setYLabel:@"Pressure (Torr) x 10E-13"];
 	}	
 }
 

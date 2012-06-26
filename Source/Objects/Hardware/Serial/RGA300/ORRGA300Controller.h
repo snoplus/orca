@@ -26,6 +26,7 @@
 @interface ORRGA300Controller : OrcaObjectController
 {
 	IBOutlet NSTextField* serialNumberField;
+	IBOutlet   NSTextField* sensitivityFactorTextField;
 	IBOutlet NSTextField* scanNumberField;
 	IBOutlet NSTextField* currentAmuIndexField;
 	IBOutlet NSTextField* currentActivityField;
@@ -80,6 +81,7 @@
 	IBOutlet NSTableView*	amuTable;
     IBOutlet NSButton*      addAmuButton;
     IBOutlet NSButton*      removeAmuButton;
+    IBOutlet NSButton*		plotLogCB;
 }
 
 #pragma mark •••Initialization
@@ -93,6 +95,7 @@
 - (void) updateButtons;
 
 #pragma mark •••Interface Management
+- (void) sensitivityFactorChanged:(NSNotification*)aNote;
 - (void) drawDidOpen:(NSNotification*)aNote;
 - (void) drawDidClose:(NSNotification*)aNote;
 - (void) scanDataChanged:(NSNotification*)aNote;

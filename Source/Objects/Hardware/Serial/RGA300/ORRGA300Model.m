@@ -25,6 +25,7 @@
 #import "ORSafeQueue.h"
 
 #pragma mark •••External Strings
+NSString* ORRGA300ModelSensitivityFactorChanged		= @"ORRGA300ModelSensitivityFactorChanged";
 NSString* ORRGA300ModelScanDataChanged				= @"ORRGA300ModelScanDataChanged";
 NSString* ORRGA300ModelScanNumberChanged			= @"ORRGA300ModelScanNumberChanged";
 NSString* ORRGA300ModelScanProgressChanged			= @"ORRGA300ModelScanProgressChanged";
@@ -152,6 +153,17 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 }
 
 #pragma mark •••Accessors
+- (float) sensitivityFactor
+{
+    return sensitivityFactor;
+}
+
+- (void) setSensitivityFactor:(float)aSensitivityFactor
+{
+    sensitivityFactor = aSensitivityFactor;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRGA300ModelSensitivityFactorChanged object:self];
+}
+
 - (int)		currentAmuIndex { return currentAmuIndex; }
 
 - (NSData*) scanData
@@ -406,6 +418,7 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 		[self sendInitComm];
 		[self sendIDRequest];
 		[self queryAll];
+		[self sendSensitivityQuery];
 	}
 }
 
@@ -478,6 +491,7 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 - (void) sendHistoScanPointsQuery	{ [self addCmdToQueue:@"HP?"]; } 
 - (void) sendStepsPerAmuQuery		{ [self addCmdToQueue:@"SA?"]; } 
 - (void) sendElecMultGainQuery		{ [self addCmdToQueue:@"MG?"]; } 
+- (void) sendSensitivityQuery		{ [self addCmdToQueue:@"SP?"]; } 
 
 - (void) sendNoiseFloorSetting		 { [self send:@"NF" withInt:noiseFloorSetting];		}
 - (void) sendIonizerElectronEnergy	 { [self send:@"EE" withInt:ionizerElectronEnergy]; }
@@ -658,7 +672,8 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 {
 	if(i<[scanData length]/4){
 		int* p = (int*)[scanData bytes];
-		return p[i];
+		if(sensitivityFactor!=0) return p[i]/sensitivityFactor;
+		else return p[i];
 	}
 	else return 0;
 }
@@ -867,6 +882,7 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 	else if([theLastRequest hasPrefix:@"FL?"])  [self setIonizerFilamentCurrentRB:	[aString floatValue]];
 	else if([theLastRequest hasPrefix:@"IE?"])  [self setIonizerIonEnergyRB:		[aString intValue]];
 	else if([theLastRequest hasPrefix:@"VF?"])  [self setIonizerFocusPlateVoltageRB:[aString intValue]];
+	else if([theLastRequest hasPrefix:@"SP?"])  [self setSensitivityFactor:			[aString floatValue]];
 	
 	else if([theLastRequest rangeOfString:@"?"].location == NSNotFound)	[self processStatusWord:aString];
 }
