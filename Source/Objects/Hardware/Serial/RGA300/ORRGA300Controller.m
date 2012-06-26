@@ -800,7 +800,7 @@
 	[removeAmuButton    setEnabled: !locked && !opIsRunning && opModeIsTable];
     [amuTable           setEnabled: !locked && !opIsRunning && opModeIsTable];
     [startMeasurementButton setEnabled:!locked && !opIsRunning];
-    [stopMeasurementButton  setEnabled:!locked && opIsRunning];
+    [stopMeasurementButton  setEnabled:!locked && opIsRunning && opModeIsTable];
     
     
 }

@@ -632,6 +632,7 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 					[self setScanData:inComingData];
 					[inComingData setLength:0];
 					[self setScanNumber:scanNumber+1];
+                    [self setCurrentActivity:kRGAIdle];
 					[self setLastRequest:nil];
                     [self processOneCommandFromQueue];	 //do the next command in the queue
 				}
