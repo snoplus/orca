@@ -122,6 +122,7 @@ NSString* ORProXR16SSRLock							= @"ORProXR16SSRLock";
 								[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
 								unsigned char* p = (unsigned char*)[inBuffer bytes];
 								int i;
+								isValid = YES;
 								for(i=0;i<32;i++)[self setRelayMask:p[i] bank:i];
 								[inBuffer release];
 								inBuffer = nil;
@@ -195,6 +196,10 @@ NSString* ORProXR16SSRLock							= @"ORProXR16SSRLock";
 	cmdArray[1] = kProXR16SSRAllRelayStatus;
 	cmdArray[2] = 0;
     [self addCmdToQueue:[NSData dataWithBytes:cmdArray length:3]];
+}
+- (BOOL) isValid
+{
+	return isValid;
 }
 
 - (void) commonScriptMethodSectionEnd { }
@@ -329,6 +334,8 @@ NSString* ORProXR16SSRLock							= @"ORProXR16SSRLock";
 - (void) timeout
 {
 	NSLogError(@"command timeout",@"ProXR16SSR",nil);
+	isValid = NO;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORProXR16SSRModelUpdateAllRelaysChanged object:self];
 	[self setLastRequest:nil];
 	[cmdQueue removeAllObjects];
 }

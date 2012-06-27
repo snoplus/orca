@@ -34,6 +34,7 @@
 	NSMutableData*	inBuffer;
     BOOL			relayState[16]; //we will ignore the banks out of our hardware range
 	NSMutableArray* outletNames;
+	BOOL			isValid;
 }
 
 #pragma mark •••Initialization
@@ -43,6 +44,7 @@
 - (void) openPort:(BOOL)state;
 - (NSString*) outletName:(int)index;
 - (void) setOutlet:(int)index name:(NSString*)aName;
+- (BOOL) isValid;
 
 #pragma mark •••Main Scripting Methods
 - (NSString*) commonScriptMethods;

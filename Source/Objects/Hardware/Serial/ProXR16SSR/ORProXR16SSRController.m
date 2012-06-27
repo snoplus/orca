@@ -98,9 +98,9 @@
 - (void) updateWindow
 {
     [super updateWindow];
-    [self lockChanged:nil];
     [self allRelaysChanged:nil];
 	[self outletNameChanged:nil];
+    [self lockChanged:nil];
 }
 
 - (BOOL) portLocked
@@ -123,6 +123,10 @@
     [turnOnOffMatrix setEnabled:	!locked && portOpen];    
     [outletNameMatrix setEnabled:	!locked];    
 	[serialPortController updateButtons:locked];
+	int i;
+	for(i=0;i<16;i++){
+		[self setTitles:i];
+    }
 }
 
 - (void) outletNameChanged:(NSNotification*)aNote
@@ -176,7 +180,12 @@
 - (void) setTitles:(int)i
 {
 	BOOL state = [model relayState:i];
-	[[stateMatrix cellWithTag:i] setStringValue:state?@"Closed":@"Open"];
+	BOOL connected = [[model serialPort] isOpen];
+	NSString* s = @"?";
+	if(connected && [model isValid]){
+		s = state?@"Closed":@"Open";
+	}
+	[[stateMatrix cellWithTag:i] setStringValue:s];
 	if(state)	[[stateMatrix cellWithTag:i] setTextColor:[NSColor colorWithCalibratedRed:0.7 green:0 blue:0 alpha:1]];
 	else		[[stateMatrix cellWithTag:i] setTextColor:[NSColor blackColor]];
 	[[turnOnOffMatrix cellWithTag:i] setTitle:!state?@"Close It":@"Open It"];
