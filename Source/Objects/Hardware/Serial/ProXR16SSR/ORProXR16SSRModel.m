@@ -46,11 +46,8 @@ NSString* ORProXR16SSRLock							= @"ORProXR16SSRLock";
 	[cmdQueue release];
 	[lastRequest release];
     [portName release];
-    if([serialPort isOpen]){
-        [serialPort close];
-    }
-    [serialPort release];
-
+	[outletNames release];
+ 
 	[super dealloc];
 }
 
@@ -163,6 +160,12 @@ NSString* ORProXR16SSRLock							= @"ORProXR16SSRLock";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORProXR16SSRModelOutletNameChanged object:self];
 }
 
+- (void) setOutletNames:(NSArray*)anArray
+{
+	[outletNames autorelease];
+	outletNames = [anArray mutableCopy];
+}
+
 - (BOOL) relayState:(int)index
 {
     if(index>=0 && index<16)return relayState[index];
@@ -227,6 +230,7 @@ NSString* ORProXR16SSRLock							= @"ORProXR16SSRLock";
 {
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
+	[self setOutletNames:[decoder decodeObjectForKey:@"outletNames"]];
 	[[self undoManager] enableUndoRegistration];
     
 	return self;
@@ -235,6 +239,7 @@ NSString* ORProXR16SSRLock							= @"ORProXR16SSRLock";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+	[encoder encodeObject:outletNames forKey:@"outletNames"];
 }
 
 #pragma mark ••• Commands

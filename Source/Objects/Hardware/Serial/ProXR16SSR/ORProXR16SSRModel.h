@@ -44,6 +44,7 @@
 - (void) openPort:(BOOL)state;
 - (NSString*) outletName:(int)index;
 - (void) setOutlet:(int)index name:(NSString*)aName;
+- (void) setOutletNames:(NSArray*)anArray;
 - (BOOL) isValid;
 
 #pragma mark •••Main Scripting Methods
