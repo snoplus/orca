@@ -120,7 +120,7 @@
     BOOL locked = [gSecurity isLocked:ORProXR16SSRLock];
  	BOOL portOpen = [[model serialPort] isOpen];
     [lockButton setState:			locked];
-    [turnOnOffMatrix setEnabled:	!locked && portOpen];    
+    [turnOnOffMatrix setEnabled:	!locked && portOpen & [model isValid]];    
     [outletNameMatrix setEnabled:	!locked];    
 	[serialPortController updateButtons:locked];
 	int i;
