@@ -341,6 +341,9 @@ NSString* ORTM700Lock						= @"ORTM700Lock";
 		[serialPort close];
 	}
     portWasOpen = [serialPort isOpen];
+    if(portWasOpen){
+        [self performSelector:@selector(updateAll) withObject:nil afterDelay:1]; 
+    }
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSerialPortModelPortStateChanged object:self];
     
 }
@@ -640,7 +643,6 @@ NSString* ORTM700Lock						= @"ORTM700Lock";
 
 - (void) timeout
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
 	NSLogError(@"command timeout",@"TM700",nil);
 	[self setLastRequest:nil];
 	[cmdQueue removeAllObjects];
@@ -664,10 +666,11 @@ NSString* ORTM700Lock						= @"ORTM700Lock";
 		[self performSelector:@selector(clearDelay) withObject:nil afterDelay:.2];
 	}
 	else {
-		[self setLastRequest:cmdString];
-		//NSLog(@"send: %@\n",cmdString);
-		[serialPort writeDataInBackground:[cmdString dataUsingEncoding:NSASCIIStringEncoding]];
-		[self performSelector:@selector(timeout) withObject:nil afterDelay:.3];
+        if(cmdString){
+            [self setLastRequest:cmdString];
+            [serialPort writeDataInBackground:[cmdString dataUsingEncoding:NSASCIIStringEncoding]];
+            [self performSelector:@selector(timeout) withObject:nil afterDelay:3];
+        }
 	}
 
 }
@@ -711,29 +714,25 @@ NSString* ORTM700Lock						= @"ORTM700Lock";
 
 - (void) processReceivedString:(NSString*)aCommand
 {
-	BOOL doNextCommand = NO;
 	//double check that the device address matches.
 	int anAddress = [[aCommand substringToIndex:3] intValue];
 	if(anAddress == deviceAddress){
+        [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+
 		int receivedParam = [[aCommand substringWithRange:NSMakeRange(5,3)] intValue];
 		[self decode:receivedParam command:aCommand];
-		
+	
 		if(lastRequest){
 			//if the param number matches the last cmd sent, then assume a match and remove the timeout
 			int lastParam	  = [[lastRequest    substringWithRange:NSMakeRange(5,3)] intValue];
 			if(receivedParam == lastParam){
-				[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
 				[self setLastRequest:nil];			 //clear the last request
-				doNextCommand = YES;
+                [self processOneCommandFromQueue];	 //do the next command in the queue
 			}
 		}
 	}
-	
-	if(doNextCommand){
-		[ORTimer delay:.1];
-		[self processOneCommandFromQueue];	 //do the next command in the queue
-	}
 }
+
 - (void) pollHardware
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];

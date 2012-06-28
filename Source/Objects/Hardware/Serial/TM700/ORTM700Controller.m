@@ -142,6 +142,10 @@
                          name : ORTM700ModelErrorCodeChanged
 						object: model];
     
+    [notifyCenter addObserver : self
+                     selector : @selector(lockChanged:)
+                         name : ORSerialPortModelPortStateChanged
+						object: model];
 }
 
 - (void) setModel:(id)aModel
