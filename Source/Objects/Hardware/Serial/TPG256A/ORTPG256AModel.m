@@ -29,7 +29,6 @@
 #import "ORSafeQueue.h"
 
 #pragma mark •••External Strings
-NSString* ORTPG256AModelInvolvedInProcessChanged = @"ORTPG256AModelInvolvedInProcessChanged";
 NSString* ORTPG256AModelUnitsChanged             = @"ORTPG256AModelUnitsChanged";
 NSString* ORTPG256AModelPressureScaleChanged     = @"ORTPG256AModelPressureScaleChanged";
 NSString* ORTPG256AModelShipPressuresChanged     = @"ORTPG256AModelShipPressuresChanged";
@@ -221,19 +220,6 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 
 
 #pragma mark •••Accessors
-
-- (BOOL) involvedInProcess
-{
-    return involvedInProcess;
-}
-
-- (void) setInvolvedInProcess:(BOOL)aInvolvedInProcess
-{
-    involvedInProcess = aInvolvedInProcess;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORTPG256AModelInvolvedInProcessChanged object:self];
-}
-
 - (int) units
 {
     return units;
@@ -313,12 +299,8 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
     pollTime = aPollTime;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTPG256AModelPollTimeChanged object:self];
 
-	if(pollTime && !involvedInProcess){
-		[self performSelector:@selector(pollPressures) withObject:nil afterDelay:2];
-	}
-	else {
-		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollPressures) object:nil];
-	}
+	if(pollTime)	[self performSelector:@selector(pollPressures) withObject:nil afterDelay:2];
+	else			[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollPressures) object:nil];
 }
 
 
@@ -606,37 +588,10 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
     return dataDictionary;
 }
 #pragma mark •••Adc Processing Protocol
-- (void) processIsStarting
-{
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollPressures) object:nil];
-    readOnce = NO;
-	[self setInvolvedInProcess:YES];
-}
-
-- (void) processIsStopping
-{
-	[self setInvolvedInProcess:NO];
-	[self pollPressures];
-}
-
-//note that everything called by these routines MUST be threadsafe
-- (void) startProcessCycle
-{    
-	if(!readOnce){
-		@try { 
-			[self performSelectorOnMainThread:@selector(readPressures) withObject:nil waitUntilDone:NO]; 
-			readOnce = YES;
-		}
-		@catch(NSException* localException) { 
-			//catch this here to prevent it from falling thru, but nothing to do.
-		}
-	}	
-}
-
-- (void) endProcessCycle
-{
-    readOnce = NO;
-}
+- (void) processIsStarting { }
+- (void) processIsStopping { }
+- (void) startProcessCycle { }
+- (void) endProcessCycle   { }
 
 - (NSString*) identifier
 {
@@ -708,10 +663,7 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 	return r;
 }
 
-- (void) setProcessOutput:(int)channel value:(int)value
-{
-    //nothing to do. not used in adcs. really shouldn't be in the protocol
-}
+- (void) setProcessOutput:(int)channel value:(int)value { }
 
 @end
 
@@ -774,12 +726,10 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 
 - (void) pollPressures
 {
-	if(!involvedInProcess){
-		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollPressures) object:nil];
-		if(pollTime){
-			[self readPressures];
-			[self performSelector:@selector(pollPressures) withObject:nil afterDelay:pollTime];
-		}
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollPressures) object:nil];
+	if(pollTime){
+		[self readPressures];
+		[self performSelector:@selector(pollPressures) withObject:nil afterDelay:pollTime];
 	}
 }
 

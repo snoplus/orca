@@ -80,8 +80,6 @@
         int                 cmdError;
         BOOL                wasPowerFailure;
         BOOL                delay;
-		BOOL				readOnce;
-		BOOL				involvedInProcess;
 		int					firstStageControlMethodRB;
 }
 
@@ -95,8 +93,6 @@
 - (int)		firstStageControlMethodRB;
 - (void)	setFirstStageControlMethodRB:(int)aFirstStageControlMethodRB;
 - (NSString*) firstStageControlMethodString;
-- (BOOL)	involvedInProcess;
-- (void)	setInvolvedInProcess:(BOOL)aInvolvedInProcess;
 - (BOOL)    wasPowerFailure;
 - (void)    setWasPowerFailure:(BOOL)aState;
 - (int)     cmdError;
@@ -324,5 +320,4 @@ extern NSString* ORCP8CryopumpPortNameChanged;
 extern NSString* ORCP8CryopumpPortStateChanged;
 extern NSString* ORCP8CryopumpModelCmdErrorChanged;
 extern NSString* ORCP8CryopumpModelWasPowerFailireChanged;
-extern NSString* ORCP8CryopumpModelInvolvedInProcessChanged;
 

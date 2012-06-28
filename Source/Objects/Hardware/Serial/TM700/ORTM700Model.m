@@ -42,7 +42,6 @@ NSString* ORTM700TurboAcceleratingChanged	= @"ORTM700TurboAcceleratingChanged";
 NSString* ORTM700TurboSpeedAttainedChanged	= @"ORTM700TurboSpeedAttainedChanged";
 NSString* ORTM700TurboOverTempChanged		= @"ORTM700TurboOverTempChanged";
 NSString* ORTM700DriveOverTempChanged		= @"ORTM700DriveOverTempChanged";
-NSString* ORTM700ModelInvolvedInProcessChanged		= @"ORTM700ModelInvolvedInProcessChanged";
 NSString* ORTM700ModelErrorCodeChanged		= @"ORTM700ModelErrorCodeChanged";
 NSString* ORTM700Lock						= @"ORTM700Lock";
 
@@ -125,16 +124,6 @@ NSString* ORTM700Lock						= @"ORTM700Lock";
 }
 
 #pragma mark •••Accessors
-- (BOOL) involvedInProcess
-{
-    return involvedInProcess;
-}
-
-- (void) setInvolvedInProcess:(BOOL)aInvolvedInProcess
-{
-    involvedInProcess = aInvolvedInProcess;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORTM700ModelInvolvedInProcessChanged object:self];
-}
 
 - (NSString*) errorCode
 {
@@ -601,39 +590,10 @@ NSString* ORTM700Lock						= @"ORTM700Lock";
 }
 
 #pragma mark •••Bit Processing Protocol
-- (void) processIsStarting
-{
-	//we will control the polling loop
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
-    readOnce = NO;
-	[self setInvolvedInProcess:YES];
-}
-
-- (void) processIsStopping
-{
-	//return control to the normal loop
-	[self setPollTime:pollTime];
-	[self setInvolvedInProcess:NO];
-}
-
-//note that everything called by these routines MUST be threadsafe
-- (void) startProcessCycle
-{    
-    if(!readOnce){
-        @try { 
-            [self performSelectorOnMainThread:@selector(pollHardware) withObject:nil waitUntilDone:NO]; 
-            readOnce = YES;
-        }
-		@catch(NSException* localException) { 
-			//catch this here to prevent it from falling thru, but nothing to do.
-        }
-    }
-}
-
-- (void) endProcessCycle
-{
-	readOnce = NO;
-}
+- (void) processIsStarting { }
+- (void) processIsStopping { }
+- (void) startProcessCycle { }
+- (void) endProcessCycle   { }
 
 - (NSString*) identifier
 {
@@ -664,10 +624,7 @@ NSString* ORTM700Lock						= @"ORTM700Lock";
 	return theValue;
 }
 
-- (void) setProcessOutput:(int)channel value:(int)value
-{
-    //nothing to do
-}
+- (void) setProcessOutput:(int)channel value:(int)value { }
 
 @end
 

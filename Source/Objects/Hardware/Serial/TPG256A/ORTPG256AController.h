@@ -49,7 +49,6 @@
 - (void) updateWindow;
 
 #pragma mark ***Interface Management
-- (void) involvedInProcessChanged:(NSNotification*)aNote;
 - (void) unitsChanged:(NSNotification*)aNote;
 - (void) highLimitChanged:(NSNotification*)aNote;
 - (void) highAlarmChanged:(NSNotification*)aNote;

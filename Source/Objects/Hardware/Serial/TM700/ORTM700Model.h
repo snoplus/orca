@@ -41,8 +41,6 @@
 		BOOL			stationPower;
 		BOOL			runUpTimeCtrl;
 		int				runUpTime;
-		BOOL			readOnce;
-		BOOL			involvedInProcess;
 		NSString*		errorCode;
 		BOOL            delay;
 }
@@ -53,8 +51,6 @@
 #pragma mark •••Accessors
 - (NSString*) errorCode;
 - (void) setErrorCode:(NSString *)aCode;
-- (BOOL) involvedInProcess;
-- (void) setInvolvedInProcess:(BOOL)aInvolvedInProcess;
 - (int) runUpTime;
 - (void) setRunUpTime:(int)aRunUpTime;
 - (BOOL) runUpTimeCtrl;
@@ -138,7 +134,6 @@
 @end
 
 extern NSString* ORTM700ModelErrorCodeChanged;
-extern NSString* ORTM700ModelInvolvedInProcessChanged;
 extern NSString* ORTM700ModelRunUpTimeChanged;
 extern NSString* ORTM700ModelRunUpTimeCtrlChanged;
 extern NSString* ORTM700ModelTmpRotSetChanged;

@@ -148,11 +148,6 @@
                      selector : @selector(unitsChanged:)
                          name : ORTPG256AModelUnitsChanged
 						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(involvedInProcessChanged:)
-                         name : ORTPG256AModelInvolvedInProcessChanged
-						object: model];
 }
 
 - (void) setModel:(id)aModel
@@ -178,10 +173,6 @@
 	[self unitsChanged:nil];
 }
 
-- (void) involvedInProcessChanged:(NSNotification*)aNote
-{
-	[self lockChanged:aNote];
-}
 
 - (void) unitsChanged:(NSNotification*)aNote
 {
@@ -282,7 +273,7 @@
     [pollTimePopup	setEnabled:!locked];
     [unitsPU		setEnabled:!locked];
     [shipPressuresButton setEnabled:!locked];
-    [pollTimePopup setEnabled: ![model involvedInProcess]];
+    [pollTimePopup setEnabled: !locked];
 	
     NSString* s = @"";
     if(lockedOrRunningMaintenance){

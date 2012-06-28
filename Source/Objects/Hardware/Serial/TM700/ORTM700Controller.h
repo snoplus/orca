@@ -58,7 +58,6 @@
 - (void) updateButtons;
 
 #pragma mark •••Interface Management
-- (void) involvedInProcessChanged:(NSNotification*)aNote;
 - (void) runUpTimeChanged:(NSNotification*)aNote;
 - (void) runUpTimeCtrlChanged:(NSNotification*)aNote;
 - (void) tmpRotSetChanged:(NSNotification*)aNote;

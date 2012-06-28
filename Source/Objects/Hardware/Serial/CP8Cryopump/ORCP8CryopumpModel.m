@@ -77,7 +77,6 @@ NSString* ORCP8CryopumpPortStateChanged						= @"ORCP8CryopumpPortStateChanged";
 NSString* ORCP8CryopumpLock									= @"ORCP8CryopumpLock";
 NSString* ORCP8CryopumpModelCmdErrorChanged					= @"ORCP8CryopumpModelCmdErrorChanged";
 NSString* ORCP8CryopumpModelWasPowerFailireChanged          = @"ORCP8CryopumpModelWasPowerFailireChanged";
-NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvolvedInProcessChanged";
 
 @interface ORCP8CryopumpModel (private)
 - (void) runStarted:(NSNotification*)aNote;
@@ -228,18 +227,6 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
 		default: return @"?";
 	}
 }
-
-- (BOOL) involvedInProcess
-{
-    return involvedInProcess;
-}
-
-- (void) setInvolvedInProcess:(BOOL)aInvolvedInProcess
-{
-    involvedInProcess = aInvolvedInProcess;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpModelInvolvedInProcessChanged object:self];
-}
-
 
 - (BOOL)    wasPowerFailure
 {
@@ -1156,39 +1143,10 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
 }
 
 #pragma mark •••Bit Processing Protocol
-- (void) processIsStarting
-{
-	//we will control the polling loop
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
-    readOnce = NO;
-	[self setInvolvedInProcess:YES];
-}
-
-- (void) processIsStopping
-{
-	//return control to the normal loop
-	[self setPollTime:pollTime];
-	[self setInvolvedInProcess:NO];
-}
-
-//note that everything called by these routines MUST be threadsafe
-- (void) startProcessCycle
-{    
-    if(!readOnce){
-        @try { 
-            [self performSelectorOnMainThread:@selector(pollHardware) withObject:nil waitUntilDone:NO]; 
-            readOnce = YES;
-        }
-		@catch(NSException* localException) { 
-			//catch this here to prevent it from falling thru, but nothing to do.
-        }
-    }
-}
-
-- (void) endProcessCycle
-{
-	readOnce = NO;
-}
+- (void) processIsStarting { }
+- (void) processIsStopping { }
+- (void) startProcessCycle { }
+- (void) endProcessCycle   { }
 
 - (NSString*) identifier
 {
@@ -1219,10 +1177,7 @@ NSString* ORCP8CryopumpModelInvolvedInProcessChanged		= @"ORCP8CryopumpModelInvo
 	}
 	return theValue;
 }
-
-- (void) setProcessOutput:(int)channel value:(int)value
-{	
-}
+- (void) setProcessOutput:(int)channel value:(int)value { }
 - (void) setOutputBit:(int)channel value:(int)value
 {
 	@synchronized(self){
