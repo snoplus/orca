@@ -61,10 +61,6 @@
 			[button release];
 		}
 	}
-	NSArray* labels = [[delegate model] staticLabels];
-	for(ORVacuumStaticLabel* aLable in labels){
-		
-	}
 }
 
 - (void) dealloc

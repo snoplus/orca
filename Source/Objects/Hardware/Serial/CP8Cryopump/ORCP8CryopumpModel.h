@@ -191,6 +191,7 @@
 - (unsigned long) timeMeasured;
 - (NSString*) lastRequest;
 - (void) setLastRequest:(NSString*)aRequest;
+- (NSString*) auxStatusString;
 
 #pragma mark •••Data Records
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;

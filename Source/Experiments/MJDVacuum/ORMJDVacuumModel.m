@@ -437,26 +437,26 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 #define kNumStaticVacLabelItems	18
 	VacuumStaticLabelInfo staticLabelItems[kNumStaticVacLabelItems] = {
 		//the parttags are equal to the index numbers of the regions
-		{kVacStaticLabel, 0, @"Turbo",			20,	 245,	80,	 265, YES},
-		{kVacStaticLabel, 1, @"RGA",			260, 420,	300, 440, YES},
-		{kVacStaticLabel, 3, @"Cryo Pump",		560, 200,	640, 230, YES},
-		{kVacStaticLabel, 5, @"Dry N2\nSupply",	200,  60,	300, 100, YES},
-		{kVacStaticLabel, 6, @"NEG Pump",		420, 285,	480, 315, YES},
-		{kVacStaticLabel, 7, @"Diaphragm\nPump",20,	 80,	80,	 110, YES},
-		{kVacStaticLabel, 8, @"Below Turbo",	 0,	  0,	 0,	   0, NO},
+		{kVacStaticLabel, 0, @"Turbo",			20,	 242,	80,	 268, YES, YES},
+		{kVacStaticLabel, 1, @"RGA",			260, 417,	300, 443, YES, YES},
+		{kVacStaticLabel, 3, @"Cryo Pump",		560, 202,	640, 228, YES, YES},
+		{kVacStaticLabel, 5, @"Dry N2\nSupply",	200,  60,	300, 100, YES, NO},
+		{kVacStaticLabel, 6, @"NEG Pump",		420, 285,	480, 315, YES, NO},
+		{kVacStaticLabel, 7, @"Diaphragm\nPump",20,	 80,	80,	 110, YES, NO},
+		{kVacStaticLabel, 8, @"Below Turbo",	 0,	  0,	 0,	   0, NO, NO},
 		
-		{kVacStaticLabel, 99, @"V1",			175, 375,	185, 385, NO},
-		{kVacStaticLabel, 99, @"V2",			335, 375,	365, 385, NO},
-		{kVacStaticLabel, 99, @"V3",			515, 345,	525, 355, NO},
-		{kVacStaticLabel, 99, @"V4",			575, 345,	585, 355, NO},
-		{kVacStaticLabel, 99, @"V5",			515, 245,	525, 255, NO},
-		{kVacStaticLabel, 99, @"Roughing",		485, 165,	530, 175, NO},
+		{kVacStaticLabel, 99, @"V1",			175, 375,	185, 385, NO, NO},
+		{kVacStaticLabel, 99, @"V2",			335, 375,	365, 385, NO, NO},
+		{kVacStaticLabel, 99, @"V3",			515, 345,	525, 355, NO, NO},
+		{kVacStaticLabel, 99, @"V4",			575, 345,	585, 355, NO, NO},
+		{kVacStaticLabel, 99, @"V5",			515, 245,	525, 255, NO, NO},
+		{kVacStaticLabel, 99, @"Roughing",		485, 165,	530, 175, NO, NO},
 		
-		{kVacStaticLabel, 99, @"B1",			195, 175,	205, 185, NO},
-		{kVacStaticLabel, 99, @"B2",			120, 295,	135, 305, NO},
-		{kVacStaticLabel, 99, @"Purge",			550,  45,	560,  55, NO},
-		{kVacStaticLabel, 99, @"B4",			680,  45,	690,  55, NO},
-		{kVacStaticLabel, 99, @"B5",			25,  195,	35,  205, NO},
+		{kVacStaticLabel, 99, @"B1",			195, 175,	205, 185, NO, NO},
+		{kVacStaticLabel, 99, @"B2",			120, 295,	135, 305, NO, NO},
+		{kVacStaticLabel, 99, @"Purge",			550,  45,	560,  55, NO, NO},
+		{kVacStaticLabel, 99, @"B4",			680,  45,	690,  55, NO, NO},
+		{kVacStaticLabel, 99, @"B5",			25,  195,	35,  205, NO, NO},
 
 	};	
 	
@@ -573,7 +573,8 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 	for(i=0;i<numItems;i++){
 		NSRect theBounds = NSMakeRect(labelItems[i].x1,labelItems[i].y1,labelItems[i].x2-labelItems[i].x1,labelItems[i].y2-labelItems[i].y1);
 		ORVacuumStaticLabel* aLabel = [[ORVacuumStaticLabel alloc] initWithDelegate:self partTag: labelItems[i].partTag label:labelItems[i].label bounds:theBounds];
-		aLabel.drawBox = labelItems[i].drawBox;
+		aLabel.drawBox				= labelItems[i].drawBox;
+		aLabel.displayAuxStatus		= labelItems[i].displayAuxStatus;
 		[aLabel release];
 	}
 }

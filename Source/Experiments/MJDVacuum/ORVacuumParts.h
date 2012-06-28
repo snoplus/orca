@@ -41,6 +41,7 @@ typedef struct  {
 	NSString* label;
 	float x1,y1,x2,y2;
 	BOOL drawBox;
+	BOOL displayAuxStatus;
 } VacuumStaticLabelInfo;
 
 typedef struct  {
@@ -158,9 +159,12 @@ typedef struct  {
 	NSColor*	controlColor;
 	BOOL		drawBox;
 	NSString*	dialogIdentifier;
+	BOOL		displayAuxStatus;
 }
 - (id) initWithDelegate:(id)aDelegate partTag:(int)aTag label:(NSString*)label bounds:(NSRect)aRect;
 - (void) openDialog;
+- (NSString*) auxStatusString;
+@property (nonatomic,assign) BOOL displayAuxStatus;
 @property (nonatomic,assign) BOOL drawBox;
 @property (nonatomic,assign) NSRect bounds;
 @property (nonatomic,retain) NSGradient* gradient;
@@ -251,5 +255,6 @@ extern NSString* ORVacuumPartChanged;
 - (BOOL) showGrid;
 - (void) addPart:(id)aPart;
 - (void) colorRegions;
+- (NSString*) auxStatusString;
 @end
 

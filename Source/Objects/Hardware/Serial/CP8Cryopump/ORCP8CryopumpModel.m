@@ -855,6 +855,13 @@ NSString* ORCP8CryopumpModelWasPowerFailireChanged          = @"ORCP8CryopumpMod
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpPortStateChanged object:self];
 }
 
+- (NSString*) auxStatusString
+{
+	if([serialPort isOpen]){
+		return [self pumpStatus]?@"ON":@"OFF";
+	}
+	else return @"?";	
+}
 
 #pragma mark •••Archival
 - (id) initWithCoder:(NSCoder*)decoder

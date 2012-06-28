@@ -151,6 +151,14 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 }
 
 #pragma mark •••Accessors
+- (NSString*) auxStatusString
+{
+	if([serialPort isOpen]){
+		if(ionizerFilamentCurrentRB==0)	return @"ON";
+		else					return @"OFF";
+	}
+	else return @"?";	
+}
 - (float) sensitivityFactor
 {
     return sensitivityFactor;

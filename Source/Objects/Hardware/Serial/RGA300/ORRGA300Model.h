@@ -138,6 +138,7 @@
 - (void) dealloc;
 
 #pragma mark •••Accessors
+- (NSString*) auxStatusString;
 - (float) sensitivityFactor;
 - (void) setSensitivityFactor:(float)aSensitivityFactor;
 - (int)		currentAmuIndex;

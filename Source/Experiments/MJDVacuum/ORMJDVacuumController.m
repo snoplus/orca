@@ -270,7 +270,7 @@
 		return [[model gateValves] count];
 	}
 	else if(aTableView == miscTableView){
-		return [[model dynamicLabels] count];
+		return [[model staticLabels] count];
 	}
 	else return 0;
 }

@@ -466,6 +466,17 @@ NSString* ORTM700Lock						= @"ORTM700Lock";
 	[self sendStationPower:NO];
 	[self sendStandby:NO];
 }
+- (NSString*) auxStatusString
+{
+	if([serialPort isOpen]){
+		if(stationPower){
+			if(turboAccelerating)return @"ACCEL";
+			else return @"ON";
+		}
+		else return @"OFF";
+	}
+	else return @"?";
+}
 
 #pragma mark •••Commands
 - (void) sendDataRequest:(int)aParamNum 

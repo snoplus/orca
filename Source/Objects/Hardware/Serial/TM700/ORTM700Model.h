@@ -82,6 +82,7 @@
 - (NSString*) lastRequest;
 - (void) setLastRequest:(NSString*)aCmdString;
 - (void) openPort:(BOOL)state;
+- (NSString*) auxStatusString;
 
 #pragma mark •••Archival
 - (id)   initWithCoder:(NSCoder*)decoder;

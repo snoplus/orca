@@ -433,13 +433,14 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
 @implementation ORVacuumStaticLabel
-@synthesize label,bounds,gradient,controlColor,drawBox,dialogIdentifier;
+@synthesize label,bounds,gradient,controlColor,drawBox,dialogIdentifier,displayAuxStatus;
 - (id) initWithDelegate:(id)aDelegate partTag:(int)aTag label:(NSString*)aLabel bounds:(NSRect)aRect
 {
 	self = [super initWithDelegate:aDelegate partTag:aTag];
 	self.bounds       = aRect;
 	self.label        = aLabel;
 	self.drawBox	  = YES;
+	self.displayAuxStatus = NO;
 	self.controlColor = [NSColor colorWithCalibratedRed:.75 green:.75 blue:.75 alpha:1];
 	return self;
 }
@@ -480,20 +481,53 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 
 		
 		if([label length]){
-			
+			NSDictionary* attributes = [NSDictionary dictionaryWithObjectsAndKeys:
+										[NSColor blackColor],NSForegroundColorAttributeName,
+										[NSFont fontWithName:@"Geneva" size:10],NSFontAttributeName,
+										nil];
 			[[NSColor blackColor] set];
-			NSAttributedString* s = [[[NSAttributedString alloc] initWithString:label
-																	 attributes:[NSDictionary dictionaryWithObjectsAndKeys:
-																				 [NSColor blackColor],NSForegroundColorAttributeName,
-																				 [NSFont fontWithName:@"Geneva" size:10],NSFontAttributeName,
-																				 nil]] autorelease]; 
+			NSAttributedString* s = [[[NSAttributedString alloc] initWithString:label attributes:attributes] autorelease]; 
 			NSSize size = [s size];   
 			float x_pos = (bounds.size.width - size.width) / 2; 
-			float y_pos = (bounds.size.height - size.height) /2; 
+			float y_pos;
+			if(displayAuxStatus) y_pos = bounds.size.height - size.height;
+			else				 y_pos = (bounds.size.height - size.height) /2;
 			[s drawAtPoint:NSMakePoint(bounds.origin.x + x_pos, bounds.origin.y + y_pos)];
+			if(displayAuxStatus){
+				NSString* auxString = [self auxStatusString];
+				if([auxString length]){
+					NSAttributedString* s = [[[NSAttributedString alloc] initWithString:auxString attributes:attributes] autorelease]; 
+					NSSize size = [s size];   
+					float x_pos = (bounds.size.width - size.width) / 2; 
+					y_pos = 0;
+					[s drawAtPoint:NSMakePoint(bounds.origin.x + x_pos, bounds.origin.y + y_pos)];
+				}
+			}
 		}
 		[[NSColor blackColor] set];
 	}
+}
+
+- (NSString*) auxStatusString
+{
+	NSString* auxString = @"";
+	if([dialogIdentifier length]){
+		NSArray* parts = [dialogIdentifier componentsSeparatedByString:@","];
+		if([parts count]==2){
+			Class theClass = NSClassFromString([parts objectAtIndex:0]);
+			NSArray* objects = [[[NSApp delegate]  document] collectObjectsOfClass:theClass];
+			for(OrcaObject* anObj in objects){
+				if([[anObj fullID] isEqualToString:dialogIdentifier]){
+					if([anObj respondsToSelector:@selector(auxStatusString)]){
+						auxString = [anObj auxStatusString];
+						break;
+					}
+					else break;
+				}
+			}
+		}
+	}
+	return auxString;
 }
 
 - (void) openDialog
