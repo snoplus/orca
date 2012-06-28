@@ -154,8 +154,8 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 - (NSString*) auxStatusString
 {
 	if([serialPort isOpen]){
-		if(ionizerFilamentCurrentRB==0)	return @"ON";
-		else					return @"OFF";
+		if(ionizerFilamentCurrentRB==0)	return @"OFF";
+		else					return @"ON";
 	}
 	else return @"?";	
 }
