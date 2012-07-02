@@ -219,6 +219,7 @@ typedef struct  {
 - (id) initWithDelegate:(id)aDelegate partTag:(int)aTag label:(NSString*)label controlType:(int)aControlType at:(NSPoint)aPoint connectingRegion1:(int)aRegion1 connectingRegion2:(int)aRegion2;
 - (void) checkState;
 - (void) startStuckValveTimer;
+- (void) cancelStuckValveTimer;
 - (void) clearAlarmState;
 - (void) timeout;
 @end

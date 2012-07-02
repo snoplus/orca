@@ -283,11 +283,15 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 		
 		[dataSource colorRegions];
 		[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORVacuumPartChanged object:dataSource];
-		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+        [self performSelectorOnMainThread:@selector(cancelStuckValveTimer) withObject:nil waitUntilDone:YES];
 		
-		[self checkState];
 		firstTime = NO;
 	}
+}
+- (void) cancelStuckValveTimer
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+    [self checkState];
 }
 
 - (void) startStuckValveTimer
