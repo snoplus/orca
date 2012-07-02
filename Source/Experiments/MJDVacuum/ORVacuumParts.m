@@ -293,7 +293,7 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 - (void) startStuckValveTimer
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-	[self performSelector:@selector(timeout) withObject:nil afterDelay:10];
+	[self performSelector:@selector(timeout) withObject:nil afterDelay:20];
 }
 
 - (void) clearAlarmState
