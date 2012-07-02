@@ -439,7 +439,7 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 		//the parttags are equal to the index numbers of the regions
 		{kVacStaticLabel, 0, @"Turbo",			20,	 242,	80,	 268, YES, YES},
 		{kVacStaticLabel, 1, @"RGA",			260, 417,	300, 443, YES, YES},
-		{kVacStaticLabel, 3, @"Cryo Pump",		560, 202,	640, 228, YES, YES},
+		{kVacStaticLabel, 3, @"Cryo Pump",		560, 200,	640, 230, YES, YES},
 		{kVacStaticLabel, 5, @"Dry N2\nSupply",	200,  60,	300, 100, YES, NO},
 		{kVacStaticLabel, 6, @"NEG Pump",		420, 285,	480, 315, YES, NO},
 		{kVacStaticLabel, 7, @"Diaphragm\nPump",20,	 80,	80,	 110, YES, NO},
