@@ -310,7 +310,7 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 		ORAlarm* anAlarm = [[ORAlarm alloc] initWithName:s severity:kHardwareAlarm];
 		self.valveAlarm = anAlarm;
 		[anAlarm release];
-		[valveAlarm setSticky:YES];
+		[valveAlarm setSticky:NO];
 		[valveAlarm setHelpString:@"This valve is either stuck or the command state does not match the actual state."];
 	}
 	[valveAlarm postAlarm];
