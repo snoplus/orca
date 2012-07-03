@@ -339,6 +339,12 @@
                      selector : @selector(firstStageControlMethodRBChanged:)
                          name : ORCP8CryopumpModelFirstStageControlMethodRBChanged
 						object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(lockChanged:)
+                         name : ORCP8CryopumpPortStateChanged
+						object: model];
+
 
 }
 
