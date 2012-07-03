@@ -2701,6 +2701,14 @@
 		84FEAD2015939394005D798C /* ProXR16SSR.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84FEAD1A15939393005D798C /* ProXR16SSR.nib */; };
 		84FEAD2115939394005D798C /* ProXR16SSR.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84FEAD1B15939393005D798C /* ProXR16SSR.tif */; };
 		84FEAD6D1594A4DF005D798C /* ProXR16SSRBig.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84FEAD6C1594A4DF005D798C /* ProXR16SSRBig.tif */; };
+		84FEB88815A31F42005D798C /* L2301.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84FEB88015A31F42005D798C /* L2301.nib */; };
+		84FEB88915A31F42005D798C /* L2301Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84FEB88115A31F42005D798C /* L2301Card.gif */; };
+		84FEB88A15A31F42005D798C /* ORL2301Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FEB88215A31F42005D798C /* ORL2301Controller.h */; };
+		84FEB88B15A31F42005D798C /* ORL2301Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FEB88315A31F42005D798C /* ORL2301Controller.m */; };
+		84FEB88C15A31F42005D798C /* ORL2301Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FEB88415A31F42005D798C /* ORL2301Decoders.h */; };
+		84FEB88D15A31F42005D798C /* ORL2301Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FEB88515A31F42005D798C /* ORL2301Decoders.m */; };
+		84FEB88E15A31F42005D798C /* ORL2301Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FEB88615A31F42005D798C /* ORL2301Model.h */; };
+		84FEB88F15A31F42005D798C /* ORL2301Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FEB88715A31F42005D798C /* ORL2301Model.m */; };
 		84FFCAA60636D5B10069432F /* C792.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84FFCAA00636D5B10069432F /* C792.gif */; };
 		84FFCAA70636D5B10069432F /* Caen792.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84FFCAA10636D5B10069432F /* Caen792.nib */; };
 		84FFCAA80636D5B10069432F /* ORCaen792Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FFCAA20636D5B10069432F /* ORCaen792Controller.h */; };
@@ -5646,6 +5654,14 @@
 		84FEAD1A15939393005D798C /* ProXR16SSR.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ProXR16SSR.nib; path = Source/Objects/Hardware/Serial/ProXR16SSR/ProXR16SSR.nib; sourceTree = SOURCE_ROOT; };
 		84FEAD1B15939393005D798C /* ProXR16SSR.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = ProXR16SSR.tif; path = Source/Objects/Hardware/Serial/ProXR16SSR/ProXR16SSR.tif; sourceTree = SOURCE_ROOT; };
 		84FEAD6C1594A4DF005D798C /* ProXR16SSRBig.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = ProXR16SSRBig.tif; path = Source/Objects/Hardware/Serial/ProXR16SSR/ProXR16SSRBig.tif; sourceTree = SOURCE_ROOT; };
+		84FEB88015A31F42005D798C /* L2301.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = L2301.nib; path = Source/Objects/Hardware/Camac/L2301/L2301.nib; sourceTree = SOURCE_ROOT; };
+		84FEB88115A31F42005D798C /* L2301Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = L2301Card.gif; path = Source/Objects/Hardware/Camac/L2301/L2301Card.gif; sourceTree = SOURCE_ROOT; };
+		84FEB88215A31F42005D798C /* ORL2301Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORL2301Controller.h; path = Source/Objects/Hardware/Camac/L2301/ORL2301Controller.h; sourceTree = SOURCE_ROOT; };
+		84FEB88315A31F42005D798C /* ORL2301Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORL2301Controller.m; path = Source/Objects/Hardware/Camac/L2301/ORL2301Controller.m; sourceTree = SOURCE_ROOT; };
+		84FEB88415A31F42005D798C /* ORL2301Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORL2301Decoders.h; path = Source/Objects/Hardware/Camac/L2301/ORL2301Decoders.h; sourceTree = SOURCE_ROOT; };
+		84FEB88515A31F42005D798C /* ORL2301Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORL2301Decoders.m; path = Source/Objects/Hardware/Camac/L2301/ORL2301Decoders.m; sourceTree = SOURCE_ROOT; };
+		84FEB88615A31F42005D798C /* ORL2301Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORL2301Model.h; path = Source/Objects/Hardware/Camac/L2301/ORL2301Model.h; sourceTree = SOURCE_ROOT; };
+		84FEB88715A31F42005D798C /* ORL2301Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORL2301Model.m; path = Source/Objects/Hardware/Camac/L2301/ORL2301Model.m; sourceTree = SOURCE_ROOT; };
 		84FFCAA00636D5B10069432F /* C792.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = C792.gif; sourceTree = "<group>"; };
 		84FFCAA10636D5B10069432F /* Caen792.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = Caen792.nib; sourceTree = "<group>"; };
 		84FFCAA20636D5B10069432F /* ORCaen792Controller.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORCaen792Controller.h; sourceTree = "<group>"; };
@@ -7147,6 +7163,7 @@
 				841DA0070780D7CA0099BBF6 /* TRS1 */,
 				8408A4B409071C6A004A3B34 /* HV2132 */,
 				8493D6B20F21315300BCD331 /* CMC203 */,
+				84FEB87F15A31F42005D798C /* L2301 */,
 			);
 			name = Camac;
 			path = Source/Objects/Hardware/Camac;
@@ -11743,6 +11760,22 @@
 			path = Source/Objects/Hardware/Serial/ProXR16SSR;
 			sourceTree = SOURCE_ROOT;
 		};
+		84FEB87F15A31F42005D798C /* L2301 */ = {
+			isa = PBXGroup;
+			children = (
+				84FEB88015A31F42005D798C /* L2301.nib */,
+				84FEB88115A31F42005D798C /* L2301Card.gif */,
+				84FEB88215A31F42005D798C /* ORL2301Controller.h */,
+				84FEB88315A31F42005D798C /* ORL2301Controller.m */,
+				84FEB88415A31F42005D798C /* ORL2301Decoders.h */,
+				84FEB88515A31F42005D798C /* ORL2301Decoders.m */,
+				84FEB88615A31F42005D798C /* ORL2301Model.h */,
+				84FEB88715A31F42005D798C /* ORL2301Model.m */,
+			);
+			name = L2301;
+			path = Source/Objects/Hardware/Camac/L2301;
+			sourceTree = SOURCE_ROOT;
+		};
 		84FFCA9F0636D5B10069432F /* CV792 */ = {
 			isa = PBXGroup;
 			children = (
@@ -13389,6 +13422,9 @@
 				8471D47B1588DF3C0039894D /* ORRemoteSocketModel.h in Headers */,
 				84FEAD1C15939393005D798C /* ORProXR16SSRController.h in Headers */,
 				84FEAD1E15939394005D798C /* ORProXR16SSRModel.h in Headers */,
+				84FEB88A15A31F42005D798C /* ORL2301Controller.h in Headers */,
+				84FEB88C15A31F42005D798C /* ORL2301Decoders.h in Headers */,
+				84FEB88E15A31F42005D798C /* ORL2301Model.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14243,6 +14279,8 @@
 				84FEAD2015939394005D798C /* ProXR16SSR.nib in Resources */,
 				84FEAD2115939394005D798C /* ProXR16SSR.tif in Resources */,
 				84FEAD6D1594A4DF005D798C /* ProXR16SSRBig.tif in Resources */,
+				84FEB88815A31F42005D798C /* L2301.nib in Resources */,
+				84FEB88915A31F42005D798C /* L2301Card.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -15201,6 +15239,9 @@
 				8471D47C1588DF3C0039894D /* ORRemoteSocketModel.m in Sources */,
 				84FEAD1D15939394005D798C /* ORProXR16SSRController.m in Sources */,
 				84FEAD1F15939394005D798C /* ORProXR16SSRModel.m in Sources */,
+				84FEB88B15A31F42005D798C /* ORL2301Controller.m in Sources */,
+				84FEB88D15A31F42005D798C /* ORL2301Decoders.m in Sources */,
+				84FEB88F15A31F42005D798C /* ORL2301Model.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
