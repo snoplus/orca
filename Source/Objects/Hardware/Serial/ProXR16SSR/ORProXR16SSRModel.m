@@ -106,6 +106,7 @@ NSString* ORProXR16SSRLock							= @"ORProXR16SSRLock";
 				[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
 				[self setLastRequest:nil];			 //clear the last request
 				[self processOneCommandFromQueue];	 //do the next command in the queue
+                isValid = YES;
 			}
 			else {
 				NSUInteger lastRequestLength = [lastRequest length];
@@ -119,8 +120,9 @@ NSString* ORProXR16SSRLock							= @"ORProXR16SSRLock";
 								[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
 								unsigned char* p = (unsigned char*)[inBuffer bytes];
 								int i;
-								isValid = YES;
+                                isValid = YES;
 								for(i=0;i<32;i++)[self setRelayMask:p[i] bank:i];
+
 								[inBuffer release];
 								inBuffer = nil;
 								[self setLastRequest:nil];			 //clear the last request
@@ -188,7 +190,7 @@ NSString* ORProXR16SSRLock							= @"ORProXR16SSRLock";
 	cmdArray[0] = kProXR16SSRCmdStart;
 	cmdArray[1] = kProXR16SSRRelayOff;
  	cmdArray[2] = aChan;
-   [self addCmdToQueue:[NSData dataWithBytes:cmdArray length:3]];
+    [self addCmdToQueue:[NSData dataWithBytes:cmdArray length:3]];
 	[self readAllRelayStates];
 }
 
@@ -347,16 +349,17 @@ NSString* ORProXR16SSRLock							= @"ORProXR16SSRLock";
 
 - (void) processOneCommandFromQueue
 {
-	if([cmdQueue count] == 0) return;
-	NSData* aCmd = [[[cmdQueue objectAtIndex:0] retain] autorelease];
-	[cmdQueue removeObjectAtIndex:0];
-	
-	[self setLastRequest:aCmd];
-	[self performSelector:@selector(timeout) withObject:nil afterDelay:3];
-	[serialPort writeDataInBackgroundThread:aCmd];
-	if(!lastRequest){
-		[self performSelector:@selector(processOneCommandFromQueue) withObject:nil afterDelay:.01];
-	}
+    if([cmdQueue count]){
+        NSData* aCmd = [[[cmdQueue objectAtIndex:0] retain] autorelease];
+        [cmdQueue removeObjectAtIndex:0];
+        
+        [self setLastRequest:aCmd];
+        [self performSelector:@selector(timeout) withObject:nil afterDelay:3];
+        [serialPort writeDataInBackgroundThread:aCmd];
+        if(!lastRequest){
+            [self performSelector:@selector(processOneCommandFromQueue) withObject:nil afterDelay:.1];
+        }
+    }
 }
 
 - (void) setRelayMask:(unsigned char)mask bank:(int)aBank
