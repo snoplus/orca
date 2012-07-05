@@ -35,6 +35,7 @@
 #pragma mark ¥¥¥Accessors 
 - (NSString*)name;
 - (void) setGenericData:(NSString*)aGenericData;
+- (NSString*) genericData;
 
 #pragma mark ¥¥¥Data Management
 - (void) clear;

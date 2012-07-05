@@ -1340,7 +1340,10 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
 			genericData = [[ORGenericData alloc] init];
 			[genericData setKey:[nextLevel key]];
 			[nextLevel setData:genericData];
+			[genericData setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
+
 			[genericData release];
+
 			[[NSNotificationCenter defaultCenter]
 			 postNotificationName:ORDataSetAdded
 			 object:self

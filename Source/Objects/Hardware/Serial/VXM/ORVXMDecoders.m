@@ -27,6 +27,20 @@
 
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
+    unsigned long* ptr = (unsigned long*)someData;
+	union {
+        long theLong;
+        float theFloat;
+    }data;
+	
+    data.theLong = ptr[3];
+	float theSteps = data.theFloat;
+	
+    NSString* valueString = [NSString stringWithFormat:@"%.0f",theSteps];
+	NSString* objKey      = [NSString stringWithFormat:@"Unit %d",ptr[2]&0xFFFF];
+	NSString* chanKey     = [NSString stringWithFormat:@"Channel %d",ptr[2] >> 16];
+	[aDataSet loadGenericData:valueString sender:self withKeys:@"VXM",@"Steps",objKey,chanKey,nil];
+	
      return ExtractLength(*((unsigned long*)someData));
 }
 

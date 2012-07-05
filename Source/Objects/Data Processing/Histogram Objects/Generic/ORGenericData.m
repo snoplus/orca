@@ -69,7 +69,10 @@
     if(aGenericData)[self incrementTotalCounts];
 	[dataLock unlock];
 }
-
+- (NSString*) genericData
+{
+	return genericData;
+}
 #pragma mark ¥¥¥Archival
 static NSString *ORGenericDataKey 			= @"GenericData Key";
 
