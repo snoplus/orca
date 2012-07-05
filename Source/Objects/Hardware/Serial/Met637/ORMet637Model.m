@@ -282,10 +282,10 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 		if(!lowBatteryAlarm){
 			NSString* s = [NSString stringWithFormat:@"Met637 (Unit %d)",[self uniqueIdNumber]];
 			lowBatteryAlarm = [[ORAlarm alloc] initWithName:s severity:kHardwareAlarm];
-			[lowBatteryAlarm setSticky:NO];
-			[lowBatteryAlarm setHelpString:@"The battery on the particle counter is low. Is it supposed to be running on the battery?"];
+			[lowBatteryAlarm setSticky:YES];
+			[lowBatteryAlarm setHelpString:@"The battery on the particle counter is low. Is it supposed to be running on the battery?\n\nThis alarm will not go away until the problem is cleared. Acknowledging the alarm will silence it."];
+			[lowBatteryAlarm postAlarm];
 		}
-		[lowBatteryAlarm postAlarm];
 	}
 	else {
 		[lowBatteryAlarm clearAlarm];
@@ -297,10 +297,10 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 		if(!sensorErrorAlarm){
 			NSString* s = [NSString stringWithFormat:@"Met637 (Unit %d)",[self uniqueIdNumber]];
 			sensorErrorAlarm = [[ORAlarm alloc] initWithName:s severity:kHardwareAlarm];
-			[sensorErrorAlarm setSticky:NO];
-			[sensorErrorAlarm setHelpString:@"The sensor is reporting a hardware error."];
+			[sensorErrorAlarm setSticky:YES];
+			[sensorErrorAlarm setHelpString:@"The sensor is reporting a hardware error.\n\nThis alarm will not go away until the problem is cleared. Acknowledging the alarm will silence it."];
+			[sensorErrorAlarm postAlarm];
 		}
-		[sensorErrorAlarm postAlarm];
 	}
 	else {
 		[sensorErrorAlarm clearAlarm];
@@ -312,10 +312,10 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 		if(!flowErrorAlarm){
 			NSString* s = [NSString stringWithFormat:@"Met637 (Unit %d)",[self uniqueIdNumber]];
 			flowErrorAlarm = [[ORAlarm alloc] initWithName:s severity:kHardwareAlarm];
-			[flowErrorAlarm setSticky:NO];
-			[flowErrorAlarm setHelpString:@"The particle counter is reporting a flow error."];
+			[flowErrorAlarm setSticky:YES];
+			[flowErrorAlarm setHelpString:@"The particle counter is reporting a flow error.\n\nThis alarm will not go away until the problem is cleared. Acknowledging the alarm will silence it."];
+			[flowErrorAlarm postAlarm];
 		}
-		[flowErrorAlarm postAlarm];
 	}
 	else {
 		[flowErrorAlarm clearAlarm];
