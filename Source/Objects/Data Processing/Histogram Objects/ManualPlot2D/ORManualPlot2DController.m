@@ -44,8 +44,8 @@
 - (void) awakeFromNib
 {
     [super awakeFromNib];
-    [[plotView xAxis] setRngLimitsLow:0 withHigh:256 withMinRng:16];
-    [[plotView yAxis] setRngLimitsLow:0 withHigh:256 withMinRng:16];
+    [[plotView xAxis] setRngLimitsLow:0 withHigh:256 withMinRng:5];
+    [[plotView yAxis] setRngLimitsLow:0 withHigh:256 withMinRng:5];
     [[plotView zAxis] setRngLimitsLow:0 withHigh:0xffffffff withMinRng:16];
     [[plotView yAxis] setLog:NO];
 	
