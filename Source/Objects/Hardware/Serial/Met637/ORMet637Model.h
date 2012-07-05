@@ -21,6 +21,7 @@
 
 @class ORSerialPort;
 @class ORTimeRate;
+@class ORAlarm;
 
 #define kMet637CmdTimeout  1
 #define kMet637ProbeTime   5
@@ -60,8 +61,11 @@
 		BOOL			timedOut;
 		BOOL			dumpInProgress;
 		int				dumpCount;
-        BOOL            dataValid;  
-}
+        BOOL            dataValid; 
+		ORAlarm*		sensorErrorAlarm;
+		ORAlarm*		lowBatteryAlarm;
+}		ORAlarm*		flowErrorAlarm;
+
 
 #pragma mark ***Initialization
 - (id)   init;
@@ -70,6 +74,7 @@
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark ***Accessors
+- (void) checkAlarms;
 - (int) dumpCount;
 - (void) setDumpCount:(int)aDumpCount;
 - (BOOL) dumpInProgress;

@@ -26,6 +26,7 @@
 #import "ORDataTypeAssigner.h"
 #import "ORDataPacket.h"
 #import "ORTimeRate.h"
+#import "ORAlarm.h"
 
 #pragma mark ***External Strings
 NSString* ORMet637ModelDumpCountChanged = @"ORMet637ModelDumpCountChanged";
@@ -99,6 +100,16 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 	for(i=0;i<6;i++){
 		[timeRates[i] release];
 	}	
+	
+	[sensorErrorAlarm release];
+	[sensorErrorAlarm clearAlarm];
+
+	[lowBatteryAlarm release];
+	[lowBatteryAlarm clearAlarm];
+
+	[flowErrorAlarm release];
+	[flowErrorAlarm clearAlarm];
+
 	[super dealloc];
 }
 
@@ -261,7 +272,56 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 - (void) setStatusBits:(int)aStatusBits
 {
     statusBits = aStatusBits;
+	[self checkAlarms];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMet637ModelStatusBitsChanged object:self];
+}
+
+- (void) checkAlarms
+{
+	if(statusBits & 0x10){
+		if(!lowBatteryAlarm){
+			NSString* s = [NSString stringWithFormat:@"Met637 (Unit %d)",[self uniqueIdNumber]];
+			lowBatteryAlarm = [[ORAlarm alloc] initWithName:s severity:kHardwareAlarm];
+			[lowBatteryAlarm setSticky:NO];
+			[lowBatteryAlarm setHelpString:@"The battery on the particle counter is low. Is it supposed to be running on the battery?"];
+		}
+		[lowBatteryAlarm postAlarm];
+	}
+	else {
+		[lowBatteryAlarm clearAlarm];
+		[lowBatteryAlarm release];
+		lowBatteryAlarm = nil;
+	}
+	
+	if(statusBits & 0x20){
+		if(!sensorErrorAlarm){
+			NSString* s = [NSString stringWithFormat:@"Met637 (Unit %d)",[self uniqueIdNumber]];
+			sensorErrorAlarm = [[ORAlarm alloc] initWithName:s severity:kHardwareAlarm];
+			[sensorErrorAlarm setSticky:NO];
+			[sensorErrorAlarm setHelpString:@"The sensor is reporting a hardware error."];
+		}
+		[sensorErrorAlarm postAlarm];
+	}
+	else {
+		[sensorErrorAlarm clearAlarm];
+		[sensorErrorAlarm release];
+		sensorErrorAlarm = nil;
+	}
+	
+	if(statusBits & 0x40){
+		if(!flowErrorAlarm){
+			NSString* s = [NSString stringWithFormat:@"Met637 (Unit %d)",[self uniqueIdNumber]];
+			flowErrorAlarm = [[ORAlarm alloc] initWithName:s severity:kHardwareAlarm];
+			[flowErrorAlarm setSticky:NO];
+			[flowErrorAlarm setHelpString:@"The particle counter is reporting a flow error."];
+		}
+		[flowErrorAlarm postAlarm];
+	}
+	else {
+		[flowErrorAlarm clearAlarm];
+		[flowErrorAlarm release];
+		flowErrorAlarm = nil;
+	}
 }
 
 - (int) location
@@ -820,6 +880,7 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 			[self setHumidity:[[partsByComma objectAtIndex:8] floatValue]];
 			[self setLocation:[[partsByComma objectAtIndex:9] floatValue]];
 			[self setActualDuration:[[partsByComma objectAtIndex:10] intValue]];
+			[self setStatusBits:[[partsByComma objectAtIndex:13] intValue]];
 			
 			if(running){
 				if(countingMode == kMet637Manual){
