@@ -848,6 +848,7 @@
 					<string>432.IBPluginDependency</string>
 					<string>432.IBViewBoundsToFrameTransform</string>
 					<string>432.ImportedFromIB2</string>
+					<string>436.IBAttributePlaceholdersKey</string>
 					<string>436.IBPluginDependency</string>
 					<string>436.IBViewBoundsToFrameTransform</string>
 					<string>436.ImportedFromIB2</string>
@@ -885,7 +886,7 @@
 						<object class="IBToolTipAttribute" key="NS.object.0">
 							<string key="name">ToolTip</string>
 							<reference key="object" ref="787405151"/>
-							<string key="toolTip">F0 - read all channels</string>
+							<string key="toolTip">Clear all channels</string>
 						</object>
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -895,7 +896,7 @@
 						<object class="IBToolTipAttribute" key="NS.object.0">
 							<string key="name">ToolTip</string>
 							<reference key="object" ref="934767849"/>
-							<string key="toolTip">F2 - read all channels, then clear registers,busy, and LAM</string>
+							<string key="toolTip">Start the QVT</string>
 						</object>
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -908,7 +909,7 @@
 						<object class="IBToolTipAttribute" key="NS.object.0">
 							<string key="name">ToolTip</string>
 							<reference key="object" ref="330254800"/>
-							<string key="toolTip">F8 - Test internal LAM status</string>
+							<string key="toolTip">Stop the QVT</string>
 						</object>
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -921,7 +922,7 @@
 						<object class="IBToolTipAttribute" key="NS.object.0">
 							<string key="name">ToolTip</string>
 							<reference key="object" ref="24936432"/>
-							<string key="toolTip">F11 A12 - General reset for all channels, busy, and LAM latches.</string>
+							<string key="toolTip">Prints the contents of all bins to the logger</string>
 						</object>
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -934,7 +935,7 @@
 						<object class="IBToolTipAttribute" key="NS.object.0">
 							<string key="name">ToolTip</string>
 							<reference key="object" ref="274512065"/>
-							<string key="toolTip">F25 - Test all channels simultaneously</string>
+							<string key="toolTip">Read the status register on the 2301</string>
 						</object>
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -947,7 +948,7 @@
 						<object class="IBToolTipAttribute" key="NS.object.0">
 							<string key="name">ToolTip</string>
 							<reference key="object" ref="877810392"/>
-							<string key="toolTip">F27 A12 Test the busy latch</string>
+							<string key="toolTip">Writes a random 16-bit integer to a random bin and reads it back out, declaring success or failure</string>
 						</object>
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -965,7 +966,7 @@
 						<object class="IBToolTipAttribute" key="NS.object.0">
 							<string key="name">ToolTip</string>
 							<reference key="object" ref="491992520"/>
-							<string key="toolTip">Suppress zero channel pile-up</string>
+							<string key="toolTip">Don't read out bins with no counts</string>
 						</object>
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -973,6 +974,14 @@
 						<bytes key="NSTransformStruct">P4AAAL+AAABC/gAAwmAAAA</bytes>
 					</object>
 					<boolean value="YES"/>
+					<object class="NSMutableDictionary">
+						<string key="NS.key.0">ToolTip</string>
+						<object class="IBToolTipAttribute" key="NS.object.0">
+							<string key="name">ToolTip</string>
+							<reference key="object" ref="69451421"/>
+							<string key="toolTip">Include timestamps with each readout while taking data.</string>
+						</object>
+					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<object class="NSAffineTransform">
 						<bytes key="NSTransformStruct">P4AAAL+AAABDBQAAwoAAAA</bytes>
@@ -983,7 +992,7 @@
 						<object class="IBToolTipAttribute" key="NS.object.0">
 							<string key="name">ToolTip</string>
 							<reference key="object" ref="23465515"/>
-							<string key="toolTip">Suppress zero channel pile-up</string>
+							<string key="toolTip">Check here to have the L2301Model zero-out bins when they exceed half-capacity. Enables very long runs.</string>
 						</object>
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
