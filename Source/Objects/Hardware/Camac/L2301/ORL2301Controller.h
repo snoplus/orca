@@ -3,7 +3,8 @@
  *  ORL2301ModelController.h
  *  Orca
  *
- *  Created by Mark Howe on Sat Nov 16 2002.
+ *  Created by Sam Meijer, Jason Detwiler, and David Miller, July 2012.
+ *  Adapted from AD811 code by Mark Howe, written Sat Nov 16 2002.
  *  Copyright (c) 2002 CENPA, University of Washington. All rights reserved.
  *
  */

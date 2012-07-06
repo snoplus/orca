@@ -2,6 +2,7 @@
  *  ORL2301Model.m
  *  Orca
  *
+ *  Created by Sam Meijer, Jason Detwiler, and David Miller, July 2012.
  *  Adapted from AD811 code by Mark Howe, written Sat Nov 16 2002.
  *  Copyright (c) 2002 CENPA, University of Washington. All rights reserved.
  *
@@ -45,6 +46,7 @@ NSString* ORL2301AllowOverflowChangedNotification   = @"ORL2301AllowOverflowChan
 - (void) dealloc
 {
     [super dealloc];
+    [lastDataTS release];
 }
 
 - (void) setUpImage
@@ -126,6 +128,18 @@ NSString* ORL2301AllowOverflowChangedNotification   = @"ORL2301AllowOverflowChan
 }
 
 
+- (NSDate *) lastDataTS
+{
+    return lastDataTS; 
+}
+
+- (void) setLastDataTS: (NSDate *) aLastTime
+{
+    [aLastTime retain];
+    [lastDataTS release];
+    lastDataTS = aLastTime;
+}
+
 #pragma mark ¥¥¥DataTaker
 
 - (void) setDataIds:(id)assigner
@@ -178,6 +192,7 @@ NSString* ORL2301AllowOverflowChangedNotification   = @"ORL2301AllowOverflowChan
     [self clearExceptionCount];
     [self reset];
     [self startQVT];
+    [self setLastDataTS:[NSDate date]];
 }
 
 //**************************************************************************************
@@ -187,7 +202,11 @@ NSString* ORL2301AllowOverflowChangedNotification   = @"ORL2301AllowOverflowChan
 
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-    [self shipHistogram:aDataPacket];
+    if([lastDataTS timeIntervalSinceNow] < -5.) {
+        [self shipHistogram:aDataPacket];
+        [self startQVT];
+        [self setLastDataTS:[NSDate date]];
+    }
 }
 
 - (void) shipHistogram:(ORDataPacket*)aDataPacket
@@ -233,7 +252,8 @@ NSString* ORL2301AllowOverflowChangedNotification   = @"ORL2301AllowOverflowChan
 	
     @try {
         [self setReadWriteBin: 0];
-		
+        [self setReadWriteBin: 0]; // this command is sometimes flaky
+
         unsigned int len = 0;
         int iBin;
         for(iBin = 0; iBin < kNBins; iBin++) {
@@ -303,7 +323,9 @@ NSString* ORL2301AllowOverflowChangedNotification   = @"ORL2301AllowOverflowChan
 
 - (void) clearQVT
 {   
-    [[self adapter] camacShortNAF:[self stationNumber] a:0 f:9];
+    //[[self adapter] camacShortNAF:[self stationNumber] a:0 f:9];
+    unsigned long iBin;
+    for(iBin = 0; iBin < kNBins; iBin++) [self writeQVT:0 atBin:iBin];
     memset(cachedCounts, 0, kNBins*sizeof(unsigned short));
 }
 

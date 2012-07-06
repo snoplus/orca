@@ -2,7 +2,8 @@
 //  ORAD811Decoders.m
 //  Orca
 //
-//  Created by Mark Howe on 9/21/04.
+//  Created by Sam Meijer, Jason Detwiler, and David Miller, July 2012.
+//  Adapted from AD811 code by Mark Howe, written 9/21/04.
 //  Copyright 2004 CENPA, University of Washington. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
@@ -50,6 +51,11 @@
         length = ExtractLength(*ptr);
         ptr++;
     }
+
+    unsigned char crate   = (*ptr&0x01e00000)>>21;
+    unsigned char card   = (*ptr& 0x001f0000)>>16;
+    NSString* crateKey = [self getCrateKey: crate];
+    NSString* cardKey = [self getStationKey: card];
 	
     unsigned long headerSize = 2;
     bool hasTiming = (*ptr&0x02000000);
@@ -62,18 +68,14 @@
         return length;
     }
     if(length == headerSize) return length;
-    
-    unsigned char crate   = (*ptr&0x01e00000)>>21;
-    unsigned char card   = (*ptr& 0x001f0000)>>16;
-    NSString* crateKey = [self getCrateKey: crate];
-    NSString* cardKey = [self getStationKey: card];
-	
+    	
     unsigned long nBins = length-headerSize;
     unsigned int iBin;
     for(iBin = 0; iBin < nBins; iBin++) {
-		unsigned long  bin = *ptr&0xffff0000;
+        ptr++;
+		unsigned long  bin = (*ptr&0xffff0000) >> 16;
 		unsigned long  value = *ptr&0x0000ffff;
-		[aDataSet histogramWW:bin weight:value numBins:65536 sender:self withKeys:@"L2301", crateKey,cardKey,nil,nil];
+		[aDataSet histogramWW:bin weight:value numBins:1024 sender:self withKeys:@"L2301", crateKey,cardKey,nil,nil];
     }
 	
     return length; //must return number of bytes processed.

@@ -2,6 +2,7 @@
  *  ORL2301Model.h
  *  Orca
  *
+ *  Created by Sam Meijer, Jason Detwiler, and David Miller, July 2012.
  *  Adapted from AD811 code by Mark Howe, written Sat Nov 16 2002.
  *  Copyright (c) 2002 CENPA, University of Washington. All rights reserved.
  *
@@ -50,6 +51,8 @@ enum L2301Constants {
 	// used during data taking
 	unsigned short cachedCounts[kNBins];
 	unsigned long dataBuffer[kMaxDataLen];
+    
+    NSDate *lastDataTS;
 }
 
 #pragma mark ¥¥¥Initialization
@@ -66,6 +69,8 @@ enum L2301Constants {
 - (void) setSuppressZeros:(BOOL)aFlag;
 - (BOOL) allowOverflow;
 - (void) setAllowOverflow:(BOOL)aFlag;
+- (NSDate *) lastDataTS;
+- (void) setLastDataTS: (NSDate *) aLastDataTS;
 
 
 #pragma mark ¥¥¥Hardware Test functions

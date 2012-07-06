@@ -1,8 +1,9 @@
 /*
- *  ORL2301ModelController.cpp
+ *  ORL2301ModelController.m
  *  Orca
  *
- *  Created by Mark Howe on Sat Nov 16 2002.
+ *  Created by Sam Meijer, Jason Detwiler, and David Miller, July 2012.
+ *  Adapted from AD811 code by Mark Howe, written Sat Nov 16 2002.
  *  Copyright (c) 2002 CENPA, University of Washington. All rights reserved.
  *
  */
@@ -197,12 +198,17 @@
 - (IBAction) readAllAction:(id)sender
 {
     @try {
+        NSLog(@"Reading All from L2301 station %d...\n",[model stationNumber]);
+        [model setReadWriteBin:0];
+        [model setReadWriteBin:0];
         unsigned int iBin;
         for(iBin = 0; iBin < kNBins; iBin++) {
             // read the counts for this bin
             // note: the internal read/write bin is set to iBin+1 after this call
             unsigned short counts = [model readQVT];
-            NSLog(@"L2301 station %d, bin %d: %d\n",[model stationNumber], iBin, counts);
+            if(!([model suppressZeros] && counts == 0)) {
+                NSLog(@"L2301 station %d, bin %d: %d\n",[model stationNumber], iBin, counts);
+            }
         }
     }
     @catch(NSException* localException) {
@@ -230,13 +236,12 @@
 - (IBAction) testAction:(id)sender
 {
     @try {
-        unsigned short randBin = arc4random()%1023;
-        unsigned short randValue = arc4random()%65535;
-        [model writeQVT:randValue atBin:randBin];
-        [model readQVTAt:randBin-1];
         NSLog(@"L2301 Performing spot test on random channel\n");
+        unsigned short randBin = arc4random()%1024;
+        unsigned short randValue = arc4random()%65536;
+        [model writeQVT:randValue atBin:randBin];
         NSLog(@"L2301 Value %d written to bin %d.\n",randValue, randBin);
-        unsigned short returnValue = [model readQVT];
+        unsigned short returnValue = [model readQVTAt:randBin];
         NSLog(@"L2301 Value %d read from bin %d.\n", returnValue, randBin);
         if(randValue == returnValue){
             NSLog(@"L2301 passed test on channel %d\n",randBin);

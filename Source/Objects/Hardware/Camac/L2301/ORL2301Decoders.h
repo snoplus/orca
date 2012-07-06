@@ -2,7 +2,8 @@
 //  ORAD811Decoders.h
 //  Orca
 //
-//  Created by Mark Howe on 9/21/04.
+//  Created by Sam Meijer, Jason Detwiler, and David Miller, July 2012.
+//  Adapted from AD811 code by Mark Howe, written 9/21/04.
 //  Copyright 2004 CENPA, University of Washington. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
