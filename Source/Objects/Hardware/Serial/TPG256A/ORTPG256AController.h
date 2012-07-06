@@ -23,6 +23,8 @@
 
 @interface ORTPG256AController : OrcaObjectController
 {
+	IBOutlet NSTabView*		tabView;	
+	IBOutlet NSView*		totalView;
     IBOutlet NSTextField*   lockDocField;
 	IBOutlet NSPopUpButton* unitsPU;
 	IBOutlet NSPopUpButton*	pressureScalePU;
@@ -37,6 +39,11 @@
 	IBOutlet NSTableView*	pressureTableView;
 	IBOutlet NSTableView*	processLimitTableView;
     IBOutlet NSButton*		yAxisLogCB;
+
+	NSSize					basicOpsSize;
+	NSSize					plotSize;
+	NSSize					processLimitSize;
+	NSView*					blankView;
 }
 
 #pragma mark ***Initialization
@@ -63,6 +70,8 @@
 - (void) pollTimeChanged:(NSNotification*)aNotification;
 - (void) miscAttributesChanged:(NSNotification*)aNotification;
 - (NSString*) pressureValuesForIndex:(int)index;
+- (void) tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;
+- (void) windowDidResize:(NSNotification *)aNote;
 
 #pragma mark ***Actions
 - (IBAction) unitsAction:(id)sender;

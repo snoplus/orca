@@ -45,6 +45,7 @@
 - (void) dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	[blankView release];
 	[super dealloc];
 }
 
@@ -69,7 +70,26 @@
 		[aPlot release];
 	}
 	[plotter0 setShowLegend:YES];
-    [plotter0 setPlotTitle:@"Pressures"];
+    //[plotter0 setPlotTitle:@"Pressures"];
+	
+	blankView		 = [[NSView alloc] init];
+    basicOpsSize	 = NSMakeSize(425,295);
+    processLimitSize = NSMakeSize(425,295);
+    plotSize		 = NSMakeSize(425,295);
+	
+    NSString* key = [NSString stringWithFormat: @"orca.ORTPG256A%d.selectedtab",[model uniqueIdNumber]];
+    int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
+    if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
+    [tabView selectTabViewItemAtIndex: index];
+	
+	NSUInteger style = [[self window] styleMask];
+	if(index == 1){
+		[[self window] setStyleMask: style | NSResizableWindowMask];
+	}
+	else {
+		[[self window] setStyleMask: style & ~NSResizableWindowMask];
+	}
+	
 	[super awakeFromNib];
 }
 
@@ -158,7 +178,7 @@
 
 - (void) updateWindow
 {
-    [super updateWindow];
+	[super updateWindow];
     [self lockChanged:nil];
     [self portStateChanged:nil];
     [self portNameChanged:nil];
@@ -173,6 +193,41 @@
 	[self unitsChanged:nil];
 }
 
+- (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
+{
+    [[self window] setContentView:blankView];
+	NSUInteger style = [[self window] styleMask];
+	switch([tabView indexOfTabViewItem:tabViewItem]){
+			
+		case  0: 
+			[self resizeWindowToSize:basicOpsSize];   
+			[[self window] setStyleMask: style & ~NSResizableWindowMask];
+			break;
+			
+		case  1: 
+			[self resizeWindowToSize:plotSize];	
+			[[self window] setStyleMask: style | NSResizableWindowMask];
+			break;
+			
+		default:
+			[self resizeWindowToSize:processLimitSize];     
+			[[self window] setStyleMask: style & ~NSResizableWindowMask];
+			break;
+	}
+	
+    [[self window] setContentView:totalView];
+	
+    NSString* key = [NSString stringWithFormat: @"orca.ORTPG256A%d.selectedtab",[model uniqueIdNumber]];
+    int index = [tabView indexOfTabViewItem:tabViewItem];
+    [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
+}
+
+- (void)windowDidResize:(NSNotification *)notification
+{
+	if([tabView indexOfTabViewItem:[tabView selectedTabViewItem]] == 1){
+		plotSize = [[self window] frame].size; 
+	}
+}
 
 - (void) unitsChanged:(NSNotification*)aNote
 {
@@ -200,11 +255,11 @@
 {
 	if(aNotification == nil || [aNotification object] == [plotter0 xAxis]){
 		[model setMiscAttributes:[(ORAxis*)[plotter0 xAxis]attributes] forKey:@"XAttributes0"];
-	};
+	}
 	
 	if(aNotification == nil || [aNotification object] == [plotter0 yAxis]){
 		[model setMiscAttributes:[(ORAxis*)[plotter0 yAxis]attributes] forKey:@"YAttributes0"];
-	};
+	}
 
 }
 

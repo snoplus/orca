@@ -45,6 +45,7 @@
 - (void) dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	[blankView release];
 	[super dealloc];
 }
 
@@ -69,15 +70,31 @@
     [aPlot setName:@"Second Stage"];
 	[aPlot setLineColor:[NSColor blueColor]];
     
-	[plotter0 setPlotTitle:@"Temperatures"];
 	[plotter0 setShowLegend:YES];
 
     
 	[(ORTimeAxis*)[plotter0 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 	[aPlot release];
 	
-	//NSNumberFormatter *numberFormatter = [[[NSNumberFormatter alloc] init] autorelease];
-	//[numberFormatter setFormat:@"#0.0"];	
+	blankView = [[NSView alloc] init];
+    basicOpsSize	= NSMakeSize(610,545);
+    expertOpsSize	= NSMakeSize(490,660);
+    plotSize		= NSMakeSize(610,545);
+	
+    NSString* key = [NSString stringWithFormat: @"orca.ORCryoPump%d.selectedtab",[model uniqueIdNumber]];
+    int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
+    if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
+    [tabView selectTabViewItemAtIndex: index];
+
+	NSUInteger style = [[self window] styleMask];
+	if(index == 2){
+		[[self window] setStyleMask: style | NSResizableWindowMask];
+	}
+	else {
+		[[self window] setStyleMask: style & ~NSResizableWindowMask];
+	}
+	
+	
 	[super awakeFromNib];
 }
 
@@ -406,6 +423,38 @@
 	[self roughingInterlockChanged:nil];
 	[self secondStageTempControlChanged:nil];
 	[self firstStageControlMethodRBChanged:nil];
+}
+
+- (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
+{
+    [[self window] setContentView:blankView];
+	NSUInteger style = [[self window] styleMask];
+	switch([tabView indexOfTabViewItem:tabViewItem]){
+		case  0: 
+			[self resizeWindowToSize:basicOpsSize];   
+			[[self window] setStyleMask: style & ~NSResizableWindowMask];
+			break;
+		case  1: 
+			[self resizeWindowToSize:expertOpsSize];     
+			[[self window] setStyleMask: style & ~NSResizableWindowMask];
+			break;
+		default: 
+			[self resizeWindowToSize:plotSize];	
+			[[self window] setStyleMask: style | NSResizableWindowMask];
+			break;
+	}
+    [[self window] setContentView:totalView];
+	
+    NSString* key = [NSString stringWithFormat: @"orca.ORCryoPump%d.selectedtab",[model uniqueIdNumber]];
+    int index = [tabView indexOfTabViewItem:tabViewItem];
+    [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
+}
+
+- (void)windowDidResize:(NSNotification *)notification
+{
+	if([tabView indexOfTabViewItem:[tabView selectedTabViewItem]] == 2){
+		plotSize = [[self window] frame].size; 
+	}
 }
 
 - (void) firstStageControlMethodRBChanged:(NSNotification*)aNote

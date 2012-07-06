@@ -24,8 +24,9 @@
 @interface ORCP8CryopumpController : OrcaObjectController
 {
     IBOutlet NSTextField*	lockDocField;
+	IBOutlet NSTabView*		tabView;	
+	IBOutlet NSView*		totalView;
 	IBOutlet NSTextField*	firstStageControlMethodRBField;
-	IBOutlet NSTextField*	secondStageTempControlField;
 	IBOutlet NSPopUpButton* roughingInterlockPU;
     IBOutlet NSButton*      lockButton;
 	IBOutlet NSPopUpButton*	standbyModePU;
@@ -54,7 +55,10 @@
 	IBOutlet NSTextField*	moduleVersionField;
 	IBOutlet NSTextField*	lastRateOfRaiseField;
 	IBOutlet NSPopUpButton* firstStageControlMethodPU;
+	
 	IBOutlet NSTextField*	firstStageControlTempField;
+	IBOutlet NSTextField*	secondStageTempControlField;
+	
 	IBOutlet NSTextField*	failedRepurgeCyclesField;
 	IBOutlet NSTextField*	failedRateRiseCyclesField;
 	IBOutlet NSTextField*	elapsedTimeField;
@@ -104,6 +108,10 @@
 	IBOutlet BiStateView*   thermocoupleOnBiStateView;
 	IBOutlet BiStateView*   powerFailureOccurredBiStateView;
 
+	NSSize					basicOpsSize;
+	NSSize					expertOpsSize;
+	NSSize					plotSize;
+	NSView*					blankView;
 }
 
 #pragma mark ***Initialization
@@ -166,6 +174,8 @@
 - (void) pollTimeChanged:(NSNotification*)aNote;
 - (void) miscAttributesChanged:(NSNotification*)aNote;
 - (void) scaleAction:(NSNotification*)aNote;
+- (void) tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;
+- (void) windowDidResize:(NSNotification *)aNote;
 - (void) updateButtons;
 
 #pragma mark ***Actions
