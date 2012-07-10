@@ -84,4 +84,56 @@ typedef struct { // -tb- 2008-02-27
 } katrinV4HistogramDataStruct;
 
 
+
+
+
+//TODO: add/include ipe4reader6.h (then: ipe4ewstreamer.h) -tb-
+//TODO: -------------------------------------------------- -tb-
+/*--------------------------------------------------------------------
+ *    UDP packed definitions
+ *       data, IPE crate status  -tb-
+ *--------------------------------------------------------------------*/ //-tb-
+
+//size: id + header + 21*16 + UDPFIFOmap + IPmap = (1 + 8 + 336 + 5 + 20) 32-bit words = 1480 bytes
+#define MAX_NUM_FLT_CARDS 20
+#define IPE_BLOCK_SIZE    16
+
+#define SIZEOF_UDPStructIPECrateStatus 1480
+
+typedef struct{
+    //identification
+    union {
+	    uint32_t		id4;  //packet header: 16 bit id=0xFFD0 + 16 bit reserved
+	    struct {
+	        uint16_t id0; 
+	        uint16_t id1;};
+	};
+	
+    //header
+	uint32_t	presentFLTMap;
+	uint32_t	reserved0;
+	uint32_t	reserved1;
+	
+	//SLT info (16 words)
+	uint32_t    SLT[IPE_BLOCK_SIZE];                   //one 16 word32 block for the SLT
+
+    //FLT info (20x16 = 320 words)
+	uint32_t    FLT[MAX_NUM_FLT_CARDS][IPE_BLOCK_SIZE];//twenty FLTs, one 16 word32 block per each FLT
+    
+    //IP Adress Map (20 words)
+	uint32_t	IPAdressMap[MAX_NUM_FLT_CARDS];    //IP address map associated to the according SLT/HW FIFO
+    //Port Map      (10 words)
+	uint16_t	PortMap[MAX_NUM_FLT_CARDS];        //IP address map associated to the according SLT/HW FIFO
+}
+UDPStructIPECrateStatus;
+
+
+
+
+
+
+
+
+
+
 #endif

@@ -1010,6 +1010,7 @@ NSLog(@"  arguments: %@ \n" , arguments);
 	    }
 	//handle K commands
 	if(retval>0){
+	    //check for K command replies:
 	    switch(readBuffer[0]){
 	    case 'K':
 	        readBuffer[retval]='\0';//make null terminated string for printf
@@ -1020,9 +1021,49 @@ NSLog(@"  arguments: %@ \n" , arguments);
 	    default:
 	        readBuffer[retval]='\0';//make null terminated string for printf
 	        //printf("Received unknown command: >%s<\n",readBuffer);
-	        NSLog(@"    Received unknown message: >%s<\n", readBuffer);//TODO: DEBUG -tb-
+			if(retval < 100)
+	            NSLog(@"    Received message with length %i: >%s<\n", retval, readBuffer);//TODO: DEBUG -tb-
+			else
+	            NSLog(@"    Received message with length %i: first 4 bytes 0x%08x\n", retval, *((uint16_t*)readBuffer));//TODO: DEBUG -tb-
 	        break;
 	    }
+		
+		//if(   *((uint16_t*)readBuffer) & 0xFFD0    )
+		
+		
+		//check for data packets:
+		if(   *((uint16_t*)readBuffer) == 0xFFD0   /*&&  retval==1480*/){// reply to KRC_IPECrateStatus command
+	        NSLog(@"    Received IPECrateStatus message with length %i\n", retval);//TODO: DEBUG -tb-
+			UDPStructIPECrateStatus *status = (UDPStructIPECrateStatus *)readBuffer;
+			NSLog(@"    Header0: 0x%04x,  Header1: 0x%04x\n",status->id0, status->id1);
+			NSLog(@"    presentFLTMap: 0x%08x \n",status->presentFLTMap );
+			NSLog(@"    reserved0: 0x%08x,  reserved1: 0x%08x\n",status->reserved0, status->reserved1);
+			
+			int i;
+			NSLog(@"    SLT Block: \n");
+			for(i=0; i<IPE_BLOCK_SIZE; i++){
+			    NSLog(@"        SLT[%i]: 0x%08x \n",i,status->SLT[i] );
+			}
+			int f;
+			for(f=0; f<MAX_NUM_FLT_CARDS; f++){
+			    if(status->presentFLTMap & (0x1 <<f)){
+    			    NSLog(@"    FLT #%i Block: \n",f);
+	    		    for(i=0; i<IPE_BLOCK_SIZE; i++){
+		    	        NSLog(@"        FLT #%i [%i]: 0x%08x \n",f,i,status->FLT[f][i] );
+			        }
+				}
+				else
+				{
+		    	        NSLog(@"     FLT #%i not present \n",f);
+				}
+
+			}
+
+			NSLog(@"    IPAdressMap: \n");
+			for(i=0; i<MAX_NUM_FLT_CARDS; i++){
+			    NSLog(@"        IPAdressMap[%i]: 0x%08x    Port: %i (0x%04x)\n",i,status->IPAdressMap[i], status->PortMap[i], status->PortMap[i]);
+			}
+		}
 	}
 	
 	if(	[self isListeningOnServerSocket]) [self performSelector:@selector(receiveFromReplyServer) withObject:nil afterDelay: 0];
