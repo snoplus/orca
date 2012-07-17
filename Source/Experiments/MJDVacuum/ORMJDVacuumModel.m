@@ -1151,7 +1151,7 @@ NSString* ORMJDVacuumModelDetectorsBiasedChanged    = @"ORMJDVacuumModelDetector
 		
 		//---------------------------------------------------------------------------
 		//Opening vacuum sentry could expose turbo pump to potentially damaging pressures.
-		if([cryoRoughingValve isOpen] && PKRG2PressureHigh){
+		if([vacSentryValve isClosed] && [cryoRoughingValve isOpen] && PKRG2PressureHigh){
 			[self addConstraintName:kTurboOnCryoRoughingOpenG4HighConstraint reason:kTurboOnCryoRoughingOpenG4HighReason toGateValve:vacSentryValve];
 		}
 		else {
