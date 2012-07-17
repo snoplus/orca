@@ -119,7 +119,7 @@ typedef struct  {
 }
 @property (nonatomic,assign) NSPoint startPt;
 @property (nonatomic,assign) NSPoint endPt;
-@property (retain) NSColor* regionColor;
+@property (nonatomic,retain) NSColor* regionColor;
 - (id) initWithDelegate:(id)aDelegate regionTag:(int)aTag startPt:(NSPoint)aStartPt endPt:(NSPoint)anEndPt;
 @end
 
@@ -199,8 +199,8 @@ typedef struct  {
 	NSMutableDictionary* constraints;
 }
 - (NSDictionary*) constraints;
-- (void) addConstraint:(NSString*)aName reason:(NSString*)aReason;
-- (void) removeConstraint:(NSString*)aName;
+- (void) addConstraintName:(NSString*)aName reason:(NSString*)aReason;
+- (void) removeConstraintName:(NSString*)aName;
 @property (nonatomic,copy) NSString* statusLabel;
 @end
 
@@ -234,7 +234,7 @@ typedef struct  {
 	int state;
 	NSMutableDictionary* constraints;
 }
-@property (assign) int state;
+@property (nonatomic,assign) int state;
 @property (nonatomic,copy)   NSString* controlObj;
 @property (nonatomic,assign) int controlChannel;
 @property (nonatomic,copy)   NSString* label;
@@ -254,8 +254,8 @@ typedef struct  {
 - (void) clearAlarmState;
 - (void) timeout;
 - (NSDictionary*) constraints;
-- (void) addConstraint:(NSString*)aName reason:(NSString*)aReason;
-- (void) removeConstraint:(NSString*)aName;
+- (void) addConstraintName:(NSString*)aName reason:(NSString*)aReason;
+- (void) removeConstraintName:(NSString*)aName;
 - (BOOL) isClosed;
 - (BOOL) isOpen;
 - (int) constraintCount;

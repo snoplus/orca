@@ -596,6 +596,7 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 {
 	NSLogError(@"command timeout",@"TGP256A",nil);
 	[self setLastRequest:nil];
+    [self setIsValid:YES];
 	[cmdQueue removeAllObjects];
 	[self processOneCommandFromQueue];	 //do the next command in the queue
 }
@@ -620,6 +621,7 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 
 - (void) process_response:(NSString*)theResponse
 {
+    [self setIsValid:YES];
 	if([lastRequest hasPrefix:@"PR"]){
 		int channel = [[lastRequest substringWithRange:NSMakeRange(2,1)] intValue]-1;
 		if(channel>=0 && channel<6){

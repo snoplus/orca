@@ -243,14 +243,14 @@ NSString* ORVacuumConstraintChanged = @"ORVacuumConstraintChanged";
 	return constraints;
 }
 
-- (void) addConstraint:(NSString*)aName reason:(NSString*)aReason
+- (void) addConstraintName:(NSString*)aName reason:(NSString*)aReason
 {
 	if(!constraints)constraints = [[NSMutableDictionary dictionary] retain];
 	[constraints setObject:aReason forKey:aName];
 	[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORVacuumConstraintChanged object:dataSource];
 }
 
-- (void) removeConstraint:(NSString*)aName
+- (void) removeConstraintName:(NSString*)aName
 {
 	[constraints removeObjectForKey:aName];
 	[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORVacuumConstraintChanged object:dataSource];
@@ -674,14 +674,14 @@ NSString* ORVacuumConstraintChanged = @"ORVacuumConstraintChanged";
 	return constraints;
 }
 
-- (void) addConstraint:(NSString*)aName reason:(NSString*)aReason
+- (void) addConstraintName:(NSString*)aName reason:(NSString*)aReason
 {
 	if(!constraints)constraints = [[NSMutableDictionary dictionary] retain];
 	[constraints setObject:aReason forKey:aName];
 	[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORVacuumConstraintChanged object:dataSource];
 }
 
-- (void) removeConstraint:(NSString*)aName
+- (void) removeConstraintName:(NSString*)aName
 {
 	[constraints removeObjectForKey:aName];
 	[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORVacuumConstraintChanged object:dataSource];

@@ -38,13 +38,10 @@
 - (void) colorRegionsConnectedTo:(int)aRegion withColor:(NSColor*)aColor;
 - (void) recursizelyColorRegionsConnectedTo:(int)aRegion withColor:(NSColor*)aColor;
 - (void) resetVisitationFlag;
-NSString* ORMJDVacuumModelShouldUnbiasDetectorChanged = @"ORMJDVacuumModelShouldUnbiasDetectorChanged";
-NSString* ORMJDVacuumModelOkToBiasDetectorChanged = @"ORMJDVacuumModelOkToBiasDetectorChanged";
-NSString* ORMJDVacuumModelDetectorsBiasedChanged = @"ORMJDVacuumModelDetectorsBiasedChanged";
-- (void) addConstraint:(NSString*)aName reason:(NSString*)aReason toGateValve:(id)aGateValve;
-- (void) removeConstraint:(NSString*)aName fromGateValve:(id)aGateValve;
+- (void) addConstraintName:(NSString*)aName reason:(NSString*)aReason toGateValve:(id)aGateValve;
+- (void) removeConstraintName:(NSString*)aName fromGateValve:(id)aGateValve;
 
-- (void) onAllGateValvesRemoveConstraint:(NSString*)aConstraintName;
+- (void) onAllGateValvesremoveConstraintName:(NSString*)aConstraintName;
 - (void) checkAllConstraints;
 - (void) deferredConstraintCheck;
 - (void) checkTurboRelatedConstraints:(ORTM700Model*) turbo;
@@ -66,9 +63,12 @@ NSString* ORMJDVacuumModelDetectorsBiasedChanged = @"ORMJDVacuumModelDetectorsBi
 @end
 
 
-NSString* ORMJDVacuumModelVetoMaskChanged = @"ORMJDVacuumModelVetoMaskChanged";
-NSString* ORMJDVacuumModelShowGridChanged = @"ORMJDVacuumModelShowGridChanged";
-NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
+NSString* ORMJDVacuumModelVetoMaskChanged           = @"ORMJDVacuumModelVetoMaskChanged";
+NSString* ORMJDVacuumModelShowGridChanged           = @"ORMJDVacuumModelShowGridChanged";
+NSString* ORMJCVacuumLock                           = @"ORMJCVacuumLock";
+NSString* ORMJDVacuumModelShouldUnbiasDetectorChanged = @"ORMJDVacuumModelShouldUnbiasDetectorChanged";
+NSString* ORMJDVacuumModelOkToBiasDetectorChanged   = @"ORMJDVacuumModelOkToBiasDetectorChanged";
+NSString* ORMJDVacuumModelDetectorsBiasedChanged    = @"ORMJDVacuumModelDetectorsBiasedChanged";
 
 @implementation ORMJDVacuumModel
 
@@ -1071,10 +1071,10 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 	return [c1 isEqual:c2];
 }
 			 
-- (void) onAllGateValvesRemoveConstraint:(NSString*)aConstraintName
+- (void) onAllGateValvesremoveConstraintName:(NSString*)aConstraintName
 {
 	for(ORVacuumGateValve* aGateValve in [self gateValves]){
-		[self removeConstraint:aConstraintName fromGateValve:aGateValve];
+		[self removeConstraintName:aConstraintName fromGateValve:aGateValve];
 	}
 }
 
@@ -1112,23 +1112,23 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 				BOOL side2High			= [self region:side2 valueHigherThan:1.0E-1];
 				
 				if([self regionColor:side1 sameAsRegion:side2]){
-					[self removeConstraint:kTurboOnPressureConstraint fromGateValve:aGateValve];
+					[self removeConstraintName:kTurboOnPressureConstraint fromGateValve:aGateValve];
 				}
 				else if([self regionColor:side1 sameAsRegion:kRegionAboveTurbo] && side2High ){
-					[self addConstraint:kTurboOnPressureConstraint reason:kTurboOnPressureConstraintReason toGateValve:aGateValve];
+					[self addConstraintName:kTurboOnPressureConstraint reason:kTurboOnPressureConstraintReason toGateValve:aGateValve];
 				}
 				else if([self regionColor:side1 sameAsRegion:kRegionBelowTurbo] && side2High){
-					[self addConstraint:kTurboOnPressureConstraint reason:kTurboOnPressureConstraintReason toGateValve:aGateValve];
+					[self addConstraintName:kTurboOnPressureConstraint reason:kTurboOnPressureConstraintReason toGateValve:aGateValve];
 				}
 				else if([self regionColor:side2 sameAsRegion:kRegionAboveTurbo] && side1High){
-					[self addConstraint:kTurboOnPressureConstraint reason:kTurboOnPressureConstraintReason toGateValve:aGateValve];
+					[self addConstraintName:kTurboOnPressureConstraint reason:kTurboOnPressureConstraintReason toGateValve:aGateValve];
 				}
 				else if([self regionColor:side2 sameAsRegion:kRegionBelowTurbo] && side1High){
-					[self addConstraint:kTurboOnPressureConstraint reason:kTurboOnPressureConstraintReason toGateValve:aGateValve];
+					[self addConstraintName:kTurboOnPressureConstraint reason:kTurboOnPressureConstraintReason toGateValve:aGateValve];
 				}
-				else [self removeConstraint:kTurboOnPressureConstraint  fromGateValve:aGateValve];
+				else [self removeConstraintName:kTurboOnPressureConstraint  fromGateValve:aGateValve];
 			}
-			else [self removeConstraint:kTurboOnPressureConstraint  fromGateValve:aGateValve];
+			else [self removeConstraintName:kTurboOnPressureConstraint  fromGateValve:aGateValve];
 		}
 		
 		//---------------------------------------------------------------------------
@@ -1140,36 +1140,36 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 		//---------------------------------------------------------------------------
 		//Opening cryopump roughing valve could expose turbo pump to potentially damaging pressures.
 		if([vacSentryValve isOpen] && [cryoRoughingValve isClosed]){
-			[self addConstraint:kTurboOnSentryOpenConstraint reason:kTurboOnSentryOpenConstraintReason toGateValve:cryoRoughingValve];
+			[self addConstraintName:kTurboOnSentryOpenConstraint reason:kTurboOnSentryOpenConstraintReason toGateValve:cryoRoughingValve];
 		}
 		else {
-			[self removeConstraint:kTurboOnSentryOpenConstraint fromGateValve:cryoRoughingValve];
+			[self removeConstraintName:kTurboOnSentryOpenConstraint fromGateValve:cryoRoughingValve];
 		}
 		
 		//---------------------------------------------------------------------------
 		//Opening vacuum sentry could expose turbo pump to potentially damaging pressures.
 		if([cryoRoughingValve isOpen] && PKRG2PressureHigh){
-			[self addConstraint:kTurboOnCryoRoughingOpenG4HighConstraint reason:kTurboOnCryoRoughingOpenG4HighReason toGateValve:vacSentryValve];
+			[self addConstraintName:kTurboOnCryoRoughingOpenG4HighConstraint reason:kTurboOnCryoRoughingOpenG4HighReason toGateValve:vacSentryValve];
 		}
 		else {
-			[self removeConstraint:kTurboOnCryoRoughingOpenG4HighConstraint fromGateValve:vacSentryValve];
+			[self removeConstraintName:kTurboOnCryoRoughingOpenG4HighConstraint fromGateValve:vacSentryValve];
 		}
 	}
 	else {
-		[self onAllGateValvesRemoveConstraint: kTurboOnPressureConstraint];
+		[self onAllGateValvesremoveConstraintName: kTurboOnPressureConstraint];
 	}	
 }
 
-- (void) addConstraint:(NSString*)aName reason:(NSString*)aReason toGateValve:(id)aGateValve
+- (void) addConstraintName:(NSString*)aName reason:(NSString*)aReason toGateValve:(id)aGateValve
 {
-	[aGateValve addConstraint:aName reason:aReason];
+	[aGateValve addConstraintName:aName reason:aReason];
 	if([aGateValve partTag] == 8)		[[self findCryoPump] addPurgeConstraint:aName reason:aReason];
 	else if([aGateValve partTag] == 5)	[[self findCryoPump] addRoughingConstraint:aName reason:aReason];
 }
 
-- (void) removeConstraint:(NSString*)aName fromGateValve:(id)aGateValve
+- (void) removeConstraintName:(NSString*)aName fromGateValve:(id)aGateValve
 {
-	[aGateValve removeConstraint:aName];
+	[aGateValve removeConstraintName:aName];
 	if([aGateValve partTag] == 8)		[[self findCryoPump] removePurgeConstraint:aName];
 	else if([aGateValve partTag] == 5)	[[self findCryoPump] removeRoughingConstraint:aName];
 }
@@ -1189,37 +1189,37 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 	//---------------------------------------------------------------------------
 	//Opening purge or roughing valve could cause excessive gas condensation on cryo pump.
 	if(cryoPumpEnabled){
-		if([cryoRoughingValve isClosed]) [self addConstraint:kCryoCondensationConstraint reason:kCryoCondensationReason toGateValve:cryoRoughingValve];
-		else							 [self removeConstraint:kCryoCondensationConstraint fromGateValve:cryoRoughingValve];
+		if([cryoRoughingValve isClosed]) [self addConstraintName:kCryoCondensationConstraint reason:kCryoCondensationReason toGateValve:cryoRoughingValve];
+		else							 [self removeConstraintName:kCryoCondensationConstraint fromGateValve:cryoRoughingValve];
 		
-		if([cryoPurgeValve isClosed])    [self	addConstraint:kCryoCondensationConstraint reason:kCryoCondensationReason toGateValve:cryoPurgeValve];
-		else							 [self  removeConstraint:kCryoCondensationConstraint fromGateValve:cryoPurgeValve];
+		if([cryoPurgeValve isClosed])    [self	addConstraintName:kCryoCondensationConstraint reason:kCryoCondensationReason toGateValve:cryoPurgeValve];
+		else							 [self  removeConstraintName:kCryoCondensationConstraint fromGateValve:cryoPurgeValve];
 	}
 	else {
-		[self removeConstraint:kCryoCondensationConstraint fromGateValve:cryoPurgeValve];
-		[self removeConstraint:kCryoCondensationConstraint fromGateValve:cryoRoughingValve];
+		[self removeConstraintName:kCryoCondensationConstraint fromGateValve:cryoPurgeValve];
+		[self removeConstraintName:kCryoCondensationConstraint fromGateValve:cryoRoughingValve];
 		[cryoPump removePumpOnConstraint:kRgaOnOpenToCryoConstraint];
-		[cryoRegionObj removeConstraint:kRgaOnOpenToCryoConstraint];
+		[cryoRegionObj removeConstraintName:kRgaOnOpenToCryoConstraint];
 	}
 	
 	if([cryoRoughingValve isOpen] && !cryoPumpEnabled){
 		[cryoPump addPumpOnConstraint:kRoughingValveOpenCryoConstraint reason:kRoughingValveOpenCryoReason];
-		[cryoRegionObj addConstraint:kRoughingValveOpenCryoConstraint reason:kRoughingValveOpenCryoReason];
+		[cryoRegionObj addConstraintName:kRoughingValveOpenCryoConstraint reason:kRoughingValveOpenCryoReason];
 	}
 	else {
 		[cryoPump removePumpOnConstraint:kRoughingValveOpenCryoConstraint];
-		[cryoRegionObj removeConstraint:kRoughingValveOpenCryoConstraint];
+		[cryoRegionObj removeConstraintName:kRoughingValveOpenCryoConstraint];
 	}
 
 	//---------------------------------------------------------------------------
 	//Turning Cryopump OFF will expose system to cryo pump evaporation.
 	if([CF6Valve isOpen] && cryoPumpEnabled){
 		[cryoPump addPumpOffConstraint:k6CFValveOpenCryoConstraint reason:k6CFValveOpenCryoReason];
-		[cryoRegionObj addConstraint:k6CFValveOpenCryoConstraint reason:k6CFValveOpenCryoReason];
+		[cryoRegionObj addConstraintName:k6CFValveOpenCryoConstraint reason:k6CFValveOpenCryoReason];
 	}
 	else {
 		[cryoPump removePumpOffConstraint:k6CFValveOpenCryoConstraint];
-		[cryoRegionObj removeConstraint:k6CFValveOpenCryoConstraint];
+		[cryoRegionObj removeConstraintName:k6CFValveOpenCryoConstraint];
 	}
 }
 
@@ -1246,49 +1246,49 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 				BOOL side2High			= [self region:side2 valueHigherThan:1.0E-5];
 				
 				if([self regionColor:side1 sameAsRegion:side2]){
-					[aGateValve removeConstraint:kRgaOnConstraint];
+					[aGateValve removeConstraintName:kRgaOnConstraint];
 				}
 				else if([self regionColor:side1 sameAsRegion:kRegionRGA] && side2High ){
-					[self addConstraint:kRgaOnConstraint reason:kRgaConstraintReason toGateValve:aGateValve];
+					[self addConstraintName:kRgaOnConstraint reason:kRgaConstraintReason toGateValve:aGateValve];
 				}
 				else if([self regionColor:side2 sameAsRegion:kRegionRGA] && side1High){
-					[self addConstraint:kRgaOnConstraint reason:kRgaConstraintReason toGateValve:aGateValve];
+					[self addConstraintName:kRgaOnConstraint reason:kRgaConstraintReason toGateValve:aGateValve];
 				}
-				else [self removeConstraint:kRgaOnConstraint fromGateValve:aGateValve];
+				else [self removeConstraintName:kRgaOnConstraint fromGateValve:aGateValve];
 			}
-			else [self removeConstraint:kRgaOnConstraint fromGateValve:aGateValve];
+			else [self removeConstraintName:kRgaOnConstraint fromGateValve:aGateValve];
 		}
 		
 		//---------------------------------------------------------------------------
 		//Turning cryopump OFF will expose RGA to potentially damaging pressures
 		if([self regionColor:kRegionRGA sameAsRegion:kRegionCryoPump]){
 			[cryoPump addPumpOffConstraint:kRgaOnOpenToCryoConstraint reason:kRgaOnOpenToCryoReason];
-			[cryoRegionObj addConstraint:kRgaOnOpenToCryoConstraint reason:kRgaOnOpenToCryoReason];
+			[cryoRegionObj addConstraintName:kRgaOnOpenToCryoConstraint reason:kRgaOnOpenToCryoReason];
 		}
 		else {
 			[cryoPump removePumpOffConstraint:kRgaOnOpenToCryoConstraint];
-			[cryoRegionObj removeConstraint:kRgaOnOpenToCryoConstraint];
+			[cryoRegionObj removeConstraintName:kRgaOnOpenToCryoConstraint];
 		}
 		
 		//---------------------------------------------------------------------------
 		//Turning Turbopump OFF would expose RGA filament to potentially damaging pressures
 		if([self regionColor:kRegionRGA sameAsRegion:kRegionAboveTurbo]){
 			[turboPump addPumpOffConstraint:kRgaOnOpenToTurboConstraint reason:kRgaOnOpenToTurboReason];
-			[turboRegionObj addConstraint:kRgaOnOpenToTurboConstraint reason:kRgaOnOpenToTurboReason];
+			[turboRegionObj addConstraintName:kRgaOnOpenToTurboConstraint reason:kRgaOnOpenToTurboReason];
 		}
 		else {
 			[turboPump removePumpOffConstraint:kRgaOnOpenToTurboConstraint];
-			[turboRegionObj removeConstraint:kRgaOnOpenToTurboConstraint];
+			[turboRegionObj removeConstraintName:kRgaOnOpenToTurboConstraint];
 		}
 		//---------------------------------------------------------------------------
 	}
 	else {
-		[self onAllGateValvesRemoveConstraint: kRgaOnConstraint];
+		[self onAllGateValvesremoveConstraintName: kRgaOnConstraint];
 		[cryoPump removePumpOffConstraint:kRgaOnOpenToCryoConstraint];
-		[cryoRegionObj removeConstraint:kRgaOnOpenToCryoConstraint];
+		[cryoRegionObj removeConstraintName:kRgaOnOpenToCryoConstraint];
 		
 		[turboPump removePumpOffConstraint:kRgaOnOpenToTurboConstraint];
-		[turboRegionObj removeConstraint:kRgaOnOpenToTurboConstraint];
+		[turboRegionObj removeConstraintName:kRgaOnOpenToTurboConstraint];
 	}	
 }
 
@@ -1307,11 +1307,11 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 	//---------------------------------------------------------------------------
 	//Turning Cryopump ON could cause excessive gas condensation on cryo pump
 	if(!cryoIsOn &&  cryoPressureIsHigh){
-		[cryoRegionObj addConstraint:kPressureTooHighForCryoConstraint reason:kPressureTooHighForCryoReason];
+		[cryoRegionObj addConstraintName:kPressureTooHighForCryoConstraint reason:kPressureTooHighForCryoReason];
 		[cryopump addPumpOnConstraint:kPressureTooHighForCryoConstraint reason:kPressureTooHighForCryoReason];
 	}
 	else {
-		[cryoRegionObj removeConstraint:kPressureTooHighForCryoConstraint];
+		[cryoRegionObj removeConstraintName:kPressureTooHighForCryoConstraint];
 		[cryopump removePumpOnConstraint:kPressureTooHighForCryoConstraint];
 	}
 	
@@ -1320,47 +1320,49 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 	//PKR G2>5E-6: Filament could be damaged.
 	if([rga ionizerFilamentCurrentRB]==0 && [self region:kRegionRGA valueHigherThan:5E-6]){
 		[rga addFilamentConstraint:kRgaFilamentConstraint reason:kRgaFilamentReason];
-		[rgaRegionObj addConstraint:kRgaFilamentConstraint reason:kRgaFilamentReason];
+		[rgaRegionObj addConstraintName:kRgaFilamentConstraint reason:kRgaFilamentReason];
 	}
 	else {
 		[rga removeFilamentConstraint:kRgaFilamentConstraint];
-		[rgaRegionObj removeConstraint:kRgaFilamentConstraint];
+		[rgaRegionObj removeConstraintName:kRgaFilamentConstraint];
 	}
 
 	//---------------------------------------------------------------------------
 	//PKR G2>5E-7: CEM could be damaged.
 	if([rga electronMultiOption] && [rga elecMultHVBiasRB]==0 && [self region:kRegionRGA valueHigherThan:5E-7]){
 		[rga addCEMConstraint:kRgaCEMConstraint reason:kRgaCEMReason];
-		[rgaRegionObj addConstraint:kRgaCEMConstraint reason:kRgaCEMReason];
+		[rgaRegionObj addConstraintName:kRgaCEMConstraint reason:kRgaCEMReason];
 	}
 	else {
 		[rga removeCEMConstraint:kRgaCEMConstraint];
-		[rgaRegionObj removeConstraint:kRgaCEMConstraint];
+		[rgaRegionObj removeConstraintName:kRgaCEMConstraint];
 	}
 	
 	//---------------------------------------------------------------------------
 	//Detector Biased: Detector must be protected from regions with pressure higher than 1E-5
-	for(ORVacuumGateValve* aGateValve in [self gateValves]){
-		//check kRgaOnConstraint
-		if([aGateValve isClosed]){
-			int side1				= [aGateValve connectingRegion1];
-			int side2				= [aGateValve connectingRegion2];
-			BOOL side1High			= [self region:side1 valueHigherThan:1.0E-5];
-			BOOL side2High			= [self region:side2 valueHigherThan:1.0E-5];
-			
-			if([self regionColor:side1 sameAsRegion:side2]){
-				[aGateValve removeConstraint:kDetectorBiasedConstraint];
-			}
-			else if([self regionColor:side1 sameAsRegion:kRegionCryostat] && side2High ){
-				[self addConstraint:kDetectorBiasedConstraint reason:kRgaConstraintReason toGateValve:aGateValve];
-			}
-			else if([self regionColor:side2 sameAsRegion:kRegionCryostat] && side1High){
-				[self addConstraint:kDetectorBiasedConstraint reason:kRgaConstraintReason toGateValve:aGateValve];
-			}
-			else [self removeConstraint:kDetectorBiasedConstraint fromGateValve:aGateValve];
-		}
-		else [self removeConstraint:kDetectorBiasedConstraint fromGateValve:aGateValve];
-	}
+    if([self detectorsBiased]){
+        for(ORVacuumGateValve* aGateValve in [self gateValves]){
+            if([aGateValve isClosed]){
+                int side1				= [aGateValve connectingRegion1];
+                int side2				= [aGateValve connectingRegion2];
+                BOOL side1High			= [self region:side1 valueHigherThan:1.0E-5];
+                BOOL side2High			= [self region:side2 valueHigherThan:1.0E-5];
+                
+                if([self regionColor:side1 sameAsRegion:side2]){
+                    [aGateValve removeConstraintName:kDetectorBiasedConstraint];
+                }
+                else if([self regionColor:side1 sameAsRegion:kRegionCryostat] && side2High ){
+                    [self addConstraintName:kDetectorBiasedConstraint reason:kDetectorBiasedReason toGateValve:aGateValve];
+                }
+                else if([self regionColor:side2 sameAsRegion:kRegionCryostat] && side1High){
+                    [self addConstraintName:kDetectorBiasedConstraint reason:kDetectorBiasedReason toGateValve:aGateValve];
+                }
+                else [self removeConstraintName:kDetectorBiasedConstraint fromGateValve:aGateValve];
+            }
+            else [self removeConstraintName:kDetectorBiasedConstraint fromGateValve:aGateValve];
+        }
+    }
+    else [self onAllGateValvesremoveConstraintName:kDetectorBiasedConstraint];
 	
 	//---------------------------------------------------------------------------
 	//PKR G3>1E-5: Should unbias, PKR G3>1E-6: Forbid biasing
