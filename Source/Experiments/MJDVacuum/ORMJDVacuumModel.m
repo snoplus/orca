@@ -213,7 +213,10 @@ NSString* ORMJDVacuumModelDetectorsBiasedChanged    = @"ORMJDVacuumModelDetector
 - (void) turboChanged:(NSNotification*)aNote
 {
 	ORTM700Model* turboPump = [aNote object];
-	
+    ORVacuumStatusLabel* turboRegionObj = [statusDictionary objectForKey:[NSNumber numberWithInt:kRegionAboveTurbo]];
+	[turboRegionObj setIsValid:[turboPump isValid]];
+	[turboRegionObj setStatusLabel:[turboPump auxStatusString:0]];	
+
 	[self checkTurboRelatedConstraints:turboPump];
 }
 
