@@ -20,6 +20,7 @@
 
 @class ORCompositePlotView;
 @class BiStateView;
+@class ORSerialPortController;
 
 @interface ORCP8CryopumpController : OrcaObjectController
 {
@@ -65,10 +66,7 @@
 	IBOutlet NSTextField*	dutyCycleField;
 	IBOutlet NSButton*		shipTemperaturesButton;
     IBOutlet NSButton*		initHardwareButton;
-    IBOutlet NSTextField*   portStateField;
-    IBOutlet NSPopUpButton* portListPopup;
     IBOutlet NSPopUpButton* pollTimePopup;
-    IBOutlet NSButton*      openPortButton;
     IBOutlet NSButton*      pollNowButton;
 	IBOutlet ORCompositePlotView*    plotter0;
     IBOutlet NSTextField*   cmdErrorField;
@@ -107,6 +105,14 @@
 	IBOutlet BiStateView*   purgeOpenBiStateView;
 	IBOutlet BiStateView*   thermocoupleOnBiStateView;
 	IBOutlet BiStateView*   powerFailureOccurredBiStateView;
+    IBOutlet ORSerialPortController* serialPortController;
+	
+	IBOutlet NSImageView*   powerConstraintImage;
+	IBOutlet NSImageView*   purgeConstraintImage;
+	IBOutlet NSImageView*   roughingConstraintImage;
+	IBOutlet NSPanel*		constraintPanel;
+	IBOutlet NSTextField*   constraintTitleField;
+	IBOutlet NSTextView*    constraintView;
 
 	NSSize					basicOpsSize;
 	NSSize					expertOpsSize;
@@ -124,6 +130,7 @@
 - (void) updateWindow;
 
 #pragma mark ***Interface Management
+- (void) constraintsChanged:(NSNotification*)aNote;
 - (void) firstStageControlMethodRBChanged:(NSNotification*)aNote;
 - (void) wasPowerFailureChanged:(NSNotification*)aNote;
 - (void) cmdErrorChanged:(NSNotification*)aNote;
@@ -169,16 +176,17 @@
 - (void) scaleAction:(NSNotification*)aNote;
 - (void) shipTemperaturesChanged:(NSNotification*)aNote;
 - (void) lockChanged:(NSNotification*)aNote;
-- (void) portNameChanged:(NSNotification*)aNote;
-- (void) portStateChanged:(NSNotification*)aNote;
 - (void) pollTimeChanged:(NSNotification*)aNote;
 - (void) miscAttributesChanged:(NSNotification*)aNote;
 - (void) scaleAction:(NSNotification*)aNote;
 - (void) tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;
 - (void) windowDidResize:(NSNotification *)aNote;
 - (void) updateButtons;
+- (BOOL) portLocked;
 
 #pragma mark ***Actions
+- (void) beginConstraintPanel:(NSDictionary*)constraints actionTitle:(NSString*)aTitle;
+- (IBAction) closeConstraintPanel:(id)sender;
 - (IBAction) secondStageTempControlAction:(id)sender;
 - (IBAction) standbyModeAction:(id)sender;
 - (IBAction) repurgeTimeAction:(id)sender;
@@ -200,8 +208,6 @@
 - (IBAction) initHardwareAction:(id)sender;
 - (IBAction) shipTemperaturesAction:(id)sender;
 - (IBAction) lockAction:(id) sender;
-- (IBAction) portListAction:(id) sender;
-- (IBAction) openPortAction:(id)sender;
 - (IBAction) pollTimeAction:(id)sender;
 - (IBAction) pollNowAction:(id)sender;
 - (IBAction) roughingInterlockAction:(id)sender;

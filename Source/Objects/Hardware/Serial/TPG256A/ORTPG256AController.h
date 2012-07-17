@@ -20,6 +20,7 @@
 #pragma mark ***Imported Files
 
 @class ORCompositeTimeLineView;
+@class ORSerialPortController;
 
 @interface ORTPG256AController : OrcaObjectController
 {
@@ -30,15 +31,13 @@
 	IBOutlet NSPopUpButton*	pressureScalePU;
 	IBOutlet NSButton*		shipPressuresButton;
     IBOutlet NSButton*      lockButton;
-    IBOutlet NSTextField*   portStateField;
-    IBOutlet NSPopUpButton* portListPopup;
     IBOutlet NSPopUpButton* pollTimePopup;
-    IBOutlet NSButton*      openPortButton;
     IBOutlet NSButton*      readPressuresButton;
 	IBOutlet ORCompositeTimeLineView*   plotter0;
 	IBOutlet NSTableView*	pressureTableView;
 	IBOutlet NSTableView*	processLimitTableView;
     IBOutlet NSButton*		yAxisLogCB;
+    IBOutlet ORSerialPortController* serialPortController;
 
 	NSSize					basicOpsSize;
 	NSSize					plotSize;
@@ -64,22 +63,19 @@
 - (void) scaleAction:(NSNotification*)aNotification;
 - (void) shipPressuresChanged:(NSNotification*)aNotification;
 - (void) lockChanged:(NSNotification*)aNotification;
-- (void) portNameChanged:(NSNotification*)aNotification;
-- (void) portStateChanged:(NSNotification*)aNotification;
 - (void) pressureChanged:(NSNotification*)aNotification;
 - (void) pollTimeChanged:(NSNotification*)aNotification;
 - (void) miscAttributesChanged:(NSNotification*)aNotification;
 - (NSString*) pressureValuesForIndex:(int)index;
 - (void) tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;
 - (void) windowDidResize:(NSNotification *)aNote;
+- (BOOL) portLocked;
 
 #pragma mark ***Actions
 - (IBAction) unitsAction:(id)sender;
 - (IBAction) pressureScaleAction:(id)sender;
 - (IBAction) shipPressuresAction:(id)sender;
 - (IBAction) lockAction:(id) sender;
-- (IBAction) portListAction:(id) sender;
-- (IBAction) openPortAction:(id)sender;
 - (IBAction) readPressuresAction:(id)sender;
 - (IBAction) pollTimeAction:(id)sender;
 

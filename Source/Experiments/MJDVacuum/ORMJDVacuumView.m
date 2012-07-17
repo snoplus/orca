@@ -93,6 +93,8 @@
 
 - (void) resetCursorRects
 {
+	[super resetCursorRects];
+	/*
 	NSArray* dynamicLabels = [[delegate model] dynamicLabels];
 	for(ORVacuumDynamicLabel* aDynamicLabel in dynamicLabels){	
 		if([aDynamicLabel.dialogIdentifier length]){
@@ -105,7 +107,7 @@
 			[self addCursorRect:aStaticLabel.bounds cursor:[NSCursor pointingHandCursor]];
 		}
 	}
-	
+	*/
 }
 
 - (void) updateButtons
@@ -143,25 +145,28 @@
 - (void) mouseDown:(NSEvent*) anEvent
 {
 	if ([anEvent clickCount] > 1) {
-		BOOL handledEvent = NO;
 		NSPoint localPoint = [self convertPoint:[anEvent locationInWindow] fromView:nil];
-		NSArray* dynamicLabels = [[delegate model] dynamicLabels];
-		for(ORVacuumDynamicLabel* aDynamicLabel in dynamicLabels){	
-			if(NSPointInRect(localPoint, [aDynamicLabel bounds])){
-				handledEvent = YES;
-				[aDynamicLabel openDialog];
-				break;
+		NSArray* valueLabels = [[delegate model] valueLabels];
+		for(ORVacuumValueLabel* aLabel in valueLabels){	
+			if(NSPointInRect(localPoint, [aLabel bounds])){
+				int component = [aLabel component];
+				if(component >=0 && component<=4){
+					[[delegate model] openDialogForComponent:component];
+				}
+				return;
 			}
 		} 
-		if(!handledEvent){
-			NSArray* staticLabels = [[delegate model] staticLabels];
-			for(ORVacuumStaticLabel* aStaticLabel in staticLabels){	
-				if(NSPointInRect(localPoint, [aStaticLabel bounds])){
-					[aStaticLabel openDialog];
-					break;
+		NSArray* statusLabels = [[delegate model] statusLabels];
+		for(ORVacuumStatusLabel* aLabel in statusLabels){	
+			if(NSPointInRect(localPoint, [aLabel bounds])){
+				int component = [aLabel component];
+				if(component >=0 && component<=4){
+					[[delegate model] openDialogForComponent:component];
 				}
-			} 
-		}
+				return;
+			}
+		} 
+		
 	}
 }
 

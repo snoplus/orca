@@ -19,8 +19,8 @@
 
 #pragma mark •••Imported Files
 #import "ORAdcProcessing.h"
+#import "ORSerialPortModel.h"
 
-@class ORSerialPort;
 @class ORTimeRate;
 @class ORSafeQueue;
 
@@ -34,12 +34,9 @@
 
 #define kTPG256ARecordLength				14
 
-@interface ORTPG256AModel : OrcaObject <ORAdcProcessing>
+@interface ORTPG256AModel : ORSerialPortModel <ORAdcProcessing>
 {
     @private
-        NSString*       portName;
-        BOOL            portWasOpen;
-        ORSerialPort*   serialPort;
         unsigned long	dataId;
 		NSString*		lastRequest;
 		ORSafeQueue*	cmdQueue;
@@ -58,16 +55,18 @@
 		float			pressureScaleValue;
 		int				portDataState;
 		int				units;
+		BOOL			isValid;
 }
 
 #pragma mark •••Initialization
 - (id)   init;
 - (void) dealloc;
 
-- (void) registerNotificationObservers;
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark •••Accessors
+- (BOOL) isValid;
+- (void) setIsValid:(BOOL)aIsValid;
 - (int) units;
 - (void) setUnits:(int)aUnits;
 - (int) measurementState:(int)index;
@@ -80,12 +79,6 @@
 - (void) setShipPressures:(BOOL)aShipPressures;
 - (int)  pollTime;
 - (void) setPollTime:(int)aPollTime;
-- (ORSerialPort*) serialPort;
-- (void) setSerialPort:(ORSerialPort*)aSerialPort;
-- (BOOL) portWasOpen;
-- (void) setPortWasOpen:(BOOL)aPortWasOpen;
-- (NSString*) portName;
-- (void) setPortName:(NSString*)aPortName;
 - (NSString*) lastRequest;
 - (void) setLastRequest:(NSString*)aRequest;
 - (void) openPort:(BOOL)state;
@@ -133,6 +126,7 @@
 - (void) setProcessOutput:(int)channel value:(int)value;
 @end
 
+extern NSString* ORTPG256AModelIsValidChanged;
 extern NSString* ORTPG256AModelUnitsChanged;
 extern NSString* ORTPG256AModelLowLimitChanged;
 extern NSString* ORTPG256AModelLowAlarmChanged;
@@ -141,8 +135,5 @@ extern NSString* ORTPG256AModelHighAlarmChanged;
 extern NSString* ORTPG256AModelPressureScaleChanged;
 extern NSString* ORTPG256AModelShipPressuresChanged;
 extern NSString* ORTPG256AModelPollTimeChanged;
-extern NSString* ORTPG256AModelSerialPortChanged;
 extern NSString* ORTPG256ALock;
-extern NSString* ORTPG256AModelPortNameChanged;
-extern NSString* ORTPG256AModelPortStateChanged;
 extern NSString* ORTPG256APressureChanged;

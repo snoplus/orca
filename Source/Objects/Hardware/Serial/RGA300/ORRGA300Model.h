@@ -132,13 +132,18 @@
 		NSMutableArray* amus;
 		int     currentAmuIndex;
         float   sensitivityFactor;
+		BOOL	isValid;
+		NSMutableDictionary* filamentConstraints;
+		NSMutableDictionary* cemConstraints;
 }
 
 #pragma mark •••Initialization
 - (void) dealloc;
 
 #pragma mark •••Accessors
-- (NSString*) auxStatusString;
+- (BOOL) isValid;
+- (void) setIsValid:(BOOL)aIsValid;
+- (NSString*) auxStatusString:(int)aChannel;
 - (float) sensitivityFactor;
 - (void) setSensitivityFactor:(float)aSensitivityFactor;
 - (int)		currentAmuIndex;
@@ -157,6 +162,7 @@
 - (int)		ionizerIonEnergyRB;
 - (int)		ionizerElectronEnergyRB;
 - (float)	ionizerFilamentCurrentRB;
+- (BOOL)	filamentIsOn;
 - (float)	elecMultGain;
 - (void)	setElecMultGain:(float)aElecMultGain;
 - (BOOL)	electronMultiOption;
@@ -260,11 +266,20 @@
 - (void) encodeWithCoder:(NSCoder*)encoder;
 
 
-#pragma mark •••Port Methods
+#pragma mark •••Scan Methods
 - (int) numberPointsInScan;
 - (int) scanValueAtIndex:(int)i;
 - (int) countsInAmuTableData:(int)i;
 - (int) amuTable:(int)anAmu valueAtIndex:(int)i;
+
+#pragma mark •••Constraints
+- (void) addFilamentConstraint:(NSString*)aName reason:(NSString*)aReason;
+- (void) removeFilamentConstraint:(NSString*)aName;
+- (void) addCEMConstraint:(NSString*)aName reason:(NSString*)aReason;
+- (void) removeCEMConstraint:(NSString*)aName;
+- (NSDictionary*)filamentConstraints;
+- (NSDictionary*)cemConstraints;
+
 @end
 
 @interface ORRGA300Cmd : NSObject
@@ -281,6 +296,7 @@
 @property (nonatomic,copy) NSString* cmd;
 @end
 
+extern NSString* ORRGA300ModelIsValidChanged;
 extern NSString* ORRGA300ModelSensitivityFactorChanged;
 extern NSString* ORRGA300ModelScanDataChanged;
 extern NSString* ORRGA300ModelScanNumberChanged;
@@ -325,4 +341,5 @@ extern NSString* ORRGA300ModelCurrentAmuIndexChanged;
 extern NSString* ORRGA300Lock;
 extern NSString* ORRGA300ModelUseIonizerDefaultsChanged;
 extern NSString* ORRGA300ModelUseDetectorDefaultsChanged;
+extern NSString* ORRGA300ModelConstraintsChanged;
 

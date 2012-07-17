@@ -20,42 +20,33 @@
 #import "ORVacuumParts.h"
 #import "ORAlarm.h"
 
-NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
+NSString* ORVacuumPartChanged      = @"ORVacuumPartChanged";
+NSString* ORVacuumConstraintChanged = @"ORVacuumConstraintChanged";
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
 @implementation ORVacuumPart
-@synthesize dataSource,partTag,state,value,visited;
-- (id) initWithDelegate:(id)aDelegate partTag:(int)aTag
+@synthesize dataSource,partTag,regionTag,visited;
+- (id) initWithDelegate:(id)aDelegate partTag:(int)aTag regionTag:(int)aRegionTag
 {
 	self = [super init];
-	self.partTag = aTag;
+	self.partTag   = aTag;
+	self.regionTag = aRegionTag;
 	if([aDelegate respondsToSelector:@selector(addPart:)] && [aDelegate respondsToSelector:@selector(colorRegions)]){
 		self.dataSource = aDelegate;
-		self.state   = 0;
-		self.value   = 0.0;
 		self.visited = NO;
 		[aDelegate addPart:self];
 	}
 	return self;
 }
 
+- (void) dealloc
+{
+	[super dealloc];
+}
+
 - (void) normalize { /*do nothing subclasses must override*/ }
 - (void) draw { }
-- (void) setState:(int)aState
-{
-	if(aState != state){
-		state = aState;
-		[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORVacuumPartChanged object:dataSource];
-	}
-}
-- (void) setValue:(float)aValue
-{
-	if(fabs(aValue-value) > 1.0E-8){
-		value = aValue;
-		[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORVacuumPartChanged object:dataSource];
-	}
-	
-}
+
 
 @end
 
@@ -63,9 +54,9 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 //----------------------------------------------------------------------------------------------------
 @implementation ORVacuumPipe
 @synthesize startPt,endPt,regionColor;
-- (id) initWithDelegate:(id)aDelegate partTag:(int)aTag startPt:(NSPoint)aStartPt endPt:(NSPoint)anEndPt
+- (id) initWithDelegate:(id)aDelegate regionTag:(int)aTag startPt:(NSPoint)aStartPt endPt:(NSPoint)anEndPt
 {
-	self = [super initWithDelegate:aDelegate partTag:aTag];
+	self = [super initWithDelegate:aDelegate partTag:aTag regionTag:aTag];
 	self.startPt		 = aStartPt;
 	self.endPt			 = anEndPt;
 	self.regionColor = [NSColor lightGrayColor]; //default
@@ -92,7 +83,7 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 
 - (void) draw 
 { 
-/*	if([dataSource showGrid]){
+	if([dataSource showGrid]){
 		NSAttributedString* s = [[[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%d",partTag]
 																 attributes:[NSDictionary dictionaryWithObjectsAndKeys:
 																			 [NSColor blackColor],NSForegroundColorAttributeName,
@@ -104,7 +95,7 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 		
 		[s drawAtPoint:NSMakePoint(startPt.x + x_pos, startPt.y + y_pos)];
 	}
- */
+ 
 }
 
 @end
@@ -175,9 +166,9 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 //----------------------------------------------------------------------------------------------------
 @implementation ORVacuumCPipe
 @synthesize location;
-- (id) initWithDelegate:(id)aDelegate partTag:(int)aTag at:(NSPoint)aPoint
+- (id) initWithDelegate:(id)aDelegate regionTag:(int)aTag at:(NSPoint)aPoint
 {
-	self = [super initWithDelegate:aDelegate partTag:aTag];
+	self = [super initWithDelegate:aDelegate partTag:aTag regionTag:aTag];
 	self.location = aPoint;
 	self.regionColor = [NSColor lightGrayColor]; //default
 	return self;			
@@ -198,9 +189,9 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 //----------------------------------------------------------------------------------------------------
 @implementation ORVacuumBox
 @synthesize bounds;
-- (id) initWithDelegate:(id)aDelegate partTag:(int)aTag bounds:(NSRect)aRect
+- (id) initWithDelegate:(id)aDelegate regionTag:(int)aTag bounds:(NSRect)aRect
 {
-	self = [super initWithDelegate:aDelegate partTag:aTag];
+	self = [super initWithDelegate:aDelegate partTag:aTag regionTag:aTag];
 	self.bounds = aRect;
 	self.regionColor = [NSColor lightGrayColor]; //default
 	return self;			
@@ -221,17 +212,18 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
 @implementation ORVacuumGateValve
-@synthesize location,connectingRegion1,connectingRegion2,controlPreference,label,controlType,valveAlarm;
+@synthesize state,location,connectingRegion1,connectingRegion2,controlPreference,label,controlType,valveAlarm;
 @synthesize controlObj,controlChannel,vetoed,commandedState;
 
 - (id) initWithDelegate:(id)aDelegate partTag:(int)aTag label:(NSString*)aLabel controlType:(int)aControlType at:(NSPoint)aPoint connectingRegion1:(int)aRegion1 connectingRegion2:(int)aRegion2
 {
-	self = [super initWithDelegate:aDelegate partTag:aTag];
+	self = [super initWithDelegate:aDelegate partTag:aTag regionTag:-1];
 	self.location			= aPoint;
 	self.connectingRegion1	= aRegion1;
 	self.connectingRegion2	= aRegion2;
 	self.label				= aLabel;
 	self.controlType		= aControlType;
+	self.state				= kGVChanging;
 	firstTime = YES;
 	return self;
 }
@@ -242,7 +234,26 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 	self.label		= nil;
 	[valveAlarm clearAlarm];
 	self.valveAlarm = nil;
+	[constraints release];
 	[super dealloc];
+}
+
+- (NSDictionary*) constraints
+{
+	return constraints;
+}
+
+- (void) addConstraint:(NSString*)aName reason:(NSString*)aReason
+{
+	if(!constraints)constraints = [[NSMutableDictionary dictionary] retain];
+	[constraints setObject:aReason forKey:aName];
+	[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORVacuumConstraintChanged object:dataSource];
+}
+
+- (void) removeConstraint:(NSString*)aName
+{
+	[constraints removeObjectForKey:aName];
+	[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORVacuumConstraintChanged object:dataSource];
 }
 
 - (void) setVetoed:(BOOL)aState
@@ -320,6 +331,21 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 	[valveAlarm postAlarm];
 }
 
+- (BOOL) isClosed
+{
+	return state == kGVClosed;
+}
+
+- (BOOL) isOpen
+{
+	//assume worst case for the other states 
+	return state != kGVClosed;
+}
+- (int) constraintCount
+{
+	return [constraints count];
+}
+
 @end
 
 //----------------------------------------------------------------------------------------------------
@@ -331,7 +357,20 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 	[PIPECOLOR set];
 	[NSBezierPath fillRect:NSMakeRect(location.x-kGateValveHousingWidth/2.,location.y+kPipeRadius,kGateValveHousingWidth,2*kPipeThickness)]; //above pipe part
 	[NSBezierPath fillRect:NSMakeRect(location.x-kGateValveHousingWidth/2.,location.y-kPipeRadius-2*kPipeThickness,kGateValveHousingWidth,2*kPipeThickness)]; //below pipe part
-	[[NSColor blackColor] set];	
+	
+	if(controlPreference!=kControlNone && controlType == k2BitReadBack || controlType == k1BitReadBack){
+		if([constraints count]!=0){
+			NSImage* lockImage = [[NSImage imageNamed:@"smallLock"] copy];
+			NSSize lockSize = [lockImage size];
+			float dx = lockSize.width/2.;
+			float dy = lockSize.height+5;
+			NSPoint lockPoint;
+			if(controlPreference == kControlAbove)lockPoint = NSMakePoint(location.x-dx,location.y - kPipeRadius-kPipeThickness - dy);
+			else								  lockPoint = NSMakePoint(location.x-dx,location.y + kPipeRadius+kPipeThickness+5);
+			[lockImage compositeToPoint:lockPoint operation:NSCompositeSourceOver];
+			[lockImage release];
+		}
+	}
 	
 	int theState;
 	if(controlType == kManualOnlyShowClosed)	  theState   = kGVClosed;
@@ -388,6 +427,21 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 	[NSBezierPath fillRect:NSMakeRect(location.x-kPipeRadius - 2*kPipeThickness,location.y-kGateValveHousingWidth/2.,2*kPipeThickness,kGateValveHousingWidth)]; //left of pipe part
 	[NSBezierPath fillRect:NSMakeRect(location.x+kPipeRadius,location.y-kGateValveHousingWidth/2.,2*kPipeThickness,kGateValveHousingWidth)]; //below pipe part
 
+	if(controlPreference!=kControlNone && controlType == k2BitReadBack || controlType == k1BitReadBack){
+		if([constraints count]!=0){
+			NSImage* lockImage = [[NSImage imageNamed:@"smallLock"] copy];
+			NSSize lockSize = [lockImage size];
+			float dx = lockSize.width+5;
+			float dy = lockSize.height/2.;
+			NSPoint lockPoint;
+			if(controlPreference == kControlRight)lockPoint  = NSMakePoint(location.x-kPipeRadius-kPipeThickness-dx,location.y - dy);
+			else								  lockPoint = NSMakePoint(location.x+kPipeRadius+kPipeThickness+5,  location.y - dy);
+			[lockImage compositeToPoint:lockPoint operation:NSCompositeSourceOver];
+			[lockImage release];
+		}
+	}
+	
+	
 	int theState;
 	[[NSColor blackColor] set];	
 	if(controlType == kManualOnlyShowClosed)	  theState = kGVClosed;
@@ -437,14 +491,12 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
 @implementation ORVacuumStaticLabel
-@synthesize label,bounds,gradient,controlColor,drawBox,dialogIdentifier,displayAuxStatus;
-- (id) initWithDelegate:(id)aDelegate partTag:(int)aTag label:(NSString*)aLabel bounds:(NSRect)aRect
+@synthesize label,bounds,gradient,controlColor;
+- (id) initWithDelegate:(id)aDelegate regionTag:(int)aRegionTag label:(NSString*)aLabel bounds:(NSRect)aRect
 {
-	self = [super initWithDelegate:aDelegate partTag:aTag];
+	self = [super initWithDelegate:aDelegate partTag:aRegionTag regionTag:aRegionTag];
 	self.bounds       = aRect;
 	self.label        = aLabel;
-	self.drawBox	  = YES;
-	self.displayAuxStatus = NO;
 	self.controlColor = [NSColor colorWithCalibratedRed:.75 green:.75 blue:.75 alpha:1];
 	return self;
 }
@@ -454,9 +506,9 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 	self.label			= nil;
 	self.gradient		= nil;
 	self.controlColor	= nil;
-	self.dialogIdentifier = nil;
 	[super dealloc];
 }
+
 
 - (void) setControlColor:(NSColor*)aColor
 {
@@ -478,89 +530,43 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 
 - (void) draw 
 {
-	if(drawBox){
-		[[NSColor blackColor] set];
-		[NSBezierPath strokeRect:bounds];
-		[gradient drawInRect:bounds angle:90.];
+	[[NSColor blackColor] set];
+	[NSBezierPath strokeRect:bounds];
+	[gradient drawInRect:bounds angle:90.];
 
-		
-		if([label length]){
-			NSDictionary* attributes = [NSDictionary dictionaryWithObjectsAndKeys:
+	
+	if([label length]){
+		NSDictionary* attributes = [NSDictionary dictionaryWithObjectsAndKeys:
 										[NSColor blackColor],NSForegroundColorAttributeName,
 										[NSFont fontWithName:@"Geneva" size:10],NSFontAttributeName,
 										nil];
-			[[NSColor blackColor] set];
-			NSAttributedString* s = [[[NSAttributedString alloc] initWithString:label attributes:attributes] autorelease]; 
-			NSSize size = [s size];   
-			float x_pos = (bounds.size.width - size.width) / 2; 
-			float y_pos;
-			if(displayAuxStatus) y_pos = bounds.size.height - size.height;
-			else				 y_pos = (bounds.size.height - size.height) /2;
-			[s drawAtPoint:NSMakePoint(bounds.origin.x + x_pos, bounds.origin.y + y_pos)];
-			if(displayAuxStatus){
-				NSString* auxString = [self auxStatusString];
-				if([auxString length]){
-					NSAttributedString* s = [[[NSAttributedString alloc] initWithString:auxString attributes:attributes] autorelease]; 
-					NSSize size = [s size];   
-					float x_pos = (bounds.size.width - size.width) / 2; 
-					y_pos = 0;
-					[s drawAtPoint:NSMakePoint(bounds.origin.x + x_pos, bounds.origin.y + y_pos)];
-				}
-			}
-		}
 		[[NSColor blackColor] set];
+		NSAttributedString* s = [[[NSAttributedString alloc] initWithString:label attributes:attributes] autorelease]; 
+		NSSize size = [s size];   
+		float x_pos = (bounds.size.width - size.width) / 2; 
+		float y_pos;
+		y_pos = (bounds.size.height - size.height) /2;
+		[s drawAtPoint:NSMakePoint(bounds.origin.x + x_pos, bounds.origin.y + y_pos)];
 	}
 }
 
-- (NSString*) auxStatusString
-{
-	NSString* auxString = @"";
-	if([dialogIdentifier length]){
-		NSArray* parts = [dialogIdentifier componentsSeparatedByString:@","];
-		if([parts count]==2){
-			Class theClass = NSClassFromString([parts objectAtIndex:0]);
-			NSArray* objects = [[[NSApp delegate]  document] collectObjectsOfClass:theClass];
-			for(OrcaObject* anObj in objects){
-				if([[anObj fullID] isEqualToString:dialogIdentifier]){
-					if([anObj respondsToSelector:@selector(auxStatusString)]){
-						auxString = [anObj auxStatusString];
-						break;
-					}
-					else break;
-				}
-			}
-		}
-	}
-	return auxString;
-}
 
-- (void) openDialog
-{
-	if([dialogIdentifier length]){
-		NSArray* parts = [dialogIdentifier componentsSeparatedByString:@","];
-		if([parts count]==2){
-			Class theClass = NSClassFromString([parts objectAtIndex:0]);
-			NSArray* objects = [[[NSApp delegate]  document] collectObjectsOfClass:theClass];
-			for(OrcaObject* anObj in objects){
-				if([[anObj fullID] isEqualToString:dialogIdentifier]){
-					[anObj showMainInterface];
-					[NSCursor pop];
-					break;
-				}
-			}
-		}
-	}
-}
 @end
-
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
 @implementation ORVacuumDynamicLabel
-- (id) initWithDelegate:(id)aDelegate partTag:(int)aTag label:(NSString*)aLabel bounds:(NSRect)aRect
+@synthesize channel,component,isValid;
+- (id) initWithDelegate:(id)aDelegate regionTag:(int)aRegionTag component:(int)aComponent channel:(int)aChannel label:(NSString*)aLabel bounds:(NSRect)aRect
 {
-	self = [super initWithDelegate:aDelegate partTag:aTag label:aLabel bounds:aRect];
+	self = [super initWithDelegate:aDelegate regionTag:aRegionTag label:aLabel bounds:aRect];
 	self.controlColor = [NSColor colorWithCalibratedRed:.5 green:.75 blue:.5 alpha:1];
+	self.component = aComponent;
+	self.channel = aChannel;
 	return self;
+}
+- (NSString*) displayString
+{
+	return @"?";
 }
 
 - (void) draw 
@@ -572,20 +578,22 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 	if([label length]){
 		
 		NSAttributedString* s1 = [[[NSAttributedString alloc] initWithString:label
-																 attributes:[NSDictionary dictionaryWithObjectsAndKeys:
-																			 [NSColor blackColor],NSForegroundColorAttributeName,
-																			 [NSFont fontWithName:@"Geneva" size:10],NSFontAttributeName,
-																			 nil]] autorelease]; 
+																  attributes:[NSDictionary dictionaryWithObjectsAndKeys:
+																			  [NSColor blackColor],NSForegroundColorAttributeName,
+																			  [NSFont fontWithName:@"Geneva" size:10],NSFontAttributeName,
+																			  nil]] autorelease]; 
 		NSSize size1 = [s1 size];   
 		float x_pos = (bounds.size.width - size1.width) / 2; 
 		float y_pos = bounds.size.height/2;
 		[s1 drawAtPoint:NSMakePoint(bounds.origin.x + x_pos, bounds.origin.y + y_pos)];
 
-		NSAttributedString* s2 = [[[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%.2E",[self value]]
-																 attributes:[NSDictionary dictionaryWithObjectsAndKeys:
-																			 [NSColor blackColor],NSForegroundColorAttributeName,
-																			 [NSFont fontWithName:@"Geneva" size:10],NSFontAttributeName,
-																			 nil]] autorelease]; 
+		NSString* s = [self displayString];
+		if([s length] == 0)s = @"?";
+		NSAttributedString* s2 = [[[NSAttributedString alloc] initWithString:s
+																  attributes:[NSDictionary dictionaryWithObjectsAndKeys:
+																			  [NSColor blackColor],NSForegroundColorAttributeName,
+																			  [NSFont fontWithName:@"Geneva" size:10],NSFontAttributeName,
+																			  nil]] autorelease]; 
 		
 		NSSize size2 = [s2 size];   
 		x_pos = (bounds.size.width - size2.width) / 2; 
@@ -612,11 +620,93 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
+@implementation ORVacuumValueLabel
+@synthesize value;
+
+- (void) setValue:(double)aValue
+{
+	if(fabs(aValue-value) > 1.0E-8){
+		value = aValue;
+		[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORVacuumPartChanged object:dataSource];
+	}
+}
+- (BOOL) valueHigherThan:(double)aValue
+{
+	if(!self.isValid) return YES; //assume worst case
+	else return self.value > aValue;
+}
+
+- (NSString*) displayString
+{
+	if(self.isValid) return [NSString stringWithFormat:@"%.2E",[self value]];
+	else return @"?";
+}
+
+@end
+
+//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
+@implementation ORVacuumStatusLabel
+@synthesize statusLabel;
+- (void) dealloc
+{
+	[statusLabel release];
+	[constraints release];
+	[super dealloc];
+}
+
+- (NSString*) displayString
+{
+	if(self.isValid) return statusLabel;
+	else return @"?";
+}
+
+- (void) setStatusLabel:(NSString*)aLabel
+{
+	if(![aLabel isEqualToString:statusLabel]){
+		[statusLabel autorelease];
+		statusLabel = [aLabel copy];
+		[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORVacuumPartChanged object:dataSource];
+	}
+}
+- (NSDictionary*) constraints
+{
+	return constraints;
+}
+
+- (void) addConstraint:(NSString*)aName reason:(NSString*)aReason
+{
+	if(!constraints)constraints = [[NSMutableDictionary dictionary] retain];
+	[constraints setObject:aReason forKey:aName];
+	[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORVacuumConstraintChanged object:dataSource];
+}
+
+- (void) removeConstraint:(NSString*)aName
+{
+	[constraints removeObjectForKey:aName];
+	[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORVacuumConstraintChanged object:dataSource];
+}
+- (void) draw 
+{
+	[super draw];
+	if([constraints count]!=0){
+		NSImage* lockImage = [[NSImage imageNamed:@"smallLock"] copy];
+		NSSize lockSize = [lockImage size];
+		NSPoint lockPoint = NSMakePoint(bounds.origin.x + bounds.size.width - lockSize.width, bounds.origin.y + bounds.size.height + 5);
+		[lockImage compositeToPoint:lockPoint operation:NSCompositeSourceOver];
+		[lockImage release];
+	}
+}
+@end
+
+
+//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
 @implementation ORVacuumLine
 @synthesize startPt,endPt;
-- (id) initWithDelegate:(id)aDelegate partTag:(int)aTag startPt:(NSPoint)aStartPt endPt:(NSPoint)anEndPt
+- (id) initWithDelegate:(id)aDelegate startPt:(NSPoint)aStartPt endPt:(NSPoint)anEndPt
 {
-	self = [super initWithDelegate:aDelegate partTag:aTag];
+	self = [super initWithDelegate:aDelegate partTag:-1 regionTag:-1];
 	self.startPt	= aStartPt;
 	self.endPt		= anEndPt;
 	return self;
@@ -626,7 +716,6 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 {
 	[[NSColor blackColor] set];
 	[NSBezierPath strokeLineFromPoint:startPt toPoint:endPt];
-	[[NSColor blackColor] set];
 }	
 @end
 
@@ -636,7 +725,7 @@ NSString* ORVacuumPartChanged = @"ORVacuumPartChanged";
 @synthesize location;
 - (id) initWithDelegate:(id)aDelegate partTag:(int)aTag at:(NSPoint)aPoint; 
 {
-	self = [super initWithDelegate:aDelegate partTag:aTag];
+	self = [super initWithDelegate:aDelegate partTag:aTag regionTag:aTag];
 	self.location = aPoint;
 	return self;
 }

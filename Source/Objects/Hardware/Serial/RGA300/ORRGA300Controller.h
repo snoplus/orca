@@ -81,6 +81,12 @@
     IBOutlet NSButton*      addAmuButton;
     IBOutlet NSButton*      removeAmuButton;
     IBOutlet NSButton*		plotLogCB;
+	
+	IBOutlet NSImageView*   filamentConstraintImage;
+	IBOutlet NSImageView*   cemConstraintImage;
+	IBOutlet NSPanel*		constraintPanel;
+	IBOutlet NSTextField*   constraintTitleField;
+	IBOutlet NSTextView*    constraintView;
 }
 
 #pragma mark •••Initialization
@@ -94,6 +100,7 @@
 - (void) updateButtons;
 
 #pragma mark •••Interface Management
+- (void) constraintsChanged:(NSNotification*)aNote;
 - (void) sensitivityFactorChanged:(NSNotification*)aNote;
 - (void) drawDidOpen:(NSNotification*)aNote;
 - (void) drawDidClose:(NSNotification*)aNote;
@@ -170,11 +177,15 @@
 - (IBAction) toggleIonizerAction:(id)sender;	
 - (IBAction) useIonizerDefaultsAction:(id)sender;
 - (IBAction) useDectorDefaultsAction:(id)sender;
+- (IBAction) closeConstraintPanel:(id)sender;
 
 - (int) numberPointsInPlot:(id)aPlotter;
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 - (int) numberOfRowsInTableView:(NSTableView *)tableView;
 - (id) tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(int)row;
+
+- (IBAction) closeConstraintPanel:(id)sender;
+- (void) beginConstraintPanel:(NSDictionary*)constraints actionTitle:(NSString*)aTitle;
 
 @end
 

@@ -19,6 +19,7 @@
 #pragma mark ***Imported Files
 
 @class ORCompositePlotView;
+@class ORSerialPortController;
 
 @interface ORMks660BController : OrcaObjectController
 {
@@ -34,10 +35,7 @@
 	IBOutlet NSButton*		shipPressuresButton;
     IBOutlet NSButton*      lockButton;
     IBOutlet NSButton*		initHardwareButton;
-    IBOutlet NSTextField*   portStateField;
-    IBOutlet NSPopUpButton* portListPopup;
     IBOutlet NSPopUpButton* pollTimePopup;
-    IBOutlet NSButton*      openPortButton;
     IBOutlet NSButton*      readPressureButton;
     IBOutlet NSTextField*   pressureField;
     IBOutlet NSTextField*   timeField;
@@ -45,6 +43,7 @@
 
     IBOutlet NSMatrix*		lowSetPointMatrix;
     IBOutlet NSMatrix*		highSetPointMatrix;
+    IBOutlet ORSerialPortController* serialPortController;
 }
 
 #pragma mark ***Initialization
@@ -57,6 +56,7 @@
 - (void) updateWindow;
 
 #pragma mark ***Interface Management
+- (BOOL) portLocked;
 - (void) setUpFormats;
 - (void) lowAlarmChanged:(NSNotification*)aNote;
 - (void) highLimitChanged:(NSNotification*)aNote;
@@ -72,8 +72,6 @@
 - (void) lowSetPointChanged:(NSNotification*)aNote;
 - (void) highSetPointChanged:(NSNotification*)aNote;
 - (void) lockChanged:(NSNotification*)aNote;
-- (void) portNameChanged:(NSNotification*)aNote;
-- (void) portStateChanged:(NSNotification*)aNote;
 - (void) pressureChanged:(NSNotification*)aNote;
 - (void) pollTimeChanged:(NSNotification*)aNote;
 - (void) miscAttributesChanged:(NSNotification*)aNote;
@@ -92,8 +90,6 @@
 - (IBAction) readHardware:(id)sender;
 - (IBAction) shipPressuresAction:(id)sender;
 - (IBAction) lockAction:(id) sender;
-- (IBAction) portListAction:(id) sender;
-- (IBAction) openPortAction:(id)sender;
 - (IBAction) readPressureAction:(id)sender;
 - (IBAction) pollTimeAction:(id)sender;
 - (IBAction) lowSetPointAction:(id)sender;

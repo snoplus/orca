@@ -145,7 +145,13 @@
     [notifyCenter addObserver : self
                      selector : @selector(lockChanged:)
                          name : ORSerialPortModelPortStateChanged
+						object: model];	
+
+	[notifyCenter addObserver : self
+                     selector : @selector(constraintsChanged:)
+                         name : ORTM700ConstraintsChanged
 						object: model];
+	
 }
 
 - (void) setModel:(id)aModel
@@ -175,6 +181,16 @@
 	[self runUpTimeCtrlChanged:nil];
 	[self runUpTimeChanged:nil];
     [self updateButtons];
+	[self constraintsChanged:nil];
+}
+
+- (void) constraintsChanged:(NSNotification*)aNote
+{
+	NSImage* smallLockImage = [NSImage imageNamed:@"smallLock"];
+	if([[model pumpOffConstraints] count]){
+		[constraintImage setImage:smallLockImage];
+	}
+	else [constraintImage setImage:nil];
 }
 
 - (void) errorCodeChanged:(NSNotification*)aNote
@@ -319,7 +335,11 @@
 
 - (IBAction) turnOffAction:(id)sender
 {
-    NSBeginAlertSheet(@"Turning Off Pumping Station!",
+	if([[model pumpOffConstraints] count]!=0){
+		[self beginConstraintPanel:[model pumpOffConstraints]  actionTitle:@"Turn Turbo OFF"];
+	}
+	else { 
+		NSBeginAlertSheet(@"Turning Off Pumping Station!",
                       @"Cancel",
                       @"Yes, Turn it OFF",
                       nil,[self window],
@@ -327,6 +347,28 @@
                       @selector(_turnOffSheetDidEnd:returnCode:contextInfo:),
                       nil,
                       nil,@"Is this really what you want?");
+	}
+}
+- (void) beginConstraintPanel:(NSDictionary*)constraints actionTitle:(NSString*)aTitle
+{
+	NSArray* allKeys = [constraints allKeys];
+	int n = [allKeys count];
+	[constraintTitleField setStringValue:[NSString stringWithFormat:@"Action: <%@> can not be done because there %d constraint%@ in effect. See below for more info.",
+										  aTitle,
+										  n,
+										  n==1?@"":@"s"]];
+	NSMutableString* s = [NSMutableString string];
+	for(id aKey in allKeys){
+		[s appendFormat:@"%@ --> %@\n\n",aKey,[constraints objectForKey:aKey]];
+	}
+	[constraintView setString:s];
+	[NSApp beginSheet:constraintPanel modalForWindow:[self window]
+		modalDelegate:self didEndSelector:NULL contextInfo:nil];
+}
+- (IBAction) closeConstraintPanel:(id)sender
+{
+    [constraintPanel orderOut:nil];
+    [NSApp endSheet:constraintPanel];
 }
 
 - (IBAction) deviceAddressAction:(id)sender

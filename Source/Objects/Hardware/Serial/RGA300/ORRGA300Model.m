@@ -25,6 +25,7 @@
 #import "ORSafeQueue.h"
 
 #pragma mark •••External Strings
+NSString* ORRGA300ModelIsValidChanged = @"ORRGA300ModelIsValidChanged";
 NSString* ORRGA300ModelSensitivityFactorChanged		= @"ORRGA300ModelSensitivityFactorChanged";
 NSString* ORRGA300ModelScanDataChanged				= @"ORRGA300ModelScanDataChanged";
 NSString* ORRGA300ModelScanNumberChanged			= @"ORRGA300ModelScanNumberChanged";
@@ -69,10 +70,8 @@ NSString* ORRGA300ModelAmuRemoved					= @"ORRGA300ModelAmuRemoved";
 NSString* ORRGA300ModelCurrentAmuIndexChanged		= @"ORRGA300ModelCurrentAmuIndexChanged";
 NSString* ORRGA300ModelUseIonizerDefaultsChanged	= @"ORRGA300ModelUseIonizerDefaultsChanged";
 NSString* ORRGA300ModelUseDetectorDefaultsChanged	= @"ORRGA300ModelUseDetectorDefaultsChanged";
+NSString* ORRGA300ModelConstraintsChanged			= @"ORRGA300ModelConstraintsChanged";
 
-NSString* ORRGA300ModelSerialPortChanged			= @"ORRGA300ModelSerialPortChanged";
-NSString* ORRGA300ModelPortNameChanged				= @"ORRGA300ModelPortNameChanged";
-NSString* ORRGA300ModelPortStateChanged				= @"ORRGA300ModelPortStateChanged";
 NSString* ORRGA300Lock								= @"ORRGA300Lock";
 
 @interface ORRGA300Model (private)
@@ -150,10 +149,30 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 	[self linkToController:@"ORRGA300Controller"];
 }
 
-#pragma mark •••Accessors
-- (NSString*) auxStatusString
+- (BOOL) acceptsGuardian: (OrcaObject *)aGuardian
 {
-	if([serialPort isOpen]){
+	return [super acceptsGuardian:aGuardian] || [aGuardian isMemberOfClass:NSClassFromString(@"ORMJDVacuumModel")];
+}
+
+#pragma mark •••Accessors
+
+- (BOOL) isValid
+{
+    return isValid;
+}
+
+- (void) setIsValid:(BOOL)aIsValid
+{
+    isValid = aIsValid;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRGA300ModelIsValidChanged object:self];
+}
+- (BOOL) filamentIsOn
+{
+	return (ionizerFilamentCurrentRB!=0);
+}
+- (NSString*) auxStatusString:(int)aChannel
+{
+	if([serialPort isOpen] && [self isValid]){
 		if(ionizerFilamentCurrentRB==0)	return @"OFF";
 		else					return @"ON";
 	}
@@ -389,8 +408,6 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
     
 }
 
-
-
 - (void) openPort:(BOOL)state
 {
     if(state) {
@@ -404,6 +421,7 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
     }
     else {
 		[serialPort close];
+		[self setIsValid:NO];
 	}
     portWasOpen = [serialPort isOpen];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSerialPortModelPortStateChanged object:self];
@@ -735,6 +753,33 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 }
 
 
+#pragma mark •••Constraints
+- (void) addFilamentConstraint:(NSString*)aName reason:(NSString*)aReason
+{
+	if(!filamentConstraints)filamentConstraints = [[NSMutableDictionary dictionary] retain];
+	[filamentConstraints setObject:aReason forKey:aName];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORRGA300ModelConstraintsChanged object:self];
+}
+- (void) removeFilamentConstraint:(NSString*)aName
+{
+	[filamentConstraints removeObjectForKey:aName];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORRGA300ModelConstraintsChanged object:self];
+}
+
+- (void) addCEMConstraint:(NSString*)aName reason:(NSString*)aReason
+{
+	if(!cemConstraints)cemConstraints = [[NSMutableDictionary dictionary] retain];
+	[cemConstraints setObject:aReason forKey:aName];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORRGA300ModelConstraintsChanged object:self];
+}
+
+- (void) removeCEMConstraint:(NSString*)aName
+{
+	[cemConstraints removeObjectForKey:aName];
+}
+
+- (NSDictionary*) filamentConstraints { return filamentConstraints;		}
+- (NSDictionary*) cemConstraints	  { return cemConstraints;		}
 
 @end
 
@@ -743,6 +788,7 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 - (void) timeout
 {
 	NSLogError(@"command timeout",@"RGA300",nil);
+	[self setIsValid:NO];
 	[cmdQueue removeAllObjects];
 	[self setLastRequest:nil];
 }
@@ -851,6 +897,9 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 
 - (void) processReceivedString:(NSString*)aString
 {		
+	
+	[self setIsValid:YES];
+
 	NSString* theLastRequest = lastRequest.cmd;
 	if([theLastRequest hasPrefix:@"ID?"])       [self processIDResponse:    aString];
 	else if([theLastRequest hasPrefix:@"ER?"])	[self processStatusWord:    aString];

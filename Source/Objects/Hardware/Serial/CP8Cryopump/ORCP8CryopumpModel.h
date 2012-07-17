@@ -18,17 +18,14 @@
 
 #pragma mark •••Imported Files
 #import "ORBitProcessing.h"
+#import "ORSerialPortModel.h"
 
-@class ORSerialPort;
 @class ORTimeRate;
 @class ORSafeQueue;
 
-@interface ORCP8CryopumpModel : OrcaObject <ORBitProcessing>
+@interface ORCP8CryopumpModel : ORSerialPortModel <ORBitProcessing>
 {
     @private
-        NSString*			portName;
-        BOOL				portWasOpen;
-        ORSerialPort*		serialPort;
         unsigned long		dataId;
         NSString*			lastRequest;
         ORSafeQueue*		cmdQueue;
@@ -81,15 +78,21 @@
         BOOL                wasPowerFailure;
         BOOL                delay;
 		int					firstStageControlMethodRB;
+		BOOL				isValid;
+		NSMutableDictionary* pumpOnConstraints;
+		NSMutableDictionary* pumpOffConstraints;
+		NSMutableDictionary* purgeOpenConstraints;
+		NSMutableDictionary* roughingOpenConstraints;
 }
 
+
 #pragma mark •••Initialization
-- (id)   init;
 - (void) dealloc;
-- (void) registerNotificationObservers;
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark •••Accessors
+- (BOOL)	isValid;
+- (void)	setIsValid:(BOOL)aIsValid;
 - (int)		firstStageControlMethodRB;
 - (void)	setFirstStageControlMethodRB:(int)aFirstStageControlMethodRB;
 - (NSString*) firstStageControlMethodString;
@@ -180,18 +183,12 @@
 - (void)	setShipTemperatures:(BOOL)aShipPressures;
 - (int)		pollTime;
 - (void)	setPollTime:(int)aPollTime;
-- (ORSerialPort*) serialPort;
-- (void) setSerialPort:(ORSerialPort*)aSerialPort;
-- (BOOL) portWasOpen;
-- (void) setPortWasOpen:(BOOL)aPortWasOpen;
-- (NSString*) portName;
-- (void) setPortName:(NSString*)aPortName;
 - (void) openPort:(BOOL)state;
 - (float) temperature;
 - (unsigned long) timeMeasured;
 - (NSString*) lastRequest;
 - (void) setLastRequest:(NSString*)aRequest;
-- (NSString*) auxStatusString;
+- (NSString*) auxStatusString:(int)aChannel;
 
 #pragma mark •••Data Records
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
@@ -259,8 +256,23 @@
 - (void) endProcessCycle;
 - (BOOL) processValue:(int)channel;
 - (void) setProcessOutput:(int)channel value:(int)value;
-- (void) setOutputBit:(int)channel value:(int)value;
+- (void) setOutputBit:(int)channel value:(BOOL)value;
 - (NSString*) processingTitle;
+
+#pragma mark •••Constraints
+- (void) addPumpOnConstraint:(NSString*)aName reason:(NSString*)aReason;
+- (void) removePumpOnConstraint:(NSString*)aName;
+- (void) addPumpOffConstraint:(NSString*)aName reason:(NSString*)aReason;
+- (void) removePumpOffConstraint:(NSString*)aName;
+- (void) addPurgeConstraint:(NSString*)aName reason:(NSString*)aReason;
+- (void) removePurgeConstraint:(NSString*)aName;
+- (void) addRoughingConstraint:(NSString*)aName reason:(NSString*)aReason;
+- (void) removeRoughingConstraint:(NSString*)aName;
+- (NSDictionary*)pumpOnConstraints;
+- (NSDictionary*)pumpOffConstraints;
+- (NSDictionary*)purgeOpenConstraints;
+- (NSDictionary*)roughingOpenConstraints;
+
 @end
 
 @interface ORCP8CryopumpCmd : NSObject
@@ -273,6 +285,7 @@
 @property (nonatomic,copy) NSString* cmd;
 @end
 
+extern NSString* ORCP8CryopumpModelIsValidChanged;
 extern NSString* ORCP8CryopumpModelFirstStageControlMethodRBChanged;
 extern NSString* ORCP8CryopumpModelSecondStageTempControlChanged;
 extern NSString* ORCP8CryopumpModelRoughingInterlockChanged;
@@ -315,10 +328,8 @@ extern NSString* ORCP8CryopumpModelElapsedTimeChanged;
 extern NSString* ORCP8CryopumpModelDutyCycleChanged;
 extern NSString* ORCP8CryopumpShipTemperaturesChanged;
 extern NSString* ORCP8CryopumpPollTimeChanged;
-extern NSString* ORCP8CryopumpSerialPortChanged;
 extern NSString* ORCP8CryopumpLock;
-extern NSString* ORCP8CryopumpPortNameChanged;
-extern NSString* ORCP8CryopumpPortStateChanged;
 extern NSString* ORCP8CryopumpModelCmdErrorChanged;
 extern NSString* ORCP8CryopumpModelWasPowerFailireChanged;
+extern NSString* ORCP8CryopumpModelConstraintsChanged;
 

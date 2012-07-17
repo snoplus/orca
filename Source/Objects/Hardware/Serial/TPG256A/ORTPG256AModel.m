@@ -21,7 +21,6 @@
 
 #import "ORTPG256AModel.h"
 #import "ORSerialPort.h"
-#import "ORSerialPortList.h"
 #import "ORSerialPortAdditions.h"
 #import "ORDataTypeAssigner.h"
 #import "ORDataPacket.h"
@@ -29,13 +28,11 @@
 #import "ORSafeQueue.h"
 
 #pragma mark •••External Strings
+NSString* ORTPG256AModelIsValidChanged			 = @"ORTPG256AModelIsValidChanged";
 NSString* ORTPG256AModelUnitsChanged             = @"ORTPG256AModelUnitsChanged";
 NSString* ORTPG256AModelPressureScaleChanged     = @"ORTPG256AModelPressureScaleChanged";
 NSString* ORTPG256AModelShipPressuresChanged     = @"ORTPG256AModelShipPressuresChanged";
 NSString* ORTPG256AModelPollTimeChanged          = @"ORTPG256AModelPollTimeChanged";
-NSString* ORTPG256AModelSerialPortChanged        = @"ORTPG256AModelSerialPortChanged";
-NSString* ORTPG256AModelPortNameChanged          = @"ORTPG256AModelPortNameChanged";
-NSString* ORTPG256AModelPortStateChanged         = @"ORTPG256AModelPortStateChanged";
 NSString* ORTPG256APressureChanged               = @"ORTPG256APressureChanged";
 NSString* ORTPG256AModelHighLimitChanged         = @"ORTPG256AModelHighLimitChanged";
 NSString* ORTPG256AModelHighAlarmChanged         = @"ORTPG256AModelHighAlarmChanged";
@@ -52,8 +49,6 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 #define kProcessData	2
 
 @interface ORTPG256AModel (private)
-- (void) runStarted:(NSNotification*)aNote;
-- (void) runStopped:(NSNotification*)aNote;
 - (void) timeout;
 - (void) processOneCommandFromQueue;
 - (void) process_response:(NSString*)theResponse;
@@ -64,7 +59,6 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 - (id) init
 {
 	self = [super init];
-    [self registerNotificationObservers];
 	int i;
 	for(i=0;i<6;i++){
 		lowLimit[i]  = 0; 
@@ -78,16 +72,10 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 
 - (void) dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
     [buffer release];
 	[cmdQueue release];
 	[lastRequest release];
-    [portName release];
-    if([serialPort isOpen]){
-        [serialPort close];
-    }
-    [serialPort release];
 	int i;
 	for(i=0;i<6;i++){
 		[timeRates[i] release];
@@ -122,28 +110,6 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 {
 	return @"RS232/TPG256A.html";
 }
-
-- (void) registerNotificationObservers
-{
-	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(dataReceived:)
-                         name : ORSerialPortDataReceived
-                       object : nil];
-
-    [notifyCenter addObserver: self
-                     selector: @selector(runStarted:)
-                         name: ORRunStartedNotification
-                       object: nil];
-    
-    [notifyCenter addObserver: self
-                     selector: @selector(runStopped:)
-                         name: ORRunStoppedNotification
-                       object: nil];
-
-}
-
 
 - (void) dataReceived:(NSNotification*)note
 {
@@ -218,8 +184,24 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 	}
 }
 
+- (BOOL) acceptsGuardian: (OrcaObject *)aGuardian
+{
+	return [super acceptsGuardian:aGuardian] || [aGuardian isMemberOfClass:NSClassFromString(@"ORMJDVacuumModel")];
+}
 
 #pragma mark •••Accessors
+
+- (BOOL) isValid
+{
+    return isValid;
+}
+
+- (void) setIsValid:(BOOL)aIsValid
+{
+    isValid = aIsValid;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORTPG256AModelIsValidChanged object:self];
+}
 - (int) units
 {
     return units;
@@ -319,6 +301,9 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 - (void) setPressure:(int)index value:(float)aValue;
 {
 	if(index>=0 && index<6){
+		
+		if(aValue == 0) aValue = 1.0E3;
+		
 		pressure[index] = aValue;
 		//get the time(UT!)
 		time_t	ut_Time;
@@ -327,7 +312,7 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORTPG256APressureChanged 
 															object:self 
-														userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:index] forKey:@"Index"]];
+														userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:index] forKey:@"Channel"]];
 
 		if(timeRates[index] == nil) timeRates[index] = [[ORTimeRate alloc] init];
 		[timeRates[index] addDataToTimeAverage:aValue];
@@ -346,64 +331,6 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 	lastRequest = [aRequest copy]; 
 }
 
-- (BOOL) portWasOpen
-{
-    return portWasOpen;
-}
-
-- (void) setPortWasOpen:(BOOL)aPortWasOpen
-{
-    portWasOpen = aPortWasOpen;
-}
-
-- (NSString*) portName
-{
-    return portName;
-}
-
-- (void) setPortName:(NSString*)aPortName
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setPortName:portName];
-    
-    if(![aPortName isEqualToString:portName]){
-        [portName autorelease];
-        portName = [aPortName copy];    
-
-        BOOL valid = NO;
-        NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
-        ORSerialPort *aPort;
-        while (aPort = [enumerator nextObject]) {
-            if([portName isEqualToString:[aPort name]]){
-                [self setSerialPort:aPort];
-                if(portWasOpen){
-                    [self openPort:YES];
-                 }
-                valid = YES;
-                break;
-            }
-        } 
-        if(!valid){
-            [self setSerialPort:nil];
-        }       
-    }
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORTPG256AModelPortNameChanged object:self];
-}
-
-- (ORSerialPort*) serialPort
-{
-    return serialPort;
-}
-
-- (void) setSerialPort:(ORSerialPort*)aSerialPort
-{
-    [aSerialPort retain];
-    [serialPort release];
-    serialPort = aSerialPort;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORTPG256AModelSerialPortChanged object:self];
-}
-
 - (void) openPort:(BOOL)state
 {
     if(state) {
@@ -417,7 +344,7 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
     else      [serialPort close];
     portWasOpen = [serialPort isOpen];
 	if([serialPort isOpen])[self sendUnits];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORTPG256AModelPortStateChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSerialPortModelPortStateChanged object:self];
 }
 
 - (double) lowLimit:(int)aChan
@@ -484,8 +411,6 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
 	[self setUnits:			[decoder decodeIntForKey:	 @"units"]];
-	[self setPortWasOpen:	[decoder decodeBoolForKey:	 @"portWasOpen"]];
-    [self setPortName:		[decoder decodeObjectForKey: @"portName"]];
 	[self setPressureScale:	[decoder decodeIntForKey:	 @"pressureScale"]];
 	[self setShipPressures:	[decoder decodeBoolForKey:	 @"shipPressures"]];
 	[self setPollTime:		[decoder decodeIntForKey:	 @"pollTime"]];
@@ -499,7 +424,6 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 		[self setHighLimit:i value:[decoder decodeDoubleForKey: [NSString stringWithFormat:@"highLimit%d",i]]];
 	}
 	[[self undoManager] enableUndoRegistration];
-    [self registerNotificationObservers];
 
 	return self;
 }
@@ -511,8 +435,6 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
     [encoder encodeInt:pressureScale	forKey: @"pressureScale"];
     [encoder encodeBool:shipPressures	forKey: @"shipPressures"];
     [encoder encodeInt:pollTime			forKey: @"pollTime"];
-    [encoder encodeBool:portWasOpen		forKey: @"portWasOpen"];
-    [encoder encodeObject:portName		forKey: @"portName"];
 	
 	int i;
 	for(i=0;i<6;i++){
@@ -668,13 +590,7 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 @end
 
 @implementation ORTPG256AModel (private)
-- (void) runStarted:(NSNotification*)aNote
-{
-}
 
-- (void) runStopped:(NSNotification*)aNote
-{
-}
 
 - (void) timeout
 {

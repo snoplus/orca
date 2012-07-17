@@ -40,7 +40,8 @@
 
 - (void) awakeFromNib
 {
-    [super awakeFromNib];
+	[subComponentsView setGroup:model];
+	[super awakeFromNib];
 }
 
 #pragma mark •••Accessors
@@ -67,6 +68,11 @@
 	
     [notifyCenter addObserver : self
                      selector : @selector(stateChanged:)
+                         name : ORVacuumConstraintChanged
+						object: model];	
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(stateChanged:)
                          name : ORMJDVacuumModelVetoMaskChanged
 						object: model];
 	
@@ -79,6 +85,42 @@
                      selector : @selector(lockChanged:)
                          name : ORMJCVacuumLock
                         object: nil];
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(groupChanged:)
+                         name : ORGroupObjectsAdded
+                       object : nil];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(groupChanged:)
+                         name : ORGroupObjectsRemoved
+                       object : nil];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(groupChanged:)
+                         name : ORGroupSelectionChanged
+                       object : nil];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(groupChanged:)
+                         name : OROrcaObjectMoved
+                       object : nil];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(detectorsBiasedChanged:)
+                         name : ORMJDVacuumModelDetectorsBiasedChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(okToBiasDetectorChanged:)
+                         name : ORMJDVacuumModelOkToBiasDetectorChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(shouldUnbiasDetectorChanged:)
+                         name : ORMJDVacuumModelShouldUnbiasDetectorChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -88,9 +130,35 @@
 	[self stateChanged:nil];
 	[self vetoMaskChanged:nil];
 	[self lockChanged:nil];
+	[self detectorsBiasedChanged:nil];
+	[self okToBiasDetectorChanged:nil];
+	[self shouldUnbiasDetectorChanged:nil];
 }
 
 #pragma mark •••Interface Management
+
+- (void) shouldUnbiasDetectorChanged:(NSNotification*)aNote
+{
+//	[shouldUnbiasDetectorTextField setObjectValue: [model shouldUnbiasDetector]];
+}
+
+- (void) okToBiasDetectorChanged:(NSNotification*)aNote
+{
+//	[okToBiasDetectorTextField setObjectValue: [model okToBiasDetector]];
+}
+
+- (void) detectorsBiasedChanged:(NSNotification*)aNote
+{
+//	[detectorsBiasedTextField setObjectValue: [model detectorsBiased]];
+ }
+
+-(void) groupChanged:(NSNotification*)note
+{
+	if(note == nil || [note object] == model || [[note object] guardian] == model){
+		[subComponentsView setNeedsDisplay:YES];
+	}
+}
+
 - (void) vetoMaskChanged:(NSNotification*)aNote
 {
 }
@@ -100,7 +168,7 @@
     BOOL locked = [gSecurity isLocked:ORMJCVacuumLock];
     [lockButton setState: locked];
 	
-	[groupView updateButtons];
+	[vacuumView updateButtons];
 }
 
 - (void) stateChanged:(NSNotification*)aNote
@@ -113,16 +181,16 @@
 - (void) delayedRefresh
 {
 	updateScheduled = NO;
-	[groupView setNeedsDisplay:YES];
-	[adcTableView reloadData];
+	[vacuumView setNeedsDisplay:YES];
+	[valueTableView reloadData];
+	[statusTableView reloadData];
 	[gvTableView reloadData];
-	[miscTableView reloadData];
 }
 
 - (void) showGridChanged:(NSNotification*)aNote
 {
 	[setShowGridCB setIntValue:[model showGrid]];
-	[groupView setNeedsDisplay:YES];
+	[vacuumView setNeedsDisplay:YES];
 }
 
 - (void) toggleGrid
@@ -153,86 +221,113 @@
 	[self endEditing];
 	
 	int gateValveTag	  = [sender tag];
-	int currentValveState = [model stateOfGateValve:gateValveTag];
 	ORVacuumGateValve* gv = [model gateValve:gateValveTag];
-	unsigned long changesVetoed = ([model vetoMask] & (0x1>>gateValveTag)) != 0;
-	if(gv){
-		NSString* statusString = [NSString stringWithFormat:@"%@ is now %@",[gv label],currentValveState==kGVOpen?@"OPEN":(currentValveState==kGVClosed?@"CLOSED":@"UnKnown")];
-		[gvControlValveState setStringValue:statusString];
-		int region1		= [gv connectingRegion1];
-		int region2		= [gv connectingRegion2];
-		NSColor* c1		= [model colorOfRegion:region1];
-		NSColor* c2		= [model colorOfRegion:region2];
-		
-		[gvControlPressureSide1 setStringValue:[model dynamicLabel:region1]];
-		[gvControlPressureSide2 setStringValue:[model dynamicLabel:region2]];
-		NSString* s = @"";
-		if([gv controlObj]){
-			[gvHwObjectName setStringValue:[NSString stringWithFormat:@"%@,%d",[gv controlObj],[gv controlChannel]]]; 
-		
-			
-			switch(currentValveState){
-				case kGVOpen:
-					[gvOpenToText1 setStringValue:[model namesOfRegionsWithColor:c1]];
-					[gvOpenToText2 setStringValue:@"Valve is open. Closing it may isolate some regions."];
-					if(!changesVetoed){
-						s = @"Are you sure you want to CLOSE it and potentially isolate some regions?";
-						[gvControlButton setTitle:@"YES - CLOSE it"];
-						[gvControlButton setEnabled:YES];
-					}
-					else {
-						s = @"Changes to this valve have been vetoed. Probably by the process controller.";
-						[gvControlButton setTitle:@"---"];
-						[gvControlButton setEnabled:NO];
-					}
-			
-				break;
-					
-				case kGVClosed:
-					if(!changesVetoed){
-
-						if([c1 isEqual:c2]){
-							[gvOpenToText1 setStringValue:[model namesOfRegionsWithColor:c1]];
-							[gvOpenToText2 setStringValue:@"Each Side Appears Connected now so opening the valve may be OK."];
-							s = @"Are you sure you want to OPEN it?";
-						}
-						else {
-							[gvOpenToText1 setStringValue:[model namesOfRegionsWithColor:c1]];
-							[gvOpenToText2 setStringValue:[model namesOfRegionsWithColor:c2]];
-							s = @"Are you sure you want to OPEN it and join isolated regions?";
-						}
-					
-						[gvControlButton setTitle:@"YES - OPEN it"];
-						[gvControlButton setEnabled:YES];
-					}
-					else {
-						s = @"Changes to this valve have been vetoed. Probably by the process controller.";
-						[gvControlButton setTitle:@"---"];
-						[gvControlButton setEnabled:NO];
-					}
-					break;
-					
-				default:
-					s = @"The valve is currently shown in an unknown state.";
-					[gvOpenToText1 setStringValue:[model namesOfRegionsWithColor:c1]];
-					[gvOpenToText2 setStringValue:[model namesOfRegionsWithColor:c2]];
-					[gvControlButton setTitle:@"---"];
-					[gvControlButton setEnabled:NO];
-				break;
-			}
-			
-			[gvControlButton setTag:gateValveTag];
+	int currentValveState = [gv state];
+	
+	BOOL constraintsInPlace = [[gv constraints] count]>0;
+	if(constraintsInPlace){
+		NSArray* allKeys = [[gv constraints] allKeys];
+		int n = [allKeys count];
+		[constraintTitleField setStringValue:[NSString stringWithFormat:@"%@ can not be opened because it has %d constraint%@ in effect. See below for more info.",
+											  [gv label],
+											  n,
+											  n==1?@"":@"s"]];
+		NSMutableString* s = [NSMutableString string];
+		for(id aKey in allKeys){
+			[s appendFormat:@"%@ --> %@\n\n",aKey,[[gv constraints] objectForKey:aKey]];
 		}
-		else {
-			s = @"Not mapped to HW! Valve can NOT be controlled!";
-			[gvHwObjectName setStringValue:@"--"];
-			[gvControlButton setTitle:@"---"];
-			[gvControlButton setEnabled:NO];
-		}
-		[gvControlField setStringValue:s];
-		[NSApp beginSheet:gvControlPanel modalForWindow:[self window]
+		[gvConstraintView setString:s];
+		[NSApp beginSheet:gvConstraintPanel modalForWindow:[self window]
 			modalDelegate:self didEndSelector:NULL contextInfo:nil];
 	}
+	else {
+		unsigned long changesVetoed = ([model vetoMask] & (0x1>>gateValveTag)) != 0;
+		if(gv){
+			NSString* statusString = [NSString stringWithFormat:@"%@  current state: %@",[gv label],currentValveState==kGVOpen?@"OPEN":(currentValveState==kGVClosed?@"CLOSED":@"UnKnown")];
+			[gvControlValveState setStringValue:statusString];
+			
+			int region1		= [gv connectingRegion1];
+			int region2		= [gv connectingRegion2];
+			
+			NSColor* c1		= [model colorOfRegion:region1];
+			NSColor* c2		= [model colorOfRegion:region2];
+			
+			[gvControlPressureSide1 setStringValue:[model valueLabel:region1]];
+			[gvControlPressureSide2 setStringValue:[model valueLabel:region2]];
+			NSString* s = @"";
+			
+			if([gv controlObj]){
+				[gvHwObjectName setStringValue:[NSString stringWithFormat:@"%@,%d",[gv controlObj],[gv controlChannel]]]; 
+
+				switch(currentValveState){
+					case kGVOpen:
+						[gvOpenToText1 setStringValue:[model namesOfRegionsWithColor:c1]];
+						[gvOpenToText2 setStringValue:@"Valve is open. Closing it may isolate some regions."];
+						if(!changesVetoed){
+							s = @"Are you sure you want to CLOSE it and potentially isolate some regions?";
+							[gvControlButton setTitle:@"YES - CLOSE it"];
+							[gvControlButton setEnabled:YES];
+						}
+						else {
+							s = @"Changes to this valve have been vetoed. Probably by the process controller.";
+							[gvControlButton setTitle:@"---"];
+							[gvControlButton setEnabled:NO];
+						}
+					break;
+						
+					case kGVClosed:
+						if(!changesVetoed){
+							if([c1 isEqual:c2]){
+								[gvOpenToText1 setStringValue:[model namesOfRegionsWithColor:c1]];
+								[gvOpenToText2 setStringValue:@"Each Side Appears Connected now so opening the valve may be OK."];
+								s = @"Are you sure you want to OPEN it?";
+							}
+							else {
+								[gvOpenToText1 setStringValue:[model namesOfRegionsWithColor:c1]];
+								[gvOpenToText2 setStringValue:[model namesOfRegionsWithColor:c2]];
+								s = @"Are you sure you want to OPEN it and join isolated regions?";
+							}
+						
+							[gvControlButton setTitle:@"YES - OPEN it"];
+							[gvControlButton setEnabled:YES];
+						}
+						else {
+							s = @"Changes to this valve have been vetoed by the process controller.";
+							[gvControlButton setTitle:@"---"];
+							[gvControlButton setEnabled:NO];
+						}
+						break;
+						
+					default:
+						s = @"The valve is currently in an unknown state.";
+						[gvOpenToText1 setStringValue:[model namesOfRegionsWithColor:c1]];
+						[gvOpenToText2 setStringValue:[model namesOfRegionsWithColor:c2]];
+						[gvControlButton setTitle:@"---"];
+						[gvControlButton setEnabled:NO];
+					break;
+				}
+				
+				[gvControlButton setTag:gateValveTag];
+			}
+			else {
+				s = @"Not mapped to HW! Valve can NOT be controlled!";
+				[gvHwObjectName setStringValue:@"--"];
+				[gvControlButton setTitle:@"---"];
+				[gvControlButton setEnabled:NO];
+				[gvOpenToText1 setStringValue:@"--"];
+				[gvOpenToText2 setStringValue:@"--"];
+			}
+			[gvControlField setStringValue:s];
+			[NSApp beginSheet:gvControlPanel modalForWindow:[self window]
+				modalDelegate:self didEndSelector:NULL contextInfo:nil];
+		}
+	}
+}
+
+- (IBAction) closeGVConstraintPanel:(id)sender
+{
+    [gvConstraintPanel orderOut:nil];
+    [NSApp endSheet:gvConstraintPanel];
 }
 
 - (IBAction) closeGVChangePanel:(id)sender
@@ -263,59 +358,34 @@
 #pragma mark •••Data Source For Tables
 - (int) numberOfRowsInTableView:(NSTableView *)aTableView
 {
-	if(aTableView == adcTableView){
-		return [[model dynamicLabels] count];
+	if(aTableView == valueTableView){
+		return [[model valueLabels] count];
+	}
+	else if(aTableView == statusTableView){
+		return [[model valueLabels] count];
 	}
 	else if(aTableView == gvTableView){
 		return [[model gateValves] count];
-	}
-	else if(aTableView == miscTableView){
-		return [[model staticLabels] count];
 	}
 	else return 0;
 }
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
 {
-	if(aTableView == adcTableView ){
-		NSArray* theLabels = [model dynamicLabels];
+	if((aTableView == valueTableView) || (aTableView == statusTableView)){
+		NSArray* theLabels;
+		if(aTableView == valueTableView) theLabels = [model valueLabels];
+		else							 theLabels = [model statusLabels];
 		if(rowIndex < [theLabels count]){
-			ORVacuumDynamicLabel* theDynamicLabel = [theLabels objectAtIndex:rowIndex];
+			ORVacuumDynamicLabel* theLabel = [theLabels objectAtIndex:rowIndex];
 			if([[aTableColumn identifier] isEqualToString:@"partTag"]){
 				return [NSNumber numberWithInt:rowIndex];
 			}
 			else if([[aTableColumn identifier] isEqualToString:@"label"]){
-				return [theDynamicLabel label];
+				return [theLabel label];
 			}
-			else if([[aTableColumn identifier] isEqualToString:@"dialogIdentifier"]){
-				if([aTableView currentEditor]){
-					return [[aTableView currentEditor] string];
-				}
-				else {
-					return [theDynamicLabel dialogIdentifier];
-				}
-			}
+
 			else  if([[aTableColumn identifier] isEqualToString:@"value"]){
-				return [NSString stringWithFormat:@"%.2E",[theDynamicLabel value]];
-			}
-			else return @"--";
-		}
-		else return @"";
-	}
-	if(aTableView == miscTableView ){
-		NSArray* theLabels = [model staticLabels];
-		if(rowIndex < [theLabels count]){
-			ORVacuumStaticLabel* theStaticLabel = [theLabels objectAtIndex:rowIndex];
-			if([[aTableColumn identifier] isEqualToString:@"partTag"]){
-				return [NSNumber numberWithInt:rowIndex];
-			}
-			else if([[aTableColumn identifier] isEqualToString:@"label"]){
-				return [theStaticLabel label];
-			}
-			else if([[aTableColumn identifier] isEqualToString:@"dialogIdentifier"]){
-				return [theStaticLabel dialogIdentifier];
-			}
-			else  if([[aTableColumn identifier] isEqualToString:@"value"]){
-				return [NSString stringWithFormat:@"%.2E",[theStaticLabel value]];
+				return [theLabel displayString];
 			}
 			else return @"--";
 		}
@@ -335,9 +405,8 @@
 				if([gv controlType] == k2BitReadBack || [gv controlType] == k1BitReadBack) return [gv vetoed]?@"Vetoed":@" ";
 				else return @" ";
 			}
-			else if([[aTableColumn identifier] isEqualToString:@"controlObj"]){
-				if([gv controlObj]) return [gv controlObj];
-				else return @" ";
+			else if([[aTableColumn identifier] isEqualToString:@"constraints"]){
+				return [NSNumber numberWithInt:[gv constraintCount]];
 			}
 			else if([[aTableColumn identifier] isEqualToString:@"controlChannel"]){
 				if([gv controlObj])return [NSNumber numberWithInt:[gv controlChannel]];
@@ -363,23 +432,6 @@
 	return @"";
 }
 
-- (void)tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
-{
-	if(aTableView == adcTableView ){
-		NSArray* theLabels = [model dynamicLabels];
-		if(rowIndex < [theLabels count]){
-			ORVacuumDynamicLabel* theDynamicLabel = [theLabels objectAtIndex:rowIndex];
-			theDynamicLabel.dialogIdentifier = anObject;
-		}
-	}
-	else if(aTableView == miscTableView ){
-		NSArray* theLabels = [model staticLabels];
-		if(rowIndex < [theLabels count]){
-			ORVacuumStaticLabel* theStaticLabel = [theLabels objectAtIndex:rowIndex];
-			theStaticLabel.dialogIdentifier = anObject;
-		}
-	}
-}
 
 
 @end

@@ -23,9 +23,13 @@
 
 @interface ORMJDVacuumController : OrcaObjectController
 {
-    IBOutlet ORMJDVacuumView*   groupView;
+    IBOutlet ORMJDVacuumView*   vacuumView;
+	IBOutlet   NSTextField* shouldUnbiasDetectorTextField;
+	IBOutlet   NSTextField* okToBiasDetectorTextField;
+	IBOutlet   NSTextField* detectorsBiasedTextField;
 	IBOutlet NSButton*		setShowGridCB;
 	IBOutlet NSPanel*		gvControlPanel;
+	IBOutlet NSPanel*		gvConstraintPanel;
 	IBOutlet NSButton*      gvControlButton;
 	IBOutlet NSTextField*   gvControlField;
 	IBOutlet NSTextField*   gvControlValveState;
@@ -33,12 +37,15 @@
 	IBOutlet NSTextField*   gvOpenToText1;
 	IBOutlet NSTextField*   gvControlPressureSide2;
 	IBOutlet NSTextField*   gvOpenToText2;
-	IBOutlet NSTableView*   adcTableView;
+	IBOutlet NSTableView*   valueTableView;
+	IBOutlet NSTableView*   statusTableView;
 	IBOutlet NSTableView*   gvTableView;
-	IBOutlet NSTableView*   miscTableView;
 	IBOutlet NSTextField*   gvHwObjectName;
     IBOutlet NSButton*      lockButton;
-	
+	IBOutlet ORGroupView*   subComponentsView;
+	IBOutlet NSTextView*    gvConstraintView;
+	IBOutlet NSTextField*   constraintTitleField;
+
 	BOOL					updateScheduled;
 }
 
@@ -52,9 +59,13 @@
 - (void) registerNotificationObservers;
 - (void) showGridChanged:(NSNotification*)aNote;
 - (void) lockChanged:(NSNotification*)aNote;
+-(void) groupChanged:(NSNotification*)aNote;
 - (void) toggleGrid;
 
 #pragma mark ***Interface Management
+- (void) shouldUnbiasDetectorChanged:(NSNotification*)aNote;
+- (void) okToBiasDetectorChanged:(NSNotification*)aNote;
+- (void) detectorsBiasedChanged:(NSNotification*)aNote;
 - (void) vetoMaskChanged:(NSNotification*)aNote;
 - (void) stateChanged:(NSNotification*)aNote;
 - (void) delayedRefresh;
@@ -65,12 +76,12 @@
 - (IBAction) closeGVChangePanel:(id)sender;
 - (IBAction) changeGVAction:(id)sender;
 - (IBAction) lockAction:(id) sender;
+- (IBAction) closeGVConstraintPanel:(id)sender;
 
 #pragma mark •••Data Source For Tables
 - (int)numberOfRowsInTableView:(NSTableView *)aTableView;
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn 
 			 row:(int) rowIndex;
-- (void)tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex;
 
 @end
 

@@ -36,5 +36,6 @@
 - (void) addPart:(id)aPart;
 - (void) colorRegions;
 - (NSArray*) parts;
+- (void) openDialogForComponent:(int)i;
 @end
 

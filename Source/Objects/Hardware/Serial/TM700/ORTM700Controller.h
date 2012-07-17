@@ -45,6 +45,10 @@
     IBOutlet StopLightView* lightBoardView;
     IBOutlet NSPopUpButton* pollTimePopup;
     IBOutlet ORSerialPortController* serialPortController;
+	IBOutlet NSImageView*   constraintImage;
+	IBOutlet NSPanel*		constraintPanel;
+	IBOutlet NSTextField*   constraintTitleField;
+	IBOutlet NSTextView*    constraintView;
 }
 
 #pragma mark •••Initialization
@@ -58,6 +62,7 @@
 - (void) updateButtons;
 
 #pragma mark •••Interface Management
+- (void) constraintsChanged:(NSNotification*)aNote;
 - (void) runUpTimeChanged:(NSNotification*)aNote;
 - (void) runUpTimeCtrlChanged:(NSNotification*)aNote;
 - (void) tmpRotSetChanged:(NSNotification*)aNote;
@@ -94,6 +99,8 @@
 - (IBAction) updateAllAction:(id)sender;
 - (IBAction) pollTimeAction:(id)sender;
 - (IBAction) initAction:(id)sender;
+- (IBAction) closeConstraintPanel:(id)sender;
+- (void) beginConstraintPanel:(NSDictionary*)constraints actionTitle:(NSString*)aTitle;
 
 @end
 

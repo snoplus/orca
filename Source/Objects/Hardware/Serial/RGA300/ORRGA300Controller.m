@@ -300,7 +300,16 @@
                          name : ORRGA300ModelScanNumberChanged
 						object: model];
 
-
+	[notifyCenter addObserver : self
+                     selector : @selector(lockChanged:)
+                         name : ORSerialPortModelPortStateChanged
+						object: model];
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(constraintsChanged:)
+                         name : ORRGA300ModelConstraintsChanged
+						object: model];
+	
 }
 - (void) amuCountChanged:(NSNotification*)aNote
 {
@@ -370,6 +379,21 @@
     [self useIonizerDefaultsChanged:nil];
     [self useDetectorDefaultsChanged:nil];
 	[self sensitivityFactorChanged:nil];
+	[self constraintsChanged:nil];
+}
+
+- (void) constraintsChanged:(NSNotification*)aNote
+{
+	NSImage* smallLockImage = [NSImage imageNamed:@"smallLock"];
+	if([[model filamentConstraints] count]){
+		[filamentConstraintImage setImage:smallLockImage];
+	}
+	else [filamentConstraintImage setImage:nil];
+	
+	if([[model cemConstraints] count]){
+		[cemConstraintImage setImage:smallLockImage];
+	}
+	else [cemConstraintImage setImage:nil];
 }
 
 - (void) sensitivityFactorChanged:(NSNotification*)aNote
@@ -822,13 +846,27 @@
 - (IBAction) toggleHVBiasAction:(id)sender		
 { 
 	if([model elecMultHVBiasRB]>0) [model turnDetectorOff];
-	else [model sendDetectorParameters];
+	else {
+		if([[model cemConstraints] count]!=0){
+			[self beginConstraintPanel:[model cemConstraints]  actionTitle:@"CEM Enable"];
+		}
+		else {
+			[model sendDetectorParameters];
+		}
+	}
 }
 
 - (IBAction) toggleIonizerAction:(id)sender		
 { 
 	if([model ionizerFilamentCurrentRB]>0) [model turnIonizerOff];
-	else [model sendIonizerParameters];
+	else {
+		if([[model filamentConstraints] count]!=0){
+			[self beginConstraintPanel:[model filamentConstraints]  actionTitle:@"Turn Filament ON"];
+		}
+		else {
+			[model sendIonizerParameters];
+		}
+	}
 }
 
 - (IBAction) lockAction:(id) sender						
@@ -999,6 +1037,27 @@
 		[plotter setYLabel:@"Pressure (Torr) x 10E13"];
         //[[plotter xAxis] setInteger:NO];
 	}	
+}
+- (void) beginConstraintPanel:(NSDictionary*)constraints actionTitle:(NSString*)aTitle
+{
+	NSArray* allKeys = [constraints allKeys];
+	int n = [allKeys count];
+	[constraintTitleField setStringValue:[NSString stringWithFormat:@"Action: <%@> can not be done because there %d constraint%@ in effect. See below for more info.",
+										  aTitle,
+										  n,
+										  n==1?@"":@"s"]];
+	NSMutableString* s = [NSMutableString string];
+	for(id aKey in allKeys){
+		[s appendFormat:@"%@ --> %@\n\n",aKey,[constraints objectForKey:aKey]];
+	}
+	[constraintView setString:s];
+	[NSApp beginSheet:constraintPanel modalForWindow:[self window]
+		modalDelegate:self didEndSelector:NULL contextInfo:nil];
+}
+- (IBAction) closeConstraintPanel:(id)sender
+{
+    [constraintPanel orderOut:nil];
+    [NSApp endSheet:constraintPanel];
 }
 
 @end

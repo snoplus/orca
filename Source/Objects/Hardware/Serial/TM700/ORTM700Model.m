@@ -35,15 +35,14 @@ NSString* ORTM700ModelSetRotorSpeedChanged	= @"ORTM700ModelSetRotorSpeedChanged"
 NSString* ORTM700TurboStateChanged			= @"ORTM700TurboStateChanged";
 NSString* ORTM700ModelDeviceAddressChanged	= @"ORTM700ModelDeviceAddressChanged";
 NSString* ORTM700ModelPollTimeChanged		= @"ORTM700ModelPollTimeChanged";
-NSString* ORTM700ModelSerialPortChanged		= @"ORTM700ModelSerialPortChanged";
-NSString* ORTM700ModelPortNameChanged		= @"ORTM700ModelPortNameChanged";
-NSString* ORTM700ModelPortStateChanged		= @"ORTM700ModelPortStateChanged";
 NSString* ORTM700TurboAcceleratingChanged	= @"ORTM700TurboAcceleratingChanged";
 NSString* ORTM700TurboSpeedAttainedChanged	= @"ORTM700TurboSpeedAttainedChanged";
 NSString* ORTM700TurboOverTempChanged		= @"ORTM700TurboOverTempChanged";
 NSString* ORTM700DriveOverTempChanged		= @"ORTM700DriveOverTempChanged";
 NSString* ORTM700ModelErrorCodeChanged		= @"ORTM700ModelErrorCodeChanged";
 NSString* ORTM700Lock						= @"ORTM700Lock";
+NSString* ORTM700TurboModelIsValidChanged	= @"ORTM700TurboModelIsValidChanged";
+NSString* ORTM700ConstraintsChanged			= @"ORTM700ConstraintsChanged";
 
 #pragma mark •••Status Parameters
 
@@ -121,6 +120,11 @@ NSString* ORTM700Lock						= @"ORTM700Lock";
 - (void) makeMainController
 {
 	[self linkToController:@"ORTM700Controller"];
+}
+
+- (BOOL) acceptsGuardian: (OrcaObject *)aGuardian
+{
+	return [super acceptsGuardian:aGuardian] || [aGuardian isMemberOfClass:NSClassFromString(@"ORMJDVacuumModel")];
 }
 
 #pragma mark •••Accessors
@@ -339,6 +343,7 @@ NSString* ORTM700Lock						= @"ORTM700Lock";
     }
     else {
 		[serialPort close];
+		[self setIsValid:NO];
 	}
     portWasOpen = [serialPort isOpen];
     if(portWasOpen){
@@ -466,9 +471,12 @@ NSString* ORTM700Lock						= @"ORTM700Lock";
 	[self sendStationPower:NO];
 	[self sendStandby:NO];
 }
-- (NSString*) auxStatusString
+
+//------------------------------------------------------------------------------------
+//some extra convenience methods that are common to several objects
+- (NSString*) auxStatusString:(int)aChannel
 {
-	if([serialPort isOpen]){
+	if([serialPort isOpen] && [self isValid]){
 		if(stationPower){
 			if(turboAccelerating)return @"ACCEL";
 			else return @"ON";
@@ -477,6 +485,26 @@ NSString* ORTM700Lock						= @"ORTM700Lock";
 	}
 	else return @"?";
 }
+
+- (BOOL) isValid
+{
+	if([serialPort isOpen] && isValid) return YES;
+	else return NO;
+}
+
+- (void) setIsValid:(BOOL)aState
+{
+	if(isValid!=aState){
+		isValid = aState;
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORTM700TurboModelIsValidChanged object:self];		
+	}
+}
+
+- (BOOL) isOn:(int)aChannel
+{
+	return stationPower;
+}
+//------------------------------------------------------------------------------------
 
 #pragma mark •••Commands
 - (void) sendDataRequest:(int)aParamNum 
@@ -640,6 +668,22 @@ NSString* ORTM700Lock						= @"ORTM700Lock";
 
 - (void) setProcessOutput:(int)channel value:(int)value { }
 
+
+#pragma mark •••Constraints
+- (void) addPumpOffConstraint:(NSString*)aName reason:(NSString*)aReason
+{
+	if(!pumpOffConstraints)pumpOffConstraints = [[NSMutableDictionary dictionary] retain];
+	[pumpOffConstraints setObject:aReason forKey:aName];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORTM700ConstraintsChanged object:self];
+}
+- (void) removePumpOffConstraint:(NSString*)aName
+{
+	[pumpOffConstraints removeObjectForKey:aName];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORTM700ConstraintsChanged object:self];
+}
+
+- (NSDictionary*)pumpOffConstraints		 { return pumpOffConstraints; }
+
 @end
 
 @implementation ORTM700Model (private)
@@ -655,6 +699,7 @@ NSString* ORTM700Lock						= @"ORTM700Lock";
 - (void) timeout
 {
 	NSLogError(@"command timeout",@"TM700",nil);
+	[self setIsValid:NO];
 	[self setLastRequest:nil];
 	[cmdQueue removeAllObjects];
 }
@@ -729,7 +774,7 @@ NSString* ORTM700Lock						= @"ORTM700Lock";
 	int anAddress = [[aCommand substringToIndex:3] intValue];
 	if(anAddress == deviceAddress){
         [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-
+		[self setIsValid:YES];
 		int receivedParam = [[aCommand substringWithRange:NSMakeRange(5,3)] intValue];
 		[self decode:receivedParam command:aCommand];
 	

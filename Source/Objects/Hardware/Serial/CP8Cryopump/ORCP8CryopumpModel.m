@@ -29,6 +29,7 @@
 #import "ORSafeQueue.h"
 
 #pragma mark •••External Strings
+NSString* ORCP8CryopumpModelIsValidChanged = @"ORCP8CryopumpModelIsValidChanged";
 NSString* ORCP8CryopumpModelFirstStageControlMethodRBChanged = @"ORCP8CryopumpModelFirstStageControlMethodRBChanged";
 NSString* ORCP8CryopumpModelSecondStageTempControlChanged	= @"ORCP8CryopumpModelSecondStageTempControlChanged";
 NSString* ORCP8CryopumpModelRoughingInterlockChanged		= @"ORCP8CryopumpModelRoughingInterlockChanged";
@@ -71,16 +72,12 @@ NSString* ORCP8CryopumpModelElapsedTimeChanged				= @"ORCP8CryopumpModelElapsedT
 NSString* ORCP8CryopumpModelDutyCycleChanged				= @"ORCP8CryopumpModelDutyCycleChanged";
 NSString* ORCP8CryopumpShipTemperaturesChanged				= @"ORCP8CryopumpShipTemperaturesChanged";
 NSString* ORCP8CryopumpPollTimeChanged						= @"ORCP8CryopumpPollTimeChanged";
-NSString* ORCP8CryopumpSerialPortChanged					= @"ORCP8CryopumpSerialPortChanged";
-NSString* ORCP8CryopumpPortNameChanged						= @"ORCP8CryopumpPortNameChanged";
-NSString* ORCP8CryopumpPortStateChanged						= @"ORCP8CryopumpPortStateChanged";
 NSString* ORCP8CryopumpLock									= @"ORCP8CryopumpLock";
 NSString* ORCP8CryopumpModelCmdErrorChanged					= @"ORCP8CryopumpModelCmdErrorChanged";
 NSString* ORCP8CryopumpModelWasPowerFailireChanged          = @"ORCP8CryopumpModelWasPowerFailireChanged";
+NSString* ORCP8CryopumpModelConstraintsChanged				= @"ORCP8CryopumpModelConstraintsChanged";
 
 @interface ORCP8CryopumpModel (private)
-- (void) runStarted:(NSNotification*)aNote;
-- (void) runStopped:(NSNotification*)aNote;
 - (void) timeout;
 - (void) processOneCommandFromQueue;
 - (void) process_response:(NSString*)theResponse;
@@ -89,30 +86,22 @@ NSString* ORCP8CryopumpModelWasPowerFailireChanged          = @"ORCP8CryopumpMod
 @end
 
 @implementation ORCP8CryopumpModel
-- (id) init
-{
-	self = [super init];
-    [self registerNotificationObservers];
-	return self;
-}
-
 
 - (void) dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
     [buffer release];
 	[cmdQueue release];
 	[lastRequest release];
-    [portName release];
-    if([serialPort isOpen]){
-        [serialPort close];
-    }
-    [serialPort release];
 	[timeRates[0] release];
 	[timeRates[1] release];
     [moduleVersion release];
-
+	
+	[pumpOnConstraints release];
+	[pumpOffConstraints release];
+	[purgeOpenConstraints release];
+	[roughingOpenConstraints release];
+	
 	[super dealloc];
 }
 
@@ -129,28 +118,6 @@ NSString* ORCP8CryopumpModelWasPowerFailireChanged          = @"ORCP8CryopumpMod
 - (NSString*) helpURL
 {
 	return @"RS232/MKS_651c.html";
-}
-
-- (void) registerNotificationObservers
-{
-	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-    
-    [notifyCenter removeObserver:self];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(dataReceived:)
-                         name : ORSerialPortDataReceived
-                       object : nil];
-
-    [notifyCenter addObserver: self
-                     selector: @selector(runStarted:)
-                         name: ORRunStartedNotification
-                       object: nil];
-    
-    [notifyCenter addObserver: self
-                     selector: @selector(runStopped:)
-                         name: ORRunStoppedNotification
-                       object: nil];
 }
 
 - (void) dataReceived:(NSNotification*)note
@@ -206,6 +173,18 @@ NSString* ORCP8CryopumpModelWasPowerFailireChanged          = @"ORCP8CryopumpMod
 }
 
 #pragma mark •••Accessors
+
+- (BOOL) isValid
+{
+    return isValid;
+}
+
+- (void) setIsValid:(BOOL)aIsValid
+{
+    isValid = aIsValid;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpModelIsValidChanged object:self];
+}
+
 - (int) firstStageControlMethodRB
 {
     return firstStageControlMethodRB;
@@ -780,63 +759,10 @@ NSString* ORCP8CryopumpModelWasPowerFailireChanged          = @"ORCP8CryopumpMod
 	lastRequest = [aRequest copy];    
 }
 
-- (BOOL) portWasOpen
+
+- (BOOL) acceptsGuardian: (OrcaObject *)aGuardian
 {
-    return portWasOpen;
-}
-
-- (void) setPortWasOpen:(BOOL)aPortWasOpen
-{
-    portWasOpen = aPortWasOpen;
-}
-
-- (NSString*) portName
-{
-	if([portName length])return portName;
-	return @"-";
-}
-
-- (void) setPortName:(NSString*)aPortName
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setPortName:portName];
-    
-    if(![aPortName isEqualToString:portName]){
-        [portName autorelease];
-        portName = [aPortName copy];    
-
-        BOOL valid = NO;
-        NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
-        ORSerialPort *aPort;
-        while (aPort = [enumerator nextObject]) {
-            if([portName isEqualToString:[aPort name]]){
-                [self setSerialPort:aPort];
-                if(portWasOpen){
-                    [self openPort:YES];
-                 }
-                valid = YES;
-                break;
-            }
-        } 
-        if(!valid){
-            [self setSerialPort:nil];
-        }       
-    }
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpPortNameChanged object:self];
-}
-
-- (ORSerialPort*) serialPort
-{
-    return serialPort;
-}
-
-- (void) setSerialPort:(ORSerialPort*)aSerialPort
-{
-    [aSerialPort retain];
-    [serialPort release];
-    serialPort = aSerialPort;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpSerialPortChanged object:self];
+	return [super acceptsGuardian:aGuardian] || [aGuardian isMemberOfClass:NSClassFromString(@"ORMJDVacuumModel")];
 }
 
 - (void) openPort:(BOOL)state
@@ -850,14 +776,17 @@ NSString* ORCP8CryopumpModelWasPowerFailireChanged          = @"ORCP8CryopumpMod
 		[serialPort commitChanges];
         [self readModuleVersion];
     }
-    else      [serialPort close];
+    else {
+		[serialPort close];
+		[self setIsValid:NO];
+	}
     portWasOpen = [serialPort isOpen];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpPortStateChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSerialPortModelPortStateChanged object:self];
 }
 
-- (NSString*) auxStatusString
+- (NSString*) auxStatusString:(int)aChannel
 {
-	if([serialPort isOpen]){
+	if([serialPort isOpen] && [self isValid]){
 		return [self pumpStatus]?@"ON":@"OFF";
 	}
 	else return @"?";	
@@ -887,11 +816,8 @@ NSString* ORCP8CryopumpModelWasPowerFailireChanged          = @"ORCP8CryopumpMod
 	[self setFirstStageControlTemp:		[decoder decodeIntForKey:@"firstStageControlTemp"]];
 	[self setShipTemperatures:			[decoder decodeBoolForKey:	 @"shipTemperatures"]];
 	[self setPollTime:					[decoder decodeIntForKey:	 @"pollTime"]];
-	[self setPortWasOpen:				[decoder decodeBoolForKey:	 @"portWasOpen"]];
-    [self setPortName:					[decoder decodeObjectForKey: @"portName"]];
 	
 	[[self undoManager] enableUndoRegistration];
-    [self registerNotificationObservers];
 
 	return self;
 }
@@ -917,9 +843,60 @@ NSString* ORCP8CryopumpModelWasPowerFailireChanged          = @"ORCP8CryopumpMod
     [encoder encodeInt:firstStageControlTemp	forKey:@"firstStageControlTemp"];
     [encoder encodeBool:shipTemperatures		forKey: @"shipTemperatures"];
     [encoder encodeInt: pollTime				forKey: @"pollTime"];
-    [encoder encodeBool:portWasOpen				forKey: @"portWasOpen"];
-    [encoder encodeObject:portName				forKey: @"portName"];
 }
+
+#pragma mark •••Constraints
+- (void) addPumpOnConstraint:(NSString*)aName reason:(NSString*)aReason
+{
+	if(!pumpOnConstraints)pumpOnConstraints = [[NSMutableDictionary dictionary] retain];
+	[pumpOnConstraints setObject:aReason forKey:aName];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpModelConstraintsChanged object:self];
+}
+- (void) removePumpOnConstraint:(NSString*)aName
+{
+	[pumpOnConstraints removeObjectForKey:aName];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpModelConstraintsChanged object:self];
+}
+
+- (void) addPumpOffConstraint:(NSString*)aName reason:(NSString*)aReason
+{
+	if(!pumpOffConstraints)pumpOffConstraints = [[NSMutableDictionary dictionary] retain];
+	[pumpOffConstraints setObject:aReason forKey:aName];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpModelConstraintsChanged object:self];
+}
+- (void) removePumpOffConstraint:(NSString*)aName
+{
+	[pumpOffConstraints removeObjectForKey:aName];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpModelConstraintsChanged object:self];
+}
+
+- (void) addPurgeConstraint:(NSString*)aName reason:(NSString*)aReason
+{
+	if(!purgeOpenConstraints)purgeOpenConstraints = [[NSMutableDictionary dictionary] retain];
+	[purgeOpenConstraints setObject:aReason forKey:aName];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpModelConstraintsChanged object:self];
+}
+- (void) removePurgeConstraint:(NSString*)aName
+{
+	[purgeOpenConstraints removeObjectForKey:aName];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpModelConstraintsChanged object:self];
+}
+
+- (void) addRoughingConstraint:(NSString*)aName reason:(NSString*)aReason
+{
+	if(!roughingOpenConstraints)roughingOpenConstraints = [[NSMutableDictionary dictionary] retain];
+	[roughingOpenConstraints setObject:aReason forKey:aName];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpModelConstraintsChanged object:self];
+}
+- (void) removeRoughingConstraint:(NSString*)aName
+{
+	[roughingOpenConstraints removeObjectForKey:aName];
+}
+
+- (NSDictionary*)pumpOnConstraints		 { return pumpOnConstraints;		}
+- (NSDictionary*)pumpOffConstraints		 { return pumpOffConstraints;		}
+- (NSDictionary*)purgeOpenConstraints	 { return purgeOpenConstraints;		}
+- (NSDictionary*)roughingOpenConstraints { return roughingOpenConstraints;	}
 
 #pragma mark ••• Commands
 - (void) addCmdToQueue:(NSString *)aCmd
@@ -1185,7 +1162,7 @@ NSString* ORCP8CryopumpModelWasPowerFailireChanged          = @"ORCP8CryopumpMod
 	return theValue;
 }
 - (void) setProcessOutput:(int)channel value:(int)value { }
-- (void) setOutputBit:(int)channel value:(int)value
+- (void) setOutputBit:(int)channel value:(BOOL)value
 {
 	@synchronized(self){
 		switch(channel){
@@ -1198,18 +1175,12 @@ NSString* ORCP8CryopumpModelWasPowerFailireChanged          = @"ORCP8CryopumpMod
 @end
 
 @implementation ORCP8CryopumpModel (private)
-- (void) runStarted:(NSNotification*)aNote
-{
-}
-
-- (void) runStopped:(NSNotification*)aNote
-{
-}
 
 - (void) timeout
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
 	NSLogError(@"command timeout",@"CP8Cryopump",nil);
+	[self setIsValid:NO];
 	[cmdQueue removeAllObjects];
 	[self setLastRequest:nil];
 }
@@ -1274,6 +1245,9 @@ NSString* ORCP8CryopumpModelWasPowerFailireChanged          = @"ORCP8CryopumpMod
 - (void) process_response:(NSString*)theResponse
 {	
 	if(!lastRequest)return;
+	
+	[self setIsValid:YES];
+
 	if([theResponse hasPrefix:@"$A"] || [theResponse hasPrefix:@"$B"]){
         [self setWasPowerFailure:[theResponse hasPrefix:@"$B"]];
         char cmdChar = [[lastRequest substringWithRange:NSMakeRange(1,1)] characterAtIndex:0];

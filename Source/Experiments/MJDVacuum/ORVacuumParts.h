@@ -19,11 +19,12 @@
 
 @class ORAlarm;
 
+
 typedef struct  {
 	int type;
-	int partTag;
+	int regionTag;
 	float x1,y1,x2,y2;
-} VacuumPipeInfo;
+}  VacuumPipeStruct;
 
 typedef struct  {
 	int type;
@@ -33,28 +34,28 @@ typedef struct  {
 	float x1,y1;
 	int r1,r2;
 	int conPref;
-} VacuumGVInfo;
+}  VacuumGVStruct;
 
 typedef struct  {
 	int type;
-	int partTag;
+	int regionTag;
 	NSString* label;
 	float x1,y1,x2,y2;
-	BOOL drawBox;
-	BOOL displayAuxStatus;
-} VacuumStaticLabelInfo;
+}  VacuumStaticLabelStruct;
 
 typedef struct  {
 	int type;
-	int partTag;
+	int regionTag;
+	int component;
+	int channel;
 	NSString* label;
 	float x1,y1,x2,y2;
-} VacuumDynamicLabelInfo;
+}  VacuumDynamicLabelStruct;
 
 typedef struct  {
 	int type;
 	float x1,y1,x2,y2;
-} VacuumLineInfo;
+}  VacuumLineStruct;
 
 #define kNA		 -1
 #define kUpToAir -2
@@ -68,9 +69,10 @@ typedef struct  {
 #define kVacHGateV		5
 #define kVacVGateV		6
 #define kVacStaticLabel 7
-#define kVacDynamicLabel 8
+#define kVacPressureItem 8
 #define kVacLine		9
 #define kGVControl		10
+#define kVacStatusItem	11
 
 #define kGVImpossible				0
 #define kGVOpen					    1
@@ -94,21 +96,17 @@ typedef struct  {
 @interface ORVacuumPart : NSObject
 {
 	id dataSource;
+	int	regionTag;
 	int partTag;
-	int state;
-	float value;
 	BOOL visited;
 }
-- (id) initWithDelegate:(id)aDelegate partTag:(int)aTag;
+- (id) initWithDelegate:(id)aDelegate partTag:(int)aTag regionTag:(int)aRegionTag;
 - (void) normalize; 
 - (void) draw;
-- (void) setState:(int)aState;
-- (void) setValue:(float)aState;
 @property (nonatomic,assign) id dataSource;
+@property (nonatomic,assign) int regionTag;
 @property (nonatomic,assign) int partTag;
 @property (nonatomic,assign) BOOL visited;
-@property (assign) int state;
-@property (assign) float value;
 @end
 
 //----------------------------------------------------------------------------------------------------
@@ -122,7 +120,7 @@ typedef struct  {
 @property (nonatomic,assign) NSPoint startPt;
 @property (nonatomic,assign) NSPoint endPt;
 @property (retain) NSColor* regionColor;
-- (id) initWithDelegate:(id)aDelegate partTag:(int)aTag startPt:(NSPoint)aStartPt endPt:(NSPoint)anEndPt;
+- (id) initWithDelegate:(id)aDelegate regionTag:(int)aTag startPt:(NSPoint)aStartPt endPt:(NSPoint)anEndPt;
 @end
 
 //----------------------------------------------------------------------------------------------------
@@ -138,7 +136,7 @@ typedef struct  {
 	NSPoint location;
 } 
 @property (nonatomic,assign) NSPoint location;
-- (id) initWithDelegate:(id)aDelegate partTag:(int)aTag at:(NSPoint)aPoint;
+- (id) initWithDelegate:(id)aDelegate regionTag:(int)aTag at:(NSPoint)aPoint;
 @end
 
 @interface ORVacuumBox		: ORVacuumPipe
@@ -146,7 +144,7 @@ typedef struct  {
 	NSRect bounds;
 } 
 @property (nonatomic,assign) NSRect bounds;
-- (id) initWithDelegate:(id)aDelegate partTag:(int)aTag bounds:(NSRect)aRect;
+- (id) initWithDelegate:(id)aDelegate regionTag:(int)aTag bounds:(NSRect)aRect;
 @end
 
 //----------------------------------------------------------------------------------------------------
@@ -157,24 +155,54 @@ typedef struct  {
 	NSRect		bounds;
 	NSGradient* gradient;
 	NSColor*	controlColor;
-	BOOL		drawBox;
-	NSString*	dialogIdentifier;
-	BOOL		displayAuxStatus;
 }
-- (id) initWithDelegate:(id)aDelegate partTag:(int)aTag label:(NSString*)label bounds:(NSRect)aRect;
-- (void) openDialog;
-- (NSString*) auxStatusString;
-@property (nonatomic,assign) BOOL displayAuxStatus;
-@property (nonatomic,assign) BOOL drawBox;
+- (id) initWithDelegate:(id)aDelegate regionTag:(int)aRegionTag label:(NSString*)label bounds:(NSRect)aRect;
+
 @property (nonatomic,assign) NSRect bounds;
 @property (nonatomic,retain) NSGradient* gradient;
 @property (nonatomic,retain) NSColor* controlColor;
 @property (nonatomic,copy) NSString* label;
-@property (nonatomic,copy) NSString* dialogIdentifier;
 @end
+
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
-@interface ORVacuumDynamicLabel : ORVacuumStaticLabel{}@end
+@interface ORVacuumDynamicLabel : ORVacuumStaticLabel
+{
+	BOOL isValid;
+	int component;
+	int channel;
+}
+- (id) initWithDelegate:(id)aDelegate regionTag:(int)aRegionTag component:(int)aComponent channel:(int)aChannel label:(NSString*)label bounds:(NSRect)aRect;
+- (NSString*) displayString;
+@property (nonatomic,assign) int channel;
+@property (nonatomic,assign) int component;
+@property (nonatomic,assign) BOOL isValid;
+@end
+
+//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
+@interface ORVacuumValueLabel : ORVacuumDynamicLabel
+{
+	double value;
+}
+
+- (BOOL) valueHigherThan:(double)aValue;
+
+@property (nonatomic,assign) double value;
+@end
+
+//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
+@interface ORVacuumStatusLabel : ORVacuumDynamicLabel
+{
+	NSString* statusLabel;
+	NSMutableDictionary* constraints;
+}
+- (NSDictionary*) constraints;
+- (void) addConstraint:(NSString*)aName reason:(NSString*)aReason;
+- (void) removeConstraint:(NSString*)aName;
+@property (nonatomic,copy) NSString* statusLabel;
+@end
 
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
@@ -203,7 +231,10 @@ typedef struct  {
 	int controlChannel;
 	BOOL vetoed;
 	int commandedState;
+	int state;
+	NSMutableDictionary* constraints;
 }
+@property (assign) int state;
 @property (nonatomic,copy)   NSString* controlObj;
 @property (nonatomic,assign) int controlChannel;
 @property (nonatomic,copy)   NSString* label;
@@ -216,12 +247,18 @@ typedef struct  {
 @property (nonatomic,assign) BOOL vetoed;
 @property (nonatomic,retain) ORAlarm* valveAlarm;
 
-- (id) initWithDelegate:(id)aDelegate partTag:(int)aTag label:(NSString*)label controlType:(int)aControlType at:(NSPoint)aPoint connectingRegion1:(int)aRegion1 connectingRegion2:(int)aRegion2;
+- (id) initWithDelegate:(id)aDelegate partTag:(int)aTag  label:(NSString*)label controlType:(int)aControlType at:(NSPoint)aPoint connectingRegion1:(int)aRegion1 connectingRegion2:(int)aRegion2;
 - (void) checkState;
 - (void) startStuckValveTimer;
 - (void) cancelStuckValveTimer;
 - (void) clearAlarmState;
 - (void) timeout;
+- (NSDictionary*) constraints;
+- (void) addConstraint:(NSString*)aName reason:(NSString*)aReason;
+- (void) removeConstraint:(NSString*)aName;
+- (BOOL) isClosed;
+- (BOOL) isOpen;
+- (int) constraintCount;
 @end
 
 @interface ORVacuumVGateValve	: ORVacuumGateValve { } @end;
@@ -234,7 +271,7 @@ typedef struct  {
 	NSPoint startPt;
 	NSPoint endPt;	
 }
-- (id) initWithDelegate:(id)aDelegate partTag:(int)aTag startPt:(NSPoint)aStartPt endPt:(NSPoint)anEndPt;
+- (id) initWithDelegate:(id)aDelegate startPt:(NSPoint)aStartPt endPt:(NSPoint)anEndPt;
 @property (nonatomic,assign) NSPoint startPt;
 @property (nonatomic,assign) NSPoint endPt;
 @end
@@ -250,12 +287,13 @@ typedef struct  {
 @end
 
 extern NSString* ORVacuumPartChanged;
+extern NSString* ORVacuumConstraintChanged;
 
 
 @interface NSObject (VacuumParts)
 - (BOOL) showGrid;
 - (void) addPart:(id)aPart;
 - (void) colorRegions;
-- (NSString*) auxStatusString;
+- (NSString*) auxStatusString:(int)aChannel;
 @end
 

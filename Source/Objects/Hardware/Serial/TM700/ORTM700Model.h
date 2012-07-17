@@ -43,6 +43,8 @@
 		int				runUpTime;
 		NSString*		errorCode;
 		BOOL            delay;
+		BOOL			isValid;
+		NSMutableDictionary* pumpOffConstraints;
 }
 
 #pragma mark •••Initialization
@@ -82,7 +84,9 @@
 - (NSString*) lastRequest;
 - (void) setLastRequest:(NSString*)aCmdString;
 - (void) openPort:(BOOL)state;
-- (NSString*) auxStatusString;
+- (NSString*) auxStatusString:(int)aChannel;
+- (BOOL) isOn:(int)aChannel;
+- (BOOL) isValid;
 
 #pragma mark •••Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
@@ -122,6 +126,8 @@
 - (void) sendErrorAck;
 - (void) turnStationOn;
 - (void) turnStationOff;
+- (BOOL) isValid;
+- (void) setIsValid:(BOOL)aState;
 
 #pragma mark •••Adc Processing Protocol
 - (void) processIsStarting;
@@ -132,8 +138,14 @@
 - (void) setProcessOutput:(int)channel value:(int)value;
 - (NSString*) processingTitle;
 
+#pragma mark •••Constraints
+- (void) addPumpOffConstraint:(NSString*)aName reason:(NSString*)aReason;
+- (void) removePumpOffConstraint:(NSString*)aName;
+- (NSDictionary*) pumpOffConstraints;
+
 @end
 
+extern NSString* ORTM700ConstraintsChanged;
 extern NSString* ORTM700ModelErrorCodeChanged;
 extern NSString* ORTM700ModelRunUpTimeChanged;
 extern NSString* ORTM700ModelRunUpTimeCtrlChanged;
@@ -152,3 +164,4 @@ extern NSString* ORTM700TurboStateChanged;
 extern NSString* ORTM700ModelDeviceAddressChanged;
 extern NSString* ORTM700Lock;
 extern NSString* ORTM700ModelPollTimeChanged;
+extern NSString* ORTM700TurboModelIsValidChanged;

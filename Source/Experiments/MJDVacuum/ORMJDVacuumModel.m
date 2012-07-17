@@ -22,17 +22,47 @@
 #import "ORProcessModel.h"
 #import "ORAdcModel.h"
 #import "ORAdcProcessing.h"
+#import "ORMks660BModel.h"
+#import "ORRGA300Model.h"
+#import "ORTM700Model.h"
+#import "ORTPG256AModel.h"
+#import "ORCP8CryopumpModel.h"
 
 @interface ORMJDVacuumModel (private)
 - (void) makeParts;
-- (void) makeLines:(VacuumLineInfo*)lineItems num:(int)numItems;
-- (void) makePipes:(VacuumPipeInfo*)pipeList num:(int)numItems;
-- (void) makeGateValves:(VacuumGVInfo*)pipeList num:(int)numItems;
-- (void) makeStaticLabels:(VacuumStaticLabelInfo*)labelItems num:(int)numItems;
-- (void) makeDynamicLabels:(VacuumDynamicLabelInfo*)labelItems num:(int)numItems;
+- (void) makeLines:(VacuumLineStruct*)lineItems num:(int)numItems;
+- (void) makePipes:(VacuumPipeStruct*)pipeList num:(int)numItems;
+- (void) makeGateValves:(VacuumGVStruct*)pipeList num:(int)numItems;
+- (void) makeStaticLabels:(VacuumStaticLabelStruct*)labelItems num:(int)numItems;
+- (void) makeDynamicLabels:(VacuumDynamicLabelStruct*)labelItems num:(int)numItems;
 - (void) colorRegionsConnectedTo:(int)aRegion withColor:(NSColor*)aColor;
 - (void) recursizelyColorRegionsConnectedTo:(int)aRegion withColor:(NSColor*)aColor;
 - (void) resetVisitationFlag;
+NSString* ORMJDVacuumModelShouldUnbiasDetectorChanged = @"ORMJDVacuumModelShouldUnbiasDetectorChanged";
+NSString* ORMJDVacuumModelOkToBiasDetectorChanged = @"ORMJDVacuumModelOkToBiasDetectorChanged";
+NSString* ORMJDVacuumModelDetectorsBiasedChanged = @"ORMJDVacuumModelDetectorsBiasedChanged";
+- (void) addConstraint:(NSString*)aName reason:(NSString*)aReason toGateValve:(id)aGateValve;
+- (void) removeConstraint:(NSString*)aName fromGateValve:(id)aGateValve;
+
+- (void) onAllGateValvesRemoveConstraint:(NSString*)aConstraintName;
+- (void) checkAllConstraints;
+- (void) deferredConstraintCheck;
+- (void) checkTurboRelatedConstraints:(ORTM700Model*) turbo;
+- (void) checkCryoPumpRelatedConstraints:(ORCP8CryopumpModel*) cryoPump;
+- (void) checkRGARelatedConstraints:(ORRGA300Model*) rga;
+- (void) checkPressureConstraints;
+- (double) valueForRegion:(int)aRegion;
+- (ORVacuumValueLabel*) regionValueObj:(int)aRegion;
+- (BOOL) valueValidForRegion:(int)aRegion;
+- (BOOL) region:(int)aRegion valueHigherThan:(double)aValue;
+
+- (ORMks660BModel*)    findBaratron;
+- (ORRGA300Model*)     findRGA;
+- (ORTM700Model*)      findTurboPump;
+- (ORTPG256AModel*)    findPressureGauge;
+- (ORCP8CryopumpModel*) findCryoPump;
+- (id)findObject:(NSString*)aClassName;
+
 @end
 
 
@@ -43,12 +73,27 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 @implementation ORMJDVacuumModel
 
 #pragma mark •••initialization
+- (void) wakeUp
+{
+    [super wakeUp];
+	[self registerNotificationObservers];
+}
+
+- (void) sleep
+{
+    [super sleep];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+}
 
 - (void) dealloc
 {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[parts release];
 	[partDictionary release];
 	[adcMapArray release];
+	[valueDictionary release];
 	[super dealloc];
 }
 
@@ -68,7 +113,194 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
     [self linkToController:@"ORMJDVacuumController"];
 }
 
+- (void) addObjects:(NSArray*)someObjects
+{
+	[super addObjects:someObjects];
+	[self checkAllConstraints];
+}
+
+- (void) removeObjects:(NSArray*)someObjects
+{
+	[super removeObjects:someObjects];
+	[self checkAllConstraints];
+}
+
+- (void) registerNotificationObservers
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+	//we need to know about a specific set of events in order to handle the constraints
+	ORMks660BModel* baratron = [self findBaratron];
+	if(baratron){
+		[notifyCenter addObserver : self
+						 selector : @selector(baratronChanged:)
+							 name : ORMks660BPressureChanged
+						   object : baratron];
+
+		[notifyCenter addObserver : self
+						 selector : @selector(baratronChanged:)
+							 name : ORMks660BModelIsValidChanged
+						   object : baratron];
+	}
+	
+	ORTM700Model* turbo = [self findTurboPump];
+	if(turbo){
+		[notifyCenter addObserver : self
+						 selector : @selector(turboChanged:)
+							 name : ORTM700ModelStationPowerChanged
+						   object : turbo];
+		
+		[notifyCenter addObserver : self
+						 selector : @selector(turboChanged:)
+							 name : ORTM700TurboModelIsValidChanged
+						   object : turbo];
+	}
+	
+	ORTPG256AModel* pressureGauge = [self findPressureGauge];
+	if(pressureGauge){
+		[notifyCenter addObserver : self
+						 selector : @selector(pressureGaugeChanged:)
+							 name : ORTPG256APressureChanged
+						   object : pressureGauge];
+		
+		[notifyCenter addObserver : self
+						 selector : @selector(pressureGaugeChanged:)
+							 name : ORTPG256AModelIsValidChanged
+						   object : pressureGauge];
+	}
+
+	ORCP8CryopumpModel* cryoPump = [self findCryoPump];
+	if(cryoPump){
+		[notifyCenter addObserver : self
+						 selector : @selector(cryoPumpChanged:)
+							 name : ORCP8CryopumpModelPumpStatusChanged
+						   object : cryoPump];
+		
+		[notifyCenter addObserver : self
+						 selector : @selector(cryoPumpChanged:)
+							 name : ORCP8CryopumpModelIsValidChanged
+						   object : cryoPump];
+	}
+	
+	ORRGA300Model* rga = [self findRGA];
+	if(rga){
+		[notifyCenter addObserver : self
+						 selector : @selector(rgaChanged:)
+							 name : ORRGA300ModelIonizerFilamentCurrentRBChanged
+						   object : rga];
+		
+		[notifyCenter addObserver : self
+						 selector : @selector(rgaChanged:)
+							 name : ORRGA300ModelIsValidChanged
+						   object : rga];
+	}
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(stateChanged:)
+                         name : ORVacuumPartChanged
+						object: self];
+	
+}
+
+- (void) baratronChanged:(NSNotification*)aNote
+{
+	ORMks660BModel* baratron = [aNote object];
+	ORVacuumValueLabel* aRegionlabel = [self regionValueObj:kRegionBaratron];
+	[aRegionlabel setValue:[baratron pressure]];
+	[aRegionlabel setIsValid:[baratron isValid]];
+}
+
+- (void) turboChanged:(NSNotification*)aNote
+{
+	ORTM700Model* turboPump = [aNote object];
+	
+	[self checkTurboRelatedConstraints:turboPump];
+}
+
+- (void) pressureGaugeChanged:(NSNotification*)aNote
+{
+	ORTPG256AModel* pressureGauge = [aNote object];
+	int chan = [[[aNote userInfo] objectForKey:@"Channel"]intValue];
+	int componentTag = [pressureGauge tag];
+	int aRegion;
+	for(aRegion=0;aRegion<kNumberRegions;aRegion++){
+		ORVacuumValueLabel*  aLabel = [self regionValueObj:aRegion]; 
+		if([aLabel channel ] == chan && [aLabel component] == componentTag){
+			[aLabel setIsValid:[pressureGauge isValid]]; 
+			[aLabel setValue:[pressureGauge pressure:[aLabel channel]]]; 
+		}
+	}
+	//special case... if the cryo roughing valve is open set the diaphram pump pressure to the cryopump region
+	//other wise set it to 2 Torr
+	ORVacuumGateValve* gv = [self gateValve:5];
+	ORVacuumValueLabel* aRegionlabel = [self regionValueObj:kRegionDiaphramPump];
+	if([gv isClosed]){
+		[aRegionlabel setValue:2.0];
+		[aRegionlabel setIsValid:YES];
+	}
+	[self checkPressureConstraints];
+}
+
+- (void) cryoPumpChanged:(NSNotification*)aNote
+{
+	ORCP8CryopumpModel* cryopump = [aNote object];
+	ORVacuumStatusLabel* cryoRegionObj = [statusDictionary objectForKey:[NSNumber numberWithInt:kRegionCryoPump]];
+	[cryoRegionObj setIsValid:[cryopump isValid]];
+	[cryoRegionObj setStatusLabel:[cryopump auxStatusString:0]];	
+	[self checkCryoPumpRelatedConstraints:cryopump];
+	[self checkPressureConstraints];
+}
+
+- (void) rgaChanged:(NSNotification*)aNote
+{
+	ORRGA300Model* rga = [aNote object];
+	ORVacuumStatusLabel* rgaRegionObj = [statusDictionary objectForKey:[NSNumber numberWithInt:kRegionRGA]];
+	[rgaRegionObj setIsValid:[rga isValid]];
+	[rgaRegionObj setStatusLabel:[rga auxStatusString:0]];	
+	[self checkRGARelatedConstraints:rga];
+}
+
+- (void) stateChanged:(NSNotification*)aNote
+{
+	[self  checkAllConstraints];
+}
+
 #pragma mark ***Accessors
+- (BOOL) shouldUnbiasDetector
+{
+    return shouldUnbiasDetector;
+}
+
+- (void) setShouldUnbiasDetector:(BOOL)aShouldUnbiasDetector
+{
+    shouldUnbiasDetector = aShouldUnbiasDetector;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDVacuumModelShouldUnbiasDetectorChanged object:self];
+}
+
+- (BOOL) okToBiasDetector
+{
+    return okToBiasDetector;
+}
+
+- (void) setOkToBiasDetector:(BOOL)aOkToBiasDetector
+{
+    okToBiasDetector = aOkToBiasDetector;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDVacuumModelOkToBiasDetectorChanged object:self];
+}
+
+- (BOOL) detectorsBiased
+{
+    return detectorsBiased;
+}
+
+- (void) setDetectorsBiased:(BOOL)aDetectorsBiased
+{
+    detectorsBiased = aDetectorsBiased;
+	
+	[self checkPressureConstraints];
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDVacuumModelDetectorsBiasedChanged object:self];
+}
 
 - (unsigned long) vetoMask
 {
@@ -84,7 +316,7 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 		if(vetoMask & (0x1<<tag))aGateValve.vetoed = YES;
 		else aGateValve.vetoed = NO;
 	}
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDVacuumModelVetoMaskChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORMJDVacuumModelVetoMaskChanged object:self];
 }
 
 - (BOOL) showGrid
@@ -111,28 +343,8 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
     [[self undoManager] disableUndoRegistration];
 	[self setShowGrid:	[decoder decodeBoolForKey:	@"showGrid"]];
 	
-	
 	[self makeParts];
-
-	NSArray* staticLabelDialogLinks	 = [decoder decodeObjectForKey:	@"staticLabelDialogLinks"];
-	int i=0;
-	NSArray* allLabels = [self staticLabels];
-	for(ORVacuumStaticLabel* aLabel in allLabels){
-		if(i < [staticLabelDialogLinks count]){
-			aLabel.dialogIdentifier = [staticLabelDialogLinks objectAtIndex:i];
-			i++;
-		}
-	}
-
-	NSArray* dynamicLabelDialogLinks	 = [decoder decodeObjectForKey:	@"dynamicLabelDialogLinks"];
-	i=0;
-	allLabels = [self dynamicLabels];
-	for(ORVacuumDynamicLabel* aLabel in allLabels){
-		if(i < [dynamicLabelDialogLinks count]){
-			aLabel.dialogIdentifier = [dynamicLabelDialogLinks objectAtIndex:i];
-			i++;
-		}
-	}
+	[self registerNotificationObservers];
 	
 	[[self undoManager] enableUndoRegistration];
 	
@@ -143,34 +355,6 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 {
     [super encodeWithCoder:encoder];
     [encoder encodeBool:showGrid					forKey: @"showGrid"];
-	
-	
-	NSMutableArray* staticLabelDialogLinks	 = [NSMutableArray array];
-	NSArray* allLabels = [self staticLabels];
-	int i=0;
-	for(ORVacuumStaticLabel* aLabel in allLabels){
-		if([aLabel.dialogIdentifier length]>0){
-			[staticLabelDialogLinks addObject:aLabel.dialogIdentifier];
-		}
-		else {
-			[staticLabelDialogLinks addObject:@""];
-		}
-	}
-	[encoder encodeObject:staticLabelDialogLinks	forKey: @"staticLabelDialogLinks"];
-
-	
-	NSMutableArray* dynamicLabelDialogLinks	 = [NSMutableArray array];
-	i=0;
-	allLabels = [self dynamicLabels];
-	for(ORVacuumDynamicLabel* aLabel in allLabels){
-		if([aLabel.dialogIdentifier length]>0){
-			[dynamicLabelDialogLinks addObject:aLabel.dialogIdentifier];
-		}
-		else {
-			[dynamicLabelDialogLinks addObject:@""];
-		}
-	}
-    [encoder encodeObject:dynamicLabelDialogLinks	forKey: @"dynamicLabelDialogLinks"];
 }
 
 - (NSArray*) parts
@@ -223,20 +407,32 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 	else return nil;
 }
 
-- (NSArray*) dynamicLabels
+- (NSArray*) valueLabels
 {
-	return [partDictionary objectForKey:@"DynamicLabels"];
+	return [partDictionary objectForKey:@"ValueLabels"];
 }
 
-- (NSString*) dynamicLabel:(int)region
+- (NSArray*) statusLabels
 {
-	NSArray* labels = [partDictionary objectForKey:@"DynamicLabels"];
-	if(region < [labels count]) {
-		ORVacuumDynamicLabel* theLabel = [labels objectAtIndex:region];
-		float theValue = [theLabel value];
-		return [NSString stringWithFormat:@"%.2E",theValue];
+	return [partDictionary objectForKey:@"StatusLabels"];
+}
+
+- (NSString*) valueLabel:(int)region
+{
+	NSArray* labels = [partDictionary objectForKey:@"ValueLabels"];
+	for(ORVacuumValueLabel* theLabel in labels){
+		if(theLabel.regionTag == region)return [theLabel displayString];
 	}
-	else return @"No Value Available";
+	return @"No Value Available";
+}
+
+- (NSString*) statusLabel:(int)region
+{
+	NSArray* labels = [partDictionary objectForKey:@"StatusLabels"];
+	for(ORVacuumStatusLabel* theLabel in labels){
+		if(theLabel.regionTag == region)return [theLabel displayString];
+	}
+	return @"No Value Available";
 }
 
 
@@ -253,33 +449,28 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 - (NSString*) namesOfRegionsWithColor:(NSColor*)aColor
 {
 	NSMutableString* theRegions = [NSMutableString string];
-	NSArray* allLabels = [self staticLabels];
-	int count = 0;
-	for(ORVacuumStaticLabel* aLabel in allLabels){
-		int region = [aLabel partTag];
-		if([aColor isEqual:[self colorOfRegion:region]]){
-			[theRegions appendFormat:@"%@%@,",count!=0?@" ":@"",[[aLabel label] stringByReplacingOccurrencesOfString:@"\n" withString:@" "]];
-			count++;
+	int i;
+	for(i=0;i<8;i++){
+		if([aColor isEqual:[self colorOfRegion:i]]){
+			[theRegions appendFormat:@"%@%@,",i!=0?@" ":@"",[self regionName:i]];
 		}
 	}
 	
-	//special case: the cryostat has no label
-	if([aColor isEqual:[self colorOfRegion:2]])[theRegions appendString:@" Cryostat,"];
-	
 	if([theRegions hasSuffix:@","]) return [theRegions substringToIndex:[theRegions length]-1];
 	else return theRegions;
-	
 }
 
 #pragma mark ***AdcProcessor Protocol
-- (void)processIsStarting
+- (void) processIsStarting
 {
 	[self setVetoMask:0xffffffff];
+	involvedInProcess = YES;
 }
 
-- (void)processIsStopping
+- (void) processIsStopping
 {
 	[self setVetoMask:0xffffffff];
+	involvedInProcess = NO;
 }
 
 - (void) startProcessCycle
@@ -292,24 +483,7 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 
 - (double) setProcessAdc:(int)channel value:(double)aValue isLow:(BOOL*)isLow isHigh:(BOOL*)isHigh
 {
-	NSArray* adcValues = [self dynamicLabels];
-	if(channel<[adcValues count]){
-		ORVacuumDynamicLabel* theLabel = [adcValues objectAtIndex:channel];
-		BOOL pressureIsOK = aValue<2.5;
-		*isLow  = aValue<2.5; //replace with true limits......
-		*isHigh = aValue>0;
-		[theLabel setValue:aValue];
-		[theLabel setState:pressureIsOK];
-		NSArray* pipes = [self pipesForRegion:[theLabel partTag]];
-		for(ORVacuumPipe* aPipe in pipes){
-			[aPipe setState:[theLabel state]];
-		}
-	}
-	else {
-		*isLow  = NO;
-		*isHigh = NO;
-	}
-	return aValue;
+	return 0.0;
 }
 
 - (BOOL) setProcessBit:(int)channel value:(int)value
@@ -325,6 +499,16 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 		else if(value==2)	[gv setState:kGVClosed];
 		else                [gv setState:kGVImpossible];
 	}
+	
+	//special case... if the cryo roughing valve is open set the diaphram pump pressure to the cryopump region
+	//other wise set it to 1 Torr
+	if(channel == 5){
+		ORVacuumValueLabel* aRegionlabel = [self regionValueObj:kRegionDiaphramPump];
+		if([gv isOpen]) [aRegionlabel setValue:[self valueForRegion:kRegionCryoPump]];
+		else		    [aRegionlabel setValue:1.0];
+		[aRegionlabel setIsValid:[aRegionlabel isValid]];
+	}
+
 	return value;
 }
 
@@ -356,199 +540,284 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 	}
 }
 
+#pragma mark •••CardHolding Protocol
+- (int) maxNumberOfObjects	{ return 5; }	//default
+- (int) objWidth			{ return 80; }	//default
+- (int) groupSeparation		{ return 0; }	//default
+- (NSString*) nameForSlot:(int)aSlot	
+{ 
+    return [NSString stringWithFormat:@"Slot %d",aSlot]; 
+}
+
+- (NSRange) legalSlotsForObj:(id)anObj
+{
+	if([anObj isKindOfClass:NSClassFromString(@"ORTM700Model")])			return NSMakeRange(0,1);
+	else if([anObj isKindOfClass:NSClassFromString(@"ORRGA300Model")])		return NSMakeRange(1,1);
+	else if([anObj isKindOfClass:NSClassFromString(@"ORCP8CryopumpModel")]) return NSMakeRange(2,1);
+	else if([anObj isKindOfClass:NSClassFromString(@"ORTPG256AModel")])		return NSMakeRange(3,1);
+	else if([anObj isKindOfClass:NSClassFromString(@"ORMks660BModel")])		return NSMakeRange(4,1);
+		else return NSMakeRange(0,0);
+}
+
+- (BOOL) slot:(int)aSlot excludedFor:(id)anObj 
+{ 
+	if(aSlot == 0      && [anObj isKindOfClass:NSClassFromString(@"ORTM700Model")])		  return NO;
+	else if(aSlot == 1 && [anObj isKindOfClass:NSClassFromString(@"ORRGA300Model")])	  return NO;
+	else if(aSlot == 2 && [anObj isKindOfClass:NSClassFromString(@"ORCP8CryopumpModel")]) return NO;
+	else if(aSlot == 3 && [anObj isKindOfClass:NSClassFromString(@"ORTPG256AModel")])	  return NO;
+	else if(aSlot == 4 && [anObj isKindOfClass:NSClassFromString(@"ORMks660BModel")])     return NO;
+    else return YES;
+}
+
+- (int) slotAtPoint:(NSPoint)aPoint 
+{
+	return floor(((int)aPoint.y)/[self objWidth]);
+}
+
+- (NSPoint) pointForSlot:(int)aSlot 
+{
+	return NSMakePoint(0,aSlot*[self objWidth]);
+}
+
+- (void) place:(id)anObj intoSlot:(int)aSlot
+{
+    [anObj setTag:aSlot];
+	NSPoint slotPoint = [self pointForSlot:aSlot];
+	[anObj moveTo:slotPoint];
+}
+
+- (int) slotForObj:(id)anObj
+{
+    return [anObj tag];
+}
+
+- (int) numberSlotsNeededFor:(id)anObj
+{
+	return 1;
+}
+
+- (void) openDialogForComponent:(int)i
+{
+	for(OrcaObject* anObj in [self orcaObjects]){
+		if([anObj tag] == i){
+			[anObj makeMainController];
+			break;
+		}
+	}
+}
+
+- (NSString*) regionName:(int)i
+{
+	switch(i){
+		case kRegionAboveTurbo:		return @"Above Turbo";
+		case kRegionRGA:			return @"RGA";
+		case kRegionCryostat:		return @"Cryostat";
+		case kRegionCryoPump:		return @"CryoPump";
+		case kRegionBaratron:		return @"Baratron";
+		case kRegionDryN2:			return @"Dry N2";
+		case kRegionNegPump:		return @"Neg Pump";
+		case kRegionDiaphramPump:	return @"Diaphram Pump";
+		case kRegionBelowTurbo:		return @"Below Turbo";
+		default: return nil;
+	}
+}
+
 @end
 
 
 @implementation ORMJDVacuumModel (private)
+- (ORMks660BModel*)     findBaratron		{ return [self findObject:@"ORMks660BModel"];     }
+- (ORRGA300Model*)      findRGA				{ return [self findObject:@"ORRGA300Model"];      }
+- (ORTM700Model*)       findTurboPump		{ return [self findObject:@"ORTM700Model"];       }
+- (ORTPG256AModel*)     findPressureGauge   { return [self findObject:@"ORTPG256AModel"];     }
+- (ORCP8CryopumpModel*) findCryoPump		{ return [self findObject:@"ORCP8CryopumpModel"]; }
+
+- (id) findObject:(NSString*)aClassName
+{
+	for(OrcaObject* anObj in [self orcaObjects]){
+		if([anObj isKindOfClass:NSClassFromString(aClassName)])return anObj;
+	}
+	return nil;
+}
+
+
 - (void) makeParts
 {
-	
-#define kNumVacPipes		57
-	VacuumPipeInfo vacPipeList[kNumVacPipes] = {
+#define kNumVacPipes		59
+	VacuumPipeStruct vacPipeList[kNumVacPipes] = {
 		//region 0 pipes
-		{ kVacVPipe,  0, 50,			 260,				50,					450 }, 
-		{ kVacHPipe,  0, 50+kPipeRadius, 400,				180+kPipeRadius,	400 },
-		{ kVacVPipe,  0, 150,			 400-kPipeRadius,	150,				300 },
+		{ kVacVPipe,  kRegionAboveTurbo, 50,			 260,				50,					450 }, 
+		{ kVacHPipe,  kRegionAboveTurbo, 50+kPipeRadius, 400,				180+kPipeRadius,	400 },
+		{ kVacVPipe,  kRegionAboveTurbo, 150,			 400-kPipeRadius,	150,				300 },
+		
 		//region 1 pipes
-		{ kVacCorner, 1, 500,			  200,				kNA,				kNA },
-		{ kVacVPipe,  1, 500,			  200+kPipeRadius,	 500,				250 },
-		{ kVacHPipe,  1, 180,			  400,				350,				400 },
-		{ kVacHPipe,  1, 200,			  200,				500-kPipeRadius,	200 },
-		{ kVacVPipe,  1, 280,			  200+kPipeRadius,	280,				400-kPipeRadius },
-		{ kVacVPipe,  1, 280,			  400+kPipeRadius,	280,				420 },
-		{ kVacVPipe,  1, 230,			  400+kPipeRadius,	230,				450 },
-		{ kVacHPipe,  1, 230,			  350,				280-kPipeRadius,	350 },
+		{ kVacCorner, kRegionRGA,		500,			  200,				kNA,				kNA },
+		{ kVacVPipe,  kRegionRGA,		500,			  200+kPipeRadius,	 500,				250 },
+		{ kVacHPipe,  kRegionRGA,		180,			  400,				350,				400 },
+		{ kVacHPipe,  kRegionRGA,		200,			  200,				500-kPipeRadius,	200 },
+		{ kVacVPipe,  kRegionRGA,		280,			  200+kPipeRadius,	280,				400-kPipeRadius },
+		{ kVacVPipe,  kRegionRGA,		280,			  400+kPipeRadius,	280,				420 },
+		{ kVacVPipe,  kRegionRGA,		230,			  400+kPipeRadius,	230,				450 },
+		{ kVacHPipe,  kRegionRGA,		230,			  350,				280-kPipeRadius,	350 },
+		
 		//region 2 pipes (cyrostat)
-		{ kVacBox,	  2, 475,			  500,				525,				550 },
-		{ kVacBox,	  2, 600,			  450,				680,				560 },
-		{ kVacBigHPipe,2,525,			  525,		        600,				525 },
-		{ kVacCorner, 2, 700,			  400,				kNA,				kNA },
-		{ kVacVPipe,  2, 700,			   70,				700,				400-kPipeRadius },
-		{ kVacHPipe,  2, 350,			  400,				700-kPipeRadius,	400 },
-		{ kVacVPipe,  2, 600,			  350,				600,				400-kPipeRadius },
-		{ kVacVPipe,  2, 500,			  350,				500,				400-kPipeRadius },
-		{ kVacCorner, 2, 400,			  300,				kNA,				kNA },
-		{ kVacVPipe,  2, 400,			  300+kPipeRadius,	400,				400-kPipeRadius },
-		{ kVacHPipe,  2, 350,			  300,				400-kPipeRadius,	300 },
-		{ kVacHPipe,  2, 350,			  350,				400-kPipeRadius,	350 },
-		{ kVacVPipe,  2, 400,			  400+kPipeRadius,	400,				450 },
-		{ kVacVPipe,  2, 500,			  400+kPipeRadius,	500,				500 },
+		{ kVacBox,	   kRegionCryostat, 475,			  500,				525,				550 },
+		{ kVacBox,	   kRegionCryostat, 600,			  450,				680,				560 },
+		{ kVacBigHPipe, kRegionCryostat,525,			  525,		        600,				525 },
+		{ kVacCorner,  kRegionCryostat, 700,			  400,				kNA,				kNA },
+		{ kVacVPipe,   kRegionCryostat, 700,			   70,				700,				400-kPipeRadius },
+		{ kVacHPipe,   kRegionCryostat, 350,			  400,				700-kPipeRadius,	400 },
+		{ kVacVPipe,   kRegionCryostat, 600,			  350,				600,				400-kPipeRadius },
+		{ kVacVPipe,   kRegionCryostat, 500,			  350,				500,				400-kPipeRadius },
+		{ kVacCorner,  kRegionCryostat, 400,			  300,				kNA,				kNA },
+		{ kVacVPipe,   kRegionCryostat, 400,			  300+kPipeRadius,	400,				400-kPipeRadius },
+		{ kVacHPipe,   kRegionCryostat, 350,			  300,				400-kPipeRadius,	300 },
+		{ kVacHPipe,   kRegionCryostat, 350,			  350,				400-kPipeRadius,	350 },
+		{ kVacVPipe,   kRegionCryostat, 400,			  400+kPipeRadius,	400,				450 },
+		{ kVacVPipe,   kRegionCryostat, 500,			  400+kPipeRadius,	500,				500 },
 		//region 3 pipes
-		{ kVacVPipe,  3, 600,			  230,				600,				350 },
-		{ kVacHPipe,  3, 600+kPipeRadius, 300,				620,				300 },
-		{ kVacVPipe,  3, 580,			  70,				580,				200 },
-		{ kVacHPipe,  3, 530,			  150,				580-kPipeRadius,	150 },
-		{ kVacCorner, 3, 620,			  150,				kNA,				kNA },
-		{ kVacVPipe,  3, 620,			  150+kPipeRadius,	620,				200 },
-		{ kVacHPipe,  3, 620+kPipeRadius, 150,				640,				150 },
+		{ kVacVPipe,  kRegionCryoPump,	600,			  230,				600,				350 },
+		{ kVacHPipe,  kRegionCryoPump,	600+kPipeRadius, 300,				620,				300 },
+		{ kVacVPipe,  kRegionCryoPump,	580,			  70,				580,				200 },
+		{ kVacHPipe,  kRegionCryoPump,	530,			  150,				580-kPipeRadius,	150 },
+		{ kVacCorner, kRegionCryoPump,	620,			  150,				kNA,				kNA },
+		{ kVacVPipe,  kRegionCryoPump,	620,			  150+kPipeRadius,	620,				200 },
+		{ kVacHPipe,  kRegionCryoPump,	620+kPipeRadius, 150,				640,				150 },
 		//region 4 pipes
-		{ kVacBox,	  4, 470,			  570,				530,				620 },
-		{ kVacBox,	  4, 270,			  570,				330,				620 },
-		{ kVacCorner, 4, 500,			  525,				kNA,				kNA },
-		{ kVacCorner, 4, 650,			  525,				kNA,				kNA },
-		{ kVacHPipe,  4, 500+kPipeRadius, 525,				650-kPipeRadius,	525 },
-		{ kVacVPipe,  4, 500,			  525+kPipeRadius,	500,				570 },
-		{ kVacHPipe,  4, 330,			  600,				400,				600 },
-		{ kVacHPipe,  4, 400,			  600,				470,				600 },
-		{ kVacVPipe,  4, 360,			  550,				360,				600-kPipeRadius },
+		{ kVacBox,	  kRegionBaratron,  470,			  570,				530,				620 },
+		{ kVacBox,	  kRegionBaratron,  270,			  570,				330,				620 },
+		{ kVacCorner, kRegionBaratron,  500,			  525,				kNA,				kNA },
+		{ kVacCorner, kRegionBaratron,  650,			  525,				kNA,				kNA },
+		{ kVacHPipe,  kRegionBaratron,  500+kPipeRadius, 525,				650-kPipeRadius,	525 },
+		{ kVacVPipe,  kRegionBaratron,  500,			  525+kPipeRadius,	500,				570 },
+		{ kVacHPipe,  kRegionBaratron,  330,			  600,				400,				600 },
+		{ kVacHPipe,  kRegionBaratron,  400,			  600,				470,				600 },
+		{ kVacVPipe,  kRegionBaratron,  360,			  550,				360,				600-kPipeRadius },
 		//region 5 pipes
-		{ kVacCorner, 5, 150,			  30,				kNA,				kNA },
-		{ kVacCorner, 5, 700,			  30,				kNA,				kNA },
-		{ kVacVPipe,  5, 150,			  30+kPipeRadius,	150,				300 },
-		{ kVacHPipe,  5, 150+kPipeRadius, 30,				700-kPipeRadius,	30 },
-		{ kVacHPipe,  5, 150+kPipeRadius, 200,				200,				200 },
-		{ kVacVPipe,  5, 700,			  30+kPipeRadius,	700,				70 },
-		{ kVacVPipe,  5, 580,			  30+kPipeRadius,	580,				70 },
-		{ kVacCorner, 5, 350,			  80,				kNA,				kNA },
-		{ kVacVPipe,  5, 350,			  30+kPipeRadius,	350,				80-kPipeRadius },
-		{ kVacHPipe,  5, 330,			  80,				350-kPipeRadius,	80 },
-		{ kVacHPipe,  5, 300,			  80,				330,				80 },
+		{ kVacCorner, kRegionDryN2,		150,			  30,				kNA,				kNA },
+		{ kVacCorner, kRegionDryN2,		700,			  30,				kNA,				kNA },
+		{ kVacVPipe,  kRegionDryN2,		150,			  30+kPipeRadius,	150,				300 },
+		{ kVacHPipe,  kRegionDryN2,		150+kPipeRadius, 30,				700-kPipeRadius,	30 },
+		{ kVacHPipe,  kRegionDryN2,		150+kPipeRadius, 200,				200,				200 },
+		{ kVacVPipe,  kRegionDryN2,		700,			  30+kPipeRadius,	700,				70 },
+		{ kVacVPipe,  kRegionDryN2,		580,			  30+kPipeRadius,	580,				70 },
+		{ kVacCorner, kRegionDryN2,		330,			  80,				kNA,				kNA },
+		{ kVacVPipe,  kRegionDryN2,		330,			  30+kPipeRadius,	330,				80-kPipeRadius },
+		{ kVacHPipe,  kRegionDryN2,		310,			  80,				330-kPipeRadius,	80 },
+		{ kVacHPipe,  kRegionDryN2,		280,			  80,				310,				80 },
+		{ kVacVPipe,  kRegionDryN2,		400,			  30+kPipeRadius,	400,				50 },
+
 		//region 6 pipes
-		{ kVacVPipe,  6, 500,			  250,				500,				350 },
-		{ kVacHPipe,  6, 460,			  300,				500-kPipeRadius,	300 },
+		{ kVacVPipe,  kRegionNegPump,	500,			  250,				500,				350 },
+		{ kVacHPipe,  kRegionNegPump,	460,			  300,				500-kPipeRadius,	300 },
 		//region 7 pipes
-		{ kVacVPipe,  7, 50,			 100,				50,					200 }, 
-		{ kVacHPipe,  7, 50+kPipeRadius,  150,				530,				150 },
+		{ kVacVPipe,  kRegionDiaphramPump, 50,			  100,				50,					200 }, 
+		{ kVacHPipe,  kRegionDiaphramPump, 50+kPipeRadius,150,				530,				150 },
+		{ kVacVPipe,  kRegionDiaphramPump, 400,			  130,				400,				150-kPipeRadius }, 
 		//region 8 pipes
-		{ kVacVPipe,  8, 50,			 200,				50,					260 }, 
-
+		{ kVacVPipe,  kRegionBelowTurbo, 50,			  200,				50,					260 }, 
+		
 	};
-		
-#define kNumStaticVacLabelItems	18
-	VacuumStaticLabelInfo staticLabelItems[kNumStaticVacLabelItems] = {
-		//the parttags are equal to the index numbers of the regions
-		{kVacStaticLabel, 0, @"Turbo",			20,	 242,	80,	 268, YES, YES},
-		{kVacStaticLabel, 1, @"RGA",			260, 417,	300, 443, YES, YES},
-		{kVacStaticLabel, 3, @"Cryo Pump",		560, 200,	640, 230, YES, YES},
-		{kVacStaticLabel, 5, @"Dry N2\nSupply",	200,  60,	300, 100, YES, NO},
-		{kVacStaticLabel, 6, @"NEG Pump",		420, 285,	480, 315, YES, NO},
-		{kVacStaticLabel, 7, @"Diaphragm\nPump",20,	 80,	80,	 110, YES, NO},
-		{kVacStaticLabel, 8, @"Below Turbo",	 0,	  0,	 0,	   0, NO, NO},
-		
-		{kVacStaticLabel, 99, @"V1",			175, 375,	185, 385, NO, NO},
-		{kVacStaticLabel, 99, @"V2",			335, 375,	365, 385, NO, NO},
-		{kVacStaticLabel, 99, @"V3",			515, 345,	525, 355, NO, NO},
-		{kVacStaticLabel, 99, @"V4",			575, 345,	585, 355, NO, NO},
-		{kVacStaticLabel, 99, @"V5",			515, 245,	525, 255, NO, NO},
-		{kVacStaticLabel, 99, @"Roughing",		485, 165,	530, 175, NO, NO},
-		
-		{kVacStaticLabel, 99, @"B1",			195, 175,	205, 185, NO, NO},
-		{kVacStaticLabel, 99, @"B2",			120, 295,	135, 305, NO, NO},
-		{kVacStaticLabel, 99, @"Purge",			550,  45,	560,  55, NO, NO},
-		{kVacStaticLabel, 99, @"B4",			680,  45,	690,  55, NO, NO},
-		{kVacStaticLabel, 99, @"B5",			25,  195,	35,  205, NO, NO},
-
+	
+#define kNumStaticLabelItems	3
+	VacuumStaticLabelStruct staticLabelItems[kNumStaticLabelItems] = {
+		{kVacStaticLabel, kRegionDryN2,			@"Dry N2\nSupply",	200,  60,	280, 100},
+		{kVacStaticLabel, kRegionNegPump,		@"NEG Pump",		420, 285,	480, 315},
+		{kVacStaticLabel, kRegionDiaphramPump,	@"Diaphragm\nPump",	 20,  80,	 80, 110},
 	};	
 	
-#define kNumDynamicVacLabelItems	5
-	VacuumDynamicLabelInfo dynamicLabelItems[kNumDynamicVacLabelItems] = {
-		{kVacDynamicLabel, 0, @"PKR G1",	20,	 450,	80,	 490},
-		{kVacDynamicLabel, 1, @"PKR G2",	200, 450,	260, 490},
-		{kVacDynamicLabel, 2, @"PKR G3",	370, 450,	430, 490},
-		{kVacDynamicLabel, 3, @"PKR G4",	620, 280,	680, 320},
-		{kVacDynamicLabel, 4, @"Baratron",	330, 520,	390, 550},
+#define kNumStatusItems	10
+	VacuumDynamicLabelStruct dynamicLabelItems[kNumStatusItems] = {
+		//type,	region, component, channel
+		{kVacStatusItem,   kRegionAboveTurbo,	0, 5,  @"Turbo",	20,	 242,	80,	 268},
+		{kVacStatusItem,   kRegionRGA,			1, 6,  @"RGA",		260, 417,	300, 443},
+		{kVacStatusItem,   kRegionCryoPump,		2, 7,  @"Cryo Pump",560, 200,	640, 230},
+		{kVacPressureItem, kRegionAboveTurbo,	3, 0,  @"PKR G1",	20,	 450,	80,	 480},
+		{kVacPressureItem, kRegionRGA,			3, 1,  @"PKR G2",	200, 450,	260, 480},
+		{kVacPressureItem, kRegionCryostat,		3, 2,  @"PKR G3",	370, 450,	430, 480},
+		{kVacPressureItem, kRegionCryoPump,		3, 3,  @"PKR G4",	620, 285,	680, 315},
+		{kVacPressureItem, kRegionBaratron,		4, 0,  @"Baratron",	330, 520,	390, 550},
+		{kVacPressureItem, kRegionDiaphramPump,	3, 3,  @"Assumed",	370, 100,	430, 130},
+		{kVacPressureItem, kRegionDryN2,		99, 99,@"Assumed",	370, 50,	430, 80},
 	};	
-			
 	
-#define kNumVacLines 11
-	VacuumLineInfo vacLines[kNumVacLines] = {
+#define kNumVacLines 11 
+	VacuumLineStruct vacLines[kNumVacLines] = {
 		{kVacLine, 180,400,180,420},  //V1
 		{kVacLine, 350,400,350,420},  //V2
 		{kVacLine, 600,350,620,350},  //V3
 		{kVacLine, 480,350,500,350},  //V4
 		{kVacLine, 480,250,500,250},  //V5
 		{kVacLine, 530,130,530,140},  //V6
-	
+		
 		{kVacLine, 200,200,200,220},  //B1
 		{kVacLine, 150,300,170,300},  //B2
-		{kVacLine, 560,70,580,70},  //B3
-		{kVacLine, 680,70,700,70},  //B4
-		{kVacLine, 60,200,70,200},  //B5
+		{kVacLine, 560,70,580,70},    //B3
+		{kVacLine, 680,70,700,70},    //B4
+		{kVacLine, 60,200,70,200},    //B5
 	};
-
+	
 #define kNumVacGVs			18
-	VacuumGVInfo gvList[kNumVacGVs] = {
-		{kVacVGateV, 0,		@"V1",			k2BitReadBack,	180, 400,	0,1,	kControlAbove},	//V1. Control + read back
-		{kVacVGateV, 1,		@"V2",			k2BitReadBack,	350, 400,	1,2,	kControlAbove},	//V2. Control + read back
-		{kVacHGateV, 2,		@"V3",			k2BitReadBack,	500, 350,	2,6,	kControlLeft},	//V4. Control + read back
-		{kVacHGateV, 3,		@"V4",			k2BitReadBack,	600, 350,	2,3,	kControlRight},	//V3. Control + read back
-		{kVacHGateV, 4,		@"V5",			k2BitReadBack,	500, 250,	1,6,	kControlLeft},	//V5. Control + read back
-		{kVacVGateV, 5,		@"Roughing",	k1BitReadBack,	530, 150,	7,3,	kControlBelow},   //V6. Control + read back
+	VacuumGVStruct gvList[kNumVacGVs] = {
+		{kVacVGateV, 0,		@"V1",			k2BitReadBack,				180, 400,	kRegionAboveTurbo,	kRegionRGA,				kControlAbove},	//V1. Control + read back
+		{kVacVGateV, 1,		@"V2",			k2BitReadBack,				350, 400,	kRegionRGA,			kRegionCryostat,		kControlAbove},	//V2. Control + read back
+		{kVacHGateV, 2,		@"V3",			k2BitReadBack,				500, 350,	kRegionCryostat,	kRegionNegPump,			kControlLeft},	//V4. Control + read back
+		{kVacHGateV, 3,		@"V4",			k2BitReadBack,				600, 350,	kRegionCryostat,	kRegionCryoPump,		kControlRight},	//V3. Control + read back
+		{kVacHGateV, 4,		@"V5",			k2BitReadBack,				500, 250,	kRegionRGA,			kRegionNegPump,			kControlLeft},	//V5. Control + read back
+		{kVacVGateV, 5,		@"Roughing",	k1BitReadBack,				530, 150,	kRegionDiaphramPump,kRegionCryoPump,		kControlBelow},   //V6. Control + read back
 		
-		{kVacVGateV, 6,		@"B1",			k1BitReadBack,	200, 200,	1,5,	kControlAbove},	//Control only
-		{kVacHGateV, 7,		@"B2",			k1BitReadBack,	150, 300,	0,5,	kControlRight},	//Control only
-		{kVacHGateV, 8,		@"Purge",			k1BitReadBack,	580, 70,	3,5,	kControlLeft},	//Control only 
-		{kVacHGateV, 9,		@"B4",			k1BitReadBack,	700, 70,	2,5,	kControlLeft},	//Control only 
+		{kVacVGateV, 6,		@"B1",			k1BitReadBack,				200, 200,	kRegionRGA,			kRegionDryN2,			kControlAbove},	//Control only
+		{kVacHGateV, 7,		@"B2",			k1BitReadBack,				150, 300,	kRegionAboveTurbo,	kRegionDryN2,			kControlRight},	//Control only
+		{kVacHGateV, 8,		@"Purge",		k1BitReadBack,				580, 70,	kRegionCryoPump,	kRegionDryN2,			kControlLeft},	//Control only 
+		{kVacHGateV, 9,		@"B4",			k1BitReadBack,				700, 70,	kRegionCryostat,	kRegionDryN2,			kControlLeft},	//Control only 
 		
-		{kVacVGateV, 10,	@"Burst",		kManualOnlyShowClosed,		350, 300,	2,kUpToAir,	kControlNone},	//burst
-		{kVacVGateV, 11,	@"N2 Manual",	kManualOnlyShowChanging,	330, 80,	5,kUpToAir,	kControlNone},	//Manual N2 supply
-		{kVacVGateV, 12,	@"PRV",			kManualOnlyShowClosed,		640, 150,	3,kUpToAir,	kControlNone},	//PRV
-		{kVacVGateV, 13,	@"PRV",			kManualOnlyShowClosed,		350, 350,	2,kUpToAir,	kControlNone},	//PRV
-		{kVacVGateV, 14,	@"C1",			kManualOnlyShowChanging,	400, 600,	4,4,		kControlNone},	//Manual only
-		{kVacHGateV, 15,	@"B5",			k1BitReadBack,				50, 200,	7,8,		kControlRight},	//future control
-		{kVacHGateV, 16,	@"Turbo",		k1BitReadBack,				50, 260,	0,8,		kControlNone},	//this is a virtual valve-- really the turbo on/off
-		{kVacVGateV, 17,	@"PRV",			kManualOnlyShowClosed,		230, 350,	1,kUpToAir,	kControlNone},	//PRV
+		{kVacVGateV, 10,	@"Burst",		kManualOnlyShowClosed,		350, 300,	kRegionCryostat,	kUpToAir,				kControlNone},	//burst
+		{kVacVGateV, 11,	@"N2 Manual",	kManualOnlyShowChanging,	310, 80,	kRegionDryN2,		kUpToAir,				kControlNone},	//Manual N2 supply
+		{kVacVGateV, 12,	@"PRV",			kManualOnlyShowClosed,		640, 150,	kRegionCryoPump,	kUpToAir,				kControlNone},	//PRV
+		{kVacVGateV, 13,	@"PRV",			kManualOnlyShowClosed,		350, 350,	kRegionCryostat,	kUpToAir,				kControlNone},	//PRV
+		{kVacVGateV, 14,	@"C1",			kManualOnlyShowChanging,	400, 600,	kRegionBaratron,	kRegionBaratron,		kControlNone},	//Manual only
+		{kVacHGateV, 15,	@"B5",			k1BitReadBack,				50, 200,	kRegionDiaphramPump,kRegionBelowTurbo,		kControlRight},	//future control
+		{kVacHGateV, 16,	@"Turbo",		k1BitReadBack,				50, 260,	kRegionAboveTurbo,	kRegionBelowTurbo,		kControlNone},	//this is a virtual valve-- really the turbo on/off
+		{kVacVGateV, 17,	@"PRV",			kManualOnlyShowClosed,		230, 350,	kRegionRGA,			kUpToAir,				kControlNone},	//PRV
 	};
 	
 	[self makeLines:vacLines					num:kNumVacLines];
 	[self makePipes:vacPipeList					num:kNumVacPipes];
 	[self makeGateValves:gvList					num:kNumVacGVs];
-	[self makeStaticLabels:staticLabelItems		num:kNumStaticVacLabelItems];
-	[self makeDynamicLabels:dynamicLabelItems	num:kNumDynamicVacLabelItems];
-	
-	
+	[self makeStaticLabels:staticLabelItems		num:kNumStaticLabelItems];
+	[self makeDynamicLabels:dynamicLabelItems	num:kNumStatusItems];
 }
 
-- (void) makePipes:(VacuumPipeInfo*)pipeList num:(int)numItems
+- (void) makePipes:( VacuumPipeStruct*)pipeList num:(int)numItems
 {
 	int i;
 	for(i=0;i<numItems;i++){
 		ORVacuumPipe* aPipe = nil;
 		switch(pipeList[i].type){
 			case kVacCorner:
-				aPipe = [[[ORVacuumCPipe alloc] initWithDelegate:self partTag:pipeList[i].partTag at:NSMakePoint(pipeList[i].x1, pipeList[i].y1)] autorelease];
+				aPipe = [[[ORVacuumCPipe alloc] initWithDelegate:self regionTag:pipeList[i].regionTag at:NSMakePoint(pipeList[i].x1, pipeList[i].y1)] autorelease];
 				break;
 				
 			case kVacVPipe:
-				aPipe = [[[ORVacuumVPipe alloc] initWithDelegate:self partTag:pipeList[i].partTag startPt:NSMakePoint(pipeList[i].x1, pipeList[i].y1) endPt:NSMakePoint(pipeList[i].x2, pipeList[i].y2)] autorelease];
+				aPipe = [[[ORVacuumVPipe alloc] initWithDelegate:self regionTag:pipeList[i].regionTag startPt:NSMakePoint(pipeList[i].x1, pipeList[i].y1) endPt:NSMakePoint(pipeList[i].x2, pipeList[i].y2)] autorelease];
 				break;
 				
 			case kVacHPipe:
-				aPipe = [[[ORVacuumHPipe alloc] initWithDelegate:self partTag:pipeList[i].partTag startPt:NSMakePoint(pipeList[i].x1, pipeList[i].y1) endPt:NSMakePoint(pipeList[i].x2, pipeList[i].y2)] autorelease];
+				aPipe = [[[ORVacuumHPipe alloc] initWithDelegate:self regionTag:pipeList[i].regionTag startPt:NSMakePoint(pipeList[i].x1, pipeList[i].y1) endPt:NSMakePoint(pipeList[i].x2, pipeList[i].y2)] autorelease];
 				break;
 				
 			case kVacBigHPipe:
-				aPipe = [[[ORVacuumBigHPipe alloc] initWithDelegate:self partTag:pipeList[i].partTag startPt:NSMakePoint(pipeList[i].x1, pipeList[i].y1) endPt:NSMakePoint(pipeList[i].x2, pipeList[i].y2)] autorelease];
+				aPipe = [[[ORVacuumBigHPipe alloc] initWithDelegate:self regionTag:pipeList[i].regionTag startPt:NSMakePoint(pipeList[i].x1, pipeList[i].y1) endPt:NSMakePoint(pipeList[i].x2, pipeList[i].y2)] autorelease];
 				break;
 				
 			case kVacBox:
-				aPipe = [[[ORVacuumBox alloc] initWithDelegate:self partTag:pipeList[i].partTag bounds:NSMakeRect(pipeList[i].x1, pipeList[i].y1,pipeList[i].x2-pipeList[i].x1,pipeList[i].y2-pipeList[i].y1)] autorelease];
+				aPipe = [[[ORVacuumBox alloc] initWithDelegate:self regionTag:pipeList[i].regionTag bounds:NSMakeRect(pipeList[i].x1, pipeList[i].y1,pipeList[i].x2-pipeList[i].x1,pipeList[i].y2-pipeList[i].y1)] autorelease];
 				break;
 		}
 	}
 }
 
-- (void) makeGateValves:(VacuumGVInfo*)gvList num:(int)numItems
+- (void) makeGateValves:( VacuumGVStruct*)gvList num:(int)numItems
 {
 	int i;
 	for(i=0;i<numItems;i++){
@@ -567,32 +836,39 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 		}
 	}
 }
-- (void) makeStaticLabels:(VacuumStaticLabelInfo*)labelItems num:(int)numItems
+
+- (void) makeStaticLabels:(VacuumStaticLabelStruct*)labelItems num:(int)numItems
 {
 	int i;
 	for(i=0;i<numItems;i++){
 		NSRect theBounds = NSMakeRect(labelItems[i].x1,labelItems[i].y1,labelItems[i].x2-labelItems[i].x1,labelItems[i].y2-labelItems[i].y1);
-		ORVacuumStaticLabel* aLabel = [[ORVacuumStaticLabel alloc] initWithDelegate:self partTag: labelItems[i].partTag label:labelItems[i].label bounds:theBounds];
-		aLabel.drawBox				= labelItems[i].drawBox;
-		aLabel.displayAuxStatus		= labelItems[i].displayAuxStatus;
+		ORVacuumStaticLabel* aLabel = [[ORVacuumStaticLabel alloc] initWithDelegate:self regionTag:labelItems[i].regionTag label:labelItems[i].label bounds:theBounds];
 		[aLabel release];
 	}
 }
 
-- (void) makeDynamicLabels:(VacuumDynamicLabelInfo*)labelItems num:(int)numItems
+- (void)  makeDynamicLabels:(VacuumDynamicLabelStruct*)labelItems num:(int)numItems
 {
 	int i;
 	for(i=0;i<numItems;i++){
 		NSRect theBounds = NSMakeRect(labelItems[i].x1,labelItems[i].y1,labelItems[i].x2-labelItems[i].x1,labelItems[i].y2-labelItems[i].y1);
-		[[[ORVacuumDynamicLabel alloc] initWithDelegate:self partTag: labelItems[i].partTag label:labelItems[i].label bounds:theBounds] autorelease];
+		if(labelItems[i].type == kVacPressureItem){
+			[[[ORVacuumValueLabel alloc] initWithDelegate:self regionTag:labelItems[i].regionTag component:labelItems[i].component channel:labelItems[i].channel label:labelItems[i].label bounds:theBounds] autorelease];			
+		}
+		if(labelItems[i].type == kVacStatusItem){
+			[[[ORVacuumStatusLabel alloc] initWithDelegate:self regionTag:labelItems[i].regionTag component:labelItems[i].component channel:labelItems[i].channel label:labelItems[i].label bounds:theBounds] autorelease];
+		}
 	}
+	ORVacuumValueLabel* aLabel = [self regionValueObj:kRegionDryN2];
+	[aLabel setIsValid:YES];
+	[aLabel setValue:1.0E3];
 }
 
-- (void) makeLines:(VacuumLineInfo*)lineItems num:(int)numItems
+- (void) makeLines:( VacuumLineStruct*)lineItems num:(int)numItems
 {
 	int i;
 	for(i=0;i<numItems;i++){
-		[[[ORVacuumLine alloc] initWithDelegate:self partTag:0 startPt:NSMakePoint(lineItems[i].x1, lineItems[i].y1) endPt:NSMakePoint(lineItems[i].x2, lineItems[i].y2)] autorelease];
+		[[[ORVacuumLine alloc] initWithDelegate:self startPt:NSMakePoint(lineItems[i].x1, lineItems[i].y1) endPt:NSMakePoint(lineItems[i].x2, lineItems[i].y2)] autorelease];
 	}
 }
 
@@ -620,9 +896,17 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 	
 	NSArray* staticLabels = [self staticLabels];
 	for(ORVacuumStaticLabel* aLabel in staticLabels){
-		int region = [aLabel partTag];
+		int region = [aLabel regionTag];
 		if(region<kNumberPriorityRegions){
 			[aLabel setControlColor:regionColor[region]];
+		}
+	}
+	
+	NSArray* statusLabels = [self statusLabels];
+	for(ORVacuumStatusLabel* aLabel in statusLabels){
+		int regionTag = [aLabel regionTag];
+		if(regionTag<kNumberPriorityRegions){
+			[aLabel setControlColor:regionColor[regionTag]];
 		}
 	}
 }
@@ -644,8 +928,7 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 	}
 	NSArray* gateValves = [self gateValvesConnectedTo:(int)aRegion];
 	for(id aGateValve in gateValves){
-		int state = [aGateValve state];
-		if(state!=kGVClosed){
+		if([aGateValve isOpen]){
 			int r1 = [aGateValve connectingRegion1];
 			int r2 = [aGateValve connectingRegion2];
 			if(r1!=aRegion){
@@ -665,6 +948,8 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 
 - (void) addPart:(id)aPart
 {
+	if(!aPart)return;
+	
 	//the parts array contains all parts
 	if(!parts)parts = [[NSMutableArray array] retain];
 	[parts addObject:aPart];
@@ -674,10 +959,18 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 		partDictionary = [[NSMutableDictionary dictionary] retain];
 		[partDictionary setObject:[NSMutableDictionary dictionary] forKey:@"Regions"];
 		[partDictionary setObject:[NSMutableArray array] forKey:@"GateValves"];		
-		[partDictionary setObject:[NSMutableArray array] forKey:@"DynamicLabels"];		
+		[partDictionary setObject:[NSMutableArray array] forKey:@"ValueLabels"];		
+		[partDictionary setObject:[NSMutableArray array] forKey:@"StatusLabels"];		
 		[partDictionary setObject:[NSMutableArray array] forKey:@"StaticLabels"];		
 	}
-	NSNumber* thePartKey = [NSNumber numberWithInt:[aPart partTag]];
+	if(!valueDictionary){
+		valueDictionary = [[NSMutableDictionary dictionary] retain];
+	}
+	if(!statusDictionary){
+		statusDictionary = [[NSMutableDictionary dictionary] retain];
+	}
+	
+	NSNumber* thePartKey = [NSNumber numberWithInt:[aPart regionTag]];
 	if([aPart isKindOfClass:NSClassFromString(@"ORVacuumPipe")]){
 		NSMutableArray* aRegionArray = [[partDictionary objectForKey:@"Regions"] objectForKey:thePartKey];
 		if(!aRegionArray)aRegionArray = [NSMutableArray array];
@@ -687,8 +980,13 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 	else if([aPart isKindOfClass:NSClassFromString(@"ORVacuumGateValve")]){
 		[[partDictionary objectForKey:@"GateValves"] addObject:aPart];
 	}
-	else if([aPart isKindOfClass:NSClassFromString(@"ORVacuumDynamicLabel")]){
-		[[partDictionary objectForKey:@"DynamicLabels"] addObject:aPart];
+	else if([aPart isKindOfClass:NSClassFromString(@"ORVacuumValueLabel")]){
+		[[partDictionary objectForKey:@"ValueLabels"] addObject:aPart];
+		[valueDictionary setObject:aPart forKey:[NSNumber numberWithInt:[aPart regionTag]]];
+	}
+	else if([aPart isKindOfClass:NSClassFromString(@"ORVacuumStatusLabel")]){
+		[[partDictionary objectForKey:@"StatusLabels"] addObject:aPart];
+		[statusDictionary setObject:aPart forKey:[NSNumber numberWithInt:[aPart regionTag]]];
 	}
 	else if([aPart isKindOfClass:NSClassFromString(@"ORVacuumStaticLabel")]){
 		[[partDictionary objectForKey:@"StaticLabels"] addObject:aPart];
@@ -727,4 +1025,361 @@ NSString* ORMJCVacuumLock				  = @"ORMJCVacuumLock";
 	}
 	return nil;
 }
+
+- (BOOL) region:(int)aRegion valueHigherThan:(double)aValue
+{
+	if(aRegion == kRegionNegPump){
+		if([[self gateValve:2] isOpen])		 return [[self regionValueObj:kRegionCryostat] valueHigherThan:aValue];
+		else if([[self gateValve:4] isOpen]) return [[self regionValueObj:kRegionRGA] valueHigherThan:aValue];
+		else return 0.0;
+	}
+	else return [[self regionValueObj:aRegion] valueHigherThan:aValue];
+}
+
+- (BOOL) valueValidForRegion:(int)aRegion
+{
+	if(aRegion == kRegionNegPump)return YES;
+	else return [[self regionValueObj:aRegion] isValid];
+}
+
+- (double) valueForRegion:(int)aRegion
+{	
+	if(aRegion == kRegionNegPump){
+		if([[self gateValve:2] isOpen])		 return [self valueForRegion:kRegionCryostat];
+		else if([[self gateValve:4] isOpen]) return [self valueForRegion:kRegionRGA];
+		else return 0.0;
+	}
+	else return [[self regionValueObj:aRegion] value];
+}
+
+- (ORVacuumValueLabel*) regionValueObj:(int)aRegion
+{
+	return [valueDictionary objectForKey:[NSNumber numberWithInt:aRegion]];
+}
+- (id) component:(int)aComponentTag
+{
+	for(OrcaObject* anObj in [self orcaObjects]){
+		if([anObj tag] == aComponentTag)return anObj;
+	}
+	return nil;
+}
+
+- (BOOL) regionColor:(int)r1 sameAsRegion:(int)r2
+{
+	NSColor* c1	= [self colorOfRegion:r1];
+	NSColor* c2	= [self colorOfRegion:r2];
+	return [c1 isEqual:c2];
+}
+			 
+- (void) onAllGateValvesRemoveConstraint:(NSString*)aConstraintName
+{
+	for(ORVacuumGateValve* aGateValve in [self gateValves]){
+		[self removeConstraint:aConstraintName fromGateValve:aGateValve];
+	}
+}
+
+- (void)  checkAllConstraints
+{
+	if(!constraintCheckScheduled){
+		constraintCheckScheduled = YES;
+		[self performSelector:@selector(deferredConstraintCheck) withObject:nil afterDelay:.5];
+	}
+}
+- (void) deferredConstraintCheck
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(deferredConstraintCheck) object:nil];
+	[self checkTurboRelatedConstraints:[self findTurboPump]];
+	[self checkRGARelatedConstraints:  [self findRGA]];
+	[self checkCryoPumpRelatedConstraints:[self findCryoPump]];
+	[self checkPressureConstraints];
+	constraintCheckScheduled = NO;
+}
+
+- (void) checkTurboRelatedConstraints:(ORTM700Model*) turbo
+{
+	BOOL turboIsOn;
+	if(![turbo isValid]) turboIsOn = YES;
+	else turboIsOn = [turbo stationPower];
+	//
+	if(turboIsOn){
+		for(ORVacuumGateValve* aGateValve in [self gateValves]){
+			//---------------------------------------------------------------------------
+			//Opening valve will expose turbo pump to potentially damaging pressures.
+			if([aGateValve isClosed]){
+				int side1				= [aGateValve connectingRegion1];
+				int side2				= [aGateValve connectingRegion2];
+				BOOL side1High			= [self region:side1 valueHigherThan:1.0E-1];
+				BOOL side2High			= [self region:side2 valueHigherThan:1.0E-1];
+				
+				if([self regionColor:side1 sameAsRegion:side2]){
+					[self removeConstraint:kTurboOnPressureConstraint fromGateValve:aGateValve];
+				}
+				else if([self regionColor:side1 sameAsRegion:kRegionAboveTurbo] && side2High ){
+					[self addConstraint:kTurboOnPressureConstraint reason:kTurboOnPressureConstraintReason toGateValve:aGateValve];
+				}
+				else if([self regionColor:side1 sameAsRegion:kRegionBelowTurbo] && side2High){
+					[self addConstraint:kTurboOnPressureConstraint reason:kTurboOnPressureConstraintReason toGateValve:aGateValve];
+				}
+				else if([self regionColor:side2 sameAsRegion:kRegionAboveTurbo] && side1High){
+					[self addConstraint:kTurboOnPressureConstraint reason:kTurboOnPressureConstraintReason toGateValve:aGateValve];
+				}
+				else if([self regionColor:side2 sameAsRegion:kRegionBelowTurbo] && side1High){
+					[self addConstraint:kTurboOnPressureConstraint reason:kTurboOnPressureConstraintReason toGateValve:aGateValve];
+				}
+				else [self removeConstraint:kTurboOnPressureConstraint  fromGateValve:aGateValve];
+			}
+			else [self removeConstraint:kTurboOnPressureConstraint  fromGateValve:aGateValve];
+		}
+		
+		//---------------------------------------------------------------------------
+		//the next constraints involve the vacSentry and the cryoRoughing valve
+		ORVacuumGateValve* vacSentryValve    = [self gateValve:15];
+		ORVacuumGateValve* cryoRoughingValve = [self gateValve:5];
+		BOOL PKRG2PressureHigh				 = [self region:kRegionCryoPump valueHigherThan:2];
+
+		//---------------------------------------------------------------------------
+		//Opening cryopump roughing valve could expose turbo pump to potentially damaging pressures.
+		if([vacSentryValve isOpen] && [cryoRoughingValve isClosed]){
+			[self addConstraint:kTurboOnSentryOpenConstraint reason:kTurboOnSentryOpenConstraintReason toGateValve:cryoRoughingValve];
+		}
+		else {
+			[self removeConstraint:kTurboOnSentryOpenConstraint fromGateValve:cryoRoughingValve];
+		}
+		
+		//---------------------------------------------------------------------------
+		//Opening vacuum sentry could expose turbo pump to potentially damaging pressures.
+		if([cryoRoughingValve isOpen] && PKRG2PressureHigh){
+			[self addConstraint:kTurboOnCryoRoughingOpenG4HighConstraint reason:kTurboOnCryoRoughingOpenG4HighReason toGateValve:vacSentryValve];
+		}
+		else {
+			[self removeConstraint:kTurboOnCryoRoughingOpenG4HighConstraint fromGateValve:vacSentryValve];
+		}
+	}
+	else {
+		[self onAllGateValvesRemoveConstraint: kTurboOnPressureConstraint];
+	}	
+}
+
+- (void) addConstraint:(NSString*)aName reason:(NSString*)aReason toGateValve:(id)aGateValve
+{
+	[aGateValve addConstraint:aName reason:aReason];
+	if([aGateValve partTag] == 8)		[[self findCryoPump] addPurgeConstraint:aName reason:aReason];
+	else if([aGateValve partTag] == 5)	[[self findCryoPump] addRoughingConstraint:aName reason:aReason];
+}
+
+- (void) removeConstraint:(NSString*)aName fromGateValve:(id)aGateValve
+{
+	[aGateValve removeConstraint:aName];
+	if([aGateValve partTag] == 8)		[[self findCryoPump] removePurgeConstraint:aName];
+	else if([aGateValve partTag] == 5)	[[self findCryoPump] removeRoughingConstraint:aName];
+}
+
+
+- (void) checkCryoPumpRelatedConstraints:(ORCP8CryopumpModel*) cryoPump
+{
+	ORVacuumGateValve* cryoRoughingValve = [self gateValve:5];
+	ORVacuumGateValve* cryoPurgeValve    = [self gateValve:8];
+	ORVacuumGateValve* CF6Valve			 = [self gateValve:3];
+	ORVacuumStatusLabel* cryoRegionObj = [statusDictionary objectForKey:[NSNumber numberWithInt:kRegionCryoPump]];
+
+	BOOL cryoPumpEnabled;
+	if(![cryoPump isValid]) cryoPumpEnabled = YES;
+	else cryoPumpEnabled = [cryoPump pumpStatus];
+	
+	//---------------------------------------------------------------------------
+	//Opening purge or roughing valve could cause excessive gas condensation on cryo pump.
+	if(cryoPumpEnabled){
+		if([cryoRoughingValve isClosed]) [self addConstraint:kCryoCondensationConstraint reason:kCryoCondensationReason toGateValve:cryoRoughingValve];
+		else							 [self removeConstraint:kCryoCondensationConstraint fromGateValve:cryoRoughingValve];
+		
+		if([cryoPurgeValve isClosed])    [self	addConstraint:kCryoCondensationConstraint reason:kCryoCondensationReason toGateValve:cryoPurgeValve];
+		else							 [self  removeConstraint:kCryoCondensationConstraint fromGateValve:cryoPurgeValve];
+	}
+	else {
+		[self removeConstraint:kCryoCondensationConstraint fromGateValve:cryoPurgeValve];
+		[self removeConstraint:kCryoCondensationConstraint fromGateValve:cryoRoughingValve];
+		[cryoPump removePumpOnConstraint:kRgaOnOpenToCryoConstraint];
+		[cryoRegionObj removeConstraint:kRgaOnOpenToCryoConstraint];
+	}
+	
+	if([cryoRoughingValve isOpen] && !cryoPumpEnabled){
+		[cryoPump addPumpOnConstraint:kRoughingValveOpenCryoConstraint reason:kRoughingValveOpenCryoReason];
+		[cryoRegionObj addConstraint:kRoughingValveOpenCryoConstraint reason:kRoughingValveOpenCryoReason];
+	}
+	else {
+		[cryoPump removePumpOnConstraint:kRoughingValveOpenCryoConstraint];
+		[cryoRegionObj removeConstraint:kRoughingValveOpenCryoConstraint];
+	}
+
+	//---------------------------------------------------------------------------
+	//Turning Cryopump OFF will expose system to cryo pump evaporation.
+	if([CF6Valve isOpen] && cryoPumpEnabled){
+		[cryoPump addPumpOffConstraint:k6CFValveOpenCryoConstraint reason:k6CFValveOpenCryoReason];
+		[cryoRegionObj addConstraint:k6CFValveOpenCryoConstraint reason:k6CFValveOpenCryoReason];
+	}
+	else {
+		[cryoPump removePumpOffConstraint:k6CFValveOpenCryoConstraint];
+		[cryoRegionObj removeConstraint:k6CFValveOpenCryoConstraint];
+	}
+}
+
+- (void) checkRGARelatedConstraints:(ORRGA300Model*) rga
+{
+	BOOL rgaIsOn;
+	if(![rga isValid]) rgaIsOn = YES;
+	else rgaIsOn = [rga filamentIsOn];
+	
+	ORVacuumStatusLabel* turboRegionObj	= [statusDictionary objectForKey:[NSNumber numberWithInt:kRegionAboveTurbo]];
+	ORVacuumStatusLabel* cryoRegionObj	= [statusDictionary objectForKey:[NSNumber numberWithInt:kRegionCryoPump]];
+	ORCP8CryopumpModel*  cryoPump		= [self findCryoPump];
+	ORTM700Model*		 turboPump		= [self findTurboPump];
+	//Do the gatevalves first
+	if(rgaIsOn){
+		//---------------------------------------------------------------------------
+		//Opening valve will expose RGA to potentially damaging pressures.
+		for(ORVacuumGateValve* aGateValve in [self gateValves]){
+			//check kRgaOnConstraint
+			if([aGateValve isClosed]){
+				int side1				= [aGateValve connectingRegion1];
+				int side2				= [aGateValve connectingRegion2];
+				BOOL side1High			= [self region:side1 valueHigherThan:1.0E-5];
+				BOOL side2High			= [self region:side2 valueHigherThan:1.0E-5];
+				
+				if([self regionColor:side1 sameAsRegion:side2]){
+					[aGateValve removeConstraint:kRgaOnConstraint];
+				}
+				else if([self regionColor:side1 sameAsRegion:kRegionRGA] && side2High ){
+					[self addConstraint:kRgaOnConstraint reason:kRgaConstraintReason toGateValve:aGateValve];
+				}
+				else if([self regionColor:side2 sameAsRegion:kRegionRGA] && side1High){
+					[self addConstraint:kRgaOnConstraint reason:kRgaConstraintReason toGateValve:aGateValve];
+				}
+				else [self removeConstraint:kRgaOnConstraint fromGateValve:aGateValve];
+			}
+			else [self removeConstraint:kRgaOnConstraint fromGateValve:aGateValve];
+		}
+		
+		//---------------------------------------------------------------------------
+		//Turning cryopump OFF will expose RGA to potentially damaging pressures
+		if([self regionColor:kRegionRGA sameAsRegion:kRegionCryoPump]){
+			[cryoPump addPumpOffConstraint:kRgaOnOpenToCryoConstraint reason:kRgaOnOpenToCryoReason];
+			[cryoRegionObj addConstraint:kRgaOnOpenToCryoConstraint reason:kRgaOnOpenToCryoReason];
+		}
+		else {
+			[cryoPump removePumpOffConstraint:kRgaOnOpenToCryoConstraint];
+			[cryoRegionObj removeConstraint:kRgaOnOpenToCryoConstraint];
+		}
+		
+		//---------------------------------------------------------------------------
+		//Turning Turbopump OFF would expose RGA filament to potentially damaging pressures
+		if([self regionColor:kRegionRGA sameAsRegion:kRegionAboveTurbo]){
+			[turboPump addPumpOffConstraint:kRgaOnOpenToTurboConstraint reason:kRgaOnOpenToTurboReason];
+			[turboRegionObj addConstraint:kRgaOnOpenToTurboConstraint reason:kRgaOnOpenToTurboReason];
+		}
+		else {
+			[turboPump removePumpOffConstraint:kRgaOnOpenToTurboConstraint];
+			[turboRegionObj removeConstraint:kRgaOnOpenToTurboConstraint];
+		}
+		//---------------------------------------------------------------------------
+	}
+	else {
+		[self onAllGateValvesRemoveConstraint: kRgaOnConstraint];
+		[cryoPump removePumpOffConstraint:kRgaOnOpenToCryoConstraint];
+		[cryoRegionObj removeConstraint:kRgaOnOpenToCryoConstraint];
+		
+		[turboPump removePumpOffConstraint:kRgaOnOpenToTurboConstraint];
+		[turboRegionObj removeConstraint:kRgaOnOpenToTurboConstraint];
+	}	
+}
+
+- (void) checkPressureConstraints
+{
+	ORCP8CryopumpModel* cryopump = [self findCryoPump];
+	ORRGA300Model*	    rga		 = [self findRGA];
+	
+	BOOL cryoIsOn;
+	if(![cryopump isValid]) cryoIsOn = YES;
+	else cryoIsOn = [cryopump pumpStatus];
+	
+	ORVacuumStatusLabel* cryoRegionObj = [statusDictionary objectForKey:[NSNumber numberWithInt:kRegionCryoPump]];
+	BOOL  cryoPressureIsHigh = [self region:kRegionCryoPump valueHigherThan:2.0E0];
+	
+	//---------------------------------------------------------------------------
+	//Turning Cryopump ON could cause excessive gas condensation on cryo pump
+	if(!cryoIsOn &&  cryoPressureIsHigh){
+		[cryoRegionObj addConstraint:kPressureTooHighForCryoConstraint reason:kPressureTooHighForCryoReason];
+		[cryopump addPumpOnConstraint:kPressureTooHighForCryoConstraint reason:kPressureTooHighForCryoReason];
+	}
+	else {
+		[cryoRegionObj removeConstraint:kPressureTooHighForCryoConstraint];
+		[cryopump removePumpOnConstraint:kPressureTooHighForCryoConstraint];
+	}
+	
+	//---------------------------------------------------------------------------
+	ORVacuumStatusLabel* rgaRegionObj	= [statusDictionary objectForKey:[NSNumber numberWithInt:kRegionRGA]];
+	//PKR G2>5E-6: Filament could be damaged.
+	if([rga ionizerFilamentCurrentRB]==0 && [self region:kRegionRGA valueHigherThan:5E-6]){
+		[rga addFilamentConstraint:kRgaFilamentConstraint reason:kRgaFilamentReason];
+		[rgaRegionObj addConstraint:kRgaFilamentConstraint reason:kRgaFilamentReason];
+	}
+	else {
+		[rga removeFilamentConstraint:kRgaFilamentConstraint];
+		[rgaRegionObj removeConstraint:kRgaFilamentConstraint];
+	}
+
+	//---------------------------------------------------------------------------
+	//PKR G2>5E-7: CEM could be damaged.
+	if([rga electronMultiOption] && [rga elecMultHVBiasRB]==0 && [self region:kRegionRGA valueHigherThan:5E-7]){
+		[rga addCEMConstraint:kRgaCEMConstraint reason:kRgaCEMReason];
+		[rgaRegionObj addConstraint:kRgaCEMConstraint reason:kRgaCEMReason];
+	}
+	else {
+		[rga removeCEMConstraint:kRgaCEMConstraint];
+		[rgaRegionObj removeConstraint:kRgaCEMConstraint];
+	}
+	
+	//---------------------------------------------------------------------------
+	//Detector Biased: Detector must be protected from regions with pressure higher than 1E-5
+	for(ORVacuumGateValve* aGateValve in [self gateValves]){
+		//check kRgaOnConstraint
+		if([aGateValve isClosed]){
+			int side1				= [aGateValve connectingRegion1];
+			int side2				= [aGateValve connectingRegion2];
+			BOOL side1High			= [self region:side1 valueHigherThan:1.0E-5];
+			BOOL side2High			= [self region:side2 valueHigherThan:1.0E-5];
+			
+			if([self regionColor:side1 sameAsRegion:side2]){
+				[aGateValve removeConstraint:kDetectorBiasedConstraint];
+			}
+			else if([self regionColor:side1 sameAsRegion:kRegionCryostat] && side2High ){
+				[self addConstraint:kDetectorBiasedConstraint reason:kRgaConstraintReason toGateValve:aGateValve];
+			}
+			else if([self regionColor:side2 sameAsRegion:kRegionCryostat] && side1High){
+				[self addConstraint:kDetectorBiasedConstraint reason:kRgaConstraintReason toGateValve:aGateValve];
+			}
+			else [self removeConstraint:kDetectorBiasedConstraint fromGateValve:aGateValve];
+		}
+		else [self removeConstraint:kDetectorBiasedConstraint fromGateValve:aGateValve];
+	}
+	
+	//---------------------------------------------------------------------------
+	//PKR G3>1E-5: Should unbias, PKR G3>1E-6: Forbid biasing
+	double cyrostatPress = [self valueForRegion:kRegionCryostat];
+	if(cyrostatPress < 1E-6){
+		[self setOkToBiasDetector:YES];
+		[self setShouldUnbiasDetector:NO];
+	}
+	//PKR G3>1E-6: forbid biasing
+	else if(cyrostatPress > 1E-6 && cyrostatPress < 1E-5){
+		[self setOkToBiasDetector:NO];
+		[self setShouldUnbiasDetector:NO];
+	}
+	else if(cyrostatPress > 1E-5){
+		[self setOkToBiasDetector:NO];
+		[self setShouldUnbiasDetector:YES];
+	}
+	
+}
+
+
 @end

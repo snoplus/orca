@@ -23,13 +23,8 @@
 #import "ORTimeLinePlot.h"
 #import "ORCompositePlotView.h"
 #import "ORTimeAxis.h"
-#import "ORSerialPortList.h"
-#import "ORSerialPort.h"
+#import "ORSerialPortController.h"
 #import "ORTimeRate.h"
-
-@interface ORMks660BController (private)
-- (void) populatePortListPopup;
-@end
 
 @implementation ORMks660BController
 
@@ -49,7 +44,6 @@
 
 - (void) awakeFromNib
 {
-    [self populatePortListPopup];
     [[plotter0 yAxis] setRngLow:-1000. withHigh:1000.];
 	[[plotter0 yAxis] setRngLimitsLow:-100000 withHigh:100000 withMinRng:10];
 	[plotter0 setUseGradient:YES];
@@ -92,17 +86,7 @@
                      selector : @selector(lockChanged:)
                          name : ORMks660BLock
                         object: nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(portNameChanged:)
-                         name : ORMks660BPortNameChanged
-                        object: nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(portStateChanged:)
-                         name : ORSerialPortStateChanged
-                       object : nil];
-                                              
+	
     [notifyCenter addObserver : self
                      selector : @selector(pressureChanged:)
                          name : ORMks660BPressureChanged
@@ -187,7 +171,11 @@
                          name : ORMks660BInvolvedInProcessChanged
 						object: model];
 	
-
+	[notifyCenter addObserver : self
+                     selector : @selector(lockChanged:)
+                         name : ORSerialPortModelPortStateChanged
+						object: model];
+	
 }
 
 - (void) involvedInProcessChanged:(NSNotification*)aNote
@@ -205,8 +193,6 @@
 {
     [super updateWindow];
     [self lockChanged:nil];
-    [self portStateChanged:nil];
-    [self portNameChanged:nil];
 	[self pressureChanged:nil];
     [self lowSetPointChanged:nil];
     [self highSetPointChanged:nil];
@@ -354,6 +340,11 @@
     [lockButton setEnabled:secure];
 }
 
+- (BOOL) portLocked
+{
+	return [gSecurity isLocked:ORMks660BLock];;
+}
+
 - (void) lockChanged:(NSNotification*)aNotification
 {
 
@@ -363,9 +354,9 @@
 	BOOL inProcess = [model involvedInProcess];
 
     [lockButton setState: locked];
+	
+	[serialPortController updateButtons:locked];
 
-    [portListPopup setEnabled:!locked];
-    [openPortButton setEnabled:!locked];
     [pollTimePopup setEnabled:!locked && !inProcess];
     [shipPressuresButton setEnabled:!locked];
  
@@ -414,52 +405,10 @@
 	[self highSetPointChanged:nil];
 }
 
-- (void) portStateChanged:(NSNotification*)aNotification
-{
-    if(aNotification == nil || [aNotification object] == [model serialPort]){
-        if([model serialPort]){
-            [openPortButton setEnabled:YES];
-
-            if([[model serialPort] isOpen]){
-                [openPortButton setTitle:@"Close"];
-                [portStateField setTextColor:[NSColor colorWithCalibratedRed:0.0 green:.8 blue:0.0 alpha:1.0]];
-                [portStateField setStringValue:@"Open"];
-            }
-            else {
-                [openPortButton setTitle:@"Open"];
-                [portStateField setStringValue:@"Closed"];
-                [portStateField setTextColor:[NSColor redColor]];
-            }
-        }
-        else {
-            [openPortButton setEnabled:NO];
-            [portStateField setTextColor:[NSColor blackColor]];
-            [portStateField setStringValue:@"---"];
-            [openPortButton setTitle:@"---"];
-        }
-    }
-}
 
 - (void) pollTimeChanged:(NSNotification*)aNotification
 {
 	[pollTimePopup selectItemWithTag:[model pollTime]];
-}
-
-- (void) portNameChanged:(NSNotification*)aNotification
-{
-    NSString* portName = [model portName];
-    
-	NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
-	ORSerialPort *aPort;
-
-    [portListPopup selectItemAtIndex:0]; //the default
-    while (aPort = [enumerator nextObject]) {
-        if([portName isEqualToString:[aPort name]]){
-            [portListPopup selectItemWithTitle:portName];
-            break;
-        }
-	}  
-    [self portStateChanged:nil];
 }
 
 #pragma mark ***Actions
@@ -536,15 +485,6 @@
     [gSecurity tryToSetLock:ORMks660BLock to:[sender intValue] forWindow:[self window]];
 }
 
-- (IBAction) portListAction:(id) sender
-{
-    [model setPortName: [portListPopup titleOfSelectedItem]];
-}
-
-- (IBAction) openPortAction:(id)sender
-{
-    [model openPort:![[model serialPort] isOpen]];
-}
 
 - (IBAction) readPressureAction:(id)sender
 {
@@ -645,18 +585,4 @@
 
 @end
 
-@implementation ORMks660BController (private)
-
-- (void) populatePortListPopup
-{
-	NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
-	ORSerialPort *aPort;
-    [portListPopup removeAllItems];
-    [portListPopup addItemWithTitle:@"--"];
-
-	while (aPort = [enumerator nextObject]) {
-        [portListPopup addItemWithTitle:[aPort name]];
-	}    
-}
-@end
 

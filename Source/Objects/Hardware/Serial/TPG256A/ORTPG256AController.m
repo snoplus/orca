@@ -25,12 +25,9 @@
 #import "ORCompositePlotView.h"
 #import "ORTimeAxis.h"
 #import "ORSerialPortList.h"
-#import "ORSerialPort.h"
 #import "ORTimeRate.h"
-
-@interface ORTPG256AController (private)
-- (void) populatePortListPopup;
-@end
+#import "ORSerialPort.h"
+#import "ORSerialPortController.h"
 
 @implementation ORTPG256AController
 
@@ -51,7 +48,6 @@
 
 - (void) awakeFromNib
 {
-    [self populatePortListPopup];
     [[plotter0 yAxis] setRngLow:0.0 withHigh:1000.];
 	[[plotter0 yAxis] setRngLimitsLow:0.0 withHigh:1.0E9 withMinRng:10];
 
@@ -73,7 +69,7 @@
     //[plotter0 setPlotTitle:@"Pressures"];
 	
 	blankView		 = [[NSView alloc] init];
-    basicOpsSize	 = NSMakeSize(425,295);
+    basicOpsSize	 = NSMakeSize(425,315);
     processLimitSize = NSMakeSize(425,295);
     plotSize		 = NSMakeSize(425,295);
 	
@@ -109,16 +105,6 @@
                          name : ORTPG256ALock
                         object: nil];
 
-    [notifyCenter addObserver : self
-                     selector : @selector(portNameChanged:)
-                         name : ORTPG256AModelPortNameChanged
-                        object: nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(portStateChanged:)
-                         name : ORSerialPortStateChanged
-                       object : nil];
-                                              
     [notifyCenter addObserver : self
                      selector : @selector(pressureChanged:)
                          name : ORTPG256APressureChanged
@@ -168,6 +154,12 @@
                      selector : @selector(unitsChanged:)
                          name : ORTPG256AModelUnitsChanged
 						object: model];
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(lockChanged:)
+                         name : ORSerialPortModelPortStateChanged
+						object: model];
+	
 }
 
 - (void) setModel:(id)aModel
@@ -180,8 +172,6 @@
 {
 	[super updateWindow];
     [self lockChanged:nil];
-    [self portStateChanged:nil];
-    [self portNameChanged:nil];
 	[self pressureChanged:nil];
 	[self pollTimeChanged:nil];
 	[self shipPressuresChanged:nil];
@@ -314,6 +304,11 @@
     [lockButton setEnabled:secure];
 }
 
+- (BOOL) portLocked
+{
+	return [gSecurity isLocked:ORTPG256ALock];;
+}
+
 - (void) lockChanged:(NSNotification*)aNotification
 {
 
@@ -321,10 +316,10 @@
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORTPG256ALock];
     BOOL locked = [gSecurity isLocked:ORTPG256ALock];
 
+	[serialPortController updateButtons:locked];
+
     [lockButton setState: locked];
 
-    [portListPopup	setEnabled:!locked];
-    [openPortButton setEnabled:!locked];
     [pollTimePopup	setEnabled:!locked];
     [unitsPU		setEnabled:!locked];
     [shipPressuresButton setEnabled:!locked];
@@ -338,52 +333,10 @@
 
 }
 
-- (void) portStateChanged:(NSNotification*)aNotification
-{
-    if(aNotification == nil || [aNotification object] == [model serialPort]){
-        if([model serialPort]){
-            [openPortButton setEnabled:YES];
-
-            if([[model serialPort] isOpen]){
-                [openPortButton setTitle:@"Close"];
-                [portStateField setTextColor:[NSColor colorWithCalibratedRed:0.0 green:.8 blue:0.0 alpha:1.0]];
-                [portStateField setStringValue:@"Open"];
-            }
-            else {
-                [openPortButton setTitle:@"Open"];
-                [portStateField setStringValue:@"Closed"];
-                [portStateField setTextColor:[NSColor redColor]];
-            }
-        }
-        else {
-            [openPortButton setEnabled:NO];
-            [portStateField setTextColor:[NSColor blackColor]];
-            [portStateField setStringValue:@"---"];
-            [openPortButton setTitle:@"---"];
-        }
-    }
-}
 
 - (void) pollTimeChanged:(NSNotification*)aNotification
 {
 	[pollTimePopup selectItemWithTag:[model pollTime]];
-}
-
-- (void) portNameChanged:(NSNotification*)aNotification
-{
-    NSString* portName = [model portName];
-    
-	NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
-	ORSerialPort *aPort;
-
-    [portListPopup selectItemAtIndex:0]; //the default
-    while (aPort = [enumerator nextObject]) {
-        if([portName isEqualToString:[aPort name]]){
-            [portListPopup selectItemWithTitle:portName];
-            break;
-        }
-	}  
-    [self portStateChanged:nil];
 }
 
 
@@ -408,16 +361,6 @@
 - (IBAction) lockAction:(id) sender
 {
     [gSecurity tryToSetLock:ORTPG256ALock to:[sender intValue] forWindow:[self window]];
-}
-
-- (IBAction) portListAction:(id) sender
-{
-    [model setPortName: [portListPopup titleOfSelectedItem]];
-}
-
-- (IBAction) openPortAction:(id)sender
-{
-    [model openPort:![[model serialPort] isOpen]];
 }
 
 - (IBAction) readPressuresAction:(id)sender
@@ -548,19 +491,5 @@
 	else											 return @"--";
 }
 
-@end
-
-@implementation ORTPG256AController (private)
-- (void) populatePortListPopup
-{
-	NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
-	ORSerialPort *aPort;
-    [portListPopup removeAllItems];
-    [portListPopup addItemWithTitle:@"--"];
-
-	while (aPort = [enumerator nextObject]) {
-        [portListPopup addItemWithTitle:[aPort name]];
-	}    
-}
 @end
 

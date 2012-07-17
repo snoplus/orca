@@ -23,14 +23,9 @@
 #import "ORTimeLinePlot.h"
 #import "ORCompositePlotView.h"
 #import "ORTimeAxis.h"
-#import "ORSerialPortList.h"
-#import "ORSerialPort.h"
 #import "ORTimeRate.h"
 #import "BiStateView.h"
-
-@interface ORCP8CryopumpController (private)
-- (void) populatePortListPopup;
-@end
+#import "ORSerialPortController.h"
 
 @implementation ORCP8CryopumpController
 
@@ -51,7 +46,6 @@
 
 - (void) awakeFromNib
 {
-    [self populatePortListPopup];
     [[plotter0 yAxis] setRngLow:-1000. withHigh:1000.];
 	[[plotter0 yAxis] setRngLimitsLow:-100000 withHigh:100000 withMinRng:10];
 	[plotter0 setUseGradient:YES];
@@ -113,16 +107,6 @@
                          name : ORCP8CryopumpLock
                         object: nil];
 
-    [notifyCenter addObserver : self
-                     selector : @selector(portNameChanged:)
-                         name : ORCP8CryopumpPortNameChanged
-                        object: nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(portStateChanged:)
-                         name : ORSerialPortStateChanged
-                       object : nil];
-                                                   
     [notifyCenter addObserver : self
                      selector : @selector(pollTimeChanged:)
                          name : ORCP8CryopumpPollTimeChanged
@@ -359,10 +343,14 @@
     
     [notifyCenter addObserver : self
                      selector : @selector(lockChanged:)
-                         name : ORCP8CryopumpPortStateChanged
+                         name : ORSerialPortModelPortStateChanged
 						object: model];
 
-
+	[notifyCenter addObserver : self
+                     selector : @selector(constraintsChanged:)
+                         name : ORCP8CryopumpModelConstraintsChanged
+						object: model];
+	
 }
 
 - (void) setModel:(id)aModel
@@ -377,8 +365,6 @@
     [self wasPowerFailureChanged:nil];
     [self cmdErrorChanged:nil];
     [self lockChanged:nil];
-    [self portStateChanged:nil];
-    [self portNameChanged:nil];
 	[self pollTimeChanged:nil];
 	[self shipTemperaturesChanged:nil];
 	[self updateTimePlot:nil];
@@ -423,6 +409,7 @@
 	[self roughingInterlockChanged:nil];
 	[self secondStageTempControlChanged:nil];
 	[self firstStageControlMethodRBChanged:nil];
+	[self constraintsChanged:nil];
 }
 
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
@@ -455,6 +442,26 @@
 	if([tabView indexOfTabViewItem:[tabView selectedTabViewItem]] == 2){
 		plotSize = [[self window] frame].size; 
 	}
+}
+
+- (void) constraintsChanged:(NSNotification*)aNote
+{
+	NSImage* smallLockImage = [NSImage imageNamed:@"smallLock"];
+	if([[model pumpOnConstraints] count] || [[model pumpOffConstraints] count]){
+		[powerConstraintImage setImage:smallLockImage];
+	}
+	else [powerConstraintImage setImage:nil];
+	
+	if([[model purgeOpenConstraints] count]){
+		[purgeConstraintImage setImage:smallLockImage];
+	}
+	else [purgeConstraintImage setImage:nil];
+	
+	if([[model roughingOpenConstraints] count]){
+		[roughingConstraintImage setImage:smallLockImage];
+	}
+	else [roughingConstraintImage setImage:nil];
+	
 }
 
 - (void) firstStageControlMethodRBChanged:(NSNotification*)aNote
@@ -779,6 +786,11 @@
     [lockButton setEnabled:secure];
 }
 
+- (BOOL) portLocked
+{
+	return [gSecurity isLocked:ORCP8CryopumpLock];;
+}
+
 - (void) lockChanged:(NSNotification*)aNotification
 {
 
@@ -791,10 +803,11 @@
 - (void) updateButtons
 {
     BOOL locked = [gSecurity isLocked:ORCP8CryopumpLock];
+
+	[serialPortController updateButtons:locked];
+
 	
     [pollTimePopup					setEnabled:!locked];
-    [portListPopup					setEnabled:!locked];
-    [openPortButton					setEnabled:!locked];
     [shipTemperaturesButton			setEnabled:!locked];
  
 	[secondStageTempControlField	setEnabled:!locked];
@@ -838,53 +851,12 @@
 	
 }
 
-- (void) portStateChanged:(NSNotification*)aNotification
-{
-    if(aNotification == nil || [aNotification object] == [model serialPort]){
-        if([model serialPort]){
-            [openPortButton setEnabled:YES];
-
-            if([[model serialPort] isOpen]){
-                [openPortButton setTitle:@"Close"];
-                [portStateField setTextColor:[NSColor colorWithCalibratedRed:0.0 green:.8 blue:0.0 alpha:1.0]];
-                [portStateField setStringValue:@"Open"];
-            }
-            else {
-                [openPortButton setTitle:@"Open"];
-                [portStateField setStringValue:@"Closed"];
-                [portStateField setTextColor:[NSColor redColor]];
-            }
-        }
-        else {
-            [openPortButton setEnabled:NO];
-            [portStateField setTextColor:[NSColor blackColor]];
-            [portStateField setStringValue:@"---"];
-            [openPortButton setTitle:@"---"];
-        }
-    }
-}
 
 - (void) pollTimeChanged:(NSNotification*)aNotification
 {
 	[pollTimePopup selectItemWithTag:[model pollTime]];
 }
 
-- (void) portNameChanged:(NSNotification*)aNotification
-{
-    NSString* portName = [model portName];
-    
-	NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
-	ORSerialPort *aPort;
-
-    [portListPopup selectItemAtIndex:0]; //the default
-    while (aPort = [enumerator nextObject]) {
-        if([portName isEqualToString:[aPort name]]){
-            [portListPopup selectItemWithTitle:portName];
-            break;
-        }
-	}  
-    [self portStateChanged:nil];
-}
 
 #pragma mark ***Actions
 - (IBAction) roughingInterlockAction:(id)sender		  { [model setRoughingInterlock:		[sender indexOfSelectedItem]]; }
@@ -910,8 +882,6 @@
 - (IBAction) shipTemperaturesAction:(id)sender		  { [model setShipTemperatures:			[sender intValue]]; }
 
 - (IBAction) lockAction:(id) sender					  { [gSecurity tryToSetLock:ORCP8CryopumpLock to:[sender intValue] forWindow:[self window]];}
-- (IBAction) portListAction:(id) sender				  { [model setPortName:	[portListPopup titleOfSelectedItem]];}
-- (IBAction) openPortAction:(id)sender				  { [model openPort:![[model serialPort] isOpen]];}
 - (IBAction) readTemperaturesAction:(id)sender		  { [model pollHardware];}
 - (IBAction) pollTimeAction:(id)sender				  { [model setPollTime:[[sender selectedItem] tag]];}
 - (IBAction) pollNowAction:(id)sender				  { [model pollHardware]; }
@@ -924,16 +894,21 @@
 
 - (IBAction) turnCryoPumpOnAction:(id)sender
 {
-    [self endEditing];
-	NSBeginAlertSheet(@"Turn ON Cryo Pump",
-					  @"YES/Turn ON Cryopump",
-					  @"Cancel",
-					  nil,[self window],
-					  self,
-					  @selector(turnOnCryoPumpDidFinish:returnCode:contextInfo:),
-					  nil,
-					  nil,
-					  @"Really turn ON the cryopump?");
+	[self endEditing];
+	if([[model pumpOnConstraints] count]!=0){
+		[self beginConstraintPanel:[model pumpOnConstraints]  actionTitle:@"Turn Cryo ON"];
+	}
+	else { 
+		NSBeginAlertSheet(@"Turn ON Cryo Pump",
+						  @"YES/Turn ON Cryopump",
+						  @"Cancel",
+						  nil,[self window],
+						  self,
+						  @selector(turnOnCryoPumpDidFinish:returnCode:contextInfo:),
+						  nil,
+						  nil,
+						  @"Really turn ON the cryopump?");
+	}
 }
 
 - (void) turnOnCryoPumpDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
@@ -941,10 +916,20 @@
 	if(returnCode == NSAlertDefaultReturn)[model writeCryoPumpOn:YES];
 }
 
+- (IBAction) closeConstraintPanel:(id)sender
+{
+    [constraintPanel orderOut:nil];
+    [NSApp endSheet:constraintPanel];
+}
+
 - (IBAction) turnCryoPumpOffAction:(id)sender
 {
     [self endEditing];
-	NSBeginAlertSheet(@"Turn OFF Cryo Pump",
+	if([[model pumpOffConstraints] count]!=0){
+		[self beginConstraintPanel:[model pumpOffConstraints]  actionTitle:@"Turn Cryo OFF"];
+	}
+	else { 
+		NSBeginAlertSheet(@"Turn OFF Cryo Pump",
 					  @"YES/Turn OFF Cryopump",
 					  @"Cancel",
 					  nil,[self window],
@@ -953,6 +938,7 @@
 					  nil,
 					  nil,
 					  @"Really turn OFF the cryopump?");
+	}
 }
 
 - (void) turnOffCryoPumpDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
@@ -962,22 +948,45 @@
 
 - (IBAction) openPurgeValveAction:(id)sender
 {
-    [self endEditing];
-	NSBeginAlertSheet(@"Open Purge Valve",
-					  @"YES/OPEN Purge Valve",
-					  @"Cancel",
-					  nil,[self window],
-					  self,
-					  @selector(openPurgeValveDidFinish:returnCode:contextInfo:),
-					  nil,
-					  nil,
-					  @"Really OPEN the purge valve?");
+	[self endEditing];
+	if([[model purgeOpenConstraints] count]!=0){
+		[self beginConstraintPanel:[model purgeOpenConstraints]  actionTitle:@"Open Purge Valve"];
+	}
+	else {
+		NSBeginAlertSheet(@"Open Purge Valve",
+						  @"YES/OPEN Purge Valve",
+						  @"Cancel",
+						  nil,[self window],
+						  self,
+						  @selector(openPurgeValveDidFinish:returnCode:contextInfo:),
+						  nil,
+						  nil,
+						  @"Really OPEN the purge valve?");
+	}
 }
 
 - (void) openPurgeValveDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
 	if(returnCode == NSAlertDefaultReturn)[model writePurgeValveOpen:YES];
 }
+
+- (void) beginConstraintPanel:(NSDictionary*)constraints actionTitle:(NSString*)aTitle
+{
+	NSArray* allKeys = [constraints allKeys];
+	int n = [allKeys count];
+	[constraintTitleField setStringValue:[NSString stringWithFormat:@"Action: <%@> can not be done because there %d constraint%@ in effect. See below for more info.",
+										  aTitle,
+										  n,
+										  n==1?@"":@"s"]];
+	NSMutableString* s = [NSMutableString string];
+	for(id aKey in allKeys){
+		[s appendFormat:@"%@ --> %@\n\n",aKey,[constraints objectForKey:aKey]];
+	}
+	[constraintView setString:s];
+	[NSApp beginSheet:constraintPanel modalForWindow:[self window]
+		modalDelegate:self didEndSelector:NULL contextInfo:nil];
+}
+
 
 - (IBAction) closePurgeValveAction:(id)sender
 {
@@ -1000,8 +1009,12 @@
 
 - (IBAction) openRoughingValveAction:(id)sender
 {
-    [self endEditing];
-	NSBeginAlertSheet(@"Open Roughing Valve",
+	[self endEditing];
+	if([[model roughingOpenConstraints] count]!=0){
+		[self beginConstraintPanel:[model roughingOpenConstraints]  actionTitle:@"Open Roughing Valve"];
+	}
+	else {
+		NSBeginAlertSheet(@"Open Roughing Valve",
 					  @"YES/OPEN Roughing Valve",
 					  @"Cancel",
 					  nil,[self window],
@@ -1010,6 +1023,7 @@
 					  nil,
 					  nil,
 					  @"Really OPEN the Roughing valve?");
+	}
 }
 
 - (void) openRoughingValveDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
@@ -1089,21 +1103,6 @@
 	int index = count-i-1;
 	*xValue = [[model timeRate:set]timeSampledAtIndex:index];
 	*yValue = [[model timeRate:set] valueAtIndex:index];
-}
-@end
-
-@implementation ORCP8CryopumpController (private)
-
-- (void) populatePortListPopup
-{
-	NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
-	ORSerialPort *aPort;
-    [portListPopup removeAllItems];
-    [portListPopup addItemWithTitle:@"--"];
-
-	while (aPort = [enumerator nextObject]) {
-        [portListPopup addItemWithTitle:[aPort name]];
-	}    
 }
 @end
 

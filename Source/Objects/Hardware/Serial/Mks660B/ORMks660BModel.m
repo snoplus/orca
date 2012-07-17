@@ -20,8 +20,6 @@
 
 #import "ORMks660BModel.h"
 #import "ORSerialPort.h"
-#import "ORSerialPortList.h"
-#import "ORSerialPort.h"
 #import "ORSerialPortAdditions.h"
 #import "ORDataTypeAssigner.h"
 #import "ORDataPacket.h"
@@ -29,6 +27,7 @@
 #import "ORSafeQueue.h"
 
 #pragma mark •••External Strings
+NSString* ORMks660BModelIsValidChanged		= @"ORMks660BModelIsValidChanged";
 NSString* ORMks660BModelLowAlarmChanged		= @"ORMks660BModelLowAlarmChanged";
 NSString* ORMks660BModelHighLimitChanged	= @"ORMks660BModelHighLimitChanged";
 NSString* ORMks660BModelHighAlarmChanged	= @"ORMks660BModelHighAlarmChanged";
@@ -39,9 +38,6 @@ NSString* ORMks660BModelHighHysteresisChanged	 = @"ORMks660BModelHighHysteresisC
 NSString* ORMks660BModelDecimalPtPositionChanged = @"ORMks660BModelDecimalPtPositionChanged";
 NSString* ORMks660BShipPressuresChanged		= @"ORMks660BShipPressuresChanged";
 NSString* ORMks660BPollTimeChanged			= @"ORMks660BPollTimeChanged";
-NSString* ORMks660BSerialPortChanged		= @"ORMks660BSerialPortChanged";
-NSString* ORMks660BPortNameChanged			= @"ORMks660BPortNameChanged";
-NSString* ORMks660BPortStateChanged			= @"ORMks660BPortStateChanged";
 NSString* ORMks660BPressureChanged			= @"ORMks660BPressureChanged";
 NSString* ORMks660BLowSetPointChanged       = @"ORMks660BLowSetPointChanged";
 NSString* ORMks660BHighSetPointChanged      = @"ORMks660BHighSetPointChanged";
@@ -50,8 +46,6 @@ NSString* ORMks660BInvolvedInProcessChanged = @"ORMks660BInvolvedInProcessChange
 NSString* ORMks660BLock = @"ORMks660BLock";
 
 @interface ORMks660BModel (private)
-- (void) runStarted:(NSNotification*)aNote;
-- (void) runStopped:(NSNotification*)aNote;
 - (void) timeout;
 - (void) processOneCommandFromQueue;
 - (void) process_response:(NSString*)theResponse;
@@ -63,26 +57,13 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 @end
 
 @implementation ORMks660BModel
-- (id) init
-{
-	self = [super init];
-    [self registerNotificationObservers];
-	return self;
-}
-
 
 - (void) dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
     [buffer release];
 	[cmdQueue release];
 	[lastRequest release];
-    [portName release];
-    if([serialPort isOpen]){
-        [serialPort close];
-    }
-    [serialPort release];
 	[timeRates release];
 
 	[super dealloc];
@@ -103,25 +84,9 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 	return nil;
 }
 
-- (void) registerNotificationObservers
+- (BOOL) acceptsGuardian: (OrcaObject *)aGuardian
 {
-	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(dataReceived:)
-                         name : ORSerialPortDataReceived
-                       object : nil];
-
-    [notifyCenter addObserver: self
-                     selector: @selector(runStarted:)
-                         name: ORRunStartedNotification
-                       object: nil];
-    
-    [notifyCenter addObserver: self
-                     selector: @selector(runStopped:)
-                         name: ORRunStoppedNotification
-                       object: nil];
-
+	return [super acceptsGuardian:aGuardian] || [aGuardian isMemberOfClass:NSClassFromString(@"ORMJDVacuumModel")];
 }
 
 - (void) dataReceived:(NSNotification*)note
@@ -174,6 +139,19 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 }
 
 #pragma mark •••Accessors
+
+- (BOOL) isValid
+{
+    return isValid;
+}
+
+- (void) setIsValid:(BOOL)aState
+{
+	if(aState != isValid){
+		isValid = aState;
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORMks660BModelIsValidChanged object:self];
+	}
+}
 - (BOOL) involvedInProcess
 {
     return involvedInProcess;
@@ -392,64 +370,6 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 	lastRequest = [aRequest copy];    
 }
 
-- (BOOL) portWasOpen
-{
-    return portWasOpen;
-}
-
-- (void) setPortWasOpen:(BOOL)aPortWasOpen
-{
-    portWasOpen = aPortWasOpen;
-}
-
-- (NSString*) portName
-{
-    return portName;
-}
-
-- (void) setPortName:(NSString*)aPortName
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setPortName:portName];
-    
-    if(![aPortName isEqualToString:portName]){
-        [portName autorelease];
-        portName = [aPortName copy];    
-
-        BOOL valid = NO;
-        NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
-        ORSerialPort *aPort;
-        while (aPort = [enumerator nextObject]) {
-            if([portName isEqualToString:[aPort name]]){
-                [self setSerialPort:aPort];
-                if(portWasOpen){
-                    [self openPort:YES];
-                 }
-                valid = YES;
-                break;
-            }
-        } 
-        if(!valid){
-            [self setSerialPort:nil];
-        }       
-    }
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks660BPortNameChanged object:self];
-}
-
-- (ORSerialPort*) serialPort
-{
-    return serialPort;
-}
-
-- (void) setSerialPort:(ORSerialPort*)aSerialPort
-{
-    [aSerialPort retain];
-    [serialPort release];
-    serialPort = aSerialPort;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks660BSerialPortChanged object:self];
-}
-
 - (void) openPort:(BOOL)state
 {
     if(state) {
@@ -460,9 +380,12 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 		[serialPort setDataBits:8];
 		[serialPort commitChanges];
    }
-    else      [serialPort close];
+    else {
+		[serialPort close];
+		[self setIsValid:NO];
+	}
     portWasOpen = [serialPort isOpen];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMks660BPortStateChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSerialPortModelPortStateChanged object:self];
 }
 
 
@@ -480,8 +403,6 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 	[self setDecimalPtPosition:	[decoder decodeIntForKey:	 @"decimalPtPosition"]];
 	[self setShipPressures:		[decoder decodeBoolForKey:	 @"shipPressures"]];
 	[self setPollTime:			[decoder decodeIntForKey:	 @"pollTime"]];
-	[self setPortWasOpen:		[decoder decodeBoolForKey:	 @"portWasOpen"]];
-    [self setPortName:			[decoder decodeObjectForKey: @"portName"]];
 	
 	int i;
 	for(i=0;i<2;i++){
@@ -491,7 +412,6 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 	
 	[[self undoManager] enableUndoRegistration];
 	timeRates = [[ORTimeRate alloc] init];
-    [self registerNotificationObservers];
 
 	return self;
 }
@@ -508,8 +428,6 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 	[encoder encodeInt:decimalPtPosition	forKey:@"decimalPtPosition"];
 	[encoder encodeBool:shipPressures		forKey: @"shipPressures"];
     [encoder encodeInt: pollTime			forKey: @"pollTime"];
-    [encoder encodeBool:portWasOpen			forKey: @"portWasOpen"];
-    [encoder encodeObject:portName			forKey: @"portName"];
 	int i;
 	for(i=0;i<2;i++){
 		[encoder encodeInt:lowSetPoint[i]	forKey: [NSString stringWithFormat:@"lowSetPoint%d",i]];
@@ -779,17 +697,12 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 @end
 
 @implementation ORMks660BModel (private)
-- (void) runStarted:(NSNotification*)aNote
-{
-}
 
-- (void) runStopped:(NSNotification*)aNote
-{
-}
 
 - (void) timeout
 {
 	NSLogError(@"command timeout",@"MKS660B",nil);
+	[self setIsValid:NO];
 	[cmdQueue removeAllObjects];
 	[self setLastRequest:nil];
 }
@@ -839,6 +752,8 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 
 - (void) process_response:(NSString*)theResponse
 {	
+	[self setIsValid:YES];
+
 	if(!lastRequest)return;
 	
 	int lastRequestNumber = [[lastRequest substringFromIndex:1] intValue];

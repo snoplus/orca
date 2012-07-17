@@ -18,17 +18,14 @@
 
 #pragma mark •••Imported Files
 #import "ORAdcProcessing.h"
+#import "ORSerialPortModel.h"
 
-@class ORSerialPort;
 @class ORTimeRate;
 @class ORSafeQueue;
 
-@interface ORMks660BModel : OrcaObject <ORAdcProcessing>
+@interface ORMks660BModel : ORSerialPortModel <ORAdcProcessing>
 {
     @private
-        NSString*			portName;
-        BOOL				portWasOpen;
-        ORSerialPort*		serialPort;
         unsigned long		dataId;
         NSString*			lastRequest;
         ORSafeQueue*		cmdQueue;
@@ -54,15 +51,16 @@
 		BOOL				delay;
 		BOOL				readOnce;
 		BOOL				involvedInProcess;
+		BOOL				isValid;
 }
 
 #pragma mark •••Initialization
-- (id)   init;
 - (void) dealloc;
-- (void) registerNotificationObservers;
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark •••Accessors
+- (BOOL) isValid;
+- (void) setIsValid:(BOOL)aIsValid;
 - (BOOL) involvedInProcess;
 - (void) setInvolvedInProcess:(BOOL)aInvolvedInProcess;
 - (float) lowAlarm;
@@ -86,12 +84,6 @@
 - (void) setShipPressures:(BOOL)aShipPressures;
 - (int)  pollTime;
 - (void) setPollTime:(int)aPollTime;
-- (ORSerialPort*) serialPort;
-- (void) setSerialPort:(ORSerialPort*)aSerialPort;
-- (BOOL) portWasOpen;
-- (void) setPortWasOpen:(BOOL)aPortWasOpen;
-- (NSString*) portName;
-- (void) setPortName:(NSString*)aPortName;
 - (void) openPort:(BOOL)state;
 - (float) pressure;
 - (unsigned long) timeMeasured;
@@ -137,6 +129,7 @@
 
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
+
 #pragma mark •••Adc Processing Protocol
 - (void) processIsStarting;
 - (void) processIsStopping;
@@ -163,6 +156,8 @@
 @property (nonatomic,copy) NSString* cmd;
 @end
 
+
+extern NSString* ORMks660BModelIsValidChanged;
 extern NSString* ORMks660BModelLowAlarmChanged;
 extern NSString* ORMks660BModelHighLimitChanged;
 extern NSString* ORMks660BModelHighAlarmChanged;
@@ -173,9 +168,6 @@ extern NSString* ORMks660BModelHighHysteresisChanged;
 extern NSString* ORMks660BModelDecimalPtPositionChanged;
 extern NSString* ORMks660BShipPressuresChanged;
 extern NSString* ORMks660BPollTimeChanged;
-extern NSString* ORMks660BSerialPortChanged;
-extern NSString* ORMks660BPortNameChanged;
-extern NSString* ORMks660BPortStateChanged;
 extern NSString* ORMks660BPressureChanged;
 extern NSString* ORMks660BLowSetPointChanged;
 extern NSString* ORMks660BHighSetPointChanged;
