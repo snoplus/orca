@@ -1215,7 +1215,7 @@ static double table[32]={
 	int i=0;
 	static uint32_t shape =0x210;
 	//shape +=0x10;
-	NSLog(@"shape is: 0x%x  (%i) ",shape);
+	NSLog(@"shape is: 0x%x  (%i) ",shape,shape);
 	//[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x80]; i++;
 	//[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: 0x440]; i++;
 	[[[self crate] adapter] rawWriteReg: SLTTPShapeRam+i value: shape]; i++;
@@ -1253,8 +1253,9 @@ static double table[32]={
 	[[[self crate] adapter] rawWriteReg: address   value: 0x0];  
 	[[[self crate] adapter] rawWriteReg: address+1 value: fltpattern];
 	[[[self crate] adapter] rawWriteReg: address+2 value: 0x2000000];
-	//[[[self crate] adapter] rawWriteReg: address+3 value: 0x0];
+	//[[[self crate] adapter] rawWriteReg: address+2 value: 0x0];
 	[[[self crate] adapter] rawWriteReg: address+3 value: fltpattern];
+	//[[[self crate] adapter] rawWriteReg: address+3 value: 0x0];
 	[[[self crate] adapter] rawWriteReg: address+4 value: 0x0];
 	#if 0
 	[[[self crate] adapter] rawWriteReg: address+5 value: 0x0];
