@@ -637,6 +637,7 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 - (void) dataReceived:(NSNotification*)note
 {	
     if([[note userInfo] objectForKey:@"serialPort"] == serialPort){
+        [self setIsValid:YES];
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
 		if(!inComingData)inComingData = [[NSMutableData data] retain];
 		[inComingData appendData:[[note userInfo] objectForKey:@"data"]];
@@ -897,9 +898,6 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 
 - (void) processReceivedString:(NSString*)aString
 {		
-	
-	[self setIsValid:YES];
-
 	NSString* theLastRequest = lastRequest.cmd;
 	if([theLastRequest hasPrefix:@"ID?"])       [self processIDResponse:    aString];
 	else if([theLastRequest hasPrefix:@"ER?"])	[self processStatusWord:    aString];
