@@ -18,10 +18,11 @@
 
 #pragma mark ***Imported Files
 #import "ORAdcProcessing.h"
+#import "ORSerialPortModel.h"
 
-@class ORSerialPort;
 @class ORTimeRate;
 @class ORAlarm;
+@class ORSafeQueue;
 
 #define kMet637CmdTimeout  1
 #define kMet637ProbeTime   5
@@ -29,12 +30,12 @@
 #define kMet637Manual  0
 #define kMet637Auto    1
 
-@interface ORMet637Model : OrcaObject <ORAdcProcessing>
+@interface ORMet637Model : ORSerialPortModel <ORAdcProcessing>
 {
     @private
-        NSString*       portName;
-        BOOL            portWasOpen;
-        ORSerialPort*   serialPort;
+		NSString*		lastRequest;
+		ORSafeQueue*	cmdQueue;
+		BOOL            delay;
         NSMutableString* buffer;
 		NSString*		measurementDate;
 		ORTimeRate*		timeRates[8];
@@ -70,7 +71,6 @@
 #pragma mark ***Initialization
 - (id)   init;
 - (void) dealloc;
-- (void) registerNotificationObservers;
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark ***Accessors
@@ -116,12 +116,6 @@
 - (int) count:(int)index;
 - (NSString*) measurementDate;
 - (void) setMeasurementDate:(NSString*)aMeasurementDate;
-- (ORSerialPort*) serialPort;
-- (void) setSerialPort:(ORSerialPort*)aSerialPort;
-- (BOOL) portWasOpen;
-- (void) setPortWasOpen:(BOOL)aPortWasOpen;
-- (NSString*) portName;
-- (void) setPortName:(NSString*)aPortName;
 - (void) openPort:(BOOL)state;
 - (NSString*) countingModeString;
 - (float) countAlarmLimit:(int)index;
@@ -151,6 +145,8 @@
 - (void) sendHoldTime:(int)aValue;
 - (void) sendTempUnit:(int)aTempUnit countUnits:(int)aCountUnit;
 - (void) probe;
+- (NSString*) lastRequest;
+- (void) setLastRequest:(NSString*)aRequest;
 
 #pragma mark •••Adc Processing Protocol
 - (void)processIsStarting;
@@ -194,8 +190,5 @@ extern NSString* ORMet637ModelCountingModeChanged;
 extern NSString* ORMet637ModelCountChanged;
 extern NSString* ORMet637ModelMeasurementDateChanged;
 extern NSString* ORMet637ModelPollTimeChanged;
-extern NSString* ORMet637ModelSerialPortChanged;
 extern NSString* ORMet637Lock;
-extern NSString* ORMet637ModelPortNameChanged;
-extern NSString* ORMet637ModelPortStateChanged;
 

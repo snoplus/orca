@@ -20,16 +20,11 @@
 
 #import "ORMet637Controller.h"
 #import "ORMet637Model.h"
-#import "ORSerialPortList.h"
-#import "ORSerialPort.h"
 #import "ORTimeLinePlot.h"
 #import "ORCompositePlotView.h"
 #import "ORTimeAxis.h"
 #import "ORTimeRate.h"
-
-@interface ORMet637Controller (private)
-- (void) populatePortListPopup;
-@end
+#import "ORSerialPortController.h"
 
 @implementation ORMet637Controller
 
@@ -49,7 +44,6 @@
 
 - (void) awakeFromNib
 {
-    [self populatePortListPopup];
 
     [[plotter0 yAxis] setRngLow:0.0 withHigh:100.];
 	[[plotter0 yAxis] setRngLimitsLow:0 withHigh:10000000. withMinRng:5];
@@ -141,16 +135,6 @@
                          name : ORMet637Lock
                         object: nil];
 
-    [notifyCenter addObserver : self
-                     selector : @selector(portNameChanged:)
-                         name : ORMet637ModelPortNameChanged
-                        object: nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(portStateChanged:)
-                         name : ORSerialPortStateChanged
-                       object : nil];
-                                              
     [notifyCenter addObserver : self
                      selector : @selector(measurementDateChanged:)
                          name : ORMet637ModelMeasurementDateChanged
@@ -251,7 +235,6 @@
                          name : ORMet637ModelIsLogChanged
 						object: model];
 	
-	
     [notifyCenter addObserver : self
                      selector : @selector(actualDurationChanged:)
                          name : ORMet637ModelActualDurationChanged
@@ -271,15 +254,12 @@
                      selector : @selector(dumpCountChanged:)
                          name : ORMet637ModelDumpCountChanged
 						object: model];
-
 }
 
 - (void) updateWindow
 {
     [super updateWindow];
     [self lockChanged:nil];
-    [self portStateChanged:nil];
-    [self portNameChanged:nil];
 	[self measurementDateChanged:nil];
 	[self countChanged:nil];
 	[self countingModeChanged:nil];
@@ -522,10 +502,6 @@
     BOOL locked = [gSecurity isLocked:ORMet637Lock];
 
     [lockButton setState: locked];
-
-    [portListPopup setEnabled:!locked];
-    [openPortButton setEnabled:!locked];
-    [openPortButton setEnabled:!locked];
     
 	if(!locked){
 		[startCycleButton setEnabled:![model running]];
@@ -544,49 +520,6 @@
 	[dumpAllButton setEnabled:![model running]];
 	[dumpRecentButton setEnabled:![model running]];
 	
-}
-
-- (void) portStateChanged:(NSNotification*)aNotification
-{
-    if(aNotification == nil || [aNotification object] == [model serialPort]){
-        if([model serialPort]){
-            [openPortButton setEnabled:YES];
-
-            if([[model serialPort] isOpen]){
-                [openPortButton setTitle:@"Close"];
-                [portStateField setTextColor:[NSColor colorWithCalibratedRed:0.0 green:.8 blue:0.0 alpha:1.0]];
-                [portStateField setStringValue:@"Open"];
-            }
-            else {
-                [openPortButton setTitle:@"Open"];
-                [portStateField setStringValue:@"Closed"];
-                [portStateField setTextColor:[NSColor redColor]];
-            }
-        }
-        else {
-            [openPortButton setEnabled:NO];
-            [portStateField setTextColor:[NSColor blackColor]];
-            [portStateField setStringValue:@"---"];
-            [openPortButton setTitle:@"---"];
-        }
-    }
-}
-
-- (void) portNameChanged:(NSNotification*)aNotification
-{
-    NSString* portName = [model portName];
-    
-	NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
-	ORSerialPort *aPort;
-
-    [portListPopup selectItemAtIndex:0]; //the default
-    while (aPort = [enumerator nextObject]) {
-        if([portName isEqualToString:[aPort name]]){
-            [portListPopup selectItemWithTitle:portName];
-            break;
-        }
-	}  
-    [self portStateChanged:nil];
 }
 
 #pragma mark ***Actions
@@ -643,16 +576,6 @@
     [gSecurity tryToSetLock:ORMet637Lock to:[sender intValue] forWindow:[self window]];
 }
 
-- (IBAction) portListAction:(id) sender
-{
-    [model setPortName: [portListPopup titleOfSelectedItem]];
-}
-
-- (IBAction) openPortAction:(id)sender
-{
-    [model openPort:![[model serialPort] isOpen]];
-}
-
 - (IBAction) countUnitsAction:(id)sender
 {
 	[model setCountUnits:[sender indexOfSelectedItem]];
@@ -701,22 +624,6 @@
 	int index = count-i-1;
 	*yValue = [[model timeRate:set] valueAtIndex:index];
 	*xValue = [[model timeRate:set] timeSampledAtIndex:index];
-}
-
-@end
-
-@implementation ORMet637Controller (private)
-
-- (void) populatePortListPopup
-{
-	NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
-	ORSerialPort *aPort;
-    [portListPopup removeAllItems];
-    [portListPopup addItemWithTitle:@"---"];
-
-	while (aPort = [enumerator nextObject]) {
-        [portListPopup addItemWithTitle:[aPort name]];
-	}    
 }
 
 @end

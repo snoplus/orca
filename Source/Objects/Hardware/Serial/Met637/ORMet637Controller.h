@@ -19,6 +19,7 @@
 #pragma mark ***Imported Files
 
 @class ORCompositeTimeLineView;
+@class ORSerialPortController;
 
 @interface ORMet637Controller : OrcaObjectController
 {
@@ -39,9 +40,6 @@
 	IBOutlet NSTextField*	measurementDateField;
 
     IBOutlet NSButton*      lockButton;
-    IBOutlet NSTextField*   portStateField;
-    IBOutlet NSPopUpButton* portListPopup;
-    IBOutlet NSButton*      openPortButton;
     IBOutlet NSButton*      clearAllButton;
     IBOutlet NSButton*      dumpAllButton;
     IBOutlet NSButton*      dumpRecentButton;
@@ -62,6 +60,8 @@
 	IBOutlet ORCompositeTimeLineView*   plotter0;
 	IBOutlet NSMatrix* countAlarmLimitMatrix;
 	IBOutlet NSMatrix* maxCountsMatrix;
+	
+    IBOutlet ORSerialPortController* serialPortController;
 }
 
 #pragma mark ***Initialization
@@ -97,8 +97,6 @@
 - (void) measurementDateChanged:(NSNotification*)aNote;
 - (void) updateButtons;
 - (void) lockChanged:(NSNotification*)aNote;
-- (void) portNameChanged:(NSNotification*)aNote;
-- (void) portStateChanged:(NSNotification*)aNote;
 - (void) updateTimePlot:(NSNotification*)aNotification;
 - (void) scaleAction:(NSNotification*)aNotification;
 - (void) miscAttributesChanged:(NSNotification*)aNotification;
@@ -110,8 +108,6 @@
 - (IBAction) countAlarmLimitAction:(id)sender;
 - (IBAction) maxCountsAction:(id)sender;
 - (IBAction) lockAction:(id) sender;
-- (IBAction) portListAction:(id) sender;
-- (IBAction) openPortAction:(id)sender;
 - (IBAction) cycleDurationAction:(id)sender;
 - (IBAction) startCycleAction:(id)sender;
 - (IBAction) stopCycleAction:(id)sender;
