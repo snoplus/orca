@@ -500,6 +500,8 @@
 - (void) updateButtons
 {
     BOOL locked = [gSecurity isLocked:ORMet637Lock];
+	
+	[serialPortController updateButtons:locked];
 
     [lockButton setState: locked];
     
