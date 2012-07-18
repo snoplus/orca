@@ -1205,12 +1205,12 @@ static NSDictionary* xl3Ops;
     if (sender == hvTargetValueField) {
         nextTargetValue = (int) ([sender floatValue] * 4096 / 3000);
         if (nextTargetValue < 0) nextTargetValue = 0;
-        if (nextTargetValue > 1800 / 3000. * 4096) nextTargetValue = 1800 * 4096 / 3000;
+        if (nextTargetValue > 2500 / 3000. * 4096) nextTargetValue = 2500 * 4096 / 3000;
     }
     else if (sender == hvTargetValueStepper) {
         nextTargetValue = [sender intValue];
         if (nextTargetValue < 0) nextTargetValue = 0;
-        if (nextTargetValue > 1800 / 3000. * 4096) nextTargetValue = 1800 * 4096 / 3000;
+        if (nextTargetValue > 2500 / 3000. * 4096) nextTargetValue = 2500 * 4096 / 3000;
     }
     else {
         return;

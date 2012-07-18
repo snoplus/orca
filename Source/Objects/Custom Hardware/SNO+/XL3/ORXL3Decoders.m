@@ -32,7 +32,8 @@
 	if (0x0000ABCD == htonl(0x0000ABCD) && !indexerSwaps) swapBundle = NO;
 
     NSMutableString* dsc = [NSMutableString string];
-    
+
+    /*
     if (ptr[1] == 0x5F46414B && ptr[2] == 0x455F5F0A) {
         char fake_id[5];
         if (0x0000ABCD != htonl(0x0000ABCD)) ptr[0] = swapLong(ptr[0]);
@@ -42,35 +43,36 @@
         if (0x0000ABCD != htonl(0x0000ABCD)) ptr[0] = swapLong(ptr[0]);
     }
     else {
-        if (swapBundle) {
-            ptr[0] = swapLong(ptr[0]);
-            ptr[1] = swapLong(ptr[1]);
-            ptr[2] = swapLong(ptr[2]);
-        }
-        
-        [dsc appendFormat:@"GTId = 0x%06x\n", (*ptr & 0x0000ffff) | ((ptr[2] << 4) & 0x000f0000) | ((ptr[2] >> 8) & 0x00f00000)];
-        [dsc appendFormat:@"CCCC: %d, %d, ", (*ptr >> 21) & 0x1fUL, (*ptr >> 26) & 0x0fUL];
-        [dsc appendFormat:@"%d, %d\n", (*ptr >> 16) & 0x1fUL, (ptr[1] >> 12) & 0x0fUL];
-        [dsc appendFormat:@"QHL = 0x%03x\n", ptr[2] & 0x0fffUL ^ 0x0800UL];
-        [dsc appendFormat:@"QHS = 0x%03x\n", (ptr[1] >> 16) & 0x0fffUL ^ 0x0800UL];
-        [dsc appendFormat:@"QLX = 0x%03x\n", ptr[1] & 0x0fffUL ^ 0x0800UL];
-        [dsc appendFormat:@"TAC = 0x%03x\n", (ptr[2] >> 16) & 0x0fffUL ^ 0x0800UL];
-        [dsc appendFormat:@"Sync errors CGT16: %@,\n", ((*ptr >> 30) & 0x1UL) ? @"Yes" : @"No"];
-        [dsc appendFormat:@"CGT24: %@, ", ((*ptr >> 31) & 0x1UL) ? @"Yes" : @"No"];
-        [dsc appendFormat:@"CMOS16: %@\n", ((ptr[1] >> 31) & 0x1UL) ? @"Yes" : @"No"];
-        [dsc appendFormat:@"Missed count error: %@\n", ((ptr[1] >> 28) & 0x1UL) ? @"Yes" : @"No"];
-        [dsc appendFormat:@"NC/CC: %@, ", ((ptr[1] >> 29) & 0x1UL) ? @"CC" : @"NC"];
-        [dsc appendFormat:@"LGI: %@\n", ((ptr[1] >> 30) & 0x1UL) ? @"Long" : @"Short"];
-        [dsc appendFormat:@"Wrd0 = 0x%08x\n", *ptr];
-        [dsc appendFormat:@"Wrd1 = 0x%08x\n", ptr[1]];
-        [dsc appendFormat:@"Wrd2 = 0x%08x\n\n", ptr[2]];
+    */
 
-        //swap back the PMT bundle 
-        if (swapBundle) {
-            ptr[0] = swapLong(ptr[0]);
-            ptr[1] = swapLong(ptr[1]);
-            ptr[2] = swapLong(ptr[2]);
-        }
+    if (swapBundle) {
+        ptr[0] = swapLong(ptr[0]);
+        ptr[1] = swapLong(ptr[1]);
+        ptr[2] = swapLong(ptr[2]);
+    }
+    
+    [dsc appendFormat:@"GTId = 0x%06x\n", (*ptr & 0x0000ffff) | ((ptr[2] << 4) & 0x000f0000) | ((ptr[2] >> 8) & 0x00f00000)];
+    [dsc appendFormat:@"CCCC: %d, %d, ", (*ptr >> 21) & 0x1fUL, (*ptr >> 26) & 0x0fUL];
+    [dsc appendFormat:@"%d, %d\n", (*ptr >> 16) & 0x1fUL, (ptr[1] >> 12) & 0x0fUL];
+    [dsc appendFormat:@"QHL = 0x%03x\n", ptr[2] & 0x0fffUL ^ 0x0800UL];
+    [dsc appendFormat:@"QHS = 0x%03x\n", (ptr[1] >> 16) & 0x0fffUL ^ 0x0800UL];
+    [dsc appendFormat:@"QLX = 0x%03x\n", ptr[1] & 0x0fffUL ^ 0x0800UL];
+    [dsc appendFormat:@"TAC = 0x%03x\n", (ptr[2] >> 16) & 0x0fffUL ^ 0x0800UL];
+    [dsc appendFormat:@"Sync errors CGT16: %@,\n", ((*ptr >> 30) & 0x1UL) ? @"Yes" : @"No"];
+    [dsc appendFormat:@"CGT24: %@, ", ((*ptr >> 31) & 0x1UL) ? @"Yes" : @"No"];
+    [dsc appendFormat:@"CMOS16: %@\n", ((ptr[1] >> 31) & 0x1UL) ? @"Yes" : @"No"];
+    [dsc appendFormat:@"Missed count error: %@\n", ((ptr[1] >> 28) & 0x1UL) ? @"Yes" : @"No"];
+    [dsc appendFormat:@"NC/CC: %@, ", ((ptr[1] >> 29) & 0x1UL) ? @"CC" : @"NC"];
+    [dsc appendFormat:@"LGI: %@\n", ((ptr[1] >> 30) & 0x1UL) ? @"Long" : @"Short"];
+    [dsc appendFormat:@"Wrd0 = 0x%08x\n", *ptr];
+    [dsc appendFormat:@"Wrd1 = 0x%08x\n", ptr[1]];
+    [dsc appendFormat:@"Wrd2 = 0x%08x\n\n", ptr[2]];
+
+    //swap back the PMT bundle 
+    if (swapBundle) {
+        ptr[0] = swapLong(ptr[0]);
+        ptr[1] = swapLong(ptr[1]);
+        ptr[2] = swapLong(ptr[2]);
     }
     
     return [[dsc retain] autorelease];
@@ -108,7 +110,8 @@
 
     ptr += 1;
     version = ptr[0] >> 5 & 0x7;
-    [dsc appendFormat:@"packet_num: %d\ncrate_num: %d\nversion: %d\n", ptr[0] >> 16, ptr[0] & 0x1f, version];
+    [dsc appendFormat:@"packet_num: %d\ncrate_num: %d\nversion: %d\nnum_longs: %d\n",
+     ptr[0] >> 16, ptr[0] & 0x1f, version, length];
     ptr += 1;
 
     switch (version) {
@@ -151,8 +154,8 @@
                 unsigned char mini_card = mini_header >> 24 & 0xf;
                 unsigned char mini_type = mini_header >> 31;
                 
-                [dsc appendFormat:@"\n---\nmini bundle\ncard: %d\ntype: %@\nnum_longs: %u\n\n",
-                 mini_card, mini_type?@"pass cur":@"pmt bundles", mini_num_longs];
+                [dsc appendFormat:@"\n---\nmini bundle\ncard: %d\ntype: %@\nnum_longs: %u\ninfo: 0x%08x\n\n",
+                 mini_card, mini_type?@"pass cur":@"pmt bundles", mini_num_longs, mini_header];
                 ptr +=1;
                 
                 switch (mini_type) {

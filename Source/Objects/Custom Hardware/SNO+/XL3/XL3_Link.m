@@ -45,7 +45,7 @@ NSString* XL3_LinkAutoConnectChanged    = @"XL3_LinkAutoConnectChanged";
 @interface XL3_Link (private)
 - (void) allocBufferWithSize:(unsigned) aBufferSize;
 - (void) releaseBuffer;
-- (BOOL) writeBundle:(char*)someBytes length:(unsigned)numBytes version:(unsigned)aRev;
+- (BOOL) writeBundle:(char*)someBytes length:(unsigned)numBytes version:(unsigned)aRev packetNum:(unsigned short)packet_num;
 - (unsigned) bundleBufferSize;
 - (unsigned) bundleReadMark;
 - (unsigned) bundleWriteMark;
@@ -831,18 +831,20 @@ static void SwapLongBlock(void* p, int32_t n)
 
             if (((XL3_Packet*) aPacket)->cmdHeader.packet_type == MEGA_BUNDLE_ID) {
                 //packet_num?
+                unsigned short packet_num = ((XL3_Packet*) aPacket)->cmdHeader.packet_num;
+                if (needToSwap) packet_num = swapShort(packet_num);
                 if (((XL3_Packet*) aPacket)->cmdHeader.num_bundles != 0) {
-                    [self writeBundle:((XL3_Packet*) aPacket)->payload length:((XL3_Packet*) aPacket)->cmdHeader.num_bundles * 12 version:0];
+                    [self writeBundle:((XL3_Packet*) aPacket)->payload length:((XL3_Packet*) aPacket)->cmdHeader.num_bundles * 12 version:0 packetNum:packet_num];
                 }
                 else {
                     unsigned int num_bytes = *(unsigned int*)(((XL3_Packet*)aPacket)->payload);
                     if (needToSwap) num_bytes = swapLong(num_bytes);
                     num_bytes &= 0xffffff;
-                    num_bytes = (num_bytes + 1) * 4;
+                    num_bytes = (num_bytes + 3) * 4;
                     if (num_bytes > XL3_MAXPAYLOADSIZE_BYTES) {
                         num_bytes = XL3_MAXPAYLOADSIZE_BYTES;
                     }
-                    [self writeBundle:((XL3_Packet*) aPacket)->payload length:num_bytes version:1];
+                    [self writeBundle:((XL3_Packet*) aPacket)->payload length:num_bytes version:1 packetNum:packet_num];
                 }
                 bundle_count++;
             }
@@ -1165,15 +1167,13 @@ static void SwapLongBlock(void* p, int32_t n)
 	return bundleWriteMark;
 }
 
-- (BOOL) writeBundle:(char*)someBytes length:(unsigned)numBytes version:(unsigned)aRev
+- (BOOL) writeBundle:(char*)someBytes length:(unsigned)numBytes version:(unsigned)aRev packetNum:(unsigned short)packet_num
 {
     [bundleBufferLock lock];
     BOOL full = NO;
     if(bundleFreeSpace > 0){
         NSMutableData* theData = [[NSMutableData alloc] initWithLength:numBytes + 8];
         unsigned int rev = aRev << 5;
-        unsigned short packet_num = ((XL3_Packet*) someBytes)->cmdHeader.packet_num;
-        if (needToSwap) packet_num = swapShort(packet_num);
         rev |= packet_num << 16;
         [theData replaceBytesInRange:NSMakeRange(4, 4) withBytes:&rev length:4];
         [theData replaceBytesInRange:NSMakeRange(8, numBytes) withBytes:someBytes length:numBytes];

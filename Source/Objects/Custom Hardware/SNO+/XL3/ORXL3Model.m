@@ -94,7 +94,8 @@ NSString* ORXL3ModelHVCMOSRateIgnoreChanged = @"ORXL3ModelHVCMOSRateIgnoreChange
 @end
 
 @implementation ORXL3Model
-@synthesize pollDict, isPollingForced,
+@synthesize isPollingForced,
+    pollDict = _pollDict,
     calcCMOSRatesFromCounts = _calcCMOSRatesFromCounts,
     hvANextStepValue = _hvANextStepValue,
     hvBNextStepValue = _hvBNextStepValue,
@@ -119,7 +120,7 @@ NSString* ORXL3ModelHVCMOSRateIgnoreChanged = @"ORXL3ModelHVCMOSRateIgnoreChange
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
     if (pollThread) [pollThread release];
     if (hvThread) [hvThread release];
-    [pollDict release];
+    [_pollDict release];
     if (relayStatus) [relayStatus release];
     if (triggerStatus) [triggerStatus release];
     [xl3DateFormatter release];
@@ -1136,7 +1137,7 @@ void SwapLongBlock(void* p, int32_t n)
 	if (xl3OpsRunning == nil) xl3OpsRunning = [[NSMutableDictionary alloc] init];
     //if (isPollingXl3 == YES) [self setIsPollingXl3:NO];
 
-    pollDict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
+    _pollDict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
                 @"XL3_status", @"doc_type", nil];
 
 	[[self undoManager] enableUndoRegistration];
@@ -2318,12 +2319,12 @@ void SwapLongBlock(void* p, int32_t n)
                 [slot_rates release]; slot_rates = nil;
             }
             NSNumber* numMsk = [[NSNumber alloc] initWithInt:msk];
-            [pollDict removeObjectForKey:@"cmos_rt"];
-            [pollDict setObject:rates forKey:@"cmos_rt"];
-            [pollDict removeObjectForKey:@"cmos_rt_time_stamp"];
-            [pollDict setObject:time_stamps forKey:@"cmos_rt_time_stamp"];
-            [pollDict removeObjectForKey:@"cmos_rt_slot_mask"];
-            [pollDict setObject:numMsk forKey:@"cmos_rt_slot_mask"];
+            [[self pollDict] removeObjectForKey:@"cmos_rt"];
+            [[self pollDict] setObject:rates forKey:@"cmos_rt"];
+            [[self pollDict] removeObjectForKey:@"cmos_rt_time_stamp"];
+            [[self pollDict] setObject:time_stamps forKey:@"cmos_rt_time_stamp"];
+            [[self pollDict] removeObjectForKey:@"cmos_rt_slot_mask"];
+            [[self pollDict] setObject:numMsk forKey:@"cmos_rt_slot_mask"];
             [numMsk release]; numMsk = nil;
             [time_stamps release]; time_stamps = nil;
             [rates release]; rates = nil;
@@ -2497,12 +2498,12 @@ void SwapLongBlock(void* p, int32_t n)
             [slot_currents release]; slot_currents = nil;
         }
         NSNumber* numMsk = [[NSNumber alloc] initWithInt:msk];
-        [pollDict removeObjectForKey:@"pmt_base_i"];
-        [pollDict setObject:currents forKey:@"pmt_base_i"];
-        [pollDict removeObjectForKey:@"pmt_base_i_time_stamp"];
-        [pollDict setObject:str forKey:@"pmt_base_i_time_stamp"];
-        [pollDict removeObjectForKey:@"pmt_base_i_slot_mask"];
-        [pollDict setObject:numMsk forKey:@"pmt_base_i_slot_mask"];
+        [[self pollDict] removeObjectForKey:@"pmt_base_i"];
+        [[self pollDict] setObject:currents forKey:@"pmt_base_i"];
+        [[self pollDict] removeObjectForKey:@"pmt_base_i_time_stamp"];
+        [[self pollDict] setObject:str forKey:@"pmt_base_i_time_stamp"];
+        [[self pollDict] removeObjectForKey:@"pmt_base_i_slot_mask"];
+        [[self pollDict] setObject:numMsk forKey:@"pmt_base_i_slot_mask"];
         [numMsk release]; numMsk = nil;
         [str release]; str = nil;
         [currents release]; currents=nil;
@@ -2545,24 +2546,24 @@ void SwapLongBlock(void* p, int32_t n)
             }
             return;
         }
-        [self setHvAVoltageReadValue:status.voltage_a * 300];
-        [self setHvBVoltageReadValue:status.voltage_b * 300];
-        [self setHvACurrentReadValue:status.current_a * 10];
-        [self setHvBCurrentReadValue:status.current_a * 10];
+        [self setHvAVoltageReadValue:status.voltage_a * 300.];
+        [self setHvBVoltageReadValue:status.voltage_b * 300.];
+        [self setHvACurrentReadValue:status.current_a * 10.];
+        [self setHvBCurrentReadValue:status.current_b * 10.];
 
         //unless (isPollingXl3 && !isPollingVerbose)
         if (!isPollingXl3 || isPollingVerbose) {    
             NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ HV status: \n", [[self xl3Link] crateName]];
             [msg appendFormat:@"voltageA: %f V\nvoltageB: %f V\n", status.voltage_a * 300., status.voltage_b * 300.];
-            [msg appendFormat:@"currentA: %f mA\ncurrentB: %f mA\n", status.current_a * 10, status.current_b * 10];
+            [msg appendFormat:@"currentA: %f mA\ncurrentB: %f mA\n", status.current_a * 10., status.current_b * 10.];
             NSLog(msg);
         }
         if (isPollingXl3) {
             NSString* str = [[NSString alloc] initWithString:[self stringDate]];
             NSNumber* numVoltageA = [[NSNumber alloc] initWithFloat:status.voltage_a * 300.];
             NSNumber* numVoltageB = [[NSNumber alloc] initWithFloat:status.voltage_b * 300.];
-            NSNumber* numCurrentA = [[NSNumber alloc] initWithFloat:status.current_a * 300.];
-            NSNumber* numCurrentB = [[NSNumber alloc] initWithFloat:status.current_b * 300.];
+            NSNumber* numCurrentA = [[NSNumber alloc] initWithFloat:status.current_a * 10.];
+            NSNumber* numCurrentB = [[NSNumber alloc] initWithFloat:status.current_b * 10.];
             NSDictionary* hvSupplyDict = [[NSDictionary alloc] initWithObjectsAndKeys:
                                           str, @"time_stamp",
                                           numVoltageA, @"VLT_A",
@@ -2575,8 +2576,8 @@ void SwapLongBlock(void* p, int32_t n)
             [numVoltageB release]; numVoltageB = nil;
             [numCurrentA release]; numCurrentA = nil;
             [numCurrentB release]; numCurrentB = nil;
-            [pollDict removeObjectForKey:@"hv_supply"];
-            [pollDict setObject:hvSupplyDict forKey:@"hv_supply"];
+            [[self pollDict] removeObjectForKey:@"hv_supply"];
+            [[self pollDict] setObject:hvSupplyDict forKey:@"hv_supply"];
             [hvSupplyDict release];
         }
     }
@@ -3013,7 +3014,7 @@ void SwapLongBlock(void* p, int32_t n)
         }
         
         NSMutableArray* vlt_array; //16 slots * 32 floats
-        if ([pollDict objectForKey:@"fec_vlt"]) vlt_array = [[pollDict objectForKey:@"fec_vlt"] mutableCopy];
+        if ([[self pollDict] objectForKey:@"fec_vlt"]) vlt_array = [[[self pollDict] objectForKey:@"fec_vlt"] mutableCopy];
         else {
             vlt_array = [[NSMutableArray alloc] initWithCapacity:16];
             unsigned char sl;
@@ -3022,8 +3023,8 @@ void SwapLongBlock(void* p, int32_t n)
             }
         }
         NSMutableArray* vlt_time_stamp; //16 slot strings
-        if ([pollDict objectForKey:@"fec_vlt_time_stamp"]) {
-            vlt_time_stamp = [[pollDict objectForKey:@"fec_vlt_time_stamp"] mutableCopy];
+        if ([[self pollDict] objectForKey:@"fec_vlt_time_stamp"]) {
+            vlt_time_stamp = [[[self pollDict] objectForKey:@"fec_vlt_time_stamp"] mutableCopy];
         }
         else {
             vlt_time_stamp = [[NSMutableArray alloc] initWithCapacity:16];
@@ -3039,12 +3040,12 @@ void SwapLongBlock(void* p, int32_t n)
 
         [vlt_array replaceObjectAtIndex:aSlot withObject:slot_voltages];
         [vlt_time_stamp replaceObjectAtIndex:aSlot withObject:str];
-        [pollDict removeObjectForKey:@"fec_vlt"];
-        [pollDict setObject:vlt_array forKey:@"fec_vlt"];
-        [pollDict removeObjectForKey:@"fec_vlt_time_stamp"];
-        [pollDict setObject:vlt_time_stamp forKey:@"fec_vlt_time_stamp"];
-        [pollDict removeObjectForKey:@"fec_vlt_tag"];
-        [pollDict setObject:fec_vlts_tags forKey:@"fec_vlt_tag"];
+        [[self pollDict] removeObjectForKey:@"fec_vlt"];
+        [[self pollDict] setObject:vlt_array forKey:@"fec_vlt"];
+        [[self pollDict] removeObjectForKey:@"fec_vlt_time_stamp"];
+        [[self pollDict] setObject:vlt_time_stamp forKey:@"fec_vlt_time_stamp"];
+        [[self pollDict] removeObjectForKey:@"fec_vlt_tag"];
+        [[self pollDict] setObject:fec_vlts_tags forKey:@"fec_vlt_tag"];
 
         [str release]; str = nil;
         [slot_voltages release]; slot_voltages = nil;
@@ -3141,9 +3142,9 @@ void SwapLongBlock(void* p, int32_t n)
             [xl3_vlts addObject:number];
             [number release]; number = nil;
         }
-        [pollDict setObject:xl3_vlts forKey:@"xl3_vlt"];
-        [pollDict setObject:xl3_vlts_tags forKey:@"xl3_vlt_tag"];
-        [pollDict setObject:str forKey:@"xl3_vlt_time_stamp"];
+        [[self pollDict] setObject:xl3_vlts forKey:@"xl3_vlt"];
+        [[self pollDict] setObject:xl3_vlts_tags forKey:@"xl3_vlt_tag"];
+        [[self pollDict] setObject:str forKey:@"xl3_vlt_time_stamp"];
         [str release]; str = nil;
         [xl3_vlts release]; xl3_vlts = nil;
         [xl3_vlts_tags release]; xl3_vlts_tags = nil;
@@ -3327,23 +3328,58 @@ void SwapLongBlock(void* p, int32_t n)
         }
         pollStartDate = [[NSDate alloc] init];
         if ([self isPollingCMOSRates] && (![[NSThread currentThread] isCancelled] || isPollingForced)) {
-            [self readCMOSRate]; //[msec]
+            @try {
+                [self readCMOSRate]; //[msec]
+            }
+            @catch (NSException *e) {
+                NSLog(@"%@ exception in the polling loop, readCMOSRate.\n", 
+                      [self xl3Link]?[[self xl3Link] crateName]:@"REALLY BAD");
+                NSLog(@"Exception: %@ with reason: %@\n", [e name], [e reason]);
+            }
         }
         
         if ([self isPollingPMTCurrents] && (![[NSThread currentThread] isCancelled] || isPollingForced)) {
-            [self readPMTBaseCurrents];
+            @try {
+                [self readPMTBaseCurrents];
+            }
+            @catch (NSException *e) {
+                NSLog(@"%@ exception in the polling loop, readPMTBaseCurrents.\n", 
+                      [self xl3Link]?[[self xl3Link] crateName]:@"REALLY BAD");
+                NSLog(@"Exception: %@ with reason: %@\n", [e name], [e reason]);
+            }
         }
         
         if ([self isPollingFECVoltages] && (![[NSThread currentThread] isCancelled] || isPollingForced)) {
-            [self readVMONWithMask:[self pollFECVoltagesMask]];
+            @try {
+                [self readVMONWithMask:[self pollFECVoltagesMask]];
+            }
+            @catch (NSException *e) {
+                NSLog(@"%@ exception in the polling loop, readVMON.\n", 
+                      [self xl3Link]?[[self xl3Link] crateName]:@"REALLY BAD");
+                NSLog(@"Exception: %@ with reason: %@\n", [e name], [e reason]);
+            }
         }
         
         if ([self isPollingXl3Voltages] && (![[NSThread currentThread] isCancelled] || isPollingForced)) {
-            [self readVMONXL3];
+            @try {
+                [self readVMONXL3];
+            }
+            @catch (NSException *e) {
+                NSLog(@"%@ exception in the polling loop, readVMONXL3.\n", 
+                      [self xl3Link]?[[self xl3Link] crateName]:@"REALLY BAD");
+                NSLog(@"Exception: %@ with reason: %@\n", [e name], [e reason]);
+            }
         }
         
         if ([self isPollingHVSupply] && (![[NSThread currentThread] isCancelled] || isPollingForced)) {
-            [self readHVStatus];
+            @try {
+                [self readHVStatus];
+            }
+            @catch (NSException *e) {
+                NSLog(@"%@ exception in the polling loop, readHVStatus.\n", 
+                      [self xl3Link]?[[self xl3Link] crateName]:@"REALLY BAD");
+                NSLog(@"Exception: %@ with reason: %@\n", [e name], [e reason]);
+            }
         }
 
         if ([self isPollingForced] || [[NSThread currentThread] isCancelled]) isTimeToQuit = YES;

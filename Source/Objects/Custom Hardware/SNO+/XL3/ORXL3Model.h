@@ -89,7 +89,7 @@ enum {
     BOOL            isPollingForced;
     NSString*       pollStatus;
     NSThread*       pollThread;
-    NSMutableDictionary* pollDict;
+    NSMutableDictionary* _pollDict;
     
     unsigned long long  relayMask;
     NSString* relayStatus;
