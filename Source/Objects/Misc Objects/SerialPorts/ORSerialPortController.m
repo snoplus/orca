@@ -60,7 +60,7 @@
     [notifyCenter addObserver : self
                      selector : @selector(portNameChanged:)
                          name : ORSerialPortModelPortNameChanged
-                        object: nil];
+                        object: own];
 
     [notifyCenter addObserver : self
                      selector : @selector(portStateChanged:)
@@ -113,21 +113,23 @@
     }
 }
 
-- (void) portNameChanged:(NSNotification*)aNotification
+- (void) portNameChanged:(NSNotification*)aNote
 {
-    NSString* portName = [[owner model] portName];
-    
-	NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
-	ORSerialPort *aPort;
+	if(aNote == nil || [aNote object] == [owner model]){
+		NSString* portName = [[owner model] portName];
+		
+		NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
+		ORSerialPort *aPort;
 
-    [portListPopup selectItemAtIndex:0]; //the default
-    while (aPort = [enumerator nextObject]) {
-        if([portName isEqualToString:[aPort name]]){
-            [portListPopup selectItemWithTitle:portName];
-            break;
-        }
-	}  
-    [self portStateChanged:nil];
+		[portListPopup selectItemAtIndex:0]; //the default
+		while (aPort = [enumerator nextObject]) {
+			if([portName isEqualToString:[aPort name]]){
+				[portListPopup selectItemWithTitle:portName];
+				break;
+			}
+		}  
+		[self portStateChanged:nil];
+	}
 }
 
 - (BOOL) portLocked
