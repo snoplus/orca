@@ -60,7 +60,7 @@
     [notifyCenter addObserver : self
                      selector : @selector(portNameChanged:)
                          name : ORSerialPortModelPortNameChanged
-                        object: own];
+                        object: nil];
 
     [notifyCenter addObserver : self
                      selector : @selector(portStateChanged:)
