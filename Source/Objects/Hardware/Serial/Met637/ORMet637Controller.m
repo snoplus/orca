@@ -118,6 +118,10 @@
 	[super setModel:aModel];
 	[[self window] setTitle:[NSString stringWithFormat:@"Met637 (Unit %d)",[model uniqueIdNumber]]];
 }
+- (BOOL) portLocked
+{
+	return [gSecurity isLocked:ORMet637Lock];;
+}
 
 #pragma mark ***Notifications
 
