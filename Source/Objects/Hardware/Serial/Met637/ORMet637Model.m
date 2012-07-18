@@ -568,6 +568,7 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 	[self setLocation:			[decoder decodeIntForKey:   @"location"]];
 	wasRunning =				[decoder decodeBoolForKey:  @"wasRunning"];
 	[self setCycleDuration:		[decoder decodeIntForKey:   @"cycleDuration"]];
+	[self setCountingMode:		[decoder decodeIntForKey:   @"countingMode"]];
 
 	int i; 
 	for(i=0;i<8;i++){
@@ -589,6 +590,7 @@ NSString* ORMet637Lock = @"ORMet637Lock";
     [encoder encodeInt:		countUnits		forKey: @"countUnits"];
     [encoder encodeInt:		location		forKey: @"location"];
     [encoder encodeInt:		cycleDuration	forKey: @"cycleDuration"];
+    [encoder encodeInt:		countingMode	forKey: @"countingMode"];
     [encoder encodeBool:	wasRunning		forKey:	@"wasRunning"];
 	int i; 
 	for(i=0;i<8;i++){
