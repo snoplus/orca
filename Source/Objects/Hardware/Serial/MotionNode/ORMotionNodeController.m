@@ -148,6 +148,8 @@
                      selector : @selector(totalShippedChanged:)
                          name : ORMotionNodeModelTotalShippedChanged
 						object: model];
+	
+	[serialPortController registerNotificationObservers];
 
 }
 
@@ -208,6 +210,8 @@
 	[self outOfBandChanged:nil];
 	[self lastRecordShippedChanged:nil];
 	[self totalShippedChanged:nil];
+	[serialPortController updateWindow];
+
 }
 
 - (void) totalShippedChanged:(NSNotification*)aNote

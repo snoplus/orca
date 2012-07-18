@@ -174,6 +174,9 @@
                      selector : @selector(tmpRotSetChanged:)
                          name : ORPDcuModelTmpRotSetChanged
 						object: model];
+	
+	[serialPortController registerNotificationObservers];
+
 
 }
 
@@ -204,6 +207,7 @@
 	[self pressureScaleChanged:nil];
 	[self pollTimeChanged:nil];
 	[self tmpRotSetChanged:nil];
+	[serialPortController updateWindow];
 }
 
 - (void) tmpRotSetChanged:(NSNotification*)aNote

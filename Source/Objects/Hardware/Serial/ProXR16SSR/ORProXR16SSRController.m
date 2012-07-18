@@ -86,7 +86,8 @@
                      selector : @selector(lockChanged:)
                          name : ORSerialPortStateChanged
                        object : nil];
-	
+	[serialPortController registerNotificationObservers];
+
 }
 
 - (void) setModel:(id)aModel
@@ -101,6 +102,7 @@
     [self allRelaysChanged:nil];
 	[self outletNameChanged:nil];
     [self lockChanged:nil];
+	[serialPortController updateWindow];
 }
 
 - (BOOL) portLocked

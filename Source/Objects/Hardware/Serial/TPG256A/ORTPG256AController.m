@@ -24,7 +24,6 @@
 #import "ORTimeLinePlot.h"
 #import "ORCompositePlotView.h"
 #import "ORTimeAxis.h"
-#import "ORSerialPortList.h"
 #import "ORTimeRate.h"
 #import "ORSerialPort.h"
 #import "ORSerialPortController.h"
@@ -160,6 +159,7 @@
                          name : ORSerialPortModelPortStateChanged
 						object: model];
 	
+	[serialPortController registerNotificationObservers];
 }
 
 - (void) setModel:(id)aModel
@@ -181,6 +181,7 @@
 	[self highLimitChanged:nil];
 	[self highAlarmChanged:nil];
 	[self unitsChanged:nil];
+	[serialPortController updateWindow];
 }
 
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem

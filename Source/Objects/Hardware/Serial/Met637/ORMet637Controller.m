@@ -258,6 +258,9 @@
                      selector : @selector(dumpCountChanged:)
                          name : ORMet637ModelDumpCountChanged
 						object: model];
+	
+	[serialPortController registerNotificationObservers];
+	
 }
 
 - (void) updateWindow
@@ -287,6 +290,7 @@
 	[self timedOutChanged:nil];
 	[self dumpInProgressChanged:nil];
 	[self dumpCountChanged:nil];
+	[serialPortController updateWindow];
 }
 
 - (void) dumpCountChanged:(NSNotification*)aNote

@@ -147,6 +147,8 @@
                          name : ORVarianTPSModelControllerTempChanged
 						object: model];	
 	
+	[serialPortController registerNotificationObservers];
+
 }
 
 - (void) setModel:(id)aModel
@@ -170,6 +172,8 @@
 	[self remoteChanged:nil];
 	[self statusChanged:nil];
 	[self controllerTempChanged:nil];
+	[serialPortController updateWindow];
+
 }
 
 - (void) statusChanged:(NSNotification*)aNote

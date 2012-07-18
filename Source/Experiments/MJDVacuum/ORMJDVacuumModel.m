@@ -508,7 +508,7 @@ NSString* ORMJDVacuumModelDetectorsBiasedChanged    = @"ORMJDVacuumModelDetector
 	if(channel == 5){
 		ORVacuumValueLabel* aRegionlabel = [self regionValueObj:kRegionDiaphramPump];
 		if([gv isOpen]) [aRegionlabel setValue:[self valueForRegion:kRegionCryoPump]];
-		else		    [aRegionlabel setValue:1.0];
+		else		    [aRegionlabel setValue:2.0];
 		[aRegionlabel setIsValid:[aRegionlabel isValid]];
 	}
 

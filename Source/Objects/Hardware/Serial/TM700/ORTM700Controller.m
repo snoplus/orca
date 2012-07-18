@@ -152,6 +152,8 @@
                          name : ORTM700ConstraintsChanged
 						object: model];
 	
+	[serialPortController registerNotificationObservers];
+
 }
 
 - (void) setModel:(id)aModel
@@ -182,6 +184,8 @@
 	[self runUpTimeChanged:nil];
     [self updateButtons];
 	[self constraintsChanged:nil];
+	[serialPortController updateWindow];
+
 }
 
 - (void) constraintsChanged:(NSNotification*)aNote

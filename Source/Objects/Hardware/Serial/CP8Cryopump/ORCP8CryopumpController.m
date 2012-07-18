@@ -351,6 +351,8 @@
                          name : ORCP8CryopumpModelConstraintsChanged
 						object: model];
 	
+	[serialPortController registerNotificationObservers];
+
 }
 
 - (void) setModel:(id)aModel
@@ -410,6 +412,8 @@
 	[self secondStageTempControlChanged:nil];
 	[self firstStageControlMethodRBChanged:nil];
 	[self constraintsChanged:nil];
+	[serialPortController updateWindow];
+
 }
 
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem

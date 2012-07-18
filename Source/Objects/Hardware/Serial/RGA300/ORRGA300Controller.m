@@ -310,7 +310,10 @@
                          name : ORRGA300ModelConstraintsChanged
 						object: model];
 	
+	[serialPortController registerNotificationObservers];
+
 }
+
 - (void) amuCountChanged:(NSNotification*)aNote
 {
 	[amuTable reloadData];
@@ -380,6 +383,8 @@
     [self useDetectorDefaultsChanged:nil];
 	[self sensitivityFactorChanged:nil];
 	[self constraintsChanged:nil];
+	[serialPortController updateWindow];
+
 }
 
 - (void) constraintsChanged:(NSNotification*)aNote

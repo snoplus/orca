@@ -176,6 +176,8 @@
                          name : ORSerialPortModelPortStateChanged
 						object: model];
 	
+	[serialPortController registerNotificationObservers];
+
 }
 
 - (void) involvedInProcessChanged:(NSNotification*)aNote
@@ -208,6 +210,7 @@
 	[self highAlarmChanged:nil];
 	[self highLimitChanged:nil];
 	[self lowAlarmChanged:nil];
+	[serialPortController updateWindow];
 }
 
 - (void) lowAlarmChanged:(NSNotification*)aNote
