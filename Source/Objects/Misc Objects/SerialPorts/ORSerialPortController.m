@@ -115,7 +115,7 @@
 
 - (void) portNameChanged:(NSNotification*)aNote
 {
-	if(aNote == nil || [aNote object] == [owner model]){
+	if(aNote == nil || [aNote object] == [[owner model] serialPort]){
 		NSString* portName = [[owner model] portName];
 		
 		NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
