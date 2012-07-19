@@ -17,25 +17,30 @@
 //for the use of this software.
 //-------------------------------------------------------------
 #pragma mark ***Imported Files
-
+@class ORSerialPortController;
 @class ORCompositeTimeLineView;
 
 @interface ORCC4189Controller : OrcaObjectController
 {
-    IBOutlet NSTextField*   lockDocField;
+	IBOutlet NSTabView*		tabView;	
+	IBOutlet NSView*		totalView;
 	IBOutlet NSTextField*	highLimit1Field;
 	IBOutlet NSTextField*	highLimit0Field;
 	IBOutlet NSTextField*	lowLimit1Field;
 	IBOutlet NSTextField*	lowLimit0Field;
 	IBOutlet NSButton*		shipValuesButton;
     IBOutlet NSButton*      lockButton;
-    IBOutlet NSTextField*   portStateField;
-    IBOutlet NSPopUpButton* portListPopup;
-    IBOutlet NSButton*      openPortButton;
     IBOutlet NSTextField*   temperatureField;
     IBOutlet NSTextField*   humidityField;
     IBOutlet NSTextField*   timeField;
 	IBOutlet ORCompositeTimeLineView*    plotter0;
+    IBOutlet ORSerialPortController* serialPortController;
+	
+	NSSize					basicOpsSize;
+	NSSize					valuesSize;
+	NSSize					plotSize;
+	NSSize					processLimitSize;
+	NSView*					blankView;
 }
 
 #pragma mark ***Initialization
@@ -56,12 +61,12 @@
 - (void) scaleAction:(NSNotification*)aNotification;
 - (void) shipValuesChanged:(NSNotification*)aNotification;
 - (void) lockChanged:(NSNotification*)aNotification;
-- (void) portNameChanged:(NSNotification*)aNotification;
-- (void) portStateChanged:(NSNotification*)aNotification;
 - (void) temperatureChanged:(NSNotification*)aNotification;
 - (void) humidityChanged:(NSNotification*)aNotification;
 - (void) miscAttributesChanged:(NSNotification*)aNotification;
 - (void) scaleAction:(NSNotification*)aNotification;
+- (void) tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;
+- (void) windowDidResize:(NSNotification *)aNote;
 
 #pragma mark ***Actions
 - (IBAction) highLimit1Action:(id)sender;
@@ -70,8 +75,6 @@
 - (IBAction) lowLimit0Action:(id)sender;
 - (IBAction) shipValuesAction:(id)sender;
 - (IBAction) lockAction:(id) sender;
-- (IBAction) portListAction:(id) sender;
-- (IBAction) openPortAction:(id)sender;
 
 @end
 

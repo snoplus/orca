@@ -20,16 +20,13 @@
 #pragma mark ***Imported Files
 
 #import "ORAdcProcessing.h"
+#import "ORSerialPortModel.h"
 
-@class ORSerialPort;
 @class ORTimeRate;
 
-@interface ORCC4189Model : OrcaObject <ORAdcProcessing>
+@interface ORCC4189Model : ORSerialPortModel <ORAdcProcessing>
 {
     @private
-        NSString*       portName;
-        BOOL            portWasOpen;
-        ORSerialPort*   serialPort;
         unsigned long	dataId;
 		float		    temperature;
 		float		    humidity;
@@ -49,7 +46,6 @@
 - (id)   init;
 - (void) dealloc;
 
-- (void) registerNotificationObservers;
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark ***Accessors
@@ -64,12 +60,6 @@
 - (ORTimeRate*)timeRate:(int)index;
 - (BOOL) shipValues;
 - (void) setShipValues:(BOOL)aFlag;
-- (ORSerialPort*) serialPort;
-- (void) setSerialPort:(ORSerialPort*)aSerialPort;
-- (BOOL) portWasOpen;
-- (void) setPortWasOpen:(BOOL)aPortWasOpen;
-- (NSString*) portName;
-- (void) setPortName:(NSString*)aPortName;
 - (void) openPort:(BOOL)state;
 - (unsigned long) timeMeasured;
 - (float) temperature;
@@ -110,9 +100,6 @@ extern NSString* ORCC4189ModelLowLimit1Changed;
 extern NSString* ORCC4189ModelLowLimit0Changed;
 extern NSString* ORCC4189ModelShipValuesChanged;
 extern NSString* ORCC4189ModelPollTimeChanged;
-extern NSString* ORCC4189ModelSerialPortChanged;
 extern NSString* ORCC4189Lock;
-extern NSString* ORCC4189ModelPortNameChanged;
-extern NSString* ORCC4189ModelPortStateChanged;
 extern NSString* ORCC4189TemperatureChanged;
 extern NSString* ORCC4189HumidityChanged;

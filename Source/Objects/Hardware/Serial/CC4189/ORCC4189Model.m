@@ -20,9 +20,6 @@
 #pragma mark ***Imported Files
 
 #import "ORCC4189Model.h"
-#import "ORSerialPort.h"
-#import "ORSerialPortList.h"
-#import "ORSerialPort.h"
 #import "ORSerialPortAdditions.h"
 #import "ORDataTypeAssigner.h"
 #import "ORDataPacket.h"
@@ -34,9 +31,6 @@ NSString* ORCC4189ModelHighLimit0Changed = @"ORCC4189ModelHighLimit0Changed";
 NSString* ORCC4189ModelLowLimit1Changed = @"ORCC4189ModelLowLimit1Changed";
 NSString* ORCC4189ModelLowLimit0Changed = @"ORCC4189ModelLowLimit0Changed";
 NSString* ORCC4189ModelShipValuesChanged = @"ORCC4189ModelShipValuesChanged";
-NSString* ORCC4189ModelSerialPortChanged= @"ORCC4189ModelSerialPortChanged";
-NSString* ORCC4189ModelPortNameChanged	= @"ORCC4189ModelPortNameChanged";
-NSString* ORCC4189ModelPortStateChanged	= @"ORCC4189ModelPortStateChanged";
 NSString* ORCC4189TemperatureChanged	= @"ORCC4189TemperatureChanged";
 NSString* ORCC4189HumidityChanged		= @"ORCC4189HumidityChanged";
 
@@ -46,7 +40,6 @@ NSString* ORCC4189Lock = @"ORCC4189Lock";
 - (id) init
 {
 	self = [super init];
-    [self registerNotificationObservers];
 	lowLimit0 = 0;
 	highLimit0 = 100;
 	lowLimit1 = 0;
@@ -57,14 +50,8 @@ NSString* ORCC4189Lock = @"ORCC4189Lock";
 
 - (void) dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
     [buffer release];
-    [portName release];
-    if([serialPort isOpen]){
-        [serialPort close];
-    }
-    [serialPort release];
 	int i;
 	for(i=0;i<2;i++){
 		[timeRates[i] release];
@@ -87,16 +74,6 @@ NSString* ORCC4189Lock = @"ORCC4189Lock";
 //{
 //	return @"RS232/LakeShore_210.html";
 //}
-
-- (void) registerNotificationObservers
-{
-	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(dataReceived:)
-                         name : ORSerialPortDataReceived
-                       object : nil];
-}
 
 - (void) dataReceived:(NSNotification*)note
 {
@@ -284,65 +261,6 @@ NSString* ORCC4189Lock = @"ORCC4189Lock";
 	
 }
 									
-
-- (BOOL) portWasOpen
-{
-    return portWasOpen;
-}
-
-- (void) setPortWasOpen:(BOOL)aPortWasOpen
-{
-    portWasOpen = aPortWasOpen;
-}
-
-- (NSString*) portName
-{
-    return portName;
-}
-
-- (void) setPortName:(NSString*)aPortName
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setPortName:portName];
-    
-    if(![aPortName isEqualToString:portName]){
-        [portName autorelease];
-        portName = [aPortName copy];    
-
-        BOOL valid = NO;
-        NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
-        ORSerialPort *aPort;
-        while ((aPort = [enumerator nextObject])) {
-            if([portName isEqualToString:[aPort name]]){
-                [self setSerialPort:aPort];
-                if(portWasOpen){
-                    [self openPort:YES];
-                 }
-                valid = YES;
-                break;
-            }
-        } 
-        if(!valid){
-            [self setSerialPort:nil];
-        }       
-    }
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCC4189ModelPortNameChanged object:self];
-}
-
-- (ORSerialPort*) serialPort
-{
-    return serialPort;
-}
-
-- (void) setSerialPort:(ORSerialPort*)aSerialPort
-{
-    [aSerialPort retain];
-    [serialPort release];
-    serialPort = aSerialPort;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCC4189ModelSerialPortChanged object:self];
-}
-
 - (void) openPort:(BOOL)state
 {
     if(state) {
@@ -354,10 +272,9 @@ NSString* ORCC4189Lock = @"ORCC4189Lock";
     }
     else      [serialPort close];
     portWasOpen = [serialPort isOpen];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCC4189ModelPortStateChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSerialPortModelPortStateChanged object:self];
     
 }
-
 
 #pragma mark ***Archival
 - (id) initWithCoder:(NSCoder*)decoder
@@ -369,13 +286,9 @@ NSString* ORCC4189Lock = @"ORCC4189Lock";
 	[self setLowLimit1:[decoder decodeDoubleForKey:@"lowLimit1"]];
 	[self setLowLimit0:[decoder decodeDoubleForKey:@"lowLimit0"]];
 	[self setShipValues:	[decoder decodeBoolForKey:@"shipValues"]];
-	[self setPortWasOpen:	[decoder decodeBoolForKey:@"portWasOpen"]];
-    [self setPortName:		[decoder decodeObjectForKey: @"portName"]];
 	[[self undoManager] enableUndoRegistration];
 	int i;
 	for(i=0;i<2;i++)timeRates[i] = [[ORTimeRate alloc] init];
-
-    [self registerNotificationObservers];
 
 	return self;
 }
@@ -387,8 +300,6 @@ NSString* ORCC4189Lock = @"ORCC4189Lock";
     [encoder encodeDouble:lowLimit1 forKey:@"lowLimit1"];
     [encoder encodeDouble:lowLimit0 forKey:@"lowLimit0"];
     [encoder encodeBool:shipValues forKey:@"shipValues"];
-    [encoder encodeBool:portWasOpen forKey:@"portWasOpen"];
-    [encoder encodeObject:portName	forKey: @"portName"];
 }
 
 #pragma mark ***Data Records

@@ -24,13 +24,8 @@
 #import "ORTimeLinePlot.h"
 #import "ORCompositePlotView.h"
 #import "ORTimeAxis.h"
-#import "ORSerialPortList.h"
-#import "ORSerialPort.h"
 #import "ORTimeRate.h"
-
-@interface ORCC4189Controller (private)
-- (void) populatePortListPopup;
-@end
+#import "ORSerialPortController.h"
 
 @implementation ORCC4189Controller
 
@@ -50,7 +45,6 @@
 
 - (void) awakeFromNib
 {
-    [self populatePortListPopup];
     [(ORAxis*)[plotter0 yAxis] setRngLow:0.0 withHigh:300.];
 	[(ORAxis*)[plotter0 yAxis] setRngLimitsLow:-300.0 withHigh:500 withMinRng:4];
 
@@ -61,17 +55,53 @@
 	ORTimeLinePlot* aPlot;
 	aPlot= [[ORTimeLinePlot alloc] initWithTag:0 andDataSource:self];
 	[plotter0 addPlot: aPlot];
+	[aPlot setName:@"Temp"];
 	[aPlot setLineColor:[NSColor redColor]];
 	[(ORTimeAxis*)[plotter0 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 	[aPlot release];
 	
 	aPlot= [[ORTimeLinePlot alloc] initWithTag:1 andDataSource:self];
 	[plotter0 addPlot: aPlot];
+	[aPlot setName:@"RH"];
 	[aPlot setLineColor:[NSColor blueColor]];
 	[(ORTimeAxis*)[plotter0 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 	[aPlot release];
+
+	[plotter0 setShowLegend:YES];
+
+	blankView		 = [[NSView alloc] init];
+    basicOpsSize	 = NSMakeSize(410,170);
+    valuesSize		 = NSMakeSize(410,170);
+    processLimitSize = NSMakeSize(410,170);
+    plotSize		 = NSMakeSize(410,315);
+	
+	NSString* key = [NSString stringWithFormat: @"orca.ORCC4189%d.selectedtab",[model uniqueIdNumber]];
+    int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
+    if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
+    [tabView selectTabViewItemAtIndex: index];
+	
+	NSUInteger style = [[self window] styleMask];
+	if(index == 2){
+		[[self window] setStyleMask: style | NSResizableWindowMask];
+	}
+	else {
+		[[self window] setStyleMask: style & ~NSResizableWindowMask];
+	}
+	
 	
 	[super awakeFromNib];
+}
+
+- (BOOL) portLocked
+{
+	return [gSecurity isLocked:ORCC4189Lock];
+}
+								  
+								  
+- (void) setModel:(id)aModel
+{
+	[super setModel:aModel];
+	[[self window] setTitle:[NSString stringWithFormat:@"CC4189 (Unit %d)",[model uniqueIdNumber]]];
 }
 
 #pragma mark ***Notifications
@@ -90,16 +120,6 @@
                      selector : @selector(lockChanged:)
                          name : ORCC4189Lock
                         object: nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(portNameChanged:)
-                         name : ORCC4189ModelPortNameChanged
-                        object: nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(portStateChanged:)
-                         name : ORSerialPortStateChanged
-                       object : nil];
                                               
     [notifyCenter addObserver : self
                      selector : @selector(temperatureChanged:)
@@ -151,14 +171,13 @@
                          name : ORCC4189ModelHighLimit1Changed
 						object: model];
 
+	[serialPortController registerNotificationObservers];
 }
 
 - (void) updateWindow
 {
     [super updateWindow];
     [self lockChanged:nil];
-    [self portStateChanged:nil];
-    [self portNameChanged:nil];
 	[self temperatureChanged:nil];
 	[self humidityChanged:nil];
 	[self shipValuesChanged:nil];
@@ -168,6 +187,48 @@
 	[self lowLimit1Changed:nil];
 	[self highLimit0Changed:nil];
 	[self highLimit1Changed:nil];
+	[serialPortController updateWindow];
+}
+
+- (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
+{
+    [[self window] setContentView:blankView];
+	NSUInteger style = [[self window] styleMask];
+	switch([tabView indexOfTabViewItem:tabViewItem]){
+			
+		case  0: 
+			[self resizeWindowToSize:basicOpsSize];   
+			[[self window] setStyleMask: style & ~NSResizableWindowMask];
+			break;
+			
+		case  1: 
+			[self resizeWindowToSize:valuesSize];   
+			[[self window] setStyleMask: style & ~NSResizableWindowMask];
+			break;
+			
+		case  2: 
+			[self resizeWindowToSize:plotSize];	
+			[[self window] setStyleMask: style | NSResizableWindowMask];
+			break;
+			
+		default:
+			[self resizeWindowToSize:processLimitSize];     
+			[[self window] setStyleMask: style & ~NSResizableWindowMask];
+			break;
+	}
+	
+    [[self window] setContentView:totalView];
+	
+    NSString* key = [NSString stringWithFormat: @"orca.ORCC4189%d.selectedtab",[model uniqueIdNumber]];
+    int index = [tabView indexOfTabViewItem:tabViewItem];
+    [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
+}
+
+- (void)windowDidResize:(NSNotification *)notification
+{
+	if([tabView indexOfTabViewItem:[tabView selectedTabViewItem]] == 2){
+		plotSize = [[self window] frame].size; 
+	}
 }
 
 - (void) highLimit1Changed:(NSNotification*)aNote
@@ -265,71 +326,18 @@
 - (void) lockChanged:(NSNotification*)aNotification
 {
 
-    BOOL runInProgress = [gOrcaGlobals runInProgress];
-    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORCC4189Lock];
     BOOL locked = [gSecurity isLocked:ORCC4189Lock];
 
     [lockButton setState: locked];
+	
+	[serialPortController updateButtons:locked];
 
-    [portListPopup setEnabled:!locked];
-    [openPortButton setEnabled:!locked];
     [shipValuesButton setEnabled:!locked];
     [lowLimit0Field setEnabled:!locked];
     [lowLimit1Field setEnabled:!locked];
 	[highLimit0Field setEnabled:!locked];
     [highLimit1Field setEnabled:!locked];
-   
-    NSString* s = @"";
-    if(lockedOrRunningMaintenance){
-        if(runInProgress && ![gSecurity isLocked:ORCC4189Lock])s = @"Not in Maintenance Run.";
-    }
-    [lockDocField setStringValue:s];
-
-}
-
-- (void) portStateChanged:(NSNotification*)aNotification
-{
-    if(aNotification == nil || [aNotification object] == [model serialPort]){
-        if([model serialPort]){
-            [openPortButton setEnabled:YES];
-
-            if([[model serialPort] isOpen]){
-                [openPortButton setTitle:@"Close"];
-                [portStateField setTextColor:[NSColor colorWithCalibratedRed:0.0 green:.8 blue:0.0 alpha:1.0]];
-                [portStateField setStringValue:@"Open"];
-            }
-            else {
-                [openPortButton setTitle:@"Open"];
-                [portStateField setStringValue:@"Closed"];
-                [portStateField setTextColor:[NSColor redColor]];
-            }
-        }
-        else {
-            [openPortButton setEnabled:NO];
-            [portStateField setTextColor:[NSColor blackColor]];
-            [portStateField setStringValue:@"---"];
-            [openPortButton setTitle:@"---"];
-        }
-    }
-}
-
-- (void) portNameChanged:(NSNotification*)aNotification
-{
-    NSString* portName = [model portName];
-    
-	NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
-	ORSerialPort *aPort;
-
-    [portListPopup selectItemAtIndex:0]; //the default
-    while (aPort = [enumerator nextObject]) {
-        if([portName isEqualToString:[aPort name]]){
-            [portListPopup selectItemWithTitle:portName];
-            break;
-        }
-	}  
-    [self portStateChanged:nil];
-}
-
+ }
 
 #pragma mark ***Actions
 
@@ -363,16 +371,6 @@
     [gSecurity tryToSetLock:ORCC4189Lock to:[sender intValue] forWindow:[self window]];
 }
 
-- (IBAction) portListAction:(id) sender
-{
-    [model setPortName: [portListPopup titleOfSelectedItem]];
-}
-
-- (IBAction) openPortAction:(id)sender
-{
-    [model openPort:![[model serialPort] isOpen]];
-}
-
 #pragma mark •••Data Source
 - (int) numberPointsInPlot:(id)aPlotter
 {
@@ -387,20 +385,5 @@
 	*yValue = [[model timeRate:set] valueAtIndex:index];
 }
 
-@end
-
-@implementation ORCC4189Controller (private)
-
-- (void) populatePortListPopup
-{
-	NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
-	ORSerialPort *aPort;
-    [portListPopup removeAllItems];
-    [portListPopup addItemWithTitle:@"--"];
-
-	while (aPort = [enumerator nextObject]) {
-        [portListPopup addItemWithTitle:[aPort name]];
-	}    
-}
 @end
 
