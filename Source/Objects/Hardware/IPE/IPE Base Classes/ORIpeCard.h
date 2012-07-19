@@ -26,6 +26,7 @@
 #define kIpeRegReadable	0x1
 #define kIpeRegWriteable	0x2
 #define kIpeRegNeedsChannel	0x4
+#define kIpeRegNeedsIndex	0x8
 
 
 typedef struct IpeRegisterNamesStruct {
