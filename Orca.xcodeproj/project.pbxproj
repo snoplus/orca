@@ -129,6 +129,15 @@
 		2D24A8DF126F543400BA2E2E /* Fieldline.gif in Resources */ = {isa = PBXBuildFile; fileRef = 2D24A8DE126F543400BA2E2E /* Fieldline.gif */; };
 		2D2C84070F4EC6640005D69F /* ORIpeSlowControlDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D2C84040F4EC6640005D69F /* ORIpeSlowControlDecoder.h */; };
 		2D2C84080F4EC6650005D69F /* ORIpeSlowControlDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D2C84050F4EC6640005D69F /* ORIpeSlowControlDecoder.m */; };
+		2D51C60A15B5A115000F0ACD /* EdelweissFLT.nib in Resources */ = {isa = PBXBuildFile; fileRef = 2D51C60115B5A115000F0ACD /* EdelweissFLT.nib */; };
+		2D51C60B15B5A115000F0ACD /* EdelweissFLTCard.gif in Resources */ = {isa = PBXBuildFile; fileRef = 2D51C60215B5A115000F0ACD /* EdelweissFLTCard.gif */; };
+		2D51C60C15B5A115000F0ACD /* OREdelweissFLTController.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D51C60315B5A115000F0ACD /* OREdelweissFLTController.h */; };
+		2D51C60D15B5A115000F0ACD /* OREdelweissFLTController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D51C60415B5A115000F0ACD /* OREdelweissFLTController.m */; };
+		2D51C60E15B5A115000F0ACD /* OREdelweissFLTDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D51C60515B5A115000F0ACD /* OREdelweissFLTDecoder.h */; };
+		2D51C60F15B5A115000F0ACD /* OREdelweissFLTDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D51C60615B5A115000F0ACD /* OREdelweissFLTDecoder.m */; };
+		2D51C61015B5A115000F0ACD /* OREdelweissFLTDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D51C60715B5A115000F0ACD /* OREdelweissFLTDefs.h */; };
+		2D51C61115B5A115000F0ACD /* OREdelweissFLTModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D51C60815B5A115000F0ACD /* OREdelweissFLTModel.h */; };
+		2D51C61215B5A115000F0ACD /* OREdelweissFLTModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D51C60915B5A115000F0ACD /* OREdelweissFLTModel.m */; };
 		2D556352109F4CBE00A65E6C /* Needle in Resources */ = {isa = PBXBuildFile; fileRef = 2D556351109F4CBE00A65E6C /* Needle */; };
 		2DC1EE800F33724E00E93C75 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2DC1EE7F0F33724E00E93C75 /* WebKit.framework */; };
 		4325BA38109F6378009E15B9 /* GermaniumHighE in Resources */ = {isa = PBXBuildFile; fileRef = 4325BA37109F6378009E15B9 /* GermaniumHighE */; };
@@ -3186,6 +3195,15 @@
 		2D24A8DE126F543400BA2E2E /* Fieldline.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Fieldline.gif; sourceTree = "<group>"; };
 		2D2C84040F4EC6640005D69F /* ORIpeSlowControlDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORIpeSlowControlDecoder.h; path = "IPE SlowControl/ORIpeSlowControlDecoder.h"; sourceTree = "<group>"; };
 		2D2C84050F4EC6640005D69F /* ORIpeSlowControlDecoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORIpeSlowControlDecoder.m; path = "IPE SlowControl/ORIpeSlowControlDecoder.m"; sourceTree = "<group>"; };
+		2D51C60115B5A115000F0ACD /* EdelweissFLT.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = EdelweissFLT.nib; path = EdelweissFLT/EdelweissFLT.nib; sourceTree = "<group>"; };
+		2D51C60215B5A115000F0ACD /* EdelweissFLTCard.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = EdelweissFLTCard.gif; path = EdelweissFLT/EdelweissFLTCard.gif; sourceTree = "<group>"; };
+		2D51C60315B5A115000F0ACD /* OREdelweissFLTController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OREdelweissFLTController.h; path = EdelweissFLT/OREdelweissFLTController.h; sourceTree = "<group>"; };
+		2D51C60415B5A115000F0ACD /* OREdelweissFLTController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OREdelweissFLTController.m; path = EdelweissFLT/OREdelweissFLTController.m; sourceTree = "<group>"; };
+		2D51C60515B5A115000F0ACD /* OREdelweissFLTDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OREdelweissFLTDecoder.h; path = EdelweissFLT/OREdelweissFLTDecoder.h; sourceTree = "<group>"; };
+		2D51C60615B5A115000F0ACD /* OREdelweissFLTDecoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OREdelweissFLTDecoder.m; path = EdelweissFLT/OREdelweissFLTDecoder.m; sourceTree = "<group>"; };
+		2D51C60715B5A115000F0ACD /* OREdelweissFLTDefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OREdelweissFLTDefs.h; path = EdelweissFLT/OREdelweissFLTDefs.h; sourceTree = "<group>"; };
+		2D51C60815B5A115000F0ACD /* OREdelweissFLTModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OREdelweissFLTModel.h; path = EdelweissFLT/OREdelweissFLTModel.h; sourceTree = "<group>"; };
+		2D51C60915B5A115000F0ACD /* OREdelweissFLTModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OREdelweissFLTModel.m; path = EdelweissFLT/OREdelweissFLTModel.m; sourceTree = "<group>"; };
 		2D556351109F4CBE00A65E6C /* Needle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Needle; sourceTree = "<group>"; };
 		2DC1EE7F0F33724E00E93C75 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
 		4325BA37109F6378009E15B9 /* GermaniumHighE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = GermaniumHighE; path = Source/Objects/Hardware/GPIB/HPPulser/GermaniumHighE; sourceTree = SOURCE_ROOT; };
@@ -6193,6 +6211,22 @@
 				2D24A8CF126F516D00BA2E2E /* SimStop.tif */,
 			);
 			path = IpeSimulation;
+			sourceTree = "<group>";
+		};
+		2D51C5F915B59CFE000F0ACD /* EdelweissFLT */ = {
+			isa = PBXGroup;
+			children = (
+				2D51C60115B5A115000F0ACD /* EdelweissFLT.nib */,
+				2D51C60215B5A115000F0ACD /* EdelweissFLTCard.gif */,
+				2D51C60315B5A115000F0ACD /* OREdelweissFLTController.h */,
+				2D51C60415B5A115000F0ACD /* OREdelweissFLTController.m */,
+				2D51C60515B5A115000F0ACD /* OREdelweissFLTDecoder.h */,
+				2D51C60615B5A115000F0ACD /* OREdelweissFLTDecoder.m */,
+				2D51C60715B5A115000F0ACD /* OREdelweissFLTDefs.h */,
+				2D51C60815B5A115000F0ACD /* OREdelweissFLTModel.h */,
+				2D51C60915B5A115000F0ACD /* OREdelweissFLTModel.m */,
+			);
+			name = EdelweissFLT;
 			sourceTree = "<group>";
 		};
 		546D9DA60874BDD60072A274 /* TDC2228A */ = {
@@ -11496,6 +11530,7 @@
 			isa = PBXGroup;
 			children = (
 				2D12EDC8150FE21A00EBD8A2 /* EdelweissSLT */,
+				2D51C5F915B59CFE000F0ACD /* EdelweissFLT */,
 				2D1AB8070F1B9EBC00E6B850 /* IPE SlowControl */,
 				84F46F0A0CA44255007EFADA /* IPE Base Classes */,
 				84F46F110CA44255007EFADA /* IPE Crate */,
@@ -13425,6 +13460,10 @@
 				84FEB88A15A31F42005D798C /* ORL2301Controller.h in Headers */,
 				84FEB88C15A31F42005D798C /* ORL2301Decoders.h in Headers */,
 				84FEB88E15A31F42005D798C /* ORL2301Model.h in Headers */,
+				2D51C60C15B5A115000F0ACD /* OREdelweissFLTController.h in Headers */,
+				2D51C60E15B5A115000F0ACD /* OREdelweissFLTDecoder.h in Headers */,
+				2D51C61015B5A115000F0ACD /* OREdelweissFLTDefs.h in Headers */,
+				2D51C61115B5A115000F0ACD /* OREdelweissFLTModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14281,6 +14320,8 @@
 				84FEAD6D1594A4DF005D798C /* ProXR16SSRBig.tif in Resources */,
 				84FEB88815A31F42005D798C /* L2301.nib in Resources */,
 				84FEB88915A31F42005D798C /* L2301Card.gif in Resources */,
+				2D51C60A15B5A115000F0ACD /* EdelweissFLT.nib in Resources */,
+				2D51C60B15B5A115000F0ACD /* EdelweissFLTCard.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -15242,6 +15283,9 @@
 				84FEB88B15A31F42005D798C /* ORL2301Controller.m in Sources */,
 				84FEB88D15A31F42005D798C /* ORL2301Decoders.m in Sources */,
 				84FEB88F15A31F42005D798C /* ORL2301Model.m in Sources */,
+				2D51C60D15B5A115000F0ACD /* OREdelweissFLTController.m in Sources */,
+				2D51C60F15B5A115000F0ACD /* OREdelweissFLTDecoder.m in Sources */,
+				2D51C61215B5A115000F0ACD /* OREdelweissFLTModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

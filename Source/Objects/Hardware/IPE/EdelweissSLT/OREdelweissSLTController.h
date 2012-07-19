@@ -43,16 +43,11 @@
 		IBOutlet NSTextField*	hwVersionField;
 		IBOutlet NSTextField*	sltScriptArgumentsTextField;
 		IBOutlet NSMatrix*		countersMatrix;
-		IBOutlet NSTextField*	secondsSetField;
-		IBOutlet NSButton*		secondsSetInitWithHostButton;
 		IBOutlet NSButton*		hwVersionButton;
 	
 		//control reg
-		IBOutlet NSMatrix*		triggerEnableMatrix;
-		IBOutlet NSMatrix*		inhibitEnableMatrix;
 		IBOutlet NSMatrix*		testPatternEnableMatrix;
 		IBOutlet NSMatrix*		miscCntrlBitsMatrix;
-		IBOutlet NSMatrix*		enableDisableCountersMatrix;
 	
 		IBOutlet NSButton*		initBoardButton;
 		IBOutlet NSButton*		initBoard1Button;
@@ -123,14 +118,8 @@
 - (void) crateUDPCommandIPChanged:(NSNotification*)aNote;
 - (void) crateUDPCommandPortChanged:(NSNotification*)aNote;
 - (void) crateUDPReplyPortChanged:(NSNotification*)aNote;
-- (void) secondsSetInitWithHostChanged:(NSNotification*)aNote;
 - (void) sltScriptArgumentsChanged:(NSNotification*)aNote;
-- (void) countersEnabledChanged:(NSNotification*)aNote;
 - (void) clockTimeChanged:(NSNotification*)aNote;
-- (void) runTimeChanged:(NSNotification*)aNote;
-- (void) vetoTimeChanged:(NSNotification*)aNote;
-- (void) deadTimeChanged:(NSNotification*)aNote;
-- (void) secondsSetChanged:(NSNotification*)aNote;
 - (void) statusRegChanged:(NSNotification*)aNote;
 - (void) controlRegChanged:(NSNotification*)aNote;
 - (void) hwVersionChanged:(NSNotification*) aNote;
@@ -169,17 +158,9 @@
 - (IBAction) openCommandSocketButtonAction:(id)sender;
 - (IBAction) closeCommandSocketButtonAction:(id)sender;
 
-- (IBAction) secondsSetInitWithHostButtonAction:(id)sender;
 - (IBAction) sltScriptArgumentsTextFieldAction:(id)sender;
-- (IBAction) enableDisableCounterAction:(id)sender;
-- (IBAction) secondsSetAction:(id)sender;
-- (IBAction) triggerEnableAction:(id)sender;
-- (IBAction) inhibitEnableAction:(id)sender;
-- (IBAction) testPatternEnableAction:(id)sender;
 - (IBAction) miscCntrlBitsAction:(id)sender;
 - (IBAction) hwVersionAction: (id) sender;
-- (IBAction) writeSWTrigAction:(id)sender;
-- (IBAction) resetPageManagerAction:(id)sender;
 
 - (IBAction) dumpPageStatus:(id)sender;
 - (IBAction) pollRateAction:(id)sender;
@@ -205,19 +186,10 @@
 - (IBAction) calibrateAction:(id)sender;
 
 
-- (IBAction) enableCountersAction:(id)sender;
-- (IBAction) disableCountersAction:(id)sender;
-- (IBAction) clearCountersAction:(id)sender;
-- (IBAction) activateSWRequestAction:(id)sender;
 - (IBAction) configureFPGAsAction:(id)sender;
-- (IBAction) tpStartAction:(id)sender;
 - (IBAction) resetFLTAction:(id)sender;
 - (IBAction) resetSLTAction:(id)sender;
-- (IBAction) writeSWTrigAction:(id)sender;
-- (IBAction) writeClrInhibitAction:(id)sender;
-- (IBAction) writeSetInhibitAction:(id)sender;
-- (IBAction) resetPageManagerAction:(id)sender;
-- (IBAction) resetPageManagerAction:(id)sender;
+- (IBAction) evResAction:(id)sender;
 
 - (IBAction) sendCommandScript:(id)sender;
 - (IBAction) sendSimulationConfigScriptON:(id)sender;

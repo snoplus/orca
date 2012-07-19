@@ -170,43 +170,13 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 						object: model];
 	
     [notifyCenter addObserver : self
-                     selector : @selector(secondsSetChanged:)
-                         name : OREdelweissSLTModelSecondsSetChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(deadTimeChanged:)
-                         name : OREdelweissSLTModelDeadTimeChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(vetoTimeChanged:)
-                         name : OREdelweissSLTModelVetoTimeChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(runTimeChanged:)
-                         name : OREdelweissSLTModelRunTimeChanged
-						object: model];
-
-    [notifyCenter addObserver : self
                      selector : @selector(clockTimeChanged:)
                          name : OREdelweissSLTModelClockTimeChanged
 						object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(countersEnabledChanged:)
-                         name : OREdelweissSLTModelCountersEnabledChanged
-						object: model];
-
-    [notifyCenter addObserver : self
                      selector : @selector(sltScriptArgumentsChanged:)
                          name : OREdelweissSLTModelSltScriptArgumentsChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(secondsSetInitWithHostChanged:)
-                         name : OREdelweissSLTModelSecondsSetInitWithHostChanged
 						object: model];
 
     [notifyCenter addObserver : self
@@ -266,68 +236,31 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	[crateUDPCommandPortTextField setIntValue: [model crateUDPCommandPort]];
 }
 
-- (void) secondsSetInitWithHostChanged:(NSNotification*)aNote
-{
-	[secondsSetInitWithHostButton setState: [model secondsSetInitWithHost]];
-	[secondsSetField setEnabled:![model secondsSetInitWithHost]];
-}
 
 - (void) sltScriptArgumentsChanged:(NSNotification*)aNote
 {
 	[sltScriptArgumentsTextField setStringValue: [model sltScriptArguments]];
 }
 
-- (void) countersEnabledChanged:(NSNotification*)aNote
-{
-	[enableDisableCountersMatrix selectCellWithTag: [model countersEnabled]];
-}
 
 - (void) clockTimeChanged:(NSNotification*)aNote
 {
-	[[countersMatrix cellWithTag:3] setIntValue:[model clockTime]];
+ 	//NSLog(@"   %@::%@:   clockTime: 0x%016qx   \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model clockTime]);//TODO: DEBUG testing ...-tb-
+	//[[countersMatrix cellWithTag:3] setIntValue:[model clockTime]];  //setIntValue seems not to work for 64-bit integer? -tb-
+	[[countersMatrix cellWithTag:3] setStringValue: [NSString stringWithFormat:@"%qu",[model clockTime]]];
 }
 
-- (void) runTimeChanged:(NSNotification*)aNote
-{
-	//[[countersMatrix cellWithTag:2] setStringValue: [NSString stringWithFormat:@"%llu",(unsigned long long)[model runTime]]];
-	unsigned long long t=[model runTime];
-	[[countersMatrix cellWithTag:2] setStringValue: [NSString stringWithFormat:@"%llu",t]];
-	//[[countersMatrix cellWithTag:2] setStringValue: [NSString stringWithFormat:@"%llu.%llu", (t>>32) & 0xffffffff, t & 0xffffffff]];
-	//[[countersMatrix cellWithTag:2] setIntValue:  [model runTime]];
-}
 
-- (void) vetoTimeChanged:(NSNotification*)aNote
-{
-	unsigned long long t=[model vetoTime];
-	[[countersMatrix cellWithTag:1] setStringValue: [NSString stringWithFormat:@"%llu",t]];
-	//[[countersMatrix cellWithTag:1] setStringValue: [NSString stringWithFormat:@"%llu.%llu", (t>>32) & 0xffffffff, t & 0xffffffff]];
-	//[[countersMatrix cellWithTag:1] setIntValue:[model vetoTime]];
-}
-
-- (void) deadTimeChanged:(NSNotification*)aNote
-{
-	unsigned long long t=[model deadTime];
-	[[countersMatrix cellWithTag:0] setStringValue: [NSString stringWithFormat:@"%llu",t]];
-	//[[countersMatrix cellWithTag:0] setStringValue: [NSString stringWithFormat:@"%llu.%llu", (t>>32) & 0xffffffff, t & 0xffffffff]];
-	//[[countersMatrix cellWithTag:0] setIntValue:[model deadTime]];
-}
-
-- (void) secondsSetChanged:(NSNotification*)aNote
-{
-	[secondsSetField setIntValue: [model secondsSet]];
-}
 
 - (void) statusRegChanged:(NSNotification*)aNote
 {
 	unsigned long statusReg = [model statusReg];
-	[[statusMatrix cellWithTag:0] setStringValue: IsBitSet(statusReg,kStatusFltRq)?@"ERR":@"OK"];
-	[[statusMatrix cellWithTag:1] setStringValue: IsBitSet(statusReg,kStatusWDog)?@"ERR":@"OK"];
-	[[statusMatrix cellWithTag:2] setStringValue: IsBitSet(statusReg,kStatusPixErr)?@"ERR":@"OK"]; 
-	[[statusMatrix cellWithTag:3] setStringValue: IsBitSet(statusReg,kStatusPpsErr)?@"ERR":@"OK"]; 
-	[[statusMatrix cellWithTag:4] setStringValue: [NSString stringWithFormat:@"0x%02x",ExtractValue(statusReg,kStatusClkErr,4)]]; 
-	[[statusMatrix cellWithTag:5] setStringValue: IsBitSet(statusReg,kStatusGpsErr)?@"ERR":@"OK"]; 
-	[[statusMatrix cellWithTag:6] setStringValue: IsBitSet(statusReg,kStatusVttErr)?@"ERR":@"OK"]; 
-	[[statusMatrix cellWithTag:7] setStringValue: IsBitSet(statusReg,kStatusFanErr)?@"ERR":@"OK"]; 
+//DEBUG OUTPUT:  NSLog(@"WARNING: %@::%@: UNDER CONSTRUCTION! status reg: 0x%08x\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),statusReg);//TODO: DEBUG testing ...-tb-
+	
+	[[statusMatrix cellWithTag:0] setStringValue: IsBitSet(statusReg,kStatusIrq)?@"1":@"0"];
+	[[statusMatrix cellWithTag:1] setStringValue: IsBitSet(statusReg,kStatusPixErr)?@"1":@"0"];
+
+	[[statusMatrix cellWithTag:2] setStringValue: [NSString stringWithFormat:@"0x%04x",ExtractValue(statusReg,0xffff,0)]]; 
 
 }
 
@@ -408,14 +341,8 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
     [self pollRunningChanged:nil];
 	[self patternFilePathChanged:nil];
 	[self statusRegChanged:nil];
-	[self secondsSetChanged:nil];
-	[self deadTimeChanged:nil];
-	[self vetoTimeChanged:nil];
-	[self runTimeChanged:nil];
 	[self clockTimeChanged:nil];
-	[self countersEnabledChanged:nil];
 	[self sltScriptArgumentsChanged:nil];
-	[self secondsSetInitWithHostChanged:nil];
 	[self crateUDPCommandPortChanged:nil];
 	[self crateUDPCommandIPChanged:nil];
 	[self crateUDPReplyPortChanged:nil];
@@ -440,10 +367,7 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	BOOL isRunning = [gOrcaGlobals runInProgress];
 	
 	
-	[triggerEnableMatrix setEnabled:!lockedOrRunningMaintenance]; 
-    [inhibitEnableMatrix setEnabled:!lockedOrRunningMaintenance];
 	[hwVersionButton setEnabled:!isRunning];
-	[enableDisableCountersMatrix setEnabled:!isRunning];
 
 	[loadPatternFileButton setEnabled:!lockedOrRunningMaintenance];
 	[definePatternFileButton setEnabled:!lockedOrRunningMaintenance];
@@ -526,22 +450,10 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 - (void) controlRegChanged:(NSNotification*)aNote
 {
 	unsigned long value = [model controlReg];
-	unsigned long aMask = (value & kCtrlTrgEnMask)>>kCtrlTrgEnShift;
-	int i;
-	for(i=0;i<6;i++)[[triggerEnableMatrix cellWithTag:i] setIntValue:aMask & (0x1<<i)];
 	
-	aMask = (value & kCtrlInhEnMask)>>kCtrlInhEnShift;
-	for(i=0;i<4;i++)[[inhibitEnableMatrix cellWithTag:i] setIntValue:aMask & (0x1<<i)];
-	
-	aMask = (value & kCtrlTpEnMask)>>kCtrlTpEnEnShift;
-	[testPatternEnableMatrix selectCellWithTag:aMask];
-	
-	[[miscCntrlBitsMatrix cellWithTag:0] setIntValue:value & kCtrlPPSMask];
-	[[miscCntrlBitsMatrix cellWithTag:1] setIntValue:value & kCtrlShapeMask];
-	[[miscCntrlBitsMatrix cellWithTag:2] setIntValue:value & kCtrlRunMask];
-	[[miscCntrlBitsMatrix cellWithTag:3] setIntValue:value & kCtrlTstSltMask];
-	[[miscCntrlBitsMatrix cellWithTag:4] setIntValue:value & kCtrlIntEnMask];
-	[[miscCntrlBitsMatrix cellWithTag:5] setIntValue:value & kCtrlLedOffmask];	
+	[[miscCntrlBitsMatrix cellWithTag:0] setIntValue:value & kCtrlInvert];
+	[[miscCntrlBitsMatrix cellWithTag:1] setIntValue:value & kCtrlLedOff];
+	[[miscCntrlBitsMatrix cellWithTag:2] setIntValue:value & kCtrlOnLine];
 }
 
 - (void) populatePullDown
@@ -630,69 +542,18 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 
 
-- (void) secondsSetInitWithHostButtonAction:(id)sender
-{
-	[model setSecondsSetInitWithHost:[secondsSetInitWithHostButton intValue]];	
-}
-
 - (void) sltScriptArgumentsTextFieldAction:(id)sender
 {
 	[model setSltScriptArguments:[sender stringValue]];	
 }
 
-- (void) enableDisableCounterAction:(id)sender
-{
-	[model setCountersEnabled:[[sender selectedCell]tag]];	
-}
-
-- (IBAction) secondsSetAction:(id)sender
-{
-	[model setSecondsSet:[sender intValue]];	
-}
-
-- (IBAction) triggerEnableAction:(id)sender
-{
-	unsigned long aMask = 0;
-	int i;
-	for(i=0;i<6;i++){
-		if([[triggerEnableMatrix cellWithTag:i] intValue]) aMask |= (1L<<i);
-		else aMask &= ~(1L<<i);
-	}
-	unsigned long theRegValue = [model controlReg] & ~kCtrlTrgEnMask; 
-	theRegValue |= (aMask<< kCtrlTrgEnShift);
-	[model setControlReg:theRegValue];
-}
-
-- (IBAction) inhibitEnableAction:(id)sender;
-{
-	unsigned long aMask = 0;
-	int i;
-	for(i=0;i<4;i++){
-		if([[inhibitEnableMatrix cellWithTag:i] intValue]) aMask |= (1L<<i);
-		else aMask &= ~(1L<<i);
-	}
-	unsigned long theRegValue = [model controlReg] & ~kCtrlInhEnMask; 
-	theRegValue |= (aMask<<kCtrlInhEnShift);
-	[model setControlReg:theRegValue];
-}
-
-- (IBAction) testPatternEnableAction:(id)sender;
-{
-	unsigned long aMask       = [[testPatternEnableMatrix selectedCell] tag];
-	unsigned long theRegValue = [model controlReg] & ~kCtrlTpEnMask; 
-	theRegValue |= (aMask<<kCtrlTpEnEnShift);
-	[model setControlReg:theRegValue];
-}
 
 - (IBAction) miscCntrlBitsAction:(id)sender;
 {
-	unsigned long theRegValue = [model controlReg] & ~(kCtrlPPSMask | kCtrlShapeMask | kCtrlRunMask | kCtrlTstSltMask | kCtrlIntEnMask | kCtrlLedOffmask); 
-	if([[miscCntrlBitsMatrix cellWithTag:0] intValue])	theRegValue |= kCtrlPPSMask;
-	if([[miscCntrlBitsMatrix cellWithTag:1] intValue])	theRegValue |= kCtrlShapeMask;
-	if([[miscCntrlBitsMatrix cellWithTag:2] intValue])	theRegValue |= kCtrlRunMask;
-	if([[miscCntrlBitsMatrix cellWithTag:3] intValue])	theRegValue |= kCtrlTstSltMask;
-	if([[miscCntrlBitsMatrix cellWithTag:4] intValue])	theRegValue |= kCtrlIntEnMask;
-	if([[miscCntrlBitsMatrix cellWithTag:5] intValue])	theRegValue |= kCtrlLedOffmask;
+	unsigned long theRegValue = [model controlReg] & ~(kCtrlInvert | kCtrlLedOff | kCtrlOnLine); 
+	if([[miscCntrlBitsMatrix cellWithTag:0] intValue])	theRegValue |= kCtrlInvert;
+	if([[miscCntrlBitsMatrix cellWithTag:1] intValue])	theRegValue |= kCtrlLedOff;
+	if([[miscCntrlBitsMatrix cellWithTag:2] intValue])	theRegValue |= kCtrlOnLine;
 
 	[model setControlReg:theRegValue];
 }
@@ -718,6 +579,7 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (IBAction) pollNowAction:(id)sender
 {
+//DEBUG OUTPUT: 	NSLog(@"WARNING: %@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
 	[model readAllStatus];
 }
 
@@ -788,10 +650,7 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 		[model printStatusReg];
 		[model printControlReg];
 		NSLogFont(aFont,@"--------------------------------------\n");
-		NSLogFont(aFont,@"Dead Time  : %lld\n",[model readDeadTime]);
-		NSLogFont(aFont,@"Veto Time  : %lld\n",[model readVetoTime]);
-		NSLogFont(aFont,@"Run Time   : %lld\n",[model readRunTime]);
-		NSLogFont(aFont,@"Seconds    : %d\n",  [model getSeconds]);
+		NSLogFont(aFont,@"SLT Time   : %lld\n",[model getTime]);
 		[model printInterruptMask];
 		[model printInterruptRequests];
 	    long fdhwlibVersion = [model getFdhwlibVersion];  //TODO: write a method [model printFdhwlibVersion];
@@ -885,19 +744,10 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 }
 
 //most of these are not currently connected to anything.. used during testing..
-- (IBAction) enableCountersAction:(id)sender	{ [self do:@selector(writeEnCnt) name:@"Enable Counters"]; }
-- (IBAction) disableCountersAction:(id)sender	{ [self do:@selector(writeDisCnt) name:@"Disable Counters"]; }
-- (IBAction) clearCountersAction:(id)sender		{ [self do:@selector(writeClrCnt) name:@"Clear Counters"]; }
-- (IBAction) activateSWRequestAction:(id)sender	{ [self do:@selector(writeSwRq) name:@"Active SW Request Interrupt"]; }
 - (IBAction) configureFPGAsAction:(id)sender	{ [self do:@selector(writeFwCfg) name:@"Config FPGAs"]; }
-- (IBAction) tpStartAction:(id)sender			{ [self do:@selector(writeTpStart) name:@"Test Pattern Start"]; }
 - (IBAction) resetFLTAction:(id)sender			{ [self do:@selector(writeFltReset) name:@"FLT Reset"]; }
 - (IBAction) resetSLTAction:(id)sender			{ [self do:@selector(writeSltReset) name:@"SLT Reset"]; }
-- (IBAction) writeSWTrigAction:(id)sender		{ [self do:@selector(writeSwTrigger) name:@"SW Trigger"]; }
-- (IBAction) writeClrInhibitAction:(id)sender	{ [self do:@selector(writeClrInhibit) name:@"Clr Inhibit"]; }
-- (IBAction) writeSetInhibitAction:(id)sender	{ [self do:@selector(writeSetInhibit) name:@"Set Inhibit"]; }
-- (IBAction) resetPageManagerAction:(id)sender	{ [self do:@selector(writePageManagerReset) name:@"Reset Page Manager"]; }
-- (IBAction) releaseAllPagesAction:(id)sender	{ [self do:@selector(writeReleasePage) name:@"Release Pages"]; }
+- (IBAction) evResAction:(id)sender		        { [self do:@selector(writeEvRes) name:@"EvRes"]; }
 
 - (IBAction) sendCommandScript:(id)sender
 {

@@ -44,56 +44,22 @@
 #define ExtractValue(A,B,C) (((A) & (B)) >> (C))
 
 //control reg bit masks
-#define kCtrlTrgEnShift		0
-#define kCtrlInhEnShift		6
-#define kCtrlPPSShift		10
-#define kCtrlTpEnEnShift	11
-
-#define kCtrlLedOffmask	(0x00000001 << 17) //RW
-#define kCtrlIntEnMask	(0x00000001 << 16) //RW
-#define kCtrlTstSltMask	(0x00000001 << 15) //RW
-#define kCtrlRunMask	(0x00000001 << 14) //RW
-#define kCtrlShapeMask	(0x00000001 << 13) //RW
-#define kCtrlTpEnMask	(0x00000003 << kCtrlTpEnEnShift)	//RW
-#define kCtrlPPSMask	(0x00000001 << kCtrlPPSShift)		//RW
-#define kCtrlInhEnMask	(0x0000000F <<  kCtrlInhEnShift)	//RW
-#define kCtrlTrgEnMask	(0x0000003F <<  kCtrlTrgEnShift)	//RW
+#define kCtrlInvert 	(0x00000001 << 16) //RW
+#define kCtrlLedOff 	(0x00000001 << 15) //RW
+#define kCtrlOnLine		(0x00000001 << 14) //RW
 
 //status reg bit masks
-#define kStatusIrq			(0x00000001 << 31) //R
-#define kStatusFltStat		(0x00000001 << 30) //R
-#define kStatusGps2			(0x00000001 << 29) //R
-#define kStatusGps1			(0x00000001 << 28) //R
-#define kStatusInhibitSrc	(0x0000000f << 24) //R
-#define kStatusInh			(0x00000001 << 23) //R
-#define kStatusSemaphores	(0x00000007 << 16) //R - cleared on W
-#define kStatusFltTimeOut	(0x00000001 << 15) //R - cleared on W
-#define kStatusPgFull		(0x00000001 << 14) //R - cleared on W
-#define kStatusPgRdy		(0x00000001 << 13) //R - cleared on W
-#define kStatusEvRdy		(0x00000001 << 12) //R - cleared on W
-#define kStatusSwRq			(0x00000001 << 11) //R - cleared on W
-#define kStatusFanErr		(0x00000001 << 10) //R - cleared on W
-#define kStatusVttErr		(0x00000001 <<  9) //R - cleared on W
-#define kStatusGpsErr		(0x00000001 <<  8) //R - cleared on W
-#define kStatusClkErr		(0x0000000F <<  4) //R - cleared on W
-#define kStatusPpsErr		(0x00000001 <<  3) //R - cleared on W
-#define kStatusPixErr		(0x00000001 <<  2) //R - cleared on W
-#define kStatusWDog			(0x00000001 <<  1) //R - cleared on W
-#define kStatusFltRq		(0x00000001 <<  0) //R - cleared on W
+#define kStatusIrq			(0x00000001 << 31) //R - cleared on W
+#define kStatusPixErr		(0x00000001 << 16) //R - cleared on W
+
 
 //Cmd reg bit masks
-#define kCmdDisCnt			(0x00000001 << 10) //W - self cleared
-#define kCmdEnCnt			(0x00000001 <<  9) //W - self cleared
-#define kCmdClrCnt			(0x00000001 <<  8) //W - self cleared
-#define kCmdSwRq			(0x00000001 <<  7) //W - self cleared
-#define kCmdFltReset		(0x00000001 <<  6) //W - self cleared
-#define kCmdSltReset		(0x00000001 <<  5) //W - self cleared
-#define kCmdFwCfg			(0x00000001 <<  4) //W - self cleared
-#define kCmdTpStart			(0x00000001 <<  3) //W - self cleared
-#define kCmdSwTr			(0x00000001 <<  2) //W - self cleared
-#define kCmdClrInh			(0x00000001 <<  1) //W - self cleared
-#define kCmdSetInh			(0x00000001 <<  0) //W - self cleared
+#define kCmdEvRes			(0x00000001 <<  3) //W - self cleared
+#define kCmdFltReset		(0x00000001 <<  2) //W - self cleared
+#define kCmdSltReset		(0x00000001 <<  1) //W - self cleared
+#define kCmdFwCfg			(0x00000001 <<  0) //W - self cleared
 
+#if 0
 //Interrupt Request and Mask reg bit masks
 //Interrupt Request Read only - cleared on Read
 //Interrupt Mask Read/Write only
@@ -110,6 +76,7 @@
 #define kIrptPixErr		(0x00000001 <<  2) 
 #define kIrptWdog		(0x00000001 <<  1) 
 #define kIrptFltRq		(0x00000001 <<  0) 
+#endif
 
 //Revision Masks
 #define kRevisionProject (0x0000000F << 28) //R
@@ -125,13 +92,6 @@
 #define kPageMngOldestPageShift	1
 #define kPageMngReleaseShift		0
 
-#define kPageMngReset			(0x00000001 << kPageMngResetShift)			//W - self cleared
-#define kPageMngNumFreePages	(0x0000007F << kPageMngNumFreePagesShift)	//R
-#define kPageMngPgFull			(0x00000001 << kPageMngPgFullShift)			//W
-#define kPageMngNextPage		(0x0000003F << kPageMngNextPageShift)		//W
-#define kPageMngReady			(0x00000001 << kPageMngReadyShift)			//W
-#define kPageMngOldestPage		(0x0000003F << kPageMngOldestPageShift)	//W
-#define kPageMngRelease			(0x00000001 << kPageMngReleaseShift)		//W - self cleared
 
 //Trigger Timing
 #define kTrgTimingTrgWindow		(0x00000007 <<  16) //R/W
@@ -171,12 +131,7 @@
         
 		unsigned long controlReg;
 		unsigned long statusReg;
-		unsigned long secondsSet;
-		unsigned long long deadTime;
-		unsigned long long vetoTime;
-		unsigned long long runTime;
-		unsigned long clockTime;
-		BOOL countersEnabled;
+		unsigned long long clockTime;
 		
         NSString* sltScriptArguments;
         BOOL secondsSetInitWithHost;
@@ -231,18 +186,9 @@
 - (void) setSecondsSetInitWithHost:(BOOL)aSecondsSetInitWithHost;
 - (NSString*) sltScriptArguments;
 - (void) setSltScriptArguments:(NSString*)aSltScriptArguments;
-- (BOOL) countersEnabled;
-- (void) setCountersEnabled:(BOOL)aContersEnabled;
-- (unsigned long) clockTime;
-- (void) setClockTime:(unsigned long)aClockTime;
-- (unsigned long long) runTime;
-- (void) setRunTime:(unsigned long long)aRunTime;
-- (unsigned long long) vetoTime;
-- (void) setVetoTime:(unsigned long long)aVetoTime;
-- (unsigned long long) deadTime;
-- (void) setDeadTime:(unsigned long long)aDeadTime;
-- (unsigned long) secondsSet;
-- (void) setSecondsSet:(unsigned long)aSecondsSet;
+- (unsigned long long) clockTime;
+- (void) setClockTime:(unsigned long long)aClockTime;
+
 - (unsigned long) statusReg;
 - (void) setStatusReg:(unsigned long)aStatusReg;
 - (unsigned long) controlReg;
@@ -311,29 +257,18 @@
 - (void)		  readAllStatus;
 - (void)		  checkPresence;
 - (unsigned long) readControlReg;
-- (unsigned long) readPageSelectReg;
 - (void)		  writeControlReg;
 - (void)		  printControlReg;
 - (unsigned long) readStatusReg;
 - (void)		  printStatusReg;
-- (void)		  loadSecondsReg;
-- (void)		writeSetInhibit;
-- (void)		writeClrInhibit;
-- (void)		writeSwTrigger;
-- (void)		writeTpStart;
+
 - (void)		writeFwCfg;
 - (void)		writeSltReset;
 - (void)		writeFltReset;
-- (void)		writeSwRq;
-- (void)		writeClrCnt;
-- (void)		writeEnCnt;
-- (void)		writeDisCnt;
-- (void)		writeReleasePage;		
-- (void)		writePageManagerReset;
+- (void)		writeEvRes;
 - (unsigned long long) readBoardID;
 - (void) readEventStatus:(unsigned long*)eventStatusBuffer;
 
-- (void)		  writePageSelect:(unsigned long)aPageNum;
 - (void)		  writeInterruptMask;
 - (void)		  readInterruptMask;
 - (void)		  readInterruptRequest;
@@ -349,12 +284,9 @@
 - (id) writeHardwareRegisterCmd:(unsigned long)regAddress value:(unsigned long) aValue;
 - (id) readHardwareRegisterCmd:(unsigned long)regAddress;
 - (unsigned long) readHwVersion;
-- (unsigned long long) readDeadTime;
-- (unsigned long long) readVetoTime;
-- (unsigned long long) readRunTime;
-- (unsigned long) readSecondsCounter;
-- (unsigned long) readSubSecondsCounter;
-- (unsigned long) getSeconds;
+- (unsigned long) readTimeLow;
+- (unsigned long) readTimeHigh;
+- (unsigned long long) getTime;
 
 - (void)		reset;
 - (void)		hw_config;
@@ -414,7 +346,7 @@ extern NSString* OREdelweissSLTModelCrateUDPCommandIPChanged;
 extern NSString* OREdelweissSLTModelCrateUDPCommandPortChanged;
 extern NSString* OREdelweissSLTModelSecondsSetInitWithHostChanged;
 extern NSString* OREdelweissSLTModelSltScriptArgumentsChanged;
-extern NSString* OREdelweissSLTModelCountersEnabledChanged;
+
 extern NSString* OREdelweissSLTModelClockTimeChanged;
 extern NSString* OREdelweissSLTModelRunTimeChanged;
 extern NSString* OREdelweissSLTModelVetoTimeChanged;

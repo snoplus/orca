@@ -141,7 +141,7 @@ void FindHardware(void)
 #else
     //TODO: check here blocking semaphores? -tb-
     srack = new hw4::SubrackKatrin((char*)name,0);
-    srack->checkSlot(); //check for available slots (init for isPresent(slot)); is necessary to prepare readout loop! -tb-
+    //TODO: changed for EW ... -tb- ... srack->checkSlot(); //check for available slots (init for isPresent(slot)); is necessary to prepare readout loop! -tb-
     pbus = srack->theSlt->version; //all registers inherit from Pbus, we choose "version" as it shall exist for all FPGA configurations
     if(!pbus) fprintf(stdout,"HW_Readout.cc (IPE DAQ V4): ERROR: could not connect to Pbus!\n");
     // test/force the C++ link to fdhwlib -tb-
@@ -249,7 +249,10 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply)
     //TODO: -tb- printf("perr: %d\n",perr);
 #else
     try{
-        if (numItems == 1)  *lPtr = pbus->read(startAddress);
+        if (numItems == 1){
+		    *lPtr = pbus->read(startAddress);
+			//printf("read from 0x%x, value is %i (0x%x)\n",startAddress, *lPtr,*lPtr);//TODO: debugging
+		}
         else                pbus->readBlock(startAddress, (unsigned long *) lPtr, numItems);
     }catch(PbusError &e){
         perr = 1;
