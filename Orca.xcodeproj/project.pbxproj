@@ -1635,6 +1635,7 @@
 		848648AC0975CB2E001C459D /* ORProcessConnector.h in Headers */ = {isa = PBXBuildFile; fileRef = 848648AA0975CB2E001C459D /* ORProcessConnector.h */; };
 		848648AD0975CB2E001C459D /* ORProcessConnector.m in Sources */ = {isa = PBXBuildFile; fileRef = 848648AB0975CB2E001C459D /* ORProcessConnector.m */; };
 		8486F4660CC6D02E00800B1E /* ORIpeDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 8486F44C0CC6CF9A00800B1E /* ORIpeDefs.h */; };
+		84880EEE15B8950D0073CDFC /* MJDStrings.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84880EED15B8950D0073CDFC /* MJDStrings.tif */; };
 		848883CC10179CBA0043E7D6 /* EduWashingtonNplOrcaNi488PlugIn.plugin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 84888394101796C10043E7D6 /* EduWashingtonNplOrcaNi488PlugIn.plugin */; };
 		848A147B10BAE3D6002A80D0 /* ORFileReader.h in Headers */ = {isa = PBXBuildFile; fileRef = 848A147910BAE3D6002A80D0 /* ORFileReader.h */; };
 		848A147C10BAE3D6002A80D0 /* ORFileReader.m in Sources */ = {isa = PBXBuildFile; fileRef = 848A147A10BAE3D6002A80D0 /* ORFileReader.m */; };
@@ -4470,6 +4471,7 @@
 		848648AA0975CB2E001C459D /* ORProcessConnector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORProcessConnector.h; sourceTree = "<group>"; };
 		848648AB0975CB2E001C459D /* ORProcessConnector.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORProcessConnector.m; sourceTree = "<group>"; };
 		8486F44C0CC6CF9A00800B1E /* ORIpeDefs.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORIpeDefs.h; path = "Source/Objects/Hardware/IPE/IPE Base Classes/ORIpeDefs.h"; sourceTree = SOURCE_ROOT; };
+		84880EED15B8950D0073CDFC /* MJDStrings.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = MJDStrings.tif; path = Source/Experiments/MJDVacuum/MJDStrings.tif; sourceTree = SOURCE_ROOT; };
 		84888394101796C10043E7D6 /* EduWashingtonNplOrcaNi488PlugIn.plugin */ = {isa = PBXFileReference; lastKnownFileType = folder; name = EduWashingtonNplOrcaNi488PlugIn.plugin; path = PlugIns/Universal/EduWashingtonNplOrcaNi488PlugIn.plugin; sourceTree = SOURCE_ROOT; };
 		848A147910BAE3D6002A80D0 /* ORFileReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORFileReader.h; path = "Source/Objects/Data Processing/ReplayData/ORFileReader.h"; sourceTree = SOURCE_ROOT; };
 		848A147A10BAE3D6002A80D0 /* ORFileReader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORFileReader.m; path = "Source/Objects/Data Processing/ReplayData/ORFileReader.m"; sourceTree = SOURCE_ROOT; };
@@ -9569,6 +9571,7 @@
 				8415B6A8152223050092C975 /* ORMJDVacuumView.m */,
 				8415E584152C7C560092C975 /* ORVacuumParts.h */,
 				8415E585152C7C560092C975 /* ORVacuumParts.m */,
+				84880EED15B8950D0073CDFC /* MJDStrings.tif */,
 			);
 			name = MJDVacuum;
 			path = Source/Experiments/MJDVacuum;
@@ -14322,6 +14325,7 @@
 				84FEB88915A31F42005D798C /* L2301Card.gif in Resources */,
 				2D51C60A15B5A115000F0ACD /* EdelweissFLT.nib in Resources */,
 				2D51C60B15B5A115000F0ACD /* EdelweissFLTCard.gif in Resources */,
+				84880EEE15B8950D0073CDFC /* MJDStrings.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
