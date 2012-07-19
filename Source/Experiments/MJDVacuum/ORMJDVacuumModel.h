@@ -86,6 +86,17 @@
 #define kDetectorBiasedConstraint				@"Detector Biased"
 #define kDetectorBiasedReason					@"Detector must be protected from regions with pressure higher than 1E-5."
 
+#define kBaratronTooLowConstraint				@"BaratronTooLow"
+#define kBaratronTooLowReason					@"Baratron out of range. Pressure less than 1000."
+
+#define kBaratronTooHighConstraint				@"BaratronTooHigh"
+#define kBaratronTooHighReason					@"Baratron out of range. Pressure greater than 2500."
+
+#define kG3HighConstraint						@"G3High"
+#define kG3HighReason							@"PKR G3 greater than 1E-6."
+
+#define kG3WayHighConstraint					@"G3High"
+#define kG3WayHighReason						@"PKR G3 greater than 1E-5."
 
 //-----------------------------------
 @interface ORMJDVacuumModel : ORGroup <OROrderedObjHolding,ORAdcProcessor,ORBitProcessor,ORCallBackBitProcessor>
@@ -100,18 +111,17 @@
 	BOOL				 involvedInProcess;
 	BOOL				 constraintCheckScheduled;
     BOOL				 detectorsBiased;
-    BOOL				 okToBiasDetector;
-    BOOL				 shouldUnbiasDetector;
+
+	NSMutableDictionary* okToBiasConstraints;
+	NSMutableDictionary* continuedBiasConstraints;
 }
 
 #pragma mark ***Accessors
 - (BOOL) shouldUnbiasDetector;
-- (void) setShouldUnbiasDetector:(BOOL)aShouldUnbiasDetector;
 - (BOOL) okToBiasDetector;
 - (BOOL) detectorsBiased;
-
-- (void) setOkToBiasDetector:(BOOL)aOkToBiasDetector;
 - (void) setDetectorsBiased:(BOOL)aDetectorsBiased;
+
 - (unsigned long) vetoMask;
 - (void) setVetoMask:(unsigned long)aVetoMask;
 - (void) setUpImage;
@@ -172,15 +182,23 @@
 - (void) place:(id)anObj intoSlot:(int)aSlot;
 - (int) slotForObj:(id)anObj;
 - (int) numberSlotsNeededFor:(id)anObj;
+
+#pragma mark •••Constraints
+- (void) addOkToBiasConstraints:(NSString*)aName reason:(NSString*)aReason;
+- (void) removeOkToBiasConstraints:(NSString*)aName;
+- (void) addContinuedBiasConstraints:(NSString*)aName reason:(NSString*)aReason;
+- (void) removeContinuedBiasConstraints:(NSString*)aName;
+- (NSDictionary*) okToBiasConstraints;
+- (NSDictionary*) continuedBiasConstraints;
+
 @end
 
-extern NSString* ORMJDVacuumModelShouldUnbiasDetectorChanged;
-extern NSString* ORMJDVacuumModelOkToBiasDetectorChanged;
 extern NSString* ORMJDVacuumModelDetectorsBiasedChanged;
 extern NSString* ORMJDVacuumModelVetoMaskChanged;
 extern NSString* ORMJDVacuumModelPollTimeChanged;
 extern NSString* ORMJDVacuumModelShowGridChanged;
 extern NSString* ORMJCVacuumLock;
+extern NSString* ORMJDVacuumModelConstraintsChanged;
 
 
 @interface ORMJDVacuumModel (hidden)

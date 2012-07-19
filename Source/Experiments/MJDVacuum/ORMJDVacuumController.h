@@ -24,9 +24,6 @@
 @interface ORMJDVacuumController : OrcaObjectController
 {
     IBOutlet ORMJDVacuumView*   vacuumView;
-	IBOutlet   NSTextField* shouldUnbiasDetectorTextField;
-	IBOutlet   NSTextField* okToBiasDetectorTextField;
-	IBOutlet   NSTextField* detectorsBiasedTextField;
 	IBOutlet NSButton*		setShowGridCB;
 	IBOutlet NSPanel*		gvControlPanel;
 	IBOutlet NSPanel*		gvConstraintPanel;
@@ -45,6 +42,8 @@
 	IBOutlet ORGroupView*   subComponentsView;
 	IBOutlet NSTextView*    gvConstraintView;
 	IBOutlet NSTextField*   constraintTitleField;
+	IBOutlet NSTextField*   detectorStatusField;
+	IBOutlet NSTextField*   constraintStatusField;
 
 	BOOL					updateScheduled;
 }
@@ -63,9 +62,8 @@
 - (void) toggleGrid;
 
 #pragma mark ***Interface Management
-- (void) shouldUnbiasDetectorChanged:(NSNotification*)aNote;
-- (void) okToBiasDetectorChanged:(NSNotification*)aNote;
 - (void) detectorsBiasedChanged:(NSNotification*)aNote;
+- (void) localConstraintsChanged:(NSNotification*)aNote;
 - (void) vetoMaskChanged:(NSNotification*)aNote;
 - (void) stateChanged:(NSNotification*)aNote;
 - (void) delayedRefresh;

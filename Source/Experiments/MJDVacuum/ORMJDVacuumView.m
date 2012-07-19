@@ -65,6 +65,8 @@
 
 - (void) dealloc
 {
+	[hvPlusSign release];
+	[biasPath release];
 	[gvButtons release];
 	[super dealloc];
 }
@@ -89,6 +91,34 @@
 	if([delegate showGrid]) [self drawGrid];
 	NSArray* parts = [[delegate model] parts];
 	for(ORVacuumPart* aPart in parts)[aPart draw];
+	
+	NSImage* stringsImage = [NSImage imageNamed:@"MJDStrings"];
+	NSPoint aPoint = NSMakePoint(615,445);
+	[stringsImage compositeToPoint:aPoint operation:NSCompositeSourceOver];
+	
+	if([[delegate model] detectorsBiased]){
+		if(!biasPath){ 
+			biasPath = [[NSBezierPath bezierPath] retain];
+			//top
+			[biasPath moveToPoint:NSMakePoint(620,510)];
+			[biasPath lineToPoint:NSMakePoint(610,510)];
+			[biasPath lineToPoint:NSMakePoint(610,490)];
+			
+			//bottom
+			[biasPath moveToPoint:NSMakePoint(620,445)];
+			[biasPath lineToPoint:NSMakePoint(610,445)];
+			[biasPath lineToPoint:NSMakePoint(610,465)];
+			
+			hvPlusSign = [[NSAttributedString alloc] initWithString:@"+"
+																	 attributes:[NSDictionary dictionaryWithObjectsAndKeys:
+																				 [NSColor redColor],NSForegroundColorAttributeName,
+																				 [NSFont fontWithName:@"Geneva" size:14],NSFontAttributeName,
+																				 nil]]; 			
+		}
+		[[NSColor redColor] set];
+		[biasPath stroke];
+		[hvPlusSign drawAtPoint:NSMakePoint( 605, 470)];
+	}
 }
 
 - (void) resetCursorRects

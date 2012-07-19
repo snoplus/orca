@@ -112,15 +112,9 @@
 						object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(okToBiasDetectorChanged:)
-                         name : ORMJDVacuumModelOkToBiasDetectorChanged
+                     selector : @selector(localConstraintsChanged:)
+                         name : ORMJDVacuumModelConstraintsChanged
 						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(shouldUnbiasDetectorChanged:)
-                         name : ORMJDVacuumModelShouldUnbiasDetectorChanged
-						object: model];
-
 }
 
 - (void) updateWindow
@@ -131,25 +125,27 @@
 	[self vetoMaskChanged:nil];
 	[self lockChanged:nil];
 	[self detectorsBiasedChanged:nil];
-	[self okToBiasDetectorChanged:nil];
-	[self shouldUnbiasDetectorChanged:nil];
+	[self localConstraintsChanged:nil];
 }
 
 #pragma mark •••Interface Management
 
-- (void) shouldUnbiasDetectorChanged:(NSNotification*)aNote
+- (void) localConstraintsChanged:(NSNotification*)aNote
 {
-//	[shouldUnbiasDetectorTextField setObjectValue: [model shouldUnbiasDetector]];
-}
-
-- (void) okToBiasDetectorChanged:(NSNotification*)aNote
-{
-//	[okToBiasDetectorTextField setObjectValue: [model okToBiasDetector]];
+	if([model detectorsBiased]){
+		if([model shouldUnbiasDetector]) [constraintStatusField setStringValue:@"Should unbias"];
+		else							 [constraintStatusField setStringValue:@"Normal Ops"];
+	}
+	else {
+		if([model okToBiasDetector]) [constraintStatusField setStringValue:@"OK to bias"];
+		else						 [constraintStatusField setStringValue:@"Do NOT bias"];
+	}
 }
 
 - (void) detectorsBiasedChanged:(NSNotification*)aNote
 {
-//	[detectorsBiasedTextField setObjectValue: [model detectorsBiased]];
+	[vacuumView setNeedsDisplay:YES];
+	[detectorStatusField setStringValue: [model detectorsBiased]?@"Biased":@"Unbiased"];
  }
 
 -(void) groupChanged:(NSNotification*)note

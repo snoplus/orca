@@ -48,6 +48,7 @@
 - (void) checkCryoPumpRelatedConstraints:(ORCP8CryopumpModel*) cryoPump;
 - (void) checkRGARelatedConstraints:(ORRGA300Model*) rga;
 - (void) checkPressureConstraints;
+- (void) checkDetectorConstraints;
 - (double) valueForRegion:(int)aRegion;
 - (ORVacuumValueLabel*) regionValueObj:(int)aRegion;
 - (BOOL) valueValidForRegion:(int)aRegion;
@@ -69,6 +70,7 @@ NSString* ORMJCVacuumLock                           = @"ORMJCVacuumLock";
 NSString* ORMJDVacuumModelShouldUnbiasDetectorChanged = @"ORMJDVacuumModelShouldUnbiasDetectorChanged";
 NSString* ORMJDVacuumModelOkToBiasDetectorChanged   = @"ORMJDVacuumModelOkToBiasDetectorChanged";
 NSString* ORMJDVacuumModelDetectorsBiasedChanged    = @"ORMJDVacuumModelDetectorsBiasedChanged";
+NSString* ORMJDVacuumModelConstraintsChanged		= @"ORMJDVacuumModelConstraintsChanged";
 
 @implementation ORMJDVacuumModel
 
@@ -242,6 +244,7 @@ NSString* ORMJDVacuumModelDetectorsBiasedChanged    = @"ORMJDVacuumModelDetector
 		[aRegionlabel setIsValid:YES];
 	}
 	[self checkPressureConstraints];
+	[self checkDetectorConstraints];
 }
 
 - (void) cryoPumpChanged:(NSNotification*)aNote
@@ -269,40 +272,23 @@ NSString* ORMJDVacuumModelDetectorsBiasedChanged    = @"ORMJDVacuumModelDetector
 }
 
 #pragma mark ***Accessors
-- (BOOL) shouldUnbiasDetector
-{
-    return shouldUnbiasDetector;
+- (BOOL) shouldUnbiasDetector	
+{ 
+	return [continuedBiasConstraints count] != 0;
 }
-
-- (void) setShouldUnbiasDetector:(BOOL)aShouldUnbiasDetector
+- (BOOL) okToBiasDetector		
 {
-    shouldUnbiasDetector = aShouldUnbiasDetector;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDVacuumModelShouldUnbiasDetectorChanged object:self];
+	return [okToBiasConstraints count] == 0;
 }
+- (BOOL) detectorsBiased		{ return detectorsBiased; }
 
-- (BOOL) okToBiasDetector
+- (void) setDetectorsBiased:(BOOL)aState
 {
-    return okToBiasDetector;
-}
-
-- (void) setOkToBiasDetector:(BOOL)aOkToBiasDetector
-{
-    okToBiasDetector = aOkToBiasDetector;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDVacuumModelOkToBiasDetectorChanged object:self];
-}
-
-- (BOOL) detectorsBiased
-{
-    return detectorsBiased;
-}
-
-- (void) setDetectorsBiased:(BOOL)aDetectorsBiased
-{
-    detectorsBiased = aDetectorsBiased;
-	
-	[self checkPressureConstraints];
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDVacuumModelDetectorsBiasedChanged object:self];
+	if(detectorsBiased!=aState){
+		detectorsBiased = aState;
+		[self checkDetectorConstraints];
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORMJDVacuumModelDetectorsBiasedChanged object:self];
+	}
 }
 
 - (unsigned long) vetoMask
@@ -312,14 +298,16 @@ NSString* ORMJDVacuumModelDetectorsBiasedChanged    = @"ORMJDVacuumModelDetector
 
 - (void) setVetoMask:(unsigned long)aVetoMask
 {
-    vetoMask = aVetoMask;
-	NSArray* gateValves = [self gateValves];
-	for(ORVacuumGateValve* aGateValve in gateValves){
-		int tag = [aGateValve partTag];
-		if(vetoMask & (0x1<<tag))aGateValve.vetoed = YES;
-		else aGateValve.vetoed = NO;
+	if(vetoMask != aVetoMask){
+		vetoMask = aVetoMask;
+		NSArray* gateValves = [self gateValves];
+		for(ORVacuumGateValve* aGateValve in gateValves){
+			int tag = [aGateValve partTag];
+			if(vetoMask & (0x1<<tag))aGateValve.vetoed = YES;
+			else aGateValve.vetoed = NO;
+		}
+		[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORMJDVacuumModelVetoMaskChanged object:self];
 	}
-    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORMJDVacuumModelVetoMaskChanged object:self];
 }
 
 - (BOOL) showGrid
@@ -625,6 +613,45 @@ NSString* ORMJDVacuumModelDetectorsBiasedChanged    = @"ORMJDVacuumModelDetector
 	}
 }
 
+#pragma mark •••Constraints
+- (void) addOkToBiasConstraints:(NSString*)aName reason:(NSString*)aReason
+{
+	if(!okToBiasConstraints)okToBiasConstraints = [[NSMutableDictionary dictionary] retain];
+	[okToBiasConstraints setObject:aReason forKey:aName];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORMJDVacuumModelConstraintsChanged object:self];
+	
+}
+
+- (void) removeOkToBiasConstraints:(NSString*)aName
+{
+	[okToBiasConstraints removeObjectForKey:aName];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORMJDVacuumModelConstraintsChanged object:self];
+}
+
+- (void) addContinuedBiasConstraints:(NSString*)aName reason:(NSString*)aReason
+{
+	if(!continuedBiasConstraints)continuedBiasConstraints = [[NSMutableDictionary dictionary] retain];
+	[continuedBiasConstraints setObject:aReason forKey:aName];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORMJDVacuumModelConstraintsChanged object:self];
+}
+
+- (void) removeContinuedBiasConstraints:(NSString*)aName
+{
+	[continuedBiasConstraints removeObjectForKey:aName];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORMJDVacuumModelConstraintsChanged object:self];
+}
+
+- (NSDictionary*) okToBiasConstraints
+{
+	return okToBiasConstraints;
+}
+
+- (NSDictionary*) continuedBiasConstraints
+{
+	return continuedBiasConstraints;
+}
+
+
 @end
 
 
@@ -665,7 +692,7 @@ NSString* ORMJDVacuumModelDetectorsBiasedChanged    = @"ORMJDVacuumModelDetector
 		
 		//region 2 pipes (cyrostat)
 		{ kVacBox,	   kRegionCryostat, 475,			  500,				525,				550 },
-		{ kVacBox,	   kRegionCryostat, 600,			  450,				680,				560 },
+		{ kVacBox,	   kRegionCryostat, 600,			  435,				700,				550 },
 		{ kVacBigHPipe, kRegionCryostat,525,			  525,		        600,				525 },
 		{ kVacCorner,  kRegionCryostat, 700,			  400,				kNA,				kNA },
 		{ kVacVPipe,   kRegionCryostat, 700,			   70,				700,				400-kPipeRadius },
@@ -690,8 +717,8 @@ NSString* ORMJDVacuumModelDetectorsBiasedChanged    = @"ORMJDVacuumModelDetector
 		{ kVacBox,	  kRegionBaratron,  470,			  570,				530,				620 },
 		{ kVacBox,	  kRegionBaratron,  270,			  570,				330,				620 },
 		{ kVacCorner, kRegionBaratron,  500,			  525,				kNA,				kNA },
-		{ kVacCorner, kRegionBaratron,  650,			  525,				kNA,				kNA },
-		{ kVacHPipe,  kRegionBaratron,  500+kPipeRadius, 525,				650-kPipeRadius,	525 },
+		{ kVacCorner, kRegionBaratron,  680,			  525,				kNA,				kNA },
+		{ kVacHPipe,  kRegionBaratron,  500+kPipeRadius,  525,				680-kPipeRadius,	525 },
 		{ kVacVPipe,  kRegionBaratron,  500,			  525+kPipeRadius,	500,				570 },
 		{ kVacHPipe,  kRegionBaratron,  330,			  600,				400,				600 },
 		{ kVacHPipe,  kRegionBaratron,  400,			  600,				470,				600 },
@@ -1095,6 +1122,7 @@ NSString* ORMJDVacuumModelDetectorsBiasedChanged    = @"ORMJDVacuumModelDetector
 	[self checkRGARelatedConstraints:  [self findRGA]];
 	[self checkCryoPumpRelatedConstraints:[self findCryoPump]];
 	[self checkPressureConstraints];
+	[self checkDetectorConstraints];
 	constraintCheckScheduled = NO;
 }
 
@@ -1341,15 +1369,19 @@ NSString* ORMJDVacuumModelDetectorsBiasedChanged    = @"ORMJDVacuumModelDetector
 		[rgaRegionObj removeConstraintName:kRgaCEMConstraint];
 	}
 	
+}
+
+- (void) checkDetectorConstraints
+{
 	//---------------------------------------------------------------------------
 	//Detector Biased: Detector must be protected from regions with pressure higher than 1E-5
     if([self detectorsBiased]){
         for(ORVacuumGateValve* aGateValve in [self gateValves]){
             if([aGateValve isClosed]){
-                int side1				= [aGateValve connectingRegion1];
-                int side2				= [aGateValve connectingRegion2];
-                BOOL side1High			= [self region:side1 valueHigherThan:1.0E-5];
-                BOOL side2High			= [self region:side2 valueHigherThan:1.0E-5];
+                int side1		= [aGateValve connectingRegion1];
+                int side2		= [aGateValve connectingRegion2];
+                BOOL side1High	= [self region:side1 valueHigherThan:1.0E-5];
+                BOOL side2High	= [self region:side2 valueHigherThan:1.0E-5];
                 
                 if([self regionColor:side1 sameAsRegion:side2]){
                     [aGateValve removeConstraintName:kDetectorBiasedConstraint];
@@ -1369,22 +1401,42 @@ NSString* ORMJDVacuumModelDetectorsBiasedChanged    = @"ORMJDVacuumModelDetector
 	
 	//---------------------------------------------------------------------------
 	//PKR G3>1E-5: Should unbias, PKR G3>1E-6: Forbid biasing
-	double cyrostatPress = [self valueForRegion:kRegionCryostat];
-	if(cyrostatPress < 1E-6){
-		[self setOkToBiasDetector:YES];
-		[self setShouldUnbiasDetector:NO];
+	//baratron must be >1000Torr  and <2500Torr 
+	//Note: the bias info can only get back to the DAQ via the DAQ system script
+	double			cyrostatPress		= [self valueForRegion:kRegionCryostat];
+	ORMks660BModel* baratron			= [self findBaratron];
+	float			baratronPressure	= [baratron pressure];
+	
+	//baratron operational?
+	if(baratronPressure >= 1000 && baratronPressure <= 2500){
+		[self removeContinuedBiasConstraints:kBaratronTooHighConstraint];
+		[self removeOkToBiasConstraints:kBaratronTooHighConstraint];
+		[self removeContinuedBiasConstraints:kBaratronTooLowConstraint];
+		[self removeOkToBiasConstraints:kBaratronTooLowConstraint];
 	}
-	//PKR G3>1E-6: forbid biasing
-	else if(cyrostatPress > 1E-6 && cyrostatPress < 1E-5){
-		[self setOkToBiasDetector:NO];
-		[self setShouldUnbiasDetector:NO];
-	}
-	else if(cyrostatPress > 1E-5){
-		[self setOkToBiasDetector:NO];
-		[self setShouldUnbiasDetector:YES];
+	else {
+		//nope, not operational
+		if(baratronPressure < 1000) {
+			[self addContinuedBiasConstraints:kBaratronTooLowConstraint  reason:kBaratronTooLowReason];
+			[self addOkToBiasConstraints:kBaratronTooLowConstraint  reason:kBaratronTooLowReason];
+		}
+		else if(baratronPressure > 2500)	{
+			[self addContinuedBiasConstraints:kBaratronTooHighConstraint reason:kBaratronTooHighReason];
+			[self addOkToBiasConstraints:kBaratronTooHighConstraint reason:kBaratronTooHighReason];
+		}
 	}
 	
+	//cryostat region pressure must be <1E-5 to stay biased
+	if(cyrostatPress>1E-5)		[self addContinuedBiasConstraints:kG3WayHighConstraint  reason:kG3WayHighReason];
+	else						[self removeContinuedBiasConstraints:kG3WayHighConstraint];
+	
+	//cryostat region pressure must be <1E-6 to allow biasing
+	if(cyrostatPress>1E-6)		[self addOkToBiasConstraints:kG3HighConstraint  reason:kG3HighReason];
+	else						[self removeOkToBiasConstraints:kG3HighConstraint];
+	
+	
 }
+
 
 
 @end

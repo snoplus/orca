@@ -20,6 +20,8 @@
 @interface ORMJDVacuumView : NSView {
 	IBOutlet id delegate;
 	NSMutableArray* gvButtons;
+	NSBezierPath* biasPath;
+	NSAttributedString* hvPlusSign;
 }
 - (void) drawGrid;
 - (void) keyDown:(NSEvent *)theEvent;
