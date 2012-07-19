@@ -362,11 +362,11 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 {
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
-	//[self setRampers:[decoder decodeObjectForKey:@"rampers"]];
+	[self setRampers:[decoder decodeObjectForKey:@"rampers"]];
 	if(!rampers)[self makeRampers];
 	int i;
 	for(i=0;i<8;i++){
-		//[[self ramper:i] setDelegate:self];
+		[[self ramper:i] setDelegate:self];
 		[self setTripTime:i withValue:[decoder decodeIntForKey: [@"tripTime" stringByAppendingFormat:@"%d",i]]];
 		[self setOutputFailureBehavior:i withValue:[decoder decodeIntForKey: [@"outputFailureBehavior" stringByAppendingFormat:@"%d",i]]];
 		[self setCurrentTripBehavior:i withValue:[decoder decodeIntForKey: [@"currentTripBehavior" stringByAppendingFormat:@"%d",i]]];
