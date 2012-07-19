@@ -161,8 +161,6 @@
 - (int) runMode;
 - (void) setRunMode:(int)aRunMode;
 - (void) setToDefaults;
-- (BOOL) runBoxCarFilter;
-- (void) setRunBoxCarFilter:(BOOL)aRunBoxCarFilter;
 - (BOOL) storeDataInRam;
 - (void) setStoreDataInRam:(BOOL)aStoreDataInRam;
 - (int) filterShapingLength;
@@ -425,7 +423,6 @@ extern NSString* ORKatrinV4FLTModelHistModeChanged;
 extern NSString* ORKatrinV4FLTModelHistEBinChanged;
 extern NSString* ORKatrinV4FLTModelHistEMinChanged;
 extern NSString* ORKatrinV4FLTModelRunModeChanged;
-extern NSString* ORKatrinV4FLTModelRunBoxCarFilterChanged;
 extern NSString* ORKatrinV4FLTModelStoreDataInRamChanged;
 extern NSString* ORKatrinV4FLTModelFilterShapingLengthChanged;
 extern NSString* ORKatrinV4FLTModelGapLengthChanged;

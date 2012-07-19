@@ -256,10 +256,6 @@
 						object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(runBoxCarFilterChanged:)
-                         name : ORKatrinV4FLTModelRunBoxCarFilterChanged
-						object: model];
-    [notifyCenter addObserver : self
                      selector : @selector(histEMinChanged:)
                          name : ORKatrinV4FLTModelHistEMinChanged
 						object: model];
@@ -498,11 +494,6 @@
 	[histEMinTextField setIntValue: [model histEMin]];
 }
 
-- (void) runBoxCarFilterChanged:(NSNotification*)aNote
-{
-	[runBoxCarFilterCB setIntValue: [model runBoxCarFilter]];
-}
-
 - (void) storeDataInRamChanged:(NSNotification*)aNote
 {
 	[storeDataInRamCB setIntValue: [model storeDataInRam]];
@@ -611,7 +602,6 @@
 	[self gapLengthChanged:nil];
 	[self filterShapingLengthChanged:nil];
 	[self storeDataInRamChanged:nil];
-	[self runBoxCarFilterChanged:nil];
 	[self histEMinChanged:nil];
 	[self histEBinChanged:nil];
 	[self histModeChanged:nil];
@@ -1147,10 +1137,6 @@
 	[model setHistEMin:[sender intValue]];	
 }
 
-- (IBAction) runBoxCarFilterAction:(id)sender
-{
-	[model setRunBoxCarFilter:[sender intValue]];	
-}
 
 - (IBAction) storeDataInRamAction:(id)sender
 {

@@ -52,7 +52,6 @@ NSString* ORKatrinV4FLTModelHistModeChanged			= @"ORKatrinV4FLTModelHistModeChan
 NSString* ORKatrinV4FLTModelHistEBinChanged			= @"ORKatrinV4FLTModelHistEBinChanged";
 NSString* ORKatrinV4FLTModelHistEMinChanged			= @"ORKatrinV4FLTModelHistEMinChanged";
 NSString* ORKatrinV4FLTModelRunModeChanged				= @"ORKatrinV4FLTModelRunModeChanged";
-NSString* ORKatrinV4FLTModelRunBoxCarFilterChanged		= @"ORKatrinV4FLTModelRunBoxCarFilterChanged";
 NSString* ORKatrinV4FLTModelStoreDataInRamChanged		= @"ORKatrinV4FLTModelStoreDataInRamChanged";
 //NSString* ORKatrinV4FLTModelFilterLengthChanged		= @"ORKatrinV4FLTModelFilterLengthChanged";
 NSString* ORKatrinV4FLTModelFilterShapingLengthChanged		= @"ORKatrinV4FLTModelFilterShapingLengthChanged";
@@ -853,13 +852,6 @@ static double table[32]={
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelHistRecTimeChanged object:self];
 }
 
-- (BOOL) runBoxCarFilter { return runBoxCarFilter; }
-- (void) setRunBoxCarFilter:(BOOL)aRunBoxCarFilter
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setRunBoxCarFilter:runBoxCarFilter];
-    runBoxCarFilter = aRunBoxCarFilter;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelRunBoxCarFilterChanged object:self];
-}
 
 - (BOOL) storeDataInRam { return storeDataInRam; }
 - (void) setStoreDataInRam:(BOOL)aStoreDataInRam
@@ -1176,7 +1168,6 @@ static double table[32]={
 		[self setThreshold:i withValue:17000];
 		[self setGain:i withValue:0];
 	}
-	[self setRunBoxCarFilter:YES];
 	[self setGapLength:0];
 	//[self setFilterLength:5];
 	[self setFilterShapingLength:7];
