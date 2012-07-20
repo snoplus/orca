@@ -125,6 +125,27 @@
                          name : ORCouchDBModelReplicationRunningChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(oldNameChanged:)
+                         name : ORCouchDBModelOldNameChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(newNameChanged:)
+                         name : ORCouchDBModelNewNameChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(sweepInProgressChanged:)
+                         name : ORCouchDBModelSweepInProgressChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(processCountChanged:)
+                         name : ORCouchDBModelProcessCountChanged
+						object: model];
+
+ 
 }
 
 - (void) updateWindow
@@ -138,6 +159,30 @@
 	[self stealthModeChanged:nil];
 	[self keepHistoryChanged:nil];
 	[self replicationRunningChanged:nil];
+	[self oldNameChanged:nil];
+	[self newNameChanged:nil];
+	[self sweepInProgressChanged:nil];
+	[self processCountChanged:nil];
+}
+
+- (void) processCountChanged:(NSNotification*)aNote
+{
+	[processCountTextField setIntValue: [model processCount]];
+}
+
+- (void) sweepInProgressChanged:(NSNotification*)aNote
+{
+	[sweepInProgressTextField setStringValue: [model sweepInProgress]?@"Running":@"Idle"];
+}
+
+- (void) newNameChanged:(NSNotification*)aNote
+{
+	[newNameTextField setStringValue: [model newName]];
+}
+
+- (void) oldNameChanged:(NSNotification*)aNote
+{
+	[oldNameTextField setStringValue: [model oldName]];
 }
 
 - (void) replicationRunningChanged:(NSNotification*)aNote
@@ -216,6 +261,16 @@
 }
 
 #pragma mark •••Actions
+
+- (void) newNameTextFieldAction:(id)sender
+{
+	[model setNewName:[sender stringValue]];	
+}
+
+- (void) oldNameTextFieldAction:(id)sender
+{
+	[model setOldName:[sender stringValue]];	
+}
 - (IBAction) startReplicationAction:(id)sender
 {
 	[model startReplication];
@@ -308,6 +363,17 @@
 - (IBAction) compactAction:(id)sender
 {
 	[model compactDatabase];
+}
+
+- (IBAction) renameAction:(id)sender
+{
+	[self endEditing];
+	[model getEachDocForRenamingAdc];
+}
+
+- (IBAction) stopSweep:(id)sender
+{
+	[model cancelSweep];
 }
 
 @end

@@ -48,9 +48,11 @@
 - (void) deleteDocumentId:(NSString*)anId tag:(NSString*)aTag;
 - (void) listTasks:(id)aDelegate tag:(NSString*)aTag;
 - (void) listDocuments:(id)aDelegate tag:(NSString*)aTag;
-//---------temp---- for a db repair
+- (void) processEachDoc:(id)aDelegate tag:(NSString*)aTag;
+- (void) renameDoc:(id)aDoc adc:(NSString*)oldName to:(NSString*)newName delegate:(id)aDelegate tag:(NSString*)aTag;
+
 - (void) fixDocument:(NSString*)anId tag:(NSString*)aTag;
-//--------------------------------
+
 #pragma mark ***CouchDB Checks
 - (BOOL) couchDBRunning;
 
@@ -119,6 +121,10 @@
 -(void) main;
 @end
 
+@interface ORCouchDBProcessEachDocOp :ORCouchDBOperation
+- (void) main;
+@end
+
 @interface ORCouchDBListDBOp :ORCouchDBOperation
 - (void) main;
 @end
@@ -168,11 +174,19 @@
 - (void) main;
 @end
 
+@interface ORCouchDBRenameAdcOp :ORCouchDBPutDocumentOp
+{	
+	NSString* oldName;
+	NSString* newName;
+}
+- (void) main;
+@property (copy) NSString* oldName;
+@property (copy) NSString* newName;
+@end
 
 @interface ORCouchDBDeleteDocumentOp :ORCouchDBGetDocumentOp
 - (void) main;
 @end
-
 
 //a thin wrapper around NSOperationQueue to make a shared queue for couch access
 @interface ORCouchDBQueue : NSObject {
@@ -190,7 +204,9 @@
 @end
 
 @interface NSObject (ORCouchDB)
-- (void) couchDBResult:(id)aResult tag:(NSString*)aTag;
+- (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp;
+- (void) startingSweep;
+- (void) sweepDone;
 @end
 
 

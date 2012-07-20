@@ -37,6 +37,11 @@
 	unsigned long subRunNumber;
     BOOL replicationRunning;
 	NSDictionary* docList;
+    NSString* oldName;
+    NSString* newName;
+    BOOL sweepInProgress;
+    BOOL cancelSweep;
+    int processCount;
 }
 
 #pragma mark ***Initialization
@@ -52,6 +57,15 @@
 - (void) statusLogChanged:(NSNotification*)aNote;
 
 #pragma mark ***Accessors
+- (int) processCount;
+- (void) setProcessCount:(int)aProcessCount;
+- (void) cancelSweep;
+- (BOOL) sweepInProgress;
+- (void) setSweepInProgress:(BOOL)aSweepInProgress;
+- (NSString*) newName;
+- (void) setNewName:(NSString*)aNewName;
+- (NSString*) oldName;
+- (void) setOldName:(NSString*)aOldName;
 - (BOOL) replicationRunning;
 - (void) setReplicationRunning:(BOOL)aReplicationRunning;
 - (BOOL) couchRunning;
@@ -73,6 +87,8 @@
 - (void) setDBHistoryInfo:(NSDictionary*)someInfo;
 - (NSDictionary*) dBHistoryInfo;
 - (NSDictionary*) dBInfo;
+- (void) startingSweep;
+- (void) sweepDone;
 
 #pragma mark ***DB Access
 - (ORCouchDB*) statusDBRef;
@@ -85,7 +101,7 @@
 - (void) startReplication;
 - (void) replicate:(BOOL)continuously;
 - (void) deleteDatabase;
-- (void) couchDBResult:(id)aResult tag:(NSString*)aTag;
+- (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp;
 //test functions
 - (void) databaseInfo:(BOOL)toStatusWindow;
 - (void) listDatabases;
@@ -95,14 +111,18 @@
 - (void) compactDatabase;
 - (void) updateDatabaseStats;
 - (void) updateRunInfo;
+- (void) getEachDocForRenamingAdc;
+- (void) renameAdc:(id)aDoc;
 
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
-
-
 @end
 
+extern NSString* ORCouchDBModelProcessCountChanged;
+extern NSString* ORCouchDBModelSweepInProgressChanged;
+extern NSString* ORCouchDBModelNewNameChanged;
+extern NSString* ORCouchDBModelOldNameChanged;
 extern NSString* ORCouchDBModelReplicationRunningChanged;
 extern NSString* ORCouchDBModelKeepHistoryChanged;
 extern NSString* ORCouchDBPasswordChanged;
