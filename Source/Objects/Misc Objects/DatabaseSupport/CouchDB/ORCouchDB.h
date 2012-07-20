@@ -207,6 +207,7 @@
 - (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp;
 - (void) startingSweep;
 - (void) sweepDone;
+- (void) incChangeCounter;
 @end
 
 

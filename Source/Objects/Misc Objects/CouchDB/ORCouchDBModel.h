@@ -42,6 +42,7 @@
     BOOL sweepInProgress;
     BOOL cancelSweep;
     int processCount;
+    int changedCount;
 }
 
 #pragma mark ***Initialization
@@ -55,8 +56,9 @@
 - (void) runStatusChanged:(NSNotification*)aNote;
 - (void) alarmsChanged:(NSNotification*)aNote;
 - (void) statusLogChanged:(NSNotification*)aNote;
-
 #pragma mark ***Accessors
+- (int) changedCount;
+- (void) setChangedCount:(int)aChangedCount;
 - (int) processCount;
 - (void) setProcessCount:(int)aProcessCount;
 - (void) cancelSweep;
@@ -89,6 +91,7 @@
 - (NSDictionary*) dBInfo;
 - (void) startingSweep;
 - (void) sweepDone;
+- (void) incChangeCounter;
 
 #pragma mark ***DB Access
 - (ORCouchDB*) statusDBRef;
@@ -119,6 +122,7 @@
 - (void) encodeWithCoder:(NSCoder*)encoder;
 @end
 
+extern NSString* ORCouchDBModelChangedCountChanged;
 extern NSString* ORCouchDBModelProcessCountChanged;
 extern NSString* ORCouchDBModelSweepInProgressChanged;
 extern NSString* ORCouchDBModelNewNameChanged;

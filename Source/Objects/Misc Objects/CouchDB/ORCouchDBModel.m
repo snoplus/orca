@@ -36,6 +36,7 @@
 #import <ifaddrs.h>
 #import <arpa/inet.h>
 
+NSString* ORCouchDBModelChangedCountChanged = @"ORCouchDBModelChangedCountChanged";
 NSString* ORCouchDBModelProcessCountChanged = @"ORCouchDBModelProcessCountChanged";
 NSString* ORCouchDBModelSweepInProgressChanged	= @"ORCouchDBModelSweepInProgressChanged";
 NSString* ORCouchDBModelNewNameChanged			= @"ORCouchDBModelNewNameChanged";
@@ -225,6 +226,18 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 
 #pragma mark ***Accessors
 
+- (int) changedCount
+{
+    return changedCount;
+}
+
+- (void) setChangedCount:(int)aChangedCount
+{
+    changedCount = aChangedCount;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCouchDBModelChangedCountChanged object:self];
+}
+
 - (int) processCount
 {
     return processCount;
@@ -250,6 +263,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 - (void) startingSweep
 {
 	[self setProcessCount:0];
+	[self setChangedCount:0];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateDatabaseStats) object:nil];
 	[self setSweepInProgress:YES];
 }
@@ -258,6 +272,11 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 {
 	[self updateDatabaseStats];
 	[self setSweepInProgress:NO];
+}
+
+- (void) incChangeCounter
+{
+	[self setChangedCount:changedCount+1];
 }
 
 - (void) setSweepInProgress:(BOOL)aSweepInProgress

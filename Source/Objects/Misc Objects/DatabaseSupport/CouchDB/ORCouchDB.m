@@ -398,8 +398,6 @@
 	if([self isCancelled])return;
 	if([newName length]==0)return;
 	if([oldName length]==0)return;
-	NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/%@", host, port, database, documentId];
-	//id result = [self send:httpString];	
 	NSArray* adcs = [document objectForKey:@"adcs"];
 	for(id anAdc in adcs){
 		for(id aKey in anAdc){
@@ -407,7 +405,11 @@
 				id theValue = [anAdc objectForKey:aKey];
 				[anAdc setObject:theValue forKey:newName];
 				[anAdc removeObjectForKey:oldName];
+				NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/%@", host, port, database, documentId];
 				[self send:httpString type:@"PUT" body:document];
+				if([delegate respondsToSelector:@selector(incChangeCounter)]){
+					[delegate performSelectorOnMainThread:@selector(incChangeCounter) withObject:nil waitUntilDone:NO ];
+				}
 			}
 		}
 	}
