@@ -270,7 +270,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 
 - (void) sweepDone
 {
-	[self updateDatabaseStats];
+	[self performSelector:@selector(updateDatabaseStats) withObject:nil afterDelay:5];
 	[self setSweepInProgress:NO];
 }
 
