@@ -44,22 +44,22 @@
 {
     unsigned long length;
     unsigned long* ptr = (unsigned long*)someData;
-    if(IsShortForm(*ptr)){
-        length = 1;
-    }
-    else  {       //oh, we have been assign the long form--skip to the next long word for the data
-        ptr++;
-        length = 2;
-    }
+    if(IsShortForm(*ptr))	length = 1;
+    else					length= ExtractLength(ptr[0]);
     
-	unsigned char crate   = (*ptr&0x01e00000)>>21;
-	unsigned char card   = (*ptr& 0x001f0000)>>16;
-	unsigned char channel = (*ptr&0x0000f000)>>12;
-	NSString* crateKey = [self getCrateKey: crate];
-	NSString* cardKey = [self getCardKey: card];
+	int dataOffset = 0;
+	if(length>1) dataOffset = 1;
+
+	int crate			 = ShiftAndExtract(ptr[dataOffset],21,0x1e);
+	int card			 = ShiftAndExtract(ptr[dataOffset],16,0x1f);
+	int channel			 = ShiftAndExtract(ptr[dataOffset],12,0xf);
+	
+	NSString* crateKey   = [self getCrateKey:	crate];
+	NSString* cardKey    = [self getCardKey:	card];
 	NSString* channelKey = [self getChannelKey: channel];
 	
-    [aDataSet histogram:*ptr&0x00000fff numBins:4096 sender:self  withKeys:@"Shaper", crateKey,cardKey,channelKey,nil];
+	
+    [aDataSet histogram:ptr[dataOffset]&0x00000fff numBins:4096 sender:self  withKeys:@"Shaper", crateKey,cardKey,channelKey,nil];
 	
 	//get the actual object
 	if(getRatesFromDecodeStage){
@@ -83,20 +83,32 @@
     return length; //must return number of bytes processed.
 }
 
-- (NSString*) dataRecordDescription:(unsigned long*)ptr
+- (NSString*) dataRecordDescription:(unsigned long*)someData
 {
-    if(!IsShortForm(*ptr)){
-        ptr++;
-    }
-
+    unsigned long length;
+    unsigned long* ptr = (unsigned long*)someData;
+    if(IsShortForm(*ptr))	length = 1;
+    else					length= ExtractLength(ptr[0]);
+	
     NSString* title= @"Shaper ADC Record\n\n";
-    
-    NSString* crate = [NSString stringWithFormat:@"Crate = %d\n",(*ptr&0x01e00000)>>21];
-    NSString* card  = [NSString stringWithFormat:@"Card  = %d\n",(*ptr&0x001f0000)>>16];
-    NSString* chan  = [NSString stringWithFormat:@"Chan  = %d\n",(*ptr&0x0000f000)>>12];
+
+	int dataOffset = 0;
+	if(length>1) dataOffset = 1;
+	int crate			 = ShiftAndExtract(ptr[dataOffset],21,0x1e);
+	int card			 = ShiftAndExtract(ptr[dataOffset],16,0x1f);
+	int channel			 = ShiftAndExtract(ptr[dataOffset],12,0xf);
+	
+    NSString* crateName = [NSString stringWithFormat:@"Crate = %d\n",crate];
+    NSString* cardName  = [NSString stringWithFormat:@"Card  = %d\n",card];
+    NSString* channame  = [NSString stringWithFormat:@"Chan  = %d\n",channel];
     NSString* adc   = [NSString stringWithFormat:@"ADC   = 0x%x\n",*ptr&0x00000fff];
     
-    return [NSString stringWithFormat:@"%@%@%@%@%@",title,crate,card,chan,adc];               
+	NSString* timeString = @"No Time Stamp\n";
+	if(length==4){
+		timeString = [NSString stringWithFormat:@"seconds: %lu\n milliseconds: %lu\n",ptr[2],ptr[3]];
+	}
+	
+    return [NSString stringWithFormat:@"%@%@%@%@%@%@",title,crateName,cardName,channame,adc,timeString];               
 }
 
 
@@ -158,59 +170,6 @@
     }while(index < length);
 
     return [NSString stringWithFormat:@"%@%@%@%@%@%@%@",title,crate,card,gtid,global,subTitle,restOfString];               
-}
-
-@end
-
-//------------------------------------------------------------------
-//xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
-//^^^^ ^^^^ ^^^^ ^^-----------------------data id
-//                 ^^ ^^^^ ^^^^ ^^^^ ^^^^-length in longs
-//xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
-//^^^^ ^^^--------------------------------spare
-//        ^ ^^^---------------------------crate
-//             ^ ^^^^---------------------card
-//                    ^^^^ ^^^^-----------channel
-//								^^^^ ^^^--spare
-//xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx-seconds
-//xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx-millisconds
-//------------------------------------------------------------------
-
-@implementation ORShaperDecoderForTime
-- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
-{
-    unsigned long* ptr   = (unsigned long*)someData;
-    unsigned long length = ExtractLength(ptr[0]);
-    
-	int crate	= ShiftAndExtract(ptr[1],21,0xf);
-	int card	= ShiftAndExtract(ptr[1],16,0x1f);
-	int channel = ShiftAndExtract(ptr[1],8,0xff);
-	
- 	NSString* crateKey		= [self getCrateKey: crate];
-	NSString* cardKey		= [self getCardKey: card];
-	NSString* channelKey	= [self getChannelKey: channel];
-
-	NSString* infoString = [NSString stringWithFormat:@"%hu.%hu",ptr[2],ptr[3]];
-
-    [aDataSet loadGenericData:infoString sender:self withKeys:@"Time",@"Shaper", crateKey, cardKey, channelKey, @"Time Record",nil];
-	
-
-    return length;
-}
-
-- (NSString*) dataRecordDescription:(unsigned long*)ptr
-{ 	
-    NSString* title= @"Shaper Time Stamp\n\n";
- 	int crate	= ShiftAndExtract(ptr[1],21,0xf);
-	int card	= ShiftAndExtract(ptr[1],16,0x1f);
-	int channel = ShiftAndExtract(ptr[1],8,0xff);
-	
-    NSString* crateString		= [NSString stringWithFormat:@"Crate = %d\n",crate];
-    NSString* cardString		= [NSString stringWithFormat:@"Card  = %d\n",card];    
-    NSString* channelString	= [NSString stringWithFormat:	 @"Channel = %d\n",channel];
-	NSString* seconds	= [NSString stringWithFormat:		 @"Seconds = %hu.%hu\n",ptr[2],ptr[3]];
-	
-    return [NSString stringWithFormat:@"%@%@%@%@%@",title,crateString,cardString,channelString,seconds];               
 }
 
 @end

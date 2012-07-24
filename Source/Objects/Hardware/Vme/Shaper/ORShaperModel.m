@@ -591,13 +591,6 @@ NSString* ORShaperSettingsLock							= @"ORShaperSettingsLock";
     dataId = DataId;
 }
 
-- (unsigned long) timeId { return timeId; }
-- (void) setTimeId: (unsigned long) aTimeId
-{
-    timeId = aTimeId;
-}
-
-
 - (unsigned long) scalerDataId { return scalerDataId; }
 - (void) setScalerDataId: (unsigned long) ScalerDataId
 {
@@ -1095,21 +1088,20 @@ NSString* ORShaperSettingsLock							= @"ORShaperSettingsLock";
 - (NSDictionary*) dataRecordDescription
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
+	int len;
+	if(shipTimeStamp) len = 4;
+	else {
+		if(IsShortForm(dataId))len = 1;
+		else len = 2;
+	}
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-								 @"ORShaperDecoderForShaper",                    @"decoder",
-								 [NSNumber numberWithLong:dataId],               @"dataId",
-								 [NSNumber numberWithBool:NO],                   @"variable",
-								 [NSNumber numberWithLong:IsShortForm(dataId)?1:2],@"length",
+								 @"ORShaperDecoderForShaper",               @"decoder",
+								 [NSNumber numberWithLong:dataId],          @"dataId",
+								 [NSNumber numberWithBool:NO],              @"variable",
+								 [NSNumber numberWithLong:len],				@"length",
 								 nil];
     [dataDictionary setObject:aDictionary forKey:@"Shaper"];
  	
-    aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-								 @"ORShaperDecoderForTime",						@"decoder",
-								 [NSNumber numberWithLong:timeId],              @"dataId",
-								 [NSNumber numberWithBool:NO],                  @"variable",
-								 [NSNumber numberWithLong:4],					@"length",
-								 nil];
-    [dataDictionary setObject:aDictionary forKey:@"Time"];
 	
 	
     aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -1199,21 +1191,6 @@ NSString* ORShaperSettingsLock							= @"ORShaperSettingsLock";
 				unsigned char chanMask = (1L<<channel) & onlineMask;
 				if(theConversionMask & chanMask){
 					
-					if(shipTimeStamp){
-						
-						struct timeb mt;
-						if (ftime(&mt) == 0) {
-							
-							unsigned long data[4];
-							data[0] = timeId | 4;
-							data[1] = (([self crateNumber]&0x0000000f)<<21) | (([self slot]& 0x0000001f)<<16) | ((channel & 0x000000ff)<<8);
-							data[2] = mt.time & 0xffffffff;
-							data[3] = mt.millitm;
-							[aDataPacket addLongsToFrameBuffer:data length:4];
-						}						
-						
-					}
-					
 					unsigned short aValue;
 					
 					[controller readWordBlock:&aValue
@@ -1228,10 +1205,24 @@ NSString* ORShaperSettingsLock							= @"ORShaperSettingsLock";
                         [aDataPacket addLongsToFrameBuffer:&data length:1];
                     }
                     else {
-                        unsigned long data[2];
-                        data[0] = dataId | 2;
+                        unsigned long data[4];
+						short len = 2;
+						if(shipTimeStamp) {
+							len = 4;
+							struct timeb mt;
+							if (ftime(&mt) == 0) {
+								data[2] = mt.time;
+								data[3] = mt.millitm;
+							}
+							else {
+								data[2] = 0xffffffff;
+								data[3] = 0xffffffff;
+							}
+						}
+						data[0] = dataId | len;
                         data[1] =  slotMask | ((channel & 0x0000000f) << 12) | (aValue & 0x0fff);
-                        [aDataPacket addLongsToFrameBuffer:data length:2];
+
+                        [aDataPacket addLongsToFrameBuffer:data length:len];
                     }
 										
 					++adcCount[channel]; 
@@ -1317,7 +1308,6 @@ NSString* ORShaperSettingsLock							= @"ORShaperSettingsLock";
 	configStruct->total_cards++;
 	configStruct->card_info[index].hw_type_id = kShaper; //should be unique
 	configStruct->card_info[index].hw_mask[0] = dataId; //better be unique
-	configStruct->card_info[index].hw_mask[1] = timeId; //better be unique
 	configStruct->card_info[index].slot 	 = [self slot];
 	configStruct->card_info[index].crate 	 = [self crateNumber];
 	configStruct->card_info[index].add_mod 	 = [self addressModifier];
@@ -1662,14 +1652,13 @@ static NSString *ORShaperDisplayRaw 		= @"ORShaper DisplayRaw";
 
 - (void) setDataIds:(id)assigner
 {
-    dataId       = [assigner assignDataIds:kShortForm]; //short form preferred
+	if(!shipTimeStamp)  dataId       = [assigner assignDataIds:kShortForm]; //short form preferred
+	else				dataId       = [assigner assignDataIds:kLongForm]; //short form preferred
     scalerDataId = [assigner assignDataIds:kLongForm];
-    timeId		 = [assigner assignDataIds:kLongForm];
 }
 
 - (void) syncDataIdsWith:(id)anotherShaper
 {
-    [self setTimeId:[anotherShaper timeId]];
     [self setDataId:[anotherShaper dataId]];
     [self setScalerDataId:[anotherShaper scalerDataId]];
 }

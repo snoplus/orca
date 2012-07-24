@@ -84,7 +84,6 @@ enum {
 	
     unsigned long dataId;
     unsigned long scalerDataId;
-	unsigned long timeId;
 
 	NSMutableArray* thresholds;
 	NSMutableArray* thresholdAdcs;
@@ -155,8 +154,6 @@ enum {
 - (ORRateGroup*)    scalerRateGroup;
 - (void)	    setScalerRateGroup:(ORRateGroup*)newScalerRateGroup;
 
-- (unsigned long) timeId;
-- (void) setTimeId: (unsigned long) TimeId;
 - (unsigned long) dataId;
 - (void) setDataId: (unsigned long) DataId;
 - (unsigned long) scalerDataId;

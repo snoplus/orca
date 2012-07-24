@@ -14,7 +14,6 @@ bool ORShaperReadout::Readout(SBC_LAM_Data* lamData)
     if(result == (int32_t) sizeof(theConversionMask) && theConversionMask != 0){
 
         uint32_t dataId            = GetHardwareMask()[0];
-        uint32_t timeId            = GetHardwareMask()[1];
         uint32_t locationMask      = ((GetCrate() & 0x01e)<<21) | 
                                      ((GetSlot() & 0x0000001f)<<16);
         uint32_t onlineMask        = GetDeviceSpecificData()[0];
@@ -25,17 +24,6 @@ bool ORShaperReadout::Readout(SBC_LAM_Data* lamData)
         for (int16_t channel=0; channel<8; ++channel) {
             if(onlineMask & theConversionMask & (1L<<channel)){
 				
-				if(shipTimeStamp){
-					
-					struct timeb mt;
-					if (ftime(&mt) == 0) {
-						data[dataIndex++] = timeId | 4;
-						data[dataIndex++] = locationMask | ((channel & 0x000000ff)<<8);
-						data[dataIndex++] = mt.time;
-						data[dataIndex++] = mt.millitm;
-					}						
-					
-				}
 				
                 uint16_t aValue;
                 result = VMERead(GetBaseAddress() + firstAdcRegOffset + 2*channel,
@@ -48,9 +36,24 @@ bool ORShaperReadout::Readout(SBC_LAM_Data* lamData)
                             ((channel & 0x0000000f) << 12) | (aValue & 0x0fff);
                     } 
 					else { //long form
-                        data[dataIndex++] = dataId | 2;
-                        data[dataIndex++] = locationMask | 
-                            ((channel & 0x0000000f) << 12) | (aValue & 0x0fff);
+						int length;
+						if(shipTimeStamp)length = 4;
+						else length = 2;
+						
+                        data[dataIndex++] = dataId | length;
+                        data[dataIndex++] = locationMask | ((channel & 0x0000000f) << 12) | (aValue & 0x0fff);
+						if(shipTimeStamp){
+							struct timeb mt;
+							if (ftime(&mt) == 0) {
+								data[dataIndex++] = mt.time;
+								data[dataIndex++] = mt.millitm;
+							}
+							else {
+								data[dataIndex++] = 0xFFFFFFFF;
+								data[dataIndex++] = 0xFFFFFFFF;
+
+							}
+						}
                     }
                 } 
 				else if (result < 0) {
