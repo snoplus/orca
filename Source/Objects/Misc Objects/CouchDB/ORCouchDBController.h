@@ -22,6 +22,7 @@
 @interface ORCouchDBController : OrcaObjectController 
 {	
 	IBOutlet NSTextField* remoteHostNameField;
+	IBOutlet   NSTextField* changedCountTextField;
 	IBOutlet   NSTextField* processCountTextField;
 	IBOutlet NSTextField* sweepInProgressTextField;
 	IBOutlet NSTextField* newNameTextField;
@@ -46,6 +47,7 @@
 }
 
 #pragma mark ***Interface Management
+- (void) changedCountChanged:(NSNotification*)aNote;
 - (void) processCountChanged:(NSNotification*)aNote;
 - (void) sweepInProgressChanged:(NSNotification*)aNote;
 - (void) newNameChanged:(NSNotification*)aNote;

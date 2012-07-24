@@ -146,6 +146,11 @@
 						object: model];
 
  
+    [notifyCenter addObserver : self
+                     selector : @selector(changedCountChanged:)
+                         name : ORCouchDBModelChangedCountChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -163,6 +168,12 @@
 	[self newNameChanged:nil];
 	[self sweepInProgressChanged:nil];
 	[self processCountChanged:nil];
+	[self changedCountChanged:nil];
+}
+
+- (void) changedCountChanged:(NSNotification*)aNote
+{
+	[changedCountTextField setIntValue: [model changedCount]];
 }
 
 - (void) processCountChanged:(NSNotification*)aNote
