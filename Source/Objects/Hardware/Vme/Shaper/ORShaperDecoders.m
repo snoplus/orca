@@ -44,8 +44,8 @@
 //             ^ ^^^^---------------------card
 //                    ^^^^----------------channel
 //                         ^^^^ ^^^^ ^^^^-adc value
-//xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx-seconds since Jan 1,1970
-//xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx-milliseconds since last second
+//xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx-seconds since Jan 1,1970 (only included if timestamp option selected)
+//xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx-milliseconds since last second (only included if timestamp option selected)
 
 
 @implementation ORShaperDecoderForShaper
