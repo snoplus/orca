@@ -128,7 +128,12 @@
     
 	NSString* timeString = @"No Time Stamp\n";
 	if(length==4){
-		timeString = [NSString stringWithFormat:@"seconds: %lu\n milliseconds: %lu\n",ptr[2],ptr[3]];
+        NSDate* timeStamp = [NSDate dateWithTimeIntervalSince1970:ptr[2]];
+        NSDateFormatter *dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
+        [dateFormatter setDateFormat:@"d MMM yyyy HH:mm:ss"];
+        [dateFormatter setTimeZone:[NSTimeZone timeZoneWithName:@"GMT"]];
+        NSString *dateString = [dateFormatter stringFromDate:timeStamp];
+		timeString = [NSString stringWithFormat:@"%@ GMT\n milliseconds: %lu\n",dateString,ptr[3]];
 	}
 	
     return [NSString stringWithFormat:@"%@%@%@%@%@%@",title,crateName,cardName,channame,adc,timeString];               
