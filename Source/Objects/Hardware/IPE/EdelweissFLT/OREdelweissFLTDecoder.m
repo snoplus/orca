@@ -257,7 +257,19 @@
 	//-----------------------------------------------
 	#endif
 //TODO: no offset -tb-
-startIndex=traceStart16;
+//startIndex=traceStart16;
+startIndex=0;
+	[aDataSet loadWaveform: waveFormdata					//pass in the whole data set
+					offset: 9*sizeof(long)					// Offset in bytes (past header words)
+				  unitSize: sizeof(short)					// unit size in bytes
+				startIndex:	startIndex					// first Point Index (past the header offset!!!)
+					  mask:	0xFFFF							// when displayed all values will be masked with this value
+			   specialBits:0x0000	
+				  bitNames: [NSArray arrayWithObjects:nil]
+					sender: self 
+				  withKeys: @"FLTv4", @"Waveform",crateKey,stationKey,channelKey,nil];
+
+    #if 0 //this was the KATRIN setting -tb-
 	[aDataSet loadWaveform: waveFormdata					//pass in the whole data set
 					offset: 9*sizeof(long)					// Offset in bytes (past header words)
 				  unitSize: sizeof(short)					// unit size in bytes
@@ -267,7 +279,9 @@ startIndex=traceStart16;
 				  bitNames: [NSArray arrayWithObjects:@"trig",@"over",@"under", @"extern",nil]
 					sender: self 
 				  withKeys: @"FLTv4", @"Waveform",crateKey,stationKey,channelKey,nil];
-
+    #endif
+	
+	
 	//get the actual object
 	if(getRatesFromDecodeStage){
 		NSString* fltKey = [crateKey stringByAppendingString:stationKey];
@@ -305,7 +319,7 @@ startIndex=traceStart16;
     uint32_t eventFlags     = ptr[7];
     uint32_t traceStart16 = ShiftAndExtract(eventFlags,8,0x7ff);//start of trace in short array
     
-    NSString* title= @"Ipe FLT Waveform Record\n\n";
+    NSString* title= @"EDELWEISS FLT Waveform Record\n\n";
 
 	++ptr;		//skip the first word (dataID and length)
     

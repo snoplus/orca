@@ -181,6 +181,9 @@ static IpeRegisterNamesStruct regV4[kSltV4NumRegs] = {
 
 #pragma mark ***External Strings
 
+NSString* OREdelweissSLTModelEventFifoStatusRegChanged = @"OREdelweissSLTModelEventFifoStatusRegChanged";
+NSString* OREdelweissSLTModelPixelBusEnableRegChanged = @"OREdelweissSLTModelPixelBusEnableRegChanged";
+NSString* OREdelweissSLTModelSelectedFifoIndexChanged = @"OREdelweissSLTModelSelectedFifoIndexChanged";
 NSString* OREdelweissSLTModelIsListeningOnServerSocketChanged = @"OREdelweissSLTModelIsListeningOnServerSocketChanged";
 NSString* OREdelweissSLTModelCrateUDPCommandChanged = @"OREdelweissSLTModelCrateUDPCommandChanged";
 NSString* OREdelweissSLTModelCrateUDPReplyPortChanged = @"OREdelweissSLTModelCrateUDPReplyPortChanged";
@@ -305,7 +308,7 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 	[super setGuardian:aGuardian];
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Notifications
+#pragma mark •••Notifications
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
@@ -334,7 +337,45 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+#pragma mark •••Accessors
+
+- (unsigned long) eventFifoStatusReg
+{
+    return eventFifoStatusReg;
+}
+
+- (void) setEventFifoStatusReg:(unsigned long)aEventFifoStatusReg
+{
+    eventFifoStatusReg = aEventFifoStatusReg;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelEventFifoStatusRegChanged object:self];
+}
+
+- (unsigned long) pixelBusEnableReg
+{
+    return pixelBusEnableReg;
+}
+
+- (void) setPixelBusEnableReg:(unsigned long)aPixelBusEnableReg
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setPixelBusEnableReg:pixelBusEnableReg];
+    pixelBusEnableReg = aPixelBusEnableReg;
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelPixelBusEnableRegChanged object:self];
+}
+
+- (int) selectedFifoIndex
+{
+    return selectedFifoIndex;
+}
+
+- (void) setSelectedFifoIndex:(int)aSelectedFifoIndex
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSelectedFifoIndex:selectedFifoIndex];
+    
+    selectedFifoIndex = aSelectedFifoIndex;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelSelectedFifoIndexChanged object:self];
+}
 
 - (int) isListeningOnServerSocket
 {
@@ -572,7 +613,7 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 }
 
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+#pragma mark •••Accessors
 
 - (NSString*) patternFilePath
 {
@@ -1257,6 +1298,11 @@ NSLog(@"  arguments: %@ \n" , arguments);
 	[self write: [self getAddress:index] value:aValue];
 }
 
+- (void) writeReg:(int)index  forFifo:(int)fifoIndex value:(unsigned long)aValue
+{
+	[self write: ([self getAddress:index]|(fifoIndex << 14)) value:aValue];
+}
+
 - (void)		  rawWriteReg:(unsigned long) address  value:(unsigned long)aValue
 //TODO: FOR TESTING AND DEBUGGING ONLY -tb-
 {
@@ -1273,6 +1319,12 @@ NSLog(@"  arguments: %@ \n" , arguments);
 - (unsigned long) readReg:(int) index
 {
 	return [self read: [self getAddress:index]];
+
+}
+
+- (unsigned long) readReg:(int) index forFifo:(int)fifoIndex;
+{
+	return [ self read: ([self getAddress:index] | (fifoIndex << 14)) ];
 
 }
 
@@ -1300,6 +1352,30 @@ NSLog(@"  arguments: %@ \n" , arguments);
 	[self readStatusReg];
 	//[self readReadOutControlReg];
 	[self getTime];
+	[self readEventFifoStatusReg];
+}
+
+
+
+- (unsigned long) readControlReg
+{
+	return [self readReg:kSltV4ControlReg];
+}
+
+
+- (void) writeControlReg
+{
+	[self writeReg:kSltV4ControlReg value:controlReg];
+}
+
+- (void) printControlReg
+{
+	unsigned long data = [self readControlReg];
+	NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
+	NSLogFont(aFont,@"----Control Register %@ is 0x%08x ----\n",[self fullID],data);
+	NSLogFont(aFont,@"OnLine  : 0x%02x\n",(data & kCtrlOnLine) >> 14);
+	NSLogFont(aFont,@"LedOff  : 0x%02x\n",(data & kCtrlLedOff) >> 15);
+	NSLogFont(aFont,@"Invert  : 0x%02x\n",(data & kCtrlInvert) >> 16);
 }
 
 
@@ -1320,6 +1396,30 @@ NSLog(@"  arguments: %@ \n" , arguments);
 	NSLogFont(aFont,@"PixErr        : 0x%02x\n",ExtractValue(data,kStatusPixErr,16));
 	NSLogFont(aFont,@"FLT0..15 Requ.: 0x%04x\n",ExtractValue(data,0xffff,0));
 }
+
+
+
+
+- (void) writePixelBusEnableReg
+{
+	[self writeReg:kSltV4PixelBusEnableReg value: [self pixelBusEnableReg]];
+}
+
+- (void) readPixelBusEnableReg
+{
+    unsigned long val;
+	val = [self readReg:kSltV4PixelBusEnableReg];
+	[self setPixelBusEnableReg:val];	
+}
+
+
+
+
+
+
+
+
+
 
 - (long) getSBCCodeVersion
 {
@@ -1371,6 +1471,12 @@ NSLog(@"  arguments: %@ \n" , arguments);
 	
 }
 
+- (void) readEventFifoStatusReg
+{
+	[self setEventFifoStatusReg:[self readReg:kSltV4EventFIFOStatusReg]];
+}
+
+
 - (unsigned long long) readBoardID
 {
 	unsigned long low = [self readReg:kSltV4BoardIDLoReg];
@@ -1381,28 +1487,6 @@ NSLog(@"  arguments: %@ \n" , arguments);
 	}
 	else return 0;
 }
-
-- (unsigned long) readControlReg
-{
-	return [self readReg:kSltV4ControlReg];
-}
-
-- (void) printControlReg
-{
-	unsigned long data = [self readControlReg];
-	NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
-	NSLogFont(aFont,@"----Control Register %@ is 0x%08x ----\n",[self fullID],data);
-	NSLogFont(aFont,@"OnLine  : 0x%02x\n",(data & kCtrlOnLine) >> 14);
-	NSLogFont(aFont,@"LedOff  : 0x%02x\n",(data & kCtrlLedOff) >> 15);
-	NSLogFont(aFont,@"Invert  : 0x%02x\n",(data & kCtrlInvert) >> 16);
-}
-
-
-- (void) writeControlReg
-{
-	[self writeReg:kSltV4ControlReg value:controlReg];
-}
-
 
 //DEBUG OUTPUT: 	NSLog(@"WARNING: %@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
 
@@ -1492,6 +1576,7 @@ NSLog(@"  arguments: %@ \n" , arguments);
 
 	[self writeControlReg];
 	[self writeInterruptMask];
+	[self writePixelBusEnableReg];
 	//-----------------------------------------------
 	//board doesn't appear to start without this stuff
 	//[self writeReg:kSltActResetFlt value:0];
@@ -1603,6 +1688,8 @@ NSLog(@"  arguments: %@ \n" , arguments);
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
 	
+	[self setPixelBusEnableReg:[decoder decodeInt32ForKey:@"pixelBusEnableReg"]];
+	[self setSelectedFifoIndex:[decoder decodeIntForKey:@"selectedFifoIndex"]];
 	[self setCrateUDPCommand:[decoder decodeObjectForKey:@"crateUDPCommand"]];
 	[self setCrateUDPReplyPort:[decoder decodeIntForKey:@"crateUDPReplyPort"]];
 	[self setCrateUDPCommandIP:[decoder decodeObjectForKey:@"crateUDPCommandIP"]];
@@ -1654,6 +1741,8 @@ NSLog(@"  arguments: %@ \n" , arguments);
 {
 	[super encodeWithCoder:encoder];
 	
+	[encoder encodeInt32:pixelBusEnableReg forKey:@"pixelBusEnableReg"];
+	[encoder encodeInt:selectedFifoIndex forKey:@"selectedFifoIndex"];
 	[encoder encodeObject:crateUDPCommand forKey:@"crateUDPCommand"];
 	[encoder encodeInt:crateUDPReplyPort forKey:@"crateUDPReplyPort"];
 	[encoder encodeObject:crateUDPCommandIP forKey:@"crateUDPCommandIP"];
@@ -1729,7 +1818,7 @@ NSLog(@"  arguments: %@ \n" , arguments);
 	return objDictionary;
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Data Taker
+#pragma mark •••Data Taker
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
 
@@ -1764,7 +1853,7 @@ NSLog(@"WARNING: %@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class])
 	
 	dataTakers = [[readOutGroup allObjects] retain];		//cache of data takers.
 	
-	for(id obj in dataTakers){
+	for(id obj in dataTakers){ //the SLT calls runTaskStarted:userInfo: for all FLTs -tb-
         [obj runTaskStarted:aDataPacket userInfo:userInfo];
     }
 	
@@ -2030,7 +2119,7 @@ NSLog(@"WARNING: %@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class])
 	//nothing to do... this just removes a run-time exception
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢SBC_Linking protocol
+#pragma mark •••SBC_Linking protocol
 - (NSString*) driverScriptName {return nil;} //no driver
 - (NSString*) driverScriptInfo {return @"";}
 
@@ -2055,7 +2144,7 @@ NSLog(@"WARNING: %@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class])
 }
 
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢SBC Data Structure Setup
+#pragma mark •••SBC Data Structure Setup
 - (void) load_HW_Config
 {
 	int index = 0;
@@ -2068,7 +2157,7 @@ NSLog(@"WARNING: %@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class])
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
 {
 	configStruct->total_cards++;
-	configStruct->card_info[index].hw_type_id	= kSLTv4;	//should be unique
+	configStruct->card_info[index].hw_type_id	= kSLTv4EW;	//should be unique
 	configStruct->card_info[index].hw_mask[0] 	= eventDataId;
 	configStruct->card_info[index].hw_mask[1] 	= multiplicityId;
 	configStruct->card_info[index].slot			= [self stationNumber];

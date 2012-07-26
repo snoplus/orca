@@ -29,27 +29,27 @@
 @interface OREdelweissFLTController : OrcaObjectController {
 	@private
         IBOutlet NSButton*		settingLockButton;
+	IBOutlet   NSTextField* totalTriggerNRegisterTextField;
+	IBOutlet   NSTextField* statusRegisterTextField;
+		IBOutlet NSMatrix*		fiberDelaysMatrix;
+	    IBOutlet NSTextField*   fiberDelaysTextField;
+	    IBOutlet NSButton*      fastWriteCB;
+	    IBOutlet NSTextField*   streamMaskTextField;
+		IBOutlet NSMatrix*		streamMaskMatrix;
+		
+		IBOutlet NSPopUpButton* fltModeFlagsPU;
+		IBOutlet NSMatrix*		fiberEnableMaskMatrix;
+		IBOutlet NSMatrix*		BBv1MaskMatrix;
+		IBOutlet NSPopUpButton* selectFiberTrigPU;
+		
 		IBOutlet NSMatrix*		displayEventRateMatrix;
 		IBOutlet NSTextField*	targetRateField;
-        IBOutlet NSTextField*   histMaxEnergyTextField;
-        IBOutlet NSTextField*   histPageABTextField;
         IBOutlet NSTextField*   fltSlotNumTextField;
-		IBOutlet NSTextField*	histLastEntryField;
-		IBOutlet NSTextField*	histFirstEntryField;
-		IBOutlet NSPopUpButton* histClrModePU;
-		IBOutlet NSPopUpButton* histModePU;
-		IBOutlet NSPopUpButton* histEBinPU;
-		IBOutlet NSTextField*	histEMinTextField;
-		IBOutlet NSButton*		runBoxCarFilterCB;
 		IBOutlet NSButton*		storeDataInRamCB;
 		IBOutlet NSPopUpButton*	filterLengthPU;
 		IBOutlet NSPopUpButton*	gapLengthPU;
-		IBOutlet NSTextField*	histNofMeasField;
-		IBOutlet NSTextField*	histMeasTimeField;
-		IBOutlet NSTextField*	histRecTimeField;
 		IBOutlet NSTextField*   postTriggerTimeField;
 		IBOutlet NSMatrix*		fifoBehaviourMatrix;
-		IBOutlet NSTextField*	analogOffsetField;
 		IBOutlet NSTextField*	interruptMaskField;
 		IBOutlet NSPopUpButton*	modeButton;
 		IBOutlet NSButton*		versionButton;
@@ -121,27 +121,24 @@
 - (void) updateButtons;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+- (void) totalTriggerNRegisterChanged:(NSNotification*)aNote;
+- (void) statusRegisterChanged:(NSNotification*)aNote;
+- (void) fastWriteChanged:(NSNotification*)aNote;
+- (void) fiberDelaysChanged:(NSNotification*)aNote;
+- (void) streamMaskChanged:(NSNotification*)aNote;
+- (void) selectFiberTrigChanged:(NSNotification*)aNote;
+- (void) BBv1MaskChanged:(NSNotification*)aNote;
+- (void) fiberEnableMaskChanged:(NSNotification*)aNote;
+- (void) fltModeFlagsChanged:(NSNotification*)aNote;
 - (void) targetRateChanged:(NSNotification*)aNote;
-- (void) histMaxEnergyChanged:(NSNotification*)aNote;
-- (void) histPageABChanged:(NSNotification*)aNote;
 - (void) noiseFloorChanged:(NSNotification*)aNote;
 - (void) noiseFloorOffsetChanged:(NSNotification*)aNote;
-- (void) histLastEntryChanged:(NSNotification*)aNote;
-- (void) histFirstEntryChanged:(NSNotification*)aNote;
-- (void) histClrModeChanged:(NSNotification*)aNote;
-- (void) histModeChanged:(NSNotification*)aNote;
-- (void) histEBinChanged:(NSNotification*)aNote;
-- (void) histEMinChanged:(NSNotification*)aNote;
-- (void) runBoxCarFilterChanged:(NSNotification*)aNote;
 - (void) storeDataInRamChanged:(NSNotification*)aNote;
 - (void) filterLengthChanged:(NSNotification*)aNote;
 - (void) gapLengthChanged:(NSNotification*)aNote;
-- (void) histNofMeasChanged:(NSNotification*)aNote;
-- (void) histMeasTimeChanged:(NSNotification*)aNote;
-- (void) histRecTimeChanged:(NSNotification*)aNote;
 - (void) postTriggerTimeChanged:(NSNotification*)aNote;
 - (void) fifoBehaviourChanged:(NSNotification*)aNote;
-- (void) analogOffsetChanged:(NSNotification*)aNote;
+
 - (void) interruptMaskChanged:(NSNotification*)aNote;
 - (void) populatePullDown;
 - (void) updateWindow;
@@ -155,8 +152,7 @@
 - (void) thresholdArrayChanged:(NSNotification*)aNote;
 - (void) triggersEnabledArrayChanged:(NSNotification*)aNote;
 - (void) triggerEnabledChanged:(NSNotification*)aNote;
-- (void) hitRatesEnabledArrayChanged:(NSNotification*)aNote;
-- (void) hitRateEnabledChanged:(NSNotification*)aNote;
+
 - (void) hitRateLengthChanged:(NSNotification*)aNote;
 - (void) hitRateChanged:(NSNotification*)aNote;
 - (void) scaleAction:(NSNotification*)aNote;
@@ -170,18 +166,34 @@
 - (void) selectedChannelValueChanged:(NSNotification*) aNote;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+- (IBAction) totalTriggerNRegisterTextFieldAction:(id)sender;
+- (void) readStatusButtonAction:(id)sender;
+- (IBAction) statusRegisterTextFieldAction:(id)sender;
+- (IBAction) fastWriteCBAction:(id)sender;
+- (void) writeFiberDelaysButtonAction:(id)sender;
+- (void) readFiberDelaysButtonAction:(id)sender;
+- (IBAction) fiberDelaysTextFieldAction:(id)sender;
+- (IBAction) fiberDelaysMatrixAction:(id)sender;
+- (IBAction) streamMaskEnableAllAction:(id)sender;
+- (IBAction) streamMaskEnableNoneAction:(id)sender;
+- (IBAction) streamMaskTextFieldAction:(id)sender;
+- (IBAction) streamMaskMatrixAction:(id)sender;
+- (IBAction) selectFiberTrigPUAction:(id)sender;
+- (IBAction) BBv1MaskMatrixAction:(id)sender;
+- (IBAction) fiberEnableMaskMatrixAction:(id)sender;
+- (IBAction) fltModeFlagsPUAction:(id)sender;
+
+- (IBAction) writeCommandResyncAction:(id)sender;
+- (IBAction) writeCommandTrigEvCounterResetAction:(id)sender;
+- (IBAction) writeSWTriggerAction:(id)sender;
+- (IBAction) readTriggerDataAction:(id)sender;
+
 - (IBAction) targetRateAction:(id)sender;
-- (IBAction) histClrModeAction:(id)sender;
-- (IBAction) histModeAction:(id)sender;
-- (IBAction) histEBinAction:(id)sender;
-- (IBAction) histEMinAction:(id)sender;
-- (IBAction) runBoxCarFilterAction:(id)sender;
+
 - (IBAction) storeDataInRamAction:(id)sender;
 - (IBAction) filterLengthAction:(id)sender;
 - (IBAction) gapLengthAction:(id)sender;
-- (IBAction) histNofMeasAction:(id)sender;
-- (IBAction) histMeasTimeAction:(id)sender;
-- (IBAction) setTimeToMacClock:(id)sender;
+
 - (IBAction) postTriggerTimeAction:(id)sender;
 - (IBAction) fifoBehaviourAction:(id)sender;
 - (IBAction) analogOffsetAction:(id)sender;
@@ -190,7 +202,7 @@
 - (IBAction) reportButtonAction:(id)sender;
 - (IBAction) gainAction:(id)sender;
 - (IBAction) triggerEnableAction:(id)sender;
-- (IBAction) hitRateEnableAction:(id)sender;
+
 - (IBAction) thresholdAction:(id)sender;
 - (IBAction) settingLockAction:(id) sender;
 - (IBAction) modeAction: (id) sender;

@@ -30,6 +30,9 @@
 	    //udp connection
 		//listener (server)
 	    IBOutlet NSTextField*   crateUDPReplyPortTextField;
+	IBOutlet   NSTextField* eventFifoStatusRegTextField;
+	    IBOutlet NSMatrix*		pixelBusEnableRegMatrix;
+	    IBOutlet NSTextField*	pixelBusEnableRegTextField;
 		IBOutlet NSButton*		startListeningForReplyButton;
 		IBOutlet NSButton*		stopListeningForReplyButton;
 	    IBOutlet NSProgressIndicator*   listeningForReplyIndicator;
@@ -69,6 +72,8 @@
 		IBOutlet NSTextField* 	regWriteValueTextField;
 		IBOutlet NSButton*		regWriteButton;
 		IBOutlet NSButton*		regReadButton;
+		//IBOutlet NSPopUpButton*	indexPopUp;
+	    IBOutlet NSPopUpButton* selectedFifoIndexPU;
 		IBOutlet NSButton*		setSWInhibitButton;
 		IBOutlet NSButton*		relSWInhibitButton;
 		IBOutlet NSButton*		forceTriggerButton;
@@ -101,6 +106,7 @@
 		NSSize					cpuManagementSize;
 		NSSize					cpuTestsSize;
 		NSSize					udpSize;
+		NSSize					streamingSize;
 };
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
@@ -113,6 +119,9 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+- (void) eventFifoStatusRegChanged:(NSNotification*)aNote;
+- (void) pixelBusEnableRegChanged:(NSNotification*)aNote;
+- (void) selectedFifoIndexChanged:(NSNotification*)aNote;
 - (void) isListeningOnServerSocketChanged:(NSNotification*)aNote;
 - (void) crateUDPCommandChanged:(NSNotification*)aNote;
 - (void) crateUDPCommandIPChanged:(NSNotification*)aNote;
@@ -148,6 +157,13 @@
 - (void) enableRegControls;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+- (IBAction) eventFifoStatusRegTextFieldAction:(id)sender;
+- (IBAction) pixelBusEnableRegTextFieldAction:(id)sender;
+- (IBAction) pixelBusEnableRegMatrixAction:(id)sender;
+- (IBAction) writePixelBusEnableRegButtonAction:(id)sender;
+- (IBAction) readPixelBusEnableRegButtonAction:(id)sender;
+
+- (IBAction) selectedFifoIndexPUAction:(id)sender;
 - (IBAction) startListeningForReplyButtonAction:(id)sender;
 - (IBAction) stopListeningForReplyButtonAction:(id)sender;
 - (IBAction) crateUDPReplyPortTextFieldAction:(id)sender;

@@ -73,11 +73,12 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 - (void) awakeFromNib
 {
 	controlSize			= NSMakeSize(555,670);
-    statusSize			= NSMakeSize(555,480);
+    statusSize			= NSMakeSize(555,670);
     lowLevelSize		= NSMakeSize(555,400);
     cpuManagementSize	= NSMakeSize(485,450);
     cpuTestsSize		= NSMakeSize(555,315);
     udpSize		        = NSMakeSize(555,670);
+    streamingSize		= NSMakeSize(555,670);
 	
 	[[self window] setTitle:@"IPE-DAQ-V4 EDELWEISS SLT"];	
 	
@@ -204,9 +205,51 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
                          name : OREdelweissSLTModelIsListeningOnServerSocketChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(selectedFifoIndexChanged:)
+                         name : OREdelweissSLTModelSelectedFifoIndexChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(pixelBusEnableRegChanged:)
+                         name : OREdelweissSLTModelPixelBusEnableRegChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(eventFifoStatusRegChanged:)
+                         name : OREdelweissSLTModelEventFifoStatusRegChanged
+						object: model];
+
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+
+- (void) eventFifoStatusRegChanged:(NSNotification*)aNote
+{
+	//[eventFifoStatusRegTextField setIntValue: [model eventFifoStatusReg]];
+	//[countersMatrix setIntValue: [model eventFifoStatusReg]];
+	//[[countersMatrix cellWithTag:0] setStringValue: [NSString stringWithFormat:@"%qu",[model clockTime]]];
+	[[countersMatrix cellWithTag:0] setIntValue:  ([model eventFifoStatusReg]&0x7ff) ];
+	if([model eventFifoStatusReg]&0x400) [[countersMatrix cellWithTag:1] setStringValue:  @"EMPTY" ];
+	else if([model eventFifoStatusReg]&0x800) [[countersMatrix cellWithTag:1] setStringValue:  @"OVFL" ];
+	else  [[countersMatrix cellWithTag:1] setStringValue:  @"0" ];
+}
+
+- (void) pixelBusEnableRegChanged:(NSNotification*)aNote
+{
+	[pixelBusEnableRegTextField setIntValue: [model pixelBusEnableReg]];
+	int i;
+	for(i=0;i<16;i++){
+		[[pixelBusEnableRegMatrix cellWithTag:i] setIntValue: ([model pixelBusEnableReg] & (0x1 <<i))];
+	}    
+
+
+}
+
+- (void) selectedFifoIndexChanged:(NSNotification*)aNote
+{
+	[selectedFifoIndexPU selectItemWithTag: [model selectedFifoIndex]];
+}
 
 - (void) isListeningOnServerSocketChanged:(NSNotification*)aNote
 {
@@ -274,6 +317,8 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 		case  2: [self resizeWindowToSize:lowLevelSize];	    break;
 		case  3: [self resizeWindowToSize:cpuManagementSize];	break;
 		case  4: [self resizeWindowToSize:cpuTestsSize];	    break;
+		case  5: [self resizeWindowToSize:udpSize];				break;
+		case  6: [self resizeWindowToSize:streamingSize];	    break;
 		default: [self resizeWindowToSize:udpSize];	            break;
     }
 }
@@ -348,6 +393,9 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	[self crateUDPReplyPortChanged:nil];
 	[self crateUDPCommandChanged:nil];
 	[self isListeningOnServerSocketChanged:nil];
+	[self selectedFifoIndexChanged:nil];
+	[self pixelBusEnableRegChanged:nil];
+	[self eventFifoStatusRegChanged:nil];
 }
 
 
@@ -403,12 +451,15 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	short index = [model selectedRegIndex];
 	BOOL readAllowed = !lockedOrRunningMaintenance && ([model getAccessType:index] & kIpeRegReadable)>0;
 	BOOL writeAllowed = !lockedOrRunningMaintenance && ([model getAccessType:index] & kIpeRegWriteable)>0;
+	BOOL needsIndex = !lockedOrRunningMaintenance && ([model getAccessType:index] & kIpeRegNeedsIndex)>0;
 	
 	[regWriteButton setEnabled:writeAllowed];
 	[regReadButton setEnabled:readAllowed];
 	
 	[regWriteValueStepper setEnabled:writeAllowed];
 	[regWriteValueTextField setEnabled:writeAllowed];
+
+    [selectedFifoIndexPU setEnabled: needsIndex];
 }
 
 - (void) endAllEditing:(NSNotification*)aNotification
@@ -467,6 +518,18 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
     for (i = 0; i < [model getNumberRegisters]; i++) {
         [registerPopUp insertItemWithTitle:[model getRegisterName:i] atIndex:i];
     }
+
+	// Clear all the popup items.
+    [selectedFifoIndexPU removeAllItems];
+    
+	// Populate the register popup
+    for (i = 0; i < 16; i++) {
+        [selectedFifoIndexPU insertItemWithTitle: [NSString stringWithFormat: @"%i",i ] atIndex:i];
+        [[selectedFifoIndexPU itemAtIndex:i] setTag: i]; //I am not using the tag ... -tb-
+    }
+    [selectedFifoIndexPU insertItemWithTitle: @"All" atIndex:i];
+    [[selectedFifoIndexPU itemAtIndex:i] setTag: i];//TODO: do I need this??? -tb-
+
 }
 
 - (void) pulserAmpChanged:(NSNotification*) aNote
@@ -480,9 +543,49 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 }
 
 #pragma mark ***Actions
+
+- (void) eventFifoStatusRegTextFieldAction:(id)sender
+{
+	[model setEventFifoStatusReg:[sender intValue]];	
+}
+
+- (void) pixelBusEnableRegTextFieldAction:(id)sender
+{
+	[model setPixelBusEnableReg:[sender intValue]];	
+}
+
+
+- (void) pixelBusEnableRegMatrixAction:(id)sender
+{
+    //debug
+	NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+//	[model setPixelBusEnableReg:[sender intValue]];	
+	int i, val=0;
+	for(i=0;i<16;i++){
+		if([[sender cellWithTag:i] intValue]) val |= (0x1<<i);
+	}
+	[model setPixelBusEnableReg:val];
+}
+
+- (IBAction) writePixelBusEnableRegButtonAction:(id)sender
+{
+	[model writePixelBusEnableReg];	
+}
+
+- (IBAction) readPixelBusEnableRegButtonAction:(id)sender
+{
+	[model readPixelBusEnableReg];	
+}
+
+
+- (void) selectedFifoIndexPUAction:(id)sender
+{
+	[model setSelectedFifoIndex:[sender indexOfSelectedItem]];	//sender is selectedFifoIndexPU
+}
 //reply socket (server)
 - (IBAction) startListeningForReplyButtonAction:(id)sender
 {
+    //debug
 	NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
 	[model startListeningServerSocket];	
 }
@@ -696,8 +799,19 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 {
 	int index = [registerPopUp indexOfSelectedItem];
 	@try {
-		unsigned long value = [model readReg:index];
-		NSLog(@"SLT reg: %@ value: 0x%x\n",[model getRegisterName:index],value);
+		//unsigned long value = [model readReg:index];
+		//NSLog(@"SLT reg: %@ value: 0x%x\n",[model getRegisterName:index],value);
+		unsigned long value;
+        if(([model getAccessType:index] & kIpeRegNeedsIndex)){
+            int fifoIndex = [model selectedFifoIndex];
+		    value = [model readReg:index forFifo: fifoIndex ];
+		    NSLog(@"FLTv4 reg: %@  for fifo# %i has value: 0x%x (%i)\n",[model getRegisterName:index], fifoIndex, value, value);
+		    //NSLog(@"  (addr: 0x%08x = 0x%08x ... 0x%08x)  \n", ([model getAddress:index]|(fifoIndex << 14)), [model getAddress:index],  (fifoIndex << 14));
+        }
+		else {
+		    value = [model readReg:index ];
+		    NSLog(@"SLTv4 reg: %@ has value: 0x%x (%i)\n",[model getRegisterName:index],value, value);
+        }
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception reading SLT reg: %@\n",[model getRegisterName:index]);
@@ -710,8 +824,18 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	[self endEditing];
 	int index = [registerPopUp indexOfSelectedItem];
 	@try {
-		[model writeReg:index value:[model writeValue]];
-		NSLog(@"wrote 0x%x to SLT reg: %@ \n",[model writeValue],[model getRegisterName:index]);
+		//[model writeReg:index value:[model writeValue]];
+		//NSLog(@"wrote 0x%x to SLT reg: %@ \n",[model writeValue],[model getRegisterName:index]);
+		unsigned long val = [model writeValue];
+        if(([model getAccessType:index] & kIpeRegNeedsIndex)){
+            int fifoIndex = [model selectedFifoIndex];
+		    [model writeReg:index forFifo: fifoIndex  value:val];
+    		NSLog(@"wrote 0x%x (%i) to SLTv4 reg: %@ fifo# %i\n", val, val, [model getRegisterName:index], fifoIndex);
+        }
+		else {
+		    [model writeReg:index value:val];
+		    NSLog(@"wrote 0x%x to SLT reg: %@ \n",val,[model getRegisterName:index]);
+        }
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception writing SLT reg: %@\n",[model getRegisterName:index]);
@@ -900,7 +1024,7 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 		NSLog(@"SLT: Manual %@\n",aName);
 	}
 	@catch(NSException* localException) {
-		NSLog(@"Exception doing SLT %@\n",aName);
+		NSLog(@"Exception doing EDELWEISS SLT %@\n",aName);
         NSRunAlertPanel([localException name], @"%@\nSLT%d %@ failed", @"OK", nil, nil,
                         localException,[model stationNumber],aName);
 	}

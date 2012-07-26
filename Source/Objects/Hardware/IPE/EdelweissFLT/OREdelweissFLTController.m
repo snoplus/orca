@@ -122,17 +122,7 @@
 					 selector : @selector(gainChanged:)
 						 name : OREdelweissFLTModelGainChanged
 					   object : model];
-	
-	[notifyCenter addObserver : self
-					 selector : @selector(triggerEnabledChanged:)
-						 name : OREdelweissFLTModelTriggerEnabledMaskChanged
-					   object : model];
-	
-	[notifyCenter addObserver : self
-					 selector : @selector(hitRateEnabledChanged:)
-						 name : OREdelweissFLTModelHitRateEnabledMaskChanged
-					   object : model];
-		
+
 	
     [notifyCenter addObserver : self
 					 selector : @selector(gainArrayChanged:)
@@ -190,11 +180,6 @@
 						object: model];
 	
     [notifyCenter addObserver : self
-                     selector : @selector(analogOffsetChanged:)
-                         name : OREdelweissFLTModelAnalogOffsetChanged
-						object: model];
-		
-    [notifyCenter addObserver : self
 					 selector : @selector(selectedRegIndexChanged:)
 						 name : OREdelweissFLTSelectedRegIndexChanged
 					   object : model];
@@ -220,21 +205,6 @@
 						object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(histRecTimeChanged:)
-                         name : OREdelweissFLTModelHistRecTimeChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(histMeasTimeChanged:)
-                         name : OREdelweissFLTModelHistMeasTimeChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(histNofMeasChanged:)
-                         name : OREdelweissFLTModelHistNofMeasChanged
-						object: model];
-
-    [notifyCenter addObserver : self
                      selector : @selector(gapLengthChanged:)
                          name : OREdelweissFLTModelGapLengthChanged
 						object: model];
@@ -249,39 +219,6 @@
                          name : OREdelweissFLTModelStoreDataInRamChanged
 						object: model];
 
-    [notifyCenter addObserver : self
-                     selector : @selector(runBoxCarFilterChanged:)
-                         name : OREdelweissFLTModelRunBoxCarFilterChanged
-						object: model];
-    [notifyCenter addObserver : self
-                     selector : @selector(histEMinChanged:)
-                         name : OREdelweissFLTModelHistEMinChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(histEBinChanged:)
-                         name : OREdelweissFLTModelHistEBinChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(histModeChanged:)
-                         name : OREdelweissFLTModelHistModeChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(histClrModeChanged:)
-                         name : OREdelweissFLTModelHistClrModeChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(histFirstEntryChanged:)
-                         name : OREdelweissFLTModelHistFirstEntryChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(histLastEntryChanged:)
-                         name : OREdelweissFLTModelHistLastEntryChanged
-						object: model];
 
     [notifyCenter addObserver : self
                      selector : @selector(noiseFloorChanged:)
@@ -292,73 +229,173 @@
                      selector : @selector(noiseFloorOffsetChanged:)
                          name : OREdelweissFLTNoiseFloorOffsetChanged
                        object : model];
-    [notifyCenter addObserver : self
-                     selector : @selector(histPageABChanged:)
-                         name : OREdelweissFLTModelHistPageABChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(histMaxEnergyChanged:)
-                         name : OREdelweissFLTModelHistMaxEnergyChanged
-						object: model];
 
     [notifyCenter addObserver : self
                      selector : @selector(targetRateChanged:)
                          name : OREdelweissFLTModelTargetRateChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(fltModeFlagsChanged:)
+                         name : OREdelweissFLTModelFltModeFlagsChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(fiberEnableMaskChanged:)
+                         name : OREdelweissFLTModelFiberEnableMaskChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(BBv1MaskChanged:)
+                         name : OREdelweissFLTModelBBv1MaskChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(selectFiberTrigChanged:)
+                         name : OREdelweissFLTModelSelectFiberTrigChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(streamMaskChanged:)
+                         name : OREdelweissFLTModelStreamMaskChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(fiberDelaysChanged:)
+                         name : OREdelweissFLTModelFiberDelaysChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(fastWriteChanged:)
+                         name : OREdelweissFLTModelFastWriteChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(statusRegisterChanged:)
+                         name : OREdelweissFLTModelStatusRegisterChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(totalTriggerNRegisterChanged:)
+                         name : OREdelweissFLTModelTotalTriggerNRegisterChanged
+						object: model];
+
+
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+
+- (void) totalTriggerNRegisterChanged:(NSNotification*)aNote
+{
+	[totalTriggerNRegisterTextField setIntValue: [model totalTriggerNRegister]];
+}
+
+- (void) statusRegisterChanged:(NSNotification*)aNote
+{
+	[statusRegisterTextField setIntValue: [model statusRegister]];
+}
+
+- (void) fastWriteChanged:(NSNotification*)aNote
+{
+	[fastWriteCB setIntValue: [model fastWrite]];
+}
+
+- (void) fiberDelaysChanged:(NSNotification*)aNote
+{
+    uint64_t val=[model fiberDelays];
+    //DEBUG OUTPUT:
+ 	NSLog(@"%@::%@: UNDER CONSTRUCTION! 0x%016llx \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model fiberDelays]);//TODO: DEBUG testing ...-tb-
+	//[fiberDelaysTextField setIntValue: [model fiberDelays]];
+	[fiberDelaysTextField setStringValue: [NSString stringWithFormat:@"0x%016qx",val]];
+
+	uint64_t fibDelays;
+	uint64_t fib;
+	int clk12,clk120;
+
+	for(fib=0;fib<6;fib++){
+	    //NSLog(@"fib %i:",fib);
+			fibDelays = ((val) >> (fib*8)) & 0xffff;
+			clk120 = (fibDelays & 0xf0) >> 4;
+			clk12  =  fibDelays & 0x0f;
+		    [[fiberDelaysMatrix cellAtRow:0 column: fib] selectItemAtIndex: clk12 ];
+		    [[fiberDelaysMatrix cellAtRow:1 column: fib] selectItemAtIndex: clk120];
+	}
+
+}
+
+- (void) streamMaskChanged:(NSNotification*)aNote
+{
+	//[streamMaskTextField setIntValue: [model streamMask]];
+	[streamMaskTextField setStringValue: [NSString stringWithFormat:@"0x%016qx",[model streamMask]]];
+	//[streamMaskTextField setStringValue: [NSString stringWithFormat:@"0x1234000012340000"]];
+//DEBUG OUTPUT:
+ 	NSLog(@"%@::%@: UNDER CONSTRUCTION! 0x%016qx 0x%032qx 0x%016llx \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model streamMask],[model streamMask],[model streamMask]);//TODO: DEBUG testing ...-tb-
+
+	//[model setStreamMask:[sender intValue]];	
+	uint64_t chan, fib;
+    uint64_t val=[model streamMask];
+	for(fib=0;fib<6;fib++){
+	    //NSLog(@"fib %i:",fib);
+		NSString *s = [NSString stringWithFormat:@"fib %i:",fib];
+	    for(chan=0;chan<6;chan++){
+		    if([model streamMaskForFiber:fib chan:chan]) [[streamMaskMatrix cellAtRow:fib column: chan] setIntValue: 1];
+			else  [[streamMaskMatrix cellAtRow:fib column: chan] setIntValue: 0];
+			
+			s=[s stringByAppendingString: [NSString stringWithFormat: @"%llu",[model streamMaskForFiber:fib chan:chan]]];
+			#if 0
+		    if([model streamMaskForFiber:fib chan:chan]){ 
+			    //val |= ((0x1LL<<chan) << (fib*8));
+				s=[s stringByAppendingString: @"1"];
+			}else{
+				s=[s stringByAppendingString: @"0"];
+			}
+			#endif
+		}
+			NSLog(@"%@\n",s);
+	}
+			NSLog(@"%016qx done.\n",val);
+}
+
+- (void) selectFiberTrigChanged:(NSNotification*)aNote
+{
+//DEBUG OUTPUT:
+ 	NSLog(@"%@::%@: UNDER CONSTRUCTION! %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model selectFiberTrig]);//TODO: DEBUG testing ...-tb-
+	//[selectFiberTrigPU setIntValue: [model selectFiberTrig]];
+	[selectFiberTrigPU selectItemAtIndex: [model selectFiberTrig]];
+}
+
+- (void) BBv1MaskChanged:(NSNotification*)aNote
+{
+	//[BBv1MaskMatrix setIntValue: [model BBv1Mask]];
+	int i;
+	for(i=0;i<6;i++){
+		[[BBv1MaskMatrix cellWithTag:i] setIntValue:[model BBv1MaskForChan:i]];
+//DEBUG OUTPUT:
+ 	NSLog(@"%@::%@: UNDER CONSTRUCTION! [model BBv1MaskForChan:%i] %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),i,[model BBv1MaskForChan:i]);//TODO: DEBUG testing ...-tb-
+	}    
+
+}
+
+- (void) fiberEnableMaskChanged:(NSNotification*)aNote
+{
+	//[fiberEnableMask<custom> setIntValue: [model fiberEnableMask]];
+	int i;
+	for(i=0;i<6;i++){
+		[[fiberEnableMaskMatrix cellAtRow:0 column:i] setIntValue: [model fiberEnableMaskForChan:i] ];
+	}    
+}
+
+- (void) fltModeFlagsChanged:(NSNotification*)aNote
+{
+	[fltModeFlagsPU selectItemAtIndex: [model fltModeFlags]];
+	[fltModeFlagsPU setIntValue: [model fltModeFlags]];
+}
+
 - (void) targetRateChanged:(NSNotification*)aNote
 {
 	[targetRateField setIntValue: [model targetRate]];
 }
 
-- (void) histMaxEnergyChanged:(NSNotification*)aNote
-{
-	[histMaxEnergyTextField setIntValue: [model histMaxEnergy]];
-}
-
-- (void) histPageABChanged:(NSNotification*)aNote
-{
-	[histPageABTextField setStringValue: [model histPageAB]?@"B":@"A"];
-	//[histPageABTextField setIntValue: [model histPageAB]];
-}
-- (void) histLastEntryChanged:(NSNotification*)aNote
-{
-	[histLastEntryField setIntValue: [model histLastEntry]];
-}
-
-- (void) histFirstEntryChanged:(NSNotification*)aNote
-{
-	[histFirstEntryField setIntValue: [model histFirstEntry]];
-}
-
-- (void) histClrModeChanged:(NSNotification*)aNote
-{
-	[histClrModePU selectItemAtIndex: [model histClrMode]];
-}
-
-- (void) histModeChanged:(NSNotification*)aNote
-{
-	[histModePU selectItemAtIndex: [model histMode]];
-}
-
-- (void) histEBinChanged:(NSNotification*)aNote
-{
-	[histEBinPU selectItemAtIndex: [model histEBin]];
-}
-
-- (void) histEMinChanged:(NSNotification*)aNote
-{
-	[histEMinTextField setIntValue: [model histEMin]];
-}
-
-- (void) runBoxCarFilterChanged:(NSNotification*)aNote
-{
-	[runBoxCarFilterCB setIntValue: [model runBoxCarFilter]];
-}
 
 - (void) storeDataInRamChanged:(NSNotification*)aNote
 {
@@ -375,21 +412,6 @@
 	[gapLengthPU selectItemAtIndex: [model gapLength]];
 }
 
-- (void) histNofMeasChanged:(NSNotification*)aNote
-{
-	[histNofMeasField setIntValue: [model histNofMeas]];
-}
-
-- (void) histMeasTimeChanged:(NSNotification*)aNote
-{
-	[histMeasTimeField setIntValue: [model histMeasTime]];
-}
-
-- (void) histRecTimeChanged:(NSNotification*)aNote
-{
-	[histRecTimeField setIntValue: [model histRecTime]];
-}
-
 - (void) postTriggerTimeChanged:(NSNotification*)aNote
 {
 	[postTriggerTimeField setIntValue: [model postTriggerTime]];
@@ -398,11 +420,6 @@
 - (void) fifoBehaviourChanged:(NSNotification*)aNote
 {
 	[fifoBehaviourMatrix selectCellWithTag: [model fifoBehaviour]];
-}
-
-- (void) analogOffsetChanged:(NSNotification*)aNote
-{
-	[analogOffsetField setIntValue: [model analogOffset]];
 }
 
 - (void) interruptMaskChanged:(NSNotification*)aNote
@@ -443,7 +460,6 @@
 	[self gainArrayChanged:nil];
 	[self thresholdArrayChanged:nil];
 	[self triggersEnabledArrayChanged:nil];
-	[self hitRatesEnabledArrayChanged:nil];
 	[self hitRateLengthChanged:nil];
 	[self hitRateChanged:nil];
     [self updateTimePlot:nil];
@@ -453,31 +469,27 @@
 	[self testStatusArrayChanged:nil];
     [self miscAttributesChanged:nil];
 	[self interruptMaskChanged:nil];
-	[self analogOffsetChanged:nil];
 	[self selectedRegIndexChanged:nil];
 	[self writeValueChanged:nil];
 	[self selectedChannelValueChanged:nil];
 	[self fifoBehaviourChanged:nil];
 	[self postTriggerTimeChanged:nil];
-	[self histRecTimeChanged:nil];
-	[self histMeasTimeChanged:nil];
-	[self histNofMeasChanged:nil];
     [self settingsLockChanged:nil];
 	[self gapLengthChanged:nil];
 	[self filterLengthChanged:nil];
 	[self storeDataInRamChanged:nil];
-	[self runBoxCarFilterChanged:nil];
-	[self histEMinChanged:nil];
-	[self histEBinChanged:nil];
-	[self histModeChanged:nil];
-	[self histClrModeChanged:nil];
-	[self histFirstEntryChanged:nil];
-	[self histLastEntryChanged:nil];
 	[self noiseFloorChanged:nil];
 	[self noiseFloorOffsetChanged:nil];
-	[self histPageABChanged:nil];
-	[self histMaxEnergyChanged:nil];
 	[self targetRateChanged:nil];
+	[self fltModeFlagsChanged:nil];
+	[self fiberEnableMaskChanged:nil];
+	[self BBv1MaskChanged:nil];
+	[self selectFiberTrigChanged:nil];
+	[self streamMaskChanged:nil];
+	[self fiberDelaysChanged:nil];
+	[self fastWriteChanged:nil];
+	[self statusRegisterChanged:nil];
+	[self totalTriggerNRegisterChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -528,13 +540,14 @@
 		[testButton setTitle: @"Test"];
 	}
 	
-	int fltRunMode = [model fltRunMode];
-	[histNofMeasField setEnabled: !locked & (fltRunMode == kIpeFltV4Katrin_Histo_Mode)];
-	[histMeasTimeField setEnabled: !locked & (fltRunMode == kIpeFltV4Katrin_Histo_Mode)];
 
 	[startNoiseFloorButton setEnabled: runInProgress || [model noiseFloorRunning]];
 	
  	[self enableRegControls];
+	
+	//NSTabViewItem *tvi= [tabView tabViewItemAtIndex:4];
+	//[tvi setEnabled:false];
+	
 }
 
 - (void) enableRegControls
@@ -678,14 +691,6 @@
 	}
 }
 
-- (void) hitRateEnabledChanged:(NSNotification*)aNotification
-{
-	int i;
-	for(i=0;i<kNumV4FLTChannels;i++){
-		[[hitRateEnabledCBs cellWithTag:i] setState: [model hitRateEnabled:i]];
-	}
-}
-
 - (void) thresholdChanged:(NSNotification*)aNotification
 {
 	int chan = [[[aNotification userInfo] objectForKey:OREdelweissFLTChan] intValue];
@@ -726,14 +731,6 @@
 	}
 }
 
-- (void) hitRatesEnabledArrayChanged:(NSNotification*)aNotification
-{
-	short chan;
-	for(chan=0;chan<kNumV4FLTChannels;chan++){
-		[[hitRateEnabledCBs cellWithTag:chan] setIntValue: [model hitRateEnabled:chan]];
-		
-	}
-}
 
 - (void) modeChanged:(NSNotification*)aNote
 {
@@ -816,6 +813,172 @@
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
 
+- (void) totalTriggerNRegisterTextFieldAction:(id)sender
+{
+	[model setTotalTriggerNRegister:[sender intValue]];	
+}
+
+- (void) readStatusButtonAction:(id)sender
+{
+    //DEBUG
+ 	NSLog(@"%@::%@ \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+	[model readStatus];	
+	[model readTotalTriggerNRegister];	
+}
+
+- (void) statusRegisterTextFieldAction:(id)sender
+{
+	[model setStatusRegister:[sender intValue]];	
+}
+
+- (void) fastWriteCBAction:(id)sender
+{
+	[model setFastWrite:[sender intValue]];	
+}
+
+- (void) writeFiberDelaysButtonAction:(id)sender
+{
+//DEBUG OUTPUT:
+ 	NSLog(@"%@::%@ \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+	[model writeFiberDelays];	
+}
+
+- (void) readFiberDelaysButtonAction:(id)sender
+{
+//DEBUG OUTPUT:
+ 	NSLog(@"%@::%@ \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+	[model readFiberDelays];	
+}
+
+- (void) fiberDelaysTextFieldAction:(id)sender
+{
+//DEBUG OUTPUT:
+ 	NSLog(@"%@::%@: there is something wrong! Please contact a ORCA expert!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+	//[model setFiberDelays:[sender intValue]];	
+}
+
+- (IBAction) fiberDelaysMatrixAction:(id)sender
+{
+//DEBUG OUTPUT:
+ 	NSLog(@"%@::%@: UNDER CONSTRUCTION!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+	//[model setStreamMask:[sender intValue]];	
+	uint64_t fib;
+    uint64_t val=0;
+	int clk12,clk120;
+	uint64_t fibDelays;
+	for(fib=0;fib<6;fib++){
+	    //NSLog(@"fib %i:",fib);
+		NSString *s = [NSString stringWithFormat:@"fib %i:",fib];
+		    clk12  = [[fiberDelaysMatrix cellAtRow:0 column: fib] indexOfSelectedItem];
+		    clk120 = [[fiberDelaysMatrix cellAtRow:1 column: fib] indexOfSelectedItem];
+			s=[s stringByAppendingString: [NSString stringWithFormat:@"clk12 %i:",clk12]];
+			s=[s stringByAppendingString: [NSString stringWithFormat:@"clk120 %i:",clk120]];
+			fibDelays = ((clk120 & 0xf) << 4)  |   (clk12 & 0xf);
+			val |= ((fibDelays) << (fib*8));// see - (int) streamMaskForFiber:(int)aFiber chan:(int)aChan;
+			NSLog(@"%@\n",s);
+	}
+			NSLog(@"%016qx done.\n",val);
+	[model setFiberDelays:val];
+}
+
+- (IBAction) streamMaskEnableAllAction:(id)sender
+{	[model setStreamMask:0x00003f3f3f3f3f3fLL];	 }
+
+- (IBAction) streamMaskEnableNoneAction:(id)sender
+{	[model setStreamMask:0x0];	 }
+
+
+- (void) streamMaskTextFieldAction:(id)sender
+{
+	//[model setStreamMask:[sender intValue]];	
+}
+
+- (void) streamMaskMatrixAction:(id)sender
+{
+//DEBUG OUTPUT:
+ 	NSLog(@"%@::%@: UNDER CONSTRUCTION!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+	//[model setStreamMask:[sender intValue]];	
+	uint64_t chan, fib;
+    uint64_t val=0;
+	for(fib=0;fib<6;fib++){
+	    //NSLog(@"fib %i:",fib);
+		NSString *s = [NSString stringWithFormat:@"fib %i:",fib];
+	    for(chan=0;chan<6;chan++){
+		    if([[streamMaskMatrix cellAtRow:fib column: chan] intValue]){ 
+			    val |= ((0x1LL<<chan) << (fib*8));// see - (int) streamMaskForFiber:(int)aFiber chan:(int)aChan;
+				s=[s stringByAppendingString: @"1"];
+			}else{
+				s=[s stringByAppendingString: @"0"];
+			}
+		}
+			NSLog(@"%@\n",s);
+	}
+			NSLog(@"%016qx done.\n",val);
+	[model setStreamMask:val];
+}
+
+- (void) selectFiberTrigPUAction:(id)sender
+{
+//DEBUG OUTPUT:
+ 	NSLog(@"%@::%@: UNDER CONSTRUCTION! %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[sender indexOfSelectedItem]);//TODO: DEBUG testing ...-tb-
+	//[model setSelectFiberTrig:[sender intValue]];	
+	[model setSelectFiberTrig:[sender indexOfSelectedItem]];	
+}
+
+- (void) BBv1MaskMatrixAction:(id)sender
+{
+	//[model setBBv1Mask:[sender intValue]];	
+	int i, val=0;
+	for(i=0;i<6;i++){
+		if([[sender cellWithTag:i] intValue]) val |= (0x1<<i);
+	}
+	[model setBBv1Mask:val];
+}
+
+- (void) fiberEnableMaskMatrixAction:(id)sender
+{
+	//[model setFiberEnableMask:[sender intValue]];	
+	int i, val=0;
+	for(i=0;i<6;i++){
+		if([[sender cellWithTag:i] intValue]) val |= (0x1<<i);
+	}
+	[model setFiberEnableMask:val];
+}
+
+- (void) fltModeFlagsPUAction:(id)sender
+{
+	//[model setFltModeFlags:[sender intValue]];	
+	[model setFltModeFlags:[sender indexOfSelectedItem]];	
+}
+
+
+- (IBAction) writeCommandResyncAction:(id)sender
+{
+    //DEBUG OUTPUT:
+ 	NSLog(@"%@::%@ \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+	[model writeCommandResync];	
+}
+
+- (IBAction) writeCommandTrigEvCounterResetAction:(id)sender
+{
+    //DEBUG OUTPUT:
+ 	NSLog(@"%@::%@ \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+	[model writeCommandTrigEvCounterReset];	
+}
+
+- (IBAction) writeSWTriggerAction:(id)sender
+{
+	[model writeCommandSoftwareTrigger];	
+}
+
+- (IBAction) readTriggerDataAction:(id)sender
+{
+//DEBUG OUTPUT:
+ 	NSLog(@"%@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+	[model readTriggerData];	
+}
+
+
 - (void) targetRateAction:(id)sender
 {
 	[model setTargetRate:[sender intValue]];	
@@ -854,30 +1017,6 @@
     }
 }
 
-- (IBAction) histClrModeAction:(id)sender
-{
-	[model setHistClrMode:[sender indexOfSelectedItem]];	
-}
-
-- (IBAction) histModeAction:(id)sender
-{
-	[model setHistMode:[sender indexOfSelectedItem]];	
-}
-
-- (IBAction) histEBinAction:(id)sender
-{
-	[model setHistEBin:[sender indexOfSelectedItem]];	
-}
-
-- (IBAction) histEMinAction:(id)sender
-{
-	[model setHistEMin:[sender intValue]];	
-}
-
-- (IBAction) runBoxCarFilterAction:(id)sender
-{
-	[model setRunBoxCarFilter:[sender intValue]];	
-}
 
 - (IBAction) storeDataInRamAction:(id)sender
 {
@@ -894,27 +1033,6 @@
 	[model setGapLength:[sender indexOfSelectedItem]];	
 }
 
-- (IBAction) histNofMeasAction:(id)sender
-{
-	[model setHistNofMeas:[sender intValue]];	
-}
-
-- (IBAction) histMeasTimeAction:(id)sender
-{
-	[model setHistMeasTime:[sender intValue]];	
-}
-
-- (IBAction) setTimeToMacClock:(id)sender
-{
-	@try {
-		[model setTimeToMacClock];
-	}
-	@catch(NSException* localException) {
-		NSLog(@"Exception setting FLT clock\n");
-		NSRunAlertPanel([localException name], @"%@\nSetClock of FLT%d failed", @"OK", nil, nil,
-						localException,[model stationNumber]);
-	}
-}
 
 
 - (IBAction) postTriggerTimeAction:(id)sender
@@ -990,6 +1108,10 @@
 
 - (IBAction) readThresholdsGains:(id)sender
 {
+
+
+
+//TODO: readThresholdsGains    under construction -tb-
 	@try {
 		int i;
 		NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
@@ -997,7 +1119,7 @@
 		NSLogFont(aFont,   @"chan | Gain | Threshold\n");
 		NSLogFont(aFont,   @"-----------------------\n");
 		for(i=0;i<kNumV4FLTChannels;i++){
-			NSLogFont(aFont,@"%4d | %4d | %4d \n",i,[model readGain:i],[model readThreshold:i]);
+			//NSLogFont(aFont,@"%4d | %4d | %4d \n",i,[model readGain:i],[model readThreshold:i]);
 			//NSLog(@"%d: %d\n",i,[model readGain:i]);
 		}
 		NSLogFont(aFont,   @"-----------------------\n");
@@ -1045,12 +1167,6 @@
 	[model setTriggerEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
-- (IBAction) hitRateEnableAction:(id)sender
-{
-	[[self undoManager] setActionName: @"Set HitRate Enabled"];
-	[model setHitRateEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
-}
-
 
 - (IBAction) reportButtonAction:(id)sender
 {
@@ -1058,7 +1174,6 @@
 	@try {
 		[model printVersions];
 		[model printStatusReg];
-		[model printPStatusRegs];
 		//[model printPixelRegs];
 		[model printValueTable];
 		//[model printStatistics];
@@ -1244,8 +1359,11 @@
 
 - (IBAction) testButtonAction: (id) sender //temp routine to hook up to any on a temp basis
 {
+//DEBUG OUTPUT:
+ 	NSLog(@"WARNING: %@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+
 	@try {
-		[model testReadHisto];
+		//[model testReadHisto];
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception running FLT test code\n");

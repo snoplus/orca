@@ -63,11 +63,9 @@
 @interface OREdelweissFLTModel : ORIpeCard <ORDataTaker,ORHWWizard,ORHWRamping,ORAdcInfoProviding>
 {
     // Hardware configuration
-    int				fltRunMode;		//!< Run modes: 0=standby, 1=standard, 2=histogram, 3=test
+    //int				fltRunMode;		replaced by flt ModeFlags -tb-
     NSMutableArray* thresholds;     //!< Array to keep the threshold of all 24 channel
     NSMutableArray* gains;			//!< Aarry to keep the gains
-    unsigned long	triggerEnabledMask;	//!< mask to keep the activated channel for the trigger
-	unsigned long	hitRateEnabledMask;	//!< mask to store the activated trigger rate measurement
     unsigned long	dataId;         //!< Id used to identify energy data set (run mode)
 	unsigned long	waveFormId;		//!< Id used to identify energy+trace data set (debug mode)
 	unsigned long	hitRateId;
@@ -109,19 +107,8 @@
     BOOL runBoxCarFilter;
     BOOL readWaveforms;
     int runMode;        //!< This is the daqRunMode (not the fltRunMode on the hardware).
+	                    //TODO: meaning runMode changed (compared to KATRIN); for EW we have several mode flags -tb-
     
-    // fields for histogram readout
-    unsigned long histRecTime;  //!<the histogram refresh time
-    unsigned long histMeasTime; //!<the per-cycle second counter
-    unsigned long histNofMeas;  //!<number of histo measurement cycles (0..63)
-    unsigned long histEMin;     //!< the energy offset of the histogram
-    unsigned long histEBin;     //!<the bin size setting (histBinWidth = 2^histEBin)
-    int histMaxEnergy;
-    int histMode;
-    int histClrMode;
-    unsigned long histFirstEntry;
-    unsigned long histLastEntry;
-    int histPageAB;
 	
 	BOOL noiseFloorRunning;
 	int noiseFloorState;
@@ -135,6 +122,18 @@
 	long newThreshold[kNumV4FLTChannels];
 	
 	unsigned long eventCount[kNumV4FLTChannels];
+	
+    //EDELWEISS vars
+    int fltModeFlags;
+    int fiberEnableMask;
+    int BBv1Mask;
+    int selectFiberTrig;
+	//uint64_t streamMask;
+    uint64_t streamMask;
+    uint64_t fiberDelays;
+    int fastWrite;
+    int statusRegister;
+    int totalTriggerNRegister;
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
@@ -145,17 +144,35 @@
 - (short) getNumberRegisters;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+- (int) totalTriggerNRegister;
+- (void) setTotalTriggerNRegister:(int)aTotalTriggerNRegister;
+- (int) statusRegister;
+- (void) setStatusRegister:(int)aStatusRegister;
+- (int) fastWrite;
+- (void) setFastWrite:(int)aFastWrite;
+- (uint64_t) fiberDelays;
+- (void) setFiberDelays:(uint64_t)aFiberDelays;
+- (uint64_t) streamMask;
+- (uint32_t) streamMask1;
+- (uint32_t) streamMask2;
+- (int) streamMaskForFiber:(int)aFiber chan:(int)aChan;
+- (void) setStreamMask:(uint64_t)aStreamMask;
+//- (void) setStreamMaskForFiber:(int)aFiber chan:(int)aChan;
+- (int) selectFiberTrig;
+- (void) setSelectFiberTrig:(int)aSelectFiberTrig;
+- (int) BBv1Mask;
+- (BOOL) BBv1MaskForChan:(int)i;
+- (void) setBBv1Mask:(int)aBBv1Mask;
+- (int) fiberEnableMask;
+- (int) fiberEnableMaskForChan:(int)i;
+- (void) setFiberEnableMask:(int)aFiberEnableMask;
+- (int) fltModeFlags;
+- (void) setFltModeFlags:(int)aFltModeFlags;
 - (int) targetRate;
 - (void) setTargetRate:(int)aTargetRate;
-- (int) histMaxEnergy;
-- (void) setHistMaxEnergy:(int)aHistMaxEnergy;
-- (int) histPageAB;
-- (void) setHistPageAB:(int)aHistPageAB;
 - (int) runMode;
 - (void) setRunMode:(int)aRunMode;
 - (void) setToDefaults;
-- (BOOL) runBoxCarFilter;
-- (void) setRunBoxCarFilter:(BOOL)aRunBoxCarFilter;
 - (BOOL) storeDataInRam;
 - (void) setStoreDataInRam:(BOOL)aStoreDataInRam;
 - (int) filterLength;
@@ -180,24 +197,6 @@
 - (void) findNoiseFloors;
 - (NSString*) noiseFloorStateString;
 
-- (unsigned long) histNofMeas;
-- (void) setHistNofMeas:(unsigned long)aHistNofMeas;
-- (unsigned long) histMeasTime;
-- (void) setHistMeasTime:(unsigned long)aHistMeasTime;
-- (unsigned long) histRecTime;
-- (void) setHistRecTime:(unsigned long)aHistRecTime;
-- (unsigned long) histLastEntry;
-- (void) setHistLastEntry:(unsigned long)aHistLastEntry;
-- (unsigned long) histFirstEntry;
-- (void) setHistFirstEntry:(unsigned long)aHistFirstEntry;
-- (int) histClrMode;
-- (void) setHistClrMode:(int)aHistClrMode;
-- (int) histMode;
-- (void) setHistMode:(int)aHistMode;
-- (unsigned long) histEBin;
-- (void) setHistEBin:(unsigned long)aHistEBin;
-- (unsigned long) histEMin;
-- (void) setHistEMin:(unsigned long)aHistEMin;
 
 - (unsigned long) dataId;
 - (void) setDataId: (unsigned long)aDataId;
@@ -213,14 +212,8 @@
 
 - (NSMutableArray*) gains;
 - (NSMutableArray*) thresholds;
-- (unsigned long) triggerEnabledMask;
-- (void) setTriggerEnabledMask:(unsigned long)aMask;
 - (void) setGains:(NSMutableArray*)aGains;
 - (void) setThresholds:(NSMutableArray*)aThresholds;
-- (void) disableAllTriggers;
-
-- (BOOL) hitRateEnabled:(unsigned short) aChan;
-- (void) setHitRateEnabled:(unsigned short) aChan withValue:(BOOL) aState;
 
 - (unsigned long)threshold:(unsigned short) aChan;
 - (unsigned short)gain:(unsigned short) aChan;
@@ -229,8 +222,6 @@
 - (void) setGain:(unsigned short) aChan withValue:(unsigned short) aGain;
 - (void) setTriggerEnabled:(unsigned short) aChan withValue:(BOOL) aState;
 
-- (int) fltRunMode;
-- (void) setFltRunMode:(int)aMode;
 - (void) enableAllHitRates:(BOOL)aState;
 - (void) enableAllTriggers:(BOOL)aState;
 - (float) hitRate:(unsigned short)aChan;
@@ -258,11 +249,13 @@
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢HW Access
 //all can raise exceptions
+- (unsigned long) regAddress:(int)aReg channel:(int)aChannel index:(int)index;
 - (unsigned long) regAddress:(int)aReg channel:(int)aChannel;
 - (unsigned long) regAddress:(int)aReg;
 - (unsigned long) adcMemoryChannel:(int)aChannel page:(int)aPage;
 - (unsigned long) readReg:(int)aReg;
 - (unsigned long) readReg:(int)aReg channel:(int)aChannel;
+- (unsigned long) readReg:(int)aReg channel:(int)aChannel  index:(int)aIndex;
 - (void) writeReg:(int)aReg value:(unsigned long)aValue;
 - (void) writeReg:(int)aReg channel:(int)aChannel value:(unsigned long)aValue;
 
@@ -272,12 +265,7 @@
 - (id) readRegCmd:(unsigned long) aRegister;
 - (id) writeRegCmd:(unsigned long) aRegister value:(unsigned long)aValue;
 
-- (unsigned long)  readSeconds;
-- (void)  writeSeconds:(unsigned long)aValue;
-- (void) setTimeToMacClock;
-
 - (unsigned long) readVersion;
-- (unsigned long) readpVersion;
 - (unsigned long) readBoardIDLow;
 - (unsigned long) readBoardIDHigh;
 - (int)			  readSlot;
@@ -286,32 +274,32 @@
 
 - (void) loadThresholdsAndGains;
 - (void) initBoard;
-- (void) writeHitRateMask;
 - (void) writeInterruptMask;
-- (unsigned long) hitRateEnabledMask;
-- (void) setHitRateEnabledMask:(unsigned long)aMask;
 - (void) readHitRates;
-- (void) readHistogrammingStatus;
 - (void) writeTestPattern:(unsigned long*)mask length:(int)len;
 - (void) rewindTestPattern;
 - (void) writeNextPattern:(unsigned long)aValue;
 - (unsigned long) readStatus;
 - (unsigned long) readControl;
-- (unsigned long) readHitRateMask;
+- (unsigned long) readTotalTriggerNRegister;
 - (void) writeControl;
+- (void) writeStreamMask;
+- (void) writeFiberDelays;
+- (void) readFiberDelays;
+- (void) writeCommandResync;
+- (void) writeCommandTrigEvCounterReset;
+- (void) writeCommandSoftwareTrigger;
+- (void) readTriggerData;
+
 - (void) printStatusReg;
-- (void) printPStatusRegs;
 - (void) printVersions;
 - (void) printValueTable;
 - (void) printEventFIFOs;
-- (void) writeHistogramControl;
 
 /** Print result of hardware statistics for all channels */
 - (void) printStatistics; // ak, 7.10.07
 - (void) writeThreshold:(int)i value:(unsigned int)aValue;
 - (unsigned int) readThreshold:(int)i;
-- (void) writeGain:(int)i value:(unsigned short)aValue;
-- (unsigned short) readGain:(int)i;
 - (void) writeTriggerControl;
 - (BOOL) partOfEvent:(short)chan;
 - (unsigned long) eventMask;
@@ -353,7 +341,6 @@
 - (NSNumber*) extractParam:(NSString*)param from:(NSDictionary*)fileHeader forChannel:(int)aChannel;
 
 
-- (void) testReadHisto;
 
 @end
 
@@ -379,23 +366,19 @@
 				  n:(int) n;
 @end
 
+extern NSString* OREdelweissFLTModelTotalTriggerNRegisterChanged;
+extern NSString* OREdelweissFLTModelStatusRegisterChanged;
+extern NSString* OREdelweissFLTModelFastWriteChanged;
+extern NSString* OREdelweissFLTModelFiberDelaysChanged;
+extern NSString* OREdelweissFLTModelStreamMaskChanged;
+extern NSString* OREdelweissFLTModelSelectFiberTrigChanged;
+extern NSString* OREdelweissFLTModelBBv1MaskChanged;
+extern NSString* OREdelweissFLTModelFiberEnableMaskChanged;
+extern NSString* OREdelweissFLTModelFltModeFlagsChanged;
 extern NSString* OREdelweissFLTModelTargetRateChanged;
-extern NSString* OREdelweissFLTModelHistMaxEnergyChanged;
-extern NSString* OREdelweissFLTModelHistPageABChanged;
-extern NSString* OREdelweissFLTModelHistLastEntryChanged;
-extern NSString* OREdelweissFLTModelHistFirstEntryChanged;
-extern NSString* OREdelweissFLTModelHistClrModeChanged;
-extern NSString* OREdelweissFLTModelHistModeChanged;
-extern NSString* OREdelweissFLTModelHistEBinChanged;
-extern NSString* OREdelweissFLTModelHistEMinChanged;
-extern NSString* OREdelweissFLTModelRunModeChanged;
-extern NSString* OREdelweissFLTModelRunBoxCarFilterChanged;
 extern NSString* OREdelweissFLTModelStoreDataInRamChanged;
 extern NSString* OREdelweissFLTModelFilterLengthChanged;
 extern NSString* OREdelweissFLTModelGapLengthChanged;
-extern NSString* OREdelweissFLTModelHistNofMeasChanged;
-extern NSString* OREdelweissFLTModelHistMeasTimeChanged;
-extern NSString* OREdelweissFLTModelHistRecTimeChanged;
 extern NSString* OREdelweissFLTModelPostTriggerTimeChanged;
 extern NSString* OREdelweissFLTModelFifoBehaviourChanged;
 extern NSString* OREdelweissFLTModelAnalogOffsetChanged;
@@ -406,8 +389,6 @@ extern NSString* OREdelweissFLTModelTestEnabledArrayChanged;
 extern NSString* OREdelweissFLTModelTestStatusArrayChanged;
 extern NSString* OREdelweissFLTModelHitRateChanged;
 extern NSString* OREdelweissFLTModelHitRateLengthChanged;
-extern NSString* OREdelweissFLTModelHitRateEnabledMaskChanged;
-extern NSString* OREdelweissFLTModelTriggerEnabledMaskChanged;
 extern NSString* OREdelweissFLTModelGainChanged;
 extern NSString* OREdelweissFLTModelThresholdChanged;
 extern NSString* OREdelweissFLTChan;

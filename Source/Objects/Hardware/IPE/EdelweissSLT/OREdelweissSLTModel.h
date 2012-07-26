@@ -155,6 +155,9 @@
         struct sockaddr_in sockaddr_from;
         socklen_t sockaddr_fromLength;
 		int isListeningOnServerSocket;
+    int selectedFifoIndex;
+    unsigned long pixelBusEnableReg;
+    unsigned long eventFifoStatusReg;
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
@@ -172,6 +175,12 @@
 - (void) runIsStartingSubRun:(NSNotification*)aNote;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+- (unsigned long) eventFifoStatusReg;
+- (void) setEventFifoStatusReg:(unsigned long)aEventFifoStatusReg;
+- (unsigned long) pixelBusEnableReg;
+- (void) setPixelBusEnableReg:(unsigned long)aPixelBusEnableReg;
+- (int) selectedFifoIndex;
+- (void) setSelectedFifoIndex:(int)aSelectedFifoIndex;
 - (int) isListeningOnServerSocket;
 - (void) setIsListeningOnServerSocket:(int)aIsListeningOnServerSocket;
 - (NSString*) crateUDPCommand;
@@ -213,6 +222,7 @@
 - (void) setPulserAmp:(float)aPulserAmp;
 - (short) getNumberRegisters;			
 - (NSString*) getRegisterName: (short) anIndex;
+- (unsigned long) getAddress: (short) anIndex;
 //- (unsigned long) getAddressOffset: (short) anIndex;
 - (short) getAccessType: (short) anIndex;
 
@@ -262,12 +272,16 @@
 - (unsigned long) readStatusReg;
 - (void)		  printStatusReg;
 
+- (void) writePixelBusEnableReg;
+- (void) readPixelBusEnableReg;
+
 - (void)		writeFwCfg;
 - (void)		writeSltReset;
 - (void)		writeFltReset;
 - (void)		writeEvRes;
 - (unsigned long long) readBoardID;
 - (void) readEventStatus:(unsigned long*)eventStatusBuffer;
+- (void) readEventFifoStatusReg;
 
 - (void)		  writeInterruptMask;
 - (void)		  readInterruptMask;
@@ -278,9 +292,11 @@
 //- (void)		  dumpTriggerRAM:(int)aPageIndex;
 
 - (void)		  writeReg:(int)index value:(unsigned long)aValue;
+- (void)          writeReg:(int)index  forFifo:(int)fifoIndex value:(unsigned long)aValue;
 - (void)		  rawWriteReg:(unsigned long) address  value:(unsigned long)aValue;//TODO: FOR TESTING AND DEBUGGING ONLY -tb-
 - (unsigned long) rawReadReg:(unsigned long) address; //TODO: FOR TESTING AND DEBUGGING ONLY -tb-
 - (unsigned long) readReg:(int) index;
+- (unsigned long) readReg:(int) index forFifo:(int)fifoIndex;
 - (id) writeHardwareRegisterCmd:(unsigned long)regAddress value:(unsigned long) aValue;
 - (id) readHardwareRegisterCmd:(unsigned long)regAddress;
 - (unsigned long) readHwVersion;
@@ -339,6 +355,10 @@
 
 @end
 
+extern NSString* OREdelweissSLTModelEventFifoStatusRegChanged;
+extern NSString* OREdelweissSLTModelPixelBusEnableRegChanged;
+extern NSString* OREdelweissSLTModelPixelBusEnableRegChanged;
+extern NSString* OREdelweissSLTModelSelectedFifoIndexChanged;
 extern NSString* OREdelweissSLTModelIsListeningOnServerSocketChanged;
 extern NSString* OREdelweissSLTModelCrateUDPCommandChanged;
 extern NSString* OREdelweissSLTModelCrateUDPReplyPortChanged;

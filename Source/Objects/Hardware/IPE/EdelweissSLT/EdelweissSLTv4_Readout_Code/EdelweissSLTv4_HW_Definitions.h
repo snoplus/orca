@@ -20,8 +20,8 @@
 #ifndef _H_SLTV4HWDEFINITIONS_
 #define _H_SLTV4HWDEFINITIONS_
 
-#define kSLTv4    1
-#define kFLTv4    2
+#define kSLTv4EW    1
+#define kFLTv4EW    2
 
 
 #define kReadWaveForms	0x1 << 0
@@ -53,7 +53,9 @@
 // I switched to enums to always have a guilty kIpeFltV4_NumberOfDaqModes; older Orca versions may get newer Orca files with daq modes
 // still unknown to the older Orca; with kIpeFltV4_NumberOfDaqModes we can check this -tb-
 enum daqMode { 
-	kIpeFltV4_EnergyDaqMode			= 0,
+	kIpeFltV4_EventDaqMode			= 0,
+	kIpeFltV4_MonitoringDaqMode		= 1,
+#if 0
 	kIpeFltV4_EnergyTraceDaqMode	= 1,
 	kIpeFltV4_Histogram_DaqMode		= 2,
 	kIpeFltV4_VetoEnergyDaqMode		= 3, 
@@ -61,6 +63,7 @@ enum daqMode {
 	kIpeFltV4_VetoEnergyAutoDaqMode = 5, //for future use
 	kIpeFltV4_VetoEnergyTraceSyncDaqMode	= 6, //for future use
 	kIpeFltV4_EnergyTraceSyncDaqMode= 7,
+#endif
 	kIpeFltV4_NumberOfDaqModes // do not assign a value, the compiler will do it
 };
 #endif

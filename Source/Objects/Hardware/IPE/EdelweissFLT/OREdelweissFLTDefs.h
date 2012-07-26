@@ -12,6 +12,9 @@
 #define kIpeFlt_PageNumber 10		// Page Number          bits 14..10
 #define kIpeFlt_RegId 0				// Register Id          bits 14.. 0
 
+
+
+//TODO: for EW: 6 or 36??? -tb-
 #define kNumV4FLTChannels 24
 
 #define kIpeFlt_Page_Size 1000
@@ -44,7 +47,10 @@
 #define kIpeFlt_Cntl_InterruptSources_Shift	0
 #define kIpeFlt_Cntl_InterruptSources_Mask	0xff
 
-#define kIpeFlt_Cmd_LoadGains	            0x100
+//command register
+#define kIpeFlt_Cmd_resync	                0x1
+#define kIpeFlt_Cmd_TrigEvCountRes          (0x1 << 16)
+#define kIpeFlt_Cmd_SWTrig	                (0x1 << 31)
 
 #define kIpeFlt_Periph_CoinTme_Shift		0
 #define kIpeFlt_Periph_CoinTme_Mask			0x1ff
@@ -78,7 +84,7 @@
 #define kIpeFlt_TestPattern_Reset	0x00000010
 
 //#define kIpeFlt_Reset_All			0x18010 I added the resetPage flag -tb-
-#define kIpeFlt_Reset_All			0x38010
+//#define kIpeFlt_Reset_All			0x38010
 
 #define kSetStandBy		1
 #define kReleaseStandBy 0

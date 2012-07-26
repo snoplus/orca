@@ -13,8 +13,176 @@
 	#include "katrinhw4/subrackkatrin.h"
 #endif
 
+
+
+//TODO: move to HW_Readout.cc -tb-
+//TODO: move to HW_Readout.cc -tb-
+//TODO: move to HW_Readout.cc -tb-
+//TODO: move to HW_Readout.cc -tb-
+//TODO: move to HW_Readout.cc -tb-
+//TODO: move to HW_Readout.cc -tb-
+//TODO: move to HW_Readout.cc -tb-
+
+
+    //SLT registers
+	static const uint32_t SLTControlReg     = 0xa80000 >> 2;
+	static const uint32_t SLTStatusReg      = 0xa80004 >> 2;
+	static const uint32_t SLTCommandReg     = 0xa80008 >> 2;
+	static const uint32_t SLTVersionReg     = 0xa80020 >> 2;
+
+	static const uint32_t SLTPixbusPErrorReg     = 0xa80024 >> 2;
+	static const uint32_t SLTPixbusEnableReg     = 0xa80028 >> 2;
+	static const uint32_t SLTBBOpenedReg         = 0xa80034 >> 2;
+
+	
+	static const uint32_t SLTSemaphoreReg   = 0xb00000 >> 2;
+	
+	static const uint32_t CmdFIFOReg        = 0xb00004 >> 2;
+	static const uint32_t CmdFIFOStatusReg  = 0xb00008 >> 2;
+	static const uint32_t OperaStatusReg0    = 0xb0000c >> 2;
+	static const uint32_t OperaStatusReg1    = 0xb00010 >> 2;
+	static const uint32_t OperaStatusReg2    = 0xb00014 >> 2;
+	
+	static const uint32_t FIFO0StatusReg    = 0xe00004 >> 2;
+	static const uint32_t FIFO0ModeReg      = 0xe00000 >> 2;
+	static const uint32_t FIFO0Addr         = 0xd00000 >> 2;
+	static const uint32_t BB0PAEOffsetReg   = 0xe00008 >> 2;
+	static const uint32_t BB0PAFOffsetReg   = 0xe0000c >> 2;
+	static const uint32_t BB0csrReg         = 0xe00010 >> 2;
+
+	static const uint32_t SLTTimeLowReg     = 0xb00018 >> 2;
+	static const uint32_t SLTTimeHighReg    = 0xb0001c >> 2;
+
+
+	
+inline unsigned long FIFOStatusReg(int numFIFO){
+    return FIFO0StatusReg | ((numFIFO & 0xf) <<14);  //PCI adress would be <<16, but we use Pbus adress -tb-
+}
+
+inline unsigned long FIFOModeReg(int numFIFO){
+    return FIFO0ModeReg | ((numFIFO & 0xf) <<14);  //PCI adress would be <<16, but we use Pbus adress -tb-
+}
+
+inline unsigned long FIFOAddr(int numFIFO){
+    return FIFO0Addr | ((numFIFO & 0xf) <<14);  //PCI adress would be <<16, but we use Pbus adress -tb-
+}
+
+inline unsigned long PAEOffsetReg(int numFIFO){
+    return BB0PAEOffsetReg | ((numFIFO & 0xf) <<14);  //PCI adress would be <<16, but we use Pbus adress -tb-
+}
+
+inline unsigned long PAFOffsetReg(int numFIFO){
+    return BB0PAFOffsetReg | ((numFIFO & 0xf) <<14);  //PCI adress would be <<16, but we use Pbus adress -tb-
+}
+
+inline unsigned long BBcsrReg(int numFIFO){
+    return BB0csrReg | ((numFIFO & 0xf) <<14);  //PCI adress would be <<16, but we use Pbus adress -tb-
+}
+
+    //FLT registers
+	static const uint32_t FLTStatusRegBase      = 0x000000 >> 2;
+	static const uint32_t FLTControlRegBase     = 0x000004 >> 2;
+	static const uint32_t FLTCommandRegBase     = 0x000008 >> 2;
+	static const uint32_t FLTVersionRegBase     = 0x00000c >> 2;
+	
+	static const uint32_t FLTFiberSet_1RegBase  = 0x000024 >> 2;
+	static const uint32_t FLTFiberSet_2RegBase  = 0x000028 >> 2;
+	static const uint32_t FLTStreamMask_1RegBase  = 0x00002c >> 2;
+	static const uint32_t FLTStreamMask_2RegBase  = 0x000030 >> 2;
+	static const uint32_t FLTTriggerMask_1RegBase  = 0x000034 >> 2;
+	static const uint32_t FLTTriggerMask_2RegBase  = 0x000038 >> 2;
+
+	static const uint32_t FLTAccessTestRegBase     = 0x000040 >> 2;
+	
+	static const uint32_t FLTTotalTriggerNRegBase  = 0x000084 >> 2;
+
+	static const uint32_t FLTBBStatusRegBase    = 0x001400 >> 2;
+
+	static const uint32_t FLTRAMDataRegBase     = 0x003000 >> 2;
+	
+// 
+// NOTE: numFLT from 1...20  !!!!!!!!!!!!
+//
+// (NOT from 0 ... 19!!!)
+//
+// channels from 0 to 5!!!
+
+	//TODO: 0x3f or 0x1f?????????????
+
+inline unsigned long FLTStatusReg(int numFLT){
+    return FLTStatusRegBase | ((numFLT & 0x3f) <<17);  //PCI adress would be <<16, but we use Pbus adress -tb-
+}
+
+inline unsigned long FLTControlReg(int numFLT){
+    return FLTControlRegBase | ((numFLT & 0x3f) <<17);  
+}
+
+inline unsigned long FLTCommandReg(int numFLT){
+    return FLTCommandRegBase | ((numFLT & 0x3f) <<17);  
+}
+
+inline unsigned long FLTVersionReg(int numFLT){
+    return FLTVersionRegBase | ((numFLT & 0x3f) <<17);  
+}
+
+inline unsigned long FLTFiberSet_1Reg(int numFLT){
+    return FLTFiberSet_1RegBase | ((numFLT & 0x3f) <<17);  
+}
+
+inline unsigned long FLTFiberSet_2Reg(int numFLT){
+    return FLTFiberSet_2RegBase | ((numFLT & 0x3f) <<17);  
+}
+
+inline unsigned long FLTStreamMask_1Reg(int numFLT){
+    return FLTStreamMask_1RegBase | ((numFLT & 0x3f) <<17);  
+}
+
+inline unsigned long FLTStreamMask_2Reg(int numFLT){
+    return FLTStreamMask_2RegBase | ((numFLT & 0x3f) <<17);  
+}
+
+inline unsigned long FLTTriggerMask_1Reg(int numFLT){
+    return FLTTriggerMask_1RegBase | ((numFLT & 0x3f) <<17);  
+}
+
+inline unsigned long FLTTriggerMask_2Reg(int numFLT){
+    return FLTTriggerMask_2RegBase | ((numFLT & 0x3f) <<17);  
+}
+
+inline unsigned long FLTAccessTestReg(int numFLT){
+    return FLTAccessTestRegBase | ((numFLT & 0x3f) <<17); 
+}
+
+inline unsigned long FLTBBStatusReg(int numFLT, int numChan){
+    return FLTBBStatusRegBase | ((numFLT & 0x3f) <<17) | ((numChan & 0x1f) <<12); 
+}
+
+inline unsigned long FLTTotalTriggerNReg(int numFLT){
+    return FLTTotalTriggerNRegBase | ((numFLT & 0x3f) <<17);  
+}
+
+
+inline unsigned long FLTRAMDataReg(int numFLT, int numChan){
+    return FLTRAMDataRegBase | ((numFLT & 0x3f) <<17) | ((numChan & 0x1f) <<12); 
+}
+
+//TODO: move to HW_Readout.cc -tb-
+//TODO: move to HW_Readout.cc -tb-
+//TODO: move to HW_Readout.cc -tb-
+//TODO: move to HW_Readout.cc -tb-
+//TODO: move to HW_Readout.cc -tb-
+//TODO: move to HW_Readout.cc -tb-
+//TODO: move to HW_Readout.cc -tb-
+
+
+
+
+
 //init static members and globals
 uint32_t histoShipSumHistogram = 0;
+
+
+
 
 
 #if !PMC_COMPILE_IN_SIMULATION_MODE
@@ -22,14 +190,8 @@ uint32_t histoShipSumHistogram = 0;
 //----------------------------------------------------------------
 
 extern hw4::SubrackKatrin* srack; 
+extern Pbus* pbus; 
 
-void readSltSecSubsec(uint32_t & sec, uint32_t & subsec)
-{
-    uint32_t subsecreg;
-    subsecreg    = srack->theSlt->subSecCounter->read();
-    sec             = srack->theSlt->secCounter->read();
-    subsec   = ((subsecreg>>11)&0x3fff)*2000   +  (subsecreg & 0x7ff);//TODO: move this to the fdhwlib -tb-
-}
 
 bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
 {
@@ -48,6 +210,9 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
 	static uint32_t debugbuffer[kNumV4FLTs][kNumV4FLTChannels];//used for debugging -tb-
 
 
+	static uint32_t isPresentFLT[kNumV4FLTs];
+
+
     //this data must be constant during a run
     static uint32_t histoBinWidth = 0;
     static uint32_t histoEnergyOffset = 0;
@@ -58,12 +223,12 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
     uint32_t waveformId = GetHardwareMask()[1];
     uint32_t histogramId = GetHardwareMask()[2];
     uint32_t energyTraceId = GetHardwareMask()[3];
-    uint32_t col        = GetSlot() - 1; //GetSlot() is in fact stationNumber, which goes from 1 to 24 (slots go from 0-9, 11-20)
+    uint32_t col        = GetSlot() - 1; //GetSlot() is in fact stationNumber, which goes from 1 to 20 (slots go from 0-9, 11-20)
     uint32_t crate      = GetCrate();
     
     uint32_t postTriggerTime = GetDeviceSpecificData()[0];
     uint32_t eventType  = GetDeviceSpecificData()[1];
-    uint32_t fltRunMode = GetDeviceSpecificData()[2];
+    uint32_t fltModeFlags = GetDeviceSpecificData()[2];
     uint32_t runFlags   = GetDeviceSpecificData()[3];//this is runFlagsMask of ORKatrinV4FLTModel.m, load_HW_Config_Structure:index:
     uint32_t triggerEnabledMask = GetDeviceSpecificData()[4];
     uint32_t daqRunMode = GetDeviceSpecificData()[5];
@@ -72,1168 +237,165 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
     uint32_t versionFPGA8 = GetDeviceSpecificData()[8];
     uint32_t filterShapingLength = GetDeviceSpecificData()[9];//TODO: need to change in the code below! -tb- 2011-04-01
 	
-	uint32_t location   = ((crate & 0x01e)<<21) | (((col+1) & 0x0000001f)<<16) | ((filterIndex & 0xf)<<4)  | (filterShapingLength & 0xf)  ;
+	uint32_t location   = ((crate & 0x01e)<<21) | (((col+1) & 0x0000001f)<<16); // | ((filterIndex & 0xf)<<4)  | (filterShapingLength & 0xf)  ;
 
-	//for backward compatibility (before FLT versions2.1.1.4); shall be removed Jan. 2011 -tb-
-	//===========================================================================================
-	if((versionCFPGA>0x20010100 && versionCFPGA<0x20010104) || (versionFPGA8>0x20010100  && versionFPGA8<0x20010104) ){
-	//this is for FPGA config. before FIFO redesign and 'sync' mode -tb-
-    if(srack->theFlt[col]->isPresent()){
-    
-        #if 0
-        //check timing
-        //TODO: hmm, this should be done even before SLT releases inhibit ... -tb-
-        if(0 /*runFlags & kSyncFltWithSltTimerFlag*/){ //TODO: FLT sec counter has only 13 bit, so this currently makes no sense; maybe after firmware redesign ... -tb-
-            GetDeviceSpecificData()[3] &= ~(kSyncFltWithSltTimerFlag);
-            uint32_t sltsubsec;
-            uint32_t sltsec1;
-            uint32_t sltsec2;
-            uint32_t fltsec;
-            sltsubsec   = srack->theSlt->subSecCounter->read();
-            sltsec1      = srack->theSlt->secCounter->read();
-            fltsec      = srack->theFlt[col]->secondCounter->read();
-            sltsubsec   = srack->theSlt->subSecCounter->read();
-            sltsec2      = srack->theSlt->secCounter->read();
-            int i;
-            for(i=0; i<10; i++){
-                if(sltsec1==fltsec && sltsec2==fltsec) break;//to be sure that the second strobe was not between reading sltsec1 and sltsec2
-                sltsubsec   = srack->theSlt->subSecCounter->read();
-                sltsec1      = srack->theSlt->secCounter->read();
-                srack->theFlt[col]->secondCounter->write(sltsec1);
-                fltsec      = srack->theFlt[col]->secondCounter->read();
-                sltsubsec   = srack->theSlt->subSecCounter->read();
-                sltsec2      = srack->theSlt->secCounter->read();
-                //debug fprintf(stdout,"ORFLTv4Readout.cc: Syncronizing FLT %i to secCounter %li!\n",col+1,sltsec1);fflush(stdout);
-            }
-        }
-        #endif
-        #if 0 // a temporary test -tb-
-        {
-            static int once=1;
-            if(once){
-            once=0;
-            uint32_t sltsec;
-            uint32_t sltsec1;
-            uint32_t sltsec2;
-            uint32_t sltsubsec;
-            uint32_t sltsubsec1;
-            uint32_t sltsubsec2;
-            uint32_t fltsec,fltsec1;
-            sltsubsec   = srack->theSlt->subSecCounter->read();
-            sltsec1=sltsec      = srack->theSlt->secCounter->read();
-            while(sltsec1 == sltsec){
-                sltsubsec   = srack->theSlt->subSecCounter->read();
-                sltsec      = srack->theSlt->secCounter->read();
-            }
-            fltsec1=fltsec = srack->theFlt[col]->secondCounter->read();
-            fprintf(stdout,"slt strobe:slt sec %i  slt sub  %i  fltsec:  %i\n",sltsec,sltsubsec,fltsec);
-            while(fltsec1==fltsec){
-                fltsec = srack->theFlt[col]->secondCounter->read();
-            }
-                sltsubsec   = srack->theSlt->subSecCounter->read();
-                sltsec      = srack->theSlt->secCounter->read();
-            fprintf(stdout,"FLT strobe:slt sec %i  slt sub  %i  fltsec:  %i\n",sltsec,sltsubsec,fltsec);
-            fflush(stdout);
-            sleep(1);
-            }
-        }
-        #endif
-        
-        
-        //READOUT MODES (energy, energy+trace, histogram)
-        ////////////////////////////////////////////////////
-        
-        
-        // --- ENERGY MODE ------------------------------
-        if((daqRunMode == kIpeFltV4_EnergyDaqMode) || (daqRunMode == kIpeFltV4_VetoEnergyDaqMode)){  //then fltRunMode == kIpeFltV4Katrin_Run_Mode resp. kIpeFltV4Katrin_Veto_Mode
-            //uint32_t status         = srack->theFlt[col]->status->read();
-            uint32_t fifoStatus;// = (status >> 24) & 0xf;
-            uint32_t fifoFlags;// =   FF, AF, AE, EF
-            
-            //TO DO... the number of events to read could (should) be made variable <-- depending on the readptr/witeptr -tb-
-            uint32_t eventN;
-            for(eventN=0;eventN<10;eventN++){
-                hw4::FltKatrinEventFIFOStatus* eventFIFOStatus = (hw4::FltKatrinEventFIFOStatus*)srack->theFlt[col]->eventFIFOStatus;//TODO: typing error in fdhwlib - remove cast after correction -tb-
-                //fifoStatus = srack->theFlt[col]->eventFIFOStatus->read();//reads to cache
-                fifoStatus = eventFIFOStatus->read();//reads to cache
-                //uint32_t fifoEmptyFlag = (fifoStatus>>28)&1;//srack->theFlt[col]->eventFIFOStatus->emptyFlag->getCache();
-                uint32_t fifoEmptyFlag = eventFIFOStatus->emptyFlag->getCache();
-                //not needed for now - uint32_t fifoAlmostFull = eventFIFOStatus->almostFullFlag->getCache();//TODO: then we should read more than 10 events? -tb-
-                //not needed for now - uint32_t fifoFullFlag = eventFIFOStatus->fullFlag->getCache();//TODO: then we should clear the fifo and leave? -tb-
 
-                if(!fifoEmptyFlag){
-                    //should be something in the fifo, check the read/write pointers and read and package up to 10 events.
-                    //uint32_t writeptr = fifoStatus & 0x3ff;      //srack->theFlt[col]->eventFIFOStatus->writePointer->getCache();
-                    //uint32_t readptr = (fifoStatus >>16) & 0x3ff;//srack->theFlt[col]->eventFIFOStatus->readPointer->getCache();
-                    uint32_t writeptr = eventFIFOStatus->writePointer->getCache();
-                    uint32_t readptr  = eventFIFOStatus->readPointer->getCache();
-                    uint32_t diff = (writeptr-readptr+1024) % 512;
-					fifoFlags = (eventFIFOStatus->fullFlag->getCache()			<< 3) |
-								(eventFIFOStatus->almostFullFlag->getCache()	<< 2) |
-								(eventFIFOStatus->almostEmptyFlag->getCache()	<< 1) |
-								(eventFIFOStatus->emptyFlag->getCache());
-								
-                    //depending on 'diff' the loop should start here -tb-
-                    
-                    if(diff>0){
-                        hw4::FltKatrinEventFIFO1 *eventFIFO1 = srack->theFlt[col]->eventFIFO1;
-                        hw4::FltKatrinEventFIFO2 *eventFIFO2 = srack->theFlt[col]->eventFIFO2;
-                        eventFIFO1->read();
-                        eventFIFO2->read();
-                        //uint32_t chmap = f1 >> 8;
-                        uint32_t chmap = eventFIFO1->channelMap->getCache();
-                        uint32_t evsec      = (eventFIFO1->sec12downto5->getCache()<<5) | (eventFIFO2->sec4downto0->getCache());//( (f1 & 0xff) <<5 )  |  (f2 >>27);  //13 bit
-                        uint32_t evsubsec   = eventFIFO2->subSec->getCache();//(f2 >> 2) & 0x1ffffff; // 25 bit
-                                //evsubsec   = srack->theSlt->subSecCounter->read();
-                                //evsec      = srack->theSlt->secCounter->read();
-                        uint32_t precision  = eventFIFO2->timePrecision->getCache();
-                        uint32_t eventchan, eventchanmask;
-                        for(eventchan=0;eventchan<kNumChan;eventchan++){
-                            eventchanmask = (0x1L << eventchan);
-                            if((chmap & eventchanmask) && (triggerEnabledMask & eventchanmask)){
-                                //fprintf(stdout,"  -->EVENT FLT %2i, chan %2i: ",col,eventchan);fflush(stdout);
-                                uint32_t f3            = srack->theFlt[col]->eventFIFO3->read(eventchan);
-                                uint32_t f4            = srack->theFlt[col]->eventFIFO4->read(eventchan);
-                                uint32_t pagenr        = f3 & 0x3f;
-                                uint32_t energy        = f4 ;
-                                
-                                ensureDataCanHold(7); 
-                                data[dataIndex++] = dataId | 7;    
-                                data[dataIndex++] = location | eventchan<<8;
-                                data[dataIndex++] = evsec;        //sec
-                                data[dataIndex++] = evsubsec;     //subsec
-                                data[dataIndex++] = chmap;
-                                data[dataIndex++] = (readptr & 0x3ff) | ((pagenr & 0x3f)<<10) | ((precision & 0x3)<<16)  | ((fifoFlags & 0xf)<<20) | ((fltRunMode & 0xf)<<24);        //event flags: event ID=read ptr (10 bit); pagenr (6 bit); fifoFlags (4 bit);flt mode (4 bit)
-                                data[dataIndex++] = energy;
-                            }
-                        }
-                    }
-                }//if(!fifoEmptyFlag)...
-                else break;//fifo is empty, leave ...
-            }//for(eventN=0; ...
-        }
-        // --- ENERGY+TRACE MODE ------------------------------
-        else if((daqRunMode == kIpeFltV4_EnergyTraceDaqMode) || (daqRunMode == kIpeFltV4_VetoEnergyTraceDaqMode)){  //then fltRunMode == kIpeFltV4Katrin_Run_Mode resp. kIpeFltV4Katrin_Veto_Mode
-            //uint32_t status         = srack->theFlt[col]->status->read();
-            uint32_t fifoStatus;// = (status >> 24) & 0xf;
-            uint32_t fifoFlags;// =   FF, AF, AE, EF
-            
-            //TO DO... the number of events to read could (should) be made variable <-- depending on the readptr/witeptr -tb-
-            uint32_t eventN;
-            for(eventN=0;eventN<10;eventN++){
-                hw4::FltKatrinEventFIFOStatus* eventFIFOStatus = (hw4::FltKatrinEventFIFOStatus*)srack->theFlt[col]->eventFIFOStatus;//TODO: typing error in fdhwlib - remove cast after correction -tb-
-                //fifoStatus = srack->theFlt[col]->eventFIFOStatus->read();//reads to cache
-                fifoStatus = eventFIFOStatus->read();//reads to cache
-                //uint32_t fifoEmptyFlag = (fifoStatus>>28)&1;//srack->theFlt[col]->eventFIFOStatus->emptyFlag->getCache();
-                uint32_t fifoEmptyFlag = eventFIFOStatus->emptyFlag->getCache();
-                uint32_t fifoAlmostFull = eventFIFOStatus->almostFullFlag->getCache();
-                if(!fifoEmptyFlag){
-                    
-                    //should be something in the fifo, check the read/write pointers and read and package up to 10 events.
-                    //uint32_t writeptr = fifoStatus & 0x3ff;      //srack->theFlt[col]->eventFIFOStatus->writePointer->getCache();
-                    //uint32_t readptr = (fifoStatus >>16) & 0x3ff;//srack->theFlt[col]->eventFIFOStatus->readPointer->getCache();
-                    uint32_t writeptr = eventFIFOStatus->writePointer->getCache();
-                    uint32_t readptr  = eventFIFOStatus->readPointer->getCache();
-                    uint32_t diff = (writeptr-readptr+1024) % 512;
-					fifoFlags = (eventFIFOStatus->fullFlag->getCache()			<< 3) |
-								(eventFIFOStatus->almostFullFlag->getCache()	<< 2) |
-								(eventFIFOStatus->almostEmptyFlag->getCache()	<< 1) |
-								(eventFIFOStatus->emptyFlag->getCache());
-                    
-                    //depending on 'diff' the loop should start here -tb-
-                    
-                    if(diff>0){
-                        hw4::FltKatrinEventFIFO1 *eventFIFO1 = srack->theFlt[col]->eventFIFO1;
-                        hw4::FltKatrinEventFIFO2 *eventFIFO2 = srack->theFlt[col]->eventFIFO2;
-                        eventFIFO1->read();
-                        eventFIFO2->read();
-                        //uint32_t chmap = f1 >> 8;
-                        uint32_t chmap = eventFIFO1->channelMap->getCache();
-                        uint32_t evsec      = (eventFIFO1->sec12downto5->getCache()<<5) | (eventFIFO2->sec4downto0->getCache());//( (f1 & 0xff) <<5 )  |  (f2 >>27);  //13 bit
-                        uint32_t evsubsec   = eventFIFO2->subSec->getCache();//(f2 >> 2) & 0x1ffffff; // 25 bit
-                        uint32_t adcoffset  = evsubsec & 0x7ff; // cut 11 ls bits (equal to % 2048)                                //evsubsec   = srack->theSlt->subSecCounter->read();
-                                //evsec      = srack->theSlt->secCounter->read();
-                        uint32_t precision  = eventFIFO2->timePrecision->getCache();
-                        uint32_t sltsubsec;
-                        uint32_t sltsec;
-                        int32_t timediff2slt;
-                        uint32_t eventchan, eventchanmask;
-                        for(eventchan=0;eventchan<kNumChan;eventchan++){
-                            eventchanmask = (0x1L << eventchan);
-                            if((chmap & eventchanmask) && (triggerEnabledMask & eventchanmask)){
-                                uint32_t f3            = srack->theFlt[col]->eventFIFO3->read(eventchan);
-                                uint32_t f4            = srack->theFlt[col]->eventFIFO4->read(eventchan);
-                                uint32_t pagenr        = f3 & 0x3f;
-                                uint32_t energy        = f4 ;
-                                //fprintf(stdout,"  -->EVENT FLT %2i, chan %2i: page %i\n",col,eventchan,pagenr);fflush(stdout);
-                                uint32_t eventFlags=0;//append page, append next page
-                                uint32_t wfRecordVersion=0;//length: 4 bit (0..15) 0x1=raw trace, full length
-                                uint32_t traceStart16;//start of trace in short array
-                                
-                                //wfRecordVersion = 0x1 ;//0x1=raw trace, full length, search within 4 time slots for trigger
-                                wfRecordVersion = 0x2 ;//0x2=always take adcoffset+post trigger time - recommended as default -tb-
-                                //else: full trigger search (not recommended)
-								
-                                #if 0
-                                //check timing
-                                readSltSecSubsec(sltsec,sltsubsec);
-                                timediff2slt = (sltsec-evsec)*(int32_t)20000000 + ((int32_t)sltsubsec-(int32_t)evsubsec);//in 50ns units
-//fprintf(stdout,"FLT%i>%i,%i<Timediff ev2slttime is %i (sec slt %i  ev %i) (subsec slt %i  ev  %i))   \n\r",col+1,readptr,writeptr,timediff2slt,sltsec,evsec,sltsubsec,evsubsec); fflush(stdout);
-//fprintf(stdout,"-----------------------------                                  \n\r"); fflush(stdout);
-                                #endif
 
-                                uint32_t waveformLength = 2048; 
-                                static uint32_t waveformBuffer32[64*1024];
-                                static uint32_t shipWaveformBuffer32[64*1024];
-                                static uint16_t *waveformBuffer16 = (uint16_t *)(waveformBuffer32);
-                                static uint16_t *shipWaveformBuffer16 = (uint16_t *)(shipWaveformBuffer32);
-                                uint32_t searchTrig,triggerPos = 0xffffffff;
-                                int32_t appendFlagPos = -1;
-                                
-                                srack->theSlt->pageSelect->write(0x100 | pagenr);
-                                
-								//read raw trace
-                                uint32_t adccount, trigSlot;
-								trigSlot = adcoffset/2;
-								for(adccount=trigSlot; adccount<1024;adccount++){
-									shipWaveformBuffer32[adccount]= srack->theFlt[col]->ramData->read(eventchan,adccount);
-								}
-								for(adccount=0; adccount<trigSlot;adccount++){
-									shipWaveformBuffer32[adccount]= srack->theFlt[col]->ramData->read(eventchan,adccount);
-								}
-								/* old version; 2010-10-gap-in-trace-bug: PMC was reading too fast, so data was read faster than FLT could write -tb-
-								for(adccount=0; adccount<1024;adccount++){
-									shipWaveformBuffer32[adccount]= srack->theFlt[col]->ramData->read(eventchan,adccount);
-								}*/
-                                if(wfRecordVersion == 0x2){
-                                    traceStart16 = (adcoffset + postTriggerTime + 1) % 2048;
-								}
-                                else if(wfRecordVersion == 0x1){
-                                     //search trigger flag (usually in the same or adcoffset+2 bin 2009-12-15)
-                                    searchTrig=adcoffset; //+2;
-                                    searchTrig = searchTrig & 0x7ff;
-                                    if(shipWaveformBuffer16[searchTrig] & 0x08000) triggerPos = searchTrig;
-                                    searchTrig = (searchTrig+1) & 0x7ff;
-                                    if(shipWaveformBuffer16[searchTrig] & 0x08000) triggerPos = searchTrig;
-                                    searchTrig = (searchTrig+1) & 0x7ff;
-                                    if(shipWaveformBuffer16[searchTrig] & 0x08000) triggerPos = searchTrig;
-                                    searchTrig = (searchTrig+1) & 0x7ff;
-                                    if(shipWaveformBuffer16[searchTrig] & 0x08000) triggerPos = searchTrig;
-                                    searchTrig = (searchTrig+1) & 0x7ff;
-                                    if(shipWaveformBuffer16[searchTrig] & 0x08000) triggerPos = searchTrig;
-                                    //printf("FLT%i: FOund triggerPos %i , diff> %i<  (adcoffset was %i, searchtrig %i)\n",col+1,triggerPos,triggerPos-adcoffset, adcoffset,searchTrig);
-									//printf("FLT%i: FOund triggerPos %i , diff> %i<  \n",col+1,triggerPos,triggerPos-adcoffset);fflush(stdout);
-                                    //uint32_t copyindex = (adcoffset + postTriggerTime) % 2048;
-#if 0  //TODO: testcode - I will remove it later -tb-
-             fprintf(stdout,"triggerPos is %x (%i)  (last search pos %i)\n",triggerPos,triggerPos,searchTrig);fflush(stdout);
-             fprintf(stdout,"srack->theFlt[col]->postTrigTime->read() %x \n",srack->theFlt[col]->postTrigTime->read());fflush(stdout);
-           if(srack->theFlt[col]->postTrigTime->read() == 0x12c){
-           for(adccount=0; adccount<2*1024;adccount++){
-                   uint16_t adcval = shipWaveformBuffer16[adccount] & 0xffff;
-                        if(adcval & 0xf000){
-                         fprintf(stdout,"adcval[%i] has flags %x \n",adccount,adcval);fflush(stdout);
-                        }
-           }
-           }
-#endif
-                                    traceStart16 = (triggerPos + postTriggerTime ) % 2048;
-                                }
-                                else {
-                                    //search trigger pos
-                                    for(adccount=0; adccount<1024;adccount++){
-                                        uint32_t adcval = waveformBuffer32[adccount];
-                                        #if 1
-                                        uint32_t adcval1 = adcval & 0xffff;
-                                        uint32_t adcval2 = (adcval >> 16) & 0xffff;
-                                        if(adcval1 & 0x8000) triggerPos = adccount*2;
-                                        if(adcval2 & 0x8000) triggerPos = adccount*2+1;
-                                        if(adcval1 & 0x2000) appendFlagPos = adccount*2;
-                                        if(adcval2 & 0x2000) appendFlagPos = adccount*2+1;
-                                        #endif
-                                    }
-                                    //printf("FLT%i:triggerPos %i\n",col+1, triggerPos);
-                                    //set append page flag
-                                    if(appendFlagPos>=0) eventFlags |= 0x20;
-                                    //uint32_t copyindex = (triggerPos + 1024) % 2048; //<- this aligns the trigger in the middle (from Mark)
-                                    //uint32_t copyindex = (triggerPos + postTriggerTime) % 2048 ;// this was the workaround without time info -tb-
-                                    traceStart16 = (adcoffset + postTriggerTime) % 2048 ;
-								}
-                                
-                                //ship data record
-                                ensureDataCanHold(9 + waveformLength/2); 
-                                data[dataIndex++] = waveformId | (9 + waveformLength/2);    
-                                //printf("FLT%i: waveformId is %i  loc+ev.chan %i\n",col+1,waveformId,  location | eventchan<<8);
-                                data[dataIndex++] = location | eventchan<<8;
-                                data[dataIndex++] = evsec;        //sec
-                                data[dataIndex++] = evsubsec;     //subsec
-                                data[dataIndex++] = chmap;
-                                data[dataIndex++] = (readptr & 0x3ff) | ((pagenr & 0x3f)<<10) | ((precision & 0x3)<<16)  | ((fifoFlags & 0xf)<<20) | ((fltRunMode & 0xf)<<24);        //event flags: event ID=read ptr (10 bit); pagenr (6 bit);; fifoFlags (4 bit);flt mode (4 bit)
-                                data[dataIndex++] = energy;
-                                data[dataIndex++] = ((traceStart16 & 0x7ff)<<8) | eventFlags | (wfRecordVersion & 0xf);
-                                //data[dataIndex++] = 0;    //spare to remain byte compatible with the v3 record
-                                data[dataIndex++] = postTriggerTime /*for debugging -tb-*/   ;    //spare to remain byte compatible with the v3 record
-                                
-                                //TODO: SHIP TRIGGER POS and POSTTRIGG time !!! -tb-
-                                
-                                //ship waveform
-                                uint32_t waveformLength32=waveformLength/2; //the waveform length is variable    
-                                for(uint32_t i=0;i<waveformLength32;i++){
-                                    data[dataIndex++] = shipWaveformBuffer32[i];
-                                }
-                                
-                            }
-                        }
-                    }
-                }//if(!fifoEmptyFlag)...
-                else break;//fifo is empty, leave loop ...
-            }//for(eventN=0; ...
-        }
-        // --- HISTOGRAM MODE ------------------------------
-        else if(fltRunMode == kIpeFltV4Katrin_Histo_Mode) {    //then fltRunMode == kIpeFltV4Katrin_Histo_Mode
-                // buffer some data:
-                hw4::FltKatrin *currentFlt = srack->theFlt[col];
-                //hw4::SltKatrin *currentSlt = srack->theSlt;
-                uint32_t pageAB,oldpageAB;
-                //uint32_t pStatus[3];
-                //fprintf(stdout,"FLT %i:runFlags %x\n",col+1, runFlags );fflush(stdout);    
-                //fprintf(stdout,"FLT %i:runFlags %x  pn 0x%x\n",col+1, runFlags,srack->theFlt[col]->histNofMeas->read() );fflush(stdout); 
-                //sleep(1);   
-                if(runFlags & kFirstTimeFlag){// firstTime   
-                    //make some plausability checks
-                    currentFlt->histogramSettings->read();//read to cache
-                    if(currentFlt->histogramSettings->histModeStopUncleared->getCache() ||
-                       currentFlt->histogramSettings->histClearModeManual->getCache()){
-                        fprintf(stdout,"ORFLTv4Readout.cc: WARNING: histogram readout is designed for continous and auto-clear mode only! Change your FLTv4 settings!\n");
-                        fflush(stdout);
-                    }
-                    //store some static data which is constant during run
-                    histoBinWidth       = currentFlt->histogramSettings->histEBin->getCache();
-                    histoEnergyOffset   = currentFlt->histogramSettings->histEMin->getCache();
-                    histoRefreshTime    = currentFlt->histMeasTime->read();
-					histoShipSumHistogram = runFlags & kShipSumHistogramFlag;
-
-					//clear the buffers for the sum histogram
-					ClearSumHistogramBuffer();
-				
-					//set page manager to automatic mode
-					//srack->theSlt->pageSelect->write(0x100 | 3); //TODO: this flips the two parts of the histogram - FPGA bug? -tb-
-					srack->theSlt->pageSelect->write((long unsigned int)0x0);
-                    //reset histogram time counters (=histRecTime=refresh time -tb-) //TODO: unfortunately there is no such command for the histogramming -tb- 2010-07-28
-                    //TODO: srack->theFlt[col]->command->resetPointers->write(1);
-                    //clear histogram (probably not really necessary with "automatic clear" -tb-) 
-                    srack->theFlt[col]->command->resetPages->write(1);
-                    //init page AB flag
-                    pageAB = srack->theFlt[col]->status->histPageAB->read();
-                    GetDeviceSpecificData()[3]=pageAB;// runFlags is GetDeviceSpecificData()[3], so this clears the 'first time' flag -tb-
-					//TODO: better use a local static variable and init it the first time, as changing GetDeviceSpecificData()[3] could be dangerous -tb-
-                    //debug: fprintf(stdout,"FLT %i: first cycle\n",col+1);fflush(stdout);
-                    //debug: //sleep(1);
-                }
-                else{//check timing
-                    //pagenr=srack->theFlt[col]->histNofMeas->read() & 0x3f;
-                    //srack->theFlt[col]->periphStatus->readBlock((long unsigned int*)pStatus);//TODO: fdhwlib will change to uint32_t in the future -tb-
-                    //pageAB = (pStatus[0] & 0x10) >> 4;
-                    oldpageAB = GetDeviceSpecificData()[3]; //
-                    //pageAB = (srack->theFlt[col]->periphStatus->read(0) & 0x10) >> 4;
-                    //pageAB = srack->theFlt[col]->periphStatus->histPageAB->read(0);
-                    pageAB = srack->theFlt[col]->status->histPageAB->read();
-                    //fprintf(stdout,"FLT %i: oldpage  %i currpagenr %i\n",col+1, oldpagenr, pagenr  );fflush(stdout);  
-                    //              sleep(1);
-                    
-                    if(oldpageAB != pageAB){
-                        //debug: fprintf(stdout,"FLT %i:toggle now from %i to page %i\n",col+1, oldpageAB, pageAB  );fflush(stdout);    
-                        GetDeviceSpecificData()[3] = pageAB; 
-                        //read data
-                        uint32_t chan=0;
-                        uint32_t readoutSec;
-                        unsigned long totalLength;
-                        uint32_t last,first;
-                        uint32_t fpgaHistogramID;
-                        static uint32_t shipHistogramBuffer32[2048];
-                        fpgaHistogramID     = currentFlt->histNofMeas->read();
-                        // CHANNEL LOOP ----------------
-                        for(chan=0;chan<kNumChan;chan++) {//read out histogram
-                            if( !(triggerEnabledMask & (0x1L << chan)) ) continue; //skip channels with disabled trigger
-                            currentFlt->histLastFirst->read(chan);//read to cache ...
-                            //last = (lastFirst >>16) & 0xffff;
-                            //first = lastFirst & 0xffff;
-                            last  = currentFlt->histLastFirst->histLastEntry->getCache(chan);
-                            first = currentFlt->histLastFirst->histFirstEntry->getCache(chan);
-                            //debug: fprintf(stdout,"FLT %i: ch %i:first %i, last %i \n",col+1,chan,first,last);fflush(stdout);
-                            
-                            #if 1  //READ OUT HISTOGRAM -tb- -------------
-							{
-								//read sec
-								readoutSec=currentFlt->secondCounter->read();
-                                //prepare data record
-                                katrinV4HistogramDataStruct theEventData;
-                                theEventData.readoutSec = readoutSec;
-                                theEventData.refreshTimeSec =  histoRefreshTime;//histoRunTime;   
-								
-								//read out histogram
-								if(last<first){
-									//no events, write out empty histogram -tb-
-									theEventData.firstBin  = 2047;//histogramDataFirstBin[chan];//read in readHistogramDataForChan ... [self readFirstBinForChan: chan];
-									theEventData.lastBin   = 0;//histogramDataLastBin[chan]; //                "                ... [self readLastBinForChan:  chan];
-									theEventData.histogramLength =0;
-								}
-								else{
-									//read histogram block
-									srack->theFlt[col]->histogramData->readBlockAutoInc(chan,  (long unsigned int*)shipHistogramBuffer32, 0, 2048);
-									theEventData.firstBin  = 0;//histogramDataFirstBin[chan];//read in readHistogramDataForChan ... [self readFirstBinForChan: chan];
-									theEventData.lastBin   = 2047;//histogramDataLastBin[chan]; //                "                ... [self readLastBinForChan:  chan];
-									theEventData.histogramLength =2048;
-								}
-							
-                                //theEventData.histogramLength = theEventData.lastBin - theEventData.firstBin +1;
-                                //if(theEventData.histogramLength < 0){// we had no counts ...
-                                //    theEventData.histogramLength = 0;
-                                //}
-                                theEventData.maxHistogramLength = 2048; // needed here? is already in the header! yes, the decoder needs it for calibration of the plot -tb-
-                                theEventData.binSize    = histoBinWidth;        
-                                theEventData.offsetEMin = histoEnergyOffset;
-                                theEventData.histogramID    = fpgaHistogramID;
-                                theEventData.histogramInfo  = pageAB & 0x1;//one bit
-                                
-                                //ship data record
-                                totalLength = 2 + (sizeof(katrinV4HistogramDataStruct)/sizeof(long)) + theEventData.histogramLength;// 2 = header + locationWord
-                                ensureDataCanHold(totalLength); 
-                                data[dataIndex++] = histogramId | totalLength;    
-                                data[dataIndex++] = location | chan<<8;
-                                int32_t checkDataIndexLength = dataIndex;
-                                data[dataIndex++] = theEventData.readoutSec;
-                                data[dataIndex++] = theEventData.refreshTimeSec;
-                                data[dataIndex++] = theEventData.firstBin;
-                                data[dataIndex++] = theEventData.lastBin;
-                                data[dataIndex++] = theEventData.histogramLength;
-                                data[dataIndex++] = theEventData.maxHistogramLength;
-                                data[dataIndex++] = theEventData.binSize;
-                                data[dataIndex++] = theEventData.offsetEMin;
-                                data[dataIndex++] = theEventData.histogramID;// don't confuse with Orca data ID 'histogramID' -tb-
-                                data[dataIndex++] = theEventData.histogramInfo;
-                                if( ((dataIndex-checkDataIndexLength)*sizeof(int32_t)) != sizeof(katrinV4HistogramDataStruct) ){ fprintf(stdout,"ORFLTv4Readout: WARNING: bad record size!\n");fflush(stdout); }  
-                                int i;
-								if(theEventData.histogramLength>0){
-									for(i=0; i<theEventData.histogramLength;i++)
-										data[dataIndex++] = shipHistogramBuffer32[i];
-								}
-								//debug: fprintf(stdout," Shipping histogram with ID %i\n",histogramID);     fflush(stdout);  
-								
-								//add histogram to sum histogram
-								if( histoShipSumHistogram & kShipSumHistogramFlag ){
-									recordingTimeSum[chan] += theEventData.refreshTimeSec;
-									if(theEventData.histogramLength>0){//don't fill in empty histograms
-										for(i=0; i<theEventData.histogramLength;i++){//TODO: need to use firstBin...lastBin for parts of histograms -tb-
-											sumHistogram[chan][i] += shipHistogramBuffer32[i];
-										}
-									}
-								}
-                            }
-                            #endif
-                            
-                        }
-                    } 
-                }
-        }
-        // --- BAD MODE ------------------------------
-        else{
-            fprintf(stdout,"ORFLTv4Readout.cc: WARNING: received unknown DAQ mode! (old FPGA conf?)\n"); fflush(stdout);
-			return true;
-        }
-
-    }
+    if(runFlags & kFirstTimeFlag){// firstTime   
+fprintf(stdout,"ORFLTv4Readout::Readout(SBC_LAM_Data* lamData): location %i, GetNextTriggerIndex()[0] %i\n",location,GetNextTriggerIndex()[0]);fflush(stdout);
+		//make some plausability checks
+		//...
+		//  is FLT present?
+	    uint32_t val;
+	    val = pbus->read(FLTVersionReg(col+1));
+	    printf("FLT %i: version 0x%08x\n",col,val);
+	    if(val!=0x1f000000 && val!=0xffffffff) isPresentFLT[col]=1;
+		else  isPresentFLT[col]=0;
+		
+		runFlags &= ~(kFirstTimeFlag);
+        GetDeviceSpecificData()[3]=runFlags;// runFlags is GetDeviceSpecificData()[3], so this clears the 'first time' flag -tb-
+		//TODO: better use a local static variable and init it the first time, as changing GetDeviceSpecificData()[3] could be dangerous -tb-
+        //debug: 
+		fprintf(stdout,"FLT #%i: first cycle\n",col+1);fflush(stdout);
+        //debug: //sleep(1);
+		return true;
 	}
+
+
 
 	//this handles FLT firmware starting from CFPGA-FPGA8 version 0x20010104-0x20010104 (both 2.1.1.4) and newer 2010-11-08  -tb-
 	// (mainly from 2.1.1.4 - 2.1.2.1 -tb-)((but both 2.1.1.4 will work, too)
 	// new in FPGA config:  FIFO redesign and new 'sync' mode -tb-
 	//===================================================================================================================
-    if(srack->theFlt[col]->isPresent()){
+    if(isPresentFLT[col]){
 		
-		static uint32_t currFlt = col;// only for better readability (started using it since EnergyTraceSync mode for HW data buffering)  -tb-
-		
-        #if 0
-        //check timing
-        //TODO: hmm, this should be done even before SLT releases inhibit ... -tb-
-        if(0 /*runFlags & kSyncFltWithSltTimerFlag*/){ //TODO: FLT sec counter has only 13 bit, so this currently makes no sense; maybe after firmware redesign ... -tb-
-            GetDeviceSpecificData()[3] &= ~(kSyncFltWithSltTimerFlag);
-            uint32_t sltsubsec;
-            uint32_t sltsec1;
-            uint32_t sltsec2;
-            uint32_t fltsec;
-            sltsubsec   = srack->theSlt->subSecCounter->read();
-            sltsec1      = srack->theSlt->secCounter->read();
-            fltsec      = srack->theFlt[col]->secondCounter->read();
-            sltsubsec   = srack->theSlt->subSecCounter->read();
-            sltsec2      = srack->theSlt->secCounter->read();
-            int i;
-            for(i=0; i<10; i++){
-                if(sltsec1==fltsec && sltsec2==fltsec) break;//to be sure that the second strobe was not between reading sltsec1 and sltsec2
-                sltsubsec   = srack->theSlt->subSecCounter->read();
-                sltsec1      = srack->theSlt->secCounter->read();
-                srack->theFlt[col]->secondCounter->write(sltsec1);
-                fltsec      = srack->theFlt[col]->secondCounter->read();
-                sltsubsec   = srack->theSlt->subSecCounter->read();
-                sltsec2      = srack->theSlt->secCounter->read();
-                //debug fprintf(stdout,"ORFLTv4Readout.cc: Syncronizing FLT %i to secCounter %li!\n",col+1,sltsec1);fflush(stdout);
-            }
-        }
-        #endif
-        #if 0 // a temporary test -tb-
-        {
-            static int once=1;
-            if(once){
-            once=0;
-            uint32_t sltsec;
-            uint32_t sltsec1;
-            uint32_t sltsec2;
-            uint32_t sltsubsec;
-            uint32_t sltsubsec1;
-            uint32_t sltsubsec2;
-            uint32_t fltsec,fltsec1;
-            sltsubsec   = srack->theSlt->subSecCounter->read();
-            sltsec1=sltsec      = srack->theSlt->secCounter->read();
-            while(sltsec1 == sltsec){
-                sltsubsec   = srack->theSlt->subSecCounter->read();
-                sltsec      = srack->theSlt->secCounter->read();
-            }
-            fltsec1=fltsec = srack->theFlt[col]->secondCounter->read();
-            fprintf(stdout,"slt strobe:slt sec %i  slt sub  %i  fltsec:  %i\n",sltsec,sltsubsec,fltsec);
-            while(fltsec1==fltsec){
-                fltsec = srack->theFlt[col]->secondCounter->read();
-            }
-                sltsubsec   = srack->theSlt->subSecCounter->read();
-                sltsec      = srack->theSlt->secCounter->read();
-            fprintf(stdout,"FLT strobe:slt sec %i  slt sub  %i  fltsec:  %i\n",sltsec,sltsubsec,fltsec);
-            fflush(stdout);
-            sleep(1);
-            }
-        }
-        #endif
+		uint32_t currFlt = col;// only for better readability  -tb-
         
         
         //READOUT MODES (energy, energy+trace, histogram)
         ////////////////////////////////////////////////////
         
         
-        // --- ENERGY MODE ------------------------------
-        if((daqRunMode == kIpeFltV4_EnergyDaqMode) || (daqRunMode == kIpeFltV4_VetoEnergyDaqMode)){  //then fltRunMode == kIpeFltV4Katrin_Run_Mode resp. kIpeFltV4Katrin_Veto_Mode
+        // --- TRIGGER EVENT MODE ------------------------------
+        if(1 || daqRunMode == kIpeFltV4_EventDaqMode){  //then fltRunMode == kIpeFltV4Katrin_Run_Mode resp. kIpeFltV4Katrin_Veto_Mode
+            uint32_t status         = pbus->read(FIFOStatusReg(currFlt+1));
+            uint32_t totalTriggerN  = pbus->read(FLTTotalTriggerNReg(currFlt+1));
+            //uint32_t status         = srack->theFlt[col]->status->read();
+
             //uint32_t status         = srack->theFlt[col]->status->read();
             uint32_t fifoStatus;// = (status >> 24) & 0xf;
             uint32_t fifoFlags;// =   FF, AF, AE, EF
             uint32_t f1, f2;
             
             //TO DO... the number of events to read could (should) be made variable <-- depending on the readptr/witeptr -tb-
-            uint32_t eventN;
-            for(eventN=0;eventN<10;eventN++){
-                hw4::FltKatrinEventFIFOStatus* eventFIFOStatus = (hw4::FltKatrinEventFIFOStatus*)srack->theFlt[col]->eventFIFOStatus;//TODO: typing error in fdhwlib - remove cast after correction -tb-
+                //hw4::FltKatrinEventFIFOStatus* eventFIFOStatus = (hw4::FltKatrinEventFIFOStatus*)srack->theFlt[col]->eventFIFOStatus;//TODO: typing error in fdhwlib - remove cast after correction -tb-
                 //fifoStatus = srack->theFlt[col]->eventFIFOStatus->read();//reads to cache
-                fifoStatus = eventFIFOStatus->read();//reads to cache
+                //fifoStatus = eventFIFOStatus->read();//reads to cache
                 //uint32_t fifoEmptyFlag = (fifoStatus>>28)&1;//srack->theFlt[col]->eventFIFOStatus->emptyFlag->getCache();
-                uint32_t fifoEmptyFlag = eventFIFOStatus->emptyFlag->getCache();
-                //not needed for now - uint32_t fifoAlmostFull = eventFIFOStatus->almostFullFlag->getCache();//TODO: then we should read more than 10 events? -tb-
-                //not needed for now - uint32_t fifoFullFlag = eventFIFOStatus->fullFlag->getCache();//TODO: then we should clear the fifo and leave? -tb-
+                //uint32_t fifoEmptyFlag = eventFIFOStatus->emptyFlag->getCache();
+                //uint32_t fifoAlmostFull = eventFIFOStatus->almostFullFlag->getCache();
+                if(totalTriggerN>0){
+                    fprintf(stdout,"totalTriggerN for FLT #%i (col %i): %i\n",currFlt+1,col+1,totalTriggerN);fflush(stdout);
 
-                if(!fifoEmptyFlag){
+					
                     //should be something in the fifo, check the read/write pointers and read and package up to 10 events.
                     //uint32_t writeptr = fifoStatus & 0x3ff;      //srack->theFlt[col]->eventFIFOStatus->writePointer->getCache();
                     //uint32_t readptr = (fifoStatus >>16) & 0x3ff;//srack->theFlt[col]->eventFIFOStatus->readPointer->getCache();
-                    uint32_t writeptr = eventFIFOStatus->writePointer->getCache();
-                    uint32_t readptr  = eventFIFOStatus->readPointer->getCache();
-                    uint32_t diff = (writeptr-readptr+1024) % 512;
-					fifoFlags = (eventFIFOStatus->fullFlag->getCache()			<< 3) |
-								(eventFIFOStatus->almostFullFlag->getCache()	<< 2) |
-								(eventFIFOStatus->almostEmptyFlag->getCache()	<< 1) |
-								(eventFIFOStatus->emptyFlag->getCache());
-								
-                    //depending on 'diff' the loop should start here -tb-
-                    
-                    if(diff>0){
-                        hw4::FltKatrinEventFIFO1 *eventFIFO1 = srack->theFlt[col]->eventFIFO1;
-                        hw4::FltKatrinEventFIFO2 *eventFIFO2 = srack->theFlt[col]->eventFIFO2;
-                        f1=eventFIFO1->read();
-                        f2=eventFIFO2->read();
-                        //uint32_t f3            = srack->theFlt[col]->eventFIFO3->read(eventchan);
-                        //uint32_t f3            = srack->theFlt[col]->eventFIFO3->read(0);//TODO: -tb-
-						uint32_t f4            = srack->theFlt[col]->eventFIFO4->read(0);//TODO: for blocking trace mode (FW 2.1.1.4 and larger) this need to be moved to the end -tb-
-                        //uint32_t chmap = f1 >> 8;
-                        uint32_t chmap = eventFIFO1->channelMap->getCache();
-                        uint32_t fifoEventID      = ((f1&0xff)<<4) | (f2>>28);//( (f1 & 0xff) <<5 )  |  (f2 >>28);  //12 bit
-                        uint32_t evsec      = f4;//( (f1 & 0xff) <<5 )  |  (f2 >>27);  //13 bit
-                        //uint32_t evsec      = (eventFIFO1->sec12downto5->getCache()<<5) | (eventFIFO2->sec4downto0->getCache());//( (f1 & 0xff) <<5 )  |  (f2 >>27);  //13 bit
-                        uint32_t evsubsec   = eventFIFO2->subSec->getCache();//(f2 >> 2) & 0x1ffffff; // 25 bit
-                                //evsubsec   = srack->theSlt->subSecCounter->read();
-                                //evsec      = srack->theSlt->secCounter->read();
-                        uint32_t precision  = eventFIFO2->timePrecision->getCache();
-                        uint32_t eventchan, eventchanmask;
-                        for(eventchan=0;eventchan<kNumChan;eventchan++){
-                            eventchanmask = (0x1L << eventchan);
-                            if((chmap & eventchanmask) && (triggerEnabledMask & eventchanmask)){
-                                //fprintf(stdout,"  -->EVENT FLT %2i, chan %2i: ",col,eventchan);fflush(stdout);
-                                uint32_t f3            = srack->theFlt[col]->eventFIFO3->read(eventchan);
-                                uint32_t pagenr        = (f3 >> 24) & 0x3f;
-                                uint32_t energy        = f3 & 0xfffff;
-                                
-                                ensureDataCanHold(7); 
-                                data[dataIndex++] = dataId | 7;    
-                                data[dataIndex++] = location | eventchan<<8;
-                                data[dataIndex++] = evsec;        //sec
-                                data[dataIndex++] = evsubsec;     //subsec
-                                data[dataIndex++] = chmap;
-                                data[dataIndex++] = (readptr & 0x3ff) | ((pagenr & 0x3f)<<10) | ((precision & 0x3)<<16)  | ((fifoFlags & 0xf)<<20) | ((fltRunMode & 0xf)<<24);        //event flags: event ID=read ptr (10 bit); pagenr (6 bit); fifoFlags (4 bit);flt mode (4 bit)
-                                //data[dataIndex++] = energy; changed 2011-06-14 to add fifoEventID -tb-
-                                data[dataIndex++] = ((fifoEventID & 0xfff) << 20) | energy;
-                            }
-                        }
-                    }
-                }//if(!fifoEmptyFlag)...
-                else break;//fifo is empty, leave ...
-            }//for(eventN=0; ...
-        }
-        // --- 'ENERGY+TRACE (SYNC)' MODE ------------------------NEW: 2011-01-tb-------
-        else if((daqRunMode == kIpeFltV4_EnergyTraceSyncDaqMode) ){  //then fltRunMode == kIpeFltV4Katrin_Run_Mode resp. kIpeFltV4Katrin_Veto_Mode
-        //TODO: else if((daqRunMode == kIpeFltV4_EnergyTraceSyncDaqMode) || (daqRunMode == kIpeFltV4_VetoEnergyTraceSyncDaqMode)){  //then fltRunMode == kIpeFltV4Katrin_Run_Mode resp. kIpeFltV4Katrin_Veto_Mode
-			// this mode ensures to read out according energy and trace (but will not catch all events at high rates)
-			#if 0
-            {//TODO: remove debugging output -tb-
-			static int firsttimeflag=0;
-			if(firsttimeflag<5){fprintf(stdout,"ORFLTv4Readout.cc:   DAQ mode kIpeFltV4_EnergyTraceSyncDaqMode!\n"); fflush(stdout);}
-			firsttimeflag++;
-			}
-			//return true;
-			#endif
-			
-            //uint32_t status         = srack->theFlt[col]->status->read();
-            uint32_t fifoStatus;// = (status >> 24) & 0xf;
-            uint32_t fifoFlags;// =   FF, AF, AE, EF
-            uint32_t f1, f2;
-            
-            //TO DO... the number of events to read could (should) be made variable <-- depending on the readptr/witeptr -tb-
-            uint32_t eventN;
-            for(eventN=0;eventN<10;eventN++){
-                hw4::FltKatrinEventFIFOStatus* eventFIFOStatus = (hw4::FltKatrinEventFIFOStatus*)srack->theFlt[col]->eventFIFOStatus;//TODO: typing error in fdhwlib - remove cast after correction -tb-
-                //fifoStatus = srack->theFlt[col]->eventFIFOStatus->read();//reads to cache
-                fifoStatus = eventFIFOStatus->read();//reads to cache
-                //uint32_t fifoEmptyFlag = (fifoStatus>>28)&1;//srack->theFlt[col]->eventFIFOStatus->emptyFlag->getCache();
-                uint32_t fifoEmptyFlag = eventFIFOStatus->emptyFlag->getCache();
-                uint32_t fifoAlmostFull = eventFIFOStatus->almostFullFlag->getCache();
-                if(!fifoEmptyFlag){
-
-                    
-                    //should be something in the fifo, check the read/write pointers and read and package up to 10 events.
-                    //uint32_t writeptr = fifoStatus & 0x3ff;      //srack->theFlt[col]->eventFIFOStatus->writePointer->getCache();
-                    //uint32_t readptr = (fifoStatus >>16) & 0x3ff;//srack->theFlt[col]->eventFIFOStatus->readPointer->getCache();
-                    uint32_t writeptr = eventFIFOStatus->writePointer->getCache();
-                    uint32_t readptr  = eventFIFOStatus->readPointer->getCache();
+                    uint32_t writeptr = 0;//eventFIFOStatus->writePointer->getCache();
+                    uint32_t readptr  = 0;//eventFIFOStatus->readPointer->getCache();
 					//{//DEBUGGING CODE
 					//	eventFIFOStatus->read();
 					//	uint32_t writeptrx = eventFIFOStatus->writePointer->getCache();
 					//	uint32_t readptrx  = eventFIFOStatus->readPointer->getCache();
 					//	fprintf(stdout,"0 - readpr:%i, writeptr:%i\n",readptrx,writeptrx);fflush(stdout);
 					//}//DEBUGGING CODE END
-                    uint32_t diff = (writeptr-readptr+1024) % 512;
-					fifoFlags = (eventFIFOStatus->fullFlag->getCache()			<< 3) |
-								(eventFIFOStatus->almostFullFlag->getCache()	<< 2) |
-								(eventFIFOStatus->almostEmptyFlag->getCache()	<< 1) |
-								(eventFIFOStatus->emptyFlag->getCache());
+					fifoFlags = (status >> 24) & 0xf;
+					//(eventFIFOStatus->fullFlag->getCache()			<< 3) |
+					//			(eventFIFOStatus->almostFullFlag->getCache()	<< 2) |
+					//			(eventFIFOStatus->almostEmptyFlag->getCache()	<< 1) |
+					//			(eventFIFOStatus->emptyFlag->getCache());
                     
                     //depending on 'diff' the loop should start here -tb-
 					//TODO: maybe checking 'diff' is not necessary any more? (I used it at the beginning due to bad fifo counter problems) -tb-  2010/11/08
                     
-                    if(diff>0){
-						//first buffer the data in the FIFO and the ADC pages ...
-                        hw4::FltKatrinEventFIFO1 *eventFIFO1 = srack->theFlt[col]->eventFIFO1;
-                        hw4::FltKatrinEventFIFO2 *eventFIFO2 = srack->theFlt[col]->eventFIFO2;
-                        FIFO1[col] =eventFIFO1->read();
-                        FIFO2[col] =eventFIFO2->read();
-                        f1 = FIFO1[col];
-                        f2 = FIFO2[col];
-						//uint32_t f3            = srack->theFlt[col]->eventFIFO3->read(eventchan);//TODO: for blocking trace mode (FW 2.1.1.4 and larger) this need to be moved to the end -tb-
-						//uint32_t f3            = srack->theFlt[col]->eventFIFO3->read(0);//TODO: for blocking trace mode (FW 2.1.1.4 and larger) this need to be moved to the end -tb-
-                        //uint32_t chmap = f1 >> 8;
-                        uint32_t chmap = eventFIFO1->channelMap->getCache();
-                        uint32_t fifoEventID      = ((f1&0xff)<<4) | (f2>>28);//( (f1 & 0xff) <<5 )  |  (f2 >>28);  //12 bit
+                        uint32_t evsec      = 0;//( (f1 & 0xff) <<5 )  |  (f2 >>27);  //13 bit
                         //uint32_t evsec      = (eventFIFO1->sec12downto5->getCache()<<5) | (eventFIFO2->sec4downto0->getCache());//( (f1 & 0xff) <<5 )  |  (f2 >>27);  //13 bit
-                        uint32_t evsubsec   = eventFIFO2->subSec->getCache();//(f2 >> 2) & 0x1ffffff; // 25 bit
-                        uint32_t adcoffset  = evsubsec & 0x7ff; // cut 11 ls bits (equal to % 2048)                                //evsubsec   = srack->theSlt->subSecCounter->read();
-						uint32_t traceStart16;//start of trace in short array
-                                //if(wfRecordVersion == 0x2){ 
-                                    traceStart16 = (adcoffset + postTriggerTime + 1) % 2048;  //TODO: take this as standard from FW 2.1.1.4 on -tb-
-								//}
+                        uint32_t evsubsec   = 0;//(f2 >> 2) & 0x1ffffff; // 25 bit
+                        //uint32_t adcoffset  = evsubsec & 0x7ff; // cut 11 ls bits (equal to % 2048)                                //evsubsec   = srack->theSlt->subSecCounter->read();
                                 //evsec      = srack->theSlt->secCounter->read();
-                        uint32_t precision  = eventFIFO2->timePrecision->getCache(); //TODO: we would need this for every channel in the channel mask -> move to FIFO3!!!! -tb-   !!!!!!!!
-						
-						uint32_t wfRecordVersion=0;//length: 4 bit (0..15) 0x1=raw trace, full length
-                        //wfRecordVersion = 0x1 ;//0x1=raw trace, full length, search within 4 time slots for trigger - OBSOLETE (I think this never was used ...)
-                        wfRecordVersion = 0x2 ;//0x2=always take adcoffset+post trigger time - recommended as default -tb-
-						//TODO: I would like to store the version of the readout code <------------------------------------!!!! use new functions "generalRead/Write   -tb-
-                        //else: full trigger search (not recommended)
-
-                        uint32_t eventchan, eventchanmask;
-						//now start loop to buffer FIFO and the ADC pages ...
-                        for(eventchan=0;eventchan<kNumChan;eventchan++){
-                            eventchanmask = (0x1L << eventchan);
-                            if((chmap & eventchanmask) && (triggerEnabledMask & eventchanmask)){
-                                uint32_t f3            = srack->theFlt[col]->eventFIFO3->read(eventchan);
-								//DEBUG:// for checking the peripheral page counters (debugging) -tb-
-								//DEBUG://test page#
-                                //DEBUG:uint32_t pageN            = (srack->theFlt[col]->eventFIFO3)->Pbus::read(0x20200c>>2); 
-								//DEBUG:debugbuffer[col][eventchan] = pageN;
-								//DEBUG:
-								FIFO3[col][eventchan] = f3;
-                                uint32_t pagenr        = (f3 >> 24) & 0x3f;
-                                uint32_t energy        = f3 & 0xfffff;
-//fprintf(stdout,"col:%i, rp: %i wp: %i , chmap: %i pagenr:%i energy: %i \n\r",col+1,readptr,writeptr, chmap,pagenr, energy); fflush(stdout);
-//fprintf(stdout,"-----------------------------                                  \n\r"); fflush(stdout);
-				
-                                //static uint32_t waveformBuffer32[64*1024];
-                                //static uint32_t shipWaveformBuffer32[64*1024];
-                                //static uint16_t *waveformBuffer16 = (uint16_t *)(waveformBuffer32);
-                                //static uint16_t *shipWaveformBuffer16 = (uint16_t *)(shipWaveformBuffer32);
-                                uint32_t searchTrig,triggerPos = 0xffffffff;
-                                int32_t appendFlagPos = -1;
-                                
-                                srack->theSlt->pageSelect->write(0x100 | pagenr);
-                                
-								//read raw trace (use two loops as otherwise the FLT maybe has not yet written 'postTrigTIme' traces ... then we would read old data - see Elog XXX Florian)
-								#if 1
-                                uint32_t adccount, trigSlot;
-								trigSlot = adcoffset/2;
-								for(adccount=trigSlot; adccount<1024;adccount++){
-									adctrace32[col][eventchan][adccount]= srack->theFlt[col]->ramData->read(eventchan,adccount);
-									//shipWaveformBuffer32[adccount]= adctrace32[col][eventchan][adccount]; //TODO: not necessary any more? -tb-
-								}
-								for(adccount=0; adccount<trigSlot;adccount++){
-									adctrace32[col][eventchan][adccount]= srack->theFlt[col]->ramData->read(eventchan,adccount);
-									//shipWaveformBuffer32[adccount]= adctrace32[col][eventchan][adccount]; //TODO: not necessary any more? -tb-
-								}
-								#else
-								//DMA: readBlock
-								#pragma message Using DMA mode!
-								;
-								//srack->theFlt[col]->ramData->readBlock(eventchan,(long unsigned int*)adctrace32[col][eventchan],1024); //memcopy w/o libPCIDMA
-								//srack->theFlt[col]->ramData->readBlock(eventchan,(long unsigned int*)adctrace32[col][eventchan],1024); //DMA with libPCIDMA
-								srack->theFlt[col]->histogramData->readBlock(eventchan,(long unsigned int*)adctrace32[col][eventchan],1024); //PCI burst  w/o libPCIDMA
-								#endif
-								/* old version; 2010-10-gap-in-trace-bug: PMC was reading too fast, so data was read faster than FLT could write -tb-
-								for(adccount=0; adccount<1024;adccount++){
-									shipWaveformBuffer32[adccount]= srack->theFlt[col]->ramData->read(eventchan,adccount);
-								}*/
-							}
-						}
-						//if FIFO is full this (reading FIFO4) will release the current entry in the FIFO to allow the HW to record the next event -tb-
-						uint32_t f4            = srack->theFlt[col]->eventFIFO4->read(0);//TODO: for blocking trace mode (FW 2.1.1.4 and larger) this need to be moved to the end -tb-
-						FIFO4[col]=f4;
-						
-						//now ship the buffered data ...
-                        for(eventchan=0;eventchan<kNumChan;eventchan++){
-                            eventchanmask = (0x1L << eventchan);
-                            if((chmap & eventchanmask) && (triggerEnabledMask & eventchanmask)){
-                                uint32_t f3		= FIFO3[col][eventchan];
-                                uint32_t pagenr = (f3 >> 24) & 0x3f;
-                                uint32_t energy = f3 & 0xfffff;
-								uint32_t evsec	= FIFO4[col];//( (f1 & 0xff) <<5 )  |  (f2 >>27);  //13 bit
-       
-                                uint32_t waveformLength = 2048; 
-								uint32_t waveformLength32=waveformLength/2; //the waveform length is variable    
-								
-                                uint32_t eventFlags=0;//append page, append next page  TODO: currently not used <--------------------remove it -tb-
-
-                                //ship data record
-                                ensureDataCanHold(9 + waveformLength/2); 
-                                data[dataIndex++] = waveformId | (9 + waveformLength32);    
-                                //printf("FLT%i: waveformId is %i  loc+ev.chan %i\n",col+1,waveformId,  location | eventchan<<8);
-                                data[dataIndex++] = location | eventchan<<8;
-                                data[dataIndex++] = evsec;        //sec
-                                data[dataIndex++] = evsubsec;     //subsec
-                                data[dataIndex++] = chmap;
-                                data[dataIndex++] = (readptr & 0x3ff) | ((pagenr & 0x3f)<<10) | ((precision & 0x3)<<16)  | ((fifoFlags & 0xf)<<20) | ((fltRunMode & 0xf)<<24);        //event flags: event ID=read ptr (10 bit); pagenr (6 bit);; fifoFlags (4 bit);flt mode (4 bit)
-                                //data[dataIndex++] = energy; changed 2011-06-14 to add fifoEventID -tb-
-                                data[dataIndex++] = ((fifoEventID & 0xfff) << 20) | energy;
-                                //DEBUG:data[dataIndex++] = debugbuffer[col][eventchan];   //TODO: debug ... energy; for checking page counter I wrote out page counter instead of energy -tb-
-                                data[dataIndex++] = ((traceStart16 & 0x7ff)<<8) | eventFlags | (wfRecordVersion & 0xf);
-                                //data[dataIndex++] = ((traceStart16 & 0x7ff)<<8) |  (wfRecordVersion & 0xf);
-                                //data[dataIndex++] = 0;    //spare to remain byte compatible with the v3 record
-                                data[dataIndex++] = postTriggerTime /*for debugging -tb-*/   ;    //spare to remain byte compatible with the v3 record
-                                
-                                //TODO: SHIP TRIGGER POS and POSTTRIGG time !!! -tb-
-                                
-                                //ship waveform
-                                for(uint32_t i=0;i<waveformLength32;i++){
-                                    data[dataIndex++] = adctrace32[col][eventchan][i];
-                                }
-                                
-                            }
-                        }
-#if 0
-						//f4            = 
-{eventFIFOStatus->read();
-uint32_t writeptrx = eventFIFOStatus->writePointer->getCache();
-uint32_t readptrx  = eventFIFOStatus->readPointer->getCache();
-fprintf(stdout,"3x - readpr:%i, writeptr:%i\n",readptrx,writeptrx);fflush(stdout);
-}
-						srack->theFlt[col]->eventFIFO4->read(0);
-{eventFIFOStatus->read();
-uint32_t writeptrx = eventFIFOStatus->writePointer->getCache();
-uint32_t readptrx  = eventFIFOStatus->readPointer->getCache();
-fprintf(stdout,"4x - readpr:%i, writeptr:%i\n",readptrx,writeptrx);fflush(stdout);
-}
-#endif
-                    }
-                }//if(!fifoEmptyFlag)...
-                else break;//fifo is empty, leave loop ...
-            }//for(eventN=0; ...
-        }
-        // --- ENERGY+TRACE MODE ------------------------------
-        else if((daqRunMode == kIpeFltV4_EnergyTraceDaqMode) || (daqRunMode == kIpeFltV4_VetoEnergyTraceDaqMode)){  //then fltRunMode == kIpeFltV4Katrin_Run_Mode resp. kIpeFltV4Katrin_Veto_Mode
-            //uint32_t status         = srack->theFlt[col]->status->read();
-            uint32_t fifoStatus;// = (status >> 24) & 0xf;
-            uint32_t fifoFlags;// =   FF, AF, AE, EF
-            uint32_t f1, f2;
-            
-            //TO DO... the number of events to read could (should) be made variable <-- depending on the readptr/witeptr -tb-
-            uint32_t eventN;
-            for(eventN=0;eventN<10;eventN++){
-                hw4::FltKatrinEventFIFOStatus* eventFIFOStatus = (hw4::FltKatrinEventFIFOStatus*)srack->theFlt[col]->eventFIFOStatus;//TODO: typing error in fdhwlib - remove cast after correction -tb-
-                //fifoStatus = srack->theFlt[col]->eventFIFOStatus->read();//reads to cache
-                fifoStatus = eventFIFOStatus->read();//reads to cache
-                //uint32_t fifoEmptyFlag = (fifoStatus>>28)&1;//srack->theFlt[col]->eventFIFOStatus->emptyFlag->getCache();
-                uint32_t fifoEmptyFlag = eventFIFOStatus->emptyFlag->getCache();
-                uint32_t fifoAlmostFull = eventFIFOStatus->almostFullFlag->getCache();
-                if(!fifoEmptyFlag){
-
-                    
-                    //should be something in the fifo, check the read/write pointers and read and package up to 10 events.
-                    //uint32_t writeptr = fifoStatus & 0x3ff;      //srack->theFlt[col]->eventFIFOStatus->writePointer->getCache();
-                    //uint32_t readptr = (fifoStatus >>16) & 0x3ff;//srack->theFlt[col]->eventFIFOStatus->readPointer->getCache();
-                    uint32_t writeptr = eventFIFOStatus->writePointer->getCache();
-                    uint32_t readptr  = eventFIFOStatus->readPointer->getCache();
-					//{//DEBUGGING CODE
-					//	eventFIFOStatus->read();
-					//	uint32_t writeptrx = eventFIFOStatus->writePointer->getCache();
-					//	uint32_t readptrx  = eventFIFOStatus->readPointer->getCache();
-					//	fprintf(stdout,"0 - readpr:%i, writeptr:%i\n",readptrx,writeptrx);fflush(stdout);
-					//}//DEBUGGING CODE END
-                    uint32_t diff = (writeptr-readptr+1024) % 512;
-					fifoFlags = (eventFIFOStatus->fullFlag->getCache()			<< 3) |
-								(eventFIFOStatus->almostFullFlag->getCache()	<< 2) |
-								(eventFIFOStatus->almostEmptyFlag->getCache()	<< 1) |
-								(eventFIFOStatus->emptyFlag->getCache());
-                    
-                    //depending on 'diff' the loop should start here -tb-
-					//TODO: maybe checking 'diff' is not necessary any more? (I used it at the beginning due to bad fifo counter problems) -tb-  2010/11/08
-                    
-                    if(diff>0){
-                        hw4::FltKatrinEventFIFO1 *eventFIFO1 = srack->theFlt[col]->eventFIFO1;
-                        hw4::FltKatrinEventFIFO2 *eventFIFO2 = srack->theFlt[col]->eventFIFO2;
-                        f1=eventFIFO1->read();
-                        f2=eventFIFO2->read();
-						//uint32_t f3            = srack->theFlt[col]->eventFIFO3->read(eventchan);//TODO: for blocking trace mode (FW 2.1.1.4 and larger) this need to be moved to the end -tb-
-						//uint32_t f3            = srack->theFlt[col]->eventFIFO3->read(0);//TODO: for blocking trace mode (FW 2.1.1.4 and larger) this need to be moved to the end -tb-
-						uint32_t f4            = srack->theFlt[col]->eventFIFO4->read(0);//TODO: for blocking trace mode (FW 2.1.1.4 and larger) this need to be moved to the end -tb-
-                        //uint32_t chmap = f1 >> 8;
-                        uint32_t chmap = eventFIFO1->channelMap->getCache();
-                        uint32_t fifoEventID      = ((f1&0xff)<<4) | (f2>>28);//( (f1 & 0xff) <<5 )  |  (f2 >>28);  //12 bit
-                        uint32_t evsec      = f4;//( (f1 & 0xff) <<5 )  |  (f2 >>27);  //13 bit
-                        //uint32_t evsec      = (eventFIFO1->sec12downto5->getCache()<<5) | (eventFIFO2->sec4downto0->getCache());//( (f1 & 0xff) <<5 )  |  (f2 >>27);  //13 bit
-                        uint32_t evsubsec   = eventFIFO2->subSec->getCache();//(f2 >> 2) & 0x1ffffff; // 25 bit
-                        uint32_t adcoffset  = evsubsec & 0x7ff; // cut 11 ls bits (equal to % 2048)                                //evsubsec   = srack->theSlt->subSecCounter->read();
-                                //evsec      = srack->theSlt->secCounter->read();
-                        uint32_t precision  = eventFIFO2->timePrecision->getCache();
+                        uint32_t precision  = 0;
                         uint32_t sltsubsec;
-                        uint32_t sltsec;
                         int32_t timediff2slt;
-                        uint32_t eventchan, eventchanmask;
-                        for(eventchan=0;eventchan<kNumChan;eventchan++){
-                            eventchanmask = (0x1L << eventchan);
-                            if((chmap & eventchanmask) && (triggerEnabledMask & eventchanmask)){
-                                uint32_t f3            = srack->theFlt[col]->eventFIFO3->read(eventchan);
-                                uint32_t pagenr        = (f3 >> 24) & 0x3f;
-                                uint32_t energy        = f3 & 0xfffff;
+                        int32_t chan=0;
+                            for(chan=0;chan<6;chan++){
+                                uint32_t f3            = 0;
+                                uint32_t pagenr        = 0;
+                                uint32_t energy        = 0;
                                 //fprintf(stdout,"  -->EVENT FLT %2i, chan %2i: page %i\n",col,eventchan,pagenr);fflush(stdout);
                                 uint32_t eventFlags=0;//append page, append next page
-                                uint32_t wfRecordVersion=0;//length: 4 bit (0..15) 0x1=raw trace, full length
-                                uint32_t traceStart16;//start of trace in short array
+                                //TODO: REMOVE IT, use FW version or Orca rev. or ... ? see KATRINv4FLT !!!!!      
+								//TODO:  uint32_t wfRecordVersion=0;//length: 4 bit (0..15) 0x1=raw trace, full length
                                 
                                 //wfRecordVersion = 0x1 ;//0x1=raw trace, full length, search within 4 time slots for trigger
-                                wfRecordVersion = 0x2 ;//0x2=always take adcoffset+post trigger time - recommended as default -tb-
+						//wfRecordVersion = 0x2 ;//0x2=always take adcoffset+post trigger time - recommended as default -tb-
                                 //else: full trigger search (not recommended)
 								
-                                #if 0
-                                //check timing
-                                readSltSecSubsec(sltsec,sltsubsec);
-                                timediff2slt = (sltsec-evsec)*(int32_t)20000000 + ((int32_t)sltsubsec-(int32_t)evsubsec);//in 50ns units
-//fprintf(stdout,"FLT%i>%i,%i<Timediff ev2slttime is %i (sec slt %i  ev %i) (subsec slt %i  ev  %i))   \n\r",col+1,readptr,writeptr,timediff2slt,sltsec,evsec,sltsubsec,evsubsec); fflush(stdout);
-//fprintf(stdout,"-----------------------------                                  \n\r"); fflush(stdout);
-                                #endif
 
                                 uint32_t waveformLength = 2048; 
                                 static uint32_t waveformBuffer32[64*1024];
                                 static uint32_t shipWaveformBuffer32[64*1024];
                                 static uint16_t *waveformBuffer16 = (uint16_t *)(waveformBuffer32);
                                 static uint16_t *shipWaveformBuffer16 = (uint16_t *)(shipWaveformBuffer32);
-                                uint32_t searchTrig,triggerPos = 0xffffffff;
-                                int32_t appendFlagPos = -1;
+                                //uint32_t searchTrig,triggerPos = 0xffffffff;
+                                //int32_t appendFlagPos = 0;
                                 
-                                srack->theSlt->pageSelect->write(0x100 | pagenr);
+                                //srack->theSlt->pageSelect->write(0x100 | pagenr);
                                 
 								//read raw trace
                                 uint32_t adccount, trigSlot;
-								trigSlot = adcoffset/2;
-								for(adccount=trigSlot; adccount<1024;adccount++){
-									shipWaveformBuffer32[adccount]= srack->theFlt[col]->ramData->read(eventchan,adccount);
-								}
-								for(adccount=0; adccount<trigSlot;adccount++){
-									shipWaveformBuffer32[adccount]= srack->theFlt[col]->ramData->read(eventchan,adccount);
+								for(adccount=0; adccount<kNumV4FLTADCPageSize32;adccount++){
+								    
+                                    shipWaveformBuffer32[adccount]  = pbus->read(FLTRAMDataReg(currFlt+1,chan)+adccount);
+                    if(adccount<20){fprintf(stdout,"RAMDataReg for flt #%i, chan %i (location 0x%x,colSlot %i,crate %i):  addr 0x%08x   value:", currFlt+1,chan,location,col,crate ,FLTRAMDataReg(currFlt+1,0)+adccount);
+                                    fprintf(stdout,"     0x%08x\n", shipWaveformBuffer32[adccount]);fflush(stdout);
+						 }
+                                    //shipWaveformBuffer32[adccount]  = (adccount*2)  | ((adccount*2+1)<<16);
 								}
 								/* old version; 2010-10-gap-in-trace-bug: PMC was reading too fast, so data was read faster than FLT could write -tb-
 								for(adccount=0; adccount<1024;adccount++){
 									shipWaveformBuffer32[adccount]= srack->theFlt[col]->ramData->read(eventchan,adccount);
 								}*/
-                                if(wfRecordVersion == 0x2){
-                                    traceStart16 = (adcoffset + postTriggerTime + 1) % 2048;  //TODO: take this as standard from FW 2.1.1.4 on -tb-
-								}
-                                else if(wfRecordVersion == 0x1){
-                                     //search trigger flag (usually in the same or adcoffset+2 bin 2009-12-15)
-                                    searchTrig=adcoffset; //+2;
-                                    searchTrig = searchTrig & 0x7ff;
-                                    if(shipWaveformBuffer16[searchTrig] & 0x08000) triggerPos = searchTrig;
-                                    searchTrig = (searchTrig+1) & 0x7ff;
-                                    if(shipWaveformBuffer16[searchTrig] & 0x08000) triggerPos = searchTrig;
-                                    searchTrig = (searchTrig+1) & 0x7ff;
-                                    if(shipWaveformBuffer16[searchTrig] & 0x08000) triggerPos = searchTrig;
-                                    searchTrig = (searchTrig+1) & 0x7ff;
-                                    if(shipWaveformBuffer16[searchTrig] & 0x08000) triggerPos = searchTrig;
-                                    searchTrig = (searchTrig+1) & 0x7ff;
-                                    if(shipWaveformBuffer16[searchTrig] & 0x08000) triggerPos = searchTrig;
-                                    //printf("FLT%i: FOund triggerPos %i , diff> %i<  (adcoffset was %i, searchtrig %i)\n",col+1,triggerPos,triggerPos-adcoffset, adcoffset,searchTrig);
-									//printf("FLT%i: FOund triggerPos %i , diff> %i<  \n",col+1,triggerPos,triggerPos-adcoffset);fflush(stdout);
-                                    //uint32_t copyindex = (adcoffset + postTriggerTime) % 2048;
-#if 0  //TODO: testcode - I will remove it later -tb-
-             fprintf(stdout,"triggerPos is %x (%i)  (last search pos %i)\n",triggerPos,triggerPos,searchTrig);fflush(stdout);
-             fprintf(stdout,"srack->theFlt[col]->postTrigTime->read() %x \n",srack->theFlt[col]->postTrigTime->read());fflush(stdout);
-           if(srack->theFlt[col]->postTrigTime->read() == 0x12c){
-           for(adccount=0; adccount<2*1024;adccount++){
-                   uint16_t adcval = shipWaveformBuffer16[adccount] & 0xffff;
-                        if(adcval & 0xf000){
-                         fprintf(stdout,"adcval[%i] has flags %x \n",adccount,adcval);fflush(stdout);
-                        }
-           }
-           }
-#endif
-                                    traceStart16 = (triggerPos + postTriggerTime ) % 2048;
-                                }
-                                else {
-                                    //search trigger pos
-                                    for(adccount=0; adccount<1024;adccount++){
-                                        uint32_t adcval = waveformBuffer32[adccount];
-                                        #if 1
-                                        uint32_t adcval1 = adcval & 0xffff;
-                                        uint32_t adcval2 = (adcval >> 16) & 0xffff;
-                                        if(adcval1 & 0x8000) triggerPos = adccount*2;
-                                        if(adcval2 & 0x8000) triggerPos = adccount*2+1;
-                                        if(adcval1 & 0x2000) appendFlagPos = adccount*2;
-                                        if(adcval2 & 0x2000) appendFlagPos = adccount*2+1;
-                                        #endif
-                                    }
-                                    //printf("FLT%i:triggerPos %i\n",col+1, triggerPos);
-                                    //set append page flag
-                                    if(appendFlagPos>=0) eventFlags |= 0x20;
-                                    //uint32_t copyindex = (triggerPos + 1024) % 2048; //<- this aligns the trigger in the middle (from Mark)
-                                    //uint32_t copyindex = (triggerPos + postTriggerTime) % 2048 ;// this was the workaround without time info -tb-
-                                    traceStart16 = (adcoffset + postTriggerTime) % 2048 ;
-								}
-                                
+								
+								
+								
+								
                                 //ship data record
                                 ensureDataCanHold(9 + waveformLength/2); 
                                 data[dataIndex++] = waveformId | (9 + waveformLength/2);    
                                 //printf("FLT%i: waveformId is %i  loc+ev.chan %i\n",col+1,waveformId,  location | eventchan<<8);
-                                data[dataIndex++] = location | eventchan<<8;
-                                data[dataIndex++] = evsec;        //sec
-                                data[dataIndex++] = evsubsec;     //subsec
-                                data[dataIndex++] = chmap;
-                                data[dataIndex++] = (readptr & 0x3ff) | ((pagenr & 0x3f)<<10) | ((precision & 0x3)<<16)  | ((fifoFlags & 0xf)<<20) | ((fltRunMode & 0xf)<<24);        //event flags: event ID=read ptr (10 bit); pagenr (6 bit);; fifoFlags (4 bit);flt mode (4 bit)
+                                data[dataIndex++] = location | chan<<8;
+                                data[dataIndex++] = 2;//evsec;        //sec
+                                data[dataIndex++] = 3;//evsubsec;     //subsec
+                                data[dataIndex++] = 0;//chmap;
+                                data[dataIndex++] = 0;//(readptr & 0x3ff) | ((pagenr & 0x3f)<<10) | ((precision & 0x3)<<16)  | ((fifoFlags & 0xf)<<20) | ((fltRunMode & 0xf)<<24);        //event flags: event ID=read ptr (10 bit); pagenr (6 bit);; fifoFlags (4 bit);flt mode (4 bit)
                                 //data[dataIndex++] = energy; changed 2011-06-14 to add fifoEventID -tb-
-                                data[dataIndex++] = ((fifoEventID & 0xfff) << 20) | energy;
-                                data[dataIndex++] = ((traceStart16 & 0x7ff)<<8) | eventFlags | (wfRecordVersion & 0xf);
+                                data[dataIndex++] = 6;// ((fifoEventID & 0xfff) << 20) | energy;
+                                data[dataIndex++] = 0;// ((traceStart16 & 0x7ff)<<8) | eventFlags | (wfRecordVersion & 0xf);
                                 //data[dataIndex++] = 0;    //spare to remain byte compatible with the v3 record
-                                data[dataIndex++] = postTriggerTime /*for debugging -tb-*/   ;    //spare to remain byte compatible with the v3 record
+                                data[dataIndex++] = 1023;//postTriggerTime /*for debugging -tb-*/   ;    //spare to remain byte compatible with the v3 record
                                 
                                 //TODO: SHIP TRIGGER POS and POSTTRIGG time !!! -tb-
                                 
                                 //ship waveform
                                 uint32_t waveformLength32=waveformLength/2; //the waveform length is variable    
-                                for(uint32_t i=0;i<waveformLength32;i++){
+                                for(uint32_t i=0;i<waveformLength32;i++){//TODO: use memcopy!!!
                                     data[dataIndex++] = shipWaveformBuffer32[i];
                                 }
                                 
-                            }
-                        }
-#if 0
-						//f4            = 
-{eventFIFOStatus->read();
-uint32_t writeptrx = eventFIFOStatus->writePointer->getCache();
-uint32_t readptrx  = eventFIFOStatus->readPointer->getCache();
-fprintf(stdout,"3x - readpr:%i, writeptr:%i\n",readptrx,writeptrx);fflush(stdout);
-}
-						srack->theFlt[col]->eventFIFO4->read(0);
-{eventFIFOStatus->read();
-uint32_t writeptrx = eventFIFOStatus->writePointer->getCache();
-uint32_t readptrx  = eventFIFOStatus->readPointer->getCache();
-fprintf(stdout,"4x - readpr:%i, writeptr:%i\n",readptrx,writeptrx);fflush(stdout);
-}
-#endif
-                    }
-                }//if(!fifoEmptyFlag)...
-                else break;//fifo is empty, leave loop ...
-            }//for(eventN=0; ...
-        }
-        // --- HISTOGRAM MODE ------------------------------
-        else if(fltRunMode == kIpeFltV4Katrin_Histo_Mode) {    //then fltRunMode == kIpeFltV4Katrin_Histo_Mode
-                // buffer some data:
-                hw4::FltKatrin *currentFlt = srack->theFlt[col];
-                //hw4::SltKatrin *currentSlt = srack->theSlt;
-                uint32_t pageAB,oldpageAB;
-                //uint32_t pStatus[3];
-                //fprintf(stdout,"FLT %i:runFlags %x\n",col+1, runFlags );fflush(stdout);    
-                //fprintf(stdout,"FLT %i:runFlags %x  pn 0x%x\n",col+1, runFlags,srack->theFlt[col]->histNofMeas->read() );fflush(stdout); 
-                //sleep(1);   
-                if(runFlags & kFirstTimeFlag){// firstTime   
-                    //make some plausability checks
-                    currentFlt->histogramSettings->read();//read to cache
-                    if(currentFlt->histogramSettings->histModeStopUncleared->getCache() ||
-                       currentFlt->histogramSettings->histClearModeManual->getCache()){
-                        fprintf(stdout,"ORFLTv4Readout.cc: WARNING: histogram readout is designed for continous and auto-clear mode only! Change your FLTv4 settings!\n");
-                        fflush(stdout);
-                    }
-                    //store some static data which is constant during run
-                    histoBinWidth       = currentFlt->histogramSettings->histEBin->getCache();
-                    histoEnergyOffset   = currentFlt->histogramSettings->histEMin->getCache();
-                    histoRefreshTime    = currentFlt->histMeasTime->read();
-					histoShipSumHistogram = runFlags & kShipSumHistogramFlag;
-
-					//clear the buffers for the sum histogram
-					ClearSumHistogramBuffer();
-				
-					//set page manager to automatic mode
-					//srack->theSlt->pageSelect->write(0x100 | 3); //TODO: this flips the two parts of the histogram - FPGA bug? -tb-
-					srack->theSlt->pageSelect->write((long unsigned int)0x0);
-                    //reset histogram time counters (=histRecTime=refresh time -tb-) //TODO: unfortunately there is no such command for the histogramming -tb- 2010-07-28
-                    //TODO: srack->theFlt[col]->command->resetPointers->write(1);
-                    //clear histogram (probably not really necessary with "automatic clear" -tb-) 
-                    srack->theFlt[col]->command->resetPages->write(1);
-                    //init page AB flag
-                    pageAB = srack->theFlt[col]->status->histPageAB->read();
-                    GetDeviceSpecificData()[3]=pageAB;// runFlags is GetDeviceSpecificData()[3], so this clears the 'first time' flag -tb-
-					//TODO: better use a local static variable and init it the first time, as changing GetDeviceSpecificData()[3] could be dangerous -tb-
-                    //debug: fprintf(stdout,"FLT %i: first cycle\n",col+1);fflush(stdout);
-                    //debug: //sleep(1);
-                }
-                else{//check timing
-                    //pagenr=srack->theFlt[col]->histNofMeas->read() & 0x3f;
-                    //srack->theFlt[col]->periphStatus->readBlock((long unsigned int*)pStatus);//TODO: fdhwlib will change to uint32_t in the future -tb-
-                    //pageAB = (pStatus[0] & 0x10) >> 4;
-                    oldpageAB = GetDeviceSpecificData()[3]; //
-                    //pageAB = (srack->theFlt[col]->periphStatus->read(0) & 0x10) >> 4;
-                    //pageAB = srack->theFlt[col]->periphStatus->histPageAB->read(0);
-                    pageAB = srack->theFlt[col]->status->histPageAB->read();
-                    //fprintf(stdout,"FLT %i: oldpage  %i currpagenr %i\n",col+1, oldpagenr, pagenr  );fflush(stdout);  
-                    //              sleep(1);
-                    
-                    if(oldpageAB != pageAB){
-                        //debug: fprintf(stdout,"FLT %i:toggle now from %i to page %i\n",col+1, oldpageAB, pageAB  );fflush(stdout);    
-                        GetDeviceSpecificData()[3] = pageAB; 
-                        //read data
-                        uint32_t chan=0;
-                        uint32_t readoutSec;
-                        unsigned long totalLength;
-                        uint32_t last,first;
-                        uint32_t fpgaHistogramID;
-                        static uint32_t shipHistogramBuffer32[2048];
-                        fpgaHistogramID     = currentFlt->histNofMeas->read();
-                        // CHANNEL LOOP ----------------
-                        for(chan=0;chan<kNumChan;chan++) {//read out histogram
-                            if( !(triggerEnabledMask & (0x1L << chan)) ) continue; //skip channels with disabled trigger
-                            currentFlt->histLastFirst->read(chan);//read to cache ...
-                            //last = (lastFirst >>16) & 0xffff;
-                            //first = lastFirst & 0xffff;
-                            last  = currentFlt->histLastFirst->histLastEntry->getCache(chan);
-                            first = currentFlt->histLastFirst->histFirstEntry->getCache(chan);
-                            //debug: fprintf(stdout,"FLT %i: ch %i:first %i, last %i \n",col+1,chan,first,last);fflush(stdout);
-                            
-                            #if 1  //READ OUT HISTOGRAM -tb- -------------
-							{
-								//read sec
-								readoutSec=currentFlt->secondCounter->read();
-                                //prepare data record
-                                katrinV4HistogramDataStruct theEventData;
-                                theEventData.readoutSec = readoutSec;
-                                theEventData.refreshTimeSec =  histoRefreshTime;//histoRunTime;   
-								
-								//read out histogram
-								if(last<first){
-									//no events, write out empty histogram -tb-
-									theEventData.firstBin  = 2047;//histogramDataFirstBin[chan];//read in readHistogramDataForChan ... [self readFirstBinForChan: chan];
-									theEventData.lastBin   = 0;//histogramDataLastBin[chan]; //                "                ... [self readLastBinForChan:  chan];
-									theEventData.histogramLength =0;
-								}
-								else{
-									//read histogram block
-									srack->theFlt[col]->histogramData->readBlockAutoInc(chan,  (long unsigned int*)shipHistogramBuffer32, 0, 2048);
-									theEventData.firstBin  = 0;//histogramDataFirstBin[chan];//read in readHistogramDataForChan ... [self readFirstBinForChan: chan];
-									theEventData.lastBin   = 2047;//histogramDataLastBin[chan]; //                "                ... [self readLastBinForChan:  chan];
-									theEventData.histogramLength =2048;
-								}
-							
-                                //theEventData.histogramLength = theEventData.lastBin - theEventData.firstBin +1;
-                                //if(theEventData.histogramLength < 0){// we had no counts ...
-                                //    theEventData.histogramLength = 0;
-                                //}
-                                theEventData.maxHistogramLength = 2048; // needed here? is already in the header! yes, the decoder needs it for calibration of the plot -tb-
-                                theEventData.binSize    = histoBinWidth;        
-                                theEventData.offsetEMin = histoEnergyOffset;
-                                theEventData.histogramID    = fpgaHistogramID;
-                                theEventData.histogramInfo  = pageAB & 0x1;//one bit
-                                
-                                //ship data record
-                                totalLength = 2 + (sizeof(katrinV4HistogramDataStruct)/sizeof(long)) + theEventData.histogramLength;// 2 = header + locationWord
-                                ensureDataCanHold(totalLength); 
-                                data[dataIndex++] = histogramId | totalLength;    
-                                data[dataIndex++] = location | chan<<8;
-                                int32_t checkDataIndexLength = dataIndex;
-                                data[dataIndex++] = theEventData.readoutSec;
-                                data[dataIndex++] = theEventData.refreshTimeSec;
-                                data[dataIndex++] = theEventData.firstBin;
-                                data[dataIndex++] = theEventData.lastBin;
-                                data[dataIndex++] = theEventData.histogramLength;
-                                data[dataIndex++] = theEventData.maxHistogramLength;
-                                data[dataIndex++] = theEventData.binSize;
-                                data[dataIndex++] = theEventData.offsetEMin;
-                                data[dataIndex++] = theEventData.histogramID;// don't confuse with Orca data ID 'histogramID' -tb-
-                                data[dataIndex++] = theEventData.histogramInfo;
-                                if( ((dataIndex-checkDataIndexLength)*sizeof(int32_t)) != sizeof(katrinV4HistogramDataStruct) ){ fprintf(stdout,"ORFLTv4Readout: WARNING: bad record size!\n");fflush(stdout); }  
-                                int i;
-								if(theEventData.histogramLength>0){
-									for(i=0; i<theEventData.histogramLength;i++)
-										data[dataIndex++] = shipHistogramBuffer32[i];
-								}
-								//debug: fprintf(stdout," Shipping histogram with ID %i\n",histogramID);     fflush(stdout);  
-								
-								//add histogram to sum histogram
-								if( histoShipSumHistogram & kShipSumHistogramFlag ){
-									recordingTimeSum[chan] += theEventData.refreshTimeSec;
-									if(theEventData.histogramLength>0){//don't fill in empty histograms
-										for(i=0; i<theEventData.histogramLength;i++){//TODO: need to use firstBin...lastBin for parts of histograms -tb-
-											sumHistogram[chan][i] += shipHistogramBuffer32[i];
-										}
-									}
-								}
-                            }
-                            #endif
-                            
-                        }
-                    } 
-                }
+                            }//for(chan ...
+					pbus->write(FLTCommandReg(currFlt+1),0x10000);//reset  TotalTriggerNReg
+                }//if(totalTriggerN>0)...
+                //else break;//fifo is empty, leave loop ...
         }
         // --- BAD MODE ------------------------------
         else{

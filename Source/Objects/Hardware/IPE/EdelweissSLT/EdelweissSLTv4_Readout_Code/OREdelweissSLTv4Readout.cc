@@ -24,6 +24,8 @@ bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
     int32_t leaf_index;
     //read out the children flts that are in the readout list
     leaf_index = GetNextTriggerIndex()[0];
+    //debug fprintf(stdout,"ORSLTv4Readout::Readout(SBC_LAM_Data* lamData): leaf_index %i\n",leaf_index);fflush(stdout);
+	
     while(leaf_index >= 0) {
         leaf_index = readout_card(leaf_index,lamData);
     }
