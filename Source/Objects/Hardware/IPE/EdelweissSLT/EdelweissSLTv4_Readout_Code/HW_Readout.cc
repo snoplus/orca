@@ -96,6 +96,7 @@ extern "C" {
 #else
     //# warning MESSAGE: PMC_COMPILE_IN_SIMULATION_MODE is 0
 	#include "fdhwlib.h"
+	//already included #include "Pbus/Pbus.h"
 	#include "hw4/baseregister.h"
 	#include "katrinhw4/subrackkatrin.h"
 	#include "katrinhw4/sltkatrin.h"
@@ -141,11 +142,19 @@ void FindHardware(void)
 #else
     //TODO: check here blocking semaphores? -tb-
     srack = new hw4::SubrackKatrin((char*)name,0);
-    //TODO: changed for EW ... -tb- ... srack->checkSlot(); //check for available slots (init for isPresent(slot)); is necessary to prepare readout loop! -tb-
+    //TODO: changed for EW ... -tb- ... 
+	srack->checkSlot(); //check for available slots (init for isPresent(slot)); is necessary to prepare readout loop! -tb-
     pbus = srack->theSlt->version; //all registers inherit from Pbus, we choose "version" as it shall exist for all FPGA configurations
     if(!pbus) fprintf(stdout,"HW_Readout.cc (IPE DAQ V4): ERROR: could not connect to Pbus!\n");
+
+    //pbus test
+    std::string getStr, cmdStr;
+    cmdStr = "blockmode";
+    pbus->get(cmdStr,&getStr);
+    printf("   Pbus:: get %s: result: %s \n",cmdStr.c_str(),getStr.c_str());
+
     // test/force the C++ link to fdhwlib -tb-
-    if(0){
+    if(0){// unused, but compiled! -tb-
         printf("Try to create a BaseRegister object -tb-\n");
         fflush(stdout);
         hw4::BaseRegister *reg;
