@@ -109,7 +109,9 @@ NSString* ORSerialPortWithQueueModelPortClosedAfterTimeout	= @"ORSerialPortWithQ
 	[self setIsValid:NO];
 	[cmdQueue removeAllObjects];
 	[self setLastRequest:nil];
-	[self recoverFromTimeout];
+	if([serialPort isOpen]){
+		[self recoverFromTimeout];
+	}
 }
 
 - (void) recoverFromTimeout
@@ -131,6 +133,8 @@ NSString* ORSerialPortWithQueueModelPortClosedAfterTimeout	= @"ORSerialPortWithQ
 		[timeoutAlarm setSticky:NO];
 		[timeoutAlarm setHelpString:@"The serial port is not working. The port was closed. Acknowledging this alarm will clear it. You will need to reopen the serial port to try again."];
 		[serialPort close];
+		[cmdQueue removeAllObjects];
+		[self setLastRequest:nil];
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORSerialPortWithQueueModelPortClosedAfterTimeout object:self];		
 	}
 	[timeoutAlarm postAlarm];
