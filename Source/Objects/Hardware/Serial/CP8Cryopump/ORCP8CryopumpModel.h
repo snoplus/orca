@@ -18,17 +18,14 @@
 
 #pragma mark •••Imported Files
 #import "ORBitProcessing.h"
-#import "ORSerialPortModel.h"
+#import "ORSerialPortWithQueueModel.h"
 
 @class ORTimeRate;
-@class ORSafeQueue;
 
-@interface ORCP8CryopumpModel : ORSerialPortModel <ORBitProcessing>
+@interface ORCP8CryopumpModel : ORSerialPortWithQueueModel <ORBitProcessing>
 {
     @private
         unsigned long		dataId;
-        NSString*			lastRequest;
-        ORSafeQueue*		cmdQueue;
 	
 		float				temperature;
 		unsigned long		timeMeasured;
@@ -78,7 +75,6 @@
         BOOL                wasPowerFailure;
         BOOL                delay;
 		int					firstStageControlMethodRB;
-		BOOL				isValid;
 		NSMutableDictionary* pumpOnConstraints;
 		NSMutableDictionary* pumpOffConstraints;
 		NSMutableDictionary* purgeOpenConstraints;
@@ -91,8 +87,6 @@
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark •••Accessors
-- (BOOL)	isValid;
-- (void)	setIsValid:(BOOL)aIsValid;
 - (int)		firstStageControlMethodRB;
 - (void)	setFirstStageControlMethodRB:(int)aFirstStageControlMethodRB;
 - (NSString*) firstStageControlMethodString;
@@ -186,8 +180,6 @@
 - (void) openPort:(BOOL)state;
 - (float) temperature;
 - (unsigned long) timeMeasured;
-- (NSString*) lastRequest;
-- (void) setLastRequest:(NSString*)aRequest;
 - (NSString*) auxStatusString:(int)aChannel;
 
 #pragma mark •••Data Records
@@ -285,7 +277,6 @@
 @property (nonatomic,copy) NSString* cmd;
 @end
 
-extern NSString* ORCP8CryopumpModelIsValidChanged;
 extern NSString* ORCP8CryopumpModelFirstStageControlMethodRBChanged;
 extern NSString* ORCP8CryopumpModelSecondStageTempControlChanged;
 extern NSString* ORCP8CryopumpModelRoughingInterlockChanged;

@@ -16,16 +16,13 @@
 //for the use of this software.
 //-------------------------------------------------------------
 #pragma mark •••Imported Files
-#import "ORSerialPortModel.h"
+#import "ORSerialPortWithQueueModel.h"
 #import "ORBitProcessing.h"
 
-@class ORSafeQueue;
 
-@interface ORTM700Model : ORSerialPortModel <ORBitProcessing>
+@interface ORTM700Model : ORSerialPortWithQueueModel <ORBitProcessing>
 {
     @private
-		NSString*		lastRequest;
-		ORSafeQueue*	cmdQueue;
 		NSMutableData*	inComingData;
 		int				deviceAddress;
 		int				setRotorSpeed;
@@ -43,7 +40,6 @@
 		int				runUpTime;
 		NSString*		errorCode;
 		BOOL            delay;
-		BOOL			isValid;
 		NSMutableDictionary* pumpOffConstraints;
 }
 
@@ -81,12 +77,9 @@
 - (void) setDriveUnitOverTemp:(BOOL)aDriveUnitOverTemp;
 - (int) deviceAddress;
 - (void) setDeviceAddress:(int)aDeviceAddress;
-- (NSString*) lastRequest;
-- (void) setLastRequest:(NSString*)aCmdString;
 - (void) openPort:(BOOL)state;
 - (NSString*) auxStatusString:(int)aChannel;
 - (BOOL) isOn:(int)aChannel;
-- (BOOL) isValid;
 
 #pragma mark •••Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
@@ -126,8 +119,6 @@
 - (void) sendErrorAck;
 - (void) turnStationOn;
 - (void) turnStationOff;
-- (BOOL) isValid;
-- (void) setIsValid:(BOOL)aState;
 
 #pragma mark •••Adc Processing Protocol
 - (void) processIsStarting;
@@ -164,4 +155,3 @@ extern NSString* ORTM700TurboStateChanged;
 extern NSString* ORTM700ModelDeviceAddressChanged;
 extern NSString* ORTM700Lock;
 extern NSString* ORTM700ModelPollTimeChanged;
-extern NSString* ORTM700TurboModelIsValidChanged;

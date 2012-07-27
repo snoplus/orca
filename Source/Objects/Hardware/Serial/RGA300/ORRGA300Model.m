@@ -22,10 +22,8 @@
 #import "ORRGA300Model.h"
 #import "ORSerialPort.h"
 #import "ORSerialPortAdditions.h"
-#import "ORSafeQueue.h"
 
 #pragma mark •••External Strings
-NSString* ORRGA300ModelIsValidChanged = @"ORRGA300ModelIsValidChanged";
 NSString* ORRGA300ModelSensitivityFactorChanged		= @"ORRGA300ModelSensitivityFactorChanged";
 NSString* ORRGA300ModelScanDataChanged				= @"ORRGA300ModelScanDataChanged";
 NSString* ORRGA300ModelScanNumberChanged			= @"ORRGA300ModelScanNumberChanged";
@@ -75,8 +73,6 @@ NSString* ORRGA300ModelConstraintsChanged			= @"ORRGA300ModelConstraintsChanged"
 NSString* ORRGA300Lock								= @"ORRGA300Lock";
 
 @interface ORRGA300Model (private)
-- (ORRGA300Cmd*) lastRequest;
-- (void) setLastRequest:(ORRGA300Cmd*)aCmdString;
 - (void) send:(NSString*)aCmd withInt:(int)aValue;
 - (int) limitInt:(int)aValue min:(int)aMin max:(int)aMax;
 - (float) limitFloat:(float)aValue min:(float)aMin max:(float)aMax;
@@ -118,16 +114,12 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 - (void) setCurrentAmuIndex:(int)aValue;
 - (void) setScanData:(NSData*)aScanData;
 - (void) addTableData:(NSData*)data;
-- (void) timeout;
 @end
 
 @implementation ORRGA300Model
 - (void) dealloc
 {
     [scanData release];
-    [NSObject cancelPreviousPerformRequestsWithTarget:self];
-	[cmdQueue release];
-	[lastRequest release];
 	[inComingData release];
 	[amus release];
 	[amuTableData release];
@@ -156,16 +148,6 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 
 #pragma mark •••Accessors
 
-- (BOOL) isValid
-{
-    return isValid;
-}
-
-- (void) setIsValid:(BOOL)aIsValid
-{
-    isValid = aIsValid;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORRGA300ModelIsValidChanged object:self];
-}
 - (BOOL) filamentIsOn
 {
 	return (ionizerFilamentCurrentRB!=0);
@@ -556,6 +538,11 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 	}
 }
 
+- (void) recoverFromTimeout
+{
+	//there was a timout on the serial line, try again.
+	[self queryAll];
+}
 
 - (void) queryAll
 {
@@ -638,11 +625,11 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 {	
     if([[note userInfo] objectForKey:@"serialPort"] == serialPort){
         [self setIsValid:YES];
-		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+		[self cancelTimeout];
 		if(!inComingData)inComingData = [[NSMutableData data] retain];
 		[inComingData appendData:[[note userInfo] objectForKey:@"data"]];
-		if([lastRequest dataExpected]){
-			unsigned long expectedDataLength = [lastRequest expectedDataLength];
+		if([(ORRGA300Cmd*)lastRequest dataExpected]){
+			unsigned long expectedDataLength = [(ORRGA300Cmd*)lastRequest expectedDataLength];
 			if(currentActivity == kRGATableScan){
 				if([inComingData length] >= expectedDataLength){
 					//set data
@@ -786,27 +773,11 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 
 @implementation ORRGA300Model (private)
 
-- (void) timeout
-{
-	NSLogError(@"command timeout",@"RGA300",nil);
-	[self setIsValid:NO];
-	[cmdQueue removeAllObjects];
-	[self setLastRequest:nil];
-}
-
 - (void) setCurrentAmuIndex:(int)aValue
 {
 	currentAmuIndex = aValue;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORRGA300ModelCurrentAmuIndexChanged object:self];
 
-}
-
-- (ORRGA300Cmd*) lastRequest { return lastRequest; }
-- (void) setLastRequest:(ORRGA300Cmd*)aCmd
-{
-	[aCmd retain];
-	[lastRequest release];
-	lastRequest = aCmd;    
 }
 
 - (int) limitInt:(int)aValue min:(int)aMin max:(int)aMax
@@ -856,12 +827,12 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 
 - (void) processOneCommandFromQueue
 {
-	ORRGA300Cmd* cmdObj = [cmdQueue dequeue];
+	ORRGA300Cmd* cmdObj = [self nextCmd];
 	if(cmdObj){
 		NSString* aCmd = cmdObj.cmd;
 
 		if(cmdObj.waitForResponse) {
-			[self performSelector:@selector(timeout) withObject:nil afterDelay:3];
+			[self startTimeout:3];
 			[self setLastRequest:cmdObj];
 		}
 		else [self setLastRequest:nil];
@@ -882,14 +853,13 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 - (void) addCmdToQueue:(NSString*)aString
 {
 	if([serialPort isOpen]){
-		if(!cmdQueue) cmdQueue = [[ORSafeQueue alloc] init];
 		if(![aString hasSuffix:@"\r"])aString = [aString stringByAppendingString:@"\r"];
 		
 		ORRGA300Cmd* cmdObj = [[[ORRGA300Cmd alloc] init] autorelease];
 		cmdObj.cmd = aString;
 		[self setExpectations:cmdObj];
 		
-		[cmdQueue enqueue:cmdObj];
+		[self enqueueCmd:cmdObj];
 		if(!lastRequest){
 			[self processOneCommandFromQueue];
 		}
@@ -898,7 +868,8 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 
 - (void) processReceivedString:(NSString*)aString
 {		
-	NSString* theLastRequest = lastRequest.cmd;
+	ORRGA300Cmd* lastCmd = [self lastRequest];
+	NSString* theLastRequest = lastCmd.cmd;
 	if([theLastRequest hasPrefix:@"ID?"])       [self processIDResponse:    aString];
 	else if([theLastRequest hasPrefix:@"ER?"])	[self processStatusWord:    aString];
 	else if([theLastRequest hasPrefix:@"EC?"])	[self setRs232ErrWord:      [aString intValue]];

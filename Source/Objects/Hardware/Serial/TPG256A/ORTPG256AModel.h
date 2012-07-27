@@ -19,10 +19,9 @@
 
 #pragma mark •••Imported Files
 #import "ORAdcProcessing.h"
-#import "ORSerialPortModel.h"
+#import "ORSerialPortWithQueueModel.h"
 
 @class ORTimeRate;
-@class ORSafeQueue;
 
 #define kTPG256AMeasurementOK				0
 #define kTPG256AMeasurementUnderRange		1
@@ -34,12 +33,10 @@
 
 #define kTPG256ARecordLength				14
 
-@interface ORTPG256AModel : ORSerialPortModel <ORAdcProcessing>
+@interface ORTPG256AModel : ORSerialPortWithQueueModel <ORAdcProcessing>
 {
     @private
         unsigned long	dataId;
-		NSString*		lastRequest;
-		ORSafeQueue*	cmdQueue;
 		float		    pressure[6];
 		unsigned long	timeMeasured[6];
 		ORTimeRate*		timeRates[6];
@@ -55,7 +52,6 @@
 		float			pressureScaleValue;
 		int				portDataState;
 		int				units;
-		BOOL			isValid;
 }
 
 #pragma mark •••Initialization
@@ -65,8 +61,6 @@
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark •••Accessors
-- (BOOL) isValid;
-- (void) setIsValid:(BOOL)aIsValid;
 - (int) units;
 - (void) setUnits:(int)aUnits;
 - (int) measurementState:(int)index;
@@ -79,8 +73,6 @@
 - (void) setShipPressures:(BOOL)aShipPressures;
 - (int)  pollTime;
 - (void) setPollTime:(int)aPollTime;
-- (NSString*) lastRequest;
-- (void) setLastRequest:(NSString*)aRequest;
 - (void) openPort:(BOOL)state;
 - (float) pressure:(int)index;
 - (unsigned long) timeMeasured:(int)index;
@@ -126,7 +118,6 @@
 - (void) setProcessOutput:(int)channel value:(int)value;
 @end
 
-extern NSString* ORTPG256AModelIsValidChanged;
 extern NSString* ORTPG256AModelUnitsChanged;
 extern NSString* ORTPG256AModelLowLimitChanged;
 extern NSString* ORTPG256AModelLowAlarmChanged;

@@ -77,6 +77,12 @@
                          name:ORProXR16SSRModelUpdateAllRelaysChanged
                        object:nil];	
 
+	[notifyCenter addObserver: self
+                     selector:@selector(allRelaysChanged:)
+                         name:ORSerialPortWithQueueModelIsValidChanged
+                       object:nil];	
+	
+	
     [notifyCenter addObserver : self
                      selector : @selector(outletNameChanged:)
                          name : ORProXR16SSRModelOutletNameChanged

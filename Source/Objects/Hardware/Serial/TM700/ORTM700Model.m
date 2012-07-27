@@ -21,7 +21,6 @@
 #import "ORTM700Model.h"
 #import "ORSerialPort.h"
 #import "ORSerialPortAdditions.h"
-#import "ORSafeQueue.h"
 
 #pragma mark •••External Strings
 NSString* ORTM700ModelRunUpTimeChanged		= @"ORTM700ModelRunUpTimeChanged";
@@ -41,7 +40,6 @@ NSString* ORTM700TurboOverTempChanged		= @"ORTM700TurboOverTempChanged";
 NSString* ORTM700DriveOverTempChanged		= @"ORTM700DriveOverTempChanged";
 NSString* ORTM700ModelErrorCodeChanged		= @"ORTM700ModelErrorCodeChanged";
 NSString* ORTM700Lock						= @"ORTM700Lock";
-NSString* ORTM700TurboModelIsValidChanged	= @"ORTM700TurboModelIsValidChanged";
 NSString* ORTM700ConstraintsChanged			= @"ORTM700ConstraintsChanged";
 
 #pragma mark •••Status Parameters
@@ -67,7 +65,6 @@ NSString* ORTM700ConstraintsChanged			= @"ORTM700ConstraintsChanged";
 
 @interface ORTM700Model (private)
 - (NSString*) formatExp:(float)aFloat;
-- (void)	timeout;
 - (void)	processOneCommandFromQueue;
 - (int)		checkSum:(NSString*)aString;
 - (void)	enqueCmdString:(NSString*)aString;
@@ -92,11 +89,7 @@ NSString* ORTM700ConstraintsChanged			= @"ORTM700ConstraintsChanged";
 
 - (void) dealloc
 {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self];
-	[cmdQueue release];
-	[lastRequest release];
 	[inComingData release];
-	
 	[super dealloc];
 }
 
@@ -318,16 +311,7 @@ NSString* ORTM700ConstraintsChanged			= @"ORTM700ConstraintsChanged";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTM700ModelDeviceAddressChanged object:self];
 }
 
-- (NSString*) lastRequest
-{
-	return lastRequest;
-}
 
-- (void) setLastRequest:(NSString*)aCmdString
-{
-	[lastRequest autorelease];
-	lastRequest = [aCmdString copy];    
-}
 
 - (void) openPort:(BOOL)state
 {
@@ -363,7 +347,6 @@ NSString* ORTM700ConstraintsChanged			= @"ORTM700ConstraintsChanged";
 	[self setPollTime:		[decoder decodeIntForKey:	@"pollTime"]];
 	[self setDeviceAddress:	[decoder decodeIntForKey:	@"deviceAddress"]];
 	[[self undoManager] enableUndoRegistration];
-	cmdQueue = [[ORSafeQueue alloc] init];
 	
 	return self;
 }
@@ -486,19 +469,7 @@ NSString* ORTM700ConstraintsChanged			= @"ORTM700ConstraintsChanged";
 	else return @"?";
 }
 
-- (BOOL) isValid
-{
-	if([serialPort isOpen] && isValid) return YES;
-	else return NO;
-}
 
-- (void) setIsValid:(BOOL)aState
-{
-	if(isValid!=aState){
-		isValid = aState;
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORTM700TurboModelIsValidChanged object:self];		
-	}
-}
 
 - (BOOL) isOn:(int)aChannel
 {
@@ -610,6 +581,12 @@ NSString* ORTM700ConstraintsChanged			= @"ORTM700ConstraintsChanged";
 	}
 }
 
+- (void) recoverFromTimeout
+{
+	//there was a timout on the serial line, try again.
+	[self pollHardware];
+}
+
 - (void) decode:(int)paramNumber command:(NSString*)aCommand
 {
 	switch (paramNumber) {
@@ -696,14 +673,6 @@ NSString* ORTM700ConstraintsChanged			= @"ORTM700ConstraintsChanged";
 	return [aCommand substringWithRange:NSMakeRange(10,numChars)];
 }
 
-- (void) timeout
-{
-	NSLogError(@"command timeout",@"TM700",nil);
-	[self setIsValid:NO];
-	[self setLastRequest:nil];
-	[cmdQueue removeAllObjects];
-}
-
 - (void) clearDelay
 {
 	delay = NO;
@@ -715,17 +684,17 @@ NSString* ORTM700ConstraintsChanged			= @"ORTM700ConstraintsChanged";
 {
     if(delay) return;
 	
-	NSString* cmdString = [cmdQueue dequeue];
-	if([cmdString isEqualToString:@"++Delay"]){
-		delay = YES;
-		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(clearDelay) object:nil];
-		[self performSelector:@selector(clearDelay) withObject:nil afterDelay:.2];
-	}
-	else {
-        if(cmdString){
+	NSString* cmdString = [self nextCmd];
+	if(cmdString){
+		if([cmdString isEqualToString:@"++Delay"]){
+			delay = YES;
+			[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(clearDelay) object:nil];
+			[self performSelector:@selector(clearDelay) withObject:nil afterDelay:.2];
+		}
+		else {
             [self setLastRequest:cmdString];
             [serialPort writeDataInBackground:[cmdString dataUsingEncoding:NSASCIIStringEncoding]];
-            [self performSelector:@selector(timeout) withObject:nil afterDelay:3];
+			[self startTimeout:3];
         }
 	}
 
@@ -743,11 +712,9 @@ NSString* ORTM700ConstraintsChanged			= @"ORTM700ConstraintsChanged";
 
 - (void) enqueCmdString:(NSString*)aString
 {
-	if([serialPort isOpen]){
-		[cmdQueue enqueue:aString];
-		[cmdQueue enqueue:@"++Delay"];
-		if(!lastRequest)[self processOneCommandFromQueue];
-	}
+	[self enqueueCmd:aString];
+	[self enqueueCmd:@"++Delay"];
+	if(!lastRequest)[self processOneCommandFromQueue];
 }
 
 - (NSString*) formatExp:(float)aFloat
@@ -773,7 +740,7 @@ NSString* ORTM700ConstraintsChanged			= @"ORTM700ConstraintsChanged";
 	//double check that the device address matches.
 	int anAddress = [[aCommand substringToIndex:3] intValue];
 	if(anAddress == deviceAddress){
-        [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+		[self cancelTimeout];
 		[self setIsValid:YES];
 		int receivedParam = [[aCommand substringWithRange:NSMakeRange(5,3)] intValue];
 		[self decode:receivedParam command:aCommand];

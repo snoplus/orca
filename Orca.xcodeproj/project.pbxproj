@@ -1609,6 +1609,8 @@
 		848481E307297DDB009EDCE2 /* hrectshadow.tif in Resources */ = {isa = PBXBuildFile; fileRef = 848481E007297DDB009EDCE2 /* hrectshadow.tif */; };
 		848481E407297DDB009EDCE2 /* hrectcolormask.tif in Resources */ = {isa = PBXBuildFile; fileRef = 848481E107297DDB009EDCE2 /* hrectcolormask.tif */; };
 		8484843C072D7818009EDCE2 /* ORShaperController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8484843B072D7818009EDCE2 /* ORShaperController.h */; };
+		848604C615C2CAFC00E3A209 /* ORSerialPortWithQueueModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 848604C415C2CAFB00E3A209 /* ORSerialPortWithQueueModel.h */; };
+		848604C715C2CAFC00E3A209 /* ORSerialPortWithQueueModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 848604C515C2CAFB00E3A209 /* ORSerialPortWithQueueModel.m */; };
 		84861D2E0ACD83F300C543D7 /* L4532.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84861D280ACD83F300C543D7 /* L4532.gif */; };
 		84861D2F0ACD83F300C543D7 /* L4532.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84861D290ACD83F300C543D7 /* L4532.nib */; };
 		84861D300ACD83F300C543D7 /* ORL4532Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84861D2A0ACD83F300C543D7 /* ORL4532Controller.h */; };
@@ -4445,6 +4447,8 @@
 		848481E007297DDB009EDCE2 /* hrectshadow.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = hrectshadow.tif; path = "Source/Objects/Misc Objects/Dots/DotImages/hrectshadow.tif"; sourceTree = SOURCE_ROOT; };
 		848481E107297DDB009EDCE2 /* hrectcolormask.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = hrectcolormask.tif; path = "Source/Objects/Misc Objects/Dots/DotImages/hrectcolormask.tif"; sourceTree = SOURCE_ROOT; };
 		8484843B072D7818009EDCE2 /* ORShaperController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORShaperController.h; path = Source/Objects/Hardware/Vme/Shaper/ORShaperController.h; sourceTree = SOURCE_ROOT; };
+		848604C415C2CAFB00E3A209 /* ORSerialPortWithQueueModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSerialPortWithQueueModel.h; sourceTree = "<group>"; };
+		848604C515C2CAFB00E3A209 /* ORSerialPortWithQueueModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORSerialPortWithQueueModel.m; sourceTree = "<group>"; };
 		84861D280ACD83F300C543D7 /* L4532.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = L4532.gif; path = Source/Objects/Hardware/Camac/L4532/L4532.gif; sourceTree = SOURCE_ROOT; };
 		84861D290ACD83F300C543D7 /* L4532.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = L4532.nib; path = Source/Objects/Hardware/Camac/L4532/L4532.nib; sourceTree = SOURCE_ROOT; };
 		84861D2A0ACD83F300C543D7 /* ORL4532Controller.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORL4532Controller.h; path = Source/Objects/Hardware/Camac/L4532/ORL4532Controller.h; sourceTree = SOURCE_ROOT; };
@@ -6090,6 +6094,8 @@
 				2A943A6308A8194B00D04541 /* ORStandardEnumerator.m */,
 				84BC88ED0F9CDD5B00336DF1 /* ORSerialPortModel.h */,
 				84BC89120F9CDDAC00336DF1 /* ORSerialPortModel.m */,
+				848604C415C2CAFB00E3A209 /* ORSerialPortWithQueueModel.h */,
+				848604C515C2CAFB00E3A209 /* ORSerialPortWithQueueModel.m */,
 				84BC88DD0F9CDB5600336DF1 /* ORSerialPortController.m */,
 				84BC88DE0F9CDB5600336DF1 /* ORSerialPortController.h */,
 				84BC89C10F9CE75F00336DF1 /* SerialPortControls.nib */,
@@ -13467,6 +13473,7 @@
 				2D51C60E15B5A115000F0ACD /* OREdelweissFLTDecoder.h in Headers */,
 				2D51C61015B5A115000F0ACD /* OREdelweissFLTDefs.h in Headers */,
 				2D51C61115B5A115000F0ACD /* OREdelweissFLTModel.h in Headers */,
+				848604C615C2CAFC00E3A209 /* ORSerialPortWithQueueModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -15290,6 +15297,7 @@
 				2D51C60D15B5A115000F0ACD /* OREdelweissFLTController.m in Sources */,
 				2D51C60F15B5A115000F0ACD /* OREdelweissFLTDecoder.m in Sources */,
 				2D51C61215B5A115000F0ACD /* OREdelweissFLTModel.m in Sources */,
+				848604C715C2CAFC00E3A209 /* ORSerialPortWithQueueModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

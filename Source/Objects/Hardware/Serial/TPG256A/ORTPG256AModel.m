@@ -25,10 +25,8 @@
 #import "ORDataTypeAssigner.h"
 #import "ORDataPacket.h"
 #import "ORTimeRate.h"
-#import "ORSafeQueue.h"
 
 #pragma mark •••External Strings
-NSString* ORTPG256AModelIsValidChanged			 = @"ORTPG256AModelIsValidChanged";
 NSString* ORTPG256AModelUnitsChanged             = @"ORTPG256AModelUnitsChanged";
 NSString* ORTPG256AModelPressureScaleChanged     = @"ORTPG256AModelPressureScaleChanged";
 NSString* ORTPG256AModelShipPressuresChanged     = @"ORTPG256AModelShipPressuresChanged";
@@ -49,7 +47,6 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 #define kProcessData	2
 
 @interface ORTPG256AModel (private)
-- (void) timeout;
 - (void) processOneCommandFromQueue;
 - (void) process_response:(NSString*)theResponse;
 - (void) pollPressures;
@@ -72,10 +69,7 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 
 - (void) dealloc
 {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self];
     [buffer release];
-	[cmdQueue release];
-	[lastRequest release];
 	int i;
 	for(i=0;i<6;i++){
 		[timeRates[i] release];
@@ -143,7 +137,7 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 			else if(portDataState == kProcessData){
 				//OK, should be valid data. Process and continue with the que
 				[self process_response:buffer];
-				[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+				[self cancelTimeout];
 				[self setLastRequest:nil];			 //clear the last request
 				[self processOneCommandFromQueue];	 //do the next command in the queue
 			}
@@ -191,17 +185,6 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 
 #pragma mark •••Accessors
 
-- (BOOL) isValid
-{
-    return isValid;
-}
-
-- (void) setIsValid:(BOOL)aIsValid
-{
-    isValid = aIsValid;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORTPG256AModelIsValidChanged object:self];
-}
 - (int) units
 {
     return units;
@@ -449,8 +432,7 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 - (void) addCmdToQueue:(NSString*)aCmd
 {
     if([serialPort isOpen]){ 
-		if(!cmdQueue)cmdQueue = [[ORSafeQueue alloc] init];
-		[cmdQueue enqueue:aCmd];
+		[self enqueueCmd:aCmd];
 		if(!lastRequest){
 			[self processOneCommandFromQueue];
 		}
@@ -591,26 +573,16 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 
 @implementation ORTPG256AModel (private)
 
-
-- (void) timeout
-{
-	NSLogError(@"command timeout",@"TGP256A",nil);
-	[self setLastRequest:nil];
-    [self setIsValid:YES];
-	[cmdQueue removeAllObjects];
-	[self processOneCommandFromQueue];	 //do the next command in the queue
-}
-
 - (void) processOneCommandFromQueue
 {
-	NSString* aCmd = [cmdQueue dequeue];
+	NSString* aCmd = [self nextCmd];
 	if(aCmd){
 		if([aCmd isEqualToString:@"++ShipRecords"])[self shipPressureValues];
 		else {
 			if(![aCmd hasSuffix:@"\r\n"]) aCmd = [aCmd stringByAppendingString:@"\r\n"];
 			
 			[self setLastRequest:aCmd];
-			[self performSelector:@selector(timeout) withObject:nil afterDelay:3];
+			[self startTimeout:3];
 			//just sent a command so the first thing received should be an ACK
 			//enter that state and send the command
 			portDataState = kWaitingForACK;

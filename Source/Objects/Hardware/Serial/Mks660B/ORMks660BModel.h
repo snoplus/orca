@@ -18,17 +18,14 @@
 
 #pragma mark •••Imported Files
 #import "ORAdcProcessing.h"
-#import "ORSerialPortModel.h"
+#import "ORSerialPortWithQueueModel.h"
 
 @class ORTimeRate;
-@class ORSafeQueue;
 
-@interface ORMks660BModel : ORSerialPortModel <ORAdcProcessing>
+@interface ORMks660BModel : ORSerialPortWithQueueModel <ORAdcProcessing>
 {
     @private
         unsigned long		dataId;
-        NSString*			lastRequest;
-        ORSafeQueue*		cmdQueue;
 		float				pressure;
 		int					lowSetPoint[2];
 		int					highSetPoint[2];
@@ -51,7 +48,6 @@
 		BOOL				delay;
 		BOOL				readOnce;
 		BOOL				involvedInProcess;
-		BOOL				isValid;
 }
 
 #pragma mark •••Initialization
@@ -59,8 +55,6 @@
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark •••Accessors
-- (BOOL) isValid;
-- (void) setIsValid:(BOOL)aIsValid;
 - (BOOL) involvedInProcess;
 - (void) setInvolvedInProcess:(BOOL)aInvolvedInProcess;
 - (float) lowAlarm;
@@ -92,10 +86,6 @@
 - (int) highSetPoint:(int)index;
 - (void) setLowSetPoint:(int)index withValue:(int)aValue;
 - (void) setHighSetPoint:(int)index withValue:(int)aValue;
-
-
-- (NSString*) lastRequest;
-- (void) setLastRequest:(NSString*)aRequest;
 
 #pragma mark •••Data Records
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
@@ -157,7 +147,6 @@
 @end
 
 
-extern NSString* ORMks660BModelIsValidChanged;
 extern NSString* ORMks660BModelLowAlarmChanged;
 extern NSString* ORMks660BModelHighLimitChanged;
 extern NSString* ORMks660BModelHighAlarmChanged;

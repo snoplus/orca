@@ -26,10 +26,8 @@
 #import "ORDataTypeAssigner.h"
 #import "ORDataPacket.h"
 #import "ORTimeRate.h"
-#import "ORSafeQueue.h"
 
 #pragma mark •••External Strings
-NSString* ORCP8CryopumpModelIsValidChanged = @"ORCP8CryopumpModelIsValidChanged";
 NSString* ORCP8CryopumpModelFirstStageControlMethodRBChanged = @"ORCP8CryopumpModelFirstStageControlMethodRBChanged";
 NSString* ORCP8CryopumpModelSecondStageTempControlChanged	= @"ORCP8CryopumpModelSecondStageTempControlChanged";
 NSString* ORCP8CryopumpModelRoughingInterlockChanged		= @"ORCP8CryopumpModelRoughingInterlockChanged";
@@ -78,7 +76,6 @@ NSString* ORCP8CryopumpModelWasPowerFailireChanged          = @"ORCP8CryopumpMod
 NSString* ORCP8CryopumpModelConstraintsChanged				= @"ORCP8CryopumpModelConstraintsChanged";
 
 @interface ORCP8CryopumpModel (private)
-- (void) timeout;
 - (void) processOneCommandFromQueue;
 - (void) process_response:(NSString*)theResponse;
 - (unsigned char) checkSum:(NSString*)aCmd;
@@ -89,10 +86,7 @@ NSString* ORCP8CryopumpModelConstraintsChanged				= @"ORCP8CryopumpModelConstrai
 
 - (void) dealloc
 {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self];
     [buffer release];
-	[cmdQueue release];
-	[lastRequest release];
 	[timeRates[0] release];
 	[timeRates[1] release];
     [moduleVersion release];
@@ -123,7 +117,7 @@ NSString* ORCP8CryopumpModelConstraintsChanged				= @"ORCP8CryopumpModelConstrai
 - (void) dataReceived:(NSNotification*)note
 {
     if([[note userInfo] objectForKey:@"serialPort"] == serialPort){
-		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+		[self cancelTimeout];
         NSString* theString = [[[[NSString alloc] initWithData:[[note userInfo] objectForKey:@"data"] 
 												      encoding:NSASCIIStringEncoding] autorelease] uppercaseString];
 
@@ -173,18 +167,6 @@ NSString* ORCP8CryopumpModelConstraintsChanged				= @"ORCP8CryopumpModelConstrai
 }
 
 #pragma mark •••Accessors
-
-- (BOOL) isValid
-{
-    return isValid;
-}
-
-- (void) setIsValid:(BOOL)aIsValid
-{
-    isValid = aIsValid;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpModelIsValidChanged object:self];
-}
-
 - (int) firstStageControlMethodRB
 {
     return firstStageControlMethodRB;
@@ -747,19 +729,6 @@ NSString* ORCP8CryopumpModelConstraintsChanged				= @"ORCP8CryopumpModelConstrai
 	return timeMeasured;
 }
 
-
-- (NSString*) lastRequest
-{
-	return lastRequest;
-}
-
-- (void) setLastRequest:(NSString*)aRequest
-{
-	[lastRequest autorelease];
-	lastRequest = [aRequest copy];    
-}
-
-
 - (BOOL) acceptsGuardian: (OrcaObject *)aGuardian
 {
 	return [super acceptsGuardian:aGuardian] || [aGuardian isMemberOfClass:NSClassFromString(@"ORMJDVacuumModel")];
@@ -911,17 +880,16 @@ NSString* ORCP8CryopumpModelConstraintsChanged				= @"ORCP8CryopumpModelConstrai
 			//make sure the someone didn't add stuff that we are going to add.
 			aCmd = [aCmd stringByReplacingOccurrencesOfString:@"$" withString:@""];
 		}
-		if(!cmdQueue)cmdQueue	 = [[ORSafeQueue alloc] init];
 		ORCP8CryopumpCmd* cmdObj = [[[ORCP8CryopumpCmd alloc] init] autorelease];
 		cmdObj.cmd = [NSString stringWithFormat:@"$%@%c\r",aCmd,[self checkSum:aCmd]];
 		cmdObj.waitForResponse = waitForResponse;
 		
-		[cmdQueue enqueue:cmdObj];
+		[self enqueueCmd:cmdObj];
         
 		cmdObj = [[[ORCP8CryopumpCmd alloc] init] autorelease];
 		cmdObj.cmd = @"++Delay";
 		cmdObj.waitForResponse = NO;
-        [cmdQueue enqueue:cmdObj]; //arggg -- appears we need a delay between all commands
+        [self enqueueCmd:cmdObj]; //arggg -- appears we need a delay between all commands
 
 		if(!lastRequest){
 			[self processOneCommandFromQueue];
@@ -1088,6 +1056,12 @@ NSString* ORCP8CryopumpModelConstraintsChanged				= @"ORCP8CryopumpModelConstrai
     return dataDictionary;
 }
 
+- (void) recoverFromTimeout
+{
+	//there was a timout on the serial line, try again.
+	[self pollHardware];
+}
+
 - (void) pollHardware
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
@@ -1176,14 +1150,6 @@ NSString* ORCP8CryopumpModelConstraintsChanged				= @"ORCP8CryopumpModelConstrai
 
 @implementation ORCP8CryopumpModel (private)
 
-- (void) timeout
-{
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-	NSLogError(@"command timeout",@"CP8Cryopump",nil);
-	[self setIsValid:NO];
-	[cmdQueue removeAllObjects];
-	[self setLastRequest:nil];
-}
 
 - (void) clearDelay
 {
@@ -1195,7 +1161,7 @@ NSString* ORCP8CryopumpModelConstraintsChanged				= @"ORCP8CryopumpModelConstrai
 {
     if(delay)return;
 
-	ORCP8CryopumpCmd* cmdObj = [cmdQueue dequeue];
+	ORCP8CryopumpCmd* cmdObj = [self nextCmd];
 	if(cmdObj){
 		NSString* aCmd = cmdObj.cmd;
 		if([aCmd isEqualToString:@"++Delay"]){
@@ -1209,7 +1175,7 @@ NSString* ORCP8CryopumpModelConstraintsChanged				= @"ORCP8CryopumpModelConstrai
 		}
 		else {
 			if(cmdObj.waitForResponse) {
-				[self performSelector:@selector(timeout) withObject:nil afterDelay:3];
+				[self startTimeout:3];
 				[self setLastRequest:aCmd];
 			}
 			else [self setLastRequest:nil];

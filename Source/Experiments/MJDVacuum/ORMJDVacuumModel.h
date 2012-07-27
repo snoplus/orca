@@ -24,6 +24,7 @@
 @class ORVacuumGateValve;
 @class ORVacuumPipe;
 @class ORLabJackUE9Model;
+@class ORAlarm;
 
 //-----------------------------------
 //region definitions
@@ -111,7 +112,7 @@
 	BOOL				 involvedInProcess;
 	BOOL				 constraintCheckScheduled;
     BOOL				 detectorsBiased;
-
+	ORAlarm*			 orcaClosedCryoPumpValveAlarm;
 	NSMutableDictionary* okToBiasConstraints;
 	NSMutableDictionary* continuedBiasConstraints;
 }
@@ -154,6 +155,7 @@
 - (void) cryoPumpChanged:(NSNotification*)aNote;
 - (void) rgaChanged:(NSNotification*)aNote;
 - (void) stateChanged:(NSNotification*)aNote;
+- (void) portClosedAfterTimeout:(NSNotification*)aNote;
 
 #pragma mark ***Archival
 - (id)initWithCoder:(NSCoder*)decoder;

@@ -24,10 +24,8 @@
 #import "ORDataTypeAssigner.h"
 #import "ORDataPacket.h"
 #import "ORTimeRate.h"
-#import "ORSafeQueue.h"
 
 #pragma mark •••External Strings
-NSString* ORMks660BModelIsValidChanged		= @"ORMks660BModelIsValidChanged";
 NSString* ORMks660BModelLowAlarmChanged		= @"ORMks660BModelLowAlarmChanged";
 NSString* ORMks660BModelHighLimitChanged	= @"ORMks660BModelHighLimitChanged";
 NSString* ORMks660BModelHighAlarmChanged	= @"ORMks660BModelHighAlarmChanged";
@@ -46,7 +44,6 @@ NSString* ORMks660BInvolvedInProcessChanged = @"ORMks660BInvolvedInProcessChange
 NSString* ORMks660BLock = @"ORMks660BLock";
 
 @interface ORMks660BModel (private)
-- (void) timeout;
 - (void) processOneCommandFromQueue;
 - (void) process_response:(NSString*)theResponse;
 - (BOOL) decodeLowSetPoint:(NSString*)theResponse;
@@ -60,12 +57,8 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 
 - (void) dealloc
 {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self];
     [buffer release];
-	[cmdQueue release];
-	[lastRequest release];
 	[timeRates release];
-
 	[super dealloc];
 }
 
@@ -92,7 +85,7 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 - (void) dataReceived:(NSNotification*)note
 {
     if([[note userInfo] objectForKey:@"serialPort"] == serialPort){
-		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+		[self cancelTimeout];
         NSString* theString = [[[[NSString alloc] initWithData:[[note userInfo] objectForKey:@"data"] 
 												      encoding:NSASCIIStringEncoding] autorelease] uppercaseString];
 
@@ -139,19 +132,6 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 }
 
 #pragma mark •••Accessors
-
-- (BOOL) isValid
-{
-    return isValid;
-}
-
-- (void) setIsValid:(BOOL)aState
-{
-	if(aState != isValid){
-		isValid = aState;
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORMks660BModelIsValidChanged object:self];
-	}
-}
 - (BOOL) involvedInProcess
 {
     return involvedInProcess;
@@ -439,12 +419,11 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 - (void) addCmdToQueue:(NSString*)aCmd waitForResponse:(BOOL)waitForResponse
 {
     if([serialPort isOpen]){ 
-		if(!cmdQueue)cmdQueue = [[ORSafeQueue alloc] init];
 		ORMks660BCmd* cmdObj  = [[[ORMks660BCmd alloc] init] autorelease];
 		cmdObj.cmd = aCmd;
 		cmdObj.waitForResponse = waitForResponse;
 		
-		[cmdQueue enqueue:cmdObj];
+		[self enqueueCmd:cmdObj];
 		if(!lastRequest){
 			[self processOneCommandFromQueue];
 		}
@@ -592,6 +571,12 @@ NSString* ORMks660BLock = @"ORMks660BLock";
     return dataDictionary;
 }
 
+- (void) recoverFromTimeout
+{
+	//there was a timout on the serial line, try again.
+	[self pollHardware];
+}
+
 - (void) pollHardware
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
@@ -699,14 +684,6 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 @implementation ORMks660BModel (private)
 
 
-- (void) timeout
-{
-	NSLogError(@"command timeout",@"MKS660B",nil);
-	[self setIsValid:NO];
-	[cmdQueue removeAllObjects];
-	[self setLastRequest:nil];
-}
-
 - (void) clearDelay
 {
 	delay = NO;
@@ -717,7 +694,7 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 {
 	if(delay)return;
 	
-	ORMks660BCmd* cmdObj = [cmdQueue dequeue];
+	ORMks660BCmd* cmdObj = [self nextCmd];
 	if(cmdObj){
 		NSString* aCmd = cmdObj.cmd;
 		if([aCmd isEqualToString:@"++Delay"]){
@@ -737,7 +714,7 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 		}
 		else {
 			if(cmdObj.waitForResponse) {
-				[self performSelector:@selector(timeout) withObject:nil afterDelay:3];
+				[self startTimeout:3];
 				[self setLastRequest:aCmd];
 			}
 			else [self setLastRequest:nil];

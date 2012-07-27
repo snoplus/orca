@@ -27,6 +27,7 @@
 #import "ORTM700Model.h"
 #import "ORTPG256AModel.h"
 #import "ORCP8CryopumpModel.h"
+#import "ORAlarm.h"
 
 @interface ORMJDVacuumModel (private)
 - (void) makeParts;
@@ -96,6 +97,8 @@ NSString* ORMJDVacuumModelConstraintsChanged		= @"ORMJDVacuumModelConstraintsCha
 	[partDictionary release];
 	[adcMapArray release];
 	[valueDictionary release];
+	[orcaClosedCryoPumpValveAlarm clearAlarm];
+	[orcaClosedCryoPumpValveAlarm release];
 	[super dealloc];
 }
 
@@ -141,7 +144,7 @@ NSString* ORMJDVacuumModelConstraintsChanged		= @"ORMJDVacuumModelConstraintsCha
 
 		[notifyCenter addObserver : self
 						 selector : @selector(baratronChanged:)
-							 name : ORMks660BModelIsValidChanged
+							 name : ORSerialPortWithQueueModelIsValidChanged
 						   object : baratron];
 	}
 	
@@ -154,7 +157,7 @@ NSString* ORMJDVacuumModelConstraintsChanged		= @"ORMJDVacuumModelConstraintsCha
 		
 		[notifyCenter addObserver : self
 						 selector : @selector(turboChanged:)
-							 name : ORTM700TurboModelIsValidChanged
+							 name : ORSerialPortWithQueueModelIsValidChanged
 						   object : turbo];
 	}
 	
@@ -167,7 +170,7 @@ NSString* ORMJDVacuumModelConstraintsChanged		= @"ORMJDVacuumModelConstraintsCha
 		
 		[notifyCenter addObserver : self
 						 selector : @selector(pressureGaugeChanged:)
-							 name : ORTPG256AModelIsValidChanged
+							 name : ORSerialPortWithQueueModelIsValidChanged
 						   object : pressureGauge];
 	}
 
@@ -180,7 +183,7 @@ NSString* ORMJDVacuumModelConstraintsChanged		= @"ORMJDVacuumModelConstraintsCha
 		
 		[notifyCenter addObserver : self
 						 selector : @selector(cryoPumpChanged:)
-							 name : ORCP8CryopumpModelIsValidChanged
+							 name : ORSerialPortWithQueueModelIsValidChanged
 						   object : cryoPump];
 	}
 	
@@ -193,7 +196,7 @@ NSString* ORMJDVacuumModelConstraintsChanged		= @"ORMJDVacuumModelConstraintsCha
 		
 		[notifyCenter addObserver : self
 						 selector : @selector(rgaChanged:)
-							 name : ORRGA300ModelIsValidChanged
+							 name : ORSerialPortWithQueueModelIsValidChanged
 						   object : rga];
 	}
 	
@@ -202,6 +205,32 @@ NSString* ORMJDVacuumModelConstraintsChanged		= @"ORMJDVacuumModelConstraintsCha
                          name : ORVacuumPartChanged
 						object: self];
 	
+	[notifyCenter addObserver : self
+                     selector : @selector(portClosedAfterTimeout:)
+                         name : ORSerialPortWithQueueModelPortClosedAfterTimeout
+						object: self];
+	
+	
+	
+}
+
+- (void) portClosedAfterTimeout:(NSNotification*)aNote
+{
+	if([aNote object] && [aNote object] == [self findCryoPump]){
+		//the serial port was closed by ORCA after a timeout. Need to close the GateValve to the cryostat
+		ORVacuumGateValve* gv = [self gateValve:3];
+		if([gv isOpen]){
+			[self closeGateValve:3];
+			NSLog(@"ORCA closed the gatevalve between the cryopump and the cryostat because of a serial port timeout\n");
+			if(!orcaClosedCryoPumpValveAlarm){
+				NSString* alarmName = [NSString stringWithFormat:@"ORCA Closed %@",[gv label]];
+				orcaClosedCryoPumpValveAlarm = [[ORAlarm alloc] initWithName:alarmName severity:kHardwareAlarm];
+				[orcaClosedCryoPumpValveAlarm setHelpString:@"ORCA closed the valve because of a serial port timeout on the cryopump. Acknowledging this alarm will clear it."];
+				[orcaClosedCryoPumpValveAlarm setSticky:NO];
+			}
+			[orcaClosedCryoPumpValveAlarm postAlarm];
+		}
+	}
 }
 
 - (void) baratronChanged:(NSNotification*)aNote

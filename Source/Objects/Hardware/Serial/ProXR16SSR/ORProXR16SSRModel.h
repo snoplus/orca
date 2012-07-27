@@ -18,7 +18,7 @@
 
 #pragma mark •••Imported Files
 #import "ORBitProcessing.h"
-#import "ORSerialPortModel.h"
+#import "ORSerialPortWithQueueModel.h"
 
 #define kProXR16SSRCmdStart			0xFE
 #define kProXR16SSRRelayOff			0x2F
@@ -26,15 +26,12 @@
 #define kProXR16SSRCmdResponse		0x55
 #define kProXR16SSRAllRelayStatus	0x7C
 
-@interface ORProXR16SSRModel : ORSerialPortModel <ORBitProcessing>
+@interface ORProXR16SSRModel : ORSerialPortWithQueueModel <ORBitProcessing>
 {
 @private
-    NSData*			lastRequest;
-    NSMutableArray* cmdQueue;
 	NSMutableData*	inBuffer;
     BOOL			relayState[16]; //we will ignore the banks out of our hardware range
 	NSMutableArray* outletNames;
-	BOOL			isValid;
 }
 
 #pragma mark •••Initialization
@@ -45,7 +42,6 @@
 - (NSString*) outletName:(int)index;
 - (void) setOutlet:(int)index name:(NSString*)aName;
 - (void) setOutletNames:(NSArray*)anArray;
-- (BOOL) isValid;
 
 #pragma mark •••Main Scripting Methods
 - (NSString*) commonScriptMethods;

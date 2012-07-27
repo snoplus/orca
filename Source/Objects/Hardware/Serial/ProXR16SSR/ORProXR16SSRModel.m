@@ -29,11 +29,8 @@ NSString* ORProXR16SSRModelOutletNameChanged		= @"ORProXR16SSRModelOutletNameCha
 NSString* ORProXR16SSRLock							= @"ORProXR16SSRLock";
 
 @interface ORProXR16SSRModel (private)
-- (void) timeout;
 - (void) processOneCommandFromQueue;
 - (void) setupOutletNames;
-- (NSData*) lastRequest;
-- (void) setLastRequest:(NSData*)aRequest;
 - (void) setRelayMask:(unsigned char)mask bank:(int)aBank;
 - (void) setRelay:(int)index state:(BOOL)aState;
 @end
@@ -42,9 +39,6 @@ NSString* ORProXR16SSRLock							= @"ORProXR16SSRLock";
 
 - (void) dealloc
 {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self];
-	[cmdQueue release];
-	[lastRequest release];
     [portName release];
 	[outletNames release];
  
@@ -103,21 +97,21 @@ NSString* ORProXR16SSRLock							= @"ORProXR16SSRLock";
 		unsigned char* responseBytes = (unsigned char*)[theResponse bytes];
 		if(responseLength>=1){
 			if(responseBytes[0] == kProXR16SSRCmdResponse){
-				[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+				[self cancelTimeout];
 				[self setLastRequest:nil];			 //clear the last request
 				[self processOneCommandFromQueue];	 //do the next command in the queue
                 isValid = YES;
 			}
 			else {
-				NSUInteger lastRequestLength = [lastRequest length];
-				unsigned char* lastCmdBytes  = (unsigned char*)[lastRequest bytes];
+				NSUInteger lastRequestLength = [(NSData*)lastRequest length];
+				unsigned char* lastCmdBytes  = (unsigned char*)[(NSData*)lastRequest bytes];
 				if(lastRequestLength>=2){
 					switch(lastCmdBytes[1]){
 						case kProXR16SSRAllRelayStatus:
 							if(!inBuffer)inBuffer = [[NSMutableData data] retain];
 							[inBuffer appendData:theResponse];
 							if([inBuffer length] >=32){
-								[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+								[self cancelTimeout];
 								unsigned char* p = (unsigned char*)[inBuffer bytes];
 								int i;
                                 isValid = YES;
@@ -247,12 +241,9 @@ NSString* ORProXR16SSRLock							= @"ORProXR16SSRLock";
 #pragma mark ••• Commands
 - (void) addCmdToQueue:(NSData*)aCmd
 {
-    if([serialPort isOpen]){ 
-		if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
-		[cmdQueue addObject:aCmd];
-		if(!lastRequest) {
-			[self processOneCommandFromQueue];
-		}
+	[self enqueueCmd:aCmd];
+	if(!lastRequest) {
+		[self processOneCommandFromQueue];
 	}
 }
 
@@ -320,17 +311,6 @@ NSString* ORProXR16SSRLock							= @"ORProXR16SSRLock";
 @end
 
 @implementation ORProXR16SSRModel (private)
-- (NSData*) lastRequest
-{
-	return lastRequest;
-}
-
-- (void) setLastRequest:(NSData*)aRequest
-{
-	[aRequest retain];
-	[lastRequest release];
-	lastRequest = aRequest;    
-}
 - (void) setupOutletNames
 {
 	outletNames = [[NSMutableArray array] retain];
@@ -338,23 +318,12 @@ NSString* ORProXR16SSRLock							= @"ORProXR16SSRLock";
 	for(i=0;i<16;i++)[outletNames addObject:[NSString stringWithFormat:@"Relay %d",i]];	
 }
 
-- (void) timeout
-{
-	NSLogError(@"command timeout",@"ProXR16SSR",nil);
-	isValid = NO;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORProXR16SSRModelUpdateAllRelaysChanged object:self];
-	[self setLastRequest:nil];
-	[cmdQueue removeAllObjects];
-}
-
 - (void) processOneCommandFromQueue
 {
-    if([cmdQueue count]){
-        NSData* aCmd = [[[cmdQueue objectAtIndex:0] retain] autorelease];
-        [cmdQueue removeObjectAtIndex:0];
-        
+	NSData* aCmd = [self nextCmd];
+	if(aCmd){
         [self setLastRequest:aCmd];
-        [self performSelector:@selector(timeout) withObject:nil afterDelay:3];
+		[self startTimeout:3];
         [serialPort writeDataInBackgroundThread:aCmd];
         if(!lastRequest){
             [self performSelector:@selector(processOneCommandFromQueue) withObject:nil afterDelay:.1];

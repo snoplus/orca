@@ -19,9 +19,8 @@
 //-------------------------------------------------------------
 
 #pragma mark •••Imported Files
-#import "ORSerialPortModel.h"
+#import "ORSerialPortWithQueueModel.h"
 
-@class ORSafeQueue;
 @class ORRGA300Cmd;
 
 //Status Error Masks
@@ -76,11 +75,9 @@
 #define kRGATableMode		1
 #define kRGAHistogramMode   2
 
-@interface ORRGA300Model : ORSerialPortModel
+@interface ORRGA300Model : ORSerialPortWithQueueModel
 {
     @private
-		ORRGA300Cmd*		lastRequest;
-		ORSafeQueue*	cmdQueue;
 		NSMutableData*	inComingData;
 		int		modelNumber;
 		float	firmwareVersion;
@@ -132,7 +129,6 @@
 		NSMutableArray* amus;
 		int     currentAmuIndex;
         float   sensitivityFactor;
-		BOOL	isValid;
 		NSMutableDictionary* filamentConstraints;
 		NSMutableDictionary* cemConstraints;
 }
@@ -141,8 +137,6 @@
 - (void) dealloc;
 
 #pragma mark •••Accessors
-- (BOOL) isValid;
-- (void) setIsValid:(BOOL)aIsValid;
 - (NSString*) auxStatusString:(int)aChannel;
 - (float) sensitivityFactor;
 - (void) setSensitivityFactor:(float)aSensitivityFactor;
@@ -296,7 +290,6 @@
 @property (nonatomic,copy) NSString* cmd;
 @end
 
-extern NSString* ORRGA300ModelIsValidChanged;
 extern NSString* ORRGA300ModelSensitivityFactorChanged;
 extern NSString* ORRGA300ModelScanDataChanged;
 extern NSString* ORRGA300ModelScanNumberChanged;
