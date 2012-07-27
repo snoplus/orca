@@ -96,6 +96,17 @@ NSString* ORSerialPortWithQueueModelPortClosedAfterTimeout	= @"ORSerialPortWithQ
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
 	[self performSelector:@selector(timeout) withObject:nil afterDelay:aDelay];
 }
+- (void) openPort:(BOOL)aState
+{
+	if(!aState){
+		[self setIsValid:NO];
+		[cmdQueue removeAllObjects];
+		[self setLastRequest:nil];
+		[self clearTimeoutAlarm];
+	}
+	
+	[super openPort:aState];
+}
 
 - (void) timeout
 {
