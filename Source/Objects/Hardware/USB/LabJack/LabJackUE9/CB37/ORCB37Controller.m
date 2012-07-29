@@ -136,7 +136,7 @@
     ioSize			= NSMakeSize(300,500);
     setupSize		= NSMakeSize(700,700);
 	
-    NSString* key = [NSString stringWithFormat: @"orca.ORCB37%d.selectedtab",[model uniqueIdNumber]];
+    NSString* key = [NSString stringWithFormat: @"orca.ORCB37%lu.selectedtab",[model uniqueIdNumber]];
     int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
@@ -263,7 +263,7 @@
 	}	
 	[self resizeWindowToSize:newSize];
     [[self window] setContentView:totalView];
-    NSString* key = [NSString stringWithFormat: @"orca.ORCB37%d.selectedtab",[[model guardian] uniqueIdNumber]];
+    NSString* key = [NSString stringWithFormat: @"orca.ORCB37%lu.selectedtab",[[model guardian] uniqueIdNumber]];
     int index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
     
