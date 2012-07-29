@@ -50,7 +50,7 @@
 - (void) postStateChange
 {
 	[super postStateChange];
-	NSString* vetoName    = [NSString stringWithFormat:@"Process %d RunVeto %d",[guardian uniqueIdNumber],[self uniqueIdNumber]];
+	NSString* vetoName    = [NSString stringWithFormat:@"Process %lu RunVeto %lu",[guardian uniqueIdNumber],[self uniqueIdNumber]];
 	NSString* vetoComment = [self comment];
 	if([vetoComment length] == 0)vetoComment = @"No reason given.";
 	
@@ -89,7 +89,7 @@
         
     NSFont* theFont = [NSFont messageFontOfSize:9];
 	NSAttributedString* n = [[NSAttributedString alloc] 
-		initWithString:[NSString stringWithFormat:@"%d",[self uniqueIdNumber]] 
+		initWithString:[NSString stringWithFormat:@"%lu",[self uniqueIdNumber]] 
 			attributes:[NSDictionary dictionaryWithObject:theFont forKey:NSFontAttributeName]];
 	
 	NSSize textSize = [n size];

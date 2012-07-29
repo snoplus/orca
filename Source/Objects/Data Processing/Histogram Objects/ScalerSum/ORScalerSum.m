@@ -77,7 +77,7 @@
 	[dataLock lock];
 	unsigned long temp = scalerSum;
 	[dataLock unlock];
-    return [NSString stringWithFormat:@"%@ #runs: %d  scaler total: %d",key,[self totalCounts],temp];
+    return [NSString stringWithFormat:@"%@ #runs: %lu  scaler total: %lu",key,[self totalCounts],temp];
 }
 
 - (void) loadScalerValue:(unsigned long)newScaler

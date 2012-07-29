@@ -51,22 +51,22 @@
         ptr[2] = swapLong(ptr[2]);
     }
     
-    [dsc appendFormat:@"GTId = 0x%06x\n", (*ptr & 0x0000ffff) | ((ptr[2] << 4) & 0x000f0000) | ((ptr[2] >> 8) & 0x00f00000)];
-    [dsc appendFormat:@"CCCC: %d, %d, ", (*ptr >> 21) & 0x1fUL, (*ptr >> 26) & 0x0fUL];
-    [dsc appendFormat:@"%d, %d\n", (*ptr >> 16) & 0x1fUL, (ptr[1] >> 12) & 0x0fUL];
-    [dsc appendFormat:@"QHL = 0x%03x\n", ptr[2] & 0x0fffUL ^ 0x0800UL];
-    [dsc appendFormat:@"QHS = 0x%03x\n", (ptr[1] >> 16) & 0x0fffUL ^ 0x0800UL];
-    [dsc appendFormat:@"QLX = 0x%03x\n", ptr[1] & 0x0fffUL ^ 0x0800UL];
-    [dsc appendFormat:@"TAC = 0x%03x\n", (ptr[2] >> 16) & 0x0fffUL ^ 0x0800UL];
+    [dsc appendFormat:@"GTId = 0x%06lx\n", (*ptr & 0x0000ffff) | ((ptr[2] << 4) & 0x000f0000) | ((ptr[2] >> 8) & 0x00f00000)];
+    [dsc appendFormat:@"CCCC: %lu, %lu, ", (*ptr >> 21) & 0x1fUL, (*ptr >> 26) & 0x0fUL];
+    [dsc appendFormat:@"%lu, %lu\n", (*ptr >> 16) & 0x1fUL, (ptr[1] >> 12) & 0x0fUL];
+    [dsc appendFormat:@"QHL = 0x%03lx\n", ptr[2] & 0x0fffUL ^ 0x0800UL];
+    [dsc appendFormat:@"QHS = 0x%03lx\n", (ptr[1] >> 16) & 0x0fffUL ^ 0x0800UL];
+    [dsc appendFormat:@"QLX = 0x%03lx\n", ptr[1] & 0x0fffUL ^ 0x0800UL];
+    [dsc appendFormat:@"TAC = 0x%03lx\n", (ptr[2] >> 16) & 0x0fffUL ^ 0x0800UL];
     [dsc appendFormat:@"Sync errors CGT16: %@,\n", ((*ptr >> 30) & 0x1UL) ? @"Yes" : @"No"];
     [dsc appendFormat:@"CGT24: %@, ", ((*ptr >> 31) & 0x1UL) ? @"Yes" : @"No"];
     [dsc appendFormat:@"CMOS16: %@\n", ((ptr[1] >> 31) & 0x1UL) ? @"Yes" : @"No"];
     [dsc appendFormat:@"Missed count error: %@\n", ((ptr[1] >> 28) & 0x1UL) ? @"Yes" : @"No"];
     [dsc appendFormat:@"NC/CC: %@, ", ((ptr[1] >> 29) & 0x1UL) ? @"CC" : @"NC"];
     [dsc appendFormat:@"LGI: %@\n", ((ptr[1] >> 30) & 0x1UL) ? @"Long" : @"Short"];
-    [dsc appendFormat:@"Wrd0 = 0x%08x\n", *ptr];
-    [dsc appendFormat:@"Wrd1 = 0x%08x\n", ptr[1]];
-    [dsc appendFormat:@"Wrd2 = 0x%08x\n\n", ptr[2]];
+    [dsc appendFormat:@"Wrd0 = 0x%08lx\n", *ptr];
+    [dsc appendFormat:@"Wrd1 = 0x%08lx\n", ptr[1]];
+    [dsc appendFormat:@"Wrd2 = 0x%08lx\n\n", ptr[2]];
 
     //swap back the PMT bundle 
     if (swapBundle) {
@@ -110,7 +110,7 @@
 
     ptr += 1;
     version = ptr[0] >> 5 & 0x7;
-    [dsc appendFormat:@"packet_num: %d\ncrate_num: %d\nversion: %d\nnum_longs: %d\n",
+    [dsc appendFormat:@"packet_num: %lu\ncrate_num: %lu\nversion: %d\nnum_longs: %lu\n",
      ptr[0] >> 16, ptr[0] & 0x1f, version, length];
     ptr += 1;
 
@@ -127,7 +127,7 @@
                 ptr[0] = swapLong(ptr[0]); ptr[1] = swapLong(ptr[1]); ptr[2] = swapLong(ptr[2]);
             }
             unsigned int num_longs = ptr[0] & 0xffffff;
-            [dsc appendFormat:@"\ncrate_num: %u\nnum_longs: %u\npass_min: %u\nxl3_clock: %u\n",
+            [dsc appendFormat:@"\ncrate_num: %lu\nnum_longs: %u\npass_min: %lu\nxl3_clock: %lu\n",
              ptr[0] >> 24, num_longs, ptr[1], ptr[2]];
             if (swapBundle) {
                 ptr[0] = swapLong(ptr[0]); ptr[1] = swapLong(ptr[1]); ptr[2] = swapLong(ptr[2]);
@@ -164,7 +164,7 @@
                         if (mini_num_longs % 3 || num_longs < mini_num_longs) {
                             [dsc appendFormat:@"mini bundle header\ncorrupted, quit.\n"];
                             num_longs = 0;
-                            [dsc appendFormat:@"0x%08x\n0x%08x\n0x%08x\n0x%08x\n", ptr[0], ptr[1], ptr[2], ptr[3]];
+                            [dsc appendFormat:@"0x%08lx\n0x%08lx\n0x%08lx\n0x%08lx\n", ptr[0], ptr[1], ptr[2], ptr[3]];
                             break;
                         }
 
@@ -217,12 +217,12 @@
 
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr
 {
-    NSMutableString* dsc = [NSMutableString stringWithFormat: @"CMOS rates crate %d\n\nslot mask: 0x%x\n", dataPtr[1], dataPtr[2]];
+    NSMutableString* dsc = [NSMutableString stringWithFormat: @"CMOS rates crate %lu\n\nslot mask: 0x%lx\n", dataPtr[1], dataPtr[2]];
     unsigned char slot = 0;
     for (slot=0; slot<16; slot++) {
-        [dsc appendFormat:@"ch mask slot %2d: 0x%08x\n", slot, dataPtr[3+slot]];
+        [dsc appendFormat:@"ch mask slot %2d: 0x%08lx\n", slot, dataPtr[3+slot]];
     }
-    [dsc appendFormat:@"delay: %d ms\n\nerror flags: 0x%08x\n", dataPtr[19], dataPtr[20]];
+    [dsc appendFormat:@"delay: %lu ms\n\nerror flags: 0x%08lx\n", dataPtr[19], dataPtr[20]];
 
     unsigned char ch, slot_idx = 0;
     for (slot=0; slot<16; slot++) {
@@ -251,7 +251,7 @@
 
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr
 {
-    NSMutableString* dsc = [NSMutableString stringWithFormat: @"FIFO state crate %d\n\n", dataPtr[1]];
+    NSMutableString* dsc = [NSMutableString stringWithFormat: @"FIFO state crate %lu\n\n", dataPtr[1]];
     unsigned char slot = 0;
 
     BOOL swapBundle = YES;
@@ -264,7 +264,7 @@
     for (slot=0; slot<16; slot++) {
         fifo = dataPtr[slot];
 		if (swapBundle) fifo = swapLong(fifo);        
-        [dsc appendFormat:@"slot %2d: 0x%08x\n", slot, fifo];
+        [dsc appendFormat:@"slot %2d: 0x%08lx\n", slot, fifo];
     }
 
     return [[dsc retain] autorelease];

@@ -191,7 +191,7 @@ NSString* ORDataSetCalibrationChanged		= @"ORDataSetCalibrationChanged";
 - (NSString*) runNumberString
 {
 	long runNumber = [dataSet runNumber];
-	if(runNumber > 0) return [NSString stringWithFormat:@"Run %d",runNumber];
+	if(runNumber > 0) return [NSString stringWithFormat:@"Run %lu",runNumber];
 	else return @"";
 }
 

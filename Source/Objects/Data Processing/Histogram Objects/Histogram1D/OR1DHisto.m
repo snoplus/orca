@@ -181,7 +181,7 @@
 
 - (id)   name
 {
-    return [NSString stringWithFormat:@"%@ 1D Histogram Events: %d",[self key], [self totalCounts]];
+    return [NSString stringWithFormat:@"%@ 1D Histogram Events: %lu",[self key], [self totalCounts]];
 }
 
 
@@ -234,7 +234,7 @@
 	int i;
 	NSMutableString* s = [NSMutableString stringWithCapacity:n*64];
 	for(i=0;i<n;i++){
-		[s appendFormat:@"%d,",plotData[i]];
+		[s appendFormat:@"%lu,",plotData[i]];
 	}
 	if([s length]>0)[s deleteCharactersInRange:NSMakeRange([s length]-1,1)];
 	return s;

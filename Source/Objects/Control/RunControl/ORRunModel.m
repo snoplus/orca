@@ -214,10 +214,10 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 {
 	NSString* rn;
 	if([self subRunNumber] > 0){
-		rn = [NSString stringWithFormat:@"%d.%d",[self runNumber],[self subRunNumber]];
+		rn = [NSString stringWithFormat:@"%lu.%d",[self runNumber],[self subRunNumber]];
 	}
 	else {
-		rn = [NSString stringWithFormat:@"%d",[self runNumber]];
+		rn = [NSString stringWithFormat:@"%lu",[self runNumber]];
 	}
 	return rn;
 }
@@ -375,7 +375,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
             else NSLog(@"Could NOT create <%@>\n",fullFileName);
         }
         NSFileHandle* file = [NSFileHandle fileHandleForWritingAtPath:fullFileName];
-        NSString* s = [NSString stringWithFormat:@"%d",runNumber];
+        NSString* s = [NSString stringWithFormat:@"%lu",runNumber];
         
         [file writeData:[NSData dataWithBytes:[s cStringUsingEncoding:NSASCIIStringEncoding] length:[s length]+1]];
         [file closeFile];
@@ -1084,7 +1084,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
         [self setRunningState:eRunStopped];
         
 		if(!runFailedAlarm){
-			runFailedAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Run %d did NOT start",[self runNumber]] severity:kRunInhibitorAlarm];
+			runFailedAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Run %lu did NOT start",[self runNumber]] severity:kRunInhibitorAlarm];
 			[runFailedAlarm setSticky:YES];
 		}
 		[runFailedAlarm setAcknowledged:NO];
@@ -1728,7 +1728,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 		NSLogColor([NSColor redColor],@"====================================\n");
 		[self haltRun];
 		if(!runStoppedByVetoAlarm){
-			runStoppedByVetoAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Run %d Halted by Veto",[self runNumber]] severity:kRunInhibitorAlarm];
+			runStoppedByVetoAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Run %lu Halted by Veto",[self runNumber]] severity:kRunInhibitorAlarm];
 			[runStoppedByVetoAlarm setSticky:NO];
 			[runStoppedByVetoAlarm setHelpString:@"Run stopped by Veto system. See status log for details."];
 		}
@@ -1795,7 +1795,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	if([self isRunning]){
 		[self haltRun];
 		if(!runFailedAlarm){
-			runFailedAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Run %d did NOT start",[self runNumber]] severity:kRunInhibitorAlarm];
+			runFailedAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Run %lu did NOT start",[self runNumber]] severity:kRunInhibitorAlarm];
 			[runFailedAlarm setSticky:YES];
             [runFailedAlarm setHelpStringFromFile:@"RunFailedHelp"];
             
@@ -2112,7 +2112,7 @@ static NSString *ORRunTypeNames 	= @"ORRunTypeNames";
 	subRunNumber = dataPtr[1]>>16;
 
     NSString* remote     = [NSString stringWithFormat:@"Remote     = %@\n",(dataPtr[1] & 0x4)?@"YES":@"NO"];
-    NSString* thirdWord  = [NSString stringWithFormat:@"%@%d",thirdWordKey,dataPtr[2]];
+    NSString* thirdWord  = [NSString stringWithFormat:@"%@%lu",thirdWordKey,dataPtr[2]];
 	if(showSubRun){
 		thirdWord = [thirdWord stringByAppendingFormat:@".%d",subRunNumber];
 	}

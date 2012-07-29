@@ -219,7 +219,7 @@
 
 - (id)   name
 {
-    return [NSString stringWithFormat:@"%@ 2D Histogram Events: %d",key, [self totalCounts]];
+    return [NSString stringWithFormat:@"%@ 2D Histogram Events: %lu",key, [self totalCounts]];
 }
 
 - (void) mergeHistogram:(unsigned long*)ptr numValues:(unsigned long)num

@@ -58,7 +58,7 @@
     allKeys = [[allKeys componentsSeparatedByString:@"/"] componentsJoinedByString:@"\n"];
     ptr+=keyLength; //point at the histo length
     
-    NSString* length = [NSString stringWithFormat:@"\nLength    = %d\n",*ptr];
+    NSString* length = [NSString stringWithFormat:@"\nLength    = %lu\n",*ptr];
     
     return [NSString stringWithFormat:@"%@%@%@",title,allKeys,length];               
 }

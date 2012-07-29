@@ -337,7 +337,7 @@ NSString* ORXL1Lock						= @"ORXL1Lock";
 {
 	NSData* theData = [NSData dataWithContentsOfFile:clockFile];
 	if(![theData length]){
-		[NSException raise:@"No Clock Data" format:@"Couldn't open clockFile",[clockFile stringByAbbreviatingWithTildeInPath]];
+		[NSException raise:@"No Clock Data" format:@"Couldn't open clockFile: %@",[clockFile stringByAbbreviatingWithTildeInPath]];
 		return nil; //can't get here, but avoid the compiler warning
 	}
 	else return theData;
@@ -347,7 +347,7 @@ NSString* ORXL1Lock						= @"ORXL1Lock";
 {
 	NSData* theData = [NSData dataWithContentsOfFile:xilinxFile];
 	if(![theData length]){
-		[NSException raise:@"No Xilinx Data" format:@"Couldn't open xilinxFile",[xilinxFile stringByAbbreviatingWithTildeInPath]];
+		[NSException raise:@"No Xilinx Data" format:@"Couldn't open xilinxFile: %@",[xilinxFile stringByAbbreviatingWithTildeInPath]];
 		return nil; //can't get here, but avoid the compiler warning
 	}
 	else return theData;

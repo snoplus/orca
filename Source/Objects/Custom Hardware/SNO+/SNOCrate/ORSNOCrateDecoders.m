@@ -37,16 +37,16 @@
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
 	ptr++;
-	NSString* sGTId = [NSString stringWithFormat:@"GTId = 0x%06x\n",
+	NSString* sGTId = [NSString stringWithFormat:@"GTId = 0x%06lx\n",
 		(*ptr & 0x0000ffff) | ((ptr[2] << 4) & 0x000f0000) | ((ptr[2] >> 8) & 0x00f00000)];
-	NSString* sCrate = [NSString stringWithFormat:@"Crate = %d\n", (*ptr >> 21) & 0x1fUL];
-	NSString* sBoard = [NSString stringWithFormat:@"Board = %d\n", (*ptr >> 26) & 0x0fUL];
-	NSString* sChannel = [NSString stringWithFormat:@"Channel = %d\n", (*ptr >> 16) & 0x1fUL];
-	NSString* sCell = [NSString stringWithFormat:@"Cell = %d\n", (ptr[1] >> 12) & 0x0fUL];
-	NSString* sQHL = [NSString stringWithFormat:@"QHL = 0x%03x\n", ptr[2] & 0x0fffUL ^ 0x0800UL];
-	NSString* sQHS = [NSString stringWithFormat:@"QHS = 0x%03x\n", (ptr[1] >> 16) & 0x0fffUL ^ 0x0800UL];
-	NSString* sQLX = [NSString stringWithFormat:@"QLX = 0x%03x\n", ptr[1] & 0x0fffUL ^ 0x0800UL];
-	NSString* sTAC = [NSString stringWithFormat:@"TAC = 0x%03x\n", (ptr[2] >> 16) & 0x0fffUL ^ 0x0800UL];
+	NSString* sCrate = [NSString stringWithFormat:@"Crate = %lu\n", (*ptr >> 21) & 0x1fUL];
+	NSString* sBoard = [NSString stringWithFormat:@"Board = %lu\n", (*ptr >> 26) & 0x0fUL];
+	NSString* sChannel = [NSString stringWithFormat:@"Channel = %lu\n", (*ptr >> 16) & 0x1fUL];
+	NSString* sCell = [NSString stringWithFormat:@"Cell = %lu\n", (ptr[1] >> 12) & 0x0fUL];
+	NSString* sQHL = [NSString stringWithFormat:@"QHL = 0x%03lx\n", ptr[2] & 0x0fffUL ^ 0x0800UL];
+	NSString* sQHS = [NSString stringWithFormat:@"QHS = 0x%03lx\n", (ptr[1] >> 16) & 0x0fffUL ^ 0x0800UL];
+	NSString* sQLX = [NSString stringWithFormat:@"QLX = 0x%03lx\n", ptr[1] & 0x0fffUL ^ 0x0800UL];
+	NSString* sTAC = [NSString stringWithFormat:@"TAC = 0x%03lx\n", (ptr[2] >> 16) & 0x0fffUL ^ 0x0800UL];
 	NSString* sCGT16 = [NSString stringWithFormat:@"CGT16 sync error: %@\n",
 		((*ptr >> 30) & 0x1UL) ? @"Yes" : @"No"];
 	NSString* sCGT24 = [NSString stringWithFormat:@"CGT24 sync error: %@\n",
@@ -59,9 +59,9 @@
 		((ptr[1] >> 29) & 0x1UL) ? @"CC" : @"NC"];
 	NSString* sLGI = [NSString stringWithFormat:@"LGI select: %@\n",
 		((ptr[1] >> 30) & 0x1UL) ? @"Long" : @"Short"];
-	NSString* sWrd0 = [NSString stringWithFormat:@"Wrd0 = 0x%08x\n", *ptr];
-	NSString* sWrd1 = [NSString stringWithFormat:@"Wrd1 = 0x%08x\n", ptr[1]];
-	NSString* sWrd2 = [NSString stringWithFormat:@"Wrd2 = 0x%08x\n", ptr[2]];
+	NSString* sWrd0 = [NSString stringWithFormat:@"Wrd0 = 0x%08lx\n", *ptr];
+	NSString* sWrd1 = [NSString stringWithFormat:@"Wrd1 = 0x%08lx\n", ptr[1]];
+	NSString* sWrd2 = [NSString stringWithFormat:@"Wrd2 = 0x%08lx\n", ptr[2]];
 
 	return [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@", 
 		sGTId, sCrate, sBoard, sChannel, sCell, sQHL, sQHS, sQLX, sTAC, sCGT16,

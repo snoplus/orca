@@ -616,7 +616,7 @@ readFifoFlag = _readFifoFlag;
 		}
 		else if ([self errorTimeOutSeconds] && time(0) - xl3ReadTimer > [self errorTimeOutSeconds]) {
 			@throw [NSException exceptionWithName:@"ReadXL3Packet time out"
-				reason:[NSString stringWithFormat:@"Time out for %@ <%@> port: %d\n", [self crateName], IPNumber, portNumber]
+				reason:[NSString stringWithFormat:@"Time out for %@ <%@> port: %lu\n", [self crateName], IPNumber, portNumber]
 				userInfo:nil];
 		}
 		else {
@@ -722,11 +722,11 @@ static void SwapLongBlock(void* p, int32_t n)
 	//start try block here if we know how to handle the exceptions, ORCA gets killed now
 	@try {
 		if ((serverSocket = socket(PF_INET, SOCK_STREAM, 0)) == -1)
-			[NSException raise:@"Socket failed" format:@"Couldn't get a socket for local XL3 Port %d", portNumber];
+			[NSException raise:@"Socket failed" format:@"Couldn't get a socket for local XL3 Port %lu", portNumber];
 		//todo: try harder...
 		//???TCP_NODELAY for the moment done with recv
 		if (setsockopt(serverSocket,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(int)) == -1)
-			[NSException raise:@"Socket options failed" format:@"Couldn't set socket options for local XL3 Port %d", portNumber];
+			[NSException raise:@"Socket options failed" format:@"Couldn't set socket options for local XL3 Port %lu", portNumber];
 			
 		my_addr.sin_family = AF_INET;         // host byte order
 		my_addr.sin_addr.s_addr = INADDR_ANY; // automatically fill with my IP
@@ -734,10 +734,10 @@ static void SwapLongBlock(void* p, int32_t n)
 			
 		my_addr.sin_port = htons(portNumber);     // short, network byte order
 		if (bind(serverSocket, (struct sockaddr *)&my_addr, sizeof(struct sockaddr)) == -1)
-			[NSException raise:@"Bind failed" format:@"Couldn't bind to local XL3 Port %d", portNumber];
+			[NSException raise:@"Bind failed" format:@"Couldn't bind to local XL3 Port %lu", portNumber];
 		
 		if (listen(serverSocket, 1) == -1)
-			[NSException raise:@"Listen failed" format:@"Couldn't listen on local XL3 port %d\n", portNumber];
+			[NSException raise:@"Listen failed" format:@"Couldn't listen on local XL3 port %lu\n", portNumber];
 
 		connectState = kWaiting;
 		[[NSNotificationCenter defaultCenter] postNotificationName:XL3_LinkConnectStateChanged object: self];
@@ -749,7 +749,7 @@ static void SwapLongBlock(void* p, int32_t n)
 			//if not socket connection was kill by UI... do something meaningful
 			[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:.1]];		
 			if ([self serverSocket]) {
-				[NSException raise:@"Connection failed" format:@"Couldn't accept connection on local XL3 port %d\n", portNumber];
+				[NSException raise:@"Connection failed" format:@"Couldn't accept connection on local XL3 port %lu\n", portNumber];
 			}
 			else {
 				//disconnected by UI...
@@ -986,7 +986,7 @@ static void SwapLongBlock(void* p, int32_t n)
 {
 	//this is private method called from this object only, we lock the socket, and expect that thread lock is provided at a higher level
 	if (!workingSocket) {
-		[NSException raise:@"Write error" format:@"XL3 not connected %@ <%@> port: %d",[self crateName], IPNumber, portNumber];
+		[NSException raise:@"Write error" format:@"XL3 not connected %@ <%@> port: %lu",[self crateName], IPNumber, portNumber];
 	}
 
     //NSLog(@"Write packet: packet_type: 0x%x, packet_num: 0x%x\n", ((XL3_Packet*) aPacket)->cmdHeader.packet_type, ((XL3_Packet*) aPacket)->cmdHeader.packet_num);
@@ -1018,7 +1018,7 @@ static void SwapLongBlock(void* p, int32_t n)
                     [self performSelector:@selector(disconnectSocket) withObject:nil afterDelay:0];
 			}
 			else if (selectionResult == 0 || ([self errorTimeOutSeconds] && time(0) - t1 > [self errorTimeOutSeconds])) {
-				[NSException raise:@"Connection time out" format:@"Write to %@ <%@> port: %d timed out",[self crateName], IPNumber, portNumber];
+				[NSException raise:@"Connection time out" format:@"Write to %@ <%@> port: %lu timed out",[self crateName], IPNumber, portNumber];
                 [self performSelector:@selector(disconnectSocket) withObject:nil afterDelay:0];
 			}
 
@@ -1036,7 +1036,7 @@ static void SwapLongBlock(void* p, int32_t n)
 					//what do we want to do?
                     //not really used, SIGPIPE instead
 				}
-				[NSException raise:@"Write error" format:@"Write error(%s) %@ <%@> port: %d",strerror(errno),[self crateName],IPNumber,portNumber];
+				[NSException raise:@"Write error" format:@"Write error(%s) %@ <%@> port: %lu",strerror(errno),[self crateName],IPNumber,portNumber];
 			}
 		}
         [coreSocketLock unlock];

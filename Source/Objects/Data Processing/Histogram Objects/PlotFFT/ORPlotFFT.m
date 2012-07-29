@@ -214,7 +214,7 @@ NSString* ORPlotFFTShowChanged = @"ORPlotFFTShowChanged";
 
 - (id)   name
 {
-    return [NSString stringWithFormat:@"%@ FFT Counts: %d",[self key], [self totalCounts]];
+    return [NSString stringWithFormat:@"%@ FFT Counts: %lu",[self key], [self totalCounts]];
 }
 
 - (BOOL) canJoinMultiPlot

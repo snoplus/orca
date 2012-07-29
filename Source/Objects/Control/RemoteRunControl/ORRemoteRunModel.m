@@ -460,10 +460,10 @@ NSString* ORRemoteRunShutDownScriptNameChanged = @"ORRemoteRunShutDownScriptName
 {
 	NSString* rn;
 	if([self subRunNumber] > 0){
-		rn = [NSString stringWithFormat:@"%d.%d",[self runNumber],[self subRunNumber]];
+		rn = [NSString stringWithFormat:@"%lu.%d",[self runNumber],[self subRunNumber]];
 	}
 	else {
-		rn = [NSString stringWithFormat:@"%d",[self runNumber]];
+		rn = [NSString stringWithFormat:@"%lu",[self runNumber]];
 	}
 	return rn;
 }

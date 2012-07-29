@@ -1439,7 +1439,11 @@ void SwapLongBlock(void* p, int32_t n)
 {
     for (id anObj in [[self guardian] orcaObjects]) { 
         if ([anObj class] == NSClassFromString(@"ORFec32Model")) {
+// Removed the last argument-- it wasn't used and was causing a compiler warning in XCode 4.4. MAH 7/29/2012
+/*
             [[self debugDBRef] getDocumentId:[NSString stringWithFormat:@"_design/penn_daq_views/_view/get_fec_by_generated?descending=True&start_key=[%d,%d,{}]&end_key=[%d,%d,\"\"]&limit=1",[self crateNumber], [anObj stationNumber], [self crateNumber], [anObj stationNumber]] tag:[NSString stringWithFormat:@"%@.%d", kDebugDbEcalDocGot, [self crateNumber], [anObj stationNumber]]];
+*/
+            [[self debugDBRef] getDocumentId:[NSString stringWithFormat:@"_design/penn_daq_views/_view/get_fec_by_generated?descending=True&start_key=[%d,%d,{}]&end_key=[%d,%d,\"\"]&limit=1",[self crateNumber], [anObj stationNumber], [self crateNumber], [anObj stationNumber]] tag:[NSString stringWithFormat:@"%@.%d", kDebugDbEcalDocGot, [self crateNumber]]];
         }
     }
 }
@@ -2471,7 +2475,7 @@ void SwapLongBlock(void* p, int32_t n)
         for (ch=0; ch<32; ch++) {
             [msg appendFormat:@"ch %2d: ", ch];
             for (sl=0; sl<16; sl++) {
-                if ((msk >> sl) & 0x1) [msg appendFormat:@"%3d ", results.current_adc[sl*32 + ch] ^ (1UL << 7)];
+                if ((msk >> sl) & 0x1) [msg appendFormat:@"%3lu ", results.current_adc[sl*32 + ch] ^ (1UL << 7)];
                 else [msg appendFormat:@"--- "];
             }
             [msg appendFormat:@"\n"];

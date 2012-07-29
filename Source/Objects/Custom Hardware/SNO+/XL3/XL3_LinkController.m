@@ -71,7 +71,7 @@ static NSDictionary* xl3Ops;
 	if(aModel) {
         [[self window] setTitle: [NSString stringWithFormat:@"XL3 Crate %d",[model crateNumber]]];
         [connectionIPAddressField setStringValue:[[model guardian] iPAddress]];
-        [connectionIPPortField setStringValue:[NSString stringWithFormat:@"%d", [[model guardian] portNumber]]];
+        [connectionIPPortField setStringValue:[NSString stringWithFormat:@"%lu", [[model guardian] portNumber]]];
         [connectionCrateNumberField setStringValue:[NSString stringWithFormat:@"%d", [model crateNumber]]];
         [hvPowerSupplyMatrix selectCellAtRow:0 column:0];
         if ([model crateNumber] != 16) {
@@ -590,8 +590,8 @@ static NSDictionary* xl3Ops;
 {
     [hvAOnStatusField setStringValue:[model hvASwitch]?@"ON":@"OFF"];
     [hvBOnStatusField setStringValue:[model hvBSwitch]?@"ON":@"OFF"];
-    [hvAVoltageSetField setStringValue:[NSString stringWithFormat:@"%d V",[model hvAVoltageDACSetValue]*3000/4096]];
-    [hvBVoltageSetField setStringValue:[NSString stringWithFormat:@"%d V",[model hvBVoltageDACSetValue]*3000/4096]];
+    [hvAVoltageSetField setStringValue:[NSString stringWithFormat:@"%lu V",[model hvAVoltageDACSetValue]*3000/4096]];
+    [hvBVoltageSetField setStringValue:[NSString stringWithFormat:@"%lu V",[model hvBVoltageDACSetValue]*3000/4096]];
     [hvAVoltageReadField setStringValue:[NSString stringWithFormat:@"%d V",(unsigned int)[model hvAVoltageReadValue]]];
     [hvBVoltageReadField setStringValue:[NSString stringWithFormat:@"%d V",(unsigned int)[model hvBVoltageReadValue]]];
     [hvACurrentReadField setStringValue:[NSString stringWithFormat:@"%3.1f mA",[model hvACurrentReadValue]]];

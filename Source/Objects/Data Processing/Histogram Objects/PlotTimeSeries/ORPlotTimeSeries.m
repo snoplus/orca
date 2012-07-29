@@ -103,7 +103,7 @@ NSString* ORPlotTimeSeriesShowChanged = @"ORPlotTimeSeriesShowChanged";
 
 - (id)   name
 {
-    return [NSString stringWithFormat:@"%@ Counts: %d",[self key], [self totalCounts]];
+    return [NSString stringWithFormat:@"%@ Counts: %lu",[self key], [self totalCounts]];
 }
 
 - (BOOL) canJoinMultiPlot

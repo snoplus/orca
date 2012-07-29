@@ -144,7 +144,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SNOCableDB);
 				
 			}
 			else {
-				[NSException raise:@"Unable to Process Cable DB" format:@"Bad line: %d",lineCount-1];
+				[NSException raise:@"Unable to Process Cable DB" format:@"Bad line: %ld",lineCount-1];
 			}
 			
 		}

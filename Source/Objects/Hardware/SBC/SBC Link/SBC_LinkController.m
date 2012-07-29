@@ -620,12 +620,12 @@
 		case 0:
 			theInfoString =                                        [NSString stringWithFormat: @"Connected     : %@\t\t# Records   : %d\n",[[model sbcLink] isConnected]?@"YES":@"NO ",theRunInfo.recordsTransfered];
 			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"Config loaded : %@\t\tWrap Arounds: %d\n",(theRunInfo.statusBits & kSBC_ConfigLoadedMask) ? @"YES":@"NO ",theRunInfo.wrapArounds]];
-			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"Running       : %@\t\tThrottle    : %d\n",runState,[[model sbcLink] throttle]]];
+			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"Running       : %@\t\tThrottle    : %lu\n",runState,[[model sbcLink] throttle]]];
 			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"Cycles * 10K  : %d\n",theRunInfo.readCycles/10000]];
 			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"Lost Bytes    : %d\n",theRunInfo.lostByteCount]];
 			
-			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"CB Write Mark : %-9d   Bus Errors  : %d\n",aWriteMark,theRunInfo.busErrorCount]];
-			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"CB Read Mark  : %-9d   Err Count   : %d\n",aReadMark,theRunInfo.err_count]];
+			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"CB Write Mark : %-9lu   Bus Errors  : %d\n",aWriteMark,theRunInfo.busErrorCount]];
+			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"CB Read Mark  : %-9lu   Err Count   : %d\n",aReadMark,theRunInfo.err_count]];
 			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"In Buffer Now : %-9d   Msg Count   : %d",theRunInfo.amountInBuffer,theRunInfo.msg_count]];
 		break;
 			
@@ -650,7 +650,7 @@
 				if([jobStatus running]){
 					theInfoString =                                        [NSString stringWithFormat: @"Current Job Status\n-----------------------\n"];
 					theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"Running  : %@\n", [jobStatus running]?@"Running":@"Done" ]];
-					theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"Progress : %d%%\n",[jobStatus progress]]];
+					theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"Progress : %lu%%\n",[jobStatus progress]]];
 				}
 				else {
 					theInfoString =                                        [NSString stringWithFormat: @"Last Job Status\n-----------------------\n"];

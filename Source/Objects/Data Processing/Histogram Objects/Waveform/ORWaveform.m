@@ -166,7 +166,7 @@ NSString* ORWaveformUseUnsignedChanged   = @"ORWaveformUseUnsignedChanged";
 #pragma mark ¥¥¥Data Source Methods
 - (id) name
 {
-    return [NSString stringWithFormat:@"%@ Waveform  Counts: %d",[self key], [self totalCounts]];
+    return [NSString stringWithFormat:@"%@ Waveform  Counts: %lu",[self key], [self totalCounts]];
 }
 
 - (int)	numberOfPointsInPlot:(id)aPlotter dataSet:(int)set

@@ -59,7 +59,7 @@
     ptr+=keyLength; //point at the histo length
     
     unsigned long perSide = (unsigned long)pow((double)(*ptr),.5);
-    NSString* length = [NSString stringWithFormat:@"\nLength    = %d by %d\n",perSide,perSide];
+    NSString* length = [NSString stringWithFormat:@"\nLength    = %lu by %lu\n",perSide,perSide];
     
     return [NSString stringWithFormat:@"%@%@%@",title,allKeys,length];               
 }
