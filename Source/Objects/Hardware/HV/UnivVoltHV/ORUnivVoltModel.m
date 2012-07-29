@@ -887,27 +887,27 @@ NSString* UVkWrite = @"W";
 		// status case statement
 		switch ( status ) {
 			case eHVUEnabled:
-				statusStr = [NSString stringWithString: @"Enabled"];
+				statusStr = @"Enabled";
 				break;
 			
 			case eHVURampingUp:
-				statusStr = [NSString stringWithString: @"Ramping up"];
+				statusStr = @"Ramping up";
 				break;
 			
 			case eHVURampingDown:
-				statusStr = [NSString stringWithString: @"Ramping down"];
+				statusStr = @"Ramping down";
 				break;
 			
 			case evHVUTripForSupplyLimits:
-				statusStr = [NSString stringWithString: @"Trip for viol. supply lmt"];
+				statusStr = @"Trip for viol. supply lmt";
 				break;
 			
 			case eHVUTripForUserCurrent:
-				statusStr = [NSString stringWithString: @"Trip for viol. current lmt"];
+				statusStr = @"Trip for viol. current lmt";
 				break;
 			
 			case eHVUTripForHVError:
-				statusStr = [NSString stringWithString: @"Trip HV for volt. error"];
+				statusStr = @"Trip HV for volt. error";
 				if (!mHVValueLmtsAlarm) {
 					mHVValueLmtsAlarm = [[ORAlarm alloc] initWithName: [NSString stringWithFormat: @"HV out of limits for slot: %d channel: %d", [self stationNumber], aCurChnl] severity: kHardwareAlarm];
 					[mHVValueLmtsAlarm setSticky: YES];		
@@ -917,10 +917,10 @@ NSString* UVkWrite = @"W";
 				break;
 			
 			case eHVUTripForHVLimit:
-				statusStr = [NSString stringWithString: @"Trip for voil. of volt. lmt"];
+				statusStr = @"Trip for voil. of volt. lmt";
 			
 			default:
-				statusStr = [NSString stringWithString: @"Undefined"];
+				statusStr = @"Undefined";
 				break;
 		}
 		[chnlDictObj setObject: statusStr forKey: HVkStatus];
@@ -1286,8 +1286,8 @@ NSString* UVkWrite = @"W";
 	@try
 	{
 		float measuredHVFloat = (((float)rand())/RAND_MAX * 2) - 2.0;
-		NSString* commandRet = [NSString stringWithString: @"DMP"];
-		NSString*  slotChnlNumber = [NSString stringWithString: @"S0.0"];
+		NSString* commandRet = @"DMP";
+		NSString*  slotChnlNumber = @"S0.0";
 		NSNumber* measuredCurrent = [NSNumber numberWithFloat: 1000.0];
 		
 		NSMutableDictionary* tmpChnl = [mChannelArray objectAtIndex: 0];
@@ -1328,7 +1328,7 @@ NSString* UVkWrite = @"W";
 //		NSLog( @"Number of fake data %d\n.", [rawFakeData count] );
 		NSNumber* slot = [NSNumber numberWithInt: 0];
 		NSNumber* chnl = [NSNumber numberWithInt: 0];
-		NSString* command = [NSString stringWithString: @"DMP"];
+		NSString* command = @"DMP";
 		NSArray* retRawData = [NSArray arrayWithObjects: slot,
 													     chnl,
 													     command,

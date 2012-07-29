@@ -27,22 +27,22 @@
 
 -(id)init
 {
-	Name = [NSString stringWithString:@"N/A"];
-	Status = [NSString stringWithString:@"N/A"];
+	Name = @"N/A";
+	Status = @"N/A";
 	Value = 0.0;
-	Units = [NSString stringWithString:@"N/A"];
+	Units = @"N/A";
 	LoThresh = 0.0;
 	HiThresh = 0.0;
 	LoLoThresh = 0.0;
 	HiHiThresh = 0.0;
 	Gain = 0.0;
-	Card = [NSString stringWithString:@"N/A"];
+	Card = @"N/A";
 	Channel = 0;
 	Number = 0;
 	iosPort = 0;
-	iosName = [NSString stringWithString:@"N/A"];
-	ioServerIPAddress = [NSString stringWithString:@""];
-	ioChannelDocId = [NSString stringWithString:@""];
+	iosName = @"N/A";
+	ioServerIPAddress = @"";
+	ioChannelDocId = @"";
 	isSlowControlParameterChanged = NO;
 	isSelected = NO;
 	isEnabled = YES;

@@ -81,7 +81,7 @@ static NSString* ORHVRampConnector				= @"HV Ramp Connector";
 
 - (void) setCurrentFile:(NSString*)aCurrentFile
 {
-	if(!aCurrentFile)aCurrentFile = [NSString stringWithString:@"~/HVCurrents.txt"];
+	if(!aCurrentFile)aCurrentFile = @"~/HVCurrents.txt";
     [[[self undoManager] prepareWithInvocationTarget:self] setCurrentFile:currentFile];
     
     [currentFile autorelease];

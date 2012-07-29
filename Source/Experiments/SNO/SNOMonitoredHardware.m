@@ -35,7 +35,7 @@ NSString* morcaDBRead = @"morcaDBRead";
 
 - (void) readCableDBDocumentFromOrcaDB
 { 
-    NSString *url = [NSString stringWithString:@"http://snoplus:scintillate@snotpenn01.snolab.ca:5984/orcatest/_design/cable/_view/all?include_docs=true"];
+    NSString *url = @"http://snoplus:scintillate@snotpenn01.snolab.ca:5984/orcatest/_design/cable/_view/all?include_docs=true";
     SNOConnection *connection = [[SNOConnection alloc] init];
     [connection setDelegate:self];
     [connection setDelegateAction:@"getCableDocument"];

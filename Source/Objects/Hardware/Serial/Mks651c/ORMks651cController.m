@@ -410,7 +410,7 @@
 
 - (void) unitsChanged:(NSNotification*)aNote
 {
-	[unitsPU selectItemAtIndex: [model units]];
+	[unitsPU selectItemAtIndex: [(ORMks651cModel*)model units]];
 	[unitsField setStringValue: [model unitsString]];
 }
 

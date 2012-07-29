@@ -390,7 +390,7 @@ NSString* totalRatePlotChanged                      = @"totalRatePlotChanged";
     //forward local ports
     [self forwardPorts];
 
-	NSString *aString=[NSString stringWithString:@"Connecting..."];
+	NSString *aString=@"Connecting...";
 	[self setSlowControlMonitorStatusString:aString];
 	[self setSlowControlMonitorStatusStringColor:[NSColor blackColor]];
 	[[NSNotificationCenter defaultCenter] postNotificationName:slowControlConnectionStatusChanged object:self];
@@ -725,7 +725,7 @@ NSString* totalRatePlotChanged                      = @"totalRatePlotChanged";
     
     [[NSNotificationCenter defaultCenter] postNotificationName:slowControlTableChanged object:self];
     
-    NSString *status=[NSString stringWithString:@"Connected to snotpenn server."];
+    NSString *status=@"Connected to snotpenn server.";
     [self setSlowControlMonitorStatusString:status];	
     [self setSlowControlMonitorStatusStringColor:[NSColor blueColor]];
     

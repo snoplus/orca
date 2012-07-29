@@ -645,21 +645,21 @@ NSString* plotButtonDisabled                 = @"plotButtonDisabled";
                 
                 NSString *voltageName;
                 if (iVoltage == 0) {
-                    voltageName=[NSString stringWithString:@"VCC"];
+                    voltageName=@"VCC";
                 }else if (iVoltage == 1){
-                    voltageName=[NSString stringWithString:@"VEE"];
+                    voltageName=@"VEE";
                 }else if (iVoltage == 2){
-                    voltageName=[NSString stringWithString:@"VP24"];
+                    voltageName=@"VP24";
                 }else if (iVoltage == 3){
-                    voltageName=[NSString stringWithString:@"VM24"];
+                    voltageName=@"VM24";
                 }else if (iVoltage == 4){
-                    voltageName=[NSString stringWithString:@"TMP0"];
+                    voltageName=@"TMP0";
                 }else if (iVoltage == 5){
-                    voltageName=[NSString stringWithString:@"TMP1"];
+                    voltageName=@"TMP1";
                 }else if (iVoltage == 6){
-                    voltageName=[NSString stringWithString:@"TMP2"];
+                    voltageName=@"TMP2";
                 }else if (iVoltage == kNumXL3Voltages) {
-                    voltageName=[NSString stringWithFormat:@"INDEX"];
+                    voltageName=@"INDEX";
                 }
                 
                 NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:[NSFont fontWithName:@"Lucida Grande" size:10], 
@@ -740,7 +740,7 @@ NSString* plotButtonDisabled                 = @"plotButtonDisabled";
 {
     float aValue=0;
     
-    NSString *str = [NSString stringWithString:@""];
+    NSString *str = @"";
     if (parameterToDisplay == kOnlineTubeDisplay && selectionMode == kTubeSelectionMode){
     }else if (parameterToDisplay == kTubeTypeDisplay && selectionMode == kTubeSelectionMode){
     }else if (parameterToDisplay == kPedestalsDisplay && selectionMode == kTubeSelectionMode){
