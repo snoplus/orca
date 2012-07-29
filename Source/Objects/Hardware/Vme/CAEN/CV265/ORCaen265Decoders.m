@@ -75,11 +75,11 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 {
     NSString* title= @"Caen265 ADC Record\n\n";
 	if(IsLongForm(*ptr))ptr++;
-    NSString* crate = [NSString stringWithFormat:@"Crate = %d\n",(*ptr&0x01e00000)>>21];
-    NSString* card  = [NSString stringWithFormat:@"Card  = %d\n",(*ptr&0x001f0000)>>16];
-    NSString* chan  = [NSString stringWithFormat:@"Chan  = %d\n",(*ptr>>13)&0x7];
+    NSString* crate = [NSString stringWithFormat:@"Crate = %lu\n",(*ptr&0x01e00000)>>21];
+    NSString* card  = [NSString stringWithFormat:@"Card  = %lu\n",(*ptr&0x001f0000)>>16];
+    NSString* chan  = [NSString stringWithFormat:@"Chan  = %lu\n",(*ptr>>13)&0x7];
 	NSString* type  = [NSString stringWithFormat:@"Range = %@\n",*ptr&0x00001000?@"12 Bit":@"15 Bit"];
-	NSString* data  = [NSString stringWithFormat:@"Value = 0x%x\n",*ptr&0x00000fff];
+	NSString* data  = [NSString stringWithFormat:@"Value = 0x%lx\n",*ptr&0x00000fff];
 	    
     return [NSString stringWithFormat:@"%@%@%@%@%@%@",title,crate,card,chan,type,data];               
 }

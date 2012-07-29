@@ -153,12 +153,12 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 	ptr += 2;
 	NSMutableString* dsc = [NSMutableString string];
 	
-	NSString* eventSize = [NSString stringWithFormat:@"Event size = %d\n", *ptr & 0x0fffffffUL];
+	NSString* eventSize = [NSString stringWithFormat:@"Event size = %lu\n", *ptr & 0x0fffffffUL];
 	NSString* isZeroLengthEncoded = [NSString stringWithFormat:@"Zero length enc: %@\n", ((*ptr >> 24) & 0x1UL)?@"On":@"Off"];
-	NSString* lvioPattern = [NSString stringWithFormat:@"LVIO Pattern = 0x%04x\n", (ptr[1] >> 8) & 0xffffUL];
-	NSString* sChannelMask = [NSString stringWithFormat:@"Channel mask = 0x%02x\n", ptr[1] & 0xffUL];
-	NSString* eventCounter = [NSString stringWithFormat:@"Event counter = 0x%06x\n", ptr[2] & 0xffffffUL];
-	NSString* timeTag = [NSString stringWithFormat:@"Time tag = 0x%08x\n", ptr[3]];
+	NSString* lvioPattern = [NSString stringWithFormat:@"LVIO Pattern = 0x%04lx\n", (ptr[1] >> 8) & 0xffffUL];
+	NSString* sChannelMask = [NSString stringWithFormat:@"Channel mask = 0x%02lx\n", ptr[1] & 0xffUL];
+	NSString* eventCounter = [NSString stringWithFormat:@"Event counter = 0x%06lx\n", ptr[2] & 0xffffffUL];
+	NSString* timeTag = [NSString stringWithFormat:@"Time tag = 0x%08lx\n", ptr[3]];
 	
 	[dsc appendFormat:@"%@%@%@%@%@%@", eventSize, isZeroLengthEncoded, lvioPattern, sChannelMask, eventCounter, timeTag];
 	return dsc;               

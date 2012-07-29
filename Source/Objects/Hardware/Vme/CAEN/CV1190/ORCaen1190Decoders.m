@@ -125,8 +125,8 @@
 {
     NSString* title= @"Caen1190 TDC Record\n\n";
 	ptr++;
-    NSString* crate = [NSString stringWithFormat:@"Crate = %d\n",(*ptr&0x01e00000)>>21];
-    NSString* card  = [NSString stringWithFormat:@"Card  = %d\n",(*ptr&0x001f0000)>>16];
+    NSString* crate = [NSString stringWithFormat:@"Crate = %lu\n",(*ptr&0x01e00000)>>21];
+    NSString* card  = [NSString stringWithFormat:@"Card  = %lu\n",(*ptr&0x001f0000)>>16];
 	    
     return [NSString stringWithFormat:@"%@%@%@",title,crate,card];               
 }

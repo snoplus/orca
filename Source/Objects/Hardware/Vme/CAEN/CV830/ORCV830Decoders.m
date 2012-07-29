@@ -62,7 +62,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  counter 31 //note that only enabled cha
 	int i;
 	for(i=0;i<32;i++){
 		if(enabledMask & (0x1L<<i)){
-			NSString* valueString = [NSString stringWithFormat:@"%u",*ptr];
+			NSString* valueString = [NSString stringWithFormat:@"%lu",*ptr];
 			NSString* channelKey = [self getChannelKey:i];
 
 			[aDataSet loadGenericData:valueString sender:self withKeys:@"Scaler Event",@"V830",  crateKey,cardKey,channelKey,nil];
@@ -90,8 +90,8 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  counter 31 //note that only enabled cha
 	int i;
 	for(i=0;i<32;i++){
 		if(enabledMask & (0x1L<<i)){
-			if(dataIs24Bit) s = [s stringByAppendingFormat:@"Channel:%d Counter: %u\n",i,*ptr*0xFFFFFF];
-			else			s = [s stringByAppendingFormat:@"Channel:%d Counter: %u\n",i,*ptr];
+			if(dataIs24Bit) s = [s stringByAppendingFormat:@"Channel:%d Counter: %lu\n",i,*ptr*0xFFFFFF];
+			else			s = [s stringByAppendingFormat:@"Channel:%d Counter: %lu\n",i,*ptr];
 			ptr++;
 		}
 	}
@@ -132,7 +132,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  counter 31 //note that only enabled cha
 	int i;
 	for(i=0;i<kNumCV830Channels;i++){
 		if(enabledMask & (0x1L<<i)){
-			NSString* valueString = [NSString stringWithFormat:@"%u",ptr[4+i]];
+			NSString* valueString = [NSString stringWithFormat:@"%lu",ptr[4+i]];
 			[aDataSet loadGenericData:valueString sender:self withKeys:@"Scalers",@"V830",  crateKey,cardKey,[self getChannelKey:i],nil];
 		}
 	}
@@ -146,7 +146,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  counter 31 //note that only enabled cha
 	int cardNum		= ShiftAndExtract(ptr[1],16,0x1f);
 	unsigned long enabledMask = ptr[2];
     NSString* crate = [NSString stringWithFormat:@"Crate = %d\n",crateNum];
-    NSString* card  = [NSString stringWithFormat:@"Card  = %d\n",(*ptr&0x001f0000)>>16];
+    NSString* card  = [NSString stringWithFormat:@"Card  = %lu\n",(*ptr&0x001f0000)>>16];
     NSString* mask  = [NSString stringWithFormat:@"Mask  = 0x%x\n",cardNum];
 	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:ptr[3]];
 	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S %z\n"];
@@ -154,7 +154,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  counter 31 //note that only enabled cha
 	NSString* s = [NSString stringWithFormat:@"%@%@%@%@%@",title,crate,card,mask,date];
 	for(i=0;i<kNumCV830Channels;i++){
 		if(enabledMask & (0x1L<<i)){
-			s = [s stringByAppendingFormat:@"%d:%u\n",i,ptr[4+i]];
+			s = [s stringByAppendingFormat:@"%d:%lu\n",i,ptr[4+i]];
 		}
 	}
 	

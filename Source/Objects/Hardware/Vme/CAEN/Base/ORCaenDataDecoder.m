@@ -247,15 +247,15 @@
 
     NSString* title= [NSString stringWithFormat:@"%@ Record\n\n",[self identifier]];
     
-    NSString* len =[NSString stringWithFormat:   @"Record Length = %d\n",length-2];
-    NSString* crate = [NSString stringWithFormat:@"Crate = %d\n",(ptr[1] >> 21)&0x0000000f];
-    NSString* card  = [NSString stringWithFormat:@"Card  = %d\n",(ptr[1] >> 16)&0x0000001f];    
+    NSString* len =[NSString stringWithFormat:   @"Record Length = %lu\n",length-2];
+    NSString* crate = [NSString stringWithFormat:@"Crate = %lu\n",(ptr[1] >> 21)&0x0000000f];
+    NSString* card  = [NSString stringWithFormat:@"Card  = %lu\n",(ptr[1] >> 16)&0x0000001f];    
    
     NSString* restOfString = [NSString string];
     int i;
     for( i = 2; i < length; i++ ){
          if( [self isValidDatum: ptr[i]] ){
-            restOfString = [restOfString stringByAppendingFormat:@"Chan  = %d  Value = %d\n",[self channel: ptr[i]],[self adcValue: ptr[i]]];
+            restOfString = [restOfString stringByAppendingFormat:@"Chan  = %d  Value = %ld",[self channel: ptr[i]],[self adcValue: ptr[i]]];
         }
     }
 

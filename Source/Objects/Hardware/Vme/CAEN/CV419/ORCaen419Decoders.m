@@ -92,10 +92,10 @@
 
     NSString* title= @"CV419 ADC Record\n\n";
     
-    NSString* crate = [NSString stringWithFormat:@"Crate = %d\n",(*ptr&0x01e00000)>>21];
-    NSString* card  = [NSString stringWithFormat:@"Card  = %d\n",(*ptr&0x001f0000)>>16];
-    NSString* chan  = [NSString stringWithFormat:@"Chan  = %d\n",(*ptr&0x0000f000)>>12];
-    NSString* adc   = [NSString stringWithFormat:@"ADC   = 0x%x\n",*ptr&0x00000fff];
+    NSString* crate = [NSString stringWithFormat:@"Crate = %lu\n",(*ptr&0x01e00000)>>21];
+    NSString* card  = [NSString stringWithFormat:@"Card  = %lu\n",(*ptr&0x001f0000)>>16];
+    NSString* chan  = [NSString stringWithFormat:@"Chan  = %lu\n",(*ptr&0x0000f000)>>12];
+    NSString* adc   = [NSString stringWithFormat:@"ADC   = 0x%lx\n",*ptr&0x00000fff];
     
     return [NSString stringWithFormat:@"%@%@%@%@%@",title,crate,card,chan,adc];               
 }

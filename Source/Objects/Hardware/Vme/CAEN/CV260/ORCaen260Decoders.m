@@ -56,7 +56,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  counter 15
 	ptr++;	//first data word
 	int i;
 	for(i=0;i<kNumCaen260Channels;i++){
-		NSString* valueString = [NSString stringWithFormat:@"%u",*ptr];
+		NSString* valueString = [NSString stringWithFormat:@"%lu",*ptr];
 		NSString* channelKey = [self getChannelKey:i];
 
 		[aDataSet loadGenericData:valueString sender:self withKeys:@"Scalers",@"V260",  crateKey,cardKey,channelKey,nil];
@@ -69,9 +69,9 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  counter 15
 {
     NSString* title= @"Caen260 Scaler Record\n\n";
 	ptr++; //point to location
-    NSString* crate = [NSString stringWithFormat:@"Crate = %d\n",(*ptr&0x01e00000)>>21];
-    NSString* card  = [NSString stringWithFormat:@"Card  = %d\n",(*ptr&0x001f0000)>>16];
-    NSString* mask  = [NSString stringWithFormat:@"Mask  = 0x%x\n",(*ptr)&0xffff];
+    NSString* crate = [NSString stringWithFormat:@"Crate = %lu\n",(*ptr&0x01e00000)>>21];
+    NSString* card  = [NSString stringWithFormat:@"Card  = %lu\n",(*ptr&0x001f0000)>>16];
+    NSString* mask  = [NSString stringWithFormat:@"Mask  = 0x%lx\n",(*ptr)&0xffff];
 	ptr++; //point to time
 	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:*ptr];
 	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S %z\n"];
@@ -79,7 +79,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  counter 15
 	int i;
 	NSString* s = [NSString stringWithFormat:@"%@%@%@%@%@",title,crate,card,mask,date];
 	for(i=0;i<kNumCaen260Channels;i++){
-		s = [s stringByAppendingFormat:@"%d:%u\n",i,*ptr];
+		s = [s stringByAppendingFormat:@"%d:%lu\n",i,*ptr];
 		ptr++;
 	}
 	

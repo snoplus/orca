@@ -815,7 +815,7 @@ int chan1724ConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
     };
 	
     [registerOffsetTextField setStringValue:
-	 [NSString stringWithFormat:@"0x%04x",
+	 [NSString stringWithFormat:@"0x%04lx",
 	  [model getAddressOffset:aRegisterIndex]]];
 	
     [registerReadWriteTextField setStringValue:types[[model getAccessType:aRegisterIndex]]];

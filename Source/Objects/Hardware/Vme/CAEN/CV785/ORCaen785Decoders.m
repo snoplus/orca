@@ -47,9 +47,9 @@
 	long length = ExtractLength(ptr[0]);
     NSString* title= @"CAEN785 ADC Record\n\n";
 	
-    NSString* len	=[NSString stringWithFormat: @"# ADC = %d\n",length-2];
-    NSString* crate = [NSString stringWithFormat:@"Crate = %d\n",(ptr[1] >> 21)&0x0000000f];
-    NSString* card  = [NSString stringWithFormat:@"Card  = %d\n",(ptr[1] >> 16)&0x0000001f];    
+    NSString* len	=[NSString stringWithFormat: @"# ADC = %lu\n",length-2];
+    NSString* crate = [NSString stringWithFormat:@"Crate = %lu\n",(ptr[1] >> 21)&0x0000000f];
+    NSString* card  = [NSString stringWithFormat:@"Card  = %lu\n",(ptr[1] >> 16)&0x0000001f];    
 	
     NSString* restOfString = [NSString string];
     int i;
