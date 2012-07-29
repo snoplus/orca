@@ -65,7 +65,8 @@
         BOOL            dataValid; 
 		ORAlarm*		sensorErrorAlarm;
 		ORAlarm*		lowBatteryAlarm;
-}		ORAlarm*		flowErrorAlarm;
+		ORAlarm*		flowErrorAlarm;
+}
 
 
 #pragma mark ***Initialization
