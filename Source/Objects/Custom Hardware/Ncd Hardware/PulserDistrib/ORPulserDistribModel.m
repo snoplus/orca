@@ -454,11 +454,11 @@ static NSString *ORPulserDisableForPulser    = @"ORPulserDisableForPulser";
 {
     NSString* title= @"PDS Record\n\n";
     
-    NSString* gtid  = [NSString stringWithFormat:@"GTID   = %d\n",ptr[1]];
-    NSString* word1 = [NSString stringWithFormat:@"Board0 = 0x%02x\n",ptr[2] & 0x0000ffff];
-    NSString* word2 = [NSString stringWithFormat:@"Board1 = 0x%02x\n",(ptr[2] & 0xffff0000)>>16];
-    NSString* word3 = [NSString stringWithFormat:@"Board2 = 0x%02x\n",ptr[3] & 0x0000ffff];
-    NSString* word4 = [NSString stringWithFormat:@"Board3 = 0x%02x\n",(ptr[3] & 0xffff0000)>>16];
+    NSString* gtid  = [NSString stringWithFormat:@"GTID   = %lu\n",ptr[1]];
+    NSString* word1 = [NSString stringWithFormat:@"Board0 = 0x%02lx\n",ptr[2] & 0x0000ffff];
+    NSString* word2 = [NSString stringWithFormat:@"Board1 = 0x%02lx\n",(ptr[2] & 0xffff0000)>>16];
+    NSString* word3 = [NSString stringWithFormat:@"Board2 = 0x%02lx\n",ptr[3] & 0x0000ffff];
+    NSString* word4 = [NSString stringWithFormat:@"Board3 = 0x%02lx\n",(ptr[3] & 0xffff0000)>>16];
 	
     return [NSString stringWithFormat:@"%@%@%@%@%@%@",title,gtid,word1,word2,word3,word4];               
 }

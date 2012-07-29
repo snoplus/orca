@@ -70,7 +70,7 @@ static NSString* kMuxBoxKey[8] = {
     if(!IsShortForm(*ptr))ptr++;
     NSString* title= @"Mux Event Record\n\n";
     unsigned short chanHitMask = ptr[0] & 0x00000fff;
-    NSString* box = [NSString stringWithFormat:@"Box      = %d\n",(ptr[0]>>kMuxBusNumberDataRecordShift) & 0x00000007];
+    NSString* box = [NSString stringWithFormat:@"Box      = %lu\n",(ptr[0]>>kMuxBusNumberDataRecordShift) & 0x00000007];
     NSString* hit = [NSString stringWithFormat:@"Hit Mask = 0x%x\n",chanHitMask];
     NSString* subTitle = @"Channels Hit:\n";
     NSString* restOfString = [NSString string];
@@ -101,7 +101,7 @@ static NSString* kMuxBoxKey[8] = {
     }
     
     //mux global reg
-    [aDataSet loadGenericData:[NSString stringWithFormat:@"0x%08x",*ptr&0x0000ffff] sender:self withKeys:@"Mux Global Reg",nil];
+    [aDataSet loadGenericData:[NSString stringWithFormat:@"0x%08lx",*ptr&0x0000ffff] sender:self withKeys:@"Mux Global Reg",nil];
     return length;
 }
 - (NSString*) getMuxBoxKey:(unsigned short)aMuxBox
@@ -113,7 +113,7 @@ static NSString* kMuxBoxKey[8] = {
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
     NSString* title= @"Mux Global Register Record\n\n";
-    NSString* reg = [NSString stringWithFormat:@"Register = 0x%x\n",*ptr&0x0000ffff];
+    NSString* reg = [NSString stringWithFormat:@"Register = 0x%lx\n",*ptr&0x0000ffff];
 
     return [NSString stringWithFormat:@"%@%@",title,reg];
 }

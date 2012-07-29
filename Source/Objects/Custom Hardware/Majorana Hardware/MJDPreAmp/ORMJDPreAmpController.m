@@ -56,7 +56,7 @@
 - (void) setModel:(id)aModel
 {
     [super setModel:aModel];
-    [[self window] setTitle:[NSString stringWithFormat:@"PreAmp %d",[model uniqueIdNumber]]];
+    [[self window] setTitle:[NSString stringWithFormat:@"PreAmp %lu",[model uniqueIdNumber]]];
     [self settingsLockChanged:nil];
 }
 
