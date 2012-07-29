@@ -180,7 +180,7 @@
 {
 	@synchronized([NSApp delegate]){
     
-        NSString* body = [NSString stringWithString:   @"----------------------------------------------------------------------------------------------------\n"];
+        NSString* body = @"----------------------------------------------------------------------------------------------------\n";
         body           = [body stringByAppendingString:@"An ORCA debugging session has begun on\n"];
         body           = [body stringByAppendingFormat:@"\n%@\n\n",computerName()];
         body           = [body stringByAppendingString:@"If is possible that erroneous alarm emails may be generated during this process.\n"];
@@ -221,7 +221,7 @@
 	@synchronized([NSApp delegate]){
         NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 
-        NSString* body = [NSString stringWithString:   @"----------------------------------------------------------------------------------------------------\n"];
+        NSString* body = @"----------------------------------------------------------------------------------------------------\n";
         body           = [body stringByAppendingString:@"An ORCA debugging session has ended on:\n"];
         body           = [body stringByAppendingFormat:@"\n%@\n\n",computerName()];
         body           = [body stringByAppendingString:@"Normal operations have resumed. You should pay full attention to all alarms.\n"];
