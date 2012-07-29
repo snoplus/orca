@@ -571,7 +571,7 @@
 		case LOGFILE:		return [self openLogFile:p];
 		case kAppend:		return [[NSString stringWithFormat:@"%@",NodeValue(0)] stringByAppendingString:[@" " stringByAppendingFormat:@"%@",NodeValue(1)]];
 		case kTightAppend:	return [[NSString stringWithFormat:@"%@",NodeValue(0)] stringByAppendingString:[NSString stringWithFormat:@"%@",NodeValue(1)]];
-		case HEX:			return [NSString stringWithFormat:@"0x%x",(unsigned long)[NodeValue(0) longValue]];
+		case HEX:			return [NSString stringWithFormat:@"0x%lx",(unsigned long)[NodeValue(0) longValue]];
 		case MAKEPOINT:		return [NSString stringWithFormat:@"@(%@,%@)",NodeValue(0),NodeValue(1)];
 		case MAKERECT:		return [NSString stringWithFormat:@"@(%@,%@,%@,%@)",NodeValue(0),NodeValue(1),NodeValue(2),NodeValue(3)];
 		case MAKERANGE:		return [NSString stringWithFormat:@"@(%@,%@)",NodeValue(0),NodeValue(1)];
@@ -757,7 +757,7 @@
 {
 	id selName  = NodeValue(0);
 	id selValue = NodeValue(1);
-	return [NSString stringWithFormat:@"%@:%u#",selName,(unsigned long)selValue];
+	return [NSString stringWithFormat:@"%@:%lu#",selName,(unsigned long)selValue];
 }
 
 - (id) processStatements:(id) p

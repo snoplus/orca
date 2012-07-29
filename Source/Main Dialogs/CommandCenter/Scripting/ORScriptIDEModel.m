@@ -343,7 +343,7 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 
 - (NSString*) identifier
 {
-    return [NSString stringWithFormat:@"%@ %d",[self scriptName],[self uniqueIdNumber]];
+    return [NSString stringWithFormat:@"%@ %lu",[self scriptName],[self uniqueIdNumber]];
 }
 
 - (NSMutableArray*) inputValues
@@ -830,7 +830,7 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 	if(scriptType == 1)			typeString = @"ORRunScriptModel";
 	else if(scriptType == 2)	typeString = @"ORScriptTaskModel";
 	else						typeString = @"ID"; //should never use this one if all types defined.
-    NSString* idString = [NSString stringWithFormat:@"%@,%d id: %d\n",typeString,theObjID,ptr[3]];
+    NSString* idString = [NSString stringWithFormat:@"%@,%d id: %lu\n",typeString,theObjID,ptr[3]];
 	
 	NSPropertyListFormat format;
 	NSData *plistXML = [NSData dataWithBytes:&ptr[5] length:ptr[4]];

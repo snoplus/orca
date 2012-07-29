@@ -702,7 +702,7 @@
 		}
 		else if([ident isEqualToString:@"valueHex"]){
 			id aValue = [anArray objectForKey:[keyArray objectAtIndex:aRow]];
-			if([aValue isKindOfClass:[NSDecimalNumber class]]) return [NSString stringWithFormat:@"0x%X",[aValue longValue]];
+			if([aValue isKindOfClass:[NSDecimalNumber class]]) return [NSString stringWithFormat:@"0x%lX",[aValue longValue]];
 			else return @"Not Number";
 		}
 		else return nil;
