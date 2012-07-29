@@ -983,13 +983,13 @@ int filterGraph(nodeType*);
 	if(index==[outputValues count]){
 		[outputValues addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
 								 [NSString stringWithFormat:@"%d",index],   @"name",
-								 [NSString stringWithFormat:@"%d",aValue], @"iValue",
+								 [NSString stringWithFormat:@"%lu",aValue], @"iValue",
 								 nil]];
 	}
 	else {
 		[outputValues replaceObjectAtIndex:index withObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
 															 [NSString stringWithFormat:@"%d",index],  @"name",
-															 [NSString stringWithFormat:@"%d",aValue], @"iValue",
+															 [NSString stringWithFormat:@"%lu",aValue], @"iValue",
 															 nil]];
 	}
 	NSTimeInterval currentTimeRef = [NSDate timeIntervalSinceReferenceDate];
@@ -1099,8 +1099,8 @@ int filterGraph(nodeType*);
 {
     NSString* title= @"Filter Record (1D)\n\n";
     
-    NSString* value  = [NSString stringWithFormat:@"Value = %d\n",ptr[1]&0x00ffffff];    
-    NSString* index  = [NSString stringWithFormat: @"Index  = %d\n",(ptr[1]&0xff000000)>>24];    
+    NSString* value  = [NSString stringWithFormat:@"Value = %lu\n",ptr[1]&0x00ffffff];
+    NSString* index  = [NSString stringWithFormat: @"Index  = %lu\n",(ptr[1]&0xff000000)>>24];    
 	
     return [NSString stringWithFormat:@"%@%@%@",title,value,index];               
 }
@@ -1115,7 +1115,7 @@ int filterGraph(nodeType*);
     unsigned long length = 3;
 	
     [aDataSet histogram2DX:ptr[1]&0x0000ffff y:ptr[2]&0x0000ffff size:256  sender:self  
-				  withKeys:@"Filter2D",[NSString stringWithFormat:@"%d",(ptr[1]&0xff00000)>>24],
+				  withKeys:@"Filter2D",[NSString stringWithFormat:@"%lu",(ptr[1]&0xff00000)>>24],
 	 nil];
 	
 	
@@ -1126,9 +1126,9 @@ int filterGraph(nodeType*);
 {
     NSString* title= @"Filter Record (2D)\n\n";
     
-    NSString* index   = [NSString stringWithFormat: @"Index  = %d\n",(ptr[1]&0xff00000)>>24];    
-    NSString* valueX  = [NSString stringWithFormat: @"ValueX = %d\n",ptr[1]&0x0000ffff];    
-    NSString* valueY  = [NSString stringWithFormat: @"ValueY = %d\n",ptr[2]&0x0000ffff];    
+    NSString* index   = [NSString stringWithFormat: @"Index  = %lu\n",(ptr[1]&0xff00000)>>24];
+    NSString* valueX  = [NSString stringWithFormat: @"ValueX = %lu\n",ptr[1]&0x0000ffff];
+    NSString* valueY  = [NSString stringWithFormat: @"ValueY = %lu\n",ptr[2]&0x0000ffff];    
 	
     return [NSString stringWithFormat:@"%@%@%@%@",title,valueX,valueY,index];               
 }
@@ -1141,7 +1141,7 @@ int filterGraph(nodeType*);
     unsigned long length = 3;
 	
     [aDataSet loadTimeSeries:ptr[1]&0xFFFF atTime:ptr[2] sender:self  
-					withKeys:@"FilterStripChart",[NSString stringWithFormat:@"%d",(ptr[1]&0xffff0000)>>16],
+					withKeys:@"FilterStripChart",[NSString stringWithFormat:@"%lu",(ptr[1]&0xffff0000)>>16],
 	 nil];
 	
     return length; //must return number of longs processed.
@@ -1151,9 +1151,9 @@ int filterGraph(nodeType*);
 {
     NSString* title= @"Filter Time Series\n\n";
     
-    NSString* index  =     [NSString stringWithFormat: @"Index = %d\n",(ptr[1] & 0xffff0000)>>16];    
-    NSString* timeValue  = [NSString stringWithFormat: @"Time  = %d\n",ptr[1] & 0x0000ffff];    
-    NSString* value  =     [NSString stringWithFormat: @"Value = %d\n",ptr[2]];    
+    NSString* index  =     [NSString stringWithFormat: @"Index = %lu\n",(ptr[1] & 0xffff0000)>>16];
+    NSString* timeValue  = [NSString stringWithFormat: @"Time  = %lu\n",ptr[1] & 0x0000ffff];
+    NSString* value  =     [NSString stringWithFormat: @"Value = %lu\n",ptr[2]];    
 	
     return [NSString stringWithFormat:@"%@%@%@%@",title,index,timeValue,value];               
 }

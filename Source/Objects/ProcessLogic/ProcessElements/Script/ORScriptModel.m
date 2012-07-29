@@ -89,7 +89,7 @@ NSString* ORScriptPathChanged					= @"ORScriptPathChanged";
     id obj2 = [self objectConnectedTo:ORScriptInputConnection];
     NSString* nextPrefix = [prefix stringByAppendingString:@"  "];
     NSString* noConnectionString = [NSString stringWithFormat:@"%@--",nextPrefix];
-    return [NSString stringWithFormat:@"%@\n%@\n%@",s,
+    return [NSString stringWithFormat:@"%@\n%@\n",s,
                                     obj2?[obj2 description:nextPrefix]:noConnectionString];
 }
 
@@ -106,7 +106,7 @@ NSString* ORScriptPathChanged					= @"ORScriptPathChanged";
     if([self uniqueIdNumber]){
         NSFont* theFont = [NSFont messageFontOfSize:8];
         NSAttributedString*n = [[NSAttributedString alloc] 
-								initWithString:[NSString stringWithFormat:@"%d",[self uniqueIdNumber]] 
+								initWithString:[NSString stringWithFormat:@"%lu",[self uniqueIdNumber]] 
 								attributes:[NSDictionary dictionaryWithObject:theFont forKey:NSFontAttributeName]];
         
         NSSize textSize = [n size];

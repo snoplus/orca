@@ -195,7 +195,7 @@
 {
 	unsigned long fileSize = [model calculatedFileSizeBytes];
 	NSString* s;
-	if(fileSize < 1000)				s = [NSString stringWithFormat:@"%d Bytes",fileSize];
+	if(fileSize < 1000)				s = [NSString stringWithFormat:@"%lu Bytes",fileSize];
 	else if(fileSize < 1000000)		s = [NSString stringWithFormat:@"%.1f KB",fileSize/1000.];
 	else if(fileSize < 1000000000)	s = [NSString stringWithFormat:@"%.1f MB",fileSize/1000000.];
 	else							s = [NSString stringWithFormat:@"%.1f GB",fileSize/1000000000.];

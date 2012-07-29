@@ -412,7 +412,7 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
 - (NSString*) name
 {
     if([self leafNode])return [data name];
-    else return [NSString stringWithFormat:@"%@   count: %u",key,totalCounts];
+    else return [NSString stringWithFormat:@"%@   count: %lu",key,totalCounts];
 }
 
 - (void) setKey:(NSString*)aKey

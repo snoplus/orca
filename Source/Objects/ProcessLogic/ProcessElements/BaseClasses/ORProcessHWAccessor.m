@@ -311,7 +311,7 @@ NSString* ORHWAccessLock									= @"ORHWAccessLock";
     if([self uniqueIdNumber]){
         theFont = [NSFont messageFontOfSize:9];
         n = [[NSAttributedString alloc] 
-            initWithString:[NSString stringWithFormat:@"%d",[self uniqueIdNumber]] 
+            initWithString:[NSString stringWithFormat:@"%lu",[self uniqueIdNumber]] 
                 attributes:[NSDictionary dictionaryWithObject:theFont forKey:NSFontAttributeName]];
         
         NSSize textSize = [n size];

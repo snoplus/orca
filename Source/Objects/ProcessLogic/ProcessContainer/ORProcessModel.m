@@ -275,7 +275,7 @@ NSString* ORProcessModelRunNumberChanged			= @"ORProcessModelRunNumberChanged";
 - (NSString*) elementName
 {
 	if([shortName length])return [self shortName];
-	else return [NSString stringWithFormat:@"Process %d",[self uniqueIdNumber]];
+	else return [NSString stringWithFormat:@"Process %lu",[self uniqueIdNumber]];
 }
 
 
@@ -396,7 +396,7 @@ NSString* ORProcessModelRunNumberChanged			= @"ORProcessModelRunNumberChanged";
 {
 	if(inTestMode){
 		if(!testModeAlarm){
-			testModeAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Process %d in TestMode",[self uniqueIdNumber]] severity:kInformationAlarm];
+			testModeAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Process %lu in TestMode",[self uniqueIdNumber]] severity:kInformationAlarm];
 			[testModeAlarm setHelpString:@"The Process is in test mode. This means that hardware will NOT be touched. Input relays can be switched by a Cmd-Click"];
 
 		}
@@ -432,7 +432,7 @@ NSString* ORProcessModelRunNumberChanged			= @"ORProcessModelRunNumberChanged";
         }
 				
         NSAttributedString* n = [[NSAttributedString alloc] 
-                                initWithString:[NSString stringWithFormat:@"%d %@",[self uniqueIdNumber],stateString] 
+                                initWithString:[NSString stringWithFormat:@"%lu %@",[self uniqueIdNumber],stateString] 
                                     attributes:[NSDictionary dictionaryWithObject:[NSFont labelFontOfSize:12] forKey:NSFontAttributeName]];
         
         [n drawInRect:NSMakeRect(10,[i size].height-18,[i size].width-20,16)];
@@ -559,7 +559,7 @@ NSString* ORProcessModelRunNumberChanged			= @"ORProcessModelRunNumberChanged";
 - (void) incrementProcessRunNumber
 {
     NSUserDefaults* defaults 	= [NSUserDefaults standardUserDefaults];
-    NSString* aKey = [NSString stringWithFormat:@"Process%dRunNumber",[self uniqueIdNumber]];
+    NSString* aKey = [NSString stringWithFormat:@"Process%luRunNumber",[self uniqueIdNumber]];
     int n = [[defaults objectForKey:aKey] intValue];
     [defaults setObject:[NSNumber numberWithInt:n+1] forKey:aKey];
     [defaults synchronize];
@@ -569,7 +569,7 @@ NSString* ORProcessModelRunNumberChanged			= @"ORProcessModelRunNumberChanged";
 - (int) processRunNumber
 {
     NSUserDefaults* defaults 	= [NSUserDefaults standardUserDefaults];
-    NSString* aKey = [NSString stringWithFormat:@"Process%dRunNumber",[self uniqueIdNumber]];
+    NSString* aKey = [NSString stringWithFormat:@"Process%luRunNumber",[self uniqueIdNumber]];
     return [[defaults  objectForKey:aKey] intValue];
 }
 
@@ -692,7 +692,7 @@ NSString* ORProcessModelRunNumberChanged			= @"ORProcessModelRunNumberChanged";
                     time(&ut_Time);
                     if(ut_Time - lastHistorySample >= 10){
                         lastHistorySample = ut_Time;
-                        NSString* finalString = [NSString stringWithFormat:@"%d%@\n",ut_Time,s];
+                        NSString* finalString = [NSString stringWithFormat:@"%lu%@\n",ut_Time,s];
                         if(writeHeader){
                             finalString = [header stringByAppendingString:finalString];
                             writeHeader = NO;

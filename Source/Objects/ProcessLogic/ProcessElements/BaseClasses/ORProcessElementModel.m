@@ -346,7 +346,7 @@ NSString* ORProcessElementForceUpdateNotification   = @"ORProcessElementForceUpd
 
 - (NSString*) description:(NSString*)prefix
 {
-    return [NSString stringWithFormat:@"%@%@ %d",prefix,[self elementName],[self uniqueIdNumber]];
+    return [NSString stringWithFormat:@"%@%@ %lu",prefix,[self elementName],[self uniqueIdNumber]];
 }
 
 - (NSString*)comment
@@ -462,7 +462,7 @@ NSString* ORProcessElementForceUpdateNotification   = @"ORProcessElementForceUpd
 	if([self uniqueIdNumber]){
 		NSFont* theFont = [NSFont messageFontOfSize:theSize];
 		return [[[NSAttributedString alloc] 
-				 initWithString:[NSString stringWithFormat:@"%d",[self processID]] 
+				 initWithString:[NSString stringWithFormat:@"%lu",[self processID]] 
 				 attributes:[NSDictionary dictionaryWithObjectsAndKeys:theFont,NSFontAttributeName,textColor,NSForegroundColorAttributeName,nil]]autorelease];
 	}
 	else return nil;

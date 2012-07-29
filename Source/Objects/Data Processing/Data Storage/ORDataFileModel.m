@@ -172,7 +172,7 @@ static const int currentVersion = 1;           // Current version
 		[configFolder ensureExists:[configFolder finalDirectoryName]]; 
 		if([[ORGlobal sharedGlobal] documentWasEdited] || !savedFirstTime){
 			unsigned long runNumber = [[[aNotification userInfo] objectForKey:@"kRunNumber"] longValue];
-			[[self document] copyDocumentTo:[[configFolder finalDirectoryName]stringByExpandingTildeInPath] append:[NSString stringWithFormat:@"%d",runNumber]];
+			[[self document] copyDocumentTo:[[configFolder finalDirectoryName]stringByExpandingTildeInPath] append:[NSString stringWithFormat:@"%lu",runNumber]];
 			savedFirstTime = YES;
 		}
 	}
@@ -814,7 +814,7 @@ static NSString* ORDataSaveConfiguration    = @"ORDataSaveConfiguration";
 
 - (NSString*) identifier
 {
-    return [NSString stringWithFormat:@"DataStorage,%d",[self uniqueIdNumber]];
+    return [NSString stringWithFormat:@"DataStorage,%lu",[self uniqueIdNumber]];
 }
 
 - (NSString*) processingTitle

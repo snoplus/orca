@@ -53,7 +53,7 @@
 
 - (void) awakeFromNib
 {		
-    NSString* key = [NSString stringWithFormat: @"orca.ORHeaderExplorer%d.selectedtab",[model uniqueIdNumber]];
+    NSString* key = [NSString stringWithFormat: @"orca.ORHeaderExplorer%lu.selectedtab",[model uniqueIdNumber]];
     int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
@@ -805,7 +805,7 @@
 
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
 {
-    NSString* key = [NSString stringWithFormat: @"orca.ORHeaderExplorer%d.selectedtab",[model uniqueIdNumber]];
+    NSString* key = [NSString stringWithFormat: @"orca.ORHeaderExplorer%lu.selectedtab",[model uniqueIdNumber]];
     int index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
 	
