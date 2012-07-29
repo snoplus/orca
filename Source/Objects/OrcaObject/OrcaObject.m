@@ -325,7 +325,7 @@ NSString* ORMiscAttributeKey		= @"ORMiscAttributeKey";
 
 - (NSString*) fullID
 {
-    return [NSString stringWithFormat:@"%@,%d",NSStringFromClass([self class]),[self uniqueIdNumber]];
+    return [NSString stringWithFormat:@"%@,%lu",NSStringFromClass([self class]),[self uniqueIdNumber]];
 }
 
 - (void) askForUniqueIDNumber

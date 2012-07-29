@@ -355,7 +355,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 		}
 	}
 	if(valid){
-		if(header)return [NSString stringWithFormat:@"Last %d seconds of ORCA Status log\n\n%@",aDuration,tailContents];
+		if(header)return [NSString stringWithFormat:@"Last %lu seconds of ORCA Status log\n\n%@",aDuration,tailContents];
 		else return tailContents;
 	}
 	else return nil;
@@ -495,7 +495,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 	NSArray* runControlObjects = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
 	NSString* theRun;
 	if([runControlObjects count]){
-		theRun = [NSString stringWithFormat:@"Run Number %d",[[runControlObjects objectAtIndex:0] runNumber]];
+		theRun = [NSString stringWithFormat:@"Run Number %lu",[[runControlObjects objectAtIndex:0] runNumber]];
 	}
 	else {
 		theRun = @"No Run Control Obj";

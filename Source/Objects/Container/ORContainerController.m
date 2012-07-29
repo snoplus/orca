@@ -75,7 +75,7 @@
     if(range.location != NSNotFound){
         theName = [theName substringToIndex:range.location];
     }
-    [[self window] setTitle:[NSString stringWithFormat:@"%@ %d",theName,[model uniqueIdNumber]]];
+    [[self window] setTitle:[NSString stringWithFormat:@"%@ %lu",theName,[model uniqueIdNumber]]];
     
     if([[model guardian] isKindOfClass: [model class]]){
         [goBackButton setTransparent:NO];

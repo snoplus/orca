@@ -286,7 +286,7 @@ NSString* methodsInCommonSection(id anObj)
 
 NSString* hexToString(unsigned long aHexValue)
 {
-	return [NSString stringWithFormat:@"%x",aHexValue];
+	return [NSString stringWithFormat:@"%lx",aHexValue];
 }
 
 const char* decodeType(const char* aType)
@@ -329,12 +329,10 @@ NSString* commonScriptMethodsByObj(id anObj,BOOL includeSuperClass)
 	else [resultString appendString:@"No common methods defined\n"];
 	
 	if(includeSuperClass){
-		Class superClass = [anObj superclass];
-		if (superClass==nil) [resultString appendFormat: @"%@ has no superclass\n", [anObj className]];
+		if ([anObj superclass]==nil) [resultString appendFormat: @"%@ has no superclass\n", [anObj className]];
 		else {
-			NSString* superClassName = [superClass className];
-			if(![superClassName hasPrefix:@"NS"]){
-				[resultString appendFormat: @"\n-------------------\n%@ superclass: %@\n", [anObj className], superClassName];
+			if(![[anObj superclass] hasPrefix:@"NS"]){
+				[resultString appendFormat: @"\n-------------------\n%@ superclass: %@\n", [anObj className], [anObj superclass]];
 				[resultString appendString: commonScriptMethodsByObj( [anObj superclass],includeSuperClass)];
 			}
 		}

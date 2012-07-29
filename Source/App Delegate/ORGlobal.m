@@ -204,7 +204,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Global);
 					}
 
 					if(runType & ~eMaintenanceRunType){
-						rs = [rs stringByAppendingFormat:@" Mask: 0x%X",runType & ~eMaintenanceRunType];
+						rs = [rs stringByAppendingFormat:@" Mask: 0x%lX",runType & ~eMaintenanceRunType];
 					}
 				}
             }

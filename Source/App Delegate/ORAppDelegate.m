@@ -711,7 +711,7 @@ fail:
 		if([[[NSUserDefaults standardUserDefaults] objectForKey:ORPrefHeartBeatEnabled] intValue]){
 			NSString* finalPath = [[[NSUserDefaults standardUserDefaults] objectForKey:ORPrefHeartBeatPath] stringByAppendingPathComponent:@"Heartbeat"]; 
 			unsigned long now = (unsigned long)[NSDate timeIntervalSinceReferenceDate];
-			NSString* contents = [NSString stringWithFormat:@"Time:%d\nNext:%d",now,now+kHeartbeatPeriod];
+			NSString* contents = [NSString stringWithFormat:@"Time:%lu\nNext:%lu",now,now+kHeartbeatPeriod];
 			[contents writeToFile:finalPath atomically:YES encoding:NSASCIIStringEncoding error:nil];
 		}
 		//if(heartbeatCount%30 == 0){

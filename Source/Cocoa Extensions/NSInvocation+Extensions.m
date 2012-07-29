@@ -251,7 +251,7 @@
 	else if(!strncmp(theArg,"{_NSRa",6)){
 		NSRange theRange;
         [self getReturnValue:&theRange]; 
-		return [NSString stringWithFormat:@"@(%f,%f)",theRange.location,theRange.length];
+		return [NSString stringWithFormat:@"@(%f,%f)",(float)theRange.location,(float)theRange.length];
 	}
 	else if(!strncmp(theArg,"{_NSRe",6)){
 		NSRect theRect;

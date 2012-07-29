@@ -995,25 +995,24 @@
 
 - (void)keyDown:(NSEvent *)event
 {
-	NSString *input = [event characters];
-	
-	if([input isEqual:[NSString stringWithFormat:@"%C", NSUpArrowFunctionKey]]){
+    int keyCode = [event keyCode];
+	if(keyCode == 126){
 		[self moveSelectedObjectsUp:event];
 	}
-	else if([input isEqual:[NSString stringWithFormat:@"%C", NSDownArrowFunctionKey]]){
+	else if(keyCode == 125){
 		[self moveSelectedObjectsDown:event];
 	}
-	else if([input isEqual:[NSString stringWithFormat:@"%C", NSLeftArrowFunctionKey]]){
+	else if(keyCode == 123){
 		[self moveSelectedObjectsLeft:event];
 	}
-	else if([input isEqual:[NSString stringWithFormat:@"%C", NSRightArrowFunctionKey]]){
+	else if(keyCode == 124){
 		[self moveSelectedObjectsRight:event];
 	}
-	else if([input isEqual:@"="]){
+	else if(keyCode == 24){
 		[group changeSelectedObjectsLevel:NO];
 		[self setNeedsDisplay:YES];
 	}
-	else if([input isEqual:@"-"]){
+	else if(keyCode == 27){
 		[group changeSelectedObjectsLevel:YES];
 		[self setNeedsDisplay:YES];
 	}	
