@@ -170,21 +170,21 @@
 		SCBHeader 			  cbHeader 			 = [model cbControlBlockHeader];
 		eCPUDualPortControl   dualPortControl 	 = [model dualPortControl];
 		
-		NSMutableString* s1 =  [NSMutableString stringWithFormat:@"Heart beat     : %-12d   Status  : %-d\n",communicationBlock.heartbeat,communicationBlock.ecpu_status];
-		[s1 appendFormat:@"CB Head        : 0x%-10x   Debug   : %-d\n",cbHeader.qHead,dualPortControl.ecpu_dbg_level];
-		[s1 appendFormat:@"CB Tail        : 0x%-10x   Errors  : %-d\n",cbHeader.qTail,communicationBlock.tot_err_cnt];
-		[s1 appendFormat:@"Bytes Written  : %-10d     DPM Full: %-d\n",cbHeader.bytesWritten,communicationBlock.CB_err_dpm_buf_full_cnt];
-		[s1 appendFormat:@"Bytes Read     : %d\n",cbHeader.bytesRead];
-		[s1 appendFormat:@"Blocks Written : %-10d     Rqt Flag: %-d\n",cbHeader.blocksWritten,dualPortControl.ro_control_rqst];
-		[s1 appendFormat:@"Blocks Read    : %d\n",cbHeader.blocksRead];
-		[s1 appendFormat:@"Write Sentinel : 0x%0x\n",cbHeader.writeSentinel];
+		NSMutableString* s1 =  [NSMutableString stringWithFormat:@"Heart beat     : %-12lu   Status  : %-lu\n",communicationBlock.heartbeat,communicationBlock.ecpu_status];
+		[s1 appendFormat:@"CB Head        : %-10lu     Debug   : %-lu\n", (unsigned long)cbHeader.qHead,dualPortControl.ecpu_dbg_level];
+		[s1 appendFormat:@"CB Tail        : %-10lu     Errors  : %-lu\n", (unsigned long)cbHeader.qTail,communicationBlock.tot_err_cnt];
+		[s1 appendFormat:@"Bytes Written  : %-10ld     DPM Full: %-lu\n",cbHeader.bytesWritten,communicationBlock.CB_err_dpm_buf_full_cnt];
+		[s1 appendFormat:@"Bytes Read     : %ld\n",cbHeader.bytesRead];
+		[s1 appendFormat:@"Blocks Written : %-10ld     Rqt Flag: %-lu\n",cbHeader.blocksWritten,dualPortControl.ro_control_rqst];
+		[s1 appendFormat:@"Blocks Read    : %ld\n",cbHeader.blocksRead];
+		[s1 appendFormat:@"Write Sentinel : 0x%0lx\n",cbHeader.writeSentinel];
 		NSString* versionString = [[[NSString alloc] initWithBytes:&communicationBlock.version length:4 encoding:NSASCIIStringEncoding]autorelease];
-		[s1 appendFormat:@"Read Sentinel  : 0x%-10x   Version : %@\n",cbHeader.readSentinel,versionString];
+		[s1 appendFormat:@"Read Sentinel  : 0x%-10lx   Version : %@\n",cbHeader.readSentinel,versionString];
 		
 		int i;
 		[s1 appendFormat:@"\nHardware counters\n"];
 		for(i=0;i<HW_MAX_COUNT;i++){
-			[s1 appendFormat:@"%2d Err: %-10u lp: %-10u tot: %-1u\n",i,communicationBlock.rd_error_cnt[i],communicationBlock.loop_cnt[i],communicationBlock.total_rate_cnt[i]];
+			[s1 appendFormat:@"%2d Err: %-10lu lp: %-10lu tot: %-1lu\n",i,communicationBlock.rd_error_cnt[i],communicationBlock.loop_cnt[i],communicationBlock.total_rate_cnt[i]];
 		}
 		
 		[outputView setString:s1];
@@ -198,7 +198,7 @@
 			[aString appendString:[model messageString:i]];
 		}
 		[messageView setString:aString];
-		[debugLevelField setStringValue:[NSString stringWithFormat:@"Debug: %-d\n",dualPortControl.ecpu_dbg_level]];
+		[debugLevelField setStringValue:[NSString stringWithFormat:@"Debug: %-lu\n",dualPortControl.ecpu_dbg_level]];
 	}
 	else if([errorDrawer state] == NSDrawerOpenState){
 		int i;
@@ -294,7 +294,7 @@
 		const unsigned char* p = (const unsigned char*)[buffer bytes];
 		while(1){
 			NSMutableString* lineString = [[NSMutableString alloc] initWithCapacity:256];
-			[lineString setString:[NSString stringWithFormat:@"%08x: ",startAddress+offset]];
+			[lineString setString:[NSString stringWithFormat:@"%0lx: ",startAddress+offset]];
 			for(i=0;i<0x10;i++){
 				[lineString appendFormat:@"%02x ",*(p+offset)];				
 				offset++;

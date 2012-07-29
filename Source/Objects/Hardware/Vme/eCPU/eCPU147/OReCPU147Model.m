@@ -898,12 +898,12 @@ static NSString *OReCPUReadOutGroup1		= @"OReCPU ReadOut Group 1";
 		case 0: if(communicationBlock.msg_parm0[an_Index]!=0){
             [aString appendFormat:@" [%@]",[[[NSString alloc] initWithBytes:&communicationBlock.msg_parm0[an_Index] length:4 encoding:NSASCIIStringEncoding]autorelease]];
         }
-		else [aString appendFormat:@" [%d]",communicationBlock.msg_parm0[an_Index]];
+		else [aString appendFormat:@" [%lu]",communicationBlock.msg_parm0[an_Index]];
             break;
-		case 1: [aString appendFormat:@" [%d]",communicationBlock.msg_parm1[an_Index]];break;
-		case 2: [aString appendFormat:@" [%d]",communicationBlock.msg_parm2[an_Index]];break;
-		case 3: [aString appendFormat:@" [%d]",communicationBlock.msg_parm3[an_Index]];break;
-		case 4: [aString appendFormat:@" [0x%x]",communicationBlock.msg_parm4[an_Index]];break;
+		case 1: [aString appendFormat:@" [%lu]",communicationBlock.msg_parm1[an_Index]];break;
+		case 2: [aString appendFormat:@" [%lu]",communicationBlock.msg_parm2[an_Index]];break;
+		case 3: [aString appendFormat:@" [%lu]",communicationBlock.msg_parm3[an_Index]];break;
+		case 4: [aString appendFormat:@" [0x%lx]",communicationBlock.msg_parm4[an_Index]];break;
 		default: return;
 	}
 }
@@ -914,12 +914,12 @@ static NSString *OReCPUReadOutGroup1		= @"OReCPU ReadOut Group 1";
 		case 0: if(communicationBlock.er_parm0[an_Index]!=0){
             [aString appendFormat:@" [%@]",[[[NSString alloc] initWithBytes:&communicationBlock.er_parm0[an_Index] length:4 encoding:NSASCIIStringEncoding]autorelease]];
         }
-		else [aString appendFormat:@" [%d]",communicationBlock.er_parm0[an_Index]];
+		else [aString appendFormat:@" [%lu]",communicationBlock.er_parm0[an_Index]];
             break;
-		case 1: [aString appendFormat:@" [%d]",communicationBlock.er_parm1[an_Index]];break;
-		case 2: [aString appendFormat:@" [%d]",communicationBlock.er_parm2[an_Index]];break;
-		case 3: [aString appendFormat:@" [%d]",communicationBlock.er_parm3[an_Index]];break;
-		case 4: [aString appendFormat:@" [0x%x]",communicationBlock.er_parm4[an_Index]];break;
+		case 1: [aString appendFormat:@" [%lu]",communicationBlock.er_parm1[an_Index]];break;
+		case 2: [aString appendFormat:@" [%lu]",communicationBlock.er_parm2[an_Index]];break;
+		case 3: [aString appendFormat:@" [%lu]",communicationBlock.er_parm3[an_Index]];break;
+		case 4: [aString appendFormat:@" [0x%lx]",communicationBlock.er_parm4[an_Index]];break;
 		default: return;
 	}
 }
