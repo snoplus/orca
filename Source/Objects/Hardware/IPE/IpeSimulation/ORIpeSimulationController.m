@@ -333,7 +333,7 @@
 
 - (void) setWindowTitle
 {
-	[[self window] setTitle: [NSString stringWithFormat:@"IPE-KATRIN-Simulation-Interface - %d",[model uniqueIdNumber]]];
+	[[self window] setTitle: [NSString stringWithFormat:@"IPE-KATRIN-Simulation-Interface - %lu",[model uniqueIdNumber]]];
 }
 
 

@@ -420,7 +420,7 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
 		if ( mMonitorRead ) {
 			NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];	
 			NSString* dataStr = [[NSString alloc] initWithBytes: data length: nReadBytes encoding: NSASCIIStringEncoding];
-			[userInfo setObject: [NSString stringWithFormat: @"Read - Address: %d length: %d data: %@\n", 
+			[userInfo setObject: [NSString stringWithFormat: @"Read - Address: %d length: %ld data: %@\n", 
 								  aPrimaryAddress, nReadBytes, dataStr] 
 						 forKey: ORGpib1Monitor]; 
 			

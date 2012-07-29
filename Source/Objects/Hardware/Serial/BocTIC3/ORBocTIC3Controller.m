@@ -138,7 +138,7 @@
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[[self window] setTitle:[NSString stringWithFormat:@"BOC TIC (Unit %d)",[model uniqueIdNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"BOC TIC (Unit %lu)",[model uniqueIdNumber]]];
 }
 
 - (void) updateWindow

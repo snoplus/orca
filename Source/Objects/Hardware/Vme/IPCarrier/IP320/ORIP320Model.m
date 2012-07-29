@@ -668,7 +668,7 @@ static struct {
 		
 		NSString*   outputString = nil;
 		if(logToFile) {
-			outputString = [NSString stringWithFormat:@"%u ",ut_time];
+			outputString = [NSString stringWithFormat:@"%lu ",ut_time];
 		}
 		
 		short chan;

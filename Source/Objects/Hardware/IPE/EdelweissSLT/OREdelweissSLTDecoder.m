@@ -67,17 +67,17 @@ counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCoun
 	NSString* title= @"Ipe SLTv4 Event Record\n\n";
 	++ptr;		//skip the first word (dataID and length)
     
-    NSString* crate = [NSString stringWithFormat:@"Crate      = %d\n",(*ptr>>21) & 0xf];
-    NSString* card  = [NSString stringWithFormat:@"Station    = %d\n",(*ptr>>16) & 0x1f];
+    NSString* crate = [NSString stringWithFormat:@"Crate      = %lu\n",(*ptr>>21) & 0xf];
+    NSString* card  = [NSString stringWithFormat:@"Station    = %lu\n",(*ptr>>16) & 0x1f];
 	int recordType = (*ptr) & 0xf;
 	int counterType = ((*ptr)>>4) & 0xf;
 	
 	++ptr;		//point to event counter
 	
 	if (recordType == 0) {
-		NSString* eventCounter    = [NSString stringWithFormat:@"Event     = %d\n",*ptr++];
-		NSString* timeStampHi     = [NSString stringWithFormat:@"Time Hi   = %d\n",*ptr++];
-		NSString* timeStampLo     = [NSString stringWithFormat:@"Time Lo   = %d\n",*ptr];		
+		NSString* eventCounter    = [NSString stringWithFormat:@"Event     = %lu\n",*ptr++];
+		NSString* timeStampHi     = [NSString stringWithFormat:@"Time Hi   = %lu\n",*ptr++];
+		NSString* timeStampLo     = [NSString stringWithFormat:@"Time Lo   = %lu\n",*ptr];		
 
 		return [NSString stringWithFormat:@"%@%@%@%@%@%@",title,crate,card,
 							eventCounter,timeStampHi,timeStampLo];               
@@ -101,8 +101,8 @@ counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCoun
 		case kStopSubRunType:	typeString    = [NSString stringWithFormat:@"Stop SubRun Timestamp\n"]; break;
 		default:				typeString    = [NSString stringWithFormat:@"Unknown Timestamp Type\n"]; break;
 	}
-	NSString* timeStampHi     = [NSString stringWithFormat:@"Time Hi   = %d\n",*ptr++];
-	NSString* timeStampLo     = [NSString stringWithFormat:@"Time Lo   = %d\n",*ptr];		
+	NSString* timeStampHi     = [NSString stringWithFormat:@"Time Hi   = %lu\n",*ptr++];
+	NSString* timeStampLo     = [NSString stringWithFormat:@"Time Lo   = %lu\n",*ptr];		
 
 	return [NSString stringWithFormat:@"%@%@%@%@%@%@%@",title,crate,card,
 						counterString,typeString,timeStampHi,timeStampLo];               
@@ -227,11 +227,11 @@ followed by multiplicity data (20 longwords -- 1 pixel mask per card)
     NSString* title= @"Auger FLT Waveform Record\n\n";
 	++ptr;		//skip the first word (dataID and length)
     
-    NSString* crate = [NSString stringWithFormat:@"Crate      = %d\n",(*ptr>>21) & 0xf];
-    NSString* card  = [NSString stringWithFormat:@"Station    = %d\n",(*ptr>>16) & 0x1f];
+    NSString* crate = [NSString stringWithFormat:@"Crate      = %lu\n",(*ptr>>21) & 0xf];
+    NSString* card  = [NSString stringWithFormat:@"Station    = %lu\n",(*ptr>>16) & 0x1f];
 	++ptr;		//point to next structure
 	
-	NSString* eventCount		= [NSString stringWithFormat:@"Event Count = %d\n",*ptr];
+	NSString* eventCount		= [NSString stringWithFormat:@"Event Count = %lu\n",*ptr];
 
     return [NSString stringWithFormat:@"%@%@%@%@",title,crate,card,eventCount]; 
 }

@@ -88,7 +88,7 @@
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[[self window] setTitle:[NSString stringWithFormat:@"Rad7 (Unit %d)",[model uniqueIdNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"Rad7 (Unit %lu)",[model uniqueIdNumber]]];
 }
 
 #pragma mark ***Notifications

@@ -627,7 +627,7 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 {
 	NSString* s;
  	@synchronized(self){
-		s= [NSString stringWithFormat:@"MKS660,%d",[self uniqueIdNumber]];
+		s= [NSString stringWithFormat:@"MKS660,%lu",[self uniqueIdNumber]];
 	}
 	return s;
 }

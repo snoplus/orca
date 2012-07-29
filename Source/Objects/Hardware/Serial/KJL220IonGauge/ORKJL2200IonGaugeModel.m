@@ -549,7 +549,7 @@ NSString* ORKJL2200IonGaugeModelQueCountChanged			= @"ORKJL2200IonGaugeModelQueC
 	NSString* aCmd;
 	[self enqueCmdData:[NSString stringWithFormat:@"=SS:%d\r",sensitivity]];
 	[self enqueCmdData:[NSString stringWithFormat:@"=SE:%.1f\r",emissionCurrent]];
-	[self enqueCmdData:[NSString stringWithFormat:@"=ST:%d\r",degasTime]];
+	[self enqueCmdData:[NSString stringWithFormat:@"=ST:%.0f\r",degasTime]];
 	int i;
 	for(i=0;i<4;i++){
 		if([self setPoint:i]!=0) aCmd = [NSString stringWithFormat:@"=S%d:%.1E\r",i+1,setPoint[i]];

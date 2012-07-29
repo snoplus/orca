@@ -937,7 +937,7 @@ NSString* ORIpeSimulationPendingRequestsChanged	= @"ORIpeSimulationPendingReques
 
 - (NSString*) processingTitle
 {
-    return [NSString stringWithFormat: @"%@-%i",IPE_SIMULATION_SHORT_NAME,[self uniqueIdNumber]];
+    return [NSString stringWithFormat: @"%@-%lu",IPE_SIMULATION_SHORT_NAME,[self uniqueIdNumber]];
 }
 
 
@@ -1049,7 +1049,7 @@ NSString* ORIpeSimulationPendingRequestsChanged	= @"ORIpeSimulationPendingReques
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢ID Helpers (see OrcaObject)
 - (NSString*) identifier
 {
-    return [NSString stringWithFormat: @"%@-%i",IPE_SIMULATION_SHORT_NAME,[self uniqueIdNumber]];
+    return [NSString stringWithFormat: @"%@-%lu",IPE_SIMULATION_SHORT_NAME,[self uniqueIdNumber]];
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Methods Useful For Scripting

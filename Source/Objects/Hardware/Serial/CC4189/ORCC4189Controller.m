@@ -75,7 +75,7 @@
     processLimitSize = NSMakeSize(410,170);
     plotSize		 = NSMakeSize(410,315);
 	
-	NSString* key = [NSString stringWithFormat: @"orca.ORCC4189%d.selectedtab",[model uniqueIdNumber]];
+	NSString* key = [NSString stringWithFormat: @"orca.ORCC4189%lu.selectedtab",[model uniqueIdNumber]];
     int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
@@ -101,7 +101,7 @@
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[[self window] setTitle:[NSString stringWithFormat:@"CC4189 (Unit %d)",[model uniqueIdNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"CC4189 (Unit %lu)",[model uniqueIdNumber]]];
 }
 
 #pragma mark ***Notifications
@@ -219,7 +219,7 @@
 	
     [[self window] setContentView:totalView];
 	
-    NSString* key = [NSString stringWithFormat: @"orca.ORCC4189%d.selectedtab",[model uniqueIdNumber]];
+    NSString* key = [NSString stringWithFormat: @"orca.ORCC4189%lu.selectedtab",[model uniqueIdNumber]];
     int index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
 }

@@ -79,7 +79,7 @@ static NSString* kKeithleyUnit[8] = {
 		float asFloat;
 		unsigned long asLong;
 	}theData;
-	theString = [theString stringByAppendingFormat:@"HW ID = %d\n",dataPtr[1] & 0x0000ffff];
+	theString = [theString stringByAppendingFormat:@"HW ID = %lu\n",dataPtr[1] & 0x0000ffff];
 	
 	theData.asLong = dataPtr[2];
 	

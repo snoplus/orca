@@ -447,7 +447,7 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
 	if(triggerSource==0)trig = -1;
 	else trig = triggerSource;
 	
-	NSString* args = [NSString stringWithFormat:@"%lu,%ld,%ld,%ld,%G,%G",boardID,trig,triggerCoupling,triggerSlope,[self triggerLevel:0],[self triggerLevel:1]];
+	NSString* args = [NSString stringWithFormat:@"%lu,%ld,%d,%d,%G,%G",boardID,trig,triggerCoupling,triggerSlope,[self triggerLevel:0],[self triggerLevel:1]];
 	long status = [self doSetXXXCommand:kAcqiris_SetConfigTrigSource cmdArgs:args];
 	if(status)NSLog(@"config Trig Source status: %@\n",[self decodeError:status]);
 	return status;

@@ -81,9 +81,9 @@ Raw data points continue until the Data length is used up....
 	
     NSString* title= @"Pxi6289 Waveform Record\n\n";
     
-    NSString* crate = [NSString stringWithFormat:@"Crate = %d\n",ShiftAndExtract(ptr[1],21,0xf)];
-    NSString* card  = [NSString stringWithFormat:@"Card  = %d\n",ShiftAndExtract(ptr[1],16,0x1f)];
-    NSString* chan  = [NSString stringWithFormat:@"Chan  = %d\n",ShiftAndExtract(ptr[1],8,0xff)];
+    NSString* crate = [NSString stringWithFormat:@"Crate = %lu\n",ShiftAndExtract(ptr[1],21,0xf)];
+    NSString* card  = [NSString stringWithFormat:@"Card  = %lu\n",ShiftAndExtract(ptr[1],16,0x1f)];
+    NSString* chan  = [NSString stringWithFormat:@"Chan  = %lu\n",ShiftAndExtract(ptr[1],8,0xff)];
 	
     return [NSString stringWithFormat:@"%@%@%@%@",title,crate,card,chan];               
 }

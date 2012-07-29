@@ -689,9 +689,9 @@ NSString* ORLC950GpibLock  = @"ORLC950GpibLock";
 	
 	
 	NSLog(@"Record length: %d Sparsing factor: %d  scale factor: %e\n", waveformLength, sparsing, [ self horizontalScale ] );
-	[ self writeToGPIBDevice: [ NSString stringWithFormat: @"WAVEFORM_SETUP NP,%d,SP,%d", waveformLength, sparsing ]];
+	[ self writeToGPIBDevice: [ NSString stringWithFormat: @"WAVEFORM_SETUP NP,%ld,SP,%ld", waveformLength, sparsing ]];
 	//if ( waveformLength == 15000 ) waveformLength = 25000;	
-	[ self writeToGPIBDevice: [ NSString stringWithFormat: @"MEMORY_SIZE %d", waveformLength ] ];
+	[ self writeToGPIBDevice: [ NSString stringWithFormat: @"MEMORY_SIZE %ld", waveformLength ] ];
 }
 
 #pragma mark ***Hardware - Trigger
@@ -1380,7 +1380,7 @@ NSString* ORLC950GpibLock  = @"ORLC950GpibLock";
     [ self writeToGPIBDevice: @"COMM_FORMAT DEF9,BYTE,BIN" ]; // DEF9 - include 9 byte record stating size of following data.
 	// Byte data
 	// Binary encoding.
-    [ self writeToGPIBDevice: [ NSString stringWithFormat: @"WAVEFORM_SETUP NP,%d", mWaveformLength ]];  // Waveform size
+    [ self writeToGPIBDevice: [ NSString stringWithFormat: @"WAVEFORM_SETUP NP,%ld", mWaveformLength ]];  // Waveform size
     [ self oscSetAcqMode: kSingleWaveform ];  // Set to single waveform acquisition.
 }
 

@@ -72,7 +72,7 @@
     theData.asLong = dataPtr[2];
 	
 	
-    theString = [theString stringByAppendingFormat:@"Gauge %d: %.4 %@\n",ident,dataPtr[2],date];
+    theString = [theString stringByAppendingFormat:@"Gauge %d: %lu %@\n",ident,dataPtr[2],date];
 	return theString;
 }
 @end

@@ -1110,7 +1110,7 @@ NSString* ORCP8CryopumpModelConstraintsChanged				= @"ORCP8CryopumpModelConstrai
 {
 	NSString* s;
  	@synchronized(self){
-		s= [NSString stringWithFormat:@"CP8,%d",[self uniqueIdNumber]];
+		s= [NSString stringWithFormat:@"CP8,%lu",[self uniqueIdNumber]];
 	}
 	return s;
 }

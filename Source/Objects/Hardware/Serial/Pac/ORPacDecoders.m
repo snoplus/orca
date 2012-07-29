@@ -74,7 +74,7 @@
 		NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[index+1]];
 		[date setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
 		
-		theString = [theString stringByAppendingFormat:@"Channel %d: 0x%02x %@\n",i,dataPtr[index],date];
+		theString = [theString stringByAppendingFormat:@"Channel %d: 0x%02lx %@\n",i,dataPtr[index],date];
 		index+=2;
 	}
 	return theString;

@@ -348,7 +348,7 @@
 {
     [mibsta setStringValue:[NSString stringWithFormat:@"%#0x", aStatus]];
     [miberr setStringValue: [NSString stringWithFormat:@"%#0x", anError]];
-    [mibcntl setStringValue:[NSString stringWithFormat:@"%d", aCount]];
+    [mibcntl setStringValue:[NSString stringWithFormat:@"%ld", aCount]];
 }
 
 

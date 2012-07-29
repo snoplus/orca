@@ -689,7 +689,7 @@ NSString* ORHP4405AModelTraceChanged		= @"ORHP4405AModelTraceChanged";
 	NSDate *today = [NSDate date];
 	NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
 	NSDateComponents *components = [gregorian components:(NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit) fromDate:today];
-    [ self writeToGPIBDevice: [ NSString stringWithFormat: @"SYST:DATE %@,%@,%@", [components hour],[components minute],[components second]]];
+    [ self writeToGPIBDevice: [ NSString stringWithFormat: @"SYST:DATE %d,%d,%d", [components hour],[components minute],[components second]]];
 }
 
 - (unsigned long)	getPowerOnTime
@@ -726,8 +726,8 @@ NSString* ORHP4405AModelTraceChanged		= @"ORHP4405AModelTraceChanged";
 {
 	[self writeToGPIBDevice:[NSString stringWithFormat:@":TRIG:RFB:FSEL %@",burstFreqEnabled?@"ON":@"OFF"]];
 	[self writeToGPIBDevice:[NSString stringWithFormat:@":TRIG:RFB:LEV:TYPE %@",burstModeAbs?@"ABS":@"REL"]];
-	if(burstModeAbs)[self writeToGPIBDevice:[NSString stringWithFormat:@":TRIG:RFB:LEV:ABS",burstModeSetting]];
-	else			[self writeToGPIBDevice:[NSString stringWithFormat:@":TRIG:RFB:LEV:RL",burstModeSetting]];
+//	if(burstModeAbs)[self writeToGPIBDevice:[NSString stringWithFormat:@":TRIG:RFB:LEV:ABS",burstModeSetting]];
+//	else			[self writeToGPIBDevice:[NSString stringWithFormat:@":TRIG:RFB:LEV:RL",burstModeSetting]];
 	[self writeToGPIBDevice:[NSString stringWithFormat:@":TRIG:RFB:NPD %@",burstPulseDiscrimEnabled?@"ON":@"OFF"]];
 }
 

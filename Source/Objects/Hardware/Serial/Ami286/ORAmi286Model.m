@@ -1105,7 +1105,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 	for(i=0;i<4;i++){
 		if(enabledMask & (1<<i)) {
 			NSString* time = [[NSCalendarDate date] descriptionWithCalendarFormat:@"%m/%d %I:%M %p"];
-			[self addReason:[NSString stringWithFormat:@"Chan %d. As of %@ NO CHANGE to Fill state (now %@) for at least %d minutes\n",i,time,[self fillStatusName:fillStatus[i]], expiredTime]];
+			[self addReason:[NSString stringWithFormat:@"Chan %d. As of %@ NO CHANGE to Fill state (now %@) for at least %ld minutes\n",i,time,[self fillStatusName:fillStatus[i]], expiredTime]];
 			[self scheduleStatusSend];
 		}
 	}

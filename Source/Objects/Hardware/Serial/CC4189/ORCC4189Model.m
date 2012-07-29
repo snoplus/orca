@@ -419,6 +419,6 @@ NSString* ORCC4189Lock = @"ORCC4189Lock";
 
 - (NSString*) identifier
 {
-    return [NSString stringWithFormat:@"CC4189 %d",[self uniqueIdNumber]];
+    return [NSString stringWithFormat:@"CC4189 %lu",[self uniqueIdNumber]];
 }
 @end

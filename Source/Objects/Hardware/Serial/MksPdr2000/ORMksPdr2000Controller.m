@@ -146,7 +146,7 @@
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[[self window] setTitle:[NSString stringWithFormat:@"MKS PDR2000 (Unit %d)",[model uniqueIdNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"MKS PDR2000 (Unit %lu)",[model uniqueIdNumber]]];
 }
 
 - (void) updateWindow

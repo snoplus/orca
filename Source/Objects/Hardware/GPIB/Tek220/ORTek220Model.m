@@ -478,7 +478,7 @@ NSString* ORTek220GpibLock  = @"ORTek220GpibLock";
 
 - (void) oscSetWaveformRecordLength
 {
-	[self writeToGPIBDevice:[NSString stringWithFormat:@"HORIZONTAL:RECORDLENGTH %d", [self waveformLength]]];	
+	[self writeToGPIBDevice:[NSString stringWithFormat:@"HORIZONTAL:RECORDLENGTH %lu", [self waveformLength]]];	
 }
 
 
@@ -923,7 +923,7 @@ NSString* ORTek220GpibLock  = @"ORTek220GpibLock";
         long microSecs = timeValue.tv_usec - 1000 * milliSecs;
         
 		// Construct time in format needed by remainder of program.        
-        timeString = [NSString stringWithFormat:@"%d %s %d %d:%d:%d.%03d %03d 000", 
+        timeString = [NSString stringWithFormat:@"%d %s %d %d:%d:%d.%03lu %03lu 000", 
 					  timeAsStruct->tm_mday, month[timeAsStruct->tm_mon], timeAsStruct->tm_year + 1900, 
 					  timeAsStruct->tm_hour, timeAsStruct->tm_min, timeAsStruct->tm_sec,
 					  milliSecs, microSecs];
@@ -1002,7 +1002,7 @@ NSString* ORTek220GpibLock  = @"ORTek220GpibLock";
     [self writeToGPIBDevice:@"DATA:WID 1"];			// Byte data
     [self writeToGPIBDevice:@"DATA:ENCDG RIBINARY"];	// Binary data
     [self writeToGPIBDevice:@"DATA:START 1"];			// Data starts at chnl 1.	
-    [self writeToGPIBDevice:[NSString stringWithFormat:@"DATA:STOP %d", mWaveformLength]];  // Waveform size
+    [self writeToGPIBDevice:[NSString stringWithFormat:@"DATA:STOP %ld", mWaveformLength]];  // Waveform size
     [self oscSetAcqMode:kSingleWaveform];  // Set to single waveform acquisition.
 }
 

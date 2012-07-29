@@ -67,8 +67,8 @@ static NSString* kIPSlotKey[4] = {
     NSString* title= @"IP408 Value Record\n\n";
 
 	ptr++;
-    NSString* crate			= [NSString stringWithFormat:@"Crate = %d\n",(*ptr&0x01e00000)>>21];
-    NSString* card			= [NSString stringWithFormat:@"Card  = %d\n",(*ptr&0x001f0000)>>16];
+    NSString* crate			= [NSString stringWithFormat:@"Crate = %lu\n",(*ptr&0x01e00000)>>21];
+    NSString* card			= [NSString stringWithFormat:@"Card  = %lu\n",(*ptr&0x001f0000)>>16];
 	NSString* ipSlotKey		= [NSString stringWithFormat:@"IP    = %@\n",[self getSlotKey:*ptr&0x0000000f]];
 
 	ptr++;
@@ -76,10 +76,10 @@ static NSString* kIPSlotKey[4] = {
 	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S %z\n"];
 
 	NSString* s = [NSString stringWithFormat:@"%@%@%@%@%@",title,crate,card,ipSlotKey,date];
-	ptr++;  s = [s stringByAppendingFormat:@"WriteMask : 0x08X\n",*ptr];
-	ptr++;  s = [s stringByAppendingFormat:@"ReadMask  : 0x08X\n",*ptr];
-	ptr++;  s = [s stringByAppendingFormat:@"WriteValue: 0x08X\n",*ptr];
-	ptr++;  s = [s stringByAppendingFormat:@"ReadValue : 0x08X\n",*ptr];
+	ptr++;  s = [s stringByAppendingFormat:@"WriteMask : 0x%08lX\n",*ptr];
+	ptr++;  s = [s stringByAppendingFormat:@"ReadMask  : 0x%08lX\n",*ptr];
+	ptr++;  s = [s stringByAppendingFormat:@"WriteValue: 0x%08lX\n",*ptr];
+	ptr++;  s = [s stringByAppendingFormat:@"ReadValue : 0x%08lX\n",*ptr];
 
     return s;               
 }

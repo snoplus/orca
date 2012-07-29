@@ -958,7 +958,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 }
 - (void) delayedRunStop
 {
-	id s = [NSString stringWithFormat:@"VXM %d Finished Pattern",[self uniqueIdNumber]];
+	id s = [NSString stringWithFormat:@"VXM %lu Finished Pattern",[self uniqueIdNumber]];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORRequestRunStop object:self userInfo:s];
 }
 - (void) startRepeatingPositionQueries

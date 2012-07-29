@@ -85,8 +85,8 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx timestampSubSec
 	
     NSString* title= @"Slow Controls\n\n";
     NSString* theString =  [NSString stringWithFormat:@"%@\n",title];               
-	theString = [theString stringByAppendingFormat:@"ADEI-%d\n",(ptr[1]>>21) & 0xf];
-	theString = [theString stringByAppendingFormat:@"Polling Channel: %d\n",ptr[1] & 0xff];
+	theString = [theString stringByAppendingFormat:@"ADEI-%lu\n",(ptr[1]>>21) & 0xf];
+	theString = [theString stringByAppendingFormat:@"Polling Channel: %lu\n",ptr[1] & 0xff];
 	theData.asLong = ptr[2];
 	theString = [theString stringByAppendingFormat:@"Value: %.4E\n",theData.asFloat];
 	// -tb- theString = [theString stringByAppendingFormat:@"Value: %.4E\n",theData.asFloat];

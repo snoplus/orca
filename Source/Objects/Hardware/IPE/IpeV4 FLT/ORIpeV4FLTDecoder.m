@@ -124,21 +124,21 @@
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
     NSString* title= @"Katrin FLT Energy Record\n\n";    
-    NSString* crate = [NSString stringWithFormat:@"Crate      = %d\n",ShiftAndExtract(ptr[1],21,0xf)];
-    NSString* card  = [NSString stringWithFormat:@"Station    = %d\n",ShiftAndExtract(ptr[1],16,0x1f)];
-    NSString* chan  = [NSString stringWithFormat:@"Channel    = %d\n",ShiftAndExtract(ptr[1],8,0xff)];
+    NSString* crate = [NSString stringWithFormat:@"Crate      = %lu\n",ShiftAndExtract(ptr[1],21,0xf)];
+    NSString* card  = [NSString stringWithFormat:@"Station    = %lu\n",ShiftAndExtract(ptr[1],16,0x1f)];
+    NSString* chan  = [NSString stringWithFormat:@"Channel    = %lu\n",ShiftAndExtract(ptr[1],8,0xff)];
 		
 	
 	NSCalendarDate* theDate = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:(NSTimeInterval)ptr[2]];
 	NSString* eventDate     = [NSString stringWithFormat:@"Date       = %@\n", [theDate descriptionWithCalendarFormat:@"%m/%d/%y"]];
 	NSString* eventTime     = [NSString stringWithFormat:@"Time       = %@\n", [theDate descriptionWithCalendarFormat:@"%H:%M:%S"]];
 	
-	NSString* seconds		= [NSString stringWithFormat:@"Seconds    = %d\n",     ptr[2]];
-	NSString* subSec        = [NSString stringWithFormat:@"SubSeconds = %d\n",     ptr[3]];
-	NSString* chMap	    	= [NSString stringWithFormat:@"Channelmap = 0x%06x\n", ptr[4]];	
-    NSString* nPages		= [NSString stringWithFormat:@"Stored Pg  = %d\n",     ptr[5]];
+	NSString* seconds		= [NSString stringWithFormat:@"Seconds    = %lu\n",     ptr[2]];
+	NSString* subSec        = [NSString stringWithFormat:@"SubSeconds = %lu\n",     ptr[3]];
+	NSString* chMap	    	= [NSString stringWithFormat:@"Channelmap = 0x%06lx\n", ptr[4]];
+    NSString* nPages		= [NSString stringWithFormat:@"Stored Pg  = %lu\n",     ptr[5]];
 	
-	NSString* energy        = [NSString stringWithFormat:@"Energy     = %d\n",     ptr[6]];
+	NSString* energy        = [NSString stringWithFormat:@"Energy     = %lu\n",     ptr[6]];
 
 	
     return [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@%@",title,crate,card,chan,
@@ -309,19 +309,19 @@ startIndex=traceStart16;
 
 	++ptr;		//skip the first word (dataID and length)
     
-    NSString* crate     = [NSString stringWithFormat:@"Crate      = %d\n",(*ptr>>21) & 0xf];
-    NSString* card      = [NSString stringWithFormat:@"Station    = %d\n",(*ptr>>16) & 0x1f];
-    NSString* chan      = [NSString stringWithFormat:@"Channel    = %d\n",(*ptr>>8) & 0xff];
-    NSString* secStr    = [NSString stringWithFormat:@"Sec        = %d\n", sec];
-    NSString* subsecStr = [NSString stringWithFormat:@"SubSec     = %d\n", subsec];
-    NSString* energyStr = [NSString stringWithFormat:@"Energy     = %d\n", energy];
+    NSString* crate     = [NSString stringWithFormat:@"Crate      = %lu\n",(*ptr>>21) & 0xf];
+    NSString* card      = [NSString stringWithFormat:@"Station    = %lu\n",(*ptr>>16) & 0x1f];
+    NSString* chan      = [NSString stringWithFormat:@"Channel    = %lu\n",(*ptr>>8) & 0xff];
+    NSString* secStr    = [NSString stringWithFormat:@"Sec        = %u\n", sec];
+    NSString* subsecStr = [NSString stringWithFormat:@"SubSec     = %u\n", subsec];
+    NSString* energyStr = [NSString stringWithFormat:@"Energy     = %u\n", energy];
     NSString* chmapStr  = [NSString stringWithFormat:@"ChannelMap = 0x%x\n", chmap];
     NSString* eventIDStr= [NSString stringWithFormat:@"ReadPtr,Pg#= %d,%d\n", ShiftAndExtract(eventID,0,0x3ff),ShiftAndExtract(eventID,10,0x3f)];
     NSString* offsetStr = [NSString stringWithFormat:@"Offset16   = %d\n", traceStart16];
     NSString* versionStr= [NSString stringWithFormat:@"RecVersion = %d\n", ShiftAndExtract(eventFlags,0,0xf)];
     NSString* eventFlagsStr
                         = [NSString stringWithFormat:@"Flag(a,ap) = %d,%d\n", ShiftAndExtract(eventFlags,4,0x1),ShiftAndExtract(eventFlags,5,0x1)];
-    NSString* lengthStr = [NSString stringWithFormat:@"Length     = %d\n", length];
+    NSString* lengthStr = [NSString stringWithFormat:@"Length     = %lu\n", length];
     
     
     NSString* evFlagsStr= [NSString stringWithFormat:@"EventFlags = 0x%x\n", eventFlags ];
@@ -400,8 +400,8 @@ startIndex=traceStart16;
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
     NSString* title= @"Katrin FLT Hit Rate Record\n\n";
-    NSString* crate = [NSString stringWithFormat:@"Crate      = %d\n",ShiftAndExtract(ptr[1],21,0xf)];
-    NSString* card  = [NSString stringWithFormat:@"Station    = %d\n",ShiftAndExtract(ptr[1],16,0x1f)];
+    NSString* crate = [NSString stringWithFormat:@"Crate      = %lu\n",ShiftAndExtract(ptr[1],21,0xf)];
+    NSString* card  = [NSString stringWithFormat:@"Station    = %lu\n",ShiftAndExtract(ptr[1],16,0x1f)];
 	
 	unsigned long length		= ExtractLength(ptr[0]);
     uint32_t ut_time			= ptr[2];
@@ -621,9 +621,9 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx histogramInfo (some flags; some spare fo
     NSString* title= @"Katrin FLT Histogram Record\n\n";
 	++ptr;		//skip the first word (dataID and length)
     
-    NSString* crate = [NSString stringWithFormat:@"Crate      = %d\n",(*ptr>>21) & 0xf];
-    NSString* card  = [NSString stringWithFormat:@"Station    = %d\n",(*ptr>>16) & 0x1f];
-    NSString* chan  = [NSString stringWithFormat:@"Channel    = %d\n",(*ptr>>8) & 0xff];
+    NSString* crate = [NSString stringWithFormat:@"Crate      = %lu\n",(*ptr>>21) & 0xf];
+    NSString* card  = [NSString stringWithFormat:@"Station    = %lu\n",(*ptr>>16) & 0x1f];
+    NSString* chan  = [NSString stringWithFormat:@"Channel    = %lu\n",(*ptr>>8) & 0xff];
 	++ptr;		//point to next structure
 
 	katrinV4HistogramDataStruct* ePtr = (katrinV4HistogramDataStruct*)ptr;			//recast to event structure

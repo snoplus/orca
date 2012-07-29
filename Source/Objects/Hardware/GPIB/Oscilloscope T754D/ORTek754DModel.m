@@ -653,16 +653,16 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
     if ( mID == ORTEKc754D )
     {
 		// Set the frame count.
-        [ self writeToGPIBDevice: [ NSString stringWithFormat: @"HORIZONTAL:FASTFRAME:COUNT %d", 
+        [ self writeToGPIBDevice: [ NSString stringWithFormat: @"HORIZONTAL:FASTFRAME:COUNT %ld", 
 								   mFastframeCount ]];
 		
 		// Set the reference frame.
-        [ self writeToGPIBDevice: [ NSString stringWithFormat: @"HORIZONTAL:FASTFRAME:REF %d", 
+        [ self writeToGPIBDevice: [ NSString stringWithFormat: @"HORIZONTAL:FASTFRAME:REF %ld", 
 								   mFastframeRef ]];
 		
 		// Set the length of each frame.
         mFastframeRecLength = mWaveformLength / mFastframeCount;
-        [ self writeToGPIBDevice: [ NSString stringWithFormat: @"HORIZONTAL:FASTFRAME:LENGTH %d",
+        [ self writeToGPIBDevice: [ NSString stringWithFormat: @"HORIZONTAL:FASTFRAME:LENGTH %ld",
 								   mFastframeRecLength ]];
     }
 }
@@ -825,7 +825,7 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 //--------------------------------------------------------------------------------
 - (void) oscSetWaveformRecordLength
 {
-	[ self writeToGPIBDevice: [ NSString stringWithFormat: @"HORIZONTAL:RECORDLENGTH %d", [ self waveformLength ]]];	
+	[ self writeToGPIBDevice: [ NSString stringWithFormat: @"HORIZONTAL:RECORDLENGTH %ld", [ self waveformLength ]]];
 }
 
 
@@ -1399,13 +1399,13 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
         timeAsStruct = gmtime( &tmpTime );
         
         long milliSecs = timeValue.tv_usec / 1000;
-        long microSecs = timeValue.tv_usec - 1000 * milliSecs;
+        //long microSecs = timeValue.tv_usec - 1000 * milliSecs;
         
 		// Construct time in format needed by remainder of program.        
-        timeString = [ NSString stringWithFormat: @"%d %s %d %d:%d:%d.%03d %03d 000", 
+        timeString = [ NSString stringWithFormat: @"%d %s %d %d:%d:%d.%%03d%03ld 000",
 					  timeAsStruct->tm_mday, month[ timeAsStruct->tm_mon ], timeAsStruct->tm_year + 1900, 
 					  timeAsStruct->tm_hour, timeAsStruct->tm_min, timeAsStruct->tm_sec,
-					  milliSecs, microSecs ];
+					  milliSecs ];
 		[timeString getCString:theTimeStr maxLength:128 encoding:NSASCIIStringEncoding];
     }
 	
@@ -1490,7 +1490,7 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
     [ self writeToGPIBDevice: @"DATA:WID 1"];			// Byte data
     [ self writeToGPIBDevice: @"DATA:ENCDG RIBINARY"];	// Binary data
     [ self writeToGPIBDevice: @"DATA:START 1"];			// Data starts at chnl 1.	
-    [ self writeToGPIBDevice: [ NSString stringWithFormat: @"DATA:STOP %d", mWaveformLength ]];  // Waveform size
+    [ self writeToGPIBDevice: [ NSString stringWithFormat: @"DATA:STOP %ld", mWaveformLength ]];  // Waveform size
     [ self oscSetAcqMode: kSingleWaveform ];  // Set to single waveform acquisition.
 }
 

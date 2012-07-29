@@ -42,7 +42,7 @@
 
     NSString* title= @"HP Pulser Record\n\n";
     
-    NSString* waveForm  = [NSString stringWithFormat:@"Waveform    = %d\n",ptr[1]];
+    NSString* waveForm  = [NSString stringWithFormat:@"Waveform    = %lu\n",ptr[1]];
     packed.longValue = ptr[2];
     NSString* voltage = [NSString stringWithFormat:  @"Voltage     = %.2f\n",packed.floatValue];
     packed.longValue = ptr[3];

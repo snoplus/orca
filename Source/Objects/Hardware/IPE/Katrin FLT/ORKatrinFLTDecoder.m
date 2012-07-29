@@ -105,24 +105,24 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx energy
     NSString* title= @"Katrin FLT Energy Record\n\n";
 	++ptr;		//skip the first word (dataID and length)
     
-    NSString* crate = [NSString stringWithFormat:@"Crate      = %d\n",(*ptr>>21) & 0xf];
-    NSString* card  = [NSString stringWithFormat:@"Station    = %d\n",(*ptr>>16) & 0x1f];
-    NSString* chan  = [NSString stringWithFormat:@"Channel    = %d\n",(*ptr>>8)  & 0xff];
+    NSString* crate = [NSString stringWithFormat:@"Crate      = %lu\n",(*ptr>>21) & 0xf];
+    NSString* card  = [NSString stringWithFormat:@"Station    = %lu\n",(*ptr>>16) & 0x1f];
+    NSString* chan  = [NSString stringWithFormat:@"Channel    = %lu\n",(*ptr>>8)  & 0xff];
 
 	++ptr;		//point to event struct
 	katrinEventDataStruct* ePtr = (katrinEventDataStruct*)ptr;			//recast to event structure
 	
-	NSString* energy        = [NSString stringWithFormat:@"Energy     = %d\n",ePtr->energy];
+	NSString* energy        = [NSString stringWithFormat:@"Energy     = %lu\n",ePtr->energy];
 
 	NSCalendarDate* theDate = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:(NSTimeInterval)ePtr->sec];
 	NSString* eventDate     = [NSString stringWithFormat:@"Date       = %@\n", [theDate descriptionWithCalendarFormat:@"%m/%d/%y"]];
 	NSString* eventTime     = [NSString stringWithFormat:@"Time       = %@\n", [theDate descriptionWithCalendarFormat:@"%H:%M:%S"]];
 
-	NSString* seconds		= [NSString stringWithFormat:@"Seconds    = %d\n", ePtr->sec];
-	NSString* subSec        = [NSString stringWithFormat:@"SubSeconds = %d\n", ePtr->subSec];
-	NSString* eventID		= [NSString stringWithFormat:@"Event ID   = %d\n", ePtr->eventID & 0xffff];
-    NSString* nPages		= [NSString stringWithFormat:@"Stored Pg  = %d\n", ePtr->eventID >> 16];
-	NSString* chMap	    	= [NSString stringWithFormat:@"Channelmap = 0x%06x\n", ePtr->channelMap & 0x3fffff];	
+	NSString* seconds		= [NSString stringWithFormat:@"Seconds    = %lu\n", ePtr->sec];
+	NSString* subSec        = [NSString stringWithFormat:@"SubSeconds = %lu\n", ePtr->subSec];
+	NSString* eventID		= [NSString stringWithFormat:@"Event ID   = %lu\n", ePtr->eventID & 0xffff];
+    NSString* nPages		= [NSString stringWithFormat:@"Stored Pg  = %lu\n", ePtr->eventID >> 16];
+	NSString* chMap	    	= [NSString stringWithFormat:@"Channelmap = 0x%06lx\n", ePtr->channelMap & 0x3fffff];	
 		
 
     return [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@%@%@",title,crate,card,chan,
@@ -293,31 +293,31 @@ followed by waveform data (n x 1024 16-bit words)
     NSString* title= @"Katrin FLT Waveform Record\n\n";
 	++ptr;		//skip the first word (dataID and length)
     
-    NSString* crate = [NSString stringWithFormat:@"Crate      = %d\n",(*ptr>>21) & 0xf];
-    NSString* card  = [NSString stringWithFormat:@"Station    = %d\n",(*ptr>>16) & 0x1f];
-    NSString* chan  = [NSString stringWithFormat:@"Channel    = %d\n",(*ptr>>8) & 0xff];
+    NSString* crate = [NSString stringWithFormat:@"Crate      = %lu\n",(*ptr>>21) & 0xf];
+    NSString* card  = [NSString stringWithFormat:@"Station    = %lu\n",(*ptr>>16) & 0x1f];
+    NSString* chan  = [NSString stringWithFormat:@"Channel    = %lu\n",(*ptr>>8) & 0xff];
 	++ptr;		//point to next structure
 	
 	katrinEventDataStruct* ePtr = (katrinEventDataStruct*)ptr;			//recast to event structure
 	
-	NSString* energy		= [NSString stringWithFormat:@"Energy     = %d\n",ePtr->energy];
+	NSString* energy		= [NSString stringWithFormat:@"Energy     = %lu\n",ePtr->energy];
 
 	NSCalendarDate* theDate = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:(NSTimeInterval)ePtr->sec];
 	NSString* eventDate     = [NSString stringWithFormat:@"Date       = %@\n", [theDate descriptionWithCalendarFormat:@"%m/%d/%y"]];
 	NSString* eventTime     = [NSString stringWithFormat:@"Time       = %@\n", [theDate descriptionWithCalendarFormat:@"%H:%M:%S"]];
 
-	NSString* seconds		= [NSString stringWithFormat:@"Seconds    = %d\n", ePtr->sec];
-	NSString* subSec    	= [NSString stringWithFormat:@"Subseconds = %d\n", ePtr->subSec];
-	NSString* eventID		= [NSString stringWithFormat:@"Event ID   = %d\n", ePtr->eventID & 0xffff];
-	NSString* chMap   		= [NSString stringWithFormat:@"Channelmap = 0x%06x\n", ePtr->channelMap & 0x3fffff];	
+	NSString* seconds		= [NSString stringWithFormat:@"Seconds    = %lu\n", ePtr->sec];
+	NSString* subSec    	= [NSString stringWithFormat:@"Subseconds = %lu\n", ePtr->subSec];
+	NSString* eventID		= [NSString stringWithFormat:@"Event ID   = %lu\n", ePtr->eventID & 0xffff];
+	NSString* chMap   		= [NSString stringWithFormat:@"Channelmap = 0x%06lx\n", ePtr->channelMap & 0x3fffff];	
 
 
     // Decode extra debug information
 	ptr = ptr + sizeof(katrinEventDataStruct) / sizeof(unsigned long);
 	katrinDebugDataStruct* dPtr = (katrinDebugDataStruct*) ptr;
 
-	NSString* resetSec		= [NSString stringWithFormat:@"ResetSec   = %d\n", dPtr->resetSec];
-	NSString* resetSubSec  	= [NSString stringWithFormat:@"ResetSubSec= %d\n", dPtr->resetSubSec];
+	NSString* resetSec		= [NSString stringWithFormat:@"ResetSec   = %lu\n", dPtr->resetSec];
+	NSString* resetSubSec  	= [NSString stringWithFormat:@"ResetSubSec= %lu\n", dPtr->resetSubSec];
 
 
     return [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@%@%@%@",title,crate,card,chan,
@@ -409,20 +409,20 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx hitrate
     NSString* title= @"Katrin FLT Hitrate Record\n\n";
 	++ptr;		//skip the first word (dataID and length)
     
-    NSString* crate = [NSString stringWithFormat:@"Crate      = %d\n",(*ptr>>21) & 0xf];
-    NSString* card  = [NSString stringWithFormat:@"Station    = %d\n",(*ptr>>16) & 0x1f];
-    NSString* chan  = [NSString stringWithFormat:@"Channel    = %d\n",(*ptr>>8)  & 0xff];
+    NSString* crate = [NSString stringWithFormat:@"Crate      = %lu\n",(*ptr>>21) & 0xf];
+    NSString* card  = [NSString stringWithFormat:@"Station    = %lu\n",(*ptr>>16) & 0x1f];
+    NSString* chan  = [NSString stringWithFormat:@"Channel    = %lu\n",(*ptr>>8)  & 0xff];
 
 	++ptr;		//point to event struct
 	katrinHitRateDataStruct* ePtr = (katrinHitRateDataStruct*)ptr;			//recast to event structure
 	
-	NSString* hitrate        = [NSString stringWithFormat:@"Hitrate     = %d\n",ePtr->hitrate];
+	NSString* hitrate        = [NSString stringWithFormat:@"Hitrate     = %lu\n",ePtr->hitrate];
 
 	NSCalendarDate* theDate = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:(NSTimeInterval)ePtr->sec];
 	NSString* sampleDate     = [NSString stringWithFormat:@"Date       = %@\n", [theDate descriptionWithCalendarFormat:@"%m/%d/%y"]];
 	NSString* sampleTime     = [NSString stringWithFormat:@"Time       = %@\n", [theDate descriptionWithCalendarFormat:@"%H:%M:%S"]];
 
-	NSString* seconds		= [NSString stringWithFormat:@"Seconds    = %d\n", ePtr->sec];
+	NSString* seconds		= [NSString stringWithFormat:@"Seconds    = %lu\n", ePtr->sec];
 		
 
     return [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@",title,crate,card,chan,
@@ -553,16 +553,16 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx Hitrate
     NSString* title= @"Katrin FLT ThresholdScan Record\n\n";
 	++ptr;		//skip the first word (dataID and length)
     
-    NSString* crate     = [NSString stringWithFormat:@"Crate      = %d\n",(*ptr>>21) & 0xf];
-    NSString* card      = [NSString stringWithFormat:@"Station    = %d\n",(*ptr>>16) & 0x1f];
-    NSString* chan      = [NSString stringWithFormat:@"Channel    = %d\n",(*ptr>>8) & 0xff];
+    NSString* crate     = [NSString stringWithFormat:@"Crate      = %lu\n",(*ptr>>21) & 0xf];
+    NSString* card      = [NSString stringWithFormat:@"Station    = %lu\n",(*ptr>>16) & 0x1f];
+    NSString* chan      = [NSString stringWithFormat:@"Channel    = %lu\n",(*ptr>>8) & 0xff];
 	++ptr;		//point to next structure
 	
 	katrinThresholdScanDataStruct* ePtr = (katrinThresholdScanDataStruct*)ptr;			//recast to event structure
 	
-	NSString* threshold	= [NSString stringWithFormat:@"Threshold  = %d\n",ePtr->threshold];
-	NSString* hitrate	= [NSString stringWithFormat:@"Hitrate    = %d\n",ePtr->hitrate];
-	NSString* chMap   	= [NSString stringWithFormat:@"Channelmap = 0x%06x\n", ePtr->channelMap & 0x3fffff];	
+	NSString* threshold	= [NSString stringWithFormat:@"Threshold  = %lu\n",ePtr->threshold];
+	NSString* hitrate	= [NSString stringWithFormat:@"Hitrate    = %lu\n",ePtr->hitrate];
+	NSString* chMap   	= [NSString stringWithFormat:@"Channelmap = 0x%06lx\n", ePtr->channelMap & 0x3fffff];	
 
     return [NSString stringWithFormat:@"%@%@%@%@%@%@%@",title,crate,card,chan,
 	                       threshold,hitrate,chMap];
@@ -788,9 +788,9 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx offsetEMin
     NSString* title= @"Katrin FLT Histogram Record\n\n";
 	++ptr;		//skip the first word (dataID and length)
     
-    NSString* crate = [NSString stringWithFormat:@"Crate      = %d\n",(*ptr>>21) & 0xf];
-    NSString* card  = [NSString stringWithFormat:@"Station    = %d\n",(*ptr>>16) & 0x1f];
-    NSString* chan  = [NSString stringWithFormat:@"Channel    = %d\n",(*ptr>>8) & 0xff];
+    NSString* crate = [NSString stringWithFormat:@"Crate      = %lu\n",(*ptr>>21) & 0xf];
+    NSString* card  = [NSString stringWithFormat:@"Station    = %lu\n",(*ptr>>16) & 0x1f];
+    NSString* chan  = [NSString stringWithFormat:@"Channel    = %lu\n",(*ptr>>8) & 0xff];
 	++ptr;		//point to next structure
 
 	katrinHistogramDataStruct* ePtr = (katrinHistogramDataStruct*)ptr;			//recast to event structure
@@ -802,15 +802,15 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx offsetEMin
 	NSLog(@" lastBin = %d \n", ePtr->lastBin);
 	NSLog(@" histogramLength = %d \n", ePtr->histogramLength);
 	
-	NSString* readoutSec	= [NSString stringWithFormat:@"ReadoutSec = %d\n",ePtr->readoutSec];
+	NSString* readoutSec	= [NSString stringWithFormat:@"ReadoutSec = %ld\n",ePtr->readoutSec];
 	//NSString* recordingTimeSec	= [NSString stringWithFormat:@"recordingTimeSec = %d\n",ePtr->recordingTimeSec];
-	NSString* refreshTimeSec	= [NSString stringWithFormat:@"refreshTimeSec = %d\n",ePtr->recordingTimeSec];
-	NSString* firstBin	= [NSString stringWithFormat:@"firstBin = %d\n",ePtr->firstBin];
-	NSString* lastBin	= [NSString stringWithFormat:@"lastBin = %d\n",ePtr->lastBin];
-	NSString* histogramLength	= [NSString stringWithFormat:@"histogramLength = %d\n",ePtr->histogramLength];
-	NSString* maxHistogramLength	= [NSString stringWithFormat:@"maxHistogramLength = %d\n",ePtr->maxHistogramLength];
-	NSString* binSize	= [NSString stringWithFormat:@"binSize = %d\n",ePtr->binSize];
-	NSString* offsetEMin	= [NSString stringWithFormat:@"offsetEMin = %d\n",ePtr->offsetEMin];
+	NSString* refreshTimeSec	= [NSString stringWithFormat:@"refreshTimeSec = %ld\n",ePtr->recordingTimeSec];
+	NSString* firstBin	= [NSString stringWithFormat:@"firstBin = %ld\n",ePtr->firstBin];
+	NSString* lastBin	= [NSString stringWithFormat:@"lastBin = %ld\n",ePtr->lastBin];
+	NSString* histogramLength	= [NSString stringWithFormat:@"histogramLength = %ld\n",ePtr->histogramLength];
+	NSString* maxHistogramLength	= [NSString stringWithFormat:@"maxHistogramLength = %ld\n",ePtr->maxHistogramLength];
+	NSString* binSize	= [NSString stringWithFormat:@"binSize = %ld\n",ePtr->binSize];
+	NSString* offsetEMin	= [NSString stringWithFormat:@"offsetEMin = %ld\n",ePtr->offsetEMin];
 
 
     return [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@%@%@",title,crate,card,chan,

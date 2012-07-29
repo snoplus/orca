@@ -127,18 +127,18 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx --number shorts in waveform
 
     NSString* title= @"Acqiris DC440 Waveform Record\n\n";
     
-    NSString* crate = [NSString stringWithFormat:@"Crate = %d\n",(*ptr&0x01e00000)>>21];
-    NSString* card  = [NSString stringWithFormat:@"Card  = %d\n",(*ptr&0x001f0000)>>16];
-    NSString* chan  = [NSString stringWithFormat:@"Chan  = %d\n",(*ptr&0x0000ff00)>>8];
+    NSString* crate = [NSString stringWithFormat:@"Crate = %lu\n",(*ptr&0x01e00000)>>21];
+    NSString* card  = [NSString stringWithFormat:@"Card  = %lu\n",(*ptr&0x001f0000)>>16];
+    NSString* chan  = [NSString stringWithFormat:@"Chan  = %lu\n",(*ptr&0x0000ff00)>>8];
 
  	ptr++;
-	NSString* timeLo  = [NSString stringWithFormat:@"Time Lo  = %d\n",*ptr];
+	NSString* timeLo  = [NSString stringWithFormat:@"Time Lo  = %lu\n",*ptr];
 
  	ptr++;
-	NSString* timeHi  = [NSString stringWithFormat:@"Time Hi  = %d\n",*ptr];
+	NSString* timeHi  = [NSString stringWithFormat:@"Time Hi  = %lu\n",*ptr];
 
  	ptr++;
-	NSString* numPoints = [NSString stringWithFormat:@"Num Points = %d\n",*ptr];
+	NSString* numPoints = [NSString stringWithFormat:@"Num Points = %lu\n",*ptr];
 
     return [NSString stringWithFormat:@"%@%@%@%@%@%@%@",title,crate,card,chan,timeLo,timeHi,numPoints];               
 }

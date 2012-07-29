@@ -1021,10 +1021,11 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
 			NSLogFont(aFont,@"     |    delta |  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20\n");			
 			unsigned int delta = time[0];
 			for(i=0;i<len;i++){
-				NSMutableString* line = [NSMutableString stringWithFormat:@"  %2d |=%4d=%4d|",i,delta,time[i]];
+				NSMutableString* line = [NSMutableString stringWithFormat:@"  %2d |=%4d=%4lu|",i,delta,time[i]];
 				delta += time[i];
 				for(j=0;j<20;j++){
-					if(mask[j][i] != 0x1000000)[line appendFormat:@"%3s",mask[j][i]?"¥":"-"];
+					//if(mask[j][i] != 0x1000000)[line appendFormat:@"%3s",mask[j][i]?"¥":"-"];
+					if(mask[j][i] != 0x1000000)[line appendFormat:@"%3s",mask[j][i]?"*":"-"]; //fixed XCode 4.4 warning. MAH 7/29/2012
 					else [line appendFormat:@"%3s","="];
 				}
 				NSLogFont(aFont,@"%@\n",line);

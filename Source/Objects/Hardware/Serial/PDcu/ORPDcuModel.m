@@ -301,7 +301,7 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
     oilDeficiency = aOilDeficiency;
 	if(oilDeficiency){
 		if(!noOilAlarm){
-			NSString* s = [NSString stringWithFormat:@"No Oil -- DCU %d",[self uniqueIdNumber]];
+			NSString* s = [NSString stringWithFormat:@"No Oil -- DCU %lu",[self uniqueIdNumber]];
 			noOilAlarm = [[ORAlarm alloc] initWithName:s severity:kImportantAlarm];
 			[noOilAlarm setSticky:YES];
 			[noOilAlarm setHelpStringFromFile:@"NoOilHelp"];

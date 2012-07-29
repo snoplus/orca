@@ -78,9 +78,9 @@
 {
     NSString* title= @"Scope Data Record\n\n";
 
-    NSString* scope = [NSString stringWithFormat:@"Scope = %d (GPIB Address)\n",( ptr[1] >> 23 ) & 0xf];
-    NSString* chan  = [NSString stringWithFormat:@"Chan  = %d\n",( ptr[1] >> 19 ) & 0xf];
-    NSString* length = [NSString stringWithFormat:@"%d bytes of data follow\n",(ptr[0] & 0x3ffff)*sizeof(long)-8];
+    NSString* scope = [NSString stringWithFormat:@"Scope = %lu (GPIB Address)\n",( ptr[1] >> 23 ) & 0xf];
+    NSString* chan  = [NSString stringWithFormat:@"Chan  = %lu\n",( ptr[1] >> 19 ) & 0xf];
+    NSString* length = [NSString stringWithFormat:@"%lu bytes of data follow\n",(ptr[0] & 0x3ffff)*sizeof(long)-8];
 
     return [NSString stringWithFormat:@"%@%@%@%@",title,scope,chan,length];
 }
@@ -89,7 +89,7 @@
 {
     NSString* title= @"Scope GTID Record\n\n";
     if(!IsShortForm(*ptr))ptr++;
-    NSString* gtid = [NSString stringWithFormat:@"GTID = %d\n", *ptr & 0x003fffff];
+    NSString* gtid = [NSString stringWithFormat:@"GTID = %lu\n", *ptr & 0x003fffff];
     return [NSString stringWithFormat:@"%@%@",title,gtid];
 }
 

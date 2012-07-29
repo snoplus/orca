@@ -324,7 +324,7 @@
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[[self window] setTitle:[NSString stringWithFormat:@"MKS 651c (Unit %d)",[model uniqueIdNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"MKS 651c (Unit %lu)",[model uniqueIdNumber]]];
 }
 
 - (void) updateWindow

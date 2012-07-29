@@ -37,8 +37,8 @@
 	float theSteps = data.theFloat;
 	
     NSString* valueString = [NSString stringWithFormat:@"%.0f",theSteps];
-	NSString* objKey      = [NSString stringWithFormat:@"Unit %d",ptr[2]&0xFFFF];
-	NSString* chanKey     = [NSString stringWithFormat:@"Channel %d",ptr[2] >> 16];
+	NSString* objKey      = [NSString stringWithFormat:@"Unit %lu",ptr[2]&0xFFFF];
+	NSString* chanKey     = [NSString stringWithFormat:@"Channel %lu",ptr[2] >> 16];
 	[aDataSet loadGenericData:valueString sender:self withKeys:@"VXM",@"Steps",objKey,chanKey,nil];
 	
      return ExtractLength(*((unsigned long*)someData));
@@ -48,7 +48,7 @@
 {
     NSString* title= @"Motor Position Record\n\n";
 
-	NSString* motor   = [NSString stringWithFormat:@"Motor  = %d\n",(dataPtr[2]>>16) & 0x7];
+	NSString* motor   = [NSString stringWithFormat:@"Motor  = %lu\n",(dataPtr[2]>>16) & 0x7];
     union {
         long theLong;
         float theFloat;

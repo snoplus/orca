@@ -69,7 +69,7 @@
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[[self window] setTitle:[NSString stringWithFormat:@"CTI Temperature (Unit %d)",[model uniqueIdNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"CTI Temperature (Unit %lu)",[model uniqueIdNumber]]];
 }
 
 #pragma mark ***Notifications

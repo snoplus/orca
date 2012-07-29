@@ -89,7 +89,7 @@ static NSString* kLakeShoreTempUnit[3] = {
 		float asFloat;
 		unsigned long asLong;
 	}theData;
-	theString = [theString stringByAppendingFormat:@"HW ID = %d\n",dataPtr[1] & 0x0000ffff];
+	theString = [theString stringByAppendingFormat:@"HW ID = %lu\n",dataPtr[1] & 0x0000ffff];
 	theString = [theString stringByAppendingFormat:@"Units = %@\n",kLakeShoreTempUnit[((dataPtr[1]>>16) & 0x3)]];
 	int i;
 	int index = 2;

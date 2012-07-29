@@ -336,12 +336,12 @@
     uint64_t val=[model streamMask];
 	for(fib=0;fib<6;fib++){
 	    //NSLog(@"fib %i:",fib);
-		NSString *s = [NSString stringWithFormat:@"fib %i:",fib];
+		NSString *s = [NSString stringWithFormat:@"fib %llu:",fib];
 	    for(chan=0;chan<6;chan++){
 		    if([model streamMaskForFiber:fib chan:chan]) [[streamMaskMatrix cellAtRow:fib column: chan] setIntValue: 1];
 			else  [[streamMaskMatrix cellAtRow:fib column: chan] setIntValue: 0];
 			
-			s=[s stringByAppendingString: [NSString stringWithFormat: @"%llu",[model streamMaskForFiber:fib chan:chan]]];
+			s=[s stringByAppendingString: [NSString stringWithFormat: @"%u",[model streamMaskForFiber:fib chan:chan]]];
 			#if 0
 		    if([model streamMaskForFiber:fib chan:chan]){ 
 			    //val |= ((0x1LL<<chan) << (fib*8));
@@ -868,7 +868,7 @@
 	uint64_t fibDelays;
 	for(fib=0;fib<6;fib++){
 	    //NSLog(@"fib %i:",fib);
-		NSString *s = [NSString stringWithFormat:@"fib %i:",fib];
+		NSString *s = [NSString stringWithFormat:@"fib %llu",fib];
 		    clk12  = [[fiberDelaysMatrix cellAtRow:0 column: fib] indexOfSelectedItem];
 		    clk120 = [[fiberDelaysMatrix cellAtRow:1 column: fib] indexOfSelectedItem];
 			s=[s stringByAppendingString: [NSString stringWithFormat:@"clk12 %i:",clk12]];
@@ -902,7 +902,7 @@
     uint64_t val=0;
 	for(fib=0;fib<6;fib++){
 	    //NSLog(@"fib %i:",fib);
-		NSString *s = [NSString stringWithFormat:@"fib %i:",fib];
+		NSString *s = [NSString stringWithFormat:@"fib %lli:",fib];
 	    for(chan=0;chan<6;chan++){
 		    if([[streamMaskMatrix cellAtRow:fib column: chan] intValue]){ 
 			    val |= ((0x1LL<<chan) << (fib*8));// see - (int) streamMaskForFiber:(int)aFiber chan:(int)aChan;

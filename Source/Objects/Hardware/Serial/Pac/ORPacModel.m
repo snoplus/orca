@@ -1089,7 +1089,7 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 {
 	NSString* s;
  	@synchronized(self){
-		s= [NSString stringWithFormat:@"Pac,%d",[self uniqueIdNumber]];
+		s= [NSString stringWithFormat:@"Pac,%lu",[self uniqueIdNumber]];
 	}
 	return s;
 }
@@ -1328,7 +1328,7 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 {
 	NSString*   outputString = nil;
 	if(logToFile) {
-		outputString = [NSString stringWithFormat:@"%u ",timeMeasured[0]];
+		outputString = [NSString stringWithFormat:@"%lu ",timeMeasured[0]];
 		short chan;
 		for(chan=0;chan<8;chan++){
 			outputString = [outputString stringByAppendingFormat:@"%.2f ",[self convertedAdc:chan]];

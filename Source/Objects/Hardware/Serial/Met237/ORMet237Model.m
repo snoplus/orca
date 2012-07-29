@@ -582,7 +582,7 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 {
 	NSString* s;
  	@synchronized(self){
-		s= [NSString stringWithFormat:@"Met237,%d",[self uniqueIdNumber]];
+		s= [NSString stringWithFormat:@"Met237,%lu",[self uniqueIdNumber]];
 	}
 	return s;
 }

@@ -108,7 +108,7 @@
     processLimitsSize	= NSMakeSize(470,515);
     trendSize           = NSMakeSize(555,515);
 
-    NSString* key = [NSString stringWithFormat: @"orca.Pac%d.selectedtab",[model uniqueIdNumber]];
+    NSString* key = [NSString stringWithFormat: @"orca.Pac%lu.selectedtab",[model uniqueIdNumber]];
     int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
@@ -258,7 +258,7 @@
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[[self window] setTitle:[NSString stringWithFormat:@"Power and Control (Unit %d)",[model uniqueIdNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"Power and Control (Unit %lu)",[model uniqueIdNumber]]];
 }
 
 - (void) updateWindow
@@ -868,7 +868,7 @@
     }
 
     int index = [tabView indexOfTabViewItem:item];
-    [[NSUserDefaults standardUserDefaults] setInteger:index forKey:[NSString stringWithFormat:@"orca.Pac%d.selectedtab",[model uniqueIdNumber]]];
+    [[NSUserDefaults standardUserDefaults] setInteger:index forKey:[NSString stringWithFormat:@"orca.Pac%lu.selectedtab",[model uniqueIdNumber]]];
     [[self window] setContentView:totalView];
 }
 

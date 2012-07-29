@@ -686,7 +686,7 @@ NSString* ORXYScannerLock = @"ORXYScannerLock";
             }
             else {
                 //couldn't open port...stop the run.
-                NSString* reason = [NSString stringWithFormat:@"XYScanner %d port could not be opened",[self  uniqueIdNumber]];
+                NSString* reason = [NSString stringWithFormat:@"XYScanner %lu port could not be opened",[self  uniqueIdNumber]];
                 
                 [[NSNotificationCenter defaultCenter]
                     postNotificationName:ORRequestRunHalt
@@ -754,7 +754,7 @@ NSString* ORXYScannerLock = @"ORXYScannerLock";
         [self performSelector:@selector(continuePattern) withObject:nil afterDelay:.1];
     }
     else {
-        NSString* reason = [NSString stringWithFormat:@"XYScanner %d is synced to run but has no valid commands",[self  uniqueIdNumber]];
+        NSString* reason = [NSString stringWithFormat:@"XYScanner %lu is synced to run but has no valid commands",[self  uniqueIdNumber]];
 
         [[NSNotificationCenter defaultCenter]
             postNotificationName:ORRequestRunHalt
@@ -791,7 +791,7 @@ NSString* ORXYScannerLock = @"ORXYScannerLock";
                 }
                 else {
                     if([self optionSet:kXYStopRunOption]){
-                            NSString* reason = [NSString stringWithFormat:@"XYScanner %d port finished pattern",[self  uniqueIdNumber]];
+                            NSString* reason = [NSString stringWithFormat:@"XYScanner %lu port finished pattern",[self  uniqueIdNumber]];
                             
                             [[NSNotificationCenter defaultCenter]
                                 postNotificationName:ORRequestRunHalt

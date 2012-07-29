@@ -1180,7 +1180,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 {
 	NSString* s;
  	@synchronized(self){
-		s= [NSString stringWithFormat:@"Rad7,%d",[self uniqueIdNumber]];
+		s= [NSString stringWithFormat:@"Rad7,%lu",[self uniqueIdNumber]];
 	}
 	return s;
 }
@@ -1452,7 +1452,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 			[self setDataPointArray:[NSMutableArray array]];
 			if(makeFile){
 				[stopRunFilePath release];
-				stopRunFilePath = [NSString stringWithFormat:@"~/Desktop/Rad7/Rad7_%d_%@",[self uniqueIdNumber],[NSDate date]];
+				stopRunFilePath = [NSString stringWithFormat:@"~/Desktop/Rad7/Rad7_%lu_%@",[self uniqueIdNumber],[NSDate date]];
 				stopRunFilePath = [stopRunFilePath stringByExpandingTildeInPath];
 				stopRunFilePath = [stopRunFilePath stringByReplacingOccurrencesOfString:@" " withString:@"_"];
 				stopRunFilePath = [stopRunFilePath stringByReplacingOccurrencesOfString:@"-" withString:@"_"];

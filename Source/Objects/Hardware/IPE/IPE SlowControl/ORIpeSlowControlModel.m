@@ -1157,7 +1157,7 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 
 - (NSString*) processingTitle
 {
-    return [NSString stringWithFormat: @"%@-%i",IPE_SLOW_CONTROL_SHORT_NAME,[self uniqueIdNumber]];
+    return [NSString stringWithFormat: @"%@-%lu",IPE_SLOW_CONTROL_SHORT_NAME,[self uniqueIdNumber]];
 }
 
 
@@ -1269,7 +1269,7 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 #pragma mark •••ID Helpers (see OrcaObject)
 - (NSString*) identifier
 {
-    return [NSString stringWithFormat: @"%@-%i",IPE_SLOW_CONTROL_SHORT_NAME,[self uniqueIdNumber]];
+    return [NSString stringWithFormat: @"%@-%lu",IPE_SLOW_CONTROL_SHORT_NAME,[self uniqueIdNumber]];
 }
 
 #pragma mark •••Methods Useful For Scripting

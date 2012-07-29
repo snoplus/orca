@@ -303,7 +303,7 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	[[statusMatrix cellWithTag:0] setStringValue: IsBitSet(statusReg,kStatusIrq)?@"1":@"0"];
 	[[statusMatrix cellWithTag:1] setStringValue: IsBitSet(statusReg,kStatusPixErr)?@"1":@"0"];
 
-	[[statusMatrix cellWithTag:2] setStringValue: [NSString stringWithFormat:@"0x%04x",ExtractValue(statusReg,0xffff,0)]]; 
+	[[statusMatrix cellWithTag:2] setStringValue: [NSString stringWithFormat:@"0x%04lx",ExtractValue(statusReg,0xffff,0)]];
 
 }
 
@@ -468,7 +468,7 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (void) hwVersionChanged:(NSNotification*) aNote
 {
-	NSString* s = [NSString stringWithFormat:@"%d,0x%x,0x%x",[model projectVersion],[model documentVersion],[model implementation]];
+	NSString* s = [NSString stringWithFormat:@"%lu,0x%lx,0x%lx",[model projectVersion],[model documentVersion],[model implementation]];
 	[hwVersionField setStringValue:s];
 }
 

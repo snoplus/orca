@@ -105,7 +105,7 @@
     
     // Determine if device is connected.  If yes add address to name.	
 	if( [model connected ] )[ title appendFormat: @" (GPIB %d)", [model primaryAddress ]];
-	else [ title appendFormat:@" (Not Connected)",[model primaryAddress ]];
+	else [ title appendString:@" (Not Connected)"];
 	[[ self window ] setTitle: title ];
 }
 
@@ -419,7 +419,7 @@
 {
 	long value = [model waveformLength ];
 	if(value == 0)value = 500;
-	[mRecordLength selectItemWithTitle:[NSString stringWithFormat:@"%d",value]];
+	[mRecordLength selectItemWithTitle:[NSString stringWithFormat:@"%ld",value]];
 }
 
 //--------------------------------------------------------------------------------

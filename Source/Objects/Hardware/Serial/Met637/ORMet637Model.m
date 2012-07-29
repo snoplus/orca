@@ -268,7 +268,7 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 {
 	if(statusBits & 0x10){
 		if(!lowBatteryAlarm){
-			NSString* s = [NSString stringWithFormat:@"Met637 (Unit %d)",[self uniqueIdNumber]];
+			NSString* s = [NSString stringWithFormat:@"Met637 (Unit %lu)",[self uniqueIdNumber]];
 			lowBatteryAlarm = [[ORAlarm alloc] initWithName:s severity:kHardwareAlarm];
 			[lowBatteryAlarm setSticky:YES];
 			[lowBatteryAlarm setHelpString:@"The battery on the particle counter is low. Is it supposed to be running on the battery?\n\nThis alarm will not go away until the problem is cleared. Acknowledging the alarm will silence it."];
@@ -283,7 +283,7 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 	
 	if(statusBits & 0x20){
 		if(!sensorErrorAlarm){
-			NSString* s = [NSString stringWithFormat:@"Met637 (Unit %d)",[self uniqueIdNumber]];
+			NSString* s = [NSString stringWithFormat:@"Met637 (Unit %lu)",[self uniqueIdNumber]];
 			sensorErrorAlarm = [[ORAlarm alloc] initWithName:s severity:kHardwareAlarm];
 			[sensorErrorAlarm setSticky:YES];
 			[sensorErrorAlarm setHelpString:@"The sensor is reporting a hardware error.\n\nThis alarm will not go away until the problem is cleared. Acknowledging the alarm will silence it."];
@@ -298,7 +298,7 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 	
 	if(statusBits & 0x40){
 		if(!flowErrorAlarm){
-			NSString* s = [NSString stringWithFormat:@"Met637 (Unit %d)",[self uniqueIdNumber]];
+			NSString* s = [NSString stringWithFormat:@"Met637 (Unit %lu)",[self uniqueIdNumber]];
 			flowErrorAlarm = [[ORAlarm alloc] initWithName:s severity:kHardwareAlarm];
 			[flowErrorAlarm setSticky:YES];
 			[flowErrorAlarm setHelpString:@"The particle counter is reporting a flow error.\n\nThis alarm will not go away until the problem is cleared. Acknowledging the alarm will silence it."];
@@ -703,7 +703,7 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 {
 	NSString* s;
  	@synchronized(self){
-		s= [NSString stringWithFormat:@"Met637,%d",[self uniqueIdNumber]];
+		s= [NSString stringWithFormat:@"Met637,%lu",[self uniqueIdNumber]];
 	}
 	return s;
 }
