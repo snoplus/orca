@@ -60,18 +60,18 @@
 
 - (void) keyDown:(NSEvent *)event
 {
-	NSString *input = [event characters];
+	int keyCode = [event keyCode];
 	if(selectedSet>=0 && selectedPath>=0){
-		if([input isEqual:[NSString stringWithFormat:@"%C", NSUpArrowFunctionKey]]){
+		if(keyCode == 126){
 			[self upArrow];
 		}
-		else if([input isEqual:[NSString stringWithFormat:@"%C", NSRightArrowFunctionKey]]){
+		else if(keyCode == 124){
 			[self rightArrow];
 		}
-		else if([input isEqual:[NSString stringWithFormat:@"%C", NSDownArrowFunctionKey]]){
+		else if(keyCode == 125){
 			[self downArrow];
 		}
-		else if([input isEqual:[NSString stringWithFormat:@"%C", NSLeftArrowFunctionKey]]){
+		else if(keyCode == 123){
 			[self leftArrow];
 		}
 		[delegate selectedSet:selectedSet segment:selectedPath];

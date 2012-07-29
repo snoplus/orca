@@ -501,7 +501,7 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 {
 	NSString* s;
  	@synchronized(self){
-		s= [NSString stringWithFormat:@"TPG256A,%d",[self uniqueIdNumber]];
+		s= [NSString stringWithFormat:@"TPG256A,%lu",[self uniqueIdNumber]];
 	}
 	return s;
 }

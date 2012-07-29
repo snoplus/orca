@@ -1078,7 +1078,7 @@ NSString* ORLabJackUE9ModelAdcEnableMaskChanged		= @"ORLabJackUE9ModelAdcEnableM
 
 - (NSString*) identifier
 {
-    return [NSString stringWithFormat:@"LJUE9,%d",[self uniqueIdNumber]];
+    return [NSString stringWithFormat:@"LJUE9,%lu",[self uniqueIdNumber]];
 }
 
 - (NSString*) processingTitle

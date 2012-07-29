@@ -1475,7 +1475,7 @@ static NSString *ORNcdMuxFullEfficiencyThresholds = @"ORNcdMuxFullEfficiencyThre
             //put the address in a keyed dict.. if identical addresses are inserted, flag a duplicated address failure.
             if([newAddressSet objectForKey:[newBaseAddress stringValue]]){
                 [self setHardwareCheck:NO];
-                [problemArray addObject:[NSString stringWithFormat:@"**** Address %<0x%x> appears more than once: slot %@ and slot %@\n",[newBaseAddress longValue],newSlot,[newAddressSet objectForKey:[newBaseAddress stringValue]]]];
+                [problemArray addObject:[NSString stringWithFormat:@"**** Address <0x%lx> appears more than once: slot %@ and slot %@\n",[newBaseAddress longValue],newSlot,[newAddressSet objectForKey:[newBaseAddress stringValue]]]];
             }
             else [newAddressSet setObject:newSlot forKey:[newBaseAddress stringValue]];
         }
@@ -1522,7 +1522,7 @@ static NSString *ORNcdMuxFullEfficiencyThresholds = @"ORNcdMuxFullEfficiencyThre
             //put the bus number in a keyed dict.. if identical buses are inserted, flag a duplicated address failure.
             if([newBusSet objectForKey:[newBusNumber stringValue]]){
                 [self setMuxCheck:NO];
-                [problemArray addObject:[NSString stringWithFormat:@"**** Mux Bus %<0x%x> appears more than once.\n",[newBusNumber longValue]]];
+                [problemArray addObject:[NSString stringWithFormat:@"**** Mux Bus <0x%lx> appears more than once.\n",[newBusNumber longValue]]];
             }
             else [newBusSet setObject:newBoxNumber forKey:[newBusNumber stringValue]];
         }
@@ -1597,7 +1597,7 @@ static NSString *ORNcdMuxFullEfficiencyThresholds = @"ORNcdMuxFullEfficiencyThre
         if(![exclusionSet containsObject:aKey]){
             if(![[oldRecord objectForKey:aKey] isEqualTo:[newRecord objectForKey:aKey]]){
                 [self performSelector:checkSelector];
-                [problemArray addObject:[NSString stringWithFormat:@"%@ <0x%x slot %@> %@ changed.\n",
+                [problemArray addObject:[NSString stringWithFormat:@"%@ <0x%lx slot %@> %@ changed.\n",
 										 [oldRecord objectForKey:@"Class Name"],
 										 [[oldRecord objectForKey:@"baseAddress"]longValue],
 										 [oldRecord objectForKey:@"slot"], aKey]];
@@ -1616,7 +1616,7 @@ static NSString *ORNcdMuxFullEfficiencyThresholds = @"ORNcdMuxFullEfficiencyThre
         if(![exclusionSet containsObject:aKey]){
             if(![[oldRecord objectForKey:aKey] isEqualTo:[newRecord objectForKey:aKey]]){
                 [self performSelector:checkSelector];
-                [problemArray addObject:[NSString stringWithFormat:@"%@ <0x%x mux %@> %@ changed.\n",
+                [problemArray addObject:[NSString stringWithFormat:@"%@ <0x%lx mux %@> %@ changed.\n",
 										 [oldRecord objectForKey:@"Class Name"],
 										 [[oldRecord objectForKey:@"busNumber"]longValue],
 										 [oldRecord objectForKey:@"muxID"], aKey]];

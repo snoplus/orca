@@ -312,7 +312,7 @@ NSString* ORNHQ226LModelTimeout				= @"ORNHQ226LModelTimeout";
 	if(aChannel>=kNumNHQ226LChannels)return;
     [self sendCmd:[NSString stringWithFormat:@"V%d=%d",aChannel+1,rampRate[aChannel]]];
     [self sendCmd:[NSString stringWithFormat:@"D%d=%.2f",aChannel+1,voltage[aChannel]]];
-    [self sendCmd:[NSString stringWithFormat:@"L%d=%d",aChannel+1,maxCurrent[aChannel]]];
+    [self sendCmd:[NSString stringWithFormat:@"L%d=%.0f",aChannel+1,maxCurrent[aChannel]]];
     [self sendCmd:[NSString stringWithFormat:@"G%d",aChannel+1]];
 }
 
@@ -329,7 +329,7 @@ NSString* ORNHQ226LModelTimeout				= @"ORNHQ226LModelTimeout";
 {
 	if(aChannel>=kNumNHQ226LChannels)return;
     [self sendCmd:[NSString stringWithFormat:@"V%d=%d",aChannel+1,255]];
-    [self sendCmd:[NSString stringWithFormat:@"D%d=%.2f",aChannel+1,0]];
+    [self sendCmd:[NSString stringWithFormat:@"D%d=0.00",aChannel+1]];
     [self sendCmd:[NSString stringWithFormat:@"G%d",aChannel+1]];
 }
 

@@ -404,7 +404,7 @@ NSString* KSegmentChangedNotification	  =	@"KSegmentChangedNotification";
 	if([theModel hasPrefix:@"OR"]) theModel   = [theModel substringFromIndex:2];
 	if([theModel hasSuffix:@"Model"])theModel = [theModel substringToIndex:[theModel length]-[@"Model"length]];
 	string = [string stringByAppendingFormat:     @"     Adc Class: %@\n",theModel];
-	string = [string stringByAppendingFormat:     @"     Threshold: %d\n",[self threshold]];
+	string = [string stringByAppendingFormat:     @"     Threshold: %lu\n",[self threshold]];
 	string = [string stringByAppendingFormat:     @"          Gain: %d\n",[self gain]];
 	for(id aKey in params){
 		const char *theKeyAsCString = [[aKey substringFromIndex:1] cStringUsingEncoding:NSASCIIStringEncoding];

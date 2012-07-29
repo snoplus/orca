@@ -835,7 +835,7 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
 				NSString* problemCardID = [NSString stringWithFormat:@"%@ %@ %@ changed.\n",
 									[oldRecord objectForKey:@"Class Name"],
 									slotKey,
-									[oldRecord objectForKey:slotKey], aKey];
+									[oldRecord objectForKey:slotKey]];
                 if(![problemArray containsObject:problemCardID]){
 					[problemArray addObject:problemCardID];
 				}

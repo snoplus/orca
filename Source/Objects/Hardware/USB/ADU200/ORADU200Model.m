@@ -583,7 +583,7 @@ NSString* ORADU200USBNextConnection			= @"ORADU200USBNextConnection";
 - (void) endProcessCycle
 {
 	if(usbInterface && [self getUSBController]){
-		NSString* aCommand = [NSString stringWithFormat:@"SPK%04x",processOutputValue & 0xf];
+		NSString* aCommand = [NSString stringWithFormat:@"SPK%04lx",processOutputValue & 0xf];
 		char data[8];
 		[self formatCommand:aCommand buffer:data];
 		[usbInterface writeBytesOnInterruptPipe:data length:8];
@@ -603,7 +603,7 @@ NSString* ORADU200USBNextConnection			= @"ORADU200USBNextConnection";
 
 - (NSString*) processingTitle
 {
-    return [NSString stringWithFormat:@"ADU200,%d",[self serialNumber]];
+    return [NSString stringWithFormat:@"ADU200,%lu",[self uniqueIdNumber]];
 }
 
 @end

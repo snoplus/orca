@@ -94,7 +94,7 @@
     ptr++; //point at realTime
 	float realTime = *ptr * 0.02; //in seconds
 	
-    return [NSString stringWithFormat:@"%@\nMCA927 (%d)\ntype: %@\nChannel: %d\nLiveTime: %.2f\nRealTime: %.2f\n\nSpectum Length: %d",title,objectID,zdt?@"ZDT":@"Normal",channel,liveTime,realTime,spectrumLength];               
+    return [NSString stringWithFormat:@"%@\nMCA927 (%lu)\ntype: %@\nChannel: %lu\nLiveTime: %.2f\nRealTime: %.2f\n\nSpectum Length: %lu",title,objectID,zdt?@"ZDT":@"Normal",channel,liveTime,realTime,spectrumLength];               
 }
 
 

@@ -1065,7 +1065,7 @@ NSString* ORLabJackMaxValueChanged				= @"ORLabJackMaxValueChanged";
 
 - (NSString*) identifier
 {
-    return [NSString stringWithFormat:@"LabJack,%d",[self uniqueIdNumber]];
+    return [NSString stringWithFormat:@"LabJack,%lu",[self uniqueIdNumber]];
 }
 
 - (NSString*) processingTitle

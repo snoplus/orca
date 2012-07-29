@@ -144,7 +144,7 @@
     timersSize		= NSMakeSize(570,580);
     mux80Size		= NSMakeSize(400,440);
 	
-    NSString* key = [NSString stringWithFormat: @"orca.ORLabJac%d.selectedtab",[model uniqueIdNumber]];
+    NSString* key = [NSString stringWithFormat: @"orca.ORLabJackUE9%lu.selectedtab",[model uniqueIdNumber]];
     int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
@@ -447,7 +447,7 @@
 {
 	int i;
 	for(i=0;i<kUE9NumTimers;i++){
-		[[timerResultMatrix cellWithTag:i] setStringValue:[NSString stringWithFormat:@"%u",[model timerResult:i]]];
+		[[timerResultMatrix cellWithTag:i] setStringValue:[NSString stringWithFormat:@"%lu",[model timerResult:i]]];
 	}
 }
 
@@ -505,7 +505,7 @@
 	}
     [[self window] setContentView:totalView];
 
-    NSString* key = [NSString stringWithFormat: @"orca.ORLabJac%d.selectedtab",[model uniqueIdNumber]];
+    NSString* key = [NSString stringWithFormat: @"orca.ORLabJackUE9%lu.selectedtab",[model uniqueIdNumber]];
     int index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
     

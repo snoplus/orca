@@ -889,10 +889,10 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 	[s appendFormat:@"$DATA:\n%d %d\n",index,n-1];
 	int i;
 	for(i=0;i<n;i++){
-		[s appendFormat:@"%d\n",spectrum[index][i]];
+		[s appendFormat:@"%lu\n",spectrum[index][i]];
 	}
-	[s appendFormat:@"$ROI:\n%d\n%d\n",roiPeakPreset[index], roiPreset[index]];
-	[s appendFormat:@"$PRESETS:\nLive Time\n%d\n%d\n",liveTime[index],realTime[index]];
+	[s appendFormat:@"$ROI:\n%lu\n%lu\n",roiPeakPreset[index], roiPreset[index]];
+	[s appendFormat:@"$PRESETS:\nLive Time\n%lu\n%lu\n",liveTime[index],realTime[index]];
 	[s writeToFile:aFilePath atomically:NO encoding:NSASCIIStringEncoding error:nil];
 }
 
@@ -1101,7 +1101,7 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 
 - (NSString*) identifier
 {
-	return [NSString stringWithFormat:@"MCA927 %d",[self uniqueIdNumber]];
+	return [NSString stringWithFormat:@"MCA927 %lu",[self uniqueIdNumber]];
 }
 
 #pragma mark ***Archival

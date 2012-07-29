@@ -109,7 +109,7 @@
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[[self window] setTitle:[NSString stringWithFormat:@"Mod Bus (Unit %d)",[model uniqueIdNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"Mod Bus (Unit %lu)",[model uniqueIdNumber]]];
 }
 
 - (void) updateWindow

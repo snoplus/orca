@@ -151,7 +151,6 @@
 #pragma mark •••Details Interface Management
 - (void) histogramsUpdated:(NSNotification*)aNote;
 - (void) setValueHistogramTitle;
-- (void) scaleValueHistogram;
 - (void) detailsLockChanged:(NSNotification*)aNotification;
 
 #pragma mark •••Data Source For Plots

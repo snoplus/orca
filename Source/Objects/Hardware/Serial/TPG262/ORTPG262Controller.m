@@ -135,7 +135,7 @@
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[[self window] setTitle:[NSString stringWithFormat:@"TPG262 (Unit %d)",[model uniqueIdNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"TPG262 (Unit %lu)",[model uniqueIdNumber]]];
 }
 
 - (void) updateWindow

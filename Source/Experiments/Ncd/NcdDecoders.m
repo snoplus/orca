@@ -42,8 +42,8 @@
 
     NSString* title= @"HP Pulser Record\n\n";
     
-    NSString* gtid  = [NSString stringWithFormat:    @"GTID        = %d\n",ptr[1]];
-    NSString* waveForm  = [NSString stringWithFormat:@"Waveform    = %d\n",ptr[2]];
+    NSString* gtid  = [NSString stringWithFormat:    @"GTID        = %lu\n",ptr[1]];
+    NSString* waveForm  = [NSString stringWithFormat:@"Waveform    = %lu\n",ptr[2]];
     packed.longValue = ptr[3];
     NSString* voltage = [NSString stringWithFormat:  @"Voltage     = %.2f\n",packed.floatValue];
     packed.longValue = ptr[4];
@@ -68,7 +68,7 @@
 {
     NSString* title= @"NCD LogAmp Task\n\n";
     
-    NSString* gtid  = [NSString stringWithFormat:    @"GTID  = %d\n",ptr[1]];
+    NSString* gtid  = [NSString stringWithFormat:    @"GTID  = %lu\n",ptr[1]];
     NSString* state = [NSString stringWithFormat:    @"State = %@\n",ptr[2]?@"Started":@"Stopped"];
 
     return [NSString stringWithFormat:@"%@%@%@",title,gtid,state];               
@@ -87,7 +87,7 @@
 {
     NSString* title= @"NCD Linearity Task\n\n";
     
-    NSString* gtid  = [NSString stringWithFormat:    @"GTID  = %d\n",ptr[1]];
+    NSString* gtid  = [NSString stringWithFormat:    @"GTID  = %lu\n",ptr[1]];
     NSString* state = [NSString stringWithFormat:    @"State = %@\n",ptr[2]?@"Started":@"Stopped"];
 
     return [NSString stringWithFormat:@"%@%@%@",title,gtid,state];               
@@ -107,7 +107,7 @@
 {
     NSString* title= @"NCD Threshold Task\n\n";
     
-    NSString* gtid  = [NSString stringWithFormat:    @"GTID  = %d\n",ptr[1]];
+    NSString* gtid  = [NSString stringWithFormat:    @"GTID  = %lu\n",ptr[1]];
     NSString* state = [NSString stringWithFormat:    @"State = %@\n",ptr[2]?@"Started":@"Stopped"];
 
     return [NSString stringWithFormat:@"%@%@%@",title,gtid,state];               
@@ -125,7 +125,7 @@
 {
     NSString* title= @"NCD CableCheck Task\n\n";
     
-    NSString* gtid  = [NSString stringWithFormat:    @"GTID  = %d\n",ptr[1]];
+    NSString* gtid  = [NSString stringWithFormat:    @"GTID  = %lu\n",ptr[1]];
     NSString* state = [NSString stringWithFormat:    @"State = %@\n",ptr[2]?@"Started":@"Stopped"];
 
     return [NSString stringWithFormat:@"%@%@%@",title,gtid,state];               
@@ -143,7 +143,7 @@
 {
     NSString* title= @"NCD StepPDS Task\n\n";
     
-    NSString* gtid  = [NSString stringWithFormat:    @"GTID  = %d\n",ptr[1]];
+    NSString* gtid  = [NSString stringWithFormat:    @"GTID  = %lu\n",ptr[1]];
     NSString* state = [NSString stringWithFormat:    @"State = %@\n",ptr[2]?@"Started":@"Stopped"];
 
     return [NSString stringWithFormat:@"%@%@%@",title,gtid,state];               
@@ -160,7 +160,7 @@
 {
     NSString* title= @"NCD Pulse Channels Task\n\n";
     
-    NSString* gtid  = [NSString stringWithFormat:    @"GTID  = %d\n",ptr[1]];
+    NSString* gtid  = [NSString stringWithFormat:    @"GTID  = %lu\n",ptr[1]];
     NSString* state = [NSString stringWithFormat:    @"State = %@\n",ptr[2]?@"Started":@"Stopped"];
 
     return [NSString stringWithFormat:@"%@%@%@",title,gtid,state];               

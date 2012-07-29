@@ -52,7 +52,7 @@
 
 - (void) setCrateTitle
 {
-	[[self window] setTitle:[NSString stringWithFormat:@"CAMAC crate %d",[model uniqueIdNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"CAMAC crate %lu",[model uniqueIdNumber]]];
 }
 
 #pragma mark •••Notifications

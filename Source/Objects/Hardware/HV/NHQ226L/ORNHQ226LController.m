@@ -290,7 +290,7 @@
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[[self window] setTitle:[NSString stringWithFormat:@"NHQ226L (%d)",[model uniqueIdNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"NHQ226L (%lu)",[model uniqueIdNumber]]];
 }
 
 - (void) setVoltageChanged:(NSNotification*)aNote

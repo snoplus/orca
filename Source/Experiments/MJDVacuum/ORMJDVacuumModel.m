@@ -534,7 +534,7 @@ NSString* ORMJDVacuumModelConstraintsChanged		= @"ORMJDVacuumModelConstraintsCha
 
 - (NSString*) processingTitle
 {
-	return [NSString stringWithFormat:@"MJD Vac,%d",[self uniqueIdNumber]];
+	return [NSString stringWithFormat:@"MJD Vac,%lu",[self uniqueIdNumber]];
 }
 
 - (void) mapChannel:(int)aChannel toHWObject:(NSString*)objIdentifier hwChannel:(int)hwChannel;

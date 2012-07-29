@@ -102,7 +102,7 @@ static NSString* kLabJackUnit[8] = {
 		float asFloat;
 		unsigned long asLong;
 	}theAdcValue;
-	theString = [theString stringByAppendingFormat:@"HW ID = %d\n",dataPtr[1] & 0x0000ffff];
+	theString = [theString stringByAppendingFormat:@"HW ID = %lu\n",dataPtr[1] & 0x0000ffff];
 	int i;
 	int index = 2;
 	for(i=0;i<8;i++){
@@ -110,10 +110,10 @@ static NSString* kLabJackUnit[8] = {
 		theString = [theString stringByAppendingFormat:@"%d: %.3f\n",i,theAdcValue.asFloat];
 		index++;
 	}
-	theString = [theString stringByAppendingFormat:@"Counter = 0x%08x\n",dataPtr[index++]];
-	theString = [theString stringByAppendingFormat:@"I/O Dir = 0x%08x\n",dataPtr[index++] & 0x000fffff];
-	theString = [theString stringByAppendingFormat:@"I/O Out = 0x%08x\n",dataPtr[index++] & 0x000fffff];
-	theString = [theString stringByAppendingFormat:@"I/O In  = 0x%08x\n",dataPtr[index++] & 0x000fffff];
+	theString = [theString stringByAppendingFormat:@"Counter = 0x%08lx\n",dataPtr[index++]];
+	theString = [theString stringByAppendingFormat:@"I/O Dir = 0x%08lx\n",dataPtr[index++] & 0x000fffff];
+	theString = [theString stringByAppendingFormat:@"I/O Out = 0x%08lx\n",dataPtr[index++] & 0x000fffff];
+	theString = [theString stringByAppendingFormat:@"I/O In  = 0x%08lx\n",dataPtr[index++] & 0x000fffff];
 	
 	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[index]];
 	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S"];

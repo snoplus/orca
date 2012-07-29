@@ -193,9 +193,9 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 	[self addGroup:group];
 	[group release];
 	
-    group = [[ORSegmentGroup alloc] initWithName:@"Veto" numSegments:kNumVetoSegments mapEntries:[self initMapEntries:1]];
-	[self addGroup:group];
-	[group release];
+    ORSegmentGroup* group2 = [[ORSegmentGroup alloc] initWithName:@"Veto" numSegments:kNumVetoSegments mapEntries:[self initMapEntries:1]];
+	[self addGroup:group2];
+	[group2 release];
 }
 
 - (NSMutableArray*) initMapEntries:(int)index

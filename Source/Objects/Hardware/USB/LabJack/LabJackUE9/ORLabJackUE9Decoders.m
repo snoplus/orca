@@ -106,7 +106,7 @@ static NSString* kLabJackUE9Unit[8] = {
 		float asFloat;
 		unsigned long asLong;
 	}theAdcValue;
-	theString = [theString stringByAppendingFormat:@"HW ID = %d\n",dataPtr[1] & 0x0000ffff];
+	theString = [theString stringByAppendingFormat:@"HW ID = %lu\n",dataPtr[1] & 0x0000ffff];
 	
 	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[2]];
 	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
@@ -119,18 +119,18 @@ static NSString* kLabJackUE9Unit[8] = {
 		theString = [theString stringByAppendingFormat:@"%d: %.3f\n",i,theAdcValue.asFloat];
 		index++;
 	}
-	theString = [theString stringByAppendingFormat:@"Counter1 = 0x%08x\n",dataPtr[index++]];
-	theString = [theString stringByAppendingFormat:@"Counter2 = 0x%08x\n",dataPtr[index++]];
-	theString = [theString stringByAppendingFormat:@"Timer1 = 0x%08x\n",dataPtr[index++]];
-	theString = [theString stringByAppendingFormat:@"Timer2 = 0x%08x\n",dataPtr[index++]];
-	theString = [theString stringByAppendingFormat:@"Timer3 = 0x%08x\n",dataPtr[index++]];
-	theString = [theString stringByAppendingFormat:@"Timer4 = 0x%08x\n",dataPtr[index++]];
-	theString = [theString stringByAppendingFormat:@"Timer5 = 0x%08x\n",dataPtr[index++]];
-	theString = [theString stringByAppendingFormat:@"Timer6 = 0x%08x\n",dataPtr[index++]];
-	theString = [theString stringByAppendingFormat:@"Counter2 = 0x%08x\n",dataPtr[index++]];
-	theString = [theString stringByAppendingFormat:@"I/O Dir = 0x%08x\n",dataPtr[index++] & 0x000fffff];
-	theString = [theString stringByAppendingFormat:@"I/O Out = 0x%08x\n",dataPtr[index++] & 0x000fffff];
-	theString = [theString stringByAppendingFormat:@"I/O In  = 0x%08x\n",dataPtr[index++] & 0x000fffff];
+	theString = [theString stringByAppendingFormat:@"Counter1 = 0x%08lx\n",dataPtr[index++]];
+	theString = [theString stringByAppendingFormat:@"Counter2 = 0x%08lx\n",dataPtr[index++]];
+	theString = [theString stringByAppendingFormat:@"Timer1 = 0x%08lx\n",dataPtr[index++]];
+	theString = [theString stringByAppendingFormat:@"Timer2 = 0x%08lx\n",dataPtr[index++]];
+	theString = [theString stringByAppendingFormat:@"Timer3 = 0x%08lx\n",dataPtr[index++]];
+	theString = [theString stringByAppendingFormat:@"Timer4 = 0x%08lx\n",dataPtr[index++]];
+	theString = [theString stringByAppendingFormat:@"Timer5 = 0x%08lx\n",dataPtr[index++]];
+	theString = [theString stringByAppendingFormat:@"Timer6 = 0x%08lx\n",dataPtr[index++]];
+	theString = [theString stringByAppendingFormat:@"Counter2 = 0x%08lx\n",dataPtr[index++]];
+	theString = [theString stringByAppendingFormat:@"I/O Dir = 0x%08lx\n",dataPtr[index++] & 0x000fffff];
+	theString = [theString stringByAppendingFormat:@"I/O Out = 0x%08lx\n",dataPtr[index++] & 0x000fffff];
+	theString = [theString stringByAppendingFormat:@"I/O In  = 0x%08lx\n",dataPtr[index++] & 0x000fffff];
 	
 	
 	return theString;

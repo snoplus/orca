@@ -33,7 +33,7 @@
 
 - (void) setCrateTitle
 {
-	[[self window] setTitle:[NSString stringWithFormat:@"MPod Minicrate %d",[model uniqueIdNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"MPod Minicrate %lu",[model uniqueIdNumber]]];
 }
 
 #pragma mark ¥¥¥Notifications
