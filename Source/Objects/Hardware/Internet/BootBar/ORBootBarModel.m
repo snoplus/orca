@@ -97,7 +97,7 @@ NSString* ORBootBarModelOutletNameChanged	 = @"ORBootBarModelOutletNameChanged";
 	
 	NSDictionary* attDict = [NSDictionary dictionaryWithObjectsAndKeys:[NSFont labelFontOfSize:12],NSFontAttributeName, [NSColor whiteColor],NSForegroundColorAttributeName,nil];
 	NSAttributedString* n = [[NSAttributedString alloc] 
-							 initWithString:[NSString stringWithFormat:@"%d",[self uniqueIdNumber]]
+							 initWithString:[NSString stringWithFormat:@"%lu",[self uniqueIdNumber]]
 							 attributes:attDict];
 	
 

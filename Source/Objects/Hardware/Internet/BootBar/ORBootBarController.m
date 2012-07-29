@@ -32,7 +32,7 @@
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[[self window] setTitle:[NSString stringWithFormat:@"Boot Bar %d",[model uniqueIdNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"Boot Bar %lu",[model uniqueIdNumber]]];
 }
 
 - (void) registerNotificationObservers
