@@ -66,7 +66,7 @@
 	for(i=0;i<4;i++){
 		theString = [theString stringByAppendingFormat:@"--------------------------\n"];
 		theString = [theString stringByAppendingFormat:@"Channel %d\n",i];
-		theString = [theString stringByAppendingFormat:@"Status Words 0x%02x  0x%02x\n",dataPtr[index],dataPtr[index+1]];
+		theString = [theString stringByAppendingFormat:@"Status Words 0x%02lx  0x%02lx\n",dataPtr[index],dataPtr[index+1]];
 		index +=2;
 		theData.asLong = dataPtr[index++]; //act Voltage 0
 		theString = [theString stringByAppendingFormat:@"Act Voltage: %.1f\n",theData.asFloat];

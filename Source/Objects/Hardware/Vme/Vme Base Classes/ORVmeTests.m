@@ -136,7 +136,7 @@
 					if((theWriteValue&validMask) != (theReadValue&validMask)) {
 						errorCount++;
 						if(errorCount<4){
-							[self addFailureLog:[NSString stringWithFormat:@"R/W Error: 0x%08x: 0x%0x != 0x%0x (Mask = 0x%08x)",[anObj baseAddress] + theOffset,theWriteValue&validMask,theReadValue&validMask,validMask]];
+							[self addFailureLog:[NSString stringWithFormat:@"R/W Error: 0x%08lx: 0x%0lx != 0x%0lx (Mask = 0x%08lx)",[anObj baseAddress] + theOffset,theWriteValue&validMask,theReadValue&validMask,validMask]];
 						}
 					}
 				}
@@ -150,7 +150,7 @@
 	}
 	@catch(NSException* e){
 		errorCount++;
-		[self addFailureLog:[NSString stringWithFormat:@"Exception: 0x%08x\n",[anObj baseAddress] + theOffset]];
+		[self addFailureLog:[NSString stringWithFormat:@"Exception: 0x%08lx\n",[anObj baseAddress] + theOffset]];
 	}
 }
 @end

@@ -469,7 +469,7 @@ typedef enum {
 
 - (void) updateRegisterDescription:(short) aRegisterIndex
 {
-    [registerOffsetField setStringValue:[NSString stringWithFormat:@"0x%04x",[model getAddressOffset:aRegisterIndex]]];
+    [registerOffsetField setStringValue:[NSString stringWithFormat:@"0x%04lx",[model getAddressOffset:aRegisterIndex]]];
 	
     [regNameField setStringValue:[model getRegisterName:aRegisterIndex]];
 	

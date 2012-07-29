@@ -165,8 +165,8 @@ if double word format
 
     unsigned long* ptr = (unsigned long*)someData;
     
-	[totalString appendString:[NSString stringWithFormat:@"Crate    = %d\n",(ptr[1]>>21) & 0xf]];
-    [totalString appendString:[NSString stringWithFormat:@"Station  = %d\n",(ptr[1]>>16) & 0x1f]];
+	[totalString appendString:[NSString stringWithFormat:@"Crate    = %lu\n",(ptr[1]>>21) & 0xf]];
+    [totalString appendString:[NSString stringWithFormat:@"Station  = %lu\n",(ptr[1]>>16) & 0x1f]];
 	unsigned char version = (ptr[1]>>25) & 0x1;
  
     //word 0 -- the dataID and the total length in longs

@@ -47,8 +47,8 @@
 {
     NSString* title= @"Trigger32 10MHz Clock Record\n\n";
     NSString* trigger = [NSString stringWithFormat:@"Trigger   = %d\n",(ptr[1]>>24)&0x1?1:2];
-    NSString* upper   = [NSString stringWithFormat:@"Upper Reg = %d\n",ptr[1]&0x00ffffff];
-    NSString* lower   = [NSString stringWithFormat:@"Lower Reg = %d\n",ptr[2]];
+    NSString* upper   = [NSString stringWithFormat:@"Upper Reg = %lu\n",ptr[1]&0x00ffffff];
+    NSString* lower   = [NSString stringWithFormat:@"Lower Reg = %lu\n",ptr[2]];
 
     return [NSString stringWithFormat:@"%@%@%@%@",title,trigger,upper,lower];
 }
@@ -74,7 +74,7 @@
         length = 2;
     }
     
-    NSString* valueString = [NSString stringWithFormat:@"%d",*ptr&0x00ffffff];
+    NSString* valueString = [NSString stringWithFormat:@"%lu",*ptr&0x00ffffff];
     if((*ptr>>24)&0x1){
         [aDataSet loadGenericData:valueString sender:self  withKeys:@"Latched Clock",@"GTID1",nil];
     }
@@ -91,8 +91,8 @@
     if(!IsShortForm(*ptr)){
         ptr++; //long version
     }
-    NSString* trigger = [NSString stringWithFormat:@"Trigger = %d\n",(*ptr>>24)&0x1 ? 1 : 2];
-    NSString* gtid    = [NSString stringWithFormat:@"GTID    = %d\n",*ptr&0x00ffffff];
+    NSString* trigger = [NSString stringWithFormat:@"Trigger = %u\n",(*ptr>>24)&0x1 ? 1 : 2];
+    NSString* gtid    = [NSString stringWithFormat:@"GTID    = %lu\n",*ptr&0x00ffffff];
 
     return [NSString stringWithFormat:@"%@%@%@",title,trigger,gtid];
 }
@@ -105,7 +105,7 @@
     unsigned long* ptr = (unsigned long*)someData;
     unsigned long length = ExtractLength(ptr[0]);
 	
-    NSString* gtidString = [NSString stringWithFormat:@"%d",ptr[1]];
+    NSString* gtidString = [NSString stringWithFormat:@"%lu",ptr[1]];
     [aDataSet loadGenericData:gtidString sender:self withKeys:@"Latched Clock",@"Livetime", @"GTID",nil];
     
     
@@ -161,8 +161,8 @@
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
     NSString* title= @"Trigger32 LiveTime Record\n\n";
-    NSString* loc  = [NSString stringWithFormat:@"Crate = %d Card = %d\n",(ptr[2]>>8) & 0xf,ptr[2] & 0x0000001f];
-    NSString* gtid = [NSString stringWithFormat:@"GTID  = %d\n",ptr[1]];
+    NSString* loc  = [NSString stringWithFormat:@"Crate = %lu Card = %lu\n",(ptr[2]>>8) & 0xf,ptr[2] & 0x0000001f];
+    NSString* gtid = [NSString stringWithFormat:@"GTID  = %lu\n",ptr[1]];
     NSString* type;
     if(((ptr[2]>>16) & 0x3) == 3)        type = @"Type  = MidRun\n";
     else if(((ptr[2]>>16) & 0x3) == 1)   type = @"Type  = Start\n";

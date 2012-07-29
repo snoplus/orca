@@ -88,8 +88,8 @@
         ptr++; //now p[0] is the word with the location (short -or- long form
     }
 	
-    NSString* crate = [NSString stringWithFormat:@"Crate    = %d\n",(ptr[0]&0x01e00000)>>21];
-    NSString* card  = [NSString stringWithFormat:@"Station  = %d\n",(ptr[0]&0x001f0000)>>16];
+    NSString* crate = [NSString stringWithFormat:@"Crate    = %lu\n",(ptr[0]&0x01e00000)>>21];
+    NSString* card  = [NSString stringWithFormat:@"Station  = %lu\n",(ptr[0]&0x001f0000)>>16];
 	
     unsigned long headerSize = 2;
     bool hasTiming = (*ptr&0x02000000);
@@ -99,7 +99,7 @@
     }
 	
     unsigned long nBins = length-headerSize;
-    NSString* nBinsStr = [NSString stringWithFormat:@"NBins    = %d\n", nBins];
+    NSString* nBinsStr = [NSString stringWithFormat:@"NBins    = %lu\n", nBins];
 	
     unsigned int counts = 0;
     unsigned int iBin;

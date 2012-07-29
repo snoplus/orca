@@ -124,7 +124,7 @@
     NSString* crateName = [NSString stringWithFormat:@"Crate = %d\n",crate];
     NSString* cardName  = [NSString stringWithFormat:@"Card  = %d\n",card];
     NSString* channame  = [NSString stringWithFormat:@"Chan  = %d\n",channel];
-    NSString* adc   = [NSString stringWithFormat:@"ADC   = 0x%x\n",*ptr&0x00000fff];
+    NSString* adc   = [NSString stringWithFormat:@"ADC   = 0x%lx\n",*ptr&0x00000fff];
     
 	NSString* timeString = @"No Time Stamp\n";
 	if(length==4){
@@ -149,11 +149,11 @@
     unsigned long length;
     length = ExtractLength(ptr[0]);
     
-    NSString* gtidString = [NSString stringWithFormat:@"%d",ptr[1]];
+    NSString* gtidString = [NSString stringWithFormat:@"%lu",ptr[1]];
     
     short crate = (ptr[2] & 0x1e000000)>>25;
     short card  = (ptr[2] & 0x01f00000)>>20;
-    NSString* globalScaler = [NSString stringWithFormat:@"%d",ptr[3]];
+    NSString* globalScaler = [NSString stringWithFormat:@"%lu",ptr[3]];
 	NSString* crateKey = [self getCrateKey: crate];
 	NSString* cardKey = [self getCardKey: card];
     [aDataSet loadGenericData:gtidString sender:self withKeys:@"Scalers",@"Shaper",  crateKey,cardKey,@"GTID",nil];
@@ -169,7 +169,7 @@
         NSString* cardKey = [self getCardKey: card];
         NSString* channelKey = [self getChannelKey: channel];
         
-        NSString* scaler = [NSString stringWithFormat:@"%d",ptr[index]&0x0000ffff];
+        NSString* scaler = [NSString stringWithFormat:@"%lu",ptr[index]&0x0000ffff];
         [aDataSet loadGenericData:scaler sender:self withKeys:@"Scalers",@"Shaper", crateKey,cardKey,channelKey,nil];
         index++;
 
@@ -184,16 +184,16 @@
 
     NSString* title= @"Shaper Scaler Record\n\n";
     
-    NSString* gtid  = [NSString stringWithFormat:@"GTID  = %d\n",ptr[1]];
-    NSString* crate = [NSString stringWithFormat:@"Crate = %d\n",(ptr[2] & 0x1e000000)>>25];
-    NSString* card  = [NSString stringWithFormat:@"Card  = %d\n",(ptr[2] & 0x01f00000)>>20];    
-    NSString* global= [NSString stringWithFormat:@"Total = %d\n",ptr[3]];
+    NSString* gtid  = [NSString stringWithFormat:@"GTID  = %lu\n",ptr[1]];
+    NSString* crate = [NSString stringWithFormat:@"Crate = %lu\n",(ptr[2] & 0x1e000000)>>25];
+    NSString* card  = [NSString stringWithFormat:@"Card  = %lu\n",(ptr[2] & 0x01f00000)>>20];
+    NSString* global= [NSString stringWithFormat:@"Total = %lu\n",ptr[3]];
     NSString* subTitle =@"\nScalers by Card,Chan\n\n";
    
     short index = 4;
     NSString* restOfString = @"";
     do {
-        restOfString = [restOfString stringByAppendingFormat:@"%2d,%2d  = %d\n",(ptr[index] & 0x01f00000)>>20,(ptr[index] & 0x000f0000)>>16,ptr[index]&0x0000ffff];
+        restOfString = [restOfString stringByAppendingFormat:@"%2lu,%2lu  = %lu\n",(ptr[index] & 0x01f00000)>>20,(ptr[index] & 0x000f0000)>>16,ptr[index]&0x0000ffff];
         index++;
     }while(index < length);
 
@@ -214,11 +214,11 @@
     unsigned long length;
     length = ExtractLength(ptr[0]);
     
-    NSString* gtidString = [NSString stringWithFormat:@"%d",ptr[1]];
+    NSString* gtidString = [NSString stringWithFormat:@"%lu",ptr[1]];
     
     short crate = (ptr[2] & 0x1e000000)>>25;
     short card  = (ptr[2] & 0x01f00000)>>20;
-    NSString* globalScaler = [NSString stringWithFormat:@"%d",ptr[3]];
+    NSString* globalScaler = [NSString stringWithFormat:@"%lu",ptr[3]];
 	NSString* crateKey = [self getCrateKey: crate];
 	NSString* cardKey = [self getCardKey: card];
     [aDataSet loadGenericData:gtidString sender:self withKeys:@"Scalers",@"Shaper",  crateKey,cardKey,@"GTID",nil];
@@ -234,7 +234,7 @@
         NSString* cardKey = [self getCardKey: card];
         NSString* channelKey = [self getChannelKey: channel];
         
-        NSString* scaler = [NSString stringWithFormat:@"%d",ptr[index]&0x0000ffff];
+        NSString* scaler = [NSString stringWithFormat:@"%lu",ptr[index]&0x0000ffff];
         [aDataSet loadGenericData:scaler sender:self withKeys:@"Scalers",@"Shaper", crateKey,cardKey,channelKey,nil];
         index++;
 
@@ -249,16 +249,16 @@
 
     NSString* title= @"Shaper Scaler Record\n\n";
     
-    NSString* gtid  = [NSString stringWithFormat:@"GTID  = %d\n",ptr[1]];
-    NSString* crate = [NSString stringWithFormat:@"Crate = %d\n",(ptr[2] & 0x1e000000)>>25];
-    NSString* card  = [NSString stringWithFormat:@"Card  = %d\n",(ptr[2] & 0x01f00000)>>20];    
-    NSString* global= [NSString stringWithFormat:@"Total = %d\n",ptr[3]];
+    NSString* gtid  = [NSString stringWithFormat:@"GTID  = %lu\n",ptr[1]];
+    NSString* crate = [NSString stringWithFormat:@"Crate = %lu\n",(ptr[2] & 0x1e000000)>>25];
+    NSString* card  = [NSString stringWithFormat:@"Card  = %lu\n",(ptr[2] & 0x01f00000)>>20];
+    NSString* global= [NSString stringWithFormat:@"Total = %lu\n",ptr[3]];
     NSString* subTitle =@"\nScalers by Card,Chan\n\n";
    
     short index = 4;
     NSString* restOfString = @"";
     do {
-        restOfString = [restOfString stringByAppendingFormat:@"%2d,%2d  = %d\n",(ptr[index] & 0x01f00000)>>20,(ptr[index] & 0x000f0000)>>16,ptr[index]&0x0000ffff];
+        restOfString = [restOfString stringByAppendingFormat:@"%2lu,%2lu  = %lu\n",(ptr[index] & 0x01f00000)>>20,(ptr[index] & 0x000f0000)>>16,ptr[index]&0x0000ffff];
         index++;
     }while(index < length);
 

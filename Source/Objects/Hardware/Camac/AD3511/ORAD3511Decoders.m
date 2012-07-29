@@ -99,12 +99,12 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
     
     NSString* title= @"AD3511 ADC Record\n\n";
     
-    NSString* crate = [NSString stringWithFormat:@"Crate    = %d\n",(*ptr&0x01e00000)>>21];
-    NSString* card  = [NSString stringWithFormat:@"Station  = %d\n",(*ptr&0x001f0000)>>16];
+    NSString* crate = [NSString stringWithFormat:@"Crate    = %lu\n",(*ptr&0x01e00000)>>21];
+    NSString* card  = [NSString stringWithFormat:@"Station  = %lu\n",(*ptr&0x001f0000)>>16];
 
 	BOOL timingIncluded = (*ptr&0x02000000)>>25;
 	BOOL dataOffset;
-	NSMutableString* adcValues = [NSMutableString stringWithFormat:@"buffer size: %d\n",timingIncluded?length-4:length-2];
+	NSMutableString* adcValues = [NSMutableString stringWithFormat:@"buffer size: %lu\n",timingIncluded?length-4:length-2];
 	if(timingIncluded)	{
 		dataOffset = 4;
 		union {
@@ -128,7 +128,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 	int i;
 	for(i=0;i<length-dataOffset;i++){
 		ptr++;
-		[adcValues appendFormat:@"%d: %d\n",i,*ptr];
+		[adcValues appendFormat:@"%d: %lu\n",i,*ptr];
 	}
     return [NSString stringWithFormat:@"%@%@%@%@",title,crate,card,adcValues];               
 }

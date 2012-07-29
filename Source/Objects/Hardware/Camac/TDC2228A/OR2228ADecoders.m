@@ -72,10 +72,10 @@
     
     NSString* title= @"2228A TDC Record\n\n";
     
-    NSString* crate = [NSString stringWithFormat:@"Crate    = %d\n",(*ptr>>21)&0xf];
-    NSString* card  = [NSString stringWithFormat:@"Station  = %d\n",(*ptr>>16)& 0x1f];
-    NSString* chan  = [NSString stringWithFormat:@"Chan     = %d\n",(*ptr>>12)&0xf];
-    NSString* tdc   = [NSString stringWithFormat:@"TDC      = 0x%x\n",*ptr&0xfff];
+    NSString* crate = [NSString stringWithFormat:@"Crate    = %lu\n",(*ptr>>21)&0xf];
+    NSString* card  = [NSString stringWithFormat:@"Station  = %lu\n",(*ptr>>16)& 0x1f];
+    NSString* chan  = [NSString stringWithFormat:@"Chan     = %lu\n",(*ptr>>12)&0xf];
+    NSString* tdc   = [NSString stringWithFormat:@"TDC      = 0x%lx\n",*ptr&0xfff];
     NSString* time  = [NSString stringWithFormat:@"         (%.3f ns)\n",(*ptr&0xfff)*100./2047.]; //100ns full scale.
     
     return [NSString stringWithFormat:@"%@%@%@%@%@%@",title,crate,card,chan,tdc,time];               

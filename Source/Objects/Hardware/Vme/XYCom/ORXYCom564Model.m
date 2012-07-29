@@ -602,7 +602,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 }
 - (NSString*) processingTitle
 {
-    return [NSString stringWithFormat:@"XVME-564,%d,%@",[self crateNumber],[self slot]];
+    return [NSString stringWithFormat:@"XVME-564,%d,%d",[self crateNumber],[self slot]];
 }
 - (double) convertedValue:(int)channel
 {

@@ -53,7 +53,7 @@
         NSString* cardKey = [self getStationKey: card];
         NSString* channelKey = [self getChannelKey: channel];
         unsigned long scalerValue = ptr[2+i]&0x00ffffff;
-        NSString* scaler = [NSString stringWithFormat:@"%d",scalerValue];
+        NSString* scaler = [NSString stringWithFormat:@"%lu",scalerValue];
         [aDataSet loadGenericData:scaler sender:self withKeys:@"Scalers",@"LS2551", crateKey,cardKey,channelKey,nil];
         [aDataSet loadScalerSum:scalerValue sender:self withKeys:@"Scaler Sums",@"LS2551", crateKey,cardKey,channelKey,nil];
 	}
@@ -68,13 +68,13 @@
 
     unsigned long* ptr = (unsigned long*)someData;
     
-	NSString* crate = [NSString stringWithFormat:@"Crate    = %d\n",(ptr[1]>>16)&0xf];
-    NSString* card  = [NSString stringWithFormat:@"Station  = %d\n",ptr[1] & 0x001f];
+	NSString* crate = [NSString stringWithFormat:@"Crate    = %lu\n",(ptr[1]>>16)&0xf];
+    NSString* card  = [NSString stringWithFormat:@"Station  = %lu\n",ptr[1] & 0x001f];
     NSString* totalString = [NSString stringWithFormat:@"%@%@%@\nScaler Sum\n",title,crate,card];
     ptr+=2;
     int i;
     for(i=0;i<12;i++){
-        totalString = [totalString stringByAppendingFormat:@"%2d: %10d\n",(ptr[i]>>28) & 0xf,ptr[i]&0x00ffffff];
+        totalString = [totalString stringByAppendingFormat:@"%2lu: %10lu\n",(ptr[i]>>28) & 0xf,ptr[i]&0x00ffffff];
     }
     
     return totalString;               

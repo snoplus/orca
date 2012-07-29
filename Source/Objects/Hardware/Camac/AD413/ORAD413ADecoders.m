@@ -71,10 +71,10 @@
     
     NSString* title= @"AD413A ADC Record\n\n";
     
-    NSString* crate = [NSString stringWithFormat:@"Crate    = %d\n",(*ptr>>21) & 0xf];
-    NSString* card  = [NSString stringWithFormat:@"Station  = %d\n",(*ptr>>16)  & 0x1f];
-    NSString* chan  = [NSString stringWithFormat:@"Chan     = %d\n",(*ptr>>13) & 0x3];
-    NSString* adc   = [NSString stringWithFormat:@"ADC      = 0x%x\n",*ptr&0x00001fff];
+    NSString* crate = [NSString stringWithFormat:@"Crate    = %lu\n",(*ptr>>21) & 0xf];
+    NSString* card  = [NSString stringWithFormat:@"Station  = %lu\n",(*ptr>>16)  & 0x1f];
+    NSString* chan  = [NSString stringWithFormat:@"Chan     = %lu\n",(*ptr>>13) & 0x3];
+    NSString* adc   = [NSString stringWithFormat:@"ADC      = 0x%lx\n",*ptr&0x00001fff];
     
     return [NSString stringWithFormat:@"%@%@%@%@%@",title,crate,card,chan,adc];               
 }

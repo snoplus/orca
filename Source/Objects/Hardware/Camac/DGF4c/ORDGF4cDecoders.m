@@ -351,7 +351,7 @@
 		for(chan=0;chan<4;chan++){
 			//unpack the LiveTime and format a string to display holding the livetime and the number of events
 			packedDGF4LiveTime.asLong = recordPtr[index++];
-			NSString* result = [NSString stringWithFormat:@"%.4f #Events: %d",packedDGF4LiveTime.asDouble,recordPtr[index++]];
+			NSString* result = [NSString stringWithFormat:@"%.4f #Events: %lu",packedDGF4LiveTime.asDouble,recordPtr[index++]];
 			[aDataSet loadGenericData:result sender:self withKeys:@"ORDGF4c",@"Livetime",crateKey,cardKey, [self getChannelKey: chan],nil];
 			
 		}
@@ -383,7 +383,7 @@
 			rtb = bc>>16;
 			rtc = bc&0x0000ffff;
 			double dValue = (rta*pow(65536.0,2.0)+rtb*65536.0+rtc)*1.0e-6/40.;
-			NSString* result = [NSString stringWithFormat:@"%.4f #Events: %d",dValue,recordPtr[index++]];
+			NSString* result = [NSString stringWithFormat:@"%.4f #Events: %lu",dValue,recordPtr[index++]];
 			[aDataSet loadGenericData:result sender:self withKeys:@"ORDGF4c",@"Livetime",crateKey,cardKey, [self getChannelKey: chan],nil];
 			
 		}
@@ -474,7 +474,7 @@
 			
 			//unpack the numEvents for this channel
 			unsigned long numEvents = recordPtr[index++];
-			resultString = [resultString stringByAppendingString:[NSString stringWithFormat:@"%@ numEvents: %d\n",[self getChannelKey: chan],numEvents]];
+			resultString = [resultString stringByAppendingString:[NSString stringWithFormat:@"%@ numEvents: %lu\n",[self getChannelKey: chan],numEvents]];
 		}
 	}
 	else {
@@ -504,7 +504,7 @@
 			
 			//unpack the numEvents for this channel
 			unsigned long numEvents = recordPtr[index++];
-			resultString = [resultString stringByAppendingString:[NSString stringWithFormat:@"%@ numEvents: %d\n",[self getChannelKey: chan],numEvents]];
+			resultString = [resultString stringByAppendingString:[NSString stringWithFormat:@"%@ numEvents: %lu\n",[self getChannelKey: chan],numEvents]];
 		}
 	}
 	return resultString;

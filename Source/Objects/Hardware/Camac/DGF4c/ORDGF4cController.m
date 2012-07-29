@@ -537,7 +537,7 @@
 			unsigned short ia = [model paramValue:@"FASTPEAKSA" channel:i];
 			unsigned short ib = [model paramValue:@"FASTPEAKSB" channel:i];
 			long fastPeaks=(long)(ia*65536.0+ib);
-			[[inputCountsMatrix cellWithTag:i] setStringValue:[NSString stringWithFormat:@"%d",fastPeaks]];
+			[[inputCountsMatrix cellWithTag:i] setStringValue:[NSString stringWithFormat:@"%ld",fastPeaks]];
 		}
 	}
 }

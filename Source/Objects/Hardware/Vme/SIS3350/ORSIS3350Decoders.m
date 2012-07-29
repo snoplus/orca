@@ -108,9 +108,9 @@
 {
 	ptr++;
     NSString* title    = @"SIS3350 Waveform Record\n\n";
-    NSString* crate    = [NSString stringWithFormat:@"Crate = %d\n",(*ptr&0x01e00000)>>21];
-    NSString* card     = [NSString stringWithFormat:@"Card  = %d\n",(*ptr&0x001f0000)>>16];
-    NSString* channel  = [NSString stringWithFormat:@"Channel  = %d\n",*ptr&0x0000000f];
+    NSString* crate    = [NSString stringWithFormat:@"Crate = %lu\n",(*ptr&0x01e00000)>>21];
+    NSString* card     = [NSString stringWithFormat:@"Card  = %lu\n",(*ptr&0x001f0000)>>16];
+    NSString* channel  = [NSString stringWithFormat:@"Channel  = %lu\n",*ptr&0x0000000f];
     return [NSString stringWithFormat:@"%@%@%@%@",title,crate,card,channel];               
 }
 

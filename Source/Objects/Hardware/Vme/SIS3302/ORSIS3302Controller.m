@@ -617,25 +617,25 @@
 		unsigned long aValue;
 		aValue = [model mcaStatusResult:3 + (4*i)];
 		if(aValue>100000){
-			[[mcaTriggerStartCounterMatrix	cellWithTag:i] setStringValue:[NSString stringWithFormat:@"%dK",aValue/1000]];
+			[[mcaTriggerStartCounterMatrix	cellWithTag:i] setStringValue:[NSString stringWithFormat:@"%luK",aValue/1000]];
 		}
 		else [[mcaTriggerStartCounterMatrix	cellWithTag:i] setIntValue:aValue];
 
 		aValue = [model mcaStatusResult:4 + (4*i)];
 		if(aValue>100000){
-			[[mcaPileupCounterMatrix	cellWithTag:i] setStringValue:[NSString stringWithFormat:@"%dK",aValue/1000]];
+			[[mcaPileupCounterMatrix	cellWithTag:i] setStringValue:[NSString stringWithFormat:@"%luK",aValue/1000]];
 		}
 		else [[mcaPileupCounterMatrix	cellWithTag:i] setIntValue:aValue];
 
 		aValue = [model mcaStatusResult:5 + (4*i)];
 		if(aValue>100000){
-			[[mcaEnergy2LowCounterMatrix	cellWithTag:i] setStringValue:[NSString stringWithFormat:@"%dK",aValue/1000]];
+			[[mcaEnergy2LowCounterMatrix	cellWithTag:i] setStringValue:[NSString stringWithFormat:@"%luK",aValue/1000]];
 		}
 		else [[mcaEnergy2LowCounterMatrix	cellWithTag:i] setIntValue:aValue];
 
 		aValue = [model mcaStatusResult:6 + (4*i)];
 		if(aValue>100000){
-			[[mcaEnergy2HighCounterMatrix	cellWithTag:i] setStringValue:[NSString stringWithFormat:@"%dK",aValue/1000]];
+			[[mcaEnergy2HighCounterMatrix	cellWithTag:i] setStringValue:[NSString stringWithFormat:@"%luK",aValue/1000]];
 		}
 		else [[mcaEnergy2HighCounterMatrix	cellWithTag:i] setIntValue:aValue];
 	}

@@ -70,9 +70,9 @@
     
     NSString* title= @"8818 Digitizer Record\n\n";
     
-    NSString* crate = [NSString stringWithFormat:@"Crate    = %d\n",(*ptr&0x01e00000)>>21];
-    NSString* card  = [NSString stringWithFormat:@"Station  = %d\n",(*ptr&0x001f0000)>>16];
-    return [NSString stringWithFormat:@"%@%@%@%@",title,crate,card];               
+    NSString* crate = [NSString stringWithFormat:@"Crate    = %lu\n",(*ptr&0x01e00000)>>21];
+    NSString* card  = [NSString stringWithFormat:@"Station  = %lu\n",(*ptr&0x001f0000)>>16];
+    return [NSString stringWithFormat:@"%@%@%@",title,crate,card];               
 }
 
 

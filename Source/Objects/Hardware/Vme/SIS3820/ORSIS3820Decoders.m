@@ -65,7 +65,7 @@
 	
 	int i;
 	for(i=0;i<32;i++){
-		NSString* scalerValue = [NSString stringWithFormat:@"%u",ptr[7+i]];
+		NSString* scalerValue = [NSString stringWithFormat:@"%lu",ptr[7+i]];
 		NSString* channelKey	= [self getCardKey: i];
 
 		[aDataSet loadGenericData:scalerValue sender:self withKeys:@"Scalers",module, crateKey,cardKey,channelKey,nil];
@@ -78,8 +78,8 @@
 {
 	NSString* s = @"";
 	s = [s stringByAppendingString: @"SIS3820 Scaler Record\n\n"];
-	s = [s stringByAppendingFormat:@"Crate = %d\n",ShiftAndExtract(ptr[1],21,0xf)];
-	s = [s stringByAppendingFormat:@"Card  = %d\n",ShiftAndExtract(ptr[1],16,0x1f)];
+	s = [s stringByAppendingFormat:@"Crate = %lu\n",ShiftAndExtract(ptr[1],21,0xf)];
+	s = [s stringByAppendingFormat:@"Card  = %lu\n",ShiftAndExtract(ptr[1],16,0x1f)];
 	s = [s stringByAppendingString:(ptr[1]&0x1)?@"SIS3820\n":@"SIS3820\n"];
 
 	NSCalendarDate* date;	 
@@ -91,10 +91,10 @@
 	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
 	s = [s stringByAppendingFormat:@"Last Read: %@\n",date];
 		 
-	s = [s stringByAppendingFormat:@"Enabled  Mask: 0x%08x\n",ptr[4]];
-	s = [s stringByAppendingFormat:@"OverFlow Mask: 0x%08x\n",ptr[5]];
+	s = [s stringByAppendingFormat:@"Enabled  Mask: 0x%08lx\n",ptr[4]];
+	s = [s stringByAppendingFormat:@"OverFlow Mask: 0x%08lx\n",ptr[5]];
 	
-	s = [s stringByAppendingFormat:@"LemoInMod: %d\n",ShiftAndExtract(ptr[6],0,0x3)];
+	s = [s stringByAppendingFormat:@"LemoInMod: %lu\n",ShiftAndExtract(ptr[6],0,0x3)];
 	s = [s stringByAppendingFormat:@"25MHz Pulses Enabled: %@\n",ShiftAndExtract(ptr[6],3,0x1)?@"YES":@"NO"];
 	s = [s stringByAppendingFormat:@"Input Test Mode Enabled: %@\n",ShiftAndExtract(ptr[6],4,0x1)?@"YES":@"NO"];
 	s = [s stringByAppendingFormat:@"Ref Pulser Enabled: %@\n",ShiftAndExtract(ptr[6],5,0x1)?@"YES":@"NO"];
@@ -105,7 +105,7 @@
 	
 	int i;
 	for(i=0;i<32;i++){
-		s = [s stringByAppendingFormat:@"%2d: %u\n",i,ptr[7+i]];
+		s = [s stringByAppendingFormat:@"%2d: %lu\n",i,ptr[7+i]];
 	}
 	
 

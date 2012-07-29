@@ -741,12 +741,12 @@
 	if(dataType == 0){
 		if(channel>=0 && channel<8){
 			totalLost[channel] += ptr[2];
-			NSString* numLostRecords = [NSString stringWithFormat:@"%u",totalLost[channel]];
+			NSString* numLostRecords = [NSString stringWithFormat:@"%lu",totalLost[channel]];
 			[aDataSet loadGenericData:numLostRecords sender:self withKeys:@"SIS3302", @"Lost Records", crateKey,cardKey,channelKey,nil];
 		}
 	}
 	else if(dataType == 1){
-		[aDataSet loadGenericData:[NSString stringWithFormat:@"0x%02x",ptr[2]>>16] sender:self withKeys:@"SIS3302", @"Reset Event", crateKey,cardKey,nil];
+		[aDataSet loadGenericData:[NSString stringWithFormat:@"0x%02lx",ptr[2]>>16] sender:self withKeys:@"SIS3302", @"Reset Event", crateKey,cardKey,nil];
 	}
     return length; //must return number of longs
 }
@@ -765,13 +765,13 @@
     NSString* cardString    = [NSString stringWithFormat:@"Card  = %d\n",card];    
     NSString* channelString = [NSString stringWithFormat:@"Card  = %d\n",channel];  
 	if(dataType == 0){
-		data = [NSString stringWithFormat:@"Num Records Lost = %d\n",ptr[2]];
+		data = [NSString stringWithFormat:@"Num Records Lost = %lu\n",ptr[2]];
 	}
 	else if(dataType == 1){
-		data = [NSString stringWithFormat:@"Reset Event Mask = 0x%02x\n",ptr[2]];
+		data = [NSString stringWithFormat:@"Reset Event Mask = 0x%02lx\n",ptr[2]];
 	}
 
-    return [NSString stringWithFormat:@"%@%@%@%@%@%@%@",title,crateString,cardString,channelString,data];               
+    return [NSString stringWithFormat:@"%@%@%@%@%@",title,crateString,cardString,channelString,data];               
 }
 
 @end

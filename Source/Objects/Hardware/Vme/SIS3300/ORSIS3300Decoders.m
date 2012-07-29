@@ -156,14 +156,14 @@
 {
 	ptr++;
     NSString* title= @"SIS3300 Waveform Record\n\n";
-    NSString* crate = [NSString stringWithFormat:@"Crate = %d\n",(*ptr&0x01e00000)>>21];
-    NSString* card  = [NSString stringWithFormat:@"Card  = %d\n",(*ptr&0x001f0000)>>16];
+    NSString* crate = [NSString stringWithFormat:@"Crate = %lu\n",(*ptr&0x01e00000)>>21];
+    NSString* card  = [NSString stringWithFormat:@"Card  = %lu\n",(*ptr&0x001f0000)>>16];
 	NSString* moduleID = (*ptr&0x1)?@"SIS3301":@"SIS3300";
 	ptr++;
-	NSString* triggerWord = [NSString stringWithFormat:@"TriggerWord  = 0x08%x\n",*ptr];
+	NSString* triggerWord = [NSString stringWithFormat:@"TriggerWord  = 0x08%lx\n",*ptr];
 	ptr++;
-	NSString* Event = [NSString stringWithFormat:@"Event  = 0x%08x\n",(*ptr>>24)&0xff];
-	NSString* Time = [NSString stringWithFormat:@"Time Since Last Trigger  = 0x%08x\n",*ptr&0xffffff];
+	NSString* Event = [NSString stringWithFormat:@"Event  = 0x%08lx\n",(*ptr>>24)&0xff];
+	NSString* Time = [NSString stringWithFormat:@"Time Since Last Trigger  = 0x%08lx\n",*ptr&0xffffff];
 
     return [NSString stringWithFormat:@"%@%@%@%@%@%@%@",title,crate,card,moduleID,triggerWord,Event,Time];               
 }

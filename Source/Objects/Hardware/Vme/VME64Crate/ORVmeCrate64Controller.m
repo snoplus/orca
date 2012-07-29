@@ -34,7 +34,7 @@
 
 - (void) setCrateTitle
 {
-	[[self window] setTitle:[NSString stringWithFormat:@"VME64 crate %d",[model uniqueIdNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"VME64 crate %lu",[model uniqueIdNumber]]];
 }
 
 @end

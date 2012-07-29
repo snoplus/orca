@@ -66,7 +66,7 @@
         length = 2*sizeof(long);
     }
     
-    NSString* valueString = [NSString stringWithFormat:@"%d",*ptr&0x00ffffff];
+    NSString* valueString = [NSString stringWithFormat:@"%lu",*ptr&0x00ffffff];
     if(((*ptr>>24)&0x3)==1){
         [aDataSet loadGenericData:valueString sender:self  withKeys:@"Latched Clock",@"GTID1",nil];
     }
@@ -85,7 +85,7 @@
         ptr++; //long version
     }
     NSString* trigger = [NSString stringWithFormat:@"Trigger = %d\n",(*ptr>>24)&0x1 ? 1 : 2];
-    NSString* gtid    = [NSString stringWithFormat:@"GTID    = %d\n",*ptr&0x00ffffff];
+    NSString* gtid    = [NSString stringWithFormat:@"GTID    = %lu\n",*ptr&0x00ffffff];
 
     return [NSString stringWithFormat:@"%@%@%@",title,trigger,gtid];
 }

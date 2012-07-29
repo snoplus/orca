@@ -83,10 +83,10 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
     unsigned long* ptr = (unsigned long*)someData;
 	unsigned long length = ExtractLength(ptr[0]) - kCMC203ReservedHistoHeaderWords; //get the length
    
-	[totalString appendString:[NSString stringWithFormat:@"Crate    = %d\n",(ptr[1]>>21) & 0xf]];
-    [totalString appendString:[NSString stringWithFormat:@"Station  = %d\n",(ptr[1]>>16) & 0x1f]];
-    [totalString appendString:[NSString stringWithFormat:@"Total Count  = %d %d\n",ptr[3],ptr[2]]];
-    [totalString appendString:[NSString stringWithFormat:@"Histogram Length = %d\n",length]]; 
+	[totalString appendString:[NSString stringWithFormat:@"Crate    = %lu\n",(ptr[1]>>21) & 0xf]];
+    [totalString appendString:[NSString stringWithFormat:@"Station  = %lu\n",(ptr[1]>>16) & 0x1f]];
+    [totalString appendString:[NSString stringWithFormat:@"Total Count  = %lu %lu\n",ptr[3],ptr[2]]];
+    [totalString appendString:[NSString stringWithFormat:@"Histogram Length = %lu\n",length]]; 
 	
     return totalString;               
 }
@@ -167,9 +167,9 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
     unsigned long* ptr = (unsigned long*)someData;
 	unsigned long length = ExtractLength(ptr[0]) - kCMC203ReservedFifoHeaderWords; //get the length
 	
-	[totalString appendString:[NSString stringWithFormat:@"Crate    = %d\n",(ptr[1]>>21) & 0xf]];
-    [totalString appendString:[NSString stringWithFormat:@"Station  = %d\n",(ptr[1]>>16) & 0x1f]];
-    [totalString appendString:[NSString stringWithFormat:@"Record Length  = %d\n",length]]; 
+	[totalString appendString:[NSString stringWithFormat:@"Crate    = %lu\n",(ptr[1]>>21) & 0xf]];
+    [totalString appendString:[NSString stringWithFormat:@"Station  = %lu\n",(ptr[1]>>16) & 0x1f]];
+    [totalString appendString:[NSString stringWithFormat:@"Record Length  = %lu\n",length]]; 
 	
     return totalString;               
 }

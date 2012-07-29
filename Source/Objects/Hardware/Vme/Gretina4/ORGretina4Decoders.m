@@ -142,10 +142,10 @@
 
     NSString* title= @"Gretina4 Waveform Record\n\n";
     
-    NSString* crate = [NSString stringWithFormat:@"Crate = %d\n",(*ptr&0x01e00000)>>21];
-    NSString* card  = [NSString stringWithFormat:@"Card  = %d\n",(*ptr&0x001f0000)>>16];
+    NSString* crate = [NSString stringWithFormat:@"Crate = %lu\n",(*ptr&0x01e00000)>>21];
+    NSString* card  = [NSString stringWithFormat:@"Card  = %lu\n",(*ptr&0x001f0000)>>16];
 	ptr++;
-    NSString* chan  = [NSString stringWithFormat:@"Chan  = %d\n",*ptr&0x7];
+    NSString* chan  = [NSString stringWithFormat:@"Chan  = %lu\n",*ptr&0x7];
 	ptr+=2;
 	unsigned long energy = *ptr >> 16;
 	ptr++;	  //point to Energy second word
@@ -153,7 +153,7 @@
 	
 	// energy is in 2's complement, taking abs value if necessary
 	if (energy & 0x1000000) energy = (~energy & 0x1ffffff) + 1;
-	NSString* energyStr  = [NSString stringWithFormat:@"Energy  = %d\n",energy/50]; //mah 10/21 added the /50 to be consistent with histogramed value
+	NSString* energyStr  = [NSString stringWithFormat:@"Energy  = %lu\n",energy/50]; //mah 10/21 added the /50 to be consistent with histogramed value
     return [NSString stringWithFormat:@"%@%@%@%@%@",title,crate,card,chan,energyStr];               
 }
 

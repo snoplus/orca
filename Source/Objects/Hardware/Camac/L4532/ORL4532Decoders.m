@@ -67,11 +67,11 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 {    
     NSString* title= @"L4532 Trigger Record\n\n";
 	ptr++;
-	NSString* eventCount = [NSString stringWithFormat:@"EventCount = %d\n",*ptr];
+	NSString* eventCount = [NSString stringWithFormat:@"EventCount = %lu\n",*ptr];
 
 	ptr++;
-    NSString* crate = [NSString stringWithFormat:@"Crate    = %d\n",(*ptr&0x01e00000)>>21];
-    NSString* card  = [NSString stringWithFormat:@"Station  = %d\n",(*ptr&0x001f0000)>>16];
+    NSString* crate = [NSString stringWithFormat:@"Crate    = %lu\n",(*ptr&0x01e00000)>>21];
+    NSString* card  = [NSString stringWithFormat:@"Station  = %lu\n",(*ptr&0x001f0000)>>16];
 
 	BOOL timingIncluded = (*ptr&0x02000000)>>25;
 	NSString* timeString;
@@ -148,11 +148,11 @@ static NSString* kTriggerKey[32] = {
     NSString* title= @"L4532 Channel Trigger Record\n\n";
 
 	ptr++;
-    NSString* crate = [NSString stringWithFormat:@"Crate    = %d\n",(*ptr&0x01e00000)>>21];
-    NSString* card  = [NSString stringWithFormat:@"Station  = %d\n",(*ptr&0x001f0000)>>16];
+    NSString* crate = [NSString stringWithFormat:@"Crate    = %lu\n",(*ptr&0x01e00000)>>21];
+    NSString* card  = [NSString stringWithFormat:@"Station  = %lu\n",(*ptr&0x001f0000)>>16];
 
 	ptr++;
-	NSString* eventCount = [NSString stringWithFormat:@"Trigger Mask = 0x%08x\n",*ptr];
+	NSString* eventCount = [NSString stringWithFormat:@"Trigger Mask = 0x%08lx\n",*ptr];
 
     return [NSString stringWithFormat:@"%@%@%@%@",title,crate,card,eventCount];               
 }

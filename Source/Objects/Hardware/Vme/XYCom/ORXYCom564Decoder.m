@@ -67,8 +67,8 @@
     NSString* title= @"ORXYCom564 ADC Record\n\n";
 
 	ptr++;
-    NSString* crate			= [NSString stringWithFormat:@"Crate = %d\n",(*ptr&0x01e00000)>>21];
-    NSString* card			= [NSString stringWithFormat:@"Card  = %d\n",(*ptr&0x001f0000)>>16];
+    NSString* crate			= [NSString stringWithFormat:@"Crate = %lu\n",(*ptr&0x01e00000)>>21];
+    NSString* card			= [NSString stringWithFormat:@"Card  = %lu\n",(*ptr&0x001f0000)>>16];
 
 	ptr++;
 	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:*ptr];
@@ -80,7 +80,7 @@
 	int i;
 	for(i=0;i<n;i++){
 		ptr++;
-		adcString   = [adcString stringByAppendingFormat:@"ADC(%02d) = 0x%x\n",(*ptr>>16)&0x000000ff, *ptr&0x00000fff];
+		adcString   = [adcString stringByAppendingFormat:@"ADC(%02lu) = 0x%lx\n",(*ptr>>16)&0x000000ff, *ptr&0x00000fff];
     }
 
     return [NSString stringWithFormat:@"%@%@%@%@%@",title,crate,card,date,adcString];               

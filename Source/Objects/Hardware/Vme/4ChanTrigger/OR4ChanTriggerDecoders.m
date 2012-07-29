@@ -57,10 +57,10 @@ NSString* chan4TriggerEventName[4] = {
     else {
         name = [NSString stringWithFormat:@"Out of bounds index: %d\n",index];
     }
-    NSString* upper = [NSString stringWithFormat:@"Upper Clock: %u\n",upperClock];
+    NSString* upper = [NSString stringWithFormat:@"Upper Clock: %lu\n",upperClock];
 
     ptr++;
-    NSString* lower = [NSString stringWithFormat:@"Lower Clock: %u\n",*ptr];
+    NSString* lower = [NSString stringWithFormat:@"Lower Clock: %lu\n",*ptr];
 
     return [NSString stringWithFormat:@"%@%@%@%@",title,name,upper,lower];               
 }
