@@ -156,7 +156,7 @@ NSString* ORBiRa2351IModelLastReadChanged		= @"ORBiRa2351IModelLastReadChanged";
 	
     [[self undoManager] disableUndoRegistration];
     [self setPollingState:[decoder decodeIntForKey:	   @"pollingState"]];
-	[self setLastRead:[NSString stringWithString:@"Never"]];
+	[self setLastRead:@"Never"];
     [[self undoManager] enableUndoRegistration];
 	
     return self;

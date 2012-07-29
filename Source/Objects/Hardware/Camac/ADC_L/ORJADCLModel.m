@@ -436,7 +436,7 @@ struct {
 		[self setLowLimit:i withValue:[decoder decodeFloatForKey: [NSString stringWithFormat:@"ORJADCLModelLowLimit_%d",i]]];
 		[self setHighLimit:i withValue:[decoder decodeFloatForKey: [NSString stringWithFormat:@"ORJADCLModelHighLimit_%d",i]]];
 	}
-	[self setLastRead:[NSString stringWithString:@"Never"]];
+	[self setLastRead:@"Never"];
 	
     [[self undoManager] enableUndoRegistration];
 	

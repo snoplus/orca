@@ -478,7 +478,7 @@
 								 beforeDate:[NSDate dateWithTimeIntervalSinceNow:.01]];
 		
         [self endEditing];
-        progressString = [NSString stringWithString:@"Checking Status"];
+        progressString = @"Checking Status";
         [model checkStatusErrors];
         
         // write a 32 bit value to dual port memory
@@ -487,7 +487,7 @@
         addressModifier = kRemoteDualPortAddressModifier;
         addressSpace    = kAccessRemoteDRAM;
         data = 0x12345678;
-        progressString = [NSString stringWithString:@"Writing Dual Port Memory"];
+        progressString = @"Writing Dual Port Memory";
         [model writeLongBlock:&data
 					atAddress:vmeAddress
 				   numToWrite:numberLongs
@@ -496,7 +496,7 @@
         
         
         // read 32 bit value just written
-        progressString = [NSString stringWithString:@"Reading Dual Port Memory"];
+        progressString = @"Reading Dual Port Memory";
         data = 0x00000000;
         [model readLongBlock:&data
 				   atAddress:vmeAddress
@@ -505,7 +505,7 @@
 			   usingAddSpace:addressSpace];
         
         
-        progressString = [NSString stringWithString:@"32 Bit Block Write Dual Port Memory"];
+        progressString = @"32 Bit Block Write Dual Port Memory";
         // write a data block of 32 bit values to dual port memory
         vmeAddress = kDualPortAddress;
         numberLongs = 64L;
@@ -520,7 +520,7 @@
 				   withAddMod:addressModifier
 				usingAddSpace:addressSpace];
         
-        progressString = [NSString stringWithString:@"32 Bit Block Read Dual Port Memory"];
+        progressString = @"32 Bit Block Read Dual Port Memory";
         for( i = 0; i < 64; i++ ) {
             dataBlockIn[i] = 0x00000000;
         }
@@ -554,7 +554,7 @@
             dataBlockWordOut[i] = ( 1 << 8 ) | i;
         }
         
-        progressString = [NSString stringWithString:@"Word Block Write Dual Port Memory"];
+        progressString = @"Word Block Write Dual Port Memory";
         [model writeWordBlock:dataBlockWordOut
 					atAddress:vmeAddress
 				   numToWrite:numberWords
@@ -564,7 +564,7 @@
         for( i = 0; i < 64; i++ ) {
             dataBlockWordIn[i] = 0x0000;
         }
-        progressString = [NSString stringWithString:@"Word Block Read Dual Port Memory"];
+        progressString = @"Word Block Read Dual Port Memory";
         [model readWordBlock:dataBlockWordIn
 				   atAddress:vmeAddress
 				   numToRead:numberWords
@@ -593,7 +593,7 @@
         for( i = 0; i < 64; i++ ) {
             dataBlockByteOut[i] = i;
         }
-        progressString = [NSString stringWithString:@"Byte Block Write Dual Port Memory"];
+        progressString = @"Byte Block Write Dual Port Memory";
         [model writeByteBlock:dataBlockByteOut
 					atAddress:vmeAddress
 				   numToWrite:numberBytes
@@ -602,7 +602,7 @@
         for( i = 0; i < 64; i++ ) {
             dataBlockByteIn[i] = 0x00;
         }
-        progressString = [NSString stringWithString:@"Byte Block Read Dual Port Memory"];
+        progressString = @"Byte Block Read Dual Port Memory";
         [model readByteBlock:dataBlockByteIn
 				   atAddress:vmeAddress
 				   numToRead:numberBytes

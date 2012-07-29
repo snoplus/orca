@@ -481,7 +481,7 @@ struct {
 		[self setHighLimit:i withValue:[decoder decodeFloatForKey: [NSString stringWithFormat:@"ORJAMFModelHighLimit_%d",i]]];
 		[self setRangeIndex:i withValue:[decoder decodeIntForKey:  [NSString stringWithFormat:@"ORJAMFModelRangeIndex_%d",i]]];
 	}
-	[self setLastRead:[NSString stringWithString:@"Never"]];
+	[self setLastRead:@"Never"];
 	
     [[self undoManager] enableUndoRegistration];
 	
