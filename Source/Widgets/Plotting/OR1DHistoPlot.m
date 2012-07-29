@@ -150,12 +150,12 @@
 	NSDictionary* attrsDictionary = [plotView textAttributes];
 	
 	if(roiDragInProgress){
-		positionString = [NSString stringWithFormat:@"Min: %d",[roi minChannel]];
+		positionString = [NSString stringWithFormat:@"Min: %ld",[roi minChannel]];
 		s			   = [[NSAttributedString alloc] initWithString:positionString attributes:attrsDictionary];
 		labelSize = [s size];
 		[s drawAtPoint:NSMakePoint(width - labelSize.width - 10,height-labelSize.height-5)];
 		[s release];
-		positionString = [NSString stringWithFormat:@"Max: %d",[roi maxChannel]];
+		positionString = [NSString stringWithFormat:@"Max: %ld",[roi maxChannel]];
 		s			   = [[NSAttributedString alloc] initWithString:positionString attributes:attrsDictionary];
 		labelSize = [s size];
 		[s drawAtPoint:NSMakePoint(width - labelSize.width - 10,height-2*labelSize.height-5)];

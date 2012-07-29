@@ -1990,8 +1990,8 @@ enum {
 				else {
 					float ticValue = [theCalibration convertedValueForChannel:ival*convertMultipler];
 					if (dec) {
-						if (ival<0) axisNumberString = [NSString stringWithFormat:@"-%.1f.%.3f%c",(-ticValue)/10,((int)-ticValue)%10,suffix];
-						else		axisNumberString = [NSString stringWithFormat:@"%.1f.%.3f%c",ticValue/10,(int)ticValue%10,suffix];
+						if (ival<0) axisNumberString = [NSString stringWithFormat:@"-%.1f.%.3d%c",(-ticValue)/10,((int)-ticValue)%10,suffix];
+						else		axisNumberString = [NSString stringWithFormat:@"%.1f.%.3d%c",ticValue/10,(int)ticValue%10,suffix];
 					}	
 					else			axisNumberString = [NSString stringWithFormat:@"%.3f",ticValue];
 				}

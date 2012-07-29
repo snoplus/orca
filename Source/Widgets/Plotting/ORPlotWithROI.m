@@ -49,7 +49,7 @@
 		int index = [rois indexOfObject:roi];
 		NSString* s;
 		if([[self name] length]>0)s = [self name];
-		else s = [NSString stringWithFormat:@"Plot %1",tag+1];;
+		else s = [NSString stringWithFormat:@"Plot %d",tag+1];;
 		[roi setLabel:[NSString stringWithFormat:@"%@ Roi %d of %d",s,index+1,[rois count]]];
 	}
 }

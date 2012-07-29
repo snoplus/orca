@@ -151,7 +151,7 @@
 		if(x>=dataXMin && x<=dataXMax && y>=dataYMin && y<=dataYMax){
 			z = data[(int)x + (int)y*numBinsPerSide];
 		}
-		NSString* cursorPositionString = [NSString stringWithFormat:@"x:%3.0f y:%3.0f z:%d",x,y,z];
+		NSString* cursorPositionString = [NSString stringWithFormat:@"x:%3.0f y:%3.0f z:%lu",x,y,z];
 		s = [[NSAttributedString alloc] initWithString:cursorPositionString attributes:attrsDictionary];
 		labelSize = [s size];
 		[s drawAtPoint:NSMakePoint(width - labelSize.width - 10,height-labelSize.height-5)];
@@ -270,13 +270,13 @@
 	unsigned long* data = [dataSource plotter:self numberBinsPerSide:&numberBinsPerSide];
 	[dataSource plotter:self xMin:&dataXMin xMax:&dataXMax yMin:&dataYMin yMax:&dataYMax];
 	y +=  dataYMin;
-	NSMutableString* s = [NSMutableString stringWithFormat:@"%d ",y];
+	NSMutableString* s = [NSMutableString stringWithFormat:@"%ld ",y];
 	unsigned short val = 0;
 	for (x=dataXMin; x<dataXMax;++x) {	
 		val = data[x+y*numberBinsPerSide];
 		[s appendFormat:@"%d ",val];
 	}
-	[s appendFormat:@"\n",val];
+	[s appendString:@"\n"];
 	return s; 	
 }
 
