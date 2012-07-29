@@ -108,12 +108,12 @@
 	[anOp release];
 }
 
-- (void) renameDoc:(id)aDoc adc:(NSString*)oldName to:(NSString*)newName delegate:(id)aDelegate tag:(NSString*)aTag
+- (void) renameDoc:(id)aDoc adc:(NSString*)oldName to:(NSString*)aReplacementName delegate:(id)aDelegate tag:(NSString*)aTag
 {
 	ORCouchDBRenameAdcOp* anOp = [[ORCouchDBRenameAdcOp alloc] initWithHost:host port:port database:database delegate:delegate tag:aTag];
 	[anOp setDocument:aDoc documentID:[aDoc objectForKey:@"_id"]];
 	[anOp setOldName: oldName];
-	[anOp setNewName: newName];
+	[anOp setReplacementName: aReplacementName];
 	[ORCouchDBQueue addOperation:anOp];
 	[anOp release];
 }
@@ -392,18 +392,18 @@
 @end
 
 @implementation ORCouchDBRenameAdcOp
-@synthesize oldName,newName;
+@synthesize oldName,replacementName;
 - (void) main
 {
 	if([self isCancelled])return;
-	if([newName length]==0)return;
+	if([replacementName length]==0)return;
 	if([oldName length]==0)return;
 	NSArray* adcs = [document objectForKey:@"adcs"];
 	for(id anAdc in adcs){
 		for(id aKey in anAdc){
 			if([aKey isEqualToString:oldName]){
 				id theValue = [anAdc objectForKey:aKey];
-				[anAdc setObject:theValue forKey:newName];
+				[anAdc setObject:theValue forKey:replacementName];
 				[anAdc removeObjectForKey:oldName];
 				NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/%@", host, port, database, documentId];
 				[self send:httpString type:@"PUT" body:document];
@@ -418,7 +418,7 @@
 
 - (void) dealloc
 {
-	self.newName=nil;
+	self.replacementName=nil;
 	self.oldName=nil;
 	[super dealloc];
 }

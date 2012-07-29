@@ -177,11 +177,11 @@
 @interface ORCouchDBRenameAdcOp :ORCouchDBPutDocumentOp
 {	
 	NSString* oldName;
-	NSString* newName;
+	NSString* replacementName;
 }
 - (void) main;
 @property (copy) NSString* oldName;
-@property (copy) NSString* newName;
+@property (copy) NSString* replacementName;
 @end
 
 @interface ORCouchDBDeleteDocumentOp :ORCouchDBGetDocumentOp

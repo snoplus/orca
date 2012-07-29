@@ -549,7 +549,7 @@ NSCalendarDate		*MCPYear0000;
         NSArray			*theRow;
         MYSQL_ROW_OFFSET	thePosition;
 
-        [theString appendFormat:@"ORSqlResult: (dim %d x %d)\n",(long)mNumOfFields, (long)[self numOfRows]];
+        [theString appendFormat:@"ORSqlResult: (dim %ld x %ld)\n",(long)mNumOfFields, (long)[self numOfRows]];
         [self fetchFieldsName];
         for (i=0; i<(mNumOfFields-1); i++) {
             [theString appendFormat:@"%@\t", [mNames objectAtIndex:i]];
