@@ -387,11 +387,11 @@ enum {
 {
 	NSString* s = @"\n";
 	if(useNeutrinoRun){
-		s = [s stringByAppendingFormat:@"Time/chan: %d  Waveform: %d\n",neutrinoParam[kTimePerChannelIndex],neutrinoWaveform];
+		s = [s stringByAppendingFormat:@"Time/chan: %.0f  Waveform: %d\n",neutrinoParam[kTimePerChannelIndex],neutrinoWaveform];
 		s = [s stringByAppendingFormat:@"Amp: %.2f Width : %.2f\n",neutrinoParam[kVoltageIndex],neutrinoParam[kWidthIndex]];
 	}
 	else {
-		s = [s stringByAppendingFormat:@"Time/chan: %d  Waveform: %d\n",sourceParam[kTimePerChannelIndex],sourceWaveform];
+		s = [s stringByAppendingFormat:@"Time/chan: %.0f  Waveform: %d\n",sourceParam[kTimePerChannelIndex],sourceWaveform];
 		s = [s stringByAppendingFormat:@"Amp: %.2f Width : %.2f\n",sourceParam[kVoltageIndex],sourceParam[kWidthIndex]];
 	}
 	
