@@ -104,7 +104,7 @@ NSString* ORUSBRegisteredObjectChanged	= @"ORUSBRegisteredObjectChanged";
 
 - (NSString*) serialNumber
 {
-	if([serialNumber isEqualToString:@"0"])return [NSString stringWithFormat:@"0x%8x", locationID];
+	if([serialNumber isEqualToString:@"0"])return [NSString stringWithFormat:@"0x%8lx", locationID];
     else return serialNumber;
 }
 
@@ -588,7 +588,7 @@ readon:
 		s = [s stringByAppendingFormat:@"SW Object: %@\n",[registeredObject className]];
 	}
 	else      s = [s stringByAppendingString:@"SW Object: ---\n"];
-	s = [s stringByAppendingFormat:@"Location : 0x%x\n",locationID];
+	s = [s stringByAppendingFormat:@"Location : 0x%lx\n",locationID];
 	if(serialNumber){
 		s = [s stringByAppendingFormat:@"Serial # : %@\n",serialNumber];
 	}

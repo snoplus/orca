@@ -325,7 +325,7 @@
 
 - (NSString*) identifier
 {
-    return [NSString stringWithFormat:@"Test Data %d",[self uniqueIdNumber]];
+    return [NSString stringWithFormat:@"Test Data %lu",[self uniqueIdNumber]];
 }
 
 - (NSString*) processingTitle

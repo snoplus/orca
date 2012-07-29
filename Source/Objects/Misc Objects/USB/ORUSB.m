@@ -550,7 +550,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 		HRESULT res = (*plugInInterface)->QueryInterface(plugInInterface, CFUUIDGetUUIDBytes(kIOUSBInterfaceInterfaceID), (void**) &intf);
 		(*plugInInterface)->Release(plugInInterface);                   // done with this
 		if (res || !intf) {
-			[NSException raise: @"USB Exception" format:@"couldn't create an IOUSBInterfaceInterface (%08x)\n", res];
+			[NSException raise: @"USB Exception" format:@"couldn't create an IOUSBInterfaceInterface (%08lx)\n", res];
 		}
 		
 		//kr = (*intf)->GetInterfaceClass(intf, &intfClass);
@@ -674,7 +674,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 
 - (NSString*) keyForVendorID:(unsigned long)aVendorID productID:(unsigned long)aProductID
 {
-	return [NSString stringWithFormat:@"%d_%d",aVendorID,aProductID];
+	return [NSString stringWithFormat:@"%lu_%lu",aVendorID,aProductID];
 }
 
 - (NSArray*) interfacesForVender:(unsigned long)aVenderID product:(unsigned long)aProductID

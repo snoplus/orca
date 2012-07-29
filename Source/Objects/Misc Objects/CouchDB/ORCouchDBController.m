@@ -260,14 +260,14 @@
 	if(dbSize > 1000000000)[dbSizeField setStringValue:[NSString stringWithFormat:@"%.2f GB",dbSize/1000000000.]];
 	else if(dbSize > 1000000)[dbSizeField setStringValue:[NSString stringWithFormat:@"%.2f MB",dbSize/1000000.]];
 	else if(dbSize > 1000)[dbSizeField setStringValue:[NSString stringWithFormat:@"%.1f KB",dbSize/1000.]];
-	else [dbSizeField setStringValue:[NSString stringWithFormat:@"%d Bytes",dbSize]];
+	else [dbSizeField setStringValue:[NSString stringWithFormat:@"%lu Bytes",dbSize]];
 
 	dbInfo = [model dBHistoryInfo];
 	dbSize = [[dbInfo objectForKey:@"disk_size"] unsignedLongValue];
 	if(dbSize > 1000000000)[dbHistorySizeField setStringValue:[NSString stringWithFormat:@"%.2f GB",dbSize/1000000000.]];
 	else if(dbSize > 1000000)[dbHistorySizeField setStringValue:[NSString stringWithFormat:@"%.2f MB",dbSize/1000000.]];
 	else if(dbSize > 1000)[dbHistorySizeField setStringValue:[NSString stringWithFormat:@"%.1f KB",dbSize/1000.]];
-	else [dbHistorySizeField setStringValue:[NSString stringWithFormat:@"%d Bytes",dbSize]];
+	else [dbHistorySizeField setStringValue:[NSString stringWithFormat:@"%lu Bytes",dbSize]];
 	
 }
 

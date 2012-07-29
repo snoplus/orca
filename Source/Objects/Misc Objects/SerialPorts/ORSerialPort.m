@@ -256,7 +256,7 @@ error:
 	[optionsDictionary removeAllObjects];
 	[optionsDictionary setObject:[self name]
 												forKey:ORSerialOptionServiceName];
-	[optionsDictionary setObject:[NSString stringWithFormat:@"%d", [self getSpeed]]
+	[optionsDictionary setObject:[NSString stringWithFormat:@"%ld", [self getSpeed]]
 												forKey:ORSerialOptionSpeed];
 	[optionsDictionary setObject:[NSString stringWithFormat:@"%d", [self getDataBits]]
 												forKey:ORSerialOptionDataBits];

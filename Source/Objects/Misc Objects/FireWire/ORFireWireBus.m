@@ -85,7 +85,7 @@
 		if ( matchDictionary == nil ) {
 			// No matching dictionary -- fatal error
 			NSLog(@"Unable to obtain I/O matching dictionary\n" );
-			[NSException raise:@"IOKit Matching Error" format:@"Unable to match firewire device venderID %d",aVendorID];
+			[NSException raise:@"IOKit Matching Error" format:@"Unable to match firewire device venderID %lu",aVendorID];
 		}
 		
 		// Get a registry enumerator for all matching kFWDevType devices
@@ -94,7 +94,7 @@
 		if ( result != kIOReturnSuccess ) {
 			// Can't get registry enumerator -- fatal error
 			NSLog(@"Unable to obtain matching I/O services for FireWire Device\n" );
-			[NSException raise:@"IOKit Matching Services Error" format:@"Unable to obtain matching I/O services for venderID %d",aVendorID];
+			[NSException raise:@"IOKit Matching Services Error" format:@"Unable to obtain matching I/O services for venderID %lu",aVendorID];
 		}
 		
 		// Create a list of the matched devices

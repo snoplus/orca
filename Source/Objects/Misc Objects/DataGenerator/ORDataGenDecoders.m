@@ -73,9 +73,9 @@ static NSString* kCardKey[8] = {
 {
     NSString* title= @"Data Gen Record\n\n";
     
-    NSString* value  = [NSString stringWithFormat:@"Value = %d\n",ShiftAndExtract(ptr[1],0,0xfff)];    
-    NSString* card  = [NSString stringWithFormat: @"Card  = %d\n",ShiftAndExtract(ptr[1],16,0xf)];    
-    NSString* chan  = [NSString stringWithFormat: @"Chan  = %d\n",ShiftAndExtract(ptr[1],12,0xf)];    
+    NSString* value  = [NSString stringWithFormat:@"Value = %lu\n",ShiftAndExtract(ptr[1],0,0xfff)];
+    NSString* card  = [NSString stringWithFormat: @"Card  = %lu\n",ShiftAndExtract(ptr[1],16,0xf)];
+    NSString* chan  = [NSString stringWithFormat: @"Chan  = %lu\n",ShiftAndExtract(ptr[1],12,0xf)];    
 
     return [NSString stringWithFormat:@"%@%@%@%@",title,value,card,chan];               
 }
@@ -133,10 +133,10 @@ static NSString* kCardKey[8] = {
 {
     NSString* title= @"Data Gen Record (2D)\n\n";
  
-	NSString* valueX  = [NSString stringWithFormat:@"ValueX = %d\n",ShiftAndExtract(ptr[1],0,0xfff)];    
-    NSString* valueY  = [NSString stringWithFormat:@"ValueY = %d\n",ShiftAndExtract(ptr[2],0,0xfff)];    
-    NSString* card    = [NSString stringWithFormat: @"Card  = %d\n",ShiftAndExtract(ptr[1],16,0xf)];    
-    NSString* chan    = [NSString stringWithFormat: @"Chan  = %d\n",ShiftAndExtract(ptr[1],12,0xf)];    
+	NSString* valueX  = [NSString stringWithFormat:@"ValueX = %lu\n",ShiftAndExtract(ptr[1],0,0xfff)];
+    NSString* valueY  = [NSString stringWithFormat:@"ValueY = %lu\n",ShiftAndExtract(ptr[2],0,0xfff)];
+    NSString* card    = [NSString stringWithFormat: @"Card  = %lu\n",ShiftAndExtract(ptr[1],16,0xf)];
+    NSString* chan    = [NSString stringWithFormat: @"Chan  = %lu\n",ShiftAndExtract(ptr[1],12,0xf)];    
 
     return [NSString stringWithFormat:@"%@%@%@%@%@",title,valueX,valueY,card,chan];               
 }
@@ -184,8 +184,8 @@ static NSString* kCardKey[8] = {
 {
     NSString* title= @"Data Gen Record (Waveform)\n\n";
     
-    NSString* card  = [NSString stringWithFormat: @"Card  = %d\n",ShiftAndExtract(ptr[1],16,0xf)];    
-    NSString* chan  = [NSString stringWithFormat: @"Chan  = %d\n",ShiftAndExtract(ptr[1],12,0xf)];    
+    NSString* card  = [NSString stringWithFormat: @"Card  = %lu\n",ShiftAndExtract(ptr[1],16,0xf)];
+    NSString* chan  = [NSString stringWithFormat: @"Chan  = %lu\n",ShiftAndExtract(ptr[1],12,0xf)];    
 
     return [NSString stringWithFormat:@"%@%@%@",title,card,chan];               
 }
