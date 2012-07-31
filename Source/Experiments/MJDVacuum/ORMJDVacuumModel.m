@@ -208,7 +208,7 @@ NSString* ORMJDVacuumModelConstraintsChanged		= @"ORMJDVacuumModelConstraintsCha
 	[notifyCenter addObserver : self
                      selector : @selector(portClosedAfterTimeout:)
                          name : ORSerialPortWithQueueModelPortClosedAfterTimeout
-						object: self];
+						object: nil];
 	
 	
 	
