@@ -596,10 +596,16 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     return YES;
 }
 
+- (int) numberOfChannels
+{
+    return [self getNumberOfChannels];
+}
+
 - (void) setProcessOutput:(int)channel value:(int)value
 {
     
 }
+
 - (NSString*) processingTitle
 {
     return [NSString stringWithFormat:@"XVME-564,%d,%d",[self crateNumber],[self slot]];
