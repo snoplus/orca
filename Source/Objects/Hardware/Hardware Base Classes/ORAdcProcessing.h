@@ -3,7 +3,7 @@
 //  Orca
 //
 //  Created by Mark Howe on Wed Nov 30 2005.
-//  Copyright © 2002 CENPA, University of Washington. All rights reserved.
+//  Copyright ï¿½ 2002 CENPA, University of Washington. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
 //Washington at the Center for Experimental Nuclear Physics and 
@@ -35,6 +35,10 @@
 - (double) maxValueForChan:(int)channel;
 - (double) minValueForChan:(int)channel;
 - (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit  channel:(int)channel;
+
+@optional
+- (int) numberOfChannels;
+
 @end
 
 @protocol ORAdcProcessor
