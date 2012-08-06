@@ -54,7 +54,7 @@
 			<object class="NSWindowTemplate" id="261041963">
 				<int key="NSWindowStyleMask">7</int>
 				<int key="NSWindowBacking">2</int>
-				<string key="NSWindowRect">{{221, 833}, {821, 668}}</string>
+				<string key="NSWindowRect">{{246, 67}, {821, 668}}</string>
 				<int key="NSWTFlags">1886912512</int>
 				<string key="NSWindowTitle">MKS 651C Pressure Controller</string>
 				<string key="NSWindowClass">NSWindow</string>
@@ -288,7 +288,6 @@
 							<int key="NSvFlags">256</int>
 							<string key="NSFrame">{{-2, -12}, {830, 592}}</string>
 							<reference key="NSSuperview" ref="584450007"/>
-							<reference key="NSNextKeyView" ref="132292912"/>
 							<object class="NSMutableArray" key="NSTabViewItems">
 								<bool key="EncodedWithXMLCoder">YES</bool>
 								<object class="NSTabViewItem" id="902320854">
@@ -4681,7 +4680,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					<reference key="NSSuperview"/>
 					<reference key="NSNextKeyView" ref="435822873"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1280, 778}}</string>
 				<string key="NSMinSize">{213, 129}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<bool key="NSWindowIsRestorable">YES</bool>
