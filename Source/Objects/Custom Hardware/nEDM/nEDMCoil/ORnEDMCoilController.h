@@ -22,12 +22,25 @@
 
 #import "OrcaObjectController.h"
 
-@interface ORnEDMCoilController : OrcaObjectController
+@interface ORnEDMCoilController : OrcaObjectController <NSTableViewDataSource>
 {
+    IBOutlet NSTabView* 	tabView;
     IBOutlet ORGroupView*   groupView;
     IBOutlet NSTextField*   lockDocField;
     IBOutlet NSButton*      startStopButton;
-    IBOutlet NSTextField*   runRateField;    
+    IBOutlet NSTextField*   runRateField;   
+    IBOutlet NSPopUpButton* listOfAdcs;
+    IBOutlet NSTableView*   listOfRegisteredADCs;
+    IBOutlet NSTableView*   hardwareMap;    
+    IBOutlet NSPopUpButton* commandPopUp;
+    IBOutlet NSPopUpButton* outputNumberPopUp;    
+    IBOutlet NSTextField*   inputValueText;
+    IBOutlet NSButton*      debugModeButton;
+    
+    NSView *blankView;    
+    NSSize controlSize;
+    NSSize powerSupplySize;
+    NSSize adcSize;
 }
 
 - (id) init;
@@ -48,14 +61,29 @@
 - (void) documentLockChanged:(NSNotification*)aNote;
 - (void) runStatusChanged:(NSNotification*)aNote;
 - (void) runRateChanged:(NSNotification*)aNote;
+- (void) modelADCListChanged:(NSNotification*)aNote;
+- (void) channelMapChanged:(NSNotification*)aNote;
+- (void) objectsAdded:(NSNotification*)aNote;
+- (void) debugRunningChanged:(NSNotification*)aNote;
+
+- (void) populateListADCs;
 
 - (IBAction) runRateAction:(id)sender; 
 - (IBAction) runAction:(id)sender; 
+- (IBAction) readPrimaryMapFileAction:(id)sender;
+- (IBAction) readPrimaryMagnetometerMapFileAction:(id)sender;
+- (IBAction) readPrimaryOrientationMatrixFileAction:(id)sender;
+- (IBAction) addADCAction:(id)sender;
+- (IBAction) sendCommandAction:(id)sender;
+- (IBAction) debugCommandAction:(id)sender;
+- (IBAction) connectAllAction:(id)sender;
 
-- (IBAction) delete:(id)sender; 
-- (IBAction) cut:(id)sender; 
-- (IBAction) paste:(id)sender ;
-- (IBAction) selectAll:(id)sender;
+- (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;
+
+//- (IBAction) delete:(id)sender; 
+//- (IBAction) cut:(id)sender; 
+//- (IBAction) paste:(id)sender ;
+//- (IBAction) selectAll:(id)sender;
 //-----------------------------------------------------------------
 
 @end

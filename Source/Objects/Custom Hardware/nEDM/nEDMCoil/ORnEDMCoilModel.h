@@ -21,20 +21,57 @@
 #pragma mark •••Imported Files
 #import "OrcaObject.h"
 #import "OROrderedObjHolding.h"
+#import "Accelerate/Accelerate.h"
+
+//defined here so that length of instvars can depend on
+#define MaxNumberOfMagnetometers 60
+#define MaxNumberOfChannels 3*MaxNumberOfMagnetometers
+#define MaxNumberOfCoils 24
+#define MaxCurrent 20.0
 
 @interface ORnEDMCoilModel : ORGroup <OROrderedObjHolding> {
     NSMutableDictionary* objMap;
     BOOL isRunning;
     float pollingFrequency;
+    int NumberOfMagnetometers;  
+    int NumberOfChannels;
+    int NumberOfCoils;
+    BOOL debugRunning;
+    
+    
+    NSMutableData* FeedbackMatData;    
+    
+    NSMutableArray* listOfADCs;
+    NSMutableData*  currentADCValues;
+    NSMutableArray* MagnetometerMap;
+    NSMutableArray* OrientationMatrix;
 }
 
 - (void) setUpImage;
 - (void) makeMainController;
 - (int) rackNumber;
 - (BOOL) isRunning;
+- (BOOL) debugRunning;
+- (void) setDebugRunning:(BOOL)debug;
 - (float) pollingFrequency;
 - (void) setPollingFrequency:(float)aFrequency;
 - (void) toggleRunState;
+- (void) connectAllPowerSupplies;
+
+- (void) addADC:(id)adc;
+- (void) removeADC:(id)adc;
+- (NSArray*) listOfADCs;
+
+- (int) numberOfChannels;
+- (int) mappedChannelAtChannel:(int)aChan;
+
+- (void) setOrientationMatrix:(NSMutableArray*)anArray;
+- (void) setMagnetometerMatrix:(NSMutableArray*)anArray;
+- (void) setConversionMatrix:(NSMutableData*)anArray;
+
+- (void) initializeConversionMatrixWithPlistFile:(NSString*)plistFile;
+- (void) initializeMagnetometerMapWithPlistFile:(NSString*)plistFile;
+- (void) initializeOrientationMatrixWithPlistFile:(NSString*)plistFile;
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
@@ -53,7 +90,14 @@
 - (void) place:(id)anObj intoSlot:(int)aSlot;
 - (int) slotForObj:(id)anObj;
 - (int) numberSlotsNeededFor:(id)anObj;
+
+#pragma mark •••Holding ADCs
+- (NSArray*) validObjects;
+
 @end
 
 extern NSString* ORnEDMCoilPollingActivityChanged;
 extern NSString* ORnEDMCoilPollingFrequencyChanged;
+extern NSString* ORnEDMCoilADCListChanged;
+extern NSString* ORnEDMCoilHWMapChanged;
+extern NSString* ORnEDMCoilDebugRunningHasChanged;
