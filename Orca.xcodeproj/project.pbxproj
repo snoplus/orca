@@ -2782,6 +2782,7 @@
 		9CF2C1BB0CC195E2002B279B /* ORL8013CrateModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CF2C1B10CC195E1002B279B /* ORL8013CrateModel.m */; };
 		B322A309146D64D000491347 /* ORTcpIpProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = B322A308146D64D000491347 /* ORTcpIpProtocol.h */; };
 		B33FBC93146F2A6A0046A733 /* edu.washington.npl.orca.VXIHardware.plist in Resources */ = {isa = PBXBuildFile; fileRef = B33FBC92146F2A6A0046A733 /* edu.washington.npl.orca.VXIHardware.plist */; };
+		B357BE0415249955001EE082 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B357BE0315249955001EE082 /* Accelerate.framework */; };
 		B38DEE4814E02B40003914FF /* ADVME1314.gif in Resources */ = {isa = PBXBuildFile; fileRef = B38DEE4214E02B40003914FF /* ADVME1314.gif */; };
 		B38DEE4914E02B40003914FF /* ADVME1314.nib in Resources */ = {isa = PBXBuildFile; fileRef = B38DEE4314E02B40003914FF /* ADVME1314.nib */; };
 		B38DEE4A14E02B40003914FF /* ORADVME1314Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = B38DEE4414E02B40003914FF /* ORADVME1314Controller.h */; };
@@ -5748,6 +5749,7 @@
 		9CF2C1B10CC195E1002B279B /* ORL8013CrateModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORL8013CrateModel.m; path = "Source/Objects/Hardware/Camac/L8013 Crate/ORL8013CrateModel.m"; sourceTree = SOURCE_ROOT; };
 		B322A308146D64D000491347 /* ORTcpIpProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORTcpIpProtocol.h; sourceTree = "<group>"; };
 		B33FBC92146F2A6A0046A733 /* edu.washington.npl.orca.VXIHardware.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = edu.washington.npl.orca.VXIHardware.plist; sourceTree = "<group>"; };
+		B357BE0315249955001EE082 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = SDKs/MacOSX10.6.sdk/System/Library/Frameworks/Accelerate.framework; sourceTree = DEVELOPER_DIR; };
 		B38DEE4214E02B40003914FF /* ADVME1314.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = ADVME1314.gif; sourceTree = "<group>"; };
 		B38DEE4314E02B40003914FF /* ADVME1314.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = ADVME1314.nib; sourceTree = "<group>"; };
 		B38DEE4414E02B40003914FF /* ORADVME1314Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORADVME1314Controller.h; sourceTree = "<group>"; };
@@ -5909,6 +5911,7 @@
 				840F5B191222C90000D49A75 /* QTKit.framework in Frameworks */,
 				EF37879212DFFF81003C814E /* YAJL.framework in Frameworks */,
 				8475EC0B14759D53003A165D /* libusb-1.0.a in Frameworks */,
+				B357BE0415249955001EE082 /* Accelerate.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5918,6 +5921,7 @@
 		1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B357BE0315249955001EE082 /* Accelerate.framework */,
 				EF37879112DFFF81003C814E /* YAJL.framework */,
 				840F5B181222C90000D49A75 /* QTKit.framework */,
 				84F5E11A0A151E0B00707A0F /* OpenGL.framework */,
