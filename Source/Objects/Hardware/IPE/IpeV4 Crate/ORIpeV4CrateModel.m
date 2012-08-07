@@ -84,7 +84,7 @@ NSString* ORIpeV4CrateConnectedChanged = @"ORIpeV4CrateConnectedChanged";
 - (void) connected
 {
 	[self setIsConnected:YES];
-	[[self adapter] readHwVersion];
+	//[[self adapter] readHwVersion];  //TODO: this produces issues together with the Edelweiss SLT -tb-
 }
 
 - (void) disconnected
