@@ -45,7 +45,7 @@
 	
 	detectorSize		= NSMakeSize(620,595);
 	detailsSize			= NSMakeSize(450,589);
-	focalPlaneSize		= NSMakeSize(350,589);
+	focalPlaneSize		= NSMakeSize(700,589);
 	
     blankView = [[NSView alloc] init];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
@@ -140,6 +140,7 @@
 		[self resizeWindowToSize:focalPlaneSize];
 		[[self window] setContentView:tabView];
     }
+
 	int index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:@"orca.HaloController.selectedtab"];
 }
