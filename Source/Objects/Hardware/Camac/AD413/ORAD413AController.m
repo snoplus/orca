@@ -319,7 +319,7 @@
     }
     else {
         NSRunAlertPanel([anException name], @"%@\n%@ (F%d)", @"OK", nil, nil,
-                        [anException name],name);
+                        [anException name],name,[model stationNumber]+1);
     }
 }
 @end

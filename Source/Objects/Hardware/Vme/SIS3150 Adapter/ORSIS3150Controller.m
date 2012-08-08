@@ -394,7 +394,7 @@
 		
     }
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@\nAddress: 0x%08X", @"OK", nil, nil,
+        NSRunAlertPanel([localException name], @"%@\nAddress: 0x%08lX", @"OK", nil, nil,
                         localException,address);
     }
 }

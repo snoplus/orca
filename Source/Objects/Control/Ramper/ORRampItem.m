@@ -822,7 +822,7 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 			[targetObject turnOff];
 		}
 		@catch(NSException* localException) {
-			NSRunAlertPanel([localException name], @"%@\n\nUnable to turn off hw", @"OK", nil, nil,
+			NSRunAlertPanel([localException name], @"%@\n\nUnable to turn off %@", @"OK", nil, nil,
 							localException,[self itemName]);
 		}
 	}

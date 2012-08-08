@@ -409,7 +409,7 @@
     }
 	@catch(NSException* localException) {
 		NSLog(@"FAILED to load Trigger Lower 100MHz Clock: 0x%04x\n",[model lowerClock]);
-		NSRunAlertPanel([localException name], @"%@\nFAILED to load Trigger Lower 100MHz Clock: 0x%04x", @"OK", nil, nil,
+		NSRunAlertPanel([localException name], @"%@\nFAILED to load Trigger Lower 100MHz Clock: 0x%04lx", @"OK", nil, nil,
 						localException,[model lowerClock]);
     }
 }
@@ -424,7 +424,7 @@
     }
 	@catch(NSException* localException) {
 		NSLog(@"FAILED to load Trigger Upper 100MHz Clock: 0x%04x\n",[model upperClock]);
-		NSRunAlertPanel([localException name], @"%@\nFAILED to load Trigger Upper 100MHz Clock: 0x%04x", @"OK", nil, nil,
+		NSRunAlertPanel([localException name], @"%@\nFAILED to load Trigger Upper 100MHz Clock: 0x%04lx", @"OK", nil, nil,
 						localException,[model upperClock]);
     }	
 }

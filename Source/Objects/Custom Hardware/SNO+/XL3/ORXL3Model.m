@@ -1439,11 +1439,7 @@ void SwapLongBlock(void* p, int32_t n)
 {
     for (id anObj in [[self guardian] orcaObjects]) { 
         if ([anObj class] == NSClassFromString(@"ORFec32Model")) {
-// Removed the last argument-- it wasn't used and was causing a compiler warning in XCode 4.4. MAH 7/29/2012
-/*
-            [[self debugDBRef] getDocumentId:[NSString stringWithFormat:@"_design/penn_daq_views/_view/get_fec_by_generated?descending=True&start_key=[%d,%d,{}]&end_key=[%d,%d,\"\"]&limit=1",[self crateNumber], [anObj stationNumber], [self crateNumber], [anObj stationNumber]] tag:[NSString stringWithFormat:@"%@.%d", kDebugDbEcalDocGot, [self crateNumber], [anObj stationNumber]]];
-*/
-            [[self debugDBRef] getDocumentId:[NSString stringWithFormat:@"_design/penn_daq_views/_view/get_fec_by_generated?descending=True&start_key=[%d,%d,{}]&end_key=[%d,%d,\"\"]&limit=1",[self crateNumber], [anObj stationNumber], [self crateNumber], [anObj stationNumber]] tag:[NSString stringWithFormat:@"%@.%d", kDebugDbEcalDocGot, [self crateNumber]]];
+            [[self debugDBRef] getDocumentId:[NSString stringWithFormat:@"_design/penn_daq_views/_view/get_fec_by_generated?descending=True&start_key=[%d,%d,{}]&end_key=[%d,%d,\"\"]&limit=1",[self crateNumber], [anObj stationNumber], [self crateNumber], [anObj stationNumber]] tag:[NSString stringWithFormat:@"%@.%d.%d", kDebugDbEcalDocGot, [self crateNumber], [anObj stationNumber]]];
         }
     }
 }

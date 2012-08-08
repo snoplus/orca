@@ -685,7 +685,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"FAILED to load Trigger Lower GTID: 0x%08x\n",[model gtIdValue]);
-        NSRunAlertPanel([localException name], @"%@\nFAILED to load Trigger Lower GTID: 0x%08x", @"OK", nil, nil,
+        NSRunAlertPanel([localException name], @"%@\nFAILED to load Trigger Lower GTID: 0x%08lx", @"OK", nil, nil,
 						localException,[model gtIdValue]);
     }
 }
@@ -698,7 +698,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"FAILED to load Trigger Lower %@ GTID: 0x%04x\n",[model trigger1Name],[model gtIdValue]);
-        NSRunAlertPanel([localException name], @"%@\nFAILED to read Trigger Lower GTID 1\n", @"OK", nil, nil,
+        NSRunAlertPanel([localException name], @"%@\nFAILED to read Trigger Lower %@ GTID 1\n", @"OK", nil, nil,
 						localException,[model trigger1Name]);
     }
 }
@@ -712,7 +712,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"FAILED to load Trigger %@ GTID: 0x%04x\n",[model trigger2Name],[model gtIdValue]);
-        NSRunAlertPanel([localException name], @"%@\nFAILED to read Trigger Lower GTID 2\n", @"OK", nil, nil,
+        NSRunAlertPanel([localException name], @"%@\nFAILED to read Trigger Lower %@ GTID 2\n", @"OK", nil, nil,
 						localException,[model trigger2Name]);
     }
 }
@@ -737,7 +737,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"FAILED to load Trigger test register\n");
-        NSRunAlertPanel([localException name], @"%@\nFAILED to load trigger test register\n", @"OK", nil, nil,
+        NSRunAlertPanel([localException name], @"%@\nFAILED to load trigger %@ test register\n", @"OK", nil, nil,
 						localException,[model trigger2Name]);
     }
 }
@@ -779,7 +779,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"FAILED to load trigger lower clock: 0x%04x\n",[model lowerTimeValue]);
-        NSRunAlertPanel([localException name], @"%@\nFAILED to load trigger lower clock: 0x%04x", @"OK", nil, nil,
+        NSRunAlertPanel([localException name], @"%@\nFAILED to load trigger lower clock: 0x%04lx", @"OK", nil, nil,
 						localException,[model lowerTimeValue]);
     }
     
@@ -795,7 +795,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"FAILED to load trigger upper clock: 0x%04x\n",[model upperTimeValue]);
-        NSRunAlertPanel([localException name], @"%@\nFAILED to load trigger upper clock: 0x%04x", @"OK", nil, nil,
+        NSRunAlertPanel([localException name], @"%@\nFAILED to load trigger upper clock: 0x%04lx", @"OK", nil, nil,
 						localException,[model upperTimeValue]);
     }
 }

@@ -234,7 +234,7 @@
 		[model report];
     }
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%Report failed: %@", @"OK", nil, nil,
+        NSRunAlertPanel([localException name], @"Report failed: %@", @"OK", nil, nil,
                         localException);
     }
 }
@@ -304,7 +304,7 @@
 		[model initSqWave:chipIndex];	
     }
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"Init Square Wave failed: ", @"OK", nil, nil,
+        NSRunAlertPanel([localException name], @"Init Square Wave failed: %@", @"OK", nil, nil,
                         localException);
     }	
 }

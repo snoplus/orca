@@ -307,7 +307,7 @@ typedef enum {
 		[model report];
     }
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%Report failed: %@", @"OK", nil, nil,
+        NSRunAlertPanel([localException name], @"Report failed: %@", @"OK", nil, nil,
                         localException);
     }
 }
