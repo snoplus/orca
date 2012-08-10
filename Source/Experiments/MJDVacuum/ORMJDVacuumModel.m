@@ -1316,13 +1316,13 @@ NSString* ORMJDVacuumModelConstraintsChanged		= @"ORMJDVacuumModelConstraintsCha
 		if([CF6Valve isOpen]){
 			[self closeGateValve:3];
 			NSLog(@"ORCA closed the gatevalve between cryopump and cryostat because cryopump >20K or temperature is unknown\n");
-			if(!orcaCloseCF6TempAlarm){
+			if(!orcaClosedCF6TempAlarm){
 				NSString* alarmName = [NSString stringWithFormat:@"ORCA Closed %@",[CF6Valve label]];
-				orcaCloseCF6TempAlarm = [[ORAlarm alloc] initWithName:alarmName severity:kHardwareAlarm];
-				[orcaCloseCF6TempAlarm setHelpString:@"ORCA closed the valve because cryopump temp >20K or unknown. Acknowledging this alarm will clear it."];
-				[orcaCloseCF6TempAlarm setSticky:NO];
+				orcaClosedCF6TempAlarm = [[ORAlarm alloc] initWithName:alarmName severity:kHardwareAlarm];
+				[orcaClosedCF6TempAlarm setHelpString:@"ORCA closed the valve because cryopump temp >20K or unknown. Acknowledging this alarm will clear it."];
+				[orcaClosedCF6TempAlarm setSticky:NO];
 			}
-			[orcaCloseCF6TempAlarm postAlarm];
+			[orcaClosedCF6TempAlarm postAlarm];
 		}
 	}	
 }

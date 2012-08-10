@@ -116,7 +116,7 @@
 	BOOL				 constraintCheckScheduled;
     BOOL				 detectorsBiased;
 	ORAlarm*			 orcaClosedCryoPumpValveAlarm;
-	ORAlarm*			 orcaCloseCF6TempAlarm;
+	ORAlarm*			 orcaClosedCF6TempAlarm;
 	NSMutableDictionary* okToBiasConstraints;
 	NSMutableDictionary* continuedBiasConstraints;
 }
