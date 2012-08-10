@@ -756,7 +756,8 @@ NSString* ORCP8CryopumpModelConstraintsChanged				= @"ORCP8CryopumpModelConstrai
 - (NSString*) auxStatusString:(int)aChannel
 {
 	if([serialPort isOpen] && [self isValid]){
-		return [self pumpStatus]?@"ON":@"OFF";
+		if([self pumpStatus]) return [NSString stringWithFormat:@"%dK",[self secondStageTemp]];
+		else return @"OFF";
 	}
 	else return @"?";	
 }
