@@ -57,7 +57,7 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
 //	return @"Halo/Index.html";
 //}
 
-- (NSMutableArray*) initMapEntries:(int) index
+/*- (NSMutableArray*) initMapEntries:(int) index
 {
 	//default set -- subsclasses can override
 	NSMutableArray* mapEntries = [NSMutableArray array];
@@ -74,6 +74,7 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
     [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kPulserChan",	@"key", [NSNumber numberWithInt:0], @"sortType", nil]];
 	return mapEntries;
 }
+ */
 
 #pragma mark ¥¥¥Accessors
 
@@ -137,29 +138,31 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
 	ORSegmentGroup* theGroup = [segmentGroups objectAtIndex:aGroup];
 	
     NSString* crateName      = [ theGroup segment:index objectForKey:@"kCrate"       ];
-    NSString* boreName       = [ theGroup segment:index objectForKey:@"kBore"        ];
-    NSString* clockName      = [ theGroup segment:index objectForKey:@"kClock"       ];
-    NSString* NCDName        = [ theGroup segment:index objectForKey:@"kNCD"         ];
+    //NSString* boreName       = [ theGroup segment:index objectForKey:@"kBore"        ];
+    //NSString* clockName      = [ theGroup segment:index objectForKey:@"kClock"       ];
+    //NSString* NCDName        = [ theGroup segment:index objectForKey:@"kNCD"         ];
 	NSString* cardName       = [ theGroup segment:index objectForKey:@"kCardSlot"    ];
 	NSString* chanName       = [ theGroup segment:index objectForKey:@"kChannel"     ];
-    NSString* hvCrateName    = [ theGroup segment:index objectForKey:@"kHvCrate"     ];
-    NSString* hvChanName     = [ theGroup segment:index objectForKey:@"kHvChan"      ];
-    NSString* preAmpName     = [ theGroup segment:index objectForKey:@"kPreAmp"      ];
-    NSString* pulserCardName = [ theGroup segment:index objectForKey:@"kPulserCard"  ];
-    NSString* pulserChanName = [ theGroup segment:index objectForKey:@"kPulserChan"  ];
+    //NSString* hvCrateName    = [ theGroup segment:index objectForKey:@"kHvCrate"     ];
+    //NSString* hvChanName     = [ theGroup segment:index objectForKey:@"kHvChan"      ];
+    //NSString* preAmpName     = [ theGroup segment:index objectForKey:@"kPreAmp"      ];
+    //NSString* pulserCardName = [ theGroup segment:index objectForKey:@"kPulserCard"  ];
+    //NSString* pulserChanName = [ theGroup segment:index objectForKey:@"kPulserChan"  ];
 	
-	return [NSString stringWithFormat:@"Shaper,ID %2d,Clock %2d,NCD %2d,Crate %2d,Card %2d,Channel %2d,HV Crate %2d,HV Chan %2d,Preamp %2d,Pulser Card %2d,Pulser Chan %2d",
-            [boreName       intValue],
-            [clockName      intValue],
-            [NCDName        intValue],
-            [crateName      intValue],
-            [cardName       intValue],
-            [chanName       intValue],
-            [hvCrateName    intValue],
-            [hvChanName     intValue],
-            [preAmpName     intValue],
-            [pulserCardName intValue],
-            [pulserChanName intValue]];
+	//return [NSString stringWithFormat:@"Shaper,ID %2d,Clock %2d,NCD %2d,Crate %2d,Card %2d,Channel %2d,HV Crate %2d,HV Chan %2d,Preamp %2d,Pulser Card %2d,Pulser Chan %2d",
+            //[boreName       intValue],
+            //[clockName      intValue],
+            //[NCDName        intValue],
+            //[crateName      intValue],
+            //[cardName       intValue],
+            //[chanName       intValue],
+            //[hvCrateName    intValue],
+            //[hvChanName     intValue],
+            //[preAmpName     intValue],
+            //[pulserCardName intValue],
+            //[pulserChanName intValue]];
+    
+    return [NSString stringWithFormat:@"FLT,Energy,Crate %2d,Station %2d,Channel %2d",[crateName intValue],[cardName intValue],[chanName intValue]];
 }
 #pragma mark ¥¥¥Specific Dialog Lock Methods
 - (NSString*) experimentMapLock
