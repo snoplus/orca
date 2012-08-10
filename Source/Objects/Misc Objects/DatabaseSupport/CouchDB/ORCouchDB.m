@@ -484,8 +484,29 @@
 												   nil];
 		else {
 			if(views){
-				NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/_design/%@", host, port, database, database];
-				/*id result = */[self send:httpString type:@"PUT" body:views];
+				NSDictionary* oldViews = [views objectForKey:@"views"];
+				NSArray* allViewKeys = [oldViews allKeys];
+				for(id aViewKey in allViewKeys){
+					
+					NSMutableDictionary* newViews = [NSMutableDictionary dictionaryWithObjectsAndKeys:@"javascript",@"language",nil];
+
+					NSMutableDictionary* aOldView = [[[oldViews objectForKey:aViewKey] mutableCopy] autorelease];
+					
+					NSMutableDictionary* aNewView= [NSMutableDictionary dictionaryWithDictionary:aOldView];
+					
+					id mapName = [[[aNewView objectForKey:@"mapName"] retain] autorelease];
+					if(![mapName length])mapName = database;
+					else [aNewView removeObjectForKey:@"mapName"];
+					
+					NSMutableDictionary* theLowLevelView = [NSMutableDictionary dictionaryWithObjectsAndKeys:aNewView,aViewKey,nil];
+
+
+					[newViews setObject:theLowLevelView forKey:@"views"];
+					
+					NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/_design/%@", host, port, database, mapName];
+					/*id result = */[self send:httpString type:@"PUT" body:newViews];		
+				}
+				
 			}
 
 		}

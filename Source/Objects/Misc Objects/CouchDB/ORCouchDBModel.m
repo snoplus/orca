@@ -541,6 +541,16 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 		[aViewDictionary setObject:aDictionary forKey:@"ave"]; 
     }
 	
+	mapPath = [mainBundle pathForResource: @"CouchHistoryValuesMap" ofType: @"txt"];
+    if([[NSFileManager defaultManager] fileExistsAtPath:mapPath] ){
+		aMap         = [NSString stringWithContentsOfFile:mapPath encoding:NSASCIIStringEncoding error:nil];
+		NSMutableDictionary* aDictionary  = [NSMutableDictionary dictionary];
+		[aDictionary setObject:aMap forKey:@"map"];
+		[aDictionary setObject:@"history" forKey:@"mapName"];
+		[aViewDictionary setObject:aDictionary forKey:@"values"]; 
+    }
+	
+	
 
 	NSDictionary* theViews = [NSDictionary dictionaryWithObjectsAndKeys:
 							  @"javascript",@"language",
