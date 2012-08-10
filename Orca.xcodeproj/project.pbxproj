@@ -708,6 +708,7 @@
 		843175D41152766E005643AB /* HaloModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 843175CB1152766E005643AB /* HaloModel.h */; };
 		843175D51152766E005643AB /* HaloModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 843175CC1152766E005643AB /* HaloModel.m */; };
 		8431D2FF096F11E600995510 /* DGF4c.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8431D2FE096F11E600995510 /* DGF4c.nib */; };
+		8432B5E915D56C7C00C5FB5D /* CouchHistoryValuesMap.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8432B5E815D56C7C00C5FB5D /* CouchHistoryValuesMap.txt */; };
 		8434149D08EDF240009B7659 /* NoFireWireServiceHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8434149C08EDF240009B7659 /* NoFireWireServiceHelp.plist */; };
 		8434150D08EE0378009B7659 /* ORCrateController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8434150B08EE0378009B7659 /* ORCrateController.h */; };
 		8434150E08EE0378009B7659 /* ORCrateController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8434150C08EE0378009B7659 /* ORCrateController.m */; };
@@ -3801,6 +3802,7 @@
 		843175CB1152766E005643AB /* HaloModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HaloModel.h; sourceTree = "<group>"; };
 		843175CC1152766E005643AB /* HaloModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HaloModel.m; sourceTree = "<group>"; };
 		8431D2FE096F11E600995510 /* DGF4c.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = DGF4c.nib; path = Source/Objects/Hardware/Camac/DGF4c/DGF4c.nib; sourceTree = SOURCE_ROOT; };
+		8432B5E815D56C7C00C5FB5D /* CouchHistoryValuesMap.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = CouchHistoryValuesMap.txt; path = "Source/Objects/Misc Objects/CouchDB/CouchHistoryValuesMap.txt"; sourceTree = SOURCE_ROOT; };
 		8434149C08EDF240009B7659 /* NoFireWireServiceHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = NoFireWireServiceHelp.plist; path = "Source/Objects/Misc Objects/FireWire/NoFireWireServiceHelp.plist"; sourceTree = SOURCE_ROOT; };
 		8434150B08EE0378009B7659 /* ORCrateController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORCrateController.h; sourceTree = "<group>"; };
 		8434150C08EE0378009B7659 /* ORCrateController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORCrateController.m; sourceTree = "<group>"; };
@@ -6326,6 +6328,7 @@
 				84052A2A13106B65007607A4 /* ORCouchDBModel.h */,
 				84052A2B13106B65007607A4 /* ORCouchDBModel.m */,
 				8459AD2B138D92F90029C5B6 /* CouchHistoryAveMap.txt */,
+				8432B5E815D56C7C00C5FB5D /* CouchHistoryValuesMap.txt */,
 				8459AD2F138D93240029C5B6 /* CouchHistoryAveReduce.txt */,
 			);
 			name = CouchDB;
@@ -14337,6 +14340,7 @@
 				2D51C60A15B5A115000F0ACD /* EdelweissFLT.nib in Resources */,
 				2D51C60B15B5A115000F0ACD /* EdelweissFLTCard.gif in Resources */,
 				84880EEE15B8950D0073CDFC /* MJDStrings.tif in Resources */,
+				8432B5E915D56C7C00C5FB5D /* CouchHistoryValuesMap.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
