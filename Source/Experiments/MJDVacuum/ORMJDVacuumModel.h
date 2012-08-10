@@ -60,6 +60,9 @@
 #define kCryoCondensationConstraint				 @"Cryopump ON."
 #define kCryoCondensationReason				     @"Opening purge or roughing valve could cause excessive gas condensation on cryo pump."
 
+#define kCryoOffDetectorConstraint				 @"Cryopump OFF."
+#define kCryoOffDetectorReason				     @"Opening valve could expose detector to cryo pump evaporation."
+
 #define kRgaOnConstraint						 @"RGA ON."
 #define kRgaConstraintReason					 @"Opening valve will expose RGA to potentially damaging pressures."
 
@@ -113,6 +116,7 @@
 	BOOL				 constraintCheckScheduled;
     BOOL				 detectorsBiased;
 	ORAlarm*			 orcaClosedCryoPumpValveAlarm;
+	ORAlarm*			 orcaCloseCF6TempAlarm;
 	NSMutableDictionary* okToBiasConstraints;
 	NSMutableDictionary* continuedBiasConstraints;
 }

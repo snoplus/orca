@@ -99,6 +99,8 @@ NSString* ORMJDVacuumModelConstraintsChanged		= @"ORMJDVacuumModelConstraintsCha
 	[valueDictionary release];
 	[orcaClosedCryoPumpValveAlarm clearAlarm];
 	[orcaClosedCryoPumpValveAlarm release];
+	[orcaClosedCF6TempAlarm clearAlarm];
+	[orcaClosedCF6TempAlarm release];
 	[super dealloc];
 }
 
@@ -185,6 +187,12 @@ NSString* ORMJDVacuumModelConstraintsChanged		= @"ORMJDVacuumModelConstraintsCha
 						 selector : @selector(cryoPumpChanged:)
 							 name : ORSerialPortWithQueueModelIsValidChanged
 						   object : cryoPump];
+
+		[notifyCenter addObserver : self
+						 selector : @selector(cryoPumpChanged:)
+							 name : ORCP8CryopumpModelSecondStageTempChanged
+						   object : cryoPump];
+		
 	}
 	
 	ORRGA300Model* rga = [self findRGA];
@@ -1245,7 +1253,7 @@ NSString* ORMJDVacuumModelConstraintsChanged		= @"ORMJDVacuumModelConstraintsCha
 	BOOL cryoPumpEnabled;
 	if(![cryoPump isValid]) cryoPumpEnabled = YES;
 	else cryoPumpEnabled = [cryoPump pumpStatus];
-	
+		
 	//---------------------------------------------------------------------------
 	//Opening purge or roughing valve could cause excessive gas condensation on cryo pump.
 	if(cryoPumpEnabled){
@@ -1281,6 +1289,42 @@ NSString* ORMJDVacuumModelConstraintsChanged		= @"ORMJDVacuumModelConstraintsCha
 		[cryoPump removePumpOffConstraint:k6CFValveOpenCryoConstraint];
 		[cryoRegionObj removeConstraintName:k6CFValveOpenCryoConstraint];
 	}
+	
+	//---------------------------------------------------------------------------
+	//If Cryopump is OFF forbid connection of cryopump to detector region
+	//loop over all valves if one side is cryo and one side is detector, then put in constraint
+	for(ORVacuumGateValve* aGateValve in [self gateValves]){
+		if([aGateValve isClosed] && !cryoPumpEnabled){
+			int side1				= [aGateValve connectingRegion1];
+			int side2				= [aGateValve connectingRegion2];
+			
+			if([self regionColor:side1 sameAsRegion:side2]){
+				[self removeConstraintName:kCryoOffDetectorConstraint fromGateValve:aGateValve];
+			}
+			else if([self regionColor:side1 sameAsRegion:kRegionCryostat] ){
+				[self addConstraintName:kCryoOffDetectorConstraint reason:kCryoOffDetectorReason toGateValve:aGateValve];
+			}
+			else [self removeConstraintName:kCryoOffDetectorConstraint  fromGateValve:aGateValve];
+		}
+		else [self removeConstraintName:kCryoOffDetectorConstraint  fromGateValve:aGateValve];
+	}
+	
+	//---------------------------------------------------------------------------
+	//If Cryopump temp is >20K close the CF6 valve
+	float secondStateTempHigh = [cryoPump secondStageTemp]>20;
+	if(!cryoPumpEnabled || secondStateTempHigh){
+		if([CF6Valve isOpen]){
+			[self closeGateValve:3];
+			NSLog(@"ORCA closed the gatevalve between cryopump and cryostat because cryopump >20K or temperature is unknown\n");
+			if(!orcaCloseCF6TempAlarm){
+				NSString* alarmName = [NSString stringWithFormat:@"ORCA Closed %@",[CF6Valve label]];
+				orcaCloseCF6TempAlarm = [[ORAlarm alloc] initWithName:alarmName severity:kHardwareAlarm];
+				[orcaCloseCF6TempAlarm setHelpString:@"ORCA closed the valve because cryopump temp >20K or unknown. Acknowledging this alarm will clear it."];
+				[orcaCloseCF6TempAlarm setSticky:NO];
+			}
+			[orcaCloseCF6TempAlarm postAlarm];
+		}
+	}	
 }
 
 - (void) checkRGARelatedConstraints:(ORRGA300Model*) rga
