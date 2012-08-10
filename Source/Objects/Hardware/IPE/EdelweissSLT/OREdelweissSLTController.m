@@ -253,10 +253,17 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (void) isListeningOnServerSocketChanged:(NSNotification*)aNote
 {
-    if([model isListeningOnServerSocket])
+    if([model isListeningOnServerSocket]){
 	    [listeningForReplyIndicator  startAnimation: nil];
+		[startListeningForReplyButton setEnabled:NO];
+		[stopListeningForReplyButton setEnabled:YES];
+	}
     else
+	{
 	    [listeningForReplyIndicator  stopAnimation: nil];
+		[startListeningForReplyButton setEnabled:YES];
+		[stopListeningForReplyButton setEnabled:NO];
+	}
 }
 
 - (void) crateUDPCommandChanged:(NSNotification*)aNote
@@ -277,6 +284,23 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 - (void) crateUDPCommandPortChanged:(NSNotification*)aNote
 {
 	[crateUDPCommandPortTextField setIntValue: [model crateUDPCommandPort]];
+}
+
+
+- (void) openCommandSocketChanged:(NSNotification*)aNote
+{
+    if([model isOpenCommandSocket]){
+	    [openCommandSocketIndicator  startAnimation: nil];
+		[openCommandSocketButton setEnabled:NO];
+		[closeCommandSocketButton setEnabled:YES];
+	}
+    else
+	{
+	    [openCommandSocketIndicator  stopAnimation: nil];
+		[openCommandSocketButton setEnabled:YES];
+		[closeCommandSocketButton setEnabled:NO];
+	}
+
 }
 
 
@@ -396,6 +420,7 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	[self selectedFifoIndexChanged:nil];
 	[self pixelBusEnableRegChanged:nil];
 	[self eventFifoStatusRegChanged:nil];
+    [self openCommandSocketChanged:nil];
 }
 
 
@@ -582,6 +607,21 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 {
 	[model setSelectedFifoIndex:[sender indexOfSelectedItem]];	//sender is selectedFifoIndexPU
 }
+
+
+//UDP command Connection Start/Stop all
+- (IBAction) startUDPCommandConnectionButtonAction:(id)sender
+{
+    [self openCommandSocketButtonAction:nil];
+    [self startListeningForReplyButtonAction:nil];
+}
+
+- (IBAction) stopUDPCommandConnectionButtonAction:(id)sender
+{
+    [self closeCommandSocketButtonAction:nil];
+    [self stopListeningForReplyButtonAction:nil];
+}
+
 //reply socket (server)
 - (IBAction) startListeningForReplyButtonAction:(id)sender
 {
@@ -631,12 +671,14 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 {
 	NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
 	[model openCommandSocket];	
+    [self openCommandSocketChanged:nil];
 }
 
 - (IBAction) closeCommandSocketButtonAction:(id)sender
 {
 	NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
 	[model closeCommandSocket];	
+    [self openCommandSocketChanged:nil];
 }
 
 

@@ -258,8 +258,10 @@
 
 //command socket (client)
 - (int) openCommandSocket;
+- (int) isOpenCommandSocket;
 - (void) closeCommandSocket;
 - (int) sendUDPCommand;
+- (int) sendUDPCommandString:(NSString*)aString;
 
 #pragma mark ***HW Access
 //note that most of these method can raise 

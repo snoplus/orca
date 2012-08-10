@@ -359,7 +359,7 @@
 - (void) selectFiberTrigChanged:(NSNotification*)aNote
 {
 //DEBUG OUTPUT:
- 	NSLog(@"%@::%@: UNDER CONSTRUCTION! %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model selectFiberTrig]);//TODO: DEBUG testing ...-tb-
+ 	NSLog(@"%@::%@: UNDER CONSTRUCTION! [model selectFiberTrig] is %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model selectFiberTrig]);//TODO: DEBUG testing ...-tb-
 	//[selectFiberTrigPU setIntValue: [model selectFiberTrig]];
 	[selectFiberTrigPU selectItemAtIndex: [model selectFiberTrig]];
 }

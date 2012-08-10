@@ -28,6 +28,8 @@
 	@private
 	
 	    //udp connection
+		IBOutlet NSButton*		startUDPCommandConnectionButton;
+		IBOutlet NSButton*		stopUDPCommandConnectionButton;
 		//listener (server)
 	    IBOutlet NSTextField*   crateUDPReplyPortTextField;
 	IBOutlet   NSTextField* eventFifoStatusRegTextField;
@@ -42,6 +44,7 @@
 	    IBOutlet   NSTextField* crateUDPCommandTextField;
 	    IBOutlet NSTextField*   crateUDPCommandIPTextField;
 	    IBOutlet NSTextField*   crateUDPCommandPortTextField;
+	    IBOutlet NSProgressIndicator*   openCommandSocketIndicator;
 		
 		IBOutlet NSTextField*	hwVersionField;
 		IBOutlet NSTextField*	sltScriptArgumentsTextField;
@@ -126,6 +129,7 @@
 - (void) crateUDPCommandChanged:(NSNotification*)aNote;
 - (void) crateUDPCommandIPChanged:(NSNotification*)aNote;
 - (void) crateUDPCommandPortChanged:(NSNotification*)aNote;
+- (void) openCommandSocketChanged:(NSNotification*)aNote;
 - (void) crateUDPReplyPortChanged:(NSNotification*)aNote;
 - (void) sltScriptArgumentsChanged:(NSNotification*)aNote;
 - (void) clockTimeChanged:(NSNotification*)aNote;
@@ -164,6 +168,9 @@
 - (IBAction) readPixelBusEnableRegButtonAction:(id)sender;
 
 - (IBAction) selectedFifoIndexPUAction:(id)sender;
+
+- (IBAction) stopUDPCommandConnectionButtonAction:(id)sender;
+- (IBAction) startUDPCommandConnectionButtonAction:(id)sender;
 - (IBAction) startListeningForReplyButtonAction:(id)sender;
 - (IBAction) stopListeningForReplyButtonAction:(id)sender;
 - (IBAction) crateUDPReplyPortTextFieldAction:(id)sender;

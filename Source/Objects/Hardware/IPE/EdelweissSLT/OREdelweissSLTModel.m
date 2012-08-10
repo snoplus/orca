@@ -937,6 +937,7 @@ NSLog(@"  arguments: %@ \n" , arguments);
 
     int status, retval=0;
 
+	if(UDP_REPLY_SERVER_SOCKET>0) [self stopListeningServerSocket];//still open, first close the socket
 	UDP_REPLY_SERVER_SOCKET = socket ( AF_INET, SOCK_DGRAM, IPPROTO_UDP );
 	if (UDP_REPLY_SERVER_SOCKET==-1){
         //fprintf(stderr, "initUDPServerSocket: socket(...) failed\n");
@@ -1138,13 +1139,22 @@ NSLog(@"  arguments: %@ \n" , arguments);
       UDP_COMMAND_CLIENT_SOCKET = -1;
 }
 
+- (int) isOpenCommandSocket
+{
+	if(UDP_COMMAND_CLIENT_SOCKET>0) return 1; else return 0;
+}
 
 
 
 
 
 - (int) sendUDPCommand
+#if 1
 {
+    return [self sendUDPCommandString: crateUDPCommand];
+}
+#else
+{ //this was the first version, moved everything to 'sendUDPCommandString:' -tb-
     //taken from ipe4reader6.cpp, function int sendtoGlobalClient3(const void *buffer, size_t length, char* receiverIPAddr, uint32_t port)
 	NSLog(@"Called %@::%@! Send string: >%@<\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),  [self crateUDPCommand]);//TODO: DEBUG -tb-
 	//[model setCrateUDPCommand:[sender stringValue]];	
@@ -1176,6 +1186,43 @@ NSLog(@"  arguments: %@ \n" , arguments);
     return retval;
 
 }
+#endif
+
+
+- (int) sendUDPCommandString:(NSString*)aString
+{
+    //taken from ipe4reader6.cpp, function int sendtoGlobalClient3(const void *buffer, size_t length, char* receiverIPAddr, uint32_t port)
+	NSLog(@"Called %@::%@! Send string: >%@<\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),  [self crateUDPCommand]);//TODO: DEBUG -tb-
+	//[model setCrateUDPCommand:[sender stringValue]];	
+    if(UDP_COMMAND_CLIENT_SOCKET<=0){ NSLog(@"   socket not open\n"); return 1;}
+
+
+    //const char *buffer   = [crateUDPCommand cStringUsingEncoding: NSASCIIStringEncoding];  //TODO: maybe use NSData and NSString::dataUsingEncoding:allowLossyConversion: ??? -tb-
+    const void *buffer   = [[aString dataUsingEncoding: NSASCIIStringEncoding allowLossyConversion: YES] bytes]; 
+	size_t length        = [aString lengthOfBytesUsingEncoding: NSASCIIStringEncoding];
+	const char* receiverIPAddr = [crateUDPCommandIP cStringUsingEncoding: NSASCIIStringEncoding];;
+
+	int retval=0;
+	
+  //	if(port==0) port = GLOBAL_UDP_CLIENT_PORT;//use default port
+	
+  memset((char *) &UDP_COMMAND_sockaddrin_to, 0, sizeof(UDP_COMMAND_sockaddrin_to));
+  UDP_COMMAND_sockaddrin_to.sin_family = AF_INET;
+  UDP_COMMAND_sockaddrin_to.sin_port = htons(crateUDPCommandPort);
+  if (inet_aton([crateUDPCommandIP cStringUsingEncoding:NSASCIIStringEncoding], &UDP_COMMAND_sockaddrin_to.sin_addr)==0) {
+	NSLog(@" %@::%@  inet_aton() failed \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
+    //fprintf(stderr, "ERROR: sendtoGlobalClient3: inet_aton() failed\n");
+	return 2;
+    //exit(1);
+  }
+    fprintf(stderr, "    sendtoGlobalClient3: UDP Client: IP: %s, port: %i\n",receiverIPAddr,crateUDPCommandPort);
+    //TODO: only recommended when using a char buffer ...  ((char*)buffer)[length]=0;    fprintf(stderr, "    sendtoGlobalClient3: %s\n",buffer); //DEBUG
+	
+	retval = sendto(UDP_COMMAND_CLIENT_SOCKET, buffer, length, 0 /*flags*/, (struct sockaddr *)&UDP_COMMAND_sockaddrin_to, sockaddrin_to_len);
+    return retval;
+
+}
+
 
 
 

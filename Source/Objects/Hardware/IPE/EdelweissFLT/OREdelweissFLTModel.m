@@ -968,6 +968,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	((aMode & 0x7)<<4 );
 //DEBUG OUTPUT:
  	NSLog(@"%@::%@:   kFLTV4ControlReg: 0x%08x \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),aValue);//TODO: DEBUG testing ...-tb-
+    //DEBUG OUTPUT: 	NSLog(@"%@::%@:   selectFiberTrig: 0x%08x \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),selectFiberTrig);//TODO: DEBUG testing ...-tb-
 	
 	[self writeReg: kFLTV4ControlReg value:aValue];
 }
