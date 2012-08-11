@@ -33,6 +33,8 @@
 // Address information for this unit.
 #define k792DefaultBaseAddress 		0xa00000
 #define k792DefaultAddressModifier 	0x09
+#define kNumberBLTEventsToReadout   12 //most BLTEvent numbers don't make sense, make sure you know what you change
+
 NSString* ORCaen1720ModelEventSizeChanged = @"ORCaen1720ModelEventSizeChanged";
 static NSString* Caen1720RunModeString[4] = {
 @"Register-Controlled",
@@ -130,10 +132,9 @@ NSString* ORCaen1720ModelContinuousModeChanged              = @"ORCaen1720ModelC
     [self setAddressModifier:k792DefaultAddressModifier];
 	[self setEnabledMask:0xFF];
     [self setEventSize:0xa];
-    [self setNumberBLTEventsToReadout:1];
+    [self setNumberBLTEventsToReadout:kNumberBLTEventsToReadout];
     [[self undoManager] enableUndoRegistration];
     
-	
     return self;
 }
 
@@ -166,6 +167,7 @@ NSString* ORCaen1720ModelContinuousModeChanged              = @"ORCaen1720ModelC
 	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1720ModelEventSizeChanged object:self];
 }
+
 - (int)	bufferState
 {
 	return bufferState;
@@ -570,8 +572,6 @@ NSString* ORCaen1720ModelContinuousModeChanged              = @"ORCaen1720ModelC
 	 object:self
 	 userInfo:userInfo];
 }
-
-
 
 - (void) readChan:(unsigned short)chan reg:(unsigned short) pReg returnValue:(unsigned long*) pValue
 {
@@ -1092,7 +1092,10 @@ NSString* ORCaen1720ModelContinuousModeChanged              = @"ORCaen1720ModelC
 
 - (void) writeNumberBLTEvents:(BOOL)enable
 {
-    unsigned long aValue = (enable) ? numberBLTEventsToReadout : 0;
+    //we must start in a safe mode with 1 event, the numberBLTEvents is passed to SBC
+    //unsigned long aValue = (enable) ? numberBLTEventsToReadout : 0;
+    unsigned long aValue = (enable) ? 1 : 0;
+    
 	[[self adapter] writeLongBlock:&aValue
                          atAddress:[self baseAddress] + reg[kBLTEventNum].addressOffset
                         numToWrite:1
@@ -1228,7 +1231,6 @@ NSString* ORCaen1720ModelContinuousModeChanged              = @"ORCaen1720ModelC
     }
     else {
         [self initBoard];
-        [self setNumberBLTEventsToReadout:1];  // Hardcode this for now
         [self writeNumberBLTEvents:sbcRun];
         [self writeEnableBerr:sbcRun];
         [self writeAcquistionControl:YES];
@@ -1329,16 +1331,19 @@ NSString* ORCaen1720ModelContinuousModeChanged              = @"ORCaen1720ModelC
 	configStruct->card_info[index].crate		= [self crateNumber];
 	configStruct->card_info[index].add_mod		= [self addressModifier];
 	configStruct->card_info[index].base_add		= [self baseAddress];
-	configStruct->card_info[index].deviceSpecificData[0]	= reg[kEventStored].addressOffset; //Status buffer
+	configStruct->card_info[index].deviceSpecificData[0]	= reg[kVMEStatus].addressOffset; //VME Status buffer
     configStruct->card_info[index].deviceSpecificData[1]	= reg[kEventSize].addressOffset; // "next event size" address
     configStruct->card_info[index].deviceSpecificData[2]	= reg[kOutputBuffer].addressOffset; // fifo Address
     configStruct->card_info[index].deviceSpecificData[3]	= 0x0C; // fifo Address Modifier (A32 MBLT supervisory)
-    configStruct->card_info[index].deviceSpecificData[4]	= 0xFFC; // fifo Size
+    configStruct->card_info[index].deviceSpecificData[4]	= 0x0FFC; // fifo Size, has to match datasheet
     configStruct->card_info[index].deviceSpecificData[5]	= location;
     configStruct->card_info[index].deviceSpecificData[6]	= reg[kVMEControl].addressOffset; // VME Control address
     configStruct->card_info[index].deviceSpecificData[7]	= reg[kBLTEventNum].addressOffset; // Num of BLT events address
 
-	unsigned sizeOfEvent = 0; // number of uint32_t for DMA transfer
+    //sizeOfEvent is the size of a single event, regardless what the BLTEvent number is
+    //SBC uses it to calculate number of blocks for the DMA transfer
+    //unit is uint32_t word
+	unsigned sizeOfEvent = 0;
 	if (isFixedSize) {
 		unsigned long numChan = 0;
 		unsigned long chanMask = [self enabledMask];
@@ -1350,11 +1355,10 @@ NSString* ORCaen1720ModelContinuousModeChanged              = @"ORCaen1720ModelC
 			sizeOfEvent = numChan * (1UL << 20 >> [self eventSize]) / 4 + 4; //(1MB / num of blocks)
 		}
 	}
-	configStruct->card_info[index].deviceSpecificData[8]	= sizeOfEvent;
-	
-	configStruct->card_info[index].num_Trigger_Indexes		= 0;
-	
-	configStruct->card_info[index].next_Card_Index 	= index+1;	
+	configStruct->card_info[index].deviceSpecificData[8] = sizeOfEvent;
+    configStruct->card_info[index].deviceSpecificData[9] = kNumberBLTEventsToReadout;
+	configStruct->card_info[index].num_Trigger_Indexes = 0;
+	configStruct->card_info[index].next_Card_Index = index+1;
 	
 	return index+1;
 }

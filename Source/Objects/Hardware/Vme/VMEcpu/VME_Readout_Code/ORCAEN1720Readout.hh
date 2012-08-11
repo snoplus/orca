@@ -11,8 +11,10 @@ class ORCAEN1720Readout : public ORVVmeCard
 	virtual bool Start();
     virtual bool Readout(SBC_LAM_Data*);
 private:
-	uint32_t numEventsToReadout;
+	uint32_t userBLTEventsNumber;
+	uint32_t currentBLTEventsNumber;
 	uint32_t fixedEventSize;
+    uint32_t firmwareBugZero;
 };
 
 #endif /* _ORCAEN1720Readout_hh_*/
