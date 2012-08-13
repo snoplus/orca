@@ -31,19 +31,19 @@
 	float baseX = [self frame].origin.x;
 	float baseY = [self frame].origin.y;
 	for(ORVacuumGateValve* aValve in gateValves){		
-		NSRect theControlRect;
-		float x1 = baseX+aValve.location.x;
-		float y1 = baseY+aValve.location.y;
-		float w  = 75; //button width
-		float h  = 26; //button height
-		switch(aValve.controlPreference){
-			case kControlAbove: theControlRect = NSMakeRect(x1-w/2.,y1+kPipeRadius+2*kPipeThickness+5,w,h);		break;
-			case kControlBelow: theControlRect = NSMakeRect(x1-w/2.,y1-h-kPipeRadius-2*kPipeThickness-5,w,h);	break;
-			case kControlRight: theControlRect = NSMakeRect(x1+kPipeRadius+2*kPipeThickness+5,y1-h/2.,w,h);	break;
-			case kControlLeft:  theControlRect = NSMakeRect(x1-kPipeRadius-2*kPipeThickness-w,y1-h/2.,w,h);	break;
-		}
-		
 		if(aValve.controlPreference != kControlNone){
+			NSRect theControlRect;
+			float x1 = baseX+aValve.location.x;
+			float y1 = baseY+aValve.location.y;
+			float w  = 75; //button width
+			float h  = 26; //button height
+			switch(aValve.controlPreference){
+				case kControlAbove: theControlRect = NSMakeRect(x1-w/2.,y1+kPipeRadius+2*kPipeThickness+5,w,h);		break;
+				case kControlBelow: theControlRect = NSMakeRect(x1-w/2.,y1-h-kPipeRadius-2*kPipeThickness-5,w,h);	break;
+				case kControlRight: theControlRect = NSMakeRect(x1+kPipeRadius+2*kPipeThickness+5,y1-h/2.,w,h);	break;
+				case kControlLeft:  theControlRect = NSMakeRect(x1-kPipeRadius-2*kPipeThickness-w,y1-h/2.,w,h);	break;
+			}
+		
 			int gateValveTag = [aValve partTag];
 			NSButton *button = [[NSButton alloc] initWithFrame:theControlRect]; 
 			[button setBezelStyle:NSRoundedBezelStyle];
@@ -124,20 +124,20 @@
 - (void) resetCursorRects
 {
 	[super resetCursorRects];
-	/*
-	NSArray* dynamicLabels = [[delegate model] dynamicLabels];
-	for(ORVacuumDynamicLabel* aDynamicLabel in dynamicLabels){	
-		if([aDynamicLabel.dialogIdentifier length]){
-			[self addCursorRect:aDynamicLabel.bounds cursor:[NSCursor pointingHandCursor]];
+	
+	NSArray* valueLabels = [[delegate model] valueLabels];
+	for(ORVacuumDynamicLabel* aLabel in valueLabels){	
+		if(![[aLabel label] isEqualToString:@"Assumed"]){
+			[self addCursorRect:aLabel.bounds cursor:[NSCursor pointingHandCursor]];
 		}
-	}
-	NSArray* staticLabels = [[delegate model] staticLabels];
-	for(ORVacuumStaticLabel* aStaticLabel in staticLabels){	
-		if([aStaticLabel.dialogIdentifier length]){
-			[self addCursorRect:aStaticLabel.bounds cursor:[NSCursor pointingHandCursor]];
+	}	
+	
+	NSArray* statusLabels = [[delegate model] statusLabels];
+	for(ORVacuumStatusLabel* aLabel in statusLabels){	
+		if(![[aLabel label] isEqualToString:@"Assumed"]){
+			[self addCursorRect:aLabel.bounds cursor:[NSCursor pointingHandCursor]];
 		}
-	}
-	*/
+	}	
 }
 
 - (void) updateButtons
