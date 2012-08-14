@@ -201,7 +201,6 @@
 
 extern NSString* ORMJDVacuumModelDetectorsBiasedChanged;
 extern NSString* ORMJDVacuumModelVetoMaskChanged;
-extern NSString* ORMJDVacuumModelPollTimeChanged;
 extern NSString* ORMJDVacuumModelShowGridChanged;
 extern NSString* ORMJCVacuumLock;
 extern NSString* ORMJDVacuumModelConstraintsChanged;
