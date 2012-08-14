@@ -65,5 +65,7 @@
 	<string>NSApplication</string>
 	<key>ReportBugsTo</key>
 	<string>mhowe@physics.unc.edu</string>
+	<key>LSMinimumSystemVersion</key>
+    	<string>10.5</string>
 </dict>
 </plist>
