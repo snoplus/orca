@@ -18,6 +18,7 @@
 //-------------------------------------------------------------
 
 #import "ORMailer.h"
+#import "mail.h"
 
 #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
 #import <Message/NSMailDelivery.h>
@@ -30,7 +31,6 @@
 - (BOOL) addressOK;
 - (BOOL) subjectOK;
 - (void) sendit;
-- (void) taskDataAvailable:(NSNotification*)aNotification;
 @end
 
 @implementation ORMailer
@@ -138,21 +138,6 @@
 	}
 }
 
-- (NSArray *)ccArray {
-	NSArray *array = [[self cc] componentsSeparatedByString:@","];
-	return array;
-}
-
-- (void) mailDone:(NSNotification*)aNote
-{
-	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	[mailTask release];
-	mailTask = nil;
-	if([delegate respondsToSelector:@selector(mailSent:)]){
-		[delegate mailSent:to];
-	}
-	[self autorelease];
-}
 @end
 
 @implementation ORMailer (private)
@@ -244,81 +229,76 @@
 			NSLogColor([NSColor redColor], @"e-mail could NOT be sent because eMail delivery has not been configured in Mail.app\n");
 		}
 #else
-		NSMutableString* recipents   = [@"make new to recipient at end of to recipients with properties {address:\"</address/>\"}" mutableCopy];
-		NSMutableString* ccrecipents = [@"make new to recipient at end of cc recipients with properties {address:\"</cc/>\"}" mutableCopy];
-		NSString* mailScriptPath = [[NSBundle mainBundle] pathForResource: @"MailScript" ofType: @"txt"];
-		NSMutableString* script = [NSMutableString stringWithContentsOfFile:mailScriptPath encoding:NSASCIIStringEncoding error:nil];
-		[script replaceOccurrencesOfString:@"</subject/>" withString:subject options:NSLiteralSearch range:NSMakeRange(0,[script length])];
-		[script replaceOccurrencesOfString:@"</body/>" withString:[body string] options:NSLiteralSearch range:NSMakeRange(0,[script length])];
-		[recipents replaceOccurrencesOfString:@"</address/>" withString:to options:NSLiteralSearch range:NSMakeRange(0,[recipents length])];
-		[script replaceOccurrencesOfString:@"</addressLine/>" withString:recipents options:NSLiteralSearch range:NSMakeRange(0,[script length])];
+	
+		/* create a Scripting Bridge object for talking to the Mail application */
+		MailApplication *mail = [SBApplication applicationWithBundleIdentifier:@"com.apple.Mail"];
 		
-		 if([cc length]){
-			[ccrecipents replaceOccurrencesOfString:@"</cc/>" withString:cc options:NSLiteralSearch range:NSMakeRange(0,[ccrecipents length])];
-			[script replaceOccurrencesOfString:@"</ccLine/>" withString:ccrecipents options:NSLiteralSearch range:NSMakeRange(0,[script length])];
+        /* set ourself as the delegate to receive any errors */
+	//	mail.delegate = self;
+		
+		/* create a new outgoing message object */
+		MailOutgoingMessage *emailMessage = [[[mail classForScriptingClass:@"outgoing message"] alloc] initWithProperties:
+											 [NSDictionary dictionaryWithObjectsAndKeys:
+											  subject, @"subject",
+											  [body string], @"content",
+											  nil]];
+		
+		/* add the object to the mail app  */
+		[[mail outgoingMessages] addObject: emailMessage];
+		
+		/* set the sender, don't show the message */
+		emailMessage.sender = @"ORCA";
+		emailMessage.visible = NO;
+		
+		if ( [mail lastError] != nil ){
+			NSLog( @"Possible problems with sending e-mail to %@\n",to);
+			return;
 		}
-		else [script replaceOccurrencesOfString:@"</ccLine/>" withString:@"" options:NSLiteralSearch range:NSMakeRange(0,[script length])];
-		NSFileManager* fm = [NSFileManager defaultManager];
+		NSArray* people = [to componentsSeparatedByString:@","];
+		int count = 0;
+		for(id aPerson in people){
+			if([aPerson rangeOfString:@"@"].location != NSNotFound){
+				/* create a new recipient and add it to the recipients list */
+				MailToRecipient *theRecipient = [[[mail classForScriptingClass:@"to recipient"] alloc] initWithProperties:
+												 [NSDictionary dictionaryWithObjectsAndKeys:
+												  aPerson, @"address",
+												  nil]];
+				[emailMessage.toRecipients addObject: theRecipient];
+				[theRecipient release];
+				count++;
+			}
+		}
+		
+		people = [cc componentsSeparatedByString:@","];
+		for(id aPerson in people){
+			if([aPerson rangeOfString:@"@"].location != NSNotFound){
+				/* create a new recipient and add it to the recipients list */
+				MailToRecipient *theRecipient = [[[mail classForScriptingClass:@"cc recipient"] alloc] initWithProperties:
+												 [NSDictionary dictionaryWithObjectsAndKeys:
+												  aPerson, @"address",
+												  nil]];
+				[emailMessage.ccRecipients addObject: theRecipient];
+				[theRecipient release];
+				count++;
+			}
+		}
 		
 		
-		NSString* mailFolder = [[ApplicationSupport sharedApplicationSupport] applicationSupportFolder:@"Mail"];
-		char* tmpName = tempnam([mailFolder cStringUsingEncoding:NSASCIIStringEncoding] ,"aMailScriptXXX");
-		tempFilePath = [[NSString stringWithCString:tmpName encoding:NSASCIIStringEncoding] retain];
-		free(tmpName);
-		
-		
-		[fm createFileAtPath:tempFilePath contents:[script dataUsingEncoding:NSASCIIStringEncoding] attributes:nil];
-		mailTask = [[NSTask alloc] init];
-		
-		NSPipe *newPipe = [NSPipe pipe];
-		NSFileHandle *readHandle = [newPipe fileHandleForReading];
-		
-		NSNotificationCenter* nc = [NSNotificationCenter defaultCenter];
-		
-		[nc addObserver:self 
-			   selector:@selector(taskDataAvailable:) 
-				   name:NSFileHandleReadCompletionNotification 
-				 object:readHandle];
-		
-		[nc addObserver:self 
-			   selector:@selector(mailDone:) 
-				   name:NSTaskDidTerminateNotification 
-				 object:mailTask];
-		
-		[readHandle readInBackgroundAndNotify];
-		
-		[mailTask setLaunchPath:@"/usr/bin/osascript"];
-		[mailTask setArguments:[NSArray arrayWithObject:tempFilePath]];
-		[mailTask setStandardOutput:newPipe];
-		[mailTask setStandardError:newPipe];
-		[mailTask launch];
-		[recipents release];
-		[ccrecipents release];
-		
+		if ( [mail lastError] == nil && count>0){
+			[emailMessage send];
+			if ( [mail lastError] != nil ){
+				NSLog( @"Possible problems with sending e-mail to %@\n",to);
+			}
+			else {
+				NSLog(@"email sent to: %@\n",to);
+			}
+		}
+		[emailMessage release];
+	
 #endif
 		
 	}
 }
 
-- (void) taskDataAvailable:(NSNotification*)aNotification
-{
-	if(!allOutput)allOutput = [[NSMutableString stringWithCapacity:512] retain];
-    NSData *incomingData = [[aNotification userInfo] objectForKey:NSFileHandleNotificationDataItem];
-    if (incomingData && [incomingData length]) {
-        // Note:  if incomingData is nil, the filehandle is closed.
-        NSString *incomingText = [[NSString alloc] initWithData:incomingData encoding:NSASCIIStringEncoding];
-		
-        [allOutput appendString:incomingText];
-        		
-        [[aNotification object] readInBackgroundAndNotify];  // go back for more.
-        [incomingText release];
-    }  
-	else {
-		if([allOutput rangeOfString:@"true"].location == NSNotFound){
-			NSLog( @"Possible problems with sending e-mail to %@\n",to);
-			NSLog(@"%@\n",allOutput);
-		}
-	}
-}
 
 @end

@@ -1,9 +1,0 @@
-tell application "Mail"
-	set theNewMessage to make new outgoing message with properties {subject:"</subject/>", content:"</body/>", visible:false}
-	tell theNewMessage
-		</addressLine/>
-		</ccLine/>
-		send
-	end tell
-end tell
-

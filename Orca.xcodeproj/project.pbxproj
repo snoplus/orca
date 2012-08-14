@@ -709,6 +709,19 @@
 		843175D51152766E005643AB /* HaloModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 843175CC1152766E005643AB /* HaloModel.m */; };
 		8431D2FF096F11E600995510 /* DGF4c.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8431D2FE096F11E600995510 /* DGF4c.nib */; };
 		8432B5E915D56C7C00C5FB5D /* CouchHistoryValuesMap.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8432B5E815D56C7C00C5FB5D /* CouchHistoryValuesMap.txt */; };
+		8432B6BE15D92D4700C5FB5D /* MJDString.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8432B6B315D92D4700C5FB5D /* MJDString.tif */; };
+		8432B6BF15D92D4700C5FB5D /* MJDPumpCart.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8432B6B415D92D4700C5FB5D /* MJDPumpCart.nib */; };
+		8432B6C015D92D4700C5FB5D /* MJDPumpCart.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8432B6B515D92D4700C5FB5D /* MJDPumpCart.tif */; };
+		8432B6C115D92D4700C5FB5D /* ORMJDPumpCartController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8432B6B615D92D4700C5FB5D /* ORMJDPumpCartController.h */; };
+		8432B6C215D92D4700C5FB5D /* ORMJDPumpCartController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8432B6B715D92D4700C5FB5D /* ORMJDPumpCartController.m */; };
+		8432B6C315D92D4700C5FB5D /* ORMJDPumpCartModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8432B6B815D92D4700C5FB5D /* ORMJDPumpCartModel.h */; };
+		8432B6C415D92D4700C5FB5D /* ORMJDPumpCartModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8432B6B915D92D4700C5FB5D /* ORMJDPumpCartModel.m */; };
+		8432B93215D9645700C5FB5D /* ORMJDPumpCartView.h in Headers */ = {isa = PBXBuildFile; fileRef = 8432B93015D9645700C5FB5D /* ORMJDPumpCartView.h */; };
+		8432B93315D9645700C5FB5D /* ORMJDPumpCartView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8432B93115D9645700C5FB5D /* ORMJDPumpCartView.m */; };
+		8432B98915D9697900C5FB5D /* ORMJDTestCryostat.h in Headers */ = {isa = PBXBuildFile; fileRef = 8432B98715D9697900C5FB5D /* ORMJDTestCryostat.h */; };
+		8432B98A15D9697900C5FB5D /* ORMJDTestCryostat.m in Sources */ = {isa = PBXBuildFile; fileRef = 8432B98815D9697900C5FB5D /* ORMJDTestCryostat.m */; };
+		8432BC2A15D9994E00C5FB5D /* ORMJDTestCryoView.h in Headers */ = {isa = PBXBuildFile; fileRef = 8432BC2815D9994E00C5FB5D /* ORMJDTestCryoView.h */; };
+		8432BC2B15D9994E00C5FB5D /* ORMJDTestCryoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8432BC2915D9994E00C5FB5D /* ORMJDTestCryoView.m */; };
 		8434149D08EDF240009B7659 /* NoFireWireServiceHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8434149C08EDF240009B7659 /* NoFireWireServiceHelp.plist */; };
 		8434150D08EE0378009B7659 /* ORCrateController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8434150B08EE0378009B7659 /* ORCrateController.h */; };
 		8434150E08EE0378009B7659 /* ORCrateController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8434150C08EE0378009B7659 /* ORCrateController.m */; };
@@ -1275,6 +1288,9 @@
 		8457D25612F9986E00D3E3B4 /* ORiSeg8ChanHVController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8457D25412F9986E00D3E3B4 /* ORiSeg8ChanHVController.m */; };
 		8457D37712F9AB8A00D3E3B4 /* ORiSeg8ChanHVDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 8457D37512F9AB8A00D3E3B4 /* ORiSeg8ChanHVDecoders.h */; };
 		8457D37812F9AB8A00D3E3B4 /* ORiSeg8ChanHVDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 8457D37612F9AB8A00D3E3B4 /* ORiSeg8ChanHVDecoders.m */; };
+		8458E8ED15DA89B5005C43A9 /* Mail.app in Resources */ = {isa = PBXBuildFile; fileRef = 8458E8EC15DA89B5005C43A9 /* Mail.app */; };
+		8458E8EE15DA89EF005C43A9 /* Mail.app in Sources */ = {isa = PBXBuildFile; fileRef = 8458E8EC15DA89B5005C43A9 /* Mail.app */; };
+		8458E91515DA8A2A005C43A9 /* ScriptingBridge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8458E91415DA8A2A005C43A9 /* ScriptingBridge.framework */; };
 		8459A8D4137C1FEC0029C5B6 /* ORComparatorController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8459A8D0137C1FEC0029C5B6 /* ORComparatorController.h */; };
 		8459A8D5137C1FEC0029C5B6 /* ORComparatorController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8459A8D1137C1FEC0029C5B6 /* ORComparatorController.m */; };
 		8459A8D6137C1FEC0029C5B6 /* ORComparatorModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8459A8D2137C1FEC0029C5B6 /* ORComparatorModel.h */; };
@@ -2764,7 +2780,6 @@
 		9C88468A0E2D8D960099B98E /* ORHP4405AModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C8846820E2D8D960099B98E /* ORHP4405AModel.h */; };
 		9C88468B0E2D8D960099B98E /* ORHP4405AModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C8846830E2D8D960099B98E /* ORHP4405AModel.m */; };
 		9C8846A60E2D90ED0099B98E /* HP4405A.gif in Resources */ = {isa = PBXBuildFile; fileRef = 9C8846A50E2D90ED0099B98E /* HP4405A.gif */; };
-		9C9861580ED10DC900E18ED7 /* MailScript.txt in Resources */ = {isa = PBXBuildFile; fileRef = 9C9861570ED10DC900E18ED7 /* MailScript.txt */; };
 		9CD6DD880BE83F1B007096CE /* edu.washington.npl.orca.PlotFFT.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9CD6DD810BE83F1B007096CE /* edu.washington.npl.orca.PlotFFT.plist */; };
 		9CD6DD890BE83F1B007096CE /* ORPlotFFT.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CD6DD820BE83F1B007096CE /* ORPlotFFT.h */; };
 		9CD6DD8A0BE83F1B007096CE /* ORPlotFFT.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CD6DD830BE83F1B007096CE /* ORPlotFFT.m */; };
@@ -2868,6 +2883,17 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
+		8458E8EA15DA897F005C43A9 /* PBXBuildRule */ = {
+			isa = PBXBuildRule;
+			compilerSpec = com.apple.compilers.proxy.script;
+			filePatterns = "*.app";
+			fileType = pattern.proxy;
+			isEditable = 1;
+			outputFiles = (
+				"$(DERIVED_FILES_DIR)/$(INPUT_FILE_BASE).h",
+			);
+			script = "sdef \"$INPUT_FILE_PATH\" | sdp -fh -o \"$DERIVED_FILES_DIR\" --basename \"$INPUT_FILE_BASE\" --bundleid `defaults read \"$INPUT_FILE_PATH/Contents/Info\" CFBundleIdentifier`";
+		};
 		9C2595AC0D5171B90039C5DF /* PBXBuildRule */ = {
 			isa = PBXBuildRule;
 			compilerSpec = com.apple.compilers.proxy.script;
@@ -3803,6 +3829,19 @@
 		843175CC1152766E005643AB /* HaloModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HaloModel.m; sourceTree = "<group>"; };
 		8431D2FE096F11E600995510 /* DGF4c.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = DGF4c.nib; path = Source/Objects/Hardware/Camac/DGF4c/DGF4c.nib; sourceTree = SOURCE_ROOT; };
 		8432B5E815D56C7C00C5FB5D /* CouchHistoryValuesMap.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = CouchHistoryValuesMap.txt; path = "Source/Objects/Misc Objects/CouchDB/CouchHistoryValuesMap.txt"; sourceTree = SOURCE_ROOT; };
+		8432B6B315D92D4700C5FB5D /* MJDString.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = MJDString.tif; sourceTree = "<group>"; };
+		8432B6B415D92D4700C5FB5D /* MJDPumpCart.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = MJDPumpCart.nib; sourceTree = "<group>"; };
+		8432B6B515D92D4700C5FB5D /* MJDPumpCart.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = MJDPumpCart.tif; sourceTree = "<group>"; };
+		8432B6B615D92D4700C5FB5D /* ORMJDPumpCartController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORMJDPumpCartController.h; sourceTree = "<group>"; };
+		8432B6B715D92D4700C5FB5D /* ORMJDPumpCartController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORMJDPumpCartController.m; sourceTree = "<group>"; };
+		8432B6B815D92D4700C5FB5D /* ORMJDPumpCartModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORMJDPumpCartModel.h; sourceTree = "<group>"; };
+		8432B6B915D92D4700C5FB5D /* ORMJDPumpCartModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORMJDPumpCartModel.m; sourceTree = "<group>"; };
+		8432B93015D9645700C5FB5D /* ORMJDPumpCartView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORMJDPumpCartView.h; sourceTree = "<group>"; };
+		8432B93115D9645700C5FB5D /* ORMJDPumpCartView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORMJDPumpCartView.m; sourceTree = "<group>"; };
+		8432B98715D9697900C5FB5D /* ORMJDTestCryostat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMJDTestCryostat.h; path = Source/Experiments/MJDTestCryoVac/ORMJDTestCryostats/ORMJDTestCryostat.h; sourceTree = SOURCE_ROOT; };
+		8432B98815D9697900C5FB5D /* ORMJDTestCryostat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMJDTestCryostat.m; path = Source/Experiments/MJDTestCryoVac/ORMJDTestCryostats/ORMJDTestCryostat.m; sourceTree = SOURCE_ROOT; };
+		8432BC2815D9994E00C5FB5D /* ORMJDTestCryoView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMJDTestCryoView.h; path = Source/Experiments/MJDTestCryoVac/ORMJDTestCryostats/ORMJDTestCryoView.h; sourceTree = SOURCE_ROOT; };
+		8432BC2915D9994E00C5FB5D /* ORMJDTestCryoView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMJDTestCryoView.m; path = Source/Experiments/MJDTestCryoVac/ORMJDTestCryostats/ORMJDTestCryoView.m; sourceTree = SOURCE_ROOT; };
 		8434149C08EDF240009B7659 /* NoFireWireServiceHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = NoFireWireServiceHelp.plist; path = "Source/Objects/Misc Objects/FireWire/NoFireWireServiceHelp.plist"; sourceTree = SOURCE_ROOT; };
 		8434150B08EE0378009B7659 /* ORCrateController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORCrateController.h; sourceTree = "<group>"; };
 		8434150C08EE0378009B7659 /* ORCrateController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORCrateController.m; sourceTree = "<group>"; };
@@ -4107,6 +4146,8 @@
 		8457D25412F9986E00D3E3B4 /* ORiSeg8ChanHVController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORiSeg8ChanHVController.m; path = "Source/Objects/Hardware/HV/MPod/MPod Base Classes/ORiSeg8ChanHVController.m"; sourceTree = SOURCE_ROOT; };
 		8457D37512F9AB8A00D3E3B4 /* ORiSeg8ChanHVDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORiSeg8ChanHVDecoders.h; path = "Source/Objects/Hardware/HV/MPod/MPod Base Classes/ORiSeg8ChanHVDecoders.h"; sourceTree = SOURCE_ROOT; };
 		8457D37612F9AB8A00D3E3B4 /* ORiSeg8ChanHVDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORiSeg8ChanHVDecoders.m; path = "Source/Objects/Hardware/HV/MPod/MPod Base Classes/ORiSeg8ChanHVDecoders.m"; sourceTree = SOURCE_ROOT; };
+		8458E8EC15DA89B5005C43A9 /* Mail.app */ = {isa = PBXFileReference; lastKnownFileType = wrapper.application; name = Mail.app; path = ../../../../Applications/Mail.app; sourceTree = SOURCE_ROOT; };
+		8458E91415DA8A2A005C43A9 /* ScriptingBridge.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ScriptingBridge.framework; path = ../../../../System/Library/Frameworks/ScriptingBridge.framework; sourceTree = SOURCE_ROOT; };
 		8459A8D0137C1FEC0029C5B6 /* ORComparatorController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORComparatorController.h; path = Source/Objects/ProcessLogic/ProcessElements/Logic/Comparator/ORComparatorController.h; sourceTree = SOURCE_ROOT; };
 		8459A8D1137C1FEC0029C5B6 /* ORComparatorController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORComparatorController.m; path = Source/Objects/ProcessLogic/ProcessElements/Logic/Comparator/ORComparatorController.m; sourceTree = SOURCE_ROOT; };
 		8459A8D2137C1FEC0029C5B6 /* ORComparatorModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORComparatorModel.h; path = Source/Objects/ProcessLogic/ProcessElements/Logic/Comparator/ORComparatorModel.h; sourceTree = SOURCE_ROOT; };
@@ -5732,7 +5773,6 @@
 		9C8846820E2D8D960099B98E /* ORHP4405AModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORHP4405AModel.h; sourceTree = "<group>"; };
 		9C8846830E2D8D960099B98E /* ORHP4405AModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORHP4405AModel.m; sourceTree = "<group>"; };
 		9C8846A50E2D90ED0099B98E /* HP4405A.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = HP4405A.gif; sourceTree = "<group>"; };
-		9C9861570ED10DC900E18ED7 /* MailScript.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = MailScript.txt; sourceTree = "<group>"; };
 		9CD6DD810BE83F1B007096CE /* edu.washington.npl.orca.PlotFFT.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = edu.washington.npl.orca.PlotFFT.plist; path = "Source/Objects/Data Processing/Histogram Objects/PlotFFT/edu.washington.npl.orca.PlotFFT.plist"; sourceTree = SOURCE_ROOT; };
 		9CD6DD820BE83F1B007096CE /* ORPlotFFT.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORPlotFFT.h; path = "Source/Objects/Data Processing/Histogram Objects/PlotFFT/ORPlotFFT.h"; sourceTree = SOURCE_ROOT; };
 		9CD6DD830BE83F1B007096CE /* ORPlotFFT.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORPlotFFT.m; path = "Source/Objects/Data Processing/Histogram Objects/PlotFFT/ORPlotFFT.m"; sourceTree = SOURCE_ROOT; };
@@ -5914,6 +5954,7 @@
 				EF37879212DFFF81003C814E /* YAJL.framework in Frameworks */,
 				8475EC0B14759D53003A165D /* libusb-1.0.a in Frameworks */,
 				B357BE0415249955001EE082 /* Accelerate.framework in Frameworks */,
+				8458E91515DA8A2A005C43A9 /* ScriptingBridge.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5923,6 +5964,7 @@
 		1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				8458E91415DA8A2A005C43A9 /* ScriptingBridge.framework */,
 				B357BE0315249955001EE082 /* Accelerate.framework */,
 				EF37879112DFFF81003C814E /* YAJL.framework */,
 				840F5B181222C90000D49A75 /* QTKit.framework */,
@@ -7623,6 +7665,36 @@
 			path = Halo;
 			sourceTree = "<group>";
 		};
+		8432B6B215D92D4700C5FB5D /* MJDTestCryoVac */ = {
+			isa = PBXGroup;
+			children = (
+				8432B6B315D92D4700C5FB5D /* MJDString.tif */,
+				8432B6B415D92D4700C5FB5D /* MJDPumpCart.nib */,
+				8432B6B515D92D4700C5FB5D /* MJDPumpCart.tif */,
+				8432B6B615D92D4700C5FB5D /* ORMJDPumpCartController.h */,
+				8432B6B715D92D4700C5FB5D /* ORMJDPumpCartController.m */,
+				8432B6B815D92D4700C5FB5D /* ORMJDPumpCartModel.h */,
+				8432B6B915D92D4700C5FB5D /* ORMJDPumpCartModel.m */,
+				8432B93015D9645700C5FB5D /* ORMJDPumpCartView.h */,
+				8432B93115D9645700C5FB5D /* ORMJDPumpCartView.m */,
+				8432B98615D9697900C5FB5D /* ORMJDTestCryostats */,
+			);
+			name = MJDTestCryoVac;
+			path = Source/Experiments/MJDTestCryoVac;
+			sourceTree = SOURCE_ROOT;
+		};
+		8432B98615D9697900C5FB5D /* ORMJDTestCryostats */ = {
+			isa = PBXGroup;
+			children = (
+				8432B98715D9697900C5FB5D /* ORMJDTestCryostat.h */,
+				8432B98815D9697900C5FB5D /* ORMJDTestCryostat.m */,
+				8432BC2815D9994E00C5FB5D /* ORMJDTestCryoView.h */,
+				8432BC2915D9994E00C5FB5D /* ORMJDTestCryoView.m */,
+			);
+			name = ORMJDTestCryostats;
+			path = Source/Experiments/MJDTestCryoVac/ORMJDTestCryostats;
+			sourceTree = SOURCE_ROOT;
+		};
 		8435624008FDB287002864C7 /* ContainerIO */ = {
 			isa = PBXGroup;
 			children = (
@@ -9043,7 +9115,7 @@
 		848E3BC509DB0B3E0003F7A2 /* MailCenter */ = {
 			isa = PBXGroup;
 			children = (
-				9C9861570ED10DC900E18ED7 /* MailScript.txt */,
+				8458E8EC15DA89B5005C43A9 /* Mail.app */,
 				84E743420DAD5EEF0099CAEE /* ORMailer.h */,
 				84E743430DAD5EEF0099CAEE /* ORMailer.m */,
 				848E3BC609DB0B3E0003F7A2 /* ORMailCenter.h */,
@@ -10558,6 +10630,7 @@
 			children = (
 				849B26D60B2F48490007484F /* BaseClasses */,
 				842544DF12F1FF9E00472314 /* BamDectector */,
+				8432B6B215D92D4700C5FB5D /* MJDTestCryoVac */,
 				8499C96A15221F9800CD7AAC /* MJDVacuum */,
 				84E966C611848BEF008D9119 /* Majorana */,
 				843175C31152766E005643AB /* Halo */,
@@ -13481,6 +13554,11 @@
 				2D51C61015B5A115000F0ACD /* OREdelweissFLTDefs.h in Headers */,
 				2D51C61115B5A115000F0ACD /* OREdelweissFLTModel.h in Headers */,
 				848604C615C2CAFC00E3A209 /* ORSerialPortWithQueueModel.h in Headers */,
+				8432B6C115D92D4700C5FB5D /* ORMJDPumpCartController.h in Headers */,
+				8432B6C315D92D4700C5FB5D /* ORMJDPumpCartModel.h in Headers */,
+				8432B93215D9645700C5FB5D /* ORMJDPumpCartView.h in Headers */,
+				8432B98915D9697900C5FB5D /* ORMJDTestCryostat.h in Headers */,
+				8432BC2A15D9994E00C5FB5D /* ORMJDTestCryoView.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13508,6 +13586,7 @@
 				2D12EE33150FE5D800EBD8A2 /* CopyFiles */,
 			);
 			buildRules = (
+				8458E8EA15DA897F005C43A9 /* PBXBuildRule */,
 				9C2595AC0D5171B90039C5DF /* PBXBuildRule */,
 				9C2595AD0D5171B90039C5DF /* PBXBuildRule */,
 			);
@@ -13987,7 +14066,6 @@
 				8491F6720EC0D3C40084BAD6 /* pmtShadow.gif in Resources */,
 				8491F6730EC0D3C40084BAD6 /* pmtColorMask.gif in Resources */,
 				8491F6740EC0D3C40084BAD6 /* pmt.gif in Resources */,
-				9C9861580ED10DC900E18ED7 /* MailScript.txt in Resources */,
 				84FAD2B50EE46AF500746B91 /* RunScript.gif in Resources */,
 				84C37D2B0EF834DD00E77E09 /* SNO.gif in Resources */,
 				84C37D2C0EF834DD00E77E09 /* SNO.nib in Resources */,
@@ -14341,6 +14419,10 @@
 				2D51C60B15B5A115000F0ACD /* EdelweissFLTCard.gif in Resources */,
 				84880EEE15B8950D0073CDFC /* MJDStrings.tif in Resources */,
 				8432B5E915D56C7C00C5FB5D /* CouchHistoryValuesMap.txt in Resources */,
+				8432B6BE15D92D4700C5FB5D /* MJDString.tif in Resources */,
+				8432B6BF15D92D4700C5FB5D /* MJDPumpCart.nib in Resources */,
+				8432B6C015D92D4700C5FB5D /* MJDPumpCart.tif in Resources */,
+				8458E8ED15DA89B5005C43A9 /* Mail.app in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14381,6 +14463,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8458E8EE15DA89EF005C43A9 /* Mail.app in Sources */,
 				8434A2A7055B3287002D3102 /* main.m in Sources */,
 				8434A2A8055B3287002D3102 /* ORAppDelegate.m in Sources */,
 				8434A2A9055B3287002D3102 /* ORAboutBox.m in Sources */,
@@ -15306,6 +15389,11 @@
 				2D51C60F15B5A115000F0ACD /* OREdelweissFLTDecoder.m in Sources */,
 				2D51C61215B5A115000F0ACD /* OREdelweissFLTModel.m in Sources */,
 				848604C715C2CAFC00E3A209 /* ORSerialPortWithQueueModel.m in Sources */,
+				8432B6C215D92D4700C5FB5D /* ORMJDPumpCartController.m in Sources */,
+				8432B6C415D92D4700C5FB5D /* ORMJDPumpCartModel.m in Sources */,
+				8432B93315D9645700C5FB5D /* ORMJDPumpCartView.m in Sources */,
+				8432B98A15D9697900C5FB5D /* ORMJDTestCryostat.m in Sources */,
+				8432BC2B15D9994E00C5FB5D /* ORMJDTestCryoView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -26,7 +26,6 @@
 	NSString *from;
 	NSModalSession session;
 	id delegate;
-	NSTask* mailTask;
 	NSString* tempFilePath;
 	NSMutableString* allOutput;
 }
@@ -51,7 +50,6 @@
 - (void)setFrom:(NSString *)value;
 
 - (void) send:(id)aDelegate;
-- (void) mailDone:(NSNotification*)aNote;
 
 @end
 
