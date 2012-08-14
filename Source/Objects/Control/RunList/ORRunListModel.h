@@ -27,6 +27,7 @@
 enum eRunListStates {
 	kStartup,
     kWaitForRunToStop,
+    kWaitForSubRun,
     kReadyToStart,
 	kStartRun,
 	kStartSubRun,

@@ -27,7 +27,7 @@
 #import "ORScriptIDEModel.h"
 #import "ORScriptRunner.h"
 
-#define kTimeDelta 1
+#define kTimeDelta .1
 
 #pragma mark •••Local Strings
 NSString* ORRunListModelTimesToRepeatChanged	= @"ORRunListModelTimesToRepeatChanged";
@@ -317,6 +317,7 @@ static NSString* ORRunListDataOut	= @"ORRunListDataOut";
 	switch(runListState){
 		case kStartup:			return @"Startup";
 		case kWaitForRunToStop:	return @"Run Wait";
+		case kWaitForSubRun:	return @"Subrun Wait";
 		case kReadyToStart:     return @"Ready";
 		case kStartRun:			return @"StartRun";
 		case kStartSubRun:		return @"StartSubRun";
@@ -401,8 +402,14 @@ static NSString* ORRunListDataOut	= @"ORRunListDataOut";
             
         case kWaitForRunToStop:
 			[self setWorkingItemState];
-            if(![runModel isRunning])runListState = kReadyToStart;
+            if(![runModel isRunning])runListState = nextState;
         break;
+			
+		case kWaitForSubRun:
+			[self setWorkingItemState];
+			if([runModel runningState] == eRunBetweenSubRuns) runListState = nextState;
+		break;
+			
             
         case kReadyToStart:
 			if(!scriptModel) runListState = kStartRun;
@@ -458,13 +465,15 @@ static NSString* ORRunListDataOut	= @"ORRunListDataOut";
 				doSubRun = [[[self objectAtWorkingIndex] objectForKey:@"SubRun"] intValue];
 				if(doSubRun){
 					[runModel prepareForNewSubRun];
-					if(!scriptModel) runListState = kStartSubRun;
-					else			 runListState = kStartScript;
+					runListState = kWaitForSubRun;
+					if(!scriptModel) nextState = kStartSubRun;
+					else			 nextState = kStartScript;
 				}
 				else {
 					[runModel stopRun];
-					if(!scriptModel) runListState = kStartRun;
-					else runListState = kStartScript;
+					runListState = kWaitForRunToStop;
+					if(!scriptModel) nextState = kStartRun;
+					else nextState = kStartScript;
 				}
 			}
 		break;
