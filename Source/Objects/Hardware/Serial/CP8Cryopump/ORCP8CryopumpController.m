@@ -58,12 +58,14 @@
 	[plotter0 addPlot: aPlot];
     [aPlot setName:@"First Stage"];
 	[aPlot setLineColor:[NSColor redColor]];
-
+    [aPlot release];
+    
 	aPlot= [[ORTimeLinePlot alloc] initWithTag:1 andDataSource:self];
 	[plotter0 addPlot: aPlot];
     [aPlot setName:@"Second Stage"];
 	[aPlot setLineColor:[NSColor blueColor]];
-    
+    [aPlot release];
+   
 	[plotter0 setShowLegend:YES];
 
     
