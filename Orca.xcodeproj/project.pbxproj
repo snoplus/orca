@@ -1291,6 +1291,13 @@
 		8458E8ED15DA89B5005C43A9 /* Mail.app in Resources */ = {isa = PBXBuildFile; fileRef = 8458E8EC15DA89B5005C43A9 /* Mail.app */; };
 		8458E8EE15DA89EF005C43A9 /* Mail.app in Sources */ = {isa = PBXBuildFile; fileRef = 8458E8EC15DA89B5005C43A9 /* Mail.app */; };
 		8458E91515DA8A2A005C43A9 /* ScriptingBridge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8458E91415DA8A2A005C43A9 /* ScriptingBridge.framework */; };
+		8458EA3A15DBCFF6005C43A9 /* MPodCrate.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8458EA3315DBCFF6005C43A9 /* MPodCrate.nib */; };
+		8458EA3B15DBCFF6005C43A9 /* MPodCrate.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8458EA3415DBCFF6005C43A9 /* MPodCrate.tif */; };
+		8458EA3C15DBCFF6005C43A9 /* MPodCrateSmall.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8458EA3515DBCFF6005C43A9 /* MPodCrateSmall.tif */; };
+		8458EA3D15DBCFF6005C43A9 /* ORMPodCrateController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8458EA3615DBCFF6005C43A9 /* ORMPodCrateController.h */; };
+		8458EA3E15DBCFF6005C43A9 /* ORMPodCrateController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8458EA3715DBCFF6005C43A9 /* ORMPodCrateController.m */; };
+		8458EA3F15DBCFF6005C43A9 /* ORMPodCrateModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8458EA3815DBCFF6005C43A9 /* ORMPodCrateModel.h */; };
+		8458EA4015DBCFF6005C43A9 /* ORMPodCrateModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8458EA3915DBCFF6005C43A9 /* ORMPodCrateModel.m */; };
 		8459A8D4137C1FEC0029C5B6 /* ORComparatorController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8459A8D0137C1FEC0029C5B6 /* ORComparatorController.h */; };
 		8459A8D5137C1FEC0029C5B6 /* ORComparatorController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8459A8D1137C1FEC0029C5B6 /* ORComparatorController.m */; };
 		8459A8D6137C1FEC0029C5B6 /* ORComparatorModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8459A8D2137C1FEC0029C5B6 /* ORComparatorModel.h */; };
@@ -4148,6 +4155,13 @@
 		8457D37612F9AB8A00D3E3B4 /* ORiSeg8ChanHVDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORiSeg8ChanHVDecoders.m; path = "Source/Objects/Hardware/HV/MPod/MPod Base Classes/ORiSeg8ChanHVDecoders.m"; sourceTree = SOURCE_ROOT; };
 		8458E8EC15DA89B5005C43A9 /* Mail.app */ = {isa = PBXFileReference; lastKnownFileType = wrapper.application; name = Mail.app; path = ../../../../Applications/Mail.app; sourceTree = SOURCE_ROOT; };
 		8458E91415DA8A2A005C43A9 /* ScriptingBridge.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ScriptingBridge.framework; path = ../../../../System/Library/Frameworks/ScriptingBridge.framework; sourceTree = SOURCE_ROOT; };
+		8458EA3315DBCFF6005C43A9 /* MPodCrate.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = MPodCrate.nib; path = Source/Objects/Hardware/HV/MPod/MPodCrate/MPodCrate.nib; sourceTree = SOURCE_ROOT; };
+		8458EA3415DBCFF6005C43A9 /* MPodCrate.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = MPodCrate.tif; path = Source/Objects/Hardware/HV/MPod/MPodCrate/MPodCrate.tif; sourceTree = SOURCE_ROOT; };
+		8458EA3515DBCFF6005C43A9 /* MPodCrateSmall.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = MPodCrateSmall.tif; path = Source/Objects/Hardware/HV/MPod/MPodCrate/MPodCrateSmall.tif; sourceTree = SOURCE_ROOT; };
+		8458EA3615DBCFF6005C43A9 /* ORMPodCrateController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMPodCrateController.h; path = Source/Objects/Hardware/HV/MPod/MPodCrate/ORMPodCrateController.h; sourceTree = SOURCE_ROOT; };
+		8458EA3715DBCFF6005C43A9 /* ORMPodCrateController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMPodCrateController.m; path = Source/Objects/Hardware/HV/MPod/MPodCrate/ORMPodCrateController.m; sourceTree = SOURCE_ROOT; };
+		8458EA3815DBCFF6005C43A9 /* ORMPodCrateModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMPodCrateModel.h; path = Source/Objects/Hardware/HV/MPod/MPodCrate/ORMPodCrateModel.h; sourceTree = SOURCE_ROOT; };
+		8458EA3915DBCFF6005C43A9 /* ORMPodCrateModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMPodCrateModel.m; path = Source/Objects/Hardware/HV/MPod/MPodCrate/ORMPodCrateModel.m; sourceTree = SOURCE_ROOT; };
 		8459A8D0137C1FEC0029C5B6 /* ORComparatorController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORComparatorController.h; path = Source/Objects/ProcessLogic/ProcessElements/Logic/Comparator/ORComparatorController.h; sourceTree = SOURCE_ROOT; };
 		8459A8D1137C1FEC0029C5B6 /* ORComparatorController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORComparatorController.m; path = Source/Objects/ProcessLogic/ProcessElements/Logic/Comparator/ORComparatorController.m; sourceTree = SOURCE_ROOT; };
 		8459A8D2137C1FEC0029C5B6 /* ORComparatorModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORComparatorModel.h; path = Source/Objects/ProcessLogic/ProcessElements/Logic/Comparator/ORComparatorModel.h; sourceTree = SOURCE_ROOT; };
@@ -8362,6 +8376,21 @@
 			path = Source/Objects/Hardware/HV/MPod/EHS8260p;
 			sourceTree = SOURCE_ROOT;
 		};
+		8458EA3215DBCFF6005C43A9 /* MPodCrate */ = {
+			isa = PBXGroup;
+			children = (
+				8458EA3315DBCFF6005C43A9 /* MPodCrate.nib */,
+				8458EA3415DBCFF6005C43A9 /* MPodCrate.tif */,
+				8458EA3515DBCFF6005C43A9 /* MPodCrateSmall.tif */,
+				8458EA3615DBCFF6005C43A9 /* ORMPodCrateController.h */,
+				8458EA3715DBCFF6005C43A9 /* ORMPodCrateController.m */,
+				8458EA3815DBCFF6005C43A9 /* ORMPodCrateModel.h */,
+				8458EA3915DBCFF6005C43A9 /* ORMPodCrateModel.m */,
+			);
+			name = MPodCrate;
+			path = Source/Objects/Hardware/HV/MPod/MPodCrate;
+			sourceTree = SOURCE_ROOT;
+		};
 		8459A8CF137C1FEC0029C5B6 /* Comparator */ = {
 			isa = PBXGroup;
 			children = (
@@ -8561,6 +8590,7 @@
 				8472AA4B12DB44B300DEEB02 /* EHQ8060n */,
 				8457D11512F8816900D3E3B4 /* EHS8260p */,
 				8472AA5C12DB44B400DEEB02 /* MPod Controller */,
+				8458EA3215DBCFF6005C43A9 /* MPodCrate */,
 				8472AA6312DB44B400DEEB02 /* MPod MiniCrate */,
 			);
 			name = MPod;
@@ -13559,6 +13589,8 @@
 				8432B93215D9645700C5FB5D /* ORMJDPumpCartView.h in Headers */,
 				8432B98915D9697900C5FB5D /* ORMJDTestCryostat.h in Headers */,
 				8432BC2A15D9994E00C5FB5D /* ORMJDTestCryoView.h in Headers */,
+				8458EA3D15DBCFF6005C43A9 /* ORMPodCrateController.h in Headers */,
+				8458EA3F15DBCFF6005C43A9 /* ORMPodCrateModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14423,6 +14455,9 @@
 				8432B6BF15D92D4700C5FB5D /* MJDPumpCart.nib in Resources */,
 				8432B6C015D92D4700C5FB5D /* MJDPumpCart.tif in Resources */,
 				8458E8ED15DA89B5005C43A9 /* Mail.app in Resources */,
+				8458EA3A15DBCFF6005C43A9 /* MPodCrate.nib in Resources */,
+				8458EA3B15DBCFF6005C43A9 /* MPodCrate.tif in Resources */,
+				8458EA3C15DBCFF6005C43A9 /* MPodCrateSmall.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -15394,6 +15429,8 @@
 				8432B93315D9645700C5FB5D /* ORMJDPumpCartView.m in Sources */,
 				8432B98A15D9697900C5FB5D /* ORMJDTestCryostat.m in Sources */,
 				8432BC2B15D9994E00C5FB5D /* ORMJDTestCryoView.m in Sources */,
+				8458EA3E15DBCFF6005C43A9 /* ORMPodCrateController.m in Sources */,
+				8458EA4015DBCFF6005C43A9 /* ORMPodCrateModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
