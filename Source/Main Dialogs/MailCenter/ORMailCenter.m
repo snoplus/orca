@@ -89,8 +89,45 @@
 		[[self window] endEditingFor:nil];		
 	}
 	
-	NSData* theRTFDData = [bodyField RTFDFromRange:NSMakeRange(0,[[bodyField string] length])];;
+	NSString* address = [[mailForm cellWithTag:0] stringValue];
+	NSString* subject = [[mailForm cellWithTag:2] stringValue];
+	if([address length]!=0 && [address rangeOfString:@"@"].location != NSNotFound){
+		if([subject length]!=0){
+			[self sendit];
+		}
+		else {
+			NSBeginAlertSheet(@"ORCA Mail",
+							  @"Cancel",
+							  @"Send Anyway",
+							  nil,
+							  [self window],
+							  self,
+							  @selector(noSubjectSheetDidEnd:returnCode:contextInfo:),
+							  nil,
+							  nil,@"No Subject...");	
+		}
+	}
+	else {
+		NSBeginAlertSheet(@"ORCA Mail",
+						  @"OK",
+						  nil,
+						  nil,
+						  [self window],
+						  self,
+						  @selector(noAddressSheetDidEnd:returnCode:contextInfo:),
+						  nil,
+						  nil,@"No Destination Address Given");
+	}
+	
+	
+} 
+	
+- (void) sendit
+{
+	[[self window] performClose:self];
 
+	NSData* theRTFDData = [bodyField RTFDFromRange:NSMakeRange(0,[[bodyField string] length])];;
+	
 	NSDictionary* attrib;
 	NSMutableAttributedString* theContent = [[NSMutableAttributedString alloc] initWithRTFD:theRTFDData documentAttributes:&attrib];
 	
@@ -99,15 +136,21 @@
 	[mailer setCc:[[mailForm cellWithTag:1] stringValue]];
 	[mailer setSubject:[[mailForm cellWithTag:2] stringValue]];
 	[mailer setBody:theContent];
-	[theContent release];
-	
 	[mailer send:self];
+	[theContent release];
+}
+
+
+- (void) noAddressSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
 	
 }
 
-- (void) mailSent:(NSString*)to
+- (void) noSubjectSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
-	[[self window] performClose:self];
+	if(returnCode == NSAlertAlternateReturn){
+		[self sendit];
+	}
 }
 
 @end

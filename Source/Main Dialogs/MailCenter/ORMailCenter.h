@@ -35,6 +35,7 @@
 - (id)init;
 - (NSUndoManager *)windowWillReturnUndoManager:(NSWindow*)window;
 - (void) windowWillClose:(NSNotification*)aNote;
+- (void) sendit;
 
 #pragma mark ¥¥¥Accessors
 - (void) setFileToAttach:(NSString*)aFileToAttach;
@@ -42,6 +43,8 @@
 
 #pragma mark ¥¥¥Actions
 - (IBAction) send:(id)sender;
-- (void) mailSent:(NSString*)to;
+- (void) noAddressSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) noSubjectSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 
 @end
+
