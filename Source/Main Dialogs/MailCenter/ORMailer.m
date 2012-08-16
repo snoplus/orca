@@ -79,7 +79,7 @@
 	
 	/* set the sender, don't show the message */
 	emailMessage.sender = @"ORCA";
-	emailMessage.visible = NO;
+	emailMessage.visible = YES;
 	
 	if ( [mail lastError] != nil ){
 		NSLog( @"Possible problems with sending e-mail to %@\n",to);
