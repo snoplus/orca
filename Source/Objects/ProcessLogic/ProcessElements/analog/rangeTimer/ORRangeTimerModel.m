@@ -432,16 +432,14 @@ NSString* ORRangeTimerModelOKConnection     = @"ORRangeTimerModelOKConnection";
 		content = [content stringByAppendingString:theMessage];
 	}
 	
-	@synchronized([NSApp delegate]){
-
-		NSAttributedString* theContent = [[NSAttributedString alloc] initWithString:content];
-		ORMailer* mailer = [ORMailer mailer];
-		[mailer setTo:address];
-		[mailer setSubject:@"Orca Message"];
-		[mailer setBody:theContent];
-		[mailer send:self];
-		[theContent autorelease];
-	}
+	NSAttributedString* theContent = [[NSAttributedString alloc] initWithString:content];
+	ORMailer* mailer = [ORMailer mailer];
+	[mailer setTo:address];
+	[mailer setSubject:@"Orca Message"];
+	[mailer setBody:theContent];
+	[mailer send:self];
+	[theContent autorelease];
+	
 
 	[pool release];
 		

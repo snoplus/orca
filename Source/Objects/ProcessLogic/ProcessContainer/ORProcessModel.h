@@ -109,12 +109,13 @@
 - (void) sendHeartbeatShutOffWarning;
 - (void) sendHeartbeat;
 - (void) mailSent:(NSString*)address;
-- (void) eMailThread:(id)userInfo;
+- (void) sendMail:(id)userInfo;
 - (void) setNextHeartbeatString;
 - (NSDate*) nextHeartbeat;
 - (void) sendStartStopNotice:(BOOL)state;
 - (void) incrementProcessRunNumber;
 - (int) processRunNumber;
+- (NSString*) cleanupAddresses:(NSArray*)aListOfAddresses;
 
 #pragma mark ¥¥¥Archival
 - (id)initWithCoder:(NSCoder*)decoder;

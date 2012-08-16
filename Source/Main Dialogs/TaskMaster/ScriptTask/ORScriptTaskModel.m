@@ -164,13 +164,15 @@ NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
 
 - (void) sendMailTo:(NSString*)receipients cc:(NSString*)cc subject:(NSString*)subject content:(NSString*)theContent
 {
-	ORMailer* mailer = [ORMailer mailer];
-	[mailer setTo:receipients];
-	[mailer setSubject:subject];
-	NSAttributedString* s = [[NSAttributedString alloc] initWithString:theContent];
-	[mailer setBody:s];
-	[mailer send:self];
-	[s release];
+	@synchronized([NSApp delegate]){
+		ORMailer* mailer = [ORMailer mailer];
+		[mailer setTo:receipients];
+		[mailer setSubject:subject];
+		NSAttributedString* s = [[NSAttributedString alloc] initWithString:theContent];
+		[mailer setBody:s];
+		[mailer send:self];
+		[s release];
+	}
 }
 
 - (void) mailSent:(NSString*)to

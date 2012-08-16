@@ -912,11 +912,9 @@ NSString* ORProcessModelRunNumberChanged			= @"ORProcessModelRunNumberChanged";
 	theContent = [theContent stringByAppendingString:@"The following people received this message:\n"];
 	for(id address in emailList) theContent = [theContent stringByAppendingFormat:@"%@\n",address];
 	theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];						
-	for(id address in emailList){
-		if(	!address || [address length] == 0 || [address isEqualToString:@"<eMail>"])continue;
-		NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:address,@"Address",theContent,@"Message",@"Shutdown",@"Shutdown",nil];
-		[NSThread detachNewThreadSelector:@selector(eMailThread:) toTarget:self withObject:userInfo];
-	}
+	NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:[self cleanupAddresses:emailList],@"Address",theContent,@"Message",@"Shutdown",@"Shutdown",nil];
+	[self sendMail:userInfo];
+	
 }
 
 - (void) sendHeartbeat
@@ -935,11 +933,9 @@ NSString* ORProcessModelRunNumberChanged			= @"ORProcessModelRunNumberChanged";
 	for(id address in emailList) theContent = [theContent stringByAppendingFormat:@"%@\n",address];
 	theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];						
 	
-	for(id address in emailList){
-		if(	!address || [address length] == 0 || [address isEqualToString:@"<eMail>"])continue;
-		NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:address,@"Address",theContent,@"Message",nil];
-		[NSThread detachNewThreadSelector:@selector(eMailThread:) toTarget:self withObject:userInfo];
-	}
+	NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:[self cleanupAddresses:emailList],@"Address",theContent,@"Message",nil];
+	[self sendMail:userInfo];
+	
 	
 	if([self heartbeatSeconds]){
 		[self performSelector:@selector(sendHeartbeat) withObject:nil afterDelay:[self heartbeatSeconds]];
@@ -972,11 +968,19 @@ NSString* ORProcessModelRunNumberChanged			= @"ORProcessModelRunNumberChanged";
 	for(id address in emailList) theContent = [theContent stringByAppendingFormat:@"%@\n",address];
 	theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];						
 	
-	for(id address in emailList){
-		if(	!address || [address length] == 0 || [address isEqualToString:@"<eMail>"])continue;
-		NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:address,@"Address",theContent,@"Message",nil];
-		[NSThread detachNewThreadSelector:@selector(eMailThread:) toTarget:self withObject:userInfo];
+	NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:[self cleanupAddresses:emailList],@"Address",theContent,@"Message",nil];
+	[self sendMail:userInfo];
+}
+
+- (NSString*) cleanupAddresses:(NSArray*)aListOfAddresses
+{
+	NSMutableArray* listCopy = [NSMutableArray array];
+	for(id anAddress in aListOfAddresses){
+		if([anAddress length] && [anAddress rangeOfString:@"@"].location!= NSNotFound){
+			[listCopy addObject:anAddress];
+		}
 	}
+	return [listCopy componentsJoinedByString:@","];
 }
 
 - (int) heartbeatSeconds
@@ -1020,9 +1024,8 @@ NSString* ORProcessModelRunNumberChanged			= @"ORProcessModelRunNumberChanged";
 	NSLog(@"Process Center status was sent to:\n%@\n",address);
 }
 
-- (void) eMailThread:(id)userInfo
+- (void) sendMail:(id)userInfo
 {
-	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	NSString* address =  [userInfo objectForKey:@"Address"];
 	NSString* content = [NSString string];
 	NSString* hostAddress = @"<Unable to get host address>";
@@ -1047,19 +1050,14 @@ NSString* ORProcessModelRunNumberChanged			= @"ORProcessModelRunNumberChanged";
 		//generated from a manual shutdown of the email system. 
 		//don't send out any other info.
 	}
-	@synchronized([NSApp delegate]){
-		
-		NSAttributedString* theContent = [[NSAttributedString alloc] initWithString:content];
-		ORMailer* mailer = [ORMailer mailer];
-		[mailer setTo:address];
-		[mailer setSubject:@"Orca Message"];
-		[mailer setBody:theContent];
-		[mailer send:self];
-		[theContent autorelease];
-	}
 	
-	[pool release];
-	
+	NSAttributedString* theContent = [[NSAttributedString alloc] initWithString:content];
+	ORMailer* mailer = [ORMailer mailer];
+	[mailer setTo:address];
+	[mailer setSubject:@"Orca Message"];
+	[mailer setBody:theContent];
+	[mailer send:self];
+	[theContent release];
 }
 
 @end

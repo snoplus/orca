@@ -56,9 +56,9 @@
 {
 	delegate = aDelegate;
 	[[ORMailQueue sharedMailQueue] addOperation:self];
-    ORMailerDelay* aDelay = [[ORMailerDelay alloc] init];
-	[[ORMailQueue sharedMailQueue] addOperation:aDelay];
-    [aDelay release];
+    //ORMailerDelay* aDelay = [[ORMailerDelay alloc] init];
+	//[[ORMailQueue sharedMailQueue] addOperation:aDelay];
+    //[aDelay release];
 }
 
 - (void) main
@@ -125,11 +125,11 @@
 - (void) main
 {
     if([self isCancelled])return;
-    //int i;
-    //for(i=0;i<5;i++){
-    //    if([self isCancelled])return;
-        sleep(1);
-   // }
+    int i;
+    for(i=0;i<50;i++){
+        if([self isCancelled])return;
+        usleep(100000);
+    }
 }
 @end
 											 
