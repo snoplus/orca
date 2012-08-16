@@ -66,6 +66,8 @@
 		ORAlarm*		sensorErrorAlarm;
 		ORAlarm*		lowBatteryAlarm;
 		ORAlarm*		flowErrorAlarm;
+		BOOL			sentStartOnce;
+		BOOL			sentStopOnce;
 }
 
 
