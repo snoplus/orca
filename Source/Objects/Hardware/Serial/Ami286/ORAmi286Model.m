@@ -1193,18 +1193,17 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 		eMailReasons = nil;
 	}
 	
-	@synchronized([NSApp delegate]){
-		if(content){
-			NSFont*       labelFont  = [NSFont fontWithName:@"Monaco" size:12];
-			NSDictionary* attributes = [NSDictionary dictionaryWithObjectsAndKeys: labelFont,NSFontAttributeName,nil];
-			NSAttributedString* theContent = [[NSAttributedString alloc] initWithString:content attributes:attributes];
-			ORMailer* mailer = [ORMailer mailer];
-			[mailer setTo:receipients];
-			[mailer setSubject:@"Orca Ami286 Status"];
-			[mailer setBody:theContent];
-			[mailer send:self];
-		}
+	if(content){
+		NSFont*       labelFont  = [NSFont fontWithName:@"Monaco" size:12];
+		NSDictionary* attributes = [NSDictionary dictionaryWithObjectsAndKeys: labelFont,NSFontAttributeName,nil];
+		NSAttributedString* theContent = [[NSAttributedString alloc] initWithString:content attributes:attributes];
+		ORMailer* mailer = [ORMailer mailer];
+		[mailer setTo:receipients];
+		[mailer setSubject:@"Orca Ami286 Status"];
+		[mailer setBody:theContent];
+		[mailer send:self];
 	}
+	
 	[eMailLock unlock];
 	
 	eMailThreadRunning = NO;
