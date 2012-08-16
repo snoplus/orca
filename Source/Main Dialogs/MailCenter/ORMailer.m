@@ -55,11 +55,15 @@
 - (void) send:(id)aDelegate
 {
 	delegate = aDelegate;
-	[[ORMailQueue sharedMailQueue] addOperation:self]; 
+	[[ORMailQueue sharedMailQueue] addOperation:self];
+    ORMailerDelay* aDelay = [[ORMailerDelay alloc] init];
+	[[ORMailQueue sharedMailQueue] addOperation:aDelay];
+    [aDelay release];
 }
 
 - (void) main
 {
+    if([self isCancelled])return;
 	/* create a Scripting Bridge object for talking to the Mail application */
 	MailApplication *mail = [SBApplication applicationWithBundleIdentifier:@"com.apple.Mail"];
 		
@@ -117,7 +121,17 @@
 }
 
 @end
-											 
+@implementation ORMailerDelay
+- (void) main
+{
+    if([self isCancelled])return;
+    //int i;
+    //for(i=0;i<5;i++){
+    //    if([self isCancelled])return;
+        sleep(1);
+   // }
+}
+@end
 											 
 
 //-----------------------------------------------------------

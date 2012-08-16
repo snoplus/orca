@@ -55,3 +55,7 @@
 - (NSOperationQueue*) queue;
 - (NSInteger) operationCount;
 @end
+
+@interface ORMailerDelay : NSOperation {
+}
+@end
