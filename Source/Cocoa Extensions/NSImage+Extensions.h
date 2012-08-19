@@ -19,4 +19,5 @@
 
 @interface NSImage (OrcaExtensions)
 - (NSImage *) rotateIndividualImage: (NSImage *)image angle:(float)anAngle;
+- (NSRect) imageRect;
 @end

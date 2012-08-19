@@ -215,7 +215,7 @@ NSString* ORConnectionChanged = @"OR Connection Changed";
 	
 	onImage_Highlighted = [[NSImage alloc] initWithSize:[onImage size]];
 	[onImage_Highlighted lockFocus];
-	[onImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
+	[onImage drawAtPoint:NSZeroPoint fromRect:[onImage imageRect] operation:NSCompositeCopy fraction:1.0];
 	[[NSColor colorWithCalibratedWhite:0.0 alpha:0.5] set];
 	NSRect sourceRect = NSMakeRect(0,0,[onImage size].width,[onImage size].height);
 	NSRectFillUsingOperation(sourceRect, NSCompositeSourceAtop);
@@ -236,7 +236,7 @@ NSString* ORConnectionChanged = @"OR Connection Changed";
 	
 	offImage_Highlighted = [[NSImage alloc] initWithSize:[offImage size]];
 	[offImage_Highlighted lockFocus];
-	[offImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
+	[offImage drawAtPoint:NSZeroPoint fromRect:[offImage imageRect] operation:NSCompositeCopy fraction:1.0];
 	[[NSColor colorWithCalibratedWhite:0.0 alpha:0.5] set];
 	NSRect sourceRect = NSMakeRect(0,0,[offImage size].width,[offImage size].height);
 	NSRectFillUsingOperation(sourceRect, NSCompositeSourceAtop);

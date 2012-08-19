@@ -102,11 +102,10 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
     
     NSImage* aCachedImage = [NSImage imageNamed:@"Histo"];
     NSSize theIconSize = [aCachedImage size];
-    NSPoint theOffset = NSZeroPoint;
     
     NSImage* i = [[NSImage alloc] initWithSize:theIconSize];
     [i lockFocus];
-    [aCachedImage compositeToPoint:theOffset operation:NSCompositeCopy];
+    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeCopy fraction:1.0];
     
     if([self uniqueIdNumber]){
         NSAttributedString* n = [[NSAttributedString alloc] 

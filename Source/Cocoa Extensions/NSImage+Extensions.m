@@ -56,4 +56,9 @@
     return [rotatedImage autorelease];
 }
 
+- (NSRect) imageRect
+{
+    return NSMakeRect(0,0,[self size].width,[self size].height);
+}
+
 @end
