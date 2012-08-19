@@ -127,7 +127,7 @@
 			NSImage* symbol;
 			if([self useConstantColor] || [plotView topPlot] == self) symbol = symbolNormal;
 			else													   symbol = symbolLight;
-			[symbol compositeToPoint:NSMakePoint(x-kSymbolSize/2,y-kSymbolSize/2) operation:NSCompositePlusDarker];
+			[symbol drawAtPoint:NSMakePoint(x-kSymbolSize/2,y-kSymbolSize/2) fromRect:[symbol imageRect] operation:NSCompositeSourceOver fraction:1.0];
 		}
 	}
 	

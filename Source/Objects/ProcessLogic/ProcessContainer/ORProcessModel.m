@@ -421,8 +421,7 @@ NSString* ORProcessModelRunNumberChanged			= @"ORProcessModelRunNumberChanged";
     NSImage* aCachedImage = [NSImage imageNamed:@"Process"];
     NSImage* i = [[NSImage alloc] initWithSize:[aCachedImage size]];
     [i lockFocus];
-    [aCachedImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
-    
+    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];    
 	
     if([self uniqueIdNumber]){
         NSString* stateString = @"Idle";
@@ -465,11 +464,12 @@ NSString* ORProcessModelRunNumberChanged			= @"ORProcessModelRunNumberChanged";
 
     if(processRunning && inTestMode){
         NSImage* aNoticeImage = [NSImage imageNamed:@"notice"];
-        [aNoticeImage compositeToPoint:NSMakePoint(0,0)operation:NSCompositeSourceOver];
+        [aNoticeImage drawAtPoint:NSMakePoint(0,0)fromRect:[aNoticeImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+        
     }
     if(processRunning){
         NSImage* aLockedImage = [NSImage imageNamed:@"smallLock"];
-        [aLockedImage compositeToPoint:NSMakePoint([self frame].size.width - [aLockedImage size].width,0)operation:NSCompositeSourceOver];
+        [aLockedImage drawAtPoint:NSMakePoint([self frame].size.width - [aLockedImage size].width,0) fromRect:[aLockedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
     }
 	
 	if([self heartBeatIndex] == 0){
@@ -477,7 +477,7 @@ NSString* ORProcessModelRunNumberChanged			= @"ORProcessModelRunNumberChanged";
 		float x;
 		if(processRunning && inTestMode) x = 22;
 		else x = 0;
-        [noHeartbeatImage compositeToPoint:NSMakePoint(x,0) operation:NSCompositeSourceOver];
+        [noHeartbeatImage drawAtPoint:NSMakePoint(x,0) fromRect:[noHeartbeatImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
 	}
 	
 

@@ -441,7 +441,7 @@ NSString* ORAdcModelHighConnection		= @"ORAdcModelHighConnection";
 	NSSize theIconSize = [anImage size];
     NSImage* finalImage = [[NSImage alloc] initWithSize:theIconSize];
     [finalImage lockFocus];
-    [anImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
+    [anImage drawAtPoint:NSZeroPoint fromRect:[anImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
 
 	NSAttributedString* idLabel   = [self idLabelWithSize:9 color:[NSColor blackColor]];
 	NSAttributedString* iconValue = [self iconValueWithSize:9 color:[NSColor blackColor]];
@@ -552,7 +552,7 @@ NSString* ORAdcModelHighConnection		= @"ORAdcModelHighConnection";
 	
     NSImage* finalImage = [[NSImage alloc] initWithSize:theIconSize];
     [finalImage lockFocus];
-    [anImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
+    [anImage drawAtPoint:NSZeroPoint fromRect:[anImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
 	
 	float slope = (195. + 15.)/(minValue-maxValue);
 	float intercept = 195. - slope*minValue;
@@ -647,7 +647,7 @@ NSString* ORAdcModelHighConnection		= @"ORAdcModelHighConnection";
 	
     NSImage* finalImage = [[NSImage alloc] initWithSize:theIconSize];
     [finalImage lockFocus];
-    [anImage compositeToPoint:NSMakePoint(iconStart,0) operation:NSCompositeCopy];
+    [anImage drawAtPoint:NSMakePoint(iconStart,0) fromRect:[anImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
 	if(!normalGradient){
 		float red   = 1.0; 
 		float green = 1.0; 
@@ -738,8 +738,7 @@ NSString* ORAdcModelHighConnection		= @"ORAdcModelHighConnection";
 	
     NSImage* finalImage = [[NSImage alloc] initWithSize:theIconSize];
     [finalImage lockFocus];
-    [anImage compositeToPoint:NSMakePoint(iconStart,0) operation:NSCompositeCopy];
-	
+    [anImage drawAtPoint:NSMakePoint(iconStart,0) fromRect:[anImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
 	if(iconValue){		
 		NSSize textSize = [iconValue size];
 		float x = iconStart + 10;
@@ -772,7 +771,7 @@ NSString* ORAdcModelHighConnection		= @"ORAdcModelHighConnection";
 	
     NSImage* finalImage = [[NSImage alloc] initWithSize:theIconSize];
     [finalImage lockFocus];
-    [anImage compositeToPoint:NSMakePoint(iconStart,0) operation:NSCompositeCopy];
+    [anImage drawAtPoint:NSMakePoint(iconStart,0) fromRect:[anImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
 	if(!normalGradient){
 		float red   = 0.0; 
 		float green = 1.0; 

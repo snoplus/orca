@@ -289,8 +289,7 @@ NSString* UVkWrite = @"W";
 	
     [i lockFocus];
 	
-	[aCachedImage compositeToPoint: NSZeroPoint operation: NSCompositeCopy];
-	
+    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];	
 	if (mHVValueLmtsAlarm) {
 		
 		if(!mHVValueLmtsAlarm){

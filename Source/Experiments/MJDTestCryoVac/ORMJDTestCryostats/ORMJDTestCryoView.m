@@ -30,7 +30,7 @@
 	
 	NSImage* stringsImage = [NSImage imageNamed:@"MJDString"];
 	NSPoint aPoint = NSMakePoint(85,105);
-	[stringsImage compositeToPoint:aPoint operation:NSCompositeSourceOver];
+	[stringsImage drawAtPoint:aPoint fromRect:[stringsImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
 }
 
 @end

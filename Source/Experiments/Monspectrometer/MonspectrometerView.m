@@ -82,7 +82,7 @@
 
 - (void)drawRect:(NSRect)rect
 {
-	[theBackground compositeToPoint:NSZeroPoint operation:NSCompositeSourceOver];
+	[theBackground drawAtPoint:NSZeroPoint fromRect:[theBackground imageRect] operation:NSCompositeSourceOver fraction:1.0];
 
 	[super drawRect:rect];
 }

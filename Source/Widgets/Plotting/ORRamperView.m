@@ -148,9 +148,10 @@
 	[[NSColor colorWithCalibratedRed:.8 green:.3 blue:.3 alpha:1] set];
 	[NSBezierPath strokeLineFromPoint:NSMakePoint(0,targetLineY+.2) toPoint:NSMakePoint([self bounds].size.width-bugPadWidth,targetLineY+.2)];
 	if(![model isRunning]){
-		[rightTargetBug compositeToPoint:NSMakePoint([self bounds].size.width - [rightTargetBug size].width,
+		[rightTargetBug drawAtPoint:NSMakePoint([self bounds].size.width - [rightTargetBug size].width,
 												 targetLineY-[rightTargetBug size].height/2.) 
-						   operation:NSCompositeSourceOver];
+						   fromRect:[rightTargetBug imageRect] operation:NSCompositeSourceOver fraction:1.0];
+
 	}
 	
 	if(mouseIsDown && !selectedWayPoint){

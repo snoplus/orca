@@ -37,8 +37,8 @@
     NSImage* aCachedImage = [NSImage imageNamed:@"MPodCrateSmall"];
     NSImage* i = [[NSImage alloc] initWithSize:[aCachedImage size]];
     [i lockFocus];
-    [aCachedImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
-    if(powerOff){
+    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+     if(powerOff){
         NSAttributedString* s = [[[NSAttributedString alloc] initWithString:@"No Pwr"
                                                                  attributes:[NSDictionary dictionaryWithObjectsAndKeys:
                                                                      [NSColor redColor],NSForegroundColorAttributeName,

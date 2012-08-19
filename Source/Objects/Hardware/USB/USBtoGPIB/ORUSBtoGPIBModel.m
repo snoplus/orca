@@ -114,12 +114,11 @@ NSString* ORUSBtoGPIBUSBOutConnection			= @"ORUSBtoGPIBUSBOutConnection";
 	NSImage* aCachedImage = [NSImage imageNamed:@"USBtoGPIB"];
     if(!usbInterface){
 		NSSize theIconSize = [aCachedImage size];
-		NSPoint theOffset = NSZeroPoint;
 		
 		NSImage* i = [[NSImage alloc] initWithSize:theIconSize];
 		[i lockFocus];
 		
-		[aCachedImage compositeToPoint:theOffset operation:NSCompositeCopy];
+        [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
 		
 		if(!usbInterface){
 			NSBezierPath* path = [NSBezierPath bezierPath];

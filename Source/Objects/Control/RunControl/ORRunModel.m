@@ -187,14 +187,13 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     NSImage* i = [[NSImage alloc] initWithSize:theIconSize];
     [i lockFocus];
     if(remoteControl){
-        [netConnectIcon compositeToPoint:NSZeroPoint operation:NSCompositeSourceOver];
+        [netConnectIcon drawAtPoint:NSZeroPoint fromRect:[netConnectIcon imageRect] operation:NSCompositeSourceOver fraction:1.0];
         theOffset.x += 10;
     }
-    [aCachedImage compositeToPoint:theOffset operation:NSCompositeCopy];
-    
+    [aCachedImage drawAtPoint:theOffset fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
     if([[ORGlobal sharedGlobal] runMode] == kOfflineRun && !_ignoreMode){
         NSImage* aNoticeImage = [NSImage imageNamed:@"notice"];
-        [aNoticeImage compositeToPoint:NSMakePoint(theOffset.x/2.+[i size].width/2-[aNoticeImage size].width/2 ,[i size].height/2-[aNoticeImage size].height/2)operation:NSCompositeSourceOver];
+        [aNoticeImage drawAtPoint:NSMakePoint(theOffset.x/2.+[i size].width/2-[aNoticeImage size].width/2 ,[i size].height/2-[aNoticeImage size].height/2) fromRect:[aNoticeImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
     }
 	
 	

@@ -190,11 +190,10 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
     NSImage* i = [[NSImage alloc] initWithSize:theIconSize];
     [i lockFocus];
     if(connectionProtocol == kHPPulserUseIP){
-        [netConnectIcon compositeToPoint:NSZeroPoint operation:NSCompositeSourceOver];
+        [netConnectIcon drawAtPoint:NSZeroPoint fromRect:[netConnectIcon imageRect] operation:NSCompositeSourceOver fraction:1.0];
         theOffset.x += 10;
     }
-    [aCachedImage compositeToPoint:theOffset operation:NSCompositeCopy];
-	
+    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];	
     if(connectionProtocol == kHPPulserUseUSB && (!usbInterface || ![self getUSBController])){
         NSBezierPath* path = [NSBezierPath bezierPath];
         [path moveToPoint:NSMakePoint(20,10)];

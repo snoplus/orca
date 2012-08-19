@@ -39,7 +39,7 @@ NSString* ORContainerBackgroundImageChangedNotification = @"ORContainerBackgroun
     NSImage* aCachedImage = [NSImage imageNamed:@"Container"];
     NSImage* i = [[NSImage alloc] initWithSize:[aCachedImage size]];
     [i lockFocus];
-    [aCachedImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
+    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
 	NSImage* anImage = [[NSImage alloc] initWithContentsOfFile:[backgroundImagePath stringByExpandingTildeInPath]];
 
 	float xScale = .8*[aCachedImage size].width/[anImage size].width;
@@ -49,7 +49,7 @@ NSString* ORContainerBackgroundImageChangedNotification = @"ORContainerBackgroun
 	float newHeight = [anImage size].height*scale;
 	[anImage setScalesWhenResized:YES];
 	[anImage setSize:NSMakeSize(newWidth,newHeight)];
-	[anImage compositeToPoint:NSMakePoint([aCachedImage size].width/2. - [anImage size].width/2., [aCachedImage size].height/2. - [anImage size].height/2.) operation:NSCompositeSourceAtop];
+	[anImage drawAtPoint:NSMakePoint([aCachedImage size].width/2. - [anImage size].width/2., [aCachedImage size].height/2. - [anImage size].height/2.) fromRect:[anImage imageRect] operation:NSCompositeSourceAtop fraction:1.0];
 	[anImage release];
 	
     
@@ -62,7 +62,7 @@ NSString* ORContainerBackgroundImageChangedNotification = @"ORContainerBackgroun
 		float newHeight = [imageOfObjects size].height*scale;
 		
 		[imageOfObjects setSize:NSMakeSize(newWidth,newHeight)];
-		[imageOfObjects compositeToPoint:NSMakePoint([aCachedImage size].width/2-newWidth/2, [aCachedImage size].height/2-newHeight/2) operation:NSCompositeSourceAtop];
+		[imageOfObjects drawAtPoint:NSMakePoint([aCachedImage size].width/2-newWidth/2, [aCachedImage size].height/2-newHeight/2) fromRect:[imageOfObjects imageRect]  operation:NSCompositeSourceAtop fraction:1.0];
 	}
 	
 	if([self uniqueIdNumber]){

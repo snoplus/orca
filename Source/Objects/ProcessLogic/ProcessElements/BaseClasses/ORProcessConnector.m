@@ -46,7 +46,8 @@
 
 	stateOnImage_Highlighted = [[NSImage alloc] initWithSize:[stateOnImage size]];
 	[stateOnImage_Highlighted lockFocus];
-	[stateOnImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
+    [stateOnImage drawAtPoint:NSZeroPoint fromRect:[stateOnImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+    
 	[[NSColor colorWithCalibratedWhite:0.0 alpha:0.5] set];
 	NSRect sourceRect = NSMakeRect(0,0,[stateOnImage size].width,[stateOnImage size].height);
 	NSRectFillUsingOperation(sourceRect, NSCompositeSourceAtop);
@@ -66,7 +67,7 @@
 
 	stateOffImage_Highlighted = [[NSImage alloc] initWithSize:[stateOffImage size]];
 	[stateOffImage_Highlighted lockFocus];
-	[stateOffImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
+    [stateOffImage drawAtPoint:NSZeroPoint fromRect:[stateOffImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
 	[[NSColor colorWithCalibratedWhite:0.0 alpha:0.5] set];
 	NSRect sourceRect = NSMakeRect(0,0,[stateOffImage size].width,[stateOffImage size].height);
 	NSRectFillUsingOperation(sourceRect, NSCompositeSourceAtop);

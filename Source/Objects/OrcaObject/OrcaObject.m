@@ -91,7 +91,7 @@ NSString* ORMiscAttributeKey		= @"ORMiscAttributeKey";
 		[highlightedImage release];
 		highlightedImage = [[NSImage alloc] initWithSize:[image size]];
 		[highlightedImage lockFocus];
-		[image dissolveToPoint:NSZeroPoint fraction:1];
+		[image drawAtPoint:NSZeroPoint fromRect:[image imageRect] operation:NSCompositeSourceOver fraction:1.0];
 		[[NSColor colorWithCalibratedWhite:0.0 alpha:0.5] set];
 		NSRectFillUsingOperation(sourceRect, NSCompositeSourceAtop);
 		[highlightedImage unlockFocus];

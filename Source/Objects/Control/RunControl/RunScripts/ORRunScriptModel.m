@@ -62,7 +62,7 @@
 	
     NSImage* i = [[NSImage alloc] initWithSize:[aCachedImage size]];
     [i lockFocus];
-    [aCachedImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
+    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
 	NSSize imageSize = [aCachedImage size];
 	NSDictionary* attributes = [NSDictionary dictionaryWithObjectsAndKeys:
 								[NSFont labelFontOfSize:12], NSFontAttributeName,
@@ -75,7 +75,7 @@
 		[runningImage setSize:NSMakeSize(40,40)];
 		NSSize imageSize = [runningImage size];
 		NSSize ourSize = [self frame].size;
-        [runningImage compositeToPoint:NSMakePoint(ourSize.width - imageSize.width,-16) operation:NSCompositeSourceOver];
+        [runningImage drawAtPoint:NSMakePoint(ourSize.width - imageSize.width,-16) fromRect:[runningImage imageRect] operation:NSCompositeSourceOver fraction:1.0];        
     }
 	
 	[i unlockFocus];

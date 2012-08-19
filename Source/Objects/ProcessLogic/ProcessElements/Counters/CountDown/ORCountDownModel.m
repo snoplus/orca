@@ -72,7 +72,7 @@ NSString* ORCountDownLock							= @"ORCountDownLock";
     NSSize theIconSize = [aCachedImage size];
     NSImage* i = [[NSImage alloc] initWithSize:theIconSize];
     [i lockFocus];
-    [aCachedImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
+    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
     
     NSString* label;
     NSFont* theFont;

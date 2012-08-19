@@ -74,13 +74,11 @@ uint8_t verbose = 0;
 	NSImage* aCachedImage = [NSImage imageNamed:@"SIS3150Card"];
     if(!usbInterface){
 		NSSize theIconSize = [aCachedImage size];
-		NSPoint theOffset = NSZeroPoint;
 		
 		NSImage* i = [[NSImage alloc] initWithSize:theIconSize];
 		[i lockFocus];
 		
-		[aCachedImage compositeToPoint:theOffset operation:NSCompositeCopy];
-		
+        [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];		
 		if(!usbInterface || ![self getUSBController]){
 			NSBezierPath* path = [NSBezierPath bezierPath];
 			[path moveToPoint:NSMakePoint(8,13)];
@@ -96,7 +94,7 @@ uint8_t verbose = 0;
 		[i release];
     }
 	else {
-		[ self setImage: aCachedImage];
+		[self setImage: aCachedImage];
 	}
 	[[NSNotificationCenter defaultCenter] postNotificationName:OROrcaObjectImageChanged object:self];
 }

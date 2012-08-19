@@ -192,12 +192,11 @@ NSString* HV4032Lock					= @"HV4032Lock";
 	if([self hvOn]) aCachedImage = [NSImage imageNamed:@"HV4032Off"];
 	else aCachedImage = [NSImage imageNamed:@"HV4032On"];
     NSSize theIconSize = [aCachedImage size];
-    NSPoint theOffset = NSZeroPoint;
     
     NSImage* i = [[NSImage alloc] initWithSize:theIconSize];
     [i lockFocus];
-    [aCachedImage compositeToPoint:theOffset operation:NSCompositeCopy];
-	NSAttributedString* n;
+    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+    NSAttributedString* n;
 	NSString* s;
 	if([self mainFrameID]== 0xffffffff) s = @"--";
 	else s = [NSString stringWithFormat:@"%lu",[self mainFrameID]];

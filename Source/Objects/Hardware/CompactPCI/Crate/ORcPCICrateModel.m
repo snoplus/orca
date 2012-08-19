@@ -42,8 +42,8 @@
     NSImage* aCachedImage = [NSImage imageNamed:@"cPCICrateSmall"];
     NSImage* i = [[NSImage alloc] initWithSize:[aCachedImage size]];
     [i lockFocus];
-    [aCachedImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
-	NSAttributedString* n = [[NSAttributedString alloc] 
+    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+    NSAttributedString* n = [[NSAttributedString alloc]
 							initWithString:[NSString stringWithFormat:@"%d",[self crateNumber]] 
 								attributes:[NSDictionary dictionaryWithObject:[NSFont labelFontOfSize:13] forKey:NSFontAttributeName]];
 	

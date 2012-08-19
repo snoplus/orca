@@ -116,7 +116,7 @@ NSString* ORProcessElementForceUpdateNotification   = @"ORProcessElementForceUpd
 			[highlightedAltImage release];
 			highlightedAltImage = [[NSImage alloc] initWithSize:[anImage size]];
 			[highlightedAltImage lockFocus];
-			[anImage dissolveToPoint:NSZeroPoint fraction:1];
+            [anImage drawAtPoint:NSZeroPoint fromRect:[anImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
 			[[NSColor colorWithCalibratedWhite:0.0 alpha:0.5] set];
 			NSRectFillUsingOperation(sourceRect, NSCompositeSourceAtop);
 			[NSBezierPath strokeRect:sourceRect];

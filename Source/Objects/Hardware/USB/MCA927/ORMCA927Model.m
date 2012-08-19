@@ -181,13 +181,11 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 	NSImage* aCachedImage = [NSImage imageNamed:@"MCA927"];
     if(!usbInterface || ![self getUSBController]){
 		NSSize theIconSize = [aCachedImage size];
-		NSPoint theOffset = NSZeroPoint;
 		
 		NSImage* i = [[NSImage alloc] initWithSize:theIconSize];
 		[i lockFocus];
 		
-		[aCachedImage compositeToPoint:theOffset operation:NSCompositeCopy];
-		
+        [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];		
 		NSBezierPath* path = [NSBezierPath bezierPath];
 		[path moveToPoint:NSMakePoint(5,0)];
 		[path lineToPoint:NSMakePoint(20,20)];

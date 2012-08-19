@@ -94,8 +94,7 @@
 	
 	NSImage* stringsImage = [NSImage imageNamed:@"MJDStrings"];
 	NSPoint aPoint = NSMakePoint(615,445);
-	[stringsImage compositeToPoint:aPoint operation:NSCompositeSourceOver];
-	
+	[stringsImage drawAtPoint:aPoint fromRect:[stringsImage imageRect] operation:NSCompositeSourceOver fraction:1.0];	
 	if([[delegate model] detectorsBiased]){
 		if(!biasPath){ 
 			biasPath = [[NSBezierPath bezierPath] retain];

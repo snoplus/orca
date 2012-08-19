@@ -79,16 +79,16 @@ NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
 	    
     NSImage* i = [[NSImage alloc] initWithSize:[aCachedImage size]];
     [i lockFocus];
-    [aCachedImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
-	
+    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
 	[self decorateIcon:i];
 	
 	if([self breakChain] && [self objectConnectedTo: ORScriptTaskOutConnector]){
-		[[NSImage imageNamed:@"chainBroken"] compositeToPoint:NSZeroPoint operation:NSCompositeSourceOver];
+        NSImage* theImage = [NSImage imageNamed:@"chainBroken"];
+        [theImage drawAtPoint:NSZeroPoint fromRect:[theImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
 	}	
     if([self running]){
-        [[NSImage imageNamed:@"ScriptRunning"] compositeToPoint:NSZeroPoint operation:NSCompositeSourceOver];
-    }
+        NSImage* theImage = [NSImage imageNamed:@"ScriptRunning"];
+        [theImage drawAtPoint:NSZeroPoint fromRect:[theImage imageRect] operation:NSCompositeSourceOver fraction:1.0];    }
 	
     [i unlockFocus];
     

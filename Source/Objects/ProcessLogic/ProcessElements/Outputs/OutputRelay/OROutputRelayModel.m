@@ -70,8 +70,7 @@
 	NSSize theIconSize = [anImage size];
     NSImage* finalImage = [[NSImage alloc] initWithSize:theIconSize];
     [finalImage lockFocus];
-    [anImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
-	
+    [anImage drawAtPoint:NSZeroPoint fromRect:[anImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
 	NSAttributedString* idLabel   = [self idLabelWithSize:9 color:[NSColor blackColor]];
 	NSAttributedString* iconLabel = [self iconLabelWithSize:9 color:[NSColor blackColor]];
 	if(iconLabel){
@@ -118,8 +117,7 @@
 	
     NSImage* finalImage = [[NSImage alloc] initWithSize:theIconSize];
     [finalImage lockFocus];
-    [anImage compositeToPoint:NSMakePoint(iconStart,0) operation:NSCompositeCopy];
-	
+    [anImage drawAtPoint:NSMakePoint(iconStart,0) fromRect:[anImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
 	if(iconLabel){		
 		NSSize textSize = [iconLabel size];
 		[iconLabel drawInRect:NSMakeRect(iconStart-textSize.width-1,3,textSize.width,textSize.height)];

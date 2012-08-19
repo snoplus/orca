@@ -39,8 +39,7 @@
     NSImage* aCachedImage = [NSImage imageNamed:@"SNORack"];
     NSImage* i = [[NSImage alloc] initWithSize:[aCachedImage size]];
     [i lockFocus];
-    [aCachedImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
-    
+    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];    
     if([[self orcaObjects] count]){
         NSAffineTransform* transform = [NSAffineTransform transform];
         [transform translateXBy:5 yBy:27];

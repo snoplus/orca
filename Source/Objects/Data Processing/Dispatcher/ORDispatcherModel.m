@@ -73,11 +73,10 @@ NSString* ORDispatcherLock                      = @"ORDispatcherLock";
 	NSImage* aCachedImage = [NSImage imageNamed:@"Dispatcher"];
 	NSImage* i = [[NSImage alloc] initWithSize:[aCachedImage size]];
 	[i lockFocus];
-	[aCachedImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
-    
+    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];    
     if((runMode == kOfflineRun) && !_ignoreMode){
         NSImage* aNoticeImage = [NSImage imageNamed:@"notice"];
-        [aNoticeImage compositeToPoint:NSMakePoint([i size].width/2-[aNoticeImage size].width/2 ,[i size].height/2-[aNoticeImage size].height/2) operation:NSCompositeSourceOver];
+        [aNoticeImage drawAtPoint:NSMakePoint([i size].width/2-[aNoticeImage size].width/2 ,[i size].height/2-[aNoticeImage size].height/2) fromRect:[aNoticeImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
     }
 	[i unlockFocus];
     

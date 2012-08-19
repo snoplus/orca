@@ -83,14 +83,14 @@ static NSImage *pmtImage, *colorMaskImage, *topImage;
 	
 	anImage = [[anImage copy] autorelease];        
 	[anImage lockFocus];
-	[pmtImage compositeToPoint:NSZeroPoint operation:NSCompositeSourceOver];
-	[anImage compositeToPoint:NSZeroPoint operation:NSCompositeSourceOver fraction:1];
-	[topImage compositeToPoint:NSZeroPoint operation:NSCompositeSourceOver fraction:.6];
+    [pmtImage drawAtPoint:NSZeroPoint fromRect:[pmtImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+    [anImage drawAtPoint:NSZeroPoint fromRect:[anImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+    [topImage drawAtPoint:NSZeroPoint fromRect:[topImage imageRect] operation:NSCompositeSourceOver fraction:0.6];
 	[anImage unlockFocus];
 	
 	NSImage* newImage =     [self rotateIndividualImage: anImage angle:angle];
 	[self lockFocus];
-	[newImage compositeToPoint:NSZeroPoint operation:NSCompositeSourceOver fraction:1];
+    [newImage drawAtPoint:NSZeroPoint fromRect:[newImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
 	[self unlockFocus];
 	
 }

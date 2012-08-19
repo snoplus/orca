@@ -68,9 +68,10 @@ NSString* ORRamperNeedsUpdate		= @"ORRamperNeedsUpdate";
 	
     NSImage* i = [[NSImage alloc] initWithSize:[aCachedImage size]];
     [i lockFocus];
-    [aCachedImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
+    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
     if([self runningCount]){
-        [[NSImage imageNamed:@"RampRunning"] compositeToPoint:NSZeroPoint operation:NSCompositeSourceOver];
+        NSImage* anImage = [NSImage imageNamed:@"RampRunning"];
+        [anImage drawAtPoint:NSZeroPoint fromRect:[anImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
     }
 	
     [i unlockFocus];

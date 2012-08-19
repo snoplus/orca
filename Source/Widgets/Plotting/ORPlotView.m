@@ -305,7 +305,7 @@
 	// Draw components in order
 	[self drawBackground];
 	if(backgroundImage){
-		[backgroundImage compositeToPoint:NSMakePoint(0,0) operation:NSCompositeSourceOver];
+        [backgroundImage drawAtPoint:NSZeroPoint fromRect:[backgroundImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
 	}
 	if([self showGrid]){
 		[NSBezierPath setDefaultLineWidth:.2];

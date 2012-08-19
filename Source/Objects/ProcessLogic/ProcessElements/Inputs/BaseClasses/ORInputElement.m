@@ -174,8 +174,7 @@ NSString* ORInputElementOutConnection  = @"ORInputElementOutConnection";
 	
     NSImage* finalImage = [[NSImage alloc] initWithSize:theIconSize];
     [finalImage lockFocus];
-    [anImage compositeToPoint:NSMakePoint(iconStart,0) operation:NSCompositeCopy];
-	
+	[anImage drawAtPoint:NSMakePoint(iconStart,0) fromRect:[anImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
 	if(iconLabel){		
 		NSSize textSize = [iconLabel size];
 		[iconLabel drawInRect:NSMakeRect(iconStart-textSize.width-1,3,textSize.width,textSize.height)];

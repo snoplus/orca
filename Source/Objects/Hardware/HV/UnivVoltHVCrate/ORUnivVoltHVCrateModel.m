@@ -139,7 +139,7 @@ NSString* HVkErrorMsg = @"ErrorMsg";
     NSImage* aCachedImage = [NSImage imageNamed: @"UnivVoltHVCrateSmall"];
     NSImage* i = [[NSImage alloc] initWithSize: [aCachedImage size]];
     [i lockFocus];
-    [aCachedImage compositeToPoint: NSZeroPoint operation: NSCompositeCopy];
+    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
     if([self powerOff]){
         NSAttributedString* s = [[[NSAttributedString alloc] initWithString: @"No Pwr"
                                                                  attributes: [NSDictionary dictionaryWithObjectsAndKeys:
