@@ -1092,8 +1092,7 @@ static void _cfsocketCallback( CFSocketRef inCFSocketRef, CFSocketCallBackType i
 		if( [mDelegate respondsToSelector:@selector( netsocketDataSent:length: )] )
 			[mDelegate netsocketDataSent:self length:amountSent];
     
-		else 
-			if( [mDelegate respondsToSelector:@selector( netsocketDataInOutgoingBuffer:length: )] )
+		else if( [mDelegate respondsToSelector:@selector( netsocketDataInOutgoingBuffer:length: )] )
 				[mDelegate netsocketDataInOutgoingBuffer:self length:len];
     
 	[mLock unlock];
