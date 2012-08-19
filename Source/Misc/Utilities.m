@@ -331,7 +331,8 @@ NSString* commonScriptMethodsByObj(id anObj,BOOL includeSuperClass)
 	if(includeSuperClass){
 		if ([anObj superclass]==nil) [resultString appendFormat: @"%@ has no superclass\n", [anObj className]];
 		else {
-			NSString* superClassName = [[anObj superclass] className];
+            id theSuperClass = [anObj superclass];
+			NSString* superClassName = [theSuperClass className];
 			if(![superClassName hasPrefix:@"NS"]){
 				[resultString appendFormat: @"\n-------------------\n%@ superclass: %@\n", [anObj className], [anObj superclass]];
 				[resultString appendString: commonScriptMethodsByObj( [anObj superclass],includeSuperClass)];

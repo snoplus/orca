@@ -157,7 +157,7 @@
 
 	if (context != nil){
 		[context drawImage: [filter valueForKey: @"outputImage"]
-			atPoint: cg.origin  fromRect: cg];
+			inRect: cg  fromRect: cg];
 	}
 }
 

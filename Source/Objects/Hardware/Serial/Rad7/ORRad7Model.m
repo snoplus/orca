@@ -683,9 +683,14 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 
 - (void) setProtocol:(int)aProtocol
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setProtocol:protocol];
+    [[[self undoManager] prepareWithInvocationTarget:self] setRad7Protocol:protocol];
     protocol = aProtocol;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelProtocolChanged object:self];
+}
+
+- (void) setRad7Protocol:(int)aProtocol
+{
+    [self setProtocol:aProtocol];
 }
 
 - (int) pollTime

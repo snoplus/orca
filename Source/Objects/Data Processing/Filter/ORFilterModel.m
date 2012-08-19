@@ -495,7 +495,7 @@ int filterGraph(nodeType*);
 
 - (void) reloadPlugin
 {
-	if([ORAppDelegate isMacOSX10_5]){
+    if ( NSAppKitVersionNumber >= NSAppKitVersionNumber10_5 ) {
         NSBundle* currBundle = [NSBundle bundleWithPath:[pluginPath stringByExpandingTildeInPath]];
 		[pluginInstance release];
 		pluginInstance = nil;

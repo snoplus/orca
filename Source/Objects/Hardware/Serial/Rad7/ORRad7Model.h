@@ -208,6 +208,7 @@
 - (void) setCycleTime:(int)aCycleTime;
 - (int) protocol;
 - (void) setProtocol:(int)aProtocol;
+- (void) setRad7Protocol:(int)aProtocol;
 - (int) pollTime;
 - (void) setPollTime:(int)aPollTime;
 - (ORSerialPort*) serialPort;

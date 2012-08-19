@@ -74,10 +74,8 @@
 
 	NSString* s = [bodyField string];
 	NSString* startString = [s copy];
-	unsigned major,minor,bugFix;
-	[NSApp getSystemVersionMajor:&major
-						minor:&minor
-					   bugFix:&bugFix];
+    NSString *version = [[NSProcessInfo processInfo] operatingSystemVersionString];
+
 
 
 	CFBundleRef localInfoBundle = CFBundleGetMainBundle();
@@ -96,7 +94,7 @@
 		default:s = [s stringByAppendingFormat:@"Bug Category: Feature Request\n"]; break;
 	}
 	s = [s stringByAppendingFormat:@"-----------------------------------------\n"];
-	s = [s stringByAppendingFormat:@"MacOS %u.%u.%u\n",major,minor,bugFix];
+	s = [s stringByAppendingFormat:@"MacOS %@\n",version];
 	s = [s stringByAppendingFormat:@"Orca Version : %@\n",versionString];
 
 	BOOL foundOne = NO;

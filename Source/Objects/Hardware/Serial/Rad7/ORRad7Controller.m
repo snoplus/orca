@@ -801,7 +801,7 @@
 
 - (void) protocolAction:(id)sender
 {
-	[model setProtocol:[sender indexOfSelectedItem]];	
+	[(ORRad7Model*)model setProtocol:[sender indexOfSelectedItem]];
 }
 
 

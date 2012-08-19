@@ -632,7 +632,7 @@
 					  @selector(_panicRampSheetDidEnd:returnCode:contextInfo:),
 					  nil,
 					  nil,
-					  [NSString stringWithFormat:@"Really Panic Channel %d High Voltage OFF?",chan]);
+					  @"%@",[NSString stringWithFormat:@"Really Panic Channel %d High Voltage OFF?",chan]);
 }
 
 - (IBAction) clearPanicAction:(id)sender
@@ -669,7 +669,7 @@
 					  @selector(_allOnSheetDidEnd:returnCode:contextInfo:),
 					  nil,
 					  nil,
-					  s2);
+					  @"%@",s2);
 }
 
 - (IBAction) powerAllOffAction:(id)sender
@@ -699,7 +699,7 @@
 					  @selector(_allOffSheetDidEnd:returnCode:contextInfo:),
 					  nil,
 					  nil,
-					  s2);
+					  @"%@",s2);
 }
 
 - (IBAction) stopAllRampAction:(id)sender

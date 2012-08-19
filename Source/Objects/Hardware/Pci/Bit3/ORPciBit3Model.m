@@ -1561,21 +1561,23 @@ physicalBufferAddress: physicalAddress
 		  direction: 'R'];
 	
 	// wait for dma to complete or done interrupt to occur
-	unsigned long elapsedTime;
-	unsigned long startTime = TickCount();
+    ORTimer* timer = [[ORTimer alloc]init];
+    [timer start];
 	do {
 		
 		// need to put a reasonable delay here to prevent slowdown
 		// by repeated check for dma complete
-		elapsedTime = TickCount() - startTime;
-		if( elapsedTime < 10L ) {
+        
+		long elapsedTime = [timer microsecondsSinceStart];
+		if( elapsedTime < 100L ) {
 			continue;
 		}
-		if( elapsedTime > 1000L ) {  // to prevent hang
+		if( elapsedTime > 100000L ) {  // to prevent hang
 			break;
 		}
 		
 	} while( ![self checkDmaComplete:dmaFlags] );
+    [timer release];
 	//unsigned long endTime = TickCount();
 	//StatusPrintf("Time For %ld Byte Reads = %ld Ticks",bytes,
 	//		(unsigned long)(endTime - startTime));
@@ -1638,13 +1640,13 @@ physicalBufferAddress: physicalAddress
 	
 	
 	// wait for dma to complete or done interrupt to occur
-	unsigned long elapsedTime;
-	unsigned long startTime = TickCount();
+    ORTimer* timer = [[ORTimer alloc]init];
+    [timer start];
 	do {
 		
 		// need to put a reasonable delay here to prevent slowdown
 		// by repeated check for dma complete
-		elapsedTime = TickCount() - startTime;
+		long elapsedTime = [timer microsecondsSinceStart];
 		if( elapsedTime < 10L ) {
 			continue;
 		}
@@ -1653,6 +1655,7 @@ physicalBufferAddress: physicalAddress
 		}
 		
 	} while( ![self checkDmaComplete:dmaFlags]);
+    [timer release];
 	//unsigned long endTime = TickCount();
 	//StatusPrintf("Time For %ld Byte Reads = %ld Ticks",bytes,
 	//		(unsigned long)(endTime - startTime));

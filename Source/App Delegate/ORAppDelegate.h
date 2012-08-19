@@ -39,8 +39,6 @@
 	unsigned long heartbeatCount;
 	
 }
-+ (BOOL)isMacOSX10_5;
-+ (BOOL)isMacOSX10_4;
 
 - (MemoryWatcher*) memoryWatcher;
 - (void) setMemoryWatcher:(MemoryWatcher*)aWatcher;
@@ -94,15 +92,6 @@
 
 @end
 
-
-//a category on NSApplication so we can easily get the OS version
-@interface NSApplication (SystemVersion)
-
-- (void)getSystemVersionMajor:(unsigned *)major
-                        minor:(unsigned *)minor
-                       bugFix:(unsigned *)bugFix;
-
-@end
 
 @interface ORHeartBeatOp : NSOperation
 {
