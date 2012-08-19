@@ -764,7 +764,8 @@ NSString* ORFolderTransferTypeChangedNotification	= @"ORFolderTransferTypeChange
     if(![[view window] makeFirstResponder:[view window]]){
 	    [[view window] endEditingFor:nil];		
     }
-    
+    NSString* s = queueIsRunning?@"You can always send them later.":
+    [NSString stringWithFormat:@"Push 'Send' to send ALL files in:\n<%@>",[self finalDirectoryName]];
     NSBeginAlertSheet(queueIsRunning?@"Stop Sending?":@"Send All Files?",
                       queueIsRunning?@"Stop":@"Send",
                       @"Cancel",
@@ -773,12 +774,12 @@ NSString* ORFolderTransferTypeChangedNotification	= @"ORFolderTransferTypeChange
                       @selector(_sendAllSheetDidEnd:returnCode:contextInfo:),
                       nil,
                       nil,
-                      queueIsRunning?@"You can always send them later.":
-                      [NSString stringWithFormat:@"Push 'Send' to send ALL files in:\n<%@>",[self finalDirectoryName]]);
+                      @"%@",s);
 }
 
 - (IBAction) deleteButtonAction:(id)sender
 {
+    NSString* s = [NSString stringWithFormat:@"Push 'Delete' to delete files that are in:\n<%@/sentFiles>",[self finalDirectoryName]];
     NSBeginAlertSheet(@"Delete All Sent Files?",
                       @"Delete",
                       @"Cancel",
@@ -787,7 +788,7 @@ NSString* ORFolderTransferTypeChangedNotification	= @"ORFolderTransferTypeChange
                       @selector(_deleteAllSheetDidEnd:returnCode:contextInfo:),
                       nil,
                       nil,
-                      [NSString stringWithFormat:@"Push 'Delete' to delete files that are in:\n<%@/sentFiles>",[self finalDirectoryName]]);
+                      @"%@",s);
     
 }
 

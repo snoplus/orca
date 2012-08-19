@@ -47,7 +47,7 @@
 			<object class="NSWindowTemplate" id="509370149">
 				<int key="NSWindowStyleMask">7</int>
 				<int key="NSWindowBacking">2</int>
-				<string key="NSWindowRect">{{442, 12}, {352, 866}}</string>
+				<string key="NSWindowRect">{{298, 0}, {352, 866}}</string>
 				<int key="NSWTFlags">1886912512</int>
 				<string key="NSWindowTitle">PC-16 Controller</string>
 				<string key="NSWindowClass">NSWindow</string>
@@ -78,6 +78,7 @@
 							</object>
 							<string key="NSFrame">{{27, 525}, {308, 243}}</string>
 							<reference key="NSSuperview" ref="724346688"/>
+							<reference key="NSNextKeyView" ref="798001474"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSImageCell" key="NSCell" id="403820264">
 								<int key="NSCellFlags">134348288</int>
@@ -98,6 +99,7 @@
 							<int key="NSvFlags">256</int>
 							<string key="NSFrame">{{189, 57}, {146, 442}}</string>
 							<reference key="NSSuperview" ref="724346688"/>
+							<reference key="NSNextKeyView" ref="247823184"/>
 							<bool key="NSEnabled">YES</bool>
 							<int key="NSNumRows">16</int>
 							<int key="NSNumCols">1</int>
@@ -501,7 +503,7 @@
 							<int key="NSvFlags">256</int>
 							<string key="NSFrame">{{36, 60}, {50, 437}}</string>
 							<reference key="NSSuperview" ref="724346688"/>
-							<reference key="NSNextKeyView" ref="717193139"/>
+							<reference key="NSNextKeyView" ref="214643894"/>
 							<bool key="NSEnabled">YES</bool>
 							<int key="NSNumRows">16</int>
 							<int key="NSNumCols">1</int>
@@ -931,6 +933,7 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{56, 725}, {261, 20}}</string>
 							<reference key="NSSuperview" ref="724346688"/>
+							<reference key="NSNextKeyView" ref="422640000"/>
 							<string key="NSClassName">ProXR16SSRStateView</string>
 						</object>
 						<object class="NSCustomView" id="194769693">
@@ -938,6 +941,7 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{213, 648}, {45, 17}}</string>
 							<reference key="NSSuperview" ref="724346688"/>
+							<reference key="NSNextKeyView" ref="802282522"/>
 							<string key="NSClassName">ProXR16SSRStateViewSmall</string>
 						</object>
 						<object class="NSCustomView" id="802282522">
@@ -945,6 +949,7 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{213, 629}, {45, 17}}</string>
 							<reference key="NSSuperview" ref="724346688"/>
+							<reference key="NSNextKeyView" ref="216632995"/>
 							<string key="NSClassName">ProXR16SSRStateViewSmall</string>
 						</object>
 						<object class="NSCustomView" id="1063099585">
@@ -952,6 +957,7 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{56, 548}, {261, 20}}</string>
 							<reference key="NSSuperview" ref="724346688"/>
+							<reference key="NSNextKeyView" ref="858486509"/>
 							<string key="NSClassName">ProXR16SSRStateView</string>
 						</object>
 						<object class="NSButton" id="247823184">
@@ -959,6 +965,7 @@
 							<int key="NSvFlags">256</int>
 							<string key="NSFrame">{{4, 16}, {39, 36}}</string>
 							<reference key="NSSuperview" ref="724346688"/>
+							<reference key="NSNextKeyView"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="341142602">
 								<int key="NSCellFlags">67239424</int>
@@ -991,6 +998,7 @@
 							<int key="NSvFlags">256</int>
 							<string key="NSFrame">{{60, 709}, {272, 17}}</string>
 							<reference key="NSSuperview" ref="724346688"/>
+							<reference key="NSNextKeyView" ref="194769693"/>
 							<bool key="NSEnabled">YES</bool>
 							<int key="NSNumRows">1</int>
 							<int key="NSNumCols">8</int>
@@ -1098,6 +1106,7 @@
 							<int key="NSvFlags">256</int>
 							<string key="NSFrame">{{60, 571}, {264, 17}}</string>
 							<reference key="NSSuperview" ref="724346688"/>
+							<reference key="NSNextKeyView" ref="1063099585"/>
 							<bool key="NSEnabled">YES</bool>
 							<int key="NSNumRows">1</int>
 							<int key="NSNumCols">8</int>
@@ -1206,10 +1215,12 @@
 									<int key="NSvFlags">274</int>
 									<string key="NSFrame">{{3, 3}, {210, 66}}</string>
 									<reference key="NSSuperview" ref="58112827"/>
+									<reference key="NSNextKeyView" ref="1009987138"/>
 								</object>
 							</object>
 							<string key="NSFrame">{{33, 772}, {216, 84}}</string>
 							<reference key="NSSuperview" ref="724346688"/>
+							<reference key="NSNextKeyView" ref="766171981"/>
 							<string key="NSOffsets">{0, 0}</string>
 							<object class="NSTextFieldCell" key="NSTitleCell">
 								<int key="NSCellFlags">67239424</int>
@@ -1233,6 +1244,7 @@
 							<int key="NSvFlags">12</int>
 							<string key="NSFrame">{{6, 503}, {329, 5}}</string>
 							<reference key="NSSuperview" ref="724346688"/>
+							<reference key="NSNextKeyView" ref="886712185"/>
 							<string key="NSOffsets">{0, 0}</string>
 							<object class="NSTextFieldCell" key="NSTitleCell">
 								<int key="NSCellFlags">67239424</int>
@@ -1255,6 +1267,7 @@
 							<int key="NSvFlags">12</int>
 							<string key="NSFrame">{{6, 49}, {329, 5}}</string>
 							<reference key="NSSuperview" ref="724346688"/>
+							<reference key="NSNextKeyView" ref="717193139"/>
 							<string key="NSOffsets">{0, 0}</string>
 							<object class="NSTextFieldCell" key="NSTitleCell">
 								<int key="NSCellFlags">67239424</int>
@@ -1277,6 +1290,7 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{10, 505}, {79, 17}}</string>
 							<reference key="NSSuperview" ref="724346688"/>
+							<reference key="NSNextKeyView" ref="930281617"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="975409677">
 								<int key="NSCellFlags">68288064</int>
@@ -1296,6 +1310,7 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{94, 505}, {79, 17}}</string>
 							<reference key="NSSuperview" ref="724346688"/>
+							<reference key="NSNextKeyView" ref="824108279"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="136895692">
 								<int key="NSCellFlags">68288064</int>
@@ -1315,6 +1330,7 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{186, 505}, {152, 17}}</string>
 							<reference key="NSSuperview" ref="724346688"/>
+							<reference key="NSNextKeyView" ref="218795898"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="1052698938">
 								<int key="NSCellFlags">68288064</int>
@@ -1334,6 +1350,7 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{249, 794}, {89, 17}}</string>
 							<reference key="NSSuperview" ref="724346688"/>
+							<reference key="NSNextKeyView" ref="196595522"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="868933640">
 								<int key="NSCellFlags">68288064</int>
@@ -1353,6 +1370,7 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{249, 776}, {97, 17}}</string>
 							<reference key="NSSuperview" ref="724346688"/>
+							<reference key="NSNextKeyView" ref="146137267"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="200895424">
 								<int key="NSCellFlags">68288064</int>
@@ -1369,6 +1387,7 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{249, 813}, {97, 17}}</string>
 							<reference key="NSSuperview" ref="724346688"/>
+							<reference key="NSNextKeyView" ref="884066474"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="575494742">
 								<int key="NSCellFlags">68288064</int>
@@ -1383,9 +1402,9 @@
 					</object>
 					<string key="NSFrameSize">{352, 866}</string>
 					<reference key="NSSuperview"/>
-					<reference key="NSNextKeyView" ref="146137267"/>
+					<reference key="NSNextKeyView" ref="58112827"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1280, 778}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
 				<string key="NSMinSize">{213, 129}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<bool key="NSWindowIsRestorable">YES</bool>
@@ -2580,409 +2599,7 @@
 			<nil key="sourceID"/>
 			<int key="maxID">1639</int>
 		</object>
-		<object class="IBClassDescriber" key="IBDocument.Classes">
-			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
-				<bool key="EncodedWithXMLCoder">YES</bool>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSObject</string>
-					<object class="NSMutableDictionary" key="actions">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>sequenceCompleted:</string>
-							<string>taskFinished:</string>
-							<string>tasksCompleted:</string>
-						</object>
-						<object class="NSArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-						</object>
-					</object>
-					<object class="NSMutableDictionary" key="actionInfosByName">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>sequenceCompleted:</string>
-							<string>taskFinished:</string>
-							<string>tasksCompleted:</string>
-						</object>
-						<object class="NSArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<object class="IBActionInfo">
-								<string key="name">sequenceCompleted:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">taskFinished:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">tasksCompleted:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-						</object>
-					</object>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/NSObject.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">ORProXR16SSRController</string>
-					<string key="superclassName">OrcaObjectController</string>
-					<object class="NSMutableDictionary" key="actions">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>lockAction:</string>
-							<string>outletNameAction:</string>
-							<string>turnOnOffAction:</string>
-						</object>
-						<object class="NSArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-						</object>
-					</object>
-					<object class="NSMutableDictionary" key="actionInfosByName">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>lockAction:</string>
-							<string>outletNameAction:</string>
-							<string>turnOnOffAction:</string>
-						</object>
-						<object class="NSArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<object class="IBActionInfo">
-								<string key="name">lockAction:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">outletNameAction:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">turnOnOffAction:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-						</object>
-					</object>
-					<object class="NSMutableDictionary" key="outlets">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>lockButton</string>
-							<string>outletNameMatrix</string>
-							<string>serialPortController</string>
-							<string>stateMatrix</string>
-							<string>stateView0_7</string>
-							<string>stateView8_15</string>
-							<string>stateViewSmall0_7</string>
-							<string>stateViewSmall8_15</string>
-							<string>turnOnOffMatrix</string>
-						</object>
-						<object class="NSArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>NSButton</string>
-							<string>NSMatrix</string>
-							<string>ORSerialPortController</string>
-							<string>NSMatrix</string>
-							<string>ProXR16SSRStateView</string>
-							<string>ProXR16SSRStateView</string>
-							<string>ProXR16SSRStateViewSmall</string>
-							<string>ProXR16SSRStateViewSmall</string>
-							<string>NSMatrix</string>
-						</object>
-					</object>
-					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>lockButton</string>
-							<string>outletNameMatrix</string>
-							<string>serialPortController</string>
-							<string>stateMatrix</string>
-							<string>stateView0_7</string>
-							<string>stateView8_15</string>
-							<string>stateViewSmall0_7</string>
-							<string>stateViewSmall8_15</string>
-							<string>turnOnOffMatrix</string>
-						</object>
-						<object class="NSArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<object class="IBToOneOutletInfo">
-								<string key="name">lockButton</string>
-								<string key="candidateClassName">NSButton</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">outletNameMatrix</string>
-								<string key="candidateClassName">NSMatrix</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">serialPortController</string>
-								<string key="candidateClassName">ORSerialPortController</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">stateMatrix</string>
-								<string key="candidateClassName">NSMatrix</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">stateView0_7</string>
-								<string key="candidateClassName">ProXR16SSRStateView</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">stateView8_15</string>
-								<string key="candidateClassName">ProXR16SSRStateView</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">stateViewSmall0_7</string>
-								<string key="candidateClassName">ProXR16SSRStateViewSmall</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">stateViewSmall8_15</string>
-								<string key="candidateClassName">ProXR16SSRStateViewSmall</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">turnOnOffMatrix</string>
-								<string key="candidateClassName">NSMatrix</string>
-							</object>
-						</object>
-					</object>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/ORProXR16SSRController.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">ORSerialPortController</string>
-					<string key="superclassName">NSObject</string>
-					<object class="NSMutableDictionary" key="actions">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>openPortAction:</string>
-							<string>portListAction:</string>
-						</object>
-						<object class="NSArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>id</string>
-							<string>id</string>
-						</object>
-					</object>
-					<object class="NSMutableDictionary" key="actionInfosByName">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>openPortAction:</string>
-							<string>portListAction:</string>
-						</object>
-						<object class="NSArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<object class="IBActionInfo">
-								<string key="name">openPortAction:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">portListAction:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-						</object>
-					</object>
-					<object class="NSMutableDictionary" key="outlets">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>openPortButton</string>
-							<string>owner</string>
-							<string>portControlsContent</string>
-							<string>portControlsView</string>
-							<string>portListPopup</string>
-							<string>portStateField</string>
-						</object>
-						<object class="NSArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>NSButton</string>
-							<string>id</string>
-							<string>NSView</string>
-							<string>NSBox</string>
-							<string>NSPopUpButton</string>
-							<string>NSTextField</string>
-						</object>
-					</object>
-					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>openPortButton</string>
-							<string>owner</string>
-							<string>portControlsContent</string>
-							<string>portControlsView</string>
-							<string>portListPopup</string>
-							<string>portStateField</string>
-						</object>
-						<object class="NSArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<object class="IBToOneOutletInfo">
-								<string key="name">openPortButton</string>
-								<string key="candidateClassName">NSButton</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">owner</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">portControlsContent</string>
-								<string key="candidateClassName">NSView</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">portControlsView</string>
-								<string key="candidateClassName">NSBox</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">portListPopup</string>
-								<string key="candidateClassName">NSPopUpButton</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">portStateField</string>
-								<string key="candidateClassName">NSTextField</string>
-							</object>
-						</object>
-					</object>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/ORSerialPortController.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">ORTimedTextField</string>
-					<string key="superclassName">NSTextField</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/ORTimedTextField.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">OrcaObjectController</string>
-					<string key="superclassName">NSWindowController</string>
-					<object class="NSMutableDictionary" key="actions">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>copy:</string>
-							<string>decDialog:</string>
-							<string>incDialog:</string>
-							<string>printDocument:</string>
-							<string>saveDocument:</string>
-							<string>saveDocumentAs:</string>
-						</object>
-						<object class="NSArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-						</object>
-					</object>
-					<object class="NSMutableDictionary" key="actionInfosByName">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>copy:</string>
-							<string>decDialog:</string>
-							<string>incDialog:</string>
-							<string>printDocument:</string>
-							<string>saveDocument:</string>
-							<string>saveDocumentAs:</string>
-						</object>
-						<object class="NSArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<object class="IBActionInfo">
-								<string key="name">copy:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">decDialog:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">incDialog:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">printDocument:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">saveDocument:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">saveDocumentAs:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-						</object>
-					</object>
-					<object class="NSMutableDictionary" key="outlets">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>model</string>
-							<string>warningField</string>
-						</object>
-						<object class="NSArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>id</string>
-							<string>ORTimedTextField</string>
-						</object>
-					</object>
-					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>model</string>
-							<string>warningField</string>
-						</object>
-						<object class="NSArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<object class="IBToOneOutletInfo">
-								<string key="name">model</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">warningField</string>
-								<string key="candidateClassName">ORTimedTextField</string>
-							</object>
-						</object>
-					</object>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/OrcaObjectController.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">ProXR16SSRStateView</string>
-					<string key="superclassName">NSView</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/ProXR16SSRStateView.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">ProXR16SSRStateViewSmall</string>
-					<string key="superclassName">ProXR16SSRStateView</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/ProXR16SSRStateViewSmall.h</string>
-					</object>
-				</object>
-			</object>
-		</object>
+		<object class="IBClassDescriber" key="IBDocument.Classes"/>
 		<int key="IBDocument.localizationMode">0</int>
 		<string key="IBDocument.TargetRuntimeIdentifier">IBCocoaFramework</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDependencies">

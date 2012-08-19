@@ -1693,7 +1693,7 @@ static NSString *ORShaperDisplayRaw 		= @"ORShaper DisplayRaw";
             for(channel=0;channel<kNumShaperChannels;channel++){
                 if([self scalerMask] & (1<<channel)){
                     [self readScaler:channel];
-                    dataWord[index++]= crateAndCard | ((channel & 0x0000000f) << 16) | scalerCount[channel]&0x0000ffff;
+                    dataWord[index++]= crateAndCard | ((channel & 0x0000000f) << 16) | (scalerCount[channel]&0x0000ffff);
                 }	
             }
             //now that we know the size we fill in the header and ship

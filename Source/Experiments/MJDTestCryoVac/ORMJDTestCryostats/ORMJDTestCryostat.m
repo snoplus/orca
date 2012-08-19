@@ -619,9 +619,7 @@
 {
 	return [valueDictionary objectForKey:[NSNumber numberWithInt:aRegion]];
 }
-- (void) openDialogForComponent:(int)i
-{
-}
+
 
 - (BOOL) regionColor:(int)r1 sameAsRegion:(int)r2
 {
