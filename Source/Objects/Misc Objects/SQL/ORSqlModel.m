@@ -917,7 +917,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 		[[[self document] collectObjectsOfClass:NSClassFromString(@"OrcaObject")] makeObjectsPerformSelector:@selector(clearLoopChecked)];
 		NSArray* runObjects = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
 		if([runObjects count]){
-			NSArray* arrayOfHistos = [[objs objectAtIndex:0] collectConnectedObjectsOfClass:NSClassFromString(@"ORHistoModel")];
+			NSArray* arrayOfHistos = [[runObjects objectAtIndex:0] collectConnectedObjectsOfClass:NSClassFromString(@"ORHistoModel")];
 			if([arrayOfHistos count]){
 				id histoObj = [arrayOfHistos objectAtIndex:0];
 				//assume first one in the data chain
