@@ -24,11 +24,10 @@
 #import "ORDataPacket.h"
 #import "ORTimeRate.h"
 #import "ORAlarm.h"
-#import "ORSafeQueue.h"
 
 #pragma mark ***External Strings
-NSString* ORMet637ModelDumpCountChanged = @"ORMet637ModelDumpCountChanged";
-NSString* ORMet637ModelDumpInProgressChanged = @"ORMet637ModelDumpInProgressChanged";
+NSString* ORMet637ModelDumpCountChanged		  = @"ORMet637ModelDumpCountChanged";
+NSString* ORMet637ModelDumpInProgressChanged  = @"ORMet637ModelDumpInProgressChanged";
 NSString* ORMet637ModelTimedOutChanged		  = @"ORMet637ModelTimedOutChanged";
 NSString* ORMet637ModelIsLogChanged			  = @"ORMet637ModelIsLogChanged";
 NSString* ORMet637ModelHoldTimeChanged		  = @"ORMet637ModelHoldTimeChanged";
@@ -56,8 +55,6 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 - (void) addCmdToQueue:(NSString*)aCmd;
 - (void) process_response:(NSString*)theResponse;
 - (void) checkCycle;
-- (void) startTimeOut;
-- (void) timeout;
 - (void) dumpTimeout;
 - (void) clearDelay;
 - (void) processOneCommandFromQueue;
@@ -101,8 +98,6 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 	[flowErrorAlarm release];
 	[flowErrorAlarm clearAlarm];
 	
-	[cmdQueue release];
-	[lastRequest release];
 	[super dealloc];
 }
 
@@ -545,16 +540,7 @@ NSString* ORMet637Lock = @"ORMet637Lock";
     portWasOpen = [serialPort isOpen];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSerialPortModelPortStateChanged object:self];
 }
-- (NSString*) lastRequest
-{
-	return lastRequest;
-}
 
-- (void) setLastRequest:(NSString*)aRequest
-{
-	[lastRequest autorelease];
-	lastRequest = [aRequest copy];    
-}
 
 #pragma mark ***Archival
 - (id) initWithCoder:(NSCoder*)decoder
@@ -775,7 +761,7 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 
 - (BOOL) dataForChannelValid:(int)aChannel
 {
-    return dataValid && [serialPort isOpen];
+    return [self isValid] && [serialPort isOpen];
 }
 
 @end
@@ -794,13 +780,11 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 {
 	if([serialPort isOpen]){ 
 		
-		if(!cmdQueue)cmdQueue	 = [[ORSafeQueue alloc] init];
-
 		aCmd = [aCmd stringByReplacingOccurrencesOfString:@"\n" withString:@""];
 		if(![aCmd hasSuffix:@"\r"])aCmd = [aCmd stringByAppendingFormat:@"\r"];
 		
-		[cmdQueue enqueue:aCmd];
-		[cmdQueue enqueue:@"++Delay"];
+		[self enqueueCmd:aCmd];
+		[self enqueueCmd:@"++Delay"];
 		
 		if(!lastRequest){
 			[self processOneCommandFromQueue];
@@ -812,7 +796,7 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 
 - (void) process_response:(NSString*)theResponse
 {
-    dataValid = YES;
+	[self setIsValid:YES];
 
 	theResponse = [theResponse stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 	NSArray* partsByComma = [theResponse componentsSeparatedByString:@","];
@@ -910,26 +894,11 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
 }
 
-- (void) startTimeOut
-{
-	[self setTimedOut:NO];
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-	[self performSelector:@selector(timeout) withObject:nil afterDelay:kMet637CmdTimeout];
-}
 
 - (void) clearDelay
 {
 	delay = NO;
 	[self processOneCommandFromQueue];
-}
-
-- (void) timeout
-{
-	NSLogError(@"command timeout",@"Met637",nil);
-	[self setTimedOut:YES];
-    dataValid = NO;
-	[cmdQueue removeAllObjects];
-	[self setLastRequest:nil];
 }
 
 - (void) dumpTimeout
@@ -946,7 +915,7 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 {
     if(delay)return;
 	
-	NSString* aCmd = [cmdQueue dequeue];
+	NSString* aCmd = [self nextCmd];
 	if(aCmd){
 		if([aCmd isEqualToString:@"++Delay"]){
 			delay = YES;
@@ -954,7 +923,7 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 			[self performSelector:@selector(clearDelay) withObject:nil afterDelay:.1];
 		}
 		else {
-			[self performSelector:@selector(timeout) withObject:nil afterDelay:3];
+			[self startTimeout:3];
 			[self setLastRequest:aCmd];
 			[serialPort writeString:aCmd];
 		}

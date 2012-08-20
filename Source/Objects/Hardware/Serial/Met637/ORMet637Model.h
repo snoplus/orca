@@ -18,11 +18,10 @@
 
 #pragma mark ***Imported Files
 #import "ORAdcProcessing.h"
-#import "ORSerialPortModel.h"
+#import "ORSerialPortWithQueueModel.h"
 
 @class ORTimeRate;
 @class ORAlarm;
-@class ORSafeQueue;
 
 #define kMet637CmdTimeout  1
 #define kMet637ProbeTime   5
@@ -30,11 +29,9 @@
 #define kMet637Manual  0
 #define kMet637Auto    1
 
-@interface ORMet637Model : ORSerialPortModel <ORAdcProcessing>
+@interface ORMet637Model : ORSerialPortWithQueueModel <ORAdcProcessing>
 {
     @private
-		NSString*		lastRequest;
-		ORSafeQueue*	cmdQueue;
 		BOOL            delay;
         NSMutableString* buffer;
 		NSString*		measurementDate;
@@ -62,7 +59,6 @@
 		BOOL			timedOut;
 		BOOL			dumpInProgress;
 		int				dumpCount;
-        BOOL            dataValid; 
 		ORAlarm*		sensorErrorAlarm;
 		ORAlarm*		lowBatteryAlarm;
 		ORAlarm*		flowErrorAlarm;
@@ -148,8 +144,6 @@
 - (void) sendHoldTime:(int)aValue;
 - (void) sendTempUnit:(int)aTempUnit countUnits:(int)aCountUnit;
 - (void) probe;
-- (NSString*) lastRequest;
-- (void) setLastRequest:(NSString*)aRequest;
 
 #pragma mark •••Adc Processing Protocol
 - (void)processIsStarting;
