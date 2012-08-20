@@ -915,15 +915,17 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 		ORPostSegmentMapOp* anOp = [[ORPostSegmentMapOp alloc] initWithDelegate:self];
 		
 		[[[self document] collectObjectsOfClass:NSClassFromString(@"OrcaObject")] makeObjectsPerformSelector:@selector(clearLoopChecked)];
-		NSArray* objs = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-		NSArray* arrayOfHistos = [[objs objectAtIndex:0] collectConnectedObjectsOfClass:NSClassFromString(@"ORHistoModel")];
-		if([arrayOfHistos count]){
-			id histoObj = [arrayOfHistos objectAtIndex:0];
-			//assume first one in the data chain
-			[anOp setDataMonitorId:[histoObj uniqueIdNumber]];
-			[ORSqlDBQueue addOperation:anOp];
+		NSArray* runObjects = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+		if([runObjects count]){
+			NSArray* arrayOfHistos = [[objs objectAtIndex:0] collectConnectedObjectsOfClass:NSClassFromString(@"ORHistoModel")];
+			if([arrayOfHistos count]){
+				id histoObj = [arrayOfHistos objectAtIndex:0];
+				//assume first one in the data chain
+				[anOp setDataMonitorId:[histoObj uniqueIdNumber]];
+				[ORSqlDBQueue addOperation:anOp];
+			}
+			[anOp release];
 		}
-		[anOp release];
 	}
 }
 
