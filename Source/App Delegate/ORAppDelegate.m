@@ -472,7 +472,7 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 	int     count  = [[ORGlobal sharedGlobal] cpuCount];
 	if(count==1){
 		[self closeSplashWindow];
-		NSLogColor([NSColor redColor],@"Number Processors: %d\n",count);
+		NSLogColor([NSColor redColor],@"Number of processors: %d\n",count);
 		if([[NSUserDefaults standardUserDefaults] objectForKey:@"IgnoreSingleCPUWarning"] == nil){
 			int result = NSRunInformationalAlertPanel(@"Single CPU Warning",@"ORCA runs best on machines with multiple processors!",@"OK",nil,@"OK/Don't remind me",nil);
 			if(result == -1){
@@ -481,7 +481,7 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 			}
 		}
 	}
-	else NSLog(@"Number Processors: %d\n",count);
+	else NSLog(@"Number of processors: %d\n",count);
 	
 	heartbeatCount = 0;
 	[self doHeartBeat];

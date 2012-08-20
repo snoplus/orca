@@ -216,12 +216,16 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Global);
 
 - (int) cpuCount
 {
-	if(cpuCount)return cpuCount;
-	else {
-		NSProcessInfo* pinfo = [NSProcessInfo processInfo];
-		cpuCount = [pinfo processorCount];
-		return cpuCount;
+	if(!cpuCount) {
+		//NSProcessInfo* pinfo = [NSProcessInfo processInfo];
+		//cpuCount = [pinfo processorCount];
+		//return cpuCount;
+		
+		size_t  size=sizeof(cpuCount) ;
+		if (sysctlbyname("hw.ncpu",&cpuCount,&size,NULL,0)) cpuCount = 1;
+
 	}
+	return cpuCount;
 }
 
 - (void) prepareForForcedHalt
