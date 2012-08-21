@@ -177,7 +177,6 @@
 - (void)	setShipTemperatures:(BOOL)aShipPressures;
 - (int)		pollTime;
 - (void)	setPollTime:(int)aPollTime;
-- (void) openPort:(BOOL)state;
 - (float) temperature;
 - (unsigned long) timeMeasured;
 - (NSString*) auxStatusString:(int)aChannel;

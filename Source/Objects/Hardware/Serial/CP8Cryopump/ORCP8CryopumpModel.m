@@ -734,23 +734,17 @@ NSString* ORCP8CryopumpModelConstraintsChanged				= @"ORCP8CryopumpModelConstrai
 	return [super acceptsGuardian:aGuardian] || [aGuardian isMemberOfClass:NSClassFromString(@"ORMJDVacuumModel")];
 }
 
-- (void) openPort:(BOOL)state
+- (void) setUpPort
 {
-    if(state) {
-        [serialPort open];
-		[serialPort setSpeed:2400];
-		[serialPort setParityEven];
-		[serialPort setStopBits2:0];
-		[serialPort setDataBits:7];
-		[serialPort commitChanges];
-        [self readModuleVersion];
-    }
-    else {
-		[serialPort close];
-		[self setIsValid:NO];
-	}
-    portWasOpen = [serialPort isOpen];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSerialPortModelPortStateChanged object:self];
+	[serialPort setSpeed:2400];
+	[serialPort setParityEven];
+	[serialPort setStopBits2:0];
+	[serialPort setDataBits:7];
+ }
+
+- (void) firstActionAfterOpeningPort
+{
+	[self readModuleVersion];
 }
 
 - (NSString*) auxStatusString:(int)aChannel
