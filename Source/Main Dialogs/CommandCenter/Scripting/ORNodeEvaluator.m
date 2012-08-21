@@ -1377,7 +1377,7 @@
         return [[NSDecimalNumber decimalNumberWithString:a] compare:b];
     }
     else if([b isKindOfClass:NSClassFromString(@"NSString")] && [a isKindOfClass:NSClassFromString(@"NSDecimalNumber")]){
-        return [[NSDecimalNumber decimalNumberWithString:b] compare:a];
+        return [a compare:[NSDecimalNumber decimalNumberWithString:b]];
     }
     else {
         [NSException raise:@"Run time" format:@"illegal to compare %@ to %@",[a className],[b className]];
