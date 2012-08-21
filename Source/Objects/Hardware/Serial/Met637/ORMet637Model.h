@@ -56,7 +56,6 @@
 		BOOL			probing;
 		int				holdTime;
 		BOOL			isLog;
-		BOOL			timedOut;
 		BOOL			dumpInProgress;
 		int				dumpCount;
 		ORAlarm*		sensorErrorAlarm;
@@ -78,8 +77,6 @@
 - (void) setDumpCount:(int)aDumpCount;
 - (BOOL) dumpInProgress;
 - (void) setDumpInProgress:(BOOL)aDumpInProgress;
-- (BOOL) timedOut;
-- (void) setTimedOut:(BOOL)aTimedOut;
 - (BOOL) isLog;
 - (void) setIsLog:(BOOL)aIsLog;
 - (int) holdTime;
@@ -166,7 +163,6 @@
 
 extern NSString* ORMet637ModelDumpCountChanged;
 extern NSString* ORMet637ModelDumpInProgressChanged;
-extern NSString* ORMet637ModelTimedOutChanged;
 extern NSString* ORMet637ModelIsLogChanged;
 extern NSString* ORMet637ModelHoldTimeChanged;
 extern NSString* ORMet637ModelTempUnitsChanged;

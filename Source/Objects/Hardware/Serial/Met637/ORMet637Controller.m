@@ -246,7 +246,7 @@
 
     [notifyCenter addObserver : self
                      selector : @selector(timedOutChanged:)
-                         name : ORMet637ModelTimedOutChanged
+                         name : ORSerialPortWithQueueModelTimeoutCountChanged
 						object: model];
 
     [notifyCenter addObserver : self
@@ -305,7 +305,7 @@
 
 - (void) timedOutChanged:(NSNotification*)aNote
 {
-	[timedOutField setStringValue: [model timedOut]?@"Last Command Timed Out":@""];
+	[timedOutField setStringValue: [model timeoutCount]!=0 ? @"Last Command Timed Out":@""];
 }
 
 - (void) isLogChanged:(NSNotification*)aNote

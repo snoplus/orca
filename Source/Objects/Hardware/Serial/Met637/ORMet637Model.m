@@ -28,7 +28,6 @@
 #pragma mark ***External Strings
 NSString* ORMet637ModelDumpCountChanged		  = @"ORMet637ModelDumpCountChanged";
 NSString* ORMet637ModelDumpInProgressChanged  = @"ORMet637ModelDumpInProgressChanged";
-NSString* ORMet637ModelTimedOutChanged		  = @"ORMet637ModelTimedOutChanged";
 NSString* ORMet637ModelIsLogChanged			  = @"ORMet637ModelIsLogChanged";
 NSString* ORMet637ModelHoldTimeChanged		  = @"ORMet637ModelHoldTimeChanged";
 NSString* ORMet637ModelTempUnitsChanged		  = @"ORMet637ModelTempUnitsChanged";
@@ -182,17 +181,6 @@ NSString* ORMet637Lock = @"ORMet637Lock";
     dumpInProgress = aDumpInProgress;
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMet637ModelDumpInProgressChanged object:self];
-}
-
-- (BOOL) timedOut
-{
-    return timedOut;
-}
-
-- (void) setTimedOut:(BOOL)aTimedOut
-{
-    timedOut = aTimedOut;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMet637ModelTimedOutChanged object:self];
 }
 
 - (BOOL) isLog
@@ -527,6 +515,7 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 
 - (void) openPort:(BOOL)state
 {
+    [self setTimeoutCount:0];
     if(state) {
         [serialPort open];
 		[serialPort setSpeed:9600];
