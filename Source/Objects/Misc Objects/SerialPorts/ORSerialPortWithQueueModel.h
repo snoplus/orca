@@ -44,6 +44,7 @@
 - (void) enqueueCmd:(id)aCmd;
 - (void) cancelTimeout;
 - (void) startTimeout:(int)aDelay;
+- (void) setTimeoutCount:(int)aValue;
 - (void) timeout;
 - (void) clearTimeoutAlarm;
 - (void) postTimeoutAlarm;
@@ -53,3 +54,4 @@
 
 extern NSString* ORSerialPortWithQueueModelIsValidChanged;
 extern NSString* ORSerialPortWithQueueModelPortClosedAfterTimeout;
+extern NSString* ORSerialPortWithQueueModelTimeoutCountChanged;

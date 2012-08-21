@@ -27,6 +27,7 @@
 #pragma mark •••External Strings
 NSString* ORSerialPortWithQueueModelIsValidChanged			= @"ORSerialPortWithQueueModelIsValidChanged";
 NSString* ORSerialPortWithQueueModelPortClosedAfterTimeout	= @"ORSerialPortWithQueueModelPortClosedAfterTimeout";
+NSString* ORSerialPortWithQueueModelTimeoutCountChanged     = @"ORSerialPortWithQueueModelTimeoutCountChanged";
 
 @implementation ORSerialPortWithQueueModel
 
@@ -41,6 +42,12 @@ NSString* ORSerialPortWithQueueModelPortClosedAfterTimeout	= @"ORSerialPortWithQ
 }
 
 #pragma mark •••Accessors
+- (void) setTimeoutCount:(int)aValue
+{
+    timeoutCount=aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSerialPortWithQueueModelTimeoutCountChanged object:self];		
+
+}
 - (int) timeoutCount
 {
 	return timeoutCount;
@@ -72,7 +79,7 @@ NSString* ORSerialPortWithQueueModelPortClosedAfterTimeout	= @"ORSerialPortWithQ
 	}
 	
 	if(isValid){
-		timeoutCount=0;
+        [self setTimeoutCount:0];
 		[self clearTimeoutAlarm];
 	}
 }
@@ -116,7 +123,7 @@ NSString* ORSerialPortWithQueueModelPortClosedAfterTimeout	= @"ORSerialPortWithQ
 
 - (void) timeout
 {
-	timeoutCount++;
+	[self setTimeoutCount: timeoutCount+1];
 	if(timeoutCount>10){
 		[self postTimeoutAlarm];
 	}
