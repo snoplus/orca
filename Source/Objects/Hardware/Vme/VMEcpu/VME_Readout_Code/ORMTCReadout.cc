@@ -4,6 +4,10 @@
 #include <iostream>
 #include <unistd.h>
 
+
+#include <stdlib.h>
+#include <sys/time.h>
+
 using namespace std;
 
 uint32_t ORMTCReadout::last_mem_read_ptr = k_fifo_valid_mask;
@@ -11,8 +15,6 @@ uint32_t ORMTCReadout::mem_read_ptr = k_fifo_valid_mask;
 
 
 bool ORMTCReadout::Start() {
-	//should we reset the fifo? what about subruns?
-
 	const uint32_t mem_read_reg = GetDeviceSpecificData()[0]; // 0x2CUL;
 	uint32_t value = 0;
 
@@ -21,7 +23,7 @@ bool ORMTCReadout::Start() {
 		LogBusError("BusError: mem_access at: 0x%08x", mem_read_reg); //limited to 64 * 0.75 chars
 		return true; 
 	}
-	
+
 	value &= k_fifo_valid_mask;
 	last_mem_read_ptr = value;
 	mem_read_ptr = value;
@@ -58,83 +60,122 @@ bool ORMTCReadout::Readout(SBC_LAM_Data* /*lamData*/)
 		LogBusError("BusError: mem_access at: 0x%08x", mem_read_reg);
 		return true; 
 	}
-		
+
 	triggered = ((mem_read_ptr & k_no_data_available) == 0);
 	mem_read_ptr &= k_fifo_valid_mask;
-	
+
+    if (!triggered) return true;
+
 	//check the trigger, step 2: write_ptr > last_read_ptr mod rollover
-	if (triggered) {
-		if (VMERead(GetBaseAddress() + mem_write_reg, GetAddressModifier(),
-				sizeof(mem_write_ptr), mem_write_ptr) < (int32_t) sizeof(mem_write_ptr)) {
-			LogBusError("BusError: mem_write at: 0x%08x\n", mem_write_reg);
-			return true; 
-		}
-		mem_write_ptr &= k_fifo_valid_mask;
-		//smarter check, taking into account gtid and clocks
-		triggered = (last_mem_read_ptr != mem_write_ptr); 
-	}
+
+    if (VMERead(GetBaseAddress() + mem_write_reg, GetAddressModifier(),
+            sizeof(mem_write_ptr), mem_write_ptr) < (int32_t) sizeof(mem_write_ptr)) {
+        LogBusError("BusError: mem_write at: 0x%08x\n", mem_write_reg);
+        return true; 
+    }
+    mem_write_ptr &= k_fifo_valid_mask;
 
 	//check consistency
-	if (triggered) {
-		triggered = (last_mem_read_ptr == mem_read_ptr);
-		
-		if (!triggered) {
-			//can we recover?
-			LogError("MTC readout broken, reseting\n");
-			value = 0UL;
-			if (VMEWrite(GetBaseAddress() + mem_read_reg, GetAddressModifier(), 
-					sizeof(value), value) < (int32_t) sizeof(value)){
-				LogBusError("BusError: reset read ptr\n");
-				return true; 
-			}        
-			
-			//todo: replace reset of the write pointer with full fifo reset
-			if (VMEWrite(GetBaseAddress() + mem_write_reg, GetAddressModifier(), 
-					sizeof(value), value) < (int32_t) sizeof(value)){
-				LogBusError("BusError: reset write ptr\n");
-				return true; 
-			}        
-			
-			//todo: maybe...
-			last_mem_read_ptr = 0UL;
-			mem_read_ptr = 0UL;
-			LogMessage("MTC readout reset done.\n");
-			
-			return true;
-		}
-	}
-	
-	if (triggered) {
-		ensureDataCanHold(7);
-		int32_t savedIndex = dataIndex;
-		data[dataIndex++] = GetHardwareMask()[0] | 7;
-		
-		for (int i = 0; i < 6; i++) {
-			if (VMERead(mem_base_address, mem_address_modifier, 
-					 sizeof(value), value) < (int32_t) sizeof(value)){
-				LogBusError("BusError: reading mtc word %d\n", i);
-				dataIndex = savedIndex;
-				// can we recover?
-				// we have to 1. reset the controller, and 2. make sure we start from scratch
-				// todo: reset fifo here and set bba to zero
-				return true; 
-			}
-			
-			data[dataIndex++] = value;
-		}
+    triggered = (last_mem_read_ptr == mem_read_ptr);
+    
+    if (!triggered) {
+        //trust MTCD, restart us
+        if (!Start()) {
+            LogError("MTCD readout: failed to restart");
+        }
+             
+        return true;
 
-		mem_read_ptr++;
-		if (mem_read_ptr > k_fifo_valid_mask) mem_read_ptr = 0UL;
-		if (VMEWrite(GetBaseAddress() + mem_read_reg, GetAddressModifier(), 
-			     sizeof(mem_read_ptr), mem_read_ptr) < (int32_t) sizeof(mem_read_ptr)){
-			LogBusError("BusError: rd ptr inc to 0x%08x\n", mem_read_ptr);
-			return true; 
-		}        
-		
-		last_mem_read_ptr = mem_read_ptr;
-	}
-	
-/*	
+        /*
+        //this is a backup plan reset code
+        //can we recover?
+        LogError("MTC readout broken, reseting\n");
+        value = 0UL;
+        if (VMEWrite(GetBaseAddress() + mem_read_reg, GetAddressModifier(), 
+                sizeof(value), value) < (int32_t) sizeof(value)){
+            LogBusError("BusError: reset read ptr\n");
+            return true; 
+        }        
+        
+        //todo: replace reset of the write pointer with full fifo reset
+        if (VMEWrite(GetBaseAddress() + mem_write_reg, GetAddressModifier(), 
+                sizeof(value), value) < (int32_t) sizeof(value)){
+            LogBusError("BusError: reset write ptr\n");
+            return true; 
+        }        
+        
+        //todo: maybe...
+        last_mem_read_ptr = 0UL;
+        mem_read_ptr = 0UL;
+        LogMessage("MTC readout reset done.\n");
+        */
+    }
+
+    /*
+     * the idea here is to guarantee MTCD doesn't get behind the CAEN digitizer
+     * the lame implementation is to grab a couple events before we switch
+     * before you change the 32 events per switch make sure you measure all the times
+     * make sure that the time to pull data traces from CAEN is less than the time
+     * MTCD needs to get the next event ready
+     */
+    /*
+    struct timeval tv1, tv2;
+    struct timezone tz;
+    gettimeofday(&tv1, &tz);
+    */
+
+    int32_t eventsStored = mem_write_ptr - mem_read_ptr;
+    if (eventsStored <= 0) eventsStored += 0xfffff;
+    if (eventsStored > 32) eventsStored = 32;
+
+    do {
+        ensureDataCanHold(7);
+        int32_t savedIndex = dataIndex;
+        data[dataIndex++] = GetHardwareMask()[0] | 7;
+
+        for (int i = 0; i < 6; i++) {
+            if (VMERead(mem_base_address, mem_address_modifier, 
+                     sizeof(value), value) < (int32_t) sizeof(value)){
+                LogBusError("BusError: reading mtc word %d\n", i);
+                dataIndex = savedIndex;
+                /* can we recover?
+                 * we need to keep reading the fifo until we find the 0th word again
+                 * for now just skip this one.
+                 */
+                
+                mem_read_ptr++;
+                if (mem_read_ptr > k_fifo_valid_mask) mem_read_ptr = 0UL;
+                if (VMEWrite(GetBaseAddress() + mem_read_reg, GetAddressModifier(), 
+                         sizeof(mem_read_ptr), mem_read_ptr) < (int32_t) sizeof(mem_read_ptr)){
+                    LogBusError("BusError: rd ptr inc to 0x%08x\n", mem_read_ptr);
+                    return true; 
+                }        
+                return true; 
+            }
+            data[dataIndex++] = value;
+        }
+
+        mem_read_ptr++;
+        if (mem_read_ptr > k_fifo_valid_mask) mem_read_ptr = 0UL;
+
+        if (VMEWrite(GetBaseAddress() + mem_read_reg, GetAddressModifier(), 
+                 sizeof(mem_read_ptr), mem_read_ptr) < (int32_t) sizeof(mem_read_ptr)){
+            LogBusError("BusError: rd ptr inc to 0x%08x\n", mem_read_ptr);
+            return true; 
+        }        
+
+        eventsStored--;
+        last_mem_read_ptr = mem_read_ptr;
+    } while(eventsStored);
+
+
+    /*
+    gettimeofday(&tv2, &tz);
+    std::cout << "readout took: " << std::dec << tv2.tv_usec - tv1.tv_usec << std::endl;
+    std::cout << "gtid: " << std::hex << data[dataIndex-3] << std::endl;
+    */
+
+    /*	
     if(triggered){
         //we have a trigger so read out the FECs for event
         leaf_index = GetNextTriggerIndex()[0];
@@ -142,7 +183,7 @@ bool ORMTCReadout::Readout(SBC_LAM_Data* /*lamData*/)
             leaf_index = readout_card(leaf_index,lamData);
         }
     }
-*/
+    */
 	
     return true; 
 }
