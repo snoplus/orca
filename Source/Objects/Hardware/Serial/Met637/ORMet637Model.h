@@ -112,7 +112,6 @@
 - (int) count:(int)index;
 - (NSString*) measurementDate;
 - (void) setMeasurementDate:(NSString*)aMeasurementDate;
-- (void) openPort:(BOOL)state;
 - (NSString*) countingModeString;
 - (float) countAlarmLimit:(int)index;
 - (void) setIndex:(int)index countAlarmLimit:(float)aCountAlarmLimit;

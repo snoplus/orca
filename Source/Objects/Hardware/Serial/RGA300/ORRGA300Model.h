@@ -203,7 +203,6 @@
 - (float)	firmwareVersion;
 - (int)		modelNumber;
 
-- (void) openPort:(BOOL)state;
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark •••Commands

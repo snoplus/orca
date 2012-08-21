@@ -203,22 +203,18 @@ NSString* ORProXR16SSRLock							= @"ORProXR16SSRLock";
 - (void) commonScriptMethodSectionEnd { }
 //-------------end of common script methods---------------------------------
 
-- (void) openPort:(BOOL)state
+- (void) setUpPort
 {
-    if(state) {
-        [serialPort open];
-		[serialPort setSpeed:38400];
-		[serialPort setParityNone];
-		[serialPort setStopBits2:NO];
-		[serialPort setDataBits:8];
-		[serialPort commitChanges];
-		[self readAllRelayStates];
-    }
-    else      [serialPort close];
-    portWasOpen = [serialPort isOpen];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSerialPortModelPortStateChanged object:self];
+	[serialPort setSpeed:38400];
+	[serialPort setParityNone];
+	[serialPort setStopBits2:NO];
+	[serialPort setDataBits:8];
 }
 
+- (void) firstActionAfterOpeningPort
+{
+	[self readAllRelayStates];
+}
 
 #pragma mark •••Archival
 - (id) initWithCoder:(NSCoder*)decoder

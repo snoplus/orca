@@ -390,29 +390,20 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
     
 }
 
-- (void) openPort:(BOOL)state
+- (void) setUpPort
 {
-    if(state) {
-        [serialPort open];
-		[serialPort setSpeed:28800];
-		[serialPort setParityNone];
-		[serialPort setStopBits2:NO];
-		[serialPort setDataBits:8];
-		[serialPort commitChanges];
-		[serialPort setDelegate:self];
-    }
-    else {
-		[serialPort close];
-		[self setIsValid:NO];
-	}
-    portWasOpen = [serialPort isOpen];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSerialPortModelPortStateChanged object:self];
-	if([serialPort isOpen]){
-		[self sendInitComm];
-		[self sendIDRequest];
-		[self queryAll];
-		[self sendSensitivityQuery];
-	}
+	[serialPort setSpeed:28800];
+	[serialPort setParityNone];
+	[serialPort setStopBits2:NO];
+	[serialPort setDataBits:8];
+}
+
+- (void) firstActionAfterOpeningPort
+{
+	[self sendInitComm];
+	[self sendIDRequest];
+	[self queryAll];
+	[self sendSensitivityQuery];
 }
 
 #pragma mark •••Archival

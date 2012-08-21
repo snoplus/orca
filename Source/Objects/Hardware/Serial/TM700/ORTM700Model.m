@@ -311,30 +311,17 @@ NSString* ORTM700ConstraintsChanged			= @"ORTM700ConstraintsChanged";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTM700ModelDeviceAddressChanged object:self];
 }
 
-
-
-- (void) openPort:(BOOL)state
+- (void) setUpPort
 {
-    if(state) {
-        [serialPort open];
-		[serialPort setSpeed:9600];
-		[serialPort setParityNone];
-		[serialPort setStopBits2:NO];
-		[serialPort setDataBits:8];
-		[serialPort commitChanges];
+	[serialPort setSpeed:9600];
+	[serialPort setParityNone];
+	[serialPort setStopBits2:NO];
+	[serialPort setDataBits:8];
+}
 
-		[serialPort setDelegate:self];
-    }
-    else {
-		[serialPort close];
-		[self setIsValid:NO];
-	}
-    portWasOpen = [serialPort isOpen];
-    if(portWasOpen){
-        [self performSelector:@selector(updateAll) withObject:nil afterDelay:1]; 
-    }
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSerialPortModelPortStateChanged object:self];
-    
+- (void) firstActionAfterOpeningPort
+{
+	[self performSelector:@selector(updateAll) withObject:nil afterDelay:1]; 
 }
 
 #pragma mark •••Archival

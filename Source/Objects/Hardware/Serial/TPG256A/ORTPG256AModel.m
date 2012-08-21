@@ -314,20 +314,12 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 	lastRequest = [aRequest copy]; 
 }
 
-- (void) openPort:(BOOL)state
+- (void) setUpPort
 {
-    if(state) {
-        [serialPort open];
-		[serialPort setSpeed:9600];
-		[serialPort setParityNone];
-		[serialPort setStopBits2:0];
-		[serialPort setDataBits:8];
-		[serialPort commitChanges];
-    }
-    else      [serialPort close];
-    portWasOpen = [serialPort isOpen];
-	if([serialPort isOpen])[self sendUnits];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSerialPortModelPortStateChanged object:self];
+	[serialPort setSpeed:9600];
+	[serialPort setParityNone];
+	[serialPort setStopBits2:0];
+	[serialPort setDataBits:8];
 }
 
 - (double) lowLimit:(int)aChan

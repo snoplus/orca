@@ -108,17 +108,40 @@ NSString* ORSerialPortWithQueueModelTimeoutCountChanged     = @"ORSerialPortWith
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
 	[self performSelector:@selector(timeout) withObject:nil afterDelay:aDelay];
 }
-- (void) openPort:(BOOL)aState
+
+- (void) openPort:(BOOL)state
 {
-	if(!aState){
+    if(state) {
+        [serialPort open];
+		[self setUpPort];
+		[serialPort commitChanges];
+		[serialPort setDelegate:self];
+		[self firstActionAfterOpeningPort];
+	}
+    else {
 		[self cancelTimeout];
-		[self setIsValid:NO];
 		[cmdQueue removeAllObjects];
 		[self setLastRequest:nil];
 		[self clearTimeoutAlarm];
+		[self setIsValid:NO];
+		[serialPort close];
 	}
-	
-	[super openPort:aState];
+    portWasOpen = [serialPort isOpen];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSerialPortModelPortStateChanged object:self];
+}
+
+- (void) setUpPort
+{		
+	//defaults -- subclasses can override
+	[serialPort setSpeed:9600];
+	[serialPort setParityNone];
+	[serialPort setStopBits2:NO];
+	[serialPort setDataBits:8];
+}
+
+- (void) firstActionAfterOpeningPort
+{
+	//subclasses can override
 }
 
 - (void) timeout

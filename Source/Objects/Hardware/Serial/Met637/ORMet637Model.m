@@ -513,23 +513,18 @@ NSString* ORMet637Lock = @"ORMet637Lock";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMet637ModelMeasurementDateChanged object:self];
 }
 
-- (void) openPort:(BOOL)state
+- (void) setUpPort
 {
-    [self setTimeoutCount:0];
-    if(state) {
-        [serialPort open];
-		[serialPort setSpeed:9600];
-		[serialPort setParityNone];
-		[serialPort setStopBits2:NO];
-		[serialPort setDataBits:8];
-		[serialPort commitChanges];
-		[self probe];
-    }
-    else [serialPort close];
-    portWasOpen = [serialPort isOpen];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSerialPortModelPortStateChanged object:self];
+	[serialPort setSpeed:9600];
+	[serialPort setParityNone];
+	[serialPort setStopBits2:NO];
+	[serialPort setDataBits:8];
 }
 
+- (void) firstActionAfterOpeningPort
+{
+	[self probe];
+}
 
 #pragma mark ***Archival
 - (id) initWithCoder:(NSCoder*)decoder

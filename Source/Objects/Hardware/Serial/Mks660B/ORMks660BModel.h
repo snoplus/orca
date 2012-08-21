@@ -78,7 +78,6 @@
 - (void) setShipPressures:(BOOL)aShipPressures;
 - (int)  pollTime;
 - (void) setPollTime:(int)aPollTime;
-- (void) openPort:(BOOL)state;
 - (float) pressure;
 - (unsigned long) timeMeasured;
 - (void) setPressure:(float)aValue;

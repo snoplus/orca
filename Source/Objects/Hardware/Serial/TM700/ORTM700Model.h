@@ -77,7 +77,6 @@
 - (void) setDriveUnitOverTemp:(BOOL)aDriveUnitOverTemp;
 - (int) deviceAddress;
 - (void) setDeviceAddress:(int)aDeviceAddress;
-- (void) openPort:(BOOL)state;
 - (NSString*) auxStatusString:(int)aChannel;
 - (BOOL) isOn:(int)aChannel;
 

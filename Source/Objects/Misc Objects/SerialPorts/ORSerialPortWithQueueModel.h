@@ -38,6 +38,9 @@
 - (void) setLastRequest:(id)aCmd;
 - (BOOL) isValid;
 - (void) setIsValid:(BOOL)aState;
+- (void) openPort:(BOOL)state;
+- (void) setUpPort;
+- (void) firstActionAfterOpeningPort;
 
 #pragma mark •••Cmd Handling
 - (id) nextCmd;
