@@ -41,6 +41,11 @@ NSString* ORSerialPortWithQueueModelPortClosedAfterTimeout	= @"ORSerialPortWithQ
 }
 
 #pragma mark •••Accessors
+- (int) timeoutCount
+{
+	return timeoutCount;
+}
+
 - (id) lastRequest
 {
 	return lastRequest;

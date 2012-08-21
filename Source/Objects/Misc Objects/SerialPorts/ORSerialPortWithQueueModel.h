@@ -48,6 +48,7 @@
 - (void) clearTimeoutAlarm;
 - (void) postTimeoutAlarm;
 - (void) recoverFromTimeout;
+- (int) timeoutCount;
 @end
 
 extern NSString* ORSerialPortWithQueueModelIsValidChanged;
