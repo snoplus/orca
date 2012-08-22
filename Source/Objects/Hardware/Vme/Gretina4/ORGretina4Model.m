@@ -2401,7 +2401,8 @@ static struct {
 	
 	while(1) {
 		if(stopDownLoadingMainFPGA)return;
-
+		[ORTimer delayNanoseconds:100000];			
+		
 		// Checking status to make sure that flash is ready
 		/* This is slightly different since we give another command if the status hasn't updated. */
 		[[self adapter] readLongBlock:&tempToWrite
@@ -2409,6 +2410,7 @@ static struct {
 							numToRead:1
 						   withAddMod:[self addressModifier]
 						usingAddSpace:0x01];		
+		
 		if ( (tempToWrite & kGretina4FlashReady)  == 0 ) {
 			tempToWrite = kGretina4FlashWriteCmd;
 			[[self adapter] writeLongBlock:&tempToWrite
@@ -2457,7 +2459,7 @@ static struct {
 	unsigned long tempToRead;
 	while(1) {
 		if(stopDownLoadingMainFPGA)return;
-
+		
 		[ORTimer delayNanoseconds:100000];
 		// Checking status to make sure that flash is ready
 		[[self adapter] readLongBlock:&tempToRead
@@ -2466,6 +2468,7 @@ static struct {
 						   withAddMod:[self addressModifier]
 						usingAddSpace:0x01];		
 		if ( (tempToRead & kGretina4FlashReady) != 0 ) break;
+		break;
 	}
 	
 }
@@ -2595,6 +2598,8 @@ static struct {
 					usingAddSpace:0x01];
 	
 	while ( ( tempToWrite & kGretina4MainFPGAIsLoaded ) != kGretina4MainFPGAIsLoaded ) {
+		
+		[ORTimer delayNanoseconds:100000];			
 		[[self adapter] readLongBlock:&tempToWrite
 							atAddress:[self baseAddress] + fpga_register_information[kMainFPGAStatus].offset
 							numToRead:1
@@ -2605,6 +2610,9 @@ static struct {
 
 - (void) downloadingMainFPGADone
 {
+	[fpgaProgrammingThread release];
+	fpgaProgrammingThread = nil;
+	
 	if(!stopDownLoadingMainFPGA) NSLog(@"Programming Complete.\n");
 	else						 NSLog(@"Programming manually stopped before done\n");
 	[self setDownLoadMainFPGAInProgress: NO];
