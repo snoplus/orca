@@ -1601,8 +1601,13 @@ static struct {
 	
 	[self setDownLoadMainFPGAInProgress: YES];
 	[self updateDownLoadProgress];
+
+	if(fpgaProgrammingThread)[fpgaProgrammingThread release];
+	fpgaProgrammingThread = [[NSThread alloc] initWithTarget:self selector:@selector(fpgaDownLoadThread:) object:dataFromFile];
+	[fpgaProgrammingThread setStackSize:4*1024*1024];
+	[fpgaProgrammingThread start];
 	
-	[NSThread detachNewThreadSelector:@selector(fpgaDownLoadThread:) toTarget:self withObject:dataFromFile];
+	//[NSThread detachNewThreadSelector:@selector(fpgaDownLoadThread:) toTarget:self withObject:dataFromFile];
 }
 
 - (void) stopDownLoadingMainFPGA
@@ -2226,6 +2231,8 @@ static struct {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	
 	@try {
+		[dataFromFile retain];
+
 		[self setProgressStateOnMainThread:@"Block Erase"];
 		if(!stopDownLoadingMainFPGA) [self blockEraseFlash];
 		[self setProgressStateOnMainThread:@"Programming"];
@@ -2245,7 +2252,10 @@ static struct {
 	@catch(NSException* localException) {
 		[self setProgressStateOnMainThread:@"Exception"];
 	}
-	[self performSelectorOnMainThread:@selector(downloadingMainFPGADone) withObject:nil waitUntilDone:NO];
+	@finally {
+		[self performSelectorOnMainThread:@selector(downloadingMainFPGADone) withObject:nil waitUntilDone:NO];
+		[dataFromFile release];
+	}
 	[pool release];
 }
 
@@ -2289,8 +2299,10 @@ static struct {
 	unsigned int i;
 	[self setFpgaDownProgress:0.];
 	for (i=0; i<kGretina4UsedFlashBlocks; i++ ) {
+		if(stopDownLoadingMainFPGA)return;
 		@try {
 			[self blockEraseFlashAtBlock:i];
+			//[ORTimer delayNanoseconds:10000];
 			[self setFpgaDownProgress: 100. * (i+1)/(float)kGretina4UsedFlashBlocks];
 		}
 		@catch(NSException* localException) {
@@ -2388,6 +2400,8 @@ static struct {
 					 usingAddSpace:0x01];
 	
 	while(1) {
+		if(stopDownLoadingMainFPGA)return;
+
 		// Checking status to make sure that flash is ready
 		/* This is slightly different since we give another command if the status hasn't updated. */
 		[[self adapter] readLongBlock:&tempToWrite
@@ -2442,9 +2456,12 @@ static struct {
 {
 	unsigned long tempToRead;
 	while(1) {
+		if(stopDownLoadingMainFPGA)return;
+
+		[ORTimer delayNanoseconds:100000];
 		// Checking status to make sure that flash is ready
 		[[self adapter] readLongBlock:&tempToRead
-							atAddress:[self baseAddress] + fpga_register_information[kFlashData].offset
+							atAddress:[self baseAddress] + fpga_register_information[kMainFPGA].offset
 							numToRead:1
 						   withAddMod:[self addressModifier]
 						usingAddSpace:0x01];		
@@ -2501,7 +2518,6 @@ static struct {
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];					 
-	
 	/* Now make sure that it finishes correctly. We don't need to issue the flash command to
 	 read the status register because the confirm command already sets that.  */
 	[self testFlashStatusRegisterWithNoFlashCmd];
@@ -2511,7 +2527,10 @@ static struct {
 - (BOOL) verifyFlashBuffer:(NSData*)theData
 {
 	/* First reset to make sure it is read mode. */
+	//[ORTimer delayNanoseconds:100000];
 	[self resetFlashStatus];
+	//[ORTimer delayNanoseconds:100000];
+
 	unsigned int position = 0;
 	unsigned long tempToRead;
 	const char* dataPtr = (const char*)[theData bytes];
@@ -2547,7 +2566,7 @@ static struct {
 		position += 4;
 	}
 	[self setFpgaDownProgress: 100];
-	[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:.1]];
+	//[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:.1]];
 	[self setFpgaDownProgress: 0];
 	return YES;
 }
