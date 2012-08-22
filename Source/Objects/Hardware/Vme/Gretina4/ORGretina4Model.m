@@ -2461,7 +2461,7 @@ static struct {
 		[ORTimer delayNanoseconds:100000];
 		// Checking status to make sure that flash is ready
 		[[self adapter] readLongBlock:&tempToRead
-							atAddress:[self baseAddress] + fpga_register_information[kMainFPGA].offset
+							atAddress:[self baseAddress] + fpga_register_information[kFlashData].offset
 							numToRead:1
 						   withAddMod:[self addressModifier]
 						usingAddSpace:0x01];		
