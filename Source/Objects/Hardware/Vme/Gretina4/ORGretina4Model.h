@@ -176,6 +176,7 @@ enum Gretina4FIFOStates {
 @interface ORGretina4Model : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping,AutoTesting>
 {
   @private
+	NSThread*		fpgaProgrammingThread;
 	unsigned long   dataId;
 	unsigned long*  dataBuffer;
 
