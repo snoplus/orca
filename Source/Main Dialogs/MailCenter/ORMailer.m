@@ -83,6 +83,7 @@
 	
 	if ( [mail lastError] != nil ){
 		NSLog( @"Possible problems with sending e-mail to %@\n",to);
+        [emailMessage release];
 		return;
 	}
 	NSArray* people = [to componentsSeparatedByString:@","];

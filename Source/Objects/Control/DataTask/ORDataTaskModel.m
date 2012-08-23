@@ -80,7 +80,8 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
     [readOutList release];
     [dataTakers release];
 	[theDecoder release];
-
+    [recordsPending release];
+    
     [super dealloc];
 }
 
