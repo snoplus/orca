@@ -2420,7 +2420,7 @@ static struct {
 							 usingAddSpace:0x01];			
 		} else break;
 	}
-	
+
 	// Setting how many we are trying to write
 	tempToWrite = (aNumber/2) - 1;
 	[[self adapter] writeLongBlock:&tempToWrite
@@ -2468,8 +2468,7 @@ static struct {
 						   withAddMod:[self addressModifier]
 						usingAddSpace:0x01];		
 		if ( (tempToRead & kGretina4FlashReady) != 0 ) break;
-		break;
-	}
+		}
 	
 }
 
