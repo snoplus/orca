@@ -670,14 +670,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 
 - (void) move:(int)motorIndex dx:(float)aPosition
 {
-	if(motorIndex>=0 && motorIndex<[motors count]){	
-		NSString* aCmd = [NSString stringWithFormat:@"F,C,I%dM%.0f,R",motorIndex+1,aPosition];
-		float conversion = [[motors objectAtIndex:motorIndex] conversion];
-		NSString* units = displayRaw?@"stps":@"mm";
-		[self addCmdToQueue:aCmd 
-				description:[NSString stringWithFormat:@"Move %d by %.2f%@",motorIndex,aPosition/conversion,units]
-				 waitToSend:YES];
-	}
+    [self move: motorIndex dx: aPosition speed: [[self motor: motorIndex] motorSpeed]];
 }
 
 - (void) move:(int)motorIndex dx:(float)aPosition speed:(int)aSpeed
