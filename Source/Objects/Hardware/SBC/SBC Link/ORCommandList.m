@@ -76,20 +76,33 @@
 	blockPacket->cmdHeader.numberBytesinPayload	= 0; //fill in as we go
 	char* blockPayloadPtr				= (char*)blockPacket->payload;
     
-    // We use an NSData object so that if any exceptions are thrown, this will be cleaned up automatically.
-    NSData* tmpData = [NSMutableData dataWithLength:sizeof(SBC_Packet)];
-    SBC_Packet* cmdPacket = (SBC_Packet*)[tmpData bytes];
-	
-	for(id aCmd in commands){
-        [aCmd SBCPacket:cmdPacket];
-        if (blockPacket->cmdHeader.numberBytesinPayload + cmdPacket->numBytes > kSBC_MaxPayloadSizeBytes) {
-            [NSException raise: @"SBC/VME access Error" format:@"Memory overflow on SBC_Packet"];
-        }
-		memcpy(blockPayloadPtr,cmdPacket,cmdPacket->numBytes);
+    // We use an NSData object so we can put the packet on the heap and if any exceptions are thrown, we can cleanup.
+    NSData* tmpData = [[NSMutableData dataWithLength:sizeof(SBC_Packet)]retain];
+    if(tmpData){
+        @try {
+            SBC_Packet* cmdPacket = (SBC_Packet*)[tmpData bytes];
+            
+            for(id aCmd in commands){
+                [aCmd SBCPacket:cmdPacket];
+                if (blockPacket->cmdHeader.numberBytesinPayload + cmdPacket->numBytes > kSBC_MaxPayloadSizeBytes) {
+                    [NSException raise: @"SBC/VME access Error" format:@"Memory overflow on SBC_Packet"];
+                }
+                memcpy(blockPayloadPtr,cmdPacket,cmdPacket->numBytes);
 
-		blockPacket->cmdHeader.numberBytesinPayload += cmdPacket->numBytes;
-		blockPayloadPtr += cmdPacket->numBytes;
-	}
+                blockPacket->cmdHeader.numberBytesinPayload += cmdPacket->numBytes;
+                blockPayloadPtr += cmdPacket->numBytes;
+            }
+        }
+        @catch (NSException * e) {
+            [e raise];
+        }
+        @finally {
+            [tmpData release];
+        }
+    }
+    else {
+        [NSException raise: @"SBC/VME allocation Error" format:@"Could not allocate memory for the SBC_Packet"];
+    }
 }
 
 - (void) extractData:(SBC_Packet*) aPacket

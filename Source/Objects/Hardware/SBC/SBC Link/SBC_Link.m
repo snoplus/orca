@@ -1492,8 +1492,8 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 //temp discrete ops
 - (void) executeCommandList:(ORCommandList*)aList
 {
+    NSData* tmpData = [[NSMutableData dataWithLength:sizeof(SBC_Packet)] retain];
 	@try {
-        NSData* tmpData = [NSMutableData dataWithLength:sizeof(SBC_Packet)];
         SBC_Packet* blockPacket = (SBC_Packet*)[tmpData bytes];        
         [aList SBCPacket:blockPacket];
 		
@@ -1510,6 +1510,9 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 		[socketLock unlock]; //end critical section
 		[localException raise];
 	}
+    @finally {
+        [tmpData release];
+    }
 }
 
 
