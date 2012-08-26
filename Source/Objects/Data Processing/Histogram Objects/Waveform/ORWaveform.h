@@ -26,7 +26,6 @@
     NSData*				waveform;
     unsigned long		dataOffset;
 	int					unitSize;
-	NSRecursiveLock*	dataLock;
 	BOOL				useUnsignedValues;
 	NSMutableArray*		rois;
 }

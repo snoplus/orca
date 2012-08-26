@@ -51,12 +51,14 @@ NSString* ORManualPlotDataChanged			= @"ORManualPlotDataChanged";
 - (void) dealloc
 {
     [comment release];
+	[dataSetLock release];
 	[fftDataSet release];
     [col3Title release];
     [col2Title release];
     [col1Title release];
     [col0Title release];
-	[dataSetLock release];
+    [col0Title release];
+	[calibration release];
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[data release];
  	[roiSet release];

@@ -57,6 +57,7 @@
 
 - (void) dealloc
 {
+    [objectLookup release];
 	[fileHeader release];
 	[super dealloc];
 }

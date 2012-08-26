@@ -90,6 +90,7 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
     [dataSet release];
     [directoryName release];
     [fileName release];
+    [mLock release];
     [super dealloc];
 }
 

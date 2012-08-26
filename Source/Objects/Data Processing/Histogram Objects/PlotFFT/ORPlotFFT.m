@@ -40,6 +40,7 @@ NSString* ORPlotFFTShowChanged = @"ORPlotFFTShowChanged";
 {
 	[realArray release];
 	[imaginaryArray release];
+	[powerSpectrumArray release];
 	[dataLock release];
     [super dealloc];
 }

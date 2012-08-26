@@ -45,6 +45,7 @@
 
 - (void) dealloc
 {
+    [currentDecoder release];
     [theDataLock release];
     [dataArray release];
 	[cacheArray release];
