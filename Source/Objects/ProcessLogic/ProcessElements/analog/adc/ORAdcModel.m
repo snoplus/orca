@@ -257,7 +257,7 @@ NSString* ORAdcModelHighConnection		= @"ORAdcModelHighConnection";
 			double theMaxValue		  = [hwObject maxValueForChan:[self bit]];
 			double theMinValue		  = [hwObject minValueForChan:[self bit]];
 		
-			if(fabs(theConvertedValue-hwValue) >= minChange || theMaxValue!=maxValue || theMinValue!=minValue)updateNeeded = YES;
+			if(fabs(theConvertedValue-hwValue) > minChange || theMaxValue!=maxValue || theMinValue!=minValue)updateNeeded = YES;
 			hwValue = theConvertedValue;
 			maxValue = theMaxValue;
 			minValue = theMinValue;
@@ -309,15 +309,19 @@ NSString* ORAdcModelHighConnection		= @"ORAdcModelHighConnection";
         }
         if(isValid){
             s =  [NSString stringWithFormat:@"%@: %@ ", [self iconLabel],[self iconValue]];
+            NSString* theFormat = @"%.1f";
+            if([displayFormat length] != 0)									theFormat = displayFormat;
+            if([theFormat rangeOfString:@"%@"].location !=NSNotFound)		theFormat = @"%.1f";
+            else if([theFormat rangeOfString:@"%d"].location !=NSNotFound)	theFormat = @"%.0f";
             
-            if(valueTooLow)		  s =  [s stringByAppendingString:@" [LOW ALARM POSTED] "];
-            else if(valueTooHigh) s =  [s stringByAppendingString:@" [HIGH ALARM POSTED]"];
+            if(valueTooLow)	{
+                s =  [s stringByAppendingFormat:@" [BELOW USER SPECIFIED LIMIT (%@)] ",[NSString stringWithFormat:theFormat,lowLimit]];
+            }
+            else if(valueTooHigh){
+               s =  [s stringByAppendingFormat:@" [ABOVE USER SPECIFIED LIMIT (%@)] ",[NSString stringWithFormat:theFormat,highLimit]];
+            }
             
             if(trackMaxMin){
-                NSString* theFormat = @"%.1f";
-                if([displayFormat length] != 0)									theFormat = displayFormat;
-                if([theFormat rangeOfString:@"%@"].location !=NSNotFound)		theFormat = @"%.1f";
-                else if([theFormat rangeOfString:@"%d"].location !=NSNotFound)	theFormat = @"%.0f";
                 NSString* highestValueString =  [NSString stringWithFormat:theFormat,highestValue];
                 NSString* lowestValueString  =  [NSString stringWithFormat:theFormat,lowestValue];
                 
