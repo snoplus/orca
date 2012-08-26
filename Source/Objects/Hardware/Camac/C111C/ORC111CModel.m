@@ -503,7 +503,7 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
 	blk_info.totsize = numWords;  
     blk_info.ascii_transf = 0;	
 	blk_info.timeout = 0;
-	unsigned int* buffer = (unsigned int*)malloc(numWords*sizeof(int));
+	unsigned int* buffer = (unsigned int*)malloc(numWords*sizeof(unsigned int));
 	if(trackTransactions)[transactionTimer reset];
 	int i;
 	if(f < 16){
@@ -547,7 +547,7 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
 	blk_info.blksize = 24; //16 bit word size  
 	blk_info.totsize = numWords;  	
 	blk_info.timeout = 0;
-	unsigned int* buffer = (unsigned int*)malloc(numWords*sizeof(long));
+	unsigned int* buffer = (unsigned int*)malloc(numWords*sizeof(unsigned int));
 	if(trackTransactions)[transactionTimer reset];
 	int i;
 	if(f < 16){

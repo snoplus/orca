@@ -493,7 +493,7 @@ NSString* ORCaen1190RateGroupChangedNotification    = @"ORCaen1190RateGroupChang
     [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:NSStringFromClass([self class])]; 
     
     //make buffer for data with extra room for our 2 long word header.
-    dataBuffer   = (unsigned long*)malloc([self getDataBufferSize]+2*sizeof(long));
+    dataBuffer   = (unsigned long*)malloc([self getDataBufferSize]+2*sizeof(unsigned long));
     controller   = [self adapter]; //cache for speed
 	long detectiontype = [self edgeDetection];
 	locationWord = (detectiontype << 25) | (([self crateNumber] & 0x0000000f)<<21) | (([self slot] & 0x0000001f)<<16);

@@ -295,7 +295,7 @@ NSString* 	caenChnl				= @"CAEN Chnl";
             ORDataPacket* tempDataPacket = [[ORDataPacket alloc]init];
 			dataDecoder = [[ORCaenDataDecoder alloc] init];
 			//make buffer for data with extra room for our 2 long word header.
-			dataBuffer = (unsigned long*)malloc([self getDataBufferSize]+2*sizeof(long));
+			dataBuffer = (unsigned long*)malloc([self getDataBufferSize]+2*sizeof(unsigned long));
 			controller = [self adapter]; //cache for speed
 			
             [self takeData:tempDataPacket userInfo:nil];
@@ -688,7 +688,7 @@ static NSString*	CAENThresholdChnl       = @"CAENThresholdChnl%d";
     
     dataDecoder = [[ORCaenDataDecoder alloc] init];
     //make buffer for data with extra room for our 2 long word header.
-    dataBuffer = (unsigned long*)malloc([self getDataBufferSize]+2*sizeof(long));
+    dataBuffer = (unsigned long*)malloc([self getDataBufferSize]+2*sizeof(unsigned long));
     controller = [self adapter]; //cache for speed
 	
 	[self flushBuffer];

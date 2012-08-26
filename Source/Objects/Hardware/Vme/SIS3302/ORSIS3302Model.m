@@ -3039,7 +3039,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 					long sisHeaderLength = 2;
 					if(wrapMaskForRun & (1L<<group))	sisHeaderLength = 4;
 					dataRecordlength[group] = 4+sisHeaderLength+[self sampleLength:group]/2+energySampleLength/2+4; //Orca header+sisheader+samples+energy+sistrailer
-					dataRecord[group]		= malloc(dataRecordlength[group]*sizeof(long)+100);
+					dataRecord[group]		= malloc(dataRecordlength[group]*sizeof(unsigned long)+100);
 				}
 				isRunning = YES;
 				firstTime = NO;

@@ -1832,7 +1832,7 @@ static struct {
     }
     [self clearFIFO];
     fifoLostEvents = 0;
-    dataBuffer = (unsigned long*)malloc(0xffff * sizeof(long));
+    dataBuffer = (unsigned long*)malloc(0xffff * sizeof(unsigned long));
     [self startRates];
     
     [self initBoard:true];

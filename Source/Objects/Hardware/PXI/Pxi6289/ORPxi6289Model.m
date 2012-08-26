@@ -260,7 +260,7 @@ static unsigned long register_offsets[kNumberOfPxi6289Registers] = {
     location        = (([self crateNumber]&0x0000000f)<<21) | (([self slot]& 0x0000001f)<<16);
     controller		= [self adapter];
     
-    dataBuffer = (unsigned long*)malloc(0xffff * sizeof(long));
+    dataBuffer = (unsigned long*)malloc(0xffff * sizeof(unsigned long));
     [self startRates];
     [self initBoard];
 }
