@@ -297,6 +297,8 @@
 {
 	[calibrationArray release];
 	[calibrationName release];
+	[units release];
+	[label release];
 	[super dealloc];
 }
 
