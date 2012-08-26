@@ -686,15 +686,11 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
         returnLength = [ self writeReadGPIBDevice: @"HORIZONTAL:FASTFRAME:STATE?" 
                                              data: mReturnData
                                         maxLength: kMaxGPIBReturn ];
-        if ( returnLength > 0 )
-            if ( [ self convertStringToLong: mReturnData withLength: returnLength ] == 0 )
-            {
-                mFastframeState = false;
-            }
-            else
-            {
-                mFastframeState = true;
-            }
+        if ( returnLength > 0 ){
+            if ( [ self convertStringToLong: mReturnData withLength: returnLength ] == 0 )mFastframeState = false;
+            
+            else mFastframeState = true;
+        }
         
 		// Read the Fastframe:Timestamp state
         returnLength = [ self writeReadGPIBDevice: @"HORIZONTAL:FASTFRAME:TIMESTAMP:STATE?"

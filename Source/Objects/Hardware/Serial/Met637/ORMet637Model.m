@@ -830,7 +830,7 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 		}
 	}
 	else {
-		if(([theResponse length]==1) && [lastRequest hasPrefix:@"2"] || [lastRequest hasPrefix:@"3"]){
+		if(([theResponse length]==1) && ([lastRequest hasPrefix:@"2"] || [lastRequest hasPrefix:@"3"])){
 			[self setDumpInProgress:YES];
 			[self setDumpCount:0];
 			[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(dumpTimeout) object:nil];

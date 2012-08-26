@@ -1384,7 +1384,7 @@ NSString* ORLabJackUE9ModelAdcEnableMaskChanged		= @"ORLabJackUE9ModelAdcEnableM
 	sendBuff[10] = (unsigned char)((dirMask>>8) & 0xFF); //MIODir
 	sendBuff[11] = (unsigned char)((doValueOut>>8) & 0xFF); //MIOState
 	sendBuff[12] = (unsigned char)0xFF;					//CIOMask
-	sendBuff[13] = ((unsigned char)(((dirMask>>16) & 0xF)<<4) | (doValueOut>>16) & 0xF); //CIODirState: 7-4 Dir, 3-0 state
+	sendBuff[13] = ((unsigned char)(((dirMask>>16) & 0xF)<<4) | ((doValueOut>>16) & 0xF)); //CIODirState: 7-4 Dir, 3-0 state
 
 	sendBuff[14] = 0x0; //MIOMask not used
 	sendBuff[15] = 0x0; //MIODirState not used

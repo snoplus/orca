@@ -358,7 +358,7 @@ NSString* ORVacuumConstraintChanged = @"ORVacuumConstraintChanged";
 	[NSBezierPath fillRect:NSMakeRect(location.x-kGateValveHousingWidth/2.,location.y+kPipeRadius,kGateValveHousingWidth,2*kPipeThickness)]; //above pipe part
 	[NSBezierPath fillRect:NSMakeRect(location.x-kGateValveHousingWidth/2.,location.y-kPipeRadius-2*kPipeThickness,kGateValveHousingWidth,2*kPipeThickness)]; //below pipe part
 	
-	if(controlPreference!=kControlNone && controlType == k2BitReadBack || controlType == k1BitReadBack){
+	if(controlPreference!=kControlNone && (controlType == k2BitReadBack || controlType == k1BitReadBack)){
 		if([constraints count]!=0){
 			NSImage* lockImage = [[NSImage imageNamed:@"smallLock"] copy];
 			NSSize lockSize = [lockImage size];
@@ -427,7 +427,7 @@ NSString* ORVacuumConstraintChanged = @"ORVacuumConstraintChanged";
 	[NSBezierPath fillRect:NSMakeRect(location.x-kPipeRadius - 2*kPipeThickness,location.y-kGateValveHousingWidth/2.,2*kPipeThickness,kGateValveHousingWidth)]; //left of pipe part
 	[NSBezierPath fillRect:NSMakeRect(location.x+kPipeRadius,location.y-kGateValveHousingWidth/2.,2*kPipeThickness,kGateValveHousingWidth)]; //below pipe part
 
-	if(controlPreference!=kControlNone && controlType == k2BitReadBack || controlType == k1BitReadBack){
+	if(controlPreference!=kControlNone && (controlType == k2BitReadBack || controlType == k1BitReadBack)){
 		if([constraints count]!=0){
 			NSImage* lockImage = [[NSImage imageNamed:@"smallLock"] copy];
 			NSSize lockSize = [lockImage size];
