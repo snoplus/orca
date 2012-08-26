@@ -70,7 +70,6 @@
 
     
 	[(ORTimeAxis*)[plotter0 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
-	[aPlot release];
 	
 	blankView = [[NSView alloc] init];
     basicOpsSize	= NSMakeSize(610,545);

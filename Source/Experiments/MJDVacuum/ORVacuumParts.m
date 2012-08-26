@@ -524,7 +524,7 @@ NSString* ORVacuumConstraintChanged = @"ORVacuumConstraintChanged";
 	green = MIN(1.0,green*1.5);
 	blue = MIN(1.0,blue*1.5);
 	NSColor* endingColor = [NSColor colorWithCalibratedRed:red green:green blue:blue alpha:1];
-	self.gradient = [[NSGradient alloc] initWithStartingColor:controlColor endingColor:endingColor];
+	self.gradient = [[[NSGradient alloc] initWithStartingColor:controlColor endingColor:endingColor]autorelease];
 	
 }
 

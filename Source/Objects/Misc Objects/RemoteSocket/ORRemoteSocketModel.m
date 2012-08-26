@@ -195,7 +195,7 @@ NSString* ORRemoteSocketLock		= @"ORRemoteSocketLock";
 	} 
 	else return SCCInitError_NoSocket;
 	
-	NSFileHandle* fileHandle = [[NSFileHandle alloc] initWithFileDescriptor:filedescriptor closeOnDealloc:YES];
+	NSFileHandle* fileHandle = [[[NSFileHandle alloc] initWithFileDescriptor:filedescriptor closeOnDealloc:YES] autorelease];
 	if(fileHandle) {
 		SimpleCocoaConnection* connection = [[SimpleCocoaConnection alloc] initWithFileHandle:fileHandle delegate:self];
 		if(connection) {
@@ -382,7 +382,7 @@ NSString* ORRemoteSocketLock		= @"ORRemoteSocketLock";
 	} 
 	else {
 		[fileHandle readInBackgroundAndNotify];
-		NSString *received = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+		NSString *received = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
 		if([received characterAtIndex:0] == 0x04) { // End-Of-Transmission sent by client
 			return;
 		}

@@ -912,11 +912,11 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 - (void) collectSegmentMap
 {		
 	if(!stealthMode){
-		ORPostSegmentMapOp* anOp = [[ORPostSegmentMapOp alloc] initWithDelegate:self];
 		
 		[[[self document] collectObjectsOfClass:NSClassFromString(@"OrcaObject")] makeObjectsPerformSelector:@selector(clearLoopChecked)];
 		NSArray* runObjects = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
 		if([runObjects count]){
+            ORPostSegmentMapOp* anOp = [[ORPostSegmentMapOp alloc] initWithDelegate:self];
 			NSArray* arrayOfHistos = [[runObjects objectAtIndex:0] collectConnectedObjectsOfClass:NSClassFromString(@"ORHistoModel")];
 			if([arrayOfHistos count]){
 				id histoObj = [arrayOfHistos objectAtIndex:0];
