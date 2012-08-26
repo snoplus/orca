@@ -53,8 +53,8 @@ NSString* OR2dRoiCurveFitChanged = @"OR2dRoiCurveFitChanged";
 - (void) dealloc
 {
 	[label release];
-	[points dealloc];
-	[theRoiPath dealloc];
+	[points release];
+	[theRoiPath release];
 	[super dealloc];
 }
 - (id) fit { return nil; }

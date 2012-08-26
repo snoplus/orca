@@ -42,6 +42,7 @@
     [attributes release];
     [gradient release];
 	[backgroundImage release];
+	[comment release];
     [super dealloc];
 }
 

@@ -39,7 +39,6 @@
 	NSImage*				symbolNormal;
 	NSImage*				symbolLight;
 	NSColor*				savedColor;
-	NSString*				name;
 }
 
 - (id) initWithTag:(int)aTag andDataSource:(id)dataSource;

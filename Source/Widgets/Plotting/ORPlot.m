@@ -40,7 +40,8 @@
 {
 	[attributes release];
 	[symbolNormal release];
-	[symbolLight release];
+	[symbolNormal release];
+	[savedColor release];
     [super dealloc];
 }
 
