@@ -245,6 +245,13 @@ NSString* ORAdcModelHighConnection		= @"ORAdcModelHighConnection";
 	[[self hwObject] showMainInterface];
 }
 
+- (BOOL) isTrueEndNode
+{
+    return  [self objectConnectedTo:ORAdcModelHighConnection]==nil &&
+            [self objectConnectedTo:ORAdcModelLowConnection]==nil &&
+            [self objectConnectedTo:ORAdcModelOKConnection]==nil;
+}
+
 //--------------------------------
 //runs in the process logic thread
 - (id) eval
@@ -264,7 +271,7 @@ NSString* ORAdcModelHighConnection		= @"ORAdcModelHighConnection";
 			
 			double theLowLimit,theHighLimit;
 			[hwObject getAlarmRangeLow:&theLowLimit high:&theHighLimit channel:[self bit]];
-			if(theLowLimit!=lowLimit || theHighLimit!=highLimit)updateNeeded = YES;
+cd /			if(theLowLimit!=lowLimit || theHighLimit!=highLimit)updateNeeded = YES;
 
 			lowLimit = theLowLimit;
 			highLimit = theHighLimit;
