@@ -271,7 +271,7 @@ NSString* ORAdcModelHighConnection		= @"ORAdcModelHighConnection";
 			
 			double theLowLimit,theHighLimit;
 			[hwObject getAlarmRangeLow:&theLowLimit high:&theHighLimit channel:[self bit]];
-cd /			if(theLowLimit!=lowLimit || theHighLimit!=highLimit)updateNeeded = YES;
+			if(theLowLimit!=lowLimit || theHighLimit!=highLimit)updateNeeded = YES;
 
 			lowLimit = theLowLimit;
 			highLimit = theHighLimit;
