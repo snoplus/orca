@@ -38,7 +38,6 @@
 	IBOutlet NSButton*		addPtButton;
 	IBOutlet NSButton*		removePtButton;
 	NSMutableArray*			calibrationArray;
-	id						objectToCalibrate;
 	NSDictionary*			contextInfo;
 }
 

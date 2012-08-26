@@ -38,6 +38,7 @@
 
 - (void) dealloc
 {
+	[calibrationArray release];
 	[contextInfo release];
 	[super dealloc];
 }
