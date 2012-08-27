@@ -57,6 +57,7 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 - (void) dumpTimeout;
 - (void) clearDelay;
 - (void) processOneCommandFromQueue;
+- (void) checkAndSyncDate;
 @end
 
 @implementation ORMet637Model
@@ -524,6 +525,7 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 - (void) firstActionAfterOpeningPort
 {
 	[self probe];
+	[self setDate];
 }
 
 #pragma mark ***Archival
@@ -811,6 +813,7 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 					[self setCycleStarted:[NSDate date]];
 				}
 			}
+			[self setDate];
 		}
 		else {
 			theResponse = [theResponse stringByReplacingOccurrencesOfString:@"\n" withString:@""];
