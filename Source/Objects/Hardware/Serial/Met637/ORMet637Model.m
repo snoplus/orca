@@ -57,7 +57,6 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 - (void) dumpTimeout;
 - (void) clearDelay;
 - (void) processOneCommandFromQueue;
-- (void) checkAndSyncDate;
 @end
 
 @implementation ORMet637Model
