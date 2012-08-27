@@ -812,7 +812,7 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 					[self setCycleStarted:[NSDate date]];
 				}
 			}
-			[self setDate];
+			//[self setDate];
 		}
 		else {
 			theResponse = [theResponse stringByReplacingOccurrencesOfString:@"\n" withString:@""];
