@@ -143,7 +143,9 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 
 - (BOOL) acceptsGuardian: (OrcaObject *)aGuardian
 {
-	return [super acceptsGuardian:aGuardian] || [aGuardian isMemberOfClass:NSClassFromString(@"ORMJDVacuumModel")];
+	return	[super acceptsGuardian:aGuardian] || 
+			[aGuardian isMemberOfClass:NSClassFromString(@"ORMJDVacuumModel")] || 
+			[aGuardian isMemberOfClass:NSClassFromString(@"ORMJDPumpCartModel")];
 }
 
 #pragma mark •••Accessors
