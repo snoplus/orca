@@ -19,10 +19,8 @@
 #pragma mark •••Imported Files
 #import "ORMJDTestCryostat.h"
 #import "ORMJDVacuumView.h"
-#import "ORProcessModel.h"
-#import "ORAdcModel.h"
-#import "ORAdcProcessing.h"
 #import "ORTPG256AModel.h"
+#import "ORMJDPumpCartModel.h"
 
 @interface ORMJDTestCryostat (private)
 - (void) _makeParts;
@@ -39,89 +37,67 @@
 - (BOOL) valueValidForRegion:(int)aRegion;
 - (BOOL) region:(int)aRegion valueHigherThan:(double)aValue;
 
-- (ORTPG256AModel*)    findPressureGauge;
-- (id)findObject:(NSString*)aClassName;
+- (ORTPG256AModel*)    findPressureGauge:(int)aSlot;
+- (id) findObject:(NSString*)aClassName inSlot:(int)aSlot;
 
 @end
+
+NSString* ORMJDTestCryoConnectionChanged = @"ORMJDTestCryoConnectionChanged";
 
 @implementation ORMJDTestCryostat
 
 #pragma mark •••initialization
+
 - (void) setDelegate:(id)aDelegate
 {
 	delegate = aDelegate;
 }
 - (id) model { return self; }
+
 - (BOOL) showGrid {return [delegate showGrid];}
-
-- (void) wakeUp
-{
-	[self registerNotificationObservers];
-}
-
-- (void) sleep
-{
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-	[NSObject cancelPreviousPerformRequestsWithTarget:self];
-}
 
 - (void) dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[parts release];
 	[partDictionary release];
 	[valueDictionary release];
 	[super dealloc];
 }
 
-- (void) registerNotificationObservers
-{
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-	//we need to know about a specific set of events in order to handle the constraints
-	
-	ORTPG256AModel* pressureGauge = [self findPressureGauge];
-	if(pressureGauge){
-		[notifyCenter addObserver : self
-						 selector : @selector(pressureGaugeChanged:)
-							 name : ORTPG256APressureChanged
-						   object : pressureGauge];
-		
-		[notifyCenter addObserver : self
-						 selector : @selector(pressureGaugeChanged:)
-							 name : ORSerialPortWithQueueModelIsValidChanged
-						   object : pressureGauge];
-	}
-}
-
-
 - (void) pressureGaugeChanged:(NSNotification*)aNote
 {
 	ORTPG256AModel* pressureGauge = [aNote object];
 	int chan = [[[aNote userInfo] objectForKey:@"Channel"]intValue];
 	int componentTag = [pressureGauge tag];
-	int aRegion;
-	for(aRegion=0;aRegion<kNumberRegions;aRegion++){
-		ORVacuumValueLabel*  aLabel = [self regionValueObj:aRegion]; 
-		if([aLabel channel ] == chan && [aLabel component] == componentTag){
-			[aLabel setIsValid:[pressureGauge isValid]]; 
-			[aLabel setValue:[pressureGauge pressure:[aLabel channel]]]; 
-		}
+	ORVacuumValueLabel*  aLabel = [self regionValueObj:kRegionNegPump]; 
+	if([aLabel channel ] == chan && [aLabel component] == componentTag){
+		[aLabel setIsValid:[pressureGauge isValid]]; 
+		[aLabel setValue:[pressureGauge pressure:[aLabel channel]]]; 
 	}
 }
 
 
 #pragma mark ***Accessors
-
-- (id)initWithCoder:(NSCoder*)decoder
+- (int) connectionStatus
 {
-    self = [super init];
-	
-	[self registerNotificationObservers];
-	
-    return self;
+	return connectionStatus;
 }
+
+- (void) setConnectionStatus:(int) aState
+{
+	connectionStatus = aState;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDTestCryoConnectionChanged object:self];
+}
+
+- (NSInteger) tag
+{
+	return tag;
+}
+- (void) setTag:(NSInteger)aValue
+{
+	tag = aValue;
+}
+
 
 - (NSArray*) parts
 {
@@ -226,104 +202,6 @@
 	else return theRegions;
 }
 
-#pragma mark ***AdcProcessor Protocol
-- (void) processIsStarting
-{
-	involvedInProcess = YES;
-}
-
-- (void) processIsStopping
-{
-	involvedInProcess = NO;
-}
-
-- (void) startProcessCycle
-{
-}
-
-- (void) endProcessCycle
-{
-}
-
-- (double) setProcessAdc:(int)channel value:(double)aValue isLow:(BOOL*)isLow isHigh:(BOOL*)isHigh
-{
-	return 0.0;
-}
-
-- (NSString*) processingTitle
-{
-	return [NSString stringWithFormat:@"MJD Test Cryo"];
-}
-
-- (void) mapChannel:(int)aChannel toHWObject:(NSString*)objIdentifier hwChannel:(int)hwChannel;
-{
-	ORVacuumGateValve* aGateValve = [self gateValve:aChannel];
-	aGateValve.controlObj		  = objIdentifier;
-	aGateValve.controlChannel	  = hwChannel;
-}
-
-- (void) unMapChannel:(int)aChannel fromHWObject:(NSString*)objIdentifier hwChannel:(int)aHWChannel;
-{
-	ORVacuumGateValve* aGateValve = [self gateValve:aChannel];
-	aGateValve.controlObj		  = nil;
-}
-
-#pragma mark •••CardHolding Protocol
-- (int) maxNumberOfObjects	{ return 5; }	//default
-- (int) objWidth			{ return 80; }	//default
-- (int) groupSeparation		{ return 0; }	//default
-- (NSString*) nameForSlot:(int)aSlot	
-{ 
-    return [NSString stringWithFormat:@"Slot %d",aSlot]; 
-}
-
-- (NSRange) legalSlotsForObj:(id)anObj
-{
-	if([anObj isKindOfClass:NSClassFromString(@"ORTM700Model")])			return NSMakeRange(0,1);
-	else if([anObj isKindOfClass:NSClassFromString(@"ORRGA300Model")])		return NSMakeRange(1,1);
-	else if([anObj isKindOfClass:NSClassFromString(@"ORCP8CryopumpModel")]) return NSMakeRange(2,1);
-	else if([anObj isKindOfClass:NSClassFromString(@"ORTPG256AModel")])		return NSMakeRange(3,1);
-	else if([anObj isKindOfClass:NSClassFromString(@"ORMks660BModel")])		return NSMakeRange(4,1);
-		else return NSMakeRange(0,0);
-}
-
-- (BOOL) slot:(int)aSlot excludedFor:(id)anObj 
-{ 
-	if(aSlot == 0      && [anObj isKindOfClass:NSClassFromString(@"ORTM700Model")])		  return NO;
-	else if(aSlot == 1 && [anObj isKindOfClass:NSClassFromString(@"ORRGA300Model")])	  return NO;
-	else if(aSlot == 2 && [anObj isKindOfClass:NSClassFromString(@"ORCP8CryopumpModel")]) return NO;
-	else if(aSlot == 3 && [anObj isKindOfClass:NSClassFromString(@"ORTPG256AModel")])	  return NO;
-	else if(aSlot == 4 && [anObj isKindOfClass:NSClassFromString(@"ORMks660BModel")])     return NO;
-    else return YES;
-}
-
-- (int) slotAtPoint:(NSPoint)aPoint 
-{
-	return floor(((int)aPoint.y)/[self objWidth]);
-}
-
-- (NSPoint) pointForSlot:(int)aSlot 
-{
-	return NSMakePoint(0,aSlot*[self objWidth]);
-}
-
-- (void) place:(id)anObj intoSlot:(int)aSlot
-{
-    [anObj setTag:aSlot];
-	NSPoint slotPoint = [self pointForSlot:aSlot];
-	[anObj moveTo:slotPoint];
-}
-
-- (int) slotForObj:(id)anObj
-{
-    return [anObj tag];
-}
-
-- (int) numberSlotsNeededFor:(id)anObj
-{
-	return 1;
-}
-
 - (void) openDialogForComponent:(int)i
 {
 	/*
@@ -352,15 +230,18 @@
 
 
 @implementation ORMJDTestCryostat (private)
-- (ORTPG256AModel*)     findPressureGauge   { return [self findObject:@"ORTPG256AModel"];     }
+- (ORTPG256AModel*)     findPressureGauge:(int)aSlot   { return [self findObject:@"ORTPG256AModel" inSlot:aSlot];     }
 
-- (id) findObject:(NSString*)aClassName
+- (id) findObject:(NSString*)aClassName inSlot:(int)aSlot
 {
-//	for(OrcaObject* anObj in [NSApp delegate] ){
-//		if([anObj isKindOfClass:NSClassFromString(aClassName)])return anObj;
-//	}
+	for(OrcaObject* anObj in [delegate orcaObjects]){
+		if([anObj isKindOfClass:NSClassFromString(aClassName)]){
+			if([anObj tag] == aSlot)return anObj;
+		}
+	}
 	return nil;
 }
+
 
 
 - (void) _makeParts
@@ -373,28 +254,28 @@
 		{ kVacHPipe,  kRegionCryostat, 65,				75,			100-kPipeRadius,	75 }, 
 		
 		//region 1 pipes
-		{ kVacVPipe,  kRegionBelowCryo, 100,			0,			100,				50 }, 
-		{ kVacHPipe,  kRegionBelowCryo, 100+kPipeRadius,	30,			120,				30}, 
-		{ kVacHPipe,  kRegionBelowCryo, 120,				30,			140,				30 }, 
+		{ kVacVPipe,  kRegionNegPump, 100,				0,			100,				50 }, 
+		{ kVacHPipe,  kRegionNegPump, 100+kPipeRadius,	30,			120,				30}, 
+		{ kVacHPipe,  kRegionNegPump, 120,				30,			140,				30 }, 
 
 	};
 	
 #define kNumStaticLabelItems	1
 	VacuumStaticLabelStruct staticLabelItems[kNumStaticLabelItems] = {
-		{kVacStaticLabel, kRegionDryN2,			@"NEG\nPump",	135,  15,	195, 45},
+		{kVacStaticLabel, kRegionNegPump,			@"NEG\nPump",	135,  15,	195, 45},
 	};	
 	
 #define kNumStatusItems	1
 	VacuumDynamicLabelStruct dynamicLabelItems[kNumStatusItems] = {
 		//type,	region, component, channel
-		{kVacPressureItem, kRegionBelowCryo,	3, 0,  @"PKR G1",	5, 60,	65, 90},
+		{kVacPressureItem, kRegionNegPump,	2, 3,  @"PKR G1",	5, 60,	65, 90}, //The component, channel are first one. The actual values are offset using the stand number.
 	};	
 		
 #define kNumVacGVs			3
 	VacuumGVStruct gvList[kNumVacGVs] = {
-		{kVacHGateV, 0,	@"V1",			kManualOnlyShowChanging,	100, 5,	kRegionDryN2,		kRegionAboveTurbo,		kControlNone},	//Manual N2 supply
-		{kVacHGateV, 1,	@"V2",			kManualOnlyShowChanging,	100, 50,	kRegionDryN2,		kRegionAboveTurbo,		kControlNone},	//Manual N2 supply
-		{kVacVGateV, 2,	@"V3",			kManualOnlyShowChanging,	120, 30,	kRegionDryN2,		kRegionAboveTurbo,		kControlNone},	//Manual N2 supply
+		{kVacHGateV, 0,	@"V1",			kManualOnlyShowChanging,	100, 5,		kRegionNegPump,		kRegionNegPump,			kControlNone},	//Manual N2 supply
+		{kVacHGateV, 1,	@"V2",			kManualOnlyShowChanging,	100, 50,	kRegionNegPump,		kRegionCryostat,		kControlNone},	//Manual N2 supply
+		{kVacVGateV, 2,	@"V3",			kManualOnlyShowChanging,	120, 30,	kRegionNegPump,		kRegionNegPump,			kControlNone},	//Manual N2 supply
 	};
 	
 	[self makePipes:vacPipeList					num:kNumVacPipes];
@@ -464,19 +345,18 @@
 
 - (void)  makeDynamicLabels:(VacuumDynamicLabelStruct*)labelItems num:(int)numItems
 {
-	int i;
-	for(i=0;i<numItems;i++){
-		NSRect theBounds = NSMakeRect(labelItems[i].x1,labelItems[i].y1,labelItems[i].x2-labelItems[i].x1,labelItems[i].y2-labelItems[i].y1);
-		if(labelItems[i].type == kVacPressureItem){
-			[[[ORVacuumValueLabel alloc] initWithDelegate:self regionTag:labelItems[i].regionTag component:labelItems[i].component channel:labelItems[i].channel label:labelItems[i].label bounds:theBounds] autorelease];			
-		}
-		if(labelItems[i].type == kVacStatusItem){
-			[[[ORVacuumStatusLabel alloc] initWithDelegate:self regionTag:labelItems[i].regionTag component:labelItems[i].component channel:labelItems[i].channel label:labelItems[i].label bounds:theBounds] autorelease];
-		}
+	//the pressure gauge has six channels. Our pump stands start at the first pressure gauge, channel 3 and are offset from there
+	int i = 0;
+	int channel		= labelItems[i].channel + [self tag];
+	int component	= labelItems[i].component;
+	if(channel>5){
+		channel   = [self tag]-3;
+		component+=1;
 	}
-	ORVacuumValueLabel* aLabel = [self regionValueObj:kRegionDryN2];
-	[aLabel setIsValid:YES];
-	[aLabel setValue:1.0E3];
+	NSRect theBounds = NSMakeRect(labelItems[i].x1,labelItems[i].y1,labelItems[i].x2-labelItems[i].x1,labelItems[i].y2-labelItems[i].y1);
+	if(labelItems[i].type == kVacPressureItem){
+		[[[ORVacuumValueLabel alloc] initWithDelegate:self regionTag:labelItems[i].regionTag component:component channel:channel label:labelItems[i].label bounds:theBounds] autorelease];			
+	}
 }
 
 - (void) colorRegions

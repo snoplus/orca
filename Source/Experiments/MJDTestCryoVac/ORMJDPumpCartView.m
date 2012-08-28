@@ -45,6 +45,7 @@
 
 - (void) drawRect:(NSRect)dirtyRect 
 {
+	[super drawRect:dirtyRect];
 	if([delegate showGrid]) {
 		[[NSColor whiteColor] set];
 		[NSBezierPath fillRect:[self bounds]];

@@ -18,8 +18,17 @@
 //-------------------------------------------------------------
 
 #import "ORMJDTestCryoView.h"
+#import "ORMJDTestCryostat.h"
 
 @implementation ORMJDTestCryoView
+- (NSInteger) tag
+{
+	return tag;
+}
+- (void) setTag:(NSInteger)aValue
+{
+	tag = aValue;
+}
 
 - (void) drawRect:(NSRect)dirtyRect 
 {
@@ -31,6 +40,13 @@
 	NSImage* stringsImage = [NSImage imageNamed:@"MJDString"];
 	NSPoint aPoint = NSMakePoint(85,105);
 	[stringsImage drawAtPoint:aPoint fromRect:[stringsImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+
+	NSAttributedString* s = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"Cryo #%d",tag+1]
+												 attributes:[NSDictionary dictionaryWithObjectsAndKeys:
+															 [NSFont fontWithName:@"Geneva" size:12],NSFontAttributeName,
+															 nil]]; 			
+	[s drawAtPoint:NSMakePoint( 3, 167)];
+	[s release];
 }
 
 @end

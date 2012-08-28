@@ -38,6 +38,10 @@
 - (void) colorRegionsConnectedTo:(int)aRegion withColor:(NSColor*)aColor;
 - (void) recursizelyColorRegionsConnectedTo:(int)aRegion withColor:(NSColor*)aColor;
 - (void) resetVisitationFlag;
+- (void) disconnectLeftSide;
+- (void) connectLeftSideToCryostat:(int)anIndex;
+- (void) disconnectRightSide;
+- (void) connectRightSideToCryostat:(int)anIndex;
 
 - (double) valueForRegion:(int)aRegion;
 - (ORVacuumValueLabel*) regionValueObj:(int)aRegion;
@@ -46,14 +50,18 @@
 
 - (ORRGA300Model*)     findRGA;
 - (ORTM700Model*)      findTurboPump;
-- (ORTPG256AModel*)    findPressureGauge;
-- (id)findObject:(NSString*)aClassName;
+- (ORTPG256AModel*)    findPressureGauge:(int)aSlot;
+- (id) findObject:(NSString*)aClassName;
+- (id) findObject:(NSString*)aClassName inSlot:(int)aSlot;
 
 @end
 
 
-NSString* ORMJDPumpCartModelShowGridChanged           = @"ORMJDPumpCartModelShowGridChanged";
+NSString* ORMJDPumpCartModelShowGridChanged				 = @"ORMJDPumpCartModelShowGridChanged";
 NSString* ORMJCTestCryoVacLock                           = @"ORMJCTestCryoVacLock";
+NSString* ORMJDPumpCartModelRightSideConnectionChanged   = @"ORMJDPumpCartModelRightSideConnectionChanged";
+NSString* ORMJDPumpCartModelLeftSideConnectionChanged    = @"ORMJDPumpCartModelLeftSideConnectionChanged";
+NSString* ORMJDPumpCartModelConnectionChanged			 = @"ORMJDPumpCartModelConnectionChanged";
 
 @implementation ORMJDPumpCartModel
 
@@ -114,21 +122,33 @@ NSString* ORMJCTestCryoVacLock                           = @"ORMJCTestCryoVacLoc
 						 selector : @selector(turboChanged:)
 							 name : ORSerialPortWithQueueModelIsValidChanged
 						   object : turbo];
+		
 	}
 	
-	ORTPG256AModel* pressureGauge = [self findPressureGauge];
-	if(pressureGauge){
+	ORTPG256AModel* pressureGauge1 = [self findPressureGauge:2];
+	ORTPG256AModel* pressureGauge2 = [self findPressureGauge:3];
+	if(pressureGauge1){
 		[notifyCenter addObserver : self
 						 selector : @selector(pressureGaugeChanged:)
 							 name : ORTPG256APressureChanged
-						   object : pressureGauge];
+						   object : pressureGauge1];
 		
 		[notifyCenter addObserver : self
 						 selector : @selector(pressureGaugeChanged:)
 							 name : ORSerialPortWithQueueModelIsValidChanged
-						   object : pressureGauge];
+						   object : pressureGauge1];
 	}
-
+	if(pressureGauge2){
+		[notifyCenter addObserver : self
+						 selector : @selector(pressureGaugeChanged:)
+							 name : ORTPG256APressureChanged
+						   object : pressureGauge2];
+		
+		[notifyCenter addObserver : self
+						 selector : @selector(pressureGaugeChanged:)
+							 name : ORSerialPortWithQueueModelIsValidChanged
+						   object : pressureGauge2];
+	}
 	
 	ORRGA300Model* rga = [self findRGA];
 	if(rga){
@@ -168,6 +188,10 @@ NSString* ORMJCTestCryoVacLock                           = @"ORMJCTestCryoVacLoc
 			[aLabel setValue:[pressureGauge pressure:[aLabel channel]]]; 
 		}
 	}
+	
+	for(id aCryostat in testCryostats){
+		[aCryostat pressureGaugeChanged:aNote];
+	}
 }
 
 - (void) rgaChanged:(NSNotification*)aNote
@@ -202,8 +226,12 @@ NSString* ORMJCTestCryoVacLock                           = @"ORMJCTestCryoVacLoc
 	
     [[self undoManager] disableUndoRegistration];
 	[self setShowGrid:	[decoder decodeBoolForKey:	@"showGrid"]];
-	
+
 	[self makeParts];
+
+	[self setLeftSideConnection:	[decoder decodeIntForKey:	@"leftSideConnection"]];
+	[self setRightSideConnection:	[decoder decodeIntForKey:	@"rightSideConnection"]];
+	
 	[self registerNotificationObservers];
 	
 	[[self undoManager] enableUndoRegistration];
@@ -214,7 +242,9 @@ NSString* ORMJCTestCryoVacLock                           = @"ORMJCTestCryoVacLoc
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeBool:showGrid					forKey: @"showGrid"];
+    [encoder encodeBool:showGrid				forKey: @"showGrid"];
+    [encoder encodeInt:leftSideConnection		forKey: @"leftSideConnection"];
+    [encoder encodeInt:rightSideConnection		forKey: @"rightSideConnection"];
 }
 
 - (NSArray*) parts
@@ -320,52 +350,42 @@ NSString* ORMJCTestCryoVacLock                           = @"ORMJCTestCryoVacLoc
 	else return theRegions;
 }
 
-#pragma mark ***AdcProcessor Protocol
-- (void) processIsStarting
+- (int) leftSideConnection
 {
-	involvedInProcess = YES;
+	return leftSideConnection;
 }
 
-- (void) processIsStopping
+- (void) setLeftSideConnection:(int)aState
 {
-	involvedInProcess = NO;
+    [[[self undoManager] prepareWithInvocationTarget:self] setLeftSideConnection:leftSideConnection];
+	if(aState == 0)[self disconnectLeftSide];
+	else [self connectLeftSideToCryostat:aState-1];
+    leftSideConnection = aState;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPumpCartModelLeftSideConnectionChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPumpCartModelConnectionChanged object:self];
+	
 }
 
-- (void) startProcessCycle
+- (int) rightSideConnection
 {
+	return rightSideConnection;
 }
 
-- (void) endProcessCycle
+- (void) setRightSideConnection:(int)aState
 {
+	[[[self undoManager] prepareWithInvocationTarget:self] setRightSideConnection:rightSideConnection];
+	if(aState == 0)[self disconnectRightSide];
+	else [self connectRightSideToCryostat:aState-1];
+	rightSideConnection = aState;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPumpCartModelRightSideConnectionChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPumpCartModelConnectionChanged object:self];
 }
 
-- (double) setProcessAdc:(int)channel value:(double)aValue isLow:(BOOL*)isLow isHigh:(BOOL*)isHigh
-{
-	return 0.0;
-}
-
-- (NSString*) processingTitle
-{
-	return [NSString stringWithFormat:@"MJD Vac,%lu",[self uniqueIdNumber]];
-}
-
-- (void) mapChannel:(int)aChannel toHWObject:(NSString*)objIdentifier hwChannel:(int)hwChannel;
-{
-	ORVacuumGateValve* aGateValve = [self gateValve:aChannel];
-	aGateValve.controlObj		  = objIdentifier;
-	aGateValve.controlChannel	  = hwChannel;
-}
-
-- (void) unMapChannel:(int)aChannel fromHWObject:(NSString*)objIdentifier hwChannel:(int)aHWChannel;
-{
-	ORVacuumGateValve* aGateValve = [self gateValve:aChannel];
-	aGateValve.controlObj		  = nil;
-}
 
 #pragma mark •••CardHolding Protocol
-- (int) maxNumberOfObjects	{ return 5; }	//default
-- (int) objWidth			{ return 80; }	//default
-- (int) groupSeparation		{ return 0; }	//default
+- (int) maxNumberOfObjects	{ return 4;  }	
+- (int) objWidth			{ return 80; }	
+- (int) groupSeparation		{ return 0;  }	
 - (NSString*) nameForSlot:(int)aSlot	
 { 
     return [NSString stringWithFormat:@"Slot %d",aSlot]; 
@@ -375,19 +395,17 @@ NSString* ORMJCTestCryoVacLock                           = @"ORMJCTestCryoVacLoc
 {
 	if([anObj isKindOfClass:NSClassFromString(@"ORTM700Model")])			return NSMakeRange(0,1);
 	else if([anObj isKindOfClass:NSClassFromString(@"ORRGA300Model")])		return NSMakeRange(1,1);
-	else if([anObj isKindOfClass:NSClassFromString(@"ORCP8CryopumpModel")]) return NSMakeRange(2,1);
+	else if([anObj isKindOfClass:NSClassFromString(@"ORTPG256AModel")]) return NSMakeRange(2,1);
 	else if([anObj isKindOfClass:NSClassFromString(@"ORTPG256AModel")])		return NSMakeRange(3,1);
-	else if([anObj isKindOfClass:NSClassFromString(@"ORMks660BModel")])		return NSMakeRange(4,1);
-		else return NSMakeRange(0,0);
+	else return NSMakeRange(0,0);
 }
 
 - (BOOL) slot:(int)aSlot excludedFor:(id)anObj 
 { 
-	if(aSlot == 0      && [anObj isKindOfClass:NSClassFromString(@"ORTM700Model")])		  return NO;
-	else if(aSlot == 1 && [anObj isKindOfClass:NSClassFromString(@"ORRGA300Model")])	  return NO;
-	else if(aSlot == 2 && [anObj isKindOfClass:NSClassFromString(@"ORCP8CryopumpModel")]) return NO;
-	else if(aSlot == 3 && [anObj isKindOfClass:NSClassFromString(@"ORTPG256AModel")])	  return NO;
-	else if(aSlot == 4 && [anObj isKindOfClass:NSClassFromString(@"ORMks660BModel")])     return NO;
+	if(aSlot == 0      && [anObj isKindOfClass:NSClassFromString(@"ORTM700Model")])		return NO;
+	else if(aSlot == 1 && [anObj isKindOfClass:NSClassFromString(@"ORRGA300Model")])	return NO;
+	else if(aSlot == 2 && [anObj isKindOfClass:NSClassFromString(@"ORTPG256AModel")])	return NO;
+	else if(aSlot == 3 && [anObj isKindOfClass:NSClassFromString(@"ORTPG256AModel")])	return NO;
     else return YES;
 }
 
@@ -447,19 +465,28 @@ NSString* ORMJCTestCryoVacLock                           = @"ORMJCTestCryoVacLoc
 	else return nil;
 }
 
-
 @end
 
 
 @implementation ORMJDPumpCartModel (private)
 - (ORRGA300Model*)      findRGA				{ return [self findObject:@"ORRGA300Model"];      }
 - (ORTM700Model*)       findTurboPump		{ return [self findObject:@"ORTM700Model"];       }
-- (ORTPG256AModel*)     findPressureGauge   { return [self findObject:@"ORTPG256AModel"];     }
+- (ORTPG256AModel*)     findPressureGauge:(int)aSlot   { return [self findObject:@"ORTPG256AModel" inSlot:aSlot];     }
 
 - (id) findObject:(NSString*)aClassName
 {
 	for(OrcaObject* anObj in [self orcaObjects]){
 		if([anObj isKindOfClass:NSClassFromString(aClassName)])return anObj;
+	}
+	return nil;
+}
+
+- (id) findObject:(NSString*)aClassName inSlot:(int)aSlot
+{
+	for(OrcaObject* anObj in [self orcaObjects]){
+		if([anObj isKindOfClass:NSClassFromString(aClassName)]){
+			if([anObj tag] == aSlot)return anObj;
+		}
 	}
 	return nil;
 }
@@ -477,9 +504,9 @@ NSString* ORMJCTestCryoVacLock                           = @"ORMJCTestCryoVacLoc
 		
 		//region 2 pipes
 		{ kVacVPipe,  kRegionAboveTurbo, 250,				150,			250,					300 }, 
-		{ kVacHPipe,  kRegionAboveTurbo, 200,				205,			250-kPipeRadius,		205 },
-		{ kVacHPipe,  kRegionAboveTurbo, 250+kPipeRadius,	205,			280,					205 },
-		{ kVacHPipe,  kRegionAboveTurbo, 280,				205,			300,					205 },
+		{ kVacHPipe,  kRegionAboveTurbo, 200,				215,			250-kPipeRadius,		215 },
+		{ kVacHPipe,  kRegionAboveTurbo, 250+kPipeRadius,	215,			280,					215 },
+		{ kVacHPipe,  kRegionAboveTurbo, 280,				215,			300,					215 },
 		{ kVacHPipe,  kRegionAboveTurbo, 250+kPipeRadius,	335,			280,					335 },
 		
 		{ kVacHPipe,  kRegionAboveTurbo, 250+kPipeRadius,	270,			300,					270 },
@@ -491,21 +518,21 @@ NSString* ORMJCTestCryoVacLock                           = @"ORMJCTestCryoVacLoc
 		//region 5 pipes
 		{ kVacCorner, kRegionLeftSide, 100,					270,			kNA,				kNA },
 		{ kVacHPipe,  kRegionLeftSide, 100+kPipeRadius,		270,			200,				270 },
-		{ kVacVPipe,  kRegionLeftSide, 100,					270+kPipeRadius,100,				400 },
+		{ kVacVPipe,  kRegionLeftSide, 100,					270+kPipeRadius,100,				405 },
 		{ kVacHPipe,  kRegionLeftSide, 100+kPipeRadius,		335,			140,				335 },
 		{ kVacHPipe,  kRegionLeftSide, 75,					335,			100-kPipeRadius,	335 },
 
 		//region 6 pipes
 		{ kVacCorner, kRegionRightSide, 400,				270,			kNA,				kNA },
 		{ kVacHPipe,  kRegionRightSide, 300,				270,			400,				270 },
-		{ kVacVPipe,  kRegionRightSide, 400,				270+kPipeRadius,400,				400 },
+		{ kVacVPipe,  kRegionRightSide, 400,				270+kPipeRadius,400,				405 },
 		{ kVacHPipe,  kRegionRightSide, 360,				335,			400-kPipeRadius,	335 },
 		{ kVacHPipe,  kRegionRightSide, 400+kPipeRadius,	335,			425,				335 },
 	};
 	
 #define kNumStaticLabelItems	2
 	VacuumStaticLabelStruct staticLabelItems[kNumStaticLabelItems] = {
-		{kVacStaticLabel, kRegionDryN2,			@"Dry N2\nSupply",	300,  190,	360, 220},
+		{kVacStaticLabel, kRegionDryN2,			@"Dry N2\nSupply",	300,  200,	360, 230},
 		{kVacStaticLabel, kRegionDiaphramPump,	@"Diaphragm\nPump",	 220,  40,	 280, 70},
 	};	
 	
@@ -514,21 +541,23 @@ NSString* ORMJCTestCryoVacLock                           = @"ORMJCTestCryoVacLoc
 		//type,	region, component, channel
 		{kVacStatusItem,   kRegionAboveTurbo,	0, 5,  @"Turbo",	220, 135,	280, 165},
 		{kVacStatusItem,   kRegionRGA,			1, 6,  @"RGA",		220, 320,	280, 350},
-		{kVacPressureItem, kRegionAboveTurbo,	3, 0,  @"PKR G1",	140, 190,	200, 220},
-		{kVacPressureItem, kRegionLeftSide,		3, 1,  @"PKR G2",	140, 320,	200, 350},
-		{kVacPressureItem, kRegionRightSide,	3, 2,  @"PKR G3",	300, 320,	360, 350},
+		{kVacPressureItem, kRegionAboveTurbo,	2, 0,  @"PKR G1",	140, 200,	200, 230},
+		{kVacPressureItem, kRegionLeftSide,		2, 1,  @"PKR G2",	140, 320,	200, 350},
+		{kVacPressureItem, kRegionRightSide,	2, 2,  @"PKR G3",	300, 320,	360, 350},
 	};	
 		
-#define kNumVacGVs			8
+#define kNumVacGVs			10
 	VacuumGVStruct gvList[kNumVacGVs] = {
-		{kVacVGateV, 0,	@"N2 Manual",	kManualOnlyShowChanging,	280, 205,	kRegionDryN2,		kRegionAboveTurbo,		kControlNone},	//Manual N2 supply
+		{kVacVGateV, 0,	@"N2 Manual",	kManualOnlyShowChanging,	280, 215,	kRegionDryN2,		kRegionAboveTurbo,		kControlNone},	//Manual N2 supply
 		{kVacHGateV, 1,	@"Turbo",		k1BitReadBack,				250, 150,	kRegionAboveTurbo,	kRegionBelowTurbo,		kControlNone},	//this is a virtual valve-- really the turbo on/off
 		{kVacHGateV, 2,	@"Sentry",		kManualOnlyShowChanging,	250, 100,	kRegionDiaphramPump,kRegionBelowTurbo,		kControlNone},	//future control
 		{kVacHGateV, 3,	@"RGA",			kManualOnlyShowChanging,	250, 300,	kRegionRGA,			kRegionAboveTurbo,		kControlNone},	
 		{kVacVGateV, 4,	@"",			kManualOnlyShowChanging,	200, 270,	kRegionRGA,			kRegionAboveTurbo,		kControlNone},	
 		{kVacVGateV, 5,	@"",			kManualOnlyShowChanging,	300, 270,	kRegionRGA,			kRegionAboveTurbo,		kControlNone},	
-		{kVacVGateV, 5,	@"",			kManualOnlyShowClosed,		75,  335,	kRegionLeftSide,	kUpToAir,				kControlNone},	
-		{kVacVGateV, 5,	@"",			kManualOnlyShowClosed,		425, 335,	kRegionRightSide,	kUpToAir,				kControlNone},	
+		{kVacVGateV, 6,	@"",			kManualOnlyShowClosed,		75,  335,	kRegionLeftSide,	kUpToAir,				kControlNone},	
+		{kVacVGateV, 7,	@"",			kManualOnlyShowClosed,		425, 335,	kRegionRightSide,	kUpToAir,				kControlNone},	
+		{kVacHGateV, 8,	@"",			kManualOnlyShowClosed,		100, 405,	kRegionRightSide,	kUpToAir,				kControlNone},	
+		{kVacHGateV, 9,	@"",			kManualOnlyShowClosed,		400, 405,	kRegionRightSide,	kUpToAir,				kControlNone},	
 	};
 	
 	[self makePipes:vacPipeList					num:kNumVacPipes];
@@ -624,6 +653,7 @@ NSString* ORMJCTestCryoVacLock                           = @"ORMJCTestCryoVacLoc
 			ORMJDTestCryostat* aTestCryostat = [[ORMJDTestCryostat alloc] init];
 			[testCryostats addObject:aTestCryostat];
 			[aTestCryostat setDelegate:self];
+			[aTestCryostat setTag:i];
 			[aTestCryostat makeParts];
 			[aTestCryostat release];
 		}
@@ -797,5 +827,35 @@ NSString* ORMJCTestCryoVacLock                           = @"ORMJCTestCryoVacLoc
 	NSColor* c2	= [self colorOfRegion:r2];
 	return [c1 isEqual:c2];
 }
-			 
+
+- (void) disconnectLeftSide
+{
+	for(id aCryostat in testCryostats){
+		if([aCryostat connectionStatus] == kConnectedToLeftSide)[aCryostat setConnectionStatus:kNotConnected];
+	}
+}
+
+- (void) connectLeftSideToCryostat:(int)anIndex
+{
+	for(id aCryostat in testCryostats){
+		if([aCryostat connectionStatus] == kConnectedToLeftSide && [aCryostat tag] != anIndex)[aCryostat setConnectionStatus:kNotConnected];
+		if([aCryostat tag] == anIndex) [aCryostat setConnectionStatus:kConnectedToLeftSide];
+	}
+}
+
+- (void) disconnectRightSide
+{
+	for(id aCryostat in testCryostats){
+		if([aCryostat connectionStatus] == kConnectedToRightSide)[aCryostat setConnectionStatus:kNotConnected];
+	}
+}
+
+- (void) connectRightSideToCryostat:(int)anIndex
+{
+	for(id aCryostat in testCryostats){
+		if([aCryostat connectionStatus] == kConnectedToRightSide && [aCryostat tag] != anIndex)[aCryostat setConnectionStatus:kNotConnected];
+		if([aCryostat tag] == anIndex) [aCryostat setConnectionStatus:kConnectedToRightSide];
+	}
+}
+
 @end

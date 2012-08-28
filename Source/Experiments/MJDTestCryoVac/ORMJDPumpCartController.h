@@ -19,27 +19,29 @@
 
 
 #pragma mark •••Forward Declarations
+@class ORMJDTestCryoView;
 @class ORMJDPumpCartView;
 
 @interface ORMJDPumpCartController : OrcaObjectController
 {
     IBOutlet ORMJDPumpCartView*   vacuumView;
 	IBOutlet NSButton*		setShowGridCB;
-	IBOutlet NSTableView*   valueTableView;
-	IBOutlet NSTableView*   statusTableView;
-	IBOutlet NSTableView*   gvTableView;
 	IBOutlet NSTextField*   gvHwObjectName;
     IBOutlet NSButton*      lockButton;
 	IBOutlet ORGroupView*   subComponentsView;
-	
-    IBOutlet ORMJDPumpCartView*   testStand0;
-    IBOutlet ORMJDPumpCartView*   testStand1;
-    IBOutlet ORMJDPumpCartView*   testStand2;
-    IBOutlet ORMJDPumpCartView*   testStand3;
-    IBOutlet ORMJDPumpCartView*   testStand4;
-    IBOutlet ORMJDPumpCartView*   testStand5;
-    IBOutlet ORMJDPumpCartView*   testStand6;
+	IBOutlet NSPopUpButton* leftSideConnectionPU;
+	IBOutlet NSPopUpButton* rightSideConnectionPU;
 
+    IBOutlet ORMJDTestCryoView*   testStandView0;
+    IBOutlet ORMJDTestCryoView*   testStandView1;
+    IBOutlet ORMJDTestCryoView*   testStandView2;
+    IBOutlet ORMJDTestCryoView*   testStandView3;
+    IBOutlet ORMJDTestCryoView*   testStandView4;
+    IBOutlet ORMJDTestCryoView*   testStandView5;
+    IBOutlet ORMJDTestCryoView*   testStandView6;
+
+	ORMJDTestCryoView*	testStandView[7];
+	
 	BOOL					updateScheduled;
 }
 
@@ -53,8 +55,12 @@
 - (void) registerNotificationObservers;
 - (void) showGridChanged:(NSNotification*)aNote;
 - (void) lockChanged:(NSNotification*)aNote;
--(void) groupChanged:(NSNotification*)aNote;
+- (void) groupChanged:(NSNotification*)aNote;
 - (void) toggleGrid;
+- (void) leftSideConnectionChanged:(NSNotification*)aNote;
+- (void) rightSideConnectionChanged:(NSNotification*)aNote;
+- (void) connectionChanged:(NSNotification*)aNote;
+- (void) updatePUButtons:(NSNotification*)aNote;
 
 #pragma mark ***Interface Management
 - (void) stateChanged:(NSNotification*)aNote;
@@ -63,11 +69,9 @@
 #pragma mark •••Actions
 - (IBAction) showGridAction:(id)sender;
 - (IBAction) lockAction:(id) sender;
+- (IBAction) leftSideConnectionRequest:(id)sender;
+- (IBAction) rightSideConnectionRequest:(id)sender;
 
-#pragma mark •••Data Source For Tables
-- (int)numberOfRowsInTableView:(NSTableView *)aTableView;
-- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn 
-			 row:(int) rowIndex;
 
 @end
 

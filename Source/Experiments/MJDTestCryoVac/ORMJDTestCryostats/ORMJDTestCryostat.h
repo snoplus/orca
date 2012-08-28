@@ -17,40 +17,31 @@
 //for the use of this software.
 //-------------------------------------------------------------
 #import "ORVacuumParts.h"
-#import "ORAdcProcessing.h"
-#import "ORBitProcessing.h"
-#import "OROrderedObjHolding.h"
 
 @class ORVacuumGateValve;
 @class ORVacuumPipe;
-@class ORLabJackUE9Model;
-@class ORAlarm;
 
-//-----------------------------------
-//region definitions
-#define kRegionCryostat		0
-#define kRegionBelowCryo	1
-#define kRegionAboveTurbo	2
-#define kRegionRGA			3
-#define kRegionDryN2		4
-#define kRegionLeftSide		5
-#define kRegionRightSide	6
+#define kNotConnected			0
+#define kConnectedToLeftSide	1
+#define kConnectedToRightSide	2
 
-#define kNumberRegions	    10
-
-//-----------------------------------
-@interface ORMJDTestCryostat : NSObject <ORAdcProcessor>
+@interface ORMJDTestCryostat : NSObject
 {
-	id delegate;
+	id					 delegate;
+	int					 connectionStatus; 
+	NSInteger			 tag;
 	NSMutableDictionary* partDictionary;
 	NSMutableDictionary* valueDictionary;
 	NSMutableDictionary* statusDictionary;
 	NSMutableArray*		 parts;
-	BOOL				 involvedInProcess;
 }
 
 #pragma mark ***Accessors
 - (id) model;
+- (int) connectionStatus;
+- (void) setConnectionStatus:(int) aState;
+- (NSInteger) tag;
+- (void) setTag:(NSInteger)aValue;
 - (BOOL) showGrid;
 - (void) setDelegate:(id)aDelegate;
 - (void) makeParts;
@@ -72,15 +63,10 @@
 - (NSString*) regionName:(int)i;
 
 #pragma mark ***Notificatons
-- (void) registerNotificationObservers;
 - (void) pressureGaugeChanged:(NSNotification*)aNote;
 
-#pragma mark ***Archival
-- (id)initWithCoder:(NSCoder*)decoder;
-
-#pragma mark ***AdcProcessor Protocol
-- (double) setProcessAdc:(int)channel value:(double)value isLow:(BOOL*)isLow isHigh:(BOOL*)isHigh;
-- (NSString*) processingTitle;
 
 @end
+
+extern NSString* ORMJDTestCryoConnectionChanged;
 

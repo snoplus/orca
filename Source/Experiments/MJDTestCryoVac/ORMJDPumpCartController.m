@@ -24,6 +24,7 @@
 #import "ORMJDPumpCartModel.h"
 #import "ORMJDPumpCartView.h"
 #import "ORVacuumParts.h"
+#import "ORMJDTestCryostat.h"
 
 @implementation ORMJDPumpCartController
 - (id) init
@@ -41,13 +42,30 @@
 - (void) awakeFromNib
 {
 	[subComponentsView setGroup:model];
-	[testStand0 setDelegate:[model testCryoStat:0]];
-	[testStand1 setDelegate:[model testCryoStat:1]];
-	[testStand2 setDelegate:[model testCryoStat:2]];
-	[testStand3 setDelegate:[model testCryoStat:3]];
-	[testStand4 setDelegate:[model testCryoStat:4]];
-	[testStand5 setDelegate:[model testCryoStat:5]];
-	[testStand6 setDelegate:[model testCryoStat:6]];
+	[testStandView0 setDelegate:[model testCryoStat:0]];
+	[testStandView1 setDelegate:[model testCryoStat:1]];
+	[testStandView2 setDelegate:[model testCryoStat:2]];
+	[testStandView3 setDelegate:[model testCryoStat:3]];
+	[testStandView4 setDelegate:[model testCryoStat:4]];
+	[testStandView5 setDelegate:[model testCryoStat:5]];
+	[testStandView6 setDelegate:[model testCryoStat:6]];
+	
+	[testStandView0 setTag:0];
+	[testStandView1 setTag:1];
+	[testStandView2 setTag:2];
+	[testStandView3 setTag:3];
+	[testStandView4 setTag:4];
+	[testStandView5 setTag:5];
+	[testStandView6 setTag:6];
+	
+	testStandView[0] = testStandView0;
+	testStandView[1] = testStandView1;
+	testStandView[2] = testStandView2;
+	testStandView[3] = testStandView3;
+	testStandView[4] = testStandView4;
+	testStandView[5] = testStandView5;
+	testStandView[6] = testStandView6;
+	
 	[super awakeFromNib];
 }
 
@@ -98,6 +116,26 @@
                          name : OROrcaObjectMoved
                        object : nil];
 
+	[notifyCenter addObserver : self
+                     selector : @selector(leftSideConnectionChanged:)
+                         name : ORMJDPumpCartModelLeftSideConnectionChanged
+                       object : nil];
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(rightSideConnectionChanged:)
+                         name : ORMJDPumpCartModelRightSideConnectionChanged
+                       object : nil];
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(connectionChanged:)
+                         name : ORMJDPumpCartModelConnectionChanged
+                       object : nil];
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(updatePUButtons:)
+                         name : ORMJDTestCryoConnectionChanged
+                       object : nil];	
+	
 }
 
 - (void) updateWindow
@@ -105,10 +143,65 @@
     [super updateWindow];
 	[self showGridChanged:nil];
 	[self stateChanged:nil];
+	[self leftSideConnectionChanged:nil];
+	[self rightSideConnectionChanged:nil];
+	[self connectionChanged:nil];
+	[self updatePUButtons:nil];
 	[self lockChanged:nil];
 }
 
 #pragma mark •••Interface Management
+- (void) leftSideConnectionChanged:(NSNotification*)aNotification
+{
+	[leftSideConnectionPU selectItemAtIndex:[model leftSideConnection]];
+}
+
+- (void) rightSideConnectionChanged:(NSNotification*)aNotification
+{
+	[rightSideConnectionPU selectItemAtIndex:[model rightSideConnection]];
+}
+
+- (void) updatePUButtons:(NSNotification*)aNotification
+{
+	BOOL leftSideConnected = NO;
+	BOOL rightSideConnected = NO;
+	int i;
+	for(i=0;i<7;i++){
+		ORMJDTestCryostat* aCryostat = [model testCryoStat:i];
+		if([aCryostat connectionStatus] == kConnectedToLeftSide)leftSideConnected = YES;
+		if([aCryostat connectionStatus] == kConnectedToRightSide)rightSideConnected = YES;
+	}
+	if(!leftSideConnected)[leftSideConnectionPU selectItemAtIndex:0];
+	if(!rightSideConnected)[rightSideConnectionPU selectItemAtIndex:0];
+}
+
+- (void) connectionChanged:(NSNotification*)aNotification
+{
+	NSRect homePosition[7];
+	homePosition[0] = NSMakeRect(740,400,200,185);
+	homePosition[1] = NSMakeRect(530,400,200,185);
+	homePosition[2] = NSMakeRect(740,205,200,185);
+	homePosition[3] = NSMakeRect(530,205,200,185);
+	homePosition[4] = NSMakeRect(740,5,200,185);
+	homePosition[5] = NSMakeRect(530,5,200,185);
+	homePosition[6] = NSMakeRect(300,5,200,185);
+	int position = 0;
+	int i;
+	for(i=0;i<7;i++){
+		ORMJDTestCryostat* aCryostat = [model testCryoStat:i];
+		if([aCryostat connectionStatus] == kNotConnected){
+			[[testStandView[i] animator] setFrame:homePosition[position++]];
+		}
+		else if([aCryostat connectionStatus] == kConnectedToLeftSide){
+			NSRect position = NSMakeRect(0,400,200,185);
+			[[testStandView[i] animator] setFrame:position];
+		}
+		else if([aCryostat connectionStatus] == kConnectedToRightSide){
+			NSRect position = NSMakeRect(300,400,200,185);
+			[[testStandView[i] animator] setFrame:position];
+		}
+	}	
+}
 
 -(void) groupChanged:(NSNotification*)note
 {
@@ -121,22 +214,25 @@
 {
     BOOL locked = [gSecurity isLocked:ORMJCTestCryoVacLock];
     [lockButton setState: locked];
+	[leftSideConnectionPU setEnabled:!locked];
+	[rightSideConnectionPU setEnabled:!locked];	
 }
 
 - (void) stateChanged:(NSNotification*)aNote
 {
 	if(!updateScheduled){
 		updateScheduled = YES;
-		[self performSelector:@selector(delayedRefresh) withObject:nil afterDelay:.5];
+		[self performSelector:@selector(delayedRefresh) withObject:nil afterDelay:1];
 	}
 }
 - (void) delayedRefresh
 {
 	updateScheduled = NO;
 	[vacuumView setNeedsDisplay:YES];
-	[valueTableView reloadData];
-	[statusTableView reloadData];
-	[gvTableView reloadData];
+	int i;
+	for(i=0;i<7;i++){
+		[testStandView[i] setNeedsDisplay:YES];
+	}
 }
 
 - (void) showGridChanged:(NSNotification*)aNote
@@ -173,81 +269,14 @@
     [gSecurity tryToSetLock:ORMJCTestCryoVacLock to:[sender intValue] forWindow:[self window]];
 }
 
-
-#pragma mark •••Data Source For Tables
-- (int) numberOfRowsInTableView:(NSTableView *)aTableView
+- (IBAction) leftSideConnectionRequest:(id)sender
 {
-	if(aTableView == valueTableView){
-		return [[model valueLabels] count];
-	}
-	else if(aTableView == statusTableView){
-		return [[model valueLabels] count];
-	}
-	else if(aTableView == gvTableView){
-		return [[model gateValves] count];
-	}
-	else return 0;
+	[model setLeftSideConnection:[sender indexOfSelectedItem]];
 }
 
-- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
+- (IBAction) rightSideConnectionRequest:(id)sender
 {
-	if((aTableView == valueTableView) || (aTableView == statusTableView)){
-		NSArray* theLabels;
-		if(aTableView == valueTableView) theLabels = [model valueLabels];
-		else							 theLabels = [model statusLabels];
-		if(rowIndex < [theLabels count]){
-			ORVacuumDynamicLabel* theLabel = [theLabels objectAtIndex:rowIndex];
-			if([[aTableColumn identifier] isEqualToString:@"partTag"]){
-				return [NSNumber numberWithInt:rowIndex];
-			}
-			else if([[aTableColumn identifier] isEqualToString:@"label"]){
-				return [theLabel label];
-			}
-
-			else  if([[aTableColumn identifier] isEqualToString:@"value"]){
-				return [theLabel displayString];
-			}
-			else return @"--";
-		}
-		else return @"";
-	}
-	else if(aTableView == gvTableView ){
-		NSArray* theGateValves = [model gateValves];
-		if(rowIndex < [theGateValves count]){
-			ORVacuumGateValve* gv = [theGateValves objectAtIndex:rowIndex];
-			if([[aTableColumn identifier] isEqualToString:@"partTag"]){
-				return [NSNumber numberWithInt:rowIndex];
-			}
-			else if([[aTableColumn identifier] isEqualToString:@"label"]){
-				return [gv label];
-			}
-			else if([[aTableColumn identifier] isEqualToString:@"constraints"]){
-				return [NSNumber numberWithInt:[gv constraintCount]];
-			}
-			else if([[aTableColumn identifier] isEqualToString:@"controlChannel"]){
-				if([gv controlObj])return [NSNumber numberWithInt:[gv controlChannel]];
-				else return @" ";
-			}
-			else  if([[aTableColumn identifier] isEqualToString:@"state"]){
-				if([gv controlType]      == kManualOnlyShowClosed) return @"Manual-Closed??";
-				else if([gv controlType] == kManualOnlyShowChanging) return @"Manual-Open??";
-				else {
-					int currentValveState = [gv state];
-					if([gv controlType] == k1BitReadBack){
-						return currentValveState==kGVOpen?@"OPEN":@"CLOSED";
-					}
-					else {
-						return currentValveState==kGVOpen?@"OPEN":(currentValveState==kGVClosed?@"CLOSED":@"CHANGING");
-					}
-				}
-			}
-			else return @"--";
-		}
-		else return @"";
-	}
-	return @"";
+	[model setRightSideConnection:[sender indexOfSelectedItem]];
 }
-
-
 
 @end

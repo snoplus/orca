@@ -17,7 +17,9 @@
 //for the use of this software.
 //-------------------------------------------------------------
 #import "ORMJDPumpCartView.h"
-
 @interface ORMJDTestCryoView : ORMJDPumpCartView {
+	NSInteger tag;
 }
+- (NSInteger) tag;
+- (void) setTag:(NSInteger)aValue;
 @end

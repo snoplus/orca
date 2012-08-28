@@ -17,8 +17,6 @@
 //for the use of this software.
 //-------------------------------------------------------------
 #import "ORVacuumParts.h"
-#import "ORAdcProcessing.h"
-#import "ORBitProcessing.h"
 #import "OROrderedObjHolding.h"
 
 @class ORVacuumGateValve;
@@ -36,24 +34,27 @@
 #define kRegionDryN2		4
 #define kRegionLeftSide		5
 #define kRegionRightSide	6
+#define kRegionNegPump		7
+#define kRegionCryostat		8
 
-#define kNumberRegions	    10
+#define kNumberRegions	    9
 //-----------------------------------
 //component tag numbers
-#define kTurboComponent			0
-#define kRGAComponent			1
-#define kCryoPumpComponent		2
-#define kPressureGaugeComponent 3
+#define kTurboComponent			 0
+#define kRGAComponent			 1
+#define kPressureGaugeComponent1 2
+#define kPressureGaugeComponent2 3
 
 //-----------------------------------
-@interface ORMJDPumpCartModel : ORGroup <OROrderedObjHolding,ORAdcProcessor>
+@interface ORMJDPumpCartModel : ORGroup <OROrderedObjHolding>
 {
 	NSMutableDictionary* partDictionary;
 	NSMutableDictionary* valueDictionary;
 	NSMutableDictionary* statusDictionary;
 	NSMutableArray*		 parts;
 	BOOL				 showGrid;
-	BOOL				 involvedInProcess;
+	int					 leftSideConnection;
+	int					 rightSideConnection;
 	NSMutableArray*		 testCryostats;
 }
 
@@ -81,6 +82,10 @@
 - (void) openDialogForComponent:(int)i;
 - (NSString*) regionName:(int)i;
 - (ORMJDTestCryostat*) testCryoStat:(int)i;
+- (int) leftSideConnection;
+- (void) setLeftSideConnection:(int)aCryostat;
+- (int) rightSideConnection;
+- (void) setRightSideConnection:(int)aCryostat;
 
 #pragma mark ***Notificatons
 - (void) registerNotificationObservers;
@@ -91,14 +96,6 @@
 #pragma mark ***Archival
 - (id)initWithCoder:(NSCoder*)decoder;
 - (void)encodeWithCoder:(NSCoder*)encoder;
-
-#pragma mark ***AdcProcessor Protocol
-- (double) setProcessAdc:(int)channel value:(double)value isLow:(BOOL*)isLow isHigh:(BOOL*)isHigh;
-- (NSString*) processingTitle;
-
-#pragma mark ***CallBackBitProcessor Protocol
-- (void) mapChannel:(int)aChannel toHWObject:(NSString*)objIdentifier hwChannel:(int)objChannel;
-- (void) unMapChannel:(int)aChannel fromHWObject:(NSString*)objIdentifier hwChannel:(int)aHWChannel;
 
 #pragma mark •••OROrderedObjHolding Protocol
 - (int) maxNumberOfObjects;
@@ -117,7 +114,9 @@
 
 extern NSString* ORMJDPumpCartModelShowGridChanged;
 extern NSString* ORMJCTestCryoVacLock;
-
+extern NSString* ORMJDPumpCartModelRightSideConnectionChanged;
+extern NSString* ORMJDPumpCartModelLeftSideConnectionChanged;
+extern NSString* ORMJDPumpCartModelConnectionChanged;
 
 @interface NSObject (ORMHDVacuumModel)
 - (double) convertedValue:(int)aChan;
