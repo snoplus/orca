@@ -1795,9 +1795,9 @@
 				<object class="NSAffineTransform" key="373.IBViewBoundsToFrameTransform">
 					<bytes key="NSTransformStruct">AUHQAABD1YAAA</bytes>
 				</object>
-				<string key="38.IBEditorWindowLastContentRect">{{567, 855}, {968, 641}}</string>
+				<string key="38.IBEditorWindowLastContentRect">{{366, 855}, {968, 641}}</string>
 				<string key="38.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="38.IBWindowTemplateEditedContentRect">{{567, 855}, {968, 641}}</string>
+				<string key="38.IBWindowTemplateEditedContentRect">{{366, 855}, {968, 641}}</string>
 				<boolean value="NO" key="38.windowTemplate.hasMaxSize"/>
 				<boolean value="NO" key="38.windowTemplate.hasMinSize"/>
 				<string key="38.windowTemplate.maxSize">{761, 710}</string>
@@ -1930,7 +1930,7 @@
 				</object>
 				<string key="77.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<object class="NSAffineTransform" key="77.IBViewBoundsToFrameTransform">
-					<bytes key="NSTransformStruct">AT+AAADAQAAAA</bytes>
+					<bytes key="NSTransformStruct">AUCAAABCPAAAA</bytes>
 				</object>
 			</dictionary>
 			<dictionary class="NSMutableDictionary" key="unlocalizedProperties"/>
