@@ -32,12 +32,6 @@
 #include <IOKit/IOBSD.h>
 #import "SynthesizeSingleton.h"
 
-@interface ORSerialPortList (Private)
-- (NSArray*) oldPortList;
-- (void)     setOldPortList:(NSArray*) newOldPortList;
-@end
-
-
 @implementation ORSerialPortList
 
 SYNTHESIZE_SINGLETON_FOR_ORCLASS(SerialPortList);
@@ -47,51 +41,17 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SerialPortList);
 	return [[[ORStandardEnumerator alloc] initWithCollection:[ORSerialPortList sharedSerialPortList] countSelector:@selector(count) objectAtIndexSelector:@selector(objectAtIndex:)] autorelease];
 }
 
-- (NSArray*) oldPortList
-{
-    return oldPortList;
-}
-
-- (void)setOldPortList:(NSArray*) newOldPortList
-{
-    id old = nil;
-
-    if (newOldPortList != oldPortList) {
-        old = oldPortList;
-        oldPortList = [newOldPortList retain];
-        [old release];
-    }
-}
-
-- (ORSerialPort*) oldPortByPath:(NSString*) bsdPath
-{
-	ORSerialPort *result = nil;
-	ORSerialPort *object;
-	NSEnumerator *enumerator;
-
-	enumerator = [oldPortList objectEnumerator];
-	while (object = [enumerator nextObject]) {
-		if ([[object bsdPath] isEqualToString:bsdPath]) {
-			result = object;
-			break;
-		}
-	}
-	return result;
-}
-
 -(kern_return_t)findSerialPorts:(io_iterator_t*) matchingServices
 {
-    kern_return_t		kernResult; 
     mach_port_t			masterPort;
-    CFMutableDictionaryRef	classesToMatch;
 
-    kernResult = IOMasterPort(MACH_PORT_NULL, &masterPort);
+    kern_return_t kernResult = IOMasterPort(MACH_PORT_NULL, &masterPort);
     if (KERN_SUCCESS != kernResult){
         //printf("IOMasterPort returned %d\n", kernResult);
     }
         
     // Serial devices are instances of class IOSerialBSDClient
-    classesToMatch = IOServiceMatching(kIOSerialBSDServiceValue);
+    CFMutableDictionaryRef classesToMatch = IOServiceMatching(kIOSerialBSDServiceValue);
     if (classesToMatch == NULL){
         //printf("IOServiceMatching returned a NULL dictionary.\n");
     }
@@ -112,24 +72,20 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SerialPortList);
 -(ORSerialPort*) getNextSerialPort:(io_iterator_t)serialPortIterator
 {
     io_object_t		serialService;
-    ORSerialPort	*result = nil;
+    ORSerialPort*   aSerialPort = nil;
     
     if ((serialService = IOIteratorNext(serialPortIterator))){
-        CFTypeRef	modemNameAsCFString;
-        CFTypeRef	bsdPathAsCFString;
-
-        modemNameAsCFString = IORegistryEntryCreateCFProperty(serialService,
+		
+        CFTypeRef modemNameAsCFString = IORegistryEntryCreateCFProperty(serialService,
                                                               CFSTR(kIOTTYDeviceKey),
                                                               kCFAllocatorDefault,
                                                               0);
-        bsdPathAsCFString = IORegistryEntryCreateCFProperty(serialService,
+        CFTypeRef bsdPathAsCFString = IORegistryEntryCreateCFProperty(serialService,
                                                             CFSTR(kIOCalloutDeviceKey),
                                                             kCFAllocatorDefault,
                                                             0);
         if (modemNameAsCFString && bsdPathAsCFString) {
-			result = [self oldPortByPath:(NSString*) bsdPathAsCFString];
-			if (result == nil)
-				result = [[[ORSerialPort alloc] init:(NSString*) bsdPathAsCFString withName:(NSString*) modemNameAsCFString] autorelease];
+			aSerialPort = [[[ORSerialPort alloc] init:(NSString*) bsdPathAsCFString withName:(NSString*) modemNameAsCFString] autorelease];
 		}
 
         if (modemNameAsCFString)CFRelease(modemNameAsCFString);
@@ -138,10 +94,9 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SerialPortList);
     
         (void) IOObjectRelease(serialService);
         // We have sucked this service dry of information so release it now.
-        return result;
+        return aSerialPort;
     }
-    else
-        return NULL;
+    else return NULL;
 }
 
 
@@ -153,29 +108,24 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SerialPortList);
      *	hi		 		       lo
      *	| system(6) | subsystem(12) | code(14) |
      */
-    io_iterator_t	serialPortIterator;
-    ORSerialPort	*serialPort;
+	self = [super init];
+	
+	portList = [[NSMutableArray array] retain];
 
-	if (portList != nil) {
-		[self setOldPortList:[NSArray arrayWithArray:portList]];
-		[portList removeAllObjects];
-	} 
-    else {
-		self=[super init];
-		portList = [[NSMutableArray array] retain];
-	}
-		[self findSerialPorts:&serialPortIterator];
-		do { 
-			serialPort = [self getNextSerialPort:serialPortIterator];
-			if (serialPort != NULL) {
-				if(	[[serialPort name] rangeOfString:@"Bluetooth"].location == NSNotFound &&
-					[[serialPort name] rangeOfString:@"KeySerial"].location == NSNotFound ){
-					[portList addObject:serialPort];
-				}
+    io_iterator_t	serialPortIterator;
+	[self findSerialPorts:&serialPortIterator];
+	ORSerialPort* serialPort;
+	do { 
+		serialPort = [self getNextSerialPort:serialPortIterator];
+		if (serialPort != NULL) {
+			if(	[[serialPort name] rangeOfString:@"Bluetooth"].location == NSNotFound &&
+				[[serialPort name] rangeOfString:@"KeySerial"].location == NSNotFound ){
+				[portList addObject:serialPort];
 			}
 		}
-		while (serialPort != NULL);
-		IOObjectRelease(serialPortIterator);	// Release the iterator.
+	}
+	while (serialPort != NULL);
+	IOObjectRelease(serialPortIterator);	// Release the iterator.
 
     return self;
 }

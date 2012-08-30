@@ -45,37 +45,36 @@
 
 @interface ORSerialPort : NSObject
 {
-	char *bsdPath;
-	NSString *serviceName;
+	NSString* bsdPath;
+	NSString* serviceName;
 	int fileDescriptor;
-	struct termios *options;
-	struct termios *originalOptions;
-	NSMutableDictionary *optionsDictionary;
+	struct termios* options;
+	struct termios* originalOptions;
+	NSMutableDictionary* optionsDictionary;
 	NSFileHandle *fileHandle;
 	int	lastError;
 	id owner;
 	// used by ORSerialPortAdditions only:
-	char *buffer;
-	NSTimer *readTimer;
-	id readTarget;
-	SEL readSelector;
-	struct timeval *timeout;
-	fd_set *readfds;
-	id delegate;
-	//BOOL delegateHandlesReadInBackground;
+	char*		buffer;
+	NSTimer*	readTimer;
+	id			readTarget;
+	SEL			readSelector;
+	struct timeval*	timeout;
+	fd_set*		readfds;
+	id			delegate;
 	BOOL delegateHandlesWriteInBackground;
 	
-	NSLock *writeLock;
+	NSLock* writeLock;
+	NSLock* stopWriteInBackgroundLock;
+	NSLock* countWriteInBackgroundThreadsLock;
+	NSLock* readLock;
+	NSLock* stopReadInBackgroundLock;
+	NSLock* countReadInBackgroundThreadsLock;
+	NSLock* closeLock;
 	BOOL stopWriteInBackground;
-	NSLock *stopWriteInBackgroundLock;
-	int countWriteInBackgroundThreads;
-	NSLock *countWriteInBackgroundThreadsLock;
-	NSLock *readLock;
 	BOOL stopReadInBackground;
-	NSLock *stopReadInBackgroundLock;
+	int countWriteInBackgroundThreads;
 	int countReadInBackgroundThreads;
-	NSLock *countReadInBackgroundThreadsLock;
-	NSLock *closeLock;
 }
 
 - (id)init:(NSString*) path withName:(NSString*) name;  //path is a bsdPath, name is IOKit service name

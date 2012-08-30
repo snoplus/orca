@@ -42,14 +42,12 @@ NSString* ORSerialPortDataReceived = @"ORSerialPortDataReceived";
 
 - (id)init:(NSString*) path withName:(NSString*) name
 {
-	self=[super init];
-	bsdPath = malloc([path length]);
-	strcpy(bsdPath, [path cStringUsingEncoding:NSASCIIStringEncoding]);
-	serviceName = [name retain];
+	self = [super init];
+	bsdPath			 = [path retain];
+	serviceName		 = [name retain];
 	optionsDictionary = [[NSMutableDictionary dictionaryWithCapacity:8] retain];
 	options = malloc(sizeof(*options));
 	originalOptions = malloc(sizeof(*originalOptions));
-	//buffer = malloc(AMSER_MAXBUFSIZE);
 	timeout = malloc(sizeof(*timeout));
 	readfds = malloc(sizeof(*readfds));
 	fileDescriptor = -1;
@@ -72,18 +70,21 @@ NSString* ORSerialPortDataReceived = @"ORSerialPortDataReceived";
 	[countReadInBackgroundThreadsLock release];
 	[stopReadInBackgroundLock release];
 	[readLock release];
+	[bsdPath release];
+	[serviceName release];
+	[optionsDictionary release];
 	[countWriteInBackgroundThreadsLock release];
 	[stopWriteInBackgroundLock release];
 	[writeLock release];
 	[closeLock release];
+	[fileHandle release];
+	[readTimer release];
 	
-	free(readfds);
-	free(timeout);
-	free(originalOptions);
-	free(options);
-	[optionsDictionary release];
-	[serviceName release];
-	free(bsdPath);
+	if (buffer != nil)	free(buffer);
+	if (readfds != nil)	free(readfds);
+	if (timeout != nil)	free(timeout);
+	if (originalOptions != nil)free(originalOptions);
+	if (options != nil)	free(options);
 	[super dealloc];
 }
 
@@ -109,7 +110,7 @@ NSString* ORSerialPortDataReceived = @"ORSerialPortDataReceived";
 
 - (NSString*) bsdPath
 {
-	return [NSString stringWithCString:bsdPath encoding:NSASCIIStringEncoding];
+	return bsdPath;
 }
 
 - (NSString*) name
@@ -155,11 +156,12 @@ NSString* ORSerialPortDataReceived = @"ORSerialPortDataReceived";
 
 - (NSFileHandle*) open		// use returned file handle to read and write
 {
-	fileDescriptor = open(bsdPath, O_RDWR | O_NOCTTY); // | O_NONBLOCK);
-	NSLog(@"opened: %s (file descriptor:%d)\n", bsdPath, fileDescriptor);
+	const char* thePath = [bsdPath cStringUsingEncoding:NSASCIIStringEncoding];
+	fileDescriptor = open(thePath, O_RDWR | O_NOCTTY); // | O_NONBLOCK);
+	NSLog(@"opened: %@ (file descriptor:%d)\n", bsdPath, fileDescriptor);
 	
 	if (fileDescriptor < 0){
-		NSLog(@"Error opening serial port %s - %s(%d).\n", bsdPath, strerror(errno), errno);
+		NSLog(@"Error opening serial port %@ - %s(%d).\n", bsdPath, strerror(errno), errno);
 		goto error;
 	}
 	
@@ -167,7 +169,7 @@ NSString* ORSerialPortDataReceived = @"ORSerialPortDataReceived";
 	// Get the current options and save them for later reset
 	if (tcgetattr(fileDescriptor, originalOptions) == -1)
 	{
-		NSLog(@"Error getting tty attributes %s - %s(%d).\n", bsdPath, strerror(errno), errno);
+		NSLog(@"Error getting tty attributes %@ - %s(%d).\n", bsdPath, strerror(errno), errno);
 		goto error;
 	}
 	// Get a copy for local options
@@ -182,44 +184,41 @@ NSString* ORSerialPortDataReceived = @"ORSerialPortDataReceived";
 	
 	// Failure path
 error:
-    if (fileDescriptor >= 0)
-			close(fileDescriptor);
+    if (fileDescriptor >= 0) close(fileDescriptor);
 	fileDescriptor = -1;
 	
 	return NULL;
 }
 
 
-- (void)close
+- (void) close
 {
 	//int err;
 	// Traditionally it is good to reset a serial port back to
 	// the state in which you found it.  Let's continue that tradition.
 	if (fileDescriptor >= 0) {
         [self stopReadInBackground];
-		//NSLog(@"close - attempt closeLock");
 		[closeLock lock];
-		//NSLog(@"close - closeLock locked");
 		// kill pending read by setting O_NONBLOCK
 		if (fcntl(fileDescriptor, F_SETFL, fcntl(fileDescriptor, F_GETFL, 0) | O_NONBLOCK) == -1){
-			NSLog(@"Error clearing O_NONBLOCK %s - %s(%d).\n", bsdPath, strerror(errno), errno);
-			//goto error;
+			NSLog(@"Error clearing O_NONBLOCK %@ - %s(%d).\n", bsdPath, strerror(errno), errno);
 		}
 		
 		if (tcsetattr(fileDescriptor, TCSANOW, originalOptions) == -1){
 			NSLog(@"Error resetting tty attributes - %s(%d).\n", 				strerror(errno), errno);
 		}
 		
-		if (readTimer != NULL) {
-			[readTarget release];
-			[readTimer release];
-		}
+		[readTarget release];
+		readTarget = nil;
+		
+		[readTimer release];
+		readTimer = nil;
+		
 		[fileHandle closeFile];
-		if ([fileHandle retainCount] > 1)NSLog(@"possibly leaking fileHandle (%d)\n", fileDescriptor);
 		[fileHandle release];
-
-        NSLog(@"closed: %s (file descriptor:%d)\n", bsdPath, fileDescriptor);
-        [self stopReadInBackground];
+		fileHandle = nil;
+		
+        NSLog(@"closed: %@ (file descriptor:%d)\n", bsdPath, fileDescriptor);
 		close(fileDescriptor);
 		
 		fileDescriptor = -1;
@@ -287,11 +286,11 @@ error:
 {
 	// will open the port to get options if neccessary
 	if ([optionsDictionary objectForKey:ORSerialOptionServiceName] == nil){
-		if (fileHandle < 0) {
+		if (!fileHandle) {
 			[self open];
+			[self buildOptionsDictionary];
 			[self close];
 		}
-		[self buildOptionsDictionary];
 	}
 	return [NSMutableDictionary dictionaryWithDictionary:optionsDictionary];
 }

@@ -26,7 +26,6 @@
 {
 	@private
         NSMutableArray*		 portList;
-        NSArray*			 oldPortList;
 		NSMutableDictionary* aliaseDictionary;
 }
 

@@ -62,12 +62,8 @@
 #if ORSerialDebug
     NSLog(@"readString\n");
 #endif
-    int	len;
-    
-    if (buffer == nil)
-        buffer = malloc(AMSER_MAXBUFSIZE);
-    
-    len = read(fileDescriptor, buffer, AMSER_MAXBUFSIZE);
+    if (buffer == nil) buffer = malloc(AMSER_MAXBUFSIZE);
+    int len = read(fileDescriptor, buffer, AMSER_MAXBUFSIZE);
 	return [[[NSString alloc] initWithBytes:buffer length:len encoding:NSASCIIStringEncoding] autorelease];
 }
 
@@ -79,7 +75,7 @@
     return write(fileDescriptor, [string cStringUsingEncoding:NSASCIIStringEncoding], [string length]);
 }
 
-- (int)checkRead
+- (int) checkRead
 {
 #if ORSerialDebug
     NSLog(@"checkRead\n");
@@ -91,15 +87,14 @@
     return select(fileDescriptor+1, readfds, nil, nil, timeout);
 }
 
-- (void)waitForInput:(id)target selector:(SEL)selector
+- (void) waitForInput:(id)target selector:(SEL)selector
 {
 #if ORSerialDebug
     NSLog(@"waitForInput\n");
 #endif
     readTarget = [target retain];
     readSelector = selector;
-    if (readTimer != NULL)
-        [readTimer release];
+    if (readTimer) [readTimer release];
     readTimer = [[NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(doRead:) userInfo:self repeats:NO] retain];
     
 }
