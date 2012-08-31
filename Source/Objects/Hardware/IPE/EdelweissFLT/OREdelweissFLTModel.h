@@ -132,8 +132,9 @@
     uint64_t streamMask;
     uint64_t fiberDelays;
     int fastWrite;
-    int statusRegister;
+    uint32_t statusRegister;
     int totalTriggerNRegister;
+    uint32_t controlRegister;
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
@@ -144,20 +145,12 @@
 - (short) getNumberRegisters;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
-- (int) totalTriggerNRegister;
-- (void) setTotalTriggerNRegister:(int)aTotalTriggerNRegister;
-- (int) statusRegister;
-- (void) setStatusRegister:(int)aStatusRegister;
-- (int) fastWrite;
-- (void) setFastWrite:(int)aFastWrite;
-- (uint64_t) fiberDelays;
-- (void) setFiberDelays:(uint64_t)aFiberDelays;
-- (uint64_t) streamMask;
-- (uint32_t) streamMask1;
-- (uint32_t) streamMask2;
-- (int) streamMaskForFiber:(int)aFiber chan:(int)aChan;
-- (void) setStreamMask:(uint64_t)aStreamMask;
-//- (void) setStreamMaskForFiber:(int)aFiber chan:(int)aChan;
+- (uint32_t) controlRegister;
+- (void) setControlRegister:(uint32_t)aControlRegister;
+- (int) statusLatency;
+- (void) setStatusLatency:(int)aValue;
+- (int) vetoFlag;
+- (void) setVetoFlag:(int)aValue;
 - (int) selectFiberTrig;
 - (void) setSelectFiberTrig:(int)aSelectFiberTrig;
 - (int) BBv1Mask;
@@ -168,6 +161,22 @@
 - (void) setFiberEnableMask:(int)aFiberEnableMask;
 - (int) fltModeFlags;
 - (void) setFltModeFlags:(int)aFltModeFlags;
+
+
+- (int) totalTriggerNRegister;
+- (void) setTotalTriggerNRegister:(int)aTotalTriggerNRegister;
+- (uint32_t) statusRegister;
+- (void) setStatusRegister:(uint32_t)aStatusRegister;
+- (int) fastWrite;
+- (void) setFastWrite:(int)aFastWrite;
+- (uint64_t) fiberDelays;
+- (void) setFiberDelays:(uint64_t)aFiberDelays;
+- (uint64_t) streamMask;
+- (uint32_t) streamMask1;
+- (uint32_t) streamMask2;
+- (int) streamMaskForFiber:(int)aFiber chan:(int)aChan;
+- (void) setStreamMask:(uint64_t)aStreamMask;
+//- (void) setStreamMaskForFiber:(int)aFiber chan:(int)aChan;
 - (int) targetRate;
 - (void) setTargetRate:(int)aTargetRate;
 - (int) runMode;
@@ -366,6 +375,7 @@
 				  n:(int) n;
 @end
 
+extern NSString* OREdelweissFLTModelControlRegisterChanged;
 extern NSString* OREdelweissFLTModelTotalTriggerNRegisterChanged;
 extern NSString* OREdelweissFLTModelStatusRegisterChanged;
 extern NSString* OREdelweissFLTModelFastWriteChanged;

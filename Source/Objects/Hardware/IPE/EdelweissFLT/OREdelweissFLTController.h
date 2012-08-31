@@ -29,7 +29,13 @@
 @interface OREdelweissFLTController : OrcaObjectController {
 	@private
         IBOutlet NSButton*		settingLockButton;
+		//control register
+	    IBOutlet   NSTextField* controlRegisterTextField;
+		IBOutlet NSPopUpButton* fltModeFlagsPU;
+		IBOutlet NSPopUpButton* statusLatencyPU;
+	    IBOutlet NSButton*      vetoFlagCB;
 	IBOutlet   NSTextField* totalTriggerNRegisterTextField;
+	    //other registers
 	IBOutlet   NSTextField* statusRegisterTextField;
 		IBOutlet NSMatrix*		fiberDelaysMatrix;
 	    IBOutlet NSTextField*   fiberDelaysTextField;
@@ -37,7 +43,6 @@
 	    IBOutlet NSTextField*   streamMaskTextField;
 		IBOutlet NSMatrix*		streamMaskMatrix;
 		
-		IBOutlet NSPopUpButton* fltModeFlagsPU;
 		IBOutlet NSMatrix*		fiberEnableMaskMatrix;
 		IBOutlet NSMatrix*		BBv1MaskMatrix;
 		IBOutlet NSPopUpButton* selectFiberTrigPU;
@@ -45,6 +50,7 @@
 		IBOutlet NSMatrix*		displayEventRateMatrix;
 		IBOutlet NSTextField*	targetRateField;
         IBOutlet NSTextField*   fltSlotNumTextField;
+        IBOutlet NSMatrix*      fltSlotNumMatrix;
 		IBOutlet NSButton*		storeDataInRamCB;
 		IBOutlet NSPopUpButton*	filterLengthPU;
 		IBOutlet NSPopUpButton*	gapLengthPU;
@@ -121,6 +127,7 @@
 - (void) updateButtons;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+- (void) controlRegisterChanged:(NSNotification*)aNote;
 - (void) totalTriggerNRegisterChanged:(NSNotification*)aNote;
 - (void) statusRegisterChanged:(NSNotification*)aNote;
 - (void) fastWriteChanged:(NSNotification*)aNote;
@@ -166,6 +173,13 @@
 - (void) selectedChannelValueChanged:(NSNotification*) aNote;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+- (IBAction) controlRegisterTextFieldAction:(id)sender;
+- (IBAction) writeControlRegisterButtonAction:(id)sender;
+- (IBAction) readControlRegisterButtonAction:(id)sender;
+
+- (IBAction) statusLatencyPUAction:(id)sender;
+- (IBAction) vetoFlagCBAction:(id)sender;
+
 - (IBAction) totalTriggerNRegisterTextFieldAction:(id)sender;
 - (void) readStatusButtonAction:(id)sender;
 - (IBAction) statusRegisterTextFieldAction:(id)sender;

@@ -139,6 +139,8 @@
 		2D51C61115B5A115000F0ACD /* OREdelweissFLTModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D51C60815B5A115000F0ACD /* OREdelweissFLTModel.h */; };
 		2D51C61215B5A115000F0ACD /* OREdelweissFLTModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D51C60915B5A115000F0ACD /* OREdelweissFLTModel.m */; };
 		2D556352109F4CBE00A65E6C /* Needle in Resources */ = {isa = PBXBuildFile; fileRef = 2D556351109F4CBE00A65E6C /* Needle */; };
+		2DAB012115EF988C00BC2540 /* EdelweissLogo.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2DAB011F15EF988C00BC2540 /* EdelweissLogo.tif */; };
+		2DAB012215EF988C00BC2540 /* KITLogo.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2DAB012015EF988C00BC2540 /* KITLogo.tif */; };
 		2DC1EE800F33724E00E93C75 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2DC1EE7F0F33724E00E93C75 /* WebKit.framework */; };
 		4325BA38109F6378009E15B9 /* GermaniumHighE in Resources */ = {isa = PBXBuildFile; fileRef = 4325BA37109F6378009E15B9 /* GermaniumHighE */; };
 		4325BA3A109F6381009E15B9 /* GermaniumLowE in Resources */ = {isa = PBXBuildFile; fileRef = 4325BA39109F6381009E15B9 /* GermaniumLowE */; };
@@ -3243,6 +3245,8 @@
 		2D51C60815B5A115000F0ACD /* OREdelweissFLTModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OREdelweissFLTModel.h; path = EdelweissFLT/OREdelweissFLTModel.h; sourceTree = "<group>"; };
 		2D51C60915B5A115000F0ACD /* OREdelweissFLTModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OREdelweissFLTModel.m; path = EdelweissFLT/OREdelweissFLTModel.m; sourceTree = "<group>"; };
 		2D556351109F4CBE00A65E6C /* Needle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Needle; sourceTree = "<group>"; };
+		2DAB011F15EF988C00BC2540 /* EdelweissLogo.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = EdelweissLogo.tif; path = EdelweissFLT/EdelweissLogo.tif; sourceTree = "<group>"; };
+		2DAB012015EF988C00BC2540 /* KITLogo.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = KITLogo.tif; path = EdelweissFLT/KITLogo.tif; sourceTree = "<group>"; };
 		2DC1EE7F0F33724E00E93C75 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
 		4325BA37109F6378009E15B9 /* GermaniumHighE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = GermaniumHighE; path = Source/Objects/Hardware/GPIB/HPPulser/GermaniumHighE; sourceTree = SOURCE_ROOT; };
 		4325BA39109F6381009E15B9 /* GermaniumLowE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = GermaniumLowE; path = Source/Objects/Hardware/GPIB/HPPulser/GermaniumLowE; sourceTree = SOURCE_ROOT; };
@@ -6288,6 +6292,8 @@
 			children = (
 				2D51C60115B5A115000F0ACD /* EdelweissFLT.nib */,
 				2D51C60215B5A115000F0ACD /* EdelweissFLTCard.gif */,
+				2DAB011F15EF988C00BC2540 /* EdelweissLogo.tif */,
+				2DAB012015EF988C00BC2540 /* KITLogo.tif */,
 				2D51C60315B5A115000F0ACD /* OREdelweissFLTController.h */,
 				2D51C60415B5A115000F0ACD /* OREdelweissFLTController.m */,
 				2D51C60515B5A115000F0ACD /* OREdelweissFLTDecoder.h */,
@@ -14458,6 +14464,8 @@
 				8458EA3A15DBCFF6005C43A9 /* MPodCrate.nib in Resources */,
 				8458EA3B15DBCFF6005C43A9 /* MPodCrate.tif in Resources */,
 				8458EA3C15DBCFF6005C43A9 /* MPodCrateSmall.tif in Resources */,
+				2DAB012115EF988C00BC2540 /* EdelweissLogo.tif in Resources */,
+				2DAB012215EF988C00BC2540 /* KITLogo.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

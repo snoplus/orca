@@ -54,10 +54,10 @@
 {
 	[super awakeFromNib];
 	
-    settingSize			= NSMakeSize(670,720);
-    rateSize			= NSMakeSize(490,690);
-    testSize			= NSMakeSize(400,350);
-    lowlevelSize		= NSMakeSize(400,350);
+    settingSize			= NSMakeSize(670,790);
+    rateSize			= NSMakeSize(490,760);
+    testSize			= NSMakeSize(400,420);
+    lowlevelSize		= NSMakeSize(400,420);
 	
 	rateFormatter = [[NSNumberFormatter alloc] init];
 	[rateFormatter setFormat:@"##0.00"];
@@ -281,9 +281,25 @@
 						object: model];
 
 
+    [notifyCenter addObserver : self
+                     selector : @selector(controlRegisterChanged:)
+                         name : OREdelweissFLTModelControlRegisterChanged
+						object: model];
+
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+
+- (void) controlRegisterChanged:(NSNotification*)aNote
+{
+	[controlRegisterTextField setIntValue: [model controlRegister]];
+    [self selectFiberTrigChanged:nil];
+    [self BBv1MaskChanged:nil];
+
+	//[selectFiberTrigPU selectItemAtIndex: [model selectFiberTrig]];
+	[statusLatencyPU selectItemAtIndex: [model statusLatency]];
+	[vetoFlagCB setIntValue: [model vetoFlag]];
+}
 
 - (void) totalTriggerNRegisterChanged:(NSNotification*)aNote
 {
@@ -303,7 +319,7 @@
 - (void) fiberDelaysChanged:(NSNotification*)aNote
 {
     uint64_t val=[model fiberDelays];
-    //DEBUG OUTPUT:
+    //DEBUG OUTPUT: 
  	NSLog(@"%@::%@: UNDER CONSTRUCTION! 0x%016llx \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model fiberDelays]);//TODO: DEBUG testing ...-tb-
 	//[fiberDelaysTextField setIntValue: [model fiberDelays]];
 	[fiberDelaysTextField setStringValue: [NSString stringWithFormat:@"0x%016qx",val]];
@@ -358,8 +374,7 @@
 
 - (void) selectFiberTrigChanged:(NSNotification*)aNote
 {
-//DEBUG OUTPUT:
- 	NSLog(@"%@::%@: UNDER CONSTRUCTION! [model selectFiberTrig] is %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model selectFiberTrig]);//TODO: DEBUG testing ...-tb-
+    //DEBUG: OUTPUT:  	NSLog(@"%@::%@: UNDER CONSTRUCTION! [model selectFiberTrig] is %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model selectFiberTrig]);//TODO : DEBUG testing ...-tb-
 	//[selectFiberTrigPU setIntValue: [model selectFiberTrig]];
 	[selectFiberTrigPU selectItemAtIndex: [model selectFiberTrig]];
 }
@@ -370,8 +385,7 @@
 	int i;
 	for(i=0;i<6;i++){
 		[[BBv1MaskMatrix cellWithTag:i] setIntValue:[model BBv1MaskForChan:i]];
-//DEBUG OUTPUT:
- 	NSLog(@"%@::%@: UNDER CONSTRUCTION! [model BBv1MaskForChan:%i] %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),i,[model BBv1MaskForChan:i]);//TODO: DEBUG testing ...-tb-
+        //DEBUG OUTPUT: 	NSLog(@"%@::%@: UNDER CONSTRUCTION! [model BBv1MaskForChan:%i] %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),i,[model BBv1MaskForChan:i]);//TODO : DEBUG testing ...-tb-
 	}    
 
 }
@@ -387,8 +401,16 @@
 
 - (void) fltModeFlagsChanged:(NSNotification*)aNote
 {
-	[fltModeFlagsPU selectItemAtIndex: [model fltModeFlags]];
-	[fltModeFlagsPU setIntValue: [model fltModeFlags]];
+    int index=4;
+	switch([model fltModeFlags]){
+	    case 0x0: index=0; break;
+	    case 0x1: index=1; break;
+	    case 0x2: index=2; break;
+	    case 0x3: index=3; break;
+	    default: index=4; break;
+	}
+	[fltModeFlagsPU selectItemAtIndex: index];
+	//[fltModeFlagsPU setIntValue: [model fltModeFlags]];
 }
 
 - (void) targetRateChanged:(NSNotification*)aNote
@@ -490,6 +512,7 @@
 	[self fastWriteChanged:nil];
 	[self statusRegisterChanged:nil];
 	[self totalTriggerNRegisterChanged:nil];
+	[self controlRegisterChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -703,6 +726,13 @@
 	// Set title of FLT configuration window, ak 15.6.07
 	[[self window] setTitle:[NSString stringWithFormat:@"IPE-DAQ-V4 EDELWEISS FLT Card (Slot %d, FLT# %d)",[model slot]+1,[model stationNumber]]];
     [fltSlotNumTextField setStringValue: [NSString stringWithFormat:@"FLT# %d",[model stationNumber]]];
+	//[fltSlotNumMatrix setSe];
+    //[[fltSlotNumMatrix cellWithTag:[model stationNumber]] setIntValue:1];
+	short chan;
+	for(chan=0;chan<kNumV4FLTChannels;chan++) if(chan==[model stationNumber]-1)
+	    [[fltSlotNumMatrix cellAtRow:0 column:chan] setState:1];
+		else
+        [[fltSlotNumMatrix cellAtRow:0 column:chan] setState:0];
 }
 
 - (void) gainArrayChanged:(NSNotification*)aNotification
@@ -812,6 +842,41 @@
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+
+- (void) controlRegisterTextFieldAction:(id)sender
+{
+	[model setControlRegister:[sender intValue]];	
+}
+
+- (IBAction) writeControlRegisterButtonAction:(id)sender
+{
+    //DEBUG
+ 	NSLog(@"%@::%@ \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+	//[model setStatusLatency:[sender indexOfSelectedItem]];	
+}
+
+- (IBAction) readControlRegisterButtonAction:(id)sender
+{
+    //DEBUG
+ 	NSLog(@"%@::%@ \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+	//[model setStatusLatency:[sender indexOfSelectedItem]];	
+}
+
+
+- (IBAction) statusLatencyPUAction:(id)sender
+{
+    //DEBUG
+ 	NSLog(@"%@::%@ [sender indexOfSelectedItem] %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[sender indexOfSelectedItem]);//TODO: DEBUG testing ...-tb-
+	[model setStatusLatency:[sender indexOfSelectedItem]];	
+}
+
+- (IBAction) vetoFlagCBAction:(id)sender
+{
+    //DEBUG
+ 	NSLog(@"%@::%@ \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+	[model setVetoFlag:[sender intValue]];	
+}
+
 
 - (void) totalTriggerNRegisterTextFieldAction:(id)sender
 {
@@ -947,9 +1012,20 @@
 
 - (void) fltModeFlagsPUAction:(id)sender
 {
+    int flags=4;
+	switch([sender indexOfSelectedItem]){
+	    case 0: flags=0x0; break;
+	    case 1: flags=0x1; break;
+	    case 2: flags=0x2; break;
+	    case 3: flags=0x4; break;
+	    default: flags=0; break;
+	}
 	//[model setFltModeFlags:[sender intValue]];	
-	[model setFltModeFlags:[sender indexOfSelectedItem]];	
+	[model setFltModeFlags: flags];	
 }
+
+
+
 
 
 - (IBAction) writeCommandResyncAction:(id)sender

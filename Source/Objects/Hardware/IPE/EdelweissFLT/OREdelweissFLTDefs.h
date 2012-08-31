@@ -21,6 +21,22 @@
 
 #define kIpeFlt_Pages 64
 
+// Control register bits
+#define kEWFlt_ControlReg_VetoFlag_Shift	31
+#define kEWFlt_ControlReg_VetoFlag_Mask		0x1
+#define kEWFlt_ControlReg_SelectFiber_Shift	28
+#define kEWFlt_ControlReg_SelectFiber_Mask	0x7
+#define kEWFlt_ControlReg_StatusLatency_Shift	25
+#define kEWFlt_ControlReg_StatusLatency_Mask	0x7
+#define kEWFlt_ControlReg_FiberEnable_Shift	16
+#define kEWFlt_ControlReg_FiberEnable_Mask	0x3f
+#define kEWFlt_ControlReg_BBv1_Shift		8
+#define kEWFlt_ControlReg_BBv1_Mask			0x3f
+#define kEWFlt_ControlReg_ModeFlags_Shift	4
+#define kEWFlt_ControlReg_ModeFlags_Mask	0x7
+
+
+
 // Position of the bit fields
 #define kIpeFlt_Cntl_InterruptMask_Shift	8
 #define kIpeFlt_Cntl_InterruptMask_Mask		0xff

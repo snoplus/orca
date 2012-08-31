@@ -72,13 +72,13 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (void) awakeFromNib
 {
-	controlSize			= NSMakeSize(555,670);
-    statusSize			= NSMakeSize(555,670);
-    lowLevelSize		= NSMakeSize(555,400);
-    cpuManagementSize	= NSMakeSize(485,450);
-    cpuTestsSize		= NSMakeSize(555,315);
-    udpSize		        = NSMakeSize(555,670);
-    streamingSize		= NSMakeSize(555,670);
+	controlSize			= NSMakeSize(600,670);
+    statusSize			= NSMakeSize(600,670);
+    lowLevelSize		= NSMakeSize(600,500);
+    cpuManagementSize	= NSMakeSize(600,500);
+    cpuTestsSize		= NSMakeSize(600,450);
+    udpSize		        = NSMakeSize(600,670);
+    streamingSize		= NSMakeSize(600,670);
 	
 	[[self window] setTitle:@"IPE-DAQ-V4 EDELWEISS SLT"];	
 	

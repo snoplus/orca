@@ -76,7 +76,7 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
         
         [initialUserDefaults setObject:dataForColor([NSColor whiteColor])  forKey:ORScriptBackgroundColor];
         [initialUserDefaults setObject:dataForColor([NSColor redColor])  forKey:ORScriptCommentColor];
-        [initialUserDefaults setObject:dataForColor([NSColor greenColor])  forKey:ORScriptStringColor];
+        [initialUserDefaults setObject:dataForColor([NSColor brownColor])  forKey:ORScriptStringColor];//was greenColor; several users asked me to change it (however, it is changeable at preferences ...) -tb-
         [initialUserDefaults setObject:dataForColor([NSColor blueColor])  forKey:ORScriptIdentifier1Color];
         [initialUserDefaults setObject:dataForColor([NSColor grayColor])  forKey:ORScriptIdentifier2Color];
         [initialUserDefaults setObject:dataForColor([NSColor orangeColor])  forKey:ORScriptConstantsColor];

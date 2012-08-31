@@ -36,7 +36,7 @@
         if(aString)theCmd = [NSString stringWithFormat:@"%@:%@\n",aCmd,aString]; 
         else       theCmd = [NSString stringWithFormat:@"%@\n",aCmd]; 
 
-        [socket writeString:theCmd encoding:NSASCIIStringEncoding];    
+        [socket writeString:theCmd encoding:NSASCIIStringEncoding];
     }
 }
 

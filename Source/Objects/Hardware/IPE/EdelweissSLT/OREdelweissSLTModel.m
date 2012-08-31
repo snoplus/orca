@@ -98,6 +98,7 @@ kSltV4EventNumberReg,
 	kSltV4PROMsBufferReg,
 	//kSltV4TriggerDataReg,
 	//kSltV4ADCDataReg,
+kSltV4BBxDataFIFOReg,
 kSltV4BBxFIFOModeReg,
 kSltV4BBxFIFOStatusReg,
 kSltV4BBxFIFOPAEOffsetReg,
@@ -166,6 +167,7 @@ static IpeRegisterNamesStruct regV4[kSltV4NumRegs] = {
 {@"PROMs Buffer",		0xC00100,		256/*252? ask Sascha*/,		kIpeRegReadable | kIpeRegWriteable },
 //HEAT {@"Trigger Data",		0xD80000,	  14000,		kIpeRegReadable | kIpeRegWriteable },
 //TODO: 0xEXxxxx, "needs FIFO num" implementieren!!! -tb-
+{@"BBxDataFIFO",			0xD00000,	 1,		kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsIndex }, //BBx -> x=num./index of FIFO   -tb-
 {@"BBxFIFOMode",			0xE00000,	 1,		kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsIndex }, //BBx -> x=num./index of FIFO (2012: this was equal to index FLTx), adress: 0xEX0000 -tb-
 {@"BBxFIFOStatus",			0xE00004,	 1,		kIpeRegReadable |                    kIpeRegNeedsIndex }, 
 {@"BBxFIFOPAEOffset",		0xE00008,	 1,		kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsIndex }, 

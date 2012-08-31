@@ -30,6 +30,7 @@
 #import "EdelweissSLTv4_HW_Definitions.h"
 #import "ORCommandList.h"
 
+NSString* OREdelweissFLTModelControlRegisterChanged = @"OREdelweissFLTModelControlRegisterChanged";
 NSString* OREdelweissFLTModelTotalTriggerNRegisterChanged = @"OREdelweissFLTModelTotalTriggerNRegisterChanged";
 NSString* OREdelweissFLTModelStatusRegisterChanged = @"OREdelweissFLTModelStatusRegisterChanged";
 NSString* OREdelweissFLTModelFastWriteChanged = @"OREdelweissFLTModelFastWriteChanged";
@@ -250,6 +251,120 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
 
+- (uint32_t) controlRegister
+{
+    return controlRegister;
+}
+
+- (void) setControlRegister:(uint32_t)aControlRegister
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setControlRegister:controlRegister];
+	
+    controlRegister = aControlRegister;
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelControlRegisterChanged object:self];
+	
+	//TODO: OREdelweissFLTModelControlRegisterChanged
+	//replaced
+	//OREdelweissFLTModelFiberEnableMaskChanged, OREdelweissFLTModelSelectFiberTrigChanged
+}
+
+- (int) statusLatency
+{    return (controlRegister >> kEWFlt_ControlReg_StatusLatency_Shift) & kEWFlt_ControlReg_StatusLatency_Mask;   }
+
+- (void) setStatusLatency:(int)aValue
+{
+    uint32_t cr = controlRegister & ~(kEWFlt_ControlReg_StatusLatency_Mask << kEWFlt_ControlReg_StatusLatency_Shift);
+    cr = cr | ((aValue & kEWFlt_ControlReg_StatusLatency_Mask) << kEWFlt_ControlReg_StatusLatency_Shift);
+	[self setControlRegister:cr];
+}
+
+- (int) vetoFlag
+{    return (controlRegister >> kEWFlt_ControlReg_VetoFlag_Shift) & kEWFlt_ControlReg_VetoFlag_Mask;   }
+
+- (void) setVetoFlag:(int)aValue
+{
+    uint32_t cr = controlRegister & ~(kEWFlt_ControlReg_VetoFlag_Mask << kEWFlt_ControlReg_VetoFlag_Shift);
+    cr = cr | ((aValue & kEWFlt_ControlReg_VetoFlag_Mask) << kEWFlt_ControlReg_VetoFlag_Shift);
+	[self setControlRegister:cr];
+}
+
+
+
+- (int) selectFiberTrig
+{
+    return selectFiberTrig;
+}
+
+- (void) setSelectFiberTrig:(int)aSelectFiberTrig
+{
+    //[[[self undoManager] prepareWithInvocationTarget:self] setSelectFiberTrig:selectFiberTrig];
+    uint32_t cr = controlRegister & ~(kEWFlt_ControlReg_SelectFiber_Mask << kEWFlt_ControlReg_SelectFiber_Shift);
+    selectFiberTrig = aSelectFiberTrig;
+    cr = cr | ((selectFiberTrig & kEWFlt_ControlReg_SelectFiber_Mask) << kEWFlt_ControlReg_SelectFiber_Shift);
+	[self setControlRegister:cr];
+    //[[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelSelectFiberTrigChanged object:self];
+}
+
+- (int) BBv1Mask
+{
+    return BBv1Mask;
+}
+
+- (BOOL) BBv1MaskForChan:(int)i
+{
+    return (BBv1Mask & (0x1 <<i)) != 0;
+}
+
+//TODO: OREdelweissFLTModelBBv1MaskChanged and BBv1Mask obsolete -tb-
+- (void) setBBv1Mask:(int)aBBv1Mask
+{
+    //[[[self undoManager] prepareWithInvocationTarget:self] setBBv1Mask:BBv1Mask];
+    //BBv1Mask = aBBv1Mask;
+    //[[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelBBv1MaskChanged object:self];
+    BBv1Mask = aBBv1Mask;
+    uint32_t cr = controlRegister & ~(kEWFlt_ControlReg_BBv1_Mask << kEWFlt_ControlReg_BBv1_Shift);
+    cr = cr | ((aBBv1Mask & kEWFlt_ControlReg_BBv1_Mask) << kEWFlt_ControlReg_BBv1_Shift);
+	[self setControlRegister:cr];
+}
+
+- (int) fiberEnableMask
+{    return (controlRegister >> kEWFlt_ControlReg_FiberEnable_Shift) & kEWFlt_ControlReg_FiberEnable_Mask;   }
+//{    return fiberEnableMask;}
+
+- (int) fiberEnableMaskForChan:(int)i
+{
+    return ([self fiberEnableMask] & (0x1 <<i)) != 0;
+}
+
+//TODO: OREdelweissFLTModelFiberEnableMaskChanged and fiberEnableMask obsolete -tb-
+- (void) setFiberEnableMask:(int)aFiberEnableMask
+{
+    //[[[self undoManager] prepareWithInvocationTarget:self] setFiberEnableMask:fiberEnableMask];
+    //fiberEnableMask = aFiberEnableMask;
+    //[[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelFiberEnableMaskChanged object:self];
+    uint32_t cr = controlRegister & ~(kEWFlt_ControlReg_FiberEnable_Mask << kEWFlt_ControlReg_FiberEnable_Shift);
+    fiberEnableMask = aFiberEnableMask;
+    cr = cr | ((aFiberEnableMask & kEWFlt_ControlReg_FiberEnable_Mask) << kEWFlt_ControlReg_FiberEnable_Shift);
+	[self setControlRegister:cr];
+}
+
+- (int) fltModeFlags // this are the flags 4-6 -tb-
+{    return (controlRegister >> kEWFlt_ControlReg_ModeFlags_Shift) & kEWFlt_ControlReg_ModeFlags_Mask;   }
+//{    return fltModeFlags;}
+
+- (void) setFltModeFlags:(int)aFltModeFlags
+{
+    //[[[self undoManager] prepareWithInvocationTarget:self] setFltModeFlags:fltModeFlags];
+    //fltModeFlags = aFltModeFlags;
+    //[[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelFltModeFlagsChanged object:self];
+    fltModeFlags = aFltModeFlags;
+    uint32_t cr = controlRegister & ~(kEWFlt_ControlReg_ModeFlags_Mask << kEWFlt_ControlReg_ModeFlags_Shift);
+    cr = cr | ((aFltModeFlags & kEWFlt_ControlReg_ModeFlags_Mask) << kEWFlt_ControlReg_ModeFlags_Shift);
+	[self setControlRegister:cr];
+}
+
+
+
 
 - (int) totalTriggerNRegister
 {
@@ -263,12 +378,12 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelTotalTriggerNRegisterChanged object:self];
 }
 
-- (int) statusRegister
+- (uint32_t) statusRegister
 {
     return statusRegister;
 }
 
-- (void) setStatusRegister:(int)aStatusRegister
+- (void) setStatusRegister:(uint32_t)aStatusRegister
 {
     statusRegister = aStatusRegister;
 
@@ -350,69 +465,9 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 //{
 //}
 
-- (int) selectFiberTrig
-{
-    return selectFiberTrig;
-}
 
-- (void) setSelectFiberTrig:(int)aSelectFiberTrig
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setSelectFiberTrig:selectFiberTrig];
-    
-    selectFiberTrig = aSelectFiberTrig;
 
-    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelSelectFiberTrigChanged object:self];
-}
 
-- (int) BBv1Mask
-{
-    return BBv1Mask;
-}
-
-- (BOOL) BBv1MaskForChan:(int)i
-{
-    return (BBv1Mask & (0x1 <<i)) != 0;
-}
-
-- (void) setBBv1Mask:(int)aBBv1Mask
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setBBv1Mask:BBv1Mask];
-    BBv1Mask = aBBv1Mask;
-    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelBBv1MaskChanged object:self];
-}
-
-- (int) fiberEnableMask
-{
-    return fiberEnableMask;
-}
-
-- (int) fiberEnableMaskForChan:(int)i
-{
-    return (fiberEnableMask & (0x1 <<i)) != 0;
-}
-
-- (void) setFiberEnableMask:(int)aFiberEnableMask
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setFiberEnableMask:fiberEnableMask];
-    
-    fiberEnableMask = aFiberEnableMask;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelFiberEnableMaskChanged object:self];
-}
-
-- (int) fltModeFlags
-{
-    return fltModeFlags;
-}
-
-- (void) setFltModeFlags:(int)aFltModeFlags
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setFltModeFlags:fltModeFlags];
-    
-    fltModeFlags = aFltModeFlags;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelFltModeFlagsChanged object:self];
-}
 - (int) targetRate { return targetRate; }
 - (void) setTargetRate:(int)aTargetRate
 {
@@ -941,6 +996,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (void) writeControl
 {
+    #if 0
 	//unsigned long aValue =	((fltRunMode & 0xf)<<16) | 
 	//((fifoBehaviour & 0x1)<<24) |
 	//((ledOff & 0x1)<<1 );
@@ -966,6 +1022,9 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	((fiberEnableMask & 0x3f)<<16) |
 	((BBv1Mask & 0x3f)<<8 ) |
 	((aMode & 0x7)<<4 );
+	#endif
+	
+	unsigned long aValue =	controlRegister;
 //DEBUG OUTPUT:
  	NSLog(@"%@::%@:   kFLTV4ControlReg: 0x%08x \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),aValue);//TODO: DEBUG testing ...-tb-
     //DEBUG OUTPUT: 	NSLog(@"%@::%@:   selectFiberTrig: 0x%08x \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),selectFiberTrig);//TODO: DEBUG testing ...-tb-
@@ -1318,6 +1377,7 @@ for(chan=0; chan<6;chan++)
 	
     [[self undoManager] disableUndoRegistration];
 	
+    [self setControlRegister:[decoder decodeIntForKey:@"controlRegister"]];
     [self setFastWrite:[decoder decodeIntForKey:@"fastWrite"]];
     [self setFiberDelays:[decoder decodeInt64ForKey:@"fiberDelays"]];
     [self setStreamMask:[decoder decodeInt64ForKey:@"streamMask"]];
@@ -1382,6 +1442,7 @@ for(chan=0; chan<6;chan++)
 {
     [super encodeWithCoder:encoder];
 	
+    [encoder encodeInt:controlRegister forKey:@"controlRegister"];
     [encoder encodeInt:fastWrite forKey:@"fastWrite"];
     [encoder encodeInt64:fiberDelays forKey:@"fiberDelays"];
     [encoder encodeInt64:streamMask forKey:@"streamMask"];
