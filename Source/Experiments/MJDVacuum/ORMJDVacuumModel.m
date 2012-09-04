@@ -1308,7 +1308,8 @@ NSString* ORMJDVacuumModelConstraintsChanged		= @"ORMJDVacuumModelConstraintsCha
 			if([self regionColor:side1 sameAsRegion:side2]){
 				[self removeConstraintName:kCryoOffDetectorConstraint fromGateValve:aGateValve];
 			}
-			else if([self regionColor:side1 sameAsRegion:kRegionCryostat] ){
+			else if(([self regionColor:side1 sameAsRegion:kRegionCryostat] && [self regionColor:side2 sameAsRegion:kRegionCryoPump]) ||
+					([self regionColor:side2 sameAsRegion:kRegionCryostat] && [self regionColor:side2 sameAsRegion:kRegionCryoPump]) ){
 				[self addConstraintName:kCryoOffDetectorConstraint reason:kCryoOffDetectorReason toGateValve:aGateValve];
 			}
 			else [self removeConstraintName:kCryoOffDetectorConstraint  fromGateValve:aGateValve];
