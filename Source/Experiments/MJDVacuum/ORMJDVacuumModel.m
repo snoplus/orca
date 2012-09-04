@@ -1224,7 +1224,14 @@ NSString* ORMJDVacuumModelConstraintsChanged		= @"ORMJDVacuumModelConstraintsCha
 		}
 	}
 	else {
+		ORVacuumGateValve* vacSentryValve    = [self gateValve:15];
+		ORVacuumGateValve* cryoRoughingValve = [self gateValve:5];
 		[self onAllGateValvesremoveConstraintName: kTurboOnPressureConstraint];
+		[self removeConstraintName:kTurboOnCryoRoughingOpenG4HighConstraint fromGateValve:vacSentryValve];
+		[self removeConstraintName:kTurboOnSentryOpenConstraint fromGateValve:cryoRoughingValve];
+		for(ORVacuumGateValve* aGateValve in [self gateValves]){
+			[self removeConstraintName:kTurboOnPressureConstraint  fromGateValve:aGateValve];
+		}
 	}	
 }
 
