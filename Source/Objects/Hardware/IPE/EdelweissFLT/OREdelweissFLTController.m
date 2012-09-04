@@ -286,13 +286,39 @@
                          name : OREdelweissFLTModelControlRegisterChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(repeatSWTriggerModeChanged:)
+                         name : OREdelweissFLTModelRepeatSWTriggerModeChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(swTriggerIsRepeatingChanged:)
+                         name : OREdelweissFLTModelSwTriggerIsRepeatingChanged
+						object: model];
+
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
 
+- (void) swTriggerIsRepeatingChanged:(NSNotification*)aNote
+{
+	if([model swTriggerIsRepeating]){
+	    [swTriggerProgress  startAnimation:self ];
+	}else{
+	    [swTriggerProgress  stopAnimation:self ];
+	}
+}
+
+- (void) repeatSWTriggerModeChanged:(NSNotification*)aNote
+{
+	[repeatSWTriggerModePU selectItemAtIndex: [model repeatSWTriggerMode]];
+	//[repeatSWTriggerModeTextField setIntValue: [model repeatSWTriggerMode]];
+}
+
 - (void) controlRegisterChanged:(NSNotification*)aNote
 {
 	[controlRegisterTextField setIntValue: [model controlRegister]];
+    [self fiberEnableMaskChanged:nil];
     [self selectFiberTrigChanged:nil];
     [self BBv1MaskChanged:nil];
 
@@ -513,6 +539,8 @@
 	[self statusRegisterChanged:nil];
 	[self totalTriggerNRegisterChanged:nil];
 	[self controlRegisterChanged:nil];
+	[self repeatSWTriggerModeChanged:nil];
+	[self swTriggerIsRepeatingChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -843,6 +871,16 @@
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
 
+- (void) repeatSWTriggerModePUAction:(id)sender
+{
+	[model setRepeatSWTriggerMode:[repeatSWTriggerModePU indexOfSelectedItem]];	
+}
+
+- (void) repeatSWTriggerModeTextFieldAction:(id)sender
+{
+	[model setRepeatSWTriggerMode:[sender intValue]];	
+}
+
 - (void) controlRegisterTextFieldAction:(id)sender
 {
 	[model setControlRegister:[sender intValue]];	
@@ -852,7 +890,7 @@
 {
     //DEBUG
  	NSLog(@"%@::%@ \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
-	//[model setStatusLatency:[sender indexOfSelectedItem]];	
+	[model writeControl];	
 }
 
 - (IBAction) readControlRegisterButtonAction:(id)sender
@@ -860,6 +898,9 @@
     //DEBUG
  	NSLog(@"%@::%@ \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
 	//[model setStatusLatency:[sender indexOfSelectedItem]];	
+	unsigned long controlReg = [model  readControl]; //TODO: use try ... catch ... ? -tb-
+	[model  setControlRegister: controlReg];
+
 }
 
 

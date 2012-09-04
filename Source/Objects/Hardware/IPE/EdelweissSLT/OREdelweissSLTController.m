@@ -72,13 +72,14 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (void) awakeFromNib
 {
-	controlSize			= NSMakeSize(600,670);
-    statusSize			= NSMakeSize(600,670);
-    lowLevelSize		= NSMakeSize(600,500);
-    cpuManagementSize	= NSMakeSize(600,500);
-    cpuTestsSize		= NSMakeSize(600,450);
-    udpSize		        = NSMakeSize(600,670);
-    streamingSize		= NSMakeSize(600,670);
+	controlSize			= NSMakeSize(650,670);
+    statusSize			= NSMakeSize(650,670);
+    lowLevelSize		= NSMakeSize(650,500);
+    cpuManagementSize	= NSMakeSize(650,500);
+    cpuTestsSize		= NSMakeSize(650,450);
+    udpKCmdSize		    = NSMakeSize(650,670);
+    streamingSize		= NSMakeSize(650,670);
+    udpDReadSize		= NSMakeSize(650,670);
 	
 	[[self window] setTitle:@"IPE-DAQ-V4 EDELWEISS SLT"];	
 	
@@ -220,9 +221,54 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
                          name : OREdelweissSLTModelEventFifoStatusRegChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(crateUDPDataPortChanged:)
+                         name : OREdelweissSLTModelCrateUDPDataPortChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(crateUDPDataIPChanged:)
+                         name : OREdelweissSLTModelCrateUDPDataIPChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(crateUDPDataReplyPortChanged:)
+                         name : OREdelweissSLTModelCrateUDPDataReplyPortChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(isListeningOnDataServerSocketChanged:)
+                         name : OREdelweissSLTModelIsListeningOnDataServerSocketChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(numRequestedUDPPacketsChanged:)
+                         name : OREdelweissSLTModelNumRequestedUDPPacketsChanged
+						object: model];
+
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+
+- (void) numRequestedUDPPacketsChanged:(NSNotification*)aNote
+{
+	[numRequestedUDPPacketsTextField setIntValue: [model numRequestedUDPPackets]];
+}
+
+- (void) crateUDPDataReplyPortChanged:(NSNotification*)aNote
+{
+	[crateUDPDataReplyPortTextField setIntValue: [model crateUDPDataReplyPort]];
+}
+
+- (void) crateUDPDataIPChanged:(NSNotification*)aNote
+{
+	[crateUDPDataIPTextField setStringValue: [model crateUDPDataIP]];
+}
+
+- (void) crateUDPDataPortChanged:(NSNotification*)aNote
+{
+	[crateUDPDataPortTextField setIntValue: [model crateUDPDataPort]];
+}
 
 - (void) eventFifoStatusRegChanged:(NSNotification*)aNote
 {
@@ -266,6 +312,24 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	}
 }
 
+- (void) isListeningOnDataServerSocketChanged:(NSNotification*)aNote
+{
+	//[isListeningOnDataServerSocketNo Outlet setIntValue: [model isListeningOnDataServerSocket]];
+	//TODO:  START PROGRESS INDICATOR etc
+    if([model isListeningOnDataServerSocket]){
+	    [listeningForDataReplyIndicator  startAnimation: nil];
+		[startListeningForDataReplyButton setEnabled:NO];
+		[stopListeningForDataReplyButton setEnabled:YES];
+	}
+    else
+	{
+	    [listeningForDataReplyIndicator  stopAnimation: nil];
+		[startListeningForDataReplyButton setEnabled:YES];
+		[stopListeningForDataReplyButton setEnabled:NO];
+	}
+}
+
+
 - (void) crateUDPCommandChanged:(NSNotification*)aNote
 {
 	[crateUDPCommandTextField setStringValue: [model crateUDPCommand]];
@@ -299,6 +363,22 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	    [openCommandSocketIndicator  stopAnimation: nil];
 		[openCommandSocketButton setEnabled:YES];
 		[closeCommandSocketButton setEnabled:NO];
+	}
+
+}
+
+- (void) openDataCommandSocketChanged:(NSNotification*)aNote
+{
+    if([model isOpenDataCommandSocket]){
+	    [openDataCommandSocketIndicator  startAnimation: nil];
+		[openDataCommandSocketButton setEnabled:NO];
+		[closeDataCommandSocketButton setEnabled:YES];
+	}
+    else
+	{
+	    [openDataCommandSocketIndicator  stopAnimation: nil];
+		[openDataCommandSocketButton setEnabled:YES];
+		[closeDataCommandSocketButton setEnabled:NO];
 	}
 
 }
@@ -341,9 +421,10 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 		case  2: [self resizeWindowToSize:lowLevelSize];	    break;
 		case  3: [self resizeWindowToSize:cpuManagementSize];	break;
 		case  4: [self resizeWindowToSize:cpuTestsSize];	    break;
-		case  5: [self resizeWindowToSize:udpSize];				break;
+		case  5: [self resizeWindowToSize:udpKCmdSize];				break;
 		case  6: [self resizeWindowToSize:streamingSize];	    break;
-		default: [self resizeWindowToSize:udpSize];	            break;
+		case  7: [self resizeWindowToSize:udpDReadSize];	    break;
+		default: [self resizeWindowToSize:controlSize];	            break;
     }
 }
 
@@ -421,6 +502,12 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	[self pixelBusEnableRegChanged:nil];
 	[self eventFifoStatusRegChanged:nil];
     [self openCommandSocketChanged:nil];
+    [self openDataCommandSocketChanged:nil];
+	[self crateUDPDataPortChanged:nil];
+	[self crateUDPDataIPChanged:nil];
+	[self crateUDPDataReplyPortChanged:nil];
+	[self isListeningOnDataServerSocketChanged:nil];
+	[self numRequestedUDPPacketsChanged:nil];
 }
 
 
@@ -568,6 +655,15 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 }
 
 #pragma mark ***Actions
+- (IBAction) setMasterModeButtonAction:(id)sender
+{
+	[model writeMasterMode];
+}
+
+- (IBAction) setSlaveModeButtonAction:(id)sender
+{
+	[model writeSlaveMode];
+}
 
 - (void) eventFifoStatusRegTextFieldAction:(id)sender
 {
@@ -609,6 +705,87 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 }
 
 
+
+//ADC data UDP connection
+- (IBAction) startUDPDataConnectionButtonAction:(id)sender
+{
+    [self openDataCommandSocketButtonAction:nil];
+    [self startListeningForDataReplyButtonAction:nil];
+}
+
+- (IBAction) stopUDPDataConnectionButtonAction:(id)sender
+{
+    [self closeDataCommandSocketButtonAction:nil];
+    [self stopListeningForDataReplyButtonAction:nil];
+}
+
+
+- (void) crateUDPDataReplyPortTextFieldAction:(id)sender
+{
+	[model setCrateUDPDataReplyPort:[sender intValue]];	
+}
+
+- (void) crateUDPDataIPTextFieldAction:(id)sender
+{
+	[model setCrateUDPDataIP:[sender stringValue]];	
+}
+
+- (void) crateUDPDataPortTextFieldAction:(id)sender
+{
+	[model setCrateUDPDataPort:[sender intValue]];	
+}
+
+- (IBAction) openDataCommandSocketButtonAction:(id)sender
+{
+	NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+	[model openDataCommandSocket];	
+    [self openDataCommandSocketChanged:nil];
+}
+
+
+- (IBAction) closeDataCommandSocketButtonAction:(id)sender
+{
+	NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+	[model closeDataCommandSocket];	
+    [self openDataCommandSocketChanged:nil];
+}
+
+
+- (IBAction) startListeningForDataReplyButtonAction:(id)sender
+{
+    //debug
+	NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+	[model startListeningDataServerSocket];	
+}
+
+- (IBAction) stopListeningForDataReplyButtonAction:(id)sender
+{
+	NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+	[model stopListeningDataServerSocket];	
+}
+
+- (IBAction) crateUDPDataCommandSendButtonAction:(id)sender
+{
+	NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+    char data[6];
+	int len=6;
+	data[0]='P';//'P' = 0x50 = P command
+	//data[1]=50;//amount of requested data (interpreted as second (?)), standard: 50
+	data[1]= [model numRequestedUDPPackets] & 0xffff;//50;//amount of requested data (interpreted as second (?)), standard: 50
+	uint16_t *port=(uint16_t *)(&data[2]);
+	*port = [model crateUDPDataReplyPort];
+	data[4]=0;//=bolo?
+	data[5]=0;//=bolo?
+	[model sendUDPDataCommand: data length: len];	
+}
+
+- (void) numRequestedUDPPacketsTextFieldAction:(id)sender
+{
+	[model setNumRequestedUDPPackets:[sender intValue]];	
+}
+
+
+//K command UDP connection
 //UDP command Connection Start/Stop all
 - (IBAction) startUDPCommandConnectionButtonAction:(id)sender
 {
@@ -646,7 +823,7 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 
 //command socket (client)
-- (void) crateUDPCommandSendButtonAction:(id)sender
+- (IBAction) crateUDPCommandSendButtonAction:(id)sender
 {
 	//NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
 	[model sendUDPCommand];	

@@ -136,7 +136,7 @@
         NSString* sltScriptArguments;
         BOOL secondsSetInitWithHost;
 	
-    	//UDP
+    	//UDP KCmd tab
 		    //vars in GUI
         int crateUDPCommandPort;
         NSString* crateUDPCommandIP;
@@ -155,9 +155,29 @@
         struct sockaddr_in sockaddr_from;
         socklen_t sockaddr_fromLength;
 		int isListeningOnServerSocket;
+		
+		
+		
     int selectedFifoIndex;
     unsigned long pixelBusEnableReg;
     unsigned long eventFifoStatusReg;
+	
+	
+	//UDP Data Packet tab
+    int crateUDPDataPort;
+    NSString* crateUDPDataIP;
+    int crateUDPDataReplyPort;
+		    //reply connection (server/listener)
+	    int                UDP_DATA_REPLY_SERVER_SOCKET;//=-1;
+        struct sockaddr_in UDP_DATA_REPLY_servaddr;
+        struct sockaddr_in sockaddr_data_from;
+        socklen_t sockaddr_data_fromLength;
+		    //sender connection (client)
+	    int      UDP_DATA_COMMAND_CLIENT_SOCKET;
+	    uint32_t UDP_DATA_COMMAND_CLIENT_IP;
+        struct sockaddr_in UDP_DATA_COMMAND_sockaddrin_to;
+    int isListeningOnDataServerSocket;
+    int numRequestedUDPPackets;
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
@@ -175,6 +195,16 @@
 - (void) runIsStartingSubRun:(NSNotification*)aNote;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+- (int) numRequestedUDPPackets;
+- (void) setNumRequestedUDPPackets:(int)aNumRequestedUDPPackets;
+- (int) isListeningOnDataServerSocket;
+- (void) setIsListeningOnDataServerSocket:(int)aIsListeningOnDataServerSocket;
+- (int) crateUDPDataReplyPort;
+- (void) setCrateUDPDataReplyPort:(int)aCrateUDPDataReplyPort;
+- (NSString*) crateUDPDataIP;
+- (void) setCrateUDPDataIP:(NSString*)aCrateUDPDataIP;
+- (int) crateUDPDataPort;
+- (void) setCrateUDPDataPort:(int)aCrateUDPDataPort;
 - (unsigned long) eventFifoStatusReg;
 - (void) setEventFifoStatusReg:(unsigned long)aEventFifoStatusReg;
 - (unsigned long) pixelBusEnableReg;
@@ -249,6 +279,7 @@
 - (void) makePoller:(float)anInterval;
 
 #pragma mark ***UDP Communication
+//  UDP K command connection
 //reply socket (server)
 - (int) startListeningServerSocket;
 - (void) stopListeningServerSocket;
@@ -263,9 +294,26 @@
 - (int) sendUDPCommand;
 - (int) sendUDPCommandString:(NSString*)aString;
 
+
+//  UDP data packet connection
+//reply socket (server)
+- (int) startListeningDataServerSocket;
+- (void) stopListeningDataServerSocket;
+- (int) receiveFromDataReplyServer;
+//command socket (client)
+- (int) openDataCommandSocket;
+- (void) closeDataCommandSocket;
+- (int) isOpenDataCommandSocket;
+- (int) sendUDPDataCommand:(char*)data length:(int) len;
+
+
+
 #pragma mark ***HW Access
 //note that most of these method can raise 
 //exceptions either directly or indirectly
+- (void)		  writeMasterMode;
+- (void)		  writeSlaveMode;
+
 - (void)		  readAllStatus;
 - (void)		  checkPresence;
 - (unsigned long) readControlReg;
@@ -318,6 +366,7 @@
 - (long)		getFdhwlibVersion;
 - (long)		getSltPciDriverVersion;
 
+#pragma mark *** Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 
@@ -357,6 +406,11 @@
 
 @end
 
+extern NSString* OREdelweissSLTModelNumRequestedUDPPacketsChanged;
+extern NSString* OREdelweissSLTModelIsListeningOnDataServerSocketChanged;
+extern NSString* OREdelweissSLTModelCrateUDPDataReplyPortChanged;
+extern NSString* OREdelweissSLTModelCrateUDPDataIPChanged;
+extern NSString* OREdelweissSLTModelCrateUDPDataPortChanged;
 extern NSString* OREdelweissSLTModelEventFifoStatusRegChanged;
 extern NSString* OREdelweissSLTModelPixelBusEnableRegChanged;
 extern NSString* OREdelweissSLTModelPixelBusEnableRegChanged;

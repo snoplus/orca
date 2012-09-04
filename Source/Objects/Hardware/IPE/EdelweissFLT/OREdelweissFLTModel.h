@@ -135,6 +135,8 @@
     uint32_t statusRegister;
     int totalTriggerNRegister;
     uint32_t controlRegister;
+    int repeatSWTriggerMode;
+    int swTriggerIsRepeating;
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
@@ -145,6 +147,10 @@
 - (short) getNumberRegisters;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+- (int) swTriggerIsRepeating;
+- (void) setSwTriggerIsRepeating:(int)aSwTriggerIsRepeating;
+- (int) repeatSWTriggerMode;
+- (void) setRepeatSWTriggerMode:(int)aRepeatSWTriggerMode;
 - (uint32_t) controlRegister;
 - (void) setControlRegister:(uint32_t)aControlRegister;
 - (int) statusLatency;
@@ -375,6 +381,8 @@
 				  n:(int) n;
 @end
 
+extern NSString* OREdelweissFLTModelSwTriggerIsRepeatingChanged;
+extern NSString* OREdelweissFLTModelRepeatSWTriggerModeChanged;
 extern NSString* OREdelweissFLTModelControlRegisterChanged;
 extern NSString* OREdelweissFLTModelTotalTriggerNRegisterChanged;
 extern NSString* OREdelweissFLTModelStatusRegisterChanged;

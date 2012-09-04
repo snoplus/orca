@@ -27,14 +27,17 @@
 @interface OREdelweissSLTController : SBC_LinkController {
 	@private
 	
+	    IBOutlet   NSTextField* eventFifoStatusRegTextField;
+	IBOutlet   NSTextField* numRequestedUDPPacketsTextField;
+	    IBOutlet NSMatrix*		pixelBusEnableRegMatrix;
+	    IBOutlet NSTextField*	pixelBusEnableRegTextField;
+		
+	    // UDP K-Cmd tab   -----
 	    //udp connection
 		IBOutlet NSButton*		startUDPCommandConnectionButton;
 		IBOutlet NSButton*		stopUDPCommandConnectionButton;
 		//listener (server)
 	    IBOutlet NSTextField*   crateUDPReplyPortTextField;
-	IBOutlet   NSTextField* eventFifoStatusRegTextField;
-	    IBOutlet NSMatrix*		pixelBusEnableRegMatrix;
-	    IBOutlet NSTextField*	pixelBusEnableRegTextField;
 		IBOutlet NSButton*		startListeningForReplyButton;
 		IBOutlet NSButton*		stopListeningForReplyButton;
 	    IBOutlet NSProgressIndicator*   listeningForReplyIndicator;
@@ -45,6 +48,21 @@
 	    IBOutlet NSTextField*   crateUDPCommandIPTextField;
 	    IBOutlet NSTextField*   crateUDPCommandPortTextField;
 	    IBOutlet NSProgressIndicator*   openCommandSocketIndicator;
+
+
+	    // UDP Data Packet reader tab -----
+		//(P) command sender (client)
+	    IBOutlet   NSTextField* crateUDPDataIPTextField;
+	    IBOutlet   NSTextField* crateUDPDataPortTextField;
+		IBOutlet NSButton*		openDataCommandSocketButton;
+		IBOutlet NSButton*		closeDataCommandSocketButton;
+	    IBOutlet NSProgressIndicator*   openDataCommandSocketIndicator;
+		//listener (server)
+	    IBOutlet   NSTextField* crateUDPDataReplyPortTextField;
+		IBOutlet NSButton*		startListeningForDataReplyButton;
+		IBOutlet NSButton*		stopListeningForDataReplyButton;
+	    IBOutlet NSProgressIndicator*   listeningForDataReplyIndicator;
+		
 		
 		IBOutlet NSTextField*	hwVersionField;
 		IBOutlet NSTextField*	sltScriptArgumentsTextField;
@@ -108,8 +126,9 @@
 		NSSize					lowLevelSize;
 		NSSize					cpuManagementSize;
 		NSSize					cpuTestsSize;
-		NSSize					udpSize;
+		NSSize					udpKCmdSize;
 		NSSize					streamingSize;
+		NSSize					udpDReadSize;
 };
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
@@ -122,14 +141,20 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+- (void) numRequestedUDPPacketsChanged:(NSNotification*)aNote;
+- (void) crateUDPDataReplyPortChanged:(NSNotification*)aNote;
+- (void) crateUDPDataIPChanged:(NSNotification*)aNote;
+- (void) crateUDPDataPortChanged:(NSNotification*)aNote;
 - (void) eventFifoStatusRegChanged:(NSNotification*)aNote;
 - (void) pixelBusEnableRegChanged:(NSNotification*)aNote;
 - (void) selectedFifoIndexChanged:(NSNotification*)aNote;
 - (void) isListeningOnServerSocketChanged:(NSNotification*)aNote;
+- (void) isListeningOnDataServerSocketChanged:(NSNotification*)aNote;
 - (void) crateUDPCommandChanged:(NSNotification*)aNote;
 - (void) crateUDPCommandIPChanged:(NSNotification*)aNote;
 - (void) crateUDPCommandPortChanged:(NSNotification*)aNote;
 - (void) openCommandSocketChanged:(NSNotification*)aNote;
+- (void) openDataCommandSocketChanged:(NSNotification*)aNote;
 - (void) crateUDPReplyPortChanged:(NSNotification*)aNote;
 - (void) sltScriptArgumentsChanged:(NSNotification*)aNote;
 - (void) clockTimeChanged:(NSNotification*)aNote;
@@ -161,6 +186,9 @@
 - (void) enableRegControls;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+- (IBAction) setMasterModeButtonAction:(id)sender;
+- (IBAction) setSlaveModeButtonAction:(id)sender;
+
 - (IBAction) eventFifoStatusRegTextFieldAction:(id)sender;
 - (IBAction) pixelBusEnableRegTextFieldAction:(id)sender;
 - (IBAction) pixelBusEnableRegMatrixAction:(id)sender;
@@ -169,12 +197,28 @@
 
 - (IBAction) selectedFifoIndexPUAction:(id)sender;
 
+//ADC data UDP connection
+- (IBAction) startUDPDataConnectionButtonAction:(id)sender;
+- (IBAction) stopUDPDataConnectionButtonAction:(id)sender;
+- (IBAction) crateUDPDataReplyPortTextFieldAction:(id)sender;
+- (IBAction) crateUDPDataIPTextFieldAction:(id)sender;
+- (IBAction) crateUDPDataPortTextFieldAction:(id)sender;
+- (IBAction) openDataCommandSocketButtonAction:(id)sender;
+- (IBAction) closeDataCommandSocketButtonAction:(id)sender;
+- (IBAction) startListeningForDataReplyButtonAction:(id)sender;
+- (IBAction) stopListeningForDataReplyButtonAction:(id)sender;
+- (IBAction) crateUDPDataCommandSendButtonAction:(id)sender;
+- (IBAction) numRequestedUDPPacketsTextFieldAction:(id)sender;
+
+
+//K command UDP connection
 - (IBAction) stopUDPCommandConnectionButtonAction:(id)sender;
 - (IBAction) startUDPCommandConnectionButtonAction:(id)sender;
 - (IBAction) startListeningForReplyButtonAction:(id)sender;
 - (IBAction) stopListeningForReplyButtonAction:(id)sender;
 - (IBAction) crateUDPReplyPortTextFieldAction:(id)sender;
 
+- (IBAction) crateUDPCommandSendButtonAction:(id)sender;
 - (IBAction) crateUDPCommandTextFieldAction:(id)sender;
 - (IBAction) crateUDPCommandIPTextFieldAction:(id)sender;
 - (IBAction) crateUDPCommandPortTextFieldAction:(id)sender;

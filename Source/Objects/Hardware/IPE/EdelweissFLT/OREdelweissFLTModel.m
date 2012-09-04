@@ -30,6 +30,8 @@
 #import "EdelweissSLTv4_HW_Definitions.h"
 #import "ORCommandList.h"
 
+NSString* OREdelweissFLTModelSwTriggerIsRepeatingChanged = @"OREdelweissFLTModelSwTriggerIsRepeatingChanged";
+NSString* OREdelweissFLTModelRepeatSWTriggerModeChanged = @"OREdelweissFLTModelRepeatSWTriggerModeChanged";
 NSString* OREdelweissFLTModelControlRegisterChanged = @"OREdelweissFLTModelControlRegisterChanged";
 NSString* OREdelweissFLTModelTotalTriggerNRegisterChanged = @"OREdelweissFLTModelTotalTriggerNRegisterChanged";
 NSString* OREdelweissFLTModelStatusRegisterChanged = @"OREdelweissFLTModelStatusRegisterChanged";
@@ -251,6 +253,32 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
 
+- (int) swTriggerIsRepeating
+{
+    return swTriggerIsRepeating;
+}
+
+- (void) setSwTriggerIsRepeating:(int)aSwTriggerIsRepeating
+{
+    swTriggerIsRepeating = aSwTriggerIsRepeating;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelSwTriggerIsRepeatingChanged object:self];
+}
+
+- (int) repeatSWTriggerMode
+{
+    return repeatSWTriggerMode;
+}
+
+- (void) setRepeatSWTriggerMode:(int)aRepeatSWTriggerMode
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setRepeatSWTriggerMode:repeatSWTriggerMode];
+    
+    repeatSWTriggerMode = aRepeatSWTriggerMode;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelRepeatSWTriggerModeChanged object:self];
+}
+
 - (uint32_t) controlRegister
 {
     return controlRegister;
@@ -292,7 +320,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (int) selectFiberTrig
 {
-    return selectFiberTrig;
+    uint32_t aselectFiberTrig = (controlRegister >> kEWFlt_ControlReg_SelectFiber_Shift) & kEWFlt_ControlReg_SelectFiber_Mask;
+    return aselectFiberTrig;
 }
 
 - (void) setSelectFiberTrig:(int)aSelectFiberTrig
@@ -306,13 +335,14 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 }
 
 - (int) BBv1Mask
-{
-    return BBv1Mask;
-}
+{    return (controlRegister >> kEWFlt_ControlReg_BBv1_Shift) & kEWFlt_ControlReg_BBv1_Mask;   }
+//{
+//    return BBv1Mask;
+//}
 
 - (BOOL) BBv1MaskForChan:(int)i
 {
-    return (BBv1Mask & (0x1 <<i)) != 0;
+    return ([self BBv1Mask] & (0x1 <<i)) != 0;
 }
 
 //TODO: OREdelweissFLTModelBBv1MaskChanged and BBv1Mask obsolete -tb-
@@ -978,7 +1008,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	return [self readReg: kFLTV4ControlReg];
 }
 
-
+//TODO: OBSOLETE for EW - remove it! -tb-
 //TODO: better use the STANDBY flag of the FLT -tb- 2010-01-xx     !!!!!!!!!!!!!!!!!
 - (void) writeRunControl:(BOOL)startSampling
 {
@@ -1377,6 +1407,7 @@ for(chan=0; chan<6;chan++)
 	
     [[self undoManager] disableUndoRegistration];
 	
+    [self setRepeatSWTriggerMode:[decoder decodeIntForKey:@"repeatSWTriggerMode"]];
     [self setControlRegister:[decoder decodeIntForKey:@"controlRegister"]];
     [self setFastWrite:[decoder decodeIntForKey:@"fastWrite"]];
     [self setFiberDelays:[decoder decodeInt64ForKey:@"fiberDelays"]];
@@ -1442,6 +1473,7 @@ for(chan=0; chan<6;chan++)
 {
     [super encodeWithCoder:encoder];
 	
+    [encoder encodeInt:repeatSWTriggerMode forKey:@"repeatSWTriggerMode"];
     [encoder encodeInt:controlRegister forKey:@"controlRegister"];
     [encoder encodeInt:fastWrite forKey:@"fastWrite"];
     [encoder encodeInt64:fiberDelays forKey:@"fiberDelays"];
@@ -1665,6 +1697,11 @@ for(chan=0; chan<6;chan++)
 	}
 	
 	[self writeRunControl:YES];
+	
+	if([self repeatSWTriggerMode] == 1){
+	    NSLog(@"Start SW Trigger\n");//TODO: debug output -tb-
+		[self setSwTriggerIsRepeating: 1];
+	}
 
 }
 
@@ -1693,6 +1730,12 @@ for(chan=0; chan<6;chan++)
 		hitRate[chan] = 0;
 	}
 	[self setHitRateTotal:0];
+
+	if([self repeatSWTriggerMode] == 1){
+	    NSLog(@"Stop SW Trigger\n");//TODO: debug output -tb-
+		[self setSwTriggerIsRepeating: 0];
+	}
+
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelHitRateChanged object:self];
 }
@@ -1730,6 +1773,9 @@ for(chan=0; chan<6;chan++)
 //	configStruct->card_info[index].deviceSpecificData[4] = triggerEnabledMask;	
     //the daq mode (should replace the flt mode)
     configStruct->card_info[index].deviceSpecificData[5] = runMode;//the daqRunMode
+
+    //new for Edelweiss
+    configStruct->card_info[index].deviceSpecificData[10] = [self selectFiberTrig];//the fiber_select (Select Fiber) setting of control register
 
 	configStruct->card_info[index].num_Trigger_Indexes = 0;					//we can't have children
 	configStruct->card_info[index].next_Card_Index 	= index+1;	

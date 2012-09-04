@@ -226,6 +226,8 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
     uint32_t col        = GetSlot() - 1; //GetSlot() is in fact stationNumber, which goes from 1 to 20 (slots go from 0-9, 11-20)
     uint32_t crate      = GetCrate();
     
+	
+//TODO: most of this is obsolete for Edelweiss -tb-            <----------------- !!!
     uint32_t postTriggerTime = GetDeviceSpecificData()[0];
     uint32_t eventType  = GetDeviceSpecificData()[1];
     uint32_t fltModeFlags = GetDeviceSpecificData()[2];
@@ -236,6 +238,8 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
     uint32_t versionCFPGA = GetDeviceSpecificData()[7];
     uint32_t versionFPGA8 = GetDeviceSpecificData()[8];
     uint32_t filterShapingLength = GetDeviceSpecificData()[9];//TODO: need to change in the code below! -tb- 2011-04-01
+    //new for Edelweiss
+    uint32_t selectFiberTrig = GetDeviceSpecificData()[10];//...
 	
 	uint32_t location   = ((crate & 0x01e)<<21) | (((col+1) & 0x0000001f)<<16); // | ((filterIndex & 0xf)<<4)  | (filterShapingLength & 0xf)  ;
 
@@ -373,7 +377,7 @@ fprintf(stdout,"ORFLTv4Readout::Readout(SBC_LAM_Data* lamData): location %i, Get
                                 ensureDataCanHold(9 + waveformLength/2); 
                                 data[dataIndex++] = waveformId | (9 + waveformLength/2);    
                                 //printf("FLT%i: waveformId is %i  loc+ev.chan %i\n",col+1,waveformId,  location | eventchan<<8);
-                                data[dataIndex++] = location | chan<<8;
+                                data[dataIndex++] = location | ((selectFiberTrig & 0xf)<<12) | ((chan & 0xf)<<8);
                                 data[dataIndex++] = 2;//evsec;        //sec
                                 data[dataIndex++] = 3;//evsubsec;     //subsec
                                 data[dataIndex++] = 0;//chmap;

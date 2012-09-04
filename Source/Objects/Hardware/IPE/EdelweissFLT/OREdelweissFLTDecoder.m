@@ -162,7 +162,8 @@
  ^^^^ ^^^--------------------------------spare
  ------- ^ ^^^---------------------------crate
  -------------^ ^^^^---------------------card
- --------------------^^^^ ^^^^-----------channel
+ --------------------^^^^ ---------------fiber
+ ------------------------ ^^^^-----------channel
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx sec
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx subSec
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx 
@@ -204,9 +205,11 @@
 	unsigned long length	= ExtractLength(ptr[0]);
 	unsigned char crate		= ShiftAndExtract(ptr[1],21,0xf);
 	unsigned char card		= ShiftAndExtract(ptr[1],16,0x1f);
-	unsigned char chan		= ShiftAndExtract(ptr[1],8,0xff);
+	unsigned char fiber		= ShiftAndExtract(ptr[1],12,0xf);
+	unsigned char chan		= ShiftAndExtract(ptr[1],8,0xf);
 	NSString* crateKey		= [self getCrateKey: crate];
 	NSString* stationKey	= [self getStationKey: card];	
+	NSString* fiberKey	    = [NSString stringWithFormat:@"Fiber %2d",fiber];	
 	NSString* channelKey	= [self getChannelKey: chan];	
 	unsigned long startIndex= ShiftAndExtract(ptr[7],8,0x7ff);
 
@@ -267,7 +270,7 @@ startIndex=0;
 			   specialBits:0x0000	
 				  bitNames: [NSArray arrayWithObjects:nil]
 					sender: self 
-				  withKeys: @"FLTv4", @"Waveform",crateKey,stationKey,channelKey,nil];
+				  withKeys: @"FLTv4", @"Waveform",crateKey,stationKey,fiberKey,channelKey,nil];
 
     #if 0 //this was the KATRIN setting -tb-
 	[aDataSet loadWaveform: waveFormdata					//pass in the whole data set
@@ -325,7 +328,8 @@ startIndex=0;
     
     NSString* crate     = [NSString stringWithFormat:@"Crate      = %lu\n",(*ptr>>21) & 0xf];
     NSString* card      = [NSString stringWithFormat:@"Station    = %lu\n",(*ptr>>16) & 0x1f];
-    NSString* chan      = [NSString stringWithFormat:@"Channel    = %lu\n",(*ptr>>8) & 0xff];
+    NSString* fiber     = [NSString stringWithFormat:@"Fiber      = %lu\n",(*ptr>>12) & 0xf];
+    NSString* chan      = [NSString stringWithFormat:@"Channel    = %lu\n",(*ptr>>8) & 0xf];
     NSString* secStr    = [NSString stringWithFormat:@"Sec        = %d\n", sec];
     NSString* subsecStr = [NSString stringWithFormat:@"SubSec     = %d\n", subsec];
     NSString* energyStr = [NSString stringWithFormat:@"Energy     = %d\n", energy];
@@ -340,7 +344,7 @@ startIndex=0;
     
     NSString* evFlagsStr= [NSString stringWithFormat:@"EventFlags = 0x%x\n", eventFlags ];
 
-    return [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@%@%@%@%@",title,crate,card,chan,  
+    return [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@",title,crate,card,fiber,chan,  
                 secStr, subsecStr, energyStr, chmapStr, eventIDStr, offsetStr, versionStr, eventFlagsStr, lengthStr,   evFlagsStr]; 
 }
 

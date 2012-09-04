@@ -29,6 +29,12 @@
 @interface OREdelweissFLTController : OrcaObjectController {
 	@private
         IBOutlet NSButton*		settingLockButton;
+//	IBOutlet   No Outlet* swTriggerIsRepeatingNo Outlet;
+		
+	IBOutlet   NSTextField* repeatSWTriggerModeTextField;
+		
+		IBOutlet NSPopUpButton*	repeatSWTriggerModePU;
+		IBOutlet NSProgressIndicator*	swTriggerProgress;
 		//control register
 	    IBOutlet   NSTextField* controlRegisterTextField;
 		IBOutlet NSPopUpButton* fltModeFlagsPU;
@@ -127,6 +133,8 @@
 - (void) updateButtons;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+- (void) swTriggerIsRepeatingChanged:(NSNotification*)aNote;
+- (void) repeatSWTriggerModeChanged:(NSNotification*)aNote;
 - (void) controlRegisterChanged:(NSNotification*)aNote;
 - (void) totalTriggerNRegisterChanged:(NSNotification*)aNote;
 - (void) statusRegisterChanged:(NSNotification*)aNote;
@@ -173,6 +181,8 @@
 - (void) selectedChannelValueChanged:(NSNotification*) aNote;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+- (IBAction) repeatSWTriggerModePUAction:(id)sender;
+- (IBAction) repeatSWTriggerModeTextFieldAction:(id)sender;
 - (IBAction) controlRegisterTextFieldAction:(id)sender;
 - (IBAction) writeControlRegisterButtonAction:(id)sender;
 - (IBAction) readControlRegisterButtonAction:(id)sender;

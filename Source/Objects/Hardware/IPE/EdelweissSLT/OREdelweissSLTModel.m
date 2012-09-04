@@ -183,6 +183,11 @@ static IpeRegisterNamesStruct regV4[kSltV4NumRegs] = {
 
 #pragma mark ***External Strings
 
+NSString* OREdelweissSLTModelNumRequestedUDPPacketsChanged = @"OREdelweissSLTModelNumRequestedUDPPacketsChanged";
+NSString* OREdelweissSLTModelIsListeningOnDataServerSocketChanged = @"OREdelweissSLTModelIsListeningOnDataServerSocketChanged";
+NSString* OREdelweissSLTModelCrateUDPDataReplyPortChanged = @"OREdelweissSLTModelCrateUDPDataReplyPortChanged";
+NSString* OREdelweissSLTModelCrateUDPDataIPChanged = @"OREdelweissSLTModelCrateUDPDataIPChanged";
+NSString* OREdelweissSLTModelCrateUDPDataPortChanged = @"OREdelweissSLTModelCrateUDPDataPortChanged";
 NSString* OREdelweissSLTModelEventFifoStatusRegChanged = @"OREdelweissSLTModelEventFifoStatusRegChanged";
 NSString* OREdelweissSLTModelPixelBusEnableRegChanged = @"OREdelweissSLTModelPixelBusEnableRegChanged";
 NSString* OREdelweissSLTModelSelectedFifoIndexChanged = @"OREdelweissSLTModelSelectedFifoIndexChanged";
@@ -243,14 +248,20 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 	pmcLink = [[PMC_Link alloc] initWithDelegate:self];
 	[self setSecondsSetInitWithHost: YES];
 	[self registerNotificationObservers];
+	//some defaults
 	crateUDPCommandPort = 9940;
 	crateUDPCommandIP = @"localhost";
 	crateUDPReplyPort = 9940;
+    crateUDPDataPort = 994;
+    crateUDPDataIP = @"192.168.1.100";
+    crateUDPDataReplyPort = 12345;
+	
     return self;
 }
 
 -(void) dealloc
 {
+    [crateUDPDataIP release];
     [crateUDPCommand release];
     [crateUDPCommandIP release];
     [sltScriptArguments release];
@@ -340,6 +351,76 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 }
 
 #pragma mark •••Accessors
+
+- (int) numRequestedUDPPackets
+{
+    return numRequestedUDPPackets;
+}
+
+- (void) setNumRequestedUDPPackets:(int)aNumRequestedUDPPackets
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setNumRequestedUDPPackets:numRequestedUDPPackets];
+    
+    numRequestedUDPPackets = aNumRequestedUDPPackets;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelNumRequestedUDPPacketsChanged object:self];
+}
+
+- (int) isListeningOnDataServerSocket
+{
+    return isListeningOnDataServerSocket;
+}
+
+- (void) setIsListeningOnDataServerSocket:(int)aIsListeningOnDataServerSocket
+{
+    isListeningOnDataServerSocket = aIsListeningOnDataServerSocket;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelIsListeningOnDataServerSocketChanged object:self];
+}
+
+
+- (int) crateUDPDataReplyPort
+{
+    return crateUDPDataReplyPort;
+}
+
+- (void) setCrateUDPDataReplyPort:(int)aCrateUDPDataReplyPort
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setCrateUDPDataReplyPort:crateUDPDataReplyPort];
+    
+    crateUDPDataReplyPort = aCrateUDPDataReplyPort;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelCrateUDPDataReplyPortChanged object:self];
+}
+
+- (NSString*) crateUDPDataIP
+{
+    return crateUDPDataIP;
+}
+
+- (void) setCrateUDPDataIP:(NSString*)aCrateUDPDataIP
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setCrateUDPDataIP:crateUDPDataIP];
+    
+    [crateUDPDataIP autorelease];
+    crateUDPDataIP = [aCrateUDPDataIP copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelCrateUDPDataIPChanged object:self];
+}
+
+- (int) crateUDPDataPort
+{
+    return crateUDPDataPort;
+}
+
+- (void) setCrateUDPDataPort:(int)aCrateUDPDataPort
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setCrateUDPDataPort:crateUDPDataPort];
+    
+    crateUDPDataPort = aCrateUDPDataPort;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelCrateUDPDataPortChanged object:self];
+}
 
 - (unsigned long) eventFifoStatusReg
 {
@@ -932,6 +1013,8 @@ NSLog(@"  arguments: %@ \n" , arguments);
 
 
 #pragma mark ***UDP Communication
+
+//  UDP K command connection   -------------------------------
 //reply socket (server)
 - (int) startListeningServerSocket
 {
@@ -1228,7 +1311,259 @@ NSLog(@"  arguments: %@ \n" , arguments);
 
 
 
+
+
+//  UDP data packet connection ---------------------
+//reply socket (server)
+- (int) startListeningDataServerSocket
+{
+	NSLog(@"Called %@::%@!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
+
+    int status, retval=0;
+
+	if(UDP_DATA_REPLY_SERVER_SOCKET>0) [self stopListeningDataServerSocket];//still open, first close the socket
+	UDP_DATA_REPLY_SERVER_SOCKET = socket ( AF_INET, SOCK_DGRAM, IPPROTO_UDP );
+	if (UDP_DATA_REPLY_SERVER_SOCKET==-1){
+        //fprintf(stderr, "initUDPServerSocket: socket(...) failed\n");
+	    NSLog(@" %@::%@  socket(...) failed!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
+        //diep("socket");
+	    return 1;
+    }
+	//fprintf(stderr, "initGlobalUDPServerSocket: socket(...) created socket %i\n",GLOBAL_UDP_SERVER_SOCKET);
+	NSLog(@" %@::%@  created socket %i  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) ,UDP_DATA_REPLY_SERVER_SOCKET);//TODO: DEBUG -tb-
+
+
+	UDP_DATA_REPLY_servaddr.sin_family = AF_INET; 
+	UDP_DATA_REPLY_servaddr.sin_port = htons (crateUDPDataReplyPort);
+
+	char  GLOBAL_UDP_SERVER_IP_ADDR[1024]="0.0.0.0";//TODO: this might be necessary for hosts with several network adapters -tb-
+
+
+	retval=inet_aton(GLOBAL_UDP_SERVER_IP_ADDR,&UDP_DATA_REPLY_servaddr.sin_addr);
+	int GLOBAL_UDP_SERVER_IP = UDP_DATA_REPLY_servaddr.sin_addr.s_addr;//this is already in network byte order!!!
+	printf("  inet_aton: retval: %i,IP_ADDR: %s, IP %i (0x%x)\n",retval,GLOBAL_UDP_SERVER_IP_ADDR,crateUDPDataReplyPort,GLOBAL_UDP_SERVER_IP);
+	//GLOBAL_servaddr.sin_addr.s_addr =  htonl(GLOBAL_UDP_SERVER_IP);// INADDR_ANY = 0x00000000 = 0  ;   192.168.1.9  = 0xc0a80109  ;   192.168.1.34   = 0xc0a80122
+	status = bind(UDP_DATA_REPLY_SERVER_SOCKET,(struct sockaddr *) &UDP_DATA_REPLY_servaddr,sizeof(UDP_DATA_REPLY_servaddr));
+	if (status==-1) {
+		printf("    ERROR starting UDP server .. -tb- continue, ignore error -tb-\n");
+	    NSLog(@"    ERROR starting UDP server (bind: err %i) .. probably port already used ! (-tb- continue, ignore error -tb-)\n", status);//TODO: DEBUG -tb-
+		//return 2 ; //-tb- continue, ignore error -tb-
+	}
+	printf("  serveur udp ouvert avec servaddr.sin_addr.s_addr=%s \n",inet_ntoa(UDP_DATA_REPLY_servaddr.sin_addr));
+	listen(UDP_DATA_REPLY_SERVER_SOCKET,5);  //TODO: is this necessary? what does it mean exactly? -tb-
+	                                    //TODO: is this necessary? what does it mean exactly? -tb-
+ printf("  UDP DATA SERVER is listening for data packets (data and status) on port %u\n",crateUDPDataReplyPort);
+   if(crateUDPDataReplyPort<1024) printf("  NOTE,WARNING: startListeningDataServerSocket: UDP DATA SERVER is listening on port %u, using ports below 1024 requires to run as 'root'!\n",crateUDPDataReplyPort);
+
+
+    retval=0;//no error
+
+
+	[self setIsListeningOnDataServerSocket: 1];
+	//start polling
+	if(	[self isListeningOnDataServerSocket]) 
+	[self performSelector:@selector(receiveFromDataReplyServer) withObject:nil afterDelay: 0];
+
+    return retval;//retval=0: OK, else error
+	
+	return 0;
+}
+
+
+- (void) stopListeningDataServerSocket
+{
+	NSLog(@"Called %@::%@!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
+    if(UDP_DATA_REPLY_SERVER_SOCKET>-1) close(UDP_DATA_REPLY_SERVER_SOCKET);
+    UDP_DATA_REPLY_SERVER_SOCKET = -1;
+	
+	[self setIsListeningOnDataServerSocket: 0];
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(receiveFromDataReplyServer) object:nil];
+}
+
+- (int) receiveFromDataReplyServer
+{
+
+	static int counterStatusPacket=0;
+	static int counterData1444Packet=0;
+	
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(receiveFromDataReplyServer) object:nil];
+
+    const int maxSizeOfReadbuffer=4096;
+    char readBuffer[maxSizeOfReadbuffer];
+
+	int retval=-1;
+	
+	
+int l;
+for(l=0;l<20;l++){
+	//init
+	retval=-1;
+    sockaddr_data_fromLength = sizeof(sockaddr_data_from);
+	
+	
+    //while( (retval = recvfrom(MY_UDP_SERVER_SOCKET, (char*)InBuffer,sizeof(InBuffer) , MSG_DONTWAIT,(struct sockaddr *) &servaddr, &AddrLength)) >0 ){
+    retval = recvfrom(UDP_DATA_REPLY_SERVER_SOCKET, readBuffer, maxSizeOfReadbuffer, MSG_DONTWAIT,(struct sockaddr *) &sockaddr_data_from, &sockaddr_data_fromLength);
+	    //printf("recvfromGlobalServer retval:  %i, maxSize %i\n",retval,maxSizeOfReadbuffer);
+	if(retval==-1) break;
+	    if(retval>=0 && retval != 1444){
+	        //printf("recvfromGlobalServer retval:  %i (bytes), maxSize %i, from IP %s\n",retval,maxSizeOfReadbuffer,inet_ntoa(sockaddr_from.sin_addr));
+			//printf("Got UDP data from %s\n", inet_ntoa(sockaddr_from.sin_addr));
+			//NSLog(@"Got UDP data from %s\n", inet_ntoa(sockaddr_from.sin_addr));
+	        NSLog(@" %@::%@ Got UDP data from %s!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) ,inet_ntoa(sockaddr_data_from.sin_addr));//TODO: DEBUG -tb-
+
+	    }
+	    if(retval == 1444 && counterData1444Packet==0){
+	        NSLog(@" %@::%@ Got UDP data packet from %s!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) ,inet_ntoa(sockaddr_data_from.sin_addr));//TODO: DEBUG -tb-
+			int i;
+			uint16_t *shorts=(uint16_t *)readBuffer;
+			NSMutableString *s = [[NSMutableString alloc] init];
+			[s setString:@""];
+			for(i=0;i<16;i++){
+			    [s appendFormat:@" 0x%04x",shorts[i]];
+			}
+			NSLog(@"%@\n",s);
+		}
+		
+	//give some debug output
+	if(retval>0){
+	
+	    if(retval>=4){
+		    uint32_t *hptr = (uint32_t *)(readBuffer);
+		    uint16_t *h16ptr = (uint16_t *)(readBuffer);
+		    uint16_t *h16ptr2 = (uint16_t *)(&readBuffer[2]);
+			if(retval==1444) counterData1444Packet++;
+			else{
+		        if(counterData1444Packet>0) NSLog(@"  received %i data packets with 1444 bytes  \n",counterData1444Packet);
+		        NSLog(@"  received data packet w header 0x%08x, 0x%04x,0x%04x, length %i\n",*hptr,*h16ptr,*h16ptr2,retval);
+		        NSLog(@"  bytes: %i\n",counterData1444Packet * 1440 + retval -4);
+				counterData1444Packet=0;
+			}
+		}
+
+	
+	
+	}
+}//for(l ...
+//NSLog(@"retval: %i, l=%i\n",retval,l); with one fiber we had ca. 12 packets per loop ...
+	if(	[self isListeningOnDataServerSocket]) [self performSelector:@selector(receiveFromDataReplyServer) withObject:nil afterDelay: 0];
+
+    return retval;
+}
+
+
+
+
+
+//command data socket (client)
+- (int) openDataCommandSocket
+{
+	NSLog(@"Called %@::%@!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
+	//[model setCrateUDPCommand:[sender stringValue]];	
+	
+	if(UDP_DATA_COMMAND_CLIENT_SOCKET>0) [self closeDataCommandSocket];//still open, first close the socket
+	
+	//almost a copy from ipe4reader6.cpp
+    int retval=0;
+    if ((UDP_DATA_COMMAND_CLIENT_SOCKET=socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP))==-1){
+        //fprintf(stderr, "openDataCommandSocket: socket(...) failed\n");
+	    NSLog(@" %@::%@  socket(...) failed!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
+        //diep("socket");
+	    return 1;
+    }
+	NSLog(@" %@::%@  created socket %i  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) ,UDP_DATA_COMMAND_CLIENT_SOCKET);//TODO: DEBUG -tb-
+	
+  #if 1 //do it in sendToGlobalClient... again?
+  memset((char *) &UDP_DATA_COMMAND_sockaddrin_to, 0, sizeof(UDP_DATA_COMMAND_sockaddrin_to));
+  UDP_DATA_COMMAND_sockaddrin_to.sin_family = AF_INET;
+  UDP_DATA_COMMAND_sockaddrin_to.sin_port = htons(crateUDPDataPort); //take global variable MY_UDP_CLIENT_PORT //TODO: was PORT, remove PORT
+  if (inet_aton([crateUDPDataIP cStringUsingEncoding:NSASCIIStringEncoding], &UDP_DATA_COMMAND_sockaddrin_to.sin_addr)==0) {
+	NSLog(@" %@::%@  inet_aton() failed \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
+    //fprintf(stderr, "inet_aton() failed\n");
+	return 2;
+    //exit(1);
+  }
+	NSLog(@" %@::%@  UDP Client: IP: %s, port: %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) ,[crateUDPDataIP cStringUsingEncoding:NSASCIIStringEncoding] /*crateUDPCommandIP oder %@ benutzen*/,	crateUDPCommandPort);//TODO: DEBUG -tb-
+    //fprintf(stderr, "    initGlobalUDPClientSocket: UDP Client: IP: %s, port: %i\n",[crateUDPCommandIP cStringUsingEncoding:NSASCIIStringEncoding] /*crateUDPCommandIP oder %@ benutzen*/,	crateUDPCommandPort);
+  #endif
+  
+	
+	
+	return retval;
+}
+
+
+
+- (void) closeDataCommandSocket
+{
+	NSLog(@"Called %@::%@!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
+	//[model setCrateUDPCommand:[sender stringValue]];	
+      if(UDP_DATA_COMMAND_CLIENT_SOCKET>-1) close(UDP_DATA_COMMAND_CLIENT_SOCKET);
+      UDP_DATA_COMMAND_CLIENT_SOCKET = -1;
+}
+
+- (int) isOpenDataCommandSocket
+{
+	if(UDP_DATA_COMMAND_CLIENT_SOCKET>0) return 1; else return 0;
+}
+
+- (int) sendUDPDataCommand:(char*)data length:(int) len
+{
+    //taken from ipe4reader6.cpp, function int sendtoGlobalClient3(const void *buffer, size_t length, char* receiverIPAddr, uint32_t port)
+	NSLog(@"Called %@::%@! Send data ... len %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) , len);//TODO: DEBUG -tb-
+	int i;
+	for(i=0; i<len;i++) NSLog(@"0x%02x  ",data[i]);
+	NSLog(@"\n");
+
+
+
+	//[model setCrateUDPCommand:[sender stringValue]];	
+    if(UDP_DATA_COMMAND_CLIENT_SOCKET<=0){ NSLog(@"   socket not open\n"); return 1;}
+
+
+    //const char *buffer   = [crateUDPCommand cStringUsingEncoding: NSASCIIStringEncoding];  //TODO: maybe use NSData and NSString::dataUsingEncoding:allowLossyConversion: ??? -tb-
+    //const void *buffer   = [[aString dataUsingEncoding: NSASCIIStringEncoding allowLossyConversion: YES] bytes]; 
+	//size_t length        = [aString lengthOfBytesUsingEncoding: NSASCIIStringEncoding];
+    const void *buffer   = data; 
+	size_t length        = len;
+	const char* receiverIPAddr = [crateUDPDataIP cStringUsingEncoding: NSASCIIStringEncoding];;
+
+	int retval=0;
+	
+  //	if(port==0) port = GLOBAL_UDP_CLIENT_PORT;//use default port
+	
+  memset((char *) &UDP_DATA_COMMAND_sockaddrin_to, 0, sizeof(UDP_DATA_COMMAND_sockaddrin_to));
+  UDP_DATA_COMMAND_sockaddrin_to.sin_family = AF_INET;
+  UDP_DATA_COMMAND_sockaddrin_to.sin_port = htons(crateUDPDataPort);
+  if (inet_aton([crateUDPDataIP cStringUsingEncoding:NSASCIIStringEncoding], &UDP_DATA_COMMAND_sockaddrin_to.sin_addr)==0) {
+	NSLog(@" %@::%@  inet_aton() failed \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
+    //fprintf(stderr, "ERROR: sendtoGlobalClient3: inet_aton() failed\n");
+	return 2;
+    //exit(1);
+  }
+    fprintf(stderr, "    sendtoGlobalClient3: UDP Client: IP: %s, port: %i\n",receiverIPAddr,crateUDPDataPort);
+    //TODO: only recommended when using a char buffer ...  ((char*)buffer)[length]=0;    fprintf(stderr, "    sendtoGlobalClient3: %s\n",buffer); //DEBUG
+	
+	retval = sendto(UDP_DATA_COMMAND_CLIENT_SOCKET, buffer, length, 0 /*flags*/, (struct sockaddr *)&UDP_DATA_COMMAND_sockaddrin_to, sizeof(UDP_DATA_COMMAND_sockaddrin_to));
+    return retval;
+
+
+}
+
+
 #pragma mark ***HW Access
+- (void)		  writeMasterMode
+{
+//DEBUG OUTPUT: 	
+NSLog(@"WARNING: %@::%@: STILL UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+}
+
+- (void)		  writeSlaveMode
+{
+//DEBUG OUTPUT: 	
+NSLog(@"WARNING: %@::%@: STILL UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+}
+
+
 - (void) checkPresence
 {
 	@try {
@@ -1737,6 +2072,10 @@ NSLog(@"  arguments: %@ \n" , arguments);
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
 	
+	[self setNumRequestedUDPPackets:[decoder decodeIntForKey:@"numRequestedUDPPackets"]];
+	[self setCrateUDPDataReplyPort:[decoder decodeIntForKey:@"crateUDPDataReplyPort"]];
+	[self setCrateUDPDataIP:[decoder decodeObjectForKey:@"crateUDPDataIP"]];
+	[self setCrateUDPDataPort:[decoder decodeIntForKey:@"crateUDPDataPort"]];
 	[self setPixelBusEnableReg:[decoder decodeInt32ForKey:@"pixelBusEnableReg"]];
 	[self setSelectedFifoIndex:[decoder decodeIntForKey:@"selectedFifoIndex"]];
 	[self setCrateUDPCommand:[decoder decodeObjectForKey:@"crateUDPCommand"]];
@@ -1790,6 +2129,10 @@ NSLog(@"  arguments: %@ \n" , arguments);
 {
 	[super encodeWithCoder:encoder];
 	
+	[encoder encodeInt:numRequestedUDPPackets forKey:@"numRequestedUDPPackets"];
+	[encoder encodeInt:crateUDPDataReplyPort forKey:@"crateUDPDataReplyPort"];
+	[encoder encodeObject:crateUDPDataIP forKey:@"crateUDPDataIP"];
+	[encoder encodeInt:crateUDPDataPort forKey:@"crateUDPDataPort"];
 	[encoder encodeInt32:pixelBusEnableReg forKey:@"pixelBusEnableReg"];
 	[encoder encodeInt:selectedFifoIndex forKey:@"selectedFifoIndex"];
 	[encoder encodeObject:crateUDPCommand forKey:@"crateUDPCommand"];
