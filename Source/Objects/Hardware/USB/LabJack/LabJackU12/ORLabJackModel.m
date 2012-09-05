@@ -1075,6 +1075,12 @@ NSString* ORLabJackMaxValueChanged				= @"ORLabJackMaxValueChanged";
 - (double) convertedValue:(int)aChan
 {
 	double volts = 20.0/4095.*adc[aChan] - 10.;
+	unsigned short diffMask = [self adcDiff];
+
+	if((diffMask & (1<<aChan/2)) && (aChan<7)){
+		volts += (20.0/4095.*adc[aChan+1] - 10.);
+	}
+	
 	if(aChan>=0 && aChan<8)return slope[aChan] * volts + intercept[aChan];
 	else return 0;
 }
