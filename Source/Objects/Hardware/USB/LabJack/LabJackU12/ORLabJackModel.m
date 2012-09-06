@@ -918,15 +918,17 @@ NSString* ORLabJackMaxValueChanged				= @"ORLabJackMaxValueChanged";
 #pragma mark ***HW Access
 - (void) queryAll
 {
-	if(!queue){
-		queue = [[NSOperationQueue alloc] init];
-		[queue setMaxConcurrentOperationCount:1]; //can only do one at a time
-	}	
-	if ([[queue operations] count] == 0) {
-		ORLabJackQuery* anOp = [[ORLabJackQuery alloc] initWithDelegate:self];
-		[queue addOperation:anOp];
-		[anOp release];
-		led = !led;
+	if(usbInterface){
+		if(!queue){
+			queue = [[NSOperationQueue alloc] init];
+			[queue setMaxConcurrentOperationCount:1]; //can only do one at a time
+		}	
+		if ([[queue operations] count] == 0) {
+			ORLabJackQuery* anOp = [[ORLabJackQuery alloc] initWithDelegate:self];
+			[queue addOperation:anOp];
+			[anOp release];
+			led = !led;
+		}
 	}
 }
 
@@ -1337,26 +1339,31 @@ NSString* ORLabJackMaxValueChanged				= @"ORLabJackMaxValueChanged";
 
 - (void) firstWrite
 {
-	unsigned char data[8];
-	data[0] = 0x00;
-	data[1] = 0x00;
-	data[2] = 0x00;			
-	data[3] = 0x00;
-	data[4] = 0x00;
-	data[5] = 0x57;
-	data[6] = 0x00;			
-	data[7] = 0x00;
-	[usbInterface writeBytesOnInterruptPipe:data length:8];
-	[NSThread detachNewThreadSelector: @selector(readPipeThread) toTarget:self withObject: nil];
-	[ORTimer delay:.02];
-	[self readSerialNumber];
+	if(usbInterface){
+		unsigned char data[8];
+		data[0] = 0x00;
+		data[1] = 0x00;
+		data[2] = 0x00;			
+		data[3] = 0x00;
+		data[4] = 0x00;
+		data[5] = 0x57;
+		data[6] = 0x00;			
+		data[7] = 0x00;
+		[usbInterface writeBytesOnInterruptPipe:data length:8];
+		[NSThread detachNewThreadSelector: @selector(readPipeThread) toTarget:self withObject: nil];
+		[ORTimer delay:.02];
+		[self readSerialNumber];
+	}
+	else [self setDeviceSerialNumber:0];
 }
 
 - (void) writeData:(unsigned char*) data
 {
-	[usbInterface writeBytesOnInterruptPipe:data length:8];
-	[NSThread detachNewThreadSelector: @selector(readPipeThread) toTarget:self withObject: nil];
-	[ORTimer delay:0.03];
+	if(usbInterface){
+		[usbInterface writeBytesOnInterruptPipe:data length:8];
+		[NSThread detachNewThreadSelector: @selector(readPipeThread) toTarget:self withObject: nil];
+		[ORTimer delay:0.03];
+	}
 }
 
 - (void) addCurrentState:(NSMutableDictionary*)dictionary cArray:(int*)anArray forKey:(NSString*)aKey
