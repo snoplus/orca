@@ -821,7 +821,7 @@ NSString* ORProcessModelRunNumberChanged			= @"ORProcessModelRunNumberChanged";
 				s= [s stringByAppendingString:@"\n"];
 			}
 			if(adcCount){
-				NSArray* couchObjs = [[[[NSApp delegate] document]] collectObjectsOfClass:NSClassFromString(@"ORCouchDBModel")];
+				NSArray* couchObjs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORCouchDBModel")];
 				if([couchObjs count]){
 					ORCouchDBModel* couchObj = [couchObjs objectAtIndex:0];
 					if(![couchObj replicationRunning]){
