@@ -495,13 +495,14 @@ int filterGraph(nodeType*);
 
 - (void) reloadPlugin
 {
-    if ( NSAppKitVersionNumber >= NSAppKitVersionNumber10_5 ) {
+    #if defined(MAC_OS_X_VERSION_10_5) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
         NSBundle* currBundle = [NSBundle bundleWithPath:[pluginPath stringByExpandingTildeInPath]];
-		[pluginInstance release];
-		pluginInstance = nil;
-		[currBundle unload];
-	}
-	[self loadPlugin];
+        [pluginInstance release];
+        pluginInstance = nil;
+        [currBundle unload];
+    #endif
+
+ 	[self loadPlugin];
 }
 
 - (void) loadPlugin

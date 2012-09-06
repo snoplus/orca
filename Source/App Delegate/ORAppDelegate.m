@@ -399,7 +399,10 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 
     NSString *version = [[NSProcessInfo processInfo] operatingSystemVersionString];
     NSString* updateNotice = @"";
-    if ( NSAppKitVersionNumber <= NSAppKitVersionNumber10_5 )updateNotice = @"(Note: ORCA will move to 10.6 soon. Please update)";
+    
+    #if defined(MAC_OS_X_VERSION_10_5) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
+        updateNotice = @"(Note: ORCA will move to 10.6 soon. Please update)";
+    #endif
 
     NSLog(@"Running MacOS %@ %@\n", version,updateNotice);
     NSLog(@"Mac Address: %@\n",[self ethernetHardwareAddress]);
