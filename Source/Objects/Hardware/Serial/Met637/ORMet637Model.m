@@ -611,7 +611,7 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 - (void) sendID:(int)aValue			{ [self addCmdToQueue:[NSString stringWithFormat:@"ID %d",aValue]]; }
 - (void) sendHoldTime:(int)aValue	{ [self addCmdToQueue:[NSString stringWithFormat:@"SH %d",aValue]]; }
 - (void) sendTempUnit:(int)aTempUnit countUnits:(int)aCountUnit		{ [self addCmdToQueue:[NSString stringWithFormat:@"CU %d\rTU %d",aTempUnit,aCountUnit]]; }
-- (void) probe						{ probing = YES; [self addCmdToQueue:[NSString stringWithFormat:@"ST %d",cycleDuration]]; }
+- (void) probe						{ probing = YES; [self getSampleTime]; }
 
 #pragma mark ***Polling and Cycles
 - (void) startCycle
