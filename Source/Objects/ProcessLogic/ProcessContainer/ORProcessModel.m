@@ -25,6 +25,7 @@
 #import "ORProcessThread.h"
 #import "ORProcessCenter.h"
 #import "ORMailer.h"
+#import "ORCouchDBModel.h"
 
 NSString* ORProcessModelSendOnStopChanged = @"ORProcessModelSendOnStopChanged";
 NSString* ORProcessModelSendOnStartChanged = @"ORProcessModelSendOnStartChanged";
@@ -819,12 +820,28 @@ NSString* ORProcessModelRunNumberChanged			= @"ORProcessModelRunNumberChanged";
 				}
 				s= [s stringByAppendingString:@"\n"];
 			}
-			
+			if(adcCount){
+				NSArray* couchObjs = [[NSApp document] collectObjectsOfClass:NSClassFromString(@"ORCouchDBModel")];
+				if([couchObjs count]){
+					ORCouchDBModel* couchObj = [couchObjs objectAtIndex:0];
+					if(![couchObj replicationRunning]){
+						s = [s stringByAppendingString:@"The Couch database is NOT being replicated to the remote host.\n"];
+					}
+					if(![couchObj keepHistory]){
+						s = [s stringByAppendingString:@"The CouchDB object is NOT keeping a history.\n"];
+					}
+				}
+			}
+
 		}
 		else {
 			s = [s stringByAppendingString:@"[NOT RUNNING]\n"];
 		}
 		s = [s stringByAppendingString:@"\n"];
+		
+		
+		
+		
 	}
 	return s;
 	
