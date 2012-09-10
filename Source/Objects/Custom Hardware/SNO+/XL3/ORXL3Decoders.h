@@ -34,7 +34,8 @@
 @end
 
 @interface ORXL3DecoderForCmosRate : ORVmeCardDecoder {
-
+@private
+	BOOL indexerSwaps;
 }
 
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
@@ -43,6 +44,42 @@
 
 @interface ORXL3DecoderForFifo : ORVmeCardDecoder {
     @private
+	BOOL indexerSwaps;
+}
+
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
+- (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
+@end
+
+@interface ORXL3DecoderForPmtBaseCurrent : ORVmeCardDecoder {
+@private
+	BOOL indexerSwaps;
+}
+
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
+- (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
+@end
+
+@interface ORXL3DecoderForHv : ORVmeCardDecoder {
+@private
+	BOOL indexerSwaps;
+}
+
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
+- (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
+@end
+
+@interface ORXL3DecoderForVlt : ORVmeCardDecoder {
+@private
+	BOOL indexerSwaps;
+}
+
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
+- (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
+@end
+
+@interface ORXL3DecoderForFecVlt : ORVmeCardDecoder {
+@private
 	BOOL indexerSwaps;
 }
 

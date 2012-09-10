@@ -54,9 +54,13 @@ enum {
 @interface ORXL3Model : ORSNOCard <ORDataTaker>
 {
 	XL3_Link*       xl3Link;
-	unsigned long	xl3MegaBundleDataId;
-	unsigned long	cmosRateDataId;
-    unsigned long   xl3FifoDataId;
+	unsigned long	_xl3MegaBundleDataId;
+	unsigned long	_cmosRateDataId;
+	unsigned long	_pmtBaseCurrentDataId;
+    unsigned long   _xl3FifoDataId;
+    unsigned long   _xl3HvDataId;
+    unsigned long   _xl3VltDataId;
+    unsigned long   _fecVltDataId;
 	short           selectedRegister;
 	BOOL            basicOpsRunning;
 	BOOL            autoIncrement;	
@@ -89,7 +93,6 @@ enum {
     BOOL            isPollingForced;
     NSString*       pollStatus;
     NSThread*       pollThread;
-    NSMutableDictionary* _pollDict;
     
     unsigned long long  relayMask;
     NSString* relayStatus;
@@ -117,46 +120,53 @@ enum {
     NSDateFormatter* xl3DateFormatter;
 }
 
-@property (assign)	unsigned long   xl3ChargeInjMask;
-@property (assign)	unsigned char   xl3ChargeInjCharge;
-@property (assign)	unsigned short  pollXl3Time;
-@property (assign)	BOOL            isPollingXl3;
-@property (assign)	BOOL            isPollingCMOSRates;
-@property (assign)	unsigned short  pollCMOSRatesMask;
-@property (assign)	BOOL            isPollingPMTCurrents;
-@property (assign)	unsigned short  pollPMTCurrentsMask;
-@property (assign)	BOOL            isPollingFECVoltages;
-@property (assign)	unsigned short  pollFECVoltagesMask;
-@property (assign)	BOOL            isPollingXl3Voltages;
-@property (assign)	BOOL            isPollingHVSupply;
-@property (assign)  BOOL            isPollingXl3WithRun;
-@property (assign)  BOOL            isPollingVerbose;
-@property (copy) NSString* pollStatus;
-@property (readonly, nonatomic) NSMutableDictionary* pollDict;
-@property (assign)  BOOL isPollingForced;
+@property (nonatomic,assign) unsigned long xl3MegaBundleDataId;
+@property (nonatomic,assign) unsigned long pmtBaseCurrentDataId;
+@property (nonatomic,assign) unsigned long cmosRateDataId;
+@property (nonatomic,assign) unsigned long xl3FifoDataId;
+@property (nonatomic,assign) unsigned long xl3HvDataId;
+@property (nonatomic,assign) unsigned long xl3VltDataId;
+@property (nonatomic,assign) unsigned long fecVltDataId;
 
-@property (assign) unsigned long long relayMask;
-@property (copy) NSString* relayStatus;
-@property (assign) BOOL hvASwitch;
-@property (assign) BOOL hvBSwitch;
-@property (copy) NSString* triggerStatus;
-@property (assign) unsigned long hvAVoltageDACSetValue;
-@property (assign) unsigned long hvBVoltageDACSetValue;
-@property (assign) float hvAVoltageReadValue;
-@property (assign) float hvBVoltageReadValue;
-@property (assign) float hvACurrentReadValue;
-@property (assign) float hvBCurrentReadValue;
-@property (assign) unsigned long hvAVoltageTargetValue;
-@property (assign) unsigned long hvBVoltageTargetValue;
-@property (assign) BOOL calcCMOSRatesFromCounts;
-@property (assign) unsigned long hvACMOSRateLimit;
-@property (assign) unsigned long hvBCMOSRateLimit;
-@property (assign) unsigned long hvACMOSRateIgnore;
-@property (assign) unsigned long hvBCMOSRateIgnore;
-@property (assign) unsigned long hvANextStepValue;
-@property (assign) unsigned long hvBNextStepValue;
-@property (assign) unsigned long hvCMOSReadsCounter;
-@property (assign) BOOL hvPanicFlag;
+@property (nonatomic,assign) unsigned long xl3ChargeInjMask;
+@property (nonatomic,assign) unsigned char xl3ChargeInjCharge;
+@property (nonatomic,assign) unsigned short pollXl3Time;
+@property (nonatomic,assign) BOOL isPollingXl3;
+@property (nonatomic,assign) BOOL isPollingCMOSRates;
+@property (nonatomic,assign) unsigned short pollCMOSRatesMask;
+@property (nonatomic,assign) BOOL isPollingPMTCurrents;
+@property (nonatomic,assign) unsigned short pollPMTCurrentsMask;
+@property (nonatomic,assign) BOOL isPollingFECVoltages;
+@property (nonatomic,assign) unsigned short pollFECVoltagesMask;
+@property (nonatomic,assign) BOOL isPollingXl3Voltages;
+@property (nonatomic,assign) BOOL isPollingHVSupply;
+@property (nonatomic,assign) BOOL isPollingXl3WithRun;
+@property (nonatomic,assign) BOOL isPollingVerbose;
+@property (nonatomic,copy) NSString* pollStatus;
+@property (nonatomic,assign) BOOL isPollingForced;
+
+@property (nonatomic,assign) unsigned long long relayMask;
+@property (nonatomic,copy) NSString* relayStatus;
+@property (nonatomic,assign) BOOL hvASwitch;
+@property (nonatomic,assign) BOOL hvBSwitch;
+@property (nonatomic,copy) NSString* triggerStatus;
+@property (nonatomic,assign) unsigned long hvAVoltageDACSetValue;
+@property (nonatomic,assign) unsigned long hvBVoltageDACSetValue;
+@property (nonatomic,assign) float hvAVoltageReadValue;
+@property (nonatomic,assign) float hvBVoltageReadValue;
+@property (nonatomic,assign) float hvACurrentReadValue;
+@property (nonatomic,assign) float hvBCurrentReadValue;
+@property (nonatomic,assign) unsigned long hvAVoltageTargetValue;
+@property (nonatomic,assign) unsigned long hvBVoltageTargetValue;
+@property (nonatomic,assign) BOOL calcCMOSRatesFromCounts;
+@property (nonatomic,assign) unsigned long hvACMOSRateLimit;
+@property (nonatomic,assign) unsigned long hvBCMOSRateLimit;
+@property (nonatomic,assign) unsigned long hvACMOSRateIgnore;
+@property (nonatomic,assign) unsigned long hvBCMOSRateIgnore;
+@property (nonatomic,assign) unsigned long hvANextStepValue;
+@property (nonatomic,assign) unsigned long hvBNextStepValue;
+@property (nonatomic,assign) unsigned long hvCMOSReadsCounter;
+@property (nonatomic,assign) BOOL hvPanicFlag;
 
 #pragma mark •••Initialization
 - (id)   init;
@@ -217,9 +227,6 @@ enum {
 #pragma mark •••DataTaker
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherObj;
-@property unsigned long xl3MegaBundleDataId;
-@property unsigned long cmosRateDataId;
-@property unsigned long xl3FifoDataId;
 - (NSDictionary*) dataRecordDescription;
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;

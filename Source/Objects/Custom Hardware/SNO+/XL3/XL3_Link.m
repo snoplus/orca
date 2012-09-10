@@ -377,12 +377,12 @@ readFifoFlag = _readFifoFlag;
     [fifo release];
     fifo = nil;
 
-    for (i = 0; i < 16; i++) {
+    for (i = 0; i < 17; i++) {
         [nStatus[i] release];
         nStatus[i] = nil;
     }
 
-    memcpy(_fifoBundle, aStatus, 16*4);
+    memcpy(_fifoBundle, aStatus, 17*4);
     [self setReadFifoFlag:YES];
 }
 
@@ -852,7 +852,7 @@ static void SwapLongBlock(void* p, int32_t n)
                 //NSLog(@"%@: received ping request\n", [self crateName]);
                 (((XL3_Packet*) aPacket)->cmdHeader.packet_type = PONG_ID);
                 //get data
-                if (needToSwap) SwapLongBlock(((XL3_Packet*) aPacket)->payload, 16);
+                if (needToSwap) SwapLongBlock(((XL3_Packet*) aPacket)->payload, 17);
                 [self copyFifoStatus:(int32_t*)((XL3_Packet*) aPacket)->payload];
                 @try {
                     [commandSocketLock lock]; //begin critial section

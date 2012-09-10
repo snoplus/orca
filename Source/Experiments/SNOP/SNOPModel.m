@@ -345,13 +345,15 @@ NSString* ORSNOPModelMorcaIsUpdatingChanged = @"ORSNOPModelMorcaIsUpdatingChange
 }
 
 - (void) morcaCompactDB {
-    [[self morcaDBRef] compactDatabase:self tag:kMorcaCompactDB];
+//    [[self morcaDBRef] compactDatabase:self tag:kMorcaCompactDB];
 }
 
 - (void) couchDBResult:(id)aResult tag:(NSString*)aTag
 {
+    
 	@synchronized(self){
 		if([aResult isKindOfClass:[NSDictionary class]]){
+            /*
 			NSString* message = [aResult objectForKey:@"Message"];
 			if(message){
 				if([aTag isEqualToString:kMorcaCrateDocGot]){
@@ -400,6 +402,7 @@ NSString* ORSNOPModelMorcaIsUpdatingChanged = @"ORSNOPModelMorcaIsUpdatingChange
 					[aResult prettyPrint:@"CouchDB"];
 				}
 			}
+            */
 		}
 		else if([aResult isKindOfClass:[NSArray class]]){
             /*
@@ -559,6 +562,7 @@ NSString* ORSNOPModelMorcaIsUpdatingChanged = @"ORSNOPModelMorcaIsUpdatingChange
 @implementation SNOPModel (private)
 - (void) morcaUpdateDBDict
 {
+    /*
     if (!morcaDBDict) morcaDBDict = [[NSMutableDictionary alloc] initWithCapacity:20];
     NSArray* objs = [[self document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
     ORXL3Model* xl3;
@@ -566,6 +570,7 @@ NSString* ORSNOPModelMorcaIsUpdatingChanged = @"ORSNOPModelMorcaIsUpdatingChange
         [[self morcaDBRef] getDocumentId:[NSString stringWithFormat:@"_design/xl3_status/_view/xl3_num?descending=True&start_key=%d&end_key=%d&limit=1&include_docs=True",[xl3 crateNumber], [xl3 crateNumber]]
                                      tag:[NSString stringWithFormat:@"%@.%d", kMorcaCrateDocGot, [xl3 crateNumber]]];
     }
+     */
     //?
     if ([self morcaIsUpdating]) {
         if ([self morcaUpdateTime] == 0) {
@@ -579,6 +584,7 @@ NSString* ORSNOPModelMorcaIsUpdatingChanged = @"ORSNOPModelMorcaIsUpdatingChange
 
 - (void) morcaUpdatePushDocs:(unsigned int) crate
 {
+    /*
     NSArray* objs = [[self document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
     ORXL3Model* xl3;
     for (xl3 in objs) {
@@ -625,6 +631,7 @@ NSString* ORSNOPModelMorcaIsUpdatingChanged = @"ORSNOPModelMorcaIsUpdatingChange
             [self performSelector:@selector(morcaUpdateDB) withObject:nil afterDelay:[self morcaUpdateTime] - 0.2];
         }
     }
+     */
 }
 
 @end
