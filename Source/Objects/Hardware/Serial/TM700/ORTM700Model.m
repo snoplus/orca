@@ -448,7 +448,7 @@ NSString* ORTM700ConstraintsChanged			= @"ORTM700ConstraintsChanged";
 //some extra convenience methods that are common to several objects
 - (NSString*) auxStatusString:(int)aChannel
 {
-	if([serialPort isOpen] && [self isValid]){
+	if([self isValid]){
 		if(stationPower){
 			if(turboAccelerating)return @"ACCEL";
 			else return @"ON";
