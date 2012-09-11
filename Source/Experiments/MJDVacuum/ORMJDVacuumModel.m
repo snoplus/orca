@@ -993,6 +993,7 @@ NSString* ORMJDVacuumModelConstraintsChanged		= @"ORMJDVacuumModelConstraintsCha
 		[aPipe setRegionColor:aColor];
 		[aPipe setVisited:YES];
 	}
+
 	NSArray* gateValves = [self gateValvesConnectedTo:(int)aRegion];
 	for(id aGateValve in gateValves){
 		if([aGateValve isOpen]){
@@ -1176,22 +1177,20 @@ NSString* ORMJDVacuumModelConstraintsChanged		= @"ORMJDVacuumModelConstraintsCha
 			if([aGateValve isClosed]){
 				int side1				= [aGateValve connectingRegion1];
 				int side2				= [aGateValve connectingRegion2];
-				BOOL side1High			= [self region:side1 valueHigherThan:1.0E-1];
-				BOOL side2High			= [self region:side2 valueHigherThan:1.0E-1];
 				
 				if([self regionColor:side1 sameAsRegion:side2]){
 					[self removeConstraintName:kTurboOnPressureConstraint fromGateValve:aGateValve];
 				}
-				else if([self regionColor:side1 sameAsRegion:kRegionAboveTurbo] && side2High ){
+				else if([self regionColor:side1 sameAsRegion:kRegionAboveTurbo] && [self region:side2 valueHigherThan:1.0E-1] ){
 					[self addConstraintName:kTurboOnPressureConstraint reason:kTurboOnPressureConstraintReason toGateValve:aGateValve];
 				}
-				else if([self regionColor:side1 sameAsRegion:kRegionBelowTurbo] && side2High){
+				else if([self regionColor:side1 sameAsRegion:kRegionBelowTurbo] && [self region:side2 valueHigherThan:5]){
 					[self addConstraintName:kTurboOnPressureConstraint reason:kTurboOnPressureConstraintReason toGateValve:aGateValve];
 				}
-				else if([self regionColor:side2 sameAsRegion:kRegionAboveTurbo] && side1High){
+				else if([self regionColor:side2 sameAsRegion:kRegionAboveTurbo] && [self region:side1 valueHigherThan:1.0E-1]){
 					[self addConstraintName:kTurboOnPressureConstraint reason:kTurboOnPressureConstraintReason toGateValve:aGateValve];
 				}
-				else if([self regionColor:side2 sameAsRegion:kRegionBelowTurbo] && side1High){
+				else if([self regionColor:side2 sameAsRegion:kRegionBelowTurbo] && [self region:side1 valueHigherThan:5]){
 					[self addConstraintName:kTurboOnPressureConstraint reason:kTurboOnPressureConstraintReason toGateValve:aGateValve];
 				}
 				else [self removeConstraintName:kTurboOnPressureConstraint  fromGateValve:aGateValve];
@@ -1203,7 +1202,7 @@ NSString* ORMJDVacuumModelConstraintsChanged		= @"ORMJDVacuumModelConstraintsCha
 		//the next constraints involve the vacSentry and the cryoRoughing valve
 		ORVacuumGateValve* vacSentryValve    = [self gateValve:15];
 		ORVacuumGateValve* cryoRoughingValve = [self gateValve:5];
-		BOOL PKRG2PressureHigh				 = [self region:kRegionCryoPump valueHigherThan:2];
+		BOOL PKRG2PressureHigh				 = [self region:kRegionCryoPump valueHigherThan:5];
 
 		//---------------------------------------------------------------------------
 		//Opening cryopump roughing valve could expose turbo pump to potentially damaging pressures.
@@ -1216,12 +1215,13 @@ NSString* ORMJDVacuumModelConstraintsChanged		= @"ORMJDVacuumModelConstraintsCha
 		
 		//---------------------------------------------------------------------------
 		//Opening vacuum sentry could expose turbo pump to potentially damaging pressures.
-		if([vacSentryValve isClosed] && [cryoRoughingValve isOpen] && PKRG2PressureHigh){
-			[self addConstraintName:kTurboOnCryoRoughingOpenG4HighConstraint reason:kTurboOnCryoRoughingOpenG4HighReason toGateValve:vacSentryValve];
+		if([vacSentryValve isClosed]){
+			if([cryoRoughingValve isOpen] && PKRG2PressureHigh){
+				[self addConstraintName:kTurboOnCryoRoughingOpenG4HighConstraint reason:kTurboOnCryoRoughingOpenG4HighReason toGateValve:vacSentryValve];
+			}
+			else [self removeConstraintName:kTurboOnCryoRoughingOpenG4HighConstraint fromGateValve:vacSentryValve];
 		}
-		else {
-			[self removeConstraintName:kTurboOnCryoRoughingOpenG4HighConstraint fromGateValve:vacSentryValve];
-		}
+		else [self removeConstraintName:kTurboOnCryoRoughingOpenG4HighConstraint fromGateValve:vacSentryValve];
 	}
 	else {
 		ORVacuumGateValve* vacSentryValve    = [self gateValve:15];
