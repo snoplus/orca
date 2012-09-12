@@ -242,10 +242,10 @@
             slot_idx++;
         }
     }
-    
-    if (indexerSwaps) for (unsigned char idx=21+8*32; idx < 21+8*32+6; idx++) dataPtr[idx] = swapLong(dataPtr[idx]);
+    unsigned int idx; //XCode 3 requires the type def outside the for loop 
+    if (indexerSwaps) for (idx=21+8*32; idx < 21+8*32+6; idx++) dataPtr[idx] = swapLong(dataPtr[idx]);
     [dsc appendFormat:@"\ntimestamp: %s\n", (unsigned char*) &dataPtr[21+8*32]];
-    if (indexerSwaps) for (unsigned char idx=21+8*32; idx < 21+8*32+6; idx++) dataPtr[idx] = swapLong(dataPtr[idx]);
+    if (indexerSwaps) for (idx=21+8*32; idx < 21+8*32+6; idx++) dataPtr[idx] = swapLong(dataPtr[idx]);
     
     return [[dsc retain] autorelease];
 }
@@ -305,28 +305,32 @@
     NSMutableString* dsc = [NSMutableString stringWithFormat: @"PMT base currents crate %lu\n\n", dataPtr[1]];
         
     [dsc appendFormat:@"slotmask: 0x%08lu\n\nchannel masks:\n", dataPtr[2]];
-    for (unsigned char idx=3; idx<19; idx++) {
+    unsigned char idx; //XCode 3 requires the type def outside the for loop 
+    for (idx=3; idx<19; idx++) {
         [dsc appendFormat:@"slot %02u: 0x%08lx\n", idx-3U, dataPtr[idx]];
     }
     [dsc appendFormat:@"\nerror_flags: 0x%08lx\n", dataPtr[19]];
 
-    if (indexerSwaps) for (unsigned char idx=20; idx < 20 + 16*8 +6; idx++) dataPtr[idx] = swapLong(dataPtr[idx]);
+    if (indexerSwaps) for (idx=20; idx < 20 + 16*8 +6; idx++) dataPtr[idx] = swapLong(dataPtr[idx]);
     [dsc appendFormat:@"\nADC values:"];
     unsigned char* adc = (unsigned char*) &dataPtr[20];
-    for (unsigned char slot=0; slot<16; slot++) {
+    unsigned char slot; //XCode 3 requires the type def outside the for loop 
+    for (slot=0; slot<16; slot++) {
         [dsc appendFormat:@"\nslot %hhu:", slot];
-        for (unsigned char db=0; db<4; db++) {
+		unsigned char db; //XCode 3 requires the type def outside the for loop 
+        for (db=0; db<4; db++) {
             [dsc appendFormat:@"\nch%02u-%02u:", db*8, db*8-1];
-            for (unsigned char ch=0; ch<8; ch++) {
+			unsigned char ch; //XCode 3 requires the type def outside the for loop 
+            for (ch=0; ch<8; ch++) {
                 [dsc appendFormat:@" 0x%02hhx", adc[slot*32 + db*8 + ch]];
             }
         }
     }
     [dsc appendFormat:@"\n\ntimestamp: %s\n", (unsigned char*) &dataPtr[20+16*8]];
-    if (indexerSwaps) for (unsigned char idx=20; idx < 20 + 16*8 +6; idx++) dataPtr[idx] = swapLong(dataPtr[idx]);
+    if (indexerSwaps) for (idx=20; idx < 20 + 16*8 +6; idx++) dataPtr[idx] = swapLong(dataPtr[idx]);
 
     [dsc appendFormat:@"\n raw packet:\n"];
-    for (unsigned char idx = 0; idx < 20 + 16*8 + 6; idx++) {
+    for (idx = 0; idx < 20 + 16*8 + 6; idx++) {
         [dsc appendFormat:@"%02hhu: 0x%08lx\n", idx, dataPtr[idx]];
     }
     
@@ -359,9 +363,10 @@
     [dsc appendFormat:@"current A: %3.1f mA\n", vlt[2]];
     [dsc appendFormat:@"current B: %3.1f mA\n", vlt[3]];
     
-    if (indexerSwaps) for (unsigned char idx=6; idx<12; idx++) dataPtr[idx] = swapLong(dataPtr[idx]);
+    unsigned char idx; //XCode 3 requires the type def outside the for loop 
+    if (indexerSwaps) for (idx=6; idx<12; idx++) dataPtr[idx] = swapLong(dataPtr[idx]);
     [dsc appendFormat:@"\n\ntimestamp: %s\n", (unsigned char*) &dataPtr[6]];
-    if (indexerSwaps) for (unsigned char idx=6; idx<12; idx++) dataPtr[idx] = swapLong(dataPtr[idx]);
+    if (indexerSwaps) for (idx=6; idx<12; idx++) dataPtr[idx] = swapLong(dataPtr[idx]);
 
     return [[dsc retain] autorelease];
 }
@@ -397,9 +402,10 @@
     [dsc appendFormat:@"TMP1: %4.1f V\n", vlt[6]];
     [dsc appendFormat:@"TMP2: %4.1f V\n", vlt[7]];
     
-    if (indexerSwaps) for (unsigned char idx=10; idx<16; idx++) dataPtr[idx] = swapLong(dataPtr[idx]);
+    unsigned char idx; //XCode 3 requires the type def outside the for loop 
+    if (indexerSwaps) for (idx=10; idx<16; idx++) dataPtr[idx] = swapLong(dataPtr[idx]);
     [dsc appendFormat:@"\n\ntimestamp: %s\n", (unsigned char*) &dataPtr[10]];
-    if (indexerSwaps) for (unsigned char idx=10; idx<16; idx++) dataPtr[idx] = swapLong(dataPtr[idx]);
+    if (indexerSwaps) for (idx=10; idx<16; idx++) dataPtr[idx] = swapLong(dataPtr[idx]);
     
     return [[dsc retain] autorelease];
 }
@@ -451,9 +457,10 @@
     [dsc appendFormat:@"  Cal DAC: %f V\n", vlt[19]];
     [dsc appendFormat:@"  HV Curr: %f mA\n", vlt[20]];
     
-    if (indexerSwaps) for (unsigned char idx=10; idx<16; idx++) dataPtr[idx] = swapLong(dataPtr[idx]);
+	unsigned char idx; //XCode 3 requires the type def outside the for loop 
+   if (indexerSwaps) for (idx=10; idx<16; idx++) dataPtr[idx] = swapLong(dataPtr[idx]);
     [dsc appendFormat:@"\n\ntimestamp: %s\n", (unsigned char*) &dataPtr[10]];
-    if (indexerSwaps) for (unsigned char idx=10; idx<16; idx++) dataPtr[idx] = swapLong(dataPtr[idx]);
+    if (indexerSwaps) for (idx=10; idx<16; idx++) dataPtr[idx] = swapLong(dataPtr[idx]);
     
     return [[dsc retain] autorelease];
 }
