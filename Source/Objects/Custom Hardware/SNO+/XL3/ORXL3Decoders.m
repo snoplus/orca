@@ -242,7 +242,7 @@
             slot_idx++;
         }
     }
-    unsigned int idx; //XCode 3 requires the type def outside the for loop 
+    unsigned int idx; //XCode 3 requires the type def outside the for loop. changed to unsigned int to prevent truncation warning.
     if (indexerSwaps) for (idx=21+8*32; idx < 21+8*32+6; idx++) dataPtr[idx] = swapLong(dataPtr[idx]);
     [dsc appendFormat:@"\ntimestamp: %s\n", (unsigned char*) &dataPtr[21+8*32]];
     if (indexerSwaps) for (idx=21+8*32; idx < 21+8*32+6; idx++) dataPtr[idx] = swapLong(dataPtr[idx]);
