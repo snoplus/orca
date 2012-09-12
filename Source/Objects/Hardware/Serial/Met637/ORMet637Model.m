@@ -57,6 +57,7 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 - (void) dumpTimeout;
 - (void) clearDelay;
 - (void) processOneCommandFromQueue;
+- (void) checkDate;
 @end
 
 @implementation ORMet637Model
@@ -524,7 +525,6 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 - (void) firstActionAfterOpeningPort
 {
 	[self probe];
-	[self setDate];
 }
 
 #pragma mark ***Archival
@@ -616,7 +616,7 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 #pragma mark ***Polling and Cycles
 - (void) startCycle
 {
-	if(![self running]){
+	if(![self running] && [serialPort isOpen]){
 		[self setCycleNumber:1];
 		NSDate* now = [NSDate date];
 		[self setCycleStarted:now];
@@ -632,7 +632,7 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 
 - (void) stopCycle
 {
-	if([self running]){
+	if([self running] && [serialPort isOpen]){
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(checkCycle) object:nil];
 		[self setCycleNumber:0];
 		[self sendEnd];
@@ -755,16 +755,17 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 - (void) checkCycle
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(checkCycle) object:nil];
-	[self probe];
-	if(running){
-		[self performSelector:@selector(checkCycle) withObject:nil afterDelay:kMet637ProbeTime];
-	}
+	if([serialPort isOpen]){ 
+        [self probe];
+        if(running){
+            [self performSelector:@selector(checkCycle) withObject:nil afterDelay:kMet637ProbeTime];
+        }
+    }
 }
 
 - (void) addCmdToQueue:(NSString*)aCmd
 {
 	if([serialPort isOpen]){ 
-		
 		aCmd = [aCmd stringByReplacingOccurrencesOfString:@"\n" withString:@""];
 		if(![aCmd hasSuffix:@"\r"])aCmd = [aCmd stringByAppendingFormat:@"\r"];
 		
@@ -774,7 +775,6 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 		if(!lastRequest){
 			[self processOneCommandFromQueue];
 		}
-		
 	}
 	else NSLog(@"Met637 (%d): Serial Port not open. Cmd Ignored.\n",[self uniqueIdNumber]);
 }
@@ -782,7 +782,6 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 - (void) process_response:(NSString*)theResponse
 {
 	[self setIsValid:YES];
-
 	theResponse = [theResponse stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 	NSArray* partsByComma = [theResponse componentsSeparatedByString:@","];
 	if([partsByComma count] >= 14 && ![theResponse hasPrefix:@"TIME"]){
@@ -812,7 +811,7 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 					[self setCycleStarted:[NSDate date]];
 				}
 			}
-			//[self setDate];
+            [self checkDate];
 		}
 		else {
 			theResponse = [theResponse stringByReplacingOccurrencesOfString:@"\n" withString:@""];
@@ -880,6 +879,28 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
 }
 
+- (void) checkDate
+{
+    if([measurementDate length]){
+        NSDateFormatter* dateFormat = [[[NSDateFormatter alloc] init] autorelease];
+        [dateFormat setDateFormat:@"dd-MMM-yyyy hh:mm:ss"];
+        NSDate* measuredDate = [dateFormat dateFromString:measurementDate];
+        NSTimeInterval delta = fabs((double)[measuredDate timeIntervalSinceNow]);
+        if(delta > 60){
+            BOOL runInProgress = [self running];
+            if(runInProgress){
+                NSLog(@"Stopping %@ to sync the date\n",[self fullID]);
+               [self stopCycle]; 
+            }
+            [self setDate];
+            if(runInProgress){
+                NSLog(@"Restarting %@ after sync'ing the date\n",[self fullID]);
+                [self startCycle];
+            }
+            
+        }
+    }
+}
 
 - (void) clearDelay
 {

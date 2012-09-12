@@ -23,8 +23,8 @@
 @class ORTimeRate;
 @class ORAlarm;
 
-#define kMet637CmdTimeout  1
-#define kMet637ProbeTime   5
+#define kMet637CmdTimeout  2
+#define kMet637ProbeTime   1
 
 #define kMet637Manual  0
 #define kMet637Auto    1
