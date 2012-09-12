@@ -45,6 +45,7 @@
 - (void) onAllGateValvesremoveConstraintName:(NSString*)aConstraintName;
 - (void) checkAllConstraints;
 - (void) deferredConstraintCheck;
+- (void) checkCloseConditionOnCF6;
 - (void) checkTurboRelatedConstraints:(ORTM700Model*) turbo;
 - (void) checkCryoPumpRelatedConstraints:(ORCP8CryopumpModel*) cryoPump;
 - (void) checkRGARelatedConstraints:(ORRGA300Model*) rga;
@@ -1316,6 +1317,21 @@ NSString* ORMJDVacuumModelConstraintsChanged		= @"ORMJDVacuumModelConstraintsCha
 		}
 		else [self removeConstraintName:kCryoOffDetectorConstraint  fromGateValve:aGateValve];
 	}
+	
+	if(checkCF6Now)	[self checkCloseConditionOnCF6];
+	else				[self performSelector:@selector(checkCloseConditionOnCF6) withObject:nil afterDelay:60];
+}
+
+- (void) checkCloseConditionOnCF6
+{
+	checkCF6Now = YES;
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(checkCloseConditionOnCF6) object:nil];
+	ORCP8CryopumpModel* cryoPump = [self findCryoPump];
+	BOOL cryoPumpEnabled;
+	if(![cryoPump isValid]) cryoPumpEnabled = YES;
+	else cryoPumpEnabled = [cryoPump pumpStatus];
+	
+	ORVacuumGateValve* CF6Valve			 = [self gateValve:3];
 	
 	//---------------------------------------------------------------------------
 	//If Cryopump temp is >20K close the CF6 valve

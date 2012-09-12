@@ -119,6 +119,7 @@
 	ORAlarm*			 orcaClosedCF6TempAlarm;
 	NSMutableDictionary* okToBiasConstraints;
 	NSMutableDictionary* continuedBiasConstraints;
+	BOOL				 checkCF6Now;
 }
 
 #pragma mark ***Accessors
