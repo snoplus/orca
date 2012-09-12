@@ -30,7 +30,7 @@
 #import "VME_HW_Definitions.h"
 #import "ORVmeTests.h"
 
-#define kCurrentFirmwareVersion 0x10
+#define kCurrentFirmwareVersion 0x106
 
 NSString* ORGretina4ModelDownSampleChanged			= @"ORGretina4ModelDownSampleChanged";
 NSString* ORGretina4ModelRegisterIndexChanged		= @"ORGretina4ModelRegisterIndexChanged";
@@ -1094,11 +1094,7 @@ static struct {
 	mainVersion = (mainVersion & 0xFFFFF000) >> 12;
 	NSLog(@"Main FGPA version: 0x%x \n", mainVersion);
 		
-	if (mainVersion != kCurrentFirmwareVersion)
-	//if (mainVersion != 0x108)
-	//if (mainVersion != 0x105)
-	//if (mainVersion != 0x106)
-	{
+	if (mainVersion != kCurrentFirmwareVersion){
 		NSLog(@"Main FPGA version does not match: it should be 0x%x, but now it is 0x%x \n", kCurrentFirmwareVersion,mainVersion);
 		return;
 	}
