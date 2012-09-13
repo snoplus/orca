@@ -57,7 +57,6 @@ NSString* ORAdcModelHighConnection		= @"ORAdcModelHighConnection";
 	[alarmGradient release];
 	[resetDate release];
 	[lowDate release];
-	[resetDate release];
 
 	[super dealloc];
 }
