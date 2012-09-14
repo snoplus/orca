@@ -426,6 +426,9 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootService);
 			}
 			[waitingObjects removeObjectForKey:aKey];
 		}
+		fitInFlight = NO;
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(clearFitInFlight) object:nil];
+
 	}
 }
 
@@ -446,9 +449,19 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootService);
 	[self sendRequest:[[aNote userInfo] objectForKey:ServiceRequestKey] fromObject:[aNote object]];
 }
 
+- (void) clearFitInFlight
+{
+	fitInFlight = NO;
+}
+
 - (void) sendRequest:(NSMutableDictionary*)request fromObject:(id)anObject
 {
 	if(!socket)return;
+	if(fitInFlight)return;
+	
+	fitInFlight = YES;
+	
+	[self performSelector:@selector(clearFitInFlight) withObject:nil afterDelay:5];
 	
 	if(dataId==0){
 		ORDataTypeAssigner* assigner = [[ORDataTypeAssigner alloc] init];

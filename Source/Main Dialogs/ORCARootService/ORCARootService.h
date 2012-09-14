@@ -47,6 +47,7 @@
 	BOOL			connectAtStart;
 	NSMutableArray* connectionHistory;
 	NSUInteger 		hostNameIndex;
+	BOOL			fitInFlight;
 }
 
 + (ORCARootService*) sharedORCARootService;
@@ -93,6 +94,7 @@
 - (void) sendRequest:(NSMutableDictionary*)request fromObject:(id)anObject;
 - (unsigned) connectionHistoryCount;
 - (id) connectionHistoryItem:(NSUInteger)index;
+- (void) clearFitInFlight;
 
 #pragma mark ¥¥¥Delegate Methods
 - (void) netsocketDisconnected:(NetSocket*)insocket;
