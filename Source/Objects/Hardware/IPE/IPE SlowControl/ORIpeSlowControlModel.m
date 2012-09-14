@@ -1597,6 +1597,7 @@ enum {
     int channelNumber=-1;
     NSString* itemKey = [self itemKey:aUrl :aPath];
 	NSDictionary* topLevelDictionary	= [requestCache objectForKey:itemKey];
+	if(!topLevelDictionary) return -1;
 	NSDictionary* itemDictionary		= [topLevelDictionary objectForKey:itemKey];
 	if([itemDictionary objectForKey:@"Control"]) NSLog(@"%@: no Sensor channel found, is a Control channel!\n",NSStringFromClass([self class]));//-tb- warning output  //is a Control, not a Sensor
     else channelNumber = [[topLevelDictionary objectForKey:@"ChannelNumber"] intValue];
@@ -1608,6 +1609,7 @@ enum {
     int channelNumber=-1;
     NSString* itemKey = [self itemKey:aUrl :aPath];
 	NSDictionary* topLevelDictionary	= [requestCache objectForKey:itemKey];
+	if(!topLevelDictionary) return -1;
 	NSDictionary* itemDictionary		= [topLevelDictionary objectForKey:itemKey];
 	if([itemDictionary objectForKey:@"Control"]) channelNumber = [[topLevelDictionary objectForKey:@"ChannelNumber"] intValue];
     else NSLog(@"%@: no Control channel found, is a non-Control channel!\n",NSStringFromClass([self class]));//-tb- warning output //is a Sensor, not a Control
