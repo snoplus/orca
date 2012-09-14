@@ -23,8 +23,10 @@
 @class ORTimeRate;
 @class ORAlarm;
 
-#define kMet637CmdTimeout  2
-#define kMet637ProbeTime   1
+#define kMet637CmdTimeout           2
+#define kMet637DelayTime            0.1
+#define kMet637ProbeTime            13
+#define kMet637AllowedTimeDelta     (5*60)
 
 #define kMet637Manual  0
 #define kMet637Auto    1
@@ -60,9 +62,11 @@
 		int				dumpCount;
 		ORAlarm*		sensorErrorAlarm;
 		ORAlarm*		lowBatteryAlarm;
-		ORAlarm*		flowErrorAlarm;
+        ORAlarm*		flowErrorAlarm;
+        ORAlarm*		missingCyclesAlarm;
 		BOOL			sentStartOnce;
 		BOOL			sentStopOnce;
+        int             missedCycleCount;
 }
 
 
@@ -117,8 +121,11 @@
 - (void) setIndex:(int)index countAlarmLimit:(float)aCountAlarmLimit;
 - (float) maxCounts:(int)index;
 - (void) setIndex:(int)index maxCounts:(float)aMaxCounts;
+- (void) setMissedCycleCount:(int)aValue;
+- (int) missedCycleCount;
 
 #pragma mark ***Polling
+- (void) startCycle:(BOOL)force;
 - (void) startCycle;
 - (void) stopCycle;
 
@@ -182,5 +189,7 @@ extern NSString* ORMet637ModelCountingModeChanged;
 extern NSString* ORMet637ModelCountChanged;
 extern NSString* ORMet637ModelMeasurementDateChanged;
 extern NSString* ORMet637ModelPollTimeChanged;
+extern NSString* ORMet637ModelMissedCountChanged;
+
 extern NSString* ORMet637Lock;
 

@@ -258,7 +258,7 @@
                      selector : @selector(dumpCountChanged:)
                          name : ORMet637ModelDumpCountChanged
 						object: model];
-	
+     
 	[serialPortController registerNotificationObservers];
 	
 }
@@ -567,12 +567,14 @@
 - (IBAction) startCycleAction:(id)sender
 {
 	[self endEditing];
+    [model setMissedCycleCount:0];
 	[model startCycle];	
 }
 
 - (IBAction) stopCycleAction:(id)sender
 {
 	[self endEditing];
+    [model setMissedCycleCount:0];
 	[model stopCycle];	
 }
 

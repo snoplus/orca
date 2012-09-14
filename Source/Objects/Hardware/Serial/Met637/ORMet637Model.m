@@ -1,3 +1,4 @@
+
 //--------------------------------------------------------
 // ORMet637Model
 // Created by Mark  A. Howe on Mon Jan 23, 2012
@@ -47,6 +48,7 @@ NSString* ORMet637ModelCycleDurationChanged   = @"ORMet637ModelCycleDurationChan
 NSString* ORMet637ModelCountingModeChanged	  = @"ORMet637ModelCountingModeChanged";
 NSString* ORMet637ModelCountChanged			  = @"ORMet637ModelCount2Changed";
 NSString* ORMet637ModelMeasurementDateChanged = @"ORMet637ModelMeasurementDateChanged";
+NSString* ORMet637ModelMissedCountChanged   = @"ORMet637ModelMissedCountChanged";
 
 NSString* ORMet637Lock = @"ORMet637Lock";
 
@@ -58,6 +60,10 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 - (void) clearDelay;
 - (void) processOneCommandFromQueue;
 - (void) checkDate;
+- (void) startDataArrivalTimeout;
+- (void) cancelDataArrivalTimeout;
+- (void) doCycleKick;
+
 @end
 
 @implementation ORMet637Model
@@ -97,7 +103,10 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 
 	[flowErrorAlarm release];
 	[flowErrorAlarm clearAlarm];
-	
+    
+	[missingCyclesAlarm release];
+	[missingCyclesAlarm clearAlarm];
+
 	[super dealloc];
 }
 
@@ -159,6 +168,34 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 }
 
 #pragma mark ***Accessors
+- (int) missedCycleCount
+{
+    return missedCycleCount;
+}
+
+- (void) setMissedCycleCount:(int)aValue
+{
+    missedCycleCount = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMet637ModelMissedCountChanged object:self];
+    
+	if(((missedCycleCount >= 3) && (countingMode == kMet637Auto)) || 
+       ((missedCycleCount > 0) && (countingMode == kMet637Manual))){
+		if(!missingCyclesAlarm){
+			NSString* s = [NSString stringWithFormat:@"Met637 (Unit %lu) Missing Cycles",[self uniqueIdNumber]];
+			missingCyclesAlarm = [[ORAlarm alloc] initWithName:s severity:kHardwareAlarm];
+			[missingCyclesAlarm setSticky:YES];
+            if(countingMode == kMet637Manual)[missingCyclesAlarm setHelpString:@"The particle counter did not report counts at the end of its last single cycle.\n\nThis alarm will not go away until the problem is cleared. Acknowledging the alarm will silence it."];			
+            else [missingCyclesAlarm setHelpString:@"The particle counter is not reporting counts at the end of its cycle. ORCA tried to kick start it at least three times.\n\nThis alarm will not go away until the problem is cleared. Acknowledging the alarm will silence it."];
+			[missingCyclesAlarm postAlarm];
+		}
+	}
+	else {
+		[missingCyclesAlarm clearAlarm];
+		[missingCyclesAlarm release];
+		missingCyclesAlarm = nil;
+	}
+    
+}
 
 - (int) dumpCount
 {
@@ -478,8 +515,8 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 - (NSString*) countingModeString
 {
 	switch ([self countingMode]) {
-		case kMet637Manual: return @"Manual";
-		case kMet637Auto:   return @"Auto";
+		case kMet637Manual: return @"Single Cycle";
+		case kMet637Auto:   return @"Repeating";
 		default: return @"--";
 	}
 }
@@ -616,7 +653,13 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 #pragma mark ***Polling and Cycles
 - (void) startCycle
 {
-	if(![self running] && [serialPort isOpen]){
+    [self startCycle:NO];
+}
+- (void) startCycle:(BOOL)force
+{
+	if((![self running] || force) && [serialPort isOpen]){
+		[self sendEnd];
+        [self enqueueCmd:@"++Delay"];
 		[self setCycleNumber:1];
 		NSDate* now = [NSDate date];
 		[self setCycleStarted:now];
@@ -624,9 +667,10 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 		[self sendHoldTime:holdTime];
 		[self sendTempUnit:tempUnits countUnits:countUnits];
 		[self sendCountingTime:cycleDuration];
-		[self sendEnd];
+        [self enqueueCmd:@"++Delay"];
 		[self sendStart];
-		NSLog(@"Met637(%d) Starting particle counter in %@ mode\n",[self uniqueIdNumber], countingMode==kMet637Manual?@"manual":@"auto");
+        [self startDataArrivalTimeout];
+		NSLog(@"Met637(%d) Starting particle counter in %@ mode\n",[self uniqueIdNumber], [self countingModeString]);
 	}
 }
 
@@ -636,9 +680,11 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(checkCycle) object:nil];
 		[self setCycleNumber:0];
 		[self sendEnd];
-		NSLog(@"Met637(%d) Stopping particle counter. Was in %@ mode\n",[self uniqueIdNumber], countingMode==kMet637Manual?@"manual":@"auto");
+        [self cancelDataArrivalTimeout];
+		NSLog(@"Met637(%d) Stopping particle counter. Was in %@ mode\n",[self uniqueIdNumber], [self countingModeString]);
 	}
 }
+
 
 #pragma mark •••Bit Processing Protocol
 - (void) processIsStarting
@@ -649,7 +695,7 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 		   sentStopOnce = NO;
 
 			wasRunning = NO;
-			[self startCycle];
+			[self startCycle:YES];
 		}
 	}
 }
@@ -762,6 +808,38 @@ NSString* ORMet637Lock = @"ORMet637Lock";
         }
     }
 }
+- (void) startDataArrivalTimeout
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(doCycleKick) object:nil];
+    [self performSelector:@selector(doCycleKick)  withObject:nil afterDelay:(cycleDuration+120)];
+}
+
+- (void) cancelDataArrivalTimeout
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(doCycleKick) object:nil];
+}
+
+- (void) doCycleKick
+{
+    [self setMissedCycleCount:missedCycleCount+1];
+    NSLogColor([NSColor redColor],@"%@ data did not arrive at end of cycle (missed %d)\n",[self fullID],missedCycleCount);
+    if(countingMode == kMet637Auto){
+        NSLogColor([NSColor redColor],@"Kickstarting %@\n",[self fullID]);
+        [self setCount:0 value:0];
+        [self setCount:1 value:0];
+        [self setCount:2 value:0];
+        [self setCount:3 value:0];
+        [self setCount:4 value:0];
+        [self setCount:5 value:0];       
+        [self setTemperature:0];
+        [self setHumidity:0];
+        [self setIsValid:NO];
+
+        [self stopCycle];
+        [self startCycle:YES];
+    }
+}
+
 
 - (void) addCmdToQueue:(NSString*)aCmd
 {
@@ -800,17 +878,20 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 			[self setLocation:[[partsByComma objectAtIndex:9] floatValue]];
 			[self setActualDuration:[[partsByComma objectAtIndex:10] intValue]];
 			[self setStatusBits:[[partsByComma objectAtIndex:13] intValue]];
+            
+            [self setMissedCycleCount:0];
+            [self cancelDataArrivalTimeout];
+            
+            if(countingMode == kMet637Manual){
+                [self stopCycle];
+            }
+            else {
+                [self startDataArrivalTimeout];
+                int theCount = [self cycleNumber];
+                [self setCycleNumber:theCount+1];
+                [self setCycleStarted:[NSDate date]];
+            }
 			
-			if(running){
-				if(countingMode == kMet637Manual){
-					[self stopCycle];
-				}
-				else {
-					int theCount = [self cycleNumber];
-					[self setCycleNumber:theCount+1];
-					[self setCycleStarted:[NSDate date]];
-				}
-			}
             [self checkDate];
 		}
 		else {
@@ -859,14 +940,14 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 				[self setTempUnits:[st intValue]];
 			}
 		}
-		else if([theResponse hasPrefix:@"COUNTING STOPPED"]){
+        else if([theResponse rangeOfString:@"COUNTING STOPPED" options:NSCaseInsensitiveSearch].location != NSNotFound){
 			[self setRunning:NO];
 		}
-		else if([theResponse hasPrefix:@"COUNTING STARTED"]){
+		else if([theResponse rangeOfString:@"COUNTING STARTED" options:NSCaseInsensitiveSearch].location != NSNotFound){
 			[self setRunning:YES];
 			[self checkCycle];
 		}
-		else if([theResponse hasPrefix:@"CANNOT CHANGE WHILE"]){
+        else if([theResponse rangeOfString:@"CANNOT CHANGE WHILE" options:NSCaseInsensitiveSearch].location != NSNotFound){
 			if(probing){
 				probing = NO;
 			}
@@ -883,19 +964,20 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 {
     if([measurementDate length]){
         NSDateFormatter* dateFormat = [[[NSDateFormatter alloc] init] autorelease];
-        [dateFormat setDateFormat:@"dd-MMM-yyyy hh:mm:ss"];
+        [dateFormat setDateFormat:@"dd-MMM-yyyy HH:mm:ss"];
         NSDate* measuredDate = [dateFormat dateFromString:measurementDate];
         NSTimeInterval delta = fabs((double)[measuredDate timeIntervalSinceNow]);
-        if(delta > 60){
-            BOOL runInProgress = [self running];
-            if(runInProgress){
-                NSLog(@"Stopping %@ to sync the date\n",[self fullID]);
-               [self stopCycle]; 
+        if(delta > kMet637AllowedTimeDelta){
+            NSLog(@"Stopping %@ to sync the time (time error: %.0f secs)\n",[self fullID],delta);
+            [self stopCycle];
+            int i;
+            for(i=0;i<5/kMet637DelayTime;i++){
+                [self enqueueCmd:@"++Delay"];
             }
             [self setDate];
-            if(runInProgress){
+            if(countingMode == kMet637Auto){
                 NSLog(@"Restarting %@ after sync'ing the date\n",[self fullID]);
-                [self startCycle];
+                [self startCycle:YES];
             }
             
         }
@@ -927,7 +1009,7 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 		if([aCmd isEqualToString:@"++Delay"]){
 			delay = YES;
 			[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(clearDelay) object:nil];
-			[self performSelector:@selector(clearDelay) withObject:nil afterDelay:.1];
+			[self performSelector:@selector(clearDelay) withObject:nil afterDelay:kMet637DelayTime];
 		}
 		else {
 			[self startTimeout:3];

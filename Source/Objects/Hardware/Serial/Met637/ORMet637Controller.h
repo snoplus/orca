@@ -97,9 +97,9 @@
 - (void) measurementDateChanged:(NSNotification*)aNote;
 - (void) updateButtons;
 - (void) lockChanged:(NSNotification*)aNote;
-- (void) updateTimePlot:(NSNotification*)aNotification;
-- (void) scaleAction:(NSNotification*)aNotification;
-- (void) miscAttributesChanged:(NSNotification*)aNotification;
+- (void) updateTimePlot:(NSNotification*)aNote;
+- (void) scaleAction:(NSNotification*)aNote;
+- (void) miscAttributesChanged:(NSNotification*)aNote;
 
 #pragma mark ***Actions
 - (IBAction) isLogAction:(id)sender;
