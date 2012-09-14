@@ -202,6 +202,8 @@
 - (IBAction) streamMaskEnableNoneAction:(id)sender;
 - (IBAction) streamMaskTextFieldAction:(id)sender;
 - (IBAction) streamMaskMatrixAction:(id)sender;
+- (IBAction) writeStreamMaskRegisterButtonAction:(id)sender;
+- (IBAction) readStreamMaskRegisterButtonAction:(id)sender;
 - (IBAction) selectFiberTrigPUAction:(id)sender;
 - (IBAction) BBv1MaskMatrixAction:(id)sender;
 - (IBAction) fiberEnableMaskMatrixAction:(id)sender;

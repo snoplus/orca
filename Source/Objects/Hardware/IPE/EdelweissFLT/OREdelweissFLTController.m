@@ -1023,6 +1023,15 @@
 	[model setStreamMask:val];
 }
 
+
+- (IBAction) writeStreamMaskRegisterButtonAction:(id)sender
+{	[model writeStreamMask];	}
+
+- (IBAction) readStreamMaskRegisterButtonAction:(id)sender
+{	[model readStreamMask];	}
+
+
+
 - (void) selectFiberTrigPUAction:(id)sender
 {
 //DEBUG OUTPUT:

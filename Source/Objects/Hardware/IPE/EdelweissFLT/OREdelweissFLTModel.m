@@ -133,7 +133,7 @@ enum IpeFLTV4Enum{
 
 static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	//2nd column is PCI register address shifted 2 bits to right (the two rightmost bits are always zero) -tb-
-	{@"Status",				0x000000>>2,		-1,				kIpeRegReadable},
+	{@"Status",				0x000000>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 	{@"Control",			0x000004>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 	{@"Command",			0x000008>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 	{@"CFPGAVersion",		0x00000c>>2,		-1,				kIpeRegReadable},
@@ -494,7 +494,6 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 //- (void) setStreamMaskForFiber:(int)aFiber chan:(int)aChan value:(BOOL)val
 //{
 //}
-
 
 
 
@@ -1071,7 +1070,15 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	[self writeReg: kFLTV4StreamMask_2Reg value:aValue];
 }
 
-
+- (void) readStreamMask
+{
+    //DEBUG OUTPUT:
+ 	NSLog(@"%@::%@ \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG testing ...-tb-
+    uint64_t streamMask1=[self readReg: kFLTV4StreamMask_1Reg];
+    uint64_t streamMask2=[self readReg: kFLTV4StreamMask_2Reg];
+	uint64_t theStreamMask = (streamMask2 << 32) | streamMask1;
+	[self setStreamMask: theStreamMask];
+}
 
 - (void) writeFiberDelays
 {

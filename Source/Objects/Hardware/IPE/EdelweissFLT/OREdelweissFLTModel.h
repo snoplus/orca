@@ -299,6 +299,7 @@
 - (unsigned long) readTotalTriggerNRegister;
 - (void) writeControl;
 - (void) writeStreamMask;
+- (void) readStreamMask;
 - (void) writeFiberDelays;
 - (void) readFiberDelays;
 - (void) writeCommandResync;
