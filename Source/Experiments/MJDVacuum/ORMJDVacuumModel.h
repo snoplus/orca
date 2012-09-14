@@ -102,6 +102,10 @@
 #define kG3WayHighConstraint					@"G3High"
 #define kG3WayHighReason						@"PKR G3 greater than 1E-5."
 
+#define kNegPumpPressConstraint					@"Press Too high for NEG Pump"
+#define kNegPumpPressReason						@"Opening that valve would expose the NEG to pressures higher than 1E-4."
+
+
 //-----------------------------------
 @interface ORMJDVacuumModel : ORGroup <OROrderedObjHolding,ORAdcProcessor,ORBitProcessor,ORCallBackBitProcessor>
 {

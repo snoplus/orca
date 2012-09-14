@@ -1466,6 +1466,28 @@ NSString* ORMJDVacuumModelConstraintsChanged		= @"ORMJDVacuumModelConstraintsCha
 		[rgaRegionObj removeConstraintName:kRgaCEMConstraint];
 	}
 	
+	for(ORVacuumGateValve* aGateValve in [self gateValves]){
+		if([aGateValve isClosed]){
+			int side1		= [aGateValve connectingRegion1];
+			int side2		= [aGateValve connectingRegion2];
+			BOOL side1High	= [self region:side1 valueHigherThan:1.0E-4];
+			BOOL side2High	= [self region:side2 valueHigherThan:1.0E-4];
+			
+			if([self regionColor:side1 sameAsRegion:side2]){
+				[aGateValve removeConstraintName:kNegPumpPressConstraint];
+			}
+			else if([self regionColor:side1 sameAsRegion:kRegionNegPump] && side2High ){
+				[self addConstraintName:kNegPumpPressConstraint reason:kNegPumpPressReason toGateValve:aGateValve];
+			}
+			else if([self regionColor:side2 sameAsRegion:kRegionNegPump] && side1High){
+				[self addConstraintName:kNegPumpPressConstraint reason:kNegPumpPressReason toGateValve:aGateValve];
+			}
+			else [self removeConstraintName:kNegPumpPressConstraint fromGateValve:aGateValve];
+		}
+		else [self removeConstraintName:kNegPumpPressConstraint fromGateValve:aGateValve];
+	}
+	
+	
 }
 
 - (void) checkDetectorConstraints
