@@ -1383,7 +1383,7 @@ NSLog(@"  arguments: %@ \n" , arguments);
 - (int) receiveFromDataReplyServer
 {
 
-	static int counterStatusPacket=0;
+	//static int counterStatusPacket=0; //MAH commented out 9/17/2012 to get rid of compiler unused variable warning
 	static int counterData1444Packet=0;
 	
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(receiveFromDataReplyServer) object:nil];
