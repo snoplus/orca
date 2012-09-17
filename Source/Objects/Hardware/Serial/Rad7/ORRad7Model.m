@@ -1630,9 +1630,9 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 	}
 	
 	else if(lineNumber == 3){
-		if([aLine hasPrefix:@"LAST READING: "]){
+		if([aLine rangeOfString:@"LAST READING: " options:NSCaseInsensitiveSearch].location != NSNotFound){
 			aLine = [aLine substringFromIndex:14];
-			if([aLine rangeOfString:@"NO TESTS STORED"].location == NSNotFound){
+			if([aLine rangeOfString:@"NO TESTS STORED" options:NSCaseInsensitiveSearch].location == NSNotFound){
 				aLine = [aLine stringByReplacingOccurrencesOfString:@"+- " withString:@"+-"];
 				aLine = [aLine stringByReplacingOccurrencesOfString:@" +-" withString:@"+-"];
 
@@ -1744,7 +1744,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 - (NSNumber*) getNumber:(NSString*)aString separator:(NSString*)aSeparator numberIndex:(int)anIndex
 {
 	NSArray* parts = [aString componentsSeparatedByString:aSeparator];
-	if([parts count] >= anIndex){
+	if([parts count] > anIndex){
 		return [NSNumber numberWithFloat:[[parts objectAtIndex:anIndex] floatValue]];
 	}
 	else return [NSNumber numberWithInt:0];
