@@ -92,6 +92,7 @@
 - (IBAction) cut:(id)sender;
 - (IBAction) selectAll:(id)sender;
 - (IBAction) removeItemAction:(id)sender;
+- (IBAction) saveStatusLog:(id)sender;
 
 - (IBAction) saveLogBook:(id)sender;
 - (IBAction) saveAsLogBook:(id)sender;

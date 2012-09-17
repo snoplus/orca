@@ -37,6 +37,7 @@ ORStatusController* theLogger = nil;
 #if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre-10.6-specific
 - (void) loadLogBookPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 - (void) saveAsLogBookDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+- (void) saveStatusLogDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 #endif
 - (void) deleteHistoryActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 @end
@@ -58,7 +59,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
         if(!dataSet){
             [self setDataSet:[[[ORDataSet alloc]initWithKey:@"Errors" guardian:nil] autorelease] ];
         }
-        
     }
     return self;
 }
@@ -711,7 +711,32 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
     }
 }
 
-
+- (IBAction) saveStatusLog:(id)sender
+{
+    NSSavePanel *savePanel = [NSSavePanel savePanel];
+    [savePanel setPrompt:@"Save Log As"];
+    NSString* startDir = NSHomeDirectory(); //default to home
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [savePanel setDirectoryURL:[NSURL URLWithString:startDir]];
+    [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            NSString* newPath = [[savePanel URL] path ];
+            
+            if(![[newPath pathExtension] isEqualToString:@"rtfd"]){
+                newPath = [[newPath stringByDeletingPathExtension] stringByAppendingPathExtension:@"rtfd"];
+            }
+			[statusView writeRTFDToFile:newPath atomically:YES];
+         }
+    }];
+#else
+    [savePanel beginSheetForDirectory:startDir
+								 file:nil
+					   modalForWindow:[self window]
+						modalDelegate:self
+					   didEndSelector:@selector(saveStatusLogDidEnd:returnCode:contextInfo:)
+						  contextInfo:nil];
+#endif
+}
 #pragma  mark ¥¥¥Delegate Responsiblities
 - (BOOL)outlineView:(NSOutlineView *)outlineView shouldEditTableColumn:(NSTableColumn *)tableColumn item:(id)item
 {
@@ -1027,6 +1052,20 @@ void NSLogError(NSString* aString,...)
 		
     }
 }
+
+- (void) saveStatusLogDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+{
+    if(returnCode){
+        NSString* newPath = [[sheet filenames] objectAtIndex:0];
+		if(![[newPath pathExtension] isEqualToString:@"rtfd"]){
+			newPath = [[newPath stringByDeletingPathExtension] stringByAppendingPathExtension:@"rtfd"];
+		}
+		[statusView writeRTFDToFile:newPath atomically:YES];
+    }
+}
+
+
+
 #endif
 - (void) deleteHistoryActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
