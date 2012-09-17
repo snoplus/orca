@@ -332,7 +332,7 @@ NSString* ORAdcModelHighConnection		= @"ORAdcModelHighConnection";
                 NSString* lowestValueString  =  [NSString stringWithFormat:theFormat,lowestValue];
                 
                 s =  [s stringByAppendingFormat:@" [Lowest %@ at %@]  [Highest %@ at %@] ",
-                      lowestValueString, lowDate, highestValueString, highDate];
+                      lowestValueString, [lowDate descriptionWithCalendarFormat:nil timeZone:nil locale:nil], highestValueString, [highDate descriptionWithCalendarFormat:nil timeZone:nil locale:nil]];
             }
         }
         else s =  [NSString stringWithFormat:@"%@: Data Unavailable ", [self iconLabel]];
