@@ -275,9 +275,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 
 - (void) incChangeCounter
 {
-	@synchronized(self){
-		[self setChangedCount:changedCount+1];
-	}
+	[self setChangedCount:changedCount+1];
 }
 
 - (void) setSweepInProgress:(BOOL)aSweepInProgress
@@ -822,7 +820,8 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 					if(cancelSweep)[anOp cancel];
 					else {
 						[self setProcessCount:processCount+1];
-						[self performSelectorOnMainThread:@selector(renameAdc:) withObject:aResult waitUntilDone:YES];
+						//[self performSelectorOnMainThread:@selector(renameAdc:) withObject:aResult waitUntilDone:YES];
+						[self renameAdc:aResult];
 					}
 				}
 				

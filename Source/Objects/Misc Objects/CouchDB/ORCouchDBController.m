@@ -61,6 +61,10 @@
     else {
         [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
     }
+	
+	[renameButton setEnabled:![model sweepInProgress]];
+	[stopButton setEnabled:[model sweepInProgress]];
+
 }
 
 - (void) setQueCount:(NSNumber*)n
@@ -184,6 +188,8 @@
 - (void) sweepInProgressChanged:(NSNotification*)aNote
 {
 	[sweepInProgressTextField setStringValue: [model sweepInProgress]?@"Running":@"Idle"];
+	[renameButton setEnabled:![model sweepInProgress]];
+	[stopButton setEnabled:[model sweepInProgress]];
 }
 
 - (void) newNameChanged:(NSNotification*)aNote
