@@ -388,7 +388,7 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 		
 		NSMutableDictionary* aValue = [[NSMutableDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithFloat:123.1],@"Value",nil];
 		rdParams[i] = [[NSMutableDictionary alloc] initWithObjectsAndKeys:aValue,@"outputMeasurementSenseVoltage",nil];
-		
+		[aValue release];
 	}
 }
 
