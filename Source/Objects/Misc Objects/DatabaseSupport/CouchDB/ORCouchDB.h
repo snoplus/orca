@@ -51,8 +51,6 @@
 - (void) processEachDoc:(id)aDelegate tag:(NSString*)aTag;
 - (void) renameDoc:(id)aDoc adc:(NSString*)oldName to:(NSString*)newName delegate:(id)aDelegate tag:(NSString*)aTag;
 
-- (void) fixDocument:(NSString*)anId tag:(NSString*)aTag;
-
 #pragma mark ***CouchDB Checks
 - (BOOL) couchDBRunning;
 
@@ -151,12 +149,6 @@
 - (void) main;
 - (id) addAttachement;
 @end
-
-//---------temp---- for a db repair
-@interface ORCouchDBFixDocumentOp :ORCouchDBPutDocumentOp
-- (void) main;
-@end
-//---------------------------------
 
 @interface ORCouchDBUpdateDocumentOp :ORCouchDBPutDocumentOp
 - (void) main;
