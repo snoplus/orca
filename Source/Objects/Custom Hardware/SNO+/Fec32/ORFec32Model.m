@@ -83,6 +83,7 @@ NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageSt
 @end
 
 @interface ORFec32Model (XL3)
+-(BOOL) parseVoltagesUsingXL3:(vmon_results_t*)result;
 -(BOOL) readVoltagesUsingXL3;
 -(void) readCMOSCountsUsingXL3:(unsigned long)aChannelMask;
 -(void) readCMOSRatesUsingXL3:(unsigned long)aChannelMask;
@@ -527,6 +528,13 @@ NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageSt
     }	
 }
 
+-(void) parseVoltages:(vmon_results_t*)result;
+{
+    bool statusChanged = false;
+    
+    if ([guardian adapterIsXL3]) statusChanged = [self parseVoltagesUsingXL3:result];
+    else NSLog(@"failed: FEC parse voltages implemented for XL3 only");
+}
 
 #pragma mark •••Archival
 - (id) initWithCoder:(NSCoder*)decoder
@@ -2050,19 +2058,17 @@ const short kVoltageADCMaximumAttempts = 10;
 
 @implementation ORFec32Model (XL3)
 
--(BOOL) readVoltagesUsingXL3
+-(BOOL) parseVoltagesUsingXL3:(vmon_results_t*) result
 {
     BOOL statusChanged = false;
     short whichADC;
-    vmon_results_t result;
-    [[guardian adapter] readVMONForSlot:[self stationNumber] voltages:&result];
 
     unsigned char sharc_to_xl3[21] = {20,13,12,3,2,4,1,0,19,18,14,15,5,16,6,17,9,10,11,7,8};
     
     for(whichADC=0;whichADC<kNumFecMonitorAdcs;whichADC++){
         eFecMonitorState old_channel_status = [self adcVoltageStatus:whichADC];
         eFecMonitorState new_channel_status;
-        float convertedValue = result.voltages[sharc_to_xl3[whichADC]];
+        float convertedValue = result->voltages[sharc_to_xl3[whichADC]];
         [self setAdcVoltage:whichADC withValue:convertedValue];
         if(fecVoltageAdc[whichADC].check_expected_value){
             float expected = fecVoltageAdc[whichADC].expected_value;
@@ -2080,6 +2086,17 @@ const short kVoltageADCMaximumAttempts = 10;
             statusChanged = true;
         }
     }
+    return statusChanged;
+}
+
+-(BOOL) readVoltagesUsingXL3
+{
+    BOOL statusChanged = false;
+    vmon_results_t result;
+    [[guardian adapter] readVMONForSlot:[self stationNumber] voltages:&result];
+
+    statusChanged = [self parseVoltagesUsingXL3:&result];
+    
     return statusChanged;
 }
 

@@ -1429,6 +1429,11 @@ void SwapLongBlock(void* p, int32_t n)
 		if ([xl3Link needToSwap]) {
 			for (i=0; i<6; i++) aMbId[i] = swapLong(aMbId[i]);
 		}
+        
+        //init takes some time...
+        int currentTimeOut = [[self xl3Link] errorTimeOut];
+        [[self xl3Link] setErrorTimeOut:2];
+        //[[self xl3Link] performSelector:@selector(setErrorTimeOut:) withObject:[NSNumber numberWithInt:currentTimeOut] afterDelay:60];
 		@try {
 			[[self xl3Link] sendCommand:CRATE_INIT_ID withPayload:&payload expectResponse:YES];
             /*
@@ -1447,16 +1452,18 @@ void SwapLongBlock(void* p, int32_t n)
 		@catch (NSException* e) {
 			NSLog(@"%@ init crate failed; error: %@ reason: %@\n",[[self xl3Link] crateName], [e name], [e reason]);
 		}
+        [[self xl3Link] setErrorTimeOut:currentTimeOut];
         
         NSLog(@"%@ init ok!\n",[[self xl3Link] crateName]);
+        
         [self setTriggerStatus:@"ON"];
         unsigned short* aId = (unsigned short*) payload.payload + 2; //hard to say what the first int should be
         for (i=0; i<16*5; i++) {
             aId[i] = swapShort(aId[i]);
         }
-
         
         hware_vals_t* ids;
+        NSMutableString* msg = [NSMutableString stringWithFormat:@"\n"];
         for (id anObj in [[self guardian] orcaObjects]) { 
             if ([anObj class] == NSClassFromString(@"ORFec32Model") && (msk & 1 << [anObj stationNumber])) {
                 ids = (hware_vals_t*) aId;
@@ -1466,10 +1473,11 @@ void SwapLongBlock(void* p, int32_t n)
                 if ([anObj dcPresent:1]) [[anObj dc:1] setBoardID:[NSString stringWithFormat:@"%x", ids->dc_id[1]]];
                 if ([anObj dcPresent:2]) [[anObj dc:2] setBoardID:[NSString stringWithFormat:@"%x", ids->dc_id[2]]];
                 if ([anObj dcPresent:3]) [[anObj dc:3] setBoardID:[NSString stringWithFormat:@"%x", ids->dc_id[3]]];
-                NSLog(@"slot: %2d, FEC: %4x, DB0: %4x, DB1: %4x, DB2: %4x, DB3: %4x\n",
-                      i, ids->mb_id, ids->dc_id[0], ids->dc_id[1], ids->dc_id[2], ids->dc_id[3]);
+                [msg appendFormat:@"slot: %2d, FEC: %4x, DB0: %4x, DB1: %4x, DB2: %4x, DB3: %4x\n",
+                      [anObj stationNumber], ids->mb_id, ids->dc_id[0], ids->dc_id[1], ids->dc_id[2], ids->dc_id[3]];
             }
         }
+        NSLogFont([NSFont userFixedPitchFontOfSize:0], msg);
 	}
 	else {
 		NSLog(@"%@ error loading config, init skipped.\n",[[self xl3Link] crateName]);
@@ -2342,7 +2350,7 @@ void SwapLongBlock(void* p, int32_t n)
 - (void) readPMTBaseCurrentsWithArgs:(read_pmt_base_currents_args_t*)aArgs currents:(read_pmt_base_currents_results_t*)result
 {
 	XL3_PayloadStruct payload;
-	memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
+	memset(payload.payload, 0x0, XL3_MAXPAYLOADSIZE_BYTES);
 	payload.numberBytesinPayload = sizeof(read_pmt_base_currents_results_t);
     
 	read_pmt_base_currents_args_t* data = (read_pmt_base_currents_args_t*) payload.payload;
@@ -2416,6 +2424,7 @@ void SwapLongBlock(void* p, int32_t n)
     if (isPollingXl3 || isPollingForced) {
         msk &= pollPMTCurrentsMask;
     }
+    NSLog(@"polling mask: 0x%08x\n", msk);
     
     args.slot_mask = msk;
     for (i=0; i<16; i++) {
@@ -2443,12 +2452,13 @@ void SwapLongBlock(void* p, int32_t n)
         for (ch=0; ch<32; ch++) {
             [msg appendFormat:@"ch %2d: ", ch];
             for (sl=0; sl<16; sl++) {
-                if ((msk >> sl) & 0x1) [msg appendFormat:@"%3ld ", results.current_adc[sl*32 + ch] ^ (1L<<7)];
-                else [msg appendFormat:@"--- "];
+                if ((msk >> sl) & 0x1) [msg appendFormat:@"%4d ", results.current_adc[sl*32 + ch] - 127];
+                else [msg appendFormat:@" --- "];
             }
             [msg appendFormat:@"\n"];
         }
-        NSLog(msg);
+
+        NSLogFont([NSFont userFixedPitchFontOfSize:10], msg);
     }
     
     //data packet
@@ -2957,6 +2967,13 @@ void SwapLongBlock(void* p, int32_t n)
         NSLog(msg);
     }
     
+    //update FEC
+    for (id anObj in [[self guardian] orcaObjects]) {
+        if ([anObj class] == NSClassFromString(@"ORFec32Model") && [anObj stationNumber] == aSlot) {
+            [anObj parseVoltages:&result];
+        }
+    }
+
     //data packet
     const unsigned char packet_length = 3+21+6;
     if (isPollingXl3 && [[ORGlobal sharedGlobal] runInProgress]) {
@@ -3378,7 +3395,7 @@ void SwapLongBlock(void* p, int32_t n)
         
         //monitoring loop updates
         if (![self hvPanicFlag]) {
-            if (fabs([self hvAVoltageReadValue] / 3000. * 4096 - [self hvAVoltageDACSetValue]) > 50) {
+            if (fabs([self hvAVoltageReadValue] / 3000. * 4096 - [self hvAVoltageDACSetValue]) > 100) {
                 NSLog(@"%@ read value differs from the set one. stopping!\nPress HV ON to continue.", [[self xl3Link] crateName]);
                 usleep(100000);
                 [self setHvANextStepValue:[self hvAVoltageDACSetValue]];

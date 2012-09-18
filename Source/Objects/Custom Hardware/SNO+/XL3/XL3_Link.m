@@ -141,8 +141,8 @@ readFifoFlag = _readFifoFlag;
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
 
-	[self setErrorTimeOut:  [decoder decodeIntForKey:   @"errorTimeOut"]];
-    [self setAutoConnect:   [decoder decodeBoolForKey:  @"autoConnect"]];
+	[self setErrorTimeOut: [decoder decodeIntForKey: @"errorTimeOut"]];
+    [self setAutoConnect: [decoder decodeBoolForKey: @"autoConnect"]];
 	[self setNeedToSwap];
 
 	commandSocketLock = [[NSLock alloc] init];
@@ -161,8 +161,8 @@ readFifoFlag = _readFifoFlag;
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
 	[super encodeWithCoder:encoder];
-	[encoder encodeInt:errorTimeOut		forKey:@"errorTimeOut"];
-    [encoder encodeBool:autoConnect     forKey:@"autoConnect"];
+	[encoder encodeInt:[self errorTimeOut] forKey:@"errorTimeOut"];
+    [encoder encodeBool:autoConnect forKey:@"autoConnect"];
 }
 
 
@@ -233,21 +233,21 @@ readFifoFlag = _readFifoFlag;
 
 - (void) setErrorTimeOut:(int)aValue
 {
-	[[[self undoManager] prepareWithInvocationTarget:self] setErrorTimeOut:errorTimeOut];
-	errorTimeOut = aValue;
+	[[[self undoManager] prepareWithInvocationTarget:self] setErrorTimeOut:[self errorTimeOut]];
+	_errorTimeOut = aValue;
 	[[NSNotificationCenter defaultCenter] postNotificationName:XL3_LinkErrorTimeOutChanged object:self];
 }
 
 - (int) errorTimeOut
 {
-	return errorTimeOut;
+	return _errorTimeOut;
 }
 
 - (int) errorTimeOutSeconds
 {
-	static int translatedTimeOut[4] = {2,10,60,0};
-	if(errorTimeOut<0 || errorTimeOut>3)return 2;
-	else return translatedTimeOut[errorTimeOut];
+	static int translatedTimeOut[4] = {2,5,60,0};
+	if([self errorTimeOut] < 0 || [self errorTimeOut] > 3) return 2;
+	else return translatedTimeOut[[self errorTimeOut]];
 }
 
 - (void) toggleConnect
@@ -365,10 +365,10 @@ readFifoFlag = _readFifoFlag;
 
 - (void) copyFifoStatus:(int32_t*)aStatus
 {
-    NSNumber* nStatus[16];
+    NSNumber* nStatus[17];
     unsigned char i = 0;
-    NSMutableArray* fifo = [[NSMutableArray alloc] initWithCapacity:16];
-    for (i = 0; i < 16; i++) {
+    NSMutableArray* fifo = [[NSMutableArray alloc] initWithCapacity:17];
+    for (i = 0; i < 17; i++) {
         nStatus[i] = [[NSNumber alloc] initWithInt:aStatus[i]];
         [fifo addObject:nStatus[i]];
     }

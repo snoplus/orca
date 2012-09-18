@@ -48,7 +48,7 @@ eXL3_CrateStates;
 	BOOL		isConnected;
     BOOL        autoConnect;
 	int		connectState;
-	int		errorTimeOut;
+	int		_errorTimeOut;
 	NSCalendarDate*	timeConnected;
 	NSMutableArray*	cmdArray;
 	unsigned long long num_cmd_packets;
@@ -74,11 +74,12 @@ eXL3_CrateStates;
     long            bundleFreeSpace;
 }
 
-@property (assign)	BOOL        isConnected;
-@property (assign)	BOOL        autoConnect;
-@property (copy)    NSArray*    fifoStatus;
-@property (copy)    NSDate*     fifoTimeStamp;
-@property (assign) BOOL readFifoFlag;
+@property (assign,nonatomic) BOOL isConnected;
+@property (assign,nonatomic) BOOL autoConnect;
+@property (copy,nonatomic) NSArray* fifoStatus;
+@property (copy,nonatomic) NSDate* fifoTimeStamp;
+@property (assign,nonatomic) BOOL readFifoFlag;
+@property (assign,nonatomic) int errorTimeOut;
 
 - (id)   init;
 - (void) dealloc;
