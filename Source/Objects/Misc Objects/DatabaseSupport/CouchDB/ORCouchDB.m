@@ -298,12 +298,6 @@
 	}
 	if(aBody)[request setHTTPBody:[[aBody yajl_JSONString] dataUsingEncoding:NSASCIIStringEncoding]];
 	NSData *data = [[[NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil] retain] autorelease];
-	//--------------------------
-	//this clears a memory leak
-	NSURLCache *sharedCache = [[NSURLCache alloc] initWithMemoryCapacity:0 diskCapacity:0 diskPath:nil];
-	[NSURLCache setSharedURLCache:sharedCache];
-	[sharedCache release];
-	//--------------------------
 	
 	if (data) {
 		YAJLDocument *document = [[[YAJLDocument alloc] initWithData:data parserOptions:YAJLParserOptionsNone error:nil] autorelease];
