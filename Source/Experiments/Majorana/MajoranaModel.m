@@ -62,7 +62,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups
 {
-    ORSegmentGroup* group = [[ORSegmentGroup alloc] initWithName:@"MAJORANA Detectors" numSegments:kNumTubes mapEntries:[self initMapEntries:0]];
+    ORSegmentGroup* group = [[ORSegmentGroup alloc] initWithName:@"MAJORANA Detectors" numSegments:kNumTubes mapEntries:[self setupMapEntries:0]];
 	[self addGroup:group];
 	[group release];
 }

@@ -40,7 +40,7 @@
 
 - (id) init;
 - (void) registerNotificationObservers;
-- (NSMutableArray*) initMapEntries:(int)index;
+- (NSMutableArray*) setupMapEntries:(int)index;
 
 #pragma mark •••Accessors
 - (BOOL) ignoreHWChecks;

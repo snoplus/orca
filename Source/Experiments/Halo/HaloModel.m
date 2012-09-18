@@ -57,7 +57,7 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
 //	return @"Halo/Index.html";
 //}
 
-/*- (NSMutableArray*) initMapEntries:(int) index
+/*- (NSMutableArray*) setupMapEntries:(int) index
 {
 	//default set -- subsclasses can override
 	NSMutableArray* mapEntries = [NSMutableArray array];
@@ -81,7 +81,7 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups
 {
-    ORSegmentGroup* group = [[ORSegmentGroup alloc] initWithName:@"Halo Tubes" numSegments:kNumTubes mapEntries:[self initMapEntries:0]];
+    ORSegmentGroup* group = [[ORSegmentGroup alloc] initWithName:@"Halo Tubes" numSegments:kNumTubes mapEntries:[self setupMapEntries:0]];
 	[self addGroup:group];
 	[group release];
 }

@@ -39,10 +39,8 @@ typedef enum SCCInit SCCInit;
 @private
 	SimpleCocoaConnection*	c;
 	NSString*				remoteHost;
-	NSString*				remoteHostName;
 	int						remotePort;
 	BOOL					isConnected;
-	BOOL					hasBeenInitialized;
 	int						connectionTimeout;
 	NSStringEncoding		defaultStringEncoding;
 	NSMutableDictionary*	responseDictionary;

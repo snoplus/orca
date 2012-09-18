@@ -189,16 +189,16 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups
 {
-    ORFPDSegmentGroup* group = [[ORFPDSegmentGroup alloc] initWithName:@"Focal Plane" numSegments:kNumFocalPlaneSegments mapEntries:[self initMapEntries:0]];
+    ORFPDSegmentGroup* group = [[ORFPDSegmentGroup alloc] initWithName:@"Focal Plane" numSegments:kNumFocalPlaneSegments mapEntries:[self setupMapEntries:0]];
 	[self addGroup:group];
 	[group release];
 	
-    ORSegmentGroup* group2 = [[ORSegmentGroup alloc] initWithName:@"Veto" numSegments:kNumVetoSegments mapEntries:[self initMapEntries:1]];
+    ORSegmentGroup* group2 = [[ORSegmentGroup alloc] initWithName:@"Veto" numSegments:kNumVetoSegments mapEntries:[self setupMapEntries:1]];
 	[self addGroup:group2];
 	[group2 release];
 }
 
-- (NSMutableArray*) initMapEntries:(int)index
+- (NSMutableArray*) setupMapEntries:(int)index
 {
 	if(index==1){
 		NSMutableArray* mapEntries = [NSMutableArray array];
@@ -360,7 +360,7 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
     if([segmentGroups count]>1){
 		NSObject* firstSegmentGroup = [segmentGroups objectAtIndex:0];
 		if(![firstSegmentGroup isKindOfClass:NSClassFromString(@"ORFPDSegmentGroup")]){
-			ORFPDSegmentGroup* group = [[ORFPDSegmentGroup alloc] initWithName:@"Focal Plane" numSegments:kNumFocalPlaneSegments mapEntries:[self initMapEntries:0]];
+			ORFPDSegmentGroup* group = [[ORFPDSegmentGroup alloc] initWithName:@"Focal Plane" numSegments:kNumFocalPlaneSegments mapEntries:[self setupMapEntries:0]];
 			[segmentGroups replaceObjectAtIndex:0 withObject:group];
 			[group release];
 		}

@@ -57,7 +57,7 @@ static NSString* MonSpecDbConnector		= @"MonSpecDbConnector";
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups
 {
-	NSMutableArray* mapEntries = [self initMapEntries:0];//default set	
+	NSMutableArray* mapEntries = [self setupMapEntries:0];//default set	
     ORSegmentGroup* group = [[ORSegmentGroup alloc] initWithName:@"Monspectrometer" numSegments:5 mapEntries:mapEntries];
 	[self addGroup:group];
 	[group release];

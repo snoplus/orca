@@ -168,7 +168,7 @@
 }
 
 #pragma mark ***Helpers
-- (id) newRoiAtPoint:(NSPoint)aPoint;
+- (id) roiAtPoint:(NSPoint)aPoint;
 {
 	NSPoint p = [plotView convertPoint:aPoint fromView:nil];
 	ORAxis* mXScale = [plotView xScale];

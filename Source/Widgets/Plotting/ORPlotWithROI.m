@@ -168,7 +168,7 @@
 	else  [super keyDown:theEvent];
 }
 
-- (id) newRoiAtPoint:(NSPoint)aPoint
+- (id) roiAtPoint:(NSPoint)aPoint
 {
 	NSPoint plotPoint = [self convertFromWindowToPlot:aPoint];
 	long mouseChannel  = plotPoint.x;
@@ -188,7 +188,7 @@
 	}
 	
 	if(([theEvent modifierFlags] & NSShiftKeyMask) && !([theEvent modifierFlags] & NSCommandKeyMask)){
-		id anRoi = [self newRoiAtPoint:[theEvent locationInWindow]];
+		id anRoi = [self roiAtPoint:[theEvent locationInWindow]];
 		if(anRoi){
 			[self addRoi:anRoi];
 			[plotView orderChanged];

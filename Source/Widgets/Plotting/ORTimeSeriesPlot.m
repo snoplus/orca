@@ -37,7 +37,7 @@
 	dataSource = ds;
 }
 
-- (id) newRoiAtPoint:(NSPoint)aPoint
+- (id) roiAtPoint:(NSPoint)aPoint
 {
 	NSPoint plotPoint = [self convertFromWindowToPlot:aPoint];
 	long mouseChannel  = plotPoint.x;

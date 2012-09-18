@@ -31,7 +31,7 @@
 	int		  viewType;
 }
 
-//- (NSMutableArray*) initMapEntries:(int)index;
+//- (NSMutableArray*) setupMapEntries:(int)index;
 
 #pragma mark ¥¥¥Accessors
 - (void) setViewType:(int)aViewType;

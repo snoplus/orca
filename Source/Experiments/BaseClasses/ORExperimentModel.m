@@ -110,7 +110,7 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
 
 #pragma mark •••Group Methods
 
-- (NSMutableArray*) initMapEntries:(int) index
+- (NSMutableArray*) setupMapEntries:(int) index
 {
 	//default set -- subsclasses can override
 	NSMutableArray* mapEntries = [NSMutableArray array];
@@ -497,15 +497,15 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
     [self setDisplayType:	[decoder decodeIntForKey:   @"ExperimentModelDisplayType"]];	
     [self setCaptureDate:	[decoder decodeObjectForKey:@"ExperimentCaptureDate"]];
 	segmentGroups = [[decoder decodeObjectForKey:	 @"ExperimentSegmentGroups"] retain];
-	if([segmentGroups count] == 1)[[segmentGroups objectAtIndex:0] setMapEntries:[self initMapEntries:0]];
+	if([segmentGroups count] == 1)[[segmentGroups objectAtIndex:0] setMapEntries:[self setupMapEntries:0]];
 	else if([segmentGroups count] == 2){
-		[[segmentGroups objectAtIndex:0] setMapEntries:[self initMapEntries:0]];
-		[[segmentGroups objectAtIndex:1] setMapEntries:[self initMapEntries:1]];
+		[[segmentGroups objectAtIndex:0] setMapEntries:[self setupMapEntries:0]];
+		[[segmentGroups objectAtIndex:1] setMapEntries:[self setupMapEntries:1]];
 	}
 	else if([segmentGroups count] == 3){
-		[[segmentGroups objectAtIndex:0] setMapEntries:[self initMapEntries:0]];
-		[[segmentGroups objectAtIndex:1] setMapEntries:[self initMapEntries:1]];
-		[[segmentGroups objectAtIndex:2] setMapEntries:[self initMapEntries:2]];
+		[[segmentGroups objectAtIndex:0] setMapEntries:[self setupMapEntries:0]];
+		[[segmentGroups objectAtIndex:1] setMapEntries:[self setupMapEntries:1]];
+		[[segmentGroups objectAtIndex:2] setMapEntries:[self setupMapEntries:2]];
 	}
     [[self undoManager] enableUndoRegistration];
     

@@ -44,7 +44,7 @@
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups
 {
-	NSMutableArray* mapEntries = [self initMapEntries:0];//default set	
+	NSMutableArray* mapEntries = [self setupMapEntries:0];//default set	
     ORSegmentGroup* group = [[ORSegmentGroup alloc] initWithName:@"Prespectrometer" numSegments:64 mapEntries:mapEntries];
 	[self addGroup:group];
 	[group release];

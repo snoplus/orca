@@ -57,7 +57,7 @@
 - (void) resetCursorRects;
 
 #pragma mark ***Roi Management
-- (id) newRoiAtPoint:(NSPoint)aPoint;
+- (id) roiAtPoint:(NSPoint)aPoint;
 
 - (void) shiftRoiRight;
 - (void) shiftRoiLeft;

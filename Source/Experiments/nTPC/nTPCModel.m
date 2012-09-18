@@ -60,7 +60,7 @@ NSString* nTPCModelPlaneMaskChanged = @"nTPCModelPlaneMaskChanged";
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups
 {
-	NSMutableArray* mapEntries = [self initMapEntries:0]; //the default set is good for both
+	NSMutableArray* mapEntries = [self setupMapEntries:0]; //the default set is good for both
 	
     ORSegmentGroup* group = [[ORSegmentGroup alloc] initWithName:@"Pad Plane 0" numSegments:kNumPadPlaneWires mapEntries:mapEntries];
 	[self addGroup:group];

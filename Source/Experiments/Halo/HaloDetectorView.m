@@ -156,7 +156,7 @@
 	}
 }
 
-- (NSMutableArray*) initMapEntries:(int) index
+- (NSMutableArray*) setupMapEntries:(int) index
 {
 	//default set -- subsclasses can override
 	NSMutableArray* mapEntries = [NSMutableArray array];
