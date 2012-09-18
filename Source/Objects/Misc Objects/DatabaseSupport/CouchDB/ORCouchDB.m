@@ -297,7 +297,7 @@
 		}
 	}
 	if(aBody)[request setHTTPBody:[[aBody yajl_JSONString] dataUsingEncoding:NSASCIIStringEncoding]];
-	NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
+	NSData *data = [[[NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil] retain] autorelease];
 	
 	if (data) {
 		YAJLDocument *document = [[[YAJLDocument alloc] initWithData:data parserOptions:YAJLParserOptionsNone error:nil] autorelease];
@@ -336,7 +336,7 @@
 	NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:httpString]];
 	[request setAllHTTPHeaderFields:[NSDictionary dictionaryWithObject:@"application/json" forKey:@"Content-Type"]];
 	[request setHTTPMethod:@"POST"];
-	NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
+	NSData *data = [[[NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil] retain] autorelease];	
 	YAJLDocument *document = nil;
 	if (data) {
 		document = [[[YAJLDocument alloc] initWithData:data parserOptions:YAJLParserOptionsNone error:nil] autorelease];
@@ -556,7 +556,7 @@
 	NSString* s = [aBody yajl_JSONString];
 	NSData* asData = [s dataUsingEncoding:NSASCIIStringEncoding];
 	[request setHTTPBody:asData];
-	NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
+	NSData *data = [[[NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil] retain] autorelease];
 	
 	id result = nil;
 	if (data) {
@@ -649,7 +649,8 @@
 		[request setHTTPMethod:@"PUT"];
 		[request setHTTPBody:attachmentData];
 		
-		NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
+		NSData *data = [[[NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil] retain] autorelease];
+		
 		
 		if (data) {
 			YAJLDocument *result = [[[YAJLDocument alloc] initWithData:data parserOptions:YAJLParserOptionsNone error:nil] autorelease];
