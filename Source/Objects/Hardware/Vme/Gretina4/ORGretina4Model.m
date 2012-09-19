@@ -1319,8 +1319,13 @@ static struct {
         modelStateEnabled[i] = [self enabled:i];
         [self writeControlReg:i enabled:NO];
     }
-    
+    NSDate* timeStarted = [NSDate date];
     while(1){
+		if([[NSDate date] timeIntervalSinceDate:timeStarted]>10){
+			NSLogColor([NSColor redColor], @"%@ unable to clear FIFO -- could be a serious hw problem.\n",[self fullID]);
+			[NSException raise:@"Gretina Card Could not clear FIFO" format:@"%@ unable to clear FIFO -- could be a serious hw problem.",[self fullID]];
+		}
+		
 		unsigned long val = 0;
 		//read the fifo state
 		[theController readLongBlock:&val
@@ -1399,7 +1404,13 @@ static struct {
      * leaving the FIFO aligned along an event.  The function returns the number of events lost. */
     unsigned long val;
     //read the fifo state, sanity check to make sure there is actually another event.
-    while (1) {
+    NSDate* timeStarted = [NSDate date];
+    while(1){
+		if([[NSDate date] timeIntervalSinceDate:timeStarted]>10){
+			NSLogColor([NSColor redColor], @"%@ unable to find next event in FIFO -- could be a serious hw problem.\n",[self fullID]);
+			[NSException raise:@"Gretina Card Could not find next event in FIFO" format:@"%@ unable to find next event in FIFO -- could be a serious hw problem.",[self fullID]];
+		}
+		
         [theController readLongBlock:&val
                            atAddress:fifoStateAddress
                            numToRead:1
