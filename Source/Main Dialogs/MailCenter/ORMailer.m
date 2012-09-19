@@ -72,51 +72,62 @@
 										  subject, @"subject",
 										  [body string], @"content",
 										  nil]];
+
 	@try {
 		/* add the object to the mail app  */
 		[[mail outgoingMessages] addObject: emailMessage];
 		
-		/* set the sender, don't show the message */
-		emailMessage.sender = @"ORCA";
-		emailMessage.visible = YES;
-		
-		if ( [mail lastError] != nil ){
-			@throw([NSException exceptionWithName:@"ORMailer had problems sending message" reason:@"" userInfo:nil]);
-		}
-		NSArray* people = [to componentsSeparatedByString:@","];
-		int count = 0;
-		for(id aPerson in people){
-			if([aPerson rangeOfString:@"@"].location != NSNotFound){
-				NSDictionary* properties = [NSDictionary dictionaryWithObjectsAndKeys: aPerson, @"address",nil];
-				MailToRecipient *theRecipient = [[[mail classForScriptingClass:@"to recipient"] alloc] initWithProperties:properties];
-				[emailMessage.toRecipients addObject: theRecipient];
-				[theRecipient release];
-				count++;
-			}
+		int delayCount = 0;
+		while (![mail isRunning]) {
+			[ORTimer delay:1];
+			delayCount++;
+			if(delayCount>5)break;
 		}
 		
-		people = [cc componentsSeparatedByString:@","];
-		for(id aPerson in people){
-			if([aPerson rangeOfString:@"@"].location != NSNotFound){
-				NSDictionary* properties = [NSDictionary dictionaryWithObjectsAndKeys: aPerson, @"address",nil];
-				MailToRecipient *theRecipient = [[[mail classForScriptingClass:@"cc recipient"] alloc] initWithProperties:properties];
-				[emailMessage.ccRecipients addObject: theRecipient];
-				[theRecipient release];
-			}
-		}
-		
-		if ( [mail lastError] == nil && count>0){
-			[emailMessage send];
-			if([mail lastError] != nil)	{
+		if([mail isRunning]){
+			/* set the sender, don't show the message */
+			emailMessage.sender = @"ORCA";
+			emailMessage.visible = YES;
+			
+			if ( [mail lastError] != nil ){
 				@throw([NSException exceptionWithName:@"ORMailer had problems sending message" reason:@"" userInfo:nil]);
 			}
-			else {
-				if([delegate respondsToSelector:@selector(mailSent:)]){
-					[delegate mailSent:to];
+			NSArray* people = [to componentsSeparatedByString:@","];
+			int count = 0;
+			for(id aPerson in people){
+				if([aPerson rangeOfString:@"@"].location != NSNotFound){
+					NSDictionary* properties = [NSDictionary dictionaryWithObjectsAndKeys: aPerson, @"address",nil];
+					MailToRecipient *theRecipient = [[[mail classForScriptingClass:@"to recipient"] alloc] initWithProperties:properties];
+					[emailMessage.toRecipients addObject: theRecipient];
+					[theRecipient release];
+					count++;
 				}
-				else NSLog(@"email sent to: %@\n",to);
+			}
+			
+			people = [cc componentsSeparatedByString:@","];
+			for(id aPerson in people){
+				if([aPerson rangeOfString:@"@"].location != NSNotFound){
+					NSDictionary* properties = [NSDictionary dictionaryWithObjectsAndKeys: aPerson, @"address",nil];
+					MailToRecipient *theRecipient = [[[mail classForScriptingClass:@"cc recipient"] alloc] initWithProperties:properties];
+					[emailMessage.ccRecipients addObject: theRecipient];
+					[theRecipient release];
+				}
+			}
+			
+			if ( [mail lastError] == nil && count>0){
+				[emailMessage send];
+				if([mail lastError] != nil)	{
+					@throw([NSException exceptionWithName:@"ORMailer had problems sending message" reason:@"" userInfo:nil]);
+				}
+				else {
+					if([delegate respondsToSelector:@selector(mailSent:)]){
+						[delegate mailSent:to];
+					}
+					else NSLog(@"email sent to: %@\n",to);
+				}
 			}
 		}
+		else NSLogColor([NSColor redColor],@"Mail app did not start. ORCA unable to send email.\n");
 	}
 	@catch(NSException* e){
 		NSLog( @"Possible problems with sending e-mail to %@\n",to);
@@ -124,6 +135,7 @@
 	@finally {
 		[emailMessage release];
 	}
+	
 }
 
 @end
