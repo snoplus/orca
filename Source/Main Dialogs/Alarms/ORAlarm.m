@@ -73,7 +73,12 @@ NSString* severityName[kNumAlarmSeverityTypes] = {
 
 - (NSString*) timePosted
 {
-	return [timePosted descriptionWithCalendarFormat:@"%a %m/%d/%y %I:%M  %p"];
+	return [timePosted descriptionWithCalendarFormat:@"%a %m/%d/%y %I:%M  %p" timeZone:nil locale:nil];
+}
+
+- (NSString*) timePostedUTC
+{
+	return [timePosted descriptionWithCalendarFormat:@"%a %m/%d/%y %I:%M  %p" timeZone:[NSTimeZone timeZoneWithAbbreviation:@"UTC"] locale:nil];
 }
 
 - (void) setTimePosted:(NSCalendarDate*)aDate
@@ -167,7 +172,7 @@ NSString* severityName[kNumAlarmSeverityTypes] = {
 }
 - (NSString*) genericHelpString
 {
-	return [NSString stringWithFormat:@"Name:%@  Severity:%@ Posted:%@\n",[self name],[self severityName],[self timePosted]];
+	return [NSString stringWithFormat:@"Name:%@  Severity:%@ Posted:%@    [%@ (UTC)]\n",[self name],[self severityName],[self timePosted],[self timePostedUTC]];
 }
 
 

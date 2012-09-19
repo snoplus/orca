@@ -61,6 +61,7 @@ typedef enum {
 - (void) setAdditionalInfoString:(NSString*)aName;
 
 - (NSString*) timePosted;
+- (NSString*) timePostedUTC;
 - (void) setTimePosted:(NSCalendarDate*)aDate;
 - (NSTimeInterval) timeSincePosted;
 - (NSString*) name;
