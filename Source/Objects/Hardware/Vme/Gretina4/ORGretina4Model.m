@@ -1344,6 +1344,10 @@ static struct {
 								   numToRead:1 
 								  withAddMod:[self addressModifier] 
 							   usingAddSpace:0x01];
+                                if(theValue == kGretina4PacketSeparator) {
+				    NSLog(@"Clearing FIFO: got two packet separators in a row. Is the FIFO corrupted? (slot %d). \n",[self slot]);
+				    break;
+                                }
 				
 				[theController readLongBlock:dataDump 
 								   atAddress:fifoAddress 
@@ -2315,7 +2319,7 @@ static struct {
 
 -(void) resetFlashStatus
 {
-	unsigned long tempToWrite = kGretina4FlashClearrSRCmd;
+	unsigned long tempToWrite = kGretina4FlashClearSRCmd;
 	[[self adapter] writeLongBlock:&tempToWrite
 						 atAddress:[self baseAddress] + fpga_register_information[kFlashCommandRegister].offset
 						numToWrite:1

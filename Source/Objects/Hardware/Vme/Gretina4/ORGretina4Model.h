@@ -47,6 +47,7 @@
 #define kGretina4FlashBlocks		128
 #define kGretina4UsedFlashBlocks	( kGretina4FlashBlocks / 4 )
 #define kGretina4FlashBufferBytes	32
+#define kGretina4TotalFlashBytes	( kGretina4UsedFlashBlocks * kGretina4FlashBlockSize)
 #define kGretina4FlashReady			0x80
 #define kGretina4FlashEnableWrite	0x10
 #define kGretina4FlashDisableWrite	0x0
@@ -55,7 +56,7 @@
 #define kGretina4FlashBlockEraseCmd	0x20
 #define kGretina4FlashReadArrayCmd	0xFF
 #define kGretina4FlashStatusRegCmd	0x70
-#define kGretina4FlashClearrSRCmd	0x50
+#define kGretina4FlashClearSRCmd	0x50
 
 #define kGretina4ResetMainFPGACmd	0x30
 #define kGretina4ReloadMainFPGACmd	0x3
