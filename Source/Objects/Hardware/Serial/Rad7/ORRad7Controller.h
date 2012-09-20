@@ -21,12 +21,15 @@
 #import "ObjWithHistoryController.h"
 
 @class ORTimeRoiController;
+@class ORSerialPortController;
 
 @interface ORRad7Controller : ObjWithHistoryController
 {	
+	IBOutlet NSTabView*		tabView;	
+	IBOutlet NSView*		totalView;
 	IBOutlet NSTextField*	alarmLimitTextField;
-	IBOutlet   NSTextField* humidityMaxLimitTextField;
-	IBOutlet   NSTextField* pumpCurrentMaxLimitTextField;
+	IBOutlet NSTextField*	humidityMaxLimitTextField;
+	IBOutlet NSTextField*	pumpCurrentMaxLimitTextField;
 	IBOutlet NSTextField*	pumpCurrentAlarmTextField;
 	IBOutlet NSTextField*	humidityAlarmTextField;
 	IBOutlet NSTextField*	maxRadonTextField;
@@ -34,7 +37,6 @@
 	IBOutlet NSButton*		verboseCB;
 	IBOutlet NSButton*		deleteDataOnStartCB;
 	IBOutlet NSTextField*	runToPrintTextField;
-	IBOutlet NSTextField*	runStateTextField;
 	IBOutlet NSTextField*   operationStateField;
 	IBOutlet NSPopUpButton* rUnitsPU;
 	IBOutlet NSPopUpButton* tUnitsPU;
@@ -47,12 +49,8 @@
 	IBOutlet NSTextField*   recycleTextField;
 	IBOutlet NSTextField*   cycleTimeTextField;
     IBOutlet NSButton*      lockButton;
-    IBOutlet NSTextField*   portStateField;
-    IBOutlet NSPopUpButton* portListPopup;
     IBOutlet NSPopUpButton* pollTimePopup;
-    IBOutlet NSButton*      openPortButton;
     IBOutlet NSButton*      updateSettingsButton;
-    IBOutlet NSTextField*   timeField;
 	
 	IBOutlet NSButton*		startTestButton;
 	IBOutlet NSButton*		stopTestButton;
@@ -76,8 +74,7 @@
 	IBOutlet NSTextField*   lastRadonField;
 	IBOutlet NSTextField*   lastRadonUnitsField;
 	IBOutlet NSTextField*	processUnitsField;
-	IBOutlet NSTextField*   lastRadonUncertaintyFieldField;
-	IBOutlet NSTextField*   uncertaintyField;
+	IBOutlet NSTextField*   lastRadonUncertaintyField;
 	IBOutlet NSTextField*   temperatureField;
 	IBOutlet NSTextField*   temperatureUnitsField;
 	IBOutlet NSTextField*   rhField;
@@ -86,12 +83,34 @@
 	IBOutlet NSTextField*   hvField;
 	IBOutlet NSTextField*   signalField;
 	
+	IBOutlet NSTextField*   countDown2Field;
+	IBOutlet NSTextField*   state2Field;
+	IBOutlet NSTextField*   lastRadon2Field;
+	IBOutlet NSTextField*   lastRadonUncertainty2Field;
+	IBOutlet NSTextField*   lastRadonUnits2Field;
+	IBOutlet NSTextField*   temperature2Field;
+	IBOutlet NSTextField*   temperatureUnits2Field;
+	IBOutlet NSTextField*   rh2Field;
+	IBOutlet NSTextField*   battery2Field;
+	IBOutlet NSTextField*   pumpCurrent2Field;
+	IBOutlet NSTextField*   hv2Field;
+	IBOutlet NSTextField*   signal2Field;
+	
 	IBOutlet NSTabView*		protocolTabView;
 	IBOutlet NSTextField*   userModeField;
 	IBOutlet NSTextField*   userPumpModeField;
 	IBOutlet NSTextField*   userThoronField;
 	IBOutlet NSTextField*   useCycleField;
 	IBOutlet NSTextField*   userRecycleField;
+
+    IBOutlet ORSerialPortController* serialPortController;
+	
+	NSSize					basicOpsSize;
+	NSSize					processOpsSize;
+	NSSize					summaryOpsSize;
+	NSSize					historyOpsSize;
+	NSView*					blankView;
+	
 }
 
 #pragma mark ***Initialization
@@ -128,10 +147,10 @@
 - (void) cycleTimeChanged:(NSNotification*)aNote;
 - (void) protocolChanged:(NSNotification*)aNote;
 - (void) lockChanged:(NSNotification*)aNote;
-- (void) portNameChanged:(NSNotification*)aNote;
-- (void) portStateChanged:(NSNotification*)aNote;
 - (void) pollTimeChanged:(NSNotification*)aNote;
 - (void) statusChanged:(NSNotification*)aNote;
+- (BOOL) portLocked;
+- (void) tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;
 
 - (void) miscAttributesChanged:(NSNotification*)aNotification;
 - (void) scaleAction:(NSNotification*)aNotification;
@@ -159,8 +178,6 @@
 - (IBAction) cycleTimeTextFieldAction:(id)sender;
 - (IBAction) protocolAction:(id)sender;
 - (IBAction) lockAction:(id) sender;
-- (IBAction) portListAction:(id) sender;
-- (IBAction) openPortAction:(id)sender;
 - (IBAction) updateSettingsAction:(id)sender;
 - (IBAction) pollTimeAction:(id)sender;
 - (IBAction) initAction:(id)sender;

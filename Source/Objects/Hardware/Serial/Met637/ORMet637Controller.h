@@ -23,6 +23,8 @@
 
 @interface ORMet637Controller : OrcaObjectController
 {
+	IBOutlet NSTabView*		tabView;	
+	IBOutlet NSView*		totalView;
     IBOutlet NSTextField*	lockDocField;
 	IBOutlet NSTextField*	dumpCountField;
 	IBOutlet NSTextField*	dumpInProgressField;
@@ -60,8 +62,27 @@
 	IBOutlet ORCompositeTimeLineView*   plotter0;
 	IBOutlet NSMatrix* countAlarmLimitMatrix;
 	IBOutlet NSMatrix* maxCountsMatrix;
+
+	IBOutlet NSMatrix*		count2Matrix;
+	IBOutlet NSTextField*	measurementDate2Field;
+	IBOutlet NSTextField*	tempUnits2Field;
+	IBOutlet NSTextField*	cycleWillEnd2Field;
+	IBOutlet NSTextField*	running2Field;
+	IBOutlet NSTextField*	units2Field;
+	IBOutlet NSTextField*	batteryStatus2Field;
+	IBOutlet NSTextField*	sensorStatus2Field;
+	IBOutlet NSTextField*	flowStatus2Field;
+	IBOutlet NSTextField*   actualDuration2Field;
+	
 	
     IBOutlet ORSerialPortController* serialPortController;
+
+	NSSize					basicOpsSize;
+	NSSize					processOpsSize;
+	NSSize					summaryOpsSize;
+	NSSize					historyOpsSize;
+	NSView*					blankView;
+	
 }
 
 #pragma mark ***Initialization
@@ -100,6 +121,8 @@
 - (void) updateTimePlot:(NSNotification*)aNote;
 - (void) scaleAction:(NSNotification*)aNote;
 - (void) miscAttributesChanged:(NSNotification*)aNote;
+- (void) tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;
+- (void) windowDidResize:(NSNotification *)aNote;
 
 #pragma mark ***Actions
 - (IBAction) isLogAction:(id)sender;

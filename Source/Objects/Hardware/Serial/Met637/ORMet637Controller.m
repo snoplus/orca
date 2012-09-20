@@ -110,6 +110,26 @@
 		[[maxCountsMatrix cellAtRow:i column:0] setTag:i];
 	}
 	
+	blankView = [[NSView alloc] init];
+    basicOpsSize	= NSMakeSize(422,528);
+    processOpsSize	= NSMakeSize(385,370);
+    historyOpsSize	= NSMakeSize(422,480);
+    summaryOpsSize	= NSMakeSize(400,270);
+	
+	NSString* key = [NSString stringWithFormat: @"orca.ORRad7%lu.selectedtab",[model uniqueIdNumber]];
+    int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
+	if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
+	[tabView selectTabViewItemAtIndex: index];
+	
+	NSUInteger style = [[self window] styleMask];
+	if(index == 2){
+		[[self window] setStyleMask: style | NSResizableWindowMask];
+	}
+	else {
+		[[self window] setStyleMask: style & ~NSResizableWindowMask];
+	}
+	
+	
 	[super awakeFromNib];
 }
 
@@ -323,11 +343,13 @@
 - (void) actualDurationChanged:(NSNotification*)aNote
 {
 	[actualDurationField setIntValue: [model actualDuration]];
+	[actualDuration2Field setIntValue: [model actualDuration]];
 }
 
 - (void) tempUnitsChanged:(NSNotification*)aNote
 {
 	[tempUnitsField setStringValue: [model tempUnits]==0?@"C":@"F"];
+	[tempUnits2Field setStringValue: [model tempUnits]==0?@"C":@"F"];
 	[tempUnitsPU selectItemAtIndex: [model tempUnits]];
 }
 
@@ -348,6 +370,9 @@
 	[batteryStatusField setStringValue: (bits & 0x10) ? @"BAD":@"OK"];
 	[sensorStatusField  setStringValue:	(bits & 0x20) ? @"BAD":@"OK"];
 	[flowStatusField    setStringValue:	(bits & 0x40) ? @"BAD":@"OK"];
+	[batteryStatus2Field setStringValue: (bits & 0x10) ? @"BAD":@"OK"];
+	[sensorStatus2Field  setStringValue:	(bits & 0x20) ? @"BAD":@"OK"];
+	[flowStatus2Field    setStringValue:	(bits & 0x40) ? @"BAD":@"OK"];
 }
 
 - (void) humidityChanged:(NSNotification*)aNote
@@ -449,11 +474,14 @@
 	NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] initWithDateFormat:@"%H:%M:%S" allowNaturalLanguage:NO];
 	NSString* endDateString   = [dateFormatter stringFromDate:[model cycleWillEnd]];
 	[dateFormatter release];
+	NSString* s;
 	if(endDateString && [model running]) {
-		if([model countingMode] == kMet637Manual)[cycleWillEndField setStringValue:@"--"];
-		else [cycleWillEndField setStringValue:endDateString];
+		if([model countingMode] == kMet637Manual)s = @"--";
+		else s = endDateString;
 	}
-	else [cycleWillEndField setStringValue:@"---"];
+	else s = @"---";
+	[cycleWillEndField setStringValue:s];
+	[cycleWillEnd2Field setStringValue:s];
 }
 
 - (void) cycleNumberChanged:(NSNotification*)aNote
@@ -465,6 +493,7 @@
 {
 	[self updateButtons];
 	[runningField setStringValue:[model running]?@"Counting":@"Idle"];
+	[running2Field setStringValue:[model running]?@"Counting":@"Idle"];
 	[self cycleStartedChanged:nil];
 	[self cycleWillEndChanged:nil];
 }
@@ -485,12 +514,14 @@
 	int i;
 	for(i=0;i<6;i++){
 		[[countMatrix cellAtRow:i column:0] setIntValue:[model count:i]];
+		[[count2Matrix cellAtRow:i column:0] setIntValue:[model count:i]];
 	}
 }
 
 - (void) measurementDateChanged:(NSNotification*)aNote
 {
 	[measurementDateField setStringValue: [model measurementDate]];
+	[measurementDate2Field setStringValue: [model measurementDate]];
 }
 
 - (void) checkGlobalSecurity
@@ -530,6 +561,42 @@
 	[dumpAllButton setEnabled:![model running]];
 	[dumpRecentButton setEnabled:![model running]];
 	
+}
+
+- (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
+{
+    [[self window] setContentView:blankView];
+	NSUInteger style = [[self window] styleMask];
+	switch([tabView indexOfTabViewItem:tabViewItem]){
+		case  0: 
+			[self resizeWindowToSize:basicOpsSize];   
+			[[self window] setStyleMask: style & ~NSResizableWindowMask];
+			break;
+		case  1: 
+			[self resizeWindowToSize:processOpsSize];     
+			[[self window] setStyleMask: style & ~NSResizableWindowMask];
+			break;
+		case  2: 
+			[self resizeWindowToSize:historyOpsSize];	
+			[[self window] setStyleMask: style | NSResizableWindowMask];
+			break;
+		default: 
+			[self resizeWindowToSize:summaryOpsSize];     
+			[[self window] setStyleMask: style & ~NSResizableWindowMask];
+			break;
+	}
+    [[self window] setContentView:totalView];
+	
+    NSString* key = [NSString stringWithFormat: @"orca.ORMet637%lu.selectedtab",[model uniqueIdNumber]];
+    int index = [tabView indexOfTabViewItem:tabViewItem];
+    [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
+}
+
+- (void)windowDidResize:(NSNotification *)notification
+{
+	if([tabView indexOfTabViewItem:[tabView selectedTabViewItem]] == 2){
+		historyOpsSize = [[self window] frame].size; 
+	}
 }
 
 #pragma mark ***Actions

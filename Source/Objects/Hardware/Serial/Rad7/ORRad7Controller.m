@@ -23,11 +23,9 @@
 #import "ORRad7Model.h"
 #import "ORTimeLinePlot.h"
 #import "ORTimeAxis.h"
-#import "ORSerialPortList.h"
-#import "ORSerialPort.h"
+#import "ORSerialPortController.h"
 
 @interface ORRad7Controller (private)
-- (void) populatePortListPopup;
 - (void) saveUserSettingPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info;
 - (void) loadDialogFromHWPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info;
 - (void) eraseAllDataPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info;
@@ -51,7 +49,6 @@
 
 - (void) awakeFromNib
 {
-    [self populatePortListPopup];
     [[plotter0 yAxis] setRngLow:0.0 withHigh:300.];
 	[[plotter0 yAxis] setRngLimitsLow:-300.0 withHigh:500 withMinRng:4];
 
@@ -82,6 +79,25 @@
 	
 	[(ORTimeAxis*)[plotter0 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 	
+	blankView = [[NSView alloc] init];
+    basicOpsSize	= NSMakeSize(440,685);
+    processOpsSize	= NSMakeSize(410,205);
+    historyOpsSize	= NSMakeSize(435,280);
+    summaryOpsSize	= NSMakeSize(400,230);
+	NSString* key = [NSString stringWithFormat: @"orca.ORRad7%lu.selectedtab",[model uniqueIdNumber]];
+    int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
+	if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
+	[tabView selectTabViewItemAtIndex: index];
+	
+	NSUInteger style = [[self window] styleMask];
+	if(index == 2){
+		[[self window] setStyleMask: style | NSResizableWindowMask];
+	}
+	else {
+		[[self window] setStyleMask: style & ~NSResizableWindowMask];
+	}
+	
+	
 	[super awakeFromNib];
 }
 
@@ -101,27 +117,16 @@
                      selector : @selector(lockChanged:)
                          name : ORRunStatusChangedNotification
                        object : nil];
-    
+	
     [notifyCenter addObserver : self
                      selector : @selector(lockChanged:)
                          name : ORRad7Lock
                         object: nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(portNameChanged:)
-                         name : ORRad7ModelPortNameChanged
-                        object: nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(portStateChanged:)
-                         name : ORSerialPortStateChanged
-                       object : nil];
                                               
     [notifyCenter addObserver : self
                      selector : @selector(pollTimeChanged:)
                          name : ORRad7ModelPollTimeChanged
                        object : nil];
-
 
     [notifyCenter addObserver : self
 					 selector : @selector(scaleAction:)
@@ -198,6 +203,7 @@
                      selector : @selector(runStateChanged:)
                          name : ORRad7ModelRunStateChanged
 						object: model];
+	
     [notifyCenter addObserver : self
                      selector : @selector(updatePlot:)
                          name : ORRad7ModelUpdatePlot
@@ -259,14 +265,14 @@
                          name : ORRad7ModelHumidityMaxLimitChanged
 						object: model];
 
+	[serialPortController registerNotificationObservers];
+
 }
 
 - (void) updateWindow
 {
     [super updateWindow];
     [self lockChanged:nil];
-    [self portStateChanged:nil];
-    [self portNameChanged:nil];
 	[self pollTimeChanged:nil];
     [self miscAttributesChanged:nil];
 	[self protocolChanged:nil];
@@ -293,8 +299,12 @@
 	[self pumpCurrentAlarmChanged:nil];
 	[self pumpCurrentMaxLimitChanged:nil];
 	[self humidityMaxLimitChanged:nil];
+	[serialPortController updateWindow];
 }
-
+- (BOOL) portLocked
+{
+	return [gSecurity isLocked:ORRad7Lock];;
+}
 - (void) humidityMaxLimitChanged:(NSNotification*)aNote
 {
 	[humidityMaxLimitTextField setFloatValue: [model humidityMaxLimit]];
@@ -369,7 +379,7 @@
 	[lastRadonField setObjectValue:[model statusForKey:kRad7LastRadon]];
 	[lastRadonUnitsField setObjectValue:[model statusForKey:kRad7LastRadonUnits]];
 	[processUnitsField setObjectValue:[model statusForKey:kRad7LastRadonUnits]];
-	[lastRadonUncertaintyFieldField setObjectValue:[model statusForKey:kRad7LastRadonUncertainty]];
+	[lastRadonUncertaintyField setObjectValue:[model statusForKey:kRad7LastRadonUncertainty]];
 
 	
 	[temperatureField setObjectValue:[model statusForKey:kRad7Temp]];
@@ -379,6 +389,20 @@
 	[pumpCurrentField setObjectValue:[model statusForKey:kRad7PumpCurrent]];
 	[hvField setObjectValue:[model statusForKey:kRad7HV]];
 	[signalField setObjectValue:[model statusForKey:kRad7SignalVoltage]];
+	
+	[countDown2Field setObjectValue:	 [model statusForKey:kRad7RunCountDown]];
+	[state2Field setObjectValue:      [model statusForKey:kRad7RunStatus]];
+	[lastRadonUnits2Field setObjectValue:[model statusForKey:kRad7LastRadonUnits]];
+	[temperature2Field setObjectValue:[model statusForKey:kRad7Temp]];
+	[temperatureUnits2Field setObjectValue:[model statusForKey:kRad7TempUnits]];
+	[rh2Field setObjectValue:[model statusForKey:kRad7RH]];
+	[battery2Field setObjectValue:[model statusForKey:kRad7Battery]];
+	[pumpCurrent2Field setObjectValue:[model statusForKey:kRad7PumpCurrent]];
+	[hv2Field setObjectValue:[model statusForKey:kRad7HV]];
+	[signal2Field setObjectValue:[model statusForKey:kRad7SignalVoltage]];
+	[lastRadon2Field setObjectValue:[model statusForKey:kRad7LastRadon]];
+	[lastRadonUncertainty2Field setObjectValue:[model statusForKey:kRad7LastRadonUncertainty]];
+	
 }
 
 
@@ -494,9 +518,9 @@
     BOOL locked = [gSecurity isLocked:ORRad7Lock];
 
     [lockButton setState: locked];
+	
+	[serialPortController updateButtons:locked];
 
-    [portListPopup setEnabled:!locked];
-    [openPortButton setEnabled:!locked];
     [pollTimePopup setEnabled:!locked];
     [deleteHistoryButton setEnabled:!locked];
     
@@ -653,54 +677,46 @@
 	}
 }
 
-- (void) portStateChanged:(NSNotification*)aNotification
-{
-    if(aNotification == nil || [aNotification object] == [model serialPort]){
-        if([model serialPort]){
-            [openPortButton setEnabled:YES];
-
-            if([[model serialPort] isOpen]){
-                [openPortButton setTitle:@"Close"];
-                [portStateField setTextColor:[NSColor colorWithCalibratedRed:0.0 green:.8 blue:0.0 alpha:1.0]];
-                [portStateField setStringValue:@"Open"];
-            }
-            else {
-                [openPortButton setTitle:@"Open"];
-                [portStateField setStringValue:@"Closed"];
-                [portStateField setTextColor:[NSColor redColor]];
-            }
-        }
-        else {
-            [openPortButton setEnabled:NO];
-            [portStateField setTextColor:[NSColor blackColor]];
-            [portStateField setStringValue:@"---"];
-            [openPortButton setTitle:@"---"];
-        }
-    }
-}
-
 - (void) pollTimeChanged:(NSNotification*)aNotification
 {
 	[pollTimePopup selectItemWithTag:[model pollTime]];
 }
 
-- (void) portNameChanged:(NSNotification*)aNotification
+- (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
 {
-    NSString* portName = [model portName];
-    
-	NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
-	ORSerialPort *aPort;
-
-    [portListPopup selectItemAtIndex:0]; //the default
-    while (aPort = [enumerator nextObject]) {
-        if([portName isEqualToString:[aPort name]]){
-            [portListPopup selectItemWithTitle:portName];
-            break;
-        }
-	}  
-    [self portStateChanged:nil];
+    [[self window] setContentView:blankView];
+	NSUInteger style = [[self window] styleMask];
+	switch([tabView indexOfTabViewItem:tabViewItem]){
+		case  0: 
+			[self resizeWindowToSize:basicOpsSize];   
+			[[self window] setStyleMask: style & ~NSResizableWindowMask];
+			break;
+		case  1: 
+			[self resizeWindowToSize:processOpsSize];     
+			[[self window] setStyleMask: style & ~NSResizableWindowMask];
+			break;
+		case  2: 
+			[self resizeWindowToSize:historyOpsSize];	
+			[[self window] setStyleMask: style | NSResizableWindowMask];
+			break;
+		default: 
+			[self resizeWindowToSize:summaryOpsSize];     
+			[[self window] setStyleMask: style & ~NSResizableWindowMask];
+			break;
+	}
+    [[self window] setContentView:totalView];
+	
+    NSString* key = [NSString stringWithFormat: @"orca.ORRad7%lu.selectedtab",[model uniqueIdNumber]];
+    int index = [tabView indexOfTabViewItem:tabViewItem];
+    [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
 }
 
+- (void)windowDidResize:(NSNotification *)notification
+{
+	if([tabView indexOfTabViewItem:[tabView selectedTabViewItem]] == 2){
+		historyOpsSize = [[self window] frame].size; 
+	}
+}
 
 #pragma mark ***Actions
 
@@ -808,16 +824,6 @@
 - (IBAction) lockAction:(id) sender
 {
     [gSecurity tryToSetLock:ORRad7Lock to:[sender intValue] forWindow:[self window]];
-}
-
-- (IBAction) portListAction:(id) sender
-{
-    [model setPortName: [portListPopup titleOfSelectedItem]];
-}
-
-- (IBAction) openPortAction:(id)sender
-{
-    [model openPort:![[model serialPort] isOpen]];
 }
 
 - (IBAction) updateSettingsAction:(id)sender
@@ -936,18 +942,6 @@
 @end
 
 @implementation ORRad7Controller (private)
-
-- (void) populatePortListPopup
-{
-	NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
-	ORSerialPort *aPort;
-    [portListPopup removeAllItems];
-    [portListPopup addItemWithTitle:@"--"];
-
-	while (aPort = [enumerator nextObject]) {
-        [portListPopup addItemWithTitle:[aPort name]];
-	}    
-}
 
 - (void) saveUserSettingPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info
 {
