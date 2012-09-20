@@ -346,14 +346,7 @@ NSString* commonScriptMethodsByObj(id anObj,BOOL includeSuperClass)
 
 NSString* computerName()
 {
-	NSString *computerName;
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-	computerName = [[NSHost currentHost] localizedName];
-#else																						// pre-10.6 fallback
-	computerName = [[NSHost currentHost] name];
-#endif	
-	computerName = [computerName stringByReplacingOccurrencesOfString:@".local" withString:@""];
-	return computerName;
+	return [(NSString*)CSCopyMachineName() autorelease];
 }
 
 NSString* macAddress()
