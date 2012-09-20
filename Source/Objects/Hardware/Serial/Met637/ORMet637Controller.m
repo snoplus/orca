@@ -361,6 +361,7 @@
 	else if([model countUnits]==1)	s = @"Counts/L^3";
 	else if([model countUnits]==2)	s = @"Total Counts";
 	[unitsField setStringValue:s];
+	[units2Field setStringValue:s];
 	[plotter0 setYLabel:s];
 }
 
