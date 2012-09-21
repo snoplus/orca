@@ -21,14 +21,14 @@
 #define _H_HWREADOUT_
 
 #ifdef __cplusplus
-namespace hw4 {
-	class SubrackKatrin;
-}
+//  namespace hw4 {
+//  	class SubrackKatrin;
+//  }
 using namespace hw4;
 class Pbus;
 //class hw4::SubrackKatrin;
 Pbus *pbus=0;
-hw4::SubrackKatrin *srack=0;
+//  hw4::SubrackKatrin *srack=0;
 #endif
 
 #ifdef __cplusplus

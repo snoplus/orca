@@ -53,8 +53,9 @@ UCFLAGS =  -g -Wall  -gstabs+ -I ~/src/v4/fdhwlib/src  $(defflags)
 ifeq ($(PMC_COMPILE_IN_SIMULATION_MODE),1)
   LFLAGS  =  -fexceptions -lpthread -lstdc++
 else
-  LFLAGS  =  -fexceptions -lPbusPCI  -lkatrinhw4 -lhw4 -lakutil -lpthread -lstdc++
-#for DMA:    LFLAGS  =  -fexceptions -lPbusPCIDMA  -lkatrinhw4 -lhw4 -lakutil -lpthread -lstdc++
+  LFLAGS  =  -fexceptions -lPbusPCIDMA  -lkatrinhw4 -lhw4 -lakutil -lpthread -lstdc++
+#for DMA:        LFLAGS  =  -fexceptions -lPbusPCIDMA  -lkatrinhw4 -lhw4 -lakutil -lpthread -lstdc++
+#without DMA:    LFLAGS  =  -fexceptions -lPbusPCI  -lkatrinhw4 -lhw4 -lakutil -lpthread -lstdc++
 
 endif
 #LFLAGS  =  -fexceptions -lPbusPCI  -lkatrinhw4 -lhw4 -lakutil -lpthread -lstdc++

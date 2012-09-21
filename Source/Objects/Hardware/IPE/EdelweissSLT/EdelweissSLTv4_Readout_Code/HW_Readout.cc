@@ -98,7 +98,7 @@ extern "C" {
 	#include "fdhwlib.h"
 	//already included #include "Pbus/Pbus.h"
 	#include "hw4/baseregister.h"
-	#include "katrinhw4/subrackkatrin.h"
+	//#include "katrinhw4/subrackkatrin.h"
 	#include "katrinhw4/sltkatrin.h"
 	#include "katrinhw4/fltkatrin.h"
 #endif
@@ -114,7 +114,7 @@ extern char needToSwap;
 extern int32_t  dataIndex;
 extern int32_t* data;
 
-hw4::SubrackKatrin* get_sub_rack() { return srack; }
+//hw4::SubrackKatrin* get_sub_rack() { return srack; }
 
 
 
@@ -141,11 +141,27 @@ void FindHardware(void)
     pbusInit((char*)name);
 #else
     //TODO: check here blocking semaphores? -tb-
-    srack = new hw4::SubrackKatrin((char*)name,0);
+	
+	
+	
     //TODO: changed for EW ... -tb- ... 
+	#if 0
+    srack = new hw4::SubrackKatrin((char*)name,0);
 	srack->checkSlot(); //check for available slots (init for isPresent(slot)); is necessary to prepare readout loop! -tb-
     pbus = srack->theSlt->version; //all registers inherit from Pbus, we choose "version" as it shall exist for all FPGA configurations
-    if(!pbus) fprintf(stdout,"HW_Readout.cc (IPE DAQ V4): ERROR: could not connect to Pbus!\n");
+	#else
+	//similar to readword.cpp:
+	int err = 0;
+	try {
+		if (pbus > 0) pbus->free();
+		pbus = new Pbus();
+		pbus->init();
+	} catch (PbusError &e){
+		err = 1;
+	}
+	if(err) printf("HW_Readout.cc (IPE EW DAQ V4): ERROR: Creating Pbus failed!\n");
+#endif
+    if(!pbus) fprintf(stdout,"HW_Readout.cc (IPE EW DAQ V4): ERROR: could not connect to Pbus!\n");
 
     //pbus test
     std::string getStr, cmdStr;
@@ -172,7 +188,7 @@ void ReleaseHardware(void)
     pbusFree();
 #else
     pbus = 0;
-    delete srack;
+    //delete srack;
 #endif
 }
 
