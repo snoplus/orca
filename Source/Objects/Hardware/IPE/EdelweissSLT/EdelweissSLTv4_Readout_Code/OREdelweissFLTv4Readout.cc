@@ -189,7 +189,7 @@ uint32_t histoShipSumHistogram = 0;
 // (this is the standard code accessing the v4 crate-tb-)
 //----------------------------------------------------------------
 
-extern hw4::SubrackKatrin* srack; 
+//extern hw4::SubrackKatrin* srack; 
 extern Pbus* pbus; 
 
 
@@ -417,6 +417,11 @@ fprintf(stdout,"ORFLTv4Readout::Readout(SBC_LAM_Data* lamData): location %i, Get
 //TODO: using this inhibits stopping a waveform run (?) -tb-
 bool ORFLTv4Readout::Stop()
 {
+
+
+
+//-----------------------------------------
+#if 0
 	//-tb- a test:
 	//fprintf(stdout,"ORFLTv4Readout.cc: This is bool ORFLTv4Readout::Stop() for slot %i (ct is %i)!\n",GetSlot()); fflush(stdout);
     // it seems to me that nobody cares when I return false; -tb-
@@ -491,6 +496,8 @@ bool ORFLTv4Readout::Stop()
 			}
 		}
 	}
+#endif
+//-----------------------------------------
 	
 	return true;
 }
