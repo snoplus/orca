@@ -1450,7 +1450,6 @@ static struct {
             
             /* If we've gotten here, it means we have to continue some more. */
         } 
-		
     }
 }
 
