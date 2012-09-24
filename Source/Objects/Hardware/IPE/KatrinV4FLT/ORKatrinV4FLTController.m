@@ -699,7 +699,12 @@
 	[histClrModePU setEnabled: !lockedOrRunningMaintenance & (daqMode == kIpeFltV4_Histogram_DaqMode)];
 	[clearReceivedHistoCounterButton setEnabled: !lockedOrRunningMaintenance & (daqMode == kIpeFltV4_Histogram_DaqMode)];
 	
-	[vetoActiveButton setState: !locked & ((daqMode == kIpeFltV4_VetoEnergyDaqMode)||(daqMode == kIpeFltV4_VetoEnergyTraceDaqMode))];
+	NSString* s;
+	if(locked)s = @"Veto Locked";
+	else if((daqMode == kIpeFltV4_VetoEnergyDaqMode) || (daqMode == kIpeFltV4_VetoEnergyTraceDaqMode)) s = @"Veto Active";
+	else s = @"";
+	[vetoActiveField setStringValue:s];
+							  
 
 	[startNoiseFloorButton setEnabled: runInProgress || [model noiseFloorRunning]];
 	

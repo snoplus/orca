@@ -41,7 +41,7 @@
 		IBOutlet NSTabView*		modeTabView;	
 		IBOutlet NSButton*		settingLockButton;
 		IBOutlet NSPopUpButton* nfoldCoincidencePU;
-        IBOutlet NSButton*		vetoActiveButton;
+        IBOutlet NSTextField*	vetoActiveField;
 		IBOutlet NSPopUpButton* vetoOverlapTimePU;
 		IBOutlet NSMatrix*		displayEventRateMatrix;
 		IBOutlet NSTextField*	targetRateField;
