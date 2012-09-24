@@ -20,14 +20,11 @@
 #pragma mark ***Imported Files
 
 #import "ORMet237Model.h"
-#import "ORSerialPort.h"
-#import "ORSerialPortList.h"
-#import "ORSerialPort.h"
 #import "ORSerialPortAdditions.h"
 #import "ORDataTypeAssigner.h"
 #import "ORDataPacket.h"
 #import "ORTimeRate.h"
-#import "ORSafeQueue.h"
+#import "ORAlarm.h"
 
 #pragma mark ***External Strings
 NSString* ORMet237ModelCountAlarmLimitChanged = @"ORMet237ModelCountAlarmLimitChanged";
@@ -43,9 +40,7 @@ NSString* ORMet237ModelCount1Changed		= @"ORMet237ModelCount1Changed";
 NSString* ORMet237ModelSize2Changed			= @"ORMet237ModelSize2Changed";
 NSString* ORMet237ModelSize1Changed			= @"ORMet237ModelSize1Changed";
 NSString* ORMet237ModelMeasurementDateChanged = @"ORMet237ModelMeasurementDateChanged";
-NSString* ORMet237ModelSerialPortChanged	= @"ORMet237ModelSerialPortChanged";
-NSString* ORMet237ModelPortNameChanged		= @"ORMet237ModelPortNameChanged";
-NSString* ORMet237ModelPortStateChanged		= @"ORMet237ModelPortStateChanged";
+NSString* ORMet237ModelMissedCountChanged	= @"ORMet237ModelMissedCountChanged";
 
 NSString* ORMet237Lock = @"ORMet237Lock";
 
@@ -57,6 +52,10 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 - (void) startTimeOut;
 - (void) checkCycle;
 - (void) processStatus:(NSString*)aString;
+- (void) clearDelay;
+- (void) startDataArrivalTimeout;
+- (void) cancelDataArrivalTimeout;
+- (void) doCycleKick;
 @end
 
 @implementation ORMet237Model
@@ -66,7 +65,6 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 - (id) init
 {
 	self = [super init];
-    [self registerNotificationObservers];
 	[self setMaxCounts:1000];
 	[self setCountAlarmLimit:800];
 	return self;
@@ -77,15 +75,10 @@ NSString* ORMet237Lock = @"ORMet237Lock";
     [cycleWillEnd release];
     [cycleStarted release];
     [measurementDate release];
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
     [buffer release];
-	[cmdQueue release];
-    [portName release];
-    if([serialPort isOpen]){
-        [serialPort close];
-    }
-    [serialPort release];
+	[missingCyclesAlarm release];
+	[missingCyclesAlarm clearAlarm];
 	
 	int i;
 	for(i=0;i<2;i++){
@@ -118,16 +111,6 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 	[self linkToController:@"ORMet237Controller"];
 }
 
-- (void) registerNotificationObservers
-{
-	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(dataReceived:)
-                         name : ORSerialPortDataReceived
-                       object : nil];
-}
-
 - (void) dataReceived:(NSNotification*)note
 {
     if([[note userInfo] objectForKey:@"serialPort"] == serialPort){
@@ -137,34 +120,36 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 												      encoding:NSASCIIStringEncoding] autorelease] uppercaseString];
 		
 		[self process_response:theString];
-
-		//the serial port may break the data up into small chunks, so we have to accumulate the chunks until
-		//we get a full piece.
-		/*
-		theString = [[theString componentsSeparatedByString:@"\n"] componentsJoinedByString:@""];
-		theString = [[theString componentsSeparatedByString:@">"] componentsJoinedByString:@""];
-		
-        if(!buffer)buffer = [[NSMutableString string] retain];
-        [buffer appendString:theString];	
-		
-        do {
-            NSRange lineRange = [buffer rangeOfString:@"\r"];
-            if(lineRange.location!= NSNotFound){
-                NSString* theResponse = [[[buffer substringToIndex:lineRange.location+1] copy] autorelease];
-                [buffer deleteCharactersInRange:NSMakeRange(0,lineRange.location+1)];      //take the cmd out of the buffer
-				theResponse = [theResponse stringByReplacingOccurrencesOfString:@"\r" withString:@""];
-				theResponse = [theResponse stringByReplacingOccurrencesOfString:@"\n" withString:@""];
-
-				if([theResponse length] != 0){
-					[self process_response:theResponse];
-				}
-            }
-        } while([buffer rangeOfString:@"\r"].location!= NSNotFound);
-		*/
 	}
 }
 
 #pragma mark ***Accessors
+- (int) missedCycleCount
+{
+    return missedCycleCount;
+}
+
+- (void) setMissedCycleCount:(int)aValue
+{
+    missedCycleCount = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMet237ModelMissedCountChanged object:self];
+    
+	if((missedCycleCount >= 3) && (countingMode == kMet237Counting)){
+		if(!missingCyclesAlarm){
+			NSString* s = [NSString stringWithFormat:@"Met637 (Unit %lu) Missing Cycles",[self uniqueIdNumber]];
+			missingCyclesAlarm = [[ORAlarm alloc] initWithName:s severity:kHardwareAlarm];
+			[missingCyclesAlarm setSticky:YES];
+            [missingCyclesAlarm setHelpString:@"The particle counter is not reporting counts at the end of its cycle. ORCA tried to kick start it at least three times.\n\nThis alarm will not go away until the problem is cleared. Acknowledging the alarm will silence it."];
+			[missingCyclesAlarm postAlarm];
+		}
+	}
+	else {
+		[missingCyclesAlarm clearAlarm];
+		[missingCyclesAlarm release];
+		missingCyclesAlarm = nil;
+	}
+    
+}
 - (BOOL) dataForChannelValid:(int)aChannel
 {
     return dataValid && [serialPort isOpen];
@@ -372,80 +357,19 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 	lastRequest = [aRequest copy];    
 }
 
-- (BOOL) portWasOpen
+
+- (void) setUpPort
 {
-    return portWasOpen;
+	[serialPort setSpeed:9600];
+	[serialPort setParityNone];
+	[serialPort setStopBits2:NO];
+	[serialPort setDataBits:8];
 }
 
-- (void) setPortWasOpen:(BOOL)aPortWasOpen
+- (void) firstActionAfterOpeningPort
 {
-    portWasOpen = aPortWasOpen;
-}
-
-- (NSString*) portName
-{
-	if(!portName)return @"";
-    else return portName;
-}
-
-- (void) setPortName:(NSString*)aPortName
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setPortName:portName];
-    
-    if(![aPortName isEqualToString:portName]){
-        [portName autorelease];
-        portName = [aPortName copy];    
-
-        BOOL valid = NO;
-        NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
-        ORSerialPort *aPort;
-        while (aPort = [enumerator nextObject]) {
-            if([portName isEqualToString:[aPort name]]){
-                [self setSerialPort:aPort];
-                if(portWasOpen){
-                    [self openPort:YES];
-				}
-                valid = YES;
-                break;
-            }
-        } 
-        if(!valid){
-            [self setSerialPort:nil];
-        }       
-    }
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMet237ModelPortNameChanged object:self];
-}
-
-- (ORSerialPort*) serialPort
-{
-    return serialPort;
-}
-
-- (void) setSerialPort:(ORSerialPort*)aSerialPort
-{
-    [aSerialPort retain];
-    [serialPort release];
-    serialPort = aSerialPort;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMet237ModelSerialPortChanged object:self];
-}
-
-- (void) openPort:(BOOL)state
-{
-    if(state) {
-        [serialPort open];
-		[serialPort setSpeed:9600];
-		[serialPort setParityNone];
-		[serialPort setStopBits2:NO];
-		[serialPort setDataBits:8];
-		[serialPort commitChanges];
-		[self universalSelect];
-		if(wasRunning)[self startCycle];
-    }
-    else [serialPort close];
-    portWasOpen = [serialPort isOpen];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMet237ModelPortStateChanged object:self];
+	[self universalSelect];
+	if(wasRunning)[self startCycle];
 }
 
 #pragma mark ***Archival
@@ -455,8 +379,6 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 	[[self undoManager] disableUndoRegistration];
 	wasRunning = [decoder decodeBoolForKey:@"wasRunning"];
 	[self setCycleDuration:		[decoder decodeIntForKey:@"cycleDuration"]];
-	[self setPortWasOpen:		[decoder decodeBoolForKey:	@"ORMet237ModelPortWasOpen"]];
-    [self setPortName:			[decoder decodeObjectForKey:@"portName"]];
 	[self setCountAlarmLimit:	[decoder decodeFloatForKey:@"countAlarmLimit"]];
 	[self setMaxCounts:			[decoder decodeFloatForKey:@"maxCounts"]];
 	[[self undoManager] enableUndoRegistration];
@@ -467,8 +389,6 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 	}
 	
 	
-    [self registerNotificationObservers];
-
 	return self;
 }
 - (void) encodeWithCoder:(NSCoder*)encoder
@@ -477,8 +397,6 @@ NSString* ORMet237Lock = @"ORMet237Lock";
     [encoder encodeFloat:	countAlarmLimit forKey:@"countAlarmLimit"];
     [encoder encodeFloat:	maxCounts		forKey:@"maxCounts"];
     [encoder encodeInt:		cycleDuration	forKey:@"cycleDuration"];
-    [encoder encodeBool:	portWasOpen		forKey:	@"ORMet237ModelPortWasOpen"];
-    [encoder encodeObject:	portName		forKey: @"portName"];
     [encoder encodeBool:	wasRunning		forKey:	@"wasRunning"];
 }
 
@@ -486,8 +404,8 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 - (void) addCmdToQueue:(NSString*)aCmd
 {
    if([serialPort isOpen]){ 
-		if(!cmdQueue)cmdQueue = [[ORSafeQueue alloc] init];
-		[cmdQueue enqueue:aCmd];
+	   [self enqueueCmd:aCmd];
+	   [self enqueueCmd:@"++Delay"];
 		if(!lastRequest){
 			[self processOneCommandFromQueue];
 		}
@@ -518,7 +436,11 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 #pragma mark ***Polling and Cycles
 - (void) startCycle
 {
-	if(![self running]){
+    [self startCycle:NO];
+}
+- (void) startCycle:(BOOL)force
+{
+	if((![self running] || force) && [serialPort isOpen]){
 		[self setRunning:YES];
 		[self setCycleNumber:1];
 		NSDate* now = [NSDate date];
@@ -533,18 +455,22 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 		[self startCountingByComputer];
 		[self checkCycle];
 		[self getMode];
+        [self startDataArrivalTimeout];
+		NSLog(@"Met237(%d) Starting particle counter\n",[self uniqueIdNumber]);
 	}
 }
 
 - (void) stopCycle
 {
-	if([self running]){
+	if([self running] && [serialPort isOpen]){
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(checkCycle) object:nil];
 		[self setRunning:NO];
 		[self setCycleNumber:0];
 		[self stopCounting];
 		[self getMode];
 		[self getRecord];
+        [self cancelDataArrivalTimeout];
+		NSLog(@"Met637(%d) Stopping particle counter\n",[self uniqueIdNumber]);
 	}
 }
 
@@ -552,15 +478,24 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 - (void) processIsStarting
 {
 	if(!running){
-		wasRunning = NO;
-		[self startCycle];
+		if(!sentStartOnce){
+			sentStartOnce = YES;
+			sentStopOnce = NO;
+			
+			wasRunning = NO;
+			[self startCycle:YES];
+		}
 	}
 }
 
 - (void) processIsStopping
 {
 	if(!wasRunning){
-		[self stopCycle];
+		if(!sentStopOnce){
+			sentStopOnce = YES;
+			sentStartOnce = NO;
+			[self stopCycle];
+		}
 	}
 }
 
@@ -675,16 +610,42 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 		}
 	}
 }
+- (void) startDataArrivalTimeout
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(doCycleKick) object:nil];
+    [self performSelector:@selector(doCycleKick)  withObject:nil afterDelay:(cycleDuration+120)];
+}
+
+- (void) cancelDataArrivalTimeout
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(doCycleKick) object:nil];
+}
+
+- (void) doCycleKick
+{
+    [self setMissedCycleCount:missedCycleCount+1];
+    NSLogColor([NSColor redColor],@"%@ data did not arrive at end of cycle (missed %d)\n",[self fullID],missedCycleCount);
+    if(countingMode == kMet237Counting){
+        NSLogColor([NSColor redColor],@"Kickstarting %@\n",[self fullID]);
+        [self setCount1:0];
+        [self setCount2:0];
+        [self setIsValid:NO];
+		
+        [self stopCycle];
+        [self startCycle:YES];
+    }
+}
 
 - (void) timeout
 {
-	NSLogError(@"command timeout",@"Met237",nil);
-	[cmdQueue removeAllObjects];
-	[self setLastRequest:nil];
 	recordComingIn = NO;
 	statusComingIn = NO;
-    dataValid      = NO;
+	[super timeout];
 	//[self universalSelect];
+}
+
+- (void) recoverFromTimeout
+{
 }
 
 - (void) goToNextCommand
@@ -693,13 +654,28 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 	[self processOneCommandFromQueue];	 //do the next command in the queue
 }
 
+- (void) clearDelay
+{
+	delay = NO;
+	[self processOneCommandFromQueue];
+}
+
 - (void) processOneCommandFromQueue
 {
-	NSString* aCmd = [cmdQueue dequeue];	
+	if(delay)return;
+	
+	NSString* aCmd = [self nextCmd];
 	if(aCmd){
-		[self setLastRequest:aCmd];
-		[self startTimeOut];
-		[serialPort writeString:[NSString stringWithFormat:@"%@",aCmd]];
+		if([aCmd isEqualToString:@"++Delay"]){
+			delay = YES;
+			[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(clearDelay) object:nil];
+			[self performSelector:@selector(clearDelay) withObject:nil afterDelay:kMet237DelayTime];
+		}
+		else {
+			[self setLastRequest:aCmd];
+			[self startTimeOut];
+			[serialPort writeString:aCmd];
+		}
 	}
 	if(!lastRequest){
 		[self performSelector:@selector(processOneCommandFromQueue) withObject:nil afterDelay:3];
@@ -745,6 +721,8 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 				[self setCount2: [count2Part intValue]];
 				
 				recordComingIn = NO;
+				[self setMissedCycleCount:0];
+				[self startDataArrivalTimeout];
 			}
 		}
 	}

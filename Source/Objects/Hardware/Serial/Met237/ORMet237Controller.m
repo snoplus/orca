@@ -21,16 +21,11 @@
 
 #import "ORMet237Controller.h"
 #import "ORMet237Model.h"
-#import "ORSerialPortList.h"
-#import "ORSerialPort.h"
 #import "ORTimeLinePlot.h"
 #import "ORCompositePlotView.h"
 #import "ORTimeAxis.h"
 #import "ORTimeRate.h"
-
-@interface ORMet237Controller (private)
-- (void) populatePortListPopup;
-@end
+#import "ORSerialPortController.h"
 
 @implementation ORMet237Controller
 
@@ -50,7 +45,6 @@
 
 - (void) awakeFromNib
 {
-    [self populatePortListPopup];
 
     [[plotter0 yAxis] setRngLow:0.0 withHigh:100.];
 	[[plotter0 yAxis] setRngLimitsLow:0 withHigh:1000. withMinRng:5];
@@ -84,6 +78,11 @@
 	[[self window] setTitle:[NSString stringWithFormat:@"Met237 (Unit %lu)",[model uniqueIdNumber]]];
 }
 
+- (BOOL) portLocked
+{
+	return [gSecurity isLocked:ORMet237Lock];;
+}
+
 #pragma mark ***Notifications
 
 - (void) registerNotificationObservers
@@ -100,17 +99,7 @@
                          name : ORMet237Lock
                         object: nil];
 
-    [notifyCenter addObserver : self
-                     selector : @selector(portNameChanged:)
-                         name : ORMet237ModelPortNameChanged
-                        object: nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(portStateChanged:)
-                         name : ORSerialPortStateChanged
-                       object : nil];
-                                              
-    [notifyCenter addObserver : self
+     [notifyCenter addObserver : self
                      selector : @selector(measurementDateChanged:)
                          name : ORMet237ModelMeasurementDateChanged
 						object: model];
@@ -190,14 +179,13 @@
                          name : ORMet237ModelCountAlarmLimitChanged
 						object: model];
 
+	[serialPortController registerNotificationObservers];
 }
 
 - (void) updateWindow
 {
     [super updateWindow];
     [self lockChanged:nil];
-    [self portStateChanged:nil];
-    [self portNameChanged:nil];
 	[self measurementDateChanged:nil];
 	[self size1Changed:nil];
 	[self size2Changed:nil];
@@ -213,6 +201,7 @@
     [self miscAttributesChanged:nil];
 	[self maxCountsChanged:nil];
 	[self countAlarmLimitChanged:nil];
+	[serialPortController updateWindow];
 }
 
 - (void) countAlarmLimitChanged:(NSNotification*)aNote
@@ -349,10 +338,9 @@
     BOOL locked = [gSecurity isLocked:ORMet237Lock];
 
     [lockButton setState: locked];
-
-    [portListPopup setEnabled:!locked];
-    [openPortButton setEnabled:!locked];
-    
+	
+   	[serialPortController updateButtons:locked];
+ 
 	if(!locked){
 		[startCycleButton setEnabled:![model running]];
 		[stopCycleButton setEnabled:[model running]];
@@ -376,48 +364,6 @@
 	}
 }
 
-- (void) portStateChanged:(NSNotification*)aNotification
-{
-    if(aNotification == nil || [aNotification object] == [model serialPort]){
-        if([model serialPort]){
-            [openPortButton setEnabled:YES];
-
-            if([[model serialPort] isOpen]){
-                [openPortButton setTitle:@"Close"];
-                [portStateField setTextColor:[NSColor colorWithCalibratedRed:0.0 green:.8 blue:0.0 alpha:1.0]];
-                [portStateField setStringValue:@"Open"];
-            }
-            else {
-                [openPortButton setTitle:@"Open"];
-                [portStateField setStringValue:@"Closed"];
-                [portStateField setTextColor:[NSColor redColor]];
-            }
-        }
-        else {
-            [openPortButton setEnabled:NO];
-            [portStateField setTextColor:[NSColor blackColor]];
-            [portStateField setStringValue:@"---"];
-            [openPortButton setTitle:@"---"];
-        }
-    }
-}
-
-- (void) portNameChanged:(NSNotification*)aNotification
-{
-    NSString* portName = [model portName];
-    
-	NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
-	ORSerialPort *aPort;
-
-    [portListPopup selectItemAtIndex:0]; //the default
-    while (aPort = [enumerator nextObject]) {
-        if([portName isEqualToString:[aPort name]]){
-            [portListPopup selectItemWithTitle:portName];
-            break;
-        }
-	}  
-    [self portStateChanged:nil];
-}
 
 
 #pragma mark ***Actions
@@ -449,16 +395,6 @@
 - (IBAction) lockAction:(id) sender
 {
     [gSecurity tryToSetLock:ORMet237Lock to:[sender intValue] forWindow:[self window]];
-}
-
-- (IBAction) portListAction:(id) sender
-{
-    [model setPortName: [portListPopup titleOfSelectedItem]];
-}
-
-- (IBAction) openPortAction:(id)sender
-{
-    [model openPort:![[model serialPort] isOpen]];
 }
 
 - (IBAction) initAction:(id)sender
@@ -503,22 +439,6 @@
 	int index = count-i-1;
 	*yValue = [[model timeRate:set] valueAtIndex:index];
 	*xValue = [[model timeRate:set] timeSampledAtIndex:index];
-}
-
-@end
-
-@implementation ORMet237Controller (private)
-
-- (void) populatePortListPopup
-{
-	NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
-	ORSerialPort *aPort;
-    [portListPopup removeAllItems];
-    [portListPopup addItemWithTitle:@"---"];
-
-	while (aPort = [enumerator nextObject]) {
-        [portListPopup addItemWithTitle:[aPort name]];
-	}    
 }
 
 @end

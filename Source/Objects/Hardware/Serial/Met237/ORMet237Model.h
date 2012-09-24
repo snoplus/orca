@@ -19,49 +19,50 @@
 
 #pragma mark ***Imported Files
 #import "ORAdcProcessing.h"
+#import "ORSerialPortWithQueueModel.h"
 
-@class ORSerialPort;
 @class ORTimeRate;
-@class ORSafeQueue;
+@class ORAlarm;
 
 #define kMet237Counting  0
 #define kMet237Holding   1
 #define kMet237Stopped   2
 
-@interface ORMet237Model : OrcaObject <ORAdcProcessing>
+#define kMet237DelayTime  0.1
+
+@interface ORMet237Model : ORSerialPortWithQueueModel <ORAdcProcessing>
 {
     @private
-        NSString*       portName;
-        BOOL            portWasOpen;
-        ORSerialPort*   serialPort;
-		NSString*		lastRequest;
-		ORSafeQueue*    cmdQueue;
-		unsigned long	timeMeasured;
+		BOOL             delay;
+		unsigned long	 timeMeasured;
         NSMutableString* buffer;
-		NSString* measurementDate;
-		float size1;
-		float size2;
-		int count1;
-		int count2;
-		int countingMode;
-		int cycleDuration;
-		BOOL running;
-		NSDate* cycleStarted;
-		NSDate* cycleWillEnd;
-		int cycleNumber;
-		BOOL recordComingIn;
-		BOOL statusComingIn;
-		ORTimeRate*			timeRates[2];
-		BOOL	wasRunning;
-		float maxCounts;
-		float countAlarmLimit;
-        BOOL dataValid;
+		NSString*	measurementDate;
+		float		size1;
+		float		size2;
+		int			count1;
+		int			count2;
+		int			countingMode;
+		int			cycleDuration;
+		BOOL		running;
+		NSDate*		cycleStarted;
+		NSDate*		cycleWillEnd;
+		int			cycleNumber;
+		BOOL		recordComingIn;
+		BOOL		statusComingIn;
+		ORTimeRate*	timeRates[2];
+		BOOL		wasRunning;
+		float		maxCounts;
+		float		countAlarmLimit;
+        BOOL		dataValid;
+		BOOL		sentStartOnce;
+		BOOL		sentStopOnce;
+		int         missedCycleCount;
+		ORAlarm*	missingCyclesAlarm;
 }
 
 #pragma mark ***Initialization
 - (id)   init;
 - (void) dealloc;
-- (void) registerNotificationObservers;
 - (void) dataReceived:(NSNotification*)note;
 - (BOOL) dataForChannelValid:(int)aChannel;
 
@@ -93,20 +94,15 @@
 - (void) setSize1:(float)aSize1;
 - (NSString*) measurementDate;
 - (void) setMeasurementDate:(NSString*)aMeasurementDate;
-- (ORSerialPort*) serialPort;
-- (void) setSerialPort:(ORSerialPort*)aSerialPort;
-- (BOOL) portWasOpen;
-- (void) setPortWasOpen:(BOOL)aPortWasOpen;
-- (NSString*) portName;
-- (void) setPortName:(NSString*)aPortName;
-- (NSString*) lastRequest;
-- (void) setLastRequest:(NSString*)aRequest;
-- (void) openPort:(BOOL)state;
 - (unsigned long) timeMeasured;
 - (NSString*) countingModeString;
+- (BOOL) dataForChannelValid:(int)aChannel;
+- (void) setMissedCycleCount:(int)aValue;
+- (int) missedCycleCount;
 
 #pragma mark ***Polling
 - (void) startCycle;
+- (void) startCycle:(BOOL)force;
 - (void) stopCycle;
 
 #pragma mark ***Commands
@@ -159,8 +155,6 @@ extern NSString* ORMet237ModelSize2Changed;
 extern NSString* ORMet237ModelSize1Changed;
 extern NSString* ORMet237ModelMeasurementDateChanged;
 extern NSString* ORMet237ModelPollTimeChanged;
-extern NSString* ORMet237ModelSerialPortChanged;
+extern NSString* ORMet237ModelMissedCountChanged;
 extern NSString* ORMet237Lock;
-extern NSString* ORMet237ModelPortNameChanged;
-extern NSString* ORMet237ModelPortStateChanged;
 
