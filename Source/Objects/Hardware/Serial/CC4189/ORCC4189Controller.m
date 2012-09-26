@@ -70,10 +70,10 @@
 	[plotter0 setShowLegend:YES];
 
 	blankView		 = [[NSView alloc] init];
-    basicOpsSize	 = NSMakeSize(410,170);
-    valuesSize		 = NSMakeSize(410,170);
-    processLimitSize = NSMakeSize(410,170);
-    plotSize		 = NSMakeSize(410,315);
+    basicOpsSize	 = NSMakeSize(400,170);
+    valuesSize		 = NSMakeSize(400,170);
+    processLimitSize = NSMakeSize(400,170);
+    plotSize		 = NSMakeSize(400,315);
 	
 	NSString* key = [NSString stringWithFormat: @"orca.ORCC4189%lu.selectedtab",[model uniqueIdNumber]];
     int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
@@ -202,7 +202,7 @@
 			break;
 			
 		case  1: 
-			[self resizeWindowToSize:valuesSize];   
+			[self resizeWindowToSize:processLimitSize];     
 			[[self window] setStyleMask: style & ~NSResizableWindowMask];
 			break;
 			
@@ -212,7 +212,7 @@
 			break;
 			
 		default:
-			[self resizeWindowToSize:processLimitSize];     
+			[self resizeWindowToSize:valuesSize];   
 			[[self window] setStyleMask: style & ~NSResizableWindowMask];
 			break;
 	}
