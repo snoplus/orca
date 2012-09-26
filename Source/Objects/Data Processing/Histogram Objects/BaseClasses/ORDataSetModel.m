@@ -50,7 +50,8 @@ NSString* ORDataSetCalibrationChanged		= @"ORDataSetCalibrationChanged";
     [key release];
     [fullName release];
     [shortName release];	
-	
+    [dataSet release];
+
     [super dealloc];
 }
 
@@ -96,7 +97,9 @@ NSString* ORDataSetCalibrationChanged		= @"ORDataSetCalibrationChanged";
 
 - (void) setDataSet:(id)aDataSet
 {
-	dataSet = aDataSet;	 //don't retain things like this.
+    [aDataSet retain];
+    [dataSet release];
+	dataSet = aDataSet;	
 }
 
 - (id) dataSet
