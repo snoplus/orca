@@ -145,6 +145,15 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 	functionTable = aFunctionTable;
 }
 
+- (void) appendFunctionTable:(NSMutableDictionary*)aFunctionTable
+{
+	if(!functionTable)[self setFunctionTable:aFunctionTable];
+	else {
+		[functionTable addEntriesFromDictionary:aFunctionTable];
+	}
+}
+
+
 - (BOOL) running
 {
 	return running;
@@ -204,10 +213,10 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 
 #pragma mark ¥¥¥Parsers
 
-- (id) parseFile:(NSString*)aPath
+- (void) parseFile:(NSString*)aPath
 {
 	NSString* contents = [NSString stringWithContentsOfFile:[aPath stringByExpandingTildeInPath] encoding:NSASCIIStringEncoding error:nil];
-	return [self parse:contents];
+	[self parse:contents];
 }
 
 - (BOOL) parsedOK
@@ -220,7 +229,7 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 	return scriptExists;
 }
 
--(id) parse:(NSString* )theString 
+-(void) parse:(NSString* )theString 
 {  
 	// yacc has a number of global variables so it is NOT thread safe
 	// Acquire the lock to ensure one parse processing at a time
@@ -228,39 +237,6 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 		if([theString length]){
 			parsedOK = NO;
 			scriptExists = YES;
-			
-			@try { 
-				
-				yyreset_state();
-				OrcaScriptrestart(NULL);
-				
-				theScriptRunner = self;
-				[self setString:theString];
-				
-				// Call the parser    
-				OrcaScriptparse();
-				if(functionList) {
-					NSLog(@"%d Lines Parsed Successfully\n",num_lines);
-					parsedOK = YES;
-				}
-				else  {
-					NSLog(@"line %d: %@\n",num_lines+1,[[theString componentsSeparatedByString:@"\n"] objectAtIndex:num_lines]);
-					[[NSNotificationCenter defaultCenter] postNotificationName:ORScriptRunnerParseError 
-																		object:self 
-																	  userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithLong:num_lines+1] forKey:@"ErrorLocation"]];
-				}
-			}
-			
-			@catch(NSException* localException) { 
-				NSLog(@"line %d: %@\n",num_lines+1,[[theString componentsSeparatedByString:@"\n"] objectAtIndex:num_lines]);
-				[[NSNotificationCenter defaultCenter] postNotificationName:ORScriptRunnerParseError 
-																	object:self 
-																  userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithLong:num_lines+1] forKey:@"ErrorLocation"]];
-				NSLog(@"Caught %@: %@\n",[localException name],[localException reason]);
-				[functionList release];
-				functionList = nil;
-				
-			}
 		}
 		else {
 			//no script... 
@@ -268,20 +244,132 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 			scriptExists = NO;
 		}
 		theScriptRunner = nil;
-		[self setFunctionTable:functionList];
-		
-		[eval release];
-		eval = [[ORNodeEvaluator alloc] initWithFunctionTable:functionTable functionName:@"main"];
-				
-		if(inputValue){
-			[eval setSymbolTable:[eval makeSymbolTableFor:@"main" args:[NSArray arrayWithObject:inputValue]]];
+		@try {
+			
+			//recursively gather the imported files into a linear list and parse one by one.
+			NSDictionary* importedContents = [self gatherImportedStrings:theString rootFile:@"Main Script"];
+			NSArray* keys = [importedContents allKeys];
+			for(id aFileName in keys){
+				NSString* importedScript = [importedContents objectForKey:aFileName];
+				[self subParse:importedScript rootFile:aFileName];
+				[self appendFunctionTable:functionList];
+				[functionList release];
+				functionList = nil;
+			}
+			
+			if(parsedOK){
+				[self subParse:theString rootFile:@"Main Script"];
+				[self appendFunctionTable:functionList];
+				[functionList release];
+				functionList = nil;
+			}
+			
+			
+			[eval release];
+			eval = [[ORNodeEvaluator alloc] initWithFunctionTable:functionTable functionName:@"main"];
+					
+			if(inputValue){
+				[eval setSymbolTable:[eval makeSymbolTableFor:@"main" args:[NSArray arrayWithObject:inputValue]]];
+			}
+			
 		}
+		@catch(NSException* e){
+			parsedOK = NO;
+			NSLog(@"%@\n",e);
+			NSLog(@"line %d: %@\n",num_lines+1,[[theString componentsSeparatedByString:@"\n"] objectAtIndex:num_lines]);
+			[[NSNotificationCenter defaultCenter] postNotificationName:ORScriptRunnerParseError 
+																object:self 
+															  userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithLong:num_lines+1] forKey:@"ErrorLocation"]];
+			[functionList release];
+			functionList = nil;
+		}
+	}
+}
+
+- (void) subParse:(NSString*)theString rootFile:(NSString*)rootFile
+{
+	@try { 
+		yyreset_state();
+		OrcaScriptrestart(NULL);
+		
+		theScriptRunner = self;
+		
+		[self setString:theString];
+		
+		//parse the main file
+		NSArray* lines = [theString componentsSeparatedByString:@"\n" ];
+		OrcaScriptparse();
+		if(functionList) {
+			if([rootFile isEqualToString:@"Main Script"])NSLog(@"%@: %d Lines Parsed Successfully\n",rootFile,num_lines);
+			parsedOK = YES;
+		}
+		else  {
+			parsedOK = NO;
+			NSLog(@"%@: line %d: %@\n",rootFile,num_lines+1,[lines objectAtIndex:num_lines]);
+			[[NSNotificationCenter defaultCenter] postNotificationName:ORScriptRunnerParseError 
+																object:self 
+															  userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithLong:num_lines+1] forKey:@"ErrorLocation"]];
+		}
+	}
+
+	@catch(NSException* e) { 
+		parsedOK = NO;
+		int lineCount = num_lines;
+		if([e userInfo]){
+			NSLog(@"Caught Exception %@: %@\n",[e name],[e reason]);
+			lineCount = [[[e userInfo] objectForKey:@"LineNum"] intValue];
+		}
+		else {
+			NSLog(@"line %d: %@\n",num_lines+1,[[theString componentsSeparatedByString:@"\n"] objectAtIndex:num_lines]);
+		}
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORScriptRunnerParseError 
+															object:self 
+														  userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithLong:lineCount+1] forKey:@"ErrorLocation"]];
 		[functionList release];
 		functionList = nil;
 	}
-	return [self functionTable];
+
 }
 
+- (NSMutableDictionary*) gatherImportedStrings:(NSString*)scriptString rootFile:(NSString*)rootFile
+{
+	NSMutableDictionary* importedStrings = [NSMutableDictionary dictionary];
+	int lineNum =0;
+	NSArray* lines = [scriptString componentsSeparatedByString:@"\n" ];
+	for(id aLine in lines){
+		lineNum++;
+		NSString* trimmedLine = [aLine trimSpacesFromEnds];
+		if([trimmedLine hasPrefix:@"#"]){
+			NSArray* files = [[trimmedLine stringByReplacingOccurrencesOfString:@"#" withString:@""] componentsSeparatedByString:@"import"];
+			for(id aFile in files){
+				NSString* theFileName = [aFile trimSpacesFromEnds];
+				if([theFileName length]>=3){
+					theFileName = [theFileName substringFromIndex:1];
+					theFileName = [theFileName substringToIndex:[theFileName length]-1];
+					NSFileManager* fm = [NSFileManager defaultManager];
+					if([fm fileExistsAtPath:[theFileName stringByExpandingTildeInPath]]){
+						NSString* contents = [NSString stringWithContentsOfFile:[theFileName stringByExpandingTildeInPath] encoding:NSASCIIStringEncoding error:nil];
+						if([contents length]){
+							[importedStrings setObject:contents forKey:[theFileName stringByExpandingTildeInPath]];
+						}
+						NSMutableDictionary* more = [self gatherImportedStrings:contents rootFile:[theFileName stringByExpandingTildeInPath]];
+						if([more count]){
+							[importedStrings addEntriesFromDictionary:more];
+						}
+					}
+					else {
+						NSException* e = [NSException exceptionWithName:@"File Not Found" 
+																 reason:[NSString stringWithFormat:@"%@ imported by %@ line: %d Not Found",theFileName,rootFile,lineNum] 
+															   userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:lineNum] forKey:@"LineNum"]];
+						[e raise];
+					}
+				}
+			}
+		}
+	}
+	return importedStrings;
+	
+}
 #pragma mark ¥¥¥Group Evaluators
 - (void) stopThread
 {
@@ -468,7 +556,6 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 				NSLogColor([NSColor redColor],@"Script stopped\n");
 			}
 			[self reportResult:[NSDecimalNumber numberWithInt:0]];
-
 			break;
 		}
 	}	

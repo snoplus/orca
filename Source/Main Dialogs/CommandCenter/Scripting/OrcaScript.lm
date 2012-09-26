@@ -71,7 +71,7 @@ E			[Ee][+-]?{D}+
 "!="            return NE_OP;
 "&&"			return AND_OP;
 "||"			return OR_OP;
-
+"#"				return HASH;
 "<<"			return LEFT_OP;
 ">>"			return RIGHT_OP;
 
@@ -115,9 +115,10 @@ E			[Ee][+-]?{D}+
 "fixed"			return FIXED;
 "shell"			return SHELL;
 "stringFromFile"	return STRINGFROMFILE;
-"writeLine"		return WRITELINETOFILE;
+"writeLine"			return WRITELINETOFILE;
 "deleteFile"		return DELETEFILE;
 "nsfilemanager"		return NSFILEMANAGER;
+"import"			return IMPORT;
 
 {L}({L}|{D})*   {
                 strncpy(OrcaScriptlval.symKey,yytext,yyleng);

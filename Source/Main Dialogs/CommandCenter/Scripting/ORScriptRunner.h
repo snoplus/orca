@@ -66,6 +66,7 @@
 - (void)		setString:(NSString* )theString;
 - (NSMutableDictionary*) functionTable;
 - (void)		setFunctionTable:(NSMutableDictionary*)aFunctionTable;
+- (void)		appendFunctionTable:(NSMutableDictionary*)aFunctionTable;
 - (NSString*)	scriptName;
 - (void)		setScriptName:(NSString*)aString;
 - (BOOL)		parsedOK;
@@ -94,9 +95,11 @@
 - (id) display:(id)aValue forKey:(id)aKey;
 - (void) runScriptAsString:(NSString*)aScript; //for testing
 
-#pragma mark ¥¥¥Parsers
-- (id)		 parseFile:(NSString*) aPath;
-- (id)		 parse:(NSString*) theString;
+#pragma mark ¥¥¥Parsering stuff
+- (NSMutableDictionary*) gatherImportedStrings:(NSString*)scriptString rootFile:(NSString*)aFile;
+- (void) parseFile:(NSString*) aPath;
+- (void) parse:(NSString*) theString;
+- (void) subParse:(NSString*)theString rootFile:(NSString*)aFile;
 
 #pragma mark ¥¥¥Group Evaluators
 - (void)	evaluateAll:(id) args sender:(id)aSender;

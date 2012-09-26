@@ -7,6 +7,7 @@
 	
 	/* prototypes */
 	void addFunction(id nodeName,id node);
+	void importFile(id node);
 	void addNode(id node);
 	id executionNode(int oper, ...);
 	id identifierNode(char* aString);
@@ -35,7 +36,7 @@
 %token INC_OP DEC_OP ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN ORQUALS LEFT_ASSIGN RIGHT_ASSIGN TIME FIXED SCI 
 %token AND_ASSIGN XOR_ASSIGN MOD_ASSIGN OR_ASSIGN MAKESTRING CATSTRING SWITCH CASE DEFAULT MAKEPOINT MAKERECT SHELL
 %token LEFT_OP RIGHT_OP  EQ_OP NE_OP GE_OP LE_OP AND_OP OR_OP ALARM CLEAR UNLESS DISPLAY NSDICTIONARY NSARRAY MAKERANGE
-%token NSFILEMANAGER STRINGFROMFILE WRITELINETOFILE DELETEFILE  
+%token NSFILEMANAGER STRINGFROMFILE WRITELINETOFILE DELETEFILE IMPORT HASH
 %nonassoc ELSE
 
 %left '+' '-' 
@@ -56,7 +57,17 @@
 %%
 
 program
-: funclist	{return 1;}
+:importlist funclist	{return 1;}
+| funclist  {return 1;}
+;
+
+importlist
+: importdef
+| importlist importdef
+;
+
+importdef
+: HASH IMPORT STRING										{ importFile(stringNode($3));}
 ;
 
 funclist
@@ -571,3 +582,7 @@ void addFunction(id node,id nodeArgs)
 	nodeList = nil;
 }
 
+void importFile(id node)
+{
+	//do nothing, just here as placeholder
+}
