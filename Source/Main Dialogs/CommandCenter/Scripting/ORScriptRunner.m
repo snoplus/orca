@@ -342,6 +342,10 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 		if([trimmedLine hasPrefix:@"#"]){
 			NSArray* files = [[trimmedLine stringByReplacingOccurrencesOfString:@"#" withString:@""] componentsSeparatedByString:@"import"];
 			for(id aFile in files){
+                int commentLocation = [aFile rangeOfString:@"//"].location;
+                if(commentLocation!=NSNotFound){
+                    aFile = [aFile substringToIndex:commentLocation];
+                }
 				NSString* theFileName = [aFile trimSpacesFromEnds];
 				if([theFileName length]>=3){
 					theFileName = [theFileName substringFromIndex:1];
