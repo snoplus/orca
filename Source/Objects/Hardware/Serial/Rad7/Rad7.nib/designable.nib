@@ -3089,7 +3089,7 @@
 										</object>
 										<string key="NSFrame">{{10, 25}, {433, 602}}</string>
 									</object>
-									<string key="NSLabel">Process </string>
+									<string key="NSLabel">Process Limits </string>
 									<reference key="NSColor" ref="428584035"/>
 									<reference key="NSTabView" ref="314601741"/>
 								</object>
