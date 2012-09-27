@@ -71,6 +71,7 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 	[expressionAsData release];
 	[breakpoints release];
 	[displayDictionary release];
+	[importedContents release];
 	[super dealloc];
 }
 
@@ -245,9 +246,10 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 		}
 		theScriptRunner = nil;
 		@try {
-			
+			[importedContents release];
+			importedContents = nil;
 			//recursively gather the imported files into a linear list and parse one by one.
-			NSDictionary* importedContents = [self gatherImportedStrings:theString rootFile:@"Main Script"];
+			[self gatherImportedFiles:theString rootFile:@"Main Script"];
 			NSArray* keys = [importedContents allKeys];
 			for(id aFileName in keys){
 				NSString* importedScript = [importedContents objectForKey:aFileName];
@@ -331,9 +333,8 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 
 }
 
-- (NSMutableDictionary*) gatherImportedStrings:(NSString*)scriptString rootFile:(NSString*)rootFile
+- (void) gatherImportedFiles:(NSString*)scriptString rootFile:(NSString*)rootFile
 {
-	NSMutableDictionary* importedStrings = [NSMutableDictionary dictionary];
 	int lineNum =0;
 	NSArray* lines = [scriptString componentsSeparatedByString:@"\n" ];
 	for(id aLine in lines){
@@ -349,29 +350,28 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 				NSString* theFileName = [aFile trimSpacesFromEnds];
 				if([theFileName length]>=3){
 					theFileName = [theFileName substringFromIndex:1];
-					theFileName = [theFileName substringToIndex:[theFileName length]-1];
-					NSFileManager* fm = [NSFileManager defaultManager];
-					if([fm fileExistsAtPath:[theFileName stringByExpandingTildeInPath]]){
-						NSString* contents = [NSString stringWithContentsOfFile:[theFileName stringByExpandingTildeInPath] encoding:NSASCIIStringEncoding error:nil];
-						if([contents length]){
-							[importedStrings setObject:contents forKey:[theFileName stringByExpandingTildeInPath]];
+					theFileName = [[theFileName substringToIndex:[theFileName length]-1]stringByExpandingTildeInPath];
+					if(![importedContents objectForKey:theFileName]){
+						NSFileManager* fm = [NSFileManager defaultManager];
+						if([fm fileExistsAtPath:theFileName]){
+							NSString* contents = [NSString stringWithContentsOfFile:theFileName encoding:NSASCIIStringEncoding error:nil];
+							if([contents length]){
+								if(!importedContents)importedContents = [[NSMutableDictionary dictionary] retain];
+								[importedContents setObject:contents forKey:theFileName];
+								[self gatherImportedFiles:contents rootFile:theFileName];
+							}
 						}
-						NSMutableDictionary* more = [self gatherImportedStrings:contents rootFile:[theFileName stringByExpandingTildeInPath]];
-						if([more count]){
-							[importedStrings addEntriesFromDictionary:more];
+						else {
+							NSException* e = [NSException exceptionWithName:@"File Not Found" 
+																	 reason:[NSString stringWithFormat:@"%@ imported by %@ line: %d Not Found",theFileName,rootFile,lineNum] 
+																   userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:lineNum] forKey:@"LineNum"]];
+							[e raise];
 						}
-					}
-					else {
-						NSException* e = [NSException exceptionWithName:@"File Not Found" 
-																 reason:[NSString stringWithFormat:@"%@ imported by %@ line: %d Not Found",theFileName,rootFile,lineNum] 
-															   userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:lineNum] forKey:@"LineNum"]];
-						[e raise];
 					}
 				}
 			}
 		}
 	}
-	return importedStrings;
 	
 }
 #pragma mark ¥¥¥Group Evaluators

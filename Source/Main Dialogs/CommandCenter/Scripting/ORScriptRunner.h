@@ -53,7 +53,8 @@
 	NSMutableIndexSet*	breakpoints;
 	int					debugMode;
 	NSMutableDictionary*    displayDictionary;
-	NSThread*			scriptThread;
+	NSThread*				scriptThread;
+	NSMutableDictionary*	importedContents;
 } 
 
 #pragma mark ¥¥¥Accessors
@@ -96,7 +97,7 @@
 - (void) runScriptAsString:(NSString*)aScript; //for testing
 
 #pragma mark ¥¥¥Parsering stuff
-- (NSMutableDictionary*) gatherImportedStrings:(NSString*)scriptString rootFile:(NSString*)aFile;
+- (void) gatherImportedFiles:(NSString*)scriptString rootFile:(NSString*)aFile;
 - (void) parseFile:(NSString*) aPath;
 - (void) parse:(NSString*) theString;
 - (void) subParse:(NSString*)theString rootFile:(NSString*)aFile;
