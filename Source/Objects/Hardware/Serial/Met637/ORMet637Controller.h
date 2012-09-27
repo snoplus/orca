@@ -73,7 +73,9 @@
 	IBOutlet NSTextField*	sensorStatus2Field;
 	IBOutlet NSTextField*	flowStatus2Field;
 	IBOutlet NSTextField*   actualDuration2Field;
-	
+	IBOutlet NSTextField*	humidity2Field;
+	IBOutlet NSTextField*	temperature2Field;
+
 	
     IBOutlet ORSerialPortController* serialPortController;
 

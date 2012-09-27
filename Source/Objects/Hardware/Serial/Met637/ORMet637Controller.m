@@ -379,11 +379,13 @@
 - (void) humidityChanged:(NSNotification*)aNote
 {
 	[humidityField setFloatValue: [model humidity]];
+	[humidity2Field setFloatValue: [model humidity]];
 }
 
 - (void) temperatureChanged:(NSNotification*)aNote
 {
 	[temperatureField setFloatValue: [model temperature]];
+	[temperature2Field setFloatValue: [model temperature]];
 }
 
 - (void) countAlarmLimitChanged:(NSNotification*)aNote

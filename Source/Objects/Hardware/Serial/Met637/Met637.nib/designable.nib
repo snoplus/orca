@@ -12,7 +12,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="6"/>
+			<integer value="2126"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -2198,7 +2198,6 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{97, 409}, {226, 18}}</string>
 												<reference key="NSSuperview" ref="348451693"/>
-												<reference key="NSNextKeyView"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSTextFieldCell" key="NSCell" id="226921862">
 													<int key="NSCellFlags">68288064</int>
@@ -2306,7 +2305,6 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{154, 280}, {64, 125}}</string>
 												<reference key="NSSuperview" ref="348451693"/>
-												<reference key="NSNextKeyView"/>
 												<bool key="NSEnabled">YES</bool>
 												<int key="NSNumRows">6</int>
 												<int key="NSNumCols">1</int>
@@ -3627,6 +3625,22 @@
 						<reference key="destination" ref="1031823803"/>
 					</object>
 					<int key="connectionID">2664</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">humidity2Field</string>
+						<reference key="source" ref="898754966"/>
+						<reference key="destination" ref="961783278"/>
+					</object>
+					<int key="connectionID">2665</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">temperature2Field</string>
+						<reference key="source" ref="898754966"/>
+						<reference key="destination" ref="897200801"/>
+					</object>
+					<int key="connectionID">2666</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -6793,7 +6807,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">2664</int>
+			<int key="maxID">2666</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -7910,6 +7924,7 @@
 							<string>flowStatus2Field</string>
 							<string>flowStatusField</string>
 							<string>holdTimeField</string>
+							<string>humidity2Field</string>
 							<string>humidityField</string>
 							<string>isLogCB</string>
 							<string>lockButton</string>
@@ -7929,6 +7944,7 @@
 							<string>tempUnits2Field</string>
 							<string>tempUnitsField</string>
 							<string>tempUnitsPU</string>
+							<string>temperature2Field</string>
 							<string>temperatureField</string>
 							<string>timedOutField</string>
 							<string>totalView</string>
@@ -7960,6 +7976,7 @@
 							<string>NSTextField</string>
 							<string>NSTextField</string>
 							<string>NSTextField</string>
+							<string>NSTextField</string>
 							<string>NSButton</string>
 							<string>NSButton</string>
 							<string>NSTextField</string>
@@ -7978,6 +7995,7 @@
 							<string>NSTextField</string>
 							<string>NSTextField</string>
 							<string>NSPopUpButton</string>
+							<string>NSTextField</string>
 							<string>NSTextField</string>
 							<string>NSTextField</string>
 							<string>NSView</string>
@@ -8011,6 +8029,7 @@
 							<string>flowStatus2Field</string>
 							<string>flowStatusField</string>
 							<string>holdTimeField</string>
+							<string>humidity2Field</string>
 							<string>humidityField</string>
 							<string>isLogCB</string>
 							<string>lockButton</string>
@@ -8030,6 +8049,7 @@
 							<string>tempUnits2Field</string>
 							<string>tempUnitsField</string>
 							<string>tempUnitsPU</string>
+							<string>temperature2Field</string>
 							<string>temperatureField</string>
 							<string>timedOutField</string>
 							<string>totalView</string>
@@ -8127,6 +8147,10 @@
 								<string key="candidateClassName">NSTextField</string>
 							</object>
 							<object class="IBToOneOutletInfo">
+								<string key="name">humidity2Field</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
 								<string key="name">humidityField</string>
 								<string key="candidateClassName">NSTextField</string>
 							</object>
@@ -8201,6 +8225,10 @@
 							<object class="IBToOneOutletInfo">
 								<string key="name">tempUnitsPU</string>
 								<string key="candidateClassName">NSPopUpButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">temperature2Field</string>
+								<string key="candidateClassName">NSTextField</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">temperatureField</string>
