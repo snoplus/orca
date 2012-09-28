@@ -38,6 +38,8 @@
 #import "ORTaskSequence.h"
 #import "ORFileMover.h"
 
+#include <pthread.h>
+
 
 //IPE V4 register definitions
 enum IpeV4Enum {
@@ -180,11 +182,142 @@ static IpeRegisterNamesStruct regV4[kSltV4NumRegs] = {
 //{@"Data Block Address",	0xF00008 Data Block Address
 };
 
+//threading
+	    //pthread handling
+	    pthread_t dataReplyThread;
+        pthread_mutex_t dataReplyThread_mutex;
+
+volatile int vflag = 0;
+
+typedef struct{
+	    int started;
+	    int stopNow;
+		id model;
+		struct sockaddr_in sockaddr_data_from;
+		int UDP_DATA_REPLY_SERVER_SOCKET;
+        int isListeningOnDataServerSocket;
+} THREAD_DATA;
+
+THREAD_DATA dataReplyThreadData;
+
+void* receiveFromDataReplyServerThreadFunction (void* p);
+
+
+void* receiveFromDataReplyServerThreadFunction (void* p)
+{
+	
+	THREAD_DATA *dataReplyThreadData = (THREAD_DATA *)p;
+	
+	
+	//static int counterStatusPacket=0; //MAH commented out 9/17/2012 to get rid of compiler unused variable warning
+	static int counterData1444Packet=0;
+	
+	//[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(receiveFromDataReplyServer) object:nil];
+	
+    const int maxSizeOfReadbuffer=4096*2;
+    char readBuffer[maxSizeOfReadbuffer];
+	
+	int retval=-1;
+	
+	
+	int32_t l=0;
+	int doRunLoop=true;
+	dataReplyThreadData->started = 1;
+	do{
+	    l++;
+		//usleep(10000);
+		//NSLog(@"xxxxCalled    receiveFromDataReplyServerThreadFunction: %i stop %i started %i\n",l,dataReplyThreadData->stopNow,dataReplyThreadData->started);//TODO: DEBUG -tb-
+		
+		//
+		//if(![dataReplyThreadData->model isListeningOnDataServerSocket]){
+		if(dataReplyThreadData->stopNow){
+			dataReplyThreadData->stopNow=0;
+			dataReplyThreadData->started=0;
+			NSLog(@"Called    receiveFromDataReplyServerThreadFunction with stopNow : %i \n",l);//TODO: DEBUG -tb-
+			doRunLoop=false;//finish for loop
+		}
+		if(!dataReplyThreadData->isListeningOnDataServerSocket){
+			dataReplyThreadData->stopNow=0;
+			dataReplyThreadData->started=0;
+			NSLog(@"Called    receiveFromDataReplyServerThreadFunction with !isListeningOnDataServerSocket : %i \n",l);//TODO: DEBUG -tb-
+			//NSLog(@"Called %@::%@  requestStoppingDataServerSocket:%i loop:%i  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) , requestStoppingDataServerSocket,l);//TODO: DEBUG -tb-
+			//requestStoppingDataServerSocket=0;
+			//break;
+			doRunLoop=false;//finish for loop
+		}
+		//init
+		retval=-1;
+		socklen_t  sockaddr_data_fromLength = sizeof(dataReplyThreadData->sockaddr_data_from);
+		
+		
+		retval = recvfrom(dataReplyThreadData->UDP_DATA_REPLY_SERVER_SOCKET, readBuffer, maxSizeOfReadbuffer, MSG_DONTWAIT,(struct sockaddr *) &dataReplyThreadData->sockaddr_data_from, &sockaddr_data_fromLength);
+	    //printf("recvfromGlobalServer retval:  %i, maxSize %i\n",retval,maxSizeOfReadbuffer);
+		//if(retval==-1) break;
+		if(retval==-1) continue;
+	    if(retval>=0 && retval != 1444){
+	        //printf("recvfromGlobalServer retval:  %i (bytes), maxSize %i, from IP %s\n",retval,maxSizeOfReadbuffer,inet_ntoa(sockaddr_from.sin_addr));
+			//printf("Got UDP data from %s\n", inet_ntoa(sockaddr_from.sin_addr));
+			//NSLog(@"Got UDP data from %s\n", inet_ntoa(sockaddr_from.sin_addr));
+	        NSLog(@"  receiveFromDataReplyServerThreadFunction: Got UDP data from %s!  \n", inet_ntoa(dataReplyThreadData->sockaddr_data_from.sin_addr));//TODO: DEBUG -tb-
+			
+	    }
+	    if(retval == 1444 && counterData1444Packet==0){
+	        NSLog(@"  receiveFromDataReplyServerThreadFunction: Got UDP data packet from %s!  \n",  inet_ntoa(dataReplyThreadData->sockaddr_data_from.sin_addr));//TODO: DEBUG -tb-
+			int i;
+			uint16_t *shorts=(uint16_t *)readBuffer;
+			NSMutableString *s = [[NSMutableString alloc] init];
+			[s setString:@""];
+#if 0
+			//TODO: using this the sequence is reverted!!!!! eg. 0x4122 0x4111 0x4244 0x4133 ....
+			for(i=0;i<16;i++){
+			    [s appendFormat:@" 0x%04x",shorts[i]];
+			}
+#else
+			for(i=0;i<8;i++){
+			    [s appendFormat:@" 0x%04x",shorts[i*2+1]];
+			    [s appendFormat:@" 0x%04x",shorts[i*2]];
+			}
+#endif
+			NSLog(@"%@\n",s);
+		}
+		
+		//give some debug output
+		if(retval>0){
+			
+			if(retval>=4){
+				uint32_t *hptr = (uint32_t *)(readBuffer);
+				uint16_t *h16ptr = (uint16_t *)(readBuffer);
+				uint16_t *h16ptr2 = (uint16_t *)(&readBuffer[2]);
+				if(retval==1444) counterData1444Packet++;
+				else{
+					if(counterData1444Packet>0) NSLog(@"  received %i data packets with 1444 bytes  \n",counterData1444Packet);
+					NSLog(@"  received data packet w header 0x%08x, 0x%04x,0x%04x, length %i\n",*hptr,*h16ptr,*h16ptr2,retval);
+					NSLog(@"  bytes: %i\n",counterData1444Packet * 1440 + retval -4);
+					counterData1444Packet=0;
+				}
+			}
+		}
+	}while(doRunLoop);//for(l ...
+	
+	
+	
+	NSLog(@"  receiveFromDataReplyServerThreadFunction: loop FINISHED  \n");
+	dataReplyThreadData->stopNow=0;
+	dataReplyThreadData->started=0;
+	
+	
+	
+    return (void*)0;
+}
+
+
+
 
 #pragma mark ***External Strings
 
 NSString* OREdelweissSLTModelNumRequestedUDPPacketsChanged = @"OREdelweissSLTModelNumRequestedUDPPacketsChanged";
 NSString* OREdelweissSLTModelIsListeningOnDataServerSocketChanged = @"OREdelweissSLTModelIsListeningOnDataServerSocketChanged";
+NSString* OREdelweissSLTModelOpenCloseDataCommandSocketChanged = @"OREdelweissSLTModelOpenCloseDataCommandSocketChanged";
 NSString* OREdelweissSLTModelCrateUDPDataReplyPortChanged = @"OREdelweissSLTModelCrateUDPDataReplyPortChanged";
 NSString* OREdelweissSLTModelCrateUDPDataIPChanged = @"OREdelweissSLTModelCrateUDPDataIPChanged";
 NSString* OREdelweissSLTModelCrateUDPDataPortChanged = @"OREdelweissSLTModelCrateUDPDataPortChanged";
@@ -374,10 +507,21 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 - (void) setIsListeningOnDataServerSocket:(int)aIsListeningOnDataServerSocket
 {
     isListeningOnDataServerSocket = aIsListeningOnDataServerSocket;
+	dataReplyThreadData.isListeningOnDataServerSocket=isListeningOnDataServerSocket;
 
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelIsListeningOnDataServerSocketChanged object:self];
 }
 
+
+- (int) requestStoppingDataServerSocket
+{
+    return requestStoppingDataServerSocket;
+}
+
+- (void) setRequestStoppingDataServerSocket:(int)aValue
+{
+    requestStoppingDataServerSocket = aValue;
+}
 
 - (int) crateUDPDataReplyPort
 {
@@ -1317,7 +1461,7 @@ NSLog(@"  arguments: %@ \n" , arguments);
 //reply socket (server)
 - (int) startListeningDataServerSocket
 {
-	NSLog(@"Called %@::%@!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
+	//debug NSLog(@"Called %@::%@!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
 
     int status, retval=0;
 
@@ -1377,18 +1521,31 @@ NSLog(@"  arguments: %@ \n" , arguments);
     UDP_DATA_REPLY_SERVER_SOCKET = -1;
 	
 	[self setIsListeningOnDataServerSocket: 0];
+    ////TODO: a test -tb-
+	dataReplyThreadData.stopNow=1;
+	
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(receiveFromDataReplyServer) object:nil];
 }
 
+
+
+
+
 - (int) receiveFromDataReplyServer
 {
+//TODO: changed to pthreads - needs cleanup -tb-
+// code moved to void* receiveFromDataReplyServerThreadFunction (void* p)
+ 
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(receiveFromDataReplyServer) object:nil];
 
+	#if 0
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(receiveFromDataReplyServer) object:nil];
 	//static int counterStatusPacket=0; //MAH commented out 9/17/2012 to get rid of compiler unused variable warning
 	static int counterData1444Packet=0;
 	
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(receiveFromDataReplyServer) object:nil];
 
-    const int maxSizeOfReadbuffer=4096;
+    const int maxSizeOfReadbuffer=4096*2;
     char readBuffer[maxSizeOfReadbuffer];
 
 	int retval=-1;
@@ -1396,6 +1553,14 @@ NSLog(@"  arguments: %@ \n" , arguments);
 	
 int l;
 for(l=0;l<2500;l++){
+//usleep(10000);
+	    //NSLog(@"xxxCalled %@::%@  requestStoppingDataServerSocket:%i loop:%i  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) , requestStoppingDataServerSocket,l);//TODO: DEBUG -tb-
+    //
+	if(requestStoppingDataServerSocket==1){
+	    NSLog(@"Called %@::%@  requestStoppingDataServerSocket:%i loop:%i  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) , requestStoppingDataServerSocket,l);//TODO: DEBUG -tb-
+	    requestStoppingDataServerSocket=0;
+	    break;//finish for loop
+	}
 	//init
 	retval=-1;
     sockaddr_data_fromLength = sizeof(sockaddr_data_from);
@@ -1404,7 +1569,8 @@ for(l=0;l<2500;l++){
     //while( (retval = recvfrom(MY_UDP_SERVER_SOCKET, (char*)InBuffer,sizeof(InBuffer) , MSG_DONTWAIT,(struct sockaddr *) &servaddr, &AddrLength)) >0 ){
     retval = recvfrom(UDP_DATA_REPLY_SERVER_SOCKET, readBuffer, maxSizeOfReadbuffer, MSG_DONTWAIT,(struct sockaddr *) &sockaddr_data_from, &sockaddr_data_fromLength);
 	    //printf("recvfromGlobalServer retval:  %i, maxSize %i\n",retval,maxSizeOfReadbuffer);
-	if(retval==-1) break;
+	//if(retval==-1) break;
+	if(retval==-1) continue;
 	    if(retval>=0 && retval != 1444){
 	        //printf("recvfromGlobalServer retval:  %i (bytes), maxSize %i, from IP %s\n",retval,maxSizeOfReadbuffer,inet_ntoa(sockaddr_from.sin_addr));
 			//printf("Got UDP data from %s\n", inet_ntoa(sockaddr_from.sin_addr));
@@ -1418,9 +1584,17 @@ for(l=0;l<2500;l++){
 			uint16_t *shorts=(uint16_t *)readBuffer;
 			NSMutableString *s = [[NSMutableString alloc] init];
 			[s setString:@""];
+			#if 0
+			//TODO: using this the sequence is reverted!!!!! eg. 0x4122 0x4111 0x4244 0x4133 ....
 			for(i=0;i<16;i++){
 			    [s appendFormat:@" 0x%04x",shorts[i]];
 			}
+			#else
+			for(i=0;i<8;i++){
+			    [s appendFormat:@" 0x%04x",shorts[i*2+1]];
+			    [s appendFormat:@" 0x%04x",shorts[i*2]];
+			}
+			#endif
 			NSLog(@"%@\n",s);
 		}
 		
@@ -1447,6 +1621,27 @@ for(l=0;l<2500;l++){
 //NSLog(@"retval: %i, l=%i\n",retval,l); with one fiber we had ca. 12 packets per loop ...
 	if(	[self isListeningOnDataServerSocket]) [self performSelector:@selector(receiveFromDataReplyServer) withObject:nil afterDelay: 0];
 
+
+
+
+#else
+	int retval=-1;
+
+    dataReplyThreadData.model = self;
+    dataReplyThreadData.started = 0;
+    dataReplyThreadData.stopNow = 0;
+    dataReplyThreadData.sockaddr_data_from = sockaddr_data_from;
+    dataReplyThreadData.UDP_DATA_REPLY_SERVER_SOCKET = UDP_DATA_REPLY_SERVER_SOCKET;
+
+   //is it OK to call it again? when destroy it? -tb-
+   pthread_create(&dataReplyThread, NULL, receiveFromDataReplyServerThreadFunction, (void*) &dataReplyThreadData);
+     //note: pthread_create is not blocking -tb-
+
+ //NSLog(@"retval: %i, l=%i\n",retval,l); with one fiber we had ca. 12 packets per loop ...
+	//if(	[self isListeningOnDataServerSocket]) [self performSelector:@selector(receiveFromDataReplyServer) withObject:nil afterDelay: 0];
+
+#endif
+
     return retval;
 }
 
@@ -1457,7 +1652,7 @@ for(l=0;l<2500;l++){
 //command data socket (client)
 - (int) openDataCommandSocket
 {
-	NSLog(@"Called %@::%@!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
+	//debug NSLog(@"Called %@::%@!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
 	//[model setCrateUDPCommand:[sender stringValue]];	
 	
 	if(UDP_DATA_COMMAND_CLIENT_SOCKET>0) [self closeDataCommandSocket];//still open, first close the socket
@@ -1479,14 +1674,15 @@ for(l=0;l<2500;l++){
   if (inet_aton([crateUDPDataIP cStringUsingEncoding:NSASCIIStringEncoding], &UDP_DATA_COMMAND_sockaddrin_to.sin_addr)==0) {
 	NSLog(@" %@::%@  inet_aton() failed \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
     //fprintf(stderr, "inet_aton() failed\n");
-	return 2;
+	retval = 2;
     //exit(1);
   }
-	NSLog(@" %@::%@  UDP Client: IP: %s, port: %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) ,[crateUDPDataIP cStringUsingEncoding:NSASCIIStringEncoding] /*crateUDPCommandIP oder %@ benutzen*/,	crateUDPCommandPort);//TODO: DEBUG -tb-
+	NSLog(@" %@::%@  UDP Client: IP: %s, port: %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) ,[crateUDPDataIP cStringUsingEncoding:NSASCIIStringEncoding] /*crateUDPCommandIP oder %@ benutzen*/,	crateUDPDataPort);//TODO: DEBUG -tb-
     //fprintf(stderr, "    initGlobalUDPClientSocket: UDP Client: IP: %s, port: %i\n",[crateUDPCommandIP cStringUsingEncoding:NSASCIIStringEncoding] /*crateUDPCommandIP oder %@ benutzen*/,	crateUDPCommandPort);
   #endif
   
 	
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelOpenCloseDataCommandSocketChanged object:self];
 	
 	return retval;
 }
@@ -1499,6 +1695,7 @@ for(l=0;l<2500;l++){
 	//[model setCrateUDPCommand:[sender stringValue]];	
       if(UDP_DATA_COMMAND_CLIENT_SOCKET>-1) close(UDP_DATA_COMMAND_CLIENT_SOCKET);
       UDP_DATA_COMMAND_CLIENT_SOCKET = -1;
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelOpenCloseDataCommandSocketChanged object:self];
 }
 
 - (int) isOpenDataCommandSocket
@@ -1509,10 +1706,10 @@ for(l=0;l<2500;l++){
 - (int) sendUDPDataCommand:(char*)data length:(int) len
 {
     //taken from ipe4reader6.cpp, function int sendtoGlobalClient3(const void *buffer, size_t length, char* receiverIPAddr, uint32_t port)
-	NSLog(@"Called %@::%@! Send data ... len %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) , len);//TODO: DEBUG -tb-
-	int i;
-	for(i=0; i<len;i++) NSLog(@"0x%02x  ",data[i]);
-	NSLog(@"\n");
+	//NSLog(@"Called %@::%@! Send data ... len %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) , len);//TODO: DEBUG -tb-
+	//int i;
+	//for(i=0; i<len;i++) NSLog(@"0x%02x  ",data[i]);
+	//NSLog(@"\n");
 
 
 
@@ -1547,6 +1744,26 @@ for(l=0;l<2500;l++){
     return retval;
 
 
+}
+
+- (int) sendUDPDataCommandRequestPackets:(int8_t) num
+{
+    char data[6];
+	int len=6;
+	data[0]='P';//'P' = 0x50 = P command
+	//data[1]=50;//amount of requested data (interpreted as second (?)), standard: 50
+	data[1]= num & 0xff;//50;//amount of requested data (interpreted as second (?)), standard: 50
+	uint16_t *port=(uint16_t *)(&data[2]);
+	*port = [self crateUDPDataReplyPort];
+	data[4]=0;//=bolo?
+	data[5]=0;//=bolo?
+	return [self sendUDPDataCommand: data length: len];	
+}
+
+
+- (int) sendUDPDataCommandRequestUDPData
+{
+	return [self sendUDPDataCommandRequestPackets:  numRequestedUDPPackets];	
 }
 
 

@@ -12,7 +12,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="3687"/>
+			<integer value="3001"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -459,7 +459,7 @@
 									</object>
 									<string key="NSCellSize">{18, 38}</string>
 									<string key="NSIntercellSpacing">{0, 0}</string>
-									<int key="NSMatrixFlags">1140850688</int>
+									<int key="NSMatrixFlags">1409286144</int>
 									<nil key="NSCellClass"/>
 									<object class="NSButtonCell" key="NSProtoCell" id="1026365316">
 										<int key="NSCellFlags">-1543373312</int>

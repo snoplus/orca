@@ -177,7 +177,11 @@
 	    uint32_t UDP_DATA_COMMAND_CLIENT_IP;
         struct sockaddr_in UDP_DATA_COMMAND_sockaddrin_to;
     int isListeningOnDataServerSocket;
+    int requestStoppingDataServerSocket;
     int numRequestedUDPPackets;
+	    //pthread handling
+	    pthread_t dataReplyThread;
+        pthread_mutex_t dataReplyThread_mutex;
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
@@ -199,6 +203,10 @@
 - (void) setNumRequestedUDPPackets:(int)aNumRequestedUDPPackets;
 - (int) isListeningOnDataServerSocket;
 - (void) setIsListeningOnDataServerSocket:(int)aIsListeningOnDataServerSocket;
+- (int) requestStoppingDataServerSocket;
+- (void) setRequestStoppingDataServerSocket:(int)aValue;
+
+
 - (int) crateUDPDataReplyPort;
 - (void) setCrateUDPDataReplyPort:(int)aCrateUDPDataReplyPort;
 - (NSString*) crateUDPDataIP;
@@ -305,6 +313,8 @@
 - (void) closeDataCommandSocket;
 - (int) isOpenDataCommandSocket;
 - (int) sendUDPDataCommand:(char*)data length:(int) len;
+- (int) sendUDPDataCommandRequestPackets:(int8_t) num;
+- (int) sendUDPDataCommandRequestUDPData;
 
 
 
@@ -412,7 +422,7 @@ extern NSString* OREdelweissSLTModelCrateUDPDataReplyPortChanged;
 extern NSString* OREdelweissSLTModelCrateUDPDataIPChanged;
 extern NSString* OREdelweissSLTModelCrateUDPDataPortChanged;
 extern NSString* OREdelweissSLTModelEventFifoStatusRegChanged;
-extern NSString* OREdelweissSLTModelPixelBusEnableRegChanged;
+extern NSString* OREdelweissSLTModelOpenCloseDataCommandSocketChanged;
 extern NSString* OREdelweissSLTModelPixelBusEnableRegChanged;
 extern NSString* OREdelweissSLTModelSelectedFifoIndexChanged;
 extern NSString* OREdelweissSLTModelIsListeningOnServerSocketChanged;

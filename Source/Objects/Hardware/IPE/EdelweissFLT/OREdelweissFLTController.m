@@ -751,16 +751,19 @@
 
 - (void) slotChanged:(NSNotification*)aNotification
 {
+    //DEBUG 	NSLog(@"%@::%@ \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
 	// Set title of FLT configuration window, ak 15.6.07
 	[[self window] setTitle:[NSString stringWithFormat:@"IPE-DAQ-V4 EDELWEISS FLT Card (Slot %d, FLT# %d)",[model slot]+1,[model stationNumber]]];
     [fltSlotNumTextField setStringValue: [NSString stringWithFormat:@"FLT# %d",[model stationNumber]]];
 	//[fltSlotNumMatrix setSe];
     //[[fltSlotNumMatrix cellWithTag:[model stationNumber]] setIntValue:1];
 	short chan;
-	for(chan=0;chan<kNumV4FLTChannels;chan++) if(chan==[model stationNumber]-1)
-	    [[fltSlotNumMatrix cellAtRow:0 column:chan] setState:1];
+	for(chan=0;chan<kNumV4FLTChannels;chan++){
+	    if(chan==[model stationNumber]-1)
+	        [[fltSlotNumMatrix cellAtRow:0 column:chan] setState:1];
 		else
-        [[fltSlotNumMatrix cellAtRow:0 column:chan] setState:0];
+            [[fltSlotNumMatrix cellAtRow:0 column:chan] setState:0];
+	}
 }
 
 - (void) gainArrayChanged:(NSNotification*)aNotification
@@ -965,25 +968,23 @@
 
 - (IBAction) fiberDelaysMatrixAction:(id)sender
 {
-//DEBUG OUTPUT:
- 	NSLog(@"%@::%@: UNDER CONSTRUCTION!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+//DEBUG OUTPUT:  	NSLog(@"%@::%@: UNDER CONSTRUCTION!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
 	//[model setStreamMask:[sender intValue]];	
 	uint64_t fib;
     uint64_t val=0;
 	int clk12,clk120;
 	uint64_t fibDelays;
 	for(fib=0;fib<6;fib++){
-	    //NSLog(@"fib %i:",fib);
-		NSString *s = [NSString stringWithFormat:@"fib %llu",fib];
+		//debug NSString *s = [NSString stringWithFormat:@"fib %llu",fib];
 		    clk12  = [[fiberDelaysMatrix cellAtRow:0 column: fib] indexOfSelectedItem];
 		    clk120 = [[fiberDelaysMatrix cellAtRow:1 column: fib] indexOfSelectedItem];
-			s=[s stringByAppendingString: [NSString stringWithFormat:@"clk12 %i:",clk12]];
-			s=[s stringByAppendingString: [NSString stringWithFormat:@"clk120 %i:",clk120]];
+			//debug s=[s stringByAppendingString: [NSString stringWithFormat:@"clk12 %i:",clk12]];
+			//debug s=[s stringByAppendingString: [NSString stringWithFormat:@"clk120 %i:",clk120]];
 			fibDelays = ((clk120 & 0xf) << 4)  |   (clk12 & 0xf);
 			val |= ((fibDelays) << (fib*8));// see - (int) streamMaskForFiber:(int)aFiber chan:(int)aChan;
-			NSLog(@"%@\n",s);
+			//debug NSLog(@"%@\n",s);
 	}
-			NSLog(@"%016qx done.\n",val);
+			//debug NSLog(@"%016qx done.\n",val);
 	[model setFiberDelays:val];
 }
 
@@ -1001,25 +1002,23 @@
 
 - (void) streamMaskMatrixAction:(id)sender
 {
-//DEBUG OUTPUT:
- 	NSLog(@"%@::%@: UNDER CONSTRUCTION!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+//DEBUG OUTPUT:  	NSLog(@"%@::%@: UNDER CONSTRUCTION!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
 	//[model setStreamMask:[sender intValue]];	
 	uint64_t chan, fib;
     uint64_t val=0;
 	for(fib=0;fib<6;fib++){
-	    //NSLog(@"fib %i:",fib);
-		NSString *s = [NSString stringWithFormat:@"fib %lli:",fib];
+		//debug NSString *s = [NSString stringWithFormat:@"fib %lli:",fib];
 	    for(chan=0;chan<6;chan++){
 		    if([[streamMaskMatrix cellAtRow:fib column: chan] intValue]){ 
 			    val |= ((0x1LL<<chan) << (fib*8));// see - (int) streamMaskForFiber:(int)aFiber chan:(int)aChan;
-				s=[s stringByAppendingString: @"1"];
+				//debug s=[s stringByAppendingString: @"1"];
 			}else{
-				s=[s stringByAppendingString: @"0"];
+				//debug s=[s stringByAppendingString: @"0"];
 			}
 		}
-			NSLog(@"%@\n",s);
+		//debug NSLog(@"%@\n",s);
 	}
-			NSLog(@"%016qx done.\n",val);
+	//debug NSLog(@"%016qx done.\n",val);
 	[model setStreamMask:val];
 }
 

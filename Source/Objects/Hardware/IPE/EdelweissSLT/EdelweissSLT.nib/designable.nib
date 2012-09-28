@@ -12,7 +12,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="2"/>
+			<integer value="5909"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -7069,6 +7069,29 @@ AAAAAAAAAAAAAHRleHQAAAAAQ29weXJpZ2h0IEFwcGxlIENvbXB1dGVyLCBJbmMuLCAyMDA1AAAAAA</
 													<int key="NSPeriodicInterval">25</int>
 												</object>
 											</object>
+											<object class="NSButton" id="406621629">
+												<reference key="NSNextResponder" ref="88729467"/>
+												<int key="NSvFlags">268</int>
+												<string key="NSFrame">{{299, 332}, {63, 28}}</string>
+												<reference key="NSSuperview" ref="88729467"/>
+												<bool key="NSEnabled">YES</bool>
+												<object class="NSButtonCell" key="NSCell" id="505637291">
+													<int key="NSCellFlags">67239424</int>
+													<int key="NSCellFlags2">134348800</int>
+													<string key="NSContents">Test</string>
+													<reference key="NSSupport" ref="26"/>
+													<reference key="NSControlView" ref="406621629"/>
+													<int key="NSButtonFlags">-2038284033</int>
+													<int key="NSButtonFlags2">1</int>
+													<reference key="NSAlternateImage" ref="26"/>
+													<string key="NSAlternateContents"/>
+													<object class="NSMutableString" key="NSKeyEquivalent">
+														<characters key="NS.bytes"/>
+													</object>
+													<int key="NSPeriodicDelay">200</int>
+													<int key="NSPeriodicInterval">25</int>
+												</object>
+											</object>
 											<object class="NSProgressIndicator" id="680012676">
 												<reference key="NSNextResponder" ref="88729467"/>
 												<int key="NSvFlags">1292</int>
@@ -9197,6 +9220,14 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 						<reference key="destination" ref="345595302"/>
 					</object>
 					<int key="connectionID">5992</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">testUDPDataConnectionButtonAction:</string>
+						<reference key="source" ref="524620905"/>
+						<reference key="destination" ref="406621629"/>
+					</object>
+					<int key="connectionID">5996</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -13003,6 +13034,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<reference ref="282677819"/>
 							<reference ref="228028153"/>
 							<reference ref="869386182"/>
+							<reference ref="406621629"/>
 						</object>
 						<reference key="parent" ref="219009954"/>
 					</object>
@@ -13308,6 +13340,20 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 						<int key="objectID">5987</int>
 						<reference key="object" ref="488621598"/>
 						<reference key="parent" ref="282677819"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">5993</int>
+						<reference key="object" ref="406621629"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="505637291"/>
+						</object>
+						<reference key="parent" ref="88729467"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">5994</int>
+						<reference key="object" ref="505637291"/>
+						<reference key="parent" ref="406621629"/>
 					</object>
 				</object>
 			</object>
@@ -14263,6 +14309,10 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					<string>5985.ImportedFromIB2</string>
 					<string>5986.IBPluginDependency</string>
 					<string>5987.IBPluginDependency</string>
+					<string>5993.IBPluginDependency</string>
+					<string>5993.IBViewBoundsToFrameTransform</string>
+					<string>5993.ImportedFromIB2</string>
+					<string>5994.IBPluginDependency</string>
 				</object>
 				<object class="NSMutableArray" key="dict.values">
 					<bool key="EncodedWithXMLCoder">YES</bool>
@@ -15491,7 +15541,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<object class="NSAffineTransform">
-						<bytes key="NSTransformStruct">P4AAAL+AAABDsQAAw4GAAA</bytes>
+						<bytes key="NSTransformStruct">P4AAAL+AAABDlYAAw+SAAA</bytes>
 					</object>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -15537,6 +15587,12 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<object class="NSAffineTransform">
+						<bytes key="NSTransformStruct">P4AAAL+AAABDmAAAw+IAAA</bytes>
+					</object>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="unlocalizedProperties">
@@ -15555,7 +15611,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">5992</int>
+			<int key="maxID">5996</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -16686,12 +16742,14 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<string>stopListeningForReplyButtonAction:</string>
 							<string>stopUDPCommandConnectionButtonAction:</string>
 							<string>stopUDPDataConnectionButtonAction:</string>
+							<string>testUDPDataConnectionButtonAction:</string>
 							<string>writePixelBusEnableRegButtonAction:</string>
 							<string>writeRegAction:</string>
 							<string>writeValueAction:</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -16819,6 +16877,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<string>stopListeningForReplyButtonAction:</string>
 							<string>stopUDPCommandConnectionButtonAction:</string>
 							<string>stopUDPDataConnectionButtonAction:</string>
+							<string>testUDPDataConnectionButtonAction:</string>
 							<string>writePixelBusEnableRegButtonAction:</string>
 							<string>writeRegAction:</string>
 							<string>writeValueAction:</string>
@@ -17059,6 +17118,10 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							</object>
 							<object class="IBActionInfo">
 								<string key="name">stopUDPDataConnectionButtonAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">testUDPDataConnectionButtonAction:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">

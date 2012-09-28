@@ -209,6 +209,7 @@
 - (IBAction) stopListeningForDataReplyButtonAction:(id)sender;
 - (IBAction) crateUDPDataCommandSendButtonAction:(id)sender;
 - (IBAction) numRequestedUDPPacketsTextFieldAction:(id)sender;
+- (IBAction) testUDPDataConnectionButtonAction:(id)sender;
 
 
 //K command UDP connection

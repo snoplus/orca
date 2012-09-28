@@ -246,6 +246,11 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
                          name : OREdelweissSLTModelNumRequestedUDPPacketsChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(openDataCommandSocketChanged:)
+                         name : OREdelweissSLTModelOpenCloseDataCommandSocketChanged
+						object: model];
+
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
@@ -737,24 +742,23 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (IBAction) openDataCommandSocketButtonAction:(id)sender
 {
-	NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+	//debug NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
 	[model openDataCommandSocket];	
-    [self openDataCommandSocketChanged:nil];
+    //[self openDataCommandSocketChanged:nil];
 }
 
 
 - (IBAction) closeDataCommandSocketButtonAction:(id)sender
 {
-	NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+	//debug NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
 	[model closeDataCommandSocket];	
-    [self openDataCommandSocketChanged:nil];
+    //[self openDataCommandSocketChanged:nil];
 }
 
 
 - (IBAction) startListeningForDataReplyButtonAction:(id)sender
 {
-    //debug
-	NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+    //debug 	NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
 	[model startListeningDataServerSocket];	
 }
 
@@ -766,22 +770,19 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (IBAction) crateUDPDataCommandSendButtonAction:(id)sender
 {
-	NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
-    char data[6];
-	int len=6;
-	data[0]='P';//'P' = 0x50 = P command
-	//data[1]=50;//amount of requested data (interpreted as second (?)), standard: 50
-	data[1]= [model numRequestedUDPPackets] & 0xffff;//50;//amount of requested data (interpreted as second (?)), standard: 50
-	uint16_t *port=(uint16_t *)(&data[2]);
-	*port = [model crateUDPDataReplyPort];
-	data[4]=0;//=bolo?
-	data[5]=0;//=bolo?
-	[model sendUDPDataCommand: data length: len];	
+	//debug NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+	[model sendUDPDataCommandRequestUDPData];	
 }
 
 - (void) numRequestedUDPPacketsTextFieldAction:(id)sender
 {
 	[model setNumRequestedUDPPackets:[sender intValue]];	
+}
+
+- (IBAction) testUDPDataConnectionButtonAction:(id)sender
+{
+	//debug NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+	[model setRequestStoppingDataServerSocket:1];	
 }
 
 
@@ -802,15 +803,14 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 //reply socket (server)
 - (IBAction) startListeningForReplyButtonAction:(id)sender
 {
-    //debug
-	NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+    //debug	NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
 	[model startListeningServerSocket];	
 }
 
 
 - (IBAction) stopListeningForReplyButtonAction:(id)sender
 {
-	NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+	//debug NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
 	[model stopListeningServerSocket];	
 }
 
@@ -846,16 +846,16 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (IBAction) openCommandSocketButtonAction:(id)sender
 {
-	NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+	//debug NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
 	[model openCommandSocket];	
-    [self openCommandSocketChanged:nil];
+    [self openCommandSocketChanged:nil];//TODO: use a notification from model -tb-
 }
 
 - (IBAction) closeCommandSocketButtonAction:(id)sender
 {
-	NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+	//debug NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
 	[model closeCommandSocket];	
-    [self openCommandSocketChanged:nil];
+    [self openCommandSocketChanged:nil];//TODO: use a notification from model -tb-
 }
 
 
