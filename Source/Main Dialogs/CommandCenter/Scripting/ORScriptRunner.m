@@ -259,6 +259,10 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 				functionList = nil;
 			}
 			
+			if([keys count]==0){
+				//no imported files
+				parsedOK = YES;
+			}
 			if(parsedOK){
 				[self subParse:theString rootFile:@"Main Script"];
 				[self appendFunctionTable:functionList];
