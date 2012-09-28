@@ -12,8 +12,9 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="1921"/>
-			<integer value="1902"/>
+			<integer value="2135"/>
+			<integer value="1922"/>
+			<integer value="2133"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -292,7 +293,7 @@
 														<int key="NSColorSpace">6</int>
 														<string key="NSCatalogName">System</string>
 														<string key="NSColorName">textBackgroundColor</string>
-														<object class="NSColor" key="NSColor">
+														<object class="NSColor" key="NSColor" id="29698732">
 															<int key="NSColorSpace">3</int>
 															<bytes key="NSWhite">MQA</bytes>
 														</object>
@@ -2748,6 +2749,45 @@
 												<int key="NSTitlePosition">2</int>
 												<bool key="NSTransparent">NO</bool>
 											</object>
+											<object class="NSButton" id="74744386">
+												<reference key="NSNextResponder" ref="388996000"/>
+												<int key="NSvFlags">268</int>
+												<string key="NSFrame">{{314, 513}, {96, 28}}</string>
+												<reference key="NSSuperview" ref="388996000"/>
+												<bool key="NSEnabled">YES</bool>
+												<object class="NSButtonCell" key="NSCell" id="347294149">
+													<int key="NSCellFlags">67239424</int>
+													<int key="NSCellFlags2">134348800</int>
+													<string key="NSContents">RadLink...</string>
+													<reference key="NSSupport" ref="26"/>
+													<reference key="NSControlView" ref="74744386"/>
+													<int key="NSButtonFlags">-2038284033</int>
+													<int key="NSButtonFlags2">129</int>
+													<string key="NSAlternateContents"/>
+													<string key="NSKeyEquivalent"/>
+													<int key="NSPeriodicDelay">200</int>
+													<int key="NSPeriodicInterval">25</int>
+												</object>
+											</object>
+											<object class="NSTextField" id="56530291">
+												<reference key="NSNextResponder" ref="388996000"/>
+												<int key="NSvFlags">268</int>
+												<string key="NSFrame">{{316, 545}, {92, 14}}</string>
+												<reference key="NSSuperview" ref="388996000"/>
+												<bool key="NSEnabled">YES</bool>
+												<object class="NSTextFieldCell" key="NSCell" id="172886195">
+													<int key="NSCellFlags">68288064</int>
+													<int key="NSCellFlags2">138544128</int>
+													<string key="NSContents"/>
+													<reference key="NSSupport" ref="26"/>
+													<reference key="NSControlView" ref="56530291"/>
+													<reference key="NSBackgroundColor" ref="428584035"/>
+													<object class="NSColor" key="NSTextColor">
+														<int key="NSColorSpace">1</int>
+														<bytes key="NSRGB">MC41MTAyMDQwODE2IDAuMDI4Njc0NjMzNzUgMC4wNDUyODc2NDU3AA</bytes>
+													</object>
+												</object>
+											</object>
 										</object>
 										<string key="NSFrame">{{10, 25}, {433, 602}}</string>
 										<reference key="NSSuperview" ref="314601741"/>
@@ -3698,7 +3738,7 @@
 				<nil key="NSDelegate"/>
 			</object>
 			<object class="NSCustomView" id="730733848">
-				<reference key="NSNextResponder"/>
+				<nil key="NSNextResponder"/>
 				<int key="NSvFlags">276</int>
 				<object class="NSMutableArray" key="NSSubviews">
 					<bool key="EncodedWithXMLCoder">YES</bool>
@@ -3711,7 +3751,6 @@
 					</object>
 				</object>
 				<string key="NSFrameSize">{257, 111}</string>
-				<reference key="NSSuperview"/>
 				<object class="NSMutableString" key="NSClassName">
 					<characters key="NS.bytes">NSView</characters>
 				</object>
@@ -3719,6 +3758,470 @@
 			</object>
 			<object class="NSCustomObject" id="667242251">
 				<string key="NSClassName">ORSerialPortController</string>
+			</object>
+			<object class="NSWindowTemplate" id="189704977">
+				<int key="NSWindowStyleMask">3</int>
+				<int key="NSWindowBacking">2</int>
+				<string key="NSWindowRect">{{230, 411}, {372, 276}}</string>
+				<int key="NSWTFlags">1886912512</int>
+				<object class="NSMutableString" key="NSWindowTitle">
+					<characters key="NS.bytes">Panel</characters>
+				</object>
+				<object class="NSMutableString" key="NSWindowClass">
+					<characters key="NS.bytes">NSPanel</characters>
+				</object>
+				<object class="NSMutableString" key="NSViewClass">
+					<characters key="NS.bytes">View</characters>
+				</object>
+				<string key="NSWindowContentMaxSize">{1.79769e+308, 1.79769e+308}</string>
+				<object class="NSView" key="NSWindowView" id="405283309">
+					<reference key="NSNextResponder"/>
+					<int key="NSvFlags">256</int>
+					<object class="NSMutableArray" key="NSSubviews">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSTextField" id="976882786">
+							<reference key="NSNextResponder" ref="405283309"/>
+							<int key="NSvFlags">268</int>
+							<string key="NSFrame">{{17, 234}, {310, 34}}</string>
+							<reference key="NSSuperview" ref="405283309"/>
+							<bool key="NSEnabled">YES</bool>
+							<object class="NSTextFieldCell" key="NSCell" id="895532232">
+								<int key="NSCellFlags">67239424</int>
+								<int key="NSCellFlags2">272629760</int>
+								<string key="NSContents">Use this feature to install  or disable RADLINK software on the Rad7.</string>
+								<reference key="NSSupport" ref="23476925"/>
+								<reference key="NSControlView" ref="976882786"/>
+								<reference key="NSBackgroundColor" ref="428584035"/>
+								<reference key="NSTextColor" ref="363272545"/>
+							</object>
+						</object>
+						<object class="NSTextField" id="279491726">
+							<reference key="NSNextResponder" ref="405283309"/>
+							<int key="NSvFlags">268</int>
+							<string key="NSFrame">{{17, 204}, {310, 17}}</string>
+							<reference key="NSSuperview" ref="405283309"/>
+							<bool key="NSEnabled">YES</bool>
+							<object class="NSTextFieldCell" key="NSCell" id="1017450281">
+								<int key="NSCellFlags">67239424</int>
+								<int key="NSCellFlags2">272629760</int>
+								<string key="NSContents">Please choose a RADLINK Operation</string>
+								<reference key="NSSupport" ref="23476925"/>
+								<reference key="NSControlView" ref="279491726"/>
+								<reference key="NSBackgroundColor" ref="428584035"/>
+								<reference key="NSTextColor" ref="363272545"/>
+							</object>
+						</object>
+						<object class="NSMatrix" id="1064695869">
+							<reference key="NSNextResponder" ref="405283309"/>
+							<int key="NSvFlags">268</int>
+							<string key="NSFrame">{{32, 88}, {320, 116}}</string>
+							<reference key="NSSuperview" ref="405283309"/>
+							<bool key="NSEnabled">YES</bool>
+							<int key="NSNumRows">2</int>
+							<int key="NSNumCols">1</int>
+							<object class="NSMutableArray" key="NSCells">
+								<bool key="EncodedWithXMLCoder">YES</bool>
+								<object class="NSButtonCell" id="912809911">
+									<int key="NSCellFlags">-2080244224</int>
+									<int key="NSCellFlags2">0</int>
+									<string key="NSContents">Install RADLINK </string>
+									<reference key="NSSupport" ref="23476925"/>
+									<reference key="NSControlView" ref="1064695869"/>
+									<int key="NSTag">1</int>
+									<int key="NSButtonFlags">1211912703</int>
+									<int key="NSButtonFlags2">0</int>
+									<object class="NSButtonImageSource" key="NSAlternateImage" id="239774564">
+										<string key="NSImageName">NSRadioButton</string>
+									</object>
+									<string key="NSAlternateContents"/>
+									<string key="NSKeyEquivalent"/>
+									<int key="NSPeriodicDelay">200</int>
+									<int key="NSPeriodicInterval">25</int>
+								</object>
+								<object class="NSButtonCell" id="339943812">
+									<int key="NSCellFlags">67239424</int>
+									<int key="NSCellFlags2">0</int>
+									<string key="NSContents">Disable RADLINK</string>
+									<reference key="NSSupport" ref="23476925"/>
+									<reference key="NSControlView" ref="1064695869"/>
+									<int key="NSButtonFlags">1211912703</int>
+									<int key="NSButtonFlags2">0</int>
+									<object class="NSImage" key="NSNormalImage">
+										<int key="NSImageFlags">549453824</int>
+										<string key="NSSize">{18, 18}</string>
+										<object class="NSMutableArray" key="NSReps">
+											<bool key="EncodedWithXMLCoder">YES</bool>
+											<object class="NSArray">
+												<bool key="EncodedWithXMLCoder">YES</bool>
+												<integer value="0"/>
+												<object class="NSBitmapImageRep">
+													<object class="NSData" key="NSTIFFRepresentation">
+														<bytes key="NS.bytes">TU0AKgAABRgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAAMAAAADAAAAAwAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAADwRERGLJycnySsrK/A1NTXw
+IyMjyRwcHIsJCQk8AAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFFRUVdVBQUOCoqKj/
+29vb//n5+f/6+vr/2tra/6qqqv9UVFTgHx8fdQAAAAUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAUZGRl5
+dXV198PDw//8/Pz////////////////////////////U1NT/fHx89yUlJXkAAAAFAAAAAAAAAAAAAAAA
+AAAAAxEREUZqamrmtbW1/+3t7f/+/v7//v7+//7+/v/9/f3//f39//39/f/39/f/xMTE/3d3d+YZGRlG
+AAAAAwAAAAAAAAAAAAAACkJCQqGtra3/xsbG/+vr6//y8vL/9fX1//X19f/z8/P/9fX1//Ly8v/u7u7/
+0tLS/6+vr/9KSkqhAAAACgAAAAAAAAAAAAAAF3h4eN2/v7//z8/P/93d3f/q6ur/7+/v/+/v7//w8PD/
+7e3t/+3t7f/i4uL/zs7O/8XFxf98fHzdAAAAFwAAAAAAAAADAAAAJKSkpPjOzs7/2dnZ/+Dg4P/i4uL/
+5eXl/+bm5v/n5+f/5eXl/+Li4v/e3t7/2tra/9DQ0P+srKz4AAAAJAAAAAMAAAADAAAALrCwsPrW1tb/
+3t7e/+Tk5P/p6en/6+vr/+zs7P/p6en/6+vr/+fn5//k5OT/4ODg/9nZ2f+zs7P6AAAALgAAAAMAAAAD
+AAAALp2dnezg4OD/5eXl/+rq6v/u7u7/8PDw//Dw8P/x8fH/8PDw/+7u7v/q6ur/5ubm/+Hh4f+ZmZns
+AAAALgAAAAMAAAADAAAAJG5ubs/l5eX/6enp/+/v7//y8vL/9vb2//r6+v/5+fn/9/f3//b29v/x8fH/
+6+vr/+Tk5P9ra2vPAAAAJAAAAAMAAAAAAAAAFy4uLpPCwsL67Ozs//Pz8//5+fn//v7+//7+/v/+/v7/
+/v7+//v7+//19fX/8PDw/8LCwvosLCyTAAAAFwAAAAAAAAAAAAAACgAAAENfX1/S5OTk/vn5+f/+/v7/
+///////////////////////////8/Pz/5ubm/l9fX9IAAABDAAAACgAAAAAAAAAAAAAAAwAAABcAAABl
+YmJi3NLS0v3////////////////////////////////V1dX9ZGRk3AAAAGUAAAAXAAAAAwAAAAAAAAAA
+AAAAAAAAAAUAAAAfAAAAZTMzM8KAgIDwv7+//O3t7f/t7e3/v7+//ICAgPAzMzPCAAAAZQAAAB8AAAAF
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFAAAAFwAAAEMAAAB3AAAAnwAAALMAAACzAAAAnwAAAHcAAABD
+AAAAFwAAAAUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAAoAAAAXAAAAJAAAAC4AAAAu
+AAAAJAAAABcAAAAKAAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAwAAAAMAAAADAAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADgEAAAMAAAABABIAAAEB
+AAMAAAABABIAAAECAAMAAAAEAAAFxgEDAAMAAAABAAEAAAEGAAMAAAABAAIAAAERAAQAAAABAAAACAES
+AAMAAAABAAEAAAEVAAMAAAABAAQAAAEWAAMAAAABABIAAAEXAAQAAAABAAAFEAEcAAMAAAABAAEAAAFS
+AAMAAAABAAEAAAFTAAMAAAAEAAAFzodzAAcAAAwYAAAF1gAAAAAACAAIAAgACAABAAEAAQABAAAMGGFw
+cGwCAAAAbW50clJHQiBYWVogB9YABAADABMALAASYWNzcEFQUEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAPbWAAEAAAAA0y1hcHBsAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAOclhZWgAAASwAAAAUZ1hZWgAAAUAAAAAUYlhZWgAAAVQAAAAUd3RwdAAAAWgAAAAUY2hhZAAA
+AXwAAAAsclRSQwAAAagAAAAOZ1RSQwAAAbgAAAAOYlRSQwAAAcgAAAAOdmNndAAAAdgAAAMSbmRpbgAA
+BOwAAAY+ZGVzYwAACywAAABkZHNjbQAAC5AAAAAubW1vZAAAC8AAAAAoY3BydAAAC+gAAAAtWFlaIAAA
+AAAAAF1KAAA0kQAACCVYWVogAAAAAAAAdCAAALRgAAAjPVhZWiAAAAAAAAAlbAAAFyoAAKfDWFlaIAAA
+AAAAAPNSAAEAAAABFs9zZjMyAAAAAAABDEIAAAXe///zJgAAB5IAAP2R///7ov///aMAAAPcAADAbGN1
+cnYAAAAAAAAAAQHNAABjdXJ2AAAAAAAAAAEBzQAAY3VydgAAAAAAAAABAc0AAHZjZ3QAAAAAAAAAAAAD
+AQAAAQACBAUGBwkKCw0ODxASExQWFxgaGxweHyAiIyQmJygpKywtLzAxMjM1Njc4OTs8PT5AQUJDREZH
+SElKS0xOT1BRUlNUVVZXWFlaW1xdXl9hYmNkZWZnaGlqa2xtbm9wcXJzdHV2d3h5ent8fX5/gIGCg4SF
+hoeIiYqLjI2Oj5CRkpOUlZaXmJmam5ydnZ6foKGio6SlpqanqKmqq6ytra6vsLGysrO0tba3uLi5uru8
+vL2+v8DBwcLDxMXGxsfIycrKy8zNzs7P0NHS0tPU1dbW19jZ2drb3Nzd3t/g4eLi4+Tl5ufo6enq6+zt
+7u/w8fHy8/T19vf4+fr7/P3+/v8AAgMEBQYHCAkKCwwNDg8QERITFBUWFxgZGhscHR8gISIjJCUnKCkq
+Ky0uLzAxMzQ1Njc4OTo7PD0/QEFCQ0RFRkdISUpLTE1OT1BRUlNUVVZXWFlaWltcXV5fYGFiY2RlZmdo
+aWprbG1ub3BxcnN0dXZ3d3h5ent8fH1+f4CBgoKDhIWGh4iIiYqLjI2Oj5CRkpOUlJWWl5iZmpucnZ2e
+n6ChoqOkpaamp6ipqqusra6vsLCxsrO0tba3uLm5uru8vb6/wMHCw8TFx8jJysvMzc7P0NDR0tPU1dbX
+2Nna29ze3+Dh4uPk5ebn6err7O3u7/Hy8/T19vf5+vv8/f7/AAIDAwQFBgcICQoKCwwNDg8QERITFBUW
+FxgZGhscHR4fICEiIyQlJicoKSorLC0uLzAxMjM0NTY3ODg5Ojs8PT4+P0BBQkNDREVGR0hJSUpLTE1O
+Tk9QUVJSU1RVVVZXWFhZWltbXF1eXl9gYWFiY2RkZWZnZ2hpaWprbGxtbm5vcHFxcnNzdHV1dnd4eHl6
+ent8fH1+fn+AgYGCg4SEhYaHiImJiouMjY6Oj5CRkpOTlJWWl5iZmZqbnJ2en6ChoqOkpaanqKmqq6yt
+rq+xsrO0tba3uLq7vL2+wMHDxMbHycrMzs/R0tTW19nb3d7g4uTm6Ors7vDy9Pb4+vz+/wAAbmRpbgAA
+AAAAAAY2AACXGgAAVjoAAFPKAACJ3gAAJ8IAABaoAABQDQAAVDkAAiuFAAIZmQABeFEAAwEAAAIAAAAA
+AAEABgANABcAIwAxAEAAUgBlAHsAkwCrAMUA4gD/AR8BPwFhAYUBqgHQAfgCIAJLAncCpQLSAwIDMwNl
+A5gDzgQFBD0EdQSvBOsFKQVnBacF6AYqBm4GtQb8B0UHkgfkCDkIkAjnCT4JmAn0ClAKrQsLC2sLygwq
+DIwM8Q1XDcAOKA6SDv4PbA/bEE0QxBE7EbQSMRKwEzITuRREFNAVYBXxFocXHhfAGGIZBBmsGlQa+RuU
+HC4czh1yHhQeux9jIA0gvCFoIhkizyOJJEEk+SW6JnknOygFKMspkypiKzIsASzXLawuhy9gMD4xGzH8
+MtszvzSgNYY2cjdcOEw5OTorOxs8CD0EPfU+6z/nQOFB2ELUQ9VE00XcRttH5EjxSgBLCUwdTTFOUE9v
+UI9Rt1LdVAVVNlZsV6VY4FohW21ct135X09goGH0Y0tkqGYFZ19oxGova5ptCG54b/BxbnLsdG119Xd/
+eQh6knwqfcV/W4D4gpSEO4Xih4CJKorYjIqOOY/jkZuTWJUOlsyYiZpSnB6d4Z+soX+jWqUvpxOo+6rj
+rMuuwLC4sra0rra0uL+60LzfvwDBHcLdxLXGhchYyi7MCs3lz7rRmtOA1WPXR9kq2xPc/97s4M/iveSn
+5o3obupT7ELuLPAM8fLz0PW396H5f/tZ/T3//wAAAAEAAwALABYAJQA3AE0AZQCBAJ8AwQDlAQsBNQFh
+AZABwQH1AisCZAKfAtwDHANfA6MD6gQ0BH8EzQT1BR0FcAXEBhsGdAbPBy0HXAeMB+4IUgi4CSAJVAmK
+CfYKZArVC0cLgQu8DDIMqw0mDaIOIQ6hDyQPqRAvELgQ/RFDEc8SXRLuE4AUFRSrFUMV3RZ5FxcXthhY
+GPwZoRpIGvEbnBxJHPgdqB5bHw8fxSB9ITch8iKwJDAk8yW3Jn4nRigQKNwpqSp5K0osHCzxLccuoC95
+MFUxMzISMvMz1TS5NaA2hzdxOFw5STo4Oyg8Gj4DPvs/9EDuQepD6ETpRexG8Uf3SP9LFEwhTTBOQE9S
+UGZSklOrVMVV4Vb/WB5ZP1phW4Vcq13SXvthUmJ/Y69k4GYSZ0dofGm0au1tZG6ib+FxInJlc6l073Y2
+d396FXtjfLJ+A39VgKmB/4NWhK+GCYjCiiGLgYzjjkePrJESknuT5Ja8mCuZm5sMnH+d9J9qoOGiWqPV
+pVGmz6eOqE6pzqtRrNSuWq/gsWmy8rR+tgu5Kbq6vE294b93wQ7Cp8RBxd3He8kZyrrLisxbzf/Po9FK
+0vHUm9ZF1/HZn9tO3Cbc/96x4GTiGePQ5YjnQegf6Pzquex27jbv9/G583z0X/VC9wj40Pqa/GX+Mf//
+AAAAAQADAAsAJQA3AE0AZQCBAJ8AwQELATUBYQGQAcEB9QIrAmQCnwLcAxwDXwOjA+oENAR/BM0FHQVw
+BcQGGwZ0Bs8HLQeMB+4IUgi4CSAJign2CmQK1QtHC7wMMgyrDSYNog4hDqEPJA+pEC8QuBFDEl0S7hOA
+FBUUqxVDFnkXFxe2GFgY/BpIGvEbnBxJHPgdqB8PH8UgfSE3IfIjbyQwJPMltydGKBAo3Cp5K0osHC3H
+LqAveTEzMhIy8zS5NaA2hzhcOUk6ODwaPQ4+Az/0QO5C6EPoROlG8Uf3SglLFEwhTkBPUlF7UpJUxVXh
+Vv9ZP1phXKtd0mAlYVJjr2TgZhJofGm0au1tZG6ib+FxInJldO92Nnd/eMl6FXyyfgN/VYCpgf+Er4YJ
+h2WIwoohi4GOR4+skRKSe5PklVCWvJgrmZubDJx/nfSfaqDholqj1aVRps+oTqnOq1Gs1K2Xrlqv4LFp
+svK0frYLt5m5Kbnxurq8Tb3hv3fBDsHawqfEQcUPxd3He8hKyRnKusuKzFvN/87Rz6PQdtFK0vHTxtSb
+1kXXG9fx2MjZn9tO3Cbc/93Y3rHfiuBk4hni9ePQ5KzliOZk50HoH+j86drqueuX7HbtVu427xbv9/DX
+8bnymvN89F/1QvYl9wj37PjQ+bX6mvt//GX9S/4x//8AAGRlc2MAAAAAAAAACkNvbG9yIExDRAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAABIAAAAcAEMAbwBsAG8AcgAgAEwAQwBE
+AABtbW9kAAAAAAAABhAAAJxOAAAAAL5zkQAAAAAAAAAAAAAAAAAAAAAAdGV4dAAAAABDb3B5cmlnaHQg
+QXBwbGUgQ29tcHV0ZXIsIEluYy4sIDIwMDUAAAAAA</bytes>
+													</object>
+												</object>
+											</object>
+										</object>
+										<object class="NSColor" key="NSColor" id="778289077">
+											<int key="NSColorSpace">3</int>
+											<bytes key="NSWhite">MCAwAA</bytes>
+										</object>
+									</object>
+									<reference key="NSAlternateImage" ref="239774564"/>
+									<int key="NSPeriodicDelay">400</int>
+									<int key="NSPeriodicInterval">75</int>
+								</object>
+							</object>
+							<string key="NSCellSize">{320, 57}</string>
+							<string key="NSIntercellSpacing">{4, 2}</string>
+							<int key="NSMatrixFlags">1151868928</int>
+							<string key="NSCellClass">NSActionCell</string>
+							<object class="NSButtonCell" key="NSProtoCell" id="642746897">
+								<int key="NSCellFlags">67239424</int>
+								<int key="NSCellFlags2">0</int>
+								<string key="NSContents">Radio</string>
+								<reference key="NSSupport" ref="23476925"/>
+								<int key="NSButtonFlags">1211912703</int>
+								<int key="NSButtonFlags2">0</int>
+								<object class="NSImage" key="NSNormalImage">
+									<int key="NSImageFlags">549453824</int>
+									<string key="NSSize">{18, 18}</string>
+									<object class="NSMutableArray" key="NSReps">
+										<bool key="EncodedWithXMLCoder">YES</bool>
+										<object class="NSArray">
+											<bool key="EncodedWithXMLCoder">YES</bool>
+											<integer value="0"/>
+											<object class="NSBitmapImageRep">
+												<object class="NSData" key="NSTIFFRepresentation">
+													<bytes key="NS.bytes">TU0AKgAABRgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAAMAAAADAAAAAwAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAADwRERGLJycnySsrK/A1NTXw
+IyMjyRwcHIsJCQk8AAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFFRUVdVBQUOCoqKj/
+29vb//n5+f/6+vr/2tra/6qqqv9UVFTgHx8fdQAAAAUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAUZGRl5
+dXV198PDw//8/Pz////////////////////////////U1NT/fHx89yUlJXkAAAAFAAAAAAAAAAAAAAAA
+AAAAAxEREUZqamrmtbW1/+3t7f/+/v7//v7+//7+/v/9/f3//f39//39/f/39/f/xMTE/3d3d+YZGRlG
+AAAAAwAAAAAAAAAAAAAACkJCQqGtra3/xsbG/+vr6//y8vL/9fX1//X19f/z8/P/9fX1//Ly8v/u7u7/
+0tLS/6+vr/9KSkqhAAAACgAAAAAAAAAAAAAAF3h4eN2/v7//z8/P/93d3f/q6ur/7+/v/+/v7//w8PD/
+7e3t/+3t7f/i4uL/zs7O/8XFxf98fHzdAAAAFwAAAAAAAAADAAAAJKSkpPjOzs7/2dnZ/+Dg4P/i4uL/
+5eXl/+bm5v/n5+f/5eXl/+Li4v/e3t7/2tra/9DQ0P+srKz4AAAAJAAAAAMAAAADAAAALrCwsPrW1tb/
+3t7e/+Tk5P/p6en/6+vr/+zs7P/p6en/6+vr/+fn5//k5OT/4ODg/9nZ2f+zs7P6AAAALgAAAAMAAAAD
+AAAALp2dnezg4OD/5eXl/+rq6v/u7u7/8PDw//Dw8P/x8fH/8PDw/+7u7v/q6ur/5ubm/+Hh4f+ZmZns
+AAAALgAAAAMAAAADAAAAJG5ubs/l5eX/6enp/+/v7//y8vL/9vb2//r6+v/5+fn/9/f3//b29v/x8fH/
+6+vr/+Tk5P9ra2vPAAAAJAAAAAMAAAAAAAAAFy4uLpPCwsL67Ozs//Pz8//5+fn//v7+//7+/v/+/v7/
+/v7+//v7+//19fX/8PDw/8LCwvosLCyTAAAAFwAAAAAAAAAAAAAACgAAAENfX1/S5OTk/vn5+f/+/v7/
+///////////////////////////8/Pz/5ubm/l9fX9IAAABDAAAACgAAAAAAAAAAAAAAAwAAABcAAABl
+YmJi3NLS0v3////////////////////////////////V1dX9ZGRk3AAAAGUAAAAXAAAAAwAAAAAAAAAA
+AAAAAAAAAAUAAAAfAAAAZTMzM8KAgIDwv7+//O3t7f/t7e3/v7+//ICAgPAzMzPCAAAAZQAAAB8AAAAF
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFAAAAFwAAAEMAAAB3AAAAnwAAALMAAACzAAAAnwAAAHcAAABD
+AAAAFwAAAAUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAAoAAAAXAAAAJAAAAC4AAAAu
+AAAAJAAAABcAAAAKAAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAwAAAAMAAAADAAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADQEAAAMAAAABABIAAAEB
+AAMAAAABABIAAAECAAMAAAAEAAAFugEDAAMAAAABAAEAAAEGAAMAAAABAAIAAAERAAQAAAABAAAACAES
+AAMAAAABAAEAAAEVAAMAAAABAAQAAAEWAAMAAAABABIAAAEXAAQAAAABAAAFEAEcAAMAAAABAAEAAAFS
+AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
+												</object>
+											</object>
+										</object>
+									</object>
+									<reference key="NSColor" ref="778289077"/>
+								</object>
+								<reference key="NSAlternateImage" ref="239774564"/>
+								<int key="NSPeriodicDelay">400</int>
+								<int key="NSPeriodicInterval">75</int>
+							</object>
+							<reference key="NSSelectedCell" ref="912809911"/>
+							<reference key="NSBackgroundColor" ref="428584035"/>
+							<reference key="NSCellBackgroundColor" ref="29698732"/>
+							<reference key="NSFont" ref="23476925"/>
+						</object>
+						<object class="NSTextField" id="454489328">
+							<reference key="NSNextResponder" ref="405283309"/>
+							<int key="NSvFlags">268</int>
+							<string key="NSFrame">{{52, 137}, {275, 28}}</string>
+							<reference key="NSSuperview" ref="405283309"/>
+							<bool key="NSEnabled">YES</bool>
+							<object class="NSTextFieldCell" key="NSCell" id="655760666">
+								<int key="NSCellFlags">67239424</int>
+								<int key="NSCellFlags2">272760832</int>
+								<string key="NSContents">Use this option if RADLINK is not already installed on the RAD7</string>
+								<reference key="NSSupport" ref="26"/>
+								<reference key="NSControlView" ref="454489328"/>
+								<reference key="NSBackgroundColor" ref="428584035"/>
+								<reference key="NSTextColor" ref="363272545"/>
+							</object>
+						</object>
+						<object class="NSTextField" id="299140585">
+							<reference key="NSNextResponder" ref="405283309"/>
+							<int key="NSvFlags">268</int>
+							<string key="NSFrame">{{52, 62}, {283, 42}}</string>
+							<reference key="NSSuperview" ref="405283309"/>
+							<bool key="NSEnabled">YES</bool>
+							<object class="NSTextFieldCell" key="NSCell" id="348991766">
+								<int key="NSCellFlags">67239424</int>
+								<int key="NSCellFlags2">272760832</int>
+								<string key="NSContents">Use this option to disable RADLINK. This will remove the RAD7's remote communication ability</string>
+								<reference key="NSSupport" ref="26"/>
+								<reference key="NSControlView" ref="299140585"/>
+								<reference key="NSBackgroundColor" ref="428584035"/>
+								<reference key="NSTextColor" ref="363272545"/>
+							</object>
+						</object>
+						<object class="NSButton" id="191064214">
+							<reference key="NSNextResponder" ref="405283309"/>
+							<int key="NSvFlags">268</int>
+							<string key="NSFrame">{{12, 22}, {96, 28}}</string>
+							<reference key="NSSuperview" ref="405283309"/>
+							<bool key="NSEnabled">YES</bool>
+							<object class="NSButtonCell" key="NSCell" id="363258168">
+								<int key="NSCellFlags">67239424</int>
+								<int key="NSCellFlags2">134348800</int>
+								<string key="NSContents">Close</string>
+								<reference key="NSSupport" ref="26"/>
+								<reference key="NSControlView" ref="191064214"/>
+								<int key="NSButtonFlags">-2038284033</int>
+								<int key="NSButtonFlags2">129</int>
+								<string key="NSAlternateContents"/>
+								<string key="NSKeyEquivalent"/>
+								<int key="NSPeriodicDelay">200</int>
+								<int key="NSPeriodicInterval">25</int>
+							</object>
+						</object>
+						<object class="NSButton" id="469717329">
+							<reference key="NSNextResponder" ref="405283309"/>
+							<int key="NSvFlags">268</int>
+							<string key="NSFrame">{{259, 22}, {96, 28}}</string>
+							<reference key="NSSuperview" ref="405283309"/>
+							<bool key="NSEnabled">YES</bool>
+							<object class="NSButtonCell" key="NSCell" id="752619705">
+								<int key="NSCellFlags">67239424</int>
+								<int key="NSCellFlags2">134348800</int>
+								<string key="NSContents">Continue</string>
+								<reference key="NSSupport" ref="26"/>
+								<reference key="NSControlView" ref="469717329"/>
+								<int key="NSButtonFlags">-2038284033</int>
+								<int key="NSButtonFlags2">129</int>
+								<string key="NSAlternateContents"/>
+								<string type="base64-UTF8" key="NSKeyEquivalent">DQ</string>
+								<int key="NSPeriodicDelay">200</int>
+								<int key="NSPeriodicInterval">25</int>
+							</object>
+						</object>
+					</object>
+					<string key="NSFrameSize">{372, 276}</string>
+					<reference key="NSSuperview"/>
+				</object>
+				<string key="NSScreenRect">{{0, 0}, {2560, 1578}}</string>
+				<string key="NSMaxSize">{1.79769e+308, 1.79769e+308}</string>
+			</object>
+			<object class="NSWindowTemplate" id="682429056">
+				<int key="NSWindowStyleMask">3</int>
+				<int key="NSWindowBacking">2</int>
+				<string key="NSWindowRect">{{230, 340}, {372, 347}}</string>
+				<int key="NSWTFlags">1886912512</int>
+				<object class="NSMutableString" key="NSWindowTitle">
+					<characters key="NS.bytes">Panel</characters>
+				</object>
+				<object class="NSMutableString" key="NSWindowClass">
+					<characters key="NS.bytes">NSPanel</characters>
+				</object>
+				<object class="NSMutableString" key="NSViewClass">
+					<characters key="NS.bytes">View</characters>
+				</object>
+				<string key="NSWindowContentMaxSize">{1.79769e+308, 1.79769e+308}</string>
+				<object class="NSView" key="NSWindowView" id="749792369">
+					<reference key="NSNextResponder"/>
+					<int key="NSvFlags">256</int>
+					<object class="NSMutableArray" key="NSSubviews">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSTextField" id="719066728">
+							<reference key="NSNextResponder" ref="749792369"/>
+							<int key="NSvFlags">268</int>
+							<string key="NSFrame">{{17, 293}, {347, 47}}</string>
+							<reference key="NSSuperview" ref="749792369"/>
+							<bool key="NSEnabled">YES</bool>
+							<object class="NSTextFieldCell" key="NSCell" id="601544141">
+								<int key="NSCellFlags">67239424</int>
+								<int key="NSCellFlags2">272760832</int>
+								<string key="NSContents">On the RAD7, press the Menu key, then use the right arrow key to navigate to the Special menu, and press the Enter key. When prompted to install, highlight [Yes] and press the Enter key.</string>
+								<reference key="NSSupport" ref="26"/>
+								<reference key="NSControlView" ref="719066728"/>
+								<reference key="NSBackgroundColor" ref="428584035"/>
+								<reference key="NSTextColor" ref="363272545"/>
+							</object>
+						</object>
+						<object class="NSTextField" id="843850161">
+							<reference key="NSNextResponder" ref="749792369"/>
+							<int key="NSvFlags">268</int>
+							<string key="NSFrame">{{17, 88}, {320, 56}}</string>
+							<reference key="NSSuperview" ref="749792369"/>
+							<bool key="NSEnabled">YES</bool>
+							<object class="NSTextFieldCell" key="NSCell" id="380760998">
+								<int key="NSCellFlags">67239424</int>
+								<int key="NSCellFlags2">272760832</int>
+								<string key="NSContents">Then Click Continue below. Note that you will be asked for the location of the firmware code that you want to load. This file is only available if you have paid Durridge for the RadLink option.</string>
+								<object class="NSFont" key="NSSupport">
+									<string key="NSName">LucidaGrande-Bold</string>
+									<double key="NSSize">11</double>
+									<int key="NSfFlags">16</int>
+								</object>
+								<reference key="NSControlView" ref="843850161"/>
+								<reference key="NSBackgroundColor" ref="428584035"/>
+								<reference key="NSTextColor" ref="363272545"/>
+							</object>
+						</object>
+						<object class="NSButton" id="589747491">
+							<reference key="NSNextResponder" ref="749792369"/>
+							<int key="NSvFlags">268</int>
+							<string key="NSFrame">{{15, 38}, {96, 28}}</string>
+							<reference key="NSSuperview" ref="749792369"/>
+							<bool key="NSEnabled">YES</bool>
+							<object class="NSButtonCell" key="NSCell" id="285710158">
+								<int key="NSCellFlags">67239424</int>
+								<int key="NSCellFlags2">134348800</int>
+								<string key="NSContents">Close</string>
+								<reference key="NSSupport" ref="26"/>
+								<reference key="NSControlView" ref="589747491"/>
+								<int key="NSButtonFlags">-2038284033</int>
+								<int key="NSButtonFlags2">129</int>
+								<string key="NSAlternateContents"/>
+								<string key="NSKeyEquivalent"/>
+								<int key="NSPeriodicDelay">200</int>
+								<int key="NSPeriodicInterval">25</int>
+							</object>
+						</object>
+						<object class="NSButton" id="691682818">
+							<reference key="NSNextResponder" ref="749792369"/>
+							<int key="NSvFlags">268</int>
+							<string key="NSFrame">{{259, 38}, {96, 28}}</string>
+							<reference key="NSSuperview" ref="749792369"/>
+							<bool key="NSEnabled">YES</bool>
+							<object class="NSButtonCell" key="NSCell" id="575431111">
+								<int key="NSCellFlags">67239424</int>
+								<int key="NSCellFlags2">134348800</int>
+								<string key="NSContents">Continue...</string>
+								<reference key="NSSupport" ref="26"/>
+								<reference key="NSControlView" ref="691682818"/>
+								<int key="NSButtonFlags">-2038284033</int>
+								<int key="NSButtonFlags2">129</int>
+								<string key="NSAlternateContents"/>
+								<string type="base64-UTF8" key="NSKeyEquivalent">DQ</string>
+								<int key="NSPeriodicDelay">200</int>
+								<int key="NSPeriodicInterval">25</int>
+							</object>
+						</object>
+						<object class="NSImageView" id="373326798">
+							<reference key="NSNextResponder" ref="749792369"/>
+							<int key="NSvFlags">268</int>
+							<object class="NSMutableSet" key="NSDragTypes">
+								<bool key="EncodedWithXMLCoder">YES</bool>
+								<object class="NSArray" key="set.sortedObjects">
+									<bool key="EncodedWithXMLCoder">YES</bool>
+									<string>Apple PDF pasteboard type</string>
+									<string>Apple PICT pasteboard type</string>
+									<string>Apple PNG pasteboard type</string>
+									<string>NSFilenamesPboardType</string>
+									<string>NeXT Encapsulated PostScript v1.2 pasteboard type</string>
+									<string>NeXT TIFF v4.0 pasteboard type</string>
+								</object>
+							</object>
+							<string key="NSFrame">{{0, 160}, {372, 130}}</string>
+							<reference key="NSSuperview" ref="749792369"/>
+							<bool key="NSEnabled">YES</bool>
+							<object class="NSImageCell" key="NSCell" id="448070184">
+								<int key="NSCellFlags">67239424</int>
+								<int key="NSCellFlags2">33685504</int>
+								<object class="NSCustomResource" key="NSContents">
+									<string key="NSClassName">NSImage</string>
+									<string key="NSResourceName">Rad7Buttons</string>
+								</object>
+								<reference key="NSSupport" ref="26"/>
+								<int key="NSAlign">0</int>
+								<int key="NSScale">3</int>
+								<int key="NSStyle">0</int>
+								<bool key="NSAnimates">NO</bool>
+							</object>
+							<bool key="NSEditable">YES</bool>
+						</object>
+					</object>
+					<string key="NSFrameSize">{372, 347}</string>
+					<reference key="NSSuperview"/>
+				</object>
+				<string key="NSScreenRect">{{0, 0}, {2560, 1578}}</string>
+				<string key="NSMaxSize">{1.79769e+308, 1.79769e+308}</string>
 			</object>
 		</object>
 		<object class="IBObjectContainer" key="IBDocument.Objects">
@@ -4676,6 +5179,102 @@
 					</object>
 					<int key="connectionID">2130</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">radLinkLoadPanel</string>
+						<reference key="source" ref="898754966"/>
+						<reference key="destination" ref="682429056"/>
+					</object>
+					<int key="connectionID">2163</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">radLinkSelectionContinueButton</string>
+						<reference key="source" ref="898754966"/>
+						<reference key="destination" ref="469717329"/>
+					</object>
+					<int key="connectionID">2164</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">radLinkSelectionMatrix</string>
+						<reference key="source" ref="898754966"/>
+						<reference key="destination" ref="1064695869"/>
+					</object>
+					<int key="connectionID">2165</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">radLinkSelectionPanel</string>
+						<reference key="source" ref="898754966"/>
+						<reference key="destination" ref="189704977"/>
+					</object>
+					<int key="connectionID">2166</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">radLinkSelection:</string>
+						<reference key="source" ref="898754966"/>
+						<reference key="destination" ref="74744386"/>
+					</object>
+					<int key="connectionID">2174</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">doRadLinkLoad:</string>
+						<reference key="source" ref="898754966"/>
+						<reference key="destination" ref="691682818"/>
+					</object>
+					<int key="connectionID">2175</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">closeLinkSelectionPanel:</string>
+						<reference key="source" ref="898754966"/>
+						<reference key="destination" ref="191064214"/>
+					</object>
+					<int key="connectionID">2176</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">closeLinkLoadPanel:</string>
+						<reference key="source" ref="898754966"/>
+						<reference key="destination" ref="589747491"/>
+					</object>
+					<int key="connectionID">2177</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">radLinkLoadOps:</string>
+						<reference key="source" ref="898754966"/>
+						<reference key="destination" ref="469717329"/>
+					</object>
+					<int key="connectionID">2178</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">firmwareLoadingField</string>
+						<reference key="source" ref="898754966"/>
+						<reference key="destination" ref="56530291"/>
+					</object>
+					<int key="connectionID">2181</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">pollNowButton</string>
+						<reference key="source" ref="898754966"/>
+						<reference key="destination" ref="107699830"/>
+					</object>
+					<int key="connectionID">2182</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">radLinkButton</string>
+						<reference key="source" ref="898754966"/>
+						<reference key="destination" ref="74744386"/>
+					</object>
+					<int key="connectionID">2183</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -4815,6 +5414,8 @@
 							<reference ref="127167770"/>
 							<reference ref="1050729385"/>
 							<reference ref="460610198"/>
+							<reference ref="74744386"/>
+							<reference ref="56530291"/>
 						</object>
 						<reference key="parent" ref="877375015"/>
 					</object>
@@ -7478,6 +8079,262 @@
 						<reference key="object" ref="820006556"/>
 						<reference key="parent" ref="460262519"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2133</int>
+						<reference key="object" ref="189704977"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="405283309"/>
+						</object>
+						<reference key="parent" ref="0"/>
+						<string key="objectName">RadLinkSelection</string>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2134</int>
+						<reference key="object" ref="682429056"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="749792369"/>
+						</object>
+						<reference key="parent" ref="0"/>
+						<string key="objectName">RadLinkLoad</string>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2135</int>
+						<reference key="object" ref="749792369"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="373326798"/>
+							<reference ref="719066728"/>
+							<reference ref="589747491"/>
+							<reference ref="691682818"/>
+							<reference ref="843850161"/>
+						</object>
+						<reference key="parent" ref="682429056"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2136</int>
+						<reference key="object" ref="843850161"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="380760998"/>
+						</object>
+						<reference key="parent" ref="749792369"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2137</int>
+						<reference key="object" ref="691682818"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="575431111"/>
+						</object>
+						<reference key="parent" ref="749792369"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2138</int>
+						<reference key="object" ref="373326798"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="448070184"/>
+						</object>
+						<reference key="parent" ref="749792369"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2139</int>
+						<reference key="object" ref="719066728"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="601544141"/>
+						</object>
+						<reference key="parent" ref="749792369"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2140</int>
+						<reference key="object" ref="589747491"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="285710158"/>
+						</object>
+						<reference key="parent" ref="749792369"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2141</int>
+						<reference key="object" ref="285710158"/>
+						<reference key="parent" ref="589747491"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2142</int>
+						<reference key="object" ref="601544141"/>
+						<reference key="parent" ref="719066728"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2143</int>
+						<reference key="object" ref="448070184"/>
+						<reference key="parent" ref="373326798"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2144</int>
+						<reference key="object" ref="575431111"/>
+						<reference key="parent" ref="691682818"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2145</int>
+						<reference key="object" ref="380760998"/>
+						<reference key="parent" ref="843850161"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2146</int>
+						<reference key="object" ref="405283309"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="279491726"/>
+							<reference ref="469717329"/>
+							<reference ref="191064214"/>
+							<reference ref="299140585"/>
+							<reference ref="454489328"/>
+							<reference ref="1064695869"/>
+							<reference ref="976882786"/>
+						</object>
+						<reference key="parent" ref="189704977"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2147</int>
+						<reference key="object" ref="279491726"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="1017450281"/>
+						</object>
+						<reference key="parent" ref="405283309"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2148</int>
+						<reference key="object" ref="469717329"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="752619705"/>
+						</object>
+						<reference key="parent" ref="405283309"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2149</int>
+						<reference key="object" ref="191064214"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="363258168"/>
+						</object>
+						<reference key="parent" ref="405283309"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2150</int>
+						<reference key="object" ref="299140585"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="348991766"/>
+						</object>
+						<reference key="parent" ref="405283309"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2151</int>
+						<reference key="object" ref="454489328"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="655760666"/>
+						</object>
+						<reference key="parent" ref="405283309"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2152</int>
+						<reference key="object" ref="1064695869"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="642746897"/>
+							<reference ref="339943812"/>
+							<reference ref="912809911"/>
+						</object>
+						<reference key="parent" ref="405283309"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2153</int>
+						<reference key="object" ref="976882786"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="895532232"/>
+						</object>
+						<reference key="parent" ref="405283309"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2154</int>
+						<reference key="object" ref="895532232"/>
+						<reference key="parent" ref="976882786"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2155</int>
+						<reference key="object" ref="642746897"/>
+						<reference key="parent" ref="1064695869"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2156</int>
+						<reference key="object" ref="339943812"/>
+						<reference key="parent" ref="1064695869"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2157</int>
+						<reference key="object" ref="912809911"/>
+						<reference key="parent" ref="1064695869"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2158</int>
+						<reference key="object" ref="655760666"/>
+						<reference key="parent" ref="454489328"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2159</int>
+						<reference key="object" ref="348991766"/>
+						<reference key="parent" ref="299140585"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2160</int>
+						<reference key="object" ref="363258168"/>
+						<reference key="parent" ref="191064214"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2161</int>
+						<reference key="object" ref="752619705"/>
+						<reference key="parent" ref="469717329"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2162</int>
+						<reference key="object" ref="1017450281"/>
+						<reference key="parent" ref="279491726"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2168</int>
+						<reference key="object" ref="74744386"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="347294149"/>
+						</object>
+						<reference key="parent" ref="388996000"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2169</int>
+						<reference key="object" ref="347294149"/>
+						<reference key="parent" ref="74744386"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2179</int>
+						<reference key="object" ref="56530291"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="172886195"/>
+						</object>
+						<reference key="parent" ref="388996000"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2180</int>
+						<reference key="object" ref="172886195"/>
+						<reference key="parent" ref="56530291"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -8033,6 +8890,58 @@
 					<string>2131.IBViewBoundsToFrameTransform</string>
 					<string>2132.IBPluginDependency</string>
 					<string>2132.IBViewBoundsToFrameTransform</string>
+					<string>2133.IBEditorWindowLastContentRect</string>
+					<string>2133.IBPluginDependency</string>
+					<string>2133.IBWindowTemplateEditedContentRect</string>
+					<string>2134.IBEditorWindowLastContentRect</string>
+					<string>2134.IBPluginDependency</string>
+					<string>2134.IBWindowTemplateEditedContentRect</string>
+					<string>2135.IBPluginDependency</string>
+					<string>2136.IBPluginDependency</string>
+					<string>2136.IBViewBoundsToFrameTransform</string>
+					<string>2137.IBPluginDependency</string>
+					<string>2137.IBViewBoundsToFrameTransform</string>
+					<string>2138.IBPluginDependency</string>
+					<string>2138.IBViewBoundsToFrameTransform</string>
+					<string>2139.IBPluginDependency</string>
+					<string>2139.IBViewBoundsToFrameTransform</string>
+					<string>2140.IBPluginDependency</string>
+					<string>2140.IBViewBoundsToFrameTransform</string>
+					<string>2141.IBPluginDependency</string>
+					<string>2142.IBPluginDependency</string>
+					<string>2143.IBPluginDependency</string>
+					<string>2144.IBPluginDependency</string>
+					<string>2145.IBPluginDependency</string>
+					<string>2146.IBPluginDependency</string>
+					<string>2147.IBPluginDependency</string>
+					<string>2147.IBViewBoundsToFrameTransform</string>
+					<string>2148.IBPluginDependency</string>
+					<string>2148.IBViewBoundsToFrameTransform</string>
+					<string>2149.IBPluginDependency</string>
+					<string>2149.IBViewBoundsToFrameTransform</string>
+					<string>2150.IBPluginDependency</string>
+					<string>2150.IBViewBoundsToFrameTransform</string>
+					<string>2151.IBPluginDependency</string>
+					<string>2151.IBViewBoundsToFrameTransform</string>
+					<string>2152.IBPluginDependency</string>
+					<string>2152.IBViewBoundsToFrameTransform</string>
+					<string>2153.IBPluginDependency</string>
+					<string>2153.IBViewBoundsToFrameTransform</string>
+					<string>2154.IBPluginDependency</string>
+					<string>2155.IBPluginDependency</string>
+					<string>2156.IBPluginDependency</string>
+					<string>2157.IBPluginDependency</string>
+					<string>2158.IBPluginDependency</string>
+					<string>2159.IBPluginDependency</string>
+					<string>2160.IBPluginDependency</string>
+					<string>2161.IBPluginDependency</string>
+					<string>2162.IBPluginDependency</string>
+					<string>2168.IBPluginDependency</string>
+					<string>2168.IBViewBoundsToFrameTransform</string>
+					<string>2169.IBPluginDependency</string>
+					<string>2179.IBPluginDependency</string>
+					<string>2179.IBViewBoundsToFrameTransform</string>
+					<string>2180.IBPluginDependency</string>
 					<string>5.IBEditorWindowLastContentRect</string>
 					<string>5.IBPluginDependency</string>
 					<string>5.IBWindowTemplateEditedContentRect</string>
@@ -8286,7 +9195,7 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<object class="NSAffineTransform">
-						<bytes key="NSTransformStruct">P4AAAL+AAABDSwAAw8cAAA</bytes>
+						<bytes key="NSTransformStruct">P4AAAL+AAABCNAAAwtoAAA</bytes>
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -8746,7 +9655,7 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
-					<string>{{484, 461}, {257, 111}}</string>
+					<string>{{488, 501}, {257, 111}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -8994,9 +9903,89 @@
 					<object class="NSAffineTransform">
 						<bytes key="NSTransformStruct">AUKqAABEBEAAA</bytes>
 					</object>
-					<string>{{560, 726}, {440, 685}}</string>
+					<string>{{944, 834}, {372, 276}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{560, 726}, {440, 685}}</string>
+					<string>{{944, 834}, {372, 276}}</string>
+					<string>{{490, 1114}, {372, 347}}</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>{{490, 1114}, {372, 347}}</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<object class="NSAffineTransform">
+						<bytes key="NSTransformStruct">P4AAAL+AAABBiAAAww4AAA</bytes>
+					</object>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<object class="NSAffineTransform">
+						<bytes key="NSTransformStruct">P4AAAL+AAABDgYAAwlwAAA</bytes>
+					</object>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<object class="NSAffineTransform">
+						<bytes key="NSTransformStruct">AQAAAABCsgAAA</bytes>
+					</object>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<object class="NSAffineTransform">
+						<bytes key="NSTransformStruct">P4AAAL+AAABBiAAAw4UAAA</bytes>
+					</object>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<object class="NSAffineTransform">
+						<bytes key="NSTransformStruct">P4AAAL+AAABBcAAAwlwAAA</bytes>
+					</object>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<object class="NSAffineTransform">
+						<bytes key="NSTransformStruct">P4AAAL+AAABBsAAAw4GAAA</bytes>
+					</object>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<object class="NSAffineTransform">
+						<bytes key="NSTransformStruct">P4AAAL+AAABDgYAAwsgAAA</bytes>
+					</object>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<object class="NSAffineTransform">
+						<bytes key="NSTransformStruct">P4AAAL+AAABBQAAAwsgAAA</bytes>
+					</object>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<object class="NSAffineTransform">
+						<bytes key="NSTransformStruct">P4AAAL+AAABCJAAAwxQAAA</bytes>
+					</object>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<object class="NSAffineTransform">
+						<bytes key="NSTransformStruct">P4AAAL+AAABCUAAAw1kAAA</bytes>
+					</object>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<object class="NSAffineTransform">
+						<bytes key="NSTransformStruct">P4AAAL+AAABDGQAAw28AAA</bytes>
+					</object>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<object class="NSAffineTransform">
+						<bytes key="NSTransformStruct">P4AAAL+AAABBiAAAw4QAAA</bytes>
+					</object>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<object class="NSAffineTransform">
+						<bytes key="NSTransformStruct">P4AAAL+AAABDoYAAxAfAAA</bytes>
+					</object>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<object class="NSAffineTransform">
+						<bytes key="NSTransformStruct">P4AAAL+AAABDnIAAxApAAA</bytes>
+					</object>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>{{1010, 716}, {440, 685}}</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>{{1010, 716}, {440, 685}}</string>
 					<boolean value="YES"/>
 					<boolean value="YES"/>
 					<string>{440, 300}</string>
@@ -9020,7 +10009,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">2132</int>
+			<int key="maxID">2183</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -10219,8 +11208,11 @@
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>alarmLimitTextFieldAction:</string>
+							<string>closeLinkLoadPanel:</string>
+							<string>closeLinkSelectionPanel:</string>
 							<string>cycleTimeTextFieldAction:</string>
 							<string>deleteDataOnStartAction:</string>
+							<string>doRadLinkLoad:</string>
 							<string>dumpUserValuesAction:</string>
 							<string>eraseAllDataAction:</string>
 							<string>formatAction:</string>
@@ -10240,6 +11232,8 @@
 							<string>pumpCurrentMaxLimitTextFieldAction:</string>
 							<string>pumpModeAction:</string>
 							<string>rUnitsAction:</string>
+							<string>radLinkLoadOps:</string>
+							<string>radLinkSelection:</string>
 							<string>recycleTextFieldAction:</string>
 							<string>runToPrintTextFieldAction:</string>
 							<string>saveUserSettings:</string>
@@ -10253,6 +11247,11 @@
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -10292,8 +11291,11 @@
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>alarmLimitTextFieldAction:</string>
+							<string>closeLinkLoadPanel:</string>
+							<string>closeLinkSelectionPanel:</string>
 							<string>cycleTimeTextFieldAction:</string>
 							<string>deleteDataOnStartAction:</string>
+							<string>doRadLinkLoad:</string>
 							<string>dumpUserValuesAction:</string>
 							<string>eraseAllDataAction:</string>
 							<string>formatAction:</string>
@@ -10313,6 +11315,8 @@
 							<string>pumpCurrentMaxLimitTextFieldAction:</string>
 							<string>pumpModeAction:</string>
 							<string>rUnitsAction:</string>
+							<string>radLinkLoadOps:</string>
+							<string>radLinkSelection:</string>
 							<string>recycleTextFieldAction:</string>
 							<string>runToPrintTextFieldAction:</string>
 							<string>saveUserSettings:</string>
@@ -10331,11 +11335,23 @@
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
+								<string key="name">closeLinkLoadPanel:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">closeLinkSelectionPanel:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
 								<string key="name">cycleTimeTextFieldAction:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
 								<string key="name">deleteDataOnStartAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">doRadLinkLoad:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
@@ -10415,6 +11431,14 @@
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
+								<string key="name">radLinkLoadOps:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">radLinkSelection:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
 								<string key="name">recycleTextFieldAction:</string>
 								<string key="candidateClassName">id</string>
 							</object>
@@ -10470,6 +11494,7 @@
 							<string>cycleTimeTextField</string>
 							<string>deleteDataOnStartCB</string>
 							<string>eraseAllDataButton</string>
+							<string>firmwareLoadingField</string>
 							<string>formatPU</string>
 							<string>freeCyclesField</string>
 							<string>humidityAlarmTextField</string>
@@ -10491,6 +11516,7 @@
 							<string>maxRadonTextField</string>
 							<string>modePU</string>
 							<string>operationStateField</string>
+							<string>pollNowButton</string>
 							<string>pollTimePopup</string>
 							<string>printCycleButton</string>
 							<string>printRunButton</string>
@@ -10504,6 +11530,11 @@
 							<string>pumpModeField</string>
 							<string>pumpModePU</string>
 							<string>rUnitsPU</string>
+							<string>radLinkButton</string>
+							<string>radLinkLoadPanel</string>
+							<string>radLinkSelectionContinueButton</string>
+							<string>radLinkSelectionMatrix</string>
+							<string>radLinkSelectionPanel</string>
 							<string>recycleTextField</string>
 							<string>rh2Field</string>
 							<string>rhField</string>
@@ -10546,27 +11577,29 @@
 							<string>NSTextField</string>
 							<string>NSButton</string>
 							<string>NSButton</string>
-							<string>NSPopUpButton</string>
-							<string>NSTextField</string>
-							<string>NSTextField</string>
-							<string>NSTextField</string>
-							<string>NSTextField</string>
-							<string>NSTextField</string>
-							<string>NSButton</string>
-							<string>NSTextField</string>
-							<string>NSTextField</string>
-							<string>NSTextField</string>
-							<string>NSTextField</string>
-							<string>NSTextField</string>
-							<string>NSTextField</string>
-							<string>NSTextField</string>
-							<string>NSTextField</string>
-							<string>NSButton</string>
-							<string>NSButton</string>
-							<string>NSButton</string>
 							<string>NSTextField</string>
 							<string>NSPopUpButton</string>
 							<string>NSTextField</string>
+							<string>NSTextField</string>
+							<string>NSTextField</string>
+							<string>NSTextField</string>
+							<string>NSTextField</string>
+							<string>NSButton</string>
+							<string>NSTextField</string>
+							<string>NSTextField</string>
+							<string>NSTextField</string>
+							<string>NSTextField</string>
+							<string>NSTextField</string>
+							<string>NSTextField</string>
+							<string>NSTextField</string>
+							<string>NSTextField</string>
+							<string>NSButton</string>
+							<string>NSButton</string>
+							<string>NSButton</string>
+							<string>NSTextField</string>
+							<string>NSPopUpButton</string>
+							<string>NSTextField</string>
+							<string>NSButton</string>
 							<string>NSPopUpButton</string>
 							<string>NSButton</string>
 							<string>NSButton</string>
@@ -10580,6 +11613,11 @@
 							<string>NSTextField</string>
 							<string>NSPopUpButton</string>
 							<string>NSPopUpButton</string>
+							<string>NSButton</string>
+							<string>NSPanel</string>
+							<string>NSButton</string>
+							<string>NSMatrix</string>
+							<string>NSPanel</string>
 							<string>NSTextField</string>
 							<string>NSTextField</string>
 							<string>NSTextField</string>
@@ -10625,6 +11663,7 @@
 							<string>cycleTimeTextField</string>
 							<string>deleteDataOnStartCB</string>
 							<string>eraseAllDataButton</string>
+							<string>firmwareLoadingField</string>
 							<string>formatPU</string>
 							<string>freeCyclesField</string>
 							<string>humidityAlarmTextField</string>
@@ -10646,6 +11685,7 @@
 							<string>maxRadonTextField</string>
 							<string>modePU</string>
 							<string>operationStateField</string>
+							<string>pollNowButton</string>
 							<string>pollTimePopup</string>
 							<string>printCycleButton</string>
 							<string>printRunButton</string>
@@ -10659,6 +11699,11 @@
 							<string>pumpModeField</string>
 							<string>pumpModePU</string>
 							<string>rUnitsPU</string>
+							<string>radLinkButton</string>
+							<string>radLinkLoadPanel</string>
+							<string>radLinkSelectionContinueButton</string>
+							<string>radLinkSelectionMatrix</string>
+							<string>radLinkSelectionPanel</string>
 							<string>recycleTextField</string>
 							<string>rh2Field</string>
 							<string>rhField</string>
@@ -10730,6 +11775,10 @@
 							<object class="IBToOneOutletInfo">
 								<string key="name">eraseAllDataButton</string>
 								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">firmwareLoadingField</string>
+								<string key="candidateClassName">NSTextField</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">formatPU</string>
@@ -10816,6 +11865,10 @@
 								<string key="candidateClassName">NSTextField</string>
 							</object>
 							<object class="IBToOneOutletInfo">
+								<string key="name">pollNowButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
 								<string key="name">pollTimePopup</string>
 								<string key="candidateClassName">NSPopUpButton</string>
 							</object>
@@ -10866,6 +11919,26 @@
 							<object class="IBToOneOutletInfo">
 								<string key="name">rUnitsPU</string>
 								<string key="candidateClassName">NSPopUpButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">radLinkButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">radLinkLoadPanel</string>
+								<string key="candidateClassName">NSPanel</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">radLinkSelectionContinueButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">radLinkSelectionMatrix</string>
+								<string key="candidateClassName">NSMatrix</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">radLinkSelectionPanel</string>
+								<string key="candidateClassName">NSPanel</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">recycleTextField</string>
@@ -11438,6 +12511,14 @@
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
+					<string key="className">NSMatrix</string>
+					<string key="superclassName">NSControl</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBFrameworkSource</string>
+						<string key="minorKey">AppKit.framework/Headers/NSMatrix.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
 					<string key="className">NSMenu</string>
 					<string key="superclassName">NSObject</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier" id="64072890">
@@ -11853,6 +12934,14 @@
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
+					<string key="className">NSPanel</string>
+					<string key="superclassName">NSWindow</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBFrameworkSource</string>
+						<string key="minorKey">AppKit.framework/Headers/NSPanel.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
 					<string key="className">NSPopUpButton</string>
 					<string key="superclassName">NSButton</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
@@ -12010,6 +13099,7 @@
 				<string>NSMenuMixedState</string>
 				<string>NSSwitch</string>
 				<string>Rad7</string>
+				<string>Rad7Buttons</string>
 				<string>Unlocked</string>
 			</object>
 			<object class="NSMutableArray" key="dict.values">
@@ -12019,6 +13109,7 @@
 				<string>{7, 2}</string>
 				<string>{15, 15}</string>
 				<string>{50, 71}</string>
+				<string>{352, 152}</string>
 				<string>{33, 36}</string>
 			</object>
 		</object>

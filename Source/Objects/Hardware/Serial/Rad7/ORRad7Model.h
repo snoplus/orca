@@ -106,50 +106,52 @@
 
 @interface ORRad7Model : ObjWithHistoryModel <ORAdcProcessing>
 {
-    @private
-        NSString*       portName;
-        BOOL            portWasOpen;
-        ORSerialPort*   serialPort;
-		NSString*		lastRequest;
-		ORSafeQueue* cmdQueue;
-		unsigned long	timeMeasured;
-		int				pollTime;
-        NSMutableString* buffer;
-		unsigned int    currentRequest;
-		unsigned int    waitTime;
-		unsigned int    expectedCount;
-		unsigned int    requestCount;
-		int				protocol;
-		int				cycleTime;
-		int				recycle;
-		int				mode;
-		BOOL			thoron;
-		int				pumpMode;
-		int				tone;
-		int				formatSetting;
-		int				rUnits;
-		int				tUnits;
-		int				operationState;
-		NSMutableDictionary*   statusDictionary;
-		int				runState;
-		int				dataRecordCount;
-		NSMutableArray*	dataPointArray;
-		int				runToPrint;
-		BOOL			deleteDataOnStart;
-		BOOL			verbose;
-		BOOL			makeFile;
+@private
+	NSString*       portName;
+	BOOL            portWasOpen;
+	ORSerialPort*   serialPort;
+	NSString*		lastRequest;
+	ORSafeQueue* cmdQueue;
+	unsigned long	timeMeasured;
+	int				pollTime;
+	NSMutableString* buffer;
+	unsigned int    currentRequest;
+	unsigned int    waitTime;
+	unsigned int    expectedCount;
+	unsigned int    requestCount;
+	int				protocol;
+	int				cycleTime;
+	int				recycle;
+	int				mode;
+	BOOL			thoron;
+	int				pumpMode;
+	int				tone;
+	int				formatSetting;
+	int				rUnits;
+	int				tUnits;
+	int				operationState;
+	NSMutableDictionary*   statusDictionary;
+	int				runState;
+	int				dataRecordCount;
+	NSMutableArray*	dataPointArray;
+	int				runToPrint;
+	BOOL			deleteDataOnStart;
+	BOOL			verbose;
+	BOOL			makeFile;
 	
-		NSString*		stopRunFilePath;
-		BOOL			tempVerbose;
-		BOOL			runEnded;
-		unsigned long	maxRadon;
-		unsigned long	alarmLimit;
-		BOOL			gotAtLeastOneRH;
-		float			humidityAlarm;
-		float			pumpCurrentAlarm;
-		float			pumpCurrentMaxLimit;
-		float			humidityMaxLimit;
-        BOOL            dataValid;  
+	NSString*		stopRunFilePath;
+	BOOL			tempVerbose;
+	BOOL			runEnded;
+	unsigned long	maxRadon;
+	unsigned long	alarmLimit;
+	BOOL			gotAtLeastOneRH;
+	float			humidityAlarm;
+	float			pumpCurrentAlarm;
+	float			pumpCurrentMaxLimit;
+	float			humidityMaxLimit;
+	BOOL            dataValid;  
+	int				okCount;
+    BOOL			firmwareLoading;
 }
 
 #pragma mark ***Initialization
@@ -159,6 +161,8 @@
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark ***Accessors
+- (BOOL) firmwareLoading;
+- (void) setFirmwareLoading:(BOOL)aFirmwareLoading;
 - (float) humidityMaxLimit;
 - (void) setHumidityMaxLimit:(float)aHumidityMaxLimit;
 - (float) pumpCurrentMaxLimit;
@@ -256,6 +260,7 @@
 - (void) printRun;
 - (void) printDataInProgress;
 - (void) printRun:(int) runNumber;
+- (void) loadFirmwareFile:(NSString*)filePath index:(int)type;
 
 #pragma mark •••Adc Processing Protocol
 - (void)processIsStarting;
@@ -271,6 +276,7 @@
 - (BOOL) dataForChannelValid:(int)aChannel;
 @end
 
+extern NSString* ORRad7ModelFirmwareLoadingChanged;
 extern NSString* ORRad7ModelHumidityMaxLimitChanged;
 extern NSString* ORRad7ModelPumpCurrentMaxLimitChanged;
 extern NSString* ORRad7ModelPumpCurrentAlarmChanged;

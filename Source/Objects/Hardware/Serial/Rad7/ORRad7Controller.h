@@ -26,6 +26,7 @@
 @interface ORRad7Controller : ObjWithHistoryController
 {	
 	IBOutlet NSTabView*		tabView;	
+	IBOutlet NSTextField*	firmwareLoadingField;
 	IBOutlet NSView*		totalView;
 	IBOutlet NSTextField*	alarmLimitTextField;
 	IBOutlet NSTextField*	humidityMaxLimitTextField;
@@ -50,6 +51,7 @@
 	IBOutlet NSTextField*   cycleTimeTextField;
     IBOutlet NSButton*      lockButton;
     IBOutlet NSPopUpButton* pollTimePopup;
+    IBOutlet NSButton*      pollNowButton;
     IBOutlet NSButton*      updateSettingsButton;
 	
 	IBOutlet NSButton*		startTestButton;
@@ -60,7 +62,7 @@
 	IBOutlet NSButton*		eraseAllDataButton;
 	IBOutlet NSButton*		printRunButton;
 	IBOutlet NSButton*		printCycleButton;
-
+	
 	//status fields
 	IBOutlet NSTextField*   freeCyclesField;
 	IBOutlet NSTextField*   stateField;
@@ -102,7 +104,13 @@
 	IBOutlet NSTextField*   userThoronField;
 	IBOutlet NSTextField*   useCycleField;
 	IBOutlet NSTextField*   userRecycleField;
-
+	
+	IBOutlet NSPanel*		radLinkSelectionPanel;
+	IBOutlet NSPanel*		radLinkLoadPanel;
+	IBOutlet NSButton*		radLinkSelectionContinueButton;
+	IBOutlet NSMatrix*		radLinkSelectionMatrix;
+	IBOutlet NSButton*		radLinkButton;
+	
     IBOutlet ORSerialPortController* serialPortController;
 	
 	NSSize					basicOpsSize;
@@ -123,6 +131,7 @@
 - (void) updateWindow;
 
 #pragma mark ***Interface Management
+- (void) firmwareLoadingChanged:(NSNotification*)aNote;
 - (void) humidityMaxLimitChanged:(NSNotification*)aNote;
 - (void) pumpCurrentMaxLimitChanged:(NSNotification*)aNote;
 - (void) pumpCurrentAlarmChanged:(NSNotification*)aNote;
@@ -155,6 +164,7 @@
 - (void) miscAttributesChanged:(NSNotification*)aNotification;
 - (void) scaleAction:(NSNotification*)aNotification;
 - (void) updatePlot:(NSNotification*)aNote;
+- (void) getFirmwareFile;
 
 #pragma mark ***Actions
 - (IBAction) humidityMaxLimitTextFieldAction:(id)sender;
@@ -189,10 +199,19 @@
 - (IBAction) eraseAllDataAction:(id)sender;
 - (IBAction) printRunAction:(id)sender;
 - (IBAction) printDataInProgress:(id)sender;
+- (IBAction) radLinkSelection:(id)sender;
+- (IBAction) radLinkLoadOps:(id)sender;
+- (IBAction) doRadLinkLoad:(id)sender;
+- (IBAction) closeLinkSelectionPanel:(id)sender;
+- (IBAction) closeLinkLoadPanel:(id)sender;
 
 #pragma mark ***Data Source
 - (int) numberPointsInPlot:(id)aPlotter;
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
+
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre 10.6-specific
+- (void)getFirmwareFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+#endif
 @end
 
 

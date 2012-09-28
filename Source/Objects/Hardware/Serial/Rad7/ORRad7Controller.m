@@ -51,11 +51,11 @@
 {
     [[plotter0 yAxis] setRngLow:0.0 withHigh:300.];
 	[[plotter0 yAxis] setRngLimitsLow:-300.0 withHigh:500 withMinRng:4];
-
+	
     [[plotter0 xAxis] setRngLow:0.0 withHigh:10000];
 	[[plotter0 xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
-
-
+	
+	
 	ORTimeLinePlot* aPlot1;
 	aPlot1= [[ORTimeLinePlot alloc] initWithTag:0 andDataSource:self];
 	[aPlot1 setLineColor:[NSColor redColor]];
@@ -69,9 +69,9 @@
 	[plotter0 addPlot: aPlot2];
 	[aPlot2 setName:@"RH"];
 	[aPlot2 release];
-
+	
 	[plotter0 setShowLegend:YES];
-
+	
 	int i;
 	for(i=0;i<2;i++){
 		[[plotter0 plot:i] setRoi: [[model rois:i] objectAtIndex:0]];
@@ -122,17 +122,17 @@
                      selector : @selector(lockChanged:)
                          name : ORRad7Lock
                         object: nil];
-                                              
+	
     [notifyCenter addObserver : self
                      selector : @selector(pollTimeChanged:)
                          name : ORRad7ModelPollTimeChanged
                        object : nil];
-
+	
     [notifyCenter addObserver : self
 					 selector : @selector(scaleAction:)
 						 name : ORAxisRangeChangedNotification
 					   object : nil];
-
+	
     [notifyCenter addObserver : self
 					 selector : @selector(miscAttributesChanged:)
 						 name : ORMiscAttributesChanged
@@ -142,48 +142,48 @@
                      selector : @selector(protocolChanged:)
                          name : ORRad7ModelProtocolChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(cycleTimeChanged:)
                          name : ORRad7ModelCycleTimeChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(recycleChanged:)
                          name : ORRad7ModelRecycleChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(modeChanged:)
                          name : ORRad7ModelModeChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(thoronChanged:)
                          name : ORRad7ModelThoronChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(pumpModeChanged:)
                          name : ORRad7ModelPumpModeChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(toneChanged:)
                          name : ORRad7ModelToneChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(formatChanged:)
                          name : ORRad7ModelFormatChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(tUnitsChanged:)
                          name : ORRad7ModelTUnitsChanged
 						object: model];
-
-
+	
+	
     [notifyCenter addObserver : self
                      selector : @selector(rUnitsChanged:)
                          name : ORRad7ModelRUnitsChanged
@@ -193,7 +193,7 @@
                      selector : @selector(operationStateChanged:)
                          name : ORRad7ModelOperationStateChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(statusChanged:)
                          name : ORRad7ModelStatusChanged
@@ -208,37 +208,37 @@
                      selector : @selector(updatePlot:)
                          name : ORRad7ModelUpdatePlot
 						object: model];	
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(updatePlot:)
                          name : ORRad7ModelDataPointArrayChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(runToPrintChanged:)
                          name : ORRad7ModelRunToPrintChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(deleteDataOnStartChanged:)
                          name : ORRad7ModelDeleteDataOnStartChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(verboseChanged:)
                          name : ORRad7ModelVerboseChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(makeFileChanged:)
                          name : ORRad7ModelMakeFileChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(maxRadonChanged:)
                          name : ORRad7ModelMaxRadonChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(alarmLimitChanged:)
                          name : ORRad7ModelAlarmLimitChanged
@@ -249,23 +249,28 @@
                      selector : @selector(humidityAlarmChanged:)
                          name : ORRad7ModelHumidityAlarmChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(pumpCurrentAlarmChanged:)
                          name : ORRad7ModelPumpCurrentAlarmChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(pumpCurrentMaxLimitChanged:)
                          name : ORRad7ModelPumpCurrentMaxLimitChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(humidityMaxLimitChanged:)
                          name : ORRad7ModelHumidityMaxLimitChanged
 						object: model];
-
+	
 	[serialPortController registerNotificationObservers];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(firmwareLoadingChanged:)
+                         name : ORRad7ModelFirmwareLoadingChanged
+						object: model];
 
 }
 
@@ -300,7 +305,15 @@
 	[self pumpCurrentMaxLimitChanged:nil];
 	[self humidityMaxLimitChanged:nil];
 	[serialPortController updateWindow];
+	[self firmwareLoadingChanged:nil];
 }
+
+- (void) firmwareLoadingChanged:(NSNotification*)aNote
+{
+	[firmwareLoadingField setStringValue: [model firmwareLoading]?@"Busy":@""];
+	[self updateButtons];
+}
+
 - (BOOL) portLocked
 {
 	return [gSecurity isLocked:ORRad7Lock];;
@@ -380,7 +393,7 @@
 	[lastRadonUnitsField setObjectValue:[model statusForKey:kRad7LastRadonUnits]];
 	[processUnitsField setObjectValue:[model statusForKey:kRad7LastRadonUnits]];
 	[lastRadonUncertaintyField setObjectValue:[model statusForKey:kRad7LastRadonUncertainty]];
-
+	
 	
 	[temperatureField setObjectValue:[model statusForKey:kRad7Temp]];
 	[temperatureUnitsField setObjectValue:[model statusForKey:kRad7TempUnits]];
@@ -479,7 +492,7 @@
 
 - (void) miscAttributesChanged:(NSNotification*)aNote
 {
-
+	
 	NSString*				key = [[aNote userInfo] objectForKey:ORMiscAttributeKey];
 	NSMutableDictionary* attrib = [model miscAttributesForKey:key];
 	
@@ -516,20 +529,21 @@
 - (void) updateButtons
 {
     BOOL locked = [gSecurity isLocked:ORRad7Lock];
-
+	BOOL firmwareLoading = [model firmwareLoading];
     [lockButton setState: locked];
 	
-	[serialPortController updateButtons:locked];
-
-    [pollTimePopup setEnabled:!locked];
-    [deleteHistoryButton setEnabled:!locked];
-    
-
+	[serialPortController updateButtons:locked && !firmwareLoading];
+	
+    [pollTimePopup setEnabled:!locked && !firmwareLoading];
+	[pollNowButton setEnabled:!firmwareLoading];
+    [deleteHistoryButton setEnabled:!locked && !firmwareLoading];
+    [radLinkButton setEnabled:!locked && !firmwareLoading];
+	
 	//int opState = [model operationState];
 	int runState = [model runState];
 	//BOOL idle = (opState==kRad7Idle);
 	BOOL counting = runState == kRad7RunStateCounting;
-	if(!locked){
+	if(!locked && !firmwareLoading){
 		if(runState== kRad7RunStateUnKnown){
 			[startTestButton	setEnabled:	 NO];
 			[stopTestButton		setEnabled:  NO];
@@ -582,24 +596,24 @@
 	
 	//[initHWButton		setEnabled:  !counting && idle && !locked];
 	
-	[rUnitsPU setEnabled:	!counting && !locked];
-	[tUnitsPU setEnabled:	!counting && !locked];
-	[formatPU setEnabled:	!counting && !locked];
-	[tonePU setEnabled:		!counting && !locked];
-	[protocolPU setEnabled:	!counting && !locked];
+	[rUnitsPU setEnabled:	!counting && !locked && !firmwareLoading];
+	[tUnitsPU setEnabled:	!counting && !locked && !firmwareLoading];
+	[formatPU setEnabled:	!counting && !locked && !firmwareLoading];
+	[tonePU setEnabled:		!counting && !locked && !firmwareLoading];
+	[protocolPU setEnabled:	!counting && !locked && !firmwareLoading];
 	
-	[saveUserProtocolButton setEnabled:[(ORRad7Model*)model protocol] == kRad7ProtocolNone];
-
-	[alarmLimitTextField setEnabled:!locked];
-	[maxRadonTextField setEnabled:	!locked];
-
+	[saveUserProtocolButton setEnabled:([(ORRad7Model*)model protocol] == kRad7ProtocolNone) && !firmwareLoading ];
+	
+	[alarmLimitTextField setEnabled:!locked && !firmwareLoading];
+	[maxRadonTextField setEnabled:	!locked && !firmwareLoading];
+	
 	
 	if([(ORRad7Model*)model protocol] == kRad7ProtocolUser || [(ORRad7Model*)model protocol] == kRad7ProtocolNone){
-		[pumpModePU setEnabled:	!counting && !locked];
-		[thoronPU setEnabled:	!counting && !locked];
-		[modePU setEnabled:		!counting && !locked];
-		[recycleTextField setEnabled: !counting && !locked];
-		[cycleTimeTextField setEnabled: !counting && !locked];
+		[pumpModePU setEnabled:	!counting && !locked && !firmwareLoading];
+		[thoronPU setEnabled:	!counting && !locked && !firmwareLoading];
+		[modePU setEnabled:		!counting && !locked && !firmwareLoading];
+		[recycleTextField setEnabled: !counting && !locked && !firmwareLoading];
+		[cycleTimeTextField setEnabled: !counting && !locked && !firmwareLoading];
 		
 	}
 	else {
@@ -857,6 +871,84 @@
 					  @"Really erase ALL data?");
 	
 }
+
+- (IBAction) radLinkSelection:(id)sender
+{
+	[NSApp beginSheet:radLinkSelectionPanel modalForWindow:[self window] modalDelegate:self didEndSelector:NULL contextInfo:nil];
+}
+
+- (IBAction) radLinkLoadOps:(id)sender
+{
+	[radLinkSelectionPanel orderOut:nil];
+	[NSApp endSheet:radLinkSelectionPanel];
+ 	int index = [radLinkSelectionMatrix selectedRow];
+	if(index==0){
+		[NSApp beginSheet:radLinkLoadPanel modalForWindow:[self window]
+			modalDelegate:self didEndSelector:NULL contextInfo:nil];
+	}	
+	else {
+		[self doRadLinkLoad:self];
+	}
+}
+
+
+- (IBAction) closeLinkSelectionPanel:(id)sender
+{
+    [radLinkSelectionPanel orderOut:nil];
+    [NSApp endSheet:radLinkSelectionPanel];
+}
+
+- (IBAction) closeLinkLoadPanel:(id)sender
+{
+    [radLinkLoadPanel orderOut:nil];
+    [NSApp endSheet:radLinkLoadPanel];
+}
+
+- (IBAction) doRadLinkLoad:(id)sender
+{
+	[radLinkLoadPanel orderOut:nil];
+    [NSApp endSheet:radLinkLoadPanel];
+	[self getFirmwareFile];
+}
+
+- (void) getFirmwareFile
+{
+	int index = [radLinkSelectionMatrix selectedRow];
+
+    NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+    [openPanel setCanChooseDirectories:NO];
+    [openPanel setCanChooseFiles:YES];
+    [openPanel setAllowsMultipleSelection:NO];
+    if(index==0)[openPanel setPrompt:@"Choose File With RadLink code"];
+	else		[openPanel setPrompt:@"Choose File That Removes RadLink"];
+    NSString* startingDir = NSHomeDirectory();
+	
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+			[model loadFirmwareFile:[[openPanel URL]path] index:index];
+        }
+    }];
+#else 
+    [openPanel beginSheetForDirectory:startingDir
+                                 file:nil
+                                types:nil
+                       modalForWindow:[self window]
+                        modalDelegate:self
+                       didEndSelector:@selector(getFirmwareFileDidEnd:returnCode:contextInfo:)
+                          contextInfo:NULL];
+#endif	
+}
+
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre 10.6-specific
+- (void)getFirmwareFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+{
+    if(returnCode){
+		[model loadFirmwareFile:[[sheet filenames] objectAtIndex:0] index:[radLinkSelectionMatrix selectedRow]];
+    }
+}
+#endif
 
 - (IBAction) pollTimeAction:(id)sender
 {
