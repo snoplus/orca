@@ -511,6 +511,7 @@
 		841224DC132E6638001AC05B /* ORTPG262Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 841224D4132E6638001AC05B /* ORTPG262Model.m */; };
 		841224DD132E6638001AC05B /* TPG262.nib in Resources */ = {isa = PBXBuildFile; fileRef = 841224D5132E6638001AC05B /* TPG262.nib */; };
 		841224DE132E6638001AC05B /* TPG262.tif in Resources */ = {isa = PBXBuildFile; fileRef = 841224D6132E6638001AC05B /* TPG262.tif */; };
+		84150EDC1615FF9C0054FF08 /* Rad7Buttons.png in Resources */ = {isa = PBXBuildFile; fileRef = 84150EDB1615FF9C0054FF08 /* Rad7Buttons.png */; };
 		8415B6A9152223050092C975 /* ORMJDVacuumView.h in Headers */ = {isa = PBXBuildFile; fileRef = 8415B6A7152223050092C975 /* ORMJDVacuumView.h */; };
 		8415B6AA152223050092C975 /* ORMJDVacuumView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8415B6A8152223050092C975 /* ORMJDVacuumView.m */; };
 		8415E586152C7C560092C975 /* ORVacuumParts.h in Headers */ = {isa = PBXBuildFile; fileRef = 8415E584152C7C560092C975 /* ORVacuumParts.h */; };
@@ -3612,6 +3613,7 @@
 		841224D4132E6638001AC05B /* ORTPG262Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORTPG262Model.m; path = Source/Objects/Hardware/Serial/TPG262/ORTPG262Model.m; sourceTree = SOURCE_ROOT; };
 		841224D5132E6638001AC05B /* TPG262.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = TPG262.nib; path = Source/Objects/Hardware/Serial/TPG262/TPG262.nib; sourceTree = SOURCE_ROOT; };
 		841224D6132E6638001AC05B /* TPG262.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = TPG262.tif; path = Source/Objects/Hardware/Serial/TPG262/TPG262.tif; sourceTree = SOURCE_ROOT; };
+		84150EDB1615FF9C0054FF08 /* Rad7Buttons.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Rad7Buttons.png; path = Source/Objects/Hardware/Serial/Rad7/Rad7Buttons.png; sourceTree = SOURCE_ROOT; };
 		8415B6A7152223050092C975 /* ORMJDVacuumView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORMJDVacuumView.h; sourceTree = "<group>"; };
 		8415B6A8152223050092C975 /* ORMJDVacuumView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORMJDVacuumView.m; sourceTree = "<group>"; };
 		8415E584152C7C560092C975 /* ORVacuumParts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORVacuumParts.h; path = Source/Experiments/MJDVacuum/ORVacuumParts.h; sourceTree = SOURCE_ROOT; };
@@ -8996,6 +8998,7 @@
 				847F947413D4AA31006B06B4 /* ORRad7Controller.m */,
 				847F947713D4AA31006B06B4 /* ORRad7Model.h */,
 				847F947813D4AA31006B06B4 /* ORRad7Model.m */,
+				84150EDB1615FF9C0054FF08 /* Rad7Buttons.png */,
 				847F947913D4AA31006B06B4 /* Rad7.nib */,
 				847F947A13D4AA31006B06B4 /* Rad7.tif */,
 			);
@@ -14466,6 +14469,7 @@
 				8458EA3C15DBCFF6005C43A9 /* MPodCrateSmall.tif in Resources */,
 				2DAB012115EF988C00BC2540 /* EdelweissLogo.tif in Resources */,
 				2DAB012215EF988C00BC2540 /* KITLogo.tif in Resources */,
+				84150EDC1615FF9C0054FF08 /* Rad7Buttons.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
