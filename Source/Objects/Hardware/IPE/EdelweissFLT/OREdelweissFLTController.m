@@ -345,8 +345,7 @@
 - (void) fiberDelaysChanged:(NSNotification*)aNote
 {
     uint64_t val=[model fiberDelays];
-    //DEBUG OUTPUT: 
- 	NSLog(@"%@::%@: UNDER CONSTRUCTION! 0x%016llx \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model fiberDelays]);//TODO: DEBUG testing ...-tb-
+    //DEBUG OUTPUT:  	NSLog(@"%@::%@: UNDER CONSTRUCTION! 0x%016llx \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model fiberDelays]);//TODO: DEBUG testing ...-tb-
 	//[fiberDelaysTextField setIntValue: [model fiberDelays]];
 	[fiberDelaysTextField setStringValue: [NSString stringWithFormat:@"0x%016qx",val]];
 
@@ -370,20 +369,18 @@
 	//[streamMaskTextField setIntValue: [model streamMask]];
 	[streamMaskTextField setStringValue: [NSString stringWithFormat:@"0x%016qx",[model streamMask]]];
 	//[streamMaskTextField setStringValue: [NSString stringWithFormat:@"0x1234000012340000"]];
-//DEBUG OUTPUT:
- 	NSLog(@"%@::%@: UNDER CONSTRUCTION! 0x%016qx 0x%032qx 0x%016llx \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model streamMask],[model streamMask],[model streamMask]);//TODO: DEBUG testing ...-tb-
+//DEBUG OUTPUT:  	NSLog(@"%@::%@: UNDER CONSTRUCTION! 0x%016qx 0x%032qx 0x%016llx \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model streamMask],[model streamMask],[model streamMask]);//TODO: DEBUG testing ...-tb-
 
 	//[model setStreamMask:[sender intValue]];	
 	uint64_t chan, fib;
-    uint64_t val=[model streamMask];
+    //uint64_t val=[model streamMask];
 	for(fib=0;fib<6;fib++){
-	    //NSLog(@"fib %i:",fib);
-		NSString *s = [NSString stringWithFormat:@"fib %llu:",fib];
+		//debug NSString *s = [NSString stringWithFormat:@"fib %llu:",fib];
 	    for(chan=0;chan<6;chan++){
 		    if([model streamMaskForFiber:fib chan:chan]) [[streamMaskMatrix cellAtRow:fib column: chan] setIntValue: 1];
 			else  [[streamMaskMatrix cellAtRow:fib column: chan] setIntValue: 0];
 			
-			s=[s stringByAppendingString: [NSString stringWithFormat: @"%u",[model streamMaskForFiber:fib chan:chan]]];
+			//debug s=[s stringByAppendingString: [NSString stringWithFormat: @"%u",[model streamMaskForFiber:fib chan:chan]]];
 			#if 0
 		    if([model streamMaskForFiber:fib chan:chan]){ 
 			    //val |= ((0x1LL<<chan) << (fib*8));
@@ -393,9 +390,9 @@
 			}
 			#endif
 		}
-			NSLog(@"%@\n",s);
+		//debug NSLog(@"%@\n",s);
 	}
-			NSLog(@"%016qx done.\n",val);
+	//debug NSLog(@"%016qx done.\n",val);
 }
 
 - (void) selectFiberTrigChanged:(NSNotification*)aNote

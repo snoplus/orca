@@ -220,7 +220,7 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
 	int retval=-1;
 	
 	
-	int32_t l=0;
+	int64_t l=0;
 	int doRunLoop=true;
 	dataReplyThreadData->started = 1;
 	do{
@@ -258,11 +258,11 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
 	        //printf("recvfromGlobalServer retval:  %i (bytes), maxSize %i, from IP %s\n",retval,maxSizeOfReadbuffer,inet_ntoa(sockaddr_from.sin_addr));
 			//printf("Got UDP data from %s\n", inet_ntoa(sockaddr_from.sin_addr));
 			//NSLog(@"Got UDP data from %s\n", inet_ntoa(sockaddr_from.sin_addr));
-	        NSLog(@"  receiveFromDataReplyServerThreadFunction: Got UDP data from %s!  \n", inet_ntoa(dataReplyThreadData->sockaddr_data_from.sin_addr));//TODO: DEBUG -tb-
+	        NSLog(@"     receiveFromDataReplyServerThreadFunction: Got UDP data from %s!  \n", inet_ntoa(dataReplyThreadData->sockaddr_data_from.sin_addr));//TODO: DEBUG -tb-
 			
 	    }
 	    if(retval == 1444 && counterData1444Packet==0){
-	        NSLog(@"  receiveFromDataReplyServerThreadFunction: Got UDP data packet from %s!  \n",  inet_ntoa(dataReplyThreadData->sockaddr_data_from.sin_addr));//TODO: DEBUG -tb-
+	        NSLog(@"     receiveFromDataReplyServerThreadFunction: Got UDP data packet from %s!  \n",  inet_ntoa(dataReplyThreadData->sockaddr_data_from.sin_addr));//TODO: DEBUG -tb-
 			int i;
 			uint16_t *shorts=(uint16_t *)readBuffer;
 			NSMutableString *s = [[NSMutableString alloc] init];
@@ -291,8 +291,8 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
 				if(retval==1444) counterData1444Packet++;
 				else{
 					if(counterData1444Packet>0) NSLog(@"  received %i data packets with 1444 bytes  \n",counterData1444Packet);
-					NSLog(@"  received data packet w header 0x%08x, 0x%04x,0x%04x, length %i\n",*hptr,*h16ptr,*h16ptr2,retval);
-					NSLog(@"  bytes: %i\n",counterData1444Packet * 1440 + retval -4);
+					NSLog(@"    received data packet w header 0x%08x, 0x%04x,0x%04x, length %i\n",*hptr,*h16ptr,*h16ptr2,retval);
+					NSLog(@"    bytes: %i\n",counterData1444Packet * 1440 + retval -4);
 					counterData1444Packet=0;
 				}
 			}
@@ -301,7 +301,7 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
 	
 	
 	
-	NSLog(@"  receiveFromDataReplyServerThreadFunction: loop FINISHED  \n");
+	NSLog(@"     receiveFromDataReplyServerThreadFunction: loop FINISHED  \n");
 	dataReplyThreadData->stopNow=0;
 	dataReplyThreadData->started=0;
 	
@@ -1162,7 +1162,7 @@ NSLog(@"  arguments: %@ \n" , arguments);
 //reply socket (server)
 - (int) startListeningServerSocket
 {
-	NSLog(@"Called %@::%@!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
+	//debug NSLog(@"Called %@::%@!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
 
     int status, retval=0;
 
@@ -1215,7 +1215,7 @@ NSLog(@"  arguments: %@ \n" , arguments);
 
 - (void) stopListeningServerSocket
 {
-	NSLog(@"Called %@::%@!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
+	//debug NSLog(@"Called %@::%@!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
     if(UDP_REPLY_SERVER_SOCKET>-1) close(UDP_REPLY_SERVER_SOCKET);
     UDP_REPLY_SERVER_SOCKET = -1;
 	
@@ -1325,7 +1325,7 @@ NSLog(@"  arguments: %@ \n" , arguments);
 //command socket (client)
 - (int) openCommandSocket
 {
-	NSLog(@"Called %@::%@!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
+	//debug NSLog(@"Called %@::%@!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
 	//[model setCrateUDPCommand:[sender stringValue]];	
 	
 	if(UDP_COMMAND_CLIENT_SOCKET>0) [self closeCommandSocket];//still open, first close the socket
@@ -1362,7 +1362,7 @@ NSLog(@"  arguments: %@ \n" , arguments);
 
 - (void) closeCommandSocket
 {
-	NSLog(@"Called %@::%@!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
+	//debug NSLog(@"Called %@::%@!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
 	//[model setCrateUDPCommand:[sender stringValue]];	
       if(UDP_COMMAND_CLIENT_SOCKET>-1) close(UDP_COMMAND_CLIENT_SOCKET);
       UDP_COMMAND_CLIENT_SOCKET = -1;
@@ -1516,7 +1516,7 @@ NSLog(@"  arguments: %@ \n" , arguments);
 
 - (void) stopListeningDataServerSocket
 {
-	NSLog(@"Called %@::%@!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
+	//debug NSLog(@"Called %@::%@!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
     if(UDP_DATA_REPLY_SERVER_SOCKET>-1) close(UDP_DATA_REPLY_SERVER_SOCKET);
     UDP_DATA_REPLY_SERVER_SOCKET = -1;
 	
@@ -1691,7 +1691,7 @@ for(l=0;l<2500;l++){
 
 - (void) closeDataCommandSocket
 {
-	NSLog(@"Called %@::%@!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
+	//debug NSLog(@"Called %@::%@!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
 	//[model setCrateUDPCommand:[sender stringValue]];	
       if(UDP_DATA_COMMAND_CLIENT_SOCKET>-1) close(UDP_DATA_COMMAND_CLIENT_SOCKET);
       UDP_DATA_COMMAND_CLIENT_SOCKET = -1;
