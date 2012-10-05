@@ -443,6 +443,7 @@ typedef struct{
 typedef struct{
     uint32_t error_flags;
     uint8_t current_adc[16*32];
+    uint8_t busy_flag[16*32];
 } read_pmt_base_currents_results_t;
 
 typedef struct{

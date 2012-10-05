@@ -1055,7 +1055,7 @@ void SwapLongBlock(void* p, int32_t n)
                                  @"ORXL3DecoderForPmtBaseCurrent", @"decoder",
                                  [NSNumber numberWithLong:[self pmtBaseCurrentDataId]], @"dataId",
                                  [NSNumber numberWithBool:NO], @"variable",
-                                 [NSNumber numberWithLong:20+16*8+6], @"length",
+                                 [NSNumber numberWithLong:20+16*8+16*8+6], @"length",
                                  nil];
 	[dataDictionary setObject:dDictionary forKey:@"Xl3PmtBaseCurrent"];
     
@@ -2144,7 +2144,8 @@ void SwapLongBlock(void* p, int32_t n)
             msk |= 1 << [anObj stationNumber];
         }
 	}
-
+    unsigned int msk_full = msk;
+    
     if (isPollingXl3 || isPollingForced) {
         msk &= pollCMOSRatesMask;
     }
@@ -2260,20 +2261,32 @@ void SwapLongBlock(void* p, int32_t n)
         if ((!isPollingXl3 || isPollingVerbose) && [self calcCMOSRatesFromCounts]) {
             NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ CMOS rates:\n", [[self xl3Link] crateName]];
             unsigned char slot_idx = 0;
-            
+
+            if (msk < msk_full) {
+                [msg appendFormat:@"slots masked out: "];
+                unsigned int msk_missing = msk_full & ~msk;
+                for (i=0; i<16; i++) {
+                    if (msk_missing & (1UL << i)) {
+                        [msg appendFormat:@"%d, ", i];
+                    }
+                }
+                [msg appendFormat:@"\n"];
+            }
+         
             if (num_slots > 8) {
                 slot_idx = 0;
                 unsigned char j = 0;
                 for (i=0; i<8; i++) {
                     if ((msk >> i) & 0x1) {
-                        [msg appendFormat:@"slot %2d, ch00-07:", i];
-                        for (j=0; j<8; j++) [msg appendFormat:@"%3.1f ", rates_lo.rates[slot_idx*32 + j]];
-                        [msg appendFormat:@"\nslot %2d, ch08-15:", i];
-                        for (j=8; j<16; j++) [msg appendFormat:@"%3.1f ", rates_lo.rates[slot_idx*32 + j]];
-                        [msg appendFormat:@"\nslot %2d, ch16-23:", i];
-                        for (j=16; j<23; j++) [msg appendFormat:@"%3.1f ", rates_lo.rates[slot_idx*32 + j]];
-                        [msg appendFormat:@"\nslot %2d, ch24-31:", i];
-                        for (j=24; j<32; j++) [msg appendFormat:@"%3.1f ", rates_lo.rates[slot_idx*32 + j]];
+                        [msg appendFormat:@"slot: %2d\n", i];
+                        [msg appendFormat:@"ch00-07:"];
+                        for (j=0; j<8; j++) [msg appendFormat:@"%9.0f ", rates_lo.rates[slot_idx*32 + j]];
+                        [msg appendFormat:@"\nch08-15:"];
+                        for (j=8; j<16; j++) [msg appendFormat:@"%9.0f ", rates_lo.rates[slot_idx*32 + j]];
+                        [msg appendFormat:@"\nch16-23:"];
+                        for (j=16; j<24; j++) [msg appendFormat:@"%9.0f ", rates_lo.rates[slot_idx*32 + j]];
+                        [msg appendFormat:@"\nch24-31:"];
+                        for (j=24; j<32; j++) [msg appendFormat:@"%9.0f ", rates_lo.rates[slot_idx*32 + j]];
                         [msg appendFormat:@"\n"];
                         slot_idx++;
                     }
@@ -2281,14 +2294,15 @@ void SwapLongBlock(void* p, int32_t n)
                 slot_idx=0;
                 for (i=0; i<8; i++) {
                     if ((msk >> (i + 8)) & 0x1) {
-                        [msg appendFormat:@"slot %2d, ch00-07:", i + 8];
-                        for (j=0; j<8; j++) [msg appendFormat:@"%3.1f ", rates_hi.rates[slot_idx*32 + j]];
-                        [msg appendFormat:@"\nslot %2d, ch08-15:", i + 8];
-                        for (j=8; j<16; j++) [msg appendFormat:@"%3.1f ", rates_hi.rates[slot_idx*32 + j]];
-                        [msg appendFormat:@"\nslot %2d, ch16-23:", i + 8];
-                        for (j=16; j<23; j++) [msg appendFormat:@"%3.1f ", rates_hi.rates[slot_idx*32 + j]];
-                        [msg appendFormat:@"\nslot %2d, ch24-31:", i + 8];
-                        for (j=24; j<32; j++) [msg appendFormat:@"%3.1f ", rates_hi.rates[slot_idx*32 + j]];
+                        [msg appendFormat:@"slot: %2d\n", i+8];
+                        [msg appendFormat:@"ch00-07:"];
+                        for (j=0; j<8; j++) [msg appendFormat:@"%9.0f ", rates_hi.rates[slot_idx*32 + j]];
+                        [msg appendFormat:@"\nch08-15:"];
+                        for (j=8; j<16; j++) [msg appendFormat:@"%9.0f ", rates_hi.rates[slot_idx*32 + j]];
+                        [msg appendFormat:@"\nch16-23:"];
+                        for (j=16; j<24; j++) [msg appendFormat:@"%9.0f ", rates_hi.rates[slot_idx*32 + j]];
+                        [msg appendFormat:@"\nch24-31:"];
+                        for (j=24; j<32; j++) [msg appendFormat:@"%9.0f ", rates_hi.rates[slot_idx*32 + j]];
                         [msg appendFormat:@"\n"];
                         slot_idx++;
                     }
@@ -2299,24 +2313,26 @@ void SwapLongBlock(void* p, int32_t n)
                 unsigned char j = 0;
                 for (i=0; i<16; i++) {
                      if ((msk >> i) & 0x1) {
-                         [msg appendFormat:@"slot %2d, ch00-07:", i];
-                         for (j=0; j<8; j++) [msg appendFormat:@"%3.1f ", rates_lo.rates[slot_idx*32 + j]];
-                         [msg appendFormat:@"\nslot %2d, ch08-15:", i];
-                         for (j=8; j<16; j++) [msg appendFormat:@"%3.1f ", rates_lo.rates[slot_idx*32 + j]];
-                         [msg appendFormat:@"\nslot %2d, ch16-23:", i];
-                         for (j=16; j<23; j++) [msg appendFormat:@"%3.1f ", rates_lo.rates[slot_idx*32 + j]];
-                         [msg appendFormat:@"\nslot %2d, ch24-31:", i];
-                         for (j=24; j<32; j++) [msg appendFormat:@"%3.1f ", rates_lo.rates[slot_idx*32 + j]];
+                         [msg appendFormat:@"slot: %2d\n", i];
+                         [msg appendFormat:@"ch00-07:"];
+                         for (j=0; j<8; j++) [msg appendFormat:@"%9.0f ", rates_lo.rates[slot_idx*32 + j]];
+                         [msg appendFormat:@"\nch08-15:"];
+                         for (j=8; j<16; j++) [msg appendFormat:@"%9.0f ", rates_lo.rates[slot_idx*32 + j]];
+                         [msg appendFormat:@"\nch16-23:"];
+                         for (j=16; j<24; j++) [msg appendFormat:@"%9.0f ", rates_lo.rates[slot_idx*32 + j]];
+                         [msg appendFormat:@"\nch24-31:"];
+                         for (j=24; j<32; j++) [msg appendFormat:@"%9.0f ", rates_lo.rates[slot_idx*32 + j]];
                          [msg appendFormat:@"\n"];
                          slot_idx++;
                      }
                 }
             }
-            NSLog(msg);
+            [msg appendFormat:@"\n"];
+            NSLogFont([NSFont userFixedPitchFontOfSize:10], msg);
         }
 
         //data packet
-        if (isPollingXl3 && [self calcCMOSRatesFromCounts] && [[ORGlobal sharedGlobal] runInProgress]) {
+        if (isPollingXl3 && [[ORGlobal sharedGlobal] runInProgress]) {
             unsigned long data[21+8*32+6];
             data[0] = [self cmosRateDataId] | (21+8*32+6);
             data[1] = [self crateNumber];
@@ -2326,8 +2342,8 @@ void SwapLongBlock(void* p, int32_t n)
             data[20] = results_lo.error_flags;
             memcpy(data+21, results_lo.counts, 8*32*4);
             const char* timestamp = [[self stringDate] cStringUsingEncoding:NSASCIIStringEncoding];
-            memcpy(data+21+8*32*4, timestamp, 6*4);
-            NSData* cmosData = [[NSData alloc] initWithBytes:data length:sizeof(long)*(21+8*32)];
+            memcpy(data+21+8*32, timestamp, 6*4);
+            NSData* cmosData = [[NSData alloc] initWithBytes:data length:sizeof(long)*(21+8*32+6)];
             [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification object:cmosData];
             [cmosData release];
             cmosData = nil;
@@ -2336,7 +2352,7 @@ void SwapLongBlock(void* p, int32_t n)
                 data[2] = args_hi.slot_mask;
                 data[20] = results_hi.error_flags;
                 memcpy(data+21, results_hi.counts, 8*32*4);
-                cmosData = [[NSData alloc] initWithBytes:data length:sizeof(long)*(21+8*32)];
+                cmosData = [[NSData alloc] initWithBytes:data length:sizeof(long)*(21+8*32+6)];
                 [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification object:cmosData];
                 [cmosData release];
                 cmosData = nil;
@@ -2421,10 +2437,11 @@ void SwapLongBlock(void* p, int32_t n)
         }
 	}
 
+    //if monitoring restrict to present, let scripts do what they wish
+    unsigned int msk_full = msk;
     if (isPollingXl3 || isPollingForced) {
         msk &= pollPMTCurrentsMask;
     }
-    NSLog(@"polling mask: 0x%08x\n", msk);
     
     args.slot_mask = msk;
     for (i=0; i<16; i++) {
@@ -2447,22 +2464,44 @@ void SwapLongBlock(void* p, int32_t n)
         return;
     }
     else if (!isPollingXl3 || isPollingVerbose) {    
-        NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ PMT base currents for crate:\n", [[self xl3Link] crateName]];
-        unsigned char ch, sl;
-        for (ch=0; ch<32; ch++) {
-            [msg appendFormat:@"ch %2d: ", ch];
-            for (sl=0; sl<16; sl++) {
-                if ((msk >> sl) & 0x1) [msg appendFormat:@"%4d ", results.current_adc[sl*32 + ch] - 127];
-                else [msg appendFormat:@" --- "];
+        NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ PMT base currents:\n", [[self xl3Link] crateName]];
+        if (msk < msk_full) {
+            [msg appendFormat:@"slots masked out: "];
+            unsigned int msk_missing = msk_full & ~msk;
+            for (i=0; i<16; i++) {
+                if (msk_missing & (1UL << i)) {
+                    [msg appendFormat:@"%d, ", i];
+                }
             }
             [msg appendFormat:@"\n"];
         }
 
+        [msg appendFormat:@"slot :    0    1    2    3    4    5    6    7 "];
+        [msg appendFormat:@"   8    9   10   11   12   13   14   15\n"];
+        [msg appendFormat:@"-----------------------------------------------"];
+        [msg appendFormat:@"---------------------------------------\n"];
+        unsigned char ch, sl;
+        for (ch=0; ch<32; ch++) {
+            [msg appendFormat:@"ch %2d: ", ch];
+            for (sl=0; sl<16; sl++) {
+                if ((msk >> sl) & 0x1) {
+                    if (results.busy_flag[sl*32 + ch]) {
+                        [msg appendFormat:@" BSY "];
+                    }
+                    else {
+                        [msg appendFormat:@"%4d ", results.current_adc[sl*32 + ch] - 127];
+                    }
+                }
+                else [msg appendFormat:@" --- "];
+            }
+            [msg appendFormat:@"\n"];
+        }
+        [msg appendFormat:@"\n"];
         NSLogFont([NSFont userFixedPitchFontOfSize:10], msg);
     }
     
     //data packet
-    const unsigned char packet_length = 20+16*8+6;
+    const unsigned short packet_length = 20+16*8+16*8+6;
     if (isPollingXl3 && [[ORGlobal sharedGlobal] runInProgress]) {
         unsigned long data[packet_length];
         data[0] = [self pmtBaseCurrentDataId] | packet_length;
@@ -2471,8 +2510,9 @@ void SwapLongBlock(void* p, int32_t n)
         memcpy(data+3, args.channel_masks, 16*4);
         data[19] = results.error_flags;
         memcpy(data+20, results.current_adc, 16*32);
+        memcpy(data+20+16*8, results.busy_flag, 16*32);
         const char* timestamp = [[self stringDate] cStringUsingEncoding:NSASCIIStringEncoding];
-        memcpy(data+20+16*8, timestamp, 6*4);
+        memcpy(data+20+16*8+16*8, timestamp, 6*4);
         NSData* pdata = [[NSData alloc] initWithBytes:data length:sizeof(long)*(packet_length)];
         [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification object:pdata];
         [pdata release];
@@ -2524,8 +2564,8 @@ void SwapLongBlock(void* p, int32_t n)
         //unless (isPollingXl3 && !isPollingVerbose)
         if (!isPollingXl3 || isPollingVerbose) {    
             NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ HV status: \n", [[self xl3Link] crateName]];
-            [msg appendFormat:@"voltageA: %f V\nvoltageB: %f V\n", status.voltage_a * 300., status.voltage_b * 300.];
-            [msg appendFormat:@"currentA: %f mA\ncurrentB: %f mA\n", status.current_a * 10., status.current_b * 10.];
+            [msg appendFormat:@"voltageA: %.2f V\nvoltageB: %.2f V\n", status.voltage_a * 300., status.voltage_b * 300.];
+            [msg appendFormat:@"currentA: %.2f mA\ncurrentB: %.2f mA\n", status.current_a * 10., status.current_b * 10.];
             NSLog(msg);
         }
         //data packet
@@ -2939,6 +2979,7 @@ void SwapLongBlock(void* p, int32_t n)
         }
         return;
     }
+    /*
     if (!isPollingXl3 || isPollingVerbose) {
         //it doesn't set error_flags
         NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ voltages for slot: %d\n", [[self xl3Link] crateName], aSlot];
@@ -2966,6 +3007,7 @@ void SwapLongBlock(void* p, int32_t n)
 
         NSLog(msg);
     }
+    */
     
     //update FEC
     for (id anObj in [[self guardian] orcaObjects]) {
@@ -2978,7 +3020,7 @@ void SwapLongBlock(void* p, int32_t n)
     const unsigned char packet_length = 3+21+6;
     if (isPollingXl3 && [[ORGlobal sharedGlobal] runInProgress]) {
         unsigned long data[packet_length];
-        data[0] = [self xl3VltDataId] | packet_length;
+        data[0] = [self fecVltDataId] | packet_length;
         data[1] = [self crateNumber];
         data[2] = aSlot;
         memcpy(&data[3], result.voltages, 21*4);
@@ -3004,12 +3046,84 @@ void SwapLongBlock(void* p, int32_t n)
     if (isPollingXl3 || isPollingForced) {
         msk &= aSlotMask;
     }
+    //unsigned int msk_full = msk;
 
+    vmon_results_t result[16];
     unsigned char slot;
     for (slot=0; slot<16; slot++) {
         if ((msk >> slot) & 0x1) {
-            [self readVMONForSlot:slot];
+
+            @try {
+                [self readVMONForSlot:slot voltages:&result[slot]];
+            }
+            @catch (NSException *exception) {
+                if (isPollingXl3) {
+                    NSLog(@"Polling loop stopped because reading FEC local voltages failed\n");
+                    [self setIsPollingXl3:NO];
+                }
+            }
+
             if (pollThread && [pollThread isCancelled]) break;
+            if (![self isPollingXl3]) break;
+
+            //update FEC
+            for (id anObj in [[self guardian] orcaObjects]) {
+                if ([anObj class] == NSClassFromString(@"ORFec32Model") && [anObj stationNumber] == slot) {
+                    [anObj parseVoltages:&result[slot]];
+                }
+            }
+
+            //data packet
+            const unsigned char packet_length = 3+21+6;
+            if (isPollingXl3 && [[ORGlobal sharedGlobal] runInProgress]) {
+                unsigned long data[packet_length];
+                data[0] = [self fecVltDataId] | packet_length;
+                data[1] = [self crateNumber];
+                data[2] = slot;
+                memcpy(&data[3], result[slot].voltages, 21*4);
+                const char* timestamp = [[self stringDate] cStringUsingEncoding:NSASCIIStringEncoding];
+                memcpy(data+24, timestamp, 6*4);
+                NSData* pdata = [[NSData alloc] initWithBytes:data length:sizeof(long)*(packet_length)];
+                [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification object:pdata];
+                [pdata release];
+                pdata = nil;
+            }
+        }
+    }
+
+    unsigned int cnt;
+    unsigned int msk_set = msk;
+    for (cnt = 0; msk_set; cnt++) msk_set &= msk_set - 1;
+
+    for (slot=0; slot<16; slot++) {
+        if ((msk >> slot) & 0x1) {
+            if (!isPollingXl3 || isPollingVerbose) {
+                //it doesn't set error_flags
+                NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ voltages for slot: %d\n", [[self xl3Link] crateName], slot];
+                [msg appendFormat:@" -24V Sup: %f V\n", result[slot].voltages[0]];
+                [msg appendFormat:@" -15V Sup: %f V\n", result[slot].voltages[1]];
+                [msg appendFormat:@"  VEE Sup: %f V\n", result[slot].voltages[2]];
+                [msg appendFormat:@"-3.3V Sup: %f V\n", result[slot].voltages[3]];
+                [msg appendFormat:@"-2.0V Sup: %f V\n", result[slot].voltages[4]];
+                [msg appendFormat:@" 3.3V Sup: %f V\n", result[slot].voltages[5]];
+                [msg appendFormat:@" 4.0V Sup: %f V\n", result[slot].voltages[6]];
+                [msg appendFormat:@"  VCC Sup: %f V\n", result[slot].voltages[7]];
+                [msg appendFormat:@" 6.5V Sup: %f V\n", result[slot].voltages[8]];
+                [msg appendFormat:@" 8.0V Sup: %f V\n", result[slot].voltages[9]];
+                [msg appendFormat:@"  15V Sup: %f V\n", result[slot].voltages[10]];
+                [msg appendFormat:@"  24V Sup: %f V\n", result[slot].voltages[11]];
+                [msg appendFormat:@"-2.0V Ref: %f V\n", result[slot].voltages[12]];
+                [msg appendFormat:@"-1.0V Ref: %f V\n", result[slot].voltages[13]];
+                [msg appendFormat:@" 0.8V Ref: %f V\n", result[slot].voltages[14]];
+                [msg appendFormat:@" 1.0V Ref: %f V\n", result[slot].voltages[15]];
+                [msg appendFormat:@" 4.0V Ref: %f V\n", result[slot].voltages[16]];
+                [msg appendFormat:@" 5.0V Ref: %f V\n", result[slot].voltages[17]];
+                [msg appendFormat:@"    Temp.: %f degC\n", result[slot].voltages[18]];
+                [msg appendFormat:@"  Cal DAC: %f V\n", result[slot].voltages[19]];
+                [msg appendFormat:@"  HV Curr: %f mA\n", result[slot].voltages[20]];
+                
+                NSLog(msg);
+            }
         }
     }
 }
@@ -3056,14 +3170,14 @@ void SwapLongBlock(void* p, int32_t n)
     if (!isPollingXl3 || isPollingVerbose) {
         //it doesn't set error_flags
         NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ local voltages:\n", [[self xl3Link] crateName]];
-        [msg appendFormat:@"VCC: %f V\n", result.voltages[0]];
-        [msg appendFormat:@"VEE: %f V\n", result.voltages[1]];
+        [msg appendFormat:@"VCC: %.2f V\n", result.voltages[0]];
+        [msg appendFormat:@"VEE: %.2f V\n", result.voltages[1]];
         //[msg appendFormat:@"VP8: %f V\n", result.voltages[2]];
-        [msg appendFormat:@"VP24: %f V\n", result.voltages[3]];
-        [msg appendFormat:@"VM24: %f V\n", result.voltages[4]];
-        [msg appendFormat:@"TMP0: %f degC\n", result.voltages[5]];
-        [msg appendFormat:@"TMP1: %f degC\n", result.voltages[6]];
-        [msg appendFormat:@"TMP2: %f degC\n", result.voltages[7]];
+        [msg appendFormat:@"VP24: %.2f V\n", result.voltages[3]];
+        [msg appendFormat:@"VM24: %.2f V\n", result.voltages[4]];
+        [msg appendFormat:@"TMP0: %.2f degC\n", result.voltages[5]];
+        [msg appendFormat:@"TMP1: %.2f degC\n", result.voltages[6]];
+        [msg appendFormat:@"TMP2: %.2f degC\n", result.voltages[7]];
         NSLog(msg);
     }    
     
@@ -3075,7 +3189,7 @@ void SwapLongBlock(void* p, int32_t n)
         data[1] = [self crateNumber];
         memcpy(&data[2], result.voltages, 8*4);
         const char* timestamp = [[self stringDate] cStringUsingEncoding:NSASCIIStringEncoding];
-        memcpy(data+6, timestamp, 6*4);
+        memcpy(data+10, timestamp, 6*4);
         NSData* pdata = [[NSData alloc] initWithBytes:data length:sizeof(long)*(packet_length)];
         [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification object:pdata];
         [pdata release];
@@ -3202,7 +3316,7 @@ void SwapLongBlock(void* p, int32_t n)
     if (!xl3DateFormatter) {
         xl3DateFormatter = [[NSDateFormatter alloc] init];
         //keep the format length 4*6 - 1 bytes
-        [xl3DateFormatter setDateFormat:@"yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'SSS'Z'"];
+        [xl3DateFormatter setDateFormat:@"yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'SS'Z'"];
         xl3DateFormatter.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
         //iso.calendar = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
         //iso.locale = [[[NSLocale alloc] initWithLocaleIdentifier:@"en_US"] autorelease];

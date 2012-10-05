@@ -530,9 +530,10 @@ NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageSt
 
 -(void) parseVoltages:(vmon_results_t*)result;
 {
-    bool statusChanged = false;
+    //bool statusChanged = false;
     
-    if ([guardian adapterIsXL3]) statusChanged = [self parseVoltagesUsingXL3:result];
+    //if ([guardian adapterIsXL3]) statusChanged = [self parseVoltagesUsingXL3:result];
+    if ([guardian adapterIsXL3]) [self parseVoltagesUsingXL3:result];
     else NSLog(@"failed: FEC parse voltages implemented for XL3 only");
 }
 
