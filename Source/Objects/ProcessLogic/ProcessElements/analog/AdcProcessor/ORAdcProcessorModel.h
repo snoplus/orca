@@ -54,3 +54,6 @@
 - (id) eval;
 - (int) evaluatedState;
 @end
+@interface NSObject (ORAdcProcessor)
+-(BOOL) dataForChannelValid:(int)aChannel;
+@end

@@ -228,7 +228,15 @@
 
 - (NSDictionary*) valueDictionary
 {
-	return [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:[self hwValue]] forKey:[self iconLabel]];
+    BOOL isValid = YES;
+    if([hwObject respondsToSelector:@selector(dataForChannelValid:)]){
+        isValid = [hwObject dataForChannelValid:[self bit]];
+    }
+    if(isValid)	return [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:[self hwValue]] forKey:[self iconLabel]];
+
+    else return nil;
+
+    
 }
 @end
 
