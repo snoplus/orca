@@ -59,7 +59,6 @@ NSString* ORGretina4MModelPoleZeroMultChanged	= @"ORGretina4MModelPoleZeroMultCh
 NSString* ORGretina4MModelPZTraceEnabledChanged = @"ORGretina4MModelPZTraceEnabledChanged";
 NSString* ORGretina4MModelDebugChanged			= @"ORGretina4MModelDebugChanged";
 NSString* ORGretina4MModelPileUpChanged			= @"ORGretina4MModelPileUpChanged";
-NSString* ORGretina4MModelPolarityChanged		= @"ORGretina4MModelPolarityChanged";
 NSString* ORGretina4MModelTriggerModeChanged	= @"ORGretina4MModelTriggerModeChanged";
 NSString* ORGretina4MModelLEDThresholdChanged	= @"ORGretina4MModelLEDThresholdChanged";
 NSString* ORGretina4MModelCFDDelayChanged		= @"ORGretina4MModelCFDDelayChanged";
@@ -690,7 +689,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 		poleZeroEnabled[i]	= NO;
 		poleZeroMult[i]	    = 0x600;
 		pzTraceEnabled[i]	= NO;
-		polarity[i]			= 0x3;
 		triggerMode[i]		= 0x0;
 		ledThreshold[i]		= 0x1FFFF;
 		cfdDelay[i]			= 0x3f;
@@ -700,12 +698,12 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 		dataLength[i]		= 0x3FF;
 		mrpsrt[i]           = 0x0;
 		ftCnt[i]            = 0x100;
-		mrpsdv[i]           = 0xF;
-		chpsrt[i]           = 0xF;
-		chpsdv[i]           = 0xF;
+		mrpsdv[i]           = 0x0;
+		chpsrt[i]           = 0x0;
+		chpsdv[i]           = 0x0;
 		prerecnt[i]         = 0x7FF;
 		postrecnt[i]        = 0x7FF;
-		tpol[i]             = 0x0;
+		tpol[i]             = 0x3;
 		presumEnabled[i]    = 0x0;
 	}
     
@@ -795,16 +793,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	pileUp[chan] = aValue;
     NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MModelPileUpChanged object:self userInfo:userInfo];
-}
-
-- (void) setPolarity:(short)chan withValue:(short)aValue		
-{
-	if(aValue<0)aValue=0;
-	else if(aValue>0x3)aValue= 0x3;
-    [[[self undoManager] prepareWithInvocationTarget:self] setPolarity:chan withValue:polarity[chan]];
-	polarity[chan] = aValue;
-    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MModelPolarityChanged object:self userInfo:userInfo];
 }
 
 - (void) setTriggerMode:(short)chan withValue:(short)aValue	
@@ -986,7 +974,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (short) pzTraceEnabled:(short)chan    { return pzTraceEnabled[chan]; }
 - (short) debug:(short)chan             { return debug[chan]; }
 - (short) pileUp:(short)chan			{ return pileUp[chan];}
-- (short) polarity:(short)chan          { return polarity[chan];}
 - (short) triggerMode:(short)chan		{ return triggerMode[chan];}
 - (short) ledThreshold:(short)chan      { return ledThreshold[chan]; }
 - (short) cfdDelay:(short)chan          { return cfdDelay[chan]; }
@@ -1991,12 +1978,6 @@ static struct {
     [a addObject:p];
     
     p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"Polarity"];
-    [p setFormat:@"##0" upperLimit:3 lowerLimit:0 stepSize:1 units:@""];
-    [p setSetMethod:@selector(setPolarity:withValue:) getMethod:@selector(polarity:)];
-    [a addObject:p];
-    
-    p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Trigger Mode"];
     [p setFormat:@"##0" upperLimit:3 lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setTriggerMode:withValue:) getMethod:@selector(triggerMode:)];
@@ -2413,7 +2394,6 @@ static struct {
 		[self setPoleZeroEnabled:i withValue:[decoder decodeIntForKey:[@"poleZeroEnabled" stringByAppendingFormat:@"%d",i]]];
 		[self setPoleZeroMultiplier:i withValue:[decoder decodeIntForKey:[@"poleZeroMult" stringByAppendingFormat:@"%d",i]]];
 		[self setPZTraceEnabled:i withValue:[decoder decodeIntForKey:[@"pzTraceEnabled" stringByAppendingFormat:@"%d",i]]];
-		[self setPolarity:i		withValue:[decoder decodeIntForKey:[@"polarity"     stringByAppendingFormat:@"%d",i]]];
 		[self setTriggerMode:i	withValue:[decoder decodeIntForKey:[@"triggerMode"	stringByAppendingFormat:@"%d",i]]];
 		[self setLEDThreshold:i withValue:[decoder decodeIntForKey:[@"ledThreshold" stringByAppendingFormat:@"%d",i]]];
 		[self setCFDThreshold:i withValue:[decoder decodeIntForKey:[@"cfdThreshold" stringByAppendingFormat:@"%d",i]]];
@@ -2464,7 +2444,6 @@ static struct {
 		[encoder encodeInt:poleZeroEnabled[i] forKey:[@"poleZeroEnabled" stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:poleZeroMult[i]  forKey:[@"poleZeroMult" stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:pzTraceEnabled[i] forKey:[@"pzTraceEnabled" stringByAppendingFormat:@"%d",i]];
-		[encoder encodeInt:polarity[i]		forKey:[@"polarity"		stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:triggerMode[i]	forKey:[@"triggerMode"	stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:cfdFraction[i]	forKey:[@"cfdFraction"	stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:cfdDelay[i]		forKey:[@"cfdDelay"		stringByAppendingFormat:@"%d",i]];
@@ -2497,7 +2476,6 @@ static struct {
 	[self addCurrentState:objDictionary cArray:enabled forKey:@"Enabled"];
 	[self addCurrentState:objDictionary cArray:debug forKey:@"Debug Mode"];
 	[self addCurrentState:objDictionary cArray:pileUp forKey:@"Pile Up"];
-	[self addCurrentState:objDictionary cArray:polarity forKey:@"Polarity"];
 	[self addCurrentState:objDictionary cArray:triggerMode forKey:@"Trigger Mode"];
 	[self addCurrentState:objDictionary cArray:cfdDelay forKey:@"CFD Delay"];
 	[self addCurrentState:objDictionary cArray:cfdFraction forKey:@"CFD Fraction"];

@@ -57,35 +57,14 @@
 
 - (void) awakeFromNib
 {
-    settingSize     = NSMakeSize(830,510);
+    settingSize     = NSMakeSize(1200,510);
     rateSize		= NSMakeSize(790,340);
     registerTabSize	= NSMakeSize(400,287);
 	firmwareTabSize = NSMakeSize(340,187);
-    
     blankView = [[NSView alloc] init];
+    
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
 	
-	polarityPU[0] = polarityPU0;
-	polarityPU[1] = polarityPU1;
-	polarityPU[2] = polarityPU2;
-	polarityPU[3] = polarityPU3;
-	polarityPU[4] = polarityPU4;
-	polarityPU[5] = polarityPU5;
-	polarityPU[6] = polarityPU6;
-	polarityPU[7] = polarityPU7;
-	polarityPU[8] = polarityPU8;
-	polarityPU[9] = polarityPU9;
-	
-	triggerModePU[0] = triggerModePU0;
-	triggerModePU[1] = triggerModePU1;
-	triggerModePU[2] = triggerModePU2;
-	triggerModePU[3] = triggerModePU3;
-	triggerModePU[4] = triggerModePU4;
-	triggerModePU[5] = triggerModePU5;
-	triggerModePU[6] = triggerModePU6;
-	triggerModePU[7] = triggerModePU7;
-	triggerModePU[8] = triggerModePU8;
-	triggerModePU[9] = triggerModePU9;
 
 	// Setup register popup buttons
 	[registerIndexPU removeAllItems];
@@ -99,7 +78,7 @@
 	for (i=0;i<kNumberOfFPGARegisters;i++) {
 		[registerIndexPU insertItemWithTitle:[model fpgaRegisterNameAt:i]	atIndex:(i+kNumberOfGretina4MRegisters)];
 	}
-	
+
     NSString* key = [NSString stringWithFormat: @"orca.Gretina4M%d.selectedtab",[model slot]];
     int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
@@ -235,8 +214,8 @@
                        object : model];
 	
     [notifyCenter addObserver : self
-                     selector : @selector(polarityChanged:)
-                         name : ORGretina4MModelPolarityChanged
+                     selector : @selector(tpolChanged:)
+                         name : ORGretina4MModelTpolChanged
                        object : model];
 	
     [notifyCenter addObserver : self
@@ -355,6 +334,40 @@
                          name : ORGretina4MModelIntegrateTimeChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(chpsdvChanged:)
+                         name : ORGretina4MModelChpsdvChanged
+						object: model];
+ 
+    [notifyCenter addObserver : self
+                     selector : @selector(mrpsrtChanged:)
+                         name : ORGretina4MModelMrpsrtChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(ftCntChanged:)
+                         name : ORGretina4MModelFtCntChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(mrpsdvChanged:)
+                         name : ORGretina4MModelMrpsdvChanged
+						object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(chsrtChanged:)
+                         name : ORGretina4MModelChpsrtChanged
+						object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(prerecntChanged:)
+                         name : ORGretina4MModelPrerecntChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(postrecntChanged:)
+                         name : ORGretina4MModelPostrecntChanged
+						object: model];
 }
 
 - (void) registerRates
@@ -389,7 +402,7 @@
 	[self pzTraceEnabledChanged:nil];
 	[self debugChanged:nil];
 	[self presumEnabledChanged:nil];
-	[self polarityChanged:nil];
+	[self tpolChanged:nil];
 	[self triggerModeChanged:nil];
 	[self ledThresholdChanged:nil];
 	[self cfdDelayChanged:nil];
@@ -425,9 +438,115 @@
 	[self extTrigLengthChanged:nil];
 	[self collectionTimeChanged:nil];
 	[self integrateTimeChanged:nil];
+    
+    [self chpsdvChanged:nil];
+    [self mrpsrtChanged:nil];
+    [self ftCntChanged:nil];
+    [self mrpsdvChanged:nil];
+    [self chsrtChanged:nil];
+    [self prerecntChanged:nil];
+    [self postrecntChanged:nil];
 }
 
 #pragma mark •••Interface Management
+- (void) chpsdvChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumGretina4MChannels;i++){
+            [[chpsdvMatrix cellAtRow:i column:0] selectItemAtIndex:[model chpsdv:i]];
+        }
+    }
+    else {
+        int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        [[chpsdvMatrix cellAtRow:chan column:0] selectItemAtIndex:[model chpsdv:chan]];
+    }
+}
+
+- (void) mrpsrtChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumGretina4MChannels;i++){
+            [[mrpsrtMatrix cellAtRow:i column:0] selectItemAtIndex:[model mrpsrt:i]];
+        }
+    }
+    else {
+        int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        [[mrpsrtMatrix cellAtRow:chan column:0] selectItemAtIndex:[model mrpsrt:chan]];
+    }
+}
+
+- (void) ftCntChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumGretina4MChannels;i++){
+            [[ftCntMatrix cellAtRow:i column:0] setIntValue:[model ftCnt:i]];
+        }
+    }
+    else {
+        int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        [[ftCntMatrix cellAtRow:chan column:0] setIntValue:[model ftCnt:chan]];
+    }
+}
+
+- (void) mrpsdvChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumGretina4MChannels;i++){
+            [[mrpsdvMatrix cellAtRow:i column:0] selectItemAtIndex:[model mrpsdv:i]];
+        }
+    }
+    else {
+        int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        [[mrpsdvMatrix cellAtRow:chan column:0] selectItemAtIndex:[model mrpsdv:chan]];
+    }
+}
+
+- (void) chsrtChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumGretina4MChannels;i++){
+            [[chpsrtMatrix cellAtRow:i column:0] selectItemAtIndex:[model chpsrt:i]];
+        }
+    }
+    else {
+        int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        [[chpsrtMatrix cellAtRow:chan column:0] selectItemAtIndex:[model chpsrt:chan]];
+    }
+}
+
+- (void) prerecntChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumGretina4MChannels;i++){
+            [[prerecntMatrix cellAtRow:i column:0] setIntValue:[model prerecnt:i]];
+        }
+    }
+    else {
+        int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        [[prerecntMatrix cellAtRow:chan column:0] setIntValue:[model prerecnt:chan]];
+    }
+}
+
+- (void) postrecntChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumGretina4MChannels;i++){
+            [[postrecntMatrix cellAtRow:i column:0] setIntValue:[model postrecnt:i]];
+        }
+    }
+    else {
+        int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        [[postrecntMatrix cellAtRow:chan column:0] setIntValue:[model postrecnt:chan]];
+    }
+}
+
 
 - (void) integrateTimeChanged:(NSNotification*)aNote
 {
@@ -456,8 +575,9 @@
 
 - (void) clockMuxChanged:(NSNotification*)aNote
 {
-	[clockMuxField setIntValue: [model clockMux]];
+	[clockMuxPU selectItemAtIndex: [model clockMux]];
 }
+
 - (void) downSampleChanged:(NSNotification*)aNote
 {
 	[downSamplePU selectItemAtIndex:[model downSample]];
@@ -602,32 +722,32 @@
     }
 }
 
-- (void) polarityChanged:(NSNotification*)aNote
+- (void) tpolChanged:(NSNotification*)aNote
 {
     if(aNote == nil){
         short i;
         for(i=0;i<kNumGretina4MChannels;i++){
-            [polarityPU[i] selectItemAtIndex:[model polarity:i]];
+            [[tpolMatrix  cellWithTag:i] selectItemAtIndex:[model tpol:i]];
         }
     }
     else {
         int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
-        [polarityPU[chan] selectItemAtIndex:[model polarity:chan]];
+        [[tpolMatrix cellAtRow:chan column:0] selectItemAtIndex:[model tpol:chan]];
     }
 }
 
 - (void) triggerModeChanged:(NSNotification*)aNote
 {
+    
     if(aNote == nil){
         short i;
         for(i=0;i<kNumGretina4MChannels;i++){
-            [triggerModePU[i] selectItemAtIndex:[model triggerMode:i]];
+            [[triggerModeMatrix  cellWithTag:i] selectItemAtIndex:[model triggerMode:i]];
         }
     }
     else {
         int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
-        [triggerModePU[chan] selectItemAtIndex:[model triggerMode:chan]];
-
+        [[triggerModeMatrix cellAtRow:chan column:0] selectItemAtIndex:[model triggerMode:chan]];
     }
 }
 
@@ -791,11 +911,8 @@
 	[stopFPGALoadButton setEnabled:!locked && downloading];
 	[downSamplePU setEnabled:!lockedOrRunningMaintenance && !downloading];
 	
-	int i;
-	for(i=0;i<kNumGretina4MChannels;i++){
-		[polarityPU[i] setEnabled:!lockedOrRunningMaintenance && !downloading];
-		[triggerModePU[i] setEnabled:!lockedOrRunningMaintenance && !downloading];
-	}		
+    [tpolMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [triggerModeMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
 }
 
 - (void) registerLockChanged:(NSNotification*)aNotification
@@ -964,37 +1081,72 @@
 }
 
 #pragma mark •••Actions
+- (IBAction) chpsdvAction:(id)sender
+{
+    [model setChpsdv:[sender selectedRow] withValue:[[sender selectedCell] indexOfSelectedItem]];
+}
 
-- (void) integrateTimeFieldAction:(id)sender
+- (IBAction) mrpsrtAction:(id)sender
+{
+    [model setMrpsrt:[sender selectedRow] withValue:[[sender selectedCell] indexOfSelectedItem]];
+}
+
+- (IBAction) ftCntAction:(id)sender
+{
+    [model setFtCnt:[sender selectedRow] withValue:[[sender selectedCell] intValue]];
+}
+
+- (IBAction) mrpsdvAction:(id)sender
+{
+    [model setMrpsdv:[sender selectedRow] withValue:[[sender selectedCell] indexOfSelectedItem]];
+}
+
+- (IBAction) chsrtAction:(id)sender
+{
+    [model setChpsrt:[sender selectedRow] withValue:[[sender selectedCell] indexOfSelectedItem]];
+}
+
+- (IBAction) prerecntAction:(id)sender
+{
+    [model setPrerecnt:[sender selectedRow] withValue:[[sender selectedCell] intValue]];
+}
+
+- (IBAction) postrecntAction:(id)sender
+{
+    [model setPostrecnt:[sender selectedRow] withValue:[[sender selectedCell] intValue]];
+}
+
+- (IBAction) integrateTimeFieldAction:(id)sender
 {
 	[model setIntegrateTimeConverted:[sender floatValue]];
 }
 
-- (void) collectionTimeFieldAction:(id)sender
+- (IBAction) collectionTimeFieldAction:(id)sender
 {
 	[model setCollectionTimeConverted:[sender floatValue]];	
 }
 
-- (void) extTrigLengthFieldAction:(id)sender
+- (IBAction) extTrigLengthFieldAction:(id)sender
 {
 	[model setExtTrigLengthConverted:[sender floatValue]];	
 }
 
-- (void) pileUpWindowFieldAction:(id)sender
+- (IBAction) pileUpWindowFieldAction:(id)sender
 {
 	[model setPileUpWindowConverted:[sender floatValue]];	
 }
 
-- (void) externalWindowFieldAction:(id)sender
+- (IBAction) externalWindowFieldAction:(id)sender
 {
 	[model setExternalWindowConverted:[sender floatValue]];
 }
 
-- (void) clockMuxAction:(id)sender
+- (IBAction) clockMuxAction:(id)sender
 {
-	[model setClockMux:[sender intValue]];
+	[model setClockMux:[sender indexOfSelectedItem]];
 }
-- (void) downSampleAction:(id)sender
+
+- (IBAction) downSampleAction:(id)sender
 {
 	if([sender indexOfSelectedItem] != [model downSample]){
 		[model setDownSample:[sender indexOfSelectedItem]];
@@ -1051,18 +1203,14 @@
 	}
 }
 
-- (IBAction) polarityAction:(id)sender
+- (IBAction) tpolAction:(id)sender
 {
-	if([sender indexOfSelectedItem] != [model polarity:[sender tag]]){
-		[model setPolarity:[sender tag] withValue:[sender indexOfSelectedItem]];
-	}
+    [model setTpol:[sender selectedRow] withValue:[[sender selectedCell] indexOfSelectedItem]];
 }
 
 - (IBAction) triggerModeAction:(id)sender
 {
-	if([sender indexOfSelectedItem] != [model triggerMode:[sender tag]]){
-		[model setTriggerMode:[sender tag] withValue:[sender indexOfSelectedItem]];
-	}
+    [model setTriggerMode:[sender selectedRow] withValue:[[sender selectedCell] indexOfSelectedItem]];
 }
 
 - (IBAction) ledThresholdAction:(id)sender

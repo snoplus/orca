@@ -50,33 +50,18 @@
 	IBOutlet NSMatrix*		cfdThresholdMatrix;
 	IBOutlet NSMatrix*		dataDelayMatrix;
 	IBOutlet NSMatrix*		dataLengthMatrix;
-	IBOutlet NSTextField*   clockMuxField;
+	IBOutlet NSMatrix*      tpolMatrix;
+	IBOutlet NSMatrix*      triggerModeMatrix;
+    IBOutlet NSMatrix*		chpsdvMatrix;
+    IBOutlet NSMatrix*		ftCntMatrix;
+    IBOutlet NSMatrix*		mrpsrtMatrix;
+    IBOutlet NSMatrix*		mrpsdvMatrix;
+    IBOutlet NSMatrix*		chpsrtMatrix;
+    IBOutlet NSMatrix*		prerecntMatrix;
+    IBOutlet NSMatrix*		postrecntMatrix;
 
-	//arrggg! why can't you put a popup into a NSMatrix????
-	IBOutlet NSPopUpButton*	polarityPU0;
-	IBOutlet NSPopUpButton*	polarityPU1;
-	IBOutlet NSPopUpButton*	polarityPU2;
-	IBOutlet NSPopUpButton*	polarityPU3;
-	IBOutlet NSPopUpButton*	polarityPU4;
-	IBOutlet NSPopUpButton*	polarityPU5;
-	IBOutlet NSPopUpButton*	polarityPU6;
-	IBOutlet NSPopUpButton*	polarityPU7;
-	IBOutlet NSPopUpButton*	polarityPU8;
-	IBOutlet NSPopUpButton*	polarityPU9;
-	NSPopUpButton* polarityPU[kNumGretina4MChannels];
-	
-	IBOutlet NSPopUpButton*	triggerModePU0;
-	IBOutlet NSPopUpButton*	triggerModePU1;
-	IBOutlet NSPopUpButton*	triggerModePU2;
-	IBOutlet NSPopUpButton*	triggerModePU3;
-	IBOutlet NSPopUpButton*	triggerModePU4;
-	IBOutlet NSPopUpButton*	triggerModePU5;
-	IBOutlet NSPopUpButton*	triggerModePU6;
-	IBOutlet NSPopUpButton*	triggerModePU7;
-	IBOutlet NSPopUpButton*	triggerModePU8;
-	IBOutlet NSPopUpButton*	triggerModePU9;
-	NSPopUpButton* triggerModePU[kNumGretina4MChannels];
-	
+    IBOutlet NSPopUpButton* clockMuxPU;
+
     IBOutlet NSButton*      settingLockButton;
     IBOutlet NSButton*      initButton;
     IBOutlet NSButton*      resetButton;
@@ -139,6 +124,14 @@
 - (void) updateWindow;
 
 #pragma mark •••Interface Management
+- (void) chpsdvChanged:(NSNotification*)aNote;
+- (void) mrpsrtChanged:(NSNotification*)aNote;
+- (void) ftCntChanged:(NSNotification*)aNote;
+- (void) mrpsdvChanged:(NSNotification*)aNote;
+- (void) chsrtChanged:(NSNotification*)aNote;
+- (void) prerecntChanged:(NSNotification*)aNote;
+- (void) postrecntChanged:(NSNotification*)aNote;
+
 - (void) integrateTimeChanged:(NSNotification*)aNote;
 - (void) collectionTimeChanged:(NSNotification*)aNote;
 - (void) extTrigLengthChanged:(NSNotification*)aNote;
@@ -167,7 +160,7 @@
 - (void) pzTraceEnabledChanged:(NSNotification*)aNote;
 - (void) debugChanged:(NSNotification*)aNote;
 - (void) presumEnabledChanged:(NSNotification*)aNote;
-- (void) polarityChanged:(NSNotification*)aNote;
+- (void) tpolChanged:(NSNotification*)aNote;
 - (void) triggerModeChanged:(NSNotification*)aNote;
 - (void) ledThresholdChanged:(NSNotification*)aNote;
 - (void) cfdDelayChanged:(NSNotification*)aNote;
@@ -208,6 +201,15 @@
 - (IBAction) closeNoiseFloorPanel:(id)sender;
 - (IBAction) noiseFloorIntegrationAction:(id)sender;
 
+- (IBAction) chpsdvAction:(id)sender;
+- (IBAction) mrpsrtAction:(id)sender;
+- (IBAction) ftCntAction:(id)sender;
+- (IBAction) mrpsdvAction:(id)sender;
+- (IBAction) chsrtAction:(id)sender;
+- (IBAction) prerecntAction:(id)sender;
+- (IBAction) postrecntAction:(id)sender;
+
+
 - (IBAction) enabledAction:(id)sender;
 - (IBAction) cfdEnabledAction:(id)sender;
 - (IBAction) poleZeroEnabledAction:(id)sender;
@@ -215,7 +217,7 @@
 - (IBAction) pzTraceEnabledAction:(id)sender;
 - (IBAction) debugAction:(id)sender;
 - (IBAction) presumEnabledAction:(id)sender;
-- (IBAction) polarityAction:(id)sender;
+- (IBAction) tpolAction:(id)sender;
 - (IBAction) triggerModeAction:(id)sender;
 - (IBAction) ledThresholdAction:(id)sender;
 - (IBAction) cfdFractionAction:(id)sender;

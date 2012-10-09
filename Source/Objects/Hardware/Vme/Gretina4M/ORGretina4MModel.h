@@ -184,7 +184,6 @@ enum Gretina4MFIFOStates {
     short			enabled[kNumGretina4MChannels];
     short			debug[kNumGretina4MChannels];
     short			pileUp[kNumGretina4MChannels];
-    short			polarity[kNumGretina4MChannels];
     short			triggerMode[kNumGretina4MChannels];
     unsigned long   ledThreshold[kNumGretina4MChannels];
     short			cfdDelay[kNumGretina4MChannels];
@@ -336,8 +335,7 @@ enum Gretina4MFIFOStates {
 - (short) collectionTime;
 - (short) integrateTime;
 
-- (void) setPolarity:(short)chan withValue:(short)aValue;
-- (void) setTriggerMode:(short)chan withValue:(short)aValue; 
+- (void) setTriggerMode:(short)chan withValue:(short)aValue;
 - (void) setPileUp:(short)chan withValue:(short)aValue;		
 - (void) setEnabled:(short)chan withValue:(short)aValue;
 - (void) setCFDEnabled:(short)chan withValue:(short)aValue;
@@ -370,8 +368,7 @@ enum Gretina4MFIFOStates {
 - (short) cfdEnabled:(short)chan;		
 - (short) debug:(short)chan;		
 - (short) pileUp:(short)chan;		
-- (short)	polarity:(short)chan;	
-- (short) triggerMode:(short)chan;	
+- (short) triggerMode:(short)chan;
 - (short) ledThreshold:(short)chan;	
 - (short) cfdDelay:(short)chan;		
 - (short) cfdFraction:(short)chan;	
@@ -518,7 +515,6 @@ extern NSString* ORGretina4MModelCFDEnabledChanged;
 extern NSString* ORGretina4MModelPoleZeroEnabledChanged;
 extern NSString* ORGretina4MModelPoleZeroMultChanged;
 extern NSString* ORGretina4MModelPZTraceEnabledChanged;
-extern NSString* ORGretina4MModelPolarityChanged;
 extern NSString* ORGretina4MModelTriggerModeChanged;
 extern NSString* ORGretina4MModelLEDThresholdChanged;
 extern NSString* ORGretina4MModelCFDDelayChanged;
