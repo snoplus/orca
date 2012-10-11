@@ -19,13 +19,14 @@
 
 #pragma mark •••Imported Files
 
+#import "ORAdcProcessing.h"
+
 @class ORSerialPort;
 @class ORTimeRate;
 @class ORAlarm;
 
-#define kStartingBocGaugeNumber 913
 
-@interface ORAmi286Model : OrcaObject
+@interface ORAmi286Model : OrcaObject <ORAdcProcessing>
 {
 @private
     NSString*       portName;
