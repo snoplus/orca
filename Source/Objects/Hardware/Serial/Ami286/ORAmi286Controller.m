@@ -24,14 +24,9 @@
 #import "ORTimeLinePlot.h"
 #import "ORCompositePlotView.h"
 #import "ORTimeAxis.h"
-#import "ORSerialPortList.h"
-#import "ORSerialPort.h"
 #import "ORTimeRate.h"
 #import "ORLevelMonitor.h"
-
-@interface ORAmi286Controller (private)
-- (void) populatePortListPopup;
-@end
+#import "ORSerialPortController.h"
 
 @implementation ORAmi286Controller
 
@@ -52,7 +47,6 @@
 
 - (void) awakeFromNib
 {
-    [self populatePortListPopup];
     [[plotter0 yAxis] setRngLow:0.0 withHigh:100.];
 	[[plotter0 yAxis] setRngLimitsLow:0.0 withHigh:100 withMinRng:10];
 	
@@ -73,6 +67,12 @@
     [super awakeFromNib];
 }
 
+- (BOOL) portLocked
+{
+	return [gSecurity isLocked:ORAmi286Lock];;
+}
+
+
 #pragma mark ***Notifications
 
 - (void) registerNotificationObservers
@@ -88,16 +88,6 @@
                      selector : @selector(stateChanged:)
                          name : ORAmi286Lock
                         object: nil];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(portNameChanged:)
-                         name : ORAmi286ModelPortNameChanged
-                        object: nil];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(portStateChanged:)
-                         name : ORSerialPortStateChanged
-                       object : nil];
 	
     [notifyCenter addObserver : self
                      selector : @selector(pollTimeChanged:)
@@ -180,6 +170,8 @@
                          name : ORAmi286ModelSendOnAlarmChanged
 						object: model];
 
+	[serialPortController registerNotificationObservers];
+
 }
 
 - (void) setModel:(id)aModel
@@ -192,8 +184,6 @@
 {
     [super updateWindow];
     [self stateChanged:nil];
-    [self portStateChanged:nil];
-    [self portNameChanged:nil];
 	[self pollTimeChanged:nil];
 	[self shipLevelsChanged:nil];
 	[self updateTimePlot:nil];
@@ -210,6 +200,7 @@
 	[self sendOnExpiredChanged:nil];
 	[self expiredTimeChanged:nil];
 	[self sendOnAlarmChanged:nil];
+	[serialPortController updateWindow];
 }
 
 - (void) sendOnAlarmChanged:(NSNotification*)aNote
@@ -448,9 +439,9 @@
 	
     [lockButton setState: locked];
 	
+    [serialPortController updateButtons:locked];
+    
     [enabledMaskMatrix setEnabled:!locked];
-    [portListPopup setEnabled:!locked];
-    [openPortButton setEnabled:!locked];
     [pollTimePopup setEnabled:!locked];
     [shipLevelsButton setEnabled:!locked];
 	
@@ -478,52 +469,9 @@
 	}
 }
 
-- (void) portStateChanged:(NSNotification*)aNotification
-{
-    if(aNotification == nil || [aNotification object] == [model serialPort]){
-        if([model serialPort]){
-            [openPortButton setEnabled:YES];
-			
-            if([[model serialPort] isOpen]){
-                [openPortButton setTitle:@"Close"];
-                [portStateField setTextColor:[NSColor colorWithCalibratedRed:0.0 green:.8 blue:0.0 alpha:1.0]];
-                [portStateField setStringValue:@"Open"];
-            }
-            else {
-                [openPortButton setTitle:@"Open"];
-                [portStateField setStringValue:@"Closed"];
-                [portStateField setTextColor:[NSColor redColor]];
-            }
-        }
-        else {
-            [openPortButton setEnabled:NO];
-            [portStateField setTextColor:[NSColor blackColor]];
-            [portStateField setStringValue:@"---"];
-            [openPortButton setTitle:@"---"];
-        }
-    }
-}
-
 - (void) pollTimeChanged:(NSNotification*)aNotification
 {
 	[pollTimePopup selectItemWithTag:[model pollTime]];
-}
-
-- (void) portNameChanged:(NSNotification*)aNotification
-{
-    NSString* portName = [model portName];
-    
-	NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
-	ORSerialPort *aPort;
-	
-    [portListPopup selectItemAtIndex:0]; //the default
-    while (aPort = [enumerator nextObject]) {
-        if([portName isEqualToString:[aPort name]]){
-            [portListPopup selectItemWithTitle:portName];
-            break;
-        }
-	}  
-    [self portStateChanged:nil];
 }
 
 - (void) updateTank:(int)index
@@ -626,16 +574,6 @@
 - (IBAction) lockAction:(id) sender
 {
     [gSecurity tryToSetLock:ORAmi286Lock to:[sender intValue] forWindow:[self window]];
-}
-
-- (IBAction) portListAction:(id) sender
-{
-    [model setPortName: [portListPopup titleOfSelectedItem]];
-}
-
-- (IBAction) openPortAction:(id)sender
-{
-    [model openPort:![[model serialPort] isOpen]];
 }
 
 - (IBAction) readLevelsAction:(id)sender
@@ -789,7 +727,6 @@
 	else return 0;
 }
 
-
 - (float) levelMonitorLevel:(id)aLevelMonitor
 {
 	if(aLevelMonitor == monitor0)      return [model level:0];
@@ -798,17 +735,4 @@
 }
 @end
 
-@implementation ORAmi286Controller (private)
-- (void) populatePortListPopup
-{
-	NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
-	ORSerialPort *aPort;
-    [portListPopup removeAllItems];
-    [portListPopup addItemWithTitle:@"--"];
-	
-	while (aPort = [enumerator nextObject]) {
-        [portListPopup addItemWithTitle:[aPort name]];
-	}    
-}
-@end
 

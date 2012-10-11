@@ -21,6 +21,7 @@
 
 @class ORCompositeTimeLineView;
 @class ORLevelMonitor;
+@class ORSerialPortController;
 
 @interface ORAmi286Controller : OrcaObjectController
 {
@@ -35,10 +36,7 @@
     IBOutlet ORLevelMonitor*	monitor3;
 	IBOutlet NSButton*			shipLevelsButton;
     IBOutlet NSButton*			lockButton;
-    IBOutlet NSTextField*		portStateField;
-    IBOutlet NSPopUpButton*		portListPopup;
     IBOutlet NSPopUpButton*		pollTimePopup;
-    IBOutlet NSButton*			openPortButton;
     IBOutlet NSButton*			readLevelsButton;
     IBOutlet NSMatrix*			levelMatrix;
     IBOutlet NSMatrix*			fillStatusMatrix;
@@ -60,6 +58,8 @@
 	IBOutlet NSButton*			removeAddressButton;
 	IBOutlet NSButton*			eMailEnabledButton;
 	
+    IBOutlet ORSerialPortController* serialPortController;
+
 	BOOL updateScheduled;
 }
 
@@ -81,8 +81,6 @@
 - (void) updateTimePlot:(NSNotification*)aNotification;
 - (void) shipLevelsChanged:(NSNotification*)aNotification;
 - (void) stateChanged:(NSNotification*)aNotification;
-- (void) portNameChanged:(NSNotification*)aNotification;
-- (void) portStateChanged:(NSNotification*)aNotification;
 - (void) updateMonitor:(NSNotification*)aNotification;
 - (void) pollTimeChanged:(NSNotification*)aNotification;
 - (void) loadLevelTimeValuesForIndex:(int)index;
@@ -106,8 +104,6 @@
 - (IBAction) enabledMaskAction:(id)sender;
 - (IBAction) shipLevelsAction:(id)sender;
 - (IBAction) lockAction:(id) sender;
-- (IBAction) portListAction:(id) sender;
-- (IBAction) openPortAction:(id)sender;
 - (IBAction) readLevelsAction:(id)sender;
 - (IBAction) pollTimeAction:(id)sender;
 - (IBAction) hiAlarmAction:(id)sender;

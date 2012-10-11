@@ -19,21 +19,18 @@
 
 #pragma mark •••Imported Files
 
-@class ORSerialPort;
+#import "ORAdcProcessing.h"
+#import "ORSerialPortWithQueueModel.h"
+
 @class ORTimeRate;
 @class ORAlarm;
 
 #define kStartingBocGaugeNumber 913
 
-@interface ORAmi286Model : OrcaObject
+@interface ORAmi286Model : ORSerialPortWithQueueModel <ORAdcProcessing>
 {
     @private
-        NSString*       portName;
-        BOOL            portWasOpen;
-        ORSerialPort*   serialPort;
         unsigned long	dataId;
-		NSString*		lastRequest;
-		NSMutableArray* cmdQueue;
 		int				pollTime;
         NSMutableString* buffer;
 		BOOL			shipLevels;
@@ -65,6 +62,7 @@
 		BOOL			ignoreSend;
 		BOOL			sendIsScheduled;
 		NSMutableArray* eMailReasons;
+        BOOL            readOnce;
 }
 
 #pragma mark •••Initialization
@@ -97,15 +95,6 @@
 - (void) setShipLevels:(BOOL)aShipLevels;
 - (int)  pollTime;
 - (void) setPollTime:(int)aPollTime;
-- (ORSerialPort*) serialPort;
-- (void) setSerialPort:(ORSerialPort*)aSerialPort;
-- (BOOL) portWasOpen;
-- (void) setPortWasOpen:(BOOL)aPortWasOpen;
-- (NSString*) portName;
-- (void) setPortName:(NSString*)aPortName;
-- (NSString*) lastRequest;
-- (void) setLastRequest:(NSString*)aRequest;
-- (void) openPort:(BOOL)state;
 - (unsigned long) timeMeasured:(int)index;
 - (void) setLevel:(int)index value:(float)aValue;
 - (float) level:(int)index;
@@ -156,6 +145,20 @@
 
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
+
+#pragma mark •••Adc Processing Protocol
+- (void)processIsStarting;
+- (void)processIsStopping;
+- (void) startProcessCycle;
+- (void) endProcessCycle;
+- (BOOL) processValue:(int)channel;
+- (void) setProcessOutput:(int)channel value:(int)value;
+- (NSString*) processingTitle;
+- (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit  channel:(int)channel;
+- (double) convertedValue:(int)channel;
+- (double) maxValueForChan:(int)channel;
+- (BOOL) dataForChannelValid:(int)aChannel;
+
 @end
 
 extern NSString* ORAmi286ModelSendOnAlarmChanged;
@@ -168,10 +171,7 @@ extern NSString* ORAmi286FillStateChanged;
 extern NSString* ORAmi286ModelEnabledMaskChanged;
 extern NSString* ORAmi286ModelShipLevelsChanged;
 extern NSString* ORAmi286ModelPollTimeChanged;
-extern NSString* ORAmi286ModelSerialPortChanged;
 extern NSString* ORAmi286Lock;
-extern NSString* ORAmi286ModelPortNameChanged;
-extern NSString* ORAmi286ModelPortStateChanged;
 extern NSString* ORAmi286AlarmLevelChanged;
 extern NSString* ORAmi286Update;
 extern NSString* ORAmi286LastChange;

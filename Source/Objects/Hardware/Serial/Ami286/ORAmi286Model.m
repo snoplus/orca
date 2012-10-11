@@ -20,9 +20,6 @@
 #pragma mark •••Imported Files
 
 #import "ORAmi286Model.h"
-#import "ORSerialPort.h"
-#import "ORSerialPortList.h"
-#import "ORSerialPort.h"
 #import "ORSerialPortAdditions.h"
 #import "ORDataTypeAssigner.h"
 #import "ORDataPacket.h"
@@ -37,9 +34,6 @@ NSString* ORAmi286ModelSendOnValveChangeChanged = @"ORAmi286ModelSendOnValveChan
 NSString* ORAmi286ModelEnabledMaskChanged		= @"ORAmi286ModelEnabledMaskChanged";
 NSString* ORAmi286ModelShipLevelsChanged		= @"ORAmi286ModelShipLevelsChanged";
 NSString* ORAmi286ModelPollTimeChanged			= @"ORAmi286ModelPollTimeChanged";
-NSString* ORAmi286ModelSerialPortChanged		= @"ORAmi286ModelSerialPortChanged";
-NSString* ORAmi286ModelPortNameChanged			= @"ORAmi286ModelPortNameChanged";
-NSString* ORAmi286ModelPortStateChanged			= @"ORAmi286ModelPortStateChanged";
 NSString* ORAmi286FillStateChanged				= @"ORAmi286FillStateChanged";
 NSString* ORAmi286AlarmLevelChanged				= @"ORAmi286AlarmLevelChanged";
 NSString* ORAmi286Update						= @"ORAmi286Update";
@@ -85,13 +79,6 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
     [buffer release];
-	[cmdQueue release];
-	[lastRequest release];
-    [portName release];
-    if([serialPort isOpen]){
-        [serialPort close];
-    }
-    [serialPort release];
 	int i;
 	for(i=0;i<4;i++){
 		[timeRates[i] release];
@@ -153,11 +140,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 {
 	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
 	
-    [notifyCenter addObserver : self
-                     selector : @selector(dataReceived:)
-                         name : ORSerialPortDataReceived
-                       object : nil];
-	
+
     [notifyCenter addObserver: self
                      selector: @selector(runStarted:)
                          name: ORRunStartedNotification
@@ -173,6 +156,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 - (void) dataReceived:(NSNotification*)note
 {
     if([[note userInfo] objectForKey:@"serialPort"] == serialPort){
+
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
         NSString* theString = [[[[NSString alloc] initWithData:[[note userInfo] objectForKey:@"data"] 
 												      encoding:NSASCIIStringEncoding] autorelease] uppercaseString];
@@ -698,94 +682,20 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 	else return 0;
 }
 
-- (NSString*) lastRequest
+- (void) setUpPort
 {
-	return lastRequest;
+    [serialPort setSpeed:9600];
+    [serialPort setParityNone];
+    [serialPort setStopBits2:NO];
+    [serialPort setDataBits:8];
 }
 
-- (void) setLastRequest:(NSString*)aRequest
+- (void) firstActionAfterOpeningPort
 {
-	[lastRequest autorelease];
-	lastRequest = [aRequest copy];    
-}
-
-- (BOOL) portWasOpen
-{
-    return portWasOpen;
-}
-
-- (void) setPortWasOpen:(BOOL)aPortWasOpen
-{
-    portWasOpen = aPortWasOpen;
-}
-
-- (NSString*) portName
-{
-    return portName;
-}
-
-- (void) setPortName:(NSString*)aPortName
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setPortName:portName];
-    
-    if(![aPortName isEqualToString:portName]){
-        [portName autorelease];
-        portName = [aPortName copy];    
-		
-        BOOL valid = NO;
-        NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
-        ORSerialPort *aPort;
-        while (aPort = [enumerator nextObject]) {
-            if([portName isEqualToString:[aPort name]]){
-                [self setSerialPort:aPort];
-                if(portWasOpen){
-                    [self openPort:YES];
-				}
-                valid = YES;
-                break;
-            }
-        } 
-        if(!valid){
-            [self setSerialPort:nil];
-        }       
-    }
-	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORAmi286ModelPortNameChanged object:self];
-}
-
-- (ORSerialPort*) serialPort
-{
-    return serialPort;
-}
-
-- (void) setSerialPort:(ORSerialPort*)aSerialPort
-{
-    [aSerialPort retain];
-    [serialPort release];
-    serialPort = aSerialPort;
-	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORAmi286ModelSerialPortChanged object:self];
-}
-
-- (void) openPort:(BOOL)state
-{
-    if(state) {
-		[serialPort setSpeed:9600];
-		[serialPort setParityOdd];
-		[serialPort setStopBits2:1];
-		[serialPort setDataBits:7];
-        [serialPort open];
-    }
-    else      [serialPort close];
-    portWasOpen = [serialPort isOpen];
-	
 	[[self undoManager] disableUndoRegistration];
 	[self setEmailEnabled:emailEnabled];
 	[[self undoManager] enableUndoRegistration];
-	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORAmi286ModelPortStateChanged object:self];
 }
-
 
 #pragma mark •••Archival
 - (id) initWithCoder:(NSCoder*)decoder
@@ -799,8 +709,6 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 	[self setEnabledMask:[decoder decodeIntForKey:@"enabledMask"]];
 	[self setShipLevels:[decoder decodeBoolForKey:@"ORAmi286ModelShipLevels"]];
 	[self setPollTime:[decoder decodeIntForKey:@"ORAmi286ModelPollTime"]];
-	[self setPortWasOpen:[decoder decodeBoolForKey:@"ORAmi286ModelPortWasOpen"]];
-    [self setPortName:[decoder decodeObjectForKey: @"portName"]];
     [self setEMailList:[decoder decodeObjectForKey: @"eMailList"]];
     [self setEmailEnabled:[decoder decodeBoolForKey: @"emailEnabled"]];
 	
@@ -837,9 +745,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
     [encoder encodeInt:enabledMask forKey:@"enabledMask"];
     [encoder encodeBool:shipLevels forKey:@"ORAmi286ModelShipLevels"];
     [encoder encodeInt:pollTime forKey:@"ORAmi286ModelPollTime"];
-    [encoder encodeBool:portWasOpen forKey:@"ORAmi286ModelPortWasOpen"];
-    [encoder encodeObject:portName forKey: @"portName"];
-    [encoder encodeObject:eMailList forKey: @"eMailList"];
+     [encoder encodeObject:eMailList forKey: @"eMailList"];
     [encoder encodeBool:emailEnabled forKey: @"emailEnabled"];
 	int i;
 	for(i=0;i<4;i++){
@@ -876,12 +782,10 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 	}
 }
 
-
 - (void) addCmdToQueue:(NSString*)aCmd
 {
     if([serialPort isOpen]){ 
-		if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
-		[cmdQueue addObject:aCmd];
+		[self enqueueCmd:aCmd];
 		if(!lastRequest){
 			[self processOneCommandFromQueue];
 		}
@@ -1011,6 +915,101 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
     
     return dataDictionary;
 }
+#pragma mark •••Bit Processing Protocol
+- (void) processIsStarting
+{
+	//we will control the polling loop
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollLevels) object:nil];
+    readOnce = NO;
+}
+
+- (void) processIsStopping
+{
+	//return control to the normal loop
+	[self setPollTime:pollTime];
+}
+
+//note that everything called by these routines MUST be threadsafe
+- (void) startProcessCycle
+{
+	@try {
+	}
+	@catch(NSException* localException) {
+		//catch this here to prevent it from falling thru, but nothing to do.
+	}
+}
+
+- (void) endProcessCycle
+{
+}
+
+- (NSString*) identifier
+{
+	NSString* s;
+ 	@synchronized(self){
+		s= [NSString stringWithFormat:@"Ami286,%lu",[self uniqueIdNumber]];
+	}
+	return s;
+}
+
+- (NSString*) processingTitle
+{
+	NSString* s;
+ 	@synchronized(self){
+		s= [self identifier];
+	}
+	return s;
+}
+
+- (double) convertedValue:(int)aChan
+{
+	double theValue = 0;
+	@synchronized(self){
+        if(aChan>=0 && aChan<4){
+            theValue = level[aChan];
+        }
+	}
+	return theValue;
+}
+
+- (double) maxValueForChan:(int)aChan
+{
+	return 100;;
+}
+
+- (double) minValueForChan:(int)aChan
+{
+	return 0;
+}
+
+- (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit channel:(int)channel
+{
+	@synchronized(self){
+        if(channel>=0 && channel<4){
+            *theLowLimit  = lowAlarmLevel[channel];
+            *theHighLimit = hiAlarmLevel[channel];
+        }
+	}
+}
+
+- (BOOL) processValue:(int)channel
+{
+	BOOL r;
+	@synchronized(self){
+		r = YES;    //temp -- figure out what the process bool for this object should be.
+	}
+	return r;
+}
+
+- (void) setProcessOutput:(int)channel value:(int)value
+{
+    //nothing to do. not used in adcs. really shouldn't be in the protocol
+}
+
+- (BOOL) dataForChannelValid:(int)aChannel
+{
+    return [self isValid] && [serialPort isOpen];
+}
 
 @end
 
@@ -1026,37 +1025,36 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 - (void) timeout
 {
 	NSLogError(@"command timeout",@"AMI 286",nil);
+    isValid = NO;
 	[self setLastRequest:nil];
 	[self processOneCommandFromQueue];	 //do the next command in the queue
 }
 
 - (void) processOneCommandFromQueue
 {
-	if([cmdQueue count] == 0) return;
-	@try {
-		NSString* aCmd = [[[cmdQueue objectAtIndex:0] retain] autorelease];
-		[cmdQueue removeObjectAtIndex:0];
-		if([aCmd isEqualToString:@"++ShipRecords"]){
-			if(shipLevels) [self shipLevelValues];
-		}
-		else {
-			if([aCmd rangeOfString:@"?"].location != NSNotFound){
-				[self setLastRequest:aCmd];
-				[self performSelector:@selector(timeout) withObject:nil afterDelay:3];
-			}
-			if(![aCmd hasSuffix:@"\r"]) aCmd = [aCmd stringByAppendingString:@"\r"];
-			[serialPort writeString:aCmd];
-			if(!lastRequest){
-				[self performSelector:@selector(processOneCommandFromQueue) withObject:nil afterDelay:.1];
-			}
-		}
-	}
-	@catch(NSException* localException) {
-	}
+	NSString* aCmd = [self nextCmd];
+    if(aCmd){
+        if([aCmd isEqualToString:@"++ShipRecords"]){
+            if(shipLevels) [self shipLevelValues];
+        }
+        else {
+            if([aCmd rangeOfString:@"?"].location != NSNotFound){
+                [self setLastRequest:aCmd];
+                [self performSelector:@selector(timeout) withObject:nil afterDelay:3];
+            }
+            if(![aCmd hasSuffix:@"\r"]) aCmd = [aCmd stringByAppendingString:@"\r"];
+            [serialPort writeString:aCmd];
+            if(!lastRequest){
+                [self performSelector:@selector(processOneCommandFromQueue) withObject:nil afterDelay:.1];
+            }
+        }
+    }
 }
 
 - (void) process_response:(NSString*)theResponse
 {
+    isValid = YES;
+
 	if([lastRequest rangeOfString:@":LEV?"].location != NSNotFound){
 		int channel = [[lastRequest substringFromIndex:2] intValue] - 1;
 		if(channel >= 0 && channel <=3){
