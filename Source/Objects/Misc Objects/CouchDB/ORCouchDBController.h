@@ -22,8 +22,8 @@
 @interface ORCouchDBController : OrcaObjectController 
 {	
 	IBOutlet NSTextField* remoteHostNameField;
-	IBOutlet   NSTextField* changedCountTextField;
-	IBOutlet   NSTextField* processCountTextField;
+	IBOutlet NSTextField* changedCountTextField;
+	IBOutlet NSTextField* processCountTextField;
 	IBOutlet NSTextField* sweepInProgressTextField;
 	IBOutlet NSTextField* newNameTextField;
 	IBOutlet NSTextField* oldNameTextField;

@@ -27,6 +27,8 @@
 @interface ORCouchDBController (private)
 - (void) createActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 - (void) deleteActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) stealthActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) historyActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 @end
 
 @implementation ORCouchDBController
@@ -299,12 +301,36 @@
 
 - (IBAction) keepHistoryAction:(id)sender
 {
-	[model setKeepHistory:[sender intValue]];	
+	
+    if([model keepHistory]){
+        NSString* s = [NSString stringWithFormat:@"Really DOs NOT keep a history: %@?\n",[model databaseName]];
+        NSBeginAlertSheet(s,
+                          @"Cancel",
+                          @"Yes, Disable History",
+                          nil,[self window],
+                          self,
+                          @selector(historyActionDidEnd:returnCode:contextInfo:),
+                          nil,
+                          nil,@"There will be NO history (only run status) kept if you deactivate this option.");
+    }
+    else [model setKeepHistory:YES];
+
 }
 
 - (IBAction) stealthModeAction:(id)sender
 {
-	[model setStealthMode:[sender intValue]];	
+    if(![model stealthMode]){
+        NSString* s = [NSString stringWithFormat:@"Really disable the database: %@?\n",[model databaseName]];
+        NSBeginAlertSheet(s,
+                          @"Cancel",
+                          @"Yes, Disable Database",
+                          nil,[self window],
+                          self,
+                          @selector(stealthActionDidEnd:returnCode:contextInfo:),
+                          nil,
+                          nil,@"There will be NO values put in the database if you activate this option.");
+    }
+    else [model setStealthMode:YES];
 }
 
 - (IBAction) couchDBLockAction:(id)sender
@@ -408,6 +434,22 @@
 	if(returnCode == NSAlertAlternateReturn){		
 		[model deleteDatabase];
 	}
+}
+
+- (void) stealthActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+	if(returnCode == NSAlertAlternateReturn){
+		[model setStealthMode:YES];
+	}
+    else [model setStealthMode:NO];
+}
+- (void) historyActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+	if(returnCode == NSAlertAlternateReturn){
+		[model setKeepHistory:NO];
+	}
+    else [model setKeepHistory:YES];
+    
 }
 
 @end
