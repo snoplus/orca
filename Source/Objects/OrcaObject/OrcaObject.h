@@ -194,6 +194,9 @@ extern NSString* ORObjArrayPtrPBType;
 - (void) addRunWaitFor:(id)anObject reason:(NSString*)aReason;
 - (void) releaseRunWaitFor:(id)anObject;
 
+- (unsigned long) processID;
+- (void) setProcessID:(unsigned long)aValue;
+
 @end
 
 #pragma mark ¥¥¥Compiler Warning Fixes

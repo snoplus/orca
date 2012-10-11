@@ -942,6 +942,13 @@ static NSString* OROrcaObjectUniqueIDNumber = @"OROrcaObjectUniqueIDNumber";
     NSNotification* aNote = [NSNotification notificationWithName:ORReleaseRunStateChangeWait object:anObject];
     [[NSNotificationCenter defaultCenter] postNotificationOnMainThread:aNote waitUntilDone:YES];
 }
+
+- (unsigned long) processID{return 0;}
+- (void) setProcessID:(unsigned long)aValue
+{
+    //subclasses should override
+}
+
 @end
 
 @implementation OrcaObject (cardSupport)
