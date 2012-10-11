@@ -20,6 +20,9 @@
 #pragma mark •••Imported Files
 
 #import "ORAmi286Model.h"
+#import "ORSerialPort.h"
+#import "ORSerialPortList.h"
+#import "ORSerialPort.h"
 #import "ORSerialPortAdditions.h"
 #import "ORDataTypeAssigner.h"
 #import "ORDataPacket.h"
@@ -34,6 +37,9 @@ NSString* ORAmi286ModelSendOnValveChangeChanged = @"ORAmi286ModelSendOnValveChan
 NSString* ORAmi286ModelEnabledMaskChanged		= @"ORAmi286ModelEnabledMaskChanged";
 NSString* ORAmi286ModelShipLevelsChanged		= @"ORAmi286ModelShipLevelsChanged";
 NSString* ORAmi286ModelPollTimeChanged			= @"ORAmi286ModelPollTimeChanged";
+NSString* ORAmi286ModelSerialPortChanged		= @"ORAmi286ModelSerialPortChanged";
+NSString* ORAmi286ModelPortNameChanged			= @"ORAmi286ModelPortNameChanged";
+NSString* ORAmi286ModelPortStateChanged			= @"ORAmi286ModelPortStateChanged";
 NSString* ORAmi286FillStateChanged				= @"ORAmi286FillStateChanged";
 NSString* ORAmi286AlarmLevelChanged				= @"ORAmi286AlarmLevelChanged";
 NSString* ORAmi286Update						= @"ORAmi286Update";
@@ -79,6 +85,13 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
     [buffer release];
+	[cmdQueue release];
+	[lastRequest release];
+    [portName release];
+    if([serialPort isOpen]){
+        [serialPort close];
+    }
+    [serialPort release];
 	int i;
 	for(i=0;i<4;i++){
 		[timeRates[i] release];
@@ -93,7 +106,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 		[expiredAlarm[i] release];
 	}
 	
-
+    
 	[self clearReasons];
 	
 	[eMailLock release];
@@ -140,7 +153,11 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 {
 	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
 	
-
+    [notifyCenter addObserver : self
+                     selector : @selector(dataReceived:)
+                         name : ORSerialPortDataReceived
+                       object : nil];
+	
     [notifyCenter addObserver: self
                      selector: @selector(runStarted:)
                          name: ORRunStartedNotification
@@ -156,7 +173,6 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 - (void) dataReceived:(NSNotification*)note
 {
     if([[note userInfo] objectForKey:@"serialPort"] == serialPort){
-
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
         NSString* theString = [[[[NSString alloc] initWithData:[[note userInfo] objectForKey:@"data"] 
 												      encoding:NSASCIIStringEncoding] autorelease] uppercaseString];
@@ -225,7 +241,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
     [[[self undoManager] prepareWithInvocationTarget:self] setSendOnAlarm:sendOnAlarm];
     
     sendOnAlarm = aSendOnAlarm;
-
+    
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAmi286ModelSendOnAlarmChanged object:self];
 }
 
@@ -239,7 +255,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
     [[[self undoManager] prepareWithInvocationTarget:self] setExpiredTime:expiredTime];
     if(aExpiredTime<1)aExpiredTime = 1;
     expiredTime = aExpiredTime;
-
+    
 	int i;
 	for(i=0;i<4;i++){
 		[self startExpiredTimer:i];		
@@ -258,7 +274,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
     [[[self undoManager] prepareWithInvocationTarget:self] setSendOnExpired:sendOnExpired];
     
     sendOnExpired = aSendOnExpired;
-
+    
 	if(sendOnExpired){
 		int i;
 		for(i=0;i<4;i++){
@@ -285,7 +301,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
     [[[self undoManager] prepareWithInvocationTarget:self] setSendOnValveChange:sendOnValveChange];
     
     sendOnValveChange = aSendOnValveChange;
-
+    
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAmi286ModelSendOnValveChangeChanged object:self];
 }
 
@@ -419,7 +435,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 - (void) setFillStatus:(int)index value:(int)aValue;
 {
 	if(index>=0 && index<4){
-
+        
 		if(fillStatus[index]!=aValue){
 			[self setLastChange:index];
 			if(sendOnValveChange){
@@ -541,7 +557,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 {
 	if(index>=0 && index<4){
 		[[[self undoManager] prepareWithInvocationTarget:self] setFillState:index value:fillState[index]];
-				
+        
 		fillState[index] = aValue;
 		
 		NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:index] forKey:@"Index"];
@@ -682,20 +698,94 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 	else return 0;
 }
 
-- (void) setUpPort
+- (NSString*) lastRequest
 {
-    [serialPort setSpeed:9600];
-    [serialPort setParityNone];
-    [serialPort setStopBits2:NO];
-    [serialPort setDataBits:8];
+	return lastRequest;
 }
 
-- (void) firstActionAfterOpeningPort
+- (void) setLastRequest:(NSString*)aRequest
 {
+	[lastRequest autorelease];
+	lastRequest = [aRequest copy];    
+}
+
+- (BOOL) portWasOpen
+{
+    return portWasOpen;
+}
+
+- (void) setPortWasOpen:(BOOL)aPortWasOpen
+{
+    portWasOpen = aPortWasOpen;
+}
+
+- (NSString*) portName
+{
+    return portName;
+}
+
+- (void) setPortName:(NSString*)aPortName
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setPortName:portName];
+    
+    if(![aPortName isEqualToString:portName]){
+        [portName autorelease];
+        portName = [aPortName copy];    
+		
+        BOOL valid = NO;
+        NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
+        ORSerialPort *aPort;
+        while (aPort = [enumerator nextObject]) {
+            if([portName isEqualToString:[aPort name]]){
+                [self setSerialPort:aPort];
+                if(portWasOpen){
+                    [self openPort:YES];
+				}
+                valid = YES;
+                break;
+            }
+        } 
+        if(!valid){
+            [self setSerialPort:nil];
+        }       
+    }
+	
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAmi286ModelPortNameChanged object:self];
+}
+
+- (ORSerialPort*) serialPort
+{
+    return serialPort;
+}
+
+- (void) setSerialPort:(ORSerialPort*)aSerialPort
+{
+    [aSerialPort retain];
+    [serialPort release];
+    serialPort = aSerialPort;
+	
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAmi286ModelSerialPortChanged object:self];
+}
+
+- (void) openPort:(BOOL)state
+{
+    if(state) {
+		[serialPort setSpeed:9600];
+		[serialPort setParityOdd];
+		[serialPort setStopBits2:1];
+		[serialPort setDataBits:7];
+        [serialPort open];
+    }
+    else      [serialPort close];
+    portWasOpen = [serialPort isOpen];
+	
 	[[self undoManager] disableUndoRegistration];
 	[self setEmailEnabled:emailEnabled];
 	[[self undoManager] enableUndoRegistration];
+	
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAmi286ModelPortStateChanged object:self];
 }
+
 
 #pragma mark •••Archival
 - (id) initWithCoder:(NSCoder*)decoder
@@ -709,6 +799,8 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 	[self setEnabledMask:[decoder decodeIntForKey:@"enabledMask"]];
 	[self setShipLevels:[decoder decodeBoolForKey:@"ORAmi286ModelShipLevels"]];
 	[self setPollTime:[decoder decodeIntForKey:@"ORAmi286ModelPollTime"]];
+	[self setPortWasOpen:[decoder decodeBoolForKey:@"ORAmi286ModelPortWasOpen"]];
+    [self setPortName:[decoder decodeObjectForKey: @"portName"]];
     [self setEMailList:[decoder decodeObjectForKey: @"eMailList"]];
     [self setEmailEnabled:[decoder decodeBoolForKey: @"emailEnabled"]];
 	
@@ -731,7 +823,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 	ignoreSend = NO;
 	sendIsScheduled = NO;
 	[[self undoManager] enableUndoRegistration];
-
+    
 	return self;
 }
 
@@ -745,7 +837,9 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
     [encoder encodeInt:enabledMask forKey:@"enabledMask"];
     [encoder encodeBool:shipLevels forKey:@"ORAmi286ModelShipLevels"];
     [encoder encodeInt:pollTime forKey:@"ORAmi286ModelPollTime"];
-     [encoder encodeObject:eMailList forKey: @"eMailList"];
+    [encoder encodeBool:portWasOpen forKey:@"ORAmi286ModelPortWasOpen"];
+    [encoder encodeObject:portName forKey: @"portName"];
+    [encoder encodeObject:eMailList forKey: @"eMailList"];
     [encoder encodeBool:emailEnabled forKey: @"emailEnabled"];
 	int i;
 	for(i=0;i<4;i++){
@@ -782,10 +876,12 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 	}
 }
 
+
 - (void) addCmdToQueue:(NSString*)aCmd
 {
     if([serialPort isOpen]){ 
-		[self enqueueCmd:aCmd];
+		if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
+		[cmdQueue addObject:aCmd];
 		if(!lastRequest){
 			[self processOneCommandFromQueue];
 		}
@@ -1008,9 +1104,8 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 
 - (BOOL) dataForChannelValid:(int)aChannel
 {
-    return [self isValid] && [serialPort isOpen];
+    return isValid && [serialPort isOpen];
 }
-
 @end
 
 @implementation ORAmi286Model (private)
@@ -1024,31 +1119,35 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 
 - (void) timeout
 {
-	NSLogError(@"command timeout",@"AMI 286",nil);
     isValid = NO;
+	NSLogError(@"command timeout",@"AMI 286",nil);
 	[self setLastRequest:nil];
 	[self processOneCommandFromQueue];	 //do the next command in the queue
 }
 
 - (void) processOneCommandFromQueue
 {
-	NSString* aCmd = [self nextCmd];
-    if(aCmd){
-        if([aCmd isEqualToString:@"++ShipRecords"]){
-            if(shipLevels) [self shipLevelValues];
-        }
-        else {
-            if([aCmd rangeOfString:@"?"].location != NSNotFound){
-                [self setLastRequest:aCmd];
-                [self performSelector:@selector(timeout) withObject:nil afterDelay:3];
-            }
-            if(![aCmd hasSuffix:@"\r"]) aCmd = [aCmd stringByAppendingString:@"\r"];
-            [serialPort writeString:aCmd];
-            if(!lastRequest){
-                [self performSelector:@selector(processOneCommandFromQueue) withObject:nil afterDelay:.1];
-            }
-        }
-    }
+	if([cmdQueue count] == 0) return;
+	@try {
+		NSString* aCmd = [[[cmdQueue objectAtIndex:0] retain] autorelease];
+		[cmdQueue removeObjectAtIndex:0];
+		if([aCmd isEqualToString:@"++ShipRecords"]){
+			if(shipLevels) [self shipLevelValues];
+		}
+		else {
+			if([aCmd rangeOfString:@"?"].location != NSNotFound){
+				[self setLastRequest:aCmd];
+				[self performSelector:@selector(timeout) withObject:nil afterDelay:3];
+			}
+			if(![aCmd hasSuffix:@"\r"]) aCmd = [aCmd stringByAppendingString:@"\r"];
+			[serialPort writeString:aCmd];
+			if(!lastRequest){
+				[self performSelector:@selector(processOneCommandFromQueue) withObject:nil afterDelay:.1];
+			}
+		}
+	}
+	@catch(NSException* localException) {
+	}
 }
 
 - (void) process_response:(NSString*)theResponse
@@ -1083,10 +1182,10 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 	if(emailEnabled && (enabledMask&(1<<index))){
 		[self stopExpiredTimer:index];
 		expiredTimer[index] = [[NSTimer scheduledTimerWithTimeInterval:expiredTime*60 
-														 target:self 
-													   selector:@selector(changeTimerExpired:)
-													   userInfo:nil 
-														repeats: NO] retain];
+                                                                target:self 
+                                                              selector:@selector(changeTimerExpired:)
+                                                              userInfo:nil 
+                                                               repeats: NO] retain];
 	}
 }
 
@@ -1125,7 +1224,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 		[NSThread detachNewThreadSelector:@selector(eMailThread) toTarget:self withObject:nil];
 	}
 	else sendIsScheduled = NO;
-
+    
 }
 
 - (void) addReason:(NSString*) aReason
@@ -1191,22 +1290,23 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 		eMailReasons = nil;
 	}
 	
-	if(content){
-		NSFont*       labelFont  = [NSFont fontWithName:@"Monaco" size:12];
-		NSDictionary* attributes = [NSDictionary dictionaryWithObjectsAndKeys: labelFont,NSFontAttributeName,nil];
-		NSAttributedString* theContent = [[NSAttributedString alloc] initWithString:content attributes:attributes];
-		ORMailer* mailer = [ORMailer mailer];
-		[mailer setTo:receipients];
-		[mailer setSubject:@"Orca Ami286 Status"];
-		[mailer setBody:theContent];
-		[mailer send:self];
+	@synchronized([NSApp delegate]){
+		if(content){
+			NSFont*       labelFont  = [NSFont fontWithName:@"Monaco" size:12];
+			NSDictionary* attributes = [NSDictionary dictionaryWithObjectsAndKeys: labelFont,NSFontAttributeName,nil];
+			NSAttributedString* theContent = [[NSAttributedString alloc] initWithString:content attributes:attributes];
+			ORMailer* mailer = [ORMailer mailer];
+			[mailer setTo:receipients];
+			[mailer setSubject:@"Orca Ami286 Status"];
+			[mailer setBody:theContent];
+			[mailer send:self];
+		}
 	}
-	
 	[eMailLock unlock];
 	
 	eMailThreadRunning = NO;
 	sendIsScheduled = NO;
-
+    
 	[self autorelease]; //now it's OK for object to go away
 	[pool release];
 }
