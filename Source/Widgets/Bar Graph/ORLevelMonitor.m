@@ -207,7 +207,7 @@
 
 - (NSUndoManager*) undoManager
 {
-    return [[[self window] windowController] undoManager];
+    return [[NSApp delegate] undoManager];
 }
 
 - (void) mouseDown:(NSEvent*)event
@@ -266,7 +266,6 @@
 		NSRect r2 = NSMakeRect(b.origin.x,lowFillPoint-2,b.size.width,4);
 		if(NSPointInRect(localPoint,r1) || NSPointInRect(localPoint,r2)){
 			movingLowFillPoint = YES;
-			NSLog(@"grabbed low Fill\n");
 			[dataSource setLevelMonitor:self lowFillPoint:orginalValue];
 			[[NSCursor closedHandCursor] set];
 			[self setNeedsDisplay:YES];
@@ -282,7 +281,6 @@
 
 		if(NSPointInRect(localPoint,r3)|| NSPointInRect(localPoint,r4)){
 			movingHiFillPoint = YES;
-			NSLog(@"grabbed Hi Fill\n");
 			[dataSource setLevelMonitor:self hiFillPoint:orginalValue];
 			[[NSCursor closedHandCursor] set];
 			[self setNeedsDisplay:YES];
@@ -315,13 +313,11 @@
 	else if(movingLowFillPoint){
 		if([dataSource respondsToSelector:@selector(setLevelMonitor:lowFillPoint:)]){
 			[dataSource setLevelMonitor:self lowFillPoint:level];
-			NSLog(@"moving Lo Fill\n");
 		}
 	}
 	else if(movingHiFillPoint){
 		if([dataSource respondsToSelector:@selector(setLevelMonitor:hiFillPoint:)]){
 			[dataSource setLevelMonitor:self hiFillPoint:level];
-			NSLog(@"moving Hi Fill\n");
 		}
 	}
 	

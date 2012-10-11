@@ -25,8 +25,6 @@
 @class ORTimeRate;
 @class ORAlarm;
 
-#define kStartingBocGaugeNumber 913
-
 @interface ORAmi286Model : ORSerialPortWithQueueModel <ORAdcProcessing>
 {
     @private
