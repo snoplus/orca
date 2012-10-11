@@ -85,6 +85,8 @@ NSString* ORXL3ModelTriggerStatusChanged = @"ORXL3ModelTriggerStatusChanged";
 NSString* ORXL3ModelHVTargetValueChanged = @"ORXL3ModelHVTargetValueChanged";
 NSString* ORXL3ModelHVCMOSRateLimitChanged = @"ORXL3ModelHVCMOSRateLimitChanged";
 NSString* ORXL3ModelHVCMOSRateIgnoreChanged = @"ORXL3ModelHVCMOSRateIgnoreChanged";
+NSString* ORXL3ModelXl3VltThresholdChanged = @"ORXL3ModelXl3VltThresholdChanged";
+NSString* ORXL3ModelXl3VltThresholdInInitChanged = @"ORXL3ModelXl3VltThresholdInInitChanged";
 
 @interface ORXL3Model (private)
 - (void) doBasicOp;
@@ -836,6 +838,18 @@ NSString* ORXL3ModelHVCMOSRateIgnoreChanged = @"ORXL3ModelHVCMOSRateIgnoreChange
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelTriggerStatusChanged object:self];        
 }
 
+- (BOOL) isXl3VltThresholdInInit
+{
+    return _isXl3VltThresholdInInit;
+}
+
+- (void) setIsXl3VltThresholdInInit:(BOOL)aIs
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setIsXl3VltThresholdInInit:[self isXl3VltThresholdInInit]];
+    _isXl3VltThresholdInInit = aIs;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelXl3VltThresholdInInitChanged object:self];
+}
+
 - (int) slotConv
 {
     return [self slot];
@@ -1177,6 +1191,12 @@ void SwapLongBlock(void* p, int32_t n)
     [self setHvACMOSRateIgnore:[decoder decodeIntForKey:@"ORXL3ModelhvACMOSRateIgnore"]];
     [self setHvBCMOSRateIgnore:[decoder decodeIntForKey:@"ORXL3ModelhvBCMOSRateIgnore"]];
 
+    unsigned short i;
+    for (i=0; i<12; i++) {
+        [self setXl3VltThreshold:i withValue:[decoder decodeFloatForKey:[NSString stringWithFormat:@"ORXL3ModelVltThreshold%hd", i]]];
+    }
+    [self setIsXl3VltThresholdInInit:[decoder decodeBoolForKey:@"ORXL3ModelXl3VltThresholdInInit"]];
+
 	if (xl3Mode == 0) [self setXl3Mode: 1];
 	if (xl3OpsRunning == nil) xl3OpsRunning = [[NSMutableDictionary alloc] init];
     //if (isPollingXl3 == YES) [self setIsPollingXl3:NO];
@@ -1223,6 +1243,12 @@ void SwapLongBlock(void* p, int32_t n)
     [encoder encodeInt:_hvBCMOSRateLimit forKey:@"ORXL3ModelhvBCMOSRateLimit"];
     [encoder encodeInt:_hvACMOSRateIgnore forKey:@"ORXL3ModelhvACMOSRateIgnore"];
     [encoder encodeInt:_hvBCMOSRateIgnore forKey:@"ORXL3ModelhvBCMOSRateIgnore"];
+    
+    unsigned short i;
+    for (i=0; i<12; i++) {
+        [encoder encodeFloat:[self xl3VltThreshold:i] forKey:[NSString stringWithFormat:@"ORXL3ModelVltThreshold%hd", i]];
+    }
+    [encoder encodeBool:[self isXl3VltThresholdInInit] forKey:@"ORXL3ModelXl3VltThresholdInInit"];
 }
 
 #pragma mark •••Hardware Access
@@ -3043,10 +3069,11 @@ void SwapLongBlock(void* p, int32_t n)
             msk |= 1 << [anObj stationNumber];
         }
     }
+    unsigned int msk_full = msk;
+    
     if (isPollingXl3 || isPollingForced) {
         msk &= aSlotMask;
     }
-    //unsigned int msk_full = msk;
 
     vmon_results_t result[16];
     unsigned char slot;
@@ -3091,40 +3118,72 @@ void SwapLongBlock(void* p, int32_t n)
         }
     }
 
-    unsigned int cnt;
-    unsigned int msk_set = msk;
-    for (cnt = 0; msk_set; cnt++) msk_set &= msk_set - 1;
 
-    for (slot=0; slot<16; slot++) {
-        if ((msk >> slot) & 0x1) {
-            if (!isPollingXl3 || isPollingVerbose) {
-                //it doesn't set error_flags
-                NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ voltages for slot: %d\n", [[self xl3Link] crateName], slot];
-                [msg appendFormat:@" -24V Sup: %f V\n", result[slot].voltages[0]];
-                [msg appendFormat:@" -15V Sup: %f V\n", result[slot].voltages[1]];
-                [msg appendFormat:@"  VEE Sup: %f V\n", result[slot].voltages[2]];
-                [msg appendFormat:@"-3.3V Sup: %f V\n", result[slot].voltages[3]];
-                [msg appendFormat:@"-2.0V Sup: %f V\n", result[slot].voltages[4]];
-                [msg appendFormat:@" 3.3V Sup: %f V\n", result[slot].voltages[5]];
-                [msg appendFormat:@" 4.0V Sup: %f V\n", result[slot].voltages[6]];
-                [msg appendFormat:@"  VCC Sup: %f V\n", result[slot].voltages[7]];
-                [msg appendFormat:@" 6.5V Sup: %f V\n", result[slot].voltages[8]];
-                [msg appendFormat:@" 8.0V Sup: %f V\n", result[slot].voltages[9]];
-                [msg appendFormat:@"  15V Sup: %f V\n", result[slot].voltages[10]];
-                [msg appendFormat:@"  24V Sup: %f V\n", result[slot].voltages[11]];
-                [msg appendFormat:@"-2.0V Ref: %f V\n", result[slot].voltages[12]];
-                [msg appendFormat:@"-1.0V Ref: %f V\n", result[slot].voltages[13]];
-                [msg appendFormat:@" 0.8V Ref: %f V\n", result[slot].voltages[14]];
-                [msg appendFormat:@" 1.0V Ref: %f V\n", result[slot].voltages[15]];
-                [msg appendFormat:@" 4.0V Ref: %f V\n", result[slot].voltages[16]];
-                [msg appendFormat:@" 5.0V Ref: %f V\n", result[slot].voltages[17]];
-                [msg appendFormat:@"    Temp.: %f degC\n", result[slot].voltages[18]];
-                [msg appendFormat:@"  Cal DAC: %f V\n", result[slot].voltages[19]];
-                [msg appendFormat:@"  HV Curr: %f mA\n", result[slot].voltages[20]];
-                
-                NSLog(msg);
+    if (!isPollingXl3 || isPollingVerbose) {
+     
+        char* vlt_a[] = {" -24V Sup:", " -15V Sup:", "  VEE Sup:", "-3.3V Sup:", "-2.0V Sup:",
+            " 3.3V Sup:", " 4.0V Sup:", "  VCC Sup:", " 6.5V Sup:", " 8.0V Sup:", "  15V Sup:",
+            "  24V Sup:", "-2.0V Ref:", "-1.0V Ref:", " 0.8V Ref:", " 1.0V Ref:", " 4.0V Ref:",
+            " 5.0V Ref:", "    Temp.:", "  Cal DAC:", "  HV Curr:"};
+        
+        char* vlt_b[] = {" V", " V", " V", " V", " V", " V", " V", " V", " V", " V",
+            " V", " V", " V", " V", " V", " V", " V", " V", " degC", " V", " mA"};
+        
+        NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ FEC voltages:\n", [[self xl3Link] crateName]];
+        
+        if (msk < msk_full) {
+            [msg appendFormat:@"slots masked out: "];
+            unsigned int msk_missing = msk_full & ~msk;
+            for (slot=0; slot<16; slot++) {
+                if (msk_missing & (1UL << slot)) {
+                    [msg appendFormat:@"%d, ", slot];
+                }
             }
+            [msg appendFormat:@"\n"];
         }
+        
+        slot = 0;
+        unsigned int cnt;
+        unsigned int msk_set = msk;
+        for (cnt = 0; msk_set; cnt++) msk_set &= msk_set - 1;
+        
+        while (cnt) {
+            unsigned int slot_num;
+            if (cnt > 8) {
+                slot_num = 8;
+                cnt -= 8;
+            }
+            else {
+                slot_num = cnt;
+                cnt = 0;
+            }
+            unsigned int slot_a[slot_num];
+            unsigned int slot_to_assign = 0;
+            while (slot_to_assign < slot_num) {
+                if (msk >> slot & 0x1) {
+                    slot_a[slot_to_assign] = slot;
+                    slot_to_assign++;
+                }
+                slot++;
+            }
+            unsigned char sl = 0;
+            unsigned char vlt = 0;
+            [msg appendFormat:@"slot:"];
+            for (sl = 0; sl < slot_num; sl++) {
+                [msg appendFormat:@"%8d ", slot_a[sl]];
+            }
+            [msg appendFormat:@"\n"];
+            for (vlt = 0; vlt < 21; vlt++) {
+                [msg appendFormat:@"%s", vlt_a[vlt]];
+                for (sl = 0; sl < slot_num; sl++) {
+                    [msg appendFormat:@"%6.2f ", result[slot_a[sl]].voltages[vlt]];
+                }
+                [msg appendFormat:@"%s\n", vlt_b[vlt]];
+            }
+            [msg appendFormat:@"\n"];
+        }
+
+        NSLogFont([NSFont userFixedPitchFontOfSize:10], msg);
     }
 }
 
@@ -3194,6 +3253,71 @@ void SwapLongBlock(void* p, int32_t n)
         [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification object:pdata];
         [pdata release];
         pdata = nil;
+    }
+}
+
+- (float) xl3VltThreshold:(unsigned short)idx
+{
+    if (idx < 12) {
+        return _xl3VltThreshold[idx];
+    }
+    return 0;
+}
+
+- (void) setXl3VltThreshold:(unsigned short)idx withValue:(float)aThreashold
+{
+    if (idx < 12) {
+        [[[self undoManager] prepareWithInvocationTarget:self] setXl3VltThreshold:idx withValue:[self xl3VltThreshold:idx]];
+        _xl3VltThreshold[idx] = aThreashold;
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelXl3VltThresholdChanged object:self];
+
+    }
+}
+
+- (void) setVltThreshold
+{
+    XL3_PayloadStruct payload;
+    memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
+    payload.numberBytesinPayload = sizeof(set_vlt_thresholds_args_t);
+
+    set_vlt_thresholds_args_t* data = (set_vlt_thresholds_args_t*) payload.payload;
+    
+    unsigned short i;
+    for (i=0; i<6; i++){
+        data->lowLevel[i] = [self xl3VltThreshold:2*i];
+        data->highLevel[i] = [self xl3VltThreshold:2*i+1];
+    }    
+    if ([xl3Link needToSwap]) {
+        SwapLongBlock(data, sizeof(set_vlt_thresholds_args_t)/4);
+    }
+    
+    @try {
+        [[self xl3Link] sendCommand:SET_VLT_THRESHOLD_ID withPayload:&payload expectResponse:YES];
+    }
+    @catch (NSException *exception) {
+        NSLog(@"%@ error sending SET_VLT_THRESHOLD_ID command.\n",[[self xl3Link] crateName]);
+        @throw exception;
+    }
+
+    set_vlt_thresholds_result_t* res = (set_vlt_thresholds_result_t*) payload.payload;
+    if ([xl3Link needToSwap]) {
+        SwapLongBlock(res, sizeof(set_vlt_thresholds_result_t)/4);
+    }
+
+    if (res->error_flags) {
+        char* vlts[] = {"VCC", "VEE", "VP8", "VM24", "VP24", "TMP0"};
+        NSMutableString* msg = [NSMutableString stringWithFormat:
+                                @"%@: setting voltage thresholds failed for: ",[[self xl3Link] crateName]];
+        for (i=0; i<6; i++) {
+            if (res->error_flags >> i & 0x1) {
+                [msg appendFormat:@"%s ", vlts[i]];
+            }
+        }
+        [msg appendFormat:@"\n"];
+        NSLog(msg);
+    }
+    else {
+        NSLog(@"%@: voltage thresholds set.\n",[[self xl3Link] crateName]);
     }
 }
 

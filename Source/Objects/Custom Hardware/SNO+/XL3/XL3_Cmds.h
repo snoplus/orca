@@ -43,6 +43,7 @@
 #define READ_LOCAL_VOLTAGE_ID     (0x2D) //read a single voltage on XL3 
 #define CHECK_TOTAL_COUNT_ID      (0x2E) //readout cmos total count register 
 #define SET_ALARM_DAC_ID          (0x2F) //???Set alarm dac
+#define SET_VLT_THRESHOLD_ID      (0x30) //set voltage thresholds for slow control alarms
 // HV Tasks
 #define SET_HV_RELAYS_ID          (0x40) //turns on/off hv relays
 #define GET_HV_STATUS_ID          (0x41) //checks voltage and current readback
@@ -445,6 +446,15 @@ typedef struct{
     uint8_t current_adc[16*32];
     uint8_t busy_flag[16*32];
 } read_pmt_base_currents_results_t;
+
+typedef struct{
+    float highLevel[6];
+    float lowLevel[6];
+} set_vlt_thresholds_args_t;
+
+typedef struct{
+    uint32_t error_flags;
+} set_vlt_thresholds_result_t;
 
 typedef struct{
     uint32_t cmd_in_rejected_flag;

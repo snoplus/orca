@@ -285,6 +285,16 @@ static NSDictionary* xl3Ops;
                      selector : @selector(hvCMOSRateIgnoreChanged:)
                          name : ORXL3ModelHVCMOSRateIgnoreChanged
                        object : model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(monVltThresholdChanged:)
+                         name : ORXL3ModelXl3VltThresholdChanged
+                       object : model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(monVltThresholdInInitChanged:)
+                         name : ORXL3ModelXl3VltThresholdInInitChanged
+                       object : model];
 }
 
 - (void) updateWindow
@@ -322,6 +332,8 @@ static NSDictionary* xl3Ops;
     [self monIsPollingXl3WithRunChanged:nil];
     [self monPollStatusChanged:nil];
     [self monIsPollingVerboseChanged:nil];
+    [self monVltThresholdChanged:nil];
+    [self monVltThresholdInInitChanged:nil];
     //hv
     [self hvRelayMaskChanged:nil];
     [self hvRelayStatusChanged:nil];
@@ -346,7 +358,7 @@ static NSDictionary* xl3Ops;
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item
 {
-	if([tabView indexOfTabViewItem:item] == 1 || [tabView indexOfTabViewItem:item] == 3){
+	if([tabView indexOfTabViewItem:item] > 0 && [tabView indexOfTabViewItem:item] < 4) {
 		[[self window] setContentView:blankView];
 		[self resizeWindowToSize:compositeSize];
 		[[self window] setContentView:xl3View];
@@ -558,9 +570,28 @@ static NSDictionary* xl3Ops;
     [monPollingStatusField setStringValue:[model pollStatus]];
 }
 
-- (void) monIsPollingVerboseChanged:(NSNotification*)aNote;
+- (void) monIsPollingVerboseChanged:(NSNotification*)aNote
 {
     [monIsPollingVerboseButton setIntValue:[model isPollingVerbose]];
+}
+
+- (void) monVltThresholdChanged:(NSNotification*)aNote
+{
+    
+    NSTextField* monVltThresholdTextField[] = {monVltThresholdTextField0, monVltThresholdTextField1,
+        monVltThresholdTextField2, monVltThresholdTextField3, monVltThresholdTextField4, monVltThresholdTextField5,
+        monVltThresholdTextField6,monVltThresholdTextField7, monVltThresholdTextField8, monVltThresholdTextField9,
+        monVltThresholdTextField10, monVltThresholdTextField11};
+
+    unsigned short i;
+    for (i=0; i<12; i++) {
+        [monVltThresholdTextField[i] setFloatValue:[model xl3VltThreshold:i]];
+    }
+}
+
+- (void) monVltThresholdInInitChanged:(NSNotification*)aNote
+{
+    [monVltThresholdInInitButton setIntValue:[model isXl3VltThresholdInInit]];
 }
 
 #pragma mark •hv
@@ -1110,6 +1141,21 @@ static NSDictionary* xl3Ops;
 - (IBAction) monPollNowAction:(id)sender
 {
     [model pollXl3:true];
+}
+
+- (IBAction) monVltThresholdAction:(id)sender
+{
+    [model setXl3VltThreshold:[sender tag] withValue:[sender floatValue]];
+}
+
+- (IBAction) monVltThresholdInInitAction:(id)sender
+{
+    [model setIsXl3VltThresholdInInit:[sender intValue]];
+}
+
+- (IBAction) monVltThresholdSetAction:(id)sender
+{
+    [model setVltThreshold];
 }
 
 - (IBAction) monStartPollingAction:(id)sender

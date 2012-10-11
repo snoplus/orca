@@ -91,6 +91,20 @@
     IBOutlet NSButton*              monIsPollingVerboseButton;
     IBOutlet NSButton*              monIsPollingWithRunButton;
     IBOutlet NSTextField*           monPollingStatusField;
+    IBOutlet NSTextField* monVltThresholdTextField0;
+    IBOutlet NSTextField* monVltThresholdTextField1;
+    IBOutlet NSTextField* monVltThresholdTextField2;
+    IBOutlet NSTextField* monVltThresholdTextField3;
+    IBOutlet NSTextField* monVltThresholdTextField4;
+    IBOutlet NSTextField* monVltThresholdTextField5;
+    IBOutlet NSTextField* monVltThresholdTextField6;
+    IBOutlet NSTextField* monVltThresholdTextField7;
+    IBOutlet NSTextField* monVltThresholdTextField8;
+    IBOutlet NSTextField* monVltThresholdTextField9;
+    IBOutlet NSTextField* monVltThresholdTextField10;
+    IBOutlet NSTextField* monVltThresholdTextField11;
+    IBOutlet NSButton* monVltThresholdInInitButton;
+    IBOutlet NSButton* monVltThresholdSetButton;
     //hv
     IBOutlet NSTextField *hvRelayMaskLowField;
     IBOutlet NSTextField *hvRelayMaskHighField;
@@ -170,6 +184,8 @@
 - (void) monIsPollingXl3WithRunChanged:(NSNotification*)aNote;
 - (void) monPollStatusChanged:(NSNotification*)aNote;
 - (void) monIsPollingVerboseChanged:(NSNotification*)aNote;
+- (void) monVltThresholdChanged:(NSNotification*)aNote;
+- (void) monVltThresholdInInitChanged:(NSNotification*)aNote;
 //hv
 - (void) hvRelayMaskChanged:(NSNotification*)aNote;
 - (void) hvRelayStatusChanged:(NSNotification*)aNote;
@@ -235,6 +251,9 @@
 - (IBAction) monPollNowAction:(id)sender;
 - (IBAction) monStartPollingAction:(id)sender;
 - (IBAction) monStopPollingAction:(id)sender;
+- (IBAction) monVltThresholdAction:(id)sender;
+- (IBAction) monVltThresholdInInitAction:(id)sender;
+- (IBAction) monVltThresholdSetAction:(id)sender;
 //hv
 - (IBAction)hvRelayMaskHighAction:(id)sender;
 - (IBAction)hvRelayMaskLowAction:(id)sender;

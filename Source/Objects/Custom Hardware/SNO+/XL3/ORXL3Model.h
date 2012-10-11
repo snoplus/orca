@@ -118,6 +118,8 @@ enum {
     BOOL _hvPanicFlag;
     NSThread* hvThread;
     NSDateFormatter* xl3DateFormatter;
+    float _xl3VltThreshold[12];
+    BOOL _isXl3VltThresholdInInit;
 }
 
 @property (nonatomic,assign) unsigned long xl3MegaBundleDataId;
@@ -167,6 +169,7 @@ enum {
 @property (nonatomic,assign) unsigned long hvBNextStepValue;
 @property (nonatomic,assign) unsigned long hvCMOSReadsCounter;
 @property (nonatomic,assign) BOOL hvPanicFlag;
+@property (nonatomic,assign) BOOL isXl3VltThresholdInInit;
 
 #pragma mark •••Initialization
 - (id)   init;
@@ -212,6 +215,8 @@ enum {
 - (void) setXl3OpsRunning:(BOOL)anXl3OpsRunning forKey:(id)aKey;
 - (unsigned long) xl3PedestalMask;
 - (void) setXl3PedestalMask:(unsigned long)anXl3PedestalMask;
+- (float) xl3VltThreshold:(unsigned short)idx;
+- (void) setXl3VltThreshold:(unsigned short)idx withValue:(float)aThreashold;
 
 - (int) selectedRegister;
 - (void) setSelectedRegister:(int)aSelectedRegister;
@@ -312,6 +317,7 @@ enum {
 - (void) readVMONWithMask:(unsigned short)aSlotMask;
 - (void) readVMONXL3:(vmon_xl3_results_t*)aVoltages;
 - (void) readVMONXL3;
+- (void) setVltThreshold;
 
 - (void) pollXl3:(BOOL)forceFlag;
 
@@ -359,3 +365,5 @@ extern NSString* ORXL3ModelTriggerStatusChanged;
 extern NSString* ORXL3ModelHVTargetValueChanged;
 extern NSString* ORXL3ModelHVCMOSRateLimitChanged;
 extern NSString* ORXL3ModelHVCMOSRateIgnoreChanged;
+extern NSString* ORXL3ModelXl3VltThresholdChanged;
+extern NSString* ORXL3ModelXl3VltThresholdInInitChanged;
