@@ -195,9 +195,11 @@ readFifoFlag = _readFifoFlag;
 
 - (void) setIsConnected:(BOOL)aNewIsConnected
 {
-	isConnected = aNewIsConnected;
-	[[NSNotificationCenter defaultCenter] postNotificationName:XL3_LinkConnectionChanged object: self];
-	[self setTimeConnected:isConnected?[NSCalendarDate date]:nil];
+    @synchronized(self) {
+        isConnected = aNewIsConnected;
+        [[NSNotificationCenter defaultCenter] postNotificationName:XL3_LinkConnectionChanged object: self];
+        [self setTimeConnected:isConnected?[NSCalendarDate date]:nil];
+    }
 }
 
 - (BOOL) autoConnect
@@ -615,6 +617,7 @@ readFifoFlag = _readFifoFlag;
 			break;
 		}
 		else if ([self errorTimeOutSeconds] && time(0) - xl3ReadTimer > [self errorTimeOutSeconds]) {
+            [self performSelectorOnMainThread:@selector(disconnectSocket) withObject:nil waitUntilDone:NO];
 			@throw [NSException exceptionWithName:@"ReadXL3Packet time out"
 				reason:[NSString stringWithFormat:@"Time out for %@ <%@> port: %lu\n", [self crateName], IPNumber, portNumber]
 				userInfo:nil];
@@ -793,7 +796,9 @@ static void SwapLongBlock(void* p, int32_t n)
 
 	char aPacket[XL3_PACKET_SIZE];
 	unsigned long bundle_count = 0;
-	
+
+	time_t t0 = time(0);
+    
 	while(1) {
 		if (!workingSocket) {
 			NSLog(@"%@ not connected <%@> port: %d\n", [self crateName], IPNumber, portNumber);
@@ -804,13 +809,19 @@ static void SwapLongBlock(void* p, int32_t n)
 		FD_SET(workingSocket, &fds);
 		selectionResult = select(workingSocket + 1, &fds, NULL, NULL, &tv);
 		if (selectionResult == -1 && !(errno == EAGAIN || errno == EINTR)) {
-			[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:.01]];
-            //check Timer
+			[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:.005]];
+            
 			if (workingSocket || serverSocket) {
 				NSLog(@"Error reading XL3 <%@> port: %d\n", IPNumber, portNumber);
 			}
 			break;
 		}
+
+        if ([self errorTimeOutSeconds] && (time(0) - t0) > [self errorTimeOutSeconds]) {
+            //[self performSelectorOnMainThread:@selector(disconnectSocket) withObject:nil waitUntilDone:YES];
+            break;
+        }
+
 		if (selectionResult > 0 && FD_ISSET(workingSocket, &fds)) {
 			@try {
 				[coreSocketLock lock];
@@ -825,7 +836,8 @@ static void SwapLongBlock(void* p, int32_t n)
 				break;
 			}
 
-            //reset timer
+            //reset the timer
+            t0 = time(0);
             
             //NSLog(@"Read packet:  packet_type: 0x%x, packet_num: 0x%x\n", ((XL3_Packet*) aPacket)->cmdHeader.packet_type, ((XL3_Packet*) aPacket)->cmdHeader.packet_num);
 

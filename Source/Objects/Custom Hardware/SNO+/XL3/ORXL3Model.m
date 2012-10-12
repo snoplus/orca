@@ -3276,6 +3276,14 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (void) setVltThreshold
 {
+    
+    if ([self xl3VltThreshold:4] > -10) {
+        [self setXl3VltThreshold:4 withValue: -10];
+    }
+    if ([self xl3VltThreshold:4] < 10) {
+        [self setXl3VltThreshold:4 withValue: 10];
+    }
+    
     XL3_PayloadStruct payload;
     memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
     payload.numberBytesinPayload = sizeof(set_vlt_thresholds_args_t);
