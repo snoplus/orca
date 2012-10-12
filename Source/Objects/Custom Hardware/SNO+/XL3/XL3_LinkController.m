@@ -1104,19 +1104,19 @@ static NSDictionary* xl3Ops;
 
 - (IBAction) monPollCMOSRatesMaskAction:(id)sender
 {
-    [self endEditing];
+    [[sender window] makeFirstResponder:tabView];
     [model setPollCMOSRatesMask:[sender intValue]];
 }
 
 - (IBAction) monPollPMTCurrentsMaskAction:(id)sender
 {   
-    [self endEditing];
+    [[sender window] makeFirstResponder:tabView];
     [model setPollPMTCurrentsMask:[sender intValue]];
 }
 
 - (IBAction) monPollFECVoltagesMaskAction:(id)sender
 {
-    [self endEditing];
+    [[sender window] makeFirstResponder:tabView];
     [model setPollFECVoltagesMask:[sender intValue]];
 }
 
@@ -1145,6 +1145,7 @@ static NSDictionary* xl3Ops;
 
 - (IBAction) monVltThresholdAction:(id)sender
 {
+    [[sender window] makeFirstResponder:tabView];
     [model setXl3VltThreshold:[sender tag] withValue:[sender floatValue]];
 }
 
@@ -1155,6 +1156,7 @@ static NSDictionary* xl3Ops;
 
 - (IBAction) monVltThresholdSetAction:(id)sender
 {
+    [self endEditing];
     [model setVltThreshold];
 }
 

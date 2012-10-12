@@ -3294,9 +3294,9 @@ void SwapLongBlock(void* p, int32_t n)
     @try {
         [[self xl3Link] sendCommand:SET_VLT_THRESHOLD_ID withPayload:&payload expectResponse:YES];
     }
-    @catch (NSException *exception) {
+    @catch (NSException *e) {
         NSLog(@"%@ error sending SET_VLT_THRESHOLD_ID command.\n",[[self xl3Link] crateName]);
-        @throw exception;
+        NSLog(@"%@ with reason: %@\n", [e name], [e reason]);
     }
 
     set_vlt_thresholds_result_t* res = (set_vlt_thresholds_result_t*) payload.payload;
