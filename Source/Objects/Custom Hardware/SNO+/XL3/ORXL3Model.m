@@ -3168,7 +3168,7 @@ void SwapLongBlock(void* p, int32_t n)
             }
             unsigned char sl = 0;
             unsigned char vlt = 0;
-            [msg appendFormat:@"slot:"];
+            [msg appendFormat:@"     slot:"];
             for (sl = 0; sl < slot_num; sl++) {
                 [msg appendFormat:@"%8d ", slot_a[sl]];
             }
@@ -3176,7 +3176,7 @@ void SwapLongBlock(void* p, int32_t n)
             for (vlt = 0; vlt < 21; vlt++) {
                 [msg appendFormat:@"%s", vlt_a[vlt]];
                 for (sl = 0; sl < slot_num; sl++) {
-                    [msg appendFormat:@"%6.2f ", result[slot_a[sl]].voltages[vlt]];
+                    [msg appendFormat:@"%8.2f ", result[slot_a[sl]].voltages[vlt]];
                 }
                 [msg appendFormat:@"%s\n", vlt_b[vlt]];
             }
@@ -3205,8 +3205,7 @@ void SwapLongBlock(void* p, int32_t n)
     if ([xl3Link needToSwap]) {
         SwapLongBlock(data, sizeof(vmon_xl3_results_t)/4);
     }
-    
-    memcpy(aVoltages, data, sizeof(vmon_xl3_results_t));
+            memcpy(aVoltages, data, sizeof(vmon_xl3_results_t));
 }
 
 //used from polling loop and/or ORCA script
@@ -3280,8 +3279,8 @@ void SwapLongBlock(void* p, int32_t n)
     if ([self xl3VltThreshold:4] > -10) {
         [self setXl3VltThreshold:4 withValue: -10];
     }
-    if ([self xl3VltThreshold:4] < 10) {
-        [self setXl3VltThreshold:4 withValue: 10];
+    if ([self xl3VltThreshold:5] < 10) {
+        [self setXl3VltThreshold:5 withValue: 10];
     }
     
     XL3_PayloadStruct payload;
