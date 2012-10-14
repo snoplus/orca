@@ -70,51 +70,66 @@ NSString* ORRateAverageChangedNotification 	= @"ORRateAverageChangedNotification
 
 - (void) addDataToTimeAverage:(float)aValue
 {
-	if(sampleTime == 0)sampleTime = 30;
-	if(averageStackCount<kAverageStackSize){		
-		averageStack[averageStackCount] = aValue;
-		averageStackCount++;
-	}
-	//has enough time elapsed to accept the new data?
-	NSDate* now = [NSDate date];
-	NSTimeInterval deltaTime = [now timeIntervalSinceDate:lastAverageTime];
+    @synchronized(self){
+        if(sampleTime == 0)sampleTime = 30;
+        if(averageStackCount<kAverageStackSize){		
+            averageStack[averageStackCount] = aValue;
+            averageStackCount++;
+        }
+        //has enough time elapsed to accept the new data?
+        NSDate* now = [NSDate date];
+        NSTimeInterval deltaTime = [now timeIntervalSinceDate:lastAverageTime];
 
-	if(lastAverageTime==0 || deltaTime>=sampleTime){
-			
-		aValue = [self _getAverageFromStack];	
-								
-		[self setLastAverageTime:now];
-		
-		timeAverage[timeAverageWrite] = aValue;
-		timeSampled[timeAverageWrite] = [now timeIntervalSince1970];
+        if(lastAverageTime==0 || deltaTime>=sampleTime){
+                
+            aValue = [self _getAverageFromStack];	
+                                    
+            [self setLastAverageTime:now];
+            
+            timeAverage[timeAverageWrite] = aValue;
+            timeSampled[timeAverageWrite] = [now timeIntervalSince1970];
 
-		timeAverageWrite = (timeAverageWrite+1)%kTimeAverageBufferSize;
-		if(timeAverageWrite == timeAverageRead){
-			//the circular buffer is full, advance the read position
-			timeAverageRead = (timeAverageRead+1)%kTimeAverageBufferSize;
-		}
-				
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORRateAverageChangedNotification object:self userInfo:nil];
-		
-	}	
+            timeAverageWrite = (timeAverageWrite+1)%kTimeAverageBufferSize;
+            if(timeAverageWrite == timeAverageRead){
+                //the circular buffer is full, advance the read position
+                timeAverageRead = (timeAverageRead+1)%kTimeAverageBufferSize;
+            }
+                    
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORRateAverageChangedNotification object:self userInfo:nil];
+            
+        }
+    }
 }
 
 - (unsigned) count
 {
-	if(timeAverageWrite > timeAverageRead)return timeAverageWrite - timeAverageRead;
-	else return kTimeAverageBufferSize-timeAverageRead + timeAverageWrite;
+    unsigned theCount = 0;
+    @synchronized(self){
+        if(timeAverageWrite > timeAverageRead)theCount =  timeAverageWrite - timeAverageRead;
+        else theCount = kTimeAverageBufferSize-timeAverageRead + timeAverageWrite;
+    }
+    return theCount;
+    
 }
 
 - (double)valueAtIndex:(unsigned)index
 {
-	if(index < kTimeAverageBufferSize) return timeAverage[(timeAverageRead+index)%kTimeAverageBufferSize];
-	else return 0.0;
+    double theValue = 0;
+    @synchronized(self){
+        if(index < kTimeAverageBufferSize) theValue = timeAverage[(timeAverageRead+index)%kTimeAverageBufferSize];
+        else theValue = 0.0;
+    }
+    return theValue;
 }
 
 - (NSTimeInterval)timeSampledAtIndex:(unsigned)index
 {
-	if(index < kTimeAverageBufferSize)return timeSampled[(timeAverageRead+index)%kTimeAverageBufferSize];
-	else return 0.0;
+    NSTimeInterval theValue = 0;
+    @synchronized(self){
+        if(index < kTimeAverageBufferSize)theValue = timeSampled[(timeAverageRead+index)%kTimeAverageBufferSize];
+        else theValue = 0.0;
+    }
+    return theValue;
 }
 
 #pragma mark •••Archival
