@@ -93,6 +93,8 @@ NSString* ORXL3ModelXl3VltThresholdInInitChanged = @"ORXL3ModelXl3VltThresholdIn
 - (NSString*) stringDate;
 - (void) _pollXl3;
 - (void) _hvXl3;
+- (void) sendCommandWithDict:(NSDictionary*)argDict;
+- (void) initCrateDone:(NSDictionary*)resp;
 @end
 
 @implementation ORXL3Model
@@ -110,7 +112,9 @@ NSString* ORXL3ModelXl3VltThresholdInInitChanged = @"ORXL3ModelXl3VltThresholdIn
     hvANextStepValue = _hvANextStepValue,
     hvBNextStepValue = _hvBNextStepValue,
     hvCMOSReadsCounter = _hvCMOSReadsCounter,
-    hvPanicFlag= _hvPanicFlag;
+    hvPanicFlag= _hvPanicFlag,
+    xl3LinkTimeOut = _xl3LinkTimeOut,
+    xl3InitInProgress = _xl3InitInProgress;
 
 #pragma mark •••Initialization
 - (id) init
@@ -1199,6 +1203,7 @@ void SwapLongBlock(void* p, int32_t n)
 
 	if (xl3Mode == 0) [self setXl3Mode: 1];
 	if (xl3OpsRunning == nil) xl3OpsRunning = [[NSMutableDictionary alloc] init];
+    [self setXl3InitInProgress:NO];
     //if (isPollingXl3 == YES) [self setIsPollingXl3:NO];
 
 	[[self undoManager] enableUndoRegistration];
@@ -1383,145 +1388,196 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (void) initCrateRegistersOnly
 {
-    [self initCrateWithXilinx:NO autoInit:NO registersOnly:YES];
+    NSDictionary* argDict = [NSDictionary dictionaryWithObjectsAndKeys:
+                             [NSNumber numberWithBool:YES], @"registersFlag",
+                             nil];
+
+    [self performSelector:@selector(initCrateWithDict:) withObject:argDict afterDelay:0];
 }
 
 - (void) initCrateWithXilinx:(BOOL)aXilinxFlag autoInit:(BOOL)anAutoInitFlag
 {
-    [self initCrateWithXilinx:aXilinxFlag autoInit:anAutoInitFlag registersOnly:NO];
+    NSDictionary* argDict = [NSDictionary dictionaryWithObjectsAndKeys:
+                             [NSNumber numberWithBool:aXilinxFlag], @"xilinxFlag",
+                             [NSNumber numberWithBool:anAutoInitFlag], @"autoInit",
+                             nil];
+
+    [self performSelector:@selector(initCrateWithDict:) withObject:argDict afterDelay:0];
 }
 
-- (void) initCrateWithXilinx:(BOOL)aXilinxFlag autoInit:(BOOL)anAutoInitFlag registersOnly:(BOOL)registersFlag
+- (void) initCrateWithDict:(NSDictionary*)argDict
 {
-	XL3_PayloadStruct payload;
-	memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
-	payload.numberBytesinPayload = sizeof(mb_t) + 4;
-	unsigned long* aMbId = (unsigned long*) payload.payload;
-	mb_t* aConfigBundle = (mb_t*) (payload.payload + 4);
-	
-	BOOL loadOk = YES;
-	unsigned short i;
-
-	NSLog(@"%@ Init Crate...\n",[[self xl3Link] crateName]);
-
-	for (i=0; i<16; i++) {
-		memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
-		*aMbId = i;
-		[self synthesizeDefaultsIntoBundle:aConfigBundle forSLot:i];
-		if ([xl3Link needToSwap]) {
-			*aMbId = swapLong(*aMbId);
-			[self byteSwapBundle:aConfigBundle];
-		}
-		@try {
-			[[self xl3Link] sendCommand:CRATE_INIT_ID withPayload:&payload expectResponse:NO];
-			/*
-			if (*(unsigned int*) payload.payload != 0) {
-				NSLog(@"XL3 doesn't like the config bundle for slot %d, exiting.\n", i);
-				loadOk = NO;
-				break;
-			}
-			*/
-		}
-		@catch (NSException* e) {
-			NSLog(@"%@ Init crate failed; error: %@ reason: %@\n",[[self xl3Link] crateName], [e name], [e reason]);
-			loadOk = NO;
-			break;
-		}
-	}
-		
-	if (loadOk) {
-		memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
-		// time to fly (never say 16 here!)
-		aMbId[0] = 666;
-		
-		// xil load
-		if (aXilinxFlag == YES) aMbId[1] = 1;
-		else aMbId[1] = 0;
-		
-		// hv reset, talk to Rob first
-		aMbId[2] = 0;
-		
-		// slot mask
-        unsigned int msk = 0;
-		if (anAutoInitFlag == YES) {
-			msk = 0xFFFF;
-			NSLog(@"AutoInits not yet implemented, XL3 will freeze probably.\n");
-		}
-		else {
-			ORFec32Model* aFec;
-            msk = 0;
-			NSArray* fecs = [[self guardian] collectObjectsOfClass:NSClassFromString(@"ORFec32Model")];
-			for (aFec in fecs) {
-				msk |= 1 << [aFec stationNumber];
-			}
-		}
-        aMbId[3] = msk;
-
-		// ctc delay
-		aMbId[4] = 0;
-		// cmos shift regs only if != 0
-		aMbId[5] = 0;
-        if (registersFlag) {
-            aMbId[5] = 1;
-        }
-		
-		if ([xl3Link needToSwap]) {
-			for (i=0; i<6; i++) aMbId[i] = swapLong(aMbId[i]);
-		}
+    @synchronized(self) {
         
-        //init takes some time...
-        int currentTimeOut = [[self xl3Link] errorTimeOut];
-        [[self xl3Link] setErrorTimeOut:2];
-        //[[self xl3Link] performSelector:@selector(setErrorTimeOut:) withObject:[NSNumber numberWithInt:currentTimeOut] afterDelay:60];
-		@try {
-			[[self xl3Link] sendCommand:CRATE_INIT_ID withPayload:&payload expectResponse:YES];
-            /*
-			if (*(unsigned int*)payload.payload != 0) {
-                NSLog(@"%@ error during init.\n",[[self xl3Link] crateName]);
-			}
-             */
-			
-			//todo look into the hw params returned
-			/* xl3 does the following on successfull init, or returns zeros here if things go wrong
-			 for (i=0;i<16;i++){
-			 response_hware_vals = (mb_hware_vals_t *) (payload+4+i*sizeof(mb_hware_vals_t));
-			 *response_hware_vals = hware_vals[i];
-			 */
-		}
-		@catch (NSException* e) {
-			NSLog(@"%@ init crate failed; error: %@ reason: %@\n",[[self xl3Link] crateName], [e name], [e reason]);
-		}
-        [[self xl3Link] setErrorTimeOut:currentTimeOut];
-        
-        NSLog(@"%@ init ok!\n",[[self xl3Link] crateName]);
-        
-        [self setTriggerStatus:@"ON"];
-        unsigned short* aId = (unsigned short*) payload.payload + 2; //hard to say what the first int should be
-        for (i=0; i<16*5; i++) {
-            aId[i] = swapShort(aId[i]);
+        if ([self xl3InitInProgress]) {
+            NSLog(@"%@ New init crate ignored since init is in progress already.\n",[[self xl3Link] crateName]);
+            return;
         }
         
-        hware_vals_t* ids;
-        NSMutableString* msg = [NSMutableString stringWithFormat:@"\n"];
-        for (id anObj in [[self guardian] orcaObjects]) { 
-            if ([anObj class] == NSClassFromString(@"ORFec32Model") && (msk & 1 << [anObj stationNumber])) {
-                ids = (hware_vals_t*) aId;
-                ids += [anObj stationNumber];
-                [anObj setBoardID:[NSString stringWithFormat:@"%x", ids->mb_id]];
-                if ([anObj dcPresent:0]) [[anObj dc:0] setBoardID:[NSString stringWithFormat:@"%x", ids->dc_id[0]]];
-                if ([anObj dcPresent:1]) [[anObj dc:1] setBoardID:[NSString stringWithFormat:@"%x", ids->dc_id[1]]];
-                if ([anObj dcPresent:2]) [[anObj dc:2] setBoardID:[NSString stringWithFormat:@"%x", ids->dc_id[2]]];
-                if ([anObj dcPresent:3]) [[anObj dc:3] setBoardID:[NSString stringWithFormat:@"%x", ids->dc_id[3]]];
-                [msg appendFormat:@"slot: %2d, FEC: %4x, DB0: %4x, DB1: %4x, DB2: %4x, DB3: %4x\n",
-                      [anObj stationNumber], ids->mb_id, ids->dc_id[0], ids->dc_id[1], ids->dc_id[2], ids->dc_id[3]];
+        BOOL registersFlag = NO;
+        if ([argDict objectForKey:@"registersFlag"])
+            registersFlag = [[argDict objectForKey:@"registersFlag"] boolValue];
+        
+        BOOL aXilinxFlag = NO;
+        if ([argDict objectForKey:@"xilinxFlag"])
+            registersFlag = [[argDict objectForKey:@"xilinxFlag"] boolValue];
+        
+        BOOL anAutoInitFlag = NO;
+        if ([argDict objectForKey:@"autoInit"])
+            registersFlag = [[argDict objectForKey:@"autoInit"] boolValue];
+        
+        XL3_PayloadStruct payload;
+        memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
+        payload.numberBytesinPayload = sizeof(mb_t) + 4;
+        unsigned long* aMbId = (unsigned long*) payload.payload;
+        mb_t* aConfigBundle = (mb_t*) (payload.payload + 4);
+        
+        BOOL loadOk = YES;
+        unsigned short i;
+
+        NSLog(@"%@ Init Crate...\n",[[self xl3Link] crateName]);
+
+        for (i=0; i<16; i++) {
+            memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
+            *aMbId = i;
+            [self synthesizeDefaultsIntoBundle:aConfigBundle forSLot:i];
+            if ([xl3Link needToSwap]) {
+                *aMbId = swapLong(*aMbId);
+                [self byteSwapBundle:aConfigBundle];
+            }
+            @try {
+                [[self xl3Link] sendCommand:CRATE_INIT_ID withPayload:&payload expectResponse:NO];
+                /*
+                if (*(unsigned int*) payload.payload != 0) {
+                    NSLog(@"XL3 doesn't like the config bundle for slot %d, exiting.\n", i);
+                    loadOk = NO;
+                    break;
+                }
+                */
+            }
+            @catch (NSException* e) {
+                NSLog(@"%@ Init crate failed; error: %@ reason: %@\n",[[self xl3Link] crateName], [e name], [e reason]);
+                loadOk = NO;
+                break;
             }
         }
-        NSLogFont([NSFont userFixedPitchFontOfSize:0], msg);
-	}
-	else {
-		NSLog(@"%@ error loading config, init skipped.\n",[[self xl3Link] crateName]);
-	}
+            
+        if (loadOk) {
+            memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
+            // time to fly (never say 16 here!)
+            aMbId[0] = 666;
+            
+            // xil load
+            if (aXilinxFlag == YES) aMbId[1] = 1;
+            else aMbId[1] = 0;
+            
+            // hv reset, talk to Rob first
+            aMbId[2] = 0;
+            
+            // slot mask
+            unsigned int msk = 0;
+            if (anAutoInitFlag == YES) {
+                msk = 0xFFFF;
+                NSLog(@"AutoInits not yet implemented, XL3 will freeze probably.\n");
+            }
+            else {
+                ORFec32Model* aFec;
+                msk = 0;
+                NSArray* fecs = [[self guardian] collectObjectsOfClass:NSClassFromString(@"ORFec32Model")];
+                for (aFec in fecs) {
+                    msk |= 1 << [aFec stationNumber];
+                }
+            }
+            aMbId[3] = msk;
+
+            // ctc delay
+            aMbId[4] = 0;
+            // cmos shift regs only if != 0
+            aMbId[5] = 0;
+            if (registersFlag) {
+                aMbId[5] = 1;
+            }
+            
+            if ([xl3Link needToSwap]) {
+                for (i=0; i<6; i++) aMbId[i] = swapLong(aMbId[i]);
+            }
+            
+            //init takes some time...
+            [self setXl3LinkTimeOut:[[self xl3Link] errorTimeOut]];
+            [[self xl3Link] setErrorTimeOut:2];
+            //[[self xl3Link] performSelector:@selector(setErrorTimeOut:) withObject:[NSNumber numberWithInt:currentTimeOut] afterDelay:60];
+            @try {
+                NSDictionary* arggDict = [NSDictionary dictionaryWithObjectsAndKeys:
+                                         [NSNumber numberWithInt:CRATE_INIT_ID], @"cmdId",
+                                         [NSData dataWithBytes:&payload length:sizeof(XL3_PayloadStruct)], @"payload",
+                                         [NSNumber numberWithBool:YES], @"response",
+                                         @"initCrateDone:", @"callback",
+                                         argDict, @"initArgs",
+                                         nil];
+                
+                [NSThread detachNewThreadSelector:@selector(sendCommandWithDict:) toTarget:self withObject:arggDict];
+                
+                //[[self xl3Link] sendCommand:CRATE_INIT_ID withPayload:&payload expectResponse:YES];
+                /*
+                if (*(unsigned int*)payload.payload != 0) {
+                    NSLog(@"%@ error during init.\n",[[self xl3Link] crateName]);
+                }
+                 */
+                
+                //todo look into the hw params returned
+                /* xl3 does the following on successfull init, or returns zeros here if things go wrong
+                 for (i=0;i<16;i++){
+                 response_hware_vals = (mb_hware_vals_t *) (payload+4+i*sizeof(mb_hware_vals_t));
+                 *response_hware_vals = hware_vals[i];
+                 */
+            }
+            @catch (NSException* e) {
+                NSLog(@"%@ init crate failed; error: %@ reason: %@\n",[[self xl3Link] crateName], [e name], [e reason]);
+                [[self xl3Link] setErrorTimeOut:[self xl3LinkTimeOut]];
+                return;
+            }
+            [self setXl3InitInProgress:YES];
+        }
+        else {
+            NSLog(@"%@ error loading config, init skipped.\n",[[self xl3Link] crateName]);
+        }
+    }//synchronized
 }
+
+/*
+            [[self xl3Link] setErrorTimeOut:currentTimeOut];
+            
+            NSLog(@"%@ init ok!\n",[[self xl3Link] crateName]);
+            
+            [self setTriggerStatus:@"ON"];
+            unsigned short* aId = (unsigned short*) payload.payload + 2; //hard to say what the first int should be
+            for (i=0; i<16*5; i++) {
+                aId[i] = swapShort(aId[i]);
+            }
+            
+            hware_vals_t* ids;
+            NSMutableString* msg = [NSMutableString stringWithFormat:@"\n"];
+            for (id anObj in [[self guardian] orcaObjects]) { 
+                if ([anObj class] == NSClassFromString(@"ORFec32Model") && (msk & 1 << [anObj stationNumber])) {
+                    ids = (hware_vals_t*) aId;
+                    ids += [anObj stationNumber];
+                    [anObj setBoardID:[NSString stringWithFormat:@"%x", ids->mb_id]];
+                    if ([anObj dcPresent:0]) [[anObj dc:0] setBoardID:[NSString stringWithFormat:@"%x", ids->dc_id[0]]];
+                    if ([anObj dcPresent:1]) [[anObj dc:1] setBoardID:[NSString stringWithFormat:@"%x", ids->dc_id[1]]];
+                    if ([anObj dcPresent:2]) [[anObj dc:2] setBoardID:[NSString stringWithFormat:@"%x", ids->dc_id[2]]];
+                    if ([anObj dcPresent:3]) [[anObj dc:3] setBoardID:[NSString stringWithFormat:@"%x", ids->dc_id[3]]];
+                    [msg appendFormat:@"slot: %2d, FEC: %4x, DB0: %4x, DB1: %4x, DB2: %4x, DB3: %4x\n",
+                          [anObj stationNumber], ids->mb_id, ids->dc_id[0], ids->dc_id[1], ids->dc_id[2], ids->dc_id[3]];
+                }
+            }
+            NSLogFont([NSFont userFixedPitchFontOfSize:0], msg);
+        }
+        else {
+            NSLog(@"%@ error loading config, init skipped.\n",[[self xl3Link] crateName]);
+        }
+    }//synchronized
+}
+*/
 
 - (void) ecalToOrca
 {
@@ -3686,5 +3742,93 @@ void SwapLongBlock(void* p, int32_t n)
         usleep(100000);
     }
     [hvPool release];
+}
+
+- (void) sendCommandWithDict:(NSDictionary*)argDict
+{
+    //separate thread detached from initCrateWithDict
+    NSAutoreleasePool* initPool = [[NSAutoreleasePool alloc] init];
+    NSMutableDictionary* resp = [[NSMutableDictionary alloc] init];
+    
+    /*
+    NSDictionary* argDict = [NSDictionary dictionaryWithObjectsAndKeys:
+                             [NSNumber numberWithInt:CRATE_INIT_ID], @"cmdId",
+                             [NSData dataWithBytes:&payload length:sizeof(XL3_PayloadStruct)], @"payload",
+                             [NSNumber numberWithBool:YES], @"response",
+                             @"initCrateDone:", @"callback",
+                             nil];
+     */
+    
+    XL3_PayloadStruct payload;
+    memcpy(&payload, [[argDict objectForKey:@"payload"] bytes], sizeof(XL3_PayloadStruct));
+
+    @try {
+        [[self xl3Link] sendCommand:[[argDict objectForKey:@"cmdId"] intValue]
+                        withPayload:&payload
+                        expectResponse:[[argDict objectForKey:@"response"] boolValue]];
+    }
+    @catch (NSException* e) {
+        NSLog(@"%@ init crate failed; error: %@ reason: %@\n",[[self xl3Link] crateName], [e name], [e reason]);
+        [resp setValue:[NSNumber numberWithBool:YES] forKey:@"error"];
+    }
+
+    [resp setValue:argDict forKey:@"sendCommandArgs"];
+    [resp setValue:[NSData dataWithBytes:&payload length:sizeof(XL3_PayloadStruct)] forKey:@"payload"];
+
+    [self performSelectorOnMainThread:NSSelectorFromString([argDict objectForKey:@"callback"])
+                           withObject:[resp autorelease] waitUntilDone:NO];
+
+    [initPool release];
+}
+
+- (void) initCrateDone:(NSDictionary*)resp {
+    //runs back on the main XL3Model thread
+    @synchronized(self) {
+
+        [[self xl3Link] setErrorTimeOut:[self xl3LinkTimeOut]];
+        
+        if ([[self xl3Link] isConnected] && [resp objectForKey:@"error"] == nil) {
+
+            NSLog(@"%@ init ok!\n",[[self xl3Link] crateName]);
+
+            XL3_PayloadStruct payload;
+            memcpy(&payload, [[resp objectForKey:@"payload"] bytes], sizeof(XL3_PayloadStruct));
+
+            [self setTriggerStatus:@"ON"];
+            unsigned short* aId = (unsigned short*) payload.payload + 2; //hard to say what the first int should be
+            unsigned short i;
+            for (i=0; i<16*5; i++) {
+                aId[i] = swapShort(aId[i]);
+            }
+
+            XL3_PayloadStruct init_payload;
+            memcpy(&payload, [[[resp objectForKey:@"sendCommandArgs"] objectForKey:@"payload"] bytes], sizeof(XL3_PayloadStruct));
+            unsigned long* aMbId = (unsigned long*) init_payload.payload;
+            unsigned long msk = aMbId[3];
+            
+            hware_vals_t* ids;
+            NSMutableString* msg = [NSMutableString stringWithFormat:@"\n"];
+            for (id anObj in [[self guardian] orcaObjects]) {
+                if ([anObj class] == NSClassFromString(@"ORFec32Model") && (msk & 1 << [anObj stationNumber])) {
+                    ids = (hware_vals_t*) aId;
+                    ids += [anObj stationNumber];
+                    [anObj setBoardID:[NSString stringWithFormat:@"%x", ids->mb_id]];
+                    if ([anObj dcPresent:0]) [[anObj dc:0] setBoardID:[NSString stringWithFormat:@"%x", ids->dc_id[0]]];
+                    if ([anObj dcPresent:1]) [[anObj dc:1] setBoardID:[NSString stringWithFormat:@"%x", ids->dc_id[1]]];
+                    if ([anObj dcPresent:2]) [[anObj dc:2] setBoardID:[NSString stringWithFormat:@"%x", ids->dc_id[2]]];
+                    if ([anObj dcPresent:3]) [[anObj dc:3] setBoardID:[NSString stringWithFormat:@"%x", ids->dc_id[3]]];
+                    [msg appendFormat:@"slot: %2d, FEC: %4x, DB0: %4x, DB1: %4x, DB2: %4x, DB3: %4x\n",
+                     [anObj stationNumber], ids->mb_id, ids->dc_id[0], ids->dc_id[1], ids->dc_id[2], ids->dc_id[3]];
+                }
+            }
+            NSLogFont([NSFont userFixedPitchFontOfSize:0], msg);
+        }
+        else {
+            NSLog(@"%@ Crate init failed.\n",[[self xl3Link] crateName]);
+        }
+
+        [self setXl3InitInProgress:NO];
+
+    }//synchronized
 }
 @end

@@ -120,6 +120,8 @@ enum {
     NSDateFormatter* xl3DateFormatter;
     float _xl3VltThreshold[12];
     BOOL _isXl3VltThresholdInInit;
+    int _xl3LinkTimeOut;
+    BOOL _xl3InitInProgress;
 }
 
 @property (nonatomic,assign) unsigned long xl3MegaBundleDataId;
@@ -170,6 +172,8 @@ enum {
 @property (nonatomic,assign) unsigned long hvCMOSReadsCounter;
 @property (nonatomic,assign) BOOL hvPanicFlag;
 @property (nonatomic,assign) BOOL isXl3VltThresholdInInit;
+@property (nonatomic,assign) int xl3LinkTimeOut;
+@property (nonatomic,assign) BOOL xl3InitInProgress;
 
 #pragma mark •••Initialization
 - (id)   init;
@@ -255,7 +259,7 @@ enum {
 
 - (void) initCrateRegistersOnly;
 - (void) initCrateWithXilinx:(BOOL)aXilinxFlag autoInit:(BOOL)anAutoInitFlag;
-- (void) initCrateWithXilinx:(BOOL)aXilinxFlag autoInit:(BOOL)anAutoInitFlag registersOnly:(BOOL)registersFlag;
+- (void) initCrateWithDict:(NSDictionary*)argDict;
 - (void) ecalToOrca;
 - (void) orcaToHw;
 

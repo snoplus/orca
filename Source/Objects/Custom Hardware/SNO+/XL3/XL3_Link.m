@@ -488,7 +488,6 @@ readFifoFlag = _readFifoFlag;
 	}
 }
 
-
 - (void) sendCommand:(long)aCmd withPayload:(XL3_PayloadStruct*)payloadBlock expectResponse:(BOOL)askForResponse
 {
 	//client is responsible for payload swapping, we take care of the header
@@ -738,7 +737,7 @@ static void SwapLongBlock(void* p, int32_t n)
 			
 		my_addr.sin_port = htons(portNumber);     // short, network byte order
 		if (bind(serverSocket, (struct sockaddr *)&my_addr, sizeof(struct sockaddr)) == -1)
-			[NSException raise:@"Bind failed" format:@"Couldn't bind to local XL3 Port %lu", portNumber];
+			[NSException raise:@"Bind failed" format:@"Couldn't bind to local XL3 Port %lu, %s", portNumber, strerror(errno)];
 		
 		if (listen(serverSocket, 1) == -1)
 			[NSException raise:@"Listen failed" format:@"Couldn't listen on local XL3 port %lu\n", portNumber];
@@ -757,9 +756,12 @@ static void SwapLongBlock(void* p, int32_t n)
 			}
 			else {
 				//disconnected by UI...
-				return;
+                [self setIsConnected: NO];
 			}
 		}
+        else {
+            [self setIsConnected:YES];
+        }
 	}
 	@catch (NSException* localException) {
 		NSLog(@"XL3 socket failed with exception: %@ with reason: %@\n", [localException name], [localException reason]);
@@ -776,18 +778,17 @@ static void SwapLongBlock(void* p, int32_t n)
 		connectState = kDisconnected;
 		[[NSNotificationCenter defaultCenter] postNotificationName:XL3_LinkConnectStateChanged object: self];
 		[self setIsConnected:NO];
-		
-		return;
-	}
+        //something went really bad, throttle the bad
+        [NSThread sleepForTimeInterval:1.0];
+    }
 	
-	connectState = kConnected;
-	[[NSNotificationCenter defaultCenter] postNotificationName:XL3_LinkConnectStateChanged object: self];
-	[self setIsConnected:YES];
-
-	//[self getRunInfoBlock];
-	//[[delegate crate] performSelector:@selector(connected) withObject:nil afterDelay:1];			
-
-	NSLog(@"%@ connected on local port %d\n",[self crateName], [self portNumber]);
+    if ([self isConnected]) {
+        connectState = kConnected;
+        [[NSNotificationCenter defaultCenter] postNotificationName:XL3_LinkConnectStateChanged object: self];
+        //[self getRunInfoBlock];
+        //[[delegate crate] performSelector:@selector(connected) withObject:nil afterDelay:1];
+        NSLog(@"%@ connected on local port %d\n",[self crateName], [self portNumber]);
+    }
 
 	fd_set fds;
 	int selectionResult = 0;
@@ -799,8 +800,9 @@ static void SwapLongBlock(void* p, int32_t n)
 	unsigned long bundle_count = 0;
 
 	time_t t0 = time(0);
+    BOOL go = [self isConnected];
     
-	while(1) {
+	while(go) { //yes, this is correct
 		if (!workingSocket) {
 			NSLog(@"%@ not connected <%@> port: %d\n", [self crateName], IPNumber, portNumber);
 			break;
