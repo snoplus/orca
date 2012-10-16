@@ -805,7 +805,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MModelTriggerModeChanged object:self userInfo:userInfo];
 }
 
-- (void) setLEDThreshold:(short)chan withValue:(short)aValue 
+- (void) setLEDThreshold:(short)chan withValue:(int)aValue 
 { 
 	if(aValue<0) aValue=0;
 	if(triggerMode[chan] == kTrapezoidalTriggerMode) {
@@ -1451,33 +1451,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
                        withAddMod:[self addressModifier]
                     usingAddSpace:0x01];
 }
-
-- (short) readCardInfo:(short) index
-{
-    unsigned long theValue = 0;
-    [[self adapter] readLongBlock:&theValue
-                        atAddress:[self baseAddress] + cardConstants[index].regOffset
-                        numToRead:1
-                       withAddMod:[self addressModifier]
-                    usingAddSpace:0x01];
-    return theValue & cardConstants[index].mask;
-}
-
-
-static struct {
-    NSString*       name;
-    NSString*       units;
-    unsigned long	regOffset;
-    unsigned short	mask;
-    unsigned short	initialValue;
-    float           ratio; //conversion constants
-} cardConstants[kNumGretina4MCardParams] = {
-    {@"External Window",	@"us",	kExternalWindow,        0x7FF,	0x190,    4.0/(float)0x190},
-    {@"Pileup Window",		@"us",	kPileupWindow,          0x7FF,	0x0400,	 10.0/(float)0x400},
-    {@"Ext Trigger Length", @"us",	kExtTrigSlidingLength,	0x7FF,	0x0190,	  4.0/(float)0x190},
-    {@"Collection Time",	@"us",	kCollectionTime,        0x01FF,	0x01C2,	  4.5/(float)0x1C2},
-    {@"Integration Time",	@"us",	kIntegrateTime,       0x03FF,	0x01C2,	  4.5/(float)0x1C2},
-};
 
 - (short) readExternalWindow
 {

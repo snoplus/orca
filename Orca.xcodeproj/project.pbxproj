@@ -2531,6 +2531,14 @@
 		84DEEBBD149916AD0092DB6C /* ORSerialDeviceModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84DEEBBB149916AD0092DB6C /* ORSerialDeviceModel.h */; };
 		84DEEBBE149916AD0092DB6C /* ORSerialDeviceModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84DEEBBC149916AD0092DB6C /* ORSerialDeviceModel.m */; };
 		84DF474A0962140800ABE071 /* ORDataExplorerController.h in Headers */ = {isa = PBXBuildFile; fileRef = 849F4C6E0768DA920087E9A8 /* ORDataExplorerController.h */; };
+		84DF4A08162DCE6B00261144 /* Gretina4M.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84DF4A00162DCE6B00261144 /* Gretina4M.nib */; };
+		84DF4A09162DCE6B00261144 /* Gretina4MCard.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84DF4A01162DCE6B00261144 /* Gretina4MCard.gif */; };
+		84DF4A0A162DCE6B00261144 /* ORGretina4MController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84DF4A02162DCE6B00261144 /* ORGretina4MController.h */; };
+		84DF4A0B162DCE6B00261144 /* ORGretina4MController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84DF4A03162DCE6B00261144 /* ORGretina4MController.m */; };
+		84DF4A0C162DCE6B00261144 /* ORGretina4MDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84DF4A04162DCE6B00261144 /* ORGretina4MDecoders.h */; };
+		84DF4A0D162DCE6B00261144 /* ORGretina4MDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84DF4A05162DCE6B00261144 /* ORGretina4MDecoders.m */; };
+		84DF4A0E162DCE6B00261144 /* ORGretina4MModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84DF4A06162DCE6B00261144 /* ORGretina4MModel.h */; };
+		84DF4A0F162DCE6B00261144 /* ORGretina4MModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84DF4A07162DCE6B00261144 /* ORGretina4MModel.m */; };
 		84E0968609F44E3200EFE044 /* ORTek754DModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C493B204059AEA005F64B1 /* ORTek754DModel.m */; };
 		84E099620CC934CC00EFBC8F /* play.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 84E099600CC934CB00EFBC8F /* play.tiff */; };
 		84E099630CC934CC00EFBC8F /* stop.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 84E099610CC934CB00EFBC8F /* stop.tiff */; };
@@ -5503,6 +5511,14 @@
 		84DEE4CD149794070092DB6C /* ORFPDSegmentGroup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORFPDSegmentGroup.m; path = Source/Experiments/Katrin/ORFPDSegmentGroup.m; sourceTree = SOURCE_ROOT; };
 		84DEEBBB149916AD0092DB6C /* ORSerialDeviceModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSerialDeviceModel.h; path = "Source/Objects/Hardware/Serial/Serial Base Classes/ORSerialDeviceModel.h"; sourceTree = SOURCE_ROOT; };
 		84DEEBBC149916AD0092DB6C /* ORSerialDeviceModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSerialDeviceModel.m; path = "Source/Objects/Hardware/Serial/Serial Base Classes/ORSerialDeviceModel.m"; sourceTree = SOURCE_ROOT; };
+		84DF4A00162DCE6B00261144 /* Gretina4M.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Gretina4M.nib; path = Source/Objects/Hardware/Vme/Gretina4M/Gretina4M.nib; sourceTree = SOURCE_ROOT; };
+		84DF4A01162DCE6B00261144 /* Gretina4MCard.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Gretina4MCard.gif; path = Source/Objects/Hardware/Vme/Gretina4M/Gretina4MCard.gif; sourceTree = SOURCE_ROOT; };
+		84DF4A02162DCE6B00261144 /* ORGretina4MController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORGretina4MController.h; path = Source/Objects/Hardware/Vme/Gretina4M/ORGretina4MController.h; sourceTree = SOURCE_ROOT; };
+		84DF4A03162DCE6B00261144 /* ORGretina4MController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORGretina4MController.m; path = Source/Objects/Hardware/Vme/Gretina4M/ORGretina4MController.m; sourceTree = SOURCE_ROOT; };
+		84DF4A04162DCE6B00261144 /* ORGretina4MDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORGretina4MDecoders.h; path = Source/Objects/Hardware/Vme/Gretina4M/ORGretina4MDecoders.h; sourceTree = SOURCE_ROOT; };
+		84DF4A05162DCE6B00261144 /* ORGretina4MDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORGretina4MDecoders.m; path = Source/Objects/Hardware/Vme/Gretina4M/ORGretina4MDecoders.m; sourceTree = SOURCE_ROOT; };
+		84DF4A06162DCE6B00261144 /* ORGretina4MModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORGretina4MModel.h; path = Source/Objects/Hardware/Vme/Gretina4M/ORGretina4MModel.h; sourceTree = SOURCE_ROOT; };
+		84DF4A07162DCE6B00261144 /* ORGretina4MModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORGretina4MModel.m; path = Source/Objects/Hardware/Vme/Gretina4M/ORGretina4MModel.m; sourceTree = SOURCE_ROOT; };
 		84DF917204D6D53C005F64B1 /* ORFileMover.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORFileMover.h; sourceTree = "<group>"; };
 		84DF917304D6D53C005F64B1 /* ORFileMover.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORFileMover.m; sourceTree = "<group>"; };
 		84E099600CC934CB00EFBC8F /* play.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = play.tiff; path = Source/Objects/Control/RunControl/play.tiff; sourceTree = SOURCE_ROOT; };
@@ -11453,6 +11469,22 @@
 			path = "Source/Objects/Hardware/Serial/Serial Base Classes";
 			sourceTree = SOURCE_ROOT;
 		};
+		84DF49FF162DCE6B00261144 /* Gretina4M */ = {
+			isa = PBXGroup;
+			children = (
+				84DF4A00162DCE6B00261144 /* Gretina4M.nib */,
+				84DF4A01162DCE6B00261144 /* Gretina4MCard.gif */,
+				84DF4A02162DCE6B00261144 /* ORGretina4MController.h */,
+				84DF4A03162DCE6B00261144 /* ORGretina4MController.m */,
+				84DF4A04162DCE6B00261144 /* ORGretina4MDecoders.h */,
+				84DF4A05162DCE6B00261144 /* ORGretina4MDecoders.m */,
+				84DF4A06162DCE6B00261144 /* ORGretina4MModel.h */,
+				84DF4A07162DCE6B00261144 /* ORGretina4MModel.m */,
+			);
+			name = Gretina4M;
+			path = Source/Objects/Hardware/Vme/Gretina4M;
+			sourceTree = SOURCE_ROOT;
+		};
 		84DF917104D6D51E005F64B1 /* FileMover */ = {
 			isa = PBXGroup;
 			children = (
@@ -12375,6 +12407,7 @@
 				8467E6A406480F0A00A35E6A /* Trigger32 */,
 				84749D0A07D6526F001553EC /* MCarrier */,
 				845115E104030088005F64B1 /* IPCarrier */,
+				84DF49FF162DCE6B00261144 /* Gretina4M */,
 				84CEDD0D0CDA7D9E002CFD3A /* Gretina4 */,
 				844445FE0E815C0D00A1440D /* XYCom */,
 				84E2063C11AD7841007D757F /* SIS3800 */,
@@ -13600,6 +13633,9 @@
 				8432BC2A15D9994E00C5FB5D /* ORMJDTestCryoView.h in Headers */,
 				8458EA3D15DBCFF6005C43A9 /* ORMPodCrateController.h in Headers */,
 				8458EA3F15DBCFF6005C43A9 /* ORMPodCrateModel.h in Headers */,
+				84DF4A0A162DCE6B00261144 /* ORGretina4MController.h in Headers */,
+				84DF4A0C162DCE6B00261144 /* ORGretina4MDecoders.h in Headers */,
+				84DF4A0E162DCE6B00261144 /* ORGretina4MModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14470,6 +14506,8 @@
 				2DAB012115EF988C00BC2540 /* EdelweissLogo.tif in Resources */,
 				2DAB012215EF988C00BC2540 /* KITLogo.tif in Resources */,
 				84150EDC1615FF9C0054FF08 /* Rad7Buttons.png in Resources */,
+				84DF4A08162DCE6B00261144 /* Gretina4M.nib in Resources */,
+				84DF4A09162DCE6B00261144 /* Gretina4MCard.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -15443,6 +15481,9 @@
 				8432BC2B15D9994E00C5FB5D /* ORMJDTestCryoView.m in Sources */,
 				8458EA3E15DBCFF6005C43A9 /* ORMPodCrateController.m in Sources */,
 				8458EA4015DBCFF6005C43A9 /* ORMPodCrateModel.m in Sources */,
+				84DF4A0B162DCE6B00261144 /* ORGretina4MController.m in Sources */,
+				84DF4A0D162DCE6B00261144 /* ORGretina4MDecoders.m in Sources */,
+				84DF4A0F162DCE6B00261144 /* ORGretina4MModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

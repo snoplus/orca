@@ -343,7 +343,7 @@ enum Gretina4MFIFOStates {
 - (void) setPoleZeroMultiplier:(short)chan withValue:(short)aValue;		
 - (void) setPZTraceEnabled:(short)chan withValue:(short)aValue;		
 - (void) setDebug:(short)chan withValue:(short)aValue;	
-- (void) setLEDThreshold:(short)chan withValue:(short)aValue;
+- (void) setLEDThreshold:(short)chan withValue:(int)aValue;
 - (void) setCFDDelay:(short)chan withValue:(short)aValue;	
 - (void) setCFDFraction:(short)chan withValue:(short)aValue;	
 - (void) setCFDThreshold:(short)chan withValue:(short)aValue;
@@ -445,6 +445,12 @@ enum Gretina4MFIFOStates {
 - (short) readCollectionTime;
 - (short) readIntegrateTime;
 - (short) readDownSample;
+
+- (void) writeExternalWindow;
+- (void) writePileUpWindow;
+- (void) writeExtTrigLength;
+- (void) writeCollectionTime;
+- (void) writeIntegrateTime;
 
 - (void)  writeClockMux;
 
