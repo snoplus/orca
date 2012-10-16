@@ -57,10 +57,11 @@
 
 - (void) awakeFromNib
 {
-    settingSize     = NSMakeSize(1200,510);
+    settingSize     = NSMakeSize(1060,460);
     rateSize		= NSMakeSize(790,340);
     registerTabSize	= NSMakeSize(400,287);
 	firmwareTabSize = NSMakeSize(340,187);
+	definitionsTabSize = NSMakeSize(1200,350);
     blankView = [[NSView alloc] init];
     
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
@@ -242,17 +243,7 @@
                      selector : @selector(cfdThresholdChanged:)
                          name : ORGretina4MModelCFDThresholdChanged
                        object : model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(dataDelayChanged:)
-                         name : ORGretina4MModelDataDelayChanged
-                       object : model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(dataLengthChanged:)
-                         name : ORGretina4MModelDataLengthChanged
-                       object : model];
-	
+		
     [notifyCenter addObserver : self
                      selector : @selector(fpgaFilePathChanged:)
                          name : ORGretina4MModelFpgaFilePathChanged
@@ -408,8 +399,6 @@
 	[self cfdDelayChanged:nil];
 	[self cfdFractionChanged:nil];
 	[self cfdThresholdChanged:nil];
-	[self dataDelayChanged:nil];
-	[self dataLengthChanged:nil];
 	
     [self rateGroupChanged:nil];
     [self integrationChanged:nil];
@@ -808,22 +797,6 @@
     }
 }
     
-- (void) dataDelayChanged:(NSNotification*)aNote
-{
-	short i;
-	for(i=0;i<kNumGretina4MChannels;i++){
-		[[dataDelayMatrix cellWithTag:i] setFloatValue:[model dataDelayConverted:i]];
-	}
-}
-
-- (void) dataLengthChanged:(NSNotification*)aNote
-{
-	short i;
-	for(i=0;i<kNumGretina4MChannels;i++){
-		[[dataLengthMatrix cellWithTag:i] setFloatValue:[model traceLengthConverted:i]];
-	}
-}
-
 - (void) noiseFloorIntegrationChanged:(NSNotification*)aNote
 {
 	[noiseFloorIntegrationField setFloatValue:[model noiseFloorIntegrationTime]];
@@ -904,8 +877,6 @@
 	[cfdDelayMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[cfdFractionMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[cfdThresholdMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
-	[dataDelayMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
-	[dataLengthMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[resetButton setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[loadMainFPGAButton setEnabled:!locked && !downloading];
 	[stopFPGALoadButton setEnabled:!locked && downloading];
@@ -1241,19 +1212,6 @@
 	}
 }
 
-- (IBAction) dataDelayAction:(id)sender
-{
-	if([sender intValue] != [model dataDelay:[[sender selectedCell] tag]]){
-		[model setDataDelayConverted:[[sender selectedCell] tag] withValue:[sender floatValue]];
-	}
-}
-
-- (IBAction) dataLengthAction:(id)sender
-{
-	if([sender intValue] != [model dataLength:[[sender selectedCell] tag]]){
-		[model setTraceLengthConverted:[[sender selectedCell] tag] withValue:[sender floatValue]];
-	}
-}
 
 -(IBAction) noiseFloorOffsetAction:(id)sender
 {
@@ -1484,6 +1442,11 @@
 	else if([tabView indexOfTabViewItem:tabViewItem] == 3){
 		[[self window] setContentView:blankView];
 		[self resizeWindowToSize:firmwareTabSize];
+		[[self window] setContentView:tabView];
+    }  
+	else if([tabView indexOfTabViewItem:tabViewItem] == 4){
+		[[self window] setContentView:blankView];
+		[self resizeWindowToSize:definitionsTabSize];
 		[[self window] setContentView:tabView];
     }  
 	

@@ -2539,6 +2539,7 @@
 		84DF4A0D162DCE6B00261144 /* ORGretina4MDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84DF4A05162DCE6B00261144 /* ORGretina4MDecoders.m */; };
 		84DF4A0E162DCE6B00261144 /* ORGretina4MModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84DF4A06162DCE6B00261144 /* ORGretina4MModel.h */; };
 		84DF4A0F162DCE6B00261144 /* ORGretina4MModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84DF4A07162DCE6B00261144 /* ORGretina4MModel.m */; };
+		84DF4B15162DF2C200261144 /* Gretina4MWaveform.png in Resources */ = {isa = PBXBuildFile; fileRef = 84DF4B14162DF2C200261144 /* Gretina4MWaveform.png */; };
 		84E0968609F44E3200EFE044 /* ORTek754DModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C493B204059AEA005F64B1 /* ORTek754DModel.m */; };
 		84E099620CC934CC00EFBC8F /* play.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 84E099600CC934CB00EFBC8F /* play.tiff */; };
 		84E099630CC934CC00EFBC8F /* stop.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 84E099610CC934CB00EFBC8F /* stop.tiff */; };
@@ -5519,6 +5520,7 @@
 		84DF4A05162DCE6B00261144 /* ORGretina4MDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORGretina4MDecoders.m; path = Source/Objects/Hardware/Vme/Gretina4M/ORGretina4MDecoders.m; sourceTree = SOURCE_ROOT; };
 		84DF4A06162DCE6B00261144 /* ORGretina4MModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORGretina4MModel.h; path = Source/Objects/Hardware/Vme/Gretina4M/ORGretina4MModel.h; sourceTree = SOURCE_ROOT; };
 		84DF4A07162DCE6B00261144 /* ORGretina4MModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORGretina4MModel.m; path = Source/Objects/Hardware/Vme/Gretina4M/ORGretina4MModel.m; sourceTree = SOURCE_ROOT; };
+		84DF4B14162DF2C200261144 /* Gretina4MWaveform.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Gretina4MWaveform.png; path = Source/Objects/Hardware/Vme/Gretina4M/Gretina4MWaveform.png; sourceTree = SOURCE_ROOT; };
 		84DF917204D6D53C005F64B1 /* ORFileMover.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORFileMover.h; sourceTree = "<group>"; };
 		84DF917304D6D53C005F64B1 /* ORFileMover.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORFileMover.m; sourceTree = "<group>"; };
 		84E099600CC934CB00EFBC8F /* play.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = play.tiff; path = Source/Objects/Control/RunControl/play.tiff; sourceTree = SOURCE_ROOT; };
@@ -11474,6 +11476,7 @@
 			children = (
 				84DF4A00162DCE6B00261144 /* Gretina4M.nib */,
 				84DF4A01162DCE6B00261144 /* Gretina4MCard.gif */,
+				84DF4B14162DF2C200261144 /* Gretina4MWaveform.png */,
 				84DF4A02162DCE6B00261144 /* ORGretina4MController.h */,
 				84DF4A03162DCE6B00261144 /* ORGretina4MController.m */,
 				84DF4A04162DCE6B00261144 /* ORGretina4MDecoders.h */,
@@ -14508,6 +14511,7 @@
 				84150EDC1615FF9C0054FF08 /* Rad7Buttons.png in Resources */,
 				84DF4A08162DCE6B00261144 /* Gretina4M.nib in Resources */,
 				84DF4A09162DCE6B00261144 /* Gretina4MCard.gif in Resources */,
+				84DF4B15162DF2C200261144 /* Gretina4MWaveform.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

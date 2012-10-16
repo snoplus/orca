@@ -48,8 +48,6 @@
 	IBOutlet NSMatrix*		cfdDelayMatrix;
 	IBOutlet NSMatrix*		cfdFractionMatrix;
 	IBOutlet NSMatrix*		cfdThresholdMatrix;
-	IBOutlet NSMatrix*		dataDelayMatrix;
-	IBOutlet NSMatrix*		dataLengthMatrix;
 	IBOutlet NSMatrix*      tpolMatrix;
 	IBOutlet NSMatrix*      triggerModeMatrix;
     IBOutlet NSMatrix*		chpsdvMatrix;
@@ -116,6 +114,7 @@
     NSSize rateSize;
     NSSize registerTabSize;
 	NSSize firmwareTabSize;
+	NSSize definitionsTabSize;
 
 }
 
@@ -166,8 +165,6 @@
 - (void) cfdDelayChanged:(NSNotification*)aNote;
 - (void) cfdFractionChanged:(NSNotification*)aNote;
 - (void) cfdThresholdChanged:(NSNotification*)aNote;
-- (void) dataDelayChanged:(NSNotification*)aNote;
-- (void) dataLengthChanged:(NSNotification*)aNote;
 - (void) miscAttributesChanged:(NSNotification*)aNote;
 
 - (void) scaleAction:(NSNotification*)aNote;
@@ -223,8 +220,6 @@
 - (IBAction) cfdFractionAction:(id)sender;
 - (IBAction) cfdDelayAction:(id)sender;
 - (IBAction) cfdThresholdAction:(id)sender;
-- (IBAction) dataDelayAction:(id)sender;
-- (IBAction) dataLengthAction:(id)sender;
 - (IBAction) downloadMainFPGAAction:(id)sender;
 - (IBAction) stopLoadingMainFPGAAction:(id)sender;
 

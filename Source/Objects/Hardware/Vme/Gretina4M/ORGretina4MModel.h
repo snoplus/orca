@@ -185,12 +185,10 @@ enum Gretina4MFIFOStates {
     short			debug[kNumGretina4MChannels];
     short			pileUp[kNumGretina4MChannels];
     short			triggerMode[kNumGretina4MChannels];
-    unsigned long   ledThreshold[kNumGretina4MChannels];
+    int				ledThreshold[kNumGretina4MChannels];
     short			cfdDelay[kNumGretina4MChannels];
     short			cfdThreshold[kNumGretina4MChannels];
     short			cfdFraction[kNumGretina4MChannels];
-    short           dataDelay[kNumGretina4MChannels];
-    short           dataLength[kNumGretina4MChannels];
     short           cfdEnabled[kNumGretina4MChannels];
     short           poleZeroEnabled[kNumGretina4MChannels];
     short           poleZeroMult[kNumGretina4MChannels];
@@ -225,8 +223,8 @@ enum Gretina4MFIFOStates {
 	unsigned long fifoStateAddress;
 
 	BOOL oldEnabled[kNumGretina4MChannels];
-	unsigned long oldLEDThreshold[kNumGretina4MChannels];
-	unsigned long newLEDThreshold[kNumGretina4MChannels];
+	int oldLEDThreshold[kNumGretina4MChannels];
+	int newLEDThreshold[kNumGretina4MChannels];
 	BOOL noiseFloorRunning;
 	int noiseFloorState;
 	int noiseFloorWorkingChannel;
@@ -347,10 +345,6 @@ enum Gretina4MFIFOStates {
 - (void) setCFDDelay:(short)chan withValue:(short)aValue;	
 - (void) setCFDFraction:(short)chan withValue:(short)aValue;	
 - (void) setCFDThreshold:(short)chan withValue:(short)aValue;
-- (void) setDataDelay:(short)chan withValue:(short)aValue;
-// Data Length refers to total length of the record (w/ header), trace length refers to length of trace
-- (void) setDataLength:(short)chan withValue:(short)aValue;  
-- (void) setTraceLength:(short)chan withValue:(short)aValue;  
 - (void) setMrpsrt:(short)chan withValue:(short)aValue;
 - (void) setFtCnt:(short)chan withValue:(short)aValue;
 - (void) setMrpsdv:(short)chan withValue:(short)aValue;
@@ -369,14 +363,10 @@ enum Gretina4MFIFOStates {
 - (short) debug:(short)chan;		
 - (short) pileUp:(short)chan;		
 - (short) triggerMode:(short)chan;
-- (short) ledThreshold:(short)chan;	
+- (int) ledThreshold:(short)chan;	
 - (short) cfdDelay:(short)chan;		
 - (short) cfdFraction:(short)chan;	
 - (short) cfdThreshold:(short)chan;	
-- (short) dataDelay:(short)chan;		
-// Data Length refers to total length of the record (w/ header), trace length refers to length of trace
-- (short) dataLength:(short)chan;
-- (short) traceLength:(short)chan;
 - (short) mrpsrt:(short)chan;
 - (short) ftCnt:(short)chan;
 - (short) mrpsdv:(short)chan;
@@ -391,15 +381,10 @@ enum Gretina4MFIFOStates {
 - (float) poleZeroTauConverted:(short)chan;
 - (float) cfdDelayConverted:(short)chan;
 - (float) cfdThresholdConverted:(short)chan;
-- (float) dataDelayConverted:(short)chan;
-- (float) traceLengthConverted:(short)chan;
 
 - (void) setPoleZeroTauConverted:(short)chan withValue:(float)aValue;	
 - (void) setCFDDelayConverted:(short)chan withValue:(float)aValue;	
 - (void) setCFDThresholdConverted:(short)chan withValue:(float)aValue;
-// Data Length refers to total length of the record (w/ header), trace length refers to length of trace
-- (void) setDataDelayConverted:(short)chan withValue:(float)aValue;   
-- (void) setTraceLengthConverted:(short)chan withValue:(float)aValue;  
 
 - (void) setExternalWindowConverted:(float)aValue;
 - (void) setPileUpWindowConverted:(float)aValue;
@@ -526,8 +511,6 @@ extern NSString* ORGretina4MModelLEDThresholdChanged;
 extern NSString* ORGretina4MModelCFDDelayChanged;
 extern NSString* ORGretina4MModelCFDFractionChanged;
 extern NSString* ORGretina4MModelCFDThresholdChanged;
-extern NSString* ORGretina4MModelDataDelayChanged;
-extern NSString* ORGretina4MModelDataLengthChanged;
 
 extern NSString* ORGretina4MSettingsLock;
 extern NSString* ORGretina4MRegisterLock;
