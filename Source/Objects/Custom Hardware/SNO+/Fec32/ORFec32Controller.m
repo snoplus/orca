@@ -102,7 +102,7 @@
 		[[cmosRates0Matrix cellAtRow:i column:0] setAlignment:NSRightTextAlignment];
 		[[cmosRates1Matrix cellAtRow:i column:0] setAlignment:NSRightTextAlignment];
 	}
-	
+    [[self window] makeFirstResponder:groupView];
 	[super awakeFromNib];
 }
 
@@ -259,8 +259,10 @@
 	[fecNumberField setIntValue:[model stationNumber]];
 	[crateNumberField setIntValue:[[model guardian] crateNumber]];
 	[pmtView setNeedsDisplay:YES];
+    for (id db in [[groupView group] orcaObjects]) [db setHighlighted:NO];
 	[self updateWindow];
  	[self updateButtons];
+    [[self window] makeFirstResponder:groupView];
 }
 
 #pragma mark •••Interface Management
@@ -359,7 +361,7 @@
 
 - (void) isNowKeyWindow:(NSNotification*)aNotification
 {
-	[[self window] makeFirstResponder:(NSResponder*)groupView];
+	//[[self window] makeFirstResponder:(NSResponder*)groupView];
 }
 
 - (void) enablePmtGroup:(short)enabled groupNumber:(short)group
@@ -466,6 +468,7 @@
 
 -(void) groupChanged:(NSNotification*)note
 {
+    for (id db in [[groupView group] orcaObjects]) [db setHighlighted:NO];
 	[self updateWindow];
 	[pmtView setNeedsDisplay:YES];
 }

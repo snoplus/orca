@@ -26,6 +26,8 @@
 #import "ORSNOConstants.h"
 #import "ORFec32Model.h"
 #import "ORFecDaughterCardModel.h"
+#import "OROrderedObjManager.h"
+#import "ObjectFactory.h"
 #import "ORDataTypeAssigner.h"
 #import "ORCouchDB.h"
 
@@ -1420,11 +1422,11 @@ void SwapLongBlock(void* p, int32_t n)
         
         BOOL aXilinxFlag = NO;
         if ([argDict objectForKey:@"xilinxFlag"])
-            registersFlag = [[argDict objectForKey:@"xilinxFlag"] boolValue];
+            aXilinxFlag = [[argDict objectForKey:@"xilinxFlag"] boolValue];
         
         BOOL anAutoInitFlag = NO;
         if ([argDict objectForKey:@"autoInit"])
-            registersFlag = [[argDict objectForKey:@"autoInit"] boolValue];
+            anAutoInitFlag = [[argDict objectForKey:@"autoInit"] boolValue];
         
         XL3_PayloadStruct payload;
         memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
@@ -3802,26 +3804,50 @@ void SwapLongBlock(void* p, int32_t n)
             }
 
             XL3_PayloadStruct init_payload;
-            memcpy(&payload, [[[resp objectForKey:@"sendCommandArgs"] objectForKey:@"payload"] bytes], sizeof(XL3_PayloadStruct));
+            memcpy(&init_payload, [[[resp objectForKey:@"sendCommandArgs"] objectForKey:@"payload"] bytes], sizeof(XL3_PayloadStruct));
             unsigned long* aMbId = (unsigned long*) init_payload.payload;
+            if ([xl3Link needToSwap]) {
+                for (i=0; i<6; i++) aMbId[i] = swapLong(aMbId[i]);
+            }
             unsigned long msk = aMbId[3];
             
-            hware_vals_t* ids;
-            NSMutableString* msg = [NSMutableString stringWithFormat:@"\n"];
-            for (id anObj in [[self guardian] orcaObjects]) {
-                if ([anObj class] == NSClassFromString(@"ORFec32Model") && (msk & 1 << [anObj stationNumber])) {
-                    ids = (hware_vals_t*) aId;
-                    ids += [anObj stationNumber];
-                    [anObj setBoardID:[NSString stringWithFormat:@"%x", ids->mb_id]];
-                    if ([anObj dcPresent:0]) [[anObj dc:0] setBoardID:[NSString stringWithFormat:@"%x", ids->dc_id[0]]];
-                    if ([anObj dcPresent:1]) [[anObj dc:1] setBoardID:[NSString stringWithFormat:@"%x", ids->dc_id[1]]];
-                    if ([anObj dcPresent:2]) [[anObj dc:2] setBoardID:[NSString stringWithFormat:@"%x", ids->dc_id[2]]];
-                    if ([anObj dcPresent:3]) [[anObj dc:3] setBoardID:[NSString stringWithFormat:@"%x", ids->dc_id[3]]];
-                    [msg appendFormat:@"slot: %2d, FEC: %4x, DB0: %4x, DB1: %4x, DB2: %4x, DB3: %4x\n",
-                     [anObj stationNumber], ids->mb_id, ids->dc_id[0], ids->dc_id[1], ids->dc_id[2], ids->dc_id[3]];
+            if (aMbId[1] == 1) { //XilinX flag
+                hware_vals_t* ids;
+                NSMutableString* msg = [NSMutableString stringWithFormat:@"\n"];
+                unsigned short slot;
+                //for (id anObj in [[self guardian] orcaObjects]) {
+                for (slot=0; slot<16; slot++) {
+                    //if ([anObj class] == NSClassFromString(@"ORFec32Model") && (msk & 1 << [anObj stationNumber])) {
+                    if (msk & 0x1 << slot) {
+                        ORFec32Model* anObj = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-slot];
+                        ids = (hware_vals_t*) aId;
+                        ids += [anObj stationNumber];
+                        [anObj setBoardID:[NSString stringWithFormat:@"%x", ids->mb_id]];
+                        for (i=0; i<4; i++) {
+                            if (ids->dc_id[i] != 0x0 && ids->dc_id[i] != 0xffff) {
+                                //ORFecDaughterCardModel* theCard = [[OROrderedObjManager for:self] objectInSlot:workingSlot];
+                                if (![anObj dcPresent:i]) {
+                                    ORFecDaughterCardModel* proxyDC = [ObjectFactory makeObject:@"ORFecDaughterCardModel"];
+                                    [anObj addObject:proxyDC];
+                                    [anObj place:proxyDC intoSlot:i];
+                                    NSLog(@"slot %2d DB %d ID 0x%4x was added.\n", [anObj stationNumber], i, ids->dc_id[i]);
+                                }
+                                [[anObj dc:i] setBoardID:[NSString stringWithFormat:@"%x", ids->dc_id[i]]];
+                            }
+                            else {
+                                if ([anObj dcPresent:i]) {
+                                    ORFecDaughterCardModel* theCard = [[OROrderedObjManager for:anObj] objectInSlot:i];
+                                    if (theCard) [anObj removeObject:theCard];
+                                    NSLog(@"slot %2d DB %d has BAD ID and was removed.\n", [anObj stationNumber], i);
+                                }
+                            }
+                        }
+                        [msg appendFormat:@"slot: %2d, FEC: %4x, DB0: %4x, DB1: %4x, DB2: %4x, DB3: %4x\n",
+                         [anObj stationNumber], ids->mb_id, ids->dc_id[0], ids->dc_id[1], ids->dc_id[2], ids->dc_id[3]];
+                    }
                 }
+                NSLogFont([NSFont userFixedPitchFontOfSize:0], msg);
             }
-            NSLogFont([NSFont userFixedPitchFontOfSize:0], msg);
         }
         else {
             NSLog(@"%@ Crate init failed.\n",[[self xl3Link] crateName]);

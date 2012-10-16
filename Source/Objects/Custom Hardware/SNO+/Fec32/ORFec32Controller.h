@@ -27,6 +27,7 @@
 @class ORGroupView;
 
 @interface ORFec32Controller : OrcaObjectController  {
+    IBOutlet NSTabView* tabView;
     IBOutlet ORGroupView*	groupView;
 	IBOutlet NSButton*		showVoltsCB;
 	IBOutlet NSTextField*	commentsTextField;
