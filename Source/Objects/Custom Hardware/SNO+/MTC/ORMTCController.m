@@ -38,7 +38,6 @@
 - (void) loadDBFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 #endif
 - (void) selectAndLoadDBFile:(NSString*)aStartPath;
-- (void) setMaskTags:(NSMatrix*)aMaskSet;
 - (void) setupNHitFormats;
 - (void) setupESumFormats;
 - (void) storeUserNHitValue:(float)value index:(int) thresholdIndex;
@@ -62,15 +61,11 @@
     //standardOpsSize	= NSMakeSize(390,530);
 	standardOpsSize	= NSMakeSize(560,500);
     settingsSize	= NSMakeSize(790,610);
-    triggerSize		= NSMakeSize(780,630);
+    triggerSize		= NSMakeSize(790,630);
   
     blankView = [[NSView alloc] init];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
 
-	
-	[self setMaskTags:globalTriggerMaskMatrix2];
-	[self setMaskTags:globalTriggerCrateMaskMatrix2];
-	[self setMaskTags:pedCrateMaskMatrix2];
 	[initProgressField setHidden:YES];
 	
     [super awakeFromNib];
@@ -265,7 +260,6 @@
 	[initNoXilinxButton			setEnabled: !lockedOrRunningMaintenance];
 	[initNo10MHzButton			setEnabled: !lockedOrRunningMaintenance];
 	[initNoXilinxNo100MHzButton setEnabled: !lockedOrRunningMaintenance];
-	[makeCrateMaskButton		setEnabled: !lockedOrRunningMaintenance];
 	//[load10MhzCounterButton		setEnabled: !lockedOrRunningMaintenance];
 	//[loadOnlineMaskButton		setEnabled: !lockedOrRunningMaintenance];
 	//[loadDacsButton				setEnabled: !lockedOrRunningMaintenance];
@@ -274,7 +268,6 @@
 	[findTriggerZerosButton		setEnabled: !lockedOrRunningMaintenance];
 	[continuousButton			setEnabled: !lockedOrRunningMaintenance];
 	[stopTriggerZeroButton		setEnabled: !lockedOrRunningMaintenance];
-	[passiveOnlyButton			setEnabled: !lockedOrRunningMaintenance];
 	//[setCoarseDelayButton		setEnabled: !lockedOrRunningMaintenance];
 	
 	//we want to fire pedestals during runs
@@ -286,13 +279,9 @@
 	[fixedTimePedestalsCountField	setEnabled: !sequenceRunning && ![model isPulserFixedRate]];
 	[fixedTimePedestalsDelayField	setEnabled: !sequenceRunning && ![model isPulserFixedRate]];	
     //and set thresholds
-	[makeCrateMaskButton		setEnabled:YES];
 	[load10MhzCounterButton		setEnabled:YES];
-	[loadOnlineMaskButton		setEnabled:YES];
-	[loadDacsButton				setEnabled:YES];
 	[firePedestalsButton		setEnabled:YES];
 	[setCoarseDelayButton		setEnabled:YES];
-
 }
 
 - (void) documentLockChanged:(NSNotification*)aNotification
@@ -435,21 +424,15 @@
 	int maskValue = [model dbIntByIndex: kGtMask];
 	for(i=0;i<26;i++){
 		[[globalTriggerMaskMatrix cellWithTag:i]  setIntValue: maskValue & (1<<i)];
-		[[globalTriggerMaskMatrix2 cellWithTag:i] setIntValue: maskValue & (1<<i)];
 	}
 	maskValue = [model dbIntByIndex: kGtCrateMask];
 	for(i=0;i<25;i++){
 		[[globalTriggerCrateMaskMatrix cellWithTag:i]  setIntValue: maskValue & (1<<i)];
-		[[globalTriggerCrateMaskMatrix2 cellWithTag:i] setIntValue: maskValue & (1<<i)];
 	}
 	maskValue = [model dbIntByIndex: kPEDCrateMask];
 	for(i=0;i<25;i++){
 		[[pedCrateMaskMatrix cellWithTag:i]  setIntValue: maskValue & (1<<i)];
-		[[pedCrateMaskMatrix2 cellWithTag:i] setIntValue: maskValue & (1<<i)];
 	}
-	maskValue = [model dbIntByIndex: kControlMask];
-	for(i=0;i<3;i++)[[controlRegMaskMatrix cellWithTag:i] setIntValue: maskValue & (1<<i)];
-	
 }
 
 - (void) lastFileLoadedChanged:(NSNotification*)aNote
@@ -718,6 +701,11 @@
 	[model setupGTCorseDelay];
 }
 
+- (IBAction) standardSetFineDelay:(id) sender
+{
+//TODO
+}
+
 - (IBAction) standardIsPulserFixedRate:(id) sender
 {
 	[self endEditing];
@@ -775,11 +763,6 @@
 	[self buttonPushed:sender];
 }
 
-- (IBAction) standardPeriodicReadout:(id) sender 
-{
-	[self buttonPushed:sender];
-}
-
 //Settings buttons.
 - (IBAction) eSumViewTypeAction:(id)sender
 {
@@ -796,16 +779,6 @@
 - (IBAction) settingsLoadDBFile:(id) sender 
 {
 	[self selectAndLoadDBFile:[model lastFileLoaded]];
-}
-
-- (IBAction) settingsDefaultGetSet:(id) sender 
-{
-	[self selectAndLoadDBFile:[model lastFile]];
-}
-
-- (IBAction) settingsMTCRecordSaveAs:(id) sender 
-{
-	[self settingsDefaultSaveSet:[model lastFile]];
 }
 
 - (IBAction) settingsXilinxFile:(id) sender 
@@ -838,22 +811,6 @@
                        didEndSelector:@selector(setXilinxFileDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
 #endif
-}
-
-- (IBAction) settingsLoadDefVals:(id) sender 
-{
-	[model loadSet:[model defaultFile]];
-	NSLog(@"MTC DataBase loaded from: %@\n",[[[model defaultFile] stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]);
-}
-
-- (IBAction) settingsPrint:(id) sender 
-{
-	NSLog(@"%@\n",[model mtcDataBase]);
-}
-
-- (IBAction) settingsNewComments:(id) sender 
-{
-	[model setDbObject:[sender stringValue] forIndex:kDBComments];
 }
 
 - (IBAction) settingsMTCDAction:(id) sender 
@@ -926,18 +883,6 @@
 	[model setDbLong:mask forIndex:kGtCrateMask];
 }
 
-- (IBAction) settingsControlRegMaskAction:(id) sender 
-{
-	unsigned long mask = 0;
-	int i;
-	for(i=0;i<3;i++){
-		if([[sender cellWithTag:i] intValue]){	
-			mask |= (1L << i);
-		}
-	}
-	[model setDbLong:mask forIndex:kControlMask];
-}
-
 - (IBAction) settingsPEDCrateMaskAction:(id) sender 
 {
 	unsigned long mask = 0;
@@ -949,7 +894,6 @@
 	}
 	[model setDbLong:mask forIndex:kPEDCrateMask];
 }
-
 
 - (IBAction) settingsDefValFile:(id) sender 
 {
@@ -1028,6 +972,61 @@
 #endif	
 }
 
+- (IBAction) triggerMTCAN100:(id) sender
+{
+    //TODO
+}
+
+- (IBAction) triggerMTCAN20:(id) sender
+{
+    //TODO
+}
+
+- (IBAction) triggerMTCAEHI:(id) sender
+{
+    //TODO
+}
+
+- (IBAction) triggerMTCAELO:(id) sender
+{
+    //TODO
+}
+
+- (IBAction) triggerMTCAOELO:(id) sender
+{
+    //TODO
+}
+
+- (IBAction) triggerMTCAOEHI:(id) sender
+{
+    //TODO
+}
+
+- (IBAction) triggerMTCAOWLN:(id) sender
+{
+    //TODO
+}
+
+- (IBAction) triggersLoadTriggerMask:(id) sender
+{
+    //TODO
+}
+
+- (IBAction) triggersLoadGTCrateMask:(id) sender
+{
+    //TODO
+}
+
+- (IBAction) triggersLoadPEDCrateMask:(id) sender
+{
+    //TODO
+}
+
+- (IBAction) triggersLoadMTCACrateMask:(id) sender
+{
+    //TODO
+}
+
 @end
 
 #pragma mark •••PrivateInterface
@@ -1072,14 +1071,6 @@
     }
 }
 #endif
-
-- (void) setMaskTags:(NSMatrix*)aMaskSet
-{
-	//note... works only for the vertical mask matrices
-	int n = [aMaskSet numberOfRows];
-	int i;
-	for(i=0;i<n;i++)[[aMaskSet cellAtRow:i column:0] setTag:i];
-}
 
 - (void) selectAndLoadDBFile:(NSString*)aStartPath
 {

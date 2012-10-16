@@ -1381,7 +1381,17 @@ void SwapLongBlock(void* p, int32_t n)
 	//[[self xl1] executeCommandList:aList];		
 }
 
+- (void) initCrateRegistersOnly
+{
+    [self initCrateWithXilinx:NO autoInit:NO registersOnly:YES];
+}
+
 - (void) initCrateWithXilinx:(BOOL)aXilinxFlag autoInit:(BOOL)anAutoInitFlag
+{
+    [self initCrateWithXilinx:aXilinxFlag autoInit:anAutoInitFlag registersOnly:NO];
+}
+
+- (void) initCrateWithXilinx:(BOOL)aXilinxFlag autoInit:(BOOL)anAutoInitFlag registersOnly:(BOOL)registersFlag
 {
 	XL3_PayloadStruct payload;
 	memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
@@ -1451,6 +1461,9 @@ void SwapLongBlock(void* p, int32_t n)
 		aMbId[4] = 0;
 		// cmos shift regs only if != 0
 		aMbId[5] = 0;
+        if (registersFlag) {
+            aMbId[5] = 1;
+        }
 		
 		if ([xl3Link needToSwap]) {
 			for (i=0; i<6; i++) aMbId[i] = swapLong(aMbId[i]);

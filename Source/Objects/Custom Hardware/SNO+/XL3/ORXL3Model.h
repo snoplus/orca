@@ -253,7 +253,9 @@ enum {
 - (void) writeXL3Register:(short)aRegister value:(unsigned long)aValue;
 - (unsigned long) readXL3Register:(short)aRegister;
 
+- (void) initCrateRegistersOnly;
 - (void) initCrateWithXilinx:(BOOL)aXilinxFlag autoInit:(BOOL)anAutoInitFlag;
+- (void) initCrateWithXilinx:(BOOL)aXilinxFlag autoInit:(BOOL)anAutoInitFlag registersOnly:(BOOL)registersFlag;
 - (void) ecalToOrca;
 - (void) orcaToHw;
 

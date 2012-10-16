@@ -49,11 +49,10 @@
 	IBOutlet NSButton*		initNoXilinxButton;
 	IBOutlet NSButton*		initNo10MHzButton;
 	IBOutlet NSButton*		initNoXilinxNo100MHzButton;
-	IBOutlet NSButton*		makeCrateMaskButton;
 	IBOutlet NSButton*		load10MhzCounterButton;
-	IBOutlet NSButton*		loadOnlineMaskButton;
+	IBOutlet NSButton*		setFineDelayButton;
 	IBOutlet NSButton*		setCoarseDelayButton;
-	IBOutlet NSButton*		loadDacsButton;
+	IBOutlet NSButton*		loadMTCADacsButton;
 	IBOutlet NSButton*		firePedestalsButton;
 	IBOutlet NSButton*		stopPedestalsButton;
 	IBOutlet NSButton*		continuePedestalsButton;
@@ -65,7 +64,6 @@
 	IBOutlet NSButton*		findTriggerZerosButton;
 	IBOutlet NSButton*		continuousButton;
 	IBOutlet NSButton*		stopTriggerZeroButton;
-	IBOutlet NSButton*		passiveOnlyButton;
 	IBOutlet NSProgressIndicator* initProgressBar;
 	IBOutlet NSTextField*	initProgressField;
 	IBOutlet NSMatrix*		isPulserFixedRateMatrix;
@@ -87,20 +85,27 @@
  	IBOutlet NSTextField*	coarseDelayField;
  	IBOutlet NSTextField*	fineDelayField;
 
-	IBOutlet NSMatrix*		globalTriggerMaskMatrix;
-	IBOutlet NSMatrix*		globalTriggerCrateMaskMatrix;
-	IBOutlet NSMatrix*		pedCrateMaskMatrix;
-	IBOutlet NSMatrix*		controlRegMaskMatrix;
 	IBOutlet NSMatrix*		nhitMatrix;
 	IBOutlet NSMatrix*		esumMatrix;
 	IBOutlet NSTextField*	commentsField;
-	IBOutlet NSButton*		commentButton;
 
 	//trigger
-	IBOutlet NSMatrix*		globalTriggerMaskMatrix2;
-	IBOutlet NSMatrix*		globalTriggerCrateMaskMatrix2;
-	IBOutlet NSMatrix*		pedCrateMaskMatrix2;
-
+	IBOutlet NSMatrix*		globalTriggerMaskMatrix;
+	IBOutlet NSMatrix*		globalTriggerCrateMaskMatrix;
+	IBOutlet NSMatrix*		pedCrateMaskMatrix;
+	IBOutlet NSMatrix*		mtcaN100Matrix;
+	IBOutlet NSMatrix*		mtcaN20Matrix;
+	IBOutlet NSMatrix*		mtcaEHIMatrix;
+	IBOutlet NSMatrix*		mtcaELOMatrix;
+	IBOutlet NSMatrix*		mtcaOELOMatrix;
+	IBOutlet NSMatrix*		mtcaOEHIMatrix;
+	IBOutlet NSMatrix*		mtcaOWLNMatrix;
+    
+    IBOutlet NSButton* loadTriggerMaskButton;
+    IBOutlet NSButton* loadGTCrateMaskButton;
+    IBOutlet NSButton* loadPEDCrateMaskButton;
+    IBOutlet NSButton* loadMTCACrateMaskButton;
+    
 	BOOL	sequenceRunning;
     NSView* blankView;
     NSSize  basicOpsSize;
@@ -171,9 +176,9 @@
 - (IBAction) standardInitMTCno10MHz:(id) sender;
 - (IBAction) standardInitMTCnoXilinxno10MHz:(id) sender;
 - (IBAction) standardLoad10MHzCounter:(id) sender;
-- (IBAction) standardLoadOnlineGTMasks:(id) sender;
 - (IBAction) standardLoadMTCADacs:(id) sender;
 - (IBAction) standardSetCoarseDelay:(id) sender;
+- (IBAction) standardSetFineDelay:(id) sender;
 - (IBAction) standardIsPulserFixedRate:(id) sender;
 - (IBAction) standardFirePedestals:(id) sender;
 - (IBAction) standardStopPedestals:(id) sender;
@@ -184,7 +189,6 @@
 - (IBAction) standardSetPedestalsDelay:(id) sender;
 - (IBAction) standardFindTriggerZeroes:(id) sender;
 - (IBAction) standardStopFindTriggerZeroes:(id) sender;
-- (IBAction) standardPeriodicReadout:(id) sender;
 
 //Settings
 - (IBAction) eSumViewTypeAction:(id)sender;
@@ -192,18 +196,25 @@
 - (IBAction) settingsLoadDBFile:(id) sender;
 - (IBAction) settingsDefValFile:(id) sender;
 - (IBAction) settingsXilinxFile:(id) sender;
-- (IBAction) settingsDefaultGetSet:(id) sender;
-- (IBAction) settingsDefaultSaveSet:(id) sender;
-- (IBAction) settingsMTCRecordSaveAs:(id) sender;
-- (IBAction) settingsLoadDefVals:(id) sender;
-- (IBAction) settingsPrint:(id) sender;
-- (IBAction) settingsNewComments:(id) sender;
 - (IBAction) settingsMTCDAction:(id) sender;
 - (IBAction) settingsNHitAction:(id) sender;
 - (IBAction) settingsESumAction:(id) sender;
 - (IBAction) settingsGTMaskAction:(id) sender;
 - (IBAction) settingsGTCrateMaskAction:(id) sender;
-- (IBAction) settingsControlRegMaskAction:(id) sender; 
-- (IBAction) settingsPEDCrateMaskAction:(id) sender; 
+- (IBAction) settingsPEDCrateMaskAction:(id) sender;
+
+//Triggers
+- (IBAction) triggerMTCAN100:(id) sender;
+- (IBAction) triggerMTCAN20:(id) sender;
+- (IBAction) triggerMTCAEHI:(id) sender;
+- (IBAction) triggerMTCAELO:(id) sender;
+- (IBAction) triggerMTCAOELO:(id) sender;
+- (IBAction) triggerMTCAOEHI:(id) sender;
+- (IBAction) triggerMTCAOWLN:(id) sender;
+
+- (IBAction) triggersLoadTriggerMask:(id) sender;
+- (IBAction) triggersLoadGTCrateMask:(id) sender;
+- (IBAction) triggersLoadPEDCrateMask:(id) sender;
+- (IBAction) triggersLoadMTCACrateMask:(id) sender;
 
 @end

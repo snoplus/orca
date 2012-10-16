@@ -523,7 +523,7 @@ readFifoFlag = _readFifoFlag;
         }
 	}
 	if (! askForResponse) {
-		[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.02]];
+		[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.005]];
 	}
 }
 
@@ -623,7 +623,8 @@ readFifoFlag = _readFifoFlag;
 				userInfo:nil];
 		}
 		else {
-            usleep(1000);
+            [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.01]];
+            //usleep(1000);
         }
 	}
 
