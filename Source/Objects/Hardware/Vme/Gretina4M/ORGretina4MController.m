@@ -1389,14 +1389,22 @@
         int chan;
         for(chan = 0;chan<kNumGretina4MChannels;chan++){
             unsigned value = [model readControlReg:chan];
-            NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"chan: %d Enabled: %@ Debug: %@  PileUp: %@ CFD: %@ Pole-zero: %@ Polarity: 0x%02x TriggerMode: 0x%02x\n",
+			
+			int pol=(value>>10)&0x3;
+			NSString* polString = @"?";
+			if(pol==0)polString = @"None";
+			else if(pol==1) polString = @"Pos";
+			else if(pol==2) polString = @"Neg";
+			else if(pol==3) polString = @"Both";
+			
+            NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"chan: %d Enabled: %@ Debug: %@  Presum: %@ CFD: %@ Pole-zero: %@ Polarity: %@ TriggerMode: 0x%02x\n",
                       chan, 
                       (value&0x1)?@"[YES]":@"[ NO]",		//enabled
                       ((value>>1)&0x1)?@"[YES]":@"[ NO]",	//debug
-                      ((value>>2)&0x1)?@"[YES]":@"[ NO]", //pileup
-                      ((value>>12)&0x1)?@"[YES]":@"[ NO]", //CFD
-                      ((value>>13)&0x1)?@"[YES]":@"[ NO]", //pole-zero
-                      (value>>10)&0x3, (value>>3)&0x3);
+                      ((value>>2)&0x1)?@"[YES]":@"[ NO]",   //presum
+                      ((value>>12)&0x1)?@"[YES]":@"[ NO]",  //CFD
+                      ((value>>13)&0x1)?@"[YES]":@"[ NO]",  //pole-zero
+                      polString, (value>>3)&0x3);
         }
         unsigned short fifoStatus = [model readFifoState];
         if(fifoStatus == kFull)			    NSLog(@"FIFO = Full\n");

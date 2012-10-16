@@ -1220,6 +1220,11 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 			[self writeControlReg:i enabled:[self enabled:i]];
 		}
     }
+	else {
+		for(i=0;i<kNumGretina4MChannels;i++) {
+			[self writeControlReg:i enabled:NO];
+		}
+	}
     for(i=0;i<kNumGretina4MChannels;i++) {
         [self writeLEDThreshold:i];
         [self writeCFDParameters:i];
@@ -2013,7 +2018,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"TPol"];
-    [p setFormat:@"##0" upperLimit:0x7FF lowerLimit:0 stepSize:1 units:@""];
+    [p setFormat:@"##0" upperLimit:0x3 lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setTpol:withValue:) getMethod:@selector(tpol:)];
     [a addObject:p];
 
