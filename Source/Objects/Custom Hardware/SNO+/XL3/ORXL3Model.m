@@ -3375,6 +3375,7 @@ void SwapLongBlock(void* p, int32_t n)
     @catch (NSException *e) {
         NSLog(@"%@ error sending SET_VLT_THRESHOLD_ID command.\n",[[self xl3Link] crateName]);
         NSLog(@"%@ with reason: %@\n", [e name], [e reason]);
+        return;
     }
 
     set_vlt_thresholds_result_t* res = (set_vlt_thresholds_result_t*) payload.payload;
@@ -3383,7 +3384,7 @@ void SwapLongBlock(void* p, int32_t n)
     }
 
     if (res->error_flags) {
-        char* vlts[] = {"VCC", "VEE", "VP8", "VM24", "VP24", "TMP0"};
+        char* vlts[] = {"VCC", "VEE", "VP24", "VM24", "VP8", "TMP0"};
         NSMutableString* msg = [NSMutableString stringWithFormat:
                                 @"%@: setting voltage thresholds failed for: ",[[self xl3Link] crateName]];
         for (i=0; i<6; i++) {
