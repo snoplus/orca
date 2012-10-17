@@ -199,6 +199,7 @@
 - (void) setupGTCorseDelay:(unsigned short) theCoarseDelay;
 - (void) setupGTCorseDelay;
 - (void) setupGTFineDelay:(unsigned short) theAddelValue;
+- (void) setupGTFineDelay;
 - (void) setThePulserRate:(float) thePulserPeriodValue;
 - (void) setThePulserRate:(float) thePulserPeriodValue setToInfinity:(BOOL) setToInfinity;
 - (void) loadEnablePulser;

@@ -1545,11 +1545,16 @@ kPEDCrateMask
 		
 	}
 	@catch(NSException* localException) {
-		NSLog(@"Could not setup the MTC GT course delay!\n");			
+		NSLog(@"Could not setup the MTC GT coarse delay!\n");			
 		NSLog(@"Exception: %@\n",localException);
 		[localException raise];			
 		
 	}
+}
+
+- (void) setupGTFineDelay
+{
+	[self setupGTFineDelay:[self dbIntByIndex:kFineDelay]];
 }
 
 - (void) setupGTFineDelay:(unsigned short) aValue
@@ -1582,15 +1587,22 @@ kPEDCrateMask
 
 - (void) setThePulserRate:(float) thePulserPeriodValue setToInfinity:(BOOL) setToInfinity
 {
-	unsigned long	pulserShiftValue;	
+	unsigned long	pulserShiftValue = 0xffffff;
 	
 	@try {
 		// STEP 1: Load the shift register
 		if(setToInfinity)pulserShiftValue =  0;  
 		else {
-			// calculate the value to be shifted into SMTC_SERIAL_REG
-			float pulserShiftFValue =  (thePulserPeriodValue/0.001280) - 1.0;  // max pulser period = (0.00128ms * 0x00ffffff) = 21474.8532ms 
-			pulserShiftValue = (unsigned long)pulserShiftFValue;
+            if (thePulserPeriodValue < 0.05) {
+                pulserShiftValue = 0xffffff;
+            }
+            else {
+                // calculate the value to be shifted into SMTC_SERIAL_REG
+                //float pulserShiftFValue =  (thePulserPeriodValue/0.001280) - 1.0;  // max pulser period = (0.00128ms * 0x00ffffff) = 21474.8532ms
+                // the pulser period value is rate now
+                float pulserShiftFValue =  (1000.0/thePulserPeriodValue/0.001280) - 1.0;
+                pulserShiftValue = (unsigned long)pulserShiftFValue;
+            }
 		}
 		
 		// STEP 2: Now serially shift into SMTC_SERIAL_REG the value 'pulserShiftValue'
@@ -1607,16 +1619,13 @@ kPEDCrateMask
 		}		
 		
 		float frequencyValue = (float)( 781.25/((float)pulserShiftValue + 1.0) );					// in KHz
-		if (frequencyValue < 0.001)		NSLog(@"Pulser frequency set @ %3.10f mHz.\n",(frequencyValue * 1000000.0));
-		else if (frequencyValue <= 1.0)	NSLog(@"Pulser frequency set @ %3.10f Hz.\n",(frequencyValue * 1000.0));
-		else if (frequencyValue > 1.0)	NSLog(@"Pulser frequency set @ %3.4f KHz.\n",frequencyValue);
-		
-		
+		if (frequencyValue < 0.001)		NSLog(@"Pulser frequency set @ %3.3f mHz.\n",(frequencyValue * 1000000.0));
+		else if (frequencyValue <= 1.0)	NSLog(@"Pulser frequency set @ %3.3f Hz.\n",(frequencyValue * 1000.0));
+		else if (frequencyValue > 1.0)	NSLog(@"Pulser frequency set @ %3.4f kHz.\n",frequencyValue);
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Could not setup the MTC pulser frequency!\n");
 		[localException raise];
-		
 	}
 }
 

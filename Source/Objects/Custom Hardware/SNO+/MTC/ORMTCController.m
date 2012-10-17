@@ -264,10 +264,10 @@
 	//[loadOnlineMaskButton		setEnabled: !lockedOrRunningMaintenance];
 	//[loadDacsButton				setEnabled: !lockedOrRunningMaintenance];
 	//[firePedestalsButton		setEnabled: !lockedOrRunningMaintenance];
-	[triggerZeroMatrix			setEnabled: !lockedOrRunningMaintenance];
-	[findTriggerZerosButton		setEnabled: !lockedOrRunningMaintenance];
-	[continuousButton			setEnabled: !lockedOrRunningMaintenance];
-	[stopTriggerZeroButton		setEnabled: !lockedOrRunningMaintenance];
+	//[triggerZeroMatrix			setEnabled: !lockedOrRunningMaintenance];
+	//[findTriggerZerosButton		setEnabled: !lockedOrRunningMaintenance];
+	//[continuousButton			setEnabled: !lockedOrRunningMaintenance];
+	//[stopTriggerZeroButton		setEnabled: !lockedOrRunningMaintenance];
 	//[setCoarseDelayButton		setEnabled: !lockedOrRunningMaintenance];
 	
 	//we want to fire pedestals during runs
@@ -703,7 +703,7 @@
 
 - (IBAction) standardSetFineDelay:(id) sender
 {
-//TODO
+    [model setupGTFineDelay];
 }
 
 - (IBAction) standardIsPulserFixedRate:(id) sender
@@ -1009,17 +1009,17 @@
 
 - (IBAction) triggersLoadTriggerMask:(id) sender
 {
-    //TODO
+    [model setGlobalTriggerWordMask];
 }
 
 - (IBAction) triggersLoadGTCrateMask:(id) sender
 {
-    //TODO
+    [model setGTCrateMask];
 }
 
 - (IBAction) triggersLoadPEDCrateMask:(id) sender
 {
-    //TODO
+    [model setPedestalCrateMask];
 }
 
 - (IBAction) triggersLoadMTCACrateMask:(id) sender
