@@ -693,12 +693,12 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 		cfdFraction[i]		= 0x0;
 		cfdThreshold[i]		= 0x10;
 		mrpsrt[i]           = 0x0;
-		ftCnt[i]            = 0x100;
+		ftCnt[i]            = 252;
 		mrpsdv[i]           = 0x0;
 		chpsrt[i]           = 0x0;
 		chpsdv[i]           = 0x0;
-		prerecnt[i]         = 0x7FF;
-		postrecnt[i]        = 0x7FF;
+		prerecnt[i]         = 499;
+		postrecnt[i]        = 530;
 		tpol[i]             = 0x3;
 		presumEnabled[i]    = 0x0;
 	}
@@ -860,7 +860,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) setFtCnt:(short)chan withValue:(short)aValue
 {
 	if(aValue<0)aValue=0;
-	else if(aValue>0x7FF)aValue = 0x7FF;
+	else if(aValue>252)aValue = 252;
     [[[self undoManager] prepareWithInvocationTarget:self] setFtCnt:chan withValue:ftCnt[chan]];
 	ftCnt[chan] = aValue;
     NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
@@ -899,7 +899,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) setPrerecnt:(short)chan withValue:(short)aValue
 {
 	if(aValue<0)aValue=0;
-	else if(aValue>0x7FF)aValue = 0x7FF;
+	else if(aValue>499)aValue = 499;
     [[[self undoManager] prepareWithInvocationTarget:self] setPrerecnt:chan withValue:prerecnt[chan]];
 	prerecnt[chan] = aValue;
     NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
@@ -908,8 +908,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setPostrecnt:(short)chan withValue:(short)aValue
 {
-	if(aValue<0)aValue=0;
-	else if(aValue>0x7FF)aValue = 0x7FF;
+	if(aValue<18)aValue=18;
+	else if(aValue>530)aValue = 530;
     [[[self undoManager] prepareWithInvocationTarget:self] setPostrecnt:chan withValue:postrecnt[chan]];
 	postrecnt[chan] = aValue;
     NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
@@ -1371,7 +1371,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) writeWindowTiming:(short)channel
 {    
-    unsigned long theValue = (ftCnt[channel]<<16) | (mrpsrt[channel]<<12) | (mrpsdv[channel]<<8) | (chpsrt[channel]<<4) | chpsdv[channel] ;
+    unsigned long theValue = ((ftCnt[channel]+4)<<16) | (mrpsrt[channel]<<12) | (mrpsdv[channel]<<8) | (chpsrt[channel]<<4) | chpsdv[channel] ;
     [[self adapter] writeLongBlock:&theValue
                          atAddress:[self baseAddress] + register_information[kWindowTiming].offset + 4*channel
                         numToWrite:1
@@ -1382,7 +1382,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) writeRisingEdgeWindow:(short)channel
 {    
-	unsigned long aValue = (prerecnt[channel]<<12) | postrecnt[channel];
+	unsigned long aValue = ((prerecnt[channel]+13)<<12) | (postrecnt[channel]-18);
     [[self adapter] writeLongBlock:&aValue
                          atAddress:[self baseAddress] + register_information[kRisingEdgeWindow].offset + 4*channel
                         numToWrite:1
@@ -1988,7 +1988,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"FtCnt"];
-    [p setFormat:@"##0" upperLimit:0x3FF lowerLimit:0 stepSize:1 units:@""];
+    [p setFormat:@"##0" upperLimit:252 lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setFtCnt:withValue:) getMethod:@selector(ftCnt:)];
     [a addObject:p];
 
@@ -2006,13 +2006,13 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Prerecnt"];
-    [p setFormat:@"##0" upperLimit:0x7FF lowerLimit:0 stepSize:1 units:@""];
+    [p setFormat:@"##0" upperLimit:499 lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setPrerecnt:withValue:) getMethod:@selector(prerecnt:)];
     [a addObject:p];
 
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Postrecnt"];
-    [p setFormat:@"##0" upperLimit:0x7FF lowerLimit:0 stepSize:1 units:@""];
+    [p setFormat:@"##0" upperLimit:512 lowerLimit:18 stepSize:1 units:@""];
     [p setSetMethod:@selector(setPostrecnt:withValue:) getMethod:@selector(postrecnt:)];
     [a addObject:p];
 
