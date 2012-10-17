@@ -78,8 +78,6 @@
 
 }
 
-
-
 #pragma mark •••Notifications
 - (void) registerNotificationObservers
 {
@@ -210,6 +208,10 @@
                          name : ORDocumentLock
                        object : nil];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(triggerMTCAMaskChanged:)
+                         name : ORMTCModelMTCAMaskChanged
+                       object : nil];
 }
 
 - (void) updateWindow
@@ -236,6 +238,7 @@
 	[self fixedPulserRateCountChanged:nil];
 	[self fixedPulserRateDelayChanged:nil];
     [self documentLockChanged:nil];
+    [self triggerMTCAMaskChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -575,6 +578,43 @@
 	[memBaseAddressText setIntValue: [model memBaseAddress]];
 }
 
+- (void) triggerMTCAMaskChanged:(NSNotification*)aNotification
+{
+    unsigned long maskValue = [model mtcaN100Mask];
+    unsigned short i;
+	for(i=0;i<20;i++) [[mtcaN100Matrix cellWithTag:i] setIntValue: maskValue & (1<<i)];
+
+    maskValue = [model mtcaN20Mask];
+	for(i=0;i<20;i++) [[mtcaN20Matrix cellWithTag:i] setIntValue: maskValue & (1<<i)];
+
+    maskValue = [model mtcaEHIMask];
+	for(i=0;i<20;i++) [[mtcaEHIMatrix cellWithTag:i] setIntValue: maskValue & (1<<i)];
+
+    maskValue = [model mtcaELOMask];
+	for(i=0;i<20;i++) [[mtcaELOMatrix cellWithTag:i] setIntValue: maskValue & (1<<i)];
+    
+    maskValue = [model mtcaOELOMask];
+	for(i=0;i<20;i++) {
+        if ([mtcaOELOMatrix cellWithTag:i]) {
+            [[mtcaOELOMatrix cellWithTag:i]  setIntValue: maskValue & (1<<i)];
+        }
+    }
+
+    maskValue = [model mtcaOEHIMask];
+	for(i=0;i<20;i++) {
+        if ([mtcaOEHIMatrix cellWithTag:i]) {
+            [[mtcaOEHIMatrix cellWithTag:i]  setIntValue: maskValue & (1<<i)];
+        }
+    }
+
+    maskValue = [model mtcaOWLNMask];
+	for(i=0;i<20;i++) {
+        if ([mtcaOWLNMatrix cellWithTag:i]) {
+            [[mtcaOWLNMatrix cellWithTag:i]  setIntValue: maskValue & (1<<i)];
+        }
+    }
+}
+
 #pragma mark •••Actions
 
 - (IBAction) basicAutoIncrementAction:(id)sender
@@ -868,7 +908,6 @@
 		}
 	}
 	[model setDbLong:mask forIndex:kGtMask];
-
 }
 
 - (IBAction) settingsGTCrateMaskAction:(id) sender 
@@ -974,37 +1013,86 @@
 
 - (IBAction) triggerMTCAN100:(id) sender
 {
-    //TODO
+    unsigned long mask = 0;
+	int i;
+	for(i=0;i<20;i++){
+		if([[sender cellWithTag:i] intValue]){
+			mask |= (1L << i);
+		}
+	}
+    [model setMtcaN100Mask:mask];
 }
 
 - (IBAction) triggerMTCAN20:(id) sender
 {
-    //TODO
+    unsigned long mask = 0;
+	int i;
+	for(i=0;i<20;i++){
+		if([[sender cellWithTag:i] intValue]){
+			mask |= (1L << i);
+		}
+	}
+    [model setMtcaN20Mask:mask];
 }
 
 - (IBAction) triggerMTCAEHI:(id) sender
 {
-    //TODO
+    unsigned long mask = 0;
+	int i;
+	for(i=0;i<20;i++){
+		if([[sender cellWithTag:i] intValue]){
+			mask |= (1L << i);
+		}
+	}
+    [model setMtcaEHIMask:mask];
 }
 
 - (IBAction) triggerMTCAELO:(id) sender
 {
-    //TODO
+    unsigned long mask = 0;
+	int i;
+	for(i=0;i<20;i++){
+		if([[sender cellWithTag:i] intValue]){
+			mask |= (1L << i);
+		}
+	}
+    [model setMtcaELOMask:mask];
 }
 
 - (IBAction) triggerMTCAOELO:(id) sender
 {
-    //TODO
+    unsigned long mask = 0;
+	int i;
+	for(i=0;i<20;i++){
+		if([sender cellWithTag:i] && [[sender cellWithTag:i] intValue]){
+			mask |= (1L << i);
+		}
+	}
+    [model setMtcaOELOMask:mask];
 }
 
 - (IBAction) triggerMTCAOEHI:(id) sender
 {
-    //TODO
+    unsigned long mask = 0;
+	int i;
+	for(i=0;i<20;i++){
+		if([sender cellWithTag:i] && [[sender cellWithTag:i] intValue]){
+			mask |= (1L << i);
+		}
+	}
+    [model setMtcaOEHIMask:mask];
 }
 
 - (IBAction) triggerMTCAOWLN:(id) sender
 {
-    //TODO
+    unsigned long mask = 0;
+	int i;
+	for(i=0;i<20;i++){
+		if([sender cellWithTag:i] && [[sender cellWithTag:i] intValue]){
+			mask |= (1L << i);
+		}
+	}
+    [model setMtcaOWLNMask:mask];
 }
 
 - (IBAction) triggersLoadTriggerMask:(id) sender
@@ -1023,6 +1111,26 @@
 }
 
 - (IBAction) triggersLoadMTCACrateMask:(id) sender
+{
+    //TODO
+}
+
+- (IBAction) triggersClearTriggerMask:(id) sender
+{
+    [model clearGlobalTriggerWordMask];
+}
+
+- (IBAction) triggersClearGTCrateMask:(id) sender
+{
+    [model clearGTCrateMask];
+}
+
+- (IBAction) triggersClearPEDCrateMask:(id) sender
+{
+    [model clearPedestalCrateMask];
+}
+
+- (IBAction) triggersClearMTCACrateMask:(id) sender
 {
     //TODO
 }

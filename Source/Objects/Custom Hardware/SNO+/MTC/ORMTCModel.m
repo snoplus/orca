@@ -57,6 +57,7 @@ NSString* ORMTCModelFixedPulserRateCountChanged = @"ORMTCModelFixedPulserRateCou
 NSString* ORMTCModelFixedPulserRateDelayChanged = @"ORMTCModelFixedPulserRateDelayChanged";
 NSString* ORMtcTriggerNameChanged		= @"ORMtcTriggerNameChanged";
 NSString* ORMTCLock				= @"ORMTCLock";
+NSString* ORMTCModelMTCAMaskChanged = @"ORMTCModelMTCAMaskChanged";
 
 #define kMTCRegAddressBase		0x00007000
 #define kMTCRegAddressModifier	0x29
@@ -558,6 +559,90 @@ kPEDCrateMask
     return kMTCRegAddressBase;
 }
 
+- (unsigned long) mtcaN100Mask
+{
+    return _mtcaN100Mask;
+}
+
+- (void) setMtcaN100Mask:(unsigned long)aMtcaN100Mask
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setMtcaN100Mask:[self mtcaN100Mask]];
+    _mtcaN100Mask = aMtcaN100Mask;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORMTCModelMTCAMaskChanged object:self];
+}
+
+- (unsigned long) mtcaN20Mask
+{
+    return _mtcaN20Mask;
+}
+
+- (void) setMtcaN20Mask:(unsigned long)aMtcaN20Mask
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setMtcaN20Mask:[self mtcaN20Mask]];
+    _mtcaN20Mask = aMtcaN20Mask;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORMTCModelMTCAMaskChanged object:self];
+}
+
+- (unsigned long) mtcaEHIMask
+{
+    return _mtcaEHIMask;
+}
+
+- (void) setMtcaEHIMask:(unsigned long)aMtcaEHIMask
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setMtcaEHIMask:[self mtcaEHIMask]];
+    _mtcaEHIMask = aMtcaEHIMask;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORMTCModelMTCAMaskChanged object:self];
+}
+
+- (unsigned long) mtcaELOMask
+{
+    return _mtcaELOMask;
+}
+
+- (void) setMtcaELOMask:(unsigned long)aMtcaELOMask
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setMtcaELOMask:[self mtcaELOMask]];
+    _mtcaELOMask = aMtcaELOMask;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORMTCModelMTCAMaskChanged object:self];
+}
+
+- (unsigned long) mtcaOELOMask
+{
+    return _mtcaOELOMask;
+}
+
+- (void) setMtcaOELOMask:(unsigned long)aMtcaOELOMask
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setMtcaOELOMask:[self mtcaOELOMask]];
+    _mtcaOELOMask = aMtcaOELOMask;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORMTCModelMTCAMaskChanged object:self];
+}
+
+- (unsigned long) mtcaOEHIMask
+{
+    return _mtcaOEHIMask;
+}
+
+- (void) setMtcaOEHIMask:(unsigned long)aMtcaOEHIMask
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setMtcaOEHIMask:[self mtcaOEHIMask]];
+    _mtcaOEHIMask = aMtcaOEHIMask;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORMTCModelMTCAMaskChanged object:self];
+}
+
+- (unsigned long) mtcaOWLNMask
+{
+    return _mtcaOWLNMask;
+}
+
+- (void) setMtcaOWLNMask:(unsigned long)aMtcaOWLNMask
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setMtcaOWLNMask:[self mtcaOWLNMask]];
+    _mtcaOEHIMask = aMtcaOWLNMask;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORMTCModelMTCAMaskChanged object:self];
+}
+
 #pragma mark •••Converters
 - (unsigned long) mVoltsToRaw:(float) mVolts
 {
@@ -806,13 +891,20 @@ kPEDCrateMask
 	[self setMtcDataBase:		[decoder decodeObjectForKey:	@"ORMTCModelMtcDataBase"]];
     [self setTriggerGroup:  [decoder decodeObjectForKey:    @"ORMtcTriggerGroup"]];
     [self setTriggerName:	[decoder decodeObjectForKey:	@"ORMtcTrigger1Name"]];
-	
+
+    [self setMtcaN100Mask:[decoder decodeIntForKey:@"mtcaN100Mask"]];
+    [self setMtcaN20Mask:[decoder decodeIntForKey:@"mtcaN20Mask"]];
+    [self setMtcaEHIMask:[decoder decodeIntForKey:@"mtcaEHIMask"]];
+    [self setMtcaELOMask:[decoder decodeIntForKey:@"mtcaELOMask"]];
+    [self setMtcaOELOMask:[decoder decodeIntForKey:@"mtcaOELOMask"]];
+    [self setMtcaOEHIMask:[decoder decodeIntForKey:@"mtcaOEHIMask"]];
+    [self setMtcaOWLNMask:[decoder decodeIntForKey:@"mtcaOWLNMask"]];
+    
 	if(!mtcDataBase)[self setupDefaults];
     if(triggerName == nil || [triggerName length]==0){
         [self setTriggerName:@"Trigger"];
     }
-	
-	
+		
     [[self undoManager] enableUndoRegistration];
 	
     return self;
@@ -839,6 +931,13 @@ kPEDCrateMask
 	[encoder encodeFloat:fixedPulserRateDelay forKey:@"ORMTCModelFixedPulserRateDelay"];
 	[encoder encodeObject:triggerGroup	forKey:@"ORMtcTriggerGroup"];
     [encoder encodeObject:triggerName	forKey:@"ORMtcTriggerName"];
+    [encoder encodeInt:[self mtcaN100Mask] forKey:@"mtcaN100Mask"];
+    [encoder encodeInt:[self mtcaN20Mask] forKey:@"mtcaN20Mask"];
+    [encoder encodeInt:[self mtcaEHIMask] forKey:@"mtcaEHIMask"];
+    [encoder encodeInt:[self mtcaEHIMask] forKey:@"mtcaELOMask"];
+    [encoder encodeInt:[self mtcaEHIMask] forKey:@"mtcaOELOMask"];
+    [encoder encodeInt:[self mtcaEHIMask] forKey:@"mtcaOEHIMask"];
+    [encoder encodeInt:[self mtcaEHIMask] forKey:@"mtcaOWLNMask"];
 }
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
@@ -2011,6 +2110,31 @@ kPEDCrateMask
 	}
 }
 
+- (void) mtcatLoadCrateMasks
+{
+    //TODO move to SBC
+    [self mtcatResetAll];
+    [self mtcatLoadCrateMask:[self mtcaN100Mask] toMtcat:0];
+    [self mtcatLoadCrateMask:[self mtcaN20Mask] toMtcat:1];
+    [self mtcatLoadCrateMask:[self mtcaELOMask] toMtcat:2];
+    [self mtcatLoadCrateMask:[self mtcaEHIMask] toMtcat:3];
+    [self mtcatLoadCrateMask:[self mtcaOELOMask] toMtcat:4];
+    [self mtcatLoadCrateMask:[self mtcaOEHIMask] toMtcat:5];
+    [self mtcatLoadCrateMask:[self mtcaOWLNMask] toMtcat:6];
+}
+
+- (void) mtcatClearCrateMasks
+{
+    //TODO move to SBC
+    [self mtcatResetAll];
+    [self mtcatLoadCrateMask:0 toMtcat:0];
+    [self mtcatLoadCrateMask:0 toMtcat:1];
+    [self mtcatLoadCrateMask:0 toMtcat:2];
+    [self mtcatLoadCrateMask:0 toMtcat:3];
+    [self mtcatLoadCrateMask:0 toMtcat:4];
+    [self mtcatLoadCrateMask:0 toMtcat:5];
+    [self mtcatLoadCrateMask:0 toMtcat:6];
+}
 
 - (void) mtcatLoadCrateMask:(unsigned long) mask toMtcat:(unsigned char) mtcat
 {

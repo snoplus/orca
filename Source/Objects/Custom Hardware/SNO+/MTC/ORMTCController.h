@@ -145,6 +145,7 @@
 - (void) sequenceStopped:(NSNotification*)aNote;
 - (void) sequenceProgress:(NSNotification*)aNote;
 - (void) documentLockChanged:(NSNotification*)aNotification;
+- (void) triggerMTCAMaskChanged:(NSNotification*)aNotification;
 
 #pragma mark •••Helper
 - (void) populatePullDown;
@@ -216,5 +217,10 @@
 - (IBAction) triggersLoadGTCrateMask:(id) sender;
 - (IBAction) triggersLoadPEDCrateMask:(id) sender;
 - (IBAction) triggersLoadMTCACrateMask:(id) sender;
+
+- (IBAction) triggersClearTriggerMask:(id) sender;
+- (IBAction) triggersClearGTCrateMask:(id) sender;
+- (IBAction) triggersClearPEDCrateMask:(id) sender;
+- (IBAction) triggersClearMTCACrateMask:(id) sender;
 
 @end

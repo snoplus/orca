@@ -60,6 +60,15 @@
 		
 		int						nHitViewType;
 		int						eSumViewType;
+    
+    //MTCA+ crate masks
+    unsigned long _mtcaN100Mask;
+    unsigned long _mtcaN20Mask;
+    unsigned long _mtcaEHIMask;
+    unsigned long _mtcaELOMask;
+    unsigned long _mtcaOELOMask;
+    unsigned long _mtcaOEHIMask;
+    unsigned long _mtcaOWLNMask;
 
 		//data taking variables
 		ORReadOutList*  triggerGroup;
@@ -67,9 +76,16 @@
 		NSArray*		dataTakers;       //cache of data takers.
 }
 
-@property (assign)	BOOL			isPulserFixedRate;
-@property (assign)	unsigned long		fixedPulserRateCount;
-@property (assign)	float			fixedPulserRateDelay;
+@property (nonatomic,assign) BOOL isPulserFixedRate;
+@property (nonatomic,assign) unsigned long fixedPulserRateCount;
+@property (nonatomic,assign) float fixedPulserRateDelay;
+@property (nonatomic,assign) unsigned long mtcaN100Mask;
+@property (nonatomic,assign) unsigned long mtcaN20Mask;
+@property (nonatomic,assign) unsigned long mtcaEHIMask;
+@property (nonatomic,assign) unsigned long mtcaELOMask;
+@property (nonatomic,assign) unsigned long mtcaOELOMask;
+@property (nonatomic,assign) unsigned long mtcaOEHIMask;
+@property (nonatomic,assign) unsigned long mtcaOWLNMask;
 
 #pragma mark •••Initialization
 - (id) init;
@@ -226,6 +242,8 @@
 
 - (void) mtcatResetMtcat:(unsigned char) mtcat;
 - (void) mtcatResetAll;
+- (void) mtcatLoadCrateMasks;
+- (void) mtcatClearCrateMasks;
 - (void) mtcatLoadCrateMask:(unsigned long) mask toMtcat:(unsigned char) mtcat;
 
 #pragma mark •••BasicOps
@@ -261,3 +279,4 @@ extern NSString* ORMTCModelFixedPulserRateCountChanged;
 extern NSString* ORMTCModelFixedPulserRateDelayChanged;
 extern NSString* ORMtcTriggerNameChanged;
 extern NSString* ORMTCLock;
+extern NSString* ORMTCModelMTCAMaskChanged;
