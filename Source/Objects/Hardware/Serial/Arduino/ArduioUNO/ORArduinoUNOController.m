@@ -41,7 +41,19 @@
 
 - (void) awakeFromNib
 {	
- 	[super awakeFromNib];	
+	NSNumberFormatter* formatter = [[[NSNumberFormatter alloc] init] autorelease];
+	[formatter setFormat:@"#0.000"];	
+	int i;
+	for(i=0;i<kNumArduinoUNOPins;i++){
+		[[pinNameMatrix cellAtRow:i column:0] setTag:i];
+		[[pinValueOutMatrix cellAtRow:i column:0] setTag:i];
+		[[pinValueInMatrix cellAtRow:i column:0] setTag:i];
+		[[pwmMatrix cellAtRow:i column:0] setTag:i];
+		[[adcMatrix cellAtRow:i column:0] setTag:i];
+		[[adcMatrix cellAtRow:i column:0] setFormatter:formatter];
+
+	}
+ 	[super awakeFromNib];
 }
 
 #pragma mark •••Notifications
@@ -76,6 +88,30 @@
                          name : ORArduinoUNOModelAdcChanged
 						object: model];	
 
+	[notifyCenter addObserver : self
+                     selector : @selector(pinNameChanged:)
+                         name : ORArduinoUNOPinNameChanged
+						object: model];	
+
+	[notifyCenter addObserver : self
+                     selector : @selector(pinValueInChanged:)
+                         name : ORArduinoUNOPinValueInChanged
+						object: model];	
+
+	[notifyCenter addObserver : self
+                     selector : @selector(pinTypeChanged:)
+                         name : ORArduinoUNOPinTypeChanged
+						object: model];	
+
+	[notifyCenter addObserver : self
+                     selector : @selector(pinValueOutChanged:)
+                         name : ORArduinoUNOPinValueOutChanged
+						object: model];	
+
+	[notifyCenter addObserver : self
+                     selector : @selector(pwmChanged:)
+                         name : ORArduinoUNOPwmChanged
+						object: model];	
 	
 	[serialPortController registerNotificationObservers];
 
@@ -94,6 +130,13 @@
     [self lockChanged:nil];
 	[self adcChanged:nil];
 	[self pollTimeChanged:nil];
+	
+	[self pinTypeChanged:nil];
+	[self pinValueInChanged:nil];
+	[self pinValueOutChanged:nil];
+	[self pinNameChanged:nil];
+	[self pwmChanged:nil];
+	
     [self updateButtons];
 	[serialPortController updateWindow];
 }
@@ -123,6 +166,23 @@
     [lockButton setState: locked];
 	[serialPortController updateButtons:locked];
     [pollTimePopup	setEnabled:!locked];
+	
+	short i;
+	for(i=0;i<kNumArduinoUNOPins;i++){
+		if([model pinType:i] == kArduinoPWM){
+			[[pwmMatrix cellAtRow:i column:0] setEnabled:!locked];
+			[[pinValueOutMatrix cellAtRow:i column:0] setEnabled:NO];
+		}
+		else {
+			[[pwmMatrix cellAtRow:i column:0] setEnabled:NO];
+			if([model pinType:i] == kArduinoOutput){
+				[[pinValueOutMatrix cellAtRow:i column:0] setEnabled:!locked];
+			}
+			else {
+				[[pinValueOutMatrix cellAtRow:i column:0] setEnabled:NO];
+			}
+		}
+	}
 }
 
 - (void) pollTimeChanged:(NSNotification*)aNotification
@@ -130,23 +190,99 @@
 	[pollTimePopup selectItemWithTag:[model pollTime]];
 }
 
+- (void) pwmChanged:(NSNotification*)aNote
+{
+	if(aNote == nil){
+        short i;
+        for(i=0;i<kNumArduinoUNOPins;i++){
+			if([model pinType:i] == kArduinoPWM){
+				[[pwmMatrix cellAtRow:i column:0] setIntValue:[model pwm:i]];
+			}
+			else [[pwmMatrix cellAtRow:i column:0] setStringValue:@""];
+        }
+    }
+    else {
+        int i = [[[aNote userInfo] objectForKey:@"Pin"] intValue];
+		if([model pinType:i] == kArduinoPWM){
+			[[pwmMatrix cellAtRow:i column:0] setIntValue:[model pwm:i]];
+		}
+		else [[pwmMatrix cellAtRow:i column:0] setStringValue:@""];
+    }
+	
+}
+
+- (void) pinTypeChanged:(NSNotification*)aNote
+{
+	if(aNote == nil){
+        short i;
+        for(i=0;i<kNumArduinoUNOPins;i++){
+            [[pinTypeMatrix cellAtRow:i column:0] selectItemAtIndex:[model pinType:i]];
+        }
+    }
+    else {
+        int i = [[[aNote userInfo] objectForKey:@"Pin"] intValue];
+        [[pinTypeMatrix cellAtRow:i column:0] selectItemAtIndex:[model pinType:i]];
+    }
+	[self updateButtons];
+}
+
+- (void) pinValueInChanged:(NSNotification*)aNote
+{
+	if(aNote == nil){
+        short i;
+        for(i=0;i<kNumArduinoUNOPins;i++){
+            [[pinValueInMatrix cellWithTag:i] setIntValue:[model pinValueIn:i]];
+        }
+    }
+    else {
+        int i = [[[aNote userInfo] objectForKey:@"Pin"] intValue];
+        [[pinValueInMatrix cellWithTag:i] setIntValue:[model pinValueIn:i]];
+    }
+}
+
+- (void) pinValueOutChanged:(NSNotification*)aNote
+{
+	if(aNote == nil){
+        short i;
+        for(i=0;i<kNumArduinoUNOPins;i++){
+            [[pinValueOutMatrix cellWithTag:i] setIntValue:[model pinValueOut:i]];
+        }
+    }
+    else {
+        int i = [[[aNote userInfo] objectForKey:@"Pin"] intValue];
+        [[pinValueOutMatrix cellWithTag:i] setIntValue:[model pinValueOut:i]];
+    }
+}
+
+- (void) pinNameChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumArduinoUNOPins;i++){
+            [[pinNameMatrix cellWithTag:i] setStringValue:[model pinName:i]];
+        }
+    }
+    else {
+        int i = [[[aNote userInfo] objectForKey:@"Pin"] intValue];
+        [[pinNameMatrix cellWithTag:i] setStringValue:[model pinName:i]];
+    }
+}
+
 - (void) adcChanged:(NSNotification*)aNote
 {
     if(aNote == nil){
         short i;
         for(i=0;i<kNumArduinoUNOAdcChannels;i++){
-            [[adcMatrix cellAtRow:i column:0] setIntValue:[model adc:i]];
+            [[adcMatrix cellWithTag:i] setFloatValue:[model adc:i]];
         }
     }
     else {
-        int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
-        [[adcMatrix cellAtRow:chan column:0] setIntValue:[model adc:chan]];
+        int i = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        [[adcMatrix cellWithTag:i] setFloatValue:[model adc:i]];
     }
 }
 
 #pragma mark •••Actions
-
-
 - (IBAction) lockAction:(id) sender
 {
     [gSecurity tryToSetLock:ORArduinoUNOLock to:[sender intValue] forWindow:[self window]];
@@ -160,6 +296,44 @@
 - (IBAction) pollTimeAction:(id)sender
 {
 	[model setPollTime:[[sender selectedItem] tag]];
+}
+
+- (IBAction) pinTypeAction:(id)sender
+{
+	int thePin = [sender selectedRow];
+	if([model pinValueOut:thePin]!= [[sender selectedCell] indexOfSelectedItem]){
+		[model setPin:thePin type:[[sender selectedCell] indexOfSelectedItem]];
+	}
+}
+
+- (IBAction) pinNameAction:(id)sender
+{
+	int thePin = [[sender selectedCell] tag];
+	if(![[model pinName:thePin] isEqualToString: [sender stringValue]]){
+		[model setPin:thePin name:[sender stringValue]];
+	}
+}
+
+- (IBAction) pinValueOutAction:(id)sender
+{
+	int thePin = [[sender selectedCell] tag];
+	if([model pinValueOut:thePin]!= [sender intValue]){
+		[model setPinValueOut:thePin value:[sender intValue]];
+	}
+}
+
+- (IBAction) pwmAction:(id)sender
+{
+	int thePin = [[sender selectedCell] tag];
+	if([model pwm:thePin] != [sender intValue]){
+		[model setPin:thePin pwm:[sender intValue]];
+	}
+}
+
+- (IBAction) writeValues:(id)sender
+{
+	[self endEditing];
+	[model initHardware];
 }
 
 @end

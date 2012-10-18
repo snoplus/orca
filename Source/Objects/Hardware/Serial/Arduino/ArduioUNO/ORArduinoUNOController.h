@@ -17,7 +17,6 @@
 //-------------------------------------------------------------
 #pragma mark •••Imported Files
 
-@class StopLightView;
 @class ORSerialPortController;
 
 @interface ORArduinoUNOController : OrcaObjectController
@@ -26,6 +25,11 @@
 	IBOutlet NSButton*		updateButton;
     IBOutlet NSPopUpButton* pollTimePopup;
 	IBOutlet NSMatrix*		adcMatrix;
+	IBOutlet NSMatrix*		pinTypeMatrix;
+	IBOutlet NSMatrix*		pinNameMatrix;
+	IBOutlet NSMatrix*		pinValueOutMatrix;
+	IBOutlet NSMatrix*		pinValueInMatrix;
+	IBOutlet NSMatrix*		pwmMatrix;
     IBOutlet ORSerialPortController* serialPortController;
 }
 
@@ -40,6 +44,11 @@
 - (void) updateButtons;
 - (void) lockChanged:(NSNotification*)aNote;
 - (void) adcChanged:(NSNotification*)aNote;
+- (void) pinNameChanged:(NSNotification*)aNote;
+- (void) pinTypeChanged:(NSNotification*)aNote;
+- (void) pinValueInChanged:(NSNotification*)aNote;
+- (void) pinValueOutChanged:(NSNotification*)aNote;
+- (void) pwmChanged:(NSNotification*)aNote;
 
 #pragma mark •••Interface Management
 - (void) pollTimeChanged:(NSNotification*)aNote;
@@ -50,6 +59,11 @@
 - (IBAction) lockAction:(id) sender;
 - (IBAction) updateAllAction:(id)sender;
 - (IBAction) pollTimeAction:(id)sender;
+- (IBAction) pwmAction:(id)sender;
+- (IBAction) pinTypeAction:(id)sender;
+- (IBAction) pinNameAction:(id)sender;
+- (IBAction) pinValueOutAction:(id)sender;
+- (IBAction) writeValues:(id)sender;
 @end
 
 

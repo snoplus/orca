@@ -19,7 +19,12 @@
 #import "ORSerialPortWithQueueModel.h"
 #import "ORBitProcessing.h"
 
-#define kNumArduinoUNOAdcChannels 6
+#define kNumArduinoUNOAdcChannels	6
+#define kNumArduinoUNOPins			12 //first two are serial lines
+
+#define kArduinoInput	0
+#define kArduinoOutput  1
+#define kArduinoPWM		2
 
 @interface ORArduinoUNOModel : ORSerialPortWithQueueModel <ORBitProcessing>
 {
@@ -27,7 +32,13 @@
 		NSMutableData*	inComingData;
 		int				pollTime;
 		BOOL            delay;
-		int				adc[kNumArduinoUNOAdcChannels];
+		float			adc[kNumArduinoUNOAdcChannels];
+		int				pinType[kNumArduinoUNOPins];
+		NSString*       pinName[kNumArduinoUNOPins];   //adc names
+		unsigned char	pwm[kNumArduinoUNOPins];
+		BOOL			pinValueOut[kNumArduinoUNOPins];;
+		BOOL			pinValueIn[kNumArduinoUNOPins];;
+
 }
 
 #pragma mark •••Initialization
@@ -36,8 +47,26 @@
 #pragma mark •••Accessors
 - (int)  pollTime;
 - (void) setPollTime:(int)aPollTime;
-- (int)  adc:(unsigned short)aChan;
-- (void) setAdc:(unsigned short)aChan withValue:(int)aValue;
+- (float)  adc:(unsigned short)aChan;
+- (void) setAdc:(unsigned short)aChan withValue:(float)aValue;
+
+- (NSString*) pinName:(int)i;
+- (void) setPin:(int)i name:(NSString*)aName;
+
+- (unsigned char) pwm:(unsigned short)aPin;
+- (void) setPin:(unsigned short)aPin pwm:(unsigned char)aValue;
+
+- (BOOL) pinValueOut:(unsigned short)aPin;
+- (void) setPinValueOut:(unsigned short)aPin value:(BOOL)aValue;
+
+- (BOOL) pinValueIn:(unsigned short)aPin;
+- (void) setPinValueIn:(unsigned short)aPin value:(BOOL)aValue;
+
+- (int) pinType:(unsigned short)aPin;
+- (void) setPin:(unsigned short)aPin type:(unsigned short)aType;
+
+- (unsigned char) pwm:(unsigned short)aPin;
+- (void) setPin:(unsigned short)aPin pwm:(unsigned char)aValue;
 
 #pragma mark •••Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
@@ -45,13 +74,14 @@
 
 #pragma mark •••Command Methods
 - (void) readAdcValues;
-- (void) readAdcValue:(unsigned int)aChannel;
+- (void) readPins;
 
 #pragma mark •••Port Methods
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark •••HW Methods
 - (void) updateAll;
+- (void) initHardware;
 
 #pragma mark •••Adc Processing Protocol
 - (void) processIsStarting;
@@ -66,3 +96,8 @@
 extern NSString* ORArduinoUNOLock;
 extern NSString* ORArduinoUNOModelPollTimeChanged;
 extern NSString* ORArduinoUNOModelAdcChanged;
+extern NSString* ORArduinoUNOPinTypeChanged;
+extern NSString* ORArduinoUNOPinValueInChanged;
+extern NSString* ORArduinoUNOPinValueOutChanged;
+extern NSString* ORArduinoUNOPwmChanged;
+extern NSString* ORArduinoUNOPinNameChanged;
