@@ -1112,7 +1112,7 @@
 
 - (IBAction) triggersLoadMTCACrateMask:(id) sender
 {
-    //TODO
+    [model mtcatLoadCrateMasks];
 }
 
 - (IBAction) triggersClearTriggerMask:(id) sender
@@ -1132,7 +1132,7 @@
 
 - (IBAction) triggersClearMTCACrateMask:(id) sender
 {
-    //TODO
+    [model mtcatClearCrateMasks];
 }
 
 @end

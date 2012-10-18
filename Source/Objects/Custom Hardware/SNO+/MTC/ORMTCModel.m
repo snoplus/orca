@@ -639,7 +639,7 @@ kPEDCrateMask
 - (void) setMtcaOWLNMask:(unsigned long)aMtcaOWLNMask
 {
 	[[[self undoManager] prepareWithInvocationTarget:self] setMtcaOWLNMask:[self mtcaOWLNMask]];
-    _mtcaOEHIMask = aMtcaOWLNMask;
+    _mtcaOWLNMask = aMtcaOWLNMask;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORMTCModelMTCAMaskChanged object:self];
 }
 
@@ -2138,6 +2138,11 @@ kPEDCrateMask
 
 - (void) mtcatLoadCrateMask:(unsigned long) mask toMtcat:(unsigned char) mtcat
 {
+    if (mtcat > 7) {
+        NSLog(@"MTCA load crate mask ignored, mtcat > 6\n");
+        return;
+    }
+
     if([self adapterIsSBC]){
         long errorCode = 0;
         SBC_Packet aPacket;
@@ -2162,6 +2167,8 @@ kPEDCrateMask
             NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
             //@throw e;
         }
+        char* mtcats[] = {"N100", "N20", "EHI", "ELO", "OELO", "OEHI", "OWLN"};
+        NSLog(@"MTCA: set %s crate mask to 0x%08x\n", mtcats[mtcat], mask);
     }
 	else {
         NSLog(@"Not implemented. Requires SBC with LabJack\n");

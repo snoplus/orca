@@ -1968,12 +1968,12 @@ void SwapLongBlock(void* p, int32_t n)
 {
 	[self setXl3OpsRunning:YES forKey:@"compositeEnableChargeInjection"];
 
-    NSLog(@"%@, charge injection for slot: ", [[self xl3Link] crateName]);
+    NSLog(@"%@, charge injection ", [[self xl3Link] crateName]);
     unsigned int i;
-    unsigned long msk = [self xl3ChargeInjMask];
+    unsigned long msk = [self slotMask];
     for (i=0; i < 16; i++) {
 		if (1 << i & msk) {
-            NSLog(@"%d ", i);
+            //NSLog(@"%d ", i);
             [self enableChargeInjectionForSlot:i channelMask:[self xl3ChargeInjMask]];
         }
     }    
@@ -1985,6 +1985,41 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (void) enableChargeInjectionForSlot:(unsigned short) aSlot channelMask:(unsigned long) aChannelMask
 {
+    //borrowed from penn_daq EnableChargeInjection
+    unsigned long aValue = 0;
+    unsigned long xl3Address = XL3_SEL | 0x26 | WRITE_REG; //FEC HV CSR
+    const int HV_BIT_COUNT = 40;
+    
+    @try {
+        int bit_iter = 0;
+        for (bit_iter = HV_BIT_COUNT;bit_iter>0;bit_iter--){
+            if (bit_iter > 32){
+                aValue = 0x0;
+            }else{
+                // set bit iff it is set in amask
+                aValue = ((0x1 << (bit_iter -1)) & aChannelMask) ? HV_CSR_DATIN : 0x0;
+            }
+            [xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
+            aValue |= HV_CSR_CLK;
+            [xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
+        } // end loop over bits
+
+        aValue = 0;
+		[xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
+        aValue = HV_CSR_LOAD;
+		[xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
+	}
+	@catch (NSException* e) {
+		NSLog(@"%@ enable chrge injection failed; error: %@ reason: %@\n",
+              [[self xl3Link] crateName], [e name], [e reason]);
+	}
+
+    [self loadSingleDacForSlot:aSlot dacNum:136 dacVal:0xff];
+//    NSLog(@"%@ enabled charge injection for slot %d with channel mask 0x%08x\n",
+//          [[self xl3Link] crateName], aSlot, aChannelMask);
+        
+/*
+    
 	XL3_PayloadStruct payload;
 	memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
 	payload.numberBytesinPayload = 8;
@@ -2013,7 +2048,7 @@ void SwapLongBlock(void* p, int32_t n)
     }
 
     //NSLog(@"%@: enabled charge injection for slot: %d, for channels: 0x%08x\n", [[self xl3Link] crateName], aSlot, aChannelMask);
-
+*/
 /*
 	@try {
         int index;
