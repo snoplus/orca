@@ -67,6 +67,7 @@
 
 - (unsigned char) pwm:(unsigned short)aPin;
 - (void) setPin:(unsigned short)aPin pwm:(unsigned char)aValue;
+- (BOOL) validForPwm:(unsigned short)aPin;
 
 #pragma mark •••Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
@@ -74,7 +75,8 @@
 
 #pragma mark •••Command Methods
 - (void) readAdcValues;
-- (void) readPins;
+- (void) readInputPins;
+- (unsigned int) inputMask;
 
 #pragma mark •••Port Methods
 - (void) dataReceived:(NSNotification*)note;

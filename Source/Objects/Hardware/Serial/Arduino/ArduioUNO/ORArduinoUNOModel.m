@@ -102,6 +102,20 @@ NSString* ORArduinoUNOPinNameChanged	= @"ORArduinoUNOPinNameChanged";
 	}
 }
 
+- (BOOL) validForPwm:(unsigned short)aPin
+{
+	switch(aPin){
+			//only these pins can be PWM
+		case 1:
+		case 3:
+		case 4:
+		case 7:
+		case 8:
+		case 9: return YES;
+		default: return NO;
+	}
+}
+
 - (unsigned char) pwm:(unsigned short)aPin
 {
 	if(aPin<kNumArduinoUNOPins)return pwm[aPin];
@@ -112,19 +126,11 @@ NSString* ORArduinoUNOPinNameChanged	= @"ORArduinoUNOPinNameChanged";
 {
 	if(aPin<kNumArduinoUNOPins){
 		if(pinType[aPin] == kArduinoPWM){
-			switch(aPin){
-					//only these pins can be PWM
-				case 1:
-				case 3:
-				case 4:
-				case 7:
-				case 8:
-				case 9:
-					[[[self undoManager] prepareWithInvocationTarget:self] setPin:aPin pwm:pwm[aPin]];
-					pwm[aPin] = aValue;
-					NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aPin] forKey:@"Pin"];
-					[[NSNotificationCenter defaultCenter] postNotificationName:ORArduinoUNOPwmChanged object:self userInfo:userInfo];
-					break;
+			if([self validForPwm:aPin]){
+				[[[self undoManager] prepareWithInvocationTarget:self] setPin:aPin pwm:pwm[aPin]];
+				pwm[aPin] = aValue;
+				NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aPin] forKey:@"Pin"];
+				[[NSNotificationCenter defaultCenter] postNotificationName:ORArduinoUNOPwmChanged object:self userInfo:userInfo];
 			}
 		}
 	}
@@ -141,16 +147,8 @@ NSString* ORArduinoUNOPinNameChanged	= @"ORArduinoUNOPinNameChanged";
 	if(aPin<kNumArduinoUNOPins){
 		[[[self undoManager] prepareWithInvocationTarget:self] setPin:aPin type:pinType[aPin]];
 		if(aType == kArduinoPWM){
-			switch(aPin){
-				//only these pins can be PWM
-				case 1:
-				case 3:
-				case 4:
-				case 7:
-				case 8:
-				case 9:
-					pinType[aPin] = kArduinoPWM;
-				break;
+			if([self validForPwm:aPin]){
+				pinType[aPin] = kArduinoPWM;
 			}
 		}
 		else pinType[aPin] = aType;
@@ -257,6 +255,8 @@ NSString* ORArduinoUNOPinNameChanged	= @"ORArduinoUNOPinNameChanged";
 		else	 [self setPin:i name:[NSString stringWithFormat:@"Pin %2d",i]];
 		
 		[self setPinValueOut:i value:[decoder decodeIntForKey:[NSString stringWithFormat:@"PinValueOut%d",i]]];
+		[self setPin:i type:[decoder decodeIntForKey:[NSString stringWithFormat:@"PinType%d",i]]];
+		[self setPin:i pwm:[decoder decodeIntForKey:[NSString stringWithFormat:@"PinPwm%d",i]]];
 
 	}
 	
@@ -272,6 +272,8 @@ NSString* ORArduinoUNOPinNameChanged	= @"ORArduinoUNOPinNameChanged";
 	for(i=0;i<kNumArduinoUNOPins;i++) {
 		[encoder encodeObject:pinName[i] forKey:[NSString stringWithFormat:@"pinName%d",i]];
 		[encoder encodeInt:pinValueOut[i] forKey:[NSString stringWithFormat:@"pinValueOut%d",i]];
+		[encoder encodeInt:pinType[i] forKey:[NSString stringWithFormat:@"PinType%d",i]];
+		[encoder encodeInt:pwm[i] forKey:[NSString stringWithFormat:@"PinPwm%d",i]];
 	}
 	[encoder encodeInt:pollTime			forKey: @"pollTime"];
 }
@@ -282,34 +284,45 @@ NSString* ORArduinoUNOPinNameChanged	= @"ORArduinoUNOPinNameChanged";
 	[self enqueCmdString:@"r a"];
 }
 
-- (void) readPins
+- (void) readInputPins
 {
-	[self enqueCmdString:@"r d"];
+	NSString* cmd = [NSString stringWithFormat:@"r d %d",[self inputMask]];
+	[self enqueCmdString:cmd];
+}
+
+- (unsigned int) inputMask
+{
+	unsigned int aMask = 0;
+	int i;
+	for(i=0;i<kNumArduinoUNOPins;i++){
+		if(pinType[i] == kArduinoInput)aMask |= (1<<i);
+	}
+	return aMask & 0x7ff;
 }
 
 - (void) updateAll
 {
 	[self readAdcValues];
-	[self readPins];
+	[self readInputPins];
 }
 
 - (void) initHardware
 {
+	[self readInputPins];
 	int i;
 	for(i=0;i<kNumArduinoUNOPins;i++){
 		if(pinType[i] == kArduinoOutput){
-			NSString* cmd = [NSString stringWithFormat:@"w d %d %d",i+2,pinValueOut[i]];
+			NSString* cmd = [NSString stringWithFormat:@"w d %d %d",i,pinValueOut[i]];
 			[self enqueCmdString:cmd];
 		}
 	}
 	for(i=0;i<kNumArduinoUNOPins;i++){
 		if(pinType[i] == kArduinoPWM){
-			NSString* cmd = [NSString stringWithFormat:@"w a %d %d",i+2,pwm[i]];
+			NSString* cmd = [NSString stringWithFormat:@"w a %d %d",i,pwm[i]];
 			[self enqueCmdString:cmd];
 		}
 	}
 	
-	//[self readPins];
 }
 
 #pragma mark •••Commands
@@ -423,6 +436,7 @@ NSString* ORArduinoUNOPinNameChanged	= @"ORArduinoUNOPinNameChanged";
 	[self setIsValid:YES];
 	aCommand = [[[aCommand removeNLandCRs] trimSpacesFromEnds] removeExtraSpaces];
 	NSArray* parts = [aCommand componentsSeparatedByString:@" "];
+	BOOL unsolicited = NO;
 	if([parts count] >= 1){
 		if([[parts objectAtIndex:0] isEqualToString:@"a"]){
 			if([parts count] >= kNumArduinoUNOAdcChannels+1){
@@ -442,8 +456,20 @@ NSString* ORArduinoUNOPinNameChanged	= @"ORArduinoUNOPinNameChanged";
 				}
 			}
 		}
+		else if([[parts objectAtIndex:0] isEqualToString:@"i"]){
+			//unsolicited incomming string "i hiPinMask"
+			unsolicited = YES;
+			if([parts count] >= 2){
+				unsigned int hiMask = [[parts objectAtIndex:1] unsignedIntValue];
+				int i;
+				for(i=0;i<kNumArduinoUNOPins;i++){
+					int pinValue = (hiMask & (1<<i) != 0);
+					[self setPinValueIn:i value:pinValue];
+				}
+			}
+		}
 
-		if(lastRequest){
+		if(lastRequest && !unsolicited){
 			[self setLastRequest:nil];			 //clear the last request
 			[self processOneCommandFromQueue];	 //do the next command in the queue
 		}

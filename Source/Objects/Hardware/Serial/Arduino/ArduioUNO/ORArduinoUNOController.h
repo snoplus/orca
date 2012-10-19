@@ -30,6 +30,7 @@
 	IBOutlet NSMatrix*		pinValueOutMatrix;
 	IBOutlet NSMatrix*		pinValueInMatrix;
 	IBOutlet NSMatrix*		pwmMatrix;
+	IBOutlet NSTextField*   portStatefield2;
     IBOutlet ORSerialPortController* serialPortController;
 }
 
@@ -40,6 +41,7 @@
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
+- (BOOL) portLocked;
 - (void) updateWindow;
 - (void) updateButtons;
 - (void) lockChanged:(NSNotification*)aNote;
@@ -49,10 +51,8 @@
 - (void) pinValueInChanged:(NSNotification*)aNote;
 - (void) pinValueOutChanged:(NSNotification*)aNote;
 - (void) pwmChanged:(NSNotification*)aNote;
-
-#pragma mark •••Interface Management
 - (void) pollTimeChanged:(NSNotification*)aNote;
-- (BOOL) portLocked;
+- (void) portStateChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) pollTimeAction:(id)sender;

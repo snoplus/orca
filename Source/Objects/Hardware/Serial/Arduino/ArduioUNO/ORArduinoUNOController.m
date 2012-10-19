@@ -72,7 +72,7 @@
                      selector : @selector(lockChanged:)
                          name : ORRunStatusChangedNotification
                        object : nil];
-    
+	
     [notifyCenter addObserver : self
                      selector : @selector(lockChanged:)
                          name : ORArduinoUNOLock
@@ -82,6 +82,11 @@
                      selector : @selector(lockChanged:)
                          name : ORSerialPortModelPortStateChanged
 						object: model];	
+
+	[notifyCenter addObserver : self
+                     selector : @selector(portStateChanged:)
+                         name : ORSerialPortModelPortStateChanged
+                       object : nil];
 	
 	[notifyCenter addObserver : self
                      selector : @selector(adcChanged:)
@@ -128,6 +133,7 @@
 {
     [super updateWindow];
     [self lockChanged:nil];
+    [self portStateChanged:nil];
 	[self adcChanged:nil];
 	[self pollTimeChanged:nil];
 	
@@ -136,7 +142,7 @@
 	[self pinValueOutChanged:nil];
 	[self pinNameChanged:nil];
 	[self pwmChanged:nil];
-	
+
     [self updateButtons];
 	[serialPortController updateWindow];
 }
@@ -159,6 +165,12 @@
 	return [gSecurity isLocked:ORArduinoUNOLock];;
 }
 
+- (void) portStateChanged:(NSNotification*)aNotification
+{
+	if([[model serialPort] isOpen])	[portStatefield2 setStringValue:@"Open"];
+	else [portStatefield2 setStringValue:@"Closed"];
+}
+
 - (void) updateButtons
 {
     BOOL locked = [gSecurity isLocked:ORArduinoUNOLock];
@@ -172,14 +184,18 @@
 		if([model pinType:i] == kArduinoPWM){
 			[[pwmMatrix cellAtRow:i column:0] setEnabled:!locked];
 			[[pinValueOutMatrix cellAtRow:i column:0] setEnabled:NO];
+			[[pinValueInMatrix cellAtRow:i column:0] setStringValue:@"-"];
 		}
 		else {
-			[[pwmMatrix cellAtRow:i column:0] setEnabled:NO];
 			if([model pinType:i] == kArduinoOutput){
 				[[pinValueOutMatrix cellAtRow:i column:0] setEnabled:!locked];
+				[[pinValueInMatrix cellAtRow:i column:0] setStringValue:@"-"];
+				[[pwmMatrix cellAtRow:i column:0] setEnabled:NO];
 			}
 			else {
+				[[pwmMatrix cellAtRow:i column:0] setEnabled:NO];
 				[[pinValueOutMatrix cellAtRow:i column:0] setEnabled:NO];
+				[[pinValueInMatrix cellAtRow:i column:0] setEnabled:YES];
 			}
 		}
 	}
@@ -195,15 +211,17 @@
 	if(aNote == nil){
         short i;
         for(i=0;i<kNumArduinoUNOPins;i++){
-			if([model pinType:i] == kArduinoPWM){
+			if([model validForPwm:i]){
 				[[pwmMatrix cellAtRow:i column:0] setIntValue:[model pwm:i]];
 			}
-			else [[pwmMatrix cellAtRow:i column:0] setStringValue:@""];
+			else {
+				[[pwmMatrix cellAtRow:i column:0] setStringValue:@""];
+			}
         }
     }
     else {
         int i = [[[aNote userInfo] objectForKey:@"Pin"] intValue];
-		if([model pinType:i] == kArduinoPWM){
+		if([model validForPwm:i]){
 			[[pwmMatrix cellAtRow:i column:0] setIntValue:[model pwm:i]];
 		}
 		else [[pwmMatrix cellAtRow:i column:0] setStringValue:@""];
@@ -231,12 +249,16 @@
 	if(aNote == nil){
         short i;
         for(i=0;i<kNumArduinoUNOPins;i++){
-            [[pinValueInMatrix cellWithTag:i] setIntValue:[model pinValueIn:i]];
+			NSString* s = @"-";
+			if([model pinType:i]==kArduinoInput)s = [model pinValueIn:i]?@"Hi":@"Lo";
+            [[pinValueInMatrix cellWithTag:i] setStringValue:s];
         }
     }
     else {
         int i = [[[aNote userInfo] objectForKey:@"Pin"] intValue];
-        [[pinValueInMatrix cellWithTag:i] setIntValue:[model pinValueIn:i]];
+		NSString* s = @"-";
+		if([model pinType:i]==kArduinoInput)s = [model pinValueIn:i]?@"Hi":@"Lo";
+        [[pinValueInMatrix cellWithTag:i] setStringValue:s];
     }
 }
 
@@ -301,7 +323,7 @@
 - (IBAction) pinTypeAction:(id)sender
 {
 	int thePin = [sender selectedRow];
-	if([model pinValueOut:thePin]!= [[sender selectedCell] indexOfSelectedItem]){
+	if([model pinType:thePin]!= [[sender selectedCell] indexOfSelectedItem]){
 		[model setPin:thePin type:[[sender selectedCell] indexOfSelectedItem]];
 	}
 }
