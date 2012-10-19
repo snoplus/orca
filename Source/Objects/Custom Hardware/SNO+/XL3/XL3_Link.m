@@ -127,11 +127,18 @@ readFifoFlag = _readFifoFlag;
     [bundleBufferLock lock];
     if(bundleWriteMark != bundleReadMark || bundleFreeSpace == 0){
         theBlock = (NSMutableData*)(*(dataPtr+bundleReadMark));
+        /*
+        if (!theBlock) {
+            NSLog(@"too bad\n");
+        }
+        if ([theBlock length] < 16) {
+            NSLog(@"even worse\n");
+        }
+         */
         bundleReadMark = (bundleReadMark + 1) % bundleBufferSize;
         bundleFreeSpace++; 
     }
     [bundleBufferLock unlock];
-    
     return theBlock;
 }
 
@@ -484,7 +491,7 @@ readFifoFlag = _readFifoFlag;
 	}
 	@catch (NSException* localException) {
 		[commandSocketLock unlock]; //end critial section
-		[localException raise];
+		@throw localException;
 	}
 }
 
@@ -622,8 +629,8 @@ readFifoFlag = _readFifoFlag;
 				userInfo:nil];
 		}
 		else {
-            [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.01]];
-            //usleep(1000);
+            //[[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.01]];
+            usleep(200);
         }
 	}
 
@@ -794,7 +801,7 @@ static void SwapLongBlock(void* p, int32_t n)
 	int selectionResult = 0;
 	struct timeval tv;
 	tv.tv_sec  = 0;
-	tv.tv_usec = 10000;
+	tv.tv_usec = 1000;
 
 	char aPacket[XL3_PACKET_SIZE];
 	unsigned long bundle_count = 0;
@@ -812,7 +819,8 @@ static void SwapLongBlock(void* p, int32_t n)
 		FD_SET(workingSocket, &fds);
 		selectionResult = select(workingSocket + 1, &fds, NULL, NULL, &tv);
 		if (selectionResult == -1 && !(errno == EAGAIN || errno == EINTR)) {
-			[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:.005]];
+            usleep(500);
+			//[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:.005]];
             
 			if (workingSocket || serverSocket) {
 				NSLog(@"Error reading XL3 <%@> port: %d\n", IPNumber, portNumber);
@@ -855,6 +863,9 @@ static void SwapLongBlock(void* p, int32_t n)
                     unsigned int num_bytes = *(unsigned int*)(((XL3_Packet*)aPacket)->payload);
                     if (needToSwap) num_bytes = swapLong(num_bytes);
                     num_bytes &= 0xffffff;
+                    if (num_bytes == 0) {
+                        NSLog(@"%@ megabundle with zero length ignored\n", [self crateName]);
+                    }
                     num_bytes = (num_bytes + 3) * 4;
                     if (num_bytes > XL3_MAXPAYLOADSIZE_BYTES) {
                         num_bytes = XL3_MAXPAYLOADSIZE_BYTES;
@@ -1013,7 +1024,7 @@ static void SwapLongBlock(void* p, int32_t n)
 
 	struct timeval tv;
 	tv.tv_sec  = [self errorTimeOutSeconds];
-	tv.tv_usec = 10000;
+	tv.tv_usec = 1000;
 	
 	time_t t1 = time(0);
 

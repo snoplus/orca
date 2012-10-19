@@ -201,8 +201,13 @@ NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageSt
 {
 	if(index>=0 && index<kNumFecMonitorAdcs){
 		adcVoltage[index] = aValue;
-		NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:index] forKey:@"index"];
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelAdcVoltageChanged object:self userInfo:userInfo];
+        NSNumber* aNum = [[NSNumber alloc] initWithInt:index];
+		NSDictionary* userInfo = [[NSDictionary alloc] initWithObjectsAndKeys:
+                                  aNum, @"index",
+                                  nil];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelAdcVoltageChanged object:self userInfo:userInfo];
+        [aNum release]; aNum = nil;
+        [userInfo release]; userInfo = nil;
 	}
 }
 
@@ -227,8 +232,13 @@ NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageSt
 {
 	if(index>=0 && index<kNumFecMonitorAdcs){
 		adcVoltageStatus[index] = aState;
-		NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:index] forKey:@"index"];
+        NSNumber* aNum = [[NSNumber alloc] initWithInt:index];
+		NSDictionary* userInfo = [[NSDictionary alloc] initWithObjectsAndKeys:
+                                   aNum, @"index",
+                                   nil];
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelAdcVoltageStatusChanged object:self userInfo:userInfo];
+        [aNum release]; aNum = nil;
+        [userInfo release]; userInfo = nil;      
 	}
 }
 
@@ -2082,8 +2092,8 @@ const short kVoltageADCMaximumAttempts = 10;
         //unless read error (XL3 doesn't provide)
         //else new_channel_status = kFecMonitorReadError;
         
-        [self setAdcVoltageStatus:whichADC withValue:new_channel_status];
         if(old_channel_status != new_channel_status){
+            [self setAdcVoltageStatus:whichADC withValue:new_channel_status];
             statusChanged = true;
         }
     }

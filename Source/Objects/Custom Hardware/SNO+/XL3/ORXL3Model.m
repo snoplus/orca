@@ -1123,7 +1123,14 @@ void SwapLongBlock(void* p, int32_t n)
 {
 	while ([xl3Link bundleAvailable]) {
         NSMutableData* aBundle = [xl3Link readNextBundle];
+        if (!aBundle) break; //an extra protection against nil
         unsigned long data_length = [aBundle length] / 4;
+        /*
+        if (data_length < 4) {
+            NSLog(@"%@ problem in takeData, corrupted megabundle with length of zero ignored\n",
+                  [[self xl3Link] crateName]);
+        }
+        */
         unsigned long* data = (unsigned long*)[aBundle mutableBytes];
         data[0] = [self xl3MegaBundleDataId] | data_length;
 		data[1] |= [self crateNumber]; //bits 0--4 crateNumber, bits 5-- version set by XL3_Link
@@ -1131,7 +1138,7 @@ void SwapLongBlock(void* p, int32_t n)
 		[aDataPacket addLongsToFrameBuffer:data length:data_length];
 		[aBundle release]; aBundle = nil; //this is correct even if the analyzer doesn't agree, see writeBundle in XL3_Link
 	}
-    
+
     if ([xl3Link readFifoFlag]) {
         unsigned long data[19];
         data[0] = [self xl3FifoDataId] | 19;
@@ -1141,6 +1148,7 @@ void SwapLongBlock(void* p, int32_t n)
 		[aDataPacket addLongsToFrameBuffer:data length:19];
         [xl3Link setReadFifoFlag:NO];
     }
+ 
 }
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
@@ -1968,7 +1976,7 @@ void SwapLongBlock(void* p, int32_t n)
 {
 	[self setXl3OpsRunning:YES forKey:@"compositeEnableChargeInjection"];
 
-    NSLog(@"%@, charge injection ", [[self xl3Link] crateName]);
+    NSLog(@"%@, charge injection setup...\n", [[self xl3Link] crateName]);
     unsigned int i;
     unsigned long msk = [self slotMask];
     for (i=0; i < 16; i++) {
@@ -1977,7 +1985,7 @@ void SwapLongBlock(void* p, int32_t n)
             [self enableChargeInjectionForSlot:i channelMask:[self xl3ChargeInjMask]];
         }
     }    
-	NSLog(@"enabled.\n");
+	NSLog(@"%@ charge injection enabled.\n", [[self xl3Link] crateName]);
     
 	[self setXl3OpsRunning:NO forKey:@"compositeEnableChargeInjection"];
 }
@@ -1986,8 +1994,10 @@ void SwapLongBlock(void* p, int32_t n)
 - (void) enableChargeInjectionForSlot:(unsigned short) aSlot channelMask:(unsigned long) aChannelMask
 {
     //borrowed from penn_daq EnableChargeInjection
+    
     unsigned long aValue = 0;
-    unsigned long xl3Address = XL3_SEL | 0x26 | WRITE_REG; //FEC HV CSR
+    unsigned long xl3Value = 0;
+    unsigned long xl3Address = FEC_SEL * aSlot | 0x26 | WRITE_REG; //FEC HV CSR
     const int HV_BIT_COUNT = 40;
     
     @try {
@@ -1999,22 +2009,39 @@ void SwapLongBlock(void* p, int32_t n)
                 // set bit iff it is set in amask
                 aValue = ((0x1 << (bit_iter -1)) & aChannelMask) ? HV_CSR_DATIN : 0x0;
             }
-            [xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
-            aValue |= HV_CSR_CLK;
-            [xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
+            xl3Value = aValue;
+            [xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&xl3Value];
+            //[[self xl3Link] addMultiCmdToAddress:xl3Address withValue:xl3Value];
+
+            xl3Value = aValue | HV_CSR_CLK;
+            [xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&xl3Value];
+            //[[self xl3Link] addMultiCmdToAddress:xl3Address withValue:xl3Value];
         } // end loop over bits
 
         aValue = 0;
 		[xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
+        //[[self xl3Link] addMultiCmdToAddress:xl3Address withValue:aValue];
         aValue = HV_CSR_LOAD;
 		[xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
-	}
+        //[[self xl3Link] addMultiCmdToAddress:xl3Address withValue:xl3Value];
+
+        /*
+        [[self xl3Link] executeMultiCmd];
+    
+        if ([[self xl3Link] multiCmdFailed]) {
+            NSLog(@"Enable charge injection failed: XL3 bus error.\n");
+            return;
+        }
+         */
+
+        [self loadSingleDacForSlot:aSlot dacNum:136 dacVal:0xff];
+    }
 	@catch (NSException* e) {
-		NSLog(@"%@ enable chrge injection failed; error: %@ reason: %@\n",
+		NSLog(@"%@ enable charge injection failed; error: %@ reason: %@\n",
               [[self xl3Link] crateName], [e name], [e reason]);
 	}
 
-    [self loadSingleDacForSlot:aSlot dacNum:136 dacVal:0xff];
+    
 //    NSLog(@"%@ enabled charge injection for slot %d with channel mask 0x%08x\n",
 //          [[self xl3Link] crateName], aSlot, aChannelMask);
         
@@ -3169,6 +3196,7 @@ void SwapLongBlock(void* p, int32_t n)
 - (void) readVMONWithMask:(unsigned short)aSlotMask
 {
     unsigned int msk = 0UL;
+    BOOL wasPollingXl3 = [self isPollingXl3];
     
     for (id anObj in [[self guardian] orcaObjects]) { 
         if ([anObj class] == NSClassFromString(@"ORFec32Model")) {
@@ -3182,6 +3210,7 @@ void SwapLongBlock(void* p, int32_t n)
     }
 
     vmon_results_t result[16];
+    memset(result, 0, 16*sizeof(vmon_results_t));
     unsigned char slot;
     for (slot=0; slot<16; slot++) {
         if ((msk >> slot) & 0x1) {
@@ -3193,19 +3222,22 @@ void SwapLongBlock(void* p, int32_t n)
                 if (isPollingXl3) {
                     NSLog(@"Polling loop stopped because reading FEC local voltages failed\n");
                     [self setIsPollingXl3:NO];
+                    return;
                 }
             }
 
-            if (pollThread && [pollThread isCancelled]) break;
-            if (![self isPollingXl3]) break;
+            if (wasPollingXl3) {
+                if (pollThread && [pollThread isCancelled]) return;
+                if (![self isPollingXl3]) return;
+            }
 
             //update FEC
-            for (id anObj in [[self guardian] orcaObjects]) {
-                if ([anObj class] == NSClassFromString(@"ORFec32Model") && [anObj stationNumber] == slot) {
-                    [anObj parseVoltages:&result[slot]];
+            for (id aFEC in [[self guardian] orcaObjects]) {
+                if (16 - [aFEC slot] == slot) { // do not use stationNumber here
+                    [aFEC parseVoltages:&result[slot]];
                 }
             }
-
+            
             //data packet
             const unsigned char packet_length = 3+21+6;
             if (isPollingXl3 && [[ORGlobal sharedGlobal] runInProgress]) {
@@ -3225,7 +3257,7 @@ void SwapLongBlock(void* p, int32_t n)
     }
 
 
-    if (!isPollingXl3 || isPollingVerbose) {
+    if (!wasPollingXl3 || isPollingVerbose) {
      
         char* vlt_a[] = {" -24V Sup:", " -15V Sup:", "  VEE Sup:", "-3.3V Sup:", "-2.0V Sup:",
             " 3.3V Sup:", " 4.0V Sup:", "  VCC Sup:", " 6.5V Sup:", " 8.0V Sup:", "  15V Sup:",
