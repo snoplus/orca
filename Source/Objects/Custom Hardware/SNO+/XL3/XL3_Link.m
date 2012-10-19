@@ -630,7 +630,7 @@ readFifoFlag = _readFifoFlag;
 		}
 		else {
             //[[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.01]];
-            usleep(200);
+            usleep(500);
         }
 	}
 
@@ -801,7 +801,7 @@ static void SwapLongBlock(void* p, int32_t n)
 	int selectionResult = 0;
 	struct timeval tv;
 	tv.tv_sec  = 0;
-	tv.tv_usec = 1000;
+	tv.tv_usec = 2000;
 
 	char aPacket[XL3_PACKET_SIZE];
 	unsigned long bundle_count = 0;
@@ -1024,7 +1024,7 @@ static void SwapLongBlock(void* p, int32_t n)
 
 	struct timeval tv;
 	tv.tv_sec  = [self errorTimeOutSeconds];
-	tv.tv_usec = 1000;
+	tv.tv_usec = 2000;
 	
 	time_t t1 = time(0);
 
@@ -1087,7 +1087,7 @@ static void SwapLongBlock(void* p, int32_t n)
 	
 	struct timeval tv;
 	tv.tv_sec  = 0;
-	tv.tv_usec = 10000;
+	tv.tv_usec = 2000;
 	memset(aPacket, 0, XL3_PACKET_SIZE);
 	
 	while(numBytesToGet){
