@@ -27,10 +27,17 @@
 	IBOutlet NSMatrix*		adcMatrix;
 	IBOutlet NSMatrix*		pinTypeMatrix;
 	IBOutlet NSMatrix*		pinNameMatrix;
-	IBOutlet NSMatrix*		pinValueOutMatrix;
-	IBOutlet NSMatrix*		pinValueInMatrix;
+	IBOutlet NSMatrix*		pinStateOutMatrix;
+	IBOutlet NSMatrix*		pinStateInMatrix;
 	IBOutlet NSMatrix*		pwmMatrix;
 	IBOutlet NSTextField*   portStatefield2;
+	IBOutlet NSMatrix*		lowLimitMatrix;
+	IBOutlet NSMatrix*		hiLimitMatrix;
+	IBOutlet NSMatrix*		slopeMatrix;
+	IBOutlet NSMatrix*		interceptMatrix;
+	IBOutlet NSMatrix*		minValueMatrix;
+	IBOutlet NSMatrix*		maxValueMatrix;
+	
     IBOutlet ORSerialPortController* serialPortController;
 }
 
@@ -48,11 +55,17 @@
 - (void) adcChanged:(NSNotification*)aNote;
 - (void) pinNameChanged:(NSNotification*)aNote;
 - (void) pinTypeChanged:(NSNotification*)aNote;
-- (void) pinValueInChanged:(NSNotification*)aNote;
-- (void) pinValueOutChanged:(NSNotification*)aNote;
+- (void) pinStateInChanged:(NSNotification*)aNote;
+- (void) pinStateOutChanged:(NSNotification*)aNote;
 - (void) pwmChanged:(NSNotification*)aNote;
 - (void) pollTimeChanged:(NSNotification*)aNote;
 - (void) portStateChanged:(NSNotification*)aNote;
+- (void) slopeChanged:(NSNotification*)aNote;
+- (void) interceptChanged:(NSNotification*)aNote;
+- (void) minValueChanged:(NSNotification*)aNote;
+- (void) maxValueChanged:(NSNotification*)aNote;
+- (void) lowLimitChanged:(NSNotification*)aNote;
+- (void) hiLimitChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) pollTimeAction:(id)sender;
@@ -62,8 +75,15 @@
 - (IBAction) pwmAction:(id)sender;
 - (IBAction) pinTypeAction:(id)sender;
 - (IBAction) pinNameAction:(id)sender;
-- (IBAction) pinValueOutAction:(id)sender;
+- (IBAction) pinStateOutAction:(id)sender;
 - (IBAction) writeValues:(id)sender;
+- (IBAction) minValueAction:(id)sender;
+- (IBAction) maxValueAction:(id)sender;
+- (IBAction) lowLimitAction:(id)sender;
+- (IBAction) hiLimitAction:(id)sender;
+- (IBAction) slopeAction:(id)sender;
+- (IBAction) interceptAction:(id)sender;
+
 @end
 
 

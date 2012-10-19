@@ -27,9 +27,15 @@ NSString* ORArduinoUNOModelPollTimeChanged	= @"ORArduinoUNOModelPollTimeChanged"
 NSString* ORArduinoUNOModelAdcChanged		= @"ORArduinoUNOModelAdcChanged";
 NSString* ORArduinoUNOPinTypeChanged		= @"ORArduinoUNOPinTypeChanged";
 NSString* ORArduinoUNOPwmChanged			= @"ORArduinoUNOPwmChanged";
-NSString* ORArduinoUNOPinValueOutChanged	= @"ORArduinoUNOPinValueOutChanged";
-NSString* ORArduinoUNOPinValueInChanged		= @"ORArduinoUNOPinValueInChanged";
-NSString* ORArduinoUNOPinNameChanged	= @"ORArduinoUNOPinNameChanged";
+NSString* ORArduinoUNOPinStateOutChanged	= @"ORArduinoUNOPinStateOutChanged";
+NSString* ORArduinoUNOPinStateInChanged		= @"ORArduinoUNOPinStateInChanged";
+NSString* ORArduinoUNOPinNameChanged		= @"ORArduinoUNOPinNameChanged";
+NSString* ORArduinoUNOHiLimitChanged		= @"ORArduinoUNOHiLimitChanged";
+NSString* ORArduinoUNOLowLimitChanged		= @"ORArduinoUNOLowLimitChanged";
+NSString* ORArduinoUNOSlopeChanged			= @"ORArduinoUNOSlopeChanged";
+NSString* ORArduinoUNOInterceptChanged		= @"ORArduinoUNOInterceptChanged";
+NSString* ORArduinoUNOMinValueChanged		= @"ORArduinoUNOMinValueChanged";
+NSString* ORArduinoUNOMaxValueChanged		= @"ORArduinoUNOMaxValueChanged";
 
 @interface ORArduinoUNOModel (private)
 - (void)	clearDelay;
@@ -43,6 +49,15 @@ NSString* ORArduinoUNOPinNameChanged	= @"ORArduinoUNOPinNameChanged";
 - (id) init
 {
 	self = [super init];
+	int i;
+	for(i=0;i<kNumArduinoUNOAdcChannels;i++){
+		lowLimit[i] = 0;
+		hiLimit[i]  = 5;
+		minValue[i] = 0;
+		maxValue[i]  = 5;
+		slope[i] = 1;
+		intercept[i] = 0;
+	}
 	return self;
 }
 
@@ -136,13 +151,13 @@ NSString* ORArduinoUNOPinNameChanged	= @"ORArduinoUNOPinNameChanged";
 	}
 }
 
-- (int) pinType:(unsigned short)aPin
+- (unsigned char) pinType:(unsigned short)aPin
 {
 	if(aPin<kNumArduinoUNOPins)return pinType[aPin];
 	else return 0;
 }
 
-- (void) setPin:(unsigned short)aPin type:(unsigned short)aType
+- (void) setPin:(unsigned short)aPin type:(unsigned char)aType
 {
 	if(aPin<kNumArduinoUNOPins){
 		[[[self undoManager] prepareWithInvocationTarget:self] setPin:aPin type:pinType[aPin]];
@@ -158,38 +173,37 @@ NSString* ORArduinoUNOPinNameChanged	= @"ORArduinoUNOPinNameChanged";
 	}
 }
 
-- (BOOL) pinValueOut:(unsigned short)aPin;
+- (BOOL) pinStateOut:(unsigned short)aPin;
 {
-	if(aPin<kNumArduinoUNOPins) return pinValueOut[aPin];
+	if(aPin<kNumArduinoUNOPins) return pinStateOut[aPin];
 	else return NO;
 }
 
-- (void) setPinValueOut:(unsigned short)aPin value:(BOOL)aValue
+- (void) setPin:(unsigned short)aPin stateOut:(BOOL)aValue
 {
 	@synchronized(self){
 		if(aPin<kNumArduinoUNOPins){
-			[[[self undoManager] prepareWithInvocationTarget:self] setPinValueOut:aPin value:pinValueOut[aPin]];
-			pinValueOut[aPin] = aValue;
+			[[[self undoManager] prepareWithInvocationTarget:self] setPin:aPin stateOut:pinStateOut[aPin]];
+			pinStateOut[aPin] = aValue;
 			NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aPin] forKey:@"Pin"];
-			[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORArduinoUNOPinValueOutChanged object:self userInfo:userInfo];
+			[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORArduinoUNOPinStateOutChanged object:self userInfo:userInfo];
 		}
 	}
 }
 
-- (BOOL) pinValueIn:(unsigned short)aPin;
+- (BOOL) pinStateIn:(unsigned short)aPin;
 {
-	if(aPin<kNumArduinoUNOPins) return pinValueIn[aPin];
+	if(aPin<kNumArduinoUNOPins) return pinStateIn[aPin];
 	else return NO;
 }
 
-- (void) setPinValueIn:(unsigned short)aPin value:(BOOL)aValue
+- (void) setPin:(unsigned short)aPin stateIn:(BOOL)aValue
 {
 	@synchronized(self){
 		if(aPin<kNumArduinoUNOPins){
-			[[[self undoManager] prepareWithInvocationTarget:self] setPinValueIn:aPin value:pinValueIn[aPin]];
-			pinValueIn[aPin] = aValue;
+			pinStateIn[aPin] = aValue;
 			NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aPin] forKey:@"Pin"];
-			[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORArduinoUNOPinValueInChanged object:self userInfo:userInfo];
+			[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORArduinoUNOPinStateInChanged object:self userInfo:userInfo];
 		}
 	}
 }
@@ -240,6 +254,132 @@ NSString* ORArduinoUNOPinNameChanged	= @"ORArduinoUNOPinNameChanged";
 {
 }
 
+- (float) slope:(int)i
+{
+	if(i>=0 && i<kNumArduinoUNOAdcChannels)return slope[i];
+	else return 20./4095.;
+}
+
+- (void) setSlope:(int)i value:(float)aValue
+{
+	if(i>=0 && i<kNumArduinoUNOAdcChannels){
+		[[[self undoManager] prepareWithInvocationTarget:self] setSlope:i value:slope[i]];
+		
+		slope[i] = aValue; 
+		
+		NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+		[userInfo setObject:[NSNumber numberWithInt:i] forKey: @"Channel"];
+		
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORArduinoUNOSlopeChanged object:self userInfo:userInfo];
+		
+	}
+}
+
+- (float) intercept:(int)i
+{
+	if(i>=0 && i<kNumArduinoUNOAdcChannels)return intercept[i];
+	else return -10;
+}
+
+- (void) setIntercept:(int)i value:(float)aValue
+{
+	if(i>=0 && i<kNumArduinoUNOAdcChannels){
+		[[[self undoManager] prepareWithInvocationTarget:self] setIntercept:i value:intercept[i]];
+		
+		intercept[i] = aValue; 
+		
+		NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+		[userInfo setObject:[NSNumber numberWithInt:i] forKey: @"Channel"];
+		
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORArduinoUNOInterceptChanged object:self userInfo:userInfo];
+		
+	}
+}
+
+- (float) lowLimit:(int)i
+{
+	if(i>=0 && i<kNumArduinoUNOAdcChannels)return lowLimit[i];
+	else return 0;
+}
+
+- (void) setLowLimit:(int)i value:(float)aValue
+{
+	if(i>=0 && i<kNumArduinoUNOAdcChannels){
+		[[[self undoManager] prepareWithInvocationTarget:self] setLowLimit:i value:lowLimit[i]];
+		
+		lowLimit[i] = aValue; 
+		
+		NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+		[userInfo setObject:[NSNumber numberWithInt:i] forKey: @"Channel"];
+		
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORArduinoUNOLowLimitChanged object:self userInfo:userInfo];
+		
+	}
+}
+
+- (float) hiLimit:(int)i
+{
+	if(i>=0 && i<kNumArduinoUNOAdcChannels)return hiLimit[i];
+	else return 0;
+}
+
+- (void) setHiLimit:(int)i value:(float)aValue
+{
+	if(i>=0 && i<kNumArduinoUNOAdcChannels){
+		[[[self undoManager] prepareWithInvocationTarget:self] setHiLimit:i value:lowLimit[i]];
+		
+		hiLimit[i] = aValue; 
+		
+		NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+		[userInfo setObject:[NSNumber numberWithInt:i] forKey: @"Channel"];
+		
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORArduinoUNOHiLimitChanged object:self userInfo:userInfo];
+		
+	}
+}
+
+- (float) minValue:(int)i
+{
+	if(i>=0 && i<kNumArduinoUNOAdcChannels)return minValue[i];
+	else return 0;
+}
+
+- (void) setMinValue:(int)i value:(float)aValue
+{
+	if(i>=0 && i<kNumArduinoUNOAdcChannels){
+		[[[self undoManager] prepareWithInvocationTarget:self] setMinValue:i value:minValue[i]];
+		
+		minValue[i] = aValue; 
+		
+		NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+		[userInfo setObject:[NSNumber numberWithInt:i] forKey: @"Channel"];
+		
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORArduinoUNOMinValueChanged object:self userInfo:userInfo];
+		
+	}
+}
+- (float) maxValue:(int)i
+{
+	if(i>=0 && i<kNumArduinoUNOAdcChannels)return maxValue[i];
+	else return 0;
+}
+
+- (void) setMaxValue:(int)i value:(float)aValue
+{
+	if(i>=0 && i<kNumArduinoUNOAdcChannels){
+		[[[self undoManager] prepareWithInvocationTarget:self] setMaxValue:i value:maxValue[i]];
+		
+		maxValue[i] = aValue; 
+		
+		NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+		[userInfo setObject:[NSNumber numberWithInt:i] forKey: @"Channel"];
+		
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORArduinoUNOMaxValueChanged object:self userInfo:userInfo];
+		
+	}
+}
+
+
 #pragma mark •••Archival
 - (id) initWithCoder:(NSCoder*)decoder
 {
@@ -254,10 +394,17 @@ NSString* ORArduinoUNOPinNameChanged	= @"ORArduinoUNOPinNameChanged";
 		if(aName)[self setPin:i name:aName];
 		else	 [self setPin:i name:[NSString stringWithFormat:@"Pin %2d",i]];
 		
-		[self setPinValueOut:i value:[decoder decodeIntForKey:[NSString stringWithFormat:@"PinValueOut%d",i]]];
+		[self setPin:i stateOut:[decoder decodeIntForKey:[NSString stringWithFormat:@"PinStateOut%d",i]]];
 		[self setPin:i type:[decoder decodeIntForKey:[NSString stringWithFormat:@"PinType%d",i]]];
 		[self setPin:i pwm:[decoder decodeIntForKey:[NSString stringWithFormat:@"PinPwm%d",i]]];
 
+		[self setMinValue:i value:[decoder decodeFloatForKey:[NSString stringWithFormat:@"minValue%d",i]]];
+		[self setMaxValue:i value:[decoder decodeFloatForKey:[NSString stringWithFormat:@"maxValue%d",i]]];
+		[self setLowLimit:i value:[decoder decodeFloatForKey:[NSString stringWithFormat:@"lowLimit%d",i]]];
+		[self setHiLimit:i value:[decoder decodeFloatForKey:[NSString stringWithFormat:@"hiLimit%d",i]]];
+		[self setSlope:i value:[decoder decodeFloatForKey:[NSString stringWithFormat:@"slope%d",i]]];
+		[self setIntercept:i value:[decoder decodeFloatForKey:[NSString stringWithFormat:@"intercept%d",i]]];
+		
 	}
 	
 	[[self undoManager] enableUndoRegistration];
@@ -271,14 +418,45 @@ NSString* ORArduinoUNOPinNameChanged	= @"ORArduinoUNOPinNameChanged";
 	int i;
 	for(i=0;i<kNumArduinoUNOPins;i++) {
 		[encoder encodeObject:pinName[i] forKey:[NSString stringWithFormat:@"pinName%d",i]];
-		[encoder encodeInt:pinValueOut[i] forKey:[NSString stringWithFormat:@"pinValueOut%d",i]];
+		[encoder encodeInt:pinStateOut[i] forKey:[NSString stringWithFormat:@"pinStateOut%d",i]];
 		[encoder encodeInt:pinType[i] forKey:[NSString stringWithFormat:@"PinType%d",i]];
 		[encoder encodeInt:pwm[i] forKey:[NSString stringWithFormat:@"PinPwm%d",i]];
+		[encoder encodeFloat:lowLimit[i] forKey:[NSString stringWithFormat:@"lowLimit%d",i]];
+		[encoder encodeFloat:hiLimit[i] forKey:[NSString stringWithFormat:@"hiLimit%d",i]];
+		[encoder encodeFloat:slope[i] forKey:[NSString stringWithFormat:@"slope%d",i]];
+		[encoder encodeFloat:intercept[i] forKey:[NSString stringWithFormat:@"intercept%d",i]];
+		[encoder encodeFloat:minValue[i] forKey:[NSString stringWithFormat:@"minValue%d",i]];
+		[encoder encodeFloat:maxValue[i] forKey:[NSString stringWithFormat:@"maxValue%d",i]];
 	}
 	[encoder encodeInt:pollTime			forKey: @"pollTime"];
 }
 
 #pragma mark •••HW Methods
+- (void) writeOutput:(unsigned short) aPin value:(BOOL)aState
+{
+	if(aPin < kNumArduinoUNOPins){
+		if(pinType[aPin] == kArduinoOutput){
+			NSString* cmd = [NSString stringWithFormat:@"w d %d %d",aPin,aState];
+			[self enqueCmdString:cmd];
+		}
+	}
+}
+
+- (void) writeAllOutputs:(unsigned short)aMask
+{
+ 	@synchronized(self){
+		//validate the mask -- it must use only pins set to out
+		int i;
+		for(i=0;i<kNumArduinoUNOPins;i++){
+			if(pinType[i] != kArduinoOutput){
+				aMask &= ~(0x1<<i);
+			}
+		}
+		NSString* cmd = [NSString stringWithFormat:@"w m %d",aMask];
+		[self enqueCmdString:cmd];
+	}
+}
+
 - (void) readAdcValues
 {
 	[self enqueCmdString:@"r a"];
@@ -310,12 +488,16 @@ NSString* ORArduinoUNOPinNameChanged	= @"ORArduinoUNOPinNameChanged";
 {
 	[self readInputPins];
 	int i;
+	unsigned int aMask = 0;
 	for(i=0;i<kNumArduinoUNOPins;i++){
 		if(pinType[i] == kArduinoOutput){
-			NSString* cmd = [NSString stringWithFormat:@"w d %d %d",i,pinValueOut[i]];
-			[self enqueCmdString:cmd];
+			if((pinStateOut[i] == YES) && (pinType[i] == kArduinoOutput)){
+				aMask |= (1<<i);
+			}
 		}
 	}
+	[self writeAllOutputs:aMask];
+	
 	for(i=0;i<kNumArduinoUNOPins;i++){
 		if(pinType[i] == kArduinoPWM){
 			NSString* cmd = [NSString stringWithFormat:@"w a %d %d",i,pwm[i]];
@@ -359,13 +541,19 @@ NSString* ORArduinoUNOPinNameChanged	= @"ORArduinoUNOPinNameChanged";
 - (void) processIsStarting { }
 - (void) processIsStopping { }
 - (void) startProcessCycle { }
-- (void) endProcessCycle   { }
+- (void) endProcessCycle   
+{ 
+	if(oldProcessOutMask!=processOutMask){
+		oldProcessOutMask = processOutMask;
+		[self writeAllOutputs:processOutMask];
+	}
+}
 
 - (NSString*) identifier
 {
 	NSString* s;
  	@synchronized(self){
-		s= [NSString stringWithFormat:@"ArduinoUNO,%lu",[self uniqueIdNumber]];
+		s= [NSString stringWithFormat:@"ArdUNO,%lu",[self uniqueIdNumber]];
 	}
 	return s;
 }
@@ -383,14 +571,55 @@ NSString* ORArduinoUNOPinNameChanged	= @"ORArduinoUNOPinNameChanged";
 {
 	BOOL theValue = 0;
 	@synchronized(self){
-		switch(channel){
+		if(channel<kNumArduinoUNOPins){
+			if(pinType[channel] == kArduinoInput) theValue = pinStateIn[channel];
 		}
 	}
 	return theValue;
 }
 
-- (void) setProcessOutput:(int)channel value:(int)value { }
+- (double) convertedValue:(int)aChan
+{
+	double theValue = 0;
+	@synchronized(self){
+		if(aChan<kNumArduinoUNOPins)theValue =  slope[aChan] * adc[aChan] + intercept[aChan];
+    }
+	return theValue;
+}
 
+- (void) setProcessOutput:(int)aChan value:(int)aValue 
+{ 
+ 	@synchronized(self){
+		if(aChan<kNumArduinoUNOPins){
+			if(aValue>0) processOutMask |= (0x1<<aChan);
+			else		 processOutMask &= ~(0x1<<aChan);
+		}
+	}
+}
+
+- (double) maxValueForChan:(int)aChan
+{
+	return maxValue[aChan];
+}
+
+- (double) minValueForChan:(int)aChan
+{
+	return minValue[aChan];
+}
+
+- (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit channel:(int)channel
+{
+	@synchronized(self){
+		if(channel<kNumArduinoUNOPins){
+			*theLowLimit = lowLimit[channel];
+			*theHighLimit =  hiLimit[channel];
+		}
+		else {
+			*theLowLimit = 0;
+			*theHighLimit = 5;
+		}
+	}		
+}
 
 
 @end
@@ -452,7 +681,7 @@ NSString* ORArduinoUNOPinNameChanged	= @"ORArduinoUNOPinNameChanged";
 				int i;
 				for(i=0;i<kNumArduinoUNOPins;i++){
 					int pinValue = [[parts objectAtIndex:1+i] intValue];
-					[self setPinValueIn:i value:pinValue];
+					[self setPin:i stateIn:pinValue];
 				}
 			}
 		}
@@ -463,12 +692,24 @@ NSString* ORArduinoUNOPinNameChanged	= @"ORArduinoUNOPinNameChanged";
 				unsigned int hiMask = [[parts objectAtIndex:1] unsignedIntValue];
 				int i;
 				for(i=0;i<kNumArduinoUNOPins;i++){
-					int pinValue = (hiMask & (1<<i) != 0);
-					[self setPinValueIn:i value:pinValue];
+					int pinValue = ((hiMask & (1<<i)) > 0);
+					[self setPin:i stateIn:pinValue];
 				}
 			}
 		}
-
+		else if([[parts objectAtIndex:0] isEqualToString:@"m"]){
+			[[self undoManager] disableUndoRegistration];
+			if([parts count] >= 2){
+				unsigned int outputMask = [[parts objectAtIndex:1] unsignedIntValue];
+				int i;
+				for(i=0;i<kNumArduinoUNOPins;i++){
+					BOOL state = ((outputMask & (0x1<<i))>0);
+					[self setPin:i stateOut:state];
+				}
+			}
+			[[self undoManager] enableUndoRegistration];
+		}
+		
 		if(lastRequest && !unsolicited){
 			[self setLastRequest:nil];			 //clear the last request
 			[self processOneCommandFromQueue];	 //do the next command in the queue

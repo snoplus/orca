@@ -46,12 +46,26 @@
 	int i;
 	for(i=0;i<kNumArduinoUNOPins;i++){
 		[[pinNameMatrix cellAtRow:i column:0] setTag:i];
-		[[pinValueOutMatrix cellAtRow:i column:0] setTag:i];
-		[[pinValueInMatrix cellAtRow:i column:0] setTag:i];
+		[[pinStateOutMatrix cellAtRow:i column:0] setTag:i];
+		[[pinStateInMatrix cellAtRow:i column:0] setTag:i];		
 		[[pwmMatrix cellAtRow:i column:0] setTag:i];
 		[[adcMatrix cellAtRow:i column:0] setTag:i];
-		[[adcMatrix cellAtRow:i column:0] setFormatter:formatter];
+		[[minValueMatrix cellAtRow:i column:0]	setTag:i];
+		[[maxValueMatrix cellAtRow:i column:0]	setTag:i];
+		[[slopeMatrix cellAtRow:i column:0]		setTag:i];
+		[[interceptMatrix cellAtRow:i column:0] setTag:i];
+		[[lowLimitMatrix cellAtRow:i column:0]	setTag:i];
+		[[hiLimitMatrix cellAtRow:i column:0]	setTag:i];
 
+		[[adcMatrix cellAtRow:i column:0] setFormatter:formatter];
+		[[slopeMatrix cellAtRow:i column:0] setFormatter:formatter];
+		[[interceptMatrix cellAtRow:i column:0] setFormatter:formatter];
+		[[minValueMatrix cellAtRow:i column:0] setFormatter:formatter];
+		[[maxValueMatrix cellAtRow:i column:0] setFormatter:formatter];
+		[[lowLimitMatrix cellAtRow:i column:0] setFormatter:formatter];
+		[[hiLimitMatrix cellAtRow:i column:0] setFormatter:formatter];
+		
+		
 	}
  	[super awakeFromNib];
 }
@@ -99,8 +113,8 @@
 						object: model];	
 
 	[notifyCenter addObserver : self
-                     selector : @selector(pinValueInChanged:)
-                         name : ORArduinoUNOPinValueInChanged
+                     selector : @selector(pinStateInChanged:)
+                         name : ORArduinoUNOPinStateInChanged
 						object: model];	
 
 	[notifyCenter addObserver : self
@@ -109,14 +123,44 @@
 						object: model];	
 
 	[notifyCenter addObserver : self
-                     selector : @selector(pinValueOutChanged:)
-                         name : ORArduinoUNOPinValueOutChanged
+                     selector : @selector(pinStateOutChanged:)
+                         name : ORArduinoUNOPinStateOutChanged
 						object: model];	
 
 	[notifyCenter addObserver : self
                      selector : @selector(pwmChanged:)
                          name : ORArduinoUNOPwmChanged
 						object: model];	
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(slopeChanged:)
+                         name : ORArduinoUNOSlopeChanged
+						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(interceptChanged:)
+                         name : ORArduinoUNOInterceptChanged
+						object: model];
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(minValueChanged:)
+                         name : ORArduinoUNOMinValueChanged
+						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(maxValueChanged:)
+                         name : ORArduinoUNOMaxValueChanged
+						object: model];
+
+	[notifyCenter addObserver : self
+                     selector : @selector(lowLimitChanged:)
+                         name : ORArduinoUNOLowLimitChanged
+						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(hiLimitChanged:)
+                         name : ORArduinoUNOHiLimitChanged
+						object: model];
 	
 	[serialPortController registerNotificationObservers];
 
@@ -132,16 +176,24 @@
 - (void) updateWindow
 {
     [super updateWindow];
-    [self lockChanged:nil];
     [self portStateChanged:nil];
 	[self adcChanged:nil];
 	[self pollTimeChanged:nil];
 	
-	[self pinTypeChanged:nil];
-	[self pinValueInChanged:nil];
-	[self pinValueOutChanged:nil];
+	[self pinStateInChanged:nil];
+	[self pinStateOutChanged:nil];
 	[self pinNameChanged:nil];
 	[self pwmChanged:nil];
+	[self pinTypeChanged:nil];
+
+	[self lowLimitChanged:nil];
+	[self hiLimitChanged:nil];
+	[self minValueChanged:nil];
+	[self maxValueChanged:nil];
+	[self slopeChanged:nil];
+	[self interceptChanged:nil];
+
+	[self lockChanged:nil];
 
     [self updateButtons];
 	[serialPortController updateWindow];
@@ -179,24 +231,121 @@
 	[serialPortController updateButtons:locked];
     [pollTimePopup	setEnabled:!locked];
 	
+	[pinTypeMatrix setEnabled:!locked];
+
 	short i;
 	for(i=0;i<kNumArduinoUNOPins;i++){
 		if([model pinType:i] == kArduinoPWM){
 			[[pwmMatrix cellAtRow:i column:0] setEnabled:!locked];
-			[[pinValueOutMatrix cellAtRow:i column:0] setEnabled:NO];
-			[[pinValueInMatrix cellAtRow:i column:0] setStringValue:@"-"];
+			[[pinStateOutMatrix cellAtRow:i column:0] setEnabled:NO];
+			[[pinStateInMatrix cellAtRow:i column:0] setStringValue:@"-"];
 		}
 		else {
 			if([model pinType:i] == kArduinoOutput){
-				[[pinValueOutMatrix cellAtRow:i column:0] setEnabled:!locked];
-				[[pinValueInMatrix cellAtRow:i column:0] setStringValue:@"-"];
+				[[pinStateOutMatrix cellAtRow:i column:0] setEnabled:!locked];
+				[[pinStateInMatrix cellAtRow:i column:0] setStringValue:@"-"];
 				[[pwmMatrix cellAtRow:i column:0] setEnabled:NO];
 			}
 			else {
 				[[pwmMatrix cellAtRow:i column:0] setEnabled:NO];
-				[[pinValueOutMatrix cellAtRow:i column:0] setEnabled:NO];
-				[[pinValueInMatrix cellAtRow:i column:0] setEnabled:YES];
+				[[pinStateOutMatrix cellAtRow:i column:0] setEnabled:NO];
+				[[pinStateInMatrix cellAtRow:i column:0] setEnabled:YES];
 			}
+		}
+	}
+}
+- (void) lowLimitChanged:(NSNotification*)aNotification
+{
+	if(!aNotification){
+		int i;
+		for(i=0;i<kNumArduinoUNOAdcChannels;i++){
+			[[lowLimitMatrix cellWithTag:i] setFloatValue:[model lowLimit:i]];
+		}
+	}
+	else {
+		int chan = [[[aNotification userInfo] objectForKey:@"Channel"] floatValue];
+		if(chan<kNumArduinoUNOAdcChannels){
+			[[lowLimitMatrix cellWithTag:chan] setFloatValue:[model lowLimit:chan]];
+		}
+	}
+}
+
+- (void) hiLimitChanged:(NSNotification*)aNotification
+{
+	if(!aNotification){
+		int i;
+		for(i=0;i<kNumArduinoUNOAdcChannels;i++){
+			[[hiLimitMatrix cellWithTag:i] setFloatValue:[model hiLimit:i]];
+		}
+	}
+	else {
+		int chan = [[[aNotification userInfo] objectForKey:@"Channel"] floatValue];
+		if(chan<kNumArduinoUNOAdcChannels){
+			[[hiLimitMatrix cellWithTag:chan] setFloatValue:[model hiLimit:chan]];
+		}
+	}
+}
+
+- (void) minValueChanged:(NSNotification*)aNotification
+{
+	if(!aNotification){
+		int i;
+		for(i=0;i<kNumArduinoUNOAdcChannels;i++){
+			[[minValueMatrix cellWithTag:i] setFloatValue:[model minValue:i]];
+		}
+	}
+	else {
+		int chan = [[[aNotification userInfo] objectForKey:@"Channel"] floatValue];
+		if(chan<kNumArduinoUNOAdcChannels){
+			[[minValueMatrix cellWithTag:chan] setFloatValue:[model minValue:chan]];
+		}
+	}
+}
+
+- (void) maxValueChanged:(NSNotification*)aNotification
+{
+	if(!aNotification){
+		int i;
+		for(i=0;i<kNumArduinoUNOAdcChannels;i++){
+			[[maxValueMatrix cellWithTag:i] setFloatValue:[model maxValue:i]];
+		}
+	}
+	else {
+		int chan = [[[aNotification userInfo] objectForKey:@"Channel"] floatValue];
+		if(chan<kNumArduinoUNOAdcChannels){
+			[[maxValueMatrix cellWithTag:chan] setFloatValue:[model maxValue:chan]];
+		}
+	}
+}
+
+- (void) slopeChanged:(NSNotification*)aNotification
+{
+	if(!aNotification){
+		int i;
+		for(i=0;i<kNumArduinoUNOAdcChannels;i++){
+			[[slopeMatrix cellWithTag:i] setFloatValue:[model slope:i]];
+		}
+	}
+	else {
+		int chan = [[[aNotification userInfo] objectForKey:@"Channel"] floatValue];
+		if(chan<kNumArduinoUNOAdcChannels){
+			[[slopeMatrix cellWithTag:chan] setFloatValue:[model slope:chan]];
+		}
+	}
+}
+
+- (void) interceptChanged:(NSNotification*)aNotification
+{
+	if(!aNotification){
+		int i;
+		for(i=0;i<kNumArduinoUNOAdcChannels;i++){
+			[[interceptMatrix cellWithTag:i] setFloatValue:[model intercept:i]];
+		}
+	}
+	else {
+		int chan = [[[aNotification userInfo] objectForKey:@"Channel"] floatValue];
+		if(chan<kNumArduinoUNOAdcChannels){
+			[[interceptMatrix cellWithTag:chan] setFloatValue:[model intercept:chan]];
 		}
 	}
 }
@@ -244,35 +393,35 @@
 	[self updateButtons];
 }
 
-- (void) pinValueInChanged:(NSNotification*)aNote
+- (void) pinStateInChanged:(NSNotification*)aNote
 {
 	if(aNote == nil){
         short i;
         for(i=0;i<kNumArduinoUNOPins;i++){
 			NSString* s = @"-";
-			if([model pinType:i]==kArduinoInput)s = [model pinValueIn:i]?@"Hi":@"Lo";
-            [[pinValueInMatrix cellWithTag:i] setStringValue:s];
+			if([model pinType:i]==kArduinoInput)s = [model pinStateIn:i]?@"Hi":@"Lo";
+            [[pinStateInMatrix cellWithTag:i] setStringValue:s];
         }
     }
     else {
         int i = [[[aNote userInfo] objectForKey:@"Pin"] intValue];
 		NSString* s = @"-";
-		if([model pinType:i]==kArduinoInput)s = [model pinValueIn:i]?@"Hi":@"Lo";
-        [[pinValueInMatrix cellWithTag:i] setStringValue:s];
+		if([model pinType:i]==kArduinoInput)s = [model pinStateIn:i]?@"Hi":@"Lo";
+        [[pinStateInMatrix cellWithTag:i] setStringValue:s];
     }
 }
 
-- (void) pinValueOutChanged:(NSNotification*)aNote
+- (void) pinStateOutChanged:(NSNotification*)aNote
 {
 	if(aNote == nil){
         short i;
         for(i=0;i<kNumArduinoUNOPins;i++){
-            [[pinValueOutMatrix cellWithTag:i] setIntValue:[model pinValueOut:i]];
+            [[pinStateOutMatrix cellWithTag:i] setIntValue:[model pinStateOut:i]];
         }
     }
     else {
         int i = [[[aNote userInfo] objectForKey:@"Pin"] intValue];
-        [[pinValueOutMatrix cellWithTag:i] setIntValue:[model pinValueOut:i]];
+        [[pinStateOutMatrix cellWithTag:i] setIntValue:[model pinStateOut:i]];
     }
 }
 
@@ -323,9 +472,7 @@
 - (IBAction) pinTypeAction:(id)sender
 {
 	int thePin = [sender selectedRow];
-	if([model pinType:thePin]!= [[sender selectedCell] indexOfSelectedItem]){
-		[model setPin:thePin type:[[sender selectedCell] indexOfSelectedItem]];
-	}
+	[model setPin:thePin type:[[sender selectedCell] indexOfSelectedItem]];
 }
 
 - (IBAction) pinNameAction:(id)sender
@@ -336,11 +483,11 @@
 	}
 }
 
-- (IBAction) pinValueOutAction:(id)sender
+- (IBAction) pinStateOutAction:(id)sender
 {
 	int thePin = [[sender selectedCell] tag];
-	if([model pinValueOut:thePin]!= [sender intValue]){
-		[model setPinValueOut:thePin value:[sender intValue]];
+	if([model pinStateOut:thePin]!= [sender intValue]){
+		[model setPin:thePin stateOut:[sender intValue]];
 	}
 }
 
@@ -356,6 +503,34 @@
 {
 	[self endEditing];
 	[model initHardware];
+}
+- (IBAction) slopeAction:(id)sender
+{
+	[model setSlope:[[sender selectedCell] tag] value:[[sender selectedCell] floatValue]];	
+}
+
+- (IBAction) interceptAction:(id)sender
+{
+	[model setIntercept:[[sender selectedCell] tag] value:[[sender selectedCell] floatValue]];	
+}
+- (IBAction) lowLimitAction:(id)sender
+{
+	[model setLowLimit:[[sender selectedCell] tag] value:[[sender selectedCell] floatValue]];	
+}
+
+- (IBAction) hiLimitAction:(id)sender
+{
+	[model setHiLimit:[[sender selectedCell] tag] value:[[sender selectedCell] floatValue]];	
+}
+
+- (IBAction) minValueAction:(id)sender
+{
+	[model setMinValue:[[sender selectedCell] tag] value:[[sender selectedCell] floatValue]];	
+}
+
+- (IBAction) maxValueAction:(id)sender
+{
+	[model setMaxValue:[[sender selectedCell] tag] value:[[sender selectedCell] floatValue]];	
 }
 
 @end

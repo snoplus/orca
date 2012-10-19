@@ -18,6 +18,7 @@
 #pragma mark •••Imported Files
 #import "ORSerialPortWithQueueModel.h"
 #import "ORBitProcessing.h"
+#import "ORAdcProcessing.h"
 
 #define kNumArduinoUNOAdcChannels	6
 #define kNumArduinoUNOPins			12 //first two are serial lines
@@ -26,7 +27,7 @@
 #define kArduinoOutput  1
 #define kArduinoPWM		2
 
-@interface ORArduinoUNOModel : ORSerialPortWithQueueModel <ORBitProcessing>
+@interface ORArduinoUNOModel : ORSerialPortWithQueueModel <ORBitProcessing,ORAdcProcessing>
 {
     @private
 		NSMutableData*	inComingData;
@@ -34,11 +35,20 @@
 		BOOL            delay;
 		float			adc[kNumArduinoUNOAdcChannels];
 		int				pinType[kNumArduinoUNOPins];
-		NSString*       pinName[kNumArduinoUNOPins];   //adc names
+		NSString*       pinName[kNumArduinoUNOPins];
 		unsigned char	pwm[kNumArduinoUNOPins];
-		BOOL			pinValueOut[kNumArduinoUNOPins];;
-		BOOL			pinValueIn[kNumArduinoUNOPins];;
-
+		BOOL			pinStateOut[kNumArduinoUNOPins];
+		BOOL			pinStateIn[kNumArduinoUNOPins];
+	
+		//process stuff
+		unsigned int	oldProcessOutMask;
+		unsigned int	processOutMask;
+		float             lowLimit[kNumArduinoUNOAdcChannels];
+		float             hiLimit[kNumArduinoUNOAdcChannels];
+		float             minValue[kNumArduinoUNOAdcChannels];
+		float             maxValue[kNumArduinoUNOAdcChannels];
+		float             slope[kNumArduinoUNOAdcChannels];
+		float             intercept[kNumArduinoUNOAdcChannels];
 }
 
 #pragma mark •••Initialization
@@ -56,27 +66,38 @@
 - (unsigned char) pwm:(unsigned short)aPin;
 - (void) setPin:(unsigned short)aPin pwm:(unsigned char)aValue;
 
-- (BOOL) pinValueOut:(unsigned short)aPin;
-- (void) setPinValueOut:(unsigned short)aPin value:(BOOL)aValue;
+- (BOOL) pinStateOut:(unsigned short)aPin;
+- (void) setPin:(unsigned short)aPin stateOut:(BOOL)aValue;
 
-- (BOOL) pinValueIn:(unsigned short)aPin;
-- (void) setPinValueIn:(unsigned short)aPin value:(BOOL)aValue;
+- (BOOL) pinStateIn:(unsigned short)aPin;
+- (void) setPin:(unsigned short)aPin stateIn:(BOOL)aValue;
 
-- (int) pinType:(unsigned short)aPin;
-- (void) setPin:(unsigned short)aPin type:(unsigned short)aType;
+- (unsigned char) pinType:(unsigned short)aPin;
+- (void) setPin:(unsigned short)aPin type:(unsigned char)aType;
 
 - (unsigned char) pwm:(unsigned short)aPin;
 - (void) setPin:(unsigned short)aPin pwm:(unsigned char)aValue;
 - (BOOL) validForPwm:(unsigned short)aPin;
 
+- (unsigned int) inputMask;
+
+- (float) lowLimit:(int)i;
+- (void)  setLowLimit:(int)i value:(float)aValue;
+- (float) hiLimit:(int)i;
+- (void)  setHiLimit:(int)i value:(float)aValue;
+- (float) slope:(int)i;
+- (void)  setSlope:(int)i value:(float)aValue;
+- (float) intercept:(int)i;
+- (void)  setIntercept:(int)i value:(float)aValue;
+- (float) minValue:(int)i;
+- (void)  setMinValue:(int)i value:(float)aValue;
+- (float) maxValue:(int)i;
+- (void)  setMaxValue:(int)i value:(float)aValue;
+
 #pragma mark •••Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 
-#pragma mark •••Command Methods
-- (void) readAdcValues;
-- (void) readInputPins;
-- (unsigned int) inputMask;
 
 #pragma mark •••Port Methods
 - (void) dataReceived:(NSNotification*)note;
@@ -84,6 +105,10 @@
 #pragma mark •••HW Methods
 - (void) updateAll;
 - (void) initHardware;
+- (void) writeOutput:(unsigned short) aPin value:(BOOL)aState;
+- (void) writeAllOutputs:(unsigned short)aMask;
+- (void) readAdcValues;
+- (void) readInputPins;
 
 #pragma mark •••Adc Processing Protocol
 - (void) processIsStarting;
@@ -99,7 +124,13 @@ extern NSString* ORArduinoUNOLock;
 extern NSString* ORArduinoUNOModelPollTimeChanged;
 extern NSString* ORArduinoUNOModelAdcChanged;
 extern NSString* ORArduinoUNOPinTypeChanged;
-extern NSString* ORArduinoUNOPinValueInChanged;
-extern NSString* ORArduinoUNOPinValueOutChanged;
+extern NSString* ORArduinoUNOPinStateInChanged;
+extern NSString* ORArduinoUNOPinStateOutChanged;
 extern NSString* ORArduinoUNOPwmChanged;
 extern NSString* ORArduinoUNOPinNameChanged;
+extern NSString* ORArduinoUNOHiLimitChanged;
+extern NSString* ORArduinoUNOLowLimitChanged;
+extern NSString* ORArduinoUNOSlopeChanged;
+extern NSString* ORArduinoUNOInterceptChanged;
+extern NSString* ORArduinoUNOMinValueChanged;
+extern NSString* ORArduinoUNOMaxValueChanged;
