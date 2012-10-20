@@ -202,6 +202,10 @@ kPEDCrateMask
 
 @implementation ORMTCModel
 
+@synthesize
+dataId = _dataId,
+mtcStatusDataId = _mtcStatusDataId;
+
 - (id) init //designated initializer
 {
     self = [super init];
@@ -700,23 +704,25 @@ kPEDCrateMask
     return [NSMutableArray arrayWithObjects:triggerGroup,nil];
 }
 
-- (unsigned long) dataId { return dataId; }
-- (void) setDataId: (unsigned long) DataId
-{
-    dataId = DataId;
-}
-
 - (NSDictionary*) dataRecordDescription
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
 								 @"ORMTCDecoderForMTC",	@"decoder",
-								 [NSNumber numberWithLong:dataId], @"dataId",
+								 [NSNumber numberWithLong:[self dataId]], @"dataId",
 								 [NSNumber numberWithBool:NO], @"variable",
 								 [NSNumber numberWithLong:7], @"length",  //****put in actual length
 								 nil];
     [dataDictionary setObject:aDictionary forKey:@"MTC"];
-    
+
+    NSDictionary* bDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+								 @"ORMTCDecoderForMTCStatus",	@"decoder",
+								 [NSNumber numberWithLong:[self mtcStatusDataId]], @"dataId",
+								 [NSNumber numberWithBool:NO], @"variable",
+								 [NSNumber numberWithLong:7], @"length",
+								 nil];
+    [dataDictionary setObject:bDictionary forKey:@"MTCStatus"];
+
     return dataDictionary;
 }
 
@@ -787,11 +793,21 @@ kPEDCrateMask
             //keep it running
         }
         else {
-            [self clearGlobalTriggerWordMask];
+            @try {
+                [self clearGlobalTriggerWordMask];
+            }
+            @catch (NSException *exception) {
+                NSLog(@"MTCD clear trigger mask at the end of a run failed.\n");
+            }
         }
     }
     else {
-        [self clearGlobalTriggerWordMask];
+        @try {
+            [self clearGlobalTriggerWordMask];
+        }
+        @catch (NSException *exception) {
+        NSLog(@"MTCD clear trigger mask at the end of a run failed.\n");
+        }
     }
 }
 
@@ -823,14 +839,17 @@ kPEDCrateMask
 {
     configStruct->total_cards++;
     configStruct->card_info[index].hw_type_id		= kMtc;			//should be unique 
-    configStruct->card_info[index].hw_mask[0]		= dataId;		//better be unique
+    configStruct->card_info[index].hw_mask[0]		= [self dataId];		//better be unique
+	configStruct->card_info[index].hw_mask[1] = [self mtcStatusDataId];
     configStruct->card_info[index].slot				= [self slot];
     configStruct->card_info[index].add_mod			= [self addressModifier];
     configStruct->card_info[index].base_add			= [self baseAddress];
 	configStruct->card_info[index].deviceSpecificData[0] = reg[kMtcBbaReg].addressOffset;
 	configStruct->card_info[index].deviceSpecificData[1] = reg[kMtcBwrAddOutReg].addressOffset;
 	configStruct->card_info[index].deviceSpecificData[2] = [self memBaseAddress];
-	configStruct->card_info[index].deviceSpecificData[3] = [self memAddressModifier];	
+	configStruct->card_info[index].deviceSpecificData[3] = [self memAddressModifier];
+	configStruct->card_info[index].deviceSpecificData[4] = 1000; //delay between monitoring packets in msec
+	
 	configStruct->card_info[index].num_Trigger_Indexes = 0; //no children
 	configStruct->card_info[index].next_Card_Index = index + 1;
 	
@@ -949,12 +968,14 @@ kPEDCrateMask
 
 - (void) setDataIds:(id)assigner
 {
-    dataId = [assigner assignDataIds:kLongForm];
+    [self setDataId:[assigner assignDataIds:kLongForm]];
+    [self setMtcStatusDataId:[assigner assignDataIds:kLongForm]];
 }
 
 - (void) syncDataIdsWith:(id)anotherMTC
 {
     [self setDataId:[anotherMTC dataId]];
+    [self setMtcStatusDataId:[anotherMTC mtcStatusDataId]];
 }
 
 - (void) reset
@@ -1375,11 +1396,22 @@ kPEDCrateMask
 - (void) setMtcTime
 {
 	//set the 10MHz counter to a time based on the number of seconds since 1/1/1996 (GMT)
-	static unsigned long theSecondsToSubtract = 0;
+	//static unsigned long theSecondsToSubtract = 0;
+    
+    double theTicks10MHz = [[NSDate date] timeIntervalSinceDate:[NSCalendarDate dateWithYear:1996 month:1 day:1 hour:0 minute:0 second:0 timeZone:[NSTimeZone timeZoneWithAbbreviation:@"GMT"]]];
 	
+    theTicks10MHz /= 100.E-9;
+    unsigned long theLowerBits  = (unsigned long) fmod(theTicks10MHz,4294967296.0);
+    unsigned long theUpperBits  = (unsigned long)(theTicks10MHz/4294967296.0);
+
+    [self setThe10MHzCounterLow:theLowerBits high:theUpperBits];
+    
+    /*
  	if( theSecondsToSubtract == 0 ) {
 		theSecondsToSubtract =  (unsigned long)[[NSDate date] timeIntervalSinceDate:[NSCalendarDate dateWithYear:1996 month:1 day:1 hour:0 minute:0 second:0 timeZone:[NSTimeZone timeZoneWithAbbreviation:@"GMT"]]];
  	}
+    */
+    
 	/* 
 	 //load the 10MHz clock from mac time....eventually we will 
 	 //get the time from the GPS.

@@ -35,7 +35,8 @@
 @interface ORMTCModel :  ORVmeIOCard <ORDataTaker>
 {
     @private
-		unsigned long			dataId;
+		unsigned long			_dataId;
+        unsigned long			_mtcStatusDataId;
 		NSMutableDictionary*	mtcDataBase;
 		
 		//basic ops
@@ -86,6 +87,9 @@
 @property (nonatomic,assign) unsigned long mtcaOELOMask;
 @property (nonatomic,assign) unsigned long mtcaOEHIMask;
 @property (nonatomic,assign) unsigned long mtcaOWLNMask;
+@property (nonatomic,assign) unsigned long dataId;
+@property (nonatomic,assign) unsigned long mtcStatusDataId;
+
 
 #pragma mark •••Initialization
 - (id) init;
