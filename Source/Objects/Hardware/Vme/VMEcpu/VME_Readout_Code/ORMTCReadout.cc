@@ -3,7 +3,7 @@
 #include <errno.h>
 #include <iostream>
 #include <unistd.h>
-
+#include <time.h>
 
 #include <stdlib.h>
 #include <sys/time.h>
@@ -27,6 +27,9 @@ bool ORMTCReadout::Start() {
 	value &= k_fifo_valid_mask;
 	last_mem_read_ptr = value;
 	mem_read_ptr = value;
+
+    struct timezone tz;
+    gettimeofday(&timestamp, &tz);
 			
 	return true;
 }
@@ -38,6 +41,63 @@ bool ORMTCReadout::Stop() {
         Readout(0);
     }
 	return true;
+}
+
+bool ORMTCReadout::UpdateStatus() {
+
+    ensureDataCanHold(6);
+    int32_t savedIndex = dataIndex;
+    data[dataIndex++] = GetHardwareMask()[1] | 7;
+    dataIndex++;
+
+    uint32_t aValue;
+
+    //GT
+	if (VMERead(GetBaseAddress() + 0x80UL, GetAddressModifier(),
+			sizeof(aValue), aValue) < (int32_t) sizeof(aValue)){
+		LogBusError("BusError: GT mem_access at: 0x%08x", 0x80);
+        dataIndex = savedIndex;
+		return true; 
+	}
+    data[dataIndex++] = aValue;
+
+    //10Mhz low
+	if (VMERead(GetBaseAddress() + 0x8CUL, GetAddressModifier(),
+			sizeof(aValue), aValue) < (int32_t) sizeof(aValue)){
+		LogBusError("BusError: 10MHz mem_access at: 0x%08x", 0x8C);
+        dataIndex = savedIndex;
+		return true; 
+	}
+    data[dataIndex++] = aValue;
+
+    //10Mhz high
+	if (VMERead(GetBaseAddress() + 0x90UL, GetAddressModifier(),
+			sizeof(aValue), aValue) < (int32_t) sizeof(aValue)){
+		LogBusError("BusError: mem_access at: 0x%08x", 0x90);
+        dataIndex = savedIndex;
+		return true; 
+	}
+    data[dataIndex++] = aValue;
+
+    //read pointer
+	if (VMERead(GetBaseAddress() + 0x2CUL, GetAddressModifier(),
+			sizeof(aValue), aValue) < (int32_t) sizeof(aValue)){
+		LogBusError("BusError: bba mem_access at: 0x%08x", 0x2C);
+        dataIndex = savedIndex;
+		return true; 
+	}
+    data[dataIndex++] = aValue;
+
+    //write pointer
+    if (VMERead(GetBaseAddress() + 0x28UL, GetAddressModifier(),
+			sizeof(aValue), aValue) < (int32_t) sizeof(aValue)){
+		LogBusError("BusError:next bba mem_access at: 0x%08x", 0x2C);
+        dataIndex = savedIndex;
+		return true; 
+	}
+    data[dataIndex++] = aValue;
+
+    return true;
 }
 
 bool ORMTCReadout::Readout(SBC_LAM_Data* /*lamData*/)
@@ -53,7 +113,21 @@ bool ORMTCReadout::Readout(SBC_LAM_Data* /*lamData*/)
 	
 	uint32_t value = 0;
 	bool triggered = 0;
-        
+
+    const uint32_t poll_delay = GetDeviceSpecificData()[4]; //msec
+
+    struct timeval tv;
+    struct timezone tz;
+    gettimeofday(&tv, &tz);
+
+    double time_diff = 1000 * ((tv.tv_sec - timestamp.tv_sec) + (tv.tv_usec - timestamp.tv_usec)/1.e6);
+    if (time_diff > poll_delay) {
+        timestamp.tv_sec = tv.tv_sec;
+        timestamp.tv_usec = tv.tv_usec;
+
+        UpdateStatus();
+    }
+
 	//get the read ptr and check the trigger, step 1: data available
 	if (VMERead(GetBaseAddress() + mem_read_reg, GetAddressModifier(),
 			sizeof(mem_read_ptr), mem_read_ptr) < (int32_t) sizeof(mem_read_ptr)){
