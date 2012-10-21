@@ -51,6 +51,8 @@
 
 NSString* kCrashLogDir  = @"~/Library/Logs/CrashReporter";
 NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
+NSString* OROrcaAboutToQuitNotice    = @"OROrcaAboutToQuitNotice";
+NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 
 #define kORSplashScreenDelay 1
 #define kHeartbeatPeriod 30
@@ -349,15 +351,32 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 		else okToQuit = NO;
 	}
 	if(okToQuit){
+        delayTermination = NO;
 		[[ORCommandCenter sharedCommandCenter] closeScriptIDE];
 		[ORTimer delay:1];
 		
-		[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:YES] forKey:ORNormalShutDownFlag];    
+		[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:YES] forKey:ORNormalShutDownFlag];
 		[[NSUserDefaults standardUserDefaults] synchronize];
-		//[[ORProcessCenter sharedProcessCenter] stopAllAndNotify];
-		
-		[NSApp terminate:sender];
+
+        [[NSNotificationCenter defaultCenter] postNotificationName:OROrcaAboutToQuitNotice object:self];
+        [[NSNotificationCenter defaultCenter] postNotificationName:OROrcaFinalQuitNotice object:self];
+
+        if(delayTermination){
+            NSLog(@"delaying termination for 5 seconds\n");
+            [self performSelector:@selector(delayedTermination) withObject:self afterDelay:5];
+        }
+        else [NSApp terminate:sender];
 	}
+}
+
+- (void) delayedTermination
+{
+    [NSApp terminate:self];
+}
+
+- (void) delayTermination
+{
+    delayTermination = YES;
 }
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
@@ -400,7 +419,7 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
     NSString *version = [[NSProcessInfo processInfo] operatingSystemVersionString];
     NSString* updateNotice = @"";
     
-    #if defined(MAC_OS_X_VERSION_10_5) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
+    #if defined(MAC_OS_X_VERSION_10_5) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_5
         updateNotice = @"(Note: ORCA will move to 10.6 soon. Please update)";
     #endif
 

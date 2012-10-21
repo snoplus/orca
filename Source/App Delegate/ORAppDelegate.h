@@ -37,7 +37,7 @@
 	BOOL configLoadedOK;
 	NSOperationQueue* queue;
 	unsigned long heartbeatCount;
-	
+	BOOL delayTermination;
 }
 
 - (MemoryWatcher*) memoryWatcher;
@@ -51,6 +51,7 @@
 - (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender;
 - (NSString*) ethernetHardwareAddress;
 - (BOOL) configLoadedOK;
+- (void) delayTermination;
 
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;
@@ -91,6 +92,9 @@
                          change:(NSDictionary *)change context:(void *)context;
 
 @end
+
+NSString* OROrcaAboutToQuitNotice;
+NSString* OROrcaFinalQuitNotice;
 
 
 @interface ORHeartBeatOp : NSOperation
