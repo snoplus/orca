@@ -34,7 +34,12 @@
 
 @interface ORMTCDecoderForMTCStatus : ORVmeCardDecoder {
 @private
+    NSDate* _baseDate;
+    NSDateFormatter* _mtcDateFormatter;
 }
+@property (retain,nonatomic) NSDate* baseDate;
+@property (retain,nonatomic) NSDateFormatter* mtcDateFormatter;
+
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
 @end

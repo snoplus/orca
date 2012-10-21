@@ -72,6 +72,31 @@
 
 @implementation ORMTCDecoderForMTCStatus
 
+@synthesize
+baseDate = _baseDate,
+mtcDateFormatter = _mtcDateFormatter;
+
+- (id) init
+{
+	self = [super init];
+    [self setBaseDate:[NSCalendarDate dateWithYear:1996 month:1 day:1 hour:0 minute:0 second:0
+             timeZone:[NSTimeZone timeZoneWithAbbreviation:@"GMT"]]];
+
+    [self setMtcDateFormatter:[[[NSDateFormatter alloc] init] autorelease]];
+    [[self mtcDateFormatter] setDateFormat:@"yyyy'-'MM'-'dd' 'HH':'mm':'ss"];
+    //[[self mtcDateFormatter] setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
+    [[self mtcDateFormatter] setTimeZone:[NSTimeZone localTimeZone]];
+
+	return self;
+}
+
+-(void)dealloc
+{
+    [[self baseDate] release];
+    [[self mtcDateFormatter] release];
+	[super dealloc];
+}
+
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long* ptr = (unsigned long*)someData;
@@ -81,7 +106,30 @@
 
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
-	return @"";
+    const static unsigned long k_no_data_available = 0x00800000UL; //bit 23
+	const static unsigned long k_fifo_valid_mask = 0x000fffffUL; //20 bits
+    
+    NSMutableString* msg = [NSMutableString stringWithFormat:@"MTC/D status:\n"];
+    [msg appendFormat:@"GT: 0x%08lx\n", ptr[2] & 0xffffff];
+    
+    unsigned long long ticks = ptr[3] + ((ptr[4] & 0x1fffffULL) << 32);
+
+    double timeInterval = ticks * 100.e-9;
+    NSDate* mtcDate = [[NSDate alloc] initWithTimeInterval:timeInterval sinceDate:[self baseDate]];
+    [msg appendFormat:@"10MHz clock:\n%@\n", [[self mtcDateFormatter] stringFromDate:mtcDate]];
+    [mtcDate release];
+    mtcDate = nil;
+
+    [msg appendFormat:@"data available: %@\n", ((ptr[5] & k_no_data_available) == 0)?@"YES":@"NO"];
+    [msg appendFormat:@"read pointer: 0x%05lx\n", ptr[5] & k_fifo_valid_mask];
+    [msg appendFormat:@"write pointer: 0x%05lx\n", ptr[6] & k_fifo_valid_mask];
+
+    [msg appendFormat:@"\nraw packet dump:\n"];
+    unsigned short i;
+    for (i=2; i<7; i++) {
+        [msg appendFormat:@"0x%08lx\n", ptr[i]];
+    }
+	return msg;
 }
 
 @end
