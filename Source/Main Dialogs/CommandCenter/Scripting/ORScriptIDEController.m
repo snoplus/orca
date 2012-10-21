@@ -201,6 +201,11 @@
                          name : ORScriptIDEModelShowCommonOnlyChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(autoRunAtQuitChanged:)
+                         name : ORScriptIDEModelAutoRunAtQuitChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -221,6 +226,7 @@
 	[self showSuperClassChanged:nil];
 	[self showCommonOnlyChanged:nil];
 	[codeHelperPU selectItemAtIndex:0];
+	[self autoRunAtQuitChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -232,6 +238,11 @@
 }
 
 #pragma mark •••Interface Management
+
+- (void) autoRunAtQuitChanged:(NSNotification*)aNote
+{
+	[autoRunAtQuitCB setIntValue: [model autoRunAtQuit]];
+}
 
 - (void) showCommonOnlyChanged:(NSNotification*)aNote
 {
@@ -418,6 +429,11 @@
 }
 
 #pragma mark •••Actions
+
+- (void) autoRunAtQuitAction:(id)sender
+{
+	[model setAutoRunAtQuit:[sender intValue]];
+}
 - (IBAction) classNameAction:(id)sender
 {
 	[self loadClassMethods];

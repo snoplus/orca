@@ -29,6 +29,7 @@
 #import "ORDataPacket.h"
 #import "ORDataSet.h"
 
+NSString* ORScriptIDEModelAutoRunAtQuitChanged = @"ORScriptIDEModelAutoRunAtQuitChanged";
 NSString* ORScriptIDEModelShowCommonOnlyChanged		= @"ORScriptIDEModelShowCommonOnlyChanged";
 NSString* ORScriptIDEModelAutoStopWithRunChanged	= @"ORScriptIDEModelAutoStopWithRunChanged";
 NSString* ORScriptIDEModelAutoStartWithRunChanged	= @"ORScriptIDEModelAutoStartWithRunChanged";
@@ -88,7 +89,7 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 
 - (void) decorateIcon:(NSImage*)anImage
 {
-    if(autoStopWithRun || autoStartWithRun || autoStartWithDocument){
+    if(autoStopWithRun || autoStartWithRun || autoStartWithDocument || autoRunAtQuit ){
 		NSSize iconSize = [anImage size];
 		NSFont *font = [NSFont fontWithName:@"Helvetica" size:18.0];
 		NSDictionary* attrsDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -117,7 +118,35 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 					 selector : @selector(runEnded:)
 						 name : ORRunStoppedNotification
 					   object : nil];
+
+    [notifyCenter addObserver: self
+                     selector: @selector(aboutToQuit:)
+                         name: OROrcaAboutToQuitNotice
+                       object: nil];
+ 
+    [notifyCenter addObserver: self
+                     selector: @selector(finalQuitNotice:)
+                         name: OROrcaFinalQuitNotice
+                       object: nil];
+
 }
+
+- (void) aboutToQuit:(NSNotification*)aNote
+{
+    if([scriptRunner running]){
+        [scriptRunner stop];
+    }
+}
+
+- (void) finalQuitNotice:(NSNotification*)aNote
+{
+    if(autoRunAtQuit && ![scriptRunner running]){
+        [self runScript];
+        [[NSApp delegate] delayTermination];
+    }
+}
+
+
 - (void) awakeAfterDocumentLoaded
 {
 	if(autoStartWithDocument){
@@ -140,6 +169,20 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 }
 
 #pragma mark ***Accessors
+
+- (BOOL) autoRunAtQuit
+{
+    return autoRunAtQuit;
+}
+
+- (void) setAutoRunAtQuit:(BOOL)aAutoRunAtQuit
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setAutoRunAtQuit:autoRunAtQuit];
+    
+    autoRunAtQuit = aAutoRunAtQuit;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORScriptIDEModelAutoRunAtQuitChanged object:self];
+}
 
 - (BOOL) showCommonOnly
 {
@@ -717,6 +760,7 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
     
     [[self undoManager] disableUndoRegistration];
 	
+    [self setAutoRunAtQuit:[decoder decodeBoolForKey:@"autoRunAtQuit"]];
     [self setShowCommonOnly:		[decoder decodeBoolForKey:@"showCommonOnly"]];
     [self setShowSuperClass:		[decoder decodeBoolForKey:@"showSuperClass"]];
     [self setAutoStopWithRun:		[decoder decodeBoolForKey:@"autoStopWithRun"]];
@@ -739,6 +783,7 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeBool:autoRunAtQuit forKey:@"autoRunAtQuit"];
     [encoder encodeBool:showCommonOnly			forKey:@"showCommonOnly"];
     [encoder encodeBool:showSuperClass			forKey:@"showSuperClass"];
     [encoder encodeBool:autoStopWithRun			forKey:@"autoStopWithRun"];

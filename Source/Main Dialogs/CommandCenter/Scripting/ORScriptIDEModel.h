@@ -44,6 +44,7 @@
     BOOL					autoStopWithRun;
     BOOL					showSuperClass;
     BOOL					showCommonOnly;
+    BOOL                    autoRunAtQuit;
 }
 
 #pragma mark ***Initialization
@@ -55,8 +56,12 @@
 - (void) registerNotificationObservers;
 - (void) runStarted:(NSNotification*)aNote;
 - (void) runEnded:(NSNotification*)aNote;
+- (void) aboutToQuit:(NSNotification*)aNote;
+- (void) finalQuitNotice:(NSNotification*)aNote;
 
 #pragma mark ***Accessors
+- (BOOL) autoRunAtQuit;
+- (void) setAutoRunAtQuit:(BOOL)aAutoRunAtQuit;
 - (BOOL) showCommonOnly;
 - (void) setShowCommonOnly:(BOOL)aShowCommonOnly;
 - (BOOL) autoStopWithRun;
@@ -133,6 +138,7 @@
 
 @end
 
+extern NSString* ORScriptIDEModelAutoRunAtQuitChanged;
 extern NSString* ORScriptIDEModelShowCommonOnlyChanged;
 extern NSString* ORScriptIDEModelAutoStopWithRunChanged;
 extern NSString* ORScriptIDEModelAutoStartWithRunChanged;
