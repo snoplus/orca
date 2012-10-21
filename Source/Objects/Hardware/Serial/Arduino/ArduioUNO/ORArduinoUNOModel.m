@@ -252,6 +252,7 @@ NSString* ORArduinoUNOMaxValueChanged		= @"ORArduinoUNOMaxValueChanged";
 
 - (void) firstActionAfterOpeningPort
 {
+	[self readInputPins];
 }
 
 - (float) slope:(int)i
