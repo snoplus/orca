@@ -40,11 +40,13 @@
 - (id) eval
 {
     if(!alreadyEvaluated){
-        [self setState:![super eval]];
         alreadyEvaluated = YES;
+        int theState = !([[self evalInput1] boolValue] & [[self evalInput2] boolValue]);
+        [self setState: theState];
+        [self setEvaluatedState: theState];
     }
-    [self setEvaluatedState: [self state]];
-	return [ORProcessResult processState:evaluatedState value:evaluatedState] ;}
+    return [ORProcessResult processState:evaluatedState value:evaluatedState] ;
+}
 //--------------------------------
 
 @end

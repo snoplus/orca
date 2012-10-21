@@ -42,7 +42,7 @@
 {
     if(!alreadyEvaluated){
         alreadyEvaluated = YES;
-        [self setState:![super eval]];
+        [self setState:!([[self evalInput1] boolValue] | [[self evalInput2] boolValue])];
     }
     [self setEvaluatedState:[self state]];
 	return [ORProcessResult processState:evaluatedState value:evaluatedState];
