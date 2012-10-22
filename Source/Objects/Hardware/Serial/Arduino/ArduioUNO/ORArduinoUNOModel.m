@@ -454,14 +454,13 @@ NSString* ORArduinoUNOMaxValueChanged		= @"ORArduinoUNOMaxValueChanged";
 - (void) writeAllOutputs:(unsigned short)aMask
 {
  	@synchronized(self){
-		//validate the mask -- it must use only pins set to out
+		unsigned int typeMask = 0;
 		int i;
 		for(i=2;i<kNumArduinoUNOPins;i++){
-			if(pinType[i] != kArduinoOutput){
-				aMask &= ~(0x1<<i);
-			}
+			if(pinType[i] == kArduinoOutput)typeMask |= (1<<i);
 		}
-		NSString* cmd = [NSString stringWithFormat:@"w m %d",aMask];
+		
+		NSString* cmd = [NSString stringWithFormat:@"w m %d %d",typeMask,aMask];
 		[self enqueCmdString:cmd];
 	}
 }
