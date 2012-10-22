@@ -1041,7 +1041,7 @@ static NSDictionary* xl3Ops;
 
 - (IBAction) compositeXl3RWRegisterAction:(id)sender
 {
-    [self endEditing];
+    [[sender window] makeFirstResponder:tabView];
 	unsigned long addressValue = [model xl3RWAddressValue];
 	addressValue = (addressValue & 0xFFF00000) | [[xl3RWAddresses objectForKey:[[sender selectedItem] title]] intValue];
 	[model setXl3RWAddressValue:addressValue];
@@ -1049,25 +1049,25 @@ static NSDictionary* xl3Ops;
 
 - (IBAction) compositeXl3RWDataValueAction:(id)sender;
 {
-    [self endEditing];
+    [[sender window] makeFirstResponder:tabView];
 	[model setXl3RWDataValue:[sender intValue]];
 }
 
 - (IBAction) compositeSetPedestalValue:(id)sender
 {
-    [self endEditing];
+    [[sender window] makeFirstResponder:tabView];
 	[model setXl3PedestalMask:[sender intValue]];
 }
 
 - (IBAction) compositeXl3ChargeInjMaskAction:(id)sender
 {
-    [self endEditing];
+    [[sender window] makeFirstResponder:tabView];
     [model setXl3ChargeInjMask:[sender intValue]];
 }
 
 - (IBAction) compositeXl3ChargeInjChargeAction:(id)sender
 {
-    [self endEditing];
+    [[sender window] makeFirstResponder:tabView];
     [model setXl3ChargeInjCharge:[sender intValue]];
 }
 

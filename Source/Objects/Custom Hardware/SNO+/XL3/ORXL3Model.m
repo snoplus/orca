@@ -2033,8 +2033,9 @@ void SwapLongBlock(void* p, int32_t n)
             return;
         }
          */
-
-        [self loadSingleDacForSlot:aSlot dacNum:136 dacVal:0xff];
+        
+        [self loadSingleDacForSlot:aSlot dacNum:136 dacVal:[self xl3ChargeInjCharge]];
+        //[self loadSingleDacForSlot:aSlot dacNum:136 dacVal:0xff];
     }
 	@catch (NSException* e) {
 		NSLog(@"%@ enable charge injection failed; error: %@ reason: %@\n",

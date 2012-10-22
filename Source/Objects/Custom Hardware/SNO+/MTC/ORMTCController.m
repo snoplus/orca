@@ -875,7 +875,8 @@
 	}
 	else {
 		[model setDbFloat:theValue forIndex:index];	
-	}	
+	}
+    [[sender window] makeFirstResponder:tabView];
 }
 
 
@@ -895,7 +896,8 @@
 	}
 	else {
 		[model setDbFloat:theValue forIndex:index];	
-	}	
+	}
+    [[sender window] makeFirstResponder:tabView];
 }
 
 - (IBAction) settingsGTMaskAction:(id) sender 
@@ -1274,7 +1276,9 @@
 			float mVperNHit = [model dbFloatByIndex:thresholdIndex + kmVoltPerNHit_Offset];
 			numberToStore = [model NHitsToRaw:userValue dcOffset:dcOffset mVperNHit:mVperNHit];
 		}
-		[model setDbFloat:numberToStore forIndex:thresholdIndex];	
+        if (numberToStore < 0) numberToStore = 0;
+        if (numberToStore > 4095) numberToStore = 4095;
+		[model setDbFloat:numberToStore forIndex:thresholdIndex];
 	}
 }
 
@@ -1289,8 +1293,10 @@
 		float newNHits  = [model mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
 		float newMilliVolts = [model NHitsTomVolts:newNHits dcOffset:dcOffset mVperNHit:mVperNHit];
 		numberToStore = [model mVoltsToRaw:newMilliVolts];
-		
-		[model setDbFloat:numberToStore forIndex:index];	
+
+        if (numberToStore < 0) numberToStore = 0;
+        if (numberToStore > 4095) numberToStore = 4095;
+		[model setDbFloat:numberToStore forIndex:index];
 	}
 }
 
