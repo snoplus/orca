@@ -247,7 +247,10 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 {
 	[self linkToController:@"ORRad7Controller"];
 }
-
+- (NSString*) helpURL
+{
+	return @"RS232/Rad7.html";
+}
 - (void) registerNotificationObservers
 {
 	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
