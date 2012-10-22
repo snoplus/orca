@@ -105,7 +105,7 @@
 #pragma mark •••HW Methods
 - (void) updateAll;
 - (void) initHardware;
-- (void) writeOutput:(unsigned short) aPin value:(BOOL)aState;
+- (void) writeOutput:(unsigned short) aPin state:(BOOL)aState;
 - (void) writeAllOutputs:(unsigned short)aMask;
 - (void) readAdcValues;
 - (void) readInputPins;

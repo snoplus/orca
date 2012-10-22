@@ -442,7 +442,7 @@ NSString* ORArduinoUNOMaxValueChanged		= @"ORArduinoUNOMaxValueChanged";
 }
 
 #pragma mark •••HW Methods
-- (void) writeOutput:(unsigned short) aPin value:(BOOL)aState
+- (void) writeOutput:(unsigned short) aPin state:(BOOL)aState
 {
 	if(aPin>=2 && aPin < kNumArduinoUNOPins){
 		if(pinType[aPin] == kArduinoOutput){
