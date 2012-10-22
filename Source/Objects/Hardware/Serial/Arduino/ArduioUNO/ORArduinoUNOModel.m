@@ -448,6 +448,10 @@ NSString* ORArduinoUNOMaxValueChanged		= @"ORArduinoUNOMaxValueChanged";
 		if(pinType[aPin] == kArduinoOutput){
 			NSString* cmd = [NSString stringWithFormat:@"w d %d %d",aPin,aState];
 			[self enqueCmdString:cmd];
+			[[self undoManager] disableUndoRegistration];
+			[self setPin:aPin stateOut:aState];
+			[[self undoManager] enableUndoRegistration];
+			 
 		}
 	}
 }
@@ -460,9 +464,9 @@ NSString* ORArduinoUNOMaxValueChanged		= @"ORArduinoUNOMaxValueChanged";
 		for(i=2;i<kNumArduinoUNOPins;i++){
 			if(pinType[i] == kArduinoOutput)typeMask |= (1<<i);
 		}
-		
 		NSString* cmd = [NSString stringWithFormat:@"w m %d %d",typeMask,aMask];
 		[self enqueCmdString:cmd];
+
 	}
 }
 
