@@ -109,6 +109,7 @@ E			[Ee][+-]?{D}+
 "clearAlarm"	return CLEAR;
 "logfile"		return LOGFILE;
 "nsdictionary"	return NSDICTIONARY;
+"nsdatecomponents"  return NSDATECOMPONENTS;
 "nsarray"		return NSARRAY;
 "time"			return TIME;
 "sci"			return SCI;

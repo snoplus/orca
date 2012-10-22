@@ -551,6 +551,19 @@
 		case SLEEP:			return [self sleepFunc:p];
 		case TIME:			return [self timeFunc];
 		case NSDICTIONARY:	return [NSMutableDictionary dictionary];
+        case NSDATECOMPONENTS:
+        {
+            NSCalendar* cal = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
+            return  [cal components:
+                     NSYearCalendarUnit |
+                     NSMonthCalendarUnit |
+                     NSWeekdayCalendarUnit |
+                     NSDayCalendarUnit |
+                     NSHourCalendarUnit |
+                     NSMinuteCalendarUnit |
+                     NSSecondCalendarUnit
+                           fromDate:[NSDate date]];
+        }
 		case NSARRAY:		return [NSMutableArray array];
 		case NSFILEMANAGER:		return [NSFileManager defaultManager];
 		case STRINGFROMFILE:	return [self getStringFromFile:p];
@@ -1461,6 +1474,7 @@
 				case SLEEP:				line = [NSMutableString stringWithString:@"[sleep]"];		break;
 				case NSDICTIONARY:		line = [NSMutableString stringWithString:@"[nsdictionary]"]; break;
 				case NSARRAY:			line = [NSMutableString stringWithString:@"[nsarray]"];		 break;
+                case NSDATECOMPONENTS:  line = [NSMutableString stringWithString:@"[nsdatecomponents]"]; break;
 				case NSFILEMANAGER:		line = [NSMutableString stringWithString:@"[NSFileManager]"];  break;
 				case WRITELINETOFILE:	line = [NSMutableString stringWithString:@"[writeLine]"]; break;
 				case DELETEFILE:		line = [NSMutableString stringWithString:@"[deleteFile]"]; break;
