@@ -52,6 +52,7 @@
 - (NSString*) ethernetHardwareAddress;
 - (BOOL) configLoadedOK;
 - (void) delayTermination;
+- (void) delayedTermination;
 
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;
