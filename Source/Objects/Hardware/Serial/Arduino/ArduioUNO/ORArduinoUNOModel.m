@@ -20,6 +20,7 @@
 
 #import "ORArduinoUNOModel.h"
 #import "ORSerialPortAdditions.h"
+#import "ORProcessModel.h"
 
 #pragma mark •••External Strings
 NSString* ORArduinoUNOLock					= @"ORArduinoUNOLock";
@@ -483,7 +484,7 @@ NSString* ORArduinoUNOMaxValueChanged		= @"ORArduinoUNOMaxValueChanged";
 	for(i=2;i<kNumArduinoUNOPins;i++){
 		if(pinType[i] == kArduinoInput)aMask |= (1<<i);
 	}
-	return aMask & 0x7ff;
+	return aMask;
 }
 
 - (void) updateAll
@@ -499,7 +500,7 @@ NSString* ORArduinoUNOMaxValueChanged		= @"ORArduinoUNOMaxValueChanged";
 	unsigned int aMask = 0;
 	for(i=2;i<kNumArduinoUNOPins;i++){
 		if(pinType[i] == kArduinoOutput){
-			if((pinStateOut[i] == YES) && (pinType[i] == kArduinoOutput)){
+			if(pinStateOut[i] == YES){
 				aMask |= (1<<i);
 			}
 		}
@@ -554,6 +555,7 @@ NSString* ORArduinoUNOMaxValueChanged		= @"ORArduinoUNOMaxValueChanged";
 	if(oldProcessOutMask!=processOutMask){
 		oldProcessOutMask = processOutMask;
 		[self writeAllOutputs:processOutMask];
+		[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORForceProcessPollNotification object:self userInfo:nil];
 	}
 }
 

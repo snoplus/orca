@@ -49,6 +49,8 @@
 		[[pinStateOutMatrix cellAtRow:i column:0] setTag:i];
 		[[pinStateInMatrix cellAtRow:i column:0] setTag:i];		
 		[[pwmMatrix cellAtRow:i column:0] setTag:i];
+	}
+	for(i=0;i<kNumArduinoUNOAdcChannels;i++){
 		[[adcMatrix cellAtRow:i column:0] setTag:i];
 		[[minValueMatrix cellAtRow:i column:0]	setTag:i];
 		[[maxValueMatrix cellAtRow:i column:0]	setTag:i];
@@ -56,7 +58,7 @@
 		[[interceptMatrix cellAtRow:i column:0] setTag:i];
 		[[lowLimitMatrix cellAtRow:i column:0]	setTag:i];
 		[[hiLimitMatrix cellAtRow:i column:0]	setTag:i];
-
+		
 		[[adcMatrix cellAtRow:i column:0] setFormatter:formatter];
 		[[slopeMatrix cellAtRow:i column:0] setFormatter:formatter];
 		[[interceptMatrix cellAtRow:i column:0] setFormatter:formatter];
@@ -444,12 +446,12 @@
     if(aNote == nil){
         short i;
         for(i=0;i<kNumArduinoUNOAdcChannels;i++){
-            [[adcMatrix cellWithTag:i] setFloatValue:[model adc:i]];
+            [[adcMatrix cellWithTag:i] setFloatValue:[model convertedValue:i]];
         }
     }
     else {
         int i = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
-        [[adcMatrix cellWithTag:i] setFloatValue:[model adc:i]];
+        [[adcMatrix cellWithTag:i] setFloatValue:[model convertedValue:i]];
     }
 }
 
