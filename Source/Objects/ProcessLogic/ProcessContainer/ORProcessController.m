@@ -312,7 +312,7 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
     if([[model orcaObjects] containsObject:[aNote object]]){
 		if(!scheduledForUpdate){
 			scheduledForUpdate = YES;
-			[self performSelector:@selector(doUpdate:) withObject:aNote afterDelay:.5];
+			[self performSelector:@selector(doUpdate:) withObject:aNote afterDelay:.2];
 		}
 	}
 }

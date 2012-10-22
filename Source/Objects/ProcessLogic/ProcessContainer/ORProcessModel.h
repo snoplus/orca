@@ -51,6 +51,7 @@
 - (NSString*) report;
 
 #pragma mark ***Accessors
+- (void) runNow:(NSNotification*)aNote;
 - (void) pollNow;
 - (BOOL) sendOnStop;
 - (void) setSendOnStop:(BOOL)aSendOnStop;
@@ -130,6 +131,7 @@
 - (void) resetReportValues;
 @end
 
+extern NSString* ORForceProcessPollNotification;
 extern NSString* ORProcessModelRunNumberChanged;
 extern NSString* ORProcessModelNextHeartBeatChanged;
 extern NSString* ORProcessModelSendOnStopChanged;

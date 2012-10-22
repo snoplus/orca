@@ -27,20 +27,21 @@
 #import "ORMailer.h"
 #import "ORCouchDBModel.h"
 
-NSString* ORProcessModelSendOnStopChanged = @"ORProcessModelSendOnStopChanged";
-NSString* ORProcessModelSendOnStartChanged = @"ORProcessModelSendOnStartChanged";
-NSString* ORProcessModelHeartBeatIndexChanged = @"ORProcessModelHeartBeatIndexChanged";
-NSString* ORProcessModelEmailListChanged = @"ORProcessModelEmailListChanged";
-NSString* ORProcessModelHistoryFileChanged = @"ORProcessModelHistoryFileChanged";
-NSString* ORProcessModelKeepHistoryChanged = @"ORProcessModelKeepHistoryChanged";
+NSString* ORProcessModelSendOnStopChanged			= @"ORProcessModelSendOnStopChanged";
+NSString* ORProcessModelSendOnStartChanged			= @"ORProcessModelSendOnStartChanged";
+NSString* ORProcessModelHeartBeatIndexChanged		= @"ORProcessModelHeartBeatIndexChanged";
+NSString* ORProcessModelEmailListChanged			= @"ORProcessModelEmailListChanged";
+NSString* ORProcessModelHistoryFileChanged			= @"ORProcessModelHistoryFileChanged";
+NSString* ORProcessModelKeepHistoryChanged			= @"ORProcessModelKeepHistoryChanged";
 NSString* ORProcessModelSampleRateChanged			= @"ORProcessModelSampleRateChanged";
 NSString* ORProcessTestModeChangedNotification      = @"ORProcessTestModeChangedNotification";
 NSString* ORProcessRunningChangedNotification       = @"ORProcessRunningChangedNotification";
 NSString* ORProcessModelCommentChangedNotification  = @"ORProcessModelCommentChangedNotification";
 NSString* ORProcessModelShortNameChangedNotification= @"ORProcessModelShortNameChangedNotification";
 NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged";
-NSString* ORProcessModelNextHeartBeatChanged			= @"ORProcessModelNextHeartBeatChanged";
+NSString* ORProcessModelNextHeartBeatChanged		= @"ORProcessModelNextHeartBeatChanged";
 NSString* ORProcessModelRunNumberChanged			= @"ORProcessModelRunNumberChanged";
+NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 
 @interface ORProcessModel (private)
 - (void) setSendStartNoticeNextReadAfterDelay;
@@ -96,6 +97,18 @@ NSString* ORProcessModelRunNumberChanged			= @"ORProcessModelRunNumberChanged";
 	if(wasRunning){
 		[self performSelector:@selector(startRun) withObject:nil afterDelay:3];
 	}
+}
+
+#pragma mark ¥¥¥Notifications
+- (void) registerNotificationObservers
+{	
+	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+	[notifyCenter removeObserver:self];
+	
+    [notifyCenter addObserver: self
+                     selector: @selector(runNow:)
+                         name: ORForceProcessPollNotification
+                       object: nil];
 }
 
 #pragma mark ***Accessors
@@ -510,6 +523,9 @@ NSString* ORProcessModelRunNumberChanged			= @"ORProcessModelRunNumberChanged";
 - (void) startRun
 {
 	@synchronized(self){
+		
+		[self registerNotificationObservers];
+		
         NSArray* outputNodes = [self collectObjectsRespondingTo:@selector(isTrueEndNode)];
 
         if([outputNodes count] == 0){
@@ -541,6 +557,9 @@ NSString* ORProcessModelRunNumberChanged			= @"ORProcessModelRunNumberChanged";
 
 - (void) stopRun
 {
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+	[notifyCenter removeObserver:self];
+
 	NSArray* outputNodes = [self collectObjectsRespondingTo:@selector(isTrueEndNode)];
 	//NSArray* outputNodes = [self collectObjectsOfClass:NSClassFromString(@"ORProcessEndNode")];
     if([[ORProcessThread  sharedProcessThread] nodesRunning:outputNodes]){
@@ -616,6 +635,15 @@ NSString* ORProcessModelRunNumberChanged			= @"ORProcessModelRunNumberChanged";
 
 
 #pragma mark ¥¥¥Sample Timing Control
+- (void) runNow:(NSNotification*)aNote
+{
+	if(processRunning){
+		sampleGateOpen = YES;
+		[self startProcessCycle];
+		[self endProcessCycle];
+	}
+}
+
 - (void) pollNow
 {
 	if(processRunning){
