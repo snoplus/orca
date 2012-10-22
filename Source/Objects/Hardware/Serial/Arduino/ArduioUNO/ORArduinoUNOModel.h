@@ -21,7 +21,7 @@
 #import "ORAdcProcessing.h"
 
 #define kNumArduinoUNOAdcChannels	6
-#define kNumArduinoUNOPins			12 //first two are serial lines
+#define kNumArduinoUNOPins			14 //first two are serial lines
 
 #define kArduinoInput	0
 #define kArduinoOutput  1
