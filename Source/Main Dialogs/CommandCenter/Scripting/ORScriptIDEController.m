@@ -206,6 +206,27 @@
                          name : ORScriptIDEModelAutoRunAtQuitChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(runPeriodicallyChanged:)
+                         name : ORScriptIDEModelRunPeriodicallyChanged
+						object: model];
+
+	[notifyCenter addObserver : self
+                     selector : @selector(runningChanged:)
+                         name : ORScriptIDEModelRunPeriodicallyChanged
+						object: model];
+	
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(periodicRunIntervalChanged:)
+                         name : ORScriptIDEModelPeriodicRunIntervalChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(runningChanged:)
+                         name : ORScriptIDEModelNextPeriodicRunChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -227,6 +248,8 @@
 	[self showCommonOnlyChanged:nil];
 	[codeHelperPU selectItemAtIndex:0];
 	[self autoRunAtQuitChanged:nil];
+	[self runPeriodicallyChanged:nil];
+	[self periodicRunIntervalChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -238,6 +261,15 @@
 }
 
 #pragma mark •••Interface Management
+- (void) periodicRunIntervalChanged:(NSNotification*)aNote
+{
+	[periodicRunIntervalField setIntValue: [model periodicRunInterval]];
+}
+
+- (void) runPeriodicallyChanged:(NSNotification*)aNote
+{
+	[runPeriodicallyCB setIntValue: [model runPeriodically]];
+}
 
 - (void) autoRunAtQuitChanged:(NSNotification*)aNote
 {
@@ -375,9 +407,7 @@
 		[debuggerDrawer close];
 		[scriptView unselectAll];
 	}
-	if([model running]){
-		[runStatusField setStringValue:[[model scriptRunner] debugging]?@"Debugging":@"Running"];
-	}
+	[runStatusField setStringValue:[model runStatusString]];
 	[self debuggerStateChanged:aNote];
 }
 
@@ -396,9 +426,9 @@
 
 - (void) runningChanged:(NSNotification*)aNote
 {
-	if([model running]){
+	if([model running] || ([model nextPeriodicRun]!=nil)){
 		[statusField setStringValue:@"Started"];
-		[runStatusField setStringValue:[[model scriptRunner] debugging]?@"Debugging":@"Running"];
+		[runStatusField setStringValue:[model runStatusString]];
 		
 		[runButton setImage:[NSImage imageNamed:@"Stop"]];
 		[runButton setAlternateImage:[NSImage imageNamed:@"Stop"]];
@@ -429,6 +459,21 @@
 }
 
 #pragma mark •••Actions
+
+- (void) nextPeriodicRunAction:(id)sender
+{
+	[model setNextPeriodicRun:[sender objectValue]];	
+}
+
+- (void) periodicRunIntervalAction:(id)sender
+{
+	[model setPeriodicRunInterval:[sender intValue]];	
+}
+
+- (void) runPeriodicallyAction:(id)sender
+{
+	[model setRunPeriodically:[sender intValue]];	
+}
 
 - (void) autoRunAtQuitAction:(id)sender
 {
@@ -540,9 +585,18 @@
 	[self endEditing];
 	[model setScript:[scriptView string]];
 	BOOL showError;
-	if(![model running]) showError = YES;
-	else showError = NO;
-	[model runScript];
+	if(![model running]) {
+		showError = YES;
+		NSString* startUpMessage = @"";
+		if([model runPeriodically]){
+			startUpMessage = [NSString stringWithFormat:@"[%@] Starting. Will rerun automatically every %d seconds",[model identifier],[model periodicRunInterval]];
+		}
+		[model runScriptWithMessage:startUpMessage];
+	}
+	else {
+		showError = NO;
+		[model stopScript];	
+	}
 	if(showError){
 		if([model parsedOK])[statusField setStringValue:@"Parsed OK"];
 		else [statusField setStringValue:@"ERRORS"];

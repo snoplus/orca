@@ -45,6 +45,9 @@
     BOOL					showSuperClass;
     BOOL					showCommonOnly;
     BOOL                    autoRunAtQuit;
+    BOOL					runPeriodically;
+    int						periodicRunInterval;
+    NSDate*					nextPeriodicRun;
 }
 
 #pragma mark ***Initialization
@@ -60,6 +63,15 @@
 - (void) finalQuitNotice:(NSNotification*)aNote;
 
 #pragma mark ***Accessors
+- (BOOL) suppressStartStopMessage;
+- (void) setSuppressStartStopMessage:(BOOL)aState;
+- (NSString*) runStatusString;
+- (NSDate*) nextPeriodicRun;
+- (void) setNextPeriodicRun:(NSDate*)aNextPeriodicRun;
+- (int)  periodicRunInterval;
+- (void) setPeriodicRunInterval:(int)aPeriodicRunInterval;
+- (BOOL) runPeriodically;
+- (void) setRunPeriodically:(BOOL)aRunPeriodically;
 - (BOOL) autoRunAtQuit;
 - (void) setAutoRunAtQuit:(BOOL)aAutoRunAtQuit;
 - (BOOL) showCommonOnly;
@@ -103,6 +115,7 @@
 - (void) scriptRunnerDidFinish:(BOOL)normalFinish returnValue:(id)aValue;
 - (void) parseScript;
 - (BOOL) runScript;
+- (BOOL) runScriptWithMessage:(NSString*) startMessage;
 - (BOOL) running;
 - (void) stopScript;
 - (void) saveFile;
@@ -138,6 +151,9 @@
 
 @end
 
+extern NSString* ORScriptIDEModelNextPeriodicRunChanged;
+extern NSString* ORScriptIDEModelPeriodicRunIntervalChanged;
+extern NSString* ORScriptIDEModelRunPeriodicallyChanged;
 extern NSString* ORScriptIDEModelAutoRunAtQuitChanged;
 extern NSString* ORScriptIDEModelShowCommonOnlyChanged;
 extern NSString* ORScriptIDEModelAutoStopWithRunChanged;

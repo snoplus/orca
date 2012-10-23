@@ -55,9 +55,12 @@
 	NSMutableDictionary*    displayDictionary;
 	NSThread*				scriptThread;
 	NSMutableDictionary*	importedContents;
+	BOOL					suppressStartStopMessage;
 } 
 
 #pragma mark ¥¥¥Accessors
+- (BOOL) suppressStartStopMessage;
+- (void) setSuppressStartStopMessage:(BOOL)aState;
 - (void) setBreakpoints:(NSMutableIndexSet*)aSet;
 - (ORNodeEvaluator*) eval;
 - (BOOL)		exitNow;

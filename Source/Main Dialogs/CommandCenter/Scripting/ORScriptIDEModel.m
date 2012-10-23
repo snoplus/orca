@@ -29,7 +29,10 @@
 #import "ORDataPacket.h"
 #import "ORDataSet.h"
 
-NSString* ORScriptIDEModelAutoRunAtQuitChanged = @"ORScriptIDEModelAutoRunAtQuitChanged";
+NSString* ORScriptIDEModelNextPeriodicRunChanged	= @"ORScriptIDEModelNextPeriodicRunChanged";
+NSString* ORScriptIDEModelPeriodicRunIntervalChanged = @"ORScriptIDEModelPeriodicRunIntervalChanged";
+NSString* ORScriptIDEModelRunPeriodicallyChanged	= @"ORScriptIDEModelRunPeriodicallyChanged";
+NSString* ORScriptIDEModelAutoRunAtQuitChanged		= @"ORScriptIDEModelAutoRunAtQuitChanged";
 NSString* ORScriptIDEModelShowCommonOnlyChanged		= @"ORScriptIDEModelShowCommonOnlyChanged";
 NSString* ORScriptIDEModelAutoStopWithRunChanged	= @"ORScriptIDEModelAutoStopWithRunChanged";
 NSString* ORScriptIDEModelAutoStartWithRunChanged	= @"ORScriptIDEModelAutoStartWithRunChanged";
@@ -44,6 +47,10 @@ NSString* ORScriptIDEModelBreakpointsChanged		= @"ORScriptIDEModelBreakpointsCha
 NSString* ORScriptIDEModelBreakChainChanged			= @"ORScriptIDEModelBreakChainChanged";
 NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 
+@interface ORScriptIDEModel (private)
+- (void) scheduleNextPeriodicRun;
+@end
+
 @implementation ORScriptIDEModel
 
 #pragma mark ***Initialization
@@ -56,7 +63,9 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 
 - (void) dealloc 
 {
+    [nextPeriodicRun release];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
     [comments release];
 	[scriptName release];
 	[inputValues release];
@@ -74,7 +83,8 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 - (void) sleep
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-   [super sleep];
+	[self stopScript];
+	[super sleep];
 }
 
 - (void) makeMainController
@@ -89,7 +99,7 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 
 - (void) decorateIcon:(NSImage*)anImage
 {
-    if(autoStopWithRun || autoStartWithRun || autoStartWithDocument || autoRunAtQuit ){
+    if(autoStopWithRun || autoStartWithRun || autoStartWithDocument || autoRunAtQuit || runPeriodically){
 		NSSize iconSize = [anImage size];
 		NSFont *font = [NSFont fontWithName:@"Helvetica" size:18.0];
 		NSDictionary* attrsDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -141,6 +151,7 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 - (void) finalQuitNotice:(NSNotification*)aNote
 {
     if(autoRunAtQuit && ![scriptRunner running]){
+		runPeriodically = NO; //disable for the final run
         [self runScript];
         [[NSApp delegate] delayTermination];
     }
@@ -164,11 +175,73 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 - (void) runEnded:(NSNotification*)aNote
 {		
 	if(autoStopWithRun && [scriptRunner running]){
-		[self runScript]; //this actuall will stop a running script
+		[self stopScript]; 
 	}
 }
 
 #pragma mark ***Accessors
+- (NSString*) runStatusString
+{
+	if([scriptRunner running]){
+		return [[self scriptRunner] debugging]?@"Debugging":@"Running";
+	}
+	else if(nextPeriodicRun!=nil){
+		NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] initWithDateFormat:@"%H:%M:%S" allowNaturalLanguage:NO];
+		NSString* nextTime = [dateFormatter stringFromDate:nextPeriodicRun];
+		return [NSString stringWithFormat:@"Idle until %@",nextTime];
+	}
+	else return @"";
+}
+- (NSDate*) nextPeriodicRun
+{
+    return nextPeriodicRun;
+}
+
+- (void) setNextPeriodicRun:(NSDate*)aNextPeriodicRun
+{
+    [aNextPeriodicRun retain];
+    [nextPeriodicRun release];
+    nextPeriodicRun = aNextPeriodicRun;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORScriptIDEModelNextPeriodicRunChanged object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORScriptRunnerRunningChanged object:self];
+
+}
+
+- (int) periodicRunInterval
+{
+    return periodicRunInterval;
+}
+
+- (void) setPeriodicRunInterval:(int)aPeriodicRunInterval
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setPeriodicRunInterval:periodicRunInterval];
+    if(aPeriodicRunInterval<=0)aPeriodicRunInterval=1;
+    periodicRunInterval = aPeriodicRunInterval;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORScriptIDEModelPeriodicRunIntervalChanged object:self];
+}
+
+- (BOOL) runPeriodically
+{
+    return runPeriodically;
+}
+
+- (void) setRunPeriodically:(BOOL)aRunPeriodically
+{
+	if(runPeriodically && !aRunPeriodically){
+		NSLog(@"[%@] Periodic running manually ended. Script will not repeat.\n",[self identifier]);
+	}
+    [[[self undoManager] prepareWithInvocationTarget:self] setRunPeriodically:runPeriodically];
+    runPeriodically = aRunPeriodically;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORScriptIDEModelRunPeriodicallyChanged object:self];
+	if(!runPeriodically){
+		[self setNextPeriodicRun:nil];
+		[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	}
+	[self setUpImage];
+
+}
 
 - (BOOL) autoRunAtQuit
 {
@@ -412,6 +485,16 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 
 
 #pragma mark ***Script Methods
+- (BOOL) suppressStartStopMessage
+{
+	return [scriptRunner suppressStartStopMessage];
+}
+
+- (void) setSuppressStartStopMessage:(BOOL)aState
+{
+	[scriptRunner setSuppressStartStopMessage:aState];
+}
+
 - (id) inputValue
 {
 	return inputValue;
@@ -455,8 +538,12 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 		}
 	}
 }
-
 - (BOOL) runScript
+{
+	return [self runScriptWithMessage:@""];
+}
+
+- (BOOL) runScriptWithMessage:(NSString*) startMessage
 {
 	parsedOK = YES;
 	if(!scriptRunner)scriptRunner = [[ORScriptRunner alloc] init];
@@ -473,6 +560,9 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 				}
 				[scriptRunner setDebugMode:kRunToBreakPoint];
 				[self shipTaskRecord:self running:YES];
+				if([startMessage length]>0){
+					NSLog(@"%@\n",startMessage);
+				}
 				[scriptRunner run:inputValues sender:self];
 			}
 			else {
@@ -488,8 +578,13 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 
 - (void) stopScript
 {
-	if([scriptRunner running]){
-		[self runScript]; //actually this toggles the run state....
+	if([scriptRunner running] || (nextPeriodicRun!=nil)){
+		[self setNextPeriodicRun:nil];
+		[NSObject cancelPreviousPerformRequestsWithTarget:self];
+		if(runPeriodically)NSLog(@"[%@] Manually stopped. Will not repeat.\n",[self identifier]);
+		if([scriptRunner running]){
+			[scriptRunner stop];
+		}
 	}
 }
 
@@ -509,15 +604,23 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 			[nextScriptTask runScript];
 		}
 	}
-	if(normalFinish)NSLog(@"[%@] Returned with: %@\n",[self identifier],aValue);
+	if(normalFinish){
+		if(![scriptRunner suppressStartStopMessage]){
+			NSLog(@"[%@] Returned with: %@\n",[self identifier],aValue);
+		}
+	}
 	else NSLogColor([NSColor redColor],@"[%@] Abnormal exit!\n",[[self scriptRunner] scriptName]);
 
 	[self shipTaskRecord:self running:NO];
+	
+	if(runPeriodically){
+		[self scheduleNextPeriodicRun];
+	}
 }
 
 - (BOOL) running
 {
-	return [scriptRunner running];
+	return [scriptRunner running] || nextPeriodicRun;
 }
 
 - (void) loadScriptFromFile:(NSString*)aFilePath
@@ -760,7 +863,9 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
     
     [[self undoManager] disableUndoRegistration];
 	
-    [self setAutoRunAtQuit:[decoder decodeBoolForKey:@"autoRunAtQuit"]];
+    [self setPeriodicRunInterval:	[decoder decodeIntForKey:@"periodicRunInterval"]];
+    [self setRunPeriodically:		[decoder decodeBoolForKey:@"runPeriodically"]];
+    [self setAutoRunAtQuit:			[decoder decodeBoolForKey:@"autoRunAtQuit"]];
     [self setShowCommonOnly:		[decoder decodeBoolForKey:@"showCommonOnly"]];
     [self setShowSuperClass:		[decoder decodeBoolForKey:@"showSuperClass"]];
     [self setAutoStopWithRun:		[decoder decodeBoolForKey:@"autoStopWithRun"]];
@@ -783,6 +888,8 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeInt:periodicRunInterval forKey:@"periodicRunInterval"];
+    [encoder encodeBool:runPeriodically forKey:@"runPeriodically"];
     [encoder encodeBool:autoRunAtQuit forKey:@"autoRunAtQuit"];
     [encoder encodeBool:showCommonOnly			forKey:@"showCommonOnly"];
     [encoder encodeBool:showSuperClass			forKey:@"showSuperClass"];
@@ -843,6 +950,15 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 
 @end
 
+@implementation ORScriptIDEModel (private)
+- (void) scheduleNextPeriodicRun
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	[self performSelector:@selector(runScript) withObject:nil afterDelay:periodicRunInterval];
+	[self setNextPeriodicRun:[[NSDate date] dateByAddingTimeInterval:periodicRunInterval]];
+}
+
+@end
 
 /*
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx

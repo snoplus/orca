@@ -55,7 +55,8 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 @implementation ORScriptRunner
 
 #pragma mark ¥¥¥Initialization
--(id)init {
+-(id) init 
+{
 	self = [super init];
 	if(self) {
 		expressionAsData = nil;
@@ -63,7 +64,7 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 	return self;  
 }
 
--(void)dealloc 
+-(void) dealloc 
 {
 	[eval setDelegate:nil];
 	[eval release];
@@ -76,6 +77,16 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 }
 
 #pragma mark ¥¥¥Accessors
+- (BOOL) suppressStartStopMessage
+{
+	return suppressStartStopMessage;
+}
+
+- (void) setSuppressStartStopMessage:(BOOL)aState
+{
+	suppressStartStopMessage = aState;
+}
+
 - (void) setBreakpoints:(NSMutableIndexSet*)aSet
 {
 	[aSet retain];
@@ -306,7 +317,7 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 		NSArray* lines = [theString componentsSeparatedByString:@"\n" ];
 		OrcaScriptparse();
 		if(functionList) {
-			if([rootFile isEqualToString:@"Main Script"])NSLog(@"%@: %d Lines Parsed Successfully\n",rootFile,num_lines);
+			//if([rootFile isEqualToString:@"Main Script"])NSLog(@"%@: %d Lines Parsed Successfully\n",rootFile,num_lines);
 			parsedOK = YES;
 		}
 		else  {
@@ -513,6 +524,7 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 	}
 }
 
+
 @end
 
 @implementation ORScriptRunner (private)
@@ -523,8 +535,10 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 	
 	[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORScriptRunnerRunningChanged object:self userInfo:nil waitUntilDone:YES];
 
-	if([scriptName length])NSLog(@"Started %@\n",scriptName);
-	else NSLog(@"Started OrcaScript\n");
+	if(!suppressStartStopMessage){
+		if([scriptName length])NSLog(@"Started %@\n",scriptName);
+		else NSLog(@"Started OrcaScript\n");
+	}
 	[someNodes retain];
 	
 	unsigned i;
@@ -576,8 +590,10 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 	}
 	
 	[someNodes release];
-	if([scriptName length])NSLog(@"%@ Exited\n",scriptName);
-	else NSLog(@"OrcaScript Exited\n");
+	if(!suppressStartStopMessage){
+		if([scriptName length])NSLog(@"%@ Exited\n",scriptName);
+		else NSLog(@"OrcaScript Exited\n");
+	}
 	running = NO;
 	[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORScriptRunnerRunningChanged object:self userInfo:nil waitUntilDone:YES];
 	[pool release];

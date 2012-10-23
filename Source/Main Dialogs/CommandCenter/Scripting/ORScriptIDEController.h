@@ -26,6 +26,9 @@
 
 @interface ORScriptIDEController : OrcaObjectController {
 	IBOutlet NSButton*			breakChainButton;
+	IBOutlet NSTextField*		nextPeriodicRunField;
+	IBOutlet NSTextField*		periodicRunIntervalField;
+	IBOutlet NSButton*			runPeriodicallyCB;
 	IBOutlet NSButton*          autoRunAtQuitCB;
 	IBOutlet NSButton*			showCommonOnlyCB;
 	IBOutlet NSButton*			autoStopWithRunCB;
@@ -71,6 +74,8 @@
 - (void) loadClassMethods;
 
 #pragma mark •••Interface Management
+- (void) periodicRunIntervalChanged:(NSNotification*)aNote;
+- (void) runPeriodicallyChanged:(NSNotification*)aNote;
 - (void) autoRunAtQuitChanged:(NSNotification*)aNote;
 - (void) showCommonOnlyChanged:(NSNotification*)aNote;
 - (void) autoStopWithRunChanged:(NSNotification*)aNote;
@@ -95,6 +100,8 @@
 - (void) breakpointsAction:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) periodicRunIntervalAction:(id)sender;
+- (IBAction) runPeriodicallyAction:(id)sender;
 - (IBAction) autoRunAtQuitAction:(id)sender;
 - (IBAction) classNameAction:(id)sender;
 - (IBAction) showCommonOnlyAction:(id)sender;
