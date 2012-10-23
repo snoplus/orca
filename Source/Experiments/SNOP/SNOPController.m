@@ -52,6 +52,7 @@
 	slowControlSize		= NSMakeSize(620,595);
 	
 	blankView = [[NSView alloc] init];
+    [tabView setFocusRingType:NSFocusRingTypeNone];
 	[self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
 
 	[super awakeFromNib];

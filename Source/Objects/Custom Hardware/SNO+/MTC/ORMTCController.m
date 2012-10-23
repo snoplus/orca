@@ -64,6 +64,7 @@
     triggerSize		= NSMakeSize(790,630);
   
     blankView = [[NSView alloc] init];
+    [tabView setFocusRingType:NSFocusRingTypeNone];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
 
 	[initProgressField setHidden:YES];

@@ -122,6 +122,11 @@ enum {
     BOOL _isXl3VltThresholdInInit;
     int _xl3LinkTimeOut;
     BOOL _xl3InitInProgress;
+    
+    mb_t safe_bundle[16];
+    mb_t ecal_bundle[16];
+    mb_t hw_bundle[16];
+    mb_t ui_bundle[16];
 }
 
 @property (nonatomic,assign) unsigned long xl3MegaBundleDataId;
@@ -313,6 +318,8 @@ enum {
 - (void) setHVSwitch:(BOOL)aOn forPowerSupply:(unsigned char)sup;
 - (void) hvPanicDown;
 - (void) hvMasterPanicDown;
+- (void) hvTriggersON;
+- (void) hvTriggersOFF;
 - (void) readHVInterlockGood:(BOOL*)isGood;
 - (void) readHVInterlock;
 - (void) setHVDacA:(unsigned short)aDac dacB:(unsigned short)bDac;

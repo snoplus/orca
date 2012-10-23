@@ -959,8 +959,7 @@ void SwapLongBlock(void* p, int32_t n)
 
 	//chinj
 	//aBundle->chinj.hv_id = 0x0000; // HV card id
-//	aBundle->hvref = 0x00; // MB control voltage
-	aBundle->hvref = 0xff; // !!!charge injection test!!!
+	aBundle->hvref = 0x00; // MB control voltage, charge inj value
 	//aBundle->chinj.ped_time = 100; // MTCD pedestal width (DONT NEED THIS HERE)
 
 	//tr100 width, channel 0 to 31, only bits 0 to 6 defined, bit0-5 delay, bit6 enable
@@ -1413,6 +1412,16 @@ void SwapLongBlock(void* p, int32_t n)
                              nil];
 
     [self performSelector:@selector(initCrateWithDict:) withObject:argDict afterDelay:0];
+    
+    //these are safe inits
+    unsigned short i;
+    mb_t aConfigBundle;
+    for (i=0; i<16; i++) {
+        [self synthesizeDefaultsIntoBundle:&aConfigBundle forSLot:i];
+        memcpy(&safe_bundle[i], &aConfigBundle, sizeof(mb_t));
+        memcpy(&hw_bundle[i], &aConfigBundle, sizeof(mb_t));
+        memcpy(&ui_bundle[i], &aConfigBundle, sizeof(mb_t));
+    }
 }
 
 - (void) initCrateWithDict:(NSDictionary*)argDict
@@ -1450,7 +1459,9 @@ void SwapLongBlock(void* p, int32_t n)
         for (i=0; i<16; i++) {
             memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
             *aMbId = i;
-            [self synthesizeDefaultsIntoBundle:aConfigBundle forSLot:i];
+            //hack for now
+            memcpy(aConfigBundle, &ui_bundle[i], sizeof(mb_t));
+            //fix the safe_bundle init!!!
             if ([xl3Link needToSwap]) {
                 *aMbId = swapLong(*aMbId);
                 [self byteSwapBundle:aConfigBundle];
@@ -3045,6 +3056,31 @@ void SwapLongBlock(void* p, int32_t n)
     [[[self document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvPanicDown)];
 }
 
+- (void) hvTriggersON
+{
+    unsigned short i;
+    unsigned short ch;
+    for (i=0; i<16; i++) {
+        for (ch=0; ch<32; ch++) {
+            ui_bundle[i].tr100.tdelay[ch] = hw_bundle[i].tr100.tdelay[ch];
+            ui_bundle[i].tr20.twidth[ch] = hw_bundle[i].tr20.twidth[ch];
+        }
+    }
+    [self initCrateRegistersOnly];
+}
+
+- (void) hvTriggersOFF
+{
+    unsigned short i;
+    unsigned short ch;
+    for (i=0; i<16; i++) {
+        for (ch=0; ch<32; ch++) {
+            ui_bundle[i].tr100.tdelay[ch] &= ~0x40U;
+            ui_bundle[i].tr20.twidth[ch] &= ~0x20U;
+        }
+    }
+    [self initCrateRegistersOnly];
+}
 
 - (void) readHVInterlockGood:(BOOL*)isGood
 {
