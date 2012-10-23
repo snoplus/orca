@@ -93,11 +93,15 @@
 - (void)  setMinValue:(int)i value:(float)aValue;
 - (float) maxValue:(int)i;
 - (void)  setMaxValue:(int)i value:(float)aValue;
+- (int) numberCommandsInQueue;
 
 #pragma mark •••Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 
+#pragma mark •••Mark the Common Script Methods
+- (void) commonScriptMethodSectionBegin;
+- (void) commonScriptMethodSectionEnd;
 
 #pragma mark •••Port Methods
 - (void) dataReceived:(NSNotification*)note;

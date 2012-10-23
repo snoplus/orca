@@ -441,7 +441,14 @@ NSString* ORArduinoUNOMaxValueChanged		= @"ORArduinoUNOMaxValueChanged";
 	[encoder encodeInt:pollTime			forKey: @"pollTime"];
 }
 
-#pragma mark •••HW Methods
+#pragma mark •••HW Methods//-------------Methode to flag beginning of common script methods---------------------------------
+- (void) commonScriptMethodSectionBegin { }
+
+- (int) numberCommandsInQueue
+{
+	return [cmdQueue count];
+}
+
 - (void) writeOutput:(unsigned short) aPin state:(BOOL)aState
 {
 	if(aPin>=2 && aPin < kNumArduinoUNOPins){
@@ -481,22 +488,6 @@ NSString* ORArduinoUNOMaxValueChanged		= @"ORArduinoUNOMaxValueChanged";
 	[self enqueCmdString:cmd];
 }
 
-- (unsigned int) inputMask
-{
-	unsigned int aMask = 0;
-	int i;
-	for(i=2;i<kNumArduinoUNOPins;i++){
-		if(pinType[i] == kArduinoInput)aMask |= (1<<i);
-	}
-	return aMask;
-}
-
-- (void) updateAll
-{
-	[self readAdcValues];
-	[self readInputPins];
-}
-
 - (void) initHardware
 {
 	[self readInputPins];
@@ -519,6 +510,27 @@ NSString* ORArduinoUNOMaxValueChanged		= @"ORArduinoUNOMaxValueChanged";
 	}
 	
 }
+
+
+- (void) commonScriptMethodSectionEnd { }
+//-------------end of common script methods---------------------------------
+
+- (unsigned int) inputMask
+{
+	unsigned int aMask = 0;
+	int i;
+	for(i=2;i<kNumArduinoUNOPins;i++){
+		if(pinType[i] == kArduinoInput)aMask |= (1<<i);
+	}
+	return aMask;
+}
+
+- (void) updateAll
+{
+	[self readAdcValues];
+	[self readInputPins];
+}
+
 
 #pragma mark •••Commands
 
