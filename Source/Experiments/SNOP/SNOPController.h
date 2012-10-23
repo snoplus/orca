@@ -33,7 +33,7 @@
 	NSSize detailsSize;
 	NSSize focalPlaneSize;
 	NSSize couchDBSize;
-	NSSize monitoringSize;
+	NSSize hvMasterSize;
 	NSSize slowControlSize;
     
     IBOutlet NSTextField *morcaUserNameField;
@@ -45,6 +45,7 @@
     IBOutlet NSButton *morcaIsWithinRunButton;
     IBOutlet NSPopUpButton *morcaUpdateRatePU;
     IBOutlet NSTextField *morcaStatusField;
+    IBOutlet NSMatrix* hvStatusMatrix;
 }
 
 #pragma mark ¥¥¥Initialization
@@ -61,6 +62,8 @@
 - (void) morcaIsWithinRunChanged:(NSNotification*)aNote;
 - (void) morcaUpdateRateChanged:(NSNotification*)aNote;
 - (void) morcaStatusChanged:(NSNotification*)aNote;
+
+- (void) hvStatusChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) viewTypeAction:(id)sender;
@@ -80,6 +83,8 @@
 - (IBAction)morcaIsVerboseAction:(id)sender;
 - (IBAction)morcaUpdateRateAction:(id)sender;
 - (IBAction)morcaUpdateWithinRunAction:(id)sender;
+
+- (IBAction)hvMasterPanicAction:(id)sender;
 
 #pragma mark ¥¥¥Details Interface Management
 - (void) setDetectorTitle;

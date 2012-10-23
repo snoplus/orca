@@ -3042,7 +3042,7 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (void) hvMasterPanicDown
 {
-    [[[self document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")]makeObjectsPerformSelector:@selector(hvPanicDown)];
+    [[[self document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvPanicDown)];
 }
 
 

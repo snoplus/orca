@@ -658,11 +658,12 @@ mtcStatusDataId = _mtcStatusDataId;
 	return (aRawValue*2.44140625)-5000.0;
 }
 
-- (unsigned long) mVoltsToNHits:(float) mVolts dcOffset:(float)dcOffset mVperNHit:(float)mVperNHit
+- (float) mVoltsToNHits:(float) mVolts dcOffset:(float)dcOffset mVperNHit:(float)mVperNHit
 {
 	float NHits_per_mVolts = 0.0;
 	if(mVperNHit)NHits_per_mVolts = 1/mVperNHit;
-	return (mVolts - dcOffset)*NHits_per_mVolts +.5;	
+	//return (mVolts - dcOffset)*NHits_per_mVolts +.5;
+	return (mVolts - dcOffset)*NHits_per_mVolts;
 }
 
 - (float) NHitsTomVolts:(float) NHits dcOffset:(float)dcOffset mVperNHit:(float)mVperNHit

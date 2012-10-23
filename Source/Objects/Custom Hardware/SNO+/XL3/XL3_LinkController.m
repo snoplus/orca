@@ -52,6 +52,7 @@ static NSDictionary* xl3Ops;
 	compositeSize	= NSMakeSize(485,558);
 	blankView = [[NSView alloc] init];
 	[self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
+    [tabView setFocusRingType:NSFocusRingTypeNone];
 
 	[super awakeFromNib];
 
@@ -1172,6 +1173,7 @@ static NSDictionary* xl3Ops;
 //hv
 - (IBAction)hvRelayMaskHighAction:(id)sender
 {
+    [[sender window] makeFirstResponder:tabView];
     unsigned long long newRelayMask = [model relayMask] & 0xFFFFFFFFULL;
     newRelayMask |= ((unsigned long long)[sender intValue]) << 32;
     [model setRelayMask:newRelayMask];
@@ -1179,6 +1181,7 @@ static NSDictionary* xl3Ops;
 
 - (IBAction)hvRelayMaskLowAction:(id)sender
 {
+    [[sender window] makeFirstResponder:tabView];
     unsigned long long newRelayMask = [model relayMask] & (0xFFFFFFFFULL << 32);
     newRelayMask |= [sender intValue] & 0xFFFFFFFF;
     [model setRelayMask:newRelayMask];    
@@ -1248,6 +1251,7 @@ static NSDictionary* xl3Ops;
 
 - (IBAction)hvTargetValueAction:(id)sender
 {
+    [[sender window] makeFirstResponder:tabView];
     char sup = [hvPowerSupplyMatrix selectedColumn];
     int nextTargetValue = 0;
     if (sender == hvTargetValueField) {
@@ -1400,7 +1404,15 @@ static NSDictionary* xl3Ops;
 
 - (IBAction)hvMasterPanicAction:(id)sender
 {
+    /*
+    NSArray* xl3s = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
+    for (id xl3 in xl3s) {
+        [model hvPanicDown];
+    }
+     */
+
     [model hvMasterPanicDown];
+    NSLog(@"Detector wide panic down started\n");
 }
 
 - (IBAction)hvMasterTriggerOffAction:(id)sender

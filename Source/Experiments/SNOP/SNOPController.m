@@ -25,6 +25,7 @@
 #import "ORColorScale.h"
 #import "ORAxis.h"
 #import "ORDetectorSegment.h"
+#import "ORXL3Model.h"
 
 @implementation SNOPController
 #pragma mark ¥¥¥Initialization
@@ -47,7 +48,7 @@
 	detailsSize		= NSMakeSize(450,589);
 	focalPlaneSize		= NSMakeSize(450,589);
 	couchDBSize		= NSMakeSize(450,500);
-	monitoringSize		= NSMakeSize(620,595);
+	hvMasterSize		= NSMakeSize(620,595);
 	slowControlSize		= NSMakeSize(620,595);
 	
 	blankView = [[NSView alloc] init];
@@ -118,6 +119,11 @@
                      selector : @selector(morcaIPAddressChanged:)
                          name : ORSNOPModelMorcaIsUpdatingChanged
                         object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(hvStatusChanged:)
+                         name : ORXL3ModelHvStatusChanged
+                        object: nil];
 }
 
 - (void) updateWindow
@@ -133,6 +139,7 @@
     [self morcaIsWithinRunChanged:nil];
     [self morcaUpdateRateChanged:nil];
     [self morcaStatusChanged:nil];
+    [self hvStatusChanged:nil];
 }
 
 - (void) viewTypeChanged:(NSNotification*)aNote
@@ -185,6 +192,111 @@
 - (void) morcaStatusChanged:(NSNotification*)aNote
 {
     [morcaStatusField setStringValue:[model morcaStatus]];
+}
+
+- (void) hvStatusChanged:(NSNotification*)aNote
+{
+    if (!aNote) {//pull from XL3s
+        NSArray* xl3s = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
+        unsigned long xl3Mask = 0x7ffff;
+        for (id xl3 in xl3s) {
+            xl3Mask ^= 1 << [xl3 crateNumber];
+            int mRow;
+            int mColumn;
+            bool found;
+            found = [hvStatusMatrix getRow:&mRow column:&mColumn ofCell:[hvStatusMatrix cellWithTag:[xl3 crateNumber]]];
+            if (found) {
+                [[hvStatusMatrix cellAtRow:mRow column:1] setStringValue:[xl3 hvASwitch]?@"ON":@"OFF"];
+                if ([xl3 hvASwitch]) {
+                    [[hvStatusMatrix cellAtRow:mRow column:1] setTextColor:[NSColor redColor]];
+                }
+                else {
+                    [[hvStatusMatrix cellAtRow:mRow column:1] setTextColor:[NSColor blackColor]];
+                }
+                [[hvStatusMatrix cellAtRow:mRow column:2] setStringValue:
+                 [NSString stringWithFormat:@"%d V",(unsigned int)[xl3 hvAVoltageReadValue]]];
+                [[hvStatusMatrix cellAtRow:mRow column:3] setStringValue:
+                 [NSString stringWithFormat:@"%3.1f mA",[xl3 hvACurrentReadValue]]];
+            }
+            if ([xl3 crateNumber] == 16) {//16B
+                int mRow;
+                int mColumn;
+                bool found;
+                found = [hvStatusMatrix getRow:&mRow column:&mColumn ofCell:[hvStatusMatrix cellWithTag:19]];
+                if (found) {
+                    [[hvStatusMatrix cellAtRow:mRow column:1] setStringValue:[xl3 hvBSwitch]?@"ON":@"OFF"];
+                    if ([xl3 hvBSwitch]) {
+                        [[hvStatusMatrix cellAtRow:mRow column:1] setTextColor:[NSColor redColor]];
+                    }
+                    else {
+                        [[hvStatusMatrix cellAtRow:mRow column:1] setTextColor:[NSColor blackColor]];
+                    }
+                    [[hvStatusMatrix cellAtRow:mRow column:2] setStringValue:
+                     [NSString stringWithFormat:@"%d V",(unsigned int)[xl3 hvBVoltageReadValue]]];
+                    [[hvStatusMatrix cellAtRow:mRow column:3] setStringValue:
+                     [NSString stringWithFormat:@"%3.1f mA",[xl3 hvBCurrentReadValue]]];
+                }
+            }
+        }
+        unsigned short crate_num;
+        if (xl3Mask & 1 << 16) {//16B needs an extra care
+            xl3Mask |= 1 << 19;
+        }
+        for (crate_num=0; crate_num<20; crate_num++) {
+            if (xl3Mask & 1 << crate_num) {
+                int mRow;
+                int mColumn;
+                bool found;
+                found = [hvStatusMatrix getRow:&mRow column:&mColumn ofCell:[hvStatusMatrix cellWithTag:crate_num]];
+                if (found) {
+                    [[hvStatusMatrix cellAtRow:mRow column:1] setStringValue:@"???"];
+                    [[hvStatusMatrix cellAtRow:mRow column:1] setTextColor:[NSColor blackColor]];
+                    [[hvStatusMatrix cellAtRow:mRow column:2] setStringValue:@"??? V"];
+                    [[hvStatusMatrix cellAtRow:mRow column:3] setStringValue:@"??? mA"];
+                }
+            }
+        }
+    }
+    else { //update from a notification
+        int mRow;
+        int mColumn;
+        bool found;
+        found = [hvStatusMatrix getRow:&mRow column:&mColumn ofCell:
+                 [hvStatusMatrix cellWithTag:[[aNote object] crateNumber]]];
+
+        if (found) {
+            [[hvStatusMatrix cellAtRow:mRow column:1] setStringValue:[[aNote object] hvASwitch]?@"ON":@"OFF"];
+            if ([[aNote object] hvASwitch]) {
+                [[hvStatusMatrix cellAtRow:mRow column:1] setTextColor:[NSColor redColor]];
+            }
+            else {
+                [[hvStatusMatrix cellAtRow:mRow column:1] setTextColor:[NSColor blackColor]];
+            }
+            [[hvStatusMatrix cellAtRow:mRow column:2] setStringValue:
+             [NSString stringWithFormat:@"%d V",(unsigned int)[[aNote object] hvAVoltageReadValue]]];
+            [[hvStatusMatrix cellAtRow:mRow column:3] setStringValue:
+             [NSString stringWithFormat:@"%3.1f mA",[[aNote object] hvACurrentReadValue]]];
+        }
+        if ([[aNote object] crateNumber] == 16) {//16B
+            int mRow;
+            int mColumn;
+            bool found;
+            found = [hvStatusMatrix getRow:&mRow column:&mColumn ofCell:[hvStatusMatrix cellWithTag:19]];
+            if (found) {
+                [[hvStatusMatrix cellAtRow:mRow column:1] setStringValue:[[aNote object] hvBSwitch]?@"ON":@"OFF"];
+                if ([[aNote object] hvBSwitch]) {
+                    [[hvStatusMatrix cellAtRow:mRow column:1] setTextColor:[NSColor redColor]];
+                }
+                else {
+                    [[hvStatusMatrix cellAtRow:mRow column:1] setTextColor:[NSColor blackColor]];
+                }
+                [[hvStatusMatrix cellAtRow:mRow column:2] setStringValue:
+                 [NSString stringWithFormat:@"%d V",(unsigned int)[[aNote object] hvBVoltageReadValue]]];
+                [[hvStatusMatrix cellAtRow:mRow column:3] setStringValue:
+                 [NSString stringWithFormat:@"%3.1f mA",[[aNote object] hvBCurrentReadValue]]];
+            }
+        }
+    }
 }
 
 #pragma mark ¥¥¥Interface Management
@@ -257,6 +369,17 @@
     [model setMorcaIsWithinRun:[sender intValue]];
 }
 
+- (IBAction)hvMasterPanicAction:(id)sender
+{
+    [[[self document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvPanicDown)];
+/*
+    NSArray* xl3s = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
+    for (id xl3 in xl3s) {
+        [model hvPanicDown];
+    }
+ */
+    NSLog(@"Detector wide panic down started\n");
+}
 
 - (void) specialUpdate:(NSNotification*)aNote
 {
@@ -310,12 +433,12 @@
 	    [self resizeWindowToSize:couchDBSize];
 	    [[self window] setContentView:tabView];
     }
-/*
     else if([tabView indexOfTabViewItem:tabViewItem] == 4){
 	    [[self window] setContentView:blankView];
-	    [self resizeWindowToSize:monitoringSize];
+	    [self resizeWindowToSize:hvMasterSize];
 	    [[self window] setContentView:tabView];
     }
+/*
     else if([tabView indexOfTabViewItem:tabViewItem] == 5){
 	    [[self window] setContentView:blankView];
 	    [self resizeWindowToSize:slowControlSize];
