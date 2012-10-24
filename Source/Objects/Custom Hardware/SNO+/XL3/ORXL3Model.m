@@ -2956,9 +2956,14 @@ void SwapLongBlock(void* p, int32_t n)
             NSLog(@"%@ continuing to turn OFF the HV power supply.\n",[[self xl3Link] crateName]);            
         }
     }
-    
-    
-    [self readHVStatus];
+        
+    @try {
+        [self readHVStatus];
+    }
+    @catch (NSException *exception) {
+        NSLog(@"%@ error in readHVStatus\n",[[self xl3Link] crateName]);
+        return;
+    }
 
     //XL3 reset button
     if (fabs([self hvAVoltageReadValue] * 4096/3000. - [self hvAVoltageDACSetValue]) > 50) {
@@ -3042,9 +3047,15 @@ void SwapLongBlock(void* p, int32_t n)
     
     [self setHvASwitch:xl3SwitchA];
     [self setHvBSwitch:xl3SwitchB];
-    
-    [self readHVStatus];
 
+    @try {
+        [self readHVStatus];
+    }
+    @catch (NSException *exception) {
+        NSLog(@"%@ error in readHVStatus\n",[[self xl3Link] crateName]);
+        return;
+    }
+    
     }//synchronized
 }
 
@@ -3053,6 +3064,7 @@ void SwapLongBlock(void* p, int32_t n)
     [self setHvPanicFlag:YES];
     [self setHvANextStepValue:0];
     [self setHvBNextStepValue:0];
+    [self setIsPollingXl3:NO];
     NSLog(@"%@ panic down started, hit HV ON to recover\n", [[self xl3Link] crateName]);
 }
 
