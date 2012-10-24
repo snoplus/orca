@@ -66,13 +66,17 @@ NSString* ORArduinoUNOMaxValueChanged		= @"ORArduinoUNOMaxValueChanged";
 {
 	int i;
 	for(i=0;i<kNumArduinoUNOPins;i++)	[pinName[i] release];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[inComingData release];
 	[super dealloc];
 }
 
 - (void) wakeUp
 {
-	if(pollTime)[self pollHardware];
+	if(pollTime){
+		[self initHardware];
+		[self pollHardware];
+	}
 	[super wakeUp];
 }
 
@@ -258,7 +262,9 @@ NSString* ORArduinoUNOMaxValueChanged		= @"ORArduinoUNOMaxValueChanged";
 
 - (void) firstActionAfterOpeningPort
 {
-	[self readInputPins];
+	[cmdQueue removeAllObjects];
+	[self initHardware];
+	[self pollHardware];
 }
 
 - (float) slope:(int)i
@@ -490,25 +496,26 @@ NSString* ORArduinoUNOMaxValueChanged		= @"ORArduinoUNOMaxValueChanged";
 
 - (void) initHardware
 {
-	[self readInputPins];
-	int i;
-	unsigned int aMask = 0;
-	for(i=2;i<kNumArduinoUNOPins;i++){
-		if(pinType[i] == kArduinoOutput){
-			if(pinStateOut[i] == YES){
-				aMask |= (1<<i);
+	if([serialPort isOpen]){
+		[self readInputPins];
+		int i;
+		unsigned int aMask = 0;
+		for(i=2;i<kNumArduinoUNOPins;i++){
+			if(pinType[i] == kArduinoOutput){
+				if(pinStateOut[i] == YES){
+					aMask |= (1<<i);
+				}
+			}
+		}
+		[self writeAllOutputs:aMask];
+		
+		for(i=2;i<kNumArduinoUNOPins;i++){
+			if(pinType[i] == kArduinoPWM){
+				NSString* cmd = [NSString stringWithFormat:@"w a %d %d",i,pwm[i]];
+				[self enqueCmdString:cmd];
 			}
 		}
 	}
-	[self writeAllOutputs:aMask];
-	
-	for(i=2;i<kNumArduinoUNOPins;i++){
-		if(pinType[i] == kArduinoPWM){
-			NSString* cmd = [NSString stringWithFormat:@"w a %d %d",i,pwm[i]];
-			[self enqueCmdString:cmd];
-		}
-	}
-	
 }
 
 
@@ -668,9 +675,15 @@ NSString* ORArduinoUNOMaxValueChanged		= @"ORArduinoUNOMaxValueChanged";
 			[self performSelector:@selector(clearDelay) withObject:nil afterDelay:.2];
 		}
 		else {
-            [self setLastRequest:cmdString];
-            [serialPort writeDataInBackground:[cmdString dataUsingEncoding:NSASCIIStringEncoding]];
-			[self startTimeout:3];
+			if([serialPort isOpen]){
+				[self setLastRequest:cmdString];
+				[serialPort writeDataInBackground:[cmdString dataUsingEncoding:NSASCIIStringEncoding]];
+				[self startTimeout:3];
+			}
+			else {
+				[self cancelTimeout];
+				[cmdQueue removeAllObjects];
+			}
         }
 	}
 }
@@ -746,9 +759,11 @@ NSString* ORArduinoUNOMaxValueChanged		= @"ORArduinoUNOMaxValueChanged";
 - (void) pollHardware
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
-	[self updateAll];
 	float nextTime = pollTime;
 	if(nextTime == 9999)nextTime = .03;
-	[self performSelector:@selector(pollHardware) withObject:nil afterDelay:nextTime];
+	if([serialPort isOpen]){
+		[self updateAll];
+		if(pollTime)[self performSelector:@selector(pollHardware) withObject:nil afterDelay:nextTime];
+	}
 }
 @end
