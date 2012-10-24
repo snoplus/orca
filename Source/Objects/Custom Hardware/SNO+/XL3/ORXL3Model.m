@@ -3052,9 +3052,11 @@ void SwapLongBlock(void* p, int32_t n)
 {
     [self setHvPanicFlag:YES];
     [self setHvANextStepValue:0];
-    [self setHvBNextStepValue:0];   
+    [self setHvBNextStepValue:0];
+    NSLog(@"%@ panic down started, hit HV ON to recover\n", [[self xl3Link] crateName]);
 }
 
+//not used, we collect the objects from the controller now
 - (void) hvMasterPanicDown
 {
     [[[self document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvPanicDown)];

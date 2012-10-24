@@ -1411,7 +1411,9 @@ static NSDictionary* xl3Ops;
     }
      */
 
-    [model hvMasterPanicDown];
+    [[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvPanicDown)];
+
+    //[model hvMasterPanicDown];
     NSLog(@"Detector wide panic down started\n");
 }
 
