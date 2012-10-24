@@ -831,7 +831,7 @@ NSString* ORXL3ModelXl3VltThresholdInInitChanged = @"ORXL3ModelXl3VltThresholdIn
 - (NSString*) triggerStatus
 {
     if (!triggerStatus) {
-        return @"OFF";
+        return @"ON";
     }
     return triggerStatus;
 }
@@ -2367,8 +2367,10 @@ void SwapLongBlock(void* p, int32_t n)
             unsigned char j = 0;
             for (i=0; i<8; i++) {
                 if ((msk >> i) & 0x1) {
+                    //NSLog(@"slot %d:\n", i);
                     for (j=0; j<32; j++) {
                         counts[j] = results_lo.counts[slot_idx*32 + j];
+                        //NSLog(@"channel: %d cnt: %ld\n", j, counts[j]);
                     }
                     ORFec32Model* fec;
                     for (id anObj in [[self guardian] orcaObjects]) { 
@@ -2387,8 +2389,10 @@ void SwapLongBlock(void* p, int32_t n)
             slot_idx=0;
             for (i=0; i<8; i++) {
                 if ((msk >> (i + 8)) & 0x1) {
+                    //NSLog(@"slot %d:\n", i+8);
                     for (j=0; j<32; j++) {
                         counts[j] = results_hi.counts[slot_idx*32 + j];
+                        //NSLog(@"channel: %d cnt: %ld\n", j, counts[j]);
                     }
                     ORFec32Model* fec;
                     for (id anObj in [[self guardian] orcaObjects]) { 
@@ -3058,28 +3062,38 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (void) hvTriggersON
 {
-    unsigned short i;
-    unsigned short ch;
-    for (i=0; i<16; i++) {
-        for (ch=0; ch<32; ch++) {
-            ui_bundle[i].tr100.tdelay[ch] = hw_bundle[i].tr100.tdelay[ch];
-            ui_bundle[i].tr20.twidth[ch] = hw_bundle[i].tr20.twidth[ch];
+    if ([[self xl3Link] isConnected]) {
+        unsigned short i;
+        unsigned short ch;
+        for (i=0; i<16; i++) {
+            for (ch=0; ch<32; ch++) {
+                ui_bundle[i].tr100.tdelay[ch] = hw_bundle[i].tr100.tdelay[ch];
+                ui_bundle[i].tr20.twidth[ch] = hw_bundle[i].tr20.twidth[ch];
+            }
         }
+        [self setTriggerStatus:@"ON"];
+        [self initCrateRegistersOnly];
+        NSLog(@"%@ triggers ON\n", [[self xl3Link] crateName]);
     }
-    [self initCrateRegistersOnly];
 }
 
 - (void) hvTriggersOFF
 {
-    unsigned short i;
-    unsigned short ch;
-    for (i=0; i<16; i++) {
-        for (ch=0; ch<32; ch++) {
-            ui_bundle[i].tr100.tdelay[ch] &= ~0x40U;
-            ui_bundle[i].tr20.twidth[ch] &= ~0x20U;
+    if ([[self xl3Link] isConnected]) {
+        unsigned short i;
+        unsigned short ch;
+        for (i=0; i<16; i++) {
+            for (ch=0; ch<32; ch++) {
+                ui_bundle[i].tr100.tdelay[ch] &= ~0x40U;
+                ui_bundle[i].tr20.twidth[ch] &= ~0x20U;
+                //ui_bundle[i].tr100.tdelay[ch] = 0;
+                //ui_bundle[i].tr20.twidth[ch] = 0;
+            }
         }
+        [self initCrateRegistersOnly];
+        [self setTriggerStatus:@"OFF"];
+        NSLog(@"%@ triggers OFF\n", [[self xl3Link] crateName]);
     }
-    [self initCrateRegistersOnly];
 }
 
 - (void) readHVInterlockGood:(BOOL*)isGood
@@ -3901,7 +3915,7 @@ void SwapLongBlock(void* p, int32_t n)
             XL3_PayloadStruct payload;
             memcpy(&payload, [[resp objectForKey:@"payload"] bytes], sizeof(XL3_PayloadStruct));
 
-            [self setTriggerStatus:@"ON"];
+            //[self setTriggerStatus:@"ON"];
             unsigned short* aId = (unsigned short*) payload.payload + 2; //hard to say what the first int should be
             unsigned short i;
             for (i=0; i<16*5; i++) {
