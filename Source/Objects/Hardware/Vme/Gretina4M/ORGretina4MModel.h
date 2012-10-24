@@ -35,7 +35,7 @@
 
 #define kGretina4MFIFOEmpty			0x100000
 #define kGretina4MFIFOAlmostEmpty	0x400000
-#define kGretina4MFIFOAlmostFull		0x800000
+#define kGretina4MFIFOAlmostFull	0x800000
 #define kGretina4MFIFOAllFull		0x1000000
 
 #define kGretina4MPacketSeparator    0xAAAAAAAA

@@ -30,7 +30,7 @@
 #import "VME_HW_Definitions.h"
 #import "ORVmeTests.h"
 
-#define kCurrentFirmwareVersion 0x106
+#define kCurrentFirmwareVersion 0x107
 
 NSString* ORGretina4MModelIntegrateTimeChanged		= @"ORGretina4MModelIntegrateTimeChanged";
 NSString* ORGretina4MModelCollectionTimeChanged     = @"ORGretina4MModelCollectionTimeChanged";
@@ -2263,12 +2263,12 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
      * 4: FIFO size                                         */
     
 	configStruct->total_cards++;
-	configStruct->card_info[index].hw_type_id	= kGretina; //should be unique
-	configStruct->card_info[index].hw_mask[0] 	= dataId; //better be unique
-	configStruct->card_info[index].slot			= [self slot];
-	configStruct->card_info[index].crate		= [self crateNumber];
-	configStruct->card_info[index].add_mod		= [self addressModifier];
-	configStruct->card_info[index].base_add		= [self baseAddress];
+	configStruct->card_info[index].hw_type_id				= kGretina; //should be unique
+	configStruct->card_info[index].hw_mask[0]				= dataId; //better be unique
+	configStruct->card_info[index].slot						= [self slot];
+	configStruct->card_info[index].crate					= [self crateNumber];
+	configStruct->card_info[index].add_mod					= [self addressModifier];
+	configStruct->card_info[index].base_add					= [self baseAddress];
 	configStruct->card_info[index].deviceSpecificData[0]	= [self baseAddress] + register_information[kProgrammingDone].offset; //fifoStateAddress
     configStruct->card_info[index].deviceSpecificData[1]	= kGretina4MFIFOEmpty; // fifoEmptyMask
     configStruct->card_info[index].deviceSpecificData[2]	= [self baseAddress] + 0x1000; // fifoAddress
@@ -2287,7 +2287,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
-    [self setIntegrateTime:           [decoder decodeIntForKey:@"integrateTime"]];
+    [self setIntegrateTime:             [decoder decodeIntForKey:@"integrateTime"]];
     [self setCollectionTime:            [decoder decodeIntForKey:@"collectionTime"]];
     [self setExtTrigLength:             [decoder decodeIntForKey:@"extTrigLength"]];
     [self setPileUpWindow:              [decoder decodeIntForKey:@"pileUpWindow"]];
