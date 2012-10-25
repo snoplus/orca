@@ -296,6 +296,11 @@
                          name : OREdelweissFLTModelSwTriggerIsRepeatingChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(tpixChanged:)
+                         name : OREdelweissFLTModelTpixChanged
+						object: model];
+
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
@@ -321,6 +326,8 @@
     [self fiberEnableMaskChanged:nil];
     [self selectFiberTrigChanged:nil];
     [self BBv1MaskChanged:nil];
+    [self fltModeFlagsChanged:nil];
+    [self tpixChanged:nil];
 
 	//[selectFiberTrigPU selectItemAtIndex: [model selectFiberTrig]];
 	[statusLatencyPU selectItemAtIndex: [model statusLatency]];
@@ -430,11 +437,17 @@
 	    case 0x1: index=1; break;
 	    case 0x2: index=2; break;
 	    case 0x3: index=3; break;
-	    default: index=4; break;
+	    default: index=0; break;
 	}
 	[fltModeFlagsPU selectItemAtIndex: index];
 	//[fltModeFlagsPU setIntValue: [model fltModeFlags]];
 }
+
+- (void) tpixChanged:(NSNotification*)aNote
+{
+	[tpixCB setIntValue: [model tpix]];
+}
+
 
 - (void) targetRateChanged:(NSNotification*)aNote
 {
@@ -538,6 +551,7 @@
 	[self controlRegisterChanged:nil];
 	[self repeatSWTriggerModeChanged:nil];
 	[self swTriggerIsRepeatingChanged:nil];
+	[self tpixChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -1063,11 +1077,17 @@
 	    case 0: flags=0x0; break;
 	    case 1: flags=0x1; break;
 	    case 2: flags=0x2; break;
-	    case 3: flags=0x4; break;
+	    case 3: flags=0x3; break;
 	    default: flags=0; break;
 	}
 	//[model setFltModeFlags:[sender intValue]];	
 	[model setFltModeFlags: flags];	
+}
+
+- (void) tpixCBAction:(id)sender
+{
+	//[model setTpix:[sender intValue]];	
+	[model setTpix:[tpixCB intValue]];	
 }
 
 

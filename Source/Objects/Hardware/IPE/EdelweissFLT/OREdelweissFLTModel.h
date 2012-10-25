@@ -124,7 +124,8 @@
 	unsigned long eventCount[kNumV4FLTChannels];
 	
     //EDELWEISS vars
-    int fltModeFlags;
+    int fltModeFlags; //TODO: unused, using "uint32_t controlRegister"
+    //int tpix; //TODO: unused, using "uint32_t controlRegister"
     int fiberEnableMask;
     int BBv1Mask;
     int selectFiberTrig;
@@ -167,6 +168,8 @@
 - (void) setFiberEnableMask:(int)aFiberEnableMask;
 - (int) fltModeFlags;
 - (void) setFltModeFlags:(int)aFltModeFlags;
+- (int) tpix;
+- (void) setTpix:(int)aTpix;
 
 
 - (int) totalTriggerNRegister;
@@ -382,6 +385,7 @@
 				  n:(int) n;
 @end
 
+extern NSString* OREdelweissFLTModelTpixChanged;
 extern NSString* OREdelweissFLTModelSwTriggerIsRepeatingChanged;
 extern NSString* OREdelweissFLTModelRepeatSWTriggerModeChanged;
 extern NSString* OREdelweissFLTModelControlRegisterChanged;

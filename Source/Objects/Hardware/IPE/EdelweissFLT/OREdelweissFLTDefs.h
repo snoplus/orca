@@ -33,7 +33,9 @@
 #define kEWFlt_ControlReg_BBv1_Shift		8
 #define kEWFlt_ControlReg_BBv1_Mask			0x3f
 #define kEWFlt_ControlReg_ModeFlags_Shift	4
-#define kEWFlt_ControlReg_ModeFlags_Mask	0x7
+#define kEWFlt_ControlReg_ModeFlags_Mask	0x3
+#define kEWFlt_ControlReg_tpix_Shift	6
+#define kEWFlt_ControlReg_tpix_Mask	0x1
 
 
 

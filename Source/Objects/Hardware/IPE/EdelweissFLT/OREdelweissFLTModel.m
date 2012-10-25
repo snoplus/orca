@@ -30,6 +30,7 @@
 #import "EdelweissSLTv4_HW_Definitions.h"
 #import "ORCommandList.h"
 
+NSString* OREdelweissFLTModelTpixChanged = @"OREdelweissFLTModelTpixChanged";
 NSString* OREdelweissFLTModelSwTriggerIsRepeatingChanged = @"OREdelweissFLTModelSwTriggerIsRepeatingChanged";
 NSString* OREdelweissFLTModelRepeatSWTriggerModeChanged = @"OREdelweissFLTModelRepeatSWTriggerModeChanged";
 NSString* OREdelweissFLTModelControlRegisterChanged = @"OREdelweissFLTModelControlRegisterChanged";
@@ -252,7 +253,6 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (short) getNumberRegisters{ return kFLTV4NumRegs; }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
-
 - (int) swTriggerIsRepeating
 {
     return swTriggerIsRepeating;
@@ -392,6 +392,25 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     cr = cr | ((aFltModeFlags & kEWFlt_ControlReg_ModeFlags_Mask) << kEWFlt_ControlReg_ModeFlags_Shift);
 	[self setControlRegister:cr];
 }
+
+
+
+- (int) tpix
+{    return (controlRegister >> kEWFlt_ControlReg_tpix_Shift) & kEWFlt_ControlReg_tpix_Mask;   }
+
+
+- (void) setTpix:(int)aTpix
+{
+    //[[[self undoManager] prepareWithInvocationTarget:self] setTpix:tpix];
+    //tpix = aTpix;
+    //[[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelTpixChanged object:self];
+    //tpix = aTpix;
+    uint32_t cr = controlRegister & ~(kEWFlt_ControlReg_tpix_Mask << kEWFlt_ControlReg_tpix_Shift);
+    cr = cr |              ((aTpix & kEWFlt_ControlReg_tpix_Mask) << kEWFlt_ControlReg_tpix_Shift);
+	[self setControlRegister:cr];
+}
+
+
 
 
 
@@ -1414,6 +1433,7 @@ for(chan=0; chan<6;chan++)
 	
     [[self undoManager] disableUndoRegistration];
 	
+    //[self setTpix:[decoder decodeIntForKey:@"tpix"]];
     [self setRepeatSWTriggerMode:[decoder decodeIntForKey:@"repeatSWTriggerMode"]];
     [self setControlRegister:[decoder decodeIntForKey:@"controlRegister"]];
     [self setFastWrite:[decoder decodeIntForKey:@"fastWrite"]];
@@ -1480,6 +1500,7 @@ for(chan=0; chan<6;chan++)
 {
     [super encodeWithCoder:encoder];
 	
+    //[encoder encodeInt:tpix forKey:@"tpix"];
     [encoder encodeInt:repeatSWTriggerMode forKey:@"repeatSWTriggerMode"];
     [encoder encodeInt:controlRegister forKey:@"controlRegister"];
     [encoder encodeInt:fastWrite forKey:@"fastWrite"];

@@ -29,6 +29,7 @@
 @interface OREdelweissFLTController : OrcaObjectController {
 	@private
         IBOutlet NSButton*		settingLockButton;
+	    IBOutlet NSButton*      tpixCB;
 //	IBOutlet   No Outlet* swTriggerIsRepeatingNo Outlet;
 		
 	IBOutlet   NSTextField* repeatSWTriggerModeTextField;
@@ -145,6 +146,7 @@
 - (void) BBv1MaskChanged:(NSNotification*)aNote;
 - (void) fiberEnableMaskChanged:(NSNotification*)aNote;
 - (void) fltModeFlagsChanged:(NSNotification*)aNote;
+- (void) tpixChanged:(NSNotification*)aNote;
 - (void) targetRateChanged:(NSNotification*)aNote;
 - (void) noiseFloorChanged:(NSNotification*)aNote;
 - (void) noiseFloorOffsetChanged:(NSNotification*)aNote;
@@ -181,6 +183,7 @@
 - (void) selectedChannelValueChanged:(NSNotification*) aNote;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+- (IBAction) tpixCBAction:(id)sender;
 - (IBAction) repeatSWTriggerModePUAction:(id)sender;
 - (IBAction) repeatSWTriggerModeTextFieldAction:(id)sender;
 - (IBAction) controlRegisterTextFieldAction:(id)sender;
