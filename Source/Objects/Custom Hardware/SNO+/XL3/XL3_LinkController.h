@@ -137,6 +137,8 @@
     IBOutlet NSTextField*           connectionCrateNumberField;
     IBOutlet NSButton*              connectionAutoConnectButton;
     IBOutlet NSButton*              connectionAutoInitCrateButton;
+    
+    id owl_crate_master;
 }	
 
 #pragma mark •••Initialization

@@ -198,8 +198,11 @@ bool ORMTCReadout::Readout(SBC_LAM_Data* /*lamData*/)
     gettimeofday(&tv1, &tz);
     */
 
-    int32_t eventsStored = mem_write_ptr - mem_read_ptr;
-    if (eventsStored <= 0) eventsStored += 0xfffff;
+    int32_t eventsStored = mem_write_ptr;
+    if (mem_write_ptr < mem_read_ptr) {
+        eventsStored += 0xfffff;
+    }
+    eventsStored -= mem_read_ptr;
     if (eventsStored > 32) eventsStored = 32;
 
     do {

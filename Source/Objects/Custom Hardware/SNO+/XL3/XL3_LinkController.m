@@ -620,6 +620,13 @@ static NSDictionary* xl3Ops;
 
 - (void) hvStatusChanged:(NSNotification*)aNote
 {
+    if (!owl_crate_master) { //cache owl master
+        NSArray* xl3s = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXl3Model")];
+        for (id xl3 in xl3s) {
+            if ([xl3 crateNumber] == 16) owl_crate_master = xl3;
+        }
+    }
+    
     [hvAOnStatusField setStringValue:[model hvASwitch]?@"ON":@"OFF"];
     [hvBOnStatusField setStringValue:[model hvBSwitch]?@"ON":@"OFF"];
     [hvAVoltageSetField setStringValue:[NSString stringWithFormat:@"%lu V",[model hvAVoltageDACSetValue]*3000/4096]];
@@ -630,7 +637,10 @@ static NSDictionary* xl3Ops;
     [hvBCurrentReadField setStringValue:[NSString stringWithFormat:@"%3.1f mA",[model hvBCurrentReadValue]]];
 
     //todo: add exception for OWLs
-    if ([hvPowerSupplyMatrix selectedColumn] == 0 && [model hvASwitch]) { //A ON
+    //if ([hvPowerSupplyMatrix selectedColumn] == 0 && [model hvASwitch]) {
+    if ([model hvASwitch] || //A ON or
+        (([model crateNumber] == 3 || [model crateNumber] == 13 || [model crateNumber] == 18) && //OWL crate
+         ([owl_crate_master hvBSwitch]))) { //and crate 16 HV B ON
         [hvRelayMaskHighField setEnabled:NO];
         [hvRelayMaskLowField setEnabled:NO];
         [hvRelayMaskMatrix setEnabled:NO];
@@ -690,10 +700,10 @@ static NSDictionary* xl3Ops;
 
 - (void) hvChangePowerSupplyChanged:(NSNotification*)aNote
 {
-
     [self hvTargetValueChanged:aNote];
     [self hvCMOSRateLimitChanged:aNote];
     [self hvCMOSRateIgnoreChanged:aNote];
+    [self hvStatusChanged:aNote];
 }
 
 #pragma mark •ip connection
@@ -1235,13 +1245,13 @@ static NSDictionary* xl3Ops;
             return;
         }
     }
-    else if (sup == 0 && [model hvBSwitch]) {
+    else if (sup == 1 && [model hvBSwitch]) {
         if ([model hvBVoltageDACSetValue] > 30) {
             NSBeginAlertSheet (@"Not turning OFF",@"OK",nil,nil,[self window],self,nil,nil,nil,@"Voltage too high. Ramp down first.");
             return;
         }
     }
-    [model setHVSwitch:NO forPowerSupply:sup ];    
+    [model setHVSwitch:NO forPowerSupply:sup];
 }
 
 - (IBAction)hvGetStatusAction:(id)sender
@@ -1374,7 +1384,7 @@ static NSDictionary* xl3Ops;
             [model setHvANextStepValue:[model hvAVoltageTargetValue]];
         }
         else {
-            [model setHvANextStepValue:[model hvBVoltageTargetValue]];
+            [model setHvBNextStepValue:[model hvBVoltageTargetValue]];
         }
 }
 
@@ -1384,7 +1394,7 @@ static NSDictionary* xl3Ops;
         [model setHvANextStepValue:0];
     }
     else {
-        [model setHvANextStepValue:0];
+        [model setHvBNextStepValue:0];
     }
 }
 
@@ -1394,7 +1404,7 @@ static NSDictionary* xl3Ops;
         [model setHvANextStepValue:[model hvAVoltageDACSetValue]];
     }
     else {
-        [model setHvANextStepValue:[model hvBVoltageDACSetValue]];
+        [model setHvBNextStepValue:[model hvBVoltageDACSetValue]];
     }
 }
 
