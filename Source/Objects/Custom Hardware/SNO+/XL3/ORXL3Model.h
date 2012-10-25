@@ -115,6 +115,8 @@ enum {
     unsigned long _hvBCMOSRateIgnore;
     unsigned long _hvANextStepValue;
     unsigned long _hvBNextStepValue;
+    unsigned long _hvNominalVoltageA;
+    unsigned long _hvNominalVoltageB;
     BOOL _hvPanicFlag;
     NSThread* hvThread;
     NSDateFormatter* xl3DateFormatter;
@@ -167,6 +169,8 @@ enum {
 @property (nonatomic,assign) float hvBCurrentReadValue;
 @property (nonatomic,assign) unsigned long hvAVoltageTargetValue;
 @property (nonatomic,assign) unsigned long hvBVoltageTargetValue;
+@property (nonatomic,assign) unsigned long hvNominalVoltageA;
+@property (nonatomic,assign) unsigned long hvNominalVoltageB;
 @property (nonatomic,assign) BOOL calcCMOSRatesFromCounts;
 @property (nonatomic,assign) unsigned long hvACMOSRateLimit;
 @property (nonatomic,assign) unsigned long hvBCMOSRateLimit;
@@ -376,6 +380,7 @@ extern NSString* ORXL3ModelRelayStatusChanged;
 extern NSString* ORXL3ModelHvStatusChanged;
 extern NSString* ORXL3ModelTriggerStatusChanged;
 extern NSString* ORXL3ModelHVTargetValueChanged;
+extern NSString* ORXL3ModelHVNominalVoltageChanged;
 extern NSString* ORXL3ModelHVCMOSRateLimitChanged;
 extern NSString* ORXL3ModelHVCMOSRateIgnoreChanged;
 extern NSString* ORXL3ModelXl3VltThresholdChanged;

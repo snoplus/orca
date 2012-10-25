@@ -85,6 +85,9 @@
 - (IBAction)morcaUpdateWithinRunAction:(id)sender;
 
 - (IBAction)hvMasterPanicAction:(id)sender;
+- (IBAction)hvMasterTriggersOFF:(id)sender;
+- (IBAction)hvMasterTriggersON:(id)sender;
+- (IBAction)hvMasterStatus:(id)sender;
 
 #pragma mark ¥¥¥Details Interface Management
 - (void) setDetectorTitle;
@@ -95,3 +98,5 @@
 @interface ORDetectorView (SNO)
 - (void) setViewType:(int)aState;
 @end
+
+extern NSString* ORSNOPRequestHVStatus;

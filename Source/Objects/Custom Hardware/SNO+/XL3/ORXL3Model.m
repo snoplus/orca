@@ -85,10 +85,13 @@ NSString* ORXL3ModelRelayStatusChanged = @"ORXL3ModelRelayStatusChanged";
 NSString* ORXL3ModelHvStatusChanged = @"ORXL3ModelHvStatusChanged";
 NSString* ORXL3ModelTriggerStatusChanged = @"ORXL3ModelTriggerStatusChanged";
 NSString* ORXL3ModelHVTargetValueChanged = @"ORXL3ModelHVTargetValueChanged";
+NSString* ORXL3ModelHVNominalVoltageChanged = @"ORXL3ModelHVNominalVoltageChanged";
 NSString* ORXL3ModelHVCMOSRateLimitChanged = @"ORXL3ModelHVCMOSRateLimitChanged";
 NSString* ORXL3ModelHVCMOSRateIgnoreChanged = @"ORXL3ModelHVCMOSRateIgnoreChanged";
 NSString* ORXL3ModelXl3VltThresholdChanged = @"ORXL3ModelXl3VltThresholdChanged";
 NSString* ORXL3ModelXl3VltThresholdInInitChanged = @"ORXL3ModelXl3VltThresholdInInitChanged";
+
+extern NSString* ORSNOPRequestHVStatus;
 
 @interface ORXL3Model (private)
 - (void) doBasicOp;
@@ -161,6 +164,16 @@ NSString* ORXL3ModelXl3VltThresholdInInitChanged = @"ORXL3ModelXl3VltThresholdIn
 		xl3Link = nil;
 	}
 }	
+
+- (void) registerNotificationObservers
+{
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(readHVStatus)
+                         name : ORSNOPRequestHVStatus
+                       object : nil];
+}
 
 - (void) makeMainController
 {
@@ -743,6 +756,30 @@ NSString* ORXL3ModelXl3VltThresholdInInitChanged = @"ORXL3ModelXl3VltThresholdIn
     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHVTargetValueChanged object:self];        
 }
 
+- (unsigned long) hvNominalVoltageA
+{
+    return _hvNominalVoltageA;
+}
+
+- (void) setHvNominalVoltageA:(unsigned long)hvNominalVoltageA
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setHvNominalVoltageA:[self hvNominalVoltageA]];
+    _hvNominalVoltageA = hvNominalVoltageA;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHVNominalVoltageChanged object:self];
+}
+
+- (unsigned long) hvNominalVoltageB
+{
+    return _hvNominalVoltageB;
+}
+
+- (void) setHvNominalVoltageB:(unsigned long)hvNominalVoltageB
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setHvNominalVoltageB:[self hvNominalVoltageB]];
+    _hvNominalVoltageB = hvNominalVoltageB;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHVNominalVoltageChanged object:self];
+}
+
 - (unsigned long) hvACMOSRateLimit
 {
     return _hvACMOSRateLimit;
@@ -1203,6 +1240,16 @@ void SwapLongBlock(void* p, int32_t n)
     [self setHvBCMOSRateLimit:[decoder decodeIntForKey:@"ORXL3ModelhvBCMOSRateLimit"]];
     [self setHvACMOSRateIgnore:[decoder decodeIntForKey:@"ORXL3ModelhvACMOSRateIgnore"]];
     [self setHvBCMOSRateIgnore:[decoder decodeIntForKey:@"ORXL3ModelhvBCMOSRateIgnore"]];
+    [self setHvNominalVoltageA:[decoder decodeIntForKey:@"ORXL3ModelHvNominalVoltageA"]];
+    [self setHvNominalVoltageB:[decoder decodeIntForKey:@"ORXL3ModelHvNominalVoltageB"]];
+
+    //FIXME from ORCADB
+    if ([self hvNominalVoltageA] == 0) {
+        [self setHvNominalVoltageA:2500];
+    }
+    if ([self hvNominalVoltageB] == 0) {
+        [self setHvNominalVoltageB:2500];
+    }
 
     unsigned short i;
     for (i=0; i<12; i++) {
@@ -1216,6 +1263,7 @@ void SwapLongBlock(void* p, int32_t n)
     //if (isPollingXl3 == YES) [self setIsPollingXl3:NO];
 
 	[[self undoManager] enableUndoRegistration];
+    [self registerNotificationObservers];
 	return self;
 }
 
@@ -1252,6 +1300,8 @@ void SwapLongBlock(void* p, int32_t n)
     [encoder encodeInt:hvBVoltageDACSetValue forKey:@"ORXL3ModelHvBVoltageDACSetValue"];
     [encoder encodeInt:_hvAVoltageTargetValue forKey:@"ORXL3ModelhvAVoltageTargetValue"];
     [encoder encodeInt:_hvBVoltageTargetValue forKey:@"ORXL3ModelhvBVoltageTargetValue"];
+    [encoder encodeInt:_hvNominalVoltageA forKey:@"ORXL3ModelHvNominalVoltageA"];
+    [encoder encodeInt:_hvNominalVoltageB forKey:@"ORXL3ModelHvNominalVoltageB"];
     [encoder encodeInt64:relayMask forKey:@"ORXL3ModelRelayMask"];
     [encoder encodeInt:_hvACMOSRateLimit forKey:@"ORXL3ModelhvACMOSRateLimit"];
     [encoder encodeInt:_hvBCMOSRateLimit forKey:@"ORXL3ModelhvBCMOSRateLimit"];
@@ -2720,6 +2770,9 @@ void SwapLongBlock(void* p, int32_t n)
 - (void) readHVStatus
 {
     @synchronized(self) {
+        if (![[self xl3Link] isConnected]) {//ORSNOPExperiment sends a notification to all crates
+            return;
+        }
         hv_readback_results_t status;
         @try {
             [self readHVStatus:&status];
@@ -3012,7 +3065,7 @@ void SwapLongBlock(void* p, int32_t n)
     //check the hv thread is running
     if (hvASwitch || hvBSwitch || aOn) {
         [self setIsPollingHVSupply:YES];
-        [self setIsPollingXl3:YES];
+        //[self setIsPollingXl3:YES];
         
         if (hvThread) {
             if ([hvThread isFinished]) {

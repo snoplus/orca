@@ -27,6 +27,8 @@
 #import "ORDetectorSegment.h"
 #import "ORXL3Model.h"
 
+NSString* ORSNOPRequestHVStatus = @"ORSNOPRequestHVStatus";
+
 @implementation SNOPController
 #pragma mark ¥¥¥Initialization
 -(id)init
@@ -125,6 +127,11 @@
                      selector : @selector(hvStatusChanged:)
                          name : ORXL3ModelHvStatusChanged
                         object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(hvStatusChanged:)
+                         name : ORXL3ModelHVNominalVoltageChanged
+                        object: nil];
 }
 
 - (void) updateWindow
@@ -215,8 +222,10 @@
                     [[hvStatusMatrix cellAtRow:mRow column:1] setTextColor:[NSColor blackColor]];
                 }
                 [[hvStatusMatrix cellAtRow:mRow column:2] setStringValue:
-                 [NSString stringWithFormat:@"%d V",(unsigned int)[xl3 hvAVoltageReadValue]]];
+                 [NSString stringWithFormat:@"%d V",(unsigned int)[xl3 hvNominalVoltageA]]];
                 [[hvStatusMatrix cellAtRow:mRow column:3] setStringValue:
+                 [NSString stringWithFormat:@"%d V",(unsigned int)[xl3 hvAVoltageReadValue]]];
+                [[hvStatusMatrix cellAtRow:mRow column:4] setStringValue:
                  [NSString stringWithFormat:@"%3.1f mA",[xl3 hvACurrentReadValue]]];
             }
             if ([xl3 crateNumber] == 16) {//16B
@@ -233,8 +242,10 @@
                         [[hvStatusMatrix cellAtRow:mRow column:1] setTextColor:[NSColor blackColor]];
                     }
                     [[hvStatusMatrix cellAtRow:mRow column:2] setStringValue:
-                     [NSString stringWithFormat:@"%d V",(unsigned int)[xl3 hvBVoltageReadValue]]];
+                     [NSString stringWithFormat:@"%d V",(unsigned int)[xl3 hvNominalVoltageB]]];
                     [[hvStatusMatrix cellAtRow:mRow column:3] setStringValue:
+                     [NSString stringWithFormat:@"%d V",(unsigned int)[xl3 hvBVoltageReadValue]]];
+                    [[hvStatusMatrix cellAtRow:mRow column:4] setStringValue:
                      [NSString stringWithFormat:@"%3.1f mA",[xl3 hvBCurrentReadValue]]];
                 }
             }
@@ -253,7 +264,8 @@
                     [[hvStatusMatrix cellAtRow:mRow column:1] setStringValue:@"???"];
                     [[hvStatusMatrix cellAtRow:mRow column:1] setTextColor:[NSColor blackColor]];
                     [[hvStatusMatrix cellAtRow:mRow column:2] setStringValue:@"??? V"];
-                    [[hvStatusMatrix cellAtRow:mRow column:3] setStringValue:@"??? mA"];
+                    [[hvStatusMatrix cellAtRow:mRow column:3] setStringValue:@"??? V"];
+                    [[hvStatusMatrix cellAtRow:mRow column:4] setStringValue:@"??? mA"];
                 }
             }
         }
@@ -274,8 +286,10 @@
                 [[hvStatusMatrix cellAtRow:mRow column:1] setTextColor:[NSColor blackColor]];
             }
             [[hvStatusMatrix cellAtRow:mRow column:2] setStringValue:
-             [NSString stringWithFormat:@"%d V",(unsigned int)[[aNote object] hvAVoltageReadValue]]];
+             [NSString stringWithFormat:@"%d V",(unsigned int)[[aNote object] hvNominalVoltageA]]];
             [[hvStatusMatrix cellAtRow:mRow column:3] setStringValue:
+             [NSString stringWithFormat:@"%d V",(unsigned int)[[aNote object] hvAVoltageReadValue]]];
+            [[hvStatusMatrix cellAtRow:mRow column:4] setStringValue:
              [NSString stringWithFormat:@"%3.1f mA",[[aNote object] hvACurrentReadValue]]];
         }
         if ([[aNote object] crateNumber] == 16) {//16B
@@ -292,8 +306,10 @@
                     [[hvStatusMatrix cellAtRow:mRow column:1] setTextColor:[NSColor blackColor]];
                 }
                 [[hvStatusMatrix cellAtRow:mRow column:2] setStringValue:
-                 [NSString stringWithFormat:@"%d V",(unsigned int)[[aNote object] hvBVoltageReadValue]]];
+                 [NSString stringWithFormat:@"%d V",(unsigned int)[[aNote object] hvNominalVoltageA]]];
                 [[hvStatusMatrix cellAtRow:mRow column:3] setStringValue:
+                 [NSString stringWithFormat:@"%d V",(unsigned int)[[aNote object] hvBVoltageReadValue]]];
+                [[hvStatusMatrix cellAtRow:mRow column:4] setStringValue:
                  [NSString stringWithFormat:@"%3.1f mA",[[aNote object] hvBCurrentReadValue]]];
             }
         }
@@ -381,6 +397,21 @@
     }
  */
     NSLog(@"Detector wide panic down started\n");
+}
+
+- (IBAction)hvMasterTriggersOFF:(id)sender
+{
+    [[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvTriggersOFF)];
+}
+
+- (IBAction)hvMasterTriggersON:(id)sender
+{
+    [[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvTriggersON)];
+}
+
+- (IBAction)hvMasterStatus:(id)sender
+{
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPRequestHVStatus object:self];
 }
 
 - (void) specialUpdate:(NSNotification*)aNote

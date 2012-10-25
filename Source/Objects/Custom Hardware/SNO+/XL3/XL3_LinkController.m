@@ -1249,6 +1249,7 @@ static NSDictionary* xl3Ops;
     [model readHVStatus];
 }
 
+//FIXME: redo the logic
 - (IBAction)hvTargetValueAction:(id)sender
 {
     [[sender window] makeFirstResponder:tabView];
@@ -1257,12 +1258,22 @@ static NSDictionary* xl3Ops;
     if (sender == hvTargetValueField) {
         nextTargetValue = (int) ([sender floatValue] * 4096 / 3000);
         if (nextTargetValue < 0) nextTargetValue = 0;
-        if (nextTargetValue > 2500 / 3000. * 4096) nextTargetValue = 2500 * 4096 / 3000;
+        if (sup == 0 && nextTargetValue > [model hvNominalVoltageA] / 3000. * 4096) {//A
+            nextTargetValue = [model hvNominalVoltageA] * 4096 / 3000;
+        }
+        else if (sup == 1 && nextTargetValue > [model hvNominalVoltageB] / 3000. * 4096) {//A
+            nextTargetValue = [model hvNominalVoltageB] * 4096 / 3000;
+        }
     }
     else if (sender == hvTargetValueStepper) {
         nextTargetValue = [sender intValue];
         if (nextTargetValue < 0) nextTargetValue = 0;
-        if (nextTargetValue > 2500 / 3000. * 4096) nextTargetValue = 2500 * 4096 / 3000;
+        if (sup == 0 && nextTargetValue > [model hvNominalVoltageA] / 3000. * 4096) {//A
+            nextTargetValue = [model hvNominalVoltageA] * 4096 / 3000;
+        }
+        else if (sup == 1 && nextTargetValue > [model hvNominalVoltageB] / 3000. * 4096) {//A
+            nextTargetValue = [model hvNominalVoltageB] * 4096 / 3000;
+        }
     }
     else {
         return;
