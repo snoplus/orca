@@ -621,7 +621,7 @@ static NSDictionary* xl3Ops;
 - (void) hvStatusChanged:(NSNotification*)aNote
 {
     if (!owl_crate_master) { //cache owl master
-        NSArray* xl3s = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXl3Model")];
+        NSArray* xl3s = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
         for (id xl3 in xl3s) {
             if ([xl3 crateNumber] == 16) owl_crate_master = xl3;
         }

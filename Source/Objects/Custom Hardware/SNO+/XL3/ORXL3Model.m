@@ -3890,6 +3890,33 @@ void SwapLongBlock(void* p, int32_t n)
             usleep(200000);
             if (![self hvPanicFlag]) [self readHVStatus];
         }
+        if ([self hvBNextStepValue] != [self hvBVoltageDACSetValue]) {
+            unsigned long aValueToSet = [self hvBNextStepValue];
+            
+            if ([self hvBNextStepValue] > [self hvBVoltageDACSetValue] + 10 / 3000. * 4096) {
+                aValueToSet = [self hvBVoltageDACSetValue] + 10 / 3000. * 4096;
+            }
+            if ([self hvBNextStepValue] < [self hvBVoltageDACSetValue] - 10 / 3000. * 4096) {
+                aValueToSet = [self hvBVoltageDACSetValue] - 10 / 3000. * 4096;
+            }
+            if (aValueToSet > [self hvBVoltageTargetValue]) {
+                aValueToSet = [self hvBVoltageTargetValue];
+            }
+            if (aValueToSet > [self hvBVoltageDACSetValue] + 10 / 3000. * 4096) {
+                NSLog(@"%@ HV B voltage calculation screwed. stopping\n", [[self xl3Link] crateName]);
+            }
+            @try {
+                [self setHVDacA:[self hvAVoltageDACSetValue] dacB:aValueToSet];
+                //assume it worked
+                [self setHvBVoltageDACSetValue:aValueToSet];
+            }
+            @catch (NSException *exception) {
+                NSLog(@"%@ HV B failed to set HV!\n", [[self xl3Link] crateName]);
+            }
+            
+            usleep(200000);
+            if (![self hvPanicFlag]) [self readHVStatus];
+        }
         
         //while ([self hvCMOSReadsCounter] < 3) { //or panic flag
         //    usleep(100000);
@@ -3897,11 +3924,17 @@ void SwapLongBlock(void* p, int32_t n)
         
         //monitoring loop updates
         if (![self hvPanicFlag]) {
-            if (fabs([self hvAVoltageReadValue] / 3000. * 4096 - [self hvAVoltageDACSetValue]) > 100) {
-                NSLog(@"%@ read value differs from the set one. stopping!\nPress HV ON to continue.", [[self xl3Link] crateName]);
+            if ([self hvASwitch] && fabs([self hvAVoltageReadValue] / 3000. * 4096 - [self hvAVoltageDACSetValue]) > 100) {
+                NSLog(@"%@ HVA read value differs from the set one. stopping!\nPress HV ON to continue.", [[self xl3Link] crateName]);
                 usleep(100000);
                 [self setHvANextStepValue:[self hvAVoltageDACSetValue]];
-                isTimeToQuit = YES;
+                if (![self hvBSwitch]) isTimeToQuit = YES;
+            }
+            if ([self hvBSwitch] && fabs([self hvBVoltageReadValue] / 3000. * 4096 - [self hvBVoltageDACSetValue]) > 100) {
+                NSLog(@"%@ HVB read value differs from the set one. stopping!\nPress HV ON to continue.", [[self xl3Link] crateName]);
+                usleep(100000);
+                [self setHvBNextStepValue:[self hvBVoltageDACSetValue]];
+                if (![self hvASwitch]) isTimeToQuit = YES;
             }
             
             /*
@@ -3918,14 +3951,15 @@ void SwapLongBlock(void* p, int32_t n)
             }
              */
         }
-        
-        
+                
         //if panic mode switch off power supply when done
-        if ([self hvPanicFlag] && [self hvAVoltageDACSetValue] == 0){
+        if ([self hvPanicFlag] && [self hvASwitch] && [self hvAVoltageDACSetValue] == 0){
             [self setHVSwitch:NO forPowerSupply:0];
         }
-        
-        
+        if ([self hvPanicFlag] && [self hvBSwitch] && [self hvBVoltageDACSetValue] == 0){
+            [self setHVSwitch:NO forPowerSupply:1];
+        }
+                
         if (!hvASwitch && !hvBSwitch) isTimeToQuit = YES;
         usleep(100000);
     }
