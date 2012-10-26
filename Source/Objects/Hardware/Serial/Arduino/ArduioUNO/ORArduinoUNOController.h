@@ -37,7 +37,7 @@
 	IBOutlet NSMatrix*		interceptMatrix;
 	IBOutlet NSMatrix*		minValueMatrix;
 	IBOutlet NSMatrix*		maxValueMatrix;
-	
+	IBOutlet NSTextView*	sketchView;
     IBOutlet ORSerialPortController* serialPortController;
 }
 

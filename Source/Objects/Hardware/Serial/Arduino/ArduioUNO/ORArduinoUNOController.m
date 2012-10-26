@@ -23,10 +23,11 @@
 #import "OHexFormatter.h"
 #import "ORSerialPortController.h"
 
+#define kDefaultSketchName @"DigitalReadSerial.ino"
+
 @implementation ORArduinoUNOController
 
 #pragma mark •••Initialization
-
 - (id) init
 {
 	self = [super initWithWindowNibName:@"ArduinoUNO"];
@@ -66,9 +67,19 @@
 		[[maxValueMatrix cellAtRow:i column:0] setFormatter:formatter];
 		[[lowLimitMatrix cellAtRow:i column:0] setFormatter:formatter];
 		[[hiLimitMatrix cellAtRow:i column:0] setFormatter:formatter];
-		
-		
 	}
+	
+	NSString* resourcePath = [[NSBundle mainBundle] resourcePath];
+	NSString* fullPath = [resourcePath stringByAppendingPathComponent:kDefaultSketchName];
+	if([[NSFileManager defaultManager] fileExistsAtPath:fullPath]){
+		NSString* sketchString = [NSString stringWithContentsOfFile:fullPath encoding:NSASCIIStringEncoding error:nil];
+		[sketchView setString:sketchString];
+	}
+	else {
+		[sketchView setString:@"Default Sketch code is missing.... Check the ORCA help. It may exist there."];
+	}
+	
+	
  	[super awakeFromNib];
 }
 

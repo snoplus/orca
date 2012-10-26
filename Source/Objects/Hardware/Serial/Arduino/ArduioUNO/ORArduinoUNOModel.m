@@ -447,6 +447,8 @@ NSString* ORArduinoUNOMaxValueChanged		= @"ORArduinoUNOMaxValueChanged";
 	[encoder encodeInt:pollTime			forKey: @"pollTime"];
 }
 
+- (NSString*) commonScriptMethods { return methodsInCommonSection(self); }
+
 #pragma mark •••HW Methods//-------------Methode to flag beginning of common script methods---------------------------------
 - (void) commonScriptMethodSectionBegin { }
 
@@ -518,7 +520,6 @@ NSString* ORArduinoUNOMaxValueChanged		= @"ORArduinoUNOMaxValueChanged";
 	}
 }
 
-
 - (void) commonScriptMethodSectionEnd { }
 //-------------end of common script methods---------------------------------
 
@@ -566,8 +567,6 @@ NSString* ORArduinoUNOMaxValueChanged		= @"ORArduinoUNOMaxValueChanged";
 		}
 	}
 }
-
-
 
 #pragma mark •••Bit Processing Protocol
 - (void) processIsStarting { }
