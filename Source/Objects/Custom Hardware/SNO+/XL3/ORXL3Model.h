@@ -185,7 +185,7 @@ enum {
 @property (nonatomic,assign) BOOL isXl3VltThresholdInInit;
 @property (nonatomic,assign) int xl3LinkTimeOut;
 @property (nonatomic,assign) BOOL xl3InitInProgress;
-@property (atomic,assign) unsigned long ecal_received; //set accross multiple threads
+@property (assign) unsigned long ecal_received; //set accross multiple threads
 @property (nonatomic,assign) bool ecalToOrcaInProgress;
 
 #pragma mark •••Initialization

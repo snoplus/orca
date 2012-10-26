@@ -1724,7 +1724,7 @@ void SwapLongBlock(void* p, int32_t n)
         }
     }
     
-    for (i=0; i<31; i++) {
+    for (i=0; i<32; i++) {
         aConfigBundle.vthr[i] = [[[hwDic objectForKey:@"vthr"] objectAtIndex:i] intValue];
     }
     
