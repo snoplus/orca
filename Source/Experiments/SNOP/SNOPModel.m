@@ -348,7 +348,7 @@ NSString* ORSNOPModelMorcaIsUpdatingChanged = @"ORSNOPModelMorcaIsUpdatingChange
 //    [[self morcaDBRef] compactDatabase:self tag:kMorcaCompactDB];
 }
 
-- (void) couchDBResult:(id)aResult tag:(NSString*)aTag
+- (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp
 {
     
 	@synchronized(self){

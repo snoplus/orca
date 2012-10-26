@@ -67,7 +67,7 @@
 - (ORCouchDB*) morcaDBRef;
 - (void) morcaUpdateDB;
 - (void) morcaCompactDB;
-- (void) couchDBResult:(id)aResult tag:(NSString*)aTag;
+- (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp;
 
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;

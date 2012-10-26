@@ -129,6 +129,8 @@ enum {
     mb_t ecal_bundle[16];
     mb_t hw_bundle[16];
     mb_t ui_bundle[16];
+    unsigned long _ecal_received;
+    bool _ecalToOrcaInProgress;
 }
 
 @property (nonatomic,assign) unsigned long xl3MegaBundleDataId;
@@ -183,6 +185,8 @@ enum {
 @property (nonatomic,assign) BOOL isXl3VltThresholdInInit;
 @property (nonatomic,assign) int xl3LinkTimeOut;
 @property (nonatomic,assign) BOOL xl3InitInProgress;
+@property (atomic,assign) unsigned long ecal_received; //set accross multiple threads
+@property (nonatomic,assign) bool ecalToOrcaInProgress;
 
 #pragma mark •••Initialization
 - (id)   init;
@@ -241,6 +245,7 @@ enum {
 - (void) byteSwapBundle:(mb_t*)aBundle;
 - (void) synthesizeFECIntoBundle:(mb_t*)aBundle forSLot:(unsigned short)aSlot;
 - (ORCouchDB*) debugDBRef;
+- (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp;
 
 #pragma mark •••DataTaker
 - (void) setDataIds:(id)assigner;
@@ -270,6 +275,8 @@ enum {
 - (void) initCrateWithXilinx:(BOOL)aXilinxFlag autoInit:(BOOL)anAutoInitFlag;
 - (void) initCrateWithDict:(NSDictionary*)argDict;
 - (void) ecalToOrca;
+- (void) ecalToOrcaDocumentsReceived;
+- (void) parseEcalDocument:(NSDictionary*)aResult;
 - (void) orcaToHw;
 
 #pragma mark •••Basic Ops

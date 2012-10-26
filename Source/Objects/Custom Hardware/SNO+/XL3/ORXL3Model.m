@@ -51,7 +51,7 @@ static Xl3RegNamesStruct reg[kXl3NumRegisters] = {
 
 #pragma mark •••Definitions
 
-#define kDebugDbEcalDocGot       @"kMorcaEcalDocGot"
+#define kDebugDbEcalDocGot  @"kDebugDbEcalDocGot"
 
 NSString* ORXL3ModelSelectedRegisterChanged =	@"ORXL3ModelSelectedRegisterChanged";
 NSString* ORXL3ModelRepeatCountChanged =		@"ORXL3ModelRepeatCountChanged";
@@ -119,7 +119,10 @@ extern NSString* ORSNOPRequestHVStatus;
     hvCMOSReadsCounter = _hvCMOSReadsCounter,
     hvPanicFlag= _hvPanicFlag,
     xl3LinkTimeOut = _xl3LinkTimeOut,
-    xl3InitInProgress = _xl3InitInProgress;
+    xl3InitInProgress = _xl3InitInProgress,
+    ecal_received = _ecal_received,
+    ecalToOrcaInProgress = _ecalToOrcaInProgress;
+
 
 #pragma mark •••Initialization
 - (id) init
@@ -944,8 +947,13 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (ORCouchDB*) debugDBRef
 {
-	return [ORCouchDB couchHost:@"snotpenn01.snolab.ca" port:5498 username:@"snoplus"
-                            pwd:@"scintillate" database:@"debugdb" delegate:self];    
+    //replace by snop experiment UI
+	return [ORCouchDB couchHost:@"couch.snopl.us" port:80 username:@"snoplus"
+                            pwd:@"scintillate" database:@"debugdb" delegate:self];
+
+	//return [ORCouchDB couchHost:@"127.0.0.1" port:5984 username:@"snoplus"
+    //                        pwd:@"scintillate" database:@"debugdb" delegate:self];
+
 }
 
 - (void) synthesizeDefaultsIntoBundle:(mb_t*)aBundle forSLot:(unsigned short)aSlot
@@ -1000,13 +1008,13 @@ void SwapLongBlock(void* p, int32_t n)
 	//aBundle->chinj.ped_time = 100; // MTCD pedestal width (DONT NEED THIS HERE)
 
 	//tr100 width, channel 0 to 31, only bits 0 to 6 defined, bit0-5 delay, bit6 enable
-	uint8_t s_tr100_tdelay[32] = {  0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f,
+	uint8_t s_tr100_tdelay[32] = { 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f,
 					0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f,
 					0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f,
 					0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f };
 
 	//tr20 width, channel 0 to 31, only bits 0 to 5 defined, bit0-4 width, bit5 enable from PennDB
-	uint8_t s_tr20_twidth[32] = {	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
+	uint8_t s_tr20_twidth[32] = { 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
 					0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
 					0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
 					0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30 };
@@ -1025,7 +1033,7 @@ void SwapLongBlock(void* p, int32_t n)
 	*/
 	
 	//scmos remaining 10 bits, channel 0 to 31, only bits 0 to 9 defined
-	uint16_t s_scmos[32] = {	0, 0, 0, 0, 0, 0, 0, 0,
+	uint16_t s_scmos[32] = { 0, 0, 0, 0, 0, 0, 0, 0,
 					0, 0, 0, 0, 0, 0, 0, 0,
 					0, 0, 0, 0, 0, 0, 0, 0,
 					0, 0, 0, 0, 0, 0, 0, 0 }; 
@@ -1042,10 +1050,12 @@ void SwapLongBlock(void* p, int32_t n)
 	memcpy(aBundle->tdisc.vsi, s_tdisc_vsi, 8);
 	memcpy(aBundle->tdisc.vli, s_tdisc_vli, 8);
 	memcpy(aBundle->tcmos.tac_shift, s_tcmos_tac_shift, 32);
+    memset(aBundle->tr100.mask, 0, 32);
 	memcpy(aBundle->tr100.tdelay, s_tr100_tdelay, 32);
+    memset(aBundle->tr20.mask, 0, 32);
 	memcpy(aBundle->tr20.twidth, s_tr20_twidth, 32);
 	memcpy(aBundle->tr20.tdelay, s_tr20_tdelay, 32);
-	memcpy(aBundle->scmos, s_scmos, 32);
+	memcpy(aBundle->scmos, s_scmos, 64);
 }
 
 - (void) byteSwapBundle:(mb_t*)aBundle
@@ -1056,7 +1066,7 @@ void SwapLongBlock(void* p, int32_t n)
 	aBundle->mb_id = swapShort(aBundle->mb_id);
 	for (i=0; i<4; i++) aBundle->dc_id[i] = swapShort(aBundle->dc_id[i]);
 	//scmos_vals_t
-	for (i=0; i<15; i++) aBundle->scmos[i] = swapShort(aBundle->scmos[i]);
+	for (i=0; i<32; i++) aBundle->scmos[i] = swapShort(aBundle->scmos[i]);
 	//mb_chan_disable_vals_t
 	aBundle->disable_mask = swapLong(aBundle->disable_mask);	
 }
@@ -1262,6 +1272,16 @@ void SwapLongBlock(void* p, int32_t n)
     [self setXl3InitInProgress:NO];
     //if (isPollingXl3 == YES) [self setIsPollingXl3:NO];
 
+    //fill the safe bundle for first crate init, the pull the FEC and DB IDs
+    //fill the hw bundle, too; this allows triggers ON/OFF if debugDB fails
+    mb_t aConfigBundle;
+    for (i=0; i<16; i++) {
+        memset(&aConfigBundle, 0, sizeof(mb_t));
+        [self synthesizeDefaultsIntoBundle:&aConfigBundle forSLot:i];
+        memcpy(&safe_bundle[i], &aConfigBundle, sizeof(mb_t));
+        memcpy(&hw_bundle[i], &aConfigBundle, sizeof(mb_t));
+    }
+    
 	[[self undoManager] enableUndoRegistration];
     [self registerNotificationObservers];
 	return self;
@@ -1463,14 +1483,11 @@ void SwapLongBlock(void* p, int32_t n)
 
     [self performSelector:@selector(initCrateWithDict:) withObject:argDict afterDelay:0];
     
-    //these are safe inits
+    //these are safe inits, safe bundle is populated in initwithcoder for now
     unsigned short i;
-    mb_t aConfigBundle;
     for (i=0; i<16; i++) {
-        [self synthesizeDefaultsIntoBundle:&aConfigBundle forSLot:i];
-        memcpy(&safe_bundle[i], &aConfigBundle, sizeof(mb_t));
-        memcpy(&hw_bundle[i], &aConfigBundle, sizeof(mb_t));
-        memcpy(&ui_bundle[i], &aConfigBundle, sizeof(mb_t));
+        memcpy(&hw_bundle[i], &safe_bundle[i], sizeof(mb_t));
+        memcpy(&ui_bundle[i], &safe_bundle[i], sizeof(mb_t));
     }
 }
 
@@ -1615,58 +1632,160 @@ void SwapLongBlock(void* p, int32_t n)
     }//synchronized
 }
 
-/*
-            [[self xl3Link] setErrorTimeOut:currentTimeOut];
-            
-            NSLog(@"%@ init ok!\n",[[self xl3Link] crateName]);
-            
-            [self setTriggerStatus:@"ON"];
-            unsigned short* aId = (unsigned short*) payload.payload + 2; //hard to say what the first int should be
-            for (i=0; i<16*5; i++) {
-                aId[i] = swapShort(aId[i]);
-            }
-            
-            hware_vals_t* ids;
-            NSMutableString* msg = [NSMutableString stringWithFormat:@"\n"];
-            for (id anObj in [[self guardian] orcaObjects]) { 
-                if ([anObj class] == NSClassFromString(@"ORFec32Model") && (msk & 1 << [anObj stationNumber])) {
-                    ids = (hware_vals_t*) aId;
-                    ids += [anObj stationNumber];
-                    [anObj setBoardID:[NSString stringWithFormat:@"%x", ids->mb_id]];
-                    if ([anObj dcPresent:0]) [[anObj dc:0] setBoardID:[NSString stringWithFormat:@"%x", ids->dc_id[0]]];
-                    if ([anObj dcPresent:1]) [[anObj dc:1] setBoardID:[NSString stringWithFormat:@"%x", ids->dc_id[1]]];
-                    if ([anObj dcPresent:2]) [[anObj dc:2] setBoardID:[NSString stringWithFormat:@"%x", ids->dc_id[2]]];
-                    if ([anObj dcPresent:3]) [[anObj dc:3] setBoardID:[NSString stringWithFormat:@"%x", ids->dc_id[3]]];
-                    [msg appendFormat:@"slot: %2d, FEC: %4x, DB0: %4x, DB1: %4x, DB2: %4x, DB3: %4x\n",
-                          [anObj stationNumber], ids->mb_id, ids->dc_id[0], ids->dc_id[1], ids->dc_id[2], ids->dc_id[3]];
-                }
-            }
-            NSLogFont([NSFont userFixedPitchFontOfSize:0], msg);
-        }
-        else {
-            NSLog(@"%@ error loading config, init skipped.\n",[[self xl3Link] crateName]);
-        }
-    }//synchronized
-}
-*/
-
 - (void) ecalToOrca
 {
-    for (id anObj in [[self guardian] orcaObjects]) { 
-        if ([anObj class] == NSClassFromString(@"ORFec32Model")) {
-            [[self debugDBRef] getDocumentId:[NSString stringWithFormat:@"_design/penn_daq_views/_view/get_fec_by_generated?descending=True&start_key=[%d,%d,{}]&end_key=[%d,%d,\"\"]&limit=1",[self crateNumber], [anObj stationNumber], [self crateNumber], [anObj stationNumber]] tag:[NSString stringWithFormat:@"%@.%d.%d", kDebugDbEcalDocGot, [self crateNumber], [anObj stationNumber]]];
-        }
+    unsigned short slot;
+    [self setEcal_received:0UL];
+    for (slot=0; slot<16; slot++) {
+        NSString* requestString = [NSString stringWithFormat:@"_design/penn_daq_views/_view/get_fec_by_generated?descending=true&startkey=[%d,%d,{}]&endkey=[%d,%d,\"\"]&limit=1",[self crateNumber], slot, [self crateNumber], slot];
+        NSString* tagString = [NSString stringWithFormat:@"%@.%d.%d", kDebugDbEcalDocGot, [self crateNumber], slot];
+        //NSLog(@"%@ slot %hd request: %@ tag: %@\n", [[self xl3Link] crateName], slot, requestString, tagString);
+        [[self debugDBRef] getDocumentId:requestString tag:tagString];
     }
+    NSLog(@"%@ ECAL docs requested from debugDB\n", [[self xl3Link] crateName]);
+    [self setEcalToOrcaInProgress:YES];
+    [self performSelector:@selector(ecalToOrcaDocumentsReceived) withObject:nil afterDelay:10.0];
 }
 
-- (void) couchDBResult:(id)aResult tag:(NSString*)aTag
+- (void) ecalToOrcaDocumentsReceived
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(ecalToOrcaDocumentsReceived) object:nil];
+    if (![self ecalToOrcaInProgress]) { //killed already
+        return;
+    }
+    
+    if ([self ecal_received] != 0xffff) {
+        NSMutableString* msg = [[NSMutableString alloc] initWithFormat:
+                                @"%@ didn't receive all the ECAL documents.\nMissing slots: ", [[self xl3Link] crateName]];
+
+        unsigned short slot;
+        NSLog(@"ecal_received mask: 0x%08x\n", [self ecal_received]);
+        for (slot=0; slot<16; slot++) {
+            if (!([self ecal_received] & 0x1UL << slot)) {
+                [msg appendFormat:@"%d, ", slot];
+            }
+        }
+        [msg appendFormat:@"\n"];
+        NSLog(msg);
+        [msg release];
+        msg = nil;
+    }
+    else {
+        NSLog(@"%@ received all the ECAL documents requested.\n", [[self xl3Link] crateName]);
+        unsigned short slot;
+        for (slot=0; slot<16; slot++) {
+            memcpy(&hw_bundle[slot], &ecal_bundle[slot], sizeof(mb_t));
+            memcpy(&ui_bundle[slot], &ecal_bundle[slot], sizeof(mb_t));
+        }
+        NSLog(@"%@ updated ORCA with ECAL data.\n", [[self xl3Link] crateName]);
+    }
+    
+    [self setEcal_received:0UL];
+    [self setEcalToOrcaInProgress:NO];
+}
+
+- (void) parseEcalDocument:(NSDictionary*)aResult
+{
+    NSArray* keyArray = [[[aResult objectForKey:@"rows"] objectAtIndex:0] objectForKey:@"key"];
+    NSDictionary* ecalDoc = [[[aResult objectForKey:@"rows"] objectAtIndex:0] objectForKey:@"value"];
+    NSString* docId = [[[aResult objectForKey:@"rows"] objectAtIndex:0] objectForKey:@"id"];
+
+    unsigned int crate_num = [[keyArray objectAtIndex:0] intValue];
+    unsigned int slot_num = [[keyArray objectAtIndex:1] intValue];
+
+    NSLog(@"key array crate: %d slot: %d time: %@, id: %@\n", crate_num, slot_num, [keyArray objectAtIndex:2], docId);
+    
+    if ([self crateNumber] != crate_num) {
+        NSLog(@"%@ error parsing ECAL document, the crate number in the key array doesn't match: %d\n",
+              [[self xl3Link] crateName], crate_num);
+        return;
+    }
+
+    NSDictionary* hwDic = [ecalDoc objectForKey:@"hw"];
+    if (!hwDic) {
+        NSLog(@"%@ error parsing ECAL document, the hw dictionary missing for slot: %d\n",
+              [[self xl3Link] crateName], slot_num);
+        return;
+        
+    }
+
+    mb_t aConfigBundle;
+    memset(&aConfigBundle, 0, sizeof(mb_t));
+    
+    unsigned short i, j;
+    aConfigBundle.mb_id = 0;
+    for (i=0; i<4; i++) {
+        aConfigBundle.dc_id[i] = 0;
+    }
+    
+    for (i=0; i<2; i++) {
+        for (j=0; j<32; j++) {
+            aConfigBundle.vbal[i][j] = [[[[hwDic objectForKey:@"vbal"] objectAtIndex:i] objectAtIndex:j] intValue];
+        }
+    }
+    
+    for (i=0; i<31; i++) {
+        aConfigBundle.vthr[i] = [[[hwDic objectForKey:@"vthr"] objectAtIndex:i] intValue];
+    }
+    
+    for (i=0; i<8; i++) {
+        aConfigBundle.tdisc.rmp[i] = [[[[hwDic objectForKey:@"tdisc"] objectForKey:@"rmp"] objectAtIndex:i] intValue];
+        aConfigBundle.tdisc.rmpup[i] = [[[[hwDic objectForKey:@"tdisc"] objectForKey:@"rmpup"] objectAtIndex:i] intValue];
+        aConfigBundle.tdisc.vsi[i] = [[[[hwDic objectForKey:@"tdisc"] objectForKey:@"vsi"] objectAtIndex:i] intValue];
+        aConfigBundle.tdisc.vli[i] = [[[[hwDic objectForKey:@"tdisc"] objectForKey:@"vli"] objectAtIndex:i] intValue];
+    }
+    
+    aConfigBundle.tcmos.vmax = [[[hwDic objectForKey:@"tcmos"] objectForKey:@"vmax"] intValue];
+    aConfigBundle.tcmos.tacref = [[[hwDic objectForKey:@"tcmos"] objectForKey:@"vtacref"] intValue];
+    for (i=0; i<2; i++) {
+        aConfigBundle.tcmos.isetm[i] = [[[[hwDic objectForKey:@"tcmos"] objectForKey:@"isetm"] objectAtIndex:i] intValue];
+        aConfigBundle.tcmos.iseta[i] = [[[[hwDic objectForKey:@"tcmos"] objectForKey:@"iseta"] objectAtIndex:i] intValue];
+    }
+    for (i=0; i<32; i++) {
+        aConfigBundle.tcmos.tac_shift[i] = [[[[hwDic objectForKey:@"tcmos"] objectForKey:@"tac_trim"] objectAtIndex:i] intValue];
+    }
+
+    aConfigBundle.vint = [[hwDic objectForKey:@"vint"] intValue];
+    aConfigBundle.hvref = [[hwDic objectForKey:@"hvref"] intValue];
+
+    for (i=0; i<32; i++) {
+        aConfigBundle.tr100.mask[i] = [[[[hwDic objectForKey:@"tr100"] objectForKey:@"mask"] objectAtIndex:i] intValue];
+        aConfigBundle.tr100.tdelay[i] = [[[[hwDic objectForKey:@"tr100"] objectForKey:@"delay"] objectAtIndex:i] intValue];
+    }
+
+    for (i=0; i<32; i++) {
+        aConfigBundle.tr20.mask[i] = [[[[hwDic objectForKey:@"tr20"] objectForKey:@"mask"] objectAtIndex:i] intValue];
+        aConfigBundle.tr20.tdelay[i] = [[[[hwDic objectForKey:@"tr20"] objectForKey:@"delay"] objectAtIndex:i] intValue];
+        aConfigBundle.tr20.twidth[i] = [[[[hwDic objectForKey:@"tr20"] objectForKey:@"width"] objectAtIndex:i] intValue];
+    }
+
+    for (i=0; i<32; i++) {
+        aConfigBundle.scmos[i] = [[[[hwDic objectForKey:@"tr20"] objectForKey:@"scmos"] objectAtIndex:i] intValue];
+    }
+
+	aConfigBundle.disable_mask = 0;
+
+    memcpy(&ecal_bundle[slot_num], &aConfigBundle, sizeof(mb_t));
+    
+    [self setEcal_received:[self ecal_received] | 1UL << slot_num];
+    //NSLog(@"ecal received mask: 0x%08x\n", [self ecal_received]);
+    if ([self ecal_received] == 0xffffUL) {
+        [self ecalToOrcaDocumentsReceived];
+    }
+    
+//    for(id key in ecalDoc)
+//        NSLog(@"ecalDoc key=%@ value=%@\n", key, [ecalDoc objectForKey:key]);
+    
+}
+
+- (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp
 {
 	@synchronized(self){
 		if([aResult isKindOfClass:[NSDictionary class]]){
 			NSString* message = [aResult objectForKey:@"Message"];
 			if(message){
-				if([aTag isEqualToString:kDebugDbEcalDocGot]){
-					NSLog(@"CouchDB Message getting a crate doc:");
+				if([aTag rangeOfString:kDebugDbEcalDocGot].location != NSNotFound){
+					NSLog(@"CouchDB Message getting an ECAL doc:");
 				}
 				[aResult prettyPrint:@"CouchDB Message:"];
 			}
@@ -1674,7 +1793,8 @@ void SwapLongBlock(void* p, int32_t n)
 				if([aTag rangeOfString:kDebugDbEcalDocGot].location != NSNotFound){
                     //int key = [[[aResult objectForKey:@"rows"] objectAtIndex:0] objectForKey:@"key"];
                     if ([[aResult objectForKey:@"rows"] count] && [[[aResult objectForKey:@"rows"] objectAtIndex:0] objectForKey:@"key"]){
-                        //parse ecal doc
+                        //NSLog(@"got ECAL doc: %@\n", aTag);
+                        [self parseEcalDocument:aResult];
                     }
                     else {
                         //no ecal doc found
@@ -1697,14 +1817,15 @@ void SwapLongBlock(void* p, int32_t n)
             [aResult prettyPrint:@"CouchDB"];
 		}
 		else {
-			NSLog(@"DebugDB %@ %@\n",[xl3Link crateName], aResult);
+			NSLog(@"DebugDB %@ %@\n",[[self xl3Link] crateName], aResult);
 		}
 	}
 }
 
 - (void) orcaToHw
 {
-    
+    [self initCrateRegistersOnly];
+    NSLog(@"%@ crate init registers only\n", [[self xl3Link] crateName]);
 }
 
 #pragma mark •••Basic Ops
