@@ -206,6 +206,8 @@
 {
 	ORCouchDBGetDocumentOp* anOp = [[ORCouchDBGetDocumentOp alloc] initWithHost:host port:port database:database delegate:delegate tag:aTag];
 	[anOp setDocumentId:anId];
+    [anOp setUsername:username];
+	[anOp setPwd:pwd];
 	[ORCouchDBQueue addOperation:anOp];
 	[anOp release];
 }
@@ -289,7 +291,11 @@
 	if(username && pwd){
 		httpString = [httpString stringByReplacingOccurrencesOfString:@"://" withString:[NSString stringWithFormat:@"://%@:%@@",username,pwd]];
 	}
+    
     NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:httpString]];
+    //[request setCachePolicy:NSURLRequestReloadIgnoringLocalCacheData];
+    [request setCachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData];
+    
     if(aType){
 		[request setHTTPMethod:aType];
 		if([aType isEqualToString:@"POST"]){
@@ -737,7 +743,8 @@
 - (void) main
 {
 	if([self isCancelled])return;
-	NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/%@", host, port, database, documentId];
+    NSString* escaped = [documentId stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+	NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/%@", host, port, database, escaped];
 	id result = [self send:httpString];
 	[self sendToDelegate:result];
 }
