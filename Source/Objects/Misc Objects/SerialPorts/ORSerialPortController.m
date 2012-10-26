@@ -56,6 +56,8 @@
 {
 	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
 	
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	
     [notifyCenter addObserver : self
                      selector : @selector(portNameChanged:)
                          name : ORSerialPortModelPortNameChanged
