@@ -696,6 +696,12 @@
 		842AECCB09538066009550DE /* ORCRGetterModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 842AECC409538066009550DE /* ORCRGetterModel.h */; };
 		842AECCC09538066009550DE /* ORCRGetterModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 842AECC509538066009550DE /* ORCRGetterModel.m */; };
 		842AECCD09538066009550DE /* ORCRGetterController.h in Headers */ = {isa = PBXBuildFile; fileRef = 842AECC609538066009550DE /* ORCRGetterController.h */; };
+		842BB6151639691600393470 /* DigitalReadSerial.ino in Resources */ = {isa = PBXBuildFile; fileRef = 842BB6141639691600393470 /* DigitalReadSerial.ino */; };
+		842BB6AA1639746300393470 /* ORPulser33500Chan.h in Headers */ = {isa = PBXBuildFile; fileRef = 842BB6A81639746300393470 /* ORPulser33500Chan.h */; };
+		842BB6AB1639746300393470 /* ORPulser33500Chan.m in Sources */ = {isa = PBXBuildFile; fileRef = 842BB6A91639746300393470 /* ORPulser33500Chan.m */; };
+		842BB6C516397A2000393470 /* ORPulser33500ChanController.h in Headers */ = {isa = PBXBuildFile; fileRef = 842BB6C316397A2000393470 /* ORPulser33500ChanController.h */; };
+		842BB6C616397A2000393470 /* ORPulser33500ChanController.m in Sources */ = {isa = PBXBuildFile; fileRef = 842BB6C416397A2000393470 /* ORPulser33500ChanController.m */; };
+		842BB6C816397A2800393470 /* Pulser33500Chan.nib in Resources */ = {isa = PBXBuildFile; fileRef = 842BB6C716397A2800393470 /* Pulser33500Chan.nib */; };
 		842DAEBB0A82CA8400C942A2 /* BiRa2351I.nib in Resources */ = {isa = PBXBuildFile; fileRef = 842DAEB50A82CA8400C942A2 /* BiRa2351I.nib */; };
 		842DAEBC0A82CA8400C942A2 /* BiRa2351ICard.gif in Resources */ = {isa = PBXBuildFile; fileRef = 842DAEB60A82CA8400C942A2 /* BiRa2351ICard.gif */; };
 		842DAEBD0A82CA8400C942A2 /* ORBiRa2351IController.h in Headers */ = {isa = PBXBuildFile; fileRef = 842DAEB70A82CA8400C942A2 /* ORBiRa2351IController.h */; };
@@ -2702,6 +2708,12 @@
 		84F7FB610AE5566D00A5AA4C /* my_list.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F7FB5C0AE5566D00A5AA4C /* my_list.h */; };
 		84F7FB620AE5566D00A5AA4C /* mysql_com.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F7FB5D0AE5566D00A5AA4C /* mysql_com.h */; };
 		84F7FB640AE5569100A5AA4C /* my_alloc.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F7FB630AE5569100A5AA4C /* my_alloc.h */; };
+		84F909871638383C00E9FD24 /* Pulser33500.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84F909801638383C00E9FD24 /* Pulser33500.nib */; };
+		84F909891638383C00E9FD24 /* ORPulser33500Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F909821638383C00E9FD24 /* ORPulser33500Controller.h */; };
+		84F9098A1638383C00E9FD24 /* ORPulser33500Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84F909831638383C00E9FD24 /* ORPulser33500Controller.m */; };
+		84F9098B1638383C00E9FD24 /* ORPulser33500Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F909841638383C00E9FD24 /* ORPulser33500Model.h */; };
+		84F9098C1638383C00E9FD24 /* ORPulser33500Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84F909851638383C00E9FD24 /* ORPulser33500Model.m */; };
+		84F9098D1638383C00E9FD24 /* Pulser33500Icon.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84F909861638383C00E9FD24 /* Pulser33500Icon.tif */; };
 		84F910BC0EEEC43C007B583A /* ORVmeReadWriteCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F910BA0EEEC43C007B583A /* ORVmeReadWriteCommand.h */; };
 		84F9836D06A441CF0087FA3E /* ORGTIDGenerator.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F9836C06A441CF0087FA3E /* ORGTIDGenerator.h */; };
 		84FA638C102B041800B426A6 /* ORSIS3350Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FA6384102B041800B426A6 /* ORSIS3350Controller.h */; };
@@ -3829,6 +3841,12 @@
 		842B0624040C2709005F64B1 /* NcdMuxBox.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = NcdMuxBox.nib; path = "Source/Objects/Custom Hardware/Ncd Hardware/NcdMuxBox/NcdMuxBox.nib"; sourceTree = SOURCE_ROOT; };
 		842B548404182630005F64B1 /* ORDataPacket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORDataPacket.h; sourceTree = "<group>"; };
 		842B548504182630005F64B1 /* ORDataPacket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORDataPacket.m; sourceTree = "<group>"; };
+		842BB6141639691600393470 /* DigitalReadSerial.ino */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = DigitalReadSerial.ino; path = Source/Objects/Hardware/Serial/Arduino/ArduioUNO/DigitalReadSerial.ino; sourceTree = SOURCE_ROOT; };
+		842BB6A81639746300393470 /* ORPulser33500Chan.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORPulser33500Chan.h; sourceTree = "<group>"; };
+		842BB6A91639746300393470 /* ORPulser33500Chan.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORPulser33500Chan.m; sourceTree = "<group>"; };
+		842BB6C316397A2000393470 /* ORPulser33500ChanController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPulser33500ChanController.h; path = Source/Objects/Hardware/GPIB/Pulser33500/ORPulser33500ChanController.h; sourceTree = SOURCE_ROOT; };
+		842BB6C416397A2000393470 /* ORPulser33500ChanController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORPulser33500ChanController.m; path = Source/Objects/Hardware/GPIB/Pulser33500/ORPulser33500ChanController.m; sourceTree = SOURCE_ROOT; };
+		842BB6C716397A2800393470 /* Pulser33500Chan.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = Pulser33500Chan.nib; sourceTree = "<group>"; };
 		842C084103DF4C1D005F64B1 /* FanOut.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = FanOut.nib; path = "Source/Objects/Data Flow/Fan Out/FanOut.nib"; sourceTree = SOURCE_ROOT; };
 		842C084403DF4C1D005F64B1 /* ORFanOutController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORFanOutController.h; path = "Source/Objects/Data Flow/Fan Out/ORFanOutController.h"; sourceTree = SOURCE_ROOT; };
 		842C084503DF4C1D005F64B1 /* ORFanOutController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORFanOutController.m; path = "Source/Objects/Data Flow/Fan Out/ORFanOutController.m"; sourceTree = SOURCE_ROOT; };
@@ -5719,6 +5737,12 @@
 		84F7FB5C0AE5566D00A5AA4C /* my_list.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = my_list.h; path = Libraries/my_list.h; sourceTree = SOURCE_ROOT; };
 		84F7FB5D0AE5566D00A5AA4C /* mysql_com.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = mysql_com.h; path = Libraries/mysql_com.h; sourceTree = SOURCE_ROOT; };
 		84F7FB630AE5569100A5AA4C /* my_alloc.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = my_alloc.h; path = Libraries/my_alloc.h; sourceTree = SOURCE_ROOT; };
+		84F909801638383C00E9FD24 /* Pulser33500.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = Pulser33500.nib; sourceTree = "<group>"; };
+		84F909821638383C00E9FD24 /* ORPulser33500Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPulser33500Controller.h; path = Source/Objects/Hardware/GPIB/Pulser33500/ORPulser33500Controller.h; sourceTree = SOURCE_ROOT; };
+		84F909831638383C00E9FD24 /* ORPulser33500Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORPulser33500Controller.m; path = Source/Objects/Hardware/GPIB/Pulser33500/ORPulser33500Controller.m; sourceTree = SOURCE_ROOT; };
+		84F909841638383C00E9FD24 /* ORPulser33500Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPulser33500Model.h; path = Source/Objects/Hardware/GPIB/Pulser33500/ORPulser33500Model.h; sourceTree = SOURCE_ROOT; };
+		84F909851638383C00E9FD24 /* ORPulser33500Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORPulser33500Model.m; path = Source/Objects/Hardware/GPIB/Pulser33500/ORPulser33500Model.m; sourceTree = SOURCE_ROOT; };
+		84F909861638383C00E9FD24 /* Pulser33500Icon.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Pulser33500Icon.tif; path = Source/Objects/Hardware/GPIB/Pulser33500/Pulser33500Icon.tif; sourceTree = SOURCE_ROOT; };
 		84F910BA0EEEC43C007B583A /* ORVmeReadWriteCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORVmeReadWriteCommand.h; sourceTree = "<group>"; };
 		84F9836C06A441CF0087FA3E /* ORGTIDGenerator.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORGTIDGenerator.h; path = Source/Objects/OrcaObject/ORGTIDGenerator.h; sourceTree = SOURCE_ROOT; };
 		84FA6384102B041800B426A6 /* ORSIS3350Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSIS3350Controller.h; path = Source/Objects/Hardware/Vme/SIS3350/ORSIS3350Controller.h; sourceTree = SOURCE_ROOT; };
@@ -11001,6 +11025,7 @@
 				9C88467B0E2D8D960099B98E /* Spectral Analyzer HPE4405A */,
 				84992CAD0DD21F3800E82DB4 /* HP3458a */,
 				8425384A0BC6E006004C8065 /* HP6622a */,
+				84F9097F1638383C00E9FD24 /* Pulser33500 */,
 				844D92F50A0A79AA00E83C57 /* Pulser33220 */,
 				847D7A7104701EB6005F64B1 /* HPPulser */,
 				84C493AB04059AEA005F64B1 /* Oscilloscope T754D */,
@@ -11519,6 +11544,7 @@
 				84DF4C9B162F1B2100261144 /* ORArduinoUNOController.m */,
 				84DF4C9C162F1B2100261144 /* ORArduinoUNOModel.h */,
 				84DF4C9D162F1B2100261144 /* ORArduinoUNOModel.m */,
+				842BB6141639691600393470 /* DigitalReadSerial.ino */,
 			);
 			name = ArduinoUNO;
 			path = Source/Objects/Hardware/Serial/Arduino/ArduioUNO;
@@ -11893,6 +11919,25 @@
 				84F7FB5D0AE5566D00A5AA4C /* mysql_com.h */,
 			);
 			path = Libraries;
+			sourceTree = SOURCE_ROOT;
+		};
+		84F9097F1638383C00E9FD24 /* Pulser33500 */ = {
+			isa = PBXGroup;
+			children = (
+				84F909801638383C00E9FD24 /* Pulser33500.nib */,
+				84F909821638383C00E9FD24 /* ORPulser33500Controller.h */,
+				84F909831638383C00E9FD24 /* ORPulser33500Controller.m */,
+				84F909841638383C00E9FD24 /* ORPulser33500Model.h */,
+				84F909851638383C00E9FD24 /* ORPulser33500Model.m */,
+				842BB6C716397A2800393470 /* Pulser33500Chan.nib */,
+				842BB6A81639746300393470 /* ORPulser33500Chan.h */,
+				842BB6A91639746300393470 /* ORPulser33500Chan.m */,
+				842BB6C316397A2000393470 /* ORPulser33500ChanController.h */,
+				842BB6C416397A2000393470 /* ORPulser33500ChanController.m */,
+				84F909861638383C00E9FD24 /* Pulser33500Icon.tif */,
+			);
+			name = Pulser33500;
+			path = Source/Objects/Hardware/GPIB/Pulser33500;
 			sourceTree = SOURCE_ROOT;
 		};
 		84F90B94046858FE005F64B1 /* Workers */ = {
@@ -13677,6 +13722,10 @@
 				84DF4A0E162DCE6B00261144 /* ORGretina4MModel.h in Headers */,
 				84DF4CA0162F1B2100261144 /* ORArduinoUNOController.h in Headers */,
 				84DF4CA2162F1B2100261144 /* ORArduinoUNOModel.h in Headers */,
+				84F909891638383C00E9FD24 /* ORPulser33500Controller.h in Headers */,
+				84F9098B1638383C00E9FD24 /* ORPulser33500Model.h in Headers */,
+				842BB6AA1639746300393470 /* ORPulser33500Chan.h in Headers */,
+				842BB6C516397A2000393470 /* ORPulser33500ChanController.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14552,6 +14601,10 @@
 				84DF4B15162DF2C200261144 /* Gretina4MWaveform.png in Resources */,
 				84DF4C9E162F1B2100261144 /* ArduinoUNO.nib in Resources */,
 				84DF4C9F162F1B2100261144 /* ArduinoUNO.tif in Resources */,
+				84F909871638383C00E9FD24 /* Pulser33500.nib in Resources */,
+				84F9098D1638383C00E9FD24 /* Pulser33500Icon.tif in Resources */,
+				842BB6151639691600393470 /* DigitalReadSerial.ino in Resources */,
+				842BB6C816397A2800393470 /* Pulser33500Chan.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -15530,6 +15583,10 @@
 				84DF4A0F162DCE6B00261144 /* ORGretina4MModel.m in Sources */,
 				84DF4CA1162F1B2100261144 /* ORArduinoUNOController.m in Sources */,
 				84DF4CA3162F1B2100261144 /* ORArduinoUNOModel.m in Sources */,
+				84F9098A1638383C00E9FD24 /* ORPulser33500Controller.m in Sources */,
+				84F9098C1638383C00E9FD24 /* ORPulser33500Model.m in Sources */,
+				842BB6AB1639746300393470 /* ORPulser33500Chan.m in Sources */,
+				842BB6C616397A2000393470 /* ORPulser33500ChanController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
