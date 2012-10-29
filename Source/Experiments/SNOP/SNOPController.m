@@ -306,7 +306,7 @@ NSString* ORSNOPRequestHVStatus = @"ORSNOPRequestHVStatus";
                     [[hvStatusMatrix cellAtRow:mRow column:1] setTextColor:[NSColor blackColor]];
                 }
                 [[hvStatusMatrix cellAtRow:mRow column:2] setStringValue:
-                 [NSString stringWithFormat:@"%d V",(unsigned int)[[aNote object] hvNominalVoltageA]]];
+                 [NSString stringWithFormat:@"%d V",(unsigned int)[[aNote object] hvNominalVoltageB]]];
                 [[hvStatusMatrix cellAtRow:mRow column:3] setStringValue:
                  [NSString stringWithFormat:@"%d V",(unsigned int)[[aNote object] hvBVoltageReadValue]]];
                 [[hvStatusMatrix cellAtRow:mRow column:4] setStringValue:
