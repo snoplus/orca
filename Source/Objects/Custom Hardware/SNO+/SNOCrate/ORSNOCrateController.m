@@ -116,7 +116,7 @@
 			[xilinixLoadProgress setDoubleValue:0];
 			[xilinixLoadProgress stopAnimation:self];
 		}
-		[probeButton setEnabled:![jobStatus running]];
+		//[probeButton setEnabled:![jobStatus running]];
 		[autoInitButton setEnabled:![jobStatus running]];
 		[initNoXilinxButton setEnabled:![jobStatus running]];
 		[initXilinxButton setEnabled:![jobStatus running]];
