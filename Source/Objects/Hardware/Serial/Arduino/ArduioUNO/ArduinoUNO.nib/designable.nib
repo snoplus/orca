@@ -5704,7 +5704,7 @@
 															<object class="NSTextView" id="479780131">
 																<reference key="NSNextResponder" ref="598291551"/>
 																<int key="NSvFlags">2322</int>
-																<string key="NSFrameSize">{423, 14}</string>
+																<string key="NSFrameSize">{423, 0}</string>
 																<reference key="NSSuperview" ref="598291551"/>
 																<object class="NSTextContainer" key="NSTextContainer" id="585750015">
 																	<object class="NSLayoutManager" key="NSLayoutManager">
@@ -5786,7 +5786,7 @@
 																<nil key="NSDelegate"/>
 															</object>
 														</object>
-														<string key="NSFrame">{{1, 1}, {423, 328}}</string>
+														<string key="NSFrame">{{1, 1}, {423, 301}}</string>
 														<reference key="NSSuperview" ref="63040614"/>
 														<reference key="NSNextKeyView" ref="479780131"/>
 														<reference key="NSDocView" ref="479780131"/>
@@ -5822,7 +5822,7 @@
 														<double key="NSPercent">0.94565218687057495</double>
 													</object>
 												</object>
-												<string key="NSFrame">{{12, 17}, {425, 330}}</string>
+												<string key="NSFrame">{{12, 17}, {425, 303}}</string>
 												<reference key="NSSuperview" ref="871750009"/>
 												<reference key="NSNextKeyView" ref="598291551"/>
 												<int key="NSsFlags">530</int>
@@ -5833,17 +5833,20 @@
 											<object class="NSTextField" id="420611066">
 												<reference key="NSNextResponder" ref="871750009"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{14, 349}, {265, 17}}</string>
+												<string key="NSFrame">{{14, 324}, {426, 42}}</string>
 												<reference key="NSSuperview" ref="871750009"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSTextFieldCell" key="NSCell" id="357908770">
-													<int key="NSCellFlags">68288064</int>
-													<int key="NSCellFlags2">272761856</int>
-													<string key="NSContents">Cut &amp; Paste this sketch into your Ardiuno</string>
+													<int key="NSCellFlags">67239424</int>
+													<int key="NSCellFlags2">4325376</int>
+													<string key="NSContents">Cut &amp; Paste this sketch into your Ardiuno. Also make sure you have the "SimpleMessageSystem" library installed in your Ardinuo app. See the ORCA help for detals. </string>
 													<reference key="NSSupport" ref="26"/>
 													<reference key="NSControlView" ref="420611066"/>
 													<reference key="NSBackgroundColor" ref="298791127"/>
-													<reference key="NSTextColor" ref="781566842"/>
+													<object class="NSColor" key="NSTextColor">
+														<int key="NSColorSpace">1</int>
+														<bytes key="NSRGB">MC4wMDk2NDU0ODgxIDAuMDQ2NTQ2MTg2NSAwLjQ4OTc5NTkxODQAA</bytes>
+													</object>
 												</object>
 											</object>
 										</object>
