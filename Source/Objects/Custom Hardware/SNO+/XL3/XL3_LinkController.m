@@ -861,7 +861,7 @@ static NSDictionary* xl3Ops;
 			  [NSNumber numberWithInt:0x88], @"fec cmos dt avl",
 			  [NSNumber numberWithInt:0x8C], @"fec cmos chp sel",
 			  [NSNumber numberWithInt:0x90], @"fec cmos chp dis",
-			  [NSNumber numberWithInt:0x90], @"fec cmos dat out",
+			  [NSNumber numberWithInt:0x94], @"fec cmos dat out",
 			  [NSNumber numberWithInt:0x9C], @"fec fifo read",
 			  [NSNumber numberWithInt:0x9D], @"fec fifo write",
 			  [NSNumber numberWithInt:0x9E], @"fec fifo diff",

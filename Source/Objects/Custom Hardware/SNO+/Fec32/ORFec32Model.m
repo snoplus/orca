@@ -361,7 +361,8 @@ NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageSt
 
 - (int) globalCardNumber
 {
-	return ([guardian crateNumber] * 16) + [self stationNumber];
+	//return ([guardian crateNumber] * 16) + [self stationNumber];
+	return ([[[self guardian] adapter] crateNumber] * 16) + [self stationNumber];
 }
 
 - (NSComparisonResult) globalCardNumberCompare:(id)aCard

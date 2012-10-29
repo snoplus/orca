@@ -1526,6 +1526,7 @@ void SwapLongBlock(void* p, int32_t n)
 {
     if (![[self xl3Link] isConnected]) {
         NSLog(@"%@ crate init ignored, xl3 is not connected.\n", [[self xl3Link] crateName]);
+        return;
     }
     
     NSDictionary* argDict = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -1615,6 +1616,27 @@ void SwapLongBlock(void* p, int32_t n)
         [self setTriggerStatus:@"OFF"];
     }
 
+    //write sequencer mask:
+    for (slot=0; slot<16; slot++) {
+        ORFec32Model* fec = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-slot];
+        if (!fec) {
+            continue;
+        }
+
+        unsigned long aValue = disableSeqMask[slot];
+        unsigned long xl3Address = FEC_SEL * slot | 0x90 | WRITE_REG; //CMOS CHIP DIS
+        
+        @try {
+            [xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
+        }
+        @catch (NSException* e) {
+            NSLog(@"%@ sequencer update failed; error: %@ reason: %@\n",
+                  [[self xl3Link] crateName], [e name], [e reason]);
+            return;
+        }
+    }
+    NSLog(@"%@ sequencer mask updated.\n", [[self xl3Link] crateName]);
+    
     [self performSelector:@selector(initCrateWithDict:) withObject:argDict afterDelay:0];
 }
 
@@ -1933,7 +1955,7 @@ void SwapLongBlock(void* p, int32_t n)
     unsigned short dbNum;
     for (dbNum=0; dbNum<4; dbNum++) {
         if (![fec dcPresent:dbNum]) {
-            NSLog(@"@% FEC %d DB %d NOT updated from ECAL, it's missing\n", [[self xl3Link] crateName], aSlot, dbNum);
+            NSLog(@"%@ FEC %d DB %d NOT updated from ECAL, it's missing\n", [[self xl3Link] crateName], aSlot, dbNum);
         }
     }
     
@@ -3133,8 +3155,8 @@ void SwapLongBlock(void* p, int32_t n)
         //unless (isPollingXl3 && !isPollingVerbose)
         if (!isPollingXl3 || isPollingVerbose) {    
             NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ HV status: \n", [[self xl3Link] crateName]];
-            [msg appendFormat:@"voltageA: %.2f V\nvoltageB: %.2f V\n", status.voltage_a * 300., status.voltage_b * 300.];
-            [msg appendFormat:@"currentA: %.2f mA\ncurrentB: %.2f mA\n", status.current_a * 10., status.current_b * 10.];
+            [msg appendFormat:@"vltA: %.2f V, crtA: %.2f mA\n", status.voltage_a * 300., status.current_a * 10.];
+            [msg appendFormat:@"vltB: %.2f V, crtB: %.2f mA\n", status.voltage_a * 300., status.current_a * 10.];
             NSLog(msg);
         }
         //data packet
@@ -3177,6 +3199,7 @@ void SwapLongBlock(void* p, int32_t n)
 
     @try {
         [[self xl3Link] sendCommand:SET_HV_RELAYS_ID withPayload:&payload expectResponse:YES];
+        [self initCrateRegistersOnly];
     }
     @catch (NSException *exception) {
         NSLog(@"%@ error sending setHVRelays command.\n",[[self xl3Link] crateName]);
@@ -3196,7 +3219,6 @@ void SwapLongBlock(void* p, int32_t n)
     
     @try {
         [self setHVRelays:aRelayMask error:&error];
-        [self initCrateRegistersOnly];
     }
     @catch (NSException *exception) {
         ;

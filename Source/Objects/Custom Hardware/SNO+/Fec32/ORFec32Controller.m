@@ -427,14 +427,15 @@
 - (void) updateButtons
 {
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORFecLock];
-    BOOL locked = [gSecurity isLocked:ORFecLock];
+    //BOOL locked = [gSecurity isLocked:ORFecLock];
 	[vResField		setEnabled: !lockedOrRunningMaintenance];
 	[hvRefField		setEnabled: !lockedOrRunningMaintenance];
 	[cmosMatrix		setEnabled: !lockedOrRunningMaintenance];
-	[autoInitButton setEnabled: !locked];
+	//[autoInitButton setEnabled: !locked];
 	int i;
 	for(i=0;i<4;i++){
-		[onlineSwitches[i] setEnabled:[model dcPresent:i] && !lockedOrRunningMaintenance];
+		//[onlineSwitches[i] setEnabled:[model dcPresent:i] && !lockedOrRunningMaintenance];
+		[onlineSwitches[i] setEnabled:[model dcPresent:i]];
 		[pmtImages[i] setEnabled:[model dcPresent:i]];
 	}
 	[readVoltagesButton setEnabled:!lockedOrRunningMaintenance && ([model variableDisplay] == 0)];
