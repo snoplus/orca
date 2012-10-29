@@ -42,4 +42,6 @@
 #define kCaen1724  20
 #define kCaen1724  20
 #define kCaen830   21
+#define kGretina4M 22
+
 #endif

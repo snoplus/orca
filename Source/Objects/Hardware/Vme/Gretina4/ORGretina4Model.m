@@ -2026,7 +2026,7 @@ static struct {
      * 4: FIFO size                                         */
     
 	configStruct->total_cards++;
-	configStruct->card_info[index].hw_type_id	= kGretina; //should be unique
+	configStruct->card_info[index].hw_type_id	= kGretina4M; //should be unique
 	configStruct->card_info[index].hw_mask[0] 	= dataId; //better be unique
 	configStruct->card_info[index].slot			= [self slot];
 	configStruct->card_info[index].crate		= [self crateNumber];

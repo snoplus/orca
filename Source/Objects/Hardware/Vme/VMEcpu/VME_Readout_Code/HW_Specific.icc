@@ -1,6 +1,7 @@
 #include "VME_HW_Definitions.h"
 #include "ORVCard.hh"
 #include "ORGretinaReadout.hh"
+#include "ORGretina4MReadout.hh"
 #include "ORLAMData.hh"
 #include "ORDataGenReadout.hh"
 #include "ORMTCReadout.hh"
@@ -33,6 +34,9 @@ int32_t load_card(SBC_card_info* card_info, int32_t index)
       break;
     case kGretina:
       aCard = new ORGretinaReadout(card_info); 
+      break;
+    case kGretina4M:
+      aCard = new ORGretina4MReadout(card_info); 
       break;
     case kTrigger32:
       aCard = new ORVMETrigger32Readout(card_info); 

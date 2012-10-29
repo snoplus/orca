@@ -702,6 +702,9 @@
 		842BB6C516397A2000393470 /* ORPulser33500ChanController.h in Headers */ = {isa = PBXBuildFile; fileRef = 842BB6C316397A2000393470 /* ORPulser33500ChanController.h */; };
 		842BB6C616397A2000393470 /* ORPulser33500ChanController.m in Sources */ = {isa = PBXBuildFile; fileRef = 842BB6C416397A2000393470 /* ORPulser33500ChanController.m */; };
 		842BB6C816397A2800393470 /* Pulser33500Chan.nib in Resources */ = {isa = PBXBuildFile; fileRef = 842BB6C716397A2800393470 /* Pulser33500Chan.nib */; };
+		842BC974163ED4E300393470 /* ORGretina4MReadout.hh in Headers */ = {isa = PBXBuildFile; fileRef = 842BC972163ED4E300393470 /* ORGretina4MReadout.hh */; };
+		842BC975163ED56B00393470 /* ORGretina4MReadout.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 842BC971163ED4E300393470 /* ORGretina4MReadout.cc */; };
+		842BC976163ED56B00393470 /* ORGretina4MReadout.hh in VME_Copy */ = {isa = PBXBuildFile; fileRef = 842BC972163ED4E300393470 /* ORGretina4MReadout.hh */; };
 		842DAEBB0A82CA8400C942A2 /* BiRa2351I.nib in Resources */ = {isa = PBXBuildFile; fileRef = 842DAEB50A82CA8400C942A2 /* BiRa2351I.nib */; };
 		842DAEBC0A82CA8400C942A2 /* BiRa2351ICard.gif in Resources */ = {isa = PBXBuildFile; fileRef = 842DAEB60A82CA8400C942A2 /* BiRa2351ICard.gif */; };
 		842DAEBD0A82CA8400C942A2 /* ORBiRa2351IController.h in Headers */ = {isa = PBXBuildFile; fileRef = 842DAEB70A82CA8400C942A2 /* ORBiRa2351IController.h */; };
@@ -3065,6 +3068,8 @@
 				43ADFEC210B6E2090044617C /* ORDataGenReadout.hh in VME_Copy */,
 				43ADFEC510B6E2090044617C /* ORGretinaReadout.cc in VME_Copy */,
 				43ADFEC610B6E2090044617C /* ORGretinaReadout.hh in VME_Copy */,
+				842BC975163ED56B00393470 /* ORGretina4MReadout.cc in VME_Copy */,
+				842BC976163ED56B00393470 /* ORGretina4MReadout.hh in VME_Copy */,
 				43ADFEC710B6E2090044617C /* ORLAMData.cc in VME_Copy */,
 				43ADFEC810B6E2090044617C /* ORLAMData.hh in VME_Copy */,
 				43ADFEC910B6E2090044617C /* ORMTCReadout.cc in VME_Copy */,
@@ -3847,6 +3852,8 @@
 		842BB6C316397A2000393470 /* ORPulser33500ChanController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPulser33500ChanController.h; path = Source/Objects/Hardware/GPIB/Pulser33500/ORPulser33500ChanController.h; sourceTree = SOURCE_ROOT; };
 		842BB6C416397A2000393470 /* ORPulser33500ChanController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORPulser33500ChanController.m; path = Source/Objects/Hardware/GPIB/Pulser33500/ORPulser33500ChanController.m; sourceTree = SOURCE_ROOT; };
 		842BB6C716397A2800393470 /* Pulser33500Chan.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = Pulser33500Chan.nib; sourceTree = "<group>"; };
+		842BC971163ED4E300393470 /* ORGretina4MReadout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ORGretina4MReadout.cc; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORGretina4MReadout.cc; sourceTree = SOURCE_ROOT; };
+		842BC972163ED4E300393470 /* ORGretina4MReadout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ORGretina4MReadout.hh; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORGretina4MReadout.hh; sourceTree = SOURCE_ROOT; };
 		842C084103DF4C1D005F64B1 /* FanOut.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = FanOut.nib; path = "Source/Objects/Data Flow/Fan Out/FanOut.nib"; sourceTree = SOURCE_ROOT; };
 		842C084403DF4C1D005F64B1 /* ORFanOutController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORFanOutController.h; path = "Source/Objects/Data Flow/Fan Out/ORFanOutController.h"; sourceTree = SOURCE_ROOT; };
 		842C084503DF4C1D005F64B1 /* ORFanOutController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORFanOutController.m; path = "Source/Objects/Data Flow/Fan Out/ORFanOutController.m"; sourceTree = SOURCE_ROOT; };
@@ -9487,6 +9494,8 @@
 				43ADFE5F10B6DBCF0044617C /* ORDataGenReadout.hh */,
 				43ADFE6210B6DBCF0044617C /* ORGretinaReadout.cc */,
 				43ADFE6310B6DBCF0044617C /* ORGretinaReadout.hh */,
+				842BC971163ED4E300393470 /* ORGretina4MReadout.cc */,
+				842BC972163ED4E300393470 /* ORGretina4MReadout.hh */,
 				43ADFE6410B6DBCF0044617C /* ORLAMData.cc */,
 				43ADFE6510B6DBCF0044617C /* ORLAMData.hh */,
 				43ADFE6610B6DBCF0044617C /* ORMTCReadout.cc */,
@@ -13726,6 +13735,7 @@
 				84F9098B1638383C00E9FD24 /* ORPulser33500Model.h in Headers */,
 				842BB6AA1639746300393470 /* ORPulser33500Chan.h in Headers */,
 				842BB6C516397A2000393470 /* ORPulser33500ChanController.h in Headers */,
+				842BC974163ED4E300393470 /* ORGretina4MReadout.hh in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
