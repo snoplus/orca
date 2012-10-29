@@ -99,6 +99,8 @@ enum {
     BOOL hvASwitch;
     BOOL hvBSwitch;
     NSString* triggerStatus;
+    BOOL _isTriggerON;
+
     unsigned long hvAVoltageDACSetValue;
     unsigned long hvBVoltageDACSetValue;
     float _hvAVoltageReadValue;
@@ -163,6 +165,7 @@ enum {
 @property (nonatomic,assign) BOOL hvASwitch;
 @property (nonatomic,assign) BOOL hvBSwitch;
 @property (nonatomic,copy) NSString* triggerStatus;
+@property (nonatomic,assign) BOOL isTriggerON;
 @property (nonatomic,assign) unsigned long hvAVoltageDACSetValue;
 @property (nonatomic,assign) unsigned long hvBVoltageDACSetValue;
 @property (nonatomic,assign) float hvAVoltageReadValue;
@@ -241,11 +244,15 @@ enum {
 - (NSComparisonResult) XL3NumberCompare:(id)aCard;
 
 #pragma mark •••DB Helpers
-- (void) synthesizeDefaultsIntoBundle:(mb_t*)aBundle forSLot:(unsigned short)aSlot;
+- (void) synthesizeDefaultsIntoBundle:(mb_t*)aBundle forSlot:(unsigned short)aSlot;
 - (void) byteSwapBundle:(mb_t*)aBundle;
-- (void) synthesizeFECIntoBundle:(mb_t*)aBundle forSLot:(unsigned short)aSlot;
+- (void) synthesizeFECIntoBundle:(mb_t*)aBundle forSlot:(unsigned short)aSlot;
 - (ORCouchDB*) debugDBRef;
 - (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp;
+- (void) ecalToOrca;
+- (void) ecalToOrcaDocumentsReceived;
+- (void) parseEcalDocument:(NSDictionary*)aResult;
+- (void) updateUIFromEcalBundle:(NSDictionary*)aBundle slot:(unsigned int)aSlot;
 
 #pragma mark •••DataTaker
 - (void) setDataIds:(id)assigner;
@@ -274,9 +281,6 @@ enum {
 - (void) initCrateRegistersOnly;
 - (void) initCrateWithXilinx:(BOOL)aXilinxFlag autoInit:(BOOL)anAutoInitFlag;
 - (void) initCrateWithDict:(NSDictionary*)argDict;
-- (void) ecalToOrca;
-- (void) ecalToOrcaDocumentsReceived;
-- (void) parseEcalDocument:(NSDictionary*)aResult;
 - (void) orcaToHw;
 
 #pragma mark •••Basic Ops

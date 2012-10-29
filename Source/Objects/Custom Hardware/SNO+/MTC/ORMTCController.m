@@ -981,16 +981,16 @@
     [savePanel setCanCreateDirectories:YES];
    
     NSString* startingDir;
-    NSString* defaultFile;
+    //NSString* defaultFile;
     
 	NSString* fullPath = [[model lastFile] stringByExpandingTildeInPath];
     if(fullPath){
         startingDir = [fullPath stringByDeletingLastPathComponent];
-        defaultFile = [fullPath lastPathComponent];
+        //defaultFile = [fullPath lastPathComponent];
     }
     else {
         startingDir = NSHomeDirectory();
-        defaultFile = @"MtcDataBase";
+        //defaultFile = @"MtcDataBase";
     }
 #if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
   	[savePanel setAllowedFileTypes:[NSArray arrayWithObject:@"mtcdb"]];

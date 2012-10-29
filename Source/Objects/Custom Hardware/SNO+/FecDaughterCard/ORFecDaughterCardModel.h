@@ -52,20 +52,26 @@
 		unsigned char rp2[2];	//RMP   --ramp voltage down (-3.3V to 0V)
 		unsigned char vli[2];	//VLI					   	(-1V to 1V)
 		unsigned char vsi[2];	//VSI						(-2V to 0V)
-		unsigned char vt[8];	//VTH  --voltage threshold	(-1V to 1V) channel related
-		unsigned char vb[16];	//VBAL --balance voltage	(-2V to 4V)
+		unsigned char vt[8];	//VTH --ecal+corr	(-1V to 1V) channel related
+        unsigned char _vt_ecal[8]; //VTH  --value from ECAL
+        unsigned char _vt_zero[8]; //VTH  --zero from ECAL
+        short _vt_corr[8]; //VTH  --ORCA correction on top of ECAL
+        unsigned char _vt_safety; // min num clicks above zero    
+		unsigned char vb[16]; //VBAL --balance voltage	(-2V to 4V)
 		
 		//channel related
 		unsigned char ns100width[8];
 		unsigned char ns20width[8];
 		unsigned char ns20delay[8];
-		unsigned char tac0trim[8];
-		unsigned char tac1trim[8];
+		unsigned char tac0trim[8]; //tac_trim
+		unsigned char tac1trim[8]; //scmos
 		short	cmosRegShown;
 		BOOL	setAllCmos;
 		BOOL	showVolts;
 		NSString* comments;
 }
+
+@property (nonatomic,assign) unsigned char vt_safety;
 
 #pragma mark •••Initialization
 
@@ -88,6 +94,12 @@
 - (void) setVsi:(short)anIndex withValue:(unsigned char)aValue;
 - (unsigned char) vt:(short)anIndex;
 - (void) setVt:(short)anIndex withValue:(unsigned char)aValue;
+- (unsigned char) vt_ecal:(short)anIndex;
+- (void) setVt_ecal:(short)anIndex withValue:(unsigned char)aValue;
+- (unsigned char) vt_zero:(short)anIndex;
+- (void) setVt_zero:(short)anIndex withValue:(unsigned char)aValue;
+- (short) vt_corr:(short)anIndex;
+- (void) setVt_corr:(short)anIndex withValue:(short)aValue;
 - (unsigned char) vb:(short)anIndex;
 - (void) setVb:(short)anIndex withValue:(unsigned char)aValue;
 - (unsigned char) ns100width:(short)anIndex;
@@ -101,6 +113,7 @@
 - (unsigned char) tac1trim:(short)anIndex;
 - (void) setTac1trim:(short)anIndex withValue:(unsigned char)aValue;
 - (void) loadDefaultValues;
+- (void) silentUpdateVt:(short)anIndex;
 
 #pragma mark ====Converter Methods
 - (void) setRp1Voltage:(short)n withValue:(float)value;
@@ -120,6 +133,7 @@
 #pragma mark •••Hardware Access
 - (NSString*) performBoardIDRead:(short) boardIndex;
 - (void) readBoardIds;
+- (void) setVtToHw;
 
 #pragma mark •••Archival
 - (id)   initWithCoder:(NSCoder*)decoder;

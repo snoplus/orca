@@ -22,6 +22,7 @@
 #import "ORFecDaughterCardModel.h"
 #import "ORFec32Model.h"
 #import "ORSNOConstants.h"
+#import "ORXL3Model.h"
 
 
 NSString* ORDCModelCommentsChanged			= @"ORDCModelCommentsChanged";
@@ -209,6 +210,61 @@ NSString* ORDCModelTac1trimChanged			= @"ORDCModelTac1trimChanged";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelVtChanged object:self];
 }
 
+- (unsigned char) vt_ecal:(short)anIndex
+{
+    return _vt_ecal[anIndex];
+}
+
+- (void) setVt_ecal:(short)anIndex withValue:(unsigned char)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setVt_ecal:anIndex withValue:[self vt_ecal:anIndex]];
+    _vt_ecal[anIndex] = aValue;
+    [self silentUpdateVt:anIndex];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelVtChanged object:self];
+}
+
+- (unsigned char) vt_zero:(short)anIndex
+{
+    return _vt_zero[anIndex];
+}
+
+- (void) setVt_zero:(short)anIndex withValue:(unsigned char)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setVt_zero:anIndex withValue:[self vt_zero:anIndex]];
+    _vt_zero[anIndex] = aValue;
+    [self silentUpdateVt:anIndex];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelVtChanged object:self];
+}
+
+- (short) vt_corr:(short)anIndex
+{
+    return _vt_corr[anIndex];
+}
+
+- (void) setVt_corr:(short)anIndex withValue:(short)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setVt_corr:anIndex withValue:[self vt_corr:anIndex]];
+    _vt_corr[anIndex] = aValue;
+    [self silentUpdateVt:anIndex];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelVtChanged object:self];
+}
+
+- (unsigned char) vt_safety
+{
+    return _vt_safety;
+}
+
+- (void) setVt_safety:(unsigned char)vt_safety
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setVt_safety:vt_safety];
+    _vt_safety = vt_safety;
+    unsigned short ch;
+    for (ch=0; ch<8; ch++) {
+        [self silentUpdateVt:ch];
+    }
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelVtChanged object:self];
+}
+
 - (unsigned char) vb:(short)anIndex
 {
 	return vb[anIndex];
@@ -355,13 +411,16 @@ NSString* ORDCModelTac1trimChanged			= @"ORDCModelTac1trimChanged";
 		[self setVli:i withValue:120];
 		[self setVsi:i withValue:120];
 	}
+    [self setVt_safety:2];
 	for(i=0;i<8;i++){
-		[self setVt:i withValue:255];
+		[self setVt_ecal:i withValue:255];
+		[self setVt_zero:i withValue:0];
+		[self setVt_corr:i withValue:0];
+        [self setVt:i withValue:255];
 	}
 	for(i=0;i<16;i++){
 		[self setVb:i withValue:160]; 
 	}
-	
 	for(i=0;i<8;i++){
 		[self setNs100width:i withValue:126]; 
 		[self setNs20width:i withValue:32]; 
@@ -369,6 +428,37 @@ NSString* ORDCModelTac1trimChanged			= @"ORDCModelTac1trimChanged";
 		[self setTac0trim:i withValue:0]; 
 		[self setTac1trim:i withValue:0]; 
 	}
+}
+
+- (void) silentUpdateVt:(short)anIndex
+{
+    //rethink what really makes sense to set, the following doesn't
+    //we don't touch ecal, zero, and safety
+    //we tune corr and vt to make sense
+    
+    short vt_val;
+    //new vt value
+    vt_val = [self vt_ecal:anIndex] + [self vt_corr:anIndex];
+    if (vt_val < 0) {
+        vt_val = 0;
+    }
+    if (vt_val > 255) {
+        vt_val = 255;
+    }
+    //check we are safe
+    if (vt_val < [self vt_zero:anIndex] + [self vt_safety]) {
+        //do NOT set the corr to avoid dead-lock
+        //do not touch ecal values, increment the correction
+        vt_val = [self vt_zero:anIndex] + [self vt_safety];
+        if (vt_val < 0) {
+            vt_val = 0;
+        }
+        if (vt_val > 255) {
+            vt_val = 255;
+        }
+        _vt_corr[anIndex] = vt_val - [self vt_ecal:anIndex];
+    }
+    vt[anIndex] = (unsigned char) vt_val;
 }
 
 #pragma mark •••Archival
@@ -387,8 +477,14 @@ NSString* ORDCModelTac1trimChanged			= @"ORDCModelTac1trimChanged";
 		[self setVli:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"vli_%d",i]]];
 		[self setVsi:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"vsi_%d",i]]];
 	}
+	[self setVt_safety: [decoder decodeIntForKey:@"vt_safety"]];    
  	for(i=0;i<8;i++){
-		[self setVt:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"vt_%d",i]]];
+        //the order is important see silentUpdateVt
+		[self setVt_ecal:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"vt_ecal_%d",i]]];
+		[self setVt_zero:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"vt_zero_%d",i]]];
+		[self setVt_corr:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"vt_corr_%d",i]]];
+        [self silentUpdateVt:i];
+        
 		[self setNs100width:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"select100nsTrigger_%d",i]]];
 		[self setNs100width:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"ns100width_%d",i]]];
 		[self setNs20width:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"ns20width_%d",i]]];
@@ -410,6 +506,7 @@ NSString* ORDCModelTac1trimChanged			= @"ORDCModelTac1trimChanged";
 	[encoder encodeBool:showVolts	forKey:@"showVolts"];
 	[encoder encodeBool:setAllCmos	forKey:@"setAllCmos"];
 	[encoder encodeInt:cmosRegShown forKey:@"cmosRegShown"];
+    [encoder encodeInt:[self vt_safety] forKey:@"vt_safety"];
 	int i;
 	for(i=0;i<2;i++){
 		[encoder encodeInt:rp1[i] forKey:[NSString stringWithFormat:@"rp1_%d",i]];
@@ -418,7 +515,9 @@ NSString* ORDCModelTac1trimChanged			= @"ORDCModelTac1trimChanged";
 		[encoder encodeInt:vsi[i] forKey:[NSString stringWithFormat:@"vsi_%d",i]];
 	}
  	for(i=0;i<8;i++){
-		[encoder encodeInt:vt[i] forKey:[NSString stringWithFormat:@"vt_%d",i]];
+		[encoder encodeInt:[self vt_ecal:i] forKey:[NSString stringWithFormat:@"vt_ecal_%d",i]];
+		[encoder encodeInt:[self vt_zero:i] forKey:[NSString stringWithFormat:@"vt_zero_%d",i]];
+		[encoder encodeInt:[self vt_corr:i] forKey:[NSString stringWithFormat:@"vt_corr_%d",i]];
 		[encoder encodeInt:ns100width[i] forKey:[NSString stringWithFormat:@"ns100width_%d",i]];
 		[encoder encodeInt:ns20width[i] forKey:[NSString stringWithFormat:@"ns20width_%d",i]];
 		[encoder encodeInt:ns20delay[i] forKey:[NSString stringWithFormat:@"ns20delay_%d",i]];
@@ -452,6 +551,11 @@ NSString* ORDCModelTac1trimChanged			= @"ORDCModelTac1trimChanged";
 	return result;
 }
 
+- (void) setVtToHw
+{
+    //call xl3 initRegistersOnly
+    [[[[self guardian] guardian] adapter] initCrateRegistersOnly];
+}
 @end
 
 

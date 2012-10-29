@@ -356,7 +356,7 @@ NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageSt
     [[[self undoManager] prepareWithInvocationTarget:self] setOnlineMask:onlineMask];
     onlineMask = aMask;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORFecOnlineMaskChanged object:self];
-	
+	[[[self guardian] adapter] initCrateRegistersOnly];
 }
 
 - (int) globalCardNumber

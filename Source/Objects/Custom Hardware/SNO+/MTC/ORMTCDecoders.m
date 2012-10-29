@@ -92,7 +92,6 @@ mtcDateFormatter = _mtcDateFormatter;
 
 -(void)dealloc
 {
-    [[self baseDate] release];
     [[self mtcDateFormatter] release];
 	[super dealloc];
 }

@@ -52,11 +52,15 @@
 		[[vsiMatrix cellWithTag:i] setFormatter:valueFormatter];
 	}
 	for(i=0;i<8;i++){
-		[[vtMatrix cellWithTag:i] setFormatter:valueFormatter];
+		[[vt_ecalMatrix cellWithTag:i] setFormatter:valueFormatter];
+		[[vt_zeroMatrix cellWithTag:i] setFormatter:valueFormatter];
+		[[vt_corrMatrix cellWithTag:i] setFormatter:valueFormatter];
 	}
 	for(i=0;i<16;i++){
 		[[vbMatrix cellWithTag:i] setFormatter:valueFormatter];
 	}
+    
+    [imgView setFocusRingType:NSFocusRingTypeNone];
 	[super awakeFromNib];
 }
 
@@ -264,10 +268,16 @@
 
 - (void) vtChanged:(NSNotification*)aNote 
 {
+    [vtSaferyField setIntegerValue:[model vt_safety]];
 	int i;
 	for(i=0;i<8;i++){
+        [[vt_ecalMatrix cellWithTag:i] setIntegerValue:[model vt_ecal:i]];
+        [[vt_zeroMatrix cellWithTag:i] setIntegerValue:[model vt_zero:i]];
+        [[vt_corrMatrix cellWithTag:i] setIntegerValue:[model vt_corr:i]];
+        /*
 		if([model showVolts])	[[vtMatrix cellWithTag:i] setFloatValue:[model vtVoltage:i]];
 		else					[[vtMatrix cellWithTag:i] setIntValue:[model vt:i]];
+         */
 	}
 }
 
@@ -375,13 +385,79 @@
 	if([model showVolts])	[model setVsiVoltage:i withValue:[sender floatValue]];
 	else					[model setVsi:i withValue:[sender intValue]];
 }
- 
+
+- (IBAction) vt_ecalAction:(id)sender
+{
+    [[sender window] makeFirstResponder:imgView];
+    //todo: rethink the logic
+    //safety is done in model silentUpdateVt
+    int aVal;
+    aVal = [[sender selectedCell] integerValue];
+    if (aVal < 0) {
+        aVal = 0;
+    }
+    if (aVal > 255) {
+        aVal = 255;
+    }
+    [model setVt_ecal:[[sender selectedCell] tag] withValue:aVal];
+}
+
+- (IBAction) vt_corrAction:(id)sender
+{
+    [[sender window] makeFirstResponder:imgView];
+    //todo: rethink the logic
+    //safety is done in model silentUpdateVt
+    int aVal;
+    aVal = [[sender selectedCell] integerValue];
+    if (aVal < -255) { //zero==0, ecal==255, safety==0
+        aVal = -255;
+    }
+    if (aVal > 511) { //zero==255, ecal==0, safety==255
+        aVal = 511;
+    }
+    [model setVt_corr:[[sender selectedCell] tag] withValue:aVal];
+}
+
+- (IBAction) vtSetAction:(id)sender
+{
+    [self endEditing];
+    [model setVtToHw];
+}
+
+- (IBAction) vtZeroCorrAction:(id)sender
+{
+    [self endEditing];
+    //safety is done in model silentUpdateVt
+    unsigned short ch;
+    for (ch=0; ch<8; ch++) {
+        [model setVt_corr:ch withValue:0];
+    }
+}
+
+- (IBAction) vtSafetyAction:(id)sender
+{
+    [[sender window] makeFirstResponder:imgView];
+    //todo: rethink the logic
+    //safety is done in model silentUpdateVt
+    int aVal;
+    aVal = [[sender selectedCell] integerValue];
+    if (aVal < 0) {
+        aVal = 0;
+    }
+    if (aVal > 255) {
+        aVal = 255;
+    }
+    [model setVt_safety:aVal];
+}
+
+/*
 - (IBAction) vtAction:(id)sender
 {
 	int i = [[vtMatrix selectedCell] tag];
 	if([model showVolts])	[model setVtVoltage:i withValue:[sender floatValue]];
 	else					[model setVt:i withValue:[sender intValue]];
 }
+ */
  
 - (IBAction) vbAction:(id)sender
 {

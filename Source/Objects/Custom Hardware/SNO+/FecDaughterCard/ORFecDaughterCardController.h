@@ -24,12 +24,16 @@
 
 @interface ORFecDaughterCardController : OrcaObjectController  {
 	@private
+    IBOutlet NSImageView* imgView;
 		IBOutlet NSButton* setAllCmosButton;
 		IBOutlet NSMatrix* rp1Matrix;
 		IBOutlet NSMatrix* rp2Matrix;
 		IBOutlet NSMatrix* vliMatrix;
 		IBOutlet NSMatrix* vsiMatrix;
-		IBOutlet NSMatrix* vtMatrix;
+    IBOutlet NSMatrix* vt_ecalMatrix;
+    IBOutlet NSMatrix* vt_zeroMatrix;
+    IBOutlet NSMatrix* vt_corrMatrix;
+    IBOutlet NSTextField* vtSaferyField;
 		IBOutlet NSMatrix* vbMatrix;
 		IBOutlet NSTextField* ns100widthField;			   
 		IBOutlet NSTextField* ns20widthField; 
@@ -72,7 +76,6 @@
 - (void) boardIdChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
-- (IBAction) commentsTextFieldAction:(id)sender;
 - (IBAction) showVoltsAction:(id)sender;
 - (IBAction) setAllCmosAction:(id)sender;
 - (IBAction) incCmosRegAction:(id)sender;
@@ -83,8 +86,12 @@
 - (IBAction) rp2Action:(id)sender; 
 - (IBAction) vliAction:(id)sender; 
 - (IBAction) vsiAction:(id)sender; 
-- (IBAction) vtAction:(id)sender; 
-- (IBAction) vbAction:(id)sender; 	   
+- (IBAction) vt_ecalAction:(id)sender;
+- (IBAction) vt_corrAction:(id)sender;
+- (IBAction) vtSetAction:(id)sender;
+- (IBAction) vtZeroCorrAction:(id)sender;
+- (IBAction) vtSafetyAction:(id)sender;
+- (IBAction) vbAction:(id)sender;
 - (IBAction) ns100widthAction:(id)sender; 			   
 - (IBAction) ns20widthAction:(id)sender; 
 - (IBAction) ns20delayAction:(id)sender; 

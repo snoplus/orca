@@ -105,24 +105,24 @@ extern NSString* ORSNOPRequestHVStatus;
 @implementation ORXL3Model
 
 @synthesize
-    xl3MegaBundleDataId = _xl3MegaBundleDataId,
-    pmtBaseCurrentDataId = _pmtBaseCurrentDataId,
-    cmosRateDataId = _cmosRateDataId,
-    xl3FifoDataId = _xl3FifoDataId,
-    xl3HvDataId = _xl3HvDataId,
-    xl3VltDataId = _xl3VltDataId,
-    fecVltDataId = _fecVltDataId,
-    isPollingForced,
-    calcCMOSRatesFromCounts = _calcCMOSRatesFromCounts,
-    hvANextStepValue = _hvANextStepValue,
-    hvBNextStepValue = _hvBNextStepValue,
-    hvCMOSReadsCounter = _hvCMOSReadsCounter,
-    hvPanicFlag= _hvPanicFlag,
-    xl3LinkTimeOut = _xl3LinkTimeOut,
-    xl3InitInProgress = _xl3InitInProgress,
-    ecal_received = _ecal_received,
-    ecalToOrcaInProgress = _ecalToOrcaInProgress;
-
+xl3MegaBundleDataId = _xl3MegaBundleDataId,
+pmtBaseCurrentDataId = _pmtBaseCurrentDataId,
+cmosRateDataId = _cmosRateDataId,
+xl3FifoDataId = _xl3FifoDataId,
+xl3HvDataId = _xl3HvDataId,
+xl3VltDataId = _xl3VltDataId,
+fecVltDataId = _fecVltDataId,
+isPollingForced,
+calcCMOSRatesFromCounts = _calcCMOSRatesFromCounts,
+hvANextStepValue = _hvANextStepValue,
+hvBNextStepValue = _hvBNextStepValue,
+hvCMOSReadsCounter = _hvCMOSReadsCounter,
+hvPanicFlag= _hvPanicFlag,
+xl3LinkTimeOut = _xl3LinkTimeOut,
+xl3InitInProgress = _xl3InitInProgress,
+ecal_received = _ecal_received,
+ecalToOrcaInProgress = _ecalToOrcaInProgress,
+isTriggerON = _isTriggerON;
 
 #pragma mark •••Initialization
 - (id) init
@@ -956,7 +956,7 @@ void SwapLongBlock(void* p, int32_t n)
 
 }
 
-- (void) synthesizeDefaultsIntoBundle:(mb_t*)aBundle forSLot:(unsigned short)aSlot
+- (void) synthesizeDefaultsIntoBundle:(mb_t*)aBundle forSlot:(unsigned short)aSlot
 {
 	uint16_t s_mb_id[1] = {0x0000};
 	uint16_t s_dc_id[4] = {0x0000, 0x0000, 0x0000, 0x0000};
@@ -1071,8 +1071,65 @@ void SwapLongBlock(void* p, int32_t n)
 	aBundle->disable_mask = swapLong(aBundle->disable_mask);	
 }
 
-- (void) synthesizeFECIntoBundle:(mb_t*)aBundle forSLot:(unsigned short)aSlot
+- (void) synthesizeFECIntoBundle:(mb_t*)aBundle forSlot:(unsigned short)aSlot
 {
+
+    [self synthesizeDefaultsIntoBundle:aBundle forSlot:aSlot];
+
+    ORFec32Model* fec = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-aSlot];
+    if (!fec) {
+        return;
+    }
+
+    unsigned short i;
+    aBundle->mb_id = 0;
+    for (i=0; i<4; i++) {
+        aBundle->dc_id[i] = 0;
+    }
+
+    unsigned short dbNum;
+    for (dbNum=0; dbNum<4; dbNum++) {
+        if ([fec dcPresent:dbNum]) {
+            unsigned short channel;
+            
+            for (channel=0; channel<8; channel++) {
+                aBundle->vthr[dbNum*8+channel] = [[fec dc:dbNum] vt:channel];
+                aBundle->tcmos.tac_shift[dbNum*8+channel] = [[fec dc:dbNum] tac0trim:channel];
+                aBundle->scmos[dbNum*8+channel] = [[fec dc:dbNum] tac1trim:channel];
+
+                aBundle->tr100.mask[dbNum*8+channel] = 0; //be compatible with penn_daq, it's not used
+                aBundle->tr100.tdelay[dbNum*8+channel] = [[fec dc:dbNum] ns100width:channel];
+
+                aBundle->tr20.mask[dbNum*8+channel] = 0; //be compatible with penn_daq, it's not used
+                aBundle->tr20.tdelay[dbNum*8+channel] = [[fec dc:dbNum] ns20delay:channel];
+                aBundle->tr20.twidth[dbNum*8+channel] = [[fec dc:dbNum] ns20width:channel];
+
+                for (i=0; i<2; i++) {
+                    aBundle->vbal[i][dbNum*8+channel] = [[fec dc:dbNum] vb:i*8+channel];
+                }
+            }
+            
+            for (i=0; i<2; i++) {
+                aBundle->tdisc.rmp[dbNum*2+i] = [[fec dc:dbNum] rp2:i];
+                aBundle->tdisc.rmpup[dbNum*2+i] = [[fec dc:dbNum] rp1:i];
+                aBundle->tdisc.vsi[dbNum*2+i] = [[fec dc:dbNum] vsi:i];
+                aBundle->tdisc.vli[dbNum*2+i] = [[fec dc:dbNum] vli:i];
+            }
+        }
+    }
+
+    aBundle->vint = [fec vRes];
+    aBundle->hvref = [fec hVRef];
+    
+    //unsigned char	cmos[6];	//board related	0-ISETA1 1-ISETA0 2-ISETM1 3-ISETM0 4-TACREF 5-VMAX
+    aBundle->tcmos.iseta[1] = [fec cmos:0];
+    aBundle->tcmos.iseta[0] = [fec cmos:1];
+    aBundle->tcmos.isetm[1] = [fec cmos:2];
+    aBundle->tcmos.isetm[0] = [fec cmos:3];
+    aBundle->tcmos.tacref = [fec cmos:4];
+    aBundle->tcmos.vmax = [fec cmos:5];
+
+	aBundle->disable_mask = 0;
 }
 
 #pragma mark •••DataTaker
@@ -1271,15 +1328,15 @@ void SwapLongBlock(void* p, int32_t n)
 	if (xl3OpsRunning == nil) xl3OpsRunning = [[NSMutableDictionary alloc] init];
     [self setXl3InitInProgress:NO];
     //if (isPollingXl3 == YES) [self setIsPollingXl3:NO];
+    [self setIsTriggerON:YES];
+    [self setTriggerStatus:@"ON"];
 
-    //fill the safe bundle for first crate init, the pull the FEC and DB IDs
-    //fill the hw bundle, too; this allows triggers ON/OFF if debugDB fails
+    //fill the safe bundle for first crate init, then pull the FEC and DB IDs
     mb_t aConfigBundle;
     for (i=0; i<16; i++) {
         memset(&aConfigBundle, 0, sizeof(mb_t));
-        [self synthesizeDefaultsIntoBundle:&aConfigBundle forSLot:i];
+        [self synthesizeDefaultsIntoBundle:&aConfigBundle forSlot:i];
         memcpy(&safe_bundle[i], &aConfigBundle, sizeof(mb_t));
-        memcpy(&hw_bundle[i], &aConfigBundle, sizeof(mb_t));
     }
     
 	[[self undoManager] enableUndoRegistration];
@@ -1467,9 +1524,96 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (void) initCrateRegistersOnly
 {
+    if (![[self xl3Link] isConnected]) {
+        NSLog(@"%@ crate init ignored, xl3 is not connected.\n", [[self xl3Link] crateName]);
+    }
+    
     NSDictionary* argDict = [NSDictionary dictionaryWithObjectsAndKeys:
                              [NSNumber numberWithBool:YES], @"registersFlag",
                              nil];
+    
+    unsigned short slot;
+    unsigned short ch;
+    unsigned short dbNum;
+    
+    //config bundles
+    for (slot=0; slot<16; slot++) {
+        memset(&hw_bundle[slot], 0, sizeof(mb_t));
+        [self synthesizeFECIntoBundle:&hw_bundle[slot] forSlot:slot];
+        memcpy(&ui_bundle[slot], &hw_bundle[slot], sizeof(mb_t));
+    }
+    
+    //sequencer disable masks
+    unsigned long disableSeqMask[16];
+    for (slot=0; slot<16; slot++) {
+        ORFec32Model* fec = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-slot];
+        if (!fec) {
+            disableSeqMask[slot] = 0;
+        }
+        else {
+            disableSeqMask[slot] = [fec seqDisabledMask];
+        }
+    }
+    
+    //apply pmt online mask
+    for (slot=0; slot<16; slot++) {
+        ORFec32Model* fec = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-slot];
+        if (!fec) {
+            continue;
+        }
+
+        if ([fec onlineMask] != 0xffffffff) {
+            for (ch=0; ch<32; ch++) {
+                if (([fec onlineMask] & 0x1UL << ch) == 0) {
+                    //raise thresholds to max
+                    ui_bundle[slot].vthr[ch] = 0xff;
+                    //disable trigger
+                    ui_bundle[slot].tr100.tdelay[ch] &= ~0x40U;
+                    ui_bundle[slot].tr20.twidth[ch] &= ~0x20U;
+                    //disable sequencer
+                    disableSeqMask[slot] |= 0x1UL << ch;
+                }
+            }
+        }
+    }
+    
+    //apply relay mask
+    for (slot=0; slot<16; slot++) {
+        if (([self relayMask] & 0xf << slot) != 0xf) {
+            ORFec32Model* fec = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-slot];
+            if (!fec) {
+                continue;
+            }
+
+            for (dbNum=0; dbNum<4; dbNum++) {
+                if (([self relayMask] & 0x1ULL << (slot*4 + (3-dbNum))) == 0) {
+                    for (ch=0; ch<8; ch++) {
+                        //raise thresholds to max
+                        ui_bundle[slot].vthr[dbNum*8+ch] = 0xff;
+                        //disable trigger
+                        ui_bundle[slot].tr100.tdelay[dbNum*8+ch] &= ~0x40U;
+                        ui_bundle[slot].tr20.twidth[dbNum*8+ch] &= ~0x20U;
+                    }
+                    //disable sequencer
+                    disableSeqMask[slot] |= 0xffUL << (dbNum*8);
+                }
+            }
+        }
+    }
+        
+    //apply trigger mask
+    if ([self isTriggerON]) {
+        [self setTriggerStatus:@"ON"];
+    }
+    else {
+        for (slot=0; slot<16; slot++) {
+            for (ch=0; ch<32; ch++) {
+                ui_bundle[slot].tr100.tdelay[ch] &= ~0x40U;
+                ui_bundle[slot].tr20.twidth[ch] &= ~0x20U;
+            }
+        }
+        [self setTriggerStatus:@"OFF"];
+    }
 
     [self performSelector:@selector(initCrateWithDict:) withObject:argDict afterDelay:0];
 }
@@ -1484,11 +1628,14 @@ void SwapLongBlock(void* p, int32_t n)
     [self performSelector:@selector(initCrateWithDict:) withObject:argDict afterDelay:0];
     
     //these are safe inits, safe bundle is populated in initwithcoder for now
+    //do not touch UI/HW, leave ECAL there
+    /*
     unsigned short i;
     for (i=0; i<16; i++) {
         memcpy(&hw_bundle[i], &safe_bundle[i], sizeof(mb_t));
         memcpy(&ui_bundle[i], &safe_bundle[i], sizeof(mb_t));
     }
+     */
 }
 
 - (void) initCrateWithDict:(NSDictionary*)argDict
@@ -1526,9 +1673,14 @@ void SwapLongBlock(void* p, int32_t n)
         for (i=0; i<16; i++) {
             memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
             *aMbId = i;
-            //hack for now
-            memcpy(aConfigBundle, &ui_bundle[i], sizeof(mb_t));
-            //fix the safe_bundle init!!!
+            
+            if (registersFlag) {
+                memcpy(aConfigBundle, &ui_bundle[i], sizeof(mb_t));
+            }
+            else {
+                memcpy(aConfigBundle, &safe_bundle[i], sizeof(mb_t));
+            }
+
             if ([xl3Link needToSwap]) {
                 *aMbId = swapLong(*aMbId);
                 [self byteSwapBundle:aConfigBundle];
@@ -1659,7 +1811,7 @@ void SwapLongBlock(void* p, int32_t n)
                                 @"%@ didn't receive all the ECAL documents.\nMissing slots: ", [[self xl3Link] crateName]];
 
         unsigned short slot;
-        NSLog(@"ecal_received mask: 0x%08x\n", [self ecal_received]);
+        //NSLog(@"ecal_received mask: 0x%08x\n", [self ecal_received]);
         for (slot=0; slot<16; slot++) {
             if (!([self ecal_received] & 0x1UL << slot)) {
                 [msg appendFormat:@"%d, ", slot];
@@ -1672,11 +1824,6 @@ void SwapLongBlock(void* p, int32_t n)
     }
     else {
         NSLog(@"%@ received all the ECAL documents requested.\n", [[self xl3Link] crateName]);
-        unsigned short slot;
-        for (slot=0; slot<16; slot++) {
-            memcpy(&hw_bundle[slot], &ecal_bundle[slot], sizeof(mb_t));
-            memcpy(&ui_bundle[slot], &ecal_bundle[slot], sizeof(mb_t));
-        }
         NSLog(@"%@ updated ORCA with ECAL data.\n", [[self xl3Link] crateName]);
     }
     
@@ -1706,7 +1853,6 @@ void SwapLongBlock(void* p, int32_t n)
         NSLog(@"%@ error parsing ECAL document, the hw dictionary missing for slot: %d\n",
               [[self xl3Link] crateName], slot_num);
         return;
-        
     }
 
     mb_t aConfigBundle;
@@ -1766,16 +1912,90 @@ void SwapLongBlock(void* p, int32_t n)
 	aConfigBundle.disable_mask = 0;
 
     memcpy(&ecal_bundle[slot_num], &aConfigBundle, sizeof(mb_t));
+    [self updateUIFromEcalBundle:hwDic slot:slot_num];
+    [self synthesizeFECIntoBundle:&hw_bundle[slot_num] forSlot:slot_num];
     
     [self setEcal_received:[self ecal_received] | 1UL << slot_num];
     //NSLog(@"ecal received mask: 0x%08x\n", [self ecal_received]);
     if ([self ecal_received] == 0xffffUL) {
         [self ecalToOrcaDocumentsReceived];
+    }    
+}
+
+//todo give links to debugDB documents
+- (void) updateUIFromEcalBundle:(NSDictionary*)hwDic slot:(unsigned int)aSlot;
+{
+    ORFec32Model* fec = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-aSlot];
+    if (!fec) {
+        return;
     }
     
-//    for(id key in ecalDoc)
-//        NSLog(@"ecalDoc key=%@ value=%@\n", key, [ecalDoc objectForKey:key]);
+    unsigned short dbNum;
+    for (dbNum=0; dbNum<4; dbNum++) {
+        if (![fec dcPresent:dbNum]) {
+            NSLog(@"@% FEC %d DB %d NOT updated from ECAL, it's missing\n", [[self xl3Link] crateName], aSlot, dbNum);
+        }
+    }
     
+    for (dbNum=0; dbNum<4; dbNum++) {
+        if ([fec dcPresent:dbNum]) {
+            unsigned short channel;
+            unsigned short itg;
+
+            for (channel=0; channel<8; channel++) {
+                [[fec dc:dbNum] setVt_ecal:channel
+                                 withValue:[[[hwDic objectForKey:@"vthr"] objectAtIndex:dbNum*8+channel] intValue]];
+                [[fec dc:dbNum] setVt_zero:channel
+                                 withValue:[[[hwDic objectForKey:@"vthr_zero"] objectAtIndex:dbNum*8+channel] intValue]];
+
+                [[fec dc:dbNum] setTac0trim:channel
+                                  withValue:[[[[hwDic objectForKey:@"tcmos"] objectForKey:@"tac_trim"] objectAtIndex:dbNum*8+channel] intValue]];
+
+                [[fec dc:dbNum] setTac1trim:channel
+                                  withValue:[[[[hwDic objectForKey:@"tr20"] objectForKey:@"scmos"] objectAtIndex:dbNum*8+channel] intValue]];
+                
+                for (itg=0; itg<2; itg++) {
+                    [[fec dc:dbNum] setVb:itg*8+channel
+                                withValue:[[[[hwDic objectForKey:@"vbal"] objectAtIndex:itg] objectAtIndex:dbNum*8+channel] intValue]];
+                }
+                
+                [[fec dc:dbNum] setNs100width:channel
+                                    withValue:[[[[hwDic objectForKey:@"tr100"] objectForKey:@"delay"] objectAtIndex:dbNum*8+channel] intValue]];
+
+                [[fec dc:dbNum] setNs20width:channel
+                                    withValue:[[[[hwDic objectForKey:@"tr20"] objectForKey:@"width"] objectAtIndex:dbNum*8+channel] intValue]];
+
+                [[fec dc:dbNum] setNs20delay:channel
+                                   withValue:[[[[hwDic objectForKey:@"tr20"] objectForKey:@"delay"] objectAtIndex:dbNum*8+channel] intValue]];
+            }
+            
+            for (itg=0; itg<2; itg++) {
+                [[fec dc:dbNum] setRp2:itg
+                             withValue:[[[[hwDic objectForKey:@"tdisc"] objectForKey:@"rmp"] objectAtIndex:dbNum*2+itg] intValue]];
+
+                [[fec dc:dbNum] setRp1:itg
+                             withValue:[[[[hwDic objectForKey:@"tdisc"] objectForKey:@"rmpup"] objectAtIndex:dbNum*2+itg] intValue]];
+                
+                [[fec dc:dbNum] setVli:itg
+                             withValue:[[[[hwDic objectForKey:@"tdisc"] objectForKey:@"vli"] objectAtIndex:dbNum*2+itg] intValue]];
+
+                [[fec dc:dbNum] setVsi:itg
+                             withValue:[[[[hwDic objectForKey:@"tdisc"] objectForKey:@"vsi"] objectAtIndex:dbNum*2+itg] intValue]];
+                
+            }            
+        }
+    }
+    
+    [fec setVRes:[[hwDic objectForKey:@"vint"] intValue]];
+    [fec setHVRef:[[hwDic objectForKey:@"hvref"] intValue]];
+
+    //unsigned char	cmos[6];	//board related	0-ISETA1 1-ISETA0 2-ISETM1 3-ISETM0 4-TACREF 5-VMAX
+    [fec setCmos:0 withValue:[[[[hwDic objectForKey:@"tcmos"] objectForKey:@"iseta"] objectAtIndex:1] intValue]];
+    [fec setCmos:1 withValue:[[[[hwDic objectForKey:@"tcmos"] objectForKey:@"iseta"] objectAtIndex:0] intValue]];
+    [fec setCmos:2 withValue:[[[[hwDic objectForKey:@"tcmos"] objectForKey:@"isetm"] objectAtIndex:1] intValue]];
+    [fec setCmos:3 withValue:[[[[hwDic objectForKey:@"tcmos"] objectForKey:@"isetm"] objectAtIndex:0] intValue]];
+    [fec setCmos:4 withValue:[[[hwDic objectForKey:@"tcmos"] objectForKey:@"vtacref"] intValue]];
+    [fec setCmos:5 withValue:[[[hwDic objectForKey:@"tcmos"] objectForKey:@"vmax"] intValue]];
 }
 
 - (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp
@@ -2976,6 +3196,7 @@ void SwapLongBlock(void* p, int32_t n)
     
     @try {
         [self setHVRelays:aRelayMask error:&error];
+        [self initCrateRegistersOnly];
     }
     @catch (NSException *exception) {
         ;
@@ -3251,36 +3472,24 @@ void SwapLongBlock(void* p, int32_t n)
 - (void) hvTriggersON
 {
     if ([[self xl3Link] isConnected]) {
-        unsigned short i;
-        unsigned short ch;
-        for (i=0; i<16; i++) {
-            for (ch=0; ch<32; ch++) {
-                ui_bundle[i].tr100.tdelay[ch] = hw_bundle[i].tr100.tdelay[ch];
-                ui_bundle[i].tr20.twidth[ch] = hw_bundle[i].tr20.twidth[ch];
-            }
-        }
-        [self setTriggerStatus:@"ON"];
+        [self setIsTriggerON:YES];
         [self initCrateRegistersOnly];
         NSLog(@"%@ triggers ON\n", [[self xl3Link] crateName]);
+    }
+    else {
+        NSLog(@"%@ triggers ON ignored, xl3 is not connected.\n", [[self xl3Link] crateName]);
     }
 }
 
 - (void) hvTriggersOFF
 {
     if ([[self xl3Link] isConnected]) {
-        unsigned short i;
-        unsigned short ch;
-        for (i=0; i<16; i++) {
-            for (ch=0; ch<32; ch++) {
-                ui_bundle[i].tr100.tdelay[ch] &= ~0x40U;
-                ui_bundle[i].tr20.twidth[ch] &= ~0x20U;
-                //ui_bundle[i].tr100.tdelay[ch] = 0;
-                //ui_bundle[i].tr20.twidth[ch] = 0;
-            }
-        }
+        [self setIsTriggerON:NO];
         [self initCrateRegistersOnly];
-        [self setTriggerStatus:@"OFF"];
         NSLog(@"%@ triggers OFF\n", [[self xl3Link] crateName]);
+    }
+    else {
+        NSLog(@"%@ triggers ON ignored, crate is not connected.\n", [[self xl3Link] crateName]);
     }
 }
 
@@ -4176,11 +4385,14 @@ void SwapLongBlock(void* p, int32_t n)
                                 [[anObj dc:i] setBoardID:[NSString stringWithFormat:@"%x", ids->dc_id[i]]];
                             }
                             else {
+                                //do not remove anymore, init failure is more likely then the DB really missing
+                                /*
                                 if ([anObj dcPresent:i]) {
                                     ORFecDaughterCardModel* theCard = [[OROrderedObjManager for:anObj] objectInSlot:i];
                                     if (theCard) [anObj removeObject:theCard];
                                     NSLog(@"slot %2d DB %d has BAD ID and was removed.\n", [anObj stationNumber], i);
                                 }
+                                 */
                             }
                         }
                         [msg appendFormat:@"slot: %2d, FEC: %4x, DB0: %4x, DB1: %4x, DB2: %4x, DB3: %4x\n",
