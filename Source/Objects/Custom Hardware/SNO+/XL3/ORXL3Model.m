@@ -1617,26 +1617,52 @@ void SwapLongBlock(void* p, int32_t n)
     }
 
     //write sequencer mask:
-    for (slot=0; slot<16; slot++) {
-        ORFec32Model* fec = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-slot];
-        if (!fec) {
-            continue;
-        }
-
-        unsigned long aValue = disableSeqMask[slot];
-        unsigned long xl3Address = FEC_SEL * slot | 0x90 | WRITE_REG; //CMOS CHIP DIS
-        
-        @try {
-            [xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
-        }
-        @catch (NSException* e) {
-            NSLog(@"%@ sequencer update failed; error: %@ reason: %@\n",
-                  [[self xl3Link] crateName], [e name], [e reason]);
-            return;
-        }
-    }
-    NSLog(@"%@ sequencer mask updated.\n", [[self xl3Link] crateName]);
+    BOOL runInProgress = [gOrcaGlobals runInProgress];
     
+    if (!runInProgress) {
+
+        unsigned int oldMode = [self xl3Mode];
+        [self setXl3Mode:1];
+        [self writeXl3Mode];
+
+        for (slot=0; slot<16; slot++) {
+            ORFec32Model* fec = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-slot];
+            if (!fec) {
+                continue;
+            }
+
+            unsigned long aValue = disableSeqMask[slot];
+            unsigned long xl3Address = FEC_SEL * slot | 0x90 | WRITE_REG; //CMOS CHIP DIS
+            
+            
+            @try {
+                
+                aValue = disableSeqMask[slot];
+                xl3Address = FEC_SEL * slot | 0x90 | WRITE_REG; //CMOS CHIP DIS
+                [xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
+
+                aValue = 0x6;
+                xl3Address = FEC_SEL * slot | 0x20 | WRITE_REG; //FEC CSR
+                [xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
+
+                aValue = 0x0;
+                [xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
+
+                aValue = [self crateNumber] << 11;
+                [xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
+
+            }
+            @catch (NSException* e) {
+                NSLog(@"%@ sequencer update failed; error: %@ reason: %@\n",
+                      [[self xl3Link] crateName], [e name], [e reason]);
+                return;
+            }
+        }
+        [self setXl3Mode:oldMode];
+        [self writeXl3Mode];
+
+        NSLog(@"%@ sequencer mask updated.\n", [[self xl3Link] crateName]);
+    }
     [self performSelector:@selector(initCrateWithDict:) withObject:argDict afterDelay:0];
 }
 
