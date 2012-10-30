@@ -403,6 +403,7 @@
         int i = [[[aNote userInfo] objectForKey:@"Pin"] intValue];
         [[pinTypeMatrix cellAtRow:i column:0] selectItemAtIndex:[model pinType:i]];
     }
+	[pinTypeMatrix setNeedsDisplay:YES];
 	[self updateButtons];
 }
 

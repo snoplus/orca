@@ -113,6 +113,7 @@
 - (void) writeAllOutputs:(unsigned short)aMask;
 - (void) readAdcValues;
 - (void) readInputPins;
+- (void) deferredFirstAction;
 
 #pragma mark •••Adc Processing Protocol
 - (void) processIsStarting;
