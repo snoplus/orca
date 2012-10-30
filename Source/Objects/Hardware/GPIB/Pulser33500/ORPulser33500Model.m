@@ -250,12 +250,12 @@ NSString* ORPulser33500Lock							= @"ORPulser33500Lock";
 
 - (unsigned long) vendorID
 {
-	return 0x0957;   //<<<-----needs to be be fixed with the correct value
+	return 0x0957;
 }
 
 - (unsigned long) productID
 {
-	return 0x0407;  //<<<-----needs to be be fixed with the correct value
+	return 0x2307;
 }
 
 - (id) getUSBController
