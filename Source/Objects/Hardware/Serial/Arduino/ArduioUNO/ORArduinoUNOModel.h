@@ -20,6 +20,8 @@
 #import "ORBitProcessing.h"
 #import "ORAdcProcessing.h"
 
+#define  kSketchVerion		 1.00
+
 #define kNumArduinoUNOAdcChannels	6
 #define kNumArduinoUNOPins			14 //first two are serial lines
 
@@ -43,21 +45,24 @@
 		//process stuff
 		unsigned int	oldProcessOutMask;
 		unsigned int	processOutMask;
-		float             lowLimit[kNumArduinoUNOAdcChannels];
-		float             hiLimit[kNumArduinoUNOAdcChannels];
-		float             minValue[kNumArduinoUNOAdcChannels];
-		float             maxValue[kNumArduinoUNOAdcChannels];
-		float             slope[kNumArduinoUNOAdcChannels];
-		float             intercept[kNumArduinoUNOAdcChannels];
+		float           lowLimit[kNumArduinoUNOAdcChannels];
+		float           hiLimit[kNumArduinoUNOAdcChannels];
+		float           minValue[kNumArduinoUNOAdcChannels];
+		float           maxValue[kNumArduinoUNOAdcChannels];
+		float           slope[kNumArduinoUNOAdcChannels];
+		float           intercept[kNumArduinoUNOAdcChannels];
+		float			sketchVersion;
 }
 
 #pragma mark •••Initialization
 - (void) dealloc;
 
 #pragma mark •••Accessors
+- (float) sketchVersion;
+- (void) setSketchVersion:(float)aVersion;
 - (int)  pollTime;
 - (void) setPollTime:(int)aPollTime;
-- (float)  adc:(unsigned short)aChan;
+- (float)adc:(unsigned short)aChan;
 - (void) setAdc:(unsigned short)aChan withValue:(float)aValue;
 
 - (NSString*) pinName:(int)i;
@@ -94,6 +99,7 @@
 - (float) maxValue:(int)i;
 - (void)  setMaxValue:(int)i value:(float)aValue;
 - (int) numberCommandsInQueue;
+- (void) getVersion;
 
 #pragma mark •••Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
@@ -125,6 +131,7 @@
 - (NSString*) processingTitle;
 @end
 
+extern NSString* ORArduinoUNOModelVersionChanged;
 extern NSString* ORArduinoUNOLock;
 extern NSString* ORArduinoUNOModelPollTimeChanged;
 extern NSString* ORArduinoUNOModelAdcChanged;

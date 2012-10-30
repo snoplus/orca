@@ -23,6 +23,7 @@
 #import "ORProcessModel.h"
 
 #pragma mark •••External Strings
+NSString* ORArduinoUNOModelVersionChanged	= @"ORArduinoUNOModelVersionChanged";
 NSString* ORArduinoUNOLock					= @"ORArduinoUNOLock";
 NSString* ORArduinoUNOModelPollTimeChanged	= @"ORArduinoUNOModelPollTimeChanged";
 NSString* ORArduinoUNOModelAdcChanged		= @"ORArduinoUNOModelAdcChanged";
@@ -37,6 +38,18 @@ NSString* ORArduinoUNOSlopeChanged			= @"ORArduinoUNOSlopeChanged";
 NSString* ORArduinoUNOInterceptChanged		= @"ORArduinoUNOInterceptChanged";
 NSString* ORArduinoUNOMinValueChanged		= @"ORArduinoUNOMinValueChanged";
 NSString* ORArduinoUNOMaxValueChanged		= @"ORArduinoUNOMaxValueChanged";
+
+
+#define  kCmdVersion       1  //ask for software version
+#define  kCmdReadAdcs      2  //2;             --read all adcs
+#define  kCmdReadInputs    3  //3,mask;        --read input pins using mask
+#define  kCmdWriteAnalog   4  //4,pin,value;   --set pin pwm to value
+#define  kCmdWriteOutput   5  //5,pin,value;   --set output pin to value
+#define  kCmdWriteOutputs  6  //6,typeMask,ValueMask;        --set outputs based on mask
+
+//Responses
+#define  kInputsChanged    20	//unsolicited input changed
+#define  kUnKnownCmd       99	//Arduino got an unknown command
 
 @interface ORArduinoUNOModel (private)
 - (void)	clearDelay;
@@ -102,6 +115,18 @@ NSString* ORArduinoUNOMaxValueChanged		= @"ORArduinoUNOMaxValueChanged";
 
 #pragma mark •••Accessors
 
+- (float) sketchVersion
+{
+    return sketchVersion;
+}
+
+- (void) setSketchVersion:(float)aVersion
+{
+    sketchVersion = aVersion;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORArduinoUNOModelVersionChanged object:self];
+}
+
 - (BOOL) validForPwm:(unsigned short)aPin
 {
 	switch(aPin){
@@ -161,6 +186,7 @@ NSString* ORArduinoUNOMaxValueChanged		= @"ORArduinoUNOMaxValueChanged";
 {
 	[cmdQueue removeAllObjects];
 	[self setLastRequest:nil];			 //clear the last request
+	[self getVersion];
 	[self initHardware];
 	[self pollHardware];
 }
@@ -331,9 +357,6 @@ NSString* ORArduinoUNOMaxValueChanged		= @"ORArduinoUNOMaxValueChanged";
 	int i;
 	for(i=0;i<kNumArduinoUNOAdcChannels;i++) {
 		[encoder encodeObject:pinName[i] forKey:[NSString stringWithFormat:@"pinName%d",i]];
-		[encoder encodeInt:pinStateOut[i] forKey:[NSString stringWithFormat:@"pinStateOut%d",i]];
-		[encoder encodeInt:pinType[i] forKey:[NSString stringWithFormat:@"PinType%d",i]];
-		[encoder encodeInt:pwm[i] forKey:[NSString stringWithFormat:@"PinPwm%d",i]];
 	}
 	for(i=0;i<kNumArduinoUNOPins;i++) {
 		[encoder encodeInt:pinStateOut[i] forKey:[NSString stringWithFormat:@"pinStateOut%d",i]];
@@ -472,7 +495,7 @@ NSString* ORArduinoUNOMaxValueChanged		= @"ORArduinoUNOMaxValueChanged";
 {
 	if(aPin>=2 && aPin < kNumArduinoUNOPins){
 		if(pinType[aPin] == kArduinoOutput){
-			NSString* cmd = [NSString stringWithFormat:@"w d %d %d",aPin,aState];
+			NSString* cmd = [NSString stringWithFormat:@"%d,%d,%d;",kCmdWriteOutput,aPin,aState];
 			[self enqueCmdString:cmd];
 			[[self undoManager] disableUndoRegistration];
 			[self setPin:aPin stateOut:aState];
@@ -490,7 +513,7 @@ NSString* ORArduinoUNOMaxValueChanged		= @"ORArduinoUNOMaxValueChanged";
 		for(i=2;i<kNumArduinoUNOPins;i++){
 			if(pinType[i] == kArduinoOutput)typeMask |= (1<<i);
 		}
-		NSString* cmd = [NSString stringWithFormat:@"w m %d %d",typeMask,aMask];
+		NSString* cmd = [NSString stringWithFormat:@"%d,%d,%d;",kCmdWriteOutputs,typeMask,aMask];
 		[self enqueCmdString:cmd];
 
 	}
@@ -498,12 +521,18 @@ NSString* ORArduinoUNOMaxValueChanged		= @"ORArduinoUNOMaxValueChanged";
 
 - (void) readAdcValues
 {
-	[self enqueCmdString:@"r a"];
+	[self enqueCmdString:[NSString stringWithFormat:@"%d;",kCmdReadAdcs]];
 }
 
 - (void) readInputPins
 {
-	NSString* cmd = [NSString stringWithFormat:@"r d %d",[self inputMask]];
+	NSString* cmd = [NSString stringWithFormat:@"%d,%d;",kCmdReadInputs,[self inputMask]];
+	[self enqueCmdString:cmd];
+}
+
+- (void) getVersion
+{
+	NSString* cmd = [NSString stringWithFormat:@"%d;",kCmdVersion];
 	[self enqueCmdString:cmd];
 }
 
@@ -523,7 +552,7 @@ NSString* ORArduinoUNOMaxValueChanged		= @"ORArduinoUNOMaxValueChanged";
 	
 	for(i=2;i<kNumArduinoUNOPins;i++){
 		if(pinType[i] == kArduinoPWM){
-			NSString* cmd = [NSString stringWithFormat:@"w a %d %d",i,pwm[i]];
+			NSString* cmd = [NSString stringWithFormat:@"%d,%d,%d;",kCmdWriteAnalog,i,pwm[i]];
 			[self enqueCmdString:cmd];
 		}
 	}
@@ -546,7 +575,6 @@ NSString* ORArduinoUNOMaxValueChanged		= @"ORArduinoUNOMaxValueChanged";
 - (void) updateAll
 {
 	[self readAdcValues];
-	[self readInputPins];
 }
 
 
@@ -719,16 +747,16 @@ NSString* ORArduinoUNOMaxValueChanged		= @"ORArduinoUNOMaxValueChanged";
 	NSArray* parts = [aCommand componentsSeparatedByString:@" "];
 	BOOL unsolicited = NO;
 	if([parts count] >= 1){
-		if([[parts objectAtIndex:0] isEqualToString:@"a"]){
+		if([[parts objectAtIndex:0]intValue] == kCmdReadAdcs){
 			if([parts count] >= kNumArduinoUNOAdcChannels+1){
 				int i;
 				for(i=0;i<kNumArduinoUNOAdcChannels;i++){
-					float adcValue = [[parts objectAtIndex:1+i] floatValue] * 5.0/1023.;
+					float adcValue = [[parts objectAtIndex:1+i] intValue] * 5.0/1023.;
 					[self setAdc:i withValue:adcValue];
 				}
 			}
 		}
-		else if([[parts objectAtIndex:0] isEqualToString:@"d"]){
+		else if([[parts objectAtIndex:0]intValue] ==  kCmdReadInputs){
 			if([parts count] >= kNumArduinoUNOAdcChannels+1){
 				int i;
 				for(i=0;i<kNumArduinoUNOPins;i++){
@@ -737,8 +765,8 @@ NSString* ORArduinoUNOMaxValueChanged		= @"ORArduinoUNOMaxValueChanged";
 				}
 			}
 		}
-		else if([[parts objectAtIndex:0] isEqualToString:@"i"]){
-			//unsolicited incomming string "i hiPinMask"
+		else if([[parts objectAtIndex:0]intValue] == kInputsChanged){
+			//unsolicited incomming input changed"
 			unsolicited = YES;
 			if([parts count] >= 2){
 				unsigned int hiMask = [[parts objectAtIndex:1] unsignedIntValue];
@@ -749,7 +777,7 @@ NSString* ORArduinoUNOMaxValueChanged		= @"ORArduinoUNOMaxValueChanged";
 				}
 			}
 		}
-		else if([[parts objectAtIndex:0] isEqualToString:@"m"]){
+		else if([[parts objectAtIndex:0]intValue] == kCmdWriteOutputs){
 			[[self undoManager] disableUndoRegistration];
 			if([parts count] >= 2){
 				unsigned int outputMask = [[parts objectAtIndex:1] unsignedIntValue];
@@ -761,7 +789,20 @@ NSString* ORArduinoUNOMaxValueChanged		= @"ORArduinoUNOMaxValueChanged";
 			}
 			[[self undoManager] enableUndoRegistration];
 		}
-		
+		else if([[parts objectAtIndex:0]intValue] == kCmdVersion){
+			if([parts count] >= 2){
+				[self setSketchVersion:[[parts objectAtIndex:1] floatValue]];
+				if(sketchVersion != kSketchVerion){
+					NSLogColor([NSColor redColor],@"%@ Running Sketch Version: %.2f -- should be version: %.2f\n",[self fullID],sketchVersion,kSketchVerion);
+				}
+			}	
+		}
+		else if([[parts objectAtIndex:0]intValue] == kUnKnownCmd){
+			NSLogError(@"Unknown Cmd",@"ArduinoUNO",nil);
+			[cmdQueue removeAllObjects];
+			[self setLastRequest:nil];			 //clear the last request
+		}
+
 		if(lastRequest && !unsolicited){
 			[self setLastRequest:nil];			 //clear the last request
 			[self processOneCommandFromQueue];	 //do the next command in the queue

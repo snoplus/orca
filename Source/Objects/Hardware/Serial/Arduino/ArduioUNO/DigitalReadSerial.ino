@@ -1,43 +1,125 @@
+// This example demonstrates CmdMessenger's callback  & attach methods
+// For Arduino Uno and Arduino Duemilanove board (may work with other)
 
-/* 
- Control Arduino board functions with the following messages:
- 
- r a                 -> read analog pins
- r d [mask]          -> read digital pins, mask used to restrict reads to input pins
- w d [pin] [value]   -> write digital pin
- w a [pin] [value]   -> write analog pin
- w m [mask] [vMask   -> write all digital pins using mask
- 
- //reponses
- a [adc0] [adc1] [adc2] [adc3] [adc4] [adc5]   -> from read analog
- d [pin2] [pin3] ... [pin13]                   -> from read digital
- 
- //unsolicited responses
- i [Hiinputs]               ->mask containing hi pins  
- 
- Base: Thomas Ouellet Fredericks 
- Additions: Adapted for use in ORCA by Mark Howe (UNC Physics Deptpartment) 
- */
+// Download these into your Sketches/libraries/ folder...
 
-#include <SimpleMessageSystem.h> 
+#include <CmdMessenger.h> //https://github.com/dreamcat4/cmdmessenger
+#include <Streaming.h>    //http://arduiniana.org/libraries/streaming/
 
+char field_separator      = ',';
+char command_separator    = ';';
 unsigned short inputMask  = 0x0; 
-unsigned short oldInputs = 0;
+unsigned short oldInputs  = 0x0;
 
-void setup()
+// Attach a new CmdMessenger object to the default Serial port
+CmdMessenger cmdMessenger = CmdMessenger(Serial, field_separator, command_separator);
+
+//Commands
+short kCmdVerison      = 1;  //1;
+short kCmdReadAdcs     = 2;  //2;             --read all adcs
+short kCmdReadInputs   = 3;  //3,mask;        --read input pins using mask
+short kCmdWriteAnalog  = 4;  //4,pin,value;   --set pin pwm to value
+short kCmdWriteOutput  = 5;  //5,pin,value;   --set output pin to value
+short kCmdWriteOutputs = 6;  //6,mask;        --set outputs based on mask
+
+//Responses
+short kInputsChanged   = 20;
+short kUnKnownCmd      = 99;
+
+float kSketchVersion = 1.0; //change whenever command formats change
+
+// ------------------ C A L L B A C K  M E T H O D S -------------------------
+void readAnalogValues()
 {
-  Serial.begin(57600); 
+    Serial<<2;
+    for(char i=0;i<6;i++) Serial << "," << analogRead(i);
+    Serial<< "\n\r";
 }
 
-void loop()
+void readInputPins()
 {
-  if (messageBuild() > 0) { // Checks ifmessage is complete and erase any previous message
-    switch (messageGetChar()) { 
-      case 'r': readpins(); break; 
-      case 'w': writepin(); break;
+    inputMask = cmdMessenger.readInt();
+    Serial << kCmdReadInputs;
+    for (char i=0;i<14;i++) {
+      if(inputMask & (1<<i)) {
+        if(i>=2){
+           pinMode(i, INPUT_PULLUP);
+           Serial << "," << digitalRead(i);
+        }
+        else Serial<<",0"; //return 0 for the serial lines
+      }
+      else   Serial<<",0";
     }
-  }
+    Serial<<"\n\r";
+}
+void writeOutputPin()
+{
+      char pin   = cmdMessenger.readInt();  
+      char state = cmdMessenger.readInt();
+      if(pin>=2 && (~inputMask & (1<<pin))){
+         pinMode(pin,OUTPUT);  
+         if( state)  digitalWrite(pin,HIGH);
+         else        digitalWrite(pin,LOW);
+      }
+      Serial<< kCmdWriteOutput << "," << pin << "," << state << "\n\r";
+}
   
+
+void writeOutputs()
+{
+    char pin;
+    short outputTypeMask  = cmdMessenger.readInt() & ~inputMask; //don't write inputs
+    short writeMask       = cmdMessenger.readInt() & ~inputMask;  
+    if(outputTypeMask){
+      for(pin=2;pin<14;pin++){
+        if(outputTypeMask & (1<<pin)){
+           pinMode(pin,OUTPUT);
+           if( writeMask & (1<<pin))  digitalWrite(pin,HIGH);
+           else                       digitalWrite(pin,LOW);
+        }
+      }
+    }
+    else writeMask = 0;
+    //echo the command back
+    Serial << kCmdWriteOutputs << "," << outputTypeMask << "," << writeMask << "\n\r";
+}
+
+void writeAnalog()
+{
+     char pin   = cmdMessenger.readInt(); 
+     char state = cmdMessenger.readInt();
+      if(pin>=2 && (~inputMask & (1<<pin))){
+        pinMode(pin, OUTPUT);
+        analogWrite(pin, state); //Sets the PWM value of the pin 
+      }
+      //echo the command back
+      Serial<< kCmdWriteAnalog << "," << pin << "," << state << "\n\r";
+}
+
+void sketchVersion()  { Serial << kCmdVerison<<","<< kSketchVersion << "\n\r";   }
+void unKnownCmd()     { Serial << kUnKnownCmd << "\n\r";  }
+
+// ------------------ E N D  C A L L B A C K  M E T H O D S ------------------
+
+void setup() 
+{
+  Serial.begin(57600); // Arduino Uno, Mega, with AT8u2 USB
+
+  cmdMessenger.print_LF_CR();   // Make output more readable whilst debugging in Arduino Serial Monitor
+  cmdMessenger.attach(kCmdVerison,     sketchVersion);
+  cmdMessenger.attach(kCmdReadAdcs,    readAnalogValues);
+  cmdMessenger.attach(kCmdReadInputs,  readInputPins);
+  cmdMessenger.attach(kCmdWriteAnalog, writeAnalog);
+  cmdMessenger.attach(kCmdWriteOutput, writeOutputPin);
+  cmdMessenger.attach(kCmdWriteOutputs,writeOutputs);
+
+  cmdMessenger.attach(unKnownCmd);
+}
+
+void loop() 
+{
+  cmdMessenger.feedinSerialData(); //process incoming commands
+
   if(inputMask){
       unsigned short inputs = 0;
       if(inputMask){
@@ -48,96 +130,14 @@ void loop()
         }
         if(inputs != oldInputs){
           oldInputs = inputs;
-          messageSendChar('i');
-          messageSendInt(inputs);
-          messageEnd();
+          Serial << kInputsChanged << "," << inputs <<  "\n\r";
         }
       }
   }
 }
 
-void readpins()
-{ 
-  switch (messageGetChar()) { 
-    case 'd': //READ digital pins
-       inputMask = messageGetInt();
-       messageSendChar('d');
-       for (char i=0;i<14;i++) {
-          if(inputMask & (1<<i)) {
-            if(i>=2){
-               pinMode(i, INPUT_PULLUP);
-               messageSendInt(digitalRead(i)); // Read pins 2 to 13
-            }
-            else messageSendInt(0); //return 0 for the serial lines
-          }
-          else   messageSendInt(0);
-      }
-      messageEnd(); // Terminate the message being sent
-    break; // Break from the switch
-
-    case 'a': // READ analog pins
-      messageSendChar('a');
-      for (char i=0;i<6;i++) {
-        messageSendInt(analogRead(i));
-      }
-      messageEnd();
-    break;
-  }
-}
-
-void writepin() 
-{ 
-  int pin;
-  int state;
-
-  switch (messageGetChar()) { // Gets the next word as a character
-    case 'a': // WRITE an analog pin
-      pin   = messageGetInt(); 
-      state = messageGetInt();
-      if(pin>=2 && (~inputMask & (1<<pin))){
-        pinMode(pin, OUTPUT);
-        analogWrite(pin, state); //Sets the PWM value of the pin 
-      }
-      messageSendChar('Y');      //Have to return something
-      messageEnd(); 
-    break; 
-    
-    case 'd': // WRITE a digital pin
-      pin   = messageGetInt();  
-      state = messageGetInt();  
-      if(pin>=2 && (~inputMask & (1<<pin))){
-         pinMode(pin,OUTPUT);  
-         if( state)  digitalWrite(pin,HIGH);
-         else        digitalWrite(pin,LOW);
-      }
-      messageSendChar('Y');    //Have to return something
-      messageEnd();          
-    break;  
-    
-    case 'm': // WRITE all digital pins using mask
-      int outputTypeMask  = messageGetInt() & ~inputMask; //don't write inputs
-      int writeMask       = messageGetInt() & ~inputMask;  
-      if(outputTypeMask){
-        for(pin=2;pin<14;pin++){
-          if(outputTypeMask & (1<<pin)){
-             pinMode(pin,OUTPUT);
-             if( writeMask & (1<<pin))  digitalWrite(pin,HIGH);
-             else                       digitalWrite(pin,LOW);
-          }
-        }
-      }
-      else writeMask = 0;
-      
-      messageSendChar('m');
-      messageSendInt(writeMask);
-      messageEnd();
-      
-    break;  
-  }
-}
-
-boolean          lastPinState[14];
-boolean          pinState[14];
+boolean         lastPinState[14];
+boolean         pinState[14];
 unsigned long   lastDebounceTime[14];
 unsigned long   debounceDelay = 50;
 

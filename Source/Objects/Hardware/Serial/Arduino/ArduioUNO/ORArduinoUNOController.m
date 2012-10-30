@@ -68,6 +68,10 @@
 		[[lowLimitMatrix cellAtRow:i column:0] setFormatter:formatter];
 		[[hiLimitMatrix cellAtRow:i column:0] setFormatter:formatter];
 	}
+	NSNumberFormatter* formatter2 = [[[NSNumberFormatter alloc] init] autorelease];
+	[formatter2 setFormat:@"#0.00"];	
+	[versionField setFormatter:formatter2];
+
 	
 	NSString* resourcePath = [[NSBundle mainBundle] resourcePath];
 	NSString* fullPath = [resourcePath stringByAppendingPathComponent:kDefaultSketchName];
@@ -174,6 +178,13 @@
                      selector : @selector(hiLimitChanged:)
                          name : ORArduinoUNOHiLimitChanged
 						object: model];
+
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(versionChanged:)
+                         name : ORArduinoUNOModelVersionChanged
+						object: model];
+	
 	
 	[serialPortController registerNotificationObservers];
 
@@ -207,9 +218,16 @@
 	[self interceptChanged:nil];
 
 	[self lockChanged:nil];
+	[self versionChanged:nil];
 
     [self updateButtons];
 	[serialPortController updateWindow];
+}
+
+- (void) versionChanged:(NSNotification*)aNote
+{
+	float theVersion = [model sketchVersion];
+	[versionField setFloatValue:theVersion ];
 }
 
 
@@ -468,6 +486,12 @@
 }
 
 #pragma mark •••Actions
+
+- (void) versionAction:(id)sender
+{
+	[model getVersion];	
+}
+
 - (IBAction) lockAction:(id) sender
 {
     [gSecurity tryToSetLock:ORArduinoUNOLock to:[sender intValue] forWindow:[self window]];

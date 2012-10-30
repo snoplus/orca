@@ -22,6 +22,7 @@
 @interface ORArduinoUNOController : OrcaObjectController
 {
     IBOutlet NSButton*		lockButton;
+	IBOutlet NSTextField*	versionField;
 	IBOutlet NSButton*		updateButton;
     IBOutlet NSPopUpButton* pollTimePopup;
 	IBOutlet NSMatrix*		adcMatrix;
@@ -46,10 +47,12 @@
 - (void) dealloc;
 - (void) awakeFromNib;
 
-#pragma mark •••Notifications
 - (void) registerNotificationObservers;
-- (BOOL) portLocked;
 - (void) updateWindow;
+
+#pragma mark ***Interface Management
+- (void) versionChanged:(NSNotification*)aNote;
+- (BOOL) portLocked;
 - (void) updateButtons;
 - (void) lockChanged:(NSNotification*)aNote;
 - (void) adcChanged:(NSNotification*)aNote;
@@ -68,6 +71,7 @@
 - (void) hiLimitChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) versionAction:(id)sender;
 - (IBAction) pollTimeAction:(id)sender;
 - (IBAction) lockAction:(id) sender;
 - (IBAction) updateAllAction:(id)sender;
@@ -85,5 +89,6 @@
 - (IBAction) interceptAction:(id)sender;
 
 @end
+
 
 
