@@ -427,7 +427,7 @@ static Pulser33500CustomWaveformStruct waveformData[kNumWaveforms] = {
     [self setSelectedWaveform:	 [decoder decodeIntForKey:@"selectedWaveform"]];
 
 	if(voltage==0 && frequency==0 && burstCount==0 && burstPhase==0){
-		[self setVoltage:750];
+		[self setVoltage:5];
 		[self setBurstRate:1];
 		[self setVoltageOffset:0];
 		[self setFrequency:1000.0];

@@ -145,7 +145,7 @@ NSString* ORPulser33500Lock							= @"ORPulser33500Lock";
     [self setChannels:[NSMutableArray arrayWithCapacity:2]];
     int i;
     for(i=0;i<2;i++){
-        ORPulser33500Chan* aChannel = [[ORPulser33500Chan alloc] initWithPulser:self channelNumber:i];
+        ORPulser33500Chan* aChannel = [[ORPulser33500Chan alloc] initWithPulser:self channelNumber:i+1];
         [channels addObject:aChannel];
         [aChannel release];
     }

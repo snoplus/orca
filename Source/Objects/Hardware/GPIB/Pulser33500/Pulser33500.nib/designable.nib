@@ -12,7 +12,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="264"/>
+			<integer value="684"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -906,7 +906,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<object class="NSTextFieldCell" key="NSTitleCell">
 								<int key="NSCellFlags">67239424</int>
 								<int key="NSCellFlags2">0</int>
-								<string key="NSContents">Channel 1</string>
+								<string key="NSContents">Channel 2</string>
 								<reference key="NSSupport" ref="643386387"/>
 								<reference key="NSBackgroundColor" ref="556065950"/>
 								<object class="NSColor" key="NSTextColor">
@@ -938,7 +938,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<object class="NSTextFieldCell" key="NSTitleCell">
 								<int key="NSCellFlags">67239424</int>
 								<int key="NSCellFlags2">0</int>
-								<string key="NSContents">Channel 0</string>
+								<string key="NSContents">Channel 1</string>
 								<reference key="NSSupport" ref="643386387"/>
 								<reference key="NSBackgroundColor" ref="556065950"/>
 								<object class="NSColor" key="NSTextColor">
@@ -2065,9 +2065,9 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					<object class="NSAffineTransform">
 						<bytes key="NSTransformStruct">P4AAAL+AAABDAgAAw82AAA</bytes>
 					</object>
-					<string>{{491, 459}, {1008, 517}}</string>
+					<string>{{138, 726}, {1008, 517}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{491, 459}, {1008, 517}}</string>
+					<string>{{138, 726}, {1008, 517}}</string>
 					<boolean value="YES"/>
 					<string>{213, 107}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
