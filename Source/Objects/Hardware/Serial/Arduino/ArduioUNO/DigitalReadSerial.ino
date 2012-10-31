@@ -23,6 +23,7 @@ short kCmdSetControlValue	= 7;  //7,chan,value;  --set control value. chan 0-9. 
 //Messages which can be sent unsolicited to ORCA.
 short kInputsChanged		= 20; //20,i0,i1,i2,...i13;
 short kCustomValueChanged   = 21; //21,chan,value
+short kAdcValueChanged		= 22; //22,chan,value
 short kUnKnownCmd			= 99;
 
 float kSketchVersion = 1.1; //change whenever command formats change

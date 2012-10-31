@@ -49,11 +49,12 @@ NSString* ORArduinoUNOModelControlValueChanged		= @"ORArduinoUNOModelControlValu
 #define  kCmdWriteOutput		5  //5,pin,value;   --set output pin to value
 #define  kCmdWriteOutputs		6  //6,typeMask,ValueMask; --set outputs based on mask
 #define  kCmdSetControlValue	7  //7,chan,value;         --set user value
+#define  kUnKnownCmd			99	//Arduino got an unknown command
 
-//Responses
-#define  kInputsChanged		20	//unsolicited input changed
-#define  kCustomValChanged  21	//unsolicited custom value changed
-#define  kUnKnownCmd        99	//Arduino got an unknown command
+//Unsolicited messages -- only these messages should EVER be send to ORCA unsolicited. 
+#define  kInputsChanged		20	//unsolicited input changed			 format: 20,inputValueMask
+#define  kCustomValChanged  21	//unsolicited custom value changed   format: 21,chan,value
+#define  kAdcChanged		22	//unsolicited adc message. Only used if you need to send an adc value outside the ORCA polling loop.  format: 22,chan,value
 
 @interface ORArduinoUNOModel (private)
 - (void)	clearDelay;
@@ -806,7 +807,18 @@ NSString* ORArduinoUNOModelControlValueChanged		= @"ORArduinoUNOModelControlValu
 					[self setPin:i stateIn:pinValue];
 				}
 			}
+		}		
+		
+		else if([[parts objectAtIndex:0]intValue] == kCmdSetControlValue) {
+			if([parts count] >= 3){
+				unsigned int chan = [[parts objectAtIndex:1] shortValue];
+				if(chan>=0 && chan<kNumArduinoUNOControlValues){
+					int value = [[parts objectAtIndex:2] shortValue];
+					[self setControlValue:chan withValue:value];
+				}
+			}
 		}
+		
 		else if([[parts objectAtIndex:0]intValue] == kInputsChanged){
 			//unsolicited incoming input changed"
 			unsolicited = YES;
@@ -831,6 +843,7 @@ NSString* ORArduinoUNOModelControlValueChanged		= @"ORArduinoUNOModelControlValu
 			}
 			[[self undoManager] enableUndoRegistration];
 		}
+		
 		else if([[parts objectAtIndex:0]intValue] == kCmdVersion){
 			if([parts count] >= 2){
 				[self setSketchVersion:[[parts objectAtIndex:1] floatValue]];
@@ -851,12 +864,15 @@ NSString* ORArduinoUNOModelControlValueChanged		= @"ORArduinoUNOModelControlValu
 				}
 			}
 		}
-		else if([[parts objectAtIndex:0]intValue] == kCmdSetControlValue) {
+		
+		else if([[parts objectAtIndex:0]intValue] == kAdcChanged) {
+			//unsolicited adc value changed"
+			unsolicited = YES;
 			if([parts count] >= 3){
 				unsigned int chan = [[parts objectAtIndex:1] shortValue];
-				if(chan>=0 && chan<kNumArduinoUNOControlValues){
-					int value = [[parts objectAtIndex:2] shortValue];
-					[self setControlValue:chan withValue:value];
+				if(chan<kNumArduinoUNOAdcChannels){
+					float adcValue = [[parts objectAtIndex:2] intValue] * 5.0/1023.;
+					[self setAdc:chan withValue:adcValue];
 				}
 			}
 		}
