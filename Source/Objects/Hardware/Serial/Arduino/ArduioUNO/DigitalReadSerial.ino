@@ -116,7 +116,7 @@ void unKnownCmd()     { Serial << kUnKnownCmd << "\n\r";  }
 
 void setup() 
 {
-  Serial.begin(57600); // Arduino Uno, Mega, with AT8u2 USB
+  Serial.begin(115200); // Arduino Uno, Mega, with AT8u2 USB
 
   cmdMessenger.print_LF_CR();
   cmdMessenger.attach(kCmdVerison,     sketchVersion);
