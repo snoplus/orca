@@ -68,6 +68,10 @@
 		[[lowLimitMatrix cellAtRow:i column:0] setFormatter:formatter];
 		[[hiLimitMatrix cellAtRow:i column:0] setFormatter:formatter];
 	}
+	
+	for(i=0;i<kNumArduinoUNOCustomChannels;i++){
+		[[customValueMatrix cellAtRow:i column:0] setTag:i];
+	}
 	NSNumberFormatter* formatter2 = [[[NSNumberFormatter alloc] init] autorelease];
 	[formatter2 setFormat:@"#0.00"];	
 	[versionField setFormatter:formatter2];
@@ -124,6 +128,12 @@
                          name : ORArduinoUNOModelAdcChanged
 						object: model];	
 
+	[notifyCenter addObserver : self
+                     selector : @selector(customValueChanged:)
+                         name : ORArduinoUNOModelCustomValueChanged
+						object: model];	
+	
+	
 	[notifyCenter addObserver : self
                      selector : @selector(pinNameChanged:)
                          name : ORArduinoUNOPinNameChanged
@@ -202,6 +212,7 @@
     [super updateWindow];
     [self portStateChanged:nil];
 	[self adcChanged:nil];
+	[self customValueChanged:nil];
 	[self pollTimeChanged:nil];
 	
 	[self pinStateInChanged:nil];
@@ -482,6 +493,20 @@
     else {
         int i = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
         [[adcMatrix cellWithTag:i] setFloatValue:[model convertedValue:i]];
+    }
+}
+
+- (void) customValueChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumArduinoUNOCustomChannels;i++){
+            [[customValueMatrix cellWithTag:i] setIntValue:[model customValue:i]];
+        }
+    }
+    else {
+        int i = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        [[customValueMatrix cellWithTag:i] setIntValue:[model customValue:i]];
     }
 }
 

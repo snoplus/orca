@@ -38,18 +38,22 @@ NSString* ORArduinoUNOSlopeChanged			= @"ORArduinoUNOSlopeChanged";
 NSString* ORArduinoUNOInterceptChanged		= @"ORArduinoUNOInterceptChanged";
 NSString* ORArduinoUNOMinValueChanged		= @"ORArduinoUNOMinValueChanged";
 NSString* ORArduinoUNOMaxValueChanged		= @"ORArduinoUNOMaxValueChanged";
+NSString* ORArduinoUNOModelCustomValueChanged		= @"ORArduinoUNOModelCustomValueChanged";
+NSString* ORArduinoUNOModelControlValueChanged		= @"ORArduinoUNOModelControlValueChanged";
 
 
-#define  kCmdVersion       1  //ask for software version
-#define  kCmdReadAdcs      2  //2;             --read all adcs
-#define  kCmdReadInputs    3  //3,mask;        --read input pins using mask
-#define  kCmdWriteAnalog   4  //4,pin,value;   --set pin pwm to value
-#define  kCmdWriteOutput   5  //5,pin,value;   --set output pin to value
-#define  kCmdWriteOutputs  6  //6,typeMask,ValueMask;        --set outputs based on mask
+#define  kCmdVersion			1  //ask for software version
+#define  kCmdReadAdcs			2  //2;             --read all adcs
+#define  kCmdReadInputs			3  //3,mask;        --read input pins using mask
+#define  kCmdWriteAnalog		4  //4,pin,value;   --set pin pwm to value
+#define  kCmdWriteOutput		5  //5,pin,value;   --set output pin to value
+#define  kCmdWriteOutputs		6  //6,typeMask,ValueMask; --set outputs based on mask
+#define  kCmdSetControlValue	7  //7,chan,value;         --set user value
 
 //Responses
-#define  kInputsChanged    20	//unsolicited input changed
-#define  kUnKnownCmd       99	//Arduino got an unknown command
+#define  kInputsChanged		20	//unsolicited input changed
+#define  kCustomValChanged  21	//unsolicited custom value changed
+#define  kUnKnownCmd        99	//Arduino got an unknown command
 
 @interface ORArduinoUNOModel (private)
 - (void)	clearDelay;
@@ -150,6 +154,24 @@ NSString* ORArduinoUNOMaxValueChanged		= @"ORArduinoUNOMaxValueChanged";
 	}		
 }
 
+- (void) setCustomValue:(unsigned short)aChan withValue:(unsigned short)aValue
+{
+	if(aChan<kNumArduinoUNOCustomChannels){
+		customValue[aChan] = aValue;
+		NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aChan] forKey:@"Channel"];
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORArduinoUNOModelCustomValueChanged object:self userInfo:userInfo];
+	}		
+}
+
+- (void) setControlValue:(unsigned short)aChan withValue:(unsigned short)aValue
+{
+	if(aChan<kNumArduinoUNOControlValues){
+		controlValue[aChan] = aValue;
+		NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aChan] forKey:@"Channel"];
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORArduinoUNOModelControlValueChanged object:self userInfo:userInfo];
+	}		
+}
+
 - (int) pollTime
 {
     return pollTime;
@@ -171,7 +193,8 @@ NSString* ORArduinoUNOMaxValueChanged		= @"ORArduinoUNOMaxValueChanged";
 
 - (void) setUpPort
 {
-	[serialPort setSpeed:57600];
+	//[serialPort setSpeed:57600];
+	[serialPort setSpeed:115200];
 	[serialPort setParityNone];
 	[serialPort setStopBits2:NO];
 	[serialPort setDataBits:8];
@@ -490,6 +513,17 @@ NSString* ORArduinoUNOMaxValueChanged		= @"ORArduinoUNOMaxValueChanged";
 	else return 0;
 }
 
+- (unsigned short)  customValue:(unsigned short)aChan
+{
+	if(aChan<kNumArduinoUNOCustomChannels)return customValue[aChan];
+	else return 0;
+}
+
+- (unsigned short)  controlValue:(unsigned short)aChan
+{
+	if(aChan<kNumArduinoUNOControlValues)return controlValue[aChan];
+	else return 0;
+}
 
 - (void) writeOutput:(unsigned short) aPin state:(BOOL)aState
 {
@@ -504,6 +538,18 @@ NSString* ORArduinoUNOMaxValueChanged		= @"ORArduinoUNOMaxValueChanged";
 		}
 	}
 }
+
+- (void) writeControl:(unsigned short) aChan value:(short)aValue
+{
+	if(aChan < kNumArduinoUNOControlValues){
+		NSString* cmd = [NSString stringWithFormat:@"%d,%d,%d;",kCmdSetControlValue,aChan,aValue];
+		[self enqueCmdString:cmd];
+		[[self undoManager] disableUndoRegistration];
+		[self setControlValue:aChan withValue:aValue];
+		[[self undoManager] enableUndoRegistration];
+	}
+}
+
 
 - (void) writeAllOutputs:(unsigned short)aMask
 {
@@ -690,13 +736,9 @@ NSString* ORArduinoUNOMaxValueChanged		= @"ORArduinoUNOMaxValueChanged";
 		}
 	}		
 }
-
-
 @end
 
 @implementation ORArduinoUNOModel (private)
-
-
 - (void) clearDelay
 {
 	delay = NO;
@@ -766,7 +808,7 @@ NSString* ORArduinoUNOMaxValueChanged		= @"ORArduinoUNOMaxValueChanged";
 			}
 		}
 		else if([[parts objectAtIndex:0]intValue] == kInputsChanged){
-			//unsolicited incomming input changed"
+			//unsolicited incoming input changed"
 			unsolicited = YES;
 			if([parts count] >= 2){
 				unsigned int hiMask = [[parts objectAtIndex:1] unsignedIntValue];
@@ -792,11 +834,33 @@ NSString* ORArduinoUNOMaxValueChanged		= @"ORArduinoUNOMaxValueChanged";
 		else if([[parts objectAtIndex:0]intValue] == kCmdVersion){
 			if([parts count] >= 2){
 				[self setSketchVersion:[[parts objectAtIndex:1] floatValue]];
-				if(sketchVersion != kSketchVerion){
+				if(fabs(sketchVersion-kSketchVerion)>.001){
 					NSLogColor([NSColor redColor],@"%@ Running Sketch Version: %.2f -- should be version: %.2f\n",[self fullID],sketchVersion,kSketchVerion);
 				}
 			}	
 		}
+		
+		else if([[parts objectAtIndex:0]intValue] == kCustomValChanged) {
+			//unsolicited incoming custom value changed"
+			unsolicited = YES;
+			if([parts count] >= 3){
+				unsigned int chan = [[parts objectAtIndex:1] shortValue];
+				if(chan>=0 && chan<kNumArduinoUNOCustomChannels){
+					unsigned  value = [[parts objectAtIndex:2] unsignedShortValue];
+					[self setCustomValue:chan withValue:value];
+				}
+			}
+		}
+		else if([[parts objectAtIndex:0]intValue] == kCmdSetControlValue) {
+			if([parts count] >= 3){
+				unsigned int chan = [[parts objectAtIndex:1] shortValue];
+				if(chan>=0 && chan<kNumArduinoUNOControlValues){
+					int value = [[parts objectAtIndex:2] shortValue];
+					[self setControlValue:chan withValue:value];
+				}
+			}
+		}
+		
 		else if([[parts objectAtIndex:0]intValue] == kUnKnownCmd){
 			NSLogError(@"Unknown Cmd",@"ArduinoUNO",nil);
 			[cmdQueue removeAllObjects];

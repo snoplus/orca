@@ -1,7 +1,3 @@
-// This example demonstrates CmdMessenger's callback  & attach methods
-// For Arduino Uno and Arduino Duemilanove board (may work with other)
-
-// Download these into your Sketches/libraries/ folder...
 
 #include <CmdMessenger.h> //https://github.com/dreamcat4/cmdmessenger
 #include <Streaming.h>    //http://arduiniana.org/libraries/streaming/
@@ -10,23 +6,26 @@ char field_separator      = ',';
 char command_separator    = ';';
 unsigned short inputMask  = 0x0; 
 unsigned short oldInputs  = 0x0;
+unsigned short controlValue[10]    = {0,0,0,0,0,0,0,0,0,0};
 
 // Attach a new CmdMessenger object to the default Serial port
 CmdMessenger cmdMessenger = CmdMessenger(Serial, field_separator, command_separator);
 
-//Commands
-short kCmdVerison      = 1;  //1;
-short kCmdReadAdcs     = 2;  //2;             --read all adcs
-short kCmdReadInputs   = 3;  //3,mask;        --read input pins using mask
-short kCmdWriteAnalog  = 4;  //4,pin,value;   --set pin pwm to value
-short kCmdWriteOutput  = 5;  //5,pin,value;   --set output pin to value
-short kCmdWriteOutputs = 6;  //6,mask;        --set outputs based on mask
+//Commands from ORCA (never sent unsolicited)
+short kCmdVerison			= 1;  //1;
+short kCmdReadAdcs			= 2;  //2;             --read all adcs
+short kCmdReadInputs		= 3;  //3,mask;        --read input pins using mask
+short kCmdWriteAnalog		= 4;  //4,pin,value;   --set pin pwm to value
+short kCmdWriteOutput		= 5;  //5,pin,value;   --set output pin to value
+short kCmdWriteOutputs		= 6;  //6,mask;        --set outputs based on mask
+short kCmdSetControlValue	= 7;  //7,chan,value;  --set control value. chan 0-9. value is unsigned short
 
-//Responses
-short kInputsChanged   = 20;
-short kUnKnownCmd      = 99;
+//Messages which can be sent unsolicited to ORCA.
+short kInputsChanged		= 20; //20,i0,i1,i2,...i13;
+short kCustomValueChanged   = 21; //21,chan,value
+short kUnKnownCmd			= 99;
 
-float kSketchVersion = 1.0; //change whenever command formats change
+float kSketchVersion = 1.1; //change whenever command formats change
 
 // ------------------ C A L L B A C K  M E T H O D S -------------------------
 void readAnalogValues()
@@ -52,6 +51,7 @@ void readInputPins()
     }
     Serial<<"\n\r";
 }
+
 void writeOutputPin()
 {
       char pin   = cmdMessenger.readInt();  
@@ -96,6 +96,19 @@ void writeAnalog()
       Serial<< kCmdWriteAnalog << "," << pin << "," << state << "\n\r";
 }
 
+void setControlValue()
+{
+	//users can use this value in their custom code as needed.
+    short chan  = cmdMessenger.readInt();
+    unsigned short value = cmdMessenger.readInt(); 
+    if(chan>=0 && chan<10){
+		controlValue[chan] = value;
+    }
+    //echo the command back
+    Serial << kCmdSetControlValue << "," << chan << "," << value << "\n\r";
+}
+
+
 void sketchVersion()  { Serial << kCmdVerison<<","<< kSketchVersion << "\n\r";   }
 void unKnownCmd()     { Serial << kUnKnownCmd << "\n\r";  }
 
@@ -105,13 +118,14 @@ void setup()
 {
   Serial.begin(57600); // Arduino Uno, Mega, with AT8u2 USB
 
-  cmdMessenger.print_LF_CR();   // Make output more readable whilst debugging in Arduino Serial Monitor
+  cmdMessenger.print_LF_CR();
   cmdMessenger.attach(kCmdVerison,     sketchVersion);
   cmdMessenger.attach(kCmdReadAdcs,    readAnalogValues);
   cmdMessenger.attach(kCmdReadInputs,  readInputPins);
   cmdMessenger.attach(kCmdWriteAnalog, writeAnalog);
   cmdMessenger.attach(kCmdWriteOutput, writeOutputPin);
   cmdMessenger.attach(kCmdWriteOutputs,writeOutputs);
+  cmdMessenger.attach(kCmdSetControlValue,setControlValue);
 
   cmdMessenger.attach(unKnownCmd);
 }
@@ -119,7 +133,12 @@ void setup()
 void loop() 
 {
   cmdMessenger.feedinSerialData(); //process incoming commands
+  scanInputsForChange();
+  customMethod(); //users can put custom code in here
+}
 
+void scanInputsForChange()
+{
   if(inputMask){
       unsigned short inputs = 0;
       if(inputMask){
@@ -144,14 +163,18 @@ unsigned long   debounceDelay = 50;
 boolean debouncedDigitalRead(int aPin)
 {
   boolean currentValue = digitalRead(aPin);
-  if (currentValue != lastPinState[aPin]) {
-    lastDebounceTime[aPin] = millis();
-  } 
-  
-  if ((millis() - lastDebounceTime[aPin]) > debounceDelay) {
-    pinState[aPin] = currentValue;
-  }
-
+  if (currentValue != lastPinState[aPin]) lastDebounceTime[aPin] = millis();
+  if ((millis() - lastDebounceTime[aPin]) > debounceDelay) pinState[aPin] = currentValue;
   lastPinState[aPin] = currentValue;
   return pinState[aPin];
+}
+
+//--------------------------------------------------------------
+void customMethod()
+{
+	//default is to do nothing
+	//Users can put specialized code here if needed.
+	//customValues can be sent back to ORCA with the customValue commands
+	//example:  kCustomValueChanged,channelNumber,value;
+	//Serial << kCustomValueChanged << "," << 0 << "," << 123 << "\n\r";
 }

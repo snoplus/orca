@@ -26,6 +26,7 @@
 	IBOutlet NSButton*		updateButton;
     IBOutlet NSPopUpButton* pollTimePopup;
 	IBOutlet NSMatrix*		adcMatrix;
+	IBOutlet NSMatrix*		customValueMatrix;
 	IBOutlet NSMatrix*		pinTypeMatrix;
 	IBOutlet NSMatrix*		pinNameMatrix;
 	IBOutlet NSMatrix*		pinStateOutMatrix;
@@ -56,6 +57,7 @@
 - (void) updateButtons;
 - (void) lockChanged:(NSNotification*)aNote;
 - (void) adcChanged:(NSNotification*)aNote;
+- (void) customValueChanged:(NSNotification*)aNote;
 - (void) pinNameChanged:(NSNotification*)aNote;
 - (void) pinTypeChanged:(NSNotification*)aNote;
 - (void) pinStateInChanged:(NSNotification*)aNote;

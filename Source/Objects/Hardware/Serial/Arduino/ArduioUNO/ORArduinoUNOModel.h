@@ -20,10 +20,12 @@
 #import "ORBitProcessing.h"
 #import "ORAdcProcessing.h"
 
-#define  kSketchVerion		 1.00
+#define  kSketchVerion		 1.1
 
-#define kNumArduinoUNOAdcChannels	6
-#define kNumArduinoUNOPins			14 //first two are serial lines
+#define kNumArduinoUNOAdcChannels		6
+#define kNumArduinoUNOCustomChannels	4
+#define kNumArduinoUNOControlValues		10
+#define kNumArduinoUNOPins				14 //first two are serial lines
 
 #define kArduinoInput	0
 #define kArduinoOutput  1
@@ -36,6 +38,8 @@
 		int				pollTime;
 		BOOL            delay;
 		float			adc[kNumArduinoUNOAdcChannels];
+		unsigned short	customValue[kNumArduinoUNOCustomChannels];
+		unsigned short	controlValue[kNumArduinoUNOControlValues];
 		int				pinType[kNumArduinoUNOPins];
 		NSString*       pinName[kNumArduinoUNOPins];
 		unsigned char	pwm[kNumArduinoUNOPins];
@@ -64,6 +68,11 @@
 - (void) setPollTime:(int)aPollTime;
 - (float)adc:(unsigned short)aChan;
 - (void) setAdc:(unsigned short)aChan withValue:(float)aValue;
+
+- (unsigned short)customValue:(unsigned short)aChan;
+- (void) setCustomValue:(unsigned short)aChan withValue:(unsigned short)aValue;
+- (unsigned short) controlValue:(unsigned short)aChan;
+- (void) setControlValue:(unsigned short)aChan withValue:(unsigned short)aValue;
 
 - (NSString*) pinName:(int)i;
 - (void) setPin:(int)i name:(NSString*)aName;
@@ -117,6 +126,7 @@
 - (void) initHardware;
 - (void) writeOutput:(unsigned short) aPin state:(BOOL)aState;
 - (void) writeAllOutputs:(unsigned short)aMask;
+- (void) writeControl:(unsigned short) aChan value:(short)aValue;
 - (void) readAdcValues;
 - (void) readInputPins;
 - (void) deferredFirstAction;
@@ -135,6 +145,8 @@ extern NSString* ORArduinoUNOModelVersionChanged;
 extern NSString* ORArduinoUNOLock;
 extern NSString* ORArduinoUNOModelPollTimeChanged;
 extern NSString* ORArduinoUNOModelAdcChanged;
+extern NSString* ORArduinoUNOModelCustomValueChanged;
+extern NSString* ORArduinoUNOModelControlValueChanged;
 extern NSString* ORArduinoUNOPinTypeChanged;
 extern NSString* ORArduinoUNOPinStateInChanged;
 extern NSString* ORArduinoUNOPinStateOutChanged;
