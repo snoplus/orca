@@ -55,6 +55,7 @@ NSString* ORArduinoUNOModelControlValueChanged		= @"ORArduinoUNOModelControlValu
 #define  kInputsChanged		20	//unsolicited input changed			 format: 20,inputValueMask
 #define  kCustomValChanged  21	//unsolicited custom value changed   format: 21,chan,value
 #define  kAdcChanged		22	//unsolicited adc message. Only used if you need to send an adc value outside the ORCA polling loop.  format: 22,chan,value
+#define  kArduinoReset		23	//unsolicited message. First message sent after a restart.
 
 @interface ORArduinoUNOModel (private)
 - (void)	clearDelay;
@@ -199,10 +200,12 @@ NSString* ORArduinoUNOModelControlValueChanged		= @"ORArduinoUNOModelControlValu
 	[serialPort setParityNone];
 	[serialPort setStopBits2:NO];
 	[serialPort setDataBits:8];
+	ignoreReset = YES;
 }
 
 - (void) firstActionAfterOpeningPort
 {
+	
 	[self performSelector:@selector(deferredFirstAction) withObject:nil afterDelay:2];
 }
 
@@ -877,6 +880,21 @@ NSString* ORArduinoUNOModelControlValueChanged		= @"ORArduinoUNOModelControlValu
 				}
 			}
 		}
+		
+		else if([[parts objectAtIndex:0]intValue] == kArduinoReset) {
+			//unsolicited message. Sent after a reset
+			unsolicited = YES;
+			if(ignoreReset){
+				ignoreReset = NO;
+			}
+			else {
+				if([parts count] >= 2){
+					NSLog(@"%@:%@\n", [self fullID],[parts objectAtIndex:1]);
+					[self performSelector:@selector(deferredFirstAction) withObject:nil afterDelay:2];
+				}
+			}
+		}
+		
 		
 		else if([[parts objectAtIndex:0]intValue] == kUnKnownCmd){
 			NSLogError(@"Unknown Cmd",@"ArduinoUNO",nil);

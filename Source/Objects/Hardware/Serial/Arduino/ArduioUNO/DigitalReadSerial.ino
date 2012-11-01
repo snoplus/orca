@@ -25,6 +25,7 @@ short kCmdSetControlValue	= 7;  //7,chan,value;  --set control value. chan 0-9. 
 short kInputsChanged		= 20; //20,i0,i1,i2,...i13;
 short kCustomValueChanged   = 21; //21,chan,value
 short kAdcValueChanged		= 22; //22,chan,value
+short kArduinoStarted		= 23;
 short kUnKnownCmd			= 99;
 
 float kSketchVersion = 1.1; //change whenever command formats change
@@ -130,6 +131,10 @@ void setup()
   cmdMessenger.attach(kCmdSetControlValue,setControlValue);
 
   cmdMessenger.attach(unKnownCmd);
+  
+  //Tell the world we had a reset
+  Serial << kArduinoStarted << ",Reset"<< eol;
+  
 }
 
 void loop() 

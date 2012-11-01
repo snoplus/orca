@@ -45,7 +45,7 @@
 		unsigned char	pwm[kNumArduinoUNOPins];
 		BOOL			pinStateOut[kNumArduinoUNOPins];
 		BOOL			pinStateIn[kNumArduinoUNOPins];
-	
+		BOOL			ignoreReset;
 		//process stuff
 		unsigned int	oldProcessOutMask;
 		unsigned int	processOutMask;
