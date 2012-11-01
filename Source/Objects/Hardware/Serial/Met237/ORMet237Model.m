@@ -613,7 +613,7 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 - (void) startDataArrivalTimeout
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(doCycleKick) object:nil];
-    [self performSelector:@selector(doCycleKick)  withObject:nil afterDelay:(cycleDuration+120)];
+    [self performSelector:@selector(doCycleKick)  withObject:nil afterDelay:((cycleDuration*60)+120)];
 }
 
 - (void) cancelDataArrivalTimeout
