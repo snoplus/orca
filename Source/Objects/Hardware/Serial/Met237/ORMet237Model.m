@@ -625,15 +625,9 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 {
     [self setMissedCycleCount:missedCycleCount+1];
     NSLogColor([NSColor redColor],@"%@ data did not arrive at end of cycle (missed %d)\n",[self fullID],missedCycleCount);
-    if(countingMode == kMet237Counting){
-        NSLogColor([NSColor redColor],@"Kickstarting %@\n",[self fullID]);
-        [self setCount1:0];
-        [self setCount2:0];
-        [self setIsValid:NO];
-		
-        [self stopCycle];
-        [self startCycle:YES];
-    }
+	NSLogColor([NSColor redColor],@"Kickstarting %@\n",[self fullID]);		
+	[self stopCycle];
+	[self startCycle:YES];
 }
 
 - (void) timeout
