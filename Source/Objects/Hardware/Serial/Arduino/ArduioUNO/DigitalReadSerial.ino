@@ -4,6 +4,7 @@
 
 char field_separator      = ',';
 char command_separator    = ';';
+char eol				  = '\r';
 unsigned short inputMask  = 0x0; 
 unsigned short oldInputs  = 0x0;
 unsigned short controlValue[10]    = {0,0,0,0,0,0,0,0,0,0};
@@ -33,7 +34,7 @@ void readAnalogValues()
 {
     Serial<<2;
     for(char i=0;i<6;i++) Serial << "," << analogRead(i);
-    Serial<< "\n\r";
+    Serial<< eol;
 }
 
 void readInputPins()
@@ -50,7 +51,7 @@ void readInputPins()
       }
       else   Serial<<",0";
     }
-    Serial<<"\n\r";
+    Serial<<eol;
 }
 
 void writeOutputPin()
@@ -62,7 +63,7 @@ void writeOutputPin()
          if( state)  digitalWrite(pin,HIGH);
          else        digitalWrite(pin,LOW);
       }
-      Serial<< kCmdWriteOutput << "," << pin << "," << state << "\n\r";
+      Serial<< kCmdWriteOutput << "," << pin << "," << state << eol;
 }
   
 
@@ -82,7 +83,7 @@ void writeOutputs()
     }
     else writeMask = 0;
     //echo the command back
-    Serial << kCmdWriteOutputs << "," << outputTypeMask << "," << writeMask << "\n\r";
+    Serial << kCmdWriteOutputs << "," << outputTypeMask << "," << writeMask << eol;
 }
 
 void writeAnalog()
@@ -94,7 +95,7 @@ void writeAnalog()
         analogWrite(pin, state); //Sets the PWM value of the pin 
       }
       //echo the command back
-      Serial<< kCmdWriteAnalog << "," << pin << "," << state << "\n\r";
+      Serial<< kCmdWriteAnalog << "," << pin << "," << state << eol;
 }
 
 void setControlValue()
@@ -106,12 +107,12 @@ void setControlValue()
 		controlValue[chan] = value;
     }
     //echo the command back
-    Serial << kCmdSetControlValue << "," << chan << "," << value << "\n\r";
+    Serial << kCmdSetControlValue << "," << chan << "," << value << eol;
 }
 
 
-void sketchVersion()  { Serial << kCmdVerison<<","<< kSketchVersion << "\n\r";   }
-void unKnownCmd()     { Serial << kUnKnownCmd << "\n\r";  }
+void sketchVersion()  { Serial << kCmdVerison<<","<< kSketchVersion << eol;   }
+void unKnownCmd()     { Serial << kUnKnownCmd << eol;  }
 
 // ------------------ E N D  C A L L B A C K  M E T H O D S ------------------
 
@@ -150,7 +151,7 @@ void scanInputsForChange()
         }
         if(inputs != oldInputs){
           oldInputs = inputs;
-          Serial << kInputsChanged << "," << inputs <<  "\n\r";
+          Serial << kInputsChanged << "," << inputs <<  eol;
         }
       }
   }
@@ -177,5 +178,5 @@ void customMethod()
 	//Users can put specialized code here if needed.
 	//customValues can be sent back to ORCA with the customValue commands
 	//example:  kCustomValueChanged,channelNumber,value;
-	//Serial << kCustomValueChanged << "," << 0 << "," << 123 << "\n\r";
+	//Serial << kCustomValueChanged << "," << 0 << "," << 123 << eol;
 }
