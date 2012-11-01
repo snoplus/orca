@@ -720,6 +720,12 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 				[self setSize2: [size2Part floatValue]];
 				[self setCount2: [count2Part intValue]];
 				
+				if([self running]){
+					[self stopCycle];
+					[self startCycle:YES];
+					
+				}
+				
 				recordComingIn = NO;
 				[self setMissedCycleCount:0];
 				[self startDataArrivalTimeout];
