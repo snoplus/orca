@@ -55,8 +55,8 @@ void readInputPins()
 
 void writeOutputPin()
 {
-      char pin   = cmdMessenger.readInt();  
-      char state = cmdMessenger.readInt();
+      short pin   = cmdMessenger.readInt();  
+      short state = cmdMessenger.readInt();
       if(pin>=2 && (~inputMask & (1<<pin))){
          pinMode(pin,OUTPUT);  
          if( state)  digitalWrite(pin,HIGH);
@@ -68,7 +68,7 @@ void writeOutputPin()
 
 void writeOutputs()
 {
-    char pin;
+    short pin;
     short outputTypeMask  = cmdMessenger.readInt() & ~inputMask; //don't write inputs
     short writeMask       = cmdMessenger.readInt() & ~inputMask;  
     if(outputTypeMask){
@@ -87,8 +87,8 @@ void writeOutputs()
 
 void writeAnalog()
 {
-     char pin   = cmdMessenger.readInt(); 
-     char state = cmdMessenger.readInt();
+     short pin   = cmdMessenger.readInt(); 
+     short state = cmdMessenger.readInt();
       if(pin>=2 && (~inputMask & (1<<pin))){
         pinMode(pin, OUTPUT);
         analogWrite(pin, state); //Sets the PWM value of the pin 

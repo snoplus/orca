@@ -786,8 +786,9 @@ NSString* ORArduinoUNOModelControlValueChanged		= @"ORArduinoUNOModelControlValu
 {
 	[self cancelTimeout];
 	[self setIsValid:YES];
-	aCommand = [[[aCommand removeNLandCRs] trimSpacesFromEnds] removeExtraSpaces];
-	NSArray* parts = [aCommand componentsSeparatedByString:@" "];
+	aCommand = [aCommand removeNLandCRs];
+	aCommand = [aCommand trimSpacesFromEnds];
+	NSArray* parts = [aCommand componentsSeparatedByString:@","];
 	BOOL unsolicited = NO;
 	if([parts count] >= 1){
 		if([[parts objectAtIndex:0]intValue] == kCmdReadAdcs){
