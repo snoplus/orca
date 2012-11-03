@@ -1617,14 +1617,15 @@ void SwapLongBlock(void* p, int32_t n)
     }
 
     //write sequencer mask:
-    BOOL runInProgress = [gOrcaGlobals runInProgress];
+    //BOOL runInProgress = [gOrcaGlobals runInProgress];
     
-    if (!runInProgress) {
+//    if (!runInProgress) {
 
+    
         unsigned int oldMode = [self xl3Mode];
         [self setXl3Mode:1];
         [self writeXl3Mode];
-
+    
         for (slot=0; slot<16; slot++) {
             ORFec32Model* fec = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-slot];
             if (!fec) {
@@ -1637,11 +1638,11 @@ void SwapLongBlock(void* p, int32_t n)
             
             @try {
                 
-                aValue = disableSeqMask[slot];
+                aValue = 0xffffffff;
                 xl3Address = FEC_SEL * slot | 0x90 | WRITE_REG; //CMOS CHIP DIS
                 [xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
-
-                aValue = 0x6;
+                
+                aValue = 0x2;
                 xl3Address = FEC_SEL * slot | 0x20 | WRITE_REG; //FEC CSR
                 [xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
 
@@ -1651,6 +1652,10 @@ void SwapLongBlock(void* p, int32_t n)
                 aValue = [self crateNumber] << 11;
                 [xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
 
+                aValue = disableSeqMask[slot];
+                xl3Address = FEC_SEL * slot | 0x90 | WRITE_REG; //CMOS CHIP DIS
+                [xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
+
             }
             @catch (NSException* e) {
                 NSLog(@"%@ sequencer update failed; error: %@ reason: %@\n",
@@ -1658,11 +1663,12 @@ void SwapLongBlock(void* p, int32_t n)
                 return;
             }
         }
+
         [self setXl3Mode:oldMode];
         [self writeXl3Mode];
 
         NSLog(@"%@ sequencer mask updated.\n", [[self xl3Link] crateName]);
-    }
+//    }
     [self performSelector:@selector(initCrateWithDict:) withObject:argDict afterDelay:0];
 }
 
