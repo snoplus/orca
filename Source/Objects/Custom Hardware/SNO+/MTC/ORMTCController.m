@@ -981,7 +981,8 @@
     [savePanel setCanCreateDirectories:YES];
    
     NSString* startingDir;
-    //NSString* defaultFile;
+    NSString* defaultFile;
+	defaultFile = nil; //to make both 10.5 and 10.8 compilers happy
     
 	NSString* fullPath = [[model lastFile] stringByExpandingTildeInPath];
     if(fullPath){
