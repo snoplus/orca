@@ -22,6 +22,8 @@ protected:
 	const static uint32_t k_fifo_valid_mask = 0x000fffffUL; //20 bits
 
     struct timeval timestamp;
+    uint32_t last_good_10mhz_upper;
+    uint32_t last_good_gtid;
 };
 
 #endif /* _ORMTCReadout_hh_*/

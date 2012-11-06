@@ -28,6 +28,9 @@ bool ORMTCReadout::Start() {
 	last_mem_read_ptr = value;
 	mem_read_ptr = value;
 
+	last_good_10mhz_upper = 0;
+	last_good_gtid = 0;
+
     struct timezone tz;
     gettimeofday(&timestamp, &tz);
 			
@@ -102,17 +105,17 @@ bool ORMTCReadout::UpdateStatus() {
 
 bool ORMTCReadout::Readout(SBC_LAM_Data* /*lamData*/)
 {
-	//the fecs are independent of the mtc trigger now
-	//data are pushed to orca, so the idea with leaf_indices doesn't work
+    //the fecs are independent of the mtc trigger now
+    //data are pushed to orca, so the idea with leaf_indices doesn't work
 
-	const uint32_t mem_read_reg = GetDeviceSpecificData()[0]; // 0x2CUL;
-	const uint32_t mem_write_reg = GetDeviceSpecificData()[1]; // 0x28UL;
-	const uint32_t mem_base_address = GetDeviceSpecificData()[2]; // 0x03800000UL;
-	const uint32_t mem_address_modifier = GetDeviceSpecificData()[3]; // 0x09UL;
-	uint32_t mem_write_ptr;
-	
-	uint32_t value = 0;
-	bool triggered = 0;
+    const uint32_t mem_read_reg = GetDeviceSpecificData()[0]; // 0x2CUL;
+    const uint32_t mem_write_reg = GetDeviceSpecificData()[1]; // 0x28UL;
+    const uint32_t mem_base_address = GetDeviceSpecificData()[2]; // 0x03800000UL;
+    const uint32_t mem_address_modifier = GetDeviceSpecificData()[3]; // 0x09UL;
+    uint32_t mem_write_ptr;
+    
+    uint32_t value = 0;
+    bool triggered = 0;
 
     const uint32_t poll_delay = GetDeviceSpecificData()[4]; //msec
 
@@ -128,19 +131,19 @@ bool ORMTCReadout::Readout(SBC_LAM_Data* /*lamData*/)
         UpdateStatus();
     }
 
-	//get the read ptr and check the trigger, step 1: data available
-	if (VMERead(GetBaseAddress() + mem_read_reg, GetAddressModifier(),
-			sizeof(mem_read_ptr), mem_read_ptr) < (int32_t) sizeof(mem_read_ptr)){
-		LogBusError("BusError: mem_access at: 0x%08x", mem_read_reg);
-		return true; 
-	}
+    //get the read ptr and check the trigger, step 1: data available
+    if (VMERead(GetBaseAddress() + mem_read_reg, GetAddressModifier(),
+		    sizeof(mem_read_ptr), mem_read_ptr) < (int32_t) sizeof(mem_read_ptr)){
+	    LogBusError("BusError: mem_access at: 0x%08x", mem_read_reg);
+	    return true; 
+    }
 
-	triggered = ((mem_read_ptr & k_no_data_available) == 0);
-	mem_read_ptr &= k_fifo_valid_mask;
+    triggered = ((mem_read_ptr & k_no_data_available) == 0);
+    mem_read_ptr &= k_fifo_valid_mask;
 
     if (!triggered) return true;
 
-	//check the trigger, step 2: write_ptr > last_read_ptr mod rollover
+    //check the trigger, step 2: write_ptr > last_read_ptr mod rollover
 
     if (VMERead(GetBaseAddress() + mem_write_reg, GetAddressModifier(),
             sizeof(mem_write_ptr), mem_write_ptr) < (int32_t) sizeof(mem_write_ptr)) {
@@ -149,14 +152,17 @@ bool ORMTCReadout::Readout(SBC_LAM_Data* /*lamData*/)
     }
     mem_write_ptr &= k_fifo_valid_mask;
 
-	//check consistency
+    //check consistency
     triggered = (last_mem_read_ptr == mem_read_ptr);
     
     if (!triggered) {
         //trust MTCD, restart us
         if (!Start()) {
-            LogError("MTCD readout: failed to restart");
+            LogError("MTCD readout: logic restart failed");
         }
+	else {
+            LogMessage("MTCD readout: logic restarted");
+	}
              
         return true;
 
@@ -198,42 +204,108 @@ bool ORMTCReadout::Readout(SBC_LAM_Data* /*lamData*/)
     gettimeofday(&tv1, &tz);
     */
 
-    int32_t eventsStored = mem_write_ptr;
-    if (mem_write_ptr < mem_read_ptr) {
-        eventsStored += 0xfffff;
+    int32_t eventsStored;
+    eventsStored = mem_write_ptr - mem_read_ptr;
+    if (eventsStored <= 0) { //we know there's an event already, the == takes care of full buffer
+	eventsStored += 0x100000;
     }
-    eventsStored -= mem_read_ptr;
-    if (eventsStored > 32) eventsStored = 32;
+    if (eventsStored > 32) {
+	eventsStored = 32;
+    }
+
+    /*
+    if (mem_write_ptr < 0x400 || mem_read_ptr > 0xfff00) {
+	cout << "::read ptr: " << hex << mem_read_ptr << endl;
+	cout << "::wrte ptr: " << hex << mem_write_ptr << endl;
+	cout << "::events stored " << hex << eventsStored << endl;
+    }
+    */
 
     do {
         ensureDataCanHold(7);
         int32_t savedIndex = dataIndex;
         data[dataIndex++] = GetHardwareMask()[0] | 7;
 
+	//there is a tricky region when WRITE pointer rolls over
+	//the land mine is at ANY READ address when
+	//write pointer == num bundles left in phys fifo at the moment of roll over
+	//it's somewhere between 0x0 and 0x400
+	//it took us some time to get here after reading the write pointer, too
+	if (mem_write_ptr > 0xffff00 || mem_write_ptr < 0x402) {
+	    usleep(10);
+	}
+
+	//always read full bundle of 6 words to reset MTCD counter
+	//if bus error throw it away
+	//jumping to the next bundle is very BAD idea
+	//you are guaranteed to go offsync (as SNO has)
+	bool isBusError = false;
         for (int i = 0; i < 6; i++) {
             if (VMERead(mem_base_address, mem_address_modifier, 
                      sizeof(value), value) < (int32_t) sizeof(value)){
-                LogBusError("BusError: reading mtc word %d\n", i);
-                dataIndex = savedIndex;
-                /* can we recover?
-                 * we need to keep reading the fifo until we find the 0th word again
-                 * for now just skip this one.
-                 */
-                
-                mem_read_ptr++;
-                if (mem_read_ptr > k_fifo_valid_mask) mem_read_ptr = 0UL;
-                if (VMEWrite(GetBaseAddress() + mem_read_reg, GetAddressModifier(), 
-                         sizeof(mem_read_ptr), mem_read_ptr) < (int32_t) sizeof(mem_read_ptr)){
-                    LogBusError("BusError: rd ptr inc to 0x%08x\n", mem_read_ptr);
-                    return true; 
-                }        
-                return true; 
+                LogBusError("BusError: reading mtc word %d at 0x%08x", i, mem_read_ptr);
+		if (!isBusError) {
+		    dataIndex = savedIndex;
+		    isBusError = true;
+		}
             }
             data[dataIndex++] = value;
         }
 
-        mem_read_ptr++;
-        if (mem_read_ptr > k_fifo_valid_mask) mem_read_ptr = 0UL;
+	//make sure MTCD received 6 reads even if not acknowledged
+	if (isBusError) {
+	    //check we are in sync
+	    if (last_good_10mhz_upper == ((uint32_t)data[dataIndex-5] & 0xfffff) ||
+		last_good_gtid + 1 == ((uint32_t)data[dataIndex-3] & 0xffffff)) {
+
+		LogMessage("MTCD bus error: data in sync");
+		usleep(10);
+	    }
+	    else {
+		//sync the readout logic, make sure MTCD received 6 reads
+		//assumption 1: MTCD received the read cycle but failed to complete
+		//we are in sync, just don't have data, do nothing
+		//assumption 2. MTCD hasn't seen the read cycle at all
+		//we'll look into later words
+		unsigned int slip_count = 0;
+		for (slip_count = 1; slip_count < 3; slip_count++) {
+		    if (last_good_gtid + 1 == ((uint32_t)data[dataIndex - slip_count] & 0xffffff)) {
+			break;
+		    }
+		}
+		if (slip_count < 3) {
+		    //check clock matches
+		    if (last_good_10mhz_upper == (data[dataIndex - 5 + 3 - slip_count] & 0xfffff)) {
+			//good slip_count
+			do {
+			    if (VMERead(mem_base_address, mem_address_modifier, 
+			    sizeof(value), value) < (int32_t) sizeof(value)) {
+				//we've failed again
+				//this is really bad
+			    }
+			    slip_count--;
+			} while (slip_count);
+		    }
+		}
+		else {
+		    //use clock and last word error bits to recover
+		    //todo...
+		    //assumption 3. fifo didn't set us correctly and we are ahead
+		    //look into former words, sync, and skip next bundle
+		}
+	    }
+	}
+
+	if (!isBusError) {
+	    last_good_10mhz_upper = data[dataIndex-5] & 0xfffff;
+	    last_good_gtid = data[dataIndex-3] & 0xffffff;
+	}
+
+	//our 6 tries to pull this bundle are over
+	//go for the next one even if we don't have the data
+	mem_read_ptr++;
+	if (mem_read_ptr > k_fifo_valid_mask) mem_read_ptr = 0UL;
+	last_mem_read_ptr = mem_read_ptr;
 
         if (VMEWrite(GetBaseAddress() + mem_read_reg, GetAddressModifier(), 
                  sizeof(mem_read_ptr), mem_read_ptr) < (int32_t) sizeof(mem_read_ptr)){
@@ -242,8 +314,7 @@ bool ORMTCReadout::Readout(SBC_LAM_Data* /*lamData*/)
         }        
 
         eventsStored--;
-        last_mem_read_ptr = mem_read_ptr;
-    } while(eventsStored);
+    } while(eventsStored > 0);
 
 
     /*
