@@ -253,6 +253,7 @@ enum {
 - (void) ecalToOrcaDocumentsReceived;
 - (void) parseEcalDocument:(NSDictionary*)aResult;
 - (void) updateUIFromEcalBundle:(NSDictionary*)aBundle slot:(unsigned int)aSlot;
+- (BOOL) isRelayClosedForSlot:(unsigned int)slot pc:(unsigned int)aPC;
 
 #pragma mark •••DataTaker
 - (void) setDataIds:(id)assigner;

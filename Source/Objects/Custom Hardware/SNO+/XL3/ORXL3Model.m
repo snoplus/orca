@@ -2102,6 +2102,17 @@ void SwapLongBlock(void* p, int32_t n)
     NSLog(@"%@ crate init registers only\n", [[self xl3Link] crateName]);
 }
 
+- (BOOL) isRelayClosedForSlot:(unsigned int)slot pc:(unsigned int)aPC
+{
+    BOOL isClosed = YES;
+    
+    if (([self relayMask] & 0x1ULL << (slot*4 + (3-aPC))) == 0) {
+        isClosed = NO;
+    }
+
+    return isClosed;
+}
+
 #pragma mark •••Basic Ops
 - (void) readBasicOps
 {

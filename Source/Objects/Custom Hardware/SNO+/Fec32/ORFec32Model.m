@@ -268,7 +268,7 @@ NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageSt
 
 - (BOOL) pmtOnline:(unsigned short)index
 {
-	if(index<32) return [self dcPresent:index/8] && (onlineMask & (1L<<index));
+	if(index<32) return [self dcPresent:index/8] && (onlineMask & (1UL<<index));
 	else return NO;
 }
 
