@@ -282,7 +282,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     for (i=0;i<[self getNumberOfChannels];i++) {
         programMode = (uint8_t)[[channelGains objectAtIndex:i] intValue];
         [self write:programMode atRegisterIndex:kGainChannelHigh];        
-        [self write:(uint8_t)i atRegisterIndex:kGainChannelLow];
+        [self write:(uint8_t)i+1 atRegisterIndex:kGainChannelLow];
     }
     [self write:oldMode atRegisterIndex:kADMode];    
 }
