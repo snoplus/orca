@@ -770,7 +770,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 #pragma mark ***Command Handling
 - (void) timeout
 {
-	NSLogError(@"command timeout",@"Met237",nil);
+	NSLogError(@"command timeout",@"VXM",nil);
 }
 
 - (void) startTimeOut
