@@ -133,7 +133,7 @@ typedef struct Pulser33500CustomWaveformStruct {
 - (void) writeFrequency;
 - (void) writeBurstRate:(float)aValue;
 - (void) writeBurstRate;
-- (void) writeBurstCount:(float)aValue;
+- (void) writeBurstCount:(int)aValue;
 - (void) writeBurstCount;
 - (void) writeBurstPhase;
 - (void) writeTriggerSource;

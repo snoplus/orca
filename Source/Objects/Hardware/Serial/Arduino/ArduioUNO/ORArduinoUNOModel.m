@@ -816,7 +816,7 @@ NSString* ORArduinoUNOModelControlValueChanged		= @"ORArduinoUNOModelControlValu
 		else if([[parts objectAtIndex:0]intValue] == kCmdSetControlValue) {
 			if([parts count] >= 3){
 				unsigned int chan = [[parts objectAtIndex:1] shortValue];
-				if(chan>=0 && chan<kNumArduinoUNOControlValues){
+				if(chan<kNumArduinoUNOControlValues){
 					int value = [[parts objectAtIndex:2] shortValue];
 					[self setControlValue:chan withValue:value];
 				}
@@ -862,7 +862,7 @@ NSString* ORArduinoUNOModelControlValueChanged		= @"ORArduinoUNOModelControlValu
 			unsolicited = YES;
 			if([parts count] >= 3){
 				unsigned int chan = [[parts objectAtIndex:1] shortValue];
-				if(chan>=0 && chan<kNumArduinoUNOCustomChannels){
+				if(chan<kNumArduinoUNOCustomChannels){
 					unsigned  value = [[parts objectAtIndex:2] unsignedShortValue];
 					[self setCustomValue:chan withValue:value];
 				}

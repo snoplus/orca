@@ -324,7 +324,7 @@ static Pulser33500CustomWaveformStruct waveformData[kNumWaveforms] = {
 	[self writeBurstCount:burstCount];
 }
 
-- (void) writeBurstCount:(float)aValue
+- (void) writeBurstCount:(int)aValue
 {
 	[pulser writeToDevice:[NSString stringWithFormat:@"SOUR%d:BURS:NCYC %d",channel,aValue]];
 	[pulser logSystemResponse];
@@ -502,11 +502,11 @@ static Pulser33500CustomWaveformStruct waveformData[kNumWaveforms] = {
 {
     if([pulser isConnected]){
 		if (waveformData[selectedWaveform].builtInFunction) {
-        	[pulser writeToDevice:[NSString stringWithFormat:@"SOUR%d:FM:INT:FUNC %@",waveformData[selectedWaveform].storageName]];
+        	[pulser writeToDevice:[NSString stringWithFormat:@"SOUR%d:FM:INT:FUNC %@",channel,waveformData[selectedWaveform].storageName]];
         	[pulser logSystemResponse];
 			
 		} else {
-        	[pulser writeToDevice:[NSString stringWithFormat:@"SOUR%d:FUNC:ARB %@",waveformData[selectedWaveform].storageName]];
+        	[pulser writeToDevice:[NSString stringWithFormat:@"SOUR%d:FUNC:ARB %@",channel,waveformData[selectedWaveform].storageName]];
         	[pulser logSystemResponse];
         	[pulser writeToDevice:[NSString stringWithFormat:@"SOUR%d:OUTPUT ON",channel]];
         	[pulser logSystemResponse];
@@ -520,7 +520,7 @@ static Pulser33500CustomWaveformStruct waveformData[kNumWaveforms] = {
     if([pulser isConnected]){
         if(waveformData[selectedWaveform].tryToStore){
             @try {
-				[pulser writeToDevice:[NSString stringWithFormat:@"SOUR%d:FUNC:ARB %@",waveformData[selectedWaveform].storageName]];
+				[pulser writeToDevice:[NSString stringWithFormat:@"SOUR%d:FUNC:ARB %@",channel,waveformData[selectedWaveform].storageName]];
             }
 			@catch(NSException* localException) {
 			}

@@ -333,7 +333,7 @@
 
 - (IBAction) showExceptionAlert:(NSException*) localException
 {
-	NSLog( [ localException reason ] );
+	NSLog( @"%@\n",[ localException reason ] );
 	NSRunAlertPanel( [ localException name ], 	// Name of panel
 					[ localException reason ],	// Reason for error
 					@"OK",				// Okay button

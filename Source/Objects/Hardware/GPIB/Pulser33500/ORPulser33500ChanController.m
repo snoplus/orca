@@ -420,7 +420,7 @@
 
 - (IBAction) clearMemory:(id)sender
 {
-    NSBeginAlertSheet([NSString stringWithFormat:@"Clear Channel%d Non-Volatile Memory",(ORPulser33500Chan*)[model channel]],
+    NSBeginAlertSheet([NSString stringWithFormat:@"Clear Channel%d Non-Volatile Memory",[(ORPulser33500Chan*)model channel]],
                       @"YES/Do it NOW",
                       @"Canel",
                       nil,[owner window],

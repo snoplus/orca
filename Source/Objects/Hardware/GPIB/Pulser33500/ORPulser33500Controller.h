@@ -77,7 +77,7 @@
 
 - (void) populateInterfacePopup;
 - (void) validateInterfacePopup;
-- (void) showExceptionAlert:(NSException*) localException;
+- (IBAction) showExceptionAlert:(NSException*) localException;
 
 @end
 
