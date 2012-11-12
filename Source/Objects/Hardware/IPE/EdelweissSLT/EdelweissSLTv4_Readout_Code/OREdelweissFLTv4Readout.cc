@@ -195,6 +195,7 @@ extern Pbus* pbus;
 
 bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
 {
+
 	//static data: buffer for data coming in from the hardware
 #define kNumV4FLTs 20
 #define kNumV4FLTChannels 24
@@ -246,13 +247,13 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
 
 
     if(runFlags & kFirstTimeFlag){// firstTime   
-fprintf(stdout,"ORFLTv4Readout::Readout(SBC_LAM_Data* lamData): location %i, GetNextTriggerIndex()[0] %i\n",location,GetNextTriggerIndex()[0]);fflush(stdout);
+fprintf(stderr,"ORFLTv4Readout::Readout(SBC_LAM_Data* lamData): location %i, GetNextTriggerIndex()[0] %i\n",location,GetNextTriggerIndex()[0]);fflush(stderr);
 		//make some plausability checks
 		//...
 		//  is FLT present?
 	    uint32_t val;
 	    val = pbus->read(FLTVersionReg(col+1));
-	    printf("FLT %i: version 0x%08x\n",col,val);
+	    fprintf(stderr,"FLT %i: version 0x%08x\n",col,val);fflush(stderr);
 	    if(val!=0x1f000000 && val!=0xffffffff) isPresentFLT[col]=1;
 		else  isPresentFLT[col]=0;
 		
@@ -282,7 +283,7 @@ fprintf(stdout,"ORFLTv4Readout::Readout(SBC_LAM_Data* lamData): location %i, Get
         
         // --- TRIGGER EVENT MODE ------------------------------
         if(1 || daqRunMode == kIpeFltV4_EventDaqMode){  //then fltRunMode == kIpeFltV4Katrin_Run_Mode resp. kIpeFltV4Katrin_Veto_Mode
-            uint32_t status         = pbus->read(FIFOStatusReg(currFlt+1));
+            uint32_t status         = 0;//pbus->read(FIFOStatusReg(currFlt+1));
             uint32_t totalTriggerN  = pbus->read(FLTTotalTriggerNReg(currFlt+1));
             //uint32_t status         = srack->theFlt[col]->status->read();
 
@@ -357,14 +358,16 @@ fprintf(stdout,"ORFLTv4Readout::Readout(SBC_LAM_Data* lamData): location %i, Get
                                 
 								//read raw trace
                                 uint32_t adccount, trigSlot;
-								for(adccount=0; adccount<kNumV4FLTADCPageSize32;adccount++){
+#if 1
+								for(adccount=0; adccount<waveformLength;adccount++){ //kNumV4FLTADCPageSize32 is 1024; waveformLength is 2048
 								    
-                                    shipWaveformBuffer32[adccount]  = pbus->read(FLTRAMDataReg(currFlt+1,chan)+adccount);
-                    if(adccount<20){fprintf(stdout,"RAMDataReg for flt #%i, chan %i (location 0x%x,colSlot %i,crate %i):  addr 0x%08x   value:", currFlt+1,chan,location,col,crate ,FLTRAMDataReg(currFlt+1,0)+adccount);
-                                    fprintf(stdout,"     0x%08x\n", shipWaveformBuffer32[adccount]);fflush(stdout);
+                                    waveformBuffer32[adccount]  = pbus->read(FLTRAMDataReg(currFlt+1,chan)+adccount);
+                    if(adccount<10){fprintf(stdout,"RAMDataReg for flt #%i, chan %i (location 0x%x,colSlot %i,crate %i):  addr 0x%08x   value:", currFlt+1,chan,location,col,crate ,FLTRAMDataReg(currFlt+1,0)+adccount);
+                                    fprintf(stdout,"     0x%08x\n", waveformBuffer32[adccount]);fflush(stdout);
 						 }
                                     //shipWaveformBuffer32[adccount]  = (adccount*2)  | ((adccount*2+1)<<16);
 								}
+#endif
 								/* old version; 2010-10-gap-in-trace-bug: PMC was reading too fast, so data was read faster than FLT could write -tb-
 								for(adccount=0; adccount<1024;adccount++){
 									shipWaveformBuffer32[adccount]= srack->theFlt[col]->ramData->read(eventchan,adccount);
@@ -374,7 +377,7 @@ fprintf(stdout,"ORFLTv4Readout::Readout(SBC_LAM_Data* lamData): location %i, Get
 								
 								
                                 //ship data record
-                                ensureDataCanHold(9 + waveformLength/2); 
+                                ensureDataCanHold(9 + waveformLength/2);  //waveformLength is 2048, see above
                                 data[dataIndex++] = waveformId | (9 + waveformLength/2);    
                                 //printf("FLT%i: waveformId is %i  loc+ev.chan %i\n",col+1,waveformId,  location | eventchan<<8);
                                 data[dataIndex++] = location | ((selectFiberTrig & 0xf)<<12) | ((chan & 0xf)<<8);
@@ -391,9 +394,13 @@ fprintf(stdout,"ORFLTv4Readout::Readout(SBC_LAM_Data* lamData): location %i, Get
                                 //TODO: SHIP TRIGGER POS and POSTTRIGG time !!! -tb-
                                 
                                 //ship waveform
+                                for(uint32_t i=0;i<waveformLength;i++){//TODO: use memcopy!!!
+                                    shipWaveformBuffer16[i] = waveformBuffer32[i] & 0xffff;
+                                }
                                 uint32_t waveformLength32=waveformLength/2; //the waveform length is variable    
                                 for(uint32_t i=0;i<waveformLength32;i++){//TODO: use memcopy!!!
                                     data[dataIndex++] = shipWaveformBuffer32[i];
+//                                    data[dataIndex++] = i;
                                 }
                                 
                             }//for(chan ...

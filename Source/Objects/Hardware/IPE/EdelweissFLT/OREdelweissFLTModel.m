@@ -126,7 +126,9 @@ enum IpeFLTV4Enum{
 	kFLTV4ThresholdReg,
 
 	kFLTV4TotalTriggerNReg,
-		
+
+	kFLTV4Delays120meas,
+
 	kFLTV4RAMDataReg,
 	
 	kFLTV4NumRegs //must be last
@@ -180,6 +182,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	{@"Threshold",          0x002080>>2,		-1,				kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel},
 	
 	{@"TotalTriggerN",		0x000084>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+
+	{@"Delays120meas",		0x000088>>2,		-1,				kIpeRegReadable },
 
 	{@"RAMData",		    0x003000>>2,		1024,				kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel},
 
@@ -649,7 +653,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelAnalogOffsetChanged object:self];
 }
 
-- (BOOL) ledOff{ return ledOff; }
+- (BOOL) ledOff{ return ledOff; }  //TODO: remove this and OREdelweissFLTModelInterruptMaskChanged  -tb-
 - (void) setLedOff:(BOOL)aState
 {
     ledOff = aState;
@@ -1674,6 +1678,19 @@ for(chan=0; chan<6;chan++)
 	//[self writeReg:kFLTV4CommandReg value:kIpeFlt_Reset_All];
 }
 
+
+- (void) fireRepeatedSoftwareTriggerInRun
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(fireRepeatedSoftwareTriggerInRun) object:nil];
+    
+	//now: sw trigg.
+    [self writeCommandSoftwareTrigger];
+
+	if([self swTriggerIsRepeating])[self performSelector:@selector(fireRepeatedSoftwareTriggerInRun) withObject:nil afterDelay:1];
+
+}
+
+
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {	
 //TODO: runTaskStarted UNDER CONSTRUCTION -tb- 
@@ -1728,7 +1745,8 @@ for(chan=0; chan<6;chan++)
 	
 	if([self repeatSWTriggerMode] == 1){
 	    NSLog(@"Start SW Trigger\n");//TODO: debug output -tb-
-		[self setSwTriggerIsRepeating: 1];
+		[self setSwTriggerIsRepeating: 1];  //-> call writeCommandSoftwareTrigger frequently
+	    [self performSelector:@selector(fireRepeatedSoftwareTriggerInRun) withObject:nil afterDelay:1];
 	}
 
 }
@@ -1759,10 +1777,12 @@ for(chan=0; chan<6;chan++)
 	}
 	[self setHitRateTotal:0];
 
-	if([self repeatSWTriggerMode] == 1){
+	if([self swTriggerIsRepeating]){
 	    NSLog(@"Stop SW Trigger\n");//TODO: debug output -tb-
 		[self setSwTriggerIsRepeating: 0];
+	    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(fireRepeatedSoftwareTriggerInRun) object:nil];
 	}
+	//[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(fireRepeatedSoftwareTriggerInRun) object:nil];
 
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelHitRateChanged object:self];

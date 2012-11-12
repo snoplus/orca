@@ -6,6 +6,7 @@
 	#define PMC_COMPILE_IN_SIMULATION_MODE 0
 #endif
 
+
 #if PMC_COMPILE_IN_SIMULATION_MODE
     #warning MESSAGE: ORSLTv4Readout - PMC_COMPILE_IN_SIMULATION_MODE is 1
     #include <sys/time.h> // for gettimeofday on MAC OSX -tb-
@@ -68,6 +69,19 @@ bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
         //remember for next call
         lastSec      = currentSec; 
         lastUSec     = currentUSec; 
+		//Do something here every 1 second. Begin ...
+		//
+        #if 0 
+			uint32_t dataId            = GetHardwareMask()[0];
+			uint32_t stationNumber     = GetSlot();
+			uint32_t crate             = GetCrate();
+			data[dataIndex++] = dataId | 5;
+			data[dataIndex++] =  ((stationNumber & 0x0000001f) << 16) | (crate & 0x0f) <<21;
+			data[dataIndex++] = 6;
+			data[dataIndex++] = 8;
+			data[dataIndex++] = 15;
+        #endif
+		//... End.
     }else{
         // skip shipping data record
         // obsolete ... return config->card_info[index].next_Card_Index;
@@ -80,13 +94,19 @@ bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
     leaf_index = GetNextTriggerIndex()[0];
     while(leaf_index >= 0) {
         leaf_index = readout_card(leaf_index,lamData);
+        //printf("PrPMC (SLTv4 simulation mode) leaf_index %ld  ...\n",leaf_index);
+        //fflush(stdout);
     }
     
     
 #if 0
-    uint32_t dataId            = config->card_info[index].hw_mask[0];
-    uint32_t stationNumber     = config->card_info[index].slot;
-    uint32_t crate             = config->card_info[index].crate;
+    //old uint32_t dataId            = config->card_info[index].hw_mask[0];
+    //old uint32_t stationNumber     = config->card_info[index].slot;
+    //old uint32_t crate             = config->card_info[index].crate;
+	//new
+    uint32_t dataId            = GetHardwareMask()[0];
+    uint32_t stationNumber     = GetSlot();
+    uint32_t crate             = GetCrate();
     data[dataIndex++] = dataId | 5;
     data[dataIndex++] =  ((stationNumber & 0x0000001f) << 16) | (crate & 0x0f) <<21;
     data[dataIndex++] = 6;

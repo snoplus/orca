@@ -349,6 +349,7 @@
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Data Taker
+- (void) fireRepeatedSoftwareTriggerInRun;
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
