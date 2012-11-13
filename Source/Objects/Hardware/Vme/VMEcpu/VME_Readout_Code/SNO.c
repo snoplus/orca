@@ -972,7 +972,7 @@ void firePedestalsFixedTime(SBC_Packet* aPacket)
     if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
 
     uint32_t pedestal_count = p[0];
-    usigned long long pedestal_delay = p[1] * 100 * nsec_to_ticks; //p[1] is the delay in [100 nsec]
+    unsigned long long pedestal_delay = p[1] * 100 * nsec_to_ticks; //p[1] is the delay in [100 nsec]
     uint32_t csr_mask = p[2];
     
     uint32_t error_code = 0;
