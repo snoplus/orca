@@ -53,6 +53,7 @@
 		BOOL				isPulserFixedRate;
 		unsigned long			fixedPulserRateCount;
 		float				fixedPulserRateDelay;
+    BOOL _isPedestalEnabledInCSR;
 		
 		//settings
 		NSString*				lastFileLoaded;
@@ -75,6 +76,13 @@
 		ORReadOutList*  triggerGroup;
 		NSString*		triggerName;
 		NSArray*		dataTakers;       //cache of data takers.
+    unsigned long _mtcStatusGTID;
+    unsigned long long _mtcStatusCnt10MHz;
+    NSString* _mtcStatusTime10Mhz;
+    unsigned long _mtcStatusReadPtr;
+    unsigned long _mtcStatusWritePtr;
+    BOOL _mtcStatusDataAvailable;
+    unsigned long _mtcStatusNumEventsInMem;
 }
 
 @property (nonatomic,assign) BOOL isPulserFixedRate;
@@ -89,7 +97,14 @@
 @property (nonatomic,assign) unsigned long mtcaOWLNMask;
 @property (nonatomic,assign) unsigned long dataId;
 @property (nonatomic,assign) unsigned long mtcStatusDataId;
-
+@property (nonatomic,assign) unsigned long mtcStatusGTID;
+@property (nonatomic,assign) unsigned long long mtcStatusCnt10MHz;
+@property (nonatomic,copy) NSString* mtcStatusTime10Mhz;
+@property (nonatomic,assign) unsigned long mtcStatusReadPtr;
+@property (nonatomic,assign) unsigned long mtcStatusWritePtr;
+@property (nonatomic,assign) BOOL mtcStatusDataAvailable;
+@property (nonatomic,assign) unsigned long mtcStatusNumEventsInMem;
+@property (nonatomic,assign) BOOL isPedestalEnabledInCSR;
 
 #pragma mark •••Initialization
 - (id) init;
@@ -170,6 +185,7 @@
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;
+- (BOOL) bumpRateFromDecodeStage:(NSDictionary*) mtcStatus;
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;
@@ -284,3 +300,4 @@ extern NSString* ORMTCModelFixedPulserRateDelayChanged;
 extern NSString* ORMtcTriggerNameChanged;
 extern NSString* ORMTCLock;
 extern NSString* ORMTCModelMTCAMaskChanged;
+extern NSString* ORMTCModelIsPedestalEnabledInCSR;

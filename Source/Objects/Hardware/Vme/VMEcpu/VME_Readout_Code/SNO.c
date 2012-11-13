@@ -902,7 +902,8 @@ void firePedestalJobFixedTime(SBC_Packet* aPacket)
     if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
 
     uint32_t pedestal_count = p[0];
-    unsigned long long pedestal_delay = p[1] * 1000ULL * nsec_to_ticks; //p[1] is the delay in [usec]
+    unsigned long long pedestal_delay = p[1] * 100ULL * nsec_to_ticks; //p[1] is the delay in [100 nsec]
+    uint32_t csr_mask = p[2];
     uint32_t error_code = 0;
 	uint32_t aValue = 0;
 	short i = 0;
@@ -913,8 +914,8 @@ void firePedestalJobFixedTime(SBC_Packet* aPacket)
 
 	TUVMEDevice* device = get_new_device(0x0, 0x29, 4, 0x10000);
 	if(device != 0){
-		//enable pedestals and pulser
-		aValue = 0x3;
+		//enable pulser (and pedestal)
+		aValue = csr_mask;
 		if (write_device(device, (char*)(&aValue), 4, kMtcControlReg) != sizeof(aValue)) {
 			strcpy(errorMessage, "Error enabling pedestals and pulser.\n");
 			error_code = 2;
@@ -971,7 +972,9 @@ void firePedestalsFixedTime(SBC_Packet* aPacket)
     if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
 
     uint32_t pedestal_count = p[0];
-    uint32_t pedestal_delay = p[1] * 1000 * nsec_to_ticks; //p[1] is the delay in [usec]
+    usigned long long pedestal_delay = p[1] * 100 * nsec_to_ticks; //p[1] is the delay in [100 nsec]
+    uint32_t csr_mask = p[2];
+    
     uint32_t error_code = 0;
 	uint32_t gtidDiff = 0;
 	uint32_t aValue = 0;
@@ -981,7 +984,7 @@ void firePedestalsFixedTime(SBC_Packet* aPacket)
 	TUVMEDevice* device = get_new_device(0x0, 0x29, 4, 0x10000);
 	if(device != 0){
 		//enable pedestals and pulser
-		aValue = 0x3;
+		aValue = csr_mask;
 		if (write_device(device, (char*)(&aValue), 4, kMtcControlReg) != sizeof(aValue)) {
 			LogBusError("Error enabling pedestals and pulser.\n");
 			error_code = 2;

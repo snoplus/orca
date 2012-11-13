@@ -74,7 +74,9 @@
 
 @synthesize
 baseDate = _baseDate,
-mtcDateFormatter = _mtcDateFormatter;
+mtcDateFormatter = _mtcDateFormatter,
+isGetRatesFromDecodeStage = _isGetRatesFromDecodeStage,
+mtcModel = _mtcModel;
 
 - (id) init
 {
@@ -87,6 +89,8 @@ mtcDateFormatter = _mtcDateFormatter;
     //[[self mtcDateFormatter] setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
     [[self mtcDateFormatter] setTimeZone:[NSTimeZone localTimeZone]];
 
+    [self setIsGetRatesFromDecodeStage:YES];
+    
 	return self;
 }
 
@@ -100,6 +104,34 @@ mtcDateFormatter = _mtcDateFormatter;
 {
     unsigned long* ptr = (unsigned long*)someData;
 	unsigned long length = ExtractLength(*ptr);
+    
+    if([self isGetRatesFromDecodeStage]){
+        if (![self mtcModel]) {
+            NSArray* mtcs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+            if (mtcs && [mtcs count] > 0) {
+                [self setMtcModel:[mtcs objectAtIndex:0]];
+            }
+        }
+        if ([self mtcModel]) {
+            unsigned long long ticks = ptr[3] + ((ptr[4] & 0x1fffffULL) << 32);
+            double timeInterval = ticks * 100.e-9;
+            NSDate* mtcDate = [[NSDate alloc] initWithTimeInterval:timeInterval sinceDate:[self baseDate]];
+
+            NSDictionary* mtcStatus = [NSDictionary dictionaryWithObjectsAndKeys:
+                                       [NSNumber numberWithUnsignedLong:ptr[2] & 0xffffff], @"GTID",
+                                       [NSNumber numberWithUnsignedLongLong:ptr[3] + ((ptr[4] & 0x1fffffULL) << 32)], @"cnt10MHz",
+                                       [[self mtcDateFormatter] stringFromDate:mtcDate], @"time10MHz",
+                                       [NSNumber numberWithUnsignedLong:ptr[5] & 0xfffff], @"readPtr",
+                                       [NSNumber numberWithUnsignedLong:ptr[6] & 0xfffff], @"writePtr",
+                                       [NSNumber numberWithBool:((ptr[5] & 0x00800000UL) == 0)], @"dataAvailable",
+                                       nil];
+            [mtcDate release];
+            mtcDate = nil;
+            
+            [self setIsGetRatesFromDecodeStage:[[self mtcModel] bumpRateFromDecodeStage:[[mtcStatus retain] autorelease]]];
+        }
+	}
+
     return length; //must return number of bytes processed.
 }
 

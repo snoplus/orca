@@ -36,9 +36,13 @@
 @private
     NSDate* _baseDate;
     NSDateFormatter* _mtcDateFormatter;
+    BOOL _isGetRatesFromDecodeStage;
+    id _mtcModel;
 }
 @property (retain,nonatomic) NSDate* baseDate;
 @property (retain,nonatomic) NSDateFormatter* mtcDateFormatter;
+@property (assign,nonatomic) BOOL isGetRatesFromDecodeStage;
+@property (assign,nonatomic) id mtcModel;
 
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr;

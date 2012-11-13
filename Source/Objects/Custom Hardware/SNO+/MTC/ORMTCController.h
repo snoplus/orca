@@ -67,6 +67,7 @@
 	IBOutlet NSProgressIndicator* initProgressBar;
 	IBOutlet NSTextField*	initProgressField;
 	IBOutlet NSMatrix*		isPulserFixedRateMatrix;
+    IBOutlet NSMatrix* pulserFeedsMatrix;
 	
 	//settings
 	IBOutlet NSMatrix*		eSumViewTypeMatrix;
@@ -146,6 +147,7 @@
 - (void) sequenceProgress:(NSNotification*)aNote;
 - (void) documentLockChanged:(NSNotification*)aNotification;
 - (void) triggerMTCAMaskChanged:(NSNotification*)aNotification;
+- (void) isPedestalEnabledInCSRChanged:(NSNotification*)aNotification;
 
 #pragma mark •••Helper
 - (void) populatePullDown;
@@ -190,6 +192,7 @@
 - (IBAction) standardSetPedestalsDelay:(id) sender;
 - (IBAction) standardFindTriggerZeroes:(id) sender;
 - (IBAction) standardStopFindTriggerZeroes:(id) sender;
+- (IBAction) standardPulserFeeds:(id)sender;
 
 //Settings
 - (IBAction) eSumViewTypeAction:(id)sender;

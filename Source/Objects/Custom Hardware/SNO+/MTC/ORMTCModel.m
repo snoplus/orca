@@ -58,6 +58,7 @@ NSString* ORMTCModelFixedPulserRateDelayChanged = @"ORMTCModelFixedPulserRateDel
 NSString* ORMtcTriggerNameChanged		= @"ORMtcTriggerNameChanged";
 NSString* ORMTCLock				= @"ORMTCLock";
 NSString* ORMTCModelMTCAMaskChanged = @"ORMTCModelMTCAMaskChanged";
+NSString* ORMTCModelIsPedestalEnabledInCSR = @"ORMTCModelIsPedestalEnabledInCSR";
 
 #define kMTCRegAddressBase		0x00007000
 #define kMTCRegAddressModifier	0x29
@@ -204,7 +205,14 @@ kPEDCrateMask
 
 @synthesize
 dataId = _dataId,
-mtcStatusDataId = _mtcStatusDataId;
+mtcStatusDataId = _mtcStatusDataId,
+mtcStatusGTID = _mtcStatusGTID,
+mtcStatusCnt10MHz = _mtcStatusCnt10MHz,
+mtcStatusTime10Mhz = _mtcStatusTime10Mhz,
+mtcStatusReadPtr = _mtcStatusReadPtr,
+mtcStatusWritePtr = _mtcStatusWritePtr,
+mtcStatusDataAvailable = _mtcStatusDataAvailable,
+mtcStatusNumEventsInMem = _mtcStatusNumEventsInMem;
 
 - (id) init //designated initializer
 {
@@ -230,6 +238,7 @@ mtcStatusDataId = _mtcStatusDataId;
     [lastFile release];
     [lastFileLoaded release];
     [mtcDataBase release];
+    [_mtcStatusTime10Mhz release];
     [super dealloc];
 }
 
@@ -647,6 +656,18 @@ mtcStatusDataId = _mtcStatusDataId;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORMTCModelMTCAMaskChanged object:self];
 }
 
+- (BOOL) isPedestalEnabledInCSR
+{
+    return _isPedestalEnabledInCSR;
+}
+
+- (void) setIsPedestalEnabledInCSR:(BOOL)isPedestalEnabledInCSR
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setIsPedestalEnabledInCSR:[self isPedestalEnabledInCSR]];
+    _isPedestalEnabledInCSR = isPedestalEnabledInCSR;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORMTCModelIsPedestalEnabledInCSR object:self];
+}
+
 #pragma mark •••Converters
 - (unsigned long) mVoltsToRaw:(float) mVolts
 {
@@ -886,6 +907,22 @@ mtcStatusDataId = _mtcStatusDataId;
 	
 }
 
+- (BOOL) bumpRateFromDecodeStage:(NSDictionary*) mtcStatus
+{
+    [self setMtcStatusGTID:[[mtcStatus objectForKey:@"GTID"] unsignedLongValue]];
+    [self setMtcStatusCnt10MHz:[[mtcStatus objectForKey:@"cnt10MHz"] unsignedLongLongValue]];
+    [self setMtcStatusTime10Mhz:[mtcStatus objectForKey:@"time10MHz"]];
+    [self setMtcStatusReadPtr:[[mtcStatus objectForKey:@"readPtr"] unsignedLongValue]];
+    [self setMtcStatusWritePtr:[[mtcStatus objectForKey:@"writePtr"] unsignedLongValue]];
+    [self setMtcStatusDataAvailable:[[mtcStatus objectForKey:@"dataAvailable"] boolValue]];
+    long numEventsInMem = [self mtcStatusWritePtr] - [self mtcStatusReadPtr];
+    if (numEventsInMem < 0 || (numEventsInMem == 0 && [self mtcStatusDataAvailable])) {
+        numEventsInMem += 0x100000;
+    }
+    [self setMtcStatusNumEventsInMem:(unsigned long)numEventsInMem];
+
+    return YES;
+}
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder
@@ -919,12 +956,12 @@ mtcStatusDataId = _mtcStatusDataId;
     [self setMtcaOELOMask:[decoder decodeIntForKey:@"mtcaOELOMask"]];
     [self setMtcaOEHIMask:[decoder decodeIntForKey:@"mtcaOEHIMask"]];
     [self setMtcaOWLNMask:[decoder decodeIntForKey:@"mtcaOWLNMask"]];
+    [self setIsPedestalEnabledInCSR:[decoder decodeBoolForKey:@"isPedestalEnabledInCSR"]];
     
 	if(!mtcDataBase)[self setupDefaults];
     if(triggerName == nil || [triggerName length]==0){
         [self setTriggerName:@"Trigger"];
     }
-		
     [[self undoManager] enableUndoRegistration];
 	
     return self;
@@ -958,6 +995,7 @@ mtcStatusDataId = _mtcStatusDataId;
     [encoder encodeInt:[self mtcaEHIMask] forKey:@"mtcaOELOMask"];
     [encoder encodeInt:[self mtcaEHIMask] forKey:@"mtcaOEHIMask"];
     [encoder encodeInt:[self mtcaEHIMask] forKey:@"mtcaOWLNMask"];
+    [encoder encodeBool:[self isPedestalEnabledInCSR] forKey:@"isPedestalEnabledInCSR"];
 }
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
@@ -1838,7 +1876,9 @@ mtcStatusDataId = _mtcStatusDataId;
 - (void) continueMTCPedestalsFixedRate
 {
 	@try {
-		[self enablePedestal];
+        if ([self isPedestalEnabledInCSR]) {
+            [self enablePedestal];
+        }
 		[self enablePulser];
 	}
 	@catch(NSException* e) {
@@ -1867,7 +1907,9 @@ mtcStatusDataId = _mtcStatusDataId;
 	
 	@try {
 		//[self clearGlobalTriggerWordMask];							//STEP 0a:	//added 01/24/98 QRA
-		[self enablePedestal];											// STEP 1 : Enable Pedestal	
+        if ([self isPedestalEnabledInCSR]) {
+            [self enablePedestal];											// STEP 1 : Enable Pedestal
+        }
 		[self setPedestalCrateMask];									// STEP 2: Mask in crates for pedestals (PMSK)
 		[self setGTCrateMask];											// STEP 3: Mask  Mask in crates fo GTRIGs (GMSK)
 		[self setupPulseGTDelaysCoarse: uLongDBValue(kCoarseDelay) fine:uLongDBValue(kFineDelay)]; // STEP 4: Set thSet the GTRIG/PED delay in ns
@@ -1932,7 +1974,15 @@ mtcStatusDataId = _mtcStatusDataId;
 //single shot blocking SBC command for ORCA macros only (no GUI)
 - (void) singleShotMTCPedestalsFixedTime
 {
-	[self singleShotMTCPedestalsFixedTime:[self fixedPulserRateCount] withDelay:([self fixedPulserRateDelay] * 1000)];
+    if ([self fixedPulserRateDelay] == 0) {
+        NSLog(@"MTCD: pulser rate of 0 Hz requested and ignored.\n");
+        return;
+    }
+    unsigned long pulserDelay;
+	pulserDelay = (unsigned long) (1./[self fixedPulserRateDelay] * 1e7); //100 nsec delay between pulses indeed, sorry
+
+	[self singleShotMTCPedestalsFixedTime:[self fixedPulserRateCount] withDelay:pulserDelay];
+    
 }
 
 //single shot blocking SBC command for ORCA macros only (no GUI) returns GTID difference before - after from the MTC register
@@ -2298,7 +2348,6 @@ mtcStatusDataId = _mtcStatusDataId;
 		[aDictionary setObject:[self getDBDefaultByIndex:i] forNestedKey:[self getDBKeyByIndex:i]];
 	}
 	[self setMtcDataBase:aDictionary];
-	
 }
 @end
 
@@ -2546,11 +2595,20 @@ mtcStatusDataId = _mtcStatusDataId;
 	SBC_Packet aPacket;
 	aPacket.cmdHeader.destination	= kSNO;
 	aPacket.cmdHeader.cmdID			= kSNOMtcFirePedestalJobFixedTime;
-	aPacket.cmdHeader.numberBytesinPayload	= 2*sizeof(long);
+	aPacket.cmdHeader.numberBytesinPayload	= 3*sizeof(long);
 	
 	unsigned long* payloadPtr = (unsigned long*) aPacket.payload;
 	payloadPtr[0] = [self fixedPulserRateCount];
-	payloadPtr[1] = (unsigned long) ([self fixedPulserRateDelay] * 1000); //usec between pedestals
+    //the delay is rate in Hz indeed, and we need multiples of 100 nsec for SBC
+    if ([self fixedPulserRateDelay] == 0) {
+        NSLog(@"MTCD: pulser rate of 0 Hz requested and ignored.\n");
+        return;
+    }
+	payloadPtr[1] = (unsigned long) (1./[self fixedPulserRateDelay] * 1e7); //100 nsec delay between pulses indeed, sorry
+    payloadPtr[2] = 0x2; //enable pulser
+    if ([self isPedestalEnabledInCSR]) {
+        payloadPtr[2] |= 1; //enable ped
+    }
 
 	@try {
 		[[[self adapter] sbcLink] send:&aPacket receive:&aPacket];
@@ -2636,11 +2694,15 @@ mtcStatusDataId = _mtcStatusDataId;
 	SBC_Packet aPacket;
 	aPacket.cmdHeader.destination		= kSNO;
 	aPacket.cmdHeader.cmdID			= kSNOMtcFirePedestalsFixedTime;
-	aPacket.cmdHeader.numberBytesinPayload	= 2*sizeof(long);
+	aPacket.cmdHeader.numberBytesinPayload	= 3*sizeof(long);
 	
 	unsigned long* payloadPtr = (unsigned long*) aPacket.payload;
 	payloadPtr[0] = pedestalCount;
-	payloadPtr[1] = (unsigned long) usecDelay; //usec between pedestals
+	payloadPtr[1] = (unsigned long) usecDelay; //100 nsec delay between pulses indeed, sorry
+    payloadPtr[2] = 0x2; //enable pulser
+    if ([self isPedestalEnabledInCSR]) {
+        payloadPtr[2] |= 1; //enable ped
+    }
 	
 	@try {
 		[[[self adapter] sbcLink] send:&aPacket receive:&aPacket];

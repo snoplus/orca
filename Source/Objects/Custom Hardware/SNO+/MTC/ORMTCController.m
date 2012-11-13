@@ -213,6 +213,11 @@
                      selector : @selector(triggerMTCAMaskChanged:)
                          name : ORMTCModelMTCAMaskChanged
                        object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(isPedestalEnabledInCSRChanged:)
+                         name : ORMTCModelIsPedestalEnabledInCSR
+                       object : nil];
 }
 
 - (void) updateWindow
@@ -240,6 +245,7 @@
 	[self fixedPulserRateDelayChanged:nil];
     [self documentLockChanged:nil];
     [self triggerMTCAMaskChanged:nil];
+    [self isPedestalEnabledInCSRChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -527,6 +533,18 @@
 	
 }
 
+- (void) isPedestalEnabledInCSRChanged:(NSNotification*)aNotification
+{
+    if ([model isPedestalEnabledInCSR]) {
+        [[pulserFeedsMatrix cellWithTag:0] setIntegerValue:0];
+        [[pulserFeedsMatrix cellWithTag:1] setIntegerValue:1];
+    }
+    else {
+        [[pulserFeedsMatrix cellWithTag:0] setIntegerValue:1];
+        [[pulserFeedsMatrix cellWithTag:1] setIntegerValue:0];
+    }
+}
+
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item
 {
     if([tabView indexOfTabViewItem:item] == 0){
@@ -802,6 +820,11 @@
 - (IBAction) standardStopFindTriggerZeroes:(id) sender 
 {
 	[self buttonPushed:sender];
+}
+
+- (IBAction) standardPulserFeeds:(id)sender
+{
+    [model setIsPedestalEnabledInCSR:[[sender selectedCell] tag]];
 }
 
 //Settings buttons.
