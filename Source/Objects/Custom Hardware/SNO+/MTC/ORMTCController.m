@@ -808,7 +808,7 @@
 {
 	float aValue = [sender floatValue];
 	if (aValue < 0.1) aValue = 0.1;
-	if (aValue > 1000) aValue = 1000;
+	if (aValue > 2000000) aValue = 2000000;
 	[model setFixedPulserRateDelay:aValue];
 }
 

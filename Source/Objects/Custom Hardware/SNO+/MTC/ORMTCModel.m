@@ -2591,7 +2591,6 @@ mtcStatusNumEventsInMem = _mtcStatusNumEventsInMem;
 //this is the SBC job variant suited for the mixed physics and pedestal runs
 - (void) fireMTCPedestalsFixedTimeSBC
 {
-	long errorCode = 0;
 	SBC_Packet aPacket;
 	aPacket.cmdHeader.destination	= kSNO;
 	aPacket.cmdHeader.cmdID			= kSNOMtcFirePedestalJobFixedTime;
@@ -2612,15 +2611,17 @@ mtcStatusNumEventsInMem = _mtcStatusNumEventsInMem;
 
 	@try {
 		[[[self adapter] sbcLink] send:&aPacket receive:&aPacket];
-		unsigned long* responsePtr = (unsigned long*) aPacket.payload;
-		errorCode = responsePtr[0];
-		if(errorCode){
-			NSLog(@"SBC failed to fire pedestals fixed time.\n");
-		}
-		else {
+        
+        SBC_JobStatusStruct *responsePtr = (SBC_JobStatusStruct*)aPacket.payload;
+		long running = responsePtr->running;
+		if(running){
 			NSLog(@"Firing pedestals fixed time.\n");
 			//start progress indicator
 			//schedule to stop it
+			//[[self sbcLink] monitorJobFor:self statusSelector:@selector(xilinxLoadStatus:)];
+		}
+		else {
+			NSLog(@"SBC failed to fire pedestals fixed time.\n");
 		}
 	}
 	@catch(NSException* e) {
