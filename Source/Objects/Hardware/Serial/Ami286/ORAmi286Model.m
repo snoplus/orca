@@ -1015,7 +1015,6 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 - (void) processIsStarting
 {
 	//we will control the polling loop
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollLevels) object:nil];
     readOnce = NO;
 }
 
