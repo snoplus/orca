@@ -599,7 +599,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 }
 - (BOOL) isMoving
 {
-	return [self cmdTypeExecuting]!=0;
+	return ([self cmdTypeExecuting]!=0);
 }
 
 - (void) addCustomCmd
@@ -783,7 +783,6 @@ NSString* ORVXMLock							= @"ORVXMLock";
 
 - (void) process_response:(NSString*)aCmd
 {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self];
     
 	if([aCmd hasPrefix:@"W"]){
 		NSLog(@"VXM (%d) paused and waiting on a 'Go' cmd\n",[self uniqueIdNumber]);
@@ -791,6 +790,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 	}
 	else {
 		if([aCmd rangeOfString:@"^"].location != NSNotFound){
+            [NSObject cancelPreviousPerformRequestsWithTarget:self];
 
 			//the '^' means a command is complete
 			aCmd = [aCmd substringFromIndex:1]; //might be more on this response, strip off the '^'
