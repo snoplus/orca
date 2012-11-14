@@ -220,7 +220,7 @@ bool ORMTCReadout::Readout(SBC_LAM_Data* /*lamData*/)
             LogBusError("BusError: GT mem_access at: 0x%08x", 0x80);
             return true;
         }
-        if (value & 0xffffff == last_good_gtid) {
+        if ((value & 0xffffff) == last_good_gtid) {
             LogMessage("dataAvailable error caught");
             return true;
         }
