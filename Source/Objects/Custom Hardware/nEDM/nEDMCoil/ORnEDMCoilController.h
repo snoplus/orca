@@ -35,12 +35,27 @@
     IBOutlet NSButton*      startStopButton;
     IBOutlet NSTextField*   runRateField;   
     IBOutlet NSPopUpButton* listOfAdcs;
-    IBOutlet NSTableView*   listOfRegisteredADCs;
-    IBOutlet NSTableView*   hardwareMap;    
+
+    
     IBOutlet NSPopUpButton* commandPopUp;
     IBOutlet NSPopUpButton* outputNumberPopUp;    
     IBOutlet NSTextField*   inputValueText;
     IBOutlet NSButton*      debugModeButton;
+    
+    IBOutlet NSButton*      feedBackMapButton;
+    IBOutlet NSButton*      orientationMatrixButton;
+    IBOutlet NSButton*      magnetometerMapButton;
+    
+    IBOutlet NSTextField*   feedBackNotifier;
+    IBOutlet NSButton*      deleteADCButton;
+    IBOutlet NSButton*      addADCButton;
+
+    IBOutlet NSTableView*   listOfRegisteredADCs;
+    IBOutlet NSTableView*   hardwareMap;
+    IBOutlet NSTableView*   orientationMatrix;
+    IBOutlet NSTableView*   feedbackMatrix;
+    
+    IBOutlet NSTextField*   coilText;
     
     NSView *blankView;    
     NSSize controlSize;
@@ -82,6 +97,8 @@
 - (IBAction) sendCommandAction:(id)sender;
 - (IBAction) debugCommandAction:(id)sender;
 - (IBAction) connectAllAction:(id)sender;
+- (IBAction) removeSelectedADCs:(id)sender;
+- (IBAction) handleToBeAddedADC:(id)sender;
 
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;
 

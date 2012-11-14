@@ -48,6 +48,12 @@ NSString* ORnEDMCoilDebugRunningHasChanged = @"ORnEDMCoilDebugRunningHasChanged"
 - (void) _setCurrent:(double)current forSupply:(int)index;
 
 - (void) _setADCList:(NSMutableArray*)anArray;
+
+- (void) _setOrientationMatrix:(NSMutableArray*)anArray;
+- (void) _setMagnetometerMatrix:(NSMutableArray*)anArray;
+- (void) _setConversionMatrix:(NSMutableData*)anArray;
+
+- (BOOL) _verifyMatrixSizes:(NSArray*)feedBackMatrix orientationMatrix:(NSArray*)orMax magnetometerMap:(NSArray*)magMap;
 @end
 
 #define CALL_SELECTOR_ONALL_POWERSUPPLIES(x)      \
@@ -55,6 +61,8 @@ NSString* ORnEDMCoilDebugRunningHasChanged = @"ORnEDMCoilDebugRunningHasChanged"
 NSEnumerator* anEnum = [objMap objectEnumerator]; \
 for (id obj in anEnum) [obj x];                   \
 }
+
+#define ORnEDMCoil_DEBUG 1
 
 @implementation ORnEDMCoilModel (private) 
 
@@ -226,16 +234,19 @@ for (id obj in anEnum) [obj x];                   \
 - (void) _startRunning
 {
     [self connectAllPowerSupplies];
-    if (FeedbackMatData) {
+    if (FeedbackMatData != nil && OrientationMatrix != nil &&
+        MagnetometerMap != nil &&
+        [self _verifyMatrixSizes:nil
+               orientationMatrix:OrientationMatrix
+                 magnetometerMap:MagnetometerMap] ) {
         [self _setUpRunning:YES];    
-        }
-    else{
-        NSAlert *alert = [[NSAlert alloc] init];
-        [alert setMessageText:@"Warning"];
-        [alert setInformativeText:@"Load Feedback Matrix first"];
-        [alert runModal];
-        [alert release];
-        }
+    } else {
+        [[NSAlert alertWithMessageText:@"Error"
+                         defaultButton:nil
+                       alternateButton:nil
+                           otherButton:nil
+             informativeTextWithFormat:@"Input matrices are inconsistent or non-existent.  Process can not be started."] runModal];
+    }
 }
 
 - (void) _setUpRunning:(BOOL)verbose
@@ -266,6 +277,90 @@ for (id obj in anEnum) [obj x];                   \
     [[NSNotificationCenter defaultCenter]
 	 postNotificationName:ORnEDMCoilADCListChanged
 	 object: self];        
+}
+
+
+- (void) _setOrientationMatrix:(NSMutableArray*)anArray
+{
+    [anArray retain];
+    [OrientationMatrix release];
+    OrientationMatrix = anArray;
+    [[NSNotificationCenter defaultCenter]
+	 postNotificationName:ORnEDMCoilHWMapChanged object: self];
+}
+
+- (void) _setMagnetometerMatrix:(NSMutableArray*)anArray
+{
+    [anArray retain];
+    [MagnetometerMap release];
+    MagnetometerMap = anArray;
+    [[NSNotificationCenter defaultCenter]
+	 postNotificationName:ORnEDMCoilHWMapChanged object: self];
+}
+- (void) _setConversionMatrix:(NSMutableData*)anArray
+{
+    [anArray retain];
+    [FeedbackMatData release];
+    FeedbackMatData = anArray;
+    [[NSNotificationCenter defaultCenter]
+	 postNotificationName:ORnEDMCoilHWMapChanged object: self];
+}
+
+
+- (BOOL) _verifyMatrixSizes:(NSArray*)feedBackMatrix orientationMatrix:(NSArray*)orMax magnetometerMap:(NSArray*)magMap
+{
+    // Returns YES when matrix sizes are OK.
+    
+    @try {
+        if (feedBackMatrix != nil) {
+            // Means the feedback matrix is being defined.
+            for (id e in feedBackMatrix) {
+                if (![e isKindOfClass:[NSArray class]]) {
+                    [NSException raise:@"MatrixReadInError"
+                                format:@"Feedback Matrix is mal-formed."];
+                }
+                for (id var in e) {
+                    if (![var isKindOfClass:[NSNumber class]]) {
+                        [NSException raise:@"MatrixReadInError"
+                                    format:@"Feedback Matrix is mal-formed."];
+                    }
+                }
+            }
+            NumberOfChannels   = [[feedBackMatrix objectAtIndex: 0] count];
+            NumberOfCoils      = [feedBackMatrix count];
+        }
+
+        for (id e in orMax) {
+            if (![e isKindOfClass:[NSNumber class]]) {
+                [NSException raise:@"MatrixReadInError"
+                            format:@"Input matrices are malformed."];
+            }
+        }
+        for (id e in magMap) {
+            if (![e isKindOfClass:[NSNumber class]]) {
+                [NSException raise:@"MatrixReadInError"
+                            format:@"Input matrices are malformed."];
+            }
+        }
+        
+        // Can't test if we don't know the number of coils or channels
+        if (NumberOfCoils == 0 || NumberOfChannels == 0) return YES;
+        if ((orMax != nil && [orMax count] != NumberOfCoils) &&
+            (magMap != nil && [magMap count] != NumberOfChannels)) {
+            [NSException raise:@"MatrixReadInError"
+                        format:@"Input matrices are inconsistent.  Either try again, or reset the already input data."];
+        }
+
+    } @catch(NSException *e) {
+        // This means something was wrong with the data, return NO!
+        [[NSAlert alertWithMessageText:@"Error"
+                         defaultButton:nil
+                       alternateButton:nil
+                           otherButton:nil
+             informativeTextWithFormat:[e reason]] runModal];
+        return NO;
+    }
+    return YES;
 }
 
 @end
@@ -363,10 +458,22 @@ for (id obj in anEnum) [obj x];                   \
     return NumberOfChannels;
 }
 
+- (int) numberOfCoils
+{
+    return NumberOfCoils;
+}
+
 - (int) mappedChannelAtChannel:(int)aChan
 {
-    if (aChan >= [self numberOfChannels]) return -1;
+    if (aChan >= [MagnetometerMap count]) return -1;
     return [[MagnetometerMap objectAtIndex:aChan] intValue];
+}
+
+- (double) conversionMatrix:(int)channel coil:(int)aCoil
+{
+    if (aCoil > NumberOfCoils || channel > NumberOfChannels) return 0.0;
+    double* dblPtr = (double*)[FeedbackMatData bytes];
+    return dblPtr[aCoil*NumberOfChannels + channel];
 }
 
 - (void) setPollingFrequency:(float)aFrequency
@@ -384,122 +491,113 @@ for (id obj in anEnum) [obj x];                   \
     else [self _startRunning];
 }
 
-- (void) setOrientationMatrix:(NSMutableArray*)anArray
-{
-    [anArray retain];
-    [OrientationMatrix release];
-    OrientationMatrix = anArray;
-    [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORnEDMCoilHWMapChanged object: self]; 
-}
-
-- (void) setMagnetometerMatrix:(NSMutableArray*)anArray
-{
-    [anArray retain];
-    [MagnetometerMap release];
-    MagnetometerMap = anArray;  
-    [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORnEDMCoilHWMapChanged object: self];    
-}
-- (void) setConversionMatrix:(NSMutableData*)anArray
-{
-    [anArray retain];
-    [FeedbackMatData release];
-    FeedbackMatData = anArray;   
-}
 
 - (void) initializeConversionMatrixWithPlistFile:(NSString*)plistFile
 {
     NSLog(@"Reading FeedbackMatrix\n");
+
     // reads FeedbackMatrix from GUI
     // FeedbackMatrix is 24 x 180 (Coils x Channels), unused columns filled with 0s
-    
     
     // Build the array from the plist  
     NSArray *RawFeedbackMatrix = [NSArray arrayWithContentsOfFile:plistFile];
     
     
-    // NumberOfMagnetometers: extracted from length of a line in RawFeedbackMatrix divided by 3
-    NumberOfMagnetometers=[[RawFeedbackMatrix objectAtIndex: 0] count]/3;
-    NumberOfChannels = 3* NumberOfMagnetometers;
-    NumberOfCoils = [RawFeedbackMatrix count];
+    // Verify matrix sizes
+    if (![self _verifyMatrixSizes:RawFeedbackMatrix
+                orientationMatrix:OrientationMatrix
+                  magnetometerMap:MagnetometerMap]) return;
     
-    // ToDo: catch error when NumberOfCoils>MaxNumberOfCoils, NoOfMag %3!=0...
-
+    // If we get here, NumberOfChannels and NumberOfCoils are properly set.
 
     // Bring contents of RawFeedbackMatrix to FeedbackMatrix
     // While RFM is two-dimensional, FM is a simple double Array, dimensions are handled by cblas
     
     // Initialise FeedbackMatData
-    NSMutableData* matData = [NSMutableData data];
-    [matData setLength:0];
+    NSMutableData* matData = [NSMutableData dataWithLength:NumberOfChannels*NumberOfCoils*sizeof(double)];
+    double* dblPtr = (double*)[matData bytes];
     
     int line,i;
     for(line=0; line<[RawFeedbackMatrix count]; line++){
         for (i=0; i<NumberOfChannels;i++){
-            double aVal = [[[RawFeedbackMatrix objectAtIndex:line] objectAtIndex:i] doubleValue];
-            [matData appendBytes:&aVal length:sizeof(aVal)];
+            dblPtr[line*NumberOfChannels + i] = [[[RawFeedbackMatrix objectAtIndex:line] objectAtIndex:i] doubleValue];
         }
     }
+    [self _setConversionMatrix:matData];    
+    
+#ifdef ORnEDMCoil_DEBUG
     NSLog(@"Filled FeedbackMatData\n");
-    double* dblPtr = (double*)[matData bytes];
-    for (i=0; i<NumberOfCoils*NumberOfChannels;i++) {
-        NSLog(@"%f\n",dblPtr[i]);
-    }
+    for (i=0; i<NumberOfCoils*NumberOfChannels;i++) NSLog(@"%f\n",dblPtr[i]);
     NSLog(@"output complete\n");
-    [self setConversionMatrix:matData];
+#endif
+    
+
     
 }
-
 
 - (void) initializeOrientationMatrixWithPlistFile:(NSString*)plistFile
 {
     
     NSMutableArray* orientMat = [NSMutableArray arrayWithContentsOfFile:plistFile];
 
-    if( NumberOfCoils & ([MagnetometerMap count] != NumberOfCoils )) 
-    {
-        NSAlert *alert = [[NSAlert alloc] init];
-        [alert setMessageText:@"Warning"];
-        [alert setInformativeText:@"Numbers of coils do not match"];
-        [alert runModal];
-        [alert release];
-    }
-
+    if( ![self _verifyMatrixSizes:nil orientationMatrix:orientMat magnetometerMap:MagnetometerMap] ) return;
+    [self _setOrientationMatrix:orientMat];
+    
+#ifdef ORnEDMCoil_DEBUG
     NSLog(@"OrientationMatrix read:");
     int i;
     for (i=0; i<[orientMat count]; i++) {
         NSLog([NSString stringWithFormat:@"element: %f\n",[[orientMat objectAtIndex:i] floatValue]]);
     }
-    [self setOrientationMatrix:orientMat];
+#endif
+
     
 }
 
-
-
-
 - (void) initializeMagnetometerMapWithPlistFile:(NSString*)plistFile
 {
-       
     NSMutableArray* magMap = [NSMutableArray arrayWithContentsOfFile:plistFile];
-    if( NumberOfChannels & ([magMap count] != NumberOfChannels )) 
-        {
-        NSLog(@"Number of Channels do not match");
-        NSAlert *alert = [[NSAlert alloc] init];
-        [alert setMessageText:@"Warning"];
-        [alert setInformativeText:@"Numbers of channels do not match"];
-        [alert runModal];
-        [alert release];
-        }
+    if( ![self _verifyMatrixSizes:nil orientationMatrix:OrientationMatrix magnetometerMap:magMap] ) return;
+    [self _setMagnetometerMatrix:magMap];
+    
+#ifdef ORnEDMCoil_DEBUG
     NSLog(@"MagnetometerMap read:\n");
     int i;
     for (i=0; i<[magMap count]; i++) {
         NSLog([NSString stringWithFormat:@"element: %f\n",[[magMap objectAtIndex:i] floatValue]]);
     }
-//        RAISE ERROR, request other file
-//        ;
-    [self setMagnetometerMatrix:magMap];
-    
+#endif
+}
+- (void) resetConversionMatrix
+{
+    [self _setConversionMatrix:nil];
+    NumberOfChannels = 0;
+    NumberOfCoils    = 0;
+    [self resetMagnetometerMap];
+    [self resetOrientationMatrix];
+}
+- (void) resetMagnetometerMap
+{
+    [self _setMagnetometerMatrix:nil];
+}
+- (void) resetOrientationMatrix
+{
+    [self _setOrientationMatrix:nil];
+}
+
+- (NSArray*) magnetometerMap
+{
+    return MagnetometerMap;
+}
+
+- (NSArray*) orientationMatrix
+{
+    return OrientationMatrix;
+}
+
+- (NSData*)  feedbackMatData
+{
+    return FeedbackMatData;
 }
 
 #pragma mark •••Notifications
@@ -604,10 +702,9 @@ for (id obj in anEnum) [obj x];                   \
 
     [self setPollingFrequency:[decoder decodeFloatForKey:@"kORnEDMCoilPollingFrequency"]];
     [self setDebugRunning:[decoder decodeBoolForKey:@"kORnEDMCoilDebugRunning"]]; 
-    [self setMagnetometerMatrix:[decoder decodeObjectForKey:@"kORnEDMCoilMagnetometerMap"]];
-    [self setOrientationMatrix:[decoder decodeObjectForKey:@"kORnEDMCoilOrientationMatrix"]];
-    [self setConversionMatrix:[decoder decodeObjectForKey:@"kORnEDMCoilFeedbackMatrixData"]];     
-    NumberOfMagnetometers = [decoder decodeIntForKey:@"kORnEDMCoilNumMagnetometers"];
+    [self _setMagnetometerMatrix:[decoder decodeObjectForKey:@"kORnEDMCoilMagnetometerMap"]];
+    [self _setOrientationMatrix:[decoder decodeObjectForKey:@"kORnEDMCoilOrientationMatrix"]];
+    [self _setConversionMatrix:[decoder decodeObjectForKey:@"kORnEDMCoilFeedbackMatrixData"]];
     NumberOfChannels = [decoder decodeIntForKey:@"kORnEDMCoilNumChannels"];    
     NumberOfCoils = [decoder decodeIntForKey:@"kORnEDMCoilNumCoils"]; 
     
@@ -624,8 +721,7 @@ for (id obj in anEnum) [obj x];                   \
     [encoder encodeBool:debugRunning forKey:@"kORnEDMCoilDebugRunning"];
     [encoder encodeObject:MagnetometerMap forKey:@"kORnEDMCoilMagnetometerMap"];
     [encoder encodeObject:OrientationMatrix forKey:@"kORnEDMCoilOrientationMatrix"];
-    [encoder encodeObject:FeedbackMatData forKey:@"kORnEDMCoilFeedbackMatrixData"];   
-    [encoder encodeInt:NumberOfMagnetometers forKey:@"kORnEDMCoilNumMagnetometers"];
+    [encoder encodeObject:FeedbackMatData forKey:@"kORnEDMCoilFeedbackMatrixData"];
     [encoder encodeInt:NumberOfChannels forKey:@"kORnEDMCoilNumChannels"];    
     [encoder encodeInt:NumberOfCoils forKey:@"kORnEDMCoilNumCoils"];        
     

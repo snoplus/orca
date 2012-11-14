@@ -28,7 +28,7 @@
 
 @interface ORnEDMCoilController (private)
 - (void) _buildPopUpButtons;
-- (void) _readFile:(id)sender withSelector:(SEL)asel;
+- (void) _readFile:(id)sender withSelector:(SEL)asel withMessage:(NSString*)message;
 @end
 
 @implementation ORnEDMCoilController
@@ -50,11 +50,12 @@
     
 	[groupView setGroup:model];
     
-    controlSize		= NSMakeSize(620,595);
+    controlSize		= NSMakeSize(720,610);
     powerSupplySize	= NSMakeSize(450,549);
     adcSize         = NSMakeSize(350,589);
     
     blankView = [[NSView alloc] init];
+    [coilText setFrameCenterRotation:90];// CGAffineTransformMakeRotation(M_PI/4);
     //[self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
 
     [super awakeFromNib];
@@ -212,15 +213,59 @@
 
 - (void) channelMapChanged:(NSNotification*)aNote
 {
+    // Make sure the buttons have the correct titles
+    if ([model orientationMatrix] == nil) {
+        [orientationMatrixButton setTitle:@"Load Orientation Matrix"];
+    } else {
+        [orientationMatrixButton setTitle:@"Reset Orientation Matrix"];
+    }
+    if ([model magnetometerMap] == nil) {
+        [magnetometerMapButton setTitle:@"Load Magn. Channel Map"];
+    } else {
+        [magnetometerMapButton setTitle:@"Reset Magn. Channel Map"];
+    }
+    if([model feedbackMatData] == nil) {
+        [feedBackMapButton setTitle:@"Load Feedback Matrix"];
+        [feedBackNotifier setHidden:YES];
+    } else {
+        [feedBackMapButton setTitle:@"Reset Feedback Matrix"];
+        [feedBackNotifier setHidden:NO];
+    }
+        
     [hardwareMap reloadData];
+    [feedbackMatrix reloadData];
+    [orientationMatrix reloadData];
 }
 
 #pragma mark •••Table View protocol
 
+
 - (NSInteger) numberOfRowsInTableView:(NSTableView *)aTableView
 {
     if (aTableView == listOfRegisteredADCs) return [[model listOfADCs] count];
-    if (aTableView == hardwareMap) return [model numberOfChannels];    
+    if (aTableView == hardwareMap) return [[model magnetometerMap] count];
+    if (aTableView == orientationMatrix) return [[model orientationMatrix] count];
+    if (aTableView == feedbackMatrix) {
+        if ([aTableView numberOfColumns] != [model numberOfChannels]) {
+            while ([aTableView numberOfColumns] > [model numberOfChannels] &&
+                   [aTableView numberOfColumns] > 1) {
+                
+                [aTableView removeTableColumn:[[aTableView tableColumns] objectAtIndex:[aTableView numberOfColumns]-1]];
+            }
+            NSTableColumn* firstColumn = [[aTableView tableColumns] objectAtIndex:0];
+            [firstColumn setIdentifier:@"0"];
+            [[[firstColumn dataCell] formatter] setMaximumFractionDigits:3];
+            while ([aTableView numberOfColumns] < [model numberOfChannels]) {
+                NSTableColumn* newColumn = [[NSTableColumn alloc]
+                                            initWithIdentifier:[NSString stringWithFormat:@"%d",[aTableView numberOfColumns]]];
+                [newColumn setWidth:[firstColumn width]];
+                [newColumn setDataCell:[firstColumn dataCell]];
+                [[newColumn headerCell] setStringValue:[newColumn identifier]];
+                [aTableView addTableColumn:newColumn];
+            }
+        }
+        return [model numberOfCoils];
+    }
     return 0;
 }
 
@@ -233,7 +278,24 @@
         if ([ident isEqualToString:@"kCardSlot"]) return [NSNumber numberWithInt:rowIndex];
         if ([ident isEqualToString:@"kChannel"]) return [NSNumber numberWithInt:[model mappedChannelAtChannel:rowIndex]];
     }
+    if (aTableView == orientationMatrix) {
+        NSString* ident = [aTableColumn identifier];        
+        if ([ident isEqualToString:@"kChannel"]) return [NSNumber numberWithInt:rowIndex];
+        if ([ident isEqualToString:@"kOrientation"]) return [[model orientationMatrix] objectAtIndex:rowIndex];
+    }
+    if (aTableView == feedbackMatrix) {
+        return [NSNumber numberWithDouble:[model conversionMatrix:[[aTableColumn identifier] intValue] coil:rowIndex]];
+    }
     return @"";
+}
+
+- (void) tableViewSelectionDidChange:(NSNotification*)aNotification
+{
+    if ([listOfRegisteredADCs numberOfSelectedRows] == 0){
+        [deleteADCButton setEnabled:NO];
+    } else {
+        [deleteADCButton setEnabled:YES];
+    }
 }
 
 #pragma mark •••Accessors
@@ -293,6 +355,7 @@
         }
         if (!objectExists) [listOfAdcs addItemWithTitle:[obj processingTitle]];
     }
+    [self handleToBeAddedADC:nil];
 
 }
 
@@ -326,21 +389,16 @@
     
 }
 
-- (void) _readFile:(id)sender withSelector:(SEL)asel
+- (void) _readFile:(id)sender withSelector:(SEL)asel withMessage:(NSString*)message;
 {
     NSOpenPanel *openPanel = [NSOpenPanel openPanel];
     [openPanel setCanChooseDirectories:NO];
     [openPanel setCanChooseFiles:YES];
     [openPanel setAllowsMultipleSelection:NO];
     [openPanel setPrompt:@"Choose"];
-    NSString* startingDir;
-	//NSString* fullPath = [[[model segmentGroup:0] mapFile] stringByExpandingTildeInPath];
-    //if(fullPath){
-    //    startingDir = [fullPath stringByDeletingLastPathComponent];
-    //}
-    //else {
-    startingDir = NSHomeDirectory();
-    //}
+    [openPanel setMessage:message];
+    
+    NSString* startingDir = NSHomeDirectory();
 #if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
@@ -355,19 +413,32 @@
 // import feedback matrix
 - (IBAction) readPrimaryMapFileAction:(id)sender
 {
-    [self _readFile:sender withSelector:@selector(initializeConversionMatrixWithPlistFile:)];
+    if ([model feedbackMatData] == nil) {
+        [self _readFile:sender
+           withSelector:@selector(initializeConversionMatrixWithPlistFile:)
+            withMessage:@"Choose Feedback Matrix File"];
+    } else [model resetConversionMatrix];
 }
 
 // import magnetometer channel map
 - (IBAction) readPrimaryMagnetometerMapFileAction:(id)sender
 {
-    [self _readFile:sender withSelector:@selector(initializeMagnetometerMapWithPlistFile:)];    
+    if ([model magnetometerMap] == nil) {
+        [self _readFile:sender
+           withSelector:@selector(initializeMagnetometerMapWithPlistFile:)
+            withMessage:@"Choose Magnetometer Map File"];
+    } else [model resetMagnetometerMap];
+        
 }
 
 // import magnetometer channel map
 - (IBAction) readPrimaryOrientationMatrixFileAction:(id)sender
 {
-    [self _readFile:sender withSelector:@selector(initializeOrientationMatrixWithPlistFile:)];    
+    if ([model orientationMatrix] == nil) {
+        [self _readFile:sender
+           withSelector:@selector(initializeOrientationMatrixWithPlistFile:)
+            withMessage:@"Choose Orientation Matrix File"];
+    } else [model resetOrientationMatrix];
 }
 
 - (IBAction) sendCommandAction:(id)sender
@@ -391,6 +462,23 @@
 - (IBAction) connectAllAction:(id)sender
 {
     [model connectAllPowerSupplies];
+}
+
+- (IBAction) removeSelectedADCs:(id)sender
+{
+    NSArray* objsToRemove = [[model listOfADCs] objectsAtIndexes:[listOfRegisteredADCs selectedRowIndexes]];
+    for (id obj in objsToRemove) [model removeADC:obj];
+    
+}
+
+- (IBAction) handleToBeAddedADC:(id)sender
+{
+    NSInteger index = [listOfAdcs indexOfSelectedItem];
+    if (index == 0 || index == -1){
+        [addADCButton setEnabled:NO];
+    } else {
+        [addADCButton setEnabled:YES];
+    }
 }
 
 //---------------------------------------------------------------

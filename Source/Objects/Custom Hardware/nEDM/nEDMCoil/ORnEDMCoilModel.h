@@ -33,7 +33,6 @@
     NSMutableDictionary* objMap;
     BOOL isRunning;
     float pollingFrequency;
-    int NumberOfMagnetometers;  
     int NumberOfChannels;
     int NumberOfCoils;
     BOOL debugRunning;
@@ -63,15 +62,21 @@
 - (NSArray*) listOfADCs;
 
 - (int) numberOfChannels;
+- (int) numberOfCoils;
 - (int) mappedChannelAtChannel:(int)aChan;
-
-- (void) setOrientationMatrix:(NSMutableArray*)anArray;
-- (void) setMagnetometerMatrix:(NSMutableArray*)anArray;
-- (void) setConversionMatrix:(NSMutableData*)anArray;
+- (double) conversionMatrix:(int)channel coil:(int)aCoil;
 
 - (void) initializeConversionMatrixWithPlistFile:(NSString*)plistFile;
 - (void) initializeMagnetometerMapWithPlistFile:(NSString*)plistFile;
 - (void) initializeOrientationMatrixWithPlistFile:(NSString*)plistFile;
+
+- (void) resetConversionMatrix;
+- (void) resetMagnetometerMap;
+- (void) resetOrientationMatrix;
+
+- (NSArray*) magnetometerMap;
+- (NSArray*) orientationMatrix;
+- (NSData*)  feedbackMatData;
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
