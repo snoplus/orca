@@ -34,6 +34,7 @@ NSString* ORnEDMCoilDebugRunningHasChanged = @"ORnEDMCoilDebugRunningHasChanged"
 
 @interface ORnEDMCoilModel (private) // Private interface
 #pragma mark •••Running
+- (void) _runThread;
 - (void) _runProcess;
 - (void) _stopRunning;
 - (void) _startRunning;
@@ -43,9 +44,11 @@ NSString* ORnEDMCoilDebugRunningHasChanged = @"ORnEDMCoilDebugRunningHasChanged"
 - (void) _readADCValues;
 //- (void) _writeValuesToDatabase;
 - (NSData*) _calcPowerSupplyValues;
+- (NSData*) _readCurrentValues;
 - (void) _syncPowerSupplyValues:(NSData*)currentVector;
 - (double) _fieldAtMagnetometer:(int)index;
 - (void) _setCurrent:(double)current forSupply:(int)index;
+- (double) _getCurrent:(int)supply;
 
 - (void) _setADCList:(NSMutableArray*)anArray;
 
@@ -66,30 +69,36 @@ for (id obj in anEnum) [obj x];                   \
 
 @implementation ORnEDMCoilModel (private) 
 
+- (void) _runThread
+{
+    NSRunLoop* rl = [NSRunLoop currentRunLoop];
+    // make sure we schedule the run
+    [self performSelector:@selector(_runProcess) withObject:nil afterDelay:0.5];
+    // perform the run loop
+    while( isRunning && [rl runMode:NSDefaultRunLoopMode
+                         beforeDate:[NSDate dateWithTimeIntervalSinceNow:1.0]]); // Cancel the run loop every second
+}
 
 - (void) _runProcess
-{   
-    
+{
     // The current calculation process
-    @try { 
+    @try {
         [self _readADCValues];
         NSData* currentVector = [self _calcPowerSupplyValues];
         [self _syncPowerSupplyValues:currentVector];
     }
-	@catch(NSException* localException) { 
+    @catch(NSException* localException) { 
         NSLog(@"%@\n",[localException reason]);
         [self _stopRunning];
-		//catch this here to prevent it from falling thru, but nothing to do.
-        [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_runProcess) object:nil];        
+        //catch this here to prevent it from falling thru, but nothing to do.
         return;
-	}  
+    }
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_runProcess) object:nil];
     if(pollingFrequency!=0){
         [self performSelector:@selector(_runProcess) withObject:nil afterDelay:(float) 1.0/pollingFrequency];
     } else {
         [self _stopRunning];
-    }    
-
+    }
 }
 
 
@@ -123,7 +132,7 @@ for (id obj in anEnum) [obj x];                   \
     
     //init FieldVectormutabl
     NSData* FieldVector = [NSMutableData dataWithLength:(NumberOfChannels*sizeof(double))];    
-    NSData* CurrentVector=[NSMutableData dataWithLength:(NumberOfCoils*sizeof(double))];    
+    NSData* CurrentVector = [self _readCurrentValues];
     double* ptr = (double*)[FieldVector bytes];
     //Grab field values
     int i;
@@ -144,6 +153,21 @@ for (id obj in anEnum) [obj x];                   \
     
 }
 
+- (NSData*) _readCurrentValues
+{
+    // The following tells the power supplies to read the current value, we don't wait for the actual value.
+    CALL_SELECTOR_ONALL_POWERSUPPLIES(sendCommandReadBackGetCurrentSetWithOutput:0);
+    CALL_SELECTOR_ONALL_POWERSUPPLIES(sendCommandReadBackGetCurrentSetWithOutput:1);
+    
+    NSData* CurrentVector = [[[NSMutableData alloc] initWithLength:(NumberOfCoils*sizeof(double))] autorelease];
+    double* ptr = (double*)[CurrentVector bytes];
+    
+    
+    for (int i=0; i<NumberOfCoils;i++){
+        ptr[i] = [self _getCurrent:i];
+    }
+    return CurrentVector;
+}
 
 - (void) _syncPowerSupplyValues:(NSData*) currentVector
 {
@@ -220,6 +244,11 @@ for (id obj in anEnum) [obj x];                   \
     [[objMap objectForKey:[NSNumber numberWithInt:(index/2)]] setWriteToSetCurrentLimit:current withOutput:(index%2)];
 }
 
+- (double) _getCurrent:(int)supply
+{
+    return [[objMap objectForKey:[NSNumber numberWithInt:(supply/2)]] readBackGetCurrentSetWithOutput:(supply%2)];
+}
+
 #pragma mark •••Running
 - (void) _stopRunning
 {
@@ -256,12 +285,12 @@ for (id obj in anEnum) [obj x];                   \
     
     if(pollingFrequency!=0){  
 		isRunning = YES;
-        if(verbose) NSLog(@"Running nEDM Coil compensation at a rate of %.2f Hs.\n",pollingFrequency);
-		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_runProcess) object:nil];
-        [self performSelector:@selector(_runProcess) withObject:self afterDelay:1./pollingFrequency];
+        if(verbose) NSLog(@"Running nEDM Coil compensation at a rate of %.2f Hz.\n",pollingFrequency);
+        [NSThread detachNewThreadSelector:@selector(_runThread)
+                                 toTarget:self
+                               withObject:nil];
     }
     else {
-		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_runProcess) object:nil];
         if(verbose) NSLog(@"Not running nEDM Coil compensation, polling frequency set to 0\n");
     }
     [[NSNotificationCenter defaultCenter]
