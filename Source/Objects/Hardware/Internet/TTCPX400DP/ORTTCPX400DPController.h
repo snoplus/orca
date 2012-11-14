@@ -72,6 +72,7 @@
 - (void) readbackChanged:(NSNotification*)aNote;
 - (void) setValuesChanged:(NSNotification*)aNote;
 - (void) outputStatusChanged:(NSNotification*)aNote;
+- (void) hwFinderChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 //- (IBAction) passwordFieldAction:(id)sender;
