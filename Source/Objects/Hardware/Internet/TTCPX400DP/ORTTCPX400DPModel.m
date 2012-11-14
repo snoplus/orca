@@ -447,8 +447,9 @@ ORTTCPX_READ_IMPLEMENT(GetOutputStatus, int)
         if (!shouldContinue) return;
         if(!theCmd->responds) [self _setGeneralReadback:@"N/A"];
         if([self isConnected]){
-            [self performSelectorOnMainThread:@selector(_mainThreadSocketSend:) withObject:nextCmdToWrite
-                                waitUntilDone:YES];
+            [self _mainThreadSocketSend:nextCmdToWrite];
+//            [self performSelectorOnMainThread:@selector(_mainThreadSocketSend:) withObject:nextCmdToWrite
+//                                waitUntilDone:YES];
         }
         else {
             NSString *errorMsg = @"Must establish IP connection prior to issuing command.\n";
@@ -575,7 +576,10 @@ ORTTCPX_READ_IMPLEMENT(GetOutputStatus, int)
 - (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(unsigned)inAmount
 {
 	if(inNetSocket != socket) return;
-	NSString* theString = [[inNetSocket readString:NSASCIIStringEncoding] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    
+	NSString* theString = [[inNetSocket readString:NSASCIIStringEncoding]
+                           stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    
 	[self _processNextReadCommandInQueueWithInputString:theString];
     // Process any waiting write commands.
     [self _processNextWriteCommandInQueue];
@@ -589,12 +593,6 @@ ORTTCPX_READ_IMPLEMENT(GetOutputStatus, int)
 		[socket autorelease];
 		socket = nil;
 	}
-	// Forward it if the other delegate wants this info
-    /*
-	if ([delegate respondsToSelector:selector(netsocketDisconnected:)]) {
-		[delegate netsocketDisconnected:];
-         }
-     */
 }
 
 #pragma mark ***Guardian
@@ -614,11 +612,16 @@ ORTTCPX_READ_IMPLEMENT(GetOutputStatus, int)
 
 - (void) writeCommand:(ETTCPX400DPCmds)cmd withInput:(float)input withOutputNumber:(int)output
 {
+
     [self _writeCommand:cmd withInput:input withOutputNum:output withSelectorName:nil];
 }
 
 - (void) _writeCommand:(ETTCPX400DPCmds)cmd withInput:(float)input withOutputNum:(int)output withSelectorName:(NSString*)selName
 {
+    if (![self isConnected]) {
+        NSLog(@"CPX400DP must be connected to write command\n");
+        return;
+    }
     NSString* cmdStr = [self commandStringForCommand:cmd withInput:input withOutputNumber:output];
     
     if ([cmdStr isEqualToString:@""]) {
