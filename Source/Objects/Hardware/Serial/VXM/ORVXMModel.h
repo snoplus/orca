@@ -55,6 +55,7 @@
 		NSString*		customCmd;
 		BOOL			waiting;
 		BOOL			useCmdQueue;
+        BOOL            busy;
 }
 
 #pragma mark ***Initialization
