@@ -20,7 +20,6 @@
 
 #import "ORTTCPX400DPModel.h"
 #import "NetSocket.h"
-#import "ORVXI11HardwareFinder.h"
 
 #define ORTTCPX400DPPort 9221
 
@@ -377,15 +376,6 @@ ORTTCPX_READ_IMPLEMENT(GetOutputStatus, int)
 - (void) _connectIP
 {
 	if(!isConnected){
-        NSDictionary* dict = [[ORVXI11HardwareFinder sharedVXI11HardwareFinder] availableHardware];
-        for (NSString* key in dict) {
-            ORVXI11IPDevice* dev = [dict objectForKey:key];
-            if ([[dev serialNumber] isEqualToString:serialNumber]) {
-                [self setIpAddress:[dev ipAddress]];
-                break;
-            }
-            // do stuff
-        }
 		[self setSocket:[NetSocket netsocketConnectedToHost:ipAddress port:ORTTCPX400DPPort]];	
 	}
 }
