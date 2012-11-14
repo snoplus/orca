@@ -2,32 +2,32 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">11C74</string>
-		<string key="IBDocument.InterfaceBuilderVersion">1938</string>
-		<string key="IBDocument.AppKitVersion">1138.23</string>
-		<string key="IBDocument.HIToolboxVersion">567.00</string>
+		<string key="IBDocument.SystemVersion">11G63b</string>
+		<string key="IBDocument.InterfaceBuilderVersion">2549</string>
+		<string key="IBDocument.AppKitVersion">1138.51</string>
+		<string key="IBDocument.HIToolboxVersion">569.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">1938</string>
+			<string key="NS.object.0">2549</string>
 		</object>
 		<object class="NSArray" key="IBDocument.IntegratedClassDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<string>NSPopUpButton</string>
-			<string>NSNumberFormatter</string>
 			<string>NSButton</string>
-			<string>NSMenu</string>
-			<string>NSTextFieldCell</string>
 			<string>NSButtonCell</string>
-			<string>NSImageView</string>
-			<string>NSMenuItem</string>
-			<string>NSImageCell</string>
-			<string>NSTabView</string>
 			<string>NSCustomObject</string>
+			<string>NSImageCell</string>
+			<string>NSImageView</string>
+			<string>NSMenu</string>
+			<string>NSMenuItem</string>
+			<string>NSNumberFormatter</string>
+			<string>NSPopUpButton</string>
+			<string>NSPopUpButtonCell</string>
+			<string>NSTabView</string>
 			<string>NSTabViewItem</string>
+			<string>NSTextField</string>
+			<string>NSTextFieldCell</string>
 			<string>NSView</string>
 			<string>NSWindowTemplate</string>
-			<string>NSTextField</string>
-			<string>NSPopUpButtonCell</string>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -176,7 +176,7 @@
 							<reference key="NSNextKeyView" ref="423319976"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSImageCell" key="NSCell" id="1034716894">
-								<int key="NSCellFlags">130560</int>
+								<int key="NSCellFlags">134348288</int>
 								<int key="NSCellFlags2">33554432</int>
 								<object class="NSCustomResource" key="NSContents">
 									<string key="NSClassName">NSImage</string>
@@ -250,7 +250,6 @@
 							<string key="NSFrame">{{277, 353}, {107, 32}}</string>
 							<reference key="NSSuperview" ref="699451514"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="973785048">
 								<int key="NSCellFlags">67239424</int>
@@ -272,7 +271,6 @@
 							<string key="NSFrame">{{54, 10}, {355, 348}}</string>
 							<reference key="NSSuperview" ref="699451514"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="764776737"/>
 							<object class="NSMutableArray" key="NSTabViewItems">
 								<bool key="EncodedWithXMLCoder">YES</bool>
 								<object class="NSTabViewItem" id="121034200">
@@ -484,19 +482,15 @@
 																<bool key="EncodedWithXMLCoder">YES</bool>
 																<string>allowsFloats</string>
 																<string>formatterBehavior</string>
-																<string>locale</string>
 																<string>negativeInfinitySymbol</string>
 																<string>nilSymbol</string>
 																<string>numberStyle</string>
 																<string>positiveInfinitySymbol</string>
 															</object>
-															<object class="NSMutableArray" key="dict.values">
+															<object class="NSArray" key="dict.values">
 																<bool key="EncodedWithXMLCoder">YES</bool>
 																<boolean value="YES"/>
 																<integer value="1040"/>
-																<object class="NSLocale" id="987849733">
-																	<string key="NS.identifier"/>
-																</object>
 																<string>-∞</string>
 																<string/>
 																<integer value="1"/>
@@ -539,7 +533,7 @@
 														<string key="NS.decimal">.</string>
 														<string key="NS.thousand">,</string>
 														<bool key="NS.hasthousands">YES</bool>
-														<bool key="NS.localized">NO</bool>
+														<bool key="NS.localized">YES</bool>
 														<bool key="NS.allowsfloats">YES</bool>
 													</object>
 													<reference key="NSControlView" ref="117745572"/>
@@ -619,17 +613,15 @@
 																<bool key="EncodedWithXMLCoder">YES</bool>
 																<string>allowsFloats</string>
 																<string>formatterBehavior</string>
-																<string>locale</string>
 																<string>negativeInfinitySymbol</string>
 																<string>nilSymbol</string>
 																<string>numberStyle</string>
 																<string>positiveInfinitySymbol</string>
 															</object>
-															<object class="NSMutableArray" key="dict.values">
+															<object class="NSArray" key="dict.values">
 																<bool key="EncodedWithXMLCoder">YES</bool>
 																<boolean value="YES"/>
 																<integer value="1040"/>
-																<reference ref="987849733"/>
 																<string>-∞</string>
 																<string/>
 																<integer value="1"/>
@@ -659,7 +651,7 @@
 														<string key="NS.decimal">.</string>
 														<string key="NS.thousand">,</string>
 														<bool key="NS.hasthousands">YES</bool>
-														<bool key="NS.localized">NO</bool>
+														<bool key="NS.localized">YES</bool>
 														<bool key="NS.allowsfloats">YES</bool>
 													</object>
 													<reference key="NSControlView" ref="25061397"/>
@@ -705,17 +697,15 @@
 																<bool key="EncodedWithXMLCoder">YES</bool>
 																<string>allowsFloats</string>
 																<string>formatterBehavior</string>
-																<string>locale</string>
 																<string>negativeInfinitySymbol</string>
 																<string>nilSymbol</string>
 																<string>numberStyle</string>
 																<string>positiveInfinitySymbol</string>
 															</object>
-															<object class="NSMutableArray" key="dict.values">
+															<object class="NSArray" key="dict.values">
 																<bool key="EncodedWithXMLCoder">YES</bool>
 																<boolean value="YES"/>
 																<integer value="1040"/>
-																<reference ref="987849733"/>
 																<string>-∞</string>
 																<string/>
 																<integer value="1"/>
@@ -745,7 +735,7 @@
 														<string key="NS.decimal">.</string>
 														<string key="NS.thousand">,</string>
 														<bool key="NS.hasthousands">YES</bool>
-														<bool key="NS.localized">NO</bool>
+														<bool key="NS.localized">YES</bool>
 														<bool key="NS.allowsfloats">YES</bool>
 													</object>
 													<reference key="NSControlView" ref="484927773"/>
@@ -809,17 +799,15 @@
 																<bool key="EncodedWithXMLCoder">YES</bool>
 																<string>allowsFloats</string>
 																<string>formatterBehavior</string>
-																<string>locale</string>
 																<string>negativeInfinitySymbol</string>
 																<string>nilSymbol</string>
 																<string>numberStyle</string>
 																<string>positiveInfinitySymbol</string>
 															</object>
-															<object class="NSMutableArray" key="dict.values">
+															<object class="NSArray" key="dict.values">
 																<bool key="EncodedWithXMLCoder">YES</bool>
 																<boolean value="YES"/>
 																<integer value="1040"/>
-																<reference ref="987849733"/>
 																<string>-∞</string>
 																<string/>
 																<integer value="1"/>
@@ -849,7 +837,7 @@
 														<string key="NS.decimal">.</string>
 														<string key="NS.thousand">,</string>
 														<bool key="NS.hasthousands">YES</bool>
-														<bool key="NS.localized">NO</bool>
+														<bool key="NS.localized">YES</bool>
 														<bool key="NS.allowsfloats">YES</bool>
 													</object>
 													<reference key="NSControlView" ref="975291517"/>
@@ -895,17 +883,15 @@
 																<bool key="EncodedWithXMLCoder">YES</bool>
 																<string>allowsFloats</string>
 																<string>formatterBehavior</string>
-																<string>locale</string>
 																<string>negativeInfinitySymbol</string>
 																<string>nilSymbol</string>
 																<string>numberStyle</string>
 																<string>positiveInfinitySymbol</string>
 															</object>
-															<object class="NSMutableArray" key="dict.values">
+															<object class="NSArray" key="dict.values">
 																<bool key="EncodedWithXMLCoder">YES</bool>
 																<boolean value="YES"/>
 																<integer value="1040"/>
-																<reference ref="987849733"/>
 																<string>-∞</string>
 																<string/>
 																<integer value="1"/>
@@ -935,7 +921,7 @@
 														<string key="NS.decimal">.</string>
 														<string key="NS.thousand">,</string>
 														<bool key="NS.hasthousands">YES</bool>
-														<bool key="NS.localized">NO</bool>
+														<bool key="NS.localized">YES</bool>
 														<bool key="NS.allowsfloats">YES</bool>
 													</object>
 													<reference key="NSControlView" ref="912753350"/>
@@ -999,17 +985,15 @@
 																<bool key="EncodedWithXMLCoder">YES</bool>
 																<string>allowsFloats</string>
 																<string>formatterBehavior</string>
-																<string>locale</string>
 																<string>negativeInfinitySymbol</string>
 																<string>nilSymbol</string>
 																<string>numberStyle</string>
 																<string>positiveInfinitySymbol</string>
 															</object>
-															<object class="NSMutableArray" key="dict.values">
+															<object class="NSArray" key="dict.values">
 																<bool key="EncodedWithXMLCoder">YES</bool>
 																<boolean value="YES"/>
 																<integer value="1040"/>
-																<reference ref="987849733"/>
 																<string>-∞</string>
 																<string/>
 																<integer value="1"/>
@@ -1039,7 +1023,7 @@
 														<string key="NS.decimal">.</string>
 														<string key="NS.thousand">,</string>
 														<bool key="NS.hasthousands">YES</bool>
-														<bool key="NS.localized">NO</bool>
+														<bool key="NS.localized">YES</bool>
 														<bool key="NS.allowsfloats">YES</bool>
 													</object>
 													<reference key="NSControlView" ref="1071053602"/>
@@ -1085,17 +1069,15 @@
 																<bool key="EncodedWithXMLCoder">YES</bool>
 																<string>allowsFloats</string>
 																<string>formatterBehavior</string>
-																<string>locale</string>
 																<string>negativeInfinitySymbol</string>
 																<string>nilSymbol</string>
 																<string>numberStyle</string>
 																<string>positiveInfinitySymbol</string>
 															</object>
-															<object class="NSMutableArray" key="dict.values">
+															<object class="NSArray" key="dict.values">
 																<bool key="EncodedWithXMLCoder">YES</bool>
 																<boolean value="YES"/>
 																<integer value="1040"/>
-																<reference ref="987849733"/>
 																<string>-∞</string>
 																<string/>
 																<integer value="1"/>
@@ -1125,7 +1107,7 @@
 														<string key="NS.decimal">.</string>
 														<string key="NS.thousand">,</string>
 														<bool key="NS.hasthousands">YES</bool>
-														<bool key="NS.localized">NO</bool>
+														<bool key="NS.localized">YES</bool>
 														<bool key="NS.allowsfloats">YES</bool>
 													</object>
 													<reference key="NSControlView" ref="835463954"/>
@@ -1189,17 +1171,15 @@
 																<bool key="EncodedWithXMLCoder">YES</bool>
 																<string>allowsFloats</string>
 																<string>formatterBehavior</string>
-																<string>locale</string>
 																<string>negativeInfinitySymbol</string>
 																<string>nilSymbol</string>
 																<string>numberStyle</string>
 																<string>positiveInfinitySymbol</string>
 															</object>
-															<object class="NSMutableArray" key="dict.values">
+															<object class="NSArray" key="dict.values">
 																<bool key="EncodedWithXMLCoder">YES</bool>
 																<boolean value="YES"/>
 																<integer value="1040"/>
-																<reference ref="987849733"/>
 																<string>-∞</string>
 																<string/>
 																<integer value="1"/>
@@ -1229,7 +1209,7 @@
 														<string key="NS.decimal">.</string>
 														<string key="NS.thousand">,</string>
 														<bool key="NS.hasthousands">YES</bool>
-														<bool key="NS.localized">NO</bool>
+														<bool key="NS.localized">YES</bool>
 														<bool key="NS.allowsfloats">YES</bool>
 													</object>
 													<reference key="NSControlView" ref="87976337"/>
@@ -1275,17 +1255,15 @@
 																<bool key="EncodedWithXMLCoder">YES</bool>
 																<string>allowsFloats</string>
 																<string>formatterBehavior</string>
-																<string>locale</string>
 																<string>negativeInfinitySymbol</string>
 																<string>nilSymbol</string>
 																<string>numberStyle</string>
 																<string>positiveInfinitySymbol</string>
 															</object>
-															<object class="NSMutableArray" key="dict.values">
+															<object class="NSArray" key="dict.values">
 																<bool key="EncodedWithXMLCoder">YES</bool>
 																<boolean value="YES"/>
 																<integer value="1040"/>
-																<reference ref="987849733"/>
 																<string>-∞</string>
 																<string/>
 																<integer value="1"/>
@@ -1315,7 +1293,7 @@
 														<string key="NS.decimal">.</string>
 														<string key="NS.thousand">,</string>
 														<bool key="NS.hasthousands">YES</bool>
-														<bool key="NS.localized">NO</bool>
+														<bool key="NS.localized">YES</bool>
 														<bool key="NS.allowsfloats">YES</bool>
 													</object>
 													<reference key="NSControlView" ref="1015921806"/>
@@ -1398,17 +1376,15 @@
 																<bool key="EncodedWithXMLCoder">YES</bool>
 																<string>allowsFloats</string>
 																<string>formatterBehavior</string>
-																<string>locale</string>
 																<string>negativeInfinitySymbol</string>
 																<string>nilSymbol</string>
 																<string>numberStyle</string>
 																<string>positiveInfinitySymbol</string>
 															</object>
-															<object class="NSMutableArray" key="dict.values">
+															<object class="NSArray" key="dict.values">
 																<bool key="EncodedWithXMLCoder">YES</bool>
 																<boolean value="YES"/>
 																<integer value="1040"/>
-																<reference ref="987849733"/>
 																<string>-∞</string>
 																<string/>
 																<integer value="1"/>
@@ -1438,7 +1414,7 @@
 														<string key="NS.decimal">.</string>
 														<string key="NS.thousand">,</string>
 														<bool key="NS.hasthousands">YES</bool>
-														<bool key="NS.localized">NO</bool>
+														<bool key="NS.localized">YES</bool>
 														<bool key="NS.allowsfloats">YES</bool>
 													</object>
 													<reference key="NSControlView" ref="790554548"/>
@@ -1484,17 +1460,15 @@
 																<bool key="EncodedWithXMLCoder">YES</bool>
 																<string>allowsFloats</string>
 																<string>formatterBehavior</string>
-																<string>locale</string>
 																<string>negativeInfinitySymbol</string>
 																<string>nilSymbol</string>
 																<string>numberStyle</string>
 																<string>positiveInfinitySymbol</string>
 															</object>
-															<object class="NSMutableArray" key="dict.values">
+															<object class="NSArray" key="dict.values">
 																<bool key="EncodedWithXMLCoder">YES</bool>
 																<boolean value="YES"/>
 																<integer value="1040"/>
-																<reference ref="987849733"/>
 																<string>-∞</string>
 																<string/>
 																<integer value="1"/>
@@ -1524,7 +1498,7 @@
 														<string key="NS.decimal">.</string>
 														<string key="NS.thousand">,</string>
 														<bool key="NS.hasthousands">YES</bool>
-														<bool key="NS.localized">NO</bool>
+														<bool key="NS.localized">YES</bool>
 														<bool key="NS.allowsfloats">YES</bool>
 													</object>
 													<reference key="NSControlView" ref="160413137"/>
@@ -1589,17 +1563,15 @@
 																<bool key="EncodedWithXMLCoder">YES</bool>
 																<string>allowsFloats</string>
 																<string>formatterBehavior</string>
-																<string>locale</string>
 																<string>negativeInfinitySymbol</string>
 																<string>nilSymbol</string>
 																<string>numberStyle</string>
 																<string>positiveInfinitySymbol</string>
 															</object>
-															<object class="NSMutableArray" key="dict.values">
+															<object class="NSArray" key="dict.values">
 																<bool key="EncodedWithXMLCoder">YES</bool>
 																<boolean value="YES"/>
 																<integer value="1040"/>
-																<reference ref="987849733"/>
 																<string>-∞</string>
 																<string/>
 																<integer value="1"/>
@@ -1629,7 +1601,7 @@
 														<string key="NS.decimal">.</string>
 														<string key="NS.thousand">,</string>
 														<bool key="NS.hasthousands">YES</bool>
-														<bool key="NS.localized">NO</bool>
+														<bool key="NS.localized">YES</bool>
 														<bool key="NS.allowsfloats">YES</bool>
 													</object>
 													<reference key="NSControlView" ref="712218964"/>
@@ -1675,17 +1647,15 @@
 																<bool key="EncodedWithXMLCoder">YES</bool>
 																<string>allowsFloats</string>
 																<string>formatterBehavior</string>
-																<string>locale</string>
 																<string>negativeInfinitySymbol</string>
 																<string>nilSymbol</string>
 																<string>numberStyle</string>
 																<string>positiveInfinitySymbol</string>
 															</object>
-															<object class="NSMutableArray" key="dict.values">
+															<object class="NSArray" key="dict.values">
 																<bool key="EncodedWithXMLCoder">YES</bool>
 																<boolean value="YES"/>
 																<integer value="1040"/>
-																<reference ref="987849733"/>
 																<string>-∞</string>
 																<string/>
 																<integer value="1"/>
@@ -1715,7 +1685,7 @@
 														<string key="NS.decimal">.</string>
 														<string key="NS.thousand">,</string>
 														<bool key="NS.hasthousands">YES</bool>
-														<bool key="NS.localized">NO</bool>
+														<bool key="NS.localized">YES</bool>
 														<bool key="NS.allowsfloats">YES</bool>
 													</object>
 													<reference key="NSControlView" ref="660675270"/>
@@ -1780,17 +1750,15 @@
 																<bool key="EncodedWithXMLCoder">YES</bool>
 																<string>allowsFloats</string>
 																<string>formatterBehavior</string>
-																<string>locale</string>
 																<string>negativeInfinitySymbol</string>
 																<string>nilSymbol</string>
 																<string>numberStyle</string>
 																<string>positiveInfinitySymbol</string>
 															</object>
-															<object class="NSMutableArray" key="dict.values">
+															<object class="NSArray" key="dict.values">
 																<bool key="EncodedWithXMLCoder">YES</bool>
 																<boolean value="YES"/>
 																<integer value="1040"/>
-																<reference ref="987849733"/>
 																<string>-∞</string>
 																<string/>
 																<integer value="1"/>
@@ -1820,7 +1788,7 @@
 														<string key="NS.decimal">.</string>
 														<string key="NS.thousand">,</string>
 														<bool key="NS.hasthousands">YES</bool>
-														<bool key="NS.localized">NO</bool>
+														<bool key="NS.localized">YES</bool>
 														<bool key="NS.allowsfloats">YES</bool>
 													</object>
 													<reference key="NSControlView" ref="662235093"/>
@@ -1866,17 +1834,15 @@
 																<bool key="EncodedWithXMLCoder">YES</bool>
 																<string>allowsFloats</string>
 																<string>formatterBehavior</string>
-																<string>locale</string>
 																<string>negativeInfinitySymbol</string>
 																<string>nilSymbol</string>
 																<string>numberStyle</string>
 																<string>positiveInfinitySymbol</string>
 															</object>
-															<object class="NSMutableArray" key="dict.values">
+															<object class="NSArray" key="dict.values">
 																<bool key="EncodedWithXMLCoder">YES</bool>
 																<boolean value="YES"/>
 																<integer value="1040"/>
-																<reference ref="987849733"/>
 																<string>-∞</string>
 																<string/>
 																<integer value="1"/>
@@ -1906,7 +1872,7 @@
 														<string key="NS.decimal">.</string>
 														<string key="NS.thousand">,</string>
 														<bool key="NS.hasthousands">YES</bool>
-														<bool key="NS.localized">NO</bool>
+														<bool key="NS.localized">YES</bool>
 														<bool key="NS.allowsfloats">YES</bool>
 													</object>
 													<reference key="NSControlView" ref="499684797"/>
@@ -1971,17 +1937,15 @@
 																<bool key="EncodedWithXMLCoder">YES</bool>
 																<string>allowsFloats</string>
 																<string>formatterBehavior</string>
-																<string>locale</string>
 																<string>negativeInfinitySymbol</string>
 																<string>nilSymbol</string>
 																<string>numberStyle</string>
 																<string>positiveInfinitySymbol</string>
 															</object>
-															<object class="NSMutableArray" key="dict.values">
+															<object class="NSArray" key="dict.values">
 																<bool key="EncodedWithXMLCoder">YES</bool>
 																<boolean value="YES"/>
 																<integer value="1040"/>
-																<reference ref="987849733"/>
 																<string>-∞</string>
 																<string/>
 																<integer value="1"/>
@@ -2011,7 +1975,7 @@
 														<string key="NS.decimal">.</string>
 														<string key="NS.thousand">,</string>
 														<bool key="NS.hasthousands">YES</bool>
-														<bool key="NS.localized">NO</bool>
+														<bool key="NS.localized">YES</bool>
 														<bool key="NS.allowsfloats">YES</bool>
 													</object>
 													<reference key="NSControlView" ref="532594653"/>
@@ -2057,17 +2021,15 @@
 																<bool key="EncodedWithXMLCoder">YES</bool>
 																<string>allowsFloats</string>
 																<string>formatterBehavior</string>
-																<string>locale</string>
 																<string>negativeInfinitySymbol</string>
 																<string>nilSymbol</string>
 																<string>numberStyle</string>
 																<string>positiveInfinitySymbol</string>
 															</object>
-															<object class="NSMutableArray" key="dict.values">
+															<object class="NSArray" key="dict.values">
 																<bool key="EncodedWithXMLCoder">YES</bool>
 																<boolean value="YES"/>
 																<integer value="1040"/>
-																<reference ref="987849733"/>
 																<string>-∞</string>
 																<string/>
 																<integer value="1"/>
@@ -2097,7 +2059,7 @@
 														<string key="NS.decimal">.</string>
 														<string key="NS.thousand">,</string>
 														<bool key="NS.hasthousands">YES</bool>
-														<bool key="NS.localized">NO</bool>
+														<bool key="NS.localized">YES</bool>
 														<bool key="NS.allowsfloats">YES</bool>
 													</object>
 													<reference key="NSControlView" ref="289675947"/>
@@ -2686,6 +2648,14 @@
 						<reference key="destination" ref="401302887"/>
 					</object>
 					<int key="connectionID">3924</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">setIPAddressAction:</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="158241015"/>
+					</object>
+					<int key="connectionID">3925</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -4205,7 +4175,7 @@
 					<string>903.IBPluginDependency</string>
 					<string>979.IBPluginDependency</string>
 				</object>
-				<object class="NSMutableArray" key="dict.values">
+				<object class="NSArray" key="dict.values">
 					<bool key="EncodedWithXMLCoder">YES</bool>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -4426,7 +4396,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">3924</int>
+			<int key="maxID">3925</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -4451,6 +4421,7 @@
 							<string>lockAction:</string>
 							<string>readBackAction:</string>
 							<string>sendCommandAction:</string>
+							<string>setIPAddressAction:</string>
 							<string>setSerialNumberAction:</string>
 							<string>writeCurrentAction:</string>
 							<string>writeCurrentTripAction:</string>
@@ -4458,8 +4429,9 @@
 							<string>writeVoltageAction:</string>
 							<string>writeVoltageTripAction:</string>
 						</object>
-						<object class="NSMutableArray" key="dict.values">
+						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -4482,6 +4454,7 @@
 							<string>lockAction:</string>
 							<string>readBackAction:</string>
 							<string>sendCommandAction:</string>
+							<string>setIPAddressAction:</string>
 							<string>setSerialNumberAction:</string>
 							<string>writeCurrentAction:</string>
 							<string>writeCurrentTripAction:</string>
@@ -4489,7 +4462,7 @@
 							<string>writeVoltageAction:</string>
 							<string>writeVoltageTripAction:</string>
 						</object>
-						<object class="NSMutableArray" key="dict.values">
+						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<object class="IBActionInfo">
 								<string key="name">commandPulldownAction:</string>
@@ -4509,6 +4482,10 @@
 							</object>
 							<object class="IBActionInfo">
 								<string key="name">sendCommandAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">setIPAddressAction:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
@@ -4569,7 +4546,7 @@
 							<string>writeVoltTripTwo</string>
 							<string>writeVoltTwo</string>
 						</object>
-						<object class="NSMutableArray" key="dict.values">
+						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>NSPopUpButton</string>
 							<string>NSButton</string>
@@ -4632,7 +4609,7 @@
 							<string>writeVoltTripTwo</string>
 							<string>writeVoltTwo</string>
 						</object>
-						<object class="NSMutableArray" key="dict.values">
+						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<object class="IBToOneOutletInfo">
 								<string key="name">commandPopUp</string>
@@ -4771,7 +4748,7 @@
 							<string>saveDocument:</string>
 							<string>saveDocumentAs:</string>
 						</object>
-						<object class="NSMutableArray" key="dict.values">
+						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>id</string>
 							<string>id</string>
@@ -4792,7 +4769,7 @@
 							<string>saveDocument:</string>
 							<string>saveDocumentAs:</string>
 						</object>
-						<object class="NSMutableArray" key="dict.values">
+						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<object class="IBActionInfo">
 								<string key="name">copy:</string>
@@ -4844,10 +4821,6 @@
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.macosx</string>
 			<integer value="1050" key="NS.object.0"/>
 		</object>
-		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDependencyDefaults">
-			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.macosx</string>
-			<real value="1060" key="NS.object.0"/>
-		</object>
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDevelopmentDependencies">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.InterfaceBuilder3</string>
 			<integer value="3000" key="NS.object.0"/>
@@ -4865,11 +4838,11 @@
 				<string>TTCPX400DP</string>
 				<string>Unlocked</string>
 			</object>
-			<object class="NSMutableArray" key="dict.values">
+			<object class="NSArray" key="dict.values">
 				<bool key="EncodedWithXMLCoder">YES</bool>
 				<string>{33, 36}</string>
-				<string>{9, 8}</string>
-				<string>{7, 2}</string>
+				<string>{11, 11}</string>
+				<string>{10, 3}</string>
 				<string>{15, 15}</string>
 				<string>{100, 71}</string>
 				<string>{33, 36}</string>

@@ -78,6 +78,7 @@
 - (IBAction) lockAction:(id)sender;
 - (IBAction) commandPulldownAction:(id)sender;
 - (IBAction) setSerialNumberAction:(id)sender;
+- (IBAction)setIPAddressAction:(id)sender;
 - (IBAction) connectAction:(id)sender;
 - (IBAction) sendCommandAction:(id)sender;
 - (IBAction) readBackAction:(id)sender;

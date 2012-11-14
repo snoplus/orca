@@ -265,6 +265,11 @@
     [model setSerialNumber:[serialNumberBox stringValue]];
 }
 
+- (IBAction)setIPAddressAction:(id)sender
+{
+    [model setIpAddress:[ipAddressBox stringValue]];
+}
+
 - (IBAction)readBackAction:(id)sender
 {
     int output;
