@@ -57,6 +57,9 @@
     
     IBOutlet NSTextField*   coilText;
     
+	IBOutlet NSButton*      refreshIPsButton;
+    IBOutlet NSProgressIndicator* refreshIPIndicate;
+    
     NSView *blankView;    
     NSSize controlSize;
     NSSize powerSupplySize;
@@ -85,6 +88,7 @@
 - (void) channelMapChanged:(NSNotification*)aNote;
 - (void) objectsAdded:(NSNotification*)aNote;
 - (void) debugRunningChanged:(NSNotification*)aNote;
+- (void) refreshIPAddressesDone:(NSNotification*)aNote;
 
 - (void) populateListADCs;
 
@@ -99,6 +103,7 @@
 - (IBAction) connectAllAction:(id)sender;
 - (IBAction) removeSelectedADCs:(id)sender;
 - (IBAction) handleToBeAddedADC:(id)sender;
+- (IBAction) refreshIPsAction:(id)sender;
 
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;
 

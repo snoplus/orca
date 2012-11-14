@@ -24,6 +24,7 @@
 #import "ORnEDMCoilModel.h"
 #import "ORAdcProcessing.h"
 #import "ORTTCPX400DPModel.h"
+#import "ORVXI11HardwareFinder.h"
 
 
 @interface ORnEDMCoilController (private)
@@ -132,6 +133,11 @@
 					 selector : @selector(debugRunningChanged:)
 						 name : ORnEDMCoilDebugRunningHasChanged
 					   object : nil];      
+
+    [notifyCenter addObserver : self
+					 selector : @selector(refreshIPAddressesDone:)
+						 name : ORHardwareFinderAvailableHardwareChanged
+					   object : nil];
     
 }
 
@@ -364,6 +370,12 @@
 	[[self window] makeFirstResponder:(NSResponder*)groupView];
 }
 
+- (void) refreshIPAddressesDone:(NSNotification*)aNote
+{
+    [refreshIPsButton setEnabled:YES];
+    [refreshIPIndicate stopAnimation:self];
+}
+
 - (void) runAction:(id)sender
 {
     [model toggleRunState];
@@ -387,6 +399,13 @@
         }
     }    
     
+}
+
+- (IBAction) refreshIPsAction:(id)sender
+{
+    [sender setEnabled:NO];
+    [refreshIPIndicate startAnimation:self];
+    [[ORVXI11HardwareFinder sharedVXI11HardwareFinder] refresh];
 }
 
 - (void) _readFile:(id)sender withSelector:(SEL)asel withMessage:(NSString*)message;
