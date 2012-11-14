@@ -46,6 +46,9 @@ struct ORTTCPX400DPCmdInfo;
 - (void) _processGeneralReadback:(NSNumber*)aFloat withOutputNum:(NSNumber*) anInt;
 - (void) _processGeneralReadback:(NSNumber*)aFloat;
 - (void) _setGeneralReadback:(NSString*)read;
+- (void) _socketThread:(NSString*)anIpAddress;
+- (void) _connectSocket:(NSString*)anIpAddress;
+- (void) _setSocket:(NetSocket*)aSocket;
 
 @end
 
@@ -323,7 +326,7 @@ ORTTCPX_READ_IMPLEMENT(GetOutputStatus, int)
 
 - (void) dealloc
 {
-    [socket release];
+    [self _setSocket:nil];
     [ipAddress release];
     [serialNumber release];
     [dataQueue release];  
@@ -341,16 +344,25 @@ ORTTCPX_READ_IMPLEMENT(GetOutputStatus, int)
 	[self linkToController:@"ORTTCPX400DPController"];
 }
 
-- (void) setSocket:(NetSocket*)aSocket
+
+- (void) _setSocket:(NetSocket*)aSocket
 {
-	if(aSocket != socket)[socket close];
-	[aSocket retain];
-	[socket release];
-	socket = aSocket;
-	[socket setDelegate:self];
+	if(aSocket == socket) return;
+    @synchronized(self) {
+        [socket close];
+        [aSocket retain];
+        [socket release];
+        socket = aSocket;
+        [socket setDelegate:self];
+    }
 }
 
-- (void) setIpAddress:(NSString *)anIp 
+- (void) setSocket:(NetSocket *)socket
+{
+    // Overload to do nothing to protect the variable
+}
+
+- (void) setIpAddress:(NSString *)anIp
 {
     [[[self undoManager] prepareWithInvocationTarget:self] 
      setIpAddress:ipAddress];
@@ -365,9 +377,9 @@ ORTTCPX_READ_IMPLEMENT(GetOutputStatus, int)
 
 - (void) toggleConnection 
 {
-    if (!isConnected) [self connect];
+    if (![self isConnected]) [self connect];
     else {
-        [self setSocket:nil];
+        [self _setSocket:nil];
         [self _setIsConnected:NO];
     }
 }
@@ -380,18 +392,19 @@ ORTTCPX_READ_IMPLEMENT(GetOutputStatus, int)
 - (void) _connectIP
 {
 	if(!isConnected){
-		[self setSocket:[NetSocket netsocketConnectedToHost:ipAddress port:ORTTCPX400DPPort]];	
+		[self _connectSocket:ipAddress];
 	}
 }
 
 - (void) _setIsConnected:(BOOL)connected
 {
     if (isConnected == connected) return;
-    isConnected = connected;
-    // Also release the dataQueue
-    [dataQueue release];
-    dataQueue = nil;
-    
+    @synchronized(self){
+        isConnected = connected;
+        // Also release the dataQueue
+        [dataQueue release];
+        dataQueue = nil;
+    }
     [[NSNotificationCenter defaultCenter] 
      postNotificationName:ORTTCPX400DPConnectionHasChanged 
      object:self];
@@ -478,6 +491,7 @@ ORTTCPX_READ_IMPLEMENT(GetOutputStatus, int)
         }
     }
     // we don't need to synchronize this part necessarily.
+    assert(cmd!=nil);
     if (cmd == nil) return;
     // This command absolutely needs to respond
     assert(cmd->responds);
@@ -539,6 +553,32 @@ ORTTCPX_READ_IMPLEMENT(GetOutputStatus, int)
     [[NSNotificationCenter defaultCenter] 
      postNotificationName:ORTTCPX400DPGeneralReadbackHasChanged
      object:self];
+}
+
+- (void) _socketThread:(NSString*)currentIPAddress
+{
+    NSRunLoop* rl = [NSRunLoop currentRunLoop];
+    NetSocket* currentSocket = [NetSocket netsocketConnectedToHost:currentIPAddress
+                                                              port:ORTTCPX400DPPort];
+    if (currentSocket == nil) return;
+    
+    // schedule the socket on the current run loop.
+    [currentSocket scheduleOnCurrentRunLoop];
+    [self _setSocket:currentSocket];
+    
+    // perform the run loop
+    // This ends whenever the socket changes
+    while( socket == currentSocket &&
+          [rl runMode:NSDefaultRunLoopMode
+           beforeDate:[NSDate dateWithTimeIntervalSinceNow:1.0]]);
+}
+
+- (void) _connectSocket:(NSString*)anIpAddress
+{
+    // Detach the thread to perform the run loop
+    [NSThread detachNewThreadSelector:@selector(_socketThread:)
+                             toTarget:self
+                           withObject:anIpAddress];
 }
 
 - (BOOL) isConnected
