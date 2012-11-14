@@ -63,27 +63,31 @@ ORTTCPX400DP_NOTIFY_STRING( ORTTCPX_NOTIFY_READ_FORM(CMD) )
 ORTTCPX400DP_NOTIFY_STRING( ORTTCPX_NOTIFY_WRITE_FORM(CMD) )
 
 #define ORTTCPX_GEN_IMPLEMENT(CMD, TYPE, PREPENDFUNC, UC, LC, PREPENDVAR)   \
-- (void) PREPENDFUNC##set##UC##PREPENDVAR##CMD:(TYPE)aVal                   \
-    withOutput:(unsigned int)output                                         \
+- (void) PREPENDFUNC##setAndNotify##UC##PREPENDVAR##CMD:(TYPE)aVal          \
+withOutput:(unsigned int)output sendCommand:(BOOL)cmd                       \
 {                                                                           \
     assert(output < kORTTCPX400DPOutputChannels);                           \
-    if (LC ## PREPENDVAR ## CMD[output] == aVal) return;                    \
-    [[[self undoManager] prepareWithInvocationTarget:self]                  \
-     PREPENDFUNC##set##UC##PREPENDVAR##CMD:LC ## PREPENDVAR ## CMD[output]  \
-     withOutput:output];                                                    \
     LC ## PREPENDVAR ## CMD[output] = aVal;                                 \
-    [self sendCommand ## UC ## PREPENDVAR ## CMD ## WithOutput:output];     \
+    if (cmd) [self sendCommand ## UC ## PREPENDVAR ## CMD ## WithOutput:output];     \
     [[NSNotificationCenter defaultCenter]                                   \
      postNotificationName:ORTTCPX400DP ##UC##PREPENDVAR ## CMD ## IsChanged \
      object:self];                                                          \
+}                                                                           \
+                                                                            \
+- (void) PREPENDFUNC##set##UC##PREPENDVAR##CMD:(TYPE)aVal                   \
+    withOutput:(unsigned int)output                                         \
+{                                                                           \
+    [self PREPENDFUNC##setAndNotify##UC##PREPENDVAR##CMD:aVal               \
+     withOutput:output sendCommand:YES];                                    \
 }                                                                           \
                                                                             \
 - (void) _processCmd ## CMD ## WithFloat:(NSNumber*)theFloat                \
    withOutput:(NSNumber*)theOutput                                          \
 {                                                                           \
     assert(gORTTCPXCmds[k ## CMD].responds);                                \
-    [self PREPENDFUNC##set##UC##PREPENDVAR##CMD:[theFloat TYPE ## Value]    \
-        withOutput:([theOutput intValue]-1)];                               \
+    [self                                                                   \
+     PREPENDFUNC##setAndNotify##UC##PREPENDVAR##CMD:[theFloat TYPE ## Value]\
+     withOutput:([theOutput intValue]-1) sendCommand:NO];                   \
 }                                                                           \
                                                                             \
 - (void) PREPENDFUNC ## write ## CMD ## WithOutput:(unsigned int)output     \
