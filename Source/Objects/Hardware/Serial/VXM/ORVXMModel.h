@@ -39,7 +39,7 @@
         unsigned long	dataId;
 		BOOL			forceResetQueryMaskOnce;
 		BOOL			repeatQuery;
-        int             motorQueryMask;
+        int             motorToQueryMask;
 		NSMutableArray* cmdQueue;
 		BOOL			displayRaw;
 		int				syncWithRun;
@@ -55,7 +55,7 @@
 		NSString*		customCmd;
 		BOOL			waiting;
 		BOOL			useCmdQueue;
-        BOOL            busy;
+		BOOL			queryInProgress;
 }
 
 #pragma mark ***Initialization
