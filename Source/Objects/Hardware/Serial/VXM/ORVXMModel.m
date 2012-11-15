@@ -614,10 +614,8 @@ NSString* ORVXMLock							= @"ORVXMLock";
 	[self addCmdToQueue:aCmd 
 			description:[NSString stringWithFormat:@"Zero Counter"]
 			 waitToSend:NO];
-	if(!useCmdQueue){
-		[self setCmdTypeExecuting:kVXMCmdIdle];
-		[self queryPosition];
-	}	
+    [self queryPositions];
+
 }
 
 - (void) goHome:(int)aMotorIndex plusDirection:(BOOL)yesOrNo
@@ -631,7 +629,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 	if(aMotorIndex>=0 && aMotorIndex<[motors count]){	
 		id aMotor = [motors objectAtIndex:aMotorIndex];
 		NSString* aCmd = [NSString stringWithFormat:@"F,K,C,S%dM%d,I%dM0,R",aMotorIndex+1,[aMotor motorSpeed],aMotorIndex+1];
-		[self addCmdToQueue:aCmd 
+		[self addCmdToQueue:aCmd
 				description:[NSString stringWithFormat:@"Move Motor %d to Pos Limit",aMotorIndex]
 				 waitToSend:YES];
 	}
