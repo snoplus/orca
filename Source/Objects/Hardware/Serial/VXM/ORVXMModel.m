@@ -654,7 +654,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 		abortAllRepeats = YES;
 		[NSObject cancelPreviousPerformRequestsWithTarget:self];
         [self sendCommand:@"F,K\r"];
-		[self setCmdTypeExecuting:kVXMCmdIdle];
+        [self queryPositions];
     }
 }
 
@@ -788,9 +788,6 @@ NSString* ORVXMLock							= @"ORVXMLock";
 		if([aCmd rangeOfString:@"^"].location != NSNotFound){
 			//the '^' means a command is complete
 			aCmd = [aCmd substringFromIndex:1]; //might be more on this response, strip off the '^'
-			if(useCmdQueue){
-				[self incrementCmdIndex];
-			}
 			[self queryPositions];
 		}
 		else {
@@ -815,7 +812,11 @@ NSString* ORVXMLock							= @"ORVXMLock";
 					//all motors queried. 
 					queryInProgress = NO;
 					[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-					[self setCmdTypeExecuting:kVXMCmdIdle];
+                    if(useCmdQueue){
+                        [self incrementCmdIndex];
+                        [self processNextCommand];
+                    }
+					else [self setCmdTypeExecuting:kVXMCmdIdle];
 				}
 			}
 		}
@@ -903,9 +904,9 @@ NSString* ORVXMLock							= @"ORVXMLock";
 				}
 			}
 		}
-		else {
-			[self queryPositions];
-		}
+        else {
+            [self setCmdTypeExecuting:kVXMCmdIdle];
+        }
 	}
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORVXMModelCmdQueueChanged object:self];
 }
@@ -954,6 +955,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 				motorToQueryMask |= (1<<i);
 			}
 		}
+        [self queryPosition];
 	}
 }
 
@@ -964,6 +966,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 	for(i=0;i<kNumVXMMotors;i++) {
 		if(motorToQueryMask & (1<<i)){
 			motorToQueryMask &= ~(1<<i);
+            break;
 		}
 	}
 	if(motorToQueryMask == 0)return -1;
