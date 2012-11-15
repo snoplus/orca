@@ -580,8 +580,8 @@ static NSDictionary* xl3Ops;
 {
     
     NSTextField* monVltThresholdTextField[] = {monVltThresholdTextField0, monVltThresholdTextField1,
-        monVltThresholdTextField2, monVltThresholdTextField3, monVltThresholdTextField4, monVltThresholdTextField5,
-        monVltThresholdTextField6,monVltThresholdTextField7, monVltThresholdTextField8, monVltThresholdTextField9,
+        monVltThresholdTextField2, monVltThresholdTextField3, monVltThresholdTextField6, monVltThresholdTextField7,
+        monVltThresholdTextField8,monVltThresholdTextField9, monVltThresholdTextField4, monVltThresholdTextField5,
         monVltThresholdTextField10, monVltThresholdTextField11};
 
     unsigned short i;
@@ -1157,7 +1157,15 @@ static NSDictionary* xl3Ops;
 - (IBAction) monVltThresholdAction:(id)sender
 {
     [[sender window] makeFirstResponder:tabView];
-    [model setXl3VltThreshold:[sender tag] withValue:[sender floatValue]];
+    float aValue;
+    aValue = [sender floatValue];
+    if (aValue < -99) {
+        aValue = -99;
+    }
+    if (aValue > 99) {
+        aValue = 99;
+    }
+    [model setXl3VltThreshold:[sender tag] withValue:aValue];
 }
 
 - (IBAction) monVltThresholdInInitAction:(id)sender

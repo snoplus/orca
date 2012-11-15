@@ -3199,7 +3199,7 @@ void SwapLongBlock(void* p, int32_t n)
         if (!isPollingXl3 || isPollingVerbose) {    
             NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ HV status: \n", [[self xl3Link] crateName]];
             [msg appendFormat:@"vltA: %.2f V, crtA: %.2f mA\n", status.voltage_a * 300., status.current_a * 10.];
-            [msg appendFormat:@"vltB: %.2f V, crtB: %.2f mA\n", status.voltage_a * 300., status.current_a * 10.];
+            [msg appendFormat:@"vltB: %.2f V, crtB: %.2f mA\n", status.voltage_b * 300., status.current_b * 10.];
             NSLog(msg);
         }
         //data packet
@@ -3926,13 +3926,9 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (void) setVltThreshold
 {
-    
-    if ([self xl3VltThreshold:4] > -10) {
-        [self setXl3VltThreshold:4 withValue: -10];
-    }
-    if ([self xl3VltThreshold:5] < 10) {
-        [self setXl3VltThreshold:5 withValue: 10];
-    }
+
+    [self setXl3VltThreshold:8 withValue: -99];
+    [self setXl3VltThreshold:9 withValue: 99];
     
     XL3_PayloadStruct payload;
     memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
