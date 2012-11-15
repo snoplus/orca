@@ -32,6 +32,11 @@ NSString* KatrinModelSlowControlIsConnectedChanged = @"KatrinModelSlowControlIsC
 NSString* KatrinModelSlowControlNameChanged			= @"KatrinModelSlowControlNameChanged";
 NSString* ORKatrinModelViewTypeChanged				= @"ORKatrinModelViewTypeChanged";
 NSString* ORKatrinModelSNTablesChanged				= @"ORKatrinModelSNTablesChanged";
+NSString* ORKatrinModelHiLimitChanged		= @"ORKatrinModelHiLimitChanged";
+NSString* ORKatrinModelLowLimitChanged		= @"ORKatrinModelLowLimitChanged";
+NSString* ORKatrinModelSlopeChanged			= @"ORKatrinModelSlopeChanged";
+NSString* ORKatrinModelInterceptChanged		= @"ORKatrinModelInterceptChanged";
+NSString* ORKatrinModelMaxValueChanged		= @"ORKatrinModelMaxValueChanged";
 
 static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 @interface KatrinModel (private)
@@ -100,6 +105,61 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 }
 
 #pragma mark ¥¥¥Accessors
+
+- (float) lowLimit:(int)i
+{
+	if(i>=0 && i<2)return lowLimit[i];
+	else return 0;
+}
+
+- (void) setLowLimit:(int)i value:(float)aValue
+{
+	if(i>=0 && i<2){
+		[[[self undoManager] prepareWithInvocationTarget:self] setLowLimit:i value:lowLimit[i]];
+		
+		lowLimit[i] = aValue; 
+		
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinModelLowLimitChanged object:self];
+		
+	}
+}
+
+- (float) hiLimit:(int)i
+{
+	if(i>=0 && i<2)return hiLimit[i];
+	else return 0;
+}
+
+- (void) setHiLimit:(int)i value:(float)aValue
+{
+	if(i>=0 && i<2){
+		[[[self undoManager] prepareWithInvocationTarget:self] setHiLimit:i value:lowLimit[i]];
+		
+		hiLimit[i] = aValue; 
+			
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinModelHiLimitChanged object:self];
+		
+	}
+}
+
+- (float) maxValue:(int)i
+{
+	if(i>=0 && i<2)return maxValue[i];
+	else return 0;
+}
+
+- (void) setMaxValue:(int)i value:(float)aValue
+{
+	if(i>=0 && i<2){
+		[[[self undoManager] prepareWithInvocationTarget:self] setMaxValue:i value:maxValue[i]];
+		
+		maxValue[i] = aValue; 
+		
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinModelMaxValueChanged object:self];
+		
+	}
+}
+
 - (NSString*) slowControlName;
 {
 	if(!slowControlName)return @"";
@@ -371,6 +431,14 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 	preAmpSNs	= [[decoder decodeObjectForKey:@"preAmpSNs"] retain];
 	osbSNs		= [[decoder decodeObjectForKey:@"osbSNs"] retain];
 	otherSNs	= [[decoder decodeObjectForKey:@"otherSNs"] retain];
+	int i;
+	for(i=0;i<2;i++) {
+		[self setMaxValue:i value:[decoder decodeFloatForKey:[NSString stringWithFormat:@"maxValue%d",i]]];
+		[self setLowLimit:i value:[decoder decodeFloatForKey:[NSString stringWithFormat:@"lowLimit%d",i]]];
+		[self setHiLimit:i value:[decoder decodeFloatForKey:[NSString stringWithFormat:@"hiLimit%d",i]]];
+	}
+	
+	
 	[self validateSNArrays];
 	[[self undoManager] enableUndoRegistration];
 
@@ -387,7 +455,12 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
     [encoder encodeObject:preAmpSNs			forKey: @"preAmpSNs"];
     [encoder encodeObject:osbSNs			forKey: @"osbSNs"];
     [encoder encodeObject:otherSNs			forKey: @"otherSNs"];
-}
+	int i;
+	for(i=0;i<2;i++) {
+		[encoder encodeFloat:lowLimit[i] forKey:[NSString stringWithFormat:@"lowLimit%d",i]];
+		[encoder encodeFloat:hiLimit[i] forKey:[NSString stringWithFormat:@"hiLimit%d",i]];
+		[encoder encodeFloat:maxValue[i] forKey:[NSString stringWithFormat:@"maxValue%d",i]];
+	}}
 
 
 #pragma mark ¥¥¥SN Access Methods
@@ -611,6 +684,103 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 	[fm createFileAtPath:SLTWAFERSNFILE(aPath) contents:data attributes:nil];
 	NSLog(@"Saved Slt/Wafer SerialNumbers: %@\n",SLTWAFERSNFILE(aPath));
 	
+}
+
+#pragma mark ¥¥¥Bit Processing Protocol
+- (void) processIsStarting
+{
+	//nothing to do in this case
+}
+
+- (void) processIsStopping
+{
+	//nothing to do in this case
+}
+
+//note that everything called by these routines MUST be threadsafe
+- (void) startProcessCycle
+{    
+	//nothing to do in this case
+}
+
+- (void) endProcessCycle
+{
+	//nothing to do in this case
+}
+
+- (NSString*) identifier
+{
+	NSString* s;
+ 	@synchronized(self){
+		s= [NSString stringWithFormat:@"Katrin,%lu",[self uniqueIdNumber]];
+	}
+	return s;
+}
+
+- (NSString*) processingTitle
+{
+	NSString* s;
+ 	@synchronized(self){
+		s= [self identifier];
+	}
+	return s;
+}
+
+- (NSString*)adcName:(int)aChan
+{
+    switch (aChan){
+        case 0: return @"FPD Rate"; 
+        case 1: return @"Veto Rate"; 
+        default: return @"";
+    }
+}
+
+- (double) convertedValue:(int)aChan
+{
+	double theValue;
+	@synchronized(self){
+        switch (aChan){
+            case 0: theValue =  [[self segmentGroup:0] rate];  break;
+            case 1: theValue =  [[self segmentGroup:1] rate];  break;
+			default:theValue = 0;                       break;
+        }
+	}
+	return theValue;
+}
+
+- (double) maxValueForChan:(int)aChan
+{
+	double theValue;
+	@synchronized(self){
+		theValue = (double)[self maxValue:aChan]; 
+	}
+	return theValue;
+}
+
+- (double) minValueForChan:(int)aChan
+{
+	return 0;
+}
+
+- (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit channel:(int)aChan
+{
+	@synchronized(self){
+		*theLowLimit  =  [self lowLimit:aChan]; 
+		*theHighLimit =  [self hiLimit:aChan]; 
+	}		
+}
+
+- (BOOL) processValue:(int)channel
+{
+	BOOL r;
+	@synchronized(self){
+		r = YES;    //process bool doesn't have a real meaning for this object
+	}
+	return r;}
+
+- (void) setProcessOutput:(int)channel value:(int)value
+{
+    //nothing to do. not used in adcs. really shouldn't be in the protocol
 }
 
 @end

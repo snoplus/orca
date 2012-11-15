@@ -698,9 +698,13 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     _nextRunWillQuickStart = state;
 }
 
-- (int)runningState
+- (int) runningState
 {
-    return runningState;
+	int theState = 0;
+	@synchronized(self){
+		theState =  runningState;
+	}
+	return theState;
 }
 
 - (void) setRunningState:(int)aRunningState
@@ -2045,6 +2049,50 @@ static NSString *ORRunTypeNames 	= @"ORRunTypeNames";
 		nil];
 	
 	return [selectorArray componentsJoinedByString:@"\n"];
+}
+
+#pragma mark ¥¥¥Bit Processing Protocol
+- (void)processIsStarting
+{
+	//nothing to do in this case
+}
+
+- (void)processIsStopping
+{
+	//nothing to do in this case
+}
+
+- (void) startProcessCycle
+{
+	//nothing to do in this case
+}
+
+- (void) endProcessCycle
+{
+	//nothing to do in this case
+}
+
+- (BOOL) processValue:(int)channel
+{
+	int state = [self runningState];
+	switch(channel){
+		case 0: return state == eRunStopped;
+		case 1: return state == eRunInProgress;
+		case 2: return state == eRunStarting;
+		case 3: return state == eRunStopping;
+		case 4: return state == eRunBetweenSubRuns;
+		default: return NO;
+	}
+}
+
+- (void) setProcessOutput:(int)channel value:(int)value
+{
+	//nothing to do in this case
+}
+
+- (NSString*) processingTitle
+{
+    return @"RunControl";
 }
 
 @end

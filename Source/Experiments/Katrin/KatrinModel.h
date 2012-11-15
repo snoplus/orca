@@ -21,6 +21,7 @@
 
 #pragma mark ¥¥¥Imported Files
 #import "ORExperimentModel.h"
+#import "ORAdcProcessing.h"
 
 #define kUsePixelView 0
 #define kUseCrateView 1
@@ -31,7 +32,7 @@
 #define OSBSNFILE(aPath)		[NSString stringWithFormat:@"%@_OsbSN",		aPath]
 #define SLTWAFERSNFILE(aPath)	[NSString stringWithFormat:@"%@_SltWaferSN",aPath]
 
-@interface KatrinModel :  ORExperimentModel
+@interface KatrinModel :  ORExperimentModel <ORAdcProcessing>
 {
 	NSString* slowControlName;
 	int	      slowControlIsConnected;
@@ -40,6 +41,9 @@
 	NSMutableArray*		 preAmpSNs;
 	NSMutableArray*		 osbSNs;
 	NSMutableDictionary* otherSNs;
+	float           lowLimit[2];
+	float           hiLimit[2];
+	float           maxValue[2];
 }
 #pragma mark ¥¥¥Accessors
 - (NSString*) slowControlName;
@@ -48,6 +52,12 @@
 - (void) setSlowControlIsConnected:(BOOL)aState;
 - (void) setViewType:(int)aViewType;
 - (int) viewType;
+- (float) lowLimit:(int)i;
+- (void) setLowLimit:(int)i value:(float)aValue;
+- (float) hiLimit:(int)i;
+- (void) setHiLimit:(int)i value:(float)aValue;
+- (float) maxValue:(int)i;
+- (void) setMaxValue:(int)i value:(float)aValue;
 
 #pragma mark ¥¥¥Slow Control Connection Monitoring
 - (void) slowControlConnectionChanged:(NSNotification*)aNote;
@@ -72,10 +82,25 @@
 - (NSString*) experimentMapLock;
 - (NSString*) experimentDetectorLock;
 - (NSString*) experimentDetailsLock;
+
+#pragma mark ¥¥¥Adc Processing Protocol
+- (void)processIsStarting;
+- (void)processIsStopping;
+- (void) startProcessCycle;
+- (void) endProcessCycle;
+- (BOOL) processValue:(int)channel;
+- (void) setProcessOutput:(int)channel value:(int)value;
+- (NSString*) processingTitle;
+- (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit  channel:(int)channel;
+- (double) convertedValue:(int)channel;
+- (double) maxValueForChan:(int)channel;
+
 @end
 
 extern NSString* KatrinModelSlowControlIsConnectedChanged;
 extern NSString* KatrinModelSlowControlNameChanged;
 extern NSString* ORKatrinModelViewTypeChanged;
 extern NSString* ORKatrinModelSNTablesChanged;
-
+extern NSString* ORKatrinModelMaxValueChanged;
+extern NSString* ORKatrinModelHiLimitChanged;
+extern NSString* ORKatrinModelLowLimitChanged;

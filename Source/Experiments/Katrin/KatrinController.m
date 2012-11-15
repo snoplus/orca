@@ -60,7 +60,7 @@
 {
 	
 	detectorSize		= NSMakeSize(800,750);
-	slowControlsSize    = NSMakeSize(525,157);
+	slowControlsSize    = NSMakeSize(525,320);
 	detailsSize			= NSMakeSize(655,589);
 	focalPlaneSize		= NSMakeSize(827,589);
 	vetoSize			= NSMakeSize(663,589);
@@ -79,6 +79,21 @@
     [[secondaryColorScale colorAxis] setOppositePosition:YES];
 	[[secondaryColorScale colorAxis] setNeedsDisplay:YES];
 
+	NSNumberFormatter* formatter = [[[NSNumberFormatter alloc] init] autorelease];
+	[formatter setFormat:@"#0.000"];	
+	int i;
+	for(i=0;i<2;i++){
+		[[maxValueMatrix cellAtRow:i column:0]	setTag:i];
+		[[lowLimitMatrix cellAtRow:i column:0]	setTag:i];
+		[[hiLimitMatrix cellAtRow:i column:0]	setTag:i];
+		
+		[[maxValueMatrix cellAtRow:i column:0] setFormatter:formatter];
+		[[lowLimitMatrix cellAtRow:i column:0] setFormatter:formatter];
+		[[hiLimitMatrix cellAtRow:i column:0] setFormatter:formatter];
+	}
+	
+	
+	
 	ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:1 andDataSource:self];
 	[aPlot setLineColor:[NSColor blueColor]];
 	[ratePlot addPlot: aPlot];
@@ -133,6 +148,21 @@
                      selector : @selector(snTablesChanged:)
                          name : ORKatrinModelSNTablesChanged
 						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(maxValueChanged:)
+                         name : ORKatrinModelMaxValueChanged
+						object: model];
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(lowLimitChanged:)
+                         name : ORKatrinModelLowLimitChanged
+						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(hiLimitChanged:)
+                         name : ORKatrinModelHiLimitChanged
+						object: model];
 }
 
 - (void) updateWindow
@@ -153,6 +183,37 @@
 	[self slowControlNameChanged:nil];
 	[self viewTypeChanged:nil];
 	[self snTablesChanged:nil];
+	
+	[self lowLimitChanged:nil];
+	[self hiLimitChanged:nil];
+	[self maxValueChanged:nil];
+	
+}
+
+- (void) lowLimitChanged:(NSNotification*)aNotification
+{
+	int i;
+	for(i=0;i<2;i++){
+		[[lowLimitMatrix cellWithTag:i] setFloatValue:[model lowLimit:i]];
+	}
+}
+
+- (void) hiLimitChanged:(NSNotification*)aNotification
+{
+	int i;
+	for(i=0;i<2;i++){
+		[[hiLimitMatrix cellWithTag:i] setFloatValue:[model hiLimit:i]];
+	}
+
+}
+
+- (void) maxValueChanged:(NSNotification*)aNotification
+{
+	int i;
+	for(i=0;i<2;i++){
+		[[maxValueMatrix cellWithTag:i] setFloatValue:[model maxValue:i]];
+	}
+
 }
 
 - (void) primaryMapFileChanged:(NSNotification*)aNote
@@ -201,7 +262,22 @@
 	[detectorView makeAllSegments];	
 }
 
-#pragma mark ¥¥¥HW Map Actions
+#pragma mark ¥¥¥Actions
+- (IBAction) lowLimitAction:(id)sender
+{
+	[model setLowLimit:[[sender selectedCell] tag] value:[[sender selectedCell] floatValue]];	
+}
+
+- (IBAction) hiLimitAction:(id)sender
+{
+	[model setHiLimit:[[sender selectedCell] tag] value:[[sender selectedCell] floatValue]];	
+}
+
+
+- (IBAction) maxValueAction:(id)sender
+{
+	[model setMaxValue:[[sender selectedCell] tag] value:[[sender selectedCell] floatValue]];	
+}
 
 - (IBAction) slowControlNameAction:(id)sender
 {

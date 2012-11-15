@@ -56,15 +56,17 @@
 	IBOutlet NSTextField*	preampSNField;
 	IBOutlet NSTextField*	sltWaferSNField;
 
+	IBOutlet NSMatrix*		lowLimitMatrix;
+	IBOutlet NSMatrix*		hiLimitMatrix;
+	IBOutlet NSMatrix*		maxValueMatrix;
+	
+	
 	NSView *blankView;
     NSSize detectorSize;
     NSSize slowControlsSize;
     NSSize detailsSize;
     NSSize focalPlaneSize;
-    NSSize vetoSize;
-
-
-	
+    NSSize vetoSize;	
 }
 
 #pragma mark ¥¥¥Initialization
@@ -76,14 +78,19 @@
 - (IBAction) secondaryAdcClassNameAction:(id)sender;
 - (IBAction) readSecondaryMapFileAction:(id)sender;
 - (IBAction) saveSecondaryMapFileAction:(id)sender;
-
 - (IBAction) viewTypeAction:(id)sender;
+- (IBAction) maxValueAction:(id)sender;
+- (IBAction) lowLimitAction:(id)sender;
+- (IBAction) hiLimitAction:(id)sender;
 
 #pragma mark ¥¥¥Detector Interface Management
 - (void) slowControlNameChanged:(NSNotification*)aNote;
 - (void) slowControlIsConnectedChanged:(NSNotification*)aNote;
 - (void) secondaryColorAxisAttributesChanged:(NSNotification*)aNote;
 - (void) snTablesChanged:(NSNotification*)aNote;
+- (void) maxValueChanged:(NSNotification*)aNote;
+- (void) lowLimitChanged:(NSNotification*)aNote;
+- (void) hiLimitChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥HW Map Interface Management
 - (void) secondaryAdcClassNameChanged:(NSNotification*)aNote;

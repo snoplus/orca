@@ -22,6 +22,7 @@
 
 #import "ORBaseDecoder.h"
 #import "ORDataChainObject.h"
+#import "ORBitProcessing.h"
 
 #pragma mark ¥¥¥Forward Declarations
 @class ORDataPacket;
@@ -30,7 +31,7 @@
 @class ORDataTypeAssigner;
 @class ORRunScriptModel;
 
-@interface ORRunModel :  ORDataChainObject {
+@interface ORRunModel :  ORDataChainObject <ORBitProcessing>{
     @private
         unsigned long 	runNumber;
 
@@ -235,6 +236,16 @@
 #pragma mark ¥¥¥Script Helpers
 - (void) forceClearWaits;
 - (NSString*) commonScriptMethods;
+
+#pragma mark ¥¥¥Bit Processing protocol
+- (void) processIsStarting;
+- (void) processIsStopping; 
+- (void) startProcessCycle;
+- (void) endProcessCycle;
+- (BOOL) processValue:(int)channel;
+- (void) setProcessOutput:(int)channel value:(int)value;
+- (NSString*) processingTitle;
+
 @end
 
 
