@@ -893,7 +893,10 @@ static void SwapLongBlock(void* p, int32_t n)
             }
 
             else if (((XL3_Packet*) aPacket)->cmdHeader.packet_type == MESSAGE_ID) {
-                NSLog(@"%@ message: %s\n", [self crateName], ((XL3_Packet*) aPacket)->payload);
+                ((XL3_Packet*) aPacket)->payload[XL3_MAXPAYLOADSIZE_BYTES-1] = '\0';
+                NSString* msg = [NSString stringWithFormat:@"%s", ((XL3_Packet*) aPacket)->payload]; //odd encoding
+                msg = [msg stringByReplacingOccurrencesOfString:@"\r" withString:@""];
+                NSLog(@"%@ message: %@\n", [self crateName], [[msg retain] autorelease]);
             }
 
             else if (((XL3_Packet*) aPacket)->cmdHeader.packet_type == ERROR_ID) {

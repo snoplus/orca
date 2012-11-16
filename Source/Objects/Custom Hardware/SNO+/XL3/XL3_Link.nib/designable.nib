@@ -2501,7 +2501,7 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOAA</bytes>
 												<string key="NSFrame">{{10, -134}, {34, 36}}</string>
 												<reference key="NSSuperview" ref="1069406222"/>
 												<reference key="NSWindow"/>
-												<reference key="NSNextKeyView" ref="399296633"/>
+												<reference key="NSNextKeyView"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="471501780">
 													<int key="NSCellFlags">67108864</int>
@@ -3562,7 +3562,7 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOAA</bytes>
 																<object class="NSButtonCell" key="NSCell" id="325851295">
 																	<int key="NSCellFlags">67108864</int>
 																	<int key="NSCellFlags2">268566528</int>
-																	<string key="NSContents">Set on crate init</string>
+																	<string key="NSContents">Set on crate safe init</string>
 																	<reference key="NSSupport" ref="26"/>
 																	<reference key="NSControlView" ref="240588212"/>
 																	<int key="NSButtonFlags">1211912448</int>
@@ -8041,6 +8041,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 											<string key="NSFrame">{{53, 5}, {28, 28}}</string>
 											<reference key="NSSuperview" ref="105398756"/>
 											<reference key="NSWindow"/>
+											<reference key="NSNextKeyView"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSButtonCell" key="NSCell" id="906712911">
 												<int key="NSCellFlags">67108864</int>

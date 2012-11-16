@@ -3972,7 +3972,7 @@ void SwapLongBlock(void* p, int32_t n)
         NSLog(msg);
     }
     else {
-        NSLog(@"%@: voltage thresholds set.\n",[[self xl3Link] crateName]);
+        NSLog(@"%@: voltage alarm thresholds set.\n",[[self xl3Link] crateName]);
     }
 }
 
@@ -4461,6 +4461,11 @@ void SwapLongBlock(void* p, int32_t n)
                     }
                 }
                 NSLogFont([NSFont userFixedPitchFontOfSize:0], msg);
+                
+                //update XL3 alarm levels on safe init
+                if ([self isXl3VltThresholdInInit]) {
+                    [self setVltThreshold];
+                }
             }
         }
         else {
