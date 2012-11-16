@@ -777,7 +777,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 
 - (void) process_response:(NSString*)aCmd
 {
-    
+    NSLog(@"received: %@\n",aCmd);
 	if([aCmd hasPrefix:@"W"]){
 		NSLog(@"VXM (%d) paused and waiting on a 'Go' cmd\n",[self uniqueIdNumber]);
 		[self setWaiting:YES];
@@ -863,6 +863,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (void) sendCommand:(NSString*)aCmd
 {
 	if([serialPort isOpen]){
+		NSLog(@"write: %@\n",aCmd);
 		[serialPort writeString:aCmd];
 	}
 }
