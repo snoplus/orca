@@ -321,8 +321,8 @@
 - (id) execute:(id) p container:(id)aContainer
 {
 	[delegate checkBreakpoint:[p line] functionLevel:functionLevel];
-	if([delegate exitNow])return 0;
-    if (!p) return 0;
+	if([delegate exitNow])return _zero;
+    if (!p) return _zero;
     switch([(Node*)p type]) {
 		case typeCon:				return [p nodeData];
 		case typeStr:				return [p nodeData];
@@ -505,7 +505,7 @@
 {
     int level = 0;
     NSLogFont([NSFont fontWithName:@"Monaco" size:9.0],@"\n%@",[self finalPass:[self printNode:p atLevel:level lastOne:NO]]);
-    return 0;
+    return _zero;
 }
 - (ORNodeEvaluator*) functionEvaluator
 {
@@ -699,7 +699,7 @@
 			return val;
 		}
 	}
-    return 0; //should never actually get here.
+    return _zero; //should never actually get here.
 }
 
 - (id) processDiv:(id) p
