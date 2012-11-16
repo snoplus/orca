@@ -386,7 +386,7 @@ for (id obj in anEnum) [obj x];                   \
                          defaultButton:nil
                        alternateButton:nil
                            otherButton:nil
-             informativeTextWithFormat:[e reason]] runModal];
+             informativeTextWithFormat:@"%@",[e reason]] runModal];
         return NO;
     }
     return YES;
