@@ -69,6 +69,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (void) queryPositions;
 - (int) nextMotorToQuery;
 - (void) sendCommand:(NSString*)aCmd;
+- (void) queryPositionsDeferred;
 @end
 
 @implementation ORVXMModel
@@ -945,17 +946,21 @@ NSString* ORVXMLock							= @"ORVXMLock";
 
 - (void) queryPositions
 {
-	if(!queryInProgress){
-		queryInProgress = YES;
-		int i;
-		motorToQueryMask = 0;
-		for(i=0;i<kNumVXMMotors;i++) {
-			if([[self motor:i] motorEnabled]){
-				motorToQueryMask |= (1<<i);
-			}
+	queryInProgress = YES;
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	[self performSelector:@selector(queryPositionsDeferred) withObject:nil afterDelay:.1];
+}
+- (void) queryPositionsDeferred
+{
+	int i;
+	motorToQueryMask = 0;
+	for(i=0;i<kNumVXMMotors;i++) {
+		if([[self motor:i] motorEnabled]){
+			motorToQueryMask |= (1<<i);
 		}
-        [self queryPosition];
 	}
+	[self queryPosition];
+	
 }
 
 - (int) nextMotorToQuery
