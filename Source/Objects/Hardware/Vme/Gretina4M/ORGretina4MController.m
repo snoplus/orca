@@ -185,11 +185,6 @@
                        object : model];
 		
     [notifyCenter addObserver : self
-                     selector : @selector(cfdEnabledChanged:)
-                         name : ORGretina4MModelCFDEnabledChanged
-                       object : model];
-	
-    [notifyCenter addObserver : self
                      selector : @selector(poleZeroEnabledChanged:)
                          name : ORGretina4MModelPoleZeroEnabledChanged
                        object : model];
@@ -227,21 +222,6 @@
     [notifyCenter addObserver : self
                      selector : @selector(ledThresholdChanged:)
                          name : ORGretina4MModelLEDThresholdChanged
-                       object : model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(cfdDelayChanged:)
-                         name : ORGretina4MModelCFDDelayChanged
-                       object : model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(cfdFractionChanged:)
-                         name : ORGretina4MModelCFDFractionChanged
-                       object : model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(cfdThresholdChanged:)
-                         name : ORGretina4MModelCFDThresholdChanged
                        object : model];
 		
     [notifyCenter addObserver : self
@@ -309,7 +289,12 @@
                      selector : @selector(pileUpWindowChanged:)
                          name : ORGretina4MModelPileUpWindowChanged
 						object: model];
-
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(pileUpChanged:)
+                         name : ORGretina4MModelPileUpChanged
+                       object : model];
+	
     [notifyCenter addObserver : self
                      selector : @selector(extTrigLengthChanged:)
                          name : ORGretina4MModelExtTrigLengthChanged
@@ -387,7 +372,6 @@
     [self slotChanged:nil];
     [self settingsLockChanged:nil];
 	[self enabledChanged:nil];
-	[self cfdEnabledChanged:nil];
 	[self poleZeroEnabledChanged:nil];
 	[self poleZeroTauChanged:nil];
 	[self pzTraceEnabledChanged:nil];
@@ -396,10 +380,8 @@
 	[self tpolChanged:nil];
 	[self triggerModeChanged:nil];
 	[self ledThresholdChanged:nil];
-	[self cfdDelayChanged:nil];
-	[self cfdFractionChanged:nil];
-	[self cfdThresholdChanged:nil];
-	
+	[self pileUpChanged:nil];
+
     [self rateGroupChanged:nil];
     [self integrationChanged:nil];
     [self miscAttributesChanged:nil];
@@ -438,6 +420,13 @@
 }
 
 #pragma mark •••Interface Management
+- (void) pileUpChanged:(NSNotification*)aNote
+{
+	short i;
+	for(i=0;i<kNumGretina4MChannels;i++){
+		[[pileUpMatrix cellWithTag:i] setState:[model pileUp:i]];
+	}
+}
 - (void) chpsdvChanged:(NSNotification*)aNote
 {
     if(aNote == nil){
@@ -626,20 +615,6 @@
 }
 
 
-- (void) cfdEnabledChanged:(NSNotification*)aNote
-{
-    if(aNote == nil){
-        short i;
-        for(i=0;i<kNumGretina4MChannels;i++){
-            [[cfdEnabledMatrix cellWithTag:i] setState:[model cfdEnabled:i]];
-        }
-    }
-    else {
-        int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
-        [[cfdEnabledMatrix cellWithTag:chan] setState:[model cfdEnabled:chan]];
-    }
-}
-
 - (void) poleZeroEnabledChanged:(NSNotification*)aNote
 {
     if(aNote == nil){
@@ -754,48 +729,6 @@
     }
 }
     
-- (void) cfdDelayChanged:(NSNotification*)aNote
-{
-    if(aNote == nil){
-        short i;
-        for(i=0;i<kNumGretina4MChannels;i++){
-            [[cfdDelayMatrix cellWithTag:i] setFloatValue:[model cfdDelayConverted:i]];
-        }
-    }
-    else {
-        int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
-        [[cfdDelayMatrix cellWithTag:chan] setFloatValue:[model cfdDelayConverted:chan]];
-    }
-}
-    
-- (void) cfdFractionChanged:(NSNotification*)aNote
-{
-    if(aNote == nil){
-        short i;
-        for(i=0;i<kNumGretina4MChannels;i++){
-            [[cfdFractionMatrix cellWithTag:i] setIntValue:[model cfdFraction:i]];
-        }
-    }
-    else {
-        int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
-        [[cfdFractionMatrix cellWithTag:chan] setIntValue:[model cfdFraction:chan]];
-    }
-}
-
-- (void) cfdThresholdChanged:(NSNotification*)aNote
-{
-    if(aNote == nil){
-        short i;
-        for(i=0;i<kNumGretina4MChannels;i++){
-            [[cfdThresholdMatrix cellWithTag:i] setFloatValue:[model cfdThresholdConverted:i]];
-        }
-    }
-    else {
-        int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
-        [[cfdThresholdMatrix cellWithTag:chan] setFloatValue:[model cfdThresholdConverted:chan]];
-
-    }
-}
     
 - (void) noiseFloorIntegrationChanged:(NSNotification*)aNote
 {
@@ -867,20 +800,18 @@
 	[statusButton setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[probeButton setEnabled:!locked && !runInProgress && !downloading];
 	[enabledMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
-	[cfdEnabledMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[poleZeroEnabledMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[poleZeroTauMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[pzTraceEnabledMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[debugMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
+	[pileUpMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[presumEnabledMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[ledThresholdMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
-	[cfdDelayMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
-	[cfdFractionMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
-	[cfdThresholdMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[resetButton setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[loadMainFPGAButton setEnabled:!locked && !downloading];
 	[stopFPGALoadButton setEnabled:!locked && downloading];
 	[downSamplePU setEnabled:!lockedOrRunningMaintenance && !downloading];
+	[pileUpMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
 	
     [tpolMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
     [triggerModeMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
@@ -1052,6 +983,12 @@
 }
 
 #pragma mark •••Actions
+- (IBAction) pileUpAction:(id)sender
+{
+	if([sender intValue] != [model pileUp:[[sender selectedCell] tag]]){
+		[model setPileUp:[[sender selectedCell] tag] withValue:[sender intValue]];
+	}
+}
 - (IBAction) chpsdvAction:(id)sender
 {
     [model setChpsdv:[sender selectedRow] withValue:[[sender selectedCell] indexOfSelectedItem]];
@@ -1137,12 +1074,7 @@
 		[model setEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
 	}
 }
-- (IBAction) cfdEnabledAction:(id)sender
-{
-	if([sender intValue] != [model cfdEnabled:[[sender selectedCell] tag]]){
-		[model setCFDEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
-	}
-}
+
 - (IBAction) poleZeroEnabledAction:(id)sender
 {
 	if([sender intValue] != [model poleZeroEnabled:[[sender selectedCell] tag]]){
@@ -1190,28 +1122,6 @@
 		[model setLEDThreshold:[[sender selectedCell] tag] withValue:[sender intValue]];
 	}
 }
-
-- (IBAction) cfdFractionAction:(id)sender
-{
-	if([sender intValue] != [model cfdFraction:[[sender selectedCell] tag]]){
-		[model setCFDFraction:[[sender selectedCell] tag] withValue:[sender intValue]];
-	}
-}
-
-- (IBAction) cfdDelayAction:(id)sender
-{
-	if([sender intValue] != [model cfdDelay:[[sender selectedCell] tag]]){
-		[model setCFDDelayConverted:[[sender selectedCell] tag] withValue:[sender floatValue]];
-	}
-}
-
-- (IBAction) cfdThresholdAction:(id)sender
-{
-	if([sender intValue] != [model cfdThreshold:[[sender selectedCell] tag]]){
-		[model setCFDThresholdConverted:[[sender selectedCell] tag] withValue:[sender floatValue]];
-	}
-}
-
 
 -(IBAction) noiseFloorOffsetAction:(id)sender
 {
@@ -1397,12 +1307,11 @@
 			else if(pol==2) polString = @"Neg";
 			else if(pol==3) polString = @"Both";
 			
-            NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"chan: %d Enabled: %@ Debug: %@  Presum: %@ CFD: %@ Pole-zero: %@ Polarity: %@ TriggerMode: 0x%02x\n",
+            NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"chan: %d Enabled: %@ Debug: %@  Presum: %@  Pole-zero: %@ Polarity: %@ TriggerMode: 0x%02x\n",
                       chan, 
                       (value&0x1)?@"[YES]":@"[ NO]",		//enabled
                       ((value>>1)&0x1)?@"[YES]":@"[ NO]",	//debug
                       ((value>>2)&0x1)?@"[YES]":@"[ NO]",   //presum
-                      ((value>>12)&0x1)?@"[YES]":@"[ NO]",  //CFD
                       ((value>>13)&0x1)?@"[YES]":@"[ NO]",  //pole-zero
                       polString, (value>>3)&0x3);
         }

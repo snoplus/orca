@@ -86,7 +86,6 @@ enum {
 	kExtFIFOMonitor,			//[12] External FIFO monitor
     kControlStatus,				//[13] Control Status
     kLEDThreshold,				//[14] LED Threshold
-    kCFDParameters,				//[15] CFD Parameters
     kWindowTiming,              //[16] Window timing
     kRisingEdgeWindow,          //[17] Rising Edge Window
     kDAC,						//[18] DAC
@@ -186,10 +185,6 @@ enum Gretina4MFIFOStates {
     short			pileUp[kNumGretina4MChannels];
     short			triggerMode[kNumGretina4MChannels];
     int				ledThreshold[kNumGretina4MChannels];
-    short			cfdDelay[kNumGretina4MChannels];
-    short			cfdThreshold[kNumGretina4MChannels];
-    short			cfdFraction[kNumGretina4MChannels];
-    short           cfdEnabled[kNumGretina4MChannels];
     short           poleZeroEnabled[kNumGretina4MChannels];
     short           poleZeroMult[kNumGretina4MChannels];
     short			pzTraceEnabled[kNumGretina4MChannels];
@@ -336,15 +331,11 @@ enum Gretina4MFIFOStates {
 - (void) setTriggerMode:(short)chan withValue:(short)aValue;
 - (void) setPileUp:(short)chan withValue:(short)aValue;		
 - (void) setEnabled:(short)chan withValue:(short)aValue;
-- (void) setCFDEnabled:(short)chan withValue:(short)aValue;
 - (void) setPoleZeroEnabled:(short)chan withValue:(short)aValue;		
 - (void) setPoleZeroMultiplier:(short)chan withValue:(short)aValue;		
 - (void) setPZTraceEnabled:(short)chan withValue:(short)aValue;		
 - (void) setDebug:(short)chan withValue:(short)aValue;	
 - (void) setLEDThreshold:(short)chan withValue:(int)aValue;
-- (void) setCFDDelay:(short)chan withValue:(short)aValue;	
-- (void) setCFDFraction:(short)chan withValue:(short)aValue;	
-- (void) setCFDThreshold:(short)chan withValue:(short)aValue;
 - (void) setMrpsrt:(short)chan withValue:(short)aValue;
 - (void) setFtCnt:(short)chan withValue:(short)aValue;
 - (void) setMrpsdv:(short)chan withValue:(short)aValue;
@@ -359,14 +350,10 @@ enum Gretina4MFIFOStates {
 - (short) poleZeroEnabled:(short)chan;
 - (short) poleZeroMult:(short)chan;
 - (short) pzTraceEnabled:(short)chan;
-- (short) cfdEnabled:(short)chan;		
 - (short) debug:(short)chan;		
 - (short) pileUp:(short)chan;		
 - (short) triggerMode:(short)chan;
 - (int) ledThreshold:(short)chan;	
-- (short) cfdDelay:(short)chan;		
-- (short) cfdFraction:(short)chan;	
-- (short) cfdThreshold:(short)chan;	
 - (short) mrpsrt:(short)chan;
 - (short) ftCnt:(short)chan;
 - (short) mrpsdv:(short)chan;
@@ -379,12 +366,8 @@ enum Gretina4MFIFOStates {
 
 //conversion methods
 - (float) poleZeroTauConverted:(short)chan;
-- (float) cfdDelayConverted:(short)chan;
-- (float) cfdThresholdConverted:(short)chan;
 
 - (void) setPoleZeroTauConverted:(short)chan withValue:(float)aValue;	
-- (void) setCFDDelayConverted:(short)chan withValue:(float)aValue;	
-- (void) setCFDThresholdConverted:(short)chan withValue:(float)aValue;
 
 - (void) setExternalWindowConverted:(float)aValue;
 - (void) setPileUpWindowConverted:(float)aValue;
@@ -412,7 +395,6 @@ enum Gretina4MFIFOStates {
 - (void) writeControlReg:(short)channel enabled:(BOOL)enabled;
 - (void) writeClockMux;
 - (void) writeLEDThreshold:(short)channel;
-- (void) writeCFDParameters:(short)channel;
 - (void) writeWindowTiming:(short)channel;
 - (void) writeRisingEdgeWindow:(short)channel;
 - (unsigned short) readFifoState;
@@ -502,15 +484,11 @@ extern NSString* ORGretina4MModelNoiseFloorOffsetChanged;
 extern NSString* ORGretina4MModelEnabledChanged;
 extern NSString* ORGretina4MModelDebugChanged;
 extern NSString* ORGretina4MModelPileUpChanged;
-extern NSString* ORGretina4MModelCFDEnabledChanged;
 extern NSString* ORGretina4MModelPoleZeroEnabledChanged;
 extern NSString* ORGretina4MModelPoleZeroMultChanged;
 extern NSString* ORGretina4MModelPZTraceEnabledChanged;
 extern NSString* ORGretina4MModelTriggerModeChanged;
 extern NSString* ORGretina4MModelLEDThresholdChanged;
-extern NSString* ORGretina4MModelCFDDelayChanged;
-extern NSString* ORGretina4MModelCFDFractionChanged;
-extern NSString* ORGretina4MModelCFDThresholdChanged;
 
 extern NSString* ORGretina4MSettingsLock;
 extern NSString* ORGretina4MRegisterLock;

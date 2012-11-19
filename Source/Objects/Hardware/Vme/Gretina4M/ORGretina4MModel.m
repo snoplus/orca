@@ -53,7 +53,6 @@ NSString* ORGretina4MNoiseFloorChanged			= @"ORGretina4MNoiseFloorChanged";
 NSString* ORGretina4MModelFIFOCheckChanged		= @"ORGretina4MModelFIFOCheckChanged";
 
 NSString* ORGretina4MModelEnabledChanged		 = @"ORGretina4MModelEnabledChanged";
-NSString* ORGretina4MModelCFDEnabledChanged      = @"ORGretina4MModelCFDEnabledChanged";
 NSString* ORGretina4MModelPoleZeroEnabledChanged = @"ORGretina4MModelPoleZeroEnabledChanged";
 NSString* ORGretina4MModelPoleZeroMultChanged	 = @"ORGretina4MModelPoleZeroMultChanged";
 NSString* ORGretina4MModelPZTraceEnabledChanged  = @"ORGretina4MModelPZTraceEnabledChanged";
@@ -61,9 +60,6 @@ NSString* ORGretina4MModelDebugChanged			 = @"ORGretina4MModelDebugChanged";
 NSString* ORGretina4MModelPileUpChanged			 = @"ORGretina4MModelPileUpChanged";
 NSString* ORGretina4MModelTriggerModeChanged	 = @"ORGretina4MModelTriggerModeChanged";
 NSString* ORGretina4MModelLEDThresholdChanged	 = @"ORGretina4MModelLEDThresholdChanged";
-NSString* ORGretina4MModelCFDDelayChanged		 = @"ORGretina4MModelCFDDelayChanged";
-NSString* ORGretina4MModelCFDFractionChanged	 = @"ORGretina4MModelCFDFractionChanged";
-NSString* ORGretina4MModelCFDThresholdChanged	 = @"ORGretina4MModelCFDThresholdChanged";
 NSString* ORGretina4MModelMainFPGADownLoadInProgressChanged		= @"ORGretina4MModelMainFPGADownLoadInProgressChanged";
 NSString* ORGretina4MCardInited					 = @"ORGretina4MCardInited";
 NSString* ORGretina4MSettingsLock				 = @"ORGretina4MSettingsLock";
@@ -129,7 +125,6 @@ static Gretina4MRegisterInformation register_information[kNumberOfGretina4MRegis
     {0x30,	@"External FIFO monitor", YES, NO, NO, NO}, //new for version 102b
     {0x40,  @"Control/Status", YES, YES, YES, YES},                
     {0x80,  @"LED Threshold", YES, YES, YES, YES},                 
-    {0xC0,  @"CFD Parameters", YES, YES, YES, YES},                
     {0x100, @"Window Timing", YES, YES, YES, YES},       
     {0x140, @"Risint Edge Window", YES, YES, YES, YES},        
     {0x400, @"DAC", YES, YES, NO, NO},                             
@@ -683,15 +678,11 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 		enabled[i]			= YES;
 		debug[i]			= NO;
 		pileUp[i]			= NO;
-        cfdEnabled[i]		= NO;
 		poleZeroEnabled[i]	= NO;
 		poleZeroMult[i]	    = 0x600;
 		pzTraceEnabled[i]	= NO;
 		triggerMode[i]		= 0x0;
 		ledThreshold[i]		= 0x1FFFF;
-		cfdDelay[i]			= 0x3f;
-		cfdFraction[i]		= 0x0;
-		cfdThreshold[i]		= 0x10;
 		mrpsrt[i]           = 0x0;
 		ftCnt[i]            = 252;
 		mrpsdv[i]           = 0x0;
@@ -741,14 +732,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	enabled[chan] = aValue;
     NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MModelEnabledChanged object:self userInfo:userInfo];
-}
-
-- (void) setCFDEnabled:(short)chan withValue:(short)aValue		
-{ 
-    [[[self undoManager] prepareWithInvocationTarget:self] setCFDEnabled:chan withValue:cfdEnabled[chan]];
-	cfdEnabled[chan] = aValue;
-    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MModelCFDEnabledChanged object:self userInfo:userInfo];
 }
 
 - (void) setPoleZeroEnabled:(short)chan withValue:(short)aValue		
@@ -815,37 +798,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MModelLEDThresholdChanged object:self userInfo:userInfo];
 }
-
-- (void) setCFDDelay:(short)chan withValue:(short)aValue		
-{
-	if(aValue<0)aValue=0;
-	else if(aValue>0x3F)aValue = 0x3F;
-    [[[self undoManager] prepareWithInvocationTarget:self] setCFDDelay:chan withValue:cfdDelay[chan]];
-	cfdDelay[chan] = aValue;
-    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MModelCFDDelayChanged object:self userInfo:userInfo];
-}
-
-- (void) setCFDFraction:(short)chan withValue:(short)aValue	
-{ 
-	if(aValue<0)aValue=0;
-	else if(aValue>0x11)aValue = 0x11;
-    [[[self undoManager] prepareWithInvocationTarget:self] setCFDFraction:chan withValue:cfdFraction[chan]];
-	cfdFraction[chan] = aValue;
-    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MModelCFDFractionChanged object:self userInfo:userInfo];
-}
-
-- (void) setCFDThreshold:(short)chan withValue:(short)aValue  
-{
-	if(aValue<0)aValue=0;
-	else if(aValue>0x1F)aValue = 0x1F;
-    [[[self undoManager] prepareWithInvocationTarget:self] setCFDThreshold:chan withValue:cfdThreshold[chan]];
-	cfdThreshold[chan] = aValue;
-    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MModelCFDThresholdChanged object:self userInfo:userInfo];
-}
-
 
 - (void) setMrpsrt:(short)chan withValue:(short)aValue
 {
@@ -919,7 +871,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) setTpol:(short)chan withValue:(short)aValue
 {
 	if(aValue<0)aValue=0;
-	else if(aValue>0x7FF)aValue = 0x7FF;
+	else if(aValue>0x3)aValue = 0x3;
     [[[self undoManager] prepareWithInvocationTarget:self] setTpol:chan withValue:tpol[chan]];
 	tpol[chan] = aValue;
     NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
@@ -936,7 +888,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 
 - (short) enabled:(short)chan			{ return enabled[chan]; }
-- (short) cfdEnabled:(short)chan		{ return cfdEnabled[chan]; }
 - (short) poleZeroEnabled:(short)chan	{ return poleZeroEnabled[chan]; }
 - (short) poleZeroMult:(short)chan      { return poleZeroMult[chan]; }
 - (short) pzTraceEnabled:(short)chan    { return pzTraceEnabled[chan]; }
@@ -944,9 +895,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (short) pileUp:(short)chan			{ return pileUp[chan];}
 - (short) triggerMode:(short)chan		{ return triggerMode[chan];}
 - (int) ledThreshold:(short)chan		{ return ledThreshold[chan]; }
-- (short) cfdDelay:(short)chan          { return cfdDelay[chan]; }
-- (short) cfdFraction:(short)chan		{ return cfdFraction[chan]; }
-- (short) cfdThreshold:(short)chan      { return cfdThreshold[chan]; }
 - (short) mrpsrt:(short)chan            { return mrpsrt[chan]; }
 - (short) ftCnt:(short)chan             { return ftCnt[chan]; }
 - (short) mrpsdv:(short)chan            { return mrpsdv[chan]; }
@@ -959,8 +907,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 
 - (float) poleZeroTauConverted:(short)chan  { return poleZeroMult[chan]>0 ? 0.01*pow(2., 23)/poleZeroMult[chan] : 0; } //convert to us
-- (float) cfdDelayConverted:(short)chan		{ return cfdDelay[chan]*630./(float)0x3F; }						//convert to ns
-- (float) cfdThresholdConverted:(short)chan	{ return cfdThreshold[chan]*160./(float)0x10; }					//convert to kev
 
 - (float) externalWindowConverted	{ return externalWindow * 4/(float)0x190;   }		//convert to ¬¨¬µs
 - (float) pileUpWindowConverted     { return externalWindow * 10/(float)0x400;  }		//convert to ¬¨¬µs
@@ -973,10 +919,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     if(aValue > 0) aValue = 0.01*pow(2., 23)/aValue;
 	[self setPoleZeroMultiplier:chan withValue:aValue]; 	//us -> raw
 }
-
-- (void) setCFDDelayConverted:(short)chan withValue:(float)aValue     { [self setCFDDelay:chan withValue:aValue*0x3F/630.];     }	//ns -> raw
-- (void) setCFDThresholdConverted:(short)chan withValue:(float)aValue { [self setCFDThreshold:chan withValue:aValue*0x10/160.]; }   //kev -> raw
-
 - (void) setExternalWindowConverted:(float)aValue  { [self setExternalWindow:aValue*0x190/4.0]; } //us -> raw
 - (void) setPileUpWindowConverted:(float)aValue    { [self setPileUpWindow:aValue*0x400/10.0];  } //us -> raw
 - (void) setExtTrigLengthConverted:(float)aValue   { [self setExtTrigLength:aValue*0x190/4.0];  } //us -> raw
@@ -1227,7 +1169,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	}
     for(i=0;i<kNumGretina4MChannels;i++) {
         [self writeLEDThreshold:i];
-        [self writeCFDParameters:i];
         [self writeWindowTiming:i];
         [self writeRisingEdgeWindow:i];
     }
@@ -1262,10 +1203,9 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
     unsigned long theValue = (pzTraceEnabled[chan]  << 14)  |
                              (poleZeroEnabled[chan] << 13)  |
-                             (cfdEnabled[chan]      << 12)  |
                              (tpol[chan]            << 10)  |
-                             (triggerMode[chan]     << 3)   |
-                             (presumEnabled[chan]   << 2)   |
+							 (presumEnabled[chan]   << 3)   |
+							 (pileUp[chan]			<< 2)	|
                              (debug[chan]           << 1)   |
                              startStop;
     
@@ -1358,16 +1298,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
                      usingAddSpace:0x01];
 }
 
-- (void) writeCFDParameters:(short)channel
-{    
-    unsigned long theValue = ((cfdDelay[channel] & 0x3F) << 7) | ((cfdFraction[channel] & 0x3) << 5) | (cfdThreshold[channel]);
-    [[self adapter] writeLongBlock:&theValue
-                         atAddress:[self baseAddress] + register_information[kCFDParameters].offset + 4*channel
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-    
-}
 
 - (void) writeWindowTiming:(short)channel
 {    
@@ -1946,27 +1876,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [p setSetMethod:@selector(setLEDThreshold:withValue:) getMethod:@selector(ledThreshold:)];
 	[p setCanBeRamped:YES];
     [a addObject:p];
-    
-    p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"CFD Delay"];
-    [p setFormat:@"##0" upperLimit:630 lowerLimit:0 stepSize:1 units:@"ns"];
-    [p setSetMethod:@selector(setCFDDelayConverted:withValue:) getMethod:@selector(cfdDelayConverted:)];
-	[p setCanBeRamped:YES];
-    [a addObject:p];
-    
-    p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"CFD Fraction"];
-    [p setFormat:@"##0" upperLimit:0x3 lowerLimit:0 stepSize:1 units:@""];
-    [p setSetMethod:@selector(setCFDFraction:withValue:) getMethod:@selector(cfdFraction:)];
-    [a addObject:p];
-    
-    p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"CFD Threshold"];
-    [p setFormat:@"##0.0" upperLimit:160 lowerLimit:0 stepSize:1 units:@"Kev"];
-	[p setCanBeRamped:YES];
-    [p setSetMethod:@selector(setCFDThresholdConverted:withValue:) getMethod:@selector(cfdThresholdConverted:)];
-    [a addObject:p];
-    
+        
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Down Sample"];
     [p setFormat:@"##0" upperLimit:4 lowerLimit:0 stepSize:1 units:@""];
@@ -2317,15 +2227,11 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 		[self setEnabled:i		withValue:[decoder decodeIntForKey:[@"enabled"	    stringByAppendingFormat:@"%d",i]]];
 		[self setDebug:i		withValue:[decoder decodeIntForKey:[@"debug"	    stringByAppendingFormat:@"%d",i]]];
 		[self setPileUp:i		withValue:[decoder decodeIntForKey:[@"pileUp"	    stringByAppendingFormat:@"%d",i]]];
-		[self setCFDEnabled:i 	withValue:[decoder decodeIntForKey:[@"cfdEnabled"   stringByAppendingFormat:@"%d",i]]];
 		[self setPoleZeroEnabled:i withValue:[decoder decodeIntForKey:[@"poleZeroEnabled" stringByAppendingFormat:@"%d",i]]];
 		[self setPoleZeroMultiplier:i withValue:[decoder decodeIntForKey:[@"poleZeroMult" stringByAppendingFormat:@"%d",i]]];
 		[self setPZTraceEnabled:i withValue:[decoder decodeIntForKey:[@"pzTraceEnabled" stringByAppendingFormat:@"%d",i]]];
 		[self setTriggerMode:i	withValue:[decoder decodeIntForKey:[@"triggerMode"	stringByAppendingFormat:@"%d",i]]];
 		[self setLEDThreshold:i withValue:[decoder decodeIntForKey:[@"ledThreshold" stringByAppendingFormat:@"%d",i]]];
-		[self setCFDThreshold:i withValue:[decoder decodeIntForKey:[@"cfdThreshold" stringByAppendingFormat:@"%d",i]]];
-		[self setCFDDelay:i		withValue:[decoder decodeIntForKey:[@"cfdDelay"		stringByAppendingFormat:@"%d",i]]];
-		[self setCFDFraction:i	withValue:[decoder decodeIntForKey:[@"cfdFraction"	stringByAppendingFormat:@"%d",i]]];
 		[self setMrpsrt:i       withValue:[decoder decodeIntForKey:[@"mrpsrt"       stringByAppendingFormat:@"%d",i]]];
 		[self setFtCnt:i        withValue:[decoder decodeIntForKey:[@"ftCnt"        stringByAppendingFormat:@"%d",i]]];
 		[self setMrpsdv:i       withValue:[decoder decodeIntForKey:[@"mrpsdv"       stringByAppendingFormat:@"%d",i]]];
@@ -2345,7 +2251,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt:integrateTime              forKey:@"integrateTime"];
+    [encoder encodeInt:integrateTime                forKey:@"integrateTime"];
     [encoder encodeInt:collectionTime               forKey:@"collectionTime"];
     [encoder encodeInt:extTrigLength                forKey:@"extTrigLength"];
     [encoder encodeInt:pileUpWindow                 forKey:@"pileUpWindow"];
@@ -2365,14 +2271,10 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 		[encoder encodeInt:enabled[i]		forKey:[@"enabled"		stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:debug[i]			forKey:[@"debug"		stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:pileUp[i]		forKey:[@"pileUp"		stringByAppendingFormat:@"%d",i]];
-		[encoder encodeInt:cfdEnabled[i]  	forKey:[@"cfdEnabled"  	stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:poleZeroEnabled[i] forKey:[@"poleZeroEnabled" stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:poleZeroMult[i]  forKey:[@"poleZeroMult" stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:pzTraceEnabled[i] forKey:[@"pzTraceEnabled" stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:triggerMode[i]	forKey:[@"triggerMode"	stringByAppendingFormat:@"%d",i]];
-		[encoder encodeInt:cfdFraction[i]	forKey:[@"cfdFraction"	stringByAppendingFormat:@"%d",i]];
-		[encoder encodeInt:cfdDelay[i]		forKey:[@"cfdDelay"		stringByAppendingFormat:@"%d",i]];
-		[encoder encodeInt:cfdThreshold[i]	forKey:[@"cfdThreshold" stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:ledThreshold[i]	forKey:[@"ledThreshold" stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:mrpsrt[i]        forKey:[@"mrpsrt"       stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:ftCnt[i]         forKey:[@"ftCnt"        stringByAppendingFormat:@"%d",i]];
@@ -2400,10 +2302,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	[self addCurrentState:objDictionary cArray:debug forKey:@"Debug Mode"];
 	[self addCurrentState:objDictionary cArray:pileUp forKey:@"Pile Up"];
 	[self addCurrentState:objDictionary cArray:triggerMode forKey:@"Trigger Mode"];
-	[self addCurrentState:objDictionary cArray:cfdDelay forKey:@"CFD Delay"];
-	[self addCurrentState:objDictionary cArray:cfdFraction forKey:@"CFD Fraction"];
-	[self addCurrentState:objDictionary cArray:cfdThreshold forKey:@"CFD Threshold"];
-	[self addCurrentState:objDictionary cArray:cfdEnabled forKey:@"CFD Enabled"];
 	[self addCurrentState:objDictionary cArray:poleZeroEnabled forKey:@"Pole Zero Enabled"];
 	[self addCurrentState:objDictionary cArray:poleZeroMult forKey:@"Pole Zero Multiplier"];
 	[self addCurrentState:objDictionary cArray:pzTraceEnabled forKey:@"PZ Trace Enabled"];
