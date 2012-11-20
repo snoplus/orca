@@ -784,7 +784,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 		[self setWaiting:YES];
 	}
 	else {
-		if(([aCmd rangeOfString:@"^"].location != NSNotFound) || ([aCmd rangeOfString:@","].location != NSNotFound)){
+		if([aCmd rangeOfString:@"^"].location != NSNotFound){
 			//the '^' means a command is complete. On some hardware the command is echoed and the '^' sometimes is missing.
 			[self queryPositions];
 		}
