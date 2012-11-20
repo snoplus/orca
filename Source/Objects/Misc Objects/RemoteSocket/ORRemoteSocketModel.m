@@ -40,6 +40,7 @@ NSString* ORRemoteSocketLock		= @"ORRemoteSocketLock";
 
 - (void) dealloc
 {
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	if(isConnected) {
 		[self disconnect];
 	}
@@ -157,6 +158,11 @@ NSString* ORRemoteSocketLock		= @"ORRemoteSocketLock";
 	defaultStringEncoding = encoding;
 }
 
+- (unsigned long) heartbeatCount
+{
+	return heartbeatCount;
+}
+
 #pragma mark Connecting
 
 - (SCCInit) connect
@@ -268,6 +274,12 @@ NSString* ORRemoteSocketLock		= @"ORRemoteSocketLock";
 	}
 	else return nil;
 }
+- (void) incHeartbeat
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	heartbeatCount++;
+	[self performSelector:@selector(incHeartbeat) withObject:nil afterDelay:1];
+}
 
 #pragma mark ***Archival
 - (id) initWithCoder:(NSCoder*)decoder
@@ -276,6 +288,7 @@ NSString* ORRemoteSocketLock		= @"ORRemoteSocketLock";
     [[self undoManager] disableUndoRegistration];
     [self setRemoteHost:[decoder decodeObjectForKey:@"remoteHost"]];
     [self setRemotePort:[decoder decodeIntForKey:@"remotePort"]];
+	[self performSelector:@selector(incHeartbeat) withObject:nil afterDelay:1];
     [[self undoManager] enableUndoRegistration];    
     return self;
 }

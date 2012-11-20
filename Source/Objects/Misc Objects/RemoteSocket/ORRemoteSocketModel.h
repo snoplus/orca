@@ -44,6 +44,7 @@ typedef enum SCCInit SCCInit;
 	int						connectionTimeout;
 	NSStringEncoding		defaultStringEncoding;
 	NSMutableDictionary*	responseDictionary;
+	unsigned long			heartbeatCount;
 }
 
 #pragma mark ***Initialization
@@ -63,6 +64,7 @@ typedef enum SCCInit SCCInit;
 - (void)		setConnectionTimeout:(int)newTimeout;
 - (NSStringEncoding) defaultStringEncoding;
 - (void)		setDefaultStringEncoding:(NSStringEncoding)encoding;
+- (unsigned long) heartbeatCount;
 
 #pragma mark ***Socket Methods
 - (SCCInit) connect;
