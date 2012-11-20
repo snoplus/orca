@@ -65,6 +65,8 @@ typedef enum SCCInit SCCInit;
 - (NSStringEncoding) defaultStringEncoding;
 - (void)		setDefaultStringEncoding:(NSStringEncoding)encoding;
 - (unsigned long) heartbeatCount;
+- (void)		removeResponseForKey:(NSString*)aKey;
+- (void)		incHeartbeat;
 
 #pragma mark ***Socket Methods
 - (SCCInit) connect;

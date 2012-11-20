@@ -265,6 +265,11 @@ NSString* ORRemoteSocketLock		= @"ORRemoteSocketLock";
 	else return NO;
 }
 
+- (void) removeResponseForKey:(NSString*)aKey
+{
+	[responseDictionary removeObjectForKey:aKey];
+}
+
 - (id) responseForKey:(NSString*)aKey
 {
 	if(aKey){
