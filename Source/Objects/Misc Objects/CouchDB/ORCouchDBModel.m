@@ -857,21 +857,20 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 {
 	if(!remoteHostName)return;
 	if([aList count] && verbose)NSLog(@"Couch Remote Tasks:\n");
+	[self setReplicationRunning:NO];
 	for(id aTask in aList){
-		if([[aTask objectForKey:@"type"] isEqualToString:@"Replication"]){
-			NSString* anItem = [aTask objectForKey:@"task"];
-			NSUInteger sepLoc = [anItem rangeOfString:@"->"].location;
-			NSUInteger colonLoc = [anItem rangeOfString:@":"].location;
-			if(colonLoc < sepLoc){
-				NSString* result = [anItem substringFromIndex:colonLoc+1];
-				if(verbose)NSLog(@"%@\n",result);
-				if([result rangeOfString:remoteHostName].location != NSNotFound){
+		if([[[aTask objectForKey:@"type"] lowercaseString] isEqualToString:@"replication"]){
+			NSArray* keys = [aTask allKeys];
+			for(id aKey in keys){
+				id item = [aTask objectForKey:aKey];
+				if([item isKindOfClass:NSClassFromString(@"NSString")]){
+					if([(NSString*)item rangeOfString:remoteHostName].location != NSNotFound){
 						[self setReplicationRunning:YES];
+					}
 				}
-				else [self setReplicationRunning:NO];
 			}
-			else if(verbose)NSLog(@"%@\n",anItem);
 		}
+		if(verbose)NSLog(@"%@\n",aTask);
 	}
 }
 
