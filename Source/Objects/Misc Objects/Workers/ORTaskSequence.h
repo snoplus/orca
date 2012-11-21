@@ -27,6 +27,7 @@
 	id delegate;
 	BOOL verbose;
 	BOOL textToDelegate;
+    BOOL sawErrors;
 }
 + (id) taskSequenceWithDelegate:(id)aDelegate;
 - (id) initWithDelegate:(id)aDelegate;
@@ -40,6 +41,7 @@
 - (void) taskCompleted: (NSNotification*)aNote;
 - (void) taskDataAvailable:(NSNotification*)aNotification;
 - (void) movetoNextTask:(NSNotification*)aNote;
+- (BOOL) sawErrors;
 
 @end
 

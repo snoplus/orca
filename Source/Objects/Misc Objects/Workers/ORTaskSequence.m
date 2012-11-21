@@ -67,6 +67,8 @@
 
 - (void) launch
 {
+    // Reset errors and launch
+    sawErrors = NO;
 	[self retain];
 	[self _launch];
 }
@@ -81,9 +83,15 @@
 	textToDelegate = flag;
 }
 
+- (BOOL) sawErrors
+{
+    return sawErrors;
+}
 
 - (void) taskCompleted: (NSNotification*)aNote
 {
+    if ([[aNote object] respondsToSelector:@selector(terminationStatus)] &&
+        [[aNote object] terminationStatus] != 0) sawErrors = YES;
 	[self performSelector:@selector(movetoNextTask:) withObject:aNote afterDelay:0];
 }
 
