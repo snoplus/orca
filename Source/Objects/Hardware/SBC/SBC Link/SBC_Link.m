@@ -788,21 +788,30 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 		[[NSNotificationCenter defaultCenter] removeObserver : self
 													 name : ORFileMoverIsDoneNotification
 												   object : SBCFileMover];
-		
-		NSLog(@"Transfered Core SBC Code: %@ to %@\n",[SBCFileMover fileName],[SBCFileMover remoteHost]);
-		[SBCFileMover release];
-		SBCFileMover  = nil;
-		NSString* folder = [mainStagingFolder stringByExpandingTildeInPath];
-		[[NSFileManager defaultManager] removeItemAtPath:folder error:nil];
-		[mainStagingFolder release];
-		mainStagingFolder= nil;
+		if ([[SBCFileMover task] terminationStatus] == 0) {
+            NSLog(@"Transferred Core SBC Code: %@ to %@\n",[SBCFileMover fileName],[SBCFileMover remoteHost]);
+
+            NSString* folder = [mainStagingFolder stringByExpandingTildeInPath];
+            [[NSFileManager defaultManager] removeItemAtPath:folder error:nil];
+        } else {
+            NSLogColor([NSColor redColor], @"Failed to transfer SBC Code to %@\n",[SBCFileMover remoteHost]);
+        }
+        [SBCFileMover release];
+        SBCFileMover  = nil;
+        [mainStagingFolder release];
+        mainStagingFolder= nil;
 	}
 	
 	else if([aNote object] == driverScriptFileMover){
 		[[NSNotificationCenter defaultCenter] removeObserver : self
 														name : ORFileMoverIsDoneNotification
 													  object : driverScriptFileMover];
-		NSLog(@"Transfered Driver Update Script: %@ to %@\n",[driverScriptFileMover fileName],[driverScriptFileMover remoteHost]);
+		if ([[driverScriptFileMover task] terminationStatus] == 0) {
+            NSLog(@"Transferred Driver Update Script: %@ to %@\n",[driverScriptFileMover fileName],[driverScriptFileMover remoteHost]);
+        } else {
+            NSLogColor([NSColor redColor], @"Failed to transfer Driver update script to %@\n",
+                       [driverScriptFileMover remoteHost]);
+        }
 		[driverScriptFileMover release];
 		driverScriptFileMover  = nil;
 	}
@@ -812,15 +821,17 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 {
 	if(reloading){
 		NSString* aCrateName = [self crateName];
-		NSLog(@"%@  %d: reload done\n",aCrateName,[delegate crateNumber]);
+		NSLog(@"%@  %d: reload processing done\n",aCrateName,[delegate crateNumber]);
 		[self setReloading:NO];
-		if(compilerErrors == 0 && compilerWarnings == 0){
+        if ([sender sawErrors]) {
+            NSLogColor([NSColor redColor], @"%@: %d Errors were seen during tasks\n",aCrateName,[delegate crateNumber]);
+		} else if(compilerErrors == 0 && compilerWarnings == 0){
 			NSLog(@"%@: %d loaded and compiled without errors\n",aCrateName,[delegate crateNumber]);
 		}
-		if(compilerErrors){
+		else if(compilerErrors){
 			NSLogColor([NSColor redColor],@"%@: %d didn't compile\n",aCrateName,[delegate crateNumber]);
 		}
-		if(compilerWarnings && !compilerErrors){
+		else if(compilerWarnings){
 			NSLogColor([NSColor redColor],@"%@: %d compiled with %d warnings\n",aCrateName,[self compilerWarnings],[delegate crateNumber]);
 		}
 		[self setCompilerErrors:0];
