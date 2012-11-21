@@ -20,6 +20,7 @@
 
 
 #import "ORTaskSequence.h"
+#import "ANSIEscapeHelper.h"
 
 @interface ORTaskSequence (private)
 - (void) _launch;
@@ -104,7 +105,13 @@
     if (incomingData && [incomingData length]) {
 		NSString *incomingText = [[[NSString alloc] initWithData:incomingData encoding:NSASCIIStringEncoding] autorelease];
 		incomingText = [incomingText removeNLandCRs];
-		if(verbose)NSLog(@"%@\n",incomingText);
+		if(verbose){
+            ANSIEscapeHelper* helper = [[[ANSIEscapeHelper alloc] init] autorelease];
+            [helper setFont:[NSFont fontWithName:@"Courier New" size:12]];
+            NSAttributedString* str = [helper attributedStringWithANSIEscapedString:
+                                       [NSString stringWithFormat:@"%@\n",incomingText]];
+            NSLogAttr(str);
+        }
 		if(textToDelegate && incomingText){
 			if([delegate respondsToSelector:@selector(taskData:)]){
 				[delegate taskData:incomingText];
