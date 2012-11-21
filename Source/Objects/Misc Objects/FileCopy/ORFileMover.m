@@ -295,7 +295,7 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
 					NSString* bp = [[NSBundle mainBundle ]resourcePath];
 					NSMutableString* theScript = [NSMutableString stringWithContentsOfFile:[bp stringByAppendingPathComponent:@"scpExpectScript"] encoding:NSASCIIStringEncoding error:nil];
 					[theScript replace:@"<isDir>" with:isDir?@"-r":@""];
-					[theScript replace:@"<verbose>" with:isDir?@"-v":@""];
+					[theScript replace:@"<verbose>" with:@""]; // High verbosity messes up the expect.
 					[theScript replace:@"<sourcePath>" with:[fullPath stringByReplacingOccurrencesOfString:@" " withString:@"\\ "]];
 					[theScript replace:@"<userName>" with:remoteUserName];
 					[theScript replace:@"<host>" with:remoteHost];
@@ -455,7 +455,9 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
         }
         
  		if(verbose || !transferOK){
-			NSLog(@"Transfer Log:\n-----------------------------\n%@\n-----------------------------\n",allOutput);
+			NSLog(@"Transfer Log:\n");
+            NSLogFont([NSFont fontWithName:@"Courier New" size:12],
+                      @"-----------------------------\n%@\n-----------------------------\n",allOutput);
 		}
 		NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
         [nc postNotificationName:NSTaskDidTerminateNotification object:self];
