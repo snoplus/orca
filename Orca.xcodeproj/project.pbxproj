@@ -2888,6 +2888,8 @@
 		CED29CFC1482B02200BD3AB2 /* ORSIS3302GenericModel.h in Headers */ = {isa = PBXBuildFile; fileRef = CED29CF91482B02200BD3AB2 /* ORSIS3302GenericModel.h */; };
 		CED29CFD1482B02200BD3AB2 /* ORSIS3302GenericModel.m in Sources */ = {isa = PBXBuildFile; fileRef = CED29CFA1482B02200BD3AB2 /* ORSIS3302GenericModel.m */; };
 		CED29CFE1482B02200BD3AB2 /* SIS3302Generic.nib in Resources */ = {isa = PBXBuildFile; fileRef = CED29CFB1482B02200BD3AB2 /* SIS3302Generic.nib */; };
+		CED38D1E165CDB6600358681 /* ANSIEscapeHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = CED38D1C165CDB6600358681 /* ANSIEscapeHelper.h */; };
+		CED38D1F165CDB6600358681 /* ANSIEscapeHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = CED38D1D165CDB6600358681 /* ANSIEscapeHelper.m */; };
 		EF37879212DFFF81003C814E /* YAJL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF37879112DFFF81003C814E /* YAJL.framework */; };
 		EF3787A012DFFF90003C814E /* YAJL.framework in Frameworks_Copy */ = {isa = PBXBuildFile; fileRef = EF37879112DFFF81003C814E /* YAJL.framework */; };
 		EF69C433116E5DC3008ABADC /* ORSNOCrateReadout.hh in Headers */ = {isa = PBXBuildFile; fileRef = EF69C431116E5DC3008ABADC /* ORSNOCrateReadout.hh */; };
@@ -5923,6 +5925,8 @@
 		CED29CF91482B02200BD3AB2 /* ORSIS3302GenericModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSIS3302GenericModel.h; sourceTree = "<group>"; };
 		CED29CFA1482B02200BD3AB2 /* ORSIS3302GenericModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORSIS3302GenericModel.m; sourceTree = "<group>"; };
 		CED29CFB1482B02200BD3AB2 /* SIS3302Generic.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = SIS3302Generic.nib; sourceTree = "<group>"; };
+		CED38D1C165CDB6600358681 /* ANSIEscapeHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANSIEscapeHelper.h; sourceTree = "<group>"; };
+		CED38D1D165CDB6600358681 /* ANSIEscapeHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANSIEscapeHelper.m; sourceTree = "<group>"; };
 		EF37879112DFFF81003C814E /* YAJL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = YAJL.framework; path = Frameworks/YAJL.framework; sourceTree = "<group>"; };
 		EF69C430116E5DC3008ABADC /* ORSNOCrateReadout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ORSNOCrateReadout.cc; sourceTree = "<group>"; };
 		EF69C431116E5DC3008ABADC /* ORSNOCrateReadout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ORSNOCrateReadout.hh; sourceTree = "<group>"; };
@@ -7500,6 +7504,7 @@
 				847CCA5F058E8C1B003522C8 /* DataStructures */,
 				84940B3D04E07F87005F64B1 /* Rates */,
 				84DF917104D6D51E005F64B1 /* FileMover */,
+				CED38D1B165CDB6600358681 /* ANSIEscapeHelper */,
 				84F90B94046858FE005F64B1 /* Workers */,
 				842162F0043E6317005F64B1 /* Formatters */,
 				842162F3043E6317005F64B1 /* Mouse Tasks */,
@@ -12220,6 +12225,16 @@
 			path = HardwareFinder;
 			sourceTree = "<group>";
 		};
+		CED38D1B165CDB6600358681 /* ANSIEscapeHelper */ = {
+			isa = PBXGroup;
+			children = (
+				CED38D1C165CDB6600358681 /* ANSIEscapeHelper.h */,
+				CED38D1D165CDB6600358681 /* ANSIEscapeHelper.m */,
+			);
+			name = ANSIEscapeHelper;
+			path = "Source/Objects/Misc Objects/ANSIEscapeHelper";
+			sourceTree = SOURCE_ROOT;
+		};
 		EF7722B111E813120064A1CF /* XL3 */ = {
 			isa = PBXGroup;
 			children = (
@@ -13736,6 +13751,7 @@
 				842BB6AA1639746300393470 /* ORPulser33500Chan.h in Headers */,
 				842BB6C516397A2000393470 /* ORPulser33500ChanController.h in Headers */,
 				842BC974163ED4E300393470 /* ORGretina4MReadout.hh in Headers */,
+				CED38D1E165CDB6600358681 /* ANSIEscapeHelper.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -15597,6 +15613,7 @@
 				84F9098C1638383C00E9FD24 /* ORPulser33500Model.m in Sources */,
 				842BB6AB1639746300393470 /* ORPulser33500Chan.m in Sources */,
 				842BB6C616397A2000393470 /* ORPulser33500ChanController.m in Sources */,
+				CED38D1F165CDB6600358681 /* ANSIEscapeHelper.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
