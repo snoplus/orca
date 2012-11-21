@@ -74,7 +74,7 @@
 - (oneway void) logError:(NSString*)string usingKeyArray:(NSArray*)keys;
 - (void) printAlarm: (NSString*)s1;
 - (oneway void) printString: (NSString*)aComment;
-- (oneway void) printString: (NSString*)s1 withColor:(NSColor*)aColor;
+- (oneway void) printAttributedString:(NSAttributedString*)s1;
 - (BOOL) validateMenuItem:(NSMenuItem*)menuItem;
 
 #pragma mark ¥¥¥Data Source Methods
@@ -137,8 +137,7 @@
 @interface NSProxy (ORStatusController)
 - (oneway void) logError:(id)string usingKeyArray:(id)keys;
 - (oneway void) printString: (NSString*)aComment;
-- (oneway void) printString: (NSString*)s1 withColor:(NSColor*)aColor;
-- (oneway void) printString: (NSString*)s1 withFont:(NSFont*)aFont;
+- (oneway void) printAttributedString:(NSAttributedString*)s1;
 @end
 
 extern NSString* ORStatusLogUpdatedNotification;

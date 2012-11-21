@@ -24,5 +24,6 @@ void _nsLog(NSString* aString,...);
 void NSLogColor(NSColor* aColor,NSString* aString,...);
 void NSLogFont(NSFont* aFont,NSString* aString,...);
 void NSLogError(NSString* aString,...);
+void NSLogAttr(NSAttributedString* aString);
 #define NSLog _nsLog
 

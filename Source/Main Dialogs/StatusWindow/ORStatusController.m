@@ -188,34 +188,21 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
     [s1 release];
 }
 
--(void)printString: (NSString*)s1 withColor:(NSColor*)aColor
+-(oneway void) printAttributedString:(NSAttributedString*)s1
 {
 	[s1 retain];
-    [self printString:s1];
+    [self printString:[s1 string]];
     int len = [s1 length];
+	
+    NSUInteger i=0;
+    while (i<len) {
+        NSRange range;
+        NSDictionary* dict = [s1 attributesAtIndex:i effectiveRange:&range];
+        range.location += [self statusTextlength] - len;
+        [[statusView textStorage] setAttributes:dict range:range];
+        i += range.length;
+    }
  	[s1 release];
-	
-	
-	[[statusView textStorage] setAttributes:[NSDictionary dictionaryWithObject:[NSColor grayColor] forKey:NSForegroundColorAttributeName ]
-										  range:NSMakeRange([self statusTextlength]-len,16)];
-    
-	[[statusView textStorage] setAttributes:[NSDictionary dictionaryWithObject:aColor forKey:NSForegroundColorAttributeName ]
-										  range:NSMakeRange([self statusTextlength]-len+16,len-16)];
-    
-}
-
--(void)printString: (NSString*)s1 withFont:(NSFont*)aFont
-{
-	[s1 retain];
-    [self printString:s1];
-    int len = [s1 length];
- 	[s1 release];
-	
-    [[statusView textStorage] setAttributes:[NSDictionary dictionaryWithObject:[NSColor grayColor] forKey:NSForegroundColorAttributeName ]
-                                      range:NSMakeRange([self statusTextlength]-len,16)];
-    
-    [[statusView textStorage] setAttributes:[NSDictionary dictionaryWithObject:aFont forKey:NSFontAttributeName ]
-                                      range:NSMakeRange([self statusTextlength]-len+16,len-16)];
 }
 
 - (oneway void) logError: (NSString*)anError usingKeyArray:(NSArray*)keys
@@ -872,7 +859,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 
 #pragma mark ¥¥¥¥¥Log Helper Function
 //----------------------------------------------------------------------------------------------------
-//logStatus
+//_nsLog
 //	a helper function to redirect a call to logStatus to a logger defined by the NSApp delegate
 //----------------------------------------------------------------------------------------------------
 void _nsLog(NSString* s,...)
@@ -884,25 +871,14 @@ void _nsLog(NSString* s,...)
         va_list myArgs;
         va_start(myArgs,s);
         
-        NSCalendarDate* now  	= [NSCalendarDate calendarDate];
-        [now setCalendarFormat:@"%m%d%y %H:%M:%S"];
-        
-        NSString* s1 = [NSString stringWithFormat:@"%@ %@",now,[[[NSString alloc] initWithFormat:s
-                                                                                          locale:nil
-                                                                                       arguments:myArgs] autorelease]];
+        NSAttributedString* s1 = [[[NSAttributedString alloc]
+                                   initWithString:[[[NSString alloc] initWithFormat:s
+                                                                             locale:nil
+                                                                          arguments:myArgs] autorelease]
+                                   attributes:[NSDictionary dictionaryWithObject:aColor
+                                                                          forKey:NSForegroundColorAttributeName ]]autorelease];
         va_end(myArgs);
-        
-        NSInvocation *invocation;
-        invocation = [NSInvocation invocationWithMethodSignature:[sharedStatusController methodSignatureForSelector:@selector(printString:withColor:)]];
-        
-        [invocation setTarget:sharedStatusController];
-        [invocation setSelector:@selector(printString:withColor:)];
-        [invocation setArgument:&s1 atIndex:2];
-        [invocation setArgument:&aColor atIndex:3];
-        [invocation retainArguments];
-        
-        [sharedStatusController performSelectorOnMainThread:@selector(handleInvocation:) withObject:invocation waitUntilDone:NO];
-        
+        NSLogAttr(s1);        
         
 	}
 	@catch(NSException* localException) {
@@ -913,31 +889,27 @@ void _nsLog(NSString* s,...)
 }
 
 //----------------------------------------------------------------------------------------------------
-//logStatus
-//	a helper function to redirect a call to logStatus to a logger defined by the NSApp delegate
+//NSLogAttr
+//	A function to print out attributed strings to the log.  All NSLog* functions call through this
 //----------------------------------------------------------------------------------------------------
-void NSLogColor(NSColor* aColor,NSString* s,...)
+void NSLogAttr(NSAttributedString* s)
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
     @try {
-        va_list myArgs;
-        va_start(myArgs,s);
         
         NSCalendarDate* now  	= [NSCalendarDate calendarDate];
-        [now setCalendarFormat:@"%m%d%y %H:%M:%S"];
+        [now setCalendarFormat:@"%m%d%y %H:%M:%S "];
         
-        NSString* s1 = [NSString stringWithFormat:@"%@ %@",now,[[[NSString alloc] initWithFormat:s
-                                                                                          locale:nil
-                                                                                       arguments:myArgs] autorelease]];
-        va_end(myArgs);
+        NSMutableAttributedString* now_Attr = [[[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@",now] attributes:[NSDictionary dictionaryWithObject:[NSColor grayColor] forKey:NSForegroundColorAttributeName ]] autorelease];
+        
+        [now_Attr appendAttributedString:s];
         
         NSInvocation *invocation;
-        invocation = [NSInvocation invocationWithMethodSignature:[sharedStatusController methodSignatureForSelector:@selector(printString:withColor:)]];
+        invocation = [NSInvocation invocationWithMethodSignature:[sharedStatusController methodSignatureForSelector:@selector(printAttributedString:)]];
         
         [invocation setTarget:sharedStatusController];
-        [invocation setSelector:@selector(printString:withColor:)];
-        [invocation setArgument:&s1 atIndex:2];
-        [invocation setArgument:&aColor atIndex:3];
+        [invocation setSelector:@selector(printAttributedString:)];
+        [invocation setArgument:&now_Attr atIndex:2];
         [invocation retainArguments];
         
         [sharedStatusController performSelectorOnMainThread:@selector(handleInvocation:) withObject:invocation waitUntilDone:NO];
@@ -950,8 +922,34 @@ void NSLogColor(NSColor* aColor,NSString* s,...)
 }
 
 //----------------------------------------------------------------------------------------------------
-//logStatus
-//	a helper function to redirect a call to logStatus to a logger defined by the NSApp delegate
+//NSLogColor
+//	a helper function to output colorized text
+//----------------------------------------------------------------------------------------------------
+void NSLogColor(NSColor* aColor,NSString* s,...)
+{
+	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+    @try {
+        va_list myArgs;
+        va_start(myArgs,s);
+        
+        NSAttributedString* s1 = [[[NSAttributedString alloc]
+                                   initWithString:[[[NSString alloc] initWithFormat:s
+                                                                             locale:nil
+                                                                          arguments:myArgs] autorelease]
+                                   attributes:[NSDictionary dictionaryWithObject:aColor
+                                                                          forKey:NSForegroundColorAttributeName ]]autorelease];
+        va_end(myArgs);
+        NSLogAttr(s1);
+        
+	}
+	@catch(NSException* localException) {
+	}
+	[pool release];
+}
+
+//----------------------------------------------------------------------------------------------------
+//NSLogFont
+//	a helper function to output different fonts
 //----------------------------------------------------------------------------------------------------
 void NSLogFont(NSFont* aFont,NSString* s,...)
 {
@@ -959,25 +957,15 @@ void NSLogFont(NSFont* aFont,NSString* s,...)
     @try {
         va_list myArgs;
         va_start(myArgs,s);
-        
-        NSCalendarDate* now  	= [NSCalendarDate calendarDate];
-        [now setCalendarFormat:@"%m%d%y %H:%M:%S"];
-        
-        NSString* s1 = [NSString stringWithFormat:@"%@ %@",now,[[[NSString alloc] initWithFormat:s
-                                                                                          locale:nil
-                                                                                       arguments:myArgs] autorelease]];
+        NSAttributedString* s1 = [[[NSAttributedString alloc]
+                                   initWithString:[[[NSString alloc] initWithFormat:s
+                                                                             locale:nil
+                                                                          arguments:myArgs] autorelease]
+                                   attributes:[NSDictionary dictionaryWithObject:aFont
+                                                                          forKey:NSFontAttributeName ]] autorelease];
         va_end(myArgs);
-        
-        NSInvocation *invocation;
-        invocation = [NSInvocation invocationWithMethodSignature:[sharedStatusController methodSignatureForSelector:@selector(printString:withFont:)]];
-        
-        [invocation setTarget:sharedStatusController];
-        [invocation setSelector:@selector(printString:withFont:)];
-        [invocation setArgument:&s1 atIndex:2];
-        [invocation setArgument:&aFont atIndex:3];
-        [invocation retainArguments];
-        
-        [sharedStatusController performSelectorOnMainThread:@selector(handleInvocation:) withObject:invocation waitUntilDone:NO];
+        NSLogAttr(s1);
+
         
         
 	}
