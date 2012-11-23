@@ -29,8 +29,7 @@
     IBOutlet NSPopUpButton* commandPopUp;
     IBOutlet NSPopUpButton* outputNumberPopUp;
     IBOutlet NSTextField*   inputValueText;    
-    IBOutlet NSTextField*   readBackText;
-    IBOutlet NSButton*      sendCommandButton;    
+    IBOutlet NSTextField*   readBackText;  
     IBOutlet NSButton*      connectButton; 
     
     IBOutlet NSTextField*   readBackVoltOne;
@@ -85,12 +84,9 @@
 - (IBAction) connectAction:(id)sender;
 - (IBAction) sendCommandAction:(id)sender;
 - (IBAction) readBackAction:(id)sender;
+- (IBAction) syncValuesAction:(id)sender;
 - (IBAction) changeVerbosityAction:(id)sender;
 
-- (IBAction) writeVoltageAction:(id)sender;
-- (IBAction) writeVoltageTripAction:(id)sender;
-- (IBAction) writeCurrentAction:(id)sender;
-- (IBAction) writeCurrentTripAction:(id)sender;
 - (IBAction) writeOutputStatusAction:(id)sender;
 
 @end

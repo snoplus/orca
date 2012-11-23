@@ -329,30 +329,23 @@
 
 - (IBAction)readBackAction:(id)sender
 {
-    int output;
-    for (output=0; output<kORTTCPX400DPOutputChannels; output++) {
-        [model sendCommandReadBackGetCurrentReadbackWithOutput:output];
-        [model sendCommandReadBackGetCurrentTripSetWithOutput:output];    
-        [model sendCommandReadBackGetVoltageReadbackWithOutput:output];
-        [model sendCommandReadBackGetVoltageTripSetWithOutput:output];
-    }
+    [model readback];
 }
 
-- (IBAction) writeVoltageAction:(id)sender
+- (IBAction) syncValuesAction:(id)sender
 {
-    [model setWriteToSetVoltage:[sender floatValue] withOutput:[sender tag]];
-}
-- (IBAction) writeVoltageTripAction:(id)sender
-{
-    [model setWriteToSetOverVoltageProtectionTripPoint:[sender floatValue] withOutput:[sender tag]];
-}
-- (IBAction) writeCurrentAction:(id)sender
-{
-    [model setWriteToSetCurrentLimit:[sender floatValue] withOutput:[sender tag]];
-}
-- (IBAction) writeCurrentTripAction:(id)sender
-{
-    [model setWriteToSetOverCurrentProtectionTripPoint:[sender floatValue] withOutput:[sender tag]];
+#define SYNCALL(val)                                                                        \
+    [model setWriteToSetVoltage:[writeVolt ## val floatValue]                               \
+                     withOutput:[writeVolt ## val tag]];                                    \
+    [model setWriteToSetOverVoltageProtectionTripPoint:[writeVoltTrip ## val floatValue]    \
+                                            withOutput:[writeVoltTrip ## val tag]];         \
+    [model setWriteToSetCurrentLimit:[writeCurrent ## val floatValue]                       \
+                          withOutput:[writeCurrent ## val tag]];                            \
+    [model setWriteToSetOverCurrentProtectionTripPoint:[writeCurrentTrip ## val floatValue] \
+                                            withOutput:[writeCurrentTrip ## val tag]];
+    
+    SYNCALL(One)
+    SYNCALL(Two)
 }
 
 - (IBAction) writeOutputStatusAction:(id)sender

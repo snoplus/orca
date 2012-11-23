@@ -209,6 +209,9 @@ ORTTCPX_GEN_DEFINE_VAR(writeTo, CMD, TYPE)
 - (NSString*) commandName:(ETTCPX400DPCmds)cmd;
 - (BOOL) commandTakesInput:(ETTCPX400DPCmds)cmd;
 - (BOOL) commandTakesOutputNumber:(ETTCPX400DPCmds)cmd;
+
+- (void) readback;
+
 ORTTCPX_DEFINE_WRITE_FUNCTIONS(SetVoltage, float)
 ORTTCPX_DEFINE_WRITE_FUNCTIONS(SetVoltageAndVerify, float)
 ORTTCPX_DEFINE_WRITE_FUNCTIONS(SetOverVoltageProtectionTripPoint, float)

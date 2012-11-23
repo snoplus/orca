@@ -250,6 +250,7 @@
 							<string key="NSFrame">{{277, 353}, {107, 32}}</string>
 							<reference key="NSSuperview" ref="699451514"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="973785048">
 								<int key="NSCellFlags">67239424</int>
@@ -271,6 +272,7 @@
 							<string key="NSFrame">{{54, 10}, {355, 348}}</string>
 							<reference key="NSSuperview" ref="699451514"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="764776737"/>
 							<object class="NSMutableArray" key="NSTabViewItems">
 								<bool key="EncodedWithXMLCoder">YES</bool>
 								<object class="NSTabViewItem" id="121034200">
@@ -530,8 +532,8 @@
 															<bool key="NS.raise.underflow">YES</bool>
 															<bool key="NS.raise.dividebyzero">YES</bool>
 														</object>
-														<string key="NS.decimal">.</string>
-														<string key="NS.thousand">,</string>
+														<string key="NS.decimal">,</string>
+														<string key="NS.thousand">.</string>
 														<bool key="NS.hasthousands">YES</bool>
 														<bool key="NS.localized">YES</bool>
 														<bool key="NS.allowsfloats">YES</bool>
@@ -564,6 +566,7 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{115, 78}, {140, 32}}</string>
 												<reference key="NSSuperview" ref="9632393"/>
+												<reference key="NSNextKeyView" ref="292146045"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="1056888195">
 													<int key="NSCellFlags">67239424</int>
@@ -648,8 +651,8 @@
 															<bool key="NS.raise.underflow">YES</bool>
 															<bool key="NS.raise.dividebyzero">YES</bool>
 														</object>
-														<string key="NS.decimal">.</string>
-														<string key="NS.thousand">,</string>
+														<string key="NS.decimal">,</string>
+														<string key="NS.thousand">.</string>
 														<bool key="NS.hasthousands">YES</bool>
 														<bool key="NS.localized">YES</bool>
 														<bool key="NS.allowsfloats">YES</bool>
@@ -732,8 +735,8 @@
 															<bool key="NS.raise.underflow">YES</bool>
 															<bool key="NS.raise.dividebyzero">YES</bool>
 														</object>
-														<string key="NS.decimal">.</string>
-														<string key="NS.thousand">,</string>
+														<string key="NS.decimal">,</string>
+														<string key="NS.thousand">.</string>
 														<bool key="NS.hasthousands">YES</bool>
 														<bool key="NS.localized">YES</bool>
 														<bool key="NS.allowsfloats">YES</bool>
@@ -834,8 +837,8 @@
 															<bool key="NS.raise.underflow">YES</bool>
 															<bool key="NS.raise.dividebyzero">YES</bool>
 														</object>
-														<string key="NS.decimal">.</string>
-														<string key="NS.thousand">,</string>
+														<string key="NS.decimal">,</string>
+														<string key="NS.thousand">.</string>
 														<bool key="NS.hasthousands">YES</bool>
 														<bool key="NS.localized">YES</bool>
 														<bool key="NS.allowsfloats">YES</bool>
@@ -918,8 +921,8 @@
 															<bool key="NS.raise.underflow">YES</bool>
 															<bool key="NS.raise.dividebyzero">YES</bool>
 														</object>
-														<string key="NS.decimal">.</string>
-														<string key="NS.thousand">,</string>
+														<string key="NS.decimal">,</string>
+														<string key="NS.thousand">.</string>
 														<bool key="NS.hasthousands">YES</bool>
 														<bool key="NS.localized">YES</bool>
 														<bool key="NS.allowsfloats">YES</bool>
@@ -1020,8 +1023,8 @@
 															<bool key="NS.raise.underflow">YES</bool>
 															<bool key="NS.raise.dividebyzero">YES</bool>
 														</object>
-														<string key="NS.decimal">.</string>
-														<string key="NS.thousand">,</string>
+														<string key="NS.decimal">,</string>
+														<string key="NS.thousand">.</string>
 														<bool key="NS.hasthousands">YES</bool>
 														<bool key="NS.localized">YES</bool>
 														<bool key="NS.allowsfloats">YES</bool>
@@ -1104,8 +1107,8 @@
 															<bool key="NS.raise.underflow">YES</bool>
 															<bool key="NS.raise.dividebyzero">YES</bool>
 														</object>
-														<string key="NS.decimal">.</string>
-														<string key="NS.thousand">,</string>
+														<string key="NS.decimal">,</string>
+														<string key="NS.thousand">.</string>
 														<bool key="NS.hasthousands">YES</bool>
 														<bool key="NS.localized">YES</bool>
 														<bool key="NS.allowsfloats">YES</bool>
@@ -1206,8 +1209,8 @@
 															<bool key="NS.raise.underflow">YES</bool>
 															<bool key="NS.raise.dividebyzero">YES</bool>
 														</object>
-														<string key="NS.decimal">.</string>
-														<string key="NS.thousand">,</string>
+														<string key="NS.decimal">,</string>
+														<string key="NS.thousand">.</string>
 														<bool key="NS.hasthousands">YES</bool>
 														<bool key="NS.localized">YES</bool>
 														<bool key="NS.allowsfloats">YES</bool>
@@ -1290,8 +1293,8 @@
 															<bool key="NS.raise.underflow">YES</bool>
 															<bool key="NS.raise.dividebyzero">YES</bool>
 														</object>
-														<string key="NS.decimal">.</string>
-														<string key="NS.thousand">,</string>
+														<string key="NS.decimal">,</string>
+														<string key="NS.thousand">.</string>
 														<bool key="NS.hasthousands">YES</bool>
 														<bool key="NS.localized">YES</bool>
 														<bool key="NS.allowsfloats">YES</bool>
@@ -1411,8 +1414,8 @@
 															<bool key="NS.raise.underflow">YES</bool>
 															<bool key="NS.raise.dividebyzero">YES</bool>
 														</object>
-														<string key="NS.decimal">.</string>
-														<string key="NS.thousand">,</string>
+														<string key="NS.decimal">,</string>
+														<string key="NS.thousand">.</string>
 														<bool key="NS.hasthousands">YES</bool>
 														<bool key="NS.localized">YES</bool>
 														<bool key="NS.allowsfloats">YES</bool>
@@ -1495,8 +1498,8 @@
 															<bool key="NS.raise.underflow">YES</bool>
 															<bool key="NS.raise.dividebyzero">YES</bool>
 														</object>
-														<string key="NS.decimal">.</string>
-														<string key="NS.thousand">,</string>
+														<string key="NS.decimal">,</string>
+														<string key="NS.thousand">.</string>
 														<bool key="NS.hasthousands">YES</bool>
 														<bool key="NS.localized">YES</bool>
 														<bool key="NS.allowsfloats">YES</bool>
@@ -1598,8 +1601,8 @@
 															<bool key="NS.raise.underflow">YES</bool>
 															<bool key="NS.raise.dividebyzero">YES</bool>
 														</object>
-														<string key="NS.decimal">.</string>
-														<string key="NS.thousand">,</string>
+														<string key="NS.decimal">,</string>
+														<string key="NS.thousand">.</string>
 														<bool key="NS.hasthousands">YES</bool>
 														<bool key="NS.localized">YES</bool>
 														<bool key="NS.allowsfloats">YES</bool>
@@ -1682,8 +1685,8 @@
 															<bool key="NS.raise.underflow">YES</bool>
 															<bool key="NS.raise.dividebyzero">YES</bool>
 														</object>
-														<string key="NS.decimal">.</string>
-														<string key="NS.thousand">,</string>
+														<string key="NS.decimal">,</string>
+														<string key="NS.thousand">.</string>
 														<bool key="NS.hasthousands">YES</bool>
 														<bool key="NS.localized">YES</bool>
 														<bool key="NS.allowsfloats">YES</bool>
@@ -1785,8 +1788,8 @@
 															<bool key="NS.raise.underflow">YES</bool>
 															<bool key="NS.raise.dividebyzero">YES</bool>
 														</object>
-														<string key="NS.decimal">.</string>
-														<string key="NS.thousand">,</string>
+														<string key="NS.decimal">,</string>
+														<string key="NS.thousand">.</string>
 														<bool key="NS.hasthousands">YES</bool>
 														<bool key="NS.localized">YES</bool>
 														<bool key="NS.allowsfloats">YES</bool>
@@ -1803,7 +1806,7 @@
 												<string key="NSFrame">{{153, 122}, {63, 17}}</string>
 												<reference key="NSSuperview" ref="764776737"/>
 												<reference key="NSWindow"/>
-												<reference key="NSNextKeyView" ref="355906505"/>
+												<reference key="NSNextKeyView" ref="926794727"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSTextFieldCell" key="NSCell" id="982050041">
 													<int key="NSCellFlags">68288064</int>
@@ -1821,7 +1824,7 @@
 												<string key="NSFrame">{{195, 74}, {46, 22}}</string>
 												<reference key="NSSuperview" ref="764776737"/>
 												<reference key="NSWindow"/>
-												<reference key="NSNextKeyView" ref="291374072"/>
+												<reference key="NSNextKeyView" ref="424763570"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSTextFieldCell" key="NSCell" id="569287426">
 													<int key="NSCellFlags">-1267597759</int>
@@ -1869,8 +1872,8 @@
 															<bool key="NS.raise.underflow">YES</bool>
 															<bool key="NS.raise.dividebyzero">YES</bool>
 														</object>
-														<string key="NS.decimal">.</string>
-														<string key="NS.thousand">,</string>
+														<string key="NS.decimal">,</string>
+														<string key="NS.thousand">.</string>
 														<bool key="NS.hasthousands">YES</bool>
 														<bool key="NS.localized">YES</bool>
 														<bool key="NS.allowsfloats">YES</bool>
@@ -1972,8 +1975,8 @@
 															<bool key="NS.raise.underflow">YES</bool>
 															<bool key="NS.raise.dividebyzero">YES</bool>
 														</object>
-														<string key="NS.decimal">.</string>
-														<string key="NS.thousand">,</string>
+														<string key="NS.decimal">,</string>
+														<string key="NS.thousand">.</string>
 														<bool key="NS.hasthousands">YES</bool>
 														<bool key="NS.localized">YES</bool>
 														<bool key="NS.allowsfloats">YES</bool>
@@ -2008,7 +2011,7 @@
 												<string key="NSFrame">{{195, 3}, {46, 22}}</string>
 												<reference key="NSSuperview" ref="764776737"/>
 												<reference key="NSWindow"/>
-												<reference key="NSNextKeyView" ref="495692946"/>
+												<reference key="NSNextKeyView" ref="348554004"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSTextFieldCell" key="NSCell" id="780076543">
 													<int key="NSCellFlags">-1267597759</int>
@@ -2056,8 +2059,8 @@
 															<bool key="NS.raise.underflow">YES</bool>
 															<bool key="NS.raise.dividebyzero">YES</bool>
 														</object>
-														<string key="NS.decimal">.</string>
-														<string key="NS.thousand">,</string>
+														<string key="NS.decimal">,</string>
+														<string key="NS.thousand">.</string>
 														<bool key="NS.hasthousands">YES</bool>
 														<bool key="NS.localized">YES</bool>
 														<bool key="NS.allowsfloats">YES</bool>
@@ -2193,6 +2196,30 @@
 													<int key="NSPeriodicInterval">25</int>
 												</object>
 											</object>
+											<object class="NSButton" id="348554004">
+												<reference key="NSNextResponder" ref="764776737"/>
+												<int key="NSvFlags">268</int>
+												<string key="NSFrame">{{254, 9}, {66, 18}}</string>
+												<reference key="NSSuperview" ref="764776737"/>
+												<reference key="NSWindow"/>
+												<reference key="NSNextKeyView" ref="292146045"/>
+												<bool key="NSEnabled">YES</bool>
+												<object class="NSButtonCell" key="NSCell" id="746138624">
+													<int key="NSCellFlags">-2080244224</int>
+													<int key="NSCellFlags2">201326592</int>
+													<string key="NSContents">Verbose</string>
+													<reference key="NSSupport" ref="26"/>
+													<reference key="NSControlView" ref="348554004"/>
+													<int key="NSButtonFlags">1210864127</int>
+													<int key="NSButtonFlags2">2</int>
+													<reference key="NSNormalImage" ref="529904432"/>
+													<reference key="NSAlternateImage" ref="113398107"/>
+													<string key="NSAlternateContents"/>
+													<string key="NSKeyEquivalent"/>
+													<int key="NSPeriodicDelay">200</int>
+													<int key="NSPeriodicInterval">25</int>
+												</object>
+											</object>
 											<object class="NSButton" id="309300670">
 												<reference key="NSNextResponder" ref="764776737"/>
 												<int key="NSvFlags">268</int>
@@ -2215,20 +2242,20 @@
 													<int key="NSPeriodicInterval">25</int>
 												</object>
 											</object>
-											<object class="NSButton" id="495692946">
+											<object class="NSButton" id="424763570">
 												<reference key="NSNextResponder" ref="764776737"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{243, -2}, {89, 32}}</string>
+												<string key="NSFrame">{{250, 93}, {82, 32}}</string>
 												<reference key="NSSuperview" ref="764776737"/>
 												<reference key="NSWindow"/>
-												<reference key="NSNextKeyView" ref="424763570"/>
+												<reference key="NSNextKeyView" ref="291374072"/>
 												<bool key="NSEnabled">YES</bool>
-												<object class="NSButtonCell" key="NSCell" id="230758152">
+												<object class="NSButtonCell" key="NSCell" id="616509742">
 													<int key="NSCellFlags">67239424</int>
 													<int key="NSCellFlags2">134217728</int>
-													<string key="NSContents">Sync All</string>
+													<string key="NSContents">Read</string>
 													<reference key="NSSupport" ref="576803502"/>
-													<reference key="NSControlView" ref="495692946"/>
+													<reference key="NSControlView" ref="424763570"/>
 													<int key="NSButtonFlags">-2038284033</int>
 													<int key="NSButtonFlags2">129</int>
 													<string key="NSAlternateContents"/>
@@ -2237,19 +2264,20 @@
 													<int key="NSPeriodicInterval">25</int>
 												</object>
 											</object>
-											<object class="NSButton" id="424763570">
+											<object class="NSButton" id="926794727">
 												<reference key="NSNextResponder" ref="764776737"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{246, 26}, {82, 32}}</string>
+												<string key="NSFrame">{{257, 125}, {69, 32}}</string>
 												<reference key="NSSuperview" ref="764776737"/>
 												<reference key="NSWindow"/>
+												<reference key="NSNextKeyView" ref="355906505"/>
 												<bool key="NSEnabled">YES</bool>
-												<object class="NSButtonCell" key="NSCell" id="616509742">
+												<object class="NSButtonCell" key="NSCell" id="433575994">
 													<int key="NSCellFlags">67239424</int>
 													<int key="NSCellFlags2">134217728</int>
-													<string key="NSContents">Read</string>
+													<string key="NSContents">Sync</string>
 													<reference key="NSSupport" ref="576803502"/>
-													<reference key="NSControlView" ref="424763570"/>
+													<reference key="NSControlView" ref="926794727"/>
 													<int key="NSButtonFlags">-2038284033</int>
 													<int key="NSButtonFlags2">129</int>
 													<string key="NSAlternateContents"/>
@@ -2395,14 +2423,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">sendCommandButton</string>
-						<reference key="source" ref="890317098"/>
-						<reference key="destination" ref="603660328"/>
-					</object>
-					<int key="connectionID">3746</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
 						<string key="label">readBackCurrentOne</string>
 						<reference key="source" ref="890317098"/>
 						<reference key="destination" ref="835463954"/>
@@ -2474,38 +2494,6 @@
 					<int key="connectionID">3890</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">writeVoltageAction:</string>
-						<reference key="source" ref="890317098"/>
-						<reference key="destination" ref="25061397"/>
-					</object>
-					<int key="connectionID">3891</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">writeVoltageTripAction:</string>
-						<reference key="source" ref="890317098"/>
-						<reference key="destination" ref="712218964"/>
-					</object>
-					<int key="connectionID">3892</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">writeCurrentAction:</string>
-						<reference key="source" ref="890317098"/>
-						<reference key="destination" ref="662235093"/>
-					</object>
-					<int key="connectionID">3893</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">writeCurrentTripAction:</string>
-						<reference key="source" ref="890317098"/>
-						<reference key="destination" ref="532594653"/>
-					</object>
-					<int key="connectionID">3894</int>
-				</object>
-				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">writeCurrentOne</string>
 						<reference key="source" ref="890317098"/>
@@ -2571,38 +2559,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">writeVoltageAction:</string>
-						<reference key="source" ref="890317098"/>
-						<reference key="destination" ref="790554548"/>
-					</object>
-					<int key="connectionID">3903</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">writeCurrentAction:</string>
-						<reference key="source" ref="890317098"/>
-						<reference key="destination" ref="1071053602"/>
-					</object>
-					<int key="connectionID">3904</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">writeVoltageTripAction:</string>
-						<reference key="source" ref="890317098"/>
-						<reference key="destination" ref="975291517"/>
-					</object>
-					<int key="connectionID">3905</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">writeCurrentTripAction:</string>
-						<reference key="source" ref="890317098"/>
-						<reference key="destination" ref="87976337"/>
-					</object>
-					<int key="connectionID">3906</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
 						<string key="label">writeOutputStatusAction:</string>
 						<reference key="source" ref="890317098"/>
 						<reference key="destination" ref="309300670"/>
@@ -2624,14 +2580,6 @@
 						<reference key="destination" ref="407752976"/>
 					</object>
 					<int key="connectionID">3909</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">writeOutputStatusAction:</string>
-						<reference key="source" ref="890317098"/>
-						<reference key="destination" ref="495692946"/>
-					</object>
-					<int key="connectionID">3912</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -2656,6 +2604,30 @@
 						<reference key="destination" ref="158241015"/>
 					</object>
 					<int key="connectionID">3925</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">syncValuesAction:</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="926794727"/>
+					</object>
+					<int key="connectionID">3929</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">changeVerbosityAction:</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="348554004"/>
+					</object>
+					<int key="connectionID">3932</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">verbosity</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="348554004"/>
+					</object>
+					<int key="connectionID">3933</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -2696,22 +2668,6 @@
 						<reference key="destination" ref="117745572"/>
 					</object>
 					<int key="connectionID">3754</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">nextKeyView</string>
-						<reference key="source" ref="117745572"/>
-						<reference key="destination" ref="603660328"/>
-					</object>
-					<int key="connectionID">3755</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">nextKeyView</string>
-						<reference key="source" ref="603660328"/>
-						<reference key="destination" ref="1037170862"/>
-					</object>
-					<int key="connectionID">3761</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -2930,8 +2886,9 @@
 							<reference ref="345959916"/>
 							<reference ref="407752976"/>
 							<reference ref="309300670"/>
-							<reference ref="495692946"/>
 							<reference ref="424763570"/>
+							<reference ref="926794727"/>
+							<reference ref="348554004"/>
 						</object>
 						<reference key="parent" ref="1026496598"/>
 					</object>
@@ -3929,20 +3886,6 @@
 						<reference key="parent" ref="424763570"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">3910</int>
-						<reference key="object" ref="495692946"/>
-						<object class="NSMutableArray" key="children">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="230758152"/>
-						</object>
-						<reference key="parent" ref="764776737"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">3911</int>
-						<reference key="object" ref="230758152"/>
-						<reference key="parent" ref="495692946"/>
-					</object>
-					<object class="IBObjectRecord">
 						<int key="objectID">3913</int>
 						<reference key="object" ref="401302887"/>
 						<object class="NSMutableArray" key="children">
@@ -3969,6 +3912,34 @@
 						<int key="objectID">3917</int>
 						<reference key="object" ref="104220987"/>
 						<reference key="parent" ref="703704870"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">3926</int>
+						<reference key="object" ref="926794727"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="433575994"/>
+						</object>
+						<reference key="parent" ref="764776737"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">3927</int>
+						<reference key="object" ref="433575994"/>
+						<reference key="parent" ref="926794727"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">3930</int>
+						<reference key="object" ref="348554004"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="746138624"/>
+						</object>
+						<reference key="parent" ref="764776737"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">3931</int>
+						<reference key="object" ref="746138624"/>
+						<reference key="parent" ref="348554004"/>
 					</object>
 				</object>
 			</object>
@@ -4162,12 +4133,14 @@
 					<string>3876.IBPluginDependency</string>
 					<string>3879.IBPluginDependency</string>
 					<string>3880.IBPluginDependency</string>
-					<string>3910.IBPluginDependency</string>
-					<string>3911.IBPluginDependency</string>
 					<string>3913.IBPluginDependency</string>
 					<string>3914.IBPluginDependency</string>
 					<string>3916.IBPluginDependency</string>
 					<string>3917.IBPluginDependency</string>
+					<string>3926.IBPluginDependency</string>
+					<string>3927.IBPluginDependency</string>
+					<string>3930.IBPluginDependency</string>
+					<string>3931.IBPluginDependency</string>
 					<string>839.IBPluginDependency</string>
 					<string>839.IBWindowTemplateEditedContentRect</string>
 					<string>839.NSWindowTemplate.visibleAtLaunch</string>
@@ -4377,6 +4350,8 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>{{329, 408}, {422, 459}}</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -4396,7 +4371,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">3925</int>
+			<int key="maxID">3933</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -4423,6 +4398,7 @@
 							<string>sendCommandAction:</string>
 							<string>setIPAddressAction:</string>
 							<string>setSerialNumberAction:</string>
+							<string>syncValuesAction:</string>
 							<string>writeCurrentAction:</string>
 							<string>writeCurrentTripAction:</string>
 							<string>writeOutputStatusAction:</string>
@@ -4431,6 +4407,7 @@
 						</object>
 						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -4456,6 +4433,7 @@
 							<string>sendCommandAction:</string>
 							<string>setIPAddressAction:</string>
 							<string>setSerialNumberAction:</string>
+							<string>syncValuesAction:</string>
 							<string>writeCurrentAction:</string>
 							<string>writeCurrentTripAction:</string>
 							<string>writeOutputStatusAction:</string>
@@ -4490,6 +4468,10 @@
 							</object>
 							<object class="IBActionInfo">
 								<string key="name">setSerialNumberAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">syncValuesAction:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
@@ -4535,8 +4517,8 @@
 							<string>readBackVoltTripOne</string>
 							<string>readBackVoltTripTwo</string>
 							<string>readBackVoltTwo</string>
-							<string>sendCommandButton</string>
 							<string>serialNumberBox</string>
+							<string>verbosity</string>
 							<string>writeCurrentOne</string>
 							<string>writeCurrentTripOne</string>
 							<string>writeCurrentTripTwo</string>
@@ -4565,8 +4547,8 @@
 							<string>NSTextField</string>
 							<string>NSTextField</string>
 							<string>NSTextField</string>
-							<string>NSButton</string>
 							<string>NSTextField</string>
+							<string>NSButton</string>
 							<string>NSTextField</string>
 							<string>NSTextField</string>
 							<string>NSTextField</string>
@@ -4598,8 +4580,8 @@
 							<string>readBackVoltTripOne</string>
 							<string>readBackVoltTripTwo</string>
 							<string>readBackVoltTwo</string>
-							<string>sendCommandButton</string>
 							<string>serialNumberBox</string>
+							<string>verbosity</string>
 							<string>writeCurrentOne</string>
 							<string>writeCurrentTripOne</string>
 							<string>writeCurrentTripTwo</string>
@@ -4680,12 +4662,12 @@
 								<string key="candidateClassName">NSTextField</string>
 							</object>
 							<object class="IBToOneOutletInfo">
-								<string key="name">sendCommandButton</string>
-								<string key="candidateClassName">NSButton</string>
-							</object>
-							<object class="IBToOneOutletInfo">
 								<string key="name">serialNumberBox</string>
 								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">verbosity</string>
+								<string key="candidateClassName">NSButton</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">writeCurrentOne</string>

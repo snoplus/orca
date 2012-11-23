@@ -772,6 +772,18 @@ ORTTCPX_READ_IMPLEMENT(GetOutputStatus, int)
      object:self];
 }
 
+- (void) readback
+{
+    if (![self isConnected]) return;
+    int output;
+    for (output=0; output<kORTTCPX400DPOutputChannels; output++) {
+        [self sendCommandReadBackGetCurrentReadbackWithOutput:output];
+        [self sendCommandReadBackGetCurrentTripSetWithOutput:output];
+        [self sendCommandReadBackGetVoltageReadbackWithOutput:output];
+        [self sendCommandReadBackGetVoltageTripSetWithOutput:output];
+    }
+}
+
 #pragma mark ***Archival
 - (id) initWithCoder:(NSCoder*)decoder
 {
