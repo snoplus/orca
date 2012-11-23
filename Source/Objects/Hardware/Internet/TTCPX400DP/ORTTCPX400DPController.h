@@ -54,7 +54,8 @@
     IBOutlet NSTextField*   writeCurrentTripTwo; 
     
     IBOutlet NSButton*      outputOnOne;
-    IBOutlet NSButton*      outputOnTwo;    
+    IBOutlet NSButton*      outputOnTwo;
+    IBOutlet NSButton*      verbosity;
 }
 
 #pragma mark •••Initialization
@@ -73,6 +74,7 @@
 - (void) setValuesChanged:(NSNotification*)aNote;
 - (void) outputStatusChanged:(NSNotification*)aNote;
 - (void) hwFinderChanged:(NSNotification*)aNote;
+- (void) verbosityChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 //- (IBAction) passwordFieldAction:(id)sender;
@@ -83,6 +85,7 @@
 - (IBAction) connectAction:(id)sender;
 - (IBAction) sendCommandAction:(id)sender;
 - (IBAction) readBackAction:(id)sender;
+- (IBAction) changeVerbosityAction:(id)sender;
 
 - (IBAction) writeVoltageAction:(id)sender;
 - (IBAction) writeVoltageTripAction:(id)sender;

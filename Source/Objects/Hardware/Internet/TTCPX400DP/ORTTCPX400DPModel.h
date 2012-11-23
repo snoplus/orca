@@ -186,6 +186,10 @@ ORTTCPX_GEN_DEFINE_VAR(writeTo, CMD, TYPE)
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 
+
+- (BOOL) verbose;
+- (void) setVerbose:(BOOL)aVerb;
+
 - (void) setSerialNumber:(NSString*)aSerial;
 - (NSString*) serialNumber;
 
@@ -271,6 +275,8 @@ extern NSString* ORTTCPX400DPModelLock;
 extern NSString* ORTTCPX400DPIpHasChanged;
 extern NSString* ORTTCPX400DPSerialNumberHasChanged;
 extern NSString* ORTTCPX400DPGeneralReadbackHasChanged;
+extern NSString* ORTTCPX400DPVerbosityHasChanged;
+
 ORTTCPX_NOTIFY_WRITE_DEFINE(SetVoltage)
 ORTTCPX_NOTIFY_WRITE_DEFINE(SetVoltageAndVerify)
 ORTTCPX_NOTIFY_WRITE_DEFINE(SetOverVoltageProtectionTripPoint)

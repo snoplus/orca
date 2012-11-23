@@ -29,6 +29,7 @@ NSString* ORTTCPX400DPIpHasChanged = @"ORTTCPX400DPIpHasChanged";
 NSString* ORTTCPX400DPSerialNumberHasChanged = @"ORTTCPX400DPSerialNumberHasChanged";
 NSString* ORTTCPX400DPModelLock = @"ORTTCPX400DPModelLock";
 NSString* ORTTCPX400DPGeneralReadbackHasChanged = @"ORTTCPX400DPGeneralReadbackHasChanged";
+NSString* ORTTCPX400DPVerbosityHasChanged = @"ORTTCPX400DPVerbosityHasChanged";
 
 struct ORTTCPX400DPCmdInfo;
 
@@ -758,6 +759,19 @@ ORTTCPX_READ_IMPLEMENT(GetOutputStatus, int)
     return serialNumber;
 }
 
+- (BOOL) verbose
+{
+    return verbose;
+}
+- (void) setVerbose:(BOOL)aVerb
+{
+    if (verbose == aVerb) return;
+    verbose = aVerb;
+    [[NSNotificationCenter defaultCenter]
+     postNotificationName:ORTTCPX400DPVerbosityHasChanged
+     object:self];
+}
+
 #pragma mark ***Archival
 - (id) initWithCoder:(NSCoder*)decoder
 {
@@ -767,7 +781,8 @@ ORTTCPX_READ_IMPLEMENT(GetOutputStatus, int)
 	[self setIpAddress:[decoder decodeObjectForKey:@"ipAddress"]];
 	[self setSerialNumber:[decoder decodeObjectForKey:@"serialNumber"]];    
     [self setPort:[decoder decodeIntForKey:@"portNumber"]];
-
+    [self setVerbose:[decoder decodeIntForKey:@"verbose"]];
+    
 	[[self undoManager] enableUndoRegistration];
 	return self;
 }
@@ -777,7 +792,8 @@ ORTTCPX_READ_IMPLEMENT(GetOutputStatus, int)
 	[super encodeWithCoder:encoder];
  	[encoder encodeObject:ipAddress	forKey:@"ipAddress"];
  	[encoder encodeObject:serialNumber	forKey:@"serialNumber"];    
-    [encoder encodeInt:port forKey:@"portNumber"];    
+    [encoder encodeInt:port forKey:@"portNumber"];
+    [encoder encodeInt:verbose forKey:@"verbose"];
 }
 
 

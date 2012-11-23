@@ -80,6 +80,11 @@
 						object: nil];
     
     [notifyCenter addObserver : self
+					 selector : @selector(verbosityChanged:)
+						 name : ORTTCPX400DPVerbosityHasChanged
+						object: nil];
+    
+    [notifyCenter addObserver : self
 					 selector : @selector(readbackChanged:)
 						 name : ORTTCPX400DPReadBackGetCurrentReadbackIsChanged
 						object: nil];    
@@ -133,7 +138,8 @@
     [self connectionChanged:nil];
     [self readbackChanged:nil]; 
     [self setValuesChanged:nil];
-    [self outputStatusChanged:nil];    
+    [self outputStatusChanged:nil];
+    [self verbosityChanged:nil];
 }
 
 - (void) _buildPopUpButtons
@@ -175,8 +181,12 @@
     BOOL isConnected = [model isConnected];
     if (isConnected) {
         [connectButton setTitle:@"Disconnect"];
+        [serialNumberBox setEnabled:NO];
+        [ipAddressBox setEnabled:NO];
     } else {
-        [connectButton setTitle:@"Connect"];        
+        [connectButton setTitle:@"Connect"];
+        [serialNumberBox setEnabled:YES];
+        [ipAddressBox setEnabled:YES];
     }
     [[self window] setTitle:[NSString stringWithFormat:@"TT CPX400DP  %@",[model serialNumber]]];
 }
@@ -266,6 +276,11 @@
     }
 }
 
+- (void) verbosityChanged:(NSNotification*)aNote
+{
+    [verbosity setState:[model verbose]];
+}
+
 #pragma mark •••Actions
 - (IBAction) lockAction:(id) sender
 {
@@ -348,6 +363,11 @@
         [model setOutput:0 toBeOn:[outputOnOne state]];
         [model setOutput:1 toBeOn:[outputOnTwo state]];        
     }
+}
+
+- (IBAction) changeVerbosityAction:(id)sender
+{
+    [model setVerbose:[sender state]];
 }
 
 @end
