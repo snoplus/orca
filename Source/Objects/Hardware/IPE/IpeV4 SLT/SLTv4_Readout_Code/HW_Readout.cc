@@ -179,15 +179,6 @@ void doWriteBlock(SBC_Packet* aPacket,uint8_t reply)
     SBC_IPEv4WriteBlockStruct* p = (SBC_IPEv4WriteBlockStruct*)aPacket->payload;
     if(needToSwap)SwapLongBlock(p,sizeof(SBC_IPEv4WriteBlockStruct)/sizeof(int32_t));
 	
- fprintf(stderr, "doWriteBlock: SBC_Packet size %i, SBC_IPEv4WriteBlockStruct size %i, sizeof(unsigned long *)  %i \n",
- sizeof(SBC_Packet),
- sizeof(SBC_IPEv4WriteBlockStruct), 
- sizeof(unsigned long *)
- );
-	
- fflush(stderr);
-  fprintf(stdout, "stdout: stdout  stdout\n");
- fflush(stdout);  
 		     
     uint32_t startAddress   = p->address;
     uint32_t numItems       = p->numItems;
@@ -205,13 +196,11 @@ void doWriteBlock(SBC_Packet* aPacket,uint8_t reply)
     try{
         if (numItems == 1){
 
-            fprintf(stdout, "PrPMC: doWriteBlock: adr 0x%08x , val %i (0x%08x) \n",startAddress,*lptr,*lptr);
-            fflush(stdout);  
 		     		    
 		    pbus->write(startAddress, *lptr);
 			{
 			
-//TODO: DEBUGGING sim mode+PCIe issue -tb-    int32_t val = pbus->read(startAddress);
+//TODO: DEBUGGING sim mode+PCIe issue -tb-    int32_t val = pbus->read(startAddress);     // TODO: !!!!!!!!!-tb-
 			
 			
 //TODO: DEBUGGING sim mode+PCIe issue -tb-            fprintf(stdout, "PrPMC: doReadBlock: read back  adr 0x%08x , val %i (0x%08x) \n",startAddress,val,val);
