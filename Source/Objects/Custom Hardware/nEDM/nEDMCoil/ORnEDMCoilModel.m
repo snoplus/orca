@@ -164,7 +164,9 @@ for (id obj in anEnum) [obj x];                   \
     NSData* CurrentVector = [[[NSMutableData alloc] initWithLength:(NumberOfCoils*sizeof(double))] autorelease];
     double* ptr = (double*)[CurrentVector bytes];
     
-    int i;
+    CALL_SELECTOR_ONALL_POWERSUPPLIES(waitUntilCommandsDone);
+    
+	int i;
     for (i=0; i<NumberOfCoils;i++){
         ptr[i] = [self _getCurrent:i];
     }

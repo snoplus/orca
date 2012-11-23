@@ -125,7 +125,10 @@ ORTTCPX_GEN_DEFINE_VAR(writeTo, CMD, TYPE)
     NSString* generalReadback;
     NSMutableArray* dataQueue;
     NSMutableArray* writeQueue;
-    BOOL expectingReply;
+    NSCondition* readConditionLock;
+    BOOL verbose;
+    BOOL waitingToFinishCommands;
+    
     ORTTCPX_DEFINE_WRITE_VAR(SetVoltage, float)
     ORTTCPX_DEFINE_WRITE_VAR(SetVoltageAndVerify, float)
     ORTTCPX_DEFINE_WRITE_VAR(SetOverVoltageProtectionTripPoint, float)
@@ -196,6 +199,8 @@ ORTTCPX_GEN_DEFINE_VAR(writeTo, CMD, TYPE)
 - (void) writeCommand:(ETTCPX400DPCmds)cmd withInput:(float)input withOutputNumber:(int)output;
 
 - (NSString*) commandStringForCommand:(ETTCPX400DPCmds)cmd withInput:(float)input withOutputNumber:(int)output;
+
+- (void) waitUntilCommandsDone;
 
 #pragma mark ***Guardian
 - (BOOL) acceptsGuardian:(OrcaObject *)aGuardian;

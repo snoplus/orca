@@ -321,7 +321,8 @@ ORTTCPX_READ_IMPLEMENT(GetOutputStatus, int)
 {
     self = [super init];
     [self setIpAddress:@""];
-    [self setSerialNumber:@""];    
+    [self setSerialNumber:@""];
+    readConditionLock = [[NSCondition alloc] init];
     return self;
 }
 
@@ -332,6 +333,7 @@ ORTTCPX_READ_IMPLEMENT(GetOutputStatus, int)
     [serialNumber release];
     [dataQueue release];  
     [generalReadback release];
+    [readConditionLock release];
 	[super dealloc];
 }
 
@@ -409,16 +411,24 @@ ORTTCPX_READ_IMPLEMENT(GetOutputStatus, int)
     [[NSNotificationCenter defaultCenter] 
      postNotificationName:ORTTCPX400DPConnectionHasChanged 
      object:self];
+    
+    // If we are connected, we fire off the readback command.
+    if (isConnected) [self performSelectorOnMainThread:@selector(readback)
+                                            withObject:nil
+                                         waitUntilDone:NO];
 }
 
 - (void) setAllOutputToBeOn:(BOOL)on
 {
-    [self writeCommand:kSetAllOutput withInput:on withOutputNumber:1];
+    [self writeCommand:kSetAllOutput
+             withInput:on
+      withOutputNumber:1];
+    
     writeToSetOutput[0] = on;
     writeToSetOutput[1] = on;    
     [[NSNotificationCenter defaultCenter]
      postNotificationName:ORTTCPX400DPWriteToSetOutputIsChanged
-     object:self];      
+     object:self];
 }
 - (void) setOutput:(unsigned int)output toBeOn:(BOOL)on
 {
@@ -432,42 +442,54 @@ ORTTCPX_READ_IMPLEMENT(GetOutputStatus, int)
 {
     // We take pointers, but we know the pointers always exist.
 
-    @synchronized(self) {
-        if (dataQueue == nil) {
-            dataQueue = [[NSMutableArray array] retain];
-        }
-        // First add the write command
-        [dataQueue addObject:[NSArray arrayWithObjects:[NSNumber numberWithUnsignedLong:(unsigned long)theCmd],cmdStr,@"",[NSNumber numberWithUnsignedInt:output],nil]];        
-        // If there's a read command, add it as well.
-        if (selName != nil) {        
-            [dataQueue addObject:[NSArray arrayWithObjects:[NSNumber numberWithUnsignedLong:(unsigned long)theCmd],@"",selName,[NSNumber numberWithUnsignedInt:output],nil]];
-        }
+    [readConditionLock lock];
+    if (dataQueue == nil) {
+        dataQueue = [[NSMutableArray array] retain];
     }
+    // First add the write command
+    [dataQueue addObject:[NSArray arrayWithObjects:[NSNumber numberWithUnsignedLong:(unsigned long)theCmd],cmdStr,@"",[NSNumber numberWithUnsignedInt:output],nil]];        
+    // If there's a read command, add it as well.
+    if (selName != nil) {        
+        [dataQueue addObject:[NSArray arrayWithObjects:[NSNumber numberWithUnsignedLong:(unsigned long)theCmd],@"",selName,[NSNumber numberWithUnsignedInt:output],nil]];
+    }
+    [readConditionLock unlock];
 }
 
 - (void) _processNextWriteCommandInQueue
 {
     // This function processes the next write command in the queue.  It returns if the next command is a read command.
+    // This should *always* be called on the main thread.
     while (1) {
         BOOL shouldContinue = NO;
         NSString* nextCmdToWrite;
         struct ORTTCPX400DPCmdInfo* theCmd = nil;
-        @synchronized(self) {
-            if ([dataQueue count] > 0 && [[[dataQueue objectAtIndex:0] objectAtIndex:1] length] != 0) {
-                // The queue to receive something is empty.
-                shouldContinue = YES;
-                // We have to copy it, because removing it gets rid of it.
-                nextCmdToWrite = [NSString stringWithString:[[dataQueue objectAtIndex:0] objectAtIndex:1]];
-                theCmd = (struct ORTTCPX400DPCmdInfo*)[[[dataQueue objectAtIndex:0] objectAtIndex:0] longValue];                
-                [dataQueue removeObjectAtIndex:0];
-            }
+
+        [readConditionLock lock];
+        // If we are waiting to finish commands, wait until that process completes.
+        // Otherwise, we can overwhelm the queue.
+        //while (waitingToFinishCommands) [readConditionLock wait];
+        
+        if ([dataQueue count] > 0 && [[[dataQueue objectAtIndex:0] objectAtIndex:1] length] != 0) {
+            // The queue to receive something is empty.
+            shouldContinue = YES;
+            // We have to copy it, because removing it gets rid of it.
+            nextCmdToWrite = [NSString stringWithString:[[dataQueue objectAtIndex:0] objectAtIndex:1]];
+            theCmd = (struct ORTTCPX400DPCmdInfo*)[[[dataQueue objectAtIndex:0] objectAtIndex:0] longValue];                
+            [dataQueue removeObjectAtIndex:0];
         }
+        // We signal if someone is waiting on the count to reach zero
+        if ([dataQueue count] == 0) [readConditionLock broadcast];
+        [readConditionLock unlock];
+        
         if (!shouldContinue) return;
         if(!theCmd->responds) [self _setGeneralReadback:@"N/A"];
         if([self isConnected]){
-            [self _mainThreadSocketSend:nextCmdToWrite];
-//            [self performSelectorOnMainThread:@selector(_mainThreadSocketSend:) withObject:nextCmdToWrite
-//                                waitUntilDone:YES];
+            if(verbose) {
+                NSLog(@"IP,SN(%@,%@) writing: %@\n", [self ipAddress], [self serialNumber],nextCmdToWrite);
+            }
+            [self performSelectorOnMainThread:@selector(_mainThreadSocketSend:)
+                                   withObject:nextCmdToWrite
+                                waitUntilDone:NO];
         }
         else {
             NSString *errorMsg = @"Must establish IP connection prior to issuing command.\n";
@@ -481,23 +503,19 @@ ORTTCPX_READ_IMPLEMENT(GetOutputStatus, int)
 {
     struct ORTTCPX400DPCmdInfo* cmd = nil;
     SEL callSelector = nil;    
-    int outputNum = 1;       
-    @synchronized(self) {
-        if ([dataQueue count] > 0 && [[[dataQueue objectAtIndex:0] objectAtIndex:2] length] != 0) {
-            cmd = (struct ORTTCPX400DPCmdInfo*)[[[dataQueue objectAtIndex:0] objectAtIndex:0] longValue];
-            callSelector = NSSelectorFromString([[dataQueue objectAtIndex:0] objectAtIndex:2]);
-            // We unfortunately have to do this, because some output numbers are not set by the returned strings.
-            outputNum = [[[dataQueue objectAtIndex:0] objectAtIndex:3] unsignedIntValue];
-            [dataQueue removeObjectAtIndex:0];
-        }
+    int outputNum = 1;
+    [readConditionLock lock];
+    if ([dataQueue count] > 0 && [[[dataQueue objectAtIndex:0] objectAtIndex:2] length] != 0) {
+        cmd = (struct ORTTCPX400DPCmdInfo*)[[[dataQueue objectAtIndex:0] objectAtIndex:0] longValue];
+        callSelector = NSSelectorFromString([[dataQueue objectAtIndex:0] objectAtIndex:2]);
+        // We unfortunately have to do this, because some output numbers are not set by the returned strings.
+        outputNum = [[[dataQueue objectAtIndex:0] objectAtIndex:3] unsignedIntValue];
+        [dataQueue removeObjectAtIndex:0];
     }
     // we don't need to synchronize this part necessarily.
     assert(cmd!=nil);
-    if (cmd == nil) return;
-    // This command absolutely needs to respond
     assert(cmd->responds);
     float readBackValue = 0;
-
     
     int numberOfOutputs = [[cmd->responseFormat componentsSeparatedByString:@"%"] count] - 1;
     switch (numberOfOutputs) {
@@ -524,16 +542,21 @@ ORTTCPX_READ_IMPLEMENT(GetOutputStatus, int)
         numberOfOutputs = [[NSStringFromSelector(callSelector) componentsSeparatedByString:@":"] count] - 1;
         switch (numberOfOutputs) {
             case 1:
-                [self performSelector:callSelector withObject:[NSNumber numberWithFloat:readBackValue]];
+                [self performSelector:callSelector
+                           withObject:[NSNumber numberWithFloat:readBackValue]];
                 break;
             case 2:
-                [self performSelector:callSelector withObject:[NSNumber numberWithFloat:readBackValue] withObject:[NSNumber numberWithInt:outputNum] ];
+                [self performSelector:callSelector
+                           withObject:[NSNumber numberWithFloat:readBackValue]
+                           withObject:[NSNumber numberWithInt:outputNum] ];
                 break;
             default:
                 assert((numberOfOutputs != 1 && numberOfOutputs != 2));
                 break;
         }
     }
+    if ([dataQueue count] == 0) [readConditionLock broadcast];
+    [readConditionLock unlock];
 }
 
 - (void) _processGeneralReadback:(NSNumber*)aFloat withOutputNum:(NSNumber*) anInt
@@ -624,10 +647,14 @@ ORTTCPX_READ_IMPLEMENT(GetOutputStatus, int)
     
 	NSString* theString = [[inNetSocket readString:NSASCIIStringEncoding]
                            stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-    
+    if (verbose) {
+        NSLog(@"IP,SN(%@,%@) reading: %@\n", [self ipAddress], [self serialNumber],theString);
+    }
 	[self _processNextReadCommandInQueueWithInputString:theString];
     // Process any waiting write commands.
-    [self _processNextWriteCommandInQueue];
+    [self performSelectorOnMainThread:@selector(_processNextWriteCommandInQueue)
+                           withObject:nil
+                        waitUntilDone:NO];
 }
 
 - (void) netsocketDisconnected:(NetSocket*)inNetSocket
@@ -690,9 +717,13 @@ ORTTCPX_READ_IMPLEMENT(GetOutputStatus, int)
         }
         
     }
-    [self _addCommandToDataProcessingQueue:theCmd withSendString:cmdStr withReturnSelectorName:selName withOutputNumber:output];
-    [self _processNextWriteCommandInQueue];
-    //[self write:cmdStr];
+    [self _addCommandToDataProcessingQueue:theCmd withSendString:cmdStr
+                    withReturnSelectorName:selName
+                          withOutputNumber:output];
+    
+    [self performSelectorOnMainThread:@selector(_processNextWriteCommandInQueue)
+                           withObject:nil
+                        waitUntilDone:NO];
 }
 
 - (NSString*) commandStringForCommand:(ETTCPX400DPCmds)cmd withInput:(float)input withOutputNumber:(int)output
@@ -730,15 +761,24 @@ ORTTCPX_READ_IMPLEMENT(GetOutputStatus, int)
 
 - (void) write: (NSString*) aCommand
 {
-    // This function is disable for now.
-    //[self _addCommandToDataProcessingQueue:<#(struct ORTTCPX400DPCmdInfo *)#> withSendString:<#(NSString *)#> withReturnSelectorName:<#(NSString *)#>];
-    //[self _processNextCmdInWriteQueue];
+    // This function is disabled for now.
 }
 
 - (void) _mainThreadSocketSend:(NSString*)aCommand
 {
+    // This *must* be called on the main thread.  We want to ensure that it is impossible for
+    // any commands sent not to block the run loop which is handling readbacks.
 	if(!aCommand)aCommand = @"";
 	[socket writeString:aCommand encoding:NSASCIIStringEncoding];
+}
+
+- (void) waitUntilCommandsDone
+{
+    [readConditionLock lock];
+    while ([dataQueue count] != 0) {
+        [readConditionLock wait];
+    }
+    [readConditionLock unlock];
 }
 
 - (void) setSerialNumber:(NSString *)aSerial
@@ -789,6 +829,7 @@ ORTTCPX_READ_IMPLEMENT(GetOutputStatus, int)
 {
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
+    readConditionLock = [[NSCondition alloc] init];
 	
 	[self setIpAddress:[decoder decodeObjectForKey:@"ipAddress"]];
 	[self setSerialNumber:[decoder decodeObjectForKey:@"serialNumber"]];    
