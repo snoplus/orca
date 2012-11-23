@@ -1,3 +1,4 @@
+
 //
 //  ORnEDMCoilModel.m
 //  Orca
@@ -29,6 +30,7 @@ NSString* ORnEDMCoilPollingFrequencyChanged    = @"ORnEDMCoilPollingFrequencyCha
 NSString* ORnEDMCoilADCListChanged = @"ORnEDMCoilADCListChanged";
 NSString* ORnEDMCoilHWMapChanged   = @"ORnEDMCoilHWMapChanged";
 NSString* ORnEDMCoilDebugRunningHasChanged = @"ORnEDMCoilDebugRunningHasChanged";
+NSString* ORnEDMCoilVerboseHasChanged = @"ORnEDMCoilVerboseHasChanged";
 
 #define kADCChannelNumber 128
 
@@ -199,7 +201,6 @@ for (id obj in anEnum) [obj x];                   \
         if (Current[i]<0) {
             //[NSException raise:@"Current Negative in Coil" format:@"Current Negative in Coil Channel: %d",i];            
         }
-        NSLog(@"Current Value (%d): %f\n",i,Current[i]);
     }
     for (i=0; i<NumberOfCoils;i++){
         [self _setCurrent:dblPtr[i] forSupply:i];
@@ -232,6 +233,7 @@ for (id obj in anEnum) [obj x];                   \
     double adcrange = 65536; // 16bit
     double vol = raw -32768; // offset
     double vol2 = vol * volrange / adcrange; //scaling
+    if (verbose) NSLog(@"Field %i: %f\n",index,vol2);
     return vol2;
     
 }
@@ -242,11 +244,18 @@ for (id obj in anEnum) [obj x];                   \
     // magnetometers and channels naturally ordered
     // Mapping will be taken care of at GUI level
     [[objMap objectForKey:[NSNumber numberWithInt:(index/2)]] setWriteToSetCurrentLimit:current withOutput:(index%2)];
+    
+    if (verbose) NSLog(@"Set Current (%@,%@): %f\n",[[objMap objectForKey:[NSNumber numberWithInt:(index/2)]] ipAddress],
+          [[objMap objectForKey:[NSNumber numberWithInt:(index/2)]] serialNumber],current);
 }
 
-- (double) _getCurrent:(int)supply
+- (double) _getCurrent:(int)index
 {
-    return [[objMap objectForKey:[NSNumber numberWithInt:(supply/2)]] readBackGetCurrentSetWithOutput:(supply%2)];
+    double retVal = [[objMap objectForKey:[NSNumber numberWithInt:(index/2)]] readBackGetCurrentSetWithOutput:(index%2)];
+    if (verbose) NSLog(@"Read back current (%@,%@): %f\n",[[objMap objectForKey:[NSNumber numberWithInt:(index/2)]] ipAddress],
+          [[objMap objectForKey:[NSNumber numberWithInt:(index/2)]] serialNumber],retVal);
+    return retVal;
+
 }
 
 #pragma mark •••Running
@@ -278,20 +287,20 @@ for (id obj in anEnum) [obj x];                   \
     }
 }
 
-- (void) _setUpRunning:(BOOL)verbose
+- (void) _setUpRunning:(BOOL)aVerb
 {
 	
 	if(isRunning && pollingFrequency != 0)return;
     
     if(pollingFrequency!=0){  
 		isRunning = YES;
-        if(verbose) NSLog(@"Running nEDM Coil compensation at a rate of %.2f Hz.\n",pollingFrequency);
+        if(aVerb) NSLog(@"Running nEDM Coil compensation at a rate of %.2f Hz.\n",pollingFrequency);
         [NSThread detachNewThreadSelector:@selector(_runThread)
                                  toTarget:self
                                withObject:nil];
     }
     else {
-        if(verbose) NSLog(@"Not running nEDM Coil compensation, polling frequency set to 0\n");
+        if(aVerb) NSLog(@"Not running nEDM Coil compensation, polling frequency set to 0\n");
     }
     [[NSNotificationCenter defaultCenter]
 	 postNotificationName:ORnEDMCoilPollingActivityChanged
@@ -511,6 +520,21 @@ for (id obj in anEnum) [obj x];                   \
     pollingFrequency = aFrequency;
     [[NSNotificationCenter defaultCenter]
 	 postNotificationName:ORnEDMCoilPollingFrequencyChanged
+	 object: self];
+}
+
+
+- (BOOL) verbose
+{
+    return verbose;
+}
+
+- (void) setVerbose:(BOOL)aVerb
+{
+    if (verbose == aVerb) return;
+    verbose = aVerb;
+    [[NSNotificationCenter defaultCenter]
+	 postNotificationName:ORnEDMCoilVerboseHasChanged
 	 object: self];
 }
 
@@ -737,7 +761,8 @@ for (id obj in anEnum) [obj x];                   \
     NumberOfChannels = [decoder decodeIntForKey:@"kORnEDMCoilNumChannels"];    
     NumberOfCoils = [decoder decodeIntForKey:@"kORnEDMCoilNumCoils"]; 
     
-    [self _setADCList:[decoder decodeObjectForKey:@"kORnEDMCoilListOfADCs"]];    
+    [self _setADCList:[decoder decodeObjectForKey:@"kORnEDMCoilListOfADCs"]];
+    [self setVerbose:[decoder decodeIntForKey:@"kORnEDMCoilVerbose"]];
     [[self undoManager] enableUndoRegistration];
     
     return self;
@@ -753,7 +778,7 @@ for (id obj in anEnum) [obj x];                   \
     [encoder encodeObject:FeedbackMatData forKey:@"kORnEDMCoilFeedbackMatrixData"];
     [encoder encodeInt:NumberOfChannels forKey:@"kORnEDMCoilNumChannels"];    
     [encoder encodeInt:NumberOfCoils forKey:@"kORnEDMCoilNumCoils"];        
-    
+    [encoder encodeInt:verbose forKey:@"kORnEDMCoilVerbose"];
     [encoder encodeObject:listOfADCs forKey:@"kORnEDMCoilListOfADCs"];       
 }
 

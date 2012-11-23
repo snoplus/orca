@@ -36,6 +36,7 @@
     int NumberOfChannels;
     int NumberOfCoils;
     BOOL debugRunning;
+    BOOL verbose;
     
     
     NSMutableData* FeedbackMatData;    
@@ -78,6 +79,9 @@
 - (NSArray*) orientationMatrix;
 - (NSData*)  feedbackMatData;
 
+- (BOOL) verbose;
+- (void) setVerbose:(BOOL)aVerb;
+
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
 
@@ -106,3 +110,4 @@ extern NSString* ORnEDMCoilPollingFrequencyChanged;
 extern NSString* ORnEDMCoilADCListChanged;
 extern NSString* ORnEDMCoilHWMapChanged;
 extern NSString* ORnEDMCoilDebugRunningHasChanged;
+extern NSString* ORnEDMCoilVerboseHasChanged;

@@ -60,6 +60,8 @@
 	IBOutlet NSButton*      refreshIPsButton;
     IBOutlet NSProgressIndicator* refreshIPIndicate;
     
+    IBOutlet NSButton*      processVerbose;
+    
     NSView *blankView;    
     NSSize controlSize;
     NSSize powerSupplySize;
@@ -89,6 +91,7 @@
 - (void) objectsAdded:(NSNotification*)aNote;
 - (void) debugRunningChanged:(NSNotification*)aNote;
 - (void) refreshIPAddressesDone:(NSNotification*)aNote;
+- (void) processVerboseChanged:(NSNotification*)aNote;
 
 - (void) populateListADCs;
 
@@ -104,6 +107,7 @@
 - (IBAction) removeSelectedADCs:(id)sender;
 - (IBAction) handleToBeAddedADC:(id)sender;
 - (IBAction) refreshIPsAction:(id)sender;
+- (IBAction) processVerboseAction:(id)sender;
 
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;
 

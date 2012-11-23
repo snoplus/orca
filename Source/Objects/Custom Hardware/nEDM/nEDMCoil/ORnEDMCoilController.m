@@ -139,6 +139,11 @@
 						 name : ORHardwareFinderAvailableHardwareChanged
 					   object : nil];
     
+    [notifyCenter addObserver : self
+					 selector : @selector(processVerboseAction:)
+						 name : ORnEDMCoilVerboseHasChanged
+					   object : nil];
+    
 }
 
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
@@ -189,6 +194,11 @@
     [debugModeButton setState:[model debugRunning]];
 }
 
+- (void) processVerboseChanged:(NSNotification *)aNote
+{
+    [processVerbose setState:[model verbose]];
+}
+
 - (void) updateWindow
 {
     [super updateWindow];
@@ -201,6 +211,7 @@
 	[self runRateChanged:nil];    
 	[self runStatusChanged:nil];
     [self debugRunningChanged:nil];
+    [self processVerboseChanged:nil];
     [groupView setNeedsDisplay:YES];
 }
 
@@ -498,6 +509,11 @@
     } else {
         [addADCButton setEnabled:YES];
     }
+}
+
+- (IBAction) processVerboseAction:(id)sender
+{
+    [model setVerbose:[processVerbose state]];
 }
 
 //---------------------------------------------------------------
