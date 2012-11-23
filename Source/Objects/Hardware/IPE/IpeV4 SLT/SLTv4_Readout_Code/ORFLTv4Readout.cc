@@ -67,13 +67,15 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
     uint32_t runFlags   = GetDeviceSpecificData()[3];//this is runFlagsMask of ORKatrinV4FLTModel.m, load_HW_Config_Structure:index:
     uint32_t triggerEnabledMask = GetDeviceSpecificData()[4];
     uint32_t daqRunMode = GetDeviceSpecificData()[5];
-    uint32_t filterIndex = GetDeviceSpecificData()[6];
+    //uint32_t filterIndex = GetDeviceSpecificData()[6]; obsolete, changed 2012-11 -tb-
     uint32_t versionCFPGA = GetDeviceSpecificData()[7];
     uint32_t versionFPGA8 = GetDeviceSpecificData()[8];
     uint32_t filterShapingLength = GetDeviceSpecificData()[9];//TODO: need to change in the code below! -tb- 2011-04-01
     uint32_t useDmaBlockRead = GetDeviceSpecificData()[10];//TODO: need to change in the code below! -tb- 2011-04-01
+    uint32_t boxcarLen = GetDeviceSpecificData()[11];
 	
-	uint32_t location   = ((crate & 0x01e)<<21) | (((col+1) & 0x0000001f)<<16) | ((filterIndex & 0xf)<<4)  | (filterShapingLength & 0xf)  ;  //TODO:  remove filterIndex (remove in decoders, too!) -tb-
+	uint32_t location   = ((crate & 0x01e)<<21) | (((col+1) & 0x0000001f)<<16) | ((boxcarLen & 0x3)<<4)  | (filterShapingLength & 0xf)  ;  //TODO:  remove filterIndex (remove in decoders, too!) -tb-
+	//uint32_t location   = ((crate & 0x01e)<<21) | (((col+1) & 0x0000001f)<<16) | ((filterIndex & 0xf)<<4)  | (filterShapingLength & 0xf)  ;  //TODO:  remove filterIndex (remove in decoders, too!) -tb-
 
 	//for backward compatibility (before FLT versions2.1.1.4); shall be removed Jan. 2011 -tb-
 	//===========================================================================================

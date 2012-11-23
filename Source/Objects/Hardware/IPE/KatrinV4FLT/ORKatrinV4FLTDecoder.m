@@ -40,7 +40,7 @@
 		 ^ ^^^---------------------------crate
 			  ^ ^^^^---------------------card
                      ^^^^ ^^^^ ----------channel
-                               ^^^^------filterIndex  
+                                 ^^------boxcarLen  
                                     ^^^^-filterShapingLength  
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx sec
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx subSec
@@ -59,6 +59,9 @@
  *
  */
 //-------------------------------------------------------------
+
+
+// removed                                ^^^^------filterIndex and replaced by boxcarLen 2012-11 -tb-
 
 - (id) init
 {
@@ -82,22 +85,23 @@
 	unsigned char card		= ShiftAndExtract(ptr[1],16,0x1f);
 	unsigned char chan		= ShiftAndExtract(ptr[1],8,0xff);
 	unsigned char fifoFlags = ShiftAndExtract(ptr[5],20,0xf);
-	int filterIndex = ShiftAndExtract(ptr[1],4,0xf); if(filterIndex == 0xf) filterIndex=-1;//TODO: replace by filterShapingLength in the future -tb-
+	int boxcarLen = ShiftAndExtract(ptr[1],4,0x3);
 	int filterShapingLength = ShiftAndExtract(ptr[1],0,0xf);
+	//
+	NSLog(@"Called %@::%@: boxcarLen %i,filterShapingLength  %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),boxcarLen,filterShapingLength);//TODO: DEBUG -tb-
 	unsigned short filterDiv;
 	unsigned long histoLen;
-	histoLen = 4096;
+	histoLen = 4096;//=max. ADC value for 12 bit ADC
 	filterDiv = 1L << filterShapingLength;
 	if(filterShapingLength==0){
-		if(filterIndex==0)	{
-			histoLen = 16*1024;
-			filterDiv = 64;
-		}
-		else {
-			histoLen = 4096;
-			filterDiv = 1L << (filterIndex+2);
-		}
+		filterDiv = boxcarLen + 1;
 	}
+	#if 0  //obsolete  since filterIndex is obsolete, changed 2012-11
+	if(filterShapingLength==0){
+		if(filterIndex==0)	{			histoLen = 16*1024;			filterDiv = 64;		}
+		else {			histoLen = 4096;			filterDiv = 1L << (filterIndex+2);		}
+	}
+	#endif
 	
 	NSString* crateKey		= [self getCrateKey: crate];
 	NSString* stationKey	= [self getStationKey: card];	
@@ -192,7 +196,7 @@
  ------- ^ ^^^---------------------------crate
  -------------^ ^^^^---------------------card
  --------------------^^^^ ^^^^-----------channel
- ------------------------------^^^^------filterIndex 
+                                 ^^------boxcarLen  
                                     ^^^^-filterShapingLength  
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx sec
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx subSec
@@ -217,6 +221,10 @@
  followed by waveform data (up to 2048 16-bit words)
  <pre>  
  */ 
+ 
+ // removed                                ^^^^------filterIndex and replaced by boxcarLen 2012-11 -tb-
+
+ 
 //-------------------------------------------------------------
 
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
@@ -231,21 +239,15 @@
 	NSString* crateKey		= [self getCrateKey: crate];
 	NSString* stationKey	= [self getStationKey: card];	
 	NSString* channelKey	= [self getChannelKey: chan];	
-	int filterIndex = ShiftAndExtract(ptr[1],4,0xf); if(filterIndex == 0xf) filterIndex=-1;//TODO: replace by filterShapingLength in the future -tb-
+	int boxcarLen = ShiftAndExtract(ptr[1],4,0x3);
 	int filterShapingLength = ShiftAndExtract(ptr[1],0,0xf);
+	//	NSLog(@"Called %@::%@: boxcarLen %i,filterShapingLength  %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),boxcarLen,filterShapingLength);//TODO: DEBUG -tb-
 	unsigned short filterDiv;
 	unsigned long histoLen;
-	histoLen = 4096;
+	histoLen = 4096;//=max. ADC value for 12 bit ADC
 	filterDiv = 1L << filterShapingLength;
 	if(filterShapingLength==0){
-		if(filterIndex==0)	{
-			histoLen = 16*1024;
-			filterDiv = 64;
-		}
-		else {
-			histoLen = 4096;
-			filterDiv = 1L << (filterIndex+2);
-		}
+		filterDiv = boxcarLen + 1;
 	}
 	
 	
@@ -255,6 +257,7 @@
 	//note the ptr[6] shares the eventID and the energy
 	//the eventID must be masked off
 	unsigned long energy = (ptr[6] & 0xfffff)/filterDiv;
+	// NSLog(@"Called %@::%@: energy %i,energyADC  %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),(ptr[6] & 0xfffff),energy);//TODO: DEBUG -tb-
 
 	//uint32_t subsec         = ptr[3]; // ShiftAndExtract(ptr[1],0,0xffffffff);//TODO: DEBUG -tb- //commented out since unused MAH 9/14/10
 	//uint32_t eventID        = ptr[5];//commented out since unused MAH 9/14/10

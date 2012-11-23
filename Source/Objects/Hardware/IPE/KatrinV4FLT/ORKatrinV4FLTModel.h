@@ -106,6 +106,7 @@
     int runControlState;
 	ORAlarm* fltV4useDmaBlockReadAlarm;
     int useDmaBlockRead;
+    int boxcarLength;
 }
 
 #pragma mark •••Initialization
@@ -123,6 +124,8 @@
 - (void) syncWithRunControlCheckStopCondition;
 
 #pragma mark •••Accessors
+- (int) boxcarLength;
+- (void) setBoxcarLength:(int)aBoxcarLength;
 - (ORAlarm*) fltV4useDmaBlockReadAlarm;
 - (void) setFltV4useDmaBlockReadAlarm:(ORAlarm*) aAlarm;
 - (int) useDmaBlockRead;
@@ -402,6 +405,7 @@
 				  n:(int) n;
 @end
 
+extern NSString* ORKatrinV4FLTModelBoxcarLengthChanged;
 extern NSString* ORKatrinV4FLTModelUseDmaBlockReadChanged;
 extern NSString* ORKatrinV4FLTModelSyncWithRunControlChanged;
 extern NSString* ORKatrinV4FLTModelDecayTimeChanged;

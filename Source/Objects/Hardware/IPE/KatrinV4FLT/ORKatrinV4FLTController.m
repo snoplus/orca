@@ -374,10 +374,14 @@
                          name : ORKatrinV4FLTModelUseDmaBlockReadChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(boxcarLengthChanged:)
+                         name : ORKatrinV4FLTModelBoxcarLengthChanged
+						object: model];
+
 }
 
 #pragma mark •••Interface Management
-
 - (void) useDmaBlockReadChanged:(NSNotification*)aNote
 {
 	[useDmaBlockReadButton setIntValue: [model useDmaBlockRead]];
@@ -504,12 +508,24 @@
 	//[filterLengthPU selectItemAtIndex:[model filterLength]];
 	[filterShapingLengthPU selectItemWithTag:[model filterShapingLength]];
 	[self recommendedPZCChanged:nil];
+	#if 1
+	bool useBoxcar=([model filterShapingLength]==0);
+	[boxcarLengthPU setEnabled: useBoxcar];
+	[boxcarLengthLabel setEnabled: useBoxcar];
+	#endif
 }
 
 - (void) gapLengthChanged:(NSNotification*)aNote
 {
 	[gapLengthPU selectItemAtIndex: [model gapLength]];
 }
+
+- (void) boxcarLengthChanged:(NSNotification*)aNote
+{
+	//[boxcarLength<custom> setIntValue: [model boxcarLength]];
+	[boxcarLengthPU selectItemWithTag:[model boxcarLength]];
+}
+
 
 - (void) histNofMeasChanged:(NSNotification*)aNote
 {
@@ -627,6 +643,7 @@
 	[self recommendedPZCChanged:nil];
 	[self syncWithRunControlChanged:nil];
 	[self useDmaBlockReadChanged:nil];
+	[self boxcarLengthChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -654,6 +671,9 @@
 	
 	[gapLengthPU setEnabled:!lockedOrRunningMaintenance && (([model runMode]<3) || ([model runMode]>6))];
 	[filterShapingLengthPU setEnabled:!lockedOrRunningMaintenance];
+	bool useBoxcar=([model filterShapingLength]==0);
+	[boxcarLengthPU setEnabled:!lockedOrRunningMaintenance && useBoxcar];
+	[boxcarLengthLabel setEnabled:!lockedOrRunningMaintenance && useBoxcar];
 	
     [testEnabledMatrix setEnabled:!locked && !testingOrRunning];
     [settingLockButton setState: locked];
@@ -1158,6 +1178,13 @@
 {
 	[model setGapLength:[sender indexOfSelectedItem]];	
 }
+
+- (void) boxcarLengthPUAction:(id)sender
+{
+	//[model setBoxcarLength:[sender intValue]];	
+	[model setBoxcarLength:[[sender selectedCell] tag]];
+}
+
 
 - (IBAction) histNofMeasAction:(id)sender
 {

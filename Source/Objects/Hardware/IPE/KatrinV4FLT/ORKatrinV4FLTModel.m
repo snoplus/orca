@@ -31,6 +31,7 @@
 #import "ORCommandList.h"
 
 
+NSString* ORKatrinV4FLTModelBoxcarLengthChanged = @"ORKatrinV4FLTModelBoxcarLengthChanged";
 NSString* ORKatrinV4FLTModelUseDmaBlockReadChanged = @"ORKatrinV4FLTModelUseDmaBlockReadChanged";
 NSString* ORKatrinV4FLTModelSyncWithRunControlChanged = @"ORKatrinV4FLTModelSyncWithRunControlChanged";
 NSString* ORKatrinV4FLTModelDecayTimeChanged = @"ORKatrinV4FLTModelDecayTimeChanged";
@@ -376,6 +377,22 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 }
 
 #pragma mark •••Accessors
+
+- (int) boxcarLength
+{
+    return boxcarLength;
+}
+
+- (void) setBoxcarLength:(int)aBoxcarLength
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setBoxcarLength:boxcarLength];
+    
+    boxcarLength = aBoxcarLength;
+	if(boxcarLength<0) boxcarLength=0;
+	if(boxcarLength>3) boxcarLength=3;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelBoxcarLengthChanged object:self];
+}
 
 /** Used to open the alarm view only once if there are the same alarms from several FLTs.
   */  //-tb-
@@ -869,7 +886,7 @@ static double table[32]={
 		NSLog(@"Warning: setFilterShapingLength: FLTv4: maximum filter length allows only gap length of 0. Gap length reset to 0!\n");
 	}
     [[[self undoManager] prepareWithInvocationTarget:self] setFilterShapingLength:filterShapingLength];
-    filterShapingLength = [self restrictIntValue:aFilterShapingLength min:1 max:8];//TODO: MAY BE REMOVED AFTER TEST - set to min:1 for releasing shaping length 100 nsec -tb-
+    filterShapingLength = [self restrictIntValue:aFilterShapingLength min:0 max:8];
 	filterLength = filterShapingLength - 2;//TODO: this line should be removed mid 2011, filterLength is obsolete; filterLength is int, may become -1! -tb-
 	//DEBUG -tb- 
 	//TODO: DEBUG-REMOVE - NSLog(@"%@::%@  filterLength: %i filterShapingLength:%i  filterLength: 0x%x filterShapingLength: 0x%x\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),filterLength,filterShapingLength, filterLength,filterShapingLength);
@@ -1628,7 +1645,7 @@ static double table[32]={
 	(((poleZeroCorrection)  & 0xf)<<24) |		//poleZeroCorrection is stored as the popup index -- NEW since 2011-06-09 -tb-
 	(((nfoldCoincidence)    & 0xf)<<20) |		//nfoldCoincidence is stored as the popup index -- NEW since 2010-11-09 -tb-
 	(((vetoOverlapTime)     & 0xf)<<16)	|		//vetoOverlapTime is stored as the popup index -- NEW since 2010-08-04 -tb-
-	//(((filterLength+2)    & 0xf)<<8)	|		//filterLength is stored as the popup index -- convert to 2 to 6 [Note: in fact it is (((.+2) & 0x3f)<<8) but higher bits are unused -tb-]
+	(((boxcarLength)        & 0x3)<<14)	|		//boxcarLength is the register value and the popup item tag -tb-
 	(((filterShapingLength) & 0xf)<<8)	|		//filterShapingLength is the register value and the popup item tag -tb-
 	((gapLength & 0xf)<<4)			| 
 	// -tb- ((runBoxCarFilter & 0x1)<<2)	|
@@ -2009,6 +2026,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 	
     [[self undoManager] disableUndoRegistration];
 	
+    [self setBoxcarLength:[decoder decodeIntForKey:@"boxcarLength"]];
     [self setUseDmaBlockRead:[decoder decodeIntForKey:@"useDmaBlockRead"]];
     [self setSyncWithRunControl:[decoder decodeIntForKey:@"syncWithRunControl"]];
     [self setDecayTime:[decoder decodeDoubleForKey:@"decayTime"]];
@@ -2047,6 +2065,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 {
     [super encodeWithCoder:encoder];
 	
+    [encoder encodeInt:boxcarLength forKey:@"boxcarLength"];
     [encoder encodeInt:useDmaBlockRead forKey:@"useDmaBlockRead"];
     [encoder encodeInt:syncWithRunControl forKey:@"syncWithRunControl"];
     [encoder encodeDouble:decayTime forKey:@"decayTime"];
@@ -2433,7 +2452,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 	configStruct->card_info[index].deviceSpecificData[4] = triggerEnabledMask;	
     //the daq mode (should replace the flt mode)
     configStruct->card_info[index].deviceSpecificData[5] = runMode;			//the daqRunMode
-	configStruct->card_info[index].deviceSpecificData[6] = [self filterLength];		//packed into the records for normalization (MAH/May5,2010) --//TODO: this two lines should be removed mid 2011, filterLength is obsolete -tb-
+	//configStruct->card_info[index].deviceSpecificData[6] = [self filterLength];		//packed into the records for normalization (MAH/May5,2010) --//TODO: this two lines should be removed mid 2011, filterLength is obsolete -tb-
 																					//to avoid any conflicts I use deviceSpecificData[9] for the filterShapingLength -tb- 2011-04
 	//for handling of different firmware versions
     uint32_t versionCFPGA = [self readVersion];
@@ -2456,6 +2475,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 	configStruct->card_info[index].deviceSpecificData[9] = [self filterShapingLength];		////replaces filterShapingLength -tb- 2011-04
 
 	configStruct->card_info[index].deviceSpecificData[10] = [self useDmaBlockRead];		////enables DMA access //TODO: - no plausibility checks yet!!! -tb- 2012-03
+	configStruct->card_info[index].deviceSpecificData[11] = [self boxcarLength];		////enables DMA access //TODO: - no plausibility checks yet!!! -tb- 2012-03
 
 	configStruct->card_info[index].num_Trigger_Indexes = 0;					//we can't have children
 	configStruct->card_info[index].next_Card_Index 	= index+1;	
