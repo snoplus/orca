@@ -97,7 +97,11 @@ for (id obj in anEnum) [obj x];                   \
     }
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_runProcess) object:nil];
     if(pollingFrequency!=0){
-        [self performSelector:@selector(_runProcess) withObject:nil afterDelay:(float) 1.0/pollingFrequency];
+        // Force a readback of all values.
+        //CALL_SELECTOR_ONALL_POWERSUPPLIES(readback);
+        // Wait until every command has completed so that we stay synchronized with the device.
+        CALL_SELECTOR_ONALL_POWERSUPPLIES(waitUntilCommandsDone);
+        [self performSelector:@selector(_runProcess) withObject:nil afterDelay:(float) 1.0/pollingFrequency];        
     } else {
         [self _stopRunning];
     }
@@ -139,17 +143,21 @@ for (id obj in anEnum) [obj x];                   \
     //Grab field values
     int i;
     for (i=0; i<NumberOfChannels;i++) ptr[i] = [self _fieldAtMagnetometer:i];
-
-    //FOR TESTING: artificial constant field
-    //double one=(double)1;
-    //[FieldVector replaceBytesInRange:(NSRange){(NumberOfChannels-1)*sizeof(double),sizeof(double)} withBytes:&one  length:sizeof(double)];
-
-    // Perform multiplication with FeedbackMatrix, product is automatically added to CurrentVector    
-    cblas_dgemv(CblasRowMajor, CblasNoTrans, NumberOfCoils, NumberOfChannels, 1, [FeedbackMatData bytes], NumberOfChannels, ptr,1,1,(double*)[CurrentVector bytes],1);
-    
-    //FOR TESTING: log current in last coil
-    double* CurPtr = (double*)[CurrentVector bytes];
-    NSLog([NSString  stringWithFormat:@"Last Current: %f\n",CurPtr[NumberOfCoils-1]]);
+    // Perform multiplication with FeedbackMatrix, product is automatically added to CurrentVector
+    // Y = alpha*A*X + beta*Y
+    cblas_dgemv(CblasRowMajor,      // Row-major ordering
+                CblasNoTrans,       // Don't transpose
+                NumberOfCoils,      // Row number (A)
+                NumberOfChannels,   // Column number (A)
+                1,                  // Scaling Factor alpha
+                [FeedbackMatData bytes], // Matrix A
+                NumberOfChannels,   // Size of first dimension
+                ptr,                // vector X
+                1,                  // Stride (should be 1)
+                1,                  // Scaling Factor beta
+                (double*)[CurrentVector bytes],// vector Y
+                1                   // Stride (should be 1)
+                );
 
     return CurrentVector;
     
@@ -188,6 +196,7 @@ for (id obj in anEnum) [obj x];                   \
     }*/
     
     if ([self debugRunning]) CALL_SELECTOR_ONALL_POWERSUPPLIES(setAllOutputToBeOn:NO);
+    CALL_SELECTOR_ONALL_POWERSUPPLIES(waitUntilCommandsDone);
     double* dblPtr = (double*)[currentVector bytes];
     double Current[NumberOfCoils];
     int i;    
@@ -199,15 +208,19 @@ for (id obj in anEnum) [obj x];                   \
     for (i=0;i<NumberOfCoils;i++) {
         if (Current[i]>MaxCurrent) {
             //[NSException raise:@"Current Exceeded in Coil" format:@"Current Exceeded in Coil Channel: %d",i];
+            Current[i] = MaxCurrent;
         }
         if (Current[i]<0) {
-            //[NSException raise:@"Current Negative in Coil" format:@"Current Negative in Coil Channel: %d",i];            
+            //[NSException raise:@"Current Negative in Coil" format:@"Current Negative in Coil Channel: %d",i];
+            Current[i] = 0.0;
         }
     }
     for (i=0; i<NumberOfCoils;i++){
-        [self _setCurrent:dblPtr[i] forSupply:i];
+        [self _setCurrent:Current[i] forSupply:i];
     }
-    if (![self debugRunning]) CALL_SELECTOR_ONALL_POWERSUPPLIES(setAllOutputToBeOn:YES);        
+    CALL_SELECTOR_ONALL_POWERSUPPLIES(waitUntilCommandsDone);    
+    if (![self debugRunning]) CALL_SELECTOR_ONALL_POWERSUPPLIES(setAllOutputToBeOn:YES);
+    CALL_SELECTOR_ONALL_POWERSUPPLIES(waitUntilCommandsDone);
 }
 
 - (double) _fieldAtMagnetometer:(int)index
