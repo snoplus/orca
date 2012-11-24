@@ -854,8 +854,8 @@
 		   ([s rangeOfString:@"default"].location != NSNotFound)){
 			level++;
 		}
-		if( (([s rangeOfString:@"}"].location != NSNotFound) && ([s rangeOfString:@"{"].location == NSNotFound))/* ||
-			([s rangeOfString:@"break;"].location != NSNotFound)*/){
+		if( (([s rangeOfString:@"}"].location != NSNotFound) && ([s rangeOfString:@"{"].location == NSNotFound)) ||
+			([s rangeOfString:@"break;"].location != NSNotFound)){
 
 			level--;
 			if(level<0)level=0;
@@ -873,4 +873,7 @@
 		[self didChangeText];
 	}
 }
+
+
+
 @end
