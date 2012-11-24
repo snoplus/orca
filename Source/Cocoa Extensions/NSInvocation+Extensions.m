@@ -169,6 +169,15 @@
 									[[xy objectAtIndex:3] floatValue]);
 		[self setArgument:&theRect atIndex:argIndex];
 	}
+	else if(!strncmp(theArg,"{_NSSi",6)){
+		aVal = [aVal substringFromIndex:2];
+		aVal = [aVal substringToIndex:[aVal length]-1];
+		NSArray* xy = [aVal componentsSeparatedByString:@","];
+		NSSize theSize = NSMakeSize([[xy objectAtIndex:0] floatValue], 
+									[[xy objectAtIndex:1] floatValue]);
+		[self setArgument:&theSize atIndex:argIndex];
+	}
+	
 	
     else return NO;
     
@@ -258,6 +267,12 @@
         [self getReturnValue:&theRect]; 
 		return [NSString stringWithFormat:@"@(%f,%f,%f,%f)",theRect.origin.x,theRect.origin.y,theRect.size.width,theRect.size.height];
 	}
+	else if(!strncmp(theArg,"{_NSSi",6)){
+		NSSize theSize;
+        [self getReturnValue:&theSize]; 
+		return [NSString stringWithFormat:@"@(%f,%f)",theSize.width,theSize.height];
+	}
+	
 
     if(returnValueAsString)return [NSDecimalNumber decimalNumberWithString:returnValueAsString];
     else return [NSDecimalNumber decimalNumberWithString:@"0"];
