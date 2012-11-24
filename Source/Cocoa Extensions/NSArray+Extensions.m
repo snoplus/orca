@@ -107,11 +107,14 @@
 
 - (void) moveObject:(id)anObj toIndex:(unsigned)newIndex
 {
+	if(newIndex>[self count])newIndex = [self count];
     if([self containsObject:anObj]){
-        NSNull* aNullObj = [NSNull null];
-        [self replaceObjectAtIndex:[self indexOfObject:anObj] withObject:aNullObj];
-        [self insertObject:anObj atIndex:newIndex];
-        [self removeObject:aNullObj];
+		NSNull* null = [NSNull null];
+		if(newIndex>[self indexOfObject:anObj])newIndex++;
+		[self insertObject:null atIndex:newIndex];
+		NSUInteger oldIndex = [self indexOfObject:anObj];
+        [self replaceObjectAtIndex:newIndex withObject:anObj];
+		[self removeObjectAtIndex:oldIndex];
     }
     else [self insertObject:anObj atIndex:newIndex];
 }
