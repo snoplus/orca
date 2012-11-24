@@ -587,6 +587,7 @@
 		case HEX:			return [NSString stringWithFormat:@"0x%lx",(unsigned long)[NodeValue(0) longValue]];
 		case MAKEPOINT:		return [NSString stringWithFormat:@"@(%@,%@)",NodeValue(0),NodeValue(1)];
 		case MAKERECT:		return [NSString stringWithFormat:@"@(%@,%@,%@,%@)",NodeValue(0),NodeValue(1),NodeValue(2),NodeValue(3)];
+		case MAKESIZE:		return [NSString stringWithFormat:@"@(%@,%@)",NodeValue(0),NodeValue(1)];
 		case MAKERANGE:		return [NSString stringWithFormat:@"@(%@,%@)",NodeValue(0),NodeValue(1)];
 		case FIXED:			return [self fixedString:NodeValue(0) precision:NodeValue(1)];
 		case SCI:			return [self sciString:NodeValue(0) precision:NodeValue(1)];
@@ -1497,6 +1498,7 @@
 				case kMakeArgList:		line = [NSMutableString stringWithString:@"[argList]"];		break;
 				case MAKEPOINT:			line = [NSMutableString stringWithString:@"[point]"];		break;
 				case MAKERECT:			line = [NSMutableString stringWithString:@"[rect]"];		break;
+				case MAKESIZE:			line = [NSMutableString stringWithString:@"[size]"];		break;
 				case MAKERANGE:			line = [NSMutableString stringWithString:@"[range]"];		break;
                 case ',':				line = [NSMutableString stringWithString:@"[,]"];			break;
 				default:				line = [NSMutableString stringWithString:@"[??]"];			break;

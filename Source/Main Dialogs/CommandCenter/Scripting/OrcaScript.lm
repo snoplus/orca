@@ -103,6 +103,7 @@ E			[Ee][+-]?{D}+
 "point"			return MAKEPOINT;
 "rect"			return MAKERECT;
 "range"			return MAKERANGE;
+"size"			return MAKESIZE;
 "postalarm"		return ALARM;
 "postAlarm"		return ALARM;
 "clearalarm"	return CLEAR;

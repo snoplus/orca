@@ -34,7 +34,7 @@
 %token <symKey> VARIABLE
 %token FUNCTION WHILE DO FOR IF PRINT LOGFILE PRINTFILE FIND MAKE BREAK EXIT CONTINUE SLEEP RETURN WAITUNTIL HEX MAKEARRAY
 %token INC_OP DEC_OP ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN ORQUALS LEFT_ASSIGN RIGHT_ASSIGN TIME FIXED SCI 
-%token AND_ASSIGN XOR_ASSIGN MOD_ASSIGN OR_ASSIGN MAKESTRING CATSTRING SWITCH CASE DEFAULT MAKEPOINT MAKERECT SHELL
+%token AND_ASSIGN XOR_ASSIGN MOD_ASSIGN OR_ASSIGN MAKESTRING CATSTRING SWITCH CASE DEFAULT MAKEPOINT MAKERECT MAKESIZE SHELL
 %token LEFT_OP RIGHT_OP  EQ_OP NE_OP GE_OP LE_OP AND_OP OR_OP ALARM CLEAR UNLESS DISPLAY NSDICTIONARY NSDATECOMPONENTS NSARRAY MAKERANGE
 %token NSFILEMANAGER STRINGFROMFILE WRITELINETOFILE DELETEFILE IMPORT HASH
 %nonassoc ELSE
@@ -47,7 +47,7 @@
 %type <nPtr> hex_str expr statement_list objC findObj makeObj selection_statement iteration_statement printfile_statement
 %type <nPtr> objVar objVar_list print_list log_list print_statement log_statement arg_list argName_list clear_statement
 %type <nPtr> compound_statement expression_statement jump_statement special_statement ns_object sci_statement fixed_statement
-%type <nPtr> case_statement case_list constant_expr point_str rect_str wait_statement alarm_statement
+%type <nPtr> case_statement case_list constant_expr point_str rect_str size_str wait_statement alarm_statement
 %type <nPtr> primary_expr multiplicative_expr postfix_expr unary_expr  additive_expr time_statement
 %type <nPtr> shift_expr relational_expr equality_expr and_expr exclusive_or_expr inclusive_or_expr shell_statement
 %type <nPtr> logical_and_expr logical_or_expr conditional_expr assignment_expr leftArrayElement objectPtr rng_str file_str writeLineToFile_statement
@@ -342,6 +342,7 @@ assignment_expr
 | time_statement									{ $$ = $1; }
 | point_str											{ $$ = $1; }
 | rect_str											{ $$ = $1; }
+| size_str											{ $$ = $1; }
 | rng_str											{ $$ = $1; }
 ;
 
@@ -433,6 +434,10 @@ point_str
 
 rect_str
 : MAKERECT '(' expr ',' expr ',' expr ',' expr ')'	{ $$ = executionNode(MAKERECT,$3,$5,$7,$9,nil);}
+;
+
+size_str
+: MAKESIZE '(' expr ',' expr  ')'	{ $$ = executionNode(MAKESIZE,$3,$5,nil);}
 ;
 
 rng_str
