@@ -110,8 +110,9 @@ ORTTCPX_GEN_DEFINE_VAR(writeTo, CMD, TYPE)
 - (TYPE) writeTo ## CMD ## WithOutput:(unsigned int) output;           \
 - (void) sendCommandWriteTo ## CMD ## WithOutput:(unsigned int) output;
 
-#define ORTTCPX_DEFINE_READ_FUNCTIONS(CMD, TYPE) \
-- (TYPE) readBack ## CMD ## WithOutput:(unsigned int) output; \
+#define ORTTCPX_DEFINE_READ_FUNCTIONS(CMD, TYPE)                        \
+- (TYPE) readBack ## CMD ## WithOutput:(unsigned int) output;           \
+- (TYPE) readAndBlock ## CMD ## WithOutput:(unsigned int) output;       \
 - (void) sendCommandReadBack ## CMD ## WithOutput:(unsigned int) output;
 
 

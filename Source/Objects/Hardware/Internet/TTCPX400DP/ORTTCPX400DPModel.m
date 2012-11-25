@@ -117,8 +117,19 @@ withOutput:(unsigned int)output sendCommand:(BOOL)cmd                       \
     [self PREPENDFUNC ## write ## CMD ## WithOutput:output];                \
 }                                                                           
 
-#define ORTTCPX_READ_IMPLEMENT(CMD, TYPE) ORTTCPX_GEN_IMPLEMENT(CMD, TYPE,_, R, r, eadBack)
-#define ORTTCPX_WRITE_IMPLEMENT(CMD, TYPE) ORTTCPX_GEN_IMPLEMENT(CMD, TYPE, , W, w, riteTo)
+#define ORTTCPX_WRITE_IMPLEMENT(CMD, TYPE)                                  \
+ORTTCPX_GEN_IMPLEMENT(CMD, TYPE, , W, w, riteTo)
+
+#define ORTTCPX_READ_IMPLEMENT(CMD, TYPE)                                   \
+ORTTCPX_GEN_IMPLEMENT(CMD, TYPE,_, R, r, eadBack)                           \
+- (TYPE) readAndBlock ## CMD ## WithOutput:(unsigned int)output             \
+{                                                                           \
+    assert(gORTTCPXCmds[k ## CMD].responds);                                \
+    [self waitUntilCommandsDone];                                           \
+    [self _write ## CMD ## WithOutput:output];                              \
+    [self waitUntilCommandsDone];                                           \
+    return [self readBack ## CMD ## WithOutput:output];                     \
+}
                                                                  
  
 ORTTCPX_WRITE_IMPLEMENT_NOTIFY(SetVoltage)
