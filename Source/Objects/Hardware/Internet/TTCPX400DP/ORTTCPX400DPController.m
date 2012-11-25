@@ -24,6 +24,8 @@
 
 @interface ORTTCPX400DPController (private)
 - (void) _buildPopUpButtons;
+- (void) _showWarningPanel:(NSString*)astr;
+- (void) _updateChannelModes:(unsigned int)bits withTextField:(NSTextField*)tf;
 @end
 
 @implementation ORTTCPX400DPController
@@ -170,17 +172,6 @@
         [lockText setStringValue:@""];
     }
     
-}
-
-- (void) _buildPopUpButtons
-{
-    if ([commandPopUp numberOfItems] == [model numberOfCommands]) return;
-    [commandPopUp removeAllItems];
-    int i;
-    for (i=0; i<[model numberOfCommands]; i++) {
-        [commandPopUp addItemWithTitle:[model commandName:i]];
-        [[commandPopUp itemAtIndex:i] setTag:i];
-    }
 }
 
 #pragma mark •••Notifications
@@ -394,5 +385,43 @@
     [model setVerbose:[sender state]];
 }
 
+@implementation ORTTCPX400DPController (private)
+
+- (void) _buildPopUpButtons
+{
+    if ([commandPopUp numberOfItems] == [model numberOfCommands]) return;
+    [commandPopUp removeAllItems];
+    int i;
+    for (i=0; i<[model numberOfCommands]; i++) {
+        [commandPopUp addItemWithTitle:[model commandName:i]];
+        [[commandPopUp itemAtIndex:i] setTag:i];
+    }
+}
+
+- (void) _showWarningPanel:(NSString *)astr
+{
+    NSRunAlertPanel([NSString stringWithFormat:@"HW Error Seen in %@ (%@, %@)",[model objectName],
+                     [model ipAddress],[model serialNumber]],
+                    astr,
+                    @"OK",nil,nil);
+}
+
+- (void) _updateChannelModes:(unsigned int)bits withTextField:(NSTextField*)tf
+{
+    if (bits == 0) {
+        [tf setTextColor:[NSColor blackColor]];
+        [tf setStringValue:@"Not Set"];
+    }
+    else if (bits & 0x1) {
+        [tf setTextColor:[NSColor greenColor]];
+        [tf setStringValue:@"CV Mode"];
+    } else if (bits & 0x2) {
+        [tf setTextColor:[NSColor greenColor]];
+        [tf setStringValue:@"CC Mode"];
+    } else {
+        [tf setTextColor:[NSColor redColor]];
+        [tf setStringValue:@"TRIP"];
+    }
+}
 @end
 
