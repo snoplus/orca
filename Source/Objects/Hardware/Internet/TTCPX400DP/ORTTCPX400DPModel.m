@@ -51,6 +51,7 @@ struct ORTTCPX400DPCmdInfo;
 - (void) _socketThread:(NSString*)anIpAddress;
 - (void) _connectSocket:(NSString*)anIpAddress;
 - (void) _setSocket:(NetSocket*)aSocket;
+- (void) _syncReadoutSetToModel;
 
 @end
 
@@ -456,6 +457,7 @@ ORTTCPX_READ_IMPLEMENT(QueryAndClearESR, int)
     [self reset];
     [self clearStatus];
     [self readback];
+    [self performSelectorInBackground:@selector(_syncReadoutSetToModel) withObject:nil];
 }
 
 - (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(unsigned)inAmount
@@ -1058,4 +1060,22 @@ ORTTCPX_READ_IMPLEMENT(QueryAndClearESR, int)
                           withOutputNumber:output];
 }
 
+#define SYNC_MODEL_VARS(setVar, readBackVar)   \
+[self setAndNotifyWriteTo ## setVar:[self readAndBlock ## readBackVar ## WithOutput:0]  \
+    withOutput:0 sendCommand:NO];                                                       \
+[self setAndNotifyWriteTo ## setVar:[self readAndBlock ## readBackVar ## WithOutput:1]  \
+    withOutput:1 sendCommand:NO];
+
+#define SYNC_MODEL_NORMALVARS(var) \
+SYNC_MODEL_VARS(Set ## var, Get ## var ## Set)
+
+- (void) _syncReadoutSetToModel
+{
+    // Because this uses block commands, it must *not* be run on the readout thread.
+    SYNC_MODEL_VARS(SetVoltage,GetVoltageSet); // Voltage Get/Set
+    SYNC_MODEL_VARS(SetOverVoltageProtectionTripPoint, GetVoltageTripSet); // Current Trip
+    SYNC_MODEL_VARS(SetOverCurrentProtectionTripPoint, GetCurrentTripSet); // Current Trip
+    SYNC_MODEL_VARS(SetCurrentLimit, GetCurrentSet); // Current Trip
+    SYNC_MODEL_VARS(SetOutput, GetOutputStatus); // Current Trip
+}
 @end
