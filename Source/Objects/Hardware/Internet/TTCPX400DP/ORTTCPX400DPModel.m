@@ -30,6 +30,7 @@ NSString* ORTTCPX400DPSerialNumberHasChanged = @"ORTTCPX400DPSerialNumberHasChan
 NSString* ORTTCPX400DPModelLock = @"ORTTCPX400DPModelLock";
 NSString* ORTTCPX400DPGeneralReadbackHasChanged = @"ORTTCPX400DPGeneralReadbackHasChanged";
 NSString* ORTTCPX400DPVerbosityHasChanged = @"ORTTCPX400DPVerbosityHasChanged";
+NSString* ORTTCPX400DPErrorSeen = @"ORTTCPX400DPErrorSeen";
 
 struct ORTTCPX400DPCmdInfo;
 
@@ -452,6 +453,9 @@ ORTTCPX_READ_IMPLEMENT(QueryAndClearESR, int)
 {
 	if(inNetSocket != socket) return;
 	[self _setIsConnected:[socket isConnected]];
+    [self reset];
+    [self clearStatus];
+    [self readback];
 }
 
 - (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(unsigned)inAmount
@@ -634,6 +638,52 @@ ORTTCPX_READ_IMPLEMENT(QueryAndClearESR, int)
     if (readoutThread != [NSThread currentThread]) {
         [self waitUntilCommandsDone];
     }
+}
+
+- (void) reset
+{
+    [self writeCommand:kResetToRemoteDflt withInput:0 withOutputNumber:0];
+}
+
+- (void) clearStatus
+{
+    [self writeCommand:kClearStatus withInput:0 withOutputNumber:0];
+}
+
+- (void) resetTrips
+{
+    [self writeCommand:kClearTrip withInput:0 withOutputNumber:0];
+}
+
+- (BOOL) checkAndClearErrors
+{
+    assert(readoutThread !=[NSThread currentThread]);
+    [self waitUntilCommandsDone];
+    [self sendCommandReadBackQueryAndClearEERWithOutput:0];
+    [self sendCommandReadBackQueryAndClearESRWithOutput:0];
+    [self sendCommandReadBackQueryAndClearQERWithOutput:0];
+    [self sendCommandReadBackQueryAndClearLSRWithOutput:0];
+    [self sendCommandReadBackQueryAndClearLSRWithOutput:1];
+    [self waitUntilCommandsDone];
+    if ([self currentErrorCondition]) {
+        [[NSNotificationCenter defaultCenter]
+         postNotificationName:ORTTCPX400DPErrorSeen
+         object:self];
+        return YES;
+    }
+    return NO;
+}
+
+- (BOOL) currentErrorCondition
+{
+    // returns if there is a current error condition.
+    BOOL retVal =
+    (([self readBackValueESR] & 0x3c) != 0 ||
+     ([self readBackValueEER] != 0)        ||
+     (([self readBackValueLSR:0] & 0xFC) != 0)      ||
+     (([self readBackValueLSR:1] & 0xFC) != 0)      ||
+     ([self readBackValueQER] != 0));
+    return retVal;
 }
 
 - (unsigned int) readBackValueLSR:(int)outputNum

@@ -229,6 +229,12 @@ ORTTCPX_GEN_DEFINE_VAR(writeTo, CMD, TYPE)
 - (BOOL) commandTakesOutputNumber:(ETTCPX400DPCmds)cmd;
 
 - (void) readback;
+- (void) reset;
+- (void) resetTrips;
+- (void) clearStatus;
+- (BOOL) checkAndClearErrors;
+- (BOOL) currentErrorCondition;
+
 - (unsigned int) readBackValueLSR:(int)outputNum;
 - (unsigned int) readBackValueEER;
 - (unsigned int) readBackValueESR;
@@ -311,6 +317,7 @@ extern NSString* ORTTCPX400DPIpHasChanged;
 extern NSString* ORTTCPX400DPSerialNumberHasChanged;
 extern NSString* ORTTCPX400DPGeneralReadbackHasChanged;
 extern NSString* ORTTCPX400DPVerbosityHasChanged;
+extern NSString* ORTTCPX400DPErrorSeen;
 
 ORTTCPX_NOTIFY_WRITE_DEFINE(SetVoltage)
 ORTTCPX_NOTIFY_WRITE_DEFINE(SetVoltageAndVerify)
