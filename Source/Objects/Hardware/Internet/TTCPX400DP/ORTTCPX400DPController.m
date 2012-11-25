@@ -147,8 +147,11 @@
 - (void) updateButtons
 {
     BOOL locked = [gSecurity isLocked:ORTTCPX400DPModelLock] || [model userLocked];
-    [serialNumberBox setEnabled:(![model isConnected] && !locked)];
-    [ipAddressBox setEnabled:(![model isConnected] && !locked)];
+    BOOL connected = [model isConnected];
+    
+    [serialNumberBox setEnabled:(!connected && !locked)];
+    [ipAddressBox setEnabled:(!connected && !locked)];
+
     
 #define LOCK_ALL_BUTTONS(opt)                       \
     [writeVolt ## opt setEnabled:!locked];          \
@@ -160,12 +163,17 @@
     LOCK_ALL_BUTTONS(One);
     LOCK_ALL_BUTTONS(Two);
     
-    [syncButton setEnabled:!locked];
-    [syncOutButton setEnabled:!locked];
-    [sendCommandButton setEnabled:!locked];
-    [readButton setEnabled:!locked];
+    [syncButton setEnabled:(!locked && connected)];
+    [syncOutButton setEnabled:(!locked && connected)];
+    [sendCommandButton setEnabled:(!locked && connected)];
+    [readButton setEnabled:(!locked && connected)];
+    [resetButton setEnabled:(!locked && connected)];
+    [resetTripsButton setEnabled:(!locked && connected)];
+    [clearButton setEnabled:(!locked && connected)];
+    [checkErrorsButton setEnabled:(!locked && connected)];
     
     [connectButton setEnabled:!locked];
+    
     if ([model userLocked]) {
         [lockText setStringValue:[NSString stringWithFormat:@"Locked by: %@",[model userLockedString]]];
     } else {
@@ -314,7 +322,7 @@
     BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
     [gSecurity setLock:ORTTCPX400DPModelLock to:secure];
     [lockButton setEnabled:secure];
-	//[self updateButtons];
+	[self updateButtons];
 }
 
 - (IBAction) commandPulldownAction:(id)sender
@@ -352,22 +360,35 @@
 - (IBAction)readBackAction:(id)sender
 {
     [model readback];
+    [self checkAndClearErrorsAction:sender];
 }
 
 - (IBAction) syncValuesAction:(id)sender
 {
+#define DEF_TMP_VARS(val) \
+    float vt ## val = [writeVoltTrip ## val floatValue];    \
+    float ct ## val = [writeCurrentTrip ## val floatValue]; \
+    float v ## val = [writeVolt ## val floatValue];         \
+    float c ## val = [writeCurrent ## val floatValue];
+
 #define SYNCALL(val)                                                                        \
-    [model setWriteToSetVoltage:[writeVolt ## val floatValue]                               \
-                     withOutput:[writeVolt ## val tag]];                                    \
-    [model setWriteToSetOverVoltageProtectionTripPoint:[writeVoltTrip ## val floatValue]    \
+    [model setWriteToSetOverVoltageProtectionTripPoint:vt ## val                            \
                                             withOutput:[writeVoltTrip ## val tag]];         \
-    [model setWriteToSetCurrentLimit:[writeCurrent ## val floatValue]                       \
+    [model setWriteToSetOverCurrentProtectionTripPoint:ct ## val                            \
+                                            withOutput:[writeCurrentTrip ## val tag]];      \
+    [model setWriteToSetCurrentLimit:c ## val                                               \
                           withOutput:[writeCurrent ## val tag]];                            \
-    [model setWriteToSetOverCurrentProtectionTripPoint:[writeCurrentTrip ## val floatValue] \
-                                            withOutput:[writeCurrentTrip ## val tag]];
-    
+    [model setWriteToSetVoltage:v ## val                                                    \
+                     withOutput:[writeVolt ## val tag]];
+
+    DEF_TMP_VARS(One)
+    DEF_TMP_VARS(Two)
     SYNCALL(One)
     SYNCALL(Two)
+    
+    [self performSelector:@selector(readBackAction:)
+               withObject:nil
+               afterDelay:0.5];
 }
 
 - (IBAction) writeOutputStatusAction:(id)sender
@@ -378,12 +399,40 @@
         [model setOutput:0 toBeOn:[outputOnOne state]];
         [model setOutput:1 toBeOn:[outputOnTwo state]];        
     }
+    [self performSelector:@selector(readBackAction:)
+               withObject:nil
+               afterDelay:0.5];
 }
 
 - (IBAction) changeVerbosityAction:(id)sender
 {
     [model setVerbose:[sender state]];
 }
+
+- (IBAction) clearAction:(id)sender
+{
+    [model clearStatus];
+    [self readBackAction:nil];
+}
+
+- (IBAction) resetAction:(id)sender
+{
+    [model reset];
+    [self readBackAction:nil];
+}
+
+- (IBAction) resetTripsAction:(id)sender
+{
+    [model resetTrips];
+    [self readBackAction:nil];
+}
+
+- (IBAction) checkAndClearErrorsAction:(id)sender
+{
+    [model performSelectorInBackground:@selector(checkAndClearErrors) withObject:nil];
+}
+
+@end
 
 @implementation ORTTCPX400DPController (private)
 

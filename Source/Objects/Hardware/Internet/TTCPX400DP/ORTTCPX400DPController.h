@@ -32,6 +32,12 @@
     IBOutlet NSTextField*   readBackText;  
     IBOutlet NSButton*      connectButton;
     IBOutlet NSButton*      sendCommandButton;
+    IBOutlet NSButton*      clearButton;
+    IBOutlet NSButton*      resetButton;
+    IBOutlet NSButton*      resetTripsButton;
+    IBOutlet NSButton*      checkErrorsButton;
+    
+    
     IBOutlet NSButton*      syncOutButton;
     IBOutlet NSButton*      readButton;
     IBOutlet NSButton*      syncButton;
@@ -94,8 +100,11 @@
 - (IBAction) readBackAction:(id)sender;
 - (IBAction) syncValuesAction:(id)sender;
 - (IBAction) changeVerbosityAction:(id)sender;
-
 - (IBAction) writeOutputStatusAction:(id)sender;
+- (IBAction) clearAction:(id)sender;
+- (IBAction) resetAction:(id)sender;
+- (IBAction) resetTripsAction:(id)sender;
+- (IBAction) checkAndClearErrorsAction:(id)sender;
 
 @end
 
