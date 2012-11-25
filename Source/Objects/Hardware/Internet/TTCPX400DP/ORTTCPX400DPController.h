@@ -67,6 +67,8 @@
     IBOutlet NSButton*      verbosity;
     
     IBOutlet NSTextField*   lockText;
+    IBOutlet NSTextField*   channelOneModeText;
+    IBOutlet NSTextField*   channelTwoModeText;
 }
 
 #pragma mark •••Initialization
@@ -88,6 +90,8 @@
 - (void) outputStatusChanged:(NSNotification*)aNote;
 - (void) hwFinderChanged:(NSNotification*)aNote;
 - (void) verbosityChanged:(NSNotification*)aNote;
+- (void) hardwareErrorSeen:(NSNotification*)aNote;
+- (void) channelModeChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 //- (IBAction) passwordFieldAction:(id)sender;

@@ -119,8 +119,17 @@
     [notifyCenter addObserver : self
 					 selector : @selector(outputStatusChanged:)
 						 name : ORTTCPX_NOTIFY_WRITE_FORM(SetOutput)
-						object: nil];      
+						object: nil];
     
+    [notifyCenter addObserver : self
+					 selector : @selector(hardwareErrorSeen:)
+						 name : ORTTCPX400DPErrorSeen
+						object: nil];
+    
+    [notifyCenter addObserver : self
+					 selector : @selector(channelModeChanged:)
+						 name : ORTTCPX_NOTIFY_READ_FORM(QueryAndClearLSR)
+						object: nil];
 }
 
 - (void) awakeFromNib
@@ -141,6 +150,7 @@
     [self readbackChanged:nil]; 
     [self setValuesChanged:nil];
     [self outputStatusChanged:nil];
+    [self channelModeChanged:nil];
     [self verbosityChanged:nil];
 }
 
@@ -214,10 +224,12 @@
 
     } else {
         [connectButton setTitle:@"Connect"];
-        [serialNumberBox setEnabled:YES];
-        [ipAddressBox setEnabled:YES];
+        [self _updateChannelModes:0
+                    withTextField:channelOneModeText];
+        [self _updateChannelModes:0
+                    withTextField:channelTwoModeText];
     }
-    
+    [self updateButtons];
     [[self window] setTitle:[NSString stringWithFormat:@"TT CPX400DP  %@",[model serialNumber]]];
 }
 
@@ -306,9 +318,46 @@
     }
 }
 
+- (void) hardwareErrorSeen:(NSNotification *)aNote
+{
+    if ([aNote object] != model) return;
+    if (![model currentErrorCondition]) return;
+    NSMutableString* mutableStr = [NSMutableString stringWithString:@"ESR Errors:\n"];
+    NSArray* tempArray = [model explainStringsForESRBits:[model readBackValueESR]];
+    for (id obj in tempArray) [mutableStr appendString:[NSString stringWithFormat:@"  %@\n",obj]];
+    
+    [mutableStr appendString:[NSString stringWithFormat:@"EER Error: %@\n",[model explainStringForEERBits:[model readBackValueEER]]]];
+    [mutableStr appendString:[NSString stringWithFormat:@"QER Error: %@\n",[model explainStringForQERBits:[model readBackValueQER]]]];
+
+    BOOL addExplainTest = NO;
+    tempArray = [model explainStringsForLSRBits:[model readBackValueLSR:0]];
+    [mutableStr appendString:@"LSR Errors(Output 1): \n"];
+    for (id obj in tempArray) [mutableStr appendString:[NSString stringWithFormat:@"  %@\n",obj]];
+    addExplainTest = ([tempArray count] != 0);
+    
+    tempArray = [model explainStringsForLSRBits:[model readBackValueLSR:1]];
+    [mutableStr appendString:@"LSR Errors(Output 2): \n"];
+    for (id obj in tempArray) [mutableStr appendString:[NSString stringWithFormat:@"  %@\n",obj]];
+    
+    addExplainTest |= ([tempArray count] != 0);
+    
+    if (addExplainTest) [mutableStr appendString:@"TRIP Errors MUST be explicitly reset.\n"];
+    [self performSelectorOnMainThread:@selector(_showWarningPanel:)
+                           withObject:mutableStr
+                        waitUntilDone:NO];
+    
+}
+
 - (void) verbosityChanged:(NSNotification*)aNote
 {
     [verbosity setState:[model verbose]];
+}
+
+- (void) channelModeChanged:(NSNotification *)aNote
+{
+    [self _updateChannelModes:[model readBackValueLSR:0] withTextField:channelOneModeText];
+    [self _updateChannelModes:[model readBackValueLSR:1] withTextField:channelTwoModeText];
+    
 }
 
 #pragma mark •••Actions
