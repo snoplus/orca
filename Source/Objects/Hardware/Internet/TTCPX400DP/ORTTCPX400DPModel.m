@@ -831,13 +831,13 @@ ORTTCPX_READ_IMPLEMENT(QueryAndClearESR, int)
 - (void) _setIsConnected:(BOOL)connected
 {
     if (isConnected == connected) return;
-    @synchronized(self){
-        // Also release the dataQueue
-        [dataQueue release];
-        dataQueue = [[NSMutableArray array] retain];
-        isProcessingCommands = NO;
-        isConnected = connected;
-    }
+    [readConditionLock lock];
+    // Also release the dataQueue
+    [dataQueue release];
+    dataQueue = [[NSMutableArray array] retain];
+    isProcessingCommands = NO;
+    isConnected = connected;
+    [readConditionLock unlock];
     [[NSNotificationCenter defaultCenter]
      postNotificationName:ORTTCPX400DPConnectionHasChanged
      object:self];
@@ -918,27 +918,32 @@ ORTTCPX_READ_IMPLEMENT(QueryAndClearESR, int)
     assert(cmd != nil && cmd->responds);
     
     float readBackValue = 0;
-    
     int numberOfOutputs = [[cmd->responseFormat componentsSeparatedByString:@"%"] count] - 1;
-    switch (numberOfOutputs) {
-        case 1:
-            if (sscanf([input cStringUsingEncoding:NSASCIIStringEncoding],
-                       [cmd->responseFormat cStringUsingEncoding:NSASCIIStringEncoding],&readBackValue) != 1) {
-                [NSException raise:@"Error in TTCPX400DP"
-                            format:@"parsing input string (%@) with format (%@)",input,cmd->responseFormat];
-            }
-            break;
-        case 2:
-            
-            if (sscanf([input cStringUsingEncoding:NSASCIIStringEncoding],
-                       [cmd->responseFormat cStringUsingEncoding:NSASCIIStringEncoding],&outputNum,&readBackValue) != 2) {
-                [NSException raise:@"Error in TTCPX400DP"
-                            format:@"parsing input string (%@) with format (%@)",input,cmd->responseFormat];
-            }
-            break;
-        default:
-            assert((numberOfOutputs != 1 && numberOfOutputs != 2));
-            break;
+    @try {
+        switch (numberOfOutputs) {
+            case 1:
+                if (sscanf([input cStringUsingEncoding:NSASCIIStringEncoding],
+                           [cmd->responseFormat cStringUsingEncoding:NSASCIIStringEncoding],&readBackValue) != 1) {
+                    [NSException raise:@"Error in TTCPX400DP"
+                                format:@"parsing input string (%@) with format (%@)",input,cmd->responseFormat];
+                }
+                break;
+            case 2:
+                
+                if (sscanf([input cStringUsingEncoding:NSASCIIStringEncoding],
+                           [cmd->responseFormat cStringUsingEncoding:NSASCIIStringEncoding],&outputNum,&readBackValue) != 2) {
+                    [NSException raise:@"Error in TTCPX400DP"
+                                format:@"parsing input string (%@) with format (%@)",input,cmd->responseFormat];
+                }
+                break;
+            default:
+                assert((numberOfOutputs != 1 && numberOfOutputs != 2));
+                break;
+        }
+        
+    } @catch (NSException *e) {
+        [readConditionLock unlock];
+        [e raise];
     }
     if (callSelector) {
         numberOfOutputs = [[NSStringFromSelector(callSelector) componentsSeparatedByString:@":"] count] - 1;
@@ -1005,9 +1010,17 @@ ORTTCPX_READ_IMPLEMENT(QueryAndClearESR, int)
     
     // perform the run loop
     // This ends whenever the socket changes
-    while( socket == currentSocket &&
-          [rl runMode:NSDefaultRunLoopMode
-           beforeDate:[NSDate dateWithTimeIntervalSinceNow:1.0]]);
+    @try{
+        while( socket == currentSocket &&
+              [rl runMode:NSDefaultRunLoopMode
+               beforeDate:[NSDate dateWithTimeIntervalSinceNow:1.0]]);
+    } @catch (NSException* e) {
+        [self _setSocket:nil];
+        [self _setIsConnected:NO];
+        NSLogColor([NSColor redColor], @"Exception at (%@, %@, %@) readout thread, disconnected.\n",
+                   [self objectName],[self ipAddress],[self serialNumber]);
+        NSLogColor([NSColor redColor], @"%@\n",e);
+    }
     readoutThread = nil;
     [readConditionLock lock];
     isProcessingCommands = NO;
