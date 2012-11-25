@@ -138,6 +138,10 @@ ORTTCPX_READ_IMPLEMENT_NOTIFY(GetVoltageStepSize)
 ORTTCPX_READ_IMPLEMENT_NOTIFY(GetCurrentStepSize)
 ORTTCPX_WRITE_IMPLEMENT_NOTIFY(SetOutput)
 ORTTCPX_READ_IMPLEMENT_NOTIFY(GetOutputStatus)
+ORTTCPX_READ_IMPLEMENT_NOTIFY(QueryAndClearLSR)
+ORTTCPX_READ_IMPLEMENT_NOTIFY(QueryAndClearEER)
+ORTTCPX_READ_IMPLEMENT_NOTIFY(QueryAndClearESR)
+ORTTCPX_READ_IMPLEMENT_NOTIFY(QueryAndClearQER)
 
 //ORTTCPX_WRITE_IMPLEMENT_NOTIFY(IncrementVoltage)
 //ORTTCPX_WRITE_IMPLEMENT_NOTIFY(IncrementVoltageAndVerify)
@@ -151,7 +155,7 @@ ORTTCPX_READ_IMPLEMENT_NOTIFY(GetOutputStatus)
 //ORTTCPX_WRITE_IMPLEMENT_NOTIFY(RequestLock)
 //ORTTCPX_WRITE_IMPLEMENT_NOTIFY(CheckLock)
 //ORTTCPX_WRITE_IMPLEMENT_NOTIFY(ReleaseLock)
-//ORTTCPX_WRITE_IMPLEMENT_NOTIFY(QueryClearLSR)
+
 //ORTTCPX_WRITE_IMPLEMENT_NOTIFY(SetEventStatusRegister)
 //ORTTCPX_WRITE_IMPLEMENT_NOTIFY(GetEventStatusRegister)
 //ORTTCPX_WRITE_IMPLEMENT_NOTIFY(SaveCurrentSetup)
@@ -161,16 +165,16 @@ ORTTCPX_READ_IMPLEMENT_NOTIFY(GetOutputStatus)
 //ORTTCPX_WRITE_IMPLEMENT_NOTIFY(SetRatio)
 //ORTTCPX_WRITE_IMPLEMENT_NOTIFY(GetRatio)
 //ORTTCPX_WRITE_IMPLEMENT_NOTIFY(ClearStatus)
-//ORTTCPX_WRITE_IMPLEMENT_NOTIFY(QueryAndClearEER)
+
 //ORTTCPX_WRITE_IMPLEMENT_NOTIFY(SetESE)
 //ORTTCPX_WRITE_IMPLEMENT_NOTIFY(GetESE)
-//ORTTCPX_WRITE_IMPLEMENT_NOTIFY(GetESR)
+
 //ORTTCPX_WRITE_IMPLEMENT_NOTIFY(GetISTLocalMsg)
 //ORTTCPX_WRITE_IMPLEMENT_NOTIFY(SetOPCBit)
 //ORTTCPX_WRITE_IMPLEMENT_NOTIFY(GetOPCBit)
 //ORTTCPX_WRITE_IMPLEMENT_NOTIFY(SetParallelPollRegister)
 //ORTTCPX_WRITE_IMPLEMENT_NOTIFY(GetParallelPollRegister)
-//ORTTCPX_WRITE_IMPLEMENT_NOTIFY(QueryAndClearQER)
+
 //ORTTCPX_WRITE_IMPLEMENT_NOTIFY(ResetToRemoteDflt)
 //ORTTCPX_WRITE_IMPLEMENT_NOTIFY(SetSRE)
 //ORTTCPX_WRITE_IMPLEMENT_NOTIFY(GetSRE)
@@ -200,11 +204,14 @@ static struct ORTTCPX400DPCmdInfo gORTTCPXCmds[kNumTTCPX400Cmds] = {
     {@"Get Voltage Set Point", @"V%i?", YES, YES, NO, @"V%i %f"}, //kGetVoltageSet,
     {@"Get Current Set Point", @"I%i?", YES, YES, NO, @"I%i %f"}, //kGetCurrentSet,
     // These next two should be the following
+    
     //{@"Get Voltage Trip Point", @"OVP%i?", YES, YES, NO, @"VP%i %f"}, //kGetVoltageTripSet,
     //{@"Get Current Trip Point", @"OCP%i?", YES, YES, NO, @"CP%i %f"}, //kGetCurrentTripSet,
+    
     // But I have instead found them to be:
     {@"Get Voltage Trip Point", @"OVP%i?", YES, YES, NO, @"%f"}, //kGetVoltageTripSet,
     {@"Get Current Trip Point", @"OCP%i?", YES, YES, NO, @"%f"}, //kGetCurrentTripSet,
+    
     // This is a bit of a problem, because it means we have to specially handle these two cases.
     
     {@"Get Voltage Readback", @"V%iO?", YES, YES, NO, @"%fV"}, //kGetVoltageReadback,
@@ -227,7 +234,7 @@ static struct ORTTCPX400DPCmdInfo gORTTCPXCmds[kNumTTCPX400Cmds] = {
     {@"Request Lock", @"IFLOCK", YES, NO, NO, @"%f"}, //kRequestLock,
     {@"Check Lock", @"IFLOCK?", YES, NO, NO, @"%f"}, //kCheckLock,
     {@"Release Lock", @"IFUNLOCK", YES, NO, NO, @"%f"}, //kReleaseLock,
-    {@"Query and Clear LSR", @"LSR%i?", YES, YES, NO, @"%f"}, //kQueryClearLSR,
+    {@"Query and Clear LSR", @"LSR%i?", YES, YES, NO, @"%f"}, //kQueryAndClearLSR,
     {@"Set LSE", @"LSE%i %f", NO, YES, YES, @""}, //kSetEventStatusRegister,
     {@"Get LSE", @"LSE%i?", YES, YES, NO, @"%f"}, //kGetEventStatusRegister,
     {@"Save Setup", @"SAV%i %f", NO, YES, YES, @""}, //kSaveCurrentSetup,
@@ -238,9 +245,9 @@ static struct ORTTCPX400DPCmdInfo gORTTCPXCmds[kNumTTCPX400Cmds] = {
     {@"Get Ratio", @"RATIO?", YES, NO, NO, @"%f"}, //kGetRatio,
     {@"Clear Status", @"*CLS", NO, NO, NO, @""}, //kClearStatus,
     {@"Query and Clear EER", @"EER?", YES, NO, NO, @"%f"}, //kQueryAndClearEER,
-    {@"Set ESE", @"*ESE %f", NO, NO, YES, @""}, //kSetESE,
-    {@"Get ESE", @"*ESE?", YES, NO, NO, @"%f"}, //kGetESE,
-    {@"Get ESR", @"*ESR?", YES, NO, NO, @"%f"}, //kGetESR,
+    {@"Set ESE", @"*ESE %i", NO, NO, YES, @""}, //kSetESE,
+    {@"Get ESE", @"*ESE?", YES, NO, NO, @"%i"}, //kGetESE,
+    {@"Get and clear ESR", @"*ESR?", YES, NO, NO, @"%f"}, //kQueryAndClearESR,
     {@"Get IST Local", @"*IST?", YES, NO, NO, @"%f"}, //kGetISTLocalMsg,
     {@"Set Operation Complete Bit", @"*OPC", NO, NO, NO, @""}, //kSetOPCBit,
     {@"Get Operation Complete Bit", @"*OPC?", YES, NO, NO, @"%f"}, //kGetOPCBit,
@@ -273,6 +280,10 @@ ORTTCPX_READ_IMPLEMENT(GetVoltageStepSize, float)
 ORTTCPX_READ_IMPLEMENT(GetCurrentStepSize, float)
 ORTTCPX_WRITE_IMPLEMENT(SetOutput, int)
 ORTTCPX_READ_IMPLEMENT(GetOutputStatus, int)
+ORTTCPX_READ_IMPLEMENT(QueryAndClearEER, int)
+ORTTCPX_READ_IMPLEMENT(QueryAndClearQER, int)
+ORTTCPX_READ_IMPLEMENT(QueryAndClearLSR, int)
+ORTTCPX_READ_IMPLEMENT(QueryAndClearESR, int)
 
 //ORTTCPX_WRITE_IMPLEMENT(IncrementVoltage, float)
 //ORTTCPX_WRITE_IMPLEMENT(IncrementVoltageAndVerify, float)
@@ -286,7 +297,7 @@ ORTTCPX_READ_IMPLEMENT(GetOutputStatus, int)
 //ORTTCPX_WRITE_IMPLEMENT(RequestLock, float)
 //ORTTCPX_WRITE_IMPLEMENT(CheckLock, float)
 //ORTTCPX_WRITE_IMPLEMENT(ReleaseLock, float)
-//ORTTCPX_WRITE_IMPLEMENT(QueryClearLSR, float)
+
 //ORTTCPX_WRITE_IMPLEMENT(SetEventStatusRegister, float)
 //ORTTCPX_WRITE_IMPLEMENT(GetEventStatusRegister, float)
 //ORTTCPX_WRITE_IMPLEMENT(SaveCurrentSetup, float)
@@ -296,16 +307,16 @@ ORTTCPX_READ_IMPLEMENT(GetOutputStatus, int)
 //ORTTCPX_WRITE_IMPLEMENT(SetRatio, float)
 //ORTTCPX_WRITE_IMPLEMENT(GetRatio, float)
 //ORTTCPX_WRITE_IMPLEMENT(ClearStatus, float)
-//ORTTCPX_WRITE_IMPLEMENT(QueryAndClearEER, float)
+
 //ORTTCPX_WRITE_IMPLEMENT(SetESE, float)
 //ORTTCPX_WRITE_IMPLEMENT(GetESE, float)
-//ORTTCPX_WRITE_IMPLEMENT(GetESR, float)
+
 //ORTTCPX_WRITE_IMPLEMENT(GetISTLocalMsg, float)
 //ORTTCPX_WRITE_IMPLEMENT(SetOPCBit, float)
 //ORTTCPX_WRITE_IMPLEMENT(GetOPCBit, float)
 //ORTTCPX_WRITE_IMPLEMENT(SetParallelPollRegister, float)
 //ORTTCPX_WRITE_IMPLEMENT(GetParallelPollRegister, float)
-//ORTTCPX_WRITE_IMPLEMENT(QueryAndClearQER, float)
+
 //ORTTCPX_WRITE_IMPLEMENT(ResetToRemoteDflt, float)
 //ORTTCPX_WRITE_IMPLEMENT(SetSRE, float)
 //ORTTCPX_WRITE_IMPLEMENT(GetSRE, float)
