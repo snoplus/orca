@@ -73,12 +73,17 @@ for (id obj in anEnum) [obj x];                   \
 
 - (void) _runThread
 {
+    CALL_SELECTOR_ONALL_POWERSUPPLIES(setUserLock:YES withString:@"nEDM Coil Process");
+
     NSRunLoop* rl = [NSRunLoop currentRunLoop];
     // make sure we schedule the run
     [self performSelector:@selector(_runProcess) withObject:nil afterDelay:0.5];
     // perform the run loop
     while( isRunning && [rl runMode:NSDefaultRunLoopMode
                          beforeDate:[NSDate dateWithTimeIntervalSinceNow:1.0]]); // Cancel the run loop every second
+    
+    CALL_SELECTOR_ONALL_POWERSUPPLIES(setUserLock:NO withString:@"nEDM Coil Process");
+    
 }
 
 - (void) _runProcess
