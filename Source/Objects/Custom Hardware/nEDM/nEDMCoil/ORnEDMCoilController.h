@@ -66,6 +66,7 @@
     NSSize controlSize;
     NSSize powerSupplySize;
     NSSize adcSize;
+    NSString* startingDirectory;
 }
 
 - (id) init;
