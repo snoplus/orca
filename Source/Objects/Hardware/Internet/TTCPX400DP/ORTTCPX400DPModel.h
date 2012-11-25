@@ -128,8 +128,10 @@ ORTTCPX_GEN_DEFINE_VAR(writeTo, CMD, TYPE)
     NSMutableArray* writeQueue;
     NSCondition* readConditionLock;
     BOOL verbose;
-    BOOL waitingToFinishCommands;
+    BOOL isProcessingCommands;
     NSString* userLocked;
+    NSThread* readoutThread;
+    
     
     ORTTCPX_DEFINE_WRITE_VAR(SetVoltage, float)
     ORTTCPX_DEFINE_WRITE_VAR(SetVoltageAndVerify, float)
