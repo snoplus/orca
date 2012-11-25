@@ -142,6 +142,36 @@
     [self verbosityChanged:nil];
 }
 
+- (void) updateButtons
+{
+    BOOL locked = [gSecurity isLocked:ORTTCPX400DPModelLock] || [model userLocked];
+    [serialNumberBox setEnabled:(![model isConnected] && !locked)];
+    [ipAddressBox setEnabled:(![model isConnected] && !locked)];
+    
+#define LOCK_ALL_BUTTONS(opt)                       \
+    [writeVolt ## opt setEnabled:!locked];          \
+    [writeVoltTrip ## opt setEnabled:!locked];      \
+    [writeCurrent ## opt setEnabled:!locked];       \
+    [writeCurrentTrip ## opt setEnabled:!locked];   \
+    [outputOn ## opt setEnabled:!locked];
+    
+    LOCK_ALL_BUTTONS(One);
+    LOCK_ALL_BUTTONS(Two);
+    
+    [syncButton setEnabled:!locked];
+    [syncOutButton setEnabled:!locked];
+    [sendCommandButton setEnabled:!locked];
+    [readButton setEnabled:!locked];
+    
+    [connectButton setEnabled:!locked];
+    if ([model userLocked]) {
+        [lockText setStringValue:[NSString stringWithFormat:@"Locked by: %@",[model userLockedString]]];
+    } else {
+        [lockText setStringValue:@""];
+    }
+    
+}
+
 - (void) _buildPopUpButtons
 {
     if ([commandPopUp numberOfItems] == [model numberOfCommands]) return;
@@ -158,6 +188,7 @@
 {   
     BOOL locked = [gSecurity isLocked:ORTTCPX400DPModelLock];
     [lockButton setState: locked];
+    [self updateButtons];
 }
 
 - (void) ipChanged:(NSNotification*)aNote
@@ -181,13 +212,13 @@
     BOOL isConnected = [model isConnected];
     if (isConnected) {
         [connectButton setTitle:@"Disconnect"];
-        [serialNumberBox setEnabled:NO];
-        [ipAddressBox setEnabled:NO];
+
     } else {
         [connectButton setTitle:@"Connect"];
         [serialNumberBox setEnabled:YES];
         [ipAddressBox setEnabled:YES];
     }
+    
     [[self window] setTitle:[NSString stringWithFormat:@"TT CPX400DP  %@",[model serialNumber]]];
 }
 

@@ -30,7 +30,11 @@
     IBOutlet NSPopUpButton* outputNumberPopUp;
     IBOutlet NSTextField*   inputValueText;    
     IBOutlet NSTextField*   readBackText;  
-    IBOutlet NSButton*      connectButton; 
+    IBOutlet NSButton*      connectButton;
+    IBOutlet NSButton*      sendCommandButton;
+    IBOutlet NSButton*      syncOutButton;
+    IBOutlet NSButton*      readButton;
+    IBOutlet NSButton*      syncButton;
     
     IBOutlet NSTextField*   readBackVoltOne;
     IBOutlet NSTextField*   readBackVoltTripOne;    
@@ -64,6 +68,8 @@
 - (void) registerNotificationObservers;
 - (void) awakeFromNib;
 - (void) updateWindow;
+
+- (void) updateButtons;
 
 #pragma mark ***Interface Management
 - (void) lockChanged:(NSNotification*)aNote;
