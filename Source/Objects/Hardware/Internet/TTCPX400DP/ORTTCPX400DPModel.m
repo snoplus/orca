@@ -636,6 +636,81 @@ ORTTCPX_READ_IMPLEMENT(QueryAndClearESR, int)
     }
 }
 
+- (unsigned int) readBackValueLSR:(int)outputNum
+{
+    return [self readBackQueryAndClearLSRWithOutput:outputNum];
+}
+- (unsigned int) readBackValueEER
+{
+    return [self readBackQueryAndClearEERWithOutput:0];
+}
+- (unsigned int) readBackValueESR
+{
+    return [self readBackQueryAndClearESRWithOutput:0];
+}
+- (unsigned int) readBackValueQER
+{
+    return [self readBackQueryAndClearQERWithOutput:0];
+}
+
+- (NSArray*) explainStringsForLSRBits:(unsigned int)bits
+{
+    NSMutableArray *retArray = [NSMutableArray array];
+    if (bits & 0x1) [retArray addObject:@"Output at Voltage Limit (CV mode)"];
+    if (bits & 0x2) [retArray addObject:@"Output at Current Limit (CC mode)"];
+    if (bits & 0x4) [retArray addObject:@"Output over Voltage Trip"];
+    if (bits & 0x8) [retArray addObject:@"Output over Current Trip"];
+    if (bits & 0x10) [retArray addObject:@"Output over Power Limit"];
+    if (bits & 0x40) [retArray addObject:@"Trip, Requires panel reset and power cycle"];
+    if ([retArray count] == 0) [retArray addObject:@"No Errors"];
+    return retArray;
+}
+
+- (NSString*) explainStringForEERBits:(unsigned int)bits
+{
+    if (bits == 0) return @"No Errors";
+    if (bits < 10) return [NSString stringWithFormat:@"(%i) Internal Hardware Error",bits];
+    switch (bits) {
+        case 100: return @"(100) Range Error";
+        case 101: return @"(101) Corrupted Memory by Recall";
+        case 102: return @"(102) No data by Recall";
+        case 103: return @"(103) Second output not available";
+        case 104: return @"(104) Command not valid with output on";
+        case 200: return @"(200) Device read only";
+        default:  return @"(?) Unknown";
+    }
+}
+
+- (NSArray*) explainStringsForESRBits:(unsigned int)bits
+{
+    NSMutableArray *retArray = [NSMutableArray array];
+    if (bits & 0x4) {
+        [retArray addObject:@"(0x4) Query Error"];
+    }
+    if (bits & 0x8) {
+        [retArray addObject:@"(0x8) Verify Timeout Error"];
+    }
+    if (bits & 0x10) {
+        [retArray addObject:@"(0x10) Execution Error"];
+    }
+    if (bits & 0x20) {
+        [retArray addObject:@"(0x20) Command Error"];
+    }
+    if ([retArray count] == 0) [retArray addObject:@"No Errors"];
+    return retArray;
+}
+
+- (NSString*) explainStringForQERBits:(unsigned int)bits
+{
+    switch(bits) {
+        case 0: return @"No Error";
+        case 1: return @"Interrupted";
+        case 2: return @"Deadlock";
+        case 3: return @"Unterminated";
+        default: return @"Unknown QER Error";
+    }
+}
+
 #pragma mark ***Archival
 - (id) initWithCoder:(NSCoder*)decoder
 {

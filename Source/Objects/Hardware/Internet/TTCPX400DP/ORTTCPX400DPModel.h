@@ -229,6 +229,15 @@ ORTTCPX_GEN_DEFINE_VAR(writeTo, CMD, TYPE)
 - (BOOL) commandTakesOutputNumber:(ETTCPX400DPCmds)cmd;
 
 - (void) readback;
+- (unsigned int) readBackValueLSR:(int)outputNum;
+- (unsigned int) readBackValueEER;
+- (unsigned int) readBackValueESR;
+- (unsigned int) readBackValueQER;
+
+- (NSArray*) explainStringsForLSRBits:(unsigned int)bits;
+- (NSString*) explainStringForEERBits:(unsigned int)bits;
+- (NSArray*) explainStringsForESRBits:(unsigned int)bits;
+- (NSString*) explainStringForQERBits:(unsigned int)bits;
 
 ORTTCPX_DEFINE_WRITE_FUNCTIONS(SetVoltage, float)
 ORTTCPX_DEFINE_WRITE_FUNCTIONS(SetVoltageAndVerify, float)
