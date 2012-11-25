@@ -181,8 +181,15 @@
 
 - (void) runStatusChanged:(NSNotification *)aNote
 {
-    if ([model isRunning]) [startStopButton setTitle:@"Stop Process"];
-    else [startStopButton setTitle:@"Start Process"];
+    if ([model isRunning]) {
+        [startStopButton setTitle:@"Stop Process"];
+        [processIndicate startAnimation:self];
+    } else {
+        [startStopButton setTitle:@"Start Process"];
+        [processIndicate stopAnimation:self];
+    }
+    
+    [startStopButton setEnabled:YES];
 }
 
 - (void) viewChanged:(NSNotification*)aNotification
@@ -390,6 +397,7 @@
 
 - (void) runAction:(id)sender
 {
+    [sender setEnabled:NO];
     [model toggleRunState];
 }
 

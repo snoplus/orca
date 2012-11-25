@@ -35,7 +35,7 @@
     IBOutlet NSButton*      startStopButton;
     IBOutlet NSTextField*   runRateField;   
     IBOutlet NSPopUpButton* listOfAdcs;
-
+    IBOutlet NSProgressIndicator* processIndicate;
     
     IBOutlet NSPopUpButton* commandPopUp;
     IBOutlet NSPopUpButton* outputNumberPopUp;    

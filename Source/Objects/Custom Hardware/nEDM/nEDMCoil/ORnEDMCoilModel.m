@@ -84,6 +84,9 @@ for (id obj in anEnum) [obj x];                   \
     
     CALL_SELECTOR_ONALL_POWERSUPPLIES(setUserLock:NO withString:@"nEDM Coil Process");
     
+    // Finally notify that we've finished.
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORnEDMCoilPollingActivityChanged
+                                                        object:self];
 }
 
 - (void) _runProcess
@@ -283,9 +286,6 @@ for (id obj in anEnum) [obj x];                   \
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_runProcess) object:nil];
 	isRunning = NO;
-    [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORnEDMCoilPollingActivityChanged
-	 object: self]; 
     NSLog(@"Stopping nEDM Coil Compensation processing.\n");
 }
 
