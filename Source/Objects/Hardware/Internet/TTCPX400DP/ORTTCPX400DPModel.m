@@ -812,6 +812,51 @@ ORTTCPX_READ_IMPLEMENT(GetOutputStatus, int)
      object:self];
 }
 
+- (BOOL) userLocked
+{
+    return userLocked != nil;
+}
+
+- (NSString*) userLockedString
+{
+    if (userLocked == nil) return @"";
+    return userLocked;
+}
+
+- (BOOL) setUserLock:(BOOL)lock withString:(NSString *)lockString
+{
+    // Tries to set or unset lock, returns YES on success, NO on failure.
+    
+    // am I locked?
+    if (userLocked != nil) {
+        if ([userLocked isEqualToString:lockString]) {
+            // Means we are already locked, can only unlock
+            if (!lock) {
+                [userLocked release];
+                userLocked = nil;
+                [[NSNotificationCenter defaultCenter]
+                 postNotificationName:ORTTCPX400DPModelLock
+                 object:self];
+            }
+            return YES;
+        }
+        return NO;
+    }
+    if (!lock) {
+        // Trying to unlock without a already having a lock?
+        return YES;
+    }
+    
+    [lockString retain];
+    userLocked = lockString;
+    
+    [[NSNotificationCenter defaultCenter]
+     postNotificationName:ORTTCPX400DPModelLock
+     object:self];
+    
+    return YES;
+}
+
 - (void) readback
 {
     if (![self isConnected]) return;
@@ -835,6 +880,8 @@ ORTTCPX_READ_IMPLEMENT(GetOutputStatus, int)
 	[self setSerialNumber:[decoder decodeObjectForKey:@"serialNumber"]];    
     [self setPort:[decoder decodeIntForKey:@"portNumber"]];
     [self setVerbose:[decoder decodeIntForKey:@"verbose"]];
+    NSString* ul = [decoder decodeObjectForKey:@"kORTTCPX400DPUL"];
+    if (ul != nil) [self setUserLock:YES withString:ul];
     
 	[[self undoManager] enableUndoRegistration];
 	return self;
@@ -847,6 +894,7 @@ ORTTCPX_READ_IMPLEMENT(GetOutputStatus, int)
  	[encoder encodeObject:serialNumber	forKey:@"serialNumber"];    
     [encoder encodeInt:port forKey:@"portNumber"];
     [encoder encodeInt:verbose forKey:@"verbose"];
+    [encoder encodeObject:userLocked forKey:@"kORTTCPX400DPUL"];
 }
 
 

@@ -55,6 +55,8 @@
     IBOutlet NSButton*      outputOnOne;
     IBOutlet NSButton*      outputOnTwo;
     IBOutlet NSButton*      verbosity;
+    
+    IBOutlet NSTextField*   lockText;
 }
 
 #pragma mark •••Initialization

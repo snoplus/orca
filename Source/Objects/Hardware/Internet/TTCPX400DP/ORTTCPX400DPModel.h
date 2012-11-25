@@ -128,6 +128,7 @@ ORTTCPX_GEN_DEFINE_VAR(writeTo, CMD, TYPE)
     NSCondition* readConditionLock;
     BOOL verbose;
     BOOL waitingToFinishCommands;
+    NSString* userLocked;
     
     ORTTCPX_DEFINE_WRITE_VAR(SetVoltage, float)
     ORTTCPX_DEFINE_WRITE_VAR(SetVoltageAndVerify, float)
@@ -192,6 +193,10 @@ ORTTCPX_GEN_DEFINE_VAR(writeTo, CMD, TYPE)
 
 - (BOOL) verbose;
 - (void) setVerbose:(BOOL)aVerb;
+
+- (BOOL) userLocked;
+- (NSString*) userLockedString;
+- (BOOL) setUserLock:(BOOL)lock withString:(NSString*)lockString;
 
 - (void) setSerialNumber:(NSString*)aSerial;
 - (NSString*) serialNumber;
