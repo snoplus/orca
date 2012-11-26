@@ -967,6 +967,8 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(sendHeartbeat) object:nil];
 	if([self heartbeatSeconds]==0)return;
 	
+	[self setNextHeartbeatString];
+	
 	NSString* theContent = @"";
 	theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];						
 	theContent = [theContent stringByAppendingFormat:@"This heartbeat message was generated automatically by the Process\n"];
@@ -983,14 +985,12 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 	NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:[self cleanupAddresses:emailList],@"Address",theContent,@"Message",nil];
 	[self sendMail:userInfo];
 	
-	
 	if([self heartbeatSeconds]){
 		[self performSelector:@selector(sendHeartbeat) withObject:nil afterDelay:[self heartbeatSeconds]];
 	}
 	else {
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(sendHeartbeat) object:nil];
 	}
-	[self setNextHeartbeatString];
 	
 	for(id anObj in [self orcaObjects]){
 		if([anObj isKindOfClass:NSClassFromString(@"ORAdcModel")]){
