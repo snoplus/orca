@@ -971,7 +971,8 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 	
 	NSString* theContent = @"";
 	theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];						
-	theContent = [theContent stringByAppendingFormat:@"This heartbeat message was generated automatically by the Process\n"];
+	theContent = [theContent stringByAppendingFormat:@"This heartbeat message was generated automatically by the Process at:\n"];
+	theContent = [theContent stringByAppendingFormat:@"%@ (Local time of ORCA machine)\n",[[NSDate date]descriptionWithCalendarFormat:nil timeZone:nil locale:nil]];
 	theContent = [theContent stringByAppendingFormat:@"Unless changed in ORCA, it will be repeated at:\n"];
     theContent = [theContent stringByAppendingFormat:@"%@ (Local time of ORCA machine)\n%@ (UTC)\n",
                   [nextHeartbeat descriptionWithCalendarFormat:nil timeZone:nil locale:nil], [nextHeartbeat descriptionWithCalendarFormat:nil timeZone:[NSTimeZone timeZoneWithAbbreviation:@"UTC"] locale:nil]];
