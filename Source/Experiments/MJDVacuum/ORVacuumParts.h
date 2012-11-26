@@ -216,6 +216,7 @@ typedef struct  {
 #define kManualOnlyShowChanging	  1
 #define k2BitReadBack			  2
 #define k1BitReadBack			  3
+#define kSpareValve				  4
 
 @interface ORVacuumGateValve : ORVacuumPart
 {

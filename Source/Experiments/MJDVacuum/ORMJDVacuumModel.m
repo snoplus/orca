@@ -716,7 +716,6 @@ NSString* ORMJDVacuumModelConstraintsChanged		= @"ORMJDVacuumModelConstraintsCha
 		//region 0 pipes
 		{ kVacVPipe,  kRegionAboveTurbo, 50,			 260,				50,					450 }, 
 		{ kVacHPipe,  kRegionAboveTurbo, 50+kPipeRadius, 400,				180+kPipeRadius,	400 },
-		{ kVacVPipe,  kRegionAboveTurbo, 150,			 400-kPipeRadius,	150,				300 },
 		
 		//region 1 pipes
 		{ kVacCorner, kRegionRGA,		500,			  200,				kNA,				kNA },
@@ -764,7 +763,8 @@ NSString* ORMJDVacuumModelConstraintsChanged		= @"ORMJDVacuumModelConstraintsCha
 		//region 5 pipes
 		{ kVacCorner, kRegionDryN2,		150,			  30,				kNA,				kNA },
 		{ kVacCorner, kRegionDryN2,		700,			  30,				kNA,				kNA },
-		{ kVacVPipe,  kRegionDryN2,		150,			  30+kPipeRadius,	150,				300 },
+		{ kVacCorner, kRegionDryN2,		150,			  200,				kNA,				kNA },
+		{ kVacVPipe,  kRegionDryN2,		150,			  30+kPipeRadius,	150,				200-kPipeRadius },
 		{ kVacHPipe,  kRegionDryN2,		150+kPipeRadius, 30,				700-kPipeRadius,	30 },
 		{ kVacHPipe,  kRegionDryN2,		150+kPipeRadius, 200,				200,				200 },
 		{ kVacVPipe,  kRegionDryN2,		700,			  30+kPipeRadius,	700,				70 },
@@ -835,7 +835,7 @@ NSString* ORMJDVacuumModelConstraintsChanged		= @"ORMJDVacuumModelConstraintsCha
 		{kVacVGateV, 5,		@"Roughing",	k1BitReadBack,				530, 150,	kRegionDiaphramPump,kRegionCryoPump,		kControlBelow},   //V6. Control + read back
 		
 		{kVacVGateV, 6,		@"B1",			k1BitReadBack,				200, 200,	kRegionRGA,			kRegionDryN2,			kControlAbove},	//Control only
-		{kVacHGateV, 7,		@"B2",			k1BitReadBack,				150, 300,	kRegionAboveTurbo,	kRegionDryN2,			kControlRight},	//Control only
+		{kVacHGateV, 7,		@"Spare-Ignore",kSpareValve,				150, 300,	kSpareValve,		kSpareValve,			kControlNone},	//Spare. 
 		{kVacHGateV, 8,		@"Purge",		k1BitReadBack,				580, 70,	kRegionCryoPump,	kRegionDryN2,			kControlLeft},	//Control only 
 		{kVacHGateV, 9,		@"B4",			k1BitReadBack,				700, 70,	kRegionCryostat,	kRegionDryN2,			kControlLeft},	//Control only 
 		
