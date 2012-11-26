@@ -411,6 +411,7 @@
 			else  if([[aTableColumn identifier] isEqualToString:@"state"]){
 				if([gv controlType]      == kManualOnlyShowClosed) return @"Manual-Closed??";
 				else if([gv controlType] == kManualOnlyShowChanging) return @"Manual-Open??";
+				else if([gv controlType] == kSpareValve) return @"--";
 				else {
 					int currentValveState = [gv state];
 					if([gv controlType] == k1BitReadBack){
