@@ -809,7 +809,7 @@ NSString* ORMJDVacuumModelConstraintsChanged		= @"ORMJDVacuumModelConstraintsCha
 		{kVacPressureItem, kRegionDryN2,		99, 99,@"Assumed",	370, 50,	430, 80},
 	};	
 	
-#define kNumVacLines 11 
+#define kNumVacLines 10
 	VacuumLineStruct vacLines[kNumVacLines] = {
 		{kVacLine, 180,400,180,420},  //V1
 		{kVacLine, 350,400,350,420},  //V2
@@ -819,7 +819,6 @@ NSString* ORMJDVacuumModelConstraintsChanged		= @"ORMJDVacuumModelConstraintsCha
 		{kVacLine, 530,130,530,140},  //V6
 		
 		{kVacLine, 200,200,200,220},  //B1
-		{kVacLine, 150,300,170,300},  //B2
 		{kVacLine, 560,70,580,70},    //B3
 		{kVacLine, 680,70,700,70},    //B4
 		{kVacLine, 60,200,70,200},    //B5

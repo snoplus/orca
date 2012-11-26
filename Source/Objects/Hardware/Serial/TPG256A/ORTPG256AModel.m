@@ -289,7 +289,8 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 		
 		if(aValue == 0) aValue = 1.0E3;
 		
-		pressure[index] = aValue;
+		pressure[index] = aValue * 0.750061683; //convert the value from mBar to Torr.
+		
 		//get the time(UT!)
 		time_t	ut_Time;
 		time(&ut_Time);
