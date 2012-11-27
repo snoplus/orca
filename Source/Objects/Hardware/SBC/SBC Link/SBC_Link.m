@@ -1268,12 +1268,15 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 	}
 }
 
-- (void) readByteBlock:(unsigned char *) buffer
-			 atAddress:(unsigned int) aVmeAddress
-			 numToRead:(unsigned int) numberBytes
-			withAddMod:(unsigned short) anAddressModifier
-		 usingAddSpace:(unsigned short) anAddressSpace;
+
+- (void) _readBlock:(void *) buffer
+          atAddress:(unsigned int) aVmeAddress
+           numBytes:(unsigned int) numberBytes
+         withAddMod:(unsigned short) anAddressModifier
+      usingAddSpace:(unsigned short) anAddressSpace
+       withUnitSize:(unsigned short) unitSize
 {
+    assert(numberBytes % unitSize == 0);
 	@try {
 		[socketLock lock]; //begin critical section
 		SBC_Packet aPacket;
@@ -1285,7 +1288,7 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 		readBlockPtr->address			= aVmeAddress;
 		readBlockPtr->addressModifier	= anAddressModifier;
 		readBlockPtr->addressSpace		= anAddressSpace;
-		readBlockPtr->unitSize			= 1;
+		readBlockPtr->unitSize			= unitSize;
 		readBlockPtr->numItems			= numberBytes;
 		
 		//Do NOT call the combo send:receive method here... we have the locks already in place
@@ -1293,10 +1296,9 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 		[self read:socketfd buffer:&aPacket];  //read the response
 		
 		SBC_VmeReadBlockStruct* rp = (SBC_VmeReadBlockStruct*)aPacket.payload;
-		if(!rp->errorCode){		
-			int num = rp->numItems;
-			char* dp = (char*)(rp+1);
-			memcpy(buffer,dp,num);
+		if(!rp->errorCode){
+			void* dp = (void*)(rp+1);
+			memcpy(buffer,dp,numberBytes);
 		}
 		else [self throwError:rp->errorCode address:aVmeAddress];
 		[socketLock unlock]; //end critical section
@@ -1305,6 +1307,20 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 		[socketLock unlock]; //end critical section
 		[localException raise];
 	}
+}
+
+- (void) readByteBlock:(unsigned char *) buffer
+			 atAddress:(unsigned int) aVmeAddress
+			 numToRead:(unsigned int) numberBytes
+			withAddMod:(unsigned short) anAddressModifier
+		 usingAddSpace:(unsigned short) anAddressSpace;
+{
+    [self _readBlock:buffer
+           atAddress:aVmeAddress
+            numBytes:numberBytes
+          withAddMod:anAddressModifier
+       usingAddSpace:anAddressSpace
+        withUnitSize:1];
 }
 
 - (void) readWordBlock:(unsigned short *) buffer
@@ -1313,37 +1329,12 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 			withAddMod:(unsigned short) anAddressModifier
 		 usingAddSpace:(unsigned short) anAddressSpace
 {
-	@try {
-		[socketLock lock]; //begin critical section
-		SBC_Packet aPacket;
-		aPacket.cmdHeader.destination			= kSBC_Process;
-		aPacket.cmdHeader.cmdID					= kSBC_ReadBlock;
-		aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_VmeReadBlockStruct);
-		
-		SBC_VmeReadBlockStruct* readBlockPtr = (SBC_VmeReadBlockStruct*)aPacket.payload;
-		readBlockPtr->address			= aVmeAddress;
-		readBlockPtr->addressModifier	= anAddressModifier;
-		readBlockPtr->addressSpace		= anAddressSpace;
-		readBlockPtr->unitSize			= 2;
-		readBlockPtr->numItems			= numberWords;
-		
-		//Do NOT call the combo send:receive method here... we have the locks already in place
-		[self write:socketfd buffer:&aPacket]; //write the packet
-		[self read:socketfd buffer:&aPacket];  //read the response
-		
-		SBC_VmeReadBlockStruct* rp = (SBC_VmeReadBlockStruct*)aPacket.payload;
-		if(!rp->errorCode){		
-			int num = rp->numItems;
-			short* dp = (short*)(rp+1);
-			memcpy(buffer,dp,num*sizeof(short));
-		}
-		else [self throwError:rp->errorCode address:aVmeAddress];
-		[socketLock unlock]; //end critical section
-	}
-	@catch (NSException* localException) {
-		[socketLock unlock]; //end critical section
-		[localException raise];
-	}
+    [self _readBlock:buffer
+           atAddress:aVmeAddress
+            numBytes:numberWords*2
+          withAddMod:anAddressModifier
+       usingAddSpace:anAddressSpace
+        withUnitSize:2];
 }
 
 - (void) readLongBlock:(unsigned long *) buffer
@@ -1352,47 +1343,23 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 			withAddMod:(unsigned short) anAddressModifier
 		 usingAddSpace:(unsigned short) anAddressSpace
 {
-	@try {
-		[socketLock lock]; //begin critical section
-		SBC_Packet aPacket;
-		aPacket.cmdHeader.destination			= kSBC_Process;
-		aPacket.cmdHeader.cmdID					= kSBC_ReadBlock;
-		aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_VmeReadBlockStruct);
-		
-		SBC_VmeReadBlockStruct* readBlockPtr = (SBC_VmeReadBlockStruct*)aPacket.payload;
-		readBlockPtr->address			= aVmeAddress;
-		readBlockPtr->addressModifier	= anAddressModifier;
-		readBlockPtr->addressSpace		= anAddressSpace;
-		readBlockPtr->unitSize			= 4;
-		readBlockPtr->numItems			= numberLongs;
-		
-		//Do NOT call the combo send:receive method here... we have the locks already in place
-		[self write:socketfd buffer:&aPacket];	//write the packet
-		[self read:socketfd buffer:&aPacket];		//read the response
-		
-		SBC_VmeReadBlockStruct* rp = (SBC_VmeReadBlockStruct*)aPacket.payload;
-		if(!rp->errorCode){		
-			int num = rp->numItems;
-			
-			rp++;
-			memcpy(buffer,rp,num*sizeof(long));
-		}
-		else [self throwError:rp->errorCode address:aVmeAddress];
-		[socketLock unlock]; //end critical section
-	}
-	@catch (NSException* localException) {
-		[socketLock unlock]; //end critical section
-		[localException raise];
-	}
+    [self _readBlock:buffer
+           atAddress:aVmeAddress
+            numBytes:numberLongs*4
+          withAddMod:anAddressModifier
+       usingAddSpace:anAddressSpace
+        withUnitSize:4];
 }
 
 
-- (void) writeByteBlock:(unsigned char *) buffer
-			  atAddress:(unsigned int) aVmeAddress
-			 numToWrite:(unsigned int) numberBytes
-			 withAddMod:(unsigned short) anAddressModifier
-		  usingAddSpace:(unsigned short) anAddressSpace
+- (void) _writeBlock:(void *) buffer
+           atAddress:(unsigned int) aVmeAddress
+            numBytes:(unsigned int) numberBytes
+          withAddMod:(unsigned short) anAddressModifier
+       usingAddSpace:(unsigned short) anAddressSpace
+        withUnitSize:(unsigned short) unitSize
 {
+    assert(numberBytes % unitSize == 0);
 	@try {
 		[socketLock lock]; //begin critical section
 		
@@ -1405,10 +1372,10 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 		writeBlockPtr->address			= aVmeAddress;
 		writeBlockPtr->addressModifier	= anAddressModifier;
 		writeBlockPtr->addressSpace		= anAddressSpace;
-		writeBlockPtr->unitSize			= 1;
-		writeBlockPtr->numItems			= numberBytes;
-		char* bPtr = (char*)(writeBlockPtr+1); //point to the payload
-		memcpy(bPtr,buffer,numberBytes);
+		writeBlockPtr->unitSize			= unitSize;
+		writeBlockPtr->numItems			= numberBytes/unitSize;
+		writeBlockPtr++; //point to the payload
+		memcpy(writeBlockPtr,buffer,numberBytes);
 		
 		//Do NOT call the combo send:receive method here... we have the locks already in place
 		[self write:socketfd buffer:&aPacket];	//write the packet
@@ -1422,6 +1389,20 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 		[socketLock unlock]; //end critical section
 		[localException raise];
 	}
+
+}
+- (void) writeByteBlock:(unsigned char *) buffer
+			  atAddress:(unsigned int) aVmeAddress
+			 numToWrite:(unsigned int) numberBytes
+			 withAddMod:(unsigned short) anAddressModifier
+		  usingAddSpace:(unsigned short) anAddressSpace
+{
+    [self _writeBlock:buffer
+            atAddress:aVmeAddress
+             numBytes:numberBytes
+           withAddMod:anAddressModifier
+        usingAddSpace:anAddressSpace
+         withUnitSize:1];
 }
 
 
@@ -1431,35 +1412,12 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 			 withAddMod:(unsigned short) anAddressModifier
 		  usingAddSpace:(unsigned short) anAddressSpace
 {
-	@try {
-		[socketLock lock]; //begin critical section
-		
-		SBC_Packet aPacket;
-		aPacket.cmdHeader.destination			= kSBC_Process;
-		aPacket.cmdHeader.cmdID					= kSBC_WriteBlock;
-		aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_VmeWriteBlockStruct) + numberWords*sizeof(short);
-		
-		SBC_VmeWriteBlockStruct* writeBlockPtr = (SBC_VmeWriteBlockStruct*)aPacket.payload;
-		writeBlockPtr->address			= aVmeAddress;
-		writeBlockPtr->addressModifier	= anAddressModifier;
-		writeBlockPtr->addressSpace		= anAddressSpace;
-		writeBlockPtr->unitSize			= 2;
-		writeBlockPtr->numItems			= numberWords;
-		short* wPtr = (short*)(writeBlockPtr+1); //point to the payload
-		memcpy(wPtr,buffer,numberWords*sizeof(short));
-		
-		//Do NOT call the combo send:receive method here... we have the locks already in place
-		[self write:socketfd buffer:&aPacket];	//write the packet
-		[self read:socketfd buffer:&aPacket];		//read the response
-		
-		SBC_VmeReadBlockStruct* rp = (SBC_VmeReadBlockStruct*)aPacket.payload;
-		if(rp->errorCode)[self throwError:rp->errorCode address:aVmeAddress];
-		[socketLock unlock]; //end critical section
-	}
-	@catch (NSException* localException) {
-		[socketLock unlock]; //end critical section
-		[localException raise];
-	}
+    [self _writeBlock:buffer
+            atAddress:aVmeAddress
+             numBytes:numberWords*2
+           withAddMod:anAddressModifier
+        usingAddSpace:anAddressSpace
+         withUnitSize:2];
 }
 
 - (void) writeLongBlock:(unsigned long *) buffer
@@ -1468,35 +1426,12 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 			 withAddMod:(unsigned short) anAddressModifier
 		  usingAddSpace:(unsigned short) anAddressSpace
 {
-	@try {
-		[socketLock lock]; //begin critical section
-		
-		SBC_Packet aPacket;
-		aPacket.cmdHeader.destination			= kSBC_Process;
-		aPacket.cmdHeader.cmdID					= kSBC_WriteBlock;
-		aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_VmeWriteBlockStruct) + numberLongs*sizeof(long);
-		
-		SBC_VmeWriteBlockStruct* writeBlockPtr = (SBC_VmeWriteBlockStruct*)aPacket.payload;
-		writeBlockPtr->address			= aVmeAddress;
-		writeBlockPtr->addressModifier	= anAddressModifier;
-		writeBlockPtr->addressSpace		= anAddressSpace;
-		writeBlockPtr->unitSize			= 4;
-		writeBlockPtr->numItems			= numberLongs;
-		writeBlockPtr++;				//point to the payload
-		memcpy(writeBlockPtr,buffer,numberLongs*sizeof(long));
-		
-		//Do NOT call the combo send:receive method here... we have the locks already in place
-		[self write:socketfd buffer:&aPacket];	//write the packet
-		[self read:socketfd buffer:&aPacket];		//read the response
-		
-		SBC_VmeReadBlockStruct* rp = (SBC_VmeReadBlockStruct*)aPacket.payload;
-		if(rp->errorCode)[self throwError:rp->errorCode address:aVmeAddress];
-		[socketLock unlock]; //end critical section
-	}
-	@catch (NSException* localException) {
-		[socketLock unlock]; //end critical section
-		[localException raise];
-	}
+    [self _writeBlock:buffer
+            atAddress:aVmeAddress
+             numBytes:numberLongs*4
+           withAddMod:anAddressModifier
+        usingAddSpace:anAddressSpace
+         withUnitSize:4];
 }
 
 
