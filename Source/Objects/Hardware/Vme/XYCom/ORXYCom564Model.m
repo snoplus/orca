@@ -73,87 +73,6 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     {0x200,  @"A/D Scan"}
 };
 
-#pragma mark ***Private
-- (void) _addAverageValues:(NSArray *)vals
-{
-    if (vals == nil) return;
-    uint32_t* averageValPtr = nil;
-    if (chanADCAverageValsCache == nil) chanADCAverageValsCache = [[NSMutableData data] retain];
-    if ([chanADCAverageValsCache length]/sizeof(*averageValPtr) != [vals count]) {
-        
-        [chanADCAverageValsCache setLength:[vals count]*sizeof(*averageValPtr)];
-        averageValPtr = (uint32_t*)[chanADCAverageValsCache mutableBytes];
-        memset(averageValPtr, 0, [chanADCAverageValsCache length]); 
-        currentAverageState = 0;
-    }
-    averageValPtr = (uint32_t*)[chanADCAverageValsCache mutableBytes];
-    int i;
-    for (i=0;i<[vals count];i++) {
-        averageValPtr[i] += (uint16_t)[[vals objectAtIndex:i] intValue];
-    }
-    currentAverageState++;
-    if (currentAverageState == averageValueNumber) {
-        for (i=0;i<[vals count];i++) {
-            averageValPtr[i] /= averageValueNumber;
-        }        
-        [self _setAverageADCValues:averageValPtr withLength:[vals count]];
-        memset(averageValPtr, 0, [chanADCAverageValsCache length]);
-        currentAverageState = 0;
-    }
-    
-    
-}
-
-- (void) _setAverageADCValues:(uint32_t *)array withLength:(int)length
-{
-    if (chanADCAverageVals == nil) chanADCAverageVals = [[NSMutableArray array] retain];
-    [chanADCAverageVals removeAllObjects];
-    int i;
-    for (i=0;i<length;i++) {
-        [chanADCAverageVals addObject:[NSNumber numberWithInt:array[i]]];
-    }
-}
-
-- (void) _setChannelGains:(NSMutableArray *)gains
-{
-    [gains retain];
-    [channelGains release];
-    channelGains = gains;    
-    if (channelGains == nil) {
-        int i;
-        channelGains = [[NSMutableArray array] retain];
-        for (i=0;i<[self getNumberOfChannels];i++) {
-            [channelGains addObject:[NSNumber numberWithInt:kGainOne]];
-        }
-    }
-
-    [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORXYCom564ChannelGainChanged
-	 object:self];    
-    
-}
-
-- (void) _setChannelADCValues:(NSMutableArray *)vals withNotify:(BOOL)notify
-{
-    [vals retain];
-    [chanADCVals release];
-    chanADCVals = vals;
-    if (chanADCVals == nil) {
-        chanADCVals = [[NSMutableArray array] retain];
-        int i;
-        for (i=0; i<[self getNumberOfChannels]; i++) {
-            [chanADCVals addObject:[NSNumber numberWithInt:0]];
-        }
-    }
-    if (notify) {
-        [[NSNotificationCenter defaultCenter]
-         postNotificationName:ORXYCom564ADCValuesChanged
-         object:self];            
-    }
-
-    
-}
-
 #pragma mark ***Initialization
 - (id) init 
 {
@@ -628,68 +547,6 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 }
 
 #pragma mark •••Polling
-- (void) _stopPolling
-{
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_pollAllChannels) object:nil];
-	pollRunning = NO;
-    [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORXYCom564PollingActivityChanged
-	 object: self];    
-}
-
-- (void) _startPolling
-{
-	[self _setUpPolling:YES];
-}
-
-- (void) _setUpPolling:(BOOL)verbose
-{
-	
-	if(pollRunning && pollingState != 0)return;
-    if (isRunning) {
-        if(verbose) NSLog(@"XVME564,%d,%d, can not poll while it is in the run loop\n",[self crateNumber],[self slot]);
-        return;
-    }
-    
-    if(pollingState!=0){  
-        if ([self operationMode] != kAutoscanning) {
-            if(verbose) NSLog(@"XVME564,%d,%d, must be in autoscan mode to poll\n",[self crateNumber],[self slot]);
-            return;
-        }
-		pollRunning = YES;
-        if(verbose) NSLog(@"Polling XVME564,%d,%d  every %.0f seconds.\n",[self crateNumber],[self slot],pollingState);
-		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_pollAllChannels) object:nil];
-        [self performSelector:@selector(_pollAllChannels) withObject:self afterDelay:pollingState];
-        [self _pollAllChannels];
-    }
-    else {
-		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_pollAllChannels) object:nil];
-        if(verbose) NSLog(@"Not Polling XVME564,%d,%d\n",[self crateNumber],[self slot]);
-    }
-    [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORXYCom564PollingActivityChanged
-	 object: self];
-}
-
-- (void) _pollAllChannels
-{
-    @try { 
-        [self readAllAdcChannels]; 
-        if ([self shipRecords]) {
-            [self _shipRawValues:nil];
-        }
-    }
-	@catch(NSException* localException) { 
-		//catch this here to prevent it from falling thru, but nothing to do.
-	}
-	
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_pollAllChannels) object:nil];
-	if(pollingState!=0){
-		[self performSelector:@selector(_pollAllChannels) withObject:nil afterDelay:pollingState];
-	} else {
-        [self _stopPolling];
-    }
-}
 - (BOOL) isPolling
 {
     return pollRunning;
@@ -763,38 +620,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 {
 }
 
-- (void) _shipRawValues:(ORDataPacket*)dataPacket
-{
-    BOOL runInProgress = [gOrcaGlobals runInProgress];
-	
-	if(!runInProgress) return;
-    int channelsToRead =kXVME564_NumAutoScanChannelsPerGroup << ([self autoscanMode]);    
-    int headernumber = 4;
-    unsigned long data[headernumber+channelsToRead];
-    
-    data[1] = (([self crateNumber]&0x01e)<<21) |  (([self slot]&0x1f) << 16);
-    
-    //get the time(UT!)
-    struct timeval ut_time;
-    gettimeofday(&ut_time, NULL);
-    data[2] = ut_time.tv_sec;	//seconds since 1970
-    data[3] = ut_time.tv_usec;	//seconds since 1970    
-    int index = headernumber;
-    int i;
-    for(i=0;i<channelsToRead;i++){
-        uint16_t val = [self getAdcValueAtChannel:i];
-        data[index++] = (i&0xff)<<16 | (val & 0xffff);
-    }
-    data[0] = dataId | index;
-    
-    if(dataPacket != nil) {
-        [dataPacket addLongsToFrameBuffer:data length:index];
-    } else if(index>headernumber){
-        //the full record goes into the data stream via a notification
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-                                                            object:[NSData dataWithBytes:data length:sizeof(data[0])*index]];
-    }
-}
+
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder
@@ -834,3 +660,183 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 
 @end
 
+@implementation ORXYCom564Model (private)
+
+#pragma mark ***Private
+- (void) _addAverageValues:(NSArray *)vals
+{
+    if (vals == nil) return;
+    uint32_t* averageValPtr = nil;
+    if (chanADCAverageValsCache == nil) chanADCAverageValsCache = [[NSMutableData data] retain];
+    if ([chanADCAverageValsCache length]/sizeof(*averageValPtr) != [vals count]) {
+        
+        [chanADCAverageValsCache setLength:[vals count]*sizeof(*averageValPtr)];
+        averageValPtr = (uint32_t*)[chanADCAverageValsCache mutableBytes];
+        memset(averageValPtr, 0, [chanADCAverageValsCache length]);
+        currentAverageState = 0;
+    }
+    averageValPtr = (uint32_t*)[chanADCAverageValsCache mutableBytes];
+    int i;
+    for (i=0;i<[vals count];i++) {
+        averageValPtr[i] += (uint16_t)[[vals objectAtIndex:i] intValue];
+    }
+    currentAverageState++;
+    if (currentAverageState == averageValueNumber) {
+        for (i=0;i<[vals count];i++) {
+            averageValPtr[i] /= averageValueNumber;
+        }
+        [self _setAverageADCValues:averageValPtr withLength:[vals count]];
+        memset(averageValPtr, 0, [chanADCAverageValsCache length]);
+        currentAverageState = 0;
+    }
+    
+    
+}
+
+- (void) _setAverageADCValues:(uint32_t *)array withLength:(int)length
+{
+    if (chanADCAverageVals == nil) chanADCAverageVals = [[NSMutableArray array] retain];
+    [chanADCAverageVals removeAllObjects];
+    int i;
+    for (i=0;i<length;i++) {
+        [chanADCAverageVals addObject:[NSNumber numberWithInt:array[i]]];
+    }
+}
+
+- (void) _setChannelGains:(NSMutableArray *)gains
+{
+    [gains retain];
+    [channelGains release];
+    channelGains = gains;
+    if (channelGains == nil) {
+        int i;
+        channelGains = [[NSMutableArray array] retain];
+        for (i=0;i<[self getNumberOfChannels];i++) {
+            [channelGains addObject:[NSNumber numberWithInt:kGainOne]];
+        }
+    }
+    
+    [[NSNotificationCenter defaultCenter]
+	 postNotificationName:ORXYCom564ChannelGainChanged
+	 object:self];
+    
+}
+
+- (void) _setChannelADCValues:(NSMutableArray *)vals withNotify:(BOOL)notify
+{
+    [vals retain];
+    [chanADCVals release];
+    chanADCVals = vals;
+    if (chanADCVals == nil) {
+        chanADCVals = [[NSMutableArray array] retain];
+        int i;
+        for (i=0; i<[self getNumberOfChannels]; i++) {
+            [chanADCVals addObject:[NSNumber numberWithInt:0]];
+        }
+    }
+    if (notify) {
+        [[NSNotificationCenter defaultCenter]
+         postNotificationName:ORXYCom564ADCValuesChanged
+         object:self];
+    }
+    
+    
+}
+
+#pragma mark •••Polling
+- (void) _stopPolling
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_pollAllChannels) object:nil];
+	pollRunning = NO;
+    [[NSNotificationCenter defaultCenter]
+	 postNotificationName:ORXYCom564PollingActivityChanged
+	 object: self];
+}
+
+- (void) _startPolling
+{
+	[self _setUpPolling:YES];
+}
+
+- (void) _setUpPolling:(BOOL)verbose
+{
+	
+	if(pollRunning && pollingState != 0)return;
+    if (isRunning) {
+        if(verbose) NSLog(@"XVME564,%d,%d, can not poll while it is in the run loop\n",[self crateNumber],[self slot]);
+        return;
+    }
+    
+    if(pollingState!=0){
+        if ([self operationMode] != kAutoscanning) {
+            if(verbose) NSLog(@"XVME564,%d,%d, must be in autoscan mode to poll\n",[self crateNumber],[self slot]);
+            return;
+        }
+		pollRunning = YES;
+        if(verbose) NSLog(@"Polling XVME564,%d,%d  every %.0f seconds.\n",[self crateNumber],[self slot],pollingState);
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_pollAllChannels) object:nil];
+        [self performSelector:@selector(_pollAllChannels) withObject:self afterDelay:pollingState];
+        [self _pollAllChannels];
+    }
+    else {
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_pollAllChannels) object:nil];
+        if(verbose) NSLog(@"Not Polling XVME564,%d,%d\n",[self crateNumber],[self slot]);
+    }
+    [[NSNotificationCenter defaultCenter]
+	 postNotificationName:ORXYCom564PollingActivityChanged
+	 object: self];
+}
+
+- (void) _pollAllChannels
+{
+    @try {
+        [self readAllAdcChannels];
+        if ([self shipRecords]) {
+            [self _shipRawValues:nil];
+        }
+    }
+	@catch(NSException* localException) {
+		//catch this here to prevent it from falling thru, but nothing to do.
+	}
+	
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_pollAllChannels) object:nil];
+	if(pollingState!=0){
+		[self performSelector:@selector(_pollAllChannels) withObject:nil afterDelay:pollingState];
+	} else {
+        [self _stopPolling];
+    }
+}
+
+- (void) _shipRawValues:(ORDataPacket*)dataPacket
+{
+    BOOL runInProgress = [gOrcaGlobals runInProgress];
+	
+	if(!runInProgress) return;
+    int channelsToRead =kXVME564_NumAutoScanChannelsPerGroup << ([self autoscanMode]);
+    int headernumber = 4;
+    unsigned long data[headernumber+channelsToRead];
+    
+    data[1] = (([self crateNumber]&0x01e)<<21) |  (([self slot]&0x1f) << 16);
+    
+    //get the time(UT!)
+    struct timeval ut_time;
+    gettimeofday(&ut_time, NULL);
+    data[2] = ut_time.tv_sec;	//seconds since 1970
+    data[3] = ut_time.tv_usec;	//seconds since 1970
+    int index = headernumber;
+    int i;
+    for(i=0;i<channelsToRead;i++){
+        uint16_t val = [self getAdcValueAtChannel:i];
+        data[index++] = (i&0xff)<<16 | (val & 0xffff);
+    }
+    data[0] = dataId | index;
+    
+    if(dataPacket != nil) {
+        [dataPacket addLongsToFrameBuffer:data length:index];
+    } else if(index>headernumber){
+        //the full record goes into the data stream via a notification
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification
+                                                            object:[NSData dataWithBytes:data length:sizeof(data[0])*index]];
+    }
+}
+@end
