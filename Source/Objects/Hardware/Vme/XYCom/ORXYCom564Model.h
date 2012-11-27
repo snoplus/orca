@@ -81,6 +81,7 @@ typedef enum {
     BOOL                   pollRunning;
     BOOL                   isRunning;
     BOOL                   pollStopRequested;
+    NSTimeInterval         pollSpeed;    
     NSMutableArray*        channelGains;
     NSData*                chanADCVals;
     NSData*                chanADCAverageVals;
@@ -89,6 +90,7 @@ typedef enum {
     int                    averageValueNumber;
     int                    currentAverageState;
     id                     adapter;
+
 }
 #pragma mark ***Initialization
 - (id) init;
@@ -120,6 +122,7 @@ typedef enum {
 - (uint16_t) getAdcValueAtChannel:(int)chan;
 - (uint16_t) getAdcAverageValueAtChannel:(int)chan;
 - (BOOL) isPolling;
+- (NSTimeInterval) pollSpeed;
 
 - (void) initBoard;
 - (void) report;
@@ -168,3 +171,4 @@ extern NSString* ORXYCom564PollingActivityChanged;
 extern NSString* ORXYCom564ADCValuesChanged;
 extern NSString* ORXYCom564ShipRecordsChanged;
 extern NSString* ORXYCom564AverageValueNumberHasChanged;
+extern NSString* ORXYCom564PollingSpeedHasChanged;

@@ -33,6 +33,7 @@ NSString* ORXYCom564ADCValuesChanged        = @"ORXYCom564ADCValuesChanged";
 NSString* ORXYCom564PollingActivityChanged  = @"ORXYCom564PollingActivityChanged"; 
 NSString* ORXYCom564ShipRecordsChanged      = @"ORXYCom564ShipRecordsChanged";
 NSString* ORXYCom564AverageValueNumberHasChanged = @"ORXYCom564AverageValueNumberHasChanged";
+NSString* ORXYCom564PollingSpeedHasChanged = @"ORXYCom564PollingSpeedHasChanged";
 
 @interface ORXYCom564Model (private)
 - (void) _setChannelGains:(NSMutableArray*)gains;
@@ -47,6 +48,7 @@ NSString* ORXYCom564AverageValueNumberHasChanged = @"ORXYCom564AverageValueNumbe
 - (void) _pollingThread;
 - (void) _createArrays;
 - (void) _readAllAdcChannels;
+- (void) _setPollingSpeed:(NSTimeInterval)aTime;
 @end
 
 @implementation ORXYCom564Model
@@ -272,6 +274,11 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 - (int) averageValueNumber
 {
     return averageValueNumber;
+}
+
+- (NSTimeInterval) pollSpeed
+{
+    return pollSpeed;
 }
 
 - (void) setAverageValueNumber:(int)aValue
@@ -741,11 +748,19 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     adapter = [self adapter];
 
     // perform the run loop
+    int tryTime = 0;
+    NSDate* now = [NSDate date];
     @try{
         [self initBoard];
         while(!pollStopRequested){
             @autoreleasepool {
                 [self _pollAllChannels];
+	            tryTime += 1;
+    	        if (tryTime == 1000) {
+        	        [self _setPollingSpeed:[now timeIntervalSinceDate:[NSDate date]]/1000];
+            	    now = [NSDate date];
+                	tryTime = 0;
+            	}
             }
         }
     } @catch (NSException* e) {
@@ -829,4 +844,11 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     
 }
 
+- (void) _setPollingSpeed:(NSTimeInterval)aTime
+{
+    if (pollSpeed == aTime) return;
+    pollSpeed = aTime;
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORXYCom564PollingSpeedHasChanged
+                                                        object:self];
+}
 @end
