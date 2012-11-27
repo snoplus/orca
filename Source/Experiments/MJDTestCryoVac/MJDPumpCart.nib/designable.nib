@@ -11,7 +11,7 @@
 			<string key="NS.object.0">851</string>
 		</object>
 		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs">
-			<integer value="137"/>
+			<integer value="135"/>
 		</array>
 		<array key="IBDocument.PluginDependencies">
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -768,14 +768,14 @@
 											<object class="NSTextField" id="600156184">
 												<reference key="NSNextResponder" ref="1002106552"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{303, 294}, {130, 14}}</string>
+												<string key="NSFrame">{{303, 294}, {137, 14}}</string>
 												<reference key="NSSuperview" ref="1002106552"/>
 												<int key="NSViewLayerContentsRedrawPolicy">2</int>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSTextFieldCell" key="NSCell" id="1000967490">
 													<int key="NSCellFlags">68288064</int>
 													<int key="NSCellFlags2">272761856</int>
-													<string key="NSContents">Chan 3 -&gt; TS 1 PKR G1</string>
+													<string key="NSContents">Chan 3 -&gt; STC 1 PKR G1</string>
 													<reference key="NSSupport" ref="26"/>
 													<reference key="NSControlView" ref="600156184"/>
 													<reference key="NSBackgroundColor" ref="276406613"/>
@@ -785,14 +785,14 @@
 											<object class="NSTextField" id="845037913">
 												<reference key="NSNextResponder" ref="1002106552"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{303, 277}, {130, 14}}</string>
+												<string key="NSFrame">{{303, 277}, {137, 14}}</string>
 												<reference key="NSSuperview" ref="1002106552"/>
 												<int key="NSViewLayerContentsRedrawPolicy">2</int>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSTextFieldCell" key="NSCell" id="694032480">
 													<int key="NSCellFlags">68288064</int>
 													<int key="NSCellFlags2">272761856</int>
-													<string key="NSContents">Chan 4 -&gt; TS 2 PKR G1</string>
+													<string key="NSContents">Chan 4 -&gt; STC 2 PKR G1</string>
 													<reference key="NSSupport" ref="26"/>
 													<reference key="NSControlView" ref="845037913"/>
 													<reference key="NSBackgroundColor" ref="276406613"/>
@@ -809,7 +809,7 @@
 												<object class="NSTextFieldCell" key="NSCell" id="764300749">
 													<int key="NSCellFlags">68288064</int>
 													<int key="NSCellFlags2">272761856</int>
-													<string key="NSContents">Chan 5 -&gt; TS 3 PKR G1</string>
+													<string key="NSContents">Chan 5 -&gt; STC 3 PKR G1</string>
 													<reference key="NSSupport" ref="26"/>
 													<reference key="NSControlView" ref="333480881"/>
 													<reference key="NSBackgroundColor" ref="276406613"/>
@@ -819,14 +819,14 @@
 											<object class="NSTextField" id="870004645">
 												<reference key="NSNextResponder" ref="1002106552"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{299, 430}, {130, 14}}</string>
+												<string key="NSFrame">{{299, 430}, {137, 14}}</string>
 												<reference key="NSSuperview" ref="1002106552"/>
 												<int key="NSViewLayerContentsRedrawPolicy">2</int>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSTextFieldCell" key="NSCell" id="326673994">
 													<int key="NSCellFlags">68288064</int>
 													<int key="NSCellFlags2">272761856</int>
-													<string key="NSContents">Chan 0 -&gt; TS 4 PKR G1</string>
+													<string key="NSContents">Chan 0 -&gt; STC 4 PKR G1</string>
 													<reference key="NSSupport" ref="26"/>
 													<reference key="NSControlView" ref="870004645"/>
 													<reference key="NSBackgroundColor" ref="276406613"/>
@@ -836,14 +836,14 @@
 											<object class="NSTextField" id="537334520">
 												<reference key="NSNextResponder" ref="1002106552"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{299, 413}, {130, 14}}</string>
+												<string key="NSFrame">{{299, 413}, {137, 14}}</string>
 												<reference key="NSSuperview" ref="1002106552"/>
 												<int key="NSViewLayerContentsRedrawPolicy">2</int>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSTextFieldCell" key="NSCell" id="563764388">
 													<int key="NSCellFlags">68288064</int>
 													<int key="NSCellFlags2">272761856</int>
-													<string key="NSContents">Chan 1 -&gt; TS 5 PKR G1</string>
+													<string key="NSContents">Chan 1 -&gt; STC 5 PKR G1</string>
 													<reference key="NSSupport" ref="26"/>
 													<reference key="NSControlView" ref="537334520"/>
 													<reference key="NSBackgroundColor" ref="276406613"/>
@@ -860,7 +860,7 @@
 												<object class="NSTextFieldCell" key="NSCell" id="629026425">
 													<int key="NSCellFlags">68288064</int>
 													<int key="NSCellFlags2">272761856</int>
-													<string key="NSContents">Chan 2 -&gt; TS 6 PKR G1</string>
+													<string key="NSContents">Chan 2 -&gt; STC 6 PKR G1</string>
 													<reference key="NSSupport" ref="26"/>
 													<reference key="NSControlView" ref="857839862"/>
 													<reference key="NSBackgroundColor" ref="276406613"/>
@@ -877,7 +877,7 @@
 												<object class="NSTextFieldCell" key="NSCell" id="469956007">
 													<int key="NSCellFlags">68288064</int>
 													<int key="NSCellFlags2">272761856</int>
-													<string key="NSContents">Chan 3 -&gt; TS 7 PKR G1</string>
+													<string key="NSContents">Chan 3 -&gt; STC 7 PKR G1</string>
 													<reference key="NSSupport" ref="26"/>
 													<reference key="NSControlView" ref="483968326"/>
 													<reference key="NSBackgroundColor" ref="276406613"/>
@@ -2386,6 +2386,13 @@
 					<string key="className">NSObject</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Objects/Misc Objects/ScriptableDialog/ScriptableView.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">Source/Objects/Misc Objects/SerialPorts/ORSerialPortAdditions.h</string>
 					</object>
 				</object>
@@ -2531,6 +2538,13 @@
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">Source/Objects/ProcessLogic/ProcessElements/Outputs/ProcessHistory/ORProcessHistoryModel.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Objects/ProcessLogic/ProcessElements/analog/AdcProcessor/ORAdcProcessorModel.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
