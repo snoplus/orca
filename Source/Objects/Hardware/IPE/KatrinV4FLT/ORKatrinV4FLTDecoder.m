@@ -87,8 +87,6 @@
 	unsigned char fifoFlags = ShiftAndExtract(ptr[5],20,0xf);
 	int boxcarLen = ShiftAndExtract(ptr[1],4,0x3);
 	int filterShapingLength = ShiftAndExtract(ptr[1],0,0xf);
-	//
-	NSLog(@"Called %@::%@: boxcarLen %i,filterShapingLength  %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),boxcarLen,filterShapingLength);//TODO: DEBUG -tb-
 	unsigned short filterDiv;
 	unsigned long histoLen;
 	histoLen = 4096;//=max. ADC value for 12 bit ADC
@@ -147,6 +145,22 @@
 				getFifoFlagsFromDecodeStage = [obj setFromDecodeStage:chan fifoFlags:fifoFlags];
 				fifoFlags = oldFifoFlags[chan];
 			}
+			#if 0
+			//TESTING TIMESTAMPS --------------
+				int32_t diff, seconds		=     ptr[2];
+				static int32_t lastseconds		=  -1;
+				if(lastseconds==-1){
+				    NSLog(@"Sec is %i\n",seconds);
+					lastseconds=0;
+				}
+				diff = seconds-lastseconds;
+			//NSLog(@"WARNING: Sec is %i, lastsec %i\n",seconds,lastseconds);
+				if(diff<0 || diff>2){
+				    NSLog(@"WARNING: Sec is %i, lastsec %i\n",seconds,lastseconds);
+				}
+
+				lastseconds = seconds;
+            #endif
 	    }	
     }
 	
