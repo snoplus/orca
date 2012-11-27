@@ -80,6 +80,20 @@ NSString* ORSBC_LinkJobStatus				= @"ORSBC_LinkJobStatus";
 NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 
+@interface SBC_Link (private)
+- (SBC_Packet*) _localSbcPacket;
+@end
+
+@implementation SBC_Link (private)
+
+- (SBC_Packet*) _localSbcPacket
+{
+    // returns a zeroed SBC packet to be used in *this* function.
+    return (SBC_Packet*) [[NSMutableData dataWithLength:sizeof(SBC_Packet)] bytes];
+}
+
+@end
+
 @implementation SBC_Link
 - (id)   initWithDelegate:(ORCard*)aDelegate
 {
@@ -843,14 +857,14 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 
 - (void) getRunInfoBlock
 {
-	SBC_Packet aPacket;
-	aPacket.cmdHeader.destination			= kSBC_Process;
-	aPacket.cmdHeader.cmdID					= kSBC_RunInfoRequest;
-	aPacket.cmdHeader.numberBytesinPayload	= 0;
+	SBC_Packet* aPacket = [self _localSbcPacket];
+	aPacket->cmdHeader.destination			= kSBC_Process;
+	aPacket->cmdHeader.cmdID			= kSBC_RunInfoRequest;
+	aPacket->cmdHeader.numberBytesinPayload	= 0;
 	
-	[self send:&aPacket receive:&aPacket];
+	[self send:aPacket receive:aPacket];
 	
-	memcpy(&runInfo,aPacket.payload,sizeof(SBC_info_struct));
+	memcpy(&runInfo,aPacket->payload,sizeof(SBC_info_struct));
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkRunInfoChanged object:self];
 }
@@ -1176,21 +1190,21 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 
 - (void) sendCommand:(long)aCmd withOptions:(SBC_CmdOptionStruct*)optionBlock expectResponse:(BOOL)askForResponse
 {
-	SBC_Packet aPacket;
+	SBC_Packet* aPacket = [self _localSbcPacket];
 	
-	aPacket.cmdHeader.destination			= kSBC_Process;
-	aPacket.cmdHeader.cmdID					= aCmd;
-	aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_CmdOptionStruct);
-	memcpy(aPacket.payload,optionBlock,sizeof(SBC_CmdOptionStruct));
+	aPacket->cmdHeader.destination		= kSBC_Process;
+	aPacket->cmdHeader.cmdID			= aCmd;
+	aPacket->cmdHeader.numberBytesinPayload	= sizeof(SBC_CmdOptionStruct);
+	memcpy(aPacket->payload,optionBlock,sizeof(SBC_CmdOptionStruct));
 	
 	@try {
 		[socketLock lock]; //begin critical section
-		[self write:socketfd buffer:&aPacket];
+		[self write:socketfd buffer:aPacket];
 		
 		if(askForResponse){
 			//get the response....
-			[self read:socketfd buffer:&aPacket];
-			SBC_CmdOptionStruct* optionPtr = (SBC_CmdOptionStruct*)aPacket.payload;
+			[self read:socketfd buffer:aPacket];
+			SBC_CmdOptionStruct* optionPtr = (SBC_CmdOptionStruct*)aPacket->payload;
 			int i;
 			for(i=0;i<kMaxOptions;i++){
 				optionBlock->option[i] = optionPtr->option[i];
@@ -1212,18 +1226,18 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 {
 	@try {
 		[socketLock lock]; //begin critical section
-		SBC_Packet aPacket;
-		aPacket.cmdHeader.destination			= kSBC_Process;
-		aPacket.cmdHeader.cmdID					= kSBC_WriteBlock;
-		aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_WriteBlockStruct) + numberLongs*sizeof(long);
+		SBC_Packet* aPacket = [self _localSbcPacket];
+		aPacket->cmdHeader.destination			= kSBC_Process;
+		aPacket->cmdHeader.cmdID				= kSBC_WriteBlock;
+		aPacket->cmdHeader.numberBytesinPayload	= sizeof(SBC_WriteBlockStruct) + numberLongs*sizeof(long);
 		
-		SBC_WriteBlockStruct* writeBlockPtr = (SBC_WriteBlockStruct*)aPacket.payload;
+		SBC_WriteBlockStruct* writeBlockPtr = (SBC_WriteBlockStruct*)aPacket->payload;
 		writeBlockPtr->address		= anAddress;
 		writeBlockPtr->numLongs		= numberLongs;
 		writeBlockPtr++;
 		memcpy(writeBlockPtr,buffer,numberLongs*sizeof(long));
 		
-		[self write:socketfd buffer:&aPacket];
+		[self write:socketfd buffer:aPacket];
 		[socketLock unlock]; //end critical section
 	}
 	@catch (NSException* localException) {
@@ -1239,20 +1253,20 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 {
 	@try {
 		[socketLock lock]; //begin critical section
-		SBC_Packet aPacket;
-		aPacket.cmdHeader.destination			= kSBC_Process;
-		aPacket.cmdHeader.cmdID					= kSBC_ReadBlock;
-		aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_ReadBlockStruct);
+		SBC_Packet* aPacket = [self _localSbcPacket];
+		aPacket->cmdHeader.destination			= kSBC_Process;
+		aPacket->cmdHeader.cmdID				= kSBC_ReadBlock;
+		aPacket->cmdHeader.numberBytesinPayload	= sizeof(SBC_ReadBlockStruct);
 		
-		SBC_ReadBlockStruct* readBlockPtr = (SBC_ReadBlockStruct*)aPacket.payload;
+		SBC_ReadBlockStruct* readBlockPtr = (SBC_ReadBlockStruct*)aPacket->payload;
 		readBlockPtr->address		= anAddress;
 		readBlockPtr->numLongs		= numberLongs;
 		
 		//Do NOT call the combo send:receive method here... we have the locks already in place
-		[self write:socketfd buffer:&aPacket]; //write the packet
-		[self read:socketfd buffer:&aPacket]; //read the response
+		[self write:socketfd buffer:aPacket]; //write the packet
+		[self read:socketfd buffer:aPacket]; //read the response
 		
-		SBC_ReadBlockStruct* rp = (SBC_ReadBlockStruct*)aPacket.payload;
+		SBC_ReadBlockStruct* rp = (SBC_ReadBlockStruct*)aPacket->payload;
 		int numLongs = rp->numLongs;
 		rp++;
 		long* dp = (long*)rp;
@@ -1279,12 +1293,12 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
     assert(numberBytes % unitSize == 0);
 	@try {
 		[socketLock lock]; //begin critical section
-		SBC_Packet aPacket;
-		aPacket.cmdHeader.destination			= kSBC_Process;
-		aPacket.cmdHeader.cmdID					= kSBC_ReadBlock;
-		aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_VmeReadBlockStruct);
+		SBC_Packet* aPacket = [self _localSbcPacket];
+		aPacket->cmdHeader.destination			= kSBC_Process;
+		aPacket->cmdHeader.cmdID				= kSBC_ReadBlock;
+		aPacket->cmdHeader.numberBytesinPayload	= sizeof(SBC_VmeReadBlockStruct);
 		
-		SBC_VmeReadBlockStruct* readBlockPtr = (SBC_VmeReadBlockStruct*)aPacket.payload;
+		SBC_VmeReadBlockStruct* readBlockPtr = (SBC_VmeReadBlockStruct*)aPacket->payload;
 		readBlockPtr->address			= aVmeAddress;
 		readBlockPtr->addressModifier	= anAddressModifier;
 		readBlockPtr->addressSpace		= anAddressSpace;
@@ -1292,10 +1306,10 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 		readBlockPtr->numItems			= numberBytes;
 		
 		//Do NOT call the combo send:receive method here... we have the locks already in place
-		[self write:socketfd buffer:&aPacket]; //write the packet
-		[self read:socketfd buffer:&aPacket];  //read the response
+		[self write:socketfd buffer:aPacket]; //write the packet
+		[self read:socketfd buffer:aPacket];  //read the response
 		
-		SBC_VmeReadBlockStruct* rp = (SBC_VmeReadBlockStruct*)aPacket.payload;
+		SBC_VmeReadBlockStruct* rp = (SBC_VmeReadBlockStruct*)aPacket->payload;
 		if(!rp->errorCode){
 			void* dp = (void*)(rp+1);
 			memcpy(buffer,dp,numberBytes);
@@ -1363,12 +1377,12 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 	@try {
 		[socketLock lock]; //begin critical section
 		
-		SBC_Packet aPacket;
-		aPacket.cmdHeader.destination			= kSBC_Process;
-		aPacket.cmdHeader.cmdID					= kSBC_WriteBlock;
-		aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_VmeWriteBlockStruct) + numberBytes;
+		SBC_Packet* aPacket = [self _localSbcPacket];
+		aPacket->cmdHeader.destination			= kSBC_Process;
+		aPacket->cmdHeader.cmdID				= kSBC_WriteBlock;
+		aPacket->cmdHeader.numberBytesinPayload	= sizeof(SBC_VmeWriteBlockStruct) + numberBytes;
 		
-		SBC_VmeWriteBlockStruct* writeBlockPtr = (SBC_VmeWriteBlockStruct*)aPacket.payload;
+		SBC_VmeWriteBlockStruct* writeBlockPtr = (SBC_VmeWriteBlockStruct*)aPacket->payload;
 		writeBlockPtr->address			= aVmeAddress;
 		writeBlockPtr->addressModifier	= anAddressModifier;
 		writeBlockPtr->addressSpace		= anAddressSpace;
@@ -1378,10 +1392,10 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 		memcpy(writeBlockPtr,buffer,numberBytes);
 		
 		//Do NOT call the combo send:receive method here... we have the locks already in place
-		[self write:socketfd buffer:&aPacket];	//write the packet
-		[self read:socketfd buffer:&aPacket];		//read the response
+		[self write:socketfd buffer:aPacket];	//write the packet
+		[self read:socketfd buffer:aPacket];		//read the response
 		
-		SBC_VmeReadBlockStruct* rp = (SBC_VmeReadBlockStruct*)aPacket.payload;
+		SBC_VmeReadBlockStruct* rp = (SBC_VmeReadBlockStruct*)aPacket->payload;
 		if(rp->errorCode)[self throwError:rp->errorCode address:aVmeAddress];
 		[socketLock unlock]; //end critical section
 	}
@@ -1438,9 +1452,8 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 //temp discrete ops
 - (void) executeCommandList:(ORCommandList*)aList
 {
-    NSData* tmpData = [[NSMutableData dataWithLength:sizeof(SBC_Packet)] retain];
 	@try {
-        SBC_Packet* blockPacket = (SBC_Packet*)[tmpData bytes];        
+        SBC_Packet* blockPacket = [self _localSbcPacket];
         [aList SBCPacket:blockPacket];
 		
 		[socketLock lock]; //begin critical section
@@ -1456,9 +1469,6 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 		[socketLock unlock]; //end critical section
 		[localException raise];
 	}
-    @finally {
-        [tmpData release];
-    }
 }
 
 
@@ -1565,14 +1575,14 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 	//will result in larger sized buffers from the SBC.
 	if(++throttleCount>throttle){
 		throttleCount = 0;
-		SBC_Packet aPacket;
-        aPacket.cmdHeader.destination	= kSBC_Process;
-        aPacket.cmdHeader.cmdID			= kSBC_CBRead;
-        aPacket.cmdHeader.numberBytesinPayload = 0;
-		[self send:&aPacket receive:&aPacket];
+		SBC_Packet* aPacket = [self _localSbcPacket];
+        aPacket->cmdHeader.destination	= kSBC_Process;
+        aPacket->cmdHeader.cmdID			= kSBC_CBRead;
+        aPacket->cmdHeader.numberBytesinPayload = 0;
+		[self send:aPacket receive:aPacket];
 		
-		unsigned long* rp = (unsigned long*)aPacket.payload;
-		long numLongs = aPacket.cmdHeader.numberBytesinPayload/sizeof(long);
+		unsigned long* rp = (unsigned long*)aPacket->payload;
+		long numLongs = aPacket->cmdHeader.numberBytesinPayload/sizeof(long);
 		if(numLongs>0){
 			[aDataPacket addLongsToFrameBuffer:rp length:numLongs];
 		}
@@ -1623,14 +1633,14 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 
 - (void) load_HW_Config:(SBC_crate_config*) aConfig
 {	
-	SBC_Packet aPacket;
+	SBC_Packet* aPacket = [self _localSbcPacket];
 	
-	aPacket.cmdHeader.destination			= kSBC_Process;
-	aPacket.cmdHeader.cmdID					= kSBC_LoadConfig;
-	aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_crate_config);
-	memcpy(aPacket.payload,aConfig,sizeof(SBC_crate_config));
+	aPacket->cmdHeader.destination			= kSBC_Process;
+	aPacket->cmdHeader.cmdID					= kSBC_LoadConfig;
+	aPacket->cmdHeader.numberBytesinPayload	= sizeof(SBC_crate_config);
+	memcpy(aPacket->payload,aConfig,sizeof(SBC_crate_config));
 	
-	[self write:socketfd buffer:&aPacket];	
+	[self write:socketfd buffer:aPacket];	
 }
 
 #pragma mark ***DataSource
@@ -2047,18 +2057,18 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 - (void) watchIrqSocket
 {
 	irqThreadRunning = YES;
-	SBC_Packet aPacket;
+	SBC_Packet* aPacket = [self _localSbcPacket];
 	lamsToAck    = [[ORSafeQueue alloc] init];
 	while([self isConnected]){
 		if([self dataAvailable:irqfd]){
-			[self readSocket:irqfd buffer:&aPacket]; //read the irq
-			int irqNumber = aPacket.payload[0];
+			[self readSocket:irqfd buffer:aPacket]; //read the irq
+			int irqNumber = aPacket->payload[0];
 			int i;
 			for(i=0;i<[[self orcaObjects] count]; i++){
 				ORSBC_LAMModel* lamObj = [[self orcaObjects] objectAtIndex:i];
 				if([lamObj slot] == irqNumber){
 					if(![lamObj isBusy]){
-						[lamObj processPacket:&aPacket];
+						[lamObj processPacket:aPacket];
 						[lamsToAck enqueue:lamObj];
 					}
 					break;
@@ -2069,7 +2079,7 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 		//ack any lams that have been processed on this side
 		int n = [lamsToAck count];
 		if(n){
-			SBC_LamAckStruct *p = (SBC_LamAckStruct*)aPacket.payload;
+			SBC_LamAckStruct *p = (SBC_LamAckStruct*)aPacket->payload;
 			char* lamPtr = (char*)(p+1);
 			ORSBC_LAMModel* lamObj = nil;
 			do {
@@ -2080,7 +2090,7 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 				}
 			}while(lamObj);
 			//send off the ack packet
-			[self write:irqfd buffer:&aPacket];
+			[self write:irqfd buffer:aPacket];
 		}
 		else if(stopWatchingIRQ) break;
 	}
@@ -2407,21 +2417,21 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 		lastInfoUpdate = [now retain];
 	}
 	
-	SBC_Packet aPacket;
-	aPacket.cmdHeader.destination	= kSBC_Process;
-	aPacket.cmdHeader.cmdID			= kSBC_CBRead;
-	aPacket.cmdHeader.numberBytesinPayload = 0;
+	SBC_Packet* aPacket = [self _localSbcPacket];
+	aPacket->cmdHeader.destination	= kSBC_Process;
+	aPacket->cmdHeader.cmdID			= kSBC_CBRead;
+	aPacket->cmdHeader.numberBytesinPayload = 0;
 	
 	ORTimer* timer = [[ORTimer alloc] init];
 	[timer start];
-	[self send:&aPacket receive:&aPacket];
+	[self send:aPacket receive:aPacket];
 	totalTime += [timer microseconds];
-	totalPayload += aPacket.cmdHeader.numberBytesinPayload;
+	totalPayload += aPacket->cmdHeader.numberBytesinPayload;
 	totalMeasurements++;
 	[timer release];
 	
-	unsigned long* rp = (unsigned long*)aPacket.payload;
-	long numLongs = aPacket.cmdHeader.numberBytesinPayload/sizeof(long);
+	unsigned long* rp = (unsigned long*)aPacket->payload;
+	long numLongs = aPacket->cmdHeader.numberBytesinPayload/sizeof(long);
 	unsigned long* endPt = rp + numLongs;
 	
 	
@@ -2471,17 +2481,17 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 
 - (void) monitorJob
 {
-	SBC_Packet aPacket;
-	aPacket.cmdHeader.destination			= kSBC_Process;
-	aPacket.cmdHeader.cmdID					= kSBC_JobStatus;
-	aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_JobStatusStruct);
+	SBC_Packet* aPacket = [self _localSbcPacket];
+	aPacket->cmdHeader.destination			= kSBC_Process;
+	aPacket->cmdHeader.cmdID					= kSBC_JobStatus;
+	aPacket->cmdHeader.numberBytesinPayload	= sizeof(SBC_JobStatusStruct);
 	
 	@try {
-		[self send:&aPacket receive:&aPacket];
+		[self send:aPacket receive:aPacket];
 		
-		SBC_JobStatusStruct* p	= (SBC_JobStatusStruct*)aPacket.payload;
+		SBC_JobStatusStruct* p	= (SBC_JobStatusStruct*)aPacket->payload;
 		if([jobDelegate respondsToSelector:statusSelector]){
-			ORSBCLinkJobStatus* aJobStatus = [ORSBCLinkJobStatus jobStatus:p message:aPacket.message];
+			ORSBCLinkJobStatus* aJobStatus = [ORSBCLinkJobStatus jobStatus:p message:aPacket->message];
 			[self setJobStatus:aJobStatus];
 			//NSLog(@"monitor job ok: job %s running with message: %s\n", [aJobStatus running]?"is":"is not", [aJobStatus message]);
 			[jobDelegate performSelector:statusSelector withObject:jobStatus];
@@ -2500,18 +2510,18 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 {
 	@try {
 		[socketLock lock]; //begin critical section
-		SBC_Packet aPacket;
-		aPacket.cmdHeader.destination			= kSBC_Process;
-		aPacket.cmdHeader.cmdID					= kSBC_GeneralWrite;
-		aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_WriteBlockStruct) + numberLongs*sizeof(long);
+		SBC_Packet* aPacket = [self _localSbcPacket];
+		aPacket->cmdHeader.destination			= kSBC_Process;
+		aPacket->cmdHeader.cmdID					= kSBC_GeneralWrite;
+		aPacket->cmdHeader.numberBytesinPayload	= sizeof(SBC_WriteBlockStruct) + numberLongs*sizeof(long);
 		
-		SBC_WriteBlockStruct* dataPtr = (SBC_WriteBlockStruct*)aPacket.payload;
+		SBC_WriteBlockStruct* dataPtr = (SBC_WriteBlockStruct*)aPacket->payload;
 		dataPtr->address		= anOperationID;
 		dataPtr->numLongs		= numberLongs;
 		dataPtr++;
 		memcpy(dataPtr,buffer,numberLongs*sizeof(long));
 		
-		[self write:socketfd buffer:&aPacket];
+		[self write:socketfd buffer:aPacket];
 		[socketLock unlock]; //end critical section
 	}
 	@catch (NSException* localException) {
@@ -2527,20 +2537,20 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 {
 	@try {
 		[socketLock lock]; //begin critical section
-		SBC_Packet aPacket;
-		aPacket.cmdHeader.destination			= kSBC_Process;
-		aPacket.cmdHeader.cmdID					= kSBC_GeneralRead;
-		aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_ReadBlockStruct);
+		SBC_Packet* aPacket = [self _localSbcPacket];
+		aPacket->cmdHeader.destination			= kSBC_Process;
+		aPacket->cmdHeader.cmdID					= kSBC_GeneralRead;
+		aPacket->cmdHeader.numberBytesinPayload	= sizeof(SBC_ReadBlockStruct);
 		
-		SBC_ReadBlockStruct* readBlockPtr = (SBC_ReadBlockStruct*)aPacket.payload;
+		SBC_ReadBlockStruct* readBlockPtr = (SBC_ReadBlockStruct*)aPacket->payload;
 		readBlockPtr->address		= anOperationID;
 		readBlockPtr->numLongs		= numberLongs;
 		
 		//Do NOT call the combo send:receive method here... we have the locks already in place
-		[self write:socketfd buffer:&aPacket]; //write the packet
-		[self read:socketfd buffer:&aPacket]; //read the response
+		[self write:socketfd buffer:aPacket]; //write the packet
+		[self read:socketfd buffer:aPacket]; //read the response
 		
-		SBC_ReadBlockStruct* rp = (SBC_ReadBlockStruct*)aPacket.payload;
+		SBC_ReadBlockStruct* rp = (SBC_ReadBlockStruct*)aPacket->payload;
 		int numLongs = rp->numLongs;
 		rp++;
 		long* dp = (long*)rp;
