@@ -753,7 +753,8 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     @try{
         [self initBoard];
         while(!pollStopRequested){
-            @autoreleasepool {
+			NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+            //@autoreleasepool { //some of us are still using XCode 3.xx
                 [self _pollAllChannels];
 	            tryTime += 1;
     	        if (tryTime == 1000) {
@@ -761,7 +762,8 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
             	    now = [NSDate date];
                 	tryTime = 0;
             	}
-            }
+           // }
+			[pool release];
         }
     } @catch (NSException* e) {
         [self _stopPolling];
