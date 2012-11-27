@@ -71,6 +71,7 @@
     IBOutlet NSTextField*	averagingValue;
     IBOutlet NSTextField*	pollingText;
     IBOutlet NSProgressIndicator* pollingIndicator;
+    IBOutlet NSTextField*   pollingSpeed;
     
     NSView *blankView;
     NSSize settingsSize;
@@ -96,6 +97,7 @@
 - (void) pollingActivityChanged:(NSNotification*)aNote;
 - (void) shipRecordsChanged:(NSNotification*)aNote;
 - (void) averagingValueChanged:(NSNotification*)aNote;
+- (void) pollingSpeedChanged:(NSNotification*)aNote;
 - (void) updateRegisterDescription:(short) aRegisterIndex;
 
 #pragma mark •••Actions

@@ -139,7 +139,12 @@ typedef enum {
     [notifyCenter addObserver:self
 					 selector:@selector(averagingValueChanged:)
 						 name:ORXYCom564AverageValueNumberHasChanged
-					   object:model];      
+					   object:model];
+    
+    [notifyCenter addObserver:self
+					 selector:@selector(pollingSpeedChanged:)
+						 name:ORXYCom564PollingSpeedHasChanged
+					   object:model];
 }
 
 
@@ -158,6 +163,7 @@ typedef enum {
     [self shipRecordsChanged:nil];    
     [self autoscanModeChanged:nil]; 
     [self averagingValueChanged:nil];
+    [self pollingSpeedChanged:nil];
 }
 #pragma mark •••Interface Management
 
@@ -267,6 +273,16 @@ typedef enum {
 - (void) averagingValueChanged:(NSNotification *)aNote
 {
     [averagingValue setIntValue:[model averageValueNumber]];
+}
+
+- (void) pollingSpeedChanged:(NSNotification *)aNote
+{
+    NSTimeInterval atime = [model pollSpeed];
+    if (atime == 0.0) {
+        [pollingSpeed setStringValue:[NSString stringWithFormat:@"%.2f Hz",0.0]];
+    } else {
+        [pollingSpeed setStringValue:[NSString stringWithFormat:@"%.2f Hz",1./atime]];
+    }
 }
 
 #pragma mark •••Actions
