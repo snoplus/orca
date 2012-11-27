@@ -77,16 +77,18 @@ typedef enum {
     EXyCom564OperationMode operationMode;
     EXyCom564AutoscanMode  autoscanMode;
     BOOL                   pollCard;
-    BOOL                   shipRecords;    
-    NSTimeInterval         pollingState;
+    BOOL                   shipRecords;
     BOOL                   pollRunning;
-    BOOL                   isRunning;    
+    BOOL                   isRunning;
+    BOOL                   pollStopRequested;
     NSMutableArray*        channelGains;
-    NSMutableArray*        chanADCVals; 
-    NSMutableArray*        chanADCAverageVals;
-    NSMutableData*         chanADCAverageValsCache;
+    NSData*                chanADCVals;
+    NSData*                chanADCAverageVals;
+    NSData*                chanADCAverageValsCache;
+    NSData*                readBuffer;
     int                    averageValueNumber;
     int                    currentAverageState;
+    id                     adapter;
 }
 #pragma mark ***Initialization
 - (id) init;
@@ -103,8 +105,6 @@ typedef enum {
 - (void)                    setOperationMode: (EXyCom564OperationMode) anIndex;
 - (EXyCom564AutoscanMode) 	autoscanMode;
 - (void)                    setAutoscanMode: (EXyCom564AutoscanMode) anIndex;
-- (NSTimeInterval)          pollingState;
-- (void)                    setPollingState:(NSTimeInterval)aState;
 - (BOOL)                    shipRecords;
 - (void)                    setShipRecords:(BOOL)ship;
 - (int) averageValueNumber;
@@ -117,7 +117,6 @@ typedef enum {
 - (void) setGain:(EXyCom564ChannelGain) gain channel:(unsigned short) aChannel;
 - (void) setGain:(EXyCom564ChannelGain) gain;
 - (EXyCom564ChannelGain) getGain:(unsigned short) aChannel;
-- (void) readAllAdcChannels;
 - (uint16_t) getAdcValueAtChannel:(int)chan;
 - (uint16_t) getAdcAverageValueAtChannel:(int)chan;
 - (BOOL) isPolling;
@@ -165,7 +164,6 @@ extern NSString* ORXYCom564ReadoutModeChanged;
 extern NSString* ORXYCom564OperationModeChanged;
 extern NSString* ORXYCom564AutoscanModeChanged;
 extern NSString* ORXYCom564ChannelGainChanged;
-extern NSString* ORXYCom564PollingStateChanged;
 extern NSString* ORXYCom564PollingActivityChanged;
 extern NSString* ORXYCom564ADCValuesChanged;
 extern NSString* ORXYCom564ShipRecordsChanged;

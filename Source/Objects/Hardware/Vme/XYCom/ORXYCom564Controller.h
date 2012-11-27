@@ -27,9 +27,9 @@
 @interface ORXYCom564Controller : OrcaObjectController
 #endif
 
-{	
-    
+{
     IBOutlet NSTabView* 	tabView;
+    IBOutlet NSView*        winView;
     
     // Register Box
 	IBOutlet NSTextField*   slotField;
@@ -68,8 +68,9 @@
     
     IBOutlet NSTableView*   adcCountsAndChannels;
     
-    IBOutlet NSTextField*	pollingState;
-    IBOutlet NSTextField*	averagingValue;    
+    IBOutlet NSTextField*	averagingValue;
+    IBOutlet NSTextField*	pollingText;
+    IBOutlet NSProgressIndicator* pollingIndicator;
     
     NSView *blankView;
     NSSize settingsSize;
@@ -92,7 +93,6 @@
 - (void) autoscanModeChanged:(NSNotification*) aNotification;
 - (void) channelGainsChanged:(NSNotification*) aNotification;
 - (void) displayRawChanged:(NSNotification*)aNote;
-- (void) pollingStateChanged:(NSNotification*)aNote;
 - (void) pollingActivityChanged:(NSNotification*)aNote;
 - (void) shipRecordsChanged:(NSNotification*)aNote;
 - (void) averagingValueChanged:(NSNotification*)aNote;
@@ -106,7 +106,6 @@
 - (IBAction) selectReadoutModeAction:(id) aSender;
 - (IBAction) selectOperationModeAction:(id) aSender;
 - (IBAction) selectAutoscanModeAction:(id) aSender;
-- (IBAction) setPollingAction:(id)sender;
 - (IBAction) startPollingActivityAction:(id)sender;
 - (IBAction) setAverageValueAction:(id)sender;
 - (IBAction) setShipRecordsAction:(id)sender;

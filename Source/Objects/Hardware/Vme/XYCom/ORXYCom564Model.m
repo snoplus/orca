@@ -29,7 +29,6 @@ NSString* ORXYCom564ReadoutModeChanged      = @"ORXYCom564ReadoutModeChanged";
 NSString* ORXYCom564OperationModeChanged    = @"ORXYCom564OperationModeChanged";
 NSString* ORXYCom564AutoscanModeChanged     = @"ORXYCom564AutoscanModeChanged";
 NSString* ORXYCom564ChannelGainChanged      = @"ORXYCom564ChannelGainChanged";
-NSString* ORXYCom564PollingStateChanged     = @"ORXYCom564PollingStateChanged";
 NSString* ORXYCom564ADCValuesChanged        = @"ORXYCom564ADCValuesChanged";
 NSString* ORXYCom564PollingActivityChanged  = @"ORXYCom564PollingActivityChanged"; 
 NSString* ORXYCom564ShipRecordsChanged      = @"ORXYCom564ShipRecordsChanged";
@@ -41,10 +40,13 @@ NSString* ORXYCom564AverageValueNumberHasChanged = @"ORXYCom564AverageValueNumbe
 - (void) _stopPolling;
 - (void) _startPolling;
 - (void) _pollAllChannels;
-- (void) _setChannelADCValues:(NSMutableArray*)vals withNotify:(BOOL)notify;
+- (void) _setChannelADCValues:(NSData*)vals withNotify:(BOOL)notify;
 - (void) _shipRawValues:(ORDataPacket*)dataPacket;
-- (void) _addAverageValues:(NSArray*)vals;
+- (void) _addAverageValues:(NSData*)vals;
 - (void) _setAverageADCValues:(uint32_t*)array withLength:(int)length;
+- (void) _pollingThread;
+- (void) _createArrays;
+- (void) _readAllAdcChannels;
 @end
 
 @implementation ORXYCom564Model
@@ -78,15 +80,16 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 {
     self = [super init];
     [[self undoManager] disableUndoRegistration];
-    [self setAddressModifier:0x29];
+    [self _createArrays];
     [self _setChannelGains:nil];
-    [self _setChannelADCValues:nil withNotify:YES];
+    [self setAddressModifier:0x29];
     [self setShipRecords:NO];
     [self setOperationMode:kAutoscanning];
     [self setAutoscanMode:k0to64];   
     [self _stopPolling];
-    [self setPollingState:0.0];
-    [[self undoManager] enableUndoRegistration]; 
+
+
+    [[self undoManager] enableUndoRegistration];
     [self setAverageValueNumber:1];
     return self;
 }
@@ -96,7 +99,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     [channelGains release];
     [chanADCVals release];
     [chanADCAverageVals release];
-    [chanADCAverageValsCache release];  
+    [chanADCAverageValsCache release];
 	[self _stopPolling];    
     [super dealloc];
 }
@@ -137,22 +140,6 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 	 postNotificationName:ORXYCom564ReadoutModeChanged
 	 object:self];
 
-}
-
-- (void) setPollingState:(NSTimeInterval)aState
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setPollingState:pollingState];
-    
-    pollingState = aState;
-    
-    [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORXYCom564PollingStateChanged
-	 object: self];
-}
-
-- (NSTimeInterval) pollingState
-{
-    return pollingState;
 }
 
 - (void) startPollingActivity
@@ -289,10 +276,13 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 
 - (void) setAverageValueNumber:(int)aValue
 {
-    if (aValue == averageValueNumber) return;
-    if (aValue < 1) aValue = 1;
-    averageValueNumber = aValue;
-    [chanADCAverageValsCache setLength:0];
+    @synchronized(self) {
+        if (aValue == averageValueNumber) return;
+        if (aValue < 1) aValue = 1;
+        averageValueNumber = aValue;
+        currentAverageState = 0;
+        memset((void*)[chanADCAverageValsCache bytes], 0, [chanADCAverageValsCache length]);
+    }
     [[NSNotificationCenter defaultCenter]
 	 postNotificationName:ORXYCom564AverageValueNumberHasChanged
 	 object:self];    
@@ -391,14 +381,14 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 
 - (uint16_t) getAdcValueAtChannel:(int)chan
 {
-    if (chan >= [chanADCVals count]) return 0;
-    return [[chanADCVals objectAtIndex:chan] intValue];
+    if (chan >= [self getNumberOfChannels]) return 0;
+    return ((uint16_t*)[chanADCVals bytes])[chan];
 }
 
 - (uint16_t) getAdcAverageValueAtChannel:(int)chan
 {
-    if (chan >= [chanADCAverageVals count]) return 0;    
-    return [[chanADCAverageVals objectAtIndex:chan] intValue];    
+    if (chan >= [self getNumberOfChannels]) return 0;
+    return ((uint16_t*)[chanADCAverageVals bytes])[chan];
 }
 
 - (EXyCom564ReadoutMode) readoutMode
@@ -456,33 +446,6 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 	 object:self];    
 }
 
-#pragma mark ***Readout
-
-- (void) readAllAdcChannels
-{
-    if (operationMode != kAutoscanning) {
-        NSLog(@"XVME not in autoscanning mode\n");   
-        return;
-    }
-    int channelsToRead = kXVME564_NumAutoScanChannelsPerGroup << ([self autoscanMode]);
-    uint16_t readOut[channelsToRead];
-    [[self adapter] readWordBlock:readOut
-                        atAddress:[self baseAddress] + mIOXY564Reg[kADScan].offset 
-                        numToRead:channelsToRead 
-                       withAddMod:[self addressModifier] 
-                    usingAddSpace:0x01];
-    int i;
-    for (i=0; i<[chanADCVals count]; i++) {
-        if (i>=channelsToRead) {
-            [chanADCVals replaceObjectAtIndex:i withObject:[NSNumber numberWithShort:0]];
-        } else {
-            [chanADCVals replaceObjectAtIndex:i withObject:[NSNumber numberWithShort:readOut[i]]];            
-        }
-    }
-    [self _addAverageValues:chanADCVals];
-    [self _setChannelADCValues:chanADCVals withNotify:!isRunning];
-    
-}
 
 #pragma mark ***Card qualities
 - (short) getNumberOfChannels
@@ -531,7 +494,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 }
 - (double) convertedValue:(int)channel
 {
-    return (double) 0xFFFF;    
+    return (double) 0xFFFF;
 }
 - (double) maxValueForChan:(int)channel
 {
@@ -598,6 +561,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     //----------------------------------------------------------------------------------------
     // first add our description to the data description
     isRunning = YES;
+    adapter = [self adapter];
     [self _stopPolling];
     [self appendDataDescription:aDataPacket userInfo:userInfo];
     
@@ -607,7 +571,8 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-    [self readAllAdcChannels];
+    assert(!pollRunning);
+    [self _readAllAdcChannels];
     [self _shipRawValues:aDataPacket];
 }
 
@@ -628,19 +593,19 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
+    [self _createArrays];
     [self _setChannelGains:[decoder decodeObjectForKey:@"kORXYCom564chanGains"]];
-    [self _setChannelADCValues:[decoder decodeObjectForKey:@"kORXYCom564chanADCValues"] withNotify:YES];
     // The super decoder handles the address Modifier output
     if ([self addressModifier] == 0x29) {
         [self setReadoutMode:kA16];
     } else {
         [self setReadoutMode:kA24];
     }
+
     [self setOperationMode:[decoder decodeIntForKey:@"kORXYCom564OperationMode"]];
     [self setAverageValueNumber:[decoder decodeIntForKey:@"kORXYCom564AvgValNumber"]];    
     [self setAutoscanMode:[decoder decodeIntForKey:@"kORXYCom564AutoscanMode"]];
-    [self setPollingState:[decoder decodeDoubleForKey:@"kORXYCom564PollingState"]]; 
-    [self setShipRecords:[decoder decodeBoolForKey:@"kORXYCom564ShipRecords"]];     
+    [self setShipRecords:[decoder decodeBoolForKey:@"kORXYCom564ShipRecords"]];
     [[self undoManager] enableUndoRegistration];
 		
     return self;
@@ -652,9 +617,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     [encoder encodeObject:channelGains forKey:@"kORXYCom564chanGains"];
     [encoder encodeInt:[self operationMode] forKey:@"kORXYCom564OperationMode"];    
     [encoder encodeInt:[self autoscanMode] forKey:@"kORXYCom564AutoscanMode"];
-    [encoder encodeInt:[self averageValueNumber] forKey:@"kORXYCom564AvgValNumber"];        
-    [encoder encodeDouble:pollingState forKey:@"kORXYCom564PollingState"];        
-    [encoder encodeObject:chanADCVals forKey:@"kORXYCom564chanADCValues"]; 
+    [encoder encodeInt:[self averageValueNumber] forKey:@"kORXYCom564AvgValNumber"];
     [encoder encodeBool:shipRecords forKey:@"kORXYCom564ShipRecords"];
 }
 
@@ -663,43 +626,35 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 @implementation ORXYCom564Model (private)
 
 #pragma mark ***Private
-- (void) _addAverageValues:(NSArray *)vals
+- (void) _addAverageValues:(NSData *)vals
 {
-    if (vals == nil) return;
-    uint32_t* averageValPtr = nil;
-    if (chanADCAverageValsCache == nil) chanADCAverageValsCache = [[NSMutableData data] retain];
-    if ([chanADCAverageValsCache length]/sizeof(*averageValPtr) != [vals count]) {
-        
-        [chanADCAverageValsCache setLength:[vals count]*sizeof(*averageValPtr)];
-        averageValPtr = (uint32_t*)[chanADCAverageValsCache mutableBytes];
-        memset(averageValPtr, 0, [chanADCAverageValsCache length]);
-        currentAverageState = 0;
-    }
-    averageValPtr = (uint32_t*)[chanADCAverageValsCache mutableBytes];
+
+    int numChans = [self getNumberOfChannels];
+    uint32_t* averageValPtr = (uint32_t*)[chanADCAverageValsCache bytes];
     int i;
-    for (i=0;i<[vals count];i++) {
-        averageValPtr[i] += (uint16_t)[[vals objectAtIndex:i] intValue];
-    }
-    currentAverageState++;
-    if (currentAverageState == averageValueNumber) {
-        for (i=0;i<[vals count];i++) {
-            averageValPtr[i] /= averageValueNumber;
+    @synchronized(self) {
+        for (i=0;i<numChans;i++) {
+            averageValPtr[i] += ((uint16_t*)[vals bytes])[i];
         }
-        [self _setAverageADCValues:averageValPtr withLength:[vals count]];
-        memset(averageValPtr, 0, [chanADCAverageValsCache length]);
-        currentAverageState = 0;
+        currentAverageState++;
+        if (currentAverageState == averageValueNumber) {
+            for (i=0;i<numChans;i++) {
+                averageValPtr[i] /= averageValueNumber;
+            }
+            [self _setAverageADCValues:averageValPtr withLength:numChans];
+            memset(averageValPtr, 0, [chanADCAverageValsCache length]);
+            currentAverageState = 0;
+        }
     }
-    
     
 }
 
 - (void) _setAverageADCValues:(uint32_t *)array withLength:(int)length
 {
-    if (chanADCAverageVals == nil) chanADCAverageVals = [[NSMutableArray array] retain];
-    [chanADCAverageVals removeAllObjects];
+    assert([chanADCAverageVals length] == length*sizeof(uint16_t));
     int i;
     for (i=0;i<length;i++) {
-        [chanADCAverageVals addObject:[NSNumber numberWithInt:array[i]]];
+        ((uint16_t*)[chanADCAverageVals bytes])[i] = array[i];
     }
 }
 
@@ -722,35 +677,22 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     
 }
 
-- (void) _setChannelADCValues:(NSMutableArray *)vals withNotify:(BOOL)notify
+- (void) _setChannelADCValues:(NSData *)vals withNotify:(BOOL)notify
 {
     [vals retain];
     [chanADCVals release];
     chanADCVals = vals;
-    if (chanADCVals == nil) {
-        chanADCVals = [[NSMutableArray array] retain];
-        int i;
-        for (i=0; i<[self getNumberOfChannels]; i++) {
-            [chanADCVals addObject:[NSNumber numberWithInt:0]];
-        }
-    }
     if (notify) {
         [[NSNotificationCenter defaultCenter]
          postNotificationName:ORXYCom564ADCValuesChanged
          object:self];
-    }
-    
-    
+    }    
 }
 
 #pragma mark •••Polling
 - (void) _stopPolling
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_pollAllChannels) object:nil];
-	pollRunning = NO;
-    [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORXYCom564PollingActivityChanged
-	 object: self];
+    pollStopRequested = YES;
 }
 
 - (void) _startPolling
@@ -760,52 +702,67 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 
 - (void) _setUpPolling:(BOOL)verbose
 {
-	
-	if(pollRunning && pollingState != 0)return;
+    if(pollRunning)return;
     if (isRunning) {
         if(verbose) NSLog(@"XVME564,%d,%d, can not poll while it is in the run loop\n",[self crateNumber],[self slot]);
         return;
     }
-    
-    if(pollingState!=0){
-        if ([self operationMode] != kAutoscanning) {
-            if(verbose) NSLog(@"XVME564,%d,%d, must be in autoscan mode to poll\n",[self crateNumber],[self slot]);
-            return;
-        }
-		pollRunning = YES;
-        if(verbose) NSLog(@"Polling XVME564,%d,%d  every %.0f seconds.\n",[self crateNumber],[self slot],pollingState);
-		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_pollAllChannels) object:nil];
-        [self performSelector:@selector(_pollAllChannels) withObject:self afterDelay:pollingState];
-        [self _pollAllChannels];
+    if ([self operationMode] != kAutoscanning) {
+        if(verbose) NSLog(@"XVME564,%d,%d, must be in autoscan mode to poll\n",[self crateNumber],[self slot]);
+        return;
     }
-    else {
-		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_pollAllChannels) object:nil];
-        if(verbose) NSLog(@"Not Polling XVME564,%d,%d\n",[self crateNumber],[self slot]);
-    }
-    [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORXYCom564PollingActivityChanged
-	 object: self];
+    pollStopRequested = NO;
+
+    [NSThread detachNewThreadSelector:@selector(_pollingThread)
+                             toTarget:self
+                           withObject:nil];
+
 }
 
 - (void) _pollAllChannels
 {
-    @try {
-        [self readAllAdcChannels];
-        if ([self shipRecords]) {
-            [self _shipRawValues:nil];
-        }
-    }
-	@catch(NSException* localException) {
-		//catch this here to prevent it from falling thru, but nothing to do.
-	}
-	
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_pollAllChannels) object:nil];
-	if(pollingState!=0){
-		[self performSelector:@selector(_pollAllChannels) withObject:nil afterDelay:pollingState];
-	} else {
-        [self _stopPolling];
+    [self _readAllAdcChannels];
+    if ([self shipRecords]) {
+        [self _shipRawValues:nil];
     }
 }
+
+- (void) _pollingThread
+{
+    NSLog(@"Beginning thread: %@,0x %x\n",[self objectName],[self baseAddress]);
+    @synchronized(self) {
+        if (pollRunning) return;
+        pollRunning = YES;
+    }
+    
+    [[NSNotificationCenter defaultCenter]
+     postNotificationOnMainThreadWithName:ORXYCom564PollingActivityChanged
+                                   object:self];
+    adapter = [self adapter];
+
+    // perform the run loop
+    @try{
+        [self initBoard];
+        while(!pollStopRequested){
+            @autoreleasepool {
+                [self _pollAllChannels];
+            }
+        }
+    } @catch (NSException* e) {
+        [self _stopPolling];
+        NSLogColor([NSColor redColor], @"Exception at (%@, %d, %d) readout thread, stopping.\n",
+                   [self objectName],[self crateNumber],[self slot]);
+        NSLogColor([NSColor redColor], @"%@\n",e);
+    }
+    pollRunning = NO;
+    
+    [[NSNotificationCenter defaultCenter]
+     postNotificationOnMainThreadWithName:ORXYCom564PollingActivityChanged
+                                   object:self];
+    
+    NSLog(@"Ending thread: %@,0x %x\n",[self objectName],[self baseAddress]);    
+}
+
 
 - (void) _shipRawValues:(ORDataPacket*)dataPacket
 {
@@ -835,8 +792,41 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
         [dataPacket addLongsToFrameBuffer:data length:index];
     } else if(index>headernumber){
         //the full record goes into the data stream via a notification
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification
-                                                            object:[NSData dataWithBytes:data length:sizeof(data[0])*index]];
+        [[NSNotificationCenter defaultCenter]
+         postNotificationOnMainThreadWithName:ORQueueRecordForShippingNotification
+                                        object:[NSData dataWithBytes:data length:sizeof(data[0])*index]];
     }
 }
+
+- (void) _createArrays
+{
+    chanADCAverageValsCache = [[NSMutableData dataWithLength:[self getNumberOfChannels]*sizeof(uint32_t)] retain];
+    chanADCVals = [[NSMutableData dataWithLength:[self getNumberOfChannels]*sizeof(uint16_t)] retain];
+    chanADCAverageVals = [[NSMutableData dataWithLength:[self getNumberOfChannels]*sizeof(uint16_t)] retain];
+}
+
+#pragma mark ***Readout
+
+- (void) _readAllAdcChannels
+{
+    @synchronized(self) {
+        if (operationMode != kAutoscanning) {
+            [NSException raise:@"XVME-564 Exception" format:@"XVME not in autoscanning mode"];
+        }
+        int channelsToRead = kXVME564_NumAutoScanChannelsPerGroup << ([self autoscanMode]);
+        
+        uint16_t* readOut = (uint16_t*)[chanADCVals bytes];
+        assert([chanADCVals length] == channelsToRead*sizeof(readOut[0]));
+        
+        [[self adapter]
+                 readWordBlock:readOut
+                     atAddress:[self baseAddress] + mIOXY564Reg[kADScan].offset
+                     numToRead:channelsToRead
+                    withAddMod:[self addressModifier]
+                 usingAddSpace:0x01];
+    }
+    [self _addAverageValues:chanADCVals];
+    
+}
+
 @end

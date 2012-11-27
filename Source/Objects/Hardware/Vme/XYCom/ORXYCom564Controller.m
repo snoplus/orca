@@ -54,9 +54,9 @@ typedef enum {
 {
     [super awakeFromNib];
     
-    settingsSize       = NSMakeSize(360,540);
-    gainsSize          = NSMakeSize(440,550);
-    channelReadoutSize = NSMakeSize(540,470);    
+    settingsSize       = NSMakeSize(400,570);
+    gainsSize          = NSMakeSize(480,580);
+    channelReadoutSize = NSMakeSize(580,480);
     
     blankView = [[NSView alloc] init];
     
@@ -119,12 +119,7 @@ typedef enum {
     [notifyCenter addObserver:self
 					 selector:@selector(channelGainsChanged:)
 						 name:ORXYCom564ChannelGainChanged
-					   object:model];     
-    
-    [notifyCenter addObserver:self
-					 selector:@selector(pollingStateChanged:)
-						 name:ORXYCom564PollingStateChanged
-					   object:model];       
+					   object:model];
     
     [notifyCenter addObserver:self
 					 selector:@selector(displayRawChanged:)
@@ -159,8 +154,7 @@ typedef enum {
     [self operationModeChanged:nil];    
     [self channelGainsChanged:nil]; 
     [self displayRawChanged:nil];
-    [self pollingActivityChanged:nil]; 
-    [self pollingStateChanged:nil];
+    [self pollingActivityChanged:nil];
     [self shipRecordsChanged:nil];    
     [self autoscanModeChanged:nil]; 
     [self averagingValueChanged:nil];
@@ -178,11 +172,6 @@ typedef enum {
     [gSecurity setLock:ORXYCom564Lock to:secure];
     [settingLockButton setEnabled:secure];
     [basicOpsLockButton setEnabled:secure];
-}
-
-- (void) pollingStateChanged:(NSNotification*)aNotification
-{
-	[pollingState setFloatValue:[model pollingState]];
 }
 
 - (void) lockChanged:(NSNotification*)aNotification
@@ -253,10 +242,15 @@ typedef enum {
 
 - (void) pollingActivityChanged:(NSNotification*)aNote
 {
+    [pollButton setEnabled:YES];
     if ([model isPolling]) {
         [pollButton setTitle:@"Stop Polling"];
+        [pollingIndicator startAnimation:self];
+        [pollingText setHidden:NO];
     } else {
-        [pollButton setTitle:@"Start Polling"];        
+        [pollButton setTitle:@"Start Polling"];
+        [pollingIndicator stopAnimation:self];
+        [pollingText setHidden:YES];
     }
 }
 
@@ -373,11 +367,6 @@ typedef enum {
     [model setGain:[setAllChannelGains indexOfSelectedItem]];
 }
 
-- (IBAction) setPollingAction:(id)sender
-{
-    [model setPollingState:(NSTimeInterval)[sender floatValue]];
-}
-
 - (IBAction) read:(id) pSender
 {
 	@try {
@@ -408,6 +397,7 @@ typedef enum {
 
 - (IBAction) startPollingActivityAction:(id)sender
 {
+    [sender setEnabled:NO];
     if ([model isPolling]) {
         [model stopPollingActivity];
     } else {
@@ -511,17 +501,17 @@ typedef enum {
     if([tabView indexOfTabViewItem:tabViewItem] == 0){
 		[[self window] setContentView:blankView];
 		[self resizeWindowToSize:settingsSize];
-		[[self window] setContentView:tabView];
+		[[self window] setContentView:winView];
     }
     else if([tabView indexOfTabViewItem:tabViewItem] == 1){
 		[[self window] setContentView:blankView];
 		[self resizeWindowToSize:gainsSize];
-		[[self window] setContentView:tabView];
+		[[self window] setContentView:winView];
     }    
     else if([tabView indexOfTabViewItem:tabViewItem] == 2){
 		[[self window] setContentView:blankView];
 		[self resizeWindowToSize:channelReadoutSize];
-		[[self window] setContentView:tabView];
+		[[self window] setContentView:winView];
     }
 	
     NSString* key = [NSString stringWithFormat: @"orca.ORSIS3302%d.selectedtab",[model slot]];
