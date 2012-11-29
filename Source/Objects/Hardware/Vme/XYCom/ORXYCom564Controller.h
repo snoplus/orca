@@ -99,6 +99,7 @@
 - (void) shipRecordsChanged:(NSNotification*)aNote;
 - (void) averagingValueChanged:(NSNotification*)aNote;
 - (void) pollingSpeedChanged:(NSNotification*)aNote;
+- (void) interpretADCChanged:(NSNotification*)aNote;
 - (void) updateRegisterDescription:(short) aRegisterIndex;
 
 #pragma mark •••Actions
@@ -112,6 +113,7 @@
 - (IBAction) startPollingActivityAction:(id)sender;
 - (IBAction) setAverageValueAction:(id)sender;
 - (IBAction) setShipRecordsAction:(id)sender;
+- (IBAction) setInterpretADCAction:(id)sender;
 
 - (IBAction) read: (id) pSender;
 - (IBAction) write: (id) pSender;

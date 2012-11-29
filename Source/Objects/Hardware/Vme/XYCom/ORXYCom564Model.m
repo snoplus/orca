@@ -33,7 +33,8 @@ NSString* ORXYCom564ADCValuesChanged        = @"ORXYCom564ADCValuesChanged";
 NSString* ORXYCom564PollingActivityChanged  = @"ORXYCom564PollingActivityChanged"; 
 NSString* ORXYCom564ShipRecordsChanged      = @"ORXYCom564ShipRecordsChanged";
 NSString* ORXYCom564AverageValueNumberHasChanged = @"ORXYCom564AverageValueNumberHasChanged";
-NSString* ORXYCom564PollingSpeedHasChanged = @"ORXYCom564PollingSpeedHasChanged";
+NSString* ORXYCom564PollingSpeedHasChanged  = @"ORXYCom564PollingSpeedHasChanged";
+NSString* ORXYCom564InterpretADCHasChanged  = @"ORXYCom564InterpretADCHasChanged";
 
 @interface ORXYCom564Model (private)
 - (void) _setChannelGains:(NSMutableArray*)gains;
@@ -454,6 +455,21 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 	 object:self];    
 }
 
+- (EInterpretXy564ADC) interpretADC
+{
+    return interpretADC;
+}
+
+- (void) setInterpretADC: (EInterpretXy564ADC)anInt
+{
+    if (anInt == interpretADC) return;
+    interpretADC = anInt;
+    [[NSNotificationCenter defaultCenter]
+     postNotificationOnMainThreadWithName:ORXYCom564InterpretADCHasChanged
+	 object:self];
+}
+
+
 - (BOOL) userLocked
 {
     return userLocked != nil;
@@ -658,6 +674,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     [self setAverageValueNumber:[decoder decodeIntForKey:@"kORXYCom564AvgValNumber"]];    
     [self setAutoscanMode:[decoder decodeIntForKey:@"kORXYCom564AutoscanMode"]];
     [self setShipRecords:[decoder decodeBoolForKey:@"kORXYCom564ShipRecords"]];
+    [self setInterpretADC:[decoder decodeIntForKey:@"kORXYCom564InterpretADC"]];
     NSString* ul = [decoder decodeObjectForKey:@"kORXYCom564UL"];
     if (ul != nil) [self setUserLock:YES withString:ul];
     
@@ -674,6 +691,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     [encoder encodeInt:[self autoscanMode] forKey:@"kORXYCom564AutoscanMode"];
     [encoder encodeInt:[self averageValueNumber] forKey:@"kORXYCom564AvgValNumber"];
     [encoder encodeBool:shipRecords forKey:@"kORXYCom564ShipRecords"];
+    [encoder encodeInt:interpretADC forKey:@"kORXYCom564InterpretADC"];
     [encoder encodeObject:userLocked forKey:@"kORXYCom564UL"];
 }
 

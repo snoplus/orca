@@ -23,16 +23,9 @@
 #pragma mark ***Imported Files
 #import "ORXYCom564Controller.h"
 
-typedef enum {
-    kRawADC = 0,
-    k0to5Volts,
-    k0to10Volts,
-    kPlusMinus5Volts,
-    kPlusMinus10Volts        
-} EInterpretXy564ADC;
 
 @interface ORXYCom564Controller (private)
-- (NSString*) stringOfADCValue:(int)aVal withFormat:(EInterpretXy564ADC)interpret;
+- (NSString*) stringOfADCValue:(double)aVal withFormat:(EInterpretXy564ADC)interpret;
 - (void) _updateButtons;
 @end
 
@@ -146,6 +139,11 @@ typedef enum {
 					 selector:@selector(pollingSpeedChanged:)
 						 name:ORXYCom564PollingSpeedHasChanged
 					   object:model];
+    
+    [notifyCenter addObserver:self
+					 selector:@selector(interpretADCChanged:)
+						 name:ORXYCom564InterpretADCHasChanged
+					   object:model];
 }
 
 
@@ -165,6 +163,7 @@ typedef enum {
     [self autoscanModeChanged:nil]; 
     [self averagingValueChanged:nil];
     [self pollingSpeedChanged:nil];
+    [self interpretADCChanged:nil];
 }
 #pragma mark •••Interface Management
 
@@ -286,6 +285,11 @@ typedef enum {
     } else {
         [pollingSpeed setStringValue:[NSString stringWithFormat:@"%.1f Hz",1./atime]];
     }
+}
+
+- (void) interpretADCChanged:(NSNotification *)aNote
+{
+    [interpretADCAsPopUp selectItemAtIndex:[model interpretADC]];
 }
 
 #pragma mark •••Actions
@@ -434,6 +438,11 @@ typedef enum {
     [model setAverageValueNumber:[sender intValue]];
 }
 
+- (IBAction) setInterpretADCAction:(id)sender
+{
+    [model setInterpretADC:(EInterpretXy564ADC)[interpretADCAsPopUp indexOfSelectedItem]];
+}
+
 #pragma mark ***Misc Helpers
 - (void) populatePopups
 {
@@ -496,11 +505,10 @@ typedef enum {
     rowIndex += [aTableView tag];
     int chan = [[aTableView tableColumns] indexOfObject:aTableColumn]/2;
     chan = rowIndex + chan*[self numberOfRowsInTableView:aTableView];  
-    EInterpretXy564ADC interpret = [interpretADCAsPopUp indexOfSelectedItem];
 	if([[aTableColumn identifier] hasPrefix:kXVME564ChannelKey]){
         return [NSString stringWithFormat:@"%d",chan];
 	} else {
-        return [self stringOfADCValue:[model getAdcValueAtChannel:chan] withFormat:interpret];        
+        return [self stringOfADCValue:[model convertedValue:chan] withFormat:[model interpretADC]];
     }
 }
 
@@ -543,25 +551,17 @@ typedef enum {
 
 @implementation ORXYCom564Controller (private)
 
-- (NSString*) stringOfADCValue:(int)aVal withFormat:(EInterpretXy564ADC)interpret
+- (NSString*) stringOfADCValue:(double)aVal withFormat:(EInterpretXy564ADC)interpret
 {
-    const double factor = 1./(double)0xFFFF;
-    if (aVal < 32767) {
-        aVal += 32767;
-    } else {
-        aVal -= 32767;
-    }
+
     switch (interpret) {
         case kRawADC:
-            return [NSString stringWithFormat:@"%d",aVal];
+            return [NSString stringWithFormat:@"%d",(int)aVal];
         case k0to5Volts:
-            return [NSString stringWithFormat:@"%4.3f",(aVal*5*factor)];            
         case k0to10Volts:
-            return [NSString stringWithFormat:@"%4.3f",(aVal*10*factor)];            
         case kPlusMinus5Volts:
-            return [NSString stringWithFormat:@"%4.3f",(aVal*10*factor - 5.)];            
-        case kPlusMinus10Volts:            
-            return [NSString stringWithFormat:@"%4.3f",(aVal*20*factor - 10.)];            
+        case kPlusMinus10Volts:
+            return [NSString stringWithFormat:@"%4.3f",aVal];
         default:
             return @"";
     }

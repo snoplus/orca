@@ -70,12 +70,21 @@ typedef enum {
     kNumberOfAutoscanModes
 } EXyCom564AutoscanMode;
 
+typedef enum {
+    kRawADC = 0,
+    k0to5Volts,
+    k0to10Volts,
+    kPlusMinus5Volts,
+    kPlusMinus10Volts
+} EInterpretXy564ADC;
+
 @interface ORXYCom564Model : ORVmeIOCard <ORDataTaker, ORAdcProcessing>
 {
     @protected
     unsigned long          dataId;
     EXyCom564OperationMode operationMode;
     EXyCom564AutoscanMode  autoscanMode;
+    EInterpretXy564ADC     interpretADC;
     BOOL                   pollCard;
     BOOL                   shipRecords;
     BOOL                   pollRunning;
@@ -109,6 +118,9 @@ typedef enum {
 - (void)                    setAutoscanMode: (EXyCom564AutoscanMode) anIndex;
 - (BOOL)                    shipRecords;
 - (void)                    setShipRecords:(BOOL)ship;
+- (void)                    setInterpretADC: (EInterpretXy564ADC)anInt;
+- (EInterpretXy564ADC)      interpretADC;
+
 - (int) averageValueNumber;
 - (void) setAverageValueNumber:(int)aValue;
 
@@ -176,3 +188,4 @@ extern NSString* ORXYCom564ADCValuesChanged;
 extern NSString* ORXYCom564ShipRecordsChanged;
 extern NSString* ORXYCom564AverageValueNumberHasChanged;
 extern NSString* ORXYCom564PollingSpeedHasChanged;
+extern NSString* ORXYCom564InterpretADCHasChanged;
