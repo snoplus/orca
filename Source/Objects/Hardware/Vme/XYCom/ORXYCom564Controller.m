@@ -290,6 +290,7 @@
 - (void) interpretADCChanged:(NSNotification *)aNote
 {
     [interpretADCAsPopUp selectItemAtIndex:[model interpretADC]];
+    [self displayRawChanged:aNote];
 }
 
 #pragma mark •••Actions
@@ -441,6 +442,11 @@
 - (IBAction) setInterpretADCAction:(id)sender
 {
     [model setInterpretADC:(EInterpretXy564ADC)[interpretADCAsPopUp indexOfSelectedItem]];
+}
+
+- (IBAction) refreshADCValuesAction:(id)sender
+{
+    [self displayRawChanged:nil];
 }
 
 #pragma mark ***Misc Helpers

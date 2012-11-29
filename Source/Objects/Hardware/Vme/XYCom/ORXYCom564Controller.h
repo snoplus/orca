@@ -114,6 +114,7 @@
 - (IBAction) setAverageValueAction:(id)sender;
 - (IBAction) setShipRecordsAction:(id)sender;
 - (IBAction) setInterpretADCAction:(id)sender;
+- (IBAction) refreshADCValuesAction:(id)sender;
 
 - (IBAction) read: (id) pSender;
 - (IBAction) write: (id) pSender;
