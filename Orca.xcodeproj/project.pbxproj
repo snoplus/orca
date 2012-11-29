@@ -2342,7 +2342,6 @@
 		84BC88EE0F9CDD5B00336DF1 /* ORSerialPortModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84BC88ED0F9CDD5B00336DF1 /* ORSerialPortModel.h */; };
 		84BC89130F9CDDAC00336DF1 /* ORSerialPortModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84BC89120F9CDDAC00336DF1 /* ORSerialPortModel.m */; };
 		84BC89C20F9CE75F00336DF1 /* SerialPortControls.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84BC89C10F9CE75F00336DF1 /* SerialPortControls.nib */; };
-		84BC8DF40F9DF76500336DF1 /* NoOilHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84BC8DF30F9DF76500336DF1 /* NoOilHelp.plist */; };
 		84BDF04312DC943700B974F8 /* ORSNMP.h in Headers */ = {isa = PBXBuildFile; fileRef = 84BDF04112DC943700B974F8 /* ORSNMP.h */; };
 		84BDF04412DC943700B974F8 /* ORSNMP.m in Sources */ = {isa = PBXBuildFile; fileRef = 84BDF04212DC943700B974F8 /* ORSNMP.m */; };
 		84BF43CC118793FA00F55216 /* Caen1785.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84BF43C4118793FA00F55216 /* Caen1785.gif */; };
@@ -14339,7 +14338,6 @@
 				84098F5D0F964F0100036BE8 /* PDcu.tif in Resources */,
 				84098F6F0F96589B00036BE8 /* Turbo.gif in Resources */,
 				84BC89C20F9CE75F00336DF1 /* SerialPortControls.nib in Resources */,
-				84BC8DF40F9DF76500336DF1 /* NoOilHelp.plist in Resources */,
 				84D258680FA7340B00626276 /* MotionNode.gif in Resources */,
 				84D258690FA7340B00626276 /* MotionNode.nib in Resources */,
 				84D2586B0FA7340B00626276 /* NoMotionNodeDriverHelp.plist in Resources */,
