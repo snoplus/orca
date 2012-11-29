@@ -19,6 +19,8 @@
 
 #pragma mark ***Imported Files
 @class ORCouchDB;
+@class ORAlarm;
+
 @interface ORCouchDBModel : OrcaObject
 {
 @private
@@ -43,6 +45,9 @@
     BOOL cancelSweep;
     int processCount;
     int changedCount;
+    BOOL wasReplicationRunning;
+    int replicationCheckCount;
+    ORAlarm* replicationAlarm;
 }
 
 #pragma mark ***Initialization

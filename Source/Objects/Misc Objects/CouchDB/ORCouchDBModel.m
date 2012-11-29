@@ -71,6 +71,7 @@ NSString* ORCouchDBLock							= @"ORCouchDBLock";
 #define kAdcRenamed		 @"kAdcRenamed"
 
 #define kCouchDBPort 5984
+#define kUpdateStatsInterval 30
 
 static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 
@@ -110,6 +111,9 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
     [userName release];
     [remoteHostName release];
 	[docList release];
+    [replicationAlarm release];
+	[replicationAlarm clearAlarm];
+
 	[super dealloc];
 }
 
@@ -467,12 +471,14 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 
 - (ORCouchDB*) remoteHistoryDBRef
 {
-	return [ORCouchDB couchHost:remoteHostName port:kCouchDBPort username:userName pwd:password database:[self historyDatabaseName] delegate:self];
+    if([remoteHostName length]==0)return nil;
+	else return [ORCouchDB couchHost:remoteHostName port:kCouchDBPort username:userName pwd:password database:[self historyDatabaseName] delegate:self];
 }
 
 - (ORCouchDB*) remoteDBRef
 {
-	return [ORCouchDB couchHost:remoteHostName port:kCouchDBPort username:userName pwd:password database:[self databaseName] delegate:self];
+    if([remoteHostName length]==0)return nil;
+	else return [ORCouchDB couchHost:remoteHostName port:kCouchDBPort username:userName pwd:password database:[self databaseName] delegate:self];
 }
 
 - (void) createDatabase
@@ -736,7 +742,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 			if(keepHistory)[[self historyDBRef] databaseInfo:self tag:kInfoHistoryDB];
 			[self getRemoteInfo:NO];
 		}
-		[self performSelector:@selector(updateDatabaseStats) withObject:nil afterDelay:30];	
+		[self performSelector:@selector(updateDatabaseStats) withObject:nil afterDelay:kUpdateStatsInterval];
 	}
 }
 
@@ -855,7 +861,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 }
 - (void) processRemoteTaskList:(NSArray*)aList verbose:(BOOL)verbose
 {
-	if(!remoteHostName)return;
+    if([remoteHostName length]==0)return;
 	if([aList count] && verbose)NSLog(@"Couch Remote Tasks:\n");
 	[self setReplicationRunning:NO];
 	for(id aTask in aList){
@@ -866,18 +872,50 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 				if([item isKindOfClass:NSClassFromString(@"NSString")]){
 					if([(NSString*)item rangeOfString:remoteHostName].location != NSNotFound){
 						[self setReplicationRunning:YES];
+                        wasReplicationRunning = YES;
+                        replicationCheckCount = 0;
 					}
 				}
 			}
 		}
 		if(verbose)NSLog(@"%@\n",aTask);
 	}
+    [self performSelectorOnMainThread:@selector(checkReplication) withObject:nil waitUntilDone:NO];
+}
+
+- (void) checkReplication
+{
+    if(wasReplicationRunning && !replicationRunning){
+        replicationCheckCount++;
+        if(replicationCheckCount==5 || replicationCheckCount==7){
+            [self startReplication];
+        }
+        if(replicationCheckCount >= 10){
+            if(!replicationAlarm){
+                NSString* s = [NSString stringWithFormat:@"CouchDB (%lu)",[self uniqueIdNumber]];
+                replicationAlarm = [[ORAlarm alloc] initWithName:s severity:kImportantAlarm];
+                [replicationAlarm setSticky:YES];
+                [replicationAlarm setHelpString:@"CouchDB replication has failed.\nORCA has tried repeatedly and has been unable to restart it. Intervention is required. Contact your database manager.\n\nThis alarm will not go away until the problem is cleared. Acknowledging the alarm will silence it."];
+                [replicationAlarm postAlarm];
+            }
+            replicationCheckCount = 0;
+        }
+    }
+    else {
+        [replicationAlarm clearAlarm];
+        [replicationAlarm release];
+        replicationAlarm = nil;
+    }
+
 }
 
 - (void) startReplication
 {
-	[self createRemoteDataBases];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateDatabaseStats) object:nil];
+    
 	[self replicate:YES];
+    
+	[self performSelector:@selector(updateDatabaseStats) withObject:nil afterDelay:4];
 }
 
 - (void) periodicCompact
@@ -1086,10 +1124,16 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
     [self setUserName:[decoder decodeObjectForKey:@"UserName"]];
     [self setRemoteHostName:[decoder decodeObjectForKey:@"RemoteHostName"]];
     [self setStealthMode:[decoder decodeBoolForKey:@"stealthMode"]];
-    [[self undoManager] enableUndoRegistration];    
+    
+    wasReplicationRunning = [decoder decodeBoolForKey:@"wasReplicationRunning"];
+	if(wasReplicationRunning){
+        [self performSelector:@selector(startReplication) withObject:nil afterDelay:4];
+    }
+    replicationCheckCount = 0;
+    
+    [[self undoManager] enableUndoRegistration];
 	[self registerNotificationObservers];
-	
-    return self;
+   return self;
 }
 
 - (void)encodeWithCoder:(NSCoder*)encoder
@@ -1102,6 +1146,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
     [encoder encodeObject:password forKey:@"Password"];
     [encoder encodeObject:userName forKey:@"UserName"];
     [encoder encodeObject:remoteHostName forKey:@"RemoteHostName"];
+    [encoder encodeBool:wasReplicationRunning forKey:@"wasReplicationRunning"];
 }
 @end
 
