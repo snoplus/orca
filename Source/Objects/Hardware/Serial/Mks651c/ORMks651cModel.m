@@ -1343,41 +1343,40 @@ NSString* ORMks651cLock = @"ORMks651cLock";
 	
 	int lastRequestNumber = [[lastRequest substringFromIndex:1] intValue];
 	
-	BOOL status = NO;
 	switch(lastRequestNumber){
-		case 0: status = [self decodeAnalogSetPoint:theResponse];			break;
+		case 0:  [self decodeAnalogSetPoint:theResponse];			break;
 			
 		case 1:
 		case 2:
 		case 3:
 		case 4:
 		case 10:
-					status = [self decodeSetPoint:theResponse]; 
+					 [self decodeSetPoint:theResponse]; 
 		break;
 			
-		case 5:		status = [self decodeSystemPressure:theResponse];			break;
-		case 7:		status = [self decodeAlternateSystemStatus:theResponse];	break;
+		case 5:		 [self decodeSystemPressure:theResponse];			break;
+		case 7:		 [self decodeAlternateSystemStatus:theResponse];	break;
 			
 		case 11:	
 		case 12:	
 		case 13:	
 		case 14:	
-			status = [self decodeThresholdLimits:theResponse];		break;
+			 [self decodeThresholdLimits:theResponse];		break;
 	
 		case 15:
 		case 16:
 		case 17:
 		case 18:
 		case 19:
-			status = [self decodeSoftStartRate:theResponse]; 
+			 [self decodeSoftStartRate:theResponse]; 
 		break;
 			
-		case 20:	status = [self decodeAnalogSoftStart:theResponse];			break;
-		case 21:	status = [self decodeOpenSoftStart:theResponse];			break;
-		case 22:	status = [self decodeCloseSoftStart:theResponse];			break;
+		case 20:	 [self decodeAnalogSoftStart:theResponse];			break;
+		case 21:	 [self decodeOpenSoftStart:theResponse];			break;
+		case 22:	 [self decodeCloseSoftStart:theResponse];			break;
 			
-		case 23:	status = [self decodeValveType:theResponse];				break;
-		case 24:	status = [self decodeAnalogRange:theResponse];				break;
+		case 23:	 [self decodeValveType:theResponse];				break;
+		case 24:	 [self decodeAnalogRange:theResponse];				break;
 			
 		case 25:
 		case 26:
@@ -1385,26 +1384,26 @@ NSString* ORMks651cLock = @"ORMks651cLock";
 		case 28:
 		case 29:
 		case 30:
-					status = [self decodeSetPointType:theResponse]; 
+					 [self decodeSetPointType:theResponse]; 
 		break;
 			
-		case 31:	status = [self decodePositionIndicatorRange:theResponse];	break;
-		case 32:	status = [self decodeDirectReverse:theResponse];			break;
-		case 33:	status = [self decodeSensorRange:theResponse];				break;
-		case 34:	status = [self decodePressureUnits:theResponse];			break;
-		case 35:	status = [self decodeSensorVoltageRange:theResponse];		break;
-		case 36:	status = [self decodeSensorType:theResponse];				break;
-		case 37:	status = [self decodeSystemStatus:theResponse];				break;
-		case 38:	status = [self decodeSoftwareVersion:theResponse];			break;
-		case 39:	status = [self decodeBatteryStatus:theResponse];			break;
-		case 40:	status = [self decodeValveResponseToPowerFail:theResponse];	break;
+		case 31:	 [self decodePositionIndicatorRange:theResponse];	break;
+		case 32:	 [self decodeDirectReverse:theResponse];			break;
+		case 33:	 [self decodeSensorRange:theResponse];				break;
+		case 34:	 [self decodePressureUnits:theResponse];			break;
+		case 35:	 [self decodeSensorVoltageRange:theResponse];		break;
+		case 36:	 [self decodeSensorType:theResponse];				break;
+		case 37:	 [self decodeSystemStatus:theResponse];				break;
+		case 38:	 [self decodeSoftwareVersion:theResponse];			break;
+		case 39:	 [self decodeBatteryStatus:theResponse];			break;
+		case 40:	 [self decodeValveResponseToPowerFail:theResponse];	break;
 			
 		case 41:
 		case 42:
 		case 43:
 		case 44:
 		case 45:
-			status = [self decodeLeadValue:theResponse];			
+			 [self decodeLeadValue:theResponse];			
 		break;
 
 		case 46:
@@ -1412,11 +1411,11 @@ NSString* ORMks651cLock = @"ORMks651cLock";
 		case 48:
 		case 49:
 		case 50:
-			status = [self decodeGainValue:theResponse];			
+			 [self decodeGainValue:theResponse];			
 		break;
 	
 		case 51:
-			status = [self decodeControlType:theResponse];			
+			 [self decodeControlType:theResponse];			
 		break;
 			
 	}
