@@ -618,6 +618,7 @@ ORTTCPX_READ_IMPLEMENT(QueryAndClearESR, int)
     }
     
     [lockString retain];
+    [userLocked release];
     userLocked = lockString;
     
     [[NSNotificationCenter defaultCenter]
