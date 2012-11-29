@@ -312,7 +312,7 @@ NSString* ORTRS1ModelControlRegisterChanged = @"ORTRS1ModelControlRegisterChange
 	expectedNumberDataBytes = 8L * 1024L * (((controlRegister >> 8) & 0xff) + 1);
 	
 	
-    dataBuffer = (unsigned long*)malloc(RecodeSizeInLongs * sizeof(long));
+    dataBuffer = (unsigned long*)malloc(RecodeSizeInLongs * sizeof(unsigned long));
 	firstTime = YES;
 }
 

@@ -238,7 +238,6 @@ enum Gretina4FIFOStates {
     int registerIndex;
     unsigned long spiWriteValue;
 	
-	NSString* spiConnectorName;
 	ORConnector*  spiConnector; //we won't draw this connector so we have to keep a reference to it
 
 }
