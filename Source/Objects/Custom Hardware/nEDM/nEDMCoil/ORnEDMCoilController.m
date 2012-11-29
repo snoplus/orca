@@ -287,6 +287,7 @@
                 [newColumn setDataCell:[firstColumn dataCell]];
                 [[newColumn headerCell] setStringValue:[newColumn identifier]];
                 [aTableView addTableColumn:newColumn];
+                [newColumn release]; //fix memory leak. MAH 11/29/13
             }
         }
         return [model numberOfCoils];
