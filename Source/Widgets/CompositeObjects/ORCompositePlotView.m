@@ -188,7 +188,6 @@
 							   heightOfXAxis) ];
 	
 	//adjust position of legend to be on the right, at the bottom of the plot
-	legendXDelta = 0;
 	if(showLegend){
 		legendXDelta = legendRect.size.width;
 		[legend setFrame:NSMakeRect([self bounds].size.width - legendXDelta,
