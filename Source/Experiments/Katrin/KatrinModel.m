@@ -202,8 +202,8 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 	[[segmentGroups objectAtIndex:0] addParametersToDictionary:objDictionary useName:@"FPDGeometry" addInGroupName:NO];
 	[[segmentGroups objectAtIndex:1] addParametersToDictionary:objDictionary useName:@"VetoGeometry" addInGroupName:NO];
 	
-	NSString* rootMapFile = [[[segmentGroups objectAtIndex:0] mapFile] stringByExpandingTildeInPath];
-	rootMapFile = [rootMapFile stringByDeletingPathExtension];
+	//NSString* rootMapFile = [[[segmentGroups objectAtIndex:0] mapFile] stringByExpandingTildeInPath];
+	//rootMapFile = [rootMapFile stringByDeletingPathExtension];
 
 	//add the FLT/ORB SN
 	NSArray* keys = [NSArray arrayWithObjects:@"kFltSlot",@"kFltSN",@"kORBSN",nil];
