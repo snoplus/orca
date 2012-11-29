@@ -98,11 +98,12 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 
 - (void) dealloc 
 {
+    [self _stopPolling];
     [channelGains release];
     [chanADCVals release];
     [chanADCAverageVals release];
     [chanADCAverageValsCache release];
-	[self _stopPolling];    
+    [userLocked release];
     [super dealloc];
 }
 
@@ -146,12 +147,12 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 
 - (void) startPollingActivity
 {
-    [self performSelector:@selector(_startPolling) withObject:nil afterDelay:0.5];    
+    [self _startPolling];
     
 }
 - (void) stopPollingActivity
 {
-    [self performSelector:@selector(_stopPolling) withObject:nil afterDelay:0.5];    
+    [self _stopPolling];    
 }
 
 #pragma mark •••Hardware Access
@@ -453,6 +454,51 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 	 object:self];    
 }
 
+- (BOOL) userLocked
+{
+    return userLocked != nil;
+}
+
+- (NSString*) userLockedString
+{
+    if (userLocked == nil) return @"";
+    return userLocked;
+}
+
+- (BOOL) setUserLock:(BOOL)lock withString:(NSString *)lockString
+{
+    // Tries to set or unset lock, returns YES on success, NO on failure.
+    
+    // am I locked?
+    if (userLocked != nil) {
+        if ([userLocked isEqualToString:lockString]) {
+            // Means we are already locked, can only unlock
+            if (!lock) {
+                [userLocked release];
+                userLocked = nil;
+                [[NSNotificationCenter defaultCenter]
+                      postNotificationOnMainThreadWithName:ORXYCom564Lock
+                 object:self];
+            }
+            return YES;
+        }
+        return NO;
+    }
+    if (!lock) {
+        // Trying to unlock without a already having a lock?
+        return YES;
+    }
+    
+    [lockString retain];
+    [userLocked release];
+    userLocked = lockString;
+    
+    [[NSNotificationCenter defaultCenter]
+          postNotificationOnMainThreadWithName:ORXYCom564Lock
+     object:self];
+    
+    return YES;
+}
 
 #pragma mark ***Card qualities
 - (short) getNumberOfChannels
@@ -568,7 +614,6 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     //----------------------------------------------------------------------------------------
     // first add our description to the data description
     isRunning = YES;
-    adapter = [self adapter];
     [self _stopPolling];
     [self appendDataDescription:aDataPacket userInfo:userInfo];
     
@@ -613,6 +658,9 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     [self setAverageValueNumber:[decoder decodeIntForKey:@"kORXYCom564AvgValNumber"]];    
     [self setAutoscanMode:[decoder decodeIntForKey:@"kORXYCom564AutoscanMode"]];
     [self setShipRecords:[decoder decodeBoolForKey:@"kORXYCom564ShipRecords"]];
+    NSString* ul = [decoder decodeObjectForKey:@"kORXYCom564UL"];
+    if (ul != nil) [self setUserLock:YES withString:ul];
+    
     [[self undoManager] enableUndoRegistration];
 		
     return self;
@@ -626,6 +674,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     [encoder encodeInt:[self autoscanMode] forKey:@"kORXYCom564AutoscanMode"];
     [encoder encodeInt:[self averageValueNumber] forKey:@"kORXYCom564AvgValNumber"];
     [encoder encodeBool:shipRecords forKey:@"kORXYCom564ShipRecords"];
+    [encoder encodeObject:userLocked forKey:@"kORXYCom564UL"];
 }
 
 @end
@@ -745,7 +794,6 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     [[NSNotificationCenter defaultCenter]
      postNotificationOnMainThreadWithName:ORXYCom564PollingActivityChanged
                                    object:self];
-    adapter = [self adapter];
 
     // perform the run loop
     int tryTime = 0;

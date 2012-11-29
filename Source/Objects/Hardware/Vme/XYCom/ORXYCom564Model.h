@@ -89,7 +89,7 @@ typedef enum {
     NSData*                readBuffer;
     int                    averageValueNumber;
     int                    currentAverageState;
-    id                     adapter;
+    NSString*              userLocked;
 
 }
 #pragma mark ***Initialization
@@ -131,6 +131,10 @@ typedef enum {
 - (void) programReadoutMode;
 - (void) startPollingActivity;
 - (void) stopPollingActivity;
+
+- (BOOL) userLocked;
+- (NSString*) userLockedString;
+- (BOOL) setUserLock:(BOOL)lock withString:(NSString*)lockString;
 
 #pragma mark ***Card qualities
 - (short) getNumberOfChannels;
