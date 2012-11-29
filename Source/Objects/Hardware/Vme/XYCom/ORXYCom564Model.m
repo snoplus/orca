@@ -50,6 +50,8 @@ NSString* ORXYCom564InterpretADCHasChanged  = @"ORXYCom564InterpretADCHasChanged
 - (void) _createArrays;
 - (void) _readAllAdcChannels;
 - (void) _setPollingSpeed:(NSTimeInterval)aTime;
+- (double) _interpretADCValue:(uint16_t)adc;
+- (uint16_t) _recenterValue:(uint16)adc;
 @end
 
 @implementation ORXYCom564Model
@@ -561,18 +563,25 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 {
     return [NSString stringWithFormat:@"XVME-564,%d,%d",[self crateNumber],[self slot]];
 }
+
 - (double) convertedValue:(int)channel
 {
-    return (double) 0xFFFF;
+    uint16_t raw = (averageValueNumber != 1) ?
+                    [self getAdcAverageValueAtChannel:channel] :
+                    [self getAdcValueAtChannel:channel];
+    return [self _interpretADCValue:raw];
 }
+
 - (double) maxValueForChan:(int)channel
 {
-    return (double) 0xFFFF;
+    return [self _interpretADCValue:0xFFFF];
 }
+
 - (double) minValueForChan:(int)channel
 {
-    return 0.0;
+    return [self _interpretADCValue:0x0000];
 }
+
 - (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit  channel:(int)channel
 {
     
@@ -908,6 +917,8 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
                      numToRead:channelsToRead
                     withAddMod:[self addressModifier]
                  usingAddSpace:0x01];
+        int i;
+        for (i=0;i<channelsToRead;i++) readOut[i] = [self _recenterValue:readOut[i]];
     }
     [self _addAverageValues:chanADCVals];
     
@@ -920,4 +931,46 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORXYCom564PollingSpeedHasChanged
                                                         object:self];
 }
+
+- (double) _interpretADCValue:(uint16_t)raw
+{
+    // we assume value is recentered.
+    
+    double volrange = 20; // +-10V
+    double adcrange = (double)(0xFFFF + 1); // 16bit
+    double _offset = 0;
+    
+    switch ([self interpretADC]) {
+        case kRawADC: return raw;
+        case k0to5Volts:
+            volrange = 5.; break;
+        case k0to10Volts:
+            volrange = 10.; break;
+        case kPlusMinus5Volts:
+            volrange = 10.;
+            _offset = (double) 0x8000;
+            break;
+        case kPlusMinus10Volts:
+            volrange = 20.;
+            _offset = (double) 0x8000;
+            break;
+        default: break;
+    }
+    double vol = raw - _offset; // offset
+    return vol * volrange / adcrange; //scaling
+}
+
+- (uint16_t) _recenterValue:(uint16)raw
+{
+    // first thing, centering so that 0x8000 is 0.
+    if (raw < 0x8000) {
+        // Really positive numbers
+        raw += 0x8000;
+    } else {
+        // really negative numbers
+        raw -= 0x8000;
+    }
+    return raw;
+}
+
 @end
