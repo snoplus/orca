@@ -247,7 +247,7 @@ void arrayList(nodeType* p, id delegate)
 filterData ex(nodeType *p,id delegate) 
 {
 	filterData tempData = {0,{0}};
-	filterData tempData1 = {0,{0}};
+	filterData tempData1;
     if (!p) {
 		tempData.type = kFilterLongType;
 		tempData.val.lValue = 0;
