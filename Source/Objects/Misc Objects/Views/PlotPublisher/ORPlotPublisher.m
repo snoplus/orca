@@ -219,8 +219,6 @@
 	NSString* startingPath = [[NSUserDefaults standardUserDefaults] objectForKey: kPlotPublisherDefaultFile];
 	NSString* startingDir = [startingPath stringByDeletingLastPathComponent];
 	if(!startingDir)startingDir = NSHomeDirectory();
-	NSString* startingFile = [startingPath lastPathComponent];
-	if(!startingFile)startingFile = @"PublisherSettings";
 	
     NSOpenPanel *openPanel = [NSOpenPanel openPanel];
     [openPanel setPrompt:@"Choose"];
@@ -237,6 +235,8 @@
         }
     }];
 #else 	
+	NSString* startingFile = [startingPath lastPathComponent];
+	if(!startingFile)startingFile = @"PublisherSettings";
     [openPanel beginSheetForDirectory:startingDir
 								 file:startingFile
 					   modalForWindow:[self window]
