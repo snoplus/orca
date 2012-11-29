@@ -736,7 +736,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 
 - (void) _pollingThread
 {
-    NSLog(@"Beginning thread: %@,0x %x\n",[self objectName],[self baseAddress]);
+    NSLog(@"Beginning thread: %@, (Crate %d Slot %d) \n",[self objectName],[self crateNumber],[self slot]);
     @synchronized(self) {
         if (pollRunning) return;
         pollRunning = YES;
@@ -749,35 +749,36 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 
     // perform the run loop
     int tryTime = 0;
-    NSDate* now = [NSDate date];
+    NSDate* start = [[[NSDate alloc] init] retain];
     @try{
         [self initBoard];
         while(!pollStopRequested){
 			NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-            //@autoreleasepool { //some of us are still using XCode 3.xx
-                [self _pollAllChannels];
-	            tryTime += 1;
-    	        if (tryTime == 1000) {
-        	        [self _setPollingSpeed:[now timeIntervalSinceDate:[NSDate date]]/1000];
-            	    now = [NSDate date];
-                	tryTime = 0;
-            	}
-           // }
-			[pool release];
+            [self _pollAllChannels];
+	        tryTime += 1;
+            if (tryTime == 1000) {
+                NSDate* tmp = [[[NSDate alloc] init] retain];
+                [self _setPollingSpeed:[tmp timeIntervalSinceDate:start]/1000];
+                [start release];
+                start = tmp;
+                tryTime = 0;
+            }
+            [pool release];
         }
     } @catch (NSException* e) {
         [self _stopPolling];
-        NSLogColor([NSColor redColor], @"Exception at (%@, %d, %d) readout thread, stopping.\n",
+        NSLogColor([NSColor redColor], @"Exception at (%@, Crate %d, Slot %d) readout thread, stopping.\n",
                    [self objectName],[self crateNumber],[self slot]);
         NSLogColor([NSColor redColor], @"%@\n",e);
     }
     pollRunning = NO;
-    
+    [start release];
+    [self _setPollingSpeed:0.0];
     [[NSNotificationCenter defaultCenter]
      postNotificationOnMainThreadWithName:ORXYCom564PollingActivityChanged
                                    object:self];
     
-    NSLog(@"Ending thread: %@,0x %x\n",[self objectName],[self baseAddress]);    
+   NSLog(@"Ending thread: %@ (Crate %d, Slot %d) \n",[self objectName],[self crateNumber],[self slot]);
 }
 
 
