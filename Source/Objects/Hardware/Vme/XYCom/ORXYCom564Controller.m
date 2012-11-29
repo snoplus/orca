@@ -57,7 +57,7 @@ typedef enum {
     
     settingsSize       = NSMakeSize(400,570);
     gainsSize          = NSMakeSize(480,580);
-    channelReadoutSize = NSMakeSize(580,480);
+    channelReadoutSize = NSMakeSize(580,500);
     
     blankView = [[NSView alloc] init];
     
@@ -191,6 +191,7 @@ typedef enum {
     [basicOpsLockButton setState: locked];
     [addressText setEnabled:!locked && !runInProgress];
 	[initBoardButton setEnabled:!locked && !runInProgress];
+    [self _updateButtons];
 }
 
 - (void) setModel:(id)aModel
@@ -568,16 +569,23 @@ typedef enum {
 
 - (void) _updateButtons
 {
+    BOOL isUserLocked = [model userLocked];
+    if (isUserLocked) {
+        [userLockedText setStringValue:[NSString stringWithFormat:@"Card locked with: %@",[model userLockedString]]];
+    } else {
+        [userLockedText setStringValue:@""];
+    }
     BOOL isPolling = [model isPolling];
-    [averagingValue setEnabled:!isPolling];
-    [shipRecordsButton setEnabled:!isPolling];
-    [resetBoardButton setEnabled:!isPolling];
-    [initBoardButton setEnabled:!isPolling];
-    [basicWriteButton setEnabled:!isPolling];
-    [addressModifierPopUp setEnabled:!isPolling];
-    [addressText setEnabled:!isPolling];
-    [operationModePopUp setEnabled:!isPolling];
-    [autoscanModePopUp setEnabled:!isPolling];
+    [averagingValue setEnabled:(!isPolling && !isUserLocked)];
+    [shipRecordsButton setEnabled:(!isPolling && !isUserLocked)];
+    [resetBoardButton setEnabled:(!isPolling && !isUserLocked)];
+    [initBoardButton setEnabled:(!isPolling && !isUserLocked)];
+    [basicWriteButton setEnabled:(!isPolling && !isUserLocked)];
+    [addressModifierPopUp setEnabled:(!isPolling && !isUserLocked)];
+    [addressText setEnabled:(!isPolling && !isUserLocked)];
+    [operationModePopUp setEnabled:(!isPolling && !isUserLocked)];
+    [autoscanModePopUp setEnabled:(!isPolling && !isUserLocked)];
+    [pollButton setEnabled:!isUserLocked];
     
 }
 @end

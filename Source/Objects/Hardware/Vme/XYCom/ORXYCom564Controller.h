@@ -71,6 +71,8 @@
     IBOutlet NSTextField*	pollingText;
     IBOutlet NSProgressIndicator* pollingIndicator;
     IBOutlet NSTextField*   pollingSpeed;
+
+    IBOutlet NSTextField*	userLockedText;
     
     NSView *blankView;
     NSSize settingsSize;
