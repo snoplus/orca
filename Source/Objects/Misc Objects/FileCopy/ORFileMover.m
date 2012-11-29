@@ -363,7 +363,7 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
 		int exitCode = [task terminationStatus];
         if( exitCode == 0) {
             //probable success.. but let's make sure
-            NSRange range = {NSNotFound,0}; //default is not found
+            NSRange range;
             switch ([self transferType]) {
                 case eUseSCP:
 					range = [allOutput rangeOfString:@"%"];
