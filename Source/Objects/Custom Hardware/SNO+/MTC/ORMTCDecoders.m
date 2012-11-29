@@ -96,7 +96,7 @@ mtcModel = _mtcModel;
 
 -(void)dealloc
 {
-    [[self mtcDateFormatter] release];
+    self.mtcDateFormatter = nil;
 	[super dealloc];
 }
 
