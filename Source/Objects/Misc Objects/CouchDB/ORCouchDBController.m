@@ -292,6 +292,7 @@
 }
 - (IBAction) startReplicationAction:(id)sender
 {
+    [model createRemoteDataBases];
 	[model startReplication];
 }
 - (IBAction) createRemoteDBAction:(id)sender
@@ -330,7 +331,7 @@
                           nil,
                           nil,@"There will be NO values put in the database if you activate this option.");
     }
-    else [model setStealthMode:YES];
+    else [model setStealthMode:NO];
 }
 
 - (IBAction) couchDBLockAction:(id)sender
