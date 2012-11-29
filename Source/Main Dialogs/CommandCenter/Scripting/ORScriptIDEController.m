@@ -269,6 +269,7 @@
 - (void) runPeriodicallyChanged:(NSNotification*)aNote
 {
 	[runPeriodicallyCB setIntValue: [model runPeriodically]];
+    [self lockChanged:nil];
 }
 
 - (void) autoRunAtQuitChanged:(NSNotification*)aNote
@@ -335,6 +336,16 @@
 	
     [addInputButton setEnabled:!locked];
 	[removeInputButton setEnabled:!locked && ([[inputVariablesTableView selectedRowIndexes] count] > 0)];
+    [periodicRunIntervalField setEnabled:!locked && [model runPeriodically]];
+    
+    [breakChainButton setEnabled:!locked];
+	[runPeriodicallyCB setEnabled:!locked];
+	[autoRunAtQuitCB setEnabled:!locked];
+	[autoStopWithRunCB setEnabled:!locked];
+	[autoStartWithRunCB setEnabled:!locked];
+	[autoStartWithDocumentCB setEnabled:!locked];
+    [nameField setEnabled:!locked];
+    [insertCodeButton setEnabled:!locked];
 }
 
 - (void) debuggerStateChanged:(NSNotification*)aNote

@@ -186,7 +186,7 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 		return [[self scriptRunner] debugging]?@"Debugging":@"Running";
 	}
 	else if(nextPeriodicRun!=nil){
-		NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] initWithDateFormat:@"%H:%M:%S" allowNaturalLanguage:NO];
+		NSDateFormatter* dateFormatter = [[[NSDateFormatter alloc] initWithDateFormat:@"%H:%M:%S" allowNaturalLanguage:NO] autorelease];
 		NSString* nextTime = [dateFormatter stringFromDate:nextPeriodicRun];
 		return [NSString stringWithFormat:@"Idle until %@",nextTime];
 	}
