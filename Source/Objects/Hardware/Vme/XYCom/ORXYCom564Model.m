@@ -140,7 +140,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
             break;
     }    
     [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORXYCom564ReadoutModeChanged
+	      postNotificationOnMainThreadWithName:ORXYCom564ReadoutModeChanged
 	 object:self];
 
 }
@@ -250,7 +250,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     }
 
     [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORXYCom564ChannelGainChanged
+	      postNotificationOnMainThreadWithName:ORXYCom564ChannelGainChanged
 	 object:self];    
     
 }
@@ -262,7 +262,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     [channelGains replaceObjectAtIndex:aChannel withObject:[NSNumber numberWithInt:gain]];
     
     [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORXYCom564ChannelGainChanged
+	      postNotificationOnMainThreadWithName:ORXYCom564ChannelGainChanged
 	 object:self];    
 
 }
@@ -292,7 +292,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
         memset((void*)[chanADCAverageValsCache bytes], 0, [chanADCAverageValsCache length]);
     }
     [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORXYCom564AverageValueNumberHasChanged
+	      postNotificationOnMainThreadWithName:ORXYCom564AverageValueNumberHasChanged
 	 object:self];    
 }
     
@@ -418,7 +418,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     operationMode = anIndex;
     
     [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORXYCom564OperationModeChanged
+	      postNotificationOnMainThreadWithName:ORXYCom564OperationModeChanged
 	 object:self];
 }
 
@@ -434,7 +434,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     autoscanMode = anIndex;
     
     [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORXYCom564AutoscanModeChanged
+	      postNotificationOnMainThreadWithName:ORXYCom564AutoscanModeChanged
 	 object:self];    
 }
 
@@ -450,7 +450,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     shipRecords = ship;
     
     [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORXYCom564ShipRecordsChanged
+	      postNotificationOnMainThreadWithName:ORXYCom564ShipRecordsChanged
 	 object:self];    
 }
 
@@ -728,7 +728,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     }
     
     [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORXYCom564ChannelGainChanged
+	      postNotificationOnMainThreadWithName:ORXYCom564ChannelGainChanged
 	 object:self];
     
 }
@@ -740,7 +740,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     chanADCVals = vals;
     if (notify) {
         [[NSNotificationCenter defaultCenter]
-         postNotificationName:ORXYCom564ADCValuesChanged
+              postNotificationOnMainThreadWithName:ORXYCom564ADCValuesChanged
          object:self];
     }    
 }

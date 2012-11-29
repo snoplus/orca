@@ -76,7 +76,7 @@ withOutput:(unsigned int)output sendCommand:(BOOL)cmd                       \
     LC ## PREPENDVAR ## CMD[output] = aVal;                                 \
     if (cmd) [self sendCommand ## UC ## PREPENDVAR ## CMD ## WithOutput:output];     \
     [[NSNotificationCenter defaultCenter]                                   \
-     postNotificationName:ORTTCPX400DP ##UC##PREPENDVAR ## CMD ## IsChanged \
+ postNotificationOnMainThreadWithName:ORTTCPX400DP ##UC##PREPENDVAR ## CMD ## IsChanged \
      object:self];                                                          \
 }                                                                           \
                                                                             \
@@ -385,7 +385,7 @@ ORTTCPX_READ_IMPLEMENT(QueryAndClearESR, int)
     [ipAddress release];
     ipAddress = anIp;
     [[NSNotificationCenter defaultCenter] 
-     postNotificationName:ORTTCPX400DPIpHasChanged
+          postNotificationOnMainThreadWithName:ORTTCPX400DPIpHasChanged
      object:self];   
 }
 
@@ -412,7 +412,7 @@ ORTTCPX_READ_IMPLEMENT(QueryAndClearESR, int)
     writeToSetOutput[0] = on;
     writeToSetOutput[1] = on;    
     [[NSNotificationCenter defaultCenter]
-     postNotificationName:ORTTCPX400DPWriteToSetOutputIsChanged
+          postNotificationOnMainThreadWithName:ORTTCPX400DPWriteToSetOutputIsChanged
      object:self];
 }
 - (void) setOutput:(unsigned int)output toBeOn:(BOOL)on
@@ -558,7 +558,7 @@ ORTTCPX_READ_IMPLEMENT(QueryAndClearESR, int)
     serialNumber = aSerial;
     
     [[NSNotificationCenter defaultCenter] 
-     postNotificationName:ORTTCPX400DPSerialNumberHasChanged
+          postNotificationOnMainThreadWithName:ORTTCPX400DPSerialNumberHasChanged
      object:self];      
     
 }
@@ -578,7 +578,7 @@ ORTTCPX_READ_IMPLEMENT(QueryAndClearESR, int)
     if (verbose == aVerb) return;
     verbose = aVerb;
     [[NSNotificationCenter defaultCenter]
-     postNotificationName:ORTTCPX400DPVerbosityHasChanged
+          postNotificationOnMainThreadWithName:ORTTCPX400DPVerbosityHasChanged
      object:self];
 }
 
@@ -605,7 +605,7 @@ ORTTCPX_READ_IMPLEMENT(QueryAndClearESR, int)
                 [userLocked release];
                 userLocked = nil;
                 [[NSNotificationCenter defaultCenter]
-                 postNotificationName:ORTTCPX400DPModelLock
+                      postNotificationOnMainThreadWithName:ORTTCPX400DPModelLock
                  object:self];
             }
             return YES;
@@ -622,7 +622,7 @@ ORTTCPX_READ_IMPLEMENT(QueryAndClearESR, int)
     userLocked = lockString;
     
     [[NSNotificationCenter defaultCenter]
-     postNotificationName:ORTTCPX400DPModelLock
+          postNotificationOnMainThreadWithName:ORTTCPX400DPModelLock
      object:self];
     
     return YES;
@@ -670,7 +670,7 @@ ORTTCPX_READ_IMPLEMENT(QueryAndClearESR, int)
     [self waitUntilCommandsDone];
     if ([self currentErrorCondition]) {
         [[NSNotificationCenter defaultCenter]
-         postNotificationName:ORTTCPX400DPErrorSeen
+              postNotificationOnMainThreadWithName:ORTTCPX400DPErrorSeen
          object:self];
         return YES;
     }
@@ -840,7 +840,7 @@ ORTTCPX_READ_IMPLEMENT(QueryAndClearESR, int)
     isConnected = connected;
     [readConditionLock unlock];
     [[NSNotificationCenter defaultCenter]
-     postNotificationName:ORTTCPX400DPConnectionHasChanged
+     postNotificationOnMainThreadWithName:ORTTCPX400DPConnectionHasChanged
      object:self];
     
 }
@@ -993,7 +993,7 @@ ORTTCPX_READ_IMPLEMENT(QueryAndClearESR, int)
     [generalReadback release];
     generalReadback = read;
     [[NSNotificationCenter defaultCenter]
-     postNotificationName:ORTTCPX400DPGeneralReadbackHasChanged
+          postNotificationOnMainThreadWithName:ORTTCPX400DPGeneralReadbackHasChanged
      object:self];
 }
 
