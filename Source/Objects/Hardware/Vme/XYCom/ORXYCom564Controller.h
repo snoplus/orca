@@ -34,7 +34,6 @@
     // Register Box
 	IBOutlet NSTextField*   slotField;
 	IBOutlet NSTextField*   addressText;
-    IBOutlet NSTextField* 	addressTextField;
     
     IBOutlet NSTextField* 	writeValueTextField;
     

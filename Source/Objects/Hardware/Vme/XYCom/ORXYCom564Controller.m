@@ -32,7 +32,8 @@ typedef enum {
 } EInterpretXy564ADC;
 
 @interface ORXYCom564Controller (private)
-- (NSString*) stringOfADCValue:(int)aVal withFormat:(EInterpretXy564ADC)interpret; 
+- (NSString*) stringOfADCValue:(int)aVal withFormat:(EInterpretXy564ADC)interpret;
+- (void) _updateButtons;
 @end
 
 @implementation ORXYCom564Controller
@@ -249,6 +250,7 @@ typedef enum {
 - (void) pollingActivityChanged:(NSNotification*)aNote
 {
     [pollButton setEnabled:YES];
+    [self _updateButtons];
     if ([model isPolling]) {
         [pollButton setTitle:@"Stop Polling"];
         [pollingIndicator startAnimation:self];
@@ -279,9 +281,9 @@ typedef enum {
 {
     NSTimeInterval atime = [model pollSpeed];
     if (atime == 0.0) {
-        [pollingSpeed setStringValue:[NSString stringWithFormat:@"%.2f Hz",0.0]];
+        [pollingSpeed setStringValue:[NSString stringWithFormat:@"%.1f Hz",0.0]];
     } else {
-        [pollingSpeed setStringValue:[NSString stringWithFormat:@"%.2f Hz",1./atime]];
+        [pollingSpeed setStringValue:[NSString stringWithFormat:@"%.1f Hz",1./atime]];
     }
 }
 
@@ -562,5 +564,20 @@ typedef enum {
         default:
             return @"";
     }
+}
+
+- (void) _updateButtons
+{
+    BOOL isPolling = [model isPolling];
+    [averagingValue setEnabled:!isPolling];
+    [shipRecordsButton setEnabled:!isPolling];
+    [resetBoardButton setEnabled:!isPolling];
+    [initBoardButton setEnabled:!isPolling];
+    [basicWriteButton setEnabled:!isPolling];
+    [addressModifierPopUp setEnabled:!isPolling];
+    [addressText setEnabled:!isPolling];
+    [operationModePopUp setEnabled:!isPolling];
+    [autoscanModePopUp setEnabled:!isPolling];
+    
 }
 @end
