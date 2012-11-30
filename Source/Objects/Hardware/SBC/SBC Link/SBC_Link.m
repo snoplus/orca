@@ -1303,7 +1303,7 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 		readBlockPtr->addressModifier	= anAddressModifier;
 		readBlockPtr->addressSpace		= anAddressSpace;
 		readBlockPtr->unitSize			= unitSize;
-		readBlockPtr->numItems			= numberBytes;
+		readBlockPtr->numItems			= numberBytes/unitSize;
 		
 		//Do NOT call the combo send:receive method here... we have the locks already in place
 		[self write:socketfd buffer:aPacket]; //write the packet
