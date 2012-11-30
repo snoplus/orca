@@ -833,7 +833,7 @@ static struct {
 	// so it can never be shorter than the header (*2 for words).
 	
 	if(aValue<kGretina4HeaderLengthLongs*2)aValue=kGretina4HeaderLengthLongs*2;
-	else if(aValue>0x3FF)aValue = 0x3FF;
+	else if(aValue>0x7FF)aValue = 0x7FF;
     [[[self undoManager] prepareWithInvocationTarget:self] setDataLength:chan withValue:dataLength[chan]];
 	dataLength[chan] = aValue;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelDataLengthChanged object:self];
@@ -1781,7 +1781,7 @@ static struct {
     
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Data Length"];
-    [p setFormat:@"##0" upperLimit:0x3FF lowerLimit:1 stepSize:1 units:@"ns"];
+    [p setFormat:@"##0" upperLimit:0x7FF lowerLimit:1 stepSize:1 units:@"ns"];
     [p setSetMethod:@selector(setTraceLengthConverted:withValue:) getMethod:@selector(traceLengthConverted:)];
     [a addObject:p];
 
