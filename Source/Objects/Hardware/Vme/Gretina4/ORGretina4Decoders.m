@@ -26,6 +26,7 @@
 #import "ORGretina4Model.h"
 
 #define kIntegrationTimeKey @"Integration Time"
+#define kHistEMultiplierKey @"Hist E Multiplier"
 
 @implementation ORGretina4WaveformDecoder
 - (id) init
@@ -45,6 +46,7 @@
 	[super registerNotifications];
 	NSNotificationCenter* nc = [NSNotificationCenter defaultCenter];
 	[nc addObserver:self selector:@selector(integrationTimeChanged:) name:ORGretina4CardInited object:nil];
+	[nc addObserver:self selector:@selector(histEMultiplierChanged:) name:ORGretina4ModelHistEMultiplierChanged object:nil];
 }
 
 - (void) integrationTimeChanged:(NSNotification*)aNote
@@ -55,11 +57,20 @@
 	[self setObject:[NSNumber numberWithInt:[theCard integrationTimeAsInt]] forNestedKey:crateKey,cardKey,kIntegrationTimeKey,nil];
 }
 
+- (void) histEMultiplierChanged:(NSNotification*)aNote
+{
+	ORGretina4Model* theCard	= [aNote object];
+	NSString* crateKey			= [self getCrateKey: [theCard crateNumber]];
+	NSString* cardKey			= [self getCardKey: [theCard slot]];
+	[self setObject:[NSNumber numberWithInt:[theCard histEMultiplier]] forNestedKey:crateKey,cardKey,kHistEMultiplierKey,nil];
+}
+
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
 
 	if(![self cacheSetUp]){
 		[self cacheCardLevelObject:kIntegrationTimeKey fromHeader:[aDecoder fileHeader]];
+		[self cacheCardLevelObject:kHistEMultiplierKey fromHeader:[aDecoder fileHeader]];
 	}
 	
     unsigned long* ptr = (unsigned long*)someData;
@@ -85,8 +96,10 @@
 
 	int integrationTime = [[self objectForNestedKey:crateKey,cardKey,kIntegrationTimeKey,nil] intValue];
 	if(integrationTime) energy /= integrationTime; 
+	int histEMultiplier = [[self objectForNestedKey:crateKey,cardKey,kHistEMultiplierKey,nil] intValue];
+        if(histEMultiplier) energy *= histEMultiplier;
 	
-    [aDataSet histogram:energy numBins:0x1fff sender:self  withKeys:@"Gretina4", @"Energy",crateKey,cardKey,channelKey,nil];
+    [aDataSet histogram:energy numBins:0x1fff*histEMultiplier sender:self  withKeys:@"Gretina4", @"Energy",crateKey,cardKey,channelKey,nil];
 	
 	
 	if (packetLength > 0) {

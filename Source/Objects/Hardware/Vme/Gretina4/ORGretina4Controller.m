@@ -332,6 +332,11 @@
                          name : ORGretina4ModelDownSampleChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(histEMultiplierChanged:)
+                         name : ORGretina4ModelHistEMultiplierChanged
+						object: model];
+
 	[self registerRates];
 }
 
@@ -399,12 +404,18 @@
 	[self registerWriteValueChanged:nil];
 	[self spiWriteValueChanged:nil];
 	[self downSampleChanged:nil];
+	[self histEMultiplierChanged:nil];
 }
 
 #pragma mark ¥¥¥Interface Management
 - (void) downSampleChanged:(NSNotification*)aNote
 {
 	[downSamplePU selectItemAtIndex:[model downSample]];
+}
+
+- (void) histEMultiplierChanged:(NSNotification*)aNote
+{
+	[histEMultiplierField setIntValue: [model histEMultiplier]];
 }
 
 - (void) registerWriteValueChanged:(NSNotification*)aNote
@@ -655,6 +666,7 @@
 	[loadMainFPGAButton setEnabled:!locked && !downloading];
 	[stopFPGALoadButton setEnabled:!locked && downloading];
 	[downSamplePU setEnabled:!lockedOrRunningMaintenance && !downloading];
+	[histEMultiplierField setEnabled:!lockedOrRunningMaintenance && !downloading];
 	
 	int i;
 	for(i=0;i<kNumGretina4Channels;i++){
@@ -849,6 +861,11 @@
 	if([sender indexOfSelectedItem] != [model downSample]){
 		[model setDownSample:[sender indexOfSelectedItem]];
 	}
+}
+
+- (void) histEMultiplierAction:(id)sender
+{
+	[model setHistEMultiplier:[sender intValue]];
 }
 
 - (IBAction) registerIndexPUAction:(id)sender

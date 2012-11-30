@@ -84,6 +84,7 @@
     IBOutlet NSTextField*   fifoState;
 
 	IBOutlet NSPopUpButton* downSamplePU;
+	IBOutlet NSTextField*	histEMultiplierField;
 	
 	//FPGA download
 	IBOutlet NSTextField*			fpgaFilePathField;
@@ -137,6 +138,7 @@
 
 #pragma mark ¥¥¥Interface Management
 - (void) downSampleChanged:(NSNotification*)aNote;
+- (void) histEMultiplierChanged:(NSNotification*)aNote;
 - (void) registerIndexChanged:(NSNotification*)aNote;
 - (void) fpgaDownInProgressChanged:(NSNotification*)aNote;
 - (void) fpgaDownProgressChanged:(NSNotification*)aNote;
@@ -182,6 +184,7 @@
 
 #pragma mark ¥¥¥Actions
 - (IBAction) downSampleAction:(id)sender;
+- (IBAction) histEMultiplierAction:(id)sender;
 - (IBAction) baseAddressAction:(id)sender;
 - (IBAction) settingLockAction:(id) sender;
 - (IBAction) cardInfoAction:(id) sender;

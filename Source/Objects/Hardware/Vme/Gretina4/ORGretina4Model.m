@@ -33,6 +33,7 @@
 #define kCurrentFirmwareVersion 0x106
 
 NSString* ORGretina4ModelDownSampleChanged			= @"ORGretina4ModelDownSampleChanged";
+NSString* ORGretina4ModelHistEMultiplierChanged			= @"ORGretina4ModelHistEMultiplierChanged";
 NSString* ORGretina4ModelRegisterIndexChanged		= @"ORGretina4ModelRegisterIndexChanged";
 NSString* ORGretina4ModelRegisterWriteValueChanged	= @"ORGretina4ModelRegisterWriteValueChanged";
 NSString* ORGretina4ModelSPIWriteValueChanged	    = @"ORGretina4ModelSPIWriteValueChanged";
@@ -358,6 +359,20 @@ static struct {
     downSample = aDownSample;
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelDownSampleChanged object:self];
+}
+
+- (int) histEMultiplier
+{
+    return histEMultiplier;
+}
+
+- (void) setHistEMultiplier:(int)aHistEMultiplier
+{
+    if(aHistEMultiplier<1)aHistEMultiplier=1;
+    else if(aHistEMultiplier>100)aHistEMultiplier = 100;
+    [[[self undoManager] prepareWithInvocationTarget:self] setHistEMultiplier:histEMultiplier];
+    histEMultiplier = aHistEMultiplier;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelHistEMultiplierChanged object:self];
 }
 
 - (int) registerIndex
@@ -1785,10 +1800,16 @@ static struct {
     [p setSetMethod:@selector(setTraceLengthConverted:withValue:) getMethod:@selector(traceLengthConverted:)];
     [a addObject:p];
 
-	p = [[[ORHWWizParam alloc] init] autorelease];
+    p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Down Sample"];
     [p setFormat:@"##0" upperLimit:4 lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setDownSample:) getMethod:@selector(downSample)];
+    [a addObject:p];
+	
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Hist E Multiplier"];
+    [p setFormat:@"##0" upperLimit:100 lowerLimit:1 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setHistEMultiplier:) getMethod:@selector(histEMultiplier)];
     [a addObject:p];
 	
     p = [[[ORHWWizParam alloc] init] autorelease];
@@ -2052,6 +2073,7 @@ static struct {
     [[self undoManager] disableUndoRegistration];
     [self setSpiConnector:			[decoder decodeObjectForKey:@"spiConnector"]];
     [self setDownSample:				[decoder decodeIntForKey:@"downSample"]];
+    [self setHistEMultiplier:				[decoder decodeIntForKey:@"histEMultiplier"]];
     [self setRegisterIndex:				[decoder decodeIntForKey:@"registerIndex"]];
     [self setRegisterWriteValue:		[decoder decodeInt32ForKey:@"registerWriteValue"]];
     [self setSPIWriteValue:     		[decoder decodeInt32ForKey:@"spiWriteValue"]];
@@ -2099,6 +2121,7 @@ static struct {
     [super encodeWithCoder:encoder];
     [encoder encodeObject:spiConnector				forKey:@"spiConnector"];
     [encoder encodeInt:downSample					forKey:@"downSample"];
+    [encoder encodeInt:histEMultiplier                           forKey:@"histEMultiplier"];
     [encoder encodeInt:registerIndex				forKey:@"registerIndex"];
     [encoder encodeInt32:registerWriteValue			forKey:@"registerWriteValue"];
     [encoder encodeInt32:spiWriteValue			    forKey:@"spiWriteValue"];
@@ -2156,6 +2179,7 @@ static struct {
 	}
     [objDictionary setObject:ar forKey:@"LED Threshold"];
     [objDictionary setObject:[NSNumber numberWithInt:downSample] forKey:@"Down Sample"];
+    [objDictionary setObject:[NSNumber numberWithInt:histEMultiplier] forKey:@"Hist E Multiplier"];
 	
 	
     return objDictionary;

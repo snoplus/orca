@@ -198,6 +198,7 @@ enum Gretina4FIFOStates {
     short                       poleZeroMult[kNumGretina4Channels];
     short			pzTraceEnabled[kNumGretina4Channels];
     int				downSample;
+    int				histEMultiplier;
 	
 	ORRateGroup*	waveFormRateGroup;
 	unsigned long 	waveFormCount[kNumGretina4Channels];
@@ -255,6 +256,8 @@ enum Gretina4FIFOStates {
 - (void) setSpiConnector:(ORConnector*)aConnector;
 - (int) downSample;
 - (void) setDownSample:(int)aDownSample;
+- (int) histEMultiplier;
+- (void) setHistEMultiplier:(int)aHistEMultiplier;
 - (int) registerIndex;
 - (void) setRegisterIndex:(int)aRegisterIndex;
 - (unsigned long) registerWriteValue;
@@ -439,6 +442,7 @@ enum Gretina4FIFOStates {
 @end
 
 extern NSString* ORGretina4ModelDownSampleChanged;
+extern NSString* ORGretina4ModelHistEMultiplierChanged;
 extern NSString* ORGretina4ModelRegisterIndexChanged;
 extern NSString* ORGretina4ModelRegisterWriteValueChanged;
 extern NSString* ORGretina4ModelSPIWriteValueChanged;
