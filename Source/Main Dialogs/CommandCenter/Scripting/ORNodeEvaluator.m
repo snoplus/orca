@@ -758,8 +758,8 @@
 		if(target != _zero){
 			[[self undoManager] disableUndoRegistration];
 			result =  [NSInvocation invoke:argList withTarget:target];
+            [[self undoManager] enableUndoRegistration];
 		}
-		[[self undoManager] enableUndoRegistration];
 	}
 	@catch (NSException* localException){
 	}
