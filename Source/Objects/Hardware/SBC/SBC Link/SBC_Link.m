@@ -80,18 +80,27 @@ NSString* ORSBC_LinkJobStatus				= @"ORSBC_LinkJobStatus";
 NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 
-@interface SBC_Link (private)
-- (SBC_Packet*) _localSbcPacket;
-@end
-
-@implementation SBC_Link (private)
-
-- (SBC_Packet*) _localSbcPacket
-{
-    // returns a zeroed SBC packet to be used in *this* function.
-    return (SBC_Packet*) [[NSMutableData dataWithLength:sizeof(SBC_Packet)] bytes];
+@interface SBCPacketWrapper : NSObject {
+    NSMutableData* data;
 }
 
+- (void) dealloc;
+- (SBC_Packet*) sbcPacket;
+
+@end
+
+@implementation SBCPacketWrapper
+- (void) dealloc
+{
+    [data release];
+    [super dealloc];
+}
+
+- (SBC_Packet*) sbcPacket
+{
+    if(!data) data = [[NSMutableData alloc] initWithLength:sizeof(SBC_Packet)];
+    return (SBC_Packet*) [data mutableBytes];
+}
 @end
 
 @implementation SBC_Link
@@ -857,7 +866,8 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 
 - (void) getRunInfoBlock
 {
-	SBC_Packet* aPacket = [self _localSbcPacket];
+	id pw = [[SBCPacketWrapper alloc] init];
+	SBC_Packet* aPacket = [pw sbcPacket];
 	aPacket->cmdHeader.destination			= kSBC_Process;
 	aPacket->cmdHeader.cmdID			= kSBC_RunInfoRequest;
 	aPacket->cmdHeader.numberBytesinPayload	= 0;
@@ -865,6 +875,7 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 	[self send:aPacket receive:aPacket];
 	
 	memcpy(&runInfo,aPacket->payload,sizeof(SBC_info_struct));
+	[pw release];
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkRunInfoChanged object:self];
 }
@@ -1190,7 +1201,8 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 
 - (void) sendCommand:(long)aCmd withOptions:(SBC_CmdOptionStruct*)optionBlock expectResponse:(BOOL)askForResponse
 {
-	SBC_Packet* aPacket = [self _localSbcPacket];
+	id pw = [[SBCPacketWrapper alloc] init];
+	SBC_Packet* aPacket = [pw sbcPacket];
 	
 	aPacket->cmdHeader.destination		= kSBC_Process;
 	aPacket->cmdHeader.cmdID			= aCmd;
@@ -1216,7 +1228,9 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 	@catch (NSException* localException) {
 		[socketLock unlock]; //end critical section
 		[localException raise];
-	}
+	} @finally {
+        [pw release];
+    }
 	
 }
 
@@ -1224,9 +1238,10 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 			  atAddress:(unsigned long) anAddress
 			 numToWrite:(unsigned int)  numberLongs
 {
+    id pw = [[SBCPacketWrapper alloc] init];    
 	@try {
 		[socketLock lock]; //begin critical section
-		SBC_Packet* aPacket = [self _localSbcPacket];
+		SBC_Packet* aPacket = [pw sbcPacket];
 		aPacket->cmdHeader.destination			= kSBC_Process;
 		aPacket->cmdHeader.cmdID				= kSBC_WriteBlock;
 		aPacket->cmdHeader.numberBytesinPayload	= sizeof(SBC_WriteBlockStruct) + numberLongs*sizeof(long);
@@ -1243,7 +1258,9 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 	@catch (NSException* localException) {
 		[socketLock unlock]; //end critical section
 		[localException raise];
-	}
+	} @finally {
+        [pw release];
+    }
 }
 
 
@@ -1251,9 +1268,10 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 			 atAddress:(unsigned long) anAddress
 			 numToRead:(unsigned int) numberLongs
 {
+    id pw = [[SBCPacketWrapper alloc] init];    
 	@try {
 		[socketLock lock]; //begin critical section
-		SBC_Packet* aPacket = [self _localSbcPacket];
+		SBC_Packet* aPacket = [pw sbcPacket];
 		aPacket->cmdHeader.destination			= kSBC_Process;
 		aPacket->cmdHeader.cmdID				= kSBC_ReadBlock;
 		aPacket->cmdHeader.numberBytesinPayload	= sizeof(SBC_ReadBlockStruct);
@@ -1279,7 +1297,9 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 	@catch (NSException* localException) {
 		[socketLock unlock]; //end critical section
 		[localException raise];
-	}
+	} @finally {
+        [pw release];
+    }
 }
 
 
@@ -1291,9 +1311,10 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
        withUnitSize:(unsigned short) unitSize
 {
     assert(numberBytes % unitSize == 0);
+    id pw = [[SBCPacketWrapper alloc] init];    
 	@try {
 		[socketLock lock]; //begin critical section
-		SBC_Packet* aPacket = [self _localSbcPacket];
+		SBC_Packet* aPacket = [pw sbcPacket];
 		aPacket->cmdHeader.destination			= kSBC_Process;
 		aPacket->cmdHeader.cmdID				= kSBC_ReadBlock;
 		aPacket->cmdHeader.numberBytesinPayload	= sizeof(SBC_VmeReadBlockStruct);
@@ -1320,6 +1341,9 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 	@catch (NSException* localException) {
 		[socketLock unlock]; //end critical section
 		[localException raise];
+	}
+	@finally {
+		[pw release];
 	}
 }
 
@@ -1374,10 +1398,11 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
         withUnitSize:(unsigned short) unitSize
 {
     assert(numberBytes % unitSize == 0);
+    id pw = [[SBCPacketWrapper alloc] init];    
 	@try {
 		[socketLock lock]; //begin critical section
 		
-		SBC_Packet* aPacket = [self _localSbcPacket];
+		SBC_Packet* aPacket = [pw sbcPacket];
 		aPacket->cmdHeader.destination			= kSBC_Process;
 		aPacket->cmdHeader.cmdID				= kSBC_WriteBlock;
 		aPacket->cmdHeader.numberBytesinPayload	= sizeof(SBC_VmeWriteBlockStruct) + numberBytes;
@@ -1402,6 +1427,9 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 	@catch (NSException* localException) {
 		[socketLock unlock]; //end critical section
 		[localException raise];
+	}
+	@finally {
+		[pw release];
 	}
 
 }
@@ -1452,8 +1480,10 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 //temp discrete ops
 - (void) executeCommandList:(ORCommandList*)aList
 {
+    id pw = [[SBCPacketWrapper alloc] init];
 	@try {
-        SBC_Packet* blockPacket = [self _localSbcPacket];
+	
+        SBC_Packet* blockPacket = [pw sbcPacket];
         [aList SBCPacket:blockPacket];
 		
 		[socketLock lock]; //begin critical section
@@ -1468,6 +1498,9 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 	@catch (NSException* localException) {
 		[socketLock unlock]; //end critical section
 		[localException raise];
+	}
+	@finally {
+		[pw release];
 	}
 }
 
@@ -1575,10 +1608,11 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 	//will result in larger sized buffers from the SBC.
 	if(++throttleCount>throttle){
 		throttleCount = 0;
-		SBC_Packet* aPacket = [self _localSbcPacket];
-        aPacket->cmdHeader.destination	= kSBC_Process;
-        aPacket->cmdHeader.cmdID			= kSBC_CBRead;
-        aPacket->cmdHeader.numberBytesinPayload = 0;
+		id pw = [[SBCPacketWrapper alloc] init];
+		SBC_Packet* aPacket = [pw sbcPacket];
+		aPacket->cmdHeader.destination	= kSBC_Process;
+		aPacket->cmdHeader.cmdID			= kSBC_CBRead;
+		aPacket->cmdHeader.numberBytesinPayload = 0;
 		[self send:aPacket receive:aPacket];
 		
 		unsigned long* rp = (unsigned long*)aPacket->payload;
@@ -1586,6 +1620,7 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 		if(numLongs>0){
 			[aDataPacket addLongsToFrameBuffer:rp length:numLongs];
 		}
+		[pw release];
 	}
 }
 
@@ -1633,7 +1668,8 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 
 - (void) load_HW_Config:(SBC_crate_config*) aConfig
 {	
-	SBC_Packet* aPacket = [self _localSbcPacket];
+	id pw = [[SBCPacketWrapper alloc] init];
+	SBC_Packet* aPacket = [pw sbcPacket];
 	
 	aPacket->cmdHeader.destination			= kSBC_Process;
 	aPacket->cmdHeader.cmdID					= kSBC_LoadConfig;
@@ -1641,6 +1677,7 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 	memcpy(aPacket->payload,aConfig,sizeof(SBC_crate_config));
 	
 	[self write:socketfd buffer:aPacket];	
+	[pw release];
 }
 
 #pragma mark ***DataSource
@@ -2057,7 +2094,8 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 - (void) watchIrqSocket
 {
 	irqThreadRunning = YES;
-	SBC_Packet* aPacket = [self _localSbcPacket];
+	id pw = [[SBCPacketWrapper alloc] init];
+	SBC_Packet* aPacket = [pw sbcPacket];
 	lamsToAck    = [[ORSafeQueue alloc] init];
 	while([self isConnected]){
 		if([self dataAvailable:irqfd]){
@@ -2097,6 +2135,7 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 	
 	irqThreadRunning = NO;
 	[lamsToAck release];
+	[pw release];
 	
 	lamsToAck    = nil;
 }
@@ -2417,7 +2456,8 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 		lastInfoUpdate = [now retain];
 	}
 	
-	SBC_Packet* aPacket = [self _localSbcPacket];
+	id pw = [[SBCPacketWrapper alloc] init];
+	SBC_Packet* aPacket = [pw sbcPacket];
 	aPacket->cmdHeader.destination	= kSBC_Process;
 	aPacket->cmdHeader.cmdID			= kSBC_CBRead;
 	aPacket->cmdHeader.numberBytesinPayload = 0;
@@ -2470,6 +2510,7 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 		cbTestRunning = NO;
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_LinkCBTest object:self];
 	}
+	[pw release];
 }
 
 - (void) monitorJobFor:(id)aDelegate statusSelector:(SEL)aSelector
@@ -2481,7 +2522,8 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 
 - (void) monitorJob
 {
-	SBC_Packet* aPacket = [self _localSbcPacket];
+	id pw = [[SBCPacketWrapper alloc] init];
+	SBC_Packet* aPacket = [pw sbcPacket];
 	aPacket->cmdHeader.destination			= kSBC_Process;
 	aPacket->cmdHeader.cmdID					= kSBC_JobStatus;
 	aPacket->cmdHeader.numberBytesinPayload	= sizeof(SBC_JobStatusStruct);
@@ -2502,15 +2544,19 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 	}
 	@catch(NSException* localException) {
 	}
+	@finally {
+		[pw release];
+	}
 }
 
 - (void) writeGeneral:(long*) buffer
 			  operation:(unsigned long) anOperationID
 			 numToWrite:(unsigned int)  numberLongs
 {
+    id pw = [[SBCPacketWrapper alloc] init];
 	@try {
 		[socketLock lock]; //begin critical section
-		SBC_Packet* aPacket = [self _localSbcPacket];
+		SBC_Packet* aPacket = [pw sbcPacket];
 		aPacket->cmdHeader.destination			= kSBC_Process;
 		aPacket->cmdHeader.cmdID					= kSBC_GeneralWrite;
 		aPacket->cmdHeader.numberBytesinPayload	= sizeof(SBC_WriteBlockStruct) + numberLongs*sizeof(long);
@@ -2528,6 +2574,9 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 		[socketLock unlock]; //end critical section
 		[localException raise];
 	}
+	@finally {
+		[pw release];
+	}
 }
 
 
@@ -2535,9 +2584,10 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 		   operation:(unsigned long) anOperationID
 		   numToRead:(unsigned int) numberLongs
 {
+    id pw = [[SBCPacketWrapper alloc] init];    
 	@try {
 		[socketLock lock]; //begin critical section
-		SBC_Packet* aPacket = [self _localSbcPacket];
+		SBC_Packet* aPacket = [pw sbcPacket];
 		aPacket->cmdHeader.destination			= kSBC_Process;
 		aPacket->cmdHeader.cmdID					= kSBC_GeneralRead;
 		aPacket->cmdHeader.numberBytesinPayload	= sizeof(SBC_ReadBlockStruct);
@@ -2563,6 +2613,9 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 	@catch (NSException* localException) {
 		[socketLock unlock]; //end critical section
 		[localException raise];
+	}
+	@finally {
+		[pw release];
 	}
 }
 @end
