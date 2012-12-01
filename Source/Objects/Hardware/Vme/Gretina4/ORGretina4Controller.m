@@ -443,6 +443,7 @@
 - (void) fpgaDownProgressChanged:(NSNotification*)aNote
 {
 	[loadFPGAProgress setDoubleValue:(double)[model fpgaDownProgress]];
+    [extraFPGADownloadInfoField setStringValue:[model extraFPGADownloadInformation]];
 }
 
 - (void) mainFPGADownLoadStateChanged:(NSNotification*)aNote

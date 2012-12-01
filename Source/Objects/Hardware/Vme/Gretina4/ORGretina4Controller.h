@@ -92,6 +92,7 @@
 	IBOutlet NSButton*				stopFPGALoadButton;
     IBOutlet NSProgressIndicator*	loadFPGAProgress;
 	IBOutlet NSTextField*			mainFPGADownLoadStateField;
+	IBOutlet NSTextField*			extraFPGADownloadInfoField;
 
     //rate page
     IBOutlet NSMatrix*      rateTextFields;
