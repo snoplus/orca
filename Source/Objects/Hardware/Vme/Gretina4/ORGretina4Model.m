@@ -88,6 +88,7 @@ NSString* ORGretina4ModelSetEnableStatusChanged				= @"ORGretina4ModelSetEnableS
 - (void) updateDownLoadProgress;
 - (void) downloadingMainFPGADone;
 - (void) fpgaDownLoadThread:(NSData*)dataFromFile;
+- (void) setExtraFPGADownloadInformation:(NSString*)downInfo;
 @end
 
 
@@ -526,6 +527,12 @@ static struct {
     temp = fpgaDownProgress;
 	[progressLock unlock];
     return temp;
+}
+
+- (NSString*) extraFPGADownloadInformation
+{
+    if (!extraFPGADownloadInformation) return @"";
+    return extraFPGADownloadInformation;
 }
 
 - (NSString*) mainFPGADownLoadState
@@ -2266,7 +2273,7 @@ static struct {
 	
 	@try {
 		[dataFromFile retain];
-
+        [self setExtraFPGADownloadInformation:@""];
 		[self setProgressStateOnMainThread:@"Block Erase"];
 		if(!stopDownLoadingMainFPGA) [self blockEraseFlash];
 		[self setProgressStateOnMainThread:@"Programming"];
@@ -2285,6 +2292,7 @@ static struct {
 	}
 	@catch(NSException* localException) {
 		[self setProgressStateOnMainThread:@"Exception"];
+        [self setExtraFPGADownloadInformation:@""];
 	}
 	@finally {
 		[self performSelectorOnMainThread:@selector(downloadingMainFPGADone) withObject:nil waitUntilDone:NO];
@@ -2299,6 +2307,7 @@ static struct {
 	unsigned long address = 0x0;
 	long totalSize = [theData length];
 	[self setFpgaDownProgress:0.];
+    int percentSeen = 0;
 	while (address < totalSize ) {
 		@try {
 			[ self programFlashBufferAtAddress:([theData bytes] + address)
@@ -2307,17 +2316,19 @@ static struct {
 												? kGretina4FlashBufferBytes : ([theData length]-address) )];
 			address += kGretina4FlashBufferBytes;
 			if(stopDownLoadingMainFPGA)break;
-			
-			if(address%(totalSize/1000) == 0){
-				[self setFpgaDownProgress: 100. * address/(float)totalSize];
+			if ((int)(100*address/(float)totalSize) > percentSeen) {
+                percentSeen = (int)(100*address/(float)totalSize);
+				[self setFpgaDownProgress:(float)percentSeen];
 			}
+            [self setExtraFPGADownloadInformation:[NSString stringWithFormat:@"%lu of %lu KB programmed",address/1000,totalSize/1000]];
 		}
 		@catch(NSException* localException) {
 			NSLog(@"Gretina4 exception programming flash.\n");
 			break;
 		}
 	}
-	//if(!stopDownLoadingMainFPGA) 
+    [self setExtraFPGADownloadInformation:@""];
+	//if(!stopDownLoadingMainFPGA)
 	[self disableFlashEraseAndProg];
 	//if(!stopDownLoadingMainFPGA) 
 	[self resetFlashStatus];
@@ -2338,6 +2349,7 @@ static struct {
 			[self blockEraseFlashAtBlock:i];
 			//[ORTimer delayNanoseconds:10000];
 			[self setFpgaDownProgress: 100. * (i+1)/(float)kGretina4UsedFlashBlocks];
+            [self setExtraFPGADownloadInformation:[NSString stringWithFormat:@"%i of %i blocks erased",i+1,kGretina4UsedFlashBlocks]];
 		}
 		@catch(NSException* localException) {
 			NSLog(@"Gretina4 exception erasing flash.\n");
@@ -2572,6 +2584,7 @@ static struct {
 	const char* dataPtr = (const char*)[theData bytes];
 	unsigned long tempToCompare;
 	[self setFpgaDownProgress:0.];
+    int percentSeen = 0;
 	while ( position < [theData length] ) {
 		[[self adapter] readLongBlock:&tempToRead
 							atAddress:[self baseAddress] + fpga_register_information[kFlashDataWithAddrIncr].offset
@@ -2594,13 +2607,20 @@ static struct {
 		}
 		if ( tempToRead != tempToCompare ) {
 			[self setFpgaDownProgress: 0];
+            [self setExtraFPGADownloadInformation:@""];            
 			return NO;
 		}
+        if ((int)(100*position/(float)[theData length]) > percentSeen) {
+            percentSeen = (int)(100*position/(float)[theData length]);
+            [self setFpgaDownProgress:(float)percentSeen];
+        }
+        [self setExtraFPGADownloadInformation:[NSString stringWithFormat:@"%u of %u KB verified",position/1000,[theData length]/1000]];
 		if(position%([theData length]/1000) == 0){
 			[self setFpgaDownProgress: 100. * position/(float)[theData length]];
 		}
 		position += 4;
 	}
+    [self setExtraFPGADownloadInformation:@""];
 	[self setFpgaDownProgress: 100];
 	//[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:.1]];
 	[self setFpgaDownProgress: 0];
@@ -2650,6 +2670,13 @@ static struct {
 	else						 NSLog(@"Programming manually stopped before done\n");
 	[self setDownLoadMainFPGAInProgress: NO];
 	
+}
+
+- (void) setExtraFPGADownloadInformation:(NSString*)downInfo
+{
+    [downInfo retain];
+    [extraFPGADownloadInformation release];
+    extraFPGADownloadInformation = downInfo;
 }
 
 @end

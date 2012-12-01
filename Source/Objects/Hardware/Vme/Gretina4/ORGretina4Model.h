@@ -228,6 +228,7 @@ enum Gretina4FIFOStates {
     float noiseFloorIntegrationTime;
 	
     NSString* mainFPGADownLoadState;
+    NSString* extraFPGADownloadInformation;
 	BOOL isFlashWriteEnabled;
     NSString* fpgaFilePath;
 	BOOL stopDownLoadingMainFPGA;
@@ -269,6 +270,7 @@ enum Gretina4FIFOStates {
 - (int) fpgaDownProgress;
 - (NSString*) mainFPGADownLoadState;
 - (void) setMainFPGADownLoadState:(NSString*)aMainFPGADownLoadState;
+- (NSString*) extraFPGADownloadInformation;
 - (NSString*) fpgaFilePath;
 - (void) setFpgaFilePath:(NSString*)aFpgaFilePath;
 - (float) noiseFloorIntegrationTime;
