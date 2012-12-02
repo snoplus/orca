@@ -23,6 +23,7 @@
 #import "ORTaskSequence.h"
 #import "NetSocket.h"
 #import "ORAlarm.h"
+#import "ORRunModel.h"
 
 NSString* HaloSentryIpNumber2Changed = @"HaloSentryIpNumber2Changed";
 NSString* HaloSentryIpNumber1Changed = @"HaloSentryIpNumber1Changed";
@@ -33,6 +34,7 @@ NSString* HaloSentryTypeChanged      = @"HaloSentryTypeChanged";
 NSString* HaloSentryPingTask         = @"HaloSentryPingTask";
 NSString* HaloSentryIsConnectedChanged = @"HaloSentryIsConnectedChanged";
 NSString* HaloSentryRemoteStateChanged = @"HaloSentryRemoteStateChanged";
+NSString* HaloSentryDisabledChanged      = @"HaloSentryDisabledChanged";
 
 #define kRemotePort 4667
 
@@ -56,6 +58,7 @@ NSString* HaloSentryRemoteStateChanged = @"HaloSentryRemoteStateChanged";
     [ipNumber1 release];
     [sbcArray release];
     [otherSystemIP release];
+    [remoteRunParams release];
     [super dealloc];
 }
 
@@ -73,15 +76,67 @@ NSString* HaloSentryRemoteStateChanged = @"HaloSentryRemoteStateChanged";
                      selector : @selector(objectsChanged:)
                          name : ORGroupObjectsRemoved
                        object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(runStarted:)
+                         name : ORRunStartedNotification
+						object: nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(runStopped:)
+                         name : ORRunStoppedNotification
+						object: nil];
 }
 
+#pragma mark ***Notifications
 - (void) objectsChanged:(NSNotification*)aNote
 {
+    [runControl release];
+    runControl = nil;
     [sbcArray release];
     sbcArray = [[[[NSApp delegate ]document] collectObjectsOfClass:NSClassFromString(@"ORVmecpuModel")]retain];
+    NSArray* anArray = [[[NSApp delegate ]document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    if([anArray count]){
+        runControl = [[anArray objectAtIndex:0] retain];
+    }
+}
+
+- (void) runStarted:(NSNotification*)aNote
+{
+    //a local run has started
+    if(!disabled){
+        [self setSentryType:ePrimary];
+        [self setNextState:eStarting stepTime:.2];
+        [self start];
+    }
+}
+
+- (void) runStopped:(NSNotification*)aNote
+{
+    //a local run has ended. Switch back to being a neutral system
+    if(!disabled){
+        [self setSentryType:eNeither];
+        [self setNextState:eStarting stepTime:.2];
+        [self start];
+    }
 }
 
 #pragma mark ***Accessors
+- (BOOL) disabled
+{
+    return disabled;
+}
+
+- (void) setDisabled:(BOOL)aDisabled
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setDisabled:disabled];
+    disabled = aDisabled;
+    if(disabled) [self stop];
+    else         [self start];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryDisabledChanged object:self];
+}
+
 - (NSString*) ipNumber2
 {
     return ipNumber2;
@@ -134,6 +189,12 @@ NSString* HaloSentryRemoteStateChanged = @"HaloSentryRemoteStateChanged";
                 break;
             }
         }
+        
+        sentryType  = eNeither;
+        state       = eStarting;
+        if(!disabled){
+            [self start];
+        }
     }
 }
 
@@ -164,10 +225,16 @@ NSString* HaloSentryRemoteStateChanged = @"HaloSentryRemoteStateChanged";
 {
     return remoteRunInProgress;
 }
-
 - (void) setRemoteRunInProgress:(BOOL)aState
 {
     remoteRunInProgress = aState;
+    if((remoteRunInProgress==YES) && !disabled){
+        [[ORGlobal sharedGlobal] addRunVeto:@"Secondary" comment:@"Run in progress on Primary Machine"];
+    }
+    else {
+        [[ORGlobal sharedGlobal] removeRunVeto:@"Secondary"];
+    }
+
     [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryRemoteStateChanged object:self];
 }
 
@@ -189,9 +256,9 @@ NSString* HaloSentryRemoteStateChanged = @"HaloSentryRemoteStateChanged";
         case eStarting:             return @"Starting";
         case eStopping:             return @"Stopping";
         case eCheckRemoteMachine:   return @"Pinging";
-        case eConnectToRemoteOrca:  return @"ConnectToRemoteOrca";
+        case eConnectToRemoteOrca:  return @"Connecting";
         case eGetRunState:          return @"GetRunState";
-        case eCheckRunState:        return @"CheckRunState";
+        case eCheckRunState:        return @"Checking Run";
         case eWaitForPing:          return @"Ping Wait";
     }
 }
@@ -229,10 +296,12 @@ NSString* HaloSentryRemoteStateChanged = @"HaloSentryRemoteStateChanged";
     
     [socket setDelegate:self];
 }
+
 - (BOOL) isConnected
 {
 	return isConnected;
 }
+
 - (void) setIsConnected:(BOOL)aIsConnected
 {
 	isConnected = aIsConnected;
@@ -242,8 +311,9 @@ NSString* HaloSentryRemoteStateChanged = @"HaloSentryRemoteStateChanged";
 #pragma mark ***Run Stuff
 - (void) start
 {
-    if(isRunning)return;
+    if(isRunning || disabled || [otherSystemIP length]==0)return;
     isRunning = YES;
+    [self setSentryType:eNeither];
     [self setNextState:eStarting stepTime:1];
     [self step];
     [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryIsRunningChanged object:self];
@@ -253,7 +323,9 @@ NSString* HaloSentryRemoteStateChanged = @"HaloSentryRemoteStateChanged";
 {
     if (!isRunning) return;
     [self setNextState:eStopping stepTime:1];
+    [self step];
     isRunning = NO;
+    [[ORGlobal sharedGlobal] removeRunVeto:@"Secondary"];
     [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryIsRunningChanged object:self];
 }
 
@@ -265,10 +337,9 @@ NSString* HaloSentryRemoteStateChanged = @"HaloSentryRemoteStateChanged";
     [[self undoManager] disableUndoRegistration];
     [self setIpNumber2:[decoder decodeObjectForKey: @"ipNumber2"]];
     [self setIpNumber1:[decoder decodeObjectForKey: @"ipNumber1"]];
-    [[self undoManager] enableUndoRegistration];    
+    [self setDisabled:  [decoder decodeBoolForKey:  @"disabled"]];
+    [[self undoManager] enableUndoRegistration];
 
-    state = eIdle;
-    
     return self;
 }
 
@@ -276,6 +347,7 @@ NSString* HaloSentryRemoteStateChanged = @"HaloSentryRemoteStateChanged";
 {
     [encoder encodeObject:ipNumber2 forKey:@"ipNumber2"];
     [encoder encodeObject:ipNumber1 forKey:@"ipNumber1"];
+    [encoder encodeBool:disabled     forKey:@"disabled"];
 }
 
 - (NSUndoManager *)undoManager
@@ -302,9 +374,11 @@ NSString* HaloSentryRemoteStateChanged = @"HaloSentryRemoteStateChanged";
 
 - (void) step
 {
+    
     state = nextState;
-    [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryStateChanged object:self];
 
+    [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryStateChanged object:self];
+    
     switch(sentryType){
         case eNeither:
             [self stepSimpleWatch];
@@ -331,10 +405,13 @@ NSString* HaloSentryRemoteStateChanged = @"HaloSentryRemoteStateChanged";
             
             [self setRemoteMachineRunning:NO];
             [self setRemoteORCARunning:NO];
-            [self setRemoteRunInProgress:NO];
             
-            [self setNextState:eCheckRemoteMachine stepTime:.3];
-            stepTime = .3;
+            //----temp for testing
+            [self setRemoteMachineRunning:YES];
+            [self setNextState:eConnectToRemoteOrca stepTime:1];
+            //--------------------
+            
+          // [self setNextState:eCheckRemoteMachine stepTime:.3];
             break;
             
         case eCheckRemoteMachine:
@@ -350,7 +427,6 @@ NSString* HaloSentryRemoteStateChanged = @"HaloSentryRemoteStateChanged";
                 }
                 else {
                     [self setNextState:eCheckRemoteMachine stepTime:60];
-                    [self postMachineAlarm];
                     //remote machine not running. post alarm and retry later
                     //we are just watching at this point so do nothing other than
                     //the alarm post
@@ -366,7 +442,7 @@ NSString* HaloSentryRemoteStateChanged = @"HaloSentryRemoteStateChanged";
             
         case eGetRunState:
             if(isConnected){
-                [self sendCmd:@"RunStatus=[RunControl isRunning];"];
+                [self sendCmd:@"runningState = [RunControl runningState];"];
                 [self setNextState:eCheckRunState stepTime:1];
             }
             else {
@@ -387,17 +463,22 @@ NSString* HaloSentryRemoteStateChanged = @"HaloSentryRemoteStateChanged";
             break;
 
         case eStopping:
-            [self connectSocket:NO];
-            [self setRemoteMachineRunning:NO];
-            [self setRemoteORCARunning:NO];
-            [self setRemoteRunInProgress:NO];
-            break;
+            [self finish];
+            [self setNextState:eIdle stepTime:.2];
+           break;
             
         case eIdle:
             break;
     }
-    if(state!=eStopping)[self performSelector:@selector(step) withObject:nil afterDelay:stepTime];
+    if(state!=eIdle)[self performSelector:@selector(step) withObject:nil afterDelay:stepTime];
 
+}
+- (void) finish
+{
+    [self connectSocket:NO];
+    [self setRemoteMachineRunning:NO];
+    [self setRemoteORCARunning:NO];
+    [self clearMachineAlarm];
 }
 
 - (void) stepPrimarySystem
@@ -409,9 +490,7 @@ NSString* HaloSentryRemoteStateChanged = @"HaloSentryRemoteStateChanged";
         case eStarting:
             [self setRemoteMachineRunning:NO];
             [self setRemoteORCARunning:NO];
-            [self setRemoteRunInProgress:NO];
             [self setNextState:eCheckRemoteMachine stepTime:.3];
-            stepTime = .3;
             break;
             
         case eCheckRemoteMachine:
@@ -423,9 +502,10 @@ NSString* HaloSentryRemoteStateChanged = @"HaloSentryRemoteStateChanged";
             if(!pingTask){
                 if(remoteMachineRunning){
                     [self setNextState:eConnectToRemoteOrca stepTime:1];
-                }
+                    [self clearMachineAlarm];
+               }
                 else {
-                    NSLog(@"post alarm\n");
+                    [self postMachineAlarm];
                     [self setNextState:eCheckRemoteMachine stepTime:60];
                     //remote machine not running. post alarm and retry later
                     //we are just watching at this point so do nothing other than
@@ -434,16 +514,19 @@ NSString* HaloSentryRemoteStateChanged = @"HaloSentryRemoteStateChanged";
             }
             break;
             
+        case eStopping:
+            [self finish];
+            [self setNextState:eIdle stepTime:.2];
+            break;
             
         //unsed state to stop compiler warnings
         case eIdle:
-        case eStopping:
         case eConnectToRemoteOrca:
         case eGetRunState:
         case eCheckRunState:
             break;
     }
-    if(state!=eStopping)[self performSelector:@selector(step) withObject:nil afterDelay:stepTime];
+    if(state!=eIdle)[self performSelector:@selector(step) withObject:nil afterDelay:stepTime];
 }
 
 - (void) stepSecondarySystem
@@ -457,39 +540,47 @@ NSString* HaloSentryRemoteStateChanged = @"HaloSentryRemoteStateChanged";
         case eStarting:
             [self setNextState:eGetRunState stepTime:10];
            break;
-            
-        case eStopping:
-            break;
-            
+                        
         case eGetRunState:
             if(isConnected){
-                [self sendCmd:@"RunStatus=[RunControl isRunning];"];
-                [self setNextState:eGetRunState stepTime:10];
+                [self askForRunStatus];
+                [self setNextState:eGetRunState stepTime:30];
             }
             else {
                 //the connection was dropped. This signals that the other machine has crashed
-                //we will now take over the run
                 [self takeOverRunning];
             }
             break;
-            
-            //unsed state to stop compiler warnings
+
+        case eStopping:
+            [self finish];
+            [self setNextState:eIdle stepTime:.2];
+            break;
+
+        //-------------------------------------
+        //unsed state to stop compiler warnings
         case eIdle:
         case eCheckRemoteMachine:
         case eConnectToRemoteOrca:
         case eCheckRunState:
         case  eWaitForPing:
             break;
+        //-------------------------------------
 
     }
-    if(state!=eStopping)[self performSelector:@selector(step) withObject:nil afterDelay:stepTime];
+    if(state!=eIdle)[self performSelector:@selector(step) withObject:nil afterDelay:stepTime];
 }
 
 - (void) takeOverRunning
 {
+    //switch over to being the primary system
+    [[ORGlobal sharedGlobal] removeRunVeto:@"Secondary"];
     [self setSentryType:ePrimary];
     [self setNextState:eStarting stepTime:.2];
-    //do the start up
+    //do the start up...
+    // 1) double check the SBCs
+    // 2) set up RunControl
+    // 3) start a run
 }
 
 
@@ -549,7 +640,9 @@ NSString* HaloSentryRemoteStateChanged = @"HaloSentryRemoteStateChanged";
 
 - (void) parseString:(NSString*)inString
 {
-    [[self undoManager] disableUndoRegistration];
+    if(!remoteRunParams){
+        remoteRunParams = [[NSMutableDictionary alloc]init];
+    }
     NSArray* lines= [inString componentsSeparatedByString:@"\n"];
     int n = [lines count];
     int i;    
@@ -559,22 +652,22 @@ NSString* HaloSentryRemoteStateChanged = @"HaloSentryRemoteStateChanged";
         if(firstColonRange.location != NSNotFound){
             NSString* key = [aLine substringToIndex:firstColonRange.location];
             id value      = [aLine substringFromIndex:firstColonRange.location+1];
+            [remoteRunParams setObject:value forKey:key];
             if([key isEqualToString:@"runStatus"]){
-                int runStatus = [value intValue];
-                if(runStatus==1) [self setRemoteRunInProgress:YES];
-                else             [self setRemoteRunInProgress:NO];
-                NSLog(@"runStatus: %d\n",runStatus);
+                int ival = [value intValue];
+                [self setRemoteRunInProgress:ival!=eRunStopped];
             }
         }
         else {
-            //probably a heartbeat
             if([aLine hasPrefix:@"OrcaHeartBeat"]){
-                NSLog(@"got heartbeat\n");
+                //should get a heartbeat every 30 seconds if ORCA is not hung
+               // NSLog(@"got heartbeat\n");
             }
         }
 		
     }
-	[[self undoManager] enableUndoRegistration];
+    [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryRemoteStateChanged object:self];
+
 }
 
 #pragma mark ***Delegate Methods
@@ -611,6 +704,39 @@ NSString* HaloSentryRemoteStateChanged = @"HaloSentryRemoteStateChanged";
 {
     if([self isConnected]){
         [socket writeString:aCmd encoding:NSASCIIStringEncoding];
+    }
+}
+
+- (void) askForRunStatus
+{
+    //put a 1 onto the parameter so we can load the parameter
+    //into the right status dictionary
+    [self sendCmd:@"runNumber = [RunControl runNumber];"];
+    [self sendCmd:@"subRunNumber = [RunControl subRunNumber];"];
+    [self sendCmd:@"elapsedTime = [RunControl elapsedRunTime];"];
+    [self sendCmd:@"repeatRun = [RunControl repeatRun];"];
+    [self sendCmd:@"timedRun = [RunControl timedRun];"];
+    [self sendCmd:@"timeLimit = [RunControl timeLimit];"];
+    [self sendCmd:@"quickStart = [RunControl quickStart];"];
+    [self sendCmd:@"offline = [RunControl offlineRun];"];
+    [self sendCmd:@"runningState = [RunControl runningState];"];
+    [self sendCmd:@"startTime = [RunControl startTimeAsString];"];
+}
+
+- (void) toggleSystems
+{
+    
+    //to be done... have to make a fsm to control the process
+    //only proceed if connection Open
+    if([self isConnected]){
+        if([runControl isRunning]){
+           // [runControl stopRun];
+           // [self sendCmd:@"[RunControl startRun];"];
+         }
+        else {
+           // [self sendCmd:@"[RunControl stopRun];"];
+           // [runControl startRun];
+        }
     }
 }
 

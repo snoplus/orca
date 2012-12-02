@@ -23,8 +23,10 @@
 #import "HaloModel.h"
 #import "HaloController.h"
 #import "ORSegmentGroup.h"
+#import "HaloSentry.h"
 
-NSString* ORHaloModelViewTypeChanged	= @"ORHaloModelViewTypeChanged";
+NSString* HaloModelHaloSentryChanged    = @"HaloModelHaloSentryChanged";
+NSString* HaloModelViewTypeChanged      = @"HaloModelViewTypeChanged";
 static NSString* HaloDbConnector		= @"HaloDbConnector";
 
 @implementation HaloModel
@@ -76,7 +78,27 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
 }
  */
 
+- (void) dealloc
+{
+    [haloSentry release];
+    [super dealloc];
+}
 #pragma mark ¥¥¥Accessors
+
+
+- (HaloSentry*) haloSentry
+{
+    return haloSentry;
+}
+
+- (void) setHaloSentry:(HaloSentry*)aHaloSentry
+{
+    [aHaloSentry retain];
+    [haloSentry release];
+    haloSentry = aHaloSentry;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:HaloModelHaloSentryChanged object:self];
+}
 
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups
@@ -184,7 +206,7 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
 {
 	[[[self undoManager] prepareWithInvocationTarget:self] setViewType:aViewType];
 	viewType = aViewType;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORHaloModelViewTypeChanged object:self userInfo:nil];
+	[[NSNotificationCenter defaultCenter] postNotificationName:HaloModelViewTypeChanged object:self userInfo:nil];
 }
 
 - (int) viewType
@@ -198,16 +220,23 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
     
     [[self undoManager] disableUndoRegistration];
     
-    [self setViewType:[decoder decodeIntForKey:@"viewType"]];
+    [self setHaloSentry:[decoder decodeObjectForKey:@"haloSentry"]];
+    [self setViewType:  [decoder decodeIntForKey:   @"viewType"]];
 	[[self undoManager] enableUndoRegistration];
 
+    if(!haloSentry){
+        haloSentry = [[HaloSentry alloc] init];
+    }
+    [haloSentry registerNotificationObservers];
+    
     return self;
 }
 
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt:viewType forKey:@"viewType"];
+    [encoder encodeObject:haloSentry forKey:@"haloSentry"];
+    [encoder encodeInt:viewType      forKey:@"viewType"];
 }
 
 - (NSString*) reformatSelectionString:(NSString*)aString forSet:(int)aSet

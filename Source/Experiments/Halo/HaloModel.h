@@ -26,14 +26,19 @@
 #define kUseCrateView 1
 #define kNumTubes	 128
 
+@class HaloSentry;
+
 @interface HaloModel :  ORExperimentModel
 {
-	int		  viewType;
+	int		    viewType;
+    HaloSentry* haloSentry;
 }
 
 //- (NSMutableArray*) setupMapEntries:(int)index;
 
 #pragma mark ¥¥¥Accessors
+- (HaloSentry*) haloSentry;
+- (void) setHaloSentry:(HaloSentry*)aHaloSentry;
 - (void) setViewType:(int)aViewType;
 - (int) viewType;
 
@@ -44,7 +49,13 @@
 - (NSString*) experimentMapLock;
 - (NSString*) experimentDetectorLock;
 - (NSString*) experimentDetailsLock;
+
+- (id)   initWithCoder:(NSCoder*)decoder;
+- (void) encodeWithCoder:(NSCoder*)encoder;
+
 @end
 
-extern NSString* ORHaloModelViewTypeChanged;
+
+extern NSString* HaloModelHaloSentryChanged;
+extern NSString* HaloModelViewTypeChanged;
 

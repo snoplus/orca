@@ -24,7 +24,7 @@
 #import "HaloModel.h"
 #import "ORDetectorSegment.h"
 #import "ORSegmentGroup.h"
-
+#import "HaloSentry.h"
 
 @implementation HaloController
 #pragma mark ¥¥¥Initialization
@@ -46,12 +46,12 @@
 	detectorSize		= NSMakeSize(620,595);
 	detailsSize			= NSMakeSize(450,589);
 	focalPlaneSize		= NSMakeSize(700,589);
+	sentrySize          = NSMakeSize(700,589);
 	
     blankView = [[NSView alloc] init];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
 
     [super awakeFromNib];
-		
 }
 
 
@@ -64,16 +64,87 @@
 
     [notifyCenter addObserver : self
                      selector : @selector(viewTypeChanged:)
-                         name : ORHaloModelViewTypeChanged
+                         name : HaloModelViewTypeChanged
 						object: model];
-	
-	
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(registerNotificationObservers)
+                         name : HaloModelHaloSentryChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(ipNumberChanged:)
+                         name : HaloSentryIpNumber1Changed
+						object: [model haloSentry]];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(ipNumberChanged:)
+                         name : HaloSentryIpNumber2Changed
+						object: [model haloSentry]];
+ 
+    [notifyCenter addObserver : self
+                     selector : @selector(sentryTypeChanged:)
+                         name : HaloSentryTypeChanged
+						object: [model haloSentry]];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(stateChanged:)
+                         name : HaloSentryStateChanged
+						object: [model haloSentry]];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(remoteStateChanged:)
+                         name : HaloSentryRemoteStateChanged
+						object: [model haloSentry]];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(disabledChanged:)
+                         name : HaloSentryDisabledChanged
+						object: [model haloSentry]];
 }
 
 - (void) updateWindow
 {
     [super updateWindow];
 	[self viewTypeChanged:nil];
+	[self stateChanged:nil];
+	[self sentryTypeChanged:nil];
+	[self ipNumberChanged:nil];
+	[self remoteStateChanged:nil];
+	[self disabledChanged:nil];
+}
+
+- (void) remoteStateChanged:(NSNotification*)aNote
+{
+    BOOL remoteMachine  = [[model haloSentry] remoteMachineRunning];
+    BOOL remoteOrca     = [[model haloSentry] remoteORCARunning];
+    BOOL remoteRun      = [[model haloSentry] remoteRunInProgress];
+    if([[model haloSentry]state] != eIdle){
+        [remoteMachineRunningField  setStringValue:remoteMachine ? @"Reachable":@"Unreachable"];
+        [remoteOrcaRunningField     setStringValue:remoteMachine ? (remoteOrca ? @"Running":@"NOT Running"):@"?"];
+        [remoteRunInProgressField   setStringValue:remoteMachine ? (remoteRun  ? @"YES":@"NO"):@"?"];
+    }
+    else {
+        [remoteMachineRunningField  setStringValue:@"?"];
+        [remoteOrcaRunningField     setStringValue:@"?"];
+        [remoteRunInProgressField   setStringValue:@"?"];        
+    }
+}
+
+- (void) sentryTypeChanged:(NSNotification*)aNote
+{
+    [sentryTypeField setStringValue:[[model haloSentry] sentryTypeName]];
+}
+
+- (void) stateChanged:(NSNotification*)aNote
+{
+    [stateField setStringValue:[[model haloSentry] stateName]];
+}
+
+- (void) ipNumberChanged:(NSNotification*)aNote
+{
+    [ip1Field setStringValue:[[model haloSentry] ipNumber1]];
+    [ip2Field setStringValue:[[model haloSentry] ipNumber2]];
 }
 
 - (void) viewTypeChanged:(NSNotification*)aNote
@@ -85,11 +156,10 @@
 
 #pragma mark ¥¥¥Interface Management
 
-- (IBAction) viewTypeAction:(id)sender
+- (void) disabledChanged:(NSNotification*)aNote
 {
-	[model setViewType:[sender indexOfSelectedItem]];
+	[disabledCB setIntValue: [[model haloSentry]  disabled]];
 }
-
 
 - (void) specialUpdate:(NSNotification*)aNote
 {
@@ -108,6 +178,31 @@
 	}
 }
 
+#pragma mark ¥¥¥Actions
+- (IBAction) disabledAction:(id)sender
+{
+	[[model haloSentry] setDisabled:[sender intValue]];
+}
+
+- (IBAction) viewTypeAction:(id)sender
+{
+	[model setViewType:[sender indexOfSelectedItem]];
+}
+
+- (IBAction) ip1Action:(id)sender
+{
+	[[model haloSentry] setIpNumber1:[sender stringValue]];
+}
+- (IBAction) ip2Action:(id)sender
+{
+	[[model haloSentry] setIpNumber2:[sender stringValue]];
+}
+
+- (IBAction) toggleSystems:(id)sender
+{
+    [[model haloSentry] toggleSystems];
+}
+
 #pragma mark ¥¥¥Details Interface Management
 - (void) detailsLockChanged:(NSNotification*)aNotification
 {
@@ -121,10 +216,8 @@
 }
 
 #pragma mark ¥¥¥Table Data Source
-
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem
 {
-	
     if([tabView indexOfTabViewItem:tabViewItem] == 0){
 		[[self window] setContentView:blankView];
 		[self resizeWindowToSize:detectorSize];
@@ -138,6 +231,11 @@
     else if([tabView indexOfTabViewItem:tabViewItem] == 2){
 		[[self window] setContentView:blankView];
 		[self resizeWindowToSize:focalPlaneSize];
+		[[self window] setContentView:tabView];
+    }
+    else if([tabView indexOfTabViewItem:tabViewItem] == 3){
+		[[self window] setContentView:blankView];
+		[self resizeWindowToSize:sentrySize];
 		[[self window] setContentView:tabView];
     }
 

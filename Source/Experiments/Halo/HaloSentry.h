@@ -37,11 +37,13 @@ enum eHaloSentryType {
 
 @class NetSocket;
 @class NSAlarm;
+@class ORRunModel;
 
 @interface HaloSentry : NSObject
 {
   @private
     enum eHaloSentryType sentryType;
+    BOOL disabled;
     BOOL isRunning;
     NSString* ipNumber1;
     NSString* ipNumber2;;
@@ -60,6 +62,8 @@ enum eHaloSentryType {
     NetSocket* socket;
     BOOL    isConnected;
     ORAlarm* remoteMachineNotReachable;
+    NSMutableDictionary* remoteRunParams;
+    ORRunModel* runControl;
 }
 
 #pragma mark ***Initialization
@@ -67,7 +71,6 @@ enum eHaloSentryType {
 - (void) dealloc;
 - (NSUndoManager*) undoManager;
 - (void) registerNotificationObservers;
-- (void) objectsChanged:(NSNotification*)aNote;
 - (void) setOtherIP;
 - (BOOL) remoteMachineRunning;
 - (void) setRemoteMachineRunning:(BOOL)aState;
@@ -76,7 +79,14 @@ enum eHaloSentryType {
 - (BOOL) remoteRunInProgress;
 - (void) setRemoteRunInProgress:(BOOL)aState;
 
+#pragma mark ***Notifications
+- (void) objectsChanged:(NSNotification*)aNote;
+- (void) runStarted:(NSNotification*)aNote;
+- (void) runStopped:(NSNotification*)aNote;
+
 #pragma mark ***Accessors
+- (BOOL) disabled;
+- (void) setDisabled:(BOOL)aDisabled;
 - (NSString*) ipNumber2;
 - (void) setIpNumber2:(NSString*)aIpNumber2;
 - (NSString*) ipNumber1;
@@ -103,6 +113,8 @@ enum eHaloSentryType {
 - (void) tasksCompleted:(id)sender;
 - (void) postMachineAlarm;
 - (void) clearMachineAlarm;
+- (void) askForRunStatus;
+- (void) toggleSystems;
 @end
 
 extern NSString* HaloSentryIpNumber2Changed;
@@ -114,4 +126,5 @@ extern NSString* HaloSentryTypeChanged;
 extern NSString* HaloSentryPingTask;
 extern NSString* HaloSentryIsConnectedChanged;
 extern NSString* HaloSentryRemoteStateChanged;
+extern NSString* HaloSentryDisabledChanged;
 

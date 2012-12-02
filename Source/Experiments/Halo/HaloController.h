@@ -27,24 +27,45 @@
 @interface HaloController : ORExperimentController {
  
     IBOutlet NSTextField*	detectorTitle;
+	IBOutlet NSButton*      disabledCB;
+	IBOutlet NSButton*      toggleButton;
+    IBOutlet NSTextField*	ip1Field;
+    IBOutlet NSTextField*	ip2Field;
+    IBOutlet NSTextField*	sentryTypeField;
+    IBOutlet NSTextField*	stateField;
+    IBOutlet NSTextField*	remoteMachineRunningField;
+    IBOutlet NSTextField*	remoteOrcaRunningField;
+    IBOutlet NSTextField*	remoteRunInProgressField;
     IBOutlet NSPopUpButton*	viewTypePU;
 
 	NSView *blankView;
     NSSize detectorSize;
     NSSize detailsSize;
     NSSize focalPlaneSize;
+    NSSize sentrySize;
 }
 
 #pragma mark ¥¥¥Initialization
 - (void) registerNotificationObservers;
 - (void) updateWindow;
-
-- (IBAction) viewTypeAction:(id)sender;
-
-#pragma mark ¥¥¥Details Interface Management
 - (void) setDetectorTitle;
+
+#pragma mark ¥¥¥Actions
+- (IBAction) disabledAction:(id)sender;
+- (IBAction) viewTypeAction:(id)sender;
+- (IBAction) ip1Action:(id)sender;
+- (IBAction) ip2Action:(id)sender;
+- (IBAction) toggleSystems:(id)sender;
+
+#pragma mark ¥¥¥Interface Management
+- (void) disabledChanged:(NSNotification*)aNote;
 - (void) viewTypeChanged:(NSNotification*)aNote;
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem;
+- (void) sentryTypeChanged:(NSNotification*)aNote;
+- (void) ipNumberChanged:(NSNotification*)aNote;
+- (void) stateChanged:(NSNotification*)aNote;
+- (void) remoteStateChanged:(NSNotification*)aNote;
+- (void) specialUpdate:(NSNotification*)aNote;
 
 @end
 @interface ORDetectorView (Halo)
