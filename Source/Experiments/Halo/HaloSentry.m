@@ -59,6 +59,13 @@ NSString* HaloSentryDisabledChanged      = @"HaloSentryDisabledChanged";
     [sbcArray release];
     [otherSystemIP release];
     [remoteRunParams release];
+    
+    [remoteMachineNotReachable clearAlarm];
+    [remoteMachineNotReachable release];
+    
+    [noOrcaConnection clearAlarm];
+    [noOrcaConnection release];
+    
     [super dealloc];
 }
 
@@ -355,6 +362,23 @@ NSString* HaloSentryDisabledChanged      = @"HaloSentryDisabledChanged";
     return [[[NSApp delegate]document]  undoManager];
 }
 
+
+- (void) postOrcaAlarm
+{
+    if(!noOrcaConnection){
+        noOrcaConnection = [[ORAlarm alloc] initWithName:@"No ORCA Connection" severity:kHardwareAlarm];
+        [noOrcaConnection setHelpString:@"No connection can be made to the other ORCA.\n\nThis alarm will remain until the condition is fixed. You may acknowledge the alarm to silence it"];
+        [noOrcaConnection setSticky:YES];
+    }
+    [noOrcaConnection postAlarm];
+}
+
+- (void) clearOcraAlarm
+{
+    [noOrcaConnection clearAlarm];
+    noOrcaConnection = nil;
+}
+
 - (void) postMachineAlarm
 {
     if(!remoteMachineNotReachable){
@@ -405,13 +429,14 @@ NSString* HaloSentryDisabledChanged      = @"HaloSentryDisabledChanged";
             
             [self setRemoteMachineRunning:NO];
             [self setRemoteORCARunning:NO];
-            
+            [self setRemoteMachineRunning:NO];
+
             //----temp for testing
-            [self setRemoteMachineRunning:YES];
-            [self setNextState:eConnectToRemoteOrca stepTime:1];
+            //[self setRemoteMachineRunning:YES];
+            //[self setNextState:eConnectToRemoteOrca stepTime:1];
             //--------------------
             
-          // [self setNextState:eCheckRemoteMachine stepTime:.3];
+           [self setNextState:eCheckRemoteMachine stepTime:.3];
             break;
             
         case eCheckRemoteMachine:
@@ -437,16 +462,18 @@ NSString* HaloSentryDisabledChanged      = @"HaloSentryDisabledChanged";
  
         case eConnectToRemoteOrca:
             if(!isConnected)[self connectSocket:YES];
-            [self setNextState:eGetRunState stepTime:1];
+            [self setNextState:eGetRunState stepTime:2];
             break;
             
         case eGetRunState:
             if(isConnected){
+                [self clearOcraAlarm];
                 [self sendCmd:@"runningState = [RunControl runningState];"];
                 [self setNextState:eCheckRunState stepTime:1];
             }
             else {
                 [self setNextState:eCheckRemoteMachine stepTime:10];
+                [self postOrcaAlarm];
             }
             break;
             
@@ -472,13 +499,6 @@ NSString* HaloSentryDisabledChanged      = @"HaloSentryDisabledChanged";
     }
     if(state!=eIdle)[self performSelector:@selector(step) withObject:nil afterDelay:stepTime];
 
-}
-- (void) finish
-{
-    [self connectSocket:NO];
-    [self setRemoteMachineRunning:NO];
-    [self setRemoteORCARunning:NO];
-    [self clearMachineAlarm];
 }
 
 - (void) stepPrimarySystem
@@ -543,10 +563,12 @@ NSString* HaloSentryDisabledChanged      = @"HaloSentryDisabledChanged";
                         
         case eGetRunState:
             if(isConnected){
+                [self clearOcraAlarm];
                 [self askForRunStatus];
                 [self setNextState:eGetRunState stepTime:30];
             }
             else {
+                [self postOrcaAlarm];
                 //the connection was dropped. This signals that the other machine has crashed
                 [self takeOverRunning];
             }
@@ -569,6 +591,15 @@ NSString* HaloSentryDisabledChanged      = @"HaloSentryDisabledChanged";
 
     }
     if(state!=eIdle)[self performSelector:@selector(step) withObject:nil afterDelay:stepTime];
+}
+
+- (void) finish
+{
+    [self connectSocket:NO];
+    [self setRemoteMachineRunning:NO];
+    [self setRemoteORCARunning:NO];
+    [self clearMachineAlarm];
+    [self clearOcraAlarm];
 }
 
 - (void) takeOverRunning

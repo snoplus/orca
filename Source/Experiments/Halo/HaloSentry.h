@@ -62,6 +62,7 @@ enum eHaloSentryType {
     NetSocket* socket;
     BOOL    isConnected;
     ORAlarm* remoteMachineNotReachable;
+    ORAlarm* noOrcaConnection;
     NSMutableDictionary* remoteRunParams;
     ORRunModel* runControl;
 }
@@ -111,10 +112,12 @@ enum eHaloSentryType {
 - (void) ping;
 - (BOOL) pingTaskRunning;
 - (void) tasksCompleted:(id)sender;
-- (void) postMachineAlarm;
-- (void) clearMachineAlarm;
 - (void) askForRunStatus;
 - (void) toggleSystems;
+- (void) postMachineAlarm;
+- (void) clearMachineAlarm;
+- (void) postOrcaAlarm;
+- (void) clearOcraAlarm;
 @end
 
 extern NSString* HaloSentryIpNumber2Changed;
