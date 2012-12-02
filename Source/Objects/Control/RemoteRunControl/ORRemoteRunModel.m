@@ -407,6 +407,23 @@ NSString* ORRemoteRunShutDownScriptNameChanged = @"ORRemoteRunShutDownScriptName
 	 object: self];
 }
 
+- (NSString*) elapsedRunTimeString
+{
+	return [self elapsedTimeString:[self elapsedTime]];
+}
+
+- (NSString*) elapsedTimeString:(NSTimeInterval) aTimeInterval;
+
+{
+	if([self isRunning]){
+		int hr = aTimeInterval/3600;
+		int min =(aTimeInterval - hr*3600)/60;
+		int sec = aTimeInterval - hr*3600 - min*60;
+		return [NSString stringWithFormat:@"%02d:%02d:%02d",hr,min,sec];
+	}
+	else return @"---";
+}
+
 
 -(BOOL)quickStart
 {

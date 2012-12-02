@@ -58,6 +58,8 @@
 #pragma mark ¥¥¥Initialization
 
 #pragma mark ¥¥¥Accessors
+- (NSString*) elapsedRunTimeString;
+- (NSString*) elapsedTimeString:(NSTimeInterval) aTimeInterval;
 - (int) subRunNumber;
 - (void) setSubRunNumber:(int)aSubRunNumber;
 - (NSArray*) scriptNames;
