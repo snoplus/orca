@@ -1548,6 +1548,8 @@
 		84762044118CD53D00016A8D /* xAxisMarkerOpposite.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84762009118CD53C00016A8D /* xAxisMarkerOpposite.gif */; };
 		84762045118CD53D00016A8D /* yAxisMarker.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8476200A118CD53C00016A8D /* yAxisMarker.gif */; };
 		84762046118CD53D00016A8D /* yAxisMarkerOpposite.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8476200B118CD53C00016A8D /* yAxisMarkerOpposite.gif */; };
+		8477DF43166A4023000144BA /* HaloSentry.h in Headers */ = {isa = PBXBuildFile; fileRef = 8477DF41166A4023000144BA /* HaloSentry.h */; };
+		8477DF44166A4023000144BA /* HaloSentry.m in Sources */ = {isa = PBXBuildFile; fileRef = 8477DF42166A4023000144BA /* HaloSentry.m */; };
 		847946CE07330E5300C5E1FA /* PciBit3.nib in Resources */ = {isa = PBXBuildFile; fileRef = 847946C407330E5200C5E1FA /* PciBit3.nib */; };
 		847946CF07330E5300C5E1FA /* PciBit3Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 847946C507330E5300C5E1FA /* PciBit3Card.gif */; };
 		847946D107330E5300C5E1FA /* ORPciBit3Commands.h in Headers */ = {isa = PBXBuildFile; fileRef = 847946C707330E5300C5E1FA /* ORPciBit3Commands.h */; };
@@ -4451,6 +4453,8 @@
 		8476200A118CD53C00016A8D /* yAxisMarker.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = yAxisMarker.gif; path = Source/Widgets/Plotting/yAxisMarker.gif; sourceTree = SOURCE_ROOT; };
 		8476200B118CD53C00016A8D /* yAxisMarkerOpposite.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = yAxisMarkerOpposite.gif; path = Source/Widgets/Plotting/yAxisMarkerOpposite.gif; sourceTree = SOURCE_ROOT; };
 		84764CC105055A32005F64B1 /* English */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = English; path = English.lproj/UnderConstruction.gif; sourceTree = "<group>"; };
+		8477DF41166A4023000144BA /* HaloSentry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HaloSentry.h; sourceTree = "<group>"; };
+		8477DF42166A4023000144BA /* HaloSentry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HaloSentry.m; sourceTree = "<group>"; };
 		84789FD70528A49E005F64B1 /* ORDataSetModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORDataSetModel.h; sourceTree = "<group>"; };
 		84789FD80528A49E005F64B1 /* ORDataSetModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORDataSetModel.m; sourceTree = "<group>"; };
 		847946C407330E5200C5E1FA /* PciBit3.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = PciBit3.nib; sourceTree = "<group>"; };
@@ -7748,6 +7752,8 @@
 				843175CA1152766E005643AB /* HaloDetectorView.m */,
 				843175CB1152766E005643AB /* HaloModel.h */,
 				843175CC1152766E005643AB /* HaloModel.m */,
+				8477DF41166A4023000144BA /* HaloSentry.h */,
+				8477DF42166A4023000144BA /* HaloSentry.m */,
 			);
 			path = Halo;
 			sourceTree = "<group>";
@@ -13751,6 +13757,7 @@
 				842BB6C516397A2000393470 /* ORPulser33500ChanController.h in Headers */,
 				842BC974163ED4E300393470 /* ORGretina4MReadout.hh in Headers */,
 				CED38D1E165CDB6600358681 /* ANSIEscapeHelper.h in Headers */,
+				8477DF43166A4023000144BA /* HaloSentry.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -15612,6 +15619,7 @@
 				842BB6AB1639746300393470 /* ORPulser33500Chan.m in Sources */,
 				842BB6C616397A2000393470 /* ORPulser33500ChanController.m in Sources */,
 				CED38D1F165CDB6600358681 /* ANSIEscapeHelper.m in Sources */,
+				8477DF44166A4023000144BA /* HaloSentry.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
