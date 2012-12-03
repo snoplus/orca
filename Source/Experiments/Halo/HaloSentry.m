@@ -18,11 +18,9 @@
 //-------------------------------------------------------------
 
 #pragma mark ***Imported Files
-#import <Cocoa/Cocoa.h>
 #import "HaloSentry.h"
 #import "ORTaskSequence.h"
 #import "NetSocket.h"
-#import "ORAlarm.h"
 #import "ORRunModel.h"
 
 NSString* HaloSentryIpNumber2Changed = @"HaloSentryIpNumber2Changed";
@@ -34,7 +32,8 @@ NSString* HaloSentryTypeChanged      = @"HaloSentryTypeChanged";
 NSString* HaloSentryPingTask         = @"HaloSentryPingTask";
 NSString* HaloSentryIsConnectedChanged = @"HaloSentryIsConnectedChanged";
 NSString* HaloSentryRemoteStateChanged = @"HaloSentryRemoteStateChanged";
-NSString* HaloSentryDisabledChanged      = @"HaloSentryDisabledChanged";
+NSString* HaloSentryStealthMode2Changed = @"HaloSentryStealthMode2Changed";
+NSString* HaloSentryStealthMode1Changed = @"HaloSentryStealthMode1Changed";
 
 #define kRemotePort 4667
 
@@ -101,6 +100,8 @@ NSString* HaloSentryDisabledChanged      = @"HaloSentryDisabledChanged";
     [runControl release];
     runControl = nil;
     [sbcArray release];
+    [shapers release];
+    shapers = [[[[NSApp delegate ]document] collectObjectsOfClass:NSClassFromString(@"ORShaperModel")]retain];
     sbcArray = [[[[NSApp delegate ]document] collectObjectsOfClass:NSClassFromString(@"ORVmecpuModel")]retain];
     NSArray* anArray = [[[NSApp delegate ]document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if([anArray count]){
@@ -111,7 +112,7 @@ NSString* HaloSentryDisabledChanged      = @"HaloSentryDisabledChanged";
 - (void) runStarted:(NSNotification*)aNote
 {
     //a local run has started
-    if(!disabled){
+    if(isRunning){
         [self setSentryType:ePrimary];
         [self setNextState:eStarting stepTime:.2];
         [self start];
@@ -121,7 +122,7 @@ NSString* HaloSentryDisabledChanged      = @"HaloSentryDisabledChanged";
 - (void) runStopped:(NSNotification*)aNote
 {
     //a local run has ended. Switch back to being a neutral system
-    if(!disabled){
+    if(isRunning){
         [self setSentryType:eNeither];
         [self setNextState:eStarting stepTime:.2];
         [self start];
@@ -129,28 +130,57 @@ NSString* HaloSentryDisabledChanged      = @"HaloSentryDisabledChanged";
 }
 
 #pragma mark ***Accessors
-- (BOOL) disabled
+
+- (BOOL) isRunning
 {
-    return disabled;
+    return isRunning;
+}
+- (void) setIsRunning:(BOOL)aState
+{
+    isRunning = aState;
+    [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryIsRunningChanged object:self];
 }
 
-- (void) setDisabled:(BOOL)aDisabled
+- (BOOL) otherSystemStealthMode
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setDisabled:disabled];
-    disabled = aDisabled;
-    if(disabled) [self stop];
-    else         [self start];
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryDisabledChanged object:self];
+    return otherSystemStealthMode;
+}
+
+- (BOOL) stealthMode2
+{
+    return stealthMode2;
+}
+
+- (void) setStealthMode2:(BOOL)aStealthMode2
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setStealthMode2:stealthMode2];
+    stealthMode2 = aStealthMode2;
+    [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryStealthMode2Changed object:self];
+    [self setOtherIP];
+}
+
+- (BOOL) stealthMode1
+{
+    return stealthMode1;
+}
+
+- (void) setStealthMode1:(BOOL)aStealthMode1
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setStealthMode1:stealthMode1];
+    stealthMode1 = aStealthMode1;
+    [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryStealthMode1Changed object:self];
+    [self setOtherIP];
 }
 
 - (NSString*) ipNumber2
 {
-    return ipNumber2;
+    if(!ipNumber2)return @"";
+    else return ipNumber2;
 }
 
 - (void) setIpNumber2:(NSString*)aIpNumber2
 {
+    if(!aIpNumber2)aIpNumber2 = @"";
     [[[self undoManager] prepareWithInvocationTarget:self] setIpNumber2:ipNumber2];
     
     [ipNumber2 autorelease];
@@ -163,11 +193,13 @@ NSString* HaloSentryDisabledChanged      = @"HaloSentryDisabledChanged";
 
 - (NSString*) ipNumber1
 {
-    return ipNumber1;
+    if(!ipNumber1)return @"";
+    else return ipNumber1;
 }
 
 - (void) setIpNumber1:(NSString*)aIpNumber1
 {
+    if(!aIpNumber1)aIpNumber1 = @"";
     [[[self undoManager] prepareWithInvocationTarget:self] setIpNumber1:ipNumber1];
     
     [ipNumber1 autorelease];
@@ -188,19 +220,15 @@ NSString* HaloSentryDisabledChanged      = @"HaloSentryDisabledChanged";
             if([anAddress isEqualToString:ipNumber1]){
                 [otherSystemIP autorelease];
                 otherSystemIP = [ipNumber2 copy];
+                otherSystemStealthMode = stealthMode2;
                 break;
             }
             if([anAddress isEqualToString:ipNumber2]){
                 [otherSystemIP autorelease];
                 otherSystemIP = [ipNumber1 copy];
+                otherSystemStealthMode = stealthMode1;
                 break;
             }
-        }
-        
-        sentryType  = eNeither;
-        state       = eStarting;
-        if(!disabled){
-            [self start];
         }
     }
 }
@@ -235,7 +263,7 @@ NSString* HaloSentryDisabledChanged      = @"HaloSentryDisabledChanged";
 - (void) setRemoteRunInProgress:(BOOL)aState
 {
     remoteRunInProgress = aState;
-    if((remoteRunInProgress==YES) && !disabled){
+    if((remoteRunInProgress==YES) && isRunning){
         [[ORGlobal sharedGlobal] addRunVeto:@"Secondary" comment:@"Run in progress on Primary Machine"];
     }
     else {
@@ -318,12 +346,11 @@ NSString* HaloSentryDisabledChanged      = @"HaloSentryDisabledChanged";
 #pragma mark ***Run Stuff
 - (void) start
 {
-    if(isRunning || disabled || [otherSystemIP length]==0)return;
-    isRunning = YES;
+    if(isRunning || [otherSystemIP length]==0)return;
+    [self setIsRunning:YES];
     [self setSentryType:eNeither];
     [self setNextState:eStarting stepTime:1];
     [self step];
-    [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryIsRunningChanged object:self];
 }
 
 - (void) stop
@@ -331,9 +358,7 @@ NSString* HaloSentryDisabledChanged      = @"HaloSentryDisabledChanged";
     if (!isRunning) return;
     [self setNextState:eStopping stepTime:1];
     [self step];
-    isRunning = NO;
     [[ORGlobal sharedGlobal] removeRunVeto:@"Secondary"];
-    [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryIsRunningChanged object:self];
 }
 
 #pragma mark ***Archival
@@ -344,7 +369,8 @@ NSString* HaloSentryDisabledChanged      = @"HaloSentryDisabledChanged";
     [[self undoManager] disableUndoRegistration];
     [self setIpNumber2:[decoder decodeObjectForKey: @"ipNumber2"]];
     [self setIpNumber1:[decoder decodeObjectForKey: @"ipNumber1"]];
-    [self setDisabled:  [decoder decodeBoolForKey:  @"disabled"]];
+    [self setStealthMode2:[decoder decodeBoolForKey: @"stealthMode2"]];
+    [self setStealthMode1:[decoder decodeBoolForKey: @"stealthMode1"]];
     [[self undoManager] enableUndoRegistration];
 
     return self;
@@ -352,9 +378,10 @@ NSString* HaloSentryDisabledChanged      = @"HaloSentryDisabledChanged";
 
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
-    [encoder encodeObject:ipNumber2 forKey:@"ipNumber2"];
-    [encoder encodeObject:ipNumber1 forKey:@"ipNumber1"];
-    [encoder encodeBool:disabled     forKey:@"disabled"];
+    [encoder encodeObject:ipNumber2 forKey: @"ipNumber2"];
+    [encoder encodeObject:ipNumber1 forKey: @"ipNumber1"];
+    [encoder encodeBool:stealthMode2 forKey: @"stealthMode2"];
+    [encoder encodeBool:stealthMode1 forKey: @"stealthMode1"];
 }
 
 - (NSUndoManager *)undoManager
@@ -381,7 +408,7 @@ NSString* HaloSentryDisabledChanged      = @"HaloSentryDisabledChanged";
 
 - (void) postMachineAlarm
 {
-    if(!remoteMachineNotReachable){
+    if(!remoteMachineNotReachable && !otherSystemStealthMode){
         NSString* alarmName = [NSString stringWithFormat:@"%@ Unreachable",otherSystemIP];
         remoteMachineNotReachable = [[ORAlarm alloc] initWithName:alarmName severity:kHardwareAlarm];
         [remoteMachineNotReachable setHelpString:@"The backup machine is not reachable.\n\nThis alarm will remain until the condition is fixed. You may acknowledge the alarm to silence it"];
@@ -395,27 +422,22 @@ NSString* HaloSentryDisabledChanged      = @"HaloSentryDisabledChanged";
     [remoteMachineNotReachable clearAlarm];
     remoteMachineNotReachable = nil;
 }
-
+#pragma mark •••Finite State Machines
 - (void) step
 {
-    
     state = nextState;
-
+    
     [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryStateChanged object:self];
+   
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(step) object:nil];
     
     switch(sentryType){
-        case eNeither:
-            [self stepSimpleWatch];
-            break;
-            
-        case ePrimary:
-            [self stepPrimarySystem];
-            break;
-            
-        case eSecondary:
-            [self stepSecondarySystem];
-            break;
+        case eNeither:[self stepSimpleWatch];break;
+        case ePrimary:[self stepPrimarySystem];break;
+        case eSecondary:[self stepSecondarySystem];break;
     }
+    
+    if(state!=eIdle)[self performSelector:@selector(step) withObject:nil afterDelay:stepTime];
 }
 
 - (void) stepSimpleWatch
@@ -423,7 +445,6 @@ NSString* HaloSentryDisabledChanged      = @"HaloSentryDisabledChanged";
     //Neither system is running. Just check the other system and ensure that the network is alive
     //and that ORCA is running. If a run is started on a machine, that machine will become primary
     //and the other one will become secondary
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(step) object:nil];
     switch (state){
         case eStarting:
             
@@ -452,10 +473,7 @@ NSString* HaloSentryDisabledChanged      = @"HaloSentryDisabledChanged";
                 }
                 else {
                     [self setNextState:eCheckRemoteMachine stepTime:60];
-                    //remote machine not running. post alarm and retry later
-                    //we are just watching at this point so do nothing other than
-                    //the alarm post
-                    [self postMachineAlarm];
+                    [self postMachineAlarm]; //just watching, so just post alarm
                 }
             }
             break;
@@ -473,7 +491,7 @@ NSString* HaloSentryDisabledChanged      = @"HaloSentryDisabledChanged";
             }
             else {
                 [self setNextState:eCheckRemoteMachine stepTime:10];
-                [self postOrcaAlarm];
+                [self postOrcaAlarm]; //just watching, so just post alarm
             }
             break;
             
@@ -486,7 +504,6 @@ NSString* HaloSentryDisabledChanged      = @"HaloSentryDisabledChanged";
                 [self setSentryType:eSecondary];
                 [self setNextState:eStarting stepTime:.2];
             }
-            
             break;
 
         case eStopping:
@@ -494,10 +511,8 @@ NSString* HaloSentryDisabledChanged      = @"HaloSentryDisabledChanged";
             [self setNextState:eIdle stepTime:.2];
            break;
             
-        case eIdle:
-            break;
+        default: break;
     }
-    if(state!=eIdle)[self performSelector:@selector(step) withObject:nil afterDelay:stepTime];
 
 }
 
@@ -505,7 +520,6 @@ NSString* HaloSentryDisabledChanged      = @"HaloSentryDisabledChanged";
 {
     //We are the primary, we are taking data. We will just monitor the other
     //system to ensure that it is alive. If not, all we do is post an alarm.
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(step) object:nil];
     switch (state){
         case eStarting:
             [self setRemoteMachineRunning:NO];
@@ -539,14 +553,8 @@ NSString* HaloSentryDisabledChanged      = @"HaloSentryDisabledChanged";
             [self setNextState:eIdle stepTime:.2];
             break;
             
-        //unsed state to stop compiler warnings
-        case eIdle:
-        case eConnectToRemoteOrca:
-        case eGetRunState:
-        case eCheckRunState:
-            break;
+        default: break;
     }
-    if(state!=eIdle)[self performSelector:@selector(step) withObject:nil afterDelay:stepTime];
 }
 
 - (void) stepSecondarySystem
@@ -555,7 +563,6 @@ NSString* HaloSentryDisabledChanged      = @"HaloSentryDisabledChanged";
     //if it dies, we have to take over and take control of the run
     //this sentry type should not be run unless the connection is open and we are ready to take over
     //running is it closes
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(step) object:nil];
     switch (state){
         case eStarting:
             [self setNextState:eGetRunState stepTime:10];
@@ -579,18 +586,9 @@ NSString* HaloSentryDisabledChanged      = @"HaloSentryDisabledChanged";
             [self setNextState:eIdle stepTime:.2];
             break;
 
-        //-------------------------------------
-        //unsed state to stop compiler warnings
-        case eIdle:
-        case eCheckRemoteMachine:
-        case eConnectToRemoteOrca:
-        case eCheckRunState:
-        case  eWaitForPing:
-            break;
-        //-------------------------------------
+        default: break;
 
     }
-    if(state!=eIdle)[self performSelector:@selector(step) withObject:nil afterDelay:stepTime];
 }
 
 - (void) finish
@@ -600,6 +598,7 @@ NSString* HaloSentryDisabledChanged      = @"HaloSentryDisabledChanged";
     [self setRemoteORCARunning:NO];
     [self clearMachineAlarm];
     [self clearOcraAlarm];
+    [self setIsRunning:NO];
 }
 
 - (void) takeOverRunning
@@ -618,22 +617,27 @@ NSString* HaloSentryDisabledChanged      = @"HaloSentryDisabledChanged";
 #pragma mark •••Helpers
 - (void) ping
 {
-	if(!pingTask){
-		ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
-		pingTask = [[NSTask alloc] init];
-		
-		[pingTask setLaunchPath:@"/sbin/ping"];
-		[pingTask setArguments: [NSArray arrayWithObjects:@"-c",@"1",@"-t",@"10",@"-q",otherSystemIP,nil]];
-		
-		[aSequence addTaskObj:pingTask];
-		[aSequence setVerbose:NO];
-		[aSequence setTextToDelegate:YES];
-		[aSequence launch];
-		[[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryPingTask object:self];
-	}
-	else {
-		[pingTask terminate];
-	}
+    if(!pingTask){
+        if(otherSystemStealthMode){
+            [self setRemoteMachineRunning:YES];
+        }
+        else {
+            ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
+            pingTask = [[NSTask alloc] init];
+            
+            [pingTask setLaunchPath:@"/sbin/ping"];
+            [pingTask setArguments: [NSArray arrayWithObjects:@"-c",@"1",@"-t",@"10",@"-q",otherSystemIP,nil]];
+            
+            [aSequence addTaskObj:pingTask];
+            [aSequence setVerbose:NO];
+            [aSequence setTextToDelegate:YES];
+            [aSequence launch];
+            [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryPingTask object:self];
+        }
+    }
+    else {
+        [pingTask terminate];
+    }
 }
 
 - (BOOL) pingTaskRunning
@@ -651,7 +655,8 @@ NSString* HaloSentryDisabledChanged      = @"HaloSentryDisabledChanged";
 - (void) taskData:(NSString*)text
 {
     if([text rangeOfString:@"100.0% packet loss"].location != NSNotFound){
-        [self setRemoteMachineRunning:NO];
+        if(otherSystemStealthMode) [self setRemoteMachineRunning:YES];
+        else [self setRemoteMachineRunning:NO];
     }
     else {
         [self setRemoteMachineRunning:YES];
@@ -770,5 +775,4 @@ NSString* HaloSentryDisabledChanged      = @"HaloSentryDisabledChanged";
         }
     }
 }
-
 @end

@@ -27,7 +27,9 @@
 @interface HaloController : ORExperimentController {
  
     IBOutlet NSTextField*	detectorTitle;
-	IBOutlet NSButton*      disabledCB;
+    IBOutlet NSButton*      startButton;
+	IBOutlet NSButton*      stealthMode2CB;
+	IBOutlet NSButton*      stealthMode1CB;
 	IBOutlet NSButton*      toggleButton;
     IBOutlet NSTextField*	ip1Field;
     IBOutlet NSTextField*	ip2Field;
@@ -37,7 +39,7 @@
     IBOutlet NSTextField*	remoteOrcaRunningField;
     IBOutlet NSTextField*	remoteRunInProgressField;
     IBOutlet NSPopUpButton*	viewTypePU;
-
+    IBOutlet NSButton*      sentryLockButton;
 	NSView *blankView;
     NSSize detectorSize;
     NSSize detailsSize;
@@ -51,14 +53,18 @@
 - (void) setDetectorTitle;
 
 #pragma mark ¥¥¥Actions
-- (IBAction) disabledAction:(id)sender;
+- (IBAction) stealthMode2Action:(id)sender;
+- (IBAction) stealthMode1Action:(id)sender;
 - (IBAction) viewTypeAction:(id)sender;
 - (IBAction) ip1Action:(id)sender;
 - (IBAction) ip2Action:(id)sender;
 - (IBAction) toggleSystems:(id)sender;
+- (IBAction) startStopSentry:(id)sender;
+- (IBAction) sentryLockAction:(id)sender;
 
 #pragma mark ¥¥¥Interface Management
-- (void) disabledChanged:(NSNotification*)aNote;
+- (void) stealthMode2Changed:(NSNotification*)aNote;
+- (void) stealthMode1Changed:(NSNotification*)aNote;
 - (void) viewTypeChanged:(NSNotification*)aNote;
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem;
 - (void) sentryTypeChanged:(NSNotification*)aNote;
@@ -66,6 +72,8 @@
 - (void) stateChanged:(NSNotification*)aNote;
 - (void) remoteStateChanged:(NSNotification*)aNote;
 - (void) specialUpdate:(NSNotification*)aNote;
+- (void) sentryLockChanged:(NSNotification*)aNote;
+- (void) updateButtons;
 
 @end
 @interface ORDetectorView (Halo)

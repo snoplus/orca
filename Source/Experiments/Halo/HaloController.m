@@ -98,9 +98,25 @@
 						object: [model haloSentry]];
 
     [notifyCenter addObserver : self
-                     selector : @selector(disabledChanged:)
-                         name : HaloSentryDisabledChanged
+                     selector : @selector(stealthMode1Changed:)
+                         name : HaloSentryStealthMode1Changed
 						object: [model haloSentry]];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(stealthMode2Changed:)
+                         name : HaloSentryStealthMode2Changed
+						object: [model haloSentry]];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(sentryIsRunningChanged:)
+                         name : HaloSentryIsRunningChanged
+						object: [model haloSentry]];   
+
+    [notifyCenter addObserver : self
+                     selector : @selector(sentryLockChanged:)
+                         name : HaloModelSentryLock
+                       object : nil];
+
 }
 
 - (void) updateWindow
@@ -111,7 +127,25 @@
 	[self sentryTypeChanged:nil];
 	[self ipNumberChanged:nil];
 	[self remoteStateChanged:nil];
-	[self disabledChanged:nil];
+	[self stealthMode1Changed:nil];
+	[self stealthMode2Changed:nil];
+	[self sentryIsRunningChanged:nil];
+    [self sentryLockChanged:nil];
+}
+
+#pragma mark ¥¥¥Interface Management
+
+- (void) checkGlobalSecurity
+{
+    [super checkGlobalSecurity];
+    BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
+    [gSecurity setLock:HaloModelSentryLock to:secure];
+    [sentryLockButton setEnabled:secure];
+}
+
+- (void) sentryIsRunningChanged:(NSNotification*)aNote
+{
+    [self updateButtons];
 }
 
 - (void) remoteStateChanged:(NSNotification*)aNote
@@ -119,8 +153,9 @@
     BOOL remoteMachine  = [[model haloSentry] remoteMachineRunning];
     BOOL remoteOrca     = [[model haloSentry] remoteORCARunning];
     BOOL remoteRun      = [[model haloSentry] remoteRunInProgress];
+    BOOL stealthMode    = [[model haloSentry] otherSystemStealthMode];
     if([[model haloSentry]state] != eIdle){
-        [remoteMachineRunningField  setStringValue:remoteMachine ? @"Reachable":@"Unreachable"];
+        [remoteMachineRunningField  setStringValue:remoteMachine ? (stealthMode? @"Stealth Mode":@"Reachable"):@"Unreachable"];
         [remoteOrcaRunningField     setStringValue:remoteMachine ? (remoteOrca ? @"Running":@"NOT Running"):@"?"];
         [remoteRunInProgressField   setStringValue:remoteMachine ? (remoteRun  ? @"YES":@"NO"):@"?"];
     }
@@ -154,11 +189,14 @@
 	[detectorView makeAllSegments];	
 }
 
-#pragma mark ¥¥¥Interface Management
-
-- (void) disabledChanged:(NSNotification*)aNote
+- (void) stealthMode2Changed:(NSNotification*)aNote
 {
-	[disabledCB setIntValue: [[model haloSentry]  disabled]];
+	[stealthMode2CB setIntValue: [[model haloSentry] stealthMode2]];
+}
+
+- (void) stealthMode1Changed:(NSNotification*)aNote
+{
+	[stealthMode1CB setIntValue: [[model haloSentry] stealthMode1]];
 }
 
 - (void) specialUpdate:(NSNotification*)aNote
@@ -177,11 +215,34 @@
 		default: break;
 	}
 }
+- (void) sentryLockChanged:(NSNotification*)aNote
+{
+    BOOL locked = [gSecurity isLocked:HaloModelSentryLock];
+	[sentryLockButton setState: locked];
+    [self updateButtons];
+}
+- (void) updateButtons
+{
+    BOOL locked = [gSecurity isLocked:HaloModelSentryLock];
+    BOOL sentryRunning = [[model haloSentry] isRunning];
+    [stealthMode2CB setEnabled:!locked && !sentryRunning];
+    [stealthMode1CB setEnabled:!locked && !sentryRunning];
+    [ip1Field setEnabled:!locked && !sentryRunning];
+    [ip2Field setEnabled:!locked && !sentryRunning];
+    [startButton setEnabled:!locked];
+    [startButton setTitle:sentryRunning?@"Stop":@"Start"];
+}
 
 #pragma mark ¥¥¥Actions
-- (IBAction) disabledAction:(id)sender
+
+- (void) stealthMode2Action:(id)sender
 {
-	[[model haloSentry] setDisabled:[sender intValue]];
+	[[model haloSentry] setStealthMode2:[sender intValue]];
+}
+
+- (void) stealthMode1Action:(id)sender
+{
+	[[model haloSentry] setStealthMode1:[sender intValue]];	
 }
 
 - (IBAction) viewTypeAction:(id)sender
@@ -203,17 +264,21 @@
     [[model haloSentry] toggleSystems];
 }
 
-#pragma mark ¥¥¥Details Interface Management
-- (void) detailsLockChanged:(NSNotification*)aNotification
+- (IBAction) sentryLockAction:(id)sender
 {
-	[super detailsLockChanged:aNotification];
-    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:[model experimentDetailsLock]];
-    BOOL locked = [gSecurity isLocked:[model experimentDetailsLock]];
-
-	[detailsLockButton setState: locked];
-    [initButton setEnabled: !lockedOrRunningMaintenance];
-
+    [gSecurity tryToSetLock:HaloModelSentryLock to:[sender intValue] forWindow:[self window]];
 }
+
+- (IBAction) startStopSentry:(id)sender
+{
+    if(![[model haloSentry] isRunning]){
+        [[model haloSentry] start];
+    }
+    else {
+        [[model haloSentry] stop];
+    }
+}
+
 
 #pragma mark ¥¥¥Table Data Source
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem

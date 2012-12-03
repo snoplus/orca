@@ -27,6 +27,8 @@
 
 NSString* HaloModelHaloSentryChanged    = @"HaloModelHaloSentryChanged";
 NSString* HaloModelViewTypeChanged      = @"HaloModelViewTypeChanged";
+NSString* HaloModelSentryLock           = @"HaloModelSentryLock";
+
 static NSString* HaloDbConnector		= @"HaloDbConnector";
 
 @implementation HaloModel
@@ -84,6 +86,7 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
     [super dealloc];
 }
 #pragma mark ¥¥¥Accessors
+
 
 
 - (HaloSentry*) haloSentry

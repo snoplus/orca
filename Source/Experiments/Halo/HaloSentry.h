@@ -1,5 +1,5 @@
 //-------------------------------------------------------------------------
-//  HaloSentryModel.h
+//  HaloSentry.h
 //
 //  Created by Mark Howe on Saturday 12/01/2012.
 //  Copyright (c) 2012 University of North Carolina. All rights reserved.
@@ -18,6 +18,11 @@
 //-------------------------------------------------------------
 
 #pragma mark ***Imported Files
+
+@class NetSocket;
+@class ORRunModel;
+
+
 enum  eHaloSentryState {
     eIdle,
     eStarting,
@@ -26,7 +31,7 @@ enum  eHaloSentryState {
     eConnectToRemoteOrca,
     eGetRunState,
     eCheckRunState,
-    eWaitForPing,
+    eWaitForPing
 } eHaloSentryState;
 
 enum eHaloSentryType {
@@ -35,21 +40,17 @@ enum eHaloSentryType {
     eSecondary
 }eHaloSentryType;
 
-@class NetSocket;
-@class ORAlarm;
-@class ORRunModel;
-
 @interface HaloSentry : NSObject
 {
   @private
     enum eHaloSentryType sentryType;
-    BOOL disabled;
     BOOL isRunning;
     NSString* ipNumber1;
     NSString* ipNumber2;;
-    NSString* primarySystemIP;
-    NSString* secondarySystemIP;
     NSString* otherSystemIP;
+    BOOL stealthMode1;
+    BOOL stealthMode2;
+    BOOL otherSystemStealthMode;
     
     NSTimeInterval stepTime;
     enum eHaloSentryState state;
@@ -81,6 +82,13 @@ enum eHaloSentryType {
 - (void) setRemoteORCARunning:(BOOL)aState;
 - (BOOL) remoteRunInProgress;
 - (void) setRemoteRunInProgress:(BOOL)aState;
+- (BOOL) stealthMode2;
+- (void) setStealthMode2:(BOOL)aStealthMode2;
+- (BOOL) stealthMode1;
+- (void) setStealthMode1:(BOOL)aStealthMode1;
+- (BOOL) otherSystemStealthMode;
+- (BOOL) isRunning;
+- (void) setIsRunning:(BOOL)aState;
 
 #pragma mark ***Notifications
 - (void) objectsChanged:(NSNotification*)aNote;
@@ -88,8 +96,6 @@ enum eHaloSentryType {
 - (void) runStopped:(NSNotification*)aNote;
 
 #pragma mark ***Accessors
-- (BOOL) disabled;
-- (void) setDisabled:(BOOL)aDisabled;
 - (NSString*) ipNumber2;
 - (void) setIpNumber2:(NSString*)aIpNumber2;
 - (NSString*) ipNumber1;
@@ -122,6 +128,8 @@ enum eHaloSentryType {
 - (void) clearOcraAlarm;
 @end
 
+extern NSString* HaloSentryStealthMode2Changed;
+extern NSString* HaloSentryStealthMode1Changed;
 extern NSString* HaloSentryIpNumber2Changed;
 extern NSString* HaloSentryIpNumber1Changed;
 extern NSString* HaloSentryIsPrimaryChanged;
@@ -131,5 +139,4 @@ extern NSString* HaloSentryTypeChanged;
 extern NSString* HaloSentryPingTask;
 extern NSString* HaloSentryIsConnectedChanged;
 extern NSString* HaloSentryRemoteStateChanged;
-extern NSString* HaloSentryDisabledChanged;
-
+extern NSString* HaloSentryIsRunningChanged;

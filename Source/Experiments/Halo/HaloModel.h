@@ -58,4 +58,5 @@
 
 extern NSString* HaloModelHaloSentryChanged;
 extern NSString* HaloModelViewTypeChanged;
+extern NSString* HaloModelSentryLock;
 
