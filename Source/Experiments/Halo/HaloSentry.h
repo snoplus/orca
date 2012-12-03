@@ -36,7 +36,7 @@ enum eHaloSentryType {
 }eHaloSentryType;
 
 @class NetSocket;
-@class NSAlarm;
+@class ORAlarm;
 @class ORRunModel;
 
 @interface HaloSentry : NSObject
@@ -54,7 +54,6 @@ enum eHaloSentryType {
     NSTimeInterval stepTime;
     enum eHaloSentryState state;
     enum eHaloSentryState nextState;
-    NSArray* sbcArray;
 	NSTask*	 pingTask;
     BOOL     remoteMachineRunning;
     BOOL     remoteORCARunning;
@@ -64,7 +63,10 @@ enum eHaloSentryType {
     ORAlarm* remoteMachineNotReachable;
     ORAlarm* noOrcaConnection;
     NSMutableDictionary* remoteRunParams;
+    
     ORRunModel* runControl;
+    NSArray* sbcArray;
+    NSArray* shapers;
 }
 
 #pragma mark ***Initialization
