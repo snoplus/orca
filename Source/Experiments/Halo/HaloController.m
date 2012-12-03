@@ -151,17 +151,17 @@
 - (void) remoteStateChanged:(NSNotification*)aNote
 {
     BOOL remoteMachine  = [[model haloSentry] remoteMachineRunning];
-    BOOL remoteOrca     = [[model haloSentry] remoteORCARunning];
+    BOOL connection     = [[model haloSentry] isConnected];
     BOOL remoteRun      = [[model haloSentry] remoteRunInProgress];
     BOOL stealthMode    = [[model haloSentry] otherSystemStealthMode];
     if([[model haloSentry]state] != eIdle){
         [remoteMachineRunningField  setStringValue:remoteMachine ? (stealthMode? @"Stealth Mode":@"Reachable"):@"Unreachable"];
-        [remoteOrcaRunningField     setStringValue:remoteMachine ? (remoteOrca ? @"Running":@"NOT Running"):@"?"];
+        [connectedField     setStringValue:remoteMachine ? (connection ? @"Connected":@"NOT Connected"):@"?"];
         [remoteRunInProgressField   setStringValue:remoteMachine ? (remoteRun  ? @"YES":@"NO"):@"?"];
     }
     else {
         [remoteMachineRunningField  setStringValue:@"?"];
-        [remoteOrcaRunningField     setStringValue:@"?"];
+        [connectedField             setStringValue:@"?"];
         [remoteRunInProgressField   setStringValue:@"?"];        
     }
 }

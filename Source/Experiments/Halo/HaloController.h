@@ -36,7 +36,7 @@
     IBOutlet NSTextField*	sentryTypeField;
     IBOutlet NSTextField*	stateField;
     IBOutlet NSTextField*	remoteMachineRunningField;
-    IBOutlet NSTextField*	remoteOrcaRunningField;
+    IBOutlet NSTextField*	connectedField;
     IBOutlet NSTextField*	remoteRunInProgressField;
     IBOutlet NSPopUpButton*	viewTypePU;
     IBOutlet NSButton*      sentryLockButton;

@@ -57,7 +57,6 @@ enum eHaloSentryType {
     enum eHaloSentryState nextState;
 	NSTask*	 pingTask;
     BOOL     remoteMachineRunning;
-    BOOL     remoteORCARunning;
     BOOL     remoteRunInProgress;
     NetSocket* socket;
     BOOL    isConnected;
@@ -78,8 +77,6 @@ enum eHaloSentryType {
 - (void) setOtherIP;
 - (BOOL) remoteMachineRunning;
 - (void) setRemoteMachineRunning:(BOOL)aState;
-- (BOOL) remoteORCARunning;
-- (void) setRemoteORCARunning:(BOOL)aState;
 - (BOOL) remoteRunInProgress;
 - (void) setRemoteRunInProgress:(BOOL)aState;
 - (BOOL) stealthMode2;
@@ -89,6 +86,7 @@ enum eHaloSentryType {
 - (BOOL) otherSystemStealthMode;
 - (BOOL) isRunning;
 - (void) setIsRunning:(BOOL)aState;
+- (BOOL) isConnected;
 
 #pragma mark ***Notifications
 - (void) objectsChanged:(NSNotification*)aNote;

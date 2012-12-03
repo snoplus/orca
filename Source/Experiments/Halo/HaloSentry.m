@@ -245,17 +245,6 @@ NSString* HaloSentryStealthMode1Changed = @"HaloSentryStealthMode1Changed";
  
 }
 
-- (BOOL) remoteORCARunning
-{
-    return remoteORCARunning;
-}
-
-- (void) setRemoteORCARunning:(BOOL)aState
-{
-    remoteORCARunning = aState;
-   [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryRemoteStateChanged object:self];
-}
-
 - (BOOL) remoteRunInProgress
 {
     return remoteRunInProgress;
@@ -449,7 +438,6 @@ NSString* HaloSentryStealthMode1Changed = @"HaloSentryStealthMode1Changed";
         case eStarting:
             
             [self setRemoteMachineRunning:NO];
-            [self setRemoteORCARunning:NO];
             [self setRemoteMachineRunning:NO];
 
             //----temp for testing
@@ -523,7 +511,6 @@ NSString* HaloSentryStealthMode1Changed = @"HaloSentryStealthMode1Changed";
     switch (state){
         case eStarting:
             [self setRemoteMachineRunning:NO];
-            [self setRemoteORCARunning:NO];
             [self setNextState:eCheckRemoteMachine stepTime:.3];
             break;
             
@@ -595,7 +582,6 @@ NSString* HaloSentryStealthMode1Changed = @"HaloSentryStealthMode1Changed";
 {
     [self connectSocket:NO];
     [self setRemoteMachineRunning:NO];
-    [self setRemoteORCARunning:NO];
     [self clearMachineAlarm];
     [self clearOcraAlarm];
     [self setIsRunning:NO];
@@ -713,7 +699,6 @@ NSString* HaloSentryStealthMode1Changed = @"HaloSentryStealthMode1Changed";
         [self setIsConnected:[socket isConnected]];
         [self sendCmd:@"[self setName:Halo];"];
         //able to connect, so ORCA is running remotely
-        [self setRemoteORCARunning:YES];
     }
 }
 
