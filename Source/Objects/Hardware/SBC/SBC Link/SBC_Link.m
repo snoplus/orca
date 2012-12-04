@@ -2568,6 +2568,17 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 		memcpy(dataPtr,buffer,numberLongs*sizeof(long));
 		
 		[self write:socketfd buffer:aPacket];
+        [self read:socketfd buffer:aPacket]; //read the response
+		
+		SBC_ReadBlockStruct* rp = (SBC_ReadBlockStruct*)aPacket->payload;
+		int numLongs = rp->numLongs;
+		rp++;
+		long* dp = (long*)rp;
+		int i;
+		for(i=0;i<numLongs;i++){
+			buffer[i] = dp[i];
+		}
+
 		[socketLock unlock]; //end critical section
 	}
 	@catch (NSException* localException) {
