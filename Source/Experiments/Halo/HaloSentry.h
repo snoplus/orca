@@ -40,6 +40,16 @@ enum eHaloSentryType {
     eSecondary
 }eHaloSentryType;
 
+enum eHaloStatus {
+    eOK             = 0,
+    eYES            = 0,
+    eRunning        = 0,
+    eBad            = 1,
+    eNO             = 1,
+    eBeingChecked   = 2,
+    eUnknown        = 3
+} eHaloStatus;
+
 @interface HaloSentry : NSObject
 {
   @private
@@ -56,13 +66,19 @@ enum eHaloSentryType {
     enum eHaloSentryState state;
     enum eHaloSentryState nextState;
 	NSTask*	 pingTask;
-    BOOL     remoteMachineRunning;
-    BOOL     remoteRunInProgress;
+    
+    enum eHaloStatus remoteMachineReachable;
+    enum eHaloStatus remoteORCARunning;
+    enum eHaloStatus remoteRunInProgress;
+    
     NetSocket* socket;
     BOOL    isConnected;
     ORAlarm* remoteMachineNotReachable;
     ORAlarm* noOrcaConnection;
+    ORAlarm* orcaHung;
     NSMutableDictionary* remoteRunParams;
+    short missedHeartbeatCount;
+    long lastRunState;
     
     ORRunModel* runControl;
     NSArray* sbcArray;
@@ -75,10 +91,12 @@ enum eHaloSentryType {
 - (NSUndoManager*) undoManager;
 - (void) registerNotificationObservers;
 - (void) setOtherIP;
-- (BOOL) remoteMachineRunning;
-- (void) setRemoteMachineRunning:(BOOL)aState;
-- (BOOL) remoteRunInProgress;
-- (void) setRemoteRunInProgress:(BOOL)aState;
+- (enum eHaloStatus) remoteMachineReachable;
+- (void) setRemoteMachineReachable:(enum eHaloStatus)aState;
+- (enum eHaloStatus) remoteORCARunning;
+- (void) setRemoteORCARunning:(enum eHaloStatus)aState;
+- (enum eHaloStatus) remoteRunInProgress;
+- (void) setRemoteRunInProgress:(enum eHaloStatus)aState;
 - (BOOL) stealthMode2;
 - (void) setStealthMode2:(BOOL)aStealthMode2;
 - (BOOL) stealthMode1;
@@ -92,6 +110,7 @@ enum eHaloSentryType {
 - (void) objectsChanged:(NSNotification*)aNote;
 - (void) runStarted:(NSNotification*)aNote;
 - (void) runStopped:(NSNotification*)aNote;
+- (void) collectObjects;
 
 #pragma mark ***Accessors
 - (NSString*) ipNumber2;
@@ -124,6 +143,13 @@ enum eHaloSentryType {
 - (void) clearMachineAlarm;
 - (void) postOrcaAlarm;
 - (void) clearOcraAlarm;
+- (void) postOrcaHungAlarm;
+- (void) clearOcraHungAlarm;
+- (void) startHeartbeatTimeout;
+- (void) cancelHeartbeatTimeout;
+- (void) missedHeartBeat;
+- (short) missedHeartBeatCount;
+
 @end
 
 extern NSString* HaloSentryStealthMode2Changed;
@@ -138,3 +164,4 @@ extern NSString* HaloSentryPingTask;
 extern NSString* HaloSentryIsConnectedChanged;
 extern NSString* HaloSentryRemoteStateChanged;
 extern NSString* HaloSentryIsRunningChanged;
+extern NSString* HaloSentryMissedHeartbeat;

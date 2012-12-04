@@ -117,6 +117,12 @@
                          name : HaloModelSentryLock
                        object : nil];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(remoteStateChanged:)
+                         name : HaloSentryMissedHeartbeat
+						object: [model haloSentry]];
+   
+    
 }
 
 - (void) updateWindow
@@ -150,14 +156,43 @@
 
 - (void) remoteStateChanged:(NSNotification*)aNote
 {
-    BOOL remoteMachine  = [[model haloSentry] remoteMachineRunning];
-    BOOL connection     = [[model haloSentry] isConnected];
-    BOOL remoteRun      = [[model haloSentry] remoteRunInProgress];
+    enum eHaloStatus remoteMachineState  = [[model haloSentry] remoteMachineReachable];
+    enum eHaloStatus connectionState     = [[model haloSentry] remoteORCARunning];
+    enum eHaloStatus remoteRunState      = [[model haloSentry] remoteRunInProgress];
+    
     BOOL stealthMode    = [[model haloSentry] otherSystemStealthMode];
+    short missedHearts  = [[model haloSentry] missedHeartBeatCount];
+        
     if([[model haloSentry]state] != eIdle){
-        [remoteMachineRunningField  setStringValue:remoteMachine ? (stealthMode? @"Stealth Mode":@"Reachable"):@"Unreachable"];
-        [connectedField     setStringValue:remoteMachine ? (connection ? @"Connected":@"NOT Connected"):@"?"];
-        [remoteRunInProgressField   setStringValue:remoteMachine ? (remoteRun  ? @"YES":@"NO"):@"?"];
+        NSString* s = @"?";
+        if(remoteMachineState == eOK){
+            if(stealthMode) s = @"Stealth Mode";
+            else            s = @"Reachable";
+        }
+        else if(remoteMachineState == eBad)          s = @"Unreachable";
+        else if(remoteMachineState == eBeingChecked) s = @"Being Checked";
+        
+        [remoteMachineRunningField  setStringValue:s];
+        
+        s = @"?";
+        if(missedHearts==0){
+            if(connectionState == eYES)     s = @"Connected";
+            else if(connectionState == eBad)s = @"NOT Connected";
+            else if(connectionState == eBeingChecked)s = @"Being Checked";
+            [connectedField     setStringValue:s];
+        }
+        else if(missedHearts<3){
+            [connectedField setStringValue:[NSString stringWithFormat:@"Missed %d Heartbeat%@",missedHearts,missedHearts>1?@"s":@""]];
+        }
+        else [connectedField setStringValue:@"Hung"];
+        
+        s = @"?";
+        if(remoteMachineState == eOK){
+            if(remoteRunState == eOK)s = @"Running";
+            else if(remoteRunState == eBad)s = @"NOT Running";
+            else if(remoteRunState == eBeingChecked)s = @"Being Checked";
+        }
+        [remoteRunInProgressField   setStringValue:s];
     }
     else {
         [remoteMachineRunningField  setStringValue:@"?"];
