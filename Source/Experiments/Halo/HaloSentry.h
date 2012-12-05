@@ -77,9 +77,10 @@ enum eHaloStatus {
     enum eHaloStatus remoteORCARunning;
     enum eHaloStatus remoteRunInProgress;
     
-    ORAlarm* remoteMachineNotReachable;
-    ORAlarm* noOrcaConnection;
-    ORAlarm* orcaHung;
+    ORAlarm* pingFailedAlarm;
+    ORAlarm* noConnectionAlarm;
+    ORAlarm* orcaHungAlarm;
+    ORAlarm* noRemoteSentryAlarm;
     
     ORRunModel* runControl;
     NSArray* sbcs;
@@ -141,16 +142,20 @@ enum eHaloStatus {
 - (void) tasksCompleted:(id)sender;
 - (void) updateRemoteMachine;
 - (void) toggleSystems;
-- (void) postMachineAlarm;
-- (void) clearMachineAlarm;
-- (void) postOrcaAlarm;
-- (void) clearOcraAlarm;
-- (void) postOrcaHungAlarm;
-- (void) clearOcraHungAlarm;
 - (void) startHeartbeatTimeout;
 - (void) cancelHeartbeatTimeout;
 - (void) missedHeartBeat;
 - (short) missedHeartBeatCount;
+
+#pragma mark ***Alarms
+- (void) postPingAlarm;
+- (void) clearPingAlarm;
+- (void) postConnectionAlarm;
+- (void) clearConnectionAlarm;
+- (void) postOrcaHungAlarm;
+- (void) clearOrcaHungAlarm;
+- (void) postNoRemoteSentryAlarm;
+- (void) clearNoRemoteSentryAlarm;
 
 @end
 

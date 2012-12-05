@@ -58,14 +58,17 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
     [sbcs release];
     [otherSystemIP release];
     
-    [remoteMachineNotReachable clearAlarm];
-    [remoteMachineNotReachable release];
+    [pingFailedAlarm clearAlarm];
+    [pingFailedAlarm release];
     
-    [noOrcaConnection clearAlarm];
-    [noOrcaConnection release];
+    [noConnectionAlarm clearAlarm];
+    [noConnectionAlarm release];
 
-    [orcaHung clearAlarm];
-    [orcaHung release];
+    [orcaHungAlarm clearAlarm];
+    [orcaHungAlarm release];
+
+    [noRemoteSentryAlarm clearAlarm];
+    [noRemoteSentryAlarm release];
 
     
     [super dealloc];
@@ -135,7 +138,7 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
     if(sentryIsRunning){
         [self setSentryType:ePrimary];
         [self setNextState:eStarting stepTime:.2];
-        [self start];
+        [self step];
         [self updateRemoteMachine];
     }
 }
@@ -146,7 +149,7 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
     if(sentryIsRunning){
         [self setSentryType:eNeither];
         [self setNextState:eStarting stepTime:.2];
-        [self start];
+        [self step];
     }
 }
 
@@ -290,11 +293,9 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
     
     if((aState == eYES) && sentryIsRunning){
         [[ORGlobal sharedGlobal] addRunVeto:@"Secondary" comment:@"Run in progress on Primary Machine"];
-        [self startHeartbeatTimeout];
     }
     else {
         [[ORGlobal sharedGlobal] removeRunVeto:@"Secondary"];
-        [self cancelHeartbeatTimeout];
     }
 
     [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryRemoteStateChanged object:self];
@@ -424,56 +425,74 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
 }
 
 
-- (void) postOrcaAlarm
+- (void) postConnectionAlarm
 {
-    if(!noOrcaConnection){
-        noOrcaConnection = [[ORAlarm alloc] initWithName:@"No ORCA Connection" severity:kHardwareAlarm];
-        [noOrcaConnection setHelpString:@"No connection can be made to the other ORCA.\n\nThis alarm will remain until the condition is fixed. You may acknowledge the alarm to silence it"];
-        [noOrcaConnection setSticky:YES];
+    if(!noConnectionAlarm){
+        noConnectionAlarm = [[ORAlarm alloc] initWithName:@"No ORCA Connection" severity:kHardwareAlarm];
+        [noConnectionAlarm setHelpString:@"No connection can be made to the other ORCA.\n\nThis alarm will remain until the condition is fixed. You may acknowledge the alarm to silence it"];
+        [noConnectionAlarm setSticky:YES];
     }
-    [noOrcaConnection postAlarm];
+    [noConnectionAlarm postAlarm];
 }
 
-- (void) clearOcraAlarm
+- (void) clearConnectionAlarm
 {
-    [noOrcaConnection clearAlarm];
-    noOrcaConnection = nil;
+    [noConnectionAlarm clearAlarm];
+    noConnectionAlarm = nil;
 }
 
-- (void) postMachineAlarm
+- (void) postPingAlarm
 {
-    if(!remoteMachineNotReachable && !otherSystemStealthMode){
+    if(!pingFailedAlarm && !otherSystemStealthMode){
         NSString* alarmName = [NSString stringWithFormat:@"%@ Unreachable",otherSystemIP];
-        remoteMachineNotReachable = [[ORAlarm alloc] initWithName:alarmName severity:kHardwareAlarm];
-        [remoteMachineNotReachable setHelpString:@"The backup machine is not reachable.\n\nThis alarm will remain until the condition is fixed. You may acknowledge the alarm to silence it"];
-        [remoteMachineNotReachable setSticky:YES];
+        pingFailedAlarm = [[ORAlarm alloc] initWithName:alarmName severity:kHardwareAlarm];
+        [pingFailedAlarm setHelpString:@"The backup machine is not reachable.\n\nThis alarm will remain until the condition is fixed. You may acknowledge the alarm to silence it"];
+        [pingFailedAlarm setSticky:YES];
     }
-    [remoteMachineNotReachable postAlarm];
+    [pingFailedAlarm postAlarm];
 }
 
-- (void) clearMachineAlarm
+- (void) clearPingAlarm
 {
-    [remoteMachineNotReachable clearAlarm];
-    remoteMachineNotReachable = nil;
+    [pingFailedAlarm clearAlarm];
+    pingFailedAlarm = nil;
 }
 
 - (void) postOrcaHungAlarm
 {
-    if(!orcaHung){
+    if(!orcaHungAlarm){
         NSString* alarmName = [NSString stringWithFormat:@"ORCA %@ Hung",otherSystemIP];
-        orcaHung = [[ORAlarm alloc] initWithName:alarmName severity:kHardwareAlarm];
-        [orcaHung setHelpString:@"The primary ORCA appears hung.\n\nThis alarm will remain until the condition is fixed. You may acknowledge the alarm to silence it"];
-        [orcaHung setSticky:YES];
+        orcaHungAlarm = [[ORAlarm alloc] initWithName:alarmName severity:kHardwareAlarm];
+        [orcaHungAlarm setHelpString:@"The primary ORCA appears hung.\n\nThis alarm will remain until the condition is fixed. You may acknowledge the alarm to silence it"];
+        [orcaHungAlarm setSticky:YES];
     }
-    [orcaHung postAlarm];
+    [orcaHungAlarm postAlarm];
 }
 
 
-- (void) clearOcraHungAlarm
+- (void) clearOrcaHungAlarm
 {
-    [orcaHung clearAlarm];
-    orcaHung = nil;
+    [orcaHungAlarm clearAlarm];
+    orcaHungAlarm = nil;
 }
+
+- (void) postNoRemoteSentryAlarm
+{
+    if(!noRemoteSentryAlarm){
+        noRemoteSentryAlarm = [[ORAlarm alloc] initWithName:@"No Remote Sentry" severity:kInformationAlarm];
+        [noRemoteSentryAlarm setHelpString:@"There is no remote sentry watching this machine.\n\nThis alarm will remain until the condition is fixed. You may acknowledge the alarm to silence it"];
+        [noRemoteSentryAlarm setSticky:YES];
+    }
+    [noRemoteSentryAlarm postAlarm];
+}
+
+
+- (void) clearNoRemoteSentryAlarm
+{
+    [noRemoteSentryAlarm clearAlarm];
+    noRemoteSentryAlarm = nil;
+}
+
 
 #pragma mark •••Finite State Machines
 - (void) step
@@ -485,9 +504,9 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(step) object:nil];
     
     switch(sentryType){
-        case eNeither:[self stepSimpleWatch];break;
-        case ePrimary:[self stepPrimarySystem];break;
-        case eSecondary:[self stepSecondarySystem];break;
+        case eNeither:  [self stepSimpleWatch];     break;
+        case ePrimary:  [self stepPrimarySystem];   break;
+        case eSecondary:[self stepSecondarySystem]; break;
     }
     
     if(state!=eIdle)[self performSelector:@selector(step) withObject:nil afterDelay:stepTime];
@@ -507,7 +526,7 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
             
         case eCheckRemoteMachine:
             [self ping];
-            [self setNextState:eWaitForPing stepTime:1];
+            [self setNextState:eWaitForPing stepTime:.3];
             break;
             
         case eWaitForPing:
@@ -515,11 +534,11 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
                 if(remoteMachineReachable == eYES){
                     [self setRemoteORCARunning:eBeingChecked];
                     [self setNextState:eConnectToRemoteOrca stepTime:1];
-                    [self clearMachineAlarm];
+                    [self clearPingAlarm];
                 }
                 else {
                     [self setNextState:eCheckRemoteMachine stepTime:60];
-                    [self postMachineAlarm]; //just watching, so just post alarm
+                    [self postPingAlarm]; //just watching, so just post alarm
                 }
             }
             break;
@@ -531,16 +550,13 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
             
         case eGetRunState:
             if(isConnected){
-                [self clearOcraAlarm];
-                //note that we use a different return value on purpose here so
-                //we can tell which query response we're dealing with
-                [self sendCmd:@"runningState = [RunControl runningState];"];
+                [self clearConnectionAlarm];
+                [self sendCmd:@"runStatus = [RunControl runningState];"];
                 [self setNextState:eCheckRunState stepTime:1];
            }
             else {
                 [self setRemoteORCARunning:eBeingChecked];
                 [self setNextState:eCheckRemoteMachine stepTime:10];
-                [self postOrcaAlarm]; //just watching, so just post alarm
             }
             break;
             
@@ -551,7 +567,7 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
             else {
                //the remote macine is running. Flip over to being the secondarySystem
                 [self setSentryType:eSecondary];
-                [self setNextState:eStarting stepTime:.2];
+                [self setNextState:eStarting stepTime:.3];
             }
             break;
 
@@ -583,10 +599,10 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
             if(!pingTask){
                 if(remoteMachineReachable == eYES){
                     [self setNextState:eConnectToRemoteOrca stepTime:10];
-                    [self clearMachineAlarm];
+                    [self clearPingAlarm];
                }
                 else {
-                    [self postMachineAlarm];
+                    [self postPingAlarm];
                     [self setNextState:eCheckRemoteMachine stepTime:60];
                     //remote machine not running. post alarm and retry later
                     //we are just watching at this point so do nothing other than
@@ -602,13 +618,11 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
             
         case eGetSecondaryState:
             if(isConnected){
-                [self sendCmd:@"remoteSentryIsRunning = [HaloModel sentryIsRunning];"];
-                [self startHeartbeatTimeout];
+                [self sendCmd:@"remoteSentryRunning = [HaloModel sentryIsRunning];"];
                 [self setNextState:eGetSecondaryState stepTime:30];
             }
             else {
                 [self setNextState:eStarting stepTime:10];
-                [self postOrcaAlarm]; //just watching, so just post alarm
             }
             break;
 
@@ -626,7 +640,6 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
     //We are the secondary system -- the machine in waiting. We monitor the other machine and
     //if it dies, we have to take over and take control of the run
     //this sentry type should not be run unless the connection is open and we are ready to take over
-    //running is it closes
     switch (state){
         case eStarting:
             [self setRemoteRunInProgress:eBeingChecked];
@@ -634,13 +647,12 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
            break;
                         
         case eGetRunState:
-            if(isConnected && !orcaHung){
-                [self clearOcraAlarm];
+            if(isConnected && !orcaHungAlarm){
                 [self setNextState:eGetRunState stepTime:30];
+                //we should get the runStatus at run boundaries, but we'll ask anyway
+                [self sendCmd:@"runStatus = [RunControl runningState];"];
             }
-            
             else {
-                if(!orcaHung)[self postOrcaAlarm];
                 //the connection was dropped. This signals that the other machine has crashed
                 [self takeOverRunning];
             }
@@ -661,9 +673,9 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
     [self setRemoteMachineReachable:eUnknown];
     [self setRemoteORCARunning:eUnknown];
     [self setRemoteRunInProgress:eUnknown];
-    [self clearMachineAlarm];
-    [self clearOcraAlarm];
-    [self clearOcraHungAlarm];
+    [self clearPingAlarm];
+    [self clearConnectionAlarm];
+    [self clearOrcaHungAlarm];
     [self setSentryIsRunning:NO];
     [self setSentryType:eNeither];
     [self setNextState:eIdle stepTime:.2];
@@ -744,6 +756,9 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
 
 - (void) parseString:(NSString*)inString
 {
+    //handle returns from the other system
+    //If a connection is open, a heartbeat should arrive every 30 seconds
+    //the run state of the remote machine should arrive whenever it changes
     NSArray* lines= [inString componentsSeparatedByString:@"\n"];
     int n = [lines count];
     int i;    
@@ -758,18 +773,16 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
                 if(ival==eRunStopped)   [self setRemoteRunInProgress:eNO];
                 else                    [self setRemoteRunInProgress:eYES];
             }
+            else if([key isEqualToString:@"remoteSentryRunning"]){
+                if(ival == NO)  [self postNoRemoteSentryAlarm];
+                else            [self clearNoRemoteSentryAlarm];
+            }
         }
         else {
             if([aLine hasPrefix:@"OrcaHeartBeat"]){
-                //should get a heartbeat every 30 seconds if ORCA is not hung
                 [self startHeartbeatTimeout];
             }
-            else if([aLine hasPrefix:@"remoteSentryIsRunning"]){
-                //should get a heartbeat every 30 seconds if ORCA is not hung
-            
-                [self startHeartbeatTimeout];
-            }
-        }
+         }
     }
     [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryRemoteStateChanged object:self];
 
@@ -780,9 +793,19 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
 {
     if(aSocket == socket){
         [self setIsConnected:[socket isConnected]];
-        [self sendCmd:@"[self setName:Halo];"];
+        [self clearConnectionAlarm];
         [self setRemoteORCARunning:eYES];
-        //able to connect, so ORCA is running remotely
+        [self startHeartbeatTimeout];
+    }
+}
+
+- (void) netsocketDisconnected:(NetSocket*)inNetSocket
+{
+    if(inNetSocket == socket){
+        [self setIsConnected:[socket isConnected]];
+        [self setIsConnected:NO];
+        [self setRemoteORCARunning:eBad];
+        [self postConnectionAlarm];
     }
 }
 
@@ -793,15 +816,6 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
         if(inString){
             [self parseString:inString];
         }
-    }
-}
-
-- (void) netsocketDisconnected:(NetSocket*)inNetSocket
-{
-    if(inNetSocket == socket){
-        [self setIsConnected:[socket isConnected]];
-        [self setIsConnected:NO];
-        [self setRemoteORCARunning:eBad];
     }
 }
 
@@ -818,7 +832,7 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
     [self sendCmd:[NSString stringWithFormat:@"[RunControl setSubRunNumber:%d];",[runControl subRunNumber]]];
     [self sendCmd:[NSString stringWithFormat:@"[RunControl setRepeatRun:%d];",[runControl repeatRun]]];
     [self sendCmd:[NSString stringWithFormat:@"[RunControl setTimedRun:%d];",[runControl timedRun]]];
-    [self sendCmd:[NSString stringWithFormat:@"[RunControl setSetTimeLimit:%f];",[runControl timeLimit]]];
+    [self sendCmd:[NSString stringWithFormat:@"[RunControl setTimeLimit:%f];",[runControl timeLimit]]];
     [self sendCmd:[NSString stringWithFormat:@"[RunControl setQuickStart:%d];",[runControl quickStart]]];
     [self sendCmd:[NSString stringWithFormat:@"[RunControl setOfflineRun:%d];",[runControl offlineRun]]];
     [self sendCmd:@"runStatus = [RunControl runningState];"];
@@ -826,7 +840,7 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
 
 - (void) startHeartbeatTimeout
 {
-    [self clearOcraHungAlarm];
+    [self clearOrcaHungAlarm];
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(missedHeartBeat) object:nil];
     [self performSelector:@selector(missedHeartBeat) withObject:nil afterDelay:45];
     missedHeartbeatCount = 0;

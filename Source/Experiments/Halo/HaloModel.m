@@ -164,7 +164,6 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
 		}
 	}
 }
-
 - (NSString*) dataSetNameGroup:(int)aGroup segment:(int)index
 {
 	ORSegmentGroup* theGroup = [segmentGroups objectAtIndex:aGroup];
@@ -196,7 +195,6 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
     
     return [NSString stringWithFormat:@"FLT,Energy,Crate %2d,Station %2d,Channel %2d",[crateName intValue],[cardName intValue],[chanName intValue]];
 }
-
 #pragma mark ¥¥¥Specific Dialog Lock Methods
 - (NSString*) experimentMapLock
 {
