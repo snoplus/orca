@@ -32,13 +32,18 @@ enum  eHaloSentryState {
     eGetRunState,
     eCheckRunState,
     eWaitForPing,
-    eGetSecondaryState
+    eGetSecondaryState,
+    eWaitForLocalRunStop,
+    eWaitForRemoteRunStop,
+    eWaitForLocalRunStart,
+    eWaitForRemoteRunStart,
 } eHaloSentryState;
 
 enum eHaloSentryType {
     eNeither,
     ePrimary,
-    eSecondary
+    eSecondary,
+    eHealthyToggle,
 }eHaloSentryType;
 
 enum eHaloStatus {
@@ -61,13 +66,14 @@ enum eHaloStatus {
     BOOL    sentryIsRunning;
     short   missedHeartbeatCount;
     BOOL    wasRunning;
-    
+    float   loopTime;
     NSString*   ipNumber1;
     NSString*   ipNumber2;;
     NSString*   otherSystemIP;
     BOOL        stealthMode1;
     BOOL        stealthMode2;
     BOOL        otherSystemStealthMode;
+    BOOL        ignoreRunStates;
     
 	NSTask*     pingTask;
     NetSocket*  socket;
@@ -81,6 +87,7 @@ enum eHaloStatus {
     ORAlarm* noConnectionAlarm;
     ORAlarm* orcaHungAlarm;
     ORAlarm* noRemoteSentryAlarm;
+    ORAlarm* runProblemAlarm;
     
     ORRunModel* runControl;
     NSArray* sbcs;
@@ -146,6 +153,9 @@ enum eHaloStatus {
 - (void) cancelHeartbeatTimeout;
 - (void) missedHeartBeat;
 - (short) missedHeartBeatCount;
+- (NSString*) remoteMachineStatusString;
+- (NSString*) connectionStatusString;
+- (NSString*) remoteORCArunStateString;
 
 #pragma mark ***Alarms
 - (void) postPingAlarm;
@@ -156,7 +166,8 @@ enum eHaloStatus {
 - (void) clearOrcaHungAlarm;
 - (void) postNoRemoteSentryAlarm;
 - (void) clearNoRemoteSentryAlarm;
-
+- (void) postRunProblemAlarm:(NSString*)aTitle;
+- (void) clearRunProblemAlarm;
 @end
 
 extern NSString* HaloSentryStealthMode2Changed;

@@ -70,6 +70,9 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
     [noRemoteSentryAlarm clearAlarm];
     [noRemoteSentryAlarm release];
 
+    [runProblemAlarm clearAlarm];
+    [runProblemAlarm release];
+
     
     [super dealloc];
 }
@@ -135,7 +138,7 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
 - (void) runStarted:(NSNotification*)aNote
 {
     //a local run has started
-    if(sentryIsRunning){
+    if(sentryIsRunning && !ignoreRunStates){
         [self setSentryType:ePrimary];
         [self setNextState:eStarting stepTime:.2];
         [self step];
@@ -146,7 +149,7 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
 - (void) runStopped:(NSNotification*)aNote
 {
     //a local run has ended. Switch back to being a neutral system
-    if(sentryIsRunning){
+    if(sentryIsRunning && !ignoreRunStates){
         [self setSentryType:eNeither];
         [self setNextState:eStarting stepTime:.2];
         [self step];
@@ -324,16 +327,55 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
         case eCheckRunState:        return @"Checking Run";
         case eWaitForPing:          return @"Ping Wait";
         case eGetSecondaryState:    return @"Checking Sentry";
+        case eWaitForLocalRunStop:  return @"Run Stop Wait";
+        case eWaitForRemoteRunStop: return @"Run Stop Wait";
+        case eWaitForLocalRunStart: return @"Run Start Wait";
+        case eWaitForRemoteRunStart:return @"Run Start Wait";
     }
 }
 
 - (NSString*) sentryTypeName
 {
     switch(sentryType){
-        case eNeither:      return @"Waiting";
-        case ePrimary:      return @"Primary";
-        case eSecondary:    return @"Secondary";
+        case eNeither:          return @"Waiting";
+        case ePrimary:          return @"Primary";
+        case eSecondary:        return @"Secondary";
+        case eHealthyToggle:    return @"Toggle";
     }
+}
+
+- (NSString*) remoteMachineStatusString
+{
+    if(remoteMachineReachable == eOK){
+        if(otherSystemStealthMode) return @"Stealth Mode";
+        else                       return @"Reachable";
+    }
+    else if(remoteMachineReachable == eBad)          return  @"Unreachable";
+    else if(remoteMachineReachable == eBeingChecked) return  @"Being Checked";
+    else return @"?";
+}
+
+- (NSString*) connectionStatusString
+{
+    if(missedHeartbeatCount==0){
+        if(remoteORCARunning == eYES)               return @"Connected";
+        else if(remoteORCARunning == eBad)          return @"NOT Connected";
+        else if(remoteORCARunning == eBeingChecked) return @"Being Checked";
+    }
+    else if(missedHeartbeatCount<3){
+        return [NSString stringWithFormat:@"Missed %d Heartbeat%@",missedHeartbeatCount,missedHeartbeatCount>1?@"s":@""];
+    }
+    return @"Hung";
+}
+
+- (NSString*) remoteORCArunStateString
+{
+    if(remoteMachineReachable == eOK){
+        if(remoteRunInProgress == eOK)               return @"Running";
+        else if(remoteRunInProgress == eBad)         return @"NOT Running";
+        else if(remoteRunInProgress == eBeingChecked)return @"Being Checked";
+    }
+    return @"?";
 }
 
 - (enum eHaloSentryState) state
@@ -493,20 +535,37 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
     noRemoteSentryAlarm = nil;
 }
 
+- (void) postRunProblemAlarm:(NSString*)aTitle
+{
+    if(!runProblemAlarm){
+        runProblemAlarm = [[ORAlarm alloc] initWithName:aTitle severity:kHardwareAlarm];
+        [runProblemAlarm setHelpString:@"There was trouble with the run state.\n\nThis alarm will remain until the condition is fixed. You may acknowledge the alarm to silence it"];
+        [runProblemAlarm setSticky:YES];
+    }
+    [runProblemAlarm postAlarm];
+
+}
+- (void) clearRunProblemAlarm
+{
+    [runProblemAlarm clearAlarm];
+    runProblemAlarm = nil;
+}
 
 #pragma mark •••Finite State Machines
 - (void) step
 {
-    state = nextState;
+    state    =  nextState;
+    loopTime += stepTime;
     
     [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryStateChanged object:self];
    
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(step) object:nil];
     
     switch(sentryType){
-        case eNeither:  [self stepSimpleWatch];     break;
-        case ePrimary:  [self stepPrimarySystem];   break;
-        case eSecondary:[self stepSecondarySystem]; break;
+        case eNeither:      [self stepSimpleWatch];     break;
+        case ePrimary:      [self stepPrimarySystem];   break;
+        case eSecondary:    [self stepSecondarySystem]; break;
+        case eHealthyToggle:[self stepHealthyToggle];   break;
     }
     
     if(state!=eIdle)[self performSelector:@selector(step) withObject:nil afterDelay:stepTime];
@@ -664,6 +723,106 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
 
         default: break;
 
+    }
+}
+
+- (void) stepHealthyToggle
+{
+    switch (state){
+        case eStarting:
+            loopTime = 0;
+            ignoreRunStates = YES;
+            if([runControl isRunning]){
+                [runControl stopRun];
+                [self setNextState:eWaitForLocalRunStop stepTime:.1];
+            }
+            else if (remoteRunInProgress == eYES){
+                [self sendCmd:@"[RunControl stopRun];"];
+                [self setNextState:eWaitForRemoteRunStop stepTime:.1];
+            }
+            break;
+            
+        case eWaitForLocalRunStop:
+            if(![runControl isRunning]){
+                [self sendCmd:@"[RunControl startRun];"];
+                [self setNextState:eWaitForRemoteRunStart stepTime:.1];
+                loopTime = 0;
+           }
+            else {
+                if(loopTime>10.){
+                    //something is seriously wrong...
+                    [self postRunProblemAlarm:@"Local Run didn't stop"];
+                    [self setSentryType:eNeither];
+                    [self setNextState:eStarting stepTime:.1];
+                    [self step];
+                }
+                else [self setNextState:eWaitForLocalRunStop stepTime:.1];
+            }
+            break;
+            
+        case eWaitForRemoteRunStop:
+            if(remoteRunInProgress == eNO){
+                [runControl startRun];
+                [self setNextState:eWaitForLocalRunStart stepTime:.1];
+                loopTime = 0;
+            }
+            else {
+                if(loopTime>10){
+                    //something is seriously wrong...
+                    [self postRunProblemAlarm:@"Remote Run didn't stop"];
+                    [self setSentryType:eNeither];
+                    [self setNextState:eStarting stepTime:.1];
+                    [self step];
+                }
+                else [self setNextState:eWaitForRemoteRunStop stepTime:.1];
+            }
+           break;
+ 
+        case eWaitForLocalRunStart:
+            if([runControl isRunning]){
+                //all is good
+                ignoreRunStates = NO;
+                [self setSentryType:ePrimary];
+                [self setNextState:eGetSecondaryState stepTime:.1];
+                [self step];
+            }
+            else {
+                if(loopTime>10){
+                    ignoreRunStates = NO;
+                  //something is seriously wrong...
+                    [self postRunProblemAlarm:@"Local Run didn't start"];
+                    [self setSentryType:eNeither];
+                    [self setNextState:eStarting stepTime:.1];
+                    [self step];
+                }
+                else [self setNextState:eWaitForLocalRunStart stepTime:.1];
+            }
+            break;
+            
+        case eWaitForRemoteRunStart:
+            if(remoteRunInProgress == eYES){
+                //all is good
+                ignoreRunStates = NO;
+                [self setSentryType:eSecondary];
+                [self setNextState:eGetRunState stepTime:.1];
+                [self step];
+            }
+            else {
+                if(loopTime>10){
+                    //something is seriously wrong...
+                    ignoreRunStates = NO;
+                    [self postRunProblemAlarm:@"Remote Run didn't start"];
+                    [self setSentryType:eSecondary];
+                    [self setNextState:eStarting stepTime:.1];
+                    [self step];
+                }
+                else [self setNextState:eWaitForRemoteRunStart stepTime:.1];
+            }
+            break;
+
+            
+                     
+        default: break;
     }
 }
 
@@ -867,9 +1026,30 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
 {
     return missedHeartbeatCount;
 }
+- (BOOL) systemIsHeathy
+{
+    if(!pingFailedAlarm && 
+       !noConnectionAlarm &&
+       !orcaHungAlarm &&
+       !noRemoteSentryAlarm) {
+        return YES;
+    }
+    else {
+        return NO;
+    }
+}
 
 - (void) toggleSystems
 {
+    if([self systemIsHeathy]){
+        [self setSentryType:eHealthyToggle];
+        [self setNextState:eStarting stepTime:.1];
+        [self step];
+    }
+    else {
+        
+    }
+    
     //to be done... have to make a fsm to control the process
     //only proceed if connection Open
     if([self isConnected]){

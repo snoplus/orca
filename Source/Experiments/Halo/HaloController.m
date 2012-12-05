@@ -156,43 +156,11 @@
 
 - (void) remoteStateChanged:(NSNotification*)aNote
 {
-    enum eHaloStatus remoteMachineState  = [[model haloSentry] remoteMachineReachable];
-    enum eHaloStatus connectionState     = [[model haloSentry] remoteORCARunning];
-    enum eHaloStatus remoteRunState      = [[model haloSentry] remoteRunInProgress];
-    
-    BOOL stealthMode    = [[model haloSentry] otherSystemStealthMode];
-    short missedHearts  = [[model haloSentry] missedHeartBeatCount];
-        
     if([[model haloSentry]state] != eIdle){
-        NSString* s = @"?";
-        if(remoteMachineState == eOK){
-            if(stealthMode) s = @"Stealth Mode";
-            else            s = @"Reachable";
-        }
-        else if(remoteMachineState == eBad)          s = @"Unreachable";
-        else if(remoteMachineState == eBeingChecked) s = @"Being Checked";
-        
-        [remoteMachineRunningField  setStringValue:s];
-        
-        s = @"?";
-        if(missedHearts==0){
-            if(connectionState == eYES)     s = @"Connected";
-            else if(connectionState == eBad)s = @"NOT Connected";
-            else if(connectionState == eBeingChecked)s = @"Being Checked";
-            [connectedField     setStringValue:s];
-        }
-        else if(missedHearts<3){
-            [connectedField setStringValue:[NSString stringWithFormat:@"Missed %d Heartbeat%@",missedHearts,missedHearts>1?@"s":@""]];
-        }
-        else [connectedField setStringValue:@"Hung"];
-        
-        s = @"?";
-        if(remoteMachineState == eOK){
-            if(remoteRunState == eOK)s = @"Running";
-            else if(remoteRunState == eBad)s = @"NOT Running";
-            else if(remoteRunState == eBeingChecked)s = @"Being Checked";
-        }
-        [remoteRunInProgressField   setStringValue:s];
+         
+        [remoteMachineRunningField  setStringValue: [[model haloSentry] remoteMachineStatusString]];
+        [connectedField             setStringValue: [[model haloSentry] connectionStatusString]];
+        [remoteRunInProgressField   setStringValue: [[model haloSentry] remoteORCArunStateString]];
     }
     else {
         [remoteMachineRunningField  setStringValue:@"?"];
