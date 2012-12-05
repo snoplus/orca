@@ -513,6 +513,11 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 	[self writeAuxIOSPI:(kDAC2 | zeroAllOctalChips)];
 }
 
+- (void) writeAdcChipRanges
+{
+	[self writeRangeForAdcChip:0];
+	[self writeRangeForAdcChip:1];
+}
 
 - (void) writeRangeForAdcChip:(int)index
 {
@@ -528,10 +533,11 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 	}
 }
 
-- (void) writeAdcChipRanges
+
+- (void) readAdcs
 {
-	[self writeRangeForAdcChip:0];
-	[self writeRangeForAdcChip:1];
+	[self readAdcsOnChip:0];
+	[self readAdcsOnChip:1];
 }
 
 - (void) readAdcsOnChip:(int)aChip
@@ -553,35 +559,31 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
     unsigned long readBack;
 	for(i=0;i<8;i++){
 		if(adcEnabledMask&(0x1<<((aChip*8)+i))){
-			int j;
-			for(j=0;j<4;j++) readBack = [self writeAuxIOSPI:adcBase | channelSelect[i]];
-			//if(i>0){
-				//readBack = readBack & 0x1fff; //!!!!fix to put the sign in the right place and convert to a number
-				readBack = ~readBack;
+			readBack = [self writeAuxIOSPI:adcBase | channelSelect[i]];
+			if(i>0){
+				readBack = readBack & 0x1fff; //!!!!fix to put the sign in the right place and convert to a number
 				int channelReadBack = (readBack & 0xE000) >> 13;
-				//if(channelReadBack != i-1) {
-				if(channelReadBack != i) {
-				  NSLog(@"Warning! channelReadBack = %d, not %d\n", channelReadBack, i);
+				if(channelReadBack != i-1) {
+				  NSLog(@"Warning! channel index in read back result = %d, not %d\n", channelReadBack, i-1);
 				}
 				int voltage = readBack & 0xfff;
 				if(readBack & 0x1000) voltage |= 0xfffff000;
-				//NSLog(@"Got voltage %f*%d=%f for channel %d\n", voltageMultiplier, voltage, voltageMultiplier*voltage, i);
+				NSLog(@"Got voltage %f*%d=%f for channel %d\n", voltageMultiplier, voltage, voltageMultiplier*voltage, i);
 				//[self setAdc:(aChip*8)+i-1 value:voltage];
-				[self setAdc:(aChip*8)+i value:voltageMultiplier*voltage];
-			//}
+				[self setAdc:(aChip*8)+i-1 value:voltageMultiplier*voltage];
+			}
 		}
 		else [self setAdc:(aChip*8)+i value:0.0];
 	}
-	
-    /*
+
 	if(adcEnabledMask & (0x1<<(aChip*8))){
-		//select the first one and to readBack the last one
+		//select the first one  to readBack the last one
 		readBack = [self writeAuxIOSPI:adcBase | channelSelect[0]];
-		//readBack = readBack & 0x1fff; //!!!!fix to put the sign in the right place and convert to a number
+		readBack = readBack & 0x1fff; //!!!!fix to put the sign in the right place and convert to a number
 		[self setAdc:(aChip*8)+7 value:readBack];
 	}
 	else [self setAdc:(aChip*8)+7 value:0.0];
-	*/
+	
 	
 	//get the time(UT!) for the data record. 
 	time_t	ut_Time;
@@ -597,11 +599,6 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 	if(pollTime)[self performSelector:@selector(pollValues) withObject:nil afterDelay:pollTime];
 }
 
-- (void) readAdcs
-{
-	[self readAdcsOnChip:0];
-	[self readAdcsOnChip:1];
-}
 
 - (void) stopPulser
 {
