@@ -156,6 +156,7 @@ enum eHaloStatus {
 - (NSString*) remoteMachineStatusString;
 - (NSString*) connectionStatusString;
 - (NSString*) remoteORCArunStateString;
+- (BOOL) runIsInProgress;
 
 #pragma mark ***Alarms
 - (void) postPingAlarm;

@@ -122,7 +122,6 @@
                          name : HaloSentryMissedHeartbeat
 						object: [model haloSentry]];
    
-    
 }
 
 - (void) updateWindow
@@ -157,7 +156,6 @@
 - (void) remoteStateChanged:(NSNotification*)aNote
 {
     if([[model haloSentry]state] != eIdle){
-         
         [remoteMachineRunningField  setStringValue: [[model haloSentry] remoteMachineStatusString]];
         [connectedField             setStringValue: [[model haloSentry] connectionStatusString]];
         [remoteRunInProgressField   setStringValue: [[model haloSentry] remoteORCArunStateString]];
@@ -167,6 +165,7 @@
         [connectedField             setStringValue:@"?"];
         [remoteRunInProgressField   setStringValue:@"?"];        
     }
+    [self updateButtons];
 }
 
 - (void) sentryTypeChanged:(NSNotification*)aNote
@@ -218,22 +217,27 @@
 		default: break;
 	}
 }
+
 - (void) sentryLockChanged:(NSNotification*)aNote
 {
     BOOL locked = [gSecurity isLocked:HaloModelSentryLock];
 	[sentryLockButton setState: locked];
     [self updateButtons];
 }
+
 - (void) updateButtons
 {
     BOOL locked = [gSecurity isLocked:HaloModelSentryLock];
     BOOL sentryRunning = [[model haloSentry] sentryIsRunning];
+    BOOL aRunIsInProgress = [[model haloSentry] runIsInProgress];
+    
     [stealthMode2CB setEnabled:!locked && !sentryRunning];
     [stealthMode1CB setEnabled:!locked && !sentryRunning];
     [ip1Field setEnabled:!locked && !sentryRunning];
     [ip2Field setEnabled:!locked && !sentryRunning];
     [startButton setEnabled:!locked];
     [startButton setTitle:sentryRunning?@"Stop":@"Start"];
+    [toggleButton setEnabled:!locked & aRunIsInProgress];
 }
 
 #pragma mark ¥¥¥Actions

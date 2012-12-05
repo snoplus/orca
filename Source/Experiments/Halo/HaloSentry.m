@@ -414,6 +414,11 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
 	[[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryIsConnectedChanged object:self];
 }
 
+- (BOOL) runIsInProgress
+{
+    return (remoteRunInProgress == eYES) || [runControl isRunning];
+}
+
 #pragma mark ***Run Stuff
 - (void) start
 {
