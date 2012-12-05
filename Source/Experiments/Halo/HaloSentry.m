@@ -785,6 +785,7 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
                 [self setSentryType:ePrimary];
                 [self setNextState:eGetSecondaryState stepTime:.1];
                 [self step];
+                [self updateRemoteMachine];
             }
             else {
                 if(loopTime>10){
@@ -820,8 +821,11 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
             }
             break;
 
+        case eStopping:
+            [self finish];
+            break;
+
             
-                     
         default: break;
     }
 }
