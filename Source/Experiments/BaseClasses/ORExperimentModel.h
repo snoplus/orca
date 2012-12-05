@@ -41,6 +41,7 @@
 - (id) init;
 - (void) registerNotificationObservers;
 - (NSMutableArray*) setupMapEntries:(int)index;
+- (void) awakeAfterDocumentLoaded;
 
 #pragma mark •••Accessors
 - (BOOL) ignoreHWChecks;

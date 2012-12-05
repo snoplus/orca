@@ -259,7 +259,7 @@
 - (void) updateButtons
 {
     BOOL locked = [gSecurity isLocked:HaloModelSentryLock];
-    BOOL sentryRunning = [[model haloSentry] isRunning];
+    BOOL sentryRunning = [[model haloSentry] sentryIsRunning];
     [stealthMode2CB setEnabled:!locked && !sentryRunning];
     [stealthMode1CB setEnabled:!locked && !sentryRunning];
     [ip1Field setEnabled:!locked && !sentryRunning];
@@ -306,7 +306,7 @@
 
 - (IBAction) startStopSentry:(id)sender
 {
-    if(![[model haloSentry] isRunning]){
+    if(![[model haloSentry] sentryIsRunning]){
         [[model haloSentry] start];
     }
     else {

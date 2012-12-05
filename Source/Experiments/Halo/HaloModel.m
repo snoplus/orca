@@ -40,6 +40,12 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
     [self setImage:[NSImage imageNamed:@"Halo"]];
 }
 
+- (void) awakeAfterDocumentLoaded
+{
+    [super awakeAfterDocumentLoaded];
+    [haloSentry awakeAfterDocumentLoaded];
+}
+
 - (void) makeMainController
 {
     [self linkToController:@"HaloController"];
@@ -158,6 +164,7 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
 		}
 	}
 }
+
 - (NSString*) dataSetNameGroup:(int)aGroup segment:(int)index
 {
 	ORSegmentGroup* theGroup = [segmentGroups objectAtIndex:aGroup];
@@ -189,6 +196,7 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
     
     return [NSString stringWithFormat:@"FLT,Energy,Crate %2d,Station %2d,Channel %2d",[crateName intValue],[cardName intValue],[chanName intValue]];
 }
+
 #pragma mark ¥¥¥Specific Dialog Lock Methods
 - (NSString*) experimentMapLock
 {
@@ -215,6 +223,11 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
 - (int) viewType
 {
 	return viewType;
+}
+
+- (BOOL) sentryIsRunning
+{
+    return [haloSentry sentryIsRunning];
 }
 
 - (id)initWithCoder:(NSCoder*)decoder

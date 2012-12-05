@@ -31,7 +31,8 @@ enum  eHaloSentryState {
     eConnectToRemoteOrca,
     eGetRunState,
     eCheckRunState,
-    eWaitForPing
+    eWaitForPing,
+    eGetSecondaryState
 } eHaloSentryState;
 
 enum eHaloSentryType {
@@ -54,34 +55,34 @@ enum eHaloStatus {
 {
   @private
     enum eHaloSentryType sentryType;
-    BOOL isRunning;
-    NSString* ipNumber1;
-    NSString* ipNumber2;;
-    NSString* otherSystemIP;
-    BOOL stealthMode1;
-    BOOL stealthMode2;
-    BOOL otherSystemStealthMode;
-    
-    NSTimeInterval stepTime;
     enum eHaloSentryState state;
     enum eHaloSentryState nextState;
-	NSTask*	 pingTask;
+    NSTimeInterval stepTime;    
+    BOOL    sentryIsRunning;
+    short   missedHeartbeatCount;
+    BOOL    wasRunning;
     
+    NSString*   ipNumber1;
+    NSString*   ipNumber2;;
+    NSString*   otherSystemIP;
+    BOOL        stealthMode1;
+    BOOL        stealthMode2;
+    BOOL        otherSystemStealthMode;
+    
+	NSTask*     pingTask;
+    NetSocket*  socket;
+    BOOL        isConnected;
+   
     enum eHaloStatus remoteMachineReachable;
     enum eHaloStatus remoteORCARunning;
     enum eHaloStatus remoteRunInProgress;
     
-    NetSocket* socket;
-    BOOL    isConnected;
     ORAlarm* remoteMachineNotReachable;
     ORAlarm* noOrcaConnection;
     ORAlarm* orcaHung;
-    NSMutableDictionary* remoteRunParams;
-    short missedHeartbeatCount;
-    long lastRunState;
     
     ORRunModel* runControl;
-    NSArray* sbcArray;
+    NSArray* sbcs;
     NSArray* shapers;
 }
 
@@ -89,6 +90,7 @@ enum eHaloStatus {
 - (id)   init;
 - (void) dealloc;
 - (NSUndoManager*) undoManager;
+- (void) awakeAfterDocumentLoaded;
 - (void) registerNotificationObservers;
 - (void) setOtherIP;
 - (enum eHaloStatus) remoteMachineReachable;
@@ -102,8 +104,8 @@ enum eHaloStatus {
 - (BOOL) stealthMode1;
 - (void) setStealthMode1:(BOOL)aStealthMode1;
 - (BOOL) otherSystemStealthMode;
-- (BOOL) isRunning;
-- (void) setIsRunning:(BOOL)aState;
+- (BOOL) sentryIsRunning;
+- (void) setSentryIsRunning:(BOOL)aState;
 - (BOOL) isConnected;
 
 #pragma mark ***Notifications
@@ -137,7 +139,7 @@ enum eHaloStatus {
 - (void) ping;
 - (BOOL) pingTaskRunning;
 - (void) tasksCompleted:(id)sender;
-- (void) askForRunStatus;
+- (void) updateRemoteMachine;
 - (void) toggleSystems;
 - (void) postMachineAlarm;
 - (void) clearMachineAlarm;
@@ -163,5 +165,4 @@ extern NSString* HaloSentryTypeChanged;
 extern NSString* HaloSentryPingTask;
 extern NSString* HaloSentryIsConnectedChanged;
 extern NSString* HaloSentryRemoteStateChanged;
-extern NSString* HaloSentryIsRunningChanged;
 extern NSString* HaloSentryMissedHeartbeat;

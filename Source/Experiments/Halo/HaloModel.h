@@ -41,6 +41,7 @@
 - (void) setHaloSentry:(HaloSentry*)aHaloSentry;
 - (void) setViewType:(int)aViewType;
 - (int) viewType;
+- (BOOL) sentryIsRunning;
 
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups;
