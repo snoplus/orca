@@ -23,6 +23,7 @@
 #define kGetFdhwLibVersion   0x02
 #define kGetSltPciDriverVersion   0x03  //TODO: only for Linux implemented 2012-03 -tb-
 #define kGetIsLinkedWithPCIDMALib 0x04
+#define kSetHostTimeToFLTsAndSLT 0x05
 
 
 // see: HW_Readout.cc

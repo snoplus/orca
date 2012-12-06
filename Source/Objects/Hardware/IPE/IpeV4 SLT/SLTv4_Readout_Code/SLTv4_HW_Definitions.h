@@ -66,9 +66,11 @@ enum daqMode {
 #endif
 	
 //flags in the runFlagsMask, sent to PrPMC by ORIpeV4FLTModel::load_HW_Config_Structure
-#define kFirstTimeFlag              0x10000
-#define kSyncFltWithSltTimerFlag    0x20000
-#define kShipSumHistogramFlag		0x40000
+#define kFirstTimeFlag              0x010000
+#define kSyncFltWithSltTimerFlag    0x020000
+#define kShipSumHistogramFlag		0x040000
+#define kSecondsSetInitWithHostFlag	0x080000
+#define kSecondsSetSendToFLTsFlag	0x100000
 
 typedef struct { // -tb- 2008-02-27
 	int32_t readoutSec;
