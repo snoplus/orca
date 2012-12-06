@@ -32,6 +32,7 @@
 		IBOutlet NSMatrix*		countersMatrix;
 		IBOutlet NSTextField*	secondsSetField;
 		IBOutlet NSButton*		secondsSetInitWithHostButton;
+	    IBOutlet NSButton*      secondsSetSendToFLTsCB;
 		IBOutlet NSButton*		hwVersionButton;
 	
 		//control reg
@@ -104,6 +105,7 @@
 - (void) registerNotificationObservers;
 
 #pragma mark •••Interface Management
+- (void) secondsSetSendToFLTsChanged:(NSNotification*)aNote;
 - (void) secondsSetInitWithHostChanged:(NSNotification*)aNote;
 - (void) sltScriptArgumentsChanged:(NSNotification*)aNote;
 - (void) countersEnabledChanged:(NSNotification*)aNote;
@@ -140,6 +142,8 @@
 - (void) enableRegControls;
 
 #pragma mark •••Actions
+- (IBAction) secondsSetSetNowButtonAction:(id)sender;
+- (IBAction) secondsSetSendToFLTsCBAction:(id)sender;
 - (IBAction) secondsSetInitWithHostButtonAction:(id)sender;
 - (IBAction) sltScriptArgumentsTextFieldAction:(id)sender;
 - (IBAction) enableDisableCounterAction:(id)sender;

@@ -23,13 +23,6 @@ uint32_t histoShipSumHistogram = 0;
 
 extern hw4::SubrackKatrin* srack; 
 
-void readSltSecSubsec(uint32_t & sec, uint32_t & subsec)
-{
-    uint32_t subsecreg;
-    subsecreg    = srack->theSlt->subSecCounter->read();
-    sec             = srack->theSlt->secCounter->read();
-    subsec   = ((subsecreg>>11)&0x3fff)*2000   +  (subsecreg & 0x7ff);//TODO: move this to the fdhwlib -tb-
-}
 
 bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
 {

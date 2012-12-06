@@ -171,6 +171,7 @@
 		BOOL countersEnabled;
     NSString* sltScriptArguments;
     BOOL secondsSetInitWithHost;
+    bool secondsSetSendToFLTs;
 }
 
 #pragma mark •••Initialization
@@ -187,7 +188,11 @@
 - (void) runIsBetweenSubRuns:(NSNotification*)aNote;
 - (void) runIsStartingSubRun:(NSNotification*)aNote;
 
+- (void) viewChanged:(NSNotification*)aNotification;
+
 #pragma mark •••Accessors
+- (bool) secondsSetSendToFLTs;
+- (void) setSecondsSetSendToFLTs:(bool)aSecondsSetSendToFLTs;
 - (BOOL) secondsSetInitWithHost;
 - (void) setSecondsSetInitWithHost:(BOOL)aSecondsSetInitWithHost;
 - (NSString*) sltScriptArguments;
@@ -321,6 +326,7 @@
 - (long)		getFdhwlibVersion;
 - (long)		getSltPciDriverVersion;
 - (long)		getSltkGetIsLinkedWithPCIDMALib;
+- (void)		setHostTimeToFLTsAndSLT;
 
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
@@ -361,6 +367,7 @@
 
 @end
 
+extern NSString* ORIpeV4SLTModelSecondsSetSendToFLTsChanged;
 extern NSString* ORIpeV4SLTModelSecondsSetInitWithHostChanged;
 extern NSString* ORIpeV4SLTModelSltScriptArgumentsChanged;
 extern NSString* ORIpeV4SLTModelCountersEnabledChanged;

@@ -31,6 +31,7 @@
 #import "ORCommandList.h"
 
 
+NSString* ORKatrinV4FLTModelUseSLTtimeChanged = @"ORKatrinV4FLTModelUseSLTtimeChanged";
 NSString* ORKatrinV4FLTModelBoxcarLengthChanged = @"ORKatrinV4FLTModelBoxcarLengthChanged";
 NSString* ORKatrinV4FLTModelUseDmaBlockReadChanged = @"ORKatrinV4FLTModelUseDmaBlockReadChanged";
 NSString* ORKatrinV4FLTModelSyncWithRunControlChanged = @"ORKatrinV4FLTModelSyncWithRunControlChanged";
@@ -377,6 +378,37 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 }
 
 #pragma mark •••Accessors
+
+- (int) useSLTtime
+{
+    // return value: NO=0; YES=1; undef (no SLT present) = 2
+	id slt = [[self crate] adapter];
+	if(slt != nil){
+	    if([slt  secondsSetSendToFLTs]) return 1; else return 0;
+	}else return 2;
+
+}
+
+- (void) updateUseSLTtime
+{
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelUseSLTtimeChanged object:self];
+}
+
+#if 0
+- (void) setUseSLTtime:(int)aUseSLTtime //updates just the interface
+{
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelUseSLTtimeChanged object:self];
+    if(aUseSLTtime == useSLTtime) return;
+	
+    [[[self undoManager] prepareWithInvocationTarget:self] setUseSLTtime:useSLTtime];
+    
+    useSLTtime = aUseSLTtime;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelUseSLTtimeChanged object:self];
+	
+	//if([[self crate] adapter])  [[[self crate] adapter] setSecondsSetSendToFLTs: useSLTtime];
+}
+#endif
 
 - (int) boxcarLength
 {
@@ -1192,6 +1224,9 @@ static double table[32]={
 	[self setPostTriggerTime:1024]; // max. filter length should fit into the range -tb-
 	
 	[self setHistMeasTime:	5];
+	
+	[self setPoleZeroCorrection:0];
+	
 }
 
 
@@ -2026,6 +2061,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 	
     [[self undoManager] disableUndoRegistration];
 	
+    //[self setUseSLTtime:[decoder decodeIntForKey:@"useSLTtime"]];
     [self setBoxcarLength:[decoder decodeIntForKey:@"boxcarLength"]];
     [self setUseDmaBlockRead:[decoder decodeIntForKey:@"useDmaBlockRead"]];
     [self setSyncWithRunControl:[decoder decodeIntForKey:@"syncWithRunControl"]];
@@ -2065,6 +2101,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 {
     [super encodeWithCoder:encoder];
 	
+    //[encoder encodeInt:useSLTtime forKey:@"useSLTtime"];
     [encoder encodeInt:boxcarLength forKey:@"boxcarLength"];
     [encoder encodeInt:useDmaBlockRead forKey:@"useDmaBlockRead"];
     [encoder encodeInt:syncWithRunControl forKey:@"syncWithRunControl"];
@@ -2384,7 +2421,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 		}
 	}
 	[self writeControl];
-	[self writeSeconds:0];//TODO: write UTC/UNIX time would be better -tb-
+	if(![self useSLTtime])[self writeSeconds:0];//optionally write UTC/UNIX time of SLT (see SLT) -tb-
 
 }
 

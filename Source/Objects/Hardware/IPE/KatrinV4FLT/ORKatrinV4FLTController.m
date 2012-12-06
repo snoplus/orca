@@ -85,6 +85,11 @@
 		[[fifoDisplayMatrix cellAtRow:i column:0] setTag:i];
 	}
 	[self populatePullDown];
+	
+	[useSLTtimePU setAutoenablesItems: false];  // seems to be not settable with InterfaceBuilder, do it here -tb-
+	[[useSLTtimePU itemAtIndex: 2] setEnabled:false];
+	
+	
 	[self updateWindow];
 
 }
@@ -379,9 +384,22 @@
                          name : ORKatrinV4FLTModelBoxcarLengthChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(useSLTtimeChanged:)
+                         name : ORKatrinV4FLTModelUseSLTtimeChanged
+						object: model];
+
 }
 
 #pragma mark •••Interface Management
+
+- (void) useSLTtimeChanged:(NSNotification*)aNote
+{
+	//[useSLTtimeCB setState: [model useSLTtime]];
+	[useSLTtimePU selectItemAtIndex: [model useSLTtime]];
+	//[useSLTtimePU setAutoenablesItems: false];
+	//[[useSLTtimePU itemAtIndex: 2] setEnabled:false];
+}
 - (void) useDmaBlockReadChanged:(NSNotification*)aNote
 {
 	[useDmaBlockReadButton setIntValue: [model useDmaBlockRead]];
@@ -644,6 +662,7 @@
 	[self syncWithRunControlChanged:nil];
 	[self useDmaBlockReadChanged:nil];
 	[self boxcarLengthChanged:nil];
+	[self useSLTtimeChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -1033,6 +1052,13 @@
 }
 
 #pragma mark •••Actions
+
+- (void) useSLTtimePUAction:(id)sender
+{
+	//DEBUG -tb-    	NSLog(@"Called %@::%@! selected %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[sender indexOfSelectedItem]);//TODO: DEBUG -tb-
+	//[model setUseSLTtime:[sender intValue]];	
+	[model updateUseSLTtime];	
+}
 
 - (void) useDmaBlockReadButtonAction:(id)sender
 {

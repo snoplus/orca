@@ -208,9 +208,20 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
                          name : ORIpeV4SLTModelSecondsSetInitWithHostChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(secondsSetSendToFLTsChanged:)
+                         name : ORIpeV4SLTModelSecondsSetSendToFLTsChanged
+						object: model];
+
 }
 
 #pragma mark •••Interface Management
+
+- (void) secondsSetSendToFLTsChanged:(NSNotification*)aNote
+{
+    //NSLog(@"Called %@::%@\n  secondsSetSendToFLTs is %i",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model secondsSetSendToFLTs]);//DEBUG -tb-
+	[secondsSetSendToFLTsCB setState: [model secondsSetSendToFLTs]];
+}
 
 - (void) secondsSetInitWithHostChanged:(NSNotification*)aNote
 {
@@ -361,6 +372,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	[self countersEnabledChanged:nil];
 	[self sltScriptArgumentsChanged:nil];
 	[self secondsSetInitWithHostChanged:nil];
+	[self secondsSetSendToFLTsChanged:nil];
 }
 
 
@@ -508,6 +520,15 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 }
 
 #pragma mark ***Actions
+- (IBAction) secondsSetSetNowButtonAction:(id)sender
+{
+    [model loadSecondsReg];
+}
+
+- (void) secondsSetSendToFLTsCBAction:(id)sender
+{
+	[model setSecondsSetSendToFLTs:[secondsSetSendToFLTsCB intValue]];	
+}
 
 - (void) secondsSetInitWithHostButtonAction:(id)sender
 {
@@ -718,7 +739,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	int index = [registerPopUp indexOfSelectedItem];
 	@try {
 		unsigned long value = [model readReg:index];
-		NSLog(@"SLT reg: %@ value: 0x%x\n",[model getRegisterName:index],value);
+		NSLog(@"SLT reg: %@ value: 0x%x (%u)\n",[model getRegisterName:index],value,value);
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception reading SLT reg: %@\n",[model getRegisterName:index]);

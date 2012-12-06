@@ -42,6 +42,8 @@
 - (void) registerNotificationObservers;
 - (void) adapterChanged:(NSNotification*)aNote;
 
+- (void) updateKatrinV4FLTs;
+
 #pragma mark •••OROrderedObjHolding
 - (int) maxNumberOfObjects;
 - (int) objWidth;

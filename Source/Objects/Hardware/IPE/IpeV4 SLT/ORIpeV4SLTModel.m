@@ -134,6 +134,7 @@ static IpeRegisterNamesStruct regV4[kSltV4NumRegs] = {
 
 #pragma mark ***External Strings
 
+NSString* ORIpeV4SLTModelSecondsSetSendToFLTsChanged = @"ORIpeV4SLTModelSecondsSetSendToFLTsChanged";
 NSString* ORIpeV4SLTModelSecondsSetInitWithHostChanged = @"ORIpeV4SLTModelSecondsSetInitWithHostChanged";
 NSString* ORIpeV4SLTModelSltScriptArgumentsChanged = @"ORIpeV4SLTModelSltScriptArgumentsChanged";
 NSString* ORIpeV4SLTModelCountersEnabledChanged = @"ORIpeV4SLTModelCorntersEnabledChanged";
@@ -185,6 +186,8 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	[readList release];
 	pmcLink = [[PMC_Link alloc] initWithDelegate:self];
 	[self setSecondsSetInitWithHost: YES];
+	[self setSecondsSetSendToFLTs: YES];
+
 	[self registerNotificationObservers];
     return self;
 }
@@ -239,7 +242,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 {
 	if(aGuardian){
 		if([aGuardian adapter] == nil){
-			[aGuardian setAdapter:self];			
+			[aGuardian setAdapter:self]; //TODO: aGuardian is usually a ORCrate; if inserting the SLT AFTER the FLTs, need to update "useSLTtime" flag NOW  -tb-			
 		}
 	}
 	else {
@@ -275,9 +278,45 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
                        object : nil];
 
 
+
+
+//-tb- test -> is sent whenever a card in the crate object was added
+    [notifyCenter addObserver : self
+                     selector : @selector(viewChanged:)
+                         name : ORGroupObjectsAdded
+                       object : nil];
+    
+
+}
+
+
+- (void) viewChanged:(NSNotification*)aNotification
+{
+	NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+    //[super viewChanged: aNotification];
 }
 
 #pragma mark •••Accessors
+
+- (bool) secondsSetSendToFLTs
+{
+    return secondsSetSendToFLTs;
+}
+
+- (void) setSecondsSetSendToFLTs:(bool)aSecondsSetSendToFLTs
+{
+    if(secondsSetSendToFLTs == aSecondsSetSendToFLTs) return;
+
+    [[[self undoManager] prepareWithInvocationTarget:self] setSecondsSetSendToFLTs:secondsSetSendToFLTs];
+    
+    secondsSetSendToFLTs = aSecondsSetSendToFLTs;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTModelSecondsSetSendToFLTsChanged object:self];
+	
+	//change settings for all FLTs
+	[[self crate] updateKatrinV4FLTs];
+}
+
 - (BOOL) secondsSetInitWithHost
 {
     return secondsSetInitWithHost;
@@ -1081,6 +1120,23 @@ NSLog(@"  arguments: %@ \n" , arguments);
 	return theVersion;
 }
 
+- (void) setHostTimeToFLTsAndSLT
+{
+    uint32_t args[2];
+	args[0] = 0; //flags
+        if(secondsSetInitWithHost)  args[0] |= kSecondsSetInitWithHostFlag;
+        if(secondsSetSendToFLTs)    args[0] |= kSecondsSetSendToFLTsFlag;
+	args[1] = secondsSet; //time to write
+	if(![pmcLink isConnected]){
+		[NSException raise:@"Not Connected" format:@"Socket not connected."];
+	}
+	else {
+		[pmcLink writeGeneral:&args operation:kSetHostTimeToFLTsAndSLT numToWrite:2];
+            //this produces a compiler warning; I did NOT remove it to not forget that we expect uint32_t on the SBCs
+            //in Orca, sizeof(long) is 4 byte; SBCs may be 64 bit machines -> sizeof(long) is 8 byte!  -tb- 2012-12
+	}
+}
+
 
 - (void) readEventStatus:(unsigned long*)eventStatusBuffer
 {
@@ -1132,20 +1188,54 @@ NSLog(@"  arguments: %@ \n" , arguments);
 
 - (void) loadSecondsReg
 {
-    //TODO: add option to set system time? -tb-
+    
+    [self setHostTimeToFLTsAndSLT];
+return;
+    uint32_t i,sltsec,sltsubsec,sltsubsec2,sltsubsec1,sltsubsecreg;
+
+    //everything else moved to void setHostTimeToFLTsAndSLT(int32_t* args) on SBC called by [self setHostTimeToFLTsAndSLT]; ...
+    //wait until we are not at the end of a second (<0.9 sec)
+	for(i=0;i<1000;i++){
+	    sltsubsecreg  = [self readReg:kSltV4SubSecondCounterReg];//first read subsec counter!
+	    sltsec        = [self readReg:kSltV4SecondCounterReg];
+        sltsubsec1 = sltsubsecreg & 0x7ff  ;
+        sltsubsec2 = (sltsubsecreg >> 11) & 0x3fff  ; //100 usec counter
+        sltsubsec = sltsubsec2 * 2000 + sltsubsec1;
+	    NSLog(@"%@::%@!   sec %u, sltsubsec2 %u, sltsubsec1 %u, subsec %u\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd), sltsec, sltsubsec2, sltsubsec1, sltsubsec);//TODO: DEBUG -tb-
+        if(sltsubsec<18000000) break; //full second is 20000000 clocks
+        usleep(1000);//this loop needs 3-8 milli seconds (with usleep(1000) and two register reads)
+    }
+
+    // add option to set system time of PrPMC/crate computer? -tb- DONE.
 	unsigned long secSetpoint = secondsSet;
 	if(secondsSetInitWithHost){ 
 		struct timeval t;//    call with struct timezone tz; is obsolete ... -tb-
 		gettimeofday(&t,NULL);
 		secSetpoint = t.tv_sec;  
 	}
+	
+	if(secondsSetSendToFLTs){
+        #if 1 //TODO: broadcast to FLTs seems to nor work currently FIX IT -tb-
+	    uint32_t FLTV4SecondCounterRegAddr = (0x1f << 17) | (0x000044>>2);
+	    [self write: FLTV4SecondCounterRegAddr  value:secSetpoint];//(0x1f << 17) is broadcast to all FLTs -tb-
+        #else
+        int j;
+        for(j=1;j<21;j++){
+	        uint32_t FLTV4SecondCounterRegAddr = ( j << 17) | (0x000044>>2);
+	        [self write: FLTV4SecondCounterRegAddr  value:secSetpoint];//(0x1f << 17) is broadcast to all FLTs -tb-
+        }
+        #endif
+    }
+	
+	secSetpoint += 1;  //value will be taken after the NEXT second strobe, so we need the NEXT second
 	[self writeReg:kSltV4SecondSetReg value:secSetpoint];
+    
+    //read back and check value:
     //Wait until next second srobe!
-    uint32_t i,sltsec;
     for(i=0;i<10000;i++){// when the time already was set, this will leave the loop immediately
         usleep(100);
-        [self readReg:kSltV4SubSecondCounterReg];
-        sltsec=[self readReg:kSltV4SecondCounterReg];
+	    sltsubsecreg  = [self readReg:kSltV4SubSecondCounterReg];//first read subsec counter!
+	    sltsec        = [self readReg:kSltV4SecondCounterReg];
         if(sltsec==secSetpoint) break;
     }
     if(i==10000) NSLog(@"ORIpeV4SLTModel::loadSecondsReg: ERROR: could not read back SLT time %i (is %i)!\n",secSetpoint,sltsec);
@@ -1390,6 +1480,7 @@ NSLog(@"  arguments: %@ \n" , arguments);
 	if([decoder containsValueForKey:@"secondsSetInitWithHost"])
 		[self setSecondsSetInitWithHost:[decoder decodeBoolForKey:@"secondsSetInitWithHost"]];
 	else[self setSecondsSetInitWithHost: YES];
+	[self setSecondsSetSendToFLTs:[decoder decodeBoolForKey:@"secondsSetSendToFLTs"]];
 	
 	[self setCountersEnabled:	[decoder decodeBoolForKey:@"countersEnabled"]];
 
@@ -1429,6 +1520,7 @@ NSLog(@"  arguments: %@ \n" , arguments);
 {
 	[super encodeWithCoder:encoder];
 	
+	[encoder encodeBool:secondsSetSendToFLTs forKey:@"secondsSetSendToFLTs"];
 	[encoder encodeBool:secondsSetInitWithHost forKey:@"secondsSetInitWithHost"];
 	[encoder encodeObject:sltScriptArguments forKey:@"sltScriptArguments"];
 	[encoder encodeBool:countersEnabled forKey:@"countersEnabled"];
@@ -1835,6 +1927,18 @@ NSLog(@"  arguments: %@ \n" , arguments);
 	configStruct->card_info[index].slot			= [self stationNumber];
 	configStruct->card_info[index].crate		= [self crateNumber];
 	configStruct->card_info[index].add_mod		= 0;		//not needed for this HW
+    
+    //SLT specific settings BEGIN
+    //"first time" flag (needed for histogram mode)
+	unsigned long runFlagsMask = 0;
+	runFlagsMask |= kFirstTimeFlag;          //bit 16 = "first time" flag
+    if(secondsSetSendToFLTs)
+        runFlagsMask |= kSecondsSetSendToFLTsFlag;//bit ...
+	configStruct->card_info[index].deviceSpecificData[3] = runFlagsMask;	
+    //SLT specific settings END
+    
+
+
 	
 	configStruct->card_info[index].num_Trigger_Indexes = 1;	//Just 1 group of objects controlled by SLT
     int nextIndex = index+1;

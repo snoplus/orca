@@ -18,9 +18,19 @@
 #if !PMC_COMPILE_IN_SIMULATION_MODE
 // (this is the standard code accessing the v4 crate-tb-)
 //----------------------------------------------------------------
+extern hw4::SubrackKatrin* srack; 
 
 bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
 {
+    //init
+    uint32_t secondsSetSendToFLTs = GetDeviceSpecificData()[0];
+    uint32_t runFlags   = GetDeviceSpecificData()[3];//this is runFlagsMask of ORKatrinV4FLTModel.m, load_HW_Config_Structure:index:
+
+
+    //SLT read out
+     //  currently there is no readout, but we init the timers
+    
+    
     int32_t leaf_index;
     //read out the children flts that are in the readout list
     leaf_index = GetNextTriggerIndex()[0];

@@ -179,6 +179,17 @@ void doWriteBlock(SBC_Packet* aPacket,uint8_t reply)
     SBC_IPEv4WriteBlockStruct* p = (SBC_IPEv4WriteBlockStruct*)aPacket->payload;
     if(needToSwap)SwapLongBlock(p,sizeof(SBC_IPEv4WriteBlockStruct)/sizeof(int32_t));
 	
+#if 0
+ fprintf(stderr, "doWriteBlock: SBC_Packet size %i, SBC_IPEv4WriteBlockStruct size %i, sizeof(unsigned long *)  %i \n",
+ sizeof(SBC_Packet),
+ sizeof(SBC_IPEv4WriteBlockStruct), 
+ sizeof(unsigned long *)
+ );
+	
+ fflush(stderr);
+  fprintf(stdout, "stdout: stdout  stdout\n");
+ fflush(stdout);  
+#endif
 		     
     uint32_t startAddress   = p->address;
     uint32_t numItems       = p->numItems;
@@ -195,8 +206,10 @@ void doWriteBlock(SBC_Packet* aPacket,uint8_t reply)
 #else
     try{
         if (numItems == 1){
-
-		     		    
+#if 0
+            fprintf(stdout, "PrPMC: doWriteBlock: adr 0x%08x , val %i (0x%08x) \n",startAddress,*lptr,*lptr);
+            fflush(stdout);  
+#endif		     		    
 		    pbus->write(startAddress, *lptr);
 			{
 			
@@ -431,6 +444,8 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply)  // 'simulation' version -tb
 #endif //of #if !PMC_COMPILE_IN_SIMULATION_MODE ... #else ...
 //----------------------------------------------------------------
 
+
+
 void doGeneralWriteOp(SBC_Packet* aPacket,uint8_t reply)
 {
 	SBC_WriteBlockStruct* p = (SBC_WriteBlockStruct*)aPacket->payload;
@@ -441,7 +456,13 @@ void doGeneralWriteOp(SBC_Packet* aPacket,uint8_t reply)
 	int32_t* dataToWrite = (int32_t*)p;
 	if(needToSwap)SwapLongBlock(dataToWrite,num);
 	switch(operation){
-		//nothing defined yet
+		case kSetHostTimeToFLTsAndSLT:
+			//if(numLongs == 1) *lPtr = kCodeVersion;
+            //if(num!=2) ERROR ...
+            //DEBUG    fprintf(stderr,"kSetHostTimeToFLTsAndSLT reply %i, num %i\n",reply,num);
+            //DEBUG    fprintf(stderr,"   args 0x%x %u\n",dataToWrite[0],dataToWrite[1]);
+            setHostTimeToFLTsAndSLT(dataToWrite);
+		break;
 		default:
 		break;
 	}
@@ -500,6 +521,13 @@ void doGeneralReadOp(SBC_Packet* aPacket,uint8_t reply)
 
 
 
+
+/*--------------------------------------------------------------------------------------
+ *        HARDWARE SPECIFIC PART:
+ *--------------------------------------------------------------------------------------
+ */
+
+
 /*--------------------------------------------------------------------------------------
  *int getSltLinuxKernelDriverVersion(): search string in /proc/devices, works only for Linux!!
  *--------------------------------------------------------------------------------------
@@ -546,3 +574,115 @@ int getSltLinuxKernelDriverVersion(void)
 	return version;
 }
 #endif
+
+
+
+
+// this is a similar #if #else #endif struct like above ...
+#if !PMC_COMPILE_IN_SIMULATION_MODE
+// (this is the standard code accessing the v4 crate-tb-)
+//----------------------------------------------------------------
+void readSltSecSubsec(uint32_t & sec, uint32_t & subsec)
+{
+    if(!srack) return;
+    uint32_t subsecreg;
+    subsecreg    = srack->theSlt->subSecCounter->read();//first read subsec counter!
+    sec             = srack->theSlt->secCounter->read();
+    subsec   = ((subsecreg>>11)&0x3fff)*2000   +  (subsecreg & 0x7ff);//TODO: move this to the fdhwlib -tb-
+}
+
+
+
+void setHostTimeToFLTsAndSLT(int32_t* args)
+{
+    uint32_t flags=args[0];
+    uint32_t secondsSet=args[1];
+    //DEBUG    fprintf(stderr,"setHostTimeToFLTsAndSLT(int32_t* args):   args 0x%x %u\n",flags,secondsSet);
+    
+    //1.read SLT time; ensure we have 0.1 sec to second strobe
+    //2.case A: use host time; case B: use given time
+    //3. case A: read host time -> secondsSet (else take given seconds set)
+    //4.if 'sendToFLTs': loop over present FLTs and write seconds
+    //5. secondsSet++ and write secondsSet to SLT setSeconds register
+
+    uint32_t i,sltsec,sltsubsec;
+
+    //1.
+    //wait until we are not at the end of a second (<0.9 sec)
+	for(i=0;i<1000;i++){
+        //uint32_t i,sltsec,sltsubsec,sltsubsec2,sltsubsec1,sltsubsecreg;
+        //sltsubsec1 = sltsubsecreg & 0x7ff  ;
+        //sltsubsec2 = (sltsubsecreg >> 11) & 0x3fff  ; //100 usec counter
+	    //fprintf(stdout,"setHostTimeToFLTsAndSLT:  SLT timer:  sec %u, sltsubsec2 %u, sltsubsec1 %u, subsec %u\n", sltsec, sltsubsec2, sltsubsec1, sltsubsec);//TODO: DEBUG -tb-
+        readSltSecSubsec(sltsec,sltsubsec);
+	    //DEBUG    fprintf(stdout,"setHostTimeToFLTsAndSLT:  SLT timer:  sec %u,   subsec %u\n", sltsec,  sltsubsec);//TODO: DEBUG -tb-
+        if(sltsubsec>1000000 && sltsubsec<16000000) break; //full second is 20000000 clocks - I want not be too close to a second change
+        //sltsubsec>1000000 as the PrPMC clock might differ; sltsubsec<16000000 to have0.2 seconds to make all settings to the hardware
+        usleep(1000);//this loop needs XXX milli seconds (with usleep(1000) and two register reads)
+    }
+    //2.+3.
+	unsigned long secSetpoint = secondsSet;
+	if(flags & kSecondsSetInitWithHostFlag){ 
+		struct timeval t;//    call with struct timezone tz; is obsolete ... -tb-
+		gettimeofday(&t,NULL);
+		secSetpoint = t.tv_sec;  
+	}
+
+
+    //DEBUG    readSltSecSubsec(sltsec,sltsubsec);
+    //DEBUG    fprintf(stdout,"setHostTimeToFLTsAndSLT:  SLT timer:  sec %u,   subsec %u, setpoint %u\n", sltsec,  sltsubsec, secSetpoint);//TODO: DEBUG -tb-
+
+    //4.
+	if(flags & kSecondsSetSendToFLTsFlag){
+        #if 0 //TODO: broadcast to FLTs seems to nor work currently FIX IT -tb-
+	    uint32_t FLTV4SecondCounterRegAddr = (0x1f << 17) | (0x000044>>2);
+	    [self write: FLTV4SecondCounterRegAddr  value:secSetpoint];//(0x1f << 17) is broadcast to all FLTs -tb-
+        #else
+        int flt;
+        for(flt=0;flt<20;flt++){
+	        //uint32_t FLTV4SecondCounterRegAddr = ( (flt+1) << 17) | (0x000044>>2);
+	        //[self write: FLTV4SecondCounterRegAddr  value:secSetpoint];//(0x1f << 17) is broadcast to all FLTs -tb-
+	        //DEBUG    if(srack->theFlt[flt]->isPresent()) fprintf(stdout,"setHostTimeToFLTsAndSLT:    write to FLT idx %i   sltsecsetpoint %u, \n", flt, secSetpoint);//TODO: DEBUG -tb-
+            if(srack->theFlt[flt]->isPresent()) srack->theFlt[flt]->secondCounter->write(secSetpoint);
+        }
+        #endif
+    }
+    
+    
+    //DEBUG    readSltSecSubsec(sltsec,sltsubsec);
+    //DEBUG    fprintf(stdout,"setHostTimeToFLTsAndSLT:  SLT timer:  sec %u,   subsec %u, setpoint %u\n", sltsec,  sltsubsec, secSetpoint);//TODO: DEBUG -tb-
+    
+    
+	//5.
+    //as the second change between SLT and PrPMC is not syncronized, this might be necessary even if the crate counters were set previously: the SLT may be 'before' OR 'behind' the host clock
+    //TODO: keep in mind: all crate computers should be synchronized up to accuracy of 10 % to get this work properly -tb-
+    if(sltsec !=secSetpoint){
+	    fprintf(stdout,"setHostTimeToFLTsAndSLT:   need to write SLT TIME!!! sltsec %u, sltsecsetpoint %u, \n", sltsec, secSetpoint);//TODO: DEBUG -tb-
+	    secSetpoint += 1;  //value will be taken after the NEXT second strobe, so we need the NEXT second
+        srack->theSlt->setSecCounter->write(secSetpoint);
+    }
+    else
+    {
+        readSltSecSubsec(sltsec,sltsubsec);
+	    //DEBUG    fprintf(stdout,"setHostTimeToFLTsAndSLT:  SLT timer already OK:  sec %u,   subsec %u, setpoint %u\n", sltsec,  sltsubsec, secSetpoint);//TODO: DEBUG -tb-
+    }
+
+}
+
+
+
+#else //of #if !PMC_COMPILE_IN_SIMULATION_MODE
+// (here follow the 'simulation' versions of all functions -tb-)
+//----------------------------------------------------------------
+void setHostTimeToFLTsAndSLT(int32_t* args)
+{
+    //simulation mode: do nothing
+}
+
+
+
+#endif //of #if !PMC_COMPILE_IN_SIMULATION_MODE ... #else ...
+//----------------------------------------------------------------
+
+
+

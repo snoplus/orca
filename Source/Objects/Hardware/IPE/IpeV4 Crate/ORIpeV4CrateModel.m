@@ -129,9 +129,15 @@ NSString* ORIpeV4CrateConnectedChanged = @"ORIpeV4CrateConnectedChanged";
 
 - (void) adapterChanged:(NSNotification*)aNote
 {
-	//nothing to do...
+	//DEBUG check when a notification was received ...    NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+	[self updateKatrinV4FLTs];
 }
 
+- (void) viewChanged:(NSNotification*)aNotification
+{
+	//DEBUG    NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+    [super viewChanged: aNotification];
+}
 
 - (void) checkCards
 {
@@ -141,6 +147,25 @@ NSString* ORIpeV4CrateConnectedChanged = @"ORIpeV4CrateConnectedChanged";
 		[anObject checkPresence];
 	}	
 }
+
+- (void) updateKatrinV4FLTs
+{
+	//change/update dialog for all FLTs
+	int i,n = [self count];
+	for(i=0;i<n;i++){
+	    id obj = [self objectAtIndex: i];
+		//ORKatrinV4FLTModel *flt;
+		    if([obj isKindOfClass:NSClassFromString(@"ORKatrinV4FLTModel")] ){
+	            //NSLog(@" %@::%@ count objects: %i out of %i is FLTv4\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),i,n);//DEBUG -tb-
+				if([obj respondsToSelector: @selector(updateUseSLTtime)]) 
+				    [obj updateUseSLTtime];//I don't know how to get rid of this compiler warning -tb-
+			}
+	}
+}
+ 
+
+
+
 
 - (id)initWithCoder:(NSCoder*)decoder
 {

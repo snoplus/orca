@@ -29,6 +29,8 @@ class Pbus;
 //class hw4::SubrackKatrin;
 Pbus *pbus=0;
 hw4::SubrackKatrin *srack=0;
+
+void readSltSecSubsec(uint32_t & sec, uint32_t & subsec);
 #endif
 
 #ifdef __cplusplus
@@ -46,8 +48,11 @@ void doGeneralWriteOp(SBC_Packet* aPacket,uint8_t reply);
 void doGeneralReadOp(SBC_Packet* aPacket,uint8_t reply);
 
 int getSltLinuxKernelDriverVersion(void);
+void setHostTimeToFLTsAndSLT(int32_t* args);
 #ifdef __cplusplus
 }
 #endif
+
+
 
 #endif

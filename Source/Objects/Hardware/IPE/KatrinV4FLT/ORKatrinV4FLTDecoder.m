@@ -147,19 +147,28 @@
 			}
 			#if 0
 			//TESTING TIMESTAMPS --------------
-				int32_t diff, seconds		=     ptr[2];
-				static int32_t lastseconds		=  -1;
+				int32_t diff, seconds, subseconds, evID;
+				seconds		=     ptr[2];
+				subseconds		=     ptr[3];
+				evID = ptr[5] & 0x3ff;
+				static int32_t lastseconds		=  -1, lastsubseconds =0;
 				if(lastseconds==-1){
 				    NSLog(@"Sec is %i\n",seconds);
 					lastseconds=0;
 				}
-				diff = seconds-lastseconds;
+				diff = (seconds-lastseconds)*20000000 + subseconds-lastsubseconds;
 			//NSLog(@"WARNING: Sec is %i, lastsec %i\n",seconds,lastseconds);
-				if(diff<0 || diff>2){
-				    NSLog(@"WARNING: Sec is %i, lastsec %i\n",seconds,lastseconds);
+			//NSLog(@"WARNING: evID %i, Sec is %i, subsec %i,  lastsec %i, lastsubsec %i,   diff %i, \n",evID,seconds,subseconds,lastseconds,lastsubseconds,diff);
+			//NSLog(@"WARNING: diff %i, Sec is %i, subsec %i,  lastsec %i, lastsubsec %i\n",diff,seconds,subseconds,lastseconds,lastsubseconds);
+
+				//if( diff<=0 || subseconds>19900000){
+				if( diff<=0 || diff>19900000){
+				    //NSLog(@"WARNING: diff %i, Sec is %i, subsec %i,  lastsec %i, lastsubsec %i\n",diff,seconds,subseconds,lastseconds,lastsubseconds);
+					NSLog(@"WARNING: evID %i, Sec is %i, subsec %i,  lastsec %i, lastsubsec %i,   diff %i, \n",evID,seconds,subseconds,lastseconds,lastsubseconds,diff);
 				}
 
 				lastseconds = seconds;
+				lastsubseconds = subseconds;
             #endif
 	    }	
     }
