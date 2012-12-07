@@ -1038,7 +1038,21 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 		NSString* ave;
 		[scanner scanUpToString:@"/" intoString:&ave];
 		NSLog(@"ave: %.3f ms\n",[ave floatValue]);
+        pingedSuccessfully = NO;
 	}
+    else if([text rangeOfString:@"0% packet loss"].location){
+        pingedSuccessfully = NO;
+    }
+}
+
+- (BOOL) pingInProgress
+{
+    return pingTask!=nil;
+}
+
+- (BOOL)pingedSuccessfully
+{
+    return pingedSuccessfully;
 }
 
 - (void) toggleCrate
@@ -1818,9 +1832,33 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 	return crateName;
 }
 
+- (void) pingOnce
+{
+	if(!pingTask){
+        pingedSuccessfully = NO;
+		ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
+		pingTask = [[NSTask alloc] init];
+		
+		[pingTask setLaunchPath:@"/sbin/ping"];
+		[pingTask setArguments: [NSArray arrayWithObjects:@"-c",@"1",@"-t",@"1",@"-q",IPNumber,nil]];
+		
+		[aSequence addTaskObj:pingTask];
+		[aSequence setVerbose:NO];
+		[aSequence setTextToDelegate:YES];
+		[aSequence launch];
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_LinkPingTask object:self];
+	}
+	else {
+        pingedSuccessfully = NO;
+		[pingTask terminate];
+	}
+}
+
+
 - (void) ping
 {
 	if(!pingTask){
+        pingedSuccessfully = NO;
 		ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
 		pingTask = [[NSTask alloc] init];
 		
@@ -1834,6 +1872,7 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_LinkPingTask object:self];
 	}
 	else {
+        pingedSuccessfully = NO;
 		[pingTask terminate];
 	}
 }
@@ -1866,6 +1905,7 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 		[self doCBTransferTest];
 	}
 }
+
 - (int) cbTestCount
 {
 	return cbTestCount;

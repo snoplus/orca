@@ -107,6 +107,7 @@ typedef enum eSBC_ThrottleConsts{
 	BOOL			stopWatchingIRQ;
 
 	NSTask*			pingTask;
+    BOOL            pingedSuccessfully;
 
 	//cbTest varibles
 	int				numTestPoints;
@@ -214,6 +215,8 @@ typedef enum eSBC_ThrottleConsts{
 - (void) setJobStatus:(ORSBCLinkJobStatus*)theJobStatus;
 - (unsigned) connectionHistoryCount;
 - (id) connectionHistoryItem:(unsigned)index;
+- (BOOL) pingInProgress;
+- (BOOL) pingedSuccessfully;
 
 - (void) calculateRates;
 - (void) setByteRateSent:(float)aRate;
@@ -317,6 +320,7 @@ typedef enum eSBC_ThrottleConsts{
 - (NSString*) crateName;
 
 - (void) ping;
+- (void) pingOnce;
 - (BOOL) pingTaskRunning;
 - (void) startCBTransferTest;
 - (BOOL) cbTestRunning;
