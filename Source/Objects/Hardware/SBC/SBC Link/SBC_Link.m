@@ -1038,7 +1038,7 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 		NSString* ave;
 		[scanner scanUpToString:@"/" intoString:&ave];
 		NSLog(@"ave: %.3f ms\n",[ave floatValue]);
-        pingedSuccessfully = NO;
+        pingedSuccessfully = YES;
 	}
     else if([text rangeOfString:@"0% packet loss"].location){
         pingedSuccessfully = NO;
