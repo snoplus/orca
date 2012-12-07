@@ -42,6 +42,7 @@
 - (void) setViewType:(int)aViewType;
 - (int) viewType;
 - (BOOL) sentryIsRunning;
+- (void) takeOverRunning;
 
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups;

@@ -228,6 +228,11 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
     return [haloSentry sentryIsRunning];
 }
 
+- (void) takeOverRunning
+{
+    [haloSentry takeOverRunning:NO];
+}
+
 - (id)initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
