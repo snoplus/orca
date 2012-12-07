@@ -24,16 +24,43 @@
 #import "HaloController.h"
 #import "ORSegmentGroup.h"
 #import "HaloSentry.h"
+#import "ORMailer.h"
 
-NSString* HaloModelHaloSentryChanged    = @"HaloModelHaloSentryChanged";
-NSString* HaloModelViewTypeChanged      = @"HaloModelViewTypeChanged";
-NSString* HaloModelSentryLock           = @"HaloModelSentryLock";
+NSString* HaloModelHaloSentryChanged     = @"HaloModelHaloSentryChanged";
+NSString* HaloModelViewTypeChanged       = @"HaloModelViewTypeChanged";
+NSString* HaloModelSentryLock            = @"HaloModelSentryLock";
+NSString* HaloModelEmailListChanged		 = @"HaloModelEmailListChanged";
+NSString* HaloModelHeartBeatIndexChanged = @"HaloModelHeartBeatIndexChanged";
+NSString* HaloModelNextHeartBeatChanged	 = @"HaloModelNextHeartBeatChanged";
 
 static NSString* HaloDbConnector		= @"HaloDbConnector";
 
 @implementation HaloModel
 
 #pragma mark ¥¥¥Initialization
+
+- (void) dealloc
+{
+    [emailList release];
+    [haloSentry release];
+	[nextHeartbeat release];
+    [super dealloc];
+}
+- (void) sleep
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+    [haloSentry sleep];
+    [super sleep];
+}
+
+- (void) wakeUp
+{
+	[super wakeUp];
+    [haloSentry wakeUp];
+	if([self heartbeatSeconds]){
+		[self performSelector:@selector(sendHeartbeat) withObject:nil afterDelay:[self heartbeatSeconds]];
+	}
+}
 
 - (void) setUpImage
 {
@@ -86,14 +113,57 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
 }
  */
 
-- (void) dealloc
-{
-    [haloSentry release];
-    [super dealloc];
-}
 #pragma mark ¥¥¥Accessors
+- (int) heartBeatIndex
+{
+    return heartBeatIndex;
+}
 
+- (void) setHeartBeatIndex:(int)aHeartBeatIndex
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setHeartBeatIndex:heartBeatIndex];
+    heartBeatIndex = aHeartBeatIndex;
+    [[NSNotificationCenter defaultCenter] postNotificationName:HaloModelHeartBeatIndexChanged object:self];
+    
+	if([self heartbeatSeconds]){
+		[self performSelector:@selector(sendHeartbeat) withObject:nil afterDelay:[self heartbeatSeconds]];
+	}
+	[self setNextHeartbeatString];
+}
+- (NSMutableArray*) emailList
+{
+    return emailList;
+}
 
+- (void) setEmailList:(NSMutableArray*)aEmailList
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setEmailList:emailList];
+    
+    [aEmailList retain];
+    [emailList release];
+    emailList = aEmailList;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:HaloModelEmailListChanged object:self];
+}
+
+- (void) addAddress:(id)anAddress atIndex:(int)anIndex
+{
+	if(!emailList) emailList= [[NSMutableArray array] retain];
+	if([emailList count] == 0)anIndex = 0;
+	anIndex = MIN(anIndex,[emailList count]);
+	
+	[[[self undoManager] prepareWithInvocationTarget:self] removeAddressAtIndex:anIndex];
+	[emailList insertObject:anAddress atIndex:anIndex];
+    [[NSNotificationCenter defaultCenter] postNotificationName:HaloModelEmailListChanged object:self];
+}
+
+- (void) removeAddressAtIndex:(int) anIndex
+{
+	id anAddress = [emailList objectAtIndex:anIndex];
+	[[[self undoManager] prepareWithInvocationTarget:self] addAddress:anAddress atIndex:anIndex];
+	[emailList removeObjectAtIndex:anIndex];
+    [[NSNotificationCenter defaultCenter] postNotificationName:HaloModelEmailListChanged object:self];
+}
 
 - (HaloSentry*) haloSentry
 {
@@ -230,7 +300,7 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
 
 - (void) takeOverRunning
 {
-    [haloSentry takeOverRunning:NO];
+    [haloSentry takeOverRunning:YES];
 }
 
 - (id)initWithCoder:(NSCoder*)decoder
@@ -241,6 +311,8 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
     
     [self setHaloSentry:[decoder decodeObjectForKey:@"haloSentry"]];
     [self setViewType:  [decoder decodeIntForKey:   @"viewType"]];
+    [self setEmailList: [decoder decodeObjectForKey:@"emailList"]];
+    [self setHeartBeatIndex:[decoder decodeIntForKey:@"heartBeatIndex"]];
 	[[self undoManager] enableUndoRegistration];
 
     if(!haloSentry){
@@ -254,9 +326,45 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeObject:haloSentry forKey:@"haloSentry"];
-    [encoder encodeInt:viewType      forKey:@"viewType"];
+    [encoder encodeObject:haloSentry    forKey:@"haloSentry"];
+    [encoder encodeInt:viewType         forKey:@"viewType"];
+    [encoder encodeObject:emailList     forKey:@"emailList"];
+    [encoder encodeInt:heartBeatIndex forKey:@"heartBeatIndex"];
 }
+
+- (void) sendHeartbeat
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(sendHeartbeat) object:nil];
+	if([self heartbeatSeconds]==0)return;
+	[self setNextHeartbeatString];
+
+	NSString* theContent = @"";
+	theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
+	theContent = [theContent stringByAppendingFormat:@"This report was generated automatically by HALO at:\n"];
+	theContent = [theContent stringByAppendingFormat:@"%@ (Local time of ORCA machine)\n",[[NSDate date]descriptionWithCalendarFormat:nil timeZone:nil locale:nil]];
+	theContent = [theContent stringByAppendingFormat:@"Unless changed in ORCA, it will be repeated at:\n"];
+    theContent = [theContent stringByAppendingFormat:@"%@ (Local time of ORCA machine)\n%@ (UTC)\n",
+                  [nextHeartbeat descriptionWithCalendarFormat:nil timeZone:nil locale:nil], [nextHeartbeat descriptionWithCalendarFormat:nil timeZone:[NSTimeZone timeZoneWithAbbreviation:@"UTC"] locale:nil]];
+	theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
+    NSString* haloReport = [haloSentry report];
+    if([haloReport length] == 0)haloReport = @"Halo report was empty of content";
+	theContent = [theContent stringByAppendingFormat:@"%@\n",haloReport];
+	theContent = [theContent stringByAppendingString:@"\n\n+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
+	theContent = [theContent stringByAppendingString:@"The following people received this message:\n"];
+	for(id address in emailList) theContent = [theContent stringByAppendingFormat:@"%@\n",address];
+	theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
+	
+	NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:[self cleanupAddresses:emailList],@"Address",theContent,@"Message",nil];
+	[self sendMail:userInfo];
+	
+	if([self heartbeatSeconds]){
+		[self performSelector:@selector(sendHeartbeat) withObject:nil afterDelay:[self heartbeatSeconds]];
+	}
+	else {
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(sendHeartbeat) object:nil];
+	}
+}
+
 
 - (NSString*) reformatSelectionString:(NSString*)aString forSet:(int)aSet
 {
@@ -290,6 +398,91 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
 	}
 	return @"";
 }
+- (int) heartbeatSeconds
+{
+	switch(heartBeatIndex){
+		case 0: return 0;
+		case 1: return 30*60;
+		case 2: return 60*60;
+		case 3: return 2*60*60;
+		case 4: return 8*60*60;
+		case 5: return 12*60*60;
+		case 6: return 24*60*60;
+		default: return 0;
+	}
+	return 0;
+}
 
+- (void) setNextHeartbeatString
+{
+	if([self heartbeatSeconds]){
+		[nextHeartbeat release];
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+		nextHeartbeat = [[[NSDate date] dateByAddingTimeInterval:[self heartbeatSeconds]] retain];
+#else
+		nextHeartbeat = [[[NSDate date] addTimeInterval:[self heartbeatSeconds]] retain];
+#endif
+	}
+	[[NSNotificationCenter defaultCenter] postNotificationName:HaloModelNextHeartBeatChanged object:self];
+	
+}
+
+- (NSDate*) nextHeartbeat
+{
+	return nextHeartbeat;
+}
+
+
+#pragma mark ¥¥¥EMail
+- (void) mailSent:(NSString*)address
+{
+	NSLog(@"Process Center status was sent to:\n%@\n",address);
+}
+
+- (void) sendMail:(id)userInfo
+{
+	NSString* address =  [userInfo objectForKey:@"Address"];
+	NSString* content = [NSString string];
+	NSString* hostAddress = @"<Unable to get host address>";
+	NSArray* names =  [[NSHost currentHost] addresses];
+	for(id aName in names){
+		if([aName rangeOfString:@"::"].location == NSNotFound){
+			if([aName rangeOfString:@".0.0."].location == NSNotFound){
+				hostAddress = aName;
+				break;
+			}
+		}
+	}
+	content = [content stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
+	content = [content stringByAppendingFormat:@"ORCA Message From Host: %@\n",hostAddress];
+	content = [content stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n"];
+	NSString* theMessage = [userInfo objectForKey:@"Message"];
+	if(theMessage){
+		content = [content stringByAppendingString:theMessage];
+	}
+	NSString* shutDownWarning = [userInfo objectForKey:@"Shutdown"];
+	if(shutDownWarning){
+		//generated from a manual shutdown of the email system.
+		//don't send out any other info.
+	}
+	
+	NSAttributedString* theContent = [[NSAttributedString alloc] initWithString:content];
+	ORMailer* mailer = [ORMailer mailer];
+	[mailer setTo:address];
+	[mailer setSubject:@"Orca Message"];
+	[mailer setBody:theContent];
+	[mailer send:self];
+	[theContent release];
+}
+- (NSString*) cleanupAddresses:(NSArray*)aListOfAddresses
+{
+	NSMutableArray* listCopy = [NSMutableArray array];
+	for(id anAddress in aListOfAddresses){
+		if([anAddress length] && [anAddress rangeOfString:@"@"].location!= NSNotFound){
+			[listCopy addObject:anAddress];
+		}
+	}
+	return [listCopy componentsJoinedByString:@","];
+}
 @end
 

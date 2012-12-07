@@ -32,6 +32,9 @@
 {
 	int		    viewType;
     HaloSentry* haloSentry;
+    NSMutableArray* emailList;
+    int			heartBeatIndex;
+	NSDate*		nextHeartbeat;
 }
 
 //- (NSMutableArray*) setupMapEntries:(int)index;
@@ -43,6 +46,21 @@
 - (int) viewType;
 - (BOOL) sentryIsRunning;
 - (void) takeOverRunning;
+- (NSMutableArray*) emailList;
+- (void) setEmailList:(NSMutableArray*)aEmailList;
+- (void) addAddress:(id)anAddress atIndex:(int)anIndex;
+- (void) removeAddressAtIndex:(int) anIndex;
+- (int) heartBeatIndex;
+- (void) setHeartBeatIndex:(int)aHeartBeatIndex;
+- (int) heartbeatSeconds;
+- (void) sendHeartbeat;
+- (void) setNextHeartbeatString;
+- (NSDate*) nextHeartbeat;
+
+#pragma mark ¥¥¥EMail
+- (void) mailSent:(NSString*)address;
+- (void) sendMail:(id)userInfo;
+- (NSString*) cleanupAddresses:(NSArray*)aListOfAddresses;
 
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups;
@@ -61,4 +79,6 @@
 extern NSString* HaloModelHaloSentryChanged;
 extern NSString* HaloModelViewTypeChanged;
 extern NSString* HaloModelSentryLock;
+extern NSString* HaloModelEmailListChanged;
+extern NSString* HaloModelNextHeartBeatChanged;
 

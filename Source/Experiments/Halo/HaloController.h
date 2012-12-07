@@ -41,6 +41,11 @@
     IBOutlet NSTextField*	sbcPasswordField;
     IBOutlet NSPopUpButton*	viewTypePU;
     IBOutlet NSButton*      sentryLockButton;
+	IBOutlet NSTableView*   emailListTable;
+	IBOutlet NSPopUpButton* heartBeatIndexPU;
+	IBOutlet NSTextField*   nextHeartbeatField;
+	IBOutlet NSButton*      removeAddressButton;
+    
 	NSView *blankView;
     NSSize detectorSize;
     NSSize detailsSize;
@@ -52,17 +57,6 @@
 - (void) registerNotificationObservers;
 - (void) updateWindow;
 - (void) setDetectorTitle;
-
-#pragma mark ¥¥¥Actions
-- (IBAction) stealthMode2Action:(id)sender;
-- (IBAction) stealthMode1Action:(id)sender;
-- (IBAction) viewTypeAction:(id)sender;
-- (IBAction) ip1Action:(id)sender;
-- (IBAction) ip2Action:(id)sender;
-- (IBAction) toggleSystems:(id)sender;
-- (IBAction) startStopSentry:(id)sender;
-- (IBAction) sentryLockAction:(id)sender;
-- (IBAction) sbcPasswordAction:(id)sender;
 
 #pragma mark ¥¥¥Interface Management
 - (void) stealthMode2Changed:(NSNotification*)aNote;
@@ -77,6 +71,24 @@
 - (void) sentryLockChanged:(NSNotification*)aNote;
 - (void) updateButtons;
 - (void) sbcPasswordChanged:(NSNotification*)aNote;
+- (void) emailListChanged:(NSNotification*)aNote;
+- (void) heartBeatIndexChanged:(NSNotification*)aNote;
+- (void) nextHeartBeatChanged:(NSNotification*)aNote;
+
+#pragma mark ¥¥¥Actions
+- (IBAction) stealthMode2Action:(id)sender;
+- (IBAction) stealthMode1Action:(id)sender;
+- (IBAction) viewTypeAction:(id)sender;
+- (IBAction) ip1Action:(id)sender;
+- (IBAction) ip2Action:(id)sender;
+- (IBAction) toggleSystems:(id)sender;
+- (IBAction) startStopSentry:(id)sender;
+- (IBAction) sentryLockAction:(id)sender;
+- (IBAction) sbcPasswordAction:(id)sender;
+- (IBAction) heartBeatIndexAction:(id)sender;
+- (IBAction) addAddress:(id)sender;
+- (IBAction) removeAddress:(id)sender;
+
 
 @end
 @interface ORDetectorView (Halo)

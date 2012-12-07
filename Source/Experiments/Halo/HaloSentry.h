@@ -82,6 +82,7 @@ enum eHaloStatus {
     NSString*   ipNumber1;
     NSString*   ipNumber2;;
     NSString*   otherSystemIP;
+    NSString*   thisSystemIP;
     BOOL        stealthMode1;
     BOOL        stealthMode2;
     BOOL        otherSystemStealthMode;
@@ -116,6 +117,8 @@ enum eHaloStatus {
 #pragma mark ***Initialization
 - (id)   init;
 - (void) dealloc;
+- (void) sleep;
+- (void) wakeUp;
 - (NSUndoManager*) undoManager;
 - (void) awakeAfterDocumentLoaded;
 - (void) registerNotificationObservers;
@@ -157,6 +160,7 @@ enum eHaloStatus {
 - (void) takeOverRunning:(BOOL)quiet;
 - (NSString*) sentryTypeName;
 - (NSString*) stateName;
+- (NSString*) report;
 
 #pragma mark ***Run Stuff
 - (void) start;

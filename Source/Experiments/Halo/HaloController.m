@@ -127,6 +127,21 @@
                          name : HaloSentrySbcRootPwdChanged
 						object: [model haloSentry]];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(emailListChanged:)
+                         name : HaloModelEmailListChanged
+						object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(heartBeatIndexChanged:)
+                         name : HaloModelNextHeartBeatChanged
+						object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(nextHeartBeatChanged:)
+                         name : HaloModelNextHeartBeatChanged
+						object: model];
+
     
 }
 
@@ -142,6 +157,9 @@
 	[self stealthMode2Changed:nil];
 	[self sentryIsRunningChanged:nil];
 	[self sbcPasswordChanged:nil];
+    [self heartBeatIndexChanged:nil];
+	[self nextHeartBeatChanged:nil];
+
     [self sentryLockChanged:nil];
 }
 
@@ -153,6 +171,24 @@
     BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
     [gSecurity setLock:HaloModelSentryLock to:secure];
     [sentryLockButton setEnabled:secure];
+}
+
+- (void) heartBeatIndexChanged:(NSNotification*)aNote
+{
+	[heartBeatIndexPU selectItemAtIndex: [model heartBeatIndex]];
+}
+
+- (void) nextHeartBeatChanged:(NSNotification*)aNote
+{
+	if([model heartbeatSeconds]){
+		[nextHeartbeatField setStringValue:[NSString stringWithFormat:@"Next Heartbeat: %@",[[model nextHeartbeat]descriptionWithCalendarFormat:nil timeZone:nil locale:nil]]];
+	}
+	else [nextHeartbeatField setStringValue:@"No Heartbeat Scheduled"];
+}
+
+- (void) emailListChanged:(NSNotification*)aNote
+{
+	[emailListTable reloadData];
 }
 
 - (void) sentryIsRunningChanged:(NSNotification*)aNote
@@ -242,7 +278,10 @@
     BOOL locked = [gSecurity isLocked:HaloModelSentryLock];
     BOOL sentryRunning = [[model haloSentry] sentryIsRunning];
     BOOL aRunIsInProgress = [[model haloSentry] runIsInProgress];
+   	BOOL anyAddresses = ([[model emailList] count]>0);
     
+	[heartBeatIndexPU setEnabled:anyAddresses];
+ 
     [stealthMode2CB setEnabled:!locked && !sentryRunning];
     [stealthMode1CB setEnabled:!locked && !sentryRunning];
     [ip1Field setEnabled:!locked && !sentryRunning];
@@ -252,7 +291,62 @@
     [toggleButton setEnabled:!locked & aRunIsInProgress];
 }
 
+- (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem
+{
+    if([tabView indexOfTabViewItem:tabViewItem] == 0){
+		[[self window] setContentView:blankView];
+		[self resizeWindowToSize:detectorSize];
+		[[self window] setContentView:tabView];
+    }
+    else if([tabView indexOfTabViewItem:tabViewItem] == 1){
+		[[self window] setContentView:blankView];
+		[self resizeWindowToSize:detailsSize];
+		[[self window] setContentView:tabView];
+    }
+    else if([tabView indexOfTabViewItem:tabViewItem] == 2){
+		[[self window] setContentView:blankView];
+		[self resizeWindowToSize:focalPlaneSize];
+		[[self window] setContentView:tabView];
+    }
+    else if([tabView indexOfTabViewItem:tabViewItem] == 3){
+		[[self window] setContentView:blankView];
+		[self resizeWindowToSize:sentrySize];
+		[[self window] setContentView:tabView];
+    }
+    
+	int index = [tabView indexOfTabViewItem:tabViewItem];
+    [[NSUserDefaults standardUserDefaults] setInteger:index forKey:@"orca.HaloController.selectedtab"];
+}
+
 #pragma mark ¥¥¥Actions
+- (IBAction) addAddress:(id)sender
+{
+	int index = [[model emailList] count];
+	[model addAddress:@"<eMail>" atIndex:index];
+	NSIndexSet* indexSet = [NSIndexSet indexSetWithIndex:index];
+	[emailListTable selectRowIndexes:indexSet byExtendingSelection:NO];
+	[self updateButtons];
+	[emailListTable reloadData];
+}
+
+- (IBAction) removeAddress:(id)sender
+{
+	//only one can be selected at a time. If that restriction is lifted then the following will have to be changed
+	//to something a lot more complicated.
+	NSIndexSet* theSet = [emailListTable selectedRowIndexes];
+	NSUInteger current_index = [theSet firstIndex];
+    if(current_index != NSNotFound){
+		[model removeAddressAtIndex:current_index];
+	}
+	[self updateButtons];
+	[emailListTable reloadData];
+}
+
+- (IBAction) heartBeatIndexAction:(id)sender
+{
+	[model setHeartBeatIndex:[sender indexOfSelectedItem]];
+}
+
 - (IBAction) sbcPasswordAction:(id)sender
 {
 	[[model haloSentry] setSbcRootPwd:[sender stringValue]];
@@ -302,33 +396,43 @@
     }
 }
 
-
-#pragma mark ¥¥¥Table Data Source
-- (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem
+#pragma mark ¥¥¥Data Source
+- (void) tableViewSelectionDidChange:(NSNotification *)aNotification
 {
-    if([tabView indexOfTabViewItem:tabViewItem] == 0){
-		[[self window] setContentView:blankView];
-		[self resizeWindowToSize:detectorSize];
-		[[self window] setContentView:tabView];
-    }
-    else if([tabView indexOfTabViewItem:tabViewItem] == 1){
-		[[self window] setContentView:blankView];
-		[self resizeWindowToSize:detailsSize];
-		[[self window] setContentView:tabView];
-    }
-    else if([tabView indexOfTabViewItem:tabViewItem] == 2){
-		[[self window] setContentView:blankView];
-		[self resizeWindowToSize:focalPlaneSize];
-		[[self window] setContentView:tabView];
-    }
-    else if([tabView indexOfTabViewItem:tabViewItem] == 3){
-		[[self window] setContentView:blankView];
-		[self resizeWindowToSize:sentrySize];
-		[[self window] setContentView:tabView];
-    }
+	if([aNotification object] == emailListTable || aNotification == nil){
+		int selectedIndex = [emailListTable selectedRow];
+		[removeAddressButton setEnabled:selectedIndex>=0];
+	}
+}
 
-	int index = [tabView indexOfTabViewItem:tabViewItem];
-    [[NSUserDefaults standardUserDefaults] setInteger:index forKey:@"orca.HaloController.selectedtab"];
+- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
+{
+	if(aTableView == emailListTable){
+		if(rowIndex < [[model emailList] count]){
+			id addressObj = [[model emailList] objectAtIndex:rowIndex];
+			return addressObj;
+		}
+		else return @"";
+	}
+    else return [super tableView:aTableView objectValueForTableColumn:aTableColumn row:rowIndex];
+}
+- (void)tableView:(NSTableView *)aTableView setObjectValue:anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+{
+	if(aTableView == emailListTable){
+		if(rowIndex < [[model emailList] count]){
+			[[model emailList] replaceObjectAtIndex:rowIndex withObject:anObject];
+		}
+	}
+    else [super tableView:aTableView setObjectValue:anObject forTableColumn:aTableColumn row:rowIndex];
+}
+
+// just returns the number of items we have.
+- (int) numberOfRowsInTableView:(NSTableView *)aTableView
+{
+ 	if(aTableView == emailListTable){
+		return [[model emailList] count];
+    }
+    else return [super numberOfRowsInTableView:aTableView];
 }
 
 @end
