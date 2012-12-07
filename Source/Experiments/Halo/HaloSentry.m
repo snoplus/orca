@@ -351,7 +351,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
         case eCheckRun:             return @"Checking Run";
         case eBootCrates:           return @"Booting Crates";
         case eWaitForBoot:          return @"Waiting For Crates";
-        case ePingCrates:           return @"Pings Crates";
+        case ePingCrates:           return @"Pinging Crates";
     }
 }
 
@@ -856,10 +856,11 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
             break;
             
         case eKillCrateWait:
-            if(loopTime >= 2)[self setNextState:eStartCrates stepTime:.1];
+            if(loopTime >= 2)[self setNextState:ePingCrates stepTime:.1];
             break;
   
         case ePingCrates:
+            if(!unPingableSBCs) unPingableSBCs = [[NSMutableArray arrayWithArray:sbcs]retain];
             [self appendToSentryLog:@"Pinging Crates"];
             for(id anSBC in sbcs)[[anSBC sbcLink] pingOnce];
             [self setNextState:eWaitForPing stepTime:2];
@@ -867,7 +868,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
          break;
   
         case eWaitForPing:
-            if(loopTime >= 2){
+            if(loopTime >= 8){
                 if([unPingableSBCs count] == [sbcs count]){
                     [self appendToSentryLog:@"None of the SBCs responded to ping"];
                     [self setNextState:eBootCrates stepTime:.1];
@@ -881,7 +882,6 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
                 }
             }
             else {
-                if(!unPingableSBCs) unPingableSBCs = [[NSMutableArray arrayWithArray:sbcs]retain];
                 for(id anSBC in sbcs){
                     if([[anSBC sbcLink]pingedSuccessfully]){
                         [unPingableSBCs removeObject:anSBC];
@@ -898,9 +898,8 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
         case eStartCrates:
             for(id anSBC in sbcs){
                 if(![unPingableSBCs containsObject:anSBC]){
-                    if([[anSBC sbcLink] isConnected]){
+                    if(![[anSBC sbcLink] isConnected]){
                         [self appendToSentryLog:[NSString stringWithFormat:@"Start crate @ %@",[[anSBC sbcLink] IPNumber]]];
-
                         [[anSBC sbcLink] startCrate];
                     }
                 }
