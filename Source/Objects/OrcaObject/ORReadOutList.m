@@ -281,6 +281,22 @@ NSString* NSReadOutListChangedNotification = @"NSReadOutListChangedNotification"
         
 	}	
 }
+
+//--------------------------------------------------------------
+//special object... don't use unless you know what you're doing.
+- (void) removeOrcaObject:(id)anObject
+{
+    for(id aChild in children){
+        if([aChild isKindOfClass:NSClassFromString(@"ORReadOutObject")]){
+            if([aChild object]==anObject){
+                [self removeObject:aChild];
+                break;
+            }
+        }
+    }
+}
+//--------------------------------------------------------------
+
 - (unsigned) count
 {
 	return [children count];

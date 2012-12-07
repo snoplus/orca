@@ -76,6 +76,7 @@
 - (void) addObjectsFromArray:(NSArray*)anArray;
 - (void) removeObjectsInArray:(NSArray*)anArray;
 - (NSUndoManager *)	undoManager;
+- (void) removeOrcaObject:(id)anObject;
 
 - (NSArray*) allObjects;
 - (id) itemHolding:(id)anObject;
