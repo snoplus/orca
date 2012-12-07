@@ -87,6 +87,7 @@ enum eHaloStatus {
     BOOL        otherSystemStealthMode;
     BOOL        ignoreRunStates;
     BOOL        triedBooting;
+    BOOL        wasLocalRun;
     
 	NSTask*     pingTask;
     NetSocket*  socket;
@@ -153,6 +154,7 @@ enum eHaloStatus {
 - (enum eHaloSentryState) state;
 - (void) setNextState:(enum eHaloSentryState)aState stepTime:(NSTimeInterval)aTime;
 - (void) takeOverRunning;
+- (void) takeOverRunning:(BOOL)quiet;
 - (NSString*) sentryTypeName;
 - (NSString*) stateName;
 

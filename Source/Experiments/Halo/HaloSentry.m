@@ -784,11 +784,13 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
             ignoreRunStates = YES;
             [self appendToSentryLog:@"Toggling healthy systems"];
            if([runControl isRunning]){
+               wasLocalRun = YES;
                [self appendToSentryLog:@"Stopping local run."];
                [runControl stopRun];
                 [self setNextState:eWaitForLocalRunStop stepTime:.1];
             }
             else if (remoteRunInProgress == eYES){
+                wasLocalRun = NO;
                 [self appendToSentryLog:@"Stopping remote run."];
                 [self sendCmd:@"[RunControl stopRun];"];
                 [self setNextState:eWaitForRemoteRunStop stepTime:.1];
@@ -797,88 +799,37 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
             
         case eWaitForLocalRunStop:
             if(![runControl isRunning]){
-                [self appendToSentryLog:@"Local run stopped."];
-                [self sendCmd:@"[RunControl startRun];"];
-                [self setNextState:eWaitForRemoteRunStart stepTime:.1];
-                loopTime = 0;
+                [self appendToSentryLog:@"Local run stopped. Passing control to other system"];
+                [self sendCmd:@"[HaloModel takeOver];"];
+                [self setSentryType:eNeither];
+                [self setNextState:eStarting stepTime:2];
            }
             else {
                 if(loopTime>10){
                     //something is seriously wrong...
                     [self appendToSentryLog:[NSString stringWithFormat:@"Local run didn't stop after %.0f seconds.\n",loopTime]];
-
+                    [self appendToSentryLog:@"Passing control to other system"];
                     [self postRunProblemAlarm:@"Local Run didn't stop"];
+                    [self sendCmd:@"[HaloModel takeOver:YES];"];
                     [self setSentryType:eNeither];
-                    [self setNextState:eStarting stepTime:.1];
-                    [self step];
+                    [self setNextState:eStarting stepTime:2];
                 }
             }
             break;
             
         case eWaitForRemoteRunStop:
             if(remoteRunInProgress == eNO){
-                [self appendToSentryLog:@"Starting local run."];
-               [runControl startRun];
-                [self setNextState:eWaitForLocalRunStart stepTime:.1];
-                loopTime = 0;
+                [self takeOverRunning:YES];
             }
             else {
                 if(loopTime>10){
                     [self appendToSentryLog:[NSString stringWithFormat:@"Remote run didn't stop after %.0f seconds.\n",loopTime]];
                     [self postRunProblemAlarm:@"Remote Run didn't stop"];
-                    [self setSentryType:eNeither];
-                    [self setNextState:eStarting stepTime:.1];
-                    [self step];
+                    [self takeOverRunning];
                 }
             }
            break;
  
-        case eWaitForLocalRunStart:
-            if([runControl isRunning]){
-                [self appendToSentryLog:@"Local Run Started OK"];
-                ignoreRunStates = NO;
-                [self setSentryType:ePrimary];
-                [self setNextState:eGetSecondaryState stepTime:.1];
-                [self step];
-                [self updateRemoteMachine];
-            }
-            else {
-                if(loopTime>10){
-                    [self appendToSentryLog:[NSString stringWithFormat:@"Local run didn't start after %.0f seconds.\n",loopTime]];
-                     ignoreRunStates = NO;
-                    [self postRunProblemAlarm:@"Local Run didn't start"];
-                    [self setSentryType:eNeither];
-                    [self setNextState:eStarting stepTime:.1];
-                    [self step];
-                }
-            }
-            break;
-            
-        case eWaitForRemoteRunStart:
-            if(remoteRunInProgress == eYES){
-                [self appendToSentryLog:@"Remote Run Started OK"];
-                ignoreRunStates = NO;
-                [self setSentryType:eSecondary];
-                [self setNextState:eGetRunState stepTime:.1];
-                [self step];
-            }
-            else {
-                if(loopTime>10){
-                    [self appendToSentryLog:[NSString stringWithFormat:@"Remote run didn't start after %.0f seconds.\n",loopTime]];
-                    ignoreRunStates = NO;
-                    [self postRunProblemAlarm:@"Remote Run didn't start"];
-                    [self setSentryType:eSecondary];
-                    [self setNextState:eStarting stepTime:.1];
-                    [self step];
-                }
-            }
-            break;
-
-        case eStopping:
-            [self finish];
-            break;
-
-            
         default: break;
     }
 }
@@ -1047,13 +998,18 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
     [self setNextState:eIdle stepTime:.2];
 }
 
-- (void) takeOverRunning
+- (void) takeOverRunning:(BOOL)quiet
 {
-    NSLogColor([NSColor redColor],@"Something is wrong so the secondary system is attempting a takeover\n");
+    if(quiet)NSLogColor([NSColor redColor],@"Something is wrong so the secondary system is attempting a takeover\n");
     triedBooting = NO;
     [self setSentryType:eTakeOver];
     [self setNextState:eStarting stepTime:.2];
     [self step];
+}
+
+- (void) takeOverRunning
+{
+    [self takeOverRunning:NO];
 }
 
 - (void) appendToSentryLog:(NSString*)aString
