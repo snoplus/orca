@@ -37,6 +37,15 @@ enum  eHaloSentryState {
     eWaitForRemoteRunStop,
     eWaitForLocalRunStart,
     eWaitForRemoteRunStart,
+    eKillCrates,
+    eKillCrateWait,
+    eStartCrates,
+    eStartCrateWait,
+    eStartRun,
+    eCheckRun,
+    eBootCrates,
+    eWaitForBoot,
+    ePingCrates,
 } eHaloSentryState;
 
 enum eHaloSentryType {
@@ -44,6 +53,7 @@ enum eHaloSentryType {
     ePrimary,
     eSecondary,
     eHealthyToggle,
+    eTakeOver,
 }eHaloSentryType;
 
 enum eHaloStatus {
@@ -55,6 +65,8 @@ enum eHaloStatus {
     eBeingChecked   = 2,
     eUnknown        = 3
 } eHaloStatus;
+
+#define kMaxHungCount 2
 
 @interface HaloSentry : NSObject
 {
@@ -74,6 +86,7 @@ enum eHaloStatus {
     BOOL        stealthMode2;
     BOOL        otherSystemStealthMode;
     BOOL        ignoreRunStates;
+    BOOL        triedBooting;
     
 	NSTask*     pingTask;
     NetSocket*  socket;
@@ -88,10 +101,15 @@ enum eHaloStatus {
     ORAlarm* orcaHungAlarm;
     ORAlarm* noRemoteSentryAlarm;
     ORAlarm* runProblemAlarm;
+    ORAlarm* listModAlarm;
     
     ORRunModel* runControl;
     NSArray* sbcs;
     NSArray* shapers;
+    NSString* sbcRootPwd;
+    NSMutableDictionary* sbcPingTasks;
+    NSMutableArray* unPingableSBCs;
+    NSMutableArray* sentryLog;
 }
 
 #pragma mark ***Initialization
@@ -115,6 +133,9 @@ enum eHaloStatus {
 - (BOOL) sentryIsRunning;
 - (void) setSentryIsRunning:(BOOL)aState;
 - (BOOL) isConnected;
+- (NSString*)sbcRootPwd;
+- (void) setSbcRootPwd:(NSString*)aString;
+
 
 #pragma mark ***Notifications
 - (void) objectsChanged:(NSNotification*)aNote;
@@ -157,6 +178,8 @@ enum eHaloStatus {
 - (NSString*) connectionStatusString;
 - (NSString*) remoteORCArunStateString;
 - (BOOL) runIsInProgress;
+- (void) appendToSentryLog:(NSString*)aString;
+- (void) flushSentryLog;
 
 #pragma mark ***Alarms
 - (void) postPingAlarm;
@@ -169,6 +192,8 @@ enum eHaloStatus {
 - (void) clearNoRemoteSentryAlarm;
 - (void) postRunProblemAlarm:(NSString*)aTitle;
 - (void) clearRunProblemAlarm;
+- (void) postListModAlarm;
+- (void) clearListModAlarm;
 @end
 
 extern NSString* HaloSentryStealthMode2Changed;
@@ -179,7 +204,7 @@ extern NSString* HaloSentryIsPrimaryChanged;
 extern NSString* HaloSentryIsRunningChanged;
 extern NSString* HaloSentryStateChanged;
 extern NSString* HaloSentryTypeChanged;
-extern NSString* HaloSentryPingTask;
 extern NSString* HaloSentryIsConnectedChanged;
 extern NSString* HaloSentryRemoteStateChanged;
 extern NSString* HaloSentryMissedHeartbeat;
+extern NSString* HaloSentrySbcRootPwdChanged;

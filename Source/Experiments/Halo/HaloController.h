@@ -38,6 +38,7 @@
     IBOutlet NSTextField*	remoteMachineRunningField;
     IBOutlet NSTextField*	connectedField;
     IBOutlet NSTextField*	remoteRunInProgressField;
+    IBOutlet NSTextField*	sbcPasswordField;
     IBOutlet NSPopUpButton*	viewTypePU;
     IBOutlet NSButton*      sentryLockButton;
 	NSView *blankView;
@@ -61,6 +62,7 @@
 - (IBAction) toggleSystems:(id)sender;
 - (IBAction) startStopSentry:(id)sender;
 - (IBAction) sentryLockAction:(id)sender;
+- (IBAction) sbcPasswordAction:(id)sender;
 
 #pragma mark ¥¥¥Interface Management
 - (void) stealthMode2Changed:(NSNotification*)aNote;
@@ -74,6 +76,7 @@
 - (void) specialUpdate:(NSNotification*)aNote;
 - (void) sentryLockChanged:(NSNotification*)aNote;
 - (void) updateButtons;
+- (void) sbcPasswordChanged:(NSNotification*)aNote;
 
 @end
 @interface ORDetectorView (Halo)

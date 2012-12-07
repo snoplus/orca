@@ -122,6 +122,12 @@
                          name : HaloSentryMissedHeartbeat
 						object: [model haloSentry]];
    
+    [notifyCenter addObserver : self
+                     selector : @selector(sbcPasswordChanged:)
+                         name : HaloSentrySbcRootPwdChanged
+						object: [model haloSentry]];
+
+    
 }
 
 - (void) updateWindow
@@ -135,6 +141,7 @@
 	[self stealthMode1Changed:nil];
 	[self stealthMode2Changed:nil];
 	[self sentryIsRunningChanged:nil];
+	[self sbcPasswordChanged:nil];
     [self sentryLockChanged:nil];
 }
 
@@ -171,6 +178,11 @@
 - (void) sentryTypeChanged:(NSNotification*)aNote
 {
     [sentryTypeField setStringValue:[[model haloSentry] sentryTypeName]];
+}
+
+- (void) sbcPasswordChanged:(NSNotification*)aNote
+{
+    [sbcPasswordField setStringValue:[[model haloSentry] sbcRootPwd]];
 }
 
 - (void) stateChanged:(NSNotification*)aNote
@@ -241,13 +253,17 @@
 }
 
 #pragma mark ¥¥¥Actions
+- (IBAction) sbcPasswordAction:(id)sender
+{
+	[[model haloSentry] setSbcRootPwd:[sender stringValue]];
+}
 
-- (void) stealthMode2Action:(id)sender
+- (IBAction) stealthMode2Action:(id)sender
 {
 	[[model haloSentry] setStealthMode2:[sender intValue]];
 }
 
-- (void) stealthMode1Action:(id)sender
+- (IBAction) stealthMode1Action:(id)sender
 {
 	[[model haloSentry] setStealthMode1:[sender intValue]];	
 }

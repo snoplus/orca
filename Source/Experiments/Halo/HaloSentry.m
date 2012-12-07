@@ -22,6 +22,8 @@
 #import "ORTaskSequence.h"
 #import "NetSocket.h"
 #import "ORRunModel.h"
+#import "SBC_Link.h"
+#import "ORShaperModel.h"
 
 NSString* HaloSentryIpNumber2Changed = @"HaloSentryIpNumber2Changed";
 NSString* HaloSentryIpNumber1Changed = @"HaloSentryIpNumber1Changed";
@@ -29,12 +31,12 @@ NSString* HaloSentryIsPrimaryChanged = @"HaloSentryIsPrimaryChanged";
 NSString* HaloSentryIsRunningChanged = @"HaloSentryIsRunningChanged";
 NSString* HaloSentryStateChanged     = @"HaloSentryStateChanged";
 NSString* HaloSentryTypeChanged      = @"HaloSentryTypeChanged";
-NSString* HaloSentryPingTask         = @"HaloSentryPingTask";
 NSString* HaloSentryIsConnectedChanged = @"HaloSentryIsConnectedChanged";
 NSString* HaloSentryRemoteStateChanged = @"HaloSentryRemoteStateChanged";
 NSString* HaloSentryStealthMode2Changed = @"HaloSentryStealthMode2Changed";
 NSString* HaloSentryStealthMode1Changed = @"HaloSentryStealthMode1Changed";
-NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
+NSString* HaloSentryMissedHeartbeat     = @"HaloSentryMissedHeartbeat";
+NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
 
 #define kRemotePort 4667
 
@@ -57,22 +59,16 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
     [ipNumber1 release];
     [sbcs release];
     [otherSystemIP release];
+    [sbcPingTasks release];
+    [unPingableSBCs release];
+    [sentryLog release];
     
-    [pingFailedAlarm clearAlarm];
-    [pingFailedAlarm release];
-    
-    [noConnectionAlarm clearAlarm];
-    [noConnectionAlarm release];
-
-    [orcaHungAlarm clearAlarm];
-    [orcaHungAlarm release];
-
-    [noRemoteSentryAlarm clearAlarm];
-    [noRemoteSentryAlarm release];
-
-    [runProblemAlarm clearAlarm];
-    [runProblemAlarm release];
-
+    [self clearPingAlarm];
+    [self clearConnectionAlarm];
+    [self clearOrcaHungAlarm];
+    [self clearNoRemoteSentryAlarm];
+    [self clearRunProblemAlarm];
+    [self clearListModAlarm];
     
     [super dealloc];
 }
@@ -121,6 +117,9 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
 
 - (void) collectObjects
 {
+    [sbcPingTasks release];
+    sbcPingTasks = nil;
+    
     [sbcs release];
     sbcs = nil;
     sbcs = [[[[NSApp delegate ]document] collectObjectsOfClass:NSClassFromString(@"ORVmecpuModel")]retain];
@@ -157,6 +156,19 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
 }
 
 #pragma mark ***Accessors
+- (NSString*)sbcRootPwd
+{
+    if(sbcRootPwd)return sbcRootPwd;
+    else return @"";
+}
+
+- (void) setSbcRootPwd:(NSString*)aString
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSbcRootPwd:sbcRootPwd];
+    [sbcRootPwd autorelease];
+    sbcRootPwd = [aString copy];
+    [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryIsRunningChanged object:self];
+}
 
 - (BOOL) sentryIsRunning
 {
@@ -331,6 +343,15 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
         case eWaitForRemoteRunStop: return @"Run Stop Wait";
         case eWaitForLocalRunStart: return @"Run Start Wait";
         case eWaitForRemoteRunStart:return @"Run Start Wait";
+        case eKillCrates:           return @"Killing Crates";
+        case eKillCrateWait:        return @"Wait For Crates";
+        case eStartCrates:          return @"Starting Crates";
+        case eStartCrateWait:       return @"Wait For Crates";
+        case eStartRun:             return @"Starting Run";
+        case eCheckRun:             return @"Checking Run";
+        case eBootCrates:           return @"Booting Crates";
+        case eWaitForBoot:          return @"Waiting For Crates";
+        case ePingCrates:           return @"Pings Crates";
     }
 }
 
@@ -341,6 +362,7 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
         case ePrimary:          return @"Primary";
         case eSecondary:        return @"Secondary";
         case eHealthyToggle:    return @"Toggle";
+        case eTakeOver:         return @"TakeOver";
     }
 }
 
@@ -362,7 +384,7 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
         else if(remoteORCARunning == eBad)          return @"NOT Connected";
         else if(remoteORCARunning == eBeingChecked) return @"Being Checked";
     }
-    else if(missedHeartbeatCount<3){
+    else if(missedHeartbeatCount<kMaxHungCount){
         return [NSString stringWithFormat:@"Missed %d Heartbeat%@",missedHeartbeatCount,missedHeartbeatCount>1?@"s":@""];
     }
     return @"Hung";
@@ -444,10 +466,11 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
     self = [super init];
     
     [[self undoManager] disableUndoRegistration];
-    [self setIpNumber2:[decoder decodeObjectForKey: @"ipNumber2"]];
-    [self setIpNumber1:[decoder decodeObjectForKey: @"ipNumber1"]];
-    [self setStealthMode2:[decoder decodeBoolForKey: @"stealthMode2"]];
-    [self setStealthMode1:[decoder decodeBoolForKey: @"stealthMode1"]];
+    [self setIpNumber2:     [decoder decodeObjectForKey: @"ipNumber2"]];
+    [self setIpNumber1:     [decoder decodeObjectForKey: @"ipNumber1"]];
+    [self setStealthMode2:  [decoder decodeBoolForKey:   @"stealthMode2"]];
+    [self setStealthMode1:  [decoder decodeBoolForKey:   @"stealthMode1"]];
+    [self setSbcRootPwd:    [decoder decodeObjectForKey: @"sbcRootPwd"]];
     
     wasRunning = [decoder decodeBoolForKey: @"wasRunning"];
     [[self undoManager] enableUndoRegistration];
@@ -464,13 +487,13 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
     [encoder encodeBool:stealthMode2    forKey: @"stealthMode2"];
     [encoder encodeBool:stealthMode1    forKey: @"stealthMode1"];
     [encoder encodeBool:wasRunning      forKey: @"wasRunning"];
+    [encoder encodeObject:sbcRootPwd    forKey: @"sbcRootPwd"];
 }
 
 - (NSUndoManager *)undoManager
 {
     return [[[NSApp delegate]document]  undoManager];
 }
-
 
 - (void) postConnectionAlarm
 {
@@ -555,6 +578,22 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
     [runProblemAlarm clearAlarm];
     runProblemAlarm = nil;
 }
+- (void) postListModAlarm
+{
+    if(!listModAlarm){
+        listModAlarm = [[ORAlarm alloc] initWithName:@"Readout List Modified" severity:kHardwareAlarm];
+        [listModAlarm setHelpString:@"There was a problem with one of the SBCs, so the offending object was removed from the readout list"];
+        [listModAlarm setSticky:NO];
+    }
+    [listModAlarm postAlarm];
+}
+
+
+- (void) clearListModAlarm
+{
+    [listModAlarm clearAlarm];
+    listModAlarm = nil;
+}
 
 #pragma mark •••Finite State Machines
 - (void) step
@@ -571,16 +610,18 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
         case ePrimary:      [self stepPrimarySystem];   break;
         case eSecondary:    [self stepSecondarySystem]; break;
         case eHealthyToggle:[self stepHealthyToggle];   break;
+        case eTakeOver:     [self stepTakeOver];        break;
     }
     
     if(state!=eIdle)[self performSelector:@selector(step) withObject:nil afterDelay:stepTime];
 }
 
+//------------------------------------------------------------------
+//Neither system is running. Just check the other system and ensure that the network is alive
+//and that ORCA is running. If a run is started on a machine, that machine will become primary
+//and the other one will become secondary
 - (void) stepSimpleWatch
 {
-    //Neither system is running. Just check the other system and ensure that the network is alive
-    //and that ORCA is running. If a run is started on a machine, that machine will become primary
-    //and the other one will become secondary
     switch (state){
         case eStarting:
             [self setRemoteMachineReachable:eBeingChecked];
@@ -644,10 +685,11 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
 
 }
 
+//------------------------------------------------------------------
+//We are the primary, we are taking data. We will just monitor the other
+//system to ensure that it is alive. If not, all we do is post an alarm.
 - (void) stepPrimarySystem
 {
-    //We are the primary, we are taking data. We will just monitor the other
-    //system to ensure that it is alive. If not, all we do is post an alarm.
     switch (state){
         case eStarting:
             [self setRemoteMachineReachable:eBeingChecked];
@@ -698,12 +740,12 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
         default: break;
     }
 }
-
+//------------------------------------------------------------------
+//We are the secondary system -- the machine in waiting. We monitor the other machine and
+//if it dies, we have to take over and take control of the run
+//this sentry type should not be run unless the connection is open and we are ready to take over
 - (void) stepSecondarySystem
 {
-    //We are the secondary system -- the machine in waiting. We monitor the other machine and
-    //if it dies, we have to take over and take control of the run
-    //this sentry type should not be run unless the connection is open and we are ready to take over
     switch (state){
         case eStarting:
             [self setRemoteRunInProgress:eBeingChecked];
@@ -731,17 +773,23 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
     }
 }
 
+//------------------------------------------------------------------
+//The System is running, but the user requested a toggle. Just do it
+//
 - (void) stepHealthyToggle
 {
     switch (state){
         case eStarting:
             loopTime = 0;
             ignoreRunStates = YES;
-            if([runControl isRunning]){
-                [runControl stopRun];
+            [self appendToSentryLog:@"Toggling healthy systems"];
+           if([runControl isRunning]){
+               [self appendToSentryLog:@"Stopping local run."];
+               [runControl stopRun];
                 [self setNextState:eWaitForLocalRunStop stepTime:.1];
             }
             else if (remoteRunInProgress == eYES){
+                [self appendToSentryLog:@"Stopping remote run."];
                 [self sendCmd:@"[RunControl stopRun];"];
                 [self setNextState:eWaitForRemoteRunStop stepTime:.1];
             }
@@ -749,43 +797,45 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
             
         case eWaitForLocalRunStop:
             if(![runControl isRunning]){
+                [self appendToSentryLog:@"Local run stopped."];
                 [self sendCmd:@"[RunControl startRun];"];
                 [self setNextState:eWaitForRemoteRunStart stepTime:.1];
                 loopTime = 0;
            }
             else {
-                if(loopTime>10.){
+                if(loopTime>10){
                     //something is seriously wrong...
+                    [self appendToSentryLog:[NSString stringWithFormat:@"Local run didn't stop after %.0f seconds.\n",loopTime]];
+
                     [self postRunProblemAlarm:@"Local Run didn't stop"];
                     [self setSentryType:eNeither];
                     [self setNextState:eStarting stepTime:.1];
                     [self step];
                 }
-                else [self setNextState:eWaitForLocalRunStop stepTime:.1];
             }
             break;
             
         case eWaitForRemoteRunStop:
             if(remoteRunInProgress == eNO){
-                [runControl startRun];
+                [self appendToSentryLog:@"Starting local run."];
+               [runControl startRun];
                 [self setNextState:eWaitForLocalRunStart stepTime:.1];
                 loopTime = 0;
             }
             else {
                 if(loopTime>10){
-                    //something is seriously wrong...
+                    [self appendToSentryLog:[NSString stringWithFormat:@"Remote run didn't stop after %.0f seconds.\n",loopTime]];
                     [self postRunProblemAlarm:@"Remote Run didn't stop"];
                     [self setSentryType:eNeither];
                     [self setNextState:eStarting stepTime:.1];
                     [self step];
                 }
-                else [self setNextState:eWaitForRemoteRunStop stepTime:.1];
             }
            break;
  
         case eWaitForLocalRunStart:
             if([runControl isRunning]){
-                //all is good
+                [self appendToSentryLog:@"Local Run Started OK"];
                 ignoreRunStates = NO;
                 [self setSentryType:ePrimary];
                 [self setNextState:eGetSecondaryState stepTime:.1];
@@ -794,20 +844,19 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
             }
             else {
                 if(loopTime>10){
-                    ignoreRunStates = NO;
-                  //something is seriously wrong...
+                    [self appendToSentryLog:[NSString stringWithFormat:@"Local run didn't start after %.0f seconds.\n",loopTime]];
+                     ignoreRunStates = NO;
                     [self postRunProblemAlarm:@"Local Run didn't start"];
                     [self setSentryType:eNeither];
                     [self setNextState:eStarting stepTime:.1];
                     [self step];
                 }
-                else [self setNextState:eWaitForLocalRunStart stepTime:.1];
             }
             break;
             
         case eWaitForRemoteRunStart:
             if(remoteRunInProgress == eYES){
-                //all is good
+                [self appendToSentryLog:@"Remote Run Started OK"];
                 ignoreRunStates = NO;
                 [self setSentryType:eSecondary];
                 [self setNextState:eGetRunState stepTime:.1];
@@ -815,14 +864,13 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
             }
             else {
                 if(loopTime>10){
-                    //something is seriously wrong...
+                    [self appendToSentryLog:[NSString stringWithFormat:@"Remote run didn't start after %.0f seconds.\n",loopTime]];
                     ignoreRunStates = NO;
                     [self postRunProblemAlarm:@"Remote Run didn't start"];
                     [self setSentryType:eSecondary];
                     [self setNextState:eStarting stepTime:.1];
                     [self step];
                 }
-                else [self setNextState:eWaitForRemoteRunStart stepTime:.1];
             }
             break;
 
@@ -831,6 +879,156 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
             break;
 
             
+        default: break;
+    }
+}
+//------------------------------------------------------------------
+//Something is wrong with the other machine. It is hung or it dropped the
+//connection to this machine. Either way we will take over the run.
+//The main idea here is to kill the sbc readouts to prepare for the restart,
+//then try and figure out if the sbcs are healthy, and then restart from
+//this machine.
+- (void) stepTakeOver
+{
+    switch (state){
+        case eStarting:
+            [unPingableSBCs release];
+            unPingableSBCs= nil;
+            [self setNextState:eKillCrates stepTime:.1];
+            break;
+            
+        case eKillCrates:
+            [self appendToSentryLog:@"Killing Crates"];
+            for(id anSBC in sbcs)[[anSBC sbcLink] killCrate];
+            [self setNextState:eKillCrateWait stepTime:.1];
+            loopTime = 0;
+            break;
+            
+        case eKillCrateWait:
+            if(loopTime >= 2)[self setNextState:eStartCrates stepTime:.1];
+            break;
+  
+        case ePingCrates:
+            [self appendToSentryLog:@"Pinging Crates"];
+            for(id anSBC in sbcs)[[anSBC sbcLink] pingOnce];
+            [self setNextState:eWaitForPing stepTime:2];
+            loopTime = 0;
+         break;
+  
+        case eWaitForPing:
+            if(loopTime >= 2){
+                if([unPingableSBCs count] == [sbcs count]){
+                    [self appendToSentryLog:@"None of the SBCs responded to ping"];
+                    [self setNextState:eBootCrates stepTime:.1];
+                }
+                else {
+                    [self appendToSentryLog:@"Some of the SBCs responded to ping. Some didn't -- they are removed from readout list"];
+
+                    [self removeFromReadoutList:unPingableSBCs];
+                    [self setNextState:eStartCrates stepTime:2];
+                    [self postListModAlarm];
+                }
+            }
+            else {
+                if(!unPingableSBCs) unPingableSBCs = [[NSMutableArray arrayWithArray:sbcs]retain];
+                for(id anSBC in sbcs){
+                    if([[anSBC sbcLink]pingedSuccessfully]){
+                        [unPingableSBCs removeObject:anSBC];
+                    }
+                }
+                if([unPingableSBCs count] == 0){
+                    [self appendToSentryLog:@"All SBCs responded to ping"];
+                    [self setNextState:eStartCrates stepTime:2];
+                }
+            }
+            break;
+
+            
+        case eStartCrates:
+            for(id anSBC in sbcs){
+                if(![unPingableSBCs containsObject:anSBC]){
+                    if([[anSBC sbcLink] isConnected]){
+                        [self appendToSentryLog:[NSString stringWithFormat:@"Start crate @ %@",[[anSBC sbcLink] IPNumber]]];
+
+                        [[anSBC sbcLink] startCrate];
+                    }
+                }
+            }
+            [self setNextState:eStartCrateWait stepTime:.1];
+            loopTime = 0;
+            break;
+            
+        case eStartCrateWait:
+            if(loopTime >= 5){
+                [self appendToSentryLog:@"One or more crates didn't restart"];
+                [self setNextState:eBootCrates stepTime:.1];
+            }
+            else {
+                int connectedSBCCount=0;
+                for(id anSBC in sbcs){
+                    if(![unPingableSBCs containsObject:anSBC]){
+                        if([[anSBC sbcLink]isConnected]){
+                            connectedSBCCount++;
+                        }
+                    }
+                }
+                if(connectedSBCCount == ([sbcs count]-[unPingableSBCs count])){
+                    [self setNextState:eStartRun stepTime:.1];
+                }
+            }
+            break;
+
+        case eStartRun:
+            [self appendToSentryLog:@"Try to start run"];
+            [[ORGlobal sharedGlobal] removeRunVeto:@"Secondary"];
+            [runControl startRun];
+            [self setNextState:eCheckRun stepTime:.1];
+            loopTime = 0;
+            break;
+
+        case eCheckRun:
+            if(loopTime >= 5){
+                [self appendToSentryLog:@"Run failed to start."];
+                [self setNextState:eBootCrates stepTime:.1];
+            }
+            else if([runControl isRunning]){
+                [self appendToSentryLog:@"Now running again"];
+                [self setSentryType:ePrimary];
+                [self setNextState:eStarting stepTime:.1];
+            }
+            else [self setNextState:eCheckRun stepTime:.1];
+            break;
+  
+        case eBootCrates:
+            if(!triedBooting){
+                [self appendToSentryLog:@"Takeover failed after one reboot"];
+                [self postRunProblemAlarm:@"Local Run didn't stop"];
+                [self setNextState:eStopping stepTime:.1];
+            }
+            else {
+                triedBooting = YES;
+                for(id anSBC in sbcs)[[anSBC sbcLink] shutDown:sbcRootPwd reboot:YES];
+                [self setNextState:eWaitForBoot stepTime:.1];
+                loopTime = 0;
+            }
+            break;
+
+            
+        case eWaitForBoot:
+            stepTime = 5;
+            if(loopTime >= 45){
+                [self appendToSentryLog:@"Wait for reboot over"];
+                [self setNextState:eStarting stepTime:.1];
+            }
+           break;
+        
+            
+        case eStopping:
+            [self setSentryType:eNeither];
+            [self setNextState:eIdle stepTime:.1];
+            [self finish];
+            break;
+
         default: break;
     }
 }
@@ -851,16 +1049,25 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
 
 - (void) takeOverRunning
 {
-    //switch over to being the primary system
-    [[ORGlobal sharedGlobal] removeRunVeto:@"Secondary"];
-    [self setSentryType:ePrimary];
+    NSLogColor([NSColor redColor],@"Something is wrong so the secondary system is attempting a takeover\n");
+    triedBooting = NO;
+    [self setSentryType:eTakeOver];
     [self setNextState:eStarting stepTime:.2];
-    //do the start up...
-    // 1) double check the SBCs
-    // 2) set up RunControl
-    // 3) start a run
+    [self step];
 }
 
+- (void) appendToSentryLog:(NSString*)aString
+{
+    NSLog(@"%@\n",aString);
+    if(!sentryLog)sentryLog = [[NSMutableArray array] retain];
+    if(aString)[sentryLog addObject:aString];
+}
+
+- (void) flushSentryLog
+{
+    [sentryLog release];
+    sentryLog = nil;
+}
 
 #pragma mark •••Helpers
 - (void) ping
@@ -880,11 +1087,34 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
             [aSequence setVerbose:NO];
             [aSequence setTextToDelegate:YES];
             [aSequence launch];
-            [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryPingTask object:self];
         }
     }
     else {
         [pingTask terminate];
+    }
+}
+
+- (void) pingSBC:(id)anSBC
+{
+    if(!sbcPingTasks)sbcPingTasks = [[NSMutableDictionary dictionary] retain];
+    NSTask* aPingTask = [sbcPingTasks objectForKey:anSBC];
+    
+    if(!aPingTask){
+
+        ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
+        aPingTask = [[NSTask alloc] init];
+        [sbcPingTasks setObject:aPingTask forKey:anSBC];
+        [aPingTask setLaunchPath:@"/sbin/ping"];
+        [aPingTask setArguments: [NSArray arrayWithObjects:@"-c",@"1",@"-t",@"10",@"-q",otherSystemIP,nil]];
+        
+        [aSequence addTaskObj:aPingTask];
+        [aSequence setVerbose:NO];
+        [aSequence setTextToDelegate:YES];
+        [aSequence launch];
+        
+    }
+    else {
+        [aPingTask terminate];
     }
 }
 
@@ -956,6 +1186,19 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
 
 }
 
+- (void) removeFromReadoutList:(NSArray*)someObjects
+{
+    [[self undoManager] disableUndoRegistration];
+
+    NSArray* dataTasks = [[[[NSApp delegate ]document] collectObjectsOfClass:NSClassFromString(@"ORDataTaskModel")]retain];
+    for(id aDataTask in dataTasks){
+        for(id anObj in someObjects){
+            [aDataTask removeObject:anObj];
+        }
+    }
+    [[self undoManager] enableUndoRegistration];
+}
+
 #pragma mark ***Delegate Methods
 - (void) netsocketConnected:(id)aSocket
 {
@@ -1004,13 +1247,23 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
     [self sendCmd:[NSString stringWithFormat:@"[RunControl setQuickStart:%d];",[runControl quickStart]]];
     [self sendCmd:[NSString stringWithFormat:@"[RunControl setOfflineRun:%d];",[runControl offlineRun]]];
     [self sendCmd:@"runStatus = [RunControl runningState];"];
+    
+    for(id aShaper in shapers){
+        int i;
+        for(i=0;i<8;i++){
+            [self sendCmd:[NSString stringWithFormat:@"[%@ setThreshold:%d withValue:%d];",[aShaper fullID],i,[aShaper threshold:i]]];
+            [self sendCmd:[NSString stringWithFormat:@"[%@ setGain:%d withValue:%d];",[aShaper fullID],i,[aShaper threshold:i]]];
+
+        }
+        
+    }
 }
 
 - (void) startHeartbeatTimeout
 {
     [self clearOrcaHungAlarm];
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(missedHeartBeat) object:nil];
-    [self performSelector:@selector(missedHeartBeat) withObject:nil afterDelay:45];
+    [self performSelector:@selector(missedHeartBeat) withObject:nil afterDelay:40];
     missedHeartbeatCount = 0;
 }
 
@@ -1022,11 +1275,11 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
 - (void) missedHeartBeat
 {
     missedHeartbeatCount++;
-    if(missedHeartbeatCount>=3){
+    if(missedHeartbeatCount>=kMaxHungCount){
         [self postOrcaHungAlarm];
     }
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(missedHeartBeat) object:nil];
-    [self performSelector:@selector(missedHeartBeat) withObject:nil afterDelay:45];
+    [self performSelector:@selector(missedHeartBeat) withObject:nil afterDelay:40];
     [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryMissedHeartbeat object:self];
 
 }
@@ -1072,4 +1325,6 @@ NSString* HaloSentryMissedHeartbeat = @"HaloSentryMissedHeartbeat";
         }
     }
 }
+                     
+                     
 @end
