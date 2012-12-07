@@ -127,6 +127,7 @@
 		2D24A8D8126F516D00BA2E2E /* SimStart.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2D24A8CE126F516D00BA2E2E /* SimStart.tif */; };
 		2D24A8D9126F516D00BA2E2E /* SimStop.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2D24A8CF126F516D00BA2E2E /* SimStop.tif */; };
 		2D24A8DF126F543400BA2E2E /* Fieldline.gif in Resources */ = {isa = PBXBuildFile; fileRef = 2D24A8DE126F543400BA2E2E /* Fieldline.gif */; };
+		2D2AEA001672892C0057E424 /* ipe4reader.cpp in EdelweissSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2D2AE9FF1672892C0057E424 /* ipe4reader.cpp */; };
 		2D2C84070F4EC6640005D69F /* ORIpeSlowControlDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D2C84040F4EC6640005D69F /* ORIpeSlowControlDecoder.h */; };
 		2D2C84080F4EC6650005D69F /* ORIpeSlowControlDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D2C84050F4EC6640005D69F /* ORIpeSlowControlDecoder.m */; };
 		2D51C60A15B5A115000F0ACD /* EdelweissFLT.nib in Resources */ = {isa = PBXBuildFile; fileRef = 2D51C60115B5A115000F0ACD /* EdelweissFLT.nib */; };
@@ -2967,6 +2968,7 @@
 			dstPath = EdelweissSLTv4_Readout_Code;
 			dstSubfolderSpec = 7;
 			files = (
+				2D2AEA001672892C0057E424 /* ipe4reader.cpp in EdelweissSLTv4_Copy */,
 				2D12EE86150FE96900EBD8A2 /* OREdelweissSLTv4Readout.hh in EdelweissSLTv4_Copy */,
 				2D12EE83150FE95100EBD8A2 /* OREdelweissFLTv4Readout.hh in EdelweissSLTv4_Copy */,
 				2D12EE80150FE93700EBD8A2 /* IpeEdelweissV4SLTScript in EdelweissSLTv4_Copy */,
@@ -3269,6 +3271,7 @@
 		2D24A8CE126F516D00BA2E2E /* SimStart.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = SimStart.tif; sourceTree = "<group>"; };
 		2D24A8CF126F516D00BA2E2E /* SimStop.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = SimStop.tif; sourceTree = "<group>"; };
 		2D24A8DE126F543400BA2E2E /* Fieldline.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Fieldline.gif; sourceTree = "<group>"; };
+		2D2AE9FF1672892C0057E424 /* ipe4reader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ipe4reader.cpp; path = EdelweissSLT/EdelweissSLTv4_Readout_Code/ipe4reader.cpp; sourceTree = "<group>"; };
 		2D2C84040F4EC6640005D69F /* ORIpeSlowControlDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORIpeSlowControlDecoder.h; path = "IPE SlowControl/ORIpeSlowControlDecoder.h"; sourceTree = "<group>"; };
 		2D2C84050F4EC6640005D69F /* ORIpeSlowControlDecoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORIpeSlowControlDecoder.m; path = "IPE SlowControl/ORIpeSlowControlDecoder.m"; sourceTree = "<group>"; };
 		2D51C60115B5A115000F0ACD /* EdelweissFLT.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = EdelweissFLT.nib; path = EdelweissFLT/EdelweissFLT.nib; sourceTree = "<group>"; };
@@ -6290,6 +6293,7 @@
 		2D12EEA1150FEB2F00EBD8A2 /* EdelweissSLTv4_Readout_Code */ = {
 			isa = PBXGroup;
 			children = (
+				2D2AE9FF1672892C0057E424 /* ipe4reader.cpp */,
 				2D12EE84150FE96200EBD8A2 /* OREdelweissSLTv4Readout.hh */,
 				2D12EE81150FE94A00EBD8A2 /* OREdelweissFLTv4Readout.hh */,
 				2D12EE7E150FE93100EBD8A2 /* IpeEdelweissV4SLTScript */,

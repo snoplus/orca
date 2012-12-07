@@ -290,7 +290,7 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 {
 	[pixelBusEnableRegTextField setIntValue: [model pixelBusEnableReg]];
 	int i;
-	for(i=0;i<16;i++){
+	for(i=0;i<19;i++){
 		[[pixelBusEnableRegMatrix cellWithTag:i] setIntValue: ([model pixelBusEnableReg] & (0x1 <<i))];
 	}    
 
@@ -687,7 +687,7 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
 //	[model setPixelBusEnableReg:[sender intValue]];	
 	int i, val=0;
-	for(i=0;i<16;i++){
+	for(i=0;i<20;i++){
 		if([[sender cellWithTag:i] intValue]) val |= (0x1<<i);
 	}
 	[model setPixelBusEnableReg:val];
@@ -1091,6 +1091,13 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 - (IBAction) resetFLTAction:(id)sender			{ [self do:@selector(writeFltReset) name:@"FLT Reset"]; }
 - (IBAction) resetSLTAction:(id)sender			{ [self do:@selector(writeSltReset) name:@"SLT Reset"]; }
 - (IBAction) evResAction:(id)sender		        { [self do:@selector(writeEvRes) name:@"EvRes"]; }
+
+- (IBAction) installIPE4readerAction:(id)sender
+{
+ 	//
+    NSLog(@"%@::%@: still under construction\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+}
+
 
 - (IBAction) sendCommandScript:(id)sender
 {

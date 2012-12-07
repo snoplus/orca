@@ -1,0 +1,692 @@
+/***************************************************************************
+    ipe4reader5.h  -  description: header file  for the IPE4 Edelweiss firmware readout loop
+    
+	history: see *.cpp file
+
+    begin                : Jan 07 2012
+    copyright            : (C) 2012 by Till Bergmann, KIT
+    email                : Till.Bergmann@kit.edu
+ ***************************************************************************/
+
+//This is the version of the IPE4 readout code (display is: version/1000, so cew_controle will e.g. display 1934003 as 1934.003) -tb-
+
+/*--------------------------------------------------------------------
+  includes
+  --------------------------------------------------------------------*/
+  #include <stdint.h>  //for uint32_t etc.
+
+//networking / UDP includes
+#include <arpa/inet.h>
+#include <netinet/in.h>
+//#include <stdio.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <unistd.h>
+
+
+/*--------------------------------------------------------------------
+ *    UDP packed definitions
+ *       data, IPE crate status  -tb-
+ *--------------------------------------------------------------------*/ //-tb-
+
+//size: id + header + 21*16 + UDPFIFOmap + IPmap = (1 + 8 + 336 + 5 + 20) 32-bit words = 1480 bytes
+#define MAX_NUM_FLT_CARDS 20
+#define IPE_BLOCK_SIZE    16
+
+#define SIZEOF_UDPStructIPECrateStatus 1480
+
+typedef struct{
+    //identification
+    union {
+	    uint32_t		id4;  //packet header: 16 bit id=0xFFD0 + 16 bit reserved
+	    struct {
+	        uint16_t id0; 
+	        uint16_t id1;};
+	};
+	
+    //header
+	uint32_t		presentFLTMap;
+	uint32_t		reserved0;
+	uint32_t		reserved1;
+	
+	//SLT info (16 words)
+	uint32_t    SLT[IPE_BLOCK_SIZE];                   //one 16 word32 block for the SLT
+
+    //FLT info (20x16 = 320 words)
+	uint32_t    FLT[MAX_NUM_FLT_CARDS][IPE_BLOCK_SIZE];//twenty FLTs, one 16 word32 block per each FLT
+    
+    //IP Adress Map (20 words)
+	uint32_t		IPAdressMap[MAX_NUM_FLT_CARDS];    //IP address map associated to the according SLT/HW FIFO
+    //Port Map      (10 words)
+	uint16_t		PortMap[MAX_NUM_FLT_CARDS];        //IP address map associated to the according SLT/HW FIFO
+}
+UDPStructIPECrateStatus;
+
+
+UDPStructIPECrateStatus IPECrateStatusPacket;
+
+
+//struct def of UDPStructIPECrateStatus in human readable format
+//----------------------------------------------------------------
+typedef struct{
+    uint32_t  SLTControlReg;
+    uint32_t  SLTStatusReg;
+    uint32_t  SLTVersionReg;
+    uint32_t  SLTPixbusEnableReg;
+    uint32_t  SLTTimeLowReg;
+    uint32_t  SLTTimeHighReg;
+    uint32_t  word6;
+    uint32_t  word7;
+    uint32_t  word8;
+    uint32_t  word9;
+    uint32_t  word10;
+    uint32_t  word11;
+    uint32_t  word12;
+    uint32_t  word13;
+    uint32_t  word14;
+    uint32_t  word15;
+}
+SLTBlock;
+
+typedef struct{
+    uint32_t  FLTStatusReg;
+    uint32_t  FLTControlReg;
+    uint32_t  FLTVersionReg;
+    uint32_t  FLTFiberSet_1Reg;
+    uint32_t  FLTFiberSet_2Reg;
+    uint32_t  FLTStreamMask_1Reg;
+    uint32_t  FLTStreamMask_2Reg;
+    uint32_t  FLTTriggerMask_1Reg;
+    uint32_t  FLTTriggerMask_2Reg;
+    uint32_t  word9;
+    uint32_t  word10;
+    uint32_t  word11;
+    uint32_t  word12;
+    uint32_t  word13;
+    uint32_t  word14;
+    uint32_t  word15;
+}
+FLTBlock;
+
+
+
+typedef struct{
+	uint16_t id0;   //=0xFFD0
+	uint16_t id1;
+	
+    //header
+	uint32_t		presentFLTMap;
+	uint32_t		reserved0;
+	uint32_t		reserved1;
+	
+	
+	//SLT info
+	SLTBlock    SLT;            //one 16 word32 block for the SLT
+
+    //FLT info
+	FLTBlock    FLT[MAX_NUM_FLT_CARDS];//twenty FLTs, one 16 word32 block per each FLT
+    
+    
+    //IP Adress Map (20 words)
+	uint32_t		IPAdressMap[MAX_NUM_FLT_CARDS];    //IP address map associated to the according SLT/HW FIFO
+    //Port Map      (10 words)
+	uint16_t		PortMap[MAX_NUM_FLT_CARDS];        //IP address map associated to the according SLT/HW FIFO
+    
+}
+UDPStructIPECrateStatus2;
+
+
+/*--------------------------------------------------------------------
+ *    function prototypes
+ *       TODO: function prototypes: move to include file somewhen in the future  -tb-
+ *--------------------------------------------------------------------*/ //-tb-
+void handleKCommand(char *buffer, int len, struct sockaddr_in *sockaddr_from);
+int readConfigFile(char *filename);
+int parseConfigFileLine(char *line);
+
+
+/*--------------------------------------------------------------------
+  globals and functions for hardware access
+  --------------------------------------------------------------------*/
+  //this is for the global K command UDP server (write requests) and the client (read requests)
+	//open port to listen for / server port
+	//    use netcat to test the commans: eg. nc -u 192.168.1.105 9940
+	//    means: connect to crate with IP 192.168.1.105 listening on port 9940;
+	//    now type any string in the netcat console, it will be sent to the crate
+	int  GLOBAL_UDP_SERVER_SOCKET=-1;
+	int  GLOBAL_UDP_SERVER_PORT=9940;
+	char  GLOBAL_UDP_SERVER_IP_ADDR[1024]="0.0.0.0";
+	uint32_t  GLOBAL_UDP_SERVER_IP=0;
+    struct sockaddr_in GLOBAL_servaddr;
+    struct sockaddr_in sockaddr_from;
+    socklen_t sockaddr_fromLength;
+    
+	//open port to write for / client port
+	int  GLOBAL_UDP_CLIENT_SOCKET;
+	int  GLOBAL_UDP_CLIENT_PORT=9940;
+	char  GLOBAL_UDP_CLIENT_IP_ADDR[1024]="0.0.0.0";
+	uint32_t  GLOBAL_UDP_CLIENT_IP;
+    //struct sockaddr_in GLOBAL_clientaddr;
+    struct sockaddr_in GLOBAL_sockaddrin_to;
+    socklen_t  GLOBAL_sockaddrin_to_len;//=sizeof(GLOBAL_sockin_to);
+    
+    struct sockaddr sock_to;
+    int sock_to_len;//=sizeof(si_other);
+
+//static client ----------
+// not used any more ...
+  //struct sockaddr_in si_other;
+  //int si_other_len;//=sizeof(si_other);
+
+//states for FifoReader: FifoReaderState
+enum FIFOREADERSTATE {
+    frUNDEF       = 0,
+    frIDLE        = 1,
+    frINITIALIZED = 2,
+    frSTREAMING   = 3
+ };
+ 
+//bitmasks for some registers
+int fiberEnableMask = 0x003f0000;  //TODO: make global!!! -tb-
+int modeMask =        0x00000070;  //TODO: make global!!! -tb-
+int BBversionMask =   0x00003f00;  //TODO: make global!!! -tb-
+
+// aux definitions
+uint32_t bit0  = 0x00000001;
+uint32_t bit1  = 0x00000002;
+uint32_t bit2  = 0x00000004;
+uint32_t bit3  = 0x00000008;
+uint32_t bit4  = 0x00000010;
+uint32_t bit5  = 0x00000020;
+uint32_t bit6  = 0x00000040;
+uint32_t bit7  = 0x00000080;
+uint32_t bit8  = 0x00000100;
+uint32_t bit9  = 0x00000200;
+uint32_t bit10 = 0x00000400;
+uint32_t bit11 = 0x00000800;
+uint32_t bit12 = 0x00001000;
+uint32_t bit13 = 0x00002000;
+uint32_t bit14 = 0x00004000;
+uint32_t bit15 = 0x00008000;
+
+uint32_t bit16 = 0x00010000;
+uint32_t bit17 = 0x00020000;
+uint32_t bit18 = 0x00040000;
+uint32_t bit19 = 0x00080000;
+uint32_t bit20 = 0x00100000;
+uint32_t bit21 = 0x00200000;
+uint32_t bit22 = 0x00400000;
+uint32_t bit23 = 0x00800000;
+uint32_t bit24 = 0x01000000;
+uint32_t bit25 = 0x02000000;
+uint32_t bit26 = 0x04000000;
+uint32_t bit27 = 0x08000000;
+uint32_t bit28 = 0x10000000;
+uint32_t bit29 = 0x20000000;
+uint32_t bit30 = 0x40000000;
+uint32_t bit31 = 0x80000000;
+
+uint32_t bit[32] = {
+bit0  ,
+bit1  ,
+bit2  ,
+bit3  ,
+bit4  ,
+bit5  ,
+bit6  ,
+bit7  ,
+bit8  ,
+bit9  ,
+bit10 ,
+bit11 ,
+bit12 ,
+bit13 ,
+bit14 ,
+bit15 ,
+
+bit16 ,
+bit17 ,
+bit18 ,
+bit19 ,
+bit20 ,
+bit21 ,
+bit22 ,
+bit23 ,
+bit24 ,
+bit25 ,
+bit26 ,
+bit27 ,
+bit28 ,
+bit29 ,
+bit30 ,
+bit31 
+};
+
+/*--------------------------------------------------------------------
+  classes:
+  --------------------------------------------------------------------*/
+const int ascii=0, binary=1;
+	const int buflen=30000;
+	char buf_status284[buflen];
+	int buf_status284_len=0;
+	const uint32_t Preferred_FIFObuf8len = 1200016 * 2 * 6 * 20;  //1200000 = max. number of ADC data in 1 sec (BB2) + 4 x word32 (sec strobe pattern); ... 
+	                                                              //1200000 on one fiber per sec; 6 fibers per FLT; 20 FLTs per crate; 2 - some spare space in buffer
+                                                                
+
+
+    #if 0 //is now member of class FIFOREADER - remove -tb-
+	const uint32_t FIFObuf8len =  1200016 * 2 * 6 * 20;  //1200000 = max. number of ADC data in 1 sec (BB2) + 4 x word32 (sec strobe pattern)
+	                                                    //1200000 on one fiber per sec; 6 fibers per FLT; 20 FLTs per crate; 2 - some spare space in buffer
+	const uint32_t FIFObuf16len = FIFObuf8len / 2;
+	const uint32_t FIFObuf32len = FIFObuf8len / 4;
+    #endif
+
+	const uint32_t FIFOBlockSize = 8 * 1024; //TODO: FIFOBlockSize: <------ adjust to your needs; later go to 8192 (the maximum) -tb- 
+
+class FIFOREADER{
+public:
+    //ctor
+    FIFOREADER(){
+	    initVars();
+	}
+    
+    //destructor not implemented ...
+    //TODO: dealloc FIFObuf8; ...
+	
+	//FIFO data handling
+	void readFIFOtoFIFObuffer(void);
+    void scanFIFObuffer(void);	
+    int openAsciiFile(int udpdataSec, int write2file_len_sec);
+    int openBinaryFile(int utc, int write2file_len_sec);
+    int writeToAsciiFile(const char *buf, size_t n, int udpdataSec);
+	
+	//UDP packet handling
+	void addUDPClient(int port,int numRequestedPackets);
+    void endUDPClientSockets();
+    static void endAllUDPClientSockets();
+    int initUDPClientSocket(void);
+    int sendtoClient(const void *buffer, size_t length);
+	void endUDPClientSocket(void);
+    int sendtoUDPClients(int flag, const void *buffer, size_t length);
+
+    int initUDPServerSocket(void);
+    int recvfromServer(unsigned char *readBuffer, int maxSizeOfReadbuffer);
+    void endUDPServerSocket(void);
+    static void initAllUDPServerSockets(void);
+    static void endAllUDPServerSockets(void);
+
+	
+	void initVars(){
+		//globals for config file options
+		readfifo=0;  //set to 1 to activate readout
+		numfifo=0;   //my index
+	    //show_debug_info=0;
+		
+		write2file=0;  // 0 = don't write to file; 1 = write file
+		write2file_len_sec=5;
+		write2file_format=0;
+		pFile =0;
+		
+        AddrLength = 0;
+		
+		MY_UDP_SERVER_IP = INADDR_ANY;
+		strcpy(MY_UDP_SERVER_IP_ADDR, "0.0.0.0");
+	    NB_CLIENT_UDP=0;		
+	    
+	    //int		numPacketsClient[_nb_max_clients_UDP] = {0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0};
+	    //int		status_client[_nb_max_clients_UDP]    = {0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0};
+	    for(int i=0; i<_nb_max_clients_UDP; i++){ numPacketsClient[i]=0; status_client[i]=0; }
+		
+		
+		//'static' client, configured in the config file
+		use_static_udp_client = 0;
+        //static client ----------
+        //struct sockaddr_in si_other;
+		si_other_len=sizeof(si_other);
+		
+		send_status_udp_packet = 1;
+		skip_num_status_bits = 0; //skip this number of status bits (we observed offsets between 0 and 2)
+		
+		//for use of dummy status bits
+		use_dummy_status_bits = 0;
+		
+		//FIFO buffer in RAM (malloc: request space; if failed try to alloc the half of this space etc. )
+        uint32_t  i,size=Preferred_FIFObuf8len;
+        for(i=0;i<10;i++){
+                printf("FIFOREADER::initVars: try to allocate %u byte (of %u requested bytes)\n",size, Preferred_FIFObuf8len);
+	        FIFObuf8=(char *)malloc(sizeof(char)*size);
+            if(FIFObuf8==NULL){//failed
+                size = size/2;
+                size = (size/4)*4;
+                if(size==0){ printf("FIFOREADER::initVars: Failed with malloc(...), exiting!\n"); exit(123); }
+            }else{//success
+                printf("FIFOREADER::initVars: allocated %u byte (of %u requested bytes) - OK\n",size, Preferred_FIFObuf8len);
+                FIFObuf8len=size;
+                if(size<0x10000){ printf("WARNING:   !!! allocated memory is <65536; BUFFER (probably) TOO SMALL!!\n"); /*exit(123);*/ }
+                break;
+            }
+        }
+	    FIFObuf16 = (int16_t *)FIFObuf8;
+	    FIFObuf32 = (int32_t *)FIFObuf8;
+        FIFObuf16len = FIFObuf8len / 2;
+        FIFObuf32len = FIFObuf8len / 4;
+	    popIndexFIFObuf32=0;
+	    pushIndexFIFObuf32=0;
+	    FIFObuf32avail=0;
+	    FIFObuf32counter=0;
+	    FIFObuf32counterlast=0;
+
+	    udpdata16 = (int16_t *)udpdata;
+	    udpdata32 = (int32_t *)udpdata;
+	    udpdataCounter = 0;
+		udpdataSec     = 0;
+	    numSent = 0;
+        udpdataByteCounter	 = 0;
+	
+	    globalHeaderWordCounter = 0; //TODO: globalHeaderWordCounter for testing -tb- 
+		
+	    mon_indice_status_bbv2 = 0;// <----   each FIFO (in multi-FIFO readout) needs own counter!
+	}
+	
+	//FIFOREADER as state machine: the state
+    static int	State;
+     
+	//globals for config file options
+	int readfifo;
+	int numfifo;
+	//int simulation_send_dummy_udp;
+	//int run_main_readout_loop; is global!
+	//int show_debug_info;
+	
+	int write2file;  // 0 = don't write to file; 1 = write file
+	int write2file_len_sec;
+	int write2file_format;
+	FILE * pFile ;
+	
+	
+	//open port to listen for / server port
+	int  MY_UDP_SERVER_SOCKET;
+	int  MY_UDP_SERVER_PORT;
+	uint32_t  MY_UDP_SERVER_IP; //obsolete, use MY_UDP_SERVER_IP_ADDR 
+	char MY_UDP_SERVER_IP_ADDR[1024];
+    struct sockaddr_in servaddr;
+    socklen_t AddrLength;
+	
+    // 'dynamic' clients ----------
+	int		NB_CLIENT_UDP;							//  serveur UDP
+	//_nb_max_clients_UDP defined in structure.h, default: 20
+	int		UDP_CLIENT_SOCKET[_nb_max_clients_UDP];
+	struct	sockaddr_in clientaddr_list[_nb_max_clients_UDP];
+	int		numPacketsClient[_nb_max_clients_UDP];// = {0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0};
+	int		status_client[_nb_max_clients_UDP];//    = {0,0,0,0,0,0,0,0,0,0,    0,0,0,0,0,0,0,0,0,0};
+	
+	//'static' client, configured in the config file (DEPRECATED, use dynamic client)
+	int  use_static_udp_client;
+	int		MY_UDP_CLIENT_SOCKET;
+	struct	sockaddr_in cliaddr;
+	char MY_UDP_CLIENT_IP[1024];
+	int  MY_UDP_CLIENT_PORT;
+	//used in initUDPClientSocket, sendtoClient: could use local vars? -tb-
+    struct sockaddr_in si_other;
+    int si_other_len;//=sizeof(si_other);
+	
+	
+	int send_status_udp_packet;
+	int skip_num_status_bits; //skip this number of status bits (we observed offsets between 0 and 2)
+	
+	
+	//for use of dummy status bits
+	int use_dummy_status_bits;
+	
+	
+	Structure_trame_status Trame_status_udp;
+	
+	/*--------------------------------------------------------------------
+	 vars for FIFO buffer
+	 --------------------------------------------------------------------*/
+	uint32_t FIFObuf8len;// see Preferred_FIFObuf8len
+	uint32_t FIFObuf16len;// = FIFObuf8len / 2;
+	uint32_t FIFObuf32len;// = FIFObuf8len / 4;
+
+	//char * FIFObuf8[FIFObuf8len];
+	char * FIFObuf8;
+	int16_t * FIFObuf16;// = (int16_t *)FIFObuf8;
+	int32_t * FIFObuf32;// = (int32_t *)FIFObuf8;
+	uint32_t popIndexFIFObuf32;
+	uint32_t pushIndexFIFObuf32;
+	uint32_t FIFObuf32avail;
+	int64_t FIFObuf32counter;
+	int64_t FIFObuf32counterlast;
+	
+	uint32_t globalHeaderWordCounter; //TODO: globalHeaderWordCounter for testing -tb- 
+	
+	//scanning status bits
+	int mon_indice_status_bbv2;// <----   each FIFO (in multi-FIFO readout) needs own counter!
+	
+	/*--------------------------------------------------------------------
+	 vars for UDP packets
+	 --------------------------------------------------------------------*/
+	
+	//global vars for udp packet handling
+	static const int udpdatalen = 1500;
+	char udpdata[udpdatalen];
+	int16_t *udpdata16;// = (int16_t *)udpdata;
+	int32_t *udpdata32;// = (int32_t *)udpdata;
+	int udpdataCounter; //counts number of sent UDP packets
+	int udpdataByteCounter; //counts number of bytes of sent UDP packets
+	int udpdataSec ;    //second got from pattern 0x31170000....
+	int numSent ;
+	
+
+	/*--------------------------------------------------------------------
+	 vars for FIFO list
+	 --------------------------------------------------------------------*/
+	 static void initFIFOREADERList(){
+	     FifoReader = new FIFOREADER[maxNumFIFO];
+		 if(FifoReader==0){ printf("initFIFOREADERList: cannot allocate memory!\n"); exit(1); }
+		 
+		 for(int i=0; i<maxNumFIFO; i++){
+		     //no, ctor calls initVars ... FifoReader[i].initVars();
+			 FifoReader[i].numfifo=i;
+	     }
+	 }
+     static FIFOREADER	* FifoReader;
+	 static const int maxNumFIFO = 1; //FIFOREADER::maxNumFIFO
+};
+
+
+
+
+
+/*--------------------------------------------------------------------
+  globals and functions for hardware access
+  --------------------------------------------------------------------*/
+  
+  //TODO: make presentFLTMap a static member of FLTSETTINGS -tb-
+  
+class SLTSETTINGS{
+public:
+    SLTSETTINGS(){
+	    initVars();
+	}
+    uint32_t PixbusEnable;
+	void initVars(){
+		//
+		PixbusEnable=0x0;
+    }
+    
+    static void initSLTSETTINGS(){
+	     SLT = new SLTSETTINGS;
+		 if(SLT==0){ printf("initSLTSETTINGS: cannot allocate memory!\n"); exit(1); }
+		 
+	 }
+    static SLTSETTINGS * SLT;
+};
+	
+
+
+  
+class FLTSETTINGS{
+public:
+    FLTSETTINGS(){
+	    initVars();
+	}
+	
+	//FLT register
+	uint32_t fiberEnable;
+	uint32_t BBversionMask;
+	uint32_t mode; //tpix,tramp,tord = 000: Normal; 001: TM-Order; 010: TM-Ramp; 100: TM-PB
+	uint32_t fiberSet1;
+	uint32_t fiberSet2;
+	uint32_t streamMask1;
+	uint32_t streamMask2;
+	uint32_t triggerMask1;
+	uint32_t triggerMask2;
+	
+	uint32_t sendBBstatusMask;
+	
+	int32_t fltID;
+
+	void initVars(){
+		//
+		fiberEnable=0x0;
+		BBversionMask=0x0;
+		mode =0x0;
+		fiberSet1   =0x0;
+		fiberSet2   =0x0;
+	    streamMask1 =0x0;
+	    streamMask2 =0x0;
+	    triggerMask1=0x0;
+	    triggerMask2=0x0;
+	    
+	    sendBBstatusMask=0x0;
+    }
+    
+    
+    
+    static void initFLTSETTINGSList(){
+	     FLT = new FLTSETTINGS[maxNumFLT];
+		 if(FLT==0){ printf("initFLTSETTINGSList: cannot allocate memory!\n"); exit(1); }
+		 
+		 for(int i=0; i<maxNumFLT; i++){
+		     //no, ctor calls initVars ... FLT[i].initVars();
+			 FLT[i].fltID=i+1;
+	     }
+	 }
+
+    
+    static FLTSETTINGS * FLT;
+	static const int maxNumFLT = MAX_NUM_FLT_CARDS; //FLTSETTINGS::maxNumFLT
+};
+
+
+
+
+
+
+
+/*--------------------------------------------------------------------
+  unused
+  --------------------------------------------------------------------*/
+
+
+#if 0
+	//TODO: GLOBAL VARIABLES LIST
+	//globals for config file options
+	int numfifo=0;
+	int RECORDING_SEC=0;
+	int simulation_send_dummy_udp=0;
+	int run_main_readout_loop=1;
+	int show_debug_info=0;
+
+	int write2file=0;  // 0 = don't write to file; 1 = write file
+	int write2file_len_sec=5;
+	int write2file_format=0;
+	const int ascii=0, binary=1;
+	FILE * pFile =0;
+
+
+	//open port to listen for / server port
+	int  MY_UDP_SERVER_SOCKET;
+	int  MY_UDP_SERVER_PORT;
+	uint32_t  MY_UDP_SERVER_IP = INADDR_ANY;
+
+	//'static' client, configured in the config file
+	int  use_static_udp_client = 0;
+	int		MY_UDP_CLIENT_SOCKET;
+	struct	sockaddr_in cliaddr;
+	char MY_UDP_CLIENT_IP[1024];
+	int  MY_UDP_CLIENT_PORT;
+
+	int send_status_udp_packet = 1;
+	int skip_num_status_bits = 0; //skip this number of status bits (we observed offsets between 0 and 2)
+
+	//for use of dummy status bits
+	int use_dummy_status_bits = 0;
+		const int buflen=30000;
+		char buf_status284[buflen];
+		int buf_status284_len=0;
+
+
+	Structure_trame_status MY_STATUS;
+	Structure_trame_status *myStatusPtr;
+
+	//spike finder
+	int use_spike_finder = 1;
+	int32_t countSpikes=0;
+	int32_t secCountSpikes=0;
+	int32_t countSpikesChan[6]={0,0,0,0,0,0};
+	int32_t countSpikesVal[6]={0,0,0,0,0,0};//250-400, 400-1000, >1000
+	/*--------------------------------------------------------------------
+	  globals for FIFO buffer
+	  --------------------------------------------------------------------*/
+	const uint32_t FIFObuf8len = 1200016 * 8;  //1200000 = max. number of ADC data in 1 sec (BB2) + 4 x word32 (sec strobe pattern)
+	const uint32_t FIFObuf16len = FIFObuf8len / 2;
+	const uint32_t FIFObuf32len = FIFObuf8len / 4;
+	char * FIFObuf8[FIFObuf8len];
+	int16_t * FIFObuf16 = (int16_t *)FIFObuf8;
+	int32_t * FIFObuf32 = (int32_t *)FIFObuf8;
+	uint32_t popIndexFIFObuf32=0;
+	uint32_t pushIndexFIFObuf32=0;
+	uint32_t FIFObuf32avail=0;
+	int64_t FIFObuf32counter=0;
+	int64_t FIFObuf32counterlast=0;
+
+	uint32_t FIFOBlockSize = 4 * 1024; //TODO: FIFOBlockSize: later go to 8192 -tb- 
+
+	uint32_t globalHeaderWordCounter = 0; //TODO: globalHeaderWordCounter for testing -tb- 
+
+	// globals for sending commands (from cew.c)
+	//  par defaut, pour l'envoie de la premiere commande horloge : une bbv1 autonome
+	//  modifie par les valeurs du fichier config		
+	int	X=21;
+	int	Retard=16;
+	int	Masque_BB=2;
+	int	Nb_mots_lecture=3;					//is 3 for BB2, 2 for BBv21 mode!!!!!!!!!! -tb-    //marche pour un seul bolo	// nombre de mots total relut dans les data de la fifo:   -tb- d.h. Anzahl 32-bit-Worte(FIFO-Worte) pro (Time-)Sample (Sample=alle ADC-Kanaele
+	//int	Nb_mots_lecture=2;					//marche pour un seul bolo	// nombre de mots total relut dans les data de la fifo:
+	//int	Code_acqui=code_acqui_EDW_BB1;
+	int	Code_acqui=code_acqui_EDW_BB2;   // I prefer BB2 -tb-
+	int	Code_synchro=code_synchro_100000;	//+code_synchro_esclave_synchro+code_synchro_esclave_temps;
+	int	Nb_synchro=100000;					//  nombre d'echantillons entre 2 synchros
+#endif
+
+
+
+
+
+
+
+/*--------------------------------------------------------------------
+  UDP communication
+  --------------------------------------------------------------------*/
+
+/*--------------------------------------------------------------------
+  UDP communication - 1.) client communication
+  --------------------------------------------------------------------*/
+
+
+/*--------------------------------------------------------------------
+ *    function:     
+ *    purpose:      
+ *    author:       Till Bergmann, 2011
+ *--------------------------------------------------------------------*/ //-tb-
