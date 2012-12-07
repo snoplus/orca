@@ -94,6 +94,7 @@
 - (unsigned long)cycleRate;
 - (void) setCycleRate:(unsigned long)aRate;
 - (void) setRunMode:(int)runMode;
+- (void) removeOrcaObject:(id)anObject;
 
 #pragma mark ¥¥¥Run Management
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;

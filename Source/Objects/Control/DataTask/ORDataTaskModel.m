@@ -187,6 +187,11 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
     readOutList = someDataTakers;
 }
 
+- (void) removeOrcaObject:(id)anObject
+{
+    [readOutList removeOrcaObject:anObject];
+}
+
 - (unsigned long)cycleRate
 {
 	return cycleRate;
