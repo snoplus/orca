@@ -1840,7 +1840,7 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 		pingTask = [[NSTask alloc] init];
 		
 		[pingTask setLaunchPath:@"/sbin/ping"];
-		[pingTask setArguments: [NSArray arrayWithObjects:@"-c",@"1",@"-t",@"1",@"-q",IPNumber,nil]];
+		[pingTask setArguments: [NSArray arrayWithObjects:@"-c",@"3",@"-t",@"2",@"-q",IPNumber,nil]];
 		
 		[aSequence addTaskObj:pingTask];
 		[aSequence setVerbose:NO];
