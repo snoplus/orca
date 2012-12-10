@@ -1031,19 +1031,22 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
 		[self setGoScriptFailed:YES];
 		NSLogColor([NSColor redColor], @"%@\n",text);
 	}
-	else if([text rangeOfString:@"min/avg/max/stddev"].location!=NSNotFound){
-		NSScanner* scanner = [NSScanner scannerWithString:text];
-		[scanner scanUpToString:@"min/avg/max/stddev" intoString:nil];
-		[scanner scanUpToString:@"=" intoString:nil];
-		[scanner scanUpToString:@"/" intoString:nil];
-		[scanner setScanLocation:[scanner scanLocation]+1];
-		NSString* ave;
-		[scanner scanUpToString:@"/" intoString:&ave];
-        pingedSuccessfully = YES;
-	}
     else if([text rangeOfString:@"100.0% packet loss"].location != NSNotFound){
         pingedSuccessfully = NO;
     }
+    else if([text rangeOfString:@"0.0% packet loss"].location != NSNotFound){
+        pingedSuccessfully = YES;
+    }
+	else if([text rangeOfString:@"min/avg/max/stddev"].location!=NSNotFound){
+		//NSScanner* scanner = [NSScanner scannerWithString:text];
+		//[scanner scanUpToString:@"min/avg/max/stddev" intoString:nil];
+		//[scanner scanUpToString:@"=" intoString:nil];
+		//[scanner scanUpToString:@"/" intoString:nil];
+		//[scanner setScanLocation:[scanner scanLocation]+1];
+		//NSString* ave;
+		//[scanner scanUpToString:@"/" intoString:&ave];
+        pingedSuccessfully = YES;
+	}
 }
 
 - (BOOL) pingInProgress
