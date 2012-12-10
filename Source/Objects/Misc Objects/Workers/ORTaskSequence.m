@@ -92,7 +92,7 @@
 {
     if ([[aNote object] respondsToSelector:@selector(terminationStatus)] &&
         [[aNote object] terminationStatus] != 0) sawErrors = YES;
-	[self performSelector:@selector(movetoNextTask:) withObject:aNote afterDelay:0];
+	[self performSelector:@selector(movetoNextTask:) withObject:aNote afterDelay:.2];
 }
 
 - (void) movetoNextTask:(NSNotification*)aNote
