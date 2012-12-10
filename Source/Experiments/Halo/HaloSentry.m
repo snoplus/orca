@@ -702,6 +702,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
                 [self setNextState:eCheckRunState stepTime:1];
            }
             else {
+                if(!isConnected)[self connectSocket:YES];
                 [self setRemoteORCARunning:eBeingChecked];
                 [self setNextState:eCheckRemoteMachine stepTime:10];
             }
