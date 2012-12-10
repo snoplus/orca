@@ -874,7 +874,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
             break;
             
         case eKillCrateWait:
-            if(loopTime >= 2)[self setNextState:ePingCrates stepTime:.1];
+            if(loopTime >= 8)[self setNextState:ePingCrates stepTime:.1];
             break;
   
         case ePingCrates:
