@@ -1095,8 +1095,8 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
     //in that case, the other sentry could still be connected, so let it
     //handle tring to fix the syste. If the other sentry is not connected,
     //we will try to handle it here.
-    if([self remoteORCARunning]) [self toggleSystems];
-    else                         [self takeOverRunning:YES];
+    if([self remoteORCARunning]) [self connectSocket:NO];   //should force the other system's hand
+    else                         [self takeOverRunning:YES];//not connected anyway... try to fix it here
 }
 
 - (void) appendToSentryLog:(NSString*)aString
