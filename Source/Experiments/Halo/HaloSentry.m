@@ -178,8 +178,8 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
 {
     //the sbc socket was dropped. Most likely caused by the sbc readout process dying.
     ignoreRunStates = YES;
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(delayedTakeover) object:nil];
-    [self performSelector:@selector(delayedTakeover) withObject:nil afterDelay:5];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(handleSbcSocketDropped) object:nil];
+    [self performSelector:@selector(handleSbcSocketDropped) withObject:nil afterDelay:5];
 }
 
 
@@ -793,12 +793,45 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
         case eStarting:
             [self clearAllAlarms];
             [self setRemoteRunInProgress:eBeingChecked];
-            [self setNextState:eGetRunState stepTime:2];
+            [self setNextState:ePingCrates stepTime:2];
            break;
-                        
+            
+        case ePingCrates:
+            if(!unPingableSBCs) unPingableSBCs = [[NSMutableArray arrayWithArray:sbcs]retain];
+            for(id anSBC in sbcs)[[anSBC sbcLink] pingOnce];
+            [self setNextState:eWaitForPing stepTime:.2];
+            loopTime = 0;
+            break;
+            
+        case eWaitForPing:
+            if(loopTime >= 5){
+                if([unPingableSBCs count] == [sbcs count]){
+                    [self appendToSentryLog:@"**Couldn't ping any of the SBCs."];
+                }
+                else {
+                    [self appendToSentryLog:@"**Some of the SBCs responded to ping. Some didn't."];
+                }
+                //not much to do.. post alarm and stop. Intervention will be needed.
+                [self postPingAlarm];
+
+            }
+            else {
+                for(id anSBC in sbcs){
+                    if([[anSBC sbcLink]pingedSuccessfully]){
+                        [unPingableSBCs removeObject:anSBC];
+                    }
+                }
+                if([unPingableSBCs count] == 0){
+                    //all OK
+                    [self clearPingAlarm];
+                    [self setNextState:eGetRunState stepTime:2];
+                }
+            }
+            break;
+            
         case eGetRunState:
             if(isConnected && !orcaHungAlarm){
-                [self setNextState:eGetRunState stepTime:30];
+                [self setNextState:ePingCrates stepTime:30];
                 //we should get the runStatus at run boundaries, but we'll ask anyway
                 [self sendCmd:@"runStatus = [RunControl runningState];"];
             }
@@ -1052,12 +1085,18 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
 
 - (void) takeOverRunning
 {
+    //take over. don't be quite about it.
     [self takeOverRunning:NO];
 }
 
-- (void) delayedTakeover
+- (void) handleSbcSocketDropped
 {
-    [self takeOverRunning:YES];
+    //the socket could have dropped because the sbc readout task died
+    //in that case, the other sentry could still be connected, so let it
+    //handle tring to fix the syste. If the other sentry is not connected,
+    //we will try to handle it here.
+    if([self remoteORCARunning]) [self toggleSystems];
+    else                         [self takeOverRunning:YES];
 }
 
 - (void) appendToSentryLog:(NSString*)aString

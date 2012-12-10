@@ -158,7 +158,7 @@ enum eHaloStatus {
 - (void) setNextState:(enum eHaloSentryState)aState stepTime:(NSTimeInterval)aTime;
 - (void) takeOverRunning;
 - (void) takeOverRunning:(BOOL)quiet;
-- (void) delayedTakeover;
+- (void) handleSbcSocketDropped;
 - (NSString*) sentryTypeName;
 - (NSString*) stateName;
 - (NSString*) report;

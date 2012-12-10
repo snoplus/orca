@@ -1039,7 +1039,6 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
 		[scanner setScanLocation:[scanner scanLocation]+1];
 		NSString* ave;
 		[scanner scanUpToString:@"/" intoString:&ave];
-		NSLog(@"ave: %.3f ms\n",[ave floatValue]);
         pingedSuccessfully = YES;
 	}
     else if([text rangeOfString:@"100.0% packet loss"].location != NSNotFound){
