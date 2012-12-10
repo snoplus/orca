@@ -120,6 +120,12 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
                      selector : @selector(runStopped:)
                          name : ORRunStoppedNotification
 						object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(sbcSocketDropped:)
+                         name : ORSBC_SocketDroppedUnexpectedly
+						object: nil];
+    
 }
 
 #pragma mark ***Notifications
@@ -167,6 +173,15 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
         [self step];
     }
 }
+
+- (void) sbcSocketDropped:(NSNotification*)aNote
+{
+    //the sbc socket was dropped. Most likely caused by the sbc readout process dying.
+    ignoreRunStates = YES;
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(delayedTakeover) object:nil];
+    [self performSelector:@selector(delayedTakeover) withObject:nil afterDelay:5];
+}
+
 
 #pragma mark ***Accessors
 - (NSString*)sbcRootPwd
@@ -1042,6 +1057,11 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
 - (void) takeOverRunning
 {
     [self takeOverRunning:NO];
+}
+
+- (void) delayedTakeover
+{
+    [self takeOverRunning:YES];
 }
 
 - (void) appendToSentryLog:(NSString*)aString

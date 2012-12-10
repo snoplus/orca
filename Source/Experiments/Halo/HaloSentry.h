@@ -145,7 +145,7 @@ enum eHaloStatus {
 - (void) objectsChanged:(NSNotification*)aNote;
 - (void) runStarted:(NSNotification*)aNote;
 - (void) runStopped:(NSNotification*)aNote;
-- (void) collectObjects;
+- (void) sbcSocketDropped:(NSNotification*)aNote;
 
 #pragma mark ***Accessors
 - (NSString*) ipNumber2;
@@ -158,6 +158,7 @@ enum eHaloStatus {
 - (void) setNextState:(enum eHaloSentryState)aState stepTime:(NSTimeInterval)aTime;
 - (void) takeOverRunning;
 - (void) takeOverRunning:(BOOL)quiet;
+- (void) delayedTakeover;
 - (NSString*) sentryTypeName;
 - (NSString*) stateName;
 - (NSString*) report;
@@ -172,6 +173,7 @@ enum eHaloStatus {
 - (void) encodeWithCoder:(NSCoder*)encoder;
 
 #pragma mark ***Helpers
+- (void) collectObjects;
 - (void) ping;
 - (BOOL) pingTaskRunning;
 - (void) tasksCompleted:(id)sender;

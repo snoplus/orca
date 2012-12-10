@@ -422,4 +422,5 @@ extern NSString* ORSBC_LinkNumPayloadSizeChanged;
 extern NSString* ORSBC_LinkJobStatus;
 extern NSString* ORSBC_LinkErrorTimeOutChanged;
 extern NSString* ORSBC_CodeVersionChanged;
+extern NSString* ORSBC_SocketDroppedUnexpectedly;
 
