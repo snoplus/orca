@@ -673,7 +673,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
             
         case eCheckRemoteMachine:
             [self ping];
-            [self setNextState:eWaitForPing stepTime:.3];
+            [self setNextState:eWaitForPing stepTime:3];
             break;
             
         case eWaitForPing:
