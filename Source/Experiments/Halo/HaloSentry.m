@@ -776,7 +776,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
                 [self setNextState:eGetSecondaryState stepTime:30];
             }
             else {
-                [self setNextState:eStarting stepTime:10];
+                [self setNextState:eCheckRemoteMachine stepTime:10];
             }
             break;
 
