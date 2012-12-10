@@ -692,6 +692,8 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
  
         case eConnectToRemoteOrca:
             if(!isConnected)[self connectSocket:YES];
+            else [self setRemoteORCARunning:eYES];
+
             [self setNextState:eGetRunState stepTime:2];
             break;
             
@@ -703,6 +705,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
            }
             else {
                 if(!isConnected)[self connectSocket:YES];
+                else [self setRemoteORCARunning:eYES];
                 [self setRemoteORCARunning:eBeingChecked];
                 [self setNextState:eCheckRemoteMachine stepTime:10];
             }
@@ -763,6 +766,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
  
         case eConnectToRemoteOrca:
             if(!isConnected)[self connectSocket:YES];
+            else [self setRemoteORCARunning:eYES];
             [self setNextState:eGetSecondaryState stepTime:2];
             break;
             
@@ -1089,18 +1093,15 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
 
 - (void) takeOverRunning
 {
-    //take over. don't be quite about it.
+    //take over. don't be quiet about it.
     [self takeOverRunning:NO];
 }
 
 - (void) handleSbcSocketDropped
 {
-    //the socket could have dropped because the sbc readout task died
-    //in that case, the other sentry could still be connected, so let it
-    //handle tring to fix the syste. If the other sentry is not connected,
-    //we will try to handle it here.
-    if([self remoteORCARunning]) [self connectSocket:NO];   //should force the other system's hand
-    else                         [self takeOverRunning:YES];//not connected anyway... try to fix it here
+    //if the other system is connected, let it try to fix things.
+    if([self remoteORCARunning]) [self toggleSystems];
+    else                         [self takeOverRunning:YES];//not connected... try to fix it here
 }
 
 - (void) appendToSentryLog:(NSString*)aString
