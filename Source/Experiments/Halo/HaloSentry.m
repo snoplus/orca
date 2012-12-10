@@ -666,7 +666,6 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
     switch (state){
         case eStarting:
             [self clearAllAlarms];
-            [self flushSentryLog];
             [self setRemoteMachineReachable:eBeingChecked];
             [self setRemoteRunInProgress: eUnknown];
             [self setNextState:eCheckRemoteMachine stepTime:.3];
@@ -736,7 +735,6 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
     switch (state){
         case eStarting:
             [self clearAllAlarms];
-            [self flushSentryLog];
             [self setRemoteMachineReachable:eBeingChecked];
             [self setNextState:eCheckRemoteMachine stepTime:.3];
             break;
@@ -794,7 +792,6 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
     switch (state){
         case eStarting:
             [self clearAllAlarms];
-            [self flushSentryLog];
             [self setRemoteRunInProgress:eBeingChecked];
             [self setNextState:eGetRunState stepTime:2];
            break;
@@ -829,7 +826,6 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
         case eStarting:
             loopTime = 0;
             ignoreRunStates = YES;
-            [self flushSentryLog];
             [self appendToSentryLog:@"Toggling healthy systems"];
             if([runControl isRunning]){
                wasLocalRun = YES;
@@ -1047,7 +1043,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
 
 - (void) takeOverRunning:(BOOL)quiet
 {
-    if(quiet)NSLogColor([NSColor redColor],@"Something is wrong so the secondary system is attempting a takeover\n");
+    if(quiet)NSLogColor([NSColor redColor],@"Something is wrong. Trying to restart everything.\n");
     triedBooting = NO;
     [self setSentryType:eTakeOver];
     [self setNextState:eStarting stepTime:.2];
@@ -1069,7 +1065,12 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
     if([aString hasPrefix:@"**"])   NSLogColor([NSColor redColor],@"%@\n",aString);
     else                            NSLog(@"%@\n",aString);
     if(!sentryLog)sentryLog = [[NSMutableArray array] retain];
-    if(aString)[sentryLog addObject:aString];
+    
+    NSCalendarDate* now = [NSCalendarDate calendarDate];
+    [now setCalendarFormat:@"%m/%d %H:%M:%S"];
+    NSString* stringWithDate = [NSString stringWithFormat:@"%@ %@",now,aString];
+
+    if(aString)[sentryLog addObject:stringWithDate];
 }
 
 - (void) flushSentryLog
@@ -1264,7 +1265,6 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
             [self sendCmd:[NSString stringWithFormat:@"[%@ setGain:%d withValue:%d];",[aShaper fullID],i,[aShaper threshold:i]]];
 
         }
-        
     }
 }
 
@@ -1376,6 +1376,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
             theReport = [theReport stringByAppendingString:aLine];
         }
         theReport = [theReport stringByAppendingString:@"----------------------------------------------\n"];
+        [self flushSentryLog];
     }
     
     return theReport;

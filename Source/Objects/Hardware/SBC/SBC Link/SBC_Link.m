@@ -1042,7 +1042,7 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
 		NSLog(@"ave: %.3f ms\n",[ave floatValue]);
         pingedSuccessfully = YES;
 	}
-    else if([text rangeOfString:@"0% packet loss"].location != NSNotFound){
+    else if([text rangeOfString:@"100.0% packet loss"].location != NSNotFound){
         pingedSuccessfully = NO;
     }
 }
@@ -1851,7 +1851,6 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_LinkPingTask object:self];
 	}
 	else {
-        pingedSuccessfully = NO;
 		[pingTask terminate];
 	}
 }
@@ -1874,7 +1873,6 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_LinkPingTask object:self];
 	}
 	else {
-        pingedSuccessfully = NO;
 		[pingTask terminate];
 	}
 }
@@ -2230,6 +2228,7 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
 		else if (bytesWritten < 0) {
             if (errno == EPIPE) {
                 [self disconnect];
+                [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORSBC_SocketDroppedUnexpectedly  object:self];
             }
 			[NSException raise:@"Write Error" format:@"Write Error(%s) %@ <%@> port: %d",strerror(errno),[self crateName],IPNumber,portNumber];
 		}
@@ -2283,6 +2282,7 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
 			if(timeout>0){
 				if((time(0)-t1)>timeout) {
 					[self disconnect];
+                    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORSBC_SocketDroppedUnexpectedly  object:self];
 					[NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];
 				}
 			}
@@ -2326,6 +2326,7 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
 						if(timeout>0){
 							if((time(0)-t1)>timeout) {
 								[self disconnect];
+                                [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORSBC_SocketDroppedUnexpectedly  object:self];
 								[NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];
 							}
 						}
