@@ -1841,16 +1841,13 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
 		pingTask = [[NSTask alloc] init];
 		
 		[pingTask setLaunchPath:@"/sbin/ping"];
-		[pingTask setArguments: [NSArray arrayWithObjects:@"-c",@"1",@"-t",@"2",@"-q",IPNumber,nil]];
+		[pingTask setArguments: [NSArray arrayWithObjects:@"-c",@"1",@"-t",@"5",IPNumber,nil]];
 		
 		[aSequence addTaskObj:pingTask];
 		[aSequence setVerbose:NO];
 		[aSequence setTextToDelegate:YES];
 		[aSequence launch];
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_LinkPingTask object:self];
-	}
-	else {
-		[pingTask terminate];
 	}
 }
 
@@ -1870,9 +1867,6 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
 		[aSequence setTextToDelegate:YES];
 		[aSequence launch];
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_LinkPingTask object:self];
-	}
-	else {
-		[pingTask terminate];
 	}
 }
 
