@@ -794,18 +794,31 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
         case eStarting:
             [self clearAllAlarms];
             [self setRemoteRunInProgress:eBeingChecked];
-            [self setNextState:ePingCrates stepTime:2];
+            [self setNextState:eGetRunState stepTime:2];
            break;
             
+        case eGetRunState:
+            if(isConnected && !orcaHungAlarm){
+                [self setNextState:ePingCrates stepTime:30];
+                //we should get the runStatus at run boundaries, but we'll ask anyway
+                [self sendCmd:@"runStatus = [RunControl runningState];"];
+            }
+            else {
+                //the connection was dropped (other mac crashed) or other mac appears hung.
+                [self takeOverRunning];
+            }
+            break;
+  
         case ePingCrates:
             if(!unPingableSBCs) unPingableSBCs = [[NSMutableArray arrayWithArray:sbcs]retain];
             for(id anSBC in sbcs)[[anSBC sbcLink] pingOnce];
             [self setNextState:eWaitForPing stepTime:.2];
             loopTime = 0;
             break;
+
             
         case eWaitForPing:
-            if(loopTime >= 5){
+            if(loopTime >= 7){
                 if([unPingableSBCs count] == [sbcs count]){
                     [self appendToSentryLog:@"**Couldn't ping any of the SBCs."];
                 }
@@ -814,7 +827,8 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
                 }
                 //not much to do.. post alarm and stop. Intervention will be needed.
                 [self postPingAlarm];
-
+                [self setNextState:eStopping stepTime:2];
+                
             }
             else {
                 for(id anSBC in sbcs){
@@ -827,18 +841,6 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
                     [self clearPingAlarm];
                     [self setNextState:eGetRunState stepTime:2];
                 }
-            }
-            break;
-            
-        case eGetRunState:
-            if(isConnected && !orcaHungAlarm){
-                [self setNextState:ePingCrates stepTime:30];
-                //we should get the runStatus at run boundaries, but we'll ask anyway
-                [self sendCmd:@"runStatus = [RunControl runningState];"];
-            }
-            else {
-                //the connection was dropped (other mac crashed) or other mac appears hung.
-                [self takeOverRunning];
             }
             break;
 
