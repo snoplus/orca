@@ -24,6 +24,7 @@
 #import "ORRunModel.h"
 #import "SBC_Link.h"
 #import "ORShaperModel.h"
+#import "ORDataFileModel.h"
 
 NSString* HaloSentryIpNumber2Changed = @"HaloSentryIpNumber2Changed";
 NSString* HaloSentryIpNumber1Changed = @"HaloSentryIpNumber1Changed";
@@ -58,17 +59,18 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
     [ipNumber2 release];
     [ipNumber1 release];
     [sbcs release];
+    [shapers release];
+    [runControl release];
     [otherSystemIP release];
+    [thisSystemIP release];
     [sbcPingTasks release];
     [unPingableSBCs release];
     [sentryLog release];
+    [pingTask release];
+    [sbcRootPwd release];
+    [sentryLog release];
     
-    [self clearPingAlarm];
-    [self clearConnectionAlarm];
-    [self clearOrcaHungAlarm];
-    [self clearNoRemoteSentryAlarm];
-    [self clearRunProblemAlarm];
-    [self clearListModAlarm];
+    [self clearAllAlarms];
     
     [super dealloc];
 }
@@ -86,6 +88,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
 - (void) awakeAfterDocumentLoaded
 {
     if(wasRunning) [self start];
+    [self collectObjects];
 }
 
 - (void) registerNotificationObservers
@@ -459,7 +462,6 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
 - (void) start
 {
     if(sentryIsRunning || [otherSystemIP length]==0)return;
-    [self collectObjects];
     [self setSentryIsRunning:YES];
     [self setSentryType:eNeither];
     [self setNextState:eStarting stepTime:1];
@@ -609,6 +611,16 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
     listModAlarm = nil;
 }
 
+- (void) clearAllAlarms
+{
+    [self clearPingAlarm];
+    [self clearConnectionAlarm];
+    [self clearOrcaHungAlarm];
+    [self clearNoRemoteSentryAlarm];
+    [self clearRunProblemAlarm];
+    [self clearListModAlarm]; 
+}
+
 #pragma mark •••Finite State Machines
 - (void) step
 {
@@ -638,6 +650,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
 {
     switch (state){
         case eStarting:
+            [self clearAllAlarms];
             [self flushSentryLog];
             [self setRemoteMachineReachable:eBeingChecked];
             [self setRemoteRunInProgress: eUnknown];
@@ -707,6 +720,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
 {
     switch (state){
         case eStarting:
+            [self clearAllAlarms];
             [self flushSentryLog];
             [self setRemoteMachineReachable:eBeingChecked];
             [self setNextState:eCheckRemoteMachine stepTime:.3];
@@ -764,6 +778,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
 {
     switch (state){
         case eStarting:
+            [self clearAllAlarms];
             [self flushSentryLog];
             [self setRemoteRunInProgress:eBeingChecked];
             [self setNextState:eGetRunState stepTime:2];
@@ -811,7 +826,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
                 wasLocalRun = NO;
                 [self appendToSentryLog:@"Stopping remote run."];
                 [self sendCmd:@"[RunControl stopRun];"];
-                [self setNextState:eWaitForRemoteRunStop stepTime:.1];
+                [self setNextState:eWaitForRemoteRunStop stepTime:2];
             }
             break;
             
@@ -916,10 +931,10 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
         case eStartCrates:
             for(id anSBC in sbcs){
                 if(![unPingableSBCs containsObject:anSBC]){
-                    if(![[anSBC sbcLink] isConnected]){
-                        [self appendToSentryLog:[NSString stringWithFormat:@"Start crate @ %@",[[anSBC sbcLink] IPNumber]]];
-                        [[anSBC sbcLink] startCrate];
-                    }
+                    if([[anSBC sbcLink] isConnected])[[anSBC sbcLink] disconnect];
+                    [self appendToSentryLog:[NSString stringWithFormat:@"Start crate @ %@",[[anSBC sbcLink] IPNumber]]];
+                    [[anSBC sbcLink] setForceReload:NO];
+                    [[anSBC sbcLink] startCrate];
                 }
             }
             [self setNextState:eStartCrateWait stepTime:.1];
@@ -927,7 +942,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
             break;
             
         case eStartCrateWait:
-            if(loopTime >= 5){
+            if(loopTime >= 8){
                 [self appendToSentryLog:@"**One or more crates didn't restart. Will try rebooting."];
                 [self setNextState:eBootCrates stepTime:.1];
             }
@@ -955,7 +970,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
             break;
 
         case eCheckRun:
-            if(loopTime >= 5){
+            if(loopTime >= 8){
                 [self appendToSentryLog:@"**Run failed to start. Will try rebooting."];
                 [self setNextState:eBootCrates stepTime:.1];
             }
@@ -968,7 +983,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
             break;
   
         case eBootCrates:
-            if(!triedBooting){
+            if(triedBooting){
                 [self appendToSentryLog:@"**Takeover failed after one reboot"];
                 [self postRunProblemAlarm:@"Sentry unable to start run"];
                 [self setNextState:eStopping stepTime:.1];
@@ -1288,6 +1303,19 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
     }
 }
 
+- (NSString*) diskStatus
+{
+    NSString* s = @"";
+    NSArray* disks = [[[NSApp delegate ]document] collectObjectsOfClass:NSClassFromString(@"ORDataFileModel")];
+    for(ORDataFileModel* aDisk in disks){
+        if([aDisk involvedInCurrentRun]){
+            [aDisk checkDiskStatus];
+            s = [s stringByAppendingFormat:@"Disk: %@ = %.2f%%\n",[aDisk fullID],[aDisk convertedValue:0]];
+        }
+    }
+    return s;
+}
+
 - (NSString*) report
 {
     NSString* theReport = @"";
@@ -1296,13 +1324,17 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
     theReport = [theReport stringByAppendingFormat:@"Sentry Running: %@\n",[self sentryIsRunning]?@"YES":@"NO"];
     theReport = [theReport stringByAppendingFormat:@"Sentry Type   : %@\n",[self sentryTypeName]];
     if(sentryType == ePrimary){
-        theReport = [theReport stringByAppendingString:@"Current running as the Primary Machine\n"];
+        if([runControl subRunNumber]==0) theReport = [theReport stringByAppendingFormat:@"Run Number: %ld\n",[runControl runNumber]];
+        else                             theReport = [theReport stringByAppendingFormat:@"Run Number: %ld.%d\n",[runControl runNumber],[runControl subRunNumber]];
+        theReport = [theReport stringByAppendingFormat:@"Elapsed Time: %@\n",[runControl elapsedRunTimeString]];
+        theReport = [theReport stringByAppendingString:[self diskStatus]];
+        theReport = [theReport stringByAppendingString:@"Designated as the Primary Machine\n"];
         theReport = [theReport stringByAppendingString:@"Status of the Secondary machine:\n"];
         theReport = [theReport stringByAppendingFormat:@"Computer: %@\n",[self remoteMachineStatusString]];
         theReport = [theReport stringByAppendingFormat:@"ORCA: %@\n",[self connectionStatusString]];
     }
     else if(sentryType == eSecondary){
-        theReport = [theReport stringByAppendingString:@"Current running as the Secondary Machine\n"];
+        theReport = [theReport stringByAppendingString:@"Designated as the Secondary Machine\n"];
         if([self systemIsHeathy]){
             theReport = [theReport stringByAppendingString:@"Status of the Primary machine:\n"];
             theReport = [theReport stringByAppendingFormat:@"Computer: %@\n",[self remoteMachineStatusString]];
@@ -1311,15 +1343,15 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
         }
     }
     else if(sentryType == eNeither){
-        theReport = [theReport stringByAppendingString:@"No Run is Progress"];
+        theReport = [theReport stringByAppendingString:@"No Run is Progress\n"];
     }
     else {
-        theReport = [theReport stringByAppendingString:@"Sentry state is one that would indicate a problem is being addressed now"];
+        theReport = [theReport stringByAppendingString:@"Sentry state is one that would indicate a problem is being addressed now\n"];
    }
 
     if([sentryLog count]!=0){
         theReport = [theReport stringByAppendingString:@"----------------------------------------------\n"];
-        theReport = [theReport stringByAppendingString:@"These exists a Sentry Log:\n\n"];
+        theReport = [theReport stringByAppendingString:@"There exists a Sentry Log:\n\n"];
         for(id aLine in sentryLog){
             theReport = [theReport stringByAppendingString:aLine];
         }

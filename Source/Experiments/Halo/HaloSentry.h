@@ -161,6 +161,7 @@ enum eHaloStatus {
 - (NSString*) sentryTypeName;
 - (NSString*) stateName;
 - (NSString*) report;
+- (NSString*) diskStatus;
 
 #pragma mark ***Run Stuff
 - (void) start;
@@ -200,6 +201,7 @@ enum eHaloStatus {
 - (void) clearRunProblemAlarm;
 - (void) postListModAlarm;
 - (void) clearListModAlarm;
+- (void) clearAllAlarms;
 @end
 
 extern NSString* HaloSentryStealthMode2Changed;
