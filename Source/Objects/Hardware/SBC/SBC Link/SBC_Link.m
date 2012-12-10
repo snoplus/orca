@@ -1031,9 +1031,6 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
 		[self setGoScriptFailed:YES];
 		NSLogColor([NSColor redColor], @"%@\n",text);
 	}
-    else if([text rangeOfString:@"100.0% packet loss"].location != NSNotFound){
-        pingedSuccessfully = NO;
-    }
     else if([text rangeOfString:@"0.0% packet loss"].location != NSNotFound){
         pingedSuccessfully = YES;
     }
