@@ -877,6 +877,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
             
         case eWaitForLocalRunStop:
             if(![runControl isRunning]){
+                for(id anSBC in sbcs)[[anSBC sbcLink] disconnect];
                 [self appendToSentryLog:@"Local run stopped. Passing control to other system"];
                 [self sendCmd:@"[HaloModel takeOverRunning];"];
                 [self setSentryType:eNeither];
