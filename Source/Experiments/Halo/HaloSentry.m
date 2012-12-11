@@ -588,7 +588,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
     if(!orcaHungAlarm){
         NSString* alarmName = [NSString stringWithFormat:@"ORCA %@ Hung",otherSystemIP];
         orcaHungAlarm = [[ORAlarm alloc] initWithName:alarmName severity:kHardwareAlarm];
-        [orcaHungAlarm setHelpString:@"The primary ORCA appears hung.\n\nThis alarm will remain until the condition is fixed. You may acknowledge the alarm to silence it"];
+        [orcaHungAlarm setHelpString:@"The other ORCA appears hung.\n\nThis alarm will remain until the condition is fixed. You may acknowledge the alarm to silence it"];
         [orcaHungAlarm setSticky:YES];
     }
     [orcaHungAlarm postAlarm];
@@ -858,8 +858,9 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
 
                 //not much to do.. post alarm and stop. Intervention will be needed.
                 [self postPingAlarm];
-                [self setNextState:eStopping stepTime:2];
-                
+                [self setSentryType:eNeither];
+                [self setNextState:eStarting stepTime:2];
+                [self step];
             }
             else {
                 for(id anSBC in sbcs){
@@ -1066,7 +1067,9 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
             if(triedBooting){
                 [self appendToSentryLog:@"**Takeover failed after one reboot"];
                 [self postRunProblemAlarm:@"Sentry unable to start run"];
-                [self setNextState:eStopping stepTime:.1];
+                [self setSentryType:eNeither];
+                [self setNextState:eStarting stepTime:2];
+                [self step];
             }
             else {
                 triedBooting = YES;
