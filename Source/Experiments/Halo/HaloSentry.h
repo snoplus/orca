@@ -93,7 +93,8 @@ enum eHaloStatus {
 	NSTask*     pingTask;
     NetSocket*  socket;
     BOOL        isConnected;
-   
+    int         sbcSocketDropCount;
+    
     enum eHaloStatus remoteMachineReachable;
     enum eHaloStatus remoteORCARunning;
     enum eHaloStatus remoteRunInProgress;

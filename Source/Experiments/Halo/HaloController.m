@@ -282,13 +282,14 @@
     
 	[heartBeatIndexPU setEnabled:anyAddresses];
  
-    [stealthMode2CB setEnabled:!locked && !sentryRunning];
-    [stealthMode1CB setEnabled:!locked && !sentryRunning];
-    [ip1Field setEnabled:!locked && !sentryRunning];
-    [ip2Field setEnabled:!locked && !sentryRunning];
-    [startButton setEnabled:!locked];
-    [startButton setTitle:sentryRunning?@"Stop":@"Start"];
-    [toggleButton setEnabled:!locked & aRunIsInProgress];
+    [stealthMode2CB     setEnabled:!locked && !sentryRunning];
+    [stealthMode1CB     setEnabled:!locked && !sentryRunning];
+    [ip1Field           setEnabled:!locked && !sentryRunning];
+    [ip2Field           setEnabled:!locked && !sentryRunning];
+    [startButton        setEnabled:!locked];
+    [startButton        setTitle:   sentryRunning?@"Stop":@"Start"];
+    [toggleButton       setEnabled:!locked & aRunIsInProgress];
+    [sbcPasswordField   setEnabled:!locked & aRunIsInProgress];
 }
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem
@@ -388,6 +389,7 @@
 
 - (IBAction) startStopSentry:(id)sender
 {
+    [self endEditing];
     if(![[model haloSentry] sentryIsRunning]){
         [[model haloSentry] start];
     }

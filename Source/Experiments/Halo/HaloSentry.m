@@ -356,6 +356,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
 - (void) setSentryType:(enum eHaloSentryType)aType;
 {
     sentryType = aType;
+    if(sentryType!=eTakeOver)ignoreRunStates = NO;
     [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryTypeChanged object:self];
 }
 
@@ -963,7 +964,6 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
 
                     [self removeFromReadoutList:unPingableSBCs];
                     [self setNextState:eStartCrates stepTime:2];
-                    [self postListModAlarm];
                 }
             }
             else {
@@ -1099,9 +1099,18 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
 
 - (void) handleSbcSocketDropped
 {
-    //if the other system is connected, let it try to fix things.
-    if([self remoteORCARunning]) [self toggleSystems];
-    else                         [self takeOverRunning:YES];//not connected... try to fix it here
+    sbcSocketDropCount++;
+    NSMutableArray* sbcsToDrop = [NSMutableArray array];
+    if(sbcSocketDropCount>5){
+        for(id anSBC in sbcs){
+            if(![anSBC isConnected]){
+                [sbcsToDrop addObject:anSBC];
+            }
+        }
+        [self removeFromReadoutList:sbcsToDrop];
+    }
+    //try to restart
+    [self takeOverRunning:YES];
 }
 
 - (void) appendToSentryLog:(NSString*)aString
@@ -1242,15 +1251,18 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
 
 - (void) removeFromReadoutList:(NSArray*)someObjects
 {
-    [[self undoManager] disableUndoRegistration];
+    if([someObjects count]){
+        [[self undoManager] disableUndoRegistration];
 
-    NSArray* dataTasks = [[[[NSApp delegate ]document] collectObjectsOfClass:NSClassFromString(@"ORDataTaskModel")]retain];
-    for(id aDataTask in dataTasks){
-        for(id anObj in someObjects){
-            [aDataTask removeObject:anObj];
+        NSArray* dataTasks = [[[[NSApp delegate ]document] collectObjectsOfClass:NSClassFromString(@"ORDataTaskModel")]retain];
+        for(id aDataTask in dataTasks){
+            for(id anObj in someObjects){
+                [aDataTask removeObject:anObj];
+            }
         }
+        [self postListModAlarm];
+        [[self undoManager] enableUndoRegistration];
     }
-    [[self undoManager] enableUndoRegistration];
 }
 
 #pragma mark ***Delegate Methods
@@ -1416,9 +1428,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
     if([sentryLog count]!=0){
         theReport = [theReport stringByAppendingString:@"----------------------------------------------\n"];
         theReport = [theReport stringByAppendingString:@"There exists a Sentry Log:\n\n"];
-        for(id aLine in sentryLog){
-            theReport = [theReport stringByAppendingString:aLine];
-        }
+        for(id aLine in sentryLog)theReport = [theReport stringByAppendingFormat:@"%@\n",aLine];
         theReport = [theReport stringByAppendingString:@"----------------------------------------------\n"];
         [self flushSentryLog];
     }
