@@ -46,7 +46,7 @@
 	detectorSize		= NSMakeSize(620,595);
 	detailsSize			= NSMakeSize(450,589);
 	focalPlaneSize		= NSMakeSize(700,589);
-	sentrySize          = NSMakeSize(700,589);
+	sentrySize          = NSMakeSize(700,500);
 	
     blankView = [[NSView alloc] init];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
@@ -238,6 +238,8 @@
     [restartCountField setIntValue:[[model haloSentry] restartCount]];
     [dropSBCConnectionCountField setIntValue:[[model haloSentry] sbcSocketDropCount]];
     [sbcPingFailedCountField setIntValue:[[model haloSentry] sbcPingFailedCount]];
+    [macPingFailedCountField setIntValue:[[model haloSentry] macPingFailedCount]];
+    [missedHeartBeatsCountField setIntValue:[[model haloSentry] missedHeartBeatCount]];
 }
 
 - (void) ipNumberChanged:(NSNotification*)aNote
@@ -289,21 +291,23 @@
 
 - (void) updateButtons
 {
-    BOOL locked = [gSecurity isLocked:HaloModelSentryLock];
-    BOOL sentryRunning = [[model haloSentry] sentryIsRunning];
-    BOOL aRunIsInProgress = [[model haloSentry] runIsInProgress];
-   	BOOL anyAddresses = ([[model emailList] count]>0);
+    BOOL locked             = [gSecurity isLocked:HaloModelSentryLock];
+    BOOL sentryRunning      = [[model haloSentry] sentryIsRunning];
+    BOOL aRunIsInProgress   = [[model haloSentry] runIsInProgress];
+   	BOOL anyAddresses       = ([[model emailList] count]>0);
+    BOOL localRunInProgress = [[ORGlobal sharedGlobal] runInProgress];
     
 	[heartBeatIndexPU setEnabled:anyAddresses];
  
-    [stealthMode2CB     setEnabled:!locked && !sentryRunning];
-    [stealthMode1CB     setEnabled:!locked && !sentryRunning];
-    [ip1Field           setEnabled:!locked && !sentryRunning];
-    [ip2Field           setEnabled:!locked && !sentryRunning];
-    [startButton        setEnabled:!locked];
-    [startButton        setTitle:   sentryRunning?@"Stop":@"Start"];
-    [toggleButton       setEnabled:!locked & aRunIsInProgress];
-    [sbcPasswordField   setEnabled:!locked & aRunIsInProgress];
+    [stealthMode2CB      setEnabled:!locked && !sentryRunning];
+    [stealthMode1CB      setEnabled:!locked && !sentryRunning];
+    [ip1Field            setEnabled:!locked && !sentryRunning];
+    [ip2Field            setEnabled:!locked && !sentryRunning];
+    [startButton         setEnabled:!locked];
+    [startButton         setTitle:   sentryRunning?@"Stop":@"Start"];
+    [toggleButton        setEnabled:!locked & aRunIsInProgress];
+    [sbcPasswordField    setEnabled:!locked & aRunIsInProgress];
+    [updateShapersButton setEnabled:!locked & !localRunInProgress];
 }
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem
@@ -393,7 +397,6 @@
 
 - (IBAction) toggleSystems:(id)sender
 {
-    
     NSBeginAlertSheet(@"Toggle Primary Machine",
                       @"Cancel",
                       @"Yes/Switch Machines",
@@ -402,13 +405,30 @@
                       @selector(_toggleSheetDidEnd:returnCode:contextInfo:),
                       nil,
                       nil,@"Really switch which machine is the one in control of the run?");
-
 }
 
 - (void) _toggleSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
     if(returnCode == NSAlertAlternateReturn){
         [[model haloSentry] toggleSystems];
+    }
+}
+- (IBAction) updateRemoteShapersAction:(id)sender
+{
+    NSBeginAlertSheet(@"Update Remote Shapers",
+                      @"Cancel",
+                      @"Yes/Update",
+                      nil,[self window],
+                      self,
+                      @selector(_updateShaperSheetDidEnd:returnCode:contextInfo:),
+                      nil,
+                      nil,@"Really send the Threshods and Gains to the other machine?\nThey will be loaded into HW at start of next run.");
+}
+
+- (void) _updateShaperSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+    if(returnCode == NSAlertAlternateReturn){
+        [[model haloSentry] updateRemoteShapers];
     }
 }
 

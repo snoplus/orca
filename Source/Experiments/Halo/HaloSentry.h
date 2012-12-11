@@ -96,6 +96,7 @@ enum eHaloStatus {
     int         sbcSocketDropCount;
     int         restartCount;
     int         sbcPingFailedCount;
+    int         macPingFailedCount;
     
     enum eHaloStatus remoteMachineReachable;
     enum eHaloStatus remoteORCARunning;
@@ -154,6 +155,7 @@ enum eHaloStatus {
 - (int)  sbcSocketDropCount;
 - (int)  restartCount;
 - (int)  sbcPingFailedCount;
+- (int)  macPingFailedCount;
 - (NSString*) ipNumber2;
 - (void) setIpNumber2:(NSString*)aIpNumber2;
 - (NSString*) ipNumber1;
@@ -196,6 +198,7 @@ enum eHaloStatus {
 - (void) appendToSentryLog:(NSString*)aString;
 - (void) flushSentryLog;
 - (void) clearStats;
+- (void) updateRemoteShapers;
 
 #pragma mark ***Alarms
 - (void) postPingAlarm;

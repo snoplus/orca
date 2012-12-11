@@ -49,6 +49,9 @@
     IBOutlet NSTextField*   dropSBCConnectionCountField;
     IBOutlet NSTextField*   restartCountField;
     IBOutlet NSTextField*   sbcPingFailedCountField;
+    IBOutlet NSTextField*   macPingFailedCountField;
+    IBOutlet NSTextField*   missedHeartBeatsCountField;
+	IBOutlet NSButton*      updateShapersButton;
 
 	NSView *blankView;
     NSSize detectorSize;
@@ -95,7 +98,9 @@
 - (IBAction) heartBeatIndexAction:(id)sender;
 - (IBAction) addAddress:(id)sender;
 - (IBAction) removeAddress:(id)sender;
+- (IBAction) updateRemoteShapersAction:(id)sender;
 
+- (void) _updateShaperSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 - (void) _toggleSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 
 

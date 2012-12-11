@@ -200,6 +200,11 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
     return sbcPingFailedCount;
 }
 
+- (int)  macPingFailedCount
+{
+    return macPingFailedCount;
+}
+
 - (NSString*)sbcRootPwd
 {
     if(sbcRootPwd)return sbcRootPwd;
@@ -561,6 +566,8 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
 
 - (void) postPingAlarm
 {
+    macPingFailedCount++;
+
     if(!pingFailedAlarm && !otherSystemStealthMode){
         NSString* alarmName = [NSString stringWithFormat:@"%@ Unreachable",otherSystemIP];
         pingFailedAlarm = [[ORAlarm alloc] initWithName:alarmName severity:kHardwareAlarm];
@@ -626,6 +633,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
     [runProblemAlarm clearAlarm];
     runProblemAlarm = nil;
 }
+
 - (void) postListModAlarm
 {
     if(!listModAlarm){
@@ -1155,9 +1163,11 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
 #pragma mark •••Helpers
 - (void) clearStats
 {
-    sbcSocketDropCount = 0;
-    sbcPingFailedCount = 0;
-    restartCount = 0;
+    sbcSocketDropCount   = 0;
+    sbcPingFailedCount   = 0;
+    restartCount         = 0;
+    macPingFailedCount   = 0;
+
     [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryStateChanged object:self];
 }
 
@@ -1342,7 +1352,11 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
     [self sendCmd:[NSString stringWithFormat:@"[RunControl setQuickStart:%d];",[runControl quickStart]]];
     [self sendCmd:[NSString stringWithFormat:@"[RunControl setOfflineRun:%d];",[runControl offlineRun]]];
     [self sendCmd:@"runStatus = [RunControl runningState];"];
-    
+    [self updateRemoteShapers];
+}
+
+- (void) updateRemoteShapers
+{
     for(id aShaper in shapers){
         int i;
         for(i=0;i<8;i++){
