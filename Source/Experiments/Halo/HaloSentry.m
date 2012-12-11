@@ -1088,7 +1088,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
             
         case eStopping:
             [self setSentryType:eNeither];
-            [self setNextState:eIdle stepTime:.1];
+            [self setNextState:eStarting stepTime:.1];
             [self finish];
             break;
 
