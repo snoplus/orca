@@ -52,3 +52,7 @@
 @end
 
 extern NSString* ORIpeV4CrateConnectedChanged;
+
+@interface NSObject (ORIpeV4CrateModel)
+- (void) updateUseSLTtime;
+@end
