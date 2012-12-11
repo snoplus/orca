@@ -1031,7 +1031,7 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
 		[self setGoScriptFailed:YES];
 		NSLogColor([NSColor redColor], @"%@\n",text);
 	}
-    else if([text rangeOfString:@"0.0% packet loss"].location != NSNotFound){
+    else if([text rangeOfString:@" 0.0% packet loss"].location != NSNotFound){
         pingedSuccessfully = YES;
     }
 	else if([text rangeOfString:@"min/avg/max/stddev"].location!=NSNotFound){
@@ -1042,7 +1042,7 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
 		//[scanner setScanLocation:[scanner scanLocation]+1];
 		//NSString* ave;
 		//[scanner scanUpToString:@"/" intoString:&ave];
-        pingedSuccessfully = YES;
+        //pingedSuccessfully = YES;
 	}
 }
 
