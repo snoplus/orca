@@ -184,6 +184,22 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
 
 
 #pragma mark ***Accessors
+
+- (int)  sbcSocketDropCount
+{
+    return sbcSocketDropCount;
+}
+
+- (int)  restartCount
+{
+    return restartCount;
+}
+
+- (int)  sbcPingFailedCount
+{
+    return sbcPingFailedCount;
+}
+
 - (NSString*)sbcRootPwd
 {
     if(sbcRootPwd)return sbcRootPwd;
@@ -830,6 +846,8 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
                 else {
                     [self appendToSentryLog:@"**Some of the SBCs responded to ping. Some didn't."];
                 }
+                sbcPingFailedCount += [unPingableSBCs count];
+
                 //not much to do.. post alarm and stop. Intervention will be needed.
                 [self postPingAlarm];
                 [self setNextState:eStopping stepTime:2];
@@ -929,6 +947,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
 {
     switch (state){
         case eStarting:
+            restartCount++;
             [unPingableSBCs release];
             unPingableSBCs= nil;
             [self setNextState:eKillCrates stepTime:.1];
@@ -965,6 +984,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
                     [self removeFromReadoutList:unPingableSBCs];
                     [self setNextState:eStartCrates stepTime:2];
                 }
+                sbcPingFailedCount += [unPingableSBCs count];
             }
             else {
                 for(id anSBC in sbcs){
@@ -994,7 +1014,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
             break;
             
         case eStartCrateWait:
-            if(loopTime >= 8){
+            if(loopTime >= 5){
                 [self appendToSentryLog:@"**One or more crates didn't restart. Will try rebooting."];
                 [self setNextState:eBootCrates stepTime:.1];
             }
@@ -1103,7 +1123,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
     NSMutableArray* sbcsToDrop = [NSMutableArray array];
     if(sbcSocketDropCount>5){
         for(id anSBC in sbcs){
-            if(![anSBC isConnected]){
+            if(![[anSBC sbcLink] isConnected]){
                 [sbcsToDrop addObject:anSBC];
             }
         }
@@ -1133,6 +1153,14 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
 }
 
 #pragma mark •••Helpers
+- (void) clearStats
+{
+    sbcSocketDropCount = 0;
+    sbcPingFailedCount = 0;
+    restartCount = 0;
+    [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryStateChanged object:self];
+}
+
 - (void) ping
 {
     if(!pingTask){
@@ -1261,6 +1289,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
             }
         }
         [self postListModAlarm];
+        sbcSocketDropCount = 0;
         [[self undoManager] enableUndoRegistration];
     }
 }
@@ -1318,7 +1347,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
         int i;
         for(i=0;i<8;i++){
             [self sendCmd:[NSString stringWithFormat:@"[%@ setThreshold:%d withValue:%d];",[aShaper fullID],i,[aShaper threshold:i]]];
-            [self sendCmd:[NSString stringWithFormat:@"[%@ setGain:%d withValue:%d];",[aShaper fullID],i,[aShaper threshold:i]]];
+            [self sendCmd:[NSString stringWithFormat:@"[%@ setGain:%d withValue:%d];",[aShaper fullID],i,[aShaper gain:i]]];
 
         }
     }

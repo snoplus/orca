@@ -94,6 +94,8 @@ enum eHaloStatus {
     NetSocket*  socket;
     BOOL        isConnected;
     int         sbcSocketDropCount;
+    int         restartCount;
+    int         sbcPingFailedCount;
     
     enum eHaloStatus remoteMachineReachable;
     enum eHaloStatus remoteORCARunning;
@@ -123,6 +125,15 @@ enum eHaloStatus {
 - (NSUndoManager*) undoManager;
 - (void) awakeAfterDocumentLoaded;
 - (void) registerNotificationObservers;
+
+
+#pragma mark ***Notifications
+- (void) objectsChanged:(NSNotification*)aNote;
+- (void) runStarted:(NSNotification*)aNote;
+- (void) runStopped:(NSNotification*)aNote;
+- (void) sbcSocketDropped:(NSNotification*)aNote;
+
+#pragma mark •••Accessors
 - (void) setOtherIP;
 - (enum eHaloStatus) remoteMachineReachable;
 - (void) setRemoteMachineReachable:(enum eHaloStatus)aState;
@@ -140,15 +151,9 @@ enum eHaloStatus {
 - (BOOL) isConnected;
 - (NSString*)sbcRootPwd;
 - (void) setSbcRootPwd:(NSString*)aString;
-
-
-#pragma mark ***Notifications
-- (void) objectsChanged:(NSNotification*)aNote;
-- (void) runStarted:(NSNotification*)aNote;
-- (void) runStopped:(NSNotification*)aNote;
-- (void) sbcSocketDropped:(NSNotification*)aNote;
-
-#pragma mark ***Accessors
+- (int)  sbcSocketDropCount;
+- (int)  restartCount;
+- (int)  sbcPingFailedCount;
 - (NSString*) ipNumber2;
 - (void) setIpNumber2:(NSString*)aIpNumber2;
 - (NSString*) ipNumber1;
@@ -190,6 +195,7 @@ enum eHaloStatus {
 - (BOOL) runIsInProgress;
 - (void) appendToSentryLog:(NSString*)aString;
 - (void) flushSentryLog;
+- (void) clearStats;
 
 #pragma mark ***Alarms
 - (void) postPingAlarm;

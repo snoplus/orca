@@ -38,6 +38,7 @@
     IBOutlet NSTextField*	remoteMachineRunningField;
     IBOutlet NSTextField*	connectedField;
     IBOutlet NSTextField*	remoteRunInProgressField;
+    IBOutlet NSTextField*	localRunInProgressField;
     IBOutlet NSTextField*	sbcPasswordField;
     IBOutlet NSPopUpButton*	viewTypePU;
     IBOutlet NSButton*      sentryLockButton;
@@ -45,7 +46,10 @@
 	IBOutlet NSPopUpButton* heartBeatIndexPU;
 	IBOutlet NSTextField*   nextHeartbeatField;
 	IBOutlet NSButton*      removeAddressButton;
-    
+    IBOutlet NSTextField*   dropSBCConnectionCountField;
+    IBOutlet NSTextField*   restartCountField;
+    IBOutlet NSTextField*   sbcPingFailedCountField;
+
 	NSView *blankView;
     NSSize detectorSize;
     NSSize detailsSize;
@@ -74,8 +78,11 @@
 - (void) emailListChanged:(NSNotification*)aNote;
 - (void) heartBeatIndexChanged:(NSNotification*)aNote;
 - (void) nextHeartBeatChanged:(NSNotification*)aNote;
+- (void) runStateChanged:(NSNotification*)aNote;
+- (void) sentryIsRunningChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Actions
+- (IBAction) clearStatsAction:(id)sender;
 - (IBAction) stealthMode2Action:(id)sender;
 - (IBAction) stealthMode1Action:(id)sender;
 - (IBAction) viewTypeAction:(id)sender;
@@ -88,6 +95,8 @@
 - (IBAction) heartBeatIndexAction:(id)sender;
 - (IBAction) addAddress:(id)sender;
 - (IBAction) removeAddress:(id)sender;
+
+- (void) _toggleSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 
 
 @end

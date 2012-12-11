@@ -142,6 +142,10 @@
                          name : HaloModelNextHeartBeatChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(runStateChanged:)
+                         name : ORRunStatusChangedNotification
+						object: nil];
     
 }
 
@@ -159,18 +163,25 @@
 	[self sbcPasswordChanged:nil];
     [self heartBeatIndexChanged:nil];
 	[self nextHeartBeatChanged:nil];
-
+    [self runStateChanged:nil];
     [self sentryLockChanged:nil];
 }
 
 #pragma mark ¥¥¥Interface Management
-
 - (void) checkGlobalSecurity
 {
     [super checkGlobalSecurity];
     BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
     [gSecurity setLock:HaloModelSentryLock to:secure];
     [sentryLockButton setEnabled:secure];
+}
+
+- (void) runStateChanged:(NSNotification*)aNote
+{
+    NSString* s = [[[[ORGlobal sharedGlobal] runModeString] copy] autorelease];
+    if([s length] == 0)s = @"Not Running";
+    s = [s stringByReplacingOccurrencesOfString:@"." withString:@""];
+    [localRunInProgressField setStringValue:s];
 }
 
 - (void) heartBeatIndexChanged:(NSNotification*)aNote
@@ -224,6 +235,9 @@
 - (void) stateChanged:(NSNotification*)aNote
 {
     [stateField setStringValue:[[model haloSentry] stateName]];
+    [restartCountField setIntValue:[[model haloSentry] restartCount]];
+    [dropSBCConnectionCountField setIntValue:[[model haloSentry] sbcSocketDropCount]];
+    [sbcPingFailedCountField setIntValue:[[model haloSentry] sbcPingFailedCount]];
 }
 
 - (void) ipNumberChanged:(NSNotification*)aNote
@@ -379,7 +393,23 @@
 
 - (IBAction) toggleSystems:(id)sender
 {
-    [[model haloSentry] toggleSystems];
+    
+    NSBeginAlertSheet(@"Toggle Primary Machine",
+                      @"Cancel",
+                      @"Yes/Switch Machines",
+                      nil,[self window],
+                      self,
+                      @selector(_toggleSheetDidEnd:returnCode:contextInfo:),
+                      nil,
+                      nil,@"Really switch which machine is the one in control of the run?");
+
+}
+
+- (void) _toggleSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+    if(returnCode == NSAlertAlternateReturn){
+        [[model haloSentry] toggleSystems];
+    }
 }
 
 - (IBAction) sentryLockAction:(id)sender
@@ -396,6 +426,12 @@
     else {
         [[model haloSentry] stop];
     }
+}
+
+- (IBAction) clearStatsAction:(id)sender
+{
+    [[model haloSentry] clearStats];
+
 }
 
 #pragma mark ¥¥¥Data Source
