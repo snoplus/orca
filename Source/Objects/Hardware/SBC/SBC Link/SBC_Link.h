@@ -53,7 +53,8 @@ typedef enum eSBC_ThrottleConsts{
 	ORAlarm*        eRunFailedAlarm;
 	ORAlarm*        eCpuCBFillingAlarm;
 	ORAlarm*		eCpuCBLostDataAlarm;
-	
+    ORAlarm*        connectionDroppedAlarm;
+
 	//setttings
 	NSString*		IPNumber;
     NSString*		passWord;
@@ -320,8 +321,9 @@ typedef enum eSBC_ThrottleConsts{
 - (NSString*) crateName;
 
 - (void) ping;
-- (void) pingOnce;
+- (void) pingVerbose:(BOOL)aFlag;
 - (BOOL) pingTaskRunning;
+- (void) disconnectFromPingFailure;
 - (void) startCBTransferTest;
 - (BOOL) cbTestRunning;
 - (int) cbTestCount;
@@ -345,6 +347,7 @@ typedef enum eSBC_ThrottleConsts{
 - (void) throwError:(int)anError address:(unsigned long)anAddress;
 - (void) fillInScript:(NSString*)theScript;
 - (void) runFailed;
+- (void) sbcConnectionDropped;
 - (void) startCrateProcess;
 - (void) watchIrqSocket;
 - (void) write:(int)aSocket buffer:(SBC_Packet*)aPacket;

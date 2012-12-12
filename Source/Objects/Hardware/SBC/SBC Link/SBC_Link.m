@@ -135,6 +135,8 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
 	[eCpuCBFillingAlarm release];
 	[eCpuCBLostDataAlarm clearAlarm];
 	[eCpuCBLostDataAlarm release];
+	[connectionDroppedAlarm clearAlarm];
+	[connectionDroppedAlarm release];
 
     
     [lastRateUpdate release];
@@ -568,10 +570,12 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
 - (void) setIsConnected:(BOOL)aNewIsConnected
 {
 	isConnected = aNewIsConnected;
-	[[NSNotificationCenter defaultCenter] 
-	 postNotificationName:SBC_LinkConnectionChanged 
-	 object: self];
-	
+	[[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkConnectionChanged  object: self];
+	if(isConnected && connectionDroppedAlarm){
+        [connectionDroppedAlarm clearAlarm];
+        [connectionDroppedAlarm release];
+        connectionDroppedAlarm = nil;
+    }
 	[self setTimeConnected:isConnected?[NSCalendarDate date]:nil];
 }
 
@@ -1034,16 +1038,24 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
     else if([text rangeOfString:@" 0.0% packet loss"].location != NSNotFound){
         pingedSuccessfully = YES;
     }
-	else if([text rangeOfString:@"min/avg/max/stddev"].location!=NSNotFound){
-		//NSScanner* scanner = [NSScanner scannerWithString:text];
-		//[scanner scanUpToString:@"min/avg/max/stddev" intoString:nil];
-		//[scanner scanUpToString:@"=" intoString:nil];
-		//[scanner scanUpToString:@"/" intoString:nil];
-		//[scanner setScanLocation:[scanner scanLocation]+1];
-		//NSString* ave;
-		//[scanner scanUpToString:@"/" intoString:&ave];
-        //pingedSuccessfully = YES;
-	}
+    else if([text rangeOfString:@"100.0% packet loss"].location != NSNotFound){
+        [self disconnectFromPingFailure];
+    }
+    else if([text rangeOfString:@"Host is down"].location != NSNotFound){
+        [self disconnectFromPingFailure];
+    }
+    else if([text rangeOfString:@"No route to host"].location != NSNotFound){
+        [self disconnectFromPingFailure];
+    }
+}
+
+- (void) disconnectFromPingFailure
+{
+    if([self isConnected]){
+        [self disconnect];
+        [self sbcConnectionDropped];
+        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORSBC_SocketDroppedUnexpectedly  object:self];
+    }
 }
 
 - (BOOL) pingInProgress
@@ -1678,6 +1690,7 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
 	[self performSelector:@selector(getRunInfoBlock) withObject:self afterDelay:1];
 	[eCpuCBFillingAlarm clearAlarm];
 	[eCpuCBLostDataAlarm clearAlarm];
+    [self pingVerbose:NO];
 }
 
 
@@ -1833,26 +1846,13 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
 	return crateName;
 }
 
-- (void) pingOnce
+- (void) ping
 {
-	if(!pingTask){
-        pingedSuccessfully = NO;
-		ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
-		pingTask = [[NSTask alloc] init];
-		
-		[pingTask setLaunchPath:@"/sbin/ping"];
-		[pingTask setArguments: [NSArray arrayWithObjects:@"-c",@"1",@"-t",@"5",IPNumber,nil]];
-		
-		[aSequence addTaskObj:pingTask];
-		[aSequence setVerbose:NO];
-		[aSequence setTextToDelegate:YES];
-		[aSequence launch];
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_LinkPingTask object:self];
-	}
+    [self pingVerbose:YES];
 }
 
 
-- (void) ping
+- (void) pingVerbose:(BOOL)aFlag
 {
 	if(!pingTask){
         pingedSuccessfully = NO;
@@ -1860,10 +1860,11 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
 		pingTask = [[NSTask alloc] init];
 		
 		[pingTask setLaunchPath:@"/sbin/ping"];
-		[pingTask setArguments: [NSArray arrayWithObjects:@"-c",@"5",@"-t",@"10",@"-q",IPNumber,nil]];
+
+		[pingTask setArguments: [NSArray arrayWithObjects:@"-c",@"1",@"-t",@"1",@"-q",IPNumber,nil]];
 		
 		[aSequence addTaskObj:pingTask];
-		[aSequence setVerbose:YES];
+		[aSequence setVerbose:aFlag];
 		[aSequence setTextToDelegate:YES];
 		[aSequence launch];
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_LinkPingTask object:self];
@@ -2017,6 +2018,19 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
 	if(![eRunFailedAlarm isPosted]){
 		[eRunFailedAlarm setAcknowledged:NO];
 		[eRunFailedAlarm postAlarm];
+	}
+}
+
+- (void) sbcConnectionDropped
+{
+	if(!connectionDroppedAlarm){
+		connectionDroppedAlarm = [[ORAlarm alloc] initWithName:@"Crate connection dropped" severity:kHardwareAlarm];
+		[connectionDroppedAlarm setSticky:NO];
+		[connectionDroppedAlarm setHelpString:[NSString stringWithFormat:@"Socket to SBC %@ was dropped because of a ping failure. This alarm will go away if the connection is restored or if acknowledged.",[self IPNumber]]];
+	}
+	if(![connectionDroppedAlarm isPosted]){
+		[connectionDroppedAlarm setAcknowledged:NO];
+		[connectionDroppedAlarm postAlarm];
 	}
 }
 
