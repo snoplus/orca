@@ -866,7 +866,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
         case ePingCrates:
             [unPingableSBCs release];
             unPingableSBCs = [[NSMutableArray arrayWithArray:sbcs]retain];
-            for(id anSBC in sbcs)[[anSBC sbcLink] pingOnce];
+            for(id anSBC in sbcs)[[anSBC sbcLink] pingVerbose:NO];
             [self setNextState:eWaitForPing stepTime:.2];
             loopTime = 0;
             break;
@@ -1003,7 +1003,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
             [unPingableSBCs release];
             unPingableSBCs = [[NSMutableArray arrayWithArray:sbcs]retain];
             [self appendToSentryLog:@"Pinging Crates"];
-            for(id anSBC in sbcs)[[anSBC sbcLink] pingOnce];
+            for(id anSBC in sbcs)[[anSBC sbcLink] pingVerbose:NO];
             [self setNextState:eWaitForPing stepTime:.2];
             loopTime = 0;
          break;
