@@ -591,7 +591,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
 {    
     if(!sbcPingFailedAlarm){
         sbcPingFailedAlarm = [[ORAlarm alloc] initWithName:@"SBC(s) Failed Ping" severity:kHardwareAlarm];
-        NSString* s = @"SBCs that are unreachable:";
+        NSString* s = @"SBCs that are unreachable:\n";
         for(id anSBC in sbcList){
             s = [s stringByAppendingFormat:@"%@\n",[[anSBC sbcLink] IPNumber]];
         }
