@@ -51,6 +51,8 @@
     IBOutlet NSTextField*   sbcPingFailedCountField;
     IBOutlet NSTextField*   macPingFailedCountField;
     IBOutlet NSTextField*   missedHeartBeatsCountField;
+    IBOutlet NSTextField*   sbcRebootCountField;
+    IBOutlet NSTextField*   sentryRunningField;
 	IBOutlet NSButton*      updateShapersButton;
 
 	NSView *blankView;

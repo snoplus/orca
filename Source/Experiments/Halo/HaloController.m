@@ -204,6 +204,7 @@
 
 - (void) sentryIsRunningChanged:(NSNotification*)aNote
 {
+    [sentryRunningField setStringValue:[[model haloSentry] sentryIsRunning]?@"Running":@"STOPPED"];
     [self updateButtons];
 }
 
@@ -240,6 +241,7 @@
     [sbcPingFailedCountField setIntValue:[[model haloSentry] sbcPingFailedCount]];
     [macPingFailedCountField setIntValue:[[model haloSentry] macPingFailedCount]];
     [missedHeartBeatsCountField setIntValue:[[model haloSentry] missedHeartBeatCount]];
+    [sbcRebootCountField setIntValue:[[model haloSentry] sbcRebootCount]];
 }
 
 - (void) ipNumberChanged:(NSNotification*)aNote

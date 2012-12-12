@@ -97,17 +97,19 @@ enum eHaloStatus {
     int         restartCount;
     int         sbcPingFailedCount;
     int         macPingFailedCount;
+    int         sbcRebootCount;
     
     enum eHaloStatus remoteMachineReachable;
     enum eHaloStatus remoteORCARunning;
     enum eHaloStatus remoteRunInProgress;
     
-    ORAlarm* pingFailedAlarm;
+    ORAlarm* macPingFailedAlarm;
     ORAlarm* noConnectionAlarm;
     ORAlarm* orcaHungAlarm;
     ORAlarm* noRemoteSentryAlarm;
     ORAlarm* runProblemAlarm;
     ORAlarm* listModAlarm;
+    ORAlarm* sbcPingFailedAlarm;
     
     ORRunModel* runControl;
     NSArray* sbcs;
@@ -156,6 +158,7 @@ enum eHaloStatus {
 - (int)  restartCount;
 - (int)  sbcPingFailedCount;
 - (int)  macPingFailedCount;
+- (int)  sbcRebootCount;
 - (NSString*) ipNumber2;
 - (void) setIpNumber2:(NSString*)aIpNumber2;
 - (NSString*) ipNumber1;
@@ -201,8 +204,8 @@ enum eHaloStatus {
 - (void) updateRemoteShapers;
 
 #pragma mark ***Alarms
-- (void) postPingAlarm;
-- (void) clearPingAlarm;
+- (void) postMacPingAlarm;
+- (void) clearMacPingAlarm;
 - (void) postConnectionAlarm;
 - (void) clearConnectionAlarm;
 - (void) postOrcaHungAlarm;
@@ -210,9 +213,11 @@ enum eHaloStatus {
 - (void) postNoRemoteSentryAlarm;
 - (void) clearNoRemoteSentryAlarm;
 - (void) postRunProblemAlarm:(NSString*)aTitle;
-- (void) clearRunProblemAlarm;
 - (void) postListModAlarm;
 - (void) clearListModAlarm;
+- (void) postSBCPingAlarm:(id)anSBC;
+- (void) clearSBCPingAlarm;
+
 - (void) clearAllAlarms;
 @end
 

@@ -204,6 +204,10 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
 {
     return macPingFailedCount;
 }
+- (int)  sbcRebootCount
+{
+    return sbcRebootCount;
+}
 
 - (NSString*)sbcRootPwd
 {
@@ -564,23 +568,44 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
     noConnectionAlarm = nil;
 }
 
-- (void) postPingAlarm
+- (void) postMacPingAlarm
 {
     macPingFailedCount++;
 
-    if(!pingFailedAlarm && !otherSystemStealthMode){
+    if(!macPingFailedAlarm && !otherSystemStealthMode){
         NSString* alarmName = [NSString stringWithFormat:@"%@ Unreachable",otherSystemIP];
-        pingFailedAlarm = [[ORAlarm alloc] initWithName:alarmName severity:kHardwareAlarm];
-        [pingFailedAlarm setHelpString:@"The backup machine is not reachable.\n\nThis alarm will remain until the condition is fixed. You may acknowledge the alarm to silence it"];
-        [pingFailedAlarm setSticky:YES];
+        macPingFailedAlarm = [[ORAlarm alloc] initWithName:alarmName severity:kHardwareAlarm];
+        [macPingFailedAlarm setHelpString:@"The backup machine is not reachable.\n\nThis alarm will remain until the condition is fixed. You may acknowledge the alarm to silence it"];
+        [macPingFailedAlarm setSticky:YES];
     }
-    [pingFailedAlarm postAlarm];
+    [macPingFailedAlarm postAlarm];
 }
 
-- (void) clearPingAlarm
+- (void) clearMacPingAlarm
 {
-    [pingFailedAlarm clearAlarm];
-    pingFailedAlarm = nil;
+    [macPingFailedAlarm clearAlarm];
+    macPingFailedAlarm = nil;
+}
+
+- (void) postSBCPingAlarm:(NSArray*)sbcList
+{    
+    if(!sbcPingFailedAlarm){
+        sbcPingFailedAlarm = [[ORAlarm alloc] initWithName:@"SBC(s) Failed Ping" severity:kHardwareAlarm];
+        NSString* s = @"SBCs that are unreachable:";
+        for(id anSBC in sbcList){
+            s = [s stringByAppendingFormat:@"%@\n",[[anSBC sbcLink] IPNumber]];
+        }
+        s = [s stringByAppendingString:@"\n\nThis alarm will remain until the condition is fixed. You may acknowledge the alarm to silence it"];
+        [sbcPingFailedAlarm setHelpString:s];
+        [sbcPingFailedAlarm setSticky:YES];
+    }
+    [sbcPingFailedAlarm postAlarm];
+}
+
+- (void) clearSBCPingAlarm
+{
+    [sbcPingFailedAlarm clearAlarm];
+    sbcPingFailedAlarm = nil;
 }
 
 - (void) postOrcaHungAlarm
@@ -653,12 +678,13 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
 
 - (void) clearAllAlarms
 {
-    [self clearPingAlarm];
+    [self clearMacPingAlarm];
     [self clearConnectionAlarm];
     [self clearOrcaHungAlarm];
     [self clearNoRemoteSentryAlarm];
     [self clearRunProblemAlarm];
-    [self clearListModAlarm]; 
+    [self clearListModAlarm];
+    [self clearSBCPingAlarm];
 }
 
 #pragma mark •••Finite State Machines
@@ -690,7 +716,6 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
 {
     switch (state){
         case eStarting:
-            [self clearAllAlarms];
             [self setRemoteMachineReachable:eBeingChecked];
             [self setRemoteRunInProgress: eUnknown];
             [self setNextState:eCheckRemoteMachine stepTime:.3];
@@ -706,11 +731,11 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
                 if(remoteMachineReachable == eYES){
                     [self setRemoteORCARunning:eBeingChecked];
                     [self setNextState:eConnectToRemoteOrca stepTime:1];
-                    [self clearPingAlarm];
+                    [self clearMacPingAlarm];
                 }
                 else {
                     [self setNextState:eCheckRemoteMachine stepTime:60];
-                    [self postPingAlarm]; //just watching, so just post alarm
+                    [self postMacPingAlarm]; //just watching, so just post alarm
                 }
             }
             break;
@@ -777,10 +802,10 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
             if(!pingTask){
                 if(remoteMachineReachable == eYES){
                     [self setNextState:eConnectToRemoteOrca stepTime:10];
-                    [self clearPingAlarm];
+                    [self clearMacPingAlarm];
                }
                 else {
-                    [self postPingAlarm];
+                    [self postMacPingAlarm];
                     [self setNextState:eCheckRemoteMachine stepTime:60];
                     //remote machine not running. post alarm and retry later
                     //we are just watching at this point so do nothing other than
@@ -855,10 +880,10 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
                 else {
                     [self appendToSentryLog:@"**Some of the SBCs responded to ping. Some didn't."];
                 }
+                [self postSBCPingAlarm:unPingableSBCs];
                 sbcPingFailedCount += [unPingableSBCs count];
 
                 //not much to do.. post alarm and stop. Intervention will be needed.
-                [self postPingAlarm];
                 [self setSentryType:eNeither];
                 [self setNextState:eStarting stepTime:2];
                 [self step];
@@ -871,7 +896,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
                 }
                 if([unPingableSBCs count] == 0){
                     //all OK
-                    [self clearPingAlarm];
+                    [self clearMacPingAlarm];
                     [self setNextState:eGetRunState stepTime:2];
                 }
             }
@@ -982,12 +1007,14 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
             [self setNextState:eWaitForPing stepTime:.2];
             loopTime = 0;
          break;
-  
+
         case eWaitForPing:
             if(loopTime >= 5){
                 if([unPingableSBCs count] == [sbcs count]){
-                    [self appendToSentryLog:@"**None of the SBCs responded to ping. Will try rebooting."];
-                    [self setNextState:eBootCrates stepTime:.1];
+                    [self appendToSentryLog:@"**None of the SBCs responded to ping. Nothing to be done."];
+                    [self setSentryType:eNeither];
+                    [self setNextState:eStarting stepTime:2];
+                    [self step];
                 }
                 else {
                     [self appendToSentryLog:@"**Some of the SBCs responded to ping. Some didn't -- they are removed from readout list"];
@@ -996,6 +1023,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
                     [self setNextState:eStartCrates stepTime:2];
                 }
                 sbcPingFailedCount += [unPingableSBCs count];
+                [self postSBCPingAlarm:unPingableSBCs];
             }
             else {
                 for(id anSBC in sbcs){
@@ -1004,6 +1032,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
                     }
                 }
                 if([unPingableSBCs count] == 0){
+                    [self clearMacPingAlarm];
                     [self appendToSentryLog:@"All SBCs responded to ping"];
                     [self setNextState:eStartCrates stepTime:2];
                 }
@@ -1074,6 +1103,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
                 [self step];
             }
             else {
+                sbcRebootCount++;
                 triedBooting = YES;
                 for(id anSBC in sbcs)[[anSBC sbcLink] shutDown:sbcRootPwd reboot:YES];
                 [self setNextState:eWaitForBoot stepTime:.1];
@@ -1107,7 +1137,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
     [self setRemoteMachineReachable:eUnknown];
     [self setRemoteORCARunning:eUnknown];
     [self setRemoteRunInProgress:eUnknown];
-    [self clearPingAlarm];
+    [self clearMacPingAlarm];
     [self clearConnectionAlarm];
     [self clearOrcaHungAlarm];
     [self setSentryIsRunning:NO];
@@ -1172,7 +1202,8 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
     sbcPingFailedCount   = 0;
     restartCount         = 0;
     macPingFailedCount   = 0;
-
+    sbcRebootCount       = 0;
+    missedHeartbeatCount = 0;
     [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryStateChanged object:self];
 }
 
@@ -1403,7 +1434,8 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
 }
 - (BOOL) systemIsHeathy
 {
-    if(!pingFailedAlarm && 
+    if(!macPingFailedAlarm &&
+       !sbcPingFailedAlarm &&
        !noConnectionAlarm &&
        !orcaHungAlarm &&
        !noRemoteSentryAlarm) {
@@ -1443,22 +1475,22 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
 - (NSString*) report
 {
     NSString* theReport = @"";
-    theReport = [theReport stringByAppendingFormat:@"Reporting Machine: %@\n",thisSystemIP];
+    theReport = [theReport stringByAppendingFormat:@"Reporting machine: %@\n",thisSystemIP];
     theReport = [theReport stringByAppendingString:@"----------------------------------------------\n"];
-    theReport = [theReport stringByAppendingFormat:@"Sentry Running: %@\n",[self sentryIsRunning]?@"YES":@"NO"];
-    theReport = [theReport stringByAppendingFormat:@"Sentry Type   : %@\n",[self sentryTypeName]];
+    theReport = [theReport stringByAppendingFormat:@"Sentry running: %@\n",[self sentryIsRunning]?@"YES":@"NO"];
+    theReport = [theReport stringByAppendingFormat:@"Sentry type   : %@\n",[self sentryTypeName]];
     if(sentryType == ePrimary){
         if([runControl subRunNumber]==0) theReport = [theReport stringByAppendingFormat:@"Run Number: %ld\n",[runControl runNumber]];
         else                             theReport = [theReport stringByAppendingFormat:@"Run Number: %ld.%d\n",[runControl runNumber],[runControl subRunNumber]];
-        theReport = [theReport stringByAppendingFormat:@"Elapsed Time: %@\n",[runControl elapsedRunTimeString]];
+        theReport = [theReport stringByAppendingFormat:@"Elapsed time: %@\n",[runControl elapsedRunTimeString]];
         theReport = [theReport stringByAppendingString:[self diskStatus]];
-        theReport = [theReport stringByAppendingString:@"Designated as the Primary Machine\n"];
+        theReport = [theReport stringByAppendingString:@"Designated as the Primary machine\n"];
         theReport = [theReport stringByAppendingString:@"Status of the Secondary machine:\n"];
         theReport = [theReport stringByAppendingFormat:@"Computer: %@\n",[self remoteMachineStatusString]];
         theReport = [theReport stringByAppendingFormat:@"ORCA: %@\n",[self connectionStatusString]];
     }
     else if(sentryType == eSecondary){
-        theReport = [theReport stringByAppendingString:@"Designated as the Secondary Machine\n"];
+        theReport = [theReport stringByAppendingString:@"Designated as the Secondary machine\n"];
         if([self systemIsHeathy]){
             theReport = [theReport stringByAppendingString:@"Status of the Primary machine:\n"];
             theReport = [theReport stringByAppendingFormat:@"Computer: %@\n",[self remoteMachineStatusString]];
@@ -1467,17 +1499,33 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
         }
     }
     else if(sentryType == eNeither){
-        theReport = [theReport stringByAppendingString:@"No Run is Progress\n"];
+        theReport = [theReport stringByAppendingString:@"No run is in progress\n"];
     }
     else {
-        theReport = [theReport stringByAppendingString:@"Sentry state is one that would indicate a problem is being addressed now\n"];
+        theReport = [theReport stringByAppendingString:@"Sentry state is one that would indicate a problem is being addressed right now.\n"];
+        if([sentryLog count]!=0){
+            theReport = [theReport stringByAppendingString:@"Attached sentry log will be incomplete\n"];
+        }
    }
 
-    if([sentryLog count]!=0){
+    if([sentryLog count]==0){
         theReport = [theReport stringByAppendingString:@"----------------------------------------------\n"];
-        theReport = [theReport stringByAppendingString:@"There exists a Sentry Log:\n\n"];
+        theReport = [theReport stringByAppendingString:@"Only normal sentry activity since last report.\n"];
+        theReport = [theReport stringByAppendingString:@"----------------------------------------------\n"];
+    }
+    else {
+        theReport = [theReport stringByAppendingString:@"----------------------------------------------\n"];
+        theReport = [theReport stringByAppendingFormat:@"Run restart attempts: %d\n",           restartCount];
+        theReport = [theReport stringByAppendingFormat:@"SBC dropped socket connections: %d\n", sbcSocketDropCount];
+        theReport = [theReport stringByAppendingFormat:@"SBC failed pings: %d\n",               sbcPingFailedCount];
+        theReport = [theReport stringByAppendingFormat:@"SBC reboot attempts: %d\n",            sbcRebootCount];
+        theReport = [theReport stringByAppendingFormat:@"MAC missed heartbeats: %d\n",          missedHeartbeatCount];
+        theReport = [theReport stringByAppendingFormat:@"MAC failed pings: %d\n",               macPingFailedCount];
+        theReport = [theReport stringByAppendingString:@"----------------------------------------------\n"];
+        theReport = [theReport stringByAppendingString:@"Sentry log:\n\n"];
         for(id aLine in sentryLog)theReport = [theReport stringByAppendingFormat:@"%@\n",aLine];
         theReport = [theReport stringByAppendingString:@"----------------------------------------------\n"];
+        [self clearStats];
         [self flushSentryLog];
     }
     
