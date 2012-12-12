@@ -543,54 +543,57 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 - (void) readAdcsOnChip:(int)aChip
 {
 	if(aChip<0 || aChip>1) return;
-
+    
 	[self writeRangeForAdcChip:aChip ];
     float voltageMultiplier = 10./pow(2.,adcRange[aChip]+12);
-
+    
 	unsigned long adcBase = kADC1;
     if(aChip) adcBase = kADC2;
 	unsigned long channelSelect[8] = {
 		kReadAdcChannel0,kReadAdcChannel1,kReadAdcChannel2,kReadAdcChannel3,
 		kReadAdcChannel4,kReadAdcChannel5,kReadAdcChannel6,kReadAdcChannel7,
 	};
-
+    
 	//have to select a channel to be digitized, then the next time a selection is done the last channel can be read
 	int i;
     unsigned long readBack;
 	for(i=0;i<8;i++){
 		if(adcEnabledMask&(0x1<<((aChip*8)+i))){
-			readBack = [self writeAuxIOSPI:adcBase | channelSelect[i]];
-			if(i>0){
-				readBack = readBack & 0x1fff; //!!!!fix to put the sign in the right place and convert to a number
-				int channelReadBack = (readBack & 0xE000) >> 13;
-				if(channelReadBack != i-1) {
-				  NSLog(@"Warning! channel index in read back result = %d, not %d\n", channelReadBack, i-1);
-				}
-				int voltage = readBack & 0xfff;
-				if(readBack & 0x1000) voltage |= 0xfffff000;
-				NSLog(@"Got voltage %f*%d=%f for channel %d\n", voltageMultiplier, voltage, voltageMultiplier*voltage, i);
-				//[self setAdc:(aChip*8)+i-1 value:voltage];
-				[self setAdc:(aChip*8)+i-1 value:voltageMultiplier*voltage];
-			}
+			int j;
+			for(j=0;j<4;j++) readBack = [self writeAuxIOSPI:adcBase | channelSelect[i]];
+			//if(i>0){
+            //readBack = readBack & 0x1fff; //!!!!fix to put the sign in the right place and convert to a number
+            readBack = ~readBack;
+            int channelReadBack = (readBack & 0xE000) >> 13;
+            //if(channelReadBack != i-1) {
+            if(channelReadBack != i) {
+                NSLog(@"Warning! channelReadBack = %d, not %d\n", channelReadBack, i);
+            }
+            int voltage = readBack & 0xfff;
+            if(readBack & 0x1000) voltage |= 0xfffff000;
+            //NSLog(@"Got voltage %f*%d=%f for channel %d\n", voltageMultiplier, voltage, voltageMultiplier*voltage, i);
+            //[self setAdc:(aChip*8)+i-1 value:voltage];
+            [self setAdc:(aChip*8)+i value:voltageMultiplier*voltage];
+			//}
 		}
 		else [self setAdc:(aChip*8)+i value:0.0];
 	}
-
-	if(adcEnabledMask & (0x1<<(aChip*8))){
-		//select the first one  to readBack the last one
-		readBack = [self writeAuxIOSPI:adcBase | channelSelect[0]];
-		readBack = readBack & 0x1fff; //!!!!fix to put the sign in the right place and convert to a number
-		[self setAdc:(aChip*8)+7 value:readBack];
-	}
-	else [self setAdc:(aChip*8)+7 value:0.0];
 	
+    /*
+     if(adcEnabledMask & (0x1<<(aChip*8))){
+     //select the first one and to readBack the last one
+     readBack = [self writeAuxIOSPI:adcBase | channelSelect[0]];
+     //readBack = readBack & 0x1fff; //!!!!fix to put the sign in the right place and convert to a number
+     [self setAdc:(aChip*8)+7 value:readBack];
+     }
+     else [self setAdc:(aChip*8)+7 value:0.0];
+     */
 	
 	//get the time(UT!) for the data record. 
 	time_t	ut_Time;
 	time(&ut_Time);
 	timeMeasured[aChip] = ut_Time;
 }
-
 - (void) pollValues
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollValues) object:nil];
