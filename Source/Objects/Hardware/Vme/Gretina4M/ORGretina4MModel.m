@@ -184,7 +184,6 @@ static Gretina4MRegisterInformation register_information[kNumberOfGretina4MRegis
     {0x868, @"self trigger count", YES, YES, NO, NO}, 
     {0x870, @"FIFOInterfaceSMReg", YES, YES, NO, NO}, 
     {0x874, @"Test signals register", YES, YES, NO, NO},
-    {0x1C0, @"Trapezoidal trigger settings", NO, YES, YES, YES}
 };
                                       
 static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegisters] = {
@@ -728,6 +727,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 #pragma mark •••specific accessors
 - (void) setEnabled:(short)chan withValue:(short)aValue
 { 
+	if(aValue<0) aValue=0;
+    else if(aValue>1)aValue=1;
     [[[self undoManager] prepareWithInvocationTarget:self] setEnabled:chan withValue:enabled[chan]];
 	enabled[chan] = aValue;
     NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
@@ -736,6 +737,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setPoleZeroEnabled:(short)chan withValue:(short)aValue		
 { 
+	if(aValue<0) aValue=0;
+    else if(aValue>1)aValue=1;
     [[[self undoManager] prepareWithInvocationTarget:self] setPoleZeroEnabled:chan withValue:poleZeroEnabled[chan]];
 	poleZeroEnabled[chan] = aValue;
     NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
@@ -752,6 +755,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setPZTraceEnabled:(short)chan withValue:(short)aValue		
 { 
+	if(aValue<0) aValue=0;
+    else if(aValue>1)aValue=1;
     [[[self undoManager] prepareWithInvocationTarget:self] setPZTraceEnabled:chan withValue:pzTraceEnabled[chan]];
 	pzTraceEnabled[chan] = aValue;
     NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
@@ -760,6 +765,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setDebug:(short)chan withValue:(short)aValue	
 { 
+	if(aValue<0) aValue=0;
+    else if(aValue>1)aValue=1;
     [[[self undoManager] prepareWithInvocationTarget:self] setDebug:chan withValue:debug[chan]];
 	debug[chan] = aValue;
     NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
@@ -767,7 +774,10 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 }
 
 - (void) setPileUp:(short)chan withValue:(short)aValue		
-{ 
+{
+ 	if(aValue<0) aValue=0;
+    else if(aValue>1)aValue=1;
+   
     [[[self undoManager] prepareWithInvocationTarget:self] setPileUp:chan withValue:pileUp[chan]];
 	pileUp[chan] = aValue;
     NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
@@ -777,7 +787,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) setTriggerMode:(short)chan withValue:(short)aValue	
 { 
 	if(aValue<0) aValue=0;
-	else if(aValue>kTrapezoidalTriggerMode) aValue = kTrapezoidalTriggerMode;
+    else if(aValue>1)aValue=1;
+    
     [[[self undoManager] prepareWithInvocationTarget:self] setTriggerMode:chan withValue:triggerMode[chan]];
 	triggerMode[chan] = aValue;
     NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
@@ -787,12 +798,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) setLEDThreshold:(short)chan withValue:(int)aValue 
 { 
 	if(aValue<0) aValue=0;
-	if(triggerMode[chan] == kTrapezoidalTriggerMode) {
-      if(aValue>0x1FFFF) aValue = 0x1FFFF;
-    }
-	else {
-      if(aValue>0x1FFFF) aValue = 0x1FFFF;
-    }
+    else if(aValue>0x1FFFF) aValue = 0x1FFFF;
     [[[self undoManager] prepareWithInvocationTarget:self] setLEDThreshold:chan withValue:ledThreshold[chan]];
 	ledThreshold[chan] = aValue;
     NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
@@ -880,6 +886,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setPresumEnabled:(short)chan withValue:(short)aValue
 {
+    if(aValue<0)aValue=0;
+    else if(aValue>1)aValue=1;
     [[[self undoManager] prepareWithInvocationTarget:self] setPresumEnabled:chan withValue:presumEnabled[chan]];
 	presumEnabled[chan] = aValue;
     NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
@@ -929,6 +937,20 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (unsigned long) baseAddress
 {
 	return (([self slot]+1)&0x1f)<<20;
+}
+
+- (void) readFPGAVersions
+{
+    //find out the VME FPGA version
+	unsigned long vmeVersion = 0x00;
+	[[self adapter] readLongBlock:&vmeVersion
+                        atAddress:[self baseAddress] + fpga_register_information[kVMEFPGAVersionStatus].offset
+                        numToRead:1
+                       withAddMod:[self addressModifier]
+                    usingAddSpace:0x01];
+	NSLog(@"VME FPGA serial number: 0x%x \n", (vmeVersion & 0x0000FFFF));
+	NSLog(@"BOARD Revision number: 0x%x \n", ((vmeVersion & 0x00FF0000) >> 16));
+	NSLog(@"VHDL Version number: 0x%x \n", ((vmeVersion & 0xFF000000) >> 24));
 }
 
 - (short) readBoardID
@@ -1135,18 +1157,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 		return;
 	}
 	
-	//find out the VME FPGA version
-	unsigned long vmeVersion = 0x00;
-	[[self adapter] readLongBlock:&vmeVersion
-						 atAddress:[self baseAddress] + fpga_register_information[kVMEFPGAVersionStatus].offset
-                        numToRead:1
-						withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
-	NSLog(@"VME FPGA serial number: 0x%x \n", (vmeVersion & 0x0000FFFF));
-	NSLog(@"BOARD Revision number: 0x%x \n", ((vmeVersion & 0x00FF0000) >> 16));
-	NSLog(@"VHDL Version number: 0x%x \n", ((vmeVersion & 0xFF000000) >> 24));
-	
-	
     //[self initSerDes];
     //write the card level params
 	[self writeExternalWindow];
@@ -1204,6 +1214,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     unsigned long theValue = (pzTraceEnabled[chan]  << 14)  |
                              (poleZeroEnabled[chan] << 13)  |
                              (tpol[chan]            << 10)  |
+                          ((triggerMode[chan] & 0x1) << 4)  |
 							 (presumEnabled[chan]   << 3)   |
 							 (pileUp[chan]			<< 2)	|
                              (debug[chan]           << 1)   |
@@ -1286,13 +1297,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     unsigned long theValue = ((poleZeroMult[channel]) << 20) | (ledThreshold[channel] & 0x1FFFF);
     [[self adapter] writeLongBlock:&theValue
                          atAddress:[self baseAddress] + register_information[kLEDThreshold].offset + 4*channel
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-    theValue = 0x0;
-    if(triggerMode[channel] == kTrapezoidalTriggerMode) theValue = (1 << 31) | ledThreshold[channel];
-    [[self adapter] writeLongBlock:&theValue
-                         atAddress:[self baseAddress] + register_information[kTrapezoidalTriggerReg].offset + 4*channel
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];

@@ -1254,7 +1254,10 @@
     @try {
         unsigned short theID = [model readBoardID];
         NSLog(@"Gretina BoardID (slot %d): 0x%x\n",[model slot],theID);
-        if(theID == ([model baseAddress]>>16))NSLog(@"Gretina BoardID looks correct\n");
+        if(theID == ([model baseAddress]>>16)){
+            NSLog(@"Gretina BoardID looks correct\n");
+            [model readFPGAVersions];
+        }
         else NSLogColor([NSColor redColor],@"Gretina BoardID 0x%x doesn't match dip settings 0x%x\n", theID, [model baseAddress]>>16);
     }
 	@catch(NSException* localException) {
@@ -1313,7 +1316,7 @@
                       ((value>>1)&0x1)?@"[YES]":@"[ NO]",	//debug
                       ((value>>2)&0x1)?@"[YES]":@"[ NO]",   //presum
                       ((value>>13)&0x1)?@"[YES]":@"[ NO]",  //pole-zero
-                      polString, (value>>3)&0x3);
+                      polString, (value>>4)&0x1);
         }
         unsigned short fifoStatus = [model readFifoState];
         if(fifoStatus == kFull)			    NSLog(@"FIFO = Full\n");

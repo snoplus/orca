@@ -62,8 +62,6 @@
 #define kGretina4MReloadMainFPGACmd	0x3
 #define kGretina4MMainFPGAIsLoaded	0x41
 
-#define kTrapezoidalTriggerMode	0x4
-
 #define kSPIData	    0x2
 #define kSPIClock	    0x4
 #define kSPIChipSelect	0x8
@@ -146,7 +144,6 @@ enum {
 	kSelfTriggerCount,			//[72] self trigger count
 	kFIFOInterfaceSMReg,		//[73] FIFOInterfaceSMReg
 	kTestSignalReg,				//[74] Test Signals Register
-	kTrapezoidalTriggerReg,     //[75] Trapezoidal Trigger settings
 	kNumberOfGretina4MRegisters	//must be last
 };
 
@@ -385,6 +382,7 @@ enum Gretina4MFIFOStates {
 
 #pragma mark •••Hardware Access
 - (short) readBoardID;
+- (void) readFPGAVersions;
 - (void) resetBoard;
 - (void) resetDCM;
 - (void) setClockSource:(unsigned long) clocksource;
