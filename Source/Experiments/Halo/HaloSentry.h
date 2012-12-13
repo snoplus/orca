@@ -115,7 +115,6 @@ enum eHaloStatus {
     NSArray* sbcs;
     NSArray* shapers;
     NSString* sbcRootPwd;
-    NSMutableDictionary* sbcPingTasks;
     NSMutableArray* unPingableSBCs;
     NSMutableArray* sentryLog;
 }
@@ -202,6 +201,9 @@ enum eHaloStatus {
 - (void) flushSentryLog;
 - (void) clearStats;
 - (void) updateRemoteShapers;
+- (void) connectSocket:(BOOL)aFlag;
+- (void) sendCmd:(NSString*)aCmd;
+- (void) removeFromReadoutList:(NSArray*)someObjects;
 
 #pragma mark ***Alarms
 - (void) postMacPingAlarm;
@@ -219,6 +221,16 @@ enum eHaloStatus {
 - (void) clearSBCPingAlarm;
 
 - (void) clearAllAlarms;
+
+#pragma mark •••Finite State Machines
+- (void) step;
+- (void) stepSimpleWatch;
+- (void) stepPrimarySystem;
+- (void) stepSecondarySystem;
+- (void) stepHealthyToggle;
+- (void) stepTakeOver;
+- (void) finish;
+
 @end
 
 extern NSString* HaloSentryStealthMode2Changed;

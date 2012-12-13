@@ -63,7 +63,6 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
     [runControl release];
     [otherSystemIP release];
     [thisSystemIP release];
-    [sbcPingTasks release];
     [unPingableSBCs release];
     [sentryLog release];
     [pingTask release];
@@ -136,9 +135,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
 
 - (void) collectObjects
 {
-    [sbcPingTasks release];
-    sbcPingTasks = nil;
-    
+
     [sbcs release];
     sbcs = nil;
     sbcs = [[[[NSApp delegate ]document] collectObjectsOfClass:NSClassFromString(@"ORVmecpuModel")]retain];
@@ -410,6 +407,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
         case eBootCrates:           return @"Booting Crates";
         case eWaitForBoot:          return @"Waiting For Crates";
         case ePingCrates:           return @"Pinging Crates";
+        default:                    return @"?";
     }
 }
 
@@ -421,6 +419,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
         case eSecondary:        return @"Secondary";
         case eHealthyToggle:    return @"Toggle";
         case eTakeOver:         return @"TakeOver";
+        default:                return @"?";
     }
 }
 
@@ -1231,29 +1230,6 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
     }
 }
 
-- (void) pingSBC:(id)anSBC
-{
-    if(!sbcPingTasks)sbcPingTasks = [[NSMutableDictionary dictionary] retain];
-    NSTask* aPingTask = [sbcPingTasks objectForKey:anSBC];
-    
-    if(!aPingTask){
-
-        ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
-        aPingTask = [[NSTask alloc] init];
-        [sbcPingTasks setObject:aPingTask forKey:anSBC];
-        [aPingTask setLaunchPath:@"/sbin/ping"];
-        [aPingTask setArguments: [NSArray arrayWithObjects:@"-c",@"1",@"-t",@"10",@"-q",otherSystemIP,nil]];
-        
-        [aSequence addTaskObj:aPingTask];
-        [aSequence setVerbose:NO];
-        [aSequence setTextToDelegate:YES];
-        [aSequence launch];
-        
-    }
-    else {
-        [aPingTask terminate];
-    }
-}
 
 - (BOOL) pingTaskRunning
 {
@@ -1334,6 +1310,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
                 [aDataTask removeObject:anObj];
             }
         }
+        [dataTasks release];
         [self postListModAlarm];
         sbcSocketDropCount = 0;
         [[self undoManager] enableUndoRegistration];
