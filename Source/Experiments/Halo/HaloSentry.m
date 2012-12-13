@@ -77,11 +77,13 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
 - (void) sleep
 {
     [self stop];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void) wakeUp
 {
     if(wasRunning)[self start];
+    [self registerNotificationObservers];
 }
 
 - (void) awakeAfterDocumentLoaded
@@ -173,10 +175,12 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
 
 - (void) sbcSocketDropped:(NSNotification*)aNote
 {
-    //the sbc socket was dropped. Most likely caused by the sbc readout process dying.
-    ignoreRunStates = YES;
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(handleSbcSocketDropped) object:nil];
-    [self performSelector:@selector(handleSbcSocketDropped) withObject:nil afterDelay:5];
+    if(sentryIsRunning){
+        //the sbc socket was dropped. Most likely caused by the sbc readout process dying.
+        ignoreRunStates = YES;
+        [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(handleSbcSocketDropped) object:nil];
+        [self performSelector:@selector(handleSbcSocketDropped) withObject:nil afterDelay:5];
+    }
 }
 
 
