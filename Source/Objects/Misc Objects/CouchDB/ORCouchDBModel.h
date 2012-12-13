@@ -97,6 +97,7 @@
 - (void) startingSweep;
 - (void) sweepDone;
 - (void) incChangeCounter;
+- (void) checkReplication;
 
 #pragma mark ***DB Access
 - (ORCouchDB*) statusDBRef;
