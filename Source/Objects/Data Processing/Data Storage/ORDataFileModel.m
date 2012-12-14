@@ -512,41 +512,48 @@ static const int currentVersion = 1;           // Current version
         
         [filePointer release];
         filePointer = nil;
-        
+  
         [dataBuffer release];
         dataBuffer = nil;
-        
+
         NSString* tmpFileName = openFilePath;
         NSLog(@"Closing dataFile: %@\n",[tmpFileName stringByAbbreviatingWithTildeInPath]);
-        NSString* fullFileName = [[[dataFolder finalDirectoryName]stringByExpandingTildeInPath] stringByAppendingPathComponent:[self fileName]];
-		BOOL copiedOK = [[NSFileManager defaultManager] moveItemAtPath:tmpFileName toPath:fullFileName error:nil];
-        if(copiedOK){
-            NSLog(@"Moving dataFile to : %@\n",[fullFileName stringByAbbreviatingWithTildeInPath]);
+        
+        //move all files from the openFiles dir to the data dir.
+        NSString* openFilesDir = [openFilePath stringByDeletingLastPathComponent];
+        NSFileManager* fm = [NSFileManager defaultManager];
+        NSArray *files = [fm contentsOfDirectoryAtPath:openFilesDir error:nil];
+        if (files == nil) {
+            NSLogColor([NSColor redColor],@"Unable to move dataFiles out of: %@ to %@\n",openFilesDir,[dataFolder finalDirectoryName]);
+            NSLogColor([NSColor redColor],@"You will have to do it manually.\n");
         }
         else {
-            NSFileManager* fm = [NSFileManager defaultManager];
-            int subRun = 1;
-            do {
-                NSString* subRunFileName = [NSString stringWithFormat:@"%@_%d",fullFileName,subRun];
-                if(![fm fileExistsAtPath:subRunFileName]){
-                    copiedOK = [[NSFileManager defaultManager] moveItemAtPath:tmpFileName toPath:subRunFileName error:nil];
+            if([files count]>1)NSLog(@"There is more than one file in %@. Will attempt to move all of them.\n",[openFilesDir stringByAbbreviatingWithTildeInPath] );
+            int failedCount=0;
+            for (NSString *file in files) {
+                if(![file hasPrefix:@"."]){
+                    
+                    NSString* startPath = [[openFilesDir stringByAppendingPathComponent:file]stringByExpandingTildeInPath];
+                    NSString* endPath   = [[[dataFolder finalDirectoryName] stringByAppendingPathComponent:file]stringByExpandingTildeInPath];
+                    BOOL copiedOK = [[NSFileManager defaultManager] moveItemAtPath:startPath toPath:endPath error:nil];
                     if(copiedOK){
-                        NSLog(@"Moving subRun dataFile to : %@\n",[subRunFileName stringByAbbreviatingWithTildeInPath]);
+                        NSLog(@"Move %@ --> %@  <OK>\n",[startPath stringByAbbreviatingWithTildeInPath],[endPath stringByAbbreviatingWithTildeInPath]);
                     }
                     else {
-                        NSLogColor([NSColor redColor],@"Unable to move dataFile: %@ to %@\n",tmpFileName,[subRunFileName stringByAbbreviatingWithTildeInPath]);
-                        NSLogColor([NSColor redColor],@"You will have to do it manually.");
-                    }
-                    break;
-                }
-				subRun++;
-            }while(1);
+                        NSLogColor([NSColor redColor],@"Move %@ --> %@  <Failed>\n",[startPath stringByAbbreviatingWithTildeInPath],[endPath stringByAbbreviatingWithTildeInPath]);
+                        failedCount++;
+                     }
+               }
+            }
+            if(failedCount){
+                NSLogColor([NSColor redColor],@"%d file%@ failed to copy out of the openFiles folder. You will have to move %@ manually\n",failedCount,failedCount>1?@"s":@"",failedCount>1?@"them":@"it");
+
+            }
         }
-        
-        
-        if([dataFolder copyEnabled]){		
-            //start a copy of the Data File
-            [dataFolder queueFileForSending:fullFileName];
+        if([dataFolder copyEnabled]){
+            NSString* fullFileName = [[[dataFolder finalDirectoryName]stringByExpandingTildeInPath] stringByAppendingPathComponent:[self fileName]];
+            if([dataFolder queueIsRunning]) [dataFolder queueFileForSending:fullFileName];
+            else                            [dataFolder sendAll];
         }
     }
     
