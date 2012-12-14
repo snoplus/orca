@@ -315,7 +315,7 @@ NSString* ORFolderTransferTypeChangedNotification	= @"ORFolderTransferTypeChange
         }
     }
     
-    [self startTheQueue];
+    if(![self queueIsRunning])[self startTheQueue];
     
 }
 
