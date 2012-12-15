@@ -56,59 +56,63 @@
 		NSLog(@"<%@> does not exist.\n",filePath);
 		return;
 	}
-	NSFileHandle* fh = [NSFileHandle fileHandleForReadingAtPath:filePath];
-	if([currentDecoder legalDataFile:fh]){
-		dataToProcess = [[NSMutableData dataWithCapacity:kAmountToRead] retain];
-		[dataToProcess appendData:[fh readDataOfLength:kAmountToRead]];
-		if([delegate respondsToSelector:@selector(setFileToReplay:)]){
-			[delegate setFileToReplay:filePath];
-		}
-		dataArray = [[NSMutableArray arrayWithCapacity:1024*1024] retain];
+    @try {
+        NSFileHandle* fh = [NSFileHandle fileHandleForReadingAtPath:filePath];
+        if([currentDecoder legalDataFile:fh]){
+            dataToProcess = [[NSMutableData dataWithCapacity:kAmountToRead] retain];
+            [dataToProcess appendData:[fh readDataOfLength:kAmountToRead]];
+            if([delegate respondsToSelector:@selector(setFileToReplay:)]){
+                [delegate setFileToReplay:filePath];
+            }
+            dataArray = [[NSMutableArray arrayWithCapacity:1024*1024] retain];
 
-		NSDictionary *fattrs = [[NSFileManager defaultManager] attributesOfItemAtPath:filePath error:nil];
-		long long totalSize = [[fattrs objectForKey:NSFileSize] longLongValue];
-		long long totalProcessed = 0;
-		while([dataToProcess length]!=0) {
-			NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-			if([delegate respondsToSelector:@selector(cancelAndStop)]){
-				if([delegate cancelAndStop]) {
-					[pool release];
-					break;
-				}
-			}
-			if([dataToProcess length]!=0){
-				[self processData];
-				NSData* newData = [fh readDataOfLength:kAmountToRead];
-				if([newData length] == 0){
-					[pool release];
-					break;
-				}
-				totalProcessed += [newData length];
-				[dataToProcess appendData:newData];
-				if([delegate respondsToSelector:@selector(updateProgress:)]){
-					[delegate performSelectorOnMainThread:@selector(updateProgress:)
-											   withObject:[NSNumber numberWithFloat:100.*((double)totalProcessed/(double)totalSize)]
-											waitUntilDone:NO];
-				}
-			}
-			else {
-				[pool release];
-				break;
-			}
-			[pool release];
-		}
-		if([dataArray count]){
-			[delegate sendDataArray:dataArray decoder:currentDecoder];
-			[dataArray removeAllObjects];
-		}
-		if([delegate respondsToSelector:@selector(updateProgress:)]){
-			[delegate performSelectorOnMainThread:@selector(updateProgress:)
-									   withObject:[NSNumber numberWithFloat:100.]
-									waitUntilDone:YES];
-		}
-
-		
-	}
+            NSDictionary *fattrs = [[NSFileManager defaultManager] attributesOfItemAtPath:filePath error:nil];
+            long long totalSize = [[fattrs objectForKey:NSFileSize] longLongValue];
+            long long totalProcessed = 0;
+            while([dataToProcess length]!=0) {
+                NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+                if([delegate respondsToSelector:@selector(cancelAndStop)]){
+                    if([delegate cancelAndStop]) {
+                        [pool release];
+                        break;
+                    }
+                }
+                if([dataToProcess length]!=0){
+                    [self processData];
+                    NSData* newData = [fh readDataOfLength:kAmountToRead];
+                    if([newData length] == 0){
+                        [pool release];
+                        break;
+                    }
+                    totalProcessed += [newData length];
+                    [dataToProcess appendData:newData];
+                    if([delegate respondsToSelector:@selector(updateProgress:)]){
+                        [delegate performSelectorOnMainThread:@selector(updateProgress:)
+                                                   withObject:[NSNumber numberWithFloat:100.*((double)totalProcessed/(double)totalSize)]
+                                                waitUntilDone:NO];
+                    }
+                }
+                else {
+                    [pool release];
+                    break;
+                }
+                [pool release];
+            }
+            if([dataArray count]){
+                [delegate sendDataArray:dataArray decoder:currentDecoder];
+                [dataArray removeAllObjects];
+            }
+            if([delegate respondsToSelector:@selector(updateProgress:)]){
+                [delegate performSelectorOnMainThread:@selector(updateProgress:)
+                                           withObject:[NSNumber numberWithFloat:100.]
+                                        waitUntilDone:YES];
+            }
+        }
+    }
+    @catch (NSException* e){
+        NSLog(@"Replay halted abnormally\n");
+        NSLog(@"%@\n",e);
+    }
 }
 
 - (void) processData
