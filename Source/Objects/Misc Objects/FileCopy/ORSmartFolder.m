@@ -445,22 +445,32 @@ NSString* ORFolderTransferTypeChangedNotification	= @"ORFolderTransferTypeChange
 
 - (void) fileMoverIsDone: (NSNotification*)aNote
 {
-    // [[aNote object] release];
-    //OK, the last file being sent is done, get started on the next one.
-    [self setTheWorkingFileMover:[fileQueue dequeue]];
-    if(theWorkingFileMover){
-        [theWorkingFileMover doMove];
-        workingOnFile++;
-        [[NSNotificationCenter defaultCenter]
-            postNotificationName:ORDataFileQueueRunningChangedNotification
-                          object: self];
-        
-    }
-    else {
+
+    if([[[aNote userInfo] objectForKey:@"Status"] isEqualToString:@"Failed"]){
+        [self setQueueIsRunning:NO];
+        [fileQueue removeAllObjects];
         [fileQueue release];
         fileQueue = nil;
-        [self setQueueIsRunning:NO];
-        NSLog(@"<%@> Send queue empty.\n",title);
+        [theWorkingFileMover stop];
+       
+    }
+    else {
+        //OK, the last file being sent is done, get started on the next one.
+        [self setTheWorkingFileMover:[fileQueue dequeue]];
+        if(theWorkingFileMover){
+            [theWorkingFileMover doMove];
+            workingOnFile++;
+            [[NSNotificationCenter defaultCenter]
+                postNotificationName:ORDataFileQueueRunningChangedNotification
+                              object: self];
+            
+        }
+        else {
+            [fileQueue release];
+            fileQueue = nil;
+            [self setQueueIsRunning:NO];
+            NSLog(@"<%@> Send queue empty.\n",title);
+        }
     }
 }
 

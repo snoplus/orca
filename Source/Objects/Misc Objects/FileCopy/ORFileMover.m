@@ -461,8 +461,10 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
 		}
 		NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
         [nc postNotificationName:NSTaskDidTerminateNotification object:self];
-        [nc postNotificationName:ORFileMoverIsDoneNotification object:self];
-		
+        NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+        if(transferOK) [userInfo setObject:@"Success" forKey:@"Status"];
+        else           [userInfo setObject:@"Failed" forKey:@"Status"];
+        [nc postNotificationName:ORFileMoverIsDoneNotification object:self userInfo:userInfo];
 	}
 }
 
