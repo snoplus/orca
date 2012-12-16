@@ -652,12 +652,13 @@ void stopRun()
     run_info.statusBits        &= ~kSBC_RunningMask;        //clr bit
     run_info.statusBits        &= ~kSBC_PausedMask;			//clr bit
     run_info.statusBits        &= ~kSBC_ConfigLoadedMask;	//clr bit
-    run_info.readCycles        = 0;
+
+    // block until return
+    pthread_join(readoutThreadId, NULL);
+    run_info.readCycles = 0;
 
     stopHWRun(&crate_config);
 	commitData();
-    // block until return
-    pthread_join(readoutThreadId, NULL);
     cleanupHWRun(&crate_config);
     memset(&crate_config,0,sizeof(SBC_crate_config));
     //CB_cleanup();
@@ -722,9 +723,14 @@ void* readoutThread (void* p)
     while(run_info.statusBits & kSBC_RunningMask) {
 		if((run_info.statusBits & kSBC_PausedMask) != kSBC_PausedMask){
 			if (cycles % 10000 == 0 ) {
-			  pthread_mutex_lock (&runInfoMutex);  //begin critical section
-			  run_info.readCycles = cycles;
-			  pthread_mutex_unlock (&runInfoMutex);  //end critical section
+                int m_err;
+                //deadlock possible e.g. on stopRun
+                m_err = pthread_mutex_trylock(&runInfoMutex);  //begin critical section
+                if (m_err == 0) {
+                    run_info.readCycles = cycles;
+                    pthread_mutex_unlock (&runInfoMutex);  //end critical section
+                }
+                //todo else EBUSY is ok, EINVAL and EFAULT are really bad
 			}
 			
 			index = readHW(&crate_config,index,0); //nil for the lam data
