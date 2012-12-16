@@ -15,40 +15,25 @@ uint32_t ORMTCReadout::mem_read_ptr = k_fifo_valid_mask;
 uint32_t ORMTCReadout::last_mem_write_ptr = k_fifo_valid_mask;
 uint32_t ORMTCReadout::mem_write_ptr = k_fifo_valid_mask;
 uint32_t ORMTCReadout::simm_empty_space = k_fifo_valid_mask + 1;
+float ORMTCReadout::trigger_rate = 0;
+uint32_t ORMTCReadout::last_good_gtid = 0;
 
 bool ORMTCReadout::Start() {
 
-    ResetTheMemory(); //takes care of last_good_gtid and simm_empty_space
+    const bool resetFifoOnStart = GetDeviceSpecificData()[5];
+    if (resetFifoOnStart) {
+        ResetTheMemory(); //takes care of last_good_gtid and simm_empty_space
 
-	const uint32_t mem_read_reg = GetDeviceSpecificData()[0]; // 0x2CUL;
-	uint32_t value = 0;
-    
-	if (VMERead(GetBaseAddress() + mem_read_reg, GetAddressModifier(),
-                sizeof(value), value) < (int32_t) sizeof(value)){
-		LogBusError("BusError: mem_access at: 0x%08x", mem_read_reg);
-		return true;
-	}
-    
-	value &= k_fifo_valid_mask;
-	last_mem_read_ptr = value;
-	mem_read_ptr = value;
-
-	const uint32_t mem_write_reg = 0x28UL;
-	value = 0;
-    
-	if (VMERead(GetBaseAddress() + mem_write_reg, GetAddressModifier(),
-                sizeof(value), value) < (int32_t) sizeof(value)){
-		LogBusError("BusError: mem_access at: 0x%08x", mem_write_reg);
-		return true;
-	}
-    
-	value &= k_fifo_valid_mask;
-	last_mem_write_ptr = value;
-	mem_write_ptr = value;
+        //set correct trigger mask
+        uint32_t trigger_mask = GetDeviceSpecificData()[6];
+        if (VMEWrite(GetBaseAddress() + 0x34UL, GetAddressModifier(), 
+                     sizeof(trigger_mask), trigger_mask) < (int32_t) sizeof(trigger_mask)){
+            LogBusError("BusError: set trigger_mask to 0x%08x\n", trigger_mask);
+            return false; 
+        }        
+    }
 
 	last_good_10mhz_upper = 0;
-	//last_good_gtid = 0; //see ResetTheMemory()
-    //simm_empty_space = 0x100000; //ditto
     
     struct timezone tz;
     gettimeofday(&timestamp, &tz);
@@ -64,6 +49,7 @@ bool ORMTCReadout::Stop() {
         Readout(0);
     }
 */
+
 	return true;
 }
 
@@ -160,6 +146,7 @@ bool ORMTCReadout::ResetTheMemory()
     mem_write_ptr = 0;
     last_mem_write_ptr = 0;
     simm_empty_space = 0x100000;
+    trigger_rate = 0;
 
     //update GTID
     uint32_t gtid_value = 0;
@@ -174,7 +161,7 @@ bool ORMTCReadout::ResetTheMemory()
         last_good_gtid = gtid_value - 1;
     }
     else {
-        last_good_gtid = 0xffffff;
+        last_good_gtid = 0x0;
     }
 
     return true;
@@ -225,6 +212,25 @@ bool ORMTCReadout::Readout(SBC_LAM_Data* /*lamData*/)
     }
     mem_write_ptr &= k_fifo_valid_mask;
 
+    uint32_t check_mem_write_ptr = 0;
+    if (VMERead(GetBaseAddress() + mem_write_reg, GetAddressModifier(),
+                sizeof(check_mem_write_ptr), check_mem_write_ptr) < (int32_t) sizeof(check_mem_write_ptr)) {
+        LogBusError("BusError: mem_write at: 0x%08x\n", mem_write_reg);
+        return true;
+    }
+    check_mem_write_ptr &= k_fifo_valid_mask;
+
+    //the check is to avoid a bad read of the write ptr, jump forward here only
+    //bad read resulting in jump back, and real jumps are handled below
+    if ((check_mem_write_ptr > 15 && check_mem_write_ptr < mem_write_ptr) ||
+            (check_mem_write_ptr > mem_write_ptr + 15) ||
+            (check_mem_write_ptr < 15 && mem_write_ptr > 15 && mem_write_ptr < 0xffff1)) {
+
+        LogMessage("MTCD bad write ptr reads: 0x%05x, 0x%05x",
+                mem_write_ptr, check_mem_write_ptr);
+        return true;
+    }
+
     triggered = false;
     if (mem_write_ptr > mem_read_ptr) {
         triggered = true;
@@ -266,19 +272,50 @@ bool ORMTCReadout::Readout(SBC_LAM_Data* /*lamData*/)
     if (eventsStored < 0) {
         eventsStored += 0x100000;
     }
+    uint32_t number_new_events = 0;
+    if (mem_write_ptr >= last_mem_write_ptr) {
+        number_new_events = mem_write_ptr - last_mem_write_ptr;
+    }
+    else {
+        number_new_events = mem_write_ptr + 0x100000 - last_mem_write_ptr;
+    }
+   
+    simm_empty_space -= number_new_events;
+    trigger_rate = 0.9 * trigger_rate + 0.1 * number_new_events;
+    last_mem_write_ptr = mem_write_ptr;
+
+    if (simm_empty_space < 10000) {
+        reset_the_memory = true;
+        LogMessage("MTCD SIMM out of empty space, reset");
+        return true;
+    }
+
+    //trigger rate too high, skip some events
+    int32_t event_flood_bar = trigger_rate * 256 * 2 + 4096;
+    if ((trigger_rate > 32 && eventsStored > 190000) || eventsStored > event_flood_bar) {
+        //set read pointer ahead
+        uint32_t jump_ahead = trigger_rate - 31;
+        if (eventsStored > event_flood_bar) {
+            jump_ahead += 1 / 2048. * (eventsStored - event_flood_bar) + 1;
+        }
+        mem_read_ptr += jump_ahead;
+        if (mem_read_ptr > k_fifo_valid_mask) {
+            mem_read_ptr -= 0x100000;
+        }
+        last_mem_read_ptr = mem_read_ptr;
+        
+        if (VMEWrite(GetBaseAddress() + mem_read_reg, GetAddressModifier(), 
+                     sizeof(mem_read_ptr), mem_read_ptr) < (int32_t) sizeof(mem_read_ptr)){
+            LogBusError("BusError: rd ptr inc to 0x%08x", mem_read_ptr);
+            reset_the_memory = true;
+            return true; 
+        }
+    } 
+
     //check the rate
     if (eventsStored > 32) {
         eventsStored = 32;
     }
-
-    if (mem_write_ptr >= last_mem_write_ptr) {
-        simm_empty_space -= mem_write_ptr - last_mem_write_ptr;
-    }
-    else {
-        simm_empty_space -= mem_write_ptr + 0x100000 - last_mem_write_ptr;
-    }
-    
-    last_mem_write_ptr = mem_write_ptr;
 
 /* 
     //get the read ptr and check the trigger, step 1: data available
@@ -292,20 +329,7 @@ bool ORMTCReadout::Readout(SBC_LAM_Data* /*lamData*/)
     
     if (!triggered) return true;
 */
-   
-    /*
-     * the idea here is to guarantee MTCD doesn't get behind the CAEN digitizer
-     * the lame implementation is to grab a couple events before we switch
-     * before you change the 32 events per switch make sure you measure all the times
-     * make sure that the time to pull data traces from CAEN is less than the time
-     * MTCD needs to get the next event ready
-     */
-     /*
-     struct timeval tv1, tv2;
-     struct timezone tz;
-     gettimeofday(&tv1, &tz);
-     */
- 
+
     do {
         ensureDataCanHold(7);
         int32_t savedIndex = dataIndex;
@@ -349,12 +373,31 @@ bool ORMTCReadout::Readout(SBC_LAM_Data* /*lamData*/)
                     LogError("MTCD stuck GTID 0x%06x", current_gtid);
                     return true;
             }
-            else { //rollover?
-                if (current_gtid + 0x1000000 - last_good_gtid > max_allowed_gtid_jump) {
-                    reset_the_memory = true;
-                    LogError("MTCD GTID jumped back from 0x%06x to 0x%06x",
-                            last_good_gtid, current_gtid);
-                    return true;
+            else { //rollover? 0xfefffe -> 0x0
+                if (current_gtid + 0xff0000 - last_good_gtid > max_allowed_gtid_jump) {
+                    //false zero bit? misplaced bit?
+                    uint32_t expected_gtid = last_good_gtid + 1;
+                    if (expected_gtid > 0xfefffe) {
+                        expected_gtid = 0;
+                    }
+                    expected_gtid = current_gtid ^ expected_gtid;
+                    uint32_t num_bits;
+                    for (num_bits = 0; expected_gtid; num_bits++) {
+                        expected_gtid &= expected_gtid - 1;
+                    }
+                    if (num_bits < 3) {
+                        //throw away the event, don't reset
+                        dataIndex = savedIndex;
+                        LogMessage("MTCD GTID bit err from 0x%06x to 0x%06x",
+                                last_good_gtid, current_gtid);
+                        current_gtid = last_good_gtid;
+                    }
+                    else {
+                        reset_the_memory = true;
+                        LogError("MTCD GTID jumped back from 0x%06x to 0x%06x",
+                                last_good_gtid, current_gtid);
+                        return true;
+                    }
                 }
             }
 
