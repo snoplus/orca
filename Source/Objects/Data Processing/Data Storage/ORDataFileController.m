@@ -70,6 +70,11 @@ enum {
 
 #pragma  mark ¥¥¥Actions
 
+- (void) generateMD5Action:(id)sender
+{
+	[model setGenerateMD5:[sender intValue]];
+}
+
 - (IBAction) processLimitHighAction:(id)sender
 {
 	[model setProcessLimitHigh:[sender floatValue]];	
@@ -143,6 +148,11 @@ enum {
 
 
 #pragma mark ¥¥¥Interface Management
+
+- (void) generateMD5Changed:(NSNotification*)aNote
+{
+	[generateMD5CB setIntValue: [model generateMD5]];
+}
 
 - (void) processLimitHighChanged:(NSNotification*)aNote
 {
@@ -298,6 +308,11 @@ enum {
                          name : ORDataFileModelProcessLimitHighChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(generateMD5Changed:)
+                         name : ORDataFileModelGenerateMD5Changed
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -318,6 +333,7 @@ enum {
 	[self useDatedFileNamesChanged:nil];
 	[self sizeLimitReachedActionChanged:nil];
 	[self processLimitHighChanged:nil];
+	[self generateMD5Changed:nil];
 }
 
 

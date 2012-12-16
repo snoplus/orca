@@ -27,6 +27,7 @@
 #import "ORStatusController.h"
 
 #pragma mark ¥¥¥Notification Strings
+NSString* ORDataFileModelGenerateMD5Changed = @"ORDataFileModelGenerateMD5Changed";
 NSString* ORDataFileModelProcessLimitHighChanged = @"ORDataFileModelProcessLimitHighChanged";
 NSString* ORDataFileModelUseDatedFileNamesChanged	= @"ORDataFileModelUseDatedFileNamesChanged";
 NSString* ORDataFileModelUseFolderStructureChanged	= @"ORDataFileModelUseFolderStructureChanged";
@@ -92,6 +93,7 @@ static const int currentVersion = 1;           // Current version
     [dataFolder release];
     [statusFolder release];
     [configFolder release];
+    [[NSOperationQueue mainQueue] cancelAllOperations];
     
     [super dealloc];
 }
@@ -192,6 +194,20 @@ static const int currentVersion = 1;           // Current version
 
 
 #pragma mark ¥¥¥Accessors
+
+- (BOOL) generateMD5
+{
+    return generateMD5;
+}
+
+- (void) setGenerateMD5:(BOOL)aGenerateMD5
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setGenerateMD5:generateMD5];
+    
+    generateMD5 = aGenerateMD5;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDataFileModelGenerateMD5Changed object:self];
+}
 
 - (float) processLimitHigh
 {
@@ -547,13 +563,20 @@ static const int currentVersion = 1;           // Current version
             }
             if(failedCount){
                 NSLogColor([NSColor redColor],@"%d file%@ failed to copy out of the openFiles folder. You will have to move %@ manually\n",failedCount,failedCount>1?@"s":@"",failedCount>1?@"them":@"it");
-
             }
         }
         if([dataFolder copyEnabled]){
             NSString* fullFileName = [[[dataFolder finalDirectoryName]stringByExpandingTildeInPath] stringByAppendingPathComponent:[self fileName]];
-            if([dataFolder queueIsRunning]) [dataFolder queueFileForSending:fullFileName];
-            else                            [dataFolder sendAll];
+            if(generateMD5){
+                //the md5 op will send the file after generating the checksum
+                ORMD5Op* md5Op = [[ORMD5Op alloc] initWithFilePath:fullFileName delegate:self];
+                [[NSOperationQueue mainQueue] addOperation:md5Op];
+                [md5Op release];
+            }
+            else {
+                //no md5 to be done, so just send it.
+                [self sendFile:fullFileName];
+            }
         }
     }
     
@@ -606,6 +629,13 @@ static const int currentVersion = 1;           // Current version
 	[openFilePath release];
 	openFilePath = nil;
 	percentFull = 0;
+}
+
+- (void) sendFile:(NSString*)fullFileName
+{
+    if([dataFolder queueIsRunning]) [dataFolder queueFileForSending:fullFileName];
+    else                            [dataFolder sendAll];
+    
 }
 
 - (void) runTaskBoundary
@@ -707,6 +737,7 @@ static NSString* ORDataSaveConfiguration    = @"ORDataSaveConfiguration";
     
     [[self undoManager] disableUndoRegistration];
     
+    [self setGenerateMD5:[decoder decodeBoolForKey:@"ORDataFileModelGenerateMD5"]];
     [self setProcessLimitHigh:[decoder decodeFloatForKey:@"processLimitHigh"]];
     [self setUseDatedFileNames:	[decoder decodeBoolForKey:@"ORDataFileModelUseDatedFileNames"]];
     [self setMaxFileSize:		[decoder decodeFloatForKey:@"ORDataFileModelMaxFileSize"]];
@@ -761,6 +792,7 @@ static NSString* ORDataSaveConfiguration    = @"ORDataSaveConfiguration";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeBool:generateMD5 forKey:@"ORDataFileModelGenerateMD5"];
     [encoder encodeFloat:processLimitHigh forKey:@"processLimitHigh"];
     [encoder encodeBool:useDatedFileNames	forKey:@"ORDataFileModelUseDatedFileNames"];
     [encoder encodeBool:useFolderStructure	forKey:@"ORDataFileModelUseFolderStructure"];
@@ -892,3 +924,57 @@ static NSString* ORDataSaveConfiguration    = @"ORDataSaveConfiguration";
 }
 @end
 
+@implementation ORMD5Op
+- (id) initWithFilePath:(NSString*)aPath delegate:(id)aDelegate
+{
+	self = [super init];
+	delegate = aDelegate;
+	filePath = [aPath copy];
+    return self;
+}
+
+- (void) dealloc
+{
+	[filePath release];
+	[super dealloc];
+}
+
+- (void) main
+{
+	@try {
+		if(filePath && ![self isCancelled]){
+			NSTask* task = [[NSTask alloc] init];
+			[task setLaunchPath: @"/sbin/md5"];			
+			[task setArguments: [NSArray arrayWithObjects: filePath,nil]];
+			
+			NSPipe* pipe = [NSPipe pipe];
+			[task setStandardOutput: pipe];
+			
+			NSFileHandle* file = [pipe fileHandleForReading];
+			[task launch];
+            
+			NSData* data = [file readDataToEndOfFile];
+			if(data){
+				NSString* result = [[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding];
+				if([result length]){
+                    NSLog(@"md5 Task: %@", result);
+                    NSArray* parts = [result componentsSeparatedByString:@"="];
+                    if([parts count]==2){
+                        NSString* md5Part = [parts objectAtIndex:1];
+                        md5Part = [md5Part stringByReplacingOccurrencesOfString:@" " withString:@""];
+                        NSString* md5File = [[filePath stringByDeletingPathExtension] stringByAppendingPathExtension:@"md5"];
+                        [md5Part  writeToFile:md5File atomically:NO encoding:NSASCIIStringEncoding error:nil];
+                        [delegate sendFile:md5File];
+                    }
+
+                }
+			}
+			[task release];
+            
+            [delegate sendFile:filePath];
+		}
+	}
+	@catch(NSException* e){
+	}
+}
+@end

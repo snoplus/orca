@@ -71,9 +71,12 @@
 		BOOL			processCheckedOnce;
 		float			percentFull;
 		float			processLimitHigh;
+        BOOL            generateMD5;
 }
 
 #pragma mark ¥¥¥Accessors
+- (BOOL) generateMD5;
+- (void) setGenerateMD5:(BOOL)aGenerateMD5;
 - (float) processLimitHigh;
 - (void) setProcessLimitHigh:(float)aProcessLimitHigh;
 - (BOOL) useDatedFileNames;
@@ -139,6 +142,7 @@
 
 
 #pragma mark ¥¥¥External String Definitions
+extern NSString* ORDataFileModelGenerateMD5Changed;
 extern NSString* ORDataFileModelProcessLimitHighChanged;
 extern NSString* ORDataFileModelUseDatedFileNamesChanged;
 extern NSString* ORDataFileModelUseFolderStructureChanged;
@@ -153,3 +157,12 @@ extern NSString* ORDataFileLock;
 extern NSString* ORDataSaveConfigurationChangedNotification;
 extern NSString* ORDataFileModelSizeLimitReachedActionChanged;
 
+
+@interface ORMD5Op : NSOperation
+{
+	id delegate;
+    NSString* filePath;
+}
+- (id) initWithFilePath:(NSString*)aPath delegate:(id)aDelegate;
+- (void) main;
+@end
