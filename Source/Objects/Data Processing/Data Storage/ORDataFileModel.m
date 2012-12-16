@@ -633,8 +633,10 @@ static const int currentVersion = 1;           // Current version
 
 - (void) sendFile:(NSString*)fullFileName
 {
-    if([dataFolder queueIsRunning]) [dataFolder queueFileForSending:fullFileName];
-    else                            [dataFolder sendAll];
+    if([dataFolder copyEnabled]){
+        if([dataFolder queueIsRunning]) [dataFolder queueFileForSending:fullFileName];
+        else                            [dataFolder sendAll];
+    }
     
 }
 
