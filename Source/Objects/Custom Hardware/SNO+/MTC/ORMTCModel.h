@@ -75,7 +75,7 @@
 		//data taking variables
 		ORReadOutList*  triggerGroup;
 		NSString*		triggerName;
-		NSArray*		dataTakers;       //cache of data takers.
+		//NSArray*		dataTakers;       //cache of data takers.
     unsigned long _mtcStatusGTID;
     unsigned long long _mtcStatusCnt10MHz;
     NSString* _mtcStatusTime10Mhz;
@@ -83,6 +83,7 @@
     unsigned long _mtcStatusWritePtr;
     BOOL _mtcStatusDataAvailable;
     unsigned long _mtcStatusNumEventsInMem;
+    BOOL _resetFifoOnStart;
 }
 
 @property (nonatomic,assign) BOOL isPulserFixedRate;
@@ -105,6 +106,7 @@
 @property (nonatomic,assign) BOOL mtcStatusDataAvailable;
 @property (nonatomic,assign) unsigned long mtcStatusNumEventsInMem;
 @property (nonatomic,assign) BOOL isPedestalEnabledInCSR;
+@property (nonatomic,assign) BOOL resetFifoOnStart;
 
 #pragma mark •••Initialization
 - (id) init;

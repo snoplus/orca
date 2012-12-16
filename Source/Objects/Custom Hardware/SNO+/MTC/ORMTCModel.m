@@ -212,7 +212,9 @@ mtcStatusTime10Mhz = _mtcStatusTime10Mhz,
 mtcStatusReadPtr = _mtcStatusReadPtr,
 mtcStatusWritePtr = _mtcStatusWritePtr,
 mtcStatusDataAvailable = _mtcStatusDataAvailable,
-mtcStatusNumEventsInMem = _mtcStatusNumEventsInMem;
+mtcStatusNumEventsInMem = _mtcStatusNumEventsInMem,
+resetFifoOnStart = _resetFifoOnStart;
+
 
 - (id) init //designated initializer
 {
@@ -758,7 +760,7 @@ mtcStatusNumEventsInMem = _mtcStatusNumEventsInMem;
     // first add our description to the data description
     [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORMTCModel"];
     
-	
+/*
     dataTakers = [[triggerGroup allObjects] retain];	//cache of data takers.
     
     NSEnumerator* e = [dataTakers objectEnumerator];
@@ -766,15 +768,18 @@ mtcStatusNumEventsInMem = _mtcStatusNumEventsInMem;
     while(obj = [e nextObject]){
 		[obj runTaskStarted:aDataPacket userInfo:userInfo];
     }
+*/
 	
     if ([[userInfo objectForKey:@"doinit"] boolValue]) {
         [self clearGlobalTriggerWordMask];
         [self zeroTheGTCounter];
         [self setGTCrateMask];
-        [self setSingleGTWordMask: uLongDBValue(kGtMask)];
+        //[self setSingleGTWordMask: uLongDBValue(kGtMask)]; //moved to SBC
+        [self setResetFifoOnStart:YES];
     }
     else {
         //soft start
+        [self setResetFifoOnStart:NO];
     }
 }
 
@@ -836,6 +841,7 @@ mtcStatusNumEventsInMem = _mtcStatusNumEventsInMem;
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+/*
     NSEnumerator* e = [dataTakers objectEnumerator];
     id obj;
     while(obj = [e nextObject]){
@@ -843,6 +849,7 @@ mtcStatusNumEventsInMem = _mtcStatusNumEventsInMem;
     }
 	
     [dataTakers release];
+*/
 }
 
 - (void) saveReadOutList:(NSFileHandle*)aFile
@@ -871,13 +878,14 @@ mtcStatusNumEventsInMem = _mtcStatusNumEventsInMem;
 	configStruct->card_info[index].deviceSpecificData[2] = [self memBaseAddress];
 	configStruct->card_info[index].deviceSpecificData[3] = [self memAddressModifier];
 	configStruct->card_info[index].deviceSpecificData[4] = 1000; //delay between monitoring packets in msec
+	configStruct->card_info[index].deviceSpecificData[5] = [self resetFifoOnStart];
+    configStruct->card_info[index].deviceSpecificData[6] = uLongDBValue(kGtMask);
 	
 	configStruct->card_info[index].num_Trigger_Indexes = 0; //no children
 	configStruct->card_info[index].next_Card_Index = index + 1;
 	
 	return index + 1;
 
-	
 // this doesn't work in the XL3 push mode
 // it would be great if it did
 /*
@@ -1266,7 +1274,7 @@ mtcStatusNumEventsInMem = _mtcStatusNumEventsInMem;
 {
 	unsigned long aValue = 0;
 	@try {	
-		aValue =  [self read:kMtcGmskReg] & 0x03FFFFFF;							
+		aValue =  [self read:kMtcMaskReg] & 0x03FFFFFF;
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Could not get GT word mask!\n");					
