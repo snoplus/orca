@@ -200,14 +200,10 @@ int32_t main(int32_t argc, char *argv[])
             numRead = readBuffer(&aPacket);
             if(numRead == 0) break;
             if (numRead > 0) {
- 				pthread_mutex_lock (&runInfoMutex);                            //begin critical section
 				processBuffer(&aPacket,kReply);
-				pthread_mutex_unlock (&runInfoMutex);                        //end critical section
            } else {
               /* if numRead is less than 0, then an error occurred.  We'll try to continue. */
-			   pthread_mutex_lock (&runInfoMutex);                            //begin critical section
                LogError("Error reading buffer: %s", strerror(errno));
-			   pthread_mutex_unlock (&runInfoMutex);                        //end critical section
             }
        }
         
@@ -215,9 +211,7 @@ int32_t main(int32_t argc, char *argv[])
             /* The data process is still running, we need to stop it. */
             /* This generally happens if an error occurs on the Orca side and
                 the socket is broken. */
-			pthread_mutex_lock (&runInfoMutex);                            //begin critical section
 			stopRun();
-			pthread_mutex_unlock (&runInfoMutex);                        //end critical section
             /* We should exit, too, as who knows what kind of failures exist. */
             timeToExit=1;
         }
@@ -649,13 +643,18 @@ char startRun (void)
 
 void stopRun()
 {
+    pthread_mutex_lock(&runInfoMutex);
     run_info.statusBits        &= ~kSBC_RunningMask;        //clr bit
     run_info.statusBits        &= ~kSBC_PausedMask;			//clr bit
     run_info.statusBits        &= ~kSBC_ConfigLoadedMask;	//clr bit
+    pthread_mutex_unlock(&runInfoMutex);
 
     // block until return
     pthread_join(readoutThreadId, NULL);
+
+    pthread_mutex_lock(&runInfoMutex);
     run_info.readCycles = 0;
+    pthread_mutex_unlock(&runInfoMutex);
 
     stopHWRun(&crate_config);
 	commitData();
@@ -666,14 +665,20 @@ void stopRun()
 
 char pauseRun()
 {
+    pthread_mutex_lock(&runInfoMutex);
     run_info.statusBits |= kSBC_PausedMask; 
+    pthread_mutex_unlock(&runInfoMutex);
+
 	pauseHWRun(&crate_config);
 	return 0; //could return something in the future
 }
 
 char resumeRun()
 {
+    pthread_mutex_lock(&runInfoMutex);
     run_info.statusBits &= ~kSBC_PausedMask; 
+    pthread_mutex_unlock(&runInfoMutex);
+
 	resumeHWRun(&crate_config);
 	return 0; //could return something in the future
 }
@@ -712,37 +717,44 @@ void postLAM(SBC_Packet* lamPacket)
 
 void* readoutThread (void* p)
 {
-
     size_t cycles = 0;
     pthread_mutex_lock (&runInfoMutex);                //begin critical section
     run_info.statusBits |= kSBC_RunningMask;        //set bit
     pthread_mutex_unlock (&runInfoMutex);            //end critical section
 
     dataIndex = 0;
-    int32_t index      = 0;
-    while(run_info.statusBits & kSBC_RunningMask) {
-		if((run_info.statusBits & kSBC_PausedMask) != kSBC_PausedMask){
-			if (cycles % 10000 == 0 ) {
+    int32_t index = 0;
+    while(1) {
+        uint32_t statusBits;
+        pthread_mutex_lock(&runInfoMutex);
+        statusBits = run_info.statusBits;
+        pthread_mutex_unlock(&runInfoMutex);
+
+        if ((statusBits & kSBC_RunningMask) == 0) {
+            break;
+        }
+
+        if((statusBits & kSBC_PausedMask) != kSBC_PausedMask){
+            if (cycles % 10000 == 0 ) {
                 int m_err;
-                //deadlock possible e.g. on stopRun
                 m_err = pthread_mutex_trylock(&runInfoMutex);  //begin critical section
                 if (m_err == 0) {
                     run_info.readCycles = cycles;
                     pthread_mutex_unlock (&runInfoMutex);  //end critical section
                 }
                 //todo else EBUSY is ok, EINVAL and EFAULT are really bad
-			}
-			
-			index = readHW(&crate_config,index,0); //nil for the lam data
-			cycles++;
-			
-			commitData();
-			
-			if(index>=crate_config.total_cards || index<0){
-				index = 0;
-			}
-		}
-   }
+            }
+            
+            index = readHW(&crate_config,index,0); //nil for the lam data
+            cycles++;
+            
+            commitData();
+            
+            if(index>=crate_config.total_cards || index<0){
+                index = 0;
+            }
+        }
+    }
 
     pthread_exit((void *) 0);
 }
@@ -819,16 +831,22 @@ void* irqAckThread (void* p)
 void LogMessage (const char *format,...)
 {
     if(strlen(format) > kSBC_MaxStrSize*.75) return; //not a perfect check, but it will have to do....
+
+    //we misuse the runInfoMutex to sync threads, on purpose
+    pthread_mutex_lock(&runInfoMutex);
     va_list ap;
     va_start (ap, format);
     vsprintf (run_info.messageStrings[run_info.msg_buf_index], format, ap);
     run_info.msg_buf_index = (run_info.msg_buf_index + 1 ) % kSBC_MaxErrorBufferSize;
     run_info.msg_count++;
     va_end (ap);
+    pthread_mutex_unlock(&runInfoMutex);
 }
 
 void LogError (const char *format,...)
 {
+    //we misuse the runInfoMutex to sync threads, on purpose
+    pthread_mutex_lock(&runInfoMutex);
     va_list ap;
     va_start (ap, format);
 	int32_t len = strlen(format);
@@ -842,10 +860,13 @@ void LogError (const char *format,...)
     run_info.err_buf_index = (run_info.err_buf_index + 1 ) % kSBC_MaxErrorBufferSize;
     run_info.err_count++;
     va_end (ap);
+    pthread_mutex_unlock(&runInfoMutex);
 }
 
 void LogBusError (const char *format,...)
 {
+    //we misuse the runInfoMutex to sync threads, on purpose
+    pthread_mutex_lock(&runInfoMutex);
     va_list ap;
     va_start (ap, format);
 	int32_t len = strlen(format);
@@ -860,6 +881,7 @@ void LogBusError (const char *format,...)
     run_info.err_count++;
     run_info.busErrorCount++;
     va_end (ap);
+    pthread_mutex_unlock(&runInfoMutex);
 }
 
 
