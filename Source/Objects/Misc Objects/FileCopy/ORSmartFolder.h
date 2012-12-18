@@ -19,11 +19,9 @@
 
 #pragma mark ***Imported Files
 
-
-#import "ORFileMover.h"
-
 @class ORQueue;
 @class ORFolderController;
+@class ORFileMoverOp;
 
 @interface ORSmartFolder : NSObject
 {
@@ -53,19 +51,17 @@
 	NSString*    passWord;
 	BOOL	     verbose;
 	NSString*    directoryName;
-	ORFileMover* theWorkingFileMover;
-	//ORFolderController* controller;
-	NSWindow*   window;
-	BOOL	    sheetDisplayed;
-	BOOL		useFolderStructure;
-	NSString*	defaultLastPathComponent;
-	
-        //------------------internal use only
-        ORQueue*	fileQueue;
-        BOOL        queueIsRunning;
-        int         workingOnFile;
-        int         startCount;
-		int			transferType;
+	NSWindow*    window;
+	BOOL	     sheetDisplayed;
+	BOOL		 useFolderStructure;
+	NSString*	 defaultLastPathComponent;
+	int          percentDone;
+    BOOL         halt;
+    //------------------internal use only
+    NSOperationQueue*	fileQueue;
+    int         workingOnFile;
+    int         startCount;
+    int			transferType;
 }
 
 #pragma mark ***Initialization
@@ -75,7 +71,6 @@
 - (NSView*) view;
 
 #pragma mark ***Notifications
-
 - (void) registerNotificationObservers;
 - (void) updateWindow;
 - (void) copyEnabledChanged:(NSNotification*)note;
@@ -88,14 +83,19 @@
 - (void) directoryNameChanged:(NSNotification*)note;
 - (void) queueChanged:(NSNotification*)note;
 - (void) updateButtons;
+- (void) updateSpecialButtons;
 - (void) securityStateChanged:(NSNotification*)aNotification;
 - (void) checkGlobalSecurity;
 - (void) lockChanged:(NSNotification*)aNotification;
 - (void) sheetChanged:(NSNotification*)aNotification;
 - (void) transferTypeChanged:(NSNotification*)aNote;
+- (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object
+                         change:(NSDictionary *)change context:(void *)context;
 
 #pragma mark ***Accessors
 - (NSUndoManager*) undoManager;
+- (int) percentDone;
+- (void) setPercentDone:(NSNumber*)aPercent;
 - (BOOL) useFolderStructure;
 - (void) setUseFolderStructure:(BOOL)aFlag;
 - (BOOL) copyEnabled;
@@ -118,19 +118,15 @@
 - (NSString*) directoryName;
 - (void) setDirectoryName:(NSString*)aNewDirectoryName;
 - (BOOL) queueIsRunning;
-- (void) setQueueIsRunning: (BOOL) flag;
 - (NSString*) queueStatusString;
-- (ORFileMover *) theWorkingFileMover;
-- (void) setTheWorkingFileMover: (ORFileMover *) aTheWorkingFileMover;
 - (NSString *)title;
 - (void)setTitle:(NSString *)aTitle;
 - (NSWindow *)window;
 - (void)setWindow:(NSWindow *)aWindow;
 - (NSString*) lockName;
-- (eFileTransferType) transferType;
-- (void) setTransferType:(eFileTransferType)aNewTransferType;
+- (int) transferType;
+- (void) setTransferType:(int)aNewTransferType;
 
-- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 
 #pragma mark ***Actions
 
@@ -152,13 +148,12 @@
 - (void) sendAll;
 - (void) deleteAll;
 - (void) queueFileForSending:(NSString*)fullPath;
-- (void) fileMoverIsDone: (NSNotification*)aNote;
-- (void) fileMoverPercentChanged: (NSNotification*)aNote;
 - (BOOL) shouldRemoveFile:(NSString*)aFile;
-- (void) startTheQueue;
 - (void) stopTheQueue;
 - (NSString*) ensureSubFolder:(NSString*)subFolder inFolder:(NSString*)folderName;
 - (NSString*) ensureExists:(NSString*)folderName;
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
+- (void) fileMoverIsDone;
 
 @end
 
@@ -171,6 +166,7 @@ extern NSString* ORFolderPassWordChangedNotification;
 extern NSString* ORFolderVerboseChangedNotification;
 extern NSString* ORFolderDirectoryNameChangedNotification;
 extern NSString* ORFolderTransferTypeChangedNotification;
+extern NSString* ORFolderPercentDoneChanged;
 
 extern NSString* ORFolderLock;
 

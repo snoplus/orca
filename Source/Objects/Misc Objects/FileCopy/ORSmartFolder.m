@@ -22,6 +22,8 @@
 
 #import "ORSmartFolder.h"
 #import "ORQueue.h"
+#import "ORFileMoverOp.h"
+#import "ORFileMover.h"
 
 #pragma mark ***External Strings
 
@@ -36,6 +38,7 @@ NSString* ORFolderDirectoryNameChangedNotification  = @"ORFolderDirectoryNameCha
 NSString* ORDataFileQueueRunningChangedNotification = @"ORDataFileQueueRunningChangedNotification";
 NSString* ORFolderLock								= @"ORFolderLock";
 NSString* ORFolderTransferTypeChangedNotification	= @"ORFolderTransferTypeChangedNotification";
+NSString* ORFolderPercentDoneChanged                = @"ORFolderPercentDoneChanged";
 
 
 @interface ORSmartFolder (private)
@@ -57,9 +60,7 @@ NSString* ORFolderTransferTypeChangedNotification	= @"ORFolderTransferTypeChange
     [self setRemoteHost:@""];
     [self setRemoteUserName:@""];
     [self setPassWord:@""];
-    
-    //[self registerNotificationObservers];
-    
+        
     return self;
 }
 
@@ -73,8 +74,8 @@ NSString* ORFolderTransferTypeChangedNotification	= @"ORFolderTransferTypeChange
     [remoteUserName release];
     [passWord release];
     [directoryName release];
+    [fileQueue cancelAllOperations];
     [fileQueue release];
-    [theWorkingFileMover release];
     [super dealloc];
 }
 
@@ -212,11 +213,11 @@ NSString* ORFolderTransferTypeChangedNotification	= @"ORFolderTransferTypeChange
                           object: self];
 }
 
-- (eFileTransferType) transferType
+- (int) transferType
 {
     return transferType;
 }
-- (void) setTransferType:(eFileTransferType)aNewTransferType
+- (void) setTransferType:(int)aNewTransferType
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setTransferType:transferType];
     
@@ -286,25 +287,12 @@ NSString* ORFolderTransferTypeChangedNotification	= @"ORFolderTransferTypeChange
                           object: self];
 }
 
-- (ORFileMover *) theWorkingFileMover
-{
-    return theWorkingFileMover; 
-}
-
-- (void) setTheWorkingFileMover: (ORFileMover *) aTheWorkingFileMover
-{
-    [theWorkingFileMover autorelease];
-    theWorkingFileMover = [aTheWorkingFileMover retain];
-}
-
 - (void) sendAll
 {
-    
+    workingOnFile   = 0;
     NSFileManager* fileManager = [NSFileManager defaultManager];
     NSArray* files = [fileManager contentsOfDirectoryAtPath:[[self finalDirectoryName]stringByExpandingTildeInPath] error:nil];
-    NSEnumerator* e = [files objectEnumerator];
-    NSString* aFile;
-    while(aFile = [e nextObject]){
+    for(id aFile in files){
         NSString* fullName = [[[self finalDirectoryName] stringByAppendingPathComponent:aFile] stringByExpandingTildeInPath];
         BOOL isDir;
         if ([fileManager fileExistsAtPath:fullName isDirectory:&isDir] && !isDir){
@@ -314,53 +302,48 @@ NSString* ORFolderTransferTypeChangedNotification	= @"ORFolderTransferTypeChange
             }
         }
     }
-    
-    if(![self queueIsRunning])[self startTheQueue];
-    
 }
 
 - (void) deleteAll
 {
-    if(!fileQueue){
+    if(![self queueIsRunning]){
         ORFileMover* mover = [[ORFileMover alloc] init];
         [mover cleanSentFolder:[[self finalDirectoryName]stringByExpandingTildeInPath]];
         [mover release];
     }
 }
 
-// ----------------------------------------------------------
-// - queueIsRunning:
-// ----------------------------------------------------------
 - (BOOL) queueIsRunning
 {
-    return queueIsRunning;
-}
-
-// ----------------------------------------------------------
-// - setQueueIsRunning:
-// ----------------------------------------------------------
-- (void) setQueueIsRunning: (BOOL) flag
-{
-    queueIsRunning = flag;
-    
-    [[NSNotificationCenter defaultCenter]
-	postNotificationName:ORDataFileQueueRunningChangedNotification
-                  object: self];
+    return [fileQueue operationCount];
 }
 
 - (NSString*) queueStatusString
-{   
-    if(queueIsRunning) {
-		if([theWorkingFileMover transferType] == eUseCURL){
+{
+    if([fileQueue operationCount]) {
+		if(transferType == eUseCURL){
 			if(startCount > 1) return [NSString stringWithFormat:@"Working: %d/%d",workingOnFile,startCount];
 			else return [NSString stringWithFormat:@"Working"];
 		}
 		else {
-			if(startCount > 1)return [NSString stringWithFormat:@"Working: %d/%d  %d%%",workingOnFile,startCount,[theWorkingFileMover percentDone]];
-			else return [NSString stringWithFormat:@"Working: %d%%",[theWorkingFileMover percentDone]];
+			if(startCount > 1)return [NSString stringWithFormat:@"Working: %d/%d  %d%%",workingOnFile,startCount,[self percentDone]];
+			else return [NSString stringWithFormat:@"Working: %d%%",[self percentDone]];
 		}
     }
     else return @"Idle";
+}
+
+- (int) percentDone
+{
+    return percentDone;
+}
+
+- (void) setPercentDone:(NSNumber*)aPercent
+{
+    percentDone = [aPercent intValue];
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDataFileQueueRunningChangedNotification object: self];
+    
 }
 
 - (NSWindow *)window 
@@ -375,62 +358,65 @@ NSString* ORFolderTransferTypeChangedNotification	= @"ORFolderTransferTypeChange
 
 
 #pragma mark ¥¥¥Data Handling
-
 - (void) queueFileForSending:(NSString*)fullPath
 {
-    if(!fileQueue)fileQueue = [[ORQueue alloc] init];
+    halt = NO;
+    if(!fileQueue){
+        fileQueue = [[NSOperationQueue alloc] init];
+        [fileQueue setMaxConcurrentOperationCount:1];
+        [fileQueue addObserver:self forKeyPath:@"operations" options:0 context:NULL];
+    }
     
-    ORFileMover* mover = [[ORFileMover alloc] init];
-    [mover setVerbose:[self verbose]];
-    [mover setDelegate:self];
-    [mover setFullPath:fullPath];
-	[mover setTransferType:transferType];
+    startCount++;
+    if(workingOnFile==0)workingOnFile=1;
+    
+    ORFileMoverOp* mover = [[[ORFileMoverOp alloc] init] autorelease];
+    mover.delegate     = self;
+    mover.transferType = transferType;
+    mover.verbose      = verbose;
+    mover.fullPath     = fullPath;
 	
     NSString* remoteFilePath = [remotePath stringByAppendingPathComponent:[fullPath lastPathComponent]];
     [mover setMoveParams:fullPath to:remoteFilePath remoteHost:remoteHost userName:remoteUserName passWord:passWord];
     
-    [fileQueue enqueue:mover];
-    
-    [mover release]; //still retained by the queue, will be release fully when copy is done.
-    
-    if(queueIsRunning){
-        startCount++;
-        [[NSNotificationCenter defaultCenter]
-            postNotificationName:ORDataFileQueueRunningChangedNotification
-                          object: self];
-        
-    }
-    else [self startTheQueue];
+    [fileQueue addOperation:mover];
 }
 
-- (void) startTheQueue
+- (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object
+                         change:(NSDictionary *)change context:(void *)context
 {
-    if(!queueIsRunning){
-        startCount = [fileQueue count];
-        workingOnFile = 0;
-        //start the process by dequeuing and sending the first file. The next will be sent when this one is
-        //finished.
-        [self setTheWorkingFileMover:[fileQueue dequeue]];
-        if(theWorkingFileMover){
-            [theWorkingFileMover doMove];
-            workingOnFile = 1;
-            [self setQueueIsRunning:YES];
+    if (object == fileQueue && [keyPath isEqual:@"operations"]) {
+        if([fileQueue operationCount]==0){
+            workingOnFile   = 0;
+            startCount      = 0;
+            if(fileQueue && [self copyEnabled] && !halt){
+                [self sendAll];
+            }
         }
-        else {
-            NSLog(@"<%@> Nothing to send.\n",title);
-        }
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORDataFileQueueRunningChangedNotification object: self];
+        [self performSelectorOnMainThread:@selector(updateSpecialButtons) withObject:nil waitUntilDone:NO];
     }
+}
+- (void) updateSpecialButtons
+{
+    if([self queueIsRunning])   [copyButton setTitle:@"Stop"];
+    else                        [copyButton setTitle:@"Send All..."];
+    [deleteButton setEnabled:![self queueIsRunning]];
+}
+
+- (void) fileMoverIsDone
+{
+    workingOnFile++;
+    if(workingOnFile<0)workingOnFile = 0;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDataFileQueueRunningChangedNotification object: self];
 }
 
 - (void) stopTheQueue
 {
-    if(queueIsRunning){
-        NSLog(@"<%@> File transfer stopped manually\n",title);
-        [self setQueueIsRunning:NO];
-        [fileQueue removeAllObjects];
-        [fileQueue release];
-        fileQueue = nil;
-        [theWorkingFileMover stop];
+    if([fileQueue operationCount]){
+        halt = YES;
+        NSLog(@"<%@> File transfer stopped\n",title);
+        [fileQueue cancelAllOperations];
     }
 }
 
@@ -441,37 +427,6 @@ NSString* ORFolderTransferTypeChangedNotification	= @"ORFolderTransferTypeChange
         else return NO;
     }
     else return NO;
-}
-
-- (void) fileMoverIsDone: (NSNotification*)aNote
-{
-
-    if([[[aNote userInfo] objectForKey:@"Status"] isEqualToString:@"Failed"]){
-        [self setQueueIsRunning:NO];
-        [fileQueue removeAllObjects];
-        [fileQueue release];
-        fileQueue = nil;
-        [theWorkingFileMover stop];
-       
-    }
-    else {
-        //OK, the last file being sent is done, get started on the next one.
-        [self setTheWorkingFileMover:[fileQueue dequeue]];
-        if(theWorkingFileMover){
-            [theWorkingFileMover doMove];
-            workingOnFile++;
-            [[NSNotificationCenter defaultCenter]
-                postNotificationName:ORDataFileQueueRunningChangedNotification
-                              object: self];
-            
-        }
-        else {
-            [fileQueue release];
-            fileQueue = nil;
-            [self setQueueIsRunning:NO];
-            NSLog(@"<%@> Send queue empty.\n",title);
-        }
-    }
 }
 
 - (NSString*) ensureSubFolder:(NSString*)subFolder inFolder:(NSString*)folderName
@@ -606,14 +561,6 @@ NSString* ORFolderTransferTypeChangedNotification	= @"ORFolderTransferTypeChange
     [chooseDirButton setEnabled:enable];
 }
 
-- (void) fileMoverPercentChanged: (NSNotification*)aNote
-{
-    [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORDataFileQueueRunningChangedNotification
-                      object: self];
-    
-}
-
 - (void) sheetChanged:(NSNotification*)aNotification
 {
     if([[aNotification name] isEqualToString:NSWindowWillBeginSheetNotification]){
@@ -710,13 +657,6 @@ NSString* ORFolderTransferTypeChangedNotification	= @"ORFolderTransferTypeChange
 
 - (void) queueChanged:(NSNotification*)note
 {        
-	if([self queueIsRunning]){
-		[copyButton setTitle:@"Stop"];
-	}
-	else {
-		[copyButton setTitle:@"Send All..."];
-	}
-	[deleteButton setEnabled:![self queueIsRunning]];
 }
 - (NSString*) lockName
 {
@@ -774,10 +714,10 @@ NSString* ORFolderTransferTypeChangedNotification	= @"ORFolderTransferTypeChange
     if(![[view window] makeFirstResponder:[view window]]){
 	    [[view window] endEditingFor:nil];		
     }
-    NSString* s = queueIsRunning?@"You can always send them later.":
+    NSString* s = ![self queueIsRunning]?@"You can always send them later.":
     [NSString stringWithFormat:@"Push 'Send' to send ALL files in:\n<%@>",[self finalDirectoryName]];
-    NSBeginAlertSheet(queueIsRunning?@"Stop Sending?":@"Send All Files?",
-                      queueIsRunning?@"Stop":@"Send",
+    NSBeginAlertSheet([self queueIsRunning]?@"Stop Sending?":@"Send All Files?",
+                      [self queueIsRunning]?@"Stop":@"Send",
                       @"Cancel",
                       nil,window?window:[view window],
                       self,
@@ -920,7 +860,7 @@ static NSString* ORFolderDirectoryName    = @"ORFolderDirectoryName";
 - (void)_sendAllSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
     if(returnCode == NSAlertDefaultReturn){
-        if(!queueIsRunning)[self sendAll];
+        if(![self queueIsRunning])[self sendAll];
         else [self stopTheQueue];
     }
 }
