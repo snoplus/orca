@@ -43,13 +43,7 @@
 }
 
 - (void) dealloc
-{        
-    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    if (delegate){
-        [nc removeObserver:delegate name:nil object:self];
-    }
-    [nc removeObserver:self name:nil object:nil];
-	
+{        	
     self.fileName           = nil;
     self.scriptFilePath     = nil;
     self.remoteHost         = nil;
@@ -57,6 +51,7 @@
     self.remoteUserName     = nil;
     self.fullPath           = nil;
     self.remotePassWord     = nil;
+    [task terminate];
     self.task               = nil;
     [allOutput release];
     
