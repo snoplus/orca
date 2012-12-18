@@ -232,8 +232,6 @@
                     NSLogColor([NSColor redColor],@"Partial transfer only!\n");
                 }
             }
-            //range = [allOutput rangeOfString:@"Transfer complete"];
-            //if(range.location  != NSNotFound)transferOK = YES;
             break;
             
         case eOpUseSFTP:
@@ -255,17 +253,10 @@
                     NSLogColor([NSColor redColor],@"Partial transfer only!\n");	
                 }
             }
-            //  range = [allOutput rangeOfString:@"Failure"];
-            // if(range.location  == NSNotFound)transferOK = YES;
             break;
             
         case eOpUseCURL:
-            //if([task terminationStatus] == 0)transferOK = YES;
-          //  else {
-           //     transferOK = NO;
-           //     NSLog(@"task return status: %d\n",[task terminationStatus]);
-           // }
-            break;
+             break;
     }
     
     if(transferOK){
