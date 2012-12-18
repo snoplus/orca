@@ -90,10 +90,7 @@ extern NSString* ORFileMoverCopiedFile;
 extern NSString* ORFileMoverPercentDoneChanged;
 
 @interface NSObject (ORFileMoverDelegate)
-
-- (void)ourDelegate;
 - (BOOL)shouldRemoveFile:(NSString*)aFile;
 - (void) fileMoverPercentChanged: (NSNotification*)aNote;
 - (void) fileMoverIsDone:(NSNotification*)aNote;
-
 @end
