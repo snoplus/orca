@@ -422,7 +422,7 @@ NSString* ORFolderPercentDoneChanged                = @"ORFolderPercentDoneChang
 
 - (BOOL) shouldRemoveFile:(NSString*)aFile
 {
-    if([[directoryName stringByExpandingTildeInPath] isEqualToString:[aFile stringByDeletingLastPathComponent]]){
+    if([[[self finalDirectoryName]stringByExpandingTildeInPath] isEqualToString:[aFile stringByDeletingLastPathComponent]]){
         if(deleteWhenCopied)return YES;
         else return NO;
     }
