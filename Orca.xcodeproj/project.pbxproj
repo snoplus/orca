@@ -1039,6 +1039,8 @@
 		8434A354055B3287002D3102 /* ORCommandCenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 84BAA88C055AD3C90005F507 /* ORCommandCenter.m */; };
 		8434A355055B3287002D3102 /* ORCommandCenterController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84BAA896055AD4C60005F507 /* ORCommandCenterController.m */; };
 		8434A359055B3287002D3102 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84AA7A540545B1B2005F64B1 /* Cocoa.framework */; };
+		8434C37B167FB0F40068DB04 /* ORFileMoverOp.h in Headers */ = {isa = PBXBuildFile; fileRef = 8434C379167FB0F40068DB04 /* ORFileMoverOp.h */; };
+		8434C37C167FB0F40068DB04 /* ORFileMoverOp.m in Sources */ = {isa = PBXBuildFile; fileRef = 8434C37A167FB0F40068DB04 /* ORFileMoverOp.m */; };
 		8434F87505B4637700E03AAE /* ORSafeQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 8434F87305B4637600E03AAE /* ORSafeQueue.h */; };
 		8434F87605B4637700E03AAE /* ORSafeQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 8434F87405B4637600E03AAE /* ORSafeQueue.m */; };
 		8435625708FDB287002864C7 /* ContainerInput.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8435624208FDB287002864C7 /* ContainerInput.nib */; };
@@ -3908,6 +3910,8 @@
 		8434A364055B3288002D3102 /* Orca.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Orca.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8434A3E4055C223A002D3102 /* ORCommandClient.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORCommandClient.m; path = "Source/Main Dialogs/CommandCenter/ORCommandClient.m"; sourceTree = SOURCE_ROOT; };
 		8434A3E5055C223A002D3102 /* ORCommandClient.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORCommandClient.h; path = "Source/Main Dialogs/CommandCenter/ORCommandClient.h"; sourceTree = SOURCE_ROOT; };
+		8434C379167FB0F40068DB04 /* ORFileMoverOp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORFileMoverOp.h; sourceTree = "<group>"; };
+		8434C37A167FB0F40068DB04 /* ORFileMoverOp.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORFileMoverOp.m; sourceTree = "<group>"; };
 		8434F87305B4637600E03AAE /* ORSafeQueue.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORSafeQueue.h; path = "Source/Objects/Misc Objects/DataStructures/ORSafeQueue.h"; sourceTree = SOURCE_ROOT; };
 		8434F87405B4637600E03AAE /* ORSafeQueue.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORSafeQueue.m; path = "Source/Objects/Misc Objects/DataStructures/ORSafeQueue.m"; sourceTree = SOURCE_ROOT; };
 		8435624208FDB287002864C7 /* ContainerInput.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ContainerInput.nib; path = "Source/Objects/Data Flow/ContainerIO/Container Input/ContainerInput.nib"; sourceTree = SOURCE_ROOT; };
@@ -11578,6 +11582,8 @@
 			children = (
 				84DF917204D6D53C005F64B1 /* ORFileMover.h */,
 				84DF917304D6D53C005F64B1 /* ORFileMover.m */,
+				8434C379167FB0F40068DB04 /* ORFileMoverOp.h */,
+				8434C37A167FB0F40068DB04 /* ORFileMoverOp.m */,
 				848463A90625D65F00128299 /* ORSmartFolder.h */,
 				848463A60625D65F00128299 /* ORSmartFolder.m */,
 				845498C310628DF400F8DE1C /* scpExpectScript */,
@@ -13762,6 +13768,7 @@
 				842BC974163ED4E300393470 /* ORGretina4MReadout.hh in Headers */,
 				CED38D1E165CDB6600358681 /* ANSIEscapeHelper.h in Headers */,
 				8477DF43166A4023000144BA /* HaloSentry.h in Headers */,
+				8434C37B167FB0F40068DB04 /* ORFileMoverOp.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -15624,6 +15631,7 @@
 				842BB6C616397A2000393470 /* ORPulser33500ChanController.m in Sources */,
 				CED38D1F165CDB6600358681 /* ANSIEscapeHelper.m in Sources */,
 				8477DF44166A4023000144BA /* HaloSentry.m in Sources */,
+				8434C37C167FB0F40068DB04 /* ORFileMoverOp.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
