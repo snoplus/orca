@@ -179,7 +179,7 @@
     [notifyCenter addObserver : self
                      selector : @selector(lockChanged:)
                          name : [model dialogLock]
-                        object: model];
+                        object: nil];
     
 	
 	[notifyCenter addObserver : self
@@ -769,7 +769,8 @@
     [loadParamsButton setEnabled:!locked && !loading];
     [sendCommandButton setEnabled:!locked && !loading];
     [commandField setEnabled:!locked && !loading];
-		
+    [downloadButton setEnabled:!locked && !loading];
+    
     NSString* s = @"";
 	if([model lockGUI]){
 		s = @"Locked by other object";

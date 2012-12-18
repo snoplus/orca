@@ -162,6 +162,8 @@
     BOOL runInProgress  = [gOrcaGlobals runInProgress];
     BOOL locked			= [gSecurity isLocked:[model dialogLock]] || [model lockGUI];
     BOOL loading		= [model loading];
+    
+	locked |= [model lockGUI];
 	
 	[connectionProtocolMatrix setEnabled:!runInProgress || !locked];
 	[ipConnectButton setEnabled:!runInProgress || !locked];
