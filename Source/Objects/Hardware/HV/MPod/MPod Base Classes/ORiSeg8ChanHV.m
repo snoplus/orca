@@ -404,7 +404,9 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 }
 
 - (void) turnChannelOn:(short)channel
-{    
+{
+    if([self isOn:channel])return; //don't mess with channels already on.
+    
 	[self setHwGoal:channel withValue:0];
 	[self writeVoltage:channel];
 	NSString* cmd = [NSString stringWithFormat:@"outputSwitch.u%d i %d",[self slotChannelValue:channel],kiSeg8ChanHVOutputOn];
