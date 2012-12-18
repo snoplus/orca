@@ -310,7 +310,10 @@
 - (void) readOutput:(NSFileHandle*)fileHandle
 {
     do {
-        if([self isCancelled])break;
+        if([self isCancelled]){
+            [task terminate];
+            break;
+        }
         
         NSData* incomingData = [fileHandle availableData];
         
