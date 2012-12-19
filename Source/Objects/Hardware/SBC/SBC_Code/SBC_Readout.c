@@ -724,16 +724,9 @@ void* readoutThread (void* p)
 
     dataIndex = 0;
     int32_t index = 0;
-    while(1) {
-        uint32_t statusBits;
-        pthread_mutex_lock(&runInfoMutex);
-        statusBits = run_info.statusBits;
-        pthread_mutex_unlock(&runInfoMutex);
+    uint32_t statusBits = 0;
 
-        if ((statusBits & kSBC_RunningMask) == 0) {
-            break;
-        }
-
+    while(((statusBits = run_info.statusBits) & kSBC_RunningMask) != 0) {
         if((statusBits & kSBC_PausedMask) != kSBC_PausedMask){
             if (cycles % 10000 == 0 ) {
                 int m_err;
