@@ -14,6 +14,7 @@ class ORMTCReadout : public ORVVmeCard
 	virtual bool Stop();
     bool UpdateStatus();
     bool ResetTheMemory();
+    void setIsNextStopHard(bool aStop);
 	
 protected:
 	static uint32_t last_mem_read_ptr;
@@ -23,6 +24,7 @@ protected:
     static uint32_t simm_empty_space;
     static float trigger_rate;
     static uint32_t last_good_gtid;
+    static bool is_next_stop_hard;
 	
 	const static uint32_t k_no_data_available = 0x00800000UL; //bit 23
 	const static uint32_t k_fifo_valid_mask = 0x000fffffUL; //20 bits

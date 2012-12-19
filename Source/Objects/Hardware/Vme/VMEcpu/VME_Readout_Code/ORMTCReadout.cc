@@ -17,6 +17,7 @@ uint32_t ORMTCReadout::mem_write_ptr = k_fifo_valid_mask;
 uint32_t ORMTCReadout::simm_empty_space = k_fifo_valid_mask + 1;
 float ORMTCReadout::trigger_rate = 0;
 uint32_t ORMTCReadout::last_good_gtid = 0;
+bool ORMTCReadout::is_next_stop_hard = false;
 
 bool ORMTCReadout::Start() {
 
@@ -34,6 +35,8 @@ bool ORMTCReadout::Start() {
     }
 
 	last_good_10mhz_upper = 0;
+    is_next_stop_hard = false;
+    //it's set from MTCModel::runIsStopping -> SNO.c::tellMtcReadout
     
     struct timezone tz;
     gettimeofday(&timestamp, &tz);
@@ -432,4 +435,9 @@ bool ORMTCReadout::Readout(SBC_LAM_Data* /*lamData*/)
      */
  
     return true; 
+}
+
+void ORMTCReadout::setIsNextStopHard(bool aStop)
+{
+    is_next_stop_hard = aStop;
 }

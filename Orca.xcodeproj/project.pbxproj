@@ -143,6 +143,7 @@
 		2DAB012115EF988C00BC2540 /* EdelweissLogo.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2DAB011F15EF988C00BC2540 /* EdelweissLogo.tif */; };
 		2DAB012215EF988C00BC2540 /* KITLogo.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2DAB012015EF988C00BC2540 /* KITLogo.tif */; };
 		2DC1EE800F33724E00E93C75 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2DC1EE7F0F33724E00E93C75 /* WebKit.framework */; };
+		362F928B1681A05100F3ACB4 /* SNO.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 362F928A16819FCE00F3ACB4 /* SNO.cc */; };
 		4325BA38109F6378009E15B9 /* GermaniumHighE in Resources */ = {isa = PBXBuildFile; fileRef = 4325BA37109F6378009E15B9 /* GermaniumHighE */; };
 		4325BA3A109F6381009E15B9 /* GermaniumLowE in Resources */ = {isa = PBXBuildFile; fileRef = 4325BA39109F6381009E15B9 /* GermaniumLowE */; };
 		4342D59411ECB8AD007EFFB1 /* ORCAEN775Readout.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 4342D59211ECB8AD007EFFB1 /* ORCAEN775Readout.cc */; };
@@ -2312,7 +2313,6 @@
 		84BA98FD0E91260600E19946 /* SNO.h in Headers */ = {isa = PBXBuildFile; fileRef = 84BA98FB0E91260500E19946 /* SNO.h */; };
 		84BA99010E91279000E19946 /* SNOCmds.h in Headers */ = {isa = PBXBuildFile; fileRef = 84BA99000E91279000E19946 /* SNOCmds.h */; };
 		84BA99050E91288800E19946 /* SNOCmds.h in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84BA99000E91279000E19946 /* SNOCmds.h */; };
-		84BA99060E91288800E19946 /* SNO.c in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84BA98FA0E91260500E19946 /* SNO.c */; };
 		84BA99070E91288800E19946 /* SNO.h in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84BA98FB0E91260500E19946 /* SNO.h */; };
 		84BAA2A30E92A81A00E19946 /* ORSIS3300Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84BAA29B0E92A81A00E19946 /* ORSIS3300Controller.h */; };
 		84BAA2A40E92A81A00E19946 /* ORSIS3300Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84BAA29C0E92A81A00E19946 /* ORSIS3300Controller.m */; };
@@ -3045,6 +3045,7 @@
 			dstPath = VME_Readout_Code;
 			dstSubfolderSpec = 7;
 			files = (
+				362F928B1681A05100F3ACB4 /* SNO.cc in VME_Copy */,
 				84253FC412F0751A00472314 /* VmeSBCGeneralOperations.h in VME_Copy */,
 				43ADFEB910B6E2090044617C /* HW_Specific.icc in VME_Copy */,
 				840B00AA1206F70B009095A4 /* goScript in VME_Copy */,
@@ -3098,7 +3099,6 @@
 				8493CC8D0C99FAB400B46CD4 /* HW_Readout.h in VME_Copy */,
 				84BC4F4F127B1C3500965056 /* HW_Readout.c in VME_Copy */,
 				84BA99050E91288800E19946 /* SNOCmds.h in VME_Copy */,
-				84BA99060E91288800E19946 /* SNO.c in VME_Copy */,
 				84BA99070E91288800E19946 /* SNO.h in VME_Copy */,
 			);
 			name = VME_Copy;
@@ -3289,6 +3289,7 @@
 		2DAB011F15EF988C00BC2540 /* EdelweissLogo.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = EdelweissLogo.tif; path = EdelweissFLT/EdelweissLogo.tif; sourceTree = "<group>"; };
 		2DAB012015EF988C00BC2540 /* KITLogo.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = KITLogo.tif; path = EdelweissFLT/KITLogo.tif; sourceTree = "<group>"; };
 		2DC1EE7F0F33724E00E93C75 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
+		362F928A16819FCE00F3ACB4 /* SNO.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SNO.cc; sourceTree = "<group>"; };
 		4325BA37109F6378009E15B9 /* GermaniumHighE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = GermaniumHighE; path = Source/Objects/Hardware/GPIB/HPPulser/GermaniumHighE; sourceTree = SOURCE_ROOT; };
 		4325BA39109F6381009E15B9 /* GermaniumLowE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = GermaniumLowE; path = Source/Objects/Hardware/GPIB/HPPulser/GermaniumLowE; sourceTree = SOURCE_ROOT; };
 		4342D59211ECB8AD007EFFB1 /* ORCAEN775Readout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ORCAEN775Readout.cc; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAEN775Readout.cc; sourceTree = SOURCE_ROOT; };
@@ -5260,7 +5261,6 @@
 		84BA5F280F70388C00CF92D6 /* ORZupModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORZupModel.m; path = Source/Objects/Hardware/Internet/ZupSupply/ORZupModel.m; sourceTree = SOURCE_ROOT; };
 		84BA5F290F70388C00CF92D6 /* Zup.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Zup.nib; path = Source/Objects/Hardware/Internet/ZupSupply/Zup.nib; sourceTree = SOURCE_ROOT; };
 		84BA5F2A0F70388C00CF92D6 /* ZupIcon.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = ZupIcon.tif; path = Source/Objects/Hardware/Internet/ZupSupply/ZupIcon.tif; sourceTree = SOURCE_ROOT; };
-		84BA98FA0E91260500E19946 /* SNO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = SNO.c; sourceTree = "<group>"; };
 		84BA98FB0E91260500E19946 /* SNO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SNO.h; sourceTree = "<group>"; };
 		84BA99000E91279000E19946 /* SNOCmds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SNOCmds.h; sourceTree = "<group>"; };
 		84BAA29B0E92A81A00E19946 /* ORSIS3300Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSIS3300Controller.h; path = Source/Objects/Hardware/Vme/SIS3300/ORSIS3300Controller.h; sourceTree = SOURCE_ROOT; };
@@ -9485,6 +9485,7 @@
 		8493CC7D0C99FA4B00B46CD4 /* VME_Readout_Code */ = {
 			isa = PBXGroup;
 			children = (
+				362F928A16819FCE00F3ACB4 /* SNO.cc */,
 				84253F8612F073C300472314 /* VmeSBCGeneralOperations.h */,
 				43ADFE5610B6DBCF0044617C /* HW_Specific.icc */,
 				43ADFE5710B6DBCF0044617C /* HWMakefile.mk */,
@@ -9539,7 +9540,6 @@
 				84BA99000E91279000E19946 /* SNOCmds.h */,
 				843F28F811ECFEED0077E55B /* ORDataGenReadout.hh */,
 				43ADFE5E10B6DBCF0044617C /* ORDataGenReadout.cc */,
-				84BA98FA0E91260500E19946 /* SNO.c */,
 				84BA98FB0E91260500E19946 /* SNO.h */,
 			);
 			name = VME_Readout_Code;

@@ -19,6 +19,8 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
+#ifndef __SNO_H__
+#define __SNO_H__
 
 #include "SBC_Cmds.h"
 
@@ -35,3 +37,6 @@ void loadMTCADacs(SBC_Packet* aPacket);
 void mtcatResetMtcat(SBC_Packet* aPacket);
 void mtcatResetAll(SBC_Packet* aPacket);
 void mtcatLoadCrateMask(SBC_Packet* aPacket);
+void mtcTellReadout(SBC_Packet* aPacket);
+
+#endif // __SNO_H__

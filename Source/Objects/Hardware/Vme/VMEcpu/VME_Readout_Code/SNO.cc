@@ -1,5 +1,5 @@
 /*
- *  SNO.c
+ *  SNO.cc
  *  OrcaIntel
  *
  *  Created by Mark Howe on 1/8/08.
@@ -20,20 +20,26 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
+
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
 #include <dlfcn.h>
-#include "SBC_Readout.h"
-#include "SNOCmds.h"
-#include "universe_api.h"
-#include "SBC_Config.h"
-#include "VME_HW_Definitions.h"
+
+extern "C" {
 #include "HW_Readout.h"
 #include "SNO.h"
 #include "SBC_Job.h"
+#include "SBC_Readout.h"
+#include "SNOCmds.h"
+#include "SBC_Config.h"
+#include "VME_HW_Definitions.h"
+}
+
+#include "universe_api.h"
+#include "ORMTCReadout.hh"
 
 extern int32_t		dataIndex;
 extern int32_t*		data;
@@ -58,6 +64,7 @@ void processSNOCommand(SBC_Packet* aPacket)
 		case kSNOMtcatResetMtcat: mtcatResetMtcat(aPacket); break;
 		case kSNOMtcatResetAll:mtcatResetAll(aPacket); break;
 		case kSNOMtcatLoadCrateMask: mtcatLoadCrateMask(aPacket); break;
+        case kSNOMtcTellReadout: mtcTellReadout(aPacket); break;
 	}
 }
 
@@ -406,7 +413,7 @@ void fineSleep(const unsigned long long ticks) {
 	tim1 = getticks();
 	do {
 		tim2 = getticks();
-	} while (elapsed_ticks(tim1, tim2) < ticks);
+	} while (elapsed_ticks(tim1, tim2) < (long long) ticks);
 }
 
 void loadXL2Xilinx(SBC_Packet* aPacket)
@@ -471,6 +478,7 @@ void loadXL2Xilinx_penn(SBC_Packet* aPacket)
 		
 		uint32_t bitCount		= 0UL;
 		uint32_t writeValue		= 0UL;
+		uint32_t readValue = 0UL;
 		uint8_t  firstPass		= 1;
 		uint32_t index			= length; 
 		uint32_t result;
@@ -579,7 +587,7 @@ void loadXL2Xilinx_penn(SBC_Packet* aPacket)
 			usleep(theRegDelay);	//200 ms
 		
 		//check that the load was OK
-		uint32_t readValue = 0UL;
+		readValue = 0UL;
 		result = read_device(device,(char*)(&readValue),4,xl2_control_status_reg);
 		if(result!=4)FATAL_ERROR(9,"Write Error: xl2_control_status_reg")
 		if (!(readValue & xl2_control_done_prog)){	
@@ -678,6 +686,7 @@ void loadXL2Xilinx_sharc(SBC_Packet* aPacket)
 		
 		uint32_t bitCount		= 0UL;
 		uint32_t writeValue		= 0UL;
+        uint32_t readValue = 0UL;
 		uint8_t  firstPass		= 1;
 		uint32_t index			= length; 
 		uint32_t result;
@@ -781,7 +790,7 @@ void loadXL2Xilinx_sharc(SBC_Packet* aPacket)
 			
 			result = write_device(device, (char*)(&xl2_control_bit11), 4, xl2_control_status_reg);
 		if(result!=4)FATAL_ERROR(8,"Write Error: xl2_control_status_reg")
-			uint32_t readValue = 0UL;
+			readValue = 0UL;
 		result = read_device(device,(char*)(&readValue),4,xl2_control_status_reg);
 		if(result!=4)FATAL_ERROR(9,"Write Error: xl2_control_status_reg")
 			
@@ -906,7 +915,7 @@ void firePedestalJobFixedTime(SBC_Packet* aPacket)
     uint32_t csr_mask = p[2];
     uint32_t error_code = 0;
 	uint32_t aValue = 0;
-	short i = 0;
+	uint32_t i = 0;
 
 	char  errorMessage[80];
 	memset(errorMessage,'\0',80);		
@@ -979,7 +988,7 @@ void firePedestalsFixedTime(SBC_Packet* aPacket)
 	uint32_t gtidDiff = 0;
 	uint32_t aValue = 0;
 	uint32_t beforeGTId, afterGTId;
-	short i = 0;
+	uint32_t i = 0;
 	
 	TUVMEDevice* device = get_new_device(0x0, 0x29, 4, 0x10000);
 	if(device != 0){
@@ -1208,7 +1217,7 @@ void mtcatResetMtcat(SBC_Packet* aPacket)
     }
     dlerror();
 
-    reset_mtcat = dlsym(hdl, "reset_mtcat");
+    reset_mtcat = (int(*)(unsigned char)) dlsym(hdl, "reset_mtcat");
     if ((dl_err = dlerror()) != NULL) {
         LogError("%s, %d\n", dl_err, stderr);
         error_code = 2;
@@ -1244,7 +1253,7 @@ void mtcatResetAll(SBC_Packet* aPacket)
     }
     dlerror();
 
-    reset_all = dlsym(hdl, "reset_all");
+    reset_all = (int(*)())dlsym(hdl, "reset_all");
     if ((dl_err = dlerror()) != NULL) {
         LogError("%s, %d\n", dl_err, stderr);
         error_code = 2;
@@ -1285,7 +1294,7 @@ void mtcatLoadCrateMask(SBC_Packet* aPacket)
     }
     dlerror();
     
-    load_crate_mask = dlsym(hdl, "load_crate_mask");
+    load_crate_mask = (int(*)(unsigned int, unsigned char))dlsym(hdl, "load_crate_mask");
     if ((dl_err = dlerror()) != NULL) {
         LogError("%s, %d\n", dl_err, stderr);
         error_code = 2;
@@ -1299,6 +1308,30 @@ early_exit:
     dlclose(hdl);
     
 exit:
+    p[0] = error_code;
+    if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
+    writeBuffer(aPacket);
+}
+
+void mtcTellReadout(SBC_Packet* aPacket)
+{
+    uint32_t* p = (uint32_t*) aPacket->payload;
+    if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
+    
+    unsigned int cmd = p[0];
+    uint32_t error_code = 0;
+    SBC_card_info empty_card_info;
+    ORMTCReadout* mtc_readout = new ORMTCReadout(&empty_card_info);
+
+	switch(cmd){
+		case kSNOMtcTellReadoutHardEnd:
+            mtc_readout->setIsNextStopHard(true);
+            break;
+        default:
+            error_code = 1;
+            break;
+    }
+    
     p[0] = error_code;
     if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
     writeBuffer(aPacket);

@@ -34,6 +34,9 @@
 #define kSNOMtcatResetMtcat     0x08
 #define kSNOMtcatResetAll       0x09
 #define kSNOMtcatLoadCrateMask  0x0a
+#define kSNOMtcTellReadout      0x0b
+
+#define kSNOMtcTellReadoutHardEnd 0x01
 
 typedef struct {
 	int32_t baseAddress;

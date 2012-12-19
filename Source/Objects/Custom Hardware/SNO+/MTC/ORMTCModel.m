@@ -194,6 +194,7 @@ kPEDCrateMask
 - (void) enableSingleShotMTCPedestalsFixedTimeSBC;
 - (unsigned long) singleShotMTCPedestalsFixedTimeSBC:(unsigned long) pedestalCount withDelay:(unsigned long) usecDelay;
 - (void) loadTheMTCADacsUsingSBC;
+- (void) tellReadoutSBC:(unsigned int) cmd;
 @end
 
 @interface ORMTCModel (LocalAdapter)
@@ -820,11 +821,22 @@ resetFifoOnStart = _resetFifoOnStart;
             //keep it running
         }
         else {
-            @try {
-                [self clearGlobalTriggerWordMask];
+            if([self adapterIsSBC]){
+                @try {
+                    [self clearGlobalTriggerWordMask];
+                    [self tellReadoutSBC:kSNOMtcTellReadoutHardEnd];
+                }
+                @catch (NSException *exception) {
+                    NSLog(@"MTCD clear trigger mask at the end of a run failed.\n");
+                }
             }
-            @catch (NSException *exception) {
-                NSLog(@"MTCD clear trigger mask at the end of a run failed.\n");
+            else {
+                @try {
+                    [self clearGlobalTriggerWordMask];
+                }
+                @catch (NSException *exception) {
+                    NSLog(@"MTCD clear trigger mask at the end of a run failed.\n");
+                }
             }
         }
     }
@@ -2762,6 +2774,35 @@ resetFifoOnStart = _resetFifoOnStart;
 	@catch(NSException* localException) {
 		NSLog(@"Could not load the MTC/A DACs!\n");		
 		[localException raise];
+	}
+}
+
+- (void) tellReadoutSBC:(unsigned int) cmd
+{
+	long errorCode = 0;
+    
+	SBC_Packet aPacket;
+	aPacket.cmdHeader.destination = kSNO;
+	aPacket.cmdHeader.cmdID	= kSNOMtcTellReadout;
+	aPacket.cmdHeader.numberBytesinPayload = 1*sizeof(long);
+	
+	unsigned long* payloadPtr = (unsigned long*) aPacket.payload;
+    payloadPtr[0] = cmd;
+	
+	@try {
+		[[[self adapter] sbcLink] send:&aPacket receive:&aPacket];
+		unsigned long* responsePtr = (unsigned long*) aPacket.payload;
+		errorCode = responsePtr[0];
+		if(errorCode){
+			NSLog(@"SBC failed to update MTC readout.\n");
+		}
+		else {
+			NSLog(@"SBC updated MTC readout.\n");
+		}
+	}
+	@catch(NSException* e) {
+		NSLog(@"MTC: Could not update readout; %@; reason: %@\n", [e name], [e reason]);
+		[e raise];
 	}
 }
 
