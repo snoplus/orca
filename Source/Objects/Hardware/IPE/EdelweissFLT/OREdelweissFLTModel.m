@@ -30,6 +30,7 @@
 #import "EdelweissSLTv4_HW_Definitions.h"
 #import "ORCommandList.h"
 
+NSString* OREdelweissFLTModelFiberOutMaskChanged = @"OREdelweissFLTModelFiberOutMaskChanged";
 NSString* OREdelweissFLTModelTpixChanged = @"OREdelweissFLTModelTpixChanged";
 NSString* OREdelweissFLTModelSwTriggerIsRepeatingChanged = @"OREdelweissFLTModelSwTriggerIsRepeatingChanged";
 NSString* OREdelweissFLTModelRepeatSWTriggerModeChanged = @"OREdelweissFLTModelRepeatSWTriggerModeChanged";
@@ -90,8 +91,11 @@ enum IpeFLTV4Enum{
 	kFLTV4CommandReg,
 	kFLTV4VersionReg,
 //HEAT	kFLTV4pVersionReg,
-	kFLTV4BoardIDLsbReg,
-	kFLTV4BoardIDMsbReg,
+//	kFLTV4BoardIDLsbReg,
+//	kFLTV4BoardIDMsbReg,
+	kFLTV4RunControlReg,
+	kFLTV4ThreshAdjustReg,
+	kFLTV4FiberOutMaskReg,
 	kFLTV4InterruptMaskReg,
 	kFLTV4InterruptRequestReg,
 	/*kFLTV4HrMeasEnableReg,
@@ -116,8 +120,8 @@ enum IpeFLTV4Enum{
 	kFLTV4HistNumMeasReg,
 	kFLTV4PostTrigger,
 	*/
-	kFLTV4RunControlReg,     	
-	kFLTV4ThreshAdjustReg,   	
+	kFLTV4HeatTrMask1Reg,     	
+	kFLTV4HeatTrMask2Reg,   	
 	kFLTV4HeatTriggPart1Reg, 	
 	kFLTV4HeatTriggPart2Reg, 	
 	kFLTV4IonTriggPart1Reg,		
@@ -141,9 +145,12 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	{@"Command",			0x000008>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 	{@"CFPGAVersion",		0x00000c>>2,		-1,				kIpeRegReadable},
 //HEAT	{@"FPGA8Version",		0x000010>>2,		-1,				kIpeRegReadable},
-	{@"BoardIDLSB",         0x000014>>2,		-1,				kIpeRegReadable},
-	{@"BoardIDMSB",         0x000018>>2,		-1,				kIpeRegReadable},
-	
+//	{@"BoardIDLSB",         0x000014>>2,		-1,				kIpeRegReadable},
+//	{@"BoardIDMSB",         0x000018>>2,		-1,				kIpeRegReadable},
+	{@"RunControl",         0x000010>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+	{@"ThreshAdjust",       0x000014>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+	{@"FiberOutMask",       0x000018>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+
 	{@"InterruptMask",      0x00001C>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 	{@"InterruptRequest",   0x000020>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 	/*
@@ -172,8 +179,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	{@"HistNumMeas",         0x000054>>2,		-1,				kIpeRegReadable},
 	{@"PostTrigger",		0x000058>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 	*/
-	{@"RunControl",         0x000048>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-	{@"ThreshAdjust",       0x00004C>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+	{@"HeatTrMask1",        0x000048>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+	{@"HeatTrMask2",        0x00004C>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 	{@"HeatTriggPart1",     0x000050>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 	{@"HeatTriggPart2",     0x000054>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 	{@"IonTriggPart1",		0x000058>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
@@ -257,6 +264,21 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (short) getNumberRegisters{ return kFLTV4NumRegs; }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+
+- (uint32_t) fiberOutMask
+{
+    return fiberOutMask;
+}
+
+- (void) setFiberOutMask:(uint32_t)aFiberOutMask
+{
+        //DEBUG OUTPUT: 	        NSLog(@"%@::%@: UNDER CONSTRUCTION! aFiberOutMask %x\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),aFiberOutMask);//TODO : DEBUG testing ...-tb-
+    [[[self undoManager] prepareWithInvocationTarget:self] setFiberOutMask:fiberOutMask];
+    fiberOutMask = aFiberOutMask;
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelFiberOutMaskChanged object:self];
+}
+
+
 - (int) swTriggerIsRepeating
 {
     return swTriggerIsRepeating;
@@ -355,7 +377,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     //[[[self undoManager] prepareWithInvocationTarget:self] setBBv1Mask:BBv1Mask];
     //BBv1Mask = aBBv1Mask;
     //[[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelBBv1MaskChanged object:self];
-    BBv1Mask = aBBv1Mask;
+    //BBv1Mask = aBBv1Mask;
     uint32_t cr = controlRegister & ~(kEWFlt_ControlReg_BBv1_Mask << kEWFlt_ControlReg_BBv1_Shift);
     cr = cr | ((aBBv1Mask & kEWFlt_ControlReg_BBv1_Mask) << kEWFlt_ControlReg_BBv1_Shift);
 	[self setControlRegister:cr];
@@ -872,22 +894,21 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢HW Access
-- (unsigned long) readBoardIDLow
+- (int32_t) readFiberOutMask
 {
-	unsigned long value = [self readReg:kFLTV4BoardIDLsbReg];
+	int32_t value = [self readReg:kFLTV4FiberOutMaskReg];
+        //DEBUG OUTPUT: 	        NSLog(@"%@::%@: UNDER CONSTRUCTION! read 0x%x\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),value);//TODO : DEBUG testing ...-tb-
+    [self setFiberOutMask: value];
 	return value;
 }
 
-- (unsigned long) readBoardIDHigh
+- (void) writeFiberOutMask
 {
-	unsigned long value = [self readReg:kFLTV4BoardIDMsbReg];
-	return value;
+    uint32_t aValue = fiberOutMask;
+        //DEBUG OUTPUT: 	        NSLog(@"%@::%@: UNDER CONSTRUCTION!  write 0x%x\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),aValue);//TODO : DEBUG testing ...-tb-
+	[self writeReg: kFLTV4FiberOutMaskReg value:aValue];
 }
 
-- (int) readSlot
-{
-	return ([self readReg:kFLTV4BoardIDMsbReg]>>24) & 0x1F;
-}
 
 - (unsigned long)  readVersion
 {	
@@ -1034,6 +1055,9 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 //TODO: better use the STANDBY flag of the FLT -tb- 2010-01-xx     !!!!!!!!!!!!!!!!!
 - (void) writeRunControl:(BOOL)startSampling
 {
+        NSLog(@"%@::%@: DO NOT CALL!!! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
+
+exit(666);
 	unsigned long aValue = 
 	((filterLength & 0xf)<<8)		| 
 	((gapLength & 0xf)<<4)			| 
@@ -1436,7 +1460,7 @@ for(chan=0; chan<6;chan++)
     self = [super initWithCoder:decoder];
 	
     [[self undoManager] disableUndoRegistration];
-	
+    [self setFiberOutMask:[decoder decodeInt32ForKey:@"fiberOutMask"]];
     //[self setTpix:[decoder decodeIntForKey:@"tpix"]];
     [self setRepeatSWTriggerMode:[decoder decodeIntForKey:@"repeatSWTriggerMode"]];
     [self setControlRegister:[decoder decodeIntForKey:@"controlRegister"]];
@@ -1444,9 +1468,8 @@ for(chan=0; chan<6;chan++)
     [self setFiberDelays:[decoder decodeInt64ForKey:@"fiberDelays"]];
     [self setStreamMask:[decoder decodeInt64ForKey:@"streamMask"]];
     [self setSelectFiberTrig:[decoder decodeIntForKey:@"selectFiberTrig"]];
-    [self setBBv1Mask:[decoder decodeIntForKey:@"BBv1Mask"]];
-//DEBUG OUTPUT:
- 	NSLog(@"%@::%@: UNDER CONSTRUCTION! BBv1Mask %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),BBv1Mask);//TODO: DEBUG testing ...-tb-
+    //[self setBBv1Mask:[decoder decodeIntForKey:@"BBv1Mask"]];
+//DEBUG OUTPUT:    NSLog(@"%@::%@: UNDER CONSTRUCTION! BBv1Mask %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[decoder decodeIntForKey:@"BBv1Mask"]);//TODO: DEBUG testing ...-tb-
     [self setFiberEnableMask:[decoder decodeIntForKey:@"fiberEnableMask"]];
     [self setFltModeFlags:[decoder decodeIntForKey:@"fltModeFlags"]];
     [self setTargetRate:[decoder decodeIntForKey:@"targetRate"]];
@@ -1504,6 +1527,7 @@ for(chan=0; chan<6;chan++)
 {
     [super encodeWithCoder:encoder];
 	
+    [encoder encodeInt32:fiberOutMask forKey:@"fiberOutMask"];
     //[encoder encodeInt:tpix forKey:@"tpix"];
     [encoder encodeInt:repeatSWTriggerMode forKey:@"repeatSWTriggerMode"];
     [encoder encodeInt:controlRegister forKey:@"controlRegister"];
@@ -1511,9 +1535,8 @@ for(chan=0; chan<6;chan++)
     [encoder encodeInt64:fiberDelays forKey:@"fiberDelays"];
     [encoder encodeInt64:streamMask forKey:@"streamMask"];
     [encoder encodeInt:selectFiberTrig forKey:@"selectFiberTrig"];
-//DEBUG OUTPUT:
- 	NSLog(@"%@::%@: UNDER CONSTRUCTION! BBv1Mask %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),BBv1Mask);//TODO: DEBUG testing ...-tb-
-    [encoder encodeInt:BBv1Mask forKey:@"BBv1Mask"];
+//DEBUG OUTPUT: 	NSLog(@"%@::%@: UNDER CONSTRUCTION! BBv1Mask %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),BBv1Mask);//TODO: DEBUG testing ...-tb-
+    //[encoder encodeInt:BBv1Mask forKey:@"BBv1Mask"];
     [encoder encodeInt:fiberEnableMask forKey:@"fiberEnableMask"];
     [encoder encodeInt:fltModeFlags forKey:@"fltModeFlags"];
     [encoder encodeInt:targetRate			forKey:@"targetRate"];

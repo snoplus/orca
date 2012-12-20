@@ -301,9 +301,25 @@
                          name : OREdelweissFLTModelTpixChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(fiberOutMaskChanged:)
+                         name : OREdelweissFLTModelFiberOutMaskChanged
+						object: model];
+
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+
+- (void) fiberOutMaskChanged:(NSNotification*)aNote
+{
+	//[fiberOutMask<custom> setIntValue: [model fiberOutMask]];
+	int i;
+    int32_t fiberOutMask = [model fiberOutMask];
+        //DEBUG OUTPUT: 	        NSLog(@"%@::%@: UNDER CONSTRUCTION! fiberOutMask  %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),fiberOutMask);//TODO : DEBUG testing ...-tb-
+	for(i=0;i<6;i++){
+		[[fiberOutMaskMatrix cellWithTag:i] setIntValue: (fiberOutMask&(0x1<<i)) ];
+	}    
+}
 
 - (void) swTriggerIsRepeatingChanged:(NSNotification*)aNote
 {
@@ -494,9 +510,10 @@
     
 	// Populate the register popup
     for (i = 0; i < [model getNumberRegisters]; i++) {
+         //DEBUG NSLog(@"%@::%@: UNDER CONSTRUCTION! i  %i  name %@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),i,[model getRegisterName:i]);//TODO : DEBUG testing ...-tb-
         [registerPopUp insertItemWithTitle:[model getRegisterName:i] atIndex:i];
-    }
-    
+    } 
+   
     
 	// Clear all the popup items.
     [channelPopUp removeAllItems];
@@ -552,6 +569,7 @@
 	[self repeatSWTriggerModeChanged:nil];
 	[self swTriggerIsRepeatingChanged:nil];
 	[self tpixChanged:nil];
+	[self fiberOutMaskChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -884,6 +902,31 @@
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+
+- (void) fiberOutMaskMatrixAction:(id)sender
+{
+	//[model setFiberOutMask:[sender intValue]];	
+	int i, val=0;
+	for(i=0;i<6;i++){
+		if([[sender cellWithTag:i] intValue]) val |= (0x1<<i);
+	}
+	[model setFiberOutMask:val];
+    //NSLog(@"%@::%@: UNDER CONSTRUCTION! set 0x%x\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),val);//TODO : DEBUG testing ...-tb-
+}
+
+
+- (IBAction) readFiberOutMaskButtonAction:(id)sender
+{
+        //DEBUG OUTPUT:         NSLog(@"%@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
+        [model readFiberOutMask];
+}
+
+- (IBAction) writeFiberOutMaskButtonAction:(id)sender
+{
+        //DEBUG OUTPUT: 	        NSLog(@"%@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
+        [model writeFiberOutMask];
+}
+
 
 - (void) repeatSWTriggerModePUAction:(id)sender
 {

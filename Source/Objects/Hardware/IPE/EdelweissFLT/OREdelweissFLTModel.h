@@ -127,7 +127,7 @@
     int fltModeFlags; //TODO: unused, using "uint32_t controlRegister"
     //int tpix; //TODO: unused, using "uint32_t controlRegister"
     int fiberEnableMask;
-    int BBv1Mask;
+    //int BBv1Mask;
     int selectFiberTrig;
 	//uint64_t streamMask;
     uint64_t streamMask;
@@ -138,6 +138,7 @@
     uint32_t controlRegister;
     int repeatSWTriggerMode;
     int swTriggerIsRepeating;
+    int32_t fiberOutMask;
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
@@ -148,6 +149,8 @@
 - (short) getNumberRegisters;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+- (uint32_t) fiberOutMask;
+- (void) setFiberOutMask:(uint32_t)aFiberOutMask;
 - (int) swTriggerIsRepeating;
 - (void) setSwTriggerIsRepeating:(int)aSwTriggerIsRepeating;
 - (int) repeatSWTriggerMode;
@@ -284,9 +287,9 @@
 - (id) writeRegCmd:(unsigned long) aRegister value:(unsigned long)aValue;
 
 - (unsigned long) readVersion;
-- (unsigned long) readBoardIDLow;
-- (unsigned long) readBoardIDHigh;
-- (int)			  readSlot;
+
+- (int32_t) readFiberOutMask;
+- (void) writeFiberOutMask;
 
 - (int)		readMode;
 
@@ -386,6 +389,7 @@
 				  n:(int) n;
 @end
 
+extern NSString* OREdelweissFLTModelFiberOutMaskChanged;
 extern NSString* OREdelweissFLTModelTpixChanged;
 extern NSString* OREdelweissFLTModelSwTriggerIsRepeatingChanged;
 extern NSString* OREdelweissFLTModelRepeatSWTriggerModeChanged;

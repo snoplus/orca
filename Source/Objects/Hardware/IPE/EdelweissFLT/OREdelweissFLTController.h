@@ -43,6 +43,8 @@
 	    IBOutlet NSButton*      vetoFlagCB;
 	IBOutlet   NSTextField* totalTriggerNRegisterTextField;
 	    //other registers
+	    IBOutlet   NSMatrix*    fiberOutMaskMatrix;
+        
 	IBOutlet   NSTextField* statusRegisterTextField;
 		IBOutlet NSMatrix*		fiberDelaysMatrix;
 	    IBOutlet NSTextField*   fiberDelaysTextField;
@@ -134,6 +136,7 @@
 - (void) updateButtons;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+- (void) fiberOutMaskChanged:(NSNotification*)aNote;
 - (void) swTriggerIsRepeatingChanged:(NSNotification*)aNote;
 - (void) repeatSWTriggerModeChanged:(NSNotification*)aNote;
 - (void) controlRegisterChanged:(NSNotification*)aNote;
@@ -183,6 +186,9 @@
 - (void) selectedChannelValueChanged:(NSNotification*) aNote;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+- (IBAction) fiberOutMaskMatrixAction:(id)sender;
+- (IBAction) readFiberOutMaskButtonAction:(id)sender;
+- (IBAction) writeFiberOutMaskButtonAction:(id)sender;
 - (IBAction) tpixCBAction:(id)sender;
 - (IBAction) repeatSWTriggerModePUAction:(id)sender;
 - (IBAction) repeatSWTriggerModeTextFieldAction:(id)sender;
