@@ -93,8 +93,8 @@ static const int currentVersion = 1;           // Current version
     [dataFolder release];
     [statusFolder release];
     [configFolder release];
-    [[NSOperationQueue mainQueue] cancelAllOperations];
-    
+    [md5Queue cancelAllOperations];
+    [md5Queue release];
     [super dealloc];
 }
 
@@ -570,7 +570,8 @@ static const int currentVersion = 1;           // Current version
             if(generateMD5){
                 //the md5 op will send the file after generating the checksum
                 ORMD5Op* md5Op = [[ORMD5Op alloc] initWithFilePath:fullFileName delegate:self];
-                [[NSOperationQueue mainQueue] addOperation:md5Op];
+                if(!md5Queue)md5Queue = [[NSOperationQueue alloc] init];
+                [md5Queue addOperation:md5Op];
                 [md5Op release];
             }
             else {
@@ -634,10 +635,14 @@ static const int currentVersion = 1;           // Current version
 - (void) sendFile:(NSString*)fullFileName
 {
     if([dataFolder copyEnabled]){
-        if([dataFolder queueIsRunning]) [dataFolder queueFileForSending:fullFileName];
-        else                            [dataFolder sendAll];
+        [dataFolder queueFileForSending:fullFileName];
     }
-    
+}
+- (void) sendFiles:(NSArray*)filesToSend
+{
+    for(id aFile in filesToSend){
+        [self sendFile:aFile];
+    }
 }
 
 - (void) runTaskBoundary
@@ -966,15 +971,14 @@ static NSString* ORDataSaveConfiguration    = @"ORDataSaveConfiguration";
                         md5Part = [md5Part stringByReplacingOccurrencesOfString:@" " withString:@""];
                         NSString* md5File = [[filePath stringByDeletingPathExtension] stringByAppendingPathExtension:@"md5"];
                         [md5Part  writeToFile:md5File atomically:NO encoding:NSASCIIStringEncoding error:nil];
-                        [delegate sendFile:md5File];
+                        NSArray* files = [NSArray arrayWithObjects:md5File,filePath, nil];
+                        [delegate performSelectorOnMainThread:@selector(sendFiles:) withObject:files waitUntilDone:NO];
                     }
 
                 }
 			}
 			[task release];
-            
-            [delegate sendFile:filePath];
-		}
+        }
 	}
 	@catch(NSException* e){
 	}

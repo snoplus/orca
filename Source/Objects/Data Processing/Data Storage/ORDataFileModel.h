@@ -72,6 +72,7 @@
 		float			percentFull;
 		float			processLimitHigh;
         BOOL            generateMD5;
+        NSOperationQueue* md5Queue;
 }
 
 #pragma mark ¥¥¥Accessors
@@ -112,6 +113,8 @@
 - (BOOL)saveConfiguration;
 - (void)setSaveConfiguration:(BOOL)flag;
 - (NSString*) tempDir;
+- (void) sendFile:(NSString*)fullFileName;
+- (void) sendFiles:(NSArray*)filesToSend;
 
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;
