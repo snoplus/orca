@@ -106,7 +106,7 @@
 			
 			people = [cc componentsSeparatedByString:@","];
 			for(id aPerson in people){
-				if([aPerson rangeOfString:@"@"].location != NSNotFound){
+				if([aPerson rangeOfString:@"@"].location != NSNotFound && [aPerson length]>0){
 					NSDictionary* properties = [NSDictionary dictionaryWithObjectsAndKeys: aPerson, @"address",nil];
 					MailToRecipient *theRecipient = [[[mail classForScriptingClass:@"cc recipient"] alloc] initWithProperties:properties];
 					[emailMessage.ccRecipients addObject: theRecipient];
