@@ -322,7 +322,7 @@
 {
 	[delegate checkBreakpoint:[p line] functionLevel:functionLevel];
 	if([delegate exitNow])return _zero;
-    if (!p) return _zero;
+    if (!p) return nil;
     switch([(Node*)p type]) {
 		case typeCon:				return [p nodeData];
 		case typeStr:				return [p nodeData];
