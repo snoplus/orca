@@ -22,37 +22,173 @@ bool ORMTCReadout::is_next_stop_hard = false;
 bool ORMTCReadout::Start() {
 
     const bool resetFifoOnStart = GetDeviceSpecificData()[5];
-    if (resetFifoOnStart) {
-        ResetTheMemory(); //takes care of last_good_gtid and simm_empty_space
-
-        //set correct trigger mask
-        uint32_t trigger_mask = GetDeviceSpecificData()[6];
+    if (resetFifoOnStart) { //aka hard start
+        //zero the trigger mask
+        uint32_t trigger_mask = 0;
+        if (VMEWrite(GetBaseAddress() + 0x34UL, GetAddressModifier(),
+                     sizeof(trigger_mask), trigger_mask) < (int32_t) sizeof(trigger_mask)){
+            LogBusError("BusError: set trigger_mask to 0x%08x\n", trigger_mask);
+            return false;
+        }
+        
+        if (!ZeroTheGtCounter()) {
+            LogError("MTCD: zero the counter failed.");
+        }
+        
+        //set trigger crate mask
+        uint32_t crate_mask = GetDeviceSpecificData()[7];
+        if (VMEWrite(GetBaseAddress() + 0x3CUL, GetAddressModifier(),
+                     sizeof(crate_mask), crate_mask) < (int32_t) sizeof(crate_mask)){
+            LogBusError("BusError: set trigger crate mask to 0x%08x\n", crate_mask);
+            return false;
+        }
+        
+        if (!ResetTheMemory()) {
+            //takes care of last_good_gtid and simm_empty_space
+            LogError("MTCD: reset the memory failed.");
+        }
+        
+        //set correct trigger mask, and soft gt
+        trigger_mask = GetDeviceSpecificData()[6];
+        trigger_mask |= 0x02000000; //soft gt
         if (VMEWrite(GetBaseAddress() + 0x34UL, GetAddressModifier(), 
                      sizeof(trigger_mask), trigger_mask) < (int32_t) sizeof(trigger_mask)){
             LogBusError("BusError: set trigger_mask to 0x%08x\n", trigger_mask);
             return false; 
-        }        
-    }
+        }
 
+        //fire soft gt
+        uint32_t soft_gt_value = 1; //can be any value
+        if (VMEWrite(GetBaseAddress() + 0x0CUL, GetAddressModifier(),
+                     sizeof(soft_gt_value), soft_gt_value) < (int32_t) sizeof(soft_gt_value)){
+            LogBusError("BusError: fire soft gt at run start failed\n");
+            return false;
+        }
+        
+        //do a useful thing
+
+        //fire soft gt
+        soft_gt_value = 1; //can be any value
+        if (VMEWrite(GetBaseAddress() + 0x0CUL, GetAddressModifier(),
+                     sizeof(soft_gt_value), soft_gt_value) < (int32_t) sizeof(soft_gt_value)){
+            LogBusError("BusError: fire soft gt at run start failed\n");
+            return false;
+        }
+
+        //set correct trigger mask
+        trigger_mask = GetDeviceSpecificData()[6];
+        if (VMEWrite(GetBaseAddress() + 0x34UL, GetAddressModifier(),
+                     sizeof(trigger_mask), trigger_mask) < (int32_t) sizeof(trigger_mask)){
+            LogBusError("BusError: set trigger_mask to 0x%08x\n", trigger_mask);
+            return false;
+        }
+    }
+    //else soft run start and do nothing the two softgt's were fired at the end of the prev run
+    
 	last_good_10mhz_upper = 0;
     is_next_stop_hard = false;
-    //it's set from MTCModel::runIsStopping -> SNO.c::tellMtcReadout
+    //it's set from MTCModel::runIsStopping -> SNO.cc::tellMtcReadout
     
+    mem_write_ptr_stop = 0;
+    is_mem_write_ptr_stop = false;
+
     struct timezone tz;
     gettimeofday(&timestamp, &tz);
     
 	return true;
 }
 
-bool ORMTCReadout::Stop() {
-/*
-    unsigned int sweep;
-    for (sweep=0; sweep<100; sweep++) {
-        usleep(10); // let the last MTC bundle propagate through MTCD
-        Readout(0);
+bool ORMTCReadout::Stop()
+{
+    //set correct trigger mask, and soft gt
+    uint32_t trigger_mask = GetDeviceSpecificData()[6];
+    trigger_mask |= 0x02000000; //soft gt
+    if (VMEWrite(GetBaseAddress() + 0x34UL, GetAddressModifier(),
+                 sizeof(trigger_mask), trigger_mask) < (int32_t) sizeof(trigger_mask)){
+        LogBusError("BusError: set trigger_mask to 0x%08x\n", trigger_mask);
+        return false;
     }
-*/
+    
+    //read write pointer
+    uint32_t write_ptr_before = 0;
+    if (VMERead(GetBaseAddress() + 0x28UL, GetAddressModifier(),
+                sizeof(write_ptr_before), write_ptr_before) < (int32_t) sizeof(write_ptr_before)){
+		LogBusError("BusError:next bba mem_access at: 0x%08x", 0x28);
+		return false;
+	}
+    
+    //fire soft gt
+    uint32_t soft_gt_value = 1; //can be any value
+    if (VMEWrite(GetBaseAddress() + 0x0CUL, GetAddressModifier(),
+                 sizeof(soft_gt_value), soft_gt_value) < (int32_t) sizeof(soft_gt_value)){
+        LogBusError("BusError: fire soft gt at run start failed\n");
+        return false;
+    }
 
+    if (is_next_stop_hard) {
+        //zero the trigger mask
+        uint32_t trigger_mask = 0;
+        if (VMEWrite(GetBaseAddress() + 0x34UL, GetAddressModifier(),
+                     sizeof(trigger_mask), trigger_mask) < (int32_t) sizeof(trigger_mask)){
+            LogBusError("BusError: set trigger_mask to 0x%08x\n", trigger_mask);
+            return false;
+        }
+    }
+
+    //read write pointer again
+    uint32_t write_ptr_after = 0;
+    if (VMERead(GetBaseAddress() + 0x28UL, GetAddressModifier(),
+                sizeof(write_ptr_after), write_ptr_after) < (int32_t) sizeof(write_ptr_after)){
+		LogBusError("BusError:next bba mem_access at: 0x%08x", 0x28);
+		return false;
+	}
+
+    is_mem_write_ptr_stop = true;
+    mem_write_ptr_stop = write_ptr_after & 0xfffff;
+    
+    unsigned short i = 32;
+    uint32_t expected_last_mem_read_ptr;
+    //expected_last_mem_read_ptr = mem_write_ptr_stop + 1;
+    expected_last_mem_read_ptr = mem_write_ptr_stop;
+    if (expected_last_mem_read_ptr > 0xfffff) {
+        expected_last_mem_read_ptr = 0;
+    }
+    while (last_mem_read_ptr != expected_last_mem_read_ptr && i) {
+        --i;
+        Readout(0);
+        if (reset_the_memory) {
+            break;
+        }
+    }
+    
+    is_mem_write_ptr_stop = false;
+    mem_write_ptr_stop = 0;
+    
+    if (!is_next_stop_hard) {
+        //fire two more soft gts (run start ones)
+        soft_gt_value = 1;
+        if (VMEWrite(GetBaseAddress() + 0x0CUL, GetAddressModifier(),
+                     sizeof(soft_gt_value), soft_gt_value) < (int32_t) sizeof(soft_gt_value)){
+            LogBusError("BusError: fire soft gt at run start failed\n");
+            return false;
+        }
+
+        soft_gt_value = 1;
+        if (VMEWrite(GetBaseAddress() + 0x0CUL, GetAddressModifier(),
+                     sizeof(soft_gt_value), soft_gt_value) < (int32_t) sizeof(soft_gt_value)){
+            LogBusError("BusError: fire soft gt at run start failed\n");
+            return false;
+        }
+
+        //remove the soft gt bit if we set it
+        trigger_mask = GetDeviceSpecificData()[6];
+        if (VMEWrite(GetBaseAddress() + 0x34UL, GetAddressModifier(),
+                     sizeof(trigger_mask), trigger_mask) < (int32_t) sizeof(trigger_mask)){
+            LogBusError("BusError: set trigger_mask to 0x%08x\n", trigger_mask);
+            return false;
+        }
+    }
+    
 	return true;
 }
 
@@ -104,12 +240,90 @@ bool ORMTCReadout::UpdateStatus() {
     //write pointer
     if (VMERead(GetBaseAddress() + 0x28UL, GetAddressModifier(),
                 sizeof(aValue), aValue) < (int32_t) sizeof(aValue)){
-		LogBusError("BusError:next bba mem_access at: 0x%08x", 0x2C);
+		LogBusError("BusError:next bba mem_access at: 0x%08x", 0x28);
         dataIndex = savedIndex;
 		return false;
 	}
     data[dataIndex++] = aValue;
 
+    return true;
+}
+
+#define MTC_SERIAL_REG_SEN					0x00000001
+#define MTC_SERIAL_REG_DIN					0x00000002
+#define MTC_SERIAL_SHFTCLKGT				0x00000004
+#define MTC_CSR_LOAD_ENGT					0x00000800
+
+bool ORMTCReadout::ZeroTheGtCounter()
+{
+    uint32_t theGTCounterValue = 0;
+    uint32_t value = 0;
+    const uint32_t shift_reg = 0x04U;
+    
+    // Load the serial shift register, 24 bits for the GT Counter
+    short j;
+    for (j = 23; j >= 0; j--){
+        if ((1UL << j) & theGTCounterValue ){
+            value = MTC_SERIAL_REG_DIN | MTC_SERIAL_REG_SEN;
+            if (VMEWrite(GetBaseAddress() + shift_reg, GetAddressModifier(),
+                         sizeof(value), value) < (int32_t) sizeof(value)){
+                LogBusError("BusError: MTCD shift register write failed\n");
+                return false;
+            }
+            
+            value = MTC_SERIAL_REG_DIN | MTC_SERIAL_SHFTCLKGT;
+            if (VMEWrite(GetBaseAddress() + shift_reg, GetAddressModifier(),
+                         sizeof(value), value) < (int32_t) sizeof(value)){
+                LogBusError("BusError: MTCD shift register write failed\n");
+                return false;
+            }
+        }
+        else{
+            value = MTC_SERIAL_REG_SEN;
+            if (VMEWrite(GetBaseAddress() + shift_reg, GetAddressModifier(),
+                         sizeof(value), value) < (int32_t) sizeof(value)){
+                LogBusError("BusError: MTCD shift register write failed\n");
+                return false;
+            }
+            
+            value = MTC_SERIAL_SHFTCLKGT;
+            if (VMEWrite(GetBaseAddress() + shift_reg, GetAddressModifier(),
+                         sizeof(value), value) < (int32_t) sizeof(value)){
+                LogBusError("BusError: MTCD shift register write failed\n");
+                return false;
+            }
+        }
+    }
+    
+    // Now load enable by clearing and setting the appropriate bit
+    uint32_t csr = 0;
+    if (VMERead(GetBaseAddress(), GetAddressModifier(),
+                sizeof(csr), csr) < (int32_t) sizeof(csr)){
+        LogBusError("BusError: csr mem_access at: 0x%08x", 0x0);
+		return false;
+	}
+
+    csr &= ~MTC_CSR_LOAD_ENGT;
+    if (VMEWrite(GetBaseAddress(), GetAddressModifier(),
+                 sizeof(csr), csr) < (int32_t) sizeof(csr)){
+        LogBusError("BusError: csr write 0x%08x\n", csr);
+        return false;
+    }
+
+    csr |= MTC_CSR_LOAD_ENGT;
+    if (VMEWrite(GetBaseAddress(), GetAddressModifier(),
+                 sizeof(csr), csr) < (int32_t) sizeof(csr)){
+        LogBusError("BusError: csr write 0x%08x\n", csr);
+        return false;
+    }
+    
+    csr &= ~MTC_CSR_LOAD_ENGT;
+    if (VMEWrite(GetBaseAddress(), GetAddressModifier(),
+                 sizeof(csr), csr) < (int32_t) sizeof(csr)){
+        LogBusError("BusError: csr write at 0x%08x\n", csr);
+        return false;
+    }
+    
     return true;
 }
 
@@ -272,6 +486,7 @@ bool ORMTCReadout::Readout(SBC_LAM_Data* /*lamData*/)
 
     int32_t eventsStored = 0;
     eventsStored = mem_write_ptr - mem_read_ptr;
+
     if (eventsStored < 0) {
         eventsStored += 0x100000;
     }
@@ -301,6 +516,23 @@ bool ORMTCReadout::Readout(SBC_LAM_Data* /*lamData*/)
         if (eventsStored > event_flood_bar) {
             jump_ahead += 1 / 2048. * (eventsStored - event_flood_bar) + 1;
         }
+
+        //check we don't jump ahead of the mem_write_ptr_stop
+        if (is_mem_write_ptr_stop) {
+            uint32_t mem_read_ptr_test;
+            mem_read_ptr_test = mem_read_ptr + jump_ahead;
+            if (mem_read_ptr_test > k_fifo_valid_mask) {
+                mem_read_ptr_test -= 0x100000;
+            }
+            if (mem_read_ptr_test > mem_write_ptr_stop) {
+                jump_ahead -= mem_read_ptr_test - mem_write_ptr_stop;
+                if (jump_ahead < 0) {
+                    LogMessage("MTCD: jump ahead logic failed");
+                    jump_ahead = 0;
+                }
+            }
+        }
+        
         mem_read_ptr += jump_ahead;
         if (mem_read_ptr > k_fifo_valid_mask) {
             mem_read_ptr -= 0x100000;
@@ -315,7 +547,14 @@ bool ORMTCReadout::Readout(SBC_LAM_Data* /*lamData*/)
         }
     } 
 
-    //check the rate
+    //run stop exception
+    if (is_mem_write_ptr_stop) {
+        eventsStored = mem_write_ptr_stop - mem_read_ptr;
+        if (eventsStored < 0) {
+            eventsStored += 0x100000;
+        }
+    }
+
     if (eventsStored > 32) {
         eventsStored = 32;
     }
@@ -409,6 +648,11 @@ bool ORMTCReadout::Readout(SBC_LAM_Data* /*lamData*/)
         
         //our 6 tries to pull this bundle are over
         //go for the next one even if we don't have the data
+        //first check we don't cross the mem_write_ptr_stop
+        if (is_mem_write_ptr_stop && mem_read_ptr == mem_write_ptr_stop) {
+            isBusError = true; //misused to stop readout
+        }
+        
         mem_read_ptr++;
         if (mem_read_ptr > k_fifo_valid_mask) mem_read_ptr = 0UL;
         last_mem_read_ptr = mem_read_ptr;

@@ -14,6 +14,7 @@ class ORMTCReadout : public ORVVmeCard
 	virtual bool Stop();
     bool UpdateStatus();
     bool ResetTheMemory();
+    bool ZeroTheGtCounter();
     void setIsNextStopHard(bool aStop);
 	
 protected:
@@ -32,6 +33,8 @@ protected:
     struct timeval timestamp;
     bool reset_the_memory;
     uint32_t last_good_10mhz_upper;
+    uint32_t mem_write_ptr_stop;
+    bool is_mem_write_ptr_stop;
 };
 
 #endif /* _ORMTCReadout_hh_*/
