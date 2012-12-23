@@ -28,7 +28,7 @@
 
 @synthesize fileName,task,scriptFilePath,remoteHost;
 @synthesize remoteUserName,remotePath,fullPath;
-@synthesize remotePassWord,transferType,verbose;
+@synthesize remotePassWord,transferType,verbose,delegate;
 
 - (id) init
 {
@@ -59,10 +59,6 @@
 }
 
 #pragma mark •••Accessors
-- (void) setDelegate:(id)newDelegate
-{        
-    delegate = newDelegate; //don't retain delegates
-}
 
 - (void) setMoveParams:(NSString*)aFullPath 
                     to:(NSString*)aRemoteFilePath 

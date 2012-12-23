@@ -371,7 +371,7 @@ NSString* ORFolderPercentDoneChanged                = @"ORFolderPercentDoneChang
     if(workingOnFile==0)workingOnFile=1;
     
     ORFileMoverOp* mover = [[[ORFileMoverOp alloc] init] autorelease];
-    [mover setDelegate: self];    //mover.delegate     = self; caused a compile error with OSX 10.5.8/XCode 3.2.4 -tb-
+    mover.delegate     = self;
     mover.transferType = transferType;
     mover.verbose      = verbose;
     mover.fullPath     = fullPath;

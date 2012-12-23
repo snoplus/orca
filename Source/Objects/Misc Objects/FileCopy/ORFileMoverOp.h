@@ -71,6 +71,7 @@ typedef enum _eFileOpTransferType {
 @property (copy)    NSString*   fullPath;
 @property (assign)  BOOL        verbose;
 @property (assign)  eFileOpTransferType   transferType;
+@property (assign)  id   delegate;
 @property (retain)  NSTask*     task;
 
 @end
