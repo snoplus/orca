@@ -772,10 +772,19 @@ resetFifoOnStart = _resetFifoOnStart;
 */
 	
     if ([[userInfo objectForKey:@"doinit"] boolValue]) {
-        [self clearGlobalTriggerWordMask];
-        [self zeroTheGTCounter];
-        [self setGTCrateMask];
-        //[self setSingleGTWordMask: uLongDBValue(kGtMask)]; //moved to SBC
+        if([self adapterIsSBC]){
+            //moved to ORMTCReadout::Start
+            //[self clearGlobalTriggerWordMask];
+            //[self zeroTheGTCounter];
+            //[self setGTCrateMask];
+            //[self setSingleGTWordMask: uLongDBValue(kGtMask)];
+        }
+        else {
+            [self clearGlobalTriggerWordMask];
+            [self zeroTheGTCounter];
+            [self setGTCrateMask];
+            [self setSingleGTWordMask: uLongDBValue(kGtMask)];
+        }
         [self setResetFifoOnStart:YES];
     }
     else {
@@ -823,7 +832,7 @@ resetFifoOnStart = _resetFifoOnStart;
         else {
             if([self adapterIsSBC]){
                 @try {
-                    [self clearGlobalTriggerWordMask];
+                    //[self clearGlobalTriggerWordMask];
                     [self tellReadoutSBC:kSNOMtcTellReadoutHardEnd];
                 }
                 @catch (NSException *exception) {
@@ -889,10 +898,11 @@ resetFifoOnStart = _resetFifoOnStart;
 	configStruct->card_info[index].deviceSpecificData[1] = reg[kMtcBwrAddOutReg].addressOffset;
 	configStruct->card_info[index].deviceSpecificData[2] = [self memBaseAddress];
 	configStruct->card_info[index].deviceSpecificData[3] = [self memAddressModifier];
-	configStruct->card_info[index].deviceSpecificData[4] = 1000; //delay between monitoring packets in msec
+	configStruct->card_info[index].deviceSpecificData[4] = 500; //delay between monitoring packets in msec
 	configStruct->card_info[index].deviceSpecificData[5] = [self resetFifoOnStart];
     configStruct->card_info[index].deviceSpecificData[6] = uLongDBValue(kGtMask);
-	
+    configStruct->card_info[index].deviceSpecificData[7] = uLongDBValue(kGtCrateMask);
+
 	configStruct->card_info[index].num_Trigger_Indexes = 0; //no children
 	configStruct->card_info[index].next_Card_Index = index + 1;
 	
