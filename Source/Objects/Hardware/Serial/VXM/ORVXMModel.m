@@ -788,8 +788,16 @@ NSString* ORVXMLock							= @"ORVXMLock";
 			//the '^' means a command is complete.
 			[self queryPositions];
 		}
-		else {			
-			if([aCmd length]>0 && [aCmd rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"+-.0123456789"]].location==0) {			
+		else {
+            //query reponse
+			if([aCmd hasPrefix:@"X"] ||
+			   [aCmd hasPrefix:@"Y"] ||
+			   [aCmd hasPrefix:@"Z"] ||
+			   [aCmd hasPrefix:@"T"] ){
+				aCmd = [aCmd substringFromIndex:1];
+			}
+
+			if([aCmd length]>0 && [aCmd rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"+-.0123456789"]].location==0) {
 				ORVXMMotor* aMotor = [motors objectAtIndex:[self motorToQuery]];
 				[aMotor setMotorPosition:[aCmd floatValue]];
 				if([aMotor hasMoved] && shipRecords)[self shipMotorState:[self motorToQuery]];
