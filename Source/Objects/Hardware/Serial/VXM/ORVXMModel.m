@@ -785,18 +785,10 @@ NSString* ORVXMLock							= @"ORVXMLock";
 	}
 	else {
 		if([aCmd rangeOfString:@"^"].location != NSNotFound){
-			//the '^' means a command is complete. On some hardware the command is echoed and the '^' sometimes is missing.
+			//the '^' means a command is complete.
 			[self queryPositions];
 		}
-		else {
-			//query reponse
-			if([aCmd hasPrefix:@"X"] || 
-			   [aCmd hasPrefix:@"Y"] || 
-			   [aCmd hasPrefix:@"Z"] || 
-			   [aCmd hasPrefix:@"T"] ){			
-				aCmd = [aCmd substringFromIndex:1];
-			}
-			
+		else {			
 			if([aCmd length]>0 && [aCmd rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"+-.0123456789"]].location==0) {			
 				ORVXMMotor* aMotor = [motors objectAtIndex:[self motorToQuery]];
 				[aMotor setMotorPosition:[aCmd floatValue]];
@@ -987,10 +979,10 @@ NSString* ORVXMLock							= @"ORVXMLock";
     if([serialPort isOpen]){
 		NSString* cmd = nil;
 		switch([self motorToQuery]){
-			case 0: cmd = @"E,X"; break;
-			case 1: cmd = @"E,Y"; break;
-			case 2: cmd = @"E,Z"; break;
-			case 3: cmd = @"E,T"; break;
+			case 0: cmd = @"F,X"; break;
+			case 1: cmd = @"F,Y"; break;
+			case 2: cmd = @"F,Z"; break;
+			case 3: cmd = @"F,T"; break;
 		}
 		if(cmd){
 			[self sendCommand:cmd];
