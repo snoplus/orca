@@ -128,6 +128,14 @@
 		2D24A8D9126F516D00BA2E2E /* SimStop.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2D24A8CF126F516D00BA2E2E /* SimStop.tif */; };
 		2D24A8DF126F543400BA2E2E /* Fieldline.gif in Resources */ = {isa = PBXBuildFile; fileRef = 2D24A8DE126F543400BA2E2E /* Fieldline.gif */; };
 		2D2AEA001672892C0057E424 /* ipe4reader.cpp in EdelweissSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2D2AE9FF1672892C0057E424 /* ipe4reader.cpp */; };
+		2D2AED601696281E0057E424 /* Makefile.ipe4reader in Resources */ = {isa = PBXBuildFile; fileRef = 2D2AED5F1696281E0057E424 /* Makefile.ipe4reader */; };
+		2D2AED63169628310057E424 /* ipe4reader.config in Resources */ = {isa = PBXBuildFile; fileRef = 2D2AED62169628310057E424 /* ipe4reader.config */; };
+		2D2AED651696283D0057E424 /* ipe4reader.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D2AED641696283D0057E424 /* ipe4reader.h */; };
+		2D2AED671696284D0057E424 /* ipe4structure.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D2AED661696284D0057E424 /* ipe4structure.h */; };
+		2D2AED6A169628870057E424 /* Makefile.ipe4reader in EdelweissSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2D2AED5F1696281E0057E424 /* Makefile.ipe4reader */; };
+		2D2AED6B169628870057E424 /* ipe4structure.h in EdelweissSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2D2AED661696284D0057E424 /* ipe4structure.h */; };
+		2D2AED6C169628870057E424 /* ipe4reader.config in EdelweissSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2D2AED62169628310057E424 /* ipe4reader.config */; };
+		2D2AED6D169628870057E424 /* ipe4reader.h in EdelweissSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2D2AED641696283D0057E424 /* ipe4reader.h */; };
 		2D2C84070F4EC6640005D69F /* ORIpeSlowControlDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D2C84040F4EC6640005D69F /* ORIpeSlowControlDecoder.h */; };
 		2D2C84080F4EC6650005D69F /* ORIpeSlowControlDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D2C84050F4EC6640005D69F /* ORIpeSlowControlDecoder.m */; };
 		2D51C60A15B5A115000F0ACD /* EdelweissFLT.nib in Resources */ = {isa = PBXBuildFile; fileRef = 2D51C60115B5A115000F0ACD /* EdelweissFLT.nib */; };
@@ -2971,6 +2979,10 @@
 			dstSubfolderSpec = 7;
 			files = (
 				2D2AEA001672892C0057E424 /* ipe4reader.cpp in EdelweissSLTv4_Copy */,
+				2D2AED6A169628870057E424 /* Makefile.ipe4reader in EdelweissSLTv4_Copy */,
+				2D2AED6B169628870057E424 /* ipe4structure.h in EdelweissSLTv4_Copy */,
+				2D2AED6C169628870057E424 /* ipe4reader.config in EdelweissSLTv4_Copy */,
+				2D2AED6D169628870057E424 /* ipe4reader.h in EdelweissSLTv4_Copy */,
 				2D12EE86150FE96900EBD8A2 /* OREdelweissSLTv4Readout.hh in EdelweissSLTv4_Copy */,
 				2D12EE83150FE95100EBD8A2 /* OREdelweissFLTv4Readout.hh in EdelweissSLTv4_Copy */,
 				2D12EE80150FE93700EBD8A2 /* IpeEdelweissV4SLTScript in EdelweissSLTv4_Copy */,
@@ -3274,6 +3286,10 @@
 		2D24A8CF126F516D00BA2E2E /* SimStop.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = SimStop.tif; sourceTree = "<group>"; };
 		2D24A8DE126F543400BA2E2E /* Fieldline.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Fieldline.gif; sourceTree = "<group>"; };
 		2D2AE9FF1672892C0057E424 /* ipe4reader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ipe4reader.cpp; path = EdelweissSLT/EdelweissSLTv4_Readout_Code/ipe4reader.cpp; sourceTree = "<group>"; };
+		2D2AED5F1696281E0057E424 /* Makefile.ipe4reader */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Makefile.ipe4reader; path = EdelweissSLT/EdelweissSLTv4_Readout_Code/Makefile.ipe4reader; sourceTree = "<group>"; };
+		2D2AED62169628310057E424 /* ipe4reader.config */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ipe4reader.config; path = EdelweissSLT/EdelweissSLTv4_Readout_Code/ipe4reader.config; sourceTree = "<group>"; };
+		2D2AED641696283D0057E424 /* ipe4reader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ipe4reader.h; path = EdelweissSLT/EdelweissSLTv4_Readout_Code/ipe4reader.h; sourceTree = "<group>"; };
+		2D2AED661696284D0057E424 /* ipe4structure.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ipe4structure.h; path = EdelweissSLT/EdelweissSLTv4_Readout_Code/ipe4structure.h; sourceTree = "<group>"; };
 		2D2C84040F4EC6640005D69F /* ORIpeSlowControlDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORIpeSlowControlDecoder.h; path = "IPE SlowControl/ORIpeSlowControlDecoder.h"; sourceTree = "<group>"; };
 		2D2C84050F4EC6640005D69F /* ORIpeSlowControlDecoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORIpeSlowControlDecoder.m; path = "IPE SlowControl/ORIpeSlowControlDecoder.m"; sourceTree = "<group>"; };
 		2D51C60115B5A115000F0ACD /* EdelweissFLT.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = EdelweissFLT.nib; path = EdelweissFLT/EdelweissFLT.nib; sourceTree = "<group>"; };
@@ -6297,6 +6313,10 @@
 		2D12EEA1150FEB2F00EBD8A2 /* EdelweissSLTv4_Readout_Code */ = {
 			isa = PBXGroup;
 			children = (
+				2D2AED5F1696281E0057E424 /* Makefile.ipe4reader */,
+				2D2AED62169628310057E424 /* ipe4reader.config */,
+				2D2AED661696284D0057E424 /* ipe4structure.h */,
+				2D2AED641696283D0057E424 /* ipe4reader.h */,
 				2D2AE9FF1672892C0057E424 /* ipe4reader.cpp */,
 				2D12EE84150FE96200EBD8A2 /* OREdelweissSLTv4Readout.hh */,
 				2D12EE81150FE94A00EBD8A2 /* OREdelweissFLTv4Readout.hh */,
@@ -13769,6 +13789,8 @@
 				CED38D1E165CDB6600358681 /* ANSIEscapeHelper.h in Headers */,
 				8477DF43166A4023000144BA /* HaloSentry.h in Headers */,
 				8434C37B167FB0F40068DB04 /* ORFileMoverOp.h in Headers */,
+				2D2AED651696283D0057E424 /* ipe4reader.h in Headers */,
+				2D2AED671696284D0057E424 /* ipe4structure.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14647,6 +14669,8 @@
 				84F9098D1638383C00E9FD24 /* Pulser33500Icon.tif in Resources */,
 				842BB6151639691600393470 /* DigitalReadSerial.ino in Resources */,
 				842BB6C816397A2800393470 /* Pulser33500Chan.nib in Resources */,
+				2D2AED601696281E0057E424 /* Makefile.ipe4reader in Resources */,
+				2D2AED63169628310057E424 /* ipe4reader.config in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
