@@ -558,7 +558,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 {
 	if(!syncWithRun){
 		abortAllRepeats = NO;
-        [self sendCommand:@"K,C\r"];
+        [self sendCommand:@"K,C"];
 		[self setCmdIndex:0];
 		[self setRepeatCount:0];
 		[self processNextCommand];
@@ -654,7 +654,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
     if([serialPort isOpen]){
 		abortAllRepeats = YES;
 		[NSObject cancelPreviousPerformRequestsWithTarget:self];
-        [self sendCommand:@"K\r"];
+        [self sendCommand:@"K"];
         [self queryPositions];
     }
 }
@@ -711,7 +711,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (void) sendGo
 {
 	if([serialPort isOpen]){
-        [self sendCommand:@"G\r"];
+        [self sendCommand:@"G"];
 		[self setWaiting:NO];
 		NSLog(@"sent 'Go' to VXM %d\n",[self uniqueIdNumber]);
 	}
@@ -866,6 +866,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 {
 	if([serialPort isOpen]){
 		NSLog(@"write: %@\n",aCmd);
+        if(![aCmd hasSuffix:@"\r"]) aCmd = [aCmd stringByAppendingString:@"\r"];
 		[serialPort writeString:aCmd];
 	}
 }
