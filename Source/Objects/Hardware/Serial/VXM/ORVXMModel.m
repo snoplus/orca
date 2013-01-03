@@ -486,6 +486,8 @@ NSString* ORVXMLock							= @"ORVXMLock";
 		[serialPort setStopBits2:0];
 		[serialPort setDataBits:8];
  		[serialPort commitChanges];
+        [self sendCommand:@"F"]; //set to no echo
+
     }
     else      [serialPort close];
     portWasOpen = [serialPort isOpen];
@@ -556,7 +558,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 {
 	if(!syncWithRun){
 		abortAllRepeats = NO;
-        [self sendCommand:@"F,K,C\r"];
+        [self sendCommand:@"K,C\r"];
 		[self setCmdIndex:0];
 		[self setRepeatCount:0];
 		[self processNextCommand];
@@ -629,7 +631,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 {
 	if(aMotorIndex>=0 && aMotorIndex<[motors count]){	
 		id aMotor = [motors objectAtIndex:aMotorIndex];
-		NSString* aCmd = [NSString stringWithFormat:@"F,K,C,S%dM%d,I%dM0,R",aMotorIndex+1,[aMotor motorSpeed],aMotorIndex+1];
+		NSString* aCmd = [NSString stringWithFormat:@"K,C,S%dM%d,I%dM0,R",aMotorIndex+1,[aMotor motorSpeed],aMotorIndex+1];
 		[self addCmdToQueue:aCmd
 				description:[NSString stringWithFormat:@"Move Motor %d to Pos Limit",aMotorIndex]
 				 waitToSend:YES];
@@ -640,7 +642,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 {
 	if(aMotorIndex>=0 && aMotorIndex<[motors count]){	
 		id aMotor = [motors objectAtIndex:aMotorIndex];
-		NSString* aCmd = [NSString stringWithFormat:@"F,K,C,S%dM%d,I%dM-0,R",aMotorIndex+1,[aMotor motorSpeed],aMotorIndex+1];
+		NSString* aCmd = [NSString stringWithFormat:@"K,C,S%dM%d,I%dM-0,R",aMotorIndex+1,[aMotor motorSpeed],aMotorIndex+1];
 		[self addCmdToQueue:aCmd 
 				description:[NSString stringWithFormat:@"Move Motor %d to Neg Limit",aMotorIndex]
 				 waitToSend:YES];
@@ -652,7 +654,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
     if([serialPort isOpen]){
 		abortAllRepeats = YES;
 		[NSObject cancelPreviousPerformRequestsWithTarget:self];
-        [self sendCommand:@"F,K\r"];
+        [self sendCommand:@"K\r"];
         [self queryPositions];
     }
 }
@@ -660,7 +662,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (void) goToNexCommand
 {
     if([serialPort isOpen]){
-        [self sendCommand:@"F,K"]; //kill any existing program
+        [self sendCommand:@"K"]; //kill any existing program
 	}
 }
 
@@ -672,7 +674,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (void) move:(int)motorIndex dx:(float)aPosition speed:(int)aSpeed
 {
 	if(motorIndex>=0 && motorIndex<[motors count]){	
-		NSString* aCmd = [NSString stringWithFormat:@"F,C,S%dM%d,I%dM%.0f,R",motorIndex+1,aSpeed,motorIndex+1,aPosition];
+		NSString* aCmd = [NSString stringWithFormat:@"C,S%dM%d,I%dM%.0f,R",motorIndex+1,aSpeed,motorIndex+1,aPosition];
 		float conversion = [[motors objectAtIndex:motorIndex] conversion];
 		NSString* units = displayRaw?@"stps":@"mm";
 		
@@ -685,7 +687,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (void) move:(int)motorIndex to:(float)aPosition speed:(int)aSpeed
 {
 	if(motorIndex>=0 && motorIndex<[motors count]){	
-		NSString* aCmd = [NSString stringWithFormat:@"F,C,S%dM%d,IA%dM%.0f,R",motorIndex+1,aSpeed,motorIndex+1,aPosition];
+		NSString* aCmd = [NSString stringWithFormat:@"C,S%dM%d,IA%dM%.0f,R",motorIndex+1,aSpeed,motorIndex+1,aPosition];
 		float conversion = [[motors objectAtIndex:motorIndex] conversion];
 		NSString* units = displayRaw?@"stps":@"mm";
 		[self addCmdToQueue:aCmd 
@@ -697,7 +699,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (void) move:(int)motorIndex to:(float)aPosition
 {
 	if(motorIndex>=0 && motorIndex<[motors count]){	
-		NSString* aCmd = [NSString stringWithFormat:@"F,C,IA%dM%.0f,R",motorIndex+1,aPosition];
+		NSString* aCmd = [NSString stringWithFormat:@"C,IA%dM%.0f,R",motorIndex+1,aPosition];
 		float conversion = [[motors objectAtIndex:motorIndex] conversion];
 		NSString* units = displayRaw?@"stps":@"mm";
 		[self addCmdToQueue:aCmd 
@@ -987,10 +989,10 @@ NSString* ORVXMLock							= @"ORVXMLock";
     if([serialPort isOpen]){
 		NSString* cmd = nil;
 		switch([self motorToQuery]){
-			case 0: cmd = @"F,X"; break;
-			case 1: cmd = @"F,Y"; break;
-			case 2: cmd = @"F,Z"; break;
-			case 3: cmd = @"F,T"; break;
+			case 0: cmd = @"X"; break;
+			case 1: cmd = @"Y"; break;
+			case 2: cmd = @"Z"; break;
+			case 3: cmd = @"T"; break;
 		}
 		if(cmd){
 			[self sendCommand:cmd];
