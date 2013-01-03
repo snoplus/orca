@@ -1,3 +1,6 @@
+// update 2013-01-03 -tb-
+
+
 #define	_version_OPERA	3.0
 
 #include <stdint.h>  //for uint32_t etc.

@@ -1,3 +1,7 @@
+#usage:
+# make -f Makefile.ipe4reader
+#  -tb- 2013-01-03
+
 all: ipe4reader
 
 #	g++ test.cpp -o test -lFE -lHw -lhw4 -lPbusSim -lakutil -I../fdhwlib/fdhwlib/ -L../fdhwlib/fdhwlib/FE/ -L../fdhwlib/fdhwlib/hw4
