@@ -74,7 +74,6 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (id) init
 {
 	self = [super init];
-    [self registerNotificationObservers];
 	[[self undoManager] disableUndoRegistration];
     [self makeMotors];
     [[self undoManager] enableUndoRegistration];
@@ -89,15 +88,8 @@ NSString* ORVXMLock							= @"ORVXMLock";
 	[cmdList release];
     [listFile  release];
 	[customCmd release];
-
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [buffer release];
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
-	[[NSNotificationCenter defaultCenter] removeObserver:self];
-    [portName release];
-    if([serialPort isOpen]){
-        [serialPort close];
-    }
-    [serialPort release];
 	[super dealloc];
 }
 
@@ -114,12 +106,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (void) registerNotificationObservers
 {
 	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(dataReceived:)
-                         name : ORSerialPortDataReceived
-                       object : nil];
-
+	[super registerNotificationObservers];
     [notifyCenter addObserver : self
                      selector : @selector(runStarting:)
                          name : ORRunAboutToStartNotification
@@ -137,8 +124,20 @@ NSString* ORVXMLock							= @"ORVXMLock";
 {
     if([[note userInfo] objectForKey:@"serialPort"] == serialPort){
         NSString* theString = [[[[NSString alloc] initWithData:[[note userInfo] objectForKey:@"data"] 
-													  encoding:NSASCIIStringEncoding] autorelease] uppercaseString];        
-        [self process_response:theString];
+													  encoding:NSASCIIStringEncoding] autorelease] uppercaseString];
+
+        if(!buffer)buffer = [[NSMutableString string] retain];
+        [buffer appendString:theString];
+        do {
+            NSRange lineRange = [buffer rangeOfString:@"\r"];
+            if(lineRange.location!= NSNotFound){
+                NSMutableString* theResponse = [[[buffer substringToIndex:lineRange.location+1] mutableCopy] autorelease];
+                [buffer deleteCharactersInRange:NSMakeRange(0,lineRange.location+1)];      //take the cmd out of the buffer
+				                
+                [self process_response:theResponse];
+            }
+        } while([buffer rangeOfString:@"\r"].location!= NSNotFound);
+
     }
 }
 
@@ -205,13 +204,15 @@ NSString* ORVXMLock							= @"ORVXMLock";
 
 - (void) setCustomCmd:(NSString*)aCustomCmd
 {
-	if(!aCustomCmd)aCustomCmd = @"";
-    [[[self undoManager] prepareWithInvocationTarget:self] setCustomCmd:customCmd];
+	if([aCustomCmd length]){
     
-    [customCmd autorelease];
-    customCmd = [aCustomCmd copy];    
+        [[[self undoManager] prepareWithInvocationTarget:self] setCustomCmd:customCmd];
+    
+        [customCmd autorelease];
+        customCmd = [aCustomCmd copy];    
 
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORVXMModelCustomCmdChanged object:self];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORVXMModelCustomCmdChanged object:self];
+    }
 }
 
 - (int) cmdTypeExecuting
@@ -381,21 +382,6 @@ NSString* ORVXMLock							= @"ORVXMLock";
 	else return nil;
 }
 
-- (BOOL) portWasOpen
-{
-    return portWasOpen;
-}
-
-- (void) setPortWasOpen:(BOOL)aPortWasOpen
-{
-    portWasOpen = aPortWasOpen;
-}
-
-- (NSString*) portName
-{
-    return portName;
-}
-
 - (void) removeAllCmds
 {
 	[self stopAllMotion];
@@ -436,13 +422,13 @@ NSString* ORVXMLock							= @"ORVXMLock";
 {
     [serialPort setSpeed:9600];
     [serialPort setParityNone];
-    [serialPort setStopBits2:0];
+    [serialPort setStopBits2:1];
     [serialPort setDataBits:8];
 }
 
 - (void) firstActionAfterOpeningPort
 {
-    [self sendCommand:@"F"]; //set to no echo
+    [self sendCommand:@"G"]; //set to no echo -- NO <CR>
 }
 
 #pragma mark ***Archival
@@ -472,9 +458,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 		i++;
 	}
 	[[self undoManager] enableUndoRegistration];
-	
-    [self registerNotificationObservers];
-	
+		
 	return self;
 }
 
@@ -500,7 +484,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 {
 	if(!syncWithRun){
 		abortAllRepeats = NO;
-        [self sendCommand:@"K,C"];
+        [self sendCommand:@"K,C"]; //NO <CR>
 		[self setCmdIndex:0];
 		[self setRepeatCount:0];
 		[self processNextCommand];
@@ -528,7 +512,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 }
 
 - (void) addCmdFromTableFor:(int)aMotorIndex
-{	
+{
 	if(aMotorIndex>=0 && aMotorIndex<[motors count]){	
 		id aMotor = [motors objectAtIndex:aMotorIndex];
 		if([aMotor absoluteMotion]){
@@ -545,7 +529,11 @@ NSString* ORVXMLock							= @"ORVXMLock";
 }
 
 - (void) addCustomCmd
-{	
+{
+    //some command should not have <CR> some should
+    if(![customCmd hasSuffix:@"\r"]){
+        [self setCustomCmd:[customCmd stringByAppendingString:@"\r"]];
+    }
 	if([customCmd length]>0){
 		[self addCmdToQueue:customCmd 
 				description:@"Custom Cmd"
@@ -573,7 +561,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 {
 	if(aMotorIndex>=0 && aMotorIndex<[motors count]){	
 		id aMotor = [motors objectAtIndex:aMotorIndex];
-		NSString* aCmd = [NSString stringWithFormat:@"K,C,S%dM%d,I%dM0,R",aMotorIndex+1,[aMotor motorSpeed],aMotorIndex+1];
+		NSString* aCmd = [NSString stringWithFormat:@"K,C,S%dM%d,I%dM0,R\r",aMotorIndex+1,[aMotor motorSpeed],aMotorIndex+1];
 		[self addCmdToQueue:aCmd
 				description:[NSString stringWithFormat:@"Move Motor %d to Pos Limit",aMotorIndex]
 				 waitToSend:YES];
@@ -584,7 +572,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 {
 	if(aMotorIndex>=0 && aMotorIndex<[motors count]){	
 		id aMotor = [motors objectAtIndex:aMotorIndex];
-		NSString* aCmd = [NSString stringWithFormat:@"K,C,S%dM%d,I%dM-0,R",aMotorIndex+1,[aMotor motorSpeed],aMotorIndex+1];
+		NSString* aCmd = [NSString stringWithFormat:@"K,C,S%dM%d,I%dM-0,R\r",aMotorIndex+1,[aMotor motorSpeed],aMotorIndex+1];
 		[self addCmdToQueue:aCmd 
 				description:[NSString stringWithFormat:@"Move Motor %d to Neg Limit",aMotorIndex]
 				 waitToSend:YES];
@@ -596,7 +584,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
     if([serialPort isOpen]){
 		abortAllRepeats = YES;
 		[NSObject cancelPreviousPerformRequestsWithTarget:self];
-        [self sendCommand:@"K"];
+        [self sendCommand:@"K"]; //NO <CR>
         [self queryPositions];
     }
 }
@@ -604,7 +592,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (void) goToNexCommand
 {
     if([serialPort isOpen]){
-        [self sendCommand:@"K"]; //kill any existing program
+        [self sendCommand:@"K"]; //NO <CR>
 	}
 }
 
@@ -616,7 +604,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (void) move:(int)motorIndex dx:(float)aPosition speed:(int)aSpeed
 {
 	if(motorIndex>=0 && motorIndex<[motors count]){	
-		NSString* aCmd = [NSString stringWithFormat:@"C,S%dM%d,I%dM%.0f,R",motorIndex+1,aSpeed,motorIndex+1,aPosition];
+		NSString* aCmd = [NSString stringWithFormat:@"C,S%dM%d,I%dM%.0f,R\r",motorIndex+1,aSpeed,motorIndex+1,aPosition];
 		float conversion = [[motors objectAtIndex:motorIndex] conversion];
 		NSString* units = displayRaw?@"stps":@"mm";
 		
@@ -629,7 +617,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (void) move:(int)motorIndex to:(float)aPosition speed:(int)aSpeed
 {
 	if(motorIndex>=0 && motorIndex<[motors count]){	
-		NSString* aCmd = [NSString stringWithFormat:@"C,S%dM%d,IA%dM%.0f,R",motorIndex+1,aSpeed,motorIndex+1,aPosition];
+		NSString* aCmd = [NSString stringWithFormat:@"C,S%dM%d,IA%dM%.0f,R\r",motorIndex+1,aSpeed,motorIndex+1,aPosition];
 		float conversion = [[motors objectAtIndex:motorIndex] conversion];
 		NSString* units = displayRaw?@"stps":@"mm";
 		[self addCmdToQueue:aCmd 
@@ -641,7 +629,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (void) move:(int)motorIndex to:(float)aPosition
 {
 	if(motorIndex>=0 && motorIndex<[motors count]){	
-		NSString* aCmd = [NSString stringWithFormat:@"C,IA%dM%.0f,R",motorIndex+1,aPosition];
+		NSString* aCmd = [NSString stringWithFormat:@"C,IA%dM%.0f,R\r",motorIndex+1,aPosition];
 		float conversion = [[motors objectAtIndex:motorIndex] conversion];
 		NSString* units = displayRaw?@"stps":@"mm";
 		[self addCmdToQueue:aCmd 
@@ -732,7 +720,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 			//the '^' means a command is complete.
 			[self queryPositions];
 		}
-		else {
+		else if(queryInProgress){
             //query reponse
 			if([aCmd hasPrefix:@"X"] ||
 			   [aCmd hasPrefix:@"Y"] ||
@@ -742,6 +730,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 			}
 
 			if([aCmd length]>0 && [aCmd rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"+-.0123456789"]].location==0) {
+                
 				ORVXMMotor* aMotor = [motors objectAtIndex:[self motorToQuery]];
 				[aMotor setMotorPosition:[aCmd floatValue]];
 				if([aMotor hasMoved] && shipRecords)[self shipMotorState:[self motorToQuery]];
@@ -762,6 +751,15 @@ NSString* ORVXMLock							= @"ORVXMLock";
 				}
 			}
 		}
+        else {
+            [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+            if(useCmdQueue){
+                [self incrementCmdIndex];
+                [self processNextCommand];
+            }
+            else [self setCmdTypeExecuting:kVXMCmdIdle];
+       
+        }
 	}
 }
 
@@ -808,7 +806,6 @@ NSString* ORVXMLock							= @"ORVXMLock";
 {
 	if([serialPort isOpen]){
 		NSLog(@"write: %@\n",aCmd);
-        if(![aCmd hasSuffix:@"\r"]) aCmd = [aCmd stringByAppendingString:@"\r"];
 		[serialPort writeString:aCmd];
 	}
 }
@@ -896,6 +893,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 }
 - (void) queryPositionsDeferred
 {
+    
 	int i;
 	motorToQueryMask = 0;
 	for(i=0;i<kNumVXMMotors;i++) {
@@ -957,8 +955,8 @@ NSString* ORVXMLock							= @"ORVXMLock";
 #pragma mark ***Archival
 - (id) initWithCoder:(NSCoder*)decoder
 {
-	self = [super init];
-	self.description		= [decoder decodeObjectForKey:	@"description"];	
+    self = [super init];
+	self.description		= [decoder decodeObjectForKey:	@"description"];
 	self.cmd				= [decoder decodeObjectForKey:	@"cmd"];	
 	self.waitToSendNextCmd	= [decoder decodeIntForKey:		@"waitToSendNextCmd"];
 	return self;
