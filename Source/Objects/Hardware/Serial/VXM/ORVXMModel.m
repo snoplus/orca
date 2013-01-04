@@ -205,7 +205,28 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (void) setCustomCmd:(NSString*)aCustomCmd
 {
 	if([aCustomCmd length]){
-    
+        aCustomCmd = [aCustomCmd stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        char lastChar = [aCustomCmd characterAtIndex:[aCustomCmd length]-1];
+        switch (lastChar){
+            case 'Q':
+            case 'R':
+            case 'N':
+            case 'K':
+            case 'C':
+            case 'D':
+            case 'E':
+            case 'F':
+            case 'Z':
+            case 'T':
+            case 'M':
+                //do nothing.. those command should not have <CR> eol
+                break;
+            default:
+                aCustomCmd = [aCustomCmd stringByAppendingString:@"\r"];
+                break;
+        }
+        
+        
         [[[self undoManager] prepareWithInvocationTarget:self] setCustomCmd:customCmd];
     
         [customCmd autorelease];
@@ -531,9 +552,6 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (void) addCustomCmd
 {
     //some command should not have <CR> some should
-    if(![customCmd hasSuffix:@"\r"]){
-        [self setCustomCmd:[customCmd stringByAppendingString:@"\r"]];
-    }
 	if([customCmd length]>0){
 		[self addCmdToQueue:customCmd 
 				description:@"Custom Cmd"
@@ -561,7 +579,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 {
 	if(aMotorIndex>=0 && aMotorIndex<[motors count]){	
 		id aMotor = [motors objectAtIndex:aMotorIndex];
-		NSString* aCmd = [NSString stringWithFormat:@"K,C,S%dM%d,I%dM0,R\r",aMotorIndex+1,[aMotor motorSpeed],aMotorIndex+1];
+		NSString* aCmd = [NSString stringWithFormat:@"K,C,S%dM%d,I%dM0,R",aMotorIndex+1,[aMotor motorSpeed],aMotorIndex+1];
 		[self addCmdToQueue:aCmd
 				description:[NSString stringWithFormat:@"Move Motor %d to Pos Limit",aMotorIndex]
 				 waitToSend:YES];
@@ -572,7 +590,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 {
 	if(aMotorIndex>=0 && aMotorIndex<[motors count]){	
 		id aMotor = [motors objectAtIndex:aMotorIndex];
-		NSString* aCmd = [NSString stringWithFormat:@"K,C,S%dM%d,I%dM-0,R\r",aMotorIndex+1,[aMotor motorSpeed],aMotorIndex+1];
+		NSString* aCmd = [NSString stringWithFormat:@"K,C,S%dM%d,I%dM-0,R",aMotorIndex+1,[aMotor motorSpeed],aMotorIndex+1];
 		[self addCmdToQueue:aCmd 
 				description:[NSString stringWithFormat:@"Move Motor %d to Neg Limit",aMotorIndex]
 				 waitToSend:YES];
@@ -604,7 +622,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (void) move:(int)motorIndex dx:(float)aPosition speed:(int)aSpeed
 {
 	if(motorIndex>=0 && motorIndex<[motors count]){	
-		NSString* aCmd = [NSString stringWithFormat:@"C,S%dM%d,I%dM%.0f,R\r",motorIndex+1,aSpeed,motorIndex+1,aPosition];
+		NSString* aCmd = [NSString stringWithFormat:@"C,S%dM%d,I%dM%.0f,R",motorIndex+1,aSpeed,motorIndex+1,aPosition];
 		float conversion = [[motors objectAtIndex:motorIndex] conversion];
 		NSString* units = displayRaw?@"stps":@"mm";
 		
@@ -617,7 +635,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (void) move:(int)motorIndex to:(float)aPosition speed:(int)aSpeed
 {
 	if(motorIndex>=0 && motorIndex<[motors count]){	
-		NSString* aCmd = [NSString stringWithFormat:@"C,S%dM%d,IA%dM%.0f,R\r",motorIndex+1,aSpeed,motorIndex+1,aPosition];
+		NSString* aCmd = [NSString stringWithFormat:@"C,S%dM%d,IA%dM%.0f,R",motorIndex+1,aSpeed,motorIndex+1,aPosition];
 		float conversion = [[motors objectAtIndex:motorIndex] conversion];
 		NSString* units = displayRaw?@"stps":@"mm";
 		[self addCmdToQueue:aCmd 
@@ -629,7 +647,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (void) move:(int)motorIndex to:(float)aPosition
 {
 	if(motorIndex>=0 && motorIndex<[motors count]){	
-		NSString* aCmd = [NSString stringWithFormat:@"C,IA%dM%.0f,R\r",motorIndex+1,aPosition];
+		NSString* aCmd = [NSString stringWithFormat:@"C,IA%dM%.0f,R",motorIndex+1,aPosition];
 		float conversion = [[motors objectAtIndex:motorIndex] conversion];
 		NSString* units = displayRaw?@"stps":@"mm";
 		[self addCmdToQueue:aCmd 
@@ -812,6 +830,9 @@ NSString* ORVXMLock							= @"ORVXMLock";
 	if([serialPort isOpen]){
 		NSLog(@"write: %@\n",aCmd);
 		[serialPort writeString:aCmd];
+        if([aCmd isEqualToString:@"N"]){
+            [self queryPositions];
+        }
 	}
 }
 
