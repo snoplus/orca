@@ -700,6 +700,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (void) timeout
 {
 	NSLogError(@"command timeout",@"VXM",nil);
+    queryInProgress = NO;
     abortAllRepeats = YES;
     [self setCmdIndex:0];
     [self setRepeatCount:0];
