@@ -700,6 +700,10 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (void) timeout
 {
 	NSLogError(@"command timeout",@"VXM",nil);
+    abortAllRepeats = YES;
+    [self setCmdIndex:0];
+    [self setRepeatCount:0];
+    [self setCmdTypeExecuting:kVXMCmdIdle];
 }
 
 - (void) startTimeOut
