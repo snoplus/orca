@@ -18,8 +18,8 @@
 //-------------------------------------------------------------
 
 #pragma mark ***Imported Files
+#import "ORSerialPortWithQueueModel.h"
 
-@class ORSerialPort;
 @class ORVXMMotor;
 @class ORVXMMotorCmd;
 
@@ -29,18 +29,15 @@
 #define kVXMCmdListExecuting	  1 
 #define kVXMImmediateCmdExecuting 2
 
-@interface ORVXMModel : OrcaObject
+@interface ORVXMModel : ORSerialPortWithQueueModel
 {
     @private
 		NSMutableArray*	motors;
-        NSString*       portName;
-        BOOL            portWasOpen;
-        ORSerialPort*   serialPort;
         unsigned long	dataId;
 		BOOL			forceResetQueryMaskOnce;
 		BOOL			repeatQuery;
         int             motorToQueryMask;
-		NSMutableArray* cmdQueue;
+		NSMutableArray* cmdList;
 		BOOL			displayRaw;
 		int				syncWithRun;
 		BOOL			repeatCmds;
@@ -97,13 +94,6 @@
 - (void) setDisplayRaw:(BOOL)aDisplayRaw;
 - (NSArray*) motors;
 - (ORVXMMotor*) motor:(int)aMotor;
-- (ORSerialPort*) serialPort;
-- (void) setSerialPort:(ORSerialPort*)aSerialPort;
-- (BOOL) portWasOpen;
-- (void) setPortWasOpen:(BOOL)aPortWasOpen;
-- (NSString*) portName;
-- (void) setPortName:(NSString*)aPortName;
-- (void) openPort:(BOOL)state;
 - (void) addItem:(id)anItem atIndex:(int)anIndex;
 - (void) removeItemAtIndex:(int) anIndex;
 - (BOOL) isMoving;
@@ -156,10 +146,7 @@ extern NSString* ORVXMModelRepeatCountChanged;
 extern NSString* ORVXMModelRepeatCmdsChanged;
 extern NSString* ORVXMModelSyncWithRunChanged;
 extern NSString* ORVXMModelDisplayRawChanged;
-extern NSString* ORVXMModelSerialPortChanged;
 extern NSString* ORVXMLock;
-extern NSString* ORVXMModelPortNameChanged;
-extern NSString* ORVXMModelPortStateChanged;
 extern NSString* ORVXMModelCmdQueueChanged;
 extern NSString* ORVXMModelListItemsAdded;
 extern NSString* ORVXMModelListItemsRemoved;

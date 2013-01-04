@@ -19,6 +19,7 @@
 
 #pragma mark ***Imported Files
 
+@class ORSerialPortController;
 
 @interface ORVXMController : OrcaObjectController
 {
@@ -35,9 +36,6 @@
 	IBOutlet NSButton*		repeatCmdsCB;
 	IBOutlet NSButton*		syncWithRunCB;
 	IBOutlet NSMatrix*		displayRawMatrix;
-    IBOutlet NSTextField*   portStateField;
-    IBOutlet NSPopUpButton* portListPopup;
-    IBOutlet NSButton*      openPortButton;
 	IBOutlet NSButton*      lockButton;
 	IBOutlet NSButton*      loadListButton;
 	IBOutlet NSButton*      saveListButton;
@@ -68,6 +66,7 @@
     IBOutlet NSTextField*   speedLabelField;
     IBOutlet NSTextField*   currentPositionLabelField;
     IBOutlet NSTextField*   targetLabelField;
+    IBOutlet ORSerialPortController* serialPortController;
 
 }
 
@@ -93,8 +92,6 @@
 - (void) syncWithRunChanged:(NSNotification*)aNote;
 - (void) displayRawChanged:(NSNotification*)aNote;
 - (void) updateButtons:(NSNotification*)aNote;
-- (void) portNameChanged:(NSNotification*)aNote;
-- (void) portStateChanged:(NSNotification*)aNote;
 - (void) positionChanged:(NSNotification*)aNote;
 - (void) conversionChanged:(NSNotification*)aNote;
 - (void) motorEnabledChanged:(NSNotification*)aNote;
@@ -116,8 +113,6 @@
 - (IBAction) syncWithRunAction:(id)sender;
 - (IBAction) displayRawAction:(id)sender;
 - (IBAction) lockAction:(id) sender;
-- (IBAction) portListAction:(id) sender;
-- (IBAction) openPortAction:(id)sender;
 - (IBAction) stopAllAction:(id)sender;
 - (IBAction) conversionAction:(id)sender;
 - (IBAction) speedAction:(id)sender;

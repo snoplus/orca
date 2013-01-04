@@ -22,8 +22,6 @@
 #import "ORVXMModel.h"
 #import "ORVXMMotor.h"
 #import "ORSerialPort.h"
-#import "ORSerialPortList.h"
-#import "ORSerialPort.h"
 #import "ORSerialPortAdditions.h"
 #import "ORDataTypeAssigner.h"
 #import "ORDataPacket.h"
@@ -88,7 +86,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 {
 	for(id aMotor in motors)[aMotor setDelegate:nil];
 	[motors dealloc];
-	[cmdQueue release];
+	[cmdList release];
     [listFile  release];
 	[customCmd release];
 
@@ -255,7 +253,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 {
 	[self setListFile:aPath];
     NSMutableString* list = [NSMutableString string];
-    for(id aCmd in cmdQueue){
+    for(id aCmd in cmdList){
         [list appendFormat:@"%@ # %@ # %d\n",[aCmd cmd],[aCmd description],[aCmd waitToSendNextCmd]];
     }
     NSString* s = [list stringByReplacingOccurrencesOfString:@"\r" withString:@""];
@@ -401,103 +399,51 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (void) removeAllCmds
 {
 	[self stopAllMotion];
-	[cmdQueue removeAllObjects];
+	[cmdList removeAllObjects];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORVXMModelCmdQueueChanged object:self];
 }
 
 - (ORVXMMotorCmd*) motorCmd:(int)index
 {
-	if(index < [cmdQueue count]){
-		return [cmdQueue objectAtIndex:index];
+	if(index < [cmdList count]){
+		return [cmdList objectAtIndex:index];
 	}
 	else return nil;
 }
 
 - (unsigned) cmdQueueCount
 {
-	return [cmdQueue count];
+	return [cmdList count];
 }
 
 - (NSString*) cmdQueueCommand:(int)index
 {
-	if(index < [cmdQueue count]){
-		return [[cmdQueue objectAtIndex:index] cmd];
+	if(index < [cmdList count]){
+		return [[cmdList objectAtIndex:index] cmd];
 	}
 	else return @"";
 }
 
 - (NSString*) cmdQueueDescription:(int)index
 {
-	if(index < [cmdQueue count]){
-		return [[cmdQueue objectAtIndex:index] description];
+	if(index < [cmdList count]){
+		return [[cmdList objectAtIndex:index] description];
 	}
 	else return @"";
 }
 
-- (void) setPortName:(NSString*)aPortName
+- (void) setUpPort
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setPortName:portName];
-    
-    if(![aPortName isEqualToString:portName]){
-        [portName autorelease];
-        portName = [aPortName copy];    
-		
-        BOOL valid = NO;
-        NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
-        ORSerialPort *aPort;
-        while (aPort = [enumerator nextObject]) {
-            if([portName isEqualToString:[aPort name]]){
-                [self setSerialPort:aPort];
-                if(portWasOpen){
-                    [self openPort:YES];
-                }
-                valid = YES;
-                break;
-            }
-        } 
-        if(!valid){
-            [self setSerialPort:nil];
-        }       
-    }
-	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORVXMModelPortNameChanged object:self];
+    [serialPort setSpeed:9600];
+    [serialPort setParityNone];
+    [serialPort setStopBits2:0];
+    [serialPort setDataBits:8];
 }
 
-- (ORSerialPort*) serialPort
+- (void) firstActionAfterOpeningPort
 {
-    return serialPort;
+    [self sendCommand:@"F"]; //set to no echo
 }
-
-- (void) setSerialPort:(ORSerialPort*)aSerialPort
-{
-    [aSerialPort retain];
-    [serialPort release];
-    serialPort = aSerialPort;
-	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORVXMModelSerialPortChanged object:self];
-}
-
-- (void) openPort:(BOOL)state
-{
-    if(state) {
-        [serialPort open];
-		[serialPort setSpeed:9600];
-		[serialPort setParityNone];
-		[serialPort setStopBits2:0];
-		[serialPort setDataBits:8];
- 		[serialPort commitChanges];
-        [self sendCommand:@"F"]; //set to no echo
-
-    }
-    else      [serialPort close];
-    portWasOpen = [serialPort isOpen];
-	if([serialPort isOpen]){
-		[self queryPosition];
-	}
-	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORVXMModelPortStateChanged object:self];
-}
-
 
 #pragma mark ***Archival
 - (id) initWithCoder:(NSCoder*)decoder
@@ -514,11 +460,9 @@ NSString* ORVXMLock							= @"ORVXMLock";
 	[self setRepeatCount:	  [decoder decodeIntForKey:@"repeatCount"]];
 	[self setSyncWithRun:	  [decoder decodeIntForKey:@"syncWithRun"]];
 	[self setDisplayRaw:	  [decoder decodeBoolForKey:	@"displayRaw"]];
-	[self setPortWasOpen:	  [decoder decodeBoolForKey:	@"portWasOpen"]];
-    [self setPortName:		  [decoder decodeObjectForKey:@"portName"]];
     [self setListFile:		  [decoder decodeObjectForKey:@"listFile"]];
 	
-    cmdQueue = [[decoder decodeObjectForKey:@"cmdQueue"]retain];
+    cmdList = [[decoder decodeObjectForKey:@"cmdList"]retain];
 	motors   = [[decoder decodeObjectForKey:@"motors"] retain];
 	if(!motors)[self makeMotors];
 	int i = 0;
@@ -546,11 +490,9 @@ NSString* ORVXMLock							= @"ORVXMLock";
     [encoder encodeBool:repeatCmds		forKey: @"repeatCmds"];
     [encoder encodeInt:syncWithRun		forKey: @"syncWithRun"];
     [encoder encodeBool:displayRaw		forKey: @"displayRaw"];
-    [encoder encodeBool:portWasOpen		forKey: @"portWasOpen"];
-    [encoder encodeObject:portName		forKey: @"portName"];
     [encoder encodeObject:motors		forKey: @"motors"];
     [encoder encodeObject:listFile		forKey: @"listFile"];
-    [encoder encodeObject:cmdQueue		forKey: @"cmdQueue"];
+    [encoder encodeObject:cmdList		forKey: @"cmdList"];
 }
 
 #pragma mark ***Motor Commands
@@ -567,20 +509,20 @@ NSString* ORVXMLock							= @"ORVXMLock";
 
 - (void) addItem:(id)anItem atIndex:(int)anIndex
 {
-	if(!cmdQueue) cmdQueue= [[NSMutableArray array] retain];
-	if([cmdQueue count] == 0)anIndex = 0;
-	anIndex = MIN(anIndex,[cmdQueue count]);
+	if(!cmdList) cmdList= [[NSMutableArray array] retain];
+	if([cmdList count] == 0)anIndex = 0;
+	anIndex = MIN(anIndex,[cmdList count]);
 	[[[self undoManager] prepareWithInvocationTarget:self] removeItemAtIndex:anIndex];
-	[cmdQueue insertObject:anItem atIndex:anIndex];
+	[cmdList insertObject:anItem atIndex:anIndex];
 	NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Index"];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORVXMModelListItemsAdded object:self userInfo:userInfo];
 }
 
 - (void) removeItemAtIndex:(int) anIndex
 {
-	id anItem = [cmdQueue objectAtIndex:anIndex];
+	id anItem = [cmdList objectAtIndex:anIndex];
 	[[[self undoManager] prepareWithInvocationTarget:self] addItem:anItem atIndex:anIndex];
-	[cmdQueue removeObjectAtIndex:anIndex];
+	[cmdList removeObjectAtIndex:anIndex];
 	NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Index"];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORVXMModelListItemsRemoved object:self userInfo:userInfo];
 }
@@ -839,13 +781,13 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (void) addCmdToQueue:(NSString*)aCmdString description:(NSString*)aDescription waitToSend:(BOOL)waitToSendNextCmd
 {
 	if(useCmdQueue){
-		if(!cmdQueue)cmdQueue	= [[NSMutableArray array] retain];
+		if(!cmdList)cmdList	= [[NSMutableArray array] retain];
 		ORVXMMotorCmd* aCmd		= [[ORVXMMotorCmd alloc] init];
 		aCmd.cmd				= aCmdString;
 		aCmd.description		= aDescription;
 		aCmd.waitToSendNextCmd	= waitToSendNextCmd;
 	 
-		[self  addItem:aCmd atIndex:[cmdQueue count]];
+		[self  addItem:aCmd atIndex:[cmdList count]];
 
 		[aCmd release];
 		
@@ -875,8 +817,8 @@ NSString* ORVXMLock							= @"ORVXMLock";
 {
 	if([serialPort isOpen]){ 
 		if(!abortAllRepeats){
-			if(cmdIndex<[cmdQueue count]){
-				ORVXMMotorCmd* aCmd = [cmdQueue objectAtIndex:cmdIndex];
+			if(cmdIndex<[cmdList count]){
+				ORVXMMotorCmd* aCmd = [cmdList objectAtIndex:cmdIndex];
 				[self setCmdTypeExecuting:kVXMCmdListExecuting];
 				NSString* theCmd = aCmd.cmd;
                 [self sendCommand:theCmd];

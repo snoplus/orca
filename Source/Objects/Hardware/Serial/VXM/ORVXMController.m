@@ -22,12 +22,11 @@
 #import "ORVXMController.h"
 #import "ORVXMModel.h"
 #import "ORAxis.h"
-#import "ORSerialPortList.h"
-#import "ORSerialPort.h"
 #import "ORVXMMotor.h"
+#import "ORSerialPortModel.h"
+#import "ORSerialPortController.h"
 
 @interface ORVXMController (private)
-- (void) populatePortListPopup;
 #if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 - (void) _saveListPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void*)contextInfo;
 - (void) _loadListPanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
@@ -52,7 +51,6 @@
 
 - (void) awakeFromNib
 {
-    [self populatePortListPopup];
 	
 
 	NSNumberFormatter *numberFormatter = [[[NSNumberFormatter alloc] init] autorelease];
@@ -106,16 +104,6 @@
                      selector : @selector(updateButtons:)
                          name : ORVXMLock
                         object: nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(portNameChanged:)
-                         name : ORVXMModelPortNameChanged
-                        object: nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(portStateChanged:)
-                         name : ORSerialPortStateChanged
-                       object : nil];
 	
     [notifyCenter addObserver : self
                      selector : @selector(positionChanged:)
@@ -221,15 +209,21 @@
                      selector : @selector(useCmdQueueChanged:)
                          name : ORVXMModelUseCmdQueueChanged
 						object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(updateButtons:)
+                         name : ORSerialPortModelPortStateChanged
+						object: model];
 
+    [serialPortController registerNotificationObservers];
+
+    
 }
 
 - (void) updateWindow
 {
     [super updateWindow];
     [self updateButtons:nil];
-    [self portStateChanged:nil];
-    [self portNameChanged:nil];
     [self positionChanged:nil];
 	[self conversionChanged:nil];
     [self motorEnabledChanged:nil];
@@ -249,6 +243,11 @@
 	[self customCmdChanged:nil];
 	[self waitingChanged:nil];
 	[self useCmdQueueChanged:nil];
+	[serialPortController updateWindow];
+}
+- (BOOL) portLocked
+{
+	return [gSecurity isLocked:ORVXMLock];
 }
 
 - (void) useCmdQueueChanged:(NSNotification*)aNote
@@ -417,10 +416,10 @@
 	int cmdExecuting		= [model cmdTypeExecuting];
 	BOOL useCmdQueue		= [model useCmdQueue];
 	
+	[serialPortController updateButtons:locked];
+    
     [lockButton setState: locked];
 
-    [portListPopup setEnabled:!locked];
-    [openPortButton setEnabled:!locked];
     [getPositionButton setEnabled:!locked];
 	
 	[manualStartButton setEnabled:!locked && !syncWithRun && !cmdExecuting && useCmdQueue];
@@ -470,49 +469,6 @@
     }
     [lockDocField setStringValue:s];
 
-}
-
-- (void) portStateChanged:(NSNotification*)aNotification
-{
-    if(aNotification == nil || [aNotification object] == [model serialPort]){
-        if([model serialPort]){
-            [openPortButton setEnabled:YES];
-
-            if([[model serialPort] isOpen]){
-                [openPortButton setTitle:@"Close"];
-                [portStateField setTextColor:[NSColor colorWithCalibratedRed:0.0 green:.8 blue:0.0 alpha:1.0]];
-                [portStateField setStringValue:@"Open"];
-            }
-            else {
-                [openPortButton setTitle:@"Open"];
-                [portStateField setStringValue:@"Closed"];
-                [portStateField setTextColor:[NSColor redColor]];
-            }
-        }
-        else {
-            [openPortButton setEnabled:NO];
-            [portStateField setTextColor:[NSColor blackColor]];
-            [portStateField setStringValue:@"---"];
-            [openPortButton setTitle:@"---"];
-        }
-    }
-}
-
-- (void) portNameChanged:(NSNotification*)aNotification
-{
-    NSString* portName = [model portName];
-    
-	NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
-	ORSerialPort *aPort;
-
-    [portListPopup selectItemAtIndex:0]; //the default
-    while (aPort = [enumerator nextObject]) {
-        if([portName isEqualToString:[aPort name]]){
-            [portListPopup selectItemWithTitle:portName];
-            break;
-        }
-	}  
-    [self portStateChanged:nil];
 }
 
 - (void) absoluteMotionChanged:(NSNotification*)aNotification
@@ -655,16 +611,6 @@
 - (IBAction) lockAction:(id) sender
 {
     [gSecurity tryToSetLock:ORVXMLock to:[sender intValue] forWindow:[self window]];
-}
-
-- (IBAction) portListAction:(id) sender
-{
-    [model setPortName: [portListPopup titleOfSelectedItem]];
-}
-
-- (IBAction) openPortAction:(id)sender
-{
-    [model openPort:![[model serialPort] isOpen]];
 }
 
 - (IBAction) stopAllAction:(id)sender
@@ -829,17 +775,6 @@
 @end
 
 @implementation ORVXMController (private)
-- (void) populatePortListPopup
-{
-	NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
-	ORSerialPort *aPort;
-    [portListPopup removeAllItems];
-    [portListPopup addItemWithTitle:@"--"];
-
-	while (aPort = [enumerator nextObject]) {
-        [portListPopup addItemWithTitle:[aPort name]];
-	}    
-}
 #if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 - (void) _saveListPanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
