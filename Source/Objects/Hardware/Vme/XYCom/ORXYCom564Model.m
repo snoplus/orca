@@ -909,16 +909,17 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
         int channelsToRead = kXVME564_NumAutoScanChannelsPerGroup << ([self autoscanMode]);
         
         uint16_t* readOut = (uint16_t*)[chanADCVals bytes];
+        uint16_t scratchOut[channelsToRead];
         assert([chanADCVals length] == channelsToRead*sizeof(readOut[0]));
         
         [[self adapter]
-                 readWordBlock:readOut
+                 readWordBlock:scratchOut
                      atAddress:[self baseAddress] + mIOXY564Reg[kADScan].offset
                      numToRead:channelsToRead
                     withAddMod:[self addressModifier]
                  usingAddSpace:0x01];
         int i;
-        for (i=0;i<channelsToRead;i++) readOut[i] = [self _recenterValue:readOut[i]];
+        for (i=0;i<channelsToRead;i++) readOut[i] = [self _recenterValue:scratchOut[i]];
     }
     [self _addAverageValues:chanADCVals];
     
