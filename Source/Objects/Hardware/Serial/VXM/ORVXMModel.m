@@ -443,7 +443,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 {
     [serialPort setSpeed:9600];
     [serialPort setParityNone];
-    [serialPort setStopBits2:1];
+    [serialPort setStopBits2:0];
     [serialPort setDataBits:8];
 }
 
