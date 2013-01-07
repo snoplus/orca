@@ -98,7 +98,6 @@
 - (void) addItem:(id)anItem atIndex:(int)anIndex;
 - (void) removeItemAtIndex:(int) anIndex;
 - (BOOL) isMoving;
-- (BOOL) commandNeedsCR:(NSString*)aCmd;
 
 #pragma mark ***Data Records
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
