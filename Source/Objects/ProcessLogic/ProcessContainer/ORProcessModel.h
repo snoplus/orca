@@ -46,11 +46,15 @@
     BOOL		sendOnStop;
 	NSDate*		nextHeartbeat;
 	BOOL		sendStartNoticeNextRead;
+    BOOL        masterProcess;
+    BOOL        updateImageForMasterChange;
 }
 
 - (NSString*) report;
 
 #pragma mark ***Accessors
+- (BOOL) masterProcess;
+- (void) setMasterProcess:(BOOL)aMasterProcess;
 - (void) runNow:(NSNotification*)aNote;
 - (void) pollNow;
 - (BOOL) sendOnStop;
@@ -131,6 +135,7 @@
 - (void) resetReportValues;
 @end
 
+extern NSString* ORProcessModelMasterProcessChanged;
 extern NSString* ORForceProcessPollNotification;
 extern NSString* ORProcessModelRunNumberChanged;
 extern NSString* ORProcessModelNextHeartBeatChanged;

@@ -25,26 +25,29 @@
 
 @interface ORProcessController : ORContainerController
 {
-    IBOutlet NSTabView* tabView;
-	IBOutlet NSButton* sendOnStopCB;
-	IBOutlet NSButton* sendOnStartCB;
+    IBOutlet NSTabView*     tabView;
+	IBOutlet NSButton*      masterProcessCB;
+	IBOutlet NSButton*      sendOnStopCB;
+	IBOutlet NSButton*      sendOnStartCB;
 	IBOutlet NSPopUpButton* heartBeatIndexPU;
-	IBOutlet NSTableView* emailListTable;
-	IBOutlet NSTextField* historyFileTextField;
-	IBOutlet NSButton* keepHistoryCB;
-	IBOutlet NSTextField* sampleRateField;
-    IBOutlet NSTableView* tableView;
-    IBOutlet NSButton* testModeButton;
-    IBOutlet NSButton* startButton;
-    IBOutlet NSTextField* statusTextField;
-    IBOutlet NSTextView* detailsTextView;
-    IBOutlet NSTextField* shortNameField;
-    IBOutlet NSButton* altViewButton;
-	IBOutlet NSButton* 	removeAddressButton;
+	IBOutlet NSTableView*   emailListTable;
+	IBOutlet NSTextField*   historyFileTextField;
+	IBOutlet NSButton*      keepHistoryCB;
+	IBOutlet NSTextField*   sampleRateField;
+    IBOutlet NSTableView*   tableView;
+    IBOutlet NSButton*      testModeButton;
+    IBOutlet NSButton*      startButton;
+    IBOutlet NSTextField*   statusTextField;
+    IBOutlet NSTextView*    detailsTextView;
+    IBOutlet NSTextField*   shortNameField;
+    IBOutlet NSButton*      altViewButton;
+	IBOutlet NSButton*      addAddressButton;
+	IBOutlet NSButton*      removeAddressButton;
 	IBOutlet NSTextField*   nextHeartbeatField;
     IBOutlet NSImageView*	heartbeatImage;
-    IBOutlet NSButton* pollNowButton;
+    IBOutlet NSButton*      pollNowButton;
 	IBOutlet NSTextField*   processRunNumberField;
+	IBOutlet NSTextField*   masterInfoField;
 
     NSImage* descendingSortingImage;
     NSImage* ascendingSortingImage;
@@ -58,6 +61,7 @@
 -(void) awakeFromNib;
 
 #pragma mark ¥¥¥Interface Management
+- (void) masterProcessChanged:(NSNotification*)aNote;
 - (void) sendOnStopChanged:(NSNotification*)aNote;
 - (void) sendOnStartChanged:(NSNotification*)aNote;
 - (void) heartBeatIndexChanged:(NSNotification*)aNote;
@@ -82,6 +86,7 @@
 - (void) processRunNumberChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Actions
+- (IBAction) masterProcessAction:(id)sender;
 - (IBAction) sendOnStopAction:(id)sender;
 - (IBAction) sendOnStartAction:(id)sender;
 - (IBAction) heartBeatIndexAction:(id)sender;

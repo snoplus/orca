@@ -72,43 +72,6 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
 
 #pragma mark ¥¥¥Interface Management
 
-- (void) sendOnStopChanged:(NSNotification*)aNote
-{
-	[sendOnStopCB setIntValue: [model sendOnStop]];
-}
-
-- (void) sendOnStartChanged:(NSNotification*)aNote
-{
-	[sendOnStartCB setIntValue: [model sendOnStart]];
-}
-
-- (void) heartBeatIndexChanged:(NSNotification*)aNote
-{
-	[heartBeatIndexPU selectItemAtIndex: [model heartBeatIndex]];
-	[self setHeartbeatImage];
-}
-
-- (void) emailListChanged:(NSNotification*)aNote
-{
-	[emailListTable reloadData];
-}
-
-- (void) historyFileChanged:(NSNotification*)aNote
-{
-	[historyFileTextField setStringValue: [[model historyFile] stringByAbbreviatingWithTildeInPath]];
-}
-
-- (void) keepHistoryChanged:(NSNotification*)aNote
-{
-	[keepHistoryCB setIntValue: [model keepHistory]];
-}
-
-- (void) sampleRateChanged:(NSNotification*)aNote
-{
-	[sampleRateField setFloatValue: [model sampleRate]];
-	[self updatePollingButton];
-}
-
 - (void) registerNotificationObservers
 {
     [super registerNotificationObservers];
@@ -201,13 +164,18 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
     [notifyCenter addObserver : self
                      selector : @selector(nextHeartBeatChanged:)
                          name : ORProcessModelNextHeartBeatChanged
-						object: model];
+						object: nil];
     
     [notifyCenter addObserver : self
                      selector : @selector(processRunNumberChanged:)
                          name : ORProcessModelRunNumberChanged
 						object: model];
     
+    [notifyCenter addObserver : self
+                     selector : @selector(masterProcessChanged:)
+                         name : ORProcessModelMasterProcessChanged
+						object: nil];
+
 }
 
 - (void) updateWindow
@@ -227,13 +195,57 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
 	[self sendOnStopChanged:nil];
 	[self nextHeartBeatChanged:nil];
 	[self processRunNumberChanged:nil];
+	[self masterProcessChanged:nil];
+}
+
+- (void) masterProcessChanged:(NSNotification*)aNote
+{
+	[masterProcessCB setIntValue: [model masterProcess]];
+    [model setUpImage];
+    [self updateButtons];
+}
+
+- (void) sendOnStopChanged:(NSNotification*)aNote
+{
+	[sendOnStopCB setIntValue: [model sendOnStop]];
+}
+
+- (void) sendOnStartChanged:(NSNotification*)aNote
+{
+	[sendOnStartCB setIntValue: [model sendOnStart]];
+}
+
+- (void) heartBeatIndexChanged:(NSNotification*)aNote
+{
+	[heartBeatIndexPU selectItemAtIndex: [model heartBeatIndex]];
+	[self setHeartbeatImage];
+}
+
+- (void) emailListChanged:(NSNotification*)aNote
+{
+	[emailListTable reloadData];
+}
+
+- (void) historyFileChanged:(NSNotification*)aNote
+{
+	[historyFileTextField setStringValue: [[model historyFile] stringByAbbreviatingWithTildeInPath]];
+}
+
+- (void) keepHistoryChanged:(NSNotification*)aNote
+{
+	[keepHistoryCB setIntValue: [model keepHistory]];
+}
+
+- (void) sampleRateChanged:(NSNotification*)aNote
+{
+	[sampleRateField setFloatValue: [model sampleRate]];
+	[self updatePollingButton];
 }
 
 - (void) processRunNumberChanged:(NSNotification*)aNote
 {
     [processRunNumberField setIntValue:[model processRunNumber]];
 }
-
 
 - (void) setHeartbeatImage
 {
@@ -246,10 +258,13 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
 
 - (void) nextHeartBeatChanged:(NSNotification*)aNote
 {
-	if([model heartbeatSeconds]){
-		[nextHeartbeatField setStringValue:[NSString stringWithFormat:@"Next Heartbeat: %@",[[model nextHeartbeat]descriptionWithCalendarFormat:nil timeZone:nil locale:nil]]];
-	}
-	else [nextHeartbeatField setStringValue:@"No Heartbeat Scheduled"];
+    id theObj = [aNote object];
+    if(theObj == model || [theObj masterProcess]){
+        if([theObj heartbeatSeconds]){
+            [nextHeartbeatField setStringValue:[NSString stringWithFormat:@"Next Heartbeat: %@",[[theObj nextHeartbeat]descriptionWithCalendarFormat:nil timeZone:nil locale:nil]]];
+        }
+        else [nextHeartbeatField setStringValue:@"No Heartbeat Scheduled"];
+    }
 }
 
 - (void) useAltViewChanged:(NSNotification*)aNote
@@ -331,10 +346,33 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
 
 - (void) updateButtons
 {
+    NSArray* processes = [[[NSApp delegate] document] collectObjectsOfClass:[model class]];
+    BOOL aDiffMasterExists = NO;
 	BOOL anyAddresses = ([[model emailList] count]>0);
-	[heartBeatIndexPU setEnabled:anyAddresses];
-	[sendOnStopCB setEnabled:anyAddresses];
-	[sendOnStartCB setEnabled:anyAddresses];
+    for(id aProcess in processes){
+        if(aProcess ==model)continue;
+        if([aProcess masterProcess]){
+            aDiffMasterExists = YES;
+            anyAddresses = ([[aProcess emailList] count]>0);
+            break;
+        }
+    }
+    
+    int selectedIndex = [emailListTable selectedRow];
+
+    [emailListTable      setHidden:  aDiffMasterExists];
+	[addAddressButton    setEnabled:!aDiffMasterExists];
+	[removeAddressButton setEnabled:!aDiffMasterExists && (selectedIndex>=0)];
+	[heartBeatIndexPU    setEnabled:anyAddresses && !aDiffMasterExists];
+	[sendOnStopCB        setEnabled:anyAddresses];
+	[sendOnStartCB       setEnabled:anyAddresses];
+    
+    NSString* s;
+    if([model masterProcess])  s = @"Master EMail List";
+    else if(aDiffMasterExists) s = @"Master EMail List will be used!";
+    else                       s = @"Multiple EMail lists!";
+    [masterInfoField setStringValue:s];
+
 }
 
 - (void) detailsChanged:(NSNotification*)aNote
@@ -360,6 +398,11 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
 
 
 #pragma mark ¥¥¥Actions
+
+- (void) masterProcessAction:(id)sender
+{
+	[model setMasterProcess:[sender intValue]];
+}
 - (IBAction) addAddress:(id)sender
 {
 	int index = [[model emailList] count];
@@ -395,10 +438,12 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
 
 - (IBAction) heartBeatIndexAction:(id)sender
 {
-	[model setHeartBeatIndex:[sender indexOfSelectedItem]];	
-	if([model heartbeatSeconds] == 0){
-		[model sendHeartbeatShutOffWarning];
-	}
+    if([sender indexOfSelectedItem] != [model heartBeatIndex]){
+        [model setHeartBeatIndex:[sender indexOfSelectedItem]];	
+        if([model heartbeatSeconds] == 0){
+            [model sendHeartbeatShutOffWarning];
+        }
+    }
 }
 
 - (IBAction) historyFileSelectionAction:(id)sender;

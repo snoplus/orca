@@ -27,6 +27,7 @@
 #import "ORMailer.h"
 #import "ORCouchDBModel.h"
 
+NSString* ORProcessModelMasterProcessChanged = @"ORProcessModelMasterProcessChanged";
 NSString* ORProcessModelSendOnStopChanged			= @"ORProcessModelSendOnStopChanged";
 NSString* ORProcessModelSendOnStartChanged			= @"ORProcessModelSendOnStartChanged";
 NSString* ORProcessModelHeartBeatIndexChanged		= @"ORProcessModelHeartBeatIndexChanged";
@@ -112,6 +113,37 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 }
 
 #pragma mark ***Accessors
+
+- (BOOL) masterProcess
+{
+    return masterProcess;
+}
+
+- (void) setMasterProcess:(BOOL)aMasterProcess
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setMasterProcess:masterProcess];
+    
+    if(masterProcess && !aMasterProcess){
+        NSLogColor([NSColor redColor],@"Process '%@' was removed from 'Master' status\n",[self shortName]);
+    }
+    
+    masterProcess = aMasterProcess;
+    if(masterProcess){
+        NSLog(@"Process '%@' is now at 'Master' status\n",[self shortName]);
+    }
+    if(masterProcess && updateImageForMasterChange){
+        NSArray* processes = [[[NSApp delegate] document] collectObjectsOfClass:[self class]];
+        for(id aProcess in processes){
+            if(aProcess == self) continue;
+            if([aProcess masterProcess]) {
+                [aProcess setMasterProcess:NO];
+                [aProcess setUpImage];
+            }
+        }
+    }
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORProcessModelMasterProcessChanged object:self];
+}
+
 - (BOOL) sendOnStop
 {
     return sendOnStop;
@@ -441,7 +473,7 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
         NSString* stateString = @"Idle";
         if(processRunning){
             if(inTestMode)stateString = @"Testing";
-            else stateString = @"Running";
+            else stateString          = @"Running";
         }
 				
         NSAttributedString* n = [[NSAttributedString alloc] 
@@ -450,7 +482,15 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
         
         [n drawInRect:NSMakeRect(10,[i size].height-18,[i size].width-20,16)];
         [n release];
-		
+		if(masterProcess){
+            NSAttributedString* n = [[NSAttributedString alloc]
+                                     initWithString:[NSString stringWithFormat:@"%@",masterProcess?@"Master":@""]
+                                     attributes:[NSDictionary dictionaryWithObject:[NSFont labelFontOfSize:12] forKey:NSFontAttributeName]];
+           
+            [n drawInRect:NSMakeRect([i size].width-[n size].width-10,[i size].height-18,[i size].width-20,16)];
+
+            [n release];
+        }
 		if(keepHistory && [historyFile length]){
 			NSAttributedString* n = [[NSAttributedString alloc] 
 									 initWithString:@"History" 
@@ -906,6 +946,9 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
     [[self undoManager] disableUndoRegistration];
 	
 	//after the document is loaded we use this flag to autostart
+    updateImageForMasterChange = NO;
+    [self setMasterProcess:[decoder decodeBoolForKey:@"masterProcess"]];
+    updateImageForMasterChange = YES;
     [self setSendOnStop:[decoder decodeBoolForKey:@"sendOnStop"]];
     [self setSendOnStart:[decoder decodeBoolForKey:@"sendOnStart"]];
     [self setHeartBeatIndex:[decoder decodeIntForKey:@"heartBeatIndex"]];
@@ -930,6 +973,7 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeBool:masterProcess forKey:@"masterProcess"];
     [encoder encodeBool:sendOnStop forKey:@"sendOnStop"];
     [encoder encodeBool:sendOnStart forKey:@"sendOnStart"];
     [encoder encodeInt:heartBeatIndex forKey:@"heartBeatIndex"];
@@ -948,6 +992,17 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 - (void) sendHeartbeatShutOffWarning
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(sendHeartbeatShutOffWarning) object:nil];
+    
+    NSArray* processes = [[[NSApp delegate] document] collectObjectsOfClass:[self class]];
+    //check if there is another process that is the Master. If so it will handle this.
+    if(![self masterProcess]){
+        for(id aProcess in processes){
+            if(aProcess == self) continue;
+            if([aProcess masterProcess])return;
+        }
+    }
+
+    
 	NSString* theContent = @"";
 	
 	theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];						
@@ -967,24 +1022,50 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(sendHeartbeat) object:nil];
 	if([self heartbeatSeconds]==0)return;
 	
+    NSArray* processes = [[[NSApp delegate] document] collectObjectsOfClass:[self class]];
+    BOOL skipReport = NO;
+    //check if there is another process that is the Master. If so it will do a heartbeat report.
+    if(![self masterProcess]){
+        for(id aProcess in processes){
+            if(aProcess == self) continue;
+            if([aProcess masterProcess]){
+                skipReport = YES;
+                break;
+            }
+        }
+    }
+
+    
 	[self setNextHeartbeatString];
 	
-	NSString* theContent = @"";
-	theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];						
-	theContent = [theContent stringByAppendingFormat:@"This heartbeat message was generated automatically by the Process at:\n"];
-	theContent = [theContent stringByAppendingFormat:@"%@ (Local time of ORCA machine)\n",[[NSDate date]descriptionWithCalendarFormat:nil timeZone:nil locale:nil]];
-	theContent = [theContent stringByAppendingFormat:@"Unless changed in ORCA, it will be repeated at:\n"];
-    theContent = [theContent stringByAppendingFormat:@"%@ (Local time of ORCA machine)\n%@ (UTC)\n",
-                  [nextHeartbeat descriptionWithCalendarFormat:nil timeZone:nil locale:nil], [nextHeartbeat descriptionWithCalendarFormat:nil timeZone:[NSTimeZone timeZoneWithAbbreviation:@"UTC"] locale:nil]];
-	theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];	
-	theContent = [theContent stringByAppendingFormat:@"%@\n",[self report]];
-	theContent = [theContent stringByAppendingString:@"\n\n+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];						
-	theContent = [theContent stringByAppendingString:@"The following people received this message:\n"];
-	for(id address in emailList) theContent = [theContent stringByAppendingFormat:@"%@\n",address];
-	theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];						
-	
-	NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:[self cleanupAddresses:emailList],@"Address",theContent,@"Message",nil];
-	[self sendMail:userInfo];
+    if(!skipReport){
+        NSString* theContent = @"";
+        theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];						
+        theContent = [theContent stringByAppendingFormat:@"This heartbeat message was generated automatically by the Process at:\n"];
+        theContent = [theContent stringByAppendingFormat:@"%@ (Local time of ORCA machine)\n",[[NSDate date]descriptionWithCalendarFormat:nil timeZone:nil locale:nil]];
+        theContent = [theContent stringByAppendingFormat:@"Unless changed in ORCA, it will be repeated at:\n"];
+        theContent = [theContent stringByAppendingFormat:@"%@ (Local time of ORCA machine)\n%@ (UTC)\n",
+                      [nextHeartbeat descriptionWithCalendarFormat:nil timeZone:nil locale:nil], [nextHeartbeat descriptionWithCalendarFormat:nil timeZone:[NSTimeZone timeZoneWithAbbreviation:@"UTC"] locale:nil]];
+        theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];	
+        theContent = [theContent stringByAppendingFormat:@"%@\n",[self report]];
+        
+        NSArray* processes = [[[NSApp delegate] document] collectObjectsOfClass:[self class]];
+        if([self masterProcess]){
+            for(id aProcess in processes){
+                if(aProcess == self) continue;
+                theContent = [theContent stringByAppendingFormat:@"%@\n",[aProcess report]];
+            }
+        }
+
+        theContent = [theContent stringByAppendingString:@"\n\n+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];						
+        theContent = [theContent stringByAppendingString:@"The following people received this message:\n"];
+        for(id address in emailList) theContent = [theContent stringByAppendingFormat:@"%@\n",address];
+        theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];						
+
+     
+        NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:[self cleanupAddresses:emailList],@"Address",theContent,@"Message",nil];
+        [self sendMail:userInfo];
+    }
 	
 	if([self heartbeatSeconds]){
 		[self performSelector:@selector(sendHeartbeat) withObject:nil afterDelay:[self heartbeatSeconds]];
@@ -1002,6 +1083,19 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 
 - (void) sendStartStopNotice:(BOOL)state
 {
+    
+    NSArray* processes = [[[NSApp delegate] document] collectObjectsOfClass:[self class]];
+    ORProcessModel* emailSource = self;
+    if(![self masterProcess]){
+        for(id aProcess in processes){
+            if(aProcess == self) continue;
+            if([aProcess masterProcess]){
+                emailSource = aProcess;
+                break;
+            }
+        }
+    }
+
 	NSString* theContent = @"";
 	theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
 	theContent = [theContent stringByAppendingFormat:@"Process: %@ was %@\n",[self elementName], state?@"started":@"stopped"];
@@ -1013,10 +1107,10 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 	}
 					
 	theContent = [theContent stringByAppendingString:@"The following people received this message:\n"];
-	for(id address in emailList) theContent = [theContent stringByAppendingFormat:@"%@\n",address];
+	for(id address in [emailSource emailList]) theContent = [theContent stringByAppendingFormat:@"%@\n",address];
 	theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];						
 	
-	NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:[self cleanupAddresses:emailList],@"Address",theContent,@"Message",nil];
+	NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:[self cleanupAddresses:[emailSource emailList]],@"Address",theContent,@"Message",nil];
 	[self sendMail:userInfo];
 }
 
