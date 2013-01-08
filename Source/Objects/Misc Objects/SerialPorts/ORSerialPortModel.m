@@ -55,7 +55,7 @@ NSString* ORSerialPortModelPortStateChanged		= @"ORSerialPortModelPortStateChang
 - (void) registerNotificationObservers
 {
 	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-	
+	[notifyCenter removeObserver:self];
     [notifyCenter addObserver : self
                      selector : @selector(dataReceived:)
                          name : ORSerialPortDataReceived
