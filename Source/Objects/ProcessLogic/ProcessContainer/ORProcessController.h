@@ -84,6 +84,7 @@
 - (void) setHeartbeatImage;
 - (void) updatePollingButton;
 - (void) processRunNumberChanged:(NSNotification*)aNote;
+- (void) updateButtons;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) masterProcessAction:(id)sender;
