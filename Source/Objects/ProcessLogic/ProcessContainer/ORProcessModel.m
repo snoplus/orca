@@ -18,7 +18,6 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
 #pragma mark ¥¥¥Imported Files
 #import "ORProcessElementModel.h"
 #import "ORProcessModel.h"
@@ -487,7 +486,11 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
                                      initWithString:[NSString stringWithFormat:@"%@",masterProcess?@"Master":@""]
                                      attributes:[NSDictionary dictionaryWithObject:[NSFont labelFontOfSize:12] forKey:NSFontAttributeName]];
            
-            [n drawInRect:NSMakeRect([i size].width-[n size].width-10,[i size].height-18,[i size].width-20,16)];
+            NSSize theIconSize = [[self image] size];
+            NSSize textSize = [n size];
+            float x = theIconSize.width/2 - textSize.width/2;
+            [n drawInRect:NSMakeRect(x,[i size].height-18,textSize.width,textSize.height)];
+
 
             [n release];
         }
@@ -1201,7 +1204,6 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 	[mailer send:self];
 	[theContent release];
 }
-
 @end
 
 @implementation ORProcessModel (private)
@@ -1212,4 +1214,3 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 	sendStartNoticeNextRead = YES;
 }
 @end
-
