@@ -89,6 +89,7 @@ typedef struct { // -tb- 2008-02-27
 
 
 
+#if 0 //TODO: remove, moved to ipe4structure.h -tb-
 
 //TODO: add/include ipe4reader6.h (then: ipe4ewstreamer.h) -tb-
 //TODO: -------------------------------------------------- -tb-
@@ -132,7 +133,7 @@ UDPStructIPECrateStatus;
 
 
 
-
+#endif
 
 
 
