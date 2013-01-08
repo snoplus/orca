@@ -26,6 +26,8 @@
 #include <unistd.h>
 
 
+
+#if 0 //TODO: remove, moved to ipe4structure.h -tb-
 /*--------------------------------------------------------------------
  *    UDP packed definitions
  *       data, IPE crate status  -tb-
@@ -34,6 +36,7 @@
 //size: id + header + 21*16 + UDPFIFOmap + IPmap = (1 + 8 + 336 + 5 + 20) 32-bit words = 1480 bytes
 #define MAX_NUM_FLT_CARDS 20
 #define IPE_BLOCK_SIZE    16
+  //TODO: is also defined in EdelweissSLTv4_HW_Definitions.h, remove one of them -tb-
 
 #define SIZEOF_UDPStructIPECrateStatus 1480
 
@@ -138,6 +141,15 @@ typedef struct{
 UDPStructIPECrateStatus2;
 
 
+#endif
+
+
+
+
+
+
+
+
 /*--------------------------------------------------------------------
  *    function prototypes
  *       TODO: function prototypes: move to include file somewhen in the future  -tb-
@@ -189,9 +201,11 @@ enum FIFOREADERSTATE {
  };
  
 //bitmasks for some registers
-int fiberEnableMask = 0x003f0000;  //TODO: make global!!! -tb-
-int modeMask =        0x00000070;  //TODO: make global!!! -tb-
-int BBversionMask =   0x00003f00;  //TODO: make global!!! -tb-
+const int kVetoFlagMask =    0x80000000;
+const int kFiberEnableMask = 0x003f0000;  //TODO: make global!!! -tb-
+const int kFLTModeMask =     0x00000030;  //TODO: make global!!! -tb-
+const int kFLTtpixMask =     0x00000040;  //TODO: make global!!! -tb-
+const int kBBversionMask =   0x00003f00;  //TODO: make global!!! -tb-
 
 // aux definitions
 uint32_t bit0  = 0x00000001;
@@ -534,10 +548,12 @@ public:
 	    initVars();
 	}
 	
-	//FLT register
+	//FLT Control register
 	uint32_t fiberEnable;
 	uint32_t BBversionMask;
-	uint32_t mode; //tpix,tramp,tord = 000: Normal; 001: TM-Order; 010: TM-Ramp; 100: TM-PB
+	uint32_t controlVetoFlag;
+	uint32_t mode; // tramp,tord = 00: Normal; 01: TM-Order; 10: TM-Ramp; 11: Ramp Ordered
+	//FLT registers
 	uint32_t fiberSet1;
 	uint32_t fiberSet2;
 	uint32_t streamMask1;
@@ -545,14 +561,18 @@ public:
 	uint32_t triggerMask1;
 	uint32_t triggerMask2;
 	
+    //configuration of readout loop
 	uint32_t sendBBstatusMask;
 	
+    //aux vars
 	int32_t fltID;
+    int isPresent;
 
 	void initVars(){
-		//
+		// FLT registers (HW)
 		fiberEnable=0x0;
 		BBversionMask=0x0;
+        controlVetoFlag =0x0;
 		mode =0x0;
 		fiberSet1   =0x0;
 		fiberSet2   =0x0;
@@ -561,7 +581,11 @@ public:
 	    triggerMask1=0x0;
 	    triggerMask2=0x0;
 	    
+        // SW
 	    sendBBstatusMask=0x0;
+        
+        //aux vars
+        isPresent = 0;
     }
     
     
@@ -583,8 +607,58 @@ public:
 
 
 
+/*--------------------------------------------------------------------
+  aux class to pack status packets
+  --------------------------------------------------------------------*/
+//#define UDPStatusPacketSize 1480
+#define UDPStatusPacketSize MAX_UDP_STATUSPACKET_SIZE
 
-
+class UDPPacketScheduler{
+public:
+    //ctor
+    UDPPacketScheduler(FIFOREADER *fr):len(0),headerLen(0),sizeofLen(sizeof(uint16_t)){ myFiforeader=fr; sizeofLen=sizeof(uint16_t); }
+    char buf[UDPStatusPacketSize];
+    //char headerBuf[UDPStatusPacketSize];
+    int len;//total length of data
+    int headerLen;//length of header (which will be fixed for one series of packets)
+    int sizeofLen;//=2=short
+    FIFOREADER *myFiforeader; //used for sending out UDP packets
+    void resetBuf(){ len=0; headerLen=0; }
+    void resetPayloadBuf(){ len=headerLen;  }
+    int setHeader(char *data, int length){
+        if(len!=0) printf("ERROR in UDPPacketScheduler::setHeader\n");
+        headerLen=length;
+        len=headerLen;
+        for(int i=0;i<headerLen;i++) buf[i]=data[i];
+        return 0;
+    }
+    int appendData(char *data, int length){
+        if(length>(UDPStatusPacketSize-headerLen-sizeofLen)){ printf("ERROR in UDPPacketScheduler::appendData: data exceeds UDP packet size!\n"); return 1; }
+        if(headerLen==0) printf("WARNING in UDPPacketScheduler::appendData: headerLen is 0\n");
+        if(!canHoldNumBytes(length)){//full, send current buffer
+            //append 0, adjust len, send data
+            appendZeroBytes(sizeofLen);
+            sendOutUDPPacket();
+            resetPayloadBuf();
+        }
+        //append the data
+        for(int i=0;i<length;i++) buf[len+i]=data[i];
+        len+=length;
+        return 0;
+    }
+    int canHoldNumBytes(int NumBytes){ if(UDPStatusPacketSize >= sizeofLen+len+NumBytes) return 1; else return 0; }// we need place for one additional uint32_t -> sizeof(uint32_t)
+    int bodyLen(){ return len-headerLen; }
+    int appendZeroBytes(int num){ for(int i=0; i<num; i++) buf[len+i]=0; len +=num; return 0; }
+    void sendScheduledData(){
+        if(len<=headerLen) return;//payload empty ('<' would be enough)
+            appendZeroBytes(sizeofLen);
+            sendOutUDPPacket();
+            resetPayloadBuf();
+    }
+    void sendOutUDPPacket(){
+        myFiforeader->sendtoUDPClients(0,buf,len);
+    }
+};
 
 
 /*--------------------------------------------------------------------

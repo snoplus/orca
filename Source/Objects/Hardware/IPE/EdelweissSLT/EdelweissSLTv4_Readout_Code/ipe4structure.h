@@ -566,7 +566,7 @@ typedef struct {
 
 
 typedef struct {
-	uint32_t len;            // = sizeof(TypeCrateStatusBlock)
+	uint16_t size_bytes;            // = sizeof(TypeCrateStatusBlock)
 	uint32_t d0;             // previously in cew: registre_x, =20  
 	uint32_t prog_status;    // previously in cew: micro_bbv2,   for BBv2/2.3/3 programming
 	uint32_t pixbus_enable;
@@ -584,22 +584,137 @@ typedef struct {
 	uint32_t identifiant;	 // 0x0000fffe ?????
 	uint32_t PPS_count;      // 
 	uint32_t version;        // 
-	uint32_t spare;          // 
+	uint32_t spare1;          // 
+	uint32_t spare2;          // 
 
 } TypeBBStatusHeader;
 
 
 typedef struct {
-	unsigned short size_bytes;  // = sizeof(TypeBBStatusBlock)
-	unsigned char flt_num;
-	unsigned char fiber_num;
+	uint16_t size_bytes;  // = sizeof(TypeBBStatusPayload)
+	unsigned char fltIndex;
+	unsigned char fiberIndex;
 	uint32_t spare;             // 
-	unsigned short bb_status[_nb_mots_status_bbv2];	//_nb_mots_status_bbv2 = 57 -tb-
+	uint16_t bb_status[_nb_mots_status_bbv2];	//_nb_mots_status_bbv2 = 57 -tb-
 
 } TypeBBStatusBlock;
 
 
 
+
+
+/*--------------------------------------------------------------------
+ *    UDP packed definitions
+ *       data, IPE crate status  -tb-
+ *--------------------------------------------------------------------*/ //-tb-
+
+//size: id + header + 21*16 + UDPFIFOmap + IPmap = (1 + 8 + 336 + 5 + 20) 32-bit words = 1480 bytes
+#define MAX_NUM_FLT_CARDS 20
+#define IPE_BLOCK_SIZE    16
+  //TODO: is also defined in EdelweissSLTv4_HW_Definitions.h, remove one of them -tb-
+
+#define MAX_UDP_STATUSPACKET_SIZE 1480
+#define SIZEOF_UDPStructIPECrateStatus 1480
+
+typedef struct{
+    //identification
+    union {
+	    uint32_t		id4;  //packet header: 16 bit id=0xFFD0 + 16 bit reserved
+	    struct {
+	        uint16_t id0; 
+	        uint16_t id1;};
+	};
+	
+    //header
+	uint32_t		presentFLTMap;
+	uint32_t		reserved0;
+	uint32_t		reserved1;
+	
+	//SLT info (16 words)
+	uint32_t    SLT[IPE_BLOCK_SIZE];                   //one 16 word32 block for the SLT
+
+    //FLT info (20x16 = 320 words)
+	uint32_t    FLT[MAX_NUM_FLT_CARDS][IPE_BLOCK_SIZE];//twenty FLTs, one 16 word32 block per each FLT
+    
+    //IP Adress Map (20 words)
+	uint32_t		IPAdressMap[MAX_NUM_FLT_CARDS];    //IP address map associated to the according SLT/HW FIFO
+    //Port Map      (10 words)
+	uint16_t		PortMap[MAX_NUM_FLT_CARDS];        //IP address map associated to the according SLT/HW FIFO
+}
+UDPStructIPECrateStatus;
+
+
+UDPStructIPECrateStatus IPECrateStatusPacket;
+
+
+//struct def of UDPStructIPECrateStatus in human readable format
+//----------------------------------------------------------------
+typedef struct{
+    uint32_t  SLTControlReg;
+    uint32_t  SLTStatusReg;
+    uint32_t  SLTVersionReg;
+    uint32_t  SLTPixbusEnableReg;
+    uint32_t  SLTTimeLowReg;
+    uint32_t  SLTTimeHighReg;
+    uint32_t  word6;
+    uint32_t  word7;
+    uint32_t  word8;
+    uint32_t  word9;
+    uint32_t  word10;
+    uint32_t  word11;
+    uint32_t  word12;
+    uint32_t  word13;
+    uint32_t  word14;
+    uint32_t  word15;
+}
+SLTBlock;
+
+typedef struct{
+    uint32_t  FLTStatusReg;
+    uint32_t  FLTControlReg;
+    uint32_t  FLTVersionReg;
+    uint32_t  FLTFiberSet_1Reg;
+    uint32_t  FLTFiberSet_2Reg;
+    uint32_t  FLTStreamMask_1Reg;
+    uint32_t  FLTStreamMask_2Reg;
+    uint32_t  FLTTriggerMask_1Reg;
+    uint32_t  FLTTriggerMask_2Reg;
+    uint32_t  word9;
+    uint32_t  word10;
+    uint32_t  word11;
+    uint32_t  word12;
+    uint32_t  word13;
+    uint32_t  word14;
+    uint32_t  word15;
+}
+FLTBlock;
+
+
+
+typedef struct{
+	uint16_t id0;   //=0xFFD0
+	uint16_t id1;
+	
+    //header
+	uint32_t		presentFLTMap;
+	uint32_t		reserved0;
+	uint32_t		reserved1;
+	
+	
+	//SLT info
+	SLTBlock    SLT;            //one 16 word32 block for the SLT
+
+    //FLT info
+	FLTBlock    FLT[MAX_NUM_FLT_CARDS];//twenty FLTs, one 16 word32 block per each FLT
+    
+    
+    //IP Adress Map (20 words)
+	uint32_t		IPAdressMap[MAX_NUM_FLT_CARDS];    //IP address map associated to the according SLT/HW FIFO
+    //Port Map      (10 words)
+	uint16_t		PortMap[MAX_NUM_FLT_CARDS];        //IP address map associated to the according SLT/HW FIFO
+    
+}
+UDPStructIPECrateStatus2;
 
 
 

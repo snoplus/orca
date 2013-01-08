@@ -22,6 +22,9 @@
 #import "ORGlobal.h"
 #import "ORCrate.h"
 #import "OREdelweissSLTModel.h"
+#import "EdelweissSLTv4_HW_Definitions.h"
+#import "EdelweissSLTv4GeneralOperations.h"
+#import "ipe4structure.h"
 //#import "ORIpeFLTModel.h"
 //#import "ORIpeCrateModel.h"
 #import "ORIpeV4CrateModel.h"
@@ -31,9 +34,7 @@
 #import "TimedWorker.h"
 #import "ORDataTypeAssigner.h"
 #import "PMC_Link.h"               //this is taken from IpeV4 SLT !!  -tb-
-#import "EdelweissSLTv4_HW_Definitions.h"
 #import "ORPMCReadWriteCommand.h"  //this is taken from IpeV4 SLT !!  -tb-
-#import "EdelweissSLTv4GeneralOperations.h"
 
 #import "ORTaskSequence.h"
 #import "ORFileMover.h"
@@ -291,12 +292,44 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
 				if(retval==1444) counterData1444Packet++;
 				else{
 					if(counterData1444Packet>0) NSLog(@"  received %i data packets with 1444 bytes  \n",counterData1444Packet);
-					NSLog(@"    received data packet w header 0x%08x, 0x%04x,0x%04x, length %i\n",*hptr,*h16ptr,*h16ptr2,retval);
-					NSLog(@"    bytes: %i\n",counterData1444Packet * 1440 + retval -4);
+					NSLog(@"      received data packet w. header 0x%08x, 0x%04x,0x%04x, length %i\n",*hptr,*h16ptr,*h16ptr2,retval);
+					NSLog(@"      bytes: %i\n",counterData1444Packet * 1440 + retval -4);
 					counterData1444Packet=0;
 				}
 			}
 		}
+        
+        //handle known data packets:
+        //
+        if(retval>=4){
+            uint32_t *hptr = (uint32_t *)(readBuffer);
+            //--->BB status packet(s)
+            if(*hptr == 0x0000fffe){//this is a BB status packet
+                TypeBBStatusHeader *BBheader = (TypeBBStatusHeader *)readBuffer;
+				NSLog(@"      BB status packet: header 0x%08x ,     length (bytes) %i  , PPS_count %i\n",*hptr ,retval,BBheader->PPS_count);
+                TypeBBStatusBlock *BBblock;
+                int BBblockLen, counter=0;
+                char *ptr=readBuffer;
+                //let ptr point to first TypeBBStatusBlock 
+                ptr += sizeof(TypeBBStatusHeader);
+                BBblock=(TypeBBStatusBlock*)ptr;
+                BBblockLen = BBblock->size_bytes;
+                while(BBblockLen>0){
+                    counter++;
+				    NSLog(@"      BB status packet: block %i , length (bytes) %i, FLT #%i, fiber #%i, status: 0x%04x 0x%04x ... \n",
+                                 counter,BBblock->size_bytes,BBblock->fltIndex,BBblock->fiberIndex,BBblock->bb_status[0],BBblock->bb_status[1]);
+                    //let ptr point to next TypeBBStatusBlock 
+                    ptr += BBblockLen;
+                    BBblock=(TypeBBStatusBlock*)ptr;
+                    BBblockLen = BBblock->size_bytes;
+                    if((ptr-readBuffer) > MAX_UDP_STATUSPACKET_SIZE){  //is 1480
+				        NSLog(@"      WARNING: pointer pos %i exceeds max. pos %i: corrupted UDP packet? \n",ptr-readBuffer,SIZEOF_UDPStructIPECrateStatus);
+                        break;
+                    }
+                }
+            }
+        }
+
 	}while(doRunLoop);//for(l ...
 	
 	

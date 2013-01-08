@@ -12,13 +12,21 @@
 // VERSION_IPE4_HW is 1934 which means IPE4  (1=I, 9=P, 3=E, 4=4)
 // VERSION_IPE4_SW is the version of the readout software (this file)
 #define VERSION_IPE4_HW      1934200
-#define VERSION_IPE4_SW            8
+#define VERSION_IPE4_SW            9
 #define VERSION_IPE4READOUT (VERSION_IPE4_HW + VERSION_IPE4_SW)
 
 /* History:
+version 9: 2013 January
+           added ipe4reader to Orca svn repository
+               in shell use:
+               (cd ORCA;make -f Makefile.ipe4reader; cd ..)
+               (cd ORCA; ./ipe4reader ; cd ..)
+           veto flag setting for ipe4reader config file
+           FiberOutMask (FLT register) -> Orca GUI
+           
 version 8: 2012 October
            SLT now provides one single FIFO for all FLTs
-		   Pointer to secondly pattern in FIFO
+		   Pointer to secondly pattern (0x3117....) in FIFO
 		   
 version 7: 2012 September
            Ready for using PCI bridge and external processor (rack PC) -> DMA block read
@@ -528,7 +536,6 @@ void InitSLTPbus(void)
 	//for(fifo=0; fifo<20; fifo++){
 	//TODO: only one FIFO !
 	for(fifo=0; fifo<FIFOREADER::maxNumFIFO; fifo++)
-	for(fifo=0; fifo<FIFOREADER::maxNumFIFO; fifo++)
 	{
 		//if(presentFLTMap & bit[fifo])
 		{
@@ -556,7 +563,10 @@ void InitSLTPbus(void)
 	//for(flt=0; flt<16; flt++){
 	    val = pbus->read(FLTVersionReg(flt+1));
 	    printf("FLT#%i (idx %i): version 0x%08x\n",flt+1,flt,val);
-	    if(val!=0x1f000000 && val!=0xffffffff) presentFLTMap |= bit[flt];
+	    if(val!=0x1f000000 && val!=0xffffffff){
+            presentFLTMap |= bit[flt];
+            FLTSETTINGS::FLT[flt].isPresent = 1;
+        }
     }
     printf("    present FLT map is 0x%08x\n",presentFLTMap);
 
@@ -2165,6 +2175,36 @@ int handleUDPCommandPacket(unsigned char *buffer, int len, int iFifo)
 /*--------------------------------------------------------------------
   globals: scan string (line of a file)
   --------------------------------------------------------------------*/
+
+int searchIndexAndUInt32InString(char *mystring, const char *pattern, int *index, uint32_t *retval)
+{
+    //searching 'pattern(XXX):   YYY', returns index=XXX or index=XXX-1 if XXX is preceeded by '#', returns retval=YYY (YYY may be decimal or hex)
+    //returns 1 on success, otherwise 0; possible errors: pattern not found OR conversion of YYY not successful
+	char *pch,*endptr;
+	pch = strstr(mystring,pattern);
+	if(pch == NULL) return 0;
+	pch += strlen(pattern);
+    if(*pch=='#'){
+        pch++;
+	    sscanf(pch,"%i",index);
+        (*index)--;//index = #ID - 1
+    }else
+    	sscanf(pch,"%i",index);
+    //continue parsing after "):"
+	pch = strstr(mystring,"):");
+    pch +=2;
+	//sscanf(pch,"%x",retval);  //this cannot scan decimal values
+    //fprintf(stdout,"retval %i\n",*retval);
+        //test  fprintf(stdout,"sizeof(strtoul) is %i\n",   sizeof(strtoul(pch,&endptr,0)));  ->result: 4 (32-bit machine), 8 (64 bit machine)
+    *retval = strtoul(pch,&endptr,0);  //this scans decimal or hex integers (returns 64 bit integer on 64-bit machines, 32 bit integer on 32-bit machines!!!, but there is no strtoui)
+        //fprintf(stdout,"retval after strtoul %i\n",*retval);
+        if(endptr==pch) fprintf(stdout,"searchIndexAndUInt32InString: config file PARSER ERROR! endptr==pch, NO= SUCCESS, retval %i\n",*retval);
+    if(endptr==pch) return 0;
+	return 1; //success
+}
+
+
+
 int searchIntInString(char *mystring, const char *pattern, int *retval)
 {
 	char *pch;
@@ -2271,7 +2311,7 @@ int parseConfigFileLine(char *line)
 			  
 			  
 			  
-			  #if 0// now per FIFO (see below)
+    #if 0// now per FIFO (see below)
 			  //RECEIVER_PORT = searchIntInString(mystring,"receiver_port:");
 			  wasFound = searchHex32InString(mystring,"udp_server_ip:",&MY_UDP_SERVER_IP);
 			  if(wasFound) printf("udp_server_ip: 0x%x\n",MY_UDP_SERVER_IP);
@@ -2287,7 +2327,7 @@ int parseConfigFileLine(char *line)
 			  
 			  wasFound = searchStringInString(mystring,"udp_client_ip:",MY_UDP_CLIENT_IP);
 			  if(wasFound) printf("udp_client_ip:  %s\n",MY_UDP_CLIENT_IP);
-			  #endif
+    #endif
 			  
 			  wasFound = searchIntInString(mystring,"start_recording_adc_to_file_sec:",&RECORDING_SEC);
 			  if(wasFound) printf("start_recording_adc_to_file_sec:  %i\n",RECORDING_SEC);
@@ -2297,7 +2337,7 @@ int parseConfigFileLine(char *line)
 			  if(wasFound) printf("simulation_send_dummy_udp:  %i\n",simulation_send_dummy_udp);
 			  if(wasFound) return wasFound;
 			  
-#if 0
+    #if 0
 			  wasFound = searchIntInString(mystring,"num_fifo:",&numfifo);
 			  if(wasFound) printf("num_fifo:  %i\n",numfifo);
 			  
@@ -2308,13 +2348,13 @@ int parseConfigFileLine(char *line)
 			  if(wasFound) printf("skip_num_status_bits:  %i\n",skip_num_status_bits);
 			  wasFound = searchIntInString(mystring,"use_dummy_status_bits:",&use_dummy_status_bits);
 			  if(wasFound) printf("use_dummy_status_bits:  %i\n",use_dummy_status_bits);
-#endif			  
+    #endif			  
 			  
 			  wasFound = searchIntInString(mystring,"run_main_readout_loop:",&run_main_readout_loop);
 			  if(wasFound) printf("run_main_readout_loop:  %i\n",run_main_readout_loop);
 			  if(wasFound) return wasFound;
 			  
-#if 0
+    #if 0
 			  wasFound = searchIntInString(mystring,"write2file:",&write2file);
 			  if(wasFound) printf("write2file:  %i\n",write2file);
 			  
@@ -2323,7 +2363,7 @@ int parseConfigFileLine(char *line)
 			  
 			  wasFound = searchIntInString(mystring,"write2file_format:",&write2file_format);
 			  if(wasFound) printf("write2file_format:  %i (%s)\n",write2file_format, write2file_format?"binary":"ascii");
-#endif
+    #endif
 			  wasFound = searchIntInString(mystring,"show_debug_info:",&show_debug_info);
 			  if(wasFound) printf("show_debug_info:  %i\n",show_debug_info);
 			  if(wasFound) return wasFound;
@@ -2454,7 +2494,22 @@ int parseConfigFileLine(char *line)
 			  
 			  
 			  
-			  //scan with FLT indices:
+			  //scan with FLT indices: (2013-01: started scanning the index/FLT# from string; loop will be obsolete after some time -tb- 2013-01-08)
+              //two methods (1) and (2)
+              //(1)    try to read FLT index (new 2013)
+	          //char pattern[2000];
+              int index=0;
+              uint32_t value=0;
+              
+			  sprintf(pattern,"FLTcontrolVetoFlag(");
+              wasFound = searchIndexAndUInt32InString(mystring,pattern,&index,&value);
+              if(wasFound){
+                  FLTSETTINGS::FLT[index].controlVetoFlag = value;
+                  printf("%s%i): 0x%x\n",pattern,index,FLTSETTINGS::FLT[index].controlVetoFlag);
+                  return wasFound;
+              }
+              
+              //(2)   scan loop over FLT index (old)
 	          //char pattern[2000];
 			  int id;
 			  for(id=0; id<FLTSETTINGS::maxNumFLT; id++){
@@ -2905,6 +2960,11 @@ void FIFOREADER::scanFIFObuffer(void)
             popIndexFIFObuf32 += 4;
             FIFObuf32avail =  pushIndexFIFObuf32 - popIndexFIFObuf32;
 
+
+
+            //****************************************************
+            //*    BEGIN - OPERA status packet (deprecated)      *
+            //****************************************************
 			//FORMAT DEFNITION: see cew.c, macro _ecrit_trame_status(pt) as a example; or above at init of Opera Status -tb-
             Trame_status_udp.identifiant = 0x0000ffff;
             Trame_status_udp.status_opera.temps_seconde = udpdataSec;
@@ -2968,13 +3028,16 @@ erreur_synchro_opera	= _erreur_synchro_opera(pt);
 
 
 			//led_B(_rouge); 
+//TODO: ===>   KEEP THIS FOR NON-OPERA PACKETS! -tb-
 			for(i=0;i<NB_CLIENT_UDP;i++){
 			    status_client[i]=numPacketsClient[i]; 
+                //printf("DUMMYTEXT-DUMMYTEXT-DUMMYTEXT-DUMMYTEXT-DUMMYTEXT-DUMMYTEXT-DUMMYTEXT-DUMMYTEXT-\n");
+					    printf("  ... index  %i status_client(%i) \n",i,status_client[i]);
 			    if(numPacketsClient[i]){
 				    numPacketsClient[i]--;
 					//led_B(_vert); 
 					if(show_debug_info>1){ 
-					    printf(" %d(%d) ",i,status_client[i]);
+					    printf("index  %d status_client(%d) \n",i,status_client[i]);
 					}
 				}
 			    if(show_debug_info>1)
@@ -2999,20 +3062,64 @@ erreur_synchro_opera	= _erreur_synchro_opera(pt);
 			    printf("\n");
                 if(send_status_udp_packet) sendtoUDPClients(0,(&Trame_status_udp),sizeof(Trame_status_udp));
 			}
+            //****************************************************
+            //*    END - OPERA status packet (deprecated)      *
+            //****************************************************
 			
-			
+            
+            #if 0
+            //*    CRATE status packet (deprecated)      *
+            //****************************************************
+			UDPPacketScheduler crateStatusScheduler(this);
+            //prepare header
+            TypeCrateStatusHeader crateStatusHeader;
+            crateStatusHeader.identifiant = 0x0000ffe0;
+            crateStatusHeader.stamp_msb = pd_fort;
+            crateStatusHeader.stamp_lsb = pd_faible;
+            crateStatusHeader.PPS_count = udpdataSec;
+            crateStatusScheduler.setHeader(&crateStatusHeader,sizeof(crateStatusHeader));
+            //payload
+            TypeCrateStatusBlock crateStatusBlock;
+	        crateStatusBlock.size_bytes = sizeof(TypeCrateStatusPayload);            // 
+	        crateStatusBlock.d0 = 20;             // previously in cew: registre_x, =20  
+	        crateStatusBlock.prog_status = 0;     // previously in cew: micro_bbv2,   for BBv2/2.3/3 programming
+	        crateStatusBlock.pixbus_enable = 	pbus->read(SLTPixbusEnableReg);
+
+	        crateStatusBlock.internal_error_info;
+	        crateStatusBlock.version;        // _may_ be useful in some particular cases (version of C code/firmware/hardware?)
+            #endif
+            
+            //****************************************************
+            //*         BB status packet(s)                      *
+            //****************************************************
+			UDPPacketScheduler BBStatusScheduler(this);
+            //prepare header
+            TypeBBStatusHeader BBStatusHeader;
+            BBStatusHeader.identifiant = 0x0000fffe;
+            BBStatusHeader.PPS_count = udpdataSec;
+            BBStatusHeader.version   = VERSION_IPE4READOUT;
+            BBStatusHeader.spare1 = 1;
+            BBStatusHeader.spare2 = 2;
+            BBStatusScheduler.setHeader((char*)&BBStatusHeader,sizeof(BBStatusHeader));
+            //payload
+            TypeBBStatusBlock BBStatusPayload;
+            BBStatusPayload.size_bytes = sizeof(TypeBBStatusBlock);
+            BBStatusPayload.fltIndex = 0;
+            BBStatusPayload.fiberIndex = 0;
+            BBStatusPayload.spare = 0;
+            
 			//read status bits from FLT memory
 			if(send_status_udp_packet){
 			    int idx;//index, not ID
 			    for(idx=0; idx<FLTSETTINGS::maxNumFLT; idx++){
 			        FLTSETTINGS &flt = FLTSETTINGS::FLT[idx];
 					//FLTSETTINGS &FLT = FLTSETTINGS::FLT[numfifo]; //TODO: each FLT has its own SLT FIFO; move status packet sending elsewhere? -tb-
-					
+					if(flt.isPresent)
 					{
 						int numFLT = flt.fltID;
 						int fiber;
 						for(fiber=0;fiber<6;fiber++){
-							if(flt.sendBBstatusMask & (0x1<<fiber)){
+							if(flt.sendBBstatusMask & bit[fiber]){
 								//printf("Status bits fiber %i read from FLT %i with ID %i:\n",fiber,idx,numFLT);
 								int i;
 								uint32_t status;
@@ -3020,25 +3127,42 @@ erreur_synchro_opera	= _erreur_synchro_opera(pt);
 								int numChan =fiber;
 								for(i=0; i<32; i++){
 									status = pbus->read(FLTBBStatusReg(numFLT, numChan)+i);
-									temp_status_bbv2_1[i]=status;//TODO: immediately copy it! -tb-
+									temp_status_bbv2_1[i]=status;//TODO: immediately copy it! see below ... -tb-
 									//printf("0x%08x ",status);
 									//dbg printf("%04x.%04x.",status16[0],status16[1]);
 								}
+                                //build BB status packet
+                                BBStatusPayload.fltIndex = idx;
+                                BBStatusPayload.fiberIndex = fiber;
+								for(i=0; i<_nb_mots_status_bbv2; i++){
+                                    BBStatusPayload.bb_status[i] = temp_status_bbv2_1_16[i];//TODO: immediately copy it when OPERA status is removed! -tb-
+									//printf("bb_status %i: 0x%08x ",i,BBStatusPayload.bb_status[i]);
+								}
 							   //dbg printf("\n");
 								  //printf("   Reading status bits of fiber %i  from FLT#  %i (idx %i): BBv# 0x%04x\n",fiber,numFLT,idx,temp_status_bbv2_1_16[0]);
-							   //TODO: buffer and send them all -tb-
+                                BBStatusScheduler.appendData((char*)&BBStatusPayload,sizeof(TypeBBStatusBlock));
+
+                                #if 1
+                                //****************************************************
+                                //*    BEGIN - OPERA status packet (deprecated)      *
+                                //****************************************************
+							    //TODO: buffer and send them all -tb-
 								//printf("Send UDP Packet with BB status bits read from FLT# %i (BBv# 0x%04x). \n",numFLT,temp_status_bbv2_1_16[0]);
 								for(i=0; i<_nb_mots_status_bbv2;i++){
-									Trame_status_udp.status_bbv2_1[i] = temp_status_bbv2_1_16[i];
+									Trame_status_udp.status_bbv2_1[i] = temp_status_bbv2_1_16[i]; //expand 16 bit array to 32 bit array
 									//dbg printf("%04x.",Trame_status_udp.status_bbv2_1[i] & 0xffff);
 								}
 			                    if(show_debug_info>=1)
-								    printf("   Reading status bits of fiber %i  from FLT#  %i (idx %i): BBv# 0x%04x\n",fiber,numFLT,idx,Trame_status_udp.status_bbv2_1[0]);
+								    printf("   Reading status bits of fiber %i  from FLT#  %i (idx %i): BBv# 0x%08x\n",fiber,numFLT,idx,Trame_status_udp.status_bbv2_1[0]);
 								//dbg printf("\n");
-							//TODO: use old or new status packet format (currently: only old/Opera format) -tb-
-							//TODO: use old or new status packet format 
-							//TODO: use old or new status packet format 
+							       //TODO: use old or new status packet format (currently: only old/Opera format) -tb-
+							       //TODO: use old or new status packet format 
+							       //TODO: use old or new status packet format 
 								sendtoUDPClients(0,(&Trame_status_udp),sizeof(Trame_status_udp));
+                                //****************************************************
+                                //*    END - OPERA status packet (deprecated)      *
+                                //****************************************************
+                                #endif
 							}
 						}
 					}
@@ -3069,7 +3193,8 @@ erreur_synchro_opera	= _erreur_synchro_opera(pt);
 							run_main_readout_loop = 0; //TODO: set flag to finish main loop - leave it? -tb-
 						}
 					}
-				}//for(id ...
+				}//for(idx ...
+                BBStatusScheduler.sendScheduledData();
 				
 			}//if(send_status_udp_packet ...
 			
@@ -3227,7 +3352,8 @@ void RunSomeHardwareTests()
 
  /*--------------------------------------------------------------------
  *    function:     InitFLTs
- *    purpose:      
+ *    purpose:      cold start of FLTs (=write stored settings to FLT registers)
+ *                  (omit at warm start ... )
  *    author:       Till Bergmann, 2012
  *
  *--------------------------------------------------------------------*/ //-tb-
@@ -3252,10 +3378,12 @@ uint32_t InitFLTs()
         uint32_t FLTcontrol;
 	    FLTcontrol =  pbus->read(FLTControlReg(fltID));
         printf("------FLTcontrol: 0x%08x\n",FLTcontrol);
-        FLTcontrol = FLTcontrol & ~(fiberEnableMask);  //disable all fiber bits
-        FLTcontrol = FLTcontrol & ~(modeMask);  //disable all mode bits
-        FLTcontrol = FLTcontrol & ~(BBversionMask);  //disable all BBversion bits
-        FLTcontrol = FLTcontrol | (FLT.fiberEnable << 16) | (FLT.BBversionMask << 8)  | (FLT.mode << 4);
+        FLTcontrol = FLTcontrol & ~(kVetoFlagMask);  //disable veto flag
+        FLTcontrol = FLTcontrol & ~(kFiberEnableMask);  //disable all fiber bits
+        FLTcontrol = FLTcontrol & ~(kBBversionMask);  //disable all BBversion bits
+        FLTcontrol = FLTcontrol & ~(kFLTModeMask);  //disable all mode bits
+        FLTcontrol = FLTcontrol & ~(kFLTtpixMask);  //disable tpix bit
+        FLTcontrol = FLTcontrol | (FLT.controlVetoFlag << 31) | (FLT.fiberEnable << 16) | (FLT.BBversionMask << 8)  | (FLT.mode << 4);
         pbus->write(FLTControlReg(fltID),FLTcontrol);
         //read back
 	    FLTcontrol =  pbus->read(FLTControlReg(fltID));
@@ -3329,11 +3457,11 @@ void testFLTs()
     printf("------FLTstatus: 0x%08x\n",FLTstatus);
     
     int fiberEnable = 0x3f;
-    int fiberEnableMask = 0x003f0000;
+    //int kFiberEnableMask = 0x003f0000;
     uint32_t FLTcontrol;
 	FLTcontrol =  pbus->read(FLTControlReg(numFLT));
     printf("------FLTcontrol: 0x%08x\n",FLTcontrol);
-    FLTcontrol = FLTcontrol & ~(fiberEnableMask);  //disable all fiber bits
+    FLTcontrol = FLTcontrol & ~(kFiberEnableMask);  //disable all fiber bits
     FLTcontrol = FLTcontrol | (fiberEnable << 16);
     
   //FLTcontrol = 0x02010000;//fiber 1, Normal
