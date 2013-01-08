@@ -54,11 +54,13 @@
 
 - (void) send:(id)aDelegate
 {
-	delegate = aDelegate;
-	[[ORMailQueue sharedMailQueue] addOperation:self];
-    //ORMailerDelay* aDelay = [[ORMailerDelay alloc] init];
-	//[[ORMailQueue sharedMailQueue] addOperation:aDelay];
-    //[aDelay release];
+    if([to length]){
+        delegate = aDelegate;
+        [[ORMailQueue sharedMailQueue] addOperation:self];
+        //ORMailerDelay* aDelay = [[ORMailerDelay alloc] init];
+        //[[ORMailQueue sharedMailQueue] addOperation:aDelay];
+        //[aDelay release];
+    }
 }
 
 - (void) main
