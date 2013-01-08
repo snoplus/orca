@@ -3031,8 +3031,7 @@ erreur_synchro_opera	= _erreur_synchro_opera(pt);
 //TODO: ===>   KEEP THIS FOR NON-OPERA PACKETS! -tb-
 			for(i=0;i<NB_CLIENT_UDP;i++){
 			    status_client[i]=numPacketsClient[i]; 
-                //printf("DUMMYTEXT-DUMMYTEXT-DUMMYTEXT-DUMMYTEXT-DUMMYTEXT-DUMMYTEXT-DUMMYTEXT-DUMMYTEXT-\n");
-					    printf("  ... index  %i status_client(%i) \n",i,status_client[i]);
+					    //printf("  ... index  %i status_client(%i) \n",i,status_client[i]);
 			    if(numPacketsClient[i]){
 				    numPacketsClient[i]--;
 					//led_B(_vert); 
