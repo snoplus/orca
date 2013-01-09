@@ -210,31 +210,38 @@ NSString* ORVXMLock							= @"ORVXMLock";
 {
 	if([aCustomCmd length]){
         aCustomCmd = [aCustomCmd stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-        char lastChar = [aCustomCmd characterAtIndex:[aCustomCmd length]-1];
-        switch (lastChar){
-            case 'Q':
-            case 'R':
-            case 'N':
-            case 'K':
-            case 'C':
-            case 'D':
-            case 'E':
-            case 'F':
-            case 'Z':
-            case 'T':
-            case 'M':
-                //do nothing.. those command should not have <CR> eol
-                break;
-            default:
-                aCustomCmd = [aCustomCmd stringByAppendingString:@"\r"];
-                break;
+        if([aCustomCmd length]==1){
+            char lastChar = [aCustomCmd characterAtIndex:[aCustomCmd length]-1];
+            switch (lastChar){
+                case 'Q':
+                case 'R':
+                case 'N':
+                case 'K':
+                case 'C':
+                case 'D':
+                case 'E':
+                case 'F':
+                case 'Z':
+                case 'T':
+                case 'M':
+                    //do nothing.. those command should not have <CR> eol
+                    break;
+                default:
+                    aCustomCmd = [aCustomCmd stringByAppendingString:@"\r"];
+                    break;
+            }
         }
-        
+        else if([aCustomCmd hasPrefix:@"set"]){
+            //do nothing.. can not have a CR
+        }
+        else {
+            aCustomCmd = [aCustomCmd stringByAppendingString:@"\r"];
+        }
         
         [[[self undoManager] prepareWithInvocationTarget:self] setCustomCmd:customCmd];
     
         [customCmd autorelease];
-        customCmd = [aCustomCmd copy];    
+        customCmd = [aCustomCmd copy];
 
         [[NSNotificationCenter defaultCenter] postNotificationName:ORVXMModelCustomCmdChanged object:self];
     }
@@ -742,6 +749,25 @@ NSString* ORVXMLock							= @"ORVXMLock";
 		NSLog(@"VXM (%d) paused and waiting on a 'Go' cmd\n",[self uniqueIdNumber]);
 		[self setWaiting:YES];
 	}
+    else if([aCmd hasPrefix:@"?"]){
+        queryInProgress = NO;
+        [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+        if(useCmdQueue){
+            [self incrementCmdIndex];
+            [self processNextCommand];
+        }
+        else [self setCmdTypeExecuting:kVXMCmdIdle];
+
+    }
+    else if([aCmd rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"0123456789"]].location==0){
+            NSLog(@"response: %@\n",aCmd);
+            [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+            if(useCmdQueue){
+                [self incrementCmdIndex];
+                [self processNextCommand];
+            }
+            else [self setCmdTypeExecuting:kVXMCmdIdle];
+   }
 	else {
 		if([aCmd rangeOfString:@"^"].location != NSNotFound){
 			//the '^' means a command is complete.
@@ -771,7 +797,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 				aCmd = [aCmd substringFromIndex:1];
 			}
 
-			if([aCmd length]>0 && [aCmd rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"+-.0123456789"]].location==0) {
+			if([aCmd length]>0 && [aCmd rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"+-0123456789"]].location==0) {
                 
 				ORVXMMotor* aMotor = [motors objectAtIndex:[self motorToQuery]];
 				[aMotor setMotorPosition:[aCmd floatValue]];
