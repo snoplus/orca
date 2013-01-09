@@ -1102,13 +1102,14 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 	NSString* theContent = @"";
 	theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
 	theContent = [theContent stringByAppendingFormat:@"Process: %@ was %@\n",[self elementName], state?@"started":@"stopped"];
-	if(state){
+/*	if(state){
 		theContent = [theContent stringByAppendingString:@"Some Values may not have had time to be updated\n"];	
 		theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];	
 		theContent = [theContent stringByAppendingFormat:@"%@\n",[self report]];
 		theContent = [theContent stringByAppendingString:@"\n\n+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];		
 	}
-					
+*/					
+	theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
 	theContent = [theContent stringByAppendingString:@"The following people received this message:\n"];
 	for(id address in [emailSource emailList]) theContent = [theContent stringByAppendingFormat:@"%@\n",address];
 	theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];						
