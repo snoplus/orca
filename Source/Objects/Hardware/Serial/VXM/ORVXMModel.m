@@ -125,18 +125,22 @@ NSString* ORVXMLock							= @"ORVXMLock";
     if([[note userInfo] objectForKey:@"serialPort"] == serialPort){
         NSString* theString = [[[[NSString alloc] initWithData:[[note userInfo] objectForKey:@"data"] 
 													  encoding:NSASCIIStringEncoding] autorelease] uppercaseString];
-
         if(!buffer)buffer = [[NSMutableString string] retain];
         [buffer appendString:theString];
         do {
-            NSRange lineRange = [buffer rangeOfString:@"\r"];
-            if(lineRange.location!= NSNotFound){
-                NSMutableString* theResponse = [[[buffer substringToIndex:lineRange.location+1] mutableCopy] autorelease];
-                [buffer deleteCharactersInRange:NSMakeRange(0,lineRange.location+1)];      //take the cmd out of the buffer
+            NSRange crRange    = [buffer rangeOfString:@"\r"];
+            NSRange carotRange = [buffer rangeOfString:@"^"];
+            NSUInteger position = NSNotFound;
+            if(crRange.location!= NSNotFound)           position =  crRange.location;
+            else if(carotRange.location!= NSNotFound)   position =  carotRange.location;
+            if(position != NSNotFound){
+                NSMutableString* theResponse = [[[buffer substringToIndex:position+1] mutableCopy] autorelease];
+                [buffer deleteCharactersInRange:NSMakeRange(0,position+1)];      //take the cmd out of the buffer
 				                
                 [self process_response:theResponse];
             }
-        } while([buffer rangeOfString:@"\r"].location!= NSNotFound);
+
+        } while([buffer rangeOfString:@"\r"].location!= NSNotFound && [buffer rangeOfString:@"^"].location!= NSNotFound);
 
     }
 }
@@ -733,7 +737,6 @@ NSString* ORVXMLock							= @"ORVXMLock";
 
 - (void) process_response:(NSString*)aCmd
 {
-    NSLog(@"received: %@\n",aCmd);
 	if([aCmd hasPrefix:@"W"]){
 		NSLog(@"VXM (%d) paused and waiting on a 'Go' cmd\n",[self uniqueIdNumber]);
 		[self setWaiting:YES];
@@ -744,6 +747,20 @@ NSString* ORVXMLock							= @"ORVXMLock";
 			[self queryPositions];
 		}
 		else if(queryInProgress){
+ 			if([aCmd hasPrefix:@"Q"] ||
+			   [aCmd hasPrefix:@"R"] ||
+			   [aCmd hasPrefix:@"N"] ||
+			   [aCmd hasPrefix:@"K"] ||
+               [aCmd hasPrefix:@"C"] ||
+               [aCmd hasPrefix:@"D"] ||
+               [aCmd hasPrefix:@"E"] ||
+               [aCmd hasPrefix:@"F"] ||
+               [aCmd hasPrefix:@"Z"] ||
+               [aCmd hasPrefix:@"T"] ||
+               [aCmd hasPrefix:@"M"] ){
+                aCmd = [aCmd substringFromIndex:1];
+			}
+
             //query reponse
 			if([aCmd hasPrefix:@"X"] ||
 			   [aCmd hasPrefix:@"Y"] ||
@@ -828,7 +845,6 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (void) sendCommand:(NSString*)aCmd
 {
 	if([serialPort isOpen]){
-		NSLog(@"write: %@\n",aCmd);
 		[serialPort writeString:aCmd];
         if([aCmd isEqualToString:@"N"]){
             [self queryPositions];
