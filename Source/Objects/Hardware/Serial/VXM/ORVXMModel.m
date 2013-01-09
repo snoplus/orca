@@ -453,7 +453,8 @@ NSString* ORVXMLock							= @"ORVXMLock";
 
 - (void) firstActionAfterOpeningPort
 {
-    [self sendCommand:@"G"]; //set to no echo -- NO <CR>
+    [self sendCommand:@"G,C"]; //set to no echo -- NO <CR>
+    [self sendCommand:@"setDM65"]; //make sure it is master
 }
 
 #pragma mark ***Archival
@@ -761,6 +762,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
                 aCmd = [aCmd substringFromIndex:1];
 			}
 
+            
             //query reponse
 			if([aCmd hasPrefix:@"X"] ||
 			   [aCmd hasPrefix:@"Y"] ||
