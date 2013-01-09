@@ -231,9 +231,6 @@ NSString* ORVXMLock							= @"ORVXMLock";
                     break;
             }
         }
-        else if([aCustomCmd hasPrefix:@"set"]){
-            //do nothing.. can not have a CR
-        }
         else {
             aCustomCmd = [aCustomCmd stringByAppendingString:@"\r"];
         }
@@ -761,6 +758,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
     }
     else if([aCmd rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"0123456789"]].location==0){
             NSLog(@"response: %@\n",aCmd);
+            queryInProgress = NO;
             [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
             if(useCmdQueue){
                 [self incrementCmdIndex];
@@ -873,6 +871,14 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (void) sendCommand:(NSString*)aCmd
 {
 	if([serialPort isOpen]){
+        if([aCmd hasPrefix:@"get"] ||
+           [aCmd hasPrefix:@"set"]){
+            if(![aCmd hasSuffix:@"\r"]){
+                aCmd = [aCmd stringByAppendingString:@"\r"];
+            }
+        [self setCmdTypeExecuting:kVXMCmdIdle];
+       }
+
 		[serialPort writeString:aCmd];
         if([aCmd isEqualToString:@"N"]){
             [self queryPositions];
