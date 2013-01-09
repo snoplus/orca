@@ -127,6 +127,8 @@ NSString* ORVXMLock							= @"ORVXMLock";
 													  encoding:NSASCIIStringEncoding] autorelease] uppercaseString];
         if(!buffer)buffer = [[NSMutableString string] retain];
         [buffer appendString:theString];
+        NSLog(@"received: %@\n",theString);
+
         do {
             NSRange crRange    = [buffer rangeOfString:@"\r"];
             NSRange carotRange = [buffer rangeOfString:@"^"];
@@ -878,7 +880,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
             }
         [self setCmdTypeExecuting:kVXMCmdIdle];
        }
-
+    NSLog(@"sending: %@\n",aCmd);
 		[serialPort writeString:aCmd];
         if([aCmd isEqualToString:@"N"]){
             [self queryPositions];
