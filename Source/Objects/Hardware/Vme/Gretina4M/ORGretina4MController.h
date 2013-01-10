@@ -29,6 +29,7 @@
 @interface ORGretina4MController : OrcaObjectController 
 {
     IBOutlet NSTabView* 	tabView;
+	IBOutlet   NSTextField* noiseWindowField;
     
 	IBOutlet   NSTextField* integrateTimeField;
 	IBOutlet   NSTextField* collectionTimeField;
@@ -55,7 +56,7 @@
     IBOutlet NSMatrix*		prerecntMatrix;
     IBOutlet NSMatrix*		postrecntMatrix;
 
-    IBOutlet NSPopUpButton* clockMuxPU;
+    IBOutlet NSPopUpButton* clockSourcePU;
 
     IBOutlet NSButton*      settingLockButton;
     IBOutlet NSButton*      initButton;
@@ -97,6 +98,7 @@
 	IBOutlet NSTextField*	registerStatusField;
 	IBOutlet NSTextField*	spiWriteValueField;
 	IBOutlet NSButton*		writeSPIButton;
+	IBOutlet NSButton*		dumpAllRegistersButton;
 	
     //offset panel
     IBOutlet NSPanel*				noiseFloorPanel;
@@ -120,6 +122,7 @@
 - (void) updateWindow;
 
 #pragma mark •••Interface Management
+- (void) noiseWindowChanged:(NSNotification*)aNote;
 - (void) chpsdvChanged:(NSNotification*)aNote;
 - (void) mrpsrtChanged:(NSNotification*)aNote;
 - (void) ftCntChanged:(NSNotification*)aNote;
@@ -134,7 +137,7 @@
 - (void) extTrigLengthChanged:(NSNotification*)aNote;
 - (void) pileUpWindowChanged:(NSNotification*)aNote;
 - (void) externalWindowChanged:(NSNotification*)aNote;
-- (void) clockMuxChanged:(NSNotification*)aNote;
+- (void) clockSourceChanged:(NSNotification*)aNote;
 - (void) downSampleChanged:(NSNotification*)aNote;
 - (void) registerIndexChanged:(NSNotification*)aNote;
 - (void) fpgaDownInProgressChanged:(NSNotification*)aNote;
@@ -172,12 +175,13 @@
 - (void) setRegisterDisplay:(unsigned int)index;
 
 #pragma mark •••Actions
+- (IBAction) noiseWindowAction:(id)sender;
 - (IBAction) integrateTimeFieldAction:(id)sender;
 - (IBAction) collectionTimeFieldAction:(id)sender;
 - (IBAction) extTrigLengthFieldAction:(id)sender;
 - (IBAction) pileUpWindowFieldAction:(id)sender;
 - (IBAction) externalWindowFieldAction:(id)sender;
-- (IBAction) clockMuxAction:(id)sender;
+- (IBAction) clockSourceAction:(id)sender;
 - (IBAction) downSampleAction:(id)sender;
 - (IBAction) settingLockAction:(id) sender;
 - (IBAction) probeBoard:(id)sender;
@@ -221,6 +225,7 @@
 - (IBAction) registerWriteValueAction:(id)sender;
 - (IBAction) spiWriteValueAction:(id)sender;
 - (IBAction) writeSPIAction:(id)sender;
+- (IBAction) dumpAllRegisters:(id)sender;
 
 #pragma mark •••Data Source
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;

@@ -70,7 +70,27 @@
 	// Setup register popup buttons
 	[registerIndexPU removeAllItems];
 	[registerIndexPU setAutoenablesItems:NO];
+    
 	int i;
+    for(i=0;i<kNumberOfGretina4MRegisters;i++){
+        [[enabledMatrix cellAtRow:i column:0] setTag:i];
+        [[poleZeroEnabledMatrix cellAtRow:i column:0] setTag:i];
+        [[poleZeroTauMatrix cellAtRow:i column:0] setTag:i];
+        [[pzTraceEnabledMatrix cellAtRow:i column:0] setTag:i];
+        [[debugMatrix cellAtRow:i column:0] setTag:i];
+        [[pileUpMatrix cellAtRow:i column:0] setTag:i];
+        [[presumEnabledMatrix cellAtRow:i column:0] setTag:i];
+        [[ledThresholdMatrix cellAtRow:i column:0] setTag:i];
+        [[tpolMatrix cellAtRow:i column:0] setTag:i];
+        [[triggerModeMatrix cellAtRow:i column:0] setTag:i];
+        [[chpsdvMatrix cellAtRow:i column:0] setTag:i];
+        [[ftCntMatrix cellAtRow:i column:0] setTag:i];
+        [[mrpsrtMatrix cellAtRow:i column:0] setTag:i];
+        [[mrpsdvMatrix cellAtRow:i column:0] setTag:i];
+        [[chpsrtMatrix cellAtRow:i column:0] setTag:i];
+        [[prerecntMatrix cellAtRow:i column:0] setTag:i];
+        [[postrecntMatrix cellAtRow:i column:0] setTag:i];
+    }
 	for (i=0;i<kNumberOfGretina4MRegisters;i++) {
 		[registerIndexPU insertItemWithTitle:[model registerNameAt:i]	atIndex:i];
 		[[registerIndexPU itemAtIndex:i] setEnabled:![model displayRegisterOnMainPage:i] && ![model displayFPGARegisterOnMainPage:i]];
@@ -166,184 +186,190 @@
 	
     [notifyCenter addObserver : self
                      selector : @selector(noiseFloorOffsetChanged:)
-                         name : ORGretina4MModelNoiseFloorOffsetChanged
+                         name : ORGretina4MNoiseFloorOffsetChanged
                        object : model];
 	
     [notifyCenter addObserver : self
                      selector : @selector(setFifoStateLabel)
-                         name : ORGretina4MModelFIFOCheckChanged
+                         name : ORGretina4MFIFOCheckChanged
                        object : model];
 	
     [notifyCenter addObserver : self
                      selector : @selector(noiseFloorIntegrationChanged:)
-                         name : ORGretina4MModelNoiseFloorIntegrationTimeChanged
+                         name : ORGretina4MNoiseFloorIntegrationTimeChanged
                        object : model];
 	
     [notifyCenter addObserver : self
                      selector : @selector(enabledChanged:)
-                         name : ORGretina4MModelEnabledChanged
+                         name : ORGretina4MEnabledChanged
                        object : model];
 		
     [notifyCenter addObserver : self
                      selector : @selector(poleZeroEnabledChanged:)
-                         name : ORGretina4MModelPoleZeroEnabledChanged
+                         name : ORGretina4MPoleZeroEnabledChanged
                        object : model];
 	
     [notifyCenter addObserver : self
                      selector : @selector(poleZeroTauChanged:)
-                         name : ORGretina4MModelPoleZeroMultChanged
+                         name : ORGretina4MPoleZeroMultChanged
                        object : model];
 	
     [notifyCenter addObserver : self
                      selector : @selector(pzTraceEnabledChanged:)
-                         name : ORGretina4MModelPZTraceEnabledChanged
+                         name : ORGretina4MPZTraceEnabledChanged
                        object : model];
 	
     [notifyCenter addObserver : self
                      selector : @selector(debugChanged:)
-                         name : ORGretina4MModelDebugChanged
+                         name : ORGretina4MDebugChanged
                        object : model];
 	
     [notifyCenter addObserver : self
                      selector : @selector(presumEnabledChanged:)
-                         name : ORGretina4MModelPresumEnabledChanged
+                         name : ORGretina4MPresumEnabledChanged
                        object : model];
 	
     [notifyCenter addObserver : self
                      selector : @selector(tpolChanged:)
-                         name : ORGretina4MModelTpolChanged
+                         name : ORGretina4MTpolChanged
                        object : model];
 	
     [notifyCenter addObserver : self
                      selector : @selector(triggerModeChanged:)
-                         name : ORGretina4MModelTriggerModeChanged
+                         name : ORGretina4MTriggerModeChanged
                        object : model];
 	
     [notifyCenter addObserver : self
                      selector : @selector(ledThresholdChanged:)
-                         name : ORGretina4MModelLEDThresholdChanged
+                         name : ORGretina4MLEDThresholdChanged
                        object : model];
 		
     [notifyCenter addObserver : self
                      selector : @selector(fpgaFilePathChanged:)
-                         name : ORGretina4MModelFpgaFilePathChanged
+                         name : ORGretina4MFpgaFilePathChanged
 						object: model];
 	
     [notifyCenter addObserver : self
                      selector : @selector(mainFPGADownLoadStateChanged:)
-                         name : ORGretina4MModelMainFPGADownLoadStateChanged
+                         name : ORGretina4MMainFPGADownLoadStateChanged
 						object: model];
 	
 	[notifyCenter addObserver : self
                      selector : @selector(fpgaDownProgressChanged:)
-                         name : ORGretina4MModelFpgaDownProgressChanged
+                         name : ORGretina4MFpgaDownProgressChanged
 						object: model];
 	
 	[notifyCenter addObserver : self
                      selector : @selector(fpgaDownInProgressChanged:)
-                         name : ORGretina4MModelMainFPGADownLoadInProgressChanged
+                         name : ORGretina4MMainFPGADownLoadInProgressChanged
 						object: model];
 	
     [notifyCenter addObserver : self
                      selector : @selector(settingsLockChanged:)
-                         name : ORGretina4MModelMainFPGADownLoadInProgressChanged
+                         name : ORGretina4MMainFPGADownLoadInProgressChanged
                        object : nil];
 
 	[notifyCenter addObserver : self
                      selector : @selector(registerLockChanged:)
-                         name : ORGretina4MModelMainFPGADownLoadInProgressChanged
+                         name : ORGretina4MMainFPGADownLoadInProgressChanged
                        object : nil];
 	
     [notifyCenter addObserver : self
                      selector : @selector(registerWriteValueChanged:)
-                         name : ORGretina4MModelRegisterWriteValueChanged
+                         name : ORGretina4MRegisterWriteValueChanged
 						object: model];
 	
     [notifyCenter addObserver : self
                      selector : @selector(registerIndexChanged:)
-                         name : ORGretina4MModelRegisterIndexChanged
+                         name : ORGretina4MRegisterIndexChanged
 						object: model];
 
     [notifyCenter addObserver : self
                      selector : @selector(spiWriteValueChanged:)
-                         name : ORGretina4MModelSPIWriteValueChanged
+                         name : ORGretina4MSPIWriteValueChanged
 						object: model];
 	
     [notifyCenter addObserver : self
                      selector : @selector(downSampleChanged:)
-                         name : ORGretina4MModelDownSampleChanged
+                         name : ORGretina4MDownSampleChanged
 						object: model];
 
 	[self registerRates];
     [notifyCenter addObserver : self
-                     selector : @selector(clockMuxChanged:)
-                         name : ORGretina4MModelClockMuxChanged
+                     selector : @selector(clockSourceChanged:)
+                         name : ORGretina4MClockSourceChanged
 						object: model];
 
     [notifyCenter addObserver : self
                      selector : @selector(externalWindowChanged:)
-                         name : ORGretina4MModelExternalWindowChanged
+                         name : ORGretina4MExternalWindowChanged
 						object: model];
 
     [notifyCenter addObserver : self
                      selector : @selector(pileUpWindowChanged:)
-                         name : ORGretina4MModelPileUpWindowChanged
+                         name : ORGretina4MPileUpWindowChanged
 						object: model];
 	
     [notifyCenter addObserver : self
                      selector : @selector(pileUpChanged:)
-                         name : ORGretina4MModelPileUpChanged
+                         name : ORGretina4MPileUpChanged
                        object : model];
 	
     [notifyCenter addObserver : self
                      selector : @selector(extTrigLengthChanged:)
-                         name : ORGretina4MModelExtTrigLengthChanged
+                         name : ORGretina4MExtTrigLengthChanged
 						object: model];
 
     [notifyCenter addObserver : self
                      selector : @selector(collectionTimeChanged:)
-                         name : ORGretina4MModelCollectionTimeChanged
+                         name : ORGretina4MCollectionTimeChanged
 						object: model];
 
     [notifyCenter addObserver : self
                      selector : @selector(integrateTimeChanged:)
-                         name : ORGretina4MModelIntegrateTimeChanged
+                         name : ORGretina4MIntegrateTimeChanged
 						object: model];
 
     [notifyCenter addObserver : self
                      selector : @selector(chpsdvChanged:)
-                         name : ORGretina4MModelChpsdvChanged
+                         name : ORGretina4MChpsdvChanged
 						object: model];
  
     [notifyCenter addObserver : self
                      selector : @selector(mrpsrtChanged:)
-                         name : ORGretina4MModelMrpsrtChanged
+                         name : ORGretina4MMrpsrtChanged
 						object: model];
 
     [notifyCenter addObserver : self
                      selector : @selector(ftCntChanged:)
-                         name : ORGretina4MModelFtCntChanged
+                         name : ORGretina4MFtCntChanged
 						object: model];
 
     [notifyCenter addObserver : self
                      selector : @selector(mrpsdvChanged:)
-                         name : ORGretina4MModelMrpsdvChanged
+                         name : ORGretina4MMrpsdvChanged
 						object: model];
     
     [notifyCenter addObserver : self
                      selector : @selector(chsrtChanged:)
-                         name : ORGretina4MModelChpsrtChanged
+                         name : ORGretina4MChpsrtChanged
 						object: model];
     
     [notifyCenter addObserver : self
                      selector : @selector(prerecntChanged:)
-                         name : ORGretina4MModelPrerecntChanged
+                         name : ORGretina4MPrerecntChanged
 						object: model];
 
     [notifyCenter addObserver : self
                      selector : @selector(postrecntChanged:)
-                         name : ORGretina4MModelPostrecntChanged
+                         name : ORGretina4MPostrecntChanged
 						object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(noiseWindowChanged:)
+                         name : ORGretina4MNoiseWindowChanged
+						object: model];
+
 }
 
 - (void) registerRates
@@ -403,7 +429,7 @@
 	[self registerWriteValueChanged:nil];
 	[self spiWriteValueChanged:nil];
 	[self downSampleChanged:nil];
-	[self clockMuxChanged:nil];
+	[self clockSourceChanged:nil];
 	[self externalWindowChanged:nil];
 	[self pileUpWindowChanged:nil];
 	[self extTrigLengthChanged:nil];
@@ -417,9 +443,15 @@
     [self chsrtChanged:nil];
     [self prerecntChanged:nil];
     [self postrecntChanged:nil];
+	[self noiseWindowChanged:nil];
 }
 
 #pragma mark •••Interface Management
+- (void) noiseWindowChanged:(NSNotification*)aNote
+{
+	[noiseWindowField setFloatValue: [model noiseWindowConverted]];
+}
+
 - (void) pileUpChanged:(NSNotification*)aNote
 {
 	short i;
@@ -551,9 +583,9 @@
 	[externalWindowField setFloatValue: [model externalWindowConverted]];
 }
 
-- (void) clockMuxChanged:(NSNotification*)aNote
+- (void) clockSourceChanged:(NSNotification*)aNote
 {
-	[clockMuxPU selectItemAtIndex: [model clockMux]];
+	[clockSourcePU selectItemAtIndex: [model clockSource]];
 }
 
 - (void) downSampleChanged:(NSNotification*)aNote
@@ -812,7 +844,7 @@
 	[stopFPGALoadButton setEnabled:!locked && downloading];
 	[downSamplePU setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[pileUpMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
-	
+	[dumpAllRegistersButton setEnabled:!lockedOrRunningMaintenance && !downloading];
     [tpolMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
     [triggerModeMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
 }
@@ -983,6 +1015,12 @@
 }
 
 #pragma mark •••Actions
+
+- (void) noiseWindowAction:(id)sender
+{
+	[model setNoiseWindowConverted:[sender floatValue]];
+}
+
 - (IBAction) pileUpAction:(id)sender
 {
 	if([sender intValue] != [model pileUp:[[sender selectedCell] tag]]){
@@ -1049,9 +1087,9 @@
 	[model setExternalWindowConverted:[sender floatValue]];
 }
 
-- (IBAction) clockMuxAction:(id)sender
+- (IBAction) clockSourceAction:(id)sender
 {
-	[model setClockMux:[sender indexOfSelectedItem]];
+	[model setClockSource:[sender indexOfSelectedItem]];
 }
 
 - (IBAction) downSampleAction:(id)sender
@@ -1304,19 +1342,20 @@
             unsigned value = [model readControlReg:chan];
 			
 			int pol=(value>>10)&0x3;
-			NSString* polString = @"?";
+			NSString* polString = @"  ?  ";
 			if(pol==0)polString = @"None";
-			else if(pol==1) polString = @"Pos";
-			else if(pol==2) polString = @"Neg";
+			else if(pol==1) polString = @" Pos";
+			else if(pol==2) polString = @" Neg";
 			else if(pol==3) polString = @"Both";
 			
-            NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"chan: %d Enabled: %@ Debug: %@  Presum: %@  Pole-zero: %@ Polarity: %@ TriggerMode: 0x%02x\n",
+            NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"chan: %d Enabled: %@ Debug: %@  Pileup: %@ Presum: %@  Pole-zero: %@ Polarity: [%@] TriggerMode: %@\n",
                       chan, 
                       (value&0x1)?@"[YES]":@"[ NO]",		//enabled
                       ((value>>1)&0x1)?@"[YES]":@"[ NO]",	//debug
-                      ((value>>2)&0x1)?@"[YES]":@"[ NO]",   //presum
+                      ((value>>2)&0x1)?@"[YES]":@"[ NO]",   //pile up
+                      ((value>>3)&0x1)?@"[YES]":@"[ NO]",   //presum
                       ((value>>13)&0x1)?@"[YES]":@"[ NO]",  //pole-zero
-                      polString, (value>>4)&0x1);
+                      polString, (value>>4)&0x1?@"[External]":@"[Internal]");
         }
         unsigned short fifoStatus = [model readFifoState];
         if(fifoStatus == kFull)			    NSLog(@"FIFO = Full\n");
@@ -1325,12 +1364,12 @@
         else if(fifoStatus == kAlmostEmpty)	NSLog(@"FIFO = Almost Empty\n");
         else if(fifoStatus == kHalfFull)	NSLog(@"FIFO = Half Full\n");
 		
-		NSLog(@"External Window: %g us\n",  0.01*[model readExternalWindow]);
-		NSLog(@"Pileup Window: %g us\n",    0.01*[model readPileUpWindow]);
-		NSLog(@"Clock Mux: %@\n",           [model readClockMux]?@"Onboard":@"Front Panel");
-		NSLog(@"Ext Trig Length: %g us\n",  0.01*[model readExtTrigLength]);
-		NSLog(@"Collection: %g us\n",       0.01*[model readCollectionTime]);
-		NSLog(@"Integration Time: %g us\n", 0.01*[model readIntegrateTime]);
+		NSLog(@"External Window: %g us\n",  [model externalWindowConverted]);
+		NSLog(@"Pileup Window: %g us\n",    [model pileUpWindowConverted]);
+		NSLog(@"Clock Source: %@\n",           [model readClockSource]?@"Internal":@"External");
+		NSLog(@"Ext Trig Length: %g us\n",  [model extTrigLengthConverted]);
+		NSLog(@"Collection: %g us\n",       [model collectionTimeConverted]);
+		NSLog(@"Integration Time: %g us\n", [model integrateTimeConverted]);
 		NSLog(@"Down sample: x%d\n", (int) pow(2,[model readDownSample]));
         
     }
@@ -1404,6 +1443,10 @@
 - (IBAction) stopLoadingMainFPGAAction:(id)sender
 {
 	[model stopDownLoadingMainFPGA];
+}
+- (IBAction) dumpAllRegisters:(id)sender
+{
+    [model dumpAllRegisters];
 }
 
 #pragma mark •••Data Source
