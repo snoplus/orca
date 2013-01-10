@@ -64,7 +64,8 @@
 
 - (void) awakeFromNib
 {
-	[self defaultPathChanged:nil];
+	//[self defaultPathChanged:nil];
+	[defaultPathField setStringValue:[self helpFilePath]];
 	[[self window] orderOut:nil]; //this forces everything to be set up so the first showHelpCenterPage call works
 }
 
@@ -96,7 +97,11 @@
 #pragma mark ¥¥¥Actions
 - (IBAction) showHelpCenter:(id)sender
 {
+    if([[self helpFilePath] length]){
+		[[webView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:[self helpFilePath]]]];
+	}
     [[self window] makeKeyAndOrderFront:nil];
+
 }
 
 - (IBAction) goHome:(id)sender
