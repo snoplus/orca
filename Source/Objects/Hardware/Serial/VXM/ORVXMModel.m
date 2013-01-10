@@ -676,6 +676,11 @@ NSString* ORVXMLock							= @"ORVXMLock";
 	}
 }
 
+- (void) forceMotorClear
+{
+    [self stopAllMotion];
+}
+
 #pragma mark ***Data Records
 - (unsigned long) dataId { return dataId; }
 - (void) setDataId: (unsigned long) DataId

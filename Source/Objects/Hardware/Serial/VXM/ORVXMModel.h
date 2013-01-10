@@ -128,6 +128,7 @@
 - (NSString*) cmdQueueCommand:(int)index;
 - (NSString*) cmdQueueDescription:(int)index;
 - (ORVXMMotorCmd*) motorCmd:(int)index;
+- (void) forceMotorClear;
 
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
