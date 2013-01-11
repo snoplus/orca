@@ -518,7 +518,17 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
                         numToWrite:1
 					    withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
-
+    
+}
+- (unsigned long) readFromAddress:(unsigned long)anAddress aValue:(unsigned long)aValue
+{
+    unsigned long value = 0;
+    [[self adapter] readLongBlock:&value
+                         atAddress:[self baseAddress] + anAddress
+                        numToRead:1
+					    withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+    return value;
 }
 
 - (BOOL) canReadRegister:(unsigned int)index
