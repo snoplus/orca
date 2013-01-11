@@ -308,7 +308,7 @@ enum Gretina4MFIFOStates {
 - (BOOL) canWriteFPGARegister:(unsigned int)index;
 - (BOOL) displayFPGARegisterOnMainPage:(unsigned int)index;
 - (void) writeToAddress:(unsigned long)anAddress aValue:(unsigned long)aValue;
-- (unsigned long) readFromAddress:(unsigned long)anAddress aValue:(unsigned long)aValue;
+- (unsigned long) readFromAddress:(unsigned long)anAddress;
 
 - (ORRateGroup*)    waveFormRateGroup;
 - (void)			setWaveFormRateGroup:(ORRateGroup*)newRateGroup;

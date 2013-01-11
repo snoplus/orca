@@ -520,7 +520,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 					 usingAddSpace:0x01];
     
 }
-- (unsigned long) readFromAddress:(unsigned long)anAddress aValue:(unsigned long)aValue
+- (unsigned long) readFromAddress:(unsigned long)anAddress
 {
     unsigned long value = 0;
     [[self adapter] readLongBlock:&value
