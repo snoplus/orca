@@ -26,7 +26,15 @@
 
 #define kReadWaveForms	0x1 << 0
 
+//Edelweiss SLT DAQ modes  -> for sltDAQMode -tb-
+#define kSltDAQMode_Event_Mode		        0
+#define kSltDAQMode_Orca_Streaming		    1
+#define kSltDAQMode_ipe4reader_Streaming    2
+#define kSltDAQMode_Monitoring		        3
+
+
 //flt run modes (sent to hw, FLTv4 control register) -> for fltRunMode -tb-
+//OBSOLETE - KATRIN MODES !
 #define kIpeFltV4Katrin_StandBy_Mode		0
 #define kIpeFltV4Katrin_Run_Mode			1
 #define kIpeFltV4Katrin_Histo_Mode			2

@@ -346,9 +346,9 @@ fprintf(stderr,"ORFLTv4Readout::Readout(SBC_LAM_Data* lamData): location %i, Get
                                 //else: full trigger search (not recommended)
 								
 
-                                uint32_t waveformLength = 2048; 
+                                static uint32_t waveformLength = 2048; 
                                 static uint32_t waveformBuffer32[64*1024];
-                                static uint32_t shipWaveformBuffer32[64*1024];
+                                uint32_t shipWaveformBuffer32[64*1024];
                                 static uint16_t *waveformBuffer16 = (uint16_t *)(waveformBuffer32);
                                 static uint16_t *shipWaveformBuffer16 = (uint16_t *)(shipWaveformBuffer32);
                                 //uint32_t searchTrig,triggerPos = 0xffffffff;
@@ -359,16 +359,28 @@ fprintf(stderr,"ORFLTv4Readout::Readout(SBC_LAM_Data* lamData): location %i, Get
 								//read raw trace
                                 uint32_t adccount, trigSlot;
 #if 1
+                                pbus->readBlock(FLTRAMDataReg(currFlt+1,chan),(unsigned long*)waveformBuffer32,waveformLength);
+                                
+								for(adccount=0; adccount<waveformLength;adccount++){ //kNumV4FLTADCPageSize32 is 1024; waveformLength is 2048
+			            pbus->read(FLTRAMDataReg(currFlt+1,chan)+0);//dummy
+					    
+                                    //waveformBuffer32[adccount]  = pbus->read(FLTRAMDataReg(currFlt+1,chan)+adccount);
+                                    if(adccount<5){fprintf(stdout,"1RAMDataReg for flt #%i, chan %i (location 0x%x,colSlot %i,crate %i):  addr 0x%08x   value:", currFlt+1,chan,location,col,crate ,FLTRAMDataReg(currFlt+1,0)+adccount);
+                                        fprintf(stdout,"     0x%08x\n", waveformBuffer32[adccount]);fflush(stdout);
+						            }
+                                    //shipWaveformBuffer32[adccount]  = (adccount*2)  | ((adccount*2+1)<<16);
+								}
+#else
 								for(adccount=0; adccount<waveformLength;adccount++){ //kNumV4FLTADCPageSize32 is 1024; waveformLength is 2048
 								    
                                     waveformBuffer32[adccount]  = pbus->read(FLTRAMDataReg(currFlt+1,chan)+adccount);
-                    if(adccount<10){fprintf(stdout,"RAMDataReg for flt #%i, chan %i (location 0x%x,colSlot %i,crate %i):  addr 0x%08x   value:", currFlt+1,chan,location,col,crate ,FLTRAMDataReg(currFlt+1,0)+adccount);
-                                    fprintf(stdout,"     0x%08x\n", waveformBuffer32[adccount]);fflush(stdout);
-						 }
+                                    if(adccount<10){fprintf(stdout,"2RAMDataReg for flt #%i, chan %i (location 0x%x,colSlot %i,crate %i):  addr 0x%08x   value:", currFlt+1,chan,location,col,crate ,FLTRAMDataReg(currFlt+1,0)+adccount);
+                                        fprintf(stdout,"     0x%08x\n", waveformBuffer32[adccount]);fflush(stdout);
+						            }
                                     //shipWaveformBuffer32[adccount]  = (adccount*2)  | ((adccount*2+1)<<16);
 								}
 #endif
-								/* old version; 2010-10-gap-in-trace-bug: PMC was reading too fast, so data was read faster than FLT could write -tb-
+							/* old version; 2010-10-gap-in-trace-bug: PMC was reading too fast, so data was read faster than FLT could write -tb-
 								for(adccount=0; adccount<1024;adccount++){
 									shipWaveformBuffer32[adccount]= srack->theFlt[col]->ramData->read(eventchan,adccount);
 								}*/
@@ -404,6 +416,7 @@ fprintf(stderr,"ORFLTv4Readout::Readout(SBC_LAM_Data* lamData): location %i, Get
                                 }
                                 
                             }//for(chan ...
+                    usleep(1000);
 					pbus->write(FLTCommandReg(currFlt+1),0x10000);//reset  TotalTriggerNReg
                 }//if(totalTriggerN>0)...
                 //else break;//fifo is empty, leave loop ...

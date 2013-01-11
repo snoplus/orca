@@ -182,6 +182,7 @@
 	    //pthread handling
 	    pthread_t dataReplyThread;
         pthread_mutex_t dataReplyThread_mutex;
+    int sltDAQMode;
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
@@ -199,6 +200,8 @@
 - (void) runIsStartingSubRun:(NSNotification*)aNote;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+- (int) sltDAQMode;
+- (void) setSltDAQMode:(int)aSltDAQMode;
 - (int) numRequestedUDPPackets;
 - (void) setNumRequestedUDPPackets:(int)aNumRequestedUDPPackets;
 - (int) isListeningOnDataServerSocket;
@@ -416,6 +419,7 @@
 
 @end
 
+extern NSString* OREdelweissSLTModelSltDAQModeChanged;
 extern NSString* OREdelweissSLTModelNumRequestedUDPPacketsChanged;
 extern NSString* OREdelweissSLTModelIsListeningOnDataServerSocketChanged;
 extern NSString* OREdelweissSLTModelCrateUDPDataReplyPortChanged;

@@ -251,9 +251,21 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
                          name : OREdelweissSLTModelOpenCloseDataCommandSocketChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(sltDAQModeChanged:)
+                         name : OREdelweissSLTModelSltDAQModeChanged
+						object: model];
+
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+
+- (void) sltDAQModeChanged:(NSNotification*)aNote
+{
+	[sltDAQModeTextField setIntValue: [model sltDAQMode]];
+	//[sltDAQModePU setIntValue: [model sltDAQMode]];
+    [sltDAQModePU selectItemWithTag:[model sltDAQMode]];
+}
 
 - (void) numRequestedUDPPacketsChanged:(NSNotification*)aNote
 {
@@ -513,6 +525,7 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	[self crateUDPDataReplyPortChanged:nil];
 	[self isListeningOnDataServerSocketChanged:nil];
 	[self numRequestedUDPPacketsChanged:nil];
+	[self sltDAQModeChanged:nil];
 }
 
 
@@ -660,6 +673,18 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 }
 
 #pragma mark ***Actions
+
+- (IBAction) sltDAQModePUAction:(id)sender
+{
+	[model setSltDAQMode:[[sltDAQModePU selectedItem] tag]];	
+	//[model setSltDAQMode:[[sender selectedItem] tag]];	
+}
+
+- (void) sltDAQModeTextFieldAction:(id)sender
+{
+	[model setSltDAQMode:[sender intValue]];	
+}
+
 - (IBAction) setMasterModeButtonAction:(id)sender
 {
 	[model writeMasterMode];

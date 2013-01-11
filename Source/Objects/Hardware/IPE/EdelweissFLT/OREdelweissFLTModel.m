@@ -244,7 +244,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	return (eventMask & (1L<<chan)) != 0;
 }
 
-- (int) stationNumber
+- (int) stationNumber //counts FLT #: 1, 2, 3, ... (slot: 0, 1, ... SLT gap ... )
 {
 	//is it a minicrate?
 	if([[[self crate] class]  isSubclassOfClass: NSClassFromString(@"ORIpeV4MiniCrateModel")]){
@@ -1033,7 +1033,9 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 {
 	[self writeControl];
 	[self writeStreamMask];//TODO: is this necessary? we want event mode but this is for stream mode -tb-
+	[self writeFiberOutMask];//TODO: is this necessary? we want event mode but this is for stream mode -tb-
 	[self writeFiberDelays];
+    
 	[self loadThresholdsAndGains]; //TODO:
 	//!!!: xxx
 	//???: yyy
@@ -1068,8 +1070,14 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (void) writeRunControl:(BOOL)startSampling
 {
         NSLog(@"%@::%@: DO NOT CALL!!! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
+        NSLog(@"%@::%@: DO NOT CALL!!! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
+        NSLog(@"%@::%@: DO NOT CALL!!! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
+        NSLog(@"%@::%@: DO NOT CALL!!! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
+        NSLog(@"%@::%@: DO NOT CALL!!! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
+        NSLog(@"%@::%@: DO NOT CALL!!! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
 
-exit(666);
+return;
+exit(66);
 	unsigned long aValue = 
 	((filterLength & 0xf)<<8)		| 
 	((gapLength & 0xf)<<4)			| 
@@ -1781,9 +1789,11 @@ for(chan=0; chan<6;chan++)
 		}
 	}
 #endif	
+
     //if([[userInfo objectForKey:@"doinit"]intValue]){
-	[self setLedOff:NO];
-	[self writeRunControl:YES]; // writes to run control register (was NO, but this causes the first few noise events -tb-)
+//TODO: remove the obsolete commands -tb-    
+	//[self setLedOff:NO];
+	//[self writeRunControl:YES]; // writes to run control register (was NO, but this causes the first few noise events -tb-)
 	//[self reset];               // Write 1 to all reset/clear flags of the FLTv4 command register.
 	[self initBoard];           // writes control reg + hr control reg + PostTrigg + thresh+gains + offset + triggControl + hr mask + enab.statistics
 	//}
@@ -1803,8 +1813,7 @@ for(chan=0; chan<6;chan++)
 */
 	}
 	
-	[self writeRunControl:YES];
-	
+	//Edelweiss event readout
 	if([self repeatSWTriggerMode] == 1){
 	    NSLog(@"Start SW Trigger\n");//TODO: debug output -tb-
 		[self setSwTriggerIsRepeating: 1];  //-> call writeCommandSoftwareTrigger frequently

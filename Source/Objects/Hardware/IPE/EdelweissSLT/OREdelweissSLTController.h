@@ -28,6 +28,8 @@
 	@private
 	
 	    IBOutlet   NSTextField* eventFifoStatusRegTextField;
+	    IBOutlet   NSTextField* sltDAQModeTextField;
+		IBOutlet NSPopUpButton* sltDAQModePU;
 	IBOutlet   NSTextField* numRequestedUDPPacketsTextField;
 	    IBOutlet NSMatrix*		pixelBusEnableRegMatrix;
 	    IBOutlet NSTextField*	pixelBusEnableRegTextField;
@@ -141,6 +143,7 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+- (void) sltDAQModeChanged:(NSNotification*)aNote;
 - (void) numRequestedUDPPacketsChanged:(NSNotification*)aNote;
 - (void) crateUDPDataReplyPortChanged:(NSNotification*)aNote;
 - (void) crateUDPDataIPChanged:(NSNotification*)aNote;
@@ -186,6 +189,8 @@
 - (void) enableRegControls;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+- (IBAction) sltDAQModePUAction:(id)sender;
+- (IBAction) sltDAQModeTextFieldAction:(id)sender;
 - (IBAction) setMasterModeButtonAction:(id)sender;
 - (IBAction) setSlaveModeButtonAction:(id)sender;
 

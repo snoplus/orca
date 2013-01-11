@@ -571,7 +571,6 @@ typedef struct {
 	uint32_t stamp_lsb;        // previously in cew: temps_pd_faible
 	uint32_t PPS_count;        // computed from the header pattern in the data stream (previously in cew: temps_seconde (time in  seconds))
 	uint32_t size_bytes;       // = sizeof(TypeIpeCrateStatusBlock)
-	uint32_t version;          // _may_ be useful in some particular cases (version of C code/firmware/hardware?) 
     //SLT register:
 	uint32_t SLTTimeLow;       // the according SLT register
 	uint32_t SLTTimeHigh;      // the according SLT register
@@ -579,8 +578,10 @@ typedef struct {
 	uint32_t pixbus_enable;
     //software (ipe4reader) status:
 	uint32_t prog_status;      // previously in cew: micro_bbv2, BBv2/2.3/3 programming
+	uint32_t error_counter;
 	uint32_t internal_error_info;
 	uint32_t ipe4reader_status;
+	uint32_t version;          // _may_ be useful in some particular cases (version of C code/firmware/hardware?) 
 	uint32_t spare1;           // reserved for future usage
 	uint32_t spare2;           // reserved for future usage
 } TypeIpeCrateStatusBlock;

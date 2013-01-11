@@ -317,7 +317,7 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
                 ptr += sizeof(TypeStatusHeader);
                 if(header->identifiant == 0x0000ffff){//this is a synchro status packet: first packet is a TypeIpeCrateStatusBlock
                     TypeIpeCrateStatusBlock *crateStatusBlock=(TypeIpeCrateStatusBlock *)ptr;
-				    NSLog(@"  IPE crate status block:     PPS %i \n",crateStatusBlock->PPS_count);
+				    NSLog(@"  IPE crate status block:     PPS %i (0x%08x)\n",crateStatusBlock->PPS_count,crateStatusBlock->PPS_count);
 				    NSLog(@"      OperaStatus1 0x%08x (d0: %i)\n",crateStatusBlock->OperaStatus1,crateStatusBlock->OperaStatus1 & 0xfff);
 				    NSLog(@"      size_bytes %i \n",crateStatusBlock->size_bytes);
                     //let ptr point behind current block (usually the first TypeBBStatusBlock )
@@ -372,6 +372,7 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
 
 #pragma mark ***External Strings
 
+NSString* OREdelweissSLTModelSltDAQModeChanged = @"OREdelweissSLTModelSltDAQModeChanged";
 NSString* OREdelweissSLTModelNumRequestedUDPPacketsChanged = @"OREdelweissSLTModelNumRequestedUDPPacketsChanged";
 NSString* OREdelweissSLTModelIsListeningOnDataServerSocketChanged = @"OREdelweissSLTModelIsListeningOnDataServerSocketChanged";
 NSString* OREdelweissSLTModelOpenCloseDataCommandSocketChanged = @"OREdelweissSLTModelOpenCloseDataCommandSocketChanged";
@@ -541,6 +542,22 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 }
 
 #pragma mark •••Accessors
+
+- (int) sltDAQMode
+{
+    return sltDAQMode;
+}
+
+- (void) setSltDAQMode:(int)aSltDAQMode
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSltDAQMode:sltDAQMode];
+    
+    sltDAQMode = aSltDAQMode;
+    if(sltDAQMode<0) sltDAQMode=0;
+    if(sltDAQMode>4) sltDAQMode=4;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelSltDAQModeChanged object:self];
+}
 
 - (int) numRequestedUDPPackets
 {
@@ -2346,6 +2363,7 @@ NSLog(@"WARNING: %@::%@: STILL UNDER CONSTRUCTION! \n",NSStringFromClass([self c
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
 	
+	[self setSltDAQMode:[decoder decodeIntForKey:@"sltDAQMode"]];
 	[self setNumRequestedUDPPackets:[decoder decodeIntForKey:@"numRequestedUDPPackets"]];
 	[self setCrateUDPDataReplyPort:[decoder decodeIntForKey:@"crateUDPDataReplyPort"]];
 	[self setCrateUDPDataIP:[decoder decodeObjectForKey:@"crateUDPDataIP"]];
@@ -2403,6 +2421,7 @@ NSLog(@"WARNING: %@::%@: STILL UNDER CONSTRUCTION! \n",NSStringFromClass([self c
 {
 	[super encodeWithCoder:encoder];
 	
+	[encoder encodeInt:sltDAQMode forKey:@"sltDAQMode"];
 	[encoder encodeInt:numRequestedUDPPackets forKey:@"numRequestedUDPPackets"];
 	[encoder encodeInt:crateUDPDataReplyPort forKey:@"crateUDPDataReplyPort"];
 	[encoder encodeObject:crateUDPDataIP forKey:@"crateUDPDataIP"];
@@ -2487,7 +2506,6 @@ NSLog(@"WARNING: %@::%@: STILL UNDER CONSTRUCTION! \n",NSStringFromClass([self c
 #pragma mark •••Data Taker
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-
 //TODO: UNDER construction -tb-
 //TODO: UNDER construction -tb-
 //TODO: UNDER construction -tb-
@@ -2521,8 +2539,15 @@ NSLog(@"WARNING: %@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class])
 	
 	for(id obj in dataTakers){ //the SLT calls runTaskStarted:userInfo: for all FLTs -tb-
         [obj runTaskStarted:aDataPacket userInfo:userInfo];
+         #if 0
+        if([obj  isSubclassOfClass: NSClassFromString(@"OREdelweissFLTModel")]){
+            //DEBUG
+            NSLog(@"    %@::%@: found a OREdelweissFLTModel data taker! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+        }
+         #endif
     }
 	
+
 	
 	[self readStatusReg];
 //TODO: UNDER construction -tb-
