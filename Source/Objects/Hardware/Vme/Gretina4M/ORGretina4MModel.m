@@ -514,7 +514,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 {
     unsigned long value = aValue;
     [[self adapter] writeLongBlock:&value
-                         atAddress:anAddress
+                         atAddress:[self baseAddress] + anAddress
                         numToWrite:1
 					    withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
