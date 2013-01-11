@@ -546,57 +546,57 @@ Structure_trame_status;
 
 //-----------------------------------------------------------------------------------------------------------tb-
 //----- Definition of the KIT/IPE crate status packets
-//-----    1.) Crate Status
-//-----    2.) BB Status
+//-----    1.) Header
+//-----    2.) Crate Status
+//-----    3.) BB Status
 //-----------------------------------------------------------------------------------------------------------tb-
 
-// (u)int32_t MUST be same size than (u)int4  (32 bit/4 byte) 
+// (u)int32_t MUST be same size as (u)int4  (32 bit/4 byte) 
 
 
 
-//-----    1.) Crate Status
-// the Crate Status consists of the header (TypeCrateStatusHeader) and one or more 'data' blocks (TypeCrateStatusBlock) (the last one with len==0)
+//-----    1.) Header
+//the header is a 32 bit (unsigned) integer and can be regarded as two 16 bit (short unsigned) integers
 typedef struct {
-	uint32_t identifiant;	 // 0x0000ffe0 ?????
-	uint32_t stamp_msb;      // previously in cew: temps_pd_fort
-	uint32_t stamp_lsb;      // previously in cew: temps_pd_faible
-	uint32_t PPS_count;      // previously in cew: temps_seconde (time in  seconds)
-
-} TypeCrateStatusHeader;
+	uint32_t identifiant;	 // 0x0000ffff = synchro packet -> first block is a TypeIpeCrateStatusBlock (+ maybe other status packets)
+	                         // 0x0000fffe = status packet  -> contains one or more BB status blocks TypeBBStatusBlock
+} TypeStatusHeader;
 
 
+
+//-----    2.) Crate Status
+// crate status C
 typedef struct {
-	uint16_t size_bytes;            // = sizeof(TypeCrateStatusBlock)
-	uint32_t d0;             // previously in cew: registre_x, =20  
-	uint32_t prog_status;    // previously in cew: micro_bbv2,   for BBv2/2.3/3 programming
+	uint32_t stamp_msb;        // previously in cew: temps_pd_fort
+	uint32_t stamp_lsb;        // previously in cew: temps_pd_faible
+	uint32_t PPS_count;        // computed from the header pattern in the data stream (previously in cew: temps_seconde (time in  seconds))
+	uint32_t size_bytes;       // = sizeof(TypeIpeCrateStatusBlock)
+	uint32_t version;          // _may_ be useful in some particular cases (version of C code/firmware/hardware?) 
+    //SLT register:
+	uint32_t SLTTimeLow;       // the according SLT register
+	uint32_t SLTTimeHigh;      // the according SLT register
+	uint32_t OperaStatus1;     // contains d0, previously in cew: registre_x, =20  
 	uint32_t pixbus_enable;
+    //software (ipe4reader) status:
+	uint32_t prog_status;      // previously in cew: micro_bbv2, BBv2/2.3/3 programming
 	uint32_t internal_error_info;
-	uint32_t version;        // _may_ be useful in some particular cases (version of C code/firmware/hardware?)
-
-} TypeCrateStatusBlock;
-
-
-
+	uint32_t ipe4reader_status;
+	uint32_t spare1;           // reserved for future usage
+	uint32_t spare2;           // reserved for future usage
+} TypeIpeCrateStatusBlock;
 
 
-//-----    2.) BB Status
+//-----    3.) BB Status Block
+
+// BB status block B
 typedef struct {
-	uint32_t identifiant;	 // 0x0000fffe ?????
-	uint32_t PPS_count;      // 
-	uint32_t version;        // 
-	uint32_t spare1;          // 
-	uint32_t spare2;          // 
-
-} TypeBBStatusHeader;
-
-
-typedef struct {
-	uint16_t size_bytes;  // = sizeof(TypeBBStatusPayload)
-	unsigned char fltIndex;
-	unsigned char fiberIndex;
-	uint32_t spare;             // 
+	uint16_t size_bytes;                        // = sizeof(TypeBBStatusBlock)
+	unsigned char type;                         //(starts counting at 0)
+	unsigned char crateIndex;                   //(starts counting at 0)
+	unsigned char fltIndex;                     //(starts counting at 0)
+	unsigned char fiberIndex;                   //(starts counting at 0)
+	uint32_t spare;                             // reserved for future usage
 	uint16_t bb_status[_nb_mots_status_bbv2];	//_nb_mots_status_bbv2 = 57 -tb-
-
 } TypeBBStatusBlock;
 
 
@@ -757,5 +757,4 @@ while(a1&0x4000) {k++;
 	}
 //  pour retrouver les valeurs signe (le compresseur ne marche qu'avec des entiers non signes sur 14 bit) faire a = (a - 0x2000) 
 */
-
 

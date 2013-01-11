@@ -2509,6 +2509,23 @@ int parseConfigFileLine(char *line)
                   return wasFound;
               }
               
+			  sprintf(pattern,"FLTsendBBstatusMask(");
+              wasFound = searchIndexAndUInt32InString(mystring,pattern,&index,&value);
+              if(wasFound){
+                  FLTSETTINGS::FLT[index].sendBBstatusMask = value;
+                  printf("%s%i): 0x%x\n",pattern,index,FLTSETTINGS::FLT[index].sendBBstatusMask);
+                  return wasFound;
+              }
+              
+			  sprintf(pattern,"FLTsendLegacyBBstatusMask(");
+              wasFound = searchIndexAndUInt32InString(mystring,pattern,&index,&value);
+              if(wasFound){
+                  FLTSETTINGS::FLT[index].sendLegacyBBstatusMask = value;
+                  printf("%s%i): 0x%x\n",pattern,index,FLTSETTINGS::FLT[index].sendLegacyBBstatusMask);
+                  return wasFound;
+              }
+              
+                  
               //(2)   scan loop over FLT index (old)
 	          //char pattern[2000];
 			  int id;
@@ -2565,11 +2582,12 @@ int parseConfigFileLine(char *line)
 				  if(wasFound) return wasFound;
 				  
 
+                  #if 0 //changed scanner/parser, see above ...
 				  sprintf(pattern,"FLTsendBBstatusMask(%i):",id);
 				  wasFound = searchHex32InString(mystring,pattern,&flt.sendBBstatusMask);
 				  if(wasFound) printf("%s 0x%08x\n",pattern,flt.sendBBstatusMask);
 				  if(wasFound) return wasFound;
-				  
+				  #endif
 
 
 			  }
@@ -2934,6 +2952,9 @@ void FIFOREADER::scanFIFObuffer(void)
 
 
 
+        //********************************************************************************************************
+        //*                                    prepare BB status packet                                        *
+        //********************************************************************************************************
 
         if(FIFObuf32avail>=4){//we need all 4 words of the header 'sentence' to extract the time stamp
 		
@@ -3066,44 +3087,49 @@ erreur_synchro_opera	= _erreur_synchro_opera(pt);
             //****************************************************
 			
             
-            #if 0
-            //*    CRATE status packet (deprecated)      *
+            //*    CRATE status packet       *
             //****************************************************
-			UDPPacketScheduler crateStatusScheduler(this);
+			UDPPacketScheduler statusScheduler(this);
             //prepare header
-            TypeCrateStatusHeader crateStatusHeader;
-            crateStatusHeader.identifiant = 0x0000ffe0;
-            crateStatusHeader.stamp_msb = pd_fort;
-            crateStatusHeader.stamp_lsb = pd_faible;
-            crateStatusHeader.PPS_count = udpdataSec;
-            crateStatusScheduler.setHeader(&crateStatusHeader,sizeof(crateStatusHeader));
+            TypeStatusHeader crateStatusHeader;
+            crateStatusHeader.identifiant = 0x0000ffff;
+            statusScheduler.setHeader((char*)&crateStatusHeader,sizeof(crateStatusHeader));
+            statusScheduler.writeHeaderToPayload();
             //payload
-            TypeCrateStatusBlock crateStatusBlock;
-	        crateStatusBlock.size_bytes = sizeof(TypeCrateStatusPayload);            // 
-	        crateStatusBlock.d0 = 20;             // previously in cew: registre_x, =20  
-	        crateStatusBlock.prog_status = 0;     // previously in cew: micro_bbv2,   for BBv2/2.3/3 programming
-	        crateStatusBlock.pixbus_enable = 	pbus->read(SLTPixbusEnableReg);
+            TypeIpeCrateStatusBlock crateStatusBlock;
+            crateStatusBlock.stamp_msb = pd_fort;
+            crateStatusBlock.stamp_lsb = pd_faible;
+            crateStatusBlock.PPS_count = udpdataSec;
+	        crateStatusBlock.size_bytes = sizeof(crateStatusBlock);            // 
+	        crateStatusBlock.version = VERSION_IPE4READOUT;        // _may_ be useful in some particular cases (version of C code/firmware/hardware?)
+            //SLT register:
+	        crateStatusBlock.SLTTimeLow    =  pbus->read(SLTTimeLowReg);       // the according SLT register
+	        crateStatusBlock.SLTTimeHigh   =  pbus->read(SLTTimeHighReg);       // the according SLT register
+	        crateStatusBlock.OperaStatus1  = OperaStatus1;     // contains d0, previously in cew: registre_x, =20  
+	        crateStatusBlock.pixbus_enable = pbus->read(SLTPixbusEnableReg);
+            //Software status:
+            crateStatusBlock.prog_status         = 0;
+            crateStatusBlock.internal_error_info = 0;
+            crateStatusBlock.ipe4reader_status   = FIFOREADER::State;
+            crateStatusBlock.spare1 = 1;
+            crateStatusBlock.spare2 = 2;
+            //append status to payload
+            statusScheduler.appendDataSendIfFull((char*)&crateStatusBlock,sizeof(crateStatusBlock));
 
-	        crateStatusBlock.internal_error_info;
-	        crateStatusBlock.version;        // _may_ be useful in some particular cases (version of C code/firmware/hardware?)
-            #endif
             
             //****************************************************
             //*         BB status packet(s)                      *
             //****************************************************
-			UDPPacketScheduler BBStatusScheduler(this);
             //prepare header
-            TypeBBStatusHeader BBStatusHeader;
+            TypeStatusHeader BBStatusHeader;
             BBStatusHeader.identifiant = 0x0000fffe;
-            BBStatusHeader.PPS_count = udpdataSec;
-            BBStatusHeader.version   = VERSION_IPE4READOUT;
-            BBStatusHeader.spare1 = 1;
-            BBStatusHeader.spare2 = 2;
-            BBStatusScheduler.setHeader((char*)&BBStatusHeader,sizeof(BBStatusHeader));
+            statusScheduler.setHeader((char*)&BBStatusHeader,sizeof(BBStatusHeader));
             //payload
             TypeBBStatusBlock BBStatusPayload;
-            BBStatusPayload.size_bytes = sizeof(TypeBBStatusBlock);
-            BBStatusPayload.fltIndex = 0;
+            BBStatusPayload.size_bytes = sizeof(BBStatusPayload);
+            BBStatusPayload.type = 0;        //type of status block
+            BBStatusPayload.crateIndex = 0;  //TODO: read from crate backplane
+            BBStatusPayload.fltIndex   = 0;
             BBStatusPayload.fiberIndex = 0;
             BBStatusPayload.spare = 0;
             
@@ -3139,9 +3165,34 @@ erreur_synchro_opera	= _erreur_synchro_opera(pt);
 								}
 							   //dbg printf("\n");
 								  //printf("   Reading status bits of fiber %i  from FLT#  %i (idx %i): BBv# 0x%04x\n",fiber,numFLT,idx,temp_status_bbv2_1_16[0]);
-                                BBStatusScheduler.appendData((char*)&BBStatusPayload,sizeof(TypeBBStatusBlock));
+                                statusScheduler.appendDataSendIfFull((char*)&BBStatusPayload,sizeof(BBStatusPayload));
+                            }
+                            
 
-                                #if 1
+                            #if 1  //TODO: remove in the future -tb-
+							if(flt.sendLegacyBBstatusMask & bit[fiber]){
+								//printf("Status bits fiber %i read from FLT %i with ID %i:\n",fiber,idx,numFLT);
+								int i;
+								uint32_t status;
+								uint16_t *status16 = (uint16_t *)(&status);
+								int numChan =fiber;
+								for(i=0; i<32; i++){
+									status = pbus->read(FLTBBStatusReg(numFLT, numChan)+i);
+									temp_status_bbv2_1[i]=status;//TODO: immediately copy it! see below ... -tb-
+									//printf("0x%08x ",status);
+									//dbg printf("%04x.%04x.",status16[0],status16[1]);
+								}
+                                //build BB status packet
+                                BBStatusPayload.fltIndex = idx;
+                                BBStatusPayload.fiberIndex = fiber;
+								for(i=0; i<_nb_mots_status_bbv2; i++){
+                                    BBStatusPayload.bb_status[i] = temp_status_bbv2_1_16[i];//TODO: immediately copy it when OPERA status is removed! -tb-
+									//printf("bb_status %i: 0x%08x ",i,BBStatusPayload.bb_status[i]);
+								}
+							   //dbg printf("\n");
+								  //printf("   Reading status bits of fiber %i  from FLT#  %i (idx %i): BBv# 0x%04x\n",fiber,numFLT,idx,temp_status_bbv2_1_16[0]);
+                                statusScheduler.appendDataSendIfFull((char*)&BBStatusPayload,sizeof(BBStatusPayload));
+
                                 //****************************************************
                                 //*    BEGIN - OPERA status packet (deprecated)      *
                                 //****************************************************
@@ -3161,8 +3212,8 @@ erreur_synchro_opera	= _erreur_synchro_opera(pt);
                                 //****************************************************
                                 //*    END - OPERA status packet (deprecated)      *
                                 //****************************************************
-                                #endif
 							}
+                            #endif
 						}
 					}
 								
@@ -3193,7 +3244,8 @@ erreur_synchro_opera	= _erreur_synchro_opera(pt);
 						}
 					}
 				}//for(idx ...
-                BBStatusScheduler.sendScheduledData();
+                //if(statusScheduler.sendPacketCounter==0)
+                statusScheduler.sendScheduledData();
 				
 			}//if(send_status_udp_packet ...
 			

@@ -243,39 +243,39 @@ uint32_t bit30 = 0x40000000;
 uint32_t bit31 = 0x80000000;
 
 uint32_t bit[32] = {
-bit0  ,
-bit1  ,
-bit2  ,
-bit3  ,
-bit4  ,
-bit5  ,
-bit6  ,
-bit7  ,
-bit8  ,
-bit9  ,
-bit10 ,
-bit11 ,
-bit12 ,
-bit13 ,
-bit14 ,
-bit15 ,
+   0x00000001,
+   0x00000002,
+   0x00000004,
+   0x00000008,
+   0x00000010,
+   0x00000020,
+   0x00000040,
+   0x00000080,
+   0x00000100,
+   0x00000200,
+   0x00000400,
+   0x00000800,
+   0x00001000,
+   0x00002000,
+   0x00004000,
+   0x00008000,
 
-bit16 ,
-bit17 ,
-bit18 ,
-bit19 ,
-bit20 ,
-bit21 ,
-bit22 ,
-bit23 ,
-bit24 ,
-bit25 ,
-bit26 ,
-bit27 ,
-bit28 ,
-bit29 ,
-bit30 ,
-bit31 
+   0x00010000,
+   0x00020000,
+   0x00040000,
+   0x00080000,
+   0x00100000,
+   0x00200000,
+   0x00400000,
+   0x00800000,
+   0x01000000,
+   0x02000000,
+   0x04000000,
+   0x08000000,
+   0x10000000,
+   0x20000000,
+   0x40000000,
+   0x80000000,
 };
 
 /*--------------------------------------------------------------------
@@ -563,6 +563,7 @@ public:
 	
     //configuration of readout loop
 	uint32_t sendBBstatusMask;
+	uint32_t sendLegacyBBstatusMask;//send the OPERA style status packet (sendBBstatusMask then should be 0)
 	
     //aux vars
 	int32_t fltID;
@@ -583,6 +584,7 @@ public:
 	    
         // SW
 	    sendBBstatusMask=0x0;
+        sendLegacyBBstatusMask=0x0;
         
         //aux vars
         isPresent = 0;
@@ -613,33 +615,52 @@ public:
 //#define UDPStatusPacketSize 1480
 #define UDPStatusPacketSize MAX_UDP_STATUSPACKET_SIZE
 
+// Class to assemble (status) UDP packets, controlling the current buffer size, packing additional packets as needed.
+//
+//   Stores the header in 'headerBuf'; collects data (header+status structs) in payload buffer 'buf';
+//     method 'appendDataSendIfFull' handles sending of UDP packets (i.e. sends UDP packet if 'buf' is full, clears buffer and restarts filling 'buf')
+//     method 'sendScheduledData()' appends 0 to the packet and sends all buffered data; should be called after the last call to 'appendDataSendIfFull' to send pending data
+//     ('appendDataSendIfFull' uses 'sendScheduledData()')
 class UDPPacketScheduler{
 public:
     //ctor
-    UDPPacketScheduler(FIFOREADER *fr):len(0),headerLen(0),sizeofLen(sizeof(uint16_t)){ myFiforeader=fr; sizeofLen=sizeof(uint16_t); }
+    UDPPacketScheduler(FIFOREADER *fr):len(0),headerLen(0),sizeofLen(sizeof(uint32_t)),sendPacketCounter(0)
+        { myFiforeader=fr; sizeofLen=sizeof(uint16_t); bufHeaderLen=0; }
     char buf[UDPStatusPacketSize];
+    char header[UDPStatusPacketSize];
     //char headerBuf[UDPStatusPacketSize];
     int len;//total length of data
     int headerLen;//length of header (which will be fixed for one series of packets)
-    int sizeofLen;//=2=short
+    int bufHeaderLen;//length of header (which will be fixed for one series of packets)
+    int sizeofLen;//=integer (currently 4 byte, 2 byte would be sufficient); each UDP packet ends with a 0 of this size (2 or 4 bytes)
+    int sendPacketCounter;//for debugging
     FIFOREADER *myFiforeader; //used for sending out UDP packets
+    
+    //methods
     void resetBuf(){ len=0; headerLen=0; }
-    void resetPayloadBuf(){ len=headerLen;  }
-    int setHeader(char *data, int length){
-        if(len!=0) printf("ERROR in UDPPacketScheduler::setHeader\n");
+    void resetPayloadBuf(){ len=0; bufHeaderLen=0;  }
+    int setHeader(char *data, int length){//store the header (the stored header will be used automatically after sending a packet (eg. appendDataSendIfFull))
+        if(length>(UDPStatusPacketSize-sizeofLen)){ printf("ERROR in UDPPacketScheduler::setHeader: header size exceeds UDP packet size!\n"); return 1; }
         headerLen=length;
-        len=headerLen;
-        for(int i=0;i<headerLen;i++) buf[i]=data[i];
+        for(int i=0;i<headerLen;i++) header[i]=data[i];
         return 0;
     }
-    int appendData(char *data, int length){
+    int writeHeaderToPayload(){
+        if(len!=0) printf("ERROR in UDPPacketScheduler::writeHeaderToPayload(): payload not empty!\n");
+        for(int i=0;i<headerLen;i++) buf[i]=header[i];
+        len=headerLen;
+        bufHeaderLen=headerLen;
+        return 0;
+    }
+    int appendDataSendIfFull(char *data, int length){
         if(length>(UDPStatusPacketSize-headerLen-sizeofLen)){ printf("ERROR in UDPPacketScheduler::appendData: data exceeds UDP packet size!\n"); return 1; }
         if(headerLen==0) printf("WARNING in UDPPacketScheduler::appendData: headerLen is 0\n");
         if(!canHoldNumBytes(length)){//full, send current buffer
-            //append 0, adjust len, send data
-            appendZeroBytes(sizeofLen);
-            sendOutUDPPacket();
-            resetPayloadBuf();
+            sendScheduledData();
+        }
+        if(!canHoldNumBytes(length)){//full, send current buffer
+            //we cleared the payload buf previously, still no place => header + data exceeds max. packet size => ERROR
+            printf("ERROR in UDPPacketScheduler::appendDataSendIfFull: header+data size exceeds UDP packet size!\n"); return 1;
         }
         //append the data
         for(int i=0;i<length;i++) buf[len+i]=data[i];
@@ -650,13 +671,16 @@ public:
     int bodyLen(){ return len-headerLen; }
     int appendZeroBytes(int num){ for(int i=0; i<num; i++) buf[len+i]=0; len +=num; return 0; }
     void sendScheduledData(){
-        if(len<=headerLen) return;//payload empty ('<' would be enough)
+        if(len<=bufHeaderLen) return;//payload empty ('<' would be enough)
+            //append 0, adjust len, send data
             appendZeroBytes(sizeofLen);
             sendOutUDPPacket();
             resetPayloadBuf();
+            writeHeaderToPayload();
     }
     void sendOutUDPPacket(){
         myFiforeader->sendtoUDPClients(0,buf,len);
+        sendPacketCounter++;
     }
 };
 

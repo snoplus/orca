@@ -52,8 +52,6 @@ January 2011,  implemented general read and write, new
 */ //-tb-
 
 
-#define USE_PBUS 0
-//Define USE_PBUS for usage of the pbusaccess library (obsolete, will be removed/changed in the future) -tb- 2010-04-09
 
 
 #ifdef __cplusplus
@@ -80,15 +78,6 @@ extern "C" {
 #endif
 
 
-#if USE_PBUS
-#ifdef __cplusplus
-extern "C" {
-#endif
-#include "pbusinterface.h"
-#ifdef __cplusplus
-}
-#endif
-#endif
 
 
 #if PMC_COMPILE_IN_SIMULATION_MODE
@@ -137,9 +126,6 @@ void FindHardware(void)
 {
     //open device driver(s), get device driver handles
     const char* name = "FE.ini";
-#if USE_PBUS
-    pbusInit((char*)name);
-#else
     //TODO: check here blocking semaphores? -tb-
 	
 	
@@ -156,18 +142,23 @@ void FindHardware(void)
 		if (pbus > 0) pbus->free();
 		pbus = new Pbus();
 		pbus->init();
+        //TODO: when stopping (!) Orca (closing the socket) 'FindHardware()' is called AND pbus->init() seems to fail (with perror: File exists) -tb- 2013
+        //     -> stopping Orca calls FindHardware()!
+        //anyway OrcaReadout works correct! (... 'pbus' changes i.e. seems to be released correctly ... [was 'nil' before entering FindHardware()])
+        //         printf("    test  after pbus->init(): pbus is %p \n",pbus);
 	} catch (PbusError &e){
 		err = 1;
 	}
 	if(err) printf("HW_Readout.cc (IPE EW DAQ V4): ERROR: Creating Pbus failed!\n");
-#endif
+    if(err) perror("   perror is");
+    #endif
     if(!pbus) fprintf(stdout,"HW_Readout.cc (IPE EW DAQ V4): ERROR: could not connect to Pbus!\n");
 
     //pbus test
     std::string getStr, cmdStr;
     cmdStr = "blockmode";
     pbus->get(cmdStr,&getStr);
-    printf("   Pbus:: get %s: result: %s \n",cmdStr.c_str(),getStr.c_str());
+    printf("   SLT PCI mode test: Pbus:: get %s: result: %s \n",cmdStr.c_str(),getStr.c_str());
 
     // test/force the C++ link to fdhwlib -tb-
     if(0){// unused, but compiled! -tb-
@@ -178,18 +169,13 @@ void FindHardware(void)
         printf("  ->register name is %s, addr 0x%08lx\n", reg->getName(),reg->getAddr());
         fflush(stdout);
     }
-#endif
 }
 
 void ReleaseHardware(void)
 {
     //release / close device driver(s)
-#if USE_PBUS
-    pbusFree();
-#else
+    pbus->free();
     pbus = 0;
-    //delete srack;
-#endif
 }
 
 void doWriteBlock(SBC_Packet* aPacket,uint8_t reply)
@@ -206,17 +192,12 @@ void doWriteBlock(SBC_Packet* aPacket,uint8_t reply)
     
     //**** use device driver call to write data to HW
     int32_t perr = 0;
-#if USE_PBUS
-    if (numItems == 1)    perr = pbusWrite(startAddress, *lptr);
-    else                perr = pbusWriteBlock(startAddress, (unsigned long *) lptr, numItems);
-#else
     try{
         if (numItems == 1)  pbus->write(startAddress, *lptr);
         else                pbus->writeBlock(startAddress, (unsigned long *) lptr, numItems);
     }catch(PbusError &e){
         perr = 1;
     }
-#endif
     
     /* echo the structure back with the error code*/
     /* 0 == no Error*/
@@ -249,7 +230,7 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply)
     
     uint32_t startAddress   = p->address;
     int32_t numItems        = p->numItems;
-    //TODO: -tb- debug printf("starting read: %08x %d\n",startAddress,numItems);
+    //TODO: -tb- debug     printf("starting read: %08x numItems: %d\n",startAddress,numItems);
     
     if (numItems*sizeof(uint32_t) > kSBC_MaxPayloadSizeBytes) {
         sprintf(aPacket->message,"error: requested greater than payload size.");
@@ -268,21 +249,15 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply)
     unsigned long *lPtr = (unsigned long *) returnPayload;
     
     int32_t perr   = 0;
-#if USE_PBUS
-    if (numItems == 1)  perr = pbusRead(startAddress, lPtr);
-    else                perr = pbusReadBlock(startAddress, lPtr, numItems);
-    //TODO: -tb- printf("perr: %d\n",perr);
-#else
     try{
         if (numItems == 1){
 		    *lPtr = pbus->read(startAddress);
-			//printf("read from 0x%x, value is %i (0x%x)\n",startAddress, *lPtr,*lPtr);//TODO: debugging
+			//            printf("read from 0x%x, value is %i (0x%x)\n",startAddress, *lPtr,*lPtr);//TODO: debugging
 		}
         else                pbus->readBlock(startAddress, (unsigned long *) lPtr, numItems);
     }catch(PbusError &e){
         perr = 1;
     }
-#endif
      
     returnDataPtr->address         = startAddress;
     returnDataPtr->numItems        = numItems;

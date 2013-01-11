@@ -912,6 +912,18 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (unsigned long)  readVersion
 {	
+    #if 0 //test - currently this results in infinite recursion !  -tb-
+    unsigned long val=0;
+	[self readBlock: kFLTV4VersionReg dataBuffer: &val length: 1 ];
+    return val;
+    #endif
+    #if 0 //test - currently this results in infinite recursion !  -tb-
+    unsigned long val=0;
+	//[self readBlock: kFLTV4VersionReg dataBuffer: &val length: 1 ];
+    unsigned long address=  [self regAddress:kFLTV4VersionReg]  ;
+	[self readBlock: address dataBuffer: &val length: 1  increment: 1 ];
+    return val;
+    #endif
 	return [self readReg: kFLTV4VersionReg];
 }
 
@@ -1164,7 +1176,23 @@ exit(666);
     unsigned long totalTriggerN = [self readReg:kFLTV4TotalTriggerNReg];
  	NSLog(@" totalTriggerN: %i\n",totalTriggerN);//TODO: DEBUG testing ...-tb-
  	NSLog(@" selectFiberTrig: %i\n",selectFiberTrig);//TODO: DEBUG testing ...-tb-
-	int num=5;
+	int num=128;//MUST be > 48!
+	int shownum=6;//MUST be > 48!
+
+    #if 1
+    //uint32_t buf[2048];
+    unsigned long  buf[2048];
+    int i,chan;
+    for(chan=0; chan<6;chan++){
+        //unsigned long address=  [self regAddress:kFLTV4RAMDataReg channel: chan index:i]  ;
+        //unsigned long address=  [self regAddress:kFLTV4RAMDataReg ]  ;
+        unsigned long address=  [self regAddress: kFLTV4RAMDataReg   channel: chan]  ;
+	    [self readBlock: address dataBuffer: buf length: num  increment: 1 ];
+	    for (i=0; i<shownum; i++) {
+ 	        NSLog(@" adcval chan: %i index %i: 0x%08x\n",chan,i,buf[i]);//TODO: DEBUG testing ...-tb-
+        }
+	}
+    #else
 	int chan = 0;
 	int i;
 	unsigned long adcval;
@@ -1174,6 +1202,8 @@ for(chan=0; chan<6;chan++)
  	    NSLog(@" adcval chan: %i index %i: 0x%08x\n",chan,i,adcval);//TODO: DEBUG testing ...-tb-
 
 	}
+    
+    #endif
 }
 
 - (unsigned long) regAddress:(int)aReg channel:(int)aChannel index:(int)index
@@ -1227,6 +1257,13 @@ for(chan=0; chan<6;chan++)
 {
 	[self write:[self regAddress:aReg channel:aChannel] value:aValue];
 }
+
+- (void) readBlock:(int)aReg dataBuffer:(unsigned long*)aDataBuffer length:(unsigned long)length
+{
+    [self readBlock:[self regAddress:aReg] dataBuffer:aDataBuffer length:length increment:1];
+
+}
+
 
 - (void) writeThreshold:(int)i value:(unsigned int)aValue
 {

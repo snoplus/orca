@@ -303,15 +303,34 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
         //
         if(retval>=4){
             uint32_t *hptr = (uint32_t *)(readBuffer);
-            //--->BB status packet(s)
-            if(*hptr == 0x0000fffe){//this is a BB status packet
-                TypeBBStatusHeader *BBheader = (TypeBBStatusHeader *)readBuffer;
-				NSLog(@"      BB status packet: header 0x%08x ,     length (bytes) %i  , PPS_count %i\n",*hptr ,retval,BBheader->PPS_count);
+            char *ptr=readBuffer;
+            //--->synchro status packet
+            if(retval==284 && (*hptr == 0x0000ffff)){
+                //this is a 'old' status packet, skip parsing
+				NSLog(@"    -- Found a OLD STYLE Status packet: header 0x%08x , size %i, skip parsing!\n",*hptr, retval);
+                continue;
+            }
+            if((*hptr == 0x0000ffff) || (*hptr == 0x0000fffe) ){//this is a synchro status packet
+                TypeStatusHeader *header = (TypeStatusHeader *)readBuffer;
+				NSLog(@"  Found a Status packet: header 0x%08x ,     length (bytes) %i \n",header->identifiant ,retval);
+                //let ptr point to first statusBlock 
+                ptr += sizeof(TypeStatusHeader);
+                if(header->identifiant == 0x0000ffff){//this is a synchro status packet: first packet is a TypeIpeCrateStatusBlock
+                    TypeIpeCrateStatusBlock *crateStatusBlock=(TypeIpeCrateStatusBlock *)ptr;
+				    NSLog(@"  IPE crate status block:     PPS %i \n",crateStatusBlock->PPS_count);
+				    NSLog(@"      OperaStatus1 0x%08x (d0: %i)\n",crateStatusBlock->OperaStatus1,crateStatusBlock->OperaStatus1 & 0xfff);
+				    NSLog(@"      size_bytes %i \n",crateStatusBlock->size_bytes);
+                    //let ptr point behind current block (usually the first TypeBBStatusBlock )
+                    ptr += crateStatusBlock->size_bytes;
+                }else{
+				    NSLog(@"  BB status block UDP  packet:    id %i \n",header->identifiant);
+                }
+
+                //this is a BB status packet
+#if 1
+                //--->BB status packet(s)
                 TypeBBStatusBlock *BBblock;
                 int BBblockLen, counter=0;
-                char *ptr=readBuffer;
-                //let ptr point to first TypeBBStatusBlock 
-                ptr += sizeof(TypeBBStatusHeader);
                 BBblock=(TypeBBStatusBlock*)ptr;
                 BBblockLen = BBblock->size_bytes;
                 while(BBblockLen>0){
@@ -320,6 +339,10 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
                                  counter,BBblock->size_bytes,BBblock->fltIndex,BBblock->fiberIndex,BBblock->bb_status[0],BBblock->bb_status[1]);
                     //let ptr point to next TypeBBStatusBlock 
                     ptr += BBblockLen;
+                    if((ptr-readBuffer) > MAX_UDP_STATUSPACKET_SIZE){
+				        NSLog(@"    -- ERROR: prt behind MAX_UDP_STATUSPACKET_SIZE(%):  %i  , skip parsing!\n",MAX_UDP_STATUSPACKET_SIZE, ptr-readBuffer);
+                        continue;
+                    }
                     BBblock=(TypeBBStatusBlock*)ptr;
                     BBblockLen = BBblock->size_bytes;
                     if((ptr-readBuffer) > MAX_UDP_STATUSPACKET_SIZE){  //is 1480
@@ -327,6 +350,7 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
                         break;
                     }
                 }
+#endif
             }
         }
 
@@ -2849,5 +2873,22 @@ NSLog(@"WARNING: %@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class])
 					  atAddress:address
 					 numToWrite:1];
 }
+
+
+- (void) readBlock:(unsigned long)  address 
+		dataBuffer:(unsigned long*) aDataBuffer
+			length:(unsigned long)  length 
+		 increment:(unsigned long)  incr
+{
+    //DEBUG   NSLog(@"%@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+	if(![pmcLink isConnected]){
+		[NSException raise:@"Not Connected" format:@"Socket not connected."];
+	}
+	[pmcLink readLongBlockPmc:   aDataBuffer
+					  atAddress: address
+					  numToRead: length];
+}
+
+
 @end
 
