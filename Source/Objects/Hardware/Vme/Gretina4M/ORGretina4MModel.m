@@ -1169,7 +1169,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	NSLog(@"Main FGPA version: 0x%x \n", mainVersion);
 		
 	if (mainVersion != kCurrentFirmwareVersion){
-		NSLog(@"Main FPGA version does not match: it should be 0x%x, but now it is 0x%x \n", kCurrentFirmwareVersion,mainVersion);
+		NSLog(@"Main FPGA version does not match: 0x%x is required but 0x%x is loaded.\n", kCurrentFirmwareVersion,mainVersion);
 		//return;
 	}
 	
@@ -1184,16 +1184,16 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	
 	//write the channel level params
     int i;
-	//if (doEnableChannels) {
+	if (doEnableChannels) {
 		for(i=0;i<kNumGretina4MChannels;i++) {
 			[self writeControlReg:i enabled:[self enabled:i]];
 		}
-    //}
-	//else {
-	//	for(i=0;i<kNumGretina4MChannels;i++) {
-	//		[self writeControlReg:i enabled:NO];
-	//	}
-	//}
+    }
+	else {
+		for(i=0;i<kNumGretina4MChannels;i++) {
+			[self writeControlReg:i enabled:NO];
+		}
+	}
     for(i=0;i<kNumGretina4MChannels;i++) {
         [self writeLEDThreshold:i];
         [self writeWindowTiming:i];
@@ -2891,7 +2891,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
     [ORTimer delay:0.5];
-    aValue = 0x1;
+    aValue = 0x0;
     [[self adapter] writeLongBlock:&aValue
 						 atAddress:[self baseAddress] + fpga_register_information[kMainFPGAControl].offset
 						numToWrite:1
