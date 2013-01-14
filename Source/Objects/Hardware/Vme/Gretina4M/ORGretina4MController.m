@@ -723,7 +723,7 @@
     if(aNote == nil){
         short i;
         for(i=0;i<kNumGretina4MChannels;i++){
-            [[tpolMatrix  cellWithTag:i] selectItemAtIndex:[model tpol:i]];
+            [[tpolMatrix cellAtRow:i column:0] selectItemAtIndex:[model tpol:i]];
         }
     }
     else {
@@ -738,7 +738,7 @@
     if(aNote == nil){
         short i;
         for(i=0;i<kNumGretina4MChannels;i++){
-            [[triggerModeMatrix  cellWithTag:i] selectItemAtIndex:[model triggerMode:i]];
+            [[triggerModeMatrix cellAtRow:i column:0] selectItemAtIndex:[model triggerMode:i]];
         }
     }
     else {
@@ -1371,6 +1371,9 @@
 		NSLog(@"Collection: %g us\n",       [model collectionTimeConverted]);
 		NSLog(@"Integration Time: %g us\n", [model integrateTimeConverted]);
 		NSLog(@"Down sample: x%d\n", (int) pow(2,[model readDownSample]));
+        
+        
+        
         
     }
 	@catch(NSException* localException) {
