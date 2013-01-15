@@ -1842,8 +1842,13 @@ void populateIPECrateStatusPacket()
 	          address = strtoul((const char *)&buffer[9],0,0);
 	          value   = strtoul((const char *)&buffer[20],0,0);
 	          pbusAddress = (    address | (fltID << 19)    )   >> 2;
-	          printf("handleKCommand: This is a valid KWF command! Write to FLT %iaddress 0x%08x (pbusAddress:0x%08x)  value 0x%08x\n",fltID,address,pbusAddress,value);
-	          pbus->write(pbusAddress,value);
+	          printf("handleKCommand: This is a valid KWF command! Write to FLT %i address 0x%08x (pbusAddress:0x%08x)  value 0x%08x\n",fltID,address,pbusAddress,value);
+	          // if(FLTSETTINGS::FLT[fltID-1].isPresent){
+	          if(FLTSETTINGS::isPresentFLTID(fltID)){
+    	          pbus->write(pbusAddress,value);
+              }else{
+	              printf("  ERROR: FLT %i not present! Nothing written!\n",fltID);
+              }
 	      }
 	      else
 	      if(buffer[2] == 'C' && len>=5){
@@ -3422,7 +3427,8 @@ uint32_t InitFLTs()
 	for(int i=0; i<FLTSETTINGS::maxNumFLT; i++){
 		//
 		FLTSETTINGS &FLT = FLTSETTINGS::FLT[i];
-	    if(! (presentFLTMap & bit[i])) continue;
+	    if(! FLT.isPresent) continue;
+	    //if(! (presentFLTMap & bit[i])) continue;
 	    //if(FLT.fiberEnable==0) continue;
 	    fltID = FLT.fltID;
 	    printf("Init FLT # %i (index %i)\n",fltID,i);

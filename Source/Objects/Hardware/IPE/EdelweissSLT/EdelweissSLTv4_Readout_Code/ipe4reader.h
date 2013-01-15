@@ -605,6 +605,17 @@ public:
     
     static FLTSETTINGS * FLT;
 	static const int maxNumFLT = MAX_NUM_FLT_CARDS; //FLTSETTINGS::maxNumFLT
+    
+    static int isPresentFLTIndex(int i){
+        if(i<0 || i>=maxNumFLT) return 0;
+        if(FLT==0) return 0; //not yet initialized
+        return FLT[i].isPresent;
+        return 0;
+    }
+    static int isPresentFLTID(int id){
+        return isPresentFLTIndex(id-1);
+    }
+
 };
 
 
