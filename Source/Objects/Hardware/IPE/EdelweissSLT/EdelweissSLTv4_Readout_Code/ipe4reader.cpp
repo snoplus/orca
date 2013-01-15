@@ -292,6 +292,7 @@ int kbhit3_main(void)
   globals and functions for hardware access
   --------------------------------------------------------------------*/
 #include <Pbus/Pbus.h>
+#include <akutil/semaphore.h>
 
 #pragma warning TODO remove -lkatrinhw4 in Makefile
 //#include "hw4/baseregister.h"
@@ -3663,6 +3664,52 @@ void InitHardwareFIFOs()
 	
 }
 
+ /*--------------------------------------------------------------------
+ *    function:     InitSemaphore
+ *    purpose:      
+ *    author:       Till Bergmann, 2012
+ *
+ *--------------------------------------------------------------------*/ //-tb-
+#include <stdexcept>
+
+#define SEMCMDS_DEFAULT_DIR "/"  //from semcmds.cpp
+
+void InitSemaphore()
+{
+   	semaControl *s;
+    int value;
+    int numS=0;
+    try {
+        s = new semaControl(SEMCMDS_DEFAULT_DIR);
+        s->open();
+        numS = s->number();
+        if(show_debug_info>=1) printf("Number of semaphores: %i\n",numS);
+        
+        int i;
+        for(i=0;i<numS;i++){
+            value = s->value(i);
+            if(show_debug_info>=1) printf("Sem %i has value %i\n",i,value);
+            if(value==0){
+                s->unlock(i);
+                value = s->value(i);
+                printf("    Tried to unlock locked semaphore %i; new value after unlock: %i (expect: 1)\n",i,value);
+            }
+        }
+	  
+        #if 0
+        s->lock(0);//for testing
+	    value = s->value(0);
+        printf("TESTING: Sem 0 has value %i (0=locked)\n",value);
+        #endif
+        
+	    delete s;
+	  
+    } catch (std::invalid_argument &e) {
+        delete s;
+	}  
+
+}
+
 
 /*--------------------------------------------------------------------
   printUsage:
@@ -3711,9 +3758,6 @@ int32_t main(int32_t argc, char *argv[])
     }
     //----------------------------------------------------------- 
 
-
-
-    
 
 
 	//init buffers etc.
@@ -3786,6 +3830,16 @@ int32_t main(int32_t argc, char *argv[])
 	}
     //----------------------------------------------------------- 
 	
+
+
+
+    //init (=release) semaphores
+	if(show_debug_info>=1){
+        printf("Init Semaphores\n");
+        printf("---------------\n");
+    }
+    InitSemaphore();
+
 
 
 
