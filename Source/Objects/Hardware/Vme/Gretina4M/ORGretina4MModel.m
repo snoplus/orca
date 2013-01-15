@@ -746,7 +746,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     
  
  
-    fifoLostEvents = 0;
+    fifoResetCount = 0;
 	isFlashWriteEnabled = NO;
 }
 
@@ -1161,14 +1161,13 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	
 }
 
-- (void) initBoard:(BOOL)doEnableChannels
+- (BOOL) checkFirmwareVersion
 {
-    int i;
-    
-        for(i=0;i<kNumGretina4MChannels;i++) {
-            [self writeControlReg:i enabled:NO];
-        }
+    return [self checkFirmwareVersion:NO];
+}
 
+- (BOOL) checkFirmwareVersion:(BOOL)verbose
+{
 	//find out the Main FPGA version
 	unsigned long mainVersion = 0x00;
 	[[self adapter] readLongBlock:&mainVersion
@@ -1178,13 +1177,23 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 					usingAddSpace:0x01];
 	//mainVersion = (mainVersion & 0xFFFF0000) >> 16;
 	mainVersion = (mainVersion & 0xFFFFF000) >> 12;
-	NSLog(@"Main FGPA version: 0x%x \n", mainVersion);
-		
+	if(verbose)NSLog(@"Main FGPA version: 0x%x \n", mainVersion);
+    
 	if (mainVersion != kCurrentFirmwareVersion){
 		NSLog(@"Main FPGA version does not match: 0x%x is required but 0x%x is loaded.\n", kCurrentFirmwareVersion,mainVersion);
-		//return;
+		return NO;
 	}
-	
+    else return YES;
+}
+
+- (void) initBoard
+{
+    //this function inits the board, but does not write to the control-status register
+    int i;
+    for(i=0;i<kNumGretina4MChannels;i++){
+        [self writeControlReg:i enabled:NO];
+    }
+    
     //[self initSerDes];
     //write the card level params
     [self writeClockSource];
@@ -1195,18 +1204,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [self writeCollectionTime];
     [self writeIntegrateTime];
 	[self writeDownSample];
-	
-	//write the channel level params
-//	if (doEnableChannels) {
-//		for(i=0;i<kNumGretina4MChannels;i++) {
-//			[self writeControlReg:i enabled:[self enabled:i]];
-//		}
- //   }
-//	else {
-//		for(i=0;i<kNumGretina4MChannels;i++) {
-//			[self writeControlReg:i enabled:NO];
-//		}
-//	}
     
     for(i=0;i<kNumGretina4MChannels;i++) {
         if([self enabled:i]){
@@ -1215,9 +1212,9 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
             [self writeRisingEdgeWindow:i];
         }
     }
- 	
-    for(i=0;i<kNumGretina4MChannels;i++) {
-        [self writeControlReg:i enabled:[self enabled:i]];
+    
+    for(i=0;i<kNumGretina4MChannels;i++){
+        [self writeControlReg:i enabled:YES];
     }
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MCardInited object:self];
@@ -1497,161 +1494,44 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 }
 
 
-- (short) clearFIFO
+
+- (void) resetFIFO
 {
-    /* clearFIFO clears the FIFO and then resets the enabled flags on the board to whatever *
-     * was currently set *ON THE BOARD*.                                                    */
-	int count = 0;
+    unsigned long val = 0;
+    [[self adapter] readLongBlock:&val
+                        atAddress:[self baseAddress] + register_information[kProgrammingDone].offset
+                        numToRead:1
+                       withAddMod:[self addressModifier]
+                    usingAddSpace:0x01];
+    
+    val |= (0x1<<27);
+    
+    [[self adapter] writeLongBlock:&val
+                        atAddress:[self baseAddress] + register_information[kProgrammingDone].offset
+                        numToWrite:1
+                       withAddMod:[self addressModifier]
+                    usingAddSpace:0x01];
+  
+    val &= ~(0x1<<27);
+    
+    [[self adapter] writeLongBlock:&val
+                         atAddress:[self baseAddress] + register_information[kProgrammingDone].offset
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
 
-    fifoStateAddress  = [self baseAddress] + register_information[kProgrammingDone].offset;
-    fifoAddress       = [self baseAddress] + 0x1000;
-	theController     = [self adapter];
-	unsigned long  dataDump[0xffff];
-	BOOL errorFound		  = NO;
-	//NSDate* startDate = [NSDate date];
-
-    short boardStateEnabled[kNumGretina4MChannels];
-    short modelStateEnabled[kNumGretina4MChannels];
-    int i;
-    for(i=0;i<kNumGretina4MChannels;i++) {
-        /* First thing, disable all the channels so that nothing is filling the buffer. */
-        /* Reading the *BOARD STATE* (i.e. *not* the *MODEL* state) */
-        boardStateEnabled[i] = [self readControlReg:i] & 0x1;
-        modelStateEnabled[i] = [self enabled:i];
-        [self writeControlReg:i enabled:NO];
-    }
-    NSDate* timeStarted = [NSDate date];
-    while(1){
-		if([[NSDate date] timeIntervalSinceDate:timeStarted]>10){
-			NSLogColor([NSColor redColor], @"%@ unable to clear FIFO -- could be a serious hw problem.\n",[self fullID]);
-			[NSException raise:@"Gretina Card Could not clear FIFO" format:@"%@ unable to clear FIFO -- could be a serious hw problem.",[self fullID]];
-		}
-		
-		unsigned long val = 0;
-		//read the fifo state
-		[theController readLongBlock:&val
-						   atAddress:fifoStateAddress
-						   numToRead:1
-						  withAddMod:[self addressModifier]
-					   usingAddSpace:0x01];
-		if((val & kGretina4MFIFOEmpty) == 0){
-			//read the first longword which should be the packet separator:
-			unsigned long theValue;
-			[theController readLongBlock:&theValue 
-							   atAddress:fifoAddress 
-							   numToRead:1 
-							  withAddMod:[self addressModifier] 
-						   usingAddSpace:0x01];
-			
-			if(theValue==kGretina4MPacketSeparator){
-				//read the first word of actual data so we know how much to read
-				[theController readLongBlock:&theValue 
-								   atAddress:fifoAddress 
-								   numToRead:1 
-								  withAddMod:[self addressModifier] 
-							   usingAddSpace:0x01];
-                if(theValue == kGretina4MPacketSeparator) {
-				    NSLog(@"Clearing FIFO: got two packet separators in a row. Is the FIFO corrupted? (slot %d). \n",[self slot]);
-				    break;
-                }
-				
-				[theController readLongBlock:dataDump 
-								   atAddress:fifoAddress 
-								   numToRead:((theValue & kGretina4MNumberWordsMask)>>16)-1  //number longs left to read
-								  withAddMod:[self addressModifier] 
-							   usingAddSpace:0x01];
-				count++;
-			} 
-			else {
-				if (errorFound) {
-					NSLog(@"Clearing FIFO: lost place in the FIFO twice, is the FIFO corrupted? (slot %d). \n",[self slot]);
-					break;
-				}
-                NSLog(@"Clearing FIFO: FIFO corrupted on Gretina4M card (slot %d), searching for next event... \n",[self slot]);
-                count += [self findNextEventInTheFIFO];
-                NSLog(@"Clearing FIFO: Next event found on Gretina4M card (slot %d), continuing to clear FIFO. \n",[self slot]);
-				errorFound = YES;
-			}
-		} 
-		else { 
-            /* The FIFO has been cleared. */
-            break;
-        }
-		
-    }
-	
-	[[self undoManager] disableUndoRegistration];
-	@try {
-		for(i=0;i<kNumGretina4MChannels;i++) {
-			/* Now reenable all the channels that were enabled before (on the *BOARD*). */
-			[self setEnabled:i withValue:boardStateEnabled[i]];
-			[self writeControlReg:i enabled:YES];
-			[self setEnabled:i withValue:modelStateEnabled[i]];
-		}
-	}
-	@catch(NSException* localException){
-		@throw;
-	}
-	@finally {
-		[[self undoManager] enableUndoRegistration];	
-	}
-	return count;
 }
 
-- (short) findNextEventInTheFIFO
+- (BOOL) fifoIsEmpty
 {
-    /* Somehow the FIFO got corrupted and is no longer aligned along event boundaries.           *
-     * This function will read through to the next boundary and read out the next full event,    *
-     * leaving the FIFO aligned along an event.  The function returns the number of events lost. */
-    unsigned long val;
-    //read the fifo state, sanity check to make sure there is actually another event.
-    NSDate* timeStarted = [NSDate date];
-    while(1){
-		if([[NSDate date] timeIntervalSinceDate:timeStarted]>10){
-			NSLogColor([NSColor redColor], @"%@ unable to find next event in FIFO -- could be a serious hw problem.\n",[self fullID]);
-			[NSException raise:@"Gretina Card Could not find next event in FIFO" format:@"%@ unable to find next event in FIFO -- could be a serious hw problem.",[self fullID]];
-		}
-		
-        [theController readLongBlock:&val
-                           atAddress:fifoStateAddress
-                           numToRead:1
-                          withAddMod:[self addressModifier]
-                       usingAddSpace:0x01];
-        
-        if((val & kGretina4MFIFOEmpty) != 0) {
-            /* We read until the FIFO is empty, meaning we are aligned */
-            return 1; // We have only lost one event.
-        } else {
-            /* We need to continue reading until finding the packet separator */
-            //read the first longword which should be the packet separator:
-            unsigned long theValue;
-            [theController readLongBlock:&theValue 
-                               atAddress:fifoAddress 
-                               numToRead:1 
-                              withAddMod:[self addressModifier] 
-                           usingAddSpace:0x01];
-            
-            if (theValue==kGretina4MPacketSeparator) {
-                //read the first word of actual data so we know how much to read
-                [theController readLongBlock:&theValue 
-                                   atAddress:fifoAddress 
-                                   numToRead:1 
-                                  withAddMod:[self addressModifier] 
-                               usingAddSpace:0x01];
-                unsigned long numberLeftToRead = ((theValue & kGretina4MNumberWordsMask)>>16)-1;
-                unsigned long* dataDump = malloc(sizeof(unsigned long)*numberLeftToRead);
-                [theController readLongBlock:dataDump 
-								   atAddress:fifoAddress 
-								   numToRead:  numberLeftToRead //number longs left to read
-								  withAddMod:[self addressModifier] 
-							   usingAddSpace:0x01];
-                free(dataDump);
-                return 2; // We have lost two events
-            }
-            
-            /* If we've gotten here, it means we have to continue some more. */
-        } 
-    }
+    unsigned long val = 0;
+    [[self adapter] readLongBlock:&val
+                       atAddress:[self baseAddress] + register_information[kProgrammingDone].offset
+                       numToRead:1
+                      withAddMod:[self addressModifier]
+                   usingAddSpace:0x01];
+    
+    return ((val>>20) & 0x1); //bit is high if FIFO is empty
 }
 
 - (void) findNoiseFloors
@@ -1673,12 +1553,11 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	
     @try {
 		unsigned long val;
-		
+        int i;
+
 		switch(noiseFloorState){
 			case 0: //init
 				//disable all channels
-				[self initBoard:true];
-				int i;
 				for(i=0;i<kNumGretina4MChannels;i++){
 					oldEnabled[i] = [self enabled:i];
 					[self setEnabled:i withValue:NO];
@@ -1687,6 +1566,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 					[self setLEDThreshold:i withValue:0x1ffff];
 					newLEDThreshold[i] = 0x1ffff;
 				}
+				[self initBoard];
 				noiseFloorWorkingChannel = -1;
 				//find first channel
 				for(i=0;i<kNumGretina4MChannels;i++){
@@ -1703,7 +1583,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 					[self writeLEDThreshold:noiseFloorWorkingChannel];
 					[self setEnabled:noiseFloorWorkingChannel withValue:YES];
 					[self writeControlReg:noiseFloorWorkingChannel enabled:YES];
-					[self clearFIFO];
+					[self resetFIFO];
 					noiseFloorState = 1;
 				}
 				else {
@@ -1739,7 +1619,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 					//there's some data in fifo so we're too low with the threshold
 					[self setLEDThreshold:noiseFloorWorkingChannel withValue:0x1ffff];
 					[self writeLEDThreshold:noiseFloorWorkingChannel];
-					[self clearFIFO];
+					[self resetFIFO];
 					noiseFloorLow = noiseFloorTestValue + 1;
 				}
 				else noiseFloorHigh = noiseFloorTestValue - 1;										//no data so continue lowering threshold
@@ -1777,7 +1657,10 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 					[self setEnabled:i withValue:oldEnabled[i]];
 					[self setLEDThreshold:i withValue:newLEDThreshold[i]];
 				}
-				[self initBoard:true];
+				[self initBoard];
+                //re-enable all channels
+                for(i=0;i<kNumGretina4MChannels;i++) [self writeControlReg:i enabled:enabled[i]];
+               
 				noiseFloorRunning = NO;
 				break;
 		}
@@ -2013,9 +1896,9 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [a addObject:p];
     
     p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setUseValue:YES];
+    [p setUseValue:NO];
     [p setName:@"Init"];
-    [p setSetMethodSelector:@selector(initBoard:)];
+    [p setSetMethodSelector:@selector(initBoard)];
     [a addObject:p];
     
     return a;
@@ -2045,7 +1928,10 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     if(![[self adapter] controllerCard]){
         [NSException raise:@"Not Connected" format:@"You must connect to a PCI Controller (i.e. a 617)."];
     }
-    
+    if(![self checkFirmwareVersion]){
+        [NSException raise:@"Wrong Firmware" format:@"You must have firmware version 0x%x installed.",kCurrentFirmwareVersion];
+    }
+
     //----------------------------------------------------------------------------------------
     // first add our description to the data description
     
@@ -2058,15 +1944,14 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     fifoStateAddress= [self baseAddress] + register_information[kProgrammingDone].offset;
     
     short i;
-    for(i=0;i<kNumGretina4MChannels;i++) {
-        [self writeControlReg:i enabled:NO];
-    }
-    [self clearFIFO];
-    fifoLostEvents = 0;
+    for(i=0;i<kNumGretina4MChannels;i++)[self writeControlReg:i enabled:NO];
+    [self resetFIFO];
+    fifoResetCount = 0;
     dataBuffer = (unsigned long*)malloc(0xffff * sizeof(unsigned long));
     [self startRates];
+    [self initBoard];
     
-    [self initBoard:true];
+    for(i=0;i<kNumGretina4MChannels;i++) [self writeControlReg:i enabled:enabled[i]];
     
 	[self performSelector:@selector(checkFifoAlarm) withObject:nil afterDelay:1];
 }
@@ -2125,11 +2010,12 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
                 long totalNumLongs = (numLongs + numLongsLeft);
                 dataBuffer[0] |= totalNumLongs; //see, we did fill it in...
                 [aDataPacket addLongsToFrameBuffer:dataBuffer length:totalNumLongs];
-            } else {
+            }
+            else {
                 //oops... the buffer read is out of sequence
-                NSLogError([NSString stringWithFormat:@"slot %d",[self slot]],@"Packet Sequence Error -- Looking for next event",@"Gretina4M",nil);
-                fifoLostEvents += [self findNextEventInTheFIFO];
-                NSLogError(@"Packet Sequence Error -- Next event found",@"Gretina4M",[NSString stringWithFormat:@"slot %d",[self slot]],nil);
+                NSLogError([NSString stringWithFormat:@"slot %d",[self slot]],@"Packet Sequence Error -- FIFO reset",@"Gretina4M",nil);
+                fifoResetCount++;
+                [self resetFIFO];
             }
         }
 		
@@ -2166,10 +2052,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 		waveFormCount[i] = 0;
     }
     free(dataBuffer);
-    if ( fifoLostEvents != 0 ) {
-        NSLogError( [NSString stringWithFormat:@" lost events due to buffer corruption: %d",fifoLostEvents],@"Gretina4M ",[NSString stringWithFormat:@"(slot %d):",[self slot]],
-				   nil);
-    }
 }
 
 - (void) checkFifoAlarm

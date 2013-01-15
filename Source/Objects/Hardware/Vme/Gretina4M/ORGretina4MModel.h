@@ -206,7 +206,7 @@ enum Gretina4MFIFOStates {
 
     int             fifoState;
 	int				fifoEmptyCount;
-    int             fifoLostEvents;
+    int             fifoResetCount;
 	ORAlarm*        fifoFullAlarm;
 
 	//cache to speed takedata
@@ -387,11 +387,14 @@ enum Gretina4MFIFOStates {
 
 #pragma mark •••Hardware Access
 - (short) readBoardID;
+- (BOOL) checkFirmwareVersion;
+- (BOOL) checkFirmwareVersion:(BOOL)verbose;
 - (void) readFPGAVersions;
 - (void) resetBoard;
 - (void) resetDCM;
 - (void) resetMainFPGA;
-- (void) initBoard:(BOOL)doEnableChannels;
+- (void) resetFIFO;
+- (void) initBoard;
 - (void) initSerDes;
 - (unsigned long) readControlReg:(short)channel;
 - (void) writeControlReg:(short)channel enabled:(BOOL)enabled;
@@ -401,12 +404,11 @@ enum Gretina4MFIFOStates {
 - (void) writeWindowTiming:(short)channel;
 - (void) writeRisingEdgeWindow:(short)channel;
 - (unsigned short) readFifoState;
-- (short) clearFIFO;
-- (short) findNextEventInTheFIFO;
 - (void) findNoiseFloors;
 - (void) stepNoiseFloor;
 - (BOOL) noiseFloorRunning;
 - (void) writeDownSample;
+- (BOOL) fifoIsEmpty;
 
 - (short) readClockSource;
 - (short) readExternalWindow;

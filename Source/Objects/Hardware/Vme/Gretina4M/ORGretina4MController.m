@@ -1253,7 +1253,7 @@
 {
     @try {
         [self endEditing];
-        [model initBoard:false];		//initialize and load hardware, but don't enable channels
+        [model initBoard];		//initialize and load hardware, but don't enable channels
         NSLog(@"Initialized Gretina4M (Slot %d <%p>)\n",[model slot],[model baseAddress]);
         
     }
@@ -1267,8 +1267,8 @@
 - (IBAction) clearFIFO:(id)sender
 {
     @try {  
-        [model clearFIFO];
-        NSLog(@"Gretina4M (Slot %d <%p>) FIFO cleared\n",[model slot],[model baseAddress]);
+        [model resetFIFO];
+        NSLog(@"Gretina4M (Slot %d <%p>) FIFO reset\n",[model slot],[model baseAddress]);
     }
 	@catch(NSException* localException) {
         NSLog(@"Clear of Gretina4M FIFO FAILED.\n");
@@ -1293,10 +1293,14 @@
         unsigned short theID = [model readBoardID];
         NSLog(@"Gretina BoardID (slot %d): 0x%x\n",[model slot],theID);
         if(theID == ([model baseAddress]>>16)){
-            NSLog(@"Gretina BoardID looks correct\n");
+            NSLog(@"VME slot matches the ORCA configuration\n");
             [model readFPGAVersions];
+            [model checkFirmwareVersion:YES];
         }
-        else NSLogColor([NSColor redColor],@"Gretina BoardID 0x%x doesn't match dip settings 0x%x\n", theID, [model baseAddress]>>16);
+        else {
+            NSLogColor([NSColor redColor],@"Gretina Board 0x%x doesn't match dip settings 0x%x\n", theID, [model baseAddress]>>16);
+            NSLogColor([NSColor redColor],@"Apparently it is not in the right slot in the ORCA configuration\n");
+        }
     }
 	@catch(NSException* localException) {
         NSLog(@"Probe Gretina4M Board FAILED.\n");
