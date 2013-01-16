@@ -3020,11 +3020,13 @@ erreur_synchro_opera	= _erreur_synchro_opera(pt);
             //payload
             TypeBBStatusBlock BBStatusPayload;
             BBStatusPayload.size_bytes = sizeof(BBStatusPayload);
-            BBStatusPayload.type = 0;        //type of status block
-            BBStatusPayload.crateIndex = 0;  //TODO: read from crate backplane
+            BBStatusPayload.type = 0xef;        //type of status block
+            BBStatusPayload.crateIndex = 0x21;  //TODO: read from crate backplane
             BBStatusPayload.fltIndex   = 0;
             BBStatusPayload.fiberIndex = 0;
-            BBStatusPayload.spare = 0;
+            BBStatusPayload.spare_for_alignment = 0xdcba;//16 bit
+            BBStatusPayload.spare = 0x87654321;//32 bit
+            BBStatusPayload.spare_for_alignment2 = 0x10fe;//16 bit
             
 			//read status bits from FLT memory
 			if(send_status_udp_packet){
