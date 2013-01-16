@@ -64,19 +64,22 @@
 	
     unsigned long* ptr = (unsigned long*)someData;
 	unsigned long length = ExtractLength(*ptr);
+    
 	ptr++; //point to location info
     int crate = (*ptr&0x01e00000)>>21;
     int card  = (*ptr&0x001f0000)>>16;
 
-	ptr++; //first word of the actual card packet
+	ptr++; //point to first word of the actual card packet
 	int channel		 = *ptr&0xF;
 	int packetLength = ((*ptr & kGretina4MNumberWordsMask) >>16) - kGretina4MHeaderLengthLongs;
+    
 	ptr += 2; //point to Energy low word
 	unsigned long energy = *ptr >> 16;
+    
 	ptr++;	  //point to Energy second word
 	energy += (*ptr & 0x000001ff) << 16;
 	
-	// energy is in 2's complement, taking abs value if necessary
+	//energy is in 2's complement, taking abs value if necessary
 	if (energy & 0x1000000) energy = (~energy & 0x1ffffff) + 1;
 
 	NSString* crateKey	 = [self getCrateKey: crate];
@@ -88,7 +91,6 @@
 	
     [aDataSet histogram:energy numBins:0x1fff sender:self  withKeys:@"Gretina4M", @"Energy",crateKey,cardKey,channelKey,nil];
 	
-	
 	if (packetLength > 0) {
 		/* Decode the waveforms if the exist. */
 		ptr += 4; //point to the data
@@ -98,7 +100,7 @@
 		//note:  there is something wrong here. The package length should be in longs but the
 		//packet is always half empty.   
 		[tmpData setLength:packetLength*sizeof(long)];
-		unsigned short* dPtr = (unsigned short*)[tmpData bytes];
+		short* dPtr = (short*)[tmpData bytes];
 		int i;
 		int wordCount = 0;
 		//data is actually 2's complement. detwiler 08/26/08
@@ -113,6 +115,7 @@
 						sender:self  
 					  withKeys:@"Gretina4M", @"Waveforms",crateKey,cardKey,channelKey,nil];
 	}
+    
 	if(getRatesFromDecodeStage){
 		//get the actual object
 		NSString* aKey = [crateKey stringByAppendingString:cardKey];

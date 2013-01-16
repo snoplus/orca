@@ -1947,7 +1947,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     for(i=0;i<kNumGretina4MChannels;i++)[self writeControlReg:i enabled:NO];
     [self resetFIFO];
     fifoResetCount = 0;
-    dataBuffer = (unsigned long*)malloc(0xffff * sizeof(unsigned long));
     [self startRates];
     [self initBoard];
     
@@ -1965,60 +1964,28 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     isRunning = YES;
     NSString* errorLocation = @"";
     @try {
-        unsigned long val;
-        //read the fifo state
-        [theController readLongBlock:&val
-                           atAddress:fifoStateAddress
-                           numToRead:1
-                          withAddMod:[self addressModifier]
-                       usingAddSpace:0x01];
-        fifoState = val;			
-        if((val & kGretina4MFIFOEmpty) == 0){
-            unsigned long numLongs = 0;
-            dataBuffer[numLongs++] = dataId | 0; //we'll fill in the length later
-            dataBuffer[numLongs++] = location;
+        if(![self fifoIsEmpty]){
+            dataBuffer[0] = dataId | kG4MDataPacketSize;
+            dataBuffer[1] = location;
+        
+            [theController readLong:&dataBuffer[2]
+                          atAddress:fifoAddress 
+                        timesToRead:1024
+                         withAddMod:[self addressModifier] 
+                      usingAddSpace:0x01];
             
-            //read the first longword which should be the packet separator:
-            unsigned long theValue;
-            [theController readLongBlock:&theValue 
-                               atAddress:fifoAddress 
-                               numToRead:1 
-                              withAddMod:[self addressModifier] 
-                           usingAddSpace:0x01];
-            
-            if(theValue==kGretina4MPacketSeparator){
-                
-                //read the first word of actual data so we know how much to read
-                [theController readLongBlock:&theValue 
-                                   atAddress:fifoAddress 
-                                   numToRead:1 
-                                  withAddMod:[self addressModifier] 
-                               usingAddSpace:0x01];
-                
-                dataBuffer[numLongs++] = theValue;
-                
-                ++waveFormCount[theValue & 0x7];  //grab the channel and inc the count
-                
-                unsigned long numLongsLeft  = ((theValue & kGretina4MNumberWordsMask)>>16)-1;
-                
-                [theController readLong:&dataBuffer[numLongs] 
-                              atAddress:fifoAddress 
-                            timesToRead:numLongsLeft 
-                             withAddMod:[self addressModifier] 
-                          usingAddSpace:0x01];
-				
-                long totalNumLongs = (numLongs + numLongsLeft);
-                dataBuffer[0] |= totalNumLongs; //see, we did fill it in...
-                [aDataPacket addLongsToFrameBuffer:dataBuffer length:totalNumLongs];
-            }
-            else {
+            //the first word of the actual data record had better be the packet separator
+            //if(dataBuffer[2]==kGretina4MPacketSeparator){
+                ++waveFormCount[dataBuffer[3] & 0x7];  //grab the channel and inc the count
+                [aDataPacket addLongsToFrameBuffer:dataBuffer length:kG4MDataPacketSize];
+            //}
+            //else {
                 //oops... the buffer read is out of sequence
-                NSLogError([NSString stringWithFormat:@"slot %d",[self slot]],@"Packet Sequence Error -- FIFO reset",@"Gretina4M",nil);
-                fifoResetCount++;
-                [self resetFIFO];
-            }
+            //    NSLogError([NSString stringWithFormat:@"slot %d",[self slot]],@"Packet Sequence Error -- FIFO reset",@"Gretina4M",nil);
+            //    fifoResetCount++;
+            //    [self resetFIFO];
+            //}
         }
-		
     }
 	@catch(NSException* localException) {
         NSLogError(@"",@"Gretina4M Card Error",errorLocation,nil);
@@ -2030,7 +1997,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
     @try {
-		/* Disable all channels.  The remaining buffer should be readout. */
 		int i;
 		for(i=0;i<kNumGretina4MChannels;i++){					
 			[self writeControlReg:i enabled:NO];
@@ -2051,7 +2017,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     for(i=0;i<kNumGretina4MChannels;i++){					
 		waveFormCount[i] = 0;
     }
-    free(dataBuffer);
 }
 
 - (void) checkFifoAlarm

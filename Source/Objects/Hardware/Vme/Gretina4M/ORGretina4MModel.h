@@ -170,12 +170,14 @@ enum Gretina4MFIFOStates {
 	kHalfFull
 };
 
+#define kG4MDataPacketSize 1024+2  //waveforms are fixed at 1024, ORCA header is 2
+
 @interface ORGretina4MModel : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping,AutoTesting>
 {
   @private
 	NSThread*		fpgaProgrammingThread;
 	unsigned long   dataId;
-	unsigned long*  dataBuffer;
+	unsigned long   dataBuffer[kG4MDataPacketSize];
 
     BOOL			enabled[kNumGretina4MChannels];
     BOOL			debug[kNumGretina4MChannels];
