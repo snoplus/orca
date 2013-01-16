@@ -1121,7 +1121,18 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 {
  	//
     NSLog(@"%@::%@: still under construction\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+   	[model installIPE4reader];  
+
 }
+
+- (IBAction) installAndCompileIPE4readerAction:(id)sender
+{
+ 	//
+    NSLog(@"%@::%@: still under construction\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+    [model installAndCompileIPE4reader];  
+
+}
+
 
 
 - (IBAction) sendCommandScript:(id)sender

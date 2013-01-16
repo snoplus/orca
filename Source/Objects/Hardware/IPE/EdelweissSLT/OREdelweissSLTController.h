@@ -265,6 +265,7 @@
 - (IBAction) evResAction:(id)sender;
 
 - (IBAction) installIPE4readerAction:(id)sender;
+- (IBAction) installAndCompileIPE4readerAction:(id)sender;
 - (IBAction) sendCommandScript:(id)sender;
 - (IBAction) sendSimulationConfigScriptON:(id)sender;
 - (IBAction) sendSimulationConfigScriptOFF:(id)sender;

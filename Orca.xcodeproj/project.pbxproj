@@ -151,6 +151,9 @@
 		2DAB012115EF988C00BC2540 /* EdelweissLogo.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2DAB011F15EF988C00BC2540 /* EdelweissLogo.tif */; };
 		2DAB012215EF988C00BC2540 /* KITLogo.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2DAB012015EF988C00BC2540 /* KITLogo.tif */; };
 		2DC1EE800F33724E00E93C75 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2DC1EE7F0F33724E00E93C75 /* WebKit.framework */; };
+		2DD81EA616A6E49700F50F0F /* ipe4tbtools.h in Headers */ = {isa = PBXBuildFile; fileRef = 2DD81EA416A6E49700F50F0F /* ipe4tbtools.h */; };
+		2DD81EA816A6E4B100F50F0F /* ipe4tbtools.h in EdelweissSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2DD81EA416A6E49700F50F0F /* ipe4tbtools.h */; };
+		2DD81EB316A6E5D300F50F0F /* ipe4tbtools.cpp in EdelweissSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2DD81EB216A6E5D300F50F0F /* ipe4tbtools.cpp */; };
 		362F928B1681A05100F3ACB4 /* SNO.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 362F928A16819FCE00F3ACB4 /* SNO.cc */; };
 		4325BA38109F6378009E15B9 /* GermaniumHighE in Resources */ = {isa = PBXBuildFile; fileRef = 4325BA37109F6378009E15B9 /* GermaniumHighE */; };
 		4325BA3A109F6381009E15B9 /* GermaniumLowE in Resources */ = {isa = PBXBuildFile; fileRef = 4325BA39109F6381009E15B9 /* GermaniumLowE */; };
@@ -2978,6 +2981,8 @@
 			dstPath = EdelweissSLTv4_Readout_Code;
 			dstSubfolderSpec = 7;
 			files = (
+				2DD81EB316A6E5D300F50F0F /* ipe4tbtools.cpp in EdelweissSLTv4_Copy */,
+				2DD81EA816A6E4B100F50F0F /* ipe4tbtools.h in EdelweissSLTv4_Copy */,
 				2D2AEA001672892C0057E424 /* ipe4reader.cpp in EdelweissSLTv4_Copy */,
 				2D2AED6A169628870057E424 /* Makefile.ipe4reader in EdelweissSLTv4_Copy */,
 				2D2AED6B169628870057E424 /* ipe4structure.h in EdelweissSLTv4_Copy */,
@@ -3305,6 +3310,8 @@
 		2DAB011F15EF988C00BC2540 /* EdelweissLogo.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = EdelweissLogo.tif; path = EdelweissFLT/EdelweissLogo.tif; sourceTree = "<group>"; };
 		2DAB012015EF988C00BC2540 /* KITLogo.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = KITLogo.tif; path = EdelweissFLT/KITLogo.tif; sourceTree = "<group>"; };
 		2DC1EE7F0F33724E00E93C75 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
+		2DD81EA416A6E49700F50F0F /* ipe4tbtools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ipe4tbtools.h; path = EdelweissSLT/EdelweissSLTv4_Readout_Code/ipe4tbtools.h; sourceTree = "<group>"; };
+		2DD81EB216A6E5D300F50F0F /* ipe4tbtools.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ipe4tbtools.cpp; path = EdelweissSLT/EdelweissSLTv4_Readout_Code/ipe4tbtools.cpp; sourceTree = "<group>"; };
 		362F928A16819FCE00F3ACB4 /* SNO.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SNO.cc; sourceTree = "<group>"; };
 		4325BA37109F6378009E15B9 /* GermaniumHighE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = GermaniumHighE; path = Source/Objects/Hardware/GPIB/HPPulser/GermaniumHighE; sourceTree = SOURCE_ROOT; };
 		4325BA39109F6381009E15B9 /* GermaniumLowE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = GermaniumLowE; path = Source/Objects/Hardware/GPIB/HPPulser/GermaniumLowE; sourceTree = SOURCE_ROOT; };
@@ -6313,6 +6320,8 @@
 		2D12EEA1150FEB2F00EBD8A2 /* EdelweissSLTv4_Readout_Code */ = {
 			isa = PBXGroup;
 			children = (
+				2DD81EB216A6E5D300F50F0F /* ipe4tbtools.cpp */,
+				2DD81EA416A6E49700F50F0F /* ipe4tbtools.h */,
 				2D2AED5F1696281E0057E424 /* Makefile.ipe4reader */,
 				2D2AED62169628310057E424 /* ipe4reader.config */,
 				2D2AED661696284D0057E424 /* ipe4structure.h */,
@@ -13791,6 +13800,7 @@
 				8434C37B167FB0F40068DB04 /* ORFileMoverOp.h in Headers */,
 				2D2AED651696283D0057E424 /* ipe4reader.h in Headers */,
 				2D2AED671696284D0057E424 /* ipe4structure.h in Headers */,
+				2DD81EA616A6E49700F50F0F /* ipe4tbtools.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

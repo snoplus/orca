@@ -95,6 +95,10 @@ extern "C" {
 #include "HW_Readout.h"
 
 
+#include "ipe4structure.h"
+#include "ipe4tbtools.h" //better include in HW_Readout.h? here: MUST follow "ipe4structure.h" -tb-
+#include "ipe4tbtools.cpp"
+
 void SwapLongBlock(void* p, int32_t n);
 void SwapShortBlock(void* p, int32_t n);
 int32_t writeBuffer(SBC_Packet* aPacket);
@@ -154,6 +158,23 @@ void FindHardware(void)
     #endif
     if(!pbus) fprintf(stdout,"HW_Readout.cc (IPE EW DAQ V4): ERROR: could not connect to Pbus!\n");
 
+    //check for all present FLTs
+    if(pbus){
+        int flt;
+        uint32_t val;
+        presentFLTMap = 0;
+        for(flt=0; flt<MAX_NUM_FLT_CARDS; flt++){
+        //for(flt=0; flt<16; flt++){
+            val = pbus->read(FLTVersionReg(flt+1));
+            //printf("FLT#%i (idx %i): version 0x%08x\n",flt+1,flt,val);
+            if(val!=0x1f000000 && val!=0xffffffff){
+                presentFLTMap |= 0x1 << flt;//bit[flt];
+                //FLTSETTINGS::FLT[flt].isPresent = 1;
+            }
+        }
+        printf("Checked presence of FLT cards: presentFLTMap is: 0x%08x\n",presentFLTMap);
+    }
+    
     //pbus test
     std::string getStr, cmdStr;
     cmdStr = "blockmode";
@@ -178,6 +199,7 @@ void ReleaseHardware(void)
     pbus = 0;
 }
 
+
 void doWriteBlock(SBC_Packet* aPacket,uint8_t reply)
 {
     SBC_IPEv4WriteBlockStruct* p = (SBC_IPEv4WriteBlockStruct*)aPacket->payload;
@@ -190,14 +212,31 @@ void doWriteBlock(SBC_Packet* aPacket,uint8_t reply)
     int32_t* lptr = (int32_t*)p;        /*cast to the data type*/ 
     if(needToSwap) SwapLongBlock(lptr,numItems);
     
+    
+    
     //**** use device driver call to write data to HW
     int32_t perr = 0;
+    //address check:
+    int fltID = slotOfAddr(startAddress);
+    if((fltID >=1) && (fltID <=20)){//its a FLT
+        //printf("Mask 0x%08x:  0x%08x   !& is 0x%08x  \n",presentFLTMap,(0x1 << (fltID-1)), !(   presentFLTMap & (0x1 << (fltID-1)) )   );
+        if(! (  presentFLTMap & (0x1 << (fltID-1))  ) ){
+            printf("ERROR: refused reading address 0x%08x: is from flt # %i which is NOT present!\n",startAddress,fltID);
+            perr = 1;
+            goto SKIP_WRITE_ACCESS;
+        }
+    }
+    //HW access:
     try{
         if (numItems == 1)  pbus->write(startAddress, *lptr);
         else                pbus->writeBlock(startAddress, (unsigned long *) lptr, numItems);
     }catch(PbusError &e){
         perr = 1;
     }
+
+
+    SKIP_WRITE_ACCESS: // sorry for the goto ... -tb-
+    
     
     /* echo the structure back with the error code*/
     /* 0 == no Error*/

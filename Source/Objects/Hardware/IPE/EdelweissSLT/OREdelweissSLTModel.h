@@ -281,6 +281,8 @@
 - (void) setPageSize: (unsigned long) pageSize;   
 - (void) sendSimulationConfigScriptON;
 - (void) sendSimulationConfigScriptOFF;
+- (void) installIPE4reader;
+- (void) installAndCompileIPE4reader;
 - (void) sendPMCCommandScript: (NSString*)aString;
 
 #pragma mark ***Polling

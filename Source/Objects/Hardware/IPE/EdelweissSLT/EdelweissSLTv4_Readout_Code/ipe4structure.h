@@ -565,7 +565,7 @@ typedef struct {
 
 
 //-----    2.) Crate Status
-// crate status C
+// crate status C (60 bytes)
 typedef struct {
 	uint32_t stamp_msb;        // previously in cew: temps_pd_fort
 	uint32_t stamp_lsb;        // previously in cew: temps_pd_faible
@@ -589,15 +589,17 @@ typedef struct {
 
 //-----    3.) BB Status Block
 
-// BB status block B
+// BB status block B (128 bytes)
 typedef struct {
 	uint16_t size_bytes;                        // = sizeof(TypeBBStatusBlock)
 	unsigned char type;                         //(starts counting at 0)
 	unsigned char crateIndex;                   //(starts counting at 0)
 	unsigned char fltIndex;                     //(starts counting at 0)
 	unsigned char fiberIndex;                   //(starts counting at 0)
+	uint16_t spare_for_alignment;               // added for alignment
 	uint32_t spare;                             // reserved for future usage
 	uint16_t bb_status[_nb_mots_status_bbv2];	//_nb_mots_status_bbv2 = 57 -tb-
+	uint16_t spare_for_alignment2;              // added for alignment
 } TypeBBStatusBlock;
 
 

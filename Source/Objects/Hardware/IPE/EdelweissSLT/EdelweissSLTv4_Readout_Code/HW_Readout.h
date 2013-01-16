@@ -27,8 +27,8 @@
 using namespace hw4;
 class Pbus;
 //class hw4::SubrackKatrin;
-Pbus *pbus=0;
-//  hw4::SubrackKatrin *srack=0;
+Pbus *pbus=0;              //for register access with fdhwlib
+uint32_t presentFLTMap =0; // store a map of the present FLT cards
 #endif
 
 #ifdef __cplusplus

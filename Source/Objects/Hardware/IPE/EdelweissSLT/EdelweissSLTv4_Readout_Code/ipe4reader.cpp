@@ -1,5 +1,5 @@
 /***************************************************************************
-    ipe4reader6.cpp  -  description: readout loop for the IPE4 Edelweiss firmware
+    ipe4reader.cpp  -  description: readout loop for the IPE4 Edelweiss firmware
     
 	history: see below
 
@@ -17,12 +17,15 @@
 
 /* History:
 version 9: 2013 January
+           changed name from ipe4reader6 to ipe4reader;
            added ipe4reader to Orca svn repository
                in shell use:
                (cd ORCA;make -f Makefile.ipe4reader; cd ..)
                (cd ORCA; ./ipe4reader ; cd ..)
            veto flag setting for ipe4reader config file
            FiberOutMask (FLT register) -> Orca GUI
+           prohibit write access to not existing FLTs (Orca and ipe4reader)
+           sending crate and BB status packet with ipe4reader and receiving it with Orca
            
 version 8: 2012 October
            SLT now provides one single FIFO for all FLTs
@@ -92,31 +95,6 @@ void envoie_commande_horloge(void);
 
 
 
-#if 0
-#ifdef __cplusplus
-extern "C" {
-#endif
-#include "SBC_Cmds.h"
-#include "SBC_Config.h"
-#include "SBC_Readout.h"
-#include "CircularBuffer.h"
-#include "SLTv4_HW_Definitions.h"
-#ifdef __cplusplus
-}
-#endif
-#endif
-
-
-
-#if 0
-#ifdef __cplusplus
-extern "C" {
-#endif
-#include "pbusinterface.h"
-#ifdef __cplusplus
-}
-#endif
-#endif
 
 /*--------------------------------------------------------------------
   kbhit
@@ -160,124 +138,7 @@ int kbhit(void)
 
 
 // I don't use kbhit2 and kbhit3; they work but use a lot of CPU power; kbhit is very fast -tb-
-#if 0
-//-----kbhit2-----  (using select)
-// http://ohse.de/uwe/articles/kbhit.html
-//Soetwas wie die DOS-Funktion kbhit stellt Unix nicht direkt zur Verfuegung, wohl aber das Mittel es zu emulieren: Die Funktion select.
-//Dabei stellen sich folgendes Problem:
-//
-//    Das Terminal ist moeglicherweise im kanonischen Modus: Eingaben werden Zeile fuer Zeile bearbeitet. 
-//      Dies ist der Default unter Unix (was man als Benutzer nicht so recht merkt weil Shells und Editoren als allererstes den nichtkanonischen Modus einstellen). 
-//
-//Derartige Terminaleingenschaften werden heutzutage mit tcsetattr veraendert. Es folgt eine Beispielimplementation von kbhit: #include <unistd.h>
-#include <errno.h>
-#include <sys/types.h>
-#include <sys/time.h>
-#include <termios.h>
-
-#define MKFLAG(which) \
-static int io_tio_set_flag_##which(int fd, int val, int on, int *old) \
-{ struct termios tio; \
-    if (tcgetattr(fd,&tio)) return -1; \
-    if (old) *old=(tio.which & (val)); \
-    if (on) tio.which |= (val); \
-    else tio.which &= ~(val); \
-    if (tcsetattr(fd,TCSADRAIN,&tio)) return -1; \
-    return 0; \
-} 
-
-#if 0
-static int io_tio_get_flag_##which(int fd, int bit, int *value) \
-{ struct termios tio; \
-    if (tcgetattr(fd,&tio)) return -1; \
-    *value=(tio.which & (bit)); \
-    return 0; \
-}
-#endif
-
-MKFLAG(c_lflag)
-
-
-static int 
-io_charavail(int fd)
-{
-	fd_set set;
-	struct timeval zeit;
-	int ret;
-	int tty=1;	
-	int old_ICANON;
-	FD_ZERO(&set);
-	FD_SET(fd,&set);
-	zeit.tv_sec  = 0;
-	zeit.tv_usec = 0;
-	if (-1==io_tio_set_flag_c_lflag(fd,ICANON,0,&old_ICANON)) {
-		if (errno==EINVAL || errno==ENOTTY) 
-			tty=0;
-		else {
-			perror("ICANON");
-			return -1;
-		}
-	}
-
-		
-	while (1) {
-		ret=select(fd+1,&set,0,0,&zeit);
-		if (ret>=0) break;
-		if (errno==EINTR) continue;
-		perror("select");
-		break;
-	}
-	if (tty)
-		io_tio_set_flag_c_lflag(fd,ICANON,old_ICANON,NULL);
-	return ret;
-}
-
-
-int kbhit2(void)
-{
-	char c;
-	int r;
-
-	r=io_charavail(0);
-	printf("kbhit2: r is %i\n",r);
-	if (r==-1) return(0);
-	if (r) return 1; /* Zeichen verfuegbar */
-	else   return 0; /* kein Zeichen verfuegbar */
-	return (0);
-}
-#endif
-
-#if 0
-int kbhit3_main(void)
-{
-	char c;
-	int r;
-
-	r=io_charavail(0);
-	if (r==-1) exit(1);
-	if (r) exit(0); /* Zeichen verfuegbar */
-	else   exit(3); /* kein Zeichen verfuegbar */
-	return (0);
-}
-//-----kbhit3-----
-    #include <termios.h>
-    int kbhit3(void) {
-       struct termios term, oterm;
-       int fd = 0;
-       int c = 0;
-       tcgetattr(fd, &oterm);
-       memcpy(&term, &oterm, sizeof(term));
-       term.c_lflag = term.c_lflag & (!ICANON);
-       term.c_cc[VMIN] = 0;
-       term.c_cc[VTIME] = 1;
-       tcsetattr(fd, TCSANOW, &term);
-       c = getchar();
-       tcsetattr(fd, TCSANOW, &oterm);
-       if (c != -1)
-       ungetc(c, stdin);
-       return ((c != -1) ? 1 : 0);
-    }
-#endif
+// ... removed it ...
 
 
 
@@ -287,6 +148,8 @@ int kbhit3_main(void)
 #include "ipe4structure.h"
 #include "ipe4reader.h"
 
+#include "ipe4tbtools.h" //better include in ipe4reader.h? -tb-
+#include "ipe4tbtools.cpp"
 
 /*--------------------------------------------------------------------
   globals and functions for hardware access
@@ -302,12 +165,13 @@ int kbhit3_main(void)
 //#include "katrinhw4/fltkatrin.h"
 
 
+class Pbus;
 Pbus *pbus=0;              //for register access with fdhwlib
 uint32_t presentFLTMap =0; // store a map of the present FLT cards
 
 
 
-
+#if 0
     //SLT registers
 	static const uint32_t SLTControlReg			= 0xa80000 >> 2;
 	static const uint32_t SLTStatusReg			= 0xa80004 >> 2;
@@ -459,6 +323,12 @@ inline uint32_t FLTRAMDataReg(int numFLT, int numChan){
     return FLTRAMDataRegBase | ((numFLT & 0x3f) <<17) | ((numChan & 0x1f) <<12); 
 }
 
+#endif
+
+
+
+
+
 
 
 
@@ -499,6 +369,20 @@ int runPreRunChecks()
         retval++;
     }
     
+    printf("    sizeof(TypeIpeCrateStatusBlock) is %i\n",sizeof(TypeIpeCrateStatusBlock));
+    printf("    ---> expected sizeof(TypeIpeCrateStatusBlock) is %i\n",  15*4);
+    printf("    sizeof(TypeBBStatusBlock) is %i\n",sizeof(TypeBBStatusBlock));
+    printf("    ---> expected sizeof(TypeBBStatusBlock) is %i\n",  2+4+4+2*_nb_mots_status_bbv2 );
+    TypeBBStatusBlock bb;
+    printf("Offset of size_bytes: %i\n",(char*)&bb.size_bytes - (char*)&bb);
+    printf("Offset of type: %i\n",(char*)&bb.type - (char*)&bb);
+    printf("Offset of crateIndex: %i\n",(char*)&bb.crateIndex - (char*)&bb);
+    printf("Offset of fltIndex: %i\n",(char*)&bb.fltIndex - (char*)&bb);
+    printf("Offset of fiberIndex: %i\n",(char*)&bb.fiberIndex - (char*)&bb);
+    printf("Offset of spare_for_alignment: %i\n",(char*)&bb.spare_for_alignment - (char*)&bb);
+    printf("Offset of spare: %i\n",(char*)&bb.spare - (char*)&bb);
+    printf("Offset of bb_status: %i\n",(char*)&bb.bb_status - (char*)&bb);
+    printf("Offset of spare_for_alignment2: %i\n",(char*)&bb.spare_for_alignment2 - (char*)&bb);
     
     return retval;
 }
@@ -555,11 +439,6 @@ void InitSLTPbus(void)
 	int flt;
 	uint32_t val;
 	presentFLTMap = 0;
-	//TODO: fix it in firmware, then use 20 instead of 16
-	//TODO: fix it in firmware, then use 20 instead of 16
-	//TODO: fix it in firmware, then use 20 instead of 16
-	//TODO: fix it in firmware, then use 20 instead of 16
-	//TODO: fix it in firmware, then use 20 instead of 16
 	for(flt=0; flt<MAX_NUM_FLT_CARDS; flt++){
 	//for(flt=0; flt<16; flt++){
 	    val = pbus->read(FLTVersionReg(flt+1));
@@ -2047,12 +1926,20 @@ int handleUDPCommandPacket(unsigned char *buffer, int len, int iFifo)
 	}
 	printf("\n");
 	//as int (and char if possible)
-	for(i=0; i<(int)len; i++){
-	    printf(" %i",buffer[i]);
-	    if(buffer[i]>=' ' &&  buffer[i]!=127) printf(" (%c)",buffer[i]);
-	}
-	printf("\n");
-	
+    if(len<18){
+	    for(i=0; i<(int)len; i++){
+	        printf(" %i",buffer[i]);
+	        if(buffer[i]>=' ' &&  buffer[i]!=127) printf(" (%c)",buffer[i]);
+	    }
+	    printf("\n");
+	}else {
+	    for(i=0; i<(int)len; i++){
+	        if(buffer[i]>=' ' &&  buffer[i]<127) printf("%c",buffer[i]);
+	        else printf("?");
+	    }
+	    printf("\n");
+    }
+
 	//comment from cew.c:
     //*********						0		1		2		3		4		5
     //***  horloge OPERA			H		255		cpt_x(short)	retard(short)
@@ -3160,7 +3047,7 @@ erreur_synchro_opera	= _erreur_synchro_opera(pt);
 									status = pbus->read(FLTBBStatusReg(numFLT, numChan)+i);
 									temp_status_bbv2_1[i]=status;//TODO: immediately copy it! see below ... -tb-
 									//printf("0x%08x ",status);
-									//dbg printf("%04x.%04x.",status16[0],status16[1]);
+									//dbg                                     printf("%04x.%04x.",status16[0],status16[1]);
 								}
                                 //build BB status packet
                                 BBStatusPayload.fltIndex = idx;
@@ -3169,7 +3056,7 @@ erreur_synchro_opera	= _erreur_synchro_opera(pt);
                                     BBStatusPayload.bb_status[i] = temp_status_bbv2_1_16[i];//TODO: immediately copy it when OPERA status is removed! -tb-
 									//printf("bb_status %i: 0x%08x ",i,BBStatusPayload.bb_status[i]);
 								}
-							   //dbg printf("\n");
+							   //dbg                                printf("\n");
 								  //printf("   Reading status bits of fiber %i  from FLT#  %i (idx %i): BBv# 0x%04x\n",fiber,numFLT,idx,temp_status_bbv2_1_16[0]);
                                 statusScheduler.appendDataSendIfFull((char*)&BBStatusPayload,sizeof(BBStatusPayload));
                             }

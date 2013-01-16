@@ -12,7 +12,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="6007"/>
+			<integer value="2"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -4469,11 +4469,34 @@ AAAAAAAAAAAAAHRleHQAAAAAQ29weXJpZ2h0IEFwcGxlIENvbXB1dGVyLCBJbmMuLCAyMDA1AAAAAA</
 																<reference key="NSSuperview" ref="490089654"/>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSButtonCell" key="NSCell" id="721462262">
-																	<int key="NSCellFlags">67239424</int>
+																	<int key="NSCellFlags">-2080244224</int>
 																	<int key="NSCellFlags2">134479872</int>
-																	<string key="NSContents">Install</string>
+																	<string key="NSContents">Install/Copy</string>
 																	<reference key="NSSupport" ref="22"/>
 																	<reference key="NSControlView" ref="621813515"/>
+																	<int key="NSButtonFlags">-2038284033</int>
+																	<int key="NSButtonFlags2">1</int>
+																	<reference key="NSAlternateImage" ref="1025"/>
+																	<string key="NSAlternateContents"/>
+																	<object class="NSMutableString" key="NSKeyEquivalent">
+																		<characters key="NS.bytes"/>
+																	</object>
+																	<int key="NSPeriodicDelay">200</int>
+																	<int key="NSPeriodicInterval">25</int>
+																</object>
+															</object>
+															<object class="NSButton" id="795651295">
+																<reference key="NSNextResponder" ref="490089654"/>
+																<int key="NSvFlags">264</int>
+																<string key="NSFrame">{{140, 70}, {84, 16}}</string>
+																<reference key="NSSuperview" ref="490089654"/>
+																<bool key="NSEnabled">YES</bool>
+																<object class="NSButtonCell" key="NSCell" id="230175582">
+																	<int key="NSCellFlags">67239424</int>
+																	<int key="NSCellFlags2">134479872</int>
+																	<string key="NSContents">Copy+Make</string>
+																	<reference key="NSSupport" ref="22"/>
+																	<reference key="NSControlView" ref="795651295"/>
 																	<int key="NSButtonFlags">-2038284033</int>
 																	<int key="NSButtonFlags2">1</int>
 																	<reference key="NSAlternateImage" ref="1025"/>
@@ -9515,6 +9538,14 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					</object>
 					<int key="connectionID">6037</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">installAndCompileIPE4readerAction:</string>
+						<reference key="source" ref="524620905"/>
+						<reference key="destination" ref="795651295"/>
+					</object>
+					<int key="connectionID">6041</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -12092,6 +12123,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<reference ref="432030026"/>
 							<reference ref="621813515"/>
 							<reference ref="1019336088"/>
+							<reference ref="795651295"/>
 						</object>
 						<reference key="parent" ref="516101426"/>
 					</object>
@@ -13785,6 +13817,20 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 						<reference key="object" ref="871232908"/>
 						<reference key="parent" ref="380263883"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">6038</int>
+						<reference key="object" ref="795651295"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="230175582"/>
+						</object>
+						<reference key="parent" ref="974454952"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">6039</int>
+						<reference key="object" ref="230175582"/>
+						<reference key="parent" ref="795651295"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -14769,6 +14815,10 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					<string>6031.IBPluginDependency</string>
 					<string>6031.IBViewBoundsToFrameTransform</string>
 					<string>6032.IBPluginDependency</string>
+					<string>6038.IBPluginDependency</string>
+					<string>6038.IBViewBoundsToFrameTransform</string>
+					<string>6038.ImportedFromIB2</string>
+					<string>6039.IBPluginDependency</string>
 				</object>
 				<object class="NSMutableArray" key="dict.values">
 					<bool key="EncodedWithXMLCoder">YES</bool>
@@ -14776,9 +14826,9 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
-					<string>{{1094, 424}, {662, 691}}</string>
+					<string>{{836, 431}, {662, 691}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{1094, 424}, {662, 691}}</string>
+					<string>{{836, 431}, {662, 691}}</string>
 					<boolean value="YES"/>
 					<boolean value="NO"/>
 					<boolean value="YES"/>
@@ -16057,7 +16107,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<object class="NSAffineTransform">
-						<bytes key="NSTransformStruct">P4AAAL+AAABDEQAAwvYAAA</bytes>
+						<bytes key="NSTransformStruct">P4AAAL+AAABDDAAAwtQAAA</bytes>
 					</object>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -16089,6 +16139,12 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 						<bytes key="NSTransformStruct">P4AAAL+AAABDZwAAxCgAAA</bytes>
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<object class="NSAffineTransform">
+						<bytes key="NSTransformStruct">P4AAAL+AAABDEQAAwsoAAA</bytes>
+					</object>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="unlocalizedProperties">
@@ -16107,7 +16163,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">6037</int>
+			<int key="maxID">6041</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -17221,6 +17277,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<string>eventFifoStatusRegTextFieldAction:</string>
 							<string>hwVersionAction:</string>
 							<string>initBoardAction:</string>
+							<string>installAndCompileIPE4readerAction:</string>
 							<string>installIPE4readerAction:</string>
 							<string>interruptMaskAction:</string>
 							<string>loadPatternFile:</string>
@@ -17335,6 +17392,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
+							<string>id</string>
 						</object>
 					</object>
 					<object class="NSMutableDictionary" key="actionInfosByName">
@@ -17362,6 +17420,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<string>eventFifoStatusRegTextFieldAction:</string>
 							<string>hwVersionAction:</string>
 							<string>initBoardAction:</string>
+							<string>installAndCompileIPE4readerAction:</string>
 							<string>installIPE4readerAction:</string>
 							<string>interruptMaskAction:</string>
 							<string>loadPatternFile:</string>
@@ -17492,6 +17551,10 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							</object>
 							<object class="IBActionInfo">
 								<string key="name">initBoardAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">installAndCompileIPE4readerAction:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">

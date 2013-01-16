@@ -13,6 +13,39 @@ echo This is IpeV4SLTScript - number of arguments is $#
 if [ "$1" = "arg1" ]
 then
 	echo "- I recognized the argument '$1'! - "
+elif  test "$1" = "InstallIpe4reader" -o   "$1" = "InstallAndCompileIpe4reader"  
+#elif  [ "$1" = "InstallIpe4reader" -o   "$1" = "InstallAndCompileIpe4reader"  ]
+then
+    #copy all ipe4reader files to ~/ipe4reader
+	echo "- I recognized the argument '$1'! - "
+    pwd
+    ls .
+    ls ../ipe4reader
+	if test -d ~/ORCA/ ; then
+		#cd ~/ORCA
+        echo Folder ORCA exists
+    else
+        echo Folder ORCA does NOT exists, exiting
+        exit
+    fi
+	if test -d ~/ipe4reader/ ; then
+		#cd ~/ORCA
+        echo Folder ipe4reader exists
+    else
+        echo Folder ipe4reader does NOT exists, make it
+        mkdir ~/ipe4reader/
+    fi
+    (cd ORCA; cp ipe4reader.cpp ipe4reader.h ipe4structure.h ipe4tbtools.cpp ipe4tbtools.h Makefile.ipe4reader ~/ipe4reader/ ; cd ;)
+	if test -f ~/ipe4reader/ipe4reader.config ; then
+        echo File ipe4reader.config exists
+    else
+        echo File ipe4reader.config does NOT exist
+        (cd ORCA; cp ipe4reader.config ~/ipe4reader/ ; cd ;)
+    fi
+	if test  "$1" = "InstallAndCompileIpe4reader"  ; then
+        cd ~/ipe4reader/
+        make -f Makefile.ipe4reader
+    fi
 elif  [ "$1" = "SimulationConfigScriptON" ]
 then
 	echo "- I recognized the argument '$1'! - "

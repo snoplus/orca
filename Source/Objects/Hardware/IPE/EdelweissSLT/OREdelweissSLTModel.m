@@ -336,7 +336,7 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
                 while(BBblockLen>0){
                     counter++;
 				    NSLog(@"      BB status packet: block %i , length (bytes) %i, FLT #%i, fiber #%i, status: 0x%04x 0x%04x ... \n",
-                                 counter,BBblock->size_bytes,BBblock->fltIndex,BBblock->fiberIndex,BBblock->bb_status[0],BBblock->bb_status[1]);
+                                 counter,BBblock->size_bytes,BBblock->fltIndex +1,BBblock->fiberIndex +1,BBblock->bb_status[0],BBblock->bb_status[1]);
                     //let ptr point to next TypeBBStatusBlock 
                     ptr += BBblockLen;
                     if((ptr-readBuffer) > MAX_UDP_STATUSPACKET_SIZE){
@@ -1171,6 +1171,20 @@ NSLog(@"  scriptRunPath: %@ \n" , scriptRunPath);
 	[self sendPMCCommandScript: @"SimulationConfigScriptOFF"];
 }
 
+- (void) installIPE4reader
+{
+	NSLog(@"%@::%@: invoked.\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));
+	
+	[self sendPMCCommandScript: @"InstallIpe4reader"];
+}
+
+- (void) installAndCompileIPE4reader
+{
+	NSLog(@"%@::%@: under construction.\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));
+	
+	[self sendPMCCommandScript: @"InstallAndCompileIpe4reader"];
+}
+
 /*! Send a script to the PrPMC which will configure the PrPMC.
  *
  */
@@ -1184,7 +1198,7 @@ NSLog(@"  scriptRunPath: %@ \n" , scriptRunPath);
 	if(aString) scriptcommands = [aString componentsSeparatedByCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
 	if([scriptcommands count] >6) NSLog(@"WARNING: too much arguments in sendPMCConfigScript:\n");
 	
-	NSString *scriptName = @"EdelweissSLTScript";
+	NSString *scriptName = @"IpeEdelweissV4SLTScript";
 		ORTaskSequence* aSequence;	
 		aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
 		NSString* resourcePath = [[NSBundle mainBundle] resourcePath];
