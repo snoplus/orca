@@ -337,6 +337,15 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
                     counter++;
 				    NSLog(@"      BB status packet: block %i , length (bytes) %i, FLT #%i, fiber #%i, status: 0x%04x 0x%04x ... \n",
                                  counter,BBblock->size_bytes,BBblock->fltIndex +1,BBblock->fiberIndex +1,BBblock->bb_status[0],BBblock->bb_status[1]);
+                    unsigned char*myptr=ptr;
+                    NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
+
+				    NSLogFont(aFont,@"  0:   %02x %02x %02x %02x     %02x %02x %02x %02x     %02x %02x %02x %02x     %02x %02x %02x %02x \n",
+                                 myptr[0],myptr[1],myptr[2],myptr[3],myptr[4],myptr[5],myptr[6],myptr[7],
+                                 myptr[8],myptr[9],myptr[10],myptr[11],myptr[12],myptr[13],myptr[14],myptr[15]);
+				    NSLogFont(aFont,@" 16:   %02x %02x %02x %02x     %02x %02x %02x %02x     %02x %02x %02x %02x     %02x %02x %02x %02x \n",
+                                 myptr[16],myptr[17],myptr[18],myptr[19],myptr[20],myptr[21],myptr[22],myptr[23],
+                                 myptr[24],myptr[25],myptr[26],myptr[27],myptr[28],myptr[29],myptr[30],myptr[31]);
                     //let ptr point to next TypeBBStatusBlock 
                     ptr += BBblockLen;
                     if((ptr-readBuffer) > MAX_UDP_STATUSPACKET_SIZE){
