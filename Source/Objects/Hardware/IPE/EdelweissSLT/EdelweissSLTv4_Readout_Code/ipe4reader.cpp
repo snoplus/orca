@@ -372,17 +372,16 @@ int runPreRunChecks()
     printf("    sizeof(TypeIpeCrateStatusBlock) is %i\n",sizeof(TypeIpeCrateStatusBlock));
     printf("    ---> expected sizeof(TypeIpeCrateStatusBlock) is %i\n",  15*4);
     printf("    sizeof(TypeBBStatusBlock) is %i\n",sizeof(TypeBBStatusBlock));
-    printf("    ---> expected sizeof(TypeBBStatusBlock) is %i\n",  2+4+4+2*_nb_mots_status_bbv2 );
+    printf("    ---> expected sizeof(TypeBBStatusBlock) is %i\n",  4+4+4+2*_nb_mots_status_bbv2+2 );
     TypeBBStatusBlock bb;
     printf("Offset of size_bytes: %i\n",(char*)&bb.size_bytes - (char*)&bb);
     printf("Offset of type: %i\n",(char*)&bb.type - (char*)&bb);
     printf("Offset of crateIndex: %i\n",(char*)&bb.crateIndex - (char*)&bb);
     printf("Offset of fltIndex: %i\n",(char*)&bb.fltIndex - (char*)&bb);
     printf("Offset of fiberIndex: %i\n",(char*)&bb.fiberIndex - (char*)&bb);
-    printf("Offset of spare_for_alignment: %i\n",(char*)&bb.spare_for_alignment - (char*)&bb);
     printf("Offset of spare: %i\n",(char*)&bb.spare - (char*)&bb);
     printf("Offset of bb_status: %i\n",(char*)&bb.bb_status - (char*)&bb);
-    printf("Offset of spare_for_alignment2: %i\n",(char*)&bb.spare_for_alignment2 - (char*)&bb);
+    printf("Offset of spare_for_alignment: %i\n",(char*)&bb.spare_for_alignment - (char*)&bb);
     
     return retval;
 }
@@ -3024,9 +3023,8 @@ erreur_synchro_opera	= _erreur_synchro_opera(pt);
             BBStatusPayload.crateIndex = 0x21;  //TODO: read from crate backplane
             BBStatusPayload.fltIndex   = 0;
             BBStatusPayload.fiberIndex = 0;
-            BBStatusPayload.spare_for_alignment = 0xdcba;//16 bit
             BBStatusPayload.spare = 0x87654321;//32 bit
-            BBStatusPayload.spare_for_alignment2 = 0x10fe;//16 bit
+            BBStatusPayload.spare_for_alignment = 0x4321;//16 bit
             
 			//read status bits from FLT memory
 			if(send_status_udp_packet){

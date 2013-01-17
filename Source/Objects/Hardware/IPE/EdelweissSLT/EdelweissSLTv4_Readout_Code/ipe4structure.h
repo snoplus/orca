@@ -591,15 +591,14 @@ typedef struct {
 
 // BB status block B (128 bytes)
 typedef struct {
-	uint16_t size_bytes;                        // = sizeof(TypeBBStatusBlock)
+	uint32_t size_bytes;                        // = sizeof(TypeBBStatusBlock)
 	unsigned char type;                         //(starts counting at 0)
 	unsigned char crateIndex;                   //(starts counting at 0)
 	unsigned char fltIndex;                     //(starts counting at 0)
 	unsigned char fiberIndex;                   //(starts counting at 0)
-	uint16_t spare_for_alignment;               // added for alignment
 	uint32_t spare;                             // reserved for future usage
 	uint16_t bb_status[_nb_mots_status_bbv2];	//_nb_mots_status_bbv2 = 57 -tb-
-	uint16_t spare_for_alignment2;              // added for alignment
+	uint16_t spare_for_alignment;              // added for alignment
 } TypeBBStatusBlock;
 
 
