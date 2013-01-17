@@ -3020,8 +3020,8 @@ erreur_synchro_opera	= _erreur_synchro_opera(pt);
             //payload
             TypeBBStatusBlock BBStatusPayload;
             BBStatusPayload.size_bytes = sizeof(BBStatusPayload);
-            BBStatusPayload.type = 0xef;        //type of status block
-            BBStatusPayload.crateIndex = 0x21;  //TODO: read from crate backplane
+            BBStatusPayload.type = 0xbb;        //type of status block
+            BBStatusPayload.crateIndex = 0xcc;  //TODO: read from crate backplane
             BBStatusPayload.fltIndex   = 0;
             BBStatusPayload.fiberIndex = 0;
             BBStatusPayload.spare = 0x87654321;//32 bit
