@@ -136,7 +136,7 @@
 	for(i=0;i<kFastLoopupCacheSize;i++){
 		fastLookupCache[i] = 0;
 	}
-    [self setObjectLookup:[NSMutableDictionary dictionaryWithCapacity:100]];
+    [self setObjectLookup:[NSMutableDictionary dictionary]];
 
 	NSDictionary* descriptionDict = [fileHeader objectForKey:@"dataDescription"];
 	NSString* objKey;

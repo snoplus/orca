@@ -9,6 +9,7 @@ class ORGretina4MReadout : public ORVVmeCard
     ORGretina4MReadout(SBC_card_info* ci) : ORVVmeCard(ci) {} 
     virtual ~ORGretina4MReadout() {} 
     virtual bool Readout(SBC_LAM_Data*);
+    virtual void clearFifo(uint32_t fifoClearAddress);    
 };
 
 #endif /* _ORGretinaReadout_hh_*/

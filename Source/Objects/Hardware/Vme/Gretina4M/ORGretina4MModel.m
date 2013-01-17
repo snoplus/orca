@@ -382,7 +382,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setPileUpWindow:(short)aPileUpWindow
 {
-    if(aPileUpWindow>0xffff)aPileUpWindow = 0xffff;
     [[[self undoManager] prepareWithInvocationTarget:self] setPileUpWindow:pileUpWindow];
     
     pileUpWindow = aPileUpWindow;
@@ -1193,7 +1192,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     for(i=0;i<kNumGretina4MChannels;i++){
         [self writeControlReg:i enabled:NO];
     }
-    
+    [ORTimer delay:.1];
     //[self initSerDes];
     //write the card level params
     [self writeClockSource];
@@ -1214,7 +1213,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     }
     
     for(i=0;i<kNumGretina4MChannels;i++){
-        [self writeControlReg:i enabled:YES];
+        [self writeControlReg:i enabled:enabled[i]];
     }
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MCardInited object:self];
@@ -1658,8 +1657,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 					[self setLEDThreshold:i withValue:newLEDThreshold[i]];
 				}
 				[self initBoard];
-                //re-enable all channels
-                for(i=0;i<kNumGretina4MChannels;i++) [self writeControlReg:i enabled:enabled[i]];
                
 				noiseFloorRunning = NO;
 				break;
@@ -1943,15 +1940,10 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     fifoAddress     = [self baseAddress] + 0x1000;
     fifoStateAddress= [self baseAddress] + register_information[kProgrammingDone].offset;
     
-    short i;
-    for(i=0;i<kNumGretina4MChannels;i++)[self writeControlReg:i enabled:NO];
-    [self resetFIFO];
     fifoResetCount = 0;
     [self startRates];
     [self initBoard];
-    
-    for(i=0;i<kNumGretina4MChannels;i++) [self writeControlReg:i enabled:enabled[i]];
-    
+        
 	[self performSelector:@selector(checkFifoAlarm) withObject:nil afterDelay:1];
 }
 
@@ -1964,6 +1956,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     isRunning = YES;
     NSString* errorLocation = @"";
     @try {
+        //[ORTimer delay:1];
         if(![self fifoIsEmpty]){
             dataBuffer[0] = dataId | kG4MDataPacketSize;
             dataBuffer[1] = location;
@@ -1975,16 +1968,16 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
                       usingAddSpace:0x01];
             
             //the first word of the actual data record had better be the packet separator
-            //if(dataBuffer[2]==kGretina4MPacketSeparator){
+            if(dataBuffer[2]==kGretina4MPacketSeparator){
                 ++waveFormCount[dataBuffer[3] & 0x7];  //grab the channel and inc the count
                 [aDataPacket addLongsToFrameBuffer:dataBuffer length:kG4MDataPacketSize];
-            //}
-            //else {
+            }
+            else {
                 //oops... the buffer read is out of sequence
-            //    NSLogError([NSString stringWithFormat:@"slot %d",[self slot]],@"Packet Sequence Error -- FIFO reset",@"Gretina4M",nil);
-            //    fifoResetCount++;
-            //    [self resetFIFO];
-            //}
+                NSLogError([NSString stringWithFormat:@"slot %d",[self slot]],@"Packet Sequence Error -- FIFO reset",@"Gretina4M",nil);
+                fifoResetCount++;
+                [self resetFIFO];
+            }
         }
     }
 	@catch(NSException* localException) {
@@ -2094,17 +2087,16 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
      * 4: FIFO size                                         */
     
 	configStruct->total_cards++;
-	configStruct->card_info[index].hw_type_id				= kGretina; //should be unique
+	configStruct->card_info[index].hw_type_id				= kGretina4M; //should be unique
 	configStruct->card_info[index].hw_mask[0]				= dataId; //better be unique
 	configStruct->card_info[index].slot						= [self slot];
 	configStruct->card_info[index].crate					= [self crateNumber];
 	configStruct->card_info[index].add_mod					= [self addressModifier];
 	configStruct->card_info[index].base_add					= [self baseAddress];
 	configStruct->card_info[index].deviceSpecificData[0]	= [self baseAddress] + register_information[kProgrammingDone].offset; //fifoStateAddress
-    configStruct->card_info[index].deviceSpecificData[1]	= kGretina4MFIFOEmpty; // fifoEmptyMask
-    configStruct->card_info[index].deviceSpecificData[2]	= [self baseAddress] + 0x1000; // fifoAddress
-    configStruct->card_info[index].deviceSpecificData[3]	= 0x0B; // fifoAM
-    configStruct->card_info[index].deviceSpecificData[4]	= 0x1FFFF; // size of FIFO
+    configStruct->card_info[index].deviceSpecificData[1]	= [self baseAddress] + 0x1000; // fifoAddress
+    configStruct->card_info[index].deviceSpecificData[2]	= 0x0B; // fifoAM
+    configStruct->card_info[index].deviceSpecificData[3]	= [self baseAddress] + 0x04; // fifoReset Address
 	configStruct->card_info[index].num_Trigger_Indexes		= 0;
 	
 	configStruct->card_info[index].next_Card_Index 	= index+1;	

@@ -5,113 +5,115 @@ using namespace std;
 bool ORGretina4MReadout::Readout(SBC_LAM_Data* /*lamData*/)
 {
 
-#define kGretinaPacketSeparater 0xAAAAAAAA
-#define kGretinaNumberWordsMask 0x07FF0000
-	
-    uint32_t fifoState;
-
+#define kGretinaPacketSeparator ((int32_t)(0xAAAAAAAA))
+#define kGretina4MFIFOEmpty			0x100000
+#define kGretina4MFIFOAlmostEmpty	0x400000
+#define kGretina4MFIFO16KFull       0x800000
+#define kGretina4MFIFO30KFull		0x1000000
+#define kGretina4MFIFOFull          0x2000000
+    
     uint32_t baseAddress      = GetBaseAddress();  
     uint32_t fifoStateAddress = GetDeviceSpecificData()[0];
-    uint32_t fifoEmptyMask    = GetDeviceSpecificData()[1];
-    uint32_t fifoAddress      = GetDeviceSpecificData()[2];
-    uint32_t fifoAddressMod   = GetDeviceSpecificData()[3];
-    uint32_t sizeOfFIFO       = GetDeviceSpecificData()[4];
+    uint32_t fifoAddress      = GetDeviceSpecificData()[1];
+    uint32_t fifoAddressMod   = GetDeviceSpecificData()[2];
+    uint32_t fifoResetAddress = GetDeviceSpecificData()[3];
     uint32_t dataId           = GetHardwareMask()[0]; 
     uint32_t slot             = GetSlot(); 
     uint32_t crate            = GetCrate(); 
     uint32_t location         = ((crate&0x0000000f)<<21) | ((slot& 0x0000001f)<<16);
 
-    //read the fifo state
-    int32_t result;
-    fifoState = 0;
+    int32_t  result;
+    uint32_t fifoState = 0;
 
     result = VMERead(fifoStateAddress, 
                      GetAddressModifier(),
                      (uint32_t) 0x4,
                      fifoState);
-    //cout << hex << result << " " << fifoState << endl;
-    if (result != sizeof(fifoState)) return true;
-     
-    if ((fifoState & fifoEmptyMask) == 0 ) {
+    if (result != sizeof(fifoState)){
+        LogBusError("Rd Err: Gretina4 0x%04x %s",fifoStateAddress,strerror(errno));
+    }
+    else if ((fifoState & kGretina4MFIFOEmpty) == 0 ) {
+        //we want to read as much as possible to have the highest thru-put
+        int32_t numEventsToRead = 1;
+        if(fifoState & kGretina4MFIFO30KFull)           numEventsToRead = 30;
+        else if(fifoState & kGretina4MFIFO16KFull)      numEventsToRead = 16;
+        
 		
-        ensureDataCanHold(kMaxDataBufferSizeLongs/2); //not sure how much this card can produce... just ensure half the data buffer is free
+        ensureDataCanHold((1024*numEventsToRead)+2);
      
-        uint32_t numLongs = 3;
         int32_t savedIndex = dataIndex;
-        data[dataIndex++] = dataId | 0; //we'll fill in the length later
+        data[dataIndex++] = dataId | 0; //we will pack in as many events as we can and fill in the length below
         data[dataIndex++] = location;
         
-        //read the first int32_tword which should be the packet separator: 0xAAAAAAAA
-        uint32_t theValue;
-        result = VMERead(fifoAddress, 
-                         GetAddressModifier(),
-                         (uint32_t) 0x4,
-                         theValue);
+        int32_t eventStartIndex = dataIndex;
         
-        if (result == 4 && (theValue==kGretinaPacketSeparater)){
-            //read the first word of actual data so we know how much to read
-            result = VMERead(fifoAddress, 
-                             GetAddressModifier(),
-                             (uint32_t) 0x4,
-                             theValue);
-            
-            data[dataIndex++] = theValue;
-            uint32_t numLongsLeft  = ((theValue & kGretinaNumberWordsMask)>>16)-1;
-            int32_t totalNumLongs  = (numLongs + numLongsLeft);
-             
-       
-            /* OK, now use dma access. */
-                /* Gretina IV card */
-       
-            result = DMARead(fifoAddress,fifoAddressMod, (uint32_t) 4,
-                             (uint8_t*)(&data[dataIndex]),numLongsLeft*4); 
-            dataIndex += numLongsLeft;
-            
-            if (result != (int32_t)numLongsLeft*4) return true; 
-            data[savedIndex] |= totalNumLongs; //see, we did fill it in...
-       
-        } else if(result < 0) {
-            LogBusError("Rd Err: Gretina 0x%04x %s",baseAddress,strerror(errno));
-        } else {
-            //oops... really bad -- the buffer read is out of sequence -- try to recover 
-            LogError("Rd Err: Gretina 0x%04x Buffer out of sequence, trying to recover",baseAddress);
-            uint32_t i = 0;
-            while(i < sizeOfFIFO) {
-                result = VMERead(fifoAddress,
-                                 GetAddressModifier(), 
-                                 (uint32_t) 0x4,
-                                 theValue); 
-                if (result == 0) { // means the FIFO is empty
-                    return true; 
-                } else if (result < 0) {
-                    LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));
-                    return true; 
-                }
-                if (theValue == kGretinaPacketSeparater) break;
-                i++;
-            }
-            //read the first word of actual data so we know how much to read
-            //note that we are NOT going to save the data, but we do use the data buffer to hold the garbage
-            //we'll reset the index to dump the data later....
-            result = VMERead(fifoAddress,
-                             GetAddressModifier(),
-                             (uint32_t) 0x4,
-                             theValue); 
-           
-            if (result < 0) {
-                LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));                
-                return true; 
-            }
-            uint32_t numLongsLeft  = ((theValue & kGretinaNumberWordsMask)>>16)-1;
-             
-            result = DMARead(fifoAddress,fifoAddressMod, (uint32_t) 4,
-                             (uint8_t*)(&data[dataIndex]),numLongsLeft*4); 
-            if (result < 0) {
-                LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));
-                return true; 
-            }
+        result = DMARead(fifoAddress,fifoAddressMod, (uint32_t) 4,
+                         (uint8_t*)(&data[dataIndex]),1024*4*numEventsToRead); 
+        
+        if (result < 0) {
+            LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));
             dataIndex = savedIndex; //DUMP the data by reseting the data Index back to where it was when we got it.
+            clearFifo(fifoResetAddress);
         }
-    }
+        
+        else {
+            int32_t eventCount = 0;
+            while(data[eventStartIndex] == kGretinaPacketSeparator){
+                eventCount++;
+                if(eventCount>=numEventsToRead)break;
+                eventStartIndex+=1024;
+            }
+            
+            if(eventCount>0){
+                data[savedIndex] |= ((eventCount*1024)+2);
+                dataIndex += eventCount*1024;
+                LogBusError("Rd: %d Act:%d ",numEventsToRead,eventCount);
+
+           }
+            else {
+                //oops... really bad -- the buffer read is out of sequence
+                dataIndex = savedIndex; //DUMP the data by reseting the data Index back to where it was when we got it.
+                LogBusError("Fifo Rst: Gretina4 0x%04x %s",fifoResetAddress,strerror(errno));
+                clearFifo(fifoResetAddress);
+            }
+        }
+    }        
+
     return true; 
+}
+
+void ORGretina4MReadout::clearFifo(uint32_t fifoClearAddress)
+{
+    uint32_t orginalData = 0;
+    int32_t result = VMERead(fifoClearAddress, 
+                     GetAddressModifier(),
+                     (uint32_t) 0x4,
+                     orginalData);
+    
+    if (result != sizeof(orginalData)){
+        LogBusError("Rd Err: Gretina4 0x%04x %s",fifoClearAddress,strerror(errno));
+        return;
+    }
+    orginalData |= (0x1<<27);
+
+    result = VMEWrite(fifoClearAddress,
+                     GetAddressModifier(),
+                     (uint32_t) 0x4,
+                      orginalData);
+
+    if (result != sizeof(orginalData)){
+        LogBusError("Rd Err: Gretina4 0x%04x %s",fifoClearAddress,strerror(errno));
+        return;
+    }
+    orginalData &= ~(0x1<<27);
+
+    result = VMEWrite(fifoClearAddress,
+                      GetAddressModifier(),
+                      (uint32_t) 0x4,
+                      orginalData);
+    
+    if (result != sizeof(orginalData)){
+        LogBusError("Rd Err: Gretina4 0x%04x %s",fifoClearAddress,strerror(errno));
+        return;
+    }
 }

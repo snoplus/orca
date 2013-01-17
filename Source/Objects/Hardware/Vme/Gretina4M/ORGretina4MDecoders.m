@@ -68,73 +68,77 @@
 	ptr++; //point to location info
     int crate = (*ptr&0x01e00000)>>21;
     int card  = (*ptr&0x001f0000)>>16;
-
-	ptr++; //point to first word of the actual card packet
-	int channel		 = *ptr&0xF;
-	int packetLength = ((*ptr & kGretina4MNumberWordsMask) >>16) - kGretina4MHeaderLengthLongs;
     
-	ptr += 2; //point to Energy low word
-	unsigned long energy = *ptr >> 16;
-    
-	ptr++;	  //point to Energy second word
-	energy += (*ptr & 0x000001ff) << 16;
-	
-	//energy is in 2's complement, taking abs value if necessary
-	if (energy & 0x1000000) energy = (~energy & 0x1ffffff) + 1;
+    ptr++; //point to packet separator
+    int numEvents = (length-2)/1024;
+    int i;
+    for(i=0;i<numEvents;i++){
+        if(*ptr == 0xAAAAAAAA){
+            ptr++; //point to first word of the actual card packet (past the separator)
+            int channel		 = *ptr & 0xF; //extract the channel
+            ptr += 2; //point to Energy low word
+            unsigned long energy = *ptr >> 16;
+            
+            ptr++;	  //point to Energy second word
+            energy += (*ptr & 0x000001ff) << 16;
+            
+            //energy is in 2's complement, taking abs value if necessary
+            if (energy & 0x1000000) energy = (~energy & 0x1ffffff) + 1;
 
-	NSString* crateKey	 = [self getCrateKey: crate];
-	NSString* cardKey	 = [self getCardKey: card];
-	NSString* channelKey = [self getChannelKey: channel];
+            NSString* crateKey	 = [self getCrateKey: crate];
+            NSString* cardKey	 = [self getCardKey: card];
+            NSString* channelKey = [self getChannelKey: channel];
 
-	int integrateTime = [[self objectForNestedKey:crateKey,cardKey,kIntegrateTimeKey,nil] intValue];
-	if(integrateTime) energy /= integrateTime; 
-	
-    [aDataSet histogram:energy numBins:0x1fff sender:self  withKeys:@"Gretina4M", @"Energy",crateKey,cardKey,channelKey,nil];
-	
-	if (packetLength > 0) {
-		/* Decode the waveforms if the exist. */
-		ptr += 4; //point to the data
+            int integrateTime = [[self objectForNestedKey:crateKey,cardKey,kIntegrateTimeKey,nil] intValue];
+            if(integrateTime) energy /= integrateTime; 
+            
+            [aDataSet histogram:energy numBins:0x1fff sender:self  withKeys:@"Gretina4M", @"Energy",crateKey,cardKey,channelKey,nil];
+            
+            ptr += 10; //point to the data
 
-		NSMutableData* tmpData = [NSMutableData dataWithCapacity:512*2];
-		
-		//note:  there is something wrong here. The package length should be in longs but the
-		//packet is always half empty.   
-		[tmpData setLength:packetLength*sizeof(long)];
-		short* dPtr = (short*)[tmpData bytes];
-		int i;
-		int wordCount = 0;
-		//data is actually 2's complement. detwiler 08/26/08
-		for(i=0;i<packetLength;i++){
-			dPtr[wordCount++] =    (0x0000ffff & *ptr);
-			dPtr[wordCount++] =    (0xffff0000 & *ptr) >> 16;
-			ptr++;
-		}
-		[aDataSet loadWaveform:tmpData 
-						offset:0 //bytes!
-					  unitSize:2 //unit size in bytes!
-						sender:self  
-					  withKeys:@"Gretina4M", @"Waveforms",crateKey,cardKey,channelKey,nil];
-	}
-    
-	if(getRatesFromDecodeStage){
-		//get the actual object
-		NSString* aKey = [crateKey stringByAppendingString:cardKey];
-		if(!actualGretinaCards)actualGretinaCards = [[NSMutableDictionary alloc] init];
-		ORGretina4MModel* obj = [actualGretinaCards objectForKey:aKey];
-		if(!obj){
-			NSArray* listOfCards = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORGretina4MModel")];
-			NSEnumerator* e = [listOfCards objectEnumerator];
-			ORGretina4MModel* aCard;
-			while(aCard = [e nextObject]){
-				if([aCard slot] == card){
-					[actualGretinaCards setObject:aCard forKey:aKey];
-					obj = aCard;
-					break;
-				}
-			}
-		}
-		getRatesFromDecodeStage = [obj bumpRateFromDecodeStage:channel];
-	}
+            NSMutableData* tmpData = [NSMutableData dataWithCapacity:512*2];
+            
+            //note:  there is something wrong here. The package length should be in longs but the
+            //packet is always half empty.   
+            int packetLength = 1024 - 14;
+            [tmpData setLength:packetLength*sizeof(long)];
+            short* dPtr = (short*)[tmpData bytes];
+            int i;
+            int wordCount = 0;
+            //data is actually 2's complement. detwiler 08/26/08
+            for(i=0;i<packetLength;i++){
+                dPtr[wordCount++] =    (0x0000ffff & *ptr);
+                dPtr[wordCount++] =    (0xffff0000 & *ptr) >> 16;
+                ptr++;
+            }
+            [aDataSet loadWaveform:tmpData 
+                            offset:0 //bytes!
+                          unitSize:2 //unit size in bytes!
+                            sender:self  
+                          withKeys:@"Gretina4M", @"Waveforms",crateKey,cardKey,channelKey,nil];
+        
+            if(getRatesFromDecodeStage){
+                //get the actual object
+                NSString* aKey = [crateKey stringByAppendingString:cardKey];
+                if(!actualGretinaCards)actualGretinaCards = [[NSMutableDictionary alloc] init];
+                ORGretina4MModel* obj = [actualGretinaCards objectForKey:aKey];
+                if(!obj){
+                    NSArray* listOfCards = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORGretina4MModel")];
+                    NSEnumerator* e = [listOfCards objectEnumerator];
+                    ORGretina4MModel* aCard;
+                    while(aCard = [e nextObject]){
+                        if([aCard slot] == card){
+                            [actualGretinaCards setObject:aCard forKey:aKey];
+                            obj = aCard;
+                            break;
+                        }
+                    }
+                }
+                getRatesFromDecodeStage = [obj bumpRateFromDecodeStage:channel];
+            }
+            ptr+=1024;
+        }
+    }
 	 
     return length; //must return number of longs
 }
