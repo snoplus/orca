@@ -2888,8 +2888,8 @@ void FIFOREADER::scanFIFObuffer(void)
 			//get Opera status
             uint32_t OperaStatus0 =  pbus->read(OperaStatusReg0);
             uint32_t OperaStatus1 =  pbus->read(OperaStatusReg1);
-            printf("OperaStatusReg0: 0x%08x\n",OperaStatus0);
-            printf("OperaStatusReg1: 0x%08x\n",OperaStatus1);
+            //printf("OperaStatusReg0: 0x%08x\n",OperaStatus0);
+            //printf("OperaStatusReg1: 0x%08x\n",OperaStatus1);
 			Code_acqui   =  OperaStatus0      & 0xff;
 			Masque_BB    = (OperaStatus0>> 8) & 0xff;
 			Code_synchro = (OperaStatus0>>16) & 0xff;
@@ -2902,13 +2902,14 @@ void FIFOREADER::scanFIFObuffer(void)
             Trame_status_udp.status_opera.registre_retard  = Retard;
             Trame_status_udp.status_opera.registre_x       = X;
             Trame_status_udp.status_opera.version_cew      = VERSION_IPE4READOUT;
-            
+#if 0            
             switch( Trame_status_udp.status_opera.code_acqui ){
                 case 0: printf("   OperaStatus0 code acqi %i: test mode\n",Trame_status_udp.status_opera.code_acqui); break;
                 case 3: printf("   OperaStatus0 code acqi %i: BBv21\n",Trame_status_udp.status_opera.code_acqui); break;
                 case 8: printf("   OperaStatus0 code acqi %i: BB2\n",Trame_status_udp.status_opera.code_acqui); break;
                 default: printf("   OperaStatus0 code acqi %i: unsupported\n", Trame_status_udp.status_opera.code_acqui); break;
             }
+#endif
             switch( Trame_status_udp.status_opera.code_acqui ){
                 case 0: printf("   OperaStatus0 code acqi %i: test mode\n",Trame_status_udp.status_opera.code_acqui); break;
                 case 3: Nb_mots_lecture=2; break;
