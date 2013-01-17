@@ -79,6 +79,26 @@ int slotOfAddr(uint32_t address)
 }
 
 
+int count_ipe4reader_instances(void)
+{
+	char buf[1024 * 4];
+	char *cptr;
+	FILE *p;
+	int counter = 0;
+	p = popen("ps -e |grep ipe4reader | wc -l","r");
+	if(p==0){ fprintf(stderr, "could not start popen... -tb-\n"); return counter; }
+	
+	while (!feof(p)){
+	    fscanf(p,"%s",buf);
+        counter = atoi(buf);
+	    //printf("count_ipe4reader_instances is: %i\n",counter);
+		if(feof(p)) break; //??? is this necessary??? -tb-
+	};
+
+	pclose(p);
+	//printf("count_ipe4reader_instances is: %i\n",counter);
+	return counter;
+}
 
 
 /*--------------------------------------------------------------------

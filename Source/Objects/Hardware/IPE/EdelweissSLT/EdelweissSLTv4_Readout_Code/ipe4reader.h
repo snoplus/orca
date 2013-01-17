@@ -455,7 +455,7 @@ public:
 	int use_dummy_status_bits;
 	
 	
-	Structure_trame_status Trame_status_udp;
+	Structure_trame_status Trame_status_udp; //this is the deprecated OPERA status packet -tb- 2013
 	
 	/*--------------------------------------------------------------------
 	 vars for FIFO buffer

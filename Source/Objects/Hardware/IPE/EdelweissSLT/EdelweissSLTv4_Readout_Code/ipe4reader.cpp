@@ -334,8 +334,19 @@ inline uint32_t FLTRAMDataReg(int numFLT, int numChan){
 
 int runPreRunChecks()
 {
-  
-  
+    
+    int ipe4readerCnt = count_ipe4reader_instances();
+    if(ipe4readerCnt!=1){
+        printf("ERROR: there is at least one other instance of ipe4reader* running (counted %i)!\n",ipe4readerCnt-1);
+        printf("ERROR: use 'ps -e' or 'ps -ef' and e.g. 'killall ipe4reader' to kill pending instances.\n");
+        printf("ERROR: EXITING\n");
+        return 23;
+    }
+
+
+
+
+
 #ifdef __i386
     printf("__i386 is defined!\n");
 #endif
@@ -382,6 +393,7 @@ int runPreRunChecks()
     printf("Offset of spare: %i\n",(char*)&bb.spare - (char*)&bb);
     printf("Offset of bb_status: %i\n",(char*)&bb.bb_status - (char*)&bb);
     printf("Offset of spare_for_alignment: %i\n",(char*)&bb.spare_for_alignment - (char*)&bb);
+    
     
     return retval;
 }
@@ -1573,8 +1585,47 @@ void envoie_commande_horloge(void)
 
 
 /*--------------------------------------------------------------------
+ *    function:     chargeBBWithFile
+ *    purpose:      load the FPGA configuration for the BBs
+ *    author:       Till Bergmann, 2013
+ *
+ *--------------------------------------------------------------------*/ //-tb-
+
+void chargeBBWithFile(char * filename)
+{
+    printf("chargeBBWithFile: >%s<\n",filename);//DEBUG
+
+
+FILE *mon_fichier;
+int j,err;
+int numserie;
+//TODO: ? led_B(_rouge);
+
+				
+//TODO: _send_status_programmation(2)
+printf("fichier %s ",filename);   // was /var/bbv2.rbf
+if( (mon_fichier = fopen(filename,"rw")) )
+	{
+	for(j=0;j<10;j++)		// j'essaye 10 fois
+		{
+		envoie_commande_standard_BBv2();
+		err=programme_bbv2(mon_fichier,&numserie);
+		if(!err) break;
+		}
+	}
+    
+    if(!mon_fichier) printf("    ERROR: could not open file: %s\n",filename);
+    
+printf("***********   bilan de chargement :  numserie=%d  j=%d  err=%d  ********\n",numserie,j,err);
+envoie_commande_horloge();
+//TODO: led_B(_vert);
+return;
+}
+
+
+/*--------------------------------------------------------------------
  *    function:     populateIPECrateStatusPacket
- *    purpose:      fill the  IPE CrateS tatus PUD  packet
+ *    purpose:      fill the  IPE CrateS tatus UDP  packet
  *    author:       Till Bergmann, 2011
  *
  *--------------------------------------------------------------------*/ //-tb-
@@ -1637,7 +1688,10 @@ void populateIPECrateStatusPacket()
 /*--------------------------------------------------------------------
  *    function:     handleKCommand
  *    purpose:      handle command sent from cew_controle/Samba in a UDP packet
- *    author:       from cew.c, modified by Till Bergmann, 2011
+ *
+ *    argument 'buffer': a terminating '\0' will be appended! caller must ensure 'buffer' is large enough!
+ *
+ *    author:        Till Bergmann, 2011
  *
  *--------------------------------------------------------------------*/ //-tb-
  // For testing use 'netcat' (on Mac Terminals 'nc')
@@ -1652,6 +1706,8 @@ void populateIPECrateStatusPacket()
  //   => max. Paketnummer: ca 833 = 0x0341 dh. Faktor 20 ... 
  void handleKCommand(char *buffer, int len, struct sockaddr_in *sockaddr_from_ptr)
  {
+     buffer[len]=0;
+     
      struct sockaddr_in &sockaddr_from=*sockaddr_from_ptr;//convert to referenz
      
      uint32_t fltID=0;
@@ -1773,7 +1829,16 @@ void populateIPECrateStatusPacket()
 	              endKCommandSockets();
 	              initKCommandSockets();
 	          }
-	          else {
+	          else 
+	          if(  (foundPos=strstr(buffer,"chargeBBFile"))  ){
+	              printf("handleKCommand: KWC >%s< command 9!\n",foundPos);//DEBUG
+                  if(len >= sizeof("KWC_chargeBBFile_"))//filename must be at least one character
+                      chargeBBWithFile( foundPos + sizeof("chargeBBFile") );//sizeof("chargeBBFile") counts the ending \0, but I anyway need to skip one '_'
+                  else
+                      printf("   ERROR: KWC >%s< command without filename!\n",buffer);//DEBUG
+		          }
+	          else 
+              {
 	              printf("handleKCommand: WARNING KWC >%s< command unknown!\n",buffer);//DEBUG
 	          }
 	          
@@ -2684,40 +2749,23 @@ int FIFOREADER::writeToAsciiFile(const char *buf, size_t n, int udpdataSec)
 //make it global: is 3 for BB2, 2 for BBv21 mode!!!!!!!!!! -tb-
 //int	Nb_mots_lecture=3;					//marche pour un seul bolo	// nombre de mots total relut dans les data de la fifo:   -tb- d.h. Anzahl 32-bit-Worte(FIFO-Worte) pro (Time-)Sample (Sample=alle ADC-Kanaele
 
-//Funktionsweise: (Abkuerzung mon_i = mon_indice_status_bbv2)
-//    mon_i startet mit: mon_i = _nb_mots_status_bbv2 * 16 + 1  -2 = 911; Zeile unten: mot_status=... ergibt dann = (57-1) - (57*16-1)/16 = (57-1) - 911/16 = 56-int(56.93...)=0
-//    falls mon_i = 912, dann ist mot_status=56-int(57)=-1, d.h. ein Wort wird uebersprungen; will man x Worte (x Statusbits) ueberspringen, so muss 
-//            mon_i = _nb_mots_status_bbv2 * 16 + 1  -2 + x  gesetzt werden
-
- 	#define		my2nd_ecrit_status_bbv2(adc_data32,i,status_bbv2_1)	\
-	if(mon_indice_status_bbv2 &&  ( (i%Nb_mots_lecture) == (Nb_mots_lecture-1) ) )		/* ne marche que pour une seule boite: le bit 0 du dernier mot  */ \
-	{ int mot_status = _nb_mots_status_bbv2 -1 - mon_indice_status_bbv2/16; mon_indice_status_bbv2--;\
-	/*if(mot_status>=0   &&  ((&udpdata32[1])+2 == &adc_data32[i])) printf("Next read is first ADCch6(BB2) sample!\n"); */ \
-	/*if (1 || mot_status>=0) printf(" adc_data32(%p)[i is %i]&0x1))  bit0 %1x     mon_indice_status_bbv2 %i    mot_status %i\n",&adc_data32[i] ,i,adc_data32[i ]&0x1  ,   mon_indice_status_bbv2, mot_status); */  \
-	if (mot_status>=0) status_bbv2_1[mot_status] = ((adc_data32[i]&0x0001)<<15) | ((status_bbv2_1[mot_status]>>1)&0x7fff);}
-
 /*--------------------------------------------------------------------
  *    function:     FIFOREADER::scanFIFObuffer
  *    purpose:      scan data in FIFO buffer; search for header word; send UDP packets
  *    author:       Till Bergmann, 2011
  *
  *--------------------------------------------------------------------*/ //-tb-
-	int32_t		temp_status_bbv2_1[_nb_mots_status_bbv2 + 10];	//_nb_mots_status_bbv2 = 57 -tb-
-	int16_t	*	temp_status_bbv2_1_16=(int16_t	*)temp_status_bbv2_1;
 
 void FIFOREADER::scanFIFObuffer(void)
 {
+	int32_t		temp_status_bbv2_1[_nb_mots_status_bbv2 + 10];	//_nb_mots_status_bbv2 = 57 -tb-
+	int16_t	*	temp_status_bbv2_1_16=(int16_t	*)temp_status_bbv2_1;
+
     if(FIFObuf32avail < 360 ) return;// we need at most 360 words to build a standard UDP packet; only the last before header word may be shorter
     
     //TODO: if globalHeaderWordCounter==0 don't send UDP packets: we are maybe in the middle of FIFO -tb-
 	
-    //vars for scanning status bits
-    int nb_mots_trame32    = 0;
-	//static int mon_indice_status_bbv2 = 0;// <----   each FIFO (in multi-FIFO readout) needs own counter!
-    int32_t *adcdataptr32;
-	int	nb_mots_trame;
-	
-	
+    
     int udpPacketLen   = 0;
     int headerWordFoundFlag = 0;
     uint32_t i;
@@ -2775,38 +2823,6 @@ void FIFOREADER::scanFIFObuffer(void)
 		if(use_spike_finder) runSpikeFinderOnUDPPacket(udpdata,udpPacketLen);
 		
 		
-		#if 0
-		//TODO: remove all this - the FLT is now scanning the status packets -tb-
-		//b.) now scan status bits (I could scan them immediately after reading from FIFO; but here we don't need to care about header word) -tb-
-		nb_mots_trame  = (udpPacketLen/4)-1 ; //nb_mots_trame is in 32bit bunches and the first skipped (?)-tb-
-		//void scanFIFObuffer(void)
-		//mon_indice_status_bbv2 is set below, i.e. when header word found, so scanning status bits starts in next call of printf("mon_indice_status_bbv2 %i\n",mon_indice_status_bbv2);
-		if(mon_indice_status_bbv2){
-		    //DEBUG printf("Nb_mots_lecture %i\n",Nb_mots_lecture);
-			//printf("SCANNING STATUS BITS mon_indice_status_bbv2 %i  nb_mots_trame  %i\n",mon_indice_status_bbv2,nb_mots_trame);
-			//adcdataptr32=udpdata32-5;    // worked 2011-11-15 with -5
-			adcdataptr32=udpdata32+1;    // worked 2011-11-15 with -5
-			for(i=0;i<nb_mots_trame;i++){		// sur les premieres trames, boucle de decodage du status bbv2
-				//_corrige_erreur_bit31 
-				//_recupere_bit_31
-				//_ecrit_status_bbv2(i);
-				my2nd_ecrit_status_bbv2(adcdataptr32,i,Trame_status_udp.status_bbv2_1);
-			}
-			//debug output -> add debug level
-			if(mon_indice_status_bbv2==0){
-				//printf("WRITE STATUS BITS %i\n",mon_indice_status_bbv2);
-				fprintf(stdout," Nbits:");
-				for(i=0; i< _nb_mots_status_bbv2; i++){
-						fprintf(stdout,"%04x.",((unsigned int)Trame_status_udp.status_bbv2_1[i] & 0xffff));
-				}
-				fprintf(stdout,"... \n");
-			}
-		}else
-			for(i=0;i<nb_mots_trame;i++){
-				//_corrige_erreur_bit31
-				//_recupere_bit_31
-			}
-		#endif
 		
     }
 	
@@ -2874,75 +2890,8 @@ void FIFOREADER::scanFIFObuffer(void)
             FIFObuf32avail =  pushIndexFIFObuf32 - popIndexFIFObuf32;
 
 
-
-            //****************************************************
-            //*    BEGIN - OPERA status packet (deprecated)      *
-            //****************************************************
-			//FORMAT DEFNITION: see cew.c, macro _ecrit_trame_status(pt) as a example; or above at init of Opera Status -tb-
-            Trame_status_udp.identifiant = 0x0000ffff;
-            Trame_status_udp.status_opera.temps_seconde = udpdataSec;
-			
-            Trame_status_udp.status_opera.temps_pd_fort       = pd_fort;
-            Trame_status_udp.status_opera.temps_pd_faible     = pd_faible;
-			
-			//get Opera status
-            uint32_t OperaStatus0 =  pbus->read(OperaStatusReg0);
-            uint32_t OperaStatus1 =  pbus->read(OperaStatusReg1);
-            //printf("OperaStatusReg0: 0x%08x\n",OperaStatus0);
-            //printf("OperaStatusReg1: 0x%08x\n",OperaStatus1);
-			Code_acqui   =  OperaStatus0      & 0xff;
-			Masque_BB    = (OperaStatus0>> 8) & 0xff;
-			Code_synchro = (OperaStatus0>>16) & 0xff;
-			Retard       = (OperaStatus0>>24) & 0xff;
-			X            =  OperaStatus1      & 0xfff;
-            Trame_status_udp.status_opera.code_acqui       = Code_acqui;
-                 //Trame_status_udp.status_opera.code_acqui       = 3       & 0xff;
-            Trame_status_udp.status_opera.masque_BB        = Masque_BB;
-            Trame_status_udp.status_opera.code_synchro     = Code_synchro;
-            Trame_status_udp.status_opera.registre_retard  = Retard;
-            Trame_status_udp.status_opera.registre_x       = X;
-            Trame_status_udp.status_opera.version_cew      = VERSION_IPE4READOUT;
-#if 0            
-            switch( Trame_status_udp.status_opera.code_acqui ){
-                case 0: printf("   OperaStatus0 code acqi %i: test mode\n",Trame_status_udp.status_opera.code_acqui); break;
-                case 3: printf("   OperaStatus0 code acqi %i: BBv21\n",Trame_status_udp.status_opera.code_acqui); break;
-                case 8: printf("   OperaStatus0 code acqi %i: BB2\n",Trame_status_udp.status_opera.code_acqui); break;
-                default: printf("   OperaStatus0 code acqi %i: unsupported\n", Trame_status_udp.status_opera.code_acqui); break;
-            }
-#endif
-            switch( Trame_status_udp.status_opera.code_acqui ){
-                case 0: printf("   OperaStatus0 code acqi %i: test mode\n",Trame_status_udp.status_opera.code_acqui); break;
-                case 3: Nb_mots_lecture=2; break;
-                case 8: Nb_mots_lecture=3; break;
-                default: Nb_mots_lecture=3; 
-				         printf("WARNING: Unknown OperaStatus0 code acqi %i: using fallback Nb_mots_lecture=%i - status packet may be corrupt!\n", Trame_status_udp.status_opera.code_acqui,Nb_mots_lecture); 
-						 break;
-            }
-			
-			//			others
-/*
-#define		_ecrit_trame_status(pt)			\
-Trame_status_udp.status_opera.version_cew			= (int)(1000.*_version_cew + 1 ); \
-Trame_status_udp.status_opera.temps_pd_fort			= _temps_poid_fort(pt);\
-Trame_status_udp.status_opera.temps_pd_faible		= _temps_poid_faible(pt);\
-Trame_status_udp.status_opera.temps_seconde			= _temps_seconde(Trame_status_udp.status_opera.temps_pd_fort,Trame_status_udp.status_opera.temps_pd_faible);\
-Trame_status_udp.status_opera.code_acqui			= _code_acqui(pt); \
-Trame_status_udp.status_opera.micro_bbv2			= _micro_trame(pt); \
-Trame_status_udp.status_opera.masque_BB				= _masque_BB(pt); \
-Trame_status_udp.status_opera.code_synchro			= _code_synchro(pt);\
-Trame_status_udp.status_opera.registre_x			= _reg_x_trame(pt); \
-Trame_status_udp.status_opera.registre_retard		= _retard_trame(pt); \
-Trame_status_udp.status_opera.nb_erreurs_synchro_cew	= erreur_synchro_cew; \
-Trame_status_udp.status_opera.nb_erreurs_timestamp	= erreur_timestamp; \
-Trame_status_udp.status_opera.erreurs_synchro_opera	= _erreur_synchro_opera(pt); \
-erreur_synchro_opera	= _erreur_synchro_opera(pt);
-*/
-			
-
-
-
-			//led_B(_rouge); 
-//TODO: ===>   KEEP THIS FOR NON-OPERA PACKETS! -tb-
+            //decrease the UDP data request timeout
+            //TODO: ===>   KEEP THIS FOR NON-OPERA PACKETS! -tb-
 			for(i=0;i<NB_CLIENT_UDP;i++){
 			    status_client[i]=numPacketsClient[i]; 
 					    //printf("  ... index  %i status_client(%i) \n",i,status_client[i]);
@@ -2953,82 +2902,73 @@ erreur_synchro_opera	= _erreur_synchro_opera(pt);
 					    printf("index  %d status_client(%d) \n",i,status_client[i]);
 					}
 				}
-			    if(show_debug_info>1)
-    				printf("  data: %x , %x , %x , %x ",(FIFObuf32[4]>>16)&0xffff,FIFObuf32[4]&0xffff,(FIFObuf32[5]>>16)&0xffff,FIFObuf32[5]&0xffff);
-    				//printf("err=%d/%d/%d/%d   data: %lx , %lx , %lx , %lx ",erreur_synchro_opera,erreur_synchro_cew,erreur_timestamp,erreur_synchro_bbv2,
-					//					(FIFObuf32[4]>>16)&0xffff,FIFObuf32[4]&0xffff,(FIFObuf32[5]>>16)&0xffff,FIFObuf32[5]&0xffff);
 			}
+            
+            //debug output
+            if(show_debug_info>2){
+                printf("  data: %x , %x , %x , %x ",(FIFObuf32[4]>>16)&0xffff,FIFObuf32[4]&0xffff,(FIFObuf32[5]>>16)&0xffff,FIFObuf32[5]&0xffff);
+                //printf("err=%d/%d/%d/%d   data: %lx , %lx , %lx , %lx ",erreur_synchro_opera,erreur_synchro_cew,erreur_timestamp,erreur_synchro_bbv2,
+                //					(FIFObuf32[4]>>16)&0xffff,FIFObuf32[4]&0xffff,(FIFObuf32[5]>>16)&0xffff,FIFObuf32[5]&0xffff);
+            }
+                
+                
 
-			//send UDP status packet  //TODO: send it before reading the next status????? -tb-
-			  //dummy status bits
-			if(use_dummy_status_bits){//dedicated for BBv1 with all status bits == 0; replaces status bits by dummy status of previously recorded status (for BBv2)
-			    //in main(): buf_status284_len = readFileToBuf("bb21-udp284.txt",buf_status284
-				printf("Warning: DUMMY STATUS BITS for FIFO %i\n",numfifo);
-				if(buf_status284_len==0) printf("ERROR: CANNOT READ DUMMY STATUS BITS, FILE NOT FOUND: bb21-udp284.txt or udp284.txt\n");
-				int i;
-				Structure_trame_status *dummystatus=(Structure_trame_status *)buf_status284;
-				for(i=0; i<_nb_mots_status_bbv2;i++){
-				    Trame_status_udp.status_bbv2_1[i] = dummystatus->status_bbv2_1[i];
-				    if(i==0) Trame_status_udp.status_bbv2_1[0] = use_dummy_status_bits + 0x200;//0x0000020c;//this "fakes" BB#12=0xc;
-					printf("%x.",Trame_status_udp.status_bbv2_1[i]);
-				}
-			    printf("\n");
-                if(send_status_udp_packet) sendtoUDPClients(0,(&Trame_status_udp),sizeof(Trame_status_udp));
-			}
-            //****************************************************
-            //*    END - OPERA status packet (deprecated)      *
-            //****************************************************
 			
             
-            //*    CRATE status packet       *
             //****************************************************
-			UDPPacketScheduler statusScheduler(this);
-            //prepare header
-            TypeStatusHeader crateStatusHeader;
-            crateStatusHeader.identifiant = 0x0000ffff;
-            statusScheduler.setHeader((char*)&crateStatusHeader,sizeof(crateStatusHeader));
-            statusScheduler.writeHeaderToPayload();
-            //payload
-            TypeIpeCrateStatusBlock crateStatusBlock;
-            crateStatusBlock.stamp_msb = pd_fort;
-            crateStatusBlock.stamp_lsb = pd_faible;
-            crateStatusBlock.PPS_count = udpdataSec;
-	        crateStatusBlock.size_bytes = sizeof(crateStatusBlock);            // 
-	        crateStatusBlock.version = VERSION_IPE4READOUT;        // _may_ be useful in some particular cases (version of C code/firmware/hardware?)
-            //SLT register:
-	        crateStatusBlock.SLTTimeLow    =  pbus->read(SLTTimeLowReg);       // the according SLT register
-	        crateStatusBlock.SLTTimeHigh   =  pbus->read(SLTTimeHighReg);       // the according SLT register
-	        crateStatusBlock.OperaStatus1  = OperaStatus1;     // contains d0, previously in cew: registre_x, =20  
-	        crateStatusBlock.pixbus_enable = pbus->read(SLTPixbusEnableReg);
-            //Software status:
-            crateStatusBlock.prog_status         = 0;
-            crateStatusBlock.internal_error_info = 0;
-            crateStatusBlock.ipe4reader_status   = FIFOREADER::State;
-            crateStatusBlock.spare1 = 1;
-            crateStatusBlock.spare2 = 2;
-            //append status to payload
-            statusScheduler.appendDataSendIfFull((char*)&crateStatusBlock,sizeof(crateStatusBlock));
-
-            
+            //*    BEGIN  -  IPE status packet(s)                *
             //****************************************************
-            //*         BB status packet(s)                      *
-            //****************************************************
-            //prepare header
-            TypeStatusHeader BBStatusHeader;
-            BBStatusHeader.identifiant = 0x0000fffe;
-            statusScheduler.setHeader((char*)&BBStatusHeader,sizeof(BBStatusHeader));
-            //payload
-            TypeBBStatusBlock BBStatusPayload;
-            BBStatusPayload.size_bytes = sizeof(BBStatusPayload);
-            BBStatusPayload.type = 0xbb;        //type of status block
-            BBStatusPayload.crateIndex = 0xcc;  //TODO: read from crate backplane
-            BBStatusPayload.fltIndex   = 0;
-            BBStatusPayload.fiberIndex = 0;
-            BBStatusPayload.spare = 0x87654321;//32 bit
-            BBStatusPayload.spare_for_alignment = 0x4321;//16 bit
-            
 			//read status bits from FLT memory
-			if(send_status_udp_packet){
+			if(send_status_udp_packet & 0x1){ //0x1 = bit 0 = IPE status; 0x2 = bit 1 = OPERA status (legacy)
+                //****************************************************
+                //*    CRATE status packet       *
+                //****************************************************
+                UDPPacketScheduler statusScheduler(this);
+                //prepare header
+                TypeStatusHeader crateStatusHeader;
+                crateStatusHeader.identifiant = 0x0000ffff;
+                statusScheduler.setHeader((char*)&crateStatusHeader,sizeof(crateStatusHeader));
+                statusScheduler.writeHeaderToPayload();
+                //payload
+                TypeIpeCrateStatusBlock crateStatusBlock;
+                crateStatusBlock.stamp_msb = pd_fort;
+                crateStatusBlock.stamp_lsb = pd_faible;
+                crateStatusBlock.PPS_count = udpdataSec;
+                crateStatusBlock.size_bytes = sizeof(crateStatusBlock);            // 
+                crateStatusBlock.version = VERSION_IPE4READOUT;        // _may_ be useful in some particular cases (version of C code/firmware/hardware?)
+                //SLT register:
+                uint32_t OperaStatus1 =  pbus->read(OperaStatusReg1);
+                crateStatusBlock.SLTTimeLow    =  pbus->read(SLTTimeLowReg);       // the according SLT register
+                crateStatusBlock.SLTTimeHigh   =  pbus->read(SLTTimeHighReg);       // the according SLT register
+                crateStatusBlock.OperaStatus1  = OperaStatus1;     // contains d0, previously in cew: registre_x, =20  
+                crateStatusBlock.pixbus_enable = pbus->read(SLTPixbusEnableReg);
+                //Software status:
+                crateStatusBlock.prog_status         = 0;
+                crateStatusBlock.internal_error_info = 0;
+                crateStatusBlock.ipe4reader_status   = FIFOREADER::State;
+                crateStatusBlock.spare1 = 1;
+                crateStatusBlock.spare2 = 2;
+                //append status to payload
+                statusScheduler.appendDataSendIfFull((char*)&crateStatusBlock,sizeof(crateStatusBlock));
+
+                
+                //****************************************************
+                //*         BB status packet(s)                      *
+                //****************************************************
+                //prepare header
+                TypeStatusHeader BBStatusHeader;
+                BBStatusHeader.identifiant = 0x0000fffe;
+                statusScheduler.setHeader((char*)&BBStatusHeader,sizeof(BBStatusHeader));
+                //payload
+                TypeBBStatusBlock BBStatusPayload;
+                BBStatusPayload.size_bytes = sizeof(BBStatusPayload);
+                BBStatusPayload.type = 0xbb;        //type of status block
+                BBStatusPayload.crateIndex = 0xcc;  //TODO: read from crate backplane
+                BBStatusPayload.fltIndex   = 0;
+                BBStatusPayload.fiberIndex = 0;
+                BBStatusPayload.spare = 0x87654321;//32 bit
+                BBStatusPayload.spare_for_alignment = 0x4321;//16 bit
+                
 			    int idx;//index, not ID
 			    for(idx=0; idx<FLTSETTINGS::maxNumFLT; idx++){
 			        FLTSETTINGS &flt = FLTSETTINGS::FLT[idx];
@@ -3063,7 +3003,124 @@ erreur_synchro_opera	= _erreur_synchro_opera(pt);
                             }
                             
 
-                            #if 1  //TODO: remove in the future -tb-
+						}//for(fiber ...
+					}//if FLT is present ...
+								
+					
+
+					//write UDP status packet to file
+                    #if 0
+					//TODO: now I maybe send several status packets - move to for-fiber-loop above -tb-
+					if(write2file && write2file_format == ascii){
+						if(  globalHeaderWordCounter>0 && globalHeaderWordCounter < write2file_len_sec){
+							if(pFile == NULL) openAsciiFile(udpdataSec,write2file_len_sec);//open file
+							writeToAsciiFile((char*)(&Trame_status_udp),sizeof(Trame_status_udp),udpdataSec);
+						}else
+						if( pFile){//close file
+							fclose(pFile);
+							pFile = NULL;
+							printf("STOP writing To Ascii File at sec: %i\n",udpdataSec);
+							run_main_readout_loop = 0; //TODO: set flag to finish main loop - leave it? -tb-
+						}
+					}
+                    #endif
+                    
+				}//for(idx ... FLT loop
+                //if(statusScheduler.sendPacketCounter==0)
+                statusScheduler.sendScheduledData();
+				
+			}//if(send_status_udp_packet ...
+            //****************************************************
+            //*    END    -  IPE status packet(s)                *
+            //****************************************************
+            
+            
+            
+            
+            
+            //****************************************************
+            //*    BEGIN - OPERA status packet (deprecated)      *
+            //****************************************************
+			//read status bits from FLT memory
+			if(send_status_udp_packet & 0x3){ //0x1 = bit 0 = IPE status; 0x2 = bit 1 = OPERA status (legacy)
+                //FORMAT DEFNITION: see cew.c, macro _ecrit_trame_status(pt) as a example; or above at init of Opera Status -tb-
+                Trame_status_udp.identifiant = 0x0000ffff;
+                Trame_status_udp.status_opera.temps_seconde = udpdataSec;
+                
+                Trame_status_udp.status_opera.temps_pd_fort       = pd_fort;
+                Trame_status_udp.status_opera.temps_pd_faible     = pd_faible;
+                
+                //get Opera status
+                //     ------>   see    "#define		_ecrit_trame_status(pt)..."
+                uint32_t OperaStatus0 =  pbus->read(OperaStatusReg0);
+                uint32_t OperaStatus1 =  pbus->read(OperaStatusReg1);
+                //printf("OperaStatusReg0: 0x%08x\n",OperaStatus0);
+                //printf("OperaStatusReg1: 0x%08x\n",OperaStatus1);
+                Code_acqui   =  OperaStatus0      & 0xff;
+                Masque_BB    = (OperaStatus0>> 8) & 0xff;
+                Code_synchro = (OperaStatus0>>16) & 0xff;
+                Retard       = (OperaStatus0>>24) & 0xff;
+                X            =  OperaStatus1      & 0xfff;
+                Trame_status_udp.status_opera.code_acqui       = Code_acqui;
+                     //Trame_status_udp.status_opera.code_acqui       = 3       & 0xff;
+                Trame_status_udp.status_opera.masque_BB        = Masque_BB;
+                Trame_status_udp.status_opera.code_synchro     = Code_synchro;
+                Trame_status_udp.status_opera.registre_retard  = Retard;
+                Trame_status_udp.status_opera.registre_x       = X;
+                Trame_status_udp.status_opera.version_cew      = VERSION_IPE4READOUT;
+                #if 0            
+                switch( Trame_status_udp.status_opera.code_acqui ){
+                    case 0: printf("   OperaStatus0 code acqi %i: test mode\n",Trame_status_udp.status_opera.code_acqui); break;
+                    case 3: printf("   OperaStatus0 code acqi %i: BBv21\n",Trame_status_udp.status_opera.code_acqui); break;
+                    case 8: printf("   OperaStatus0 code acqi %i: BB2\n",Trame_status_udp.status_opera.code_acqui); break;
+                    default: printf("   OperaStatus0 code acqi %i: unsupported\n", Trame_status_udp.status_opera.code_acqui); break;
+                }
+                #endif
+                switch( Trame_status_udp.status_opera.code_acqui ){
+                    case 0: printf("   OperaStatus0 code acqi %i: test mode\n",Trame_status_udp.status_opera.code_acqui); break;
+                    case 3: Nb_mots_lecture=2; break;
+                    case 8: Nb_mots_lecture=3; break;
+                    default: Nb_mots_lecture=3; 
+                             printf("WARNING: Unknown OperaStatus0 code acqi %i: using fallback Nb_mots_lecture=%i - status packet may be corrupt!\n", Trame_status_udp.status_opera.code_acqui,Nb_mots_lecture); 
+                             break;
+                }
+
+                
+                //debug output
+                //if(show_debug_info>2){
+                //    printf("  data: %x , %x , %x , %x ",(FIFObuf32[4]>>16)&0xffff,FIFObuf32[4]&0xffff,(FIFObuf32[5]>>16)&0xffff,FIFObuf32[5]&0xffff);
+                //    //printf("err=%d/%d/%d/%d   data: %lx , %lx , %lx , %lx ",erreur_synchro_opera,erreur_synchro_cew,erreur_timestamp,erreur_synchro_bbv2,
+                //    //					(FIFObuf32[4]>>16)&0xffff,FIFObuf32[4]&0xffff,(FIFObuf32[5]>>16)&0xffff,FIFObuf32[5]&0xffff);
+                //}
+                    
+                //send UDP status packet  //TODO: send it before reading the next status????? -tb-
+                  //dummy status bits
+                if(use_dummy_status_bits){//dedicated for BBv1 with all status bits == 0; replaces status bits by dummy status of previously recorded status (for BBv2)
+                    //in main(): buf_status284_len = readFileToBuf("bb21-udp284.txt",buf_status284
+                    printf("Warning: DUMMY STATUS BITS for FIFO %i\n",numfifo);
+                    if(buf_status284_len==0) printf("ERROR: CANNOT READ DUMMY STATUS BITS, FILE NOT FOUND: bb21-udp284.txt or udp284.txt\n");
+                    int i;
+                    Structure_trame_status *dummystatus=(Structure_trame_status *)buf_status284;
+                    for(i=0; i<_nb_mots_status_bbv2;i++){
+                        Trame_status_udp.status_bbv2_1[i] = dummystatus->status_bbv2_1[i];
+                        if(i==0) Trame_status_udp.status_bbv2_1[0] = use_dummy_status_bits + 0x200;//0x0000020c;//this "fakes" BB#12=0xc;
+                        printf("%x.",Trame_status_udp.status_bbv2_1[i]);
+                    }
+                    printf("\n");
+                    if(send_status_udp_packet) sendtoUDPClients(0,(&Trame_status_udp),sizeof(Trame_status_udp));
+                }
+
+			    int idx;//index, not ID
+			    for(idx=0; idx<FLTSETTINGS::maxNumFLT; idx++){
+			        FLTSETTINGS &flt = FLTSETTINGS::FLT[idx];
+					//FLTSETTINGS &FLT = FLTSETTINGS::FLT[numfifo]; //TODO: each FLT has its own SLT FIFO; move status packet sending elsewhere? -tb-
+					if(flt.isPresent)
+					{
+						int numFLT = flt.fltID;
+						int fiber;
+						for(fiber=0;fiber<6;fiber++){
+                            
+
 							if(flt.sendLegacyBBstatusMask & bit[fiber]){
 								//printf("Status bits fiber %i read from FLT %i with ID %i:\n",fiber,idx,numFLT);
 								int i;
@@ -3076,21 +3133,7 @@ erreur_synchro_opera	= _erreur_synchro_opera(pt);
 									//printf("0x%08x ",status);
 									//dbg printf("%04x.%04x.",status16[0],status16[1]);
 								}
-                                //build BB status packet
-                                BBStatusPayload.fltIndex = idx;
-                                BBStatusPayload.fiberIndex = fiber;
-								for(i=0; i<_nb_mots_status_bbv2; i++){
-                                    BBStatusPayload.bb_status[i] = temp_status_bbv2_1_16[i];//TODO: immediately copy it when OPERA status is removed! -tb-
-									//printf("bb_status %i: 0x%08x ",i,BBStatusPayload.bb_status[i]);
-								}
-							   //dbg printf("\n");
-								  //printf("   Reading status bits of fiber %i  from FLT#  %i (idx %i): BBv# 0x%04x\n",fiber,numFLT,idx,temp_status_bbv2_1_16[0]);
-                                statusScheduler.appendDataSendIfFull((char*)&BBStatusPayload,sizeof(BBStatusPayload));
-
-                                //****************************************************
-                                //*    BEGIN - OPERA status packet (deprecated)      *
-                                //****************************************************
-							    //TODO: buffer and send them all -tb-
+                                
 								//printf("Send UDP Packet with BB status bits read from FLT# %i (BBv# 0x%04x). \n",numFLT,temp_status_bbv2_1_16[0]);
 								for(i=0; i<_nb_mots_status_bbv2;i++){
 									Trame_status_udp.status_bbv2_1[i] = temp_status_bbv2_1_16[i]; //expand 16 bit array to 32 bit array
@@ -3099,17 +3142,10 @@ erreur_synchro_opera	= _erreur_synchro_opera(pt);
 			                    if(show_debug_info>=1)
 								    printf("   Reading status bits of fiber %i  from FLT#  %i (idx %i): BBv# 0x%08x\n",fiber,numFLT,idx,Trame_status_udp.status_bbv2_1[0]);
 								//dbg printf("\n");
-							       //TODO: use old or new status packet format (currently: only old/Opera format) -tb-
-							       //TODO: use old or new status packet format 
-							       //TODO: use old or new status packet format 
 								sendtoUDPClients(0,(&Trame_status_udp),sizeof(Trame_status_udp));
-                                //****************************************************
-                                //*    END - OPERA status packet (deprecated)      *
-                                //****************************************************
 							}
-                            #endif
-						}
-					}
+						}//for(fiber ...
+					}//if FLT is present ...
 								
 					  //send it  -  the last status will be sent, but use_static_udp_client is obsolete 2012-10 -tb-
 					if(use_static_udp_client && send_status_udp_packet){
@@ -3137,11 +3173,12 @@ erreur_synchro_opera	= _erreur_synchro_opera(pt);
 							run_main_readout_loop = 0; //TODO: set flag to finish main loop - leave it? -tb-
 						}
 					}
-				}//for(idx ...
-                //if(statusScheduler.sendPacketCounter==0)
-                statusScheduler.sendScheduledData();
+				}//for(idx ... FLT loop
 				
 			}//if(send_status_udp_packet ...
+            //****************************************************
+            //*    END - OPERA status packet (deprecated)      *
+            //****************************************************
 			
 			
             #if 0   //remove it - legacy -tb-
@@ -3629,6 +3666,7 @@ int32_t main(int32_t argc, char *argv[])
     char InBuffer[MY_UDP_LISTEN_MAX_PACKET_SIZE];	// took buffer size from CEW_controle,but char instead of unsigned char -tb-
     unsigned char UInBuffer[MY_UDP_LISTEN_MAX_PACKET_SIZE];	// took buffer size from CEW_controle,but char instead of unsigned char -tb-
 
+    printf("Started %s ...\n\n",argv[0]);
 
     printf("KIT-IPE EDELWEISS stream loop\n");
     printf("=============================\n");
@@ -4072,21 +4110,6 @@ int32_t main(int32_t argc, char *argv[])
 					}
 				}
 				//TODO: this was for debugging the status bit FIFOs - remove it -tb-
-				if(0){ //moved to 'scanFIFOBuffer ... -tb-
-					int numFLT=4;//<----------------------numFLT
-					printf("Status bits read from FLT:\n");
-					int i;
-					uint32_t status;
-					uint16_t *status16 = (uint16_t *)(&status);
-					int numChan =0;
-					for(i=0; i<32; i++){
-						status = pbus->read(FLTBBStatusReg(numFLT, numChan)+i);
-						temp_status_bbv2_1[i]=status;
-						printf("0x%08x ",status);
-						printf("%04x.%04x.",status16[0],status16[1]);
-					}
-					printf("\n");
-				}
 				if(0){
 					//FIFO status and mode of FIFO 0
 					uint32_t FIFO0Status =  pbus->read(FIFOStatusReg(0));
@@ -4108,10 +4131,6 @@ int32_t main(int32_t argc, char *argv[])
 			int numRead=0;
 			while( (   numRead = recvfromGlobalServer(InBuffer,sizeof(InBuffer)) ) >0 ){
 				fprintf(stderr,"main: recvfromGlobalServer(...), received UDP command packet (%i bytes)\n", numRead );
-				fprintf(stderr,"------------------------------------------------------------ (%i bytes)\n", numRead );
-				fprintf(stderr,"------------------------------------------------------------ (%i bytes)\n", numRead );
-				fprintf(stderr,"------------------------------------------------------------ (%i bytes)\n", numRead );
-				fprintf(stderr,"------------------------------------------------------------ (%i bytes)\n", numRead );
 				fprintf(stderr,"------------------------------------------------------------ (%i bytes)\n", numRead );
 				fprintf(stderr,"------------------------------------------------------------ (%i bytes)\n", numRead );
 				fprintf(stderr,"------------------------------------------------------------ (%i bytes)\n", numRead );

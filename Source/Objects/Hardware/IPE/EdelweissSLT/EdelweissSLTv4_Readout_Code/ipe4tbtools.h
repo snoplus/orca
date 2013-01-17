@@ -34,6 +34,9 @@ int slotOfPCIAddr(uint32_t address);
 // return slot associated to a address (1..20=FLT #1..#20, slot>=21 means SLT address); address = PCI-address>>2
 int slotOfAddr(uint32_t address);
 
+//counts all processes named "ipe4reader*" (used to prohibit double start)
+int count_ipe4reader_instances(void);
+
 /*--------------------------------------------------------------------
   globals and functions for hardware access
   --------------------------------------------------------------------*/
