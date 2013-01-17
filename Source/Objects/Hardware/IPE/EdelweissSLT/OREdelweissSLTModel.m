@@ -332,14 +332,21 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
                 TypeBBStatusBlock *BBblock;
                 int BBblockLen, counter=0;
                 BBblock=(TypeBBStatusBlock*)ptr;
-                BBblockLen = BBblock->size_bytes;
+                BBblockLen = BBblock->size_bytes; 
                 while(BBblockLen>0){
                     counter++;
+                    //error check
+                    if(BBblockLen > MAX_UDP_STATUSPACKET_SIZE){  //is 1480
+				        NSLog(@"      ERROR: BBblockLen %i exceeds max. len %i: corrupted UDP packet? \n",BBblockLen,SIZEOF_UDPStructIPECrateStatus);
+                        break;
+                    }
+                    //print some output
 				    NSLog(@"      BB status packet: block %i , length (bytes) %i, FLT #%i, fiber #%i, status: 0x%04x 0x%04x ... \n",
                                  counter,BBblock->size_bytes,BBblock->fltIndex +1,BBblock->fiberIndex +1,BBblock->bb_status[0],BBblock->bb_status[1]);
                     unsigned char*myptr=ptr;
-                    NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
-
+                    //NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
+	                NSFont* aFont = [NSFont fontWithName:@"Monaco" size:11];
+                    
 				    NSLogFont(aFont,@"  0:   %02x %02x %02x %02x     %02x %02x %02x %02x     %02x %02x %02x %02x     %02x %02x %02x %02x \n",
                                  myptr[0],myptr[1],myptr[2],myptr[3],myptr[4],myptr[5],myptr[6],myptr[7],
                                  myptr[8],myptr[9],myptr[10],myptr[11],myptr[12],myptr[13],myptr[14],myptr[15]);

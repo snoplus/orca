@@ -636,7 +636,7 @@ class UDPPacketScheduler{
 public:
     //ctor
     UDPPacketScheduler(FIFOREADER *fr):len(0),headerLen(0),sizeofLen(sizeof(uint32_t)),sendPacketCounter(0)
-        { myFiforeader=fr; sizeofLen=sizeof(uint16_t); bufHeaderLen=0; }
+        { myFiforeader=fr; /*sizeofLen=sizeof(uint32_t);*/ bufHeaderLen=0; }
     char buf[UDPStatusPacketSize];
     char header[UDPStatusPacketSize];
     //char headerBuf[UDPStatusPacketSize];
