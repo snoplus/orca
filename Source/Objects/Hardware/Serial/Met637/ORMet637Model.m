@@ -693,11 +693,12 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 		if(!sentStartOnce){
 		   sentStartOnce = YES;
 		   sentStopOnce = NO;
+            wasRunning = NO;
 
-			wasRunning = NO;
 			[self startCycle:YES];
 		}
 	}
+    else wasRunning = YES;
 }
 
 - (void) processIsStopping
