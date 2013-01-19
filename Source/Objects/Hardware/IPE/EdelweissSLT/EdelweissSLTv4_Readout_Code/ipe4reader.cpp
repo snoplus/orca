@@ -2761,35 +2761,116 @@ void FIFOREADER::scanFIFObuffer(void)
 	int32_t		temp_status_bbv2_1[_nb_mots_status_bbv2 + 10];	//_nb_mots_status_bbv2 = 57 -tb-
 	int16_t	*	temp_status_bbv2_1_16=(int16_t	*)temp_status_bbv2_1;
 
-    if(FIFObuf32avail < 360 ) return;// we need at most 360 words to build a standard UDP packet; only the last before header word may be shorter
+
+
+
+
+//remove flagToSendDataAndResetBuffer!!!!!!!!
+
+
+
+
+
+    if((FIFObuf32avail < 360) /*&& !flagToSendDataAndResetBuffer*/) return;// we need at most 360 words to build a standard UDP packet; only the last before header word may be shorter
     
     //TODO: if globalHeaderWordCounter==0 don't send UDP packets: we are maybe in the middle of FIFO -tb-
 	
+    //360 = 1440/4 = max. word32 payload size
     
     int udpPacketLen   = 0;
     int headerWordFoundFlag = 0;
     uint32_t i;
     int32_t val;
     
-    //1. start building a UDP packet in array udpdata32/udpdata ;    we have at least 360 words in FIFO: 
+    //1. start building a UDP packet in array udpdata32/udpdata ;    we have usually 360 words in FIFO: 
 	//     a) full packet with 360 samples or 
 	//     b) less, then we will have the header word somewhere -tb-
-    udpdata16[0] = udpdataCounter;
-    udpdata16[1] = udpdataSec;  //TODO cut to 14 bit as in cew.c?  -tb-
+    udpdata16[0] = udpdataCounter;   //
+    udpdata16[1] = udpdataSec;       //TODO cut to 14 bit as in cew.c?  -tb-
     udpPacketLen +=4;
-    if(show_debug_info>2) printf("scanFIFObuffer: start udp packet with sec %i, counter %i\n",udpdataSec ,udpdataCounter);//TODO: DEBUG output -tb-
-    for(i=0; i<360; i++){  //TODO: 360 = 1440 / 4 ---> must be configurable (FIFOREADER variable) -tb-
+
+#if 0
+    if(waitingForSynchroWord){
+        printf("-------------------------------waiting for  0x00003117\n");//TODO: DEBUG output -tb-
         val = FIFObuf32[popIndexFIFObuf32];
         if( val == 0x00003117){
-            headerWordFoundFlag=1 ;  
-            if(show_debug_info>2) printf("scanFIFObuffer: found header word at i= %i (popIndexFIFObuf32 %i)\n",i, popIndexFIFObuf32);//TODO: DEBUG output -tb-
-            break;//stop for-loop: keep headerWord in buffer and proceed to step 2.a)
+            printf("--------------------------found 0x00003117\n");//TODO: DEBUG output -tb-
         }
-        //else
+        waitingForSynchroWord=0;
+    }
+#endif    
+    
+    //compute packet size
+    int numWord32=360;
+    
+    if(flagToSendDataAndResetBuffer){
+        if(FIFObuf32avail<=360){//we have the last 'maybe not full' UDP packet (before the magic pattern)
+            numWord32=FIFObuf32avail;//in all other cases FIFObuf32avail is >360
+            //if(flagToSendDataAndResetBuffer)
+            printf("scanFIFObuffer: start LAST udp packet with sec %i, counter %i (preferred size 360, use numWord32:%i)  (flagToSendDataAndResetBuffer:%i)\n",udpdataSec ,udpdataCounter,numWord32,flagToSendDataAndResetBuffer);//TODO: DEBUG output -tb-
+            //flagToSendDataAndResetBuffer=2;
+            flagToSendDataAndResetBuffer = 0;//
+            waitingForSynchroWord = 1;
+        }
+    }
+    
+    
+    //if(synchroWordPosHint>0){
+    //        printf("  >>>>>>>>>scanFIFObuffer:  synchroWordPosHint %i waitingForSynchroWord = %i  FIFObuf32avail %i synchroWordBufferPosHint %i\n",synchroWordPosHint,waitingForSynchroWord,FIFObuf32avail,synchroWordBufferPosHint);//TODO: DEBUG output -tb-
+    //}
+
+    if(show_debug_info>3) printf("scanFIFObuffer: start udp packet with sec %i, counter %i (preferred size numWord32:%i)\n",udpdataSec ,udpdataCounter,numWord32);//TODO: DEBUG output -tb-
+static int debcnt=0;
+    for(i=0; i<numWord32; i++){  //TODO: 360 = 1440 / 4 ---> must be configurable (FIFOREADER variable) -tb-
+        val = FIFObuf32[popIndexFIFObuf32];
+        //if( (val & 0xffff) == 0x3117){  //TODO: or  if( val == 0x00003117){ ... ??? ask Sascha to see in black box (Opera FPGA) -tb-
+        if( val == 0x00003117){ //TODO: ... ??? ask Sascha to see in black box (Opera FPGA) -tb-
+            //check if position is as expected:
+            if(synchroWordBufferPosHint==0){//yes, is exactly where it should be
+                headerWordFoundFlag=1 ;  
+                waitingForSynchroWord = 0;
+                synchroWordPosHint=0;
+                //if(show_debug_info>2) 
+                printf("scanFIFObuffer: found header word at i= %i (popIndexFIFObuf32 %i)\n",i, popIndexFIFObuf32);//TODO: DEBUG output -tb-
+
+if(i==0) debcnt++;
+if(debcnt>10){
+   printf("f(debcnt>10)     scanFIFObuffer: found header word: synchroWordBufferPosHint %i    (popIndexFIFObuf32 %i)\n",synchroWordBufferPosHint, popIndexFIFObuf32);//TODO: DEBUG output -tb-
+ exit(99);
+ }
+                //printf("scanFIFObuffer: found header word: synchroWordBufferPosHint %i    (popIndexFIFObuf32 %i)\n",synchroWordBufferPosHint, popIndexFIFObuf32);//TODO: DEBUG output -tb-
+                break;//stop for-loop: keep headerWord in buffer and proceed to step 2.a)
+            }else{
+                if(synchroWordBufferPosHint>=-64 && synchroWordBufferPosHint<=64){//is near the expected position
+                    printf("scanFIFObuffer: WARNING: found synchro word shifted by %i from expected position  \n",synchroWordBufferPosHint);//TODO: DEBUG output -tb-
+                }
+                    printf("  !!!scanFIFObuffer: WARNING: found synchro word shifted by %i from expected position (i=%i, to numWord32=%i) \n",synchroWordBufferPosHint,i,numWord32);//TODO: DEBUG output -tb-
+                //in all other cases the pattern 0x00003117 is assumed to be ADC data
+                if(   (0x00080c00 == (FIFObuf32[popIndexFIFObuf32+1] & 0x000f0f00))   ||   synchroWordBufferPosHint==8192){
+                    printf("WARNING: is 0x00080cXX or 8192 shift: MOST PROBABLY A synch word - scanFIFObuffer: WARNING: found synchro word shifted by %i from expected position (i=%i, to numWord32=%i) \n",synchroWordBufferPosHint,i,numWord32);//TODO: DEBUG output -tb-
+                  headerWordFoundFlag=1 ;  
+                  waitingForSynchroWord = 0;
+                  synchroWordPosHint=0;
+                //if(show_debug_info>2) 
+                printf("scanFIFObuffer: found header word at i= %i (popIndexFIFObuf32 %i)\n",i, popIndexFIFObuf32);//TODO: DEBUG output -tb-
+                //printf("scanFIFObuffer: found header word: synchroWordBufferPosHint %i    (popIndexFIFObuf32 %i)\n",synchroWordBufferPosHint, popIndexFIFObuf32);//TODO: DEBUG output -tb-
+                break;//stop for-loop: keep headerWord in buffer and proceed to step 2.a)
+                }
+            }
+        }
+        else {
+            if(waitingForSynchroWord && synchroWordBufferPosHint==0){//we expected here the synchro word, but it is not here
+                printf("scanFIFObuffer: ERROR: expected synchro word, NOT FOUND!\n" );//TODO: DEBUG output -tb-
+            }
+        }
+
+        
+        //else is data
         udpdata32[1+i] = val;
         udpPacketLen +=4;//TODO: variable dataPacketLen=4 -tb-
         popIndexFIFObuf32 += 1;
         FIFObuf32avail = pushIndexFIFObuf32 - popIndexFIFObuf32; // or FIFObuf32avail--
+        synchroWordBufferPosHint--; //update assumed synchro word pos in buffer
     }
     
 	
@@ -2820,6 +2901,11 @@ void FIFOREADER::scanFIFObuffer(void)
         }
 		
 		//TODO: DEBUG: run spike finder on UDP packets
+		//TODO: remove spike finder! -tb-
+		//TODO: remove spike finder! -tb-
+		//TODO: remove spike finder! -tb-
+		//TODO: remove spike finder! -tb-
+		//TODO: remove spike finder! -tb-
 		if(use_spike_finder) runSpikeFinderOnUDPPacket(udpdata,udpPacketLen);
 		
 		
@@ -3218,54 +3304,160 @@ void FIFOREADER::scanFIFObuffer(void)
 void FIFOREADER::readFIFOtoFIFObuffer(void)
 {
     uint32_t FIFOavail=0, FIFOMode=0, FIFOStatus=0, FIFOStatusTSPtr=0;
-    
+    uint32_t currentBlockSize=FIFOBlockSize;//block size to be read from SLT FIFO; try to read as large blocks as possible (FIFOBlockSize*8192)
+
     // check FIFO size
     FIFOMode  =  pbus->read(FIFOModeReg(numfifo));
     FIFOavail = FIFOMode & 0x00ffffff;
     if(show_debug_info>1) printf("readFIFOtoFIFObuffer: read FIFOavail(FIFO #%i): %i (FIFOBlockSize is %i)\n",numfifo,FIFOavail,FIFOBlockSize);//DEBUG output -tb-
+//if(flagToSendDataAndResetBuffer) printf("readFIFOtoFIFObuffer: flagToSendDataAndResetBuffer is %i: thats an ERROR!\n",flagToSendDataAndResetBuffer);
     
     //do it below ...if(FIFOavail < FIFOBlockSize) return; //wait for more data in FIFO
     
     //if buffer is 'too full', we must have lost several header words ->drop buffer in memory
+    //TODO: when FIFO full, we should reset it and restart? -tb-
     if( pushIndexFIFObuf32 > (FIFObuf32len/2) ){
         printf("readFIFOtoFIFObuffer: WARNING: danger of buffer memory overflow, clear buffer, pushIndexFIFObuf32 is  : %i  \n",pushIndexFIFObuf32);//DEBUG output -tb-
         popIndexFIFObuf32=0;
         pushIndexFIFObuf32=0;
         FIFObuf32avail=0;
+        //TODO: should wait for the next magic word (mot_synchro)?
     }
     
-    //TODO: when FIFO full, we should reset it and restart? -tb-
+    //DIRTY WORKAROUND/BUGFIX
+    //do not read anything if there are not at least TWO TIMES FIFOBlockSize words in buffer (8192 * 2)
+    if(FIFOavail < ( FIFOBlockSize) ) return;
+    //WHY?:
+    //  I tried to read always EXACTLY all ADC data BEFORE the magic word (synchro word). (Then at next read cycle the pattern is at the beginning of the block.)
+    //  PROBLEM (HW ERROR?): if the data in the FIFO is too small (<2*8192), the magic pattern VANISHED after I did this! (I parse the ADC data anyway always for the pattern during tests: it really vanished!)
+    //  SOLUTION: I found this effect by try and error (and the dirty fix, too), there is no obviuos reason for this behaviour
+    //            Should be fixed by Sascha M.
+    //
+    //  NO - in this condition I was reading always 8192 packets; if I read smaller packets I loose data!!!!
+    //
+    // -tb- 2013-01
     
     if(FIFOavail >= FIFOBlockSize){
 	    FIFOStatus = pbus->read(FIFOStatusReg(numfifo));
 		FIFOStatusTSPtr = (FIFOStatus >> 8) & 0xfffff;
-		if(FIFOStatusTSPtr)
-		         if(show_debug_info>=1) printf("   ***FIFOStatusTSPtr: %i ***\n",FIFOStatusTSPtr);//DEBUG output -tb-
+        if(FIFOStatusTSPtr) synchroWordPosHint=FIFOStatusTSPtr ; 
 
-        if(show_debug_info>2) printf("readFIFOtoFIFObuffer: read  block of FIFOBlockSize   %i, to pushIndexFIFObuf32 %i\n",FIFOBlockSize,pushIndexFIFObuf32);//DEBUG output -tb-
+    if(show_debug_info>=1 && FIFOStatusTSPtr) 
+        //if(synchroWordPosHint>0) 
+        printf("   *1**FIFOStatusTSPtr: %u synchroWordPosHint: %u***\n",FIFOStatusTSPtr,synchroWordPosHint);//DEBUG output -tb-
+        
+        
+        
+        
+        
+#if 0 //DEBUG
+static int debugcounter=0;
+static int debugsizecounter=0;
+        if(FIFOStatusTSPtr){ debugcounter=5;//DEBUG output -tb-
+        debugsizecounter=FIFOStatusTSPtr;
+        }
+
+if(debugcounter>0){
+    debugcounter--;
+}
+		
+	    FIFOStatus = pbus->read(FIFOStatusReg(numfifo));
+		FIFOStatusTSPtr = (FIFOStatus >> 8) & 0xfffff;
+        
+        if(FIFOStatusTSPtr) printf("   *2**FIFOStatusTSPtr: %i ***\n",FIFOStatusTSPtr);//DEBUG output -tb-
+#endif
+
+
+		#if 0
+        //
+        if(FIFOStatusTSPtr>1){//if > 0 -> magic pattern is somewhere in FIFO, behind some data; if ==1, the synchro word will be first in the next read block: read max. block size
+                              //if FIFOStatusTSPtr == 1 then we are probably at starting point - magic word is immediately at begin of buffer -read max. block
+                 if(FIFOStatusTSPtr < FIFOBlockSize){//we can read all data right before the magic pattern
+THIS DOES NOT WORK! removes the synchro word!                         currentBlockSize = FIFOStatusTSPtr-2;//read right before -> will be 0 the next time!
+                         if(currentBlockSize>FIFOBlockSize) currentBlockSize=FIFOBlockSize;
+                         flagToSendDataAndResetBuffer=1;//flag: to send all data and reset FIFO
+                 }
+		         //if(show_debug_info>=1) printf("   ***FIFOStatusTSPtr: %i ***\n",FIFOStatusTSPtr);//DEBUG output -tb-
+        printf("readFIFOtoFIFObuffer: read  block of Size   %i (max.size  FIFOBlockSize:%i, avail. %i), to pushIndexFIFObuf32 %i\n",currentBlockSize,FIFOBlockSize,FIFOavail,pushIndexFIFObuf32);//DEBUG output -tb-
+        }
+        #endif
+
+        //if(currentBlockSize!=FIFOBlockSize)
+        if(show_debug_info>2) 
+            printf("readFIFOtoFIFObuffer: read  block of Size   %i (max.size  FIFOBlockSize:%i, avail. %i), to pushIndexFIFObuf32 %i\n",currentBlockSize,FIFOBlockSize,FIFOavail,pushIndexFIFObuf32);//DEBUG output -tb-
+
+//currentBlockSize=FIFOBlockSize;
+
+#if 0 //DEBUG
+static uint32_t oldFIFOStatusTSPtr=0;
+if(oldFIFOStatusTSPtr!=FIFOStatusTSPtr) printf("   *3**oldFIFOStatusTSPtr: %i *** (%i)\n",oldFIFOStatusTSPtr,FIFOStatusTSPtr);//DEBUG output -tb-
+oldFIFOStatusTSPtr=FIFOStatusTSPtr;
+
+
+if(debugcounter>0){
+debugsizecounter-=currentBlockSize;
+        printf("debugcounter %i: readFIFOtoFIFObuffer: read  block of Size   %i (max.size  FIFOBlockSize:%i, avail. %i), to pushIndexFIFObuf32 %i\n",debugcounter,currentBlockSize,FIFOBlockSize,FIFOavail,pushIndexFIFObuf32);//DEBUG output -tb-
+            printf("debugsizecounter %i \n",debugsizecounter);//DEBUG output -tb-
+             printf("debugcounter     *d**FIFOStatusTSPtr: %i ***  FIFOavail: %u\n",(pbus->read(FIFOStatusReg(numfifo)) >> 8) & 0xfffff,FIFOavail);
+}
+#endif
+
+
+//TODO: rm
+if(synchroWordPosHint>0) 
+        printf("   *2**FIFOStatusTSPtr: %u synchroWordPosHint: %i  synchroWordBufferPosHint %i (synchroWordPosHint - currentBlockSize)   %i ((synchroWordPosHint - currentBlockSize) <= 0)%i***\n",FIFOStatusTSPtr,synchroWordPosHint,synchroWordBufferPosHint,(synchroWordPosHint - currentBlockSize), ((synchroWordPosHint - currentBlockSize) <= 0));//DEBUG output -tb-
+
+        //keep counter up to date
+        if(synchroWordPosHint >0){
+            if( (synchroWordPosHint  ) <= currentBlockSize  ){
+                //in the next block there will be the synchro word
+                waitingForSynchroWord=1;//set a flag
+                synchroWordBufferPosHint= FIFObuf32avail + synchroWordPosHint -1;//compute expected pos in FIFO buffer
+            }
+            else
+                synchroWordPosHint -= currentBlockSize;
+        //printf("   *3**FIFOStatusTSPtr: %u synchroWordPosHint: %i   (synchroWordPosHint - currentBlockSize)   %i ((synchroWordPosHint - currentBlockSize) <= 0)%i***\n",FIFOStatusTSPtr,synchroWordPosHint,(synchroWordPosHint - currentBlockSize), ((synchroWordPosHint - currentBlockSize) <= 0));//DEBUG output -tb-
+        }
+
         #if 1
         //use DMA
-        pbus->readBlock(FIFOAddr(numfifo), (unsigned long*)&FIFObuf32[pushIndexFIFObuf32], FIFOBlockSize);
-		//TODO: change readBlock signature in fdhwlib !!!!! -tb-
+        pbus->readBlock(FIFOAddr(numfifo), (unsigned long*)&FIFObuf32[pushIndexFIFObuf32], currentBlockSize);
 		//TODO: change readBlock signature in fdhwlib !!!!! -tb-
 		//TODO: change readBlock signature in fdhwlib !!!!! -tb-
 		//TODO: change readBlock signature in fdhwlib !!!!! -tb-
         //pbus->readBlock(FIFOAddr(numfifo), (uint32_t*)&FIFObuf32[pushIndexFIFObuf32], FIFOBlockSize);
 		//pseudo block mode
         //pbus->readBlock(FIFOAddr(numfifo) | 0x80000000, (unsigned long*)&FIFObuf32[pushIndexFIFObuf32], FIFOBlockSize);//pseudo block read 
+if(1){ //DEBUG search explicitly for header ...
+        uint32_t i; 
+        uint32_t val;
+        for(i=0; i<currentBlockSize; i++){
+            val = FIFObuf32[pushIndexFIFObuf32 +i];
+            if((val & 0xffff) == 0x3117){
+                       //printf("   *5**oldFIFOStatusTSPtr: %i ***\n",oldFIFOStatusTSPtr);//DEBUG output -tb-
+                 printf("=============found  0x00003117 at i=%i , waitingForSynchroWord %i, synchroWordPosHint  %i  \n",i,waitingForSynchroWord, synchroWordPosHint);
+            }
+            //if(val & 0x00003117) printf("=============found  0x3117 at i=%i   ptr %p\n",i,FIFObuf32[pushIndexFIFObuf32 +i]);
+            //if(val & 0x31170000) printf("=============found  0x31170000 at i=%i   ptr %p\n",i,FIFObuf32[pushIndexFIFObuf32 +i]);
+        }
+        //if(0 && currentBlockSize!=FIFOBlockSize   && flagToSendDataAndResetBuffer){
+        //    val = pbus->read(FIFOAddr(numfifo));
+        //    printf("============= next val 0x%08x\n",val);
+        //}
+}
         #else
         //use single access
         int i; 
         uint32_t val;
-        for(i=0; i<FIFOBlockSize; i++){
+        for(i=0; i<currentBlockSize; i++){
             val = pbus->read(FIFOAddr(numfifo));
             FIFObuf32[pushIndexFIFObuf32 +i] = val;
         }
         #endif
         //exit(23);//TODO: DEBUGGING -tb-;
-        pushIndexFIFObuf32 += FIFOBlockSize;
+        pushIndexFIFObuf32 += currentBlockSize;
         FIFObuf32avail = pushIndexFIFObuf32 - popIndexFIFObuf32;
-		FIFObuf32counter += FIFOBlockSize;
+		FIFObuf32counter += currentBlockSize;
 		
         //write raw/binary data to file (we have exactly FIFOBlockSize new words in buffer->write them to file)
         if(write2file && write2file_format == binary){
@@ -3276,7 +3468,7 @@ void FIFOREADER::readFIFOtoFIFObuffer(void)
                   printf("Open file: UTC sec is %i\n",currentSec);
                   openBinaryFile(currentSec, write2file_len_sec);
             }else{
-                fwrite( &FIFObuf32[pushIndexFIFObuf32-FIFOBlockSize], sizeof(uint32_t), FIFOBlockSize, pFile);
+                fwrite( &FIFObuf32[pushIndexFIFObuf32-currentBlockSize], sizeof(uint32_t), currentBlockSize, pFile);
             }
             if(globalHeaderWordCounter > write2file_len_sec) run_main_readout_loop = 0; //TODO: set flag to finish main loop - leave it? -tb-
         }
@@ -4052,7 +4244,7 @@ int32_t main(int32_t argc, char *argv[])
 				if(show_debug_info>1) printf("main: FIFObuf32avail(%i): %i\n",iFifo, FifoReader[iFifo].FIFObuf32avail);//DEBUG output -tb-
 				#if 1
 				//scan and read UDP packets in while loop until buffer empty
-				while(FifoReader[iFifo].FIFObuf32avail >= 360 ){
+				while((FifoReader[iFifo].FIFObuf32avail >= 360) /*|| FifoReader[iFifo].flagToSendDataAndResetBuffer*/ ){
 					FifoReader[iFifo].scanFIFObuffer();
 				}
 				#else
@@ -4102,23 +4294,25 @@ int32_t main(int32_t argc, char *argv[])
 			//
 			//TODO: for DEBUGGING - might be removed any time -tb-
 	        //if in streaming state
-            if(FIFOREADER::State == frSTREAMING){
-				for(iFifo=0; iFifo<FIFOREADER::maxNumFIFO; iFifo++){
-					if(FifoReader[iFifo].readfifo){
-						uint32_t FIFOMode =  pbus->read(FIFOModeReg(iFifo));
-						printf("    FIFOMode%i: 0x%08x (length %u)\n",iFifo, FIFOMode, FIFOMode & 0x00ffffff);
-					}
-				}
-				//TODO: this was for debugging the status bit FIFOs - remove it -tb-
-				if(0){
-					//FIFO status and mode of FIFO 0
-					uint32_t FIFO0Status =  pbus->read(FIFOStatusReg(0));
-					printf("FIFO0Status: 0x%08x\n",FIFO0Status);
-					uint32_t FIFOMode =  pbus->read(FIFOModeReg(0));
-					printf("FIFOMode: 0x%08x (length %u)\n",FIFOMode, FIFOMode & 0x00ffffff);
-	
-				}
-	        }
+            if(show_debug_info>=1){
+                if(FIFOREADER::State == frSTREAMING){
+                    for(iFifo=0; iFifo<FIFOREADER::maxNumFIFO; iFifo++){
+                        if(FifoReader[iFifo].readfifo){
+                            uint32_t FIFOMode =  pbus->read(FIFOModeReg(iFifo));
+                            printf("    FIFOMode %i: 0x%08x (length %u)\n",iFifo, FIFOMode, FIFOMode & 0x00ffffff);
+                        }
+                    }
+                    //TODO: this was for debugging the status bit FIFOs - remove it -tb-
+                    if(0){
+                        //FIFO status and mode of FIFO 0
+                        uint32_t FIFO0Status =  pbus->read(FIFOStatusReg(0));
+                        printf("FIFO0Status: 0x%08x\n",FIFO0Status);
+                        uint32_t FIFOMode =  pbus->read(FIFOModeReg(0));
+                        printf("FIFOMode: 0x%08x (length %u)\n",FIFOMode, FIFOMode & 0x00ffffff);
+        
+                    }
+                }
+            }
 		    //code to be executed every second -END
 		    lastDiffTime = currDiffTime;
 		}

@@ -96,6 +96,7 @@ extern "C" {
 
 
 #include "ipe4structure.h"
+#include "ipe4reader.h"
 #include "ipe4tbtools.h" //better include in HW_Readout.h? here: MUST follow "ipe4structure.h" -tb-
 #include "ipe4tbtools.cpp"
 

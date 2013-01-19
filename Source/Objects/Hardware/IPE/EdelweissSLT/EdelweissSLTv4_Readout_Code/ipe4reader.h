@@ -368,12 +368,12 @@ public:
 		
 		//FIFO buffer in RAM (malloc: request space; if failed try to alloc the half of this space etc. )
         uint32_t  i,size=Preferred_FIFObuf8len;
-        for(i=0;i<10;i++){
+        for(i=0;i<10;i++){// try to allocate preferred memory; whwn failed, try to allocate the half size - up to ten tries
                 printf("FIFOREADER::initVars: try to allocate %u byte (of %u requested bytes)\n",size, Preferred_FIFObuf8len);
 	        FIFObuf8=(char *)malloc(sizeof(char)*size);
             if(FIFObuf8==NULL){//failed
                 size = size/2;
-                size = (size/4)*4;
+                size = (size/4)*4;//multiple of 4 as we want to store uint32_t's
                 if(size==0){ printf("FIFOREADER::initVars: Failed with malloc(...), exiting!\n"); exit(123); }
             }else{//success
                 printf("FIFOREADER::initVars: allocated %u byte (of %u requested bytes) - OK\n",size, Preferred_FIFObuf8len);
@@ -382,8 +382,8 @@ public:
                 break;
             }
         }
-	    FIFObuf16 = (int16_t *)FIFObuf8;
-	    FIFObuf32 = (int32_t *)FIFObuf8;
+	    FIFObuf16 = (uint16_t *)FIFObuf8;
+	    FIFObuf32 = (uint32_t *)FIFObuf8;
         FIFObuf16len = FIFObuf8len / 2;
         FIFObuf32len = FIFObuf8len / 4;
 	    popIndexFIFObuf32=0;
@@ -391,9 +391,10 @@ public:
 	    FIFObuf32avail=0;
 	    FIFObuf32counter=0;
 	    FIFObuf32counterlast=0;
+        synchroWordPosHint=0;
 
-	    udpdata16 = (int16_t *)udpdata;
-	    udpdata32 = (int32_t *)udpdata;
+	    udpdata16 = (uint16_t *)udpdata;
+	    udpdata32 = (uint32_t *)udpdata;
 	    udpdataCounter = 0;
 		udpdataSec     = 0;
 	    numSent = 0;
@@ -402,6 +403,9 @@ public:
 	    globalHeaderWordCounter = 0; //TODO: globalHeaderWordCounter for testing -tb- 
 		
 	    mon_indice_status_bbv2 = 0;// <----   each FIFO (in multi-FIFO readout) needs own counter!
+
+	    flagToSendDataAndResetBuffer = 0;
+        waitingForSynchroWord = 0;
 	}
 	
 	//FIFOREADER as state machine: the state
@@ -458,36 +462,57 @@ public:
 	Structure_trame_status Trame_status_udp; //this is the deprecated OPERA status packet -tb- 2013
 	
 	/*--------------------------------------------------------------------
-	 vars for FIFO buffer
+	 vars and functions for FIFO buffer
 	 --------------------------------------------------------------------*/
+    int pushFifoBuf32(uint32_t *data, int len){//append data to FIFO buffer
+        int i;
+        //TODO: 1) check: enough memory available?
+        //TODO: 2) make circular buffer
+        for(i=0;i<len;i++){
+            FIFObuf32[pushIndexFIFObuf32+i]=data[i];
+        }
+        pushIndexFIFObuf32+=len;
+        return 0;
+    }
+    uint32_t* ptrToFifoBufPushPos32(){
+        return &FIFObuf32[pushIndexFIFObuf32]; 
+    }
+    
 	uint32_t FIFObuf8len;// see Preferred_FIFObuf8len
 	uint32_t FIFObuf16len;// = FIFObuf8len / 2;
 	uint32_t FIFObuf32len;// = FIFObuf8len / 4;
 
 	//char * FIFObuf8[FIFObuf8len];
 	char * FIFObuf8;
-	int16_t * FIFObuf16;// = (int16_t *)FIFObuf8;
-	int32_t * FIFObuf32;// = (int32_t *)FIFObuf8;
+	uint16_t * FIFObuf16;// = (int16_t *)FIFObuf8;
+	uint32_t * FIFObuf32;// = (int32_t *)FIFObuf8;
 	uint32_t popIndexFIFObuf32;
 	uint32_t pushIndexFIFObuf32;
 	uint32_t FIFObuf32avail;
 	int64_t FIFObuf32counter;
 	int64_t FIFObuf32counterlast;
-	
-	uint32_t globalHeaderWordCounter; //TODO: globalHeaderWordCounter for testing -tb- 
+	//synchro word (is the header/"magic pattern"/0x3117/mot synchro which is written to the data stream every 1 second)
+	int32_t synchroWordPosHint; //TODO: globalHeaderWordCounter for testing -tb- 
+	int32_t synchroWordBufferPosHint; //TODO: globalHeaderWordCounter for testing -tb- 
+    
+	uint32_t globalHeaderWordCounter; //TODO: globalHeaderWordCounter for testing -tb- (header is the "magic pattern"/0x3117/mot synchro)
 	
 	//scanning status bits
-	int mon_indice_status_bbv2;// <----   each FIFO (in multi-FIFO readout) needs own counter!
+	int mon_indice_status_bbv2;// <----   each FIFO (in multi-FIFO readout) needs own counter! //TODO: obsolete, remove! -tb-
+    
+    //misc vars
+    int flagToSendDataAndResetBuffer;
+    int waitingForSynchroWord;
 	
 	/*--------------------------------------------------------------------
 	 vars for UDP packets
 	 --------------------------------------------------------------------*/
 	
 	//global vars for udp packet handling
-	static const int udpdatalen = 1500;
+	static const int udpdatalen = 2*1500;
 	char udpdata[udpdatalen];
-	int16_t *udpdata16;// = (int16_t *)udpdata;
-	int32_t *udpdata32;// = (int32_t *)udpdata;
+	uint16_t *udpdata16;// = (int16_t *)udpdata;
+	uint32_t *udpdata32;// = (int32_t *)udpdata;
 	int udpdataCounter; //counts number of sent UDP packets
 	int udpdataByteCounter; //counts number of bytes of sent UDP packets
 	int udpdataSec ;    //second got from pattern 0x31170000....
