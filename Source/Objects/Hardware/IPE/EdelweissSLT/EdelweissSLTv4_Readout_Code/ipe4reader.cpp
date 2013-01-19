@@ -2832,12 +2832,13 @@ static int debcnt=0;
                 synchroWordPosHint=0;
                 //if(show_debug_info>2) 
                 printf("scanFIFObuffer: found header word at i= %i (popIndexFIFObuf32 %i)\n",i, popIndexFIFObuf32);//TODO: DEBUG output -tb-
-
+#if 0
 if(i==0) debcnt++;
-if(debcnt>10){
+if(debcnt>10000){
    printf("f(debcnt>10)     scanFIFObuffer: found header word: synchroWordBufferPosHint %i    (popIndexFIFObuf32 %i)\n",synchroWordBufferPosHint, popIndexFIFObuf32);//TODO: DEBUG output -tb-
  exit(99);
  }
+ #endif
                 //printf("scanFIFObuffer: found header word: synchroWordBufferPosHint %i    (popIndexFIFObuf32 %i)\n",synchroWordBufferPosHint, popIndexFIFObuf32);//TODO: DEBUG output -tb-
                 break;//stop for-loop: keep headerWord in buffer and proceed to step 2.a)
             }else{
