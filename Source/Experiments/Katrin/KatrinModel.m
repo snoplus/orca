@@ -388,7 +388,10 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 {
 	return @"KatrinMapLock";
 }
-
+- (NSString*) vetoMapLock
+{
+	return @"VetoMapLock";
+}
 - (NSString*) experimentDetectorLock
 {
 	return @"KatrinDetectorLock";

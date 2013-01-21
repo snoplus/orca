@@ -59,6 +59,8 @@
 	IBOutlet NSMatrix*		lowLimitMatrix;
 	IBOutlet NSMatrix*		hiLimitMatrix;
 	IBOutlet NSMatrix*		maxValueMatrix;
+    
+	IBOutlet NSButton*		vetoMapLockButton;
 	
 	
 	NSView *blankView;
@@ -82,6 +84,7 @@
 - (IBAction) maxValueAction:(id)sender;
 - (IBAction) lowLimitAction:(id)sender;
 - (IBAction) hiLimitAction:(id)sender;
+- (IBAction) vetoMapLockAction:(id)sender;
 
 #pragma mark ¥¥¥Detector Interface Management
 - (void) slowControlNameChanged:(NSNotification*)aNote;

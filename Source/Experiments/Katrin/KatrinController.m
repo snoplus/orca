@@ -163,6 +163,16 @@
                      selector : @selector(hiLimitChanged:)
                          name : ORKatrinModelHiLimitChanged
 						object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(vetoMapLockChanged:)
+                         name : [model vetoMapLock]
+                       object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(vetoMapLockChanged:)
+                         name : ORRunStatusChangedNotification
+                       object : nil];
 }
 
 - (void) updateWindow
@@ -173,6 +183,7 @@
     [self secondaryColorAxisAttributesChanged:nil];
 
 	//hw map
+    [self vetoMapLockChanged:nil];
 	[self secondaryMapFileChanged:nil];
 	[self secondaryAdcClassNameChanged:nil];
 
@@ -263,6 +274,12 @@
 }
 
 #pragma mark ¥¥¥Actions
+
+- (IBAction) vetoMapLockAction:(id)sender
+{
+    [gSecurity tryToSetLock:[model vetoMapLock] to:[sender intValue] forWindow:[self window]];
+}
+
 - (IBAction) lowLimitAction:(id)sender
 {
 	[model setLowLimit:[[sender selectedCell] tag] value:[[sender selectedCell] floatValue]];	
@@ -425,6 +442,15 @@
 }
 
 #pragma mark ¥¥¥HW Map Interface Management
+
+- (void) checkGlobalSecurity
+{
+    [super checkGlobalSecurity];
+    BOOL secure = [gSecurity globalSecurityEnabled];
+    [gSecurity setLock:[model vetoMapLock] to:secure];
+    [vetoMapLockButton setEnabled: secure];    
+}
+
 - (void) secondaryAdcClassNameChanged:(NSNotification*)aNote
 {
 	[secondaryAdcClassNamePopup selectItemWithTitle: [[model segmentGroup:1] adcClassName]];
@@ -437,13 +463,12 @@
 	[secondaryMapFileTextField setStringValue: s];
 }
 
-- (void) mapLockChanged:(NSNotification*)aNotification
+- (void) vetoMapLockChanged:(NSNotification*)aNotification
 {
-	[super mapLockChanged:aNotification];
-    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:[model experimentDetectorLock]];
+    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:[model vetoMapLock]];
     //BOOL runningOrLocked = [gSecurity runInProgressOrIsLocked:ORPrespectrometerLock];
-    BOOL locked = [gSecurity isLocked:[model experimentMapLock]];
-    [mapLockButton setState: locked];
+    BOOL locked = [gSecurity isLocked:[model vetoMapLock]];
+    [vetoMapLockButton setState: locked];
     
     if(locked){
 		[secondaryTableView deselectAll:self];

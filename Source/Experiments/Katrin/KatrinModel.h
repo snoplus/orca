@@ -82,6 +82,7 @@
 - (NSString*) experimentMapLock;
 - (NSString*) experimentDetectorLock;
 - (NSString*) experimentDetailsLock;
+- (NSString*) vetoMapLock;
 
 #pragma mark ¥¥¥Adc Processing Protocol
 - (void)processIsStarting;
