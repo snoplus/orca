@@ -85,6 +85,7 @@ enum {
     kControlStatus,				//[13] Control Status
     kLEDThreshold,				//[14] LED Threshold
     kTrapThreshold,				//[15] Trapezoidal Threshold
+    kCCLowRes,                  //[15] Central Contract Low Resolution
     kWindowTiming,              //[16] Window timing
     kRisingEdgeWindow,          //[17] Rising Edge Window
     kDAC,						//[18] DAC
@@ -110,7 +111,6 @@ enum {
     kFrontSideBusRegister,		//[38] Front Side Bus Register
 	kTestDigitizerTxTTCL,		//[39] Test Digitizer Tx TTCL
 	kTestDigitizerRxTTCL,		//[40] Test Digitizer Rx TTCL
-	//why we have slave front bus send box again?
 	kSlaveFrontBusSendBox10_1,  //[41] Slave Front Bus Send Box 10 - 1
     kFrontBusRegisters0_10,		//[42] FrontBus Registers 0-10
 	kLogicSyncCounter,			//[43] Master Logic Sync Counter
@@ -208,6 +208,7 @@ enum Gretina4MFIFOStates {
     short           extTrigLength;
     short           collectionTime;
     short           integrateTime;
+    int             ccLowRes;
 
     int             fifoState;
 	int				fifoEmptyCount;
@@ -263,6 +264,8 @@ enum Gretina4MFIFOStates {
 - (void) guardianAssumingDisplayOfConnectors:(id)aGuardian;
 
 #pragma mark ***Accessors
+- (int)  ccLowRes;
+- (void) setCcLowRes:(int)aCcLowRes;
 - (short) integrateTime;
 - (void) setIntegrateTime:(short)aIntegrateTime;
 - (short) collectionTime;
@@ -435,6 +438,7 @@ enum Gretina4MFIFOStates {
 - (void) writeExtTrigLength;
 - (void) writeCollectionTime;
 - (void) writeIntegrateTime;
+- (void) writeCCLowRes;
 
 
 
@@ -480,6 +484,7 @@ enum Gretina4MFIFOStates {
 
 @end
 
+extern NSString* ORGretina4MModelCcLowResChanged;
 extern NSString* ORGretina4MNoiseWindowChanged;
 extern NSString* ORGretina4MClockSourceChanged;
 extern NSString* ORGretina4MIntegrateTimeChanged;

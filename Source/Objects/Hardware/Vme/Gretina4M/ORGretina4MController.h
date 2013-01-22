@@ -29,6 +29,7 @@
 @interface ORGretina4MController : OrcaObjectController 
 {
     IBOutlet NSTabView* 	tabView;
+	IBOutlet   NSTextField* ccLowResField;
 	IBOutlet   NSTextField* noiseWindowField;
     
 	IBOutlet   NSTextField* integrateTimeField;
@@ -124,6 +125,7 @@
 - (void) updateWindow;
 
 #pragma mark •••Interface Management
+- (void) ccLowResChanged:(NSNotification*)aNote;
 - (void) noiseWindowChanged:(NSNotification*)aNote;
 - (void) chpsdvChanged:(NSNotification*)aNote;
 - (void) mrpsrtChanged:(NSNotification*)aNote;
@@ -179,6 +181,7 @@
 - (void) setRegisterDisplay:(unsigned int)index;
 
 #pragma mark •••Actions
+- (IBAction) ccLowResAction:(id)sender;
 - (IBAction) noiseWindowAction:(id)sender;
 - (IBAction) integrateTimeFieldAction:(id)sender;
 - (IBAction) collectionTimeFieldAction:(id)sender;

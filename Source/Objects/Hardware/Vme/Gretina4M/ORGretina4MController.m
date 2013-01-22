@@ -382,6 +382,11 @@
                          name : ORGretina4MNoiseWindowChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(ccLowResChanged:)
+                         name : ORGretina4MModelCcLowResChanged
+						object: model];
+
 }
 
 - (void) registerRates
@@ -458,9 +463,15 @@
     [self prerecntChanged:nil];
     [self postrecntChanged:nil];
 	[self noiseWindowChanged:nil];
+	[self ccLowResChanged:nil];
 }
 
 #pragma mark •••Interface Management
+
+- (void) ccLowResChanged:(NSNotification*)aNote
+{
+	[ccLowResField setIntValue: [model ccLowRes]];
+}
 - (void) noiseWindowChanged:(NSNotification*)aNote
 {
 	[noiseWindowField setFloatValue: [model noiseWindowConverted]];
@@ -1071,6 +1082,11 @@
 }
 
 #pragma mark •••Actions
+
+- (void) ccLowResAction:(id)sender
+{
+	[model setCcLowRes:[sender intValue]];	
+}
 
 - (void) noiseWindowAction:(id)sender
 {
