@@ -30,11 +30,11 @@
 
 @interface HaloModel :  ORExperimentModel
 {
-	int		    viewType;
-    HaloSentry* haloSentry;
+	int             viewType;
+    HaloSentry*     haloSentry;
     NSMutableArray* emailList;
-    int			heartBeatIndex;
-	NSDate*		nextHeartbeat;
+    int             heartBeatIndex;
+	NSDate*         nextHeartbeat;
 }
 
 //- (NSMutableArray*) setupMapEntries:(int)index;
@@ -68,6 +68,7 @@
 #pragma mark ¥¥¥Specific Dialog Lock Methods
 - (NSString*) experimentMapLock;
 - (NSString*) experimentDetectorLock;
+- (NSString*) secondaryMapLock;
 - (NSString*) experimentDetailsLock;
 
 - (id)   initWithCoder:(NSCoder*)decoder;

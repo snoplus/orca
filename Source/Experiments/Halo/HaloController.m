@@ -25,6 +25,15 @@
 #import "ORDetectorSegment.h"
 #import "ORSegmentGroup.h"
 #import "HaloSentry.h"
+#import "OR1DHistoPlot.h"
+#import "ORCompositePlotView.h"
+
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+@interface KatrinController (private)
+- (void) readSecondaryMapFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+- (void) saveSecondaryMapFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+@end
+#endif
 
 @implementation HaloController
 #pragma mark ¥¥¥Initialization
@@ -39,19 +48,39 @@
 	return @"~/Halo";
 }
 
+- (NSString*) defaultSecondaryMapFilePath
+{
+	return @"~/TestMap";
+}
 
 -(void) awakeFromNib
 {
 	
 	detectorSize		= NSMakeSize(620,595);
-	detailsSize			= NSMakeSize(450,589);
+	detailsSize			= NSMakeSize(550,589);
 	focalPlaneSize		= NSMakeSize(700,589);
+	testDectorSize      = NSMakeSize(700,300);
 	sentrySize          = NSMakeSize(700,500);
 	
     blankView = [[NSView alloc] init];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
 
+    [self populateClassNamePopup:secondaryAdcClassNamePopup];
+
     [super awakeFromNib];
+
+    OR1DHistoPlot* aPlot1 = [[OR1DHistoPlot alloc] initWithTag:11 andDataSource:self];
+	[valueHistogramsPlot addPlot: aPlot1];
+    [aPlot1 setLineColor:[NSColor blueColor]];
+ 	[aPlot1 setUseConstantColor:YES];
+    [aPlot1 setName:@"Test Tubes"];
+	[aPlot1 release];
+    
+    OR1DHistoPlot* aPlot0 = [valueHistogramsPlot plot:0];
+    [aPlot0 setLineColor:[NSColor redColor]];
+    [aPlot0 setName:@"Detector"];
+    
+    [valueHistogramsPlot setShowLegend:YES];
 }
 
 
@@ -62,6 +91,17 @@
     
     [super registerNotificationObservers];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(secondaryAdcClassNameChanged:)
+                         name : ORSegmentGroupAdcClassNameChanged
+						object: [model segmentGroup:1]];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(secondaryMapFileChanged:)
+                         name : ORSegmentGroupMapFileChanged
+						object: [model segmentGroup:1]];
+
+    
     [notifyCenter addObserver : self
                      selector : @selector(viewTypeChanged:)
                          name : HaloModelViewTypeChanged
@@ -147,6 +187,17 @@
                          name : ORRunStatusChangedNotification
 						object: nil];
     
+    [notifyCenter addObserver : self
+                     selector : @selector(secondaryMapLockChanged:)
+                         name : [model secondaryMapLock]
+                       object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(secondaryMapLockChanged:)
+                         name : ORRunStatusChangedNotification
+                       object : nil];
+
+    
 }
 
 - (void) updateWindow
@@ -165,6 +216,10 @@
 	[self nextHeartBeatChanged:nil];
     [self runStateChanged:nil];
     [self sentryLockChanged:nil];
+	[self secondaryMapFileChanged:nil];
+	[self secondaryAdcClassNameChanged:nil];
+	[self secondaryMapLockChanged:nil];
+	[secondaryValuesView reloadData];
 }
 
 #pragma mark ¥¥¥Interface Management
@@ -173,7 +228,9 @@
     [super checkGlobalSecurity];
     BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
     [gSecurity setLock:HaloModelSentryLock to:secure];
+    [gSecurity setLock:[model secondaryMapLock] to:secure];
     [sentryLockButton setEnabled:secure];
+    [secondaryMapLockButton setEnabled:secure];
 }
 
 - (void) runStateChanged:(NSNotification*)aNote
@@ -271,6 +328,8 @@
 {
 	[super specialUpdate:aNote];
 	[detectorView makeAllSegments];
+	[secondaryTableView reloadData];
+	[secondaryValuesView reloadData];
 }
 
 - (void) setDetectorTitle
@@ -289,6 +348,33 @@
     BOOL locked = [gSecurity isLocked:HaloModelSentryLock];
 	[sentryLockButton setState: locked];
     [self updateButtons];
+}
+
+- (void) secondaryAdcClassNameChanged:(NSNotification*)aNote
+{
+	[secondaryAdcClassNamePopup selectItemWithTitle: [[model segmentGroup:1] adcClassName]];
+}
+
+- (void) secondaryMapFileChanged:(NSNotification*)aNote
+{
+	NSString* s = [[[model segmentGroup:1] mapFile]stringByAbbreviatingWithTildeInPath];
+	if(!s) s = @"--";
+	[secondaryMapFileTextField setStringValue: s];
+}
+
+- (void) secondaryMapLockChanged:(NSNotification*)aNotification
+{
+    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:[model secondaryMapLock]];
+    //BOOL runningOrLocked = [gSecurity runInProgressOrIsLocked:ORPrespectrometerLock];
+    BOOL locked = [gSecurity isLocked:[model secondaryMapLock]];
+    [secondaryMapLockButton setState: locked];
+    
+    if(locked){
+		[secondaryTableView deselectAll:self];
+	}
+    [readSecondaryMapFileButton setEnabled:!lockedOrRunningMaintenance];
+    [saveSecondaryMapFileButton setEnabled:!lockedOrRunningMaintenance];
+	[secondaryAdcClassNamePopup setEnabled:!lockedOrRunningMaintenance];
 }
 
 - (void) updateButtons
@@ -331,6 +417,11 @@
     }
     else if([tabView indexOfTabViewItem:tabViewItem] == 3){
 		[[self window] setContentView:blankView];
+		[self resizeWindowToSize:testDectorSize];
+		[[self window] setContentView:tabView];
+    }
+    else if([tabView indexOfTabViewItem:tabViewItem] == 4){
+		[[self window] setContentView:blankView];
 		[self resizeWindowToSize:sentrySize];
 		[[self window] setContentView:tabView];
     }
@@ -340,6 +431,87 @@
 }
 
 #pragma mark ¥¥¥Actions
+- (IBAction) secondaryMapLockAction:(id)sender
+{
+    [gSecurity tryToSetLock:[model secondaryMapLock] to:[sender intValue] forWindow:[self window]];
+}
+
+- (IBAction) secondaryAdcClassNameAction:(id)sender
+{
+	[[model segmentGroup:1] setAdcClassName:[sender titleOfSelectedItem]];
+}
+
+- (IBAction) readSecondaryMapFileAction:(id)sender
+{
+    NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+    [openPanel setCanChooseDirectories:NO];
+    [openPanel setCanChooseFiles:YES];
+    [openPanel setAllowsMultipleSelection:NO];
+    [openPanel setPrompt:@"Choose"];
+    NSString* startingDir;
+	NSString* fullPath = [[[model segmentGroup:1] mapFile] stringByExpandingTildeInPath];
+    if(fullPath){
+        startingDir = [fullPath stringByDeletingLastPathComponent];
+    }
+    else {
+        startingDir = NSHomeDirectory();
+    }
+    
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            [[model segmentGroup:1] readMap:[[openPanel URL] path]];
+            [secondaryTableView reloadData];
+        }
+    }];
+#else
+    [openPanel beginSheetForDirectory:startingDir
+                                 file:nil
+                                types:nil
+                       modalForWindow:[self window]
+                        modalDelegate:self
+                       didEndSelector:@selector(readSecondaryMapFilePanelDidEnd:returnCode:contextInfo:)
+                          contextInfo:NULL];
+#endif
+}
+
+- (IBAction) saveSecondaryMapFileAction:(id)sender
+{
+    NSSavePanel *savePanel = [NSSavePanel savePanel];
+    [savePanel setPrompt:@"Save As"];
+    [savePanel setCanCreateDirectories:YES];
+    
+    NSString* startingDir;
+    NSString* defaultFile;
+    
+	NSString* fullPath = [[[model segmentGroup:1] mapFile] stringByExpandingTildeInPath];
+    if(fullPath){
+        startingDir = [fullPath stringByDeletingLastPathComponent];
+        defaultFile = [fullPath lastPathComponent];
+    }
+    else {
+        startingDir = NSHomeDirectory();
+        defaultFile = [self defaultSecondaryMapFilePath];
+        
+    }
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [savePanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
+    [savePanel setNameFieldLabel:defaultFile];
+    [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            [[model segmentGroup:1] saveMapFileAs:[[savePanel URL]path]];
+        }
+    }];
+#else
+    [savePanel beginSheetForDirectory:startingDir
+                                 file:defaultFile
+                       modalForWindow:[self window]
+                        modalDelegate:self
+                       didEndSelector:@selector(saveSecondaryMapFilePanelDidEnd:returnCode:contextInfo:)
+                          contextInfo:NULL];
+#endif
+}
 - (IBAction) addAddress:(id)sender
 {
 	int index = [[model emailList] count];
@@ -474,13 +646,32 @@
 		}
 		else return @"";
 	}
+	else if(aTableView == secondaryTableView || aTableView == secondaryValuesView){
+		return [[model segmentGroup:1] segment:rowIndex objectForKey:[aTableColumn identifier]];
+	}
     else return [super tableView:aTableView objectValueForTableColumn:aTableColumn row:rowIndex];
 }
-- (void)tableView:(NSTableView *)aTableView setObjectValue:anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+
+- (void) tableView:(NSTableView *)aTableView setObjectValue:anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
 {
+    ORDetectorSegment* aSegment;
 	if(aTableView == emailListTable){
 		if(rowIndex < [[model emailList] count]){
 			[[model emailList] replaceObjectAtIndex:rowIndex withObject:anObject];
+		}
+	}
+	else if(aTableView == secondaryTableView){
+        aSegment = [[model segmentGroup:1] segment:rowIndex];
+		[aSegment setObject:anObject forKey:[aTableColumn identifier]];
+		[[model segmentGroup:1] configurationChanged:nil];
+	}
+	else if(aTableView == secondaryValuesView){
+		aSegment = [[model segmentGroup:1] segment:rowIndex];
+		if([[aTableColumn identifier] isEqualToString:@"threshold"]){
+			[aSegment setThreshold:anObject];
+		}
+		else if([[aTableColumn identifier] isEqualToString:@"gain"]){
+			[aSegment setGain:anObject];
 		}
 	}
     else [super tableView:aTableView setObjectValue:anObject forTableColumn:aTableColumn row:rowIndex];
@@ -492,7 +683,31 @@
  	if(aTableView == emailListTable){
 		return [[model emailList] count];
     }
+    else if( aTableView == secondaryTableView ||
+           aTableView == secondaryValuesView)    return [[model segmentGroup:1] numSegments];
+
     else return [super numberOfRowsInTableView:aTableView];
 }
 
 @end
+
+
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+@implementation KatrinController (Private)
+- (void) readSecondaryMapFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+{
+    if(returnCode){
+		[[model segmentGroup:1] readMap:[[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath]];
+		[secondaryTableView reloadData];
+    }
+}
+
+- (void) saveSecondaryMapFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+{
+    if(returnCode){
+        [[model segmentGroup:1] saveMapFileAs:[sheet filename]];
+		NSLog(@"Saved Veto HW Map: %@\n",[sheet filename]);
+    }
+}
+@end
+#endif

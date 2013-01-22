@@ -5,16 +5,16 @@
 //  Created by Mark Howe on Tue Jun 28 2005.
 //  Copyright (c) 2002 CENPA, University of Washington. All rights reserved.
 //-----------------------------------------------------------
-//This program was prepared for the Regents of the University of 
-//Washington at the Center for Experimental Nuclear Physics and 
-//Astrophysics (CENPA) sponsored in part by the United States 
-//Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
-//The University has certain rights in the program pursuant to 
-//the contract and the program should not be copied or distributed 
-//outside your organization.  The DOE and the University of 
+//This program was prepared for the Regents of the University of
+//Washington at the Center for Experimental Nuclear Physics and
+//Astrophysics (CENPA) sponsored in part by the United States
+//Department of Energy (DOE) under Grant #DE-FG02-97ER41020.
+//The University has certain rights in the program pursuant to
+//the contract and the program should not be copied or distributed
+//outside your organization.  The DOE and the University of
 //Washington reserve all rights in the program. Neither the authors,
-//University of Washington, or U.S. Government make any warranty, 
-//express or implied, or assume any liability or responsibility 
+//University of Washington, or U.S. Government make any warranty,
+//express or implied, or assume any liability or responsibility
 //for the use of this software.
 //-------------------------------------------------------------
 
@@ -25,7 +25,7 @@
 @class ORSegmentGroup;
 
 @interface HaloController : ORExperimentController {
- 
+    
     IBOutlet NSTextField*	detectorTitle;
     IBOutlet NSButton*      startButton;
 	IBOutlet NSButton*      stealthMode2CB;
@@ -42,6 +42,7 @@
     IBOutlet NSTextField*	sbcPasswordField;
     IBOutlet NSPopUpButton*	viewTypePU;
     IBOutlet NSButton*      sentryLockButton;
+    IBOutlet NSButton*      secondaryMapLockButton;
 	IBOutlet NSTableView*   emailListTable;
 	IBOutlet NSPopUpButton* heartBeatIndexPU;
 	IBOutlet NSTextField*   nextHeartbeatField;
@@ -55,11 +56,21 @@
     IBOutlet NSTextField*   sentryRunningField;
 	IBOutlet NSButton*      updateShapersButton;
 
+    //items in the  HW map tab view
+    IBOutlet NSTableView*	secondaryValuesView;
+	IBOutlet NSPopUpButton* secondaryAdcClassNamePopup;
+	IBOutlet NSTextField*	secondaryMapFileTextField;
+    IBOutlet NSButton*		readSecondaryMapFileButton;
+    IBOutlet NSButton*		saveSecondaryMapFileButton;
+    IBOutlet NSTableView*	secondaryTableView;
+
+    
 	NSView *blankView;
     NSSize detectorSize;
     NSSize detailsSize;
     NSSize focalPlaneSize;
     NSSize sentrySize;
+    NSSize testDectorSize;
 }
 
 #pragma mark ¥¥¥Initialization
@@ -67,7 +78,7 @@
 - (void) updateWindow;
 - (void) setDetectorTitle;
 
-#pragma mark ¥¥¥Interface Management
+- (NSString*) defaultSecondaryMapFilePath;
 - (void) stealthMode2Changed:(NSNotification*)aNote;
 - (void) stealthMode1Changed:(NSNotification*)aNote;
 - (void) viewTypeChanged:(NSNotification*)aNote;
@@ -78,13 +89,16 @@
 - (void) remoteStateChanged:(NSNotification*)aNote;
 - (void) specialUpdate:(NSNotification*)aNote;
 - (void) sentryLockChanged:(NSNotification*)aNote;
+- (void) secondaryMapLockChanged:(NSNotification*)aNote;
 - (void) updateButtons;
 - (void) sbcPasswordChanged:(NSNotification*)aNote;
 - (void) emailListChanged:(NSNotification*)aNote;
 - (void) heartBeatIndexChanged:(NSNotification*)aNote;
-- (void) nextHeartBeatChanged:(NSNotification*)aNote;
 - (void) runStateChanged:(NSNotification*)aNote;
 - (void) sentryIsRunningChanged:(NSNotification*)aNote;
+- (void) secondaryAdcClassNameChanged:(NSNotification*)aNote;
+- (void) secondaryMapFileChanged:(NSNotification*)aNote;
+
 
 #pragma mark ¥¥¥Actions
 - (IBAction) clearStatsAction:(id)sender;
@@ -96,11 +110,17 @@
 - (IBAction) toggleSystems:(id)sender;
 - (IBAction) startStopSentry:(id)sender;
 - (IBAction) sentryLockAction:(id)sender;
+- (IBAction) secondaryMapLockAction:(id)sender;
 - (IBAction) sbcPasswordAction:(id)sender;
-- (IBAction) heartBeatIndexAction:(id)sender;
-- (IBAction) addAddress:(id)sender;
-- (IBAction) removeAddress:(id)sender;
 - (IBAction) updateRemoteShapersAction:(id)sender;
+- (IBAction) secondaryAdcClassNameAction:(id)sender;
+- (IBAction) readSecondaryMapFileAction:(id)sender;
+- (IBAction) saveSecondaryMapFileAction:(id)sender;
+
+#pragma mark ¥¥¥Test Detector Map Actions
+- (IBAction) secondaryAdcClassNameAction:(id)sender;
+- (IBAction) readSecondaryMapFileAction:(id)sender;
+- (IBAction) saveSecondaryMapFileAction:(id)sender;
 
 - (void) _updateShaperSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 - (void) _toggleSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;

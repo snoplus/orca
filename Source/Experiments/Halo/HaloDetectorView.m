@@ -152,10 +152,35 @@
 		[segmentPathSet addObject:segmentPaths];
 		[errorPathSet addObject:errorPaths];
 		
+        [self makeTestTubeSegments];
+
+        
 		[self setNeedsDisplay:YES];
 	}
 }
 
+- (void) makeTestTubeSegments
+{
+    NSMutableArray* segmentPaths = [NSMutableArray arrayWithCapacity:kNumTubes];
+    NSMutableArray* errorPaths   = [NSMutableArray arrayWithCapacity:kNumTubes];
+    
+    float width = [self bounds].size.height;
+    int i;
+    float x = width;
+    float y = 10;
+    for(i=0;i<4;i++){
+        NSRect r = NSMakeRect(10+x-5,y-5,10,10);
+        r = NSOffsetRect(r, 0, 0);
+        [segmentPaths addObject:[NSBezierPath bezierPathWithOvalInRect:r]];
+        [errorPaths   addObject:[NSBezierPath bezierPathWithOvalInRect:NSInsetRect(r, -5, -5)]];
+        y += 15;
+   }
+    
+    //store into the whole set
+    [segmentPathSet addObject:segmentPaths];
+    [errorPathSet addObject:errorPaths];
+
+}
 - (NSMutableArray*) setupMapEntries:(int) index
 {
 	//default set -- subsclasses can override
