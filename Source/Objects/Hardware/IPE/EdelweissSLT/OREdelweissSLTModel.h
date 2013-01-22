@@ -183,6 +183,10 @@
 	    pthread_t dataReplyThread;
         pthread_mutex_t dataReplyThread_mutex;
     int sltDAQMode;
+    int cmdWArg1;
+    int cmdWArg2;
+    int cmdWArg3;
+    int cmdWArg4;
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
@@ -200,6 +204,14 @@
 - (void) runIsStartingSubRun:(NSNotification*)aNote;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+- (int) cmdWArg4;
+- (void) setCmdWArg4:(int)aCmdWArg4;
+- (int) cmdWArg3;
+- (void) setCmdWArg3:(int)aCmdWArg3;
+- (int) cmdWArg2;
+- (void) setCmdWArg2:(int)aCmdWArg2;
+- (int) cmdWArg1;
+- (void) setCmdWArg1:(int)aCmdWArg1;
 - (int) sltDAQMode;
 - (void) setSltDAQMode:(int)aSltDAQMode;
 - (int) numRequestedUDPPackets;
@@ -318,8 +330,11 @@
 - (void) closeDataCommandSocket;
 - (int) isOpenDataCommandSocket;
 - (int) sendUDPDataCommand:(char*)data length:(int) len;
+- (int) sendUDPDataCommandString:(NSString*)aString;
 - (int) sendUDPDataCommandRequestPackets:(int8_t) num;
 - (int) sendUDPDataCommandRequestUDPData;
+- (int) sendUDPDataWCommandRequestPacketArg1:(int) arg1 arg2:(int) arg2 arg3:(int) arg3  arg4:(int) arg4; 
+- (int) sendUDPDataWCommandRequestPacket;
 
 
 
@@ -421,6 +436,10 @@
 
 @end
 
+extern NSString* OREdelweissSLTModelCmdWArg4Changed;
+extern NSString* OREdelweissSLTModelCmdWArg3Changed;
+extern NSString* OREdelweissSLTModelCmdWArg2Changed;
+extern NSString* OREdelweissSLTModelCmdWArg1Changed;
 extern NSString* OREdelweissSLTModelSltDAQModeChanged;
 extern NSString* OREdelweissSLTModelNumRequestedUDPPacketsChanged;
 extern NSString* OREdelweissSLTModelIsListeningOnDataServerSocketChanged;

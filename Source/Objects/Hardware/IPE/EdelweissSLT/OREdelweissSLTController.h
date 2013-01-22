@@ -28,6 +28,10 @@
 	@private
 	
 	    IBOutlet   NSTextField* eventFifoStatusRegTextField;
+	IBOutlet   NSTextField* cmdWArg4TextField;
+	IBOutlet   NSTextField* cmdWArg3TextField;
+	IBOutlet   NSTextField* cmdWArg2TextField;
+	IBOutlet   NSTextField* cmdWArg1TextField;
 	    IBOutlet   NSTextField* sltDAQModeTextField;
 		IBOutlet NSPopUpButton* sltDAQModePU;
 	IBOutlet   NSTextField* numRequestedUDPPacketsTextField;
@@ -143,6 +147,10 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+- (void) cmdWArg4Changed:(NSNotification*)aNote;
+- (void) cmdWArg3Changed:(NSNotification*)aNote;
+- (void) cmdWArg2Changed:(NSNotification*)aNote;
+- (void) cmdWArg1Changed:(NSNotification*)aNote;
 - (void) sltDAQModeChanged:(NSNotification*)aNote;
 - (void) numRequestedUDPPacketsChanged:(NSNotification*)aNote;
 - (void) crateUDPDataReplyPortChanged:(NSNotification*)aNote;
@@ -189,6 +197,10 @@
 - (void) enableRegControls;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+- (IBAction) cmdWArg4TextFieldAction:(id)sender;
+- (IBAction) cmdWArg3TextFieldAction:(id)sender;
+- (IBAction) cmdWArg2TextFieldAction:(id)sender;
+- (IBAction) cmdWArg1TextFieldAction:(id)sender;
 - (IBAction) sltDAQModePUAction:(id)sender;
 - (IBAction) sltDAQModeTextFieldAction:(id)sender;
 - (IBAction) setMasterModeButtonAction:(id)sender;
@@ -212,9 +224,10 @@
 - (IBAction) closeDataCommandSocketButtonAction:(id)sender;
 - (IBAction) startListeningForDataReplyButtonAction:(id)sender;
 - (IBAction) stopListeningForDataReplyButtonAction:(id)sender;
-- (IBAction) crateUDPDataCommandSendButtonAction:(id)sender;
+- (IBAction) crateUDPDataRequestDataPCommandSendButtonAction:(id)sender;
 - (IBAction) numRequestedUDPPacketsTextFieldAction:(id)sender;
 - (IBAction) testUDPDataConnectionButtonAction:(id)sender;
+- (IBAction) crateUDPDataSendWCommandButtonAction:(id)sender;
 
 
 //K command UDP connection

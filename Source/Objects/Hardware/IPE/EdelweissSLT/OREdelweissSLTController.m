@@ -256,9 +256,49 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
                          name : OREdelweissSLTModelSltDAQModeChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(cmdWArg1Changed:)
+                         name : OREdelweissSLTModelCmdWArg1Changed
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(cmdWArg2Changed:)
+                         name : OREdelweissSLTModelCmdWArg2Changed
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(cmdWArg3Changed:)
+                         name : OREdelweissSLTModelCmdWArg3Changed
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(cmdWArg4Changed:)
+                         name : OREdelweissSLTModelCmdWArg4Changed
+						object: model];
+
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+
+- (void) cmdWArg4Changed:(NSNotification*)aNote
+{
+	[cmdWArg4TextField setIntValue: [model cmdWArg4]];
+}
+
+- (void) cmdWArg3Changed:(NSNotification*)aNote
+{
+	[cmdWArg3TextField setIntValue: [model cmdWArg3]];
+}
+
+- (void) cmdWArg2Changed:(NSNotification*)aNote
+{
+	[cmdWArg2TextField setIntValue: [model cmdWArg2]];
+}
+
+- (void) cmdWArg1Changed:(NSNotification*)aNote
+{
+	[cmdWArg1TextField setIntValue: [model cmdWArg1]];
+}
 
 - (void) sltDAQModeChanged:(NSNotification*)aNote
 {
@@ -526,6 +566,10 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	[self isListeningOnDataServerSocketChanged:nil];
 	[self numRequestedUDPPacketsChanged:nil];
 	[self sltDAQModeChanged:nil];
+	[self cmdWArg1Changed:nil];
+	[self cmdWArg2Changed:nil];
+	[self cmdWArg3Changed:nil];
+	[self cmdWArg4Changed:nil];
 }
 
 
@@ -674,6 +718,26 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 #pragma mark ***Actions
 
+- (void) cmdWArg4TextFieldAction:(id)sender
+{
+	[model setCmdWArg4:[sender intValue]];	
+}
+
+- (void) cmdWArg3TextFieldAction:(id)sender
+{
+	[model setCmdWArg3:[sender intValue]];	
+}
+
+- (void) cmdWArg2TextFieldAction:(id)sender
+{
+	[model setCmdWArg2:[sender intValue]];	
+}
+
+- (void) cmdWArg1TextFieldAction:(id)sender
+{
+	[model setCmdWArg1:[sender intValue]];	
+}
+
 - (IBAction) sltDAQModePUAction:(id)sender
 {
 	[model setSltDAQMode:[[sltDAQModePU selectedItem] tag]];	
@@ -793,7 +857,7 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	[model stopListeningDataServerSocket];	
 }
 
-- (IBAction) crateUDPDataCommandSendButtonAction:(id)sender
+- (IBAction) crateUDPDataRequestDataPCommandSendButtonAction:(id)sender
 {
 	//debug NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
 	[model sendUDPDataCommandRequestUDPData];	
@@ -809,6 +873,20 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	//debug NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
 	[model setRequestStoppingDataServerSocket:1];	
 }
+
+
+- (IBAction) crateUDPDataSendWCommandButtonAction:(id)sender
+{
+    [self endEditing];
+	//debug 
+    NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+    [model sendUDPDataWCommandRequestPacket];
+
+}
+
+
+
+
 
 
 //K command UDP connection

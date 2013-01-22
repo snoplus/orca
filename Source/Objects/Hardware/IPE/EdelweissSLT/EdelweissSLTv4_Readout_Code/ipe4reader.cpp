@@ -1369,6 +1369,290 @@ return mot;		// le dernier s'il y en a plusieurs
 
 
 /*--------------------------------------------------------------------
+ *    function:     sendChargeBBStatus
+ *    purpose:      send status of reloading BB FPGA configuration
+ *                  replacement for "_send_status_programmation(n)"
+ *                  arg 'prog_status' is the status - see below
+ *                      'numFifo' is the associated FIFo (which received the charge command) - use its socket to send the status packet
+ *    author:       Till Bergmann, 2013
+ *
+ *--------------------------------------------------------------------*/ //-tb-
+/*
+INFO Till 2013:
+_send_status_programmation(n)  sends status packet with prog_status=n
+n is: numserie + (p<<8) where
+    numserie: seems to be a FIFO status/general status with: 1=started loading; 2=during loading; 3=during/after loading
+    p: percentage of file upload 0..100 (or 0..101??)
+
+_send_status_programmation(n) is called 10 times during loading, and several times (3-5?) at beginning and after end
+
+It seems to be safe to use "numserie==3" all the time?
+*/
+
+int sendChargeBBStatus(uint32_t prog_status,int numFifo)
+{
+    if(numFifo<0  ||  numFifo>=FIFOREADER::maxNumFIFO){
+        printf("ERROR: sendChargeBBStatus: bad FIFO index: %i\n",numFifo);
+        return 0;
+    }
+    
+    FIFOREADER *fiforeader = &FIFOREADER::FifoReader[numFifo];
+    
+                UDPPacketScheduler statusScheduler(fiforeader);
+                //prepare header
+                TypeStatusHeader crateStatusHeader;
+                crateStatusHeader.identifiant = 0x0000ffff;
+                statusScheduler.setHeader((char*)&crateStatusHeader,sizeof(crateStatusHeader));
+                statusScheduler.writeHeaderToPayload();
+                //payload
+                TypeIpeCrateStatusBlock crateStatusBlock;
+                crateStatusBlock.stamp_msb = 0;//pd_fort;
+                crateStatusBlock.stamp_lsb = 0;//pd_faible;
+                crateStatusBlock.PPS_count = 0;//udpdataSec;
+                crateStatusBlock.size_bytes = sizeof(crateStatusBlock);            // 
+                crateStatusBlock.version = VERSION_IPE4READOUT;        // _may_ be useful in some particular cases (version of C code/firmware/hardware?)
+                //SLT register:
+                uint32_t OperaStatus1 =  0;//pbus->read(OperaStatusReg1);
+                crateStatusBlock.SLTTimeLow    =  0;//pbus->read(SLTTimeLowReg);       // the according SLT register
+                crateStatusBlock.SLTTimeHigh   =  0;//pbus->read(SLTTimeHighReg);       // the according SLT register
+                crateStatusBlock.OperaStatus1  = 0;//OperaStatus1;     // contains d0, previously in cew: registre_x, =20  
+                crateStatusBlock.pixbus_enable = 0;//pbus->read(SLTPixbusEnableReg);
+                //Software status:
+                crateStatusBlock.prog_status         = prog_status;
+                crateStatusBlock.internal_error_info = 0;
+                crateStatusBlock.ipe4reader_status   = FIFOREADER::State;
+                crateStatusBlock.spare1 = 1;
+                crateStatusBlock.spare2 = 2;
+                //append status to payload
+                statusScheduler.appendDataSendIfFull((char*)&crateStatusBlock,sizeof(crateStatusBlock));
+                
+                //send all buffered data (appends a trailing 0)
+                statusScheduler.sendScheduledData();   //calls fiforeader->sendtoUDPClients(0,buf,len);
+    return 1;
+}
+
+
+/*--------------------------------------------------------------------
+ *    function:     chargeBBWithFILEPtr
+ *    purpose:      reload BB FPGA configuration from FILE* pointer (called from chargeBBWithFile)
+ *                    arguments:
+ *                      int * numserie - kind of return value
+ *                      int numFifo - FIFO socket used to send status packet
+ *
+ *    author:       from cew.c, modified by Till Bergmann, 2011
+ *
+ *--------------------------------------------------------------------*/ //-tb-
+//from constant_fpga.h and cew.c -> remove all -tb-
+//#define REG_CMD (0x14) 
+//int		driver_fpga=0;
+
+
+int32_t  fsize(FILE* fd)
+{
+   int32_t size;
+   fseek(fd, 0, SEEK_END);       /* aller en fin */
+   size = ftell(fd);             /* lire la taille */
+   return size;
+}
+
+
+//  programme bbv2 retourne 0 si tout est bon
+// sinon retourne un code d'erreur
+
+
+/*
+#define _attente_cmd_vide	{int timeout=100; do read_word(driver_fpga,REG_CMD_STATUS,&b);	while ( (!(b&0x8000)) && (timeout--) ) ;\
+							if(timeout<1) printf("erreur timeout attente commande vide \n");}
+*/
+
+#define _attente_cmd_vide	{int timeout=100; do b=pbus->read(CmdFIFOStatusReg);	while ( (!(b&0x8000)) && (timeout--) ) ;\
+							if(timeout<1) printf("erreur timeout attente commande vide \n");}
+
+
+/*
+INFO Till 2013:
+_send_status_programmation(n)  sends status packet with prog_status=n
+n is: numserie + (p<<8) where
+    numserie: seems to be a FIFO status/general status with: 1=started loading; 2=during loading; 3=during/after loading
+    p: percentage of file upload 0..100 (or 0..101??)
+
+_send_status_programmation(n) is called 10 times during loading, and several times (3-5?) at beginning and after end
+
+It seems to be safe to use "numserie==3" all the time?
+*/
+
+
+//  chargeBBWithFILEPtr retourne 0 si tout est bon
+// sinon retourne un code d'erreur
+int chargeBBWithFILEPtr(FILE * fichier,int * numserie, int numFifo)
+{
+	int i,a,n;
+	uint32_t  b;
+	unsigned char filebuf[1100];
+	uint32_t  size;
+	//TODO: needed?   _send_status_programmation(2)
+	//#define _send_status_programmation(n)	{kill(pid,SIGUSR1); Trame_status_udp.status_opera.micro_bbv2=n;	_SEND_UDP_clients_status(&Trame_status_udp,sizeof(Structure_trame_status))}
+    sendChargeBBStatus(2, numFifo);
+	
+	usleep(500000);			// je rajoute 500 msec au debut
+	//TODO: needed? vide_data_FIFO();		// pour vider la fifo
+	usleep(100000);
+//	write_word(driver_fpga,REG_CMD, (uint32_t) 235);	//  c'est le code commande pour passer en mode_micro
+    pbus->write(CmdFIFOReg ,  235);
+
+	printf("\npassage de la BBv2 en mode microprocesseur\n");
+    #if 1
+	usleep(50000);	pbus->write(CmdFIFOReg ,  256);//  une data a zero
+	usleep(50000);	pbus->write(CmdFIFOReg ,  256);//  une data a zero
+	usleep(50000);	pbus->write(CmdFIFOReg ,  256);//  une data a zero
+	usleep(50000);	pbus->write(CmdFIFOReg ,  256);//  une data a zero
+	usleep(100000);	// laisser le temps (0.1sec) pour que le biphase se rende compte que l'horloge est arretee
+    #else
+	usleep(50000);	write_word(driver_fpga,REG_CMD, (uint32_t) 256);	//  une data a zero
+	usleep(50000);	write_word(driver_fpga,REG_CMD, (uint32_t) 256);	//  une data a zero
+	usleep(50000);	write_word(driver_fpga,REG_CMD, (uint32_t) 256);	//  une data a zero
+	usleep(50000);	write_word(driver_fpga,REG_CMD, (uint32_t) 256);	//  une data a zero
+	//TODO: needed? vide_data_FIFO();		// pour vider la fifo
+	usleep(100000);	// laisser le temps (0.1sec) pour que le biphase se rende compte que l'horloge est arretee
+	//TODO: needed? vide_data_FIFO();		// pour vider la fifo
+    #endif
+    
+	b=0x0120;
+	
+	for(i=0;i<10;i++)	pbus->write(CmdFIFOReg ,  b++);  // ici avec _attente_cmd_vide ca ne marche pas
+	//-tb- old code: for(i=0;i<10;i++)	write_word(driver_fpga,REG_CMD,b++);		// ici avec _attente_cmd_vide ca ne marche pas
+    
+    *numserie=3;
+    #if 0
+	for(i=0;i<10;i++)		// je fais une boucle en attendant le numero de serie
+	{
+		*numserie=lecture_data_FIFO_microbbv2();
+		if(*numserie>2) break;
+	}
+	printf(" ---> (i=%d) nmserie = %d  \n",i,*numserie);
+	if(*numserie<3)	return -1;
+	#endif
+    
+	//TODO: needed?   _send_status_programmation(*numserie)
+	
+	size = fsize(fichier);
+	fseek(fichier, 0, SEEK_SET);       /* aller au debut */
+	printf("fichier de programmation : %d octets \n",(int)size);
+	b=(size & 0xff) + 0x0100;         pbus->write(CmdFIFOReg, b);//_attente_cmd_vide
+	b=( (size>>8) & 0xff ) + 0x0100;  pbus->write(CmdFIFOReg, b);//_attente_cmd_vide
+	b=( (size>>16) & 0xff ) + 0x0100; pbus->write(CmdFIFOReg, b);//_attente_cmd_vide
+	b=( (size>>24) & 0xff ) + 0x0100; pbus->write(CmdFIFOReg, b);//_attente_cmd_vide
+    #if 0 //old code -tb-
+	b=(size & 0xff) + 0x0100;write_word(driver_fpga,REG_CMD,b);//_attente_cmd_vide
+	b=( (size>>8) & 0xff ) + 0x0100;write_word(driver_fpga,REG_CMD,b);//_attente_cmd_vide
+	b=( (size>>16) & 0xff ) + 0x0100;write_word(driver_fpga,REG_CMD,b);//_attente_cmd_vide
+	b=( (size>>24) & 0xff ) + 0x0100;write_word(driver_fpga,REG_CMD,b);//_attente_cmd_vide
+    #endif
+	usleep(10000);	// attente pour mise en mode conf du fpga (10 msec)
+	printf("on attend 0 :  ");  
+//TODO: test -tb- if(lecture_data_FIFO_microbbv2()!=0) return -2;
+	printf("\n");
+	
+	
+    //file size is (usually?) 247942 bytes ->will finish at a==248 (a/2.5==99)
+	for(a=0;a<1000;a++)
+	{
+		    //printf("--> %d%c (a:%i)\n",(int)(a/2.5),'%',a);//TODO: use next line instead of this line -tb-
+		if(a%25==0){
+		    printf("--> %d%c (a:%i)\n",(int)(a/2.5),'%',a);//TODO: use next line instead of this line -tb-
+		    //printf("--> %d%c \n",(int)(a/2.5),'%');
+			//TODO: needed?   _send_status_programmation(*numserie + (((int)(a/2.5))<<8)) 
+            sendChargeBBStatus(   *numserie + (((int)(a/2.5))<<8)   , numFifo);
+		}
+//TODO:test -tb-		if(lecture_data_FIFO_microbbv2()!=-1) return -3;		// erreur durant l'emission des data
+		n=fread(filebuf,1,1000,fichier);
+		if(n<=0)	break;
+		//TODO: needed?   if(a%10==0)	led_B(_vert);
+		//TODO: needed?   if(a%10==7)	led_B(_rouge);
+		for(i=0;i<n;i++)
+		{
+			b=( (unsigned short) filebuf[i] ) + 0x0100; 
+            pbus->write(CmdFIFOReg, b);
+			// old code -tb- write_word(driver_fpga,REG_CMD, b); 
+			_attente_cmd_vide
+		}
+	}
+	printf(" programmation de la BBv2 terminee \n");
+	//TODO: needed?   _send_status_programmation(*numserie+ (100<<8)) 
+    sendChargeBBStatus(   *numserie + (100<<8)  , numFifo);
+	usleep(50000);	pbus->write(CmdFIFOReg ,  256);//  une data a zero
+	usleep(50000);	pbus->write(CmdFIFOReg ,  256);//  une data a zero
+	//usleep(50000);	write_word(driver_fpga,REG_CMD, (uint32_t) 256);	//  une data a zero
+	//usleep(50000);	write_word(driver_fpga,REG_CMD, (uint32_t) 256);	//  une data a zero
+	
+	usleep(500000);	// laisser le temps pour lire le message d'erreur eventuel
+	b=0x200;  pbus->write(CmdFIFOReg, b);  //fin de commande 
+	//-tb- old code: b=0x200;  write_word(driver_fpga,REG_CMD, b);  //fin de commande 
+	usleep(500000);	// laisser le temps pour lire le message d'erreur eventuel
+	printf("on attend 2 pour terminer : ");
+//TODO: test -tb-
+return 0;
+	if(lecture_data_FIFO_microbbv2()!=2) return -4;
+	printf("\n");
+	printf("\n");
+	//TODO: needed?   _send_status_programmation(*numserie+ (101<<8)) 
+	return 0;
+}
+
+/*--------------------------------------------------------------------
+ *    function:     chargeBBWithFile
+ *    purpose:      load the FPGA configuration for the BBs
+ *                     in cew.c: void	 mise_a_jour_bbv2(int recharge)
+ *
+ *    author:       Till Bergmann, 2013
+ *
+ *--------------------------------------------------------------------*/ //-tb-
+
+void chargeBBWithFile(char * filename, int fromFifo)
+{
+    printf("chargeBBWithFile: >%s<, requested for FIFO %i\n",filename,fromFifo);//DEBUG
+
+
+FILE *mon_fichier;
+int j,err;
+int numserie;
+//TODO: ? led_B(_rouge);
+
+				
+//TODO: _send_status_programmation(2)
+printf("fichier %s ",filename);   // was /var/bbv2.rbf
+if( (mon_fichier = fopen(filename,"rw")) )
+	{
+	for(j=0;j<10;j++)		// j'essaye 10 fois
+		{
+		envoie_commande_standard_BBv2();
+		err=chargeBBWithFILEPtr(mon_fichier,&numserie,fromFifo);
+		if(!err) break;
+		}
+	}
+    
+    if(!mon_fichier) printf("    ERROR: could not open file: %s\n",filename);
+    
+printf("***********   bilan de chargement :  numserie=%d  j=%d  err=%d  ********\n",numserie,j,err);
+envoie_commande_horloge();
+//TODO: led_B(_vert);
+return;
+}
+
+
+
+
+
+
+
+
+
+//TODO: the following block may be removed as soon as mise_a_jour_bbv2 in 'int handleUDPCommandPacket(unsigned char *buffer, int len, int iFifo)' is removed -tb-
+#if 1
+
+
+// DEPRECATED, USE programme_bb (see above) -tb-
+/*--------------------------------------------------------------------
  *    function:     programme_bbv2
  *    purpose:      reload BB FPGA configuration
  *    author:       from cew.c, modified by Till Bergmann, 2011
@@ -1393,27 +1677,8 @@ void write_word(int fd, uint32_t offset, uint32_t dataout)
 }
 
 
-int32_t  fsize(FILE* fd)
-{
-   int32_t size;
-   fseek(fd, 0, SEEK_END);       /* aller en fin */
-   size = ftell(fd);             /* lire la taille */
-   return size;
-}
-
-
 //  programme bbv2 retourne 0 si tout est bon
 // sinon retourne un code d'erreur
-#if 1
-
-
-/*
-#define _attente_cmd_vide	{int timeout=100; do read_word(driver_fpga,REG_CMD_STATUS,&b);	while ( (!(b&0x8000)) && (timeout--) ) ;\
-							if(timeout<1) printf("erreur timeout attente commande vide \n");}
-*/
-
-#define _attente_cmd_vide	{int timeout=100; do b=pbus->read(CmdFIFOStatusReg);	while ( (!(b&0x8000)) && (timeout--) ) ;\
-							if(timeout<1) printf("erreur timeout attente commande vide \n");}
 
 int programme_bbv2(FILE * fichier,int * numserie);
 int programme_bbv2(FILE * fichier,int * numserie)
@@ -1463,10 +1728,13 @@ int programme_bbv2(FILE * fichier,int * numserie)
 	printf("\n");
 	
 	
+    //file size is (usually?) 247942 bytes ->will finish at a==248 (a/2.5==99)
 	for(a=0;a<1000;a++)
 	{
+		    printf("--> %d%c (a:%i)\n",(int)(a/2.5),'%',a);//TODO: use next line instead of this line -tb-
 		if(a%25==0){
-		    printf("--> %d%c \n",(int)(a/2.5),'%');
+		    printf("--> %d%c (a:%i)\n",(int)(a/2.5),'%',a);//TODO: use next line instead of this line -tb-
+		    //printf("--> %d%c \n",(int)(a/2.5),'%');
 			//TODO: needed?   _send_status_programmation(*numserie + (((int)(a/2.5))<<8)) 
 		}
 //TODO:test -tb-		if(lecture_data_FIFO_microbbv2()!=-1) return -3;		// erreur durant l'emission des data
@@ -1499,7 +1767,6 @@ return 0;
 	return 0;
 }
 
-#endif
 
 /*--------------------------------------------------------------------
  *    function:     mise_a_jour_bbv2
@@ -1549,6 +1816,14 @@ return;
 }
 
 
+#endif
+
+
+
+
+
+
+
 
 
 /*--------------------------------------------------------------------
@@ -1584,43 +1859,6 @@ void envoie_commande_horloge(void)
 }
 
 
-/*--------------------------------------------------------------------
- *    function:     chargeBBWithFile
- *    purpose:      load the FPGA configuration for the BBs
- *    author:       Till Bergmann, 2013
- *
- *--------------------------------------------------------------------*/ //-tb-
-
-void chargeBBWithFile(char * filename)
-{
-    printf("chargeBBWithFile: >%s<\n",filename);//DEBUG
-
-
-FILE *mon_fichier;
-int j,err;
-int numserie;
-//TODO: ? led_B(_rouge);
-
-				
-//TODO: _send_status_programmation(2)
-printf("fichier %s ",filename);   // was /var/bbv2.rbf
-if( (mon_fichier = fopen(filename,"rw")) )
-	{
-	for(j=0;j<10;j++)		// j'essaye 10 fois
-		{
-		envoie_commande_standard_BBv2();
-		err=programme_bbv2(mon_fichier,&numserie);
-		if(!err) break;
-		}
-	}
-    
-    if(!mon_fichier) printf("    ERROR: could not open file: %s\n",filename);
-    
-printf("***********   bilan de chargement :  numserie=%d  j=%d  err=%d  ********\n",numserie,j,err);
-envoie_commande_horloge();
-//TODO: led_B(_vert);
-return;
-}
 
 
 /*--------------------------------------------------------------------
@@ -1689,7 +1927,10 @@ void populateIPECrateStatusPacket()
  *    function:     handleKCommand
  *    purpose:      handle command sent from cew_controle/Samba in a UDP packet
  *
- *    argument 'buffer': a terminating '\0' will be appended! caller must ensure 'buffer' is large enough!
+ *    argument 'buffer':   a terminating '\0' will be appended! caller must ensure 'buffer' is large enough!
+ *             'fromFifo': number of FIFO, which is associated to the UDP socket, which received the command;
+ *                         needed to send status packets to dedicated receiver during charge of BBs 
+ *                         (-1 = no or undefined FIFO socket (default))
  *
  *    author:        Till Bergmann, 2011
  *
@@ -1704,7 +1945,7 @@ void populateIPECrateStatusPacket()
  //   'K' = 0x4B, 'A' = 0x41, 'Z' = 0x5A, 'k' = 0x6B, 'a' = 0x61, 'z' = 0x7A
  //         -> kleinster Wert: 'AA' = 0x4141 = 16705, bzw. 'KA'=0x4B41=19264;   groesster Wert: 'zz' = 0x7a7a = 31354
  //   => max. Paketnummer: ca 833 = 0x0341 dh. Faktor 20 ... 
- void handleKCommand(char *buffer, int len, struct sockaddr_in *sockaddr_from_ptr)
+ void handleKCommand(char *buffer, int len, struct sockaddr_in *sockaddr_from_ptr, int fromFifo)
  {
      buffer[len]=0;
      
@@ -1833,7 +2074,7 @@ void populateIPECrateStatusPacket()
 	          if(  (foundPos=strstr(buffer,"chargeBBFile"))  ){
 	              printf("handleKCommand: KWC >%s< command 9!\n",foundPos);//DEBUG
                   if(len >= sizeof("KWC_chargeBBFile_"))//filename must be at least one character
-                      chargeBBWithFile( foundPos + sizeof("chargeBBFile") );//sizeof("chargeBBFile") counts the ending \0, but I anyway need to skip one '_'
+                      chargeBBWithFile( foundPos + sizeof("chargeBBFile") , fromFifo);//sizeof("chargeBBFile") counts the ending \0, but I anyway need to skip one '_'
                   else
                       printf("   ERROR: KWC >%s< command without filename!\n",buffer);//DEBUG
 		          }
@@ -1976,32 +2217,34 @@ int handleUDPCommandPacket(unsigned char *buffer, int len, int iFifo)
 
     // handling of commands: see cew.c, function 'traite_une_commande'
     int i;
-	if(show_debug_info) printf("Received UDP cmd pack on server port for FIFO %i (len %i): ",iFifo, (int)len);
+	if(show_debug_info>=1) printf("Received UDP cmd packet on server port for FIFO %i (len %i): ",iFifo, (int)len);
 	
 	//this is from cew.c; this is necessary only for printf'ing the command string with %s, see default branch below -tb-
 	buffer[len]=0;
 
 	
-	//debug output, add a debug level -tb-
-	//in hex
-	printf("Cmd in hex:");
-	for(i=0; i<(int)len; i++){
-	    printf(" 0x%x",buffer[i]);
-	}
-	printf("\n");
-	//as int (and char if possible)
-    if(len<18){
-	    for(i=0; i<(int)len; i++){
-	        printf(" %i",buffer[i]);
-	        if(buffer[i]>=' ' &&  buffer[i]!=127) printf(" (%c)",buffer[i]);
-	    }
-	    printf("\n");
-	}else {
-	    for(i=0; i<(int)len; i++){
-	        if(buffer[i]>=' ' &&  buffer[i]<127) printf("%c",buffer[i]);
-	        else printf("?");
-	    }
-	    printf("\n");
+	//debug output
+	if(show_debug_info>=1){
+        //in hex
+        printf("Cmd in hex:");
+        for(i=0; i<(int)len; i++){
+            printf(" 0x%x",buffer[i]);
+        }
+        printf("\n");
+        //as int (and char if possible)
+        if(len<18){
+            for(i=0; i<(int)len; i++){
+                printf(" %i",buffer[i]);
+                if(buffer[i]>=' ' &&  buffer[i]!=127) printf(" (%c)",buffer[i]);
+            }
+            printf("\n");
+        }else {
+            for(i=0; i<(int)len; i++){
+                if(buffer[i]>=' ' &&  buffer[i]<127) printf("%c",buffer[i]);
+                else printf("?");
+            }
+            printf("\n");
+        }
     }
 
 	//comment from cew.c:
@@ -2021,7 +2264,7 @@ int handleUDPCommandPacket(unsigned char *buffer, int len, int iFifo)
 		            struct sockaddr_in *sockaddr_from=0;
 		            //TODO: fill sockaddr_from
 		            sockaddr_from=&fr.servaddr;
-					handleKCommand((char*)buffer,len,sockaddr_from);
+					handleKCommand((char*)buffer,len,sockaddr_from,iFifo);
 					}
 					break;
 			
@@ -2085,6 +2328,9 @@ int handleUDPCommandPacket(unsigned char *buffer, int len, int iFifo)
 					printf("code Q  redemarrage  ( code=%d ) ",buffer[1]);
 					printf("Restart command not yet supported! -tb-\n ");
 					printf("Experimantal: starting mise_a_jour_bbv2(0) -tb-\n ");
+                    //TODO: mise_a_jour_bbv2 is deprecated but left for cew_controle -tb-
+                    //TODO: remove it -tb-
+                    //TODO: remove it -tb-
 					mise_a_jour_bbv2(0 /* if second command byte was 3, see below*/);
 					//sauve_config is a QPushButton defined in ui_commande.h which calls sauve_config() -tb-
 					

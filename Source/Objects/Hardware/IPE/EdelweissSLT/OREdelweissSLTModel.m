@@ -319,7 +319,9 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
                     TypeIpeCrateStatusBlock *crateStatusBlock=(TypeIpeCrateStatusBlock *)ptr;
 				    NSLog(@"  IPE crate status block:     PPS %i (0x%08x)\n",crateStatusBlock->PPS_count,crateStatusBlock->PPS_count);
 				    NSLog(@"      OperaStatus1 0x%08x (d0: %i)\n",crateStatusBlock->OperaStatus1,crateStatusBlock->OperaStatus1 & 0xfff);
-				    NSLog(@"      size_bytes %i \n",crateStatusBlock->size_bytes);
+				    NSLog(@"      size_bytes: %i \n",crateStatusBlock->size_bytes);
+                    uint32_t ps=crateStatusBlock->prog_status;
+				    NSLog(@"      prog_status: 0x%08x: stat: %i  percent:%i%c \n",ps,ps&0xf, (ps>>8)&0xfff,'%');
                     //let ptr point behind current block (usually the first TypeBBStatusBlock )
                     ptr += crateStatusBlock->size_bytes;
                 }else{
@@ -388,6 +390,10 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
 
 #pragma mark ***External Strings
 
+NSString* OREdelweissSLTModelCmdWArg4Changed = @"OREdelweissSLTModelCmdWArg4Changed";
+NSString* OREdelweissSLTModelCmdWArg3Changed = @"OREdelweissSLTModelCmdWArg3Changed";
+NSString* OREdelweissSLTModelCmdWArg2Changed = @"OREdelweissSLTModelCmdWArg2Changed";
+NSString* OREdelweissSLTModelCmdWArg1Changed = @"OREdelweissSLTModelCmdWArg1Changed";
 NSString* OREdelweissSLTModelSltDAQModeChanged = @"OREdelweissSLTModelSltDAQModeChanged";
 NSString* OREdelweissSLTModelNumRequestedUDPPacketsChanged = @"OREdelweissSLTModelNumRequestedUDPPacketsChanged";
 NSString* OREdelweissSLTModelIsListeningOnDataServerSocketChanged = @"OREdelweissSLTModelIsListeningOnDataServerSocketChanged";
@@ -558,6 +564,65 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 }
 
 #pragma mark •••Accessors
+
+- (int) cmdWArg4
+{
+    return cmdWArg4;
+}
+
+- (void) setCmdWArg4:(int)aCmdWArg4
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setCmdWArg4:cmdWArg4];
+    cmdWArg4 = aCmdWArg4;
+    if(cmdWArg4<0) cmdWArg4=0;     if(cmdWArg4>0xff) cmdWArg4=0xff; 
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelCmdWArg4Changed object:self];
+}
+
+- (int) cmdWArg3
+{
+    return cmdWArg3;
+}
+
+- (void) setCmdWArg3:(int)aCmdWArg3
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setCmdWArg3:cmdWArg3];
+    
+    cmdWArg3 = aCmdWArg3;
+    if(cmdWArg3<0) cmdWArg3=0;     if(cmdWArg3>0xff) cmdWArg3=0xff; 
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelCmdWArg3Changed object:self];
+}
+
+- (int) cmdWArg2
+{
+    return cmdWArg2;
+}
+
+- (void) setCmdWArg2:(int)aCmdWArg2
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setCmdWArg2:cmdWArg2];
+    
+    cmdWArg2 = aCmdWArg2;
+    if(cmdWArg2<0) cmdWArg2=0;     if(cmdWArg2>0xff) cmdWArg2=0xff; 
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelCmdWArg2Changed object:self];
+}
+
+- (int) cmdWArg1
+{
+    return cmdWArg1;
+}
+
+- (void) setCmdWArg1:(int)aCmdWArg1
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setCmdWArg1:cmdWArg1];
+    
+    cmdWArg1 = aCmdWArg1;
+    if(cmdWArg1<0) cmdWArg1=0;     if(cmdWArg1>0xff) cmdWArg1=0xff; 
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelCmdWArg1Changed object:self];
+}
 
 - (int) sltDAQMode
 {
@@ -1525,7 +1590,7 @@ NSLog(@"  arguments: %@ \n" , arguments);
 - (int) sendUDPCommandString:(NSString*)aString
 {
     //taken from ipe4reader6.cpp, function int sendtoGlobalClient3(const void *buffer, size_t length, char* receiverIPAddr, uint32_t port)
-	NSLog(@"Called %@::%@! Send string: >%@<\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),  [self crateUDPCommand]);//TODO: DEBUG -tb-
+	NSLog(@"Called %@::%@! Send string: >%@<\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),  aString);//TODO: DEBUG -tb-
 	//[model setCrateUDPCommand:[sender stringValue]];	
     if(UDP_COMMAND_CLIENT_SOCKET<=0){ NSLog(@"   socket not open\n"); return 1;}
 
@@ -1810,11 +1875,12 @@ for(l=0;l<2500;l++){
 - (int) sendUDPDataCommand:(char*)data length:(int) len
 {
     //taken from ipe4reader6.cpp, function int sendtoGlobalClient3(const void *buffer, size_t length, char* receiverIPAddr, uint32_t port)
-	//NSLog(@"Called %@::%@! Send data ... len %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) , len);//TODO: DEBUG -tb-
-	//int i;
-	//for(i=0; i<len;i++) NSLog(@"0x%02x  ",data[i]);
-	//NSLog(@"\n");
-
+    #if 0
+	NSLog(@"Called %@::%@! Send data ... len %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) , len);//TODO: DEBUG -tb-
+	int i;
+	for(i=0; i<len;i++) NSLog(@"0x%02x  ",data[i]);
+	NSLog(@"\n");
+    #endif
 
 
 	//[model setCrateUDPCommand:[sender stringValue]];	
@@ -1850,6 +1916,21 @@ for(l=0;l<2500;l++){
 
 }
 
+/* similar to
+    - (int) sendUDPCommandString:(NSString*)aString
+    but sends over data UDP socket
+    */
+- (int) sendUDPDataCommandString:(NSString*)aString
+{
+	NSLog(@"Called %@::%@! Send data socket command: >%@<\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) , aString);//TODO: DEBUG -tb-
+    const void *buffer   = [[aString dataUsingEncoding: NSASCIIStringEncoding allowLossyConversion: YES] bytes]; 
+	size_t length        = [aString lengthOfBytesUsingEncoding: NSASCIIStringEncoding];
+    return [self sendUDPDataCommand:(char*)buffer length: length];
+}
+
+
+
+
 - (int) sendUDPDataCommandRequestPackets:(int8_t) num
 {
     char data[6];
@@ -1870,18 +1951,39 @@ for(l=0;l<2500;l++){
 	return [self sendUDPDataCommandRequestPackets:  numRequestedUDPPackets];	
 }
 
+- (int) sendUDPDataWCommandRequestPacketArg1:(int) arg1 arg2:(int) arg2 arg3:(int) arg3  arg4:(int) arg4
+{
+	//debug 
+    NSLog(@"Called %@::%@ Arg1:0x%x arg2:0x%x arg3:0x%x  arg4:0x%x\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd), arg1,arg2,arg3,arg4);//TODO: DEBUG -tb-
+
+    char data[6];
+	int len=6;
+	data[0]='W';//'P' = 0x50 = P command
+	data[1]= 0xf0;//cmd
+	data[2]= arg1 & 0xff;
+	data[3]= arg2 & 0xff;
+	data[4]= arg3 & 0xff;
+	data[5]= arg4 & 0xff;
+	return [self sendUDPDataCommand: data length: len];	
+}
+
+- (int) sendUDPDataWCommandRequestPacket
+{
+    return [self sendUDPDataWCommandRequestPacketArg1: cmdWArg1 arg2: cmdWArg2 arg3: cmdWArg3  arg4:cmdWArg4];
+}
+
 
 #pragma mark ***HW Access
 - (void)		  writeMasterMode
 {
 //DEBUG OUTPUT: 	
-NSLog(@"WARNING: %@::%@: STILL UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+NSLog(@"WARNING: %@::%@: master mode is not necessary any more! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
 }
 
 - (void)		  writeSlaveMode
 {
 //DEBUG OUTPUT: 	
-NSLog(@"WARNING: %@::%@: STILL UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+NSLog(@"WARNING: %@::%@:  slave mode is not necessary any more! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
 }
 
 
@@ -2393,6 +2495,10 @@ NSLog(@"WARNING: %@::%@: STILL UNDER CONSTRUCTION! \n",NSStringFromClass([self c
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
 	
+	[self setCmdWArg4:[decoder decodeIntForKey:@"cmdWArg4"]];
+	[self setCmdWArg3:[decoder decodeIntForKey:@"cmdWArg3"]];
+	[self setCmdWArg2:[decoder decodeIntForKey:@"cmdWArg2"]];
+	[self setCmdWArg1:[decoder decodeIntForKey:@"cmdWArg1"]];
 	[self setSltDAQMode:[decoder decodeIntForKey:@"sltDAQMode"]];
 	[self setNumRequestedUDPPackets:[decoder decodeIntForKey:@"numRequestedUDPPackets"]];
 	[self setCrateUDPDataReplyPort:[decoder decodeIntForKey:@"crateUDPDataReplyPort"]];
@@ -2451,6 +2557,10 @@ NSLog(@"WARNING: %@::%@: STILL UNDER CONSTRUCTION! \n",NSStringFromClass([self c
 {
 	[super encodeWithCoder:encoder];
 	
+	[encoder encodeInt:cmdWArg4 forKey:@"cmdWArg4"];
+	[encoder encodeInt:cmdWArg3 forKey:@"cmdWArg3"];
+	[encoder encodeInt:cmdWArg2 forKey:@"cmdWArg2"];
+	[encoder encodeInt:cmdWArg1 forKey:@"cmdWArg1"];
 	[encoder encodeInt:sltDAQMode forKey:@"sltDAQMode"];
 	[encoder encodeInt:numRequestedUDPPackets forKey:@"numRequestedUDPPackets"];
 	[encoder encodeInt:crateUDPDataReplyPort forKey:@"crateUDPDataReplyPort"];

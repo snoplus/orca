@@ -152,9 +152,10 @@ UDPStructIPECrateStatus2;
 
 /*--------------------------------------------------------------------
  *    function prototypes
- *       TODO: function prototypes: move to include file somewhen in the future  -tb-
+ *        
  *--------------------------------------------------------------------*/ //-tb-
-void handleKCommand(char *buffer, int len, struct sockaddr_in *sockaddr_from);
+void chargeBBWithFile(char * filename, int fromFifo=-1);
+void handleKCommand(char *buffer, int len, struct sockaddr_in *sockaddr_from, int fromFifo=-1);
 int readConfigFile(char *filename);
 int parseConfigFileLine(char *line);
 
