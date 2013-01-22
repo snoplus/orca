@@ -84,6 +84,7 @@ enum {
 	kExtFIFOMonitor,			//[12] External FIFO monitor
     kControlStatus,				//[13] Control Status
     kLEDThreshold,				//[14] LED Threshold
+    kTrapThreshold,				//[15] Trapezoidal Threshold
     kWindowTiming,              //[16] Window timing
     kRisingEdgeWindow,          //[17] Rising Edge Window
     kDAC,						//[18] DAC
@@ -180,6 +181,7 @@ enum Gretina4MFIFOStates {
 	unsigned long   dataBuffer[kG4MDataPacketSize];
 
     BOOL			enabled[kNumGretina4MChannels];
+    BOOL			trapEnabled[kNumGretina4MChannels];
     BOOL			debug[kNumGretina4MChannels];
     BOOL			pileUp[kNumGretina4MChannels];
     BOOL            poleZeroEnabled[kNumGretina4MChannels];
@@ -187,6 +189,7 @@ enum Gretina4MFIFOStates {
     BOOL			presumEnabled[kNumGretina4MChannels];
     short			triggerMode[kNumGretina4MChannels];
     int				ledThreshold[kNumGretina4MChannels];
+    short			trapThreshold[kNumGretina4MChannels];
     short           poleZeroMult[kNumGretina4MChannels];
     short			downSample;
     short			mrpsrt[kNumGretina4MChannels];
@@ -218,6 +221,7 @@ enum Gretina4MFIFOStates {
 	unsigned long fifoStateAddress;
 
 	BOOL oldEnabled[kNumGretina4MChannels];
+	BOOL oldTrapEnabled[kNumGretina4MChannels];
 	int oldLEDThreshold[kNumGretina4MChannels];
 	int newLEDThreshold[kNumGretina4MChannels];
 	BOOL noiseFloorRunning;
@@ -333,11 +337,13 @@ enum Gretina4MFIFOStates {
 - (void) setTriggerMode:(short)chan withValue:(short)aValue;
 - (void) setPileUp:(short)chan withValue:(short)aValue;		
 - (void) setEnabled:(short)chan withValue:(BOOL)aValue;
-- (void) setPoleZeroEnabled:(short)chan withValue:(BOOL)aValue;		
+- (void) setTrapEnabled:(short)chan withValue:(BOOL)aValue;
+- (void) setPoleZeroEnabled:(short)chan withValue:(BOOL)aValue;
 - (void) setPoleZeroMultiplier:(short)chan withValue:(short)aValue;		
 - (void) setPZTraceEnabled:(short)chan withValue:(BOOL)aValue;		
 - (void) setDebug:(short)chan withValue:(BOOL)aValue;	
 - (void) setLEDThreshold:(short)chan withValue:(int)aValue;
+- (void) setTrapThreshold:(short)chan withValue:(int)aValue;
 - (void) setMrpsrt:(short)chan withValue:(short)aValue;
 - (void) setFtCnt:(short)chan withValue:(short)aValue;
 - (void) setMrpsdv:(short)chan withValue:(short)aValue;
@@ -349,6 +355,7 @@ enum Gretina4MFIFOStates {
 - (void) setPresumEnabled:(short)chan withValue:(BOOL)aValue;
 
 - (BOOL) enabled:(short)chan;
+- (BOOL) trapEnabled:(short)chan;
 - (BOOL) poleZeroEnabled:(short)chan;
 - (short) poleZeroMult:(short)chan;
 - (BOOL) pzTraceEnabled:(short)chan;
@@ -356,6 +363,7 @@ enum Gretina4MFIFOStates {
 - (BOOL) pileUp:(short)chan;		
 - (short) triggerMode:(short)chan;
 - (int) ledThreshold:(short)chan;	
+- (int) trapThreshold:(short)chan;
 - (short) mrpsrt:(short)chan;
 - (short) ftCnt:(short)chan;
 - (short) mrpsdv:(short)chan;
@@ -403,6 +411,7 @@ enum Gretina4MFIFOStates {
 - (void) writeClockSource: (unsigned long) clocksource;
 - (void) writeClockSource;
 - (void) writeLEDThreshold:(short)channel;
+- (void) writeTrapThreshold:(int)channel;
 - (void) writeWindowTiming:(short)channel;
 - (void) writeRisingEdgeWindow:(short)channel;
 - (unsigned short) readFifoState;
@@ -491,6 +500,7 @@ extern NSString* ORGretina4MNoiseFloorIntegrationTimeChanged;
 extern NSString* ORGretina4MNoiseFloorOffsetChanged;
 
 extern NSString* ORGretina4MEnabledChanged;
+extern NSString* ORGretina4MTrapEnabledChanged;
 extern NSString* ORGretina4MDebugChanged;
 extern NSString* ORGretina4MPileUpChanged;
 extern NSString* ORGretina4MPoleZeroEnabledChanged;
@@ -498,6 +508,7 @@ extern NSString* ORGretina4MPoleZeroMultChanged;
 extern NSString* ORGretina4MPZTraceEnabledChanged;
 extern NSString* ORGretina4MTriggerModeChanged;
 extern NSString* ORGretina4MLEDThresholdChanged;
+extern NSString* ORGretina4ModelTrapThresholdChanged;
 
 extern NSString* ORGretina4MSettingsLock;
 extern NSString* ORGretina4MRegisterLock;
@@ -516,3 +527,4 @@ extern NSString* ORGretina4MPrerecntChanged;
 extern NSString* ORGretina4MPostrecntChanged;
 extern NSString* ORGretina4MTpolChanged;
 extern NSString* ORGretina4MPresumEnabledChanged;
+

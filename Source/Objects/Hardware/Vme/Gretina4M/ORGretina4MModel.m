@@ -53,6 +53,7 @@ NSString* ORGretina4MRateGroupChangedNotification	= @"ORGretina4MRateGroupChange
 NSString* ORGretina4MNoiseFloorChanged			= @"ORGretina4MNoiseFloorChanged";
 NSString* ORGretina4MFIFOCheckChanged           = @"ORGretina4MFIFOCheckChanged";
 
+NSString* ORGretina4MTrapEnabledChanged         = @"ORGretina4MTrapEnabledChanged";
 NSString* ORGretina4MEnabledChanged             = @"ORGretina4MEnabledChanged";
 NSString* ORGretina4MPoleZeroEnabledChanged     = @"ORGretina4MPoleZeroEnabledChanged";
 NSString* ORGretina4MPoleZeroMultChanged        = @"ORGretina4MPoleZeroMultChanged";
@@ -75,6 +76,7 @@ NSString* ORGretina4MPrerecntChanged            = @"ORGretina4MPrerecntChanged";
 NSString* ORGretina4MPostrecntChanged           = @"ORGretina4MPostrecntChanged";
 NSString* ORGretina4MTpolChanged                = @"ORGretina4MTpolChanged";
 NSString* ORGretina4MPresumEnabledChanged       = @"ORGretina4MPresumEnabledChanged";
+NSString* ORGretina4ModelTrapThresholdChanged	= @"ORGretina4ModelTrapThresholdChanged";
 
 @interface ORGretina4MModel (private)
 - (void) programFlashBuffer:(NSData*)theData;
@@ -126,7 +128,8 @@ static Gretina4MRegisterInformation register_information[kNumberOfGretina4MRegis
     {0x2C,	@"Integration time low resolution", YES, YES, NO, NO}, //new for version 102b
     {0x30,	@"External FIFO monitor", YES, NO, NO, NO}, //new for version 102b
     {0x40,  @"Control/Status", YES, YES, YES, YES},                
-    {0x80,  @"LED Threshold", YES, YES, YES, YES},                 
+    {0x80,  @"LED Threshold", YES, YES, YES, YES},
+    {0xC0,  @"TRAP Threshold", YES, YES, YES, YES},
     {0x100, @"Window Timing", YES, YES, YES, YES},
     {0x140, @"Rising Edge Window", YES, YES, YES, YES},        
     {0x400, @"DAC", YES, YES, NO, NO},                             
@@ -717,6 +720,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	int i;
 	for(i=0;i<kNumGretina4MChannels;i++){
 		enabled[i]			= YES;
+		trapEnabled[i]		= NO;
 		debug[i]			= NO;
 		pileUp[i]			= NO;
 		poleZeroEnabled[i]	= NO;
@@ -733,6 +737,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 		postrecnt[i]        = 530;
 		tpol[i]             = 0x3;
 		presumEnabled[i]    = 0x0;
+		trapThreshold[i]		= 0x10;
 	}
     
     noiseWindow     = 0x40;
@@ -775,6 +780,15 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MEnabledChanged object:self userInfo:userInfo];
 }
+
+- (void) setTrapEnabled:(short)chan withValue:(BOOL)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setTrapEnabled:chan withValue:trapEnabled[chan]];
+	trapEnabled[chan] = aValue;
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MTrapEnabledChanged object:self userInfo:userInfo];
+}
+
 
 - (void) setPoleZeroEnabled:(short)chan withValue:(BOOL)aValue		
 {
@@ -836,6 +850,16 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MLEDThresholdChanged object:self userInfo:userInfo];
 }
+
+- (void) setTrapThreshold:(short)chan withValue:(int)aValue
+{
+	if(aValue<0)aValue=0;
+	else if(aValue>0xFFFFFF)aValue = 0xFFFFFF;
+    [[[self undoManager] prepareWithInvocationTarget:self] setTrapThreshold:chan withValue:trapThreshold[chan]];
+	trapThreshold[chan] = aValue;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelTrapThresholdChanged object:self];
+}
+
 
 - (void) setMrpsrt:(short)chan withValue:(short)aValue
 {
@@ -926,6 +950,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 
 - (BOOL) enabled:(short)chan			{ return enabled[chan]; }
+- (BOOL) trapEnabled:(short)chan        { return trapEnabled[chan]; }
 - (BOOL) poleZeroEnabled:(short)chan	{ return poleZeroEnabled[chan]; }
 - (short) poleZeroMult:(short)chan      { return poleZeroMult[chan]; }
 - (BOOL) pzTraceEnabled:(short)chan     { return pzTraceEnabled[chan]; }
@@ -933,6 +958,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (BOOL) pileUp:(short)chan             { return pileUp[chan];}
 - (short) triggerMode:(short)chan		{ return triggerMode[chan];}
 - (int) ledThreshold:(short)chan		{ return ledThreshold[chan]; }
+- (int) trapThreshold:(short)chan       { return trapThreshold[chan]; }
 - (short) mrpsrt:(short)chan            { return mrpsrt[chan]; }
 - (short) ftCnt:(short)chan             { return ftCnt[chan]; }
 - (short) mrpsdv:(short)chan            { return mrpsdv[chan]; }
@@ -1207,6 +1233,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     for(i=0;i<kNumGretina4MChannels;i++) {
         if([self enabled:i]){
             [self writeLEDThreshold:i];
+            [self writeTrapThreshold:i];
             [self writeWindowTiming:i];
             [self writeRisingEdgeWindow:i];
         }
@@ -1348,7 +1375,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
 }
-
 - (void) writeLEDThreshold:(short)channel
 {
     unsigned long theValue = (poleZeroMult[channel] << 20) | (ledThreshold[channel] & 0x1FFFF);
@@ -1359,6 +1385,16 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
                      usingAddSpace:0x01];
 }
 
+- (void) writeTrapThreshold:(int)channel
+{
+    unsigned long theValue = (trapEnabled[channel]<<31) | trapThreshold[channel] & 0xFFFFFF;
+    
+    [[self adapter] writeLongBlock:&theValue
+                         atAddress:[self baseAddress] + register_information[kTrapThreshold].offset + 4*channel
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+}
 
 - (void) writeWindowTiming:(short)channel
 {    
@@ -1559,7 +1595,9 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 				//disable all channels
 				for(i=0;i<kNumGretina4MChannels;i++){
 					oldEnabled[i] = [self enabled:i];
+					oldTrapEnabled[i] = [self trapEnabled:i];
 					[self setEnabled:i withValue:NO];
+					[self setTrapEnabled:i withValue:NO];
 					[self writeControlReg:i enabled:NO];
 					oldLEDThreshold[i] = [self ledThreshold:i];
 					[self setLEDThreshold:i withValue:0x1ffff];
@@ -1654,6 +1692,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 				//load new results
 				for(i=0;i<kNumGretina4MChannels;i++){
 					[self setEnabled:i withValue:oldEnabled[i]];
+					[self setTrapEnabled:i withValue:oldTrapEnabled[i]];
 					[self setLEDThreshold:i withValue:newLEDThreshold[i]];
 				}
 				[self initBoard];
@@ -1672,6 +1711,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
         int i;
         for(i=0;i<kNumGretina4MChannels;i++){
             [self setEnabled:i withValue:oldEnabled[i]];
+            [self setTrapEnabled:i withValue:oldTrapEnabled[i]];
             [self setLEDThreshold:i withValue:oldLEDThreshold[i]];
         }
 		NSLog(@"Gretina4M LED threshold finder quit because of exception\n");
@@ -1817,6 +1857,13 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
     [p setSetMethod:@selector(setEnabled:withValue:) getMethod:@selector(enabled:)];
     [a addObject:p];
+ 
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Trap Enabled"];
+    [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
+    [p setSetMethod:@selector(setTrapEnabled:withValue:) getMethod:@selector(trapEnabled:)];
+    [a addObject:p];
+
     
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Debug Mode"];
@@ -1830,7 +1877,15 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [p setSetMethod:@selector(setLEDThreshold:withValue:) getMethod:@selector(ledThreshold:)];
 	[p setCanBeRamped:YES];
     [a addObject:p];
-        
+    
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"TRAP Threshold"];
+    [p setFormat:@"##0" upperLimit:0x1ffff lowerLimit:0 stepSize:1 units:@""];
+	[p setCanBeRamped:YES];
+    [p setSetMethod:@selector(setTrapThreshold:withValue:) getMethod:@selector(trapThreshold:)];
+    [a addObject:p];
+
+    
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Down Sample"];
     [p setFormat:@"##0" upperLimit:4 lowerLimit:0 stepSize:1 units:@""];
@@ -2139,6 +2194,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	int i;
 	for(i=0;i<kNumGretina4MChannels;i++){
 		[self setEnabled:i		withValue:[decoder decodeIntForKey:[@"enabled"	    stringByAppendingFormat:@"%d",i]]];
+		[self setTrapEnabled:i	withValue:[decoder decodeIntForKey:[@"trapEnabled"	stringByAppendingFormat:@"%d",i]]];
 		[self setDebug:i		withValue:[decoder decodeIntForKey:[@"debug"	    stringByAppendingFormat:@"%d",i]]];
 		[self setPileUp:i		withValue:[decoder decodeIntForKey:[@"pileUp"	    stringByAppendingFormat:@"%d",i]]];
 		[self setPoleZeroEnabled:i withValue:[decoder decodeIntForKey:[@"poleZeroEnabled" stringByAppendingFormat:@"%d",i]]];
@@ -2146,6 +2202,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 		[self setPZTraceEnabled:i withValue:[decoder decodeIntForKey:[@"pzTraceEnabled" stringByAppendingFormat:@"%d",i]]];
 		[self setTriggerMode:i	withValue:[decoder decodeIntForKey:[@"triggerMode"	stringByAppendingFormat:@"%d",i]]];
 		[self setLEDThreshold:i withValue:[decoder decodeIntForKey:[@"ledThreshold" stringByAppendingFormat:@"%d",i]]];
+		[self setTrapThreshold:i withValue:[decoder decodeIntForKey:[@"trapThreshold" stringByAppendingFormat:@"%d",i]]];
 		[self setMrpsrt:i       withValue:[decoder decodeIntForKey:[@"mrpsrt"       stringByAppendingFormat:@"%d",i]]];
 		[self setFtCnt:i        withValue:[decoder decodeIntForKey:[@"ftCnt"        stringByAppendingFormat:@"%d",i]]];
 		[self setMrpsdv:i       withValue:[decoder decodeIntForKey:[@"mrpsdv"       stringByAppendingFormat:@"%d",i]]];
@@ -2184,6 +2241,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	int i;
  	for(i=0;i<kNumGretina4MChannels;i++){
 		[encoder encodeInt:enabled[i]		forKey:[@"enabled"		stringByAppendingFormat:@"%d",i]];
+		[encoder encodeInt:trapEnabled[i]	forKey:[@"trapEnabled"  stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:debug[i]			forKey:[@"debug"		stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:pileUp[i]		forKey:[@"pileUp"		stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:poleZeroEnabled[i] forKey:[@"poleZeroEnabled" stringByAppendingFormat:@"%d",i]];
@@ -2191,6 +2249,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 		[encoder encodeInt:pzTraceEnabled[i] forKey:[@"pzTraceEnabled" stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:triggerMode[i]	forKey:[@"triggerMode"	stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:ledThreshold[i]	forKey:[@"ledThreshold" stringByAppendingFormat:@"%d",i]];
+		[encoder encodeInt:trapThreshold[i]	forKey:[@"trapThreshold" stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:mrpsrt[i]        forKey:[@"mrpsrt"       stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:ftCnt[i]         forKey:[@"ftCnt"        stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:mrpsdv[i]        forKey:[@"mrpsdv"       stringByAppendingFormat:@"%d",i]];
@@ -2215,6 +2274,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [objDictionary setObject:[NSNumber numberWithInt:integrateTime] forKey:@"Integration Time"];
     
 	[self addCurrentState:objDictionary cArray:(short*)enabled forKey:@"Enabled"];
+	[self addCurrentState:objDictionary cArray:(short*)trapEnabled forKey:@"Trap Enabled"];
 	[self addCurrentState:objDictionary cArray:(short*)debug forKey:@"Debug Mode"];
 	[self addCurrentState:objDictionary cArray:(short*)pileUp forKey:@"Pile Up"];
 	[self addCurrentState:objDictionary cArray:triggerMode forKey:@"Trigger Mode"];
@@ -2237,6 +2297,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 		[ar addObject:[NSNumber numberWithLong:ledThreshold[i]]];
 	}
     [objDictionary setObject:ar forKey:@"LED Threshold"];
+    [objDictionary setObject:ar forKey:@"TRAP Threshold"];
     [objDictionary setObject:[NSNumber numberWithInt:downSample] forKey:@"Down Sample"];
     [objDictionary setObject:[NSNumber numberWithInt:clockSource] forKey:@"Clock Source"];
 	

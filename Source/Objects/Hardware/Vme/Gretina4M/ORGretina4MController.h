@@ -39,6 +39,7 @@
 
     //basic ops page
 	IBOutlet NSMatrix*		enabledMatrix;
+	IBOutlet NSMatrix*		trapEnabledMatrix;
 	IBOutlet NSMatrix*		poleZeroEnabledMatrix;
 	IBOutlet NSMatrix*		poleZeroTauMatrix;
 	IBOutlet NSMatrix*		pzTraceEnabledMatrix;
@@ -46,6 +47,7 @@
 	IBOutlet NSMatrix*		pileUpMatrix;
 	IBOutlet NSMatrix*		presumEnabledMatrix;
 	IBOutlet NSMatrix*		ledThresholdMatrix;
+	IBOutlet NSMatrix*		trapThresholdMatrix;
 	IBOutlet NSMatrix*      tpolMatrix;
 	IBOutlet NSMatrix*      triggerModeMatrix;
     IBOutlet NSMatrix*		chpsdvMatrix;
@@ -154,6 +156,7 @@
 - (void) noiseFloorOffsetChanged:(NSNotification*)aNote;
 - (void) setFifoStateLabel;
 - (void) enabledChanged:(NSNotification*)aNote;
+- (void) trapEnabledChanged:(NSNotification*)aNote;
 - (void) poleZeroEnabledChanged:(NSNotification*)aNote;
 - (void) poleZeroTauChanged:(NSNotification*)aNote;
 - (void) pzTraceEnabledChanged:(NSNotification*)aNote;
@@ -162,6 +165,7 @@
 - (void) tpolChanged:(NSNotification*)aNote;
 - (void) triggerModeChanged:(NSNotification*)aNote;
 - (void) ledThresholdChanged:(NSNotification*)aNote;
+- (void) trapThresholdChanged:(NSNotification*)aNote;
 - (void) miscAttributesChanged:(NSNotification*)aNote;
 
 - (void) scaleAction:(NSNotification*)aNote;
@@ -207,6 +211,7 @@
 
 
 - (IBAction) enabledAction:(id)sender;
+- (IBAction) trapEnabledAction:(id)sender;
 - (IBAction) poleZeroEnabledAction:(id)sender;
 - (IBAction) poleZeroTauAction:(id)sender;
 - (IBAction) pzTraceEnabledAction:(id)sender;
@@ -215,6 +220,7 @@
 - (IBAction) tpolAction:(id)sender;
 - (IBAction) triggerModeAction:(id)sender;
 - (IBAction) ledThresholdAction:(id)sender;
+- (IBAction) trapThresholdAction:(id)sender;
 - (IBAction) downloadMainFPGAAction:(id)sender;
 - (IBAction) stopLoadingMainFPGAAction:(id)sender;
 

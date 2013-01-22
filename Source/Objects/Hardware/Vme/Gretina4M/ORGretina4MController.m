@@ -74,6 +74,7 @@
 	int i;
     for(i=0;i<kNumberOfGretina4MRegisters;i++){
         [[enabledMatrix cellAtRow:i column:0] setTag:i];
+        [[trapEnabledMatrix cellAtRow:i column:0] setTag:i];
         [[poleZeroEnabledMatrix cellAtRow:i column:0] setTag:i];
         [[poleZeroTauMatrix cellAtRow:i column:0] setTag:i];
         [[pzTraceEnabledMatrix cellAtRow:i column:0] setTag:i];
@@ -203,7 +204,12 @@
                      selector : @selector(enabledChanged:)
                          name : ORGretina4MEnabledChanged
                        object : model];
-		
+
+    [notifyCenter addObserver : self
+                     selector : @selector(trapEnabledChanged:)
+                         name : ORGretina4MTrapEnabledChanged
+                       object : model];
+
     [notifyCenter addObserver : self
                      selector : @selector(poleZeroEnabledChanged:)
                          name : ORGretina4MPoleZeroEnabledChanged
@@ -243,7 +249,13 @@
                      selector : @selector(ledThresholdChanged:)
                          name : ORGretina4MLEDThresholdChanged
                        object : model];
-		
+
+    [notifyCenter addObserver : self
+                     selector : @selector(trapThresholdChanged:)
+                         name : ORGretina4ModelTrapThresholdChanged
+                       object : model];
+
+    
     [notifyCenter addObserver : self
                      selector : @selector(fpgaFilePathChanged:)
                          name : ORGretina4MFpgaFilePathChanged
@@ -398,6 +410,7 @@
     [self slotChanged:nil];
     [self settingsLockChanged:nil];
 	[self enabledChanged:nil];
+	[self trapEnabledChanged:nil];
 	[self poleZeroEnabledChanged:nil];
 	[self poleZeroTauChanged:nil];
 	[self pzTraceEnabledChanged:nil];
@@ -406,6 +419,7 @@
 	[self tpolChanged:nil];
 	[self triggerModeChanged:nil];
 	[self ledThresholdChanged:nil];
+	[self trapThresholdChanged:nil];
 	[self pileUpChanged:nil];
 
     [self rateGroupChanged:nil];
@@ -646,6 +660,20 @@
     }
 }
 
+- (void) trapEnabledChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumGretina4MChannels;i++){
+            [[trapEnabledMatrix cellWithTag:i] setState:[model trapEnabled:i]];
+        }
+    }
+    else {
+        int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        [[trapEnabledMatrix cellWithTag:chan] setState:[model trapEnabled:chan]];
+    }
+    [self settingsLockChanged:nil];
+}
 
 - (void) poleZeroEnabledChanged:(NSNotification*)aNote
 {
@@ -760,7 +788,21 @@
         [[ledThresholdMatrix cellWithTag:chan] setIntValue:[model ledThreshold:chan]];
     }
 }
-    
+
+- (void) trapThresholdChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumGretina4MChannels;i++){
+            [[trapThresholdMatrix cellWithTag:i] setIntValue:[model trapThreshold:i]];
+        }
+    }
+    else {
+        int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        [[trapThresholdMatrix cellWithTag:chan] setIntValue:[model trapThreshold:chan]];
+    }
+}
+
     
 - (void) noiseFloorIntegrationChanged:(NSNotification*)aNote
 {
@@ -823,6 +865,7 @@
     BOOL locked = [gSecurity isLocked:ORGretina4MSettingsLock];
     BOOL downloading = [model downLoadMainFPGAInProgress];
 	
+    
 	[self setFifoStateLabel];
 	
     [settingLockButton setState: locked];
@@ -831,14 +874,14 @@
 	[noiseFloorButton setEnabled:!locked && !runInProgress && !downloading];
 	[statusButton setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[probeButton setEnabled:!locked && !runInProgress && !downloading];
-	[enabledMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[poleZeroEnabledMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[poleZeroTauMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[pzTraceEnabledMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[debugMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[pileUpMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[presumEnabledMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
-	[ledThresholdMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
+	[enabledMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
+	[trapEnabledMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[resetButton setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[loadMainFPGAButton setEnabled:!locked && !downloading];
 	[stopFPGALoadButton setEnabled:!locked && downloading];
@@ -847,6 +890,19 @@
 	[dumpAllRegistersButton setEnabled:!lockedOrRunningMaintenance && !downloading];
     [tpolMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
     [triggerModeMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
+    
+    if(lockedOrRunningMaintenance || downloading){
+        [ledThresholdMatrix setEnabled:NO];
+        [trapThresholdMatrix setEnabled:NO];
+    }
+    else {
+        int i;
+        for(i=0;i<kNumGretina4MChannels;i++){
+            BOOL usingTrap = [model trapEnabled:i];
+            [[ledThresholdMatrix cellAtRow:i column:0] setEnabled:!usingTrap];
+            [[trapThresholdMatrix cellAtRow:i column:0] setEnabled:usingTrap];
+        }
+    }
 }
 
 - (void) registerLockChanged:(NSNotification*)aNotification
@@ -1113,6 +1169,13 @@
 	}
 }
 
+- (IBAction) trapEnabledAction:(id)sender
+{
+	if([sender intValue] != [model trapEnabled:[[sender selectedCell] tag]]){
+		[model setTrapEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
+	}
+}
+
 - (IBAction) poleZeroEnabledAction:(id)sender
 {
 	if([sender intValue] != [model poleZeroEnabled:[[sender selectedCell] tag]]){
@@ -1158,6 +1221,12 @@
 {
 	if([sender intValue] != [model ledThreshold:[[sender selectedCell] tag]]){
 		[model setLEDThreshold:[[sender selectedCell] tag] withValue:[sender intValue]];
+	}
+}
+- (IBAction) trapThresholdAction:(id)sender
+{
+	if([sender intValue] != [model trapThreshold:[[sender selectedCell] tag]]){
+		[model setTrapThreshold:[[sender selectedCell] tag] withValue:[sender floatValue]];
 	}
 }
 
