@@ -759,7 +759,7 @@
 
 - (void) mapLockChanged:(NSNotification*)aNotification
 {
-    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:[model experimentDetectorLock]];
+    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:[model experimentMapLock]];
     BOOL locked = [gSecurity isLocked:[model experimentMapLock]];
     [mapLockButton setState: locked];
     
