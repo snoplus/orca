@@ -887,15 +887,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MMrpsrtChanged object:self userInfo:userInfo];
 }
 
-- (void) setFtCnt:(short)chan withValue:(short)aValue
-{
-	if(aValue<0)aValue=0;
-	else if(aValue>252)aValue = 252;
-    [[[self undoManager] prepareWithInvocationTarget:self] setFtCnt:chan withValue:ftCnt[chan]];
-	ftCnt[chan] = aValue;
-    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MFtCntChanged object:self userInfo:userInfo];
-}
 - (void) setChpsdv:(short)chan withValue:(short)aValue
 {
 	if(aValue<0)aValue=0;
@@ -929,7 +920,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) setPrerecnt:(short)chan withValue:(short)aValue
 {
 	if(aValue<0)aValue=0;
-	else if(aValue>499)aValue = 499;
+	else if(aValue>0x7ff)aValue = 0x7ff;
     [[[self undoManager] prepareWithInvocationTarget:self] setPrerecnt:chan withValue:prerecnt[chan]];
 	prerecnt[chan] = aValue;
     NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
@@ -938,12 +929,22 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setPostrecnt:(short)chan withValue:(short)aValue
 {
-	if(aValue<18)aValue=18;
-	else if(aValue>530)aValue = 530;
+	if(aValue<0)aValue=0;
+	else if(aValue>0x7ff)aValue = 0x7ff;
     [[[self undoManager] prepareWithInvocationTarget:self] setPostrecnt:chan withValue:postrecnt[chan]];
 	postrecnt[chan] = aValue;
     NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MPostrecntChanged object:self userInfo:userInfo];
+}
+
+- (void) setFtCnt:(short)chan withValue:(short)aValue
+{
+	if(aValue<0)aValue=0;
+	else if(aValue>0x7ff)aValue = 0x7ff;
+    [[[self undoManager] prepareWithInvocationTarget:self] setFtCnt:chan withValue:ftCnt[chan]];
+	ftCnt[chan] = aValue;
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MFtCntChanged object:self userInfo:userInfo];
 }
 
 - (void) setTpol:(short)chan withValue:(short)aValue
@@ -1941,7 +1942,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"FtCnt"];
-    [p setFormat:@"##0" upperLimit:252 lowerLimit:0 stepSize:1 units:@""];
+    [p setFormat:@"##0" upperLimit:0x7ff lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setFtCnt:withValue:) getMethod:@selector(ftCnt:)];
     [a addObject:p];
 
@@ -1959,13 +1960,13 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Prerecnt"];
-    [p setFormat:@"##0" upperLimit:499 lowerLimit:0 stepSize:1 units:@""];
+    [p setFormat:@"##0" upperLimit:0x7ff lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setPrerecnt:withValue:) getMethod:@selector(prerecnt:)];
     [a addObject:p];
 
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Postrecnt"];
-    [p setFormat:@"##0" upperLimit:512 lowerLimit:18 stepSize:1 units:@""];
+    [p setFormat:@"##0" upperLimit:0x7ff lowerLimit:18 stepSize:1 units:@""];
     [p setSetMethod:@selector(setPostrecnt:withValue:) getMethod:@selector(postrecnt:)];
     [a addObject:p];
 

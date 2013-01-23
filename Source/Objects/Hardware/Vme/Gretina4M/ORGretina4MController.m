@@ -78,7 +78,6 @@
         [[poleZeroEnabledMatrix cellAtRow:i column:0] setTag:i];
         [[poleZeroTauMatrix cellAtRow:i column:0] setTag:i];
         [[pzTraceEnabledMatrix cellAtRow:i column:0] setTag:i];
-        [[debugMatrix cellAtRow:i column:0] setTag:i];
         [[pileUpMatrix cellAtRow:i column:0] setTag:i];
         [[presumEnabledMatrix cellAtRow:i column:0] setTag:i];
         [[ledThresholdMatrix cellAtRow:i column:0] setTag:i];
@@ -223,11 +222,6 @@
     [notifyCenter addObserver : self
                      selector : @selector(pzTraceEnabledChanged:)
                          name : ORGretina4MPZTraceEnabledChanged
-                       object : model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(debugChanged:)
-                         name : ORGretina4MDebugChanged
                        object : model];
 	
     [notifyCenter addObserver : self
@@ -419,7 +413,6 @@
 	[self poleZeroEnabledChanged:nil];
 	[self poleZeroTauChanged:nil];
 	[self pzTraceEnabledChanged:nil];
-	[self debugChanged:nil];
 	[self presumEnabledChanged:nil];
 	[self tpolChanged:nil];
 	[self triggerModeChanged:nil];
@@ -729,20 +722,6 @@
     }
 }
 
-
-- (void) debugChanged:(NSNotification*)aNote
-{
-    if(aNote == nil){
-        short i;
-        for(i=0;i<kNumGretina4MChannels;i++){
-            [[debugMatrix cellWithTag:i] setState:[model debug:i]];
-        }
-    }
-    else {
-        int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
-        [[debugMatrix cellWithTag:chan] setState:[model debug:chan]];
-    }
-}
 - (void) presumEnabledChanged:(NSNotification*)aNote
 {
    if(aNote == nil){
@@ -888,7 +867,6 @@
 	[poleZeroEnabledMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[poleZeroTauMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[pzTraceEnabledMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
-	[debugMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[pileUpMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[presumEnabledMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[enabledMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
@@ -1210,12 +1188,7 @@
 		[model setPZTraceEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
 	}
 }
-- (IBAction) debugAction:(id)sender
-{
-	if([sender intValue] != [model debug:[[sender selectedCell] tag]]){
-		[model setDebug:[[sender selectedCell] tag] withValue:[sender intValue]];
-	}
-}
+
 - (IBAction) presumEnabledAction:(id)sender
 {
 	if([sender intValue] != [model presumEnabled:[[sender selectedCell] tag]]){
@@ -1437,10 +1410,9 @@
 			else if(pol==2) polString = @" Neg";
 			else if(pol==3) polString = @"Both";
 			
-            NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"chan: %d Enabled: %@ Debug: %@  Pileup: %@ Presum: %@  Pole-zero: %@ Polarity: [%@] TriggerMode: %@\n",
+            NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"chan: %d Enabled: %@ Pileup: %@ Presum: %@  Pole-zero: %@ Polarity: [%@] TriggerMode: %@\n",
                       chan, 
                       (value&0x1)?@"[YES]":@"[ NO]",		//enabled
-                      ((value>>1)&0x1)?@"[YES]":@"[ NO]",	//debug
                       ((value>>2)&0x1)?@"[YES]":@"[ NO]",   //pile up
                       ((value>>3)&0x1)?@"[YES]":@"[ NO]",   //presum
                       ((value>>13)&0x1)?@"[YES]":@"[ NO]",  //pole-zero

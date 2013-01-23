@@ -44,7 +44,6 @@
 	IBOutlet NSMatrix*		poleZeroEnabledMatrix;
 	IBOutlet NSMatrix*		poleZeroTauMatrix;
 	IBOutlet NSMatrix*		pzTraceEnabledMatrix;
-	IBOutlet NSMatrix*		debugMatrix;
 	IBOutlet NSMatrix*		pileUpMatrix;
 	IBOutlet NSMatrix*		presumEnabledMatrix;
 	IBOutlet NSMatrix*		ledThresholdMatrix;
@@ -162,7 +161,6 @@
 - (void) poleZeroEnabledChanged:(NSNotification*)aNote;
 - (void) poleZeroTauChanged:(NSNotification*)aNote;
 - (void) pzTraceEnabledChanged:(NSNotification*)aNote;
-- (void) debugChanged:(NSNotification*)aNote;
 - (void) presumEnabledChanged:(NSNotification*)aNote;
 - (void) tpolChanged:(NSNotification*)aNote;
 - (void) triggerModeChanged:(NSNotification*)aNote;
@@ -218,7 +216,6 @@
 - (IBAction) poleZeroEnabledAction:(id)sender;
 - (IBAction) poleZeroTauAction:(id)sender;
 - (IBAction) pzTraceEnabledAction:(id)sender;
-- (IBAction) debugAction:(id)sender;
 - (IBAction) presumEnabledAction:(id)sender;
 - (IBAction) tpolAction:(id)sender;
 - (IBAction) triggerModeAction:(id)sender;

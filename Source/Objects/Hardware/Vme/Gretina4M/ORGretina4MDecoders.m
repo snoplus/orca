@@ -97,16 +97,14 @@
             ptr += 10; //point to the data
 
             NSMutableData* tmpData = [NSMutableData dataWithCapacity:512*2];
-            
-            //note:  there is something wrong here. The package length should be in longs but the
-            //packet is always half empty.   
-            int packetLength = 1024 - 14;
-            [tmpData setLength:packetLength*sizeof(long)];
+              
+            int dataLength = 1024 - 14;
+            [tmpData setLength:dataLength*sizeof(long)];
             short* dPtr = (short*)[tmpData bytes];
             int i;
             int wordCount = 0;
             //data is actually 2's complement. detwiler 08/26/08
-            for(i=0;i<packetLength;i++){
+            for(i=0;i<dataLength;i++){
                 dPtr[wordCount++] =    (0x0000ffff & *ptr);
                 dPtr[wordCount++] =    (0xffff0000 & *ptr) >> 16;
                 ptr++;
