@@ -35,8 +35,8 @@ bool ORGretina4MReadout::Readout(SBC_LAM_Data* /*lamData*/)
     else if ((fifoState & kGretina4MFIFOEmpty) == 0 ) {
         //we want to read as much as possible to have the highest thru-put
         int32_t numEventsToRead = 1;
-        if(fifoState & kGretina4MFIFO30KFull)           numEventsToRead = 30;
-        else if(fifoState & kGretina4MFIFO16KFull)      numEventsToRead = 16;
+        if(fifoState & kGretina4MFIFO30KFull)           numEventsToRead = 15;
+        else if(fifoState & kGretina4MFIFO16KFull)      numEventsToRead = 8;
         
 		
         ensureDataCanHold((1024*numEventsToRead)+2);
@@ -67,8 +67,6 @@ bool ORGretina4MReadout::Readout(SBC_LAM_Data* /*lamData*/)
             if(eventCount>0){
                 data[savedIndex] |= ((eventCount*1024)+2);
                 dataIndex += eventCount*1024;
-                LogBusError("Rd: %d Act:%d ",numEventsToRead,eventCount);
-
            }
             else {
                 //oops... really bad -- the buffer read is out of sequence

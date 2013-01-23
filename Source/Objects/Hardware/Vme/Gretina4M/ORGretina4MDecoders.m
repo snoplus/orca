@@ -69,20 +69,24 @@
     int crate = (*ptr&0x01e00000)>>21;
     int card  = (*ptr&0x001f0000)>>16;
     
-    ptr++; //point to packet separator
     int numEvents = (length-2)/1024;
+
+    ptr++; //point to first word of first data recordd
+    int headerSize = 15; //long words
     int i;
+    unsigned long* dataPtr = ptr;
     for(i=0;i<numEvents;i++){
-        if(*ptr == 0xAAAAAAAA){
-            ptr++; //point to first word of the actual card packet (past the separator)
-            int channel		 = *ptr & 0xF; //extract the channel
-            ptr += 2; //point to Energy low word
-            unsigned long energy = *ptr >> 16;
+        if(*dataPtr == 0xAAAAAAAA){
+            dataPtr++;
+            int channel		 = *dataPtr & 0xF; //extract the channel
             
-            ptr++;	  //point to Energy second word
-            energy += (*ptr & 0x000001ff) << 16;
+            dataPtr += 2; //point to Energy low word
+            unsigned long energy = *dataPtr >> 16;
             
-            //energy is in 2's complement, taking abs value if necessary
+            dataPtr++;	  //point to Energy second word
+            energy += (*dataPtr & 0x000001ff) << 16;
+            
+            //energy is in 2's complement, take abs value if necessary
             if (energy & 0x1000000) energy = (~energy & 0x1ffffff) + 1;
 
             NSString* crateKey	 = [self getCrateKey: crate];
@@ -94,20 +98,20 @@
             
             [aDataSet histogram:energy numBins:0x1fff sender:self  withKeys:@"Gretina4M", @"Energy",crateKey,cardKey,channelKey,nil];
             
-            ptr += 10; //point to the data
+            dataPtr += 11; //point to the data
 
             NSMutableData* tmpData = [NSMutableData dataWithCapacity:512*2];
               
-            int dataLength = 1024 - 14;
+            int dataLength = 1024 - headerSize;
             [tmpData setLength:dataLength*sizeof(long)];
             short* dPtr = (short*)[tmpData bytes];
             int i;
             int wordCount = 0;
             //data is actually 2's complement. detwiler 08/26/08
             for(i=0;i<dataLength;i++){
-                dPtr[wordCount++] =    (0x0000ffff & *ptr);
-                dPtr[wordCount++] =    (0xffff0000 & *ptr) >> 16;
-                ptr++;
+                dPtr[wordCount++] =    (0x0000ffff & *dataPtr);
+                dPtr[wordCount++] =    (0xffff0000 & *dataPtr) >> 16;
+                dataPtr++;
             }
             [aDataSet loadWaveform:tmpData 
                             offset:0 //bytes!
@@ -115,26 +119,25 @@
                             sender:self  
                           withKeys:@"Gretina4M", @"Waveforms",crateKey,cardKey,channelKey,nil];
         
-            if(getRatesFromDecodeStage){
-                //get the actual object
-                NSString* aKey = [crateKey stringByAppendingString:cardKey];
-                if(!actualGretinaCards)actualGretinaCards = [[NSMutableDictionary alloc] init];
-                ORGretina4MModel* obj = [actualGretinaCards objectForKey:aKey];
-                if(!obj){
-                    NSArray* listOfCards = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORGretina4MModel")];
-                    NSEnumerator* e = [listOfCards objectEnumerator];
-                    ORGretina4MModel* aCard;
-                    while(aCard = [e nextObject]){
-                        if([aCard slot] == card){
-                            [actualGretinaCards setObject:aCard forKey:aKey];
-                            obj = aCard;
-                            break;
-                        }
+            //get the actual object
+            NSString* aKey = [crateKey stringByAppendingString:cardKey];
+            if(!actualGretinaCards)actualGretinaCards = [[NSMutableDictionary alloc] init];
+            ORGretina4MModel* obj = [actualGretinaCards objectForKey:aKey];
+            if(!obj){
+                NSArray* listOfCards = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORGretina4MModel")];
+                NSEnumerator* e = [listOfCards objectEnumerator];
+                ORGretina4MModel* aCard;
+                while(aCard = [e nextObject]){
+                    if([aCard slot] == card){
+                        [actualGretinaCards setObject:aCard forKey:aKey];
+                        obj = aCard;
+                        break;
                     }
                 }
-                getRatesFromDecodeStage = [obj bumpRateFromDecodeStage:channel];
             }
-            ptr+=1024;
+            [obj bumpRateFromDecodeStage:channel];
+            
+            dataPtr += 1024;
         }
     }
 	 

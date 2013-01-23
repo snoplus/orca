@@ -67,7 +67,6 @@
     IBOutlet NSButton*      probeButton;
     IBOutlet NSButton*      statusButton;
     IBOutlet NSButton*      noiseFloorButton;
-    IBOutlet NSTextField*   fifoState;
 
 	IBOutlet NSPopUpButton* downSamplePU;
 	
@@ -155,7 +154,6 @@
 - (void) noiseFloorChanged:(NSNotification*)aNote;
 - (void) totalRateChanged:(NSNotification*)aNote;
 - (void) noiseFloorOffsetChanged:(NSNotification*)aNote;
-- (void) setFifoStateLabel;
 - (void) enabledChanged:(NSNotification*)aNote;
 - (void) trapEnabledChanged:(NSNotification*)aNote;
 - (void) poleZeroEnabledChanged:(NSNotification*)aNote;

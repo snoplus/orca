@@ -190,11 +190,6 @@
                        object : model];
 	
     [notifyCenter addObserver : self
-                     selector : @selector(setFifoStateLabel)
-                         name : ORGretina4MFIFOCheckChanged
-                       object : model];
-	
-    [notifyCenter addObserver : self
                      selector : @selector(noiseFloorIntegrationChanged:)
                          name : ORGretina4MNoiseFloorIntegrationTimeChanged
                        object : model];
@@ -855,9 +850,7 @@
     BOOL locked = [gSecurity isLocked:ORGretina4MSettingsLock];
     BOOL downloading = [model downLoadMainFPGAInProgress];
 	
-    
-	[self setFifoStateLabel];
-	
+    	
     [settingLockButton setState: locked];
     [initButton setEnabled:!lockedOrRunningMaintenance && !downloading];
     [clearFIFOButton setEnabled:!locked && !runInProgress && !downloading];
@@ -908,30 +901,6 @@
     [writeRegisterButton setEnabled:!lockedOrRunningMaintenance && !downloading];
     [spiWriteValueField setEnabled:!lockedOrRunningMaintenance && !downloading];
     [writeSPIButton setEnabled:!lockedOrRunningMaintenance && !downloading];
-}
-
-- (void) setFifoStateLabel
-{
-	if(![gOrcaGlobals runInProgress]){
-		[fifoState setTextColor:[NSColor blackColor]];
-		[fifoState setStringValue:@"--"];
-	}
-	else {
-		int val = [model fifoState];
-		if((val & kGretina4MFIFOAllFull)!=0) {
-			[fifoState setTextColor:[NSColor redColor]];
-			[fifoState setStringValue:@"Full"];
-		} else if((val & kGretina4MFIFOAlmostFull)!=0) {
-			[fifoState setTextColor:[NSColor redColor]];
-			[fifoState setStringValue:@"Almost Full"];
-		} else {
-			[fifoState setTextColor:[NSColor blackColor]];
-            if((val & kGretina4MFIFOEmpty)!=0)               [fifoState setStringValue:@"Empty"];
-			else if((val & kGretina4MFIFOAlmostEmpty)!=0)    [fifoState setStringValue:@"Almost Empty"];
-            else                                            [fifoState setStringValue:@"Half Full"];
-			
-		}
-	}
 }
 
 - (void) setModel:(id)aModel

@@ -2140,7 +2140,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (BOOL) bumpRateFromDecodeStage:(short)channel
 {
-    if(isRunning)return NO;
+    //if(isRunning)return NO;
     
     ++waveFormCount[channel];
     return YES;
