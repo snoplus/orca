@@ -919,8 +919,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setPrerecnt:(short)chan withValue:(short)aValue
 {
-	if(aValue<0)aValue=0;
-	else if(aValue>0x7ff)aValue = 0x7ff;
+	if(aValue<1)aValue=1;
+	else if(aValue>0x3ff)aValue = 0x3ff;
     [[[self undoManager] prepareWithInvocationTarget:self] setPrerecnt:chan withValue:prerecnt[chan]];
 	prerecnt[chan] = aValue;
     NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
@@ -929,8 +929,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setPostrecnt:(short)chan withValue:(short)aValue
 {
-	if(aValue<0)aValue=0;
-	else if(aValue>0x7ff)aValue = 0x7ff;
+	if(aValue<1)aValue=1;
+	else if(aValue>0x3ff)aValue = 0x3ff;
     [[[self undoManager] prepareWithInvocationTarget:self] setPostrecnt:chan withValue:postrecnt[chan]];
 	postrecnt[chan] = aValue;
     NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
@@ -939,8 +939,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setFtCnt:(short)chan withValue:(short)aValue
 {
-	if(aValue<0)aValue=0;
-	else if(aValue>0x7ff)aValue = 0x7ff;
+	if(aValue<1)aValue=1;
+	else if(aValue>0x3ff)aValue = 0x3ff;
     [[[self undoManager] prepareWithInvocationTarget:self] setFtCnt:chan withValue:ftCnt[chan]];
 	ftCnt[chan] = aValue;
     NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
@@ -1425,7 +1425,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) writeWindowTiming:(short)channel
 {    
-    unsigned long theValue = (((ftCnt[channel])&0x7ff)<<16) |
+    unsigned long theValue = (((ftCnt[channel])&0x3ff)<<16) |
                              ((mrpsrt[channel]&0xf)<<12) |
                              ((mrpsdv[channel]&0xf)<<8) |
                              ((chpsrt[channel]&0xf)<<4) |
@@ -1441,7 +1441,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) writeRisingEdgeWindow:(short)channel
 {    
-	unsigned long aValue = (((prerecnt[channel])&0x7ff)<<12) | ((postrecnt[channel]&0x7ff));
+	unsigned long aValue = (((prerecnt[channel])&0x3ff)<<12) | ((postrecnt[channel]&0x3ff));
     [[self adapter] writeLongBlock:&aValue
                          atAddress:[self baseAddress] + register_information[kRisingEdgeWindow].offset + 4*channel
                         numToWrite:1
@@ -1942,7 +1942,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"FtCnt"];
-    [p setFormat:@"##0" upperLimit:0x7ff lowerLimit:0 stepSize:1 units:@""];
+    [p setFormat:@"##0" upperLimit:0x3ff lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setFtCnt:withValue:) getMethod:@selector(ftCnt:)];
     [a addObject:p];
 
@@ -1960,13 +1960,13 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Prerecnt"];
-    [p setFormat:@"##0" upperLimit:0x7ff lowerLimit:0 stepSize:1 units:@""];
+    [p setFormat:@"##0" upperLimit:0x3ff lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setPrerecnt:withValue:) getMethod:@selector(prerecnt:)];
     [a addObject:p];
 
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Postrecnt"];
-    [p setFormat:@"##0" upperLimit:0x7ff lowerLimit:18 stepSize:1 units:@""];
+    [p setFormat:@"##0" upperLimit:0x3ff lowerLimit:18 stepSize:1 units:@""];
     [p setSetMethod:@selector(setPostrecnt:withValue:) getMethod:@selector(postrecnt:)];
     [a addObject:p];
 
