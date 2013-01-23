@@ -98,6 +98,7 @@
 - (void) sentryIsRunningChanged:(NSNotification*)aNote;
 - (void) secondaryAdcClassNameChanged:(NSNotification*)aNote;
 - (void) secondaryMapFileChanged:(NSNotification*)aNote;
+- (void) nextHeartBeatChanged:(NSNotification*)aNote;
 
 
 #pragma mark ¥¥¥Actions

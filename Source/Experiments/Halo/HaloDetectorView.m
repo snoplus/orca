@@ -21,6 +21,7 @@
 
 @interface HaloDetectorView (private)
 - (void) makeAllSegments;
+- (void) makeTestTubeSegments;
 @end
 
 @implementation HaloDetectorView

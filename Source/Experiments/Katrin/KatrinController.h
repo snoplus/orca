@@ -98,6 +98,7 @@
 #pragma mark ¥¥¥HW Map Interface Management
 - (void) secondaryAdcClassNameChanged:(NSNotification*)aNote;
 - (void) secondaryMapFileChanged:(NSNotification*)aNote;
+- (void) vetoMapLockChanged:(NSNotification*)aNotification;
 
 #pragma mark ¥¥¥Details Interface Management
 - (void) setDetectorTitle;
