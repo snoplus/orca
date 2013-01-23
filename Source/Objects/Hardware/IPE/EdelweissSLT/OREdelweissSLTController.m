@@ -276,9 +276,24 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
                          name : OREdelweissSLTModelCmdWArg4Changed
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(BBCmdFFMaskChanged:)
+                         name : OREdelweissSLTModelBBCmdFFMaskChanged
+						object: model];
+
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+
+- (void) BBCmdFFMaskChanged:(NSNotification*)aNote
+{
+	[BBCmdFFMaskTextField setIntValue: [model BBCmdFFMask]];
+   	int i;
+	for(i=0;i<8;i++){
+		[[BBCmdFFMaskMatrix cellWithTag:i] setIntValue: ([model BBCmdFFMask] & (0x1 <<i))];//cellWithTag:i is not defined for all i, but it works anyway
+	}    
+
+}
 
 - (void) cmdWArg4Changed:(NSNotification*)aNote
 {
@@ -570,6 +585,7 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	[self cmdWArg2Changed:nil];
 	[self cmdWArg3Changed:nil];
 	[self cmdWArg4Changed:nil];
+	[self BBCmdFFMaskChanged:nil];
 }
 
 
@@ -717,6 +733,25 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 }
 
 #pragma mark ***Actions
+
+- (void) BBCmdFFMaskTextFieldAction:(id)sender
+{
+	[model setBBCmdFFMask:[sender intValue]];	
+}
+
+- (IBAction) BBCmdFFMaskMatrixAction:(id)sender
+{
+	//debug 
+    NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+	int i,val=0;
+	for(i=0;i<8;i++){
+        //NSLog(@"Called %@::%@   cell with tag %i, id:%p intVal:%i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),i,[sender cellWithTag:i],[[sender cellWithTag:i] intValue]);//TODO: DEBUG -tb-
+        ////cellWithTag:i is not defined for all i, but it works anyway: it returns 0 and [0 intValue] is 0, so nothing is set in this case -tb-
+        if([[BBCmdFFMaskMatrix cellWithTag:i] intValue]) val |= (0x1<<i);
+	}
+	[model setBBCmdFFMask:val];
+}
+
 
 - (void) cmdWArg4TextFieldAction:(id)sender
 {
@@ -882,6 +917,35 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
     NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
     [model sendUDPDataWCommandRequestPacket];
 
+}
+
+- (IBAction) UDPDataTabSend0xFFCommandButtonAction:(id)sender //send FF Command
+{
+    [self endEditing];
+	//debug 
+    NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+    [model sendUDPDataTab0xFFCommand: [model BBCmdFFMask]];
+}
+
+- (IBAction) UDPDataTabSendBloqueCommandButtonAction:(id)sender
+{
+	//debug 
+    NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+    [model sendUDPDataTabBloqueCommand];
+}
+
+- (IBAction) UDPDataTabSendDebloqueCommandButtonAction:(id)sender
+{
+	//debug 
+    NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+    [model sendUDPDataTabDebloqueCommand];
+}
+
+- (IBAction) UDPDataTabSendDemarrageCommandButtonAction:(id)sender
+{
+	//debug 
+    NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+    [model sendUDPDataTabDemarrageCommand];
 }
 
 

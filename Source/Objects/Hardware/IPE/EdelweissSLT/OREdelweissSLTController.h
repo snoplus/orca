@@ -27,14 +27,23 @@
 @interface OREdelweissSLTController : SBC_LinkController {
 	@private
 	
+    //BB commands
 	    IBOutlet   NSTextField* eventFifoStatusRegTextField;
+	IBOutlet   NSTextField* BBCmdFFMaskTextField;
+		IBOutlet NSMatrix*		BBCmdFFMaskMatrix;
 	IBOutlet   NSTextField* cmdWArg4TextField;
 	IBOutlet   NSTextField* cmdWArg3TextField;
 	IBOutlet   NSTextField* cmdWArg2TextField;
 	IBOutlet   NSTextField* cmdWArg1TextField;
+    
+        //DAQ mode
 	    IBOutlet   NSTextField* sltDAQModeTextField;
 		IBOutlet NSPopUpButton* sltDAQModePU;
+        
+        //UDP Data tab ----
 	IBOutlet   NSTextField* numRequestedUDPPacketsTextField;
+    
+        //control reg tab
 	    IBOutlet NSMatrix*		pixelBusEnableRegMatrix;
 	    IBOutlet NSTextField*	pixelBusEnableRegTextField;
 		
@@ -147,6 +156,7 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+- (void) BBCmdFFMaskChanged:(NSNotification*)aNote;
 - (void) cmdWArg4Changed:(NSNotification*)aNote;
 - (void) cmdWArg3Changed:(NSNotification*)aNote;
 - (void) cmdWArg2Changed:(NSNotification*)aNote;
@@ -197,6 +207,8 @@
 - (void) enableRegControls;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+- (IBAction) BBCmdFFMaskTextFieldAction:(id)sender;
+- (IBAction) BBCmdFFMaskMatrixAction:(id)sender;
 - (IBAction) cmdWArg4TextFieldAction:(id)sender;
 - (IBAction) cmdWArg3TextFieldAction:(id)sender;
 - (IBAction) cmdWArg2TextFieldAction:(id)sender;
@@ -227,7 +239,12 @@
 - (IBAction) crateUDPDataRequestDataPCommandSendButtonAction:(id)sender;
 - (IBAction) numRequestedUDPPacketsTextFieldAction:(id)sender;
 - (IBAction) testUDPDataConnectionButtonAction:(id)sender;
-- (IBAction) crateUDPDataSendWCommandButtonAction:(id)sender;
+- (IBAction) crateUDPDataSendWCommandButtonAction:(id)sender;//send BB Command
+
+- (IBAction) UDPDataTabSend0xFFCommandButtonAction:(id)sender;//send FF Command
+- (IBAction) UDPDataTabSendBloqueCommandButtonAction:(id)sender;
+- (IBAction) UDPDataTabSendDebloqueCommandButtonAction:(id)sender;
+- (IBAction) UDPDataTabSendDemarrageCommandButtonAction:(id)sender;
 
 
 //K command UDP connection

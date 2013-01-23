@@ -390,6 +390,7 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
 
 #pragma mark ***External Strings
 
+NSString* OREdelweissSLTModelBBCmdFFMaskChanged = @"OREdelweissSLTModelBBCmdFFMaskChanged";
 NSString* OREdelweissSLTModelCmdWArg4Changed = @"OREdelweissSLTModelCmdWArg4Changed";
 NSString* OREdelweissSLTModelCmdWArg3Changed = @"OREdelweissSLTModelCmdWArg3Changed";
 NSString* OREdelweissSLTModelCmdWArg2Changed = @"OREdelweissSLTModelCmdWArg2Changed";
@@ -564,6 +565,20 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 }
 
 #pragma mark •••Accessors
+
+- (uint32_t) BBCmdFFMask
+{
+    return BBCmdFFMask;
+}
+
+- (void) setBBCmdFFMask:(uint32_t)aBBCmdFFMask
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setBBCmdFFMask:BBCmdFFMask];
+    
+    BBCmdFFMask = aBBCmdFFMask & 0xff;//is only 8 bit
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelBBCmdFFMaskChanged object:self];
+}
 
 - (int) cmdWArg4
 {
@@ -1973,6 +1988,22 @@ for(l=0;l<2500;l++){
 }
 
 
+- (int) sendUDPDataTab0xFFCommand:(uint32_t) aBBCmdFFMask //send FF Command
+{
+    return [self sendUDPDataWCommandRequestPacketArg1: 0xFF arg2: 0x0A arg3: 0x00  arg4:aBBCmdFFMask];
+}
+
+- (int) sendUDPDataTabBloqueCommand
+{     return [self sendUDPDataWCommandRequestPacketArg1: 0x13 arg2: 0x0A arg3: 0x00  arg4: 0x00];  }
+
+- (int) sendUDPDataTabDebloqueCommand
+{     return [self sendUDPDataWCommandRequestPacketArg1: 0x13 arg2: 0x0A arg3: 0x00  arg4: 0x06];  }
+
+- (int) sendUDPDataTabDemarrageCommand
+{     return [self sendUDPDataWCommandRequestPacketArg1: 0x13 arg2: 0x0A arg3: 0x00  arg4: 0x07];  }
+
+
+
 #pragma mark ***HW Access
 - (void)		  writeMasterMode
 {
@@ -2495,6 +2526,7 @@ NSLog(@"WARNING: %@::%@:  slave mode is not necessary any more! \n",NSStringFrom
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
 	
+	[self setBBCmdFFMask:[decoder decodeInt32ForKey:@"BBCmdFFMask"]];
 	[self setCmdWArg4:[decoder decodeIntForKey:@"cmdWArg4"]];
 	[self setCmdWArg3:[decoder decodeIntForKey:@"cmdWArg3"]];
 	[self setCmdWArg2:[decoder decodeIntForKey:@"cmdWArg2"]];
@@ -2557,6 +2589,7 @@ NSLog(@"WARNING: %@::%@:  slave mode is not necessary any more! \n",NSStringFrom
 {
 	[super encodeWithCoder:encoder];
 	
+	[encoder encodeInt32:BBCmdFFMask forKey:@"BBCmdFFMask"];
 	[encoder encodeInt:cmdWArg4 forKey:@"cmdWArg4"];
 	[encoder encodeInt:cmdWArg3 forKey:@"cmdWArg3"];
 	[encoder encodeInt:cmdWArg2 forKey:@"cmdWArg2"];

@@ -187,6 +187,7 @@
     int cmdWArg2;
     int cmdWArg3;
     int cmdWArg4;
+    uint32_t BBCmdFFMask;
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
@@ -204,6 +205,8 @@
 - (void) runIsStartingSubRun:(NSNotification*)aNote;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+- (uint32_t) BBCmdFFMask;
+- (void) setBBCmdFFMask:(uint32_t)aBBCmdFFMask;
 - (int) cmdWArg4;
 - (void) setCmdWArg4:(int)aCmdWArg4;
 - (int) cmdWArg3;
@@ -334,8 +337,13 @@
 - (int) sendUDPDataCommandRequestPackets:(int8_t) num;
 - (int) sendUDPDataCommandRequestUDPData;
 - (int) sendUDPDataWCommandRequestPacketArg1:(int) arg1 arg2:(int) arg2 arg3:(int) arg3  arg4:(int) arg4; 
+  //BB commands
 - (int) sendUDPDataWCommandRequestPacket;
 
+- (int) sendUDPDataTab0xFFCommand:(uint32_t) aBBCmdFFMask;//send FF Command
+- (int) sendUDPDataTabBloqueCommand;
+- (int) sendUDPDataTabDebloqueCommand;
+- (int) sendUDPDataTabDemarrageCommand;
 
 
 #pragma mark ***HW Access
@@ -436,6 +444,7 @@
 
 @end
 
+extern NSString* OREdelweissSLTModelBBCmdFFMaskChanged;
 extern NSString* OREdelweissSLTModelCmdWArg4Changed;
 extern NSString* OREdelweissSLTModelCmdWArg3Changed;
 extern NSString* OREdelweissSLTModelCmdWArg2Changed;
