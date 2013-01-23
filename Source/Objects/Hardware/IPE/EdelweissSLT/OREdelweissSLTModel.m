@@ -1601,7 +1601,80 @@ NSLog(@"  arguments: %@ \n" , arguments);
 }
 #endif
 
+/*
+- (int) sendUDPCommandString:(NSString*)aString
+EXAMPLES:
+//[slt sendUDPCommandString:@"KWC_stopStreamLoop"];
+//[slt sendUDPCommandString:@"KWC_startStreamLoop"];
 
+//[slt sendUDPCommandString:@"KWC_chargeBBFile_/home/katrin/bbv2.rbf"];
+//print("Call [slt sendUDPDataCommand:...]");
+//[slt sendUDPDataCommandString: "KWC_chargeBBFile_/home/katrin/bbv2.rbf" ];
+
+//cmdWArg1=
+//[slt sendUDPDataWCommandRequestPacketArg1: cmdWArg1 arg2: cmdWArg2 arg3: cmdWArg3  arg4:cmdWArg4];
+//debloque
+[slt sendUDPDataWCommandRequestPacketArg1: 0x13 arg2: 0xA arg3: 0  arg4:0x6];
+//bloque
+[slt sendUDPDataWCommandRequestPacketArg1: 0x13 arg2: 0xA arg3: 0  arg4:0x0];
+//demarrage
+[slt sendUDPDataWCommandRequestPacketArg1: 0x13 arg2: 0xA arg3: 0  arg4:0x7];
+
+
+alim
+alim          = 0x01; 
+cmd_autorisee = 0x02;
+comprime      = 0x10;
+carte_rapide  = 0x20;
+status_diff   = 0x40;
+
+arg4= alim | cmd_autorisee | status_diff;
+[slt sendUDPDataWCommandRequestPacketArg1: 0xFF arg2: 0xA arg3: 0  arg4: arg4 ];
+
+if( 0){
+aSize=10;
+array a[aSize];
+a[0]=123;
+a[1]=2;
+i=0;
+for(i=0;i<aSize;i++) print "a[",  i   ,"] is ",a[i];
+}
+
+
+ write FiberOutMask ...
+[slt sendUDPCommandString:@"KRF_0x01_0x00000018"];
+[slt sendUDPCommandString:@"KWF_0x01_0x00000018_0x00000001"];
+[slt sendUDPCommandString:@"KRF_0x01_0x00000018"];
+
+[slt sendUDPCommandString:@"KRF_0x02_0x00000018"];
+[slt sendUDPCommandString:@"KWF_0x02_0x00000018_0x00000001"];
+
+
+
+[slt sendUDPCommandString:@"KWC_restartKCommandSockets"];
+[slt sendUDPCommandString:@"KWL_GLOBAL_UDP_CLIENT_PORT: 9942"];
+[slt sendUDPCommandString:@"KWC_restartKCommandSockets"];
+
+
+if(0){
+[slt sendUDPCommandString:@"KWC_stopStreamLoop"];
+[slt sendUDPCommandString:@"KWL_FLTstreamMask1(3):       0x00003f3f"];
+[slt sendUDPCommandString:@"KWC_startStreamLoop"];
+}
+
+
+commands:
+  KWC_init
+  KWC_startStreamLoop
+  KWC_coldStart
+  KWC_stopStreamLoop
+  KWC_reloadConfigFile
+  KWC_reset
+  KWC_restartKCommandSockets
+  KWC_exit
+
+
+*/
 - (int) sendUDPCommandString:(NSString*)aString
 {
     //taken from ipe4reader6.cpp, function int sendtoGlobalClient3(const void *buffer, size_t length, char* receiverIPAddr, uint32_t port)
