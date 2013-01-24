@@ -78,6 +78,7 @@ NSString* ORGretina4MPostrecntChanged           = @"ORGretina4MPostrecntChanged"
 NSString* ORGretina4MTpolChanged                = @"ORGretina4MTpolChanged";
 NSString* ORGretina4MPresumEnabledChanged       = @"ORGretina4MPresumEnabledChanged";
 NSString* ORGretina4ModelTrapThresholdChanged	= @"ORGretina4ModelTrapThresholdChanged";
+NSString* ORGretina4MEasySelectedChanged        = @"ORGretina4MEasySelectedChanged";
 
 @interface ORGretina4MModel (private)
 - (void) programFlashBuffer:(NSData*)theData;
@@ -736,6 +737,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	int i;
 	for(i=0;i<kNumGretina4MChannels;i++){
 		enabled[i]			= YES;
+		easySelected[i]		= NO;
 		trapEnabled[i]		= NO;
 		debug[i]			= NO;
 		pileUp[i]			= NO;
@@ -789,6 +791,14 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	else return 0;
 }
 #pragma mark •••specific accessors
+- (void) setEasySelected:(short)chan withValue:(BOOL)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setEasySelected:chan withValue:easySelected[chan]];
+	easySelected[chan] = aValue;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MEasySelectedChanged object:self];
+}
+
+
 - (void) setEnabled:(short)chan withValue:(BOOL)aValue
 { 
     [[[self undoManager] prepareWithInvocationTarget:self] setEnabled:chan withValue:enabled[chan]];
@@ -985,6 +995,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (short) postrecnt:(short)chan         { return postrecnt[chan]; }
 - (short) tpol:(short)chan              { return tpol[chan]; }
 - (BOOL) presumEnabled:(short)chan      { return presumEnabled[chan]; }
+- (BOOL) easySelected:(short)chan		{ return easySelected[chan]; }
 
 
 - (float) poleZeroTauConverted:(short)chan  { return poleZeroMult[chan]>0 ? 0.01*pow(2., 23)/poleZeroMult[chan] : 0; } //convert to us
@@ -2248,6 +2259,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 		[self setPostrecnt:i    withValue:[decoder decodeIntForKey:[@"postrecnt"    stringByAppendingFormat:@"%d",i]]];
 		[self setTpol:i         withValue:[decoder decodeIntForKey:[@"tpol"         stringByAppendingFormat:@"%d",i]]];
 		[self setPresumEnabled:i withValue:[decoder decodeIntForKey:[@"PresumEnabled"         stringByAppendingFormat:@"%d",i]]];
+        [self setEasySelected:i		withValue:[decoder decodeIntForKey:[@"easySelected"	    stringByAppendingFormat:@"%d",i]]];
 	}
 	
     [[self undoManager] enableUndoRegistration];
@@ -2296,6 +2308,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 		[encoder encodeInt:postrecnt[i]     forKey:[@"postrecnt"    stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:tpol[i]          forKey:[@"tpol"         stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:presumEnabled[i] forKey:[@"presumEnabled" stringByAppendingFormat:@"%d",i]];
+		[encoder encodeInt:easySelected[i]	forKey:[@"easySelected"		stringByAppendingFormat:@"%d",i]];
 	}
 	
 }

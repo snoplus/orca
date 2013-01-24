@@ -74,6 +74,7 @@
 	int i;
     for(i=0;i<kNumberOfGretina4MRegisters;i++){
         [[enabledMatrix cellAtRow:i column:0] setTag:i];
+        [[easySelectMatrix cellAtRow:i column:0] setTag:i];
         [[trapEnabledMatrix cellAtRow:i column:0] setTag:i];
         [[poleZeroEnabledMatrix cellAtRow:i column:0] setTag:i];
         [[poleZeroTauMatrix cellAtRow:i column:0] setTag:i];
@@ -83,11 +84,11 @@
         [[ledThresholdMatrix cellAtRow:i column:0] setTag:i];
         [[tpolMatrix cellAtRow:i column:0] setTag:i];
         [[triggerModeMatrix cellAtRow:i column:0] setTag:i];
-        [[chpsdvMatrix cellAtRow:i column:0] setTag:i];
         [[ftCntMatrix cellAtRow:i column:0] setTag:i];
         [[mrpsrtMatrix cellAtRow:i column:0] setTag:i];
         [[mrpsdvMatrix cellAtRow:i column:0] setTag:i];
         [[chpsrtMatrix cellAtRow:i column:0] setTag:i];
+        [[chpsdvMatrix cellAtRow:i column:0] setTag:i];
         [[prerecntMatrix cellAtRow:i column:0] setTag:i];
         [[postrecntMatrix cellAtRow:i column:0] setTag:i];
     }
@@ -197,6 +198,11 @@
     [notifyCenter addObserver : self
                      selector : @selector(enabledChanged:)
                          name : ORGretina4MEnabledChanged
+                       object : model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(easySelectChanged:)
+                         name : ORGretina4MEasySelectedChanged
                        object : model];
 
     [notifyCenter addObserver : self
@@ -404,6 +410,7 @@
     [self slotChanged:nil];
     [self settingsLockChanged:nil];
 	[self enabledChanged:nil];
+	[self easySelectChanged:nil];
 	[self trapEnabledChanged:nil];
 	[self poleZeroEnabledChanged:nil];
 	[self poleZeroTauChanged:nil];
@@ -659,6 +666,14 @@
     }
 }
 
+- (void) easySelectChanged:(NSNotification*)aNote
+{
+    short i;
+    for(i=0;i<kNumGretina4MChannels;i++){
+        [[easySelectMatrix cellWithTag:i] setState:[model easySelected:i]];
+    }
+}
+
 - (void) trapEnabledChanged:(NSNotification*)aNote
 {
     if(aNote == nil){
@@ -729,6 +744,7 @@
         int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
         [[presumEnabledMatrix cellWithTag:chan] setState:[model presumEnabled:chan]];
     }
+    [self settingsLockChanged:nil];
 }
 
 - (void) tpolChanged:(NSNotification*)aNote
@@ -872,17 +888,25 @@
 	[dumpAllRegistersButton setEnabled:!lockedOrRunningMaintenance && !downloading];
     [tpolMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
     [triggerModeMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
-    
+    [easySetButton setEnabled:!locked && !runInProgress && !downloading];
+    [easySelectMatrix setEnabled:!locked && !runInProgress && !downloading];
+
+
     if(lockedOrRunningMaintenance || downloading){
         [ledThresholdMatrix setEnabled:NO];
         [trapThresholdMatrix setEnabled:NO];
+        [chpsrtMatrix setEnabled:NO];
+        [chpsdvMatrix setEnabled:NO];
     }
     else {
         int i;
         for(i=0;i<kNumGretina4MChannels;i++){
-            BOOL usingTrap = [model trapEnabled:i];
+            BOOL usingTrap      = [model trapEnabled:i];
+            BOOL presumEnabled  = [model presumEnabled:i];
             [[ledThresholdMatrix cellAtRow:i column:0] setEnabled:!usingTrap];
             [[trapThresholdMatrix cellAtRow:i column:0] setEnabled:usingTrap];
+            [[chpsrtMatrix cellAtRow:i column:0] setEnabled:presumEnabled];
+            [[chpsdvMatrix cellAtRow:i column:0] setEnabled:presumEnabled];
         }
     }
 }
@@ -1132,6 +1156,29 @@
 	}
 }
 
+- (IBAction) easySelectAction:(id)sender
+{
+	if([sender intValue] != [model easySelected:[[sender selectedCell] tag]]){
+		[model setEasySelected:[[sender selectedCell] tag] withValue:[sender intValue]];
+	}
+}
+
+- (IBAction) selectAllInEasySet:(id)sender
+{
+    int i;
+    for(i=0;i<kNumberOfGretina4MRegisters;i++){
+        [model setEasySelected:i withValue:YES];
+    }
+}
+- (IBAction) selectNoneInEasySet:(id)sender
+{
+    int i;
+    for(i=0;i<kNumberOfGretina4MRegisters;i++){
+        [model setEasySelected:i withValue:NO];
+    }
+}
+
+
 - (IBAction) trapEnabledAction:(id)sender
 {
 	if([sender intValue] != [model trapEnabled:[[sender selectedCell] tag]]){
@@ -1349,6 +1396,7 @@
     [NSApp endSheet:noiseFloorPanel];
 }
 
+
 - (IBAction) findNoiseFloors:(id)sender
 {
 	[noiseFloorPanel endEditingFor:nil];		
@@ -1361,6 +1409,19 @@
         NSRunAlertPanel([localException name], @"%@\nFailed LED Threshold finder", @"OK", nil, nil,
                         localException);
     }
+}
+
+- (IBAction) openEasySetPanel:(id)sender
+{
+	[self endEditing];
+    [NSApp beginSheet:easySetPanel modalForWindow:[self window]
+		modalDelegate:self didEndSelector:NULL contextInfo:nil];
+}
+
+- (IBAction) closeEasySetPanel:(id)sender
+{
+    [easySetPanel orderOut:nil];
+    [NSApp endSheet:easySetPanel];
 }
 
 - (IBAction) readStatus:(id)sender

@@ -200,7 +200,8 @@ enum Gretina4MFIFOStates {
     short			prerecnt[kNumGretina4MChannels];
     short			postrecnt[kNumGretina4MChannels];
     short			tpol[kNumGretina4MChannels];
-    
+    BOOL			easySelected[kNumGretina4MChannels];
+
     short           clockSource;
     short           externalWindow;
     short           noiseWindow;
@@ -356,6 +357,7 @@ enum Gretina4MFIFOStates {
 - (void) setPostrecnt:(short)chan withValue:(short)aValue;
 - (void) setTpol:(short)chan withValue:(short)aValue;
 - (void) setPresumEnabled:(short)chan withValue:(BOOL)aValue;
+- (void) setEasySelected:(short)chan withValue:(BOOL)aValue;
 
 - (BOOL) enabled:(short)chan;
 - (BOOL) trapEnabled:(short)chan;
@@ -376,6 +378,7 @@ enum Gretina4MFIFOStates {
 - (short) postrecnt:(short)chan;
 - (short) tpol:(short)chan;
 - (BOOL) presumEnabled:(short)chan;
+- (BOOL) easySelected:(short)chan;
 
 //conversion methods
 - (float) poleZeroTauConverted:(short)chan;
@@ -532,4 +535,5 @@ extern NSString* ORGretina4MPrerecntChanged;
 extern NSString* ORGretina4MPostrecntChanged;
 extern NSString* ORGretina4MTpolChanged;
 extern NSString* ORGretina4MPresumEnabledChanged;
+extern NSString* ORGretina4MEasySelectedChanged;
 

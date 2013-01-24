@@ -57,6 +57,7 @@
     IBOutlet NSMatrix*		chpsrtMatrix;
     IBOutlet NSMatrix*		prerecntMatrix;
     IBOutlet NSMatrix*		postrecntMatrix;
+	IBOutlet NSMatrix*		easySelectMatrix;
 
     IBOutlet NSPopUpButton* clockSourcePU;
 
@@ -67,6 +68,7 @@
     IBOutlet NSButton*      probeButton;
     IBOutlet NSButton*      statusButton;
     IBOutlet NSButton*      noiseFloorButton;
+    IBOutlet NSButton*      easySetButton;
 
 	IBOutlet NSPopUpButton* downSamplePU;
 	
@@ -109,6 +111,9 @@
     IBOutlet NSProgressIndicator*	noiseFloorProgress;
 	IBOutlet NSButton*				registerLockButton;
 	
+    //Easy Set Panel
+    IBOutlet NSPanel*				easySetPanel;
+
     NSView *blankView;
     NSSize settingSize;
     NSSize rateSize;
@@ -165,6 +170,7 @@
 - (void) ledThresholdChanged:(NSNotification*)aNote;
 - (void) trapThresholdChanged:(NSNotification*)aNote;
 - (void) miscAttributesChanged:(NSNotification*)aNote;
+- (void) easySelectChanged:(NSNotification*)aNote;
 
 - (void) scaleAction:(NSNotification*)aNote;
 - (void) integrationChanged:(NSNotification*)aNote;
@@ -221,6 +227,7 @@
 - (IBAction) trapThresholdAction:(id)sender;
 - (IBAction) downloadMainFPGAAction:(id)sender;
 - (IBAction) stopLoadingMainFPGAAction:(id)sender;
+- (IBAction) easySelectAction:(id)sender;
 
 - (IBAction) registerIndexPUAction:(id)sender;
 - (IBAction) readRegisterAction:(id)sender;
@@ -230,6 +237,12 @@
 - (IBAction) spiWriteValueAction:(id)sender;
 - (IBAction) writeSPIAction:(id)sender;
 - (IBAction) dumpAllRegisters:(id)sender;
+
+- (IBAction) openEasySetPanel:(id)sender;
+- (IBAction) closeEasySetPanel:(id)sender;
+- (IBAction) selectAllInEasySet:(id)sender;
+- (IBAction) selectNoneInEasySet:(id)sender;
+
 
 #pragma mark •••Data Source
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;
