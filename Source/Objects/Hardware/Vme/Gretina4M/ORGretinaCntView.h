@@ -20,15 +20,18 @@
 
 @interface ORGretinaCntView : NSView {
 	IBOutlet ORGretina4MController*  dataSource;
-    NSRect b;
-	NSImage*	bugImage;
-	BOOL		movingPreRisingEdge;
-	BOOL		movingPostRisingEdge;
-	BOOL		movingFlatTop;
-	NSGradient* plotGradient;
-    float         flatTopBugX;
-    float         postReBugX;
-    float         preReBugX;
+	IBOutlet NSTextField*  preReField;
+	IBOutlet NSTextField*  postReField;
+	IBOutlet NSTextField*  flatTopField;
+    NSRect          b;
+	NSImage*        bugImage;
+	BOOL            movingPreRisingEdge;
+	BOOL            movingPostRisingEdge;
+	BOOL            movingFlatTop;
+	NSGradient*     plotGradient;
+    float           flatTopBugX;
+    float           postReBugX;
+    float           preReBugX;
 }
 
 - (id)initWithFrame:(NSRect)frame;
@@ -36,6 +39,9 @@
 - (void) setValues:(BOOL)finalValues;
 - (void) setValues:(short)channel final:(BOOL)finalValues;
 - (void) initBugs;
+- (BOOL) anythingSelected;
+- (int)  firstOneSelected;
+- (void) loadLocalFields;
 
 #pragma mark ¥¥¥Events
 - (void) mouseDown:(NSEvent*)event;
@@ -45,5 +51,13 @@
 
 #pragma mark ¥¥¥Drawing
 - (void) drawRect:(NSRect)rect ;
+
+#pragma mark ¥¥¥Actions
+- (IBAction) tweakFlatTopCounts:(id)sender;
+- (IBAction) tweakPostReCounts:(id)sender;
+- (IBAction) tweakPreReCounts:(id)sender;
+- (IBAction) flatTopCounts:(id)sender;
+- (IBAction) postReCounts:(id)sender;
+- (IBAction) preReCounts:(id)sender;
 
 @end

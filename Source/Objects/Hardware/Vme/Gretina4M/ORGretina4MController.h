@@ -25,6 +25,7 @@
 
 @class ORValueBarGroupView;
 @class ORCompositeTimeLineView;
+@class ORGretinaCntView;
 
 @interface ORGretina4MController : OrcaObjectController 
 {
@@ -113,6 +114,16 @@
 	
     //Easy Set Panel
     IBOutlet NSPanel*				easySetPanel;
+    IBOutlet ORGretinaCntView*      dataWindowView;
+    IBOutlet NSButton*              flatTopStepperUp;
+    IBOutlet NSButton*              flatTopStepperDwn;
+    IBOutlet NSButton*              postReStepperUp;
+    IBOutlet NSButton*              postReStepperDwn;
+    IBOutlet NSButton*              preReStepperUp;
+    IBOutlet NSButton*              preReStepperDwn;
+    IBOutlet NSTextField*			preCountField;
+    IBOutlet NSTextField*			postCountField;
+    IBOutlet NSTextField*			flatTopField;
 
     NSView *blankView;
     NSSize settingSize;

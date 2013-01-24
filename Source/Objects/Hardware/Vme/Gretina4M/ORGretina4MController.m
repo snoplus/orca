@@ -31,6 +31,7 @@
 #import "ORTimeAxis.h"
 #import "ORCompositePlotView.h"
 #import "ORValueBarGroupView.h"
+#import "ORGretinaCntView.h"
 
 #if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 @interface ORGretina4MController (private)
@@ -672,6 +673,8 @@
     for(i=0;i<kNumGretina4MChannels;i++){
         [[easySelectMatrix cellWithTag:i] setState:[model easySelected:i]];
     }
+    [dataWindowView initBugs];
+    [dataWindowView setNeedsDisplay:YES];
 }
 
 - (void) trapEnabledChanged:(NSNotification*)aNote
@@ -888,9 +891,18 @@
 	[dumpAllRegistersButton setEnabled:!lockedOrRunningMaintenance && !downloading];
     [tpolMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
     [triggerModeMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
-    [easySetButton setEnabled:!locked && !runInProgress && !downloading];
-    [easySelectMatrix setEnabled:!locked && !runInProgress && !downloading];
-
+    
+    [easySetButton      setEnabled:!locked && !runInProgress && !downloading];
+    [easySelectMatrix   setEnabled:!locked && !runInProgress && !downloading];
+    [postReStepperUp    setEnabled:!locked && !runInProgress && !downloading];
+    [postReStepperDwn   setEnabled:!locked && !runInProgress && !downloading];
+    [postReStepperUp    setEnabled:!locked && !runInProgress && !downloading];
+    [postReStepperDwn   setEnabled:!locked && !runInProgress && !downloading];
+    [flatTopStepperUp   setEnabled:!locked && !runInProgress && !downloading];
+    [flatTopStepperDwn  setEnabled:!locked && !runInProgress && !downloading];
+    [flatTopField       setEnabled:!locked && !runInProgress && !downloading];
+    [postCountField     setEnabled:!locked && !runInProgress && !downloading];
+    [preCountField      setEnabled:!locked && !runInProgress && !downloading];
 
     if(lockedOrRunningMaintenance || downloading){
         [ledThresholdMatrix setEnabled:NO];
@@ -931,6 +943,8 @@
 {
     [super setModel:aModel];
     [[self window] setTitle:[NSString stringWithFormat:@"Gretina4M Card (Slot %d)",[model slot]]];
+    [dataWindowView initBugs];
+    [dataWindowView setNeedsDisplay:YES];
 }
 
 - (void) slotChanged:(NSNotification*)aNotification
@@ -1177,7 +1191,6 @@
         [model setEasySelected:i withValue:NO];
     }
 }
-
 
 - (IBAction) trapEnabledAction:(id)sender
 {

@@ -46,48 +46,53 @@
 	[super dealloc];
 }
 
-- (void) awakeFromNib
-{
-    [self initBugs];
-}
-
 #pragma mark ¥¥¥Drawing
 - (void)drawRect:(NSRect)rect 
 {
 	[plotGradient drawInRect:b angle:270.];
 
-	[[NSColor blackColor] set];
-	[NSBezierPath setDefaultLineWidth:.5];
+    if([self anythingSelected]){
+        
+        [[NSColor blackColor] set];
+        [NSBezierPath setDefaultLineWidth:.5];
 
-    //draw the flat top counter
-	[bugImage drawAtPoint:NSMakePoint( flatTopBugX-kBugPad/2.,b.size.height) fromRect:[bugImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
-	[NSBezierPath strokeLineFromPoint:NSMakePoint(flatTopBugX,0) toPoint:NSMakePoint(flatTopBugX,b.size.height)];
-    
-    //draw the post rising edge counter
-	[bugImage drawAtPoint:NSMakePoint( postReBugX-kBugPad/2.,b.size.height) fromRect:[bugImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
-	[NSBezierPath strokeLineFromPoint:NSMakePoint(postReBugX,0) toPoint:NSMakePoint(postReBugX,b.size.height)];
- 
-    //draw the pre rising edge counter
-	[bugImage drawAtPoint:NSMakePoint( preReBugX-kBugPad/2.,b.size.height) fromRect:[bugImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
-	[NSBezierPath strokeLineFromPoint:NSMakePoint(preReBugX,0) toPoint:NSMakePoint(preReBugX,b.size.height)];
+        //draw the flat top counter
+        [bugImage drawAtPoint:NSMakePoint( flatTopBugX-kBugPad/2.,b.size.height) fromRect:[bugImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+        [NSBezierPath strokeLineFromPoint:NSMakePoint(flatTopBugX,0) toPoint:NSMakePoint(flatTopBugX,b.size.height)];
+        
+        //draw the post rising edge counter
+        [bugImage drawAtPoint:NSMakePoint( postReBugX-kBugPad/2.,b.size.height) fromRect:[bugImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+        [NSBezierPath strokeLineFromPoint:NSMakePoint(postReBugX,0) toPoint:NSMakePoint(postReBugX,b.size.height)];
+     
+        //draw the pre rising edge counter
+        [bugImage drawAtPoint:NSMakePoint( preReBugX-kBugPad/2.,b.size.height) fromRect:[bugImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+        [NSBezierPath strokeLineFromPoint:NSMakePoint(preReBugX,0) toPoint:NSMakePoint(preReBugX,b.size.height)];
 
-    [NSBezierPath setDefaultLineWidth:2.];
-    [[NSColor redColor] set];
-    [NSBezierPath strokeLineFromPoint:NSMakePoint(kBugPad/2., 10) toPoint:NSMakePoint(preReBugX, 10)];
- 
-    [[NSColor blueColor] set];
-    [NSBezierPath strokeLineFromPoint:NSMakePoint(preReBugX, 10) toPoint:NSMakePoint(postReBugX, 10)];
-    [NSBezierPath strokeLineFromPoint:NSMakePoint(postReBugX, 10) toPoint:NSMakePoint(postReBugX, 50)];
-    [NSBezierPath strokeLineFromPoint:NSMakePoint(postReBugX, 50) toPoint:NSMakePoint(flatTopBugX, 50)];
+        [NSBezierPath setDefaultLineWidth:2.];
+        [[NSColor redColor] set];
+        [NSBezierPath strokeLineFromPoint:NSMakePoint(kBugPad/2., 10) toPoint:NSMakePoint(preReBugX, 10)];
+     
+        [[NSColor blueColor] set];
+        [NSBezierPath strokeLineFromPoint:NSMakePoint(preReBugX, 10) toPoint:NSMakePoint(postReBugX, 10)];
+        [NSBezierPath strokeLineFromPoint:NSMakePoint(postReBugX, 10) toPoint:NSMakePoint(postReBugX, 50)];
+        [NSBezierPath strokeLineFromPoint:NSMakePoint(postReBugX, 50) toPoint:NSMakePoint(flatTopBugX, 50)];
 
-    [[NSColor redColor] set];
-    [NSBezierPath strokeLineFromPoint:NSMakePoint(flatTopBugX, 50) toPoint:NSMakePoint(b.size.width+kBugPad/2, 50)];
+        [[NSColor redColor] set];
+        [NSBezierPath strokeLineFromPoint:NSMakePoint(flatTopBugX, 50) toPoint:NSMakePoint(b.size.width+kBugPad/2, 50)];
 
-    
-    [NSBezierPath setDefaultLineWidth:1.];
-    [[NSColor blackColor] set];
-
+        [NSBezierPath setDefaultLineWidth:1.];
+        [[NSColor blackColor] set];
+    }
 	[NSBezierPath strokeRect:b];
+}
+
+- (BOOL) anythingSelected
+{
+    int i;
+    for(i=0;i<kNumGretina4MChannels;i++){
+        if([[dataSource model]easySelected:i])return YES;
+    }
+    return NO;
 }
 
 - (void) initBugs
@@ -98,14 +103,27 @@
             int ftCnt       = [[dataSource model] ftCnt:i];
             int postrecnt   = [[dataSource model] postrecnt:i];
             int prerecnt    = [[dataSource model] prerecnt:i];
-            
+                        
             flatTopBugX = b.origin.x + (2048. - ftCnt)* b.size.width/2048.;
-            postReBugX = flatTopBugX -  postrecnt* b.size.width/2048.;
+            postReBugX  = flatTopBugX -  postrecnt* b.size.width/2048.;
             preReBugX = postReBugX -  prerecnt* b.size.width/2048.;
             break;
         }
     }
 }
+
+- (void) loadLocalFields
+{
+    int i;
+    for(i=0;i<kNumGretina4MChannels;i++){
+        if([[dataSource model]easySelected:i]){
+            [preReField setIntValue:[[dataSource model] prerecnt:i]];
+            [postReField setIntValue:[[dataSource model] postrecnt:i]];
+            [flatTopField setIntValue:[[dataSource model] ftCnt:i]];
+        }
+    }
+}
+
 - (void) applyConstrainsts
 {
     float minX = b.origin.x;
@@ -215,7 +233,7 @@
         [self applyConstrainsts];
         [self setValues:NO];
 	}
-   
+    [self loadLocalFields];
 	[self setNeedsDisplay:YES];
 }
 
@@ -224,7 +242,7 @@
 	[[self undoManager] enableUndoRegistration];
 	
 	NSPoint localPoint = [self convertPoint:[event locationInWindow] fromView:nil];
-    
+
  	if(movingFlatTop){
         flatTopBugX = localPoint.x;
         [self applyConstrainsts];
@@ -241,6 +259,7 @@
         [self setValues:YES];
 	}
 	[self setNeedsDisplay:YES];
+    [self loadLocalFields];
 	
 	[NSCursor pop];
 
@@ -272,7 +291,99 @@
     r2 = NSMakeRect(preReBugX-2,0,4,b.size.height);
     [self addCursorRect:r1 cursor:[NSCursor openHandCursor]];
     [self addCursorRect:r2 cursor:[NSCursor openHandCursor]];
-
 }
+
+- (int)  firstOneSelected
+{
+    int i;
+    for(i=0;i<kNumGretina4MChannels;i++){
+        if([[dataSource model]easySelected:i])return i;
+    }
+    return -1;
+}
+
+- (IBAction) tweakFlatTopCounts:(id)sender
+{
+    int firstOneSelected = [self firstOneSelected];
+    if(firstOneSelected >= 0){
+        int ftCnt       = [[dataSource model] ftCnt:firstOneSelected] + ([sender tag]?1:-1);
+        
+        int i;
+        for(i=0;i<kNumGretina4MChannels;i++){
+            if([[dataSource model]easySelected:i])[[dataSource model] setFtCnt:i withValue:ftCnt];
+        }
+        [self applyConstrainsts];
+        [self loadLocalFields];
+        [self initBugs];
+        [self setNeedsDisplay:YES];
+    }
+}
+
+- (IBAction) tweakPostReCounts:(id)sender
+{
+    int firstOneSelected = [self firstOneSelected];
+    if(firstOneSelected >= 0){
+        int postrecnt   = [[dataSource model] postrecnt:firstOneSelected]+([sender tag]?1:-1);
+        int i;
+        for(i=0;i<kNumGretina4MChannels;i++){
+            if([[dataSource model]easySelected:i])[[dataSource model] setPostrecnt:i withValue:postrecnt];
+        }
+        [self applyConstrainsts];
+        [self loadLocalFields];
+        [self initBugs];
+        [self setNeedsDisplay:YES];
+    }
+}
+
+- (IBAction) tweakPreReCounts:(id)sender
+{
+    int firstOneSelected = [self firstOneSelected];
+    if(firstOneSelected >= 0){
+        int prerecnt    = [[dataSource model] prerecnt:firstOneSelected] + ([sender tag]?1:-1);
+        int i;
+        for(i=0;i<kNumGretina4MChannels;i++){
+            if([[dataSource model]easySelected:i])[[dataSource model] setPrerecnt:i withValue:prerecnt];
+        }
+        [self applyConstrainsts];
+        [self loadLocalFields];
+        [self initBugs];
+        [self setNeedsDisplay:YES];
+    }
+}
+
+- (IBAction) flatTopCounts:(id)sender
+{
+    int i;
+    for(i=0;i<kNumGretina4MChannels;i++){
+        if([[dataSource model]easySelected:i])[[dataSource model] setFtCnt:i withValue:[sender intValue]];
+    }
+    [self applyConstrainsts];
+    [self initBugs];
+    [self setNeedsDisplay:YES];
+}
+
+- (IBAction) postReCounts:(id)sender
+{
+    int i;
+    for(i=0;i<kNumGretina4MChannels;i++){
+        if([[dataSource model]easySelected:i])[[dataSource model] setPostrecnt:i withValue:[sender intValue]];
+    }
+    [self applyConstrainsts];
+    [self initBugs];
+    [self setNeedsDisplay:YES];
+    
+}
+
+- (IBAction) preReCounts:(id)sender
+{
+    int i;
+    for(i=0;i<kNumGretina4MChannels;i++){
+        if([[dataSource model]easySelected:i])[[dataSource model] setPrerecnt:i withValue:[sender intValue]];
+    }
+    [self applyConstrainsts];
+    [self initBugs];
+    [self setNeedsDisplay:YES];
+}
+
 
 @end
