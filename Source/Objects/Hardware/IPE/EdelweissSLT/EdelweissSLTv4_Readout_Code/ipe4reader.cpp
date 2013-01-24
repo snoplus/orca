@@ -3652,9 +3652,10 @@ debugsizecounter-=currentBlockSize;
 
 
 //TODO: rm
+#if 0
 if(synchroWordPosHint>0) 
         printf("   *2**FIFOStatusTSPtr: %u synchroWordPosHint: %i  synchroWordBufferPosHint %i (synchroWordPosHint - currentBlockSize)   %i ((synchroWordPosHint - currentBlockSize) <= 0)%i***\n",FIFOStatusTSPtr,synchroWordPosHint,synchroWordBufferPosHint,(synchroWordPosHint - currentBlockSize), ((synchroWordPosHint - currentBlockSize) <= 0));//DEBUG output -tb-
-
+#endif
         //keep counter up to date
         if(synchroWordPosHint >0){
             if( (synchroWordPosHint  ) <= currentBlockSize  ){
@@ -3949,7 +3950,7 @@ int i=0;
 			BB0csr =  pbus->read(BBcsrReg(i));
 			printf("    BBcsrReg(%i): 0x%08x (BBEn: %i)\n",i,BB0csr, (BB0csr & 0x2)>>1);
 			//now enable BB
-			printf("Send 'BBEn' flag.\n");
+			printf("Send 'BBEn=0' flag.\n");
 			pbus->write(BBcsrReg(i), 0x0);
 			BB0csr =  pbus->read(BBcsrReg(i));
 			printf("    BBcsrReg(%i): 0x%08x (BBEn: %i)\n",i,BB0csr, (BB0csr & 0x2)>>1);
