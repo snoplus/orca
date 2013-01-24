@@ -390,6 +390,7 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
 
 #pragma mark ***External Strings
 
+NSString* OREdelweissSLTModelCrateUDPDataCommandChanged = @"OREdelweissSLTModelCrateUDPDataCommandChanged";
 NSString* OREdelweissSLTModelBBCmdFFMaskChanged = @"OREdelweissSLTModelBBCmdFFMaskChanged";
 NSString* OREdelweissSLTModelCmdWArg4Changed = @"OREdelweissSLTModelCmdWArg4Changed";
 NSString* OREdelweissSLTModelCmdWArg3Changed = @"OREdelweissSLTModelCmdWArg3Changed";
@@ -475,6 +476,7 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 
 -(void) dealloc
 {
+    [crateUDPDataCommand release];
     [crateUDPDataIP release];
     [crateUDPCommand release];
     [crateUDPCommandIP release];
@@ -565,6 +567,21 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 }
 
 #pragma mark •••Accessors
+
+- (NSString*) crateUDPDataCommand
+{
+    return crateUDPDataCommand;
+}
+
+- (void) setCrateUDPDataCommand:(NSString*)aCrateUDPDataCommand
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setCrateUDPDataCommand:crateUDPDataCommand];
+    
+    [crateUDPDataCommand autorelease];
+    crateUDPDataCommand = [aCrateUDPDataCommand copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelCrateUDPDataCommandChanged object:self];
+}
 
 - (uint32_t) BBCmdFFMask
 {
@@ -2599,6 +2616,7 @@ NSLog(@"WARNING: %@::%@:  slave mode is not necessary any more! \n",NSStringFrom
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
 	
+	[self setCrateUDPDataCommand:[decoder decodeObjectForKey:@"crateUDPDataCommand"]];
 	[self setBBCmdFFMask:[decoder decodeInt32ForKey:@"BBCmdFFMask"]];
 	[self setCmdWArg4:[decoder decodeIntForKey:@"cmdWArg4"]];
 	[self setCmdWArg3:[decoder decodeIntForKey:@"cmdWArg3"]];
@@ -2662,6 +2680,7 @@ NSLog(@"WARNING: %@::%@:  slave mode is not necessary any more! \n",NSStringFrom
 {
 	[super encodeWithCoder:encoder];
 	
+	[encoder encodeObject:crateUDPDataCommand forKey:@"crateUDPDataCommand"];
 	[encoder encodeInt32:BBCmdFFMask forKey:@"BBCmdFFMask"];
 	[encoder encodeInt:cmdWArg4 forKey:@"cmdWArg4"];
 	[encoder encodeInt:cmdWArg3 forKey:@"cmdWArg3"];

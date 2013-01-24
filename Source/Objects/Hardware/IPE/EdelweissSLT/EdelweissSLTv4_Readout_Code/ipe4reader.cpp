@@ -2058,6 +2058,7 @@ void populateIPECrateStatusPacket()
 	          else
 	          if(  (foundPos=strstr(buffer,"reloadConfigFile"))  ){
 	              printf("handleKCommand: KWC >%s< command 6!\n",foundPos);//DEBUG
+	              printf("      UNDER CONSTRUCTION!\n");//DEBUG
 	          }
 	          else
 	          if(  (foundPos=strstr(buffer,"exit"))  ){
@@ -3924,12 +3925,51 @@ void testFLTs()
 
  /*--------------------------------------------------------------------
  *    function:     InitHardwareFIFOs
- *    purpose:      
+ *--------------------------------------------------------------------*/ //-tb-
+void StopSLTFIFO()
+{
+	printf("StopSLTFIFO\n");
+    uint32_t SLTControl=0;
+    uint32_t BB0csr=0;
+
+	//SLT control register
+	SLTControl =  pbus->read(SLTControlReg);
+	printf("    SLTControl: 0x%08x (OnLine: %i)\n",SLTControl, (SLTControl & 0x4000)>>14);
+	//switch to OffLine (test mode)
+//	if((SLTControl & 0x4000)>>14){
+		SLTControl = SLTControl & ~(0x4000);
+		pbus->write(SLTControlReg,SLTControl);
+		//pbus->write(SLTControlReg,0x4000);
+//	}
+	SLTControl =  pbus->read(SLTControlReg);
+	printf("    SLTControl: 0x%08x (OnLine: %i)\n",SLTControl, (SLTControl & 0x4000)>>14);
+
+int i=0;
+			//SLT csr register
+			BB0csr =  pbus->read(BBcsrReg(i));
+			printf("    BBcsrReg(%i): 0x%08x (BBEn: %i)\n",i,BB0csr, (BB0csr & 0x2)>>1);
+			//now enable BB
+			printf("Send 'BBEn' flag.\n");
+			pbus->write(BBcsrReg(i), 0x0);
+			BB0csr =  pbus->read(BBcsrReg(i));
+			printf("    BBcsrReg(%i): 0x%08x (BBEn: %i)\n",i,BB0csr, (BB0csr & 0x2)>>1);
+}
+
+ /*--------------------------------------------------------------------
+ *    function:     InitHardwareFIFOs
+ *    purpose:      start SLT to fill the  FIFO
+ *                  argument warmStart: 
+ *                        if warmStart==1, the pixelBusEnable reg is not changed
+ *                        (i.e. the readout will continue to read from the same FLTs as before a stopStreamLoop command)                
+ *                                        
  *    author:       Till Bergmann, 2012
  *
  *--------------------------------------------------------------------*/ //-tb-
-void InitHardwareFIFOs()
+void InitHardwareFIFOs(int warmStart)
 {
+	printf("InitHardwareFIFOs (%s)\n",  (warmStart ? "soft start" : "cold start")  );
+	printf("=====================================\n");
+
     int i;
 	
     //SLT registers
@@ -3961,10 +4001,12 @@ void InitHardwareFIFOs()
 	SLTControl =  pbus->read(SLTControlReg);
 	printf("SLTControl: 0x%08x (OnLine: %i)\n",SLTControl, (SLTControl & 0x4000)>>14);
 	
-	//reset Pixbus Enable mask
-	printf("SLTPixbusEnableReg: 0x%08x \n",pbus->read(SLTPixbusEnableReg));
-	pbus->write(SLTPixbusEnableReg,0x0);
-	printf("After reset: SLTPixbusEnableReg: 0x%08x \n",pbus->read(SLTPixbusEnableReg));
+    if(!warmStart){
+    	//reset Pixbus Enable mask
+	    printf("SLTPixbusEnableReg: 0x%08x \n",pbus->read(SLTPixbusEnableReg));
+	    pbus->write(SLTPixbusEnableReg,0x0);
+	    printf("After reset: SLTPixbusEnableReg: 0x%08x \n",pbus->read(SLTPixbusEnableReg));
+    }
 	
 	//read FIFO length
 	for(i=0;i<FIFOREADER::maxNumFIFO;i++)
@@ -3987,10 +4029,10 @@ void InitHardwareFIFOs()
 		}
 
 
-    //begin-----INIT HARDWARE (SLT/FLT REGISTERS)---------------------------------------
+    //begin-----INIT HARDWARE (SLT REGISTERS)---------------------------------------
     printf("\n");
-    printf("INIT HARDWARE (SLT/FLT REGISTERS)\n");
-    printf("---------------------------------\n");
+    printf("INIT HARDWARE (SLT REGISTERS)\n");
+    printf("-----------------------------\n");
     
 	printf("SLT Control: set 'OnLine' to 1.\n");
 	pbus->write(SLTControlReg, 0x4000);
@@ -4017,20 +4059,23 @@ void InitHardwareFIFOs()
 		}
 		
 		
-	//reset Pixbus Enable mask
-	printf("SLTPixbusEnableReg: 0x%08x \n",pbus->read(SLTPixbusEnableReg));
-	pbus->write(SLTPixbusEnableReg,0x0);
-	printf("After reset: SLTPixbusEnableReg: 0x%08x \n",pbus->read(SLTPixbusEnableReg));
+    if(0 /*I did it above*/ && !warmStart){
+    	//reset Pixbus Enable mask
+	    printf("SLTPixbusEnableReg: 0x%08x \n",pbus->read(SLTPixbusEnableReg));
+	    pbus->write(SLTPixbusEnableReg,0x0);
+	    printf("After reset: SLTPixbusEnableReg: 0x%08x \n",pbus->read(SLTPixbusEnableReg));
+	}
 	
-	
-	// set Pixbus Enable mask
-    SLTSETTINGS &slt = *SLTSETTINGS::SLT;
-	//SLTPixbusEnable=pbus->read(SLTPixbusEnableReg);
-	SLTPixbusEnable = slt.PixbusEnable;
-	pbus->write(SLTPixbusEnableReg,SLTPixbusEnable);
-	printf("Set SLTPixbusEnableReg to: 0x%08x \n",pbus->read(SLTPixbusEnableReg));
+    if( !warmStart){
+	    // set Pixbus Enable mask
+        SLTSETTINGS &slt = *SLTSETTINGS::SLT;
+	    //SLTPixbusEnable=pbus->read(SLTPixbusEnableReg);
+	    SLTPixbusEnable = slt.PixbusEnable;
+	    pbus->write(SLTPixbusEnableReg,SLTPixbusEnable);
+	    printf("Set SLTPixbusEnableReg to: 0x%08x \n",pbus->read(SLTPixbusEnableReg));
+    }
 
-    //end-----INIT HARDWARE (SLT/FLT REGISTERS)---------------------------------------
+    //end-----INIT HARDWARE (SLT REGISTERS)---------------------------------------
 	
 }
 
@@ -4630,6 +4675,10 @@ int32_t main(int32_t argc, char *argv[])
                     FIFOREADER::State = frINITIALIZED;
                 }
                 if(FIFOREADER::State == frSTREAMING){//stop streaming command (stopStreamLoop)
+                    //stop the SLT streaming (=stop the FIFO)
+                    //I let the SLT run on; I do a reset at the startStreamLoop command
+                    //... (maybe stop SLT?)
+                    StopSLTFIFO();
                     FIFOREADER::State = frINITIALIZED;
                 }
             }
@@ -4637,13 +4686,19 @@ int32_t main(int32_t argc, char *argv[])
                 if(FIFOREADER::State == frINITIALIZED){//start streaming command (startStreamLoop)
                     FIFOREADER::State = frSTREAMING;
                     //TODO: clear buffers + FIFOs? -tb-
+                    //start hardware
+                    printf("DO A WARM START OF STREAM LOOP\n");
+                    InitHardwareFIFOs(/*warmStart=*/ 1 );
                 }
                 if(FIFOREADER::State == frIDLE){//start streaming command (coldStart command)
                     //TODO: cold start -tb-
                     FIFOREADER::initAllUDPServerSockets();
                     //TODO: under construction -tb-
                     //TODO: what else to initialize? -tb-
+	              printf("      UNDER CONSTRUCTION!\n");//DEBUG
                     //start hardware
+                    printf("DO A COLD START OF STREAM LOOP\n");
+                    InitHardwareFIFOs(/*warmStart=*/ 0 );
                     FIFOREADER::State = frSTREAMING;
                 }
             }

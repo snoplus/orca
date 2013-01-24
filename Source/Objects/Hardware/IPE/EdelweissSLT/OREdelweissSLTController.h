@@ -29,6 +29,7 @@
 	
     //BB commands
 	    IBOutlet   NSTextField* eventFifoStatusRegTextField;
+	IBOutlet   NSTextField* crateUDPDataCommandTextField;
 	IBOutlet   NSTextField* BBCmdFFMaskTextField;
 		IBOutlet NSMatrix*		BBCmdFFMaskMatrix;
 	IBOutlet   NSTextField* cmdWArg4TextField;
@@ -156,6 +157,7 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+- (void) crateUDPDataCommandChanged:(NSNotification*)aNote;
 - (void) BBCmdFFMaskChanged:(NSNotification*)aNote;
 - (void) cmdWArg4Changed:(NSNotification*)aNote;
 - (void) cmdWArg3Changed:(NSNotification*)aNote;
@@ -207,6 +209,7 @@
 - (void) enableRegControls;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+- (IBAction) crateUDPDataCommandTextFieldAction:(id)sender;
 - (IBAction) BBCmdFFMaskTextFieldAction:(id)sender;
 - (IBAction) BBCmdFFMaskMatrixAction:(id)sender;
 - (IBAction) cmdWArg4TextFieldAction:(id)sender;
@@ -245,6 +248,8 @@
 - (IBAction) UDPDataTabSendBloqueCommandButtonAction:(id)sender;
 - (IBAction) UDPDataTabSendDebloqueCommandButtonAction:(id)sender;
 - (IBAction) UDPDataTabSendDemarrageCommandButtonAction:(id)sender;
+
+- (IBAction) crateUDPDataCommandSendButtonAction:(id)sender;
 
 
 //K command UDP connection

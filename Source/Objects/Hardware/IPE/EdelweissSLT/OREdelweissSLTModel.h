@@ -188,6 +188,7 @@
     int cmdWArg3;
     int cmdWArg4;
     uint32_t BBCmdFFMask;
+    NSString* crateUDPDataCommand;
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
@@ -205,6 +206,8 @@
 - (void) runIsStartingSubRun:(NSNotification*)aNote;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+- (NSString*) crateUDPDataCommand;
+- (void) setCrateUDPDataCommand:(NSString*)aCrateUDPDataCommand;
 - (uint32_t) BBCmdFFMask;
 - (void) setBBCmdFFMask:(uint32_t)aBBCmdFFMask;
 - (int) cmdWArg4;
@@ -444,6 +447,7 @@
 
 @end
 
+extern NSString* OREdelweissSLTModelCrateUDPDataCommandChanged;
 extern NSString* OREdelweissSLTModelBBCmdFFMaskChanged;
 extern NSString* OREdelweissSLTModelCmdWArg4Changed;
 extern NSString* OREdelweissSLTModelCmdWArg3Changed;

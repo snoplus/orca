@@ -281,9 +281,19 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
                          name : OREdelweissSLTModelBBCmdFFMaskChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(crateUDPDataCommandChanged:)
+                         name : OREdelweissSLTModelCrateUDPDataCommandChanged
+						object: model];
+
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+
+- (void) crateUDPDataCommandChanged:(NSNotification*)aNote
+{
+	[crateUDPDataCommandTextField setStringValue: [model crateUDPDataCommand]];
+}
 
 - (void) BBCmdFFMaskChanged:(NSNotification*)aNote
 {
@@ -586,6 +596,7 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	[self cmdWArg3Changed:nil];
 	[self cmdWArg4Changed:nil];
 	[self BBCmdFFMaskChanged:nil];
+	[self crateUDPDataCommandChanged:nil];
 }
 
 
@@ -733,6 +744,11 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 }
 
 #pragma mark ***Actions
+
+- (void) crateUDPDataCommandTextFieldAction:(id)sender
+{
+	[model setCrateUDPDataCommand:[sender stringValue]];	
+}
 
 - (void) BBCmdFFMaskTextFieldAction:(id)sender
 {
@@ -894,6 +910,7 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (IBAction) crateUDPDataRequestDataPCommandSendButtonAction:(id)sender
 {
+    [self endEditing];
 	//debug NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
 	[model sendUDPDataCommandRequestUDPData];	
 }
@@ -905,7 +922,8 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (IBAction) testUDPDataConnectionButtonAction:(id)sender
 {
-	//debug NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+	//debug 
+    NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
 	[model setRequestStoppingDataServerSocket:1];	
 }
 
@@ -946,6 +964,17 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	//debug 
     NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
     [model sendUDPDataTabDemarrageCommand];
+}
+
+
+
+
+- (IBAction) crateUDPDataCommandSendButtonAction:(id)sender
+{
+    [self endEditing];
+	//
+    NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+	[model sendUDPDataCommandString: [model crateUDPDataCommand]];	
 }
 
 
