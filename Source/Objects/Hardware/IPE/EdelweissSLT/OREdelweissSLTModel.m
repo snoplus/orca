@@ -570,6 +570,7 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 
 - (NSString*) crateUDPDataCommand
 {
+	if(!crateUDPDataCommand) return @"";
     return crateUDPDataCommand;
 }
 
