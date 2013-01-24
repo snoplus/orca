@@ -1209,6 +1209,18 @@
 		84499CCB0F13E457004B855B /* ORCTITempDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84499CC30F13E457004B855B /* ORCTITempDecoders.m */; };
 		84499CCC0F13E457004B855B /* ORCTITempModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84499CC40F13E457004B855B /* ORCTITempModel.h */; };
 		84499CCD0F13E457004B855B /* ORCTITempModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84499CC50F13E457004B855B /* ORCTITempModel.m */; };
+		8449A53616AEDF5B00296104 /* CV1721.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8449A52E16AEDF5B00296104 /* CV1721.nib */; };
+		8449A53716AEDF5B00296104 /* CV1721Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8449A52F16AEDF5B00296104 /* CV1721Card.gif */; };
+		8449A53816AEDF5B00296104 /* ORCV1721Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 8449A53016AEDF5B00296104 /* ORCV1721Controller.h */; };
+		8449A53916AEDF5B00296104 /* ORCV1721Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 8449A53116AEDF5B00296104 /* ORCV1721Controller.m */; };
+		8449A53A16AEDF5B00296104 /* ORCV1721Decoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 8449A53216AEDF5B00296104 /* ORCV1721Decoder.h */; };
+		8449A53B16AEDF5B00296104 /* ORCV1721Decoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 8449A53316AEDF5B00296104 /* ORCV1721Decoder.m */; };
+		8449A53C16AEDF5B00296104 /* ORCV1721Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 8449A53416AEDF5B00296104 /* ORCV1721Model.h */; };
+		8449A53D16AEDF5B00296104 /* ORCV1721Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 8449A53516AEDF5B00296104 /* ORCV1721Model.m */; };
+		8449A54216AEE44300296104 /* ORCAEN1721Readout.hh in Headers */ = {isa = PBXBuildFile; fileRef = 8449A54016AEE44300296104 /* ORCAEN1721Readout.hh */; };
+		8449A54A16B058B400296104 /* topBug.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8449A54916B058B400296104 /* topBug.tif */; };
+		8449A55116B0781B00296104 /* ORGretinaCntView.h in Headers */ = {isa = PBXBuildFile; fileRef = 8449A54F16B0781900296104 /* ORGretinaCntView.h */; };
+		8449A55216B0781B00296104 /* ORGretinaCntView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8449A55016B0781A00296104 /* ORGretinaCntView.m */; };
 		8449CC83123E85DA009C8AA2 /* ORVHSC040nController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8449CC7B123E85D9009C8AA2 /* ORVHSC040nController.h */; };
 		8449CC84123E85DA009C8AA2 /* ORVHSC040nController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8449CC7C123E85D9009C8AA2 /* ORVHSC040nController.m */; };
 		8449CC85123E85DA009C8AA2 /* ORVHSC040nDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 8449CC7D123E85D9009C8AA2 /* ORVHSC040nDecoders.h */; };
@@ -2112,6 +2124,8 @@
 		84AFC2531029F35E009F4139 /* upRamp.png in Resources */ = {isa = PBXBuildFile; fileRef = 84AFC2471029F35E009F4139 /* upRamp.png */; };
 		84AFC2541029F35E009F4139 /* VHQ224L.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84AFC2481029F35E009F4139 /* VHQ224L.nib */; };
 		84AFC2551029F35E009F4139 /* VHQ224L.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84AFC2491029F35E009F4139 /* VHQ224L.tif */; };
+		84AFEC4516B1707000EC343C /* ORCAEN1721Readout.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 8449A53F16AEE44200296104 /* ORCAEN1721Readout.cc */; };
+		84AFEC4616B1707000EC343C /* ORCAEN1721Readout.hh in VME_Copy */ = {isa = PBXBuildFile; fileRef = 8449A54016AEE44300296104 /* ORCAEN1721Readout.hh */; };
 		84B0CFBE08FC60BC00EBE23C /* Container.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84B0CFB808FC60BC00EBE23C /* Container.nib */; };
 		84B0CFBF08FC60BC00EBE23C /* Container.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B0CFB908FC60BC00EBE23C /* Container.tif */; };
 		84B0CFC008FC60BC00EBE23C /* ORContainerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B0CFBA08FC60BC00EBE23C /* ORContainerController.m */; };
@@ -3109,6 +3123,8 @@
 				43ADFED210B6E2090044617C /* ORSIS3350Readout.hh in VME_Copy */,
 				43ADFED310B6E2090044617C /* ORVMETrigger32Readout.cc in VME_Copy */,
 				43ADFED410B6E2090044617C /* ORVMETrigger32Readout.hh in VME_Copy */,
+				84AFEC4516B1707000EC343C /* ORCAEN1721Readout.cc in VME_Copy */,
+				84AFEC4616B1707000EC343C /* ORCAEN1721Readout.hh in VME_Copy */,
 				43ADFED510B6E2090044617C /* ORVVmeCard.cc in VME_Copy */,
 				43ADFED610B6E2090044617C /* ORVVmeCard.hh in VME_Copy */,
 				43ADFED710B6E2090044617C /* UniverseDriverInstall in VME_Copy */,
@@ -4101,6 +4117,19 @@
 		84499CC30F13E457004B855B /* ORCTITempDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCTITempDecoders.m; path = Source/Objects/Hardware/Serial/CTITemp/ORCTITempDecoders.m; sourceTree = SOURCE_ROOT; };
 		84499CC40F13E457004B855B /* ORCTITempModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCTITempModel.h; path = Source/Objects/Hardware/Serial/CTITemp/ORCTITempModel.h; sourceTree = SOURCE_ROOT; };
 		84499CC50F13E457004B855B /* ORCTITempModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCTITempModel.m; path = Source/Objects/Hardware/Serial/CTITemp/ORCTITempModel.m; sourceTree = SOURCE_ROOT; };
+		8449A52E16AEDF5B00296104 /* CV1721.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = CV1721.nib; sourceTree = "<group>"; };
+		8449A52F16AEDF5B00296104 /* CV1721Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = CV1721Card.gif; sourceTree = "<group>"; };
+		8449A53016AEDF5B00296104 /* ORCV1721Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORCV1721Controller.h; sourceTree = "<group>"; };
+		8449A53116AEDF5B00296104 /* ORCV1721Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORCV1721Controller.m; sourceTree = "<group>"; };
+		8449A53216AEDF5B00296104 /* ORCV1721Decoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORCV1721Decoder.h; sourceTree = "<group>"; };
+		8449A53316AEDF5B00296104 /* ORCV1721Decoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORCV1721Decoder.m; sourceTree = "<group>"; };
+		8449A53416AEDF5B00296104 /* ORCV1721Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORCV1721Model.h; sourceTree = "<group>"; };
+		8449A53516AEDF5B00296104 /* ORCV1721Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORCV1721Model.m; sourceTree = "<group>"; };
+		8449A53F16AEE44200296104 /* ORCAEN1721Readout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ORCAEN1721Readout.cc; sourceTree = "<group>"; };
+		8449A54016AEE44300296104 /* ORCAEN1721Readout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ORCAEN1721Readout.hh; sourceTree = "<group>"; };
+		8449A54916B058B400296104 /* topBug.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = topBug.tif; sourceTree = "<group>"; };
+		8449A54F16B0781900296104 /* ORGretinaCntView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORGretinaCntView.h; sourceTree = "<group>"; };
+		8449A55016B0781A00296104 /* ORGretinaCntView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORGretinaCntView.m; sourceTree = "<group>"; };
 		8449CC7B123E85D9009C8AA2 /* ORVHSC040nController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORVHSC040nController.h; path = Source/Objects/Hardware/Vme/VHSC040n/ORVHSC040nController.h; sourceTree = SOURCE_ROOT; };
 		8449CC7C123E85D9009C8AA2 /* ORVHSC040nController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORVHSC040nController.m; path = Source/Objects/Hardware/Vme/VHSC040n/ORVHSC040nController.m; sourceTree = SOURCE_ROOT; };
 		8449CC7D123E85D9009C8AA2 /* ORVHSC040nDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORVHSC040nDecoders.h; path = Source/Objects/Hardware/Vme/VHSC040n/ORVHSC040nDecoders.h; sourceTree = SOURCE_ROOT; };
@@ -8242,6 +8271,21 @@
 			path = Source/Objects/Hardware/Serial/CTITemp;
 			sourceTree = SOURCE_ROOT;
 		};
+		8449A52D16AEDF5B00296104 /* CV1721 */ = {
+			isa = PBXGroup;
+			children = (
+				8449A52E16AEDF5B00296104 /* CV1721.nib */,
+				8449A52F16AEDF5B00296104 /* CV1721Card.gif */,
+				8449A53016AEDF5B00296104 /* ORCV1721Controller.h */,
+				8449A53116AEDF5B00296104 /* ORCV1721Controller.m */,
+				8449A53216AEDF5B00296104 /* ORCV1721Decoder.h */,
+				8449A53316AEDF5B00296104 /* ORCV1721Decoder.m */,
+				8449A53416AEDF5B00296104 /* ORCV1721Model.h */,
+				8449A53516AEDF5B00296104 /* ORCV1721Model.m */,
+			);
+			path = CV1721;
+			sourceTree = "<group>";
+		};
 		8449CC7A123E85D9009C8AA2 /* VHSC040n */ = {
 			isa = PBXGroup;
 			children = (
@@ -9531,6 +9575,8 @@
 				43ADFE5910B6DBCF0044617C /* ORCAEN419Readout.hh */,
 				43ADFE5A10B6DBCF0044617C /* ORCAEN1720Readout.cc */,
 				43ADFE5B10B6DBCF0044617C /* ORCAEN1720Readout.hh */,
+				8449A53F16AEE44200296104 /* ORCAEN1721Readout.cc */,
+				8449A54016AEE44300296104 /* ORCAEN1721Readout.hh */,
 				849E7492132E5466001BF64C /* ORCAEN1724Readout.cc */,
 				849E7493132E5466001BF64C /* ORCAEN1724Readout.hh */,
 				4342D59211ECB8AD007EFFB1 /* ORCAEN775Readout.cc */,
@@ -10763,6 +10809,7 @@
 		84B7DF9C04E1C53D005F64B1 /* Bar Graph */ = {
 			isa = PBXGroup;
 			children = (
+				8449A54916B058B400296104 /* topBug.tif */,
 				84EE877E10D94B3100BBCBE5 /* rightBug.tif */,
 				84D79B850FFD347400DC81D2 /* leftBug.tif */,
 				84B7DF9F04E1C53D005F64B1 /* ORValueBar.m */,
@@ -11577,6 +11624,8 @@
 				84DF4A05162DCE6B00261144 /* ORGretina4MDecoders.m */,
 				84DF4A06162DCE6B00261144 /* ORGretina4MModel.h */,
 				84DF4A07162DCE6B00261144 /* ORGretina4MModel.m */,
+				8449A54F16B0781900296104 /* ORGretinaCntView.h */,
+				8449A55016B0781A00296104 /* ORGretinaCntView.m */,
 			);
 			name = Gretina4M;
 			path = Source/Objects/Hardware/Vme/Gretina4M;
@@ -12712,6 +12761,7 @@
 				9C1363BE0D0A7921006C550D /* CV265 */,
 				848D8B230DE23D2400D44B81 /* CV1190 */,
 				84BC164D0DA14F3600D3935C /* CV1720 */,
+				8449A52D16AEDF5B00296104 /* CV1721 */,
 				844B9BE4132E527700FEDA6B /* CV1724 */,
 				84B74CE00FEBE9B90033E658 /* CV965 */,
 			);
@@ -13801,6 +13851,11 @@
 				2D2AED651696283D0057E424 /* ipe4reader.h in Headers */,
 				2D2AED671696284D0057E424 /* ipe4structure.h in Headers */,
 				2DD81EA616A6E49700F50F0F /* ipe4tbtools.h in Headers */,
+				8449A53816AEDF5B00296104 /* ORCV1721Controller.h in Headers */,
+				8449A53A16AEDF5B00296104 /* ORCV1721Decoder.h in Headers */,
+				8449A53C16AEDF5B00296104 /* ORCV1721Model.h in Headers */,
+				8449A54216AEE44300296104 /* ORCAEN1721Readout.hh in Headers */,
+				8449A55116B0781B00296104 /* ORGretinaCntView.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14681,6 +14736,9 @@
 				842BB6C816397A2800393470 /* Pulser33500Chan.nib in Resources */,
 				2D2AED601696281E0057E424 /* Makefile.ipe4reader in Resources */,
 				2D2AED63169628310057E424 /* ipe4reader.config in Resources */,
+				8449A53616AEDF5B00296104 /* CV1721.nib in Resources */,
+				8449A53716AEDF5B00296104 /* CV1721Card.gif in Resources */,
+				8449A54A16B058B400296104 /* topBug.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -15666,6 +15724,10 @@
 				CED38D1F165CDB6600358681 /* ANSIEscapeHelper.m in Sources */,
 				8477DF44166A4023000144BA /* HaloSentry.m in Sources */,
 				8434C37C167FB0F40068DB04 /* ORFileMoverOp.m in Sources */,
+				8449A53916AEDF5B00296104 /* ORCV1721Controller.m in Sources */,
+				8449A53B16AEDF5B00296104 /* ORCV1721Decoder.m in Sources */,
+				8449A53D16AEDF5B00296104 /* ORCV1721Model.m in Sources */,
+				8449A55216B0781B00296104 /* ORGretinaCntView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
