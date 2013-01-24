@@ -4681,12 +4681,17 @@ int32_t main(int32_t argc, char *argv[])
                     //... (maybe stop SLT?)
                     StopSLTFIFO();
                     FIFOREADER::State = frINITIALIZED;
+                    //clear FIFO buffer
+                    FIFOREADER::FifoReader[0].clearFifoBuf32();
+
                 }
             }
             if(goToState == frSTREAMING){
                 if(FIFOREADER::State == frINITIALIZED){//start streaming command (startStreamLoop)
                     FIFOREADER::State = frSTREAMING;
                     //TODO: clear buffers + FIFOs? -tb-
+                    //clear FIFO buffer
+                    FIFOREADER::FifoReader[0].clearFifoBuf32();
                     //start hardware
                     printf("DO A WARM START OF STREAM LOOP\n");
                     InitHardwareFIFOs(/*warmStart=*/ 1 );

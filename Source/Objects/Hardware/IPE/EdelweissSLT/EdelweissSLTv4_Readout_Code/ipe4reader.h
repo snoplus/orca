@@ -472,6 +472,16 @@ public:
 	/*--------------------------------------------------------------------
 	 vars and functions for FIFO buffer
 	 --------------------------------------------------------------------*/
+    void clearFifoBuf32(){
+        waitingForSynchroWord = 0;
+        synchroWordPosHint=0;
+	    popIndexFIFObuf32=0;
+	    pushIndexFIFObuf32=0;
+	    FIFObuf32avail=0;
+	    //FIFObuf32counter;     //TODO: needs check -tb-
+	    //FIFObuf32counterlast; //TODO: needs check -tb-
+    }
+    
     int pushFifoBuf32(uint32_t *data, int len){//append data to FIFO buffer
         int i;
         //TODO: 1) check: enough memory available?
