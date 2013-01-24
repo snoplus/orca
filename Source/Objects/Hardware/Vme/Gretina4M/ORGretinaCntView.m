@@ -46,12 +46,19 @@
 	[super dealloc];
 }
 
+- (void) awakeFromNib
+{
+    [self loadLocalFields];
+}
+
 #pragma mark ¥¥¥Drawing
 - (void)drawRect:(NSRect)rect 
 {
 	[plotGradient drawInRect:b angle:270.];
 
     if([self anythingSelected]){
+        
+        [self loadLocalFields];
         
         [[NSColor blackColor] set];
         [NSBezierPath setDefaultLineWidth:.5];
@@ -82,6 +89,22 @@
 
         [NSBezierPath setDefaultLineWidth:1.];
         [[NSColor blackColor] set];
+        
+        int postPlusPre   = [postReField intValue] + [preReField intValue];
+        NSColor* theColor;
+        if(postPlusPre<1024)theColor = [NSColor blackColor];
+        else                theColor = [NSColor redColor];
+        NSString* ps = [NSString stringWithFormat:@"%d",postPlusPre];
+        
+        NSFont* theFont = [NSFont fontWithName:@"Geneva" size:9];
+        NSDictionary* theAttributes = [NSDictionary dictionaryWithObjectsAndKeys:theFont,NSFontAttributeName,theColor,NSForegroundColorAttributeName,nil];
+        NSAttributedString* s = [[NSAttributedString alloc] initWithString:ps attributes:theAttributes];
+        NSSize stringSize = [s size];
+        float xc = preReBugX + (flatTopBugX-preReBugX)/2. - stringSize.width/2.;
+        [s drawAtPoint:NSMakePoint(xc,b.size.height-stringSize.height)];
+        [s release];
+
+        
     }
 	[NSBezierPath strokeRect:b];
 }
@@ -186,9 +209,19 @@
 	movingPreRisingEdge		= NO;
 	movingPostRisingEdge	= NO;
 	movingFlatTop           = NO;
-	
-    NSRect r1 = NSMakeRect(flatTopBugX-kBugPad/2.,b.size.height,kBugPad,kBugPad);
-    NSRect r2 = NSMakeRect(flatTopBugX-2,0,4,b.size.height);
+
+    
+    NSRect r1 = NSMakeRect(preReBugX-kBugPad/2.,b.size.height,kBugPad,kBugPad);
+    NSRect r2 = NSMakeRect(preReBugX-2,0,4,b.size.height);
+    if(NSPointInRect(localPoint,r1) || NSPointInRect(localPoint,r2)){
+        movingPreRisingEdge = YES;
+        [[NSCursor closedHandCursor] set];
+        [self setNeedsDisplay:YES];
+        return;
+    }
+
+    r1 = NSMakeRect(flatTopBugX-kBugPad/2.,b.size.height,kBugPad,kBugPad);
+    r2 = NSMakeRect(flatTopBugX-2,0,4,b.size.height);
     if(NSPointInRect(localPoint,r1) || NSPointInRect(localPoint,r2)){
         movingFlatTop = YES;
         [[NSCursor closedHandCursor] set];
@@ -204,16 +237,7 @@
         [self setNeedsDisplay:YES];
         return;
     }
-    
-    r1 = NSMakeRect(preReBugX-kBugPad/2.,b.size.height,kBugPad,kBugPad);
-    r2 = NSMakeRect(preReBugX-2,0,4,b.size.height);
-    if(NSPointInRect(localPoint,r1) || NSPointInRect(localPoint,r2)){
-        movingPreRisingEdge = YES;
-        [[NSCursor closedHandCursor] set];
-        [self setNeedsDisplay:YES];
-        return;
-    }
-}
+ }
 
 - (void) mouseDragged:(NSEvent*)event
 {
@@ -312,9 +336,11 @@
         for(i=0;i<kNumGretina4MChannels;i++){
             if([[dataSource model]easySelected:i])[[dataSource model] setFtCnt:i withValue:ftCnt];
         }
+        movingFlatTop  = YES;
         [self applyConstrainsts];
         [self loadLocalFields];
         [self initBugs];
+        movingFlatTop  = NO;
         [self setNeedsDisplay:YES];
     }
 }
@@ -328,9 +354,11 @@
         for(i=0;i<kNumGretina4MChannels;i++){
             if([[dataSource model]easySelected:i])[[dataSource model] setPostrecnt:i withValue:postrecnt];
         }
+        movingPostRisingEdge  = YES;
         [self applyConstrainsts];
         [self loadLocalFields];
         [self initBugs];
+        movingPostRisingEdge  = YES;
         [self setNeedsDisplay:YES];
     }
 }
@@ -344,9 +372,11 @@
         for(i=0;i<kNumGretina4MChannels;i++){
             if([[dataSource model]easySelected:i])[[dataSource model] setPrerecnt:i withValue:prerecnt];
         }
+        movingPreRisingEdge  = YES;
         [self applyConstrainsts];
         [self loadLocalFields];
         [self initBugs];
+        movingPreRisingEdge  = NO;
         [self setNeedsDisplay:YES];
     }
 }
