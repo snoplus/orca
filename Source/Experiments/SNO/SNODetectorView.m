@@ -839,7 +839,7 @@ NSString* plotButtonDisabled                 = @"plotButtonDisabled";
 
 - (NSColor *) getPMTColor:(int)aCrate card:(int)aCard pmt:(int)aPMT
 {
-    NSColor *tubeColor;
+    NSColor *tubeColor = nil;
     if (parameterToDisplay == kTubeTypeDisplay){
         tubeColor = [db pmtColor:aCrate card:aCard channel:aPMT];
         if ([NSColor greenColor]==tubeColor){

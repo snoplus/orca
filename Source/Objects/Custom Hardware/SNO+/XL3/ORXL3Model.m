@@ -2828,7 +2828,7 @@ void SwapLongBlock(void* p, int32_t n)
                         counts[j] = results_lo.counts[slot_idx*32 + j];
                         //NSLog(@"channel: %d cnt: %ld\n", j, counts[j]);
                     }
-                    ORFec32Model* fec;
+                    ORFec32Model* fec=nil;
                     for (id anObj in [[self guardian] orcaObjects]) { 
                         if ([anObj class] == NSClassFromString(@"ORFec32Model") && [anObj stationNumber] == i) {
                             fec = anObj;
@@ -2850,7 +2850,7 @@ void SwapLongBlock(void* p, int32_t n)
                         counts[j] = results_hi.counts[slot_idx*32 + j];
                         //NSLog(@"channel: %d cnt: %ld\n", j, counts[j]);
                     }
-                    ORFec32Model* fec;
+                    ORFec32Model* fec = nil;
                     for (id anObj in [[self guardian] orcaObjects]) { 
                         if ([anObj class] == NSClassFromString(@"ORFec32Model") && [anObj stationNumber] == i + 8) {
                             fec = anObj;
@@ -2873,7 +2873,7 @@ void SwapLongBlock(void* p, int32_t n)
                     for (j=0; j<32; j++) {
                         counts[j] = results_lo.counts[slot_idx*32 + j];
                     }
-                    ORFec32Model* fec;
+                    ORFec32Model* fec=nil;
                     for (id anObj in [[self guardian] orcaObjects]) { 
                         if ([anObj class] == NSClassFromString(@"ORFec32Model") && [anObj stationNumber] == i) {
                             fec = anObj;
