@@ -32,6 +32,7 @@
     float           flatTopBugX;
     float           postReBugX;
     float           preReBugX;
+    int             baseline;
 }
 
 - (id)initWithFrame:(NSRect)frame;

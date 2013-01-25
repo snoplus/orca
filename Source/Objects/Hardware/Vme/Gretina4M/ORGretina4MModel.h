@@ -173,6 +173,11 @@ enum Gretina4MFIFOStates {
 
 #define kG4MDataPacketSize 1024+2  //waveforms are fixed at 1024, ORCA header is 2
 
+#define kPreAdjust  13
+#define kPostAdjust -18
+#define kFtAdjust    4
+#define kHeaderSize  29
+
 @interface ORGretina4MModel : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping,AutoTesting>
 {
   @private
@@ -303,6 +308,7 @@ enum Gretina4MFIFOStates {
 - (short) noiseFloorOffset;
 - (void) setNoiseFloorOffset:(short)aNoiseFloorOffset;
 - (void) initParams;
+- (int) baseLineLength:(int)chan;
 
 // Register access
 - (NSString*) registerNameAt:(unsigned int)index;

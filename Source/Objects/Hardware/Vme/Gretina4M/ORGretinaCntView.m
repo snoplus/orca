@@ -91,20 +91,36 @@
         [[NSColor blackColor] set];
         
         int postPlusPre   = [postReField intValue] + [preReField intValue];
-        NSColor* theColor;
-        if(postPlusPre<1024)theColor = [NSColor blackColor];
-        else                theColor = [NSColor redColor];
+        NSColor* reColor;
+        if(postPlusPre<1024)reColor = [NSColor blackColor];
+        else                reColor = [NSColor redColor];
         NSString* ps = [NSString stringWithFormat:@"%d",postPlusPre];
         
         NSFont* theFont = [NSFont fontWithName:@"Geneva" size:9];
-        NSDictionary* theAttributes = [NSDictionary dictionaryWithObjectsAndKeys:theFont,NSFontAttributeName,theColor,NSForegroundColorAttributeName,nil];
+        NSDictionary* theAttributes = [NSDictionary dictionaryWithObjectsAndKeys:theFont,NSFontAttributeName,reColor,NSForegroundColorAttributeName,nil];
         NSAttributedString* s = [[NSAttributedString alloc] initWithString:ps attributes:theAttributes];
         NSSize stringSize = [s size];
-        float xc = preReBugX + (flatTopBugX-preReBugX)/2. - stringSize.width/2.;
-        [s drawAtPoint:NSMakePoint(xc,b.size.height-stringSize.height)];
+        float x = preReBugX + (flatTopBugX-preReBugX)/2. - stringSize.width/2.;
+        [s drawAtPoint:NSMakePoint(x,b.size.height-stringSize.height)];
         [s release];
 
-        
+        NSString* bls = [NSString stringWithFormat:@"%d",baseline];
+        theAttributes = [NSDictionary dictionaryWithObjectsAndKeys:theFont,NSFontAttributeName,[NSColor blackColor],NSForegroundColorAttributeName,nil];
+        s = [[NSAttributedString alloc] initWithString:bls attributes:theAttributes];
+        stringSize = [s size];
+        x = MAX(kBugPad/2.,kBugPad/2. + (preReBugX-kBugPad/2.)/2. - stringSize.width/2.);
+        [s drawAtPoint:NSMakePoint(x,b.size.height-stringSize.height)];
+        [s release];
+
+        NSString* fts = [NSString stringWithFormat:@"%d",[flatTopField intValue]];
+        theAttributes = [NSDictionary dictionaryWithObjectsAndKeys:theFont,NSFontAttributeName,[NSColor blackColor],NSForegroundColorAttributeName,nil];
+        s = [[NSAttributedString alloc] initWithString:fts attributes:theAttributes];
+        stringSize = [s size];
+        x = flatTopBugX + (b.size.width-flatTopBugX)/2. - stringSize.width/2.;
+        if(x + stringSize.width/2 > b.size.width)x = b.size.width-stringSize.width;
+        [s drawAtPoint:NSMakePoint(x,b.size.height-stringSize.height)];
+        [s release];
+
     }
 	[NSBezierPath strokeRect:b];
 }
@@ -143,6 +159,8 @@
             [preReField setIntValue:[[dataSource model] prerecnt:i]];
             [postReField setIntValue:[[dataSource model] postrecnt:i]];
             [flatTopField setIntValue:[[dataSource model] ftCnt:i]];
+            baseline = [[dataSource model] baseLineLength:i];
+            break;
         }
     }
 }

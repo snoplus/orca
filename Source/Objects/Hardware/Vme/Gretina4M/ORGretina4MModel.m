@@ -929,8 +929,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setPrerecnt:(short)chan withValue:(short)aValue
 {
-	if(aValue<1)aValue=1;
-	else if(aValue>0x3ff)aValue = 0x3ff;
+	if(aValue<0)aValue=0;
+	else if(aValue>2036)aValue = 2036; //HW = user+13
     [[[self undoManager] prepareWithInvocationTarget:self] setPrerecnt:chan withValue:prerecnt[chan]];
 	prerecnt[chan] = aValue;
     NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
@@ -939,8 +939,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setPostrecnt:(short)chan withValue:(short)aValue
 {
-	if(aValue<1)aValue=1;
-	else if(aValue>0x3ff)aValue = 0x3ff;
+	if(aValue<18)aValue=18;
+	else if(aValue>2065)aValue = 2065; //HW = user-18
     [[[self undoManager] prepareWithInvocationTarget:self] setPostrecnt:chan withValue:postrecnt[chan]];
 	postrecnt[chan] = aValue;
     NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
@@ -949,12 +949,17 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setFtCnt:(short)chan withValue:(short)aValue
 {
-	if(aValue<1)aValue=1;
-	else if(aValue>0x3ff)aValue = 0x3ff;
+	if(aValue<0)aValue=0;
+	else if(aValue>2043)aValue = 2043; //HW = user + 4
     [[[self undoManager] prepareWithInvocationTarget:self] setFtCnt:chan withValue:ftCnt[chan]];
 	ftCnt[chan] = aValue;
     NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MFtCntChanged object:self userInfo:userInfo];
+}
+
+- (int) baseLineLength:(int)chan
+{
+    return 2048-kHeaderSize-postrecnt[chan]-prerecnt[chan]-ftCnt[chan];
 }
 
 - (void) setTpol:(short)chan withValue:(short)aValue
@@ -1422,7 +1427,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
 }
-
 - (void) writeTrapThreshold:(int)channel
 {
     unsigned long theValue = (trapEnabled[channel]<<31) | trapThreshold[channel] & 0xFFFFFF;
@@ -1436,7 +1440,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) writeWindowTiming:(short)channel
 {    
-    unsigned long theValue = (((ftCnt[channel])&0x3ff)<<16) |
+    unsigned long theValue = (((ftCnt[channel]+kFtAdjust)&0x7ff)<<16) |
                              ((mrpsrt[channel]&0xf)<<12) |
                              ((mrpsdv[channel]&0xf)<<8) |
                              ((chpsrt[channel]&0xf)<<4) |
@@ -1452,7 +1456,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) writeRisingEdgeWindow:(short)channel
 {    
-	unsigned long aValue = (((prerecnt[channel])&0x3ff)<<12) | ((postrecnt[channel]&0x3ff));
+	unsigned long aValue = (((prerecnt[channel]+kPreAdjust)&0x7ff)<<12) | (((postrecnt[channel]+kPostAdjust)&0x7ff));
     [[self adapter] writeLongBlock:&aValue
                          atAddress:[self baseAddress] + register_information[kRisingEdgeWindow].offset + 4*channel
                         numToWrite:1
