@@ -414,6 +414,7 @@ public:
 
 	    flagToSendDataAndResetBuffer = 0;
         waitingForSynchroWord = 0;
+        isSynchronized = 0;
 	}
 	
 	//FIFOREADER as state machine: the state
@@ -480,6 +481,8 @@ public:
 	    FIFObuf32avail=0;
 	    //FIFObuf32counter;     //TODO: needs check -tb-
 	    //FIFObuf32counterlast; //TODO: needs check -tb-
+        
+   		udpdataByteCounter=0;//TODO: belongs this to the sw buffer?
     }
     
     int pushFifoBuf32(uint32_t *data, int len){//append data to FIFO buffer
@@ -521,6 +524,7 @@ public:
     //misc vars
     int flagToSendDataAndResetBuffer;
     int waitingForSynchroWord;
+    int isSynchronized; //means: has received a TS pattern in the data stream (will be set to false e.g. at start/stop StreamLoop)
 	
 	/*--------------------------------------------------------------------
 	 vars for UDP packets

@@ -3123,7 +3123,7 @@ if(debcnt>10000){
     }
     
 	
-	//2. a.) send the UDP data paket and b.) scan the status bits
+	//2.  send the UDP data packet 
     if(udpPacketLen > 4){// contains more than only the UDP header (if udpPacketLen==1->contains packet header, but no data) -> ADC data
 	    //a.) send data
         if(show_debug_info>2) printf("send udp packet with size %i \n",udpPacketLen);//TODO: DEBUG output -tb-
@@ -3132,11 +3132,13 @@ if(debcnt>10000){
             if(numSent != udpPacketLen) printf("scanFIFObuffer: ERROR sendtoClient(): packet size %i, sent bytes %i\n",udpPacketLen,numSent);
 		}
 		//TODO: status clients not supported  -tb-  for (i=0;i<NB_CLIENT_UDP;i++){  if (numPacketsClientStatus[i]) numPacketsClientStatus[i]--;  }
-		sendtoUDPClients(1,udpdata,udpPacketLen);
+        if(isSynchronized)
+    		sendtoUDPClients(1,udpdata,udpPacketLen);
 
         if(udpdataCounter==0){
             if(show_debug_info>=1){
-                 printf("sending packet id 0x%08x (idx: %i, ts (16 bit): %i) ADCs:",udpdata32[0],udpdataCounter,udpdataSec & 0xffff);
+                 if(!isSynchronized) printf("not synch.-canceled:");
+                 printf("sending packet id 0x%08x (idx: %i, ts (16 bit): %i) len32 %i, ADCs:",udpdata32[0],udpdataCounter,udpdataSec & 0xffff,udpPacketLen);
                  int i,end=18;
                  if((udpPacketLen/4+1)<end) end=udpPacketLen/4+1;
                  for(i=0; i<end; i++){
@@ -3212,7 +3214,8 @@ if(debcnt>10000){
         //********************************************************************************************************
 
         if(FIFObuf32avail>=4){//we need all 4 words of the header 'sentence' to extract the time stamp
-		
+		    //found all 4 TS (time stamp) words ->we are synchronized
+            isSynchronized=1;
 		    //TODO: move "send code" to this location???? -tb-
 		
 
@@ -4703,6 +4706,8 @@ int32_t main(int32_t argc, char *argv[])
                     FIFOREADER::State = frINITIALIZED;
                     //clear FIFO buffer
                     FIFOREADER::FifoReader[0].clearFifoBuf32();
+                    FIFOREADER::FifoReader[0].isSynchronized = 0;
+                    FIFOREADER::FifoReader[0].udpdataCounter = 0;
 
                 }
             }
@@ -4712,6 +4717,8 @@ int32_t main(int32_t argc, char *argv[])
                     //TODO: clear buffers + FIFOs? -tb-
                     //clear FIFO buffer
                     FIFOREADER::FifoReader[0].clearFifoBuf32();
+                    FIFOREADER::FifoReader[0].isSynchronized = 0;
+                    FIFOREADER::FifoReader[0].udpdataCounter = 0;
                     //start hardware
                     printf("DO A WARM START OF STREAM LOOP\n");
                     InitHardwareFIFOs(/*warmStart=*/ 1 );
