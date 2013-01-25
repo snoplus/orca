@@ -19,7 +19,7 @@
 //-------------------------------------------------------------
 
 
-#pragma mark ¥¥¥Imported Files
+#pragma mark â€¢â€¢â€¢Imported Files
 #import "HaloController.h"
 #import "HaloModel.h"
 #import "ORDetectorSegment.h"
@@ -29,14 +29,14 @@
 #import "ORCompositePlotView.h"
 
 #if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-@interface KatrinController (private)
+@interface HaloController (private)
 - (void) readSecondaryMapFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 - (void) saveSecondaryMapFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 @end
 #endif
 
 @implementation HaloController
-#pragma mark ¥¥¥Initialization
+#pragma mark â€¢â€¢â€¢Initialization
 -(id)init
 {
     self = [super initWithWindowNibName:@"Halo"];
@@ -84,7 +84,7 @@
 }
 
 
-#pragma mark ¥¥¥Notifications
+#pragma mark â€¢â€¢â€¢Notifications
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
@@ -222,7 +222,7 @@
 	[secondaryValuesView reloadData];
 }
 
-#pragma mark ¥¥¥Interface Management
+#pragma mark â€¢â€¢â€¢Interface Management
 - (void) checkGlobalSecurity
 {
     [super checkGlobalSecurity];
@@ -430,7 +430,7 @@
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:@"orca.HaloController.selectedtab"];
 }
 
-#pragma mark ¥¥¥Actions
+#pragma mark â€¢â€¢â€¢Actions
 - (IBAction) secondaryMapLockAction:(id)sender
 {
     [gSecurity tryToSetLock:[model secondaryMapLock] to:[sender intValue] forWindow:[self window]];
@@ -628,7 +628,7 @@
 
 }
 
-#pragma mark ¥¥¥Data Source
+#pragma mark â€¢â€¢â€¢Data Source
 - (void) tableViewSelectionDidChange:(NSNotification *)aNotification
 {
 	if([aNotification object] == emailListTable || aNotification == nil){
@@ -693,7 +693,7 @@
 
 
 #if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-@implementation KatrinController (Private)
+@implementation HaloController (Private)
 - (void) readSecondaryMapFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode){
