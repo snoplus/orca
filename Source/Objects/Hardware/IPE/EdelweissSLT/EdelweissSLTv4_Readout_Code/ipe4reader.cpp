@@ -3009,7 +3009,8 @@ void FIFOREADER::scanFIFObuffer(void)
 	int16_t	*	temp_status_bbv2_1_16=(int16_t	*)temp_status_bbv2_1;
 
 
-
+    uint16_t currentPacketNum=0;
+    uint16_t currentPacketTS =0;
 
 
 //remove flagToSendDataAndResetBuffer!!!!!!!!
@@ -3133,6 +3134,18 @@ if(debcnt>10000){
 		//TODO: status clients not supported  -tb-  for (i=0;i<NB_CLIENT_UDP;i++){  if (numPacketsClientStatus[i]) numPacketsClientStatus[i]--;  }
 		sendtoUDPClients(1,udpdata,udpPacketLen);
 
+        if(udpdataCounter==0){
+            if(show_debug_info>=1){
+                 printf("sending packet id 0x%08x (idx: %i, ts (16 bit): %i) ADCs:",udpdata32[0],udpdataCounter,udpdataSec & 0xffff);
+                 int i,end=18;
+                 if((udpPacketLen/4+1)<end) end=udpPacketLen/4+1;
+                 for(i=0; i<end; i++){
+                     printf("%i: (0x%08x) ", i,udpdata32[1+i]);
+                 }
+                 printf("\n");
+            }
+        }
+        
         if(show_debug_info>1 && udpdataCounter<1){
             if(udpPacketLen>=16) printf("adc0,1:0x%x adc2,3:0x%x adc4,5:0x%x \n",udpdata32[1],udpdata32[2],udpdata32[3]);//TODO: DEBUG output -tb-
             else if(udpPacketLen>=12) printf("adc0,1:0x%x adc2,3:0x%x  \n",udpdata32[1],udpdata32[2]);//TODO: DEBUG output -tb-
@@ -3682,7 +3695,7 @@ if(1){ //DEBUG search explicitly for header ...
         uint32_t val;
         for(i=0; i<currentBlockSize; i++){
             val = FIFObuf32[pushIndexFIFObuf32 +i];
-            if((val & 0xffff) == 0x3117){
+            if((val & 0xffff) == 0x00003117){
                        //printf("   *5**oldFIFOStatusTSPtr: %i ***\n",oldFIFOStatusTSPtr);//DEBUG output -tb-
                  printf("=============found  0x00003117 at i=%i , waitingForSynchroWord %i, synchroWordPosHint  %i  \n",i,waitingForSynchroWord, synchroWordPosHint);
             }
@@ -3770,6 +3783,13 @@ void RunSomeHardwareTests()
 	    PAFOffset = pbus->read(PAFOffsetReg(i));
         printf("Fifo(%i): PAEOffset: 0x%08x, PAFOffset: 0x%08x\n", i,  PAEOffset, PAFOffset);
 	}
+    
+    //3.
+    //reset SLT - sometimes the CmdFIFO doesnt work (is blocked) - in this case a resetSLT command helped!
+    printf("Send SLT RESET Command.\n");
+    printf("----------------------------\n");
+    pbus->write(SLTCommandReg,0x2);//this is the SltRes flag
+
 
 }
 
@@ -3929,7 +3949,7 @@ void testFLTs()
  *--------------------------------------------------------------------*/ //-tb-
 void StopSLTFIFO()
 {
-	printf("StopSLTFIFO\n");
+	printf("StopSLTFIFO.\n");
     uint32_t SLTControl=0;
     uint32_t BB0csr=0;
 
@@ -3951,7 +3971,7 @@ int i=0;
 			printf("    BBcsrReg(%i): 0x%08x (BBEn: %i)\n",i,BB0csr, (BB0csr & 0x2)>>1);
 			//now enable BB
 			printf("Send 'BBEn=0' flag.\n");
-			pbus->write(BBcsrReg(i), 0x0);
+			pbus->write(BBcsrReg(i), (0x08 + 0x04));
 			BB0csr =  pbus->read(BBcsrReg(i));
 			printf("    BBcsrReg(%i): 0x%08x (BBEn: %i)\n",i,BB0csr, (BB0csr & 0x2)>>1);
 }
@@ -4009,7 +4029,7 @@ void InitHardwareFIFOs(int warmStart)
 	    printf("After reset: SLTPixbusEnableReg: 0x%08x \n",pbus->read(SLTPixbusEnableReg));
     }
 	
-	//read FIFO length
+	//reset FIFO (pointers), read FIFO length
 	for(i=0;i<FIFOREADER::maxNumFIFO;i++)
 	    if(FIFOREADER::FifoReader[i].readfifo){
 			FIFOMode =  pbus->read(FIFOModeReg(i));
@@ -4019,7 +4039,7 @@ void InitHardwareFIFOs(int warmStart)
 			printf("Reset FIFO:\n");
 			printf("BBcsrReg(%i): 0x%08x (BBEn: %i)\n",i,BB0csr, (BB0csr & 0x2)>>1);
 			//pbus->write(BBcsrReg(numfifo) ,BB0csr | 0x4 | 0x8);
-			pbus->write(BBcsrReg(i) ,  0xc);  //reset flags
+			pbus->write(BBcsrReg(i) ,  (0x08 + 0x04));  //reset flags
 			usleep(10);
 			//read FIFO length
 			//test pbus->write(FIFOAddr(numfifo), 13);
