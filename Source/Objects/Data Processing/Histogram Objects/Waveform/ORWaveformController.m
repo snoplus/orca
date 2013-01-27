@@ -143,6 +143,10 @@
 	if([[tableColumn identifier] isEqualToString:@"Value"]){
 		return [NSNumber numberWithInt:[model value:row]];
 	}
+    else if([[tableColumn identifier] isEqualToString:@"Hex"]){
+		return [NSString stringWithFormat:@"0x%lx",[model value:row]];
+	}
+
 	else return [NSNumber numberWithInt:row];
 }
 
