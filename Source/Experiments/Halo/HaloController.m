@@ -58,8 +58,8 @@
 	
 	detectorSize		= NSMakeSize(620,595);
 	detailsSize			= NSMakeSize(550,589);
-	focalPlaneSize		= NSMakeSize(700,589);
-	testDectorSize      = NSMakeSize(700,300);
+	focalPlaneSize		= NSMakeSize(740,589);
+	testDectorSize      = NSMakeSize(740,300);
 	sentrySize          = NSMakeSize(700,500);
 	
     blankView = [[NSView alloc] init];
