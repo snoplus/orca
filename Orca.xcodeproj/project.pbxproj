@@ -2748,6 +2748,12 @@
 		84F9098D1638383C00E9FD24 /* Pulser33500Icon.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84F909861638383C00E9FD24 /* Pulser33500Icon.tif */; };
 		84F910BC0EEEC43C007B583A /* ORVmeReadWriteCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F910BA0EEEC43C007B583A /* ORVmeReadWriteCommand.h */; };
 		84F9836D06A441CF0087FA3E /* ORGTIDGenerator.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F9836C06A441CF0087FA3E /* ORGTIDGenerator.h */; };
+		84FA1E8516B6B40500C75588 /* AdcRate.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84FA1E7F16B6B40500C75588 /* AdcRate.nib */; };
+		84FA1E8616B6B40500C75588 /* AdcRate.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84FA1E8016B6B40500C75588 /* AdcRate.tif */; };
+		84FA1E8716B6B40500C75588 /* ORAdcRateController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FA1E8116B6B40500C75588 /* ORAdcRateController.h */; };
+		84FA1E8816B6B40500C75588 /* ORAdcRateController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FA1E8216B6B40500C75588 /* ORAdcRateController.m */; };
+		84FA1E8916B6B40500C75588 /* ORAdcRateModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FA1E8316B6B40500C75588 /* ORAdcRateModel.h */; };
+		84FA1E8A16B6B40500C75588 /* ORAdcRateModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FA1E8416B6B40500C75588 /* ORAdcRateModel.m */; };
 		84FA638C102B041800B426A6 /* ORSIS3350Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FA6384102B041800B426A6 /* ORSIS3350Controller.h */; };
 		84FA638D102B041800B426A6 /* ORSIS3350Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FA6385102B041800B426A6 /* ORSIS3350Controller.m */; };
 		84FA638E102B041800B426A6 /* ORSIS3350Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FA6386102B041800B426A6 /* ORSIS3350Decoders.h */; };
@@ -5816,6 +5822,12 @@
 		84F909861638383C00E9FD24 /* Pulser33500Icon.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Pulser33500Icon.tif; path = Source/Objects/Hardware/GPIB/Pulser33500/Pulser33500Icon.tif; sourceTree = SOURCE_ROOT; };
 		84F910BA0EEEC43C007B583A /* ORVmeReadWriteCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORVmeReadWriteCommand.h; sourceTree = "<group>"; };
 		84F9836C06A441CF0087FA3E /* ORGTIDGenerator.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORGTIDGenerator.h; path = Source/Objects/OrcaObject/ORGTIDGenerator.h; sourceTree = SOURCE_ROOT; };
+		84FA1E7F16B6B40500C75588 /* AdcRate.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = AdcRate.nib; sourceTree = "<group>"; };
+		84FA1E8016B6B40500C75588 /* AdcRate.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = AdcRate.tif; sourceTree = "<group>"; };
+		84FA1E8116B6B40500C75588 /* ORAdcRateController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORAdcRateController.h; sourceTree = "<group>"; };
+		84FA1E8216B6B40500C75588 /* ORAdcRateController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORAdcRateController.m; sourceTree = "<group>"; };
+		84FA1E8316B6B40500C75588 /* ORAdcRateModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORAdcRateModel.h; sourceTree = "<group>"; };
+		84FA1E8416B6B40500C75588 /* ORAdcRateModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORAdcRateModel.m; sourceTree = "<group>"; };
 		84FA6384102B041800B426A6 /* ORSIS3350Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSIS3350Controller.h; path = Source/Objects/Hardware/Vme/SIS3350/ORSIS3350Controller.h; sourceTree = SOURCE_ROOT; };
 		84FA6385102B041800B426A6 /* ORSIS3350Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSIS3350Controller.m; path = Source/Objects/Hardware/Vme/SIS3350/ORSIS3350Controller.m; sourceTree = SOURCE_ROOT; };
 		84FA6386102B041800B426A6 /* ORSIS3350Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSIS3350Decoders.h; path = Source/Objects/Hardware/Vme/SIS3350/ORSIS3350Decoders.h; sourceTree = SOURCE_ROOT; };
@@ -7132,6 +7144,7 @@
 			children = (
 				840EFFD60944B28F00049827 /* BaseClasses */,
 				8459A8CF137C1FEC0029C5B6 /* Comparator */,
+				84FA1E7E16B6B40500C75588 /* AdcRate */,
 				840B7B99094A649D00B1B135 /* Joiner */,
 				840B7B9A094A64A600B1B135 /* Splitter */,
 				840EFFCF0944B28F00049827 /* AndGate */,
@@ -12064,6 +12077,19 @@
 			path = "Source/Objects/Misc Objects/Workers";
 			sourceTree = SOURCE_ROOT;
 		};
+		84FA1E7E16B6B40500C75588 /* AdcRate */ = {
+			isa = PBXGroup;
+			children = (
+				84FA1E7F16B6B40500C75588 /* AdcRate.nib */,
+				84FA1E8016B6B40500C75588 /* AdcRate.tif */,
+				84FA1E8116B6B40500C75588 /* ORAdcRateController.h */,
+				84FA1E8216B6B40500C75588 /* ORAdcRateController.m */,
+				84FA1E8316B6B40500C75588 /* ORAdcRateModel.h */,
+				84FA1E8416B6B40500C75588 /* ORAdcRateModel.m */,
+			);
+			path = AdcRate;
+			sourceTree = "<group>";
+		};
 		84FA6383102B041800B426A6 /* SIS3350 */ = {
 			isa = PBXGroup;
 			children = (
@@ -13856,6 +13882,8 @@
 				8449A53C16AEDF5B00296104 /* ORCV1721Model.h in Headers */,
 				8449A54216AEE44300296104 /* ORCAEN1721Readout.hh in Headers */,
 				8449A55116B0781B00296104 /* ORGretinaCntView.h in Headers */,
+				84FA1E8716B6B40500C75588 /* ORAdcRateController.h in Headers */,
+				84FA1E8916B6B40500C75588 /* ORAdcRateModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14739,6 +14767,8 @@
 				8449A53616AEDF5B00296104 /* CV1721.nib in Resources */,
 				8449A53716AEDF5B00296104 /* CV1721Card.gif in Resources */,
 				8449A54A16B058B400296104 /* topBug.tif in Resources */,
+				84FA1E8516B6B40500C75588 /* AdcRate.nib in Resources */,
+				84FA1E8616B6B40500C75588 /* AdcRate.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -15728,6 +15758,8 @@
 				8449A53B16AEDF5B00296104 /* ORCV1721Decoder.m in Sources */,
 				8449A53D16AEDF5B00296104 /* ORCV1721Model.m in Sources */,
 				8449A55216B0781B00296104 /* ORGretinaCntView.m in Sources */,
+				84FA1E8816B6B40500C75588 /* ORAdcRateController.m in Sources */,
+				84FA1E8A16B6B40500C75588 /* ORAdcRateModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
