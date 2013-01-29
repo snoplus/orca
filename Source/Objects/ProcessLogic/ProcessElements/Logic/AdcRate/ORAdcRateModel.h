@@ -46,6 +46,8 @@
 - (void) setRateLimit:(float)aRateLimit;
 - (float) rate;
 - (void) adjustBufferLength;
+- (float) calculateRate;
+
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
