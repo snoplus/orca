@@ -35,7 +35,7 @@ enum {
 
 /* other definitions */
 #define	FIRST_POW		-15			// first symbol exponent
-static char	symbols[]	= "fpnµm\0kMG";		// symbols for exponents
+static char	symbols[]	= "fpnum\0kMG";		// symbols for exponents
 
 -(id) initWithFrame:(NSRect)aFrame
 {
@@ -167,7 +167,7 @@ static char	symbols[]	= "fpnµm\0kMG";		// symbols for exponents
 			} 
 			else {
                 if ((nthTick % 3) == 0) {
-					NSString* axisNumberString;
+					NSString* axisNumberString = nil;
 					int dateOffset = -20;
                     [theAxisColoredTicks moveToPoint:NSMakePoint(x,y)];
                     [theAxisColoredTicks lineToPoint:NSMakePoint(x,y-LONG_TICK)];			// draw long tick

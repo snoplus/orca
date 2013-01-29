@@ -824,7 +824,7 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 	if(!requestCache)   requestCache = [[NSMutableDictionary dictionary] retain];
 	if(!pollingLookUp)  pollingLookUp = [[NSMutableArray array] retain];
 	for(id anItem in anItemArray){
-		NSString* itemKey = [self itemKey:[anItem objectForKey:@"URL"]:[anItem objectForKey:@"Path"]];
+		NSString* itemKey = [self itemKey:[anItem objectForKey:@"URL"] path:[anItem objectForKey:@"Path"]];
 		
 		if(![pollingLookUp containsObject:itemKey]){
 			//we have never seen this item before, so add it alone with some extra info for the processing system
@@ -935,7 +935,7 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 	}
 
     NSString* itemKey = nil;
-    itemKey = [self itemKey:goodUrl:aPath];
+    itemKey = [self itemKey:goodUrl path:aPath];
 	NSMutableDictionary* topLevelDictionary = [requestCache objectForKey:itemKey];
 	if(topLevelDictionary){//channel/item already exists
 	    //search the channel
@@ -987,7 +987,7 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 
 
 
-- (NSString*) itemKey:aUrl:aPath
+- (NSString*) itemKey:aUrl path:aPath
 {
     if(aUrl==nil || aPath==nil) return nil;
 	if([aPath hasPrefix:@"/"])return [NSString stringWithFormat:@"%@%@",aUrl,aPath];
@@ -1303,7 +1303,7 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 - (void) postSensorRequest:(NSString*)aUrl path:(NSString*)aPath
 {
 //NSLog( @"postSensorRequest: \n");//TODO: debug1
-    NSString* anItemKey = [self itemKey:aUrl :aPath];
+    NSString* anItemKey = [self itemKey:aUrl path:aPath];
 //NSLog( @"postSensorRequest: item: %@\n",anItemKey);//TODO: debug1
 		if([self requestIsPending:anItemKey]){//request is still pending
             NSLog( @"You posted a request for a still pending item: %@\n",anItemKey);
@@ -1321,7 +1321,7 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 - (void) postControlRequest:(NSString*)aUrl path:(NSString*)aPath
 {
 //NSLog( @"postControlRequest: \n");//TODO: debug1
-    NSString* anItemKey = [self itemKey:aUrl :aPath];
+    NSString* anItemKey = [self itemKey:aUrl path:aPath];
 		if([self requestIsPending:anItemKey]){//request is still pending
             NSLog( @"You posted a request for a still pending item: %@\n",anItemKey);
             //TODO: XXX return;
@@ -1337,7 +1337,7 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 //Send the request,  wait for response.
 - (void) postControlSetpoint:(NSString*)aUrl path:(NSString*)aPath value:(double)aValue
 {
-    NSString* anItemKey = [self itemKey:aUrl :aPath];
+    NSString* anItemKey = [self itemKey:aUrl path:aPath];
 		if([self requestIsPending:anItemKey]){//request is still pending
             NSLog( @"You posted a request for a still pending item: %@\n",anItemKey);
             //TODO: XXX return;
@@ -1352,7 +1352,7 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 //Just send the request, don't wait for response.
 - (void) sendControlSetpoint:(NSString*)aUrl path:(NSString*)aPath value:(double)aValue
 {
-    NSString* anItemKey = [self itemKey:aUrl :aPath];
+    NSString* anItemKey = [self itemKey:aUrl path:aPath];
 		if([self requestIsPending:anItemKey]){//request is still pending
             NSLog( @"You posted a request for a still pending item: %@\n",anItemKey);
             //TODO: XXX return;
@@ -1369,7 +1369,7 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 {
 	//NSLog(@"%@::%@: requestString:%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),requestString);//TODO: debug output -tb-
 
-    NSString* anItemKey = [self itemKey:@"requestString" :requestString];
+    NSString* anItemKey = [self itemKey:@"requestString" path:requestString];
 		if([self requestIsPending:anItemKey]){//request is still pending
             NSLog( @"You posted a request for a still pending item: %@\n",anItemKey);
             //TODO: XXX return;  post anyway -tb-
@@ -1595,7 +1595,7 @@ enum {
 - (int) findChanOfSensor:(NSString*)aUrl path:(NSString*)aPath
 {
     int channelNumber=-1;
-    NSString* itemKey = [self itemKey:aUrl :aPath];
+    NSString* itemKey = [self itemKey:aUrl path:aPath];
 	NSDictionary* topLevelDictionary	= [requestCache objectForKey:itemKey];
 	if(!topLevelDictionary) return -1;
 	NSDictionary* itemDictionary		= [topLevelDictionary objectForKey:itemKey];
@@ -1607,7 +1607,7 @@ enum {
 - (int) findChanOfControl:(NSString*)aUrl path:(NSString*)aPath
 {
     int channelNumber=-1;
-    NSString* itemKey = [self itemKey:aUrl :aPath];
+    NSString* itemKey = [self itemKey:aUrl path:aPath];
 	NSDictionary* topLevelDictionary	= [requestCache objectForKey:itemKey];
 	if(!topLevelDictionary) return -1;
 	NSDictionary* itemDictionary		= [topLevelDictionary objectForKey:itemKey];
@@ -1619,7 +1619,7 @@ enum {
 - (int) findChanOfItem:(NSString*)aUrl path:(NSString*)aPath
 {
     int channelNumber=-1;
-    NSString* itemKey = [self itemKey:aUrl :aPath];
+    NSString* itemKey = [self itemKey:aUrl path:aPath];
 	NSDictionary* topLevelDictionary	= [requestCache objectForKey:itemKey];
 	if(topLevelDictionary) channelNumber = [[topLevelDictionary objectForKey:@"ChannelNumber"] intValue];
     return channelNumber;
@@ -1696,7 +1696,7 @@ enum {
 		id anItem = [topLevelDictionary objectForKey:itemKey];
         NSString* aUrl  = [anItem objectForKey:@"URL"];
         NSString* aPath = [anItem objectForKey:@"Path"];
-        return [pendingRequests objectForKey:[self itemKey:aUrl:aPath]] != nil;
+        return [pendingRequests objectForKey:[self itemKey:aUrl path:aPath]] != nil;
     }else{
         //NSLog(@"%@: you tried to use a undefined channel!\n",NSStringFromClass([self class]));
         return false;
@@ -1734,7 +1734,7 @@ enum {
 
 - (BOOL) requestIsPending:(NSString*)aUrl path:(NSString*)aPath
 {
-	return [pendingRequests objectForKey:[self itemKey:aUrl:aPath]] != nil;
+	return [pendingRequests objectForKey:[self itemKey:aUrl path:aPath]] != nil;
 }
 
 - (BOOL) requestIsPending:(NSString*)itemKey
@@ -1781,7 +1781,7 @@ enum {
 
 - (double) valueForUrl:(NSString*)aUrl path:(NSString*)aPath
 {
-	NSString* itemKey = [self itemKey:aUrl:aPath];
+	NSString* itemKey = [self itemKey:aUrl path:aPath];
     return [self valueForItemKey: itemKey];
 }
 
@@ -1907,9 +1907,9 @@ enum {
 	//
     //NSLog(@"polledItemResult: ... result is %@ \n",result);
 	for(id resultItem in result){
-	    //		NSLog(@"%@::%@   ResultItem is >>>%@<<<\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),resultItem);//DEBUG OUTPUT -tb-  
+	    //		NSLog(@"%@::%@   ResultItem is >>>%@<<<\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),resultItem);//DEBUG OUTPUT -tb-
         int chan=-1;
-		NSString* itemKey = [self itemKey:[resultItem objectForKey:@"URL"]:[resultItem objectForKey:@"Path"]];
+		NSString* itemKey = [self itemKey:[resultItem objectForKey:@"URL"] path:[resultItem objectForKey:@"Path"]];
         if(!itemKey) continue; //avoid (null) item key; this may happen if there was a alarm message in the received xml structure (contains no path/url) -tb-
         //should work without: if(!requestCache)   requestCache = [[NSMutableDictionary dictionary] retain];
 		id topLevelDictionary = [requestCache objectForKey:itemKey];
@@ -1966,7 +1966,7 @@ enum {
     //NSLog(@"handleSilentItemResult: ... aPath is %@ \n",aPath);//DEBUG OUTPUT -tb-
 	{
 		NSMutableDictionary* dictionary = [result objectAtIndex:0];
-		NSString* itemKey = [self itemKey:[dictionary objectForKey:@"URL"]:[dictionary objectForKey:@"Path"]];
+		NSString* itemKey = [self itemKey:[dictionary objectForKey:@"URL"] path:[dictionary objectForKey:@"Path"]];
 		//NSLog(@"handleSilentItemResult: ... itemKey is %@ \n",itemKey);//DEBUG OUTPUT -tb-
         //if(!itemKey) continue; //avoid (null) item key; this may happen if there was a alarm message in the received xml structure (contains no path/url) -tb-
         

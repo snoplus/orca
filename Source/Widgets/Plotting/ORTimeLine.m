@@ -37,7 +37,7 @@ enum {
 
 /* other definitions */
 #define	FIRST_POW		-15			// first symbol exponent
-static char	symbols[]	= "fpnµm\0kMG";		// symbols for exponents
+static char	symbols[]	= "fpnum\0kMG";		// symbols for exponents
 
 -(id) initWithFrame:(NSRect)aFrame
 {

@@ -643,7 +643,7 @@ NSString* plotButtonDisabled                 = @"plotButtonDisabled";
                 float xOffset=17*segSize-5.5*segSize*16+(crate-10)*segSize*17.5;
                 float yOffset=-1*iVoltage*segSize*32/kNumXL3Voltages+1.2*(segSize*32/kNumXL3Voltages)*kNumXL3Voltages-segSize*32/kNumXL3Voltages;
                 
-                NSString *voltageName;
+                NSString *voltageName = nil;
                 if (iVoltage == 0) {
                     voltageName=@"VCC";
                 }else if (iVoltage == 1){

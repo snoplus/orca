@@ -98,10 +98,6 @@ typedef enum {
 	unsigned long   lostDataId;
 	unsigned long   dataId;
 
-
-	bool			waitingForSomeChannels;
-    short			bufferWrapEnabledMask;
-
 	short			gtMask;
 	short           useTrapTriggerMask;
 	NSMutableArray* thresholds;
@@ -134,7 +130,6 @@ typedef enum {
 	unsigned long 	waveFormCount[kNumSIS3302Channels];
 
 	unsigned long location;
-	short wrapMaskForRun;
 	id theController;
 	long count;
 

@@ -35,8 +35,6 @@
         NSMutableString* buffer;
 		NSMutableArray*	motors;
         unsigned long	dataId;
-		BOOL			forceResetQueryMaskOnce;
-		BOOL			repeatQuery;
         int             motorToQueryMask;
 		NSMutableArray* cmdList;
 		BOOL			displayRaw;

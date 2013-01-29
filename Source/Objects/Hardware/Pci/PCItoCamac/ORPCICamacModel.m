@@ -946,7 +946,7 @@ static UInt32 *fVPCICamacMem;
         
         // get PCI assigned values
         NSLog(@"Getting PCI Assigned Values:\n");
-        unsigned char cdata;
+        unsigned char cdata=0;
         ret = [self getPCIBusNumber:&cdata];
         if( ret != KERN_SUCCESS ) {
             NSLog(@"*** kPCICAMACGetPCIBusNumber Cmd FAILED ***\n");

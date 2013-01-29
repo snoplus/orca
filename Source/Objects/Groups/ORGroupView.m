@@ -1174,7 +1174,7 @@
         NSNumber* aPointer;
         
         
-        if(op == @"drop"){
+        if([op isEqual: @"drop"]){
             [group unHighlightAll];
             NSMutableArray* newObjects = [NSMutableArray array];
             while(aPointer = [e nextObject]){
@@ -1213,7 +1213,7 @@
             }
             if(result)[group addObjects:newObjects];            
         }
-        else if(op == @"move"){	
+        else if([op isEqual: @"move"]){	
             while(aPointer = [e nextObject]){
                 OrcaObject* anObject = (OrcaObject*)[aPointer longValue];
                 NSPoint     anOffset = [anObject offset];

@@ -44,7 +44,6 @@
 
 		BOOL			doRange;
 		unsigned short	rangeToDo;
-		BOOL			powerWasOff;
 }
 
 #pragma mark •••Inialization

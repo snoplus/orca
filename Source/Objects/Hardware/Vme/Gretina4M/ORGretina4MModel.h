@@ -252,7 +252,6 @@ enum Gretina4MFIFOStates {
     int registerIndex;
     unsigned long spiWriteValue;
 	
-	NSString* spiConnectorName;
 	ORConnector*  spiConnector; //we won't draw this connector so we have to keep a reference to it
 
 	ORRateGroup*	waveFormRateGroup;

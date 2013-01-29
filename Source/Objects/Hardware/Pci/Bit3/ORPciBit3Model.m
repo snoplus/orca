@@ -802,7 +802,7 @@ struct {
 // get Bit3 adapter id
 - (unsigned char) getAdapterID
 {
-    unsigned char data;
+    unsigned char data=0;
     [self readCSRRegister:PCIVME_CSR_REMOTE_ADAPTER_ID_OFFSET withDataPtr:&data];
     return data;
 }
@@ -811,7 +811,7 @@ struct {
 // get Bit3 local status
 - (unsigned char) getLocalStatus
 {
-    unsigned char data;
+    unsigned char data=0;
     [self readCSRRegister:PCIVME_CSR_LOCAL_STATUS_OFFSET withDataPtr:&data];
     return data;
 }
@@ -893,7 +893,7 @@ struct {
 // reset Bit3, return YES if any error, NO otherwise
 - (void) resetContrl
 {
-    unsigned char data;
+    unsigned char data=0;
     
     // check remote power on
     [self readCSRRegister:PCIVME_CSR_LOCAL_STATUS_OFFSET withDataPtr:&data];
@@ -2154,7 +2154,7 @@ static NSString *ORPciBit3ErrorRateYAttributes  = @"Bit3 ErrorRateYAttributes";
 -(void)printConfigurationData
 {
     // read PCI configuration registers
-    PCIConfigStructUser pciData;
+    PCIConfigStructUser pciData = {{0}};
     
     unsigned maxAddress = 0x3f;
     [self getPCIConfigurationData:maxAddress withDataPtr:&pciData];

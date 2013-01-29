@@ -26,7 +26,6 @@
 @interface ORAdcRateModel : ORSimpleLogic
 {
   @private
-    float           rangeForEqual;
     NSMutableArray* buffer;
     ORAdcRateGTNub* gtOutputNub;
 	float           rate;

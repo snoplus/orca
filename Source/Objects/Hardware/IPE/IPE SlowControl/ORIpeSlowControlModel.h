@@ -436,7 +436,7 @@
 - (void) setLastRequest:(NSString*)aString;
 - (void) loadItemTree;
 - (void) addItems:(NSArray*)aSensorPathArray;
-- (NSString*) itemKey:aUrl:aPath;
+- (NSString*) itemKey:aUrl path:aPath;
 - (void) removeSet:(NSIndexSet*)aSetToRemove;
 - (unsigned) pendingRequestsCount;
 - (id) pendingRequest:(id)aKey forIndex:(int)anIndex;

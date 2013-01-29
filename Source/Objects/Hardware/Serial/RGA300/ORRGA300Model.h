@@ -121,7 +121,6 @@
 	
 		//scan parameters and data
 		BOOL	expectingRawData;
-		unsigned long expectedRawDataLength;
 		float	scanProgress;
 		int		scanNumber;
 		NSData* scanData;

@@ -74,7 +74,7 @@ NSString* kDefFont = @"Helvetica";
 #define kBigNumber						1e100	// large number for divide by zero result
 
 
-static char	symbols[]	= "fpnµm\0kMG";		// symbols for exponents
+static char	symbols[]	= "fpnum\0kMG";		// symbols for exponents
 static char	powers[]	= {-15,-12,-9,-6,-3,0,3,6,9};		        // powers for exponents
 
 //notifications

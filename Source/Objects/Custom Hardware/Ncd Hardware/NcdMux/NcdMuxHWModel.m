@@ -424,8 +424,8 @@
 - (BOOL) readDac:(id) aSupply
 {
     
-    unsigned short coarseValue;
-    unsigned short fineValue;
+    unsigned short coarseValue=0;
+    unsigned short fineValue=0;
     BOOL result = YES;
     //grab out the coarse part
     mux_result err = [self getHVADCValue:&coarseValue mux:kHVCoarseWriteAddress channel:[aSupply supply]];
@@ -452,7 +452,7 @@
     
     BOOL result = YES;
     if( ![self delayRead]){
-        unsigned short val;
+        unsigned short val=0;
         mux_result err = [self getHVADCValue:&val mux:kHVReadAddress channel:[aSupply supply]];
         if(err == kReadAdcCmd){
             [aSupply setAdcVoltage:([aSupply voltageAdcOffset]+([aSupply voltageAdcSlope]* val/255.))];
@@ -469,7 +469,7 @@
 - (BOOL) readCurrent:(id) aSupply
 {
     
-    unsigned short val;
+    unsigned short val=0;
     BOOL result = YES;
     mux_result err = [self getHVADCValue:&val mux:kHVCurrentReadAddress channel:[aSupply supply]];
     if(err == kReadAdcCmd){

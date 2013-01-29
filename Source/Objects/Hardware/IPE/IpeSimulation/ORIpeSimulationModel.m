@@ -707,7 +707,7 @@ NSString* ORIpeSimulationPendingRequestsChanged	= @"ORIpeSimulationPendingReques
 	if(!requestCache)   requestCache = [[NSMutableDictionary dictionary] retain];
 	if(!pollingLookUp)  pollingLookUp = [[NSMutableArray array] retain];
 	for(id anItem in anItemArray){
-		NSString* itemKey = [self itemKey:[anItem objectForKey:@"URL"]:[anItem objectForKey:@"Path"]];
+		NSString* itemKey = [self itemKey:[anItem objectForKey:@"URL"] path:[anItem objectForKey:@"Path"]];
 		
 		if(![pollingLookUp containsObject:itemKey]){
 			//we have never seen this item before, so add it alone with some extra info for the processing system
@@ -795,7 +795,7 @@ NSString* ORIpeSimulationPendingRequestsChanged	= @"ORIpeSimulationPendingReques
 	else return @"<Error: index out of bounds>";
 }
 
-- (NSString*) itemKey:aUrl:aPath
+- (NSString*) itemKey:aUrl path:aPath
 {
     if(aUrl==nil || aPath==nil) return nil;
 	if([aPath hasPrefix:@"/"])return [NSString stringWithFormat:@"%@%@",aUrl,aPath];
@@ -1057,7 +1057,7 @@ NSString* ORIpeSimulationPendingRequestsChanged	= @"ORIpeSimulationPendingReques
 - (void) postSensorRequest:(NSString*)aUrl path:(NSString*)aPath
 {
 //NSLog( @"postSensorRequest: \n");//TODO: debug1
-    NSString* anItemKey = [self itemKey:aUrl :aPath];
+    NSString* anItemKey = [self itemKey:aUrl path:aPath];
 //NSLog( @"postSensorRequest: item: %@\n",anItemKey);//TODO: debug1
 		if([self requestIsPending:anItemKey]){//request is still pending
             NSLog( @"You posted a request for a still pending item: %@\n",anItemKey);
@@ -1074,7 +1074,7 @@ NSString* ORIpeSimulationPendingRequestsChanged	= @"ORIpeSimulationPendingReques
 - (void) postControlRequest:(NSString*)aUrl path:(NSString*)aPath
 {
 //NSLog( @"postControlRequest: \n");//TODO: debug1
-    NSString* anItemKey = [self itemKey:aUrl :aPath];
+    NSString* anItemKey = [self itemKey:aUrl path:aPath];
 		if([self requestIsPending:anItemKey]){//request is still pending
             NSLog( @"You posted a request for a still pending item: %@\n",anItemKey);
             //TODO: XXX return;
@@ -1109,7 +1109,7 @@ NSString* ORIpeSimulationPendingRequestsChanged	= @"ORIpeSimulationPendingReques
 - (int) findChanOfSensor:(NSString*)aUrl path:(NSString*)aPath
 {
     int channelNumber=-1;
-    NSString* itemKey = [self itemKey:aUrl :aPath];
+    NSString* itemKey = [self itemKey:aUrl path:aPath];
 	NSDictionary* topLevelDictionary	= [requestCache objectForKey:itemKey];
 	NSDictionary* itemDictionary		= [topLevelDictionary objectForKey:itemKey];
 	if([itemDictionary objectForKey:@"Control"]) NSLog(@"%@: no Sensor channel found, is a Control channel!\n",NSStringFromClass([self class]));//-tb- warning output  //is a Control, not a Sensor
@@ -1120,7 +1120,7 @@ NSString* ORIpeSimulationPendingRequestsChanged	= @"ORIpeSimulationPendingReques
 - (int) findChanOfControl:(NSString*)aUrl path:(NSString*)aPath
 {
     int channelNumber=-1;
-    NSString* itemKey = [self itemKey:aUrl :aPath];
+    NSString* itemKey = [self itemKey:aUrl path:aPath];
 	NSDictionary* topLevelDictionary	= [requestCache objectForKey:itemKey];
 	NSDictionary* itemDictionary		= [topLevelDictionary objectForKey:itemKey];
 	if([itemDictionary objectForKey:@"Control"]) channelNumber = [[topLevelDictionary objectForKey:@"ChannelNumber"] intValue];
@@ -1199,7 +1199,7 @@ NSString* ORIpeSimulationPendingRequestsChanged	= @"ORIpeSimulationPendingReques
 		id anItem = [topLevelDictionary objectForKey:itemKey];
         NSString* aUrl  = [anItem objectForKey:@"URL"];
         NSString* aPath = [anItem objectForKey:@"Path"];
-        return [pendingRequests objectForKey:[self itemKey:aUrl:aPath]] != nil;
+        return [pendingRequests objectForKey:[self itemKey:aUrl path:aPath]] != nil;
     }else{
         //NSLog(@"%@: you tried to use a undefined channel!\n",NSStringFromClass([self class]));
         return false;
@@ -1236,7 +1236,7 @@ NSString* ORIpeSimulationPendingRequestsChanged	= @"ORIpeSimulationPendingReques
 
 - (BOOL) requestIsPending:(NSString*)aUrl path:(NSString*)aPath
 {
-	return [pendingRequests objectForKey:[self itemKey:aUrl:aPath]] != nil;
+	return [pendingRequests objectForKey:[self itemKey:aUrl path:aPath]] != nil;
 }
 
 - (BOOL) requestIsPending:(NSString*)itemKey
@@ -1275,7 +1275,7 @@ NSString* ORIpeSimulationPendingRequestsChanged	= @"ORIpeSimulationPendingReques
 
 - (double) valueForUrl:(NSString*)aUrl path:(NSString*)aPath
 {
-	NSString* itemKey = [self itemKey:aUrl:aPath];
+	NSString* itemKey = [self itemKey:aUrl path:aPath];
     return [self valueForItemKey: itemKey];
 }
 //-------------end of script methods---------------------------------
@@ -1400,7 +1400,7 @@ NSString* ORIpeSimulationPendingRequestsChanged	= @"ORIpeSimulationPendingReques
     //NSLog(@"polledItemResult: ... result is %@ \n",result);
 	for(id resultItem in result){
         int chan=-1;
-		NSString* itemKey = [self itemKey:[resultItem objectForKey:@"URL"]:[resultItem objectForKey:@"Path"]];
+		NSString* itemKey = [self itemKey:[resultItem objectForKey:@"URL"] path:[resultItem objectForKey:@"Path"]];
         if(!itemKey) continue; //avoid (null) item key; this may happen if there was a alarm message in the received xml structure (contains no path/url) -tb-
         //should work without: if(!requestCache)   requestCache = [[NSMutableDictionary dictionary] retain];
 		id topLevelDictionary = [requestCache objectForKey:itemKey];
