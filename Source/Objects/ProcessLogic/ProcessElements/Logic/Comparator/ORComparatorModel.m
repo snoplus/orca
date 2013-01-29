@@ -173,7 +173,7 @@ NSString* ORComparatorALTBConnection = @"ORComparatorALTBConnection";
 	[guardian eval];
 	BOOL abLT = NO;
 	if(![guardian abEqual]){
-		if([guardian abDifference]<0)abLT = YES;
+		if([guardian abDifference]>0)abLT = YES;
 	}
 	return [ORProcessResult processState:abLT value:abLT];
 }
@@ -183,7 +183,7 @@ NSString* ORComparatorALTBConnection = @"ORComparatorALTBConnection";
 	BOOL abLT = NO;
 	float diff = [guardian abDifference];
 	if(![guardian abEqual]){
-		if(diff<0)abLT = YES;
+		if(diff>0)abLT = YES;
 	}
 	return abLT;
 }
@@ -196,7 +196,7 @@ NSString* ORComparatorALTBConnection = @"ORComparatorALTBConnection";
 	[guardian eval];
 	BOOL abGT = NO;
 	if(![guardian abEqual]){
-		if([guardian abDifference]>0)abGT = YES;
+		if([guardian abDifference]<0)abGT = YES;
 	}
 	return [ORProcessResult processState:abGT value:abGT];
 }
@@ -205,7 +205,7 @@ NSString* ORComparatorALTBConnection = @"ORComparatorALTBConnection";
 	BOOL abGT = NO;
 	float diff = [guardian abDifference];
 	if(![guardian abEqual]){
-		if(diff>0)abGT = YES;
+		if(diff<0)abGT = YES;
 	}
 	return abGT;
 }

@@ -2384,6 +2384,12 @@
 		84BF43D3118793FA00F55216 /* ORCaen1785Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84BF43CB118793FA00F55216 /* ORCaen1785Model.m */; };
 		84BF445F1187ACEE00F55216 /* ORCAEN1785Readout.hh in Headers */ = {isa = PBXBuildFile; fileRef = 84BF445D1187ACEE00F55216 /* ORCAEN1785Readout.hh */; };
 		84BF7EC514FA76BF00B6D3A3 /* LabJackUE9Mux80.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84BF7EC414FA76BF00B6D3A3 /* LabJackUE9Mux80.tif */; };
+		84C00CBB16B82350003D1504 /* fixedValue.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84C00CB216B82350003D1504 /* fixedValue.tif */; };
+		84C00CBF16B82350003D1504 /* FixedValue.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84C00CB616B82350003D1504 /* FixedValue.nib */; };
+		84C00CC016B82350003D1504 /* ORFixedValueController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84C00CB716B82350003D1504 /* ORFixedValueController.h */; };
+		84C00CC116B82350003D1504 /* ORFixedValueController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C00CB816B82350003D1504 /* ORFixedValueController.m */; };
+		84C00CC216B82350003D1504 /* ORFixedValueModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84C00CB916B82350003D1504 /* ORFixedValueModel.h */; };
+		84C00CC316B82350003D1504 /* ORFixedValueModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C00CBA16B82350003D1504 /* ORFixedValueModel.m */; };
 		84C12E780993E3FA006F2901 /* ORProcessHistoryController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84C12E720993E3FA006F2901 /* ORProcessHistoryController.h */; };
 		84C12E790993E3FA006F2901 /* ORProcessHistoryController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C12E730993E3FA006F2901 /* ORProcessHistoryController.m */; };
 		84C12E7A0993E3FA006F2901 /* ORProcessHistoryModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84C12E740993E3FA006F2901 /* ORProcessHistoryModel.h */; };
@@ -5387,6 +5393,12 @@
 		84BF445C1187ACEE00F55216 /* ORCAEN1785Readout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ORCAEN1785Readout.cc; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAEN1785Readout.cc; sourceTree = SOURCE_ROOT; };
 		84BF445D1187ACEE00F55216 /* ORCAEN1785Readout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ORCAEN1785Readout.hh; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAEN1785Readout.hh; sourceTree = SOURCE_ROOT; };
 		84BF7EC414FA76BF00B6D3A3 /* LabJackUE9Mux80.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = LabJackUE9Mux80.tif; sourceTree = "<group>"; };
+		84C00CB216B82350003D1504 /* fixedValue.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = fixedValue.tif; sourceTree = "<group>"; };
+		84C00CB616B82350003D1504 /* FixedValue.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = FixedValue.nib; sourceTree = "<group>"; };
+		84C00CB716B82350003D1504 /* ORFixedValueController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORFixedValueController.h; sourceTree = "<group>"; };
+		84C00CB816B82350003D1504 /* ORFixedValueController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORFixedValueController.m; sourceTree = "<group>"; };
+		84C00CB916B82350003D1504 /* ORFixedValueModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORFixedValueModel.h; sourceTree = "<group>"; };
+		84C00CBA16B82350003D1504 /* ORFixedValueModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORFixedValueModel.m; sourceTree = "<group>"; };
 		84C12E720993E3FA006F2901 /* ORProcessHistoryController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORProcessHistoryController.h; path = Source/Objects/ProcessLogic/ProcessElements/Outputs/ProcessHistory/ORProcessHistoryController.h; sourceTree = SOURCE_ROOT; };
 		84C12E730993E3FA006F2901 /* ORProcessHistoryController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORProcessHistoryController.m; path = Source/Objects/ProcessLogic/ProcessElements/Outputs/ProcessHistory/ORProcessHistoryController.m; sourceTree = SOURCE_ROOT; };
 		84C12E740993E3FA006F2901 /* ORProcessHistoryModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORProcessHistoryModel.h; path = Source/Objects/ProcessLogic/ProcessElements/Outputs/ProcessHistory/ORProcessHistoryModel.h; sourceTree = SOURCE_ROOT; };
@@ -7546,6 +7558,7 @@
 		8421606C094F7EDB002E68B7 /* analog */ = {
 			isa = PBXGroup;
 			children = (
+				84C00CB116B82350003D1504 /* FixedValue */,
 				843800280AB23EC20069C0BA /* rangeTimer */,
 				8421606D094F7EDB002E68B7 /* adc */,
 				8415EB54152DF0970092C975 /* AdcProcessor */,
@@ -11032,6 +11045,19 @@
 			path = Source/Objects/Hardware/Vme/CAEN/CV1785;
 			sourceTree = SOURCE_ROOT;
 		};
+		84C00CB116B82350003D1504 /* FixedValue */ = {
+			isa = PBXGroup;
+			children = (
+				84C00CB216B82350003D1504 /* fixedValue.tif */,
+				84C00CB616B82350003D1504 /* FixedValue.nib */,
+				84C00CB716B82350003D1504 /* ORFixedValueController.h */,
+				84C00CB816B82350003D1504 /* ORFixedValueController.m */,
+				84C00CB916B82350003D1504 /* ORFixedValueModel.h */,
+				84C00CBA16B82350003D1504 /* ORFixedValueModel.m */,
+			);
+			path = FixedValue;
+			sourceTree = "<group>";
+		};
 		84C12E710993E3FA006F2901 /* ProcessHistory */ = {
 			isa = PBXGroup;
 			children = (
@@ -13884,6 +13910,8 @@
 				8449A55116B0781B00296104 /* ORGretinaCntView.h in Headers */,
 				84DA76C216B803E00045F22A /* ORAdcRateController.h in Headers */,
 				84DA76C416B803E00045F22A /* ORAdcRateModel.h in Headers */,
+				84C00CC016B82350003D1504 /* ORFixedValueController.h in Headers */,
+				84C00CC216B82350003D1504 /* ORFixedValueModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14769,6 +14797,8 @@
 				8449A54A16B058B400296104 /* topBug.tif in Resources */,
 				84DA76C016B803E00045F22A /* AdcRate.nib in Resources */,
 				84DA76C116B803E00045F22A /* AdcRate.tif in Resources */,
+				84C00CBB16B82350003D1504 /* fixedValue.tif in Resources */,
+				84C00CBF16B82350003D1504 /* FixedValue.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -15760,6 +15790,8 @@
 				8449A55216B0781B00296104 /* ORGretinaCntView.m in Sources */,
 				84DA76C316B803E00045F22A /* ORAdcRateController.m in Sources */,
 				84DA76C516B803E00045F22A /* ORAdcRateModel.m in Sources */,
+				84C00CC116B82350003D1504 /* ORFixedValueController.m in Sources */,
+				84C00CC316B82350003D1504 /* ORFixedValueModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
