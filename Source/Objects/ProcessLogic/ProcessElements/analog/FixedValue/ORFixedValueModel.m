@@ -79,9 +79,9 @@ NSString* ORFixedValueLock              = @"ORFixedValueLock";
 {
 	if(!alreadyEvaluated){
 		alreadyEvaluated = YES;
-		[self setState: YES];
-		[self setEvaluatedState: YES];
         hwValue = [fixedValue doubleValue];
+		[self setState: ((int)hwValue)==1];
+		[self setEvaluatedState: ((int)hwValue)==1];
 	}
 	return [ORProcessResult processState:evaluatedState value:hwValue];
 }
