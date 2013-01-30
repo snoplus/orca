@@ -23,15 +23,20 @@
 	IBOutlet NSTextField*  preReField;
 	IBOutlet NSTextField*  postReField;
 	IBOutlet NSTextField*  flatTopField;
+    BOOL            optionKeyDown;
     NSRect          b;
 	NSImage*        bugImage;
 	BOOL            movingPreRisingEdge;
+	BOOL            movingRisingEdge;
 	BOOL            movingPostRisingEdge;
-	BOOL            movingFlatTop;
 	NSGradient*     plotGradient;
-    float           flatTopBugX;
-    float           postReBugX;
-    float           preReBugX;
+    
+    float           postRisingEdgeBugX;
+    float           risingEdgeBugX;
+    float           preRisingEdgeBugX;
+    
+    float           preXDelta;
+    float           postXDelta;
     int             baseline;
 }
 

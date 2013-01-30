@@ -64,28 +64,28 @@
         [NSBezierPath setDefaultLineWidth:.5];
 
         //draw the flat top counter
-        [bugImage drawAtPoint:NSMakePoint( flatTopBugX-kBugPad/2.,b.size.height) fromRect:[bugImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
-        [NSBezierPath strokeLineFromPoint:NSMakePoint(flatTopBugX,0) toPoint:NSMakePoint(flatTopBugX,b.size.height)];
+        [bugImage drawAtPoint:NSMakePoint( postRisingEdgeBugX-kBugPad/2.,b.size.height) fromRect:[bugImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+        [NSBezierPath strokeLineFromPoint:NSMakePoint(postRisingEdgeBugX,0) toPoint:NSMakePoint(postRisingEdgeBugX,b.size.height)];
         
         //draw the post rising edge counter
-        [bugImage drawAtPoint:NSMakePoint( postReBugX-kBugPad/2.,b.size.height) fromRect:[bugImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
-        [NSBezierPath strokeLineFromPoint:NSMakePoint(postReBugX,0) toPoint:NSMakePoint(postReBugX,b.size.height)];
+        [bugImage drawAtPoint:NSMakePoint( risingEdgeBugX-kBugPad/2.,b.size.height) fromRect:[bugImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+        [NSBezierPath strokeLineFromPoint:NSMakePoint(risingEdgeBugX,0) toPoint:NSMakePoint(risingEdgeBugX,b.size.height)];
      
         //draw the pre rising edge counter
-        [bugImage drawAtPoint:NSMakePoint( preReBugX-kBugPad/2.,b.size.height) fromRect:[bugImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
-        [NSBezierPath strokeLineFromPoint:NSMakePoint(preReBugX,0) toPoint:NSMakePoint(preReBugX,b.size.height)];
+        [bugImage drawAtPoint:NSMakePoint( preRisingEdgeBugX-kBugPad/2.,b.size.height) fromRect:[bugImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+        [NSBezierPath strokeLineFromPoint:NSMakePoint(preRisingEdgeBugX,0) toPoint:NSMakePoint(preRisingEdgeBugX,b.size.height)];
 
         [NSBezierPath setDefaultLineWidth:2.];
         [[NSColor redColor] set];
-        [NSBezierPath strokeLineFromPoint:NSMakePoint(kBugPad/2., 10) toPoint:NSMakePoint(preReBugX, 10)];
+        [NSBezierPath strokeLineFromPoint:NSMakePoint(kBugPad/2., 10) toPoint:NSMakePoint(preRisingEdgeBugX, 10)];
      
         [[NSColor blueColor] set];
-        [NSBezierPath strokeLineFromPoint:NSMakePoint(preReBugX, 10) toPoint:NSMakePoint(postReBugX, 10)];
-        [NSBezierPath strokeLineFromPoint:NSMakePoint(postReBugX, 10) toPoint:NSMakePoint(postReBugX, 50)];
-        [NSBezierPath strokeLineFromPoint:NSMakePoint(postReBugX, 50) toPoint:NSMakePoint(flatTopBugX, 50)];
+        [NSBezierPath strokeLineFromPoint:NSMakePoint(preRisingEdgeBugX, 10) toPoint:NSMakePoint(risingEdgeBugX, 10)];
+        [NSBezierPath strokeLineFromPoint:NSMakePoint(risingEdgeBugX, 10) toPoint:NSMakePoint(risingEdgeBugX, 50)];
+        [NSBezierPath strokeLineFromPoint:NSMakePoint(risingEdgeBugX, 50) toPoint:NSMakePoint(postRisingEdgeBugX, 50)];
 
         [[NSColor redColor] set];
-        [NSBezierPath strokeLineFromPoint:NSMakePoint(flatTopBugX, 50) toPoint:NSMakePoint(b.size.width+kBugPad/2, 50)];
+        [NSBezierPath strokeLineFromPoint:NSMakePoint(postRisingEdgeBugX, 50) toPoint:NSMakePoint(b.size.width+kBugPad/2, 50)];
 
         [NSBezierPath setDefaultLineWidth:1.];
         [[NSColor blackColor] set];
@@ -100,25 +100,26 @@
         NSDictionary* theAttributes = [NSDictionary dictionaryWithObjectsAndKeys:theFont,NSFontAttributeName,reColor,NSForegroundColorAttributeName,nil];
         NSAttributedString* s = [[NSAttributedString alloc] initWithString:ps attributes:theAttributes];
         NSSize stringSize = [s size];
-        float x = preReBugX + (flatTopBugX-preReBugX)/2. - stringSize.width/2.;
-        [s drawAtPoint:NSMakePoint(x,b.size.height-stringSize.height)];
+        float x = preRisingEdgeBugX + (postRisingEdgeBugX-preRisingEdgeBugX)/2. - stringSize.width/2.;
+        float y = b.size.height-stringSize.height-5;
+        [s drawAtPoint:NSMakePoint(x,y)];
         [s release];
-
+        
         NSString* bls = [NSString stringWithFormat:@"%d",baseline];
         theAttributes = [NSDictionary dictionaryWithObjectsAndKeys:theFont,NSFontAttributeName,[NSColor blackColor],NSForegroundColorAttributeName,nil];
         s = [[NSAttributedString alloc] initWithString:bls attributes:theAttributes];
         stringSize = [s size];
-        x = MAX(kBugPad/2.,kBugPad/2. + (preReBugX-kBugPad/2.)/2. - stringSize.width/2.);
-        [s drawAtPoint:NSMakePoint(x,b.size.height-stringSize.height)];
+        x = MAX(kBugPad/2.,kBugPad/2. + (preRisingEdgeBugX-kBugPad/2.)/2. - stringSize.width/2.);
+        [s drawAtPoint:NSMakePoint(x,b.size.height-stringSize.height-5)];
         [s release];
 
         NSString* fts = [NSString stringWithFormat:@"%d",[flatTopField intValue]];
         theAttributes = [NSDictionary dictionaryWithObjectsAndKeys:theFont,NSFontAttributeName,[NSColor blackColor],NSForegroundColorAttributeName,nil];
         s = [[NSAttributedString alloc] initWithString:fts attributes:theAttributes];
         stringSize = [s size];
-        x = flatTopBugX + (b.size.width-flatTopBugX)/2. - stringSize.width/2.;
+        x = postRisingEdgeBugX + (b.size.width-postRisingEdgeBugX)/2. - stringSize.width/2.;
         if(x + stringSize.width/2 > b.size.width)x = b.size.width-stringSize.width;
-        [s drawAtPoint:NSMakePoint(x,b.size.height-stringSize.height)];
+        [s drawAtPoint:NSMakePoint(x,b.size.height-stringSize.height-5)];
         [s release];
 
     }
@@ -143,9 +144,9 @@
             int postrecnt   = [[dataSource model] postrecnt:i];
             int prerecnt    = [[dataSource model] prerecnt:i];
                         
-            flatTopBugX = b.origin.x + (2048. - ftCnt)* b.size.width/2048.;
-            postReBugX  = flatTopBugX -  postrecnt* b.size.width/2048.;
-            preReBugX = postReBugX -  prerecnt* b.size.width/2048.;
+            postRisingEdgeBugX  = b.origin.x + (2048. - ftCnt)* b.size.width/2048.;
+            risingEdgeBugX      = postRisingEdgeBugX -  postrecnt* b.size.width/2048.;
+            preRisingEdgeBugX   = risingEdgeBugX -  prerecnt* b.size.width/2048.;
             break;
         }
     }
@@ -170,24 +171,24 @@
     float minX = b.origin.x;
     float maxX = b.size.width + kBugPad/2.;
     
-    if(movingFlatTop){
-        if(flatTopBugX < minX)      flatTopBugX = minX;
-        else if(flatTopBugX > maxX) flatTopBugX = maxX;
+    if(movingPostRisingEdge){
+        if(postRisingEdgeBugX < minX)      postRisingEdgeBugX = minX;
+        else if(postRisingEdgeBugX > maxX) postRisingEdgeBugX = maxX;
 
-        if(flatTopBugX < postReBugX+1)      flatTopBugX = postReBugX+1;
+        if(postRisingEdgeBugX < risingEdgeBugX+1)      postRisingEdgeBugX = risingEdgeBugX+1;
     }
-    else if(movingPostRisingEdge){
-        if(postReBugX < minX)      postReBugX = minX;
-        else if(postReBugX > maxX) postReBugX = maxX;
+    else if(movingRisingEdge){
+        if(risingEdgeBugX < minX)      risingEdgeBugX = minX;
+        else if(risingEdgeBugX > maxX) risingEdgeBugX = maxX;
 
-        if(postReBugX < preReBugX+1)postReBugX = preReBugX+1;
-        else if(postReBugX > flatTopBugX-1)postReBugX = flatTopBugX-1;
+        if(risingEdgeBugX < preRisingEdgeBugX+1)risingEdgeBugX = preRisingEdgeBugX+1;
+        else if(risingEdgeBugX > postRisingEdgeBugX-1)risingEdgeBugX = postRisingEdgeBugX-1;
     }
     else if(movingPreRisingEdge){
-        if(preReBugX < minX)      preReBugX = minX;
-        else if(preReBugX > maxX) preReBugX = maxX;
+        if(preRisingEdgeBugX < minX)      preRisingEdgeBugX = minX;
+        else if(preRisingEdgeBugX > maxX) preRisingEdgeBugX = maxX;
 
-        if(preReBugX > postReBugX-1)preReBugX = postReBugX-1;
+        if(preRisingEdgeBugX > risingEdgeBugX-1)preRisingEdgeBugX = risingEdgeBugX-1;
     }
 }
 
@@ -205,13 +206,13 @@
 {
 	if(!finalValues)[[[NSApp delegate] undoManager] disableUndoRegistration];
     
-    int ftCnt = 2048 - (flatTopBugX-b.origin.x)*2048/b.size.width;
+    int ftCnt = 2048 - (postRisingEdgeBugX-b.origin.x)*2048/b.size.width;
     [[dataSource model] setFtCnt:channel withValue:ftCnt];
     
-    int postCnt = ((flatTopBugX - postReBugX)-b.origin.x)*2048/b.size.width;
+    int postCnt = ((postRisingEdgeBugX - risingEdgeBugX)-b.origin.x)*2048/b.size.width;
     [[dataSource model] setPostrecnt:channel withValue:postCnt];
  
-    int preCnt = ((postReBugX - preReBugX)-b.origin.x)*2048/b.size.width;
+    int preCnt = ((risingEdgeBugX - preRisingEdgeBugX)-b.origin.x)*2048/b.size.width;
     [[dataSource model] setPrerecnt:channel withValue:preCnt];
 
     
@@ -221,94 +222,145 @@
 #pragma mark ¥¥¥Archival
 - (void) mouseDown:(NSEvent*)event
 {
+    optionKeyDown = ([event modifierFlags] & NSAlternateKeyMask)!=0;
+
 	[[self undoManager] disableUndoRegistration];
     NSPoint localPoint = [self convertPoint:[event locationInWindow] fromView:nil];
+    if(optionKeyDown){
+        postXDelta   = fabs(postRisingEdgeBugX - risingEdgeBugX);
+        preXDelta    = fabs(risingEdgeBugX - preRisingEdgeBugX);
+    }
+    movingPreRisingEdge		= NO;
+    movingRisingEdge        = NO;
+    movingPostRisingEdge    = NO;
 
-	movingPreRisingEdge		= NO;
-	movingPostRisingEdge	= NO;
-	movingFlatTop           = NO;
-
-    
-    NSRect r1 = NSMakeRect(preReBugX-kBugPad/2.,b.size.height,kBugPad,kBugPad);
-    NSRect r2 = NSMakeRect(preReBugX-2,0,4,b.size.height);
-    if(NSPointInRect(localPoint,r1) || NSPointInRect(localPoint,r2)){
+    if(NSPointInRect(localPoint,NSMakeRect(preRisingEdgeBugX-kBugPad/2.,b.size.height,kBugPad,kBugPad)) || NSPointInRect(localPoint,NSMakeRect(preRisingEdgeBugX-2,0,4,b.size.height))){
         movingPreRisingEdge = YES;
-        [[NSCursor closedHandCursor] set];
-        [self setNeedsDisplay:YES];
-        return;
     }
 
-    r1 = NSMakeRect(flatTopBugX-kBugPad/2.,b.size.height,kBugPad,kBugPad);
-    r2 = NSMakeRect(flatTopBugX-2,0,4,b.size.height);
-    if(NSPointInRect(localPoint,r1) || NSPointInRect(localPoint,r2)){
-        movingFlatTop = YES;
-        [[NSCursor closedHandCursor] set];
-        [self setNeedsDisplay:YES];
-        return;
+    else if(NSPointInRect(localPoint,NSMakeRect(postRisingEdgeBugX-kBugPad/2.,b.size.height,kBugPad,kBugPad)) || NSPointInRect(localPoint,NSMakeRect(postRisingEdgeBugX-2,0,4,b.size.height))){
+        movingPostRisingEdge = YES;
     }
     
-    r1 = NSMakeRect(postReBugX-kBugPad/2.,b.size.height,kBugPad,kBugPad);
-    r2 = NSMakeRect(postReBugX-2,0,4,b.size.height);
-    if(NSPointInRect(localPoint,r1) || NSPointInRect(localPoint,r2)){
-        movingPostRisingEdge = YES;
+    else if(NSPointInRect(localPoint,NSMakeRect(risingEdgeBugX-kBugPad/2.,b.size.height,kBugPad,kBugPad)) || NSPointInRect(localPoint,NSMakeRect(risingEdgeBugX-2,0,4,b.size.height))){
+        movingRisingEdge = YES;
+    }
+    
+     
+    if(movingPostRisingEdge || movingRisingEdge || movingPreRisingEdge){
         [[NSCursor closedHandCursor] set];
         [self setNeedsDisplay:YES];
-        return;
     }
  }
 
 - (void) mouseDragged:(NSEvent*)event
 {
 	NSPoint localPoint = [self convertPoint:[event locationInWindow] fromView:nil];
-	if(movingFlatTop){
-        flatTopBugX = localPoint.x;
+    if(optionKeyDown){
+        
+        float newPreRisingEdgeBugX;
+        float newRisingEdgeBugX;
+        float newPostRisingEdgeBugX;
+        
+        if(movingPreRisingEdge){
+            newPreRisingEdgeBugX   = localPoint.x;
+            newRisingEdgeBugX      = newPreRisingEdgeBugX + preXDelta;
+            newPostRisingEdgeBugX  = newPreRisingEdgeBugX +  postXDelta;
+        }
+        else if(movingRisingEdge){
+            newRisingEdgeBugX      = localPoint.x;
+            newPreRisingEdgeBugX   = newRisingEdgeBugX - preXDelta;
+            newPostRisingEdgeBugX  = newRisingEdgeBugX +  postXDelta;
+        }
+        else if(movingPostRisingEdge){
+            newPostRisingEdgeBugX  = localPoint.x;
+            newRisingEdgeBugX      = newPostRisingEdgeBugX - postXDelta;
+            newPreRisingEdgeBugX   = newRisingEdgeBugX - preXDelta;
+        }
+            
+        if(movingPreRisingEdge || movingRisingEdge || movingPostRisingEdge){
+            float minX = b.origin.x;
+            float maxX = b.size.width + kBugPad/2.;
+            if(newPreRisingEdgeBugX>minX && newPostRisingEdgeBugX<maxX){
+                preRisingEdgeBugX   = newPreRisingEdgeBugX;
+                risingEdgeBugX      = newRisingEdgeBugX;
+                postRisingEdgeBugX  = newPostRisingEdgeBugX;
+            }
+        }
+    }
+    else {
+        if(movingPostRisingEdge)        postRisingEdgeBugX  = localPoint.x;
+        else if(movingRisingEdge)       risingEdgeBugX      = localPoint.x;
+        else if(movingPreRisingEdge)    preRisingEdgeBugX   = localPoint.x;
+    }
+    
+    if(movingPostRisingEdge || movingRisingEdge || movingPreRisingEdge){
         [self applyConstrainsts];
         [self setValues:NO];
-	}
- 	else if(movingPostRisingEdge){
-        postReBugX = localPoint.x;
-        [self applyConstrainsts];
-        [self setValues:NO];
-	}
-	else if(movingPreRisingEdge){
-        preReBugX = localPoint.x;
-        [self applyConstrainsts];
-        [self setValues:NO];
-	}
-    [self loadLocalFields];
-	[self setNeedsDisplay:YES];
+        [self loadLocalFields];
+        [self setNeedsDisplay:YES];
+    }
 }
 
 - (void) mouseUp:(NSEvent*)event
 {
 	[[self undoManager] enableUndoRegistration];
-	
+    
 	NSPoint localPoint = [self convertPoint:[event locationInWindow] fromView:nil];
+    if(optionKeyDown){
+        
+        float newPreRisingEdgeBugX;
+        float newRisingEdgeBugX;
+        float newPostRisingEdgeBugX;
+        
+        if(movingPreRisingEdge){
+            newPreRisingEdgeBugX   = localPoint.x;
+            newRisingEdgeBugX      = newPreRisingEdgeBugX + preXDelta;
+            newPostRisingEdgeBugX  = newPreRisingEdgeBugX +  postXDelta;
+        }
+        else if(movingRisingEdge){
+            newRisingEdgeBugX      = localPoint.x;
+            newPreRisingEdgeBugX   = newRisingEdgeBugX - preXDelta;
+            newPostRisingEdgeBugX  = newRisingEdgeBugX +  postXDelta;
+        }
+        else if(movingPostRisingEdge){
+            newPostRisingEdgeBugX  = localPoint.x;
+            newRisingEdgeBugX      = newPostRisingEdgeBugX - postXDelta;
+            newPreRisingEdgeBugX   = newRisingEdgeBugX - preXDelta;
+        }
+        
+        if(movingPreRisingEdge || movingRisingEdge || movingPostRisingEdge){
+            float minX = b.origin.x;
+            float maxX = b.size.width + kBugPad/2.;
+            
+            if(newPreRisingEdgeBugX>minX && newPostRisingEdgeBugX<maxX){
+                preRisingEdgeBugX   = newPreRisingEdgeBugX;
+                risingEdgeBugX      = newRisingEdgeBugX;
+                postRisingEdgeBugX  = newPostRisingEdgeBugX;
+            }
+        }
+    }
 
- 	if(movingFlatTop){
-        flatTopBugX = localPoint.x;
-        [self applyConstrainsts];
-        [self setValues:YES];
-	}
- 	else if(movingPostRisingEdge){
-        postReBugX = localPoint.x;
-        [self applyConstrainsts];
-        [self setValues:YES];
-	}
-    else if(movingPreRisingEdge){
-        preReBugX = localPoint.x;
-        [self applyConstrainsts];
-        [self setValues:YES];
-	}
-	[self setNeedsDisplay:YES];
-    [self loadLocalFields];
-	
-	[NSCursor pop];
+    else {
 
+        if(movingPostRisingEdge)        postRisingEdgeBugX = localPoint.x;
+        else if(movingRisingEdge)       risingEdgeBugX = localPoint.x;
+        else if(movingPreRisingEdge)    preRisingEdgeBugX = localPoint.x;
+        
+        if(movingPostRisingEdge || movingRisingEdge || movingPreRisingEdge){
+            [self applyConstrainsts];
+            [self setValues:YES];
+            [self setNeedsDisplay:YES];
+            [self loadLocalFields];
+            [NSCursor pop];
+        }
+	}
+
+	optionKeyDown           = NO;
 	movingPreRisingEdge     = NO;
+	movingRisingEdge        = NO;
 	movingPostRisingEdge    = NO;
-	movingFlatTop           = NO;
-	[self setNeedsDisplay:YES];
+    
     [[self window] resetCursorRects];
 }
 
@@ -319,18 +371,18 @@
 
 - (void) resetCursorRects
 {    
-    NSRect r1 = NSMakeRect(flatTopBugX-kBugPad/2.,b.size.height,kBugPad,kBugPad);
-    NSRect r2 = NSMakeRect(flatTopBugX-2,0,4,b.size.height);
+    NSRect r1 = NSMakeRect(postRisingEdgeBugX-kBugPad/2.,b.size.height,kBugPad,kBugPad);
+    NSRect r2 = NSMakeRect(postRisingEdgeBugX-2,0,4,b.size.height);
     [self addCursorRect:r1 cursor:[NSCursor openHandCursor]];
     [self addCursorRect:r2 cursor:[NSCursor openHandCursor]];
 
-    r1 = NSMakeRect(postReBugX-kBugPad/2.,b.size.height,kBugPad,kBugPad);
-    r2 = NSMakeRect(postReBugX-2,0,4,b.size.height);
+    r1 = NSMakeRect(risingEdgeBugX-kBugPad/2.,b.size.height,kBugPad,kBugPad);
+    r2 = NSMakeRect(risingEdgeBugX-2,0,4,b.size.height);
     [self addCursorRect:r1 cursor:[NSCursor openHandCursor]];
     [self addCursorRect:r2 cursor:[NSCursor openHandCursor]];
 
-    r1 = NSMakeRect(preReBugX-kBugPad/2.,b.size.height,kBugPad,kBugPad);
-    r2 = NSMakeRect(preReBugX-2,0,4,b.size.height);
+    r1 = NSMakeRect(preRisingEdgeBugX-kBugPad/2.,b.size.height,kBugPad,kBugPad);
+    r2 = NSMakeRect(preRisingEdgeBugX-2,0,4,b.size.height);
     [self addCursorRect:r1 cursor:[NSCursor openHandCursor]];
     [self addCursorRect:r2 cursor:[NSCursor openHandCursor]];
 }
@@ -354,11 +406,11 @@
         for(i=0;i<kNumGretina4MChannels;i++){
             if([[dataSource model]easySelected:i])[[dataSource model] setFtCnt:i withValue:ftCnt];
         }
-        movingFlatTop  = YES;
+        movingPostRisingEdge  = YES;
         [self applyConstrainsts];
         [self loadLocalFields];
         [self initBugs];
-        movingFlatTop  = NO;
+        movingPostRisingEdge  = NO;
         [self setNeedsDisplay:YES];
     }
 }
@@ -372,11 +424,11 @@
         for(i=0;i<kNumGretina4MChannels;i++){
             if([[dataSource model]easySelected:i])[[dataSource model] setPostrecnt:i withValue:postrecnt];
         }
-        movingPostRisingEdge  = YES;
+        movingRisingEdge  = YES;
         [self applyConstrainsts];
         [self loadLocalFields];
         [self initBugs];
-        movingPostRisingEdge  = YES;
+        movingRisingEdge  = YES;
         [self setNeedsDisplay:YES];
     }
 }
