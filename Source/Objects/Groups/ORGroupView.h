@@ -62,6 +62,7 @@
 - (void) clearSelections:(BOOL)shiftKeyDown;
 - (void) checkSelectionRect:(NSRect)aRect inView:(NSView*)aView;
 - (void) checkRedrawRect:(NSRect)aRect inView:(NSView*)aView;
+- (void) flagsChanged:(NSEvent *)theEvent;
 - (void) keyDown:(NSEvent *)event;
 - (void) moveSelectedObjectsUp:(NSEvent*)event;
 - (void) moveSelectedObjectsDown:(NSEvent*)event;

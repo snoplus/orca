@@ -137,6 +137,7 @@ extern NSString* ORObjArrayPtrPBType;
 - (ORConnector*) requestsConnection: (NSPoint)aPoint;
 - (BOOL) rectIntersectsIcon:(NSRect)aRect;
 - (BOOL) validateMenuItem:(NSMenuItem *)anItem;
+- (void) flagsChanged:(NSEvent *)theEvent;
 
 #pragma mark ¥¥¥Archival
 - (id)	initWithCoder:(NSCoder*)aCoder;

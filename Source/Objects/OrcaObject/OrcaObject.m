@@ -549,10 +549,16 @@ NSString* ORMiscAttributeKey		= @"ORMiscAttributeKey";
     [self showMainInterface];
 }
 
+- (void) flagsChanged:(NSEvent *)theEvent
+{
+  	//subclasses can use as needed.
+}
+
 - (void) doCmdClick:(id)sender
 {
 	//subclasses can use as needed.
 }
+
 - (void) doCmdDoubleClick:(id)sender
 {
 	//subclasses can use as needed.

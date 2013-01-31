@@ -993,6 +993,13 @@
     draggedNodes = nil;
 }
 
+- (void) flagsChanged:(NSEvent *)theEvent 
+{
+    for(id anObj in [group orcaObjects]){
+        [anObj flagsChanged:theEvent];
+    }
+}
+
 - (void)keyDown:(NSEvent *)event
 {
     int keyCode = [event keyCode];

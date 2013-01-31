@@ -68,6 +68,24 @@ NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
 	[self setUpImage];
 }
 
+- (void) flagsChanged:(NSEvent *)theEvent
+{
+    enableIconControls  = ([[NSApp currentEvent] modifierFlags] & NSCommandKeyMask)!=0;
+    [self setUpImage];
+}
+
+- (BOOL) acceptsClickAtPoint:(NSPoint)aPoint
+{
+    if(enableIconControls){
+        if(NSPointInRect(aPoint,[self frame])){
+            if([self running]) [self stopScript];
+            else [self runScript];
+        }
+        return NO; //want no further action with this click
+    }
+	else return NSPointInRect(aPoint,[self frame]);
+}
+
 - (void) setUpImage
 {
     //---------------------------------------------------------------------------------------------------
@@ -81,14 +99,23 @@ NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
     [i lockFocus];
     [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
 	[self decorateIcon:i];
-	
+    
+    
 	if([self breakChain] && [self objectConnectedTo: ORScriptTaskOutConnector]){
         NSImage* theImage = [NSImage imageNamed:@"chainBroken"];
         [theImage drawAtPoint:NSZeroPoint fromRect:[theImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
 	}	
     if([self running]){
         NSImage* theImage = [NSImage imageNamed:@"ScriptRunning"];
-        [theImage drawAtPoint:NSZeroPoint fromRect:[theImage imageRect] operation:NSCompositeSourceOver fraction:1.0];    }
+        [theImage drawAtPoint:NSZeroPoint fromRect:[theImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+    }
+    
+	if(enableIconControls){
+        NSImage* theImage;
+        if([self running])theImage = [NSImage imageNamed:@"Stop"];
+        else              theImage = [NSImage imageNamed:@"Play"];
+         [theImage drawInRect:NSMakeRect(3,3,25,25) fromRect:[theImage imageRect] operation:NSCompositeSourceOver fraction:1];
+    }
 	
     [i unlockFocus];
     
