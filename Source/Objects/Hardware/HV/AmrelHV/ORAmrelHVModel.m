@@ -851,7 +851,7 @@ NSString* ORAmrelHVModelDataIsValidChanged	= @"ORAmrelHVModelDataIsValidChanged"
 	doSync[1] = NO;
 
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-	NSLogError(@"command timeout",@"ZUP",nil);
+	NSLogError(@"command timeout",@"AmrelHV",nil);
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAmrelHVModelTimeout object:self];
 	[self setLastRequest:nil];
 	[cmdQueue removeAllObjects];
