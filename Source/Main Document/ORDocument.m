@@ -551,11 +551,13 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
     path = [path stringByDeletingPathExtension];
 	NSString* startName = [[self fileURL] path];
     NSString* finalName = [[path stringByAppendingFormat:@"_%@",aString]stringByAppendingPathExtension:ext];
-    if([fm copyItemAtPath:startName toPath:finalName error:nil]){
+    NSError* copyError=nil;
+    if([fm copyItemAtPath:startName toPath:finalName error:&copyError]){
         NSLog(@"Saving: %@\n",startName);
     }
     else {
         NSLogColor([NSColor redColor],@"Error: Configuration file NOT saved with the data\n");
+        NSLogColor([NSColor redColor],@"%@\n",copyError);
     }
     
 }
