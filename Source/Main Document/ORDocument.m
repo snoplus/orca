@@ -533,6 +533,7 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 {
 	[[ORGlobal sharedGlobal] setDocumentWasEdited:[self isDocumentEdited]];
 	[super saveDocument:sender];
+	[[ORGlobal sharedGlobal] setDocumentWasEdited:NO];
 }
 
 
@@ -544,7 +545,6 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 
 - (void) copyDocumentTo:(NSString*)aPath append:(NSString*)aString
 {
-    [self saveDocument:self];
     NSFileManager* fm = [NSFileManager defaultManager];
     NSString* path = [aPath stringByAppendingPathComponent:[[[self fileURL] path ]lastPathComponent]];
     NSString* ext = [[[self fileURL] path]pathExtension];
@@ -553,10 +553,10 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
     NSString* finalName = [[path stringByAppendingFormat:@"_%@",aString]stringByAppendingPathExtension:ext];
     NSError* copyError=nil;
     if([fm copyItemAtPath:startName toPath:finalName error:&copyError]){
-        NSLog(@"Saving: %@\n",startName);
+        NSLog(@"Copy %@ to %@\n",startName,finalName);
     }
     else {
-        NSLogColor([NSColor redColor],@"Error: Configuration file NOT saved with the data\n");
+        NSLogColor([NSColor redColor],@"Error: Unable to copy %@ to %@\n",startName,finalName);
         NSLogColor([NSColor redColor],@"%@\n",copyError);
     }
     

@@ -172,9 +172,11 @@ static const int currentVersion = 1;           // Current version
     if(saveConfiguration){
 		[configFolder ensureExists:[configFolder finalDirectoryName]]; 
 		if([[ORGlobal sharedGlobal] documentWasEdited] || !savedFirstTime){
-			unsigned long runNumber = [[[aNotification userInfo] objectForKey:@"kRunNumber"] longValue];
-			[[self document] copyDocumentTo:[[configFolder finalDirectoryName]stringByExpandingTildeInPath] append:[NSString stringWithFormat:@"%lu",runNumber]];
-			savedFirstTime = YES;
+            if([[ORGlobal sharedGlobal] runMode] != kOfflineRun){
+                unsigned long runNumber = [[[aNotification userInfo] objectForKey:@"kRunNumber"] longValue];
+                [[self document] copyDocumentTo:[[configFolder finalDirectoryName]stringByExpandingTildeInPath] append:[NSString stringWithFormat:@"%lu",runNumber]];
+                savedFirstTime = YES;
+            }
 		}
 	}
 }
