@@ -3246,11 +3246,8 @@ void FIFOREADER::scanFIFObuffer(void)
 			printf("scanFIFObuffer: numfifo %i: read bytes: %i (delivered bytes w.UDP: %i) (packets*4: %i)\n", numfifo, udpdataByteCounter,bytesSentWithUDP,udpdataCounter*4);
             if(bytesSentWithUDP>0){
                 if(udpdataByteCounter != (bytesSentWithUDP-4*udpdataCounter)){
-	    		    printf("ERROR: scanFIFObuffer: udpdataByteCounter != bytesSentWithUDP (are %i and   %i)\n", udpdataByteCounter,bytesSentWithUDP);
-		    	    printf("ERROR: scanFIFObuffer: udpdataByteCounter != bytesSentWithUDP (are %i and   %i)\n", udpdataByteCounter,bytesSentWithUDP);
-			        printf("ERROR: scanFIFObuffer: udpdataByteCounter != bytesSentWithUDP (are %i and   %i)\n", udpdataByteCounter,bytesSentWithUDP);
-			        printf("ERROR: scanFIFObuffer: udpdataByteCounter != bytesSentWithUDP (are %i and   %i)\n", udpdataByteCounter,bytesSentWithUDP);
-			        printf("ERROR: scanFIFObuffer: udpdataByteCounter != bytesSentWithUDP (are %i and   %i)\n", udpdataByteCounter,bytesSentWithUDP);
+	    		    printf("ERROR: scanFIFObuffer: udpdataByteCounter != bytesSentWithUDP-header (are %i and   %i)\n", udpdataByteCounter,bytesSentWithUDP-4*udpdataCounter);
+		    	    printf("ERROR: scanFIFObuffer: udpdataByteCounter != bytesSentWithUDP (are %i and   %i)\n", udpdataByteCounter,bytesSentWithUDP-4*udpdataCounter);
                 }
             }
 
