@@ -86,7 +86,7 @@ int numOfBits(uint32_t val)
     for(i=0; i<32;i++){
         if(val & (0x1<<i)) num++;
     }
-    printf("numOfBits: val 0x%08x has %i bits\n",val,num);
+    //printf("numOfBits: val 0x%08x has %i bits\n",val,num);
     return num;
 }
 

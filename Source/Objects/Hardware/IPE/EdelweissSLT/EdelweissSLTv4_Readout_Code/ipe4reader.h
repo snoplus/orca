@@ -418,13 +418,13 @@ public:
 		udpdataSec     = 0;
 	    numSent = 0;
         udpdataByteCounter	 = 0;
+        bytesSentWithUDP = 0;
         numADCsInDataStream =0;
 	
 	    globalHeaderWordCounter = 0; //TODO: globalHeaderWordCounter for testing -tb- 
 		
 	    mon_indice_status_bbv2 = 0;// <----   each FIFO (in multi-FIFO readout) needs own counter!
 
-	    flagToSendDataAndResetBuffer = 0;
         waitingForSynchroWord = 0;
         isSynchronized = 0;
 	}
@@ -534,7 +534,6 @@ public:
 	int mon_indice_status_bbv2;// <----   each FIFO (in multi-FIFO readout) needs own counter! //TODO: obsolete, remove! -tb-
     
     //misc vars
-    int flagToSendDataAndResetBuffer;
     int waitingForSynchroWord;
     int isSynchronized; //means: has received a TS pattern in the data stream (will be set to false e.g. at start/stop StreamLoop)
 	
@@ -550,6 +549,7 @@ public:
 	int udpdataCounter; //counts number of sent UDP packets
 	int udpdataByteCounter; //counts number of bytes of sent UDP packets
 	int udpdataSec ;    //second got from pattern 0x31170000....
+	int bytesSentWithUDP; //counts number of bytes of sent UDP packets
 	int numSent ;
     int numADCsInDataStream;
 	
