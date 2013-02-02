@@ -10,6 +10,17 @@
 
 //This is the version of the IPE4 readout code (display is: version/1000, so cew_controle will e.g. display 1934003 as 1934.003) -tb-
 
+#if 1 //moved to ipe4reader.h
+//This is the version of the IPE4 readout code (display is: version/1000, so cew_controle will display 1934003 as 1934.003) -tb-
+// VERSION_IPE4_HW is 1934 which means IPE4  (1=I, 9=P, 3=E, 4=4)
+// VERSION_IPE4_SW is the version of the readout software (this file)
+#define VERSION_IPE4_HW      1934200
+#define VERSION_IPE4_SW           10
+#define VERSION_IPE4READOUT (VERSION_IPE4_HW + VERSION_IPE4_SW)
+#endif 
+
+
+
 // update 2013-01-03 -tb-
 
 /*--------------------------------------------------------------------
@@ -407,6 +418,7 @@ public:
 		udpdataSec     = 0;
 	    numSent = 0;
         udpdataByteCounter	 = 0;
+        numADCsInDataStream =0;
 	
 	    globalHeaderWordCounter = 0; //TODO: globalHeaderWordCounter for testing -tb- 
 		
@@ -539,6 +551,7 @@ public:
 	int udpdataByteCounter; //counts number of bytes of sent UDP packets
 	int udpdataSec ;    //second got from pattern 0x31170000....
 	int numSent ;
+    int numADCsInDataStream;
 	
 
 	/*--------------------------------------------------------------------

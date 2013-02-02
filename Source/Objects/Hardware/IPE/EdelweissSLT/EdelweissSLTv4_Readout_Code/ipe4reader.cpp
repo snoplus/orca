@@ -8,14 +8,22 @@
     email                : Till.Bergmann@kit.edu
  ***************************************************************************/
 
+#if 0 //moved to ipe4reader.h
 //This is the version of the IPE4 readout code (display is: version/1000, so cew_controle will display 1934003 as 1934.003) -tb-
 // VERSION_IPE4_HW is 1934 which means IPE4  (1=I, 9=P, 3=E, 4=4)
 // VERSION_IPE4_SW is the version of the readout software (this file)
 #define VERSION_IPE4_HW      1934200
 #define VERSION_IPE4_SW            9
 #define VERSION_IPE4READOUT (VERSION_IPE4_HW + VERSION_IPE4_SW)
+#endif 
+
 
 /* History:
+
+version 10: 2013 January 29
+            many changes for Modane comissioning
+
+
 version 9: 2013 January
            changed name from ipe4reader6 to ipe4reader;
            added ipe4reader to Orca svn repository
@@ -342,7 +350,6 @@ int runPreRunChecks()
         printf("ERROR: EXITING\n");
         return 23;
     }
-
 
 
 
@@ -1064,8 +1071,12 @@ int FIFOREADER::sendtoUDPClients(int flag, const void *buffer, size_t length)
 	        //sendto(MY_UDP_CLIENT_SOCKET[i], (char*)(trame),size, 0,(struct sockaddr *) &(cliaddr[i]), sizeof(cliaddr[i]));
 		    retval = sendto(UDP_CLIENT_SOCKET[i], buffer, length, 0 /*flags*/, (struct sockaddr *)&clientaddr_list[i], sizeof(clientaddr_list[i]));
 			if(retval==-1){
-			    printf("ERROR: during sending UDP packet for client index %i\n",i);
+			    printf("ERROR: FIFOREADER::sendtoUDPClients: during sending UDP packet for client index %i\n",i);
 				err=-1;
+			}
+			if(retval != length){
+			    printf("ERROR: FIFOREADER::sendtoUDPClients: missing bytes (sent %i of %i) during sending UDP packet for client index %i\n",retval,length,i);
+				err=-2;
 			}
 	    }
 	}
@@ -1421,7 +1432,7 @@ int sendChargeBBStatus(uint32_t prog_status,int numFifo)
                 crateStatusBlock.prog_status         = prog_status;
                 crateStatusBlock.internal_error_info = 0;
                 crateStatusBlock.ipe4reader_status   = FIFOREADER::State;
-                crateStatusBlock.spare1 = 1;
+                crateStatusBlock.numADCs = 0;
                 crateStatusBlock.spare2 = 2;
                 //append status to payload
                 statusScheduler.appendDataSendIfFull((char*)&crateStatusBlock,sizeof(crateStatusBlock));
@@ -3214,8 +3225,46 @@ if(debcnt>10000){
         //********************************************************************************************************
 
         if(FIFObuf32avail>=4){//we need all 4 words of the header 'sentence' to extract the time stamp
+            int oldisSynchronized=isSynchronized;
 		    //found all 4 TS (time stamp) words ->we are synchronized
             isSynchronized=1;
+            
+            //recompute number of ADC channels in data stream when we freshly become synchronized
+            if(!oldisSynchronized && isSynchronized){
+                numADCsInDataStream = 0;
+                int currPixBusEnable = 0;
+                currPixBusEnable = pbus->read(SLTPixbusEnableReg);
+                int flt;
+                uint32_t StreamMask_1[20],StreamMask_2[20];
+                int ADCsinFLT[20];
+	              //FLT
+	              for(flt=0; flt<20; flt++){
+                      ADCsinFLT[flt]=0;
+	                  if( (presentFLTMap & bit[flt])  &&   (currPixBusEnable & bit[flt])){//if FLT is present AND FLT set in pixbusenable reg ...
+	                      //printf("populateIPECrateStatusPacket: FLT %i is present\n",flt);
+						  StreamMask_1[flt]= pbus->read(FLTStreamMask_1Reg(flt+1));
+						  StreamMask_2[flt]= pbus->read(FLTStreamMask_2Reg(flt+1));
+	                  }
+	                  else
+	                  {
+	                      //printf("populateIPECrateStatusPacket: FLT %i NOT present\n",flt);
+						  StreamMask_1[flt]= 0;
+						  StreamMask_2[flt]= 0;
+	                  }
+                      //
+                      printf("counting ADC channels: FLT %i: #ADCs: %i\n",flt,ADCsinFLT[flt]);
+                      ADCsinFLT[flt]=numOfBits(StreamMask_1[flt])+numOfBits(StreamMask_2[flt]);
+                      printf("counting ADC channels: FLT %i: #ADCs: %i\n",flt,ADCsinFLT[flt]);
+                      if( (ADCsinFLT[flt] % 6) != 0)
+                          ADCsinFLT[flt] = ((ADCsinFLT[flt] / 6)+1) *6;//'round' to next multiple of 6
+                      printf("counting ADC channels: FLT %i: #ADCs: %i\n",flt,ADCsinFLT[flt]);
+                      numADCsInDataStream += ADCsinFLT[flt];
+	              }
+                  printf("counting ADC channels: total sum #ADCs: %i\n",numADCsInDataStream);
+            }
+            
+            
+            
 		    //TODO: move "send code" to this location???? -tb-
 		
 
@@ -3296,7 +3345,8 @@ if(debcnt>10000){
                 crateStatusBlock.prog_status         = 0;
                 crateStatusBlock.internal_error_info = 0;
                 crateStatusBlock.ipe4reader_status   = FIFOREADER::State;
-                crateStatusBlock.spare1 = 1;
+                //crateStatusBlock.spare1 = 1;
+                crateStatusBlock.numADCs = numADCsInDataStream;
                 crateStatusBlock.spare2 = 2;
                 //append status to payload
                 statusScheduler.appendDataSendIfFull((char*)&crateStatusBlock,sizeof(crateStatusBlock));
@@ -3590,7 +3640,10 @@ void FIFOREADER::readFIFOtoFIFObuffer(void)
     
     //DIRTY WORKAROUND/BUGFIX
     //do not read anything if there are not at least TWO TIMES FIFOBlockSize words in buffer (8192 * 2)
-    if(FIFOavail < ( FIFOBlockSize) ) return;
+    if(FIFOavail < ( FIFOBlockSize) ){
+        usleep(1);
+        return;
+    }
     //WHY?:
     //  I tried to read always EXACTLY all ADC data BEFORE the magic word (synchro word). (Then at next read cycle the pattern is at the beginning of the block.)
     //  PROBLEM (HW ERROR?): if the data in the FIFO is too small (<2*8192), the magic pattern VANISHED after I did this! (I parse the ADC data anyway always for the pattern during tests: it really vanished!)
@@ -4149,6 +4202,28 @@ void InitSemaphore()
 
 }
 
+/*--------------------------------------------------------------------
+  signalHandler: try to stop main readout loop after first call,
+                 call exit after 2nd call
+  --------------------------------------------------------------------*/
+
+void  signalHandler(int signum)
+{
+    int static counter=0;
+    counter++;
+    run_main_readout_loop = 0;
+    printf(" This is the signal handler - received signal: %i (SIGTERM is %i) Counter: %i. Request STOP LOOP.\n",signum,SIGTERM,counter);
+    printf("=========================================================================\n");
+    //sleep(1);
+    //if(counter>1){
+    //    run_main_readout_loop = 0;
+    //}
+    if(counter>1){
+    printf(" This is the signal handler - received signal: %i (SIGTERM is %i) Counter: %i. EXIT.\n",signum,SIGTERM,counter);
+        exit(signum);
+    }
+}
+
 
 /*--------------------------------------------------------------------
   printUsage:
@@ -4159,6 +4234,7 @@ void printUsage(char *argv[]){
 		printf("      '%s' start with default config file %s.config\n",argv[0],argv[0]);
 		printf("      '%s h' show this help text\n",argv[0]);
 		printf("      '%s n' start without config file\n",argv[0]);
+		printf("      '%s k' try to stop and kill currently active instances\n",argv[0]);
 }
 
 
@@ -4169,7 +4245,7 @@ int32_t main(int32_t argc, char *argv[])
 {
     int32_t i;
     int iFifo;
-	
+    
     #define MY_UDP_LISTEN_MAX_PACKET_SIZE   1500
     char InBuffer[MY_UDP_LISTEN_MAX_PACKET_SIZE];	// took buffer size from CEW_controle,but char instead of unsigned char -tb-
     unsigned char UInBuffer[MY_UDP_LISTEN_MAX_PACKET_SIZE];	// took buffer size from CEW_controle,but char instead of unsigned char -tb-
@@ -4179,8 +4255,17 @@ int32_t main(int32_t argc, char *argv[])
     printf("KIT-IPE EDELWEISS stream loop\n");
     printf("=============================\n");
     
+    //install signalhandler (without signalhandler ipe4reader corrupted the terminal echo (=typing not possible any more) - on PrPMC) -tb-
+    signal(SIGTERM,signalHandler);
 
 
+	if(argc==2){
+	    if(argv[1][0]=='k'){ //kill other ipe4reader instances
+		    printf("%s: killing other ipe4reader* instances\n",argv[0]);
+            kill_ipe4reader_instances();
+		    sleep(1);
+        }
+    }
     //----------------------------------------------------------- 
     //pre run checks
     printf("Running pre run checks ...\n");
@@ -4224,7 +4309,7 @@ int32_t main(int32_t argc, char *argv[])
 	
     //handle command line options
 	if(argc>2){
-		printf("ERROR: %s expects 0 or 1 argument!\n",argv[0]);
+		printf("ERROR: %s expects 0, 1 or 2 arguments!\n",argv[0]);
 		printUsage(argv);
 		exit(1);
 	}
@@ -4248,12 +4333,22 @@ int32_t main(int32_t argc, char *argv[])
 		    configfilename[0]=0;
         }
         else
+	    if(argv[1][0]=='k'){ //killed other ipe4reader instances; read default config file:
+		    //printf("%s: killing other ipe4reader* instances\n",argv[0]);
+            //kill_ipe4reader_instances();
+		    //sleep(1);
+	        strncpy(configfilename, basename(argv[0]), 2*4096);//default is: executable name +".config"
+		    strcat(configfilename,".config");
+		    printf("%s: no config file specified, using default config file '%s'\n",argv[0],configfilename);
+        }
+        else
         {
 		    printf("%s: using config file '%s'\n",argv[0],argv[1]);
 		    sprintf(configfilename,"%s",argv[1]);
 		}
 	}
-		if(configfilename[0] != 0){
+		
+    if(configfilename[0] != 0){
 		if(readConfigFile(configfilename) != 0){
 		   perror ("ERROR: Could NOT read config file!\n");
 		   perror ("ERROR: Could NOT read config file!\n");

@@ -26,13 +26,15 @@
 
 
 
-
+#if 0 //moved to ipe4reader.h
 //This is the version of the IPE4 readout code (display is: version/1000, so cew_controle will display 1934003 as 1934.003) -tb-
 // VERSION_IPE4_HW is 1934 which means IPE4  (1=I, 9=P, 3=E, 4=4)
 // VERSION_IPE4_SW is the version of the readout software (this file)
 #define VERSION_IPE4_HW      1934200
-#define VERSION_IPE4_SW            9
+#define VERSION_IPE4_SW           10
 #define VERSION_IPE4READOUT (VERSION_IPE4_HW + VERSION_IPE4_SW)
+#endif
+
 
 /* History:
 version 1: 2013 January
@@ -58,7 +60,7 @@ version 1: 2013 January
 #include <libgen.h> //for basename
 #include <stdint.h>  //for uint32_t etc.
 
-
+#include <signal.h> //for kill/SIGTERM
 
 /*--------------------------------------------------------------------
  *    functions
@@ -78,6 +80,15 @@ int slotOfAddr(uint32_t address)
     return (address >> 17) & 0x1f;
 }
 
+int numOfBits(uint32_t val)
+{
+    int i,num=0;
+    for(i=0; i<32;i++){
+        if(val & (0x1<<i)) num++;
+    }
+    printf("numOfBits: val 0x%08x has %i bits\n",val,num);
+    return num;
+}
 
 int count_ipe4reader_instances(void)
 {
@@ -100,6 +111,43 @@ int count_ipe4reader_instances(void)
 	return counter;
 }
 
+//kill all ipe4reader* instances except myself
+//
+//shell commands to get the list of IP addresses, each in a single line
+//ps -e | awk '/bergmann/{ print $1 }'
+//  -> removes leading whitespace
+//ps -e | grep bergmann | cut  -c 1-6
+int kill_ipe4reader_instances(void)
+{
+	    printf("running 'int kill_ipe4reader_instances(void)'\n");
+    int pid = getpid();
+	    printf("    kill_ipe4reader_instances()': my own PID is %i\n",pid);
+	char buf[1024 * 4];
+	char *cptr;
+	FILE *p;
+	int val = 0;
+	p = popen("ps -e | awk '/ipe4reader/{ print $1 }'","r");
+	if(p==0){ fprintf(stderr, "could not start popen... -tb-\n"); return -1; }
+	sleep(1);
+	while (!feof(p)){
+	    fscanf(p,"%s",buf);
+		//if(feof(p)) printf("... if(feof(p))  ...\n"); //I think on Mac this was to early and we would have lost one line of return values -tb-
+        val = atoi(buf);
+	    printf("Found PID >%s<; kill_ipe4reader_instances: PID is: %i\n",buf,val);
+        if(pid != val){
+	        printf("kill -s SIGTERM %i\n",val);
+            kill(val,SIGTERM);
+        }
+		if(feof(p)){
+            printf("... if(feof(p))  ...  break\n");
+            break; //??? is this necessary??? -tb-
+        }
+	};
+
+	pclose(p);
+	//printf("kill_ipe4reader_instances is: %i\n",counter);
+	return val;
+}
 
 /*--------------------------------------------------------------------
   includes

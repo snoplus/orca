@@ -321,7 +321,9 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
 				    NSLog(@"      OperaStatus1 0x%08x (d0: %i)\n",crateStatusBlock->OperaStatus1,crateStatusBlock->OperaStatus1 & 0xfff);
 				    NSLog(@"      size_bytes: %i \n",crateStatusBlock->size_bytes);
                     uint32_t ps=crateStatusBlock->prog_status;
-				    NSLog(@"      prog_status: 0x%08x: stat: %i  percent:%i%c \n",ps,ps&0xf, (ps>>8)&0xfff,'%');
+				    if(ps>0)NSLog(@"      prog_status: 0x%08x: stat: %i  percent:%i%c \n",ps,ps&0xf, (ps>>8)&0xfff,'%');
+                    uint32_t numADCsInDataStream=crateStatusBlock->numADCs;
+                    if(numADCsInDataStream>0) NSLog(@"      numADCs In Data Stream: %i \n",numADCsInDataStream);
                     //let ptr point behind current block (usually the first TypeBBStatusBlock )
                     ptr += crateStatusBlock->size_bytes;
                 }else{
@@ -376,7 +378,7 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
 	
 	
 	
-	NSLog(@"     receiveFromDataReplyServerThreadFunction: loop FINISHED  \n");
+	NSLog(@"     >>>>>>>>>>>>> receiveFromDataReplyServerThreadFunction: loop FINISHED  \n");
 	dataReplyThreadData->stopNow=0;
 	dataReplyThreadData->started=0;
 	
