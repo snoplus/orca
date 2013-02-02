@@ -14,17 +14,6 @@
 
 //This is the version of the IPE4 readout code (display is: version/1000, so cew_controle will e.g. display 1934003 as 1934.003) -tb-
 
-
-#if 0 //moved to ipe4reader.h
-//This is the version of the IPE4 readout code (display is: version/1000, so cew_controle will display 1934003 as 1934.003) -tb-
-// VERSION_IPE4_HW is 1934 which means IPE4  (1=I, 9=P, 3=E, 4=4)
-// VERSION_IPE4_SW is the version of the readout software (this file)
-#define VERSION_IPE4_HW      1934200
-#define VERSION_IPE4_SW           10
-#define VERSION_IPE4READOUT (VERSION_IPE4_HW + VERSION_IPE4_SW)
-#endif
-
-
 // update 2013-01-03 -tb-
 
 /*--------------------------------------------------------------------
@@ -56,6 +45,7 @@ int count_ipe4reader_instances(void);
 
 //kill all ipe4reader* instances except myself
 int kill_ipe4reader_instances(void);
+
 
 /*--------------------------------------------------------------------
   globals and functions for hardware access

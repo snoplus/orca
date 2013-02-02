@@ -1490,7 +1490,7 @@ NSLog(@"  arguments: %@ \n" , arguments);
 			UDPStructIPECrateStatus *status = (UDPStructIPECrateStatus *)readBuffer;
 			NSLog(@"    Header0: 0x%04x,  Header1: 0x%04x\n",status->id0, status->id1);
 			NSLog(@"    presentFLTMap: 0x%08x \n",status->presentFLTMap );
-			NSLog(@"    reserved0: 0x%08x,  reserved1: 0x%08x\n",status->reserved0, status->reserved1);
+//			NSLog(@"    reserved0: 0x%08x,  reserved1: 0x%08x\n",status->reserved0, status->reserved1);
 			
 			int i;
 			NSLog(@"    SLT Block: \n");

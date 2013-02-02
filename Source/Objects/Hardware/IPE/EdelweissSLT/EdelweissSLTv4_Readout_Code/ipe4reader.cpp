@@ -8,22 +8,14 @@
     email                : Till.Bergmann@kit.edu
  ***************************************************************************/
 
-#if 0 //moved to ipe4reader.h
 //This is the version of the IPE4 readout code (display is: version/1000, so cew_controle will display 1934003 as 1934.003) -tb-
 // VERSION_IPE4_HW is 1934 which means IPE4  (1=I, 9=P, 3=E, 4=4)
 // VERSION_IPE4_SW is the version of the readout software (this file)
 #define VERSION_IPE4_HW      1934200
 #define VERSION_IPE4_SW            9
 #define VERSION_IPE4READOUT (VERSION_IPE4_HW + VERSION_IPE4_SW)
-#endif 
-
 
 /* History:
-
-version 10: 2013 January 29
-            many changes for Modane comissioning
-
-
 version 9: 2013 January
            changed name from ipe4reader6 to ipe4reader;
            added ipe4reader to Orca svn repository
@@ -350,6 +342,7 @@ int runPreRunChecks()
         printf("ERROR: EXITING\n");
         return 23;
     }
+
 
 
 
@@ -1064,7 +1057,6 @@ int FIFOREADER::sendtoUDPClients(int flag, const void *buffer, size_t length)
     */
 	
 	int retval=0, err=0;
-    int count_bytes=0;
 	int i;
 	
 	for (i=0;i<NB_CLIENT_UDP;i++){
@@ -1072,18 +1064,13 @@ int FIFOREADER::sendtoUDPClients(int flag, const void *buffer, size_t length)
 	        //sendto(MY_UDP_CLIENT_SOCKET[i], (char*)(trame),size, 0,(struct sockaddr *) &(cliaddr[i]), sizeof(cliaddr[i]));
 		    retval = sendto(UDP_CLIENT_SOCKET[i], buffer, length, 0 /*flags*/, (struct sockaddr *)&clientaddr_list[i], sizeof(clientaddr_list[i]));
 			if(retval==-1){
-			    printf("ERROR: FIFOREADER::sendtoUDPClients: during sending UDP packet for client index %i\n",i);
+			    printf("ERROR: during sending UDP packet for client index %i\n",i);
 				err=-1;
 			}
-			if(retval != length){
-			    printf("ERROR: FIFOREADER::sendtoUDPClients: missing bytes (sent %i of %i) during sending UDP packet for client index %i\n",retval,length,i);
-				err=-2;
-			}
-            if(retval>0) count_bytes+=retval;
 	    }
 	}
-    if(err<0) return err;
-    return count_bytes;
+
+    return err;
 }
 
 
@@ -1627,7 +1614,7 @@ void chargeBBWithFile(char * filename, int fromFifo)
 
 
 FILE *mon_fichier;
-int j,err;
+int j=0,err=0;
 int numserie;
 //TODO: ? led_B(_rouge);
 
@@ -1793,7 +1780,7 @@ return 0;
 void				mise_a_jour_bbv2(int recharge)
 {
 FILE *mon_fichier;
-int j,err;
+int j=0,err=0;
 int numserie;
 //TODO: ? led_B(_rouge);
 
@@ -2178,12 +2165,15 @@ void populateIPECrateStatusPacket()
 	              
 	              //fill IPECrateStatusPacket
 	              populateIPECrateStatusPacket();
+                  //in rare cases the ipe4reader has frozen when requesting the crate status to often - for this I added some sleeps (give it a try) -tb-
+                  usleep(1);
 
 				  //send the IPECrateStatusPacket
 				  sendtoGlobalClient3((char*)(&IPECrateStatusPacket), sizeof(IPECrateStatusPacket), senderIPAddr, port);
+                  usleep(1);
 
 	              //printf("handleKCommand: sendtoGlobalClient3: sizeof(IPECrateStatusPacket) %i\n",sizeof(IPECrateStatusPacket));
-	              //netcat seems to cut the output after 1000 bytes
+	              //netcat seems to cut the output after 1000 bytes?
 
 	          }
 	          else
@@ -2201,6 +2191,8 @@ void populateIPECrateStatusPacket()
 	
 				  //send the answer
 				  sendtoGlobalClient3(sendBuffer, 25, senderIPAddr, port);
+                  usleep(1);
+
 	          }
 	          else 
 	          {
@@ -3022,12 +3014,16 @@ void FIFOREADER::scanFIFObuffer(void)
 	int16_t	*	temp_status_bbv2_1_16=(int16_t	*)temp_status_bbv2_1;
 
 
-    uint16_t currentPacketNum=0;
-    uint16_t currentPacketTS =0;
 
 
 
-    if(FIFObuf32avail < 360) return;// we need at most 360 words to build a standard UDP packet; only the last before header word may be shorter
+//TODO: remove flagToSendDataAndResetBuffer!!!!!!!! waitingForSynchroWord too??? -tb-
+
+
+
+
+
+    if( (FIFObuf32avail < 360) ) return;// we need at most 360 words to build a standard UDP packet; only the last before header word may be shorter
     
     //TODO: if globalHeaderWordCounter==0 don't send UDP packets: we are maybe in the middle of FIFO -tb-
 	
@@ -3046,17 +3042,36 @@ void FIFOREADER::scanFIFObuffer(void)
     udpPacketLen +=4;
 
     
-    //compute packet size
+    //compute packet size (360 uint32's are 1440 bytes)
     int numWord32=360;
     
     
+    
+#if 1
+    if(flagToSendDataAndResetBuffer){
+        if(FIFObuf32avail<=360){//we have the last 'maybe not full' UDP packet (before the magic pattern)
+            numWord32=FIFObuf32avail;//in all other cases FIFObuf32avail is >360
+            //if(flagToSendDataAndResetBuffer)
+            
+            //TODO: REMOVE THIS WHOLE IF CLAUSE -tb-
+            printf("scanFIFObuffer: start LAST udp packet with sec %i, counter %i (preferred size 360, use numWord32:%i)  (flagToSendDataAndResetBuffer:%i)\n",udpdataSec ,udpdataCounter,numWord32,flagToSendDataAndResetBuffer);//TODO: DEBUG output -tb-
+            printf("scanFIFObuffer: start LAST udp packet with sec %i, counter %i (preferred size 360, use numWord32:%i)  (flagToSendDataAndResetBuffer:%i)\n",udpdataSec ,udpdataCounter,numWord32,flagToSendDataAndResetBuffer);//TODO: DEBUG output -tb-
+            printf("scanFIFObuffer: start LAST udp packet with sec %i, counter %i (preferred size 360, use numWord32:%i)  (flagToSendDataAndResetBuffer:%i)\n",udpdataSec ,udpdataCounter,numWord32,flagToSendDataAndResetBuffer);//TODO: DEBUG output -tb-
+            printf("scanFIFObuffer: start LAST udp packet with sec %i, counter %i (preferred size 360, use numWord32:%i)  (flagToSendDataAndResetBuffer:%i)\n",udpdataSec ,udpdataCounter,numWord32,flagToSendDataAndResetBuffer);//TODO: DEBUG output -tb-
+            printf("scanFIFObuffer: start LAST udp packet with sec %i, counter %i (preferred size 360, use numWord32:%i)  (flagToSendDataAndResetBuffer:%i)\n",udpdataSec ,udpdataCounter,numWord32,flagToSendDataAndResetBuffer);//TODO: DEBUG output -tb-
+            printf("scanFIFObuffer: start LAST udp packet with sec %i, counter %i (preferred size 360, use numWord32:%i)  (flagToSendDataAndResetBuffer:%i)\n",udpdataSec ,udpdataCounter,numWord32,flagToSendDataAndResetBuffer);//TODO: DEBUG output -tb-
+            //flagToSendDataAndResetBuffer=2;
+            flagToSendDataAndResetBuffer = 0;//
+            waitingForSynchroWord = 1;
+        }
+    }
+#endif    
     
     //if(synchroWordPosHint>0){
     //        printf("  >>>>>>>>>scanFIFObuffer:  synchroWordPosHint %i waitingForSynchroWord = %i  FIFObuf32avail %i synchroWordBufferPosHint %i\n",synchroWordPosHint,waitingForSynchroWord,FIFObuf32avail,synchroWordBufferPosHint);//TODO: DEBUG output -tb-
     //}
 
     if(show_debug_info>3) printf("scanFIFObuffer: start udp packet with sec %i, counter %i (preferred size numWord32:%i)\n",udpdataSec ,udpdataCounter,numWord32);//TODO: DEBUG output -tb-
-
     for(i=0; i<numWord32; i++){  //TODO: 360 = 1440 / 4 ---> must be configurable (FIFOREADER variable) -tb-
         val = FIFObuf32[popIndexFIFObuf32];
         //if( (val & 0xffff) == 0x3117){  //TODO: or  if( val == 0x00003117){ ... ??? ask Sascha to see in black box (Opera FPGA) -tb-
@@ -3104,7 +3119,7 @@ void FIFOREADER::scanFIFObuffer(void)
     }
     
 	
-	//2.  send the UDP data packet 
+	//2.  send the UDP data packet
     if(udpPacketLen > 4){// contains more than only the UDP header (if udpPacketLen==1->contains packet header, but no data) -> ADC data
 	    //a.) send data
         if(show_debug_info>2) printf("send udp packet with size %i \n",udpPacketLen);//TODO: DEBUG output -tb-
@@ -3114,9 +3129,10 @@ void FIFOREADER::scanFIFObuffer(void)
 		}
 		//TODO: status clients not supported  -tb-  for (i=0;i<NB_CLIENT_UDP;i++){  if (numPacketsClientStatus[i]) numPacketsClientStatus[i]--;  }
         if(isSynchronized){
-            int retval;
-    		retval = sendtoUDPClients(1,udpdata,udpPacketLen);
-            if(retval>0) bytesSentWithUDP+=retval;
+            //int retval;
+    		//retval = sendtoUDPClients(1,udpdata,udpPacketLen);
+            //if(retval>0) bytesSentWithUDP+=retval;
+            sendtoUDPClients(1,udpdata,udpPacketLen);
         }
         
         if(udpdataCounter==0){
@@ -3132,6 +3148,7 @@ void FIFOREADER::scanFIFObuffer(void)
             }
         }
         
+
         if(show_debug_info>1 && udpdataCounter<1){
             if(udpPacketLen>=16) printf("adc0,1:0x%x adc2,3:0x%x adc4,5:0x%x \n",udpdata32[1],udpdata32[2],udpdata32[3]);//TODO: DEBUG output -tb-
             else if(udpPacketLen>=12) printf("adc0,1:0x%x adc2,3:0x%x  \n",udpdata32[1],udpdata32[2]);//TODO: DEBUG output -tb-
@@ -3203,6 +3220,7 @@ void FIFOREADER::scanFIFObuffer(void)
             isSynchronized=1;
             
             //recompute number of ADC channels in data stream when we freshly become synchronized
+            #if 1 //does this cause the SLT hangups? NO! (added this code later)
             if(!oldisSynchronized && isSynchronized){
                 numADCsInDataStream = 0;
                 int currPixBusEnable = 0;
@@ -3235,7 +3253,7 @@ void FIFOREADER::scanFIFObuffer(void)
 	              }
                   printf("counting ADC channels: total sum #ADCs: %i\n",numADCsInDataStream);
             }
-            
+            #endif
             
             
 		    //TODO: move "send code" to this location???? -tb-
@@ -3243,18 +3261,11 @@ void FIFOREADER::scanFIFObuffer(void)
 
             //print num of sent bytes
 			//if(show_debug_info) 
-			printf("scanFIFObuffer: numfifo %i: read bytes: %i (delivered bytes w.UDP: %i) (packets*4: %i)\n", numfifo, udpdataByteCounter,bytesSentWithUDP,udpdataCounter*4);
-            if(bytesSentWithUDP>0){
-                if(udpdataByteCounter != (bytesSentWithUDP-4*udpdataCounter)){
-	    		    printf("ERROR: scanFIFObuffer: udpdataByteCounter != bytesSentWithUDP-header (are %i and   %i)\n", udpdataByteCounter,bytesSentWithUDP-4*udpdataCounter);
-		    	    printf("ERROR: scanFIFObuffer: udpdataByteCounter != bytesSentWithUDP (are %i and   %i)\n", udpdataByteCounter,bytesSentWithUDP-4*udpdataCounter);
-                }
-            }
+			printf("scanFIFObuffer: numfifo %i: read bytes: %i\n", numfifo, udpdataByteCounter);
 
             //prepare next UDP packet header
             udpdataCounter = 0; //restart counting at 0
 			udpdataByteCounter = 0;
-            bytesSentWithUDP = 0;
             //    extract timestamp (sec) from header
             uint32_t pd_fort=0, pd_faible=0;
             pd_fort   = FIFObuf32[3] & 0x3ffff ;    // 18 bits
@@ -3325,7 +3336,6 @@ void FIFOREADER::scanFIFObuffer(void)
                 crateStatusBlock.prog_status         = 0;
                 crateStatusBlock.internal_error_info = 0;
                 crateStatusBlock.ipe4reader_status   = FIFOREADER::State;
-                //crateStatusBlock.spare1 = 1;
                 crateStatusBlock.numADCs = numADCsInDataStream;
                 crateStatusBlock.spare2 = 2;
                 //append status to payload
@@ -3598,12 +3608,12 @@ void FIFOREADER::scanFIFObuffer(void)
 void FIFOREADER::readFIFOtoFIFObuffer(void)
 {
     uint32_t FIFOavail=0, FIFOMode=0, FIFOStatus=0, FIFOStatusTSPtr=0;
-//    uint32_t currentBlockSize=FIFOBlockSize;//block size to be read from SLT FIFO; try to read as large blocks as possible (FIFOBlockSize=8192)
+//    uint32_t currentBlockSize=FIFOBlockSize;//block size to be read from SLT FIFO; try to read as large blocks as possible (FIFOBlockSize*8192)
 
     // check FIFO size
     FIFOMode  =  pbus->read(FIFOModeReg(numfifo));
     FIFOavail = FIFOMode & 0x00ffffff;
-    if(show_debug_info>1) printf("readFIFOtoFIFObuffer: read FIFOavail(FIFO #%i): %i (FIFOBlockSize is %i)\n",numfifo,FIFOavail,FIFOBlockSize);//DEBUG output -tb-
+    if(show_debug_info>2) printf("readFIFOtoFIFObuffer: read FIFOavail(FIFO #%i): %i (FIFOBlockSize is %i)\n",numfifo,FIFOavail,FIFOBlockSize);//DEBUG output -tb-
     
     //do it below ...if(FIFOavail < FIFOBlockSize) return; //wait for more data in FIFO
     
@@ -3617,12 +3627,12 @@ void FIFOREADER::readFIFOtoFIFObuffer(void)
         //TODO: should wait for the next magic word (mot_synchro)?
     }
     
-    //DIRTY WORKAROUND/BUGFIX
     //do not read anything if there are not at least TWO TIMES FIFOBlockSize words in buffer (8192 * 2)
     if(FIFOavail < ( FIFOBlockSize) ){
         usleep(1);
         return;
     }
+    //DIRTY WORKAROUND/BUGFIX
     //WHY?:
     //  I tried to read always EXACTLY all ADC data BEFORE the magic word (synchro word). (Then at next read cycle the pattern is at the beginning of the block.)
     //  PROBLEM (HW ERROR?): if the data in the FIFO is too small (<2*8192), the magic pattern VANISHED after I did this! (I parse the ADC data anyway always for the pattern during tests: it really vanished!)
@@ -3652,8 +3662,10 @@ void FIFOREADER::readFIFOtoFIFObuffer(void)
         
         
         
+        
 
-        //if(currentBlockSize!=FIFOBlockSize)
+
+
         if(show_debug_info>2) 
             printf("readFIFOtoFIFObuffer: read  block of Size   %i (max.size  FIFOBlockSize:%i, avail. %i), to pushIndexFIFObuf32 %i\n",FIFOBlockSize,FIFOBlockSize,FIFOavail,pushIndexFIFObuf32);//DEBUG output -tb-
 
@@ -3685,19 +3697,23 @@ if(1){ //DEBUG search explicitly for header ...
         uint32_t val;
         for(i=0; i<FIFOBlockSize; i++){
             val = FIFObuf32[pushIndexFIFObuf32 +i];
-            if((val & 0xffff) == 0x00003117){
+            if((val & 0xffff) == 0x3117){
                        //printf("   *5**oldFIFOStatusTSPtr: %i ***\n",oldFIFOStatusTSPtr);//DEBUG output -tb-
                  printf("=============found  0x00003117 at i=%i , waitingForSynchroWord %i, synchroWordPosHint  %i  \n",i,waitingForSynchroWord, synchroWordPosHint);
             }
             //if(val & 0x00003117) printf("=============found  0x3117 at i=%i   ptr %p\n",i,FIFObuf32[pushIndexFIFObuf32 +i]);
             //if(val & 0x31170000) printf("=============found  0x31170000 at i=%i   ptr %p\n",i,FIFObuf32[pushIndexFIFObuf32 +i]);
         }
+        //if(0 && currentBlockSize!=FIFOBlockSize   && flagToSendDataAndResetBuffer){
+        //    val = pbus->read(FIFOAddr(numfifo));
+        //    printf("============= next val 0x%08x\n",val);
+        //}
 }
         #else
         //use single access
         int i; 
         uint32_t val;
-        for(i=0; i<FIFOBlockSize; i++){
+        for(i=0; i<currentBlockSize; i++){
             val = pbus->read(FIFOAddr(numfifo));
             FIFObuf32[pushIndexFIFObuf32 +i] = val;
         }
@@ -3769,14 +3785,15 @@ void RunSomeHardwareTests()
 	    PAFOffset = pbus->read(PAFOffsetReg(i));
         printf("Fifo(%i): PAEOffset: 0x%08x, PAFOffset: 0x%08x\n", i,  PAEOffset, PAFOffset);
 	}
+
     
     //3.
     //reset SLT - sometimes the CmdFIFO doesnt work (is blocked) - in this case a resetSLT command helped!
     printf("Send SLT RESET Command.\n");
     printf("----------------------------\n");
     pbus->write(SLTCommandReg,0x2);//this is the SltRes flag
-
-
+    usleep(1);
+    
 }
 
  /*--------------------------------------------------------------------
@@ -3956,7 +3973,7 @@ int i=0;
 			BB0csr =  pbus->read(BBcsrReg(i));
 			printf("    BBcsrReg(%i): 0x%08x (BBEn: %i)\n",i,BB0csr, (BB0csr & 0x2)>>1);
 			//now enable BB
-			printf("Send 'BBEn=0' flag.\n");
+			printf("Send 'prt reset' flags.\n");
 			pbus->write(BBcsrReg(i), (0x08 + 0x04));
 			BB0csr =  pbus->read(BBcsrReg(i));
 			printf("    BBcsrReg(%i): 0x%08x (BBEn: %i)\n",i,BB0csr, (BB0csr & 0x2)>>1);
@@ -4098,8 +4115,8 @@ void InitHardwareFIFOs(int warmStart)
 
 void InitSemaphore()
 {
-   	semaControl *s;
-    int value;
+   	semaControl *s=0;
+    int value=0;
     int numS=0;
     try {
         s = new semaControl(SEMCMDS_DEFAULT_DIR);
@@ -4131,6 +4148,7 @@ void InitSemaphore()
 	}  
 
 }
+
 
 /*--------------------------------------------------------------------
   signalHandler: try to stop main readout loop after first call,
@@ -4165,6 +4183,7 @@ void printUsage(char *argv[]){
 		printf("      '%s h' show this help text\n",argv[0]);
 		printf("      '%s n' start without config file\n",argv[0]);
 		printf("      '%s k' try to stop and kill currently active instances\n",argv[0]);
+		printf("      '%s s' try to reset semaphore and exit\n",argv[0]);
 }
 
 
@@ -4175,7 +4194,7 @@ int32_t main(int32_t argc, char *argv[])
 {
     int32_t i;
     int iFifo;
-    
+	
     #define MY_UDP_LISTEN_MAX_PACKET_SIZE   1500
     char InBuffer[MY_UDP_LISTEN_MAX_PACKET_SIZE];	// took buffer size from CEW_controle,but char instead of unsigned char -tb-
     unsigned char UInBuffer[MY_UDP_LISTEN_MAX_PACKET_SIZE];	// took buffer size from CEW_controle,but char instead of unsigned char -tb-
@@ -4196,6 +4215,17 @@ int32_t main(int32_t argc, char *argv[])
 		    sleep(1);
         }
     }
+
+	if(argc==2){
+	    if(argv[1][0]=='s'){ //reset semaphores and exit
+		    printf("%s: reset semaphores and exit\n",argv[0]);
+            InitSemaphore();
+		    sleep(1);
+            exit(1);
+        }
+    }
+
+
     //----------------------------------------------------------- 
     //pre run checks
     printf("Running pre run checks ...\n");
@@ -4277,7 +4307,6 @@ int32_t main(int32_t argc, char *argv[])
 		    sprintf(configfilename,"%s",argv[1]);
 		}
 	}
-		
     if(configfilename[0] != 0){
 		if(readConfigFile(configfilename) != 0){
 		   perror ("ERROR: Could NOT read config file!\n");
@@ -4585,7 +4614,7 @@ int32_t main(int32_t argc, char *argv[])
 				if(show_debug_info>1) printf("main: FIFObuf32avail(%i): %i\n",iFifo, FifoReader[iFifo].FIFObuf32avail);//DEBUG output -tb-
 				#if 1
 				//scan and read UDP packets in while loop until buffer empty
-				while((FifoReader[iFifo].FIFObuf32avail >= 360) ){
+				while((FifoReader[iFifo].FIFObuf32avail >= 360)  ){
 					FifoReader[iFifo].scanFIFObuffer();
 				}
 				#else

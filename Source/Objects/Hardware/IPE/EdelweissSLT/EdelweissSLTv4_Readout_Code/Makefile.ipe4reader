@@ -31,5 +31,5 @@ writeword: writeword.cpp Makefile
 
 
 ipe4reader: ipe4reader.cpp ipe4reader.h ipe4structure.h ipe4tbtools.cpp ipe4tbtools.h Makefile.ipe4reader
-	g++ ipe4reader.cpp -o ipe4reader  -g -Wall  -gstabs+ -I ~/src/v4/fdhwlib/src -I /home/bergmann/src/v4/fdhwlib/src    -g -Wall  -gstabs+ -L /home/bergmann/lib    -fexceptions    -lPbusPCIDMA   -lakutil -lpthread -lm
+	g++ ipe4reader.cpp -o ipe4reader  -ggdb -Wall  -gstabs+ -I ~/src/v4/fdhwlib/src -I /home/bergmann/src/v4/fdhwlib/src    -g -Wall  -gstabs+ -L /home/bergmann/lib    -fexceptions    -lPbusPCIDMA   -lakutil -lpthread -lm
 

@@ -105,12 +105,13 @@ typedef struct { // -tb- 2008-02-27
  *    UDP packed definitions
  *       data, IPE crate status  -tb-
  *--------------------------------------------------------------------*/ //-tb-
-
+#if 0
 //size: id + header + 21*16 + UDPFIFOmap + IPmap = (1 + 8 + 336 + 5 + 20) 32-bit words = 1480 bytes
 #define MAX_NUM_FLT_CARDS 20
 #define IPE_BLOCK_SIZE    16
 
-#define SIZEOF_UDPStructIPECrateStatus 1480
+//defined  somewere else ...#define SIZEOF_UDPStructIPECrateStatus 1480
+#endif
 
 typedef struct{
     //identification
