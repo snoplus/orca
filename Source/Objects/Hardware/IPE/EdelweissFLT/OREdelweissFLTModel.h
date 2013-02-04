@@ -139,6 +139,7 @@
     int repeatSWTriggerMode;
     int swTriggerIsRepeating;
     int32_t fiberOutMask;
+    int fiberSelectForBBStatusBits;
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
@@ -149,6 +150,8 @@
 - (short) getNumberRegisters;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+- (int) fiberSelectForBBStatusBits;
+- (void) setFiberSelectForBBStatusBits:(int)aFiberSelectForBBStatusBits;
 - (uint32_t) fiberOutMask;
 - (void) setFiberOutMask:(uint32_t)aFiberOutMask;
 - (int) swTriggerIsRepeating;
@@ -314,6 +317,9 @@
 - (void) writeCommandSoftwareTrigger;
 - (void) readTriggerData;
 
+- (void) readBBStatusBits;
+- (void) readAllBBStatusBits;
+
 - (void) printStatusReg;
 - (void) printVersions;
 - (void) printValueTable;
@@ -390,6 +396,7 @@
 				  n:(int) n;
 @end
 
+extern NSString* OREdelweissFLTModelFiberSelectForBBStatusBitsChanged;
 extern NSString* OREdelweissFLTModelFiberOutMaskChanged;
 extern NSString* OREdelweissFLTModelTpixChanged;
 extern NSString* OREdelweissFLTModelSwTriggerIsRepeatingChanged;

@@ -30,6 +30,7 @@
 #import "EdelweissSLTv4_HW_Definitions.h"
 #import "ORCommandList.h"
 
+NSString* OREdelweissFLTModelFiberSelectForBBStatusBitsChanged = @"OREdelweissFLTModelFiberSelectForBBStatusBitsChanged";
 NSString* OREdelweissFLTModelFiberOutMaskChanged = @"OREdelweissFLTModelFiberOutMaskChanged";
 NSString* OREdelweissFLTModelTpixChanged = @"OREdelweissFLTModelTpixChanged";
 NSString* OREdelweissFLTModelSwTriggerIsRepeatingChanged = @"OREdelweissFLTModelSwTriggerIsRepeatingChanged";
@@ -133,8 +134,10 @@ enum IpeFLTV4Enum{
 
 	kFLTV4Delays120meas,
 
-	kFLTV4RAMDataReg,
+	kFLTV4BBStatusReg,
 	
+	kFLTV4RAMDataReg,
+    
 	kFLTV4NumRegs //must be last
 };
 
@@ -191,6 +194,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	{@"TotalTriggerN",		0x000084>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 
 	{@"Delays120meas",		0x000088>>2,		-1,				kIpeRegReadable },
+
+	{@"BBStatus",		    0x001400>>2,		30,				kIpeRegReadable | kIpeRegNeedsChannel},
 
 	{@"RAMData",		    0x003000>>2,		1024,				kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel},
 
@@ -264,6 +269,20 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (short) getNumberRegisters{ return kFLTV4NumRegs; }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+
+- (int) fiberSelectForBBStatusBits
+{
+    return fiberSelectForBBStatusBits;
+}
+
+- (void) setFiberSelectForBBStatusBits:(int)aFiberSelectForBBStatusBits
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setFiberSelectForBBStatusBits:fiberSelectForBBStatusBits];
+    
+    fiberSelectForBBStatusBits = aFiberSelectForBBStatusBits;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelFiberSelectForBBStatusBitsChanged object:self];
+}
 
 - (uint32_t) fiberOutMask
 {
@@ -1507,6 +1526,7 @@ for(chan=0; chan<6;chan++)
     self = [super initWithCoder:decoder];
 	
     [[self undoManager] disableUndoRegistration];
+    [self setFiberSelectForBBStatusBits:[decoder decodeIntForKey:@"fiberSelectForBBStatusBits"]];
     [self setFiberOutMask:[decoder decodeInt32ForKey:@"fiberOutMask"]];
     //[self setTpix:[decoder decodeIntForKey:@"tpix"]];
     [self setRepeatSWTriggerMode:[decoder decodeIntForKey:@"repeatSWTriggerMode"]];
@@ -1574,6 +1594,7 @@ for(chan=0; chan<6;chan++)
 {
     [super encodeWithCoder:encoder];
 	
+    [encoder encodeInt:fiberSelectForBBStatusBits forKey:@"fiberSelectForBBStatusBits"];
     [encoder encodeInt32:fiberOutMask forKey:@"fiberOutMask"];
     //[encoder encodeInt:tpix forKey:@"tpix"];
     [encoder encodeInt:repeatSWTriggerMode forKey:@"repeatSWTriggerMode"];
@@ -2100,6 +2121,60 @@ for(chan=0; chan<6;chan++)
 		default:   return @"UNKNOWN";		break;
 	}
 }
+
+
+- (void) readBBStatusBits
+{
+
+static int counter=0;
+        //DEBUG OUTPUT:           NSLog(@"%@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
+        //NSLog(@"  read from fiber in #%i\n",fiberSelectForBBStatusBits);//TODO : DEBUG testing ...-tb-
+        
+        uint32_t BBStatus32[30];
+        uint16_t *BBStatus16 = (uint16_t *)BBStatus32;
+        
+        int i;
+        
+        @try{
+        
+        for(i=0;i<30;i++){
+            //BBStatus32[i]=i*2+i*0x10000; // for testing without hardware
+            BBStatus32[i]= [self readReg:kFLTV4BBStatusReg channel:fiberSelectForBBStatusBits  index:i];
+        }
+        
+        }
+		@catch(NSException* e){
+			NSLog(@"Could not read status bits because of exception -%@- with reason -%@-\n",[e name],[e reason]);
+            return;
+		}
+        
+        
+        
+        
+		//	NSFont* aFont = [NSFont userFixedPitchFontOfSize:9];
+        NSFont* aFont = [NSFont fontWithName:@"Monaco" size:9];
+
+        NSLogFont(aFont,@"Read BBStatBits of fiber #%i (callCode %i)\n",fiberSelectForBBStatusBits+1,counter);
+counter++;
+        NSString *s = [[NSString alloc] initWithString: @""];
+        for(i=0;i<58;i++){
+            //BBStatus16[i]=i*2+i*0x10000;
+            s = [s stringByAppendingFormat:@"(%2i) 0x%04x; ", i,BBStatus16[i] ];
+            if( ((i+1) % 10)== 0){
+                NSLogFont(aFont,@"BBStatBits:%@\n",s);
+                s=@"";
+            }
+        }
+        if([s length]!= 0)        NSLogFont(aFont,@"BBStatBits:%@\n",s);
+}
+
+- (void) readAllBBStatusBits
+{
+        //DEBUG OUTPUT:         
+        NSLog(@"%@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
+}
+
+
 
 - (void) printVersions
 {

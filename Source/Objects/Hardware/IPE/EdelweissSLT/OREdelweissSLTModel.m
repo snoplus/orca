@@ -2837,10 +2837,49 @@ NSLog(@"WARNING: %@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class])
 
 -(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+        // -------TIMER-VARIABLES-----------
+        static struct timeval starttime, stoptime, currtime;//    struct timezone tz; is obsolete ... -tb-
+        //struct timezone	timeZone;
+	    static double currDiffTime=0.0, lastDiffTime=0.0;
+
+
+
+
 	if(!first){
 		//event readout controlled by the SLT cpu now. ORCA reads out 
 		//the resulting data from a generic circular buffer in the pmc code.
 		[pmcLink takeData:aDataPacket userInfo:userInfo];
+        
+        
+        //additionally we generate events here
+        //start timer -------TIMER------------
+        //timing
+        //see below ... gettimeofday(&starttime,NULL);
+        //gettimeofday(&starttime,&timeZone);
+        //start timer -------TIMER------------
+
+        //TIMER - do something every second:
+        //-----------------------
+		//gettimeofday(&starttime,NULL);
+        gettimeofday(&currtime,NULL);
+        currDiffTime =      (  (double)(currtime.tv_sec  - starttime.tv_sec)  ) +
+                    ( ((double)(currtime.tv_usec - starttime.tv_usec)) * 0.000001 );
+        double elapsedTime = currDiffTime - lastDiffTime;
+		if(elapsedTime >= 1.0){
+		    //code to be executed every second -BEGIN
+		    //
+		    // 
+		    //./ DO SOMETHING
+			NSLog(@"===================================\n");
+			NSLog(@"   Datataker Loop: 1 PPS: %f\n",currDiffTime);
+			NSLog(@"===================================\n");
+		    //code to be executed every second -END
+		    lastDiffTime = currDiffTime;
+		}
+
+
+
+        
 	}
 	else {// the first time
 		//TODO: -tb- [self writePageManagerReset];
@@ -2850,6 +2889,15 @@ NSLog(@"WARNING: %@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class])
 
 		[self shipSltSecondCounter: kStartRunType];
 		first = NO;
+        
+        //init timer
+        currDiffTime=0.0; lastDiffTime=0.0;
+        //start timer -------TIMER------------
+        //timing
+        //see below ... gettimeofday(&starttime,NULL);
+        gettimeofday(&starttime,NULL);
+        //start timer -------TIMER------------
+
 	}
 }
 

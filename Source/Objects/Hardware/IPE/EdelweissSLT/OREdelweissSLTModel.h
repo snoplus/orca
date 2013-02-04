@@ -189,6 +189,9 @@
     int cmdWArg4;
     uint32_t BBCmdFFMask;
     NSString* crateUDPDataCommand;
+    
+    //ADC buffer: 2 seconds buffer; 12 FLT * 36 chan = 432 ADCs; 432*100000 / 720 = 600000 Pakete bzw. 86 MB
+    uint32_t adcBuf[2][60000][360];
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization

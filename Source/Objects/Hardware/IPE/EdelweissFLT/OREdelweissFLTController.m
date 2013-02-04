@@ -306,9 +306,19 @@
                          name : OREdelweissFLTModelFiberOutMaskChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(fiberSelectForBBStatusBitsChanged:)
+                         name : OREdelweissFLTModelFiberSelectForBBStatusBitsChanged
+						object: model];
+
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+
+- (void) fiberSelectForBBStatusBitsChanged:(NSNotification*)aNote
+{
+	[fiberSelectForBBStatusBitsPU selectItemAtIndex: [model fiberSelectForBBStatusBits]];
+}
 
 - (void) fiberOutMaskChanged:(NSNotification*)aNote
 {
@@ -570,6 +580,7 @@
 	[self swTriggerIsRepeatingChanged:nil];
 	[self tpixChanged:nil];
 	[self fiberOutMaskChanged:nil];
+	[self fiberSelectForBBStatusBitsChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -902,6 +913,25 @@
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+
+- (void) fiberSelectForBBStatusBitsPUAction:(id)sender
+{
+	[model setFiberSelectForBBStatusBits:[fiberSelectForBBStatusBitsPU indexOfSelectedItem]];	
+}
+
+- (IBAction) readBBStatusBitsButtonAction:(id)sender
+{
+        //DEBUG OUTPUT:         NSLog(@"%@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
+        [model readBBStatusBits];
+}
+
+- (IBAction) readAllBBStatusBitsButtonAction:(id)sender
+{
+        //DEBUG OUTPUT:  
+        NSLog(@"%@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
+        [model readAllBBStatusBits];
+}
+
 
 - (void) fiberOutMaskMatrixAction:(id)sender
 {

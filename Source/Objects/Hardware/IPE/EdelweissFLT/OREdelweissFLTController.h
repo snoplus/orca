@@ -29,6 +29,7 @@
 @interface OREdelweissFLTController : OrcaObjectController {
 	@private
         IBOutlet NSButton*		settingLockButton;
+	    IBOutlet   NSPopUpButton* fiberSelectForBBStatusBitsPU;
 	    IBOutlet NSButton*      tpixCB;
 //	IBOutlet   No Outlet* swTriggerIsRepeatingNo Outlet;
 		
@@ -136,6 +137,7 @@
 - (void) updateButtons;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+- (void) fiberSelectForBBStatusBitsChanged:(NSNotification*)aNote;
 - (void) fiberOutMaskChanged:(NSNotification*)aNote;
 - (void) swTriggerIsRepeatingChanged:(NSNotification*)aNote;
 - (void) repeatSWTriggerModeChanged:(NSNotification*)aNote;
@@ -186,6 +188,9 @@
 - (void) selectedChannelValueChanged:(NSNotification*) aNote;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+- (IBAction) fiberSelectForBBStatusBitsPUAction:(id)sender;
+- (IBAction) readBBStatusBitsButtonAction:(id)sender;
+- (IBAction) readAllBBStatusBitsButtonAction:(id)sender;
 - (IBAction) fiberOutMaskMatrixAction:(id)sender;
 - (IBAction) readFiberOutMaskButtonAction:(id)sender;
 - (IBAction) writeFiberOutMaskButtonAction:(id)sender;
