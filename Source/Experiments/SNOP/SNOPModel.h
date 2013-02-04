@@ -28,50 +28,68 @@
 #define kUsePSUPView	2
 #define kNumTubes	20 //XL3s
 
-@interface SNOPModel :  ORExperimentModel
+@interface SNOPModel: ORExperimentModel
 {
-	int             viewType;
-    NSString*       morcaUserName;
-    NSString*       morcaPassword;
-    NSString*       morcaDBName;
-    unsigned int    morcaPort;
-    NSString*       morcaIPAddress;
-    unsigned int    morcaUpdateTime;
-    BOOL            morcaIsVerbose;
-    BOOL            morcaIsWithinRun;
-    NSString*       morcaStatus;
-    BOOL            morcaIsUpdating;
-    NSMutableArray*		morcaConnectionHistory;
-    NSUInteger		morcaIPNumberIndex;
-    NSTask*			morcaPingTask;
-    NSMutableDictionary* morcaDBDict;
+	int viewType;
+
+    NSString* _orcaDBUserName;
+    NSString* _orcaDBPassword;
+    NSString* _orcaDBName;
+    unsigned int _orcaDBPort;
+    NSString* _orcaDBIPAddress;
+    NSMutableArray* _orcaDBConnectionHistory;
+    NSUInteger _orcaDBIPNumberIndex;
+    NSTask*	_orcaDBPingTask;
+    
+    NSString* _debugDBUserName;
+    NSString* _debugDBPassword;
+    NSString* _debugDBName;
+    unsigned int _debugDBPort;
+    NSString* _debugDBIPAddress;
+    NSMutableArray* _debugDBConnectionHistory;
+    NSUInteger _debugDBIPNumberIndex;
+    NSTask*	_debugDBPingTask;
 }
 
-@property (copy)    NSString* morcaUserName;
-@property (copy)    NSString* morcaPassword;
-@property (copy)    NSString* morcaDBName;
-@property (assign)  unsigned int morcaPort;
-@property (copy)    NSString* morcaIPAddress;
-@property (assign)  unsigned int morcaUpdateTime;
-@property (assign)  BOOL morcaIsVerbose;
-@property (assign)  BOOL morcaIsWithinRun;
-@property (copy)    NSString* morcaStatus;
-@property (assign)  BOOL morcaIsUpdating;
+@property (nonatomic,copy) NSString* orcaDBUserName;
+@property (nonatomic,copy) NSString* orcaDBPassword;
+@property (nonatomic,copy) NSString* orcaDBName;
+@property (nonatomic,assign) unsigned int orcaDBPort;
+@property (nonatomic,copy) NSString* orcaDBIPAddress;
+@property (nonatomic,retain) NSMutableArray* orcaDBConnectionHistory;
+@property (nonatomic,assign) NSUInteger orcaDBIPNumberIndex;
+@property (nonatomic,retain) NSTask* orcaDBPingTask;
 
-- (void) initMorcaConnectionHistory;
-- (void) clearMorcaConnectionHistory;
-- (unsigned int) morcaConnectionHistoryCount;
-- (id) morcaConnectionHistoryItem:(unsigned int)index;
-- (void) morcaPing;
+@property (nonatomic,copy) NSString* debugDBUserName;
+@property (nonatomic,copy) NSString* debugDBPassword;
+@property (nonatomic,copy) NSString* debugDBName;
+@property (nonatomic,assign) unsigned int debugDBPort;
+@property (nonatomic,copy) NSString* debugDBIPAddress;
+@property (nonatomic,retain) NSMutableArray* debugDBConnectionHistory;
+@property (nonatomic,assign) NSUInteger debugDBIPNumberIndex;
+@property (nonatomic,retain) NSTask* debugDBPingTask;
+
+- (void) initOrcaDBConnectionHistory;
+- (void) clearOrcaDBConnectionHistory;
+- (id) orcaDBConnectionHistoryItem:(unsigned int)index;
+- (void) orcaDBPing;
+
+- (void) initDebugDBConnectionHistory;
+- (void) clearDebugDBConnectionHistory;
+- (id) debugDBConnectionHistoryItem:(unsigned int)index;
+- (void) debugDBPing;
+
 - (void) taskFinished:(NSTask*)aTask;
-- (ORCouchDB*) morcaDBRef;
-- (void) morcaUpdateDB;
-- (void) morcaCompactDB;
+- (ORCouchDB*) orcaDBRef;
 - (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp;
 
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;
 - (void) runStateChanged:(NSNotification*)aNote;
+- (void) subRunStarted:(NSNotification*)aNote;
+- (void) subRunEnded:(NSNotification*)aNote;
+- (void) runStarted:(NSNotification*)aNote;
+- (void) runStopped:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Accessors
 - (void) setViewType:(int)aViewType;
@@ -87,13 +105,5 @@
 @end
 
 extern NSString* ORSNOPModelViewTypeChanged;
-extern NSString* ORSNOPModelMorcaIsVerboseChanged;
-extern NSString* ORSNOPModelMorcaIsWithinRunChanged;
-extern NSString* ORSNOPModelMorcaUpdateTimeChanged;
-extern NSString* ORSNOPModelMorcaPortChanged;
-extern NSString* ORSNOPModelMorcaStatusChanged;
-extern NSString* ORSNOPModelMorcaUserNameChanged;
-extern NSString* ORSNOPModelMorcaPasswordChanged;
-extern NSString* ORSNOPModelMorcaDBNameChanged;
-extern NSString* ORSNOPModelMorcaIPAddressChanged;
-extern NSString* ORSNOPModelMorcaIsUpdatingChanged;
+extern NSString* ORSNOPModelOrcaDBIPAddressChanged;
+extern NSString* ORSNOPModelDebugDBIPAddressChanged;

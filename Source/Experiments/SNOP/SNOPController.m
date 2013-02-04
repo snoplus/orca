@@ -49,7 +49,7 @@ NSString* ORSNOPRequestHVStatus = @"ORSNOPRequestHVStatus";
 	detectorSize		= NSMakeSize(620,595);
 	detailsSize		= NSMakeSize(450,589);
 	focalPlaneSize		= NSMakeSize(450,589);
-	couchDBSize		= NSMakeSize(450,500);
+	couchDBSize		= NSMakeSize(450,480);
 	hvMasterSize		= NSMakeSize(620,595);
 	slowControlSize		= NSMakeSize(620,595);
 	
@@ -74,60 +74,20 @@ NSString* ORSNOPRequestHVStatus = @"ORSNOPRequestHVStatus";
 			object: model];
     
     [notifyCenter addObserver : self
-                     selector : @selector(morcaIsVerboseChanged:)
-                         name : ORSNOPModelMorcaIsVerboseChanged
-                        object: model];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(morcaIsWithinRunChanged:)
-                         name : ORSNOPModelMorcaIsWithinRunChanged
-                        object: model];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(morcaUpdateRateChanged:)
-                         name : ORSNOPModelMorcaUpdateTimeChanged
+                     selector : @selector(dbOrcaDBIPChanged:)
+                         name : ORSNOPModelOrcaDBIPAddressChanged
                         object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(morcaPortChanged:)
-                         name : ORSNOPModelMorcaPortChanged
-                        object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(morcaStatusChanged:)
-                         name : ORSNOPModelMorcaStatusChanged
-                        object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(morcaUserNameChanged:)
-                         name : ORSNOPModelMorcaUserNameChanged
-                        object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(morcaPasswordChanged:)
-                         name : ORSNOPModelMorcaPasswordChanged
-                        object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(morcaDBNameChanged:)
-                         name : ORSNOPModelMorcaDBNameChanged
-                        object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(morcaIPAddressChanged:)
-                         name : ORSNOPModelMorcaIPAddressChanged
-                        object: model];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(morcaIPAddressChanged:)
-                         name : ORSNOPModelMorcaIsUpdatingChanged
+                     selector : @selector(dbDebugDBIPChanged:)
+                         name : ORSNOPModelDebugDBIPAddressChanged
                         object: model];
 
     [notifyCenter addObserver : self
                      selector : @selector(hvStatusChanged:)
                          name : ORXL3ModelHvStatusChanged
                         object: nil];
-
+    
     [notifyCenter addObserver : self
                      selector : @selector(hvStatusChanged:)
                          name : ORXL3ModelHVNominalVoltageChanged
@@ -138,16 +98,9 @@ NSString* ORSNOPRequestHVStatus = @"ORSNOPRequestHVStatus";
 {
 	[super updateWindow];
 	[self viewTypeChanged:nil];
-    [self morcaUserNameChanged:nil];
-    [self morcaPasswordChanged:nil];
-    [self morcaDBNameChanged:nil];
-    [self morcaPortChanged:nil];
-    [self morcaIPAddressChanged:nil];
-    [self morcaIsVerboseChanged:nil];
-    [self morcaIsWithinRunChanged:nil];
-    [self morcaUpdateRateChanged:nil];
-    [self morcaStatusChanged:nil];
     [self hvStatusChanged:nil];
+    [self dbOrcaDBIPChanged:nil];
+    [self dbDebugDBIPChanged:nil];
 }
 
 - (void) viewTypeChanged:(NSNotification*)aNote
@@ -157,49 +110,14 @@ NSString* ORSNOPRequestHVStatus = @"ORSNOPRequestHVStatus";
 	[detectorView makeAllSegments];	
 }
 
-- (void) morcaUserNameChanged:(NSNotification*)aNote
+- (void) dbOrcaDBIPChanged:(NSNotification*)aNote
 {
-    [morcaUserNameField setStringValue:[model morcaUserName]];
+    [orcaDBIPAddressPU setStringValue:[model orcaDBIPAddress]];
 }
 
-- (void) morcaPasswordChanged:(NSNotification*)aNote
+- (void) dbDebugDBIPChanged:(NSNotification*)aNote
 {
-    [morcaPasswordField setStringValue:[model morcaPassword]];
-}
-
-- (void) morcaDBNameChanged:(NSNotification*)aNote
-{
-    [morcaDBNameField setStringValue:[model morcaDBName]];
-}
-
-- (void) morcaPortChanged:(NSNotification*)aNote
-{
-    [morcaPortField setStringValue:[NSString stringWithFormat:@"%d",[model morcaPort]]];
-}
-
-- (void) morcaIPAddressChanged:(NSNotification*)aNote
-{
-    [morcaIPAddressPU setStringValue:[model morcaIPAddress]];
-}
-
-- (void) morcaIsVerboseChanged:(NSNotification*)aNote
-{
-    [morcaIsVerboseButton setIntValue:[model morcaIsVerbose]];
-}
-
-- (void) morcaIsWithinRunChanged:(NSNotification*)aNote
-{
-    [morcaIsWithinRunButton setIntValue:[model morcaIsWithinRun]];
-}
-
-- (void) morcaUpdateRateChanged:(NSNotification*)aNote
-{
-    [morcaUpdateRatePU selectItemWithTag:[model morcaUpdateTime]];
-}
-
-- (void) morcaStatusChanged:(NSNotification*)aNote
-{
-    [morcaStatusField setStringValue:[model morcaStatus]];
+    [debugDBIPAddressPU setStringValue:[model debugDBIPAddress]];
 }
 
 - (void) hvStatusChanged:(NSNotification*)aNote
@@ -322,68 +240,58 @@ NSString* ORSNOPRequestHVStatus = @"ORSNOPRequestHVStatus";
 	[model setViewType:[sender indexOfSelectedItem]];
 }
 
-- (IBAction)morcaUserNameAction:(id)sender {
-    [model setMorcaUserName:[sender stringValue]];
+- (IBAction) orcaDBIPAddressAction:(id)sender {
+    [model setOrcaDBIPAddress:[sender stringValue]];
 }
 
-- (IBAction)morcaPasswordAction:(id)sender {
-    [model setMorcaPassword:[sender stringValue]];
+- (IBAction) debugDBIPAddressAction:(id)sender {
+    [model setDebugDBIPAddress:[sender stringValue]];
 }
 
-- (IBAction)morcaDBNameAction:(id)sender {
-    [model setMorcaDBName:[sender stringValue]];
+- (IBAction) orcaDBClearHistoryAction:(id)sender
+{
+    [model clearOrcaDBConnectionHistory];
 }
 
-- (IBAction)morcaPortAction:(id)sender {
-    [model setMorcaPort:[sender intValue]];
+- (IBAction) debugDBClearHistoryAction:(id)sender
+{
+    [model clearDebugDBConnectionHistory];
 }
 
-- (IBAction)morcaIPAddressAction:(id)sender {
-    [model setMorcaIPAddress:[sender stringValue]];
+- (IBAction) orcaDBFutonAction:(id)sender {
+    [[NSWorkspace sharedWorkspace]
+     openURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://%@:%@@%@:%d/_utils/database.html?%@",
+                                   [model orcaDBUserName], [model orcaDBPassword], [model orcaDBIPAddress],
+                                   [model orcaDBPort], [model orcaDBName]]]];
 }
 
-- (IBAction)morcaClearHistoryAction:(id)sender {
-    [model clearMorcaConnectionHistory];
+- (IBAction) debugDBFutonAction:(id)sender {
+    [[NSWorkspace sharedWorkspace]
+     openURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://%@:%@@%@:%d/_utils/database.html?%@",
+                                   [model debugDBUserName], [model debugDBPassword], [model debugDBIPAddress],
+                                   [model debugDBPort], [model debugDBName]]]];
 }
 
-- (IBAction)morcaFutonAction:(id)sender {    
-    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://%@:%@@%@:%d/_utils/database.html?%@",
-        [model morcaUserName], [model morcaPassword], [model morcaIPAddress], [model morcaPort], [model morcaDBName]]]];
+- (IBAction) orcaDBTestAction:(id)sender {
+    [[NSWorkspace sharedWorkspace]
+     openURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://%@:%@@%@:%d",
+                                   [model orcaDBUserName], [model orcaDBPassword],
+                                   [model orcaDBIPAddress], [model orcaDBPort]]]];
 }
 
-- (IBAction)morcaTestAction:(id)sender {
-    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://%@:%@@%@:%d",
-        [model morcaUserName], [model morcaPassword], [model morcaIPAddress], [model morcaPort]]]];
+- (IBAction) debugDBTestAction:(id)sender {
+    [[NSWorkspace sharedWorkspace]
+     openURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://%@:%@@%@:%d",
+                                   [model debugDBUserName], [model debugDBPassword],
+                                   [model debugDBIPAddress], [model debugDBPort]]]];
 }
 
-- (IBAction)morcaPingAction:(id)sender {
-    [model morcaPing];
+- (IBAction) orcaDBPingAction:(id)sender {
+    [model orcaDBPing];
 }
 
-- (IBAction)morcaUpdateNowAction:(id)sender {
-    [model morcaUpdateDB];
-}
-
-- (IBAction)morcaStartAction:(id)sender {
-    [model setMorcaIsUpdating:YES];
-    [model morcaCompactDB];
-    [model morcaUpdateDB];
-}
-
-- (IBAction)morcaStopAction:(id)sender {
-    [model setMorcaIsUpdating:NO];
-}
-
-- (IBAction)morcaIsVerboseAction:(id)sender {
-    [model setMorcaIsVerbose:[sender intValue]];
-}
-
-- (IBAction)morcaUpdateRateAction:(id)sender {
-    [model setMorcaUpdateTime:[[sender selectedItem] tag]];
-}
-
-- (IBAction)morcaUpdateWithinRunAction:(id)sender {
-    [model setMorcaIsWithinRun:[sender intValue]];
+- (IBAction) debugDBPingAction:(id)sender {
+    [model debugDBPing];
 }
 
 - (IBAction)hvMasterPanicAction:(id)sender
@@ -483,14 +391,28 @@ NSString* ORSNOPRequestHVStatus = @"ORSNOPRequestHVStatus";
 }
 
 #pragma mark ¥¥¥ComboBox Data Source
-- (NSInteger ) numberOfItemsInComboBox:(NSComboBox *)aComboBox
+- (NSInteger) numberOfItemsInComboBox:(NSComboBox *)aComboBox
 {
-	return  [model morcaConnectionHistoryCount];
+    if (aComboBox == orcaDBIPAddressPU) {
+        return [[model orcaDBConnectionHistory] count];
+    }
+    else if (aComboBox == debugDBIPAddressPU) {
+        return [[model debugDBConnectionHistory] count];
+    }
+
+    return 0;
 }
 
 - (id)comboBox:(NSComboBox *)aComboBox objectValueForItemAtIndex:(NSInteger)index
 {
-	return [model morcaConnectionHistoryItem:index];
+    if (aComboBox == orcaDBIPAddressPU) {
+        return [model orcaDBConnectionHistoryItem:index];
+    }
+    else if (aComboBox == debugDBIPAddressPU) {
+        return [model debugDBConnectionHistoryItem:index];
+    }
+    
+    return nil;
 }
 
 

@@ -29,16 +29,8 @@
 
 NSString* ORSNOPModelViewTypeChanged	= @"ORSNOPModelViewTypeChanged";
 static NSString* SNOPDbConnector	= @"SNOPDbConnector";
-NSString* ORSNOPModelMorcaIsVerboseChanged = @"ORSNOPModelMorcaIsVerboseChanged";
-NSString* ORSNOPModelMorcaIsWithinRunChanged = @"ORSNOPModelMorcaIsWithinRunChanged";
-NSString* ORSNOPModelMorcaUpdateTimeChanged = @"ORSNOPModelMorcaUpdateTimeChanged";
-NSString* ORSNOPModelMorcaPortChanged = @"ORSNOPModelMorcaPortChanged";
-NSString* ORSNOPModelMorcaStatusChanged = @"ORSNOPModelMorcaStatusChanged";
-NSString* ORSNOPModelMorcaUserNameChanged = @"ORSNOPModelMorcaUserNameChanged";
-NSString* ORSNOPModelMorcaPasswordChanged = @"ORSNOPModelMorcaPasswordChanged";
-NSString* ORSNOPModelMorcaDBNameChanged = @"ORSNOPModelMorcaDBNameChanged";
-NSString* ORSNOPModelMorcaIPAddressChanged = @"ORSNOPModelMorcaIPAddressChanged";
-NSString* ORSNOPModelMorcaIsUpdatingChanged = @"ORSNOPModelMorcaIsUpdatingChanged";
+NSString* ORSNOPModelOrcaDBIPAddressChanged = @"ORSNOPModelOrcaDBIPAddressChanged";
+NSString* ORSNOPModelDebugDBIPAddressChanged = @"ORSNOPModelDebugDBIPAddressChanged";
 
 #define kMorcaDocumentAdded     @"kMorcaDocumentAdded"
 #define kMorcaDocumentGot       @"kMorcaDocumentGot"
@@ -52,6 +44,22 @@ NSString* ORSNOPModelMorcaIsUpdatingChanged = @"ORSNOPModelMorcaIsUpdatingChange
 @end
 
 @implementation SNOPModel
+
+@synthesize
+orcaDBUserName = _orcaDBUserName,
+orcaDBPassword = _orcaDBPassword,
+orcaDBName = _orcaDBName,
+orcaDBPort = _orcaDBPort,
+orcaDBConnectionHistory = _orcaDBConnectionHistory,
+orcaDBIPNumberIndex = _orcaDBIPNumberIndex,
+orcaDBPingTask = _orcaDBPingTask,
+debugDBUserName = _debugDBUserName,
+debugDBPassword = _debugDBPassword,
+debugDBName = _debugDBName,
+debugDBPort = _debugDBPort,
+debugDBConnectionHistory = _debugDBConnectionHistory,
+debugDBIPNumberIndex = _debugDBIPNumberIndex,
+debugDBPingTask = _debugDBPingTask;
 
 #pragma mark ¥¥¥Initialization
 
@@ -80,12 +88,6 @@ NSString* ORSNOPModelMorcaIsUpdatingChanged = @"ORSNOPModelMorcaIsUpdatingChange
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [morcaUserName release];
-    [morcaPassword release];
-    [morcaDBName release];
-    [morcaIPAddress release];
-    if (morcaStatus) [morcaStatus release];
-    if (morcaDBDict) [morcaDBDict release];
     
     [super dealloc];
 }
@@ -93,17 +95,35 @@ NSString* ORSNOPModelMorcaIsUpdatingChanged = @"ORSNOPModelMorcaIsUpdatingChange
 - (void) sleep
 {
     [super sleep];
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(morcaUpdateDB) object:nil];
+    //[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(morcaUpdateDB) object:nil];
 }
 
-- (void) initMorcaConnectionHistory
+- (void) initOrcaDBConnectionHistory
 {
-	morcaIPNumberIndex = [[NSUserDefaults standardUserDefaults] integerForKey: [NSString stringWithFormat:@"orca.%@.morcaIPNumberIndex",[self className]]];
-	if(!morcaConnectionHistory){
-		NSArray* his = [[NSUserDefaults standardUserDefaults] objectForKey: [NSString stringWithFormat:@"orca.%@.morcaConnectionHistory",[self className]]];
-		morcaConnectionHistory = [his mutableCopy];
+	self.orcaDBIPNumberIndex = [[NSUserDefaults standardUserDefaults] integerForKey: [NSString stringWithFormat:@"orca.%@.orcaDBIPNumberIndex",[self className]]];
+	if(!self.orcaDBConnectionHistory){
+		NSArray* his = [[NSUserDefaults standardUserDefaults] objectForKey:
+                        [NSString stringWithFormat:@"orca.%@.orcaDBConnectionHistory",[self className]]];
+
+        self.orcaDBConnectionHistory = [[his mutableCopy] autorelease];
 	}
-	if(!morcaConnectionHistory) morcaConnectionHistory = [[NSMutableArray alloc] init];
+	if(!self.orcaDBConnectionHistory) {
+        self.orcaDBConnectionHistory = [NSMutableArray array];
+    }
+}
+
+- (void) initDebugDBConnectionHistory
+{
+	self.debugDBIPNumberIndex = [[NSUserDefaults standardUserDefaults] integerForKey: [NSString stringWithFormat:@"orca.%@.debugDBIPNumberIndex",[self className]]];
+	if(!self.debugDBConnectionHistory){
+		NSArray* his = [[NSUserDefaults standardUserDefaults] objectForKey:
+                        [NSString stringWithFormat:@"orca.%@.debugDBConnectionHistory",[self className]]];
+        
+		self.debugDBConnectionHistory = [[his mutableCopy] autorelease];
+	}
+	if(!self.debugDBConnectionHistory) {
+        self.debugDBConnectionHistory = [NSMutableArray array];
+    }
 }
 
 //- (NSString*) helpURL
@@ -121,227 +141,210 @@ NSString* ORSNOPModelMorcaIsUpdatingChanged = @"ORSNOPModelMorcaIsUpdatingChange
                      selector : @selector(runStateChanged:)
                          name : ORRunStatusChangedNotification
                        object : nil];    
+
+    [notifyCenter addObserver : self
+                     selector : @selector(subRunStarted:)
+                         name : ORRunStartSubRunNotification
+                       object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(subRunEnded:)
+                         name : ORRunBetweenSubRunsNotification
+                       object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(runStarted:)
+                         name : ORRunStartedNotification
+                       object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(runStopped:)
+                         name : ORRunStoppedNotification
+                       object : nil];
 }
 
 - (void) runStateChanged:(NSNotification*)aNote
 {
     int running = [[[aNote userInfo] objectForKey:ORRunStatusValue] intValue];
     if(running == eRunStopped){
-        if (morcaIsWithinRun) {
-            [self setMorcaIsUpdating:NO];
-        }
     }
     else if(running == eRunStarting) {
-        if (morcaIsWithinRun) {
-            [self setMorcaIsUpdating:YES];
-            [self morcaUpdateDB];
-        }
     }
+}
+
+- (void) subRunStarted:(NSNotification*)aNote;
+{
+    //EPED record
+    //TRIG record?
+    //update orcadb run document
+}
+
+- (void) subRunEnded:(NSNotification*)aNote;
+{
+    //update calibration documents (TELLIE temp)
+}
+
+- (void) runStarted:(NSNotification*)aNote
+{
+    //orcadb run document
+    //RHDR record
+}
+
+- (void) runStopped:(NSNotification*)aNote;
+{
+    //orcadb run document update
 }
 
 #pragma mark ¥¥¥Accessors
-- (NSString*) morcaUserName
+
+- (void) clearOrcaDBConnectionHistory
 {
-    if (!morcaUserName) return @"";
-    return morcaUserName;
+	self.orcaDBConnectionHistory = nil;
+    [self setOrcaDBIPAddress:[self orcaDBIPAddress]];
 }
 
-- (void) setMorcaUserName:(NSString *)aMorcaUserName
+- (void) clearDebugDBConnectionHistory
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setMorcaUserName:morcaUserName];
-    [morcaUserName autorelease];
-    morcaUserName = [aMorcaUserName copy];
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelMorcaUserNameChanged object:self];
+	self.debugDBConnectionHistory = nil;
+	[self setDebugDBIPAddress:[self debugDBIPAddress]];
 }
 
-- (NSString*) morcaPassword
+- (id) orcaDBConnectionHistoryItem:(unsigned int)index
 {
-    if (!morcaPassword) return @"";
-    return morcaPassword;
-}
-
-- (void) setMorcaPassword:(NSString *)aMorcaPassword
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setMorcaPassword:morcaPassword];
-    [morcaPassword autorelease];
-    morcaPassword = [aMorcaPassword copy];
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelMorcaPasswordChanged object:self];        
-}
-
-- (NSString*) morcaDBName
-{
-    if (!morcaDBName) return @"";
-    return morcaDBName;
-}
-
-- (void) setMorcaDBName:(NSString *)aMorcaDBName
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setMorcaDBName:morcaDBName];
-    [morcaDBName autorelease];
-    morcaDBName = [aMorcaDBName copy];
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelMorcaDBNameChanged object:self];        
-}
-
-- (void) clearMorcaConnectionHistory
-{
-	[morcaConnectionHistory release];
-	morcaConnectionHistory = nil;
-	
-	[self setMorcaIPAddress:[self morcaIPAddress]];
-}
-
-- (unsigned int) morcaConnectionHistoryCount
-{
-	return [morcaConnectionHistory count];
-}
-
-- (id) morcaConnectionHistoryItem:(unsigned int)index
-{
-	if(morcaConnectionHistory && index<[morcaConnectionHistory count])return [morcaConnectionHistory objectAtIndex:index];
+	if(self.orcaDBConnectionHistory && index < [self.orcaDBConnectionHistory count]) {
+        return [self.orcaDBConnectionHistory objectAtIndex:index];
+    }
 	else return nil;
 }
 
-- (NSString*) morcaIPAddress
+- (id) debugDBConnectionHistoryItem:(unsigned int)index
 {
-    if (!morcaIPAddress) return @"";
-    return morcaIPAddress;
+	if(self.debugDBConnectionHistory && index < [self.debugDBConnectionHistory count]) {
+        return [self.debugDBConnectionHistory objectAtIndex:index];
+    }
+	else return nil;
 }
 
-- (void) setMorcaIPAddress:(NSString*)aMorcaIPAddress
+- (NSString*) orcaDBIPAddress
 {
-	if([aMorcaIPAddress length]){
+    if (!_orcaDBIPAddress) {
+        return @"";
+    }
+    id result;
+    result = [_orcaDBIPAddress retain];
+    return [result autorelease];
+}
+
+- (void) setOrcaDBIPAddress:(NSString*)orcaIPAddress
+{
+	if([orcaIPAddress length] && orcaIPAddress != self.orcaDBIPAddress) {
+		[[[self undoManager] prepareWithInvocationTarget:self] setOrcaDBIPAddress:self.orcaDBIPAddress];
 		
-		[[[self undoManager] prepareWithInvocationTarget:self] setMorcaIPAddress:morcaIPAddress];
+		if (self.orcaDBIPAddress) [_orcaDBIPAddress autorelease];
+		if (orcaIPAddress) _orcaDBIPAddress = [orcaIPAddress copy];
 		
-		[morcaIPAddress autorelease];
-		morcaIPAddress = [aMorcaIPAddress copy];    
-		
-		if(!morcaConnectionHistory) morcaConnectionHistory = [[NSMutableArray alloc] init];
-		if(![morcaConnectionHistory containsObject:morcaIPAddress]){
-			[morcaConnectionHistory addObject:morcaIPAddress];
+		if(!self.orcaDBConnectionHistory) self.orcaDBConnectionHistory = [NSMutableArray arrayWithCapacity:4];
+		if(![self.orcaDBConnectionHistory containsObject:self.orcaDBIPAddress]){
+			[self.orcaDBConnectionHistory addObject:self.orcaDBIPAddress];
 		}
-		morcaIPNumberIndex = [morcaConnectionHistory indexOfObject:morcaIPAddress];
+		self.orcaDBIPNumberIndex = [self.orcaDBConnectionHistory indexOfObject:self.orcaDBIPAddress];
 		
-		[[NSUserDefaults standardUserDefaults] setObject:morcaConnectionHistory forKey:[NSString stringWithFormat:@"orca.%@.morcaConnectionHistory",[self className]]];
-		[[NSUserDefaults standardUserDefaults] setInteger:morcaIPNumberIndex forKey:[NSString stringWithFormat:@"orca.%@.morcaIPNumberIndex",[self className]]];
+		[[NSUserDefaults standardUserDefaults] setObject:self.orcaDBConnectionHistory forKey:[NSString stringWithFormat:@"orca.%@.orcaDBConnectionHistory",[self className]]];
+		[[NSUserDefaults standardUserDefaults] setInteger:self.orcaDBIPNumberIndex forKey:[NSString stringWithFormat:@"orca.%@.orcaDBIPNumberIndex",[self className]]];
 		[[NSUserDefaults standardUserDefaults] synchronize];
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelMorcaIPAddressChanged object:self];
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelOrcaDBIPAddressChanged object:self];
 	}
 }
 
-- (unsigned int) morcaPort;
+- (NSString*) debugDBIPAddress
 {
-    return morcaPort;
-}
-
-- (void) setMorcaPort:(unsigned int)aMorcaPort
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setMorcaPort:aMorcaPort];
-    morcaPort = aMorcaPort;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelMorcaPortChanged object:self];        
-}
-
-- (unsigned int) morcaUpdateTime;
-{
-    return morcaUpdateTime;
-}
-
-- (void) setMorcaUpdateTime:(unsigned int)aMorcaUpdateTime
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setMorcaUpdateTime:morcaUpdateTime];
-    morcaUpdateTime = aMorcaUpdateTime;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelMorcaUpdateTimeChanged object:self];        
-}
-
-- (BOOL) morcaIsVerbose
-{
-    return morcaIsVerbose;
-}
-
-- (void) setMorcaIsVerbose:(BOOL)aMorcaIsVerbose
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setMorcaIsVerbose:morcaIsVerbose];
-    morcaIsVerbose = aMorcaIsVerbose;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelMorcaIsVerboseChanged object:self];        
-}
-
-- (BOOL) morcaIsWithinRun
-{
-    return morcaIsWithinRun;
-}
-
-- (void) setMorcaIsWithinRun:(BOOL)aMorcaIsWithinRun
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setMorcaIsWithinRun:morcaIsWithinRun];
-    morcaIsWithinRun = aMorcaIsWithinRun;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelMorcaIsWithinRunChanged object:self];        
-}
-
-- (BOOL) morcaIsUpdating
-{
-    return morcaIsUpdating;
-}
-
-- (void) setMorcaIsUpdating:(BOOL)aMorcaIsUpdating
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setMorcaIsUpdating:morcaIsUpdating];
-    morcaIsUpdating = aMorcaIsUpdating;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelMorcaIsUpdatingChanged object:self];        
-}
-
-- (NSString*) morcaStatus
-{
-    if (!morcaStatus) {
-        return @"Status unknown";
+    if (!_debugDBIPAddress) {
+        return @"";
     }
-    return morcaStatus;
+    id result;
+    result = [_debugDBIPAddress retain];
+    return [result autorelease];
 }
 
-- (void) setMorcaStatus:(NSString*)aMorcaStatus
+- (void) setDebugDBIPAddress:(NSString*)debugIPAddress
 {
-    if (morcaStatus) [morcaStatus autorelease];
-    if (aMorcaStatus) morcaStatus = [aMorcaStatus copy];
-    
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelMorcaStatusChanged object:self];        
+	if([debugIPAddress length] && debugIPAddress != self.debugDBIPAddress) {
+		[[[self undoManager] prepareWithInvocationTarget:self] setDebugDBIPAddress:self.debugDBIPAddress];
+
+        if (self.debugDBIPAddress) [_debugDBIPAddress autorelease];
+		if (debugIPAddress) _debugDBIPAddress = [debugIPAddress copy];
+
+		if(!self.debugDBConnectionHistory) self.debugDBConnectionHistory = [NSMutableArray arrayWithCapacity:4];
+		if(![self.debugDBConnectionHistory containsObject:self.debugDBIPAddress]){
+			[self.debugDBConnectionHistory addObject:self.debugDBIPAddress];
+		}
+		self.debugDBIPNumberIndex = [self.debugDBConnectionHistory indexOfObject:self.debugDBIPAddress];
+		
+		[[NSUserDefaults standardUserDefaults] setObject:self.debugDBConnectionHistory forKey:[NSString stringWithFormat:@"orca.%@.debugDBConnectionHistory",[self className]]];
+		[[NSUserDefaults standardUserDefaults] setInteger:self.debugDBIPNumberIndex forKey:[NSString stringWithFormat:@"orca.%@.debugDBIPNumberIndex",[self className]]];
+		[[NSUserDefaults standardUserDefaults] synchronize];
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelDebugDBIPAddressChanged object:self];
+	}
 }
 
-- (void) morcaPing
+- (void) orcaDBPing
 {
-    if(!morcaPingTask){
+    if(!self.orcaDBPingTask){
 		ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
-		morcaPingTask = [[NSTask alloc] init];
+		self.orcaDBPingTask = [[[NSTask alloc] init] autorelease];
 		
-		[morcaPingTask setLaunchPath:@"/sbin/ping"];
-		[morcaPingTask setArguments: [NSArray arrayWithObjects:@"-c",@"2",@"-t",@"5",@"-q",morcaIPAddress,nil]];
+		[self.orcaDBPingTask setLaunchPath:@"/sbin/ping"];
+		[self.orcaDBPingTask setArguments: [NSArray arrayWithObjects:@"-c",@"2",@"-t",@"5",@"-q",self.orcaDBIPAddress,nil]];
 		
-		[aSequence addTaskObj:morcaPingTask];
+		[aSequence addTaskObj:self.orcaDBPingTask];
 		[aSequence setVerbose:YES];
 		[aSequence setTextToDelegate:YES];
 		[aSequence launch];
 	}
 	else {
-		[morcaPingTask terminate];
+		[self.orcaDBPingTask terminate];
+	}
+}
+
+- (void) debugDBPing
+{
+    if(!self.debugDBPingTask){
+		ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
+		self.debugDBPingTask = [[[NSTask alloc] init] autorelease];
+		
+		[self.debugDBPingTask setLaunchPath:@"/sbin/ping"];
+		[self.debugDBPingTask setArguments: [NSArray arrayWithObjects:@"-c",@"2",@"-t",@"5",@"-q",self.debugDBIPAddress,nil]];
+		
+		[aSequence addTaskObj:self.debugDBPingTask];
+		[aSequence setVerbose:YES];
+		[aSequence setTextToDelegate:YES];
+		[aSequence launch];
+	}
+	else {
+		[self.debugDBPingTask terminate];
 	}
 }
 
 - (void) taskFinished:(NSTask*)aTask
 {
-	if(aTask == morcaPingTask){
-		[morcaPingTask release];
-		morcaPingTask = nil;
+	if(aTask == self.orcaDBPingTask){
+		self.orcaDBPingTask = nil;
+	}
+	else if(aTask == self.debugDBPingTask){
+		self.debugDBPingTask = nil;
 	}
 }
 
-- (ORCouchDB*) morcaDBRef
+- (ORCouchDB*) orcaDBRef
 {
-	return [ORCouchDB couchHost:[self morcaIPAddress] port:[self morcaPort] username:[self morcaUserName]
-                            pwd:[self morcaPassword] database:[self morcaDBName] delegate:self];    
+	return [ORCouchDB couchHost:[self orcaDBIPAddress] port:self.orcaDBPort username:self.orcaDBUserName
+                            pwd:self.orcaDBPassword database:self.orcaDBName delegate:self];
 }
 
-- (void) morcaUpdateDB {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(morcaUpdateDB) object:nil];
-    [self morcaUpdateDBDict];
-//    [self performSelector:@selector(morcaUpdatePushDocs) withObject:nil afterDelay:0.2];
+- (void) orcaUpdateDB {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(orcaUpdateDB) object:nil];
+    //[self orcaUpdateDBDict];
+    //[self performSelector:@selector(morcaUpdatePushDocs) withObject:nil afterDelay:0.2];
 }
 
 - (void) morcaCompactDB {
@@ -350,7 +353,6 @@ NSString* ORSNOPModelMorcaIsUpdatingChanged = @"ORSNOPModelMorcaIsUpdatingChange
 
 - (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp
 {
-    
 	@synchronized(self){
 		if([aResult isKindOfClass:[NSDictionary class]]){
             /*
@@ -499,20 +501,21 @@ NSString* ORSNOPModelMorcaIsUpdatingChanged = @"ORSNOPModelMorcaIsUpdatingChange
 {
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
-	[self initMorcaConnectionHistory];
+	[self initOrcaDBConnectionHistory];
+	[self initDebugDBConnectionHistory];
     
     [self setViewType:[decoder decodeIntForKey:@"viewType"]];
-    [self setMorcaUserName:         [decoder decodeObjectForKey:@"ORSNOPModelMorcaUserName"]];
-    [self setMorcaPassword:         [decoder decodeObjectForKey:@"ORSNOPModelMorcaPassword"]];
-    [self setMorcaDBName:           [decoder decodeObjectForKey:@"ORSNOPModelMorcaDBName"]];
-    [self setMorcaPort:             [decoder decodeIntForKey:@"ORSNOPModelMorcaPort"]];
-    [self setMorcaIPAddress:        [decoder decodeObjectForKey:@"ORSNOPModelMorcaIPAddress"]];
-    [self setMorcaUpdateTime:       [decoder decodeIntForKey:@"ORSNOPModelMorcaUpdateTime"]];
-    [self setMorcaIsVerbose:        [decoder decodeBoolForKey:@"ORSNOPModelMorcaIsVerbose"]];
-    [self setMorcaIsWithinRun:      [decoder decodeBoolForKey:@"ORSNOPModelMorcaIsWithinRun"]];
-    [self setMorcaIsUpdating:       [decoder decodeBoolForKey:@"ORSNOPModelMorcaIsUpdating"]];
 
-    if (morcaIsUpdating == YES) [self setMorcaIsUpdating:NO];
+    self.orcaDBUserName = [decoder decodeObjectForKey:@"ORSNOPModelOrcaDBUserName"];
+    self.orcaDBPassword = [decoder decodeObjectForKey:@"ORSNOPModelOrcaDBPassword"];
+    self.orcaDBName = [decoder decodeObjectForKey:@"ORSNOPModelOrcaDBName"];
+    self.orcaDBPort = [decoder decodeInt32ForKey:@"ORSNOPModelOrcaDBPort"];
+    self.orcaDBIPAddress = [decoder decodeObjectForKey:@"ORSNOPModelOrcaDBIPAddress"];
+    self.debugDBUserName = [decoder decodeObjectForKey:@"ORSNOPModelDebugDBUserName"];
+    self.debugDBPassword = [decoder decodeObjectForKey:@"ORSNOPModelDebugDBPassword"];
+    self.debugDBName = [decoder decodeObjectForKey:@"ORSNOPModelDebugDBName"];
+    self.debugDBPort = [decoder decodeInt32ForKey:@"ORSNOPModelDebugDBPort"];
+    self.debugDBIPAddress = [decoder decodeObjectForKey:@"ORSNOPModelDebugDBIPAddress"];
 	
     [[self undoManager] enableUndoRegistration];
     return self;
@@ -522,15 +525,17 @@ NSString* ORSNOPModelMorcaIsUpdatingChanged = @"ORSNOPModelMorcaIsUpdatingChange
 {
     [super encodeWithCoder:encoder];
     [encoder encodeInt:viewType forKey:@"viewType"];
-    [encoder encodeObject:morcaUserName     forKey:@"ORSNOPModelMorcaUserName"];
-    [encoder encodeObject:morcaPassword     forKey:@"ORSNOPModelMorcaPassword"];
-    [encoder encodeObject:morcaDBName       forKey:@"ORSNOPModelMorcaDBName"];
-    [encoder encodeInt:morcaPort            forKey:@"ORSNOPModelMorcaPort"];
-    [encoder encodeObject:morcaIPAddress    forKey:@"ORSNOPModelMorcaIPAddress"];
-    [encoder encodeInt:morcaUpdateTime      forKey:@"ORSNOPModelMorcaUpdateTime"];
-    [encoder encodeBool:morcaIsVerbose      forKey:@"ORSNOPModelMorcaIsVerbose"];
-    [encoder encodeBool:morcaIsWithinRun    forKey:@"ORSNOPModelMorcaIsWithinRun"];
-    [encoder encodeBool:morcaIsUpdating     forKey:@"ORSNOPModelMorcaIsUpdating"];
+
+    [encoder encodeObject:self.orcaDBUserName forKey:@"ORSNOPModelOrcaDBUserName"];
+    [encoder encodeObject:self.orcaDBPassword forKey:@"ORSNOPModelOrcaDBPassword"];
+    [encoder encodeObject:self.orcaDBName forKey:@"ORSNOPModelOrcaDBName"];
+    [encoder encodeInt32:self.orcaDBPort forKey:@"ORSNOPModelOrcaDBPort"];
+    [encoder encodeObject:self.orcaDBIPAddress forKey:@"ORSNOPModelOrcaDBIPAddress"];
+    [encoder encodeObject:self.debugDBUserName forKey:@"ORSNOPModelDebugDBUserName"];
+    [encoder encodeObject:self.debugDBPassword forKey:@"ORSNOPModelDebugDBPassword"];
+    [encoder encodeObject:self.debugDBName forKey:@"ORSNOPModelDebugDBName"];
+    [encoder encodeInt32:self.debugDBPort forKey:@"ORSNOPModelDebugDBPort"];
+    [encoder encodeObject:self.debugDBIPAddress forKey:@"ORSNOPModelDebugDBIPAddress"];
 }
 
 - (NSString*) reformatSelectionString:(NSString*)aString forSet:(int)aSet
@@ -571,7 +576,7 @@ NSString* ORSNOPModelMorcaIsUpdatingChanged = @"ORSNOPModelMorcaIsUpdatingChange
                                      tag:[NSString stringWithFormat:@"%@.%d", kMorcaCrateDocGot, [xl3 crateNumber]]];
     }
      */
-    //?
+    /*
     if ([self morcaIsUpdating]) {
         if ([self morcaUpdateTime] == 0) {
             [self performSelector:@selector(morcaUpdateDB) withObject:nil afterDelay:0.1];
@@ -580,6 +585,7 @@ NSString* ORSNOPModelMorcaIsUpdatingChanged = @"ORSNOPModelMorcaIsUpdatingChange
             [self performSelector:@selector(morcaUpdateDB) withObject:nil afterDelay:[self morcaUpdateTime] - 0.2];
         }
     }
+     */
 }
 
 - (void) morcaUpdatePushDocs:(unsigned int) crate

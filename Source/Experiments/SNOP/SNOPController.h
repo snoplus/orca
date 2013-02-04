@@ -25,7 +25,7 @@
 @class ORSegmentGroup;
 
 @interface SNOPController : ORExperimentController {
-	IBOutlet NSTextField*	detectorTitle;
+	IBOutlet NSTextField* detectorTitle;
 	IBOutlet NSPopUpButton*	viewTypePU;
 
 	NSView *blankView;
@@ -36,15 +36,8 @@
 	NSSize hvMasterSize;
 	NSSize slowControlSize;
     
-    IBOutlet NSTextField *morcaUserNameField;
-    IBOutlet NSSecureTextField *morcaPasswordField;
-    IBOutlet NSTextField *morcaDBNameField;
-    IBOutlet NSTextField *morcaPortField;
-    IBOutlet NSComboBox *morcaIPAddressPU;
-    IBOutlet NSButton *morcaIsVerboseButton;
-    IBOutlet NSButton *morcaIsWithinRunButton;
-    IBOutlet NSPopUpButton *morcaUpdateRatePU;
-    IBOutlet NSTextField *morcaStatusField;
+    IBOutlet NSComboBox *orcaDBIPAddressPU;
+    IBOutlet NSComboBox *debugDBIPAddressPU;
     IBOutlet NSMatrix* hvStatusMatrix;
 }
 
@@ -53,41 +46,29 @@
 - (void) updateWindow;
 
 #pragma mark ¥¥¥Interface
-- (void) morcaUserNameChanged:(NSNotification*)aNote;
-- (void) morcaPasswordChanged:(NSNotification*)aNote;
-- (void) morcaDBNameChanged:(NSNotification*)aNote;
-- (void) morcaPortChanged:(NSNotification*)aNote;
-- (void) morcaIPAddressChanged:(NSNotification*)aNote;
-- (void) morcaIsVerboseChanged:(NSNotification*)aNote;
-- (void) morcaIsWithinRunChanged:(NSNotification*)aNote;
-- (void) morcaUpdateRateChanged:(NSNotification*)aNote;
-- (void) morcaStatusChanged:(NSNotification*)aNote;
-
 - (void) hvStatusChanged:(NSNotification*)aNote;
+- (void) dbOrcaDBIPChanged:(NSNotification*)aNote;
+- (void) dbDebugDBIPChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) viewTypeAction:(id)sender;
 
-- (IBAction)morcaUserNameAction:(id)sender;
-- (IBAction)morcaPasswordAction:(id)sender;
-- (IBAction)morcaDBNameAction:(id)sender;
-- (IBAction)morcaPortAction:(id)sender;
-- (IBAction)morcaIPAddressAction:(id)sender;
-- (IBAction)morcaClearHistoryAction:(id)sender;
-- (IBAction)morcaFutonAction:(id)sender;
-- (IBAction)morcaTestAction:(id)sender;
-- (IBAction)morcaPingAction:(id)sender;
-- (IBAction)morcaUpdateNowAction:(id)sender;
-- (IBAction)morcaStartAction:(id)sender;
-- (IBAction)morcaStopAction:(id)sender;
-- (IBAction)morcaIsVerboseAction:(id)sender;
-- (IBAction)morcaUpdateRateAction:(id)sender;
-- (IBAction)morcaUpdateWithinRunAction:(id)sender;
+- (IBAction) orcaDBIPAddressAction:(id)sender;
+- (IBAction) orcaDBClearHistoryAction:(id)sender;
+- (IBAction) orcaDBFutonAction:(id)sender;
+- (IBAction) orcaDBTestAction:(id)sender;
+- (IBAction) orcaDBPingAction:(id)sender;
 
-- (IBAction)hvMasterPanicAction:(id)sender;
-- (IBAction)hvMasterTriggersOFF:(id)sender;
-- (IBAction)hvMasterTriggersON:(id)sender;
-- (IBAction)hvMasterStatus:(id)sender;
+- (IBAction) debugDBIPAddressAction:(id)sender;
+- (IBAction) debugDBClearHistoryAction:(id)sender;
+- (IBAction) debugDBFutonAction:(id)sender;
+- (IBAction) debugDBTestAction:(id)sender;
+- (IBAction) debugDBPingAction:(id)sender;
+
+- (IBAction) hvMasterPanicAction:(id)sender;
+- (IBAction) hvMasterTriggersOFF:(id)sender;
+- (IBAction) hvMasterTriggersON:(id)sender;
+- (IBAction) hvMasterStatus:(id)sender;
 
 #pragma mark ¥¥¥Details Interface Management
 - (void) setDetectorTitle;
