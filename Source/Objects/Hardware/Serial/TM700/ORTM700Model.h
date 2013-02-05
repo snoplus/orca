@@ -41,12 +41,15 @@
 		NSString*		errorCode;
 		BOOL            delay;
 		NSMutableDictionary* pumpOffConstraints;
+    BOOL inStandBy;
 }
 
 #pragma mark •••Initialization
 - (void) dealloc;
 
 #pragma mark •••Accessors
+- (BOOL) inStandBy;
+- (void) setInStandBy:(BOOL)aInStandBy;
 - (NSString*) errorCode;
 - (void) setErrorCode:(NSString *)aCode;
 - (int) runUpTime;
@@ -135,6 +138,7 @@
 
 @end
 
+extern NSString* ORTM700ModelInStandByChanged;
 extern NSString* ORTM700ConstraintsChanged;
 extern NSString* ORTM700ModelErrorCodeChanged;
 extern NSString* ORTM700ModelRunUpTimeChanged;

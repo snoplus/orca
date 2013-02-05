@@ -49,6 +49,9 @@
 	IBOutlet NSPanel*		constraintPanel;
 	IBOutlet NSTextField*   constraintTitleField;
 	IBOutlet NSTextView*    constraintView;
+	IBOutlet NSButton*		standByButton;
+	IBOutlet NSTextField*   inStandByField;
+
 }
 
 #pragma mark •••Initialization
@@ -62,6 +65,7 @@
 - (void) updateButtons;
 
 #pragma mark •••Interface Management
+- (void) inStandByChanged:(NSNotification*)aNote;
 - (void) constraintsChanged:(NSNotification*)aNote;
 - (void) runUpTimeChanged:(NSNotification*)aNote;
 - (void) runUpTimeCtrlChanged:(NSNotification*)aNote;
@@ -88,6 +92,7 @@
 - (BOOL) portLocked;
 
 #pragma mark •••Actions
+- (IBAction) standByAction:(id)sender;
 - (IBAction) acknowledgeErrorAction:(id)sender;
 - (IBAction) runUpTimeAction:(id)sender;
 - (IBAction) tmpRotSetAction:(id)sender;

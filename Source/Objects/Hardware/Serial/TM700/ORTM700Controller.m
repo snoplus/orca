@@ -151,8 +151,13 @@
                      selector : @selector(constraintsChanged:)
                          name : ORTM700ConstraintsChanged
 						object: model];
-	
+	   
 	[serialPortController registerNotificationObservers];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(inStandByChanged:)
+                         name : ORTM700ModelInStandByChanged
+						object: model];
 
 }
 
@@ -184,8 +189,15 @@
 	[self runUpTimeChanged:nil];
     [self updateButtons];
 	[self constraintsChanged:nil];
+	[self inStandByChanged:nil];
+    
 	[serialPortController updateWindow];
+}
 
+- (void) inStandByChanged:(NSNotification*)aNote
+{
+	[inStandByField setStringValue: [model inStandBy]?@"YES":@"NO"];
+    [self updateButtons];
 }
 
 - (void) constraintsChanged:(NSNotification*)aNote
@@ -291,9 +303,9 @@
 
 - (void) updateButtons
 {
-    BOOL locked = [gSecurity isLocked:ORTM700Lock];
-	BOOL portOpen = [[model serialPort] isOpen];
-	BOOL stationOn = [model stationPower] && [model motorPower];
+    BOOL locked     = [gSecurity isLocked:ORTM700Lock];
+	BOOL portOpen   = [[model serialPort] isOpen];
+	BOOL stationOn  = [model stationPower] && [model motorPower];
 
     NSString* errorCode = [(ORTM700Model*)model errorCode];
     BOOL errExists = [errorCode isEqualToString:@"000000"]?NO:YES;
@@ -302,13 +314,15 @@
 	
 	[serialPortController updateButtons:locked];
 	
-    [stationOnButton setEnabled:!locked && portOpen && !stationOn];
-    [stationOffButton setEnabled:!locked && portOpen && stationOn];
-	[tmpRotSetField setEnabled:!locked && portOpen];
-    [updateButton setEnabled:portOpen];
-    [ackErrorButton setEnabled:errExists && portOpen];
-    [pollTimePopup	setEnabled:!locked];
-	[initButton  setEnabled:!locked && portOpen];
+    [stationOnButton    setEnabled: !locked && portOpen && !stationOn];
+    [stationOffButton   setEnabled: !locked && portOpen && stationOn];
+	[tmpRotSetField     setEnabled: !locked && portOpen];
+    [updateButton       setEnabled: portOpen];
+    [ackErrorButton     setEnabled: errExists && portOpen];
+    [pollTimePopup      setEnabled: !locked];
+	[initButton         setEnabled: !locked && portOpen];
+	[standByButton      setEnabled: !locked && stationOn];
+    [standByButton      setTitle:   stationOn?([model inStandBy] ? @"Continue":@"Stand By"):@"--"];
 }
 
 - (void) pollTimeChanged:(NSNotification*)aNotification
@@ -317,6 +331,11 @@
 }
 
 #pragma mark •••Actions
+- (IBAction) standByAction:(id)sender;
+{
+	[model sendStandby:![model inStandBy]];
+}
+
 - (IBAction) acknowledgeErrorAction:(id)sender
 {
     [model sendErrorAck];

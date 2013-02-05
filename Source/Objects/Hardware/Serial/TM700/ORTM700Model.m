@@ -23,6 +23,7 @@
 #import "ORSerialPortAdditions.h"
 
 #pragma mark •••External Strings
+NSString* ORTM700ModelInStandByChanged = @"ORTM700ModelInStandByChanged";
 NSString* ORTM700ModelRunUpTimeChanged		= @"ORTM700ModelRunUpTimeChanged";
 NSString* ORTM700ModelRunUpTimeCtrlChanged	= @"ORTM700ModelRunUpTimeCtrlChanged";
 NSString* ORTM700ModelTmpRotSetChanged		= @"ORTM700ModelTmpRotSetChanged";
@@ -123,6 +124,18 @@ NSString* ORTM700ConstraintsChanged			= @"ORTM700ConstraintsChanged";
 }
 
 #pragma mark •••Accessors
+
+- (BOOL) inStandBy
+{
+    return inStandBy;
+}
+
+- (void) setInStandBy:(BOOL)aInStandBy
+{
+    inStandBy = aInStandBy;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORTM700ModelInStandByChanged object:self];
+}
 
 - (NSString*) errorCode
 {
@@ -387,6 +400,7 @@ NSString* ORTM700ConstraintsChanged			= @"ORTM700ConstraintsChanged";
 	[self getSetSpeed];
 	[self getActualSpeed];
 	[self getMotorCurrent];
+	[self getStandby];
 	[self getStationPower];
 	[self getMotorPower];
 	[self getRunUpTimeCtrl];
@@ -434,7 +448,8 @@ NSString* ORTM700ConstraintsChanged			= @"ORTM700ConstraintsChanged";
 	[self sendStandby:YES];
 	[self initUnit];
 	[self sendStationPower:YES];
-	[self sendMotorPower:YES];	
+	[self sendMotorPower:YES];
+	[self performSelector:@selector(updateAll) withObject:nil afterDelay:1];
 }
 
 - (void) turnStationOff
@@ -579,19 +594,20 @@ NSString* ORTM700ConstraintsChanged			= @"ORTM700ConstraintsChanged";
 - (void) decode:(int)paramNumber command:(NSString*)aCommand
 {
 	switch (paramNumber) {
-		case kDeviceAddress: [self setDeviceAddress:	[self extractInt:aCommand]]; break;
-		case kStationPower:	 [self setStationPower:		[self extractBool:aCommand]]; break;
-		case kMotorPower:	 [self setMotorPower:		[self extractBool:aCommand]]; break;
-		case kTempDriveUnit: [self setDriveUnitOverTemp:[self extractBool:aCommand]]; break;
-		case kTempTurbo:	 [self setTurboPumpOverTemp:[self extractBool:aCommand]]; break;
-		case kSpeedAttained: [self setSpeedAttained:	[self extractBool:aCommand]]; break;
-		case kAccelerating:  [self setTurboAccelerating:[self extractBool:aCommand]]; break;
-		case kRunUpTimeCtrl: [self setRunUpTimeCtrl:	[self extractBool:aCommand]]; break;
+		case kDeviceAddress: [self setDeviceAddress:	[self extractInt:aCommand]];    break;
+		case kStationPower:	 [self setStationPower:		[self extractBool:aCommand]];   break;
+		case kMotorPower:	 [self setMotorPower:		[self extractBool:aCommand]];   break;
+		case kTempDriveUnit: [self setDriveUnitOverTemp:[self extractBool:aCommand]];   break;
+		case kTempTurbo:	 [self setTurboPumpOverTemp:[self extractBool:aCommand]];   break;
+		case kSpeedAttained: [self setSpeedAttained:	[self extractBool:aCommand]];   break;
+		case kAccelerating:  [self setTurboAccelerating:[self extractBool:aCommand]];   break;
+		case kRunUpTimeCtrl: [self setRunUpTimeCtrl:	[self extractBool:aCommand]];   break;
 		case kErrorCode:     [self setErrorCode:        [self extractString:aCommand]]; break;
 
-		case kSetSpeed:		[self setSetRotorSpeed:		[self extractInt:aCommand]];   break;
-		case kActualSpeed:  [self setActualRotorSpeed:	[self extractInt:aCommand]];   break;
-		case kMotorCurrent: [self setMotorCurrent:		[self extractFloat:aCommand]]; break;
+		case kStandby:		[self setInStandBy:         [self extractBool:aCommand]];   break;
+		case kSetSpeed:		[self setSetRotorSpeed:		[self extractInt:aCommand]];    break;
+		case kActualSpeed:  [self setActualRotorSpeed:	[self extractInt:aCommand]];    break;
+		case kMotorCurrent: [self setMotorCurrent:		[self extractFloat:aCommand]];  break;
 		default:
 		break;
 	}
