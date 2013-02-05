@@ -73,7 +73,7 @@
 	NSString*		calibrationName;
 }
 
-- (id) initCalibrationArray:(NSMutableArray*)calArray;
+- (id) init;
 - (NSMutableArray*)calibrationArray;
 - (double) slope;
 - (double) intercept;

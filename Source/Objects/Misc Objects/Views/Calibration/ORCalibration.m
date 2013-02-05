@@ -277,10 +277,9 @@
 @end
 
 @implementation ORCalibration
-- (id) initCalibrationArray:(NSMutableArray*)calArray
+- (id) init
 {
 	self = [super init];
-	calibrationArray = [calArray retain];
 	[self calibrate];	
 	return self;
 }
