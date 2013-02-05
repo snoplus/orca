@@ -445,9 +445,9 @@ NSString* ORTM700ConstraintsChanged			= @"ORTM700ConstraintsChanged";
 
 - (void) turnStationOn
 {
-	[self sendStandby:YES];
 	[self initUnit];
 	[self sendStationPower:YES];
+	[self sendStandby:YES];
 	[self sendMotorPower:YES];
 	[self performSelector:@selector(updateAll) withObject:nil afterDelay:1];
 }
