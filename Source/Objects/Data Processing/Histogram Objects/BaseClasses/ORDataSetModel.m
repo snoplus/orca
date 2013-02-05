@@ -85,7 +85,7 @@ NSString* ORDataSetCalibrationChanged		= @"ORDataSetCalibrationChanged";
 
 - (id) calibration
 {
-    if(!calibration) calibration = [[ORCalibration alloc] initCalibrationArray:nil];
+    if(!calibration) calibration = [[ORCalibration alloc] init];
 	return calibration;
 }
 
