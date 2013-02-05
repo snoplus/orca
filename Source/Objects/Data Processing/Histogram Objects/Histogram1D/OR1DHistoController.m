@@ -84,13 +84,10 @@
 #pragma mark ¥¥¥Actions
 - (IBAction) calibrate:(id)sender
 {
-	NSDictionary* aContextInfo = [NSDictionary dictionaryWithObjectsAndKeys: model, @"ObjectToCalibrate",
-																	         model , @"ObjectToUpdate",
-																	         nil];
 	calibrationPanel = [[ORCalibrationPane calibrateForWindow:[self window] 
 										   modalDelegate:self 
 										  didEndSelector:@selector(_calibrationDidEnd:returnCode:contextInfo:)
-											 contextInfo:aContextInfo] retain];
+											 contextInfo:nil] retain];
 }
 
 - (IBAction) copy:(id)sender

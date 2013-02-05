@@ -21,6 +21,7 @@
 
 #import "ORDataSetModel.h"
 #import "ORDataController.h"
+#import "ORCalibration.h"
 
 NSString* ORDataSetModelPausedChanged		= @"ORDataSetModelPausedChanged";
 NSString* ORDataSetModelRefreshModeChanged	= @"ORDataSetModelRefreshModeChanged";
@@ -84,6 +85,7 @@ NSString* ORDataSetCalibrationChanged		= @"ORDataSetCalibrationChanged";
 
 - (id) calibration
 {
+    if(!calibration) calibration = [[ORCalibration alloc] initCalibrationArray:nil];
 	return calibration;
 }
 
@@ -94,6 +96,12 @@ NSString* ORDataSetCalibrationChanged		= @"ORDataSetCalibrationChanged";
 	calibration  = aCalibration;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORDataSetCalibrationChanged object:self];
 }
+
+- (void) updateCalibration
+{
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDataSetCalibrationChanged object:self];    
+}
+
 
 - (void) setDataSet:(id)aDataSet
 {

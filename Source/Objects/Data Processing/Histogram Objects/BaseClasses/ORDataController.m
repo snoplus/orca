@@ -182,7 +182,7 @@ int windowSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1 tit
 
 - (void) miscAttributesChanged:(NSNotification*)aNote
 {
-	NSString*				key = [[aNote userInfo] objectForKey:ORMiscAttributeKey];
+	NSString* key = [[aNote userInfo] objectForKey:ORMiscAttributeKey];
 	NSMutableDictionary* attrib = [model miscAttributesForKey:key];
 	
 	if(aNote == nil || [key isEqualToString:@"XAttributes"]){

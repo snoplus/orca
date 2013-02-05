@@ -37,16 +37,14 @@
 	IBOutlet NSButton*		applyButton;
 	IBOutlet NSButton*		addPtButton;
 	IBOutlet NSButton*		removePtButton;
-	NSMutableArray*			calibrationArray;
-	NSDictionary*			contextInfo;
+	id                      model;
 }
 
 + (id) calibrateForWindow:(NSWindow *)aWindow modalDelegate:(id)aDelegate didEndSelector:(SEL)aDidEndSelector contextInfo:(id)aContextInfo;
 
-- (id) initWithContext:(id)aContext;
+- (id) initWithModel:(id)aModel;
 - (void) beginSheetFor:(NSWindow *)aWindow delegate:(id)aDelegate didEndSelector:(SEL)aDidEndSelector contextInfo:(id)aContextInfo;
 - (void) calibrate;
-- (void) setContext:(NSDictionary*)someContext;
 - (void) enableControls;
 - (void) populateSelectionPU;
 - (void) loadUI:(ORCalibration*) aCalibration;

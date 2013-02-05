@@ -19,42 +19,40 @@
 //-------------------------------------------------------------
 
 #import "ORCalibration.h"
+#import "ORDataSetModel.h"
 
 @implementation ORCalibrationPane
 
 + (id) calibrateForWindow:(NSWindow *)aWindow modalDelegate:(id)aDelegate didEndSelector:(SEL)aDidEndSelector contextInfo:(id)aContextInfo
 {
-    ORCalibrationPane* calibrationPane = [[ORCalibrationPane alloc] initWithContext:aContextInfo];
+    ORCalibrationPane* calibrationPane = [[ORCalibrationPane alloc] initWithModel:[aDelegate model]];
     [calibrationPane beginSheetFor:aWindow delegate:aDelegate didEndSelector:aDidEndSelector contextInfo:aContextInfo];
     return [calibrationPane autorelease];
 }
 
-- (id) initWithContext:(id)aContext 
+- (id) initWithModel:(id)aModel
 {
     self = [super initWithWindowNibName:@"Calibration"];
-	[self setContext:aContext];
+    model = [aModel retain];
 	return self;
 }
 
 - (void) dealloc
 {
-	[calibrationArray release];
-	[contextInfo release];
+    [model release];
 	[super dealloc];
 }
 
 - (void) awakeFromNib
 {
 	[self populateSelectionPU];
-	ORCalibration* calibration = [[contextInfo objectForKey:@"ObjectToCalibrate"] calibration];
-	[self loadUI:calibration];
+	[self loadUI:[model calibration]];
 }
 
 - (void) loadUI:(ORCalibration*) aCalibration
 {
 	if(aCalibration){
 		
-		calibrationArray = [aCalibration calibrationArray];
 		[calibrationTableView reloadData];
 		
 		[unitsField setStringValue:[aCalibration units]];
@@ -85,12 +83,6 @@
 
 }
 
-- (void) setContext:(NSDictionary*)someContext;
-{
-	[someContext retain];
-	[contextInfo release];
-	contextInfo = someContext;
-}
 
 - (void) beginSheetFor:(NSWindow *)aWindow delegate:(id)aDelegate didEndSelector:(SEL)aDidEndSelector contextInfo:(id)aContextInfo
 {
@@ -103,7 +95,7 @@
 		[[self window] endEditingFor:nil];		
 	}
 
-	ORCalibration* cal		= [[ORCalibration alloc] initCalibrationArray:calibrationArray];
+	ORCalibration* cal	= [model calibration];
 	[cal setUnits:[unitsField stringValue]];
 	[cal setLabel:[labelField stringValue]];
 	[cal setCalibrationName:[nameField stringValue]];
@@ -130,8 +122,9 @@
 		[self populateSelectionPU];
 		[selectionPU selectItemWithTitle:[nameField stringValue]];
 	}
-	[[contextInfo objectForKey:@"ObjectToCalibrate"] setCalibration:cal];
-	[cal release];
+    [[model calibration] calibrate];
+    [model updateCalibration];
+
 }
 
 - (void) populateSelectionPU
@@ -228,8 +221,7 @@
 
 - (IBAction) addPtAction:(id)sender
 {
-	if(!calibrationArray)calibrationArray = [[NSMutableArray alloc] init];
-	[calibrationArray addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys: [NSNumber numberWithInt:0],@"Channel",[NSNumber numberWithFloat:0],@"Energy",nil]];
+    [[[model calibration] calibrationArray] addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys: [NSNumber numberWithInt:0],@"Channel",[NSNumber numberWithFloat:0],@"Energy",nil]];
 	[calibrationTableView reloadData];
 }
 
@@ -237,11 +229,11 @@
 {
 	NSInteger selectedRow = [calibrationTableView selectedRow];
 	if(selectedRow == -1){
-		[calibrationArray removeLastObject];
+		[[[model calibration] calibrationArray] removeLastObject];
 		[calibrationTableView reloadData];
 	}
-	else if(selectedRow<[calibrationArray count]){
-		[calibrationArray removeObjectAtIndex:selectedRow];
+	else if(selectedRow<[[[model calibration] calibrationArray] count]){
+		[[[model calibration] calibrationArray] removeObjectAtIndex:selectedRow];
 		[calibrationTableView reloadData];
 	}
 }
@@ -263,14 +255,14 @@
 #pragma mark •••Table Data Source
 - (int) numberOfRowsInTableView:(NSTableView *)aTableView
 {
-	if( aTableView == calibrationTableView)return [calibrationArray count];
+	if( aTableView == calibrationTableView)return [[[model calibration] calibrationArray] count];
 	else return 0;
 }
 
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
 {
 	if(aTableView == calibrationTableView ){
-		return [[calibrationArray objectAtIndex:rowIndex] objectForKey:[aTableColumn identifier]];
+		return [[[[model calibration] calibrationArray] objectAtIndex:rowIndex] objectForKey:[aTableColumn identifier]];
 	}
 	else return nil;
 }
@@ -278,7 +270,7 @@
 - (void) tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
 {
 	if(aTableView == calibrationTableView){
-		[[calibrationArray objectAtIndex:rowIndex] setObject: anObject forKey:[aTableColumn identifier]];
+		[[[[model calibration] calibrationArray] objectAtIndex:rowIndex] setObject: anObject forKey:[aTableColumn identifier]];
 	}
 }
 
@@ -304,6 +296,7 @@
 
 - (NSMutableArray*)calibrationArray
 {
+    if(!calibrationArray) calibrationArray = [[NSMutableArray array]retain];
 	return calibrationArray;
 }
 
@@ -417,10 +410,6 @@
 {
     self		= [super init];
     calibrationArray =			[[decoder decodeObjectForKey:@"calibrationArray"] retain];
-    if(![calibrationArray isKindOfClass:NSClassFromString(@"NSArray")]){
-        [calibrationArray release];
-        calibrationArray = nil;
-    }
 	[self setUnits:				[decoder decodeObjectForKey:@"units"]];
 	[self setLabel:				[decoder decodeObjectForKey:@"label"]];
 	[self setIgnoreCalibration:	[decoder decodeBoolForKey:@"ignoreCalibration"]];
@@ -432,11 +421,7 @@
 
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
-    //it appears that sometimes the calibration array can be something other than an array
-    //if the cause is ever found the class check can be removed.
-    if([calibrationArray isKindOfClass:NSClassFromString(@"NSArray")]){
-        [encoder encodeObject:calibrationArray	forKey: @"calibrationArray"];
-    }
+    [encoder encodeObject:calibrationArray	forKey: @"calibrationArray"];
 	[encoder encodeObject:units				forKey:@"units"];
 	[encoder encodeObject:label				forKey:@"label"];
 	[encoder encodeBool:ignoreCalibration	forKey:@"ignoreCalibration"];
