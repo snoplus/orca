@@ -21,6 +21,10 @@
 
 #pragma mark ¥¥¥Imported Files
 #import "ORExperimentModel.h"
+#import "ORVmeCardDecoder.h"
+
+@class ORDataPacket;
+@class ORDataSet;
 @class ORCouchDB;
 
 #define kUseTubeView	0
@@ -49,6 +53,29 @@
     NSMutableArray* _debugDBConnectionHistory;
     NSUInteger _debugDBIPNumberIndex;
     NSTask*	_debugDBPingTask;
+    
+    unsigned long	_epedDataId;
+    unsigned long	_rhdrDataId;
+    
+    struct {
+        unsigned long coarseDelay;
+        unsigned long fineDelay;
+        unsigned long chargePulseAmp;
+        unsigned long pedestalWidth;
+        unsigned long calType; // pattern ID (1 to 4) + 10 * (1 ped, 2 tslope, 3 qslope)
+        unsigned long stepNumber;
+    } _epedStruct;
+    
+    struct {
+        unsigned long date;
+        unsigned long time;
+        unsigned long daqCodeVersion;
+        unsigned long runNumber;
+        unsigned long calibrationTrialNumber;
+        unsigned long sourceMask;
+        unsigned long long runMask;
+        unsigned long gtCrateMask;
+    } _rhdrStruct;
 }
 
 @property (nonatomic,copy) NSString* orcaDBUserName;
@@ -68,6 +95,9 @@
 @property (nonatomic,retain) NSMutableArray* debugDBConnectionHistory;
 @property (nonatomic,assign) NSUInteger debugDBIPNumberIndex;
 @property (nonatomic,retain) NSTask* debugDBPingTask;
+
+@property (nonatomic,assign) unsigned long epedDataId;
+@property (nonatomic,assign) unsigned long rhdrDataId;
 
 - (void) initOrcaDBConnectionHistory;
 - (void) clearOrcaDBConnectionHistory;
@@ -91,6 +121,16 @@
 - (void) runStarted:(NSNotification*)aNote;
 - (void) runStopped:(NSNotification*)aNote;
 
+- (void) updateEPEDStructWithCoarseDelay: (unsigned long) coarseDelay
+                               fineDelay: (unsigned long) fineDelay
+                          chargePulseAmp: (unsigned long) chargePulseAmp
+                           pedestalWidth: (unsigned long) pedestalWidth
+                                 calType: (unsigned long) calType;
+- (void) updateEPEDStructWithStepNumber: (unsigned long) stepNumber;
+- (void) shipEPEDRecord;
+- (void) updateRHDRSruct;
+- (void) shipRHDRRecord;
+
 #pragma mark ¥¥¥Accessors
 - (void) setViewType:(int)aViewType;
 - (int) viewType;
@@ -102,6 +142,24 @@
 - (NSString*) experimentMapLock;
 - (NSString*) experimentDetectorLock;
 - (NSString*) experimentDetailsLock;
+
+#pragma mark ¥¥¥DataTaker
+- (void) setDataIds:(id)assigner;
+- (void) syncDataIdsWith:(id)anotherObj;
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (NSDictionary*) dataRecordDescription;
+@end
+
+@interface SNOPDecoderForRHDR : ORVmeCardDecoder {
+}
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
+- (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
+@end
+
+@interface SNOPDecoderForEPED : ORVmeCardDecoder {
+}
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
+- (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
 @end
 
 extern NSString* ORSNOPModelViewTypeChanged;

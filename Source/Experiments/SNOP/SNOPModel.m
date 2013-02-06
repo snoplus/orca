@@ -26,6 +26,9 @@
 #import "ORTaskSequence.h"
 #import "ORCouchDB.h"
 #import "ORXL3Model.h"
+#import "ORDataTaker.h"
+#import "ORDataTypeAssigner.h"
+#import "ORRunModel.h"
 
 NSString* ORSNOPModelViewTypeChanged	= @"ORSNOPModelViewTypeChanged";
 static NSString* SNOPDbConnector	= @"SNOPDbConnector";
@@ -59,7 +62,9 @@ debugDBName = _debugDBName,
 debugDBPort = _debugDBPort,
 debugDBConnectionHistory = _debugDBConnectionHistory,
 debugDBIPNumberIndex = _debugDBIPNumberIndex,
-debugDBPingTask = _debugDBPingTask;
+debugDBPingTask = _debugDBPingTask,
+epedDataId = _epedDataId,
+rhdrDataId = _rhdrDataId;
 
 #pragma mark ¥¥¥Initialization
 
@@ -172,14 +177,14 @@ debugDBPingTask = _debugDBPingTask;
     }
 }
 
-- (void) subRunStarted:(NSNotification*)aNote;
+- (void) subRunStarted:(NSNotification*)aNote
 {
     //EPED record
     //TRIG record?
     //update orcadb run document
 }
 
-- (void) subRunEnded:(NSNotification*)aNote;
+- (void) subRunEnded:(NSNotification*)aNote
 {
     //update calibration documents (TELLIE temp)
 }
@@ -187,12 +192,115 @@ debugDBPingTask = _debugDBPingTask;
 - (void) runStarted:(NSNotification*)aNote
 {
     //orcadb run document
-    //RHDR record
+    [self updateRHDRSruct];
+    [self shipRHDRRecord];
 }
 
-- (void) runStopped:(NSNotification*)aNote;
+- (void) runStopped:(NSNotification*)aNote
 {
     //orcadb run document update
+}
+
+// orca script helper (will come from DB)
+- (void) updateEPEDStructWithCoarseDelay: (unsigned long) coarseDelay
+                               fineDelay: (unsigned long) fineDelay
+                          chargePulseAmp: (unsigned long) chargePulseAmp
+                           pedestalWidth: (unsigned long) pedestalWidth
+                                 calType: (unsigned long) calType
+{
+    _epedStruct.coarseDelay = coarseDelay; // nsec
+    _epedStruct.fineDelay = fineDelay; // clicks
+    _epedStruct.chargePulseAmp = chargePulseAmp; // clicks
+    _epedStruct.pedestalWidth = pedestalWidth; // nsec
+    _epedStruct.calType = calType; // nsec
+}
+
+- (void) updateEPEDStructWithStepNumber: (unsigned long) stepNumber
+{
+    _epedStruct.stepNumber = stepNumber;
+}
+
+// orca script helper
+- (void) shipEPEDRecord
+{
+    if ([[ORGlobal sharedGlobal] runInProgress]) {
+        const unsigned char eped_rec_length = 8;
+        unsigned long data[eped_rec_length];
+        data[0] = [self epedDataId] | eped_rec_length;
+        data[1] = 0;
+
+        data[2] = _epedStruct.coarseDelay;
+        data[3] = _epedStruct.fineDelay;
+        data[4] = _epedStruct.chargePulseAmp;
+        data[5] = _epedStruct.pedestalWidth;
+        data[6] = _epedStruct.calType;
+        data[7] = _epedStruct.stepNumber;
+        
+        NSData* pdata = [[NSData alloc] initWithBytes:data length:sizeof(long)*(eped_rec_length)];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification object:pdata];
+        [pdata release];
+        pdata = nil;
+    }
+}
+
+
+- (void) updateRHDRSruct
+{
+    //from run info
+    NSArray* runObjects = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+	if([runObjects count]){
+		ORRunModel* rc = [runObjects objectAtIndex:0];
+        _rhdrStruct.runNumber = [rc runNumber];
+        NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
+        NSDateComponents *cmpStartTime = [gregorian components:
+                                                 (NSYearCalendarUnit | NSMonthCalendarUnit |  NSDayCalendarUnit |
+                                                  NSHourCalendarUnit | NSMinuteCalendarUnit |NSSecondCalendarUnit)
+                                                      fromDate:[NSDate date]];
+        _rhdrStruct.date = [cmpStartTime day] + [cmpStartTime month] * 100 + [cmpStartTime year] * 10000;
+        _rhdrStruct.time = [cmpStartTime second] * 100 + [cmpStartTime minute] * 10000 + [cmpStartTime hour] * 1000000;
+	}
+
+    //svn revision
+    if (_rhdrStruct.daqCodeVersion == 0) {
+        NSFileManager* fm = [NSFileManager defaultManager];
+		NSString* svnVersionPath = [[NSBundle mainBundle] pathForResource:@"svnversion"ofType:nil];
+		NSMutableString* svnVersion = [NSMutableString stringWithString:@""];
+		if([fm fileExistsAtPath:svnVersionPath])svnVersion = [NSMutableString stringWithContentsOfFile:svnVersionPath encoding:NSASCIIStringEncoding error:nil];
+		if([svnVersion hasSuffix:@"\n"]){
+			[svnVersion replaceCharactersInRange:NSMakeRange([svnVersion length]-1, 1) withString:@""];
+		}
+        NSLog(svnVersion);
+        NSLog(svnVersionPath);
+        _rhdrStruct.daqCodeVersion = [svnVersion integerValue]; //8045:8046M -> 8045 which is desired
+    }
+    
+    _rhdrStruct.calibrationTrialNumber = 0;
+    _rhdrStruct.sourceMask = 0; // from run type document
+    _rhdrStruct.runMask = 0; // from run type document
+    _rhdrStruct.gtCrateMask = 0; // from run type document
+}
+
+- (void) shipRHDRRecord
+{
+    const unsigned char rhdr_rec_length = 11;
+    unsigned long data[rhdr_rec_length];
+    data[0] = [self rhdrDataId] | rhdr_rec_length;
+    data[1] = 0;
+    
+    data[2] = _rhdrStruct.date;
+    data[3] = _rhdrStruct.time;
+    data[4] = _rhdrStruct.daqCodeVersion;
+    data[5] = _rhdrStruct.runNumber;
+    data[6] = _rhdrStruct.calibrationTrialNumber;
+    data[7] = _rhdrStruct.sourceMask;
+    data[8] = _rhdrStruct.runMask & 0xffffffffULL;
+    data[9] = _rhdrStruct.runMask >> 32;
+    data[10] = _rhdrStruct.gtCrateMask;
+    
+    NSData* pdata = [[NSData alloc] initWithBytes:data length:sizeof(long)*(rhdr_rec_length)];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification object:pdata];
+    [pdata release];
+    pdata = nil;
 }
 
 #pragma mark ¥¥¥Accessors
@@ -562,6 +670,47 @@ debugDBPingTask = _debugDBPingTask;
 	return @"";
 }
 
+
+#pragma mark ¥¥¥DataTaker
+- (void) setDataIds:(id)assigner
+{
+    [self setRhdrDataId:[assigner assignDataIds:kLongForm]];
+    [self setEpedDataId:[assigner assignDataIds:kLongForm]];
+}
+
+- (void) syncDataIdsWith:(id)anotherObj
+{
+	[self setRhdrDataId:[anotherObj rhdrDataId]];
+	[self setEpedDataId:[anotherObj epedDataId]];
+}
+
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"SNOPModel"];
+}
+
+- (NSDictionary*) dataRecordDescription
+{
+	NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
+	NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+                                 @"SNOPDecoderForRHDR", @"decoder",
+                                 [NSNumber numberWithLong:[self rhdrDataId]], @"dataId",
+                                 [NSNumber numberWithBool:NO],	@"variable",
+                                 [NSNumber numberWithLong:8], @"length",
+                                 nil];
+	[dataDictionary setObject:aDictionary forKey:@"snopRhdrBundle"];
+    
+	NSDictionary* bDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+                                 @"SNOPDecoderForEPED", @"decoder",
+                                 [NSNumber numberWithLong:[self epedDataId]], @"dataId",
+                                 [NSNumber numberWithBool:NO], @"variable",
+                                 [NSNumber numberWithLong:11], @"length",
+                                 nil];
+	[dataDictionary setObject:bDictionary forKey:@"snopEpedBundle"];
+    
+	return dataDictionary;
+}
+
 @end
 
 @implementation SNOPModel (private)
@@ -639,5 +788,55 @@ debugDBPingTask = _debugDBPingTask;
     }
      */
 }
+@end
 
+
+@implementation SNOPDecoderForRHDR
+
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
+{
+	unsigned long* ptr = (unsigned long*)someData;
+	unsigned long length = ExtractLength(*ptr);
+	return length; //must return number of bytes processed.
+}
+
+- (NSString*) dataRecordDescription:(unsigned long*)dataPtr
+{
+    NSMutableString* dsc = [NSMutableString stringWithFormat: @"RHDR record\n\n"];
+    
+    [dsc appendFormat:@"date: %ld\n", dataPtr[2]];
+    [dsc appendFormat:@"time: %ld\n", dataPtr[3]];
+    [dsc appendFormat:@"daq ver: %ld\n", dataPtr[4]];
+    [dsc appendFormat:@"run num: %ld\n", dataPtr[5]];
+    [dsc appendFormat:@"calib trial: %ld\n", dataPtr[6]];
+    [dsc appendFormat:@"src msk: 0x%08lx\n", dataPtr[7]];
+    [dsc appendFormat:@"run msk: 0x%016llx\n", (unsigned long long)(dataPtr[8] | (((unsigned long long)dataPtr[9]) << 32))];
+    [dsc appendFormat:@"crate mask: 0x%08lx\n", dataPtr[10]];
+
+    return [[dsc retain] autorelease];
+}
+@end
+
+@implementation SNOPDecoderForEPED
+
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
+{
+	unsigned long* ptr = (unsigned long*)someData;
+	unsigned long length = ExtractLength(*ptr);
+	return length; //must return number of bytes processed.
+}
+
+- (NSString*) dataRecordDescription:(unsigned long*)dataPtr
+{
+    NSMutableString* dsc = [NSMutableString stringWithFormat: @"EPED record\n\n"];
+
+    [dsc appendFormat:@"coarse delay: %ld nsec\n", dataPtr[2]];
+    [dsc appendFormat:@"fine delay: %ld clicks\n", dataPtr[3]];
+    [dsc appendFormat:@"charge amp: %ld clicks\n", dataPtr[4]];
+    [dsc appendFormat:@"ped width: %ld nsec\n", dataPtr[5]];
+    [dsc appendFormat:@"cal type: 0x%08lx\n", dataPtr[6]];
+    [dsc appendFormat:@"step num: %ld\n", dataPtr[7]];
+    
+    return [[dsc retain] autorelease];
+}
 @end
