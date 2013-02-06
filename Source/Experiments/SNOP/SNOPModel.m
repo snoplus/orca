@@ -224,17 +224,19 @@ rhdrDataId = _rhdrDataId;
 - (void) shipEPEDRecord
 {
     if ([[ORGlobal sharedGlobal] runInProgress]) {
-        const unsigned char eped_rec_length = 8;
+        const unsigned char eped_rec_length = 10;
         unsigned long data[eped_rec_length];
         data[0] = [self epedDataId] | eped_rec_length;
         data[1] = 0;
 
-        data[2] = _epedStruct.coarseDelay;
-        data[3] = _epedStruct.fineDelay;
-        data[4] = _epedStruct.chargePulseAmp;
-        data[5] = _epedStruct.pedestalWidth;
-        data[6] = _epedStruct.calType;
-        data[7] = _epedStruct.stepNumber;
+        data[2] = _epedStruct.pedestalWidth;
+        data[3] = _epedStruct.coarseDelay;
+        data[4] = _epedStruct.fineDelay;
+        data[5] = _epedStruct.chargePulseAmp;
+        data[6] = _epedStruct.stepNumber;
+        data[7] = _epedStruct.calType;
+        data[8] = 0;
+        data[9] = 0;
         
         NSData* pdata = [[NSData alloc] initWithBytes:data length:sizeof(long)*(eped_rec_length)];
         [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification object:pdata];
@@ -282,7 +284,7 @@ rhdrDataId = _rhdrDataId;
 
 - (void) shipRHDRRecord
 {
-    const unsigned char rhdr_rec_length = 11;
+    const unsigned char rhdr_rec_length = 20;
     unsigned long data[rhdr_rec_length];
     data[0] = [self rhdrDataId] | rhdr_rec_length;
     data[1] = 0;
@@ -294,8 +296,17 @@ rhdrDataId = _rhdrDataId;
     data[6] = _rhdrStruct.calibrationTrialNumber;
     data[7] = _rhdrStruct.sourceMask;
     data[8] = _rhdrStruct.runMask & 0xffffffffULL;
-    data[9] = _rhdrStruct.runMask >> 32;
-    data[10] = _rhdrStruct.gtCrateMask;
+    data[9] = _rhdrStruct.gtCrateMask;
+    data[10] = 0;
+    data[11] = 0;
+    data[12] = _rhdrStruct.runMask >> 32;
+    data[13] = 0;
+    data[14] = 0;
+    data[15] = 0;
+    data[16] = 0;
+    data[17] = 0;
+    data[18] = 0;
+    data[19] = 0;
     
     NSData* pdata = [[NSData alloc] initWithBytes:data length:sizeof(long)*(rhdr_rec_length)];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification object:pdata];
@@ -696,7 +707,7 @@ rhdrDataId = _rhdrDataId;
                                  @"SNOPDecoderForRHDR", @"decoder",
                                  [NSNumber numberWithLong:[self rhdrDataId]], @"dataId",
                                  [NSNumber numberWithBool:NO],	@"variable",
-                                 [NSNumber numberWithLong:8], @"length",
+                                 [NSNumber numberWithLong:20], @"length",
                                  nil];
 	[dataDictionary setObject:aDictionary forKey:@"snopRhdrBundle"];
     
@@ -810,9 +821,9 @@ rhdrDataId = _rhdrDataId;
     [dsc appendFormat:@"run num: %ld\n", dataPtr[5]];
     [dsc appendFormat:@"calib trial: %ld\n", dataPtr[6]];
     [dsc appendFormat:@"src msk: 0x%08lx\n", dataPtr[7]];
-    [dsc appendFormat:@"run msk: 0x%016llx\n", (unsigned long long)(dataPtr[8] | (((unsigned long long)dataPtr[9]) << 32))];
-    [dsc appendFormat:@"crate mask: 0x%08lx\n", dataPtr[10]];
-
+    [dsc appendFormat:@"run msk: 0x%016llx\n", (unsigned long long)(dataPtr[8] | (((unsigned long long)dataPtr[12]) << 32))];
+    [dsc appendFormat:@"crate mask: 0x%08lx\n", dataPtr[9]];
+    
     return [[dsc retain] autorelease];
 }
 @end
@@ -830,12 +841,12 @@ rhdrDataId = _rhdrDataId;
 {
     NSMutableString* dsc = [NSMutableString stringWithFormat: @"EPED record\n\n"];
 
-    [dsc appendFormat:@"coarse delay: %ld nsec\n", dataPtr[2]];
-    [dsc appendFormat:@"fine delay: %ld clicks\n", dataPtr[3]];
-    [dsc appendFormat:@"charge amp: %ld clicks\n", dataPtr[4]];
-    [dsc appendFormat:@"ped width: %ld nsec\n", dataPtr[5]];
-    [dsc appendFormat:@"cal type: 0x%08lx\n", dataPtr[6]];
-    [dsc appendFormat:@"step num: %ld\n", dataPtr[7]];
+    [dsc appendFormat:@"coarse delay: %ld nsec\n", dataPtr[3]];
+    [dsc appendFormat:@"fine delay: %ld clicks\n", dataPtr[4]];
+    [dsc appendFormat:@"charge amp: %ld clicks\n", dataPtr[5]];
+    [dsc appendFormat:@"ped width: %ld nsec\n", dataPtr[2]];
+    [dsc appendFormat:@"cal type: 0x%08lx\n", dataPtr[7]];
+    [dsc appendFormat:@"step num: %ld\n", dataPtr[6]];
     
     return [[dsc retain] autorelease];
 }
