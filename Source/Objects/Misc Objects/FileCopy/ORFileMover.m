@@ -264,7 +264,7 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
 	else			tmpRemotePath = remotePath;
     if([self transferType] == eUseCURL){
 		
-        [task setLaunchPath:@"/usr/bin/curl"];
+        [task setLaunchPath:@"/opt/bin/curl"];
 		
         NSMutableArray* params = [NSMutableArray array];
         [params addObject:@"-T"];
