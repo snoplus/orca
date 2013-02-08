@@ -220,11 +220,11 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
 {
 	if(aSet>=0 && aSet < [segmentGroups count]){
 		ORSegmentGroup* aGroup = [segmentGroups objectAtIndex:aSet];
+        NSString* cardName       = [ aGroup segment:index objectForKey:@"kCardSlot"     ];
+		NSString* chanName       = [ aGroup segment:index objectForKey:@"kChannel"      ];
         NSString* boreName       = [ aGroup segment:index objectForKey:@"kBore"         ];
         NSString* clockName      = [ aGroup segment:index objectForKey:@"kClock"        ];
         NSString* NCDName        = [ aGroup segment:index objectForKey:@"kNCD"          ];
-		NSString* cardName       = [ aGroup segment:index objectForKey:@"kCardSlot"     ];
-		NSString* chanName       = [ aGroup segment:index objectForKey:@"kChannel"      ];
         NSString* vmeCrateName   = [ aGroup segment:index objectForKey:@"kVME"          ];
         NSString* hvCrateName    = [ aGroup segment:index objectForKey:@"kHvCrate"      ];
         NSString* hvChanName     = [ aGroup segment:index objectForKey:@"kHvChan"       ];
@@ -241,11 +241,11 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
 				if([arrayOfHistos count]){
 					id histoObj = [arrayOfHistos objectAtIndex:0];
 					aDataSet = [histoObj objectForKeyArray:[NSMutableArray arrayWithObjects:@"Shaper", @"Crate  0",
+                                                            [NSString stringWithFormat:@"Card %2d",[cardName intValue]],
+															[NSString stringWithFormat:@"Channel %2d",[chanName intValue]],
                                                             [NSString stringWithFormat:@"ID %2d",[boreName intValue]],
                                                             [NSString stringWithFormat:@"Clock %2d",[clockName intValue]],
                                                             [NSString stringWithFormat:@"NCD %2d",[NCDName intValue]],
-															[NSString stringWithFormat:@"Card %2d",[cardName intValue]],
-															[NSString stringWithFormat:@"Channel %2d",[chanName intValue]],
                                                             [NSString stringWithFormat:@"VME Crate %2d",[vmeCrateName intValue]],
                                                             [NSString stringWithFormat:@"HV Crate %2d",[hvCrateName intValue]],
                                                             [NSString stringWithFormat:@"HV Chan %2d",[hvChanName intValue]],
