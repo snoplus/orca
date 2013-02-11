@@ -1443,8 +1443,8 @@ NSString* ORMJDVacuumModelConstraintsChanged		= @"ORMJDVacuumModelConstraintsCha
 	
 	//---------------------------------------------------------------------------
 	ORVacuumStatusLabel* rgaRegionObj	= [statusDictionary objectForKey:[NSNumber numberWithInt:kRegionRGA]];
-	//PKR G2>5E-6: Filament could be damaged.
-	if([rga ionizerFilamentCurrentRB]==0 && [self region:kRegionRGA valueHigherThan:5E-6]){
+	//PKR G2>1E-5: Filament could be damaged.
+	if([rga ionizerFilamentCurrentRB]==0 && [self region:kRegionRGA valueHigherThan:1E-5]){
 		[rga addFilamentConstraint:kRgaFilamentConstraint reason:kRgaFilamentReason];
 		[rgaRegionObj addConstraintName:kRgaFilamentConstraint reason:kRgaFilamentReason];
 	}
