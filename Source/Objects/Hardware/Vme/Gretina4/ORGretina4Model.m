@@ -1117,8 +1117,20 @@ static struct {
 	NSLog(@"Main FGPA version: 0x%x \n", mainVersion);
 		
 	if (mainVersion != kCurrentFirmwareVersion){
-		NSLog(@"Main FPGA version does not match: it should be 0x%x, but now it is 0x%x \n", kCurrentFirmwareVersion,mainVersion);
-		return;
+		NSLogColor([NSColor redColor],@"Main FPGA version does not match: it should be 0x%x, but now it is 0x%x \n", kCurrentFirmwareVersion,mainVersion);
+		NSLog(@"Trying again\n");
+        
+        [[self adapter] readLongBlock:&mainVersion
+                            atAddress:[self baseAddress] + register_information[kBoardID].offset
+                            numToRead:1
+                           withAddMod:[self addressModifier]
+                        usingAddSpace:0x01];
+        //mainVersion = (mainVersion & 0xFFFF0000) >> 16;
+        mainVersion = (mainVersion & 0xFFFFF000) >> 12;
+       	if (mainVersion != kCurrentFirmwareVersion){
+            NSLogColor([NSColor redColor],@"Main FPGA version still does not match: it should be 0x%x, but now it is 0x%x \n", kCurrentFirmwareVersion,mainVersion);
+            NSLogColor([NSColor redColor],@"Continuing, but be aware of the mismatch!!\n");
+       }
 	}
 	
 	//find out the VME FPGA version
