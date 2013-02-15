@@ -55,6 +55,7 @@
 - (void) commentsChanged:(NSNotification*)aNote;
 - (void) modalChanged:(NSNotification*)aNote;
 - (void) listLockChanged:(NSNotification*)aNote;
+- (void) itemChanged:(NSNotification*)aNote;
 - (void) checkNotice;
 
 #pragma mark •••Delegate Methods

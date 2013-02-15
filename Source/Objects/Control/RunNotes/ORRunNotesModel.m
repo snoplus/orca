@@ -34,6 +34,7 @@ NSString* ORRunNotesItemsAdded				 = @"ORRunNotesItemsAdded";
 NSString* ORRunNotesItemsRemoved		     = @"ORRunNotesItemsRemoved";
 NSString* ORRunNotesCommentsChanged			 = @"ORRunNotesCommentsChanged";
 NSString* ORRunNotesListLock				 = @"ORRunNotesListLock";
+NSString* ORRunNotesItemChanged				 = @"ORRunNotesItemChanged";
 
 @implementation ORRunNotesModel
 
@@ -257,16 +258,46 @@ NSString* ORRunNotesListLock				 = @"ORRunNotesListLock";
 {
 	return [items count];
 }
+
+- (NSString*) commonScriptMethods { return methodsInCommonSection(self); }
+
+
 #pragma mark Scripting Methods
-- (void) addObject:(id)anItem forKey:(id)aKey
+- (void) commonScriptMethodSectionBegin { }
+
+- (void) change:(id)aKey toValue:(id)aValue
 {
 	if(!items) items= [[NSMutableArray array] retain];
+ 	for(id anObj in items){
+		if([[anObj objectForKey:@"Label"] isEqual:aKey]){
+            [anObj setObject:aValue forKey:@"Value"];
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORRunNotesItemChanged object:self userInfo:nil];
+			return;
+		}
+	}
+    //if we get here there, the key wasn't found. Add it
+    [self addObject:aValue forKey:aKey];
+}
+
+- (void) addObject:(id)anItem forKey:(id)aKey
+{
+    [[self undoManager] disableUndoRegistration];
+	if(!items) items= [[NSMutableArray array] retain];
+    for(id anObj in items){
+		if([[anObj objectForKey:@"Label"] isEqual:aKey]){
+			int index = [items indexOfObject:anObj];
+			[self removeItemAtIndex:index];
+			break;
+		}
+	}
 	id newItem = [NSMutableDictionary dictionaryWithObjectsAndKeys:aKey,@"Label",anItem,@"Value",nil];
 	[self addItem:newItem atIndex:[items count]];
+    [[self undoManager] enableUndoRegistration];
 }
 
 - (void) removeObjectWithKey:(id)aKey
 {
+    [[self undoManager] enableUndoRegistration];
 	for(id anObj in items){
 		if([[anObj objectForKey:@"Label"] isEqual:aKey]){
 			int index = [items indexOfObject:anObj];
@@ -274,7 +305,10 @@ NSString* ORRunNotesListLock				 = @"ORRunNotesListLock";
 			break;
 		}
 	}
+    [[self undoManager] disableUndoRegistration];
 }
+
+- (void) commonScriptMethodSectionEnd { }
 
 
 #pragma mark •••Run Management
@@ -283,7 +317,7 @@ NSString* ORRunNotesListLock				 = @"ORRunNotesListLock";
 {	
 	if(!ignoreValues){
 		NSMutableDictionary* runNotes = [NSMutableDictionary dictionary];
-		[runNotes setObject:comments forKey:@"comments"];
+		[runNotes setObject:[self comments] forKey:@"comments"];
 		for(id obj in items){
 			[runNotes setObject:[obj objectForKey:@"Value"] forKey:[obj objectForKey:@"Label"]];
 		}

@@ -54,6 +54,10 @@
 - (void) cancelRun;
 - (void) continueWithRun;
 
+- (void) commonScriptMethodSectionBegin;
+- (void) commonScriptMethodSectionEnd;
+
+- (void) change:(id)aKey toValue:(id)aValue;
 - (void) addObject:(id)anItem forKey:(id)aKey;
 - (void) removeObjectWithKey:(id)aKey;
 
@@ -76,5 +80,6 @@ extern NSString* ORRunNotesCommentsChanged;
 extern NSString* ORRunNotesModelModalChanged;
 extern NSString* ORRunNotesItemsAdded;
 extern NSString* ORRunNotesItemsRemoved;
+extern NSString* ORRunNotesItemChanged;
 
 

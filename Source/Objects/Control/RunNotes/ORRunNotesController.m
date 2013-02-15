@@ -97,7 +97,12 @@
 	[notifyCenter addObserver : self
                      selector : @selector(itemsRemoved:)
                          name : ORRunNotesItemsRemoved
-                       object : model];		
+                       object : model];
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(itemsRemoved:)
+                         name : ORRunNotesItemChanged
+                       object : model];    
 	
 }
 
@@ -109,6 +114,12 @@
 	[self doNotOpenChanged:nil];
     [self tableViewSelectionDidChange:nil];
 	[notesListView reloadData];
+}
+
+- (void) itemChanged:(NSNotification*)aNote
+{
+    [notesListView reloadData];
+
 }
 
 - (void) modalChanged:(NSNotification*)aNote
@@ -200,7 +211,7 @@
 
 - (BOOL) windowShouldClose:(NSNotification *)aNote
 {
-	return ![model isModal];	
+	return ![model isModal];
 }
 
 #pragma mark •••Interface Management
