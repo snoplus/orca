@@ -127,7 +127,6 @@ NSString* ORVXMLock							= @"ORVXMLock";
 													  encoding:NSASCIIStringEncoding] autorelease] uppercaseString];
         if(!buffer)buffer = [[NSMutableString string] retain];
         [buffer appendString:theString];
-        NSLog(@"received: %@\n",theString);
 
         do {
             NSRange crRange    = [buffer rangeOfString:@"\r"];
@@ -764,7 +763,6 @@ NSString* ORVXMLock							= @"ORVXMLock";
 
     }
     else if([aCmd rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"0123456789"]].location==0){
-            NSLog(@"response: %@\n",aCmd);
             queryInProgress = NO;
             [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
             if(useCmdQueue){
@@ -885,7 +883,6 @@ NSString* ORVXMLock							= @"ORVXMLock";
             }
         [self setCmdTypeExecuting:kVXMCmdIdle];
        }
-    NSLog(@"sending: %@\n",aCmd);
 		[serialPort writeString:aCmd];
         if([aCmd isEqualToString:@"N"]){
             [self queryPositions];
