@@ -19,7 +19,8 @@
 //-------------------------------------------------------------
 
 
-#pragma mark •••Imported Filesg
+#pragma mark •••Imported Files
+#import "ORAdcProcessing.h"
 
 #define kNplpCMeterPort 5000
 #define kNplpCNumChannels 4
@@ -30,7 +31,7 @@
 @class ORAlarm;
 @class ORQueue;
 
-@interface ORNplpCMeterModel : OrcaObject 
+@interface ORNplpCMeterModel : OrcaObject <ORAdcProcessing>
 {
 	NSLock* localLock;
     NSString* ipAddress;
@@ -42,6 +43,12 @@
 	ORQueue* dataStack[kNplpCNumChannels];
 	float meterAverage[kNplpCNumChannels];
     unsigned short receiveCount;
+    
+    float           lowLimit[kNplpCNumChannels];
+    float           hiLimit[kNplpCNumChannels];
+    float           minValue[kNplpCNumChannels];
+    float           maxValue[kNplpCNumChannels];
+
 }
 
 #pragma mark ***Accessors
@@ -63,6 +70,14 @@
 - (void) setMeter:(int)chan average:(float)aValue;
 - (float) meterAverage:(unsigned short)aChannel;
 - (void) restart;
+- (float) lowLimit:(int)i;
+- (void)  setLowLimit:(int)i value:(float)aValue;
+- (float) hiLimit:(int)i;
+- (void)  setHiLimit:(int)i value:(float)aValue;
+- (float) minValue:(int)i;
+- (void)  setMinValue:(int)i value:(float)aValue;
+- (float) maxValue:(int)i;
+- (void)  setMaxValue:(int)i value:(float)aValue;
 
 #pragma mark ***Utilities
 - (void) connect;
@@ -78,6 +93,22 @@
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
+
+#pragma mark •••Bit Processing Protocol
+- (void) processIsStarting;
+- (void) processIsStopping;
+- (void) startProcessCycle;
+- (void) endProcessCycle;
+
+- (NSString*) identifier;
+- (NSString*) processingTitle;
+- (double) convertedValue:(int)aChan;
+- (double) maxValueForChan:(int)aChan;
+- (double) minValueForChan:(int)aChan;
+- (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit channel:(int)channel;
+- (void) setProcessOutput:(int)aChan value:(int)aValue;
+- (BOOL) processValue:(int)channel;
+
 @end
 
 extern NSString* ORNplpCMeterReceiveCountChanged;
@@ -85,4 +116,8 @@ extern NSString* ORNplpCMeterIsConnectedChanged;
 extern NSString* ORNplpCMeterIpAddressChanged;
 extern NSString* ORNplpCMeterAverageChanged;
 extern NSString* ORNplpCMeterFrameError;
+extern NSString* ORNplpCMeterMinValueChanged;
+extern NSString* ORNplpCMeterMaxValueChanged;
+extern NSString* ORNplpCMeterHiLimitChanged;
+extern NSString* ORNplpCMeterLowLimitChanged;
 extern NSString* ORNplpCMeterLock;

@@ -28,6 +28,35 @@
     self = [ super initWithWindowNibName: @"NplpCMeter" ];
     return self;
 }
+- (void) awakeFromNib
+{
+	NSNumberFormatter* formatter = [[[NSNumberFormatter alloc] init] autorelease];
+	[formatter setFormat:@"#0.000"];
+	int i;
+	for(i=0;i<kNplpCNumChannels;i++){
+		[[minValueMatrix cellAtRow:i column:0]	setTag:i];
+		[[maxValueMatrix cellAtRow:i column:0]	setTag:i];
+		[[lowLimitMatrix cellAtRow:i column:0]	setTag:i];
+		[[hiLimitMatrix cellAtRow:i column:0]	setTag:i];
+		
+		[[minValueMatrix cellAtRow:i column:0] setFormatter:formatter];
+		[[maxValueMatrix cellAtRow:i column:0] setFormatter:formatter];
+		[[lowLimitMatrix cellAtRow:i column:0] setFormatter:formatter];
+		[[hiLimitMatrix cellAtRow:i column:0] setFormatter:formatter];
+	}
+    
+    blankView           = [[NSView alloc] init];
+    ipConnectionSize	= NSMakeSize(315,255);
+    statusSize          = NSMakeSize(270,240);
+    processSize         = NSMakeSize(315,240);
+	
+	NSString* key = [NSString stringWithFormat: @"orca.ORNplpCMeter%lu.selectedtab",[model uniqueIdNumber]];
+    int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
+	if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
+	[tabView selectTabViewItemAtIndex: index];
+	
+ 	[super awakeFromNib];
+}
 
 - (void) registerNotificationObservers
 {
@@ -69,6 +98,26 @@
                      selector : @selector(settingsLockChanged:)
                          name : ORNplpCMeterLock
                         object: nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(minValueChanged:)
+                         name : ORNplpCMeterMinValueChanged
+						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(maxValueChanged:)
+                         name : ORNplpCMeterMaxValueChanged
+						object: model];
+    
+	[notifyCenter addObserver : self
+                     selector : @selector(lowLimitChanged:)
+                         name : ORNplpCMeterLowLimitChanged
+						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(hiLimitChanged:)
+                         name : ORNplpCMeterHiLimitChanged
+						object: model];
 
 }
 
@@ -83,6 +132,10 @@
 	[self frameErrorChanged:nil];
 	[self averageChanged:nil];
 	[self receiveCountChanged:nil];
+	[self lowLimitChanged:nil];
+	[self hiLimitChanged:nil];
+	[self minValueChanged:nil];
+	[self maxValueChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -92,15 +145,41 @@
     [dialogLock setEnabled:secure];
 }
 
+#pragma mark •••Notifications
 - (void) receiveCountChanged:(NSNotification*)aNote
 {
 	[receiveCountField setIntValue: [model receiveCount]];
 }
 
-#pragma mark •••Notifications
+- (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
+{
+    [[self window] setContentView:blankView];
+	NSUInteger style = [[self window] styleMask];
+	switch([tabView indexOfTabViewItem:tabViewItem]){
+		case  0:
+			[self resizeWindowToSize:ipConnectionSize];
+			[[self window] setStyleMask: style & ~NSResizableWindowMask];
+			break;
+		case  1:
+			[self resizeWindowToSize:statusSize];
+			[[self window] setStyleMask: style & ~NSResizableWindowMask];
+			break;
+		default:
+			[self resizeWindowToSize:processSize];
+			[[self window] setStyleMask: style | NSResizableWindowMask];
+			break;
+	}
+    [[self window] setContentView:totalView];
+	
+	NSString* key = [NSString stringWithFormat: @"orca.ORNplpCMeter%lu.selectedtab",[model uniqueIdNumber]];
+    int index = [tabView indexOfTabViewItem:tabViewItem];
+    [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
+}
+
 - (void) isConnectedChanged:(NSNotification*)aNote
 {
 	[ipConnectedTextField setStringValue: [model isConnected]?@"Connected":@"Not Connected"];
+	[ipConnected2TextField setStringValue: [model isConnected]?@"Connected":@"Not Connected"];
 	[ipConnectButton setTitle:[model isConnected]?@"Disconnect":@"Connect"];
 }
 
@@ -127,6 +206,69 @@
 		[[averageValueMatrix cellWithTag:chan] setFloatValue:12*[model meterAverage:chan]/1048576.0]; //12 pC/20bits full scale
 	}
 }
+- (void) lowLimitChanged:(NSNotification*)aNotification
+{
+	if(!aNotification){
+		int i;
+		for(i=0;i<kNplpCNumChannels;i++){
+			[[lowLimitMatrix cellWithTag:i] setFloatValue:[model lowLimit:i]];
+		}
+	}
+	else {
+		int chan = [[[aNotification userInfo] objectForKey:@"Channel"] floatValue];
+		if(chan<kNplpCNumChannels){
+			[[lowLimitMatrix cellWithTag:chan] setFloatValue:[model lowLimit:chan]];
+		}
+	}
+}
+
+- (void) hiLimitChanged:(NSNotification*)aNotification
+{
+	if(!aNotification){
+		int i;
+		for(i=0;i<kNplpCNumChannels;i++){
+			[[hiLimitMatrix cellWithTag:i] setFloatValue:[model hiLimit:i]];
+		}
+	}
+	else {
+		int chan = [[[aNotification userInfo] objectForKey:@"Channel"] floatValue];
+		if(chan<kNplpCNumChannels){
+			[[hiLimitMatrix cellWithTag:chan] setFloatValue:[model hiLimit:chan]];
+		}
+	}
+}
+
+- (void) minValueChanged:(NSNotification*)aNotification
+{
+	if(!aNotification){
+		int i;
+		for(i=0;i<kNplpCNumChannels;i++){
+			[[minValueMatrix cellWithTag:i] setFloatValue:[model minValue:i]];
+		}
+	}
+	else {
+		int chan = [[[aNotification userInfo] objectForKey:@"Channel"] floatValue];
+		if(chan<kNplpCNumChannels){
+			[[minValueMatrix cellWithTag:chan] setFloatValue:[model minValue:chan]];
+		}
+	}
+}
+
+- (void) maxValueChanged:(NSNotification*)aNotification
+{
+	if(!aNotification){
+		int i;
+		for(i=0;i<kNplpCNumChannels;i++){
+			[[maxValueMatrix cellWithTag:i] setFloatValue:[model maxValue:i]];
+		}
+	}
+	else {
+		int chan = [[[aNotification userInfo] objectForKey:@"Channel"] floatValue];
+		if(chan<kNplpCNumChannels){
+			[[maxValueMatrix cellWithTag:chan] setFloatValue:[model maxValue:chan]];
+		}
+	}
+}
 
 - (void) settingsLockChanged:(NSNotification*)aNotification
 {
@@ -134,10 +276,13 @@
 
 	[ipConnectButton setEnabled:!locked];
 	[ipAddressTextField setEnabled:!locked];
-
+    [lowLimitMatrix setEnabled:!locked];
+    [hiLimitMatrix setEnabled:!locked];
+    [minValueMatrix setEnabled:!locked];
+    [maxValueMatrix setEnabled:!locked];
     [dialogLock setState: locked];
 
-}
+ }
 
 #pragma mark •••Actions
 - (IBAction) ipAddressTextFieldAction:(id)sender
@@ -155,6 +300,25 @@
 - (IBAction) dialogLockAction:(id)sender
 {
     [gSecurity tryToSetLock:ORNplpCMeterLock to:[sender intValue] forWindow:[self window]];
+}
+- (IBAction) lowLimitAction:(id)sender
+{
+	[model setLowLimit:[[sender selectedCell] tag] value:[[sender selectedCell] floatValue]];
+}
+
+- (IBAction) hiLimitAction:(id)sender
+{
+	[model setHiLimit:[[sender selectedCell] tag] value:[[sender selectedCell] floatValue]];
+}
+
+- (IBAction) minValueAction:(id)sender
+{
+	[model setMinValue:[[sender selectedCell] tag] value:[[sender selectedCell] floatValue]];
+}
+
+- (IBAction) maxValueAction:(id)sender
+{
+	[model setMaxValue:[[sender selectedCell] tag] value:[[sender selectedCell] floatValue]];
 }
 
 @end

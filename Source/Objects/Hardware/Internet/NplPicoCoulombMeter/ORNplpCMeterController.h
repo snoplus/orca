@@ -22,13 +22,26 @@
 
 @interface ORNplpCMeterController : OrcaObjectController 
 {
+	IBOutlet NSTabView*		tabView;
+	IBOutlet NSView*		totalView;
 	IBOutlet NSTextField*	ipConnectedTextField;
+	IBOutlet NSTextField*	ipConnected2TextField;
 	IBOutlet NSTextField*	ipAddressTextField;
 	IBOutlet NSButton*		ipConnectButton;
 	IBOutlet NSTextField*	frameErrorField;
 	IBOutlet NSTextField*	receiveCountField;
 	IBOutlet NSMatrix*		averageValueMatrix;
 	IBOutlet NSButton*		dialogLock;
+    IBOutlet NSMatrix*		lowLimitMatrix;
+	IBOutlet NSMatrix*		hiLimitMatrix;
+	IBOutlet NSMatrix*		minValueMatrix;
+	IBOutlet NSMatrix*		maxValueMatrix;
+
+	NSSize					ipConnectionSize;
+	NSSize					statusSize;
+	NSSize					processSize;
+	NSView*					blankView;
+
 }
 
 #pragma mark ***Interface Management
@@ -38,11 +51,19 @@
 - (void) frameErrorChanged:(NSNotification*)aNote;
 - (void) averageChanged:(NSNotification*)aNote;
 - (void) settingsLockChanged:(NSNotification*)aNote;
+- (void) minValueChanged:(NSNotification*)aNote;
+- (void) maxValueChanged:(NSNotification*)aNote;
+- (void) lowLimitChanged:(NSNotification*)aNote;
+- (void) hiLimitChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) ipAddressTextFieldAction:(id)sender;
 - (IBAction) connectAction:(id)sender;
 - (IBAction) dialogLockAction:(id)sender;
+- (IBAction) minValueAction:(id)sender;
+- (IBAction) maxValueAction:(id)sender;
+- (IBAction) lowLimitAction:(id)sender;
+- (IBAction) hiLimitAction:(id)sender;
 
 @end
 

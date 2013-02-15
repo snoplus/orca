@@ -32,6 +32,10 @@ NSString* ORNplpCMeterIpAddressChanged		= @"ORNplpCMeterIpAddressChanged";
 NSString* ORNplpCMeterAverageChanged		= @"ORNplpCMeterAverageChanged";
 NSString* ORNplpCMeterFrameError			= @"ORNplpCMeterFrameError";
 NSString* ORNplpCMeterLock					= @"ORNplpCMeterLock";
+NSString* ORNplpCMeterMinValueChanged		= @"ORNplpCMeterMinValueChanged";
+NSString* ORNplpCMeterMaxValueChanged		= @"ORNplpCMeterMaxValueChanged";
+NSString* ORNplpCMeterHiLimitChanged		= @"ORNplpCMeterHiLimitChanged";
+NSString* ORNplpCMeterLowLimitChanged		= @"ORNplpCMeterLowLimitChanged";
 
 
 @implementation ORNplpCMeterModel
@@ -374,6 +378,88 @@ NSString* ORNplpCMeterLock					= @"ORNplpCMeterLock";
 	}
 	return YES;
 }
+- (float) lowLimit:(int)i
+{
+	if(i>=0 && i<kNplpCNumChannels)return lowLimit[i];
+	else return 0;
+}
+
+- (void) setLowLimit:(int)i value:(float)aValue
+{
+	if(i>=0 && i<kNplpCNumChannels){
+		[[[self undoManager] prepareWithInvocationTarget:self] setLowLimit:i value:lowLimit[i]];
+		
+		lowLimit[i] = aValue;
+		
+		NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+		[userInfo setObject:[NSNumber numberWithInt:i] forKey: @"Channel"];
+		
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORNplpCMeterLowLimitChanged object:self userInfo:userInfo];
+		
+	}
+}
+
+- (float) hiLimit:(int)i
+{
+	if(i>=0 && i<kNplpCNumChannels)return hiLimit[i];
+	else return 0;
+}
+
+- (void) setHiLimit:(int)i value:(float)aValue
+{
+	if(i>=0 && i<kNplpCNumChannels){
+		[[[self undoManager] prepareWithInvocationTarget:self] setHiLimit:i value:lowLimit[i]];
+		
+		hiLimit[i] = aValue;
+		
+		NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+		[userInfo setObject:[NSNumber numberWithInt:i] forKey: @"Channel"];
+		
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORNplpCMeterHiLimitChanged object:self userInfo:userInfo];
+		
+	}
+}
+
+- (float) minValue:(int)i
+{
+	if(i>=0 && i<kNplpCNumChannels)return minValue[i];
+	else return 0;
+}
+
+- (void) setMinValue:(int)i value:(float)aValue
+{
+	if(i>=0 && i<kNplpCNumChannels){
+		[[[self undoManager] prepareWithInvocationTarget:self] setMinValue:i value:minValue[i]];
+		
+		minValue[i] = aValue;
+		
+		NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+		[userInfo setObject:[NSNumber numberWithInt:i] forKey: @"Channel"];
+		
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORNplpCMeterMinValueChanged object:self userInfo:userInfo];
+		
+	}
+}
+- (float) maxValue:(int)i
+{
+	if(i>=0 && i<kNplpCNumChannels)return maxValue[i];
+	else return 0;
+}
+
+- (void) setMaxValue:(int)i value:(float)aValue
+{
+	if(i>=0 && i<kNplpCNumChannels){
+		[[[self undoManager] prepareWithInvocationTarget:self] setMaxValue:i value:maxValue[i]];
+		
+		maxValue[i] = aValue;
+		
+		NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+		[userInfo setObject:[NSNumber numberWithInt:i] forKey: @"Channel"];
+		
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORNplpCMeterMaxValueChanged object:self userInfo:userInfo];
+		
+	}
+}
 
 #pragma mark ***Archival
 - (id)initWithCoder:(NSCoder*)decoder
@@ -382,7 +468,14 @@ NSString* ORNplpCMeterLock					= @"ORNplpCMeterLock";
     
     [[self undoManager] disableUndoRegistration];
 	[self setIpAddress:[decoder decodeObjectForKey:@"ORNplpCMeterModelIpAddress"]];
-    [[self undoManager] enableUndoRegistration];    
+    int i;
+    for(i=0;i<kNplpCNumChannels;i++) {
+        [self setMinValue:i value:[decoder decodeFloatForKey:[NSString stringWithFormat:@"minValue%d",i]]];
+        [self setMaxValue:i value:[decoder decodeFloatForKey:[NSString stringWithFormat:@"maxValue%d",i]]];
+        [self setLowLimit:i value:[decoder decodeFloatForKey:[NSString stringWithFormat:@"lowLimit%d",i]]];
+        [self setHiLimit:i value:[decoder decodeFloatForKey:[NSString stringWithFormat:@"hiLimit%d",i]]];
+    }
+    [[self undoManager] enableUndoRegistration];
 	
     return self;
 }
@@ -391,6 +484,77 @@ NSString* ORNplpCMeterLock					= @"ORNplpCMeterLock";
 {
     [super encodeWithCoder:encoder];
     [encoder encodeObject:ipAddress forKey:@"ORNplpCMeterModelIpAddress"];
+    int i;
+    for(i=0;i<kNplpCNumChannels;i++) {
+        [encoder encodeFloat:lowLimit[i] forKey:[NSString stringWithFormat:@"lowLimit%d",i]];
+        [encoder encodeFloat:hiLimit[i] forKey:[NSString stringWithFormat:@"hiLimit%d",i]];
+        [encoder encodeFloat:minValue[i] forKey:[NSString stringWithFormat:@"minValue%d",i]];
+        [encoder encodeFloat:maxValue[i] forKey:[NSString stringWithFormat:@"maxValue%d",i]];
+    }
+}
+
+#pragma mark •••Bit Processing Protocol
+- (void) processIsStarting { }
+- (void) processIsStopping { }
+- (void) startProcessCycle { }
+- (void) endProcessCycle   { }
+- (void) setProcessOutput:(int)aChan value:(int)aValue {}
+
+- (NSString*) identifier
+{
+	NSString* s;
+ 	@synchronized(self){
+		s= [NSString stringWithFormat:@"pCMeter,%lu",[self uniqueIdNumber]];
+	}
+	return s;
+}
+
+- (NSString*) processingTitle
+{
+	NSString* s;
+ 	@synchronized(self){
+		s= [self identifier];
+	}
+	return s;
+}
+
+
+- (double) convertedValue:(int)aChan
+{
+	double theValue = 0;
+	@synchronized(self){
+		if(aChan<kNplpCNumChannels)theValue =  meterAverage[aChan];
+    }
+	return theValue;
+}
+
+- (BOOL) processValue:(int)channel
+{
+    return TRUE;
+}
+
+- (double) maxValueForChan:(int)aChan
+{
+	return maxValue[aChan];
+}
+
+- (double) minValueForChan:(int)aChan
+{
+	return minValue[aChan];
+}
+
+- (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit channel:(int)channel
+{
+	@synchronized(self){
+		if(channel<kNplpCNumChannels){
+			*theLowLimit = lowLimit[channel];
+			*theHighLimit =  hiLimit[channel];
+		}
+		else {
+			*theLowLimit = 0;
+			*theHighLimit = 5;
+		}
+	}
 }
 
 
