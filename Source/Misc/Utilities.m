@@ -270,7 +270,11 @@ NSString* methodsInCommonSection(id anObj)
     NSArray* listArray = [allAsString componentsSeparatedByString:@"\n"];
  	NSMutableArray* methodNames = [NSMutableArray array];
     BOOL inCommonSection = NO;
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_8
+    for (id aMethod in [listArray objectEnumerator]){
+#else
     for (id aMethod in [listArray reverseObjectEnumerator]){
+#endif
         if( [aMethod hasPrefix: @"commonScriptMethodSectionBegin"] ){
             inCommonSection = YES;
             continue;
