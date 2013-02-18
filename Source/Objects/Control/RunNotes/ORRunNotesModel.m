@@ -24,6 +24,7 @@
 #import "ORDataProcessing.h"
 
 #pragma mark •••Local Strings
+NSString* ORRunNotesModelDefinitionsFilePathChanged = @"ORRunNotesModelDefinitionsFilePathChanged";
 static NSString* ORRunNotesInConnector 	= @"Data Task In Connector";
 static NSString* ORRunNotesDataOut      = @"Data Task Data Out Connector";
 
@@ -49,6 +50,7 @@ NSString* ORRunNotesItemChanged				 = @"ORRunNotesItemChanged";
 
 - (void) dealloc
 {
+    [definitionsFilePath release];
 	[items release];
     [super dealloc];
 }
@@ -113,6 +115,21 @@ NSString* ORRunNotesItemChanged				 = @"ORRunNotesItemChanged";
 }
 
 #pragma mark ***Accessors
+
+- (NSString*) definitionsFilePath
+{
+    return definitionsFilePath;
+}
+
+- (void) setDefinitionsFilePath:(NSString*)aDefinitionsFilePath
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setDefinitionsFilePath:definitionsFilePath];
+    
+    [definitionsFilePath autorelease];
+    definitionsFilePath = [aDefinitionsFilePath copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRunNotesModelDefinitionsFilePathChanged object:self];
+}
 - (BOOL) doNotOpen
 {
     return doNotOpen;
@@ -221,13 +238,6 @@ NSString* ORRunNotesItemChanged				 = @"ORRunNotesItemChanged";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRunNotesCommentsChanged object: self];
 }
 
-- (void) addItem
-{
-	if(!items) items= [[NSMutableArray array] retain];
-	id newItem = [NSMutableDictionary dictionaryWithObjectsAndKeys:@"Label",@"Label",@"0",@"Value",nil];
-	[self addItem:newItem atIndex:[items count]];
-}
-
 - (void) addItem:(id)anItem atIndex:(int)anIndex
 {
 	if(!items) items= [[NSMutableArray array] retain];
@@ -238,6 +248,7 @@ NSString* ORRunNotesItemChanged				 = @"ORRunNotesItemChanged";
 	NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Index"];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRunNotesItemsAdded object:self userInfo:userInfo];
 }
+
 
 - (void) removeItemAtIndex:(int) anIndex
 {
@@ -259,6 +270,31 @@ NSString* ORRunNotesItemChanged				 = @"ORRunNotesItemChanged";
 	return [items count];
 }
 
+
+- (BOOL) readNamesFromFile;
+{
+    if(definitionsFilePath){        
+        NSString* contents = [NSString stringWithContentsOfFile:definitionsFilePath encoding:NSASCIIStringEncoding error:nil];
+        NSArray* lines;
+		contents = [[contents componentsSeparatedByString:@"\r"] componentsJoinedByString:@"\n"];
+		contents = [[contents componentsSeparatedByString:@"\n\n"] componentsJoinedByString:@"\n"];
+        lines = [contents componentsSeparatedByString:@"\n"];
+            
+        for(id aLine in lines){
+			aLine = [aLine stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@","]];
+			aLine = [aLine stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+			if([aLine length] == 0)continue;
+            NSArray* parts = [aLine componentsSeparatedByString:@","];
+            if([parts count] == 2){
+                [self addObject:[parts objectAtIndex:1] forKey:[parts objectAtIndex:0]];
+             }
+            else return NO;
+        }
+    }
+    return YES;
+}
+
+
 - (NSString*) commonScriptMethods { return methodsInCommonSection(self); }
 
 
@@ -268,15 +304,14 @@ NSString* ORRunNotesItemChanged				 = @"ORRunNotesItemChanged";
 - (void) change:(id)aKey toValue:(id)aValue
 {
 	if(!items) items= [[NSMutableArray array] retain];
- 	for(id anObj in items){
-		if([[anObj objectForKey:@"Label"] isEqual:aKey]){
-            [anObj setObject:aValue forKey:@"Value"];
+ 	for(id anItem in items){
+		if([anItem objectForKey:aKey]){
+            [anItem setObject:aValue forKey:aKey];
             [[NSNotificationCenter defaultCenter] postNotificationName:ORRunNotesItemChanged object:self userInfo:nil];
 			return;
 		}
 	}
-    //if we get here there, the key wasn't found. Add it
-    [self addObject:aValue forKey:aKey];
+    NSLog(@"%@ is not in RunNotes list of items\n");
 }
 
 - (void) addObject:(id)anItem forKey:(id)aKey
@@ -284,24 +319,22 @@ NSString* ORRunNotesItemChanged				 = @"ORRunNotesItemChanged";
     [[self undoManager] disableUndoRegistration];
 	if(!items) items= [[NSMutableArray array] retain];
     for(id anObj in items){
-		if([[anObj objectForKey:@"Label"] isEqual:aKey]){
-			int index = [items indexOfObject:anObj];
-			[self removeItemAtIndex:index];
+		if([anObj objectForKey:aKey]!=nil){
+			[items removeObject:anObj];
 			break;
 		}
 	}
-	id newItem = [NSMutableDictionary dictionaryWithObjectsAndKeys:aKey,@"Label",anItem,@"Value",nil];
-	[self addItem:newItem atIndex:[items count]];
+	id newItem = [NSMutableDictionary dictionaryWithObject:anItem forKey:aKey];
+	[items addObject:newItem];
     [[self undoManager] enableUndoRegistration];
 }
 
 - (void) removeObjectWithKey:(id)aKey
 {
     [[self undoManager] enableUndoRegistration];
-	for(id anObj in items){
-		if([[anObj objectForKey:@"Label"] isEqual:aKey]){
-			int index = [items indexOfObject:anObj];
-			[self removeItemAtIndex:index];
+	for(id anItem in items){
+		if([anItem objectForKey:aKey]){
+			[items removeObject:anItem];
 			break;
 		}
 	}
@@ -318,10 +351,7 @@ NSString* ORRunNotesItemChanged				 = @"ORRunNotesItemChanged";
 	if(!ignoreValues){
 		NSMutableDictionary* runNotes = [NSMutableDictionary dictionary];
 		[runNotes setObject:[self comments] forKey:@"comments"];
-		for(id obj in items){
-			[runNotes setObject:[obj objectForKey:@"Value"] forKey:[obj objectForKey:@"Label"]];
-		}
-		[[userInfo objectForKey:kHeader] setObject:runNotes forKey:@"RunNotes"];
+		[[userInfo objectForKey:kHeader] setObject:items forKey:@"RunNotes"];
 	}
 		
 	nextObject =  [self objectConnectedTo: ORRunNotesDataOut]; //cach for a little more efficiency
@@ -342,6 +372,7 @@ NSString* ORRunNotesItemChanged				 = @"ORRunNotesItemChanged";
     
     [[self undoManager] disableUndoRegistration];
 	
+    [self setDefinitionsFilePath:[decoder decodeObjectForKey:@"definitionsFilePath"]];
 	items = [[decoder decodeObjectForKey:@"items"] retain];
 	
     [self setDoNotOpen:		[decoder decodeBoolForKey:@"doNotOpen"]];
@@ -355,6 +386,7 @@ NSString* ORRunNotesItemChanged				 = @"ORRunNotesItemChanged";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+	[encoder encodeObject:definitionsFilePath forKey:@"definitionsFilePath"];
 	[encoder encodeBool:doNotOpen		forKey:@"doNotOpen"];
 	[encoder encodeBool:ignoreValues	forKey:@"ignoreValues"];
 	[encoder encodeObject:items			forKey:@"items"];

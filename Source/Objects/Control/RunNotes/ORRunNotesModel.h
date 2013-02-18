@@ -29,21 +29,22 @@
 @interface ORRunNotesModel : ORDataChainObject  {
 	NSMutableArray* items;
 	NSString*       comments;
-    id nextObject;     //cache for alittle bit more speed.
-    BOOL ignoreValues;
-    BOOL doNotOpen;
-	BOOL isModal;
-	BOOL modalResult;
+    id              nextObject;     //cache for alittle bit more speed.
+    BOOL            ignoreValues;
+    BOOL            doNotOpen;
+	BOOL            isModal;
+	BOOL            modalResult;
+    NSString*       definitionsFilePath;
  }
 
 #pragma mark •••Accessors
+- (NSString*) definitionsFilePath;
+- (void) setDefinitionsFilePath:(NSString*)aDefinitionsFilePath;
 - (BOOL) doNotOpen;
 - (void) setDoNotOpen:(BOOL)aDoNotOpen;
 - (BOOL) ignoreValues;
 - (void) setIgnoreValues:(BOOL)aIgnoreValues;
-- (void) addItem;
 - (void) removeItemAtIndex:(int) anIndex;
-- (void) addItem:(id)anItem atIndex:(int)anIndex;
 - (id) itemAtIndex:(int)anIndex;
 - (unsigned long) itemCount;
 - (NSString*) comments;
@@ -60,6 +61,7 @@
 - (void) change:(id)aKey toValue:(id)aValue;
 - (void) addObject:(id)anItem forKey:(id)aKey;
 - (void) removeObjectWithKey:(id)aKey;
+- (BOOL) readNamesFromFile;
 
 #pragma mark •••Run Management
 - (void) runTaskStarted:(id)userInfo;
@@ -73,6 +75,7 @@
 - (void) encodeWithCoder:(NSCoder*)encoder;
 @end
 
+extern NSString* ORRunNotesModelDefinitionsFilePathChanged;
 extern NSString* ORRunNotesModelDoNotOpenChanged;
 extern NSString* ORRunNotesModelIgnoreValuesChanged;
 extern NSString* ORRunNotesListLock;

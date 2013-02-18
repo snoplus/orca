@@ -104,6 +104,11 @@
                          name : ORRunNotesItemChanged
                        object : model];    
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(definitionsFilePathChanged:)
+                         name : ORRunNotesModelDefinitionsFilePathChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -114,6 +119,7 @@
 	[self doNotOpenChanged:nil];
     [self tableViewSelectionDidChange:nil];
 	[notesListView reloadData];
+	[self definitionsFilePathChanged:nil];
 }
 
 - (void) itemChanged:(NSNotification*)aNote
@@ -156,6 +162,7 @@
 	[cancelRunButton setEnabled:!runInProgress && modal];
 	[addItemButton setEnabled:!locked];
 	[removeItemButton setEnabled:!locked];
+	[readDefFileButton setEnabled:!locked];
 }
 
 - (void) itemsAdded:(NSNotification*)aNote
@@ -216,6 +223,11 @@
 
 #pragma mark •••Interface Management
 
+- (void) definitionsFilePathChanged:(NSNotification*)aNote
+{
+	[definitionsFilePathField setStringValue: [[model definitionsFilePath] stringByAbbreviatingWithTildeInPath]];
+}
+
 - (void) doNotOpenChanged:(NSNotification*)aNote
 {
 	[doNotOpenButton setIntValue: [model doNotOpen]];
@@ -251,9 +263,7 @@
     [gSecurity setLock:ORRunNotesListLock to:secure];
     [listLockButton setEnabled:secure];
 }
-
 #pragma mark •••Actions
-
 - (IBAction) doNotOpenAction:(id)sender
 {
 	[model setDoNotOpen:[sender intValue]];	
@@ -274,10 +284,6 @@
     [self removeItemAction:nil];
 }
 
-- (IBAction) addItemAction:(id)sender
-{
-	[model addItem];
-}
 
 - (IBAction) removeItemAction:(id)sender
 {
@@ -305,28 +311,114 @@
 	[model continueWithRun];
 }
 
-- (IBAction) removeAddress:(id)sender
+- (IBAction) openAddItemPanel:(id)sender
 {
-	//only one can be selected at a time. If that restriction is lifted then the following will have to be changed
-	//to something a lot more complicated.
+	[self endEditing];
+    [addItemValueField setObjectValue:@""];
+    [addItemNameField setObjectValue:@""];
+    [NSApp beginSheet:addItemPanel modalForWindow:[self window]
+		modalDelegate:self didEndSelector:NULL contextInfo:nil];
 }
+
+- (IBAction) closeAddItemPanel:(id)sender
+{
+    [addItemPanel orderOut:nil];
+    [NSApp endSheet:addItemPanel];
+}
+
+- (IBAction) doAddItemAction:(id)sender
+{
+    [self endAllEditing:nil];
+    [model addObject:[addItemValueField stringValue] forKey:[addItemNameField stringValue]];
+    [addItemPanel orderOut:nil];
+    [NSApp endSheet:addItemPanel];
+    [notesListView reloadData];
+}
+
+- (IBAction) definitionsFileAction:(id)sender
+{
+    NSString* startDir = NSHomeDirectory(); //default to home
+    if([model definitionsFilePath]){
+        startDir = [[model definitionsFilePath]stringByDeletingLastPathComponent];
+        if([startDir length] == 0)startDir = NSHomeDirectory();
+    }
+    
+    NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+    [openPanel setCanChooseDirectories:NO];
+    [openPanel setCanChooseFiles:YES];
+    [openPanel setAllowsMultipleSelection:NO];
+    [openPanel setPrompt:@"Choose"];
+    
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [openPanel setDirectoryURL:[NSURL URLWithString:startDir]];
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            [model setDefinitionsFilePath:[[openPanel URL]path]];
+            if(![model readNamesFromFile]){
+                NSLogColor([NSColor redColor],@"Unable to parse <%@> as a run notes def file.\n",[[[[openPanel URLs] objectAtIndex:0]path] stringByAbbreviatingWithTildeInPath]);
+                NSLogColor([NSColor redColor],@"File must be list of items of the form: label,value\n");
+                [model setDefinitionsFilePath:nil];
+            }
+            else {
+                [self definitionsFilePathChanged:nil];
+                [notesListView reloadData];
+            }
+        }
+    }];
+#else
+    [openPanel beginSheetForDirectory:startDir
+                                 file:nil
+                                types:nil
+                       modalForWindow:[self window]
+                        modalDelegate:self
+                       didEndSelector:@selector(definitionsPanelDidEnd:returnCode:contextInfo:)
+                          contextInfo:NULL];
+#endif
+}
+
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre 10.6-specific
+- (void) definitionsPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+{
+    if(returnCode){
+        [model setDefinitionsFilePath:[[sheet filenames] objectAtIndex:0]];
+        if(![model readRunTypeNames]){
+            NSLogColor([NSColor redColor],@"Unable to parse <%@> as a run type def file.\n",[[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath]);
+            NSLogColor([NSColor redColor],@"File must be list of items of the form: lable,value\n");
+            [model setDefinitionsFilePath:nil];
+        }
+        else {
+            [self definitionsFileChanged:nil];
+        }
+    }
+}
+#endif
 
 #pragma mark Data Source Methods
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
 {
-
 	if(aTableView == notesListView){
-		id addressObj = [model itemAtIndex:rowIndex];
-		return [addressObj valueForKey:[aTableColumn identifier]]; 
-	}
-	else return nil;
+		id anItem = [model itemAtIndex:rowIndex];
+        NSArray* allKeys = [anItem allKeys];
+        if([allKeys count] == 1){
+            if([[aTableColumn identifier] isEqualToString:@"Label"]){
+                return [allKeys objectAtIndex:0];
+            }
+            else if([[aTableColumn identifier] isEqualToString:@"Value"]){
+                return [anItem objectForKey:[allKeys objectAtIndex:0]];
+            }
+        }
+    }
+    return nil;
 }
 
 - (void) tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
 {
 	if(aTableView == notesListView){
-		id addressObj = [model itemAtIndex:rowIndex];
-		[addressObj setValue:anObject forKey:[aTableColumn identifier]];
+		id anItem = [model itemAtIndex:rowIndex];
+        NSArray* allKeys = [anItem allKeys];
+        if([allKeys count] == 1){
+            [anItem setValue:anObject forKey:[allKeys objectAtIndex:0]];
+        }
 	}
 }
 

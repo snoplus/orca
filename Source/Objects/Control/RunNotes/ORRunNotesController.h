@@ -20,6 +20,7 @@
 
 @interface ORRunNotesController : OrcaObjectController {
     IBOutlet NSTableView*	notesListView;
+	IBOutlet NSTextField*   definitionsFilePathField;
 	IBOutlet NSButton*		doNotOpenButton;
 	IBOutlet NSButton*		ignoreValuesButton;
 	IBOutlet NSTextView*	commentsView;
@@ -29,6 +30,11 @@
     IBOutlet NSButton*      cancelRunButton;
     IBOutlet NSButton*      addItemButton;
     IBOutlet NSButton*      removeItemButton;
+    IBOutlet NSButton*      readDefFileButton;
+    IBOutlet NSPanel*		addItemPanel;
+    IBOutlet NSTextField*	addItemNameField;
+    IBOutlet NSTextField*	addItemValueField;
+    IBOutlet NSButton*		addItemDoneButton;
 }
 
 - (void) setButtonStates;
@@ -39,14 +45,18 @@
 - (IBAction) doNotOpenAction:(id)sender;
 - (IBAction) ignoreValuesAction:(id)sender;
 - (IBAction) removeItemAction:(id)sender;
-- (IBAction) addItemAction:(id)sender;
 - (IBAction) listLockAction:(id)sender;
 - (IBAction) delete:(id)sender;
 - (IBAction) cut:(id)sender;
 - (IBAction) continueWithRun:(id)sender;
 - (IBAction) cancelRun:(id)sender;
+- (IBAction) openAddItemPanel:(id)sender;
+- (IBAction) closeAddItemPanel:(id)sender;
+- (IBAction) doAddItemAction:(id)sender;
+- (IBAction) definitionsFileAction:(id)sender;
 
 #pragma mark •••Interface Management
+- (void) definitionsFilePathChanged:(NSNotification*)aNote;
 - (BOOL) validateMenuItem:(NSMenuItem*)menuItem;
 - (void) doNotOpenChanged:(NSNotification*)aNote;
 - (void) ignoreValuesChanged:(NSNotification*)aNote;
@@ -65,6 +75,10 @@
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex;
 - (void)tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex;
 - (int)numberOfRowsInTableView:(NSTableView *)aTableView;
+
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre 10.6-specific
+- (void) definitionsPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+#endif
 
 @end
 
