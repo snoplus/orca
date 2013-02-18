@@ -118,13 +118,14 @@ NSString* ORRunNotesItemChanged				 = @"ORRunNotesItemChanged";
 
 - (NSString*) definitionsFilePath
 {
-    return definitionsFilePath;
+    if([definitionsFilePath length])return @"";
+    else                            return definitionsFilePath;
 }
 
 - (void) setDefinitionsFilePath:(NSString*)aDefinitionsFilePath
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setDefinitionsFilePath:definitionsFilePath];
-    
+    if([aDefinitionsFilePath length]==0)aDefinitionsFilePath= @"";
     [definitionsFilePath autorelease];
     definitionsFilePath = [aDefinitionsFilePath copy];    
 
@@ -311,7 +312,7 @@ NSString* ORRunNotesItemChanged				 = @"ORRunNotesItemChanged";
 			return;
 		}
 	}
-    NSLog(@"%@ is not in RunNotes list of items\n");
+    NSLog(@"%@ is not in RunNotes list of items\n",aKey);
 }
 
 - (void) addObject:(id)anItem forKey:(id)aKey
