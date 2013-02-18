@@ -162,6 +162,20 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	return @"Data_Chain/Run_Control.html";
 }
 
+#define kRunStartStopIconRect NSMakeRect(3,3,25,25)
+- (BOOL) acceptsClickAtPoint:(NSPoint)aPoint
+{
+    if(enableIconControls){
+        if(NSPointInRect(NSMakePoint(aPoint.x-[self frame].origin.x,aPoint.y-[self frame].origin.y),kRunStartStopIconRect)){
+            if([self isRunning]) [self stopRun];
+            else [self startRun];
+        }
+        return NO; //want no further action with this click
+    }
+	else return NSPointInRect(aPoint,[self frame]);
+}
+
+
 - (void) setUpImage
 {
     //---------------------------------------------------------------------------------------------------
@@ -195,7 +209,16 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
         NSImage* aNoticeImage = [NSImage imageNamed:@"notice"];
         [aNoticeImage drawAtPoint:NSMakePoint(theOffset.x/2.+[i size].width/2-[aNoticeImage size].width/2 ,[i size].height/2-[aNoticeImage size].height/2) fromRect:[aNoticeImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
     }
-	
+    
+    if(enableIconControls){
+        
+        NSImage* theImage = nil;
+        if([self isRunning])                                theImage = [NSImage imageNamed:@"Stop"];
+        else if(![[ORGlobal sharedGlobal] anyVetosInPlace]) theImage = [NSImage imageNamed:@"Play"];
+        
+        [theImage drawInRect:kRunStartStopIconRect fromRect:[theImage imageRect] operation:NSCompositeSourceOver fraction:1];
+    }
+
 	
     [i unlockFocus];
     
@@ -710,6 +733,8 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 - (void) setRunningState:(int)aRunningState
 {
     runningState = aRunningState;
+    
+    [self setUpImage];
     
     NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
 							  [NSNumber numberWithInt:runningState], ORRunStatusValue,

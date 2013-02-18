@@ -62,16 +62,9 @@ NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
     
 }
 
-
 - (void) connectionChanged
 {
 	[self setUpImage];
-}
-
-- (void) flagsChanged:(NSEvent *)theEvent
-{
-    enableIconControls  = ([[NSApp currentEvent] modifierFlags] & NSCommandKeyMask)!=0;
-    [self setUpImage];
 }
 
 - (BOOL) acceptsClickAtPoint:(NSPoint)aPoint

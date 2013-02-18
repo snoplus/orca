@@ -52,7 +52,9 @@ extern NSString* ORObjArrayPtrPBType;
         NSMutableDictionary* connectors;
  		BOOL		alreadyVisitedInChainSearch;
         NSMutableDictionary* miscAttributes;
-		BOOL	loopChecked;
+		BOOL        loopChecked;
+        BOOL        enableIconControls;
+    
     @private
         //internal flags
         BOOL		aWake;

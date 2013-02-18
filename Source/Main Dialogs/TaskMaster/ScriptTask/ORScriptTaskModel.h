@@ -29,7 +29,6 @@
 {
 	ORScriptInterface*		task;
 	NSMutableDictionary*	externVariablePool;
-    BOOL                    enableIconControls;
 }
 
 #pragma mark ***Initialization

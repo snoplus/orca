@@ -551,7 +551,8 @@ NSString* ORMiscAttributeKey		= @"ORMiscAttributeKey";
 
 - (void) flagsChanged:(NSEvent *)theEvent
 {
-  	//subclasses can use as needed.
+    enableIconControls  = ([[NSApp currentEvent] modifierFlags] & NSCommandKeyMask)!=0;
+    [self setUpImage];
 }
 
 - (void) doCmdClick:(id)sender
