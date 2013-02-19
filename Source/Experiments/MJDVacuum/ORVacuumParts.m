@@ -520,7 +520,7 @@ NSString* ORVacuumConstraintChanged = @"ORVacuumConstraintChanged";
 	[controlColor release];
 	controlColor = aColor;
 
-	float red,green,blue,alpha;
+	float red=0,green=0,blue=0,alpha=0;
 		
 	[controlColor getRed:&red green:&green blue:&blue alpha:&alpha];
 	red = MIN(1.0,red*1.5);
