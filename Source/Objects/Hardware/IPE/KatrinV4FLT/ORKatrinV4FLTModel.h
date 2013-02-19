@@ -131,7 +131,6 @@
 - (int) boxcarLength;
 - (void) setBoxcarLength:(int)aBoxcarLength;
 - (ORAlarm*) fltV4useDmaBlockReadAlarm;
-- (void) setFltV4useDmaBlockReadAlarm:(ORAlarm*) aAlarm;
 - (int) useDmaBlockRead;
 - (void) setUseDmaBlockRead:(int)aUseDmaBlockRead;
 - (int) syncWithRunControl;

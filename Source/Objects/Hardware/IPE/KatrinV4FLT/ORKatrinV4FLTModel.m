@@ -209,6 +209,10 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	[gains release];
 	[totalRate release];
 #endif
+    
+    [fltV4useDmaBlockReadAlarm clearAlarm];
+    [fltV4useDmaBlockReadAlarm release];
+    
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[super dealloc];
 }
@@ -433,10 +437,6 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     return fltV4useDmaBlockReadAlarm;
 }
 
-- (void) setFltV4useDmaBlockReadAlarm:(ORAlarm*) aAlarm
-{    fltV4useDmaBlockReadAlarm = aAlarm;   }
-
-
 - (int) useDmaBlockRead
 {
     return useDmaBlockRead;
@@ -447,16 +447,14 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     //NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
 
     if((!useDmaBlockRead) && aUseDmaBlockRead){//at change from "no" to "yes" post alarm -tb-
-            ORAlarm *alarm = [self fltV4useDmaBlockReadAlarm];
             //
-            if(!alarm){
-			    alarm = [[ORAlarm alloc] initWithName:@"FLT V4: using DMA mode is still experimental." severity:kInformationAlarm];
-			    [alarm setSticky:NO];
-                [alarm setHelpString:@"See Status Log for details."];
-                [self setFltV4useDmaBlockReadAlarm: alarm];
+            if(!fltV4useDmaBlockReadAlarm){
+			    fltV4useDmaBlockReadAlarm = [[ORAlarm alloc] initWithName:@"FLT V4: using DMA mode is still experimental." severity:kInformationAlarm];
+			    [fltV4useDmaBlockReadAlarm setSticky:NO];
+                [fltV4useDmaBlockReadAlarm setHelpString:@"See Status Log for details."];
 		    }
-            [alarm setAcknowledged:NO];
-		    [alarm postAlarm];
+            [fltV4useDmaBlockReadAlarm setAcknowledged:NO];
+		    [fltV4useDmaBlockReadAlarm postAlarm];
             NSLog(@"%@::%@  ALARM: You selected to use DMA mode. This mode is still experimental and should not yet used for important measurements! It is currently available for Energy+Trace (sync) mode only!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
 	}
     useDmaBlockRead = aUseDmaBlockRead;
