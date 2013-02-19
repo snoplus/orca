@@ -42,6 +42,7 @@
 				case kControlBelow: theControlRect = NSMakeRect(x1-w/2.,y1-h-kPipeRadius-2*kPipeThickness-5,w,h);	break;
 				case kControlRight: theControlRect = NSMakeRect(x1+kPipeRadius+2*kPipeThickness+5,y1-h/2.,w,h);	break;
 				case kControlLeft:  theControlRect = NSMakeRect(x1-kPipeRadius-2*kPipeThickness-w,y1-h/2.,w,h);	break;
+                default: theControlRect = NSZeroRect; break;
 			}
 		
 			int gateValveTag = [aValve partTag];
