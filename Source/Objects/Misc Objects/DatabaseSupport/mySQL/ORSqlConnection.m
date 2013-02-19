@@ -84,7 +84,7 @@
 			mConnection = mysql_init (NULL);
 			if(mConnection){
 				MYSQL* result = mysql_real_connect (mConnection,[aHostName UTF8String], [aUserName UTF8String], [aPassWord UTF8String],NULL, 0, NULL, 0);
-				if ( result != mConnection){
+				if ( result && (result != mConnection)){
 					NSLog(@"mysql_real_connect() failed: %u\n",mysql_errno (result));
 					NSLog(@"Error: (%s)\n",mysql_error (result));
 					[self disconnect];
@@ -198,23 +198,26 @@
 - (ORSqlResult*) queryString:(NSString *) query
 {
 	ORSqlResult*	theResult = nil;
+        
 	NSException* e;
 	@synchronized(self){
-		const char*	theCQuery = [query UTF8String];
-		int         theQueryCode;
-		if ((theQueryCode = mysql_query(mConnection, theCQuery)) == 0) {
-			if (mysql_field_count(mConnection) != 0) {
-				theResult = [[[ORSqlResult alloc] initWithMySQLPtr:mConnection]autorelease];
-			}
-		}
-		else {
-			NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Problem in queryString error code is : %d, query is : %s -in ObjC : %@-\n", theQueryCode, theCQuery, query] forKey:@"Description"];
-			NSLog(@"%s\n", mysql_error(mConnection));
-			e = [NSException exceptionWithName: @"SQL Exception"
-													 reason: [self getLastErrorMessage]
-												   userInfo: userInfo];
-			@throw e;			
-		}
+        if(mConnection){
+            const char*	theCQuery = [query UTF8String];
+            int         theQueryCode;
+            if ((theQueryCode = mysql_query(mConnection, theCQuery)) == 0) {
+                if (mysql_field_count(mConnection) != 0) {
+                    theResult = [[[ORSqlResult alloc] initWithMySQLPtr:mConnection]autorelease];
+                }
+            }
+            else {
+                NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Problem in queryString error code is : %d, query is : %s -in ObjC : %@-\n", theQueryCode, theCQuery, query] forKey:@"Description"];
+                NSLog(@"%s\n", mysql_error(mConnection));
+                e = [NSException exceptionWithName: @"SQL Exception"
+                                                         reason: [self getLastErrorMessage]
+                                                       userInfo: userInfo];
+                @throw e;			
+            }
+        }
 	}
     return theResult ;
 }
@@ -249,13 +252,15 @@
 {
     ORSqlResult*  theResult = nil;
 	@synchronized(self){
-		MYSQL_RES*	theResPtr = mysql_list_dbs(mConnection, NULL);
-	
-		if (theResPtr) {
-			theResult = [[[ORSqlResult alloc]initWithResPtr: theResPtr]autorelease];
-		}	
+        if(mConnection){
+            MYSQL_RES*	theResPtr = mysql_list_dbs(mConnection, NULL);
+        
+            if (theResPtr) {
+                theResult = [[[ORSqlResult alloc]initWithResPtr: theResPtr]autorelease];
+            }
+        }
 	}
-    return theResult;    
+    return theResult;
 }
 
 
@@ -263,11 +268,13 @@
 {
     ORSqlResult* theResult = nil;
  	@synchronized(self){
-		MYSQL_RES* theResPtr = mysql_list_tables(mConnection, NULL);
-	
-		if (theResPtr) {
-			theResult = [[[ORSqlResult alloc] initWithResPtr: theResPtr]autorelease];
-		}
+        if(mConnection){
+            MYSQL_RES* theResPtr = mysql_list_tables(mConnection, NULL);
+        
+            if (theResPtr) {
+                theResult = [[[ORSqlResult alloc] initWithResPtr: theResPtr]autorelease];
+            }
+        }
 	}
     return theResult;
 }
@@ -277,8 +284,10 @@
 {	
 	ORSqlResult* theResult = nil;
 	@synchronized(self){
-		NSString* theQuery   = [NSString stringWithFormat:@"SHOW TABLES FROM %@", dbName];
-		theResult = [self queryString:theQuery];
+        if(mConnection){
+            NSString* theQuery   = [NSString stringWithFormat:@"SHOW TABLES FROM %@", dbName];
+            theResult = [self queryString:theQuery];
+        }
 	}
     return theResult;
 }
@@ -346,11 +355,13 @@
 {
     ORSqlResult* theResult = nil;
 	@synchronized(self){
-		MYSQL_RES* theResPtr = mysql_list_processes(mConnection);
+        if(mConnection){
+            MYSQL_RES* theResPtr = mysql_list_processes(mConnection);
 	
-		if (theResPtr) {
-			theResult = [[[ORSqlResult alloc] initWithResPtr:theResPtr] autorelease];
-		}
+            if (theResPtr) {
+                theResult = [[[ORSqlResult alloc] initWithResPtr:theResPtr] autorelease];
+            }
+        }
 	}
     return theResult;
 }
@@ -378,7 +389,9 @@
 {	
     int theErrorCode = 0; 
 	@synchronized(self){
-		theErrorCode = mysql_kill(mConnection, pid);
+        if(mConnection){
+            theErrorCode = mysql_kill(mConnection, pid);
+        }
 	}
     return (theErrorCode) ? NO : YES;
 }
@@ -393,17 +406,15 @@
 - (NSString *) prepareString:(NSString *) theString
 {
     const char*	 theCStringBuffer = [theString UTF8String];
-    unsigned int theLength;
-    char*		 theCEscBuffer;
-    NSString*    theReturn;
-	
-    if ([theString length]==0) {
-        return @"";
-    }
-    theLength = strlen(theCStringBuffer);
-    theCEscBuffer = (char *)calloc(sizeof(char),(theLength * 2) + 1);
+    
+	if(!mConnection)return nil;
+    
+    if ([theString length]==0) return @"";
+    
+    unsigned int theLength = strlen(theCStringBuffer);
+    char* theCEscBuffer = (char *)calloc(sizeof(char),(theLength * 2) + 1);
     mysql_real_escape_string(mConnection, theCEscBuffer, theCStringBuffer, theLength);
-    theReturn = [NSString stringWithCString:theCEscBuffer encoding:NSISOLatin1StringEncoding];
+    NSString*  theReturn = [NSString stringWithCString:theCEscBuffer encoding:NSISOLatin1StringEncoding];
     free (theCEscBuffer);
     return theReturn;    
 }
