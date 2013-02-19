@@ -167,7 +167,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 {
     if(enableIconControls){
         if(NSPointInRect(NSMakePoint(aPoint.x-[self frame].origin.x,aPoint.y-[self frame].origin.y),kRunStartStopIconRect)){
-            if([self isRunning]) [self stopRun];
+            if([self isRunning]) [self haltRun];
             else [self startRun];
         }
         return NO; //want no further action with this click
