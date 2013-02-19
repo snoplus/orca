@@ -94,7 +94,8 @@ NSString* ORRemoteSocketLock		= @"ORRemoteSocketLock";
 		struct hostent *host;
 		inet_pton(AF_INET, [remoteHost UTF8String], &IPaddr);
 		host = gethostbyaddr((char *) &IPaddr, sizeof(IPaddr),AF_INET);
-		return [NSString stringWithUTF8String:(host->h_name)];
+        if(host) return [NSString stringWithUTF8String:(host->h_name)];
+        else return @"";
 	}
 	else return @"";
 }
