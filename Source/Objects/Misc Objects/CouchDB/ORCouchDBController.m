@@ -137,8 +137,8 @@
 						object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(newNameChanged:)
-                         name : ORCouchDBModelNewNameChanged
+                     selector : @selector(betterNameChanged:)
+                         name : ORCouchDBModelBetterNameChanged
 						object: model];
 
     [notifyCenter addObserver : self
@@ -171,7 +171,7 @@
 	[self keepHistoryChanged:nil];
 	[self replicationRunningChanged:nil];
 	[self oldNameChanged:nil];
-	[self newNameChanged:nil];
+	[self betterNameChanged:nil];
 	[self sweepInProgressChanged:nil];
 	[self processCountChanged:nil];
 	[self changedCountChanged:nil];
@@ -194,9 +194,9 @@
 	[stopButton setEnabled:[model sweepInProgress]];
 }
 
-- (void) newNameChanged:(NSNotification*)aNote
+- (void) betterNameChanged:(NSNotification*)aNote
 {
-	[newNameTextField setStringValue: [model newName]];
+	[betterNameTextField setStringValue: [model betterName]];
 }
 
 - (void) oldNameChanged:(NSNotification*)aNote
@@ -281,9 +281,9 @@
 
 #pragma mark •••Actions
 
-- (void) newNameTextFieldAction:(id)sender
+- (void) betterNameTextFieldAction:(id)sender
 {
-	[model setNewName:[sender stringValue]];	
+	[model setBetterName:[sender stringValue]];	
 }
 
 - (void) oldNameTextFieldAction:(id)sender

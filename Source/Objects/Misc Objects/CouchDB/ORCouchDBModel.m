@@ -39,7 +39,7 @@
 NSString* ORCouchDBModelChangedCountChanged = @"ORCouchDBModelChangedCountChanged";
 NSString* ORCouchDBModelProcessCountChanged = @"ORCouchDBModelProcessCountChanged";
 NSString* ORCouchDBModelSweepInProgressChanged	= @"ORCouchDBModelSweepInProgressChanged";
-NSString* ORCouchDBModelNewNameChanged			= @"ORCouchDBModelNewNameChanged";
+NSString* ORCouchDBModelBetterNameChanged			= @"ORCouchDBModelBetterNameChanged";
 NSString* ORCouchDBModelOldNameChanged			= @"ORCouchDBModelOldNameChanged";
 NSString* ORCouchDBModelReplicationRunningChanged = @"ORCouchDBModelReplicationRunningChanged";
 NSString* ORCouchDBModelKeepHistoryChanged		= @"ORCouchDBModelKeepHistoryChanged";
@@ -103,7 +103,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 
 - (void) dealloc
 {
-    [newName release];
+    [betterName release];
     [oldName release];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -288,20 +288,20 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCouchDBModelSweepInProgressChanged object:self];
 }
 
-- (NSString*) newName
+- (NSString*) betterName
 {
-    return newName;
+    return betterName;
 }
 
-- (void) setNewName:(NSString*)aNewName
+- (void) setBetterName:(NSString*)aBetterName
 {
-	if([aNewName length]==0)aNewName = @"";
-    [[[self undoManager] prepareWithInvocationTarget:self] setNewName:newName];
+	if([aBetterName length]==0)aBetterName = @"";
+    [[[self undoManager] prepareWithInvocationTarget:self] setBetterName:betterName];
     
-    [newName autorelease];
-    newName = [aNewName copy];    
+    [betterName autorelease];
+    betterName = [aBetterName copy];    
 
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCouchDBModelNewNameChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCouchDBModelBetterNameChanged object:self];
 }
 
 - (NSString*) oldName
@@ -949,7 +949,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 
 - (void) renameAdc:(id)aDoc
 {
-	[[self historyDBRef] renameDoc:aDoc adc:oldName to:newName delegate:self tag:kAdcRenamed];
+	[[self historyDBRef] renameDoc:aDoc adc:oldName to:betterName delegate:self tag:kAdcRenamed];
 }
 
 - (void) getRemoteInfo:(BOOL)verbose
@@ -1117,7 +1117,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 {    
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
-    [self setNewName:[decoder decodeObjectForKey:@"newName"]];
+    [self setBetterName:[decoder decodeObjectForKey:@"betterName"]];
     [self setOldName:[decoder decodeObjectForKey:@"oldName"]];
     [self setKeepHistory:[decoder decodeBoolForKey:@"keepHistory"]];
     [self setPassword:[decoder decodeObjectForKey:@"Password"]];
@@ -1139,7 +1139,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeObject:newName forKey:@"newName"];
+    [encoder encodeObject:betterName forKey:@"betterName"];
     [encoder encodeObject:oldName forKey:@"oldName"];
     [encoder encodeBool:keepHistory forKey:@"keepHistory"];
     [encoder encodeBool:stealthMode forKey:@"stealthMode"];

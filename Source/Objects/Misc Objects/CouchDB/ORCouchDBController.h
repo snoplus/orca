@@ -25,7 +25,7 @@
 	IBOutlet NSTextField* changedCountTextField;
 	IBOutlet NSTextField* processCountTextField;
 	IBOutlet NSTextField* sweepInProgressTextField;
-	IBOutlet NSTextField* newNameTextField;
+	IBOutlet NSTextField* betterNameTextField;
 	IBOutlet NSTextField* oldNameTextField;
 	IBOutlet NSTextField* replicationRunningTextField;
 	IBOutlet NSButton*	  keepHistoryCB;
@@ -50,7 +50,7 @@
 - (void) changedCountChanged:(NSNotification*)aNote;
 - (void) processCountChanged:(NSNotification*)aNote;
 - (void) sweepInProgressChanged:(NSNotification*)aNote;
-- (void) newNameChanged:(NSNotification*)aNote;
+- (void) betterNameChanged:(NSNotification*)aNote;
 - (void) oldNameChanged:(NSNotification*)aNote;
 - (void) replicationRunningChanged:(NSNotification*)aNote;
 - (void) keepHistoryChanged:(NSNotification*)aNote;
@@ -65,7 +65,7 @@
 - (void) dataBaseInfoChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
-- (IBAction) newNameTextFieldAction:(id)sender;
+- (IBAction) betterNameTextFieldAction:(id)sender;
 - (IBAction) oldNameTextFieldAction:(id)sender;
 - (IBAction) startReplicationAction:(id)sender;
 - (IBAction) createRemoteDBAction:(id)sender;

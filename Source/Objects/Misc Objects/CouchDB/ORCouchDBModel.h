@@ -40,7 +40,7 @@
     BOOL replicationRunning;
 	NSDictionary* docList;
     NSString* oldName;
-    NSString* newName;
+    NSString* betterName;
     BOOL sweepInProgress;
     BOOL cancelSweep;
     int processCount;
@@ -69,8 +69,8 @@
 - (void) cancelSweep;
 - (BOOL) sweepInProgress;
 - (void) setSweepInProgress:(BOOL)aSweepInProgress;
-- (NSString*) newName;
-- (void) setNewName:(NSString*)aNewName;
+- (NSString*) betterName;
+- (void) setBetterName:(NSString*)aBetterName;
 - (NSString*) oldName;
 - (void) setOldName:(NSString*)aOldName;
 - (BOOL) replicationRunning;
@@ -131,7 +131,7 @@
 extern NSString* ORCouchDBModelChangedCountChanged;
 extern NSString* ORCouchDBModelProcessCountChanged;
 extern NSString* ORCouchDBModelSweepInProgressChanged;
-extern NSString* ORCouchDBModelNewNameChanged;
+extern NSString* ORCouchDBModelBetterNameChanged;
 extern NSString* ORCouchDBModelOldNameChanged;
 extern NSString* ORCouchDBModelReplicationRunningChanged;
 extern NSString* ORCouchDBModelKeepHistoryChanged;
