@@ -193,7 +193,8 @@ NSString* ORRemoteSocketLock		= @"ORRemoteSocketLock";
 		NSData* address4 = [NSData dataWithBytes:&addr4 length:sizeof(addr4)];
 		
 		int retVal = CFSocketConnectToAddress(socket, (CFDataRef)address4, [self connectionTimeout]);
-		
+		CFRelease(socket);
+        
 		if(retVal == kCFSocketError)   return SCCInitError_NoConnection;
 		if(retVal == kCFSocketTimeout) return SCCInitError_Timeout;
 		if(retVal != kCFSocketSuccess) return SCCInitError_Unknown;
