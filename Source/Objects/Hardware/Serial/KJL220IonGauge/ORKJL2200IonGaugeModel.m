@@ -412,9 +412,10 @@ NSString* ORKJL2200IonGaugeModelQueCountChanged			= @"ORKJL2200IonGaugeModelQueC
 
 - (void) setLastRequest:(NSString*)aRequest
 {
-	lastRequest = [aRequest copy];    
-	[aRequest autorelease];
+    [lastRequest autorelease];
+    lastRequest = [aRequest copy];
 }
+
 - (BOOL) portWasOpen
 {
     return portWasOpen;
