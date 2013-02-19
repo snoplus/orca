@@ -749,7 +749,8 @@ static MotionNodeCalibrations motionNodeCalibration[3] = {
 
 - (void) processPacket:(NSData*)thePacket
 {
-	
+	if([thePacket length]==0)return;
+    
 	char* data = (char*)[thePacket bytes];
 	
 	const unsigned char lMask = 0xF0;
