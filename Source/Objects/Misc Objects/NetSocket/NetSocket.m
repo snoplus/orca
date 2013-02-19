@@ -469,37 +469,12 @@ static void _cfsocketCallback( CFSocketRef inCFSocketRef, CFSocketCallBackType i
     
     // Determine how much to actually read
     unsigned amountToRead = MIN( inAmount, [mIncomingBuffer length] );
+    NSString* readString = [[NSString alloc] initWithBytes:[mIncomingBuffer bytes] length: amountToRead encoding:inEncoding];
+    [mIncomingBuffer replaceBytesInRange:NSMakeRange( 0, amountToRead ) withBytes:NULL length:0];
+    [inString appendString:readString];
+    [readString release];
     
-    // Reference our incoming buffer, we cut down some overhead when the requested amount is the same length as our incoming buffer
-    NSData*		readData;
-    if( amountToRead == [mIncomingBuffer length] )
-		readData = mIncomingBuffer;
-    else
-		readData = [[NSData alloc] initWithBytesNoCopy:(void*)[mIncomingBuffer bytes] length:amountToRead freeWhenDone:NO];
-    
-    // If for some reason we could not create the data object, return
-    if( !readData ){
-		[mLock unlock];
-		return 0;
-    }
-    // Create an NSString from the read data using the specified string encoding
-    NSString* readString = [[NSString alloc] initWithData:readData encoding:inEncoding];
-    if( readString )
-    {
-		// Read bytes from our incoming buffer
-		[mIncomingBuffer replaceBytesInRange:NSMakeRange( 0, amountToRead ) withBytes:NULL length:0];
-		
-		// Append created string
-		[inString appendString:readString];
-		
-		// Release the NSString we created
-		[readString release];
-    }
-    
-    // Release our buffer if it is not our incoming data buffer
-    if( readData != mIncomingBuffer )
-		[readData release];
-    
+        
 	[mLock unlock];
     return amountToRead;
 }
@@ -585,35 +560,14 @@ static void _cfsocketCallback( CFSocketRef inCFSocketRef, CFSocketCallBackType i
     
     // Determine how much to actually read
     unsigned amountToRead = MIN( inAmount, [mIncomingBuffer length] );
-    
-    // Reference our incoming buffer, we cut down some overhead when the requested amount is the same length as our incoming buffer
-    NSData*		readData;
-    if( amountToRead == [mIncomingBuffer length] )
-		readData = mIncomingBuffer;
-    else
-		readData = [[NSData alloc] initWithBytesNoCopy:(void*)[mIncomingBuffer bytes] length:amountToRead freeWhenDone:NO];
-    
-    // If for some reason we could not create the data object, return
-    if( !readData ){
-		[mLock unlock];
-		return nil;
-    }
-	
+
     
     // Create a new NSString from the read bytes using the specified encoding
-    NSString* readString = [[[NSString alloc] initWithData:readData encoding:inEncoding] autorelease];
-    if( readString )
-    {
-		// Read bytes from our incoming buffer
-		[mIncomingBuffer replaceBytesInRange:NSMakeRange( 0, amountToRead ) withBytes:NULL length:0];
-    }
-    
-    // Release our buffer if it is not our incoming data buffer
-    if( readData != mIncomingBuffer )
-		[readData release];
+    NSString* readString = [[NSString alloc] initWithBytes:[mIncomingBuffer bytes] length:amountToRead encoding:inEncoding];
+    [mIncomingBuffer replaceBytesInRange:NSMakeRange( 0, amountToRead ) withBytes:NULL length:0];
     
 	[mLock unlock];
-    return readString;
+    return [readString autorelease];
 }
 
 #pragma mark -
