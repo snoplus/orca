@@ -26,6 +26,7 @@
 - (id) initWithBufferSize:(unsigned) aBufferSize
 {
 	self = [super init];
+    if(aBufferSize==0)aBufferSize = 1024*100; //if passed zero, put something in....
 	bufferSize		 = aBufferSize;
 	buffer			 = [[NSMutableData dataWithLength:bufferSize * sizeof(long)] retain];
 	[buffer setLength:bufferSize * sizeof(long)];
