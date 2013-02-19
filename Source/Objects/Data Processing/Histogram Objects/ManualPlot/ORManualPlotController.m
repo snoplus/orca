@@ -383,16 +383,18 @@
 
 - (void) plotOrderDidChange:(id)aPlotView
 {
+    
 	id topRoi = [(ORPlotWithROI*)[aPlotView topPlot] roi];
 	[roiController setModel:topRoi];
+    /*
 	int i;
 	for(i=0;i<3;i++){
 		id aPlot = [aPlotView plot:i];
 		NSColor* theColor;
 		if(aPlot != [aPlotView topPlot])theColor = [[aPlot lineColor] highlightWithLevel:.5];
 		else							theColor = [aPlot lineColor];
-
 	}
+     */
 }
 
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(int)row
