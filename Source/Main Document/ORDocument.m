@@ -75,6 +75,41 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
     return self;
 }
 
+- (id) initForURL:(NSURL *)url withContentsOfURL:(NSURL *)contentsURL ofType:(NSString *)typeName error:(NSError **)outError
+{
+    @try {
+        if([[NSApp delegate] document]){
+            NSLogColor([NSColor redColor],@"Did not open [%@]. Only one experiment can be open at a time\n",[[url path] stringByAbbreviatingWithTildeInPath]);
+            return nil;
+        }
+        else {
+           id theDoc =  [super initForURL:url withContentsOfURL:contentsURL ofType:typeName error:outError];
+            if(theDoc)NSLog(@"Opened [%@]\n",[[url path] stringByAbbreviatingWithTildeInPath]);
+            return theDoc;
+        }
+    }
+    @catch(NSException* e){
+        return nil;
+    }
+}
+- (id) initWithContentsOfURL:(NSURL *)url ofType:(NSString *)typeName error:(NSError **)outError
+{
+    @try {
+        if([[NSApp delegate] document]){
+            NSLogColor([NSColor redColor],@"Did not open [%@]. Only one experiment can be open at a time\n",[[url path] stringByAbbreviatingWithTildeInPath]);
+            return nil;
+        }
+        else {
+            id theDoc =  [super initWithContentsOfURL:url ofType:typeName error:outError];
+            if(theDoc)NSLog(@"Opened [%@]\n",[[url path] stringByAbbreviatingWithTildeInPath]);
+            return theDoc;
+        }
+    }
+    @catch(NSException* e){
+        return nil;
+    }
+}
+
 - (void) dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -750,7 +785,7 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
             [[NSNotificationCenter defaultCenter]
 			 postNotificationName:ORDocumentClosedNotification
 			 object:self];
-            
+            NSLog(@"Closing [%@]\n",[[[self fileURL]path] stringByAbbreviatingWithTildeInPath]);
             return YES;
         }
         else return NO;
