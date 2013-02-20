@@ -93,6 +93,7 @@ static CV1721RegisterNamesStruct reg[kNumRegisters] = {
 };
 
 #define kEventReadyMask 0x8
+#define kBoardReadyMask 0x100
 
 NSString* ORCV1721ModelEnabledMaskChanged                 = @"ORCV1721ModelEnabledMaskChanged";
 NSString* ORCV1721ModelPostTriggerSettingChanged          = @"ORCV1721ModelPostTriggerSettingChanged";
@@ -439,8 +440,11 @@ NSString* ORCV1721ModelContinuousModeChanged              = @"ORCV1721ModelConti
 	
 	//can't get the packed form to work so just make sure that bit is cleared.
 	channelConfigMask &= ~(1L<<11);
+    
+	//turn off zero suppression
+	channelConfigMask &= ~(0xf<<16);
 
-	//we do the sequential memory access only
+	//we do the sequential memory access only -- manual states random access a future feature.
 	channelConfigMask |= (1L<<4);
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCV1721ModelChannelConfigMaskChanged object:self];
@@ -872,6 +876,18 @@ NSString* ORCV1721ModelContinuousModeChanged              = @"ORCV1721ModelConti
                      usingAddSpace:0x01];
 }
 
+- (unsigned long) probeBoard
+{
+    unsigned long aValue = 0;
+	[[self adapter] readLongBlock:&aValue
+                         atAddress:[self baseAddress] + reg[kFirmwareVersion].addressOffset
+                        numToRead:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+    return aValue;
+
+}
+
 - (void) report
 {
 	unsigned long enabled, threshold, numOU, status, bufferOccupancy, dacValue,triggerSrc;
@@ -1130,7 +1146,7 @@ NSString* ORCV1721ModelContinuousModeChanged              = @"ORCV1721ModelConti
 	if((bufferState == 1) && isRunning){
 		bufferEmptyCount = 0;
 		if(!bufferFullAlarm){
-			NSString* alarmName = [NSString stringWithFormat:@"Buffer FULL V1720 (slot %d)",[self slot]];
+			NSString* alarmName = [NSString stringWithFormat:@"Buffer FULL V1721 (slot %d)",[self slot]];
 			bufferFullAlarm = [[ORAlarm alloc] initWithName:alarmName severity:kDataFlowAlarm];
 			[bufferFullAlarm setSticky:YES];
 			[bufferFullAlarm setHelpString:@"The rate is too high. Adjust the Threshold accordingly."];
@@ -1165,7 +1181,7 @@ NSString* ORCV1721ModelContinuousModeChanged              = @"ORCV1721ModelConti
 }
 - (void) setDataIds:(id)assigner
 {
-    dataId       = [assigner assignDataIds:kLongForm]; //short form preferred
+    dataId       = [assigner assignDataIds:kLongForm];
 }
 
 - (void) syncDataIdsWith:(id)anotherCard
@@ -1182,7 +1198,7 @@ NSString* ORCV1721ModelContinuousModeChanged              = @"ORCV1721ModelConti
 								 [NSNumber numberWithBool:YES],              @"variable",
 								 [NSNumber numberWithLong:-1],               @"length",
 								 nil];
-    [dataDictionary setObject:aDictionary forKey:@"CAEN"];
+    [dataDictionary setObject:aDictionary forKey:@"CAEN1721"];
     return dataDictionary;
 }
 
@@ -1203,7 +1219,6 @@ NSString* ORCV1721ModelContinuousModeChanged              = @"ORCV1721ModelConti
 - (void) reset
 {
 }
-
 - (void) runTaskStarted:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
 {
 	if(![[self adapter] controllerCard]){
@@ -1250,35 +1265,34 @@ NSString* ORCV1721ModelContinuousModeChanged              = @"ORCV1721ModelConti
 						numToRead:1
 					   withAddMod:addressModifier 
 					usingAddSpace:0x01];
-		bufferState = (status & 0x10) >> 4;						
-		if(status & kEventReadyMask){
+		bufferState = (status & 0x10) >> 4;
+		if(status & (kEventReadyMask | kBoardReadyMask)){
 			//OK, at least one event is ready
 			unsigned long theFirst;
 			[controller readLongBlock:&theFirst
 					atAddress:dataReg
 					numToRead:1
-				       withAddMod:addressModifier 
+				       withAddMod:[self addressModifier] 
 				    usingAddSpace:0x01]; //we set it to not increment the address.
 			
-			unsigned long theEventSize;
-			theEventSize = theFirst&0x0FFFFFFF;
-			if ( theEventSize == 0 ) return;
-
-			NSMutableData* theData = [NSMutableData dataWithCapacity:2+theEventSize*sizeof(long)];
+			unsigned long theEventSize = theFirst & 0x0FFFFFFF;
+			if ( theEventSize == 0 || (((theFirst>>28)&0xf)!=0xa)) return;
+                        
+			NSMutableData* theData = [NSMutableData dataWithCapacity:theEventSize+2];
 			[theData setLength:(2+theEventSize)*sizeof(long)];
 			unsigned long* p = (unsigned long*)[theData bytes];
-			*p++ = dataId | (2 + theEventSize);
-			*p++ = location; 
-			*p++ = theFirst;
+			p[0] = dataId | (2 + theEventSize); //ORCA adds two words of header
+			p[1] = location;
+			p[2] = theFirst;
 
-			[controller readLongBlock:p
+			[controller readLongBlock:&p[3]
 							atAddress:dataReg
-							numToRead:theEventSize
-						   withAddMod:addressModifier 
-						usingAddSpace:0xFF]; //we set it to not increment the address.
+							numToRead:theEventSize-1 //already read in the first one
+						   withAddMod:[self addressModifier] 
+						usingAddSpace:0xff]; //we set it to not increment the address.
 			
 			[aDataPacket addData:theData];
-			unsigned short chanMask = p[0]; //remember, the pointer was already inc'ed to the start of data+1
+			unsigned short chanMask = p[3];
 			int i;
 			for(i=0;i<8;i++){
 				if(chanMask & (1<<i)) ++waveFormCount[i]; 
@@ -1318,7 +1332,7 @@ NSString* ORCV1721ModelContinuousModeChanged              = @"ORCV1721ModelConti
 
 - (NSString*) identifier
 {
-    return [NSString stringWithFormat:@"CAEN 1720 (Slot %d) ",[self slot]];
+    return [NSString stringWithFormat:@"CAEN 1721 (Slot %d) ",[self slot]];
 }
 
 //this is the data structure for the new SBCs (i.e. VX704 from Concurrent)
@@ -1431,7 +1445,7 @@ NSString* ORCV1721ModelContinuousModeChanged              = @"ORCV1721ModelConti
     }
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢HW Wizard
+#pragma mark •••HW Wizard
 - (int) numberOfChannels
 {
     return 8;
@@ -1484,7 +1498,7 @@ NSString* ORCV1721ModelContinuousModeChanged              = @"ORCV1721ModelConti
 @implementation ORCV1721DecoderForCAEN : ORCaenDataDecoder
 - (NSString*) identifier
 {
-    return @"CAEN 1720 Digitizer";
+    return @"CAEN 1721 Digitizer";
 }
 @end
 

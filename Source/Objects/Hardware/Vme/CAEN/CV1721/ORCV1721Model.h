@@ -184,6 +184,7 @@ enum {
 - (void)			setNumberBLTEventsToReadout:(unsigned long)aNumberOfBLTEvents;
 
 #pragma mark ***Register - General routines
+- (unsigned long)   probeBoard;
 - (void)			read;
 - (void)			write;
 - (void)			report;
@@ -232,7 +233,7 @@ enum {
 - (void)			readOverUnderThresholds;
 - (void)			writeBufferOrganization;
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢DataTaker
+#pragma mark •••DataTaker
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;
 - (unsigned long)	dataId;
 - (void)			setDataId: (unsigned long) DataId;

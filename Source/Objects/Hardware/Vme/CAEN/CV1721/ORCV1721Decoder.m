@@ -61,82 +61,69 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 	NSString* crateKey = [self getCrateKey: crate];
 	NSString* cardKey = [self getCardKey: card];
 
-    //there are multiple events per packet, the data in the last DMA block are followed by zeros
-    unsigned long eventLength = length - 2;
-    ptr++;
-    while (eventLength > 3) { //make sure at least the CAEN header is there
-        if (*ptr == 0 || *ptr >> 28 != 0xa) break; //trailing zeros or
-        unsigned long eventSize = *ptr & 0x0fffffff;
-        if (eventSize > eventLength) return length;
+    unsigned long recordLength = length - 2;
+    
+    if(recordLength<4)return length;
+    
+    ptr++; //point to the first word from hw
+    if(((*ptr >> 28) &0xf) != 0xa)return length;
+    
+    unsigned long eventLength = *ptr & 0xfffffff;
+    if(eventLength==0) return length;
+    
+    ptr++; //second word has the channel mask
+    unsigned long channelMask = *ptr & 0xff;
+
+    ptr++; //event counter
+    ptr++; //triger time tag
+    
+    short numChans = 0;
+    short chan[8];
+    int i;
+    for(i=0;i<8;i++){
+        if(channelMask & (1<<i)){
+            chan[numChans] = i;
+            numChans++;
+        }
+    }
+
+    //event may be empty if triggered by EXT trigger and no channel is selected
+    if (numChans == 0) return length;
+ 
+
+
+    unsigned long eventSize = (eventLength-4)/numChans;
+    int j;
+    for(j=0;j<numChans;j++){
+        NSData* tmpData = [NSData dataWithBytes:ptr length:(eventSize-4)*4];
+
+        [aDataSet loadWaveform:tmpData
+                        offset:16 //bytes!
+                        unitSize:1 //unit size in bytes!
+                        sender:self
+                        withKeys:@"CAEN1721", @"Waveforms",crateKey,cardKey,[self getChannelKey: chan[j]],nil];
+        ptr+= eventSize;
         
-        unsigned long channelMask = *++ptr & 0x000000ff;
-        //NSLog(@"Channel Mask: %d Len: %d Size: %d\n",channelMask,length,eventSize);
-        ptr += 3; //point to the start of data
-
-        short numChans = 0;
-        short chan[8];
-        int i;
-        for(i=0;i<8;i++){
-            if(channelMask & (1<<i)){
-                chan[numChans] = i;
-                numChans++;
-            }
-        }
-
-        //event may be empty if triggered by EXT trigger and no channel is selected
-        if (numChans == 0) {
-            continue;
-            //return length;
-        }
-
-        eventSize -= 4;
-        eventSize = eventSize/numChans;
-        int j;
-        
-        BOOL fullDecode = NO;
-        if(numChans){
-            time_t now;
-            time(&now);
-            if(now - lastTime >= 1){
-                fullDecode = YES;
-                lastTime = now;
-            }
-        }
-        for(j=0;j<numChans;j++){
-            if(fullDecode){
-                NSData* tmpData = [NSData dataWithBytes:ptr+(i*eventSize) length:eventSize];
-
-                [aDataSet loadWaveform:tmpData
-                                offset:0 //bytes!
-                              unitSize:1 //unit size in bytes!
-                                sender:self
-                              withKeys:@"CAEN1721", @"Waveforms",crateKey,cardKey,[self getChannelKey: chan[j]],nil];
-            }
-            else {
-                [aDataSet incrementCount:@"CAEN1721", @"Waveforms",crateKey,cardKey,[self getChannelKey: chan[j]],nil];
-                ptr += eventSize;
-            }
-            if(getRatesFromDecodeStage){
-                NSString* aKey = [crateKey stringByAppendingString:cardKey];
-                if(!actualCards)actualCards = [[NSMutableDictionary alloc] init];
-                ORCV1721Model* obj = [actualCards objectForKey:aKey];
-                if(!obj){
-                    NSArray* listOfCards = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORCV1721Model")];
-                    NSEnumerator* e = [listOfCards objectEnumerator];
-                    ORCV1721Model* aCard;
-                    while(aCard = [e nextObject]){
-                        if([aCard crateNumber] == crate && [aCard slot] == card){
-                            [actualCards setObject:aCard forKey:aKey];
-                            obj = aCard;
-                            break;
-                        }
+        if(getRatesFromDecodeStage){
+            NSString* aKey = [crateKey stringByAppendingString:cardKey];
+            if(!actualCards)actualCards = [[NSMutableDictionary alloc] init];
+            ORCV1721Model* obj = [actualCards objectForKey:aKey];
+            if(!obj){
+                NSArray* listOfCards = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORCV1721Model")];
+                NSEnumerator* e = [listOfCards objectEnumerator];
+                ORCV1721Model* aCard;
+                while(aCard = [e nextObject]){
+                    if([aCard crateNumber] == crate && [aCard slot] == card){
+                        [actualCards setObject:aCard forKey:aKey];
+                        obj = aCard;
+                        break;
                     }
                 }
-                getRatesFromDecodeStage = [obj bumpRateFromDecodeStage:chan[j]];
             }
+            getRatesFromDecodeStage = [obj bumpRateFromDecodeStage:chan[j]];
         }
-        eventLength -= eventSize*numChans + 4;
     }
+    
 	
     return length; //must return number of longs processed.
 }

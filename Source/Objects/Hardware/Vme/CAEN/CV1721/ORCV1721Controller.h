@@ -18,7 +18,7 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Imported Files
+#pragma mark •••Imported Files
 #import "OrcaObjectController.h"
 
 @class ORValueBarGroupView;
@@ -69,19 +69,20 @@
 	IBOutlet NSMatrix*		acquisitionModeMatrix;
 	IBOutlet NSMatrix*		countAllTriggersMatrix;
 	IBOutlet NSTextField*	customSizeTextField;
-	IBOutlet NSButton*	customSizeButton;
-	IBOutlet NSButton*	fixedSizeButton;
+	IBOutlet NSButton*      customSizeButton;
+	IBOutlet NSButton*      fixedSizeButton;
 	IBOutlet NSMatrix*		channelConfigMaskMatrix;
     IBOutlet NSMatrix*		overUnderMatrix;
 	IBOutlet NSPopUpButton* eventSizePopUp;
 	IBOutlet NSTextField*	eventSizeTextField;
     IBOutlet NSTextField*	slotField;
     IBOutlet NSTextField*	slot1Field;
-	
+    IBOutlet NSButton*		probeButton;
+
     IBOutlet NSButton*		initButton;
     IBOutlet NSButton*		reportButton;
     IBOutlet NSButton*		loadThresholdsButton;
-    IBOutlet NSButton *continousRunsButton;
+    IBOutlet NSButton*      continousRunsButton;
 	
 	//rates page
 	IBOutlet NSMatrix*      rateTextFields;
@@ -104,17 +105,17 @@
 	IBOutlet NSTextField*   settingsLockDocField;
 
 
-    NSView *blankView;
-    NSSize basicSize;
-    NSSize settingsSize;
-    NSSize monitoringSize;
+    NSView* blankView;
+    NSSize  basicSize;
+    NSSize  settingsSize;
+    NSSize  monitoringSize;
 
 }
 
 #pragma mark ***Initialization
 - (id)		init;
  	
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Notifications
+#pragma mark •••Notifications
 - (void) registerNotificationObservers;
 - (void) registerRates;
 
@@ -151,7 +152,7 @@
 
 - (void) setBufferStateLabel;
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+#pragma mark •••Actions
 - (IBAction) eventSizeAction:(id)sender;
 - (IBAction) integrationAction:(id)sender;
 - (IBAction) baseAddressAction: (id) aSender;
@@ -185,17 +186,17 @@
 - (IBAction) dacAction: (id) aSender;
 - (IBAction) thresholdAction: (id) aSender;
 - (IBAction) overUnderAction: (id) aSender;
-- (IBAction)countinuousRunsAction:(id)sender;
+- (IBAction) countinuousRunsAction:(id)sender;
+- (IBAction) probeAction:(id)sender;
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Misc Helpers
+#pragma mark •••Misc Helpers
 - (void)    populatePullDown;
 - (void)    updateRegisterDescription: (short) aRegisterIndex;
 - (void)    tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Data Source
-- (double) getBarValue:(int)tag;
-- (int) numberPointsInPlot:(id)aPlotter;
-- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
-
+#pragma mark •••Data Source
+- (double)  getBarValue:(int)tag;
+- (int)     numberPointsInPlot:(id)aPlotter;
+- (void)    plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 
 @end

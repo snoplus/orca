@@ -82,7 +82,7 @@ int chanConfigToMaskBit1721[kNumChanConfigBits] = {1,3,4,6,11};
 	[rate0 setNumber:8 height:10 spacing:5];
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Notifications
+#pragma mark •••Notifications
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
@@ -623,7 +623,8 @@ int chanConfigToMaskBit1721[kNumChanConfigBits] = {1,3,4,6,11};
 	[fixedSizeButton setEnabled:!locked && !runInProgress]; 
     [eventSizePopUp setEnabled:!locked && !runInProgress]; 
     [enabledMaskMatrix setEnabled:!locked && !runInProgress]; 
-	
+	[probeButton setEnabled:!locked && !runInProgress];
+    
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
 		if(runInProgress && ![gSecurity isLocked:ORCV1721SettingsLock])s = @"Not in Maintenance Run.";
@@ -633,7 +634,7 @@ int chanConfigToMaskBit1721[kNumChanConfigBits] = {1,3,4,6,11};
 	
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+#pragma mark •••Actions
 
 - (void) eventSizeAction:(id)sender
 {
@@ -927,6 +928,26 @@ int chanConfigToMaskBit1721[kNumChanConfigBits] = {1,3,4,6,11};
     [model setContinuousMode:[sender intValue]];
 }
 
+- (IBAction) probeAction:(id)sender
+{
+    
+    @try {
+        unsigned long fw = [model probeBoard];
+        NSLog(@"%@ Firmware: %02d/%02x/20%02d version %d.%02d\n",
+              [model fullID],
+              (fw>>24)&0xf,
+              (fw>>16)&0xff,
+              (fw>>28)&0xf,
+              (fw>>8)&0xff,
+              fw&0xff);
+	}
+	@catch(NSException* localException) {
+        NSRunAlertPanel([localException name], @"%@\nProbe Failed", @"OK", nil, nil,
+                        localException);
+	}
+
+}
+
 #pragma mark ***Misc Helpers
 - (void) populatePullDown
 {
@@ -996,7 +1017,7 @@ int chanConfigToMaskBit1721[kNumChanConfigBits] = {1,3,4,6,11};
 	
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Data Source
+#pragma mark •••Data Source
 - (double) getBarValue:(int)tag
 {
 	
