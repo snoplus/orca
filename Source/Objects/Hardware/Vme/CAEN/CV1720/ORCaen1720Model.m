@@ -1182,7 +1182,7 @@ NSString* ORCaen1720ModelContinuousModeChanged              = @"ORCaen1720ModelC
 								 [NSNumber numberWithBool:YES],              @"variable",
 								 [NSNumber numberWithLong:-1],               @"length",
 								 nil];
-    [dataDictionary setObject:aDictionary forKey:@"CAEN"];
+    [dataDictionary setObject:aDictionary forKey:@"CAEN1720"];
     return dataDictionary;
 }
 
