@@ -418,7 +418,30 @@
 	}
 }
 
+
 #pragma mark •••Actions
+
+- (IBAction) autoscaleMainColorScale:(id)sender
+{
+    int n = [[model segmentGroup:0] numSegments];
+    int i;
+    float maxValue = -99999;
+    for(i=0;i<n;i++){
+        float aValue = maxValue;
+        switch([model displayType]){
+            case kDisplayThresholds:	aValue = [[model segmentGroup:0] getThreshold:i];     break;
+            case kDisplayGains:			aValue = [[model segmentGroup:0] getGain:i];          break;
+            case kDisplayRates:			aValue = [[model segmentGroup:0] getRate:i];		  break;
+            case kDisplayTotalCounts:	aValue = [[model segmentGroup:0] getTotalCounts:i];   break;
+            default:	break;
+        }
+        if(aValue>maxValue)maxValue = aValue;
+    }
+    if(maxValue != -99999){
+        maxValue += (maxValue*.20);
+        [[primaryColorScale colorAxis] setRngLow:0 withHigh:maxValue];
+    }
+}
 
 - (void) ignoreHWChecksAction:(id)sender
 {
