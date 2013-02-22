@@ -89,16 +89,14 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 
     //event may be empty if triggered by EXT trigger and no channel is selected
     if (numChans == 0) return length;
- 
-
-
+    ptr++; //point to first data word
     unsigned long eventSize = (eventLength-4)/numChans;
     int j;
     for(j=0;j<numChans;j++){
-        NSData* tmpData = [NSData dataWithBytes:ptr length:(eventSize-4)*4];
+        NSData* tmpData = [NSData dataWithBytes:ptr length:eventSize*4];
 
         [aDataSet loadWaveform:tmpData
-                        offset:16 //bytes!
+                        offset:0 //bytes!
                         unitSize:1 //unit size in bytes!
                         sender:self
                         withKeys:@"CAEN1721", @"Waveforms",crateKey,cardKey,[self getChannelKey: chan[j]],nil];
@@ -110,9 +108,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
             ORCV1721Model* obj = [actualCards objectForKey:aKey];
             if(!obj){
                 NSArray* listOfCards = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORCV1721Model")];
-                NSEnumerator* e = [listOfCards objectEnumerator];
-                ORCV1721Model* aCard;
-                while(aCard = [e nextObject]){
+                for(id aCard in listOfCards){
                     if([aCard crateNumber] == crate && [aCard slot] == card){
                         [actualCards setObject:aCard forKey:aKey];
                         obj = aCard;
@@ -123,8 +119,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
             getRatesFromDecodeStage = [obj bumpRateFromDecodeStage:chan[j]];
         }
     }
-    
-	
+
     return length; //must return number of longs processed.
 }
 

@@ -119,7 +119,6 @@ NSString* ORCV1721BasicLock                               = @"ORCV1721BasicLock"
 NSString* ORCV1721SettingsLock                            = @"ORCV1721SettingsLock";
 NSString* ORCV1721RateGroupChanged                        = @"ORCV1721RateGroupChanged";
 NSString* ORCV1721ModelBufferCheckChanged                 = @"ORCV1721ModelBufferCheckChanged";
-NSString* ORCV1721ModelContinuousModeChanged              = @"ORCV1721ModelContinuousModeChanged";
 
 @implementation ORCV1721Model
 
@@ -474,19 +473,6 @@ NSString* ORCV1721ModelContinuousModeChanged              = @"ORCV1721ModelConti
     [self linkToController:@"ORCV1721Controller"];
 }
 
-- (BOOL) continuousMode
-{
-    return continuousMode;
-}
-
-- (void) setContinuousMode:(BOOL)aContinuousMode
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setContinuousMode:continuousMode];
-    
-    continuousMode = aContinuousMode;
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCV1721ModelContinuousModeChanged object:self];    
-}
 
 #pragma mark ***Register - General routines
 - (short) getNumberRegisters
@@ -1241,16 +1227,11 @@ NSString* ORCV1721ModelContinuousModeChanged              = @"ORCV1721ModelConti
 
     [self startRates];
 
-	if ([self continuousMode] && ![[userInfo objectForKey:@"doinit"] boolValue]) {
-        //??
-    }
-    else {
-        [self initBoard];
-        [self writeNumberBLTEvents:sbcRun];
-        [self writeEnableBerr:sbcRun];
-        [self writeAcquistionControl:YES];
-    }
-	
+    [self initBoard];
+    [self writeNumberBLTEvents:sbcRun];
+    [self writeEnableBerr:sbcRun];
+    [self writeAcquistionControl:YES];
+
 	[self performSelector:@selector(checkBufferAlarm) withObject:nil afterDelay:1];
 }
 
@@ -1273,7 +1254,7 @@ NSString* ORCV1721ModelContinuousModeChanged              = @"ORCV1721ModelConti
 					atAddress:dataReg
 					numToRead:1
 				       withAddMod:[self addressModifier] 
-				    usingAddSpace:0x01]; //we set it to not increment the address.
+				    usingAddSpace:0x01];
 			
 			unsigned long theEventSize = theFirst & 0x0FFFFFFF;
 			if ( theEventSize == 0 || (((theFirst>>28)&0xf)!=0xa)) return;
@@ -1309,15 +1290,7 @@ NSString* ORCV1721ModelContinuousModeChanged              = @"ORCV1721ModelConti
     [waveFormRateGroup stop];
 	short i;
     for(i=0;i<8;i++)waveFormCount[i] = 0;
-    
-    NSArray* objs = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    ORRunModel* runControl;
-    if ([objs count]) {
-        runControl = [objs objectAtIndex:0];
-        if ([self continuousMode] && [runControl nextRunWillQuickStart]) {
-            return;
-        }
-    }
+ 
     [self writeAcquistionControl:NO];
 }
 
@@ -1398,7 +1371,6 @@ NSString* ORCV1721ModelContinuousModeChanged              = @"ORCV1721ModelConti
     [self setChannelConfigMask:     [aDecoder decodeIntForKey:@"channelConfigMask"]];
     [self setWaveFormRateGroup:     [aDecoder decodeObjectForKey:@"waveFormRateGroup"]];
     [self setNumberBLTEventsToReadout:[aDecoder decodeInt32ForKey:@"numberBLTEventsToReadout"]];
-    [self setContinuousMode:        [aDecoder decodeBoolForKey:@"continuousMode"]];
     
     if(!waveFormRateGroup){
         [self setWaveFormRateGroup:[[[ORRateGroup alloc] initGroup:8 groupTag:0] autorelease]];
@@ -1436,7 +1408,6 @@ NSString* ORCV1721ModelContinuousModeChanged              = @"ORCV1721ModelConti
 	[anEncoder encodeInt:channelConfigMask      forKey:@"channelConfigMask"];
     [anEncoder encodeObject:waveFormRateGroup   forKey:@"waveFormRateGroup"];
     [anEncoder encodeInt32:numberBLTEventsToReadout forKey:@"numberBLTEventsToReadout"];
-    [anEncoder encodeBool:continuousMode        forKey:@"continuousMode"];
 	int i;
 	for (i = 0; i < [self numberOfChannels]; i++){
         [anEncoder encodeInt32:dac[i] forKey:[NSString stringWithFormat:@"CAENDacChnl%d", i]];

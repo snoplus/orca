@@ -32,10 +32,10 @@
 #import "ORCompositePlotView.h"
 #import "ORValueBarGroupView.h"
 
-#define kNumChanConfigBits 5
+#define kNumChanConfigBits 3
 #define kNumTrigSourceBits 10
 
-int chanConfigToMaskBit1721[kNumChanConfigBits] = {1,3,4,6,11};
+int chanConfigToMaskBit1721[kNumChanConfigBits] = {1,3,6};
 
 @implementation ORCV1721Controller
 
@@ -233,11 +233,6 @@ int chanConfigToMaskBit1721[kNumChanConfigBits] = {1,3,4,6,11};
 						 name : ORVmeCardSlotChangedNotification
 					   object : model];
 
-    [notifyCenter addObserver : self
-					 selector : @selector(continousRunsChanged:)
-						 name : ORCV1721ModelContinuousModeChanged
-					   object : model];
-
 	[self registerRates];
 	
 }
@@ -290,7 +285,6 @@ int chanConfigToMaskBit1721[kNumChanConfigBits] = {1,3,4,6,11};
     [self waveFormRateChanged:nil];
  	[self eventSizeChanged:nil];
  	[self slotChanged:nil];
-    [self continousRunsChanged:nil];
 	
 	[self settingsLockChanged:nil];
     [self basicLockChanged:nil];
@@ -312,7 +306,7 @@ int chanConfigToMaskBit1721[kNumChanConfigBits] = {1,3,4,6,11};
 - (void) eventSizeChanged:(NSNotification*)aNote
 {
 	[eventSizePopUp selectItemAtIndex:	[model eventSize]];
-	[eventSizeTextField setIntValue:	1024*1024./powf(2.,(float)[model eventSize]) / 2]; //in Samples
+	[eventSizeTextField setIntValue:	4*1024*1024./powf(2.,(float)[model eventSize]) / 2];
 	
 }
 
@@ -494,7 +488,7 @@ int chanConfigToMaskBit1721[kNumChanConfigBits] = {1,3,4,6,11};
 	int i;
 	unsigned short mask = [model channelConfigMask];
 	for(i=0;i<kNumChanConfigBits;i++){
-		[[channelConfigMaskMatrix cellWithTag:i] setIntValue:(mask & (1<<chanConfigToMaskBit1721[i])) !=0];
+		[[channelConfigMaskMatrix cellAtRow:i column:0] setIntValue:(mask & (1<<chanConfigToMaskBit1721[i])) !=0];
 	}
 }
 
@@ -548,10 +542,6 @@ int chanConfigToMaskBit1721[kNumChanConfigBits] = {1,3,4,6,11};
 	}
 }
 
-- (void) continousRunsChanged:(NSNotification *)aNote
-{
-    [continousRunsButton setIntValue:[model continuousMode]];
-}
 
 - (void) basicLockChanged:(NSNotification*)aNotification
 {	
@@ -898,7 +888,7 @@ int chanConfigToMaskBit1721[kNumChanConfigBits] = {1,3,4,6,11};
 	int i;
 	unsigned short mask = 0;
 	for(i=0;i<kNumChanConfigBits;i++){
-		if([[sender cellWithTag:i] intValue]) mask |= (1 << chanConfigToMaskBit1721[i]);
+		if([[channelConfigMaskMatrix cellAtRow:i column:0] intValue]) mask |= (1 << chanConfigToMaskBit1721[i]);
 	}
 	[model setChannelConfigMask:mask];	
 }
@@ -921,11 +911,6 @@ int chanConfigToMaskBit1721[kNumChanConfigBits] = {1,3,4,6,11};
         [[[model document] undoManager] setActionName:@"Set thresholds"]; // Set name of undo.
         [model setThreshold:[[aSender selectedCell] tag] withValue:[aSender intValue]]; // Set new value
     }
-}
-
-- (IBAction)countinuousRunsAction:(id)sender
-{
-    [model setContinuousMode:[sender intValue]];
 }
 
 - (IBAction) probeAction:(id)sender
