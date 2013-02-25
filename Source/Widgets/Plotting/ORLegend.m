@@ -54,7 +54,7 @@
 	NSMutableAttributedString* s = [[NSMutableAttributedString alloc] init];
 	int numPlots = [plotView numberOfPlots];
 	int i;
-	NSFont* theFont = [NSFont fontWithName:@"Helvetica" size:12];
+	NSFont* theFont = [NSFont fontWithName:@"Helvetica" size:11];
 	for(i=0;i<numPlots;i++){
 		ORPlot* aPlot = [plotView plot:i];
 		NSColor* thePlotColor = [aPlot lineColor];
@@ -73,7 +73,7 @@
 	[self setLegend:s];
 	[s release];
 	NSSize theSize = [legend size];
-	[self setFrame:NSMakeRect(0,0,theSize.width,theSize.height)];
+	[self setFrame:NSMakeRect(0,0,theSize.width+5,theSize.height+10)];
 }
 
 - (void) drawRect:(NSRect)dirtyRect 
