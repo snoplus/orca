@@ -92,21 +92,13 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 @implementation ORCouchDBModel
 
 #pragma mark ***Initialization
-- (id) init
-{
-	self=[super init];
-    [[self undoManager] disableUndoRegistration];
-	[self registerNotificationObservers];
-    [[self undoManager] enableUndoRegistration];
-	return self;
-}
 
 - (void) dealloc
 {
-    [betterName release];
-    [oldName release];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [betterName release];
+    [oldName release];
     [password release];
     [userName release];
     [remoteHostName release];
@@ -124,6 +116,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 		[self performSelector:@selector(updateRunInfo) withObject:nil afterDelay:3];
 		[self performSelector:@selector(updateDatabaseStats) withObject:nil afterDelay:4];
 		[self performSelector:@selector(periodicCompact) withObject:nil afterDelay:60];
+        [self registerNotificationObservers];
     }
     [super wakeUp];
 }
@@ -132,6 +125,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 - (void) sleep
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 	[self deleteDatabase];
 	[super sleep];
 }
