@@ -64,7 +64,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(MemoryWatcherController);
 	[thePlot setLineWidth:1];
 	[thePlot setLineColor:[NSColor colorWithCalibratedRed:0 green:.5 blue:0 alpha:1]];
 	[thePlot setUseConstantColor:YES];
-	[thePlot setName:@"CPU (%)"];
+	[thePlot setName:@"CPU(%)"];
 	[plotView addPlot: thePlot];
 	[thePlot release];
 	
@@ -72,7 +72,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(MemoryWatcherController);
 	[thePlot setLineWidth:1];
 	[thePlot setLineColor:[NSColor redColor]];
 	[thePlot setUseConstantColor:YES];
-	[thePlot setName:@"RSize (MB)"];
+	[thePlot setName:@"RSize(MB)"];
 	[plotView addPlot: thePlot];
 	[thePlot release];
 	
@@ -80,7 +80,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(MemoryWatcherController);
 	[thePlot setLineWidth:1];
 	[thePlot setLineColor:[NSColor blueColor]];
 	[thePlot setUseConstantColor:YES];
-	[thePlot setName:@"VSize (MB)"];
+	[thePlot setName:@"VSize(MB)"];
 	[plotView addPlot: thePlot];
 	[thePlot release];
 	
