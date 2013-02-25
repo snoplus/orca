@@ -128,10 +128,12 @@ NSString* ORSpliterOutConnection  = @"ORSpliterOutConnection";
 {
     if(!alreadyEvaluated){
         alreadyEvaluated = YES;
-        [self setState:[[self evalInput1] boolValue]];
+        ORProcessResult* result = [self evalInput1];
+        [self setState:[result boolValue]];
+        value = [result analogValue];
     }
     [self setEvaluatedState: [self state]];
-	return [ORProcessResult processState:evaluatedState value:evaluatedState];
+	return [ORProcessResult processState:evaluatedState value:value];
 }
 //--------------------------------
 

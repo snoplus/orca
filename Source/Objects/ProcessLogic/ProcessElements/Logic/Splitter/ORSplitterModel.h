@@ -27,6 +27,7 @@
 @interface ORSplitterModel :  ORSimpleLogic
 {
 	ORProcessNub* outputNub;
+    float value;
 }
 
 @end
