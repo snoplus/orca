@@ -1778,7 +1778,7 @@ Table: Histogram2Ds
 							if(dataset_id) {
 								if(lastCounts != countsNow){
 									NSString* convertedData = [sqlConnection quoteObject:[aDataSet rawData]];
-									NSString* theQuery = [NSString stringWithFormat:@"UPDATE waveforms SET counts=%lu,unitsize=%dmask=%lu,bitmask=%lu,offset=%lu,length=%d,data=%@ WHERE dataset_id=%@",
+									NSString* theQuery = [NSString stringWithFormat:@"UPDATE waveforms SET counts=%lu,unitsize=%d,mask=%lu,bitmask=%lu,offset=%lu,length=%d,data=%@ WHERE dataset_id=%@",
 														  [aDataSet totalCounts],
 														  [aDataSet unitSize],
 														  [aDataSet mask],
