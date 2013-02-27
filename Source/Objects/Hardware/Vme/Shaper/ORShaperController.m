@@ -295,13 +295,13 @@
 - (void) slotChanged:(NSNotification*)aNotification
 {
 	[slotField setIntValue: [model slot]];
-	[[self window] setTitle:[NSString stringWithFormat:@"Shaper Card (Slot %d)",[model slot]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"Shaper Card (Crate %d,Slot %d)",[model crateNumber],[model slot]]];
 }
 
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[[self window] setTitle:[NSString stringWithFormat:@"Shaper Card (Slot %d)",[model slot]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"Shaper Card (Crate %d,Slot %d)",[model crateNumber],[model slot]]];
 }
 
 
