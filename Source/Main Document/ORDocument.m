@@ -89,8 +89,8 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
         }
     }
     @catch(NSException* e){
-        return nil;
     }
+    return nil;
 }
 - (id) initWithContentsOfURL:(NSURL *)url ofType:(NSString *)typeName error:(NSError **)outError
 {
@@ -106,8 +106,8 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
         }
     }
     @catch(NSException* e){
-        return nil;
     }
+    return nil;
 }
 
 - (void) dealloc
