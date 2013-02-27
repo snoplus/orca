@@ -122,8 +122,10 @@
 
 - (NSString*) identifier
 {
-    return [NSString stringWithFormat:@"card %d",[self slot]];
+
+  return [NSString stringWithFormat:@"crate %d, slot %d",[self crateNumber],[self slot]];
 }
+
 
 - (NSComparisonResult)	slotCompare:(id)otherCard
 {
