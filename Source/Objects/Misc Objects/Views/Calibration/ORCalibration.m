@@ -391,7 +391,8 @@
 
 - (NSString*) calibrationName
 {
-	return calibrationName;
+    if(!calibrationName) return @"";
+	else return calibrationName;
 }
 
 - (BOOL) useCalibration

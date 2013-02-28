@@ -52,7 +52,7 @@ NSString* ORDataSetCalibrationChanged		= @"ORDataSetCalibrationChanged";
     [fullName release];
     [shortName release];	
     [dataSet release];
-
+    [calibration release];
     [super dealloc];
 }
 
