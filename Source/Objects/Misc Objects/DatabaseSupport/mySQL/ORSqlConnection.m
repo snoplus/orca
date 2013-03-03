@@ -104,6 +104,7 @@
 	@synchronized(self){
 		if (mConnection) {
 			mysql_close(mConnection);
+            mysql_library_end();
 			mConnection = nil;
 		}
 	}
