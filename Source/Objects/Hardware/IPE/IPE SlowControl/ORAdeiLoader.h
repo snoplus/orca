@@ -44,7 +44,7 @@
 	BOOL				dataFormat;
 	BOOL				fastGenOption;
 	NSArray*			setupOptions;
-    
+    NSMutableString*    resultInProgress;
 	BOOL				showDebugOutput;
 }
 

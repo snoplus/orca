@@ -1703,6 +1703,32 @@ enum {
     }
 }
 
+- (BOOL) wasErrorForChan:(int)aChan
+{
+    NSString* itemKey = [channelLookup objectForKey:[NSNumber numberWithInt:aChan]];
+    if(itemKey){
+		id topLevelDictionary = [requestCache objectForKey:itemKey];
+		id anItem = [topLevelDictionary objectForKey:itemKey];
+        NSString* result  = [anItem objectForKey:@"Result"];
+        return [result caseInsensitiveCompare:@"OK"];
+    }else{
+        return true;
+    }
+}
+
+- (NSString*) errorForChan:(int)aChan
+{
+    NSString* itemKey = [channelLookup objectForKey:[NSNumber numberWithInt:aChan]];
+    if(itemKey){
+		id topLevelDictionary = [requestCache objectForKey:itemKey];
+		id anItem = [topLevelDictionary objectForKey:itemKey];
+        return [anItem objectForKey:@"Error"];
+    }else{
+        return @"Undefined Channel";
+    }
+}
+
+
 
 //TODO: control items are badly initialized under certain circumstances!! -tb-
 //TODO: after dragging a control into the list its "value" displays the ADEI item number, not the control value!! -tb-
@@ -1952,7 +1978,9 @@ enum {
             //TODO: use Unix time -tb- ? !!!!!!!!!!!!!
             //TODO: use Unix time -tb- ? !!!!!!!!!!!!!
         }
-        
+        [topLevelDictionary setObject:[resultItem objectForKey:@"Result"] forKey:@"Result"];
+        if([resultItem objectForKey:@"Error"])[topLevelDictionary setObject:[resultItem objectForKey:@"Error"] forKey:@"Error"];
+
         //housekeeping
 		[self clearPendingRequest:itemKey];
 	}

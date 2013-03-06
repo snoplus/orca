@@ -531,6 +531,8 @@
 - (BOOL) requestIsPendingForChan:(int)aChan;
 - (double) valueForChan:(int)aChan;
 - (double) valueForItemKey:(NSString*)itemKey;
+- (BOOL) wasErrorForChan:(int)aChan;
+- (NSString*) errorForChan:(int)aChan;
 
 
 //following methods are not recommended (use "...ForChan:" instead of "...aUrl path:..." functions) -tb-

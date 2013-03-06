@@ -236,7 +236,7 @@
 		dataFormat = kxmlFormat;
 		path = [aPath copy];
 		NSURL* furl = [NSURL URLWithString: requestString];
-		NSURLRequest* theRequest=[NSURLRequest requestWithURL:furl  cachePolicy:NSURLRequestReloadIgnoringCacheData  timeoutInterval:kTimeoutInterval];// make it configurable
+		NSURLRequest* theRequest=[NSURLRequest requestWithURL:furl  cachePolicy:NSURLRequestReloadIgnoringCacheData  timeoutInterval:5*kTimeoutInterval];// make it configurable
 		theAdeiConnection=[[NSURLConnection alloc] initWithRequest:theRequest delegate:self];
 	}
 }
@@ -278,7 +278,7 @@
 {
     if(showDebugOutput){//debug timeouts
         NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
-        NSLogFont(aFont,@"Received data/string after URL request: BEGIN-%@-END\n",[receivedData description]);
+        NSLogFont(aFont,@"Received data/string after URL request: BEGIN-%@-END\n",receivedData);
     }
     //handle the request
 	if(dataFormat == kxmlFormat){
@@ -296,7 +296,12 @@
 		if(!resultArray)resultArray = [[NSMutableArray array] retain];//resultArray will be shipped to delegate
 		NSMutableDictionary* dictionary = [[NSMutableDictionary alloc] initWithObjectsAndKeys: host, @"URL", path, @"Path", nil];
 		[resultArray addObject: dictionary];
-		[resultArray addObject: [receivedData description]];
+        
+        [self parseXMLData:receivedData];
+        
+        NSString* resultAsString = [[NSString alloc] initWithData:receivedData encoding:NSASCIIStringEncoding];
+		[resultArray addObject: resultAsString];
+        [resultAsString release];
 		[dictionary release];
 		
 	}
@@ -409,13 +414,57 @@ didStartElement:(NSString*) elementName
   qualifiedName:(NSString*) qName
 	 attributes:(NSDictionary*) attributeDict
 {
-	if([elementName isEqual:@"Value"]){
+	if(![elementName caseInsensitiveCompare:@"Value"]){
 		if(!resultArray)resultArray = [[NSMutableArray array] retain];
 		NSMutableDictionary* dictWithAdditions = [NSMutableDictionary dictionaryWithDictionary:attributeDict];
 		if(adeiType)//TODO: check the value, not only existence (in the future there will be more adei types)-tb-
             [dictWithAdditions setObject:[NSNumber numberWithInt:adeiType]	forKey:@"Control"];
 		[resultArray addObject:dictWithAdditions];
 	}
+    else if(![elementName caseInsensitiveCompare:@"result"]){
+        resultInProgress = [[NSMutableString alloc] init];
+    }
+}
+
+- (void)parser:(NSXMLParser *)parser
+ didEndElement:(NSString *)elementName
+  namespaceURI:(NSString *)namespaceURI
+ qualifiedName:(NSString *)qName
+{    
+    if(!resultArray)resultArray = [[NSMutableArray array] retain];
+    
+    if (![elementName caseInsensitiveCompare:@"Result"]) {
+        NSString* s = @"";
+        if(![resultInProgress caseInsensitiveCompare:@"OK"])s = @"OK";
+        else s = @"Error";
+        if([resultArray count]==0){
+            [resultArray addObject:[NSMutableDictionary dictionaryWithObject:s forKey:@"Result"]];
+        }
+        else {
+            [[resultArray objectAtIndex:0] setObject: s forKey:@"Result"];
+        }
+    }
+    else if (![elementName caseInsensitiveCompare:@"Error"]) {
+        if([resultInProgress length]){
+            if([resultArray count]==0){
+                [resultArray addObject:[NSMutableDictionary dictionaryWithObject:resultInProgress forKey:@"Error"]];
+            }
+            else {
+                [[resultArray objectAtIndex:0] setObject: resultInProgress forKey:@"Error"];
+            }
+        }
+   }
+    [resultInProgress release];
+    resultInProgress = nil;
+    
+ }
+
+// This method can get called multiple times for the
+// text in a single element
+- (void)parser:(NSXMLParser *)parser
+foundCharacters:(NSString *)string
+{
+    [resultInProgress appendString:string];
 }
 
 + (NSString*) controlItemRequestStringUrl:(NSString*)aUrl itemPath:(NSString*)aPath;
