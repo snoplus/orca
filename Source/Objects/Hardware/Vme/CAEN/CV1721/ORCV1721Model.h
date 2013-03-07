@@ -78,10 +78,6 @@ enum {
 	kScratch,				//0xEF20
 	kSWReset,				//0xEF24
 	kSWClear,				//0xEF28
-	//kFlashEnable,			//0xEF2C
-	//kFlashData,			//0xEF30
-	//kConfigReload,		//0xEF34
-	//kConfigROM,			//0xF000
 	kNumRegisters
 };
 

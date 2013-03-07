@@ -184,7 +184,6 @@
 - (IBAction) dacAction: (id) aSender;
 - (IBAction) thresholdAction: (id) aSender;
 - (IBAction) overUnderAction: (id) aSender;
-- (IBAction) countinuousRunsAction:(id)sender;
 - (IBAction) probeAction:(id)sender;
 
 #pragma mark •••Misc Helpers

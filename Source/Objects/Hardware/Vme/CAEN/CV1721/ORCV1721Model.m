@@ -86,10 +86,6 @@ static CV1721RegisterNamesStruct reg[kNumRegisters] = {
 {@"Scratch",			false,	true, 	true,	0xEF20,		kReadWrite},
 {@"SW Reset",			false,	false, 	false,	0xEF24,		kWriteOnly},
 {@"SW Clear",			false,	false, 	false,	0xEF28,		kWriteOnly}
-//	{@"Flash Enable",		false,	false, 	true,	0xEF2C,		kReadWrite},
-//	{@"Flash Data",			false,	false, 	true,	0xEF30,		kReadWrite},
-//	{@"Config Reload",		false,	false, 	false,	0xEF34,		kWriteOnly},
-//	{@"Config ROM",			false,	false, 	false,	0xF000,		kReadOnly}
 };
 
 #define kEventReadyMask 0x8
@@ -937,32 +933,28 @@ NSString* ORCV1721ModelBufferCheckChanged                 = @"ORCV1721ModelBuffe
 
 - (void) initBoard
 {
-    [self writeAcquistionControl:NO]; // Make sure it's off.
-	[self clearAllMemory];
 	[self softwareReset];
 	[self writeThresholds];
-	[self writeChannelConfiguration];
 	[self writeCustomSize];
-	[self writeTriggerSource];
 	[self writeTriggerOut];
 	[self writeFrontPanelControl];
-	[self writeChannelEnabledMask];
 	[self writeBufferOrganization];
 	[self writeOverUnderThresholds];
 	[self writeDacs];
 	[self writePostTriggerSetting];
+	[self writeChannelConfiguration];
+	[self writeChannelEnabledMask];
+	[self writeTriggerSource];
 }
 
 - (float) convertDacToVolts:(unsigned short)aDacValue 
 { 
-	return 2*aDacValue/65535. - 0.9999;  
-    //return 2*((short)aDacValue)/65535.;  
+	return aDacValue/65535. - 0.5;
 }
 
 - (unsigned short) convertVoltsToDac:(float)aVoltage  
 { 
-	return 65535. * (aVoltage+1)/2.; 
-    //return (unsigned short)((short) (65535. * (aVoltage)/2.)); 
+	return 65535. * (aVoltage + .5);
 }
 
 - (void) writeThresholds
@@ -1073,7 +1065,8 @@ NSString* ORCV1721ModelBufferCheckChanged                 = @"ORCV1721ModelBuffe
 
 - (void) writePostTriggerSetting
 {
-	[[self adapter] writeLongBlock:&postTriggerSetting
+    unsigned long aValue = postTriggerSetting/2;
+	[[self adapter] writeLongBlock:&aValue
                          atAddress:[self baseAddress] + reg[kPostTrigSetting].addressOffset
                         numToWrite:1
                         withAddMod:[self addressModifier]
@@ -1205,6 +1198,7 @@ NSString* ORCV1721ModelBufferCheckChanged                 = @"ORCV1721ModelBuffe
 - (void) reset
 {
 }
+
 - (void) runTaskStarted:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
 {
 	if(![[self adapter] controllerCard]){
@@ -1220,16 +1214,18 @@ NSString* ORCV1721ModelBufferCheckChanged                 = @"ORCV1721ModelBuffe
 	statusReg		= [self baseAddress] + reg[kAcqStatus].addressOffset;
 	eventSizeReg	= [self baseAddress] + reg[kEventSize].addressOffset;
 	dataReg			= [self baseAddress] + reg[kOutputBuffer].addressOffset;
-	location		=  (([self crateNumber]&0x01e)<<21) | (([self slot]& 0x0000001f)<<16);
-	isRunning		= NO;
+	location		=  (([self crateNumber]&0x0f)<<21) | (([self slot]& 0x0000001f)<<16);
+	isRunning		= YES;
     
     BOOL sbcRun = [[userInfo objectForKey:kSBCisDataTaker] boolValue];
 
     [self startRates];
 
+    [self writeAcquistionControl:NO]; // Make sure it's off.
     [self initBoard];
     [self writeNumberBLTEvents:sbcRun];
     [self writeEnableBerr:sbcRun];
+	[self clearAllMemory];
     [self writeAcquistionControl:YES];
 
 	[self performSelector:@selector(checkBufferAlarm) withObject:nil afterDelay:1];
@@ -1239,46 +1235,42 @@ NSString* ORCV1721ModelBufferCheckChanged                 = @"ORCV1721ModelBuffe
 {
 	@try {
 		unsigned long status;
-		isRunning = YES; 
-		
+
 		[controller readLongBlock:&status
 						atAddress:statusReg
 						numToRead:1
 					   withAddMod:addressModifier 
 					usingAddSpace:0x01];
 		bufferState = (status & 0x10) >> 4;
-		if(status & (kEventReadyMask | kBoardReadyMask)){
-			//OK, at least one event is ready
-			unsigned long theFirst;
-			[controller readLongBlock:&theFirst
-					atAddress:dataReg
-					numToRead:1
-				       withAddMod:[self addressModifier] 
-				    usingAddSpace:0x01];
-			
-			unsigned long theEventSize = theFirst & 0x0FFFFFFF;
-			if ( theEventSize == 0 || (((theFirst>>28)&0xf)!=0xa)) return;
-                        
-			NSMutableData* theData = [NSMutableData dataWithCapacity:theEventSize+2];
-			[theData setLength:(2+theEventSize)*sizeof(long)];
-			unsigned long* p = (unsigned long*)[theData bytes];
-			p[0] = dataId | (2 + theEventSize); //ORCA adds two words of header
-			p[1] = location;
-			p[2] = theFirst;
+        if(status & kBoardReadyMask) {
+            if(status & kEventReadyMask){
+                //OK, at least one event is ready
+                unsigned long theFirst;
+                [controller readLongBlock:&theFirst
+                        atAddress:dataReg
+                        numToRead:1
+                           withAddMod:[self addressModifier] 
+                        usingAddSpace:0x01];
+                
+                unsigned long theEventSize = theFirst & 0x0FFFFFFF;
+                if ( theEventSize == 0 || (((theFirst>>28)&0xf)!=0xa)) return;
+                            
+                NSMutableData* theData = [NSMutableData dataWithCapacity:theEventSize+2];
+                [theData setLength:(2+theEventSize)*sizeof(long)];
+                unsigned long* p = (unsigned long*)[theData bytes];
+                p[0] = dataId | (2 + theEventSize); //ORCA adds two words of header
+                p[1] = location;
+                p[2] = theFirst;
 
-			[controller readLongBlock:&p[3]
-							atAddress:dataReg
-							numToRead:theEventSize-1 //already read in the first one
-						   withAddMod:[self addressModifier] 
-						usingAddSpace:0xff]; //we set it to not increment the address.
-			
-			[aDataPacket addData:theData];
-			unsigned short chanMask = p[3];
-			int i;
-			for(i=0;i<8;i++){
-				if(chanMask & (1<<i)) ++waveFormCount[i]; 
-			}
-		}
+                [controller readLongBlock:&p[3]
+                                atAddress:dataReg
+                                numToRead:theEventSize-1 //already read in the first one
+                               withAddMod:[self addressModifier] 
+                            usingAddSpace:0xff]; //we set it to not increment the address.
+                
+                [aDataPacket addData:theData];
+            }
+        }
 	}
 	@catch(NSException* localException) {
 	}
@@ -1296,7 +1288,7 @@ NSString* ORCV1721ModelBufferCheckChanged                 = @"ORCV1721ModelBuffe
 
 - (BOOL) bumpRateFromDecodeStage:(short)channel
 {
-	if(isRunning)return NO;
+	if(!isRunning)return NO;
     
     ++waveFormCount[channel];
     return YES;
