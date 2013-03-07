@@ -1,5 +1,6 @@
 #include "ORCAEN1721Readout.hh"
 #include <errno.h> 
+#include <stdio.h>
 
 #define kFastBLTThreshold 2 //must be 2 or more
 
@@ -22,7 +23,7 @@ bool ORCAEN1721Readout::Start() {
         return false;
     }
 
-    fixedEventSize = GetDeviceSpecificData()[8];
+    fixedEventSize      = GetDeviceSpecificData()[8];
     userBLTEventsNumber = GetDeviceSpecificData()[9];
     firmwareBugZero = 0;
 
@@ -31,13 +32,13 @@ bool ORCAEN1721Readout::Start() {
 
 bool ORCAEN1721Readout::Readout(SBC_LAM_Data* lamData)
 {
-    uint32_t vmeStatusReg = GetDeviceSpecificData()[0];
+    uint32_t vmeStatusReg       = GetDeviceSpecificData()[0];
     uint32_t eventSizeReg       = GetDeviceSpecificData()[1];
     uint32_t fifoBuffReg        = GetDeviceSpecificData()[2];
     uint32_t fifoAddressMod     = GetDeviceSpecificData()[3];
     uint32_t fifoBuffSize       = GetDeviceSpecificData()[4];
     uint32_t location           = GetDeviceSpecificData()[5];
-    uint32_t numBLTEventsReg = GetDeviceSpecificData()[7];
+    uint32_t numBLTEventsReg    = GetDeviceSpecificData()[7];
     uint32_t dataId             = GetHardwareMask()[0];
     uint32_t eventStored;
 
@@ -52,9 +53,7 @@ bool ORCAEN1721Readout::Readout(SBC_LAM_Data* lamData)
         return false; 
     }
 
-    if (!eventStored) {
-        return true;
-    }
+    if (!eventStored) return true;
 
     uint32_t eventSize;
     //if the event size is fixed by user, use it, else, get it from the card
@@ -77,7 +76,6 @@ bool ORCAEN1721Readout::Readout(SBC_LAM_Data* lamData)
     if (eventSize == 0) { //corrupted event in variable size mode, e.g. due to a buffer full
         return true;   
     }
-
 
     //make sure we can get all the user requested events, grab 1 otherwise
     //the change will take place after we read out this event
@@ -118,20 +116,20 @@ bool ORCAEN1721Readout::Readout(SBC_LAM_Data* lamData)
     //eventSize in uint32_t words, fifoBuffSize in Bytes
     uint32_t dmaTransferCount = thisBLTEventsNumber * eventSize * 4 / fifoBuffSize + 1;
     int32_t bufferSizeNeeded = dmaTransferCount * fifoBuffSize / 4 + 1 + 2; //+orca_header
-    if ((int32_t)(bufferSizeNeeded) > (kMaxDataBufferSizeLongs - dataIndex)) {
-        /* We can't read out. */ 
-        LogError("Temp buffer too small, requested (%d) > available (%d)",
-            bufferSizeNeeded, 
-            kMaxDataBufferSizeLongs-dataIndex);
-        return false; 
-    } 
     ensureDataCanHold(bufferSizeNeeded);
 
-    if (thisBLTEventsNumber == 1) { //recovery safe mode
-        if (eventStored <= firmwareBugZero) {
-            return true;
-        }
+    if ((int32_t)(bufferSizeNeeded) > (kMaxDataBufferSizeLongs - dataIndex)) {
+        /* We can't read out. */
+        LogError("Temp buffer too small, requested (%d) > available (%d)",
+                 bufferSizeNeeded,
+                 kMaxDataBufferSizeLongs-dataIndex);
+        return false;
+    }
 
+    
+    if (thisBLTEventsNumber == 1) { //recovery safe mode
+        if (eventStored <= firmwareBugZero) return true;
+ 
         uint32_t vmeStatus;
         result = VMERead(GetBaseAddress() + 0xEF04,
             GetAddressModifier(),
@@ -149,13 +147,13 @@ bool ORCAEN1721Readout::Readout(SBC_LAM_Data* lamData)
     dataIndex += 2; //the header to be filled after the DMA transfer succeeds
 
     do {
-        result = DMARead(GetBaseAddress()+fifoBuffReg,
+       result = DMARead(GetBaseAddress()+fifoBuffReg,
             fifoAddressMod,
             (uint32_t) 8,
             (uint8_t*) (data+dataIndex),
             fifoBuffSize);
 
-        dataIndex += fifoBuffSize / 4;
+       dataIndex += fifoBuffSize / 4;
         dmaTransferCount--;
     }
     while (dmaTransferCount && result > 0);
@@ -168,12 +166,12 @@ bool ORCAEN1721Readout::Readout(SBC_LAM_Data* lamData)
     }
     
     if (!dmaTransferCount && result > 0) {
-        LogError("Error reading DMA for V1721, BERR missing");
-        dataIndex = startIndex;
-        return true;
+       // LogError("Error reading DMA for V1721, BERR missing");
+        //dataIndex = startIndex;
+       // return true;
     }
 
-    uint32_t bufferSizeUsed = 2 + thisBLTEventsNumber * eventSize;
+    uint32_t bufferSizeUsed = 2 + thisBLTEventsNumber * eventSize - 4;
     dataIndex = startIndex + bufferSizeUsed;
     data[startIndex] = dataId | bufferSizeUsed;
     data[startIndex + 1] = location;
