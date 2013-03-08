@@ -263,7 +263,7 @@
 												<string key="NSFrame">{{15, 4}, {36, 41}}</string>
 												<reference key="NSSuperview" ref="189780115"/>
 												<reference key="NSWindow"/>
-												<reference key="NSNextKeyView"/>
+												<reference key="NSNextKeyView" ref="818506012"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="5222144">
 													<int key="NSCellFlags">67108864</int>
@@ -9142,7 +9142,7 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 																<int key="NSvFlags">256</int>
 																<string key="NSFrame">{{59, 7}, {29, 14}}</string>
 																<reference key="NSSuperview" ref="694344891"/>
-																<reference key="NSNextKeyView"/>
+																<reference key="NSNextKeyView" ref="818506012"/>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSTextFieldCell" key="NSCell" id="121099691">
 																	<int key="NSCellFlags">67108864</int>
@@ -11375,6 +11375,22 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 						<reference key="destination" ref="184400410"/>
 					</object>
 					<int key="connectionID">4551</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">dataSource</string>
+						<reference key="source" ref="844415089"/>
+						<reference key="destination" ref="200463760"/>
+					</object>
+					<int key="connectionID">4637</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">dataSource</string>
+						<reference key="source" ref="350750118"/>
+						<reference key="destination" ref="514510623"/>
+					</object>
+					<int key="connectionID">4638</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -17832,7 +17848,7 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">4636</int>
+			<int key="maxID">4638</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
