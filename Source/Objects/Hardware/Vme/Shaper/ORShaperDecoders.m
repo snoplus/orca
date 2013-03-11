@@ -133,7 +133,7 @@
         [dateFormatter setDateFormat:@"d MMM yyyy HH:mm:ss"];
         [dateFormatter setTimeZone:[NSTimeZone timeZoneWithName:@"GMT"]];
         NSString *dateString = [dateFormatter stringFromDate:timeStamp];
-		timeString = [NSString stringWithFormat:@"%@ GMT\n milliseconds: %lu\n",dateString,ptr[3]];
+		timeString = [NSString stringWithFormat:@"%@ GMT\n sub-secs: %lu\n",dateString,ptr[3]];
 	}
 	
     return [NSString stringWithFormat:@"%@%@%@%@%@%@",title,crateName,cardName,channame,adc,timeString];               
