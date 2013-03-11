@@ -51,7 +51,7 @@
 - (BOOL) connectToHost:(NSString*)aHostName userName:(NSString*)aUserName passWord:(NSString*)aPassWord dataBase:(NSString*)aDataBase verbose:(BOOL)verbose
 {
 	@synchronized(self){
-		if(!mConnection){
+		if(!mConnection && [aHostName length] && [aUserName length] && [aPassWord length] && [aDataBase length]){
 			mConnection = mysql_init (NULL);
 			if(mConnection){
 				MYSQL* result = mysql_real_connect (mConnection, [aHostName UTF8String], [aUserName UTF8String], [aPassWord UTF8String],[aDataBase UTF8String], 0, nil, 0);
@@ -80,7 +80,7 @@
 - (BOOL) connectToHost:(NSString*)aHostName userName:(NSString*)aUserName passWord:(NSString*)aPassWord
 {
 	@synchronized(self){
-		if(!mConnection){
+		if(!mConnection && [aHostName length] && [aUserName length] && [aPassWord length] ){
 			mConnection = mysql_init (NULL);
 			if(mConnection){
 				MYSQL* result = mysql_real_connect (mConnection,[aHostName UTF8String], [aUserName UTF8String], [aPassWord UTF8String],NULL, 0, NULL, 0);
