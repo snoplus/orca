@@ -233,7 +233,7 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply)
 		else {
             memMapHandle = get_dma_device(oldAddress, addressModifier, unitSize, true);
          }
-        addressSpace =0x1; // reset this for the later call.
+        //addressSpace =0x1; // reset this for the later call.
         startAddress = 0x0;
     }
     else {
