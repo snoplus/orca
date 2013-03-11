@@ -73,7 +73,7 @@
 	int dataOffset = 0;
 	if(length>1) dataOffset = 1;
 
-	int crate			 = ShiftAndExtract(ptr[dataOffset],21,0x1e);
+	int crate			 = ShiftAndExtract(ptr[dataOffset],21,0xf);
 	int card			 = ShiftAndExtract(ptr[dataOffset],16,0x1f);
 	int channel			 = ShiftAndExtract(ptr[dataOffset],12,0xf);
 	
@@ -117,14 +117,14 @@
 
 	int dataOffset = 0;
 	if(length>1) dataOffset = 1;
-	int crate			 = ShiftAndExtract(ptr[dataOffset],21,0x1e);
+	int crate			 = ShiftAndExtract(ptr[dataOffset],21,0xf);
 	int card			 = ShiftAndExtract(ptr[dataOffset],16,0x1f);
 	int channel			 = ShiftAndExtract(ptr[dataOffset],12,0xf);
 	
     NSString* crateName = [NSString stringWithFormat:@"Crate = %d\n",crate];
     NSString* cardName  = [NSString stringWithFormat:@"Card  = %d\n",card];
     NSString* channame  = [NSString stringWithFormat:@"Chan  = %d\n",channel];
-    NSString* adc   = [NSString stringWithFormat:@"ADC   = 0x%lx\n",*ptr&0x00000fff];
+    NSString* adc       = [NSString stringWithFormat:@"ADC   = 0x%lx\n",ptr[dataOffset]&0x00000fff];
     
 	NSString* timeString = @"No Time Stamp\n";
 	if(length==4){

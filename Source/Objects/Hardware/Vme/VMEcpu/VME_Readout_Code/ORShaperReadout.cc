@@ -14,8 +14,8 @@ bool ORShaperReadout::Readout(SBC_LAM_Data* lamData)
     if(result == (int32_t) sizeof(theConversionMask) && theConversionMask != 0){
 
         uint32_t dataId            = GetHardwareMask()[0];
-        uint32_t locationMask      = ((GetCrate() & 0x01e)<<21) | 
-                                     ((GetSlot() & 0x0000001f)<<16);
+        uint32_t locationMask      = ((GetCrate() & 0xf)<<21) |
+                                     ((GetSlot() & 0x1f)<<16);
         uint32_t onlineMask        = GetDeviceSpecificData()[0];
         uint32_t firstAdcRegOffset = GetDeviceSpecificData()[2];
 		uint8_t  shipTimeStamp     = GetDeviceSpecificData()[3];

@@ -1140,7 +1140,7 @@ NSString* ORShaperSettingsLock							= @"ORShaperSettingsLock";
     
     //----------------------------------------------------------------------------------------
     controller = [[self adapter] controllerCard]; //cache the controller for alittle bit more speed.
-    slotMask   =  (([self crateNumber]&0x01e)<<21) | ([self slot]& 0x0000001f)<<16;
+    slotMask   =  (([self crateNumber]&0xf)<<21) | (([self slot]& 0x1f)<<16);
 	
     [self clearExceptionCount];
 	
