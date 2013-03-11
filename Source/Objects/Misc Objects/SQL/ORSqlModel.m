@@ -463,7 +463,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 		[sqlConnection disconnect];
 		[sqlConnection release];
 		sqlConnection = nil;
-		NSLog(@"Disconnected from DataBase %@ on %@\n",dataBaseName,hostName);
+		if([dataBaseName length] && [hostName length])NSLog(@"Disconnected from DataBase %@ on %@\n",dataBaseName,hostName);
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORSqlConnectionValidChanged object:self];
 	}
 }
