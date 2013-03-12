@@ -1919,10 +1919,14 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 
 - (void) readHitRates
 {
+    unsigned long sltSubSecReg =  0;		
+    unsigned long sltSubSec =  0;		
+    unsigned long sltSec    =  0;		
+
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHitRates) object:nil];
 	
 	@try {
-		
+
 		BOOL oneChanged = NO;
 		float newTotal = 0;
 		int chan;
@@ -1940,6 +1944,13 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 			}
 		}
 		
+        //read SLT second counters after readout of the hitrates
+        unsigned long sltSubSecAddr =  [[[self crate] adapter] getAddress: kSltV4SubSecondCounterReg];		
+        unsigned long sltSecAddr    =  [[[self crate] adapter] getAddress: kSltV4SecondCounterReg];		
+		[aList addCommand: [[[self crate] adapter] readHardwareRegisterCmd:sltSubSecAddr]];
+		[aList addCommand: [[[self crate] adapter] readHardwareRegisterCmd:sltSecAddr]];
+        
+        //HW access
 		[self executeCommandList:aList];
 		
 		//put the synchronized around this code to test if access to the hitrates is thread safe
@@ -1967,7 +1978,11 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 				dataIndex++;
 			}
 		}
-		
+        
+        sltSubSecReg =  [aList longValueForCmd:dataIndex];		
+        sltSubSec   = ((sltSubSecReg>>11)&0x3fff)*2000   +  (sltSubSecReg & 0x7ff);
+        sltSec    =  [aList longValueForCmd:dataIndex+1];		
+        //DEBUGGING NSLog(@"FLT %i: readHitRates: sltSec: %08x (%i)  sltSubSec %08x (%i, %f)\n",[self stationNumber],sltSec,sltSec,sltSubSec,sltSubSec, (0.00000005*sltSubSec));		
 		if(dataIndex>0){
 			time_t	ut_time;
 			time(&ut_time);
@@ -1991,7 +2006,11 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 	@catch(NSException* localException) {
 	}
 	
-	[self performSelector:@selector(readHitRates) withObject:nil afterDelay:(1<<[self hitRateLength])];
+    //try to read always between two second strobes -> sec = fullSec+0.4
+    double delay=1<<[self hitRateLength];
+    double deltadelay=0.4 - 0.00000005*sltSubSec;
+    delay += deltadelay;
+	[self performSelector:@selector(readHitRates) withObject:nil afterDelay:(delay)];
 }
 
 //------------------

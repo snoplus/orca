@@ -129,6 +129,105 @@
 #define kTrgTimingTrgWindow		(0x00000007 <<  16) //R/W
 #define kTrgEndPageDelay		(0x000007FF <<   0) //R/W
 
+
+//IPE V4 register definitions
+enum IpeV4Enum {
+	kSltV4ControlReg,
+	kSltV4StatusReg,
+	kSltV4CommandReg,
+	kSltV4InterruptReguestReg,
+	kSltV4InterruptMaskReg,
+	kSltV4RequestSemaphoreReg,
+	kSltV4HWRevisionReg,
+	kSltV4PixelBusErrorReg,
+	kSltV4PixelBusEnableReg,
+	kSltV4PixelBusTestReg,
+	kSltV4AuxBusTestReg,
+	kSltV4DebugStatusReg,
+	kSltV4VetoCounterHiReg,		//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
+	kSltV4VetoCounterLoReg,		//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
+	kSltV4DeadTimeCounterHiReg,	//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
+	kSltV4DeadTimeCounterLoReg,	//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
+								//TODO: and dead time and veto time counter are confused, too -tb-
+	kSltV4RunCounterHiReg,		//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
+	kSltV4RunCounterLoReg,		//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
+	kSltV4SecondSetReg,
+	kSltV4SecondCounterReg,
+	kSltV4SubSecondCounterReg,
+	kSltV4PageManagerReg,
+	kSltV4TriggerTimingReg,
+	kSltV4PageSelectReg,
+	kSltV4NumberPagesReg,
+	kSltV4PageNumbersReg,
+	kSltV4EventStatusReg,
+	kSltV4ReadoutCSRReg,
+	kSltV4BufferSelectReg,
+	kSltV4ReadoutDefinitionReg,
+	kSltV4TPTimingReg,
+	kSltV4TPShapeReg,
+	kSltV4i2cCommandReg,
+	kSltV4epcsCommandReg,
+	kSltV4BoardIDLoReg,
+	kSltV4BoardIDHiReg,
+	kSltV4PROMsControlReg,
+	kSltV4PROHiufferReg,
+	kSltV4TriggerDataReg,
+	kSltV4ADCDataReg,
+	kSltV4NumRegs //must be last
+};
+
+extern IpeRegisterNamesStruct regSLTV4[kSltV4NumRegs];
+
+#if 0
+//this is in .m file
+static IpeRegisterNamesStruct regSLTV4[kSltV4NumRegs] = {
+{@"Control",			0xa80000,		1,			kIpeRegReadable | kIpeRegWriteable },
+{@"Status",				0xa80004,		1,			kIpeRegReadable },
+{@"Command",			0xa80008,		1,			kIpeRegWriteable },
+{@"Interrupt Reguest",	0xA8000C,		1,			kIpeRegReadable },
+{@"Interrupt Mask",		0xA80010,		1,			kIpeRegReadable | kIpeRegWriteable },
+{@"Request Semaphore",	0xA80014,		3,			kIpeRegReadable },
+{@"HWRevision",			0xa80020,		1,			kIpeRegReadable },
+{@"Pixel Bus Error",	0xA80024,		1,			kIpeRegReadable },			
+{@"Pixel Bus Enable",	0xA80028,		1, 			kIpeRegReadable | kIpeRegWriteable },
+{@"Pixel Bus Test",		0xA8002C, 		1, 			kIpeRegReadable | kIpeRegWriteable },
+{@"Aux Bus Test",		0xA80030, 		1, 			kIpeRegReadable | kIpeRegWriteable },
+{@"Debug Status",		0xA80034,  		1, 			kIpeRegReadable | kIpeRegWriteable },
+{@"Veto Counter (MSB)",	0xA80080, 		1,			kIpeRegReadable },	
+{@"Veto Counter (LSB)",	0xA80084,		1,			kIpeRegReadable },	
+{@"Dead Counter (MSB)",	0xA80088, 		1,			kIpeRegReadable },	
+{@"Dead Counter (LSB)",	0xA8008C, 		1,			kIpeRegReadable },	
+{@"Run Counter  (MSB)",	0xA80090,		1,			kIpeRegReadable },	
+{@"Run Counter  (LSB)",	0xA80094, 		1,			kIpeRegReadable },	
+{@"Second Set",			0xB00000,  		1, 			kIpeRegReadable | kIpeRegWriteable }, 
+{@"Second Counter",		0xB00004, 		1,			kIpeRegReadable },
+{@"Sub-second Counter",	0xB00008, 		1,			kIpeRegReadable }, 
+{@"Page Manager",		0xB80000,  		1, 			kIpeRegReadable | kIpeRegWriteable },
+{@"Trigger Timing",		0xB80004,  		1, 			kIpeRegReadable | kIpeRegWriteable },
+{@"Page Select",		0xB80008, 		1,			kIpeRegReadable },
+{@"Number of Pages",	0xB8000C, 		1,			kIpeRegReadable },
+{@"Page Numbers",		0xB81000,		64, 		kIpeRegReadable | kIpeRegWriteable },
+{@"Event Status",		0xB82000,		64,			kIpeRegReadable },
+{@"Readout CSR",		0xC00000,		1,			kIpeRegReadable | kIpeRegWriteable },
+{@"Buffer Select",		0xC00004,		1,			kIpeRegReadable | kIpeRegWriteable },
+{@"Readout Definition",	0xC10000,	  2048,			kIpeRegReadable | kIpeRegWriteable },			
+{@"TP Timing",			0xC80000,	   128,			kIpeRegReadable | kIpeRegWriteable },	
+{@"TP Shape",			0xC81000,	   512,			kIpeRegReadable | kIpeRegWriteable },	
+{@"I2C Command",		0xD00000,		1,			kIpeRegReadable },
+{@"EPC Command",		0xD00004,		1,			kIpeRegReadable | kIpeRegWriteable },
+{@"Board ID (LSB)",		0xD00008,		1,			kIpeRegReadable },
+{@"Board ID (MSB)",		0xD0000C,		1,			kIpeRegReadable },
+{@"PROMs Control",		0xD00010,		1,			kIpeRegReadable | kIpeRegWriteable },
+{@"PROMs Buffer",		0xD00100,		256,		kIpeRegReadable | kIpeRegWriteable },
+{@"Trigger Data",		0xD80000,	  14000,		kIpeRegReadable | kIpeRegWriteable },
+{@"ADC Data",			0xE00000,	 0x8000,		kIpeRegReadable | kIpeRegWriteable },
+//{@"Data Block RW",		0xF00000 Data Block RW
+//{@"Data Block Length",	0xF00004 Data Block Length 
+//{@"Data Block Address",	0xF00008 Data Block Address
+};
+#endif
+
+
 @interface ORIpeV4SLTModel : ORIpeCard <ORDataTaker,SBC_Linking>
 {
 	@private
@@ -234,6 +333,7 @@
 - (short) getNumberRegisters;			
 - (NSString*) getRegisterName: (short) anIndex;
 //- (unsigned long) getAddressOffset: (short) anIndex;
+- (unsigned long) getAddress: (short) anIndex;
 - (short) getAccessType: (short) anIndex;
 
 - (unsigned short) 	selectedRegIndex;

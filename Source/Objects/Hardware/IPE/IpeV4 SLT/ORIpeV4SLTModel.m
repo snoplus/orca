@@ -38,8 +38,9 @@
 #import "ORTaskSequence.h"
 #import "ORFileMover.h"
 
-
+#if 0
 //IPE V4 register definitions
+//MOVED TO .h FILE !!!!!!!!!!!!!!!!     <---------------- NOTE!
 enum IpeV4Enum {
 	kSltV4ControlReg,
 	kSltV4StatusReg,
@@ -84,8 +85,10 @@ enum IpeV4Enum {
 	kSltV4ADCDataReg,
 	kSltV4NumRegs //must be last
 };
+#endif
 
-static IpeRegisterNamesStruct regV4[kSltV4NumRegs] = {
+
+IpeRegisterNamesStruct regSLTV4[kSltV4NumRegs] = {
 {@"Control",			0xa80000,		1,			kIpeRegReadable | kIpeRegWriteable },
 {@"Status",				0xa80004,		1,			kIpeRegReadable },
 {@"Command",			0xa80008,		1,			kIpeRegWriteable },
@@ -130,7 +133,6 @@ static IpeRegisterNamesStruct regV4[kSltV4NumRegs] = {
 //{@"Data Block Length",	0xF00004 Data Block Length 
 //{@"Data Block Address",	0xF00008 Data Block Address
 };
-
 
 #pragma mark ***External Strings
 
@@ -655,17 +657,17 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 
 - (NSString*) getRegisterName: (short) anIndex
 {
-    return regV4[anIndex].regName;
+    return regSLTV4[anIndex].regName;
 }
 
 - (unsigned long) getAddress: (short) anIndex
 {
-    return( regV4[anIndex].addressOffset>>2);
+    return( regSLTV4[anIndex].addressOffset>>2);
 }
 
 - (short) getAccessType: (short) anIndex
 {
-	return regV4[anIndex].accessType;
+	return regSLTV4[anIndex].accessType;
 }
 
 - (unsigned short) selectedRegIndex
@@ -1144,7 +1146,7 @@ NSLog(@"  arguments: %@ \n" , arguments);
 		[NSException raise:@"Not Connected" format:@"Socket not connected."];
 	}
 	[pmcLink readLongBlockPmc:eventStatusBuffer
-					 atAddress:regV4[kSltV4EventStatusReg].addressOffset
+					 atAddress:regSLTV4[kSltV4EventStatusReg].addressOffset
 					 numToRead: 3];
 	
 }
