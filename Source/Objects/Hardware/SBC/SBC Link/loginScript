@@ -22,7 +22,7 @@ expect {
   "*$* " { }
   "*#* " { }
   "*%* " { }
-  "assword: " {
+  "assword:" {
         send "$password\r"
         expect {
           "*>* " { }
