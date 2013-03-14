@@ -108,6 +108,8 @@
     int useDmaBlockRead;
     int boxcarLength;
     //int useSLTtime; // unused - use SLT value -tb-
+    unsigned long   oldTriggerEnabledMask; //!< mask to temporarially store the enabled mask for later reuse.
+
 }
 
 #pragma mark •••Initialization
@@ -274,6 +276,8 @@
 - (void) testButtonLowLevelFireTP;
 - (void) testButtonLowLevelResetTP;
 
+- (void) disableAllTriggersIfInVetoMode;
+- (void) restoreTriggersIfInVetoMode;
 
 #pragma mark •••HW Access
 //all can raise exceptions

@@ -1894,13 +1894,28 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 	[self writeReg:kFLTV4CommandReg value:kIpeFlt_SW_Trigger];
 }
 
-
-
 //TODO: TBD after firmware update -tb- 2010-01-28
 - (void) disableAllTriggers
 {
 	[self writeReg:kFLTV4PixelSettings1Reg value:0x0];
 	[self writeReg:kFLTV4PixelSettings2Reg value:0xffffff];
+}
+
+- (void) disableAllTriggersIfInVetoMode
+{
+    if(runMode == kIpeFltV4_VetoEnergyDaqMode || runMode == kIpeFltV4_VetoEnergyTraceDaqMode){
+        oldTriggerEnabledMask = triggerEnabledMask;
+        [self setTriggerEnabledMask:0x0];
+        [self postAdcInfoProvidingValueChanged];
+    }
+}
+
+- (void) restoreTriggersIfInVetoMode
+{
+    if(runMode == kIpeFltV4_VetoEnergyDaqMode || runMode == kIpeFltV4_VetoEnergyTraceDaqMode){
+        [self setTriggerEnabledMask:oldTriggerEnabledMask];
+        [self postAdcInfoProvidingValueChanged];
+    }
 }
 
 //TODO: TBD after firmware update -tb- 2010-01-28
@@ -2107,7 +2122,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 	}
 	
 	//TODO: many fields are  still in super class ORIpeV4FLTModel, some should move here (see ORIpeV4FLTModel::initWithCoder, see my comments in 2011-04-07-ORKatrinV4FLTModel.m) -tb-
-	
+    
     [[self undoManager] enableUndoRegistration];
     [self registerNotificationObservers];
 	
