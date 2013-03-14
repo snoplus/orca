@@ -173,6 +173,11 @@
                      selector : @selector(vetoMapLockChanged:)
                          name : ORRunStatusChangedNotification
                        object : nil];
+    [notifyCenter addObserver : self
+                     selector : @selector(fpdOnlyModeChanged:)
+                         name : KatrinModelFPDOnlyModeChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -199,6 +204,7 @@
 	[self hiLimitChanged:nil];
 	[self maxValueChanged:nil];
 	
+	[self fpdOnlyModeChanged:nil];
 }
 
 - (void) lowLimitChanged:(NSNotification*)aNotification
@@ -274,6 +280,48 @@
 }
 
 #pragma mark ¥¥¥Actions
+- (IBAction) fpdOnlyModeAction:(id)sender
+{
+    BOOL fpdOnlyMode = [model fpdOnlyMode];
+ 
+    NSBeginAlertSheet(fpdOnlyMode?@"Reenable Veto Channels?":@"Disable ALL Veto channels?",
+                      @"Cancel",
+                      @"Yes/Do it!",
+                      nil,[self window],
+                      self,
+                      @selector(_toggleSheetDidEnd:returnCode:contextInfo:),
+                      nil,
+                      nil,fpdOnlyMode?@"This will re-enable veto channels to the state they were before.":@"This will disable ALL Veto channels. The current state will be saved until ORCA quits.");
+}
+
+- (void) _toggleSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+    if(returnCode == NSAlertAlternateReturn){
+        [model toggleFPDOnlyMode];
+    }
+}
+
+- (IBAction) autoscaleSecondayColorScale:(id)sender
+{
+    int n = [[model segmentGroup:1] numSegments];
+    int i;
+    float maxValue = -99999;
+    for(i=0;i<n;i++){
+        float aValue = maxValue;
+        switch([model displayType]){
+            case kDisplayThresholds:	aValue = [[model segmentGroup:1] getThreshold:i];     break;
+            case kDisplayGains:			aValue = [[model segmentGroup:1] getGain:i];          break;
+            case kDisplayRates:			aValue = [[model segmentGroup:1] getRate:i];		  break;
+            case kDisplayTotalCounts:	aValue = [[model segmentGroup:1] getTotalCounts:i];   break;
+            default:	break;
+        }
+        if(aValue>maxValue)maxValue = aValue;
+    }
+    if(maxValue != -99999){
+        maxValue += (maxValue*.20);
+        [[secondaryColorScale colorAxis] setRngLow:0 withHigh:maxValue];
+    }
+}
 
 - (IBAction) vetoMapLockAction:(id)sender
 {
@@ -380,6 +428,12 @@
 
 #pragma mark ¥¥¥Interface Management
 
+- (void) fpdOnlyModeChanged:(NSNotification*)aNote
+{
+	[fpdOnlyModeField setStringValue:   [model fpdOnlyMode]?@"Veto Disabled":@"Veto & FPD"];
+    [fpdOnlyModeButton setTitle:        [model fpdOnlyMode]?@"Reenable Veto...":@"Disable ALL Veto..."];
+}
+
 - (IBAction) viewTypeAction:(id)sender
 {
 	[model setViewType:[sender indexOfSelectedItem]];
@@ -449,6 +503,14 @@
     BOOL secure = [gSecurity globalSecurityEnabled];
     [gSecurity setLock:[model vetoMapLock] to:secure];
     [vetoMapLockButton setEnabled: secure];    
+}
+
+- (void) detectorLockChanged:(NSNotification*)aNotification
+{
+    [super detectorLockChanged:aNotification];
+    BOOL locked = [gSecurity isLocked:[model experimentDetectorLock]];
+    BOOL running = [gOrcaGlobals runInProgress];
+    [fpdOnlyModeButton setEnabled: !locked & !running];
 }
 
 - (void) secondaryAdcClassNameChanged:(NSNotification*)aNote

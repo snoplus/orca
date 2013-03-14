@@ -27,6 +27,8 @@
 @interface KatrinController : ORExperimentController {
  
     IBOutlet ORColorScale*	secondaryColorScale;
+	IBOutlet NSTextField*   fpdOnlyModeField;
+	IBOutlet NSButton*      fpdOnlyModeButton;
 	IBOutlet NSTextField*	slowControlNameField;
 	IBOutlet NSTextField*	slowControlIsConnectedField;
 	IBOutlet NSTextField*	slowControlIsConnectedField1;
@@ -76,6 +78,7 @@
 - (void) updateWindow;
 
 #pragma mark ¥¥¥HW Map Actions
+- (IBAction) fpdOnlyModeAction:(id)sender;
 - (IBAction) slowControlNameAction:(id)sender;
 - (IBAction) secondaryAdcClassNameAction:(id)sender;
 - (IBAction) readSecondaryMapFileAction:(id)sender;
@@ -87,6 +90,7 @@
 - (IBAction) vetoMapLockAction:(id)sender;
 
 #pragma mark ¥¥¥Detector Interface Management
+- (void) fpdOnlyModeChanged:(NSNotification*)aNote;
 - (void) slowControlNameChanged:(NSNotification*)aNote;
 - (void) slowControlIsConnectedChanged:(NSNotification*)aNote;
 - (void) secondaryColorAxisAttributesChanged:(NSNotification*)aNote;
@@ -94,6 +98,7 @@
 - (void) maxValueChanged:(NSNotification*)aNote;
 - (void) lowLimitChanged:(NSNotification*)aNote;
 - (void) hiLimitChanged:(NSNotification*)aNote;
+- (IBAction) autoscaleSecondayColorScale:(id)sender;
 
 #pragma mark ¥¥¥HW Map Interface Management
 - (void) secondaryAdcClassNameChanged:(NSNotification*)aNote;

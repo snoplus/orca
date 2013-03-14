@@ -34,18 +34,22 @@
 
 @interface KatrinModel :  ORExperimentModel <ORAdcProcessing>
 {
-	NSString* slowControlName;
-	int	      slowControlIsConnected;
-	int		  viewType;
+	NSString*            slowControlName;
+	int                  slowControlIsConnected;
+	int                  viewType;
+	float                lowLimit[2];
+	float                hiLimit[2];
+	float                maxValue[2];
+    BOOL                 fpdOnlyMode;
 	NSMutableArray*		 fltSNs;
 	NSMutableArray*		 preAmpSNs;
 	NSMutableArray*		 osbSNs;
 	NSMutableDictionary* otherSNs;
-	float           lowLimit[2];
-	float           hiLimit[2];
-	float           maxValue[2];
 }
 #pragma mark ¥¥¥Accessors
+- (BOOL) fpdOnlyMode;
+- (void) setFPDOnlyMode:(BOOL)aVetoOnlyMode;
+- (void) toggleFPDOnlyMode;
 - (NSString*) slowControlName;
 - (void) setSlowControlName:(NSString*)aName;
 - (BOOL) slowControlIsConnected;
@@ -98,6 +102,7 @@
 
 @end
 
+extern NSString* KatrinModelFPDOnlyModeChanged;
 extern NSString* KatrinModelSlowControlIsConnectedChanged;
 extern NSString* KatrinModelSlowControlNameChanged;
 extern NSString* ORKatrinModelViewTypeChanged;
@@ -105,3 +110,8 @@ extern NSString* ORKatrinModelSNTablesChanged;
 extern NSString* ORKatrinModelMaxValueChanged;
 extern NSString* ORKatrinModelHiLimitChanged;
 extern NSString* ORKatrinModelLowLimitChanged;
+
+@interface OrcaObject (Experiment)
+- (void) disableAllTriggersIfInVetoMode;
+- (void) restoreTriggersIfInVetoMode;
+@end

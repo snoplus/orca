@@ -28,7 +28,8 @@
 #import "ORCommandCenter.h"
 #import "ORDetectorSegment.h"
 
-NSString* KatrinModelSlowControlIsConnectedChanged = @"KatrinModelSlowControlIsConnectedChanged";
+NSString* KatrinModelFPDOnlyModeChanged             = @"KatrinModelFPDOnlyModeChanged";
+NSString* KatrinModelSlowControlIsConnectedChanged  = @"KatrinModelSlowControlIsConnectedChanged";
 NSString* KatrinModelSlowControlNameChanged			= @"KatrinModelSlowControlNameChanged";
 NSString* ORKatrinModelViewTypeChanged				= @"ORKatrinModelViewTypeChanged";
 NSString* ORKatrinModelSNTablesChanged				= @"ORKatrinModelSNTablesChanged";
@@ -105,6 +106,40 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 }
 
 #pragma mark ¥¥¥Accessors
+
+- (BOOL) fpdOnlyMode
+{
+    return fpdOnlyMode;
+}
+
+- (void) setFPDOnlyMode:(BOOL)aMode
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setFPDOnlyMode:fpdOnlyMode];
+    
+    fpdOnlyMode = aMode;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:KatrinModelFPDOnlyModeChanged object:self];
+}
+
+- (void) toggleFPDOnlyMode
+{
+    [self setFPDOnlyMode:!fpdOnlyMode];
+    ORSegmentGroup* aGroup = [segmentGroups objectAtIndex:1];
+    NSArray* cards = [[[NSApp delegate ]document] collectObjectsOfClass:NSClassFromString([aGroup adcClassName])];
+    for(id aCard in cards){
+        if([self fpdOnlyMode]){
+            if([aCard respondsToSelector:@selector(disableAllTriggersIfInVetoMode)]){
+                [aCard disableAllTriggersIfInVetoMode];
+            }
+        }
+        else {
+            if([aCard respondsToSelector:@selector(restoreTriggersIfInVetoMode)]){
+                [aCard restoreTriggersIfInVetoMode];
+            }
+        }
+    }
+    
+}
 
 - (float) lowLimit:(int)i
 {
