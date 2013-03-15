@@ -1948,7 +1948,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
         int hitRateLengthSec = 1<<hitRateLength;
 		float freq = 1.0/((double)hitRateLengthSec);
 				
-		unsigned long location = (([self crateNumber]&0x1e)<<21) | ([self stationNumber]& 0x0000001f)<<16;
+		unsigned long location = (([self crateNumber]&0xf)<<21) | ([self stationNumber]& 0x0000001f)<<16;
 		unsigned long data[5 + kNumV4FLTChannels];
 		
 		//combine all the hitrate read commands into one command packet
