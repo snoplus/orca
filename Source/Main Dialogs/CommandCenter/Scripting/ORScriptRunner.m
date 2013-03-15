@@ -604,7 +604,7 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 
 - (void) reportResult:(id)aResult
 {
-	if(finishTarget){
+	if(finishTarget && !stopThread && !exitNow){
 		NSInvocation* callBack = [NSInvocation invocationWithMethodSignature:[finishTarget methodSignatureForSelector:finishSelector]];
 		[callBack setSelector:finishSelector];
 		

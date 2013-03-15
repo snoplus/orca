@@ -129,6 +129,11 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 						 name : ORRunStoppedNotification
 					   object : nil];
 
+    [ notifyCenter addObserver: self
+                      selector: @selector( aboutToQuit: )
+                          name: ORDocumentClosedNotification
+                        object: nil];
+
     [notifyCenter addObserver: self
                      selector: @selector(aboutToQuit:)
                          name: OROrcaAboutToQuitNotice
