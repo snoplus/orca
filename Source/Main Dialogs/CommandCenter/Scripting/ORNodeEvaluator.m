@@ -294,9 +294,11 @@
 	NSString* argumentNameString = [self execute:[functionTable objectForKey:[NSString stringWithFormat:@"%@_ArgNode",aFunctionName]] container:nil];
 	NSArray* argKeys = [argumentNameString componentsSeparatedByString:@","];
 	if([argKeys count] == [argObject count]){
+        NSMutableDictionary* symbolTableForFunction = [self makeSymbolTable];
 		if([argObject count]){
-			return [NSDictionary dictionaryWithObjects:argObject forKeys:argKeys];
+            [symbolTableForFunction addEntriesFromDictionary:[NSDictionary dictionaryWithObjects:argObject forKeys:argKeys]];
 		}
+        return symbolTableForFunction;
 	}
 	else {
 		//arg count mismatch
