@@ -247,10 +247,11 @@
 	long ix;
 	for (ix=minX+1; ix<maxX;++ix) {	
 		[dataSource plotter:self index:ix x:&xValue y:&yValue];
-		if(xValue>maxXValue)break;
-		x = [mXScale getPixAbsFast:ix log:NO integer:YES minPad:aMinPadx];
-		y = [mYScale getPixAbsFast:yValue log:aLog integer:aInt minPad:aMinPad];
-		[theDataPath lineToPoint:NSMakePoint(x,y)];
+		if(xValue<maxXValue){
+            x = [mXScale getPixAbsFast:ix log:NO integer:YES minPad:aMinPadx];
+            y = [mYScale getPixAbsFast:yValue log:aLog integer:aInt minPad:aMinPad];
+            [theDataPath lineToPoint:NSMakePoint(x,y)];
+        }
 	}
 
 	if([self useConstantColor] || [plotView topPlot] == self)	[[self lineColor] set];
