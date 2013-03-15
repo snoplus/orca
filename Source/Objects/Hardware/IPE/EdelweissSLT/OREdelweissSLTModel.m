@@ -2943,7 +2943,7 @@ NSLog(@"WARNING: %@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class])
 
 	[self shipSltEvent:kSecondsCounterType withType:aType eventCt:0 high:th low:tl ];
 	#if 0
-	unsigned long location = (([self crateNumber]&0x1e)<<21) | ([self stationNumber]& 0x0000001f)<<16;
+	unsigned long location = (([self crateNumber]&0xf)<<21) | ([self stationNumber]& 0x0000001f)<<16;
 	unsigned long data[5];
 			data[0] = eventDataId | 5; 
 			data[1] = location | (aType & 0xf);
@@ -2957,7 +2957,7 @@ NSLog(@"WARNING: %@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class])
 
 - (void) shipSltEvent:(unsigned char)aCounterType withType:(unsigned char)aType eventCt:(unsigned long)c high:(unsigned long)h low:(unsigned long)l
 {
-	unsigned long location = (([self crateNumber]&0x1e)<<21) | ([self stationNumber]& 0x0000001f)<<16;
+	unsigned long location = (([self crateNumber]&0xf)<<21) | ([self stationNumber]& 0x0000001f)<<16;
 	unsigned long data[5];
 			data[0] = eventDataId | 5; 
 			data[1] = location | ((aCounterType & 0xf)<<4) | (aType & 0xf);
