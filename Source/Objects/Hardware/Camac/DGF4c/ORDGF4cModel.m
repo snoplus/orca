@@ -1773,7 +1773,7 @@ enum {
     
     //----------------------------------------------------------------------------------------
     controller = [[self adapter] controller]; //cache the controller for alittle bit more speed.
-    unChangingDataPart   = (([self crateNumber]&0x1e)<<21) | (([self stationNumber]& 0x0000001f)<<16); //doesn't change so do it here.
+    unChangingDataPart   = (([self crateNumber]&0xf)<<21) | (([self stationNumber]& 0x0000001f)<<16); //doesn't change so do it here.
 	cachedStation = [self stationNumber];
     [self clearExceptionCount];
     
@@ -1922,7 +1922,7 @@ enum {
 	
 	liveTimeData[0] = liveTimeId | 19;		//old version == 13 new version == 19
 	liveTimeData[1] = 0;					//spare
-	liveTimeData[2] = (([self crateNumber]&0x1e)<<21) | (([self stationNumber]& 0x0000001f)<<16);
+	liveTimeData[2] = (([self crateNumber]&0xf)<<21) | (([self stationNumber]& 0x0000001f)<<16);
 	
 	int chan;
 	
