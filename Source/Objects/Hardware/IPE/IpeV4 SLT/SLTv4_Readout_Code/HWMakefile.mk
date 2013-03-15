@@ -3,6 +3,18 @@
 -include linkwithdmalib.mk
 
 
+# 2013-03 changes -tb-
+# Simulation mode and new Macs (as local host): they use clang, not gcc any more:
+# - removed compile option -gstabs+ (GNU GCC specific)
+# - added defines to use gcc (now or from OSX 10.8 CXX is c++, CC?)
+# - added defines to use gcc and compile 32-bit application (for testing)
+#Standard: use standard on target system (usually gcc on Linux, clang/llvm on OSX >= 10.8)
+#CXX=gcc
+#CC=gcc
+#CXX=gcc -m32
+#CC=gcc -m32
+
+
 # RECOMMENDED SETUP:
 # It is assuemed that the fdhwlib is compiled in the folder: ~/src/v4
 #
@@ -38,7 +50,8 @@ else
   defflags2='-DPMC_LINK_WITH_DMA_LIB=0'
 endif
 
-UCFLAGS =  -g -Wall  -gstabs+ -I ~/src/v4/fdhwlib/src  $(defflags)  $(defflags2)
+UCFLAGS =  -g -Wall   -I ~/src/v4/fdhwlib/src  $(defflags)  $(defflags2)
+#2013-03: removed  -gstabs+: UCFLAGS =  -g -Wall  -gstabs+ -I ~/src/v4/fdhwlib/src  $(defflags)  $(defflags2)
 #Note: -Wno-sign-compare supresses 'comparison int with unsigned int' compiler warning -tb-
 #LFLAGS  = -fexceptions -lpbusaccess -lPbus1394 -lakutil -lpthread -lstdc++ \
 #                                /System/Library/Frameworks/CoreFoundation.framework/CoreFoundation \
