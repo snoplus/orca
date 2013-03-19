@@ -698,7 +698,7 @@
     [settingLockButton setState: locked];
 	[initBoardButton setEnabled:!lockedOrRunningMaintenance];
 	[reportButton setEnabled:!lockedOrRunningMaintenance];
-	[modeButton setEnabled:!lockedOrRunningMaintenance];
+	//[modeButton setEnabled:!lockedOrRunningMaintenance]; //as per Florian's request 3/19/2013
 	[resetButton setEnabled:!lockedOrRunningMaintenance];
     [gainTextFields setEnabled:!lockedOrRunningMaintenance];
     [thresholdTextFields setEnabled:!lockedOrRunningMaintenance];

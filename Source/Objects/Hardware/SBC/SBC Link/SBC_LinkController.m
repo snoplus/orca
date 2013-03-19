@@ -540,8 +540,8 @@
 	[pingButton setEnabled:!locked && !runInProgress];
     [cbTestButton setEnabled:!locked && !runInProgress && connected];
 	[payloadSizeSlider setEnabled:!locked && !runInProgress && connected];
-    [connectButton setEnabled:!locked && !runInProgress];
-    [connect1Button setEnabled:!locked && !runInProgress];
+    [connectButton setEnabled:!runInProgress];
+    [connect1Button setEnabled:!runInProgress];
 	[killCrateButton setEnabled:!locked && !runInProgress];
     [loadModeMatrix setEnabled:!locked && !runInProgress];
     [forceReloadButton setEnabled:!locked && !runInProgress];

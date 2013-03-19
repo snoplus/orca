@@ -560,7 +560,7 @@
     [readGainButton setEnabled:!locked && ![model setAllGains]];
     [readAdcsButton setEnabled:!locked];
     [selectModuleButton setEnabled:!locked];
-    [loadButtonAll setEnabled:!locked];
+    //[loadButtonAll setEnabled:!locked]; //as per Florian's request 3/19/2013
     [gainTableView setEnabled:!locked];
     [writeGainButton setEnabled:!lockedOrRunningMaintenance];
     [loadButton0 setEnabled:!lockedOrRunningMaintenance];

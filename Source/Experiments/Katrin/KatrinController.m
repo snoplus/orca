@@ -510,7 +510,7 @@
     [super detectorLockChanged:aNotification];
     BOOL locked = [gSecurity isLocked:[model experimentDetectorLock]];
     BOOL running = [gOrcaGlobals runInProgress];
-    [fpdOnlyModeButton setEnabled: !locked & !running];
+    //[fpdOnlyModeButton setEnabled: !locked & !running]; //as per Florian's request 3/19/2013
 }
 
 - (void) secondaryAdcClassNameChanged:(NSNotification*)aNote

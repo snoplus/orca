@@ -274,7 +274,7 @@
 {
     BOOL locked			= [gSecurity isLocked:ORNplpCMeterLock];
 
-	[ipConnectButton setEnabled:!locked];
+	//[ipConnectButton setEnabled:!locked]; //as per Florian's request 3/19/2013
 	[ipAddressTextField setEnabled:!locked];
     [lowLimitMatrix setEnabled:!locked];
     [hiLimitMatrix setEnabled:!locked];
