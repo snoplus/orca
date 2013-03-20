@@ -451,7 +451,7 @@ void InitSLTPbus(void)
 	uint32_t val;
 	presentFLTMap = 0;
 	for(flt=0; flt<MAX_NUM_FLT_CARDS; flt++){
-	//for(flt=0; flt<16; flt++){
+	//for(flt=0; flt<16; flt++){ //TODO:  <-------------------USE ABOVE LINE!!!!! Sascha NEEDS TO FIX IT -tb-
 	    val = pbus->read(FLTVersionReg(flt+1));
 	    printf("FLT#%i (idx %i): version 0x%08x\n",flt+1,flt,val);
 	    if(val!=0x1f000000 && val!=0xffffffff){
@@ -3001,6 +3001,41 @@ int FIFOREADER::writeToAsciiFile(const char *buf, size_t n, int udpdataSec)
 //make it global: is 3 for BB2, 2 for BBv21 mode!!!!!!!!!! -tb-
 //int	Nb_mots_lecture=3;					//marche pour un seul bolo	// nombre de mots total relut dans les data de la fifo:   -tb- d.h. Anzahl 32-bit-Worte(FIFO-Worte) pro (Time-)Sample (Sample=alle ADC-Kanaele
 
+int rereadNumADCsInDataStream()
+{
+                int numADCsInDataStream = 0;
+                int currPixBusEnable = 0;
+                currPixBusEnable = pbus->read(SLTPixbusEnableReg);
+                int flt;
+                uint32_t StreamMask_1[20],StreamMask_2[20];
+                int ADCsinFLT[20];
+	              //FLT
+	              for(flt=0; flt<20; flt++){
+                      ADCsinFLT[flt]=0;
+	                  if( (presentFLTMap & bit[flt])  &&   (currPixBusEnable & bit[flt])){//if FLT is present AND FLT set in pixbusenable reg ...
+	                      //printf("populateIPECrateStatusPacket: FLT %i is present\n",flt);
+						  StreamMask_1[flt]= pbus->read(FLTStreamMask_1Reg(flt+1));
+						  StreamMask_2[flt]= pbus->read(FLTStreamMask_2Reg(flt+1));
+	                  }
+	                  else
+	                  {
+	                      //printf("populateIPECrateStatusPacket: FLT %i NOT present\n",flt);
+						  StreamMask_1[flt]= 0;
+						  StreamMask_2[flt]= 0;
+	                  }
+                      //
+                      //printf("counting ADC channels: FLT %i: #ADCs: %i\n",flt,ADCsinFLT[flt]);
+                      ADCsinFLT[flt]=numOfBits(StreamMask_1[flt])+numOfBits(StreamMask_2[flt]);
+                      //printf("counting ADC channels: FLT %i: #ADCs: %i\n",flt,ADCsinFLT[flt]);
+                      if( (ADCsinFLT[flt] % 6) != 0)
+                          ADCsinFLT[flt] = ((ADCsinFLT[flt] / 6)+1) *6;//'round' to next multiple of 6
+                      //printf("counting ADC channels: FLT %i: #ADCs: %i\n",flt,ADCsinFLT[flt]);
+                      numADCsInDataStream += ADCsinFLT[flt];
+	              }
+                  //printf("counting ADC channels: total sum #ADCs: %i\n",numADCsInDataStream);
+    return numADCsInDataStream;
+}
+
 /*--------------------------------------------------------------------
  *    function:     FIFOREADER::scanFIFObuffer
  *    purpose:      scan data in FIFO buffer; search for header word; send UDP packets
@@ -3211,7 +3246,7 @@ void FIFOREADER::scanFIFObuffer(void)
 
 
         //********************************************************************************************************
-        //*                                    prepare BB status packet                                        *
+        //*                                    prepare crate + BB status packet                                        *
         //********************************************************************************************************
 
         if(FIFObuf32avail>=4){//we need all 4 words of the header 'sentence' to extract the time stamp
@@ -3222,36 +3257,8 @@ void FIFOREADER::scanFIFObuffer(void)
             //recompute number of ADC channels in data stream when we freshly become synchronized
             #if 1 //does this cause the SLT hangups? NO! (added this code later)
             if(!oldisSynchronized && isSynchronized){
-                numADCsInDataStream = 0;
-                int currPixBusEnable = 0;
-                currPixBusEnable = pbus->read(SLTPixbusEnableReg);
-                int flt;
-                uint32_t StreamMask_1[20],StreamMask_2[20];
-                int ADCsinFLT[20];
-	              //FLT
-	              for(flt=0; flt<20; flt++){
-                      ADCsinFLT[flt]=0;
-	                  if( (presentFLTMap & bit[flt])  &&   (currPixBusEnable & bit[flt])){//if FLT is present AND FLT set in pixbusenable reg ...
-	                      //printf("populateIPECrateStatusPacket: FLT %i is present\n",flt);
-						  StreamMask_1[flt]= pbus->read(FLTStreamMask_1Reg(flt+1));
-						  StreamMask_2[flt]= pbus->read(FLTStreamMask_2Reg(flt+1));
-	                  }
-	                  else
-	                  {
-	                      //printf("populateIPECrateStatusPacket: FLT %i NOT present\n",flt);
-						  StreamMask_1[flt]= 0;
-						  StreamMask_2[flt]= 0;
-	                  }
-                      //
-                      //printf("counting ADC channels: FLT %i: #ADCs: %i\n",flt,ADCsinFLT[flt]);
-                      ADCsinFLT[flt]=numOfBits(StreamMask_1[flt])+numOfBits(StreamMask_2[flt]);
-                      //printf("counting ADC channels: FLT %i: #ADCs: %i\n",flt,ADCsinFLT[flt]);
-                      if( (ADCsinFLT[flt] % 6) != 0)
-                          ADCsinFLT[flt] = ((ADCsinFLT[flt] / 6)+1) *6;//'round' to next multiple of 6
-                      //printf("counting ADC channels: FLT %i: #ADCs: %i\n",flt,ADCsinFLT[flt]);
-                      numADCsInDataStream += ADCsinFLT[flt];
-	              }
-                  printf("counting ADC channels: total sum #ADCs: %i\n",numADCsInDataStream);
+                numADCsInDataStream = rereadNumADCsInDataStream();
+                printf("counting ADC channels: total sum #ADCs: %i\n",numADCsInDataStream);
             }
             #endif
             
@@ -3692,6 +3699,7 @@ void FIFOREADER::readFIFOtoFIFObuffer(void)
         //pbus->readBlock(FIFOAddr(numfifo), (uint32_t*)&FIFObuf32[pushIndexFIFObuf32], FIFOBlockSize);
 		//pseudo block mode
         //pbus->readBlock(FIFOAddr(numfifo) | 0x80000000, (unsigned long*)&FIFObuf32[pushIndexFIFObuf32], FIFOBlockSize);//pseudo block read 
+#if 0
 if(1){ //DEBUG search explicitly for header ...
         uint32_t i; 
         uint32_t val;
@@ -3709,6 +3717,7 @@ if(1){ //DEBUG search explicitly for header ...
         //    printf("============= next val 0x%08x\n",val);
         //}
 }
+#endif
         #else
         //use single access
         int i; 
@@ -3770,7 +3779,7 @@ void RunSomeHardwareTests()
     if(((version >> 16) & 0x0fff) >= 0x130){
         printf("  SLT supports single FIFO: OK\n");
     }else{
-        printf("  SLT DOESNT supports single FIFO: ERROR\n");
+        printf("  ERROR: SLT DOESNT support single FIFO - use newer firmware! - ERROR\n");
         exit(2);
     }
 

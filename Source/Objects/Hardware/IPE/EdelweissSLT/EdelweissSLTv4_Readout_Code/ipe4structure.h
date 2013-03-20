@@ -582,7 +582,7 @@ typedef struct {
 	uint32_t internal_error_info;
 	uint32_t ipe4reader_status;
 	uint32_t version;          // _may_ be useful in some particular cases (version of C code/firmware/hardware?) 
-	uint32_t numADCs;           // reserved for future usage
+	uint32_t numADCs;           // total number of ADCs in the UDP data packets
 	uint32_t spare2;           // reserved for future usage
 } TypeIpeCrateStatusBlock;
 
