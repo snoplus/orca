@@ -195,7 +195,7 @@ void doWriteBlock(SBC_Packet* aPacket,uint8_t reply)
     uint32_t numItems       = p->numItems;
     
     p++;                                /*point to the data*/
-    int32_t* lptr = (int32_t*)p;        /*cast to the data type*/ 
+    uint32_t* lptr = (uint32_t*)p;        /*cast to the data type*/ 
     if(needToSwap) SwapLongBlock(lptr,numItems);
     
     //**** use device driver call to write data to HW
@@ -243,7 +243,7 @@ void doWriteBlock(SBC_Packet* aPacket,uint8_t reply)
         returnDataPtr->errorCode = perr;        
     }
     
-    lptr = (int32_t*)returnDataPtr;
+    lptr = (uint32_t*)returnDataPtr;
     if(needToSwap)SwapLongBlock(lptr,numItems);
     
     //send back to ORCA
@@ -274,7 +274,7 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply)
     
     SBC_IPEv4ReadBlockStruct* returnDataPtr = (SBC_IPEv4ReadBlockStruct*)aPacket->payload;
     char* returnPayload = (char*)(returnDataPtr+1);
-    unsigned long *lPtr = (unsigned long *) returnPayload;
+    uint32_t *lPtr = (uint32_t *) returnPayload;
     
     int32_t perr   = 0;
 #if USE_PBUS
@@ -407,8 +407,8 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply)  // 'simulation' version -tb
     aPacket->cmdHeader.numberBytesinPayload    = sizeof(SBC_IPEv4ReadBlockStruct) + numItems*sizeof(uint32_t);
     
     SBC_IPEv4ReadBlockStruct* returnDataPtr = (SBC_IPEv4ReadBlockStruct*)aPacket->payload;
-    char* returnPayload = (char*)(returnDataPtr+1);
-    unsigned long *lPtr = (unsigned long *) returnPayload;
+    char* returnPayload = (char*)(returnDataPtr+1);//'+1': leave space for the SBC_IPEv4ReadBlockStruct, store response behind it (lPtr will point there)
+    uint32_t *lPtr = (uint32_t *) returnPayload;
     
     int32_t perr   = 0;
 	//hardware read access removed (was here) -tb-
