@@ -28,10 +28,10 @@
 	@private
 	
     //BB commands
-	    IBOutlet   NSTextField* eventFifoStatusRegTextField;
+    IBOutlet   NSTextField* eventFifoStatusRegTextField;
 	IBOutlet   NSTextField* crateUDPDataCommandTextField;
 	IBOutlet   NSTextField* BBCmdFFMaskTextField;
-		IBOutlet NSMatrix*		BBCmdFFMaskMatrix;
+    IBOutlet   NSMatrix*		BBCmdFFMaskMatrix;
 	IBOutlet   NSTextField* cmdWArg4TextField;
 	IBOutlet   NSTextField* cmdWArg3TextField;
 	IBOutlet   NSTextField* cmdWArg2TextField;
@@ -40,6 +40,8 @@
         //DAQ mode
 	    IBOutlet   NSTextField* sltDAQModeTextField;
 		IBOutlet NSPopUpButton* sltDAQModePU;
+	IBOutlet   NSButton* takeEventDataCB;
+	IBOutlet   NSButton* takeUDPstreamDataCB;
         
         //UDP Data tab ----
 	IBOutlet   NSTextField* numRequestedUDPPacketsTextField;
@@ -157,6 +159,8 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+- (void) takeEventDataChanged:(NSNotification*)aNote;
+- (void) takeUDPstreamDataChanged:(NSNotification*)aNote;
 - (void) crateUDPDataCommandChanged:(NSNotification*)aNote;
 - (void) BBCmdFFMaskChanged:(NSNotification*)aNote;
 - (void) cmdWArg4Changed:(NSNotification*)aNote;
@@ -209,6 +213,8 @@
 - (void) enableRegControls;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+- (IBAction) takeEventDataCBAction:(id)sender;
+- (IBAction) takeUDPstreamDataCBAction:(id)sender;
 - (IBAction) crateUDPDataCommandTextFieldAction:(id)sender;
 - (IBAction) BBCmdFFMaskTextFieldAction:(id)sender;
 - (IBAction) BBCmdFFMaskMatrixAction:(id)sender;
@@ -218,8 +224,7 @@
 - (IBAction) cmdWArg1TextFieldAction:(id)sender;
 - (IBAction) sltDAQModePUAction:(id)sender;
 - (IBAction) sltDAQModeTextFieldAction:(id)sender;
-- (IBAction) setMasterModeButtonAction:(id)sender;
-- (IBAction) setSlaveModeButtonAction:(id)sender;
+- (IBAction) readAllControlSettingsFromHWButtonAction:(id)sender;
 
 - (IBAction) eventFifoStatusRegTextFieldAction:(id)sender;
 - (IBAction) pixelBusEnableRegTextFieldAction:(id)sender;

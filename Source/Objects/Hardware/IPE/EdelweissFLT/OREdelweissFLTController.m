@@ -922,7 +922,16 @@
 - (IBAction) readBBStatusBitsButtonAction:(id)sender
 {
         //DEBUG OUTPUT:         NSLog(@"%@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
+        //[model readBBStatusBits];
+	[self endEditing];
+	@try {
         [model readBBStatusBits];
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Exception '%@'-'%@' in %@::%@ ; FLT (%d) \n",[localException name],[localException reason],NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model stationNumber]);
+        NSRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
+                        localException,[model stationNumber]);
+	}
 }
 
 - (IBAction) readAllBBStatusBitsButtonAction:(id)sender
@@ -948,13 +957,29 @@
 - (IBAction) readFiberOutMaskButtonAction:(id)sender
 {
         //DEBUG OUTPUT:         NSLog(@"%@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
+	[self endEditing];
+	@try {
         [model readFiberOutMask];
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Exception '%@'-'%@' in %@::%@ ; FLT (%d) \n",[localException name],[localException reason],NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model stationNumber]);
+        NSRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
+                        localException,[model stationNumber]);
+	}
 }
 
 - (IBAction) writeFiberOutMaskButtonAction:(id)sender
 {
         //DEBUG OUTPUT: 	        NSLog(@"%@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
+	[self endEditing];
+	@try {
         [model writeFiberOutMask];
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Exception '%@'-'%@' in %@::%@ ; FLT (%d) \n",[localException name],[localException reason],NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model stationNumber]);
+        NSRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
+                        localException,[model stationNumber]);
+	}
 }
 
 
@@ -977,15 +1002,37 @@
 {
     //DEBUG
  	NSLog(@"%@::%@ \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
-	[model writeControl];	
+
+	[self endEditing];
+	@try {
+    	[model writeControl];	
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Exception '%@'-'%@' in %@::%@ ; FLT (%d) \n",[localException name],[localException reason],NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model stationNumber]);
+        NSRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
+                        localException,[model stationNumber]);
+	}
 }
 
 - (IBAction) readControlRegisterButtonAction:(id)sender
 {
     //DEBUG
  	NSLog(@"%@::%@ \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
-	//[model setStatusLatency:[sender indexOfSelectedItem]];	
-	unsigned long controlReg = [model  readControl]; //TODO: use try ... catch ... ? -tb-
+
+
+	unsigned long controlReg = 0; //TODO: use try ... catch ... ? -tb-
+	[self endEditing];
+	@try {
+	    controlReg = [model  readControl]; //TODO: use try ... catch ... ? -tb-
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Exception '%@'-'%@' in %@::%@ ; FLT (%d) \n",[localException name],[localException reason],NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model stationNumber]);
+        NSRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
+                        localException,[model stationNumber]);
+        return;
+	}
+
+
 	[model  setControlRegister: controlReg];
 
 }
@@ -1015,8 +1062,16 @@
 {
     //DEBUG
  	NSLog(@"%@::%@ \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
-	[model readStatus];	
-	[model readTotalTriggerNRegister];	
+
+	@try {
+	    [model readStatus];	
+	    [model readTotalTriggerNRegister];	
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Exception '%@'-'%@' in %@::%@ ; FLT (%d) \n",[localException name],[localException reason],NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model stationNumber]);
+        NSRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
+                        localException,[model stationNumber]);
+	}
 }
 
 - (void) statusRegisterTextFieldAction:(id)sender
@@ -1033,14 +1088,34 @@
 {
 //DEBUG OUTPUT:
  	NSLog(@"%@::%@ \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
-	[model writeFiberDelays];	
+		
+	[self endEditing];
+	@try {
+	    [model writeFiberDelays];	
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Exception '%@'-'%@' in %@::%@ ; FLT (%d) \n",[localException name],[localException reason],NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model stationNumber]);
+        NSRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
+                        localException,[model stationNumber]);
+	}
 }
 
 - (void) readFiberDelaysButtonAction:(id)sender
 {
 //DEBUG OUTPUT:
  	NSLog(@"%@::%@ \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
-	[model readFiberDelays];	
+	//[model readFiberDelays];	
+    
+	[self endEditing];
+	@try {
+	    [model readFiberDelays];	
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Exception '%@'-'%@' in %@::%@ ; FLT (%d) \n",[localException name],[localException reason],NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model stationNumber]);
+        NSRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
+                        localException,[model stationNumber]);
+	}
+
 }
 
 - (void) fiberDelaysTextFieldAction:(id)sender
@@ -1108,10 +1183,34 @@
 
 
 - (IBAction) writeStreamMaskRegisterButtonAction:(id)sender
-{	[model writeStreamMask];	}
+{
+	//[model writeStreamMask];	
+    
+	[self endEditing];
+	@try {
+	    [model writeStreamMask];	
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Exception '%@'-'%@' in %@::%@ ; FLT (%d) \n",[localException name],[localException reason],NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model stationNumber]);
+        NSRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
+                        localException,[model stationNumber]);
+	}
+}
 
 - (IBAction) readStreamMaskRegisterButtonAction:(id)sender
-{	[model readStreamMask];	}
+{
+	//[model readStreamMask];	
+    
+	[self endEditing];
+	@try {
+	    [model readStreamMask];	
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Exception '%@'-'%@' in %@::%@ ; FLT (%d) \n",[localException name],[localException reason],NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model stationNumber]);
+        NSRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
+                        localException,[model stationNumber]);
+	}
+}
 
 
 
@@ -1171,29 +1270,64 @@
 {
     //DEBUG OUTPUT:
  	NSLog(@"%@::%@ \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
-	[model writeCommandResync];	
+	//[model writeCommandResync];	
+    
+	@try {
+	    [model writeCommandResync];	
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Exception '%@'-'%@' in %@::%@ ; FLT (%d) \n",[localException name],[localException reason],NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model stationNumber]);
+        NSRunAlertPanel([localException name], @"%@\nWrite of FLT%d failed", @"OK", nil, nil,
+                        localException,[model stationNumber]);
+	}
 }
 
 - (IBAction) writeCommandTrigEvCounterResetAction:(id)sender
 {
-    //DEBUG OUTPUT:
- 	NSLog(@"%@::%@ \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
-	[model writeCommandTrigEvCounterReset];	
+    //DEBUG OUTPUT: 	NSLog(@"%@::%@ \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+	//[model writeCommandTrigEvCounterReset];	
+    
+	@try {
+	    [model writeCommandTrigEvCounterReset];	
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Exception '%@'-'%@' in %@::%@ ; FLT (%d) \n",[localException name],[localException reason],NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model stationNumber]);
+        NSRunAlertPanel([localException name], @"%@\nWrite of FLT%d failed", @"OK", nil, nil,
+                        localException,[model stationNumber]);
+	}
 }
 
 - (IBAction) writeSWTriggerAction:(id)sender
 {
-	[model writeCommandSoftwareTrigger];	
+	@try {
+	    [model writeCommandSoftwareTrigger];	
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Exception '%@'-'%@' in %@::%@ ; FLT (%d) \n",[localException name],[localException reason],NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model stationNumber]);
+        NSRunAlertPanel([localException name], @"%@\nWrite of FLT%d failed", @"OK", nil, nil,
+                        localException,[model stationNumber]);
+	}
 }
 
 - (IBAction) readTriggerDataAction:(id)sender
 {
 //DEBUG OUTPUT:
  	NSLog(@"%@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
-	[model readTriggerData];	
+
+	[self endEditing];
+	@try {
+	    [model readTriggerData];	
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Exception '%@'-'%@' in %@::%@ ; FLT (%d) \n",[localException name],[localException reason],NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model stationNumber]);
+        NSRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
+                        localException,[model stationNumber]);
+	}
 }
 
 
+
+//TODO: 'old' KATRIN functions, remove it -tb-
 - (void) targetRateAction:(id)sender
 {
 	[model setTargetRate:[sender intValue]];	
@@ -1407,7 +1541,7 @@
 		[model initBoard];
 	}
 	@catch(NSException* localException) {
-		NSLog(@"Exception intitBoard FLT (%d) status\n",[model stationNumber]);
+		NSLog(@"Exception initBoard FLT (%d) status\n",[model stationNumber]);
         NSRunAlertPanel([localException name], @"%@\nWrite of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}

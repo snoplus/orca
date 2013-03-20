@@ -36,3 +36,17 @@
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
 @end
+
+
+
+
+@interface OREdelweissSLTDecoderForADCTrace : ORIpeCardDecoder {
+	@private 
+		BOOL getRatesFromDecodeStage;
+		NSMutableDictionary* actualFlts;
+}
+// Documentation in m-file
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
+- (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
+@end
+

@@ -2134,7 +2134,7 @@ static int counter=0;
         
         int i;
         
-        @try{
+        @try{//I could omit it here because I catch exceptions in the controller (see comment below) -tb-
         
         for(i=0;i<30;i++){
             //BBStatus32[i]=i*2+i*0x10000; // for testing without hardware
@@ -2144,6 +2144,7 @@ static int counter=0;
         }
 		@catch(NSException* e){
 			NSLog(@"Could not read status bits because of exception -%@- with reason -%@-\n",[e name],[e reason]);
+            [e raise];//give exception over to higher/calling level -tb-
             return;
 		}
         

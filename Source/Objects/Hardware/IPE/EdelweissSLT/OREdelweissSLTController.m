@@ -286,9 +286,29 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
                          name : OREdelweissSLTModelCrateUDPDataCommandChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(takeUDPstreamDataChanged:)
+                         name : OREdelweissSLTModelTakeUDPstreamDataChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(takeEventDataChanged:)
+                         name : OREdelweissSLTModelTakeEventDataChanged
+						object: model];
+
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+
+- (void) takeEventDataChanged:(NSNotification*)aNote
+{
+	[takeEventDataCB setIntValue: [model takeEventData]];
+}
+
+- (void) takeUDPstreamDataChanged:(NSNotification*)aNote
+{
+	[takeUDPstreamDataCB setIntValue: [model takeUDPstreamData]];
+}
 
 - (void) crateUDPDataCommandChanged:(NSNotification*)aNote
 {
@@ -597,6 +617,8 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	[self cmdWArg4Changed:nil];
 	[self BBCmdFFMaskChanged:nil];
 	[self crateUDPDataCommandChanged:nil];
+	[self takeUDPstreamDataChanged:nil];
+	[self takeEventDataChanged:nil];
 }
 
 
@@ -745,6 +767,16 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 #pragma mark ***Actions
 
+- (void) takeEventDataCBAction:(id)sender
+{
+	[model setTakeEventData:[sender intValue]];	
+}
+
+- (void) takeUDPstreamDataCBAction:(id)sender
+{
+	[model setTakeUDPstreamData:[sender intValue]];	
+}
+
 - (void) crateUDPDataCommandTextFieldAction:(id)sender
 {
 	[model setCrateUDPDataCommand:[sender stringValue]];	
@@ -800,15 +832,11 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	[model setSltDAQMode:[sender intValue]];	
 }
 
-- (IBAction) setMasterModeButtonAction:(id)sender
+- (IBAction) readAllControlSettingsFromHWButtonAction:(id)sender
 {
-	[model writeMasterMode];
+	[model readAllControlSettingsFromHW];
 }
 
-- (IBAction) setSlaveModeButtonAction:(id)sender
-{
-	[model writeSlaveMode];
-}
 
 - (void) eventFifoStatusRegTextFieldAction:(id)sender
 {

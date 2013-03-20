@@ -190,6 +190,8 @@ static IpeRegisterNamesStruct regV4[kSltV4NumRegs] = {
 
 volatile int vflag = 0;
 
+
+#define kMaxNumUDPDataPackets 100000
 typedef struct{
 	    int started;
 	    int stopNow;
@@ -197,6 +199,23 @@ typedef struct{
 		struct sockaddr_in sockaddr_data_from;
 		int UDP_DATA_REPLY_SERVER_SOCKET;
         int isListeningOnDataServerSocket;
+
+    //ADC buffer: 2 seconds buffer; 20 FLT * 36 chan = 720 ADCs -> 2*720=1440 Bytes; 100 000 samples per ADC channel -> 144 000 000 Bytes / 1440 Bytes (UDP Packet Size) = 100000 Pakete bzw. 144 MB
+    //increased from 1440 to 1500 (packet size)
+    char adcBuf[2][kMaxNumUDPDataPackets][1500];//store the UDP packets
+    int adcBufSize[2][kMaxNumUDPDataPackets];//store the size in bytes of the according UDP packet
+    char adcBufReceivedFlag[2][kMaxNumUDPDataPackets];//flag which marks that this packet was received
+    int  hasDataPackets[2];
+    int  hasDataBytes[2];
+    int  numADCsInDataStream[2];
+    TypeIpeCrateStatusBlock  crateStatusBlock[2];
+    
+    int isSynchronized,wrIndex, rdIndex;
+    uint32_t dataPacketCounter;
+    //trace buffer: reorganized adcBuf to store all 100000 samples of one ADC channel (of 720 ADC channels)
+    uint16_t adcTraceBuf[2][720][100000];//TODO: allocate dynamically? (I want to use pure C to be able to use it in Obj-C and C++) -tb-
+    int32_t adcTraceBufCount[2][720];//count filled in shorts in accordingadcTraceBuf[2][720][100000]  -tb-
+    
 } THREAD_DATA;
 
 THREAD_DATA dataReplyThreadData;
@@ -208,10 +227,18 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
 {
 	
 	THREAD_DATA *dataReplyThreadData = (THREAD_DATA *)p;
-	
+    dataReplyThreadData->hasDataPackets[0]=0;
+    dataReplyThreadData->hasDataPackets[1]=0;
+    
+    //store some vars
+    int *wrIndex = &(dataReplyThreadData->wrIndex);//we cannot use references, we are in C, not C++
+    int *rdIndex = &(dataReplyThreadData->rdIndex);//we cannot use references, we are in C, not C++
+	int32_t debugCounter=0;
 	
 	//static int counterStatusPacket=0; //MAH commented out 9/17/2012 to get rid of compiler unused variable warning
-	static int counterData1444Packet=0;
+//static int counterData1444Packet=0;
+	int counterDataPacket=-1;
+	int32_t counterDataPacketPayload=-1;
 	
 	//[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(receiveFromDataReplyServer) object:nil];
 	
@@ -262,23 +289,25 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
 	        NSLog(@"     receiveFromDataReplyServerThreadFunction: Got UDP data from %s!  \n", inet_ntoa(dataReplyThreadData->sockaddr_data_from.sin_addr));//TODO: DEBUG -tb-
 			
 	    }
+        
+#if 0
 	    if(retval == 1444 && counterData1444Packet==0){
 	        NSLog(@"     receiveFromDataReplyServerThreadFunction: Got UDP data packet from %s!  \n",  inet_ntoa(dataReplyThreadData->sockaddr_data_from.sin_addr));//TODO: DEBUG -tb-
 			int i;
 			uint16_t *shorts=(uint16_t *)readBuffer;
 			NSMutableString *s = [[NSMutableString alloc] init];
 			[s setString:@""];
-#if 0
+  #if 0
 			//TODO: using this the sequence is reverted!!!!! eg. 0x4122 0x4111 0x4244 0x4133 ....
 			for(i=0;i<16;i++){
 			    [s appendFormat:@" 0x%04x",shorts[i]];
 			}
-#else
+  #else
 			for(i=0;i<8;i++){
 			    [s appendFormat:@" 0x%04x",shorts[i*2+1]];
 			    [s appendFormat:@" 0x%04x",shorts[i*2]];
 			}
-#endif
+  #endif
 			NSLog(@"%@\n",s);
 		}
 		
@@ -298,10 +327,11 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
 				}
 			}
 		}
+#endif
         
         //handle known data packets:
         //
-        if(retval>=4){
+        if(retval>4){
             uint32_t *hptr = (uint32_t *)(readBuffer);
             char *ptr=readBuffer;
             //--->synchro status packet
@@ -310,7 +340,7 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
 				NSLog(@"    -- Found a OLD STYLE Status packet: header 0x%08x , size %i, skip parsing!\n",*hptr, retval);
                 continue;
             }
-            if((*hptr == 0x0000ffff) || (*hptr == 0x0000fffe) ){//this is a synchro status packet
+            if((*hptr == 0x0000ffff) || (*hptr == 0x0000fffe) ){//this is a synchro or status packet
                 TypeStatusHeader *header = (TypeStatusHeader *)readBuffer;
 				NSLog(@"  Found a Status packet: header 0x%08x ,     length (bytes) %i \n",header->identifiant ,retval);
                 //let ptr point to first statusBlock 
@@ -322,10 +352,53 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
 				    NSLog(@"      size_bytes: %i \n",crateStatusBlock->size_bytes);
                     uint32_t ps=crateStatusBlock->prog_status;
 				    if(ps>0)NSLog(@"      prog_status: 0x%08x: stat: %i  percent:%i%c \n",ps,ps&0xf, (ps>>8)&0xfff,'%');
+                    //if not a prog_status packet, prepare write buffer
+                    
+                    
+                    //prepare toggling buffer (finish the current write buffer before!)
+                    if(dataReplyThreadData->isSynchronized){
+                        //we got a new synchro packet -> toggle buffers
+                        if(dataReplyThreadData->rdIndex!=-1){
+                            dataReplyThreadData->rdIndex=dataReplyThreadData->wrIndex;
+                            dataReplyThreadData->wrIndex=(dataReplyThreadData->wrIndex+1) % 2; //toggle between 0 and 1
+                        }else{//we were in the first cycle
+                            dataReplyThreadData->rdIndex=0;
+                            dataReplyThreadData->wrIndex=1; 
+                        }
+                        //mark as "ready for readout"
+                        dataReplyThreadData->hasDataPackets[dataReplyThreadData->rdIndex]=counterDataPacket;
+                        dataReplyThreadData->hasDataBytes[dataReplyThreadData->rdIndex]  =counterDataPacketPayload;
+                    }else{
+                        //now we are synchronized the first time in this cycle! init!
+                        dataReplyThreadData->isSynchronized=1;
+                        dataReplyThreadData->wrIndex=0; 
+                        dataReplyThreadData->rdIndex=-1;
+                    }
+                    //store some infos from status packet in buffer
                     uint32_t numADCsInDataStream=crateStatusBlock->numADCs;
                     if(numADCsInDataStream>0) NSLog(@"      numADCs In Data Stream: %i \n",numADCsInDataStream);
+                    dataReplyThreadData->numADCsInDataStream[*wrIndex]=numADCsInDataStream;
+                    //    we buffer the whole crate status block ...
+                    memcpy(&(dataReplyThreadData->crateStatusBlock[*wrIndex]), crateStatusBlock, sizeof(TypeIpeCrateStatusBlock));
+                    //if we are synchronized, "reset" write buffer (reset flags)
+                    #if 1
+                    memset(dataReplyThreadData->adcBufReceivedFlag[*wrIndex],0,kMaxNumUDPDataPackets);
+                    #else
+                    int i;
+                    for(i=0;i<kMaxNumUDPDataPackets; i++){
+                        dataReplyThreadData->adcBufReceivedFlag[*wrIndex][i]=0;
+                    }
+                    #endif
+                    if(counterDataPacket>0){
+				        NSLog(@"  counterDataPacket:      %i    read ADC bytes: %i\n",counterDataPacket,counterDataPacketPayload);
+                    }
+                    //reset counter for next "round"
+                    counterDataPacket=0;
+                    counterDataPacketPayload=0;
                     //let ptr point behind current block (usually the first TypeBBStatusBlock )
                     ptr += crateStatusBlock->size_bytes;
+                    //debugging
+                    debugCounter++;
                 }else{
 				    NSLog(@"  BB status block UDP  packet:    id %i \n",header->identifiant);
                 }
@@ -371,8 +444,40 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
                     }
                 }
 #endif
+            }else{//if((*hptr == 0x0000ffff) || (*hptr == 0x0000fffe) ) ... 
+                int i;
+                //all other packets are data packets
+                //1. extract timestamp and packet number
+                uint16_t *adc16ptr = (uint16_t *)(readBuffer);
+                if(adc16ptr[0] == 0){//its the first packet -> debug output of some data
+			        NSMutableString *s = [[NSMutableString alloc] init];
+			        [s setString:@""];
+ 			        for(i=0;i<8;i++){
+			            [s appendFormat:@" 0x%04x",adc16ptr[i*2]];
+			            [s appendFormat:@" 0x%04x",adc16ptr[i*2+1]];
+			        }
+ 	         		NSLog(@"UDP0:%@\n",s);
+                }
+                //copy UDP packet to buffer
+                size_t size=retval;
+                int index = adc16ptr[0];
+                if(size<1500 && index<kMaxNumUDPDataPackets){
+                    if(dataReplyThreadData->adcBufReceivedFlag[*wrIndex][index]==1){//error; already received this packet number
+ 	         		    //NSLog(@"ERROR: received packet %i at least twice!!!!!!\n", index);
+                    }
+                    memcpy(dataReplyThreadData->adcBuf[*wrIndex][index], readBuffer, size);//copy UDP packet with header
+                    dataReplyThreadData->adcBufSize[*wrIndex][index]=size;
+                    if(debugCounter<4 && index <4){
+                        NSLog(@"copy   packet with index %i num %i TS %i (size %i (%i))\n", index, adc16ptr[0],adc16ptr[1], size, dataReplyThreadData->adcBufSize[*wrIndex][index]);
+                    }
+                    dataReplyThreadData->adcBufReceivedFlag[*wrIndex][index]=1;
+                    counterDataPacket++;
+                    counterDataPacketPayload += size-4;//subtract header
+                }else{
+                }
             }
-        }
+
+        }//if(retval>4) ... smaller packets are corrupted (must contain at least the 4 byte header)
 
 	}while(doRunLoop);//for(l ...
 	
@@ -392,6 +497,8 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
 
 #pragma mark ***External Strings
 
+NSString* OREdelweissSLTModelTakeEventDataChanged = @"OREdelweissSLTModelTakeEventDataChanged";
+NSString* OREdelweissSLTModelTakeUDPstreamDataChanged = @"OREdelweissSLTModelTakeUDPstreamDataChanged";
 NSString* OREdelweissSLTModelCrateUDPDataCommandChanged = @"OREdelweissSLTModelCrateUDPDataCommandChanged";
 NSString* OREdelweissSLTModelBBCmdFFMaskChanged = @"OREdelweissSLTModelBBCmdFFMaskChanged";
 NSString* OREdelweissSLTModelCmdWArg4Changed = @"OREdelweissSLTModelCmdWArg4Changed";
@@ -569,6 +676,34 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 }
 
 #pragma mark •••Accessors
+
+- (int) takeEventData
+{
+    return takeEventData;
+}
+
+- (void) setTakeEventData:(int)aTakeEventData
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setTakeEventData:takeEventData];
+    
+    takeEventData = aTakeEventData;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelTakeEventDataChanged object:self];
+}
+
+- (int) takeUDPstreamData
+{
+    return takeUDPstreamData;
+}
+
+- (void) setTakeUDPstreamData:(int)aTakeUDPstreamData
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setTakeUDPstreamData:takeUDPstreamData];
+    
+    takeUDPstreamData = aTakeUDPstreamData;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelTakeUDPstreamDataChanged object:self];
+}
 
 - (NSString*) crateUDPDataCommand
 {
@@ -953,6 +1088,9 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 
 - (id) controllerCard		{ return self;	  }
 - (SBC_Link*)sbcLink		{ return pmcLink; } 
+- (bool)sbcIsConnected      { return [pmcLink isConnected]; }
+- (bool)crateCPUIsConnected { return [self sbcIsConnected]; }
+
 - (TimedWorker *) poller	{ return poller;  }
 
 - (void) setPoller: (TimedWorker *) aPoller
@@ -1815,7 +1953,7 @@ commands:
  
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(receiveFromDataReplyServer) object:nil];
 
-	#if 0
+#if 0
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(receiveFromDataReplyServer) object:nil];
 	//static int counterStatusPacket=0; //MAH commented out 9/17/2012 to get rid of compiler unused variable warning
 	static int counterData1444Packet=0;
@@ -1909,7 +2047,8 @@ for(l=0;l<2500;l++){
     dataReplyThreadData.stopNow = 0;
     dataReplyThreadData.sockaddr_data_from = sockaddr_data_from;
     dataReplyThreadData.UDP_DATA_REPLY_SERVER_SOCKET = UDP_DATA_REPLY_SERVER_SOCKET;
-
+    dataReplyThreadData.isSynchronized=0;
+   
    //is it OK to call it again? when destroy it? -tb-
    pthread_create(&dataReplyThread, NULL, receiveFromDataReplyServerThreadFunction, (void*) &dataReplyThreadData);
      //note: pthread_create is not blocking -tb-
@@ -2059,6 +2198,14 @@ for(l=0;l<2500;l++){
 	return [self sendUDPDataCommandRequestPackets:  numRequestedUDPPackets];	
 }
 
+- (void) loopCommandRequestUDPData
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(loopCommandRequestUDPData) object:nil];
+    if(	[self isOpenDataCommandSocket]) 
+        [self sendUDPDataCommandRequestPackets:  30];
+    [self performSelector:@selector(loopCommandRequestUDPData) withObject:nil afterDelay: 10.0];//repeat every 10 seconds
+}
+
 - (int) sendUDPDataWCommandRequestPacketArg1:(int) arg1 arg2:(int) arg2 arg3:(int) arg3  arg4:(int) arg4
 {
 	//debug 
@@ -2098,17 +2245,12 @@ for(l=0;l<2500;l++){
 
 
 #pragma mark ***HW Access
-- (void)		  writeMasterMode
+- (void)		  readAllControlSettingsFromHW
 {
 //DEBUG OUTPUT: 	
-NSLog(@"WARNING: %@::%@: master mode is not necessary any more! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
 }
 
-- (void)		  writeSlaveMode
-{
-//DEBUG OUTPUT: 	
-NSLog(@"WARNING: %@::%@:  slave mode is not necessary any more! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
-}
 
 
 - (void) checkPresence
@@ -2485,7 +2627,7 @@ NSLog(@"WARNING: %@::%@:  slave mode is not necessary any more! \n",NSStringFrom
 	unsigned long th = [self readTimeHigh]; 
 	unsigned long tl = [self readTimeLow]; 
 	[self setClockTime: (((unsigned long long) th) << 32) | tl];
-//DEBUG OUTPUT: 	NSLog(@"   %@::%@: tl: 0x%08x,  th: 0x%08x  clockTime: 0x%016qx\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),tl,th,clockTime);//TODO: DEBUG testing ...-tb-
+//DEBUG OUTPUT: 	NSLog(@"   %@::%@: tl: 0x%08x,  th: 0x%08x  clockTime: 0x%016qx  (%li)\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),tl,th,clockTime,clockTime);//TODO: DEBUG testing ...-tb-
 	return clockTime;
 }
 
@@ -2619,6 +2761,8 @@ NSLog(@"WARNING: %@::%@:  slave mode is not necessary any more! \n",NSStringFrom
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
 	
+	[self setTakeEventData:[decoder decodeIntForKey:@"takeEventData"]];
+	[self setTakeUDPstreamData:[decoder decodeIntForKey:@"takeUDPstreamData"]];
 	[self setCrateUDPDataCommand:[decoder decodeObjectForKey:@"crateUDPDataCommand"]];
 	[self setBBCmdFFMask:[decoder decodeInt32ForKey:@"BBCmdFFMask"]];
 	[self setCmdWArg4:[decoder decodeIntForKey:@"cmdWArg4"]];
@@ -2683,6 +2827,8 @@ NSLog(@"WARNING: %@::%@:  slave mode is not necessary any more! \n",NSStringFrom
 {
 	[super encodeWithCoder:encoder];
 	
+	[encoder encodeInt:takeEventData forKey:@"takeEventData"];
+	[encoder encodeInt:takeUDPstreamData forKey:@"takeUDPstreamData"];
 	[encoder encodeObject:crateUDPDataCommand forKey:@"crateUDPDataCommand"];
 	[encoder encodeInt32:BBCmdFFMask forKey:@"BBCmdFFMask"];
 	[encoder encodeInt:cmdWArg4 forKey:@"cmdWArg4"];
@@ -2745,24 +2891,37 @@ NSLog(@"WARNING: %@::%@:  slave mode is not necessary any more! \n",NSStringFrom
 	
     [dataDictionary setObject:aDictionary forKey:@"EdelweissSLTMultiplicity"];
     
+    aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+				   @"OREdelweissSLTDecoderForADCTrace",			@"decoder",
+				   [NSNumber numberWithLong:adcTraceId],        @"dataId",
+				   [NSNumber numberWithBool:YES],				@"variable",
+				   [NSNumber numberWithLong:-1],			@"length",
+				   nil];
+	
+    [dataDictionary setObject:aDictionary forKey:@"EdelweissSLTADCTrace"];
+    
     return dataDictionary;
 }
 
 - (unsigned long) eventDataId        { return eventDataId; }
 - (unsigned long) multiplicityId	 { return multiplicityId; }
+- (unsigned long) adcTraceId	 { return adcTraceId; }
 - (void) setEventDataId: (unsigned long) aDataId    { eventDataId = aDataId; }
 - (void) setMultiplicityId: (unsigned long) aDataId { multiplicityId = aDataId; }
+- (void) setAdcTraceId: (unsigned long) aDataId { adcTraceId = aDataId; }
 
 - (void) setDataIds:(id)assigner
 {
     eventDataId     = [assigner assignDataIds:kLongForm];
     multiplicityId  = [assigner assignDataIds:kLongForm];
+    adcTraceId  = [assigner assignDataIds:kLongForm];
 }
 
 - (void) syncDataIdsWith:(id)anotherCard
 {
     [self setEventDataId:[anotherCard eventDataId]];
     [self setMultiplicityId:[anotherCard multiplicityId]];
+    [self setAdcTraceId:[anotherCard adcTraceId]];
 }
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
@@ -2785,10 +2944,28 @@ NSLog(@"WARNING: %@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class])
     [self clearExceptionCount];
 	
 	//check that we can actually run
-	if(![pmcLink isConnected]){
-		[NSException raise:@"Not Connected" format:@"Check the SLT connection"];
-	}
+    if(takeEventData){
+	    if(![pmcLink isConnected]){
+		    [NSException raise:@"Not Connected" format:@"Check the SLT connection"];
+	    }
+    }
 	
+    if(takeUDPstreamData){
+        savedUDPSocketState = [self isOpenDataCommandSocket] || ([self isListeningOnDataServerSocket]<<1);
+
+NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),savedUDPSocketState);//TODO: DEBUG testing ...-tb-
+         
+	    //if(![pmcLink isConnected]){
+		//    [NSException raise:@"Not Connected" format:@"Check the SLT connection"];
+	    //}
+        //open UDP sockets, if not opened
+        if(![self isOpenDataCommandSocket]) [self openDataCommandSocket];
+        if(![self isListeningOnDataServerSocket]) [self startListeningDataServerSocket];
+	    if(! ([self isOpenDataCommandSocket]  &&  [self isListeningOnDataServerSocket]  ) ){
+		    [NSException raise:@"UDP sockets not Connected" format:@"Check the 'UDP data socket' connection of SLT"];
+	    }
+        
+    }
     //----------------------------------------------------------------------------------------
     // Add our description to the data description
     [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"OREdelweissSLTModel"];    
@@ -2799,8 +2976,26 @@ NSLog(@"WARNING: %@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class])
 	
 	//[self writeSetInhibit];  //TODO: maybe move to readout loop to avoid dead time -tb-
 	
+    
+    //warm or cold start?
     if([[userInfo objectForKey:@"doinit"]intValue]){
-		[self initBoard];					
+        //event mode
+        if(takeEventData){
+		    [self initBoard];		
+        }
+        //UDP data stream mode
+        if(takeUDPstreamData){
+            //'re-init' stream loop
+            [self sendUDPDataCommandString: @"KWC_stopStreamLoop"];	
+            usleep(10000);//need to wait for a recvfrom() cycle ...
+            [self sendUDPDataCommandString: @"KWC_startStreamLoop"];	
+            usleep(10000);
+            [self loopCommandRequestUDPData];
+            //[self sendUDPDataCommandRequestPackets:  numRequestedUDPPackets];
+            //[self performSelector:@selector(loopCommandRequestUDPData) withObject:nil afterDelay: 10.0];//repeat every 10 seconds
+        }
+
+
 	}	
 	
 	dataTakers = [[readOutGroup allObjects] retain];		//cache of data takers.
@@ -2858,21 +3053,220 @@ NSLog(@"WARNING: %@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class])
         //gettimeofday(&starttime,&timeZone);
         //start timer -------TIMER------------
 
-        //TIMER - do something every second:
+        //TIMER - do something every x seconds:
         //-----------------------
 		//gettimeofday(&starttime,NULL);
         gettimeofday(&currtime,NULL);
         currDiffTime =      (  (double)(currtime.tv_sec  - starttime.tv_sec)  ) +
                     ( ((double)(currtime.tv_usec - starttime.tv_usec)) * 0.000001 );
         double elapsedTime = currDiffTime - lastDiffTime;
-		if(elapsedTime >= 1.0){
-		    //code to be executed every second -BEGIN
+		if(elapsedTime >= 0.5){// ----> x= this value (e.g. 1.0/0.5 ...)
+		    //code to be executed every x seconds -BEGIN
 		    //
 		    // 
 		    //./ DO SOMETHING
 			NSLog(@"===================================\n");
 			NSLog(@"   Datataker Loop: 1 PPS: %f\n",currDiffTime);
 			NSLog(@"===================================\n");
+            
+            //check for data
+            int *rdIndex = &(dataReplyThreadData.rdIndex);//we cannot use references, we are in C, not C++
+            if(*rdIndex>=0){
+			    NSLog(@"   ReadBuffer:   %i   hasPackets: %i   hasBytes: %i  numADCsInDataStream: %i\n",*rdIndex, 
+                    dataReplyThreadData.hasDataPackets[*rdIndex],
+                    dataReplyThreadData.hasDataBytes[*rdIndex],
+                    dataReplyThreadData.numADCsInDataStream[*rdIndex]);
+            }else{
+			    NSLog(@"   ReadBuffer:   %i   \n",*rdIndex);
+            }
+            if(dataReplyThreadData.rdIndex>=0){//i.e. != -1
+                TypeIpeCrateStatusBlock *crateStatusBlock= &(dataReplyThreadData.crateStatusBlock[*rdIndex]);
+
+                if(dataReplyThreadData.hasDataPackets[dataReplyThreadData.rdIndex]){
+                
+                
+                //DEBUG: TESTING/DEBUGGING!!! sending raw UDP packet
+                #if 1
+                    //send the first UDP packet as 'waveform' packet
+                    //
+                    if(dataReplyThreadData.adcBufReceivedFlag[*rdIndex][0]==1){//yes, has data
+                                uint32_t headerData = 0; 
+                                uint32_t dataWord32 = 0; 
+                                uint16_t dataWord16 = 0; 
+                                uint32_t waveformLength = 1000; //2048; 
+								uint32_t waveformLength32=waveformLength/2; //the waveform length is variable   
+                                uint32_t locationWord = 0;//			  = (([self crateNumber]&0x0f)<<21) | ([self stationNumber]& 0x0000001f)<<16;
+ 						         //locationWord |= (aChan&0xff)<<8; // New: There is a place for the channel in the header?!
+
+                            int len=(dataReplyThreadData.adcBufSize[*rdIndex][0]) / 2;
+                            //int len=1500/2;
+                        waveformLength=len;
+                        waveformLength32=waveformLength/2;
+
+
+
+                        	unsigned long totalLength = (9 + waveformLength32);	// longs (1 page=1024 shorts [16 bit] are stored in 512 longs [32 bit])
+							NSMutableData* theADCTraceData = [NSMutableData dataWithCapacity:totalLength*sizeof(long)];
+							unsigned long header = adcTraceId | totalLength;
+							
+							[theADCTraceData appendBytes:&header length:4];				           //ORCA header word
+							[theADCTraceData appendBytes:&locationWord length:4];		           //which crate, which card info
+                            headerData = 123; //second
+							[theADCTraceData appendBytes:&headerData length:4];		           
+                            headerData = 0; //
+							[theADCTraceData appendBytes:&headerData length:4];		           
+							[theADCTraceData appendBytes:&headerData length:4];		           
+							[theADCTraceData appendBytes:&headerData length:4];		           
+                            headerData = 234; //energy
+							[theADCTraceData appendBytes:&headerData length:4];		           
+                            uint32_t eventFlags     = 1;//1 = UDP packet
+							[theADCTraceData appendBytes:&eventFlags length:4];		           
+                            headerData = 0; //
+							[theADCTraceData appendBytes:&headerData length:4];		           
+							//[theWaveFormData appendBytes:&theEvent length:sizeof(katrinEventDataStruct)];
+							//[theWaveFormData appendBytes:&theDebugEvent length:sizeof(katrinDebugDataStruct)];	
+                            #if 1
+                            //ship the UDP packet with index 0
+                            int j;
+                            uint16_t *data16;
+                            data16=(uint16_t*)(&dataReplyThreadData.adcBuf[*rdIndex][0][0]);
+                            NSLog(@" ship UDP packet with  len %i \n",len);
+                            for(j=0; j<len; j++){
+                                dataWord16=*(data16+j);
+							    [theADCTraceData appendBytes:&dataWord16 length:sizeof(dataWord16)];		           
+                            }
+
+                            #else
+                            //ship a test ramp
+                            int i;
+                            for(i=0; i< waveformLength;i++){
+                                dataWord16 = i;
+							    [theADCTraceData appendBytes:&dataWord16 length:sizeof(dataWord16)];		           
+                            }							
+                            #endif	
+							[aDataPacket addData:theADCTraceData]; //ship the waveform
+
+                    }
+                #endif
+                
+                
+                
+                    //read out data
+                    //    reorder UDP packets to build ADC traces according to one channel
+                    const int MaxUDPPacketSizeBytes=1444;
+                    int M=(MaxUDPPacketSizeBytes-4) / 2;//max. number of shorts (1444-4)/2=720
+                    int NA=dataReplyThreadData.numADCsInDataStream[*rdIndex];//TODO: take from crate status packet -tb-
+                    int     i, j, j_swapit, toffset;
+                    int64_t K,t;
+                    //for(i=0; i<NA; i++) adcTraceBufCount[*rdIndex][i]=0;
+                    for(i=0; i<720; i++) dataReplyThreadData.adcTraceBufCount[*rdIndex][i]=0;
+                    uint16_t *P;
+                    uint16_t *data16;
+                    int packetCounter=0;
+                    bool reachedMaxTimesample=false;
+                    for(i=0; i<kMaxNumUDPDataPackets;i++){// i counts the UDP packets
+                        if(dataReplyThreadData.adcBufReceivedFlag[*rdIndex][i]){
+                            //check: P should also be == i
+                            P = (uint16_t*)(&dataReplyThreadData.adcBuf[*rdIndex][i][0]);
+                            K = *P * M;
+                            t = K/NA; 
+                            toffset = K % NA; //toffset is more or less the abs. ADC channel number ... -tb-
+                            int len;
+                            len=(dataReplyThreadData.adcBufSize[*rdIndex][i]-4) / 2;
+                            data16=(uint16_t*)(&dataReplyThreadData.adcBuf[*rdIndex][i][4]);
+                            j_swapit=1;
+                            for(j=0; j<len; j++){//j loops through UDP packet data
+                                if(t>=100000){//we have too much data, probably the number of sent ADC channels has changed/increased: stop assembling event records
+                                    reachedMaxTimesample=true;
+                                    break;
+                                }
+                                //if(i<2 || (len<720)) NSLog(@" A i:%i j:%i index  (toffset,t)=(%i,%i)  len %i (%i)\n",(int)i,(int)j,(int)toffset,(int)t,(int)len,(int)dataReplyThreadData.adcBufSize[*rdIndex][i]);
+                                dataReplyThreadData.adcTraceBuf[*rdIndex][toffset][t]=*(data16+j+j_swapit);
+                                //we need to swap each pair of shorts (uint16_t) - this is the sequence in the UDP packets ...
+                                j_swapit = -j_swapit;// ->toggles between 1 and -1 ...
+                                //unswapped: dataReplyThreadData.adcTraceBuf[*rdIndex][toffset][t]=*(data16+j);
+                                dataReplyThreadData.adcTraceBufCount[*rdIndex][toffset]++; //count the number of shorts
+                                toffset++; 
+                                if(toffset==NA){toffset=0; t++;}
+                            }//for(j...
+                            if(reachedMaxTimesample){
+                                NSLog(@"    reachedMaxTimesample - leave loop! t is %i (should be 100000) double break \n",(int)t);
+                                break;
+                            }
+                            if(i<10 || t>99996) NSLog(@" E  index  (toffset,t)=(%i,%i)  len %i \n",(int)toffset,(int)t,(int)len);
+                        }
+
+                        if(packetCounter==dataReplyThreadData.hasDataPackets[*rdIndex]){
+                            NSLog(@"    packetCounter==dataReplyThreadData.hasDataPackets[*rdIndex]: we handled all data packets - leave loop! t is %i (should be 100000) regular break \n",(int)t);
+                            break;
+                        }
+                        packetCounter++;
+                    }//for(i...
+                    if(t<100000){
+                        NSLog(@"    end of  loop! t is %i t<100000 (should be 100000) missing UDP packets? \n",(int)t);
+                    }
+                    if(reachedMaxTimesample){
+                        NSLog(@"    reachedMaxTimesample - leave loop! t is %i (should be 100000) double break ; handled packetCounter %i, in buffer packets %i \n",(int)t,packetCounter,dataReplyThreadData.hasDataPackets[*rdIndex]);
+                    }
+                    
+                    
+                    //    now ship recorded data
+                    int chan;
+                    uint16_t dataWord16 = 0; 
+                    uint32_t locationWord = 0;//			  = (([self crateNumber]&0x0f)<<21) | ([self stationNumber]& 0x0000001f)<<16;
+                    uint32_t headerData = 0; 
+                    int numTSamples=100000;
+                    int traceLength=10000;//<---------------   <<-------  <<<----   configure the length of a single trace record here (number of shorts/uint16_t)
+                                          //<---------------   <<-------  <<<----   tested: 1000, 2000, 4000, 10000
+                    int numTraces=numTSamples/traceLength; //                             = 100,   50,   25,    10
+                    NSLog(@" Shipping num of ADC channels:%i  \n",(int)NA);
+                    
+                    for(chan=0;chan<NA;chan++){
+                        if(dataReplyThreadData.adcTraceBufCount[*rdIndex][toffset]<100000){
+                            NSLog(@"    channel %i, trace %i has missing samples (%i out of 100000) \n",chan,(int)i,(int)dataReplyThreadData.adcTraceBufCount[*rdIndex][chan]);
+
+                        }
+                        unsigned long totalLength = (9 + traceLength/2);	// header (uint32_t) + traceLength shorts (16 bit)
+                        unsigned long header = adcTraceId | totalLength;
+                        t=0;
+                        for(i=0; i<numTraces; i++){//default is: ship numTraces=10 packets with traceLength=10000 sample points
+
+                            NSMutableData* theADCTraceData = [NSMutableData dataWithCapacity:totalLength*sizeof(long)];
+                            [theADCTraceData appendBytes:&header length:4];				           //ORCA header word
+ 						    locationWord = (chan&0xff)<<8; 
+							[theADCTraceData appendBytes:&locationWord length:4];		           //which crate, which card info
+                            headerData = crateStatusBlock->PPS_count; //second
+							[theADCTraceData appendBytes:&headerData length:4];		           
+                            headerData = i * traceLength; //sub second
+							[theADCTraceData appendBytes:&headerData length:4];		           
+                            headerData = chan & 0xffff; //total number of channel in packet (was 'channel map')
+							[theADCTraceData appendBytes:&headerData length:4];		           
+                            headerData = i; //event ID
+							[theADCTraceData appendBytes:&headerData length:4];		           
+                            headerData = 234; //energy
+							[theADCTraceData appendBytes:&headerData length:4];		           
+                            uint32_t eventFlags     = 0;//0 = ADC trace
+							[theADCTraceData appendBytes:&eventFlags length:4];		           
+                            headerData = 0; //
+							[theADCTraceData appendBytes:&headerData length:4];	
+                            //append ADC values	           
+                            for(j=0; j<traceLength; j++){
+                                dataWord16 = dataReplyThreadData.adcTraceBuf[*rdIndex][chan][t];
+							    [theADCTraceData appendBytes:&dataWord16 length:sizeof(dataWord16)];		           
+                                t++;
+                            }
+                            [aDataPacket addData:theADCTraceData]; //ship the waveform
+
+                        }
+                    }
+                    
+                    
+                    
+                    //mark buffer as free
+                    dataReplyThreadData.hasDataPackets[dataReplyThreadData.rdIndex]=0;
+                    dataReplyThreadData.hasDataBytes[dataReplyThreadData.rdIndex]=0;
+                }
+            }
 		    //code to be executed every second -END
 		    lastDiffTime = currDiffTime;
 		}
@@ -2926,6 +3320,15 @@ NSLog(@"WARNING: %@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class])
 		[poller runWithTarget:self selector:@selector(readAllStatus)];
 	}
 	
+    //restore socket activity (on or off)
+    if(takeUDPstreamData){
+    	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(loopCommandRequestUDPData) object:nil];
+        if(! (savedUDPSocketState & 0x1)) [self closeDataCommandSocket];
+        if(! (savedUDPSocketState & 0x2)) [self stopListeningDataServerSocket];
+        savedUDPSocketState=0;
+    }
+
+    
 	[dataTakers release];
 	dataTakers = nil;
 

@@ -108,8 +108,9 @@
 		float			pulserDelay;
 		unsigned short  selectedRegIndex;
 		unsigned long   writeValue;
-		unsigned long	eventDataId;
-		unsigned long	multiplicityId;
+		unsigned long	eventDataId;//TODO: remove or change -tb-
+		unsigned long	multiplicityId;//TODO: remove -tb-
+		unsigned long	adcTraceId;
 		unsigned long   eventCounter;
 		int				actualPageIndex;
         TimedWorker*    poller;
@@ -190,8 +191,10 @@
     uint32_t BBCmdFFMask;
     NSString* crateUDPDataCommand;
     
-    //ADC buffer: 2 seconds buffer; 12 FLT * 36 chan = 432 ADCs; 432*100000 / 720 = 600000 Pakete bzw. 86 MB
-    uint32_t adcBuf[2][60000][360];
+    //data taking: flags and vars
+    int takeUDPstreamData;
+    int takeEventData;
+    int savedUDPSocketState;
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
@@ -209,6 +212,10 @@
 - (void) runIsStartingSubRun:(NSNotification*)aNote;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+- (int) takeEventData;
+- (void) setTakeEventData:(int)aTakeEventData;
+- (int) takeUDPstreamData;
+- (void) setTakeUDPstreamData:(int)aTakeUDPstreamData;
 - (NSString*) crateUDPDataCommand;
 - (void) setCrateUDPDataCommand:(NSString*)aCrateUDPDataCommand;
 - (uint32_t) BBCmdFFMask;
@@ -266,6 +273,8 @@
 - (void) setControlReg:(unsigned long)aControlReg;
 
 - (SBC_Link*)sbcLink;
+- (bool)sbcIsConnected;
+- (bool)crateCPUIsConnected;
 - (unsigned long) projectVersion;
 - (unsigned long) documentVersion;
 - (unsigned long) implementation;
@@ -342,6 +351,7 @@
 - (int) sendUDPDataCommandString:(NSString*)aString;
 - (int) sendUDPDataCommandRequestPackets:(int8_t) num;
 - (int) sendUDPDataCommandRequestUDPData;
+- (void) loopCommandRequestUDPData;
 - (int) sendUDPDataWCommandRequestPacketArg1:(int) arg1 arg2:(int) arg2 arg3:(int) arg3  arg4:(int) arg4; 
   //BB commands
 - (int) sendUDPDataWCommandRequestPacket;
@@ -355,8 +365,7 @@
 #pragma mark ***HW Access
 //note that most of these method can raise 
 //exceptions either directly or indirectly
-- (void)		  writeMasterMode;
-- (void)		  writeSlaveMode;
+- (void)		  readAllControlSettingsFromHW;
 
 - (void)		  readAllStatus;
 - (void)		  checkPresence;
@@ -414,6 +423,8 @@
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 
+- (unsigned long) adcTraceId;
+- (void) setAdcTraceId: (unsigned long) DataId;
 - (unsigned long) eventDataId;
 - (void) setEventDataId: (unsigned long) DataId;
 - (unsigned long) multiplicityId;
@@ -450,6 +461,8 @@
 
 @end
 
+extern NSString* OREdelweissSLTModelTakeEventDataChanged;
+extern NSString* OREdelweissSLTModelTakeUDPstreamDataChanged;
 extern NSString* OREdelweissSLTModelCrateUDPDataCommandChanged;
 extern NSString* OREdelweissSLTModelBBCmdFFMaskChanged;
 extern NSString* OREdelweissSLTModelCmdWArg4Changed;
