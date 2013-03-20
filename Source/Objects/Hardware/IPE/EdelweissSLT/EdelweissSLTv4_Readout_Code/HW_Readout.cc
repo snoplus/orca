@@ -165,7 +165,7 @@ void FindHardware(void)
         uint32_t val;
         presentFLTMap = 0;
         for(flt=0; flt<MAX_NUM_FLT_CARDS; flt++){
-        //for(flt=0; flt<16; flt++){
+        //for(flt=0; flt<16; flt++){ //TODO:  <-------------------USE ABOVE LINE!!!!! Sascha NEEDS TO FIX IT -tb-
             val = pbus->read(FLTVersionReg(flt+1));
             //printf("FLT#%i (idx %i): version 0x%08x\n",flt+1,flt,val);
             if(val!=0x1f000000 && val!=0xffffffff){
@@ -286,7 +286,7 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply)
     
     SBC_IPEv4ReadBlockStruct* returnDataPtr = (SBC_IPEv4ReadBlockStruct*)aPacket->payload;
     char* returnPayload = (char*)(returnDataPtr+1);
-    unsigned long *lPtr = (unsigned long *) returnPayload;
+    uint32_t *lPtr = (uint32_t *) returnPayload;
     
     int32_t perr   = 0;
     try{
@@ -411,7 +411,7 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply)  // 'simulation' version -tb
     
     SBC_IPEv4ReadBlockStruct* returnDataPtr = (SBC_IPEv4ReadBlockStruct*)aPacket->payload;
     char* returnPayload = (char*)(returnDataPtr+1);
-    unsigned long *lPtr = (unsigned long *) returnPayload;
+    uint32_t *lPtr = (uint32_t *) returnPayload;
     
     int32_t perr   = 0;
 	//hardware read access removed (was here) -tb-
