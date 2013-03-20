@@ -75,7 +75,7 @@
 		SBC_Packet aPacket;
 		aPacket.cmdHeader.destination			= kSBC_Process;
 		aPacket.cmdHeader.cmdID					= kSBC_WriteBlock;
-		aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_VmeWriteBlockStruct) + numberLongs*sizeof(long);
+		aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_IPEv4WriteBlockStruct) + numberLongs*sizeof(long);   //TODO: this was SBC_VmeWriteBlockStruct (instead of SBC_IPEv4WriteBlockStruct), is that correct? -tb-
 		
 		SBC_IPEv4WriteBlockStruct* writeBlockPtr = (SBC_IPEv4WriteBlockStruct*)aPacket.payload;
 		writeBlockPtr->address			= aPmcAddress;
