@@ -107,11 +107,6 @@ NSString* ORConnectionChanged = @"OR Connection Changed";
     [super dealloc];
 }
 
-- (void) flagsChanged:(NSEvent *)theEvent
-{
-    //overriden to prevent a side effect of drawing the image when we don't have to.
-}
-
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers
 {
