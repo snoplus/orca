@@ -72,7 +72,11 @@ static NSString *kFanOutConnectorKey[10]  = {
 
 - (void) setUpImage
 {
-    [self setNumberOfOutputs:2];
+    //[self setNumberOfOutputs:2];//this was the original version; maybe we can restore it, now when I added a empty '- (void) flagsChanged:(NSEvent *)theEvent'? -tb-
+    if(numberOfOutputs==0)
+        [self setNumberOfOutputs:2];
+    else
+        [self setNumberOfOutputs: numberOfOutputs];    
 }
 
 
@@ -179,6 +183,14 @@ static NSString *kFanOutConnectorKey[10]  = {
 {
 	return @"Data_Chain/Fan_In_Out.html";
 }
+
+
+- (void) flagsChanged:(NSEvent *)theEvent
+{
+    //overriden to prevent a side effect of drawing the image when we don't have to.
+}
+
+
 
 #pragma mark ¥¥¥Accessors
 - (short) numberOfOutputs
