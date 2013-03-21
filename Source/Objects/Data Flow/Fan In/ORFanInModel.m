@@ -95,6 +95,11 @@ static NSString *kFanInConnectorKey[10]  = {
     }
 }
 
+- (void) flagsChanged:(NSEvent *)theEvent
+{
+    //overriden to prevent a side effect of drawing the image when we don't have to.
+}
+
 - (void) loadDefaults
 {
     NSColor* color = colorForData([[NSUserDefaults standardUserDefaults] objectForKey: ORLineColor]);
