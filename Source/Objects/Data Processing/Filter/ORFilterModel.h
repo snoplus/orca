@@ -23,6 +23,7 @@
 #import "ORDataChainObject.h"
 #import "ORBaseDecoder.h"
 #import "ORDataProcessing.h"
+#import "FilterScript.h"
 
 #define kNumScriptArgs 5
 #define kNumDisplayValues 5
@@ -32,6 +33,8 @@
 @class ORQueue;
 @class ORTimer;
 @class ORDecoder;
+@class FilterScriptEx;
+@class ORFilterSymbolTable;
 
 #define kFilterTimeHistoSize 4000
 
@@ -73,11 +76,24 @@
 	id					theFilteredObject;	//cache the object on the other side of the filter connection
 	NSMutableDictionary* stackIndexErrorReported;
 	NSMutableDictionary* stackPtrErrorReported;
+    FilterScriptEx* filterExecuter;
+    ORFilterSymbolTable* symbolTable;
+    //-----------------------------
+    //we take over the node pointers
+    long mStartFilterNodeCount;
+    nodeType** mStartFilterNodes;
+    long mFilterNodeCount;
+    nodeType** mFilterNodes;
+    long mFinishFilterNodeCount;
+    nodeType** mFinishFilterNodes;
+    //-----------------------------
+
 }
 
 - (id)   init;
 - (void) dealloc;
 - (void) freeNodes;
+- (void) freeNode:(nodeType*) p;
 
 #pragma mark •••Accessors
 - (BOOL) usePlugin;

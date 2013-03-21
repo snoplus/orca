@@ -17,16 +17,16 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
-
-#import "ORFilterSymbolTable.h"
+#ifndef FilterScript_h
+#define  FilterScript_h
 
 extern int FilterScriptYYINPUT(char* theBuffer,int maxSize);
 #undef YY_INPUT
 #define YY_INPUT(b,r,s) (r = FilterScriptYYINPUT(b,s))
 
-typedef enum { typeCon, typeId, typeOpr } nodeEnum;
+typedef enum nodeEnum { typeCon, typeId, typeOpr } nodeEnum;
 
-typedef enum {startNodeType,filterNodeType,finishNodeType} nodetype;
+typedef enum nodetype {startNodeType,filterNodeType,finishNodeType} nodetype;
 
 enum {
 	kPostInc,
@@ -77,4 +77,4 @@ typedef struct nodeTypeTag {
     };
 } nodeType;
 
-extern ORFilterSymbolTable* symbolTable;
+#endif

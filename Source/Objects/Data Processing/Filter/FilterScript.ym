@@ -29,7 +29,6 @@ nodeType* opr(int oper, int nops, ...);
 nodeType* ident(char*);
 nodeType* con(int value);
 
-void freeNode(nodeType *p);
 void addFilterNode(int type,nodeType* node);
 
 nodeType** startFilterNodes = 0;
@@ -49,9 +48,6 @@ int ex(nodeType *p);
 int yylex(void);
 BOOL parsedSuccessfully;
 void FilterScripterror(char *s);
-ORFilterSymbolTable* symbolTable;
-unsigned short      switchLevel;
-long				switchValue[512];
 
 %}
 
@@ -87,7 +83,7 @@ long				switchValue[512];
 %%
 
 program
-        : funclist                { parsedSuccessfully = YES; switchLevel = 0; return 1; }
+        : funclist                { parsedSuccessfully = YES; return 1; }
         ;
 
 
@@ -362,7 +358,6 @@ free_statement
 
 void addFilterNode(int type,nodeType* aNode)
 {
-	if(!symbolTable)symbolTable = [[ORFilterSymbolTable alloc] init];
 
 	if(!filterNodes){
 		filterNodeCount = 0;
@@ -450,16 +445,6 @@ nodeType *opr(int oper, int nops, ...)
     return p;
 }
 
-void freeNode(nodeType *p) 
-{
-    int i;
-
-    if (!p) return;
-    if (p->type == typeOpr) {
-        for (i = 0; i < p->opr.nops; i++) freeNode(p->opr.op[i]);
-    }
-    free (p);
-}
 
 void FilterScripterror(char *s) 
 {

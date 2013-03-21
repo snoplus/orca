@@ -146,13 +146,5 @@ void fsSingleLineComment()
 
 void resetFilterState()
 {
-	int i;
-	if(filterNodes){
-		for(i=0;i<filterNodeCount;i++){
-			freeNode(filterNodes[i]);
-		}
-		free(filterNodes);
-		filterNodes = nil;
-	}
 	BEGIN(INITIAL);
 }

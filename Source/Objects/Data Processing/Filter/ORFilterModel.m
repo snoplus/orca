@@ -28,6 +28,7 @@
 #import "ORQueue.h"
 #import "ORFilterPluginBaseClass.h"
 #import "ORDecoder.h"
+#import "FilterScriptEx.h"
 
 NSString* ORFilterModelUsePluginChanged = @"ORFilterModelUsePluginChanged";
 NSString* ORFilterModelPluginValidChanged = @"ORFilterModelPluginValidChanged";
@@ -53,21 +54,20 @@ NSString* ORFilterLock                      = @"ORFilterLock";
 extern void resetFilterState();
 extern void FilterScriptrestart();
 extern int FilterScriptparse();
-extern void freeNode(nodeType *p);
-extern void startFilterScript(id delegate);
-extern void runFilterScript(id delegate);
-extern void finishFilterScript(id delegate);
 
+//-----------------------------------------
+//we will take over ownership of these pointers
+//and will release them in this object
+//they have to be global for us to get at them
 extern long startFilterNodeCount;
 extern nodeType** startFilterNodes;
 extern long filterNodeCount;
 extern nodeType** filterNodes;
 extern long finishFilterNodeCount;
 extern nodeType** finishFilterNodes;
-
+//-----------------------------------------
 extern long numFilterLines;
 extern BOOL parsedSuccessfully;
-extern ORFilterSymbolTable* symbolTable;
 
 ORFilterModel* theFilterRunner = nil;
 int FilterScriptYYINPUT(char* theBuffer,int maxSize) 
@@ -123,34 +123,44 @@ int filterGraph(nodeType*);
 - (void) freeNodes
 {
 	int i;
-	if(filterNodes){
-		for(i=0;i<filterNodeCount;i++){
-			freeNode(filterNodes[i]);
+	if(mFilterNodes){
+		for(i=0;i<mFilterNodeCount;i++){
+			[self freeNode:mFilterNodes[i]];
 		}
-		free(filterNodes);
-		filterNodes = nil;
-		filterNodeCount = 0;
+		free(mFilterNodes);
+		mFilterNodes = nil;
+		mFilterNodeCount = 0;
 	}
-	if(startFilterNodes){
-		for(i=0;i<startFilterNodeCount;i++){
-			freeNode(startFilterNodes[i]);
+	if(mStartFilterNodes){
+		for(i=0;i<mStartFilterNodeCount;i++){
+			[self freeNode:mStartFilterNodes[i]];
 		}
-		free(startFilterNodes);
-		startFilterNodes = nil;
-		startFilterNodeCount = 0;
+		free(mStartFilterNodes);
+		mStartFilterNodes = nil;
+		mStartFilterNodeCount = 0;
 	}
-	if(finishFilterNodes){
-		for(i=0;i<finishFilterNodeCount;i++){
-			if(finishFilterNodes[i]){
-				freeNode(finishFilterNodes[i]);
-				finishFilterNodes[i]  = nil;
+	if(mFinishFilterNodes){
+		for(i=0;i<mFinishFilterNodeCount;i++){
+			if(mFinishFilterNodes[i]){
+				[self freeNode:mFinishFilterNodes[i]];
+				mFinishFilterNodes[i]  = nil;
 			}
 		}
-		free(finishFilterNodes);
-		finishFilterNodes = nil;
-		finishFilterNodeCount = 0;
+		free(mFinishFilterNodes);
+		mFinishFilterNodes = nil;
+		mFinishFilterNodeCount = 0;
 	}
-	
+}
+- (void) freeNode:(nodeType*) p
+{
+    int i;
+    
+    if (!p) return;
+    if (p->type == typeOpr) {
+        for (i = 0; i < p->opr.nops; i++) [self freeNode:p->opr.op[i]];
+    }
+    free (p);
+    p = nil;
 }
 
 - (void) setUpImage
@@ -339,7 +349,7 @@ int filterGraph(nodeType*);
 				[pluginInstance start];
 			}
 			else {
-				startFilterScript(self);
+				[filterExecuter startFilterScript:mStartFilterNodes nodeCount:mStartFilterNodeCount delegate:self];
 			}
 			firstTime = NO;
 		}
@@ -389,7 +399,8 @@ int filterGraph(nodeType*);
 					[symbolTable setData:tempData forKey:"CurrentRecordLen"];
 					
 					@try {
-						runFilterScript(self);
+                        
+                        [filterExecuter runFilterNodes:mFilterNodes nodeCount:mFilterNodeCount delegate:self];
 					}
 					@catch(NSException* e){
 					}
@@ -555,7 +566,6 @@ int filterGraph(nodeType*);
 
 - (void) cleanUpFilter
 {
-	
 	[self freeNodes];
 	
 	int i;
@@ -629,7 +639,7 @@ int filterGraph(nodeType*);
 {
 	
 	if(usePlugin) [pluginInstance finish];
-	else		  finishFilterScript(self);
+	else		  [filterExecuter finishFilterScript:mFinishFilterNodes nodeCount:mFinishFilterNodeCount delegate:self];
 	
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORFilterDisplayValuesChanged object:self];
@@ -639,7 +649,9 @@ int filterGraph(nodeType*);
 	[thePassThruObject closeOutRun:userInfo];
 	
 	[self cleanUpFilter];
-	
+    
+    [filterExecuter release];
+    filterExecuter = nil;
 }
 
 - (void) setRunMode:(int)aMode
@@ -700,14 +712,16 @@ int filterGraph(nodeType*);
 {
 	parsedOK = YES;
 	if(!running){
+            
 		[self parse:script];
+        
 		parsedOK = parsedSuccessfully;
 		if(parsedOK && ([[NSApp currentEvent] modifierFlags] & 0x80000)>0){
 			//option key is down
 			int i;
-			for(i=0;i<startFilterNodeCount;i++)	 filterGraph(startFilterNodes[i]);
-			for(i=0;i<filterNodeCount;i++)		 filterGraph(filterNodes[i]);
-			for(i=0;i<finishFilterNodeCount;i++) filterGraph(finishFilterNodes[i]);
+			for(i=0;i<mStartFilterNodeCount;i++)	 [filterExecuter filterGraph:mStartFilterNodes[i]];
+			for(i=0;i<mFilterNodeCount;i++)		 [filterExecuter filterGraph:mFilterNodes[i] ];
+            for(i=0;i<mFinishFilterNodeCount;i++) [ filterExecuter filterGraph:mFinishFilterNodes[i] ];
 		}
 	}
 }
@@ -782,16 +796,41 @@ int filterGraph(nodeType*);
 			resetFilterState();
 			FilterScriptrestart(NULL);
 			
-			theFilterRunner = self;
+            [symbolTable release];
+            symbolTable = [[ORFilterSymbolTable alloc] init];
+
+            theFilterRunner = self;
 			[self setString:theString];
 			parsedSuccessfully  = NO;
 			numFilterLines = 0;
 			// Call the parser that was generated by yacc
-			FilterScriptparse();
+ 			FilterScriptparse();
+           
+                               
 			if(parsedSuccessfully) {
 				NSLog(@"%d Lines Parsed Successfully\n",numFilterLines);
 				parsedOK = YES;
-			}
+                
+                if(filterExecuter)[filterExecuter release];
+                filterExecuter = [[FilterScriptEx alloc]  init];
+                [filterExecuter setSymbolTable:symbolTable];
+                
+                mStartFilterNodeCount   = startFilterNodeCount;
+                mStartFilterNodes       = startFilterNodes;
+                startFilterNodes        = nil;
+                startFilterNodeCount    = 0;
+
+                mFilterNodeCount        = filterNodeCount;
+                mFilterNodes            = filterNodes;
+                filterNodes            = nil;
+                filterNodeCount        = 0;
+
+                mFinishFilterNodeCount   = finishFilterNodeCount;
+                mFinishFilterNodes       = finishFilterNodes;
+                finishFilterNodes       = nil;
+                finishFilterNodeCount   = 0;
+
+            }
 			else  {
 				NSLog(@"line %d: %@\n",numFilterLines+1,[[theString componentsSeparatedByString:@"\n"] objectAtIndex:numFilterLines]);
 			}

@@ -19,6 +19,7 @@
 //-------------------------------------------------------------
 
 #include <stdio.h>
+#include "FilterScriptEx.h"
 #include "FilterScript.h"
 #include "ORFilterModel.h"
 #include "FilterScript.tab.h"
@@ -27,56 +28,63 @@
 #import <time.h>
 #include <stdlib.h>
 
-extern unsigned short   switchLevel;
-extern long				switchValue[512];
-extern long startFilterNodeCount;
-extern nodeType** startFilterNodes;
-extern long filterNodeCount;
-extern nodeType** filterNodes;
-extern long finishFilterNodeCount;
-extern nodeType** finishFilterNodes;
-extern long maxFilterNodeCount;
-extern long maxStartFilterNodeCount;
-extern long maxFinishFilterNodeCount;
-filterData ex(nodeType*,id);
+@implementation FilterScriptEx
 
-void startFilterScript(id delegate)
+- (id) init
 {
-	
+    self = [super init];
+    switchLevel = 0;
+    return self;
+}
+
+- (void) dealloc
+{
+    [symbolTable release];
+    [super dealloc];
+}
+
+- (void) setSymbolTable:(ORFilterSymbolTable*)aTable
+{
+    [aTable retain];
+    [symbolTable release];
+    symbolTable = aTable;
+}
+
+- (void) startFilterScript:(nodeType**)someNodes nodeCount:(long)nodeCount delegate:(id) delegate
+{	
 	time_t seconds;
 	time(&seconds);
 	srand((unsigned int) seconds);
 	
 	unsigned node;
-	for(node=0;node<startFilterNodeCount;node++){
+	for(node=0;node<nodeCount;node++){
 		@try {
-			ex(startFilterNodes[node],delegate);
+			[self ex:someNodes[node] delegate:delegate];
 		}
 		@catch(NSException* localException) {
 		}
 	}
 }
 
-void finishFilterScript(id delegate)
+- (void) finishFilterScript:(nodeType**)someNodes nodeCount:(long)nodeCount delegate:(id) delegate
 {
 	unsigned node;
-	for(node=0;node<finishFilterNodeCount;node++){
+	for(node=0;node<nodeCount;node++){
 		@try {
-			ex(finishFilterNodes[node],delegate);
+			[self ex:someNodes[node] delegate:delegate];
 		}
 		@catch(NSException* localException) {
 		}
 	}
 }
 
-
-void runFilterScript(id delegate)
+- (void) runFilterNodes:(nodeType**)someNodes nodeCount:(long)nodeCount delegate:(id) delegate
 {
 	if(symbolTable){
 		unsigned node;
-		for(node=0;node<filterNodeCount;node++){
+		for(node=0;node<nodeCount;node++){
 			@try {
-				ex(filterNodes[node],delegate);
+                [self ex:someNodes[node] delegate:delegate];
 			}
 			@catch(NSException* localException) {
 			}
@@ -84,12 +92,12 @@ void runFilterScript(id delegate)
 	}
 }
 
-void doSwitch(nodeType *p, id delegate)
+- (void) doSwitch:(nodeType*)p delegate:(id)delegate;
 {
 	@try {
 		switchLevel++;
-		switchValue[switchLevel] = ex(p->opr.op[0],delegate).val.lValue;
-		ex(p->opr.op[1],delegate);
+		switchValue[switchLevel] = [self ex:p->opr.op[0] delegate:delegate].val.lValue;
+		[self ex:p->opr.op[1] delegate:delegate];
 	}
 	@catch(NSException* localException) {
 		if(![[localException name] isEqualToString:@"break"]){
@@ -102,22 +110,22 @@ void doSwitch(nodeType *p, id delegate)
 	switchLevel--;
 }
 
-void doCase(nodeType *p, id delegate)
+- (void) doCase:(nodeType*)p delegate:(id)delegate
 {
-	if(switchValue[switchLevel] == ex(p->opr.op[0],delegate).val.lValue){
-		ex(p->opr.op[1],delegate);
-		if (p->opr.nops == 3)ex(p->opr.op[2],delegate);
+	if(switchValue[switchLevel] == [self ex:p->opr.op[0] delegate:delegate].val.lValue){
+		[self ex:p->opr.op[1] delegate:delegate];
+		if (p->opr.nops == 3)[self ex:p->opr.op[2] delegate:delegate];
 	}
 }
 
-void doDefault(nodeType *p, id delegate)
+- (void) doDefault:(nodeType*)p delegate:(id)delegate
 {
-	ex(p->opr.op[0],delegate);
-	if (p->opr.nops == 2)ex(p->opr.op[1],delegate);
+	[self ex:p->opr.op[0] delegate:delegate];
+	if (p->opr.nops == 2)[self ex:p->opr.op[1] delegate:delegate];
 }
 
 
-void doLoop(nodeType *p, id delegate)
+- (void) doLoop:(nodeType*)p delegate:(id)delegate
 {
 	BOOL breakLoop		= NO;
 	BOOL continueLoop	= NO;
@@ -125,7 +133,7 @@ void doLoop(nodeType *p, id delegate)
 		if([delegate exitNow])break; 
 		else {
 			@try {
-				ex(p->opr.op[0],delegate);
+				[self ex:p->opr.op[0] delegate:delegate];
 			}
 			@catch(NSException* localException) {
 				if([[localException name] isEqualToString:@"continue"])continueLoop = YES;
@@ -135,18 +143,18 @@ void doLoop(nodeType *p, id delegate)
 		}
 		if(breakLoop)break;
 		if(continueLoop)continue;
-	} while(ex(p->opr.op[1],delegate).val.lValue);
+	} while([self ex:p->opr.op[1] delegate:delegate].val.lValue);
 }
 
-void whileLoop(nodeType* p, id delegate)
+- (void) whileLoop:(nodeType*)p delegate:(id)delegate;
 {
 	BOOL breakLoop		= NO;
 	BOOL continueLoop	= NO;
-	while(ex(p->opr.op[0],delegate).val.lValue){ 
+	while([self ex:p->opr.op[0] delegate:delegate].val.lValue){ 
 		if([delegate exitNow])break; 
 		else {
 			@try {
-				ex(p->opr.op[1],delegate);
+				[self ex:p->opr.op[1] delegate:delegate];
 			}
 			@catch(NSException* localException) {
 				if([[localException name] isEqualToString:@"continue"])continueLoop = YES;
@@ -159,16 +167,16 @@ void whileLoop(nodeType* p, id delegate)
 	}
 }
 
-void forLoop(nodeType* p, id delegate)
+- (void) forLoop:(nodeType*)p delegate:(id) delegate
 {
 	BOOL breakLoop		= NO;
 	BOOL continueLoop	= NO;
 	
-	for(ex(p->opr.op[0],delegate) ; ex(p->opr.op[1],delegate).val.lValue ; ex(p->opr.op[2],delegate)){
+	for([self ex:p->opr.op[0] delegate:delegate] ; [self ex:p->opr.op[1] delegate:delegate].val.lValue ; [self ex:p->opr.op[2] delegate:delegate]){
 		if([delegate exitNow])break;
 		else {
 			@try {
-				ex(p->opr.op[3],delegate);
+				[self ex:p->opr.op[3] delegate:delegate];
 			}
 			@catch(NSException* localException) {
 				if([[localException name] isEqualToString:@"continue"])  continueLoop = YES;
@@ -181,25 +189,25 @@ void forLoop(nodeType* p, id delegate)
 	}
 }
 
-void defineArray(nodeType* p, id delegate)
+- (void) defineArray:(nodeType*)p delegate:(id) delegate
 {
-	int n = ex(p->opr.op[1],delegate).val.lValue;
+	int n = [self ex:p->opr.op[1] delegate:delegate].val.lValue;
 	unsigned long* ptr = 0;
-	if(n>0) ptr = calloc(n, sizeof(unsigned long));
+	if(n>0) ptr = calloc(n, sizeof(unsigned long)); //freed in 'freeArray'
 	filterData tempData;
 	tempData.type		= kFilterPtrType;
 	tempData.val.pValue = ptr;
 	[symbolTable setData:tempData forKey:p->opr.op[0]->ident.key];
 }
 
-void freeArray(nodeType* p, id delegate)
+- (void) freeArray:(nodeType*)p delegate:(id) delegate
 {
 	filterData theFilterData;
 	if([symbolTable getData:&theFilterData forKey:p->opr.op[0]->ident.key]){
 		if(theFilterData.type == kFilterPtrType){
 			if(theFilterData.val.pValue !=0){
 				if(theFilterData.val.pValue){
-					free(theFilterData.val.pValue);
+					free(theFilterData.val.pValue); //alloc'ed in 'defineArray'
 					theFilterData.val.pValue = 0;
 				}
 				[symbolTable setData:theFilterData forKey:p->opr.op[0]->ident.key];
@@ -210,8 +218,9 @@ void freeArray(nodeType* p, id delegate)
 		}
 	}
 }
-unsigned long* loadArray(unsigned long* ptr, nodeType* p)
+- (unsigned long*) loadArray:(unsigned long*) ptr nodeType:(nodeType*)p
 {
+    if(!ptr)return ptr;
 	filterData tempData;
     switch(p->type) {
 		case typeCon: *ptr++ = p->con.value;		 break;
@@ -222,8 +231,8 @@ unsigned long* loadArray(unsigned long* ptr, nodeType* p)
 		case typeOpr:
 			switch(p->opr.oper) {
 				case kMakeArgList:	
-					ptr = loadArray(ptr++,p->opr.op[0]); 
-					if(p->opr.nops == 2)ptr = loadArray(ptr++,p->opr.op[1]); 
+					ptr = [self loadArray:ptr++ nodeType:p->opr.op[0]];
+					if(p->opr.nops == 2)ptr = [self loadArray:ptr++ nodeType:p->opr.op[1]];
 					break;
 				default: break;
 			}
@@ -232,19 +241,20 @@ unsigned long* loadArray(unsigned long* ptr, nodeType* p)
 	return ptr;
 }
 
-void arrayList(nodeType* p, id delegate)
+- (void) arrayList:(nodeType*)p delegate:(id) delegate
+
 {
-	int n = ex(p->opr.op[1],delegate).val.lValue;
+	int n = [self ex:p->opr.op[1] delegate:delegate].val.lValue;
 	unsigned long* ptr = 0;
-	if(n>0) ptr = calloc(n, sizeof(unsigned long));
+	if(n>0) ptr = calloc(n, sizeof(unsigned long)); //freed in 'freeArray'
 	filterData tempData;
 	tempData.type		= kFilterPtrType;
 	tempData.val.pValue = ptr;
 	[symbolTable setData:tempData forKey:p->opr.op[0]->ident.key];
-	loadArray(ptr,p->opr.op[2]);
+	[self loadArray:ptr nodeType:p->opr.op[2]];
 }	
 
-filterData ex(nodeType *p,id delegate) 
+- (filterData) ex:(nodeType*)p delegate:(id) delegate
 {
 	filterData tempData = {0,{0}};
 	filterData tempData1;
@@ -265,23 +275,23 @@ filterData ex(nodeType *p,id delegate)
 			
 		case typeOpr:
 			switch(p->opr.oper) {
-				case DO:		doLoop(p,delegate); return tempData;
-				case WHILE:     whileLoop(p,delegate); return tempData;
-				case FOR:		forLoop(p,delegate); return tempData;
+				case DO:		[self doLoop:p delegate:delegate]; return tempData;
+				case WHILE:     [self whileLoop:p delegate:delegate]; return tempData;
+				case FOR:		[self forLoop:p delegate:delegate]; return tempData;
 				case CONTINUE:	[NSException raise:@"continue" format:@""]; return tempData;
-				case IF:        if (ex(p->opr.op[0],delegate).val.lValue != 0) ex(p->opr.op[1],delegate);
-				else if (p->opr.nops > 2) ex(p->opr.op[2],delegate);
+				case IF:        if ([self ex:p->opr.op[0] delegate:delegate].val.lValue != 0) [self ex:p->opr.op[1] delegate:delegate];
+				else if (p->opr.nops > 2) [self ex:p->opr.op[2] delegate:delegate];
 					return tempData;
 					
-				case UNLESS:    if (ex(p->opr.op[0],delegate).val.lValue) ex(p->opr.op[1],delegate);
+				case UNLESS:    if ([self ex:p->opr.op[0] delegate:delegate].val.lValue) [self ex:p->opr.op[1] delegate:delegate];
 					return tempData;
 					
 				case BREAK:		[NSException raise:@"break" format:@""]; return tempData;
-				case SWITCH:	doSwitch(p,delegate); return tempData;
-				case CASE:		doCase(p,delegate); return tempData;
-				case DEFAULT:	doDefault(p,delegate); return tempData;
+				case SWITCH:	[self doSwitch:p delegate:delegate]; return tempData;
+				case CASE:		[self doCase:p delegate:delegate]; return tempData;
+				case DEFAULT:	[self doDefault:p delegate:delegate]; return tempData;
 				case PRINT:
-					tempData = ex(p->opr.op[0],delegate);
+					tempData = [self ex:p->opr.op[0] delegate:delegate];
 					if(tempData.type == kFilterPtrType){
 						if(tempData.val.pValue) NSLog(@"%ld\n", *tempData.val.pValue); 
 						else					NSLog(@"<nil ptr>\n"); 
@@ -290,107 +300,107 @@ filterData ex(nodeType *p,id delegate)
 					return tempData;
 					
 				case PRINTH:
-					tempData = ex(p->opr.op[0],delegate);
+					tempData = [self ex:p->opr.op[0] delegate:delegate];
 					if(tempData.type == kFilterPtrType){
 						if(tempData.val.pValue) NSLog(@"0x%07lx\n", *tempData.val.pValue); 
 						else					NSLog(@"<nil ptr>\n"); 
 					}
 					else NSLog(@"0x%07lx\n", tempData.val.lValue); 
 					return tempData;
-				case ';':       if (p->opr.nops>=1) ex(p->opr.op[0],delegate); if (p->opr.nops>=2)return ex(p->opr.op[1],delegate); else return tempData;
+				case ';':       if (p->opr.nops>=1) [self ex:p->opr.op[0] delegate:delegate]; if (p->opr.nops>=2)return [self ex:p->opr.op[1] delegate:delegate]; else return tempData;
 				case '=':      
 				{
-					tempData = ex(p->opr.op[1],delegate);
+					tempData = [self ex:p->opr.op[1] delegate:delegate];
 					[symbolTable setData:tempData forKey:p->opr.op[0]->ident.key];
 					return tempData;
 				}
 				case UMINUS: 
-					tempData = ex(p->opr.op[0],delegate);
+					tempData = [self ex:p->opr.op[0] delegate:delegate];
 					tempData.val.lValue = -tempData.val.lValue;
 					return tempData;
 					
-				case '+':       tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue + ex(p->opr.op[1],delegate).val.lValue; return tempData;
-				case '-':       tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue - ex(p->opr.op[1],delegate).val.lValue; return tempData;
-				case '*':       tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue * ex(p->opr.op[1],delegate).val.lValue; return tempData;
-				case '/':       tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue / ex(p->opr.op[1],delegate).val.lValue; return tempData;
-				case '<':       tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue < ex(p->opr.op[1],delegate).val.lValue; return tempData;
-				case '>':       tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue > ex(p->opr.op[1],delegate).val.lValue; return tempData;
-				case '^':       tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue ^ ex(p->opr.op[1],delegate).val.lValue; return tempData;
-				case '%':       tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue % ex(p->opr.op[1],delegate).val.lValue; return tempData;
-				case '|':       tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue | ex(p->opr.op[1],delegate).val.lValue; return tempData;
-				case '&':       tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue & ex(p->opr.op[1],delegate).val.lValue; return tempData;
-				case '!':       tempData.val.lValue = !ex(p->opr.op[0],delegate).val.lValue; return tempData;
-				case '~':       tempData.val.lValue = ~ex(p->opr.op[0],delegate).val.lValue; return tempData;
-				case GE_OP:     tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue >= ex(p->opr.op[1],delegate).val.lValue; return tempData;
-				case LE_OP:     tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue <= ex(p->opr.op[1],delegate).val.lValue; return tempData;
-				case NE_OP:     tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue != ex(p->opr.op[1],delegate).val.lValue; return tempData;
-				case EQ_OP:     tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue == ex(p->opr.op[1],delegate).val.lValue; return tempData;
-				case LEFT_OP:   tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue << ex(p->opr.op[1],delegate).val.lValue; return tempData;
-				case RIGHT_OP:  tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue >> ex(p->opr.op[1],delegate).val.lValue; return tempData;
-				case AND_OP:	tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue && ex(p->opr.op[1],delegate).val.lValue; return tempData;
-				case OR_OP:		tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue || ex(p->opr.op[1],delegate).val.lValue; return tempData;
+				case '+':       tempData.val.lValue = [self ex:p->opr.op[0] delegate:delegate].val.lValue + [self ex:p->opr.op[1] delegate:delegate].val.lValue; return tempData;
+				case '-':       tempData.val.lValue = [self ex:p->opr.op[0] delegate:delegate].val.lValue - [self ex:p->opr.op[1] delegate:delegate].val.lValue; return tempData;
+				case '*':       tempData.val.lValue = [self ex:p->opr.op[0] delegate:delegate].val.lValue * [self ex:p->opr.op[1] delegate:delegate].val.lValue; return tempData;
+				case '/':       tempData.val.lValue = [self ex:p->opr.op[0] delegate:delegate].val.lValue / [self ex:p->opr.op[1] delegate:delegate].val.lValue; return tempData;
+				case '<':       tempData.val.lValue = [self ex:p->opr.op[0] delegate:delegate].val.lValue < [self ex:p->opr.op[1] delegate:delegate].val.lValue; return tempData;
+				case '>':       tempData.val.lValue = [self ex:p->opr.op[0] delegate:delegate].val.lValue > [self ex:p->opr.op[1] delegate:delegate].val.lValue; return tempData;
+				case '^':       tempData.val.lValue = [self ex:p->opr.op[0] delegate:delegate].val.lValue ^ [self ex:p->opr.op[1] delegate:delegate].val.lValue; return tempData;
+				case '%':       tempData.val.lValue = [self ex:p->opr.op[0] delegate:delegate].val.lValue % [self ex:p->opr.op[1] delegate:delegate].val.lValue; return tempData;
+				case '|':       tempData.val.lValue = [self ex:p->opr.op[0] delegate:delegate].val.lValue | [self ex:p->opr.op[1] delegate:delegate].val.lValue; return tempData;
+				case '&':       tempData.val.lValue = [self ex:p->opr.op[0] delegate:delegate].val.lValue & [self ex:p->opr.op[1] delegate:delegate].val.lValue; return tempData;
+				case '!':       tempData.val.lValue = ![self ex:p->opr.op[0] delegate:delegate].val.lValue; return tempData;
+				case '~':       tempData.val.lValue = ~[self ex:p->opr.op[0] delegate:delegate].val.lValue; return tempData;
+				case GE_OP:     tempData.val.lValue = [self ex:p->opr.op[0] delegate:delegate].val.lValue >= [self ex:p->opr.op[1] delegate:delegate].val.lValue; return tempData;
+				case LE_OP:     tempData.val.lValue = [self ex:p->opr.op[0] delegate:delegate].val.lValue <= [self ex:p->opr.op[1] delegate:delegate].val.lValue; return tempData;
+				case NE_OP:     tempData.val.lValue = [self ex:p->opr.op[0] delegate:delegate].val.lValue != [self ex:p->opr.op[1] delegate:delegate].val.lValue; return tempData;
+				case EQ_OP:     tempData.val.lValue = [self ex:p->opr.op[0] delegate:delegate].val.lValue == [self ex:p->opr.op[1] delegate:delegate].val.lValue; return tempData;
+				case LEFT_OP:   tempData.val.lValue = [self ex:p->opr.op[0] delegate:delegate].val.lValue << [self ex:p->opr.op[1] delegate:delegate].val.lValue; return tempData;
+				case RIGHT_OP:  tempData.val.lValue = [self ex:p->opr.op[0] delegate:delegate].val.lValue >> [self ex:p->opr.op[1] delegate:delegate].val.lValue; return tempData;
+				case AND_OP:	tempData.val.lValue = [self ex:p->opr.op[0] delegate:delegate].val.lValue && [self ex:p->opr.op[1] delegate:delegate].val.lValue; return tempData;
+				case OR_OP:		tempData.val.lValue = [self ex:p->opr.op[0] delegate:delegate].val.lValue || [self ex:p->opr.op[1] delegate:delegate].val.lValue; return tempData;
 					
 				case RIGHT_ASSIGN: 
-					tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue>>ex(p->opr.op[1],delegate).val.lValue;
+					tempData.val.lValue = [self ex:p->opr.op[0] delegate:delegate].val.lValue>>[self ex:p->opr.op[1] delegate:delegate].val.lValue;
 					[symbolTable setData:tempData forKey:p->opr.op[0]->ident.key];
 					return tempData;
 					
 				case LEFT_ASSIGN: 
-					tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue<<ex(p->opr.op[1],delegate).val.lValue;
+					tempData.val.lValue = [self ex:p->opr.op[0] delegate:delegate].val.lValue<<[self ex:p->opr.op[1] delegate:delegate].val.lValue;
 					[symbolTable setData:tempData forKey:p->opr.op[0]->ident.key];
 					return tempData;
 					
 				case MUL_ASSIGN: 
-					tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue * ex(p->opr.op[1],delegate).val.lValue;
+					tempData.val.lValue = [self ex:p->opr.op[0] delegate:delegate].val.lValue * [self ex:p->opr.op[1] delegate:delegate].val.lValue;
 					[symbolTable setData:tempData forKey:p->opr.op[0]->ident.key];
 					return tempData;
 					
 				case DIV_ASSIGN: 
-					tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue / ex(p->opr.op[1],delegate).val.lValue;
+					tempData.val.lValue = [self ex:p->opr.op[0] delegate:delegate].val.lValue / [self ex:p->opr.op[1] delegate:delegate].val.lValue;
 					[symbolTable setData:tempData forKey:p->opr.op[0]->ident.key];
 					return tempData;
 					
 				case OR_ASSIGN: 
-					tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue | ex(p->opr.op[1],delegate).val.lValue;
+					tempData.val.lValue = [self ex:p->opr.op[0] delegate:delegate].val.lValue | [self ex:p->opr.op[1] delegate:delegate].val.lValue;
 					[symbolTable setData:tempData forKey:p->opr.op[0]->ident.key];
 					return tempData;
 					
 				case MOD_ASSIGN: 
-					tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue % ex(p->opr.op[1],delegate).val.lValue;
+					tempData.val.lValue = [self ex:p->opr.op[0] delegate:delegate].val.lValue % [self ex:p->opr.op[1] delegate:delegate].val.lValue;
 					[symbolTable setData:tempData forKey:p->opr.op[0]->ident.key];
 					return tempData;
 					
 				case AND_ASSIGN: 
-					tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue & ex(p->opr.op[1],delegate).val.lValue;
+					tempData.val.lValue = [self ex:p->opr.op[0] delegate:delegate].val.lValue & [self ex:p->opr.op[1] delegate:delegate].val.lValue;
 					[symbolTable setData:tempData forKey:p->opr.op[0]->ident.key];
 					return tempData;
 					
 				case XOR_ASSIGN: 
-					tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue ^ ex(p->opr.op[1],delegate).val.lValue;
+					tempData.val.lValue = [self ex:p->opr.op[0] delegate:delegate].val.lValue ^ [self ex:p->opr.op[1] delegate:delegate].val.lValue;
 					[symbolTable setData:tempData forKey:p->opr.op[0]->ident.key];
 					return tempData;
 					
 					
 				case kPostInc: 
-					tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue;
+					tempData.val.lValue = [self ex:p->opr.op[0] delegate:delegate].val.lValue;
 					tempData1 = tempData;
 					tempData1.val.lValue++;
 					[symbolTable setData:tempData1 forKey:p->opr.op[0]->ident.key];
 					return tempData;
 					
 				case kPreInc: 
-					tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue+1;
+					tempData.val.lValue = [self ex:p->opr.op[0] delegate:delegate].val.lValue+1;
 					[symbolTable setData:tempData forKey:p->opr.op[0]->ident.key];
 					return tempData;
 					
 				case kPostDec: 
-					tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue;
+					tempData.val.lValue = [self ex:p->opr.op[0] delegate:delegate].val.lValue;
 					tempData1 = tempData;
 					tempData1.val.lValue--;
 					[symbolTable setData:tempData1 forKey:p->opr.op[0]->ident.key];
 					
 				case kPreDec: 
-					tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue-1;
+					tempData.val.lValue = [self ex:p->opr.op[0] delegate:delegate].val.lValue-1;
 					[symbolTable setData:tempData forKey:p->opr.op[0]->ident.key];
 					return tempData;
 					
@@ -398,9 +408,9 @@ filterData ex(nodeType *p,id delegate)
 					//array stuff
 				case kArrayAssign:
 				{
-					unsigned long* ptr = ex(p->opr.op[0],delegate).val.pValue;
+					unsigned long* ptr = [self ex:p->opr.op[0] delegate:delegate].val.pValue;
 					if(ptr!=0){
-						*ptr = ex(p->opr.op[1],delegate).val.lValue;
+						*ptr = [self ex:p->opr.op[1] delegate:delegate].val.lValue;
 						tempData.type = kFilterLongType;
 						tempData.val.lValue = *ptr;
 					}
@@ -412,9 +422,9 @@ filterData ex(nodeType *p,id delegate)
 					
 				case kLeftArray:
 				{
-					unsigned long* ptr = ex(p->opr.op[0],delegate).val.pValue;
+					unsigned long* ptr = [self ex:p->opr.op[0] delegate:delegate].val.pValue;
 					if(ptr!=0){
-						unsigned long offset = ex(p->opr.op[1],delegate).val.lValue;
+						unsigned long offset = [self ex:p->opr.op[1] delegate:delegate].val.lValue;
 						tempData.type = kFilterPtrType;
 						tempData.val.pValue = ptr+offset;
 					}
@@ -426,9 +436,9 @@ filterData ex(nodeType *p,id delegate)
 					
 				case kArrayElement:
 				{
-					unsigned long* ptr = ex(p->opr.op[0],delegate).val.pValue;
+					unsigned long* ptr = [self ex:p->opr.op[0] delegate:delegate].val.pValue;
 					if(ptr!=0){
-						unsigned long offset = ex(p->opr.op[1],delegate).val.lValue;
+						unsigned long offset = [self ex:p->opr.op[1] delegate:delegate].val.lValue;
 						tempData.type = kFilterLongType;
 						tempData.val.lValue = ptr[offset];
 					}
@@ -438,86 +448,83 @@ filterData ex(nodeType *p,id delegate)
 				}
 					return tempData;
 					
-				case kDefineArray:		defineArray(p,delegate); 		break;
-				case FREEARRAY:			freeArray(p,delegate); 			break;
-					
-				case kArrayListAssign:	
-					arrayList(p,delegate);
-					break;
+				case kDefineArray:		[self defineArray:p delegate:delegate];  		break;
+                case FREEARRAY:			[self freeArray:p delegate:delegate]; 			break;
+				case kArrayListAssign:	[self arrayList:p delegate:delegate];           break;
 					
 				case CURRENTRECORD_IS:
 					[symbolTable getData:&tempData forKey:"CurrentRecordPtr"];
-					tempData.val.lValue =  [delegate record:tempData.val.pValue isEqualTo:ex(p->opr.op[0],delegate).val.lValue]; 
+					tempData.val.lValue =  [delegate record:tempData.val.pValue isEqualTo:[self ex:p->opr.op[0] delegate:delegate].val.lValue]; 
 					return tempData;
 					
 				case EXTRACTRECORD_ID: 
-					tempData.val.lValue =  [delegate extractRecordID:ex(p->opr.op[0],delegate).val.lValue]; 
+					tempData.val.lValue =  [delegate extractRecordID:[self ex:p->opr.op[0] delegate:delegate].val.lValue]; 
 					return tempData;
 					
 				case EXTRACTRECORD_LEN: 
-					tempData.val.lValue =  [delegate extractRecordLen:ex(p->opr.op[0],delegate).val.lValue]; 
+					tempData.val.lValue =  [delegate extractRecordLen:[self ex:p->opr.op[0] delegate:delegate].val.lValue]; 
 					return tempData;
 					
 				case EXTRACT_VALUE: 
-					tempData.val.lValue =  [delegate extractValue:ex(p->opr.op[0],delegate).val.lValue 
-															 mask:ex(p->opr.op[1],delegate).val.lValue
-														thenShift:ex(p->opr.op[2],delegate).val.lValue]; 
+					tempData.val.lValue =  [delegate extractValue:[self ex:p->opr.op[0] delegate:delegate].val.lValue 
+															 mask:[self ex:p->opr.op[1] delegate:delegate].val.lValue
+														thenShift:[self ex:p->opr.op[2] delegate:delegate].val.lValue]; 
 					return tempData;
 					
 					
 				case SHIP_RECORD:
 				{
-					unsigned long* ptr = ex(p->opr.op[0],delegate).val.pValue;
+					unsigned long* ptr = [self ex:p->opr.op[0] delegate:delegate].val.pValue;
 					if(ptr) [delegate shipRecord:ptr length:ExtractLength(*ptr)]; 
 				}
 					break;
 					
 				case PUSH_RECORD:
 				{
-					long stack = ex(p->opr.op[0],delegate).val.lValue;
-					unsigned long* ptr  = ex(p->opr.op[1],delegate).val.pValue;
-					unsigned long ptrValue  = ex(p->opr.op[1],delegate).val.lValue;
+					long stack = [self ex:p->opr.op[0] delegate:delegate].val.lValue;
+					unsigned long* ptr  = [self ex:p->opr.op[1] delegate:delegate].val.pValue;
+					unsigned long ptrValue  = [self ex:p->opr.op[1] delegate:delegate].val.lValue;
 					[delegate pushOntoStack:stack ptrCheck:ptrValue record:ptr]; 
 				}
 					break;
 					
 				case POP_RECORD:
-					tempData.val.pValue = [delegate popFromStack:ex(p->opr.op[0],delegate).val.lValue];
+					tempData.val.pValue = [delegate popFromStack:[self ex:p->opr.op[0] delegate:delegate].val.lValue];
 					return tempData;
 					
 				case BOTTOM_POP_RECORD:
-					tempData.val.pValue = [delegate popFromStackBottom:ex(p->opr.op[0],delegate).val.lValue];
+					tempData.val.pValue = [delegate popFromStackBottom:[self ex:p->opr.op[0] delegate:delegate].val.lValue];
 					return tempData;
 					
 				case SHIP_STACK:
-					[delegate shipStack:ex(p->opr.op[0],delegate).val.lValue];
+					[delegate shipStack:[self ex:p->opr.op[0] delegate:delegate].val.lValue];
 					break;
 					
 				case DUMP_STACK:
-					[delegate dumpStack:ex(p->opr.op[0],delegate).val.lValue];
+					[delegate dumpStack:[self ex:p->opr.op[0] delegate:delegate].val.lValue];
 					break;
 					
 				case STACK_COUNT:
-					tempData.val.lValue = [delegate stackCount:ex(p->opr.op[0],delegate).val.lValue];
+					tempData.val.lValue = [delegate stackCount:[self ex:p->opr.op[0] delegate:delegate].val.lValue];
 					return tempData;
 					
 				case HISTO_1D:				
-					[delegate histo1D:ex(p->opr.op[0],delegate).val.lValue value:ex(p->opr.op[1],delegate).val.lValue];
+					[delegate histo1D:[self ex:p->opr.op[0] delegate:delegate].val.lValue value:[self ex:p->opr.op[1] delegate:delegate].val.lValue];
 					break;
 					
 				case HISTO_2D:	
 				{
-					unsigned long x = ex(p->opr.op[1],delegate).val.lValue;
-					unsigned long y = ex(p->opr.op[2],delegate).val.lValue;
-					[delegate histo2D:ex(p->opr.op[0],delegate).val.lValue x:x y:y];
+					unsigned long x = [self ex:p->opr.op[1] delegate:delegate].val.lValue;
+					unsigned long y = [self ex:p->opr.op[2] delegate:delegate].val.lValue;
+					[delegate histo2D:[self ex:p->opr.op[0] delegate:delegate].val.lValue x:x y:y];
 				}
 					break;
 					
 				case STRIPCHART:	
 				{
-					unsigned long aTime = ex(p->opr.op[1],delegate).val.lValue;
-					unsigned long aValue = ex(p->opr.op[2],delegate).val.lValue;
-					[delegate stripChart:ex(p->opr.op[0],delegate).val.lValue time:aTime value:aValue];
+					unsigned long aTime = [self ex:p->opr.op[1] delegate:delegate].val.lValue;
+					unsigned long aValue = [self ex:p->opr.op[2] delegate:delegate].val.lValue;
+					[delegate stripChart:[self ex:p->opr.op[0] delegate:delegate].val.lValue time:aTime value:aValue];
 				}
 					break;
 					
@@ -531,14 +538,14 @@ filterData ex(nodeType *p,id delegate)
 					
 					
 				case DISPLAY_VALUE:	
-					[delegate setOutput:ex(p->opr.op[0],delegate).val.lValue 
-							  withValue:ex(p->opr.op[1],delegate).val.lValue];
+					[delegate setOutput:[self ex:p->opr.op[0] delegate:delegate].val.lValue 
+							  withValue:[self ex:p->opr.op[1] delegate:delegate].val.lValue];
 					break;
 					
 				case RANDOM:
 				{
-					int high = ex(p->opr.op[0],delegate).val.lValue;
-					int low  = ex(p->opr.op[1],delegate).val.lValue;
+					int high = [self ex:p->opr.op[0] delegate:delegate].val.lValue;
+					int low  = [self ex:p->opr.op[1] delegate:delegate].val.lValue;
 					if(low>high){
 						int temp = high;
 						high = low;
@@ -558,3 +565,170 @@ filterData ex(nodeType *p,id delegate)
     return tempData;
 }
 
+/* main entry point of the manipulation of the syntax tree */
+- (int) filterGraph:(nodeType*)p
+{
+	int level = 0;
+	NSLogFont([NSFont fontWithName:@"Monaco" size:9.0],@"\n%@\n",[self finalPass:[self exNode:p level:level lastChild: NO]]);
+    return 0;
+}
+
+- (id) exNode:(nodeType*)p level:(int)aLevel lastChild:(BOOL) lastChild
+{
+    
+    if (!p) return @"";
+	NSMutableString* line = nil;
+	
+    switch(p->type) {
+        case typeCon: line = [NSMutableString stringWithFormat:@"c(%ld)", p->con.value]; break;
+        case typeId:  line = [NSMutableString stringWithFormat:@"(%s)", p->ident.key]; break;
+        case typeOpr:
+            switch(p->opr.oper){
+                case kConditional:		line = [NSMutableString stringWithString:@"[Conditional]"];	break;
+                case DO:				line = [NSMutableString stringWithString:@"[do]"];			break;
+                case WHILE:				line = [NSMutableString stringWithString:@"[while]"];		break;
+                case FOR:				line = [NSMutableString stringWithString:@"[for]"];			break;
+                case IF:				line = [NSMutableString stringWithString:@"[if]"];			break;
+                case UNLESS:			line = [NSMutableString stringWithString:@"[unless]"];		break;
+				case SWITCH:			line = [NSMutableString stringWithString:@"[switch]"];		break;
+                case CASE:				line = [NSMutableString stringWithString:@"[case]"];		break;
+                case DEFAULT:			line = [NSMutableString stringWithString:@"[default]"];		break;
+                case PRINT:				line = [NSMutableString stringWithString:@"[print]"];		break;
+                case PRINTH:			line = [NSMutableString stringWithString:@"[printhex]"];	break;
+                case kPostInc:			line = [NSMutableString stringWithString:@"[postInc]"];		break;
+                case kPreInc:			line = [NSMutableString stringWithString:@"[preInc]"];		break;
+                case kPostDec:			line = [NSMutableString stringWithString:@"[postDec]"];		break;
+                case kPreDec:			line = [NSMutableString stringWithString:@"[prdDec]"];		break;
+                case ';':				line = [NSMutableString stringWithString:@"[;]"];			break;
+                case '=':				line = [NSMutableString stringWithString:@"[=]"];			break;
+                case UMINUS:			line = [NSMutableString stringWithString:@"[-]"];			break;
+                case '~':				line = [NSMutableString stringWithString:@"[~]"];			break;
+                case '^':				line = [NSMutableString stringWithString:@"[^]"];			break;
+                case '%':				line = [NSMutableString stringWithString:@"[%]"];			break;
+                case '!':				line = [NSMutableString stringWithString:@"[!]"];			break;
+                case '+':				line = [NSMutableString stringWithString:@"[+]"];			break;
+                case '-':				line = [NSMutableString stringWithString:@"[-]"];			break;
+                case '*':				line = [NSMutableString stringWithString:@"[*]"];			break;
+                case '/':				line = [NSMutableString stringWithString:@"[/]"];			break;
+                case '<':				line = [NSMutableString stringWithString:@"[<]"];			break;
+                case '>':				line = [NSMutableString stringWithString:@"[>]"];			break;
+                case LEFT_OP:			line = [NSMutableString stringWithString:@"[<<]"];			break;
+                case RIGHT_OP:			line = [NSMutableString stringWithString:@"[<<]"];			break;
+				case AND_OP:			line = [NSMutableString stringWithString:@"[&&]"];			break;
+				case '&':				line = [NSMutableString stringWithString:@"[&]"];			break;
+				case OR_OP:				line = [NSMutableString stringWithString:@"[||]"];			break;
+				case '|':				line = [NSMutableString stringWithString:@"[|]"];			break;
+				case GE_OP:				line = [NSMutableString stringWithString:@"[>=]"];			break;
+                case LE_OP:				line = [NSMutableString stringWithString:@"[<=]"];			break;
+                case NE_OP:				line = [NSMutableString stringWithString:@"[!=]"];			break;
+                case EQ_OP:				line = [NSMutableString stringWithString:@"[==]"];			break;
+				case BREAK:				line = [NSMutableString stringWithString:@"[break]"];		break;
+				case CONTINUE:			line = [NSMutableString stringWithString:@"[continue]"];	break;
+                case LEFT_ASSIGN:		line = [NSMutableString stringWithString:@"[<<=]"];			break;
+                case RIGHT_ASSIGN:		line = [NSMutableString stringWithString:@"[>>=]"];			break;
+                case ADD_ASSIGN:		line = [NSMutableString stringWithString:@"[+=]"];			break;
+                case SUB_ASSIGN:		line = [NSMutableString stringWithString:@"[-=]"];			break;
+                case MUL_ASSIGN:		line = [NSMutableString stringWithString:@"[*=]"];			break;
+                case DIV_ASSIGN:		line = [NSMutableString stringWithString:@"[/=]"];			break;
+                case OR_ASSIGN:			line = [NSMutableString stringWithString:@"[|=]"];			break;
+                case AND_ASSIGN:		line = [NSMutableString stringWithString:@"[&=]"];			break;
+                case ',':				line = [NSMutableString stringWithString:@"[,]"];			break;
+                case kDefineArray:		line = [NSMutableString stringWithString:@"[kDefineArray]"];break;
+                case kLeftArray:		line = [NSMutableString stringWithString:@"[kLeftArray]"];	break;
+                case kArrayElement:		line = [NSMutableString stringWithString:@"[arrayElement]"];break;
+                case kArrayAssign:		line = [NSMutableString stringWithString:@"[kArrayAssign]"];break;
+                case kArrayListAssign:	line = [NSMutableString stringWithString:@"[kArrayListAssign]"];break;
+				case FREEARRAY:			line = [NSMutableString stringWithString:@"[free]"];		break;
+                case EXTRACTRECORD_LEN:	line = [NSMutableString stringWithString:@"[extractLen]"];	break;
+                case CURRENTRECORD_IS:	line = [NSMutableString stringWithString:@"[currentRecordIs]"];	break;
+                case EXTRACTRECORD_ID:	line = [NSMutableString stringWithString:@"[exgtractID]"];	break;
+                case SHIP_RECORD:		line = [NSMutableString stringWithString:@"[shipRecord]"];	break;
+                case PUSH_RECORD:		line = [NSMutableString stringWithString:@"[push]"];		break;
+                case POP_RECORD:		line = [NSMutableString stringWithString:@"[pop]"];			break;
+                case BOTTOM_POP_RECORD:	line = [NSMutableString stringWithString:@"[bottomPop]"];	break;
+                case SHIP_STACK:		line = [NSMutableString stringWithString:@"[shipStack]"];	break;
+                case DUMP_STACK:		line = [NSMutableString stringWithString:@"[dumpStack]"];	break;
+				case STACK_COUNT:		line = [NSMutableString stringWithString:@"[stackCount]"];	break;
+				case HISTO_1D:			line = [NSMutableString stringWithString:@"[histo1D]"];		break;
+				case HISTO_2D:			line = [NSMutableString stringWithString:@"[histo2D]"];		break;
+				case TIME:				line = [NSMutableString stringWithString:@"[time]"];		break;
+				case RANDOM:			line = [NSMutableString stringWithString:@"[random]"];		break;
+				case STRIPCHART:		line = [NSMutableString stringWithString:@"[stripChart]"];	break;
+				case DISPLAY_VALUE:		line = [NSMutableString stringWithString:@"[displayValue]"];break;
+				case RESET_DISPLAYS:	line = [NSMutableString stringWithString:@"[resetDisplays]"];break;
+				case EXTRACT_VALUE:		line = [NSMutableString stringWithString:@"[extractValue]"];break;
+ 				default:				line = [NSMutableString stringWithString:@"[??]"];			break;
+            }
+            break;
+    }
+	NSString* prependString = @"";
+	int i;
+	for(i=0;i<aLevel;i++){
+		if(i>=aLevel-1)prependString = [prependString stringByAppendingString:@"|----"];
+		else prependString = [prependString stringByAppendingString:@"|    "];
+	}
+	[line insertString:prependString atIndex:0];
+	[line appendString:@"\n"];
+    
+	int count = 0;
+	if (p->type == typeOpr){
+		count = p->opr.nops;
+	}
+	
+    /* node is leaf */
+    if (count == 0) {
+		if(lastChild){
+			NSString* suffixString = @"";
+			int i;
+			for(i=0;i<aLevel;i++){
+				if(i<aLevel)suffixString = [suffixString stringByAppendingString:@"|    "];
+			}
+			[line appendFormat:@"%@\n",suffixString];
+		}
+        return line;
+    }
+	aLevel++;
+    
+    /* node has children */
+    int k;
+    for (k = 0; k < count; k++) {
+        [line appendString: [self exNode:p->opr.op[k] level: aLevel lastChild: k==count-1]];
+    }
+	return line;
+}
+
+- (id) finalPass:(id) string
+{
+	NSMutableArray* lines = [NSMutableArray arrayWithArray:[string componentsSeparatedByString:@"\n"]];
+	NSMutableString* aLine;
+	int r1 = 0;
+	while(1) {
+		NSRange r = NSMakeRange(r1,2);
+		BOOL delete = YES;
+		int count = [lines count];
+		int i;
+		BOOL done = YES;
+		for(i=count-1;i>=0;i--){
+			aLine = [lines objectAtIndex:i];
+			if([aLine length] < NSMaxRange(r))continue;
+			done = NO;
+			
+			if(delete && [[aLine substringWithRange:r] isEqualToString:@"| "]){
+				NSMutableString* newString = [NSMutableString stringWithString:aLine];
+				[newString replaceCharactersInRange:r withString:@"  "];
+				[lines replaceObjectAtIndex:i withObject:newString];
+			}
+			else if(delete && [[aLine substringWithRange:r] isEqualToString:@"|-"]){
+				delete = NO;
+			}
+			else if(!delete && ![[aLine substringWithRange:NSMakeRange(r1,1)] isEqualToString:@"|"]){
+				delete = YES;
+			}
+		}
+		r1 += 5;
+		if(done)break;
+	}
+	return [lines componentsJoinedByString:@"\n"];
+}
+
+@end
