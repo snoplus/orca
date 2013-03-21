@@ -47,12 +47,7 @@
 	return @"Push Button";
 }
 
-- (void) doCmdDoubleClick:(id)sender
-{
-	[self doCmdClick:sender];
-}
-
-- (void) doCmdClick:(id)sender
+- (void) doCmdClick:(id)sender atPoint:(NSPoint)aPoint
 {
 	BOOL currentState = [self state];
 	[self setState:!currentState];

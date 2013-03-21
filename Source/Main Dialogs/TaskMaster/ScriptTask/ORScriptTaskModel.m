@@ -67,16 +67,14 @@ NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
 	[self setUpImage];
 }
 
-- (BOOL) acceptsClickAtPoint:(NSPoint)aPoint
+- (void) doCmdClick:(id)sender atPoint:(NSPoint)aPoint
 {
     if(enableIconControls){
         if(NSPointInRect(aPoint,[self frame])){
             if([self running]) [self stopScript];
             else [self runScript];
         }
-        return NO; //want no further action with this click
     }
-	else return NSPointInRect(aPoint,[self frame]);
 }
 
 - (void) setUpImage

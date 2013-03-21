@@ -551,16 +551,21 @@ NSString* ORMiscAttributeKey		= @"ORMiscAttributeKey";
 
 - (void) flagsChanged:(NSEvent *)theEvent
 {
-    enableIconControls  = ([[NSApp currentEvent] modifierFlags] & NSCommandKeyMask)!=0;
-    [self setUpImage];
+    [self setEnableIconControls:([[NSApp currentEvent] modifierFlags] & NSCommandKeyMask)!=0];
+}
+- (void) setEnableIconControls:(BOOL) aState
+{
+    BOOL redraw = enableIconControls!=aState;
+    enableIconControls = aState;
+    if(redraw)[self setUpImage];
 }
 
-- (void) doCmdClick:(id)sender
+- (void) doCmdClick:(id)sender atPoint:(NSPoint)aPoint
 {
 	//subclasses can use as needed.
 }
 
-- (void) doCmdDoubleClick:(id)sender
+- (void) doCmdDoubleClick:(id)sender atPoint:(NSPoint)aPoint
 {
 	//subclasses can use as needed.
 }

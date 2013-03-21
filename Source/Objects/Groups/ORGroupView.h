@@ -71,6 +71,7 @@
 - (void) moveSelectedObjects:(NSPoint)delta;
 - (BOOL) validateMenuItem:(NSMenuItem*)menuItem;
 - (void) doControlClick:(id)sender;
+    - (void) setEnableIconControls:(BOOL) aState;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) copy:(id)sender;

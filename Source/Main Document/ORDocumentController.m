@@ -189,8 +189,15 @@ int sortListDnFunc(id element1,id element2, void* context){return [element2 comp
 	[[NSNotificationCenter defaultCenter] addObserver : self
                                              selector : @selector(debuggingSessionChanged:)
                                                  name : ORDebuggingSessionChanged
-                                               object : nil];	
+                                               object : nil];
+    
+	[[NSNotificationCenter defaultCenter] addObserver : self
+                                             selector : @selector(lostFocus:)
+                                                 name : NSWindowDidResignKeyNotification
+                                               object : nil];
 
+    
+    
 }
 
 - (void) updateWindow
@@ -225,6 +232,15 @@ int sortListDnFunc(id element1,id element2, void* context){return [element2 comp
     BOOL locked = [gSecurity isLocked:ORDocumentLock];
     [documentLockButton setState: locked];
     
+}
+
+- (void) lostFocus:(NSNotification*)aNotification
+{
+    id controller = [[aNotification object]windowController];
+    if([controller isKindOfClass:NSClassFromString(@"OrcaObjectController")]){
+        [(OrcaObjectController*)controller endEditing];
+    }
+    [groupView setEnableIconControls:NO];
 }
 
 - (void) statusTextChanged:(NSNotification*)aNotification

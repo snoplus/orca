@@ -59,6 +59,7 @@
 - (void) showTemplates:(NSNotification*)aNotification;
 - (void) postLogChanged:(NSNotification*)aNotification;
 - (void) debuggingSessionChanged:(NSNotification*)aNotification;
+- (void) lostFocus:(NSNotification*)aNotification;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) openArchive:(NSToolbarItem*)item;

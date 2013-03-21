@@ -59,7 +59,7 @@ NSString* ORInputElementOutConnection  = @"ORInputElementOutConnection";
 }
 
 
-- (void) doCmdClick:(id)sender
+- (void) doCmdClick:(id)sender atPoint:(NSPoint)aPoint
 {
     if([guardian inTestMode]){
         int currentState = [self state];

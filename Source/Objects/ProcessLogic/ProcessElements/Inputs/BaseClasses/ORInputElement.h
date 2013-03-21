@@ -26,7 +26,7 @@
 	@protected
 		int connectedObjState;
 }
-- (void) doCmdClick:(id)sender;
+- (void) doCmdClick:(id)sender atPoint:(NSPoint)aPoint;
 - (int) connectedObjState;
 - (NSString*) report;
 @end

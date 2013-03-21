@@ -66,7 +66,7 @@ NSString* ORPlotLinkLock							 = @"ORPlotLinkLock";
     else				  [self openMainDialog:self];
 }
 
-- (void) doCmdDoubleClick:(id)sender
+- (void) doCmdDoubleClick:(id)sender atPoint:(NSPoint)aPoint
 {
 	if([plotName length]) [self openMainDialog:self];		
     else				  [self openAltDialog:self];

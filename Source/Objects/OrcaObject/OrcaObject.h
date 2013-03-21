@@ -133,13 +133,14 @@ extern NSString* ORObjArrayPtrPBType;
 - (BOOL) acceptsClickAtPoint:(NSPoint)aPoint;
 - (void) openHelp:(id)sender;
 - (void) doDoubleClick:(id)sender;
-- (void) doCmdClick:(id)sender;
-- (void) doCmdDoubleClick:(id)sender;
+- (void) doCmdClick:(id)sender atPoint:(NSPoint)aPoint;
+- (void) doCmdDoubleClick:(id)sender atPoint:(NSPoint)aPoint;
 - (void) doCntrlClick:(id)sender;
 - (ORConnector*) requestsConnection: (NSPoint)aPoint;
 - (BOOL) rectIntersectsIcon:(NSRect)aRect;
 - (BOOL) validateMenuItem:(NSMenuItem *)anItem;
 - (void) flagsChanged:(NSEvent *)theEvent;
+- (void) setEnableIconControls:(BOOL) aState;
 
 #pragma mark ¥¥¥Archival
 - (id)	initWithCoder:(NSCoder*)aCoder;

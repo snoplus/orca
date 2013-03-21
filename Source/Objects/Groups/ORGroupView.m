@@ -322,51 +322,56 @@
 			continue;
 		}
 		if( [obj1 acceptsClickAtPoint:localPoint]){
-			if(!cmdKeyDown){
-				if(cntrlKeyDown){
-					[obj1 doCntrlClick:obj1];
-					somethingHit = YES;
-				break;
-				}
-				else {
-					somethingHit = YES;
-					connectorRequestingConnection = [obj1 requestsConnection:localPoint];
-					if(connectorRequestingConnection == nil){
-						//obj1 has been clicked on
-						hitObjectHighlighted = [obj1 highlighted];
-						if(shiftKeyDown){ 					//shift key down so..
-							[obj1 setHighlighted:![obj1 highlighted]];		//flip the highlight state
-						}
-						else [obj1 setHighlighted:YES];                         //shift key NOT down so highligth
-																				//[self setNeedsDisplayInRect:[obj1 frame]];
-						[self setNeedsDisplay:YES];
-						
-						//next handle the response of the other objects
-						if(!shiftKeyDown){                                      //shift key NOT down
-							e  = [[group orcaObjects] objectEnumerator];
-							while (obj2 = [e nextObject]){			//loop thru all icons
-								if(obj2 != obj1 && !hitObjectHighlighted){	//skip the obj1 and if obj1 was NOT highlighted...
-									[obj2 setHighlighted:NO];			//unhighlight obj2
-								}
-							}
-						}
-						
-						if([event clickCount]>=2){
-							[[group allSelectedObjects] makeObjectsPerformSelector:@selector(doDoubleClick:) withObject:self];
-						}                
-					}
-				}
-				break;
-			}
-			else {
-				[obj1 setHighlighted:NO]; 
-				if([event clickCount]>=2) [obj1 doCmdDoubleClick:obj1];
-				else					  [obj1 doCmdClick:obj1];
-				somethingHit = YES;
-				break;
-			}
-			
-		}      
+            if(cntrlKeyDown){
+                [obj1 doCntrlClick:obj1];
+                somethingHit = YES;
+                break;
+            }
+            else {
+                somethingHit = YES;
+                connectorRequestingConnection = [obj1 requestsConnection:localPoint];
+                if(connectorRequestingConnection == nil){
+                    //obj1 has been clicked on
+                    hitObjectHighlighted = [obj1 highlighted];
+                    if(shiftKeyDown){ 					//shift key down so..
+                        [obj1 setHighlighted:![obj1 highlighted]];		//flip the highlight state
+                    }
+                    else [obj1 setHighlighted:YES];                         //shift key NOT down so highligth
+                    //[self setNeedsDisplayInRect:[obj1 frame]];
+                    [self setNeedsDisplay:YES];
+                    
+                    //next handle the response of the other objects
+                    if(!shiftKeyDown){                                      //shift key NOT down
+                        e  = [[group orcaObjects] objectEnumerator];
+                        while (obj2 = [e nextObject]){			//loop thru all icons
+                            if(obj2 != obj1 && !hitObjectHighlighted){	//skip the obj1 and if obj1 was NOT highlighted...
+                                [obj2 setHighlighted:NO];			//unhighlight obj2
+                            }
+                        }
+                    }
+                    
+                    if([event clickCount]>=2){
+                        if(cmdKeyDown){
+                            [obj1 setHighlighted:NO];
+                            [obj1 doCmdDoubleClick:obj1 atPoint:localPoint];
+                            somethingHit = YES;
+                            break;
+                        }
+                        else [[group allSelectedObjects] makeObjectsPerformSelector:@selector(doDoubleClick:) withObject:self];
+                    }
+                    else {
+                        if(cmdKeyDown){
+                            [obj1 setHighlighted:NO];
+                            [obj1 doCmdClick:obj1 atPoint:(NSPoint)localPoint];
+                            somethingHit = YES;
+                            break;
+                        }
+                    }
+
+                 }
+            }
+            break;
+        }
 	}
 	
     //something else must be done..
@@ -997,6 +1002,13 @@
 {
     for(id anObj in [group orcaObjects]){
         [anObj flagsChanged:theEvent];
+    }
+}
+
+- (void) setEnableIconControls:(BOOL) aState
+{
+    for(id anObj in [group orcaObjects]){
+        [anObj setEnableIconControls:aState];
     }
 }
 
