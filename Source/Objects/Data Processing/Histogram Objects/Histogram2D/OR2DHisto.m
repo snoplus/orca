@@ -339,6 +339,16 @@
     
 }
 
+//don't allow calibration
+- (id) calibration
+{
+    return nil;
+}
+
+- (void) setCalibration:(id)aCalibration
+{
+}
+
 - (NSData*) rawData
 {
 	NSData* theRawData;
