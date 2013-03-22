@@ -39,12 +39,15 @@
 	NSBezierPath*			errorShape;
 	id<ORAdcInfoProviding>	hardwareCard;
 	NSArray*				mapEntries;
+    NSString*               identifier;
 }
 
 #pragma mark ¥¥¥Initialization
 - (void) dealloc;
 
 #pragma mark ¥¥¥Accessors
+- (void) setIdentifier:(NSString*)newIdentifier;
+- (NSString*) identifier;
 - (void) setMapEntries:(NSArray*)someMapEntries;
 - (NSArray*) mapEntries;
 -(id) mapEntry:(int)index forKey:(id)aKey;

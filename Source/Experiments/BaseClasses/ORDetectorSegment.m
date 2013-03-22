@@ -40,10 +40,22 @@ NSString* KSegmentChangedNotification	  =	@"KSegmentChangedNotification";
 	[shape release];
 	[errorShape release];
 	[mapEntries release];
+	[identifier release];
     [super dealloc];
 }
 
 #pragma mark ¥¥¥Accessors
+- (void) setIdentifier:(NSString*)newIdentifier
+{
+	[identifier autorelease];
+	identifier = [newIdentifier copy];
+}
+
+- (NSString*) identifier
+{
+	return identifier;
+}
+
 - (void) setMapEntries:(NSArray*)someMapEntries
 {
 	[mapEntries autorelease];

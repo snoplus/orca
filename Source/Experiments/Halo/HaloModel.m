@@ -209,6 +209,24 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
     ORSegmentGroup* group2 = [[ORSegmentGroup alloc] initWithName:@"Test Tubes" numSegments:4 mapEntries:[self setupMapEntries:1]];
 	[self addGroup:group2];
 	[group2 release];
+    [self setupSegmentIds];
+}
+
+- (void) setupSegmentIds
+{
+    for(ORSegmentGroup* aGroup in segmentGroups){
+        int n = [aGroup numSegments];
+        int i;
+        for(i=0;i<n;i++){
+            ORDetectorSegment* aSegment = [aGroup segment:i];
+            NSString* crateName   = [aGroup segment:i objectForKey:@"kVME"          ];
+            NSString* cardName    = [aGroup segment:i objectForKey:@"kCardSlot"     ];
+            NSString* chanName    = [aGroup segment:i objectForKey:@"kChannel"      ];
+
+            NSString* anIndentifier = [NSString stringWithFormat:@"%@,%@,%@",crateName,cardName,chanName];
+            [aSegment setIdentifier:anIndentifier];
+        }
+    }
 }
 
 - (int)  maxNumSegments
@@ -222,17 +240,9 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
 		ORSegmentGroup* aGroup = [segmentGroups objectAtIndex:aSet];
         NSString* cardName       = [ aGroup segment:index objectForKey:@"kCardSlot"     ];
 		NSString* chanName       = [ aGroup segment:index objectForKey:@"kChannel"      ];
-        NSString* boreName       = [ aGroup segment:index objectForKey:@"kBore"         ];
-        NSString* clockName      = [ aGroup segment:index objectForKey:@"kClock"        ];
-        NSString* NCDName        = [ aGroup segment:index objectForKey:@"kNCD"          ];
         NSString* vmeCrateName   = [ aGroup segment:index objectForKey:@"kVME"          ];
-        NSString* hvCrateName    = [ aGroup segment:index objectForKey:@"kHvCrate"      ];
-        NSString* hvChanName     = [ aGroup segment:index objectForKey:@"kHvChan"       ];
-        NSString* preAmpName     = [ aGroup segment:index objectForKey:@"kPreAmp"       ];
-        NSString* pulserCardName = [ aGroup segment:index objectForKey:@"kPulserCard"   ];
-        NSString* pulserChanName = [ aGroup segment:index objectForKey:@"kPulserChan"   ];
         
-		if(boreName && clockName && NCDName && cardName && chanName && vmeCrateName && hvCrateName && hvChanName && preAmpName && pulserCardName && pulserChanName && ![boreName hasPrefix:@"-"] && ![clockName hasPrefix:@"-"] && ![NCDName hasPrefix:@"-"] && ![cardName hasPrefix:@"-"] && ![chanName hasPrefix:@"-"] && ![vmeCrateName hasPrefix:@"-"] && ![hvCrateName hasPrefix:@"-"] && ![hvChanName hasPrefix:@"-"] && ![preAmpName hasPrefix:@"-"] && ![pulserCardName hasPrefix:@"-"] && ![pulserChanName hasPrefix:@"-"]){
+		if(cardName && chanName && vmeCrateName && ![cardName hasPrefix:@"-"] && ![chanName hasPrefix:@"-"] && ![vmeCrateName hasPrefix:@"-"]){
 			ORDataSet* aDataSet = nil;
 			[[[self document] collectObjectsOfClass:NSClassFromString(@"OrcaObject")] makeObjectsPerformSelector:@selector(clearLoopChecked)];
 			NSArray* objs = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
@@ -240,18 +250,10 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
 				NSArray* arrayOfHistos = [[objs objectAtIndex:0] collectConnectedObjectsOfClass:NSClassFromString(@"ORHistoModel")];
 				if([arrayOfHistos count]){
 					id histoObj = [arrayOfHistos objectAtIndex:0];
-					aDataSet = [histoObj objectForKeyArray:[NSMutableArray arrayWithObjects:@"Shaper", @"Crate  0",
+					aDataSet = [histoObj objectForKeyArray:[NSMutableArray arrayWithObjects:@"Shaper" ,
+                                                            [NSString stringWithFormat:@"Crate %2d",[vmeCrateName intValue]],
                                                             [NSString stringWithFormat:@"Card %2d",[cardName intValue]],
 															[NSString stringWithFormat:@"Channel %2d",[chanName intValue]],
-                                                            [NSString stringWithFormat:@"ID %2d",[boreName intValue]],
-                                                            [NSString stringWithFormat:@"Clock %2d",[clockName intValue]],
-                                                            [NSString stringWithFormat:@"NCD %2d",[NCDName intValue]],
-                                                            [NSString stringWithFormat:@"VME Crate %2d",[vmeCrateName intValue]],
-                                                            [NSString stringWithFormat:@"HV Crate %2d",[hvCrateName intValue]],
-                                                            [NSString stringWithFormat:@"HV Chan %2d",[hvChanName intValue]],
-                                                            [NSString stringWithFormat:@"Preamp %2d",[preAmpName intValue]],
-                                                            [NSString stringWithFormat:@"Pulser Card %2d",[pulserCardName intValue]],
-                                                            [NSString stringWithFormat:@"Pulser Chan %2d",[pulserChanName intValue]],
 															nil]];
 					
 					[aDataSet doDoubleClick:nil];
@@ -260,6 +262,12 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
 		}
 	}
 }
+- (unsigned long) count
+{
+    NSLog(@"got here\n");
+    return 0;
+}
+
 - (NSString*) dataSetNameGroup:(int)aGroup segment:(int)index
 {
 	ORSegmentGroup* theGroup = [segmentGroups objectAtIndex:aGroup];
@@ -269,7 +277,7 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
 	NSString* chanName       = [ theGroup segment:index objectForKey:@"kChannel"     ];
     
     
-    return [NSString stringWithFormat:@"FLT,Energy,Crate %2d,Station %2d,Channel %2d",[crateName intValue],[cardName intValue],[chanName intValue]];
+    return [NSString stringWithFormat:@"FLT,Energy,Crate %2d,Card %2d,Channel %2d",[crateName intValue],[cardName intValue],[chanName intValue]];
 }
 #pragma mark ¥¥¥Specific Dialog Lock Methods
 - (NSString*) experimentMapLock
@@ -384,20 +392,20 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
 	NSString* finalString = @"";
 	NSArray* parts = [aString componentsSeparatedByString:@"\n"                                                          ];
 	finalString = [ finalString stringByAppendingString:@"\n-----------------------\n"                                   ];
-	finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Segment" parts:parts]       ];
-    finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Bore" parts:parts]          ];
-    finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" NCD" parts:parts]           ];
-    finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Clock" parts:parts]         ];
+	finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Segment"    parts:parts]       ];
+    finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Bore"       parts:parts]          ];
+    finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" NCD"        parts:parts]           ];
+    finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Clock"      parts:parts]         ];
 	finalString = [ finalString stringByAppendingString:@"-----------------------\n"                                     ];
-	finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" CardSlot" parts:parts]      ];
-	finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Channel" parts:parts]       ];
-    finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" VME Crate" parts:parts]       ];
-	finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Threshold" parts:parts]     ];
-	finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Gain" parts:parts]          ];
+	finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" CardSlot"   parts:parts]      ];
+	finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Channel"    parts:parts]       ];
+    finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" VME"        parts:parts]       ];
+	finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Threshold"  parts:parts]     ];
+	finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Gain"       parts:parts]          ];
 	finalString = [ finalString stringByAppendingString:@"-----------------------\n"                                     ];
-    finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" HvCrate" parts:parts]       ];
-    finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" HvChan" parts:parts]        ];
-    finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" PreAmp" parts:parts]        ];
+    finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" HvCrate"    parts:parts]       ];
+    finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" HvChan"     parts:parts]        ];
+    finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" PreAmp"     parts:parts]        ];
     finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" PulserCard" parts:parts]    ];
     finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" PulserChan" parts:parts]    ];
 	return finalString;

@@ -342,7 +342,20 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 	float sum = 0;
 	int i;	
 	int n = [segments count];
-	for(i=0;i<n;i++)sum += [[segments objectAtIndex:i] rate];
+    NSMutableDictionary* visitedSegments = [NSMutableDictionary dictionary];
+	for(i=0;i<n;i++){
+        ORDetectorSegment* aSegment = [segments objectAtIndex:i];
+        NSString* anIdentifier = [aSegment identifier];
+        if(!anIdentifier){
+            sum += [aSegment rate];
+        }
+        else {
+            if(![visitedSegments objectForKey:anIdentifier]){
+                sum += [aSegment rate];
+                [visitedSegments setObject:anIdentifier forKey:anIdentifier];
+            }
+        }
+    }
     rate = sum;
     [totalRate addDataToTimeAverage:sum];
 }

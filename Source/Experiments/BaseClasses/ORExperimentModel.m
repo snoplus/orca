@@ -239,6 +239,7 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
 - (void) saveAuxFiles:(NSString*)aPath {;}//subclasses can override
 - (NSString*) validateHWMapPath:(NSString*)aPath{return aPath;}//subclasses can override
 - (NSString*) mapFileHeader:(int)tag{return nil;}//subclasses can override
+- (void) setupSegmentIds {;} //subclasses must override
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers
@@ -507,6 +508,8 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
 		[[segmentGroups objectAtIndex:1] setMapEntries:[self setupMapEntries:1]];
 		[[segmentGroups objectAtIndex:2] setMapEntries:[self setupMapEntries:2]];
 	}
+    [self setupSegmentIds];
+    
     [[self undoManager] enableUndoRegistration];
     
     [self setHardwareCheck:2]; //unknown
