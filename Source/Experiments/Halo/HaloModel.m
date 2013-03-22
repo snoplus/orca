@@ -262,11 +262,6 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
 		}
 	}
 }
-- (unsigned long) count
-{
-    NSLog(@"got here\n");
-    return 0;
-}
 
 - (NSString*) dataSetNameGroup:(int)aGroup segment:(int)index
 {
