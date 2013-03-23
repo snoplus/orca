@@ -296,9 +296,33 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
                          name : OREdelweissSLTModelTakeEventDataChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(idBBforWCommandChanged:)
+                         name : OREdelweissSLTModelIdBBforWCommandChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(useBroadcastIdBBChanged:)
+                         name : OREdelweissSLTModelUseBroadcastIdBBChanged
+						object: model];
+
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+
+- (void) useBroadcastIdBBChanged:(NSNotification*)aNote
+{
+	//debug 
+    NSLog(@"Called %@::%@! %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model useBroadcastIdBB]);//TODO: DEBUG -tb-
+	[useBroadcastIdBBCB setIntValue: [model useBroadcastIdBB]];
+}
+
+- (void) idBBforWCommandChanged:(NSNotification*)aNote
+{
+	//debug 
+    NSLog(@"Called %@::%@! %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model idBBforWCommand]);//TODO: DEBUG -tb-
+	[idBBforWCommandTextField setIntValue: [model idBBforWCommand]];
+}
 
 - (void) takeEventDataChanged:(NSNotification*)aNote
 {
@@ -619,6 +643,8 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	[self crateUDPDataCommandChanged:nil];
 	[self takeUDPstreamDataChanged:nil];
 	[self takeEventDataChanged:nil];
+	[self idBBforWCommandChanged:nil];
+	[self useBroadcastIdBBChanged:nil];
 }
 
 
@@ -766,6 +792,16 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 }
 
 #pragma mark ***Actions
+
+- (void) useBroadcastIdBBCBAction:(id)sender
+{
+	[model setUseBroadcastIdBB:[sender intValue]];	
+}
+
+- (void) idBBforWCommandTextFieldAction:(id)sender
+{
+	[model setIdBBforWCommand:[sender intValue]];	
+}
 
 - (void) takeEventDataCBAction:(id)sender
 {
@@ -965,12 +1001,12 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 }
 
-- (IBAction) UDPDataTabSend0xFFCommandButtonAction:(id)sender //send FF Command
+- (IBAction) sendUDPDataTab0x0ACommand:(id)sender //send 0x0A Command
 {
     [self endEditing];
 	//debug 
     NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
-    [model sendUDPDataTab0xFFCommand: [model BBCmdFFMask]];
+    [model sendUDPDataTab0x0ACommand: [model BBCmdFFMask]];
 }
 
 - (IBAction) UDPDataTabSendBloqueCommandButtonAction:(id)sender

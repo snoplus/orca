@@ -545,6 +545,114 @@ typedef struct
 Structure_trame_status;
 
 //-----------------------------------------------------------------------------------------------------------tb-
+//----- Defines for the BBv2/BBv3 status bits and commands
+//-----    1.) command adressing
+//-----    2.) BB status bits
+//-----------------------------------------------------------------------------------------------------------tb-
+//
+//
+// 1.)
+// general form: (W command) 
+// 0xf0 0xNN CMD ARG1 ARG2
+// 0xf0 means 'W' command
+// 0xNN BB identifier, 0xff broadcast
+// CMD is the sub adress, in the example below: CMD=0x31 writes filter arguments for ADC1 (..., ..., freq., gain)
+//                                              CMD=0x31 writes filter arguments for ADC2 (..., ..., freq., gain)
+//                                              etc.
+// ARG1 ARG2: command args
+// e.g. 
+// 0xf0 0xff 0x31 0x12 0x34 will write 0x1234 to the filter parameters of ADC1; see example 2.)
+// 
+// 
+// see from line 360 on, '//pour BBv2:':
+// e.g.
+// // je mets apres 0x30 les commandes de filtre et de gains
+// #define			ss_adrs_filtre1			0x31
+// ...
+// 
+
+
+#define			ss_adrs_d2				0x02
+#define			ss_adrs_d3				0x03
+#define			ss_adrs_ident			0x08
+#define			ss_adrs_alim			0x0a	
+#define			ss_adrs_relais			0x1d
+#define			ss_adrs_refDAC			0x1e
+#define			ss_adrs_DAC1				0x11
+
+#define kBBcmdSetD2        0x02  //kBBstatusD2=3
+#define kBBcmdSetD3        0x03  //kBBstatusD3=4
+
+#define kBBcmdSetIdentMode 0x08
+#define kBBcmdAlim         0x0a  //kBBstatusAlim=1
+#define kBBcmdSetRelais    0x1d  //kBBstatusRelais=36
+#define kBBcmdSetRefDAC    0x1e  //kBBstatusRefDAC=37
+
+//ARRAYS:
+
+//polar dac (12 settings, 0x11 bis 0x1c) - BBstatus: kBBstatusDAC      24
+#define kBBcmdSetDAC       0x11
+
+//triangle - BBstatus: index 38=kBBstatusTri
+#define kBBcmdSetTri       0x21
+//rectangle - BBstatus: index 44=kBBstatusRect
+#define kBBcmdSetRect      0x27
+
+//filter is: frequency (f) and gain (g) (0x00fg) for ADC1..6 (in BBstatus at index 12..17, status_filtre/kBBstatusFilter)
+#define kBBcmdSetFilter    0x31
+
+
+//Rg + Rt (controle de la regulation du point de fonctionnement avec les DAC)
+#define kBBcmdSetRt        0x38
+//Rt is reg. tous? (in BBstatus at index 5=status_regul/kBBstatusRt)
+#define kBBcmdSetRg        0x39
+//base for Rg for ADC1...6  (in BBstatus at index 6=status_regul+1/kBBstatusRg)
+//format: 0xBB 0xCmd 0xBT 0xSR with: B=bottom dac value (dacb), T=top dac value (daca),  S=signs (bit0/bit1 = top/bottom resp. sa/sb sign), R=Rg value
+
+
+//retard (BBstatus: index 50=kBBstatusRetard)
+#define kBBcmdSetRetard    0x41
+
+
+// 2.)
+// The BB status packet is a array of 57 shorts, this are the (start) indices for the according setting blocks
+// e.g. status_filtre is 12 (and next index 18 -> block of 6 values):
+//    each word contains: freq in bits 4...7, gains (multiplier) in bits0...3
+// Ofter writing the command 0xf0 0xff 0x31 0x12 0x34 we will find the value 0x1234 in the short 'BBstatusArray[status_filtre=12]'
+// etc.
+// #define	status_nserie	0
+// #define	status_alim		1
+// #define	status_tempe	2
+// #define	status_div		3
+// #define	status_regul	5
+// #define	status_filtre	12
+// #define	status_adc		18
+// #define	status_dacBN	24
+// #define	status_triangle	38
+// #define	status_carre	44
+// #define	status_retard	50
+// #define	status_nb_erreurs	56
+// #define _nb_mots_status_bbv2 57	//  nombre de mots 16 bit du status BBv2  retournees dans le dernier bit de la voie 6
+
+#define kBBstatusSerNum    0
+#define kBBstatusAlim      1
+#define kBBstatusTemperature 2
+#define kBBstatusD2        3
+#define kBBstatusD3        4
+#define kBBstatusRt        5
+#define kBBstatusRg        6
+#define kBBstatusFilter   12
+#define kBBstatusADCValue 18
+#define kBBstatusDAC      24
+#define kBBstatusRelais   36
+#define kBBstatusRefDAC   37  //????
+#define kBBstatusTri      38
+#define kBBstatusRect     44
+#define kBBstatusRetard   50
+
+
+
+//-----------------------------------------------------------------------------------------------------------tb-
 //----- Definition of the KIT/IPE crate status packets
 //-----    1.) Header
 //-----    2.) Crate Status

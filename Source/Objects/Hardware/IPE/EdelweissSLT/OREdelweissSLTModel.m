@@ -497,6 +497,8 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
 
 #pragma mark ***External Strings
 
+NSString* OREdelweissSLTModelUseBroadcastIdBBChanged = @"OREdelweissSLTModelUseBroadcastIdBBChanged";
+NSString* OREdelweissSLTModelIdBBforWCommandChanged = @"OREdelweissSLTModelIdBBforWCommandChanged";
 NSString* OREdelweissSLTModelTakeEventDataChanged = @"OREdelweissSLTModelTakeEventDataChanged";
 NSString* OREdelweissSLTModelTakeUDPstreamDataChanged = @"OREdelweissSLTModelTakeUDPstreamDataChanged";
 NSString* OREdelweissSLTModelCrateUDPDataCommandChanged = @"OREdelweissSLTModelCrateUDPDataCommandChanged";
@@ -676,6 +678,34 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 }
 
 #pragma mark •••Accessors
+
+- (bool) useBroadcastIdBB
+{
+    return useBroadcastIdBB;
+}
+
+- (void) setUseBroadcastIdBB:(bool)aUseBroadcastIdBB
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setUseBroadcastIdBB:useBroadcastIdBB];
+    
+    useBroadcastIdBB = aUseBroadcastIdBB;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelUseBroadcastIdBBChanged object:self];
+}
+
+- (int) idBBforWCommand
+{
+    return idBBforWCommand;
+}
+
+- (void) setIdBBforWCommand:(int)aIdBBforWCommand
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setIdBBforWCommand:idBBforWCommand];
+    
+    idBBforWCommand = aIdBBforWCommand;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelIdBBforWCommandChanged object:self];
+}
 
 - (int) takeEventData
 {
@@ -2228,19 +2258,34 @@ for(l=0;l<2500;l++){
 }
 
 
-- (int) sendUDPDataTab0xFFCommand:(uint32_t) aBBCmdFFMask //send FF Command
+- (int) sendUDPDataTab0x0ACommand:(uint32_t) aBBCmdFFMask //send FF Command
 {
-    return [self sendUDPDataWCommandRequestPacketArg1: 0xFF arg2: 0x0A arg3: 0x00  arg4:aBBCmdFFMask];
+    int arg1=idBBforWCommand;
+    if(useBroadcastIdBB) arg1=0xff;
+    
+    return [self sendUDPDataWCommandRequestPacketArg1: arg1 arg2: 0x0A arg3: 0x00  arg4:aBBCmdFFMask];
 }
 
 - (int) sendUDPDataTabBloqueCommand
-{     return [self sendUDPDataWCommandRequestPacketArg1: 0x13 arg2: 0x0A arg3: 0x00  arg4: 0x00];  }
+{
+    int arg1=idBBforWCommand;
+    if(useBroadcastIdBB) arg1=0xff;
+    return [self sendUDPDataWCommandRequestPacketArg1: arg1 arg2: 0x0A arg3: 0x00  arg4: 0x00];  
+}
 
 - (int) sendUDPDataTabDebloqueCommand
-{     return [self sendUDPDataWCommandRequestPacketArg1: 0x13 arg2: 0x0A arg3: 0x00  arg4: 0x06];  }
+{
+    int arg1=idBBforWCommand;
+    if(useBroadcastIdBB) arg1=0xff;
+    return [self sendUDPDataWCommandRequestPacketArg1: arg1 arg2: 0x0A arg3: 0x00  arg4: 0x06];  
+}
 
 - (int) sendUDPDataTabDemarrageCommand
-{     return [self sendUDPDataWCommandRequestPacketArg1: 0x13 arg2: 0x0A arg3: 0x00  arg4: 0x07];  }
+{ 
+    int arg1=idBBforWCommand;
+    if(useBroadcastIdBB) arg1=0xff;
+    return [self sendUDPDataWCommandRequestPacketArg1: arg1 arg2: 0x0A arg3: 0x00  arg4: 0x07];  
+}
 
 
 
@@ -2761,6 +2806,8 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
 	
+	[self setUseBroadcastIdBB:[decoder decodeIntForKey:@"useBroadcastIdBB"]];
+	[self setIdBBforWCommand:[decoder decodeIntForKey:@"idBBforWCommand"]];
 	[self setTakeEventData:[decoder decodeIntForKey:@"takeEventData"]];
 	[self setTakeUDPstreamData:[decoder decodeIntForKey:@"takeUDPstreamData"]];
 	[self setCrateUDPDataCommand:[decoder decodeObjectForKey:@"crateUDPDataCommand"]];
@@ -2827,6 +2874,8 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 {
 	[super encodeWithCoder:encoder];
 	
+	[encoder encodeInt:useBroadcastIdBB forKey:@"useBroadcastIdBB"];
+	[encoder encodeInt:idBBforWCommand forKey:@"idBBforWCommand"];
 	[encoder encodeInt:takeEventData forKey:@"takeEventData"];
 	[encoder encodeInt:takeUDPstreamData forKey:@"takeUDPstreamData"];
 	[encoder encodeObject:crateUDPDataCommand forKey:@"crateUDPDataCommand"];

@@ -140,6 +140,21 @@
     int swTriggerIsRepeating;
     int32_t fiberOutMask;
     int fiberSelectForBBStatusBits;
+    
+    
+    uint32_t statusBitsBB[kNumEWFLTFibers][kNumBBStatusBufferLength32];//default: [6][30]
+    uint32_t oldStatusBitsBB[kNumEWFLTFibers][kNumBBStatusBufferLength32];//I store the old set of the status bits
+    int relaisStatesBB; //remove it
+    int fiberSelectForBBAccess;
+    int idBBforBBAccess;
+    int useBroadcastIdforBBAccess;
+    int adcFreqkHzForBBAccess;  //remove it!!!
+    int adcMultForBBAccess;    //remove it!!!
+    int adcValueForBBAccess;   //remove it
+    int adcRgForBBAccess;   //remove it
+    int adcRtForBBAccess;   //remove it
+    
+    NSMutableData* statusBitsBBData;
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
@@ -150,7 +165,37 @@
 - (short) getNumberRegisters;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
-- (int) fiberSelectForBBStatusBits;
+- (NSMutableData*) statusBitsBBData;
+- (void) setStatusBitsBBData:(NSMutableData*)aStatusBitsBBData;
+- (int) adcRtForBBAccess;
+- (void) setAdcRtForBBAccess:(int)aAdcRtForBBAccess;
+- (int) adcRgForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex;
+- (void) setAdcRgForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex to:(int)aAdcRgForBBAccess;
+- (int) adcValueForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex;
+- (void) setAdcValueForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex to:(int)aAdcValueForBBAccess;
+- (int) adcMultForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex; //TODO: change name to 'gains' (instead of Mult)
+- (void) setAdcMultForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex to:(int)aAdcMultForBBAccess;
+- (int) adcFreqkHzForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex;
+- (void) setAdcFreqkHzForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex to:(int)aAdcFreqkHzForBBAccess;
+- (int) useBroadcastIdforBBAccess;
+- (void) setUseBroadcastIdforBBAccess:(int)aUseBroadcastIdforBBAccess;
+- (int) idBBforBBAccess;
+- (void) setIdBBforBBAccess:(int)aIdBBforBBAccess;
+- (int) fiberSelectForBBAccess;
+- (void) setFiberSelectForBBAccess:(int)aFiberSelectForBBAccess;
+- (int) relaisStatesBB;
+- (void) setRelaisStatesBB:(int)aRelaisStatesBB;
+
+//BB status bit buffer
+- (uint32_t) statusBB32forFiber:(int)aFiber atIndex:(int)aIndex;
+- (void) setStatusBB32forFiber:(int)aFiber atIndex:(int)aIndex to:(uint32_t)aValue;
+- (uint16_t) statusBB16forFiber:(int)aFiber atIndex:(int)aIndex;
+- (void) setStatusBB16forFiber:(int)aFiber atIndex:(int)aIndex to:(uint16_t)aValue;
+- (uint16_t) statusBB16forFiber:(int)aFiber atOffset:(int) off index:(int)aIndex mask:(uint16_t) mask shift:(int) shift;
+- (void) setStatusBB16forFiber:(int)aFiber atOffset:(int) off index:(int)aIndex mask:(uint16_t) mask shift:(int) shift to:(uint16_t)aValue;
+- (void) dumpStatusBB16forFiber:(int)aFiber;
+
+- (int) fiberSelectForBBStatusBits;//
 - (void) setFiberSelectForBBStatusBits:(int)aFiberSelectForBBStatusBits;
 - (uint32_t) fiberOutMask;
 - (void) setFiberOutMask:(uint32_t)aFiberOutMask;
@@ -396,6 +441,18 @@
 				  n:(int) n;
 @end
 
+extern NSString* OREdelweissFLTModelStatusBitsBBDataChanged;
+extern NSString* OREdelweissFLTModelAdcRtForBBAccessChanged;
+extern NSString* OREdelweissFLTModelAdcRgForBBAccessChanged;
+extern NSString* OREdelweissFLTModelAdcValueForBBAccessChanged;
+extern NSString* OREdelweissFLTModelAdcMultForBBAccessChanged;
+extern NSString* OREdelweissFLTModelAdcFreqkHzForBBAccessChanged;
+extern NSString* OREdelweissFLTFiber;
+extern NSString* OREdelweissFLTIndex;
+extern NSString* OREdelweissFLTModelUseBroadcastIdforBBAccessChanged;
+extern NSString* OREdelweissFLTModelIdBBforBBAccessChanged;
+extern NSString* OREdelweissFLTModelFiberSelectForBBAccessChanged;
+extern NSString* OREdelweissFLTModelRelaisStatesBBChanged;
 extern NSString* OREdelweissFLTModelFiberSelectForBBStatusBitsChanged;
 extern NSString* OREdelweissFLTModelFiberOutMaskChanged;
 extern NSString* OREdelweissFLTModelTpixChanged;

@@ -28,7 +28,21 @@
 
 @interface OREdelweissFLTController : OrcaObjectController {
 	@private
+        //BB access
+    
+        //FLT settings
         IBOutlet NSButton*		settingLockButton;
+	IBOutlet   NSTextField* adcRtForBBAccessTextField;
+#if 0
+#endif
+	IBOutlet   NSMatrix* adcRgForBBAccessMatrix;
+	IBOutlet   NSMatrix* adcValueForBBAccessMatrix;
+	IBOutlet   NSMatrix* adcMultForBBAccessMatrix;
+	IBOutlet   NSMatrix* adcFreqkHzForBBAccessMatrix;
+	IBOutlet   NSButton* useBroadcastIdforBBAccessCB;
+	IBOutlet   NSTextField* idBBforBBAccessTextField;
+	IBOutlet   NSPopUpButton* fiberSelectForBBAccessPU;
+	IBOutlet   NSMatrix* relaisStatesBBMatrix;
 	    IBOutlet   NSPopUpButton* fiberSelectForBBStatusBitsPU;
 	    IBOutlet NSButton*      tpixCB;
 //	IBOutlet   No Outlet* swTriggerIsRepeatingNo Outlet;
@@ -104,6 +118,7 @@
 		
 		NSNumberFormatter*		rateFormatter;
 		NSSize					settingSize;
+		NSSize					BBAccessSize;
 		NSSize					rateSize;
 		NSSize					testSize;
 		NSSize					lowlevelSize;
@@ -137,6 +152,16 @@
 - (void) updateButtons;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+- (void) statusBitsBBDataChanged:(NSNotification*)aNote;
+- (void) adcRtForBBAccessChanged:(NSNotification*)aNote;
+- (void) adcRgForBBAccessChanged:(NSNotification*)aNote;
+- (void) adcValueForBBAccessChanged:(NSNotification*)aNote;
+- (void) adcMultForBBAccessChanged:(NSNotification*)aNote;
+- (void) adcFreqkHzForBBAccessChanged:(NSNotification*)aNote;
+- (void) useBroadcastIdforBBAccessChanged:(NSNotification*)aNote;
+- (void) idBBforBBAccessChanged:(NSNotification*)aNote;
+- (void) fiberSelectForBBAccessChanged:(NSNotification*)aNote;
+- (void) relaisStatesBBChanged:(NSNotification*)aNote;
 - (void) fiberSelectForBBStatusBitsChanged:(NSNotification*)aNote;
 - (void) fiberOutMaskChanged:(NSNotification*)aNote;
 - (void) swTriggerIsRepeatingChanged:(NSNotification*)aNote;
@@ -188,6 +213,22 @@
 - (void) selectedChannelValueChanged:(NSNotification*) aNote;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+- (IBAction) dumpBBStatusBBAccessTextFieldAction:(id)sender;
+- (IBAction) adcRtForBBAccessTextFieldAction:(id)sender;
+
+
+#if 0
+#endif
+- (IBAction) adcRgForBBAccessMatrixAction:(id)sender;
+- (IBAction) adcValueForBBAccessMatrixAction:(id)sender;
+- (IBAction) adcMultForBBAccessMatrixAction:(id)sender;
+
+
+- (IBAction) adcFreqkHzForBBAccessMatrixAction:(id)sender;
+- (IBAction) useBroadcastIdforBBAccessCBAction:(id)sender;
+- (IBAction) idBBforBBAccessTextFieldAction:(id)sender;
+- (IBAction) fiberSelectForBBAccessPUAction:(id)sender;
+- (IBAction) relaisStatesBBMatrixAction:(id)sender;
 - (IBAction) fiberSelectForBBStatusBitsPUAction:(id)sender;
 - (IBAction) readBBStatusBitsButtonAction:(id)sender;
 - (IBAction) readAllBBStatusBitsButtonAction:(id)sender;

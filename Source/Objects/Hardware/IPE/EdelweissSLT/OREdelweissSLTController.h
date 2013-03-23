@@ -29,6 +29,8 @@
 	
     //BB commands
     IBOutlet   NSTextField* eventFifoStatusRegTextField;
+	IBOutlet   NSButton* useBroadcastIdBBCB;
+	IBOutlet   NSTextField* idBBforWCommandTextField;
 	IBOutlet   NSTextField* crateUDPDataCommandTextField;
 	IBOutlet   NSTextField* BBCmdFFMaskTextField;
     IBOutlet   NSMatrix*		BBCmdFFMaskMatrix;
@@ -159,6 +161,8 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+- (void) useBroadcastIdBBChanged:(NSNotification*)aNote;
+- (void) idBBforWCommandChanged:(NSNotification*)aNote;
 - (void) takeEventDataChanged:(NSNotification*)aNote;
 - (void) takeUDPstreamDataChanged:(NSNotification*)aNote;
 - (void) crateUDPDataCommandChanged:(NSNotification*)aNote;
@@ -213,6 +217,8 @@
 - (void) enableRegControls;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+- (IBAction) useBroadcastIdBBCBAction:(id)sender;
+- (IBAction) idBBforWCommandTextFieldAction:(id)sender;
 - (IBAction) takeEventDataCBAction:(id)sender;
 - (IBAction) takeUDPstreamDataCBAction:(id)sender;
 - (IBAction) crateUDPDataCommandTextFieldAction:(id)sender;
@@ -249,7 +255,7 @@
 - (IBAction) testUDPDataConnectionButtonAction:(id)sender;
 - (IBAction) crateUDPDataSendWCommandButtonAction:(id)sender;//send BB Command
 
-- (IBAction) UDPDataTabSend0xFFCommandButtonAction:(id)sender;//send FF Command
+- (IBAction) sendUDPDataTab0x0ACommand:(id)sender;//send 0x0A Command
 - (IBAction) UDPDataTabSendBloqueCommandButtonAction:(id)sender;
 - (IBAction) UDPDataTabSendDebloqueCommandButtonAction:(id)sender;
 - (IBAction) UDPDataTabSendDemarrageCommandButtonAction:(id)sender;

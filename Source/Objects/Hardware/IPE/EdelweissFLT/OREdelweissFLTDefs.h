@@ -2,8 +2,8 @@
     OREdelweissFLTDefs.h  -  description
 
     begin                : Tue Jul 18 2000
-    copyright            : (C) 2000 by Andreas Kopmann
-    email                : kopmann@hpe.fzk.de
+    copyright            : (C) 2010 by Till Bergmann
+    email                : bergmann@kit.edu
  ***************************************************************************/
 
 //Adress model
@@ -15,7 +15,16 @@
 
 
 //TODO: for EW: 6 or 36??? -tb-
+//TODO: remove kNumV4FLTChannels!!!!!!! legacy!!!  -tb-
+//TODO: remove kNumV4FLTChannels!!!!!!! legacy!!!  -tb-
+//TODO: remove kNumV4FLTChannels!!!!!!! legacy!!!  -tb-
+//TODO: remove kNumV4FLTChannels!!!!!!! legacy!!!  -tb-
+//TODO: remove kNumV4FLTChannels!!!!!!! legacy!!!  -tb-
 #define kNumV4FLTChannels 24
+#define kNumEWFLTFibers   6
+#define kNumBBStatusBufferLength32   30
+#define kNumBBStatusBufferLength16   (kNumBBStatusBufferLength32*2)
+#define kNumBBStatusLength16   58
 
 #define kIpeFlt_Page_Size 1000
 

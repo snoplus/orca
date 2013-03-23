@@ -55,6 +55,7 @@
 	[super awakeFromNib];
 	
     settingSize			= NSMakeSize(670,790);
+    BBAccessSize		= NSMakeSize(670,790);
     rateSize			= NSMakeSize(490,760);
     testSize			= NSMakeSize(400,420);
     lowlevelSize		= NSMakeSize(400,420);
@@ -311,9 +312,188 @@
                          name : OREdelweissFLTModelFiberSelectForBBStatusBitsChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(relaisStatesBBChanged:)
+                         name : OREdelweissFLTModelRelaisStatesBBChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(fiberSelectForBBAccessChanged:)
+                         name : OREdelweissFLTModelFiberSelectForBBAccessChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(idBBforBBAccessChanged:)
+                         name : OREdelweissFLTModelIdBBforBBAccessChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(useBroadcastIdforBBAccessChanged:)
+                         name : OREdelweissFLTModelUseBroadcastIdforBBAccessChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(adcFreqkHzForBBAccessChanged:)
+                         name : OREdelweissFLTModelAdcFreqkHzForBBAccessChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(adcMultForBBAccessChanged:)
+                         name : OREdelweissFLTModelAdcMultForBBAccessChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(adcValueForBBAccessChanged:)
+                         name : OREdelweissFLTModelAdcValueForBBAccessChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(adcRgForBBAccessChanged:)
+                         name : OREdelweissFLTModelAdcRgForBBAccessChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(adcRtForBBAccessChanged:)
+                         name : OREdelweissFLTModelAdcRtForBBAccessChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(statusBitsBBDataChanged:)
+                         name : OREdelweissFLTModelStatusBitsBBDataChanged
+						object: model];
+
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+
+- (void) statusBitsBBDataChanged:(NSNotification*)aNote
+{
+
+//TODO: call this after initFromCoder ...
+	//[statusBitsBBArrayNo Outlet setObjectValue: [model statusBitsBBData]];
+}
+
+- (void) adcRtForBBAccessChanged:(NSNotification*)aNote
+{
+	[adcRtForBBAccessTextField setIntValue: [model adcRtForBBAccess]];
+}
+
+
+
+
+
+
+
+
+- (void) adcRgForBBAccessChanged:(NSNotification*)aNote
+{
+	//[adcRgForBBAccess<custom> setIntValue: [model adcRgForBBAccess]];
+    int fiber = [model fiberSelectForBBAccess];
+      //not set ...int fiber = [[[aNote userInfo] objectForKey:OREdelweissFLTFiber] intValue];
+    int index = [[[aNote userInfo] objectForKey:OREdelweissFLTIndex] intValue];
+	[[adcRgForBBAccessMatrix cellWithTag:index] setIntValue: [model adcRgForBBAccessForFiber: fiber atIndex:index]];
+}
+
+- (void) adcValueForBBAccessChanged:(NSNotification*)aNote
+{
+	//[adcValueForBBAccess<custom> setIntValue: [model adcValueForBBAccess]];
+    int fiber = [model fiberSelectForBBAccess];
+      //not set ...int fiber = [[[aNote userInfo] objectForKey:OREdelweissFLTFiber] intValue];
+    int index = [[[aNote userInfo] objectForKey:OREdelweissFLTIndex] intValue];
+	[[adcValueForBBAccessMatrix cellWithTag:index] setIntValue: [model adcValueForBBAccessForFiber: fiber atIndex:index]];
+}
+
+- (void) adcMultForBBAccessChanged:(NSNotification*)aNote
+{
+	//[adcMultForBBAccess<custom> setIntValue: [model adcMultForBBAccess]];
+    int fiber = [model fiberSelectForBBAccess];
+      //not set ...int fiber = [[[aNote userInfo] objectForKey:OREdelweissFLTFiber] intValue];
+    int index = [[[aNote userInfo] objectForKey:OREdelweissFLTIndex] intValue];
+	[[adcMultForBBAccessMatrix cellWithTag:index] setIntValue: [model adcMultForBBAccessForFiber: fiber atIndex:index]];
+}
+
+
+
+
+
+
+- (void) adcFreqkHzForBBAccessChanged:(NSNotification*)aNote
+{
+    int fiber = [[[aNote userInfo] objectForKey:OREdelweissFLTFiber] intValue];
+    int index = [[[aNote userInfo] objectForKey:OREdelweissFLTIndex] intValue];
+        //DEBUG OUTPUT: 	        
+        NSLog(@"%@::%@: userInfo fiber %i index %i  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),fiber, index);//TODO : DEBUG testing ...-tb-
+
+    int selectedFiber = [model fiberSelectForBBAccess];
+    if(fiber != selectedFiber){
+        //is not visible
+        //DEBUG OUTPUT: 	        
+        NSLog(@"%@::%@: changed item is not visible \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
+        return;
+    }
+
+	//[adcFreqkHzForBBAccess<custom> setIntValue: [model adcFreqkHzForBBAccess]];
+	[[adcFreqkHzForBBAccessMatrix cellWithTag:index] setIntValue: [model adcFreqkHzForBBAccessForFiber: fiber atIndex:index]];
+}
+
+
+
+
+- (void) useBroadcastIdforBBAccessChanged:(NSNotification*)aNote
+{
+	[useBroadcastIdforBBAccessCB setIntValue: [model useBroadcastIdforBBAccess]];
+}
+
+- (void) idBBforBBAccessChanged:(NSNotification*)aNote
+{
+	[idBBforBBAccessTextField setIntValue: [model idBBforBBAccess]];
+}
+
+
+//this is the most important updater!
+- (void) fiberSelectForBBAccessChanged:(NSNotification*)aNote
+{
+        //DEBUG OUTPUT: 	        
+        NSLog(@"%@::%@: fiberSelectForBBAccess %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model fiberSelectForBBAccess]);//TODO : DEBUG testing ...-tb-
+	//[fiberSelectForBBAccessPU setIntValue: [model fiberSelectForBBAccess]];
+    int fiber = [model fiberSelectForBBAccess];
+	[fiberSelectForBBAccessPU selectItemAtIndex: fiber];
+    
+    //update everything from the BB status bit buffer!
+    int index;
+	[self relaisStatesBBChanged:nil];
+	//[self adcFreqkHzForBBAccessChanged:nil];
+    for(index=0;index<6;index++)
+    	[[adcFreqkHzForBBAccessMatrix cellWithTag:index] setIntValue: [model adcFreqkHzForBBAccessForFiber: fiber atIndex:index]];
+    
+	//[self adcMultForBBAccessChanged:nil];
+    for(index=0;index<6;index++)
+    	[[adcMultForBBAccessMatrix cellWithTag:index] setIntValue: [model adcMultForBBAccessForFiber: fiber atIndex:index]];
+
+	//[self adcValueForBBAccessChanged:nil];
+    for(index=0;index<6;index++)
+    	[[adcValueForBBAccessMatrix cellWithTag:index] setIntValue: [model adcValueForBBAccessForFiber: fiber atIndex:index]];
+    
+	//[self adcRgForBBAccessChanged:nil];
+    for(index=0;index<6;index++)
+    	[[adcRgForBBAccessMatrix cellWithTag:index] setIntValue: [model adcRgForBBAccessForFiber: fiber atIndex:index]];
+        
+        
+        
+	//[self adcRtForBBAccessChanged:nil];
+    
+}
+
+- (void) relaisStatesBBChanged:(NSNotification*)aNote
+{
+//	[relaisStatesBB<custom> setIntValue: [model relaisStatesBB]];
+	int i;
+    int32_t relaisStates = [model relaisStatesBB];
+        //DEBUG OUTPUT: 	        NSLog(@"%@::%@: UNDER CONSTRUCTION! fiberOutMask  %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),fiberOutMask);//TODO : DEBUG testing ...-tb-
+	for(i=0;i<3;i++){
+		[[relaisStatesBBMatrix cellWithTag:i] setIntValue: (relaisStates&(0x1<<i)) ];
+	}    
+}
 
 - (void) fiberSelectForBBStatusBitsChanged:(NSNotification*)aNote
 {
@@ -581,6 +761,20 @@
 	[self tpixChanged:nil];
 	[self fiberOutMaskChanged:nil];
 	[self fiberSelectForBBStatusBitsChanged:nil];
+	[self idBBforBBAccessChanged:nil];
+	[self useBroadcastIdforBBAccessChanged:nil];
+	[self statusBitsBBDataChanged:nil];//?? still needed? -tb-
+    
+	[self fiberSelectForBBAccessChanged:nil];
+      //<--- this calls the following commented methods
+      /*
+	[self relaisStatesBBChanged:nil];
+	[self adcFreqkHzForBBAccessChanged:nil];
+	[self adcMultForBBAccessChanged:nil];
+	[self adcValueForBBAccessChanged:nil];
+	[self adcRgForBBAccessChanged:nil];
+      */
+	[self adcRtForBBAccessChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -899,9 +1093,10 @@
     [[self window] setContentView:blankView];
     switch([tabView indexOfTabViewItem:tabViewItem]){
         case  0: [self resizeWindowToSize:settingSize];     break;
-		case  1: [self resizeWindowToSize:rateSize];	    break;
-		case  2: [self resizeWindowToSize:testSize];        break;
-		case  3: [self resizeWindowToSize:lowlevelSize];	break;
+		case  1: [self resizeWindowToSize:BBAccessSize];	    break;
+		case  2: [self resizeWindowToSize:rateSize];	    break;
+		case  3: [self resizeWindowToSize:testSize];        break;
+		case  4: [self resizeWindowToSize:lowlevelSize];	break;
 		default: [self resizeWindowToSize:testSize];	    break;
     }
     [[self window] setContentView:totalView];
@@ -913,6 +1108,98 @@
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+
+- (IBAction) dumpBBStatusBBAccessTextFieldAction:(id)sender
+{
+    [self endEditing];
+    [model dumpStatusBB16forFiber: [model fiberSelectForBBAccess]];
+}
+
+
+
+
+
+ 
+- (void) adcRtForBBAccessTextFieldAction:(id)sender
+{
+	[model setAdcRtForBBAccess:[sender intValue]];	
+}
+#if 0
+#endif
+
+- (void) adcRgForBBAccessMatrixAction:(id)sender
+{
+	//[model setAdcRgForBBAccess:[sender intValue]];	
+    int fiber = [model fiberSelectForBBAccess];
+    int index = [[sender selectedCell] tag];
+    [model setAdcRgForBBAccessForFiber: fiber atIndex:index to:[sender intValue]];
+}
+
+- (void) adcValueForBBAccessMatrixAction:(id)sender
+{
+	//[model setAdcValueForBBAccess:[sender intValue]];	
+    int fiber = [model fiberSelectForBBAccess];
+    int index = [[sender selectedCell] tag];
+    [model setAdcValueForBBAccessForFiber: fiber atIndex:index to:[sender intValue]];
+}
+
+- (void) adcMultForBBAccessMatrixAction:(id)sender
+{
+	//[model setAdcMultForBBAccess:[sender intValue]];	
+    int fiber = [model fiberSelectForBBAccess];
+    int index = [[sender selectedCell] tag];
+    [model setAdcMultForBBAccessForFiber: fiber atIndex:index to:[sender intValue]];
+}
+
+
+
+
+
+- (void) adcFreqkHzForBBAccessMatrixAction:(id)sender
+{
+
+//	[model setAdcFreqkHzForBBAccess:[sender intValue]];	
+    int fiber = [model fiberSelectForBBAccess];
+    int index = [[sender selectedCell] tag];
+        //DEBUG OUTPUT: 	        NSLog(@"%@::%@: tag %i,   intVal %i , fib %i, idx %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),
+            //[[sender selectedCell] tag],[sender intValue],fiber,index);//TODO : DEBUG testing ...-tb-
+	//if([sender intValue] != [model adcFreqkHzForBBAccessForFiber:fiber atIndex:index]){
+		//[[self undoManager] setActionName: @"Set Threshold"];
+		[model setAdcFreqkHzForBBAccessForFiber: fiber atIndex:[[sender selectedCell] tag] to:[sender intValue]];
+	//}
+}
+
+- (void) useBroadcastIdforBBAccessCBAction:(id)sender
+{
+	[model setUseBroadcastIdforBBAccess:[sender intValue]];	
+}
+
+- (void) idBBforBBAccessTextFieldAction:(id)sender
+{
+
+    //DEBUG 	
+    NSLog(@"%@::%@ - sender intVal: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[sender intValue]);//TODO: DEBUG testing ...-tb-
+	[model setIdBBforBBAccess:[sender intValue]];	
+}
+
+- (void) fiberSelectForBBAccessPUAction:(id)sender
+{
+    [self endEditing];
+	//[model setFiberSelectForBBAccess:[sender intValue]];	
+    //DEBUG 	
+    NSLog(@"%@::%@ - selItemIndex: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[sender indexOfSelectedItem]);//TODO: DEBUG testing ...-tb-
+	[model setFiberSelectForBBAccess:[sender indexOfSelectedItem]];	
+}
+
+- (void) relaisStatesBBMatrixAction:(id)sender
+{
+//	[model setRelaisStatesBB:[sender intValue]];	
+	int i, val=0;
+	for(i=0;i<3;i++){
+		if([[sender cellWithTag:i] intValue]) val |= (0x1<<i);
+	}
+	[model setRelaisStatesBB:val];
+}
 
 - (void) fiberSelectForBBStatusBitsPUAction:(id)sender
 {
@@ -1719,6 +2006,22 @@
         NSRunAlertPanel([localException name], @"%@\nFLT%d Access failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
+}
+
+
+
+
+//OrcaObjectController methods
+- (IBAction) incDialog:(id)sender
+{
+    [self endEditing];
+    [super incDialog:sender];
+}
+
+- (IBAction) decDialog:(id)sender
+{
+    [self endEditing];
+    [super decDialog:sender];
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Plot DataSource
