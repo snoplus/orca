@@ -148,8 +148,6 @@ int kbhit(void)
 #include "ipe4structure.h"
 #include "ipe4reader.h"
 
-#include "ipe4tbtools.h" //better include in ipe4reader.h? -tb-
-#include "ipe4tbtools.cpp"
 
 /*--------------------------------------------------------------------
   globals and functions for hardware access
@@ -169,6 +167,8 @@ class Pbus;
 Pbus *pbus=0;              //for register access with fdhwlib
 uint32_t presentFLTMap =0; // store a map of the present FLT cards
 
+#include "ipe4tbtools.h" //better include in ipe4reader.h? -tb-
+#include "ipe4tbtools.cpp"  //NEEDS Pbus * pbus!!!
 
 
 #if 0
@@ -1177,6 +1177,7 @@ void FIFOREADER::endAllUDPServerSockets(void)
 
 
 
+#if 0 //moved to ipe4tbtools
 
 /*--------------------------------------------------------------------
  *    function:     requestHWSemaphore, requestHWSemaphoreWaitUsec, releaseHWSemaphore
@@ -1281,7 +1282,7 @@ void sendCommandFifo(unsigned char * buffer, int len)
 	//if(sltSemaphore){	    releaseHWSemaphore();	}
 	releaseHWSemaphoreWith(sltSemaphore);
 }
-
+#endif  //moved to ipe4tbtools
 
 
 /*--------------------------------------------------------------------

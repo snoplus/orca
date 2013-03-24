@@ -22,6 +22,7 @@
 #define kGetSoftwareVersion  0x01
 #define kGetFdhwLibVersion   0x02
 #define kGetSltPciDriverVersion 0x03  //TODO: only for Linux implemented 2012-03 -tb-
+#define kWriteToCmdFIFO 0x04
 // see: HW_Readout.cc
 // void doGeneralWriteOp(SBC_Packet* aPacket,uint8_t reply)
 // and

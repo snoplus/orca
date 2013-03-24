@@ -144,17 +144,27 @@
     
     uint32_t statusBitsBB[kNumEWFLTFibers][kNumBBStatusBufferLength32];//default: [6][30]
     uint32_t oldStatusBitsBB[kNumEWFLTFibers][kNumBBStatusBufferLength32];//I store the old set of the status bits
+    NSMutableData* statusBitsBBData;//used for  writing 'statusBitsBB' to file
     int relaisStatesBB; //remove it
     int fiberSelectForBBAccess;
-    int idBBforBBAccess;
     int useBroadcastIdforBBAccess;
+    #if 0
+    int idBBforBBAccess;
     int adcFreqkHzForBBAccess;  //remove it!!!
     int adcMultForBBAccess;    //remove it!!!
     int adcValueForBBAccess;   //remove it
     int adcRgForBBAccess;   //remove it
-    int adcRtForBBAccess;   //remove it
+    int signa;//remove it
+    int daca;//remove it
+    int signb;//remove it
+    int dacb;//remove it
     
-    NSMutableData* statusBitsBBData;
+    int adcRtForBBAccess;   //remove it
+    int adcRt;  //remove it
+    #endif
+    unsigned int wCmdCode;
+    unsigned int wCmdArg1;
+    unsigned int wCmdArg2;
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
@@ -165,12 +175,27 @@
 - (short) getNumberRegisters;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+- (unsigned int) wCmdArg2;
+- (void) setWCmdArg2:(unsigned int)aWCmdArg2;
+- (unsigned int) wCmdArg1;
+- (void) setWCmdArg1:(unsigned int)aWCmdArg1;
+- (unsigned int) wCmdCode;
+- (void) setWCmdCode:(unsigned int)aWCmdCode;
 - (NSMutableData*) statusBitsBBData;
 - (void) setStatusBitsBBData:(NSMutableData*)aStatusBitsBBData;
-- (int) adcRtForBBAccess;
-- (void) setAdcRtForBBAccess:(int)aAdcRtForBBAccess;
+
+- (int) dacbForFiber:(int)aFiber atIndex:(int)aIndex;
+- (void) setDacbForFiber:(int)aFiber atIndex:(int)aIndex to:(int)aDacb;
+- (int) signbForFiber:(int)aFiber atIndex:(int)aIndex;
+- (void) setSignbForFiber:(int)aFiber atIndex:(int)aIndex to:(int)aSignb;
+- (int) dacaForFiber:(int)aFiber atIndex:(int)aIndex;
+- (void) setDacaForFiber:(int)aFiber atIndex:(int)aIndex to:(int)aDaca;
+- (int) signaForFiber:(int)aFiber atIndex:(int)aIndex;
+- (void) setSignaForFiber:(int)aFiber atIndex:(int)aIndex to:(int)aSigna;
 - (int) adcRgForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex;
 - (void) setAdcRgForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex to:(int)aAdcRgForBBAccess;
+- (int) adcRtForFiber:(int)aFiber;
+- (void) setAdcRtForFiber:(int)aFiber to:(int)aAdcRt;
 - (int) adcValueForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex;
 - (void) setAdcValueForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex to:(int)aAdcValueForBBAccess;
 - (int) adcMultForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex; //TODO: change name to 'gains' (instead of Mult)
@@ -179,12 +204,12 @@
 - (void) setAdcFreqkHzForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex to:(int)aAdcFreqkHzForBBAccess;
 - (int) useBroadcastIdforBBAccess;
 - (void) setUseBroadcastIdforBBAccess:(int)aUseBroadcastIdforBBAccess;
-- (int) idBBforBBAccess;
-- (void) setIdBBforBBAccess:(int)aIdBBforBBAccess;
+- (int) idBBforBBAccessForFiber:(int)aFiber;
+- (void) setIdBBforBBAccessForFiber:(int)aFiber to:(int)aIdBBforBBAccess;
 - (int) fiberSelectForBBAccess;
 - (void) setFiberSelectForBBAccess:(int)aFiberSelectForBBAccess;
-- (int) relaisStatesBB;
-- (void) setRelaisStatesBB:(int)aRelaisStatesBB;
+- (int) relaisStatesBBForFiber:(int)aFiber;
+- (void) setRelaisStatesBBForFiber:(int)aFiber to:(int)aRelaisStatesBB;
 
 //BB status bit buffer
 - (uint32_t) statusBB32forFiber:(int)aFiber atIndex:(int)aIndex;
@@ -362,7 +387,10 @@
 - (void) writeCommandSoftwareTrigger;
 - (void) readTriggerData;
 
-- (void) readBBStatusBits;
+- (void) sendWCommand;
+- (void) sendWCommandIdBB:(int) idBB cmd:(int) cmd arg1:(int) arg1  arg2:(int) arg2;
+- (void) readBBStatusForBBAccess;//BB access tab
+- (void) readBBStatusBits;//low level tab
 - (void) readAllBBStatusBits;
 
 - (void) printStatusReg;
@@ -441,6 +469,14 @@
 				  n:(int) n;
 @end
 
+extern NSString* OREdelweissFLTModelWCmdArg2Changed;
+extern NSString* OREdelweissFLTModelWCmdArg1Changed;
+extern NSString* OREdelweissFLTModelWCmdCodeChanged;
+extern NSString* OREdelweissFLTModelAdcRtChanged;
+extern NSString* OREdelweissFLTModelDacbChanged;
+extern NSString* OREdelweissFLTModelSignbChanged;
+extern NSString* OREdelweissFLTModelDacaChanged;
+extern NSString* OREdelweissFLTModelSignaChanged;
 extern NSString* OREdelweissFLTModelStatusBitsBBDataChanged;
 extern NSString* OREdelweissFLTModelAdcRtForBBAccessChanged;
 extern NSString* OREdelweissFLTModelAdcRgForBBAccessChanged;

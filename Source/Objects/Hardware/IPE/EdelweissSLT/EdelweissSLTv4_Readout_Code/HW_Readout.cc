@@ -92,12 +92,12 @@ extern "C" {
 	#include "katrinhw4/fltkatrin.h"
 #endif
 
-#include "HW_Readout.h"
+#include "HW_Readout.h"// provides 'Pbus * pbus' pointer
 
 
 #include "ipe4structure.h"
 #include "ipe4reader.h"
-#include "ipe4tbtools.h" //better include in HW_Readout.h? here: MUST follow "ipe4structure.h" -tb-
+#include "ipe4tbtools.h" //better include in HW_Readout.h? here: MUST follow "ipe4structure.h" (and HW_Readout.h for pbus) -tb-
 #include "ipe4tbtools.cpp"
 
 void SwapLongBlock(void* p, int32_t n);
@@ -457,6 +457,20 @@ void doGeneralWriteOp(SBC_Packet* aPacket,uint8_t reply)
 	int32_t* dataToWrite = (int32_t*)p;
 	if(needToSwap)SwapLongBlock(dataToWrite,num);
 	switch(operation){
+		case kWriteToCmdFIFO:
+            {
+            unsigned char* buf=(unsigned char*)&dataToWrite[1]; 
+			//if(numLongs == 1) *lPtr = kCodeVersion;
+            //if(num!=2) ERROR ...
+            //DEBUG               fprintf(stderr,"kWriteToCmdFIFO reply %i, num %i\n",reply,num);
+            //DEBUG               fprintf(stderr,"   args 0x%x 0x%x ...\n",dataToWrite[0],dataToWrite[1]);
+            //DEBUG  
+              //int i; for(i=0; i<  dataToWrite[0];i++){                   int val=*(buf+i) & 0xff;
+              //    fprintf(stderr,"   byte %i: 0x%x  ...\n",i,val);            }
+            //KATRIN example: setHostTimeToFLTsAndSLT(dataToWrite); , option kSetHostTimeToFLTsAndSLT
+            sendCommandFifo(buf,dataToWrite[0]);
+            }
+		break;
 		//nothing defined yet
 		default:
 		break;
@@ -535,7 +549,7 @@ int getSltLinuxKernelDriverVersion(void)
 	
 	while (!feof(p)){
 	    fscanf(p,"%s",buf);
-		if( cptr=strstr(buf, DRIVERNAME) ){  // dont use strncmp, it finds fzk_ipe_slt1, too, which does not exist -tb-
+		if( (cptr=strstr(buf, DRIVERNAME)) ){  // dont use strncmp, it finds fzk_ipe_slt1, too, which does not exist -tb-
 		     version = -1;
 			 if( strlen(buf) == strlen(DRIVERNAME)){ version = 0; break; }   // v0, 1st version "fzk_ipe_slt"
 			 if( strstr(buf, DRIVERNAME "_dma") ){ version = 1; break;}      // v1, 2nd version "fzk_ipe_slt_dma"

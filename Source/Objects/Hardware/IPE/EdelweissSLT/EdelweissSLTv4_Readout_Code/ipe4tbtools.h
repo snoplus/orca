@@ -3,8 +3,8 @@
 
 
 /***************************************************************************
-    ipe4tbtools.h  -  description: header file  for the IPE4 Edelweiss software (Orca and ipe4reader)
-    
+    ipe4tbtools.h  -  description: header file  for the IPE4 Edelweiss software (OrcaReadout and ipe4reader)
+                                   DO NOT INCLUDE to Obj-C code - will contain C++ classes!!!!
 	history: see *.icc file
 
     begin                : Jan 07 2013
@@ -45,6 +45,8 @@ int count_ipe4reader_instances(void);
 
 //kill all ipe4reader* instances except myself
 int kill_ipe4reader_instances(void);
+
+
 
 
 /*--------------------------------------------------------------------
@@ -151,6 +153,11 @@ inline uint32_t FLTRAMDataReg(int numFLT, int numChan);
 
 
 
+
+/*--------------------------------------------------------------------
+ *    function prototypes (moved from ipe4reader to provide access for OrcaReadout)
+ *--------------------------------------------------------------------*/ //-tb-
+void sendCommandFifo(unsigned char * buffer, int len);
 
 
 

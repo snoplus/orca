@@ -352,19 +352,77 @@
                          name : OREdelweissFLTModelAdcRgForBBAccessChanged
 						object: model];
 
-    [notifyCenter addObserver : self
-                     selector : @selector(adcRtForBBAccessChanged:)
-                         name : OREdelweissFLTModelAdcRtForBBAccessChanged
-						object: model];
 
     [notifyCenter addObserver : self
                      selector : @selector(statusBitsBBDataChanged:)
                          name : OREdelweissFLTModelStatusBitsBBDataChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(signaChanged:)
+                         name : OREdelweissFLTModelSignaChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(dacaChanged:)
+                         name : OREdelweissFLTModelDacaChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(signbChanged:)
+                         name : OREdelweissFLTModelSignbChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(dacbChanged:)
+                         name : OREdelweissFLTModelDacbChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(adcRtChanged:)
+                         name : OREdelweissFLTModelAdcRtChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(wCmdCodeChanged:)
+                         name : OREdelweissFLTModelWCmdCodeChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(wCmdArg1Changed:)
+                         name : OREdelweissFLTModelWCmdArg1Changed
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(wCmdArg2Changed:)
+                         name : OREdelweissFLTModelWCmdArg2Changed
+						object: model];
+
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+
+- (void) wCmdArg2Changed:(NSNotification*)aNote
+{
+	[wCmdArg2TextField setIntValue: [model wCmdArg2]];
+}
+
+- (void) wCmdArg1Changed:(NSNotification*)aNote
+{
+	[wCmdArg1TextField setIntValue: [model wCmdArg1]];
+}
+
+- (void) wCmdCodeChanged:(NSNotification*)aNote
+{
+	[wCmdCodeTextField setIntValue: [model wCmdCode]];
+}
+
+- (void) adcRtChanged:(NSNotification*)aNote
+{
+    int fiber = [model fiberSelectForBBAccess];
+	[adcRtTextField setIntValue: [model adcRtForFiber:fiber]];
+    //DEBUG 	    NSLog(@"%@::%@ fiber %i val %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),fiber,[model adcRtForFiber:fiber]);//TODO: DEBUG testing ...-tb-
+}
 
 - (void) statusBitsBBDataChanged:(NSNotification*)aNote
 {
@@ -373,17 +431,44 @@
 	//[statusBitsBBArrayNo Outlet setObjectValue: [model statusBitsBBData]];
 }
 
-- (void) adcRtForBBAccessChanged:(NSNotification*)aNote
+
+
+
+- (void) dacbChanged:(NSNotification*)aNote
 {
-	[adcRtForBBAccessTextField setIntValue: [model adcRtForBBAccess]];
+	//[dacb<custom> setIntValue: [model dacb]];
+    int fiber = [model fiberSelectForBBAccess];
+    int index = [[[aNote userInfo] objectForKey:OREdelweissFLTIndex] intValue];
+	[[dacbMatrix cellWithTag:index] setIntValue: [model dacbForFiber: fiber atIndex:index]];
 }
 
+- (void) signbChanged:(NSNotification*)aNote
+{
+	//[signb<custom> setIntValue: [model signb]];
+    int fiber = [model fiberSelectForBBAccess];
+    int index = [[[aNote userInfo] objectForKey:OREdelweissFLTIndex] intValue];
+    int sign = [model signbForFiber: fiber atIndex:index];
+	[[signbMatrix cellWithTag:index] setIntValue: sign];
+	[[signbMatrix cellWithTag:index] setTitle: (sign ? @"-":@"+")];
+}
 
+- (void) dacaChanged:(NSNotification*)aNote
+{
+	//[daca<custom> setIntValue: [model daca]];
+    int fiber = [model fiberSelectForBBAccess];
+    int index = [[[aNote userInfo] objectForKey:OREdelweissFLTIndex] intValue];
+	[[dacaMatrix cellWithTag:index] setIntValue: [model dacaForFiber: fiber atIndex:index]];
+}
 
-
-
-
-
+- (void) signaChanged:(NSNotification*)aNote
+{
+	//[signa<custom> setIntValue: [model signa]];
+    int fiber = [model fiberSelectForBBAccess];
+    int index = [[[aNote userInfo] objectForKey:OREdelweissFLTIndex] intValue];
+    int sign = [model signaForFiber: fiber atIndex:index];
+	[[signaMatrix cellWithTag:index] setIntValue: sign];
+	[[signaMatrix cellWithTag:index] setTitle: (sign ? @"-":@"+")];
+}
 
 - (void) adcRgForBBAccessChanged:(NSNotification*)aNote
 {
@@ -446,7 +531,9 @@
 
 - (void) idBBforBBAccessChanged:(NSNotification*)aNote
 {
-	[idBBforBBAccessTextField setIntValue: [model idBBforBBAccess]];
+    int fiber = [model fiberSelectForBBAccess];
+	[idBBforBBAccessTextField setIntValue: [model idBBforBBAccessForFiber:fiber]];
+	[idBBforWCommandTextField setIntValue: [model idBBforBBAccessForFiber:fiber]];
 }
 
 
@@ -474,21 +561,39 @@
     for(index=0;index<6;index++)
     	[[adcValueForBBAccessMatrix cellWithTag:index] setIntValue: [model adcValueForBBAccessForFiber: fiber atIndex:index]];
     
-	//[self adcRgForBBAccessChanged:nil];
-    for(index=0;index<6;index++)
+	/*
+    [self adcRgForBBAccessChanged:nil];
+	[self signaChanged:nil];
+	[self dacaChanged:nil];
+	[self signbChanged:nil];
+	[self dacbChanged:nil];
+    */
+    for(index=0;index<6;index++){
     	[[adcRgForBBAccessMatrix cellWithTag:index] setIntValue: [model adcRgForBBAccessForFiber: fiber atIndex:index]];
+    	[[signaMatrix cellWithTag:index] setIntValue: [model signaForFiber: fiber atIndex:index]];
+    	[[dacaMatrix cellWithTag:index] setIntValue: [model dacaForFiber: fiber atIndex:index]];
+    	[[signbMatrix cellWithTag:index] setIntValue: [model signbForFiber: fiber atIndex:index]];
+    	[[dacbMatrix cellWithTag:index] setIntValue: [model dacbForFiber: fiber atIndex:index]];
+        int signa = [model signaForFiber: fiber atIndex:index];
+	    [[signaMatrix cellWithTag:index] setTitle: (signa ? @"-":@"+")];
+        int signb = [model signbForFiber: fiber atIndex:index];
+	    [[signbMatrix cellWithTag:index] setTitle: (signb ? @"-":@"+")];
+    }
         
         
         
 	//[self adcRtForBBAccessChanged:nil];
-    
+    [self adcRtChanged:nil];
+	[self idBBforBBAccessChanged:nil];
+
 }
 
 - (void) relaisStatesBBChanged:(NSNotification*)aNote
 {
 //	[relaisStatesBB<custom> setIntValue: [model relaisStatesBB]];
+    int fiber = [model fiberSelectForBBAccess];
 	int i;
-    int32_t relaisStates = [model relaisStatesBB];
+    int32_t relaisStates = [model relaisStatesBBForFiber:fiber];
         //DEBUG OUTPUT: 	        NSLog(@"%@::%@: UNDER CONSTRUCTION! fiberOutMask  %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),fiberOutMask);//TODO : DEBUG testing ...-tb-
 	for(i=0;i<3;i++){
 		[[relaisStatesBBMatrix cellWithTag:i] setIntValue: (relaisStates&(0x1<<i)) ];
@@ -761,20 +866,28 @@
 	[self tpixChanged:nil];
 	[self fiberOutMaskChanged:nil];
 	[self fiberSelectForBBStatusBitsChanged:nil];
-	[self idBBforBBAccessChanged:nil];
 	[self useBroadcastIdforBBAccessChanged:nil];
 	[self statusBitsBBDataChanged:nil];//?? still needed? -tb-
     
 	[self fiberSelectForBBAccessChanged:nil];
       //<--- this calls the following commented methods
       /*
+	[self idBBforBBAccessChanged:nil];
 	[self relaisStatesBBChanged:nil];
 	[self adcFreqkHzForBBAccessChanged:nil];
 	[self adcMultForBBAccessChanged:nil];
 	[self adcValueForBBAccessChanged:nil];
 	[self adcRgForBBAccessChanged:nil];
+	[self signaChanged:nil];
+	[self dacaChanged:nil];
+	[self signbChanged:nil];
+	[self dacbChanged:nil];
       */
-	[self adcRtForBBAccessChanged:nil];
+	//[self adcRtForBBAccessChanged:nil];
+	[self adcRtChanged:nil];
+	[self wCmdCodeChanged:nil];
+	[self wCmdArg1Changed:nil];
+	[self wCmdArg2Changed:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -1109,6 +1222,57 @@
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
 
+- (void) wCmdArg2TextFieldAction:(id)sender
+{
+	[model setWCmdArg2:[sender intValue]];	
+}
+
+- (void) wCmdArg1TextFieldAction:(id)sender
+{
+	[model setWCmdArg1:[sender intValue]];	
+}
+
+- (void) wCmdCodeTextFieldAction:(id)sender
+{
+	[model setWCmdCode:[sender intValue]];	
+}
+- (IBAction) sendWCommandButtonAction:(id)sender
+{
+    //DEBUG    NSLog(@"%@::%@ intVal %i\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),[sender intValue]);//TODO: DEBUG testing ...-tb-
+    [self endEditing];
+    [model sendWCommand];
+}
+
+- (void) adcRtTextFieldAction:(id)sender
+{
+    //DEBUG 	    NSLog(@"%@::%@ intVal %i\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),[sender intValue]);//TODO: DEBUG testing ...-tb-
+
+    int fiber = [model fiberSelectForBBAccess];
+	[model setAdcRtForFiber:fiber to:[sender intValue]];	
+}
+
+
+
+
+- (IBAction) readBBStatusBBAccessButtonAction:(id)sender
+{
+        //DEBUG OUTPUT:         NSLog(@"%@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
+        //[model readBBStatusBits];
+	[self endEditing];
+	@try {
+        [model readBBStatusForBBAccess];
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Exception '%@'-'%@' in %@::%@ ; FLT (%d) \n",[localException name],[localException reason],NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model stationNumber]);
+        NSRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
+                        localException,[model stationNumber]);
+	}
+}
+
+
+
+
+
 - (IBAction) dumpBBStatusBBAccessTextFieldAction:(id)sender
 {
     [self endEditing];
@@ -1119,13 +1283,39 @@
 
 
 
- 
-- (void) adcRtForBBAccessTextFieldAction:(id)sender
+
+
+- (void) dacbMatrixAction:(id)sender
 {
-	[model setAdcRtForBBAccess:[sender intValue]];	
+	//[model setDacb:[sender intValue]];	
+    int fiber = [model fiberSelectForBBAccess];
+    int index = [[sender selectedCell] tag];
+    [model setDacbForFiber: fiber atIndex:index to:[sender intValue]];
 }
-#if 0
-#endif
+
+- (void) signbMatrixAction:(id)sender
+{
+	//[model setSignb:[sender intValue]];	
+    int fiber = [model fiberSelectForBBAccess];
+    int index = [[sender selectedCell] tag];
+    [model setSignbForFiber: fiber atIndex:index to:[sender intValue]];
+}
+
+- (void) dacaMatrixAction:(id)sender
+{
+	//[model setDaca:[sender intValue]];	
+    int fiber = [model fiberSelectForBBAccess];
+    int index = [[sender selectedCell] tag];
+    [model setDacaForFiber: fiber atIndex:index to:[sender intValue]];
+}
+
+- (void) signaMatrixAction:(id)sender
+{
+	//[model setSigna:[sender intValue]];	
+    int fiber = [model fiberSelectForBBAccess];
+    int index = [[sender selectedCell] tag];
+    [model setSignaForFiber: fiber atIndex:index to:[sender intValue]];
+}
 
 - (void) adcRgForBBAccessMatrixAction:(id)sender
 {
@@ -1179,7 +1369,8 @@
 
     //DEBUG 	
     NSLog(@"%@::%@ - sender intVal: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[sender intValue]);//TODO: DEBUG testing ...-tb-
-	[model setIdBBforBBAccess:[sender intValue]];	
+    int fiber = [model fiberSelectForBBAccess];
+	[model setIdBBforBBAccessForFiber:fiber to:[sender intValue]];	
 }
 
 - (void) fiberSelectForBBAccessPUAction:(id)sender
@@ -1194,17 +1385,19 @@
 - (void) relaisStatesBBMatrixAction:(id)sender
 {
 //	[model setRelaisStatesBB:[sender intValue]];	
+    int fiber = [model fiberSelectForBBAccess];
 	int i, val=0;
 	for(i=0;i<3;i++){
 		if([[sender cellWithTag:i] intValue]) val |= (0x1<<i);
 	}
-	[model setRelaisStatesBB:val];
+	[model setRelaisStatesBBForFiber:fiber to:val];
 }
 
 - (void) fiberSelectForBBStatusBitsPUAction:(id)sender
 {
 	[model setFiberSelectForBBStatusBits:[fiberSelectForBBStatusBitsPU indexOfSelectedItem]];	
 }
+
 
 - (IBAction) readBBStatusBitsButtonAction:(id)sender
 {

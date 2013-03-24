@@ -49,15 +49,15 @@
 #define kCtrlOnLine		(0x00000001 << 14) //RW
 
 //status reg bit masks
-#define kStatusIrq			(0x00000001 << 31) //R - cleared on W
-#define kStatusPixErr		(0x00000001 << 16) //R - cleared on W
+#define kEWStatusIrq			(0x00000001 << 31) //R - cleared on W
+#define kEWStatusPixErr		(0x00000001 << 16) //R - cleared on W
 
 
 //Cmd reg bit masks
-#define kCmdEvRes			(0x00000001 <<  3) //W - self cleared
-#define kCmdFltReset		(0x00000001 <<  2) //W - self cleared
-#define kCmdSltReset		(0x00000001 <<  1) //W - self cleared
-#define kCmdFwCfg			(0x00000001 <<  0) //W - self cleared
+#define kEWCmdEvRes			(0x00000001 <<  3) //W - self cleared
+#define kEWCmdFltReset		(0x00000001 <<  2) //W - self cleared
+#define kEWCmdSltReset		(0x00000001 <<  1) //W - self cleared
+#define kEWCmdFwCfg			(0x00000001 <<  0) //W - self cleared
 
 #if 0
 //Interrupt Request and Mask reg bit masks
@@ -371,6 +371,7 @@
 #pragma mark ***HW Access
 //note that most of these method can raise 
 //exceptions either directly or indirectly
+- (int)           writeToCmdFIFO:(char*)data numBytes:(int) numBytes;
 - (void)		  readAllControlSettingsFromHW;
 
 - (void)		  readAllStatus;

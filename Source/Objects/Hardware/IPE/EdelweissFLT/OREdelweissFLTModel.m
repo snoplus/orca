@@ -19,7 +19,8 @@
 //-------------------------------------------------------------
 
 #import "OREdelweissFLTModel.h"
-#import "ORIpeV4SLTModel.h"
+//#import "ORIpeV4SLTModel.h"
+#import "OREdelweissSLTModel.h"
 #import "ORIpeCrateModel.h"
 #import "ORHWWizParam.h"
 #import "ORHWWizSelection.h"
@@ -31,8 +32,16 @@
 #import "ORCommandList.h"
 
 #import "ipe4structure.h"
-#import "ipe4tbtools.h"
+//#import "ipe4tbtools.h"
 
+NSString* OREdelweissFLTModelWCmdArg2Changed = @"OREdelweissFLTModelWCmdArg2Changed";
+NSString* OREdelweissFLTModelWCmdArg1Changed = @"OREdelweissFLTModelWCmdArg1Changed";
+NSString* OREdelweissFLTModelWCmdCodeChanged = @"OREdelweissFLTModelWCmdCodeChanged";
+NSString* OREdelweissFLTModelAdcRtChanged = @"OREdelweissFLTModelAdcRtChanged";
+NSString* OREdelweissFLTModelDacbChanged = @"OREdelweissFLTModelDacbChanged";
+NSString* OREdelweissFLTModelSignbChanged = @"OREdelweissFLTModelSignbChanged";
+NSString* OREdelweissFLTModelDacaChanged = @"OREdelweissFLTModelDacaChanged";
+NSString* OREdelweissFLTModelSignaChanged = @"OREdelweissFLTModelSignaChanged";
 NSString* OREdelweissFLTModelStatusBitsBBDataChanged = @"OREdelweissFLTModelStatusBitsBBDataChanged";
 NSString* OREdelweissFLTModelAdcRtForBBAccessChanged = @"OREdelweissFLTModelAdcRtForBBAccessChanged";
 NSString* OREdelweissFLTModelAdcRgForBBAccessChanged = @"OREdelweissFLTModelAdcRgForBBAccessChanged";
@@ -290,6 +299,48 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
 
+- (unsigned int) wCmdArg2
+{
+    return wCmdArg2;
+}
+
+- (void) setWCmdArg2:(unsigned int)aWCmdArg2
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setWCmdArg2:wCmdArg2];
+    
+    wCmdArg2 = aWCmdArg2;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelWCmdArg2Changed object:self];
+}
+
+- (unsigned int) wCmdArg1
+{
+    return wCmdArg1;
+}
+
+- (void) setWCmdArg1:(unsigned int)aWCmdArg1
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setWCmdArg1:wCmdArg1];
+    
+    wCmdArg1 = aWCmdArg1;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelWCmdArg1Changed object:self];
+}
+
+- (unsigned int) wCmdCode
+{
+    return wCmdCode;
+}
+
+- (void) setWCmdCode:(unsigned int)aWCmdCode
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setWCmdCode:wCmdCode];
+    
+    wCmdCode = aWCmdCode;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelWCmdCodeChanged object:self];
+}
+
 - (NSMutableData*) statusBitsBBData
 {
     return statusBitsBBData;
@@ -304,18 +355,124 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelStatusBitsBBDataChanged object:self];
 }
 
-- (int) adcRtForBBAccess
+
+
+
+
+- (int) dacbForFiber:(int)aFiber atIndex:(int)aIndex
 {
-    return adcRtForBBAccess;
+    //return dacb;
+    int off = kBBstatusRg;
+    uint16_t mask = 0xf000;
+    int shift = 12;
+    uint16_t currVal = [self statusBB16forFiber: aFiber atIndex: (off + aIndex)];
+    return (currVal & mask) >> shift;
 }
 
-- (void) setAdcRtForBBAccess:(int)aAdcRtForBBAccess
+- (void) setDacbForFiber:(int)aFiber atIndex:(int)aIndex to:(int)aDacb
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setAdcRtForBBAccess:adcRtForBBAccess];
+    //undo
+    int oldVal = [self signaForFiber:aFiber atIndex:aIndex];
+    [[[self undoManager] prepareWithInvocationTarget:self] setDacbForFiber: aFiber atIndex:aIndex to: oldVal];
     
-    adcRtForBBAccess = aAdcRtForBBAccess;
+    int off = kBBstatusRg;
+    uint16_t mask = 0xf000;
+    int shift = 12;
+    
+    //set new value
+    [self setStatusBB16forFiber:aFiber atOffset:off index:aIndex mask:mask shift:shift to:aDacb];
+    
+    //notification
+    NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+    [userInfo setObject:[NSNumber numberWithInt:aIndex] forKey: OREdelweissFLTIndex];
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelDacbChanged object:self  userInfo: userInfo];
+}
 
-    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelAdcRtForBBAccessChanged object:self];
+- (int) signbForFiber:(int)aFiber atIndex:(int)aIndex
+{
+    //return signb;
+    int off = kBBstatusRg;
+    uint16_t mask = 0x0020;
+    int shift = 5;
+    uint16_t currVal = [self statusBB16forFiber: aFiber atIndex: (off + aIndex)];
+    return (currVal & mask) >> shift;
+}
+
+- (void) setSignbForFiber:(int)aFiber atIndex:(int)aIndex to:(int)aSignb
+{
+    //undo
+    int oldVal = [self signaForFiber:aFiber atIndex:aIndex];
+    [[[self undoManager] prepareWithInvocationTarget:self] setSignbForFiber: aFiber atIndex:aIndex to: oldVal];
+    
+    int off = kBBstatusRg;
+    uint16_t mask = 0x0020;
+    int shift = 5;
+    
+    //set new value
+    [self setStatusBB16forFiber:aFiber atOffset:off index:aIndex mask:mask shift:shift to:aSignb];
+    
+    //notification
+    NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+    [userInfo setObject:[NSNumber numberWithInt:aIndex] forKey: OREdelweissFLTIndex];
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelSignbChanged object:self  userInfo: userInfo];
+}
+
+- (int) dacaForFiber:(int)aFiber atIndex:(int)aIndex
+{
+    //return daca;
+    int off = kBBstatusRg;
+    uint16_t mask = 0x0f00;
+    int shift = 8;
+    uint16_t currVal = [self statusBB16forFiber: aFiber atIndex: (off + aIndex)];
+    return (currVal & mask) >> shift;
+}
+
+- (void) setDacaForFiber:(int)aFiber atIndex:(int)aIndex to:(int)aDaca
+{
+    //undo
+    int oldVal = [self signaForFiber:aFiber atIndex:aIndex];
+    [[[self undoManager] prepareWithInvocationTarget:self] setDacaForFiber: aFiber atIndex:aIndex to: oldVal];
+    
+    int off = kBBstatusRg;
+    uint16_t mask = 0x0f00;
+    int shift = 8;
+    
+    //set new value
+    [self setStatusBB16forFiber:aFiber atOffset:off index:aIndex mask:mask shift:shift to:aDaca];
+    
+    //notification
+    NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+    [userInfo setObject:[NSNumber numberWithInt:aIndex] forKey: OREdelweissFLTIndex];
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelDacaChanged object:self  userInfo: userInfo];
+}
+
+- (int) signaForFiber:(int)aFiber atIndex:(int)aIndex
+{
+    //return signa;
+    int off = kBBstatusRg;
+    uint16_t mask = 0x0010;
+    int shift = 4;
+    uint16_t currVal = [self statusBB16forFiber: aFiber atIndex: (off + aIndex)];
+    return (currVal & mask) >> shift;
+}
+
+- (void) setSignaForFiber:(int)aFiber atIndex:(int)aIndex to:(int)aSigna
+{
+    //undo
+    int oldVal = [self signaForFiber:aFiber atIndex:aIndex];
+    [[[self undoManager] prepareWithInvocationTarget:self] setSignaForFiber: aFiber atIndex:aIndex to: oldVal];
+    
+    int off = kBBstatusRg;
+    uint16_t mask = 0x0010;
+    int shift = 4;
+    
+    //set new value
+    [self setStatusBB16forFiber:aFiber atOffset:off index:aIndex mask:mask shift:shift to:aSigna];
+    
+    //notification
+    NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+    [userInfo setObject:[NSNumber numberWithInt:aIndex] forKey: OREdelweissFLTIndex];
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelSignaChanged object:self  userInfo: userInfo];
 }
 
 - (int) adcRgForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex
@@ -354,6 +511,36 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [userInfo setObject:[NSNumber numberWithInt:aIndex] forKey: OREdelweissFLTIndex];
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelAdcRgForBBAccessChanged object:self  userInfo: userInfo];
 }
+
+- (int) adcRtForFiber:(int)aFiber
+{
+    //return adcRt;
+    int off = kBBstatusRt;
+    uint16_t mask = 0xffff;
+    int shift = 0;
+    uint16_t currVal = [self statusBB16forFiber: aFiber atIndex: off];
+    return (currVal & mask) >> shift;
+}
+
+- (void) setAdcRtForFiber:(int)aFiber to:(int)aAdcRt
+{
+    //undo
+    int oldVal = [self relaisStatesBBForFiber:aFiber];
+    [[[self undoManager] prepareWithInvocationTarget:self] setAdcRtForFiber: aFiber to: oldVal];
+    
+    int off = kBBstatusRt;
+    uint16_t mask = 0xffff;
+    int shift = 0;
+    
+    //set new value
+    [self setStatusBB16forFiber:aFiber atOffset:off index:0 mask:mask shift:shift to:aAdcRt];
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelAdcRtChanged object:self];
+}
+
+
+
+
 
 - (int) adcValueForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex
 {
@@ -454,16 +641,28 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelUseBroadcastIdforBBAccessChanged object:self];
 }
 
-- (int) idBBforBBAccess
+- (int) idBBforBBAccessForFiber:(int)aFiber 
 {
-    return idBBforBBAccess;
+    //return idBBforBBAccess;
+    int off = kBBstatusSerNum;
+    uint16_t mask = 0x00ff;
+    int shift = 0;
+    uint16_t currVal = [self statusBB16forFiber: aFiber atIndex: off];
+    return (currVal & mask) >> shift;
 }
 
-- (void) setIdBBforBBAccess:(int)aIdBBforBBAccess
+- (void) setIdBBforBBAccessForFiber:(int)aFiber to:(int)aIdBBforBBAccess
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setIdBBforBBAccess:idBBforBBAccess];
+    //undo
+    int oldVal = [self relaisStatesBBForFiber:aFiber];
+    [[[self undoManager] prepareWithInvocationTarget:self] setIdBBforBBAccessForFiber: aFiber to: oldVal];
     
-    idBBforBBAccess = aIdBBforBBAccess;
+    int off = kBBstatusSerNum;
+    uint16_t mask = 0x00ff;
+    int shift = 0;
+    
+    //set new value
+    [self setStatusBB16forFiber:aFiber atOffset:off index:0 mask:mask shift:shift to:aIdBBforBBAccess];
 
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelIdBBforBBAccessChanged object:self];
 }
@@ -482,16 +681,28 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelFiberSelectForBBAccessChanged object:self];
 }
 
-- (int) relaisStatesBB
+- (int) relaisStatesBBForFiber:(int)aFiber
 {
-    return relaisStatesBB;
+    //return relaisStatesBB;
+    int off = kBBstatusRelais;
+    uint16_t mask = 0x0007;
+    int shift = 0;
+    uint16_t currVal = [self statusBB16forFiber: aFiber atIndex: off];
+    return (currVal & mask) >> shift;
 }
 
-- (void) setRelaisStatesBB:(int)aRelaisStatesBB
+- (void) setRelaisStatesBBForFiber:(int)aFiber to:(int)aRelaisStatesBB
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setRelaisStatesBB:relaisStatesBB];
+    //undo
+    int oldVal = [self relaisStatesBBForFiber:aFiber];
+    [[[self undoManager] prepareWithInvocationTarget:self] setRelaisStatesBBForFiber: aFiber to: oldVal];
     
-    relaisStatesBB = aRelaisStatesBB;
+    int off = kBBstatusRelais;
+    uint16_t mask = 0x0007;
+    int shift = 0;
+    
+    //set new value
+    [self setStatusBB16forFiber:aFiber atOffset:off index:0 mask:mask shift:shift to:aRelaisStatesBB];
 
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelRelaisStatesBBChanged object:self];
 }
@@ -1815,21 +2026,31 @@ for(chan=0; chan<6;chan++)
     self = [super initWithCoder:decoder];
 	
     [[self undoManager] disableUndoRegistration];
+    
+    [self setWCmdArg2:[decoder decodeIntForKey:@"wCmdArg2"]];
+    [self setWCmdArg1:[decoder decodeIntForKey:@"wCmdArg1"]];
+    [self setWCmdCode:[decoder decodeIntForKey:@"wCmdCode"]];
+    
+//    [self setAdcRt:[decoder decodeIntForKey:@"adcRt"]];
+//TODO: remove it      [self setDacb:[decoder decodeIntForKey:@"dacb"]];
+//TODO: remove it      [self setSignb:[decoder decodeIntForKey:@"signb"]];
+//TODO: remove it      [self setDaca:[decoder decodeIntForKey:@"daca"]];
+//TODO: remove it    [self setSigna:[decoder decodeIntForKey:@"signa"]];
     [self setStatusBitsBBData:[decoder decodeObjectForKey:@"statusBitsBBData"]];
 	if(!statusBitsBBData){
 		[self setStatusBitsBBData: [NSMutableData dataWithLength: 4 * kNumEWFLTFibers * kNumBBStatusBufferLength32]];
 	}
     memcpy(&(statusBitsBB[0][0]), [statusBitsBBData bytes], 4 * kNumEWFLTFibers * kNumBBStatusBufferLength32);
     
-    [self setAdcRtForBBAccess:[decoder decodeIntForKey:@"adcRtForBBAccess"]];
+ //   [self setAdcRtForBBAccess:[decoder decodeIntForKey:@"adcRtForBBAccess"]];
  //   [self setAdcRgForBBAccess:[decoder decodeIntForKey:@"adcRgForBBAccess"]];
  //   [self setAdcValueForBBAccess:[decoder decodeIntForKey:@"adcValueForBBAccess"]];
  //TODO: remove all    [self setAdcMultForBBAccess:[decoder decodeIntForKey:@"adcMultForBBAccess"]];
  //   [self setAdcFreqkHzForBBAccess:[decoder decodeIntForKey:@"adcFreqkHzForBBAccess"]];
     [self setUseBroadcastIdforBBAccess:[decoder decodeIntForKey:@"useBroadcastIdforBBAccess"]];
-    [self setIdBBforBBAccess:[decoder decodeIntForKey:@"idBBforBBAccess"]];
+//    [self setIdBBforBBAccess:[decoder decodeIntForKey:@"idBBforBBAccess"]];
     [self setFiberSelectForBBAccess:[decoder decodeIntForKey:@"fiberSelectForBBAccess"]];
-    [self setRelaisStatesBB:[decoder decodeIntForKey:@"relaisStatesBB"]];
+//RM    [self setRelaisStatesBB:[decoder decodeIntForKey:@"relaisStatesBB"]];
     [self setFiberSelectForBBStatusBits:[decoder decodeIntForKey:@"fiberSelectForBBStatusBits"]];
     [self setFiberOutMask:[decoder decodeInt32ForKey:@"fiberOutMask"]];
     //[self setTpix:[decoder decodeIntForKey:@"tpix"]];
@@ -1898,6 +2119,10 @@ for(chan=0; chan<6;chan++)
 {
     [super encodeWithCoder:encoder];
 	
+    [encoder encodeInt:wCmdArg2 forKey:@"wCmdArg2"];
+    [encoder encodeInt:wCmdArg1 forKey:@"wCmdArg1"];
+    [encoder encodeInt:wCmdCode forKey:@"wCmdCode"];
+    
     //BB access tab
 	if(!statusBitsBBData){
 		[self setStatusBitsBBData: [NSMutableData dataWithLength: 4 * kNumEWFLTFibers * kNumBBStatusBufferLength32]];
@@ -1905,19 +2130,24 @@ for(chan=0; chan<6;chan++)
     //memcpy([statusBitsBBData bytes], &(statusBitsBB[0][0]), 4 * kNumEWFLTFibers * kNumBBStatusBufferLength32);
     NSRange range = {0, [statusBitsBBData length] };
     [statusBitsBBData replaceBytesInRange:range withBytes: &(statusBitsBB[0][0]) ];
+//[encoder encodeInt:adcRt forKey:@"adcRt"];
+//TODO: remove it      [encoder encodeInt:dacb forKey:@"dacb"];
+//TODO: remove it      [encoder encodeInt:signb forKey:@"signb"];
+//TODO: remove it      [encoder encodeInt:daca forKey:@"daca"];
+//    [encoder encodeInt:signa forKey:@"signa"];
     [encoder encodeObject:statusBitsBBData forKey:@"statusBitsBBData"];
     
-    [encoder encodeInt:adcRtForBBAccess forKey:@"adcRtForBBAccess"];
+//    [encoder encodeInt:adcRtForBBAccess forKey:@"adcRtForBBAccess"];
 //    [encoder encodeInt:adcRgForBBAccess forKey:@"adcRgForBBAccess"];
 //    [encoder encodeInt:adcValueForBBAccess forKey:@"adcValueForBBAccess"];
 //    [encoder encodeInt:adcMultForBBAccess forKey:@"adcMultForBBAccess"];
 //    [encoder encodeInt:adcFreqkHzForBBAccess forKey:@"adcFreqkHzForBBAccess"];
     [encoder encodeInt:useBroadcastIdforBBAccess forKey:@"useBroadcastIdforBBAccess"];
-    [encoder encodeInt:idBBforBBAccess forKey:@"idBBforBBAccess"];
+//    [encoder encodeInt:idBBforBBAccess forKey:@"idBBforBBAccess"];
     [encoder encodeInt:fiberSelectForBBAccess forKey:@"fiberSelectForBBAccess"];
     
     //others
-    [encoder encodeInt:relaisStatesBB forKey:@"relaisStatesBB"];
+//RM    [encoder encodeInt:relaisStatesBB forKey:@"relaisStatesBB"];
     [encoder encodeInt:fiberSelectForBBStatusBits forKey:@"fiberSelectForBBStatusBits"];
     [encoder encodeInt32:fiberOutMask forKey:@"fiberOutMask"];
     //[encoder encodeInt:tpix forKey:@"tpix"];
@@ -2447,6 +2677,126 @@ for(chan=0; chan<6;chan++)
 }
 
 
+- (void) sendWCommand
+{
+    OREdelweissSLTModel *slt=0;
+    slt=[[self crate] adapter];
+    //DEBUG 	    
+    NSLog(@"%@::%@  test: %@\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),NSStringFromClass([slt class]));//TODO: DEBUG testing ...-tb-
+
+    char bytes[16];
+    int i=0;
+    /*
+    //a test
+    bytes[i]=0xf0;     i++;
+    bytes[i]=0x01;     i++;
+    bytes[i]=0x02;     i++;
+    bytes[i]=0x03;     i++;
+    bytes[i]=0x04;     i++;
+    bytes[i]=0x05;     i++;
+    bytes[i]=0x23;     i++;
+    */
+
+    /*a other test: switch to IdMode
+    bytes[i]='W';      i++;
+    bytes[i]=0xf0;     i++;
+    bytes[i]=0x11;     i++;
+    bytes[i]=0x08;     i++;
+    bytes[i]=0x00;     i++;
+    bytes[i]=0x01;     i++; //1=IdMode on; 2=off
+    */
+    bytes[i]='W';      i++;
+    bytes[i]=0xf0;     i++;
+    if([self useBroadcastIdforBBAccess]){  bytes[i]=0xff;     i++;}
+    else                                {  bytes[i]=0xff & [self idBBforBBAccessForFiber:  fiberSelectForBBAccess];     i++;}
+    bytes[i]=0xff & wCmdCode;     i++;
+    bytes[i]=0xff & wCmdArg1;     i++;
+    bytes[i]=0xff & wCmdArg2;     i++; //1=IdMode on; 2=off
+    [slt writeToCmdFIFO:bytes numBytes:i];
+
+}
+
+- (void) sendWCommandIdBB:(int) idBB cmd:(int) cmd arg1:(int) arg1  arg2:(int) arg2
+{
+    OREdelweissSLTModel *slt=0;
+    slt=[[self crate] adapter];
+    char bytes[16];
+    int i=0;
+    bytes[i]='W';      i++;
+    bytes[i]=0xf0;     i++;
+    bytes[i]=0xff & idBB;     i++;
+    bytes[i]=0xff & cmd;     i++;
+    bytes[i]=0xff & arg1;     i++;
+    bytes[i]=0xff & arg2;     i++;
+    [slt writeToCmdFIFO:bytes numBytes:i];
+
+}
+
+
+//for call from "BB Access"
+- (void) readBBStatusForBBAccess
+{
+    int fiber = [self fiberSelectForBBAccess];
+
+        //DEBUG OUTPUT:           NSLog(@"%@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
+        NSLog(@"  read from fiber in #%i\n",fiberSelectForBBAccess);//TODO : DEBUG testing ...-tb-
+        
+        //uint32_t BBStatus32[30];
+        //uint16_t *BBStatus16 = (uint16_t *)BBStatus32;
+        uint32_t *BBStatus32=statusBitsBB[fiber];
+        uint16_t *BBStatus16 = (uint16_t *)&BBStatus32[0];
+        
+        int i;
+        
+        @try{//I could omit it here because I catch exceptions in the controller (see comment below) -tb-
+        
+        #if 0
+        for(i=0;i<30;i++){
+            //BBStatus32[i]=i*2+i*0x10000; // for testing without hardware
+            BBStatus32[i]= [self readReg:kFLTV4BBStatusReg channel:fiberSelectForBBStatusBits  index:i];
+        }
+        #else
+        unsigned long address = [self regAddress:kFLTV4BBStatusReg channel:fiber index:0];
+        [self readBlock: address
+		     dataBuffer: (unsigned long*) BBStatus32
+			     length:  30 
+		      increment:  0];
+        #endif
+        
+        }
+		@catch(NSException* e){
+			NSLog(@"Could not read status bits because of exception -%@- with reason -%@-\n",[e name],[e reason]);
+            [e raise];//give exception over to higher/calling level -tb-
+            return;
+		}
+        
+        // we re-use this notification, it will have the same effect ...
+        [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelFiberSelectForBBAccessChanged object:self];
+        
+        
+        
+		//	NSFont* aFont = [NSFont userFixedPitchFontOfSize:9];
+        NSFont* aFont = [NSFont fontWithName:@"Monaco" size:9];
+
+        NSLogFont(aFont,@"Read BBStatBits of fiber #%i \n",fiber+1);
+        NSString *s = [[NSString alloc] initWithString: @""];
+        for(i=0;i<58;i++){
+            //BBStatus16[i]=i*2+i*0x10000;
+            s = [s stringByAppendingFormat:@"(%2i) 0x%04x; ", i,BBStatus16[i] ];
+            if( ((i+1) % 10)== 0){
+                NSLogFont(aFont,@"BBStatBits:%@\n",s);
+                s=@"";
+            }
+        }
+        if([s length]!= 0)        NSLogFont(aFont,@"BBStatBits:%@\n",s);
+        
+        
+        
+        
+}
+
+
+//for call from "Low Level"
 - (void) readBBStatusBits
 {
 
@@ -2461,10 +2811,18 @@ static int counter=0;
         
         @try{//I could omit it here because I catch exceptions in the controller (see comment below) -tb-
         
+        #if 0
         for(i=0;i<30;i++){
             //BBStatus32[i]=i*2+i*0x10000; // for testing without hardware
             BBStatus32[i]= [self readReg:kFLTV4BBStatusReg channel:fiberSelectForBBStatusBits  index:i];
         }
+        #else
+        unsigned long address = [self regAddress:kFLTV4BBStatusReg channel:fiberSelectForBBStatusBits index:0];
+        [self readBlock: address
+		     dataBuffer: (unsigned long*) BBStatus32
+			     length:  30 
+		      increment:  0];
+        #endif
         
         }
 		@catch(NSException* e){
@@ -2491,6 +2849,10 @@ counter++;
             }
         }
         if([s length]!= 0)        NSLogFont(aFont,@"BBStatBits:%@\n",s);
+        
+        
+        
+        
 }
 
 - (void) readAllBBStatusBits

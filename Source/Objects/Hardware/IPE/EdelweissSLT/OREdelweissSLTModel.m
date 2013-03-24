@@ -1111,10 +1111,10 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 }
 
 
-- (void) writeEvRes				{ [self writeReg:kSltV4CommandReg value:kCmdEvRes];   }
-- (void) writeFwCfg				{ [self writeReg:kSltV4CommandReg value:kCmdFwCfg];   }
-- (void) writeSltReset			{ [self writeReg:kSltV4CommandReg value:kCmdSltReset];   }
-- (void) writeFltReset			{ [self writeReg:kSltV4CommandReg value:kCmdFltReset];   }
+- (void) writeEvRes				{ [self writeReg:kSltV4CommandReg value:kEWCmdEvRes];   }
+- (void) writeFwCfg				{ [self writeReg:kSltV4CommandReg value:kEWCmdFwCfg];   }
+- (void) writeSltReset			{ [self writeReg:kSltV4CommandReg value:kEWCmdSltReset];   }
+- (void) writeFltReset			{ [self writeReg:kSltV4CommandReg value:kEWCmdFltReset];   }
 
 - (id) controllerCard		{ return self;	  }
 - (SBC_Link*)sbcLink		{ return pmcLink; } 
@@ -2290,6 +2290,39 @@ for(l=0;l<2500;l++){
 
 
 #pragma mark ***HW Access
+
+
+//this uses a general read command
+- (int)          writeToCmdFIFO:(char*)data numBytes:(int) numBytes
+{
+
+
+    //DEBUG 	    
+    NSLog(@"%@::%@ \n", NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+
+
+   long buf32[257]; //cannot exceed size of cmd FIFO
+   //uint32_t buf32[257]; //cannot exceed size of cmd FIFO
+   int num32ToSend = (numBytes+3)/4 + 1;//round up if not multiple of 4; add 1 for first word containing numBytes
+   if(numBytes>1024) return -1;
+   buf32[0]=numBytes;
+   char* buf=(char*)&buf32[1];
+   int i;
+   for(i=0; i<numBytes; i++) buf[i]=data[i];
+   
+	if(![pmcLink isConnected]){
+		[NSException raise:@"Not Connected" format:@"Socket not connected."];
+	}
+	else {
+		[pmcLink writeGeneral:buf32 operation:kWriteToCmdFIFO numToWrite:num32ToSend];
+	}
+   
+   
+   return 0;
+}
+
+
+
 - (void)		  readAllControlSettingsFromHW
 {
 //DEBUG OUTPUT: 	
@@ -2510,8 +2543,8 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 	unsigned long data = [self readStatusReg];
 	NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
 	NSLogFont(aFont,@"----Status Register %@ is 0x%08x ----\n",[self fullID],data);
-	NSLogFont(aFont,@"IRQ           : 0x%02x\n",ExtractValue(data,kStatusIrq,31));
-	NSLogFont(aFont,@"PixErr        : 0x%02x\n",ExtractValue(data,kStatusPixErr,16));
+	NSLogFont(aFont,@"IRQ           : 0x%02x\n",ExtractValue(data,kEWStatusIrq,31));
+	NSLogFont(aFont,@"PixErr        : 0x%02x\n",ExtractValue(data,kEWStatusPixErr,16));
 	NSLogFont(aFont,@"FLT0..15 Requ.: 0x%04x\n",ExtractValue(data,0xffff,0));
 }
 

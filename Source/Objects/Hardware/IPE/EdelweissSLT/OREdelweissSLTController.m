@@ -530,8 +530,8 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	unsigned long statusReg = [model statusReg];
 //DEBUG OUTPUT:  NSLog(@"WARNING: %@::%@: UNDER CONSTRUCTION! status reg: 0x%08x\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),statusReg);//TODO: DEBUG testing ...-tb-
 	
-	[[statusMatrix cellWithTag:0] setStringValue: IsBitSet(statusReg,kStatusIrq)?@"1":@"0"];
-	[[statusMatrix cellWithTag:1] setStringValue: IsBitSet(statusReg,kStatusPixErr)?@"1":@"0"];
+	[[statusMatrix cellWithTag:0] setStringValue: IsBitSet(statusReg,kEWStatusIrq)?@"1":@"0"];
+	[[statusMatrix cellWithTag:1] setStringValue: IsBitSet(statusReg,kEWStatusPixErr)?@"1":@"0"];
 
 	[[statusMatrix cellWithTag:2] setStringValue: [NSString stringWithFormat:@"0x%04lx",ExtractValue(statusReg,0xffff,0)]];
 

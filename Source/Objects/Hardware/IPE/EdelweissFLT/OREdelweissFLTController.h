@@ -32,15 +32,23 @@
     
         //FLT settings
         IBOutlet NSButton*		settingLockButton;
-	IBOutlet   NSTextField* adcRtForBBAccessTextField;
-#if 0
-#endif
+	IBOutlet   NSTextField* wCmdArg2TextField;
+	IBOutlet   NSTextField* wCmdArg1TextField;
+	IBOutlet   NSTextField* wCmdCodeTextField;
+	IBOutlet   NSTextField* adcRtTextField;
+    
+	IBOutlet   NSMatrix* dacbMatrix;
+	IBOutlet   NSMatrix* signbMatrix;
+	IBOutlet   NSMatrix* dacaMatrix;
+	IBOutlet   NSMatrix* signaMatrix;
 	IBOutlet   NSMatrix* adcRgForBBAccessMatrix;
+    
 	IBOutlet   NSMatrix* adcValueForBBAccessMatrix;
 	IBOutlet   NSMatrix* adcMultForBBAccessMatrix;
 	IBOutlet   NSMatrix* adcFreqkHzForBBAccessMatrix;
 	IBOutlet   NSButton* useBroadcastIdforBBAccessCB;
 	IBOutlet   NSTextField* idBBforBBAccessTextField;
+	IBOutlet   NSTextField* idBBforWCommandTextField;
 	IBOutlet   NSPopUpButton* fiberSelectForBBAccessPU;
 	IBOutlet   NSMatrix* relaisStatesBBMatrix;
 	    IBOutlet   NSPopUpButton* fiberSelectForBBStatusBitsPU;
@@ -152,8 +160,15 @@
 - (void) updateButtons;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+- (void) wCmdArg2Changed:(NSNotification*)aNote;
+- (void) wCmdArg1Changed:(NSNotification*)aNote;
+- (void) wCmdCodeChanged:(NSNotification*)aNote;
+- (void) adcRtChanged:(NSNotification*)aNote;
+- (void) dacbChanged:(NSNotification*)aNote;
+- (void) signbChanged:(NSNotification*)aNote;
+- (void) dacaChanged:(NSNotification*)aNote;
+- (void) signaChanged:(NSNotification*)aNote;
 - (void) statusBitsBBDataChanged:(NSNotification*)aNote;
-- (void) adcRtForBBAccessChanged:(NSNotification*)aNote;
 - (void) adcRgForBBAccessChanged:(NSNotification*)aNote;
 - (void) adcValueForBBAccessChanged:(NSNotification*)aNote;
 - (void) adcMultForBBAccessChanged:(NSNotification*)aNote;
@@ -213,12 +228,19 @@
 - (void) selectedChannelValueChanged:(NSNotification*) aNote;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+- (IBAction) wCmdArg2TextFieldAction:(id)sender;
+- (IBAction) wCmdArg1TextFieldAction:(id)sender;
+- (IBAction) wCmdCodeTextFieldAction:(id)sender;
+- (IBAction) sendWCommandButtonAction:(id)sender;
+
+- (IBAction) adcRtTextFieldAction:(id)sender;
+
+- (IBAction) dacbMatrixAction:(id)sender;
+- (IBAction) signbMatrixAction:(id)sender;
+- (IBAction) dacaMatrixAction:(id)sender;
+- (IBAction) signaMatrixAction:(id)sender;
+- (IBAction) readBBStatusBBAccessButtonAction:(id)sender;
 - (IBAction) dumpBBStatusBBAccessTextFieldAction:(id)sender;
-- (IBAction) adcRtForBBAccessTextFieldAction:(id)sender;
-
-
-#if 0
-#endif
 - (IBAction) adcRgForBBAccessMatrixAction:(id)sender;
 - (IBAction) adcValueForBBAccessMatrixAction:(id)sender;
 - (IBAction) adcMultForBBAccessMatrixAction:(id)sender;

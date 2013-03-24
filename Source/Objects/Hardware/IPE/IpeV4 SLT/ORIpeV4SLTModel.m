@@ -1133,8 +1133,10 @@ NSLog(@"  arguments: %@ \n" , arguments);
 		[NSException raise:@"Not Connected" format:@"Socket not connected."];
 	}
 	else {
-		[pmcLink writeGeneral:&args operation:kSetHostTimeToFLTsAndSLT numToWrite:2];
-            //this produces a compiler warning; I did NOT remove it to not forget that we expect uint32_t on the SBCs
+		[pmcLink writeGeneral:(long*)&args operation:kSetHostTimeToFLTsAndSLT numToWrite:2];
+		//[pmcLink writeGeneral:&args operation:kSetHostTimeToFLTsAndSLT numToWrite:2];
+            //WARNING:
+            //this produced a compiler warning; I did NOT remove it to not forget that we expect uint32_t on the SBCs
             //in Orca, sizeof(long) is 4 byte; SBCs may be 64 bit machines -> sizeof(long) is 8 byte!  -tb- 2012-12
 	}
 }
