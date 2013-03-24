@@ -398,9 +398,24 @@
                          name : OREdelweissFLTModelWCmdArg2Changed
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(writeToBBModeChanged:)
+                         name : OREdelweissFLTModelWriteToBBModeChanged
+						object: model];
+
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+
+- (void) writeToBBModeChanged:(NSNotification*)aNote
+{
+	[writeToBBModeCB setIntValue: [model writeToBBMode]];
+    if([model writeToBBMode]){
+        [writeToBBModeIndicator startAnimation:nil];
+    }else{
+        [writeToBBModeIndicator stopAnimation:nil];
+    }
+}
 
 - (void) wCmdArg2Changed:(NSNotification*)aNote
 {
@@ -519,6 +534,7 @@
 
 	//[adcFreqkHzForBBAccess<custom> setIntValue: [model adcFreqkHzForBBAccess]];
 	[[adcFreqkHzForBBAccessMatrix cellWithTag:index] setIntValue: [model adcFreqkHzForBBAccessForFiber: fiber atIndex:index]];
+    
 }
 
 
@@ -534,6 +550,7 @@
     int fiber = [model fiberSelectForBBAccess];
 	[idBBforBBAccessTextField setIntValue: [model idBBforBBAccessForFiber:fiber]];
 	[idBBforWCommandTextField setIntValue: [model idBBforBBAccessForFiber:fiber]];
+	[idBBforAlimCommandTextField setIntValue: [model idBBforBBAccessForFiber:fiber]];
 }
 
 
@@ -545,6 +562,10 @@
 	//[fiberSelectForBBAccessPU setIntValue: [model fiberSelectForBBAccess]];
     int fiber = [model fiberSelectForBBAccess];
 	[fiberSelectForBBAccessPU selectItemAtIndex: fiber];
+    
+    //update infos
+    if([model BBv1MaskForChan:fiber])[fiberIsBBv1TextField setStringValue:@"Is BBv1: YES"];
+    else [fiberIsBBv1TextField setStringValue:@"Is BBv1: NO"];
     
     //update everything from the BB status bit buffer!
     int index;
@@ -728,6 +749,9 @@
 		[[BBv1MaskMatrix cellWithTag:i] setIntValue:[model BBv1MaskForChan:i]];
         //DEBUG OUTPUT: 	NSLog(@"%@::%@: UNDER CONSTRUCTION! [model BBv1MaskForChan:%i] %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),i,[model BBv1MaskForChan:i]);//TODO : DEBUG testing ...-tb-
 	}    
+    int fiber = [model fiberSelectForBBAccess];
+    if([model BBv1MaskForChan:fiber])[fiberIsBBv1TextField setStringValue:@"Is BBv1: YES"];
+    else [fiberIsBBv1TextField setStringValue:@"Is BBv1: NO"];
 
 }
 
@@ -888,6 +912,7 @@
 	[self wCmdCodeChanged:nil];
 	[self wCmdArg1Changed:nil];
 	[self wCmdArg2Changed:nil];
+	[self writeToBBModeChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -1222,6 +1247,11 @@
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
 
+- (void) writeToBBModeCBAction:(id)sender
+{
+	[model setWriteToBBMode:[sender intValue]];	
+}
+
 - (void) wCmdArg2TextFieldAction:(id)sender
 {
 	[model setWCmdArg2:[sender intValue]];	
@@ -1249,6 +1279,8 @@
 
     int fiber = [model fiberSelectForBBAccess];
 	[model setAdcRtForFiber:fiber to:[sender intValue]];	
+    //if "Write Changes to BB" is selected ...
+    if([model writeToBBMode]) [model writeAdcRtForBBAccessForFiber:fiber];
 }
 
 
@@ -1291,6 +1323,9 @@
     int fiber = [model fiberSelectForBBAccess];
     int index = [[sender selectedCell] tag];
     [model setDacbForFiber: fiber atIndex:index to:[sender intValue]];
+    
+    //if "Write Changes to BB" is selected ...
+    if([model writeToBBMode]) [model writeAdcRgForBBAccessForFiber:fiber atIndex:index];
 }
 
 - (void) signbMatrixAction:(id)sender
@@ -1299,6 +1334,9 @@
     int fiber = [model fiberSelectForBBAccess];
     int index = [[sender selectedCell] tag];
     [model setSignbForFiber: fiber atIndex:index to:[sender intValue]];
+    
+    //if "Write Changes to BB" is selected ...
+    if([model writeToBBMode]) [model writeAdcRgForBBAccessForFiber:fiber atIndex:index];
 }
 
 - (void) dacaMatrixAction:(id)sender
@@ -1307,6 +1345,9 @@
     int fiber = [model fiberSelectForBBAccess];
     int index = [[sender selectedCell] tag];
     [model setDacaForFiber: fiber atIndex:index to:[sender intValue]];
+    
+    //if "Write Changes to BB" is selected ...
+    if([model writeToBBMode]) [model writeAdcRgForBBAccessForFiber:fiber atIndex:index];
 }
 
 - (void) signaMatrixAction:(id)sender
@@ -1315,6 +1356,9 @@
     int fiber = [model fiberSelectForBBAccess];
     int index = [[sender selectedCell] tag];
     [model setSignaForFiber: fiber atIndex:index to:[sender intValue]];
+    
+    //if "Write Changes to BB" is selected ...
+    if([model writeToBBMode]) [model writeAdcRgForBBAccessForFiber:fiber atIndex:index];
 }
 
 - (void) adcRgForBBAccessMatrixAction:(id)sender
@@ -1323,6 +1367,9 @@
     int fiber = [model fiberSelectForBBAccess];
     int index = [[sender selectedCell] tag];
     [model setAdcRgForBBAccessForFiber: fiber atIndex:index to:[sender intValue]];
+    
+    //if "Write Changes to BB" is selected ...
+    if([model writeToBBMode]) [model writeAdcRgForBBAccessForFiber:fiber atIndex:index];
 }
 
 - (void) adcValueForBBAccessMatrixAction:(id)sender
@@ -1339,6 +1386,13 @@
     int fiber = [model fiberSelectForBBAccess];
     int index = [[sender selectedCell] tag];
     [model setAdcMultForBBAccessForFiber: fiber atIndex:index to:[sender intValue]];
+
+    //if "Write Changes to BB" is selected ...
+    if([model writeToBBMode]){
+    //DEBUG    
+    NSLog(@"%@::%@ call writeAdcFilterForBBAccessForFiber: fiber %i index %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),fiber,index);//TODO: DEBUG testing ...-tb-
+        [model writeAdcFilterForBBAccessForFiber:fiber atIndex:index];
+    }
 }
 
 
@@ -1357,6 +1411,10 @@
 		//[[self undoManager] setActionName: @"Set Threshold"];
 		[model setAdcFreqkHzForBBAccessForFiber: fiber atIndex:[[sender selectedCell] tag] to:[sender intValue]];
 	//}
+    
+    //if "Write Changes to BB" is selected ...
+    if([model writeToBBMode]) [model writeAdcFilterForBBAccessForFiber:fiber atIndex:index];
+
 }
 
 - (void) useBroadcastIdforBBAccessCBAction:(id)sender

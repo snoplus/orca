@@ -34,6 +34,7 @@
 #import "ipe4structure.h"
 //#import "ipe4tbtools.h"
 
+NSString* OREdelweissFLTModelWriteToBBModeChanged = @"OREdelweissFLTModelWriteToBBModeChanged";
 NSString* OREdelweissFLTModelWCmdArg2Changed = @"OREdelweissFLTModelWCmdArg2Changed";
 NSString* OREdelweissFLTModelWCmdArg1Changed = @"OREdelweissFLTModelWCmdArg1Changed";
 NSString* OREdelweissFLTModelWCmdCodeChanged = @"OREdelweissFLTModelWCmdCodeChanged";
@@ -299,6 +300,20 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
 
+- (int) writeToBBMode
+{
+    return writeToBBMode;
+}
+
+- (void) setWriteToBBMode:(int)aWriteToBBMode
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setWriteToBBMode:writeToBBMode];
+    
+    writeToBBMode = aWriteToBBMode;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelWriteToBBModeChanged object:self];
+}
+
 - (unsigned int) wCmdArg2
 {
     return wCmdArg2;
@@ -512,6 +527,21 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelAdcRgForBBAccessChanged object:self  userInfo: userInfo];
 }
 
+- (void) writeAdcRgForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex//HW access
+{
+    uint16_t val = [self statusBB16forFiber: aFiber atIndex: (kBBstatusRg + aIndex)];
+    
+    int idBB = 0xff;
+    if(![self useBroadcastIdforBBAccess]) [self idBBforBBAccessForFiber:aFiber];
+    int cmd = kBBcmdSetRg+aIndex;
+    int arg1 = (val >> 8) & 0xff;
+    int arg2 = val & 0xff;
+    
+    [self sendWCommandIdBB:idBB cmd:cmd arg1:arg1  arg2: arg2];
+
+}
+
+
 - (int) adcRtForFiber:(int)aFiber
 {
     //return adcRt;
@@ -536,6 +566,21 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [self setStatusBB16forFiber:aFiber atOffset:off index:0 mask:mask shift:shift to:aAdcRt];
 
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelAdcRtChanged object:self];
+}
+
+
+- (void) writeAdcRtForBBAccessForFiber:(int)aFiber//HW access
+{
+    uint16_t val = [self statusBB16forFiber: aFiber atIndex: (kBBstatusRt)];
+    
+    int idBB = 0xff;
+    if(![self useBroadcastIdforBBAccess]) [self idBBforBBAccessForFiber:aFiber];
+    int cmd = kBBcmdSetRt;
+    int arg1 = (val >> 8) & 0xff;
+    int arg2 = val & 0xff;
+    
+    [self sendWCommandIdBB:idBB cmd:cmd arg1:arg1  arg2: arg2];
+
 }
 
 
@@ -626,6 +671,22 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelAdcFreqkHzForBBAccessChanged 
                                           object:self userInfo: userInfo];
 }
+
+
+- (void) writeAdcFilterForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex//HW access
+{
+    uint16_t val = [self statusBB16forFiber: aFiber atIndex: (kBBstatusFilter + aIndex)];
+    
+    int idBB = 0xff;
+    if(![self useBroadcastIdforBBAccess]) [self idBBforBBAccessForFiber:aFiber];
+    int cmd = kBBcmdSetFilter+aIndex;
+    int arg1 = (val >> 8) & 0xff;
+    int arg2 = val & 0xff;
+    
+    [self sendWCommandIdBB:idBB cmd:cmd arg1:arg1  arg2: arg2];
+
+}
+
 
 - (int) useBroadcastIdforBBAccess
 {
@@ -2027,6 +2088,7 @@ for(chan=0; chan<6;chan++)
 	
     [[self undoManager] disableUndoRegistration];
     
+    [self setWriteToBBMode:[decoder decodeIntForKey:@"writeToBBMode"]];
     [self setWCmdArg2:[decoder decodeIntForKey:@"wCmdArg2"]];
     [self setWCmdArg1:[decoder decodeIntForKey:@"wCmdArg1"]];
     [self setWCmdCode:[decoder decodeIntForKey:@"wCmdCode"]];
@@ -2119,6 +2181,7 @@ for(chan=0; chan<6;chan++)
 {
     [super encodeWithCoder:encoder];
 	
+    [encoder encodeInt:writeToBBMode forKey:@"writeToBBMode"];
     [encoder encodeInt:wCmdArg2 forKey:@"wCmdArg2"];
     [encoder encodeInt:wCmdArg1 forKey:@"wCmdArg1"];
     [encoder encodeInt:wCmdCode forKey:@"wCmdCode"];
@@ -2718,6 +2781,12 @@ for(chan=0; chan<6;chan++)
 
 - (void) sendWCommandIdBB:(int) idBB cmd:(int) cmd arg1:(int) arg1  arg2:(int) arg2
 {
+
+    //DEBUG 	    
+    NSLog(@"%@::%@  write 0x%x  0x%x  0x%x  0x%x \n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),
+    0xff & idBB,  0xff & cmd  ,  0xff & arg1  ,  0xff & arg2  );//TODO: DEBUG testing ...-tb-
+
+
     OREdelweissSLTModel *slt=0;
     slt=[[self crate] adapter];
     char bytes[16];

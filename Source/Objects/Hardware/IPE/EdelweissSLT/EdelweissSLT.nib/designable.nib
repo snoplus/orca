@@ -12,7 +12,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="2"/>
+			<integer value="21"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1720,7 +1720,6 @@ Z2h0IEFwcGxlIENvbXB1dGVyLCBJbmMuLCAyMDA1AAAAAA</bytes>
 																<int key="NSvFlags">256</int>
 																<string key="NSFrame">{{85, 9}, {64, 18}}</string>
 																<reference key="NSSuperview" ref="453275521"/>
-																<reference key="NSNextKeyView"/>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSButtonCell" key="NSCell" id="183270703">
 																	<int key="NSCellFlags">67239424</int>
@@ -1803,7 +1802,6 @@ Z2h0IEFwcGxlIENvbXB1dGVyLCBJbmMuLCAyMDA1AAAAAA</bytes>
 																<int key="NSvFlags">268</int>
 																<string key="NSFrame">{{153, 7}, {54, 28}}</string>
 																<reference key="NSSuperview" ref="26626492"/>
-																<reference key="NSNextKeyView"/>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSButtonCell" key="NSCell" id="538774384">
 																	<int key="NSCellFlags">67239424</int>
@@ -7532,13 +7530,13 @@ QXBwbGUgQ29tcHV0ZXIsIEluYy4sIDIwMDUAAAAAA</bytes>
 															<object class="NSButton" id="619106107">
 																<reference key="NSNextResponder" ref="459482361"/>
 																<int key="NSvFlags">268</int>
-																<string key="NSFrame">{{229, 95}, {139, 28}}</string>
+																<string key="NSFrame">{{228, 95}, {142, 28}}</string>
 																<reference key="NSSuperview" ref="459482361"/>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSButtonCell" key="NSCell" id="722995530">
 																	<int key="NSCellFlags">67239424</int>
 																	<int key="NSCellFlags2">134348800</int>
-																	<string key="NSContents">Send 0xFF Command</string>
+																	<string key="NSContents">Send 0x0A Command</string>
 																	<reference key="NSSupport" ref="26"/>
 																	<reference key="NSControlView" ref="619106107"/>
 																	<int key="NSButtonFlags">-2038284033</int>
@@ -7795,7 +7793,7 @@ QXBwbGUgQ29tcHV0ZXIsIEluYy4sIDIwMDUAAAAAA</bytes>
 												<object class="NSTextFieldCell" key="NSTitleCell">
 													<int key="NSCellFlags">67239424</int>
 													<int key="NSCellFlags2">0</int>
-													<string key="NSContents">BB 0x0A Command</string>
+													<string key="NSContents">Alim (BB 0x0A Command)</string>
 													<reference key="NSSupport" ref="26"/>
 													<reference key="NSBackgroundColor" ref="153208608"/>
 													<object class="NSColor" key="NSTextColor">
@@ -10665,27 +10663,35 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">UDPDataTabSendDebloqueCommandButtonAction:</string>
-						<reference key="source" ref="524620905"/>
-						<reference key="destination" ref="652953196"/>
-					</object>
-					<int key="connectionID">6224</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">numRequestedUDPPacketsTextFieldAction:</string>
-						<reference key="source" ref="524620905"/>
-						<reference key="destination" ref="297727720"/>
-					</object>
-					<int key="connectionID">6227</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
 						<string key="label">sendUDPDataTab0x0ACommand:</string>
 						<reference key="source" ref="524620905"/>
 						<reference key="destination" ref="619106107"/>
 					</object>
 					<int key="connectionID">6228</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">chargeBBFileTextField</string>
+						<reference key="source" ref="524620905"/>
+						<reference key="destination" ref="297727720"/>
+					</object>
+					<int key="connectionID">6230</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">chargeBBFileTextFieldAction:</string>
+						<reference key="source" ref="524620905"/>
+						<reference key="destination" ref="297727720"/>
+					</object>
+					<int key="connectionID">6231</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">crateUDPDataChargeBBFileCommandSendButtonAction:</string>
+						<reference key="source" ref="524620905"/>
+						<reference key="destination" ref="652953196"/>
+					</object>
+					<int key="connectionID">6232</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -16611,9 +16617,9 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
-					<string>{{1215, 412}, {662, 691}}</string>
+					<string>{{2833, 237}, {662, 691}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{1215, 412}, {662, 691}}</string>
+					<string>{{2833, 237}, {662, 691}}</string>
 					<boolean value="YES"/>
 					<boolean value="NO"/>
 					<boolean value="YES"/>
@@ -18161,7 +18167,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">6228</int>
+			<int key="maxID">6232</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -19260,6 +19266,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<string>UDPDataTabSendDebloqueCommandButtonAction:</string>
 							<string>UDPDataTabSendDemarrageCommandButtonAction:</string>
 							<string>calibrateAction:</string>
+							<string>chargeBBFileTextFieldAction:</string>
 							<string>closeCommandSocketButtonAction:</string>
 							<string>closeDataCommandSocketButtonAction:</string>
 							<string>cmdWArg1TextFieldAction:</string>
@@ -19271,6 +19278,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<string>crateUDPCommandPortTextFieldAction:</string>
 							<string>crateUDPCommandSendButtonAction:</string>
 							<string>crateUDPCommandTextFieldAction:</string>
+							<string>crateUDPDataChargeBBFileCommandSendButtonAction:</string>
 							<string>crateUDPDataCommandSendButtonAction:</string>
 							<string>crateUDPDataCommandTextFieldAction:</string>
 							<string>crateUDPDataIPTextFieldAction:</string>
@@ -19340,6 +19348,8 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -19435,6 +19445,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<string>UDPDataTabSendDebloqueCommandButtonAction:</string>
 							<string>UDPDataTabSendDemarrageCommandButtonAction:</string>
 							<string>calibrateAction:</string>
+							<string>chargeBBFileTextFieldAction:</string>
 							<string>closeCommandSocketButtonAction:</string>
 							<string>closeDataCommandSocketButtonAction:</string>
 							<string>cmdWArg1TextFieldAction:</string>
@@ -19446,6 +19457,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<string>crateUDPCommandPortTextFieldAction:</string>
 							<string>crateUDPCommandSendButtonAction:</string>
 							<string>crateUDPCommandTextFieldAction:</string>
+							<string>crateUDPDataChargeBBFileCommandSendButtonAction:</string>
 							<string>crateUDPDataCommandSendButtonAction:</string>
 							<string>crateUDPDataCommandTextFieldAction:</string>
 							<string>crateUDPDataIPTextFieldAction:</string>
@@ -19540,6 +19552,10 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
+								<string key="name">chargeBBFileTextFieldAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
 								<string key="name">closeCommandSocketButtonAction:</string>
 								<string key="candidateClassName">id</string>
 							</object>
@@ -19581,6 +19597,10 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							</object>
 							<object class="IBActionInfo">
 								<string key="name">crateUDPCommandTextFieldAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">crateUDPDataChargeBBFileCommandSendButtonAction:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
@@ -19855,6 +19875,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>BBCmdFFMaskMatrix</string>
 							<string>BBCmdFFMaskTextField</string>
+							<string>chargeBBFileTextField</string>
 							<string>closeCommandSocketButton</string>
 							<string>closeDataCommandSocketButton</string>
 							<string>cmdWArg1TextField</string>
@@ -19934,6 +19955,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>NSMatrix</string>
+							<string>NSTextField</string>
 							<string>NSTextField</string>
 							<string>NSButton</string>
 							<string>NSButton</string>
@@ -20018,6 +20040,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>BBCmdFFMaskMatrix</string>
 							<string>BBCmdFFMaskTextField</string>
+							<string>chargeBBFileTextField</string>
 							<string>closeCommandSocketButton</string>
 							<string>closeDataCommandSocketButton</string>
 							<string>cmdWArg1TextField</string>
@@ -20102,6 +20125,10 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">BBCmdFFMaskTextField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">chargeBBFileTextField</string>
 								<string key="candidateClassName">NSTextField</string>
 							</object>
 							<object class="IBToOneOutletInfo">

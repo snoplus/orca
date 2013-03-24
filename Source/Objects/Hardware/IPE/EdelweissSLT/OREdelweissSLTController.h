@@ -47,6 +47,7 @@
         
         //UDP Data tab ----
 	IBOutlet   NSTextField* numRequestedUDPPacketsTextField;
+	IBOutlet   NSTextField* chargeBBFileTextField;
     
         //control reg tab
 	    IBOutlet NSMatrix*		pixelBusEnableRegMatrix;
@@ -161,6 +162,7 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+- (void) chargeBBFileChanged:(NSNotification*)aNote;
 - (void) useBroadcastIdBBChanged:(NSNotification*)aNote;
 - (void) idBBforWCommandChanged:(NSNotification*)aNote;
 - (void) takeEventDataChanged:(NSNotification*)aNote;
@@ -217,6 +219,7 @@
 - (void) enableRegControls;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+- (IBAction) chargeBBFileTextFieldAction:(id)sender;
 - (IBAction) useBroadcastIdBBCBAction:(id)sender;
 - (IBAction) idBBforWCommandTextFieldAction:(id)sender;
 - (IBAction) takeEventDataCBAction:(id)sender;
@@ -251,6 +254,7 @@
 - (IBAction) startListeningForDataReplyButtonAction:(id)sender;
 - (IBAction) stopListeningForDataReplyButtonAction:(id)sender;
 - (IBAction) crateUDPDataRequestDataPCommandSendButtonAction:(id)sender;
+- (IBAction) crateUDPDataChargeBBFileCommandSendButtonAction:(id)sender;
 - (IBAction) numRequestedUDPPacketsTextFieldAction:(id)sender;
 - (IBAction) testUDPDataConnectionButtonAction:(id)sender;
 - (IBAction) crateUDPDataSendWCommandButtonAction:(id)sender;//send BB Command

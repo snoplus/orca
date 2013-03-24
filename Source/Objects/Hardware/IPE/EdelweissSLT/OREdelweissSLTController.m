@@ -306,9 +306,19 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
                          name : OREdelweissSLTModelUseBroadcastIdBBChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(chargeBBFileChanged:)
+                         name : OREdelweissSLTModelChargeBBFileChanged
+						object: model];
+
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+
+- (void) chargeBBFileChanged:(NSNotification*)aNote
+{
+	[chargeBBFileTextField setStringValue: [model chargeBBFile]];
+}
 
 - (void) useBroadcastIdBBChanged:(NSNotification*)aNote
 {
@@ -645,6 +655,7 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	[self takeEventDataChanged:nil];
 	[self idBBforWCommandChanged:nil];
 	[self useBroadcastIdBBChanged:nil];
+	[self chargeBBFileChanged:nil];
 }
 
 
@@ -792,6 +803,11 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 }
 
 #pragma mark ***Actions
+
+- (void) chargeBBFileTextFieldAction:(id)sender
+{
+	[model setChargeBBFile:[sender stringValue]];	
+}
 
 - (void) useBroadcastIdBBCBAction:(id)sender
 {
@@ -977,6 +993,14 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
     [self endEditing];
 	//debug NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
 	[model sendUDPDataCommandRequestUDPData];	
+}
+
+- (IBAction) crateUDPDataChargeBBFileCommandSendButtonAction:(id)sender
+{
+    [self endEditing];
+	//debug 
+    NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+	[model sendUDPDataCommandChargeBBFile];	
 }
 
 - (void) numRequestedUDPPacketsTextFieldAction:(id)sender

@@ -197,6 +197,7 @@
     int savedUDPSocketState;
     int idBBforWCommand;
     bool useBroadcastIdBB;
+    NSString * chargeBBFile;
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
@@ -214,6 +215,8 @@
 - (void) runIsStartingSubRun:(NSNotification*)aNote;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+- (NSString *) chargeBBFile;
+- (void) setChargeBBFile:(NSString *)aChargeBBFile;
 - (bool) useBroadcastIdBB;
 - (void) setUseBroadcastIdBB:(bool)aUseBroadcastIdBB;
 - (int) idBBforWCommand;
@@ -357,6 +360,7 @@
 - (int) sendUDPDataCommandString:(NSString*)aString;
 - (int) sendUDPDataCommandRequestPackets:(int8_t) num;
 - (int) sendUDPDataCommandRequestUDPData;
+- (int) sendUDPDataCommandChargeBBFile;
 - (void) loopCommandRequestUDPData;
 - (int) sendUDPDataWCommandRequestPacketArg1:(int) arg1 arg2:(int) arg2 arg3:(int) arg3  arg4:(int) arg4; 
   //BB commands
@@ -468,6 +472,7 @@
 
 @end
 
+extern NSString* OREdelweissSLTModelChargeBBFileChanged;
 extern NSString* OREdelweissSLTModelUseBroadcastIdBBChanged;
 extern NSString* OREdelweissSLTModelIdBBforWCommandChanged;
 extern NSString* OREdelweissSLTModelTakeEventDataChanged;

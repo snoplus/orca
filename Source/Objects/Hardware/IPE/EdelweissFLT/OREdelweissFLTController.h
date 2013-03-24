@@ -28,7 +28,6 @@
 
 @interface OREdelweissFLTController : OrcaObjectController {
 	@private
-        //BB access
     
         //FLT settings
         IBOutlet NSButton*		settingLockButton;
@@ -43,12 +42,17 @@
 	IBOutlet   NSMatrix* signaMatrix;
 	IBOutlet   NSMatrix* adcRgForBBAccessMatrix;
     
+    //BB access tab
+	IBOutlet   NSButton*    writeToBBModeCB;
+    IBOutlet   NSProgressIndicator*	writeToBBModeIndicator;
 	IBOutlet   NSMatrix* adcValueForBBAccessMatrix;
 	IBOutlet   NSMatrix* adcMultForBBAccessMatrix;
 	IBOutlet   NSMatrix* adcFreqkHzForBBAccessMatrix;
 	IBOutlet   NSButton* useBroadcastIdforBBAccessCB;
+	IBOutlet   NSTextField* fiberIsBBv1TextField;
 	IBOutlet   NSTextField* idBBforBBAccessTextField;
-	IBOutlet   NSTextField* idBBforWCommandTextField;
+	IBOutlet   NSTextField* idBBforWCommandTextField;//clone of idBBforBBAccessTextField
+	IBOutlet   NSTextField* idBBforAlimCommandTextField;//clone of idBBforBBAccessTextField
 	IBOutlet   NSPopUpButton* fiberSelectForBBAccessPU;
 	IBOutlet   NSMatrix* relaisStatesBBMatrix;
 	    IBOutlet   NSPopUpButton* fiberSelectForBBStatusBitsPU;
@@ -160,6 +164,7 @@
 - (void) updateButtons;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+- (void) writeToBBModeChanged:(NSNotification*)aNote;
 - (void) wCmdArg2Changed:(NSNotification*)aNote;
 - (void) wCmdArg1Changed:(NSNotification*)aNote;
 - (void) wCmdCodeChanged:(NSNotification*)aNote;
@@ -228,6 +233,7 @@
 - (void) selectedChannelValueChanged:(NSNotification*) aNote;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+- (IBAction) writeToBBModeCBAction:(id)sender;
 - (IBAction) wCmdArg2TextFieldAction:(id)sender;
 - (IBAction) wCmdArg1TextFieldAction:(id)sender;
 - (IBAction) wCmdCodeTextFieldAction:(id)sender;

@@ -497,6 +497,7 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
 
 #pragma mark ***External Strings
 
+NSString* OREdelweissSLTModelChargeBBFileChanged = @"OREdelweissSLTModelChargeBBFileChanged";
 NSString* OREdelweissSLTModelUseBroadcastIdBBChanged = @"OREdelweissSLTModelUseBroadcastIdBBChanged";
 NSString* OREdelweissSLTModelIdBBforWCommandChanged = @"OREdelweissSLTModelIdBBforWCommandChanged";
 NSString* OREdelweissSLTModelTakeEventDataChanged = @"OREdelweissSLTModelTakeEventDataChanged";
@@ -587,6 +588,7 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 
 -(void) dealloc
 {
+    [chargeBBFile release];
     [crateUDPDataCommand release];
     [crateUDPDataIP release];
     [crateUDPCommand release];
@@ -678,6 +680,22 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 }
 
 #pragma mark •••Accessors
+
+- (NSString *) chargeBBFile
+{
+    if(chargeBBFile==0) return @"";
+    return chargeBBFile;
+}
+
+- (void) setChargeBBFile:(NSString *)aChargeBBFile
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setChargeBBFile:chargeBBFile];
+    
+    [chargeBBFile autorelease];
+    chargeBBFile = [aChargeBBFile copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelChargeBBFileChanged object:self];
+}
 
 - (bool) useBroadcastIdBB
 {
@@ -2195,7 +2213,7 @@ for(l=0;l<2500;l++){
 
 /* similar to
     - (int) sendUDPCommandString:(NSString*)aString
-    but sends over data UDP socket
+    but sends over UDP data socket
     */
 - (int) sendUDPDataCommandString:(NSString*)aString
 {
@@ -2227,6 +2245,16 @@ for(l=0;l<2500;l++){
 {
 	return [self sendUDPDataCommandRequestPackets:  numRequestedUDPPackets];	
 }
+
+- (int) sendUDPDataCommandChargeBBFile
+{
+    NSString *cmd = [[NSString alloc] initWithFormat: @"KWC_chargeBBFile_%@", [self chargeBBFile]];
+	//debug 
+    NSLog(@" %@::%@ senf KCommand:%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd), cmd);//TODO: DEBUG -tb-
+	return [self sendUDPDataCommandString:  cmd];	
+}
+
+
 
 - (void) loopCommandRequestUDPData
 {
@@ -2839,6 +2867,7 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
 	
+	[self setChargeBBFile:[decoder decodeObjectForKey:@"chargeBBFile"]];
 	[self setUseBroadcastIdBB:[decoder decodeIntForKey:@"useBroadcastIdBB"]];
 	[self setIdBBforWCommand:[decoder decodeIntForKey:@"idBBforWCommand"]];
 	[self setTakeEventData:[decoder decodeIntForKey:@"takeEventData"]];
@@ -2907,6 +2936,7 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 {
 	[super encodeWithCoder:encoder];
 	
+	[encoder encodeObject:chargeBBFile forKey:@"chargeBBFile"];
 	[encoder encodeInt:useBroadcastIdBB forKey:@"useBroadcastIdBB"];
 	[encoder encodeInt:idBBforWCommand forKey:@"idBBforWCommand"];
 	[encoder encodeInt:takeEventData forKey:@"takeEventData"];

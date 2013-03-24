@@ -165,6 +165,7 @@
     unsigned int wCmdCode;
     unsigned int wCmdArg1;
     unsigned int wCmdArg2;
+    int writeToBBMode;
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
@@ -175,6 +176,8 @@
 - (short) getNumberRegisters;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+- (int) writeToBBMode;
+- (void) setWriteToBBMode:(int)aWriteToBBMode;
 - (unsigned int) wCmdArg2;
 - (void) setWCmdArg2:(unsigned int)aWCmdArg2;
 - (unsigned int) wCmdArg1;
@@ -194,14 +197,18 @@
 - (void) setSignaForFiber:(int)aFiber atIndex:(int)aIndex to:(int)aSigna;
 - (int) adcRgForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex;
 - (void) setAdcRgForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex to:(int)aAdcRgForBBAccess;
+- (void) writeAdcRgForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex;//HW access for Regul Parameter
+
 - (int) adcRtForFiber:(int)aFiber;
 - (void) setAdcRtForFiber:(int)aFiber to:(int)aAdcRt;
+- (void) writeAdcRtForBBAccessForFiber:(int)aFiber;//HW access Rt
 - (int) adcValueForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex;
 - (void) setAdcValueForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex to:(int)aAdcValueForBBAccess;
 - (int) adcMultForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex; //TODO: change name to 'gains' (instead of Mult)
 - (void) setAdcMultForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex to:(int)aAdcMultForBBAccess;
 - (int) adcFreqkHzForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex;
 - (void) setAdcFreqkHzForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex to:(int)aAdcFreqkHzForBBAccess;
+- (void) writeAdcFilterForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex;//HW access for Freq+Gain (Mult)
 - (int) useBroadcastIdforBBAccess;
 - (void) setUseBroadcastIdforBBAccess:(int)aUseBroadcastIdforBBAccess;
 - (int) idBBforBBAccessForFiber:(int)aFiber;
@@ -469,6 +476,7 @@
 				  n:(int) n;
 @end
 
+extern NSString* OREdelweissFLTModelWriteToBBModeChanged;
 extern NSString* OREdelweissFLTModelWCmdArg2Changed;
 extern NSString* OREdelweissFLTModelWCmdArg1Changed;
 extern NSString* OREdelweissFLTModelWCmdCodeChanged;
