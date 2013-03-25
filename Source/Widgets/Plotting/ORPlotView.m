@@ -200,7 +200,8 @@
 	for(id aPlot in plotArray){
 		if([aPlot tag] == aTag) return aPlot;
 	}
-	return [plotArray objectAtIndex:0];
+    if([plotArray count]) return [plotArray objectAtIndex:0];
+    else return nil;
 }
 
 #pragma mark ***Attributes
