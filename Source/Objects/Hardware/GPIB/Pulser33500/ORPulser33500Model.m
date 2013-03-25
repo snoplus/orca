@@ -619,9 +619,12 @@ NSString* ORPulser33500Lock							= @"ORPulser33500Lock";
         [self setIpConnected:[socket isConnected]];
 		if(ipConnected){
 			[self writeToDevice:@"SYST:COMM:RLST REM"];
-			for(id aChannel in channels){
-				[aChannel setWaitForGetWaveformsLoadedDone:YES];
-			}
+            //------
+            //commented out MAH 3/25/13 -- setWaitForGetWaveformsLoadedDone: doesn't exist in the chan object... throwing an unrecognized selector exception
+			//for(id aChannel in channels){
+			//	[aChannel setWaitForGetWaveformsLoadedDone:YES];
+			//}
+            //-------
 			[self writeToDevice:@"Data:CAT?;*WAI;*OPC?"];
 		}
     }
