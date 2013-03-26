@@ -1331,7 +1331,7 @@ Table: Histogram2Ds
 {
 	@try {
 		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
-		if(sqlConnection){
+		if([sqlConnection isConnected]){
 			NSString* name			 = computerName();
 			NSString* hw_address	 = macAddress();
 			NSString* thisHostAdress = @"";
@@ -1377,7 +1377,7 @@ Table: Histogram2Ds
 {
 	@try {	
 		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
-		if(sqlConnection){
+		if([sqlConnection isConnected]){
 			[sqlConnection queryString:[NSString stringWithFormat:@"DELETE from machines where hw_address = %@",[sqlConnection quoteObject:macAddress()]]];
 			[sqlConnection release];
 		}
@@ -1393,7 +1393,7 @@ Table: Histogram2Ds
 {
 	@try {	
 		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
-		if(sqlConnection){
+		if([sqlConnection isConnected]){
 			unsigned long uptime = (unsigned long)[[[NSApp delegate] memoryWatcher] accurateUptime];
 			NSString* hw_address = macAddress();
 		
@@ -1438,7 +1438,7 @@ Table: Histogram2Ds
 {
 	@try {
 		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
-		if(sqlConnection){
+		if([sqlConnection isConnected]){
 			//get our machine id using our MAC Address
 			ORSqlResult* theResult = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = %@",[sqlConnection quoteObject:macAddress()]]];
 			id row				   = [theResult fetchRowAsDictionary];
@@ -1504,7 +1504,7 @@ Table: Histogram2Ds
 {
 	@try {
 		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
-		if(sqlConnection){
+		if([sqlConnection isConnected]){
 			//get our machine id using our MAC Address
 			ORSqlResult* theResult = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = %@",[sqlConnection quoteObject:macAddress()]]];
 			id row				   = [theResult fetchRowAsDictionary];
@@ -1553,7 +1553,7 @@ Table: Histogram2Ds
 {
 	@try {
 		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
-		if(sqlConnection){
+		if([sqlConnection isConnected]){
 			//get our machine id using our MAC Address
 			ORSqlResult* theResult = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = %@",[sqlConnection quoteObject:macAddress()]]];
 			id row				   = [theResult fetchRowAsDictionary];
@@ -1602,7 +1602,7 @@ Table: Histogram2Ds
 {
 	@try {
 		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
-		if(sqlConnection){
+		if([sqlConnection isConnected]){
 			//get our machine id using our MAC Address
 			ORSqlResult* theResult = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = %@",[sqlConnection quoteObject:macAddress()]]];
 			id row				   = [theResult fetchRowAsDictionary];
@@ -1653,7 +1653,7 @@ Table: Histogram2Ds
 {
 	@try {
 		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
-		if(sqlConnection){
+		if([sqlConnection isConnected]){
 			//get our machine_id using our MAC Address
 			ORSqlResult* theResult  = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = %@",[sqlConnection quoteObject:macAddress()]]];
 			id row				    = [theResult fetchRowAsDictionary];
@@ -1843,7 +1843,7 @@ Table: Histogram2Ds
 {
 	@try {
 		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
-		if(sqlConnection){
+		if([sqlConnection isConnected]){
 			if([experiment isKindOfClass:NSClassFromString(@"ORExperimentModel")]) {
 				NSString* experimentName = [experiment className];
 				if([experimentName hasPrefix:@"OR"])    experimentName = [experimentName substringFromIndex:2];
@@ -1925,7 +1925,7 @@ Table: Histogram2Ds
 {
 	@try {			
 		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
-		if(sqlConnection){
+		if([sqlConnection isConnected]){
 			//get our machine_id using our MAC Address
 			ORSqlResult* theResult  = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = %@",[sqlConnection quoteObject:macAddress()]]];
 			id row				    = [theResult fetchRowAsDictionary];
@@ -1976,7 +1976,7 @@ Table: Histogram2Ds
 	ORExperimentModel* experiment = (ORExperimentModel*)[[delegate nextObject] retain];
 	@try {			
 		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
-		if(sqlConnection){
+		if([sqlConnection isConnected]){
 			//get our machine_id using our MAC Address
 			ORSqlResult* theResult  = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = %@",[sqlConnection quoteObject:macAddress()]]];
 			id row				    = [theResult fetchRowAsDictionary];
@@ -2037,7 +2037,7 @@ Table: Histogram2Ds
 	@try {
 		//get our machine_id using our MAC Address
 		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
-		if(sqlConnection){		ORSqlResult* theResult  = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = %@",[sqlConnection quoteObject:macAddress()]]];
+		if([sqlConnection isConnected]){		ORSqlResult* theResult  = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = %@",[sqlConnection quoteObject:macAddress()]]];
 			id row			= [theResult fetchRowAsDictionary];
 			id machine_id	= [row objectForKey:@"machine_id"];
 			if(machine_id) {
