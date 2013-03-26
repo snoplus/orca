@@ -2147,7 +2147,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
             int i;
 			for (i=0;i<8;i++) {
                 unsigned long endSampleAddress = [self readPreviousAdcAddress:i] & 0xffffff;
-                unsigned long add = [self readNextAdcAddress:i];
+                //unsigned long add = [self readNextAdcAddress:i];
                 if (endSampleAddress != 0) {
                     [self regDump];
                     unsigned long data[522+2];

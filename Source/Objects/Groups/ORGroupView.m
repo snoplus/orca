@@ -459,7 +459,7 @@
 	[openPanel setPrompt:@"Choose Image"];
     
 #if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 //10.6-specific
-    [openPanel setDirectoryURL:[NSURL URLWithString:startDir]];
+    [openPanel setDirectoryURL:[NSURL fileURLWithPath:startDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
             NSString* path = [[[openPanel URL]path]stringByAbbreviatingWithTildeInPath];

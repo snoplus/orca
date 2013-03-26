@@ -728,7 +728,7 @@
     else				 startingDir = NSHomeDirectory();
 	
 #if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-    [openPanel setDirectoryURL:[NSURL URLWithString:startingDir]];
+    [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
             [model loadListFrom:[[openPanel URL]path]];

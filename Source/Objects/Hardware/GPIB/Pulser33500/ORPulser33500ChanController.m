@@ -443,7 +443,7 @@
         [openPanel setPrompt:@"Download"];
         
 #if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-        [openPanel setDirectoryURL:[NSURL URLWithString:NSHomeDirectory()]];
+        [openPanel setDirectoryURL:[NSURL fileURLWithPath:NSHomeDirectory()]];
         [openPanel beginSheetModalForWindow:[owner window] completionHandler:^(NSInteger result){
             if (result == NSFileHandlingPanelOKButton) {
                 NSString* fileName = [[[openPanel URL]path] stringByAbbreviatingWithTildeInPath];

@@ -551,7 +551,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
         }
     }
 #if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-    [savePanel setDirectoryURL:[NSURL URLWithString:startDir]];
+    [savePanel setDirectoryURL:[NSURL fileURLWithPath:startDir]];
     [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
             NSString* newPath = [[savePanel URL] path ];
@@ -592,7 +592,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
     [openPanel setPrompt:@"Load Log Book"];
     
 #if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-    [openPanel setDirectoryURL:[NSURL URLWithString:startDir]];
+    [openPanel setDirectoryURL:[NSURL fileURLWithPath:startDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
             NSString* fileName = [[openPanel URL] path];
@@ -704,7 +704,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
     [savePanel setPrompt:@"Save Log As"];
     NSString* startDir = NSHomeDirectory(); //default to home
 #if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-    [savePanel setDirectoryURL:[NSURL URLWithString:startDir]];
+    [savePanel setDirectoryURL:[NSURL fileURLWithPath:startDir]];
     [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
             NSString* newPath = [[savePanel URL] path ];
