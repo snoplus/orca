@@ -446,8 +446,9 @@
 - (void) keyDown:(NSEvent*)theEvent
 {
 	unsigned short keyCode = [theEvent keyCode];
-	if(keyCode == 7)		[self autoScaleX:nil];		//'x'
-	else if(keyCode == 16)	[self autoScaleY:nil];		//'y'			
+	if(keyCode == 0)		{[self autoScaleX:nil];[self autoScaleY:nil];}		//'a'
+	else if(keyCode == 7)	[self autoScaleX:nil];		//'x'
+	else if(keyCode == 16)	[self autoScaleY:nil];		//'y'
 	else if(keyCode == 6)	[self autoScaleZ:nil];		//'z'
 	else if(keyCode == 15)	[self resetScales:nil];		//'r'
 	else if(keyCode == 8)	[self centerOnPeak:nil];	//'c'
