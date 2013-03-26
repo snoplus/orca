@@ -227,11 +227,10 @@ NSString* ORMultiPlotNameChangedNotification         = @"ORMultiPlotNameChangedN
 
 - (id) cachedObjectAtIndex:(int)index
 {
-	id obj = nil;
-	@synchronized(self){	
-		obj =  [cachedDataSets objectAtIndex:index];
-	}
-	return obj;
+    if([cachedDataSets count]>index){
+        return [cachedDataSets objectAtIndex:index];
+    }
+    else return nil;
 }
 
 - (id) description
