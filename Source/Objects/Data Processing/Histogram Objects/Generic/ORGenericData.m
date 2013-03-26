@@ -73,6 +73,11 @@
 {
 	return genericData;
 }
+
+- (void) setCalibration:(id)aCalibration
+{
+}
+
 #pragma mark ¥¥¥Archival
 static NSString *ORGenericDataKey 			= @"GenericData Key";
 
