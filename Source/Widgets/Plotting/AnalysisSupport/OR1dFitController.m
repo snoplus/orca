@@ -143,7 +143,7 @@
     if(fitType == 4) {
         NSString* s = [model fitFunction];
         if(s) [fitFunctionField setObjectValue:s];
-        else [fitFunctionField setObjectValue:@"format: function; parameterValues (parameters is a comma-deliminated list)"];
+        else [fitFunctionField setObjectValue:@""];
     }
 }
 
@@ -173,9 +173,16 @@
 	[deleteButton setEnabled: [model fitExists]];
 }
 
+- (void) endEditing
+{
+	//commit all text editing... subclasses should call before doing their work.
+	if(![[[self view] window] endEditing]){
+		[[[self view]  window] forceEndEditing];
+	}
+}
 
 #pragma mark ***Actions
-- (IBAction) doFitAction:(id)sender		 { [model doFit]; }
+- (IBAction) doFitAction:(id)sender		 { [self endEditing]; [model doFit]; }
 - (IBAction) deleteFitAction:(id)sender  { [model removeFit]; }
 - (IBAction) fitTypeAction:(id)sender	 { [model setFitType:[sender indexOfSelectedItem]]; }
 - (IBAction) fitOrderAction:(id)sender   { [model setFitOrder:[sender intValue]]; }

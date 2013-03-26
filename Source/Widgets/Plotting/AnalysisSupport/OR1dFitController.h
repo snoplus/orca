@@ -55,6 +55,7 @@
 - (void) orcaRootServiceConnectionChanged:(NSNotification*)aNote;
 
 #pragma mark ***Actions
+- (void) endEditing;
 - (IBAction) doFitAction:(id)sender;
 - (IBAction) deleteFitAction:(id)sender;
 
