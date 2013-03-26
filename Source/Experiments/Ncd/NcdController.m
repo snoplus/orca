@@ -430,7 +430,7 @@
         startingDir = NSHomeDirectory();
     }
 #if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-    [openPanel setDirectoryURL:[NSURL URLWithString:startingDir]];
+    [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton) {
             [[NcdDetector sharedInstance] setMapFileName:[[openPanel URL] path]];
@@ -468,7 +468,7 @@
         
     }
 #if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-    [savePanel setDirectoryURL:[NSURL URLWithString:startingDir]];
+    [savePanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [savePanel setNameFieldStringValue:defaultFile];
     [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton) {
@@ -593,7 +593,7 @@
 #if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
         NSSavePanel* savePanel = [NSSavePanel savePanel];
         [savePanel setNameFieldStringValue:defaultFileName];
-        [savePanel setDirectoryURL:[NSURL URLWithString:startingDir]];
+        [savePanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
         [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
             if (result == NSFileHandlingPanelOKButton) {
                 [model saveNominalSettingsTo:[[savePanel URL]path]];
@@ -637,7 +637,7 @@
 		[openPanel setAllowsMultipleSelection:NO];
 		[openPanel setPrompt:@"Choose"];
 #if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-        [openPanel setDirectoryURL:[NSURL URLWithString:startDir]];
+        [openPanel setDirectoryURL:[NSURL fileURLWithPath:startDir]];
         [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
             if (result == NSFileHandlingPanelOKButton) {
                 [model setNominalSettingsFile: [[openPanel URL]path]];
@@ -1119,7 +1119,7 @@
     [openPanel setAllowsMultipleSelection:NO];
     [openPanel setPrompt:@"Choose"];
 #if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-    [openPanel setDirectoryURL:[NSURL URLWithString:startDir]];
+    [openPanel setDirectoryURL:[NSURL fileURLWithPath:startDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton) {
             NSString* fileName = [[[openPanel URL] path] stringByAbbreviatingWithTildeInPath];
