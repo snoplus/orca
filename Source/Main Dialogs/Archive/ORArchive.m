@@ -187,6 +187,11 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 	[queue addOperation:anOp];
 	[anOp release];
 
+    ORCleanOrcaOp* aCleanOp = [[ORCleanOrcaOp alloc] initAtPath:anUpdatePath delegate:self];
+	[queue addOperation:aCleanOp];
+	[aCleanOp release];
+
+    
 	ORBuildOrcaOp* aBuildOp = [[ORBuildOrcaOp alloc] initAtPath:anUpdatePath delegate:self];
 	[queue addOperation:aBuildOp];
 	[aBuildOp release];
@@ -599,6 +604,69 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 				if([result length]) NSLog(@"svn returned:\n%@", result);
 			}
 			[delegate updateStatus:@"Update Finished"];
+			[task release];
+		}
+	}
+	@catch(NSException* e){
+	}
+}
+@end
+@implementation ORCleanOrcaOp
+- (id) initAtPath:(NSString*)aPath delegate:(id)aDelegate
+{
+	self = [super init];
+	delegate = aDelegate;
+	srcPath = [[aPath stringByDeletingLastPathComponent] copy];
+    return self;
+}
+
+- (void) dealloc
+{
+	[srcPath release];
+	[super dealloc];
+}
+
+- (void) main
+{
+	@try {
+		if(srcPath){
+			NSTask* task = [[NSTask alloc] init];
+			NSString* thePath = [[srcPath stringByExpandingTildeInPath] stringByAppendingPathComponent:@"Orca"];
+			[task setCurrentDirectoryPath:thePath];
+			[task setLaunchPath: @"/usr/bin/xcodebuild"];
+			NSArray* arguments = [NSArray arrayWithObjects: @"-alltargets",@"clean",
+								  nil];
+			
+			[task setArguments: arguments];
+			
+			NSPipe* pipe = [NSPipe pipe];
+			[task setStandardOutput: pipe];
+			
+			NSFileHandle* file = [pipe fileHandleForReading];
+			[delegate updateStatus:[NSString stringWithFormat:@"Cleaning: %@",thePath]];
+			[task launch];
+			
+			NSData* data = [file readDataToEndOfFile];
+			if(data){
+				NSString* result = [[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding];
+				NSRange r = [result rangeOfString:@"**"];
+				if(r.location != NSNotFound){
+					result = [result substringFromIndex:r.location];
+					[delegate updateStatus:@"Clean Finished"];
+				}
+				else {
+					NSRange r = [result rangeOfString:@"error:"];
+					if(r.location != NSNotFound){
+						result = @"Clean Failed";
+						NSLogColor([NSColor redColor],@"Errors detected during build. You will have to do a manual build.\n");
+						[delegate updateStatus:@"Clean Failed"];
+						[[delegate queue] cancelAllOperations];
+					}
+					else [delegate updateStatus:@"Clean Finished"];
+				}
+                
+				if([result length]) NSLog(@"Operation returned:\n%@", result);
+			}
 			[task release];
 		}
 	}

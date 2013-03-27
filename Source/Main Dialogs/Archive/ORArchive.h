@@ -115,6 +115,16 @@ extern NSString*  ArchiveLock;
 - (void) main;
 @end
 
+@interface ORCleanOrcaOp : NSOperation
+{
+	id		  delegate;
+	NSString* srcPath;
+}
+
+- (id)   initAtPath:(NSString*)aPath delegate:(id)aDelegate;
+- (void) main;
+@end
+
 @interface ORBuildOrcaOp : NSOperation
 {
 	id		  delegate;
