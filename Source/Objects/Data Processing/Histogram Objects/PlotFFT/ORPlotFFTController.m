@@ -23,6 +23,7 @@
 #import "ORPlotFFTController.h"
 #import "ORPlotFFT.h"
 #import "ORAxis.h"
+#import "ORCompositePlotView.h"
 #import "ORPlotWithROI.h"
 #import "ORPlotView.h"
 
@@ -39,7 +40,7 @@
 - (void) awakeFromNib
 {
     [super awakeFromNib];
-    [[plotView yScale] setRngLimitsLow:0 withHigh:5E9 withMinRng:25];
+    [[plotView yAxis] setRngLimitsLow:0 withHigh:5E9 withMinRng:25];
 	
 	ORPlotWithROI* aPlot;
 	aPlot = [[ORPlotWithROI alloc] initWithTag:0 andDataSource:self];
