@@ -67,7 +67,7 @@ NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
 	[self setUpImage];
 }
 
-- (void) doCmdClick:(id)sender atPoint:(NSPoint)aPoint
+- (void) doShiftCmdClick:(id)sender atPoint:(NSPoint)aPoint
 {
     if(enableIconControls){
         if(NSPointInRect(aPoint,[self frame])){

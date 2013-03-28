@@ -305,6 +305,7 @@
     BOOL cmdKeyDown   = ([event modifierFlags] & NSCommandKeyMask)!=0;
     BOOL cntrlKeyDown = ([event modifierFlags] & NSControlKeyMask)!=0;
     BOOL optionKeyDown = ([event modifierFlags] & NSAlternateKeyMask)!=0;
+    BOOL shiftCmdKeyDown = cmdKeyDown & shiftKeyDown;
 	
     NSPoint localPoint = [self convertPoint:[event locationInWindow] fromView:nil];
     
@@ -324,6 +325,11 @@
 		if( [obj1 acceptsClickAtPoint:localPoint]){
             if(cntrlKeyDown){
                 [obj1 doCntrlClick:obj1];
+                somethingHit = YES;
+                break;
+            }
+            else if(shiftCmdKeyDown){
+                [obj1 doShiftCmdClick:obj1 atPoint:localPoint];
                 somethingHit = YES;
                 break;
             }
@@ -366,7 +372,7 @@
                             somethingHit = YES;
                             break;
                         }
-                    }
+                     }
 
                  }
             }

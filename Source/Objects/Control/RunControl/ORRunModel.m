@@ -163,7 +163,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 }
 
 #define kRunStartStopIconRect NSMakeRect(3,3,25,25)
-- (void) doCmdClick:(id)sender atPoint:(NSPoint)aPoint
+- (void) doShiftCmdClick:(id)sender atPoint:(NSPoint)aPoint
 {
     if(enableIconControls){
         if(NSPointInRect(NSMakePoint(aPoint.x-[self frame].origin.x,aPoint.y-[self frame].origin.y),kRunStartStopIconRect)){

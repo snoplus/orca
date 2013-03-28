@@ -134,6 +134,7 @@ extern NSString* ORObjArrayPtrPBType;
 - (void) openHelp:(id)sender;
 - (void) doDoubleClick:(id)sender;
 - (void) doCmdClick:(id)sender atPoint:(NSPoint)aPoint;
+- (void) doShiftCmdClick:(id)sender atPoint:(NSPoint)aPoint;
 - (void) doCmdDoubleClick:(id)sender atPoint:(NSPoint)aPoint;
 - (void) doCntrlClick:(id)sender;
 - (ORConnector*) requestsConnection: (NSPoint)aPoint;

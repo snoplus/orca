@@ -551,7 +551,9 @@ NSString* ORMiscAttributeKey		= @"ORMiscAttributeKey";
 
 - (void) flagsChanged:(NSEvent *)theEvent
 {
-    [self setEnableIconControls:([[NSApp currentEvent] modifierFlags] & NSCommandKeyMask)!=0];
+    BOOL shiftKeyDown = ([[NSApp currentEvent] modifierFlags] & NSShiftKeyMask) != 0 ;
+    BOOL cmdKeyDown = ([[NSApp currentEvent] modifierFlags] & NSCommandKeyMask) != 0;
+    [self setEnableIconControls:shiftKeyDown && cmdKeyDown];
 }
 - (void) setEnableIconControls:(BOOL) aState
 {
@@ -564,7 +566,10 @@ NSString* ORMiscAttributeKey		= @"ORMiscAttributeKey";
 {
 	//subclasses can use as needed.
 }
-
+- (void) doShiftCmdClick:(id)sender atPoint:(NSPoint)aPoint
+{
+	//subclasses can use as needed.
+}
 - (void) doCmdDoubleClick:(id)sender atPoint:(NSPoint)aPoint
 {
 	//subclasses can use as needed.
