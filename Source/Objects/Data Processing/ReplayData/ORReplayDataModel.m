@@ -259,6 +259,7 @@ static NSString *ORReplayDataConnection = @"Replay File Input Connector";
 {
 	[userInfo retain];
 	nextObject = [self objectConnectedTo:ORReplayDataConnection];
+    [nextObject runTaskStarted:userInfo];
 	[nextObject setInvolvedInCurrentRun:YES];
 	[userInfo release];
 }
