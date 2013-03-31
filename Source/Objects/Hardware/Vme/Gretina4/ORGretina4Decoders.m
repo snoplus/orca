@@ -126,7 +126,7 @@
 						sender:self  
 					  withKeys:@"Gretina4", @"Waveforms",crateKey,cardKey,channelKey,nil];
 	}
-	if(getRatesFromDecodeStage){
+	if(getRatesFromDecodeStage && !skipRateCounts){
 		//get the actual object
 		NSString* aKey = [crateKey stringByAppendingString:cardKey];
 		if(!actualGretinaCards)actualGretinaCards = [[NSMutableDictionary alloc] init];
