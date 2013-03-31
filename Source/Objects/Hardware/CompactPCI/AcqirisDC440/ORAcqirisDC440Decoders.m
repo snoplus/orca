@@ -99,7 +99,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx --number shorts in waveform
 	
 
 	//get the actual object
-	if(getRatesFromDecodeStage){
+	if(getRatesFromDecodeStage && !skipRateCounts){
 		NSString* acqirisKey = [crateKey stringByAppendingString:cardKey];
 		if(!actualAcqirisDC440)actualAcqirisDC440 = [[NSMutableDictionary alloc] init];
 		ORAcqirisDC440Model* obj = [actualAcqirisDC440 objectForKey:acqirisKey];

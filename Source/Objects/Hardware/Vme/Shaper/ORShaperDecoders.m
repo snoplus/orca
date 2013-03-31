@@ -85,7 +85,7 @@
     [aDataSet histogram:ptr[dataOffset]&0x00000fff numBins:4096 sender:self  withKeys:@"Shaper", crateKey,cardKey,channelKey,nil];
 	
 	//get the actual object
-	if(getRatesFromDecodeStage){
+	if(getRatesFromDecodeStage && !skipRateCounts){
 		NSString* shaperKey = [crateKey stringByAppendingString:cardKey];
 		if(!actualShapers)actualShapers = [[NSMutableDictionary alloc] init];
 		ORShaperModel* obj = [actualShapers objectForKey:shaperKey];

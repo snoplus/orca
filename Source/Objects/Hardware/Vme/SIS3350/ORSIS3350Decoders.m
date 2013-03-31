@@ -82,7 +82,7 @@
 				  withKeys:@"SIS3350", @"Waveforms",crateKey,cardKey,channelKey,nil];
 	
 	//get the actual object
-	if(getRatesFromDecodeStage){
+	if(getRatesFromDecodeStage && !skipRateCounts){
 		NSString* aKey = [crateKey stringByAppendingString:cardKey];
 		if(!actualSIS3350Cards)actualSIS3350Cards = [[NSMutableDictionary alloc] init];
 		ORSIS3350Model* obj = [actualSIS3350Cards objectForKey:aKey];

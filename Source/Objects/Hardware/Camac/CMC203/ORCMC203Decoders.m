@@ -137,7 +137,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 		[aDataSet histogram:*ptr numBins:8192 sender:self  withKeys:@"MC203",@"FIFO Histogram",crateKey,cardKey,nil];
 	}
 	//get the actual object
-	if(getRatesFromDecodeStage){
+	if(getRatesFromDecodeStage && !skipRateCounts){
 		NSString* cmc203Key = [crateKey stringByAppendingString:cardKey];
 		if(!actualCards)actualCards = [[NSMutableDictionary alloc] init];
 		ORCMC203Model* obj = [actualCards objectForKey:cmc203Key];

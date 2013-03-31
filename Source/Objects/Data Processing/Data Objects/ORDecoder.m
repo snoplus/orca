@@ -51,6 +51,7 @@
 - (id) initWithHeader:(NSMutableDictionary*)aHeader
 {
 	self = [super init];
+    skipRateCounts = NO;
 	[self setFileHeader:aHeader];
 	return self;
 }
@@ -103,6 +104,18 @@
 	[fileHeader setObject:[NSNumber numberWithLong:headerLength] forKey:@"Header Length"];
 
 }
+
+- (void) setSkipRateCounts:(BOOL)aState
+{
+    skipRateCounts = aState;
+}
+
+- (BOOL) skipRateCounts
+{
+    return skipRateCounts;
+    
+}
+
 
 - (NSMutableDictionary*) objectLookup
 {
@@ -207,8 +220,10 @@
 			}
 			
         }
-        else numLong = [anObj decodeData:dPtr  fromDecoder:self intoDataSet:aDataSet];
-		
+        else {
+            [anObj setSkipRateCounts:skipRateCounts];
+            numLong = [anObj decodeData:dPtr  fromDecoder:self intoDataSet:aDataSet];
+		}
         if(numLong)dPtr+=numLong;
         else break; //can not continue with this record.. size was zero
 		

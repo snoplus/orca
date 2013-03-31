@@ -174,7 +174,7 @@
 		}
 		
 		//get the actual object
-		if(getRatesFromDecodeStage){
+        if(getRatesFromDecodeStage && !skipRateCounts){
 			NSString* aKey = [crateKey stringByAppendingString:cardKey];
 			if(!actualSIS3302Cards)actualSIS3302Cards = [[NSMutableDictionary alloc] init];
 			ORSIS3302Model* obj = [actualSIS3302Cards objectForKey:aKey];
@@ -592,7 +592,7 @@
 		}
 
 		//get the actual object
-		if(getRatesFromDecodeStage){
+        if(getRatesFromDecodeStage && !skipRateCounts){
 			NSString* aKey = [crateKey stringByAppendingString:cardKey];
 			if(!actualSIS3302Cards)actualSIS3302Cards = [[NSMutableDictionary alloc] init];
 			ORSIS3302Model* obj = [actualSIS3302Cards objectForKey:aKey];

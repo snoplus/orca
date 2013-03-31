@@ -102,7 +102,7 @@
 			   withKeys:@"FLTv4", [NSString stringWithFormat:@"Total Crate Energy (%d - %d)",startPage,endPage], crateKey,nil];
 
 	//get the actual object
-	if(getRatesFromDecodeStage){
+	if(getRatesFromDecodeStage && !skipRateCounts){
 		NSString* fltKey = [crateKey stringByAppendingString:stationKey];
 		if(!actualFlts)actualFlts = [[NSMutableDictionary alloc] init];
 		ORIpeV4FLTModel* obj = [actualFlts objectForKey:fltKey];
@@ -269,7 +269,7 @@ startIndex=traceStart16;
 				  withKeys: @"FLTv4", @"Waveform",crateKey,stationKey,channelKey,nil];
 
 	//get the actual object
-	if(getRatesFromDecodeStage){
+	if(getRatesFromDecodeStage && !skipRateCounts){
 		NSString* fltKey = [crateKey stringByAppendingString:stationKey];
 		if(!actualFlts)actualFlts = [[NSMutableDictionary alloc] init];
 		ORIpeV4FLTModel* obj = [actualFlts objectForKey:fltKey];

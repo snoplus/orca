@@ -26,13 +26,16 @@
 	NSMutableDictionary* objectLookup;			//table of objects that are taking data.
 	id					 fastLookupCache[kFastLoopupCacheSize];
 	NSMutableDictionary* fileHeader;
-	BOOL needToSwap;
+	BOOL                 needToSwap;
+    BOOL                 skipRateCounts;
 }
 + (NSMutableDictionary*)readHeader:(NSFileHandle*)fp;
 + (id) decoderWithFile:(NSFileHandle*)fp;
 + (NSData*) convertHeaderToData:(NSMutableDictionary*)aHeader;
 - (id) initWithHeader:(NSMutableDictionary*)aHeader;
 - (void) dealloc;
+- (void) setSkipRateCounts:(BOOL)aState;
+- (BOOL) skipRateCounts;
 - (NSMutableDictionary*) readHeader:(NSFileHandle*)fh;
 - (void) setFileHeader:(NSMutableDictionary*) aHeader;
 - (NSMutableDictionary*)fileHeader;

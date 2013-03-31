@@ -102,7 +102,7 @@
 			   withKeys:@"FLTv4", [NSString stringWithFormat:@"Total Crate Energy (%d - %d)",startPage,endPage], crateKey,nil];
 
 	//get the actual object
-	if(getRatesFromDecodeStage){
+	if(getRatesFromDecodeStage && !skipRateCounts){
 		NSString* fltKey = [crateKey stringByAppendingString:stationKey];
 		if(!actualFlts)actualFlts = [[NSMutableDictionary alloc] init];
 		OREdelweissFLTModel* obj = [actualFlts objectForKey:fltKey];
@@ -292,7 +292,7 @@ startIndex=0;
 	
 	
 	//get the actual object
-	if(getRatesFromDecodeStage){
+	if(getRatesFromDecodeStage && !skipRateCounts){
 		NSString* fltKey = [crateKey stringByAppendingString:stationKey];
 		if(!actualFlts)actualFlts = [[NSMutableDictionary alloc] init];
 		OREdelweissFLTModel* obj = [actualFlts objectForKey:fltKey];

@@ -62,7 +62,7 @@
     [aDataSet histogram:*ptr&0x00000fff numBins:4096 sender:self  withKeys:@"CV419", crateKey,cardKey,channelKey,nil];
 
 	//get the actual object
-	if(getRatesFromDecodeStage){
+	if(getRatesFromDecodeStage && !skipRateCounts){
 		NSString* caen419Key = [crateKey stringByAppendingString:cardKey];
 		if(!actual419s)actual419s = [[NSMutableDictionary alloc] init];
 		ORCaen419Model* obj = [actual419s objectForKey:caen419Key];

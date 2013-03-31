@@ -82,6 +82,16 @@ static NSString* kCrateKey[16] = {
 	[nc addObserver:self selector:@selector(runStopped:) name:ORRunStoppedNotification object:nil];
 }
 
+- (void) setSkipRateCounts:(BOOL)aState
+{
+    skipRateCounts = aState;
+}
+- (BOOL) skipRateCounts
+{
+    return skipRateCounts;
+}
+
+
 - (void) runStarted:(NSNotification*)aNote
 {
 

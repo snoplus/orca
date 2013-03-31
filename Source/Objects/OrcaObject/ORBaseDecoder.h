@@ -28,7 +28,12 @@
 	@private
 		NSMutableDictionary* cachedObjects;	//decoder can cache info here
 		NSLock* cachedObjectsLock;
+    @protected
+        BOOL skipRateCounts;
+
 }
+- (void) setSkipRateCounts:(BOOL)aState;
+- (BOOL) skipRateCounts;
 
 - (NSString*) getChannelKey:(unsigned short)aChan;
 - (NSString*) getCardKey:(unsigned short)aChan;

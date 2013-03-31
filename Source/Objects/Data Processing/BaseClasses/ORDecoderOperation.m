@@ -49,6 +49,7 @@
 	[aDecoder retain];
 	[currentDecoder release];
 	currentDecoder = aDecoder;
+    [currentDecoder setSkipRateCounts:YES];
 	needToSwap = [currentDecoder needToSwap];
 }
 

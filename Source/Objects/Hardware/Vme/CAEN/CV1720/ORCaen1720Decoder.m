@@ -124,7 +124,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
                 [aDataSet incrementCount:@"CAEN1720", @"Waveforms",crateKey,cardKey,[self getChannelKey: chan[j]],nil];
                 ptr += eventSize;
             }
-            if(getRatesFromDecodeStage){
+            if(getRatesFromDecodeStage && !skipRateCounts){
                 NSString* aKey = [crateKey stringByAppendingString:cardKey];
                 if(!actualCards)actualCards = [[NSMutableDictionary alloc] init];
                 ORCaen1720Model* obj = [actualCards objectForKey:aKey];
