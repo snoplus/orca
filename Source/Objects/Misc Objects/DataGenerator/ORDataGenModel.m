@@ -47,7 +47,7 @@
 }
 - (void) showMainInterface
 {
-    NSLog(@"The Data Generate has no settable parameters and hence no dialog. Just put it into a readout list to make some test data\n");
+    NSLog(@"The Data Generator has no settable parameters and hence no dialog. Just put it into a readout list to make some test data\n");
 }
 - (unsigned long) timeSeriesId { return timeSeriesId; }
 - (void) setTimeSeriesId: (unsigned long) aDataId
