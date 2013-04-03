@@ -1025,7 +1025,7 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 }
 
-- (IBAction) sendUDPDataTab0x0ACommand:(id)sender //send 0x0A Command
+- (IBAction) sendUDPDataTab0x0ACommandAction:(id)sender //send 0x0A Command
 {
     [self endEditing];
 	//debug 

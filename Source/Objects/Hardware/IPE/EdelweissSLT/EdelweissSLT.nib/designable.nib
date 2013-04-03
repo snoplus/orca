@@ -10662,14 +10662,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					<int key="connectionID">6219</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">sendUDPDataTab0x0ACommand:</string>
-						<reference key="source" ref="524620905"/>
-						<reference key="destination" ref="619106107"/>
-					</object>
-					<int key="connectionID">6228</int>
-				</object>
-				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">chargeBBFileTextField</string>
 						<reference key="source" ref="524620905"/>
@@ -10692,6 +10684,14 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 						<reference key="destination" ref="652953196"/>
 					</object>
 					<int key="connectionID">6232</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">sendUDPDataTab0x0ACommandAction:</string>
+						<reference key="source" ref="524620905"/>
+						<reference key="destination" ref="619106107"/>
+					</object>
+					<int key="connectionID">6233</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -16617,9 +16617,9 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
-					<string>{{2833, 237}, {662, 691}}</string>
+					<string>{{1146, 413}, {662, 691}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{2833, 237}, {662, 691}}</string>
+					<string>{{1146, 413}, {662, 691}}</string>
 					<boolean value="YES"/>
 					<boolean value="NO"/>
 					<boolean value="YES"/>
@@ -17979,7 +17979,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<object class="NSAffineTransform">
-						<bytes key="NSTransformStruct">AUNCAABB+AAAA</bytes>
+						<bytes key="NSTransformStruct">AUAAAABBMAAAA</bytes>
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<object class="NSAffineTransform">
@@ -18167,7 +18167,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">6232</int>
+			<int key="maxID">6233</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -19325,7 +19325,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<string>sendCommandScript:</string>
 							<string>sendSimulationConfigScriptOFF:</string>
 							<string>sendSimulationConfigScriptON:</string>
-							<string>sendUDPDataTab0x0ACommand:</string>
+							<string>sendUDPDataTab0x0ACommandAction:</string>
 							<string>settingLockAction:</string>
 							<string>sltDAQModePUAction:</string>
 							<string>sltDAQModeTextFieldAction:</string>
@@ -19504,7 +19504,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<string>sendCommandScript:</string>
 							<string>sendSimulationConfigScriptOFF:</string>
 							<string>sendSimulationConfigScriptON:</string>
-							<string>sendUDPDataTab0x0ACommand:</string>
+							<string>sendUDPDataTab0x0ACommandAction:</string>
 							<string>settingLockAction:</string>
 							<string>sltDAQModePUAction:</string>
 							<string>sltDAQModeTextFieldAction:</string>
@@ -19788,7 +19788,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
-								<string key="name">sendUDPDataTab0x0ACommand:</string>
+								<string key="name">sendUDPDataTab0x0ACommandAction:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
