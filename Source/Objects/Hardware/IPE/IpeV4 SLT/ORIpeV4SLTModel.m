@@ -90,7 +90,7 @@ enum IpeV4Enum {
 
 IpeRegisterNamesStruct regSLTV4[kSltV4NumRegs] = {
 {@"Control",			0xa80000,		1,			kIpeRegReadable | kIpeRegWriteable },
-{@"Status",				0xa80004,		1,			kIpeRegReadable },
+{@"Status",				0xa80004,		1,			kIpeRegReadable | kIpeRegWriteable },
 {@"Command",			0xa80008,		1,			kIpeRegWriteable },
 {@"Interrupt Reguest",	0xA8000C,		1,			kIpeRegReadable },
 {@"Interrupt Mask",		0xA80010,		1,			kIpeRegReadable | kIpeRegWriteable },
@@ -473,6 +473,8 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 - (void) writeDisCnt			{ [self writeReg:kSltV4CommandReg value:kCmdDisCnt];   }
 - (void) writeReleasePage		{ [self writeReg:kSltV4PageManagerReg value:kPageMngRelease];   }
 - (void) writePageManagerReset	{ [self writeReg:kSltV4PageManagerReg value:kPageMngReset];   }
+- (void) clearAllStatusErrorBits{ [self writeReg:kSltV4StatusReg value:kStatusClearAllMask];   }
+
 
 - (id) controllerCard		{ return self;	  }
 - (SBC_Link*)sbcLink		{ return pmcLink; } 
@@ -1363,6 +1365,9 @@ return;
 	[self loadSecondsReg];
 	[self writeControlReg];
 	[self writeInterruptMask];
+	[self clearAllStatusErrorBits];
+    
+    
 	//-----------------------------------------------
 	//board doesn't appear to start without this stuff
 	//[self writeReg:kSltActResetFlt value:0];

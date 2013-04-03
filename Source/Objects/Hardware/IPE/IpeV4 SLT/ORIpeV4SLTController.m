@@ -411,6 +411,8 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	[setSWInhibitButton setEnabled:!lockedOrRunningMaintenance];
 	[relSWInhibitButton setEnabled:!lockedOrRunningMaintenance];
 	[forceTrigger1Button setEnabled:!lockedOrRunningMaintenance];
+    
+	[clearAllStatusErrorBitsButton setEnabled:!lockedOrRunningMaintenance];
 
 	[resetHWButton setEnabled:!isRunning];
 	
@@ -799,6 +801,8 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 - (IBAction) writeSetInhibitAction:(id)sender	{ [self do:@selector(writeSetInhibit) name:@"Set Inhibit"]; }
 - (IBAction) resetPageManagerAction:(id)sender	{ [self do:@selector(writePageManagerReset) name:@"Reset Page Manager"]; }
 - (IBAction) releaseAllPagesAction:(id)sender	{ [self do:@selector(writeReleasePage) name:@"Release Pages"]; }
+
+- (IBAction) clearAllStatusErrorBitsAction:(id)sender		{ [self do:@selector(clearAllStatusErrorBits) name:@"Clear All Status Error+Flag Bits"]; }
 
 - (IBAction) sendCommandScript:(id)sender
 {

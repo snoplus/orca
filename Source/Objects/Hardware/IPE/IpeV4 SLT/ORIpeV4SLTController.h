@@ -55,6 +55,7 @@
 		//status reg
 		IBOutlet NSMatrix*		statusMatrix;
 		IBOutlet NSButton*		resetPageManagerButton;
+		IBOutlet NSButton*		clearAllStatusErrorBitsButton;
         
         //low level
 		IBOutlet NSPopUpButton*	registerPopUp;
@@ -155,6 +156,7 @@
 - (IBAction) hwVersionAction: (id) sender;
 - (IBAction) writeSWTrigAction:(id)sender;
 - (IBAction) resetPageManagerAction:(id)sender;
+- (IBAction) clearAllStatusErrorBitsAction:(id)sender;
 
 - (IBAction) dumpPageStatus:(id)sender;
 - (IBAction) pollRateAction:(id)sender;

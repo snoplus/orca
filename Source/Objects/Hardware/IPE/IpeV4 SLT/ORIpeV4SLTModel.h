@@ -73,6 +73,8 @@
 #define kStatusWDog			(0x00000001 <<  1) //R - cleared on W
 #define kStatusFltRq		(0x00000001 <<  0) //R - cleared on W
 
+#define kStatusClearAllMask	(0x0007ffff) //R - cleared on W
+
 //Cmd reg bit masks
 #define kCmdDisCnt			(0x00000001 << 10) //W - self cleared
 #define kCmdEnCnt			(0x00000001 <<  9) //W - self cleared
@@ -388,6 +390,8 @@ static IpeRegisterNamesStruct regSLTV4[kSltV4NumRegs] = {
 - (void)		writeDisCnt;
 - (void)		writeReleasePage;		
 - (void)		writePageManagerReset;
+- (void)		clearAllStatusErrorBits;
+
 - (unsigned long long) readBoardID;
 - (void) readEventStatus:(unsigned long*)eventStatusBuffer;
 
