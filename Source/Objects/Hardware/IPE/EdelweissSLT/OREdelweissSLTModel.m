@@ -348,6 +348,7 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
                 if(header->identifiant == 0x0000ffff){//this is a synchro status packet: first packet is a TypeIpeCrateStatusBlock
                     TypeIpeCrateStatusBlock *crateStatusBlock=(TypeIpeCrateStatusBlock *)ptr;
 				    NSLog(@"  IPE crate status block:     PPS %i (0x%08x)\n",crateStatusBlock->PPS_count,crateStatusBlock->PPS_count);
+				    NSLog(@"                              SLT time: %li \n",((((unsigned long long) crateStatusBlock->SLTTimeHigh) << 32) | crateStatusBlock->SLTTimeLow) );
 				    NSLog(@"      OperaStatus1 0x%08x (d0: %i)\n",crateStatusBlock->OperaStatus1,crateStatusBlock->OperaStatus1 & 0xfff);
 				    NSLog(@"      size_bytes: %i \n",crateStatusBlock->size_bytes);
                     uint32_t ps=crateStatusBlock->prog_status;
