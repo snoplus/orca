@@ -100,6 +100,7 @@ extern NSString* ORSNOPRequestHVStatus;
 - (void) _hvXl3;
 - (void) sendCommandWithDict:(NSDictionary*)argDict;
 - (void) initCrateDone:(NSDictionary*)resp;
+- (void) _setPedestalInParallelWorker;
 @end
 
 @implementation ORXL3Model
@@ -2261,6 +2262,16 @@ void SwapLongBlock(void* p, int32_t n)
 		NSLog(@"%@ Set Pedestal failed; error: %@ reason: %@\n", [[self xl3Link] crateName],[e name], [e reason]);
 	}
 	[self setXl3OpsRunning:NO forKey:@"compositeSetPedestal"];
+}
+
+//used by OrcaScript for ECA
+- (void) setPedestalInParallel
+{
+    if (![[self xl3Link] isConnected]) {
+        return;
+    }
+
+    [NSThread detachNewThreadSelector:@selector(_setPedestalInParallelWorker) toTarget:self withObject:nil];
 }
 
 - (unsigned short) getBoardIDForSlot:(unsigned short)aSlot chip:(unsigned short)aChip
@@ -4476,4 +4487,47 @@ void SwapLongBlock(void* p, int32_t n)
 
     }//synchronized
 }
+
+- (void) _setPedestalInParallelWorker
+{
+    NSAutoreleasePool* pedPool = [[NSAutoreleasePool alloc] init];
+
+    if (![[self xl3Link] isConnected]) {
+        return;
+    }
+
+    XL3_PayloadStruct payload;
+	payload.numberBytesinPayload = 8;
+	unsigned long* data = (unsigned long*) payload.payload;
+    BOOL error_flag = NO;
+
+    NSArray* fecs = [[self guardian] collectObjectsOfClass:NSClassFromString(@"ORFec32Model")];
+    for (id aFec in fecs) {
+        data[0] = 1 << [aFec stationNumber];
+        data[1] = [aFec pedEnabledMask];
+        
+        if ([xl3Link needToSwap]) {
+            data[0] = swapLong(data[0]);
+            data[1] = swapLong(data[1]);
+        }
+
+        @try {
+            [[self xl3Link] sendCommand:SET_CRATE_PEDESTALS_ID withPayload:&payload expectResponse:YES];
+            if ([xl3Link needToSwap]) *data = swapLong(*data);
+            if (*data != 0) error_flag = YES;
+        }
+        @catch (NSException* e) {
+            error_flag = YES;
+        }
+        
+        if (error_flag) break;
+    }
+    
+    if (error_flag) {
+        NSLog(@"%@ Set Pedestal failed.\n", [[self xl3Link] crateName]);
+    }
+    
+    [pedPool release];
+}
+
 @end

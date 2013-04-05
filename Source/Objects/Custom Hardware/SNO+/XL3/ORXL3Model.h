@@ -296,6 +296,7 @@ enum {
 - (void) compositeXl3RW;
 - (void) compositeQuit;
 - (void) compositeSetPedestal;
+- (void) setPedestalInParallel;
 - (unsigned short) getBoardIDForSlot:(unsigned short)aSlot chip:(unsigned short)aChip;
 - (void) getBoardIDs;
 - (void) compositeResetCrate;
