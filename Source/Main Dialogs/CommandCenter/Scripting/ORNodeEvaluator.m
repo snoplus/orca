@@ -1154,12 +1154,12 @@
 		}
 		else {
 			@try {
-				NodeValue(3); //this is the loop guts
-				NodeValue(2); //this is the end of loop action, i.e. i++
 				if([NodeValue(1) isEqual: _zero]){ //the end of loop check, i.e. i<10
 					[pool release];
 					break;
 				}
+				NodeValue(3); //this is the loop guts
+				NodeValue(2); //this is the end of loop action, i.e. i++
 			}
 			@catch(NSException* localException) {
 				if([[localException name] isEqualToString:@"continue"]){
