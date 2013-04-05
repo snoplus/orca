@@ -113,6 +113,10 @@
 - (ORCouchDB*) orcaDBRef;
 - (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp;
 
+#pragma mark ¥¥orcascript helpers
+- (void) zeroPedestalMasks;
+- (void) updatePedestalMasks:(unsigned int)pattern;
+
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;
 - (void) runStateChanged:(NSNotification*)aNote;

@@ -722,6 +722,23 @@ rhdrDataId = _rhdrDataId;
 	return dataDictionary;
 }
 
+
+- (void) zeroPedestalMasks
+{
+    [[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")]
+     makeObjectsPerformSelector:@selector(zeroPedestalMasks)];
+}
+
+- (void) updatePedestalMasks:(unsigned int)pattern
+{
+    
+    unsigned int** pt_step = (unsigned int**) pattern;
+    NSLog(@"aaa 0x%08x\n", pt_step);
+    
+    //unsigned int* pt_step_crate = pt_step[0];
+    
+}
+
 @end
 
 @implementation SNOPModel (private)
