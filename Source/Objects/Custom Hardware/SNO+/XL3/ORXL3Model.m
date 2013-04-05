@@ -2274,6 +2274,26 @@ void SwapLongBlock(void* p, int32_t n)
     [NSThread detachNewThreadSelector:@selector(_setPedestalInParallelWorker) toTarget:self withObject:nil];
 }
 
+//used by OrcaScript for ECA
+- (void) zeroPedestalMasks
+{
+    if (![[self xl3Link] isConnected]) {
+        return;
+    }
+
+    NSArray* fecs = [[self guardian] collectObjectsOfClass:NSClassFromString(@"ORFec32Model")];
+    unsigned int slotMaskPresent = 0;
+    for (id aFec in fecs) {
+        slotMaskPresent |= 1 << [aFec stationNumber];
+    }
+    
+    unsigned int slotMaskSet = [self slotMask];
+    [self setSlotMask:slotMaskPresent];
+    [self setXl3PedestalMask:0];
+    [self compositeSetPedestal];
+    [self setSlotMask:slotMaskSet];
+}
+
 - (unsigned short) getBoardIDForSlot:(unsigned short)aSlot chip:(unsigned short)aChip
 {
 	XL3_PayloadStruct payload;

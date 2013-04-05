@@ -297,6 +297,7 @@ enum {
 - (void) compositeQuit;
 - (void) compositeSetPedestal;
 - (void) setPedestalInParallel;
+- (void) zeroPedestalMasks;
 - (unsigned short) getBoardIDForSlot:(unsigned short)aSlot chip:(unsigned short)aChip;
 - (void) getBoardIDs;
 - (void) compositeResetCrate;
