@@ -26,7 +26,9 @@
 		IBOutlet NSMatrix*		adcEnabledMaskMatrix;
 		IBOutlet NSButton*		shipValuesCB;
 		IBOutlet NSPopUpButton* pollTimePU;
-		IBOutlet NSMatrix*		adcMatrix;
+        IBOutlet NSMatrix*		adcMatrix;
+        IBOutlet NSMatrix*		feedBackResistorMatrix;
+        IBOutlet NSMatrix*		baselineVoltageMatrix;
 		IBOutlet NSPopUpButton* loopForeverPU;
 		IBOutlet NSTextField*	pulseCountField;
 		IBOutlet NSPopUpButton* enabled0PU;
@@ -88,6 +90,10 @@
 - (void) adcArrayChanged:(NSNotification*)aNote;
 - (void) adcChanged:(NSNotification*)aNote;
 - (void) adcRangeChanged:(NSNotification*)aNote;
+- (void) feedbackResistorArrayChanged:(NSNotification*)aNote;
+- (void) feedbackResistorChanged:(NSNotification*)aNote;
+- (void) baselineVoltageArrayChanged:(NSNotification*)aNote;
+- (void) baselineVoltageChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) adcEnabledMaskAction:(id)sender;
@@ -110,6 +116,8 @@
 - (IBAction) startPulserAction:(id)sender;
 - (IBAction) stopPulserAction:(id)sender;
 - (IBAction) readAdcs:(id)sender;
+- (IBAction) feedBackResistorAction:(id)sender;
+- (IBAction) baselineVoltageAction:(id)sender;
 
 - (int) numberPointsInPlot:(id)aPlotter;
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;

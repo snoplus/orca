@@ -24,10 +24,13 @@
 @class ORTimeRate;
 
 #define kMJDPreAmpDacChannels   16	//if this ever changes, change the record length also
+#define kMJDPreAmpAdcChannels   16
 #define kMJDPreAmpDataRecordLen 21
 
 @interface ORMJDPreAmpModel : OrcaObject {
     NSMutableArray* adcs;
+    NSMutableArray* feedBackResistors;
+    NSMutableArray* baselineVoltages;
     NSMutableArray* dacs;
     NSMutableArray* amplitudes;
     unsigned short pulserMask;
@@ -50,6 +53,15 @@
 - (void) setUpArrays;
 
 #pragma mark ¥¥¥Accessors
+- (NSMutableArray*) feedBackResistors;
+- (void) setFeedBackResistors:(NSMutableArray*)anArray;
+- (float) feedBackResistor:(unsigned short) aChan;
+- (void) setFeedBackResistor:(int) aChan value:(float) aValue;
+- (NSMutableArray*) baselineVoltages;
+- (void) setBaselineVoltages:(NSMutableArray*)anArray;
+- (float) baselineVoltage:(unsigned short) aChan;
+- (void) setBaselineVoltage:(int) aChan value:(float) aValue;
+
 - (ORTimeRate*)timeRate:(int)index;
 - (unsigned long) adcEnabledMask;
 - (void) setAdcEnabledMask:(unsigned long)aAdcEnabledMask;
@@ -99,7 +111,6 @@
 - (void) syncDataIdsWith:(id)anotherObject;
 - (void) shipRecords;
 
-
 #pragma mark ¥¥¥HW Access
 - (void) startPulser;
 - (void) stopPulser;
@@ -114,7 +125,6 @@
 - (void) readAdcs;
 - (void) pollValues;
 - (unsigned long) writeAuxIOSPI:(unsigned long)aValue;
-
 
 #pragma mark ¥¥¥Archival
 - (id)      initWithCoder:(NSCoder*)aDecoder;
@@ -141,6 +151,10 @@ extern NSString* ORMJDPreAmpDacChanged;
 extern NSString* ORMJDPreAmpAmplitudeChanged;
 extern NSString* ORMJDPreAmpAdcChanged;
 extern NSString* ORMJDPreAmpAdcRangeChanged;
+extern NSString* ORMJDFeedBackResistorArrayChanged;
+extern NSString* ORMJDBaselineVoltageArrayChanged;
+extern NSString* ORMJDFeedBackResistorChanged;
+extern NSString* ORMJDBaselineVoltageChanged;
 
 @interface NSObject (ORMJDPreAmpModel)
 - (unsigned long) writeAuxIOSPI:(unsigned long)spiData;

@@ -51,9 +51,16 @@
 		[[dacsMatrix cellAtRow:chan column:0] setFormatter:aFormat];
 		[[amplitudesMatrix cellAtRow:chan column:0] setTag:chan];
 		[[pulserMaskMatrix cellAtRow:chan column:0] setTag:chan];
+        
+		[[baselineVoltageMatrix cellAtRow:chan column:0] setTag:chan];
+		[[baselineVoltageMatrix cellAtRow:chan column:0] setFormatter:aFormat];
+       
 		[[adcMatrix cellAtRow:chan column:0] setTag:chan];
 		[[adcMatrix cellAtRow:chan column:0] setFormatter:aFormat];
 		[[adcEnabledMaskMatrix cellAtRow:chan column:0] setTag:chan];
+        
+		[[feedBackResistorMatrix cellAtRow:chan column:0] setFormatter:aFormat];
+ 		[[feedBackResistorMatrix cellAtRow:chan column:0] setTag:chan];
 	}
     
     [[plotter0 yAxis] setRngLow:0.0 withHigh:300.];
@@ -219,7 +226,27 @@
                      selector : @selector(adcArrayChanged:)
                          name : ORMJDPreAmpAdcArrayChanged
 						object: model];
-	
+
+    [notifyCenter addObserver : self
+                     selector : @selector(feedbackResistorArrayChanged:)
+                         name : ORMJDFeedBackResistorArrayChanged
+						object: model];
+    
+	[notifyCenter addObserver : self
+                     selector : @selector(feedbackResistorChanged:)
+                         name : ORMJDFeedBackResistorChanged
+						object: model];
+ 
+    [notifyCenter addObserver : self
+                     selector : @selector(baselineVoltageArrayChanged:)
+                         name : ORMJDBaselineVoltageArrayChanged
+						object: model];
+    
+	[notifyCenter addObserver : self
+                     selector : @selector(baselineVoltageChanged:)
+                         name : ORMJDBaselineVoltageChanged
+						object: model];
+    
     [notifyCenter addObserver : self
                      selector : @selector(shipValuesChanged:)
                          name : ORMJDPreAmpModelShipValuesChanged
@@ -230,7 +257,6 @@
                          name : ORMJDPreAmpModelPollTimeChanged
                        object : model];
 	
-
     [notifyCenter addObserver : self
                      selector : @selector(adcEnabledMaskChanged:)
                          name : ORMJDPreAmpModelAdcEnabledMaskChanged
@@ -273,6 +299,8 @@
 	[self pollTimeChanged:nil];
 	[self adcEnabledMaskChanged:nil];
 	[self updateTimePlot:nil];
+	[self baselineVoltageArrayChanged:nil];
+	[self feedbackResistorArrayChanged:nil];
 }
 
 #pragma mark ¥¥¥Interface Management
@@ -438,6 +466,35 @@
 {
 	int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
 	[[adcMatrix cellWithTag:chan] setFloatValue: [model adc:chan]];
+}
+
+- (void) feedbackResistorArrayChanged:(NSNotification*)aNote
+{
+ 	short chan;
+	for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
+		[[feedBackResistorMatrix cellWithTag:chan] setFloatValue: [model feedBackResistor:chan]];
+	}
+}
+
+- (void) feedbackResistorChanged:(NSNotification*)aNote
+{
+ 	int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+	[[feedBackResistorMatrix cellWithTag:chan] setFloatValue: [model feedBackResistor:chan]];
+}
+
+- (void) baselineVoltageArrayChanged:(NSNotification*)aNote
+{
+ 	short chan;
+	for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
+		[[baselineVoltageMatrix cellWithTag:chan] setFloatValue: [model baselineVoltage:chan]];
+	}   
+}
+
+- (void) baselineVoltageChanged:(NSNotification*)aNote
+{
+ 	int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+	[[baselineVoltageMatrix cellWithTag:chan] setFloatValue: [model baselineVoltage:chan]];
+   
 }
 
 - (void) loopForeverChanged:(NSNotification*)aNote
@@ -675,6 +732,18 @@
 {
 	[model pollValues];
 }
+
+- (IBAction) feedBackResistorAction:(id)sender
+{
+	[model setFeedBackResistor:[[sender selectedCell] tag]  value:[sender floatValue]];
+}
+
+- (IBAction) baselineVoltageAction:(id)sender
+{
+  	[model setBaselineVoltage:[[sender selectedCell] tag]  value:[sender floatValue]];
+  
+}
+
 
 #pragma mark ¥¥¥Data Source
 - (int) numberPointsInPlot:(id)aPlotter

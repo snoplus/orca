@@ -43,6 +43,11 @@ NSString* ORMJDPreAmpAmplitudeChanged		= @"ORMJDPreAmpAmplitudeChanged";
 NSString* MJDPreAmpSettingsLock				= @"MJDPreAmpSettingsLock";
 NSString* ORMJDPreAmpAdcChanged				= @"ORMJDPreAmpAdcChanged";
 NSString* ORMJDPreAmpAdcRangeChanged		= @"ORMJDPreAmpAdcRangeChanged";
+NSString* ORMJDFeedBackResistorArrayChanged = @"ORMJDFeedBackResistorArrayChanged";
+NSString* ORMJDBaselineVoltageArrayChanged  = @"ORMJDBaselineVoltageArrayChanged";
+NSString* ORMJDFeedBackResistorChanged      = @"ORMJDFeedBackResistorChanged";
+NSString* ORMJDBaselineVoltageChanged		= @"ORMJDBaselineVoltageChanged";
+
 
 #pragma mark ¥¥¥Local Strings
 static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
@@ -137,9 +142,23 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 	if(!adcs){
 		[self setAdcs:[NSMutableArray arrayWithCapacity:kMJDPreAmpDacChannels]];
 		int i;
-		for(i=0;i<kMJDPreAmpDacChannels;i++){
+		for(i=0;i<kMJDPreAmpAdcChannels;i++){
 			[adcs addObject:[NSNumber numberWithInt:0]];
 		}	
+	}
+    if(!feedBackResistors){
+		[self setFeedBackResistors:[NSMutableArray arrayWithCapacity:kMJDPreAmpAdcChannels]];
+		int i;
+		for(i=0;i<kMJDPreAmpAdcChannels;i++){
+			[feedBackResistors addObject:[NSNumber numberWithInt:0]];
+		}
+	}
+    if(!baselineVoltages){
+		[self setBaselineVoltages:[NSMutableArray arrayWithCapacity:kMJDPreAmpAdcChannels]];
+		int i;
+		for(i=0;i<kMJDPreAmpAdcChannels;i++){
+			[baselineVoltages addObject:[NSNumber numberWithInt:0]];
+		}
 	}
 }
 
@@ -233,6 +252,82 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 															object:self];
 		
 }
+
+- (NSMutableArray*) feedBackResistors
+{
+    return feedBackResistors;
+}
+- (void) setFeedBackResistors:(NSMutableArray*)anArray
+{
+    [anArray retain];
+    [feedBackResistors release];
+    feedBackResistors = anArray;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDFeedBackResistorArrayChanged object:self];
+
+}
+- (float) feedBackResistor:(unsigned short) aChan
+{
+    if(aChan<[feedBackResistors count]){
+        return [[feedBackResistors objectAtIndex:aChan] floatValue];
+	}
+	else return 0.0;
+
+}
+- (void) setFeedBackResistor:(int) aChan value:(float) aValue
+{
+    if(aChan<[feedBackResistors count]){
+		[[[self undoManager] prepareWithInvocationTarget:self] setFeedBackResistor:aChan value:[self feedBackResistor:aChan]];
+		[feedBackResistors replaceObjectAtIndex:aChan withObject:[NSNumber numberWithFloat:aValue]];
+        
+		NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+		[userInfo setObject:[NSNumber numberWithFloat:aChan] forKey: @"Channel"];
+        
+ 		[[NSNotificationCenter defaultCenter] postNotificationName:ORMJDFeedBackResistorChanged
+															object:self
+														  userInfo: userInfo];
+       
+	}
+
+}
+- (NSMutableArray*) baselineVoltages
+{
+    return baselineVoltages;
+
+}
+- (void) setBaselineVoltages:(NSMutableArray*)anArray
+{
+    [anArray retain];
+    [baselineVoltages release];
+    baselineVoltages = anArray;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDBaselineVoltageArrayChanged object:self];
+  
+}
+- (float) baselineVoltage:(unsigned short) aChan
+{
+    if(aChan<[baselineVoltages count]){
+        return [[baselineVoltages objectAtIndex:aChan] floatValue];
+	}
+	else return 0.0;
+ 
+}
+- (void) setBaselineVoltage:(int) aChan value:(float) aValue
+{
+    if(aChan<[baselineVoltages count]){
+		[[[self undoManager] prepareWithInvocationTarget:self] setBaselineVoltage:aChan value:[self baselineVoltage:aChan]];
+		[feedBackResistors replaceObjectAtIndex:aChan withObject:[NSNumber numberWithFloat:aValue]];
+        
+		NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+		[userInfo setObject:[NSNumber numberWithFloat:aChan] forKey: @"Channel"];
+        
+ 		[[NSNotificationCenter defaultCenter] postNotificationName:ORMJDBaselineVoltageChanged
+															object:self
+														  userInfo: userInfo];
+        
+	}
+}
+
 
 - (NSMutableArray*) adcs
 {
@@ -700,8 +795,10 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
     [self setDacs:			[decoder decodeObjectForKey: @"dacs"]];
 	[self setAdcs:			[decoder decodeObjectForKey: @"adcs"]];
     [self setAmplitudes:	[decoder decodeObjectForKey: @"amplitudes"]];
+    [self setFeedBackResistors:	[decoder decodeObjectForKey: @"feedBackResistors"]];
+    [self setBaselineVoltages:	[decoder decodeObjectForKey: @"baselineVoltages"]];
 	
-    if(!dacs || !amplitudes)	[self setUpArrays];
+    if(!dacs || !amplitudes || !feedBackResistors || !baselineVoltages)	[self setUpArrays];
 
     for(i=0;i<16;i++)timeRates[i] = [[ORTimeRate alloc] init];
 
@@ -732,6 +829,8 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 	[encoder encodeObject:dacs			forKey:@"dacs"];
 	[encoder encodeObject:amplitudes	forKey:@"amplitudes"];
 	[encoder encodeObject:adcs			forKey:@"adcs"];
+	[encoder encodeObject:feedBackResistors			forKey:@"feedBackResistors"];
+	[encoder encodeObject:baselineVoltages			forKey:@"baselineVoltages"];
 }
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
