@@ -17,6 +17,7 @@
 //for the use of this software.
 //-------------------------------------------------------------
 #import "OrcaObjectController.h"
+@class ORCompositeTimeLineView;
 
 @interface ORMJDPreAmpController : OrcaObjectController
 {
@@ -45,6 +46,10 @@
 		IBOutlet NSPopUpButton* adcRange0PU;
 		IBOutlet NSPopUpButton* adcRange1PU;
 		IBOutlet NSButton*		pollNowButton;
+        IBOutlet ORCompositeTimeLineView*	plotter0;
+        IBOutlet ORCompositeTimeLineView*	plotter1;
+        IBOutlet ORCompositeTimeLineView*	plotter2;
+        IBOutlet ORCompositeTimeLineView*	plotter3;
 }
 
 #pragma mark ¥¥¥Initialization
@@ -57,6 +62,8 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ¥¥¥Interface Management
+- (void) updateTimePlot:(NSNotification*)aNotification;
+- (void) scaleAction:(NSNotification*)aNotification;
 - (void) adcEnabledMaskChanged:(NSNotification*)aNote;
 - (void) shipValuesChanged:(NSNotification*)aNote;
 - (void) pollTimeChanged:(NSNotification*)aNote;
@@ -103,4 +110,8 @@
 - (IBAction) startPulserAction:(id)sender;
 - (IBAction) stopPulserAction:(id)sender;
 - (IBAction) readAdcs:(id)sender;
+
+- (int) numberPointsInPlot:(id)aPlotter;
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
+
 @end

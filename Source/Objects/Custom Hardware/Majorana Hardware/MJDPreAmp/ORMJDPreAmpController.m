@@ -21,6 +21,10 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORMJDPreAmpController.h"
 #import "ORMJDPreAmpModel.h"
+#import "ORTimeLinePlot.h"
+#import "ORCompositePlotView.h"
+#import "ORTimeAxis.h"
+#import "ORTimeRate.h"
 
 @implementation ORMJDPreAmpController
 
@@ -51,6 +55,70 @@
 		[[adcMatrix cellAtRow:chan column:0] setFormatter:aFormat];
 		[[adcEnabledMaskMatrix cellAtRow:chan column:0] setTag:chan];
 	}
+    
+    [[plotter0 yAxis] setRngLow:0.0 withHigh:300.];
+	[[plotter0 yAxis] setRngLimitsLow:-300.0 withHigh:500 withMinRng:4];
+    [[plotter1 yAxis] setRngLow:0.0 withHigh:300.];
+	[[plotter1 yAxis] setRngLimitsLow:-300.0 withHigh:500 withMinRng:4];
+    [[plotter2 yAxis] setRngLow:0.0 withHigh:300.];
+	[[plotter2 yAxis] setRngLimitsLow:-300.0 withHigh:500 withMinRng:4];
+    [[plotter3 yAxis] setRngLow:0.0 withHigh:300.];
+	[[plotter3 yAxis] setRngLimitsLow:-300.0 withHigh:500 withMinRng:4];
+   
+    
+    [[plotter0 xAxis] setRngLow:0.0 withHigh:10000];
+	[[plotter0 xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
+    [[plotter1 xAxis] setRngLow:0.0 withHigh:10000];
+	[[plotter1 xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
+    [[plotter2 xAxis] setRngLow:0.0 withHigh:10000];
+	[[plotter2 xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
+    [[plotter3 xAxis] setRngLow:0.0 withHigh:10000];
+	[[plotter3 xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
+	
+	NSColor* color[4] = {
+		[NSColor redColor],
+		[NSColor greenColor],
+		[NSColor blueColor],
+		[NSColor brownColor],
+	};
+	int i;
+	for(i=0;i<4;i++){
+		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:i andDataSource:self];
+		[plotter0 addPlot: aPlot];
+		[aPlot setLineColor:color[i]];
+		[aPlot setName:[NSString stringWithFormat:@"Adc%d",i]];
+		[(ORTimeAxis*)[plotter0 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
+		[aPlot release];
+	}
+	for(i=0;i<4;i++){
+		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:i+4 andDataSource:self];
+		[plotter1 addPlot: aPlot];
+		[aPlot setLineColor:color[i]];
+		[aPlot setName:[NSString stringWithFormat:@"Adc%d",i+4]];
+		[(ORTimeAxis*)[plotter1 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
+		[aPlot release];
+	}
+	for(i=0;i<4;i++){
+		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:i+8 andDataSource:self];
+		[plotter2 addPlot: aPlot];
+		[aPlot setLineColor:color[i]];
+		[aPlot setName:[NSString stringWithFormat:@"Adc%d",i+8]];
+		[(ORTimeAxis*)[plotter2 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
+		[aPlot release];
+	}
+	for(i=0;i<4;i++){
+		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:i+12 andDataSource:self];
+		[plotter3 addPlot: aPlot];
+		[aPlot setLineColor:color[i]];
+		[aPlot setName:[NSString stringWithFormat:@"Adc%d",i+12]];
+		[(ORTimeAxis*)[plotter3 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
+		[aPlot release];
+	}
+	
+	[plotter0 setShowLegend:YES];
+	[plotter1 setShowLegend:YES];
+	[plotter2 setShowLegend:YES];
+	[plotter3 setShowLegend:YES];
 }
 
 - (void) setModel:(id)aModel
@@ -168,6 +236,20 @@
                          name : ORMJDPreAmpModelAdcEnabledMaskChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+					 selector : @selector(scaleAction:)
+						 name : ORAxisRangeChangedNotification
+					   object : nil];
+    
+    [notifyCenter addObserver : self
+					 selector : @selector(miscAttributesChanged:)
+						 name : ORMiscAttributesChanged
+					   object : model];
+    
+    [notifyCenter addObserver : self
+					 selector : @selector(updateTimePlot:)
+						 name : ORRateAverageChangedNotification
+					   object : nil];
 }
 
 - (void) updateWindow
@@ -190,9 +272,131 @@
 	[self shipValuesChanged:nil];
 	[self pollTimeChanged:nil];
 	[self adcEnabledMaskChanged:nil];
+	[self updateTimePlot:nil];
 }
 
 #pragma mark ¥¥¥Interface Management
+- (void) scaleAction:(NSNotification*)aNotification
+{
+	if(aNotification == nil || [aNotification object] == [plotter0 xAxis]){
+		[model setMiscAttributes:[(ORAxis*)[plotter0 xAxis]attributes] forKey:@"XAttributes0"];
+	};
+	
+	if(aNotification == nil || [aNotification object] == [plotter0 yAxis]){
+		[model setMiscAttributes:[(ORAxis*)[plotter0 yAxis]attributes] forKey:@"YAttributes0"];
+	};
+    
+	if(aNotification == nil || [aNotification object] == [plotter1 xAxis]){
+		[model setMiscAttributes:[(ORAxis*)[plotter1 xAxis]attributes] forKey:@"XAttributes1"];
+	};
+	
+	if(aNotification == nil || [aNotification object] == [plotter1 yAxis]){
+		[model setMiscAttributes:[(ORAxis*)[plotter1 yAxis]attributes] forKey:@"YAttributes1"];
+	};
+    if(aNotification == nil || [aNotification object] == [plotter2 xAxis]){
+		[model setMiscAttributes:[(ORAxis*)[plotter2 xAxis]attributes] forKey:@"XAttributes2"];
+	};
+	
+	if(aNotification == nil || [aNotification object] == [plotter2 yAxis]){
+		[model setMiscAttributes:[(ORAxis*)[plotter2 yAxis]attributes] forKey:@"YAttributes2"];
+	};
+    if(aNotification == nil || [aNotification object] == [plotter3 xAxis]){
+		[model setMiscAttributes:[(ORAxis*)[plotter3 xAxis]attributes] forKey:@"XAttributes3"];
+	};
+	
+	if(aNotification == nil || [aNotification object] == [plotter3 yAxis]){
+		[model setMiscAttributes:[(ORAxis*)[plotter3 yAxis]attributes] forKey:@"YAttributes3"];
+	};
+}
+
+- (void) miscAttributesChanged:(NSNotification*)aNote
+{
+    
+	NSString*				key = [[aNote userInfo] objectForKey:ORMiscAttributeKey];
+	NSMutableDictionary* attrib = [model miscAttributesForKey:key];
+	
+	if(aNote == nil || [key isEqualToString:@"XAttributes0"]){
+		if(aNote==nil)attrib = [model miscAttributesForKey:@"XAttributes0"];
+		if(attrib){
+			[(ORAxis*)[plotter0 xAxis] setAttributes:attrib];
+			[plotter0 setNeedsDisplay:YES];
+			[[plotter0 xAxis] setNeedsDisplay:YES];
+		}
+	}
+	if(aNote == nil || [key isEqualToString:@"YAttributes0"]){
+		if(aNote==nil)attrib = [model miscAttributesForKey:@"YAttributes0"];
+		if(attrib){
+			[(ORAxis*)[plotter0 yAxis] setAttributes:attrib];
+			[plotter0 setNeedsDisplay:YES];
+			[[plotter0 yAxis] setNeedsDisplay:YES];
+		}
+	}
+	if(aNote == nil || [key isEqualToString:@"XAttributes1"]){
+		if(aNote==nil)attrib = [model miscAttributesForKey:@"XAttributes1"];
+		if(attrib){
+			[(ORAxis*)[plotter1 xAxis] setAttributes:attrib];
+			[plotter1 setNeedsDisplay:YES];
+			[[plotter1 xAxis] setNeedsDisplay:YES];
+		}
+	}
+	if(aNote == nil || [key isEqualToString:@"YAttributes1"]){
+		if(aNote==nil)attrib = [model miscAttributesForKey:@"YAttributes1"];
+		if(attrib){
+			[(ORAxis*)[plotter1 yAxis] setAttributes:attrib];
+			[plotter1 setNeedsDisplay:YES];
+			[[plotter1 yAxis] setNeedsDisplay:YES];
+		}
+	}
+    if(aNote == nil || [key isEqualToString:@"XAttributes2"]){
+		if(aNote==nil)attrib = [model miscAttributesForKey:@"XAttributes2"];
+		if(attrib){
+			[(ORAxis*)[plotter2 xAxis] setAttributes:attrib];
+			[plotter2 setNeedsDisplay:YES];
+			[[plotter2 xAxis] setNeedsDisplay:YES];
+		}
+	}
+	if(aNote == nil || [key isEqualToString:@"YAttributes2"]){
+		if(aNote==nil)attrib = [model miscAttributesForKey:@"YAttributes2"];
+		if(attrib){
+			[(ORAxis*)[plotter2 yAxis] setAttributes:attrib];
+			[plotter2 setNeedsDisplay:YES];
+			[[plotter2 yAxis] setNeedsDisplay:YES];
+		}
+	}
+    if(aNote == nil || [key isEqualToString:@"XAttributes3"]){
+		if(aNote==nil)attrib = [model miscAttributesForKey:@"XAttributes3"];
+		if(attrib){
+			[(ORAxis*)[plotter3 xAxis] setAttributes:attrib];
+			[plotter3 setNeedsDisplay:YES];
+			[[plotter3 xAxis] setNeedsDisplay:YES];
+		}
+	}
+	if(aNote == nil || [key isEqualToString:@"YAttributes3"]){
+		if(aNote==nil)attrib = [model miscAttributesForKey:@"YAttributes3"];
+		if(attrib){
+			[(ORAxis*)[plotter3 yAxis] setAttributes:attrib];
+			[plotter3 setNeedsDisplay:YES];
+			[[plotter3 yAxis] setNeedsDisplay:YES];
+		}
+	}
+}
+- (void) updateTimePlot:(NSNotification*)aNote
+{
+	if(!aNote || ([aNote object] == [model timeRate:0])){
+		[plotter0 setNeedsDisplay:YES];
+	}
+	else if(!aNote || ([aNote object] == [model timeRate:1])){
+		[plotter1 setNeedsDisplay:YES];
+	}
+
+	else if(!aNote || ([aNote object] == [model timeRate:2])){
+		[plotter2 setNeedsDisplay:YES];
+	}
+    else if(!aNote || ([aNote object] == [model timeRate:3])){
+		[plotter3 setNeedsDisplay:YES];
+	}
+}
+
 - (void) adcEnabledMaskChanged:(NSNotification*)aNote
 {
 
@@ -470,6 +674,21 @@
 - (IBAction) pollNowAction:(id)sender
 {
 	[model pollValues];
+}
+
+#pragma mark ¥¥¥Data Source
+- (int) numberPointsInPlot:(id)aPlotter
+{
+	return [[model timeRate:[aPlotter tag]] count];
+}
+
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
+{
+	int set = [aPlotter tag];
+	int count = [[model timeRate:set] count];
+	int index = count-i-1;
+	*xValue = [[model timeRate:set] timeSampledAtIndex:index];
+	*yValue = [[model timeRate:set] valueAtIndex:index];
 }
 
 @end

@@ -21,6 +21,8 @@
 #import "ORHWWizard.h"
 #import "ThresholdCalibrationTask.h"
 
+@class ORTimeRate;
+
 #define kMJDPreAmpDacChannels   16	//if this ever changes, change the record length also
 #define kMJDPreAmpDataRecordLen 21
 
@@ -42,11 +44,13 @@
 	unsigned long	dataId;
 	unsigned long timeMeasured[2];
     unsigned long adcEnabledMask;
+    ORTimeRate*		timeRates[16];
 }
 
 - (void) setUpArrays;
 
 #pragma mark ¥¥¥Accessors
+- (ORTimeRate*)timeRate:(int)index;
 - (unsigned long) adcEnabledMask;
 - (void) setAdcEnabledMask:(unsigned long)aAdcEnabledMask;
 - (BOOL) shipValues;

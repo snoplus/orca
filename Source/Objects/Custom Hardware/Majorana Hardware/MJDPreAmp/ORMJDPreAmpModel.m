@@ -21,6 +21,7 @@
 #import "ORMJDPreAmpModel.h"
 #import "ORDataTypeAssigner.h"
 #import "ORDataPacket.h"
+#import "ORTimeRate.h"
 
 #pragma mark ¥¥¥Notification Strings
 NSString* ORMJDPreAmpModelAdcEnabledMaskChanged = @"ORMJDPreAmpModelAdcEnabledMaskChanged";
@@ -97,7 +98,10 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 {
     [adcs release];
     [dacs release];
-    [super dealloc];
+	int i;
+	for(i=0;i<16;i++){
+		[timeRates[i] release];
+	}    [super dealloc];
 }
 
 - (void) sleep
@@ -160,6 +164,10 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 }
 
 #pragma mark ¥¥¥Accessors
+- (ORTimeRate*)timeRate:(int)index
+{
+	return timeRates[index];
+}
 
 - (unsigned long) adcEnabledMask
 {
@@ -259,7 +267,11 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 	
 		NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
 		[userInfo setObject:[NSNumber numberWithFloat:aChan] forKey: @"Channel"];
-	
+
+        if(timeRates[aChan] == nil) timeRates[aChan] = [[ORTimeRate alloc] init];
+		[timeRates[aChan] addDataToTimeAverage:aValue];
+
+        
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpAdcChanged
 															object:self
 														  userInfo: userInfo];
@@ -690,6 +702,9 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
     [self setAmplitudes:	[decoder decodeObjectForKey: @"amplitudes"]];
 	
     if(!dacs || !amplitudes)	[self setUpArrays];
+
+    for(i=0;i<16;i++)timeRates[i] = [[ORTimeRate alloc] init];
+
     [[self undoManager] enableUndoRegistration];
     
     return self;
