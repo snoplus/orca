@@ -197,7 +197,7 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 
 - (void) updateAllValues
 {
-	[self getValues: [self systemUpdateList]  target:self selector:@selector(processSystemResponseArray:)];
+	[self getValues: [self systemUpdateList]  target:self selector:@selector(processSystemResponseArray:) priority:NSOperationQueuePriorityNormal];
 }
 
 - (NSArray*) systemUpdateList
@@ -265,12 +265,22 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 	oldPower = currentPower;
 }
 
+- (void) getValue:(NSString*)aCmd target:(id)aTarget selector:(SEL)aSelector priority:(NSOperationQueuePriority)aPriority
+{
+	[self getValues:[NSArray arrayWithObject:aCmd] target:aTarget selector:aSelector priority:aPriority];
+}
+
 - (void) getValue:(NSString*)aCmd target:(id)aTarget selector:(SEL)aSelector
 {
-	[self getValues:[NSArray arrayWithObject:aCmd] target:aTarget selector:aSelector];
+	[self getValues:[NSArray arrayWithObject:aCmd] target:aTarget selector:aSelector priority:NSOperationQueuePriorityNormal];
 }
 
 - (void) getValues:(NSArray*)cmds target:(id)aTarget selector:(SEL)aSelector
+{
+    [self getValues:cmds target:aTarget selector:aSelector priority:(NSOperationQueuePriorityNormal)];
+}
+
+- (void) getValues:(NSArray*)cmds target:(id)aTarget selector:(SEL)aSelector priority:(NSOperationQueuePriority)aPriority
 {
 	for(id aCmd in cmds){
 		ORSNMPReadOperation* aReadOp = [[ORSNMPReadOperation alloc] initWithDelegate:aTarget];
@@ -278,18 +288,24 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 		aReadOp.ipNumber	= IPNumber;
 		aReadOp.selector	= aSelector;
 		aReadOp.cmds		= [NSArray arrayWithObject:aCmd];
+		aReadOp.queuePriority	= aPriority;
 		aReadOp.verbose	= verbose;
 		[ORSNMPQueue addOperation:aReadOp];
 		[aReadOp release];
 	}
 }
 
-- (void) writeValue:(NSString*)aCmd target:(id)aTarget selector:(SEL)aSelector
+- (void) writeValue:(NSString*)aCmd target:(id)aTarget selector:(SEL)aSelector priority:(NSOperationQueuePriority)aPriority
 {
-	[self writeValues:[NSArray arrayWithObject:aCmd] target:aTarget selector:aSelector];
+    [self writeValues:[NSArray arrayWithObject:aCmd] target:aTarget selector:aSelector priority:aPriority];
 }
 
-- (void) writeValues:(NSArray*)cmds target:(id)aTarget selector:(SEL)aSelector
+- (void) writeValue:(NSString*)aCmd target:(id)aTarget selector:(SEL)aSelector
+{
+	[self writeValues:[NSArray arrayWithObject:aCmd] target:aTarget selector:aSelector priority:NSOperationQueuePriorityNormal];
+}
+
+- (void) writeValues:(NSArray*)cmds target:(id)aTarget selector:(SEL)aSelector priority:(NSOperationQueuePriority)aPriority
 {
 	for(id aCmd in cmds){
 		ORSNMPWriteOperation* aWriteOP = [[ORSNMPWriteOperation alloc] initWithDelegate:self];
@@ -299,6 +315,7 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 		aWriteOP.selector	= aSelector;
 		aWriteOP.cmds		= [NSArray arrayWithObject:aCmd];
 		aWriteOP.verbose	= verbose;
+		aWriteOP.queuePriority	= aPriority;
 		[ORSNMPQueue addOperation:aWriteOP];
 		[aWriteOP release];
 	}

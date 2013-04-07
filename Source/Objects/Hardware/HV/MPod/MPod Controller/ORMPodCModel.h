@@ -57,10 +57,13 @@
 - (id) controllerCard;
 - (void) ping;
 - (BOOL) pingTaskRunning;
+- (void) getValue:(NSString*)aCmd target:(id)aTarget selector:(SEL)aSelector priority:(NSOperationQueuePriority)aPriority;
 - (void) getValue:(NSString*)aCmd target:(id)aTarget selector:(SEL)aSelector;
+- (void) writeValue:(NSString*)aCmd target:(id)aTarget selector:(SEL)aSelector priority:(NSOperationQueuePriority)aPriority;
 - (void) writeValue:(NSString*)aCmd target:(id)aTarget selector:(SEL)aSelector;
 - (void) getValues:(NSArray*)cmds target:(id)aTarget selector:(SEL)aSelector;
-- (void) writeValues:(NSArray*)cmds target:(id)aTarget selector:(SEL)aSelector;
+- (void) getValues:(NSArray*)cmds target:(id)aTarget selector:(SEL)aSelector priority:(NSOperationQueuePriority)aPriority;
+- (void) writeValues:(NSArray*)cmds target:(id)aTarget selector:(SEL)aSelector priority:(NSOperationQueuePriority)aPriority;
 - (void) pollHardware;
 - (void) pollHardwareAfterDelay;
 - (void) callBackToTarget:(id)aTarget selector:(SEL)aSelector userInfo:(id)userInfo;
