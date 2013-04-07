@@ -45,9 +45,10 @@
 
 #pragma mark ¥¥¥Initialization
 - (void) dealloc;
-- (void) setCrateIndex:(int)aValue;
 
 #pragma mark ¥¥¥Accessors
+- (void) setCrateIndex:(int)aValue;
+- (int) crateIndex;
 - (void) setIdentifier:(NSString*)newIdentifier;
 - (NSString*) identifier;
 - (void) setMapEntries:(NSArray*)someMapEntries;
@@ -108,7 +109,3 @@
 
 extern NSString* KSegmentRateChangedNotification;
 extern NSString* KSegmentChangedNotification;
-
-@interface NSObject (ORExperimentModel)
-- (int) crateIndexInMap;
-@end

@@ -25,19 +25,15 @@
 @end
 
 @implementation HaloDetectorView
-- (void) dealloc
+- (void) makeCrateImage
 {
-    [crateImage release];
-    [super dealloc];
+    if(!crateImage){
+        crateImage = [[NSImage imageNamed:@"Vme64Crate"] copy];
+        NSSize imageSize = [crateImage size];
+        [crateImage setSize:NSMakeSize(imageSize.width*.7,imageSize.height*.7)];
+    }
 }
-- (void) awakeFromNib
-{
-    [crateImage release];
-    crateImage = [[NSImage imageNamed:@"Vme64Crate"] retain];
-    NSSize imageSize = [crateImage size];
-    [crateImage setSize:NSMakeSize(imageSize.width*.7,imageSize.height*.7)];
 
-}
 - (void) setViewType:(int)aViewType
 {
 	viewType = aViewType;
@@ -120,8 +116,8 @@
 		int n = [aGroup numSegments];
 		for(i=0;i<n;i++){
 			ORDetectorSegment* aSegment = [aGroup segment:i];
-            int crate    = [[aSegment objectForKey:[aSegment mapEntry:6 forKey:@"key"]] intValue];
-			int cardSlot = [aSegment cardSlot]-1;
+            int crate    = [[aSegment objectForKey:[aSegment mapEntry:[aSegment crateIndex]forKey:@"key"]] intValue];
+			int cardSlot = [aSegment cardSlot];
 			int channel  = [aSegment channel];
 			if(channel < 0)cardSlot = -1; //we have to make the segment, but we'll draw off screen when not mapped
             float yOffset;

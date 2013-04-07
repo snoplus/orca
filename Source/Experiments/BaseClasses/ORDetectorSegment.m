@@ -100,7 +100,10 @@ NSString* KSegmentChangedNotification	  =	@"KSegmentChangedNotification";
 {
     crateIndex = aValue;
 }
-
+- (int) crateIndex
+{
+    return crateIndex;
+}
 - (unsigned long) threshold
 {
 	int channel = [[params objectForKey:mapKey(kChannel)] intValue];

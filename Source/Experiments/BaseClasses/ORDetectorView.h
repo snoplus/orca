@@ -36,6 +36,7 @@
 }
 - (id)initWithFrame:(NSRect)frameRect;
 - (void) dealloc;
+- (void) makeCrateImage;
 - (void) setDelegate:(id)aDelegate;
 - (void) makeAllSegments;
 - (void) mouseDown:(NSEvent*)anEvent;

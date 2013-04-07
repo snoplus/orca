@@ -30,7 +30,6 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 @implementation MajoranaModel
 
 #pragma mark ¥¥¥Initialization
-
 - (void) setUpImage
 {
     [self setImage:[NSImage imageNamed:@"Majorana"]];
@@ -56,6 +55,19 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 //{
 //	return @"Majorana/Index.html";
 //}
+- (NSMutableArray*) setupMapEntries:(int) index
+{
+	//default set -- subsclasses can override
+	NSMutableArray* mapEntries = [NSMutableArray array];
+	[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kSegmentNumber",	@"key", [NSNumber numberWithInt:0], @"sortType", nil]];
+	[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kCardSlot",		@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+	[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kChannel",		@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+	[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kName",			@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+ 	[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kVME",			@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+    [self setCrateIndex:4];//see above
+    
+	return mapEntries;
+}
 
 #pragma mark ¥¥¥Accessors
 
@@ -162,6 +174,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 	finalString = [finalString stringByAppendingString:@"\n-----------------------\n"];
 	finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Detector" parts:parts]];
 	finalString = [finalString stringByAppendingString:@"-----------------------\n"];
+    finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" VME"        parts:parts]       ];
 	finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" CardSlot" parts:parts]];
 	finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Channel" parts:parts]];
 	finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Threshold" parts:parts]];

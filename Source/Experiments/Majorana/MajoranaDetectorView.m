@@ -31,29 +31,53 @@
 	viewType = aViewType;
 }
 
+- (void) makeCrateImage
+{
+    if(!crateImage){
+        crateImage = [[NSImage imageNamed:@"Vme64Crate"] copy];
+        NSSize imageSize = [crateImage size];
+        [crateImage setSize:NSMakeSize(imageSize.width*.7,imageSize.height*.7)];
+    }
+}
+
+#define kCrateInsideX        45
+#define kCrateInsideY        35
+#define kCrateSeparation     20
+#define kCrateInsideWidth   237
+#define kCrateInsideHeight   85
+
+
 - (void) drawRect:(NSRect)rect
 {
 	if(viewType == kUseCrateView){
-		
-		float x;
-		float y;
-		float dx = [self bounds].size.width/21.;
-		float dy = [self bounds].size.height/8;
-		[[NSColor blackColor] set];
-		[NSBezierPath fillRect:[self bounds]];
-		[[NSColor whiteColor] set];
-		NSBezierPath* thePath = [NSBezierPath bezierPath];
-		for(x=0;x<[self bounds].size.width;x+=dx){
-			[thePath moveToPoint:NSMakePoint(x,0)];
-			[thePath lineToPoint:NSMakePoint(x,[self bounds].size.height)];
-		}
-		for(y=0;y<=[self bounds].size.height;y+=dy){
-			[thePath moveToPoint:NSMakePoint(0,y)];
-			[thePath lineToPoint:NSMakePoint([self bounds].size.width,y)];
-		}
-		[thePath moveToPoint:NSMakePoint([self bounds].size.width,0)];
-		[thePath lineToPoint:NSMakePoint([self bounds].size.width,[self bounds].size.height)];
-		[thePath stroke];
+        int crate;
+        for(crate=0;crate<2;crate++){
+            float yOffset;
+            if(crate==0) yOffset = 0;
+            else yOffset = [crateImage imageRect].size.height+20;
+            NSRect destRect = NSMakeRect(30,yOffset,[crateImage imageRect].size.width,[crateImage imageRect].size.height);
+            [crateImage drawInRect:destRect fromRect:[crateImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+            
+            [[NSColor blackColor]set];
+            NSRect inside = NSMakeRect(kCrateInsideX,yOffset+kCrateInsideY,kCrateInsideWidth,kCrateInsideHeight);
+            [NSBezierPath fillRect:inside];
+            
+            [[NSColor grayColor]set];
+            float dx = inside.size.width/21.;
+            float dy = inside.size.height/8.;
+            [NSBezierPath setDefaultLineWidth:.5];
+            int i;
+            for(i=0;i<21;i++){
+                [NSBezierPath strokeLineFromPoint:NSMakePoint(inside.origin.x+i*dx,inside.origin.y) toPoint:NSMakePoint(inside.origin.x+i*dx,inside.origin.y + inside.size.height)];
+            }
+            
+            for(i=0;i<8;i++){
+                [NSBezierPath strokeLineFromPoint:NSMakePoint(inside.origin.x,inside.origin.y+i*dy) toPoint:NSMakePoint(inside.origin.x + inside.size.width,inside.origin.y+i*dy)];
+            }
+            
+            
+        }
+
 		 
 	}
 	[super drawRect:rect];
@@ -89,8 +113,8 @@
 	[super makeAllSegments];
 	
 	if(viewType == kUseCrateView){
-		float dx = [self bounds].size.width/21.;
-		float dy = [self bounds].size.height/8;
+		float dx = kCrateInsideWidth/21.;
+		float dy = kCrateInsideHeight/8.;
 		NSMutableArray* segmentPaths = [NSMutableArray arrayWithCapacity:kNumTubes];
 		NSMutableArray* errorPaths   = [NSMutableArray arrayWithCapacity:kNumTubes];
 		ORSegmentGroup* aGroup = [delegate segmentGroup:0];
@@ -98,19 +122,22 @@
 		int n = [aGroup numSegments];
 		for(i=0;i<n;i++){
 			ORDetectorSegment* aSegment = [aGroup segment:i];
-			int cardSlot = [aSegment cardSlot]-1;
-			int channel = [aSegment channel];
-			if(channel < 0){
-				cardSlot = -1; //we have to make the segment, but we'll draw off screen when not mapped
-			}
-			NSRect channelRect = NSMakeRect(cardSlot*dx,[self bounds].size.height - channel*dy,dx,dy);
+            int crate    = [[aSegment objectForKey:[aSegment mapEntry:[aSegment crateIndex] forKey:@"key"]] intValue];
+			int cardSlot = [aSegment cardSlot];
+			int channel  = [aSegment channel];
+			if(channel < 0)cardSlot = -1; //we have to make the segment, but we'll draw off screen when not mapped
+            float yOffset;
+            if(crate==0) yOffset = kCrateInsideY;
+            else yOffset = [crateImage imageRect].size.height+kCrateSeparation+kCrateInsideY;
+            
+			NSRect channelRect = NSMakeRect(kCrateInsideX+cardSlot*dx, yOffset + (channel*dy),dx,dy);
+            
 			[segmentPaths addObject:[NSBezierPath bezierPathWithRect:channelRect]];
 			[errorPaths addObject:[NSBezierPath bezierPathWithRect:NSInsetRect(channelRect, 4, 4)]];
 		}
 		
 		[segmentPathSet addObject:segmentPaths];
 		[errorPathSet addObject:errorPaths];
- 
 	}
 	
 	else if(viewType == kUseTubeView) {		

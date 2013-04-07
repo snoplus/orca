@@ -61,7 +61,6 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
 		[self performSelector:@selector(sendHeartbeat) withObject:nil afterDelay:[self heartbeatSeconds]];
 	}
 }
-
 - (void) setUpImage
 {
     [self setImage:[NSImage imageNamed:@"Halo"]];

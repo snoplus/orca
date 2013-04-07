@@ -33,7 +33,13 @@
 {
 	[segmentPathSet release];
 	[errorPathSet release];
+    [crateImage release];
 	[super dealloc];
+}
+
+- (void) awakeFromNib
+{
+    [self makeCrateImage];
 }
 
 - (void) setDelegate:(id)aDelegate
@@ -42,6 +48,10 @@
 	delegate = aDelegate;
 }
 
+- (void) makeCrateImage
+{
+    //subclasses can override
+}
 
 - (void) makeAllSegments
 {
