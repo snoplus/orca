@@ -12,6 +12,7 @@
 //for the use of this software.
 //-------------------------------------------------------------
 #import "ORDetectorView.h"
+#import "ORDetectorSegment.h"
 
 @class ORColorScale;
 
@@ -23,3 +24,4 @@
 - (void) setViewType:(int)aViewType;
 
 @end
+

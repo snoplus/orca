@@ -40,10 +40,12 @@
 	id<ORAdcInfoProviding>	hardwareCard;
 	NSArray*				mapEntries;
     NSString*               identifier;
+    int                     crateIndex;
 }
 
 #pragma mark ¥¥¥Initialization
 - (void) dealloc;
+- (void) setCrateIndex:(int)aValue;
 
 #pragma mark ¥¥¥Accessors
 - (void) setIdentifier:(NSString*)newIdentifier;
@@ -106,3 +108,7 @@
 
 extern NSString* KSegmentRateChangedNotification;
 extern NSString* KSegmentChangedNotification;
+
+@interface NSObject (ORExperimentModel)
+- (int) crateIndexInMap;
+@end

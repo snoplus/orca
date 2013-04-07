@@ -52,7 +52,7 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
 - (id) init
 {
     self = [super init];
-	[self makeSegmentGroups];			    
+	[self makeSegmentGroups];
     return self;
 }
 
@@ -118,7 +118,13 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
 	[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kCardSlot",		@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
 	[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kChannel",		@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
 	[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kName",			@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+    [self setCrateIndex:-1]; //default is no crate
+    
 	return mapEntries;
+}
+- (void) setCrateIndex:(int)aValue
+{
+    for(id aGroup in segmentGroups)[aGroup setCrateIndex:aValue];
 }
 
 - (void) registerForRates
@@ -162,7 +168,6 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
 	//subclasses can reform if they want
 	return @"";
 }
-
 
 - (void) selectedSet:(int)aSet segment:(int)index
 {

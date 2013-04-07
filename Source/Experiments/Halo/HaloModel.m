@@ -96,8 +96,9 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
 
 - (NSMutableArray*) setupMapEntries:(int) index
 {
+    [self setCrateIndex:6]; //default is no crate
 	if(index==0){
-        //default set -- subsclasses can override. first four items should not be moved
+        //default set -- subsclasses can override. first four items and the VME crate should not be moved
         NSMutableArray* mapEntries = [NSMutableArray array];
         [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kSegmentNumber",	@"key", [NSNumber numberWithInt:0], @"sortType", nil]];
         [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kCardSlot",      @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
@@ -114,7 +115,7 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
         return mapEntries;
     }
 	else if(index ==1){
-        //default set -- subsclasses can override. first four items should not be moved
+        //default set -- subsclasses can override. first four items and the VME crate should not be moved
         NSMutableArray* mapEntries = [NSMutableArray array];
         [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kSegmentNumber",	@"key", [NSNumber numberWithInt:0], @"sortType", nil]];
         [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kCardSlot",      @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
@@ -131,6 +132,13 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
         return mapEntries;
     }
     else return nil;
+    
+
+}
+
+- (void) setCrateIndex:(int)aValue
+{
+    for(id aGroup in segmentGroups)[aGroup setCrateIndex:aValue]; //index from above
 }
 
 #pragma mark ¥¥¥Accessors

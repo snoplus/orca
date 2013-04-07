@@ -116,6 +116,7 @@
 - (void) histogram;
 - (void) initHardware;
 - (NSString*) dataSetNameGroup:(int)aGroup segment:(int)index;
+- (void) setCrateIndex:(int)aValue;
 
 #pragma mark •••Specific Dialog Lock Methods
 - (NSString*) experimentMapLock;
@@ -141,4 +142,5 @@ extern NSString* ExperimentDisplayUpdatedNeeded;
 extern NSString* ExperimentCollectedRates;
 extern NSString* ExperimentDisplayHistogramsUpdated;
 extern NSString* ExperimentModelSelectionChanged;
+
 

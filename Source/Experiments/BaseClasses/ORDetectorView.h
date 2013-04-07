@@ -32,6 +32,7 @@
 		int selectedSet;
 		int selectedPath;
 		id delegate;
+        NSImage* crateImage;
 }
 - (id)initWithFrame:(NSRect)frameRect;
 - (void) dealloc;

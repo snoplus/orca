@@ -81,6 +81,10 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 	[mapEntries release];
 	[super dealloc];
 }
+- (void) setCrateIndex:(int)aValue;
+{
+    for(id aSegment in segments)[aSegment setCrateIndex:aValue];
+}
 
 - (NSUndoManager*) undoManager
 {

@@ -96,6 +96,11 @@ NSString* KSegmentChangedNotification	  =	@"KSegmentChangedNotification";
 	return [params objectForKey:mapKey(kName)];
 }
 
+- (void) setCrateIndex:(int)aValue
+{
+    crateIndex = aValue;
+}
+
 - (unsigned long) threshold
 {
 	int channel = [[params objectForKey:mapKey(kChannel)] intValue];
@@ -392,8 +397,14 @@ NSString* KSegmentChangedNotification	  =	@"KSegmentChangedNotification";
 		id aCard = [adcCards objectAtIndex:card];
 		if(!aCard)break;
 		int theSlot = [[params objectForKey: mapKey(kCardSlot)]intValue];
+        int theCrate;
+        if(crateIndex>kCardSlot)theCrate = [[params objectForKey: mapKey(crateIndex)]intValue];
+        else theCrate = 0;
+        if(theCrate == 1){
+            NSLog(@"got crate 1\n");
+        }
 		if(theSlot>=0){
-			if([aCard displayedSlotNumber] == theSlot){
+			if([aCard displayedSlotNumber] == theSlot && [aCard crateNumber] == theCrate && crateIndex>=0){
 				hwPresent = YES;
 				int chan = [[params objectForKey: mapKey(kChannel)]intValue];
 				if([aCard onlineMaskBit:chan])online = YES;

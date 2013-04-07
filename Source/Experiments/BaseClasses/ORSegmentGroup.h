@@ -36,13 +36,14 @@
 	int				totalCountsHistogram[1020];
 	float			rate;
 	NSArray*		mapEntries;
-
+    
 }
 
 #pragma mark •••Initialization
 - (id) initWithName:(NSString*)aName numSegments:(int)numSegments mapEntries:(NSArray*)someMapEntries;
 - (void) dealloc;
 - (NSUndoManager*) undoManager;
+- (void) setCrateIndex:(int)aValue;
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
