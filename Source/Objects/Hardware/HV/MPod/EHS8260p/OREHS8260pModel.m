@@ -202,11 +202,6 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 	if([self channelInBounds:channel]){
 		NSString* cmd = [NSString stringWithFormat:@"outputTripTimeMaxCurrent.u%d i %d",[self slotChannelValue:channel],tripTime[channel]];
 		[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
-        
-        //get the response immediately
-        cmd = [NSString stringWithFormat:@"outputTripTimeMaxCurrent.u%d",[self slotChannelValue:channel]];
-		[[self adapter] getValue:cmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityHigh];
-
 	}
 }
 - (void) writeSupervisorBehaviours
@@ -223,11 +218,6 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 		short aValue = ((currentTripBehavior[channel] & 0x3)<<6) | ((outputFailureBehavior[channel] & 0x3)<<12);
 		NSString* cmd = [NSString stringWithFormat:@"outputSupervisionBehavior.u%d i %d",[self slotChannelValue:channel],aValue];
 		[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
-
-        //get the response immediately
-        cmd = [NSString stringWithFormat:@"outputSupervisionBehavior.u%d",[self slotChannelValue:channel]];
-		[[self adapter] getValue:cmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityHigh];
-
         
 		//disable the hw kill if the supervisor behaviour is set to ignore
 		if((outputFailureBehavior[channel] & 0x3) == 0){
