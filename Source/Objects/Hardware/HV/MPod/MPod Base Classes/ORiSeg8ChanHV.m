@@ -379,10 +379,6 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 	int channel = 0; //in this firmware version all the risetimes and falltimes get set to this value. So no need to send for all channels.
 	NSString* cmd = [NSString stringWithFormat:@"outputVoltageRiseRate.u%d F %f",[self slotChannelValue:channel],aValue];
 	[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
-
-	cmd = [NSString stringWithFormat:@"outputVoltageRiseRate.u%d",[self slotChannelValue:channel]];
-	[[self adapter] getValue:cmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
-
 }
 
 - (void) writeVoltage:(short)channel
@@ -390,10 +386,6 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 	if([self channelInBounds:channel]){
 		NSString* cmd = [NSString stringWithFormat:@"outputVoltage.u%d F %f",[self slotChannelValue:channel],(float)hwGoal[channel]];
 		[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
-
-		cmd = [NSString stringWithFormat:@"outputVoltage.u%d",[self slotChannelValue:channel]];
-        [[self adapter] getValue:cmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
-
     }
 }
 
@@ -402,10 +394,6 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 	if([self channelInBounds:channel]){
 		NSString* cmd = [NSString stringWithFormat:@"outputCurrent.u%d F %f",[self slotChannelValue:channel],maxCurrent[channel]/1000.];
 		[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
-
-        cmd = [NSString stringWithFormat:@"outputCurrent.u%d",[self slotChannelValue:channel]];
-        [[self adapter] getValue:cmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
-
     }
 }
 
@@ -423,10 +411,6 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 	[self writeVoltage:channel];
 	NSString* cmd = [NSString stringWithFormat:@"outputSwitch.u%d i %d",[self slotChannelValue:channel],kiSeg8ChanHVOutputOn];
 	[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
-    
-    cmd = [NSString stringWithFormat:@"outputSwitch.u%d",[self slotChannelValue:channel]];
-    [[self adapter] getValue:cmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
-
 }
 
 - (void) turnChannelOff:(short)channel
@@ -435,39 +419,24 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 	[self writeVoltage:channel];
 	NSString* cmd = [NSString stringWithFormat:@"outputSwitch.u%d i %d",[self slotChannelValue:channel],kiSeg8ChanHVOutputOff];
 	[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
- 
-    cmd = [NSString stringWithFormat:@"outputSwitch.u%d",[self slotChannelValue:channel]];
-    [[self adapter] getValue:cmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
 }
 
 - (void) panicChannel:(short)channel
 {    
 	NSString* cmd = [NSString stringWithFormat:@"outputSwitch.u%d i %d",[self slotChannelValue:channel],kiSeg8ChanHVOutputSetEmergencyOff];
 	[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
-
-    cmd = [NSString stringWithFormat:@"outputSwitch.u%d",[self slotChannelValue:channel]];
-    [[self adapter] getValue:cmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
-
 }
 
 - (void) clearPanicChannel:(short)channel
 {    
 	NSString* cmd = [NSString stringWithFormat:@"outputSwitch.u%d i %d",[self slotChannelValue:channel],kiSeg8ChanHVOutputResetEmergencyOff];
 	[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
-
-    cmd = [NSString stringWithFormat:@"outputSwitch.u%d",[self slotChannelValue:channel]];
-    [[self adapter] getValue:cmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
-
 }
 
 - (void) clearEventsChannel:(short)channel
 {    
 	NSString* cmd = [NSString stringWithFormat:@"outputSwitch.u%d i %d",[self slotChannelValue:channel],kiSeg8ChanHVOutputClearEvents];
 	[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
-
-    cmd = [NSString stringWithFormat:@"outputSwitch.u%d",[self slotChannelValue:channel]];
-    [[self adapter] getValue:cmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
-
 }
 
 - (void) stopRamping:(short)channel

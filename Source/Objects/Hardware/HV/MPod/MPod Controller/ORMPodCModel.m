@@ -197,7 +197,7 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 
 - (void) updateAllValues
 {
-	[self getValues: [self systemUpdateList]  target:self selector:@selector(processSystemResponseArray:) priority:NSOperationQueuePriorityNormal];
+	[self getValues: [self systemUpdateList]  target:self selector:@selector(processSystemResponseArray:) priority:NSOperationQueuePriorityLow];
 }
 
 - (NSArray*) systemUpdateList
@@ -272,12 +272,12 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 
 - (void) getValue:(NSString*)aCmd target:(id)aTarget selector:(SEL)aSelector
 {
-	[self getValues:[NSArray arrayWithObject:aCmd] target:aTarget selector:aSelector priority:NSOperationQueuePriorityNormal];
+	[self getValues:[NSArray arrayWithObject:aCmd] target:aTarget selector:aSelector priority:NSOperationQueuePriorityLow];
 }
 
 - (void) getValues:(NSArray*)cmds target:(id)aTarget selector:(SEL)aSelector
 {
-    [self getValues:cmds target:aTarget selector:aSelector priority:(NSOperationQueuePriorityNormal)];
+    [self getValues:cmds target:aTarget selector:aSelector priority:NSOperationQueuePriorityLow];
 }
 
 - (void) getValues:(NSArray*)cmds target:(id)aTarget selector:(SEL)aSelector priority:(NSOperationQueuePriority)aPriority
@@ -302,7 +302,7 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 
 - (void) writeValue:(NSString*)aCmd target:(id)aTarget selector:(SEL)aSelector
 {
-	[self writeValues:[NSArray arrayWithObject:aCmd] target:aTarget selector:aSelector priority:NSOperationQueuePriorityNormal];
+	[self writeValues:[NSArray arrayWithObject:aCmd] target:aTarget selector:aSelector priority:NSOperationQueuePriorityLow];
 }
 
 - (void) writeValues:(NSArray*)cmds target:(id)aTarget selector:(SEL)aSelector priority:(NSOperationQueuePriority)aPriority
