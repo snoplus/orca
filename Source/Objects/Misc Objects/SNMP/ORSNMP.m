@@ -412,7 +412,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SNMPQueue);
 	if(verbose)for(id anEntry in response) NSLog(@"Reponse: %@\n",anEntry);
 	[delegate performSelectorOnMainThread:selector withObject:response waitUntilDone:YES];
 	[ss release];
-	[ORTimer delay:.05];
+	//[ORTimer delay:.05];
 }
 
 @end
@@ -432,7 +432,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SNMPQueue);
 	if(verbose)for(id anEntry in response) NSLog(@"Reponse: %@\n",anEntry);
 	[delegate performSelectorOnMainThread:selector withObject:response waitUntilDone:YES];
 	[ss release];
-	[ORTimer delay:.05];
+	//[ORTimer delay:.05];
 }
 @end
 
@@ -448,7 +448,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SNMPQueue);
 	if([self isCancelled]) return;
 	if(verbose)NSLog(@"CallBack to %@: %@ with %@\n",[target className], NSStringFromSelector(selector),userInfo);
 	[target performSelectorOnMainThread:selector withObject:userInfo waitUntilDone:YES];
-	[ORTimer delay:.1];
+	//[ORTimer delay:.1];
 }
 @end
 
