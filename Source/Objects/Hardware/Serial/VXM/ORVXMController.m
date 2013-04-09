@@ -664,7 +664,7 @@
 {
     if([model useCmdQueue])[model addZeroCmd];
     else {
-        int choice = NSRunAlertPanel(@"About to reset postion counter to zero!",@"Is this really what you want?\n",@"Cancel",@"Yes, Do it",nil);
+        int choice = NSRunAlertPanel(@"About to reset position counter to zero!",@"Is this really what you want?\n",@"Cancel",@"Yes, Do it",nil);
         if(choice == NSAlertAlternateReturn){
             [model addZeroCmd];
         }
