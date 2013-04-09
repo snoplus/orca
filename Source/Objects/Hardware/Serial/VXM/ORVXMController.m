@@ -436,7 +436,7 @@
 	[addCustomCmdButton setEnabled: !cmdExecuting];
 	[addCustomCmdButton setTitle:[model useCmdQueue]?@"Add Custom Cmd": @"Execute Cmd"];
 	[zeroCounterButton setEnabled:!locked && !cmdExecuting];
-	[zeroCounterButton setTitle:[model useCmdQueue]?@"Add Zero Cmd": @"Execute Zero Cmd"];
+	[zeroCounterButton setTitle:[model useCmdQueue]?@"Add Zero Cmd": @"Execute Zero Cmd..."];
 	
 	for(id aMotor in [model motors]){
 		int i = [aMotor motorId];
@@ -662,7 +662,13 @@
 
 - (IBAction) addZeroCounterAction:(id)sender
 {
-	[model addZeroCmd];
+    if([model useCmdQueue])[model addZeroCmd];
+    else {
+        int choice = NSRunAlertPanel(@"About to reset postion counter to zero!",@"Is this really what you want?\n",@"Cancel",@"Yes, Do it",nil);
+        if(choice == NSAlertAlternateReturn){
+            [model addZeroCmd];
+        }
+    }
 }
 
 - (IBAction) addHomePlusAction:(id)sender

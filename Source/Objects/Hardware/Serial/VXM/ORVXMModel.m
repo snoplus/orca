@@ -574,7 +574,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 	NSString* aCmd = [NSString stringWithFormat:@"N"];
 	[self addCmdToQueue:aCmd 
 			description:[NSString stringWithFormat:@"Zero Counter"]
-			 waitToSend:NO];
+			 waitToSend:YES];
     [self queryPositions];
 
 }
