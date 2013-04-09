@@ -301,7 +301,7 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 														userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:index] forKey:@"Channel"]];
 
 		if(timeRates[index] == nil) timeRates[index] = [[ORTimeRate alloc] init];
-		[timeRates[index] addDataToTimeAverage:aValue];
+		[timeRates[index] addDataToTimeAverage:pressure[index]];
 
 	}
 }
