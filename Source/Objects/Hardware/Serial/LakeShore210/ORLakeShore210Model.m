@@ -51,8 +51,13 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 - (id) init
 {
 	self = [super init];
-    [self registerNotificationObservers];
-	return self;
+    int i;
+	for(i=0;i<8;i++){
+		lowLimit[i]  = 0; 
+		highLimit[i] = 300.0; 
+		lowAlarm[i]  = 0; 
+		highAlarm[i] = 300.0; 
+	}	return self;
 }
 
 - (void) dealloc
@@ -267,13 +272,13 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 
 - (double) lowLimit:(int)aChan
 {
-	if(aChan>=0 && aChan<6)return lowLimit[aChan];
+	if(aChan>=0 && aChan<8)return lowLimit[aChan];
 	else return 1;
 }
 
 - (void) setLowLimit:(int)aChan value:(double)aValue
 {
-	if(aChan>=0 && aChan<6){
+	if(aChan>=0 && aChan<8){
 		[[[self undoManager] prepareWithInvocationTarget:self] setLowLimit:aChan value:lowLimit[aChan]];
 		lowLimit[aChan] = aValue;
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORLakeShore210ModelLowLimitChanged object:self];
@@ -281,13 +286,13 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 }
 - (double) highLimit:(int)aChan
 {
-	if(aChan>=0 && aChan<6)return highLimit[aChan];
-	else return 1;
+	if(aChan>=0 && aChan<8)return highLimit[aChan];
+	else return 100;
 }
 
 - (void) setHighLimit:(int)aChan value:(double)aValue
 {
-	if(aChan>=0 && aChan<6){
+	if(aChan>=0 && aChan<8){
 		[[[self undoManager] prepareWithInvocationTarget:self] setHighLimit:aChan value:highLimit[aChan]];
 		highLimit[aChan] = aValue;
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORLakeShore210ModelHighLimitChanged object:self];
@@ -295,13 +300,13 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 }
 - (double) lowAlarm:(int)aChan
 {
-	if(aChan>=0 && aChan<6)return lowAlarm[aChan];
-	else return 1;
+	if(aChan>=0 && aChan<8)return lowAlarm[aChan];
+	else return 300;
 }
 
 - (void) setLowAlarm:(int)aChan value:(double)aValue
 {
-	if(aChan>=0 && aChan<6){
+	if(aChan>=0 && aChan<8){
 		[[[self undoManager] prepareWithInvocationTarget:self] setHighAlarm:aChan value:lowAlarm[aChan]];
 		lowAlarm[aChan] = aValue;
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORLakeShore210ModelLowAlarmChanged object:self];
@@ -310,13 +315,13 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 
 - (double) highAlarm:(int)aChan
 {
-	if(aChan>=0 && aChan<6)return highAlarm[aChan];
+	if(aChan>=0 && aChan<8)return highAlarm[aChan];
 	else return 1;
 }
 
 - (void) setHighAlarm:(int)aChan value:(double)aValue
 {
-	if(aChan>=0 && aChan<6){
+	if(aChan>=0 && aChan<8){
 		[[[self undoManager] prepareWithInvocationTarget:self] setHighAlarm:aChan value:highAlarm[aChan]];
 		highAlarm[aChan] = aValue;
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORLakeShore210ModelHighAlarmChanged object:self];
