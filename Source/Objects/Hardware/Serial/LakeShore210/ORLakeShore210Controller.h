@@ -20,6 +20,7 @@
 #pragma mark ***Imported Files
 
 @class ORCompositeTimeLineView;
+@class ORSerialPortController;
 
 @interface ORLakeShore210Controller : OrcaObjectController
 {
@@ -28,16 +29,14 @@
     IBOutlet NSTextField*   tempUnitsField;
 	IBOutlet NSMatrix*		unitsTypeMatrix;
     IBOutlet NSButton*      lockButton;
-    IBOutlet NSTextField*   portStateField;
-    IBOutlet NSPopUpButton* portListPopup;
     IBOutlet NSPopUpButton* pollTimePopup;
-    IBOutlet NSButton*      openPortButton;
     IBOutlet NSButton*      readTempsButton;
     IBOutlet NSMatrix*      tempMatrix;
     IBOutlet NSMatrix*      timeMatrix;
 	IBOutlet NSTableView*	processLimitTableView;
 	IBOutlet ORCompositeTimeLineView*	plotter0;
 	IBOutlet ORCompositeTimeLineView*	plotter1;
+    IBOutlet ORSerialPortController* serialPortController;
 }
 
 #pragma mark ***Initialization
@@ -55,8 +54,6 @@
 - (void) scaleAction:(NSNotification*)aNotification;
 - (void) shipTemperaturesChanged:(NSNotification*)aNotification;
 - (void) lockChanged:(NSNotification*)aNotification;
-- (void) portNameChanged:(NSNotification*)aNotification;
-- (void) portStateChanged:(NSNotification*)aNotification;
 - (void) tempChanged:(NSNotification*)aNotification;
 - (void) pollTimeChanged:(NSNotification*)aNotification;
 - (void) unitsTypeChanged:(NSNotification*)aNotification;
@@ -70,8 +67,6 @@
 - (IBAction) shipTemperaturesAction:(id)sender;
 - (IBAction) unitsTypeAction:(id)sender;
 - (IBAction) lockAction:(id) sender;
-- (IBAction) portListAction:(id) sender;
-- (IBAction) openPortAction:(id)sender;
 - (IBAction) readTempsAction:(id)sender;
 - (IBAction) pollTimeAction:(id)sender;
 

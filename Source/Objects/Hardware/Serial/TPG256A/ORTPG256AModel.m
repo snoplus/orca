@@ -306,16 +306,6 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 	}
 }
 
-- (NSString*) lastRequest
-{
-	return lastRequest;
-}
-
-- (void) setLastRequest:(NSString*)aRequest
-{
-	[lastRequest autorelease];
-	lastRequest = [aRequest copy]; 
-}
 
 - (void) setUpPort
 {

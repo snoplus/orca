@@ -21,8 +21,6 @@
 
 #import "ORLakeShore210Model.h"
 #import "ORSerialPort.h"
-#import "ORSerialPortList.h"
-#import "ORSerialPort.h"
 #import "ORSerialPortAdditions.h"
 #import "ORDataTypeAssigner.h"
 #import "ORDataPacket.h"
@@ -32,9 +30,6 @@
 NSString* ORLakeShore210ModelShipTemperaturesChanged	= @"ORLakeShore210ModelShipTemperaturesChanged";
 NSString* ORLakeShore210ModelUnitsTypeChanged			= @"ORLakeShore210ModelUnitsTypeChanged";
 NSString* ORLakeShore210ModelPollTimeChanged			= @"ORLakeShore210ModelPollTimeChanged";
-NSString* ORLakeShore210ModelSerialPortChanged			= @"ORLakeShore210ModelSerialPortChanged";
-NSString* ORLakeShore210ModelPortNameChanged			= @"ORLakeShore210ModelPortNameChanged";
-NSString* ORLakeShore210ModelPortStateChanged			= @"ORLakeShore210ModelPortStateChanged";
 NSString* ORLakeShore210TempArrayChanged				= @"ORLakeShore210TempArrayChanged";
 NSString* ORLakeShore210TempChanged						= @"ORLakeShore210TempChanged";
 NSString* ORLakeShore210ModelHighLimitChanged           = @"ORLakeShore210ModelHighLimitChanged";
@@ -67,12 +62,7 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
     [buffer release];
 	[cmdQueue release];
 	[lastRequest release];
-    [portName release];
-    if([serialPort isOpen]){
-        [serialPort close];
-    }
-    [serialPort release];
-	int i;
+ 	int i;
 	for(i=0;i<8;i++){
 		[timeRates[i] release];
 	}
@@ -98,11 +88,6 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 - (void) registerNotificationObservers
 {
 	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(dataReceived:)
-                         name : ORSerialPortDataReceived
-                       object : nil];
 
     [notifyCenter addObserver: self
                      selector: @selector(runStarted:)
@@ -271,78 +256,13 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 	lastRequest = [aRequest copy];    
 }
 
-- (BOOL) portWasOpen
+
+- (void) setUpPort
 {
-    return portWasOpen;
-}
-
-- (void) setPortWasOpen:(BOOL)aPortWasOpen
-{
-    portWasOpen = aPortWasOpen;
-}
-
-- (NSString*) portName
-{
-    return portName;
-}
-
-- (void) setPortName:(NSString*)aPortName
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setPortName:portName];
-    
-    if(![aPortName isEqualToString:portName]){
-        [portName autorelease];
-        portName = [aPortName copy];    
-
-        BOOL valid = NO;
-        NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
-        ORSerialPort *aPort;
-        while (aPort = [enumerator nextObject]) {
-            if([portName isEqualToString:[aPort name]]){
-                [self setSerialPort:aPort];
-                if(portWasOpen){
-                    [self openPort:YES];
-                 }
-                valid = YES;
-                break;
-            }
-        } 
-        if(!valid){
-            [self setSerialPort:nil];
-        }       
-    }
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORLakeShore210ModelPortNameChanged object:self];
-}
-
-- (ORSerialPort*) serialPort
-{
-    return serialPort;
-}
-
-- (void) setSerialPort:(ORSerialPort*)aSerialPort
-{
-    [aSerialPort retain];
-    [serialPort release];
-    serialPort = aSerialPort;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORLakeShore210ModelSerialPortChanged object:self];
-}
-
-- (void) openPort:(BOOL)state
-{
-    if(state) {
-        [serialPort open];
-		[serialPort setSpeed:9600];
-		[serialPort setParityOdd];
-		[serialPort setStopBits2:1];
-		[serialPort setDataBits:7];
-		[serialPort commitChanges];
-    }
-    else      [serialPort close];
-    portWasOpen = [serialPort isOpen];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORLakeShore210ModelPortStateChanged object:self];
-    
+    [serialPort setSpeed:9600];
+    [serialPort setParityOdd];
+    [serialPort setStopBits2:1];
+    [serialPort setDataBits:7];
 }
 
 - (double) lowLimit:(int)aChan
@@ -415,8 +335,6 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 	
 	[self setShipTemperatures:	[decoder decodeBoolForKey:	@"ORLakeShore210ModelShipTemperatures"]];
 	[self setPollTime:			[decoder decodeIntForKey:	@"ORLakeShore210ModelPollTime"]];
-	[self setPortWasOpen:		[decoder decodeBoolForKey:	@"ORLakeShore210ModelPortWasOpen"]];
-    [self setPortName:			[decoder decodeObjectForKey:@"portName"]];
 	[[self undoManager] enableUndoRegistration];
 	int i;
 	for(i=0;i<8;i++){
@@ -437,8 +355,6 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
     [encoder encodeBool:shipTemperatures	forKey: @"ORLakeShore210ModelShipTemperatures"];
     [encoder encodeInt:unitsType			forKey: @"unitsType"];
     [encoder encodeInt: pollTime			forKey: @"ORLakeShore210ModelPollTime"];
-    [encoder encodeBool:portWasOpen			forKey: @"ORLakeShore210ModelPortWasOpen"];
-    [encoder encodeObject:portName			forKey: @"portName"];
 	int i;
 	for(i=0;i<8;i++){
 		[encoder encodeDouble:lowAlarm[i] forKey: [NSString stringWithFormat:@"lowAlarm%d",i]];
@@ -452,8 +368,7 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 - (void) addCmdToQueue:(NSString*)aCmd
 {
     if([serialPort isOpen]){ 
-		if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
-		[cmdQueue addObject:aCmd];
+		[self enqueueCmd:aCmd];
 		if(!lastRequest){
 			[self processOneCommandFromQueue];
 		}
@@ -602,19 +517,18 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 
 - (void) processOneCommandFromQueue
 {
-	if([cmdQueue count] == 0) return;
-	NSString* aCmd = [[[cmdQueue objectAtIndex:0] retain] autorelease];
-	[cmdQueue removeObjectAtIndex:0];
-	
-	if([aCmd rangeOfString:@"?"].location != NSNotFound){
-		[self setLastRequest:aCmd];
-		[self performSelector:@selector(timeout) withObject:nil afterDelay:3];
-	}
-	if(![aCmd hasSuffix:@"\r\n"]) aCmd = [aCmd stringByAppendingString:@"\r\n"];
-	[serialPort writeString:aCmd];
-	if(!lastRequest){
-		[self performSelector:@selector(processOneCommandFromQueue) withObject:nil afterDelay:.01];
-	}
+	NSString* aCmd = [self nextCmd];
+	if(aCmd){
+        if([aCmd rangeOfString:@"?"].location != NSNotFound){
+            [self setLastRequest:aCmd];
+            [self performSelector:@selector(timeout) withObject:nil afterDelay:3];
+        }
+        if(![aCmd hasSuffix:@"\r\n"]) aCmd = [aCmd stringByAppendingString:@"\r\n"];
+        [serialPort writeString:aCmd];
+        if(!lastRequest){
+            [self performSelector:@selector(processOneCommandFromQueue) withObject:nil afterDelay:.01];
+        }
+    }
 }
 
 - (void) process_xrdg_response:(NSString*)theResponse args:(NSArray*)cmdArgs

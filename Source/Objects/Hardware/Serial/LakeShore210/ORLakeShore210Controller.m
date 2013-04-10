@@ -24,15 +24,9 @@
 #import "ORTimeLinePlot.h"
 #import "ORCompositePlotView.h"
 #import "ORTimeAxis.h"
-#import "ORSerialPortList.h"
 #import "ORSerialPort.h"
-#define __CARBONSOUND__ //temp until undated to >10.3
-#import <Carbon/Carbon.h>
+#import "ORSerialPortController.h"
 #import "ORTimeRate.h"
-
-@interface ORLakeShore210Controller (private)
-- (void) populatePortListPopup;
-@end
 
 @implementation ORLakeShore210Controller
 
@@ -52,7 +46,6 @@
 
 - (void) awakeFromNib
 {
-    [self populatePortListPopup];
     [[plotter0 yAxis] setRngLow:0.0 withHigh:300.];
 	[[plotter0 yAxis] setRngLimitsLow:-300.0 withHigh:500 withMinRng:4];
     [[plotter1 yAxis] setRngLow:0.0 withHigh:300.];
@@ -123,17 +116,7 @@
                          name : ORLakeShore210Lock
                         object: nil];
 
-    [notifyCenter addObserver : self
-                     selector : @selector(portNameChanged:)
-                         name : ORLakeShore210ModelPortNameChanged
-                        object: nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(portStateChanged:)
-                         name : ORSerialPortStateChanged
-                       object : nil];
-                                              
-    [notifyCenter addObserver : self
+     [notifyCenter addObserver : self
                      selector : @selector(tempChanged:)
                          name : ORLakeShore210TempChanged
                        object : nil];
@@ -177,6 +160,15 @@
                      selector : @selector(highAlarmChanged:)
                          name : ORLakeShore210ModelHighAlarmChanged
 						object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(lockChanged:)
+                         name : ORSerialPortModelPortStateChanged
+						object: model];
+
+    
+    [serialPortController registerNotificationObservers];
+
 
 }
 
@@ -184,9 +176,7 @@
 {
     [super updateWindow];
     [self lockChanged:nil];
-    [self portStateChanged:nil];
-    [self portNameChanged:nil];
-	[self tempChanged:nil];
+ 	[self tempChanged:nil];
 	[self pollTimeChanged:nil];
 	[self unitsTypeChanged:nil];
 	[self shipTemperaturesChanged:nil];
@@ -194,6 +184,13 @@
     [self miscAttributesChanged:nil];
 	[self highLimitChanged:nil];
 	[self highAlarmChanged:nil];
+	[serialPortController updateWindow];
+}
+
+- (void) setModel:(id)aModel
+{
+	[super setModel:aModel];
+	[[self window] setTitle:[NSString stringWithFormat:@"LakeShore 210 (Unit %lu)",[model uniqueIdNumber]]];
 }
 
 - (void) highLimitChanged:(NSNotification*)aNote
@@ -325,6 +322,11 @@
     [lockButton setEnabled:secure];
 }
 
+- (BOOL) portLocked
+{
+	return [gSecurity isLocked:ORLakeShore210Lock];;
+}
+
 - (void) lockChanged:(NSNotification*)aNotification
 {
 
@@ -333,9 +335,8 @@
     BOOL locked = [gSecurity isLocked:ORLakeShore210Lock];
 
     [lockButton setState: locked];
+	[serialPortController updateButtons:locked];
 
-    [portListPopup setEnabled:!locked];
-    [openPortButton setEnabled:!locked];
     [pollTimePopup setEnabled:!locked];
     [shipTemperaturesButton setEnabled:!locked];
     
@@ -347,52 +348,10 @@
 
 }
 
-- (void) portStateChanged:(NSNotification*)aNotification
-{
-    if(aNotification == nil || [aNotification object] == [model serialPort]){
-        if([model serialPort]){
-            [openPortButton setEnabled:YES];
-
-            if([[model serialPort] isOpen]){
-                [openPortButton setTitle:@"Close"];
-                [portStateField setTextColor:[NSColor colorWithCalibratedRed:0.0 green:.8 blue:0.0 alpha:1.0]];
-                [portStateField setStringValue:@"Open"];
-            }
-            else {
-                [openPortButton setTitle:@"Open"];
-                [portStateField setStringValue:@"Closed"];
-                [portStateField setTextColor:[NSColor redColor]];
-            }
-        }
-        else {
-            [openPortButton setEnabled:NO];
-            [portStateField setTextColor:[NSColor blackColor]];
-            [portStateField setStringValue:@"---"];
-            [openPortButton setTitle:@"---"];
-        }
-    }
-}
 
 - (void) pollTimeChanged:(NSNotification*)aNotification
 {
 	[pollTimePopup selectItemWithTag:[model pollTime]];
-}
-
-- (void) portNameChanged:(NSNotification*)aNotification
-{
-    NSString* portName = [model portName];
-    
-	NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
-	ORSerialPort *aPort;
-
-    [portListPopup selectItemAtIndex:0]; //the default
-    while (aPort = [enumerator nextObject]) {
-        if([portName isEqualToString:[aPort name]]){
-            [portListPopup selectItemWithTitle:portName];
-            break;
-        }
-	}  
-    [self portStateChanged:nil];
 }
 
 
@@ -411,16 +370,6 @@
 - (IBAction) lockAction:(id) sender
 {
     [gSecurity tryToSetLock:ORLakeShore210Lock to:[sender intValue] forWindow:[self window]];
-}
-
-- (IBAction) portListAction:(id) sender
-{
-    [model setPortName: [portListPopup titleOfSelectedItem]];
-}
-
-- (IBAction) openPortAction:(id)sender
-{
-    [model openPort:![[model serialPort] isOpen]];
 }
 
 - (IBAction) readTempsAction:(id)sender
@@ -504,19 +453,3 @@
 
 
 @end
-
-@implementation ORLakeShore210Controller (private)
-
-- (void) populatePortListPopup
-{
-	NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
-	ORSerialPort *aPort;
-    [portListPopup removeAllItems];
-    [portListPopup addItemWithTitle:@"--"];
-
-	while (aPort = [enumerator nextObject]) {
-        [portListPopup addItemWithTitle:[aPort name]];
-	}    
-}
-@end
-

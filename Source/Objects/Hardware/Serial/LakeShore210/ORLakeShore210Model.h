@@ -19,8 +19,8 @@
 
 #pragma mark ***Imported Files
 #import "ORAdcProcessing.h"
+#import "ORSerialPortWithQueueModel.h"
 
-@class ORSerialPort;
 @class ORTimeRate;
 
 #define kLakeShore210Kelvin		0
@@ -28,15 +28,10 @@
 #define kLakeShore210Raw		2
 
 
-@interface ORLakeShore210Model : OrcaObject <ORAdcProcessing>
+@interface ORLakeShore210Model : ORSerialPortWithQueueModel <ORAdcProcessing>
 {
     @private
-        NSString*       portName;
-        BOOL            portWasOpen;
-        ORSerialPort*   serialPort;
         unsigned long	dataId;
-		NSString*		lastRequest;
-		NSMutableArray* cmdQueue;
 		float		    temp[8];
 		unsigned long	timeMeasured[8];
 		int				pollTime;
@@ -65,15 +60,6 @@
 - (void) setShipTemperatures:(BOOL)aShipTemperatures;
 - (int) pollTime;
 - (void) setPollTime:(int)aPollTime;
-- (ORSerialPort*) serialPort;
-- (void) setSerialPort:(ORSerialPort*)aSerialPort;
-- (BOOL) portWasOpen;
-- (void) setPortWasOpen:(BOOL)aPortWasOpen;
-- (NSString*) portName;
-- (void) setPortName:(NSString*)aPortName;
-- (NSString*) lastRequest;
-- (void) setLastRequest:(NSString*)aRequest;
-- (void) openPort:(BOOL)state;
 - (float) temp:(int)index;
 - (unsigned long) timeMeasured:(int)index;
 - (void) setTemp:(int)index value:(float)aValue;
