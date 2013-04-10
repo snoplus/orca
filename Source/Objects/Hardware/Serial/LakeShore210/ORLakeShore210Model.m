@@ -37,7 +37,10 @@ NSString* ORLakeShore210ModelPortNameChanged			= @"ORLakeShore210ModelPortNameCh
 NSString* ORLakeShore210ModelPortStateChanged			= @"ORLakeShore210ModelPortStateChanged";
 NSString* ORLakeShore210TempArrayChanged				= @"ORLakeShore210TempArrayChanged";
 NSString* ORLakeShore210TempChanged						= @"ORLakeShore210TempChanged";
-
+NSString* ORLakeShore210ModelHighLimitChanged           = @"ORLakeShore210ModelHighLimitChanged";
+NSString* ORLakeShore210ModelHighAlarmChanged           = @"ORLakeShore210ModelHighAlarmChanged";
+NSString* ORLakeShore210ModelLowLimitChanged            = @"ORLakeShore210ModelLowLimitChanged";
+NSString* ORLakeShore210ModelLowAlarmChanged            = @"ORLakeShore210ModelLowAlarmChanged";
 NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 
 @interface ORLakeShore210Model (private)
@@ -342,6 +345,63 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
     
 }
 
+- (double) lowLimit:(int)aChan
+{
+	if(aChan>=0 && aChan<6)return lowLimit[aChan];
+	else return 1;
+}
+
+- (void) setLowLimit:(int)aChan value:(double)aValue
+{
+	if(aChan>=0 && aChan<6){
+		[[[self undoManager] prepareWithInvocationTarget:self] setLowLimit:aChan value:lowLimit[aChan]];
+		lowLimit[aChan] = aValue;
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORLakeShore210ModelLowLimitChanged object:self];
+	}
+}
+- (double) highLimit:(int)aChan
+{
+	if(aChan>=0 && aChan<6)return highLimit[aChan];
+	else return 1;
+}
+
+- (void) setHighLimit:(int)aChan value:(double)aValue
+{
+	if(aChan>=0 && aChan<6){
+		[[[self undoManager] prepareWithInvocationTarget:self] setHighLimit:aChan value:highLimit[aChan]];
+		highLimit[aChan] = aValue;
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORLakeShore210ModelHighLimitChanged object:self];
+	}
+}
+- (double) lowAlarm:(int)aChan
+{
+	if(aChan>=0 && aChan<6)return lowAlarm[aChan];
+	else return 1;
+}
+
+- (void) setLowAlarm:(int)aChan value:(double)aValue
+{
+	if(aChan>=0 && aChan<6){
+		[[[self undoManager] prepareWithInvocationTarget:self] setHighAlarm:aChan value:lowAlarm[aChan]];
+		lowAlarm[aChan] = aValue;
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORLakeShore210ModelLowAlarmChanged object:self];
+	}
+}
+
+- (double) highAlarm:(int)aChan
+{
+	if(aChan>=0 && aChan<6)return highAlarm[aChan];
+	else return 1;
+}
+
+- (void) setHighAlarm:(int)aChan value:(double)aValue
+{
+	if(aChan>=0 && aChan<6){
+		[[[self undoManager] prepareWithInvocationTarget:self] setHighAlarm:aChan value:highAlarm[aChan]];
+		highAlarm[aChan] = aValue;
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORLakeShore210ModelHighAlarmChanged object:self];
+	}
+}
 
 #pragma mark ***Archival
 - (id) initWithCoder:(NSCoder*)decoder
@@ -359,8 +419,13 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
     [self setPortName:			[decoder decodeObjectForKey:@"portName"]];
 	[[self undoManager] enableUndoRegistration];
 	int i;
-	for(i=0;i<8;i++)timeRates[i] = [[ORTimeRate alloc] init];
-
+	for(i=0;i<8;i++){
+        timeRates[i] = [[ORTimeRate alloc] init];
+		[self setLowAlarm:i value:[decoder decodeDoubleForKey: [NSString stringWithFormat:@"lowAlarm%d",i]]];
+		[self setHighAlarm:i value:[decoder decodeDoubleForKey: [NSString stringWithFormat:@"highAlarm%d",i]]];
+		[self setLowLimit:i value:[decoder decodeDoubleForKey: [NSString stringWithFormat:@"lowLimit%d",i]]];
+		[self setHighLimit:i value:[decoder decodeDoubleForKey: [NSString stringWithFormat:@"highLimit%d",i]]];
+    }
     [self registerNotificationObservers];
 
 	return self;
@@ -374,6 +439,13 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
     [encoder encodeInt: pollTime			forKey: @"ORLakeShore210ModelPollTime"];
     [encoder encodeBool:portWasOpen			forKey: @"ORLakeShore210ModelPortWasOpen"];
     [encoder encodeObject:portName			forKey: @"portName"];
+	int i;
+	for(i=0;i<8;i++){
+		[encoder encodeDouble:lowAlarm[i] forKey: [NSString stringWithFormat:@"lowAlarm%d",i]];
+		[encoder encodeDouble:lowLimit[i] forKey: [NSString stringWithFormat:@"lowLimit%d",i]];
+		[encoder encodeDouble:highAlarm[i] forKey: [NSString stringWithFormat:@"highAlarm%d",i]];
+		[encoder encodeDouble:highLimit[i] forKey: [NSString stringWithFormat:@"highLimit%d",i]];
+	}
 }
 
 #pragma mark *** Commands
@@ -433,7 +505,83 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
     
     return dataDictionary;
 }
+#pragma mark •••Adc Processing Protocol
+- (void) processIsStarting { }
+- (void) processIsStopping { }
+- (void) startProcessCycle { }
+- (void) endProcessCycle   { }
 
+- (NSString*) identifier
+{
+	NSString* s;
+ 	@synchronized(self){
+		s= [NSString stringWithFormat:@"LakeShore210,%lu",[self uniqueIdNumber]];
+	}
+	return s;
+}
+
+- (NSString*) processingTitle
+{
+	NSString* s;
+ 	@synchronized(self){
+		s= [self identifier];
+	}
+	return s;
+}
+
+- (double) convertedValue:(int)aChan
+{
+	double theValue = 0;
+	@synchronized(self){
+		if(aChan>=0 && aChan<8)theValue =  temp[aChan];
+ 	}
+	return theValue;
+}
+
+- (double) maxValueForChan:(int)aChan
+{
+	double theValue;
+	@synchronized(self){
+        if(aChan>=0 && aChan<8) theValue = highLimit[aChan];
+		else         theValue = 1.0;
+	}
+	return theValue;
+}
+
+- (double) minValueForChan:(int)aChan
+{
+	double theValue;
+	@synchronized(self){
+        if(aChan>=0 && aChan<8) theValue = lowLimit[aChan];
+		else         theValue = 1.0;
+	}
+	return theValue;
+}
+
+- (void) getAlarmRangeLow:(double*)theLowAlarm high:(double*)theHighAlarm channel:(int)aChan
+{
+	@synchronized(self){
+        if(aChan>=0 && aChan<8) {
+            *theLowAlarm   = lowAlarm[aChan];
+            *theHighAlarm = highAlarm[aChan];
+        }
+        else {
+			*theLowAlarm = 0;
+            *theHighAlarm = 1E-4;
+        }
+	}
+}
+
+- (BOOL) processValue:(int)aChan
+{
+	BOOL r = 0;
+	@synchronized(self){
+		if(aChan>=0 && aChan<8)r =  temp[aChan];
+    }
+	return r;
+}
+
+- (void) setProcessOutput:(int)channel value:(int)value { }
 @end
 
 @implementation ORLakeShore210Model (private)

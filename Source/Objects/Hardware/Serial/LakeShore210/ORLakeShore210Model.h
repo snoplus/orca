@@ -18,6 +18,7 @@
 //-------------------------------------------------------------
 
 #pragma mark ***Imported Files
+#import "ORAdcProcessing.h"
 
 @class ORSerialPort;
 @class ORTimeRate;
@@ -27,7 +28,7 @@
 #define kLakeShore210Raw		2
 
 
-@interface ORLakeShore210Model : OrcaObject
+@interface ORLakeShore210Model : OrcaObject <ORAdcProcessing>
 {
     @private
         NSString*       portName;
@@ -43,6 +44,10 @@
         NSMutableString*       buffer;
 		BOOL			shipTemperatures;
 		ORTimeRate*		timeRates[8];
+        double			lowLimit[8];
+        double			lowAlarm[8];
+        double			highLimit[8];
+        double			highAlarm[8];
 }
 
 #pragma mark ***Initialization
@@ -72,6 +77,14 @@
 - (float) temp:(int)index;
 - (unsigned long) timeMeasured:(int)index;
 - (void) setTemp:(int)index value:(float)aValue;
+- (double) lowLimit:(int)aChan;
+- (void) setLowLimit:(int)aChan value:(double)aValue;
+- (double) highLimit:(int)aChan;
+- (void) setHighLimit:(int)aChan value:(double)aValue;
+- (double) highAlarm:(int)aChan;
+- (void) setHighAlarm:(int)aChan value:(double)aValue;
+- (double) lowAlarm:(int)aChan;
+- (void) setLowAlarm:(int)aChan value:(double)aValue;
 
 
 #pragma mark ***Data Records
@@ -91,9 +104,22 @@
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 
+#pragma mark •••Adc Processing Protocol
+- (double) lowLimit:(int)aChan;
+- (void) setLowLimit:(int)aChan value:(double)aValue;
+- (double) highLimit:(int)aChan;
+- (void) setHighLimit:(int)aChan value:(double)aValue;
+- (double) highAlarm:(int)aChan;
+- (void) setHighAlarm:(int)aChan value:(double)aValue;
+- (double) lowAlarm:(int)aChan;
+- (void) setLowAlarm:(int)aChan value:(double)aValue;
+
 @end
 
-
+extern NSString* ORLakeShore210ModelLowLimitChanged;
+extern NSString* ORLakeShore210ModelLowAlarmChanged;
+extern NSString* ORLakeShore210ModelHighLimitChanged;
+extern NSString* ORLakeShore210ModelHighAlarmChanged;
 extern NSString* ORLakeShore210ModelShipTemperaturesChanged;
 extern NSString* ORLakeShore210ModelUnitsTypeChanged;
 extern NSString* ORLakeShore210ModelPollTimeChanged;

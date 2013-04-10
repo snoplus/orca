@@ -35,6 +35,7 @@
     IBOutlet NSButton*      readTempsButton;
     IBOutlet NSMatrix*      tempMatrix;
     IBOutlet NSMatrix*      timeMatrix;
+	IBOutlet NSTableView*	processLimitTableView;
 	IBOutlet ORCompositeTimeLineView*	plotter0;
 	IBOutlet ORCompositeTimeLineView*	plotter1;
 }
@@ -62,6 +63,8 @@
 - (void) miscAttributesChanged:(NSNotification*)aNotification;
 - (void) scaleAction:(NSNotification*)aNotification;
 - (void) loadTempTimeValuesForIndex:(int)index;
+- (void) highLimitChanged:(NSNotification*)aNote;
+- (void) highAlarmChanged:(NSNotification*)aNote;
 
 #pragma mark ***Actions
 - (IBAction) shipTemperaturesAction:(id)sender;
@@ -72,8 +75,14 @@
 - (IBAction) readTempsAction:(id)sender;
 - (IBAction) pollTimeAction:(id)sender;
 
+#pragma mark ***Plotter Data Source
 - (int) numberPointsInPlot:(id)aPlotter;
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
+
+#pragma mark ***Pressure Table Data Source
+- (int)numberOfRowsInTableView:(NSTableView *)aTableView;
+- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn
+			 row:(int) rowIndex;
 
 @end
 

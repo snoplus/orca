@@ -168,6 +168,16 @@
                          name : ORLakeShore210ModelUnitsTypeChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(highLimitChanged:)
+                         name : ORLakeShore210ModelHighLimitChanged
+						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(highAlarmChanged:)
+                         name : ORLakeShore210ModelHighAlarmChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -182,8 +192,19 @@
 	[self shipTemperaturesChanged:nil];
 	[self updateTimePlot:nil];
     [self miscAttributesChanged:nil];
+	[self highLimitChanged:nil];
+	[self highAlarmChanged:nil];
 }
 
+- (void) highLimitChanged:(NSNotification*)aNote
+{
+	[processLimitTableView reloadData];
+}
+
+- (void) highAlarmChanged:(NSNotification*)aNote
+{
+	[processLimitTableView reloadData];
+}
 - (void) scaleAction:(NSNotification*)aNotification
 {
 	if(aNotification == nil || [aNotification object] == [plotter0 xAxis]){
@@ -428,6 +449,59 @@
 	*xValue = [[model timeRate:set] timeSampledAtIndex:index];
 	*yValue = [[model timeRate:set] valueAtIndex:index];
 }
+
+#pragma mark ¥¥¥Table Data Source
+- (int) numberOfRowsInTableView:(NSTableView *)aTableView
+{
+	return 8;
+}
+
+- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
+{
+    if(aTableView == processLimitTableView){
+		if([[aTableColumn identifier] isEqualToString:@"channel"]){
+			return [NSNumber numberWithInt:rowIndex];
+		}
+		else if([[aTableColumn identifier] isEqualToString:@"hiLimit"]){
+			return [NSString stringWithFormat:@"%.2f",[model highLimit:rowIndex]];
+		}
+		else if([[aTableColumn identifier] isEqualToString:@"lowLimit"]){
+			return [NSString stringWithFormat:@"%.2f",[model lowLimit:rowIndex]];
+		}
+		else if([[aTableColumn identifier] isEqualToString:@"lowAlarm"]){
+			return [NSString stringWithFormat:@"%.2f",[model lowAlarm:rowIndex]];
+		}
+		else if([[aTableColumn identifier] isEqualToString:@"hiAlarm"]){
+			return [NSString stringWithFormat:@"%.2f",[model highAlarm:rowIndex]];
+		}
+		else return @"";
+	}
+	else return @"";
+}
+
+- (void)tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+{
+    if(anObject == nil)return;
+    
+	if(aTableView == processLimitTableView){
+		
+        if([[aTableColumn identifier] isEqualToString:@"Channel"]) return;
+		
+        if([[aTableColumn identifier] isEqualToString:@"hiLimit"]){
+			[model setHighLimit:rowIndex value:[anObject doubleValue]];
+		}
+        else if([[aTableColumn identifier] isEqualToString:@"lowLimit"]){
+			[model setLowLimit:rowIndex value:[anObject doubleValue]];
+		}
+        else if([[aTableColumn identifier] isEqualToString:@"lowAlarm"]){
+			[model setLowAlarm:rowIndex value:[anObject doubleValue]];
+		}
+        else if([[aTableColumn identifier] isEqualToString:@"hiAlarm"]){
+			[model setHighAlarm:rowIndex value:[anObject doubleValue]];
+		}
+    }
+}
+
 
 @end
 
