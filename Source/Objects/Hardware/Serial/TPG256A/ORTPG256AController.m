@@ -317,9 +317,9 @@
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORTPG256ALock];
     BOOL locked = [gSecurity isLocked:ORTPG256ALock];
 
-	[serialPortController updateButtons:locked];
 
     [lockButton setState: locked];
+	[serialPortController updateButtons:locked];
 
     [pollTimePopup	setEnabled:!locked];
     [unitsPU		setEnabled:!locked];

@@ -98,7 +98,7 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
                      selector: @selector(runStopped:)
                          name: ORRunStoppedNotification
                        object: nil];
-
+    [super registerNotificationObservers];
 }
 
 - (void) dataReceived:(NSNotification*)note
