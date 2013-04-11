@@ -110,7 +110,7 @@
 		unsigned long   writeValue;
 		unsigned long	eventDataId;//TODO: remove or change -tb-
 		unsigned long	multiplicityId;//TODO: remove -tb-
-		unsigned long	adcTraceId;
+		unsigned long	waveFormId;
 		unsigned long   eventCounter;
 		int				actualPageIndex;
         TimedWorker*    poller;
@@ -193,8 +193,12 @@
     
     //data taking: flags and vars
     int takeUDPstreamData;
+    int takeRawUDPData;
+    int takeADCChannelData;
     int takeEventData;
     int savedUDPSocketState;
+    
+    //BB interface
     int idBBforWCommand;
     bool useBroadcastIdBB;
     NSString * chargeBBFile;
@@ -215,6 +219,10 @@
 - (void) runIsStartingSubRun:(NSNotification*)aNote;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+- (int) takeADCChannelData;
+- (void) setTakeADCChannelData:(int)aTakeADCChannelData;
+- (int) takeRawUDPData;
+- (void) setTakeRawUDPData:(int)aTakeRawUDPData;
 - (NSString *) chargeBBFile;
 - (void) setChargeBBFile:(NSString *)aChargeBBFile;
 - (bool) useBroadcastIdBB;
@@ -434,8 +442,8 @@
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 
-- (unsigned long) adcTraceId;
-- (void) setAdcTraceId: (unsigned long) DataId;
+- (unsigned long) waveFormId;
+- (void) setWaveFormId: (unsigned long) DataId;
 - (unsigned long) eventDataId;
 - (void) setEventDataId: (unsigned long) DataId;
 - (unsigned long) multiplicityId;
@@ -447,6 +455,7 @@
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) shipUDPPacket:(ORDataPacket*)aDataPacket data:(char*)udpPacket len:(int)len index:(int)aIndex type:(int)t;
 - (void) saveReadOutList:(NSFileHandle*)aFile;
 - (void) loadReadOutList:(NSFileHandle*)aFile;
 - (BOOL) doneTakingData;
@@ -472,6 +481,8 @@
 
 @end
 
+extern NSString* OREdelweissSLTModelTakeADCChannelDataChanged;
+extern NSString* OREdelweissSLTModelTakeRawUDPDataChanged;
 extern NSString* OREdelweissSLTModelChargeBBFileChanged;
 extern NSString* OREdelweissSLTModelUseBroadcastIdBBChanged;
 extern NSString* OREdelweissSLTModelIdBBforWCommandChanged;

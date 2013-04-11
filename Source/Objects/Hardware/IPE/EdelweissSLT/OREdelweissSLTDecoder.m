@@ -249,7 +249,7 @@ followed by multiplicity data (20 longwords -- 1 pixel mask per card)
 
 
 
-@implementation OREdelweissSLTDecoderForADCTrace
+@implementation OREdelweissSLTDecoderForWaveForm
 
 //-------------------------------------------------------------
 /** Data format for waveform
@@ -268,7 +268,7 @@ followed by multiplicity data (20 longwords -- 1 pixel mask per card)
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx sec
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx subSec
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx 
- ------------------- ^^^^ ^^^^ ^^^^ ^^^^ total channel number  (16bit)  
+ ------------------- ^^^^ ^^^^ ^^^^ ^^^^ total channel number (or index) (16bit)  
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx eventID:
  -----------------^^---------------------precision
  --------------------^^^^ ^^-------------number of page in hardware buffer
@@ -377,7 +377,7 @@ startIndex=0;
 //TODO: what is the best value for the 'mask'? 0xFFFF is appropriate for shorts ... -tb-
 
 
-if(eventFlags==1){
+if(eventFlags & 0x1){
 	[aDataSet loadWaveform: waveFormdata					//pass in the whole data set
 					offset: 9*sizeof(long)					// Offset in bytes (past header words)
 				  unitSize: sizeof(short)					// unit size in bytes
@@ -386,7 +386,7 @@ if(eventFlags==1){
 			   specialBits:0x0000	
 				  bitNames: [NSArray arrayWithObjects:nil]
 					sender: self 
-				  withKeys: @"SLTv4-EW", @"UDP",crateKey,stationKey,fiberKey,channelKey,nil];
+				  withKeys: @"IPE-SLT-EW", @"UDP-Raw",crateKey,stationKey,fiberKey,channelKey,nil];
 }else{
 	[aDataSet loadWaveform: waveFormdata					//pass in the whole data set
 					offset: 9*sizeof(long)					// Offset in bytes (past header words)
@@ -396,7 +396,7 @@ if(eventFlags==1){
 			   specialBits:0x0000	
 				  bitNames: [NSArray arrayWithObjects:nil]
 					sender: self 
-				  withKeys: @"IPE-SLT", @"ADC-Channels",crateKey,stationKey,totalChannelKey,nil];
+				  withKeys: @"IPE-SLT-EW", @"UDP-ADC-Channels",crateKey,stationKey,totalChannelKey,nil];
 				 // withKeys: @"IPE-SLT", @"ADCChannels",crateKey,stationKey,fiberKey,channelKey,nil];
 }
 

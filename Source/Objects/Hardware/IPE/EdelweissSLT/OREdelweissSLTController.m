@@ -311,9 +311,29 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
                          name : OREdelweissSLTModelChargeBBFileChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(takeRawUDPDataChanged:)
+                         name : OREdelweissSLTModelTakeRawUDPDataChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(takeADCChannelDataChanged:)
+                         name : OREdelweissSLTModelTakeADCChannelDataChanged
+						object: model];
+
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+
+- (void) takeADCChannelDataChanged:(NSNotification*)aNote
+{
+	[takeADCChannelDataCB setIntValue: [model takeADCChannelData]];
+}
+
+- (void) takeRawUDPDataChanged:(NSNotification*)aNote
+{
+	[takeRawUDPDataCB setIntValue: [model takeRawUDPData]];
+}
 
 - (void) chargeBBFileChanged:(NSNotification*)aNote
 {
@@ -656,6 +676,8 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	[self idBBforWCommandChanged:nil];
 	[self useBroadcastIdBBChanged:nil];
 	[self chargeBBFileChanged:nil];
+	[self takeRawUDPDataChanged:nil];
+	[self takeADCChannelDataChanged:nil];
 }
 
 
@@ -803,6 +825,16 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 }
 
 #pragma mark ***Actions
+
+- (void) takeADCChannelDataCBAction:(id)sender
+{
+	[model setTakeADCChannelData:[sender intValue]];	
+}
+
+- (void) takeRawUDPDataCBAction:(id)sender
+{
+	[model setTakeRawUDPData:[sender intValue]];	
+}
 
 - (void) chargeBBFileTextFieldAction:(id)sender
 {

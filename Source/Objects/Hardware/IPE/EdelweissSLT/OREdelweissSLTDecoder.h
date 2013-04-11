@@ -40,7 +40,7 @@
 
 
 
-@interface OREdelweissSLTDecoderForADCTrace : ORIpeCardDecoder {
+@interface OREdelweissSLTDecoderForWaveForm : ORIpeCardDecoder {
 	@private 
 		BOOL getRatesFromDecodeStage;
 		NSMutableDictionary* actualFlts;

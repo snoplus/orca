@@ -44,6 +44,8 @@
 		IBOutlet NSPopUpButton* sltDAQModePU;
 	IBOutlet   NSButton* takeEventDataCB;
 	IBOutlet   NSButton* takeUDPstreamDataCB;
+	IBOutlet   NSButton* takeADCChannelDataCB;
+	IBOutlet   NSButton* takeRawUDPDataCB;
         
         //UDP Data tab ----
 	IBOutlet   NSTextField* numRequestedUDPPacketsTextField;
@@ -162,6 +164,8 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+- (void) takeADCChannelDataChanged:(NSNotification*)aNote;
+- (void) takeRawUDPDataChanged:(NSNotification*)aNote;
 - (void) chargeBBFileChanged:(NSNotification*)aNote;
 - (void) useBroadcastIdBBChanged:(NSNotification*)aNote;
 - (void) idBBforWCommandChanged:(NSNotification*)aNote;
@@ -224,6 +228,8 @@
 - (IBAction) idBBforWCommandTextFieldAction:(id)sender;
 - (IBAction) takeEventDataCBAction:(id)sender;
 - (IBAction) takeUDPstreamDataCBAction:(id)sender;
+- (IBAction) takeADCChannelDataCBAction:(id)sender;
+- (IBAction) takeRawUDPDataCBAction:(id)sender;
 - (IBAction) crateUDPDataCommandTextFieldAction:(id)sender;
 - (IBAction) BBCmdFFMaskTextFieldAction:(id)sender;
 - (IBAction) BBCmdFFMaskMatrixAction:(id)sender;
