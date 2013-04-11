@@ -39,6 +39,38 @@
     [super dealloc];
 }
 
+- (int) tagToAdc:(int)aTag
+{
+    NSAssert(aTag>=0 && aTag<16 , @"Tag out of Bounds");
+    int tagConversion[16] = {0,1,2,3,4,8,9,10,11,12,7,15,5,6,13,14};
+    return tagConversion[aTag];
+}
+
+- (NSString*) nameForTag:(int)aTag
+{
+    NSAssert(aTag>=0 && aTag<16 , @"Tag out of Bounds");
+    int tagString[16] = {
+        @"Adc0",
+        @"Adc1",
+        @"Adc2",
+        @"Adc3",
+        @"Adc4",
+        @"Adc8",
+        @"Adc9",
+        @"Adc10",
+        @"Adc11",
+        @"Adc12",
+        @"Adc7",
+        @"Adc15",
+        @"Adc5",
+        @"Adc6",
+        @"Adc13",
+        @"Adc14"
+    };
+    return tagString[aTag];
+}
+
+
 - (void) awakeFromNib
 {
     [super  awakeFromNib];
@@ -82,44 +114,53 @@
     [[plotter3 xAxis] setRngLow:0.0 withHigh:10000];
 	[[plotter3 xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
 	
-	NSColor* color[4] = {
+	NSColor* color[5] = {
 		[NSColor redColor],
 		[NSColor greenColor],
 		[NSColor blueColor],
 		[NSColor brownColor],
+		[NSColor blackColor],
 	};
+    
 	int i;
-	for(i=0;i<4;i++){
-		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:i andDataSource:self];
+    int tag=0;
+	for(i=0;i<5;i++){
+		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:tag andDataSource:self];
 		[plotter0 addPlot: aPlot];
 		[aPlot setLineColor:color[i]];
-		[aPlot setName:[NSString stringWithFormat:@"Adc%d",i]];
+		[aPlot setName:[self nameForTag:tag]];
 		[(ORTimeAxis*)[plotter0 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 		[aPlot release];
+        tag++;
 	}
-	for(i=0;i<4;i++){
-		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:i+4 andDataSource:self];
+
+	for(i=0;i<5;i++){
+		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:tag andDataSource:self];
 		[plotter1 addPlot: aPlot];
 		[aPlot setLineColor:color[i]];
-		[aPlot setName:[NSString stringWithFormat:@"Adc%d",i+4]];
+		[aPlot setName:[self nameForTag:tag]];
 		[(ORTimeAxis*)[plotter1 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 		[aPlot release];
+        tag++;
 	}
-	for(i=0;i<4;i++){
-		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:i+8 andDataSource:self];
+    
+	for(i=0;i<2;i++){
+		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:tag andDataSource:self];
 		[plotter2 addPlot: aPlot];
 		[aPlot setLineColor:color[i]];
-		[aPlot setName:[NSString stringWithFormat:@"Adc%d",i+8]];
+		[aPlot setName:[self nameForTag:tag]];
 		[(ORTimeAxis*)[plotter2 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 		[aPlot release];
+        tag++;
 	}
 	for(i=0;i<4;i++){
-		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:i+12 andDataSource:self];
+		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:tag andDataSource:self];
 		[plotter3 addPlot: aPlot];
 		[aPlot setLineColor:color[i]];
-		[aPlot setName:[NSString stringWithFormat:@"Adc%d",i+12]];
+		[aPlot setName:[self nameForTag:tag]];
 		[(ORTimeAxis*)[plotter3 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 		[aPlot release];
+        tag++;
 	}
 	
 	[plotter0 setShowLegend:YES];
@@ -753,11 +794,11 @@
 
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
-	int set = [aPlotter tag];
-	int count = [[model timeRate:set] count];
+    int adc = [self tagToAdc:[aPlotter tag]];
+	int count = [[model timeRate:adc] count];
 	int index = count-i-1;
-	*xValue = [[model timeRate:set] timeSampledAtIndex:index];
-	*yValue = [[model timeRate:set] valueAtIndex:index];
+	*xValue = [[model timeRate:adc] timeSampledAtIndex:index];
+	*yValue = [[model timeRate:adc] valueAtIndex:index];
 }
 
 @end

@@ -94,6 +94,8 @@
 - (void) feedbackResistorChanged:(NSNotification*)aNote;
 - (void) baselineVoltageArrayChanged:(NSNotification*)aNote;
 - (void) baselineVoltageChanged:(NSNotification*)aNote;
+- (int) tagToAdc:(int)aTag;
+- (NSString*) nameForTag:(int)aTag;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) adcEnabledMaskAction:(id)sender;
