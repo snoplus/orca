@@ -49,7 +49,7 @@
 - (NSString*) nameForTag:(int)aTag
 {
     NSAssert(aTag>=0 && aTag<16 , @"Tag out of Bounds");
-    int tagString[16] = {
+    NSString* tagString[16] = {
         @"Adc0",
         @"Adc1",
         @"Adc2",
