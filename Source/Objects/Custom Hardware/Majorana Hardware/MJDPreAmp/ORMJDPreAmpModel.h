@@ -122,6 +122,7 @@
 - (void) writeRangeForAdcChip:(int)index;
 - (void) writeAdcChipRanges;
 - (void) readAdcsOnChip:(int)aChip;
+- (void) readTempOnChip:(int)aChip; // niko
 - (void) readAdcs;
 - (void) pollValues;
 - (unsigned long) writeAuxIOSPI:(unsigned long)aValue;

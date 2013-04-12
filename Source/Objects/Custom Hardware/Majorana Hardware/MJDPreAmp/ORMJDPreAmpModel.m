@@ -70,13 +70,16 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 
 #define kADCRange10Reg1		0x00A000
 #define kADCRange5Reg1		0x00AAA0
-#define kADCRange2_5Reg1	0x00BA40
+//#define kADCRange2_5Reg1	0x00BA40
+#define kADCRange2_5Reg1	0x00B540 // niko
 
 #define kADCRange10Reg2		0x00C000
 #define kADCRange5Reg2		0x00CAA0
-#define kADCRange2_5Reg2	0x00DA40
+//#define kADCRange2_5Reg2	0x00DA40
+#define kADCRange2_5Reg2	0x00D540 // niko
 
-#define kReadAdcChannel0 0x00801000
+
+#define kReadAdcChannel0 0x00801000 // 8 single-ended inputs mode
 #define kReadAdcChannel1 0x00841000
 #define kReadAdcChannel2 0x00881000
 #define kReadAdcChannel3 0x008C1000
@@ -85,7 +88,7 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 #define kReadAdcChannel6 0x00981000
 #define kReadAdcChannel7 0x009C1000
 
-
+#define kReadTempChannel7 0x009F1000 // 7 pseudo-differential inputs mode, temperature read out from channel 7 - niko
 
 
 @implementation ORMJDPreAmpModel
@@ -316,7 +319,7 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 {
     if(aChan<[baselineVoltages count]){
 		[[[self undoManager] prepareWithInvocationTarget:self] setBaselineVoltage:aChan value:[self baselineVoltage:aChan]];
-		[feedBackResistors replaceObjectAtIndex:aChan withObject:[NSNumber numberWithFloat:aValue]];
+		[baselineVoltages replaceObjectAtIndex:aChan withObject:[NSNumber numberWithFloat:aValue]];
         
 		NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
 		[userInfo setObject:[NSNumber numberWithFloat:aChan] forKey: @"Channel"];
@@ -649,58 +652,116 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 
 - (void) readAdcsOnChip:(int)aChip
 {
-	if(aChip<0 || aChip>1) return;
+
+    [self readTempOnChip:aChip];
+
+    /*
+    if(aChip<0 || aChip>1) return;
     
-	[self writeRangeForAdcChip:aChip ];
-    float voltageMultiplier = 10./pow(2.,adcRange[aChip]+12);
+    [self writeRangeForAdcChip:aChip ];
+    //float voltageMultiplier = 10./pow(2.,adcRange[aChip]+12); 
+    float voltageBase = 10./pow(2.,adcRange[aChip]+12); // dynamic range should not be hard coded, not sure about purpose of adcRange as is either  - niko
+    float voltageMultiplier = 2.; // account for voltage multiplier of 2 for +/-12V hard wired on ADC chip 1 and for first five channels of both ADC chips - niko
     
-	unsigned long adcBase = kADC1;
+    unsigned long adcBase = kADC1;
     if(aChip) adcBase = kADC2;
 	unsigned long channelSelect[8] = {
 		kReadAdcChannel0,kReadAdcChannel1,kReadAdcChannel2,kReadAdcChannel3,
 		kReadAdcChannel4,kReadAdcChannel5,kReadAdcChannel6,kReadAdcChannel7,
 	};
     
-	//have to select a channel to be digitized, then the next time a selection is done the last channel can be read
-	int i;
+    //have to select a channel to be digitized, then the next time a selection is done the last channel can be read
+    int i;
     unsigned long readBack;
 	for(i=0;i<8;i++){
 		if(adcEnabledMask&(0x1<<((aChip*8)+i))){
+
 			int j;
 			for(j=0;j<4;j++) readBack = [self writeAuxIOSPI:adcBase | channelSelect[i]];
-			//if(i>0){
-            //readBack = readBack & 0x1fff; //!!!!fix to put the sign in the right place and convert to a number
-            readBack = ~readBack;
-            int channelReadBack = (readBack & 0xE000) >> 13;
-            //if(channelReadBack != i-1) {
-            if(channelReadBack != i) {
-                NSLog(@"Warning! channelReadBack = %d, not %d\n", channelReadBack, i);
-            }
-            int voltage = readBack & 0xfff;
-            if(readBack & 0x1000) voltage |= 0xfffff000;
-            //NSLog(@"Got voltage %f*%d=%f for channel %d\n", voltageMultiplier, voltage, voltageMultiplier*voltage, i);
-            //[self setAdc:(aChip*8)+i-1 value:voltage];
-            [self setAdc:(aChip*8)+i value:voltageMultiplier*voltage];
-			//}
+            
+			readBack = ~readBack;
+			int channelReadBack = (readBack & 0xE000) >> 13;
+ 
+			if(channelReadBack != i) {
+			  NSLog(@"Warning! channelReadBack = %d, not %d\n", channelReadBack, i);
+			}
+
+			if(aChip && (channelReadBack == 5 || channelReadBack == 6)){ // account for voltage multiplier of 4 for +/-24V - niko
+			  voltageMultiplier *= 2.;
+			}
+
+			int voltage = readBack & 0xfff;
+			if(readBack & 0x1000) voltage |= 0xfffff000;
+
+			NSLog(@"Read voltage %f*%f*%d=%f on channel %d\n", voltageBase, voltageMultiplier, voltage, voltageBase*voltageMultiplier*voltage, channelReadBack);
+            
+			[self setAdc:(aChip*8)+i value:voltageBase*voltageMultiplier*voltage];
+
+			voltageMultiplier = 2.;
+
 		}
 		else [self setAdc:(aChip*8)+i value:0.0];
 	}
-	
-    /*
-     if(adcEnabledMask & (0x1<<(aChip*8))){
-     //select the first one and to readBack the last one
-     readBack = [self writeAuxIOSPI:adcBase | channelSelect[0]];
-     //readBack = readBack & 0x1fff; //!!!!fix to put the sign in the right place and convert to a number
-     [self setAdc:(aChip*8)+7 value:readBack];
-     }
-     else [self setAdc:(aChip*8)+7 value:0.0];
-     */
+    */
+    
 	
 	//get the time(UT!) for the data record. 
 	time_t	ut_Time;
 	time(&ut_Time);
 	timeMeasured[aChip] = ut_Time;
 }
+
+- (void) readTempOnChip:(int)aChip // read temperature on ADC chips - niko
+{
+    if(aChip<0 || aChip>1) return;
+    
+    [self writeRangeForAdcChip:aChip ]; // needed ?
+    
+	unsigned long adcBase = kADC1;
+    if(aChip) adcBase = kADC2;
+    unsigned long channelSelect = kReadTempChannel7;
+
+    unsigned long readBack;
+    
+    if(adcEnabledMask&(0x1<<((aChip*8)+7))){
+        
+        //int j;
+        //for(j=0;j<4;j++) readBack = [self writeAuxIOSPI:adcBase | channelSelect];
+        
+        readBack = [self writeAuxIOSPI:adcBase | channelSelect];
+        //sleep(1);
+        readBack = [self writeAuxIOSPI:adcBase | channelSelect];
+        readBack = [self writeAuxIOSPI:adcBase | channelSelect];
+        readBack = [self writeAuxIOSPI:adcBase | channelSelect];
+
+        readBack = ~readBack;
+        int channelReadBack = (readBack & 0xE000) >> 13;
+        
+        if(channelReadBack != 7){
+            NSLog(@"Warning! channelReadBack = %d, not %d\n", channelReadBack, 7);
+        }
+        
+        int tempCode = readBack & 0xfff; // should always be positive code (?) - niko
+        if(readBack & 0x1000) tempCode |= 0xfffff000;
+
+        
+        tempCode += pow(2.,12);
+
+        
+        // rough temp-code calibration from curve in doc
+        int tempMinCode = 4350;
+        int tempZeroCode = 4395;
+        float tempMaxValue = 80.;
+        
+        float tempOnChip = tempMaxValue - (tempCode - tempMinCode)*tempMaxValue/(tempZeroCode - tempMinCode);
+        
+        
+        NSLog(@"Read raw temp %d, temp %f on channel %d\n", tempCode, tempOnChip, channelReadBack);
+        
+        [self setAdc:(aChip*8)+7 value:tempOnChip];
+    }
+}
+
 - (void) pollValues
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollValues) object:nil];
