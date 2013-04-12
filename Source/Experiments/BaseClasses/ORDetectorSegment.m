@@ -403,9 +403,6 @@ NSString* KSegmentChangedNotification	  =	@"KSegmentChangedNotification";
         int theCrate;
         if(crateIndex>kCardSlot)theCrate = [[params objectForKey: mapKey(crateIndex)]intValue];
         else theCrate = 0;
-        if(theCrate == 1){
-            NSLog(@"got crate 1\n");
-        }
 		if(theSlot>=0){
 			if([aCard displayedSlotNumber] == theSlot && [aCard crateNumber] == theCrate && crateIndex>=0){
 				hwPresent = YES;
