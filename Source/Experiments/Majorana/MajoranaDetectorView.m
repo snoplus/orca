@@ -158,7 +158,11 @@
 			for(col=0;col<7;col++){
 				float y = (height-detHeight-10) - 5*mod*(detHeight+5) - mod*15;
 				for(det=0;det<5;det++){
-					NSRect r = NSMakeRect(x,y,detWidth,detHeight);
+					NSRect r = NSMakeRect(x,y,detWidth,detHeight/2.);
+					[segmentPaths   addObject:[NSBezierPath bezierPathWithRect:r]];
+					[errorPaths   addObject:[NSBezierPath bezierPathWithRect:NSInsetRect(r, -5, -5)]];
+                    
+					r = NSMakeRect(x,y+detHeight/2,detWidth,detHeight/2.);
 					[segmentPaths   addObject:[NSBezierPath bezierPathWithRect:r]];
 					[errorPaths   addObject:[NSBezierPath bezierPathWithRect:NSInsetRect(r, -5, -5)]];
 					y -= detHeight+5;

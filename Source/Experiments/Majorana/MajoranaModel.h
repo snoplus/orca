@@ -24,7 +24,7 @@
 
 #define kUseTubeView 0
 #define kUseCrateView 1
-#define kNumTubes	 35*2
+#define kNumTubes	 35*2*2 //2 cryostats of 35 detectors, 2 channels per detector
 
 @interface MajoranaModel :  ORExperimentModel
 {
