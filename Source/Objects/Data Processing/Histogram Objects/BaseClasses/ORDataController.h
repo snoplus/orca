@@ -32,8 +32,11 @@
     IBOutlet NSPopUpButton*	refreshModePU;
 	IBOutlet NSButton*		pauseButton;
     IBOutlet NSButton*		refreshButton;
-	IBOutlet id	plotView;
+	IBOutlet id             plotView;
+    
 	NSRect preTiledSize;
+    NSRect tooBigFrame;
+    BOOL   restoreTooBigFrame;
 }
 
 #pragma mark •••Accessors

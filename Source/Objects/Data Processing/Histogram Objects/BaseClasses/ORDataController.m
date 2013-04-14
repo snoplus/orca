@@ -144,6 +144,14 @@ int windowSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1 tit
 					 selector : @selector(runStatusChanged:)
 						 name : ORRunStatusChangedNotification
 					   object : nil];
+
+    
+    [notifyCenter addObserver : self
+					 selector : @selector(windowDidResize:)
+						 name : NSWindowDidResizeNotification
+					   object : nil];
+    
+
 }
 
 - (void) updateWindow
@@ -341,6 +349,15 @@ int windowSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1 tit
 	[rawDataTabView selectTabViewItemAtIndex:index];
 }
 
+- (void) windowDidResize:(NSNotification*)aNote
+{
+    if([aNote object] == [self window]){
+        if([NSEvent pressedMouseButtons]){
+            restoreTooBigFrame=NO;
+        }
+    }
+}
+
 - (IBAction) hideShowControls:(id)sender
 {
 	
@@ -350,7 +367,22 @@ int windowSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1 tit
     NSRect aFrame = [NSWindow contentRectForFrameRect:[[self window] frame] 
 											styleMask:[[self window] styleMask]];
     NSSize minSize = [[self window] minSize];
+    NSRect screenRect = [[NSScreen mainScreen] frame];
+    float maxHeight = screenRect.size.height;
+
     if([hideShowButton state] == NSOnState){
+        if(aFrame.size.height >= maxHeight-160){
+            restoreTooBigFrame = YES;
+            tooBigFrame = aFrame;
+            [containingView setAutoresizingMask:oldResizeMask];
+            [self resizeWindowToSize:NSMakeSize(aFrame.size.width,aFrame.size.height-85)];
+            aFrame = [NSWindow contentRectForFrameRect:[[self window] frame]
+                                                    styleMask:[[self window] styleMask]];
+            [containingView setAutoresizingMask:NSViewMinYMargin];
+        }
+        else {
+            restoreTooBigFrame = NO;
+        }
         aFrame.size.height += 85;
         minSize.height = 300;
     }
@@ -361,6 +393,9 @@ int windowSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1 tit
     [[self window] setMinSize:minSize];
     [self resizeWindowToSize:aFrame.size];
     [containingView setAutoresizingMask:oldResizeMask];
+    if(restoreTooBigFrame){
+        [self resizeWindowToSize:tooBigFrame.size];
+    }
 }
 
 //scripting helper
