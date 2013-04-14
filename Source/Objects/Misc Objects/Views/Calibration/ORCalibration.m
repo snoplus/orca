@@ -122,7 +122,7 @@
 		[self populateSelectionPU];
 		[selectionPU selectItemWithTitle:[nameField stringValue]];
 	}
-    [[model calibration] calibrate];
+    [cal calibrate];
     [model updateCalibration];
 
 }

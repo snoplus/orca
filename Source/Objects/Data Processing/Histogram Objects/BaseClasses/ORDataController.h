@@ -59,6 +59,7 @@
 - (void) openAnalysisDrawer;
 - (void) closeAnalysisDrawer;
 - (BOOL) analysisDrawerIsOpen;
+- (void) refreshX;
 
 - (IBAction) doAnalysis:(NSToolbarItem*)item;
 - (IBAction) logLin:(NSToolbarItem*)item;
