@@ -941,12 +941,18 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 	    //search the channel
 //		int ch = [self channelNumberForItemKey: itemKey];
 		int ch = [[topLevelDictionary objectForKey:@"ChannelNumber"] intValue];
+        
 		if(ch == -1){
 	        //NSLog(@"Item %@ previously was removed!\n",itemKey);
 		}else{
-    	    NSLog(@"Item %@ already exists with channel %i!\n",itemKey,ch);
-	    	//TODO: search channel number and return it
-	        return ch;
+            int existingIsControl = ([self isControlItemWithItemKey: itemKey] ? 1 : 0);//I need 0 or 1, not bool ...
+            if(existingIsControl == isControl){
+    	        NSLog(@"Item key %@ already exists with channel %i!\n",itemKey,ch);
+            }else{
+    	        NSLog(@"Item key %@ already exists with different sensor/control type with channel %i!\n",itemKey,ch);
+    	        NSLog(@"For internal reasons this is not allowed! USE A SECOND ADEI OBJECT TO USE THIS ITEM!\n");
+            }
+            return ch;
 		}
 	}
 
@@ -1703,14 +1709,22 @@ enum {
     }
 }
 
+//TODO:
 - (BOOL) wasErrorForChan:(int)aChan
 {
-    NSString* itemKey = [channelLookup objectForKey:[NSNumber numberWithInt:aChan]];
+    NSString* itemKey = [channelLookup objectForKey:[NSNumber numberWithInt:aChan]]; 
+    //DEBUG        NSLog(@"%@::%@   itemKey is >>>%@<<<  \n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),itemKey);//DEBUG OUTPUT -tb-
     if(itemKey){
 		id topLevelDictionary = [requestCache objectForKey:itemKey];
+    //DEBUG        NSLog(@"%@::%@   topLevelDictionary is >>>%@<<<  \n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),topLevelDictionary);//DEBUG OUTPUT -tb-
 		id anItem = [topLevelDictionary objectForKey:itemKey];
         NSString* result  = [anItem objectForKey:@"Result"];
-        return [result caseInsensitiveCompare:@"OK"];
+        if(!result) return false;//key "Result" not set: no error (not yet loaded, not a control request, ...) -tb-
+        int tmp=[result caseInsensitiveCompare:@"OK"];//note: caseInsensitiveCompare: returns a 'NSComparisonResult' which may be -1, 0 or 1 ({NSOrderedAscending = -1, NSOrderedSame, NSOrderedDescending})-tb-
+                                                      //if "OK" not found: NSOrderedAscending (==-1), all other cases mean: found
+    //DEBUG        NSLog(@"%@::%@   result is >>>%@<<< retval is:(%i)\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),result,tmp);//DEBUG OUTPUT -tb-
+        //NSLog(@"%@::%@   result is >>>%@<<< retval is:%@ (%i)\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),result,[result caseInsensitiveCompare:@"OK"],[result caseInsensitiveCompare:@"OK"]);//DEBUG OUTPUT -tb-
+        return (tmp==NSOrderedAscending);//note: (see above) -tb-
     }else{
         return true;
     }
@@ -1933,13 +1947,35 @@ enum {
 	//
     //NSLog(@"polledItemResult: ... result is %@ \n",result);
 	for(id resultItem in result){
-	    //		NSLog(@"%@::%@   ResultItem is >>>%@<<<\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),resultItem);//DEBUG OUTPUT -tb-
+	    //DEBUG		                   NSLog(@"%@::%@   ResultItem is >>>%@<<<\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),resultItem);//DEBUG OUTPUT -tb-
         int chan=-1;
 		NSString* itemKey = [self itemKey:[resultItem objectForKey:@"URL"] path:[resultItem objectForKey:@"Path"]];
+	        //DEBUG		        NSLog(@"%@::%@   itemKey   >>>%@<<<\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),itemKey);//DEBUG OUTPUT -tb-
         if(!itemKey) continue; //avoid (null) item key; this may happen if there was a alarm message in the received xml structure (contains no path/url) -tb-
+                               //2013-04-12 NOW this will happen for ALLMOST ALL items, as the ADEI request returns the full control group!
+                               //2013-04-16 FIXED -tb-
         //should work without: if(!requestCache)   requestCache = [[NSMutableDictionary dictionary] retain];
 		id topLevelDictionary = [requestCache objectForKey:itemKey];
+	        //DEBUG                                            NSLog(@"%@::%@   topLevelDictionary  >>>%@<<<\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),topLevelDictionary);//DEBUG OUTPUT -tb-
+
+        if([self isControlItemWithItemKey:itemKey]){//additional check for control items (they may not exist at all -> AdeiLoader sends a Result=Error) -tb-
+            NSString* result  = [resultItem objectForKey:@"Result"];
+            int tmp=[result caseInsensitiveCompare:@"Error"];//note: caseInsensitiveCompare: returns a 'NSComparisonResult' which may be -1, 0 or 1 ({NSOrderedAscending = -1, NSOrderedSame, NSOrderedDescending})-tb-
+            //DEBUG  NSLog(@"%@::%@   result is >>>%@<<< comparison is:(%i) ((NSOrderedAscending is %i))\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),result,tmp,NSOrderedAscending);//DEBUG OUTPUT -tb-
+            if(tmp!=NSOrderedDescending){//== @"Error"  found
+                //copy error message
+                NSMutableDictionary* itemDictionary		= [topLevelDictionary objectForKey:itemKey];
+                if([resultItem objectForKey:@"Result"])[itemDictionary setObject:[resultItem objectForKey:@"Result"] forKey:@"Result"];//added if(...) to check existence of "Result"; sensor and control reads are not foreseen to return the "Result" key, but this caused a exception and skipped "clearPendingRequest" -tb-
+                if([resultItem objectForKey:@"Error"])[itemDictionary setObject:[resultItem objectForKey:@"Error"] forKey:@"Error"];
+                [topLevelDictionary setObject:@"Error" forKey:@"DBValue"];
+                //housekeeping
+		        [self clearPendingRequest:itemKey];
+                continue;
+            }
+        }
+        
 		if(!topLevelDictionary){
+	        //DEBUG                       NSLog(@"%@::%@   topLevelDictionary not found  >>>%@<<<\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),topLevelDictionary);//DEBUG OUTPUT -tb-
 			//wasn't in the topLevel so we haven't seen this item before. Add it to the cache.
             //REUSE "addItems:"
             //NSArray* anItemArray = [NSArray arrayWithObject: [NSDictionary dictionaryWithObjectsAndKeys:
@@ -1968,6 +2004,8 @@ enum {
         
 		//we only replace the resultItem. leaving the other things in the dictionary (i.e. loAlarm, etc...) alone.
 		[topLevelDictionary setObject:resultItem forKey:itemKey];
+        	        //DEBUG                       NSLog(@"%@::%@   topLevelDictionary AFTER SETTING RESULT ITEM:  >>>%@<<<\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),topLevelDictionary);//DEBUG OUTPUT -tb-
+
         if([self isControlItemWithItemKey:itemKey]){
             [topLevelDictionary setObject:[resultItem objectForKey:@"value"] forKey:@"DBValue"];
             [topLevelDictionary setObject:[resultItem objectForKey:@"timestamp"] forKey:@"DBTimestamp"];
@@ -1978,7 +2016,7 @@ enum {
             //TODO: use Unix time -tb- ? !!!!!!!!!!!!!
             //TODO: use Unix time -tb- ? !!!!!!!!!!!!!
         }
-        [topLevelDictionary setObject:[resultItem objectForKey:@"Result"] forKey:@"Result"];
+        if([resultItem objectForKey:@"Result"])[topLevelDictionary setObject:[resultItem objectForKey:@"Result"] forKey:@"Result"];//added if(...) to check existence of "Result"; sensor and control reads are not foreseen to return the "Result" key, but this caused a exception and skipped "clearPendingRequest" -tb-
         if([resultItem objectForKey:@"Error"])[topLevelDictionary setObject:[resultItem objectForKey:@"Error"] forKey:@"Error"];
 
         //housekeeping

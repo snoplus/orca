@@ -87,7 +87,7 @@
 			path = [aPath copy];
 			recursive  = NO;
 			NSURL* furl = [NSURL URLWithString: requestString];
-            if(showDebugOutput) NSLog(@"Sending out sensor request string: >>>%@<<<\n",requestString);//debugging
+            if(showDebugOutput) NSLog(@"Sending out 'set control' request string: >>>%@<<<\n",requestString);//debugging
 			NSURLRequest* theRequest=[NSURLRequest requestWithURL:furl  cachePolicy:NSURLRequestReloadIgnoringCacheData  timeoutInterval:kTimeoutInterval];// make it configurable
 			theAdeiConnection=[[NSURLConnection alloc] initWithRequest:theRequest delegate:self];
 		}
@@ -118,7 +118,7 @@
 			path = [aPath copy];
 			recursive  = NO;
 			NSURL* furl = [NSURL URLWithString: requestString];
-            if(showDebugOutput) NSLog(@"Sending out sensor request string: >>>%@<<<\n",requestString);//debugging
+            if(showDebugOutput) NSLog(@"Sending out 'send control' request string: >>>%@<<<\n",requestString);//debugging
 			NSURLRequest* theRequest=[NSURLRequest requestWithURL:furl  cachePolicy:NSURLRequestReloadIgnoringCacheData  timeoutInterval:kTimeoutInterval];// make it configurable
 			theAdeiConnection=[[NSURLConnection alloc] initWithRequest:theRequest delegate:self];
 		}
@@ -236,7 +236,7 @@
 		dataFormat = kxmlFormat;
 		path = [aPath copy];
 		NSURL* furl = [NSURL URLWithString: requestString];
-		NSURLRequest* theRequest=[NSURLRequest requestWithURL:furl  cachePolicy:NSURLRequestReloadIgnoringCacheData  timeoutInterval:5*kTimeoutInterval];// make it configurable
+		NSURLRequest* theRequest=[NSURLRequest requestWithURL:furl  cachePolicy:NSURLRequestReloadIgnoringCacheData  timeoutInterval:kTimeoutInterval];//was 5*kTimeoutInterval ... ->timeouts? // make it configurable
 		theAdeiConnection=[[NSURLConnection alloc] initWithRequest:theRequest delegate:self];
 	}
 }
@@ -278,13 +278,48 @@
 {
     if(showDebugOutput){//debug timeouts
         NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
-        NSLogFont(aFont,@"Received data/string after URL request: BEGIN-%@-END\n",receivedData);
+        NSLogFont(aFont,@"Received data/string after URL request (dataFormat: %i): BEGIN-%@-END\n",dataFormat,receivedData);
+        //NSLogFont(aFont,@"Received data/string after URL request: BEGIN-%@-END\n",[receivedData description]);
     }
     //handle the request
 	if(dataFormat == kxmlFormat){
-		[self parseXMLData:receivedData];
+		[self parseXMLData:receivedData];// --> fills 'resultArray'
 		if(adeiType==kControlType){
-			NSMutableDictionary* dictionary = [resultArray objectAtIndex:0];
+            //DEBUG            NSLog(@"Received data after parseXML... (dataFormat: %i): BEGIN-%@-END\n",dataFormat,resultArray);
+			//NSMutableDictionary* dictionary = [resultArray objectAtIndex:0];//2013-04-xx it seems there had been a change in ADEI in the response format and ADEI seems to return all values of ALL items in the group! -tb-
+                                                                              //the item (dict) with index=0 is now WRONG (for all items except the 0th)!
+            int itemNum=0;
+            NSString* itemKey;
+		    NSArray* components = [path componentsSeparatedByString:@"/"];
+            if([components count]>0){ 
+                itemKey = [components  objectAtIndex:[components count]-1];
+                itemNum = [itemKey    intValue];
+            }
+            //DEBUG NSLog(@"---------->item id is %i \n",itemNum);
+
+            #if 0
+			NSMutableDictionary* dictionary = [resultArray objectAtIndex:itemNum];//TODO: search for key "id" -> value==itemNum
+            #else
+			NSMutableDictionary* dictionary=0;
+            for(id dict in resultArray){
+                //DEBUG                  NSLog(@"---------->dict is %@ \n",dict);
+                if([dict intForKey: @"id"] == itemNum){ dictionary=dict; break; }
+            }
+
+            #endif
+            
+
+            if(!dictionary){//ADEI does not report an error if e.g. the item number does not exist!!! -> fake ADEI error message
+                dictionary = [NSMutableDictionary dictionary];   //[[NSMutableDictionary alloc] init];                 [dictionary retain];
+                [resultArray addObject:dictionary];
+                //[resultArray addObject:[NSMutableDictionary dictionaryWithObject:@"Error" forKey:@"Result"]];
+                //[resultArray addObject:[NSMutableDictionary dictionaryWithObject:@"Item does not exist - check item path!" forKey:@"Error"]];
+                [dictionary setObject:@"Error"	forKey:@"Result"];
+                [dictionary setObject:@"Item does not exist - check item path! :-("	forKey:@"Error"];
+			    [dictionary setObject:[NSNumber numberWithInt:kControlType]		forKey:@"Control"];
+			    [dictionary setObject:@"--"		forKey:@"Name"];
+            }
+            
 			[dictionary setObject:host	forKey:@"URL"];
 			[dictionary setObject:path	forKey:@"Path"];
 		}
@@ -308,8 +343,11 @@
 	else {
 		NSLog(@"ADEI Loader: ERROR: unknown dataFormat %i!\n",dataFormat);
 	}
+    
+    
 	[receivedData release];
 	receivedData = nil;
+    
 	if(didFinishSelector){
 	    NSInvocation* anInvocation = [NSInvocation invocationWithMethodSignature:[delegate methodSignatureForSelector:didFinishSelector]];
 	    int numGetArgs = [[delegate methodSignatureForSelector:didFinishSelector] numberOfArguments]-2;
@@ -317,7 +355,7 @@
 	    [anInvocation setTarget:delegate];
         
 	    if(numGetArgs){
-			[anInvocation setArgument:0 to:resultArray];
+			[anInvocation setArgument:0 to:resultArray];//TODO: resultArray may be nil if the sensor path is wrong -tb- 2013-04-16
 			[anInvocation setArgument:1 to:path];
 			[anInvocation invoke];
 		}
@@ -381,8 +419,10 @@
 - (void) parseCSVData:(NSData*)someData
 {
 	//format is Date,N1,N2,N3.....\nDateValue,V1,V2,V3...
-	//we put it into a some dictionaries where the Nx values have key= @"NAME" 
+	//we put it into a some dictionaries where the Nx values have key= @"Name" 
 	//and the Vx values have the key = @"Value"
+    //2013-04-12 added appending key-value-pair "Result"-"OK" to satisfy ORIpeSlowControlModel::polledItemResult:path: and not to throw a exception before removing the item from the pendingRequests list -tb-
+
 	NSString* s		= [[[NSString alloc] initWithData:receivedData encoding:NSASCIIStringEncoding] autorelease];
 	if([s rangeOfString:@"ERROR"].location == NSNotFound){
 		s				= [s stringByReplacingOccurrencesOfString:@"\r" withString:@""];
@@ -401,6 +441,7 @@
 				[dictionary setObject:[pathRoot stringByAppendingPathComponent:[itemNumbers objectAtIndex:i-1]]	forKey:@"Path"];
 				[dictionary setObject:[keys objectAtIndex:i]	forKey:@"Name"];
 				[dictionary setObject:[values objectAtIndex:i]	forKey:@"Value"];
+				[dictionary setObject:@"OK"	forKey:@"Result"];//2013-04-12 added -tb- (is key "Error" necessary, too, even if Result=OK?)
 			}
 			[resultArray addObject:dictionary];
 		}
@@ -414,7 +455,7 @@ didStartElement:(NSString*) elementName
   qualifiedName:(NSString*) qName
 	 attributes:(NSDictionary*) attributeDict
 {
-	if(![elementName caseInsensitiveCompare:@"Value"]){
+	if(![elementName caseInsensitiveCompare:@"Value"]){//TODO: see comment in parser:didEndElement:... -tb
 		if(!resultArray)resultArray = [[NSMutableArray array] retain];
 		NSMutableDictionary* dictWithAdditions = [NSMutableDictionary dictionaryWithDictionary:attributeDict];
 		if(adeiType)//TODO: check the value, not only existence (in the future there will be more adei types)-tb-
@@ -433,7 +474,8 @@ didStartElement:(NSString*) elementName
 {    
     if(!resultArray)resultArray = [[NSMutableArray array] retain];
     
-    if (![elementName caseInsensitiveCompare:@"Result"]) {
+    if (![elementName caseInsensitiveCompare:@"Result"]) {//note: caseInsensitiveCompare: returns a 'NSComparisonResult' which may be -1, 0 or 1 ({NSOrderedAscending = -1, NSOrderedSame, NSOrderedDescending})-tb-
+                                                          //note: if pattern not found: NSOrderedAscending (==-1), all other cases mean: found
         NSString* s = @"";
         if(![resultInProgress caseInsensitiveCompare:@"OK"])s = @"OK";
         else s = @"Error";
