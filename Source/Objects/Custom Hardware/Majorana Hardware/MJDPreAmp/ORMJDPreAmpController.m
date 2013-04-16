@@ -513,7 +513,8 @@
 {
  	short chan;
 	for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
-        if(chan>=5 && chan<=10)[[feedBackResistorMatrix cellWithTag:chan] setStringValue:@""];
+        if(chan>=5 && chan<=7)[[feedBackResistorMatrix cellWithTag:chan] setStringValue:@""];
+        else if(chan>=13)[[feedBackResistorMatrix cellWithTag:chan] setStringValue:@""];
 		else [[feedBackResistorMatrix cellWithTag:chan] setFloatValue: [model feedBackResistor:chan]];
 	}
 }
@@ -521,7 +522,8 @@
 - (void) feedbackResistorChanged:(NSNotification*)aNote
 {
  	int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
-    if(chan>=5 && chan<=10)[[feedBackResistorMatrix cellWithTag:chan] setStringValue:@""];
+    if(chan>=5 && chan<=7)[[feedBackResistorMatrix cellWithTag:chan] setStringValue:@""];
+    else if(chan>=13)[[feedBackResistorMatrix cellWithTag:chan] setStringValue:@""];
 	else [[feedBackResistorMatrix cellWithTag:chan] setFloatValue: [model feedBackResistor:chan]];
 }
 
@@ -529,7 +531,8 @@
 {
  	short chan;
 	for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
-        if(chan>=5 && chan<=10)[[baselineVoltageMatrix cellWithTag:chan] setStringValue:@""];
+        if(chan>=5 && chan<=7)[[baselineVoltageMatrix cellWithTag:chan] setStringValue:@""];
+        else if(chan>=13)[[baselineVoltageMatrix cellWithTag:chan] setStringValue:@""];
 		else [[baselineVoltageMatrix cellWithTag:chan] setFloatValue: [model baselineVoltage:chan]];
 	}   
 }
@@ -537,7 +540,8 @@
 - (void) baselineVoltageChanged:(NSNotification*)aNote
 {
  	int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
-    if(chan>=5 && chan<=10)[[baselineVoltageMatrix cellWithTag:chan] setStringValue:@""];
+    if(chan>=5 && chan<=7)[[baselineVoltageMatrix cellWithTag:chan] setStringValue:@""];
+    else if(chan>=13)[[baselineVoltageMatrix cellWithTag:chan] setStringValue:@""];
 	else [[baselineVoltageMatrix cellWithTag:chan] setFloatValue: [model baselineVoltage:chan]];
    
 }
