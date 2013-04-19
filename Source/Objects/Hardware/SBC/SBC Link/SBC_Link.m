@@ -967,7 +967,7 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
 							 remoteHost:IPNumber 
 							   userName:userName 
 							   passWord:passWord];
-		[SBCFileMover setVerbose:NO];
+		[SBCFileMover setVerbose:verbose];//TODO: was NO; for testing I would like to see this output; this takes the CB state from the GUI -tb-
 		[SBCFileMover doNotMoveFilesToSentFolder];
 		[SBCFileMover setTransferType:eUseSCP];
 		[aSequence addTaskObj:SBCFileMover];
