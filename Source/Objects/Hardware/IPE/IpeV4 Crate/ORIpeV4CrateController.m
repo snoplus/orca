@@ -69,4 +69,25 @@
 }
 
 
+#pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+
+#pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+- (IBAction) snmpStartCrateAction:(id)sender
+{
+        //DEBUG OUTPUT:
+                 NSLog(@"%@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
+                 
+    //TODO: under development - this is a first test -tb- 2013-04
+    system("snmpset -v2c -m +WIENER-CRATE-MIB -c admin 192.168.2.3 sysMainSwitch.0 i 1");
+}
+
+- (IBAction) snmpStopCrateAction:(id)sender
+{
+        //DEBUG OUTPUT:
+                 NSLog(@"%@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
+    system("snmpset -v2c -m +WIENER-CRATE-MIB -c admin 192.168.2.3 sysMainSwitch.0 i 0");
+}
+
+
+
 @end

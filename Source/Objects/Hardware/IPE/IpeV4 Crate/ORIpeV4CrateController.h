@@ -27,6 +27,7 @@
 {
 	IBOutlet NSTextField* connectedField;
 	BOOL connected;
+    
 }
 - (id) init;
 - (void) awakeFromNib;
@@ -35,5 +36,10 @@
 - (void) registerNotificationObservers;
 - (void) connectionChanged:(NSNotification*)aNotification;
 
+#pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+
+#pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+- (IBAction) snmpStartCrateAction:(id)sender;
+- (IBAction) snmpStopCrateAction:(id)sender;
 
 @end
