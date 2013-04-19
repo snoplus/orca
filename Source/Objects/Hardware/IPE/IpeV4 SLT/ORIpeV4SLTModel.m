@@ -478,6 +478,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 
 - (id) controllerCard		{ return self;	  }
 - (SBC_Link*)sbcLink		{ return pmcLink; } 
+- (bool)sbcIsConnected      { return [pmcLink isConnected]; }
 - (TimedWorker *) poller	{ return poller;  }
 
 - (void) setPoller: (TimedWorker *) aPoller

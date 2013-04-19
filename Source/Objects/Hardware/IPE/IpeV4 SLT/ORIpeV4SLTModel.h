@@ -316,6 +316,7 @@ static IpeRegisterNamesStruct regSLTV4[kSltV4NumRegs] = {
 - (void) setControlReg:(unsigned long)aControlReg;
 
 - (SBC_Link*)sbcLink;
+- (bool)sbcIsConnected;
 - (unsigned long) projectVersion;
 - (unsigned long) documentVersion;
 - (unsigned long) implementation;
