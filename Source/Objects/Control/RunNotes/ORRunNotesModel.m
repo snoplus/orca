@@ -351,8 +351,15 @@ NSString* ORRunNotesItemChanged				 = @"ORRunNotesItemChanged";
 {	
 	if(!ignoreValues){
 		NSMutableDictionary* runNotes = [NSMutableDictionary dictionary];
-		[runNotes setObject:[self comments] forKey:@"comments"];
-		[[userInfo objectForKey:kHeader] setObject:items forKey:@"RunNotes"];
+        if([[self comments] length]){
+            [runNotes setObject:[self comments] forKey:@"comments"];
+        }
+        if([items count]){
+            [runNotes setObject:items forKey:@"parameters"];
+        }
+		if([[runNotes allKeys] count]){
+            [[userInfo objectForKey:kHeader] setObject:runNotes forKey:@"RunNotes"];
+        }
 	}
 		
 	nextObject =  [self objectConnectedTo: ORRunNotesDataOut]; //cach for a little more efficiency
