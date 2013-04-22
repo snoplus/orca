@@ -25,6 +25,8 @@
 
 @interface ORIpeV4CrateModel : ORCrate   {
 	BOOL isConnected;
+    NSString* snmpPowerSupplyIP;
+    int unlockedStopButton;
 }
 
 #pragma mark •••initialization
@@ -32,6 +34,10 @@
 - (void) makeMainController;
 
 #pragma mark •••Accessors
+- (int) unlockedStopButton;
+- (void) setUnlockedStopButton:(int)aUnlockedStopButton;
+- (NSString*) snmpPowerSupplyIP;
+- (void) setSnmpPowerSupplyIP:(NSString*)aSnmpPowerSupplyIP;
 - (void) setIsConnected:(BOOL)aState;
 - (BOOL)isConnected;
 
@@ -44,13 +50,26 @@
 
 - (void) updateKatrinV4FLTs;
 
+#pragma mark •••Hardware Access
+-(void) snmpWriteStartCrateCommand;
+-(void) snmpWriteStopCrateCommand;
+
+#pragma mark *** Archival
+- (id)   initWithCoder:(NSCoder*)decoder;
+- (void) encodeWithCoder:(NSCoder*)encoder;
+
+
 #pragma mark •••OROrderedObjHolding
 - (int) maxNumberOfObjects;
 - (int) objWidth;
 - (NSRange) legalSlotsForObj:(id)anObj;
 - (BOOL) slot:(int)aSlot excludedFor:(id)anObj;
+
 @end
 
+
+extern NSString* ORIpeV4CrateModelUnlockedStopButtonChanged;
+extern NSString* ORIpeV4CrateModelSnmpPowerSupplyIPChanged;
 extern NSString* ORIpeV4CrateConnectedChanged;
 
 @interface NSObject (ORIpeV4CrateModel)

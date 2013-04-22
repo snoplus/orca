@@ -25,7 +25,10 @@
 
 @interface ORIpeV4CrateController : ORCrateController
 {
-	IBOutlet NSTextField* connectedField;
+	IBOutlet   NSTextField* connectedField;
+	IBOutlet   NSButton* stopButton;
+	IBOutlet   NSButton* unlockedStopButtonCB;
+	IBOutlet   NSTextField* snmpPowerSupplyIPTextField;
 	BOOL connected;
     
 }
@@ -37,8 +40,12 @@
 - (void) connectionChanged:(NSNotification*)aNotification;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+- (void) unlockedStopButtonChanged:(NSNotification*)aNote;
+- (void) snmpPowerSupplyIPChanged:(NSNotification*)aNote;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+- (IBAction) unlockedStopButtonCBAction:(id)sender;
+- (IBAction) snmpPowerSupplyIPTextFieldAction:(id)sender;
 - (IBAction) snmpStartCrateAction:(id)sender;
 - (IBAction) snmpStopCrateAction:(id)sender;
 

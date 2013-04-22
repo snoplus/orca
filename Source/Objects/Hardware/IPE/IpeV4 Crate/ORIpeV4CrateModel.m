@@ -22,6 +22,8 @@
 #import "ORIpeV4CrateModel.h"
 #import "ORIpeV4SLTModel.h"
 
+NSString* ORIpeV4CrateModelUnlockedStopButtonChanged = @"ORIpeV4CrateModelUnlockedStopButtonChanged";
+NSString* ORIpeV4CrateModelSnmpPowerSupplyIPChanged = @"ORIpeV4CrateModelSnmpPowerSupplyIPChanged";
 NSString* ORIpeV4CrateConnectedChanged = @"ORIpeV4CrateConnectedChanged";
 
 @implementation ORIpeV4CrateModel
@@ -29,6 +31,7 @@ NSString* ORIpeV4CrateConnectedChanged = @"ORIpeV4CrateConnectedChanged";
 #pragma mark •••initialization
 - (void) dealloc
 {
+    [snmpPowerSupplyIP release];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 	[super dealloc];
 }
@@ -99,6 +102,34 @@ NSString* ORIpeV4CrateConnectedChanged = @"ORIpeV4CrateConnectedChanged";
 
 
 #pragma mark •••Accessors
+
+- (int) unlockedStopButton
+{
+    return unlockedStopButton;
+}
+
+- (void) setUnlockedStopButton:(int)aUnlockedStopButton
+{
+    unlockedStopButton = aUnlockedStopButton;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4CrateModelUnlockedStopButtonChanged object:self];
+}
+
+- (NSString*) snmpPowerSupplyIP
+{
+    if(!snmpPowerSupplyIP) return @"";
+    return snmpPowerSupplyIP;
+}
+
+- (void) setSnmpPowerSupplyIP:(NSString*)aSnmpPowerSupplyIP
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSnmpPowerSupplyIP:snmpPowerSupplyIP];
+    
+    [snmpPowerSupplyIP autorelease];
+    snmpPowerSupplyIP = [aSnmpPowerSupplyIP copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4CrateModelSnmpPowerSupplyIPChanged object:self];
+}
 - (void) setIsConnected:(BOOL)aState
 {
 	isConnected = aState;
@@ -163,10 +194,47 @@ NSString* ORIpeV4CrateConnectedChanged = @"ORIpeV4CrateConnectedChanged";
 	}
 }
  
+#pragma mark •••Hardware Access
+//snmp access: see ORMPodCModel.m/.h - (void) writeValue:(NSString*)aCmd target:(id)aTarget selector:(SEL)aSelector;
+-(void) snmpWriteStartCrateCommand
+{
+    //DEBUG OUTPUT:
+                 NSLog(@"%@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
+
+    //TODO: under development - this is a first test - use snmp objects -tb- 2013-04
+    //system("snmpset -v2c -m +WIENER-CRATE-MIB -c admin 192.168.2.3 sysMainSwitch.0 i 1");
+    if(snmpPowerSupplyIP!=nil){
+        NSString *cmd = [NSString stringWithFormat:@"snmpset -v2c -m +WIENER-CRATE-MIB -c admin %@ sysMainSwitch.0 i 1", snmpPowerSupplyIP];
+        printf("calling: %s\n",[cmd cStringUsingEncoding: NSASCIIStringEncoding]);
+        system([cmd cStringUsingEncoding: NSASCIIStringEncoding]);
+    }
+    else
+    {
+        printf("snmp command not called: no IP defined\n");
+    }
+}
+
+-(void) snmpWriteStopCrateCommand
+{
+    //DEBUG OUTPUT:
+                 NSLog(@"%@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
+
+    //TODO: under development - this is a first test - use snmp objects -tb- 2013-04
+    //system("snmpset -v2c -m +WIENER-CRATE-MIB -c admin 192.168.2.3 sysMainSwitch.0 i 0");
+    if(snmpPowerSupplyIP!=nil){
+        NSString *cmd = [NSString stringWithFormat:@"snmpset -v2c -m +WIENER-CRATE-MIB -c admin %@ sysMainSwitch.0 i 0", snmpPowerSupplyIP];
+        printf("calling: %s\n",[cmd cStringUsingEncoding: NSASCIIStringEncoding]);
+        system([cmd cStringUsingEncoding: NSASCIIStringEncoding]);
+    }
+    else
+    {
+        printf("snmp command not called: no IP defined\n");
+    }
+}
 
 
 
-
+#pragma mark *** Archival
 - (id)initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
@@ -174,6 +242,9 @@ NSString* ORIpeV4CrateConnectedChanged = @"ORIpeV4CrateConnectedChanged";
 
     
 	[[self undoManager] disableUndoRegistration];
+    
+	[self setSnmpPowerSupplyIP:[decoder decodeObjectForKey:@"snmpPowerSupplyIP"]];
+    //TODO:   for code wizard: 'decoder' (CW is searching this string ... , if not found maybe produce out-of-bounds exception at objectAtIndex: in CWImplementationFile.m, line ...) -tb-
         
 	[[self undoManager] enableUndoRegistration];
 	
@@ -185,6 +256,9 @@ NSString* ORIpeV4CrateConnectedChanged = @"ORIpeV4CrateConnectedChanged";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+
+    [encoder encodeObject:snmpPowerSupplyIP forKey:@"snmpPowerSupplyIP"];
+    //TODO:   for code wizard: 'forKey' (CW is searching this string ... , if not found will produce out-of-bounds exception at objectAtIndex: in CWImplementationFile.m, line 242) -tb-
 }
 
 #pragma mark •••OROrderedObjHolding

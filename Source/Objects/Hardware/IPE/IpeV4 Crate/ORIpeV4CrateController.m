@@ -54,6 +54,16 @@
                        object : nil];
 
 
+    [notifyCenter addObserver : self
+                     selector : @selector(snmpPowerSupplyIPChanged:)
+                         name : ORIpeV4CrateModelSnmpPowerSupplyIPChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(unlockedStopButtonChanged:)
+                         name : ORIpeV4CrateModelUnlockedStopButtonChanged
+						object: model];
+
 }
 
 
@@ -61,6 +71,8 @@
 {
 	[super updateWindow];
 	[self connectionChanged:nil];
+	[self snmpPowerSupplyIPChanged:nil];
+	[self unlockedStopButtonChanged:nil];
 }
 
 - (void) connectionChanged:(NSNotification*)aNotification
@@ -71,21 +83,45 @@
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
 
+- (void) unlockedStopButtonChanged:(NSNotification*)aNote
+{
+	[unlockedStopButtonCB setIntValue: [model unlockedStopButton]];
+    [stopButton setEnabled: [model unlockedStopButton]];
+}
+
+- (void) snmpPowerSupplyIPChanged:(NSNotification*)aNote
+{
+	[snmpPowerSupplyIPTextField setStringValue: [model snmpPowerSupplyIP]];
+}
+
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+
+- (void) unlockedStopButtonCBAction:(id)sender
+{
+	[model setUnlockedStopButton:[sender intValue]];	
+}
+
+- (void) snmpPowerSupplyIPTextFieldAction:(id)sender
+{
+	[model setSnmpPowerSupplyIP:[sender stringValue]];	
+}
+
+
 - (IBAction) snmpStartCrateAction:(id)sender
 {
-        //DEBUG OUTPUT:
-                 NSLog(@"%@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
-                 
-    //TODO: under development - this is a first test -tb- 2013-04
-    system("snmpset -v2c -m +WIENER-CRATE-MIB -c admin 192.168.2.3 sysMainSwitch.0 i 1");
+    [self endEditing];
+        //DEBUG OUTPUT:                 NSLog(@"%@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
+        
+    [model snmpWriteStartCrateCommand];
 }
 
 - (IBAction) snmpStopCrateAction:(id)sender
 {
-        //DEBUG OUTPUT:
-                 NSLog(@"%@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
-    system("snmpset -v2c -m +WIENER-CRATE-MIB -c admin 192.168.2.3 sysMainSwitch.0 i 0");
+    [self endEditing];
+    [model setUnlockedStopButton: false];
+        //DEBUG OUTPUT:                 NSLog(@"%@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
+        
+    [model snmpWriteStartCrateCommand];
 }
 
 
