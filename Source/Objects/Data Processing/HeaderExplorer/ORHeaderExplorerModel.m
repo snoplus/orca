@@ -219,8 +219,6 @@ NSString* ORHeaderExplorerProgressChanged		= @"ORHeaderExplorerProgressChanged";
 
 - (void) setSelectedRunIndex:(int)anIndex
 {
-	if(anIndex<0)anIndex = [runArray count]-1;
-	else if(anIndex>=[runArray count])anIndex = 0;
 	selectedRunIndex = anIndex;
 	[self loadHeader];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORHeaderExplorerRunSelectionChanged object: self];
@@ -339,6 +337,17 @@ NSString* ORHeaderExplorerProgressChanged		= @"ORHeaderExplorerProgressChanged";
 	else [self setHeader:nil];
 }
 
+- (BOOL) fileHasBeenProcessed:(unsigned long)anIndex
+{
+    if(anIndex>[filesToProcess count])return NO;
+    else {
+        NSString* aFileName = [filesToProcess objectAtIndex:anIndex];
+        for(id anItem in runArray){
+            if([[anItem objectForKey:@"FilePath"] isEqualToString:aFileName])return YES;
+        }
+        return NO;
+    }
+}
 
 - (BOOL)isProcessing
 {
@@ -542,11 +551,22 @@ NSString* ORHeaderExplorerProgressChanged		= @"ORHeaderExplorerProgressChanged";
       
 }
 
-- (void) removeFiles:(NSMutableArray*)anArray
+- (void) removeFiles:(NSMutableArray*)arrayOfFilesToRemove
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] addFilesToProcess:anArray];
-    [filesToProcess removeObjectsInArray:anArray];
+    [[[self undoManager] prepareWithInvocationTarget:self] addFilesToProcess:arrayOfFilesToRemove];
+    [filesToProcess removeObjectsInArray:arrayOfFilesToRemove];
 
+    NSMutableArray* processedFilesToRemove = [NSMutableArray array];
+    for(id aFileName in arrayOfFilesToRemove){
+        for(id anItem in runArray){
+            if([[anItem objectForKey:@"FilePath"] isEqualToString:aFileName]){
+                [processedFilesToRemove addObject:anItem];
+            }
+        }
+    }
+    [runArray removeObjectsInArray:processedFilesToRemove];
+    
+    
     [[NSNotificationCenter defaultCenter]
 			    postNotificationName:ORHeaderExplorerListChanged
                               object: self];
@@ -575,7 +595,7 @@ NSString* ORHeaderExplorerProgressChanged		= @"ORHeaderExplorerProgressChanged";
 }
 
 #pragma mark •••File Actions
-- (void) readHeaders
+- (BOOL) readHeaders
 {
 	[runArray release];
 	runArray = [[NSMutableArray array] retain];
@@ -614,8 +634,9 @@ NSString* ORHeaderExplorerProgressChanged		= @"ORHeaderExplorerProgressChanged";
 			}
 		}
 		
-
+        return YES;
 	}
+    return NO;
 }
 
 - (void)logHeader:(NSDictionary*)aHeader

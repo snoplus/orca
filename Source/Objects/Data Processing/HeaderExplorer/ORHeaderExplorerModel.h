@@ -94,6 +94,7 @@
 - (void) setLastFilePath: (NSString *) aSetLastListPath;
 - (unsigned long)	minRunStartTime;
 - (unsigned long)	maxRunEndTime;
+- (BOOL) fileHasBeenProcessed:(unsigned long)anIndex;
 
 #pragma mark •••Data Handling
 - (void) stopProcessing;
@@ -101,7 +102,7 @@
 - (void) stopProcessing;
 - (void) removeAll;
 - (void) removeFiles:(NSMutableArray*)anArray;
-- (void) readHeaders;
+- (BOOL) readHeaders;
 - (void) findSelectedRunByDate;
 - (void) selectFirstRunForFileIndex:(int)anIndex;
 - (void) assembleDataForPlotting;

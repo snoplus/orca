@@ -237,7 +237,11 @@
 		NSIndexSet* selectedSet = [fileListView selectedRowIndexes];
 		[fileListView deselectAll:self];
 		[model removeFilesWithIndexes:selectedSet];
+
+        NSInteger lastIndex = [selectedSet lastIndex];
+        [model setSelectedFileIndex:lastIndex];
 		[fileListView reloadData];
+		[headerView reloadData];
 	}
 	else if([[self window] firstResponder] == searchKeyTableView){
 		NSIndexSet* selectedSet = [searchKeyTableView selectedRowIndexes];
@@ -252,8 +256,7 @@
 {
 	[self endEditing];
     if(![model isProcessing]){
-        [model readHeaders];
-        [selectButton setEnabled:NO];
+        if([model readHeaders])[selectButton setEnabled:NO];
     }
     else {
         [model stopProcessing];
@@ -553,7 +556,7 @@
 	unsigned long absEnd		= [model maxRunEndTime];
 	if(absStart>0 && absEnd>0 && [model selectedRunIndex]>=0){
 		NSDictionary* runDictionary = [model runDictionaryForIndex:[model selectedRunIndex]];
-		if(runDictionary){
+		if(runDictionary && [model selectedRunIndex]>=0){
 			NSString* units = @"Bytes";
 			float fileSize = [[runDictionary objectForKey:@"FileSize"] floatValue];
 			if(fileSize>1000000){
@@ -599,7 +602,9 @@
 		int i = [fileListView selectedRow];
 		[model selectFirstRunForFileIndex:i];
 	}
+
 	[fileListView reloadData];
+    [self headerChanged:nil];
 }
 
 - (void) headerChanged:(NSNotification*)aNote
@@ -726,7 +731,7 @@
 
 - (BOOL)tableView:(NSTableView *)aTableView shouldSelectRow:(int)rowIndex
 {
-    return YES;
+    return [model fileHasBeenProcessed:rowIndex];
 }
 
 - (NSDragOperation) tableView:(NSTableView *) aTableView validateDrop:(id <NSDraggingInfo>) info proposedRow:(int) row proposedDropOperation:(NSTableViewDropOperation) operation
@@ -736,6 +741,18 @@
 		if(![model useFilter])return NSDragOperationAll;
 		else return NSDragOperationNone;
 	}
+}
+
+- (NSCell *)tableView:(NSTableView *)tableView dataCellForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+{
+    NSTextFieldCell *cell = [tableColumn dataCell];
+    if(![model fileHasBeenProcessed:row]){
+        [cell setTextColor: [NSColor lightGrayColor]];
+    }
+    else {
+        [cell setTextColor: [NSColor blackColor]];
+    }
+    return cell;
 }
 
 - (BOOL)tableView:(NSTableView*)aTableView acceptDrop:(id <NSDraggingInfo>)info row:(int)row dropOperation:(NSTableViewDropOperation)op
