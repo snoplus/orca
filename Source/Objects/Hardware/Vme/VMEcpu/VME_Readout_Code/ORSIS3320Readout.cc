@@ -64,12 +64,12 @@ bool ORSIS3320Readout::Readout(SBC_LAM_Data* /*lam_data*/)
             endSampleAddress &= 0xffffff;
             
             if (endSampleAddress != 0) {
-                uint32_t bufferSize = GetDeviceSpecificData()[i/2]; //longs
-                ensureDataCanHold(bufferSize+2);
+                uint32_t numLongsToRead = GetDeviceSpecificData()[i/2]+10; //longs
+                ensureDataCanHold(numLongsToRead+2);
                 
                 uint32_t savedDataStart = dataIndex;
                 
-                data[dataIndex++] = dataId | (bufferSize+2);
+                data[dataIndex++] = dataId | (numLongsToRead+2);
                 data[dataIndex++] = location;
                 
                 if(VMERead(GetBaseAddress() +
@@ -77,8 +77,8 @@ bool ORSIS3320Readout::Readout(SBC_LAM_Data* /*lam_data*/)
                            GetAddressModifier(),
                            (uint32_t) 4,
                            (uint8_t*)&(data[dataIndex]),
-                           bufferSize*4) == (int32_t)bufferSize*4) {
-                    dataIndex+=bufferSize;
+                           numLongsToRead*4) == (int32_t)numLongsToRead*4) {
+                    dataIndex+=numLongsToRead;
                }
                 else {
                     //something wrong.. dump the data

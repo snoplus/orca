@@ -2146,15 +2146,16 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 			for (i=0;i<8;i++) {
                 unsigned long endSampleAddress = [self readNextAdcAddress:i] & 0xffffff;
                 if (endSampleAddress != 0) {
-                    unsigned long data[552+2];
-                    data[0] = dataId | (2 + bufferLength[i/2]/2);
+                    unsigned long data[511+10+2]; //max length plus Orca header
+                    unsigned long numLongsToRead = bufferLength[i/2]/2 + 10;
+                    data[0] = dataId | (2 + numLongsToRead);
                     data[1] = location;
                     [[self adapter] readLongBlock:&data[2]
                                         atAddress:baseAddress + adcMemoryPage[i]
-                                        numToRead:bufferLength[i/2]/2
+                                        numToRead:numLongsToRead
                                        withAddMod:addressModifier
                                     usingAddSpace:0x01];
-                    [aDataPacket addLongsToFrameBuffer:data length:2 + bufferLength[i/2]/2];
+                    [aDataPacket addLongsToFrameBuffer:data length:2 + numLongsToRead];
                     ++waveFormCount[i];
 
 				}
