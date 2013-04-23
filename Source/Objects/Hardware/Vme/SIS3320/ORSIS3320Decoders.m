@@ -65,7 +65,7 @@
 	NSMutableData* tmpData = [NSMutableData dataWithBytes:someData length:(length-3)*sizeof(long)];
 	unsigned short* dp = (unsigned short*)[tmpData bytes];
 	int i;
-	for(i=3;i<length-3;i++){
+	for(i=24;i<length-24;i++){ //skip the ORCA header(4 shorts) and the hw header (20 shorts)
 		*dp++ = ptr[i] & 0xfff;
 		*dp++ = (ptr[i]>>16) & 0xfff;
 	}

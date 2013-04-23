@@ -467,8 +467,6 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 
 
 @interface ORSIS3320Model (private)
-- (NSData*) reOrderOneEvent:(NSData*)theSourceData;
-- (void) readAdcChannel:(ORDataPacket*)aDataPacket endAddress:(unsigned long)end channel:(int)adc_channel;
 - (void) setUpArrays;
 - (NSMutableArray*) arrayOfLength:(int)len;
 @end
@@ -554,7 +552,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 
 - (void) setBufferLength:(int)aGroup withValue:(unsigned long)aBufferLength
 {
-    if(aBufferLength>1024)aBufferLength= 1024;
+    if(aBufferLength>1022)aBufferLength= 1022;
     [[[self undoManager] prepareWithInvocationTarget:self] setBufferLength:aGroup withValue:bufferLength[aGroup]];
     
     bufferLength[aGroup] = aBufferLength;
@@ -795,7 +793,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 {
     if(aGroup>=0 && aGroup<kNumSIS3320Groups){
         if(aTriggerGateLength<1)aTriggerGateLength = 1;
-        else if(aTriggerGateLength>1024)aTriggerGateLength = 1024;
+        else if(aTriggerGateLength>1022)aTriggerGateLength = 1022;
         
         [[[self undoManager] prepareWithInvocationTarget:self] setTriggerGateLength:aGroup withValue:[self triggerGateLength:aGroup]];
         int triggerGateLength = [self limitIntValue:aTriggerGateLength min:0 max:65535];
@@ -2146,11 +2144,9 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 		if((status & kEndAddressThresholdFlag) == kEndAddressThresholdFlag){
             int i;
 			for (i=0;i<8;i++) {
-                unsigned long endSampleAddress = [self readPreviousAdcAddress:i] & 0xffffff;
-                //unsigned long add = [self readNextAdcAddress:i];
+                unsigned long endSampleAddress = [self readNextAdcAddress:i] & 0xffffff;
                 if (endSampleAddress != 0) {
-                    [self regDump];
-                    unsigned long data[522+2];
+                    unsigned long data[552+2];
                     data[0] = dataId | (2 + bufferLength[i/2]/2);
                     data[1] = location;
                     [[self adapter] readLongBlock:&data[2]
@@ -2159,6 +2155,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
                                        withAddMod:addressModifier
                                     usingAddSpace:0x01];
                     [aDataPacket addLongsToFrameBuffer:data length:2 + bufferLength[i/2]/2];
+                    ++waveFormCount[i];
 
 				}
 			}
@@ -2194,7 +2191,10 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 	configStruct->card_info[index].crate					= [self crateNumber];
 	configStruct->card_info[index].add_mod					= addressModifier;
 	configStruct->card_info[index].base_add					= baseAddress;
-    configStruct->card_info[index].deviceSpecificData[0]	= 0;
+    int i;
+    for(i=0;i<kNumSIS3320Groups;i++){
+        configStruct->card_info[index].deviceSpecificData[i]	= bufferLength[i]/2; //longs
+    }
 	configStruct->card_info[index].num_Trigger_Indexes		= 0;
 	
 	configStruct->card_info[index].next_Card_Index 	= index+1;	
@@ -2400,177 +2400,6 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 @end
 
 @implementation ORSIS3320Model (private)
-
-
-- (NSData*) reOrderOneEvent:(NSData*)theOriginalData
-{/*
-	unsigned long i;
-	unsigned long  wrap_length	= [self memoryWrapLength];
-	unsigned long* inDataPtr    = (unsigned long*)[theOriginalData bytes];
-	unsigned long  dataLength   = [theOriginalData length];
-	
-	NSMutableData* theRearrangedData = [NSMutableData dataWithLength:dataLength];
-	unsigned long* outDataPtr		 = (unsigned long*)[theRearrangedData bytes];
-	
-	unsigned long lword_length     = 0;
-	unsigned long lword_stop_index = 0;
-	unsigned long lword_wrap_index = 0;
-	
-	unsigned long wrapped	   = 0;
-	unsigned long stopDelayCounter=0;
-	
-	unsigned long event_sample_length = wrap_length;
-	
-	if (dataLength != 0) {
-		outDataPtr[0] = inDataPtr[0]; //copy ORCA header
-		outDataPtr[1] = inDataPtr[1]; //copy ORCA header
-		
-		unsigned long index = 2;
-		
-		outDataPtr[index] = inDataPtr[index];	// copy Timestamp	
-		outDataPtr[index+1] = inDataPtr[index+1];	// copy Timestamp	    
-		
-		wrapped			 =   ((inDataPtr[4]  & 0x08000000) >> 27); 
-		stopDelayCounter =   ((inDataPtr[4]  & 0x03000000) >> 24); 
-		
-		unsigned long stopAddress =   ((inDataPtr[index+2]  & 0x7) << 24)  
-									+ ((inDataPtr[index+3]  & 0xfff0000 ) >> 4) 
-									+  (inDataPtr[index+3]  & 0xfff);
-		
-		
-		// write event length 
-		outDataPtr[index+3] = (((event_sample_length) & 0xfff000) << 4)			// bit 23:12
-							 + ((event_sample_length) & 0xfff);					// bit 11:0 
-
-		outDataPtr[index+2] = (((event_sample_length) & 0x7000000) >> 24)		// bit 23:12
-							  + (inDataPtr[index+2]  & 0x0F000000);				// Wrap arround flag and stopDelayCounter
-		
-		
-		lword_length = event_sample_length/2;
-		// stop delay correction
-		if ((stopAddress/2) < stopDelayCounter) {
-			lword_stop_index = lword_length + (stopAddress/2) - stopDelayCounter;
-		}
-		else {
-			lword_stop_index = (stopAddress/2) - stopDelayCounter;
-		}
-		
-		// rearange
-		if (wrapped) { // all samples are vaild
-			for (i=0;i<lword_length;i++){
-				lword_wrap_index =   lword_stop_index + i;
-				if  (lword_wrap_index >= lword_length) {
-					lword_wrap_index = lword_wrap_index - lword_length; 
-				} 
-				outDataPtr[index+4+i] =  inDataPtr[index+4+lword_wrap_index]; 
-			}
-		}
-		else { // only samples from "index" to "stopAddress" are valid
-			for (i=0;i<lword_length-lword_stop_index;i++){
-				lword_wrap_index =   lword_stop_index + i;
-				if  (lword_wrap_index >= lword_length) {lword_wrap_index = lword_wrap_index - lword_length; } 
-				outDataPtr[index+4+i] =  0; 
-			}
-			for (i=lword_length-lword_stop_index;i<lword_length;i++){
-				lword_wrap_index =   lword_stop_index + i;
-				if  (lword_wrap_index >= lword_length) {lword_wrap_index = lword_wrap_index - lword_length; } 
-				outDataPtr[index+4+i] =  inDataPtr[index+4+lword_wrap_index]; 
-			}
-		}
-	}
-
-	return theRearrangedData;
-  */
-	return nil;
-}
-
-- (void) readAdcChannel:(ORDataPacket*)aDataPacket endAddress:(unsigned long)event_sample_start_addr channel:(int)adc_channel
-{
-    /*
-	unsigned int max_page_sample_length  = 0x400000 ;
-	unsigned int page_sample_length_mask = max_page_sample_length - 1 ;
-	
-	unsigned int next_event_sample_start_addr =  (event_sample_start_addr &  0x01fffffc)  ; // max 32 MSample
-	unsigned int rest_event_sample_length     =  ([self sampleLength] & 0x03fffffc)      ; // max 32 MSample
-	if (rest_event_sample_length  >= 0x2000000) {rest_event_sample_length =  0x2000000 ;}     
-	
-	unsigned int index_num_data = 0x0 ;
-	do {
-		unsigned int sub_event_sample_addr		=  (next_event_sample_start_addr & page_sample_length_mask) ;
-		unsigned int sub_max_page_sample_length =  max_page_sample_length - sub_event_sample_addr ;
-		unsigned int sub_event_sample_length ;
-		if (rest_event_sample_length >= sub_max_page_sample_length) {
-			sub_event_sample_length = sub_max_page_sample_length  ;
-		}
-		else {
-			sub_event_sample_length = rest_event_sample_length  ; // - sub_event_sample_addr
-		}
-		
-		unsigned int sub_page_addr_offset		=  (next_event_sample_start_addr >> 22) & 0x7 ;
-		unsigned int dma_request_nof_lwords     =  (sub_event_sample_length) / 2  ; // Lwords
-		unsigned int dma_adc_addr_offset_bytes  =  (sub_event_sample_addr) * 2    ; // Bytes			
-		
-		// set page
-		[self writeAdcMemoryPage:sub_page_addr_offset];
-		
-		unsigned long addr = [self baseAddress] 
-							+ kAdc1MemoryPage 
-							+ (kNextAdcMemoryOffset * adc_channel) 
-							+ (dma_adc_addr_offset_bytes);
-				
-		unsigned int req_nof_lwords = dma_request_nof_lwords ; 
-		
-		if(data)free(data);
-		data = (unsigned long*)malloc((3+req_nof_lwords)*sizeof(long));
-		data[0] =   dataId | (3+req_nof_lwords);
-		data[1] =   (([self crateNumber]&0x0000000f)<<21) | 
-		(([self slot] & 0x0000001f)<<16)      |
-		((adc_channel & 0x000000ff)<<8);
-		data[2] = [self sampleLength];
-		
-		[[self adapter] readLongBlock:&data[3]
-							atAddress:addr
-							numToRead:req_nof_lwords
-						   withAddMod:addressModifier
-						usingAddSpace:0x01];			
-		[aDataPacket addLongsToFrameBuffer:data length:3+req_nof_lwords];
-		
-		index_num_data = index_num_data + req_nof_lwords ;
-	
-		next_event_sample_start_addr =  next_event_sample_start_addr + sub_event_sample_length     ;  
-		rest_event_sample_length     =  rest_event_sample_length - sub_event_sample_length     ;  
-		
-	} while (rest_event_sample_length>0) ;
-	
-	
-	 unsigned long event_sample_length = [self sampleLength];
-	 
-	 [self writePageRegister:(endAdress>>22)&0x7];
-	 //do {
-	 //just read one event for now
-		unsigned long numOfLongsToRead     =  5*(event_sample_length / 2)  ; // Lwords
-			
-		// read		
-		unsigned long addr			 = [self baseAddress] + adcMemoryPage[adc_channel];// + dma_adc_addr_offset_bytes;
-		
-		if(data)free(data);
-		data = (unsigned long*)malloc((3+numOfLongsToRead)*sizeof(long));
-		data[0] =   dataId | (3+numOfLongsToRead);
-		data[1] =   (([self crateNumber]&0x0000000f)<<21) | 
-					(([self slot] & 0x0000001f)<<16)      |
-					((adc_channel & 0x000000ff)<<8);
-		data[2] = event_sample_length;
-		
-		[[self adapter] readLongBlock:&data[3]
-							atAddress:addr
-							numToRead:numOfLongsToRead
-						   withAddMod:addressModifier
-						usingAddSpace:0x01];			
-		[aDataPacket addLongsToFrameBuffer:data length:3+numOfLongsToRead];
-		
-	//} while (rest_event_sample_length>0) ;
-*/
-}
 
 - (void) setUpArrays
 {
