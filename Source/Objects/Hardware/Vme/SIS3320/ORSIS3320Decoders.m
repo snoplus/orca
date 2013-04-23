@@ -99,10 +99,20 @@
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
     NSString* title    = @"SIS3320 Waveform Record\n\n";
-    NSString* crate    = [NSString stringWithFormat:@"Crate = %ld\n",ShiftAndExtract(ptr[1],21,0xf)];
-    NSString* card     = [NSString stringWithFormat:@"Card  = %ld\n",ShiftAndExtract(ptr[1],16,0x1f)];
-    NSString* channel  = [NSString stringWithFormat:@"Channel  = %ld\n",ShiftAndExtract(ptr[1],0,0xf)];
-    return [NSString stringWithFormat:@"%@%@%@%@",title,crate,card,channel];               
+    NSString* crate    = [NSString stringWithFormat: @"Crate      = %ld\n",ShiftAndExtract(ptr[1],21,0xf)];
+    NSString* card     = [NSString stringWithFormat: @"Card       = %ld\n",ShiftAndExtract(ptr[1],16,0x1f)];
+    NSString* channel  = [NSString stringWithFormat: @"Channel    = %ld\n",ShiftAndExtract(ptr[1],0,0xf)];
+    NSString* timehigh  = [NSString stringWithFormat:@"Time(High) = %ld\n",ShiftAndExtract(ptr[2],16,0xffff)];
+    NSString* timelow  = [NSString stringWithFormat: @"Time(Low)  = %ld\n",ShiftAndExtract(ptr[3],0,0xffffffff)];
+    NSString* accum1  = [NSString stringWithFormat:  @"Accum Sum Gate1  = %ld\n",ShiftAndExtract(ptr[4],0,0xfffff)];
+    NSString* accum2  = [NSString stringWithFormat:  @"Accum Sum Gate2  = %ld\n",ShiftAndExtract(ptr[5],0,0xfffff)];
+    NSString* accum3  = [NSString stringWithFormat:  @"Accum Sum Gate3  = %ld\n",ShiftAndExtract(ptr[6],0,0xfffff)];
+    NSString* accum4  = [NSString stringWithFormat:  @"Accum Sum Gate4  = %ld\n",ShiftAndExtract(ptr[7],0,0xfffff)];
+    NSString* accum5  = [NSString stringWithFormat:  @"Accum Sum Gate5  = %ld\n",ShiftAndExtract(ptr[8],0,0xfffff)];
+    NSString* accum6  = [NSString stringWithFormat:  @"Accum Sum Gate6  = %ld\n",ShiftAndExtract(ptr[8],16,0xffff)];
+    NSString* accum7  = [NSString stringWithFormat:  @"Accum Sum Gate7  = %ld\n",ShiftAndExtract(ptr[9],0,0xffff)];
+    NSString* accum8  = [NSString stringWithFormat:  @"Accum Sum Gate8  = %ld\n",ShiftAndExtract(ptr[9],16,0xffff)];
+    return [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@%@%@%@%@",title,crate,card,channel,timehigh,timelow,accum1,accum2,accum3,accum4,accum5,accum6,accum7,accum8];
 }
 
 @end
