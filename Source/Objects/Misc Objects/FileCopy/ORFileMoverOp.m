@@ -51,7 +51,12 @@
     self.remoteUserName     = nil;
     self.fullPath           = nil;
     self.remotePassWord     = nil;
-    [task terminate];
+    @try {
+        [task terminate];
+    }
+    @catch (NSException* e){
+        
+    }
     self.task               = nil;
     [allOutput release];
     
@@ -187,19 +192,22 @@
             }
         }
     }
-    
-    NSPipe *newPipe = [NSPipe pipe];
-    [task setStandardOutput:newPipe];
-    [task setStandardError:newPipe];
-    NSFileHandle *readHandle = [newPipe fileHandleForReading];
-    [task launch];
-    
-    [self readOutput:readHandle];
-    [self checkOutput];
-    if ([delegate respondsToSelector:@selector(fileMoverIsDone)]){
-        [delegate performSelectorOnMainThread:@selector(fileMoverIsDone) withObject:nil waitUntilDone:NO];
+    @try {
+        NSPipe *newPipe = [NSPipe pipe];
+        [task setStandardOutput:newPipe];
+        [task setStandardError:newPipe];
+        NSFileHandle *readHandle = [newPipe fileHandleForReading];
+        [task launch];
+        
+        [self readOutput:readHandle];
+        [self checkOutput];
+        if ([delegate respondsToSelector:@selector(fileMoverIsDone)]){
+            [delegate performSelectorOnMainThread:@selector(fileMoverIsDone) withObject:nil waitUntilDone:NO];
+        }
     }
-
+    @catch (NSException* e){
+        NSLog(@"File Mover exception.. stopped during launch\n");
+    }
 }
 
 - (void) checkOutput
