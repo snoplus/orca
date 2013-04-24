@@ -656,14 +656,18 @@ startIndex=traceStart16;
  ^^^^ ^^^--------------------------------spare
          ^ ^^^---------------------------crate
               ^ ^^^^---------------------card
+			         ---^ ^^^^-----------number of channels NOC (=num of contained HR values)
+                                       ^-record version (0x0 old (wrong) version; 0x1: appending 32-bit HR registers
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx sec
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx hitRate length
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx total hitRate
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx 
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx                             
       ^^^^ ^^^^-------------------------- channel (0..23)
 			       ^--------------------- overflow  
 				     ^^^^ ^^^^ ^^^^ ^^^^- hitrate
- ...more 
+ ...  (NOC) x times
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  32 bit hitrate register (channel number: stored in according                             
+ ...  (NOC) x times
  </pre>
  *
  */
@@ -721,18 +725,44 @@ startIndex=traceStart16;
 	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:ut_time];
 	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S %z\n"];
 	
-	NSMutableString *hrString = [NSMutableString stringWithFormat:@"UTTime     = %d\nHitrateLen = %d\nTotal HR   = %d\n",
-						  ut_time,hitRateLengthSec,newTotal];
+	NSMutableString *hrString;
+
+
+    uint32_t version                = ShiftAndExtract(ptr[1],0,0x1);    //bit 1 = version
+    uint32_t countHREnabledChans    = ShiftAndExtract(ptr[1],8,0x1f);   //NOC in record
+
+
 	int i;
-	for(i=0; i<length-5; i++){
-		uint32_t chan	= ShiftAndExtract(ptr[5+i],20,0xff);
-		uint32_t over	= ShiftAndExtract(ptr[5+i],16,0x1);
-		uint32_t hitrate= ShiftAndExtract(ptr[5+i], 0,0xffff);
-		if(over)
-			[hrString appendString: [NSString stringWithFormat:@"Chan %2d    = OVERFLOW\n", chan] ];
-		else
-			[hrString appendString: [NSString stringWithFormat:@"Chan %2d    = %d\n", chan,hitrate] ];
-	}
+    
+    
+    if(version==0x1){
+	    hrString = [NSMutableString stringWithFormat:@"SLTsecond     = %d\nHitrateLen = %d\nTotal HR   = %d\n",
+						  ut_time,hitRateLengthSec,newTotal];
+        for(i=0; i<countHREnabledChans; i++){
+            uint32_t chan	= ShiftAndExtract(ptr[5+i],20,0xff);
+            uint32_t over	= ShiftAndExtract(ptr[5+countHREnabledChans+i],31,0x1);
+            uint32_t hitrate= ShiftAndExtract(ptr[5+countHREnabledChans+i], 0,0x7fffffff);
+            if(over)
+                [hrString appendString: [NSString stringWithFormat:@"Chan %2d    = OVERFLOW\n", chan] ];
+            else
+                [hrString appendString: [NSString stringWithFormat:@"Chan %2d    = %d\n", chan,hitrate] ];
+        }
+        
+    }else{
+	    hrString = [NSMutableString stringWithFormat:@"UTTime     = %d\nHitrateLen = %d\nTotal HR   = %d\n",
+						  ut_time,hitRateLengthSec,newTotal];
+        for(i=0; i<length-5; i++){
+            uint32_t chan	= ShiftAndExtract(ptr[5+i],20,0xff);
+            uint32_t over	= ShiftAndExtract(ptr[5+i],16,0x1);
+            uint32_t hitrate= ShiftAndExtract(ptr[5+i], 0,0xffff);
+            if(over)
+                [hrString appendString: [NSString stringWithFormat:@"Chan %2d    = OVERFLOW\n", chan] ];
+            else
+                [hrString appendString: [NSString stringWithFormat:@"Chan %2d    = %d\n", chan,hitrate] ];
+        }
+    }
+    
+    
     return [NSString stringWithFormat:@"%@%@%@%@%@",title,crate,card,date,hrString];
 }
 @end

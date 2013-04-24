@@ -49,7 +49,8 @@
 #define kIpeFlt_Cmd_LoadGains	            0x100
 #define kIpeFlt_SW_Trigger					0x80000000
 //#define kIpeFlt_Reset_All			0x18010 I added the resetPage flag -tb-
-#define kIpeFlt_Reset_All			0x38010
+//#define kIpeFlt_Reset_All			0x38010 flag 15 isn't defined -tb-
+#define kIpeFlt_Reset_All			0x30010 //=rstPg, rPoint, rstTP
 
 #define kIpeFlt_Periph_CoinTme_Shift		0
 #define kIpeFlt_Periph_CoinTme_Mask			0x1ff

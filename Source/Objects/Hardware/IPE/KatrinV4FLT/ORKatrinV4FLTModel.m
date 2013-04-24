@@ -1945,17 +1945,20 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 		BOOL oneChanged = NO;
 		float newTotal = 0;
 		int chan;
+		int countHREnabledChans=0;//2013-04-24 -tb-
         int hitRateLengthSec = 1<<hitRateLength;
 		float freq = 1.0/((double)hitRateLengthSec);
 				
 		unsigned long location = (([self crateNumber]&0xf)<<21) | ([self stationNumber]& 0x0000001f)<<16;
-		unsigned long data[5 + kNumV4FLTChannels];
+		//unsigned long data[5 + kNumV4FLTChannels];
+		unsigned long data[5 + kNumV4FLTChannels];//2013-04-24 changed to ship full 32 bit counter; data format changed! see decoder -tb-
 		
 		//combine all the hitrate read commands into one command packet
 		ORCommandList* aList = [ORCommandList commandList];
 		for(chan=0;chan<kNumV4FLTChannels;chan++){
 			if(hitRateEnabledMask & (1L<<chan)){
 				[aList addCommand: [self readRegCmd:kFLTV4HitRateReg channel:chan]];
+                countHREnabledChans++;
 			}
 		}
 		
@@ -1974,6 +1977,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 		for(chan=0;chan<kNumV4FLTChannels;chan++){
 			if(hitRateEnabledMask & (1L<<chan)){
 				unsigned long aValue = [aList longValueForCmd:dataIndex];
+				data[5 + countHREnabledChans + dataIndex] =  aValue;// the hitrate may have more than 16 bit in the future -tb-
 				BOOL overflow = (aValue >> 31) & 0x1;
 				aValue = aValue & 0x7fffffff;
 				if(aValue != hitRate[chan] || overflow != hitRateOverFlow[chan]){
@@ -1989,7 +1993,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 				if(!hitRateOverFlow[chan]){
 					newTotal += hitRate[chan];
 				}
-				data[dataIndex + 5] = ((chan&0xff)<<20) | ((overflow&0x1)<<16) | aValue;// the hitrate may have more than 16 bit in the future -tb-
+				data[dataIndex + 5] = ((chan&0xff)<<20) | ((overflow&0x1)<<16) | aValue;// the hitrate may have more than 16 bit in the future -tb- //2013-04-24 done -tb-
 				dataIndex++;
 			}
 		}
@@ -1997,18 +2001,25 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
         sltSubSecReg =  [aList longValueForCmd:dataIndex];		
         sltSubSec   = ((sltSubSecReg>>11)&0x3fff)*2000   +  (sltSubSecReg & 0x7ff);
         sltSec    =  [aList longValueForCmd:dataIndex+1];		
-        //DEBUGGING NSLog(@"FLT %i: readHitRates: sltSec: %08x (%i)  sltSubSec %08x (%i, %f)\n",[self stationNumber],sltSec,sltSec,sltSubSec,sltSubSec, (0.00000005*sltSubSec));		
+        //DEBUGGING NSLog(@"FLT %i: readHitRates: sltSec: %08x (%i)  sltSubSec %08x (%i, %f)\n",[self stationNumber],sltSec,sltSec,sltSubSec,sltSubSec, (0.00000005*sltSubSec));	
+        
+        if(	dataIndex != countHREnabledChans){
+            NSLog(@"ERROR:  Shipping hitrates: FLT %i:	dataIndex %i,  countHREnabledChans %i are not the same!!!\n",[self stationNumber],dataIndex , countHREnabledChans);	
+        }	
+            //DEBUGGING     NSLog(@"Shipping hitrates: FLT %i:	dataIndex %i,  countHREnabledChans %i\n",[self stationNumber],dataIndex , countHREnabledChans);	
+        
 		if(dataIndex>0){
 			time_t	ut_time;
 			time(&ut_time);
 
-			data[0] = hitRateId | (dataIndex + 5); 
-			data[1] = location;
-			data[2] = ut_time;	
+			data[0] = hitRateId | (dataIndex + countHREnabledChans + 5); 
+			data[1] = location  | ((countHREnabledChans & 0x1f)<<8) | 0x1; //2013-04-24 version of record type: 0x1: shipping  32 bit hitrate registers  -tb-
+			//data[2] = ut_time;	
+			data[2] = sltSec;	//2013-04-24 changed to ship slt second counter -tb-
 			data[3] = hitRateLengthSec;	
 			data[4] = newTotal;
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-																object:[NSData dataWithBytes:data length:sizeof(long)*(dataIndex + 5)]];
+																object:[NSData dataWithBytes:data length:sizeof(long)*(dataIndex + 5 + countHREnabledChans)]];
 			
 		}
 		
