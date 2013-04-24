@@ -100,17 +100,23 @@
 		int index = [fileListView selectedRow];
 		NSArray* files = [model filesToProcess];
 		if(index>=0 && index<[files count]){
-			id selectedObj = [files objectAtIndex: [fileListView selectedRow]];
-			NSArray* objects = [[model document] collectObjectsOfClass:NSClassFromString(@"ORDataExplorerModel")];
-			if([objects count]){
-				ORDataExplorerModel* explorer = [objects objectAtIndex:0]; //just use the first one
-                [[self undoManager] disableUndoRegistration];
-				[explorer setFileToExplore:selectedObj];
-                [[self undoManager] enableUndoRegistration];
-				[explorer makeMainController];
-				[explorer parseFile];
-			}
-			else NSLog(@"Header Explorer: No DataExplorer in configuration\n");
+			id selectedFile = [files objectAtIndex: [fileListView selectedRow]];
+            NSFileManager* fm = [NSFileManager defaultManager];
+            BOOL isDirectory;
+            if([fm fileExistsAtPath:selectedFile isDirectory:&isDirectory]){
+                NSArray* objects = [[model document] collectObjectsOfClass:NSClassFromString(@"ORDataExplorerModel")];
+                if([objects count]){
+                    ORDataExplorerModel* explorer = [objects objectAtIndex:0]; //just use the first one
+                    [[self undoManager] disableUndoRegistration];
+                    [explorer setFileToExplore:selectedFile];
+                    [[self undoManager] enableUndoRegistration];
+                    [explorer makeMainController];
+                    [explorer parseFile];
+                }
+                else NSLog(@"Header Explorer: No DataExplorer in configuration\n");
+            }
+            else NSLog(@"Header Explorer: %@ no longer exists.\n",selectedFile);
+
 		}
 	}
 }
