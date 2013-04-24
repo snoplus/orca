@@ -256,7 +256,7 @@
 {
 	[self endEditing];
     if(![model isProcessing]){
-        if([model readHeaders])[selectButton setEnabled:NO];
+        if([model readHeaders])[replayButton setEnabled:NO];
     }
     else {
         [model stopProcessing];

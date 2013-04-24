@@ -570,7 +570,6 @@ NSString* ORHeaderExplorerProgressChanged		= @"ORHeaderExplorerProgressChanged";
     [[NSNotificationCenter defaultCenter]
 			    postNotificationName:ORHeaderExplorerListChanged
                               object: self];
-	if(autoProcess)[self readHeaders];
 }
 
 - (void) removeFilesWithIndexes:(NSIndexSet*)indexSet;
@@ -607,18 +606,21 @@ NSString* ORHeaderExplorerProgressChanged		= @"ORHeaderExplorerProgressChanged";
 	
 	if ([filesToProcess count]){
 		
-		[[NSNotificationCenter defaultCenter]
-				postNotificationName:ORHeaderExplorerProcessing
-                              object: self];
 		amountDoneSoFar = 0;
 		totalToBeProcessed = 0;
+        NSMutableArray* nonExistantFiles = [NSMutableArray array];
 		for(id aPath in filesToProcess){
 			if([[NSFileManager defaultManager] fileExistsAtPath:aPath]){
 				NSDictionary *fattrs = [[NSFileManager defaultManager] attributesOfItemAtPath:aPath error:nil];
 				totalToBeProcessed += [[fattrs objectForKey:NSFileSize] longLongValue];
 			}
+            else [nonExistantFiles addObject:aPath];
 		}
-		
+		[self removeFiles:nonExistantFiles];
+    }
+	if ([filesToProcess count]){
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORHeaderExplorerProcessing object: self];
+
 		if(!queue){
 			queue = [[NSOperationQueue alloc] init];
 		}
@@ -634,7 +636,7 @@ NSString* ORHeaderExplorerProgressChanged		= @"ORHeaderExplorerProgressChanged";
 			}
 		}
 		
-        return YES;
+        return [filesToProcess count]?YES:NO;
 	}
     return NO;
 }
