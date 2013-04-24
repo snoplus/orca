@@ -76,9 +76,14 @@
 	ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:0 andDataSource:self];
 	[timeRatePlot addPlot: aPlot];
 	[(ORTimeAxis*)[timeRatePlot xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
+    [[timeRatePlot yAxis] setRngLimitsLow:0 withHigh:24*200000 withMinRng:5];
+
 	[aPlot release];
 
 	[rate0 setNumber:24 height:10 spacing:6];
+    [[rate0 xAxis] setRngLimitsLow:0 withHigh:200000 withMinRng:5];
+    
+    [[totalRate xAxis] setRngLimitsLow:0 withHigh:24*200000 withMinRng:5];
 
 	int i;
 	for(i=0;i<kNumV4FLTChannels;i++){
