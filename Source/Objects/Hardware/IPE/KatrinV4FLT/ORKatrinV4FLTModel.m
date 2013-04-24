@@ -1978,14 +1978,17 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 			if(hitRateEnabledMask & (1L<<chan)){
 				unsigned long aValue = [aList longValueForCmd:dataIndex];
 				data[5 + countHREnabledChans + dataIndex] =  aValue;// the hitrate may have more than 16 bit in the future -tb-
-				BOOL overflow = (aValue >> 31) & 0x1;
-				aValue = aValue & 0x7fffffff;
+				//BOOL overflow = (aValue >> 31) & 0x1;
+				BOOL overflow = 0;//2013-04-24 for legacy data we 'simulate' a 16 bit counter -> simulate a 16 bit overflow flag -tb-
+				if(aValue & 0xffff0000) overflow =  0x1;//2013-04-24 for legacy data we 'simulate' a 16 bit counter -> simulate a 16 bit overflow flag -tb-
+				unsigned long aValue16 = aValue & 0xffff;
+                aValue = aValue & 0x7fffffff;
 				if(aValue != hitRate[chan] || overflow != hitRateOverFlow[chan]){
 					if (hitRateLengthSec!=0)	hitRate[chan] = aValue * freq;
 					//if (hitRateLengthSec!=0)	hitRate[chan] = aValue; 
 					else					    hitRate[chan] = 0;
 					
-					if(hitRateOverFlow[chan])hitRate[chan] = 0;
+					if(overflow) hitRate[chan] = 0;
 					hitRateOverFlow[chan] = overflow;
 					
 					oneChanged = YES;
@@ -1993,7 +1996,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 				if(!hitRateOverFlow[chan]){
 					newTotal += hitRate[chan];
 				}
-				data[dataIndex + 5] = ((chan&0xff)<<20) | ((overflow&0x1)<<16) | aValue;// the hitrate may have more than 16 bit in the future -tb- //2013-04-24 done -tb-
+				data[dataIndex + 5] = ((chan&0xff)<<20) | ((overflow&0x1)<<16) | aValue16;// the hitrate may have more than 16 bit in the future -tb- //2013-04-24 done -tb-
 				dataIndex++;
 			}
 		}
@@ -2004,7 +2007,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
         //DEBUGGING NSLog(@"FLT %i: readHitRates: sltSec: %08x (%i)  sltSubSec %08x (%i, %f)\n",[self stationNumber],sltSec,sltSec,sltSubSec,sltSubSec, (0.00000005*sltSubSec));	
         
         if(	dataIndex != countHREnabledChans){
-            NSLog(@"ERROR:  Shipping hitrates: FLT %i:	dataIndex %i,  countHREnabledChans %i are not the same!!!\n",[self stationNumber],dataIndex , countHREnabledChans);	
+            NSLog(@"ERROR:  Shipping hitrates: FLT #%i:	dataIndex %i,  countHREnabledChans %i are not the same!!!\n",[self stationNumber],dataIndex , countHREnabledChans);	
         }	
             //DEBUGGING     NSLog(@"Shipping hitrates: FLT %i:	dataIndex %i,  countHREnabledChans %i\n",[self stationNumber],dataIndex , countHREnabledChans);	
         
