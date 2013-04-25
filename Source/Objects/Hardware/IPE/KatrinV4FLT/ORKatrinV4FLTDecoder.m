@@ -659,7 +659,7 @@ startIndex=traceStart16;
               ^ ^^^^---------------------card
 			         ---^ ^^^^-----------number of channels NOC (=num of contained HR values)                        //2013-04-24 added -tb-
                                        ^-record version (0x0 old (wrong) version; 0x1: appending 32-bit HR registers //2013-04-24 added -tb-
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx sec
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx sec (readout second!)
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx hitRate length
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx total hitRate
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx                             

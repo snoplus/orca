@@ -452,6 +452,7 @@ static IpeRegisterNamesStruct regSLTV4[kSltV4NumRegs] = {
 - (BOOL) doneTakingData;
 
 - (void) shipSltSecondCounter:(unsigned char)aType;
+- (void) shipSltRunCounter:(unsigned char)aType;
 - (void) shipSltEvent:(unsigned char)aCounterType withType:(unsigned char)aType eventCt:(unsigned long)c high:(unsigned long)h low:(unsigned long)l;
 
 - (ORReadOutList*)	readOutGroup;

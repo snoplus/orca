@@ -544,6 +544,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 {
 	//NSLog(@"%@::%@  called!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: debug -tb-
 	[self shipSltSecondCounter: kStopSubRunType];
+	[self shipSltRunCounter: kStopSubRunType];
 	//TODO: I could set inhibit to measure the 'netto' run time precisely -tb-
 }
 
@@ -552,6 +553,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 {
 	//NSLog(@"%@::%@  called!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));
 	[self shipSltSecondCounter: kStartSubRunType];
+	[self shipSltRunCounter: kStartSubRunType];
 }
 
 
@@ -1720,6 +1722,12 @@ return;
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
 																object:[NSData dataWithBytes:data length:sizeof(long)*(5)]];
 	#endif
+}
+
+- (void) shipSltRunCounter:(unsigned char)aType
+{
+		unsigned long long runcount = [self readRunTime];
+		[self shipSltEvent:kRunCounterType withType:aType eventCt:0 high: (runcount>>32)&0xffffffff low:(runcount)&0xffffffff ];
 }
 
 - (void) shipSltEvent:(unsigned char)aCounterType withType:(unsigned char)aType eventCt:(unsigned long)c high:(unsigned long)h low:(unsigned long)l
