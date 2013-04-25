@@ -645,6 +645,7 @@ startIndex=traceStart16;
 @implementation ORKatrinV4FLTDecoderForHitRate
 
 //-------------------------------------------------------------
+//2013-04-24 -tb- extended data format to support 32 bit hitrate register (added additional set of words at end of old record format)
 /** Data format for hit rate mode:
  *
  <pre>
@@ -656,17 +657,17 @@ startIndex=traceStart16;
  ^^^^ ^^^--------------------------------spare
          ^ ^^^---------------------------crate
               ^ ^^^^---------------------card
-			         ---^ ^^^^-----------number of channels NOC (=num of contained HR values)
-                                       ^-record version (0x0 old (wrong) version; 0x1: appending 32-bit HR registers
+			         ---^ ^^^^-----------number of channels NOC (=num of contained HR values)                        //2013-04-24 added -tb-
+                                       ^-record version (0x0 old (wrong) version; 0x1: appending 32-bit HR registers //2013-04-24 added -tb-
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx sec
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx hitRate length
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx total hitRate
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx                             
       ^^^^ ^^^^-------------------------- channel (0..23)
 			       ^--------------------- overflow  
-				     ^^^^ ^^^^ ^^^^ ^^^^- hitrate
+				     ^^^^ ^^^^ ^^^^ ^^^^- hitrate ('hitrate')
  ...  (NOC) x times
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  32 bit hitrate register (channel number: stored in according                             
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  'hitrate32': 32 bit hitrate register (channel number: stored in according 'hitrate' words) //2013-04-24 added -tb-                            
  ...  (NOC) x times
  </pre>
  *

@@ -1976,20 +1976,21 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 		int dataIndex = 0;
 		for(chan=0;chan<kNumV4FLTChannels;chan++){
 			if(hitRateEnabledMask & (1L<<chan)){
-				unsigned long aValue = [aList longValueForCmd:dataIndex];
-				data[5 + countHREnabledChans + dataIndex] =  aValue;// the hitrate may have more than 16 bit in the future -tb-
+				unsigned long aValue32 = [aList longValueForCmd:dataIndex];
+				data[5 + countHREnabledChans + dataIndex] =  aValue32;// the hitrate may have more than 16 bit in the future -tb-
 				//BOOL overflow = (aValue >> 31) & 0x1;
 				BOOL overflow = 0;//2013-04-24 for legacy data we 'simulate' a 16 bit counter -> simulate a 16 bit overflow flag -tb-
-				if(aValue & 0xffff0000) overflow =  0x1;//2013-04-24 for legacy data we 'simulate' a 16 bit counter -> simulate a 16 bit overflow flag -tb-
-				unsigned long aValue16 = aValue & 0xffff;
-                aValue = aValue & 0x7fffffff;
-				if(aValue != hitRate[chan] || overflow != hitRateOverFlow[chan]){
-					if (hitRateLengthSec!=0)	hitRate[chan] = aValue * freq;
+				if(aValue32 & 0xffff0000) overflow =  0x1;//2013-04-24 for legacy data we 'simulate' a 16 bit counter -> simulate a 16 bit overflow flag -tb-
+				BOOL overflow32 = (aValue32 >>31) & 0x1;//2013-04-24 for legacy data we 'simulate' a 16 bit counter -> simulate a 16 bit overflow flag -tb-
+				unsigned long aValue16 = aValue32 & 0xffff;
+                aValue32 = aValue32 & 0x7fffffff;
+				if(aValue32 != hitRate[chan] || overflow32 != hitRateOverFlow[chan]){
+					if (hitRateLengthSec!=0)	hitRate[chan] = aValue32 * freq;
 					//if (hitRateLengthSec!=0)	hitRate[chan] = aValue; 
 					else					    hitRate[chan] = 0;
 					
-					if(overflow) hitRate[chan] = 0;
-					hitRateOverFlow[chan] = overflow;
+					if(overflow32) hitRate[chan] = 0;
+					hitRateOverFlow[chan] = overflow32;
 					
 					oneChanged = YES;
 				}
