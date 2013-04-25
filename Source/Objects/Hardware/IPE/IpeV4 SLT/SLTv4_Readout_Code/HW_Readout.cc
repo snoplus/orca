@@ -616,8 +616,8 @@ void setHostTimeToFLTsAndSLT(int32_t* args)
 	    //fprintf(stdout,"setHostTimeToFLTsAndSLT:  SLT timer:  sec %u, sltsubsec2 %u, sltsubsec1 %u, subsec %u\n", sltsec, sltsubsec2, sltsubsec1, sltsubsec);//TODO: DEBUG -tb-
         readSltSecSubsec(sltsec,sltsubsec);
 	    //DEBUG    fprintf(stdout,"setHostTimeToFLTsAndSLT:  SLT timer:  sec %u,   subsec %u\n", sltsec,  sltsubsec);//TODO: DEBUG -tb-
-        if(sltsubsec>1000000 && sltsubsec<16000000) break; //full second is 20000000 clocks - I want not be too close to a second change
-        //sltsubsec>1000000 as the PrPMC clock might differ; sltsubsec<16000000 to have0.2 seconds to make all settings to the hardware
+        if(sltsubsec>6000000 && sltsubsec<14000000) break; //full second is 20000000 clocks - I want not be too close to a second change
+        //sltsubsec>6000000 (~0.3 sec) as the PrPMC clock might differ; sltsubsec<14000000 to have 0.3 seconds to make all settings to the hardware
         usleep(1000);//this loop needs XXX milli seconds (with usleep(1000) and two register reads)
     }
     //2.+3.
@@ -634,7 +634,7 @@ void setHostTimeToFLTsAndSLT(int32_t* args)
 
     //4.
 	if(flags & kSecondsSetSendToFLTsFlag){
-        #if 0 //TODO: broadcast to FLTs seems to nor work currently FIX IT -tb-
+        #if 0 //TODO: broadcast to FLTs seems to not work currently FIX IT => according to Denis broadcast is not possible with v4 -tb-
 	    uint32_t FLTV4SecondCounterRegAddr = (0x1f << 17) | (0x000044>>2);
 	    [self write: FLTV4SecondCounterRegAddr  value:secSetpoint];//(0x1f << 17) is broadcast to all FLTs -tb-
         #else
@@ -655,11 +655,20 @@ void setHostTimeToFLTsAndSLT(int32_t* args)
     
 	//5.
     //as the second change between SLT and PrPMC is not syncronized, this might be necessary even if the crate counters were set previously: the SLT may be 'before' OR 'behind' the host clock
-    //TODO: keep in mind: all crate computers should be synchronized up to accuracy of 10 % to get this work properly -tb-
+    //TODO: keep in mind: all crate computers should be synchronized up to accuracy of 30 % to get this work properly -tb-
     if(sltsec !=secSetpoint){
 	    fprintf(stdout,"setHostTimeToFLTsAndSLT:   need to write SLT TIME!!! sltsec %u, sltsecsetpoint %u, \n", sltsec, secSetpoint);//TODO: DEBUG -tb-
 	    secSetpoint += 1;  //value will be taken after the NEXT second strobe, so we need the NEXT second
         srack->theSlt->setSecCounter->write(secSetpoint);
+        //TODO:
+        //TODO:
+        //TODO:
+        //TODO:
+        //sleep(1);
+        //TODO:
+        //TODO:
+        //TODO:
+        //TODO:
     }
     else
     {
