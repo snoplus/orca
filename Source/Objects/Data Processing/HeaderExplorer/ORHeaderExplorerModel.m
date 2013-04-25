@@ -339,14 +339,14 @@ NSString* ORHeaderExplorerProgressChanged		= @"ORHeaderExplorerProgressChanged";
 
 - (BOOL) fileHasBeenProcessed:(unsigned long)anIndex
 {
-    if(anIndex>[filesToProcess count])return NO;
-    else {
+    if(anIndex<[filesToProcess count]){
         NSString* aFileName = [filesToProcess objectAtIndex:anIndex];
         for(id anItem in runArray){
             if([[anItem objectForKey:@"FilePath"] isEqualToString:aFileName])return YES;
         }
         return NO;
     }
+    else return NO;
 }
 
 - (BOOL)isProcessing
