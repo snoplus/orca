@@ -78,7 +78,8 @@
 #define kIpeFlt_TestPattern_Reset	0x00000010
 
 //#define kIpeFlt_Reset_All			0x18010 I added the resetPage flag -tb-
-#define kIpeFlt_Reset_All			0x38010
+//#define kIpeFlt_Reset_All			0x38010 flag 15 isn't defined -tb-
+#define kIpeFlt_Reset_All			0x30010 //=rstPg, rPoint, rstTP
 
 #define kSetStandBy		1
 #define kReleaseStandBy 0

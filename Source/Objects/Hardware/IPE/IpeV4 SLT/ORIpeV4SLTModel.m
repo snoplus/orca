@@ -26,6 +26,7 @@
 //#import "ORIpeCrateModel.h"
 #import "ORIpeV4CrateModel.h"
 #import "ORIpeV4SLTDefs.h"
+#import "ORKatrinV4FLTModel.h"
 #import "ORReadOutList.h"
 #import "unistd.h"
 #import "TimedWorker.h"
@@ -1306,9 +1307,10 @@ return;
 
 - (unsigned long) readHwVersion
 {
-	unsigned long value;
+	unsigned long value=0;
 	@try {
-		[self setHwVersion:[self readReg: kSltV4HWRevisionReg]];	
+        value = [self readReg: kSltV4HWRevisionReg];
+		[self setHwVersion: value];	
 	}
 	@catch (NSException* e){
 	}
@@ -1600,9 +1602,27 @@ return;
     [self setMultiplicityId:[anotherCard multiplicityId]];
 }
 
+//this goes to the Run header ...
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
+    //added 2013-04-29 -tb-
+	[objDictionary setObject:[NSNumber numberWithLong:controlReg]				    forKey:@"ControlReg"];
+	[objDictionary setObject:[NSNumber numberWithInt:countersEnabled]				forKey:@"CountersEnabled"];
+	[objDictionary setObject:[NSNumber numberWithInt:secondsSetInitWithHost]		forKey:@"SecondsSetInitWithHost"];
+	if(!secondsSetInitWithHost) [objDictionary setObject:[NSNumber numberWithLong:secondsSet]				    forKey:@"SecondsInitializeTo"];
+	[objDictionary setObject:[NSNumber numberWithInt:secondsSetSendToFLTs]		    forKey:@"SecondsUseForFLTs"];
+    //this is accessing the hardware and might fail
+	@try {
+	    [objDictionary setObject:[NSNumber numberWithUnsignedLong:[self readHwVersion]]		forKey:@"FPGAVersion"];
+	    [objDictionary setObject:[NSString stringWithFormat:@"0x%08x",[self readHwVersion]]		forKey:@"FPGAVersionString"];
+	    [objDictionary setObject:[NSNumber numberWithLong:[self getSBCCodeVersion]]		forKey:@"SBCCodeVersion"];
+	    [objDictionary setObject:[NSNumber numberWithLong:[self getSltPciDriverVersion]]		forKey:@"SLTDriverVersion"];
+	    [objDictionary setObject:[NSNumber numberWithLong:[self getSltkGetIsLinkedWithPCIDMALib]]		forKey:@"LinkedWithDMALib"];
+	}
+	@catch (NSException* e){
+	}
+
 	return objDictionary;
 }
 
@@ -1626,15 +1646,62 @@ return;
 	
 	[self writeSetInhibit];  //TODO: maybe move to readout loop to avoid dead time -tb-
 	
+        //DEBUG 
+        [self dumpSltSecondCounter:@"vor initBoard"];
+    //if cold start (not 'quick start' in RunControl) ...
     if([[userInfo objectForKey:@"doinit"]intValue]){
 		[self initBoard];					
 	}	
 	
 	dataTakers = [[readOutGroup allObjects] retain];		//cache of data takers.
-	
+	int runMode=0, countHistoMode=0, countNonHistoMode=0;
+    
+        //DEBUG 
+        [self dumpSltSecondCounter:@"FLT-runTaskStarted:"];
+        
+    //loop over Readout List
 	for(id obj in dataTakers){
-        [obj runTaskStarted:aDataPacket userInfo:userInfo];
+        [obj runTaskStarted:aDataPacket userInfo:userInfo];//configure FLTs, set histogramming FLTs to standby mode etc -tb-
+        if([obj respondsToSelector:@selector(runMode)]){
+            runMode=[obj runMode];
+            if(runMode == kIpeFltV4_Histogram_DaqMode) countHistoMode++; else countNonHistoMode++;
+        }
     }
+        //DEBUG 
+        NSLog(@"%@::%@  countHistoMode:%i  countNonHistoMode:%i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),countHistoMode,countNonHistoMode);//DEBUG -tb-
+        //DEBUG 
+        [self dumpSltSecondCounter:nil];
+
+    //if there are FLTs in non-histogramming mode, the filter will start after next 1PPs - wait for it ... -tb-
+    if(countNonHistoMode && [[userInfo objectForKey:@"doinit"]intValue]){
+        //wait for next second strobe/1PPs
+		uint32_t i,subsec0, subsec1;
+		subsec0 = [self readSubSecondsCounter];
+        for(i=0; i<1000; i++){
+		    subsec1 = [self readSubSecondsCounter];
+            //DEBUG 
+            if(i==0) NSLog(@"%@::%@ waiting for second strobe: i:%i  subsec:%i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),i,subsec1);//DEBUG -tb-
+            if(subsec1<subsec0) break;
+            usleep(1000);
+        }				
+        //DEBUG 
+        NSLog(@"%@::%@ waiting for second strobe: i:%i  subsec:%i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),i,subsec1);//DEBUG -tb-
+	}	
+    
+        //DEBUG 
+        [self dumpSltSecondCounter:@"histoFLT-writeControl:"];
+        
+    //if there are FLTs in histogramming mode, I start them right before releasing inhibit -> now -tb-
+    if(countHistoMode){
+	    for(id obj in dataTakers){
+            if([[obj class] isSubclassOfClass: NSClassFromString(@"ORKatrinV4FLTModel")]){//or ORIpeV4FLTModel
+            //if([obj respondsToSelector:@selector(runMode)]){
+                runMode=[obj runMode];
+                if(runMode == kIpeFltV4_Histogram_DaqMode) [obj writeControl];// -> set the run mode
+            }
+        }
+	}	
+
 	
 	if(countersEnabled)[self writeClrCnt];//If enabled run counter will be reset to 0 at run start -tb-
 	
@@ -1649,8 +1716,9 @@ return;
 	
 	//load all the data needed for the eCPU to do the HW read-out.
 	[self load_HW_Config];
-	[pmcLink runTaskStarted:aDataPacket userInfo:userInfo];
+	[pmcLink runTaskStarted:aDataPacket userInfo:userInfo];//method of SBC_Link.m: init alarm handling; send kSBC_StartRun to SBC/PrPMC -tb-
 	
+    //next  takeData:userInfo: will be called, which will release inhibit in the first cycle -tb-
 }
 
 -(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
@@ -1663,9 +1731,17 @@ return;
 	else {// the first time
 		//TODO: -tb- [self writePageManagerReset];
 		//TODO: -tb- [self writeClrCnt];
+        
+        //DEBUG 
+        [self dumpSltSecondCounter:@"SLT-takeData-vor RelInhibit:"];
+        
 		unsigned long long runcount = [self readRunTime];
 		[self shipSltEvent:kRunCounterType withType:kStartRunType eventCt:0 high: (runcount>>32)&0xffffffff low:(runcount)&0xffffffff ];
 		[self writeClrInhibit]; //TODO: maybe move to readout loop to avoid dead time -tb-
+
+        //DEBUG 
+        [self dumpSltSecondCounter:@"SLT-takeData-nach RelInhibit:"];
+
 		[self shipSltSecondCounter: kStartRunType];
 		first = NO;
 	}
@@ -1699,6 +1775,16 @@ return;
 	[dataTakers release];
 	dataTakers = nil;
 
+}
+
+- (void) dumpSltSecondCounter:(NSString*)text
+{
+	unsigned long subseconds = [self readSubSecondsCounter];
+	unsigned long seconds = [self readSecondsCounter];
+    if(text)
+        NSLog(@"%@::%@   %@   sec:%i  subsec:%i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),text,seconds,subseconds);//DEBUG -tb-
+    else
+        NSLog(@"%@::%@    sec:%i  subsec:%i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),seconds,subseconds);//DEBUG -tb-
 }
 
 /** For the V4 SLT (Auger/KATRIN)the subseconds count 100 nsec tics! (Despite the fact that the ADC sampling has a 50 nsec base.)

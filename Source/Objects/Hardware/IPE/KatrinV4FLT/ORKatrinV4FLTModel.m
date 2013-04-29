@@ -300,6 +300,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (void) runIsAboutToChangeState:(NSNotification*)aNote
 {
     if(!syncWithRunControl) return;//nothing to care about ... Sync with run control not enabled in dialog ...
+    if(syncWithRunControl && (runMode != kIpeFltV4Katrin_Histo_Mode)) return;//nothing to care about ... Sync with run control not enabled in dialog ...
 	
 	//we need to care about the following cases:
 	// 1. no run active, system going to start run:
@@ -1653,7 +1654,7 @@ static double table[32]={
 	[self writeReg:kFLTV4AnalogOffset  value:analogOffset];
 	[self writeTriggerControl];			//TODO:   (for v4 this needs to be implemented by DENIS)-tb- //set trigger mask
 	[self writeHitRateMask];			//set hitRage control mask
-	[self enableStatistics];			//TODO: OBSOLETE -tb- enable hardware ADC statistics, ak 7.1.07
+	//[self enableStatistics];			//TODO: OBSOLETE -tb- enable hardware ADC statistics, ak 7.1.07
 	
 	if(fltRunMode == kIpeFltV4Katrin_Histo_Mode){
 		[self writeHistogramControl];
@@ -2316,6 +2317,11 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 	[objDictionary setObject:[NSNumber numberWithLong:[self readVersion]]				forKey:@"CFPGAFirmwareVersion"];
 	[objDictionary setObject:[NSNumber numberWithLong:[self readpVersion]]				forKey:@"FPGA8FirmwareVersion"];
 	//------------------
+	//added -tb- 04/29/13	
+	[objDictionary setObject:[NSNumber numberWithInt:boxcarLength]				forKey:@"BoxcarLength"];
+	[objDictionary setObject:[NSNumber numberWithInt:useDmaBlockRead]		    forKey:@"UseDmaBlockRead"];
+	[objDictionary setObject:[NSNumber numberWithInt:fifoLength]				forKey:@"FifoLength64"];
+	//------------------
 	
 	return objDictionary;
 }
@@ -2416,6 +2422,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {	
+    //NOTE: during this function the whole crate is set to 'INHIBIT' by the SLT -tb-
 	firstTime = YES;
 	
     [self clearExceptionCount];
@@ -2436,16 +2443,45 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 		}
 	}
 
-	[self writeControlWithStandbyMode];//a run always should start from standby mode -tb-
+	if(runMode == kIpeFltV4_Histogram_DaqMode){//FLTs in histogram mode always need to be set to standby mode (to restart the histogramming facility) -tb-
+    	[self writeControlWithStandbyMode];
+	}
+    
+    //if cold start (not 'quick start' in RunControl) ...
+    if([[userInfo objectForKey:@"doinit"]intValue]){
+	    if(runMode != kIpeFltV4_Histogram_DaqMode){//FLTs NOT in histogram mode may stay in their previous mode - this will remove the delay (until next 1PPs) the FLT needs to start the filter -tb-
+    	    [self writeControlWithStandbyMode];
+	    }
+        //TODO: I could check the current mode and set it only if not yet set
+	    [self setLedOff:NO];
+	    [self writeRunControl:YES]; // writes to run control register (was NO, but this causes the first few noise events -tb-)
+	    [self initBoard];           // writes control reg + hr control reg + PostTrigg + thresh+gains + offset + triggControl + hr mask + enab.statistics
+
+        //I start non-histogramming FLTS early - the filter shall run and 1st PPS should be over when SLT releases inhibit -tb-
+        //histogramming FLTs will be started by SLTS late (after next 1PPS)
+	    if(runMode != kIpeFltV4_Histogram_DaqMode){//FLTs NOT in histogram mode may stay in their previous mode - this will remove the delay (until next 1PPs) the FLT needs to start the filter -tb-
+    	    [self writeControl];
+	    }
+
+	}
 	
-    //if([[userInfo objectForKey:@"doinit"]intValue]){
-	[self setLedOff:NO];
-	[self writeRunControl:YES]; // writes to run control register (was NO, but this causes the first few noise events -tb-)
-	[self reset];               // Write 1 to all reset/clear flags of the FLTv4 command register.
-	[self initBoard];           // writes control reg + hr control reg + PostTrigg + thresh+gains + offset + triggControl + hr mask + enab.statistics
-	//}
+    [self reset];               // Write 1 to all reset/clear flags of the FLTv4 command register. (-> will 'clear' the event FIFO pointers)
 	
-	
+	//removed 2013-04-29 (TIMING) is already in cold start part ...  [self writeRunControl:YES];//TODO: still necessary?? -tb- 2013-04 would restart the katrin filter ... -tb-
+    
+	if(runMode == kIpeFltV4_EnergyTraceSyncDaqMode){
+		if((fifoLength != kFifoLength64) || (fifoBehaviour != kFifoStopOnFull)){
+			[self setRunMode: runMode];// this sets all necessary settings
+			[self setFifoBehaviour: kFifoStopOnFull];
+			[self setFifoLength: kFifoLength64];
+		}
+	}
+    
+	//moved 2013-04-29 to cold start section for non-histogram mode FLTs - see above  -tb- [self writeControl];
+
+	if(![self useSLTtime])[self writeSeconds:0];//optionally write UTC/UNIX time of SLT (see SLT) -tb-
+
+    //start timer functions for hitrate readout and/or histogram monitoring
 	if(ratesEnabled){
 		[self performSelector:@selector(readHitRates) 
 				   withObject:nil
@@ -2459,17 +2495,6 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 				   afterDelay: 1];		//start reading out histogram timer and page toggle
 	}
 	
-	[self writeRunControl:YES];//TODO: still necessary?? -tb-
-	if(runMode == kIpeFltV4_EnergyTraceSyncDaqMode){
-		if((fifoLength != kFifoLength64) || (fifoBehaviour != kFifoStopOnFull)){
-			[self setRunMode: runMode];// this sets all necessary settings
-			[self setFifoBehaviour: kFifoStopOnFull];
-			[self setFifoLength: kFifoLength64];
-		}
-	}
-	[self writeControl];
-	if(![self useSLTtime])[self writeSeconds:0];//optionally write UTC/UNIX time of SLT (see SLT) -tb-
-
 }
 
 
@@ -2489,7 +2514,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
 	//[self writeRunControl:NO];// let it run, see runTaskStarted ... -tb-
-	[self writeControlWithStandbyMode];
+	//changed 2013-04-29 -tb- SLT will set inhibit anyway! for quick start we want to leave the current mode active (histogr. FLTs are restarted at runTaskStarted) [self writeControlWithStandbyMode];
 	//[self setLedOff:YES];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHitRates) object:nil];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHistogrammingStatus) object:nil];

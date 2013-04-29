@@ -433,8 +433,10 @@ static IpeRegisterNamesStruct regSLTV4[kSltV4NumRegs] = {
 - (long)		getSltkGetIsLinkedWithPCIDMALib;
 - (void)		setHostTimeToFLTsAndSLT;
 
+#pragma mark •••Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
+- (NSDictionary*) dataRecordDescription;
 
 - (unsigned long) eventDataId;
 - (void) setEventDataId: (unsigned long) DataId;
@@ -442,6 +444,8 @@ static IpeRegisterNamesStruct regSLTV4[kSltV4NumRegs] = {
 - (void) setMultiplicityId: (unsigned long) DataId;
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherCard;
+//- (void) appendEventDictionary:(NSMutableDictionary*)anEventDictionary topLevel:(NSMutableDictionary*)topLevel;
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 
 #pragma mark •••DataTaker
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
@@ -451,6 +455,7 @@ static IpeRegisterNamesStruct regSLTV4[kSltV4NumRegs] = {
 - (void) loadReadOutList:(NSFileHandle*)aFile;
 - (BOOL) doneTakingData;
 
+- (void) dumpSltSecondCounter:(NSString*)text;
 - (void) shipSltSecondCounter:(unsigned char)aType;
 - (void) shipSltRunCounter:(unsigned char)aType;
 - (void) shipSltEvent:(unsigned char)aCounterType withType:(unsigned char)aType eventCt:(unsigned long)c high:(unsigned long)h low:(unsigned long)l;
