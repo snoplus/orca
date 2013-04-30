@@ -637,7 +637,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 - (void) setMaxCurrent:(short)chan withValue:(float)aValue
 {
 	if([self channelInBounds:chan]){
-		if(aValue<1)aValue=1;
+		if(aValue<0)aValue=0;
 		else if(aValue>kMaxCurrent)aValue = kMaxCurrent;
 		[[[self undoManager] prepareWithInvocationTarget:self] setMaxCurrent:chan withValue:maxCurrent[chan]];
 		maxCurrent[chan] = aValue;
@@ -899,7 +899,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Max Current"];
-    [p setFormat:@"##0" upperLimit:1000 lowerLimit:1 stepSize:1 units:@"mA"];
+    [p setFormat:@"##0" upperLimit:1000 lowerLimit:0 stepSize:1 units:@"mA"];
     [p setSetMethod:@selector(setMaxCurrent:withValue:) getMethod:@selector(maxCurrent:)];
 	[p setInitMethodSelector:@selector(loadAllValues)];
     [a addObject:p];
