@@ -41,7 +41,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 @implementation ORiSeg8ChanHV
 
 #define kMaxVoltage 6000
-#define kMaxCurrent 1000 
+#define kMaxCurrent 1000.
 
 #pragma mark ***Initialization
 - (id) init 
