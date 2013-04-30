@@ -184,9 +184,11 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 
 - (void) pollHardware
 {
-	for(id aCard in [[self crate] orcaObjects]){
-		[aCard updateAllValues];
-	}
+    if([IPNumber length]){
+        for(id aCard in [[self crate] orcaObjects]){
+            [aCard updateAllValues];
+        }
+    }
 }
 
 - (void) pollHardwareAfterDelay
