@@ -1055,6 +1055,61 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     return theValue & 0xfff;
 }
 
+- (void) testRead
+{
+    unsigned long theValue1 = 0;
+    unsigned long theValue2 = 0;
+    unsigned long theValue3 = 0;
+    
+    id myAdapter = [self adapter];
+    [myAdapter readLongBlock:&theValue1
+                        atAddress:[self baseAddress] + register_information[kBoardID].offset
+                        numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];
+
+    [myAdapter readLongBlock:&theValue2
+                   atAddress:0x8610
+                   numToRead:1
+                  withAddMod:0x29
+               usingAddSpace:0x01];
+    
+    [myAdapter readLongBlock:&theValue3
+                   atAddress:0x8610
+                   numToRead:1
+                  withAddMod:0x29
+               usingAddSpace:0x01];
+    NSLog(@"Gretina: 0x%0x   Shaper1: 0x%0x   Shaper2: 0x%0x\n",theValue1,theValue2,theValue3);
+}
+- (void) testReadHV
+{
+    unsigned long theValue1 = 0;
+    unsigned long theValue2 = 0;
+    unsigned long theValue3 = 0;
+    
+    id myAdapter = [self adapter];
+    [myAdapter readLongBlock:&theValue1
+                   atAddress:[self baseAddress] + register_information[kBoardID].offset
+                   numToRead:1
+                  withAddMod:[self addressModifier]
+               usingAddSpace:0x01];
+    
+    [myAdapter readLongBlock:&theValue2
+                   atAddress:0xDD00
+                   numToRead:1
+                  withAddMod:0x29
+               usingAddSpace:0x01];
+    
+    [myAdapter readLongBlock:&theValue3
+                   atAddress:0xDD00
+                   numToRead:1
+                  withAddMod:0x29
+               usingAddSpace:0x01];
+    NSLog(@"Gretina: 0x%0x   HV1: 0x%0x   HV2: 0x%0x\n",theValue1,theValue2,theValue3);
+}
+
+
+
 - (void) resetDCM
 {
     //Start Slave clock
@@ -1246,13 +1301,13 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) initBoard
 {
-    //this function inits the board, but does not write to the control-status register
+    //disable all channels
     int i;
     for(i=0;i<kNumGretina4MChannels;i++){
         [self writeControlReg:i enabled:NO];
     }
-    [ORTimer delay:.1];
-    //[self initSerDes];
+    [self resetFIFO];
+
     //write the card level params
     [self writeClockSource];
 	[self writeExternalWindow];
@@ -1264,6 +1319,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [self writeCCLowRes];
 	[self writeDownSample];
     
+    //write the channel level params
     for(i=0;i<kNumGretina4MChannels;i++) {
         if([self enabled:i]){
             [self writeLEDThreshold:i];
@@ -1272,9 +1328,12 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
             [self writeRisingEdgeWindow:i];
         }
     }
-    
+    [ORTimer delay:.1];
+    //enable channels
     for(i=0;i<kNumGretina4MChannels;i++){
-        [self writeControlReg:i enabled:enabled[i]];
+        if([self enabled:i]){
+            [self writeControlReg:i enabled:YES];
+        }
     }
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MCardInited object:self];
@@ -1317,8 +1376,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
     unsigned long readBackValue = [self readControlReg:chan];
-    if((readBackValue & 0xC1F) != (theValue & 0xC1F)){
-        NSLogColor([NSColor redColor],@"Channel %d status reg readback != writeValue (0x%08x != 0x%08x)\n",chan,readBackValue & 0xC1F,theValue & 0xC1F);
+    if((readBackValue & 0xC17) != (theValue & 0xC17)){
+        NSLogColor([NSColor redColor],@"Channel %d status reg readback != writeValue (0x%08x != 0x%08x)\n",chan,readBackValue & 0xC17,theValue & 0xC17);
     }
 }
 - (short) readClockSource
@@ -2048,8 +2107,11 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     fifoResetCount = 0;
     [self startRates];
     [self initBoard];
-        
+   
 	[self performSelector:@selector(checkFifoAlarm) withObject:nil afterDelay:1];
+
+
+
 }
 
 //**************************************************************************************
@@ -2061,7 +2123,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     isRunning = YES;
     NSString* errorLocation = @"";
     @try {
-        //[ORTimer delay:1];
         if(![self fifoIsEmpty]){
             dataBuffer[0] = dataId | kG4MDataPacketSize;
             dataBuffer[1] = location;
@@ -2074,14 +2135,34 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
             
             //the first word of the actual data record had better be the packet separator
             if(dataBuffer[2]==kGretina4MPacketSeparator){
-                ++waveFormCount[dataBuffer[3] & 0x7];  //grab the channel and inc the count
-                [aDataPacket addLongsToFrameBuffer:dataBuffer length:kG4MDataPacketSize];
+                short chan = dataBuffer[3] & 0xf;
+                if(chan < 10){
+                    ++waveFormCount[dataBuffer[3] & 0x7];  //grab the channel and inc the count
+                    [aDataPacket addLongsToFrameBuffer:dataBuffer length:kG4MDataPacketSize];
+                }
+                else {
+                    NSLogError(@"",@"Bad header--record discarded",@"GRETINA4M",[NSString stringWithFormat:@"slot %d",[self slot]], [NSString stringWithFormat:@"chan %d",1],nil);
+                }
             }
             else {
                 //oops... the buffer read is out of sequence
-                NSLogError([NSString stringWithFormat:@"slot %d",[self slot]],@"Packet Sequence Error -- FIFO reset",@"Gretina4M",nil);
+                NSLogError(@"",@"Packet Sequence Error -- FIFO reset",@"GRETINA4M",[NSString stringWithFormat:@"slot %d",[self slot]],nil);
                 fifoResetCount++;
                 [self resetFIFO];
+            }
+        }
+        else {
+            int i;
+            for(i=0;i<10;i++){
+                if(enabled[i]){
+                    unsigned long val = [self readControlReg:i];
+                    BOOL bit20 = val>>20 & 0x1;
+                    if(bit20){
+                        NSLog(@"%d : 0%0x  bit 20: %d\n", i,val,bit20);
+                        [self writeControlReg:i enabled:NO];
+                        [self writeControlReg:i enabled:YES];
+                    }
+                }
             }
         }
     }
@@ -2155,8 +2236,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (BOOL) bumpRateFromDecodeStage:(short)channel
 {
-    //if(isRunning)return NO;
-    
+    if(isRunning)return NO;
     ++waveFormCount[channel];
     return YES;
 }
@@ -2190,7 +2270,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
      * 2: FIFO address                                      *
      * 3: FIFO address AM                                   *
      * 4: FIFO size                                         */
-    
+
 	configStruct->total_cards++;
 	configStruct->card_info[index].hw_type_id				= kGretina4M; //should be unique
 	configStruct->card_info[index].hw_mask[0]				= dataId; //better be unique
@@ -2426,6 +2506,48 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
     }
     NSLog(@"------------------------------------------------\n");
+}
+
+#pragma mark •••AdcProviding Protocol
+- (BOOL) onlineMaskBit:(int)bit
+{
+   return [self enabled:bit];
+}
+
+- (BOOL) partOfEvent:(unsigned short)aChannel
+{
+	//included to satisfy the protocal... change if needed
+	return NO;
+}
+
+- (unsigned long) eventCount:(int)aChannel
+{
+    return waveFormCount[aChannel];
+}
+
+- (void) clearEventCounts
+{
+    int i;
+    for(i=0;i<kNumGretina4MChannels;i++){
+		waveFormCount[i]=0;
+    }
+}
+
+- (unsigned long) thresholdForDisplay:(unsigned short) aChan
+{
+	return [self ledThreshold:aChan];
+}
+
+- (unsigned short) gainForDisplay:(unsigned short) aChan
+{
+	return 0;
+}
+- (void) postAdcInfoProvidingValueChanged
+{
+	[[NSNotificationCenter defaultCenter]
+	 postNotificationName:ORAdcInfoProvidingValueChanged
+	 object:self
+	 userInfo: nil];
 }
 
 @end

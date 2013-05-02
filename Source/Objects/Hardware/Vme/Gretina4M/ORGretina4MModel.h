@@ -25,6 +25,7 @@
 #import "ORHWWizard.h"
 #import "SBC_Config.h"
 #import "AutoTesting.h"
+#import "ORAdcInfoProviding.h"
 
 @class ORRateGroup;
 @class ORConnector;
@@ -178,7 +179,7 @@ enum Gretina4MFIFOStates {
 #define kFtAdjust    4
 #define kHeaderSize  29
 
-@interface ORGretina4MModel : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping,AutoTesting>
+@interface ORGretina4MModel : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping,AutoTesting,ORAdcInfoProviding>
 {
   @private
 	NSThread*		fpgaProgrammingThread;
@@ -489,6 +490,13 @@ enum Gretina4MFIFOStates {
 
 #pragma mark •••SPI Interface
 - (unsigned long) writeAuxIOSPI:(unsigned long)spiData;
+#pragma mark •••AdcProviding Protocol
+- (BOOL) onlineMaskBit:(int)bit;
+- (BOOL) partOfEvent:(unsigned short)aChannel;
+- (unsigned long) eventCount:(int)aChannel;
+- (void) clearEventCounts;
+- (unsigned long) thresholdForDisplay:(unsigned short) aChan;
+- (unsigned short) gainForDisplay:(unsigned short) aChan;
 
 @end
 

@@ -17,7 +17,7 @@ bool ORGretina4MReadout::Readout(SBC_LAM_Data* /*lamData*/)
     uint32_t fifoAddress      = GetDeviceSpecificData()[1];
     uint32_t fifoAddressMod   = GetDeviceSpecificData()[2];
     uint32_t fifoResetAddress = GetDeviceSpecificData()[3];
-    uint32_t dataId           = GetHardwareMask()[0]; 
+    uint32_t dataId           = GetHardwareMask()[0];
     uint32_t slot             = GetSlot(); 
     uint32_t crate            = GetCrate(); 
     uint32_t location         = ((crate&0x0000000f)<<21) | ((slot& 0x0000001f)<<16);
@@ -35,10 +35,9 @@ bool ORGretina4MReadout::Readout(SBC_LAM_Data* /*lamData*/)
     else if ((fifoState & kGretina4MFIFOEmpty) == 0 ) {
         //we want to read as much as possible to have the highest thru-put
         int32_t numEventsToRead = 1;
-        if(fifoState & kGretina4MFIFO30KFull)           numEventsToRead = 15;
-        else if(fifoState & kGretina4MFIFO16KFull)      numEventsToRead = 8;
-        
-		
+        if(fifoState & kGretina4MFIFO30KFull) numEventsToRead = 16;
+        else if(fifoState & kGretina4MFIFO16KFull)numEventsToRead = 8;
+
         ensureDataCanHold((1024*numEventsToRead)+2);
      
         int32_t savedIndex = dataIndex;
@@ -48,7 +47,7 @@ bool ORGretina4MReadout::Readout(SBC_LAM_Data* /*lamData*/)
         int32_t eventStartIndex = dataIndex;
         
         result = DMARead(fifoAddress,fifoAddressMod, (uint32_t) 4,
-                         (uint8_t*)(&data[dataIndex]),1024*4*numEventsToRead); 
+                         (uint8_t*)(&data[dataIndex]),1024*4*numEventsToRead);
         
         if (result < 0) {
             LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));
@@ -65,9 +64,9 @@ bool ORGretina4MReadout::Readout(SBC_LAM_Data* /*lamData*/)
             }
             
             if(eventCount>0){
-                data[savedIndex] |= ((eventCount*1024)+2);
+                data[savedIndex] |= ((numEventsToRead*1024)+2);
                 dataIndex += eventCount*1024;
-           }
+            }
             else {
                 //oops... really bad -- the buffer read is out of sequence
                 dataIndex = savedIndex; //DUMP the data by reseting the data Index back to where it was when we got it.
@@ -75,7 +74,7 @@ bool ORGretina4MReadout::Readout(SBC_LAM_Data* /*lamData*/)
                 clearFifo(fifoResetAddress);
             }
         }
-    }        
+    }
 
     return true; 
 }

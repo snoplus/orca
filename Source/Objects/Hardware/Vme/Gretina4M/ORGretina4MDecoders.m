@@ -71,16 +71,16 @@
     
     int numEvents = (length-2)/1024;
 
-    ptr++; //point to first word of first data recordd
-    int headerSize = 15; //long words
+    ptr++; //point to first word of first data record
+    int headerSize = 14; //long words
     int i;
     unsigned long* dataPtr = ptr;
     for(i=0;i<numEvents;i++){
         if(*dataPtr == 0xAAAAAAAA){
+            unsigned long *nextRecordPtr = dataPtr+1024;
             dataPtr++;
-            int channel		 = *dataPtr & 0xF; //extract the channel
-            
-            dataPtr += 2; //point to Energy low word
+            int channel	= *dataPtr & 0xF; //extract the channel
+            dataPtr += 2;                 //point to Energy low word
             unsigned long energy = *dataPtr >> 16;
             
             dataPtr++;	  //point to Energy second word
@@ -137,7 +137,11 @@
             }
             [obj bumpRateFromDecodeStage:channel];
             
-            dataPtr += 1024;
+            dataPtr = nextRecordPtr;
+        }
+        else {
+            headerSize = 0;
+  
         }
     }
 	 
