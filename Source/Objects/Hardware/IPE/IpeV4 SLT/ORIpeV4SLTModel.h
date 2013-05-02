@@ -444,7 +444,6 @@ static IpeRegisterNamesStruct regSLTV4[kSltV4NumRegs] = {
 - (void) setMultiplicityId: (unsigned long) DataId;
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherCard;
-//- (void) appendEventDictionary:(NSMutableDictionary*)anEventDictionary topLevel:(NSMutableDictionary*)topLevel;
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 
 #pragma mark •••DataTaker

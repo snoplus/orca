@@ -299,6 +299,17 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (void) runIsAboutToChangeState:(NSNotification*)aNote
 {
+    int state = [[[aNote userInfo] objectForKey:@"State"] intValue];
+    
+    //handle shipping final hitrate events
+    //if(run is going to stop) set a 'wait'; release it after shipping the hitrate record; use a watchdog? -tb-
+    if(state==eRunStopping){
+        //DEBUG
+        NSLog(@"%@::%@ FLT#%i: need to place a 'wait for hitrate record' (hr mask: 0x%08x)\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[self stationNumber],hitRateEnabledMask);//DEBUG -tb-
+	    //TODO: [self addRunWaitWithReason:@"FLTv4: wait for next hitrate event."];
+    }
+
+    //from here: histogram mode sync option handling
     if(!syncWithRunControl) return;//nothing to care about ... Sync with run control not enabled in dialog ...
     if(syncWithRunControl && (runMode != kIpeFltV4Katrin_Histo_Mode)) return;//nothing to care about ... Sync with run control not enabled in dialog ...
 	
@@ -324,7 +335,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	//aNote: >>>NSConcreteNotification 0x5a552d0 {name = ORRunAboutToChangeState; object = (ORRunModel,1) Decoders: ORRunDecoderForRun
     // Connectors: "Run Control Connector"  ; userInfo = {State = 4;}}<<<
 	// states: 2,3,4: 2=starting, 3=stopping, 4=between subruns (0 = eRunStopped); see ORGlobal.h, enum 'eRunState'
-    int state = [[[aNote userInfo] objectForKey:@"State"] intValue];
+      //moved to top: int state = [[[aNote userInfo] objectForKey:@"State"] intValue];
 	/*
 	id rc =  [aNote object];
     NSLog(@"Calling object %@\n",NSStringFromClass([rc class]));//DEBUG -tb-
@@ -1935,6 +1946,8 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 
 - (void) readHitRates
 {
+    //DEBUG            NSLog(@"%@::%@\n  ",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
+
     unsigned long sltSubSecReg =  0;		
     unsigned long sltSubSec =  0;		
     unsigned long sltSec    =  0;		
@@ -2006,7 +2019,8 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
         sltSubSecReg =  [aList longValueForCmd:dataIndex];		
         sltSubSec   = ((sltSubSecReg>>11)&0x3fff)*2000   +  (sltSubSecReg & 0x7ff);
         sltSec    =  [aList longValueForCmd:dataIndex+1];		
-        //DEBUGGING NSLog(@"FLT %i: readHitRates: sltSec: %08x (%i)  sltSubSec %08x (%i, %f)\n",[self stationNumber],sltSec,sltSec,sltSubSec,sltSubSec, (0.00000005*sltSubSec));	
+        //DEBUGGING 
+        NSLog(@"FLT %i: readHitRates: sltSec: %08x (%i)  sltSubSec %08x (%i, %f)\n",[self stationNumber],sltSec,sltSec,sltSubSec,sltSubSec, (0.00000005*sltSubSec));	
         
         if(	dataIndex != countHREnabledChans){
             NSLog(@"ERROR:  Shipping hitrates: FLT #%i:	dataIndex %i,  countHREnabledChans %i are not the same!!!\n",[self stationNumber],dataIndex , countHREnabledChans);	
@@ -2035,12 +2049,17 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 		}
 	}
 	@catch(NSException* localException) {
+            //DEBUG
+            NSLog(@"%@::%@\n EXCEPTION  sltSec %i",NSStringFromClass([self class]),NSStringFromSelector(_cmd),sltSec);//DEBUG -tb-
+            
 	}
 	
     //try to read always between two second strobes -> sec = fullSec+0.4
     double delay=1<<[self hitRateLength];
     double deltadelay=0.4 - 0.00000005*sltSubSec;
     delay += deltadelay;
+            //DEBUG            NSLog(@"%@::%@\n delay for call of @selector(readHitRates):delay %f",NSStringFromClass([self class]),NSStringFromSelector(_cmd),delay);//DEBUG -tb-
+
 	[self performSelector:@selector(readHitRates) withObject:nil afterDelay:(delay)];
 }
 
@@ -2272,17 +2291,6 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 }
 
 
-//what is the event dictionary? Run header? -tb-
-- (void) appendEventDictionary:(NSMutableDictionary*)anEventDictionary topLevel:(NSMutableDictionary*)topLevel
-{
-	NSDictionary* aDictionary;
-	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-				   [NSNumber numberWithLong:dataId],				@"dataId",
-				   [NSNumber numberWithLong:kNumV4FLTChannels],		@"maxChannels",
-				   nil];
-	
-	[anEventDictionary setObject:aDictionary forKey:@"KatrinV4FLT"];
-}
 
 //this goes to the Run header ...
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary

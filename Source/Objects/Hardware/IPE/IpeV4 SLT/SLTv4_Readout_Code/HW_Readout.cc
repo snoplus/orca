@@ -104,6 +104,7 @@ extern "C" {
     //# warning MESSAGE: PMC_COMPILE_IN_SIMULATION_MODE is 0
 	#include "fdhwlib.h"
 	#include "hw4/baseregister.h"
+	#include "Pbus/PbusError.h"
 	#include "katrinhw4/subrackkatrin.h"
 	#include "katrinhw4/sltkatrin.h"
 	#include "katrinhw4/fltkatrin.h"
@@ -206,10 +207,10 @@ void doWriteBlock(SBC_Packet* aPacket,uint8_t reply)
 #else
     try{
         if (numItems == 1){
-#if 0
+            #if 0
             fprintf(stdout, "PrPMC: doWriteBlock: adr 0x%08x , val %i (0x%08x) \n",startAddress,*lptr,*lptr);
             fflush(stdout);  
-#endif		     		    
+            #endif		     		    
 		    pbus->write(startAddress, *lptr);
 			{
 			
@@ -223,6 +224,7 @@ void doWriteBlock(SBC_Packet* aPacket,uint8_t reply)
 		}
         else                pbus->writeBlock(startAddress, (unsigned long *) lptr, numItems);
     }catch(PbusError &e){
+        e.displayMsg(stdout);
         perr = 1;
     }
 #endif
@@ -286,12 +288,13 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply)
         if (numItems == 1){
 		    *lPtr = pbus->read(startAddress);
 			
-			
+        
 //TODO: DEBUGGING sim mode+PCIe issue -tb-            fprintf(stdout, "PrPMC: doReadBlock: adr 0x%08x , val %i (0x%08x) \n",startAddress,*lPtr,*lPtr);
 //TODO: DEBUGGING sim mode+PCIe issue -tb-            fflush(stdout);  
 		}
         else                pbus->readBlock(startAddress, (unsigned long *) lPtr, numItems);
     }catch(PbusError &e){
+        e.displayMsg(stdout);
         perr = 1;
     }
 #endif
