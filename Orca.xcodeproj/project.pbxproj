@@ -1956,6 +1956,13 @@
 		849B26D90B2F48490007484F /* ORDetectorSegment.h in Headers */ = {isa = PBXBuildFile; fileRef = 849B26D70B2F48490007484F /* ORDetectorSegment.h */; };
 		849B472E0D98298B00AD79A0 /* AutoScale.tif in Resources */ = {isa = PBXBuildFile; fileRef = 849B472D0D98298B00AD79A0 /* AutoScale.tif */; };
 		849B47300D982AC000AD79A0 /* Calibrate.gif in Resources */ = {isa = PBXBuildFile; fileRef = 849B472F0D982AC000AD79A0 /* Calibrate.gif */; };
+		849B9D7516DD044F003F3037 /* ORSIS3320Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 849B9D6D16DD044F003F3037 /* ORSIS3320Controller.h */; };
+		849B9D7616DD044F003F3037 /* ORSIS3320Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 849B9D6E16DD044F003F3037 /* ORSIS3320Controller.m */; };
+		849B9D7716DD044F003F3037 /* ORSIS3320Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 849B9D6F16DD044F003F3037 /* ORSIS3320Decoders.h */; };
+		849B9D7816DD044F003F3037 /* ORSIS3320Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 849B9D7016DD044F003F3037 /* ORSIS3320Decoders.m */; };
+		849B9D7916DD044F003F3037 /* ORSIS3320Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 849B9D7116DD044F003F3037 /* ORSIS3320Model.h */; };
+		849B9D7B16DD044F003F3037 /* SIS3320.nib in Resources */ = {isa = PBXBuildFile; fileRef = 849B9D7316DD044F003F3037 /* SIS3320.nib */; };
+		849B9D7C16DD044F003F3037 /* SIS3320Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 849B9D7416DD044F003F3037 /* SIS3320Card.gif */; };
 		849C68010A2CC20B00511E30 /* CCUSB.nib in Resources */ = {isa = PBXBuildFile; fileRef = 849C67FD0A2CC20B00511E30 /* CCUSB.nib */; };
 		849C68020A2CC20B00511E30 /* CCUSB.tif in Resources */ = {isa = PBXBuildFile; fileRef = 849C67FE0A2CC20B00511E30 /* CCUSB.tif */; };
 		849C68030A2CC20B00511E30 /* ORCCUSBModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 849C67FF0A2CC20B00511E30 /* ORCCUSBModel.h */; };
@@ -2622,6 +2629,10 @@
 		84E6E5DB10BC570800187AF6 /* ORSISRegisterDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E6E5DA10BC570800187AF6 /* ORSISRegisterDefs.h */; };
 		84E6FB220B2DDC6000CAA7C5 /* ObjectFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E6FB200B2DDC5F00CAA7C5 /* ObjectFactory.m */; };
 		84E6FB230B2DDC6100CAA7C5 /* ObjectFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E6FB210B2DDC6000CAA7C5 /* ObjectFactory.h */; };
+		84E703FB1726E5AD00F6DADB /* ORSIS3320Readout.hh in Headers */ = {isa = PBXBuildFile; fileRef = 84E703F91726E5AD00F6DADB /* ORSIS3320Readout.hh */; };
+		84E703FC1726E60200F6DADB /* ORSIS3320Readout.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84E703F81726E5AD00F6DADB /* ORSIS3320Readout.cc */; };
+		84E703FD1726E60700F6DADB /* ORSIS3320Readout.hh in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84E703F91726E5AD00F6DADB /* ORSIS3320Readout.hh */; };
+		84E703FE17270BFD00F6DADB /* ORSIS3320Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 849B9D7216DD044F003F3037 /* ORSIS3320Model.m */; };
 		84E743440DAD5EF00099CAEE /* ORMailer.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E743420DAD5EEF0099CAEE /* ORMailer.h */; };
 		84E743450DAD5EF00099CAEE /* ORMailer.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E743430DAD5EEF0099CAEE /* ORMailer.m */; };
 		84E966CF11848BEF008D9119 /* Majorana.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84E966C711848BEF008D9119 /* Majorana.nib */; };
@@ -2840,7 +2851,6 @@
 		9C2595B80D5172460039C5DF /* FilterScript.ym in Sources */ = {isa = PBXBuildFile; fileRef = 9C2595B30D5172460039C5DF /* FilterScript.ym */; };
 		9C2595B90D5172460039C5DF /* FilterScript.lm in Sources */ = {isa = PBXBuildFile; fileRef = 9C2595B40D5172460039C5DF /* FilterScript.lm */; };
 		9C2595BA0D5172460039C5DF /* FilterScriptEx.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C2595B50D5172460039C5DF /* FilterScriptEx.m */; };
-		9C2595BB0D5172460039C5DF /* FilterScriptGraph.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C2595B60D5172460039C5DF /* FilterScriptGraph.m */; };
 		9C38E5580C775F2A00255848 /* ORcPCICardDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C38E5560C775F2A00255848 /* ORcPCICardDecoder.m */; };
 		9C38E5590C775F2A00255848 /* ORcPCICardDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C38E5570C775F2A00255848 /* ORcPCICardDecoder.h */; };
 		9C7CE7E40E2FC22500F63679 /* Caen260.nib in Resources */ = {isa = PBXBuildFile; fileRef = 9C7CE7DC0E2FC22500F63679 /* Caen260.nib */; };
@@ -3137,6 +3147,8 @@
 				43ADFED410B6E2090044617C /* ORVMETrigger32Readout.hh in VME_Copy */,
 				84AFEC4516B1707000EC343C /* ORCAEN1721Readout.cc in VME_Copy */,
 				84AFEC4616B1707000EC343C /* ORCAEN1721Readout.hh in VME_Copy */,
+				84E703FC1726E60200F6DADB /* ORSIS3320Readout.cc in VME_Copy */,
+				84E703FD1726E60700F6DADB /* ORSIS3320Readout.hh in VME_Copy */,
 				43ADFED510B6E2090044617C /* ORVVmeCard.cc in VME_Copy */,
 				43ADFED610B6E2090044617C /* ORVVmeCard.hh in VME_Copy */,
 				43ADFED710B6E2090044617C /* UniverseDriverInstall in VME_Copy */,
@@ -3925,6 +3937,7 @@
 		842DAEB80A82CA8400C942A2 /* ORBiRa2351IController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORBiRa2351IController.m; path = Source/Objects/Hardware/Camac/BiRa2351/ORBiRa2351IController.m; sourceTree = SOURCE_ROOT; };
 		842DAEB90A82CA8400C942A2 /* ORBiRa2351IModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORBiRa2351IModel.h; path = Source/Objects/Hardware/Camac/BiRa2351/ORBiRa2351IModel.h; sourceTree = SOURCE_ROOT; };
 		842DAEBA0A82CA8400C942A2 /* ORBiRa2351IModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORBiRa2351IModel.m; path = Source/Objects/Hardware/Camac/BiRa2351/ORBiRa2351IModel.m; sourceTree = SOURCE_ROOT; };
+		842E0A1016F3AD5E00E20389 /* FilterScriptEx.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FilterScriptEx.h; sourceTree = "<group>"; };
 		842F19A903B8EAF3005F64B1 /* ORRunController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORRunController.h; path = Source/Objects/Control/RunControl/ORRunController.h; sourceTree = SOURCE_ROOT; };
 		842F19AA03B8EAF3005F64B1 /* ORRunController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORRunController.m; sourceTree = "<group>"; };
 		842F19AD03B8EAF3005F64B1 /* RunControl.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = RunControl.nib; sourceTree = "<group>"; };
@@ -4916,6 +4929,14 @@
 		849B26D70B2F48490007484F /* ORDetectorSegment.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORDetectorSegment.h; path = Source/Experiments/BaseClasses/ORDetectorSegment.h; sourceTree = SOURCE_ROOT; };
 		849B472D0D98298B00AD79A0 /* AutoScale.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = AutoScale.tif; path = "Source/Objects/Data Processing/Histogram Objects/BaseClasses/AutoScale.tif"; sourceTree = SOURCE_ROOT; };
 		849B472F0D982AC000AD79A0 /* Calibrate.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Calibrate.gif; sourceTree = "<group>"; };
+		849B9D6D16DD044F003F3037 /* ORSIS3320Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSIS3320Controller.h; sourceTree = "<group>"; };
+		849B9D6E16DD044F003F3037 /* ORSIS3320Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORSIS3320Controller.m; sourceTree = "<group>"; };
+		849B9D6F16DD044F003F3037 /* ORSIS3320Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSIS3320Decoders.h; sourceTree = "<group>"; };
+		849B9D7016DD044F003F3037 /* ORSIS3320Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORSIS3320Decoders.m; sourceTree = "<group>"; };
+		849B9D7116DD044F003F3037 /* ORSIS3320Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSIS3320Model.h; sourceTree = "<group>"; };
+		849B9D7216DD044F003F3037 /* ORSIS3320Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORSIS3320Model.m; sourceTree = "<group>"; };
+		849B9D7316DD044F003F3037 /* SIS3320.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = SIS3320.nib; sourceTree = "<group>"; };
+		849B9D7416DD044F003F3037 /* SIS3320Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = SIS3320Card.gif; sourceTree = "<group>"; };
 		849C67FD0A2CC20B00511E30 /* CCUSB.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = CCUSB.nib; sourceTree = "<group>"; };
 		849C67FE0A2CC20B00511E30 /* CCUSB.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = CCUSB.tif; path = Source/Objects/Hardware/Camac/CCUSB/CCUSB.tif; sourceTree = SOURCE_ROOT; };
 		849C67FF0A2CC20B00511E30 /* ORCCUSBModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORCCUSBModel.h; sourceTree = "<group>"; };
@@ -5697,6 +5718,8 @@
 		84E6E5DA10BC570800187AF6 /* ORSISRegisterDefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSISRegisterDefs.h; sourceTree = "<group>"; };
 		84E6FB200B2DDC5F00CAA7C5 /* ObjectFactory.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ObjectFactory.m; path = Source/Objects/OrcaObject/ObjectFactory.m; sourceTree = SOURCE_ROOT; };
 		84E6FB210B2DDC6000CAA7C5 /* ObjectFactory.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ObjectFactory.h; path = Source/Objects/OrcaObject/ObjectFactory.h; sourceTree = SOURCE_ROOT; };
+		84E703F81726E5AD00F6DADB /* ORSIS3320Readout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ORSIS3320Readout.cc; sourceTree = "<group>"; };
+		84E703F91726E5AD00F6DADB /* ORSIS3320Readout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ORSIS3320Readout.hh; sourceTree = "<group>"; };
 		84E743420DAD5EEF0099CAEE /* ORMailer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMailer.h; path = "Source/Main Dialogs/MailCenter/ORMailer.h"; sourceTree = SOURCE_ROOT; };
 		84E743430DAD5EEF0099CAEE /* ORMailer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMailer.m; path = "Source/Main Dialogs/MailCenter/ORMailer.m"; sourceTree = SOURCE_ROOT; };
 		84E966C711848BEF008D9119 /* Majorana.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Majorana.nib; path = Source/Experiments/Majorana/Majorana.nib; sourceTree = SOURCE_ROOT; };
@@ -5920,7 +5943,6 @@
 		9C2595B30D5172460039C5DF /* FilterScript.ym */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.yacc; name = FilterScript.ym; path = "Source/Objects/Data Processing/Filter/FilterScript.ym"; sourceTree = SOURCE_ROOT; };
 		9C2595B40D5172460039C5DF /* FilterScript.lm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.lex; name = FilterScript.lm; path = "Source/Objects/Data Processing/Filter/FilterScript.lm"; sourceTree = SOURCE_ROOT; };
 		9C2595B50D5172460039C5DF /* FilterScriptEx.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FilterScriptEx.m; path = "Source/Objects/Data Processing/Filter/FilterScriptEx.m"; sourceTree = SOURCE_ROOT; };
-		9C2595B60D5172460039C5DF /* FilterScriptGraph.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FilterScriptGraph.m; path = "Source/Objects/Data Processing/Filter/FilterScriptGraph.m"; sourceTree = SOURCE_ROOT; };
 		9C38E5560C775F2A00255848 /* ORcPCICardDecoder.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORcPCICardDecoder.m; path = "Source/Objects/Hardware/CompactPCI/cPCI Base Classes/ORcPCICardDecoder.m"; sourceTree = SOURCE_ROOT; };
 		9C38E5570C775F2A00255848 /* ORcPCICardDecoder.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORcPCICardDecoder.h; path = "Source/Objects/Hardware/CompactPCI/cPCI Base Classes/ORcPCICardDecoder.h"; sourceTree = SOURCE_ROOT; };
 		9C7CE7DC0E2FC22500F63679 /* Caen260.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Caen260.nib; path = Source/Objects/Hardware/Vme/CAEN/CV260/Caen260.nib; sourceTree = SOURCE_ROOT; };
@@ -9632,6 +9654,8 @@
 				EF69C431116E5DC3008ABADC /* ORSNOCrateReadout.hh */,
 				43ADFE7010B6DBCF0044617C /* ORVMETrigger32Readout.cc */,
 				43ADFE7110B6DBCF0044617C /* ORVMETrigger32Readout.hh */,
+				84E703F81726E5AD00F6DADB /* ORSIS3320Readout.cc */,
+				84E703F91726E5AD00F6DADB /* ORSIS3320Readout.hh */,
 				43ADFE7210B6DBCF0044617C /* ORVVmeCard.cc */,
 				43ADFE7310B6DBCF0044617C /* ORVVmeCard.hh */,
 				84D351C210B5822F0013473E /* UniverseDriverInstall */,
@@ -9992,6 +10016,21 @@
 			path = Source/Experiments/BaseClasses;
 			sourceTree = SOURCE_ROOT;
 		};
+		849B9D6C16DD044F003F3037 /* SIS3320 */ = {
+			isa = PBXGroup;
+			children = (
+				849B9D6D16DD044F003F3037 /* ORSIS3320Controller.h */,
+				849B9D6E16DD044F003F3037 /* ORSIS3320Controller.m */,
+				849B9D6F16DD044F003F3037 /* ORSIS3320Decoders.h */,
+				849B9D7016DD044F003F3037 /* ORSIS3320Decoders.m */,
+				849B9D7116DD044F003F3037 /* ORSIS3320Model.h */,
+				849B9D7216DD044F003F3037 /* ORSIS3320Model.m */,
+				849B9D7316DD044F003F3037 /* SIS3320.nib */,
+				849B9D7416DD044F003F3037 /* SIS3320Card.gif */,
+			);
+			path = SIS3320;
+			sourceTree = "<group>";
+		};
 		849C67FC0A2CC06F00511E30 /* CCUSB */ = {
 			isa = PBXGroup;
 			children = (
@@ -10226,7 +10265,7 @@
 				9C2595B30D5172460039C5DF /* FilterScript.ym */,
 				9C2595B40D5172460039C5DF /* FilterScript.lm */,
 				9C2595B50D5172460039C5DF /* FilterScriptEx.m */,
-				9C2595B60D5172460039C5DF /* FilterScriptGraph.m */,
+				842E0A1016F3AD5E00E20389 /* FilterScriptEx.h */,
 				84DB0B820D627A0400BB9855 /* FilterScriptGuide.rtf */,
 				84DB0B6F0D6279F500BB9855 /* FilterSyntaxDefinition.plist */,
 			);
@@ -12667,6 +12706,7 @@
 				8457BE2C11B0183500C4082D /* SIS3820 */,
 				84BAA29A0E92A81A00E19946 /* SIS3300 */,
 				84D34AFB10B1D6C90013473E /* SIS3302 */,
+				849B9D6C16DD044F003F3037 /* SIS3320 */,
 				84FA6383102B041800B426A6 /* SIS3350 */,
 				848285A1112C5AD600BA30ED /* VHS4030 */,
 				84AFC23D1029F35E009F4139 /* VHQ224L */,
@@ -13912,6 +13952,10 @@
 				84DA76C416B803E00045F22A /* ORAdcRateModel.h in Headers */,
 				84C00CC016B82350003D1504 /* ORFixedValueController.h in Headers */,
 				84C00CC216B82350003D1504 /* ORFixedValueModel.h in Headers */,
+				849B9D7516DD044F003F3037 /* ORSIS3320Controller.h in Headers */,
+				849B9D7716DD044F003F3037 /* ORSIS3320Decoders.h in Headers */,
+				849B9D7916DD044F003F3037 /* ORSIS3320Model.h in Headers */,
+				84E703FB1726E5AD00F6DADB /* ORSIS3320Readout.hh in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14799,6 +14843,8 @@
 				84DA76C116B803E00045F22A /* AdcRate.tif in Resources */,
 				84C00CBB16B82350003D1504 /* fixedValue.tif in Resources */,
 				84C00CBF16B82350003D1504 /* FixedValue.nib in Resources */,
+				849B9D7B16DD044F003F3037 /* SIS3320.nib in Resources */,
+				849B9D7C16DD044F003F3037 /* SIS3320Card.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -15317,7 +15363,6 @@
 				84080D300B3C7FBF009D3704 /* OrcaScript.lm in Sources */,
 				84759CF50B6036D600123411 /* OrcaScript.ym in Sources */,
 				9C2595BA0D5172460039C5DF /* FilterScriptEx.m in Sources */,
-				9C2595BB0D5172460039C5DF /* FilterScriptGraph.m in Sources */,
 				84FBB5720D5401BD00780DBD /* ORFilterSymbolTable.m in Sources */,
 				8428ADE30D7CACD00093D35E /* ORHeaderExplorerController.m in Sources */,
 				8428ADE50D7CACD00093D35E /* ORHeaderExplorerModel.m in Sources */,
@@ -15792,6 +15837,9 @@
 				84DA76C516B803E00045F22A /* ORAdcRateModel.m in Sources */,
 				84C00CC116B82350003D1504 /* ORFixedValueController.m in Sources */,
 				84C00CC316B82350003D1504 /* ORFixedValueModel.m in Sources */,
+				84E703FE17270BFD00F6DADB /* ORSIS3320Model.m in Sources */,
+				849B9D7616DD044F003F3037 /* ORSIS3320Controller.m in Sources */,
+				849B9D7816DD044F003F3037 /* ORSIS3320Decoders.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -16153,7 +16201,6 @@
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LINK_WITH_STANDARD_LIBRARIES = YES;
-				MACOSX_DEPLOYMENT_TARGET = "";
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "";
 				SDKROOT = "";
@@ -16164,6 +16211,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
+				COPY_PHASE_STRIP = YES;
 				GCC_VERSION = "";
 				GCC_WARN_PEDANTIC = YES;
 				GCC_WARN_SHADOW = YES;
@@ -16172,7 +16220,6 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = NO;
 				GCC_WARN_UNKNOWN_PRAGMAS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = "";
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = "";
 			};
@@ -16190,7 +16237,6 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = NO;
 				GCC_WARN_UNKNOWN_PRAGMAS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = "";
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = "";
 			};
