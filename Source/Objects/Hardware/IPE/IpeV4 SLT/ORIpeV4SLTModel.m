@@ -1646,8 +1646,9 @@ return;
 	
 	[self writeSetInhibit];  //TODO: maybe move to readout loop to avoid dead time -tb-
 	
-        //DEBUG 
-        [self dumpSltSecondCounter:@"vor initBoard"];
+        //DEBUG         [self dumpSltSecondCounter:@"vor initBoard"];
+        
+        
     //if cold start (not 'quick start' in RunControl) ...
     if([[userInfo objectForKey:@"doinit"]intValue]){
 		[self initBoard];					
@@ -1656,8 +1657,7 @@ return;
 	dataTakers = [[readOutGroup allObjects] retain];		//cache of data takers.
 	int runMode=0, countHistoMode=0, countNonHistoMode=0;
     
-        //DEBUG 
-        [self dumpSltSecondCounter:@"FLT-runTaskStarted:"];
+        //DEBUG         [self dumpSltSecondCounter:@"FLT-runTaskStarted:"];
         
     //loop over Readout List
 	for(id obj in dataTakers){
@@ -1667,10 +1667,8 @@ return;
             if(runMode == kIpeFltV4_Histogram_DaqMode) countHistoMode++; else countNonHistoMode++;
         }
     }
-        //DEBUG 
-        NSLog(@"%@::%@  countHistoMode:%i  countNonHistoMode:%i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),countHistoMode,countNonHistoMode);//DEBUG -tb-
-        //DEBUG 
-        [self dumpSltSecondCounter:nil];
+        //DEBUG         NSLog(@"%@::%@  countHistoMode:%i  countNonHistoMode:%i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),countHistoMode,countNonHistoMode);//DEBUG -tb-
+        //DEBUG         [self dumpSltSecondCounter:nil];
 
     //if there are FLTs in non-histogramming mode, the filter will start after next 1PPs - wait for it ... -tb-
     if(countNonHistoMode && [[userInfo objectForKey:@"doinit"]intValue]){
@@ -1684,12 +1682,11 @@ return;
             if(subsec1<subsec0) break;
             usleep(1000);
         }				
-        //DEBUG 
-        NSLog(@"%@::%@ waiting for second strobe: i:%i  subsec:%i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),i,subsec1);//DEBUG -tb-
+        //DEBUG
+                 NSLog(@"%@::%@ waiting for second strobe: i:%i  subsec:%i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),i,subsec1);//DEBUG -tb-
 	}	
     
-        //DEBUG 
-        [self dumpSltSecondCounter:@"histoFLT-writeControl:"];
+        //DEBUG         [self dumpSltSecondCounter:@"histoFLT-writeControl:"];
         
     //if there are FLTs in histogramming mode, I start them right before releasing inhibit -> now -tb-
     if(countHistoMode){
@@ -1732,15 +1729,13 @@ return;
 		//TODO: -tb- [self writePageManagerReset];
 		//TODO: -tb- [self writeClrCnt];
         
-        //DEBUG 
-        [self dumpSltSecondCounter:@"SLT-takeData-vor RelInhibit:"];
+        //DEBUG         [self dumpSltSecondCounter:@"SLT-takeData-vor RelInhibit:"];
         
 		unsigned long long runcount = [self readRunTime];
 		[self shipSltEvent:kRunCounterType withType:kStartRunType eventCt:0 high: (runcount>>32)&0xffffffff low:(runcount)&0xffffffff ];
 		[self writeClrInhibit]; //TODO: maybe move to readout loop to avoid dead time -tb-
 
-        //DEBUG 
-        [self dumpSltSecondCounter:@"SLT-takeData-nach RelInhibit:"];
+        //DEBUG         [self dumpSltSecondCounter:@"SLT-takeData-nach RelInhibit:"];
 
 		[self shipSltSecondCounter: kStartRunType];
 		first = NO;

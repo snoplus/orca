@@ -305,7 +305,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     //if(run is going to stop) set a 'wait'; release it after shipping the hitrate record; use a watchdog? -tb-
     if(state==eRunStopping){
         //DEBUG
-        NSLog(@"%@::%@ FLT#%i: need to place a 'wait for hitrate record' (hr mask: 0x%08x)\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[self stationNumber],hitRateEnabledMask);//DEBUG -tb-
+        //NSLog(@"%@::%@ FLT#%i: need to place a 'wait for hitrate record' (hr mask: 0x%08x)\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[self stationNumber],hitRateEnabledMask);//DEBUG -tb-
 	    //TODO: [self addRunWaitWithReason:@"FLTv4: wait for next hitrate event."];
     }
 
@@ -2019,8 +2019,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
         sltSubSecReg =  [aList longValueForCmd:dataIndex];		
         sltSubSec   = ((sltSubSecReg>>11)&0x3fff)*2000   +  (sltSubSecReg & 0x7ff);
         sltSec    =  [aList longValueForCmd:dataIndex+1];		
-        //DEBUGGING 
-        NSLog(@"FLT %i: readHitRates: sltSec: %08x (%i)  sltSubSec %08x (%i, %f)\n",[self stationNumber],sltSec,sltSec,sltSubSec,sltSubSec, (0.00000005*sltSubSec));	
+        //DEBUGGING         NSLog(@"FLT %i: readHitRates: sltSec: %08x (%i)  sltSubSec %08x (%i, %f)\n",[self stationNumber],sltSec,sltSec,sltSubSec,sltSubSec, (0.00000005*sltSubSec));	
         
         if(	dataIndex != countHREnabledChans){
             NSLog(@"ERROR:  Shipping hitrates: FLT #%i:	dataIndex %i,  countHREnabledChans %i are not the same!!!\n",[self stationNumber],dataIndex , countHREnabledChans);	
