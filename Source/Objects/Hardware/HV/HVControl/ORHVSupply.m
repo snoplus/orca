@@ -227,12 +227,12 @@ NSString* ORHVSupplyVoltageAdcSlopeChangedNotification  = @"ORHVSupplyVoltageAdc
         case kHVRampPanic: 	return @"Panic";    break;
         case kHVWaitForAdc:     return @"Adc Wait"; break;
         default: 			 
-            /*if([self actualRelay]!=[self relay]){
+            if([self actualRelay]!=[self relay]){
                 if([self actualRelay])return @"On?Off";
                 else return @"Off?On";
             }
             
-            else*/ if([self actualRelay])return @" On"; 
+            else if([self actualRelay])return @" On"; 
             else return @"Off";	 
             break;
     }

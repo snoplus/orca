@@ -365,7 +365,8 @@ static NSString* ORHVRampConnector				= @"HV Ramp Connector";
             ORHVSupply* aSupply;
             while(aSupply = [e nextObject]){
                 [aSupply setActualRelay:(aMask&(1L<<[aSupply supply]))!=0];
-                if(hvPowerCycleAlarm)[aSupply setRelay:(aMask&(1L<<[aSupply supply]))!=0];
+                /*if(hvPowerCycleAlarm)*/ //<<== why was this done????
+                    [aSupply setRelay:(aMask&(1L<<[aSupply supply]))!=0];
 				[self checkAdcDacMismatch:aSupply];
                 if([aSupply adcVoltage] < ([aSupply voltageAdcOffset]+[aSupply voltageAdcSlope]-500)){
                     [self checkCurrent:aSupply];
