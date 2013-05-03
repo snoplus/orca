@@ -76,6 +76,11 @@
 	}
 }
 
+- (void) setModel:(id)aModel
+{
+	[super setModel:aModel];
+	[[self window] setTitle:[NSString stringWithFormat:@"HV Ramper (%lu)",[model uniqueIdNumber]]];
+}
 
 - (void) dealloc
 {
