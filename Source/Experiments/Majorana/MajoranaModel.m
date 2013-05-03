@@ -98,7 +98,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 				NSArray* arrayOfHistos = [[objs objectAtIndex:0] collectConnectedObjectsOfClass:NSClassFromString(@"ORHistoModel")];
 				if([arrayOfHistos count]){
 					id histoObj = [arrayOfHistos objectAtIndex:0];
-					aDataSet = [histoObj objectForKeyArray:[NSMutableArray arrayWithObjects:@"SIS3302", @"Crate  0",
+					aDataSet = [histoObj objectForKeyArray:[NSMutableArray arrayWithObjects:@"FLT", @"Crate  0",
 															[NSString stringWithFormat:@"Card %2d",[cardName intValue]], 
 															[NSString stringWithFormat:@"Channel %2d",[chanName intValue]],
 															nil]];
@@ -117,7 +117,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 	NSString* cardName  = [theGroup segment:index objectForKey:@"kCardSlot"];
 	NSString* chanName  = [theGroup segment:index objectForKey:@"kChannel"];
 	
-	return [NSString stringWithFormat:@"SIS3302,Energy,Crate %2d,Card %2d,Channel %2d",[crateName intValue],[cardName intValue],[chanName intValue]];
+	return [NSString stringWithFormat:@"FLT,Energy,Crate %2d,Card %2d,Channel %2d",[crateName intValue],[cardName intValue],[chanName intValue]];
 }
 #pragma mark ¥¥¥Specific Dialog Lock Methods
 - (NSString*) experimentMapLock

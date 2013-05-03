@@ -401,10 +401,10 @@ NSString* KSegmentChangedNotification	  =	@"KSegmentChangedNotification";
 		if(!aCard)break;
 		int theSlot = [[params objectForKey: mapKey(kCardSlot)]intValue];
         int theCrate;
-        if(crateIndex>kCardSlot)theCrate = [[params objectForKey: mapKey(crateIndex)]intValue];
+        if(crateIndex>0)theCrate = [[params objectForKey: mapKey(crateIndex)]intValue];
         else theCrate = 0;
 		if(theSlot>=0){
-			if([aCard displayedSlotNumber] == theSlot && [aCard crateNumber] == theCrate && crateIndex>=0){
+			if([aCard displayedSlotNumber] == theSlot && [aCard crateNumber] == theCrate){
 				hwPresent = YES;
 				int chan = [[params objectForKey: mapKey(kChannel)]intValue];
 				if([aCard onlineMaskBit:chan])online = YES;

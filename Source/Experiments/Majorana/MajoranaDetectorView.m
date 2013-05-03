@@ -34,7 +34,7 @@
 - (void) makeCrateImage
 {
     if(!crateImage){
-        crateImage = [[NSImage imageNamed:@"Vme64Crate"] copy];
+        crateImage = [[NSImage imageNamed:@"IpeV4MiniCrate"] copy];
         NSSize imageSize = [crateImage size];
         [crateImage setSize:NSMakeSize(imageSize.width*.7,imageSize.height*.7)];
     }
