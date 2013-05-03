@@ -87,8 +87,6 @@
     [super dealloc];
 }
 
-#pragma mark ¥¥¥Accessors
-
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers
 {
