@@ -279,7 +279,7 @@
 -(IBAction) readIdAction:(id)sender
 {
 	@try {
-		//NSLog(@"LakeShore 336 Id: %@\n",[model readIDString]);
+		[model readIDString];
 	}
 	@catch(NSException* localException) {
         NSLog( [ localException reason ] );

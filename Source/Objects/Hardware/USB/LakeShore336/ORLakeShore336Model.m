@@ -721,7 +721,7 @@ NSString* ORLakeShore336TimeoutCountChanged     = @"ORLakeShore336TimeoutCountCh
 
 - (void) writeToDevice: (NSString*) aCommand
 {
-    if(![aCommand hasPrefix:@"\r"])aCommand = [aCommand stringByAppendingString:@"\r"];
+    if(![aCommand hasSuffix:@"\r"])aCommand = [aCommand stringByAppendingString:@"\r"];
 
 	switch(connectionProtocol){
 			
