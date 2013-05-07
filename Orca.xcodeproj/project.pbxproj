@@ -2463,6 +2463,16 @@
 		84CEA6EA0EA623A50060076A /* ORFecDaughterCardController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84CEA6E40EA623A50060076A /* ORFecDaughterCardController.m */; };
 		84CEA6EB0EA623A50060076A /* ORFecDaughterCardModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84CEA6E50EA623A50060076A /* ORFecDaughterCardModel.h */; };
 		84CEA6EC0EA623A50060076A /* ORFecDaughterCardModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84CEA6E60EA623A50060076A /* ORFecDaughterCardModel.m */; };
+		84CED3931732FB9E000A84C2 /* LakeShore336.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84CED38D1732FB9E000A84C2 /* LakeShore336.nib */; };
+		84CED3941732FB9E000A84C2 /* LakeShore336.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84CED38E1732FB9E000A84C2 /* LakeShore336.tif */; };
+		84CED3951732FB9E000A84C2 /* ORLakeShore336Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84CED38F1732FB9E000A84C2 /* ORLakeShore336Controller.h */; };
+		84CED3961732FB9E000A84C2 /* ORLakeShore336Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84CED3901732FB9E000A84C2 /* ORLakeShore336Controller.m */; };
+		84CED3971732FB9E000A84C2 /* ORLakeShore336Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84CED3911732FB9E000A84C2 /* ORLakeShore336Model.h */; };
+		84CED3981732FB9E000A84C2 /* ORLakeShore336Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84CED3921732FB9E000A84C2 /* ORLakeShore336Model.m */; };
+		84CED39B1737EDF5000A84C2 /* ORLakeShore336Heater.h in Headers */ = {isa = PBXBuildFile; fileRef = 84CED3991737EDF3000A84C2 /* ORLakeShore336Heater.h */; };
+		84CED39C1737EDF5000A84C2 /* ORLakeShore336Heater.m in Sources */ = {isa = PBXBuildFile; fileRef = 84CED39A1737EDF4000A84C2 /* ORLakeShore336Heater.m */; };
+		84CED39F1737F3D9000A84C2 /* ORLakeShore336Input.h in Headers */ = {isa = PBXBuildFile; fileRef = 84CED39D1737F3D7000A84C2 /* ORLakeShore336Input.h */; };
+		84CED3A01737F3D9000A84C2 /* ORLakeShore336Input.m in Sources */ = {isa = PBXBuildFile; fileRef = 84CED39E1737F3D8000A84C2 /* ORLakeShore336Input.m */; };
 		84CEDD160CDA7D9E002CFD3A /* Gretina4.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84CEDD0E0CDA7D9E002CFD3A /* Gretina4.nib */; };
 		84CEDD170CDA7D9E002CFD3A /* Gretina4Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84CEDD0F0CDA7D9E002CFD3A /* Gretina4Card.gif */; };
 		84CEDD180CDA7D9E002CFD3A /* ORGretina4Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84CEDD100CDA7D9E002CFD3A /* ORGretina4Controller.h */; };
@@ -5516,6 +5526,16 @@
 		84CEA6E40EA623A50060076A /* ORFecDaughterCardController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORFecDaughterCardController.m; path = "Source/Objects/Custom Hardware/SNO+/FecDaughterCard/ORFecDaughterCardController.m"; sourceTree = SOURCE_ROOT; };
 		84CEA6E50EA623A50060076A /* ORFecDaughterCardModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORFecDaughterCardModel.h; path = "Source/Objects/Custom Hardware/SNO+/FecDaughterCard/ORFecDaughterCardModel.h"; sourceTree = SOURCE_ROOT; };
 		84CEA6E60EA623A50060076A /* ORFecDaughterCardModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORFecDaughterCardModel.m; path = "Source/Objects/Custom Hardware/SNO+/FecDaughterCard/ORFecDaughterCardModel.m"; sourceTree = SOURCE_ROOT; };
+		84CED38D1732FB9E000A84C2 /* LakeShore336.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = LakeShore336.nib; sourceTree = "<group>"; };
+		84CED38E1732FB9E000A84C2 /* LakeShore336.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = LakeShore336.tif; sourceTree = "<group>"; };
+		84CED38F1732FB9E000A84C2 /* ORLakeShore336Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORLakeShore336Controller.h; sourceTree = "<group>"; };
+		84CED3901732FB9E000A84C2 /* ORLakeShore336Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORLakeShore336Controller.m; sourceTree = "<group>"; };
+		84CED3911732FB9E000A84C2 /* ORLakeShore336Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORLakeShore336Model.h; sourceTree = "<group>"; };
+		84CED3921732FB9E000A84C2 /* ORLakeShore336Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORLakeShore336Model.m; sourceTree = "<group>"; };
+		84CED3991737EDF3000A84C2 /* ORLakeShore336Heater.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORLakeShore336Heater.h; sourceTree = "<group>"; };
+		84CED39A1737EDF4000A84C2 /* ORLakeShore336Heater.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORLakeShore336Heater.m; sourceTree = "<group>"; };
+		84CED39D1737F3D7000A84C2 /* ORLakeShore336Input.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORLakeShore336Input.h; sourceTree = "<group>"; };
+		84CED39E1737F3D8000A84C2 /* ORLakeShore336Input.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORLakeShore336Input.m; sourceTree = "<group>"; };
 		84CEDD0E0CDA7D9E002CFD3A /* Gretina4.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Gretina4.nib; path = Source/Objects/Hardware/Vme/Gretina4/Gretina4.nib; sourceTree = SOURCE_ROOT; };
 		84CEDD0F0CDA7D9E002CFD3A /* Gretina4Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Gretina4Card.gif; path = Source/Objects/Hardware/Vme/Gretina4/Gretina4Card.gif; sourceTree = SOURCE_ROOT; };
 		84CEDD100CDA7D9E002CFD3A /* ORGretina4Controller.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORGretina4Controller.h; path = Source/Objects/Hardware/Vme/Gretina4/ORGretina4Controller.h; sourceTree = SOURCE_ROOT; };
@@ -10114,6 +10134,7 @@
 				84A4E8950C287CA900CBC222 /* USBtoGPIB */,
 				84B28E2A0F4C7FD400E2B056 /* LDA102 */,
 				8475EC251475A66F003A165D /* LabJack */,
+				84CED38C1732FB9D000A84C2 /* LakeShore336 */,
 			);
 			path = USB;
 			sourceTree = "<group>";
@@ -11429,6 +11450,24 @@
 			);
 			name = FecDaughterCard;
 			path = "Source/Objects/Custom Hardware/SNO+/FecDaughterCard";
+			sourceTree = SOURCE_ROOT;
+		};
+		84CED38C1732FB9D000A84C2 /* LakeShore336 */ = {
+			isa = PBXGroup;
+			children = (
+				84CED38D1732FB9E000A84C2 /* LakeShore336.nib */,
+				84CED38E1732FB9E000A84C2 /* LakeShore336.tif */,
+				84CED38F1732FB9E000A84C2 /* ORLakeShore336Controller.h */,
+				84CED3901732FB9E000A84C2 /* ORLakeShore336Controller.m */,
+				84CED3911732FB9E000A84C2 /* ORLakeShore336Model.h */,
+				84CED3921732FB9E000A84C2 /* ORLakeShore336Model.m */,
+				84CED3991737EDF3000A84C2 /* ORLakeShore336Heater.h */,
+				84CED39A1737EDF4000A84C2 /* ORLakeShore336Heater.m */,
+				84CED39D1737F3D7000A84C2 /* ORLakeShore336Input.h */,
+				84CED39E1737F3D8000A84C2 /* ORLakeShore336Input.m */,
+			);
+			name = LakeShore336;
+			path = Source/Objects/Hardware/USB/LakeShore336;
 			sourceTree = SOURCE_ROOT;
 		};
 		84CEDD0D0CDA7D9E002CFD3A /* Gretina4 */ = {
@@ -13956,6 +13995,10 @@
 				849B9D7716DD044F003F3037 /* ORSIS3320Decoders.h in Headers */,
 				849B9D7916DD044F003F3037 /* ORSIS3320Model.h in Headers */,
 				84E703FB1726E5AD00F6DADB /* ORSIS3320Readout.hh in Headers */,
+				84CED3951732FB9E000A84C2 /* ORLakeShore336Controller.h in Headers */,
+				84CED3971732FB9E000A84C2 /* ORLakeShore336Model.h in Headers */,
+				84CED39B1737EDF5000A84C2 /* ORLakeShore336Heater.h in Headers */,
+				84CED39F1737F3D9000A84C2 /* ORLakeShore336Input.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14845,6 +14888,8 @@
 				84C00CBF16B82350003D1504 /* FixedValue.nib in Resources */,
 				849B9D7B16DD044F003F3037 /* SIS3320.nib in Resources */,
 				849B9D7C16DD044F003F3037 /* SIS3320Card.gif in Resources */,
+				84CED3931732FB9E000A84C2 /* LakeShore336.nib in Resources */,
+				84CED3941732FB9E000A84C2 /* LakeShore336.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14888,8 +14933,10 @@
 				8458E8EE15DA89EF005C43A9 /* Mail.app in Sources */,
 				8434A2A7055B3287002D3102 /* main.m in Sources */,
 				8434A2A8055B3287002D3102 /* ORAppDelegate.m in Sources */,
+				84CED39C1737EDF5000A84C2 /* ORLakeShore336Heater.m in Sources */,
 				8434A2A9055B3287002D3102 /* ORAboutBox.m in Sources */,
 				8434A2AA055B3287002D3102 /* ORCatalogController.m in Sources */,
+				84CED3A01737F3D9000A84C2 /* ORLakeShore336Input.m in Sources */,
 				8434A2AB055B3287002D3102 /* ORStatusController.m in Sources */,
 				8434A2AC055B3287002D3102 /* ORDocument.m in Sources */,
 				8434A2AD055B3287002D3102 /* ORDocumentController.m in Sources */,
@@ -15840,6 +15887,8 @@
 				84E703FE17270BFD00F6DADB /* ORSIS3320Model.m in Sources */,
 				849B9D7616DD044F003F3037 /* ORSIS3320Controller.m in Sources */,
 				849B9D7816DD044F003F3037 /* ORSIS3320Decoders.m in Sources */,
+				84CED3961732FB9E000A84C2 /* ORLakeShore336Controller.m in Sources */,
+				84CED3981732FB9E000A84C2 /* ORLakeShore336Model.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
