@@ -104,6 +104,7 @@
 - (void) makeMainController;
 - (NSString*) helpURL;
 - (NSRange)	memoryFootprint;
+- (void) initParams;
 
 #pragma mark ***Accessors
 - (unsigned long) accGate1Length:(int)anIndex;

@@ -94,6 +94,7 @@
 - (int)  adcVoltage:(short) aSupplyIndex;
 - (int)  current:(short) aSupplyIndex;
 - (int) rampState:(short) aSupplyIndex;
+- (NSString*) stateFileName;
 
 
 
