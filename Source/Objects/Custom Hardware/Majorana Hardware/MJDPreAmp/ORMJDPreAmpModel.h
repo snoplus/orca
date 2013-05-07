@@ -27,6 +27,7 @@
 #define kMJDPreAmpAdcChannels   16
 #define kMJDPreAmpDataRecordLen 21
 
+
 @interface ORMJDPreAmpModel : OrcaObject {
     NSMutableArray* adcs;
     NSMutableArray* feedBackResistors;
@@ -124,6 +125,7 @@
 - (void) readAdcsOnChip:(int)aChip;
 - (void) readTempOnChip:(int)aChip; // niko
 - (void) readAdcs;
+- (void) readTemperature;
 - (void) pollValues;
 - (unsigned long) writeAuxIOSPI:(unsigned long)aValue;
 

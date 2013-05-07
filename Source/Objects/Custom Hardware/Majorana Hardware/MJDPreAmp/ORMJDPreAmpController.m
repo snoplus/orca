@@ -96,13 +96,14 @@
 	}
     
     [[plotter0 yAxis] setRngLow:0.0 withHigh:300.];
-	[[plotter0 yAxis] setRngLimitsLow:-300.0 withHigh:500 withMinRng:4];
+	//[[plotter0 yAxis] setRngLimitsLow:-300.0 withHigh:500 withMinRng:4];
+    [[plotter0 yAxis] setRngLimitsLow:0.0 withHigh:150 withMinRng:4]; // up to 150 pA leakage current - niko
     [[plotter1 yAxis] setRngLow:0.0 withHigh:300.];
-	[[plotter1 yAxis] setRngLimitsLow:-300.0 withHigh:500 withMinRng:4];
+    [[plotter1 yAxis] setRngLimitsLow:0.0 withHigh:150 withMinRng:4]; // up to 150 pA leakage current - niko
     [[plotter2 yAxis] setRngLow:0.0 withHigh:300.];
-	[[plotter2 yAxis] setRngLimitsLow:-300.0 withHigh:500 withMinRng:4];
+    [[plotter2 yAxis] setRngLimitsLow:0.0 withHigh:60 withMinRng:4]; // up to 60 degrees on chip - niko
     [[plotter3 yAxis] setRngLow:0.0 withHigh:300.];
-	[[plotter3 yAxis] setRngLimitsLow:-300.0 withHigh:500 withMinRng:4];
+    [[plotter3 yAxis] setRngLimitsLow:0.0 withHigh:30 withMinRng:4]; // up to 24V - niko
    
     
     [[plotter0 xAxis] setRngLow:0.0 withHigh:10000];
@@ -777,6 +778,11 @@
 	[model readAdcs]; 
 }
 
+- (IBAction) readTemperature:(id)sender
+{
+	[model readTemperature]; 
+}
+
 - (IBAction) pollNowAction:(id)sender
 {
 	[model pollValues];
@@ -803,10 +809,21 @@
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
     int adc = [self tagToAdc:[aPlotter tag]];
-	int count = [[model timeRate:adc] count];
-	int index = count-i-1;
-	*xValue = [[model timeRate:adc] timeSampledAtIndex:index];
-	*yValue = [[model timeRate:adc] valueAtIndex:index];
-}
+    int count = [[model timeRate:adc] count];
+    int index = count-i-1;
+    *xValue = [[model timeRate:adc] timeSampledAtIndex:index];
+    *yValue = [[model timeRate:adc] valueAtIndex:index];
+    
+    float multiplier = 1000.; // nA to pA conversion - niko
+    
+    if((adc < 5) || ((adc > 7) && (adc < 13))){ // first stage ouput values
 
+        *yValue = -multiplier*([[model timeRate:adc] valueAtIndex:index]-[model baselineVoltage:adc])/[model feedBackResistor:adc];
+        
+        //NSLog(@"channel %d, adc %f , baseline %f, Rf %f, current %f\n", adc, [[model timeRate:adc] valueAtIndex:index], [model baselineVoltage:adc], [model feedBackResistor:adc], *yValue );
+    }
+    else
+        *yValue = [[model timeRate:adc] valueAtIndex:index];
+       
+}
 @end
