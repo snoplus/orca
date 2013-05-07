@@ -125,7 +125,7 @@
 - (void) readAdcsOnChip:(int)aChip;
 - (void) readTempOnChip:(int)aChip; // niko
 - (void) readAdcs;
-- (void) readTemperature;
+- (void) readTemperatures;
 - (void) pollValues;
 - (unsigned long) writeAuxIOSPI:(unsigned long)aValue;
 

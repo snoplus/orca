@@ -725,7 +725,7 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 	timeMeasured[aChip] = ut_Time;
 }
 
-- (void) readTemperature
+- (void) readTemperatures
 {
 	[self readTempOnChip:0];
 	[self readTempOnChip:1];
@@ -798,7 +798,7 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 	if(pollTime)[self performSelector:@selector(pollValues) withObject:nil afterDelay:pollTime];
 
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollValues) object:nil];
-	[self readTemperature];
+	[self readTemperatures];
 	if(shipValues)[self shipRecords];
 	if(pollTime)[self performSelector:@selector(pollValues) withObject:nil afterDelay:pollTime];
 }

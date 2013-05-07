@@ -778,9 +778,9 @@
 	[model readAdcs]; 
 }
 
-- (IBAction) readTemperature:(id)sender
+- (IBAction) readTemperatures:(id)sender
 {
-	[model readTemperature]; 
+	[model readTemperatures];
 }
 
 - (IBAction) pollNowAction:(id)sender

@@ -118,6 +118,7 @@
 - (IBAction) startPulserAction:(id)sender;
 - (IBAction) stopPulserAction:(id)sender;
 - (IBAction) readAdcs:(id)sender;
+- (IBAction) readTemperatures:(id)sender;
 - (IBAction) feedBackResistorAction:(id)sender;
 - (IBAction) baselineVoltageAction:(id)sender;
 
