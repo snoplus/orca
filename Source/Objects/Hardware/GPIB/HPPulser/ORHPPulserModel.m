@@ -644,6 +644,73 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
     }
 }
 
+- (void) writeVoltageLow:(unsigned short)value
+{
+    [self writeToGPIBDevice:@"VOLT:UNIT VPP"];
+    [self logSystemResponse];
+    [self writeToGPIBDevice:[NSString stringWithFormat:@"VOLT:LOW %dE-3",value]];
+    [self logSystemResponse];
+    NSLog(@"HP Pulser Voltage LOW PP set to %d\n",value);
+}
+
+- (void) writeVoltageHigh:(unsigned short)value
+{
+    [self writeToGPIBDevice:@"VOLT:UNIT VPP"];
+    [self logSystemResponse];
+    [self writeToGPIBDevice:[NSString stringWithFormat:@"VOLT:HIGH %dE-3",value]];
+    [self logSystemResponse];
+    NSLog(@"HP Pulser Voltage LOW PP set to %d\n",value);
+}
+
+- (void) writeOutput:(BOOL)aState
+{
+    [self writeToGPIBDevice:[NSString stringWithFormat:@"OUTPUT %@",aState?@"ON":@"OFF"]];
+    [self logSystemResponse];
+    NSLog(@"HP Pulser Output %@\n",aState?@"ON":@"OFF");
+}
+
+- (void) writeSync:(BOOL)aState
+{
+    [self writeToGPIBDevice:[NSString stringWithFormat:@"OUTPUT:SYNC %@",aState?@"ON":@"OFF"]];
+    [self logSystemResponse];
+    NSLog(@"HP Pulser Sync %@\n",aState?@"ON":@"OFF");
+}
+
+- (void) writePulsePeriod:(float)aValue
+{
+    if(aValue<200E-9)aValue=200E-9;
+    else if(aValue>2000)aValue = 2000;
+    [self writeToGPIBDevice:[NSString stringWithFormat:@"PULSE:PERIOD %E",aValue]];
+    [self logSystemResponse];
+    NSLog(@"HP Pulser Pulse Period %E\n",aValue);
+}
+
+- (void) writePulseWidth:(float)aValue
+{
+    if(aValue<200E-9)aValue=200E-9;
+    else if(aValue>2000)aValue = 2000;
+    [self writeToGPIBDevice:[NSString stringWithFormat:@"FUNC:PULSE:WIDT %E",aValue]];
+    [self logSystemResponse];
+    NSLog(@"HP Pulser Pulse Width %E\n",aValue);
+}
+
+- (void) writePulseDutyCycle:(unsigned short)aValue
+{
+    if(aValue>100)aValue = 100;
+    [self writeToGPIBDevice:[NSString stringWithFormat:@"FUNC:PULSE:DCYC %d",aValue]];
+    [self logSystemResponse];
+    NSLog(@"HP Pulser Pulse Duty Cycle %d\n",aValue);
+}
+
+- (void) writePulseEdgeTime:(float)aValue
+{
+    if(aValue<5E-9)aValue=5E-9;
+    else if(aValue>100E-9)aValue = 100E-9;
+    [self writeToGPIBDevice:[NSString stringWithFormat:@"FUNC:PULSE:TRAN %E",aValue]];
+    [self logSystemResponse];
+    NSLog(@"HP Pulser Pulse Edge Time %E\n",aValue);
+}
+
 - (void) writeVoltage:(unsigned short)value
 {
     [self writeToGPIBDevice:@"VOLT:UNIT VPP"];

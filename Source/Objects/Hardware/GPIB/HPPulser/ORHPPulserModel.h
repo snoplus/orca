@@ -195,13 +195,21 @@ typedef struct HPPulserCustomWaveformStruct {
 - (void) writeBurstRate:(float)rate;
 - (void) writeBurstPhase:(int)phase;
 - (void) writeBurstCycles:(int)cycles;
-//- (void) writeTotalWidth:(float)width;
 - (void) writeBurstState:(BOOL)value;
 - (void) writeTriggerSource:(int)value;
+- (void) writeVoltageLow:(unsigned short)value;
+- (void) writeVoltageHigh:(unsigned short)value;
+- (void) writeOutput:(BOOL)aState;
+- (void) writeSync:(BOOL)aState;
+- (void) writePulsePeriod:(float)aValue;
+- (void) writePulseWidth:(float)aValue;
+- (void) writePulseDutyCycle:(unsigned short)aValue;
+- (void) writePulseEdgeTime:(float)aValue;
 - (void) downloadWaveform;
 - (void) downloadWaveformWorker;
 - (void) copyWaveformWorker;
 - (void) outputWaveformParams;
+
 
 #pragma mark •••NonVolatile Memory Management
 - (void) loadFromVolativeMemory;
