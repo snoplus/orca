@@ -245,8 +245,13 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 
 - (void) togglePower
 {
-	NSString* cmd = [NSString stringWithFormat:@"sysMainSwitch.0 i %d",![self power]];
+    BOOL powerState = [self power];
+	NSString* cmd = [NSString stringWithFormat:@"sysMainSwitch.0 i %d",!powerState];
 	[[self adapter] writeValue:cmd target:self selector:@selector(processSystemResponseArray:)];
+    if(!powerState){
+        [self writeMaxTemperature];
+        [self writeMaxTerminalVoltage];
+    }
 }
 
 #pragma mark ¥¥¥Hardware Access
@@ -295,6 +300,16 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 		[ORSNMPQueue addOperation:aReadOp];
 		[aReadOp release];
 	}
+}
+
+- (void) writeMaxTerminalVoltage
+{
+    [[self adapter] writeValue:@"outputConfigMaxTerminalVoltage F 5000.0" target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
+}
+
+- (void) writeMaxTemperature
+{
+    [[self adapter] writeValue:@"outputSupervisionMaxTemperature i 5000" target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
 }
 
 - (void) writeValue:(NSString*)aCmd target:(id)aTarget selector:(SEL)aSelector priority:(NSOperationQueuePriority)aPriority

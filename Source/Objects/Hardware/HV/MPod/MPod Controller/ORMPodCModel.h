@@ -52,6 +52,8 @@
 - (id) systemParam:(NSString*)name;
 - (void) togglePower;
 - (void) setQueCount:(NSNumber*)n;
+- (void) writeMaxTerminalVoltage;
+- (void) writeMaxTemperature;
 
 #pragma mark ¥¥¥Hardware Access
 - (id) controllerCard;
