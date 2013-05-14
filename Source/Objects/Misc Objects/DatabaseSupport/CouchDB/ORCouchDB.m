@@ -202,6 +202,16 @@
 	[anOp release];
 }
 
+- (void) updateEventCatalog:(NSDictionary*)aDict documentId:(NSString*)anId tag:(NSString*)aTag;
+{
+	ORCouchDBUpdateEventCatalogOp* anOp = [[ORCouchDBUpdateEventCatalogOp alloc] initWithHost:host port:port database:database delegate:delegate tag:aTag];
+	[anOp setDocument:aDict documentID:anId];
+	[anOp setUsername:username];
+	[anOp setPwd:pwd];
+	[ORCouchDBQueue addOperation:anOp];
+	[anOp release];
+}
+
 - (void) getDocumentId:(NSString*)anId  tag:(NSString*)aTag
 {
 	ORCouchDBGetDocumentOp* anOp = [[ORCouchDBGetDocumentOp alloc] initWithHost:host port:port database:database delegate:delegate tag:aTag];
@@ -479,34 +489,33 @@
 												   @"Reason",
 												   nil];
 		else {
-			if(views){
-				NSDictionary* oldViews = [views objectForKey:@"views"];
-				NSArray* allViewKeys = [oldViews allKeys];
-				for(id aViewKey in allViewKeys){
-					
-					NSMutableDictionary* newViews = [NSMutableDictionary dictionaryWithObjectsAndKeys:@"javascript",@"language",nil];
+            if(views){
+                NSMutableDictionary* allMaps = [NSMutableDictionary dictionary];
 
-					NSMutableDictionary* aOldView = [[[oldViews objectForKey:aViewKey] mutableCopy] autorelease];
-					
-					NSMutableDictionary* aNewView= [NSMutableDictionary dictionaryWithDictionary:aOldView];
-					
-					id mapName = [[[aNewView objectForKey:@"mapName"] retain] autorelease];
-					if(![mapName length])mapName = database;
-					else [aNewView removeObjectForKey:@"mapName"];
-					
-					NSMutableDictionary* theLowLevelView = [NSMutableDictionary dictionaryWithObjectsAndKeys:aNewView,aViewKey,nil];
-
-
-					[newViews setObject:theLowLevelView forKey:@"views"];
-					
-					NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/_design/%@", host, port, database, mapName];
-					/*id result = */[self send:httpString type:@"PUT" body:newViews];		
-				}
-				
-			}
-
-		}
-		
+                NSDictionary* viewDictionary = [views objectForKey:@"views"];
+                for(id aViewKey in viewDictionary){
+                    
+                    NSMutableDictionary* aNewView = [[[viewDictionary objectForKey:aViewKey] mutableCopy] autorelease];
+                                    
+                    id mapName = [[[aNewView objectForKey:@"mapName"] retain] autorelease];
+                    if(![mapName length])mapName = database;
+                    else [aNewView removeObjectForKey:@"mapName"];
+                    
+                    if(![allMaps objectForKey:mapName]){
+                        [allMaps setObject:[NSMutableDictionary dictionary] forKey:mapName];
+                        [[allMaps objectForKey:mapName] setObject:@"javascript" forKey:@"language"];
+                        [[allMaps objectForKey:mapName] setObject:[NSMutableDictionary dictionary] forKey:@"views"];
+                    }
+                    
+                    [[[allMaps objectForKey:mapName] objectForKey:@"views"] setObject:aNewView forKey:aViewKey];
+                 }
+                 for(id aMapName in allMaps){
+                    NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/_design/%@", host, port, database, aMapName];
+                    /*id result = */[self send:httpString type:@"PUT" body:[allMaps objectForKey:aMapName]];
+                 }
+            }
+            
+        }
 	}
 	else {
 		result = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -709,6 +718,49 @@
 		}
 	}
 
+}
+@end
+
+@implementation ORCouchDBUpdateEventCatalogOp
+- (void) main
+{
+	if([self isCancelled])return;
+	//check for an existing document
+	NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/%@", host, port, database, documentId];
+	id result = [self send:httpString];
+	if(!result){
+		result = [NSDictionary dictionaryWithObjectsAndKeys:
+				  [NSString stringWithFormat:@"[%@] timeout",
+				   database],@"Message",nil];
+		[self sendToDelegate:result];
+	}
+	else if([result objectForKey:@"error"]){
+		//document doesn't exist. So just add it.
+        NSArray* anEvent = [NSArray arrayWithObject:[NSDictionary dictionaryWithObject:[document objectForKey:@"time"] forKey:[document objectForKey:@"name"]]];
+        NSDictionary* newDocument = [NSDictionary dictionaryWithObjectsAndKeys:@"EventCatalog",@"name", @"Event Catalog",@"title",anEvent,@"events",nil];
+		result = [self send:httpString type:@"PUT" body:newDocument];
+		if(![result objectForKey:@"error"] && attachmentData){
+			[self addAttachement];
+		}
+	}
+	else {
+		//it already exists. insert the rev number into the document and put it back
+		id rev = [result objectForKey:@"_rev"];
+		if(rev){
+            NSString* eventNameForCatalog = [document objectForKey:@"name"];
+			NSMutableDictionary* newDocument = [NSMutableDictionary dictionaryWithDictionary:result];
+            NSArray* eventsAlreadyInCatalog = [result objectForKey:@"events"];
+            for(id anEntry in eventsAlreadyInCatalog){
+                if([anEntry objectForKey:eventNameForCatalog])return; //alreay there
+            }
+            //if we get here, it's not in the list of events already
+            NSArray* newArray = [[result objectForKey:@"events"] arrayByAddingObject:[NSDictionary dictionaryWithObject:[document objectForKey:@"time"] forKey:eventNameForCatalog]];
+            [newDocument setObject:newArray forKey:@"events"];
+            [newDocument setObject:rev forKey:@"_rev"];
+            result = [self send:httpString type:@"PUT" body:newDocument];
+		}
+	}
+    
 }
 @end
 

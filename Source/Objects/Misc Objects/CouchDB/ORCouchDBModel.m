@@ -172,7 +172,17 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
                      selector : @selector(runStatusChanged:)
                          name : ORRunStatusChangedNotification
                        object : nil];
-	
+
+    [notifyCenter addObserver : self
+                     selector : @selector(runStarted:)
+                         name : ORRunStartedNotification
+                       object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(runStopped:)
+                         name : ORRunStoppedNotification
+                       object : nil];
+    
 	[notifyCenter addObserver : self
                      selector : @selector(runOptionsOrTimeChanged:)
                          name : ORRunElapsedTimesChangedNotification
@@ -220,6 +230,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 	[self updateRunInfo];
 	[self alarmsChanged:nil];
 	[self statusLogChanged:nil];
+    [self recordEvent:@"Restart" symbol:@"O" comment:@"ORCA restarted"];
 }
 
 #pragma mark ***Accessors
@@ -481,82 +492,119 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 	NSString* aMap;
 	NSDictionary* aMapDictionary;
 	NSMutableDictionary* aViewDictionary = [NSMutableDictionary dictionary];
-	
+    
 	aMap            = @"function(doc) { if(doc.type == 'Histogram1D') { emit(doc.name, { 'name': doc.name, 'counts': doc.counts }); } }";
-	aMapDictionary  = [NSDictionary dictionaryWithObject:aMap forKey:@"map"]; 
-	[aViewDictionary setObject:aMapDictionary forKey:@"counts"]; 
-
+	aMapDictionary  = [NSDictionary dictionaryWithObject:aMap forKey:@"map"];
+	[aViewDictionary setObject:aMapDictionary forKey:@"counts"];
+    
+    
 	aMap            = @"function(doc) { if(doc.type == 'alarms') { emit(doc.type, {'alarmlist': doc.alarmlist}); } }";
 	aMapDictionary  = [NSDictionary dictionaryWithObject:aMap forKey:@"map"]; 
-	[aViewDictionary setObject:aMapDictionary forKey:@"alarms"]; 
+	[aViewDictionary setObject:aMapDictionary forKey:@"alarms"];
 
 	aMap            = @"function(doc) { if(doc.type == 'processes') { emit(doc.type, {'processlist': doc.processlist}); } }";
 	aMapDictionary  = [NSDictionary dictionaryWithObject:aMap forKey:@"map"]; 
-	[aViewDictionary setObject:aMapDictionary forKey:@"processes"]; 
+	[aViewDictionary setObject:aMapDictionary forKey:@"processes"];
 	
 	
 	aMap            = @"function(doc) { if(doc.type == 'machineinfo') { emit(doc.type, doc); } }";
-	aMapDictionary  = [NSDictionary dictionaryWithObject:aMap forKey:@"map"]; 
-	[aViewDictionary setObject:aMapDictionary forKey:@"machineinfo"]; 
+	aMapDictionary  = [NSDictionary dictionaryWithObject:aMap forKey:@"map"];
+	[aViewDictionary setObject:aMapDictionary forKey:@"machineinfo"];
 
 	aMap            = @"function(doc) { if(doc.type == 'runinfo') { emit(doc._id, doc); } }";
 	aMapDictionary  = [NSDictionary dictionaryWithObject:aMap forKey:@"map"]; 
-	[aViewDictionary setObject:aMapDictionary forKey:@"runinfo"]; 
+	[aViewDictionary setObject:aMapDictionary forKey:@"runinfo"];
 
 	aMap            = @"function(doc) { if(doc.type == 'StatusLog') { emit(doc._id, doc); } }";
 	aMapDictionary  = [NSDictionary dictionaryWithObject:aMap forKey:@"map"]; 
-	[aViewDictionary setObject:aMapDictionary forKey:@"statuslog"]; 
+	[aViewDictionary setObject:aMapDictionary forKey:@"statuslog"];	
 	
-	
-	NSDictionary* theViews = [NSDictionary dictionaryWithObjectsAndKeys:
+	NSDictionary* dbViews = [NSDictionary dictionaryWithObjectsAndKeys:
 				  @"javascript",@"language",
 				  aViewDictionary,@"views",
 				  nil];	
 		
-	[[self statusDBRef] createDatabase:kCreateDB views:theViews];
+	[[self statusDBRef] createDatabase:kCreateDB views:dbViews];
+    //----temp----
+    if([NSEvent modifierFlags] & (NSCommandKeyMask | NSAlternateKeyMask | NSControlKeyMask | NSShiftKeyMask)){
+        [self processAlarmLog]; //remove at some point.
+    }
+    //---------
+}
+
+- (void) processAlarmLog
+{
+    NSString* contents = [[ORStatusController sharedStatusController] alarmLogContents];
+    NSArray* lines = [contents componentsSeparatedByString:@"\n"];
+    for(id aLine in lines){
+        if([aLine rangeOfString:@"ORCA started"].location != NSNotFound){
+            
+            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+            dateFormatter.dateFormat = @"MMddyy HH:mm:ss";
+            
+            NSDate* date = [dateFormatter dateFromString:[aLine substringToIndex:15]];
+
+            
+            NSTimeZone *gmt = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];
+            [dateFormatter setTimeZone:gmt];
+            NSString* timeString = [dateFormatter stringFromDate:date];
+            NSDate* gmtTime = [dateFormatter dateFromString:timeString];
+            unsigned long secondsSince1970 = [gmtTime timeIntervalSince1970];
+            [dateFormatter release];
+
+            NSDateFormatter* dateFormatter2 = [[NSDateFormatter alloc] init];
+            dateFormatter2.dateFormat = @"yyyy/MM/dd HH:mm:ss";
+            NSString* lastTimeStamp = [dateFormatter2 stringFromDate:gmtTime];
+            [dateFormatter2 release];
+
+            
+            [self recordEvent:@"Restart" symbol:@"O" comment:@"ORCA restarted" timeString:lastTimeStamp timeStamp:secondsSince1970];
+        }
+    }
 }
 
 - (void) createHistoryDatabase
 {			
 	NSString*     aMap;
 	NSString*     aReduce;
-	NSDictionary* aDictionary;
+	NSDictionary* aMapDictionary;
 	NSMutableDictionary* aViewDictionary = [NSMutableDictionary dictionary];
-
-	aMap            = @"function(doc) {if(doc.title){emit([doc.time,doc.title],doc);}}";
-	aDictionary  = [NSDictionary dictionaryWithObject:aMap forKey:@"map"];
-	[aViewDictionary setObject:aDictionary forKey:@"adcs"]; 
-
-	
+    
+	aMap            = @"function(doc) {if(doc.title == \"adcs\"){emit([doc.time,doc.title],doc);}}";
+	aMapDictionary  = [NSDictionary dictionaryWithObject:aMap forKey:@"map"];
+	[aViewDictionary setObject:aMapDictionary forKey:@"adcs"];
+    	
     NSBundle* mainBundle = [NSBundle mainBundle];
 	NSString*   mapPath = [mainBundle pathForResource: @"CouchHistoryAveMap" ofType: @"txt"];
 	NSString*   reducePath = [mainBundle pathForResource: @"CouchHistoryAveReduce" ofType: @"txt"];
     if([[NSFileManager defaultManager] fileExistsAtPath:mapPath] && [[NSFileManager defaultManager] fileExistsAtPath:reducePath] ){
-		aMap         = [NSString stringWithContentsOfFile:mapPath encoding:NSASCIIStringEncoding error:nil];
-		aReduce      = [NSString stringWithContentsOfFile:reducePath encoding:NSASCIIStringEncoding error:nil];
-		NSMutableDictionary* aDictionary  = [NSMutableDictionary dictionary];
-		[aDictionary setObject:aMap forKey:@"map"];
-		[aDictionary setObject:aReduce forKey:@"reduce"];
-		[aViewDictionary setObject:aDictionary forKey:@"ave"]; 
+		aMap            = [NSString stringWithContentsOfFile:mapPath encoding:NSASCIIStringEncoding error:nil];
+		aReduce         = [NSString stringWithContentsOfFile:reducePath encoding:NSASCIIStringEncoding error:nil];
+        aMapDictionary  = [NSDictionary dictionaryWithObjectsAndKeys:aMap,@"map",aReduce,@"reduce", nil];
+        [aViewDictionary setObject:aMapDictionary   forKey:@"ave"];
     }
 	
+    
 	mapPath = [mainBundle pathForResource: @"CouchHistoryValuesMap" ofType: @"txt"];
     if([[NSFileManager defaultManager] fileExistsAtPath:mapPath] ){
 		aMap         = [NSString stringWithContentsOfFile:mapPath encoding:NSASCIIStringEncoding error:nil];
-		NSMutableDictionary* aDictionary  = [NSMutableDictionary dictionary];
-		[aDictionary setObject:aMap forKey:@"map"];
-		[aDictionary setObject:@"history" forKey:@"mapName"];
-		[aViewDictionary setObject:aDictionary forKey:@"values"]; 
-    }
-	
-	
+        aMapDictionary  = [NSDictionary dictionaryWithObjectsAndKeys:aMap, @"map",@"history",@"mapName",nil];
+        [aViewDictionary setObject:aMapDictionary   forKey:@"values"];
+   }
+    
+    mapPath = [mainBundle pathForResource: @"CouchHistoryEventsMap" ofType: @"txt"];
+    if([[NSFileManager defaultManager] fileExistsAtPath:mapPath] ){
+		aMap         = [NSString stringWithContentsOfFile:mapPath encoding:NSASCIIStringEncoding error:nil];
+        aMapDictionary  = [NSDictionary dictionaryWithObjectsAndKeys:aMap, @"map",@"history",@"mapName",nil];
+        [aViewDictionary setObject:aMapDictionary   forKey:@"events"];
+   }
 
-	NSDictionary* theViews = [NSDictionary dictionaryWithObjectsAndKeys:
-							  @"javascript",@"language",
+	NSDictionary* dbViews = [NSDictionary dictionaryWithObjectsAndKeys:
+                             @"javascript",@"language",
 							  aViewDictionary,@"views",
-							  nil];	
+                             nil];
 	
-	[[self historyDBRef] createDatabase:kCreateDB views:theViews];
+	[[self historyDBRef] createDatabase:kCreateDB views:dbViews];
 	
 }
 
@@ -725,6 +773,43 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 			}
 		}
 	}
+}
+
+- (void) recordEvent:(NSString*)eventName symbol:(NSString*)aSymbol comment:(NSString*)aComment
+{
+    NSDate* localDate = [NSDate date];
+    
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    dateFormatter.dateFormat = @"yyyy/MM/dd HH:mm:ss";
+    
+    NSTimeZone *gmt = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];
+    [dateFormatter setTimeZone:gmt];
+    NSString* lastTimeStamp = [dateFormatter stringFromDate:localDate];
+    NSDate* gmtTime = [dateFormatter dateFromString:lastTimeStamp];
+    unsigned long secondsSince1970 = [gmtTime timeIntervalSince1970];
+    [dateFormatter release];
+    
+    [self recordEvent:eventName symbol:aSymbol comment:aComment timeString:lastTimeStamp timeStamp:secondsSince1970];
+}
+
+- (void) recordEvent:(NSString*)eventName symbol:(NSString*)aSymbol comment:(NSString*)aComment timeString:aDateString timeStamp:(unsigned long)aTimeStamp
+{
+    if([aSymbol length]>=1) aSymbol = [aSymbol substringWithRange:NSMakeRange(0,1)];
+    else aSymbol = @"G";
+    
+    NSMutableDictionary* eventInfo = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                        eventName,          @"name",
+                                        @"Events",			@"title",
+                                        aSymbol,            @"symbol",
+                                        aComment,           @"comment",
+                                        aDateString,		@"timestamp",
+                                        [NSNumber numberWithUnsignedLong: aTimeStamp],		@"time",
+                                        nil];
+
+    [[self historyDBRef] addDocument:eventInfo tag:kDocumentAdded];
+	
+	[[self historyDBRef] updateEventCatalog:eventInfo documentId:@"eventCatalog" tag:kDocumentAdded];
+
 }
 
 - (void) updateDatabaseStats
@@ -962,6 +1047,32 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 {
 	[self updateRunState:[aNote object]];
 	[self updateDataSets];
+}
+
+- (void) runStarted:(NSNotification*)aNote
+{
+    NSDictionary* info = [aNote userInfo];
+    if([[info objectForKey:@"kRunMode"] intValue]==0){
+        unsigned long runNumberLocal     = [[info objectForKey:@"kRunNumber"] unsignedLongValue];
+        unsigned long subRunNumberLocal  = [[info objectForKey:@"kSubRunNumber"]unsignedLongValue];
+        NSString* comment;
+        if(subRunNumberLocal==0) comment = [NSString stringWithFormat:@"Run %lu Started",runNumberLocal];
+        else                     comment = [NSString stringWithFormat:@"Run %lu.%lu Started",runNumberLocal,subRunNumberLocal];
+        [self recordEvent:@"RunStarted" symbol:@"S" comment:comment];
+    }
+}
+
+- (void) runStopped:(NSNotification*)aNote
+{
+    NSDictionary* info = [aNote userInfo];
+    if([[info objectForKey:@"kRunMode"] intValue]==0){
+        unsigned long runNumberLocal     = [[info objectForKey:@"kRunNumber"] unsignedLongValue];
+        unsigned long subRunNumberLocal  = [[info objectForKey:@"kSubRunNumber"]unsignedLongValue];
+        NSString* comment;
+        if(subRunNumberLocal==0) comment = [NSString stringWithFormat:@"Run %lu Stopped",runNumberLocal];
+        else                     comment = [NSString stringWithFormat:@"Run %lu.%lu Stopped",runNumberLocal,subRunNumberLocal];
+        [self recordEvent:@"RunStopped" symbol:@"E" comment:comment];
+    }
 }
 
 - (void) runOptionsOrTimeChanged:(NSNotification*)aNote

@@ -60,6 +60,9 @@
 - (void) runStatusChanged:(NSNotification*)aNote;
 - (void) alarmsChanged:(NSNotification*)aNote;
 - (void) statusLogChanged:(NSNotification*)aNote;
+- (void) runStarted:(NSNotification*)aNote;
+- (void) runStopped:(NSNotification*)aNote;
+
 #pragma mark ***Accessors
 - (int) changedCount;
 - (void) setChangedCount:(int)aChangedCount;
@@ -97,6 +100,9 @@
 - (void) sweepDone;
 - (void) incChangeCounter;
 - (void) checkReplication;
+- (void) recordEvent:(NSString*)eventName symbol:(NSString*)aSymbol comment:(NSString*)aComment;
+- (void) recordEvent:(NSString*)eventName symbol:(NSString*)aSymbol comment:(NSString*)aComment timeString:aDateString timeStamp:(unsigned long)aTimeStamp;
+
 
 #pragma mark ***DB Access
 - (ORCouchDB*) statusDBRef;

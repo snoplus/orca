@@ -50,6 +50,7 @@
 - (void) listDocuments:(id)aDelegate tag:(NSString*)aTag;
 - (void) processEachDoc:(id)aDelegate tag:(NSString*)aTag;
 - (void) renameDoc:(id)aDoc adc:(NSString*)oldName to:(NSString*)newName delegate:(id)aDelegate tag:(NSString*)aTag;
+- (void) updateEventCatalog:(NSDictionary*)aDict documentId:(NSString*)anId tag:(NSString*)aTag;
 
 #pragma mark ***CouchDB Checks
 - (BOOL) couchDBRunning;
@@ -151,6 +152,10 @@
 @end
 
 @interface ORCouchDBUpdateDocumentOp :ORCouchDBPutDocumentOp
+- (void) main;
+@end
+
+@interface ORCouchDBUpdateEventCatalogOp :ORCouchDBPutDocumentOp
 - (void) main;
 @end
 

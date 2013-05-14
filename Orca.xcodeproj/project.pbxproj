@@ -1131,6 +1131,7 @@
 		843DCF35058E546A000C5219 /* DataGen.gif in Resources */ = {isa = PBXBuildFile; fileRef = 843DCF2E058E546A000C5219 /* DataGen.gif */; };
 		843DCF3A058E546A000C5219 /* ORDataGenModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 843DCF33058E546A000C5219 /* ORDataGenModel.h */; };
 		843DCF3B058E546A000C5219 /* ORDataGenModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 843DCF34058E546A000C5219 /* ORDataGenModel.m */; };
+		843EB6F01741208D005CE36C /* CouchHistoryEventsMap.txt in Resources */ = {isa = PBXBuildFile; fileRef = 843EB6EF1741208D005CE36C /* CouchHistoryEventsMap.txt */; };
 		844048AE08350BEE000D03DB /* MemoryWatcher.h in Headers */ = {isa = PBXBuildFile; fileRef = 844048AC08350BEE000D03DB /* MemoryWatcher.h */; };
 		844048AF08350BEE000D03DB /* MemoryWatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = 844048AD08350BEE000D03DB /* MemoryWatcher.m */; };
 		844049C308353B65000D03DB /* MemoryWatcherController.h in Headers */ = {isa = PBXBuildFile; fileRef = 844049C108353B65000D03DB /* MemoryWatcherController.h */; };
@@ -4070,6 +4071,7 @@
 		843DCF2E058E546A000C5219 /* DataGen.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = DataGen.gif; sourceTree = "<group>"; };
 		843DCF33058E546A000C5219 /* ORDataGenModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORDataGenModel.h; sourceTree = "<group>"; };
 		843DCF34058E546A000C5219 /* ORDataGenModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORDataGenModel.m; sourceTree = "<group>"; };
+		843EB6EF1741208D005CE36C /* CouchHistoryEventsMap.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CouchHistoryEventsMap.txt; sourceTree = "<group>"; };
 		843F28F811ECFEED0077E55B /* ORDataGenReadout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ORDataGenReadout.hh; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORDataGenReadout.hh; sourceTree = SOURCE_ROOT; };
 		844048AC08350BEE000D03DB /* MemoryWatcher.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MemoryWatcher.h; path = "Source/Objects/Misc Objects/MemoryWatcher/MemoryWatcher.h"; sourceTree = SOURCE_ROOT; };
 		844048AD08350BEE000D03DB /* MemoryWatcher.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = MemoryWatcher.m; path = "Source/Objects/Misc Objects/MemoryWatcher/MemoryWatcher.m"; sourceTree = SOURCE_ROOT; };
@@ -6594,6 +6596,7 @@
 				8459AD2B138D92F90029C5B6 /* CouchHistoryAveMap.txt */,
 				8432B5E815D56C7C00C5FB5D /* CouchHistoryValuesMap.txt */,
 				8459AD2F138D93240029C5B6 /* CouchHistoryAveReduce.txt */,
+				843EB6EF1741208D005CE36C /* CouchHistoryEventsMap.txt */,
 			);
 			name = CouchDB;
 			path = "Source/Objects/Misc Objects/CouchDB";
@@ -14890,6 +14893,7 @@
 				849B9D7C16DD044F003F3037 /* SIS3320Card.gif in Resources */,
 				84CED3931732FB9E000A84C2 /* LakeShore336.nib in Resources */,
 				84CED3941732FB9E000A84C2 /* LakeShore336.tif in Resources */,
+				843EB6F01741208D005CE36C /* CouchHistoryEventsMap.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
