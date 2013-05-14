@@ -34,6 +34,7 @@
 - (void) awakeFromNib
 {
 	[groupView setGroup:model];
+    [groupView setDrawSlotNumbers:YES];
 	[super awakeFromNib];
 }
 

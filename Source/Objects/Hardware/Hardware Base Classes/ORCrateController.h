@@ -19,7 +19,7 @@
 //-------------------------------------------------------------
 
 
-#import "ORGroupView.h"
+#import "ORCardContainerView.h"
 
 @class ORCrateLabelView;
 
@@ -27,7 +27,7 @@
     IBOutlet NSTextField*   lockDocField;
 	IBOutlet NSButton*		showLabelsButton;
     IBOutlet NSTextField*   powerField;
-    IBOutlet ORGroupView*   groupView;
+    IBOutlet ORCardContainerView*   groupView;
     IBOutlet ORCrateLabelView*   labelView;
 }
 

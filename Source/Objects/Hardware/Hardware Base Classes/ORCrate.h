@@ -86,6 +86,7 @@
 - (BOOL) slot:(int)aSlot excludedFor:(id)anObj;
 - (int) slotForObj:(id)anObj;
 - (int) numberSlotsNeededFor:(id)anObj;
+- (void) drawSlotLabels;
 @end
 
 @interface NSObject (ORCrateModel)

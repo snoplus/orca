@@ -426,4 +426,26 @@ NSString* ORCrateModelCrateNumberChanged	= @"ORCrateModelCrateNumberChanged";
 {	
 	return [anObj numberSlotsUsed];
 }
+
+- (void) drawSlotLabels
+{
+    int i;
+    for(i=0;i<[self maxNumberOfObjects];i++){
+        NSString* s = [NSString stringWithFormat:@"%d",i];
+        NSAttributedString* slotLabel = [[NSAttributedString alloc]
+                                        initWithString: s
+                                          attributes  : [NSDictionary dictionaryWithObjectsAndKeys:
+                                                        [NSFont messageFontOfSize:8],NSFontAttributeName,
+                                                         [NSColor blackColor],NSForegroundColorAttributeName,nil]];
+        
+        NSSize textSize = [slotLabel size];
+        
+		float x = (i*[self objWidth])+[self objWidth]/2. - textSize.width/2;
+        
+        [slotLabel drawInRect:NSMakeRect(x,2,textSize.width,textSize.height)];
+
+        
+    }
+}
+
 @end
