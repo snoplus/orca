@@ -1049,6 +1049,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     
     if(selectedRunTypeScript){
         savedRunType = runType; //run type scripts can changed the run type, but we need to change it back then at the end
+        savedSelectedRunTypeScript = selectedRunTypeScript;
         NSArray* theScripts = [self collectObjectsOfClass:[ORRunScriptModel class]];
         for (ORRunScriptModel* aScript in theScripts){
             if([aScript selectionIndex] == selectedRunTypeScript){
@@ -1381,7 +1382,9 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	dataTypeAssigner = nil;
 	
     [[self undoManager] disableUndoRegistration];
-    [self setRunType:savedRunType];
+    if(savedSelectedRunTypeScript){
+        [self setRunType:savedRunType];
+    }
     [[self undoManager] enableUndoRegistration];
 
     
