@@ -64,6 +64,7 @@
 - (NSString*) contents;
 - (NSString*) contentsTail:(unsigned long)aDuration includeDurationHeader:(BOOL)header;
 - (NSString*) contentsTail:(unsigned long)aDuration;
+- (NSString*) alarmLogContents;
 - (void) populateFilterPopup;
 - (void) loadAlarmHistory;
 - (void) doPeriodicSnapShotToPath:(NSString*) aPath;

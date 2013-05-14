@@ -259,6 +259,15 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 	return [contents autorelease];
 }
 
+- (NSString*) alarmLogContents
+{
+   	NSString* contents;
+	@synchronized(self){
+		contents =  [[alarmLogView string] copy];
+	}
+	return [contents autorelease];
+}
+
 - (void) doPeriodicSnapShotToPath:(NSString*) aPath
 {
 	if([aPath length] == 0) return;
