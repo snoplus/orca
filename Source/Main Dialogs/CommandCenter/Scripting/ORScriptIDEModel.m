@@ -464,7 +464,8 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 
 - (NSString*) identifier
 {
-    return [NSString stringWithFormat:@"%@ %lu",[self scriptName],[self uniqueIdNumber]];
+    if([[self scriptName] isEqualToString:@"OrcaScript"])return [NSString stringWithFormat:@"%@ %lu",[self scriptName],[self uniqueIdNumber]];
+    else return [self scriptName];
 }
 
 - (NSMutableArray*) inputValues

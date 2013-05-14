@@ -411,6 +411,7 @@ objectPtr
 | objC							{ $$ = $1; }
 | file_str						{ $$ = $1; } //special case -- file_str returns an NSString
 | VARIABLE						{ $$ = identifierNode($1);}
+| leftArrayElement              { $$ = $1;}
 ;
 
 objC

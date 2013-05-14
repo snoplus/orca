@@ -578,6 +578,7 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 				NSLogColor([NSColor redColor],@"Script stopped\n");
 			}
 			[self reportResult:[NSDecimalNumber numberWithInt:0]];
+            reported = YES;
 			break;
 		}
 	}	
