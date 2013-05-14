@@ -136,9 +136,15 @@
 
 - (void)drawRect:(NSRect)rect
 {
-	[backgroundImage drawAtPoint:NSZeroPoint fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
+    [self drawBackground:rect];
 	[self drawContents:rect];
     [mouseTask drawRect:rect];
+}
+
+- (void) drawBackground:(NSRect)aRect
+{
+	[backgroundImage drawAtPoint:NSZeroPoint fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
+    
 }
 
 - (void) drawContents:(NSRect)aRect

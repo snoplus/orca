@@ -34,6 +34,20 @@
 	return self;
 }
 
+- (void) drawSlotLabels
+{
+    if([(NSObject*)containerObj respondsToSelector:@selector(drawSlotLabels)]){
+        [(NSObject*)containerObj drawSlotLabels];
+    }
+}
+
+- (void) drawSlotBoundaries
+{
+    if([(NSObject*)containerObj respondsToSelector:@selector(drawSlotBoundaries)]){
+        [(NSObject*)containerObj drawSlotBoundaries];
+    }
+}
+
 - (NSPoint) suggestLocationFor:(id)anObj
 {	
     int slot;
@@ -117,6 +131,11 @@
 - (void) moveSelectedObjects:(NSPoint)delta
 {
 	int direction = ((delta.x > 0) || (delta.y >0))  ? 1 : -1;
+    
+    if([(NSObject*)containerObj respondsToSelector:@selector(reverseDirection)]){
+        if([(NSObject*)containerObj reverseDirection]) direction *= -1;
+    }
+    
 	NSArray* sortedSelection = [[containerObj selectedObjects] sortedArrayUsingSelector:@selector(sortCompare:)];
 	id anObj;
 	NSEnumerator* e;

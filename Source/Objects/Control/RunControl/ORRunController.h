@@ -6,7 +6,7 @@
 //  Copyright (c) 2002 CENPA, University of Washington. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
-//Washington at the Center for Experimental Nuclear Physics and 
+//Washington at the Center for Experimental Nuclear Physics and
 //Astrophysics (CENPA) sponsored in part by the United States 
 //Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
 //The University has certain rights in the program pursuant to 
@@ -19,13 +19,18 @@
 //-------------------------------------------------------------
 
 @class StopLightView;
+@class ORCardContainerView;
 
 @interface ORRunController : OrcaObjectController  {
     
+    IBOutlet NSScrollView*	scriptScrollView;
+    IBOutlet ORCardContainerView*	groupView;
     IBOutlet NSDrawer*  runTypeDrawer;
     IBOutlet NSDrawer*  runNumberDrawer;
     IBOutlet NSDrawer*  waitRequestersDrawer;
+    IBOutlet NSDrawer*  scriptsDrawer;
     IBOutlet NSButton*  showWaitRequestersButton;
+    IBOutlet NSButton*  showScriptsButton;
     IBOutlet NSButton*  runNumberButton;
     IBOutlet NSButton*  runTypeButton;
     
@@ -83,13 +88,18 @@
     IBOutlet NSTextField*   waitCountField2;
     IBOutlet NSTableView*   waitRequestersTableView;
     IBOutlet NSButton*      forceClearWaitsButton;
+	IBOutlet ORGroupView*   scriptsView;
+	IBOutlet NSPopUpButton* runTypeScriptPU;
 
     BOOL retainingRunNotice;
 	BOOL wasInMaintenance;
     
 }
 
+- (ORGroupView *)groupView;
+
 #pragma  mark ¥¥¥Actions
+- (IBAction) selectedRunTypeScriptPUAction:(id)sender;
 - (IBAction) startRunAction:(id)sender;
 - (IBAction) newRunAction:(id)sender;
 - (IBAction) stopRunAction:(id)sender;
@@ -116,6 +126,7 @@
 - (IBAction) forceClearWaitsAction:(id)sender;
 
 #pragma mark ¥¥¥Interface Management
+- (void) selectedRunTypeScriptChanged:(NSNotification*)aNote;
 - (void) updateButtons;
 - (void) registerNotificationObservers;
 - (void) timeLimitChanged:(NSNotification*)aNote;
@@ -141,6 +152,7 @@
 - (void) startUpScriptChanged:(NSNotification*)aNote;
 - (void) shutDownScriptChanged:(NSNotification*)aNote;
 - (void) numberOfWaitsChanged:(NSNotification*)aNote;
+- (void) groupChanged:(NSNotification*)aNote;
 - (NSString*) getStartingString;
 - (NSString*) getRestartingString;
 - (NSString*) getStoppingString;

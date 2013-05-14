@@ -35,3 +35,8 @@
 - (void) moveSelectedObjects:(NSPoint)delta;
 @end
 
+@interface NSObject (OROrderedObjManager)
+- (void) drawSlotLabels;
+- (void) drawSlotBoundaries;
+- (BOOL) reverseDirection;
+@end

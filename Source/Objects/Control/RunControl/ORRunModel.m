@@ -29,6 +29,7 @@
 
 #pragma mark ¥¥¥Definitions
 
+NSString* ORRunModelSelectedRunTypeScriptChanged = @"ORRunModelSelectedRunTypeScriptChanged";
 NSString* ORRunModelShutDownScriptStateChanged	= @"ORRunModelShutDownScriptStateChanged";
 NSString* ORRunModelStartScriptStateChanged		= @"ORRunModelStartScriptStateChanged";
 NSString* ORRunModelShutDownScriptChanged		= @"ORRunModelShutDownScriptChanged";
@@ -59,6 +60,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
 @interface ORRunModel (private)
 - (void) startRun:(BOOL)doInit;
+- (void) startRunStage0:(NSNumber*)doInitBool;
 - (void) startRunStage1:(NSNumber*)doInitBool;
 - (void) startRunStage2:(NSNumber*)doInitBool;
 - (void) startRunStage3:(NSNumber*)doInitBool;
@@ -230,6 +232,20 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 }
 
 #pragma mark ¥¥¥Accessors
+
+- (int) selectedRunTypeScript
+{
+    return selectedRunTypeScript;
+}
+
+- (void) setSelectedRunTypeScript:(int)aSelectedRunTypeScript
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSelectedRunTypeScript:selectedRunTypeScript];
+    
+    selectedRunTypeScript = aSelectedRunTypeScript;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRunModelSelectedRunTypeScriptChanged object:self];
+}
 - (NSString*) fullRunNumberString
 {
 	NSString* rn;
@@ -1030,15 +1046,33 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 		[self setSubRunNumber:0];
 	}
 	[self setRunningState:eRunStarting];
-	//pass off to the next event cycle so the run starting state can be drawn on the screen
+    
+    if(selectedRunTypeScript){
+        savedRunType = runType; //run type scripts can changed the run type, but we need to change it back then at the end
+        NSArray* theScripts = [self collectObjectsOfClass:[ORRunScriptModel class]];
+        for (ORRunScriptModel* aScript in theScripts){
+            if([aScript selectionIndex] == selectedRunTypeScript){
+                [aScript setSelectorOK:@selector(startRunStage0:) bad:@selector(runAbortFromScript) withObject:[NSNumber numberWithBool:doInit] target:self];
+                if(![aScript runScript]){
+                    [self runAbortFromScript];
+                }
+                break;
+            }
+        }
+    }
+	else [self performSelector:@selector(startRunStage0:) withObject:[NSNumber numberWithBool:doInit] afterDelay:0];
+}
+
+- (void) startRunStage0:(NSNumber*)doInitBool
+{
 	if(startScript){
-		[startScript setSelectorOK:@selector(startRunStage1:) bad:@selector(runAbortFromScript) withObject:[NSNumber numberWithBool:doInit] target:self];
+		[startScript setSelectorOK:@selector(startRunStage1:) bad:@selector(runAbortFromScript) withObject:[NSNumber numberWithBool:doInitBool] target:self];
 		[self setStartScriptState:@"Running"];
 		if(![startScript runScript]){
 			[self runAbortFromScript];
 		}
 	}
-	else [self performSelector:@selector(startRunStage1:) withObject:[NSNumber numberWithBool:doInit] afterDelay:0];
+	else [self performSelector:@selector(startRunStage1:) withObject:[NSNumber numberWithBool:doInitBool] afterDelay:0];
 }
 
 - (void) startRunStage1:(NSNumber*)doInitBool
@@ -1177,7 +1211,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     if([self runningState] == eRunStopping){
 		NSLog(@"Stop Run message received and ignored because run is already stopping.\n");
 	}
-	else if([self runningState] == eRunStarting && !startScript){
+	else if([self runningState] == eRunStarting && !startScript && !selectedRunTypeScript ){
 		NSLog(@"Stop Run message received and ignored because run is starting.\n");
 	}
 	else if([self runningState] == eRunStopped){
@@ -1205,7 +1239,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	if([self runningState] == eRunStopping){
 		NSLog(@"Stop Run message received and ignored because run is already stopping.\n");
 	}
-	else if([self runningState] == eRunStarting && !startScript){
+	else if([self runningState] == eRunStarting && !startScript && !selectedRunTypeScript){
 		NSLog(@"Stop Run message received and ignored because run is starting.\n");
 	}
 	else if([self runningState] == eRunStopped){
@@ -1292,6 +1326,9 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 		
         NSDictionary* statusInfo = [NSDictionary
 									dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:eRunStopped],ORRunStatusValue,
+                                    [NSNumber numberWithLong:runNumber],kRunNumber,
+                                    [NSNumber numberWithLong:subRunNumber],kSubRunNumber,
+                                    [NSNumber numberWithLong:[[ORGlobal sharedGlobal] runMode]],  kRunMode,
 									@"Not Running",ORRunStatusString,
 									dataPacket,@"DataPacket",nil];
         
@@ -1343,6 +1380,11 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	[dataTypeAssigner release];
 	dataTypeAssigner = nil;
 	
+    [[self undoManager] disableUndoRegistration];
+    [self setRunType:savedRunType];
+    [[self undoManager] enableUndoRegistration];
+
+    
 	if(_forceRestart ||([self timedRun] && [self repeatRun] && !ignoreRepeat && (!remoteControl || remoteInterface))){
 		ignoreRepeat  = NO;
 		_forceRestart = NO;
@@ -1527,7 +1569,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     unsigned long data[4];
     
     data[0] = dataId | 4;
-    data[1] =  1;
+    data[1] =  0x01 | 0x20; //start of run and first sub run
     _wasQuickStart = !doInit;
     
     if(_wasQuickStart){
@@ -1875,6 +1917,7 @@ static NSString *ORRunTypeNames 	= @"ORRunTypeNames";
     
     [[self undoManager] disableUndoRegistration];
     
+    [self setSelectedRunTypeScript:[decoder decodeIntForKey:@"selectedRunTypeScript"]];
     [self setShutDownScript:[decoder decodeObjectForKey:@"shutDownScript"]];
     [self setStartScript:[decoder decodeObjectForKey:@"startScript"]];
     [self setTimeLimit:[decoder decodeInt32ForKey:ORRunTimeLimit]];
@@ -1899,6 +1942,7 @@ static NSString *ORRunTypeNames 	= @"ORRunTypeNames";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeInt:selectedRunTypeScript forKey:@"selectedRunTypeScript"];
     [encoder encodeObject:shutDownScript forKey:@"shutDownScript"];
     [encoder encodeObject:startScript forKey:@"startScript"];
     [encoder encodeInt32:[self timeLimit] forKey:ORRunTimeLimit];
@@ -2117,7 +2161,99 @@ static NSString *ORRunTypeNames 	= @"ORRunTypeNames";
 {
     return @"RunControl";
 }
+@end
 
+@implementation ORRunModel (OROrderedObjHolding)
+#pragma mark ¥¥¥CardHolding Protocol
+- (int) maxNumberOfObjects	{ return 32; }
+- (int) objWidth			{ return 25; }	//default
+- (int) groupSeparation		{ return 0; }	//default
+- (NSString*) nameForSlot:(int)aSlot
+{
+    return [NSString stringWithFormat:@"Script %d",aSlot];
+}
+
+- (BOOL) slot:(int)aSlot excludedFor:(id)anObj { return NO;}
+
+- (NSRange) legalSlotsForObj:(id)anObj
+{
+	return NSMakeRange(0,[self maxNumberOfObjects]);
+}
+
+- (int) slotAtPoint:(NSPoint)aPoint
+{
+    float totalHeight = [self objWidth]*([self maxNumberOfObjects]-1);
+	return floor(((int)(totalHeight-aPoint.y))/[self objWidth]);
+}
+
+- (NSPoint) pointForSlot:(int)aSlot
+{
+    float totalHeight = [self objWidth]*([self maxNumberOfObjects]-1);
+	return NSMakePoint(0,totalHeight - aSlot*[self objWidth]);
+}
+
+- (void) place:(id)anObj intoSlot:(int)aSlot
+{
+	[anObj setSlot: aSlot];
+	[anObj moveTo:[self pointForSlot:aSlot]];
+}
+
+- (int) slotForObj:(id)anObj
+{
+	return [anObj tag];
+}
+
+- (int) numberSlotsNeededFor:(id)anObj
+{
+	return 1;
+}
+
+- (void) openDialogForComponent:(int)i
+{
+	for(OrcaObject* anObj in [self orcaObjects]){
+		if([anObj tag] == i){
+			[anObj makeMainController];
+			break;
+		}
+	}
+}
+
+- (void) drawSlotLabels
+{
+    float totalHeight = [self objWidth]*([self maxNumberOfObjects]-1);
+    int i;
+    for(i=0;i<[self maxNumberOfObjects];i++){
+        NSString* s = [NSString stringWithFormat:@"%d",i];
+        NSAttributedString* slotLabel = [[NSAttributedString alloc]
+                                         initWithString: s
+                                         attributes  : [NSDictionary dictionaryWithObjectsAndKeys:
+                                                        [NSFont messageFontOfSize:8],NSFontAttributeName,
+                                                        [NSColor blackColor],NSForegroundColorAttributeName,nil]];
+        
+        NSSize textSize = [slotLabel size];
+        
+		float y = totalHeight-(i*[self objWidth])+[self objWidth]/2. - textSize.height/2;
+        
+        [slotLabel drawInRect:NSMakeRect(2,y,textSize.width,textSize.height)];
+        
+        
+    }
+}
+
+- (void) drawSlotBoundaries
+{
+    float totalHeight = [self objWidth]*([self maxNumberOfObjects]-1);
+    [[NSColor lightGrayColor]set];
+    int i;
+    for(i=0;i<[self maxNumberOfObjects];i++){
+		float y = totalHeight-(i*[self objWidth])+[self objWidth];
+        [NSBezierPath strokeLineFromPoint:NSMakePoint(0,y) toPoint:NSMakePoint(150,y)];
+    }
+}
+- (BOOL) reverseDirection
+{
+    return YES;
+}
 @end
 
 

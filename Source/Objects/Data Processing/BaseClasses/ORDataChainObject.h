@@ -29,7 +29,19 @@
 - (void) setRunMode:(int)aMode;
 - (void) runIsStopping:(id)userInfo;
 - (BOOL) runModals;
-
 @end
+
+@interface ORDataChainObjectWithGroup : ORGroup {
+	BOOL involvedInCurrentRun;
+}
+- (BOOL) involvedInCurrentRun;
+- (void) setInvolvedInCurrentRun:(BOOL)state;
+- (void) addObjectInfoToArray:(NSMutableArray*)anArray;
+- (void) endOfRunCleanup:(id)userInfo;
+- (void) setRunMode:(int)aMode;
+- (void) runIsStopping:(id)userInfo;
+- (BOOL) runModals;
+@end
+
 
 extern NSString* ORDataChainObjectInvolvedInCurrentRun;

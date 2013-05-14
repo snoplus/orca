@@ -316,8 +316,7 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
 	
     cachedNumberDataTakers = [dataTakers count];
 
-    
-	cachedDataTakers = (id*)malloc(cachedNumberDataTakers * sizeof(id));
+    if(cachedNumberDataTakers) cachedDataTakers = (id*)malloc(cachedNumberDataTakers * sizeof(id));
 	
     int i;
     for(i=0;i<cachedNumberDataTakers;i++){

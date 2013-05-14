@@ -31,7 +31,7 @@
 @class ORDataTypeAssigner;
 @class ORRunScriptModel;
 
-@interface ORRunModel :  ORDataChainObject <ORBitProcessing>{
+@interface ORRunModel :  ORDataChainObjectWithGroup <ORBitProcessing>{
     @private
         unsigned long 	runNumber;
 
@@ -53,6 +53,7 @@
 		NSMutableDictionary* runInfo;
         BOOL            ignoreRepeat;
         unsigned long	runType;
+        unsigned long	savedRunType;
         BOOL            remoteControl;
         unsigned long   dataId;
        
@@ -94,6 +95,8 @@
 		NSThread* readoutThread;
     
         NSMutableArray* objectsRequestingStateChangeWait;
+        NSMutableArray* runTypeScripts;
+        int selectedRunTypeScript;
 }
 
 
@@ -102,6 +105,8 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ¥¥¥Accessors
+- (int) selectedRunTypeScript;
+- (void) setSelectedRunTypeScript:(int)aSelectedRunTypeScript;
 - (NSDictionary*)runInfo;
 - (NSDictionary*) fullRunInfo;
 
@@ -245,7 +250,22 @@
 - (BOOL) processValue:(int)channel;
 - (void) setProcessOutput:(int)channel value:(int)value;
 - (NSString*) processingTitle;
+@end
 
+@interface ORRunModel (OROrderedObjHolding)
+- (int)         maxNumberOfObjects;
+- (int)         objWidth;
+- (int)         groupSeparation;
+- (NSString*)   nameForSlot:(int)aSlot;
+- (NSRange)     legalSlotsForObj:(id)anObj;
+- (int)         slotAtPoint:(NSPoint)aPoint;
+- (NSPoint)     pointForSlot:(int)aSlot;
+- (void)        place:(id)anObj intoSlot:(int)aSlot;
+- (int)         slotForObj:(id)anObj;
+- (int)         numberSlotsNeededFor:(id)anObj;
+- (void)        drawSlotLabels;
+- (void)        drawSlotBoundaries;
+- (BOOL)        reverseDirection;
 @end
 
 
@@ -261,6 +281,12 @@
 - (BOOL) preRunChecks;
 @end
 
+@interface NSObject (ScriptHolding)
+- (void) setSlot:(int)aSlot;
+@end
+
+
+extern NSString* ORRunModelSelectedRunTypeScriptChanged;
 extern NSString* ORRunModelShutDownScriptStateChanged;
 extern NSString* ORRunModelStartScriptStateChanged;
 extern NSString* ORRunModelShutDownScriptChanged;

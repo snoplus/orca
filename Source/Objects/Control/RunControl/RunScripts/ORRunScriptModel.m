@@ -26,6 +26,8 @@
 #import "ORDataSet.h"
 #import "ORScriptRunner.h"
 
+NSString* ORRunScriptSlotChangedNotification = @"ORRunScriptSlotChangedNotification";
+
 @implementation ORRunScriptModel
 
 - (NSString*) helpURL
@@ -93,8 +95,6 @@
 	[self setUpImage];
 }
 
-
-
 - (void) setSelectorOK:(SEL)aSelectorOK bad:(SEL)aSelectorBAD withObject:(id)anObject target:(id)aTarget
 {
 	selectorOK	= aSelectorOK;
@@ -123,13 +123,67 @@
 	target = nil;
 }
 
+- (BOOL) runScript
+{
+    if([[self script] rangeOfString:@"startRun"].location != NSNotFound){
+        NSLogColor([NSColor redColor], @"Explicit run control not allowed in script: [%@]. It will lead to infinite recursion. Start the run by other means.\n",[self scriptName]);
+        
+        return NO;
+    }
+    if([[self script] rangeOfString:@"stopRun"].location != NSNotFound){
+        NSLogColor([NSColor redColor], @"Explicit run control not allowed in script: [%@]. Have the script return FALSE to abort the run start up process.\n",[self scriptName]);
+        return NO;
+    }
+    return [super runScript];
+}
+
+- (int) slot
+{
+    return slot;
+}
+- (void) setSlot:(int)aSlot
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSlot:[self slot]];
+    slot = aSlot;
+    [self setTag:aSlot];
+    
+    [[NSNotificationCenter defaultCenter]
+	 postNotificationName:ORRunScriptSlotChangedNotification
+	 object: self];
+}
+
+- (int)selectionIndex
+{
+    return selectionIndex;
+}
+- (void) setSelectionIndex:(int)anIndex
+{
+    selectionIndex = anIndex;
+}
+
 - (id)initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
 	[self registerNotificationObservers];
+    [self setSlot:[decoder decodeIntForKey:@"slot"]];
     return self;
 }
+- (void)encodeWithCoder:(NSCoder*)encoder
+{
+    [super encodeWithCoder:encoder];
+    [encoder encodeInt:[self slot] forKey:@"slot"];
+}
 
+- (BOOL) acceptsGuardian: (OrcaObject *)aGuardian
+{
+	return	[super acceptsGuardian:aGuardian] ||
+    [aGuardian isMemberOfClass:NSClassFromString(@"ORRunModel")];
+}
+
+- (NSComparisonResult)compare:(ORRunScriptModel *)otherObject
+{
+    return [self slot] - [otherObject slot];
+}
 
 @end
 

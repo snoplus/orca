@@ -24,6 +24,9 @@
 #import "OROrderedObjManager.h"
 
 @implementation ORCardContainerView
+
+@synthesize drawSlotNumbers,drawSlots;
+
 - (void) awakeFromNib
 {
 	[[self window] makeFirstResponder:self];
@@ -48,7 +51,12 @@
     
 - (void) drawBackground:(NSRect)aRect
 {
-	//don't want any background
+    if(drawSlotNumbers){
+        [[OROrderedObjManager for:group] drawSlotLabels];
+    }
+    if(drawSlots){
+        [[OROrderedObjManager for:group] drawSlotBoundaries];
+    }
 }
 
 - (void) contentSizeChanged:(NSNotification*)note

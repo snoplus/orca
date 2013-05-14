@@ -22,14 +22,21 @@
 
 @interface ORRunScriptModel : ORScriptIDEModel
 {	
-	SEL						selectorOK;
-	SEL						selectorBAD;
-	id						anArg;
-	id						target;
+	SEL	selectorOK;
+	SEL	selectorBAD;
+	id	anArg;
+	id	target;
+    int slot;
+    int selectionIndex;
 }
 
 - (void) registerNotificationObservers;
 - (void) runningChanged:(NSNotification*)aNote;
+- (NSComparisonResult)compare:(ORRunScriptModel *)otherObject;
+- (int)slot;
+- (void) setSlot:(int)aSlot;
+- (int)selectionIndex;
+- (void) setSelectionIndex:(int)anIndex;
 
 #pragma mark ***Scripting
 - (void) scriptRunnerDidFinish:(BOOL)normalFinish returnValue:(id)aValue;
@@ -37,5 +44,6 @@
 
 @end
 
+extern NSString* ORRunScriptSlotChangedNotification;
 
 

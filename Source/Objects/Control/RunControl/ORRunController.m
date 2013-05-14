@@ -24,6 +24,7 @@
 #import "ORRunModel.h"
 #import "StopLightView.h"
 #import "ORRunScriptModel.h"
+#import "ORCardContainerView.h"
 
 @interface ORRunController (private)
 - (void) populatePopups;
@@ -52,9 +53,41 @@
 {
     [runProgress setStyle:NSProgressIndicatorSpinningStyle];
     [runBar setIndeterminate:NO];
+	[groupView setGroup:model];
+    
     [super awakeFromNib];
     [self performSelector:@selector(updateWithCurrentRunNumber)withObject:self afterDelay:0];
     [self updateButtons];
+    
+
+    NSPoint newScrollOrigin=NSMakePoint(0.0,NSMaxY([[scriptScrollView documentView] frame])
+                                    -NSHeight([[scriptScrollView contentView] bounds]));
+        
+    [[scriptScrollView contentView] scrollToPoint: newScrollOrigin];
+    [scriptScrollView reflectScrolledClipView: [scriptScrollView contentView]];
+
+    int i=0;
+	int row;
+    int column;
+	for(row=0;row<4;row++){
+        for(column=0;column<4;column++){
+            [[runTypeMatrix cellAtRow:row column:column] setTag:i];
+            i++;
+        }
+	}
+}
+
+- (ORGroupView *)groupView
+{
+    return [self groupView];
+}
+
+- (void) setModel:(id)aModel
+{
+    [super setModel:aModel];
+    [groupView setDrawSlotNumbers:YES];
+    [groupView setDrawSlots:YES];
+    [groupView setGroup:(ORGroup*)aModel];
 }
 
 #pragma mark ¥¥¥Accessors
@@ -62,10 +95,37 @@
 
 #pragma mark ¥¥¥Interface Management
 
+- (void) selectedRunTypeScriptChanged:(NSNotification*)aNote
+{
+	[runTypeScriptPU selectItemAtIndex: [model selectedRunTypeScript]];
+}
+
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+    
     [super registerNotificationObservers];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(updateWindow)
+                         name : ORGroupObjectsAdded
+                       object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(updateWindow)
+                         name : ORGroupObjectsRemoved
+                       object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(groupChanged:)
+                         name : ORGroupSelectionChanged
+                       object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(groupChanged:)
+                         name : OROrcaObjectMoved
+                       object : nil];
+   
     [notifyCenter addObserver: self
                      selector: @selector(timedRunChanged:)
                          name: ORRunTimedRunChangedNotification
@@ -207,6 +267,11 @@
                          name: ORRunModelNumberOfWaitsChanged
                        object: nil];    
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(selectedRunTypeScriptChanged:)
+                         name : ORRunModelSelectedRunTypeScriptChanged
+						object: model];
+
 }
 
 
@@ -236,9 +301,15 @@
 	[self vetosChanged:nil];
 	[self timeLimitChanged:nil];
     [self numberOfWaitsChanged:nil];
+    [groupView setNeedsDisplay:YES];
+	[self selectedRunTypeScriptChanged:nil];
 }
 
 
+- (void) groupChanged:(NSNotification*)note
+{
+	[self updateWindow];
+}
 
 - (void) updateButtons
 {
@@ -557,6 +628,11 @@
 }
 
 #pragma  mark ¥¥¥Actions
+
+- (void) selectedRunTypeScriptPUAction:(id)sender
+{
+	[model setSelectedRunTypeScript:[sender indexOfSelectedItem]];
+}
 - (IBAction) startNewSubRunAction:(id)sender
 {
 	if(!wasInMaintenance){
@@ -894,6 +970,10 @@
     else if([notification object] == waitRequestersDrawer){
         [showWaitRequestersButton setTitle:@"Close"];
     }
+    else if([notification object] == scriptsDrawer){
+        [showScriptsButton setTitle:@"Close"];
+    }
+
 }
 
 - (void) drawerDidClose:(NSNotification *)notification
@@ -907,6 +987,9 @@
     else if([notification object] == waitRequestersDrawer){
         [showWaitRequestersButton setTitle:@"Show Waits..."];
         [self numberOfWaitsChanged:nil];
+    }
+    else if([notification object] == scriptsDrawer){
+        [showScriptsButton setTitle:@"Scripts..."];
     }
 }
 
@@ -957,14 +1040,25 @@
 	[shutDownScripts removeAllItems];
 	[startUpScripts addItemWithTitle:@"---"];
 	[shutDownScripts addItemWithTitle:@"---"];
+	[runTypeScriptPU removeAllItems];
+    [runTypeScriptPU addItemWithTitle:@"Standard (Manual)"];
+
 	NSArray* runScripts = [[model document] collectObjectsOfClass:[ORRunScriptModel class]];
-	ORRunScriptModel* obj;
-	NSEnumerator* e = [runScripts objectEnumerator];
-	while(obj = [e nextObject]){
+	for(ORRunScriptModel* obj in runScripts){
 		[startUpScripts addItemWithTitle:[obj identifier]]; 
-		[shutDownScripts addItemWithTitle:[obj identifier]]; 
+		[shutDownScripts addItemWithTitle:[obj identifier]];
 	}
 	
+    NSArray* runTypeScripts = [model collectObjectsOfClass:[ORRunScriptModel class]];
+    NSArray* runTypeSortedBySlot = [runTypeScripts sortedArrayUsingSelector:@selector(compare:)];
+
+    int index = 1;
+    for(ORRunScriptModel* obj in runTypeSortedBySlot){
+		[runTypeScriptPU addItemWithTitle:[obj identifier]];
+        [obj setSelectionIndex:index];
+        index++;
+    }
+    
 	NSString* selectedItemName = [[model startScript] identifier];
 	if(!selectedItemName || ![startUpScripts itemWithTitle:selectedItemName])selectedItemName = @"---";
 	[startUpScripts selectItemWithTitle:selectedItemName]; 
@@ -1005,4 +1099,5 @@
 
 
 @end
+
 

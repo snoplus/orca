@@ -46,17 +46,9 @@ NSString* ORDataChainObjectInvolvedInCurrentRun = @"ORDataChainObjectInvolvedInC
 	}
 }
 
-- (void) runIsStopping:(id)userInfo
-{
-}
-
-- (void) endOfRunCleanup:(id)userInfo
-{
-}
-
-- (void) setRunMode:(int)aMode
-{
-}
+- (void) runIsStopping:(id)userInfo     { }
+- (void) endOfRunCleanup:(id)userInfo   { }
+- (void) setRunMode:(int)aMode          { }
 
 - (BOOL) runModals
 {
@@ -66,3 +58,41 @@ NSString* ORDataChainObjectInvolvedInCurrentRun = @"ORDataChainObjectInvolvedInC
 }
 
 @end
+
+@implementation ORDataChainObjectWithGroup
+- (BOOL) involvedInCurrentRun
+{
+	return involvedInCurrentRun;
+}
+
+- (void) setInvolvedInCurrentRun:(BOOL)state
+{
+	involvedInCurrentRun = state;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORDataChainObjectInvolvedInCurrentRun object: self];
+}
+
+
+- (void) addObjectInfoToArray:(NSMutableArray*)anArray
+{
+	NSMutableDictionary* dictionary = [NSMutableDictionary dictionary];
+	if([self respondsToSelector:@selector(addParametersToDictionary:)]){
+		[self addParametersToDictionary:dictionary];
+	}
+	if([dictionary count]){
+		[anArray addObject:dictionary];
+	}
+}
+
+- (void) runIsStopping:(id)userInfo     { }
+- (void) endOfRunCleanup:(id)userInfo   { }
+- (void) setRunMode:(int)aMode          { }
+
+- (BOOL) runModals
+{
+	//objects can override.
+	//return NO if run should not proceed.
+	return YES;
+}
+
+@end
+

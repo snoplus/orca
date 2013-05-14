@@ -19,10 +19,15 @@
 //-------------------------------------------------------------
 
 @interface ORCardContainerView : ORGroupView {
+    BOOL drawSlots;
+    BOOL drawSlotNumbers;
 }
 - (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender;
 - (void) drawBackground:(NSRect)aRect;
 - (void) contentSizeChanged:(NSNotification*)note;
 - (BOOL) canAddObject:(id) obj atPoint:(NSPoint)aPoint;
 - (void) moveObject:(id)obj to:(NSPoint)aPoint;
+
+@property (assign, nonatomic) BOOL drawSlots;
+@property (assign, nonatomic) BOOL drawSlotNumbers;
 @end
