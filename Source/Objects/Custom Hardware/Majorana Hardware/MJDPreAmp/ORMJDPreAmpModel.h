@@ -120,7 +120,8 @@
 - (void) writeAmplitude:(int)index;
 - (void) writeAmplitudes;
 - (void) zeroAmplitudes;
-- (void) writeRangeForAdcChip:(int)index;
+//- (void) writeRangeForAdcChip:(int)index;
+- (void) writeRangeForAdcChip:(int)aChip withValue:(int)index;
 - (void) writeAdcChipRanges;
 - (void) readAdcsOnChip:(int)aChip;
 - (void) readTempOnChip:(int)aChip; // niko

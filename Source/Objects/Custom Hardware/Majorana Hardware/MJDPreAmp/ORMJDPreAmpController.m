@@ -812,7 +812,7 @@
     int count = [[model timeRate:adc] count];
     int index = count-i-1;
     *xValue = [[model timeRate:adc] timeSampledAtIndex:index];
-    *yValue = [[model timeRate:adc] valueAtIndex:index];
+    //*yValue = [[model timeRate:adc] valueAtIndex:index];
     
     float multiplier = 1000.; // nA to pA conversion - niko
     

@@ -625,13 +625,17 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 
 - (void) writeAdcChipRanges
 {
-	[self writeRangeForAdcChip:0];
-	[self writeRangeForAdcChip:1];
+	//[self writeRangeForAdcChip:0];
+	//[self writeRangeForAdcChip:1];
+    [self writeRangeForAdcChip:0 withValue:0]; // 10V range by default - niko
+	[self writeRangeForAdcChip:1 withValue:0];
 }
 
-- (void) writeRangeForAdcChip:(int)index
+//- (void) writeRangeForAdcChip:(int)index - niko
+- (void) writeRangeForAdcChip:(int)aChip withValue:(int)index
 {
-	if(index>=0 && index<2){
+	//if(index>=0 && index<2){
+    if(index>=0 && index<3){
         
         unsigned long rangeValue[2][3] = {
 	  		{kADCRange10Reg1, kADCRange5Reg1, kADCRange2_5Reg1},
@@ -640,24 +644,12 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 		unsigned long adcBase[2] = {kADC1, kADC2};
 		
 		//unsigned long aValue = adcBase[index] | rangeValue[index][adcRange[index]];
-        //unsigned long aValue = adcBase[index] | rangeValue[index][2];
+        unsigned long aValue = adcBase[aChip] | rangeValue[0][index]; // first register on chip
+        [self writeAuxIOSPI:aValue];
         
-        unsigned long aValue;
-        if(index){
-            aValue = adcBase[index] | kADCRange2_5Reg1;
-            [self writeAuxIOSPI:aValue];
-            aValue = adcBase[index] | kADCRange2_5Reg2;
-            [self writeAuxIOSPI:aValue];
-        }
-        else{
-            aValue = adcBase[index] | kADCRange2_5Reg1;
-            [self writeAuxIOSPI:aValue];
-            aValue = adcBase[index] | kADCRange2_5Reg2;
-            [self writeAuxIOSPI:aValue];
-        }
-    
-		//[self writeAuxIOSPI:aValue];
-	}
+        aValue = adcBase[aChip] | rangeValue[1][index]; // second register on chip
+        [self writeAuxIOSPI:aValue];
+    }
 }
 
 
@@ -671,15 +663,18 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 {
     if(aChip<0 || aChip>1) return;
     
-    [self writeRangeForAdcChip:aChip ];
+    //[self writeRangeForAdcChip:aChip ];
+    [self writeRangeForAdcChip:aChip withValue:0]; // use 10V range for baseline values
+    
     //float voltageMultiplier = 10./pow(2.,adcRange[aChip]+12); 
-    //float voltageBase = 10./pow(2.,adcRange[aChip]+12); // dynamic range should not be hard coded, not sure about purpose of adcRange as is either  - niko
-    float voltageBase = 20./pow(2.,13);
+    float voltageBase = 20./pow(2.,13); // 13 bits ADC, hardcoded 10V range - niko
+    
     float voltageMultiplier = 2.; // account for voltage multiplier of 2 for +/-12V hard wired on ADC chip 1 and for first five channels of both ADC chips - niko
     
     unsigned long adcBase = kADC1;
     if(aChip) adcBase = kADC2;
-	unsigned long channelSelect[8] = {
+	
+    unsigned long channelSelect[8] = {
 		kReadAdcChannel0,kReadAdcChannel1,kReadAdcChannel2,kReadAdcChannel3,
 		kReadAdcChannel4,kReadAdcChannel5,kReadAdcChannel6,kReadAdcChannel7,
 	};
@@ -735,19 +730,16 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 {
     if(aChip<0 || aChip>1) return;
     
-    //[self writeRangeForAdcChip:aChip ];
+    [self writeRangeForAdcChip:aChip withValue:2]; // use 2.5V range for temperatures
 
-    //NSLog(@"range = %d, chip %d\n", adcRange[aChip], aChip);
-    
     unsigned long adcBase = kADC1;
     if(aChip) adcBase = kADC2;
+
     unsigned long channelSelect = kReadTempChannel7;
 
     unsigned long readBack;
     
     if(adcEnabledMask&(0x1<<((aChip*8)+7))){
-        
-        [self writeRangeForAdcChip:aChip ];  
         
         int j;
         for(j=0;j<4;j++) readBack = [self writeAuxIOSPI:adcBase | channelSelect];
@@ -765,18 +757,18 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
             NSLog(@"Warning! channelReadBack = %d, not %d\n", channelReadBack, 7);
         }
         
-        int tempCode = readBack & 0xfff; // should always be positive code (?) - niko
+        int tempCode = readBack & 0xfff;
         if(readBack & 0x1000) tempCode |= 0xfffff000;
 
         
-        tempCode += pow(2.,12);
+        tempCode += pow(2.,12); // not sure about that, but seems to work - niko
 
         
-        // rough temp-code calibration from curve in doc for 10V range
+        // rough temperature-code calibration from curve in doc for 10V range
         //int tempMinCode = 4350;
         //int tempZeroCode = 4395;
         //float tempMaxValue = 80.;
-        // rough temp-code calibration from curve in doc for 10V range
+        // rough temperature-code calibration from curve in doc for 2.5V range
         int tempMinCode = 5140;
         int tempZeroCode = 5320;
         float tempMaxValue = 80.;
@@ -788,6 +780,11 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
         
         [self setAdc:(aChip*8)+7 value:tempOnChip];
     }
+    
+    //get the time(UT!) for the data record.
+	time_t	ut_Time;
+	time(&ut_Time);
+	timeMeasured[aChip] = ut_Time;
 }
 
 - (void) pollValues
