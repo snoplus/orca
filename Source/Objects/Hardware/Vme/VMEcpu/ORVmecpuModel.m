@@ -63,7 +63,7 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 
 - (void) setUpImage
 {
-	[self setImage:[NSImage imageNamed:@"Vmecpu"]];
+    [self setImage:[NSImage imageNamed:@"Vmecpu"]];
 }
 
 - (void) makeMainController

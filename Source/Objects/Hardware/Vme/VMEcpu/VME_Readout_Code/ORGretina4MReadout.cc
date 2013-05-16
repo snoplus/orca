@@ -47,7 +47,7 @@ bool ORGretina4MReadout::Readout(SBC_LAM_Data* /*lamData*/)
         int32_t eventStartIndex = dataIndex;
         
         result = DMARead(fifoAddress,fifoAddressMod, (uint32_t) 4,
-                         (uint8_t*)(&data[dataIndex]),1024*4*numEventsToRead);
+                         (uint8_t*)(&data[eventStartIndex]),1024*4*numEventsToRead);
         
         if (result < 0) {
             LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));
@@ -70,7 +70,7 @@ bool ORGretina4MReadout::Readout(SBC_LAM_Data* /*lamData*/)
             else {
                 //oops... really bad -- the buffer read is out of sequence
                 dataIndex = savedIndex; //DUMP the data by reseting the data Index back to where it was when we got it.
-                LogBusError("Fifo Rst: Gretina4 0x%04x %s",fifoResetAddress,strerror(errno));
+               // LogBusError("Fifo Rst: Gretina4 0x%04x %s",fifoResetAddress,strerror(errno));
                 clearFifo(fifoResetAddress);
             }
         }
