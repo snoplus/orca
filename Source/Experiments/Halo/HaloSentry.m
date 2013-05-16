@@ -124,7 +124,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
 
     [notifyCenter addObserver : self
                      selector : @selector(sbcSocketDropped:)
-                         name : ORSBC_SocketDroppedUnexpectedly
+                         name : SBC_SocketDroppedUnexpectedly
 						object: nil];
     
 }
