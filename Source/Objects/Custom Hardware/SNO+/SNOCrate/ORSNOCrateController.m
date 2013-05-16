@@ -63,7 +63,7 @@
 
     [notifyCenter addObserver : self
 					 selector : @selector(xilinxLoadChanged:)
-						 name : ORSBC_LinkJobStatus
+						 name : SBC_LinkJobStatus
 					   object : nil];
 	
 }
