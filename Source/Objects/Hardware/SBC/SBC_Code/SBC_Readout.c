@@ -37,6 +37,7 @@
 #include "HW_Readout.h"
 #include "readout_code.h"
 #include "SBC_Job.h"
+#include <sys/time.h>
 
 #define BACKLOG 1     // how many pending connections queue will hold
 #ifndef TRUE
@@ -76,6 +77,7 @@ pthread_mutex_t jobInfoMutex;
 int32_t  workingSocket;
 int32_t  workingIRQSocket;
 char needToSwap;
+uint32_t minCycleTime;
 
 //as the hw is read out, the data is put into the following temp buffer, at the end
 //of the readout cycle, it is dumped into the CB
@@ -166,15 +168,20 @@ int32_t main(int32_t argc, char *argv[])
         pthread_attr_setdetachstate(&readoutThreadAttr, PTHREAD_CREATE_JOINABLE);
         pthread_mutex_init(&runInfoMutex, NULL);
         pthread_mutex_lock (&runInfoMutex);  //begin critical section
-        run_info.statusBits        &= ~kSBC_ConfigLoadedMask; //clr bit
-        run_info.statusBits        &= ~kSBC_RunningMask;        //clr bit
+        run_info.statusBits        &= ~kSBC_ConfigLoadedMask;  //clr bit
+        run_info.statusBits        &= ~kSBC_RunningMask;       //clr bit
         run_info.statusBits        &= ~kSBC_PausedMask;        //clr bit
-        run_info.readCycles            = 0;
-        run_info.busErrorCount        = 0;
-        run_info.err_count            = 0;
-        run_info.msg_count            = 0;
+        run_info.statusBits        &= ~kSBC_ThrottledMask;     //clr bit
+        run_info.readCycles         = 0;
+        run_info.busErrorCount      = 0;
+        run_info.err_count          = 0;
+        run_info.msg_count          = 0;
         run_info.err_buf_index      = 0;
         run_info.msg_buf_index      = 0;
+        run_info.pollingRate      = 0;
+        
+        minCycleTime                = 0;
+        
         pthread_mutex_unlock (&runInfoMutex);//end critical section
 		
         pthread_attr_init(&sbc_job.jobThreadAttr);
@@ -295,6 +302,7 @@ void processSBCCommand(SBC_Packet* aPacket,uint8_t reply)
         case kSBC_ResumeRun:		doRunCommand(aPacket);		break;
         case kSBC_StartRun:			doRunCommand(aPacket);		break;
         case kSBC_StopRun:          doRunCommand(aPacket);		break;
+        case kSBC_SetPollingDelay:	doRunCommand(aPacket);		break;
         case kSBC_RunInfoRequest:   sendRunInfo();				break;
         case kSBC_CBRead:           sendCBRecord();				break;
 		case kSBC_CBTest:			runCBTest(aPacket);			break;
@@ -308,19 +316,32 @@ void processSBCCommand(SBC_Packet* aPacket,uint8_t reply)
 void doRunCommand(SBC_Packet* aPacket)
 {
     //future options will be decoded here, are not any so far so the code is commented out
-    //SBC_CmdOptionStruct* p = (SBC_CmdOptionStruct*)aPacket->payload;
-    //if(needToSwap)SwapLongBlock(p,sizeof(SBC_CmdOptionStruct)/sizeof(int32_t));
+    SBC_CmdOptionStruct* p = (SBC_CmdOptionStruct*)aPacket->payload;
+    if(needToSwap)SwapLongBlock(p,sizeof(SBC_CmdOptionStruct)/sizeof(int32_t));
     // option1 = p->option[0];
     // option2 = p->option[1];
     //....
     int32_t result = 0;
-    if(aPacket->cmdHeader.cmdID == kSBC_StartRun)		result = startRun();
-    else if(aPacket->cmdHeader.cmdID == kSBC_StopRun)	stopRun();
-	else if(aPacket->cmdHeader.cmdID == kSBC_PauseRun)	result = pauseRun();
-	else if(aPacket->cmdHeader.cmdID == kSBC_ResumeRun) result = resumeRun();
+    if(aPacket->cmdHeader.cmdID == kSBC_StartRun)           result = startRun();
+    else if(aPacket->cmdHeader.cmdID == kSBC_StopRun)       stopRun();
+	else if(aPacket->cmdHeader.cmdID == kSBC_PauseRun)      result = pauseRun();
+	else if(aPacket->cmdHeader.cmdID == kSBC_ResumeRun)     result = resumeRun();
+	else if(aPacket->cmdHeader.cmdID == kSBC_SetPollingDelay){
+        if(p->option[0]>0){
+            minCycleTime = 1E6/p->option[0]; //we got it in Hz, convert to microseconds
+            run_info.statusBits &= kSBC_ThrottledMask;     //set bit
+            result = p->option[0];
+        }
+        else {
+            minCycleTime = 0;
+            run_info.statusBits &= ~kSBC_ThrottledMask;    //clr bit
+            result = 0;
+        }
+        run_info.pollingRate = p->option[0];
+    }
     SBC_CmdOptionStruct* op = (SBC_CmdOptionStruct*)aPacket->payload;
     op->option[0] = result;
-//    if(needToSwap)SwapLongBlock(op,sizeof(SBC_CmdOptionStruct)/sizeof(int32_t));
+    if(needToSwap)SwapLongBlock(op,sizeof(SBC_CmdOptionStruct)/sizeof(int32_t));
     sendResponse(aPacket);
 }
 
@@ -725,7 +746,12 @@ void* readoutThread (void* p)
     dataIndex = 0;
     int32_t index = 0;
     uint32_t statusBits = 0;
-
+    static struct timeval ts1;
+    static struct timeval ts2;
+    
+    gettimeofday(&ts1,NULL);
+    char timeToCycle = 1;
+        
     while(((statusBits = run_info.statusBits) & kSBC_RunningMask) != 0) {
         if((statusBits & kSBC_PausedMask) != kSBC_PausedMask){
             if (cycles % 10000 == 0 ) {
@@ -738,10 +764,22 @@ void* readoutThread (void* p)
                 //todo else EBUSY is ok, EINVAL and EFAULT are really bad
             }
             
-            index = readHW(&crate_config,index,0); //nil for the lam data
-            cycles++;
+            /*if(minCycleTime>0){
+                gettimeofday(&ts2,NULL);
+                uint32_t timePast = (uint32_t)(((ts2.tv_sec - ts1.tv_sec) + ( ts2.tv_usec - ts1.tv_usec )/1E6) * 1E6);//microseconds
+                if(timePast > minCycleTime){
+                    ts1         = ts2;
+                    timeToCycle = 1;
+                }
+                else timeToCycle = 0;
+            }
+            */
             
-            commitData();
+            //if(timeToCycle){
+                index = readHW(&crate_config,index,0); //nil for the lam data
+                cycles++;
+                commitData();
+            //}
             
             if(index>=crate_config.total_cards || index<0){
                 index = 0;

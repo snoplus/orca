@@ -140,6 +140,7 @@ typedef enum eSBC_ThrottleConsts{
 	NSString*		mainStagingFolder;
 	long			sbcCodeVersion;
     NSDate*         lastRateUpdate;
+	unsigned long	sbcPollingRate;
 }
 
 - (id)   initWithDelegate:(ORCard*)anDelegate;
@@ -150,6 +151,8 @@ typedef enum eSBC_ThrottleConsts{
 - (void) clearHistory;
 
 #pragma mark ¥¥¥Accessors
+- (unsigned long)sbcPollingRate;
+- (void) setSbcPollingRate:(unsigned long)aValue;
 - (long) sbcCodeVersion;
 - (void) setSbcCodeVersion:(long)aVersion;
 - (unsigned) ipNumberIndex;
@@ -249,6 +252,7 @@ typedef enum eSBC_ThrottleConsts{
 - (void) tellClientToStopRun;
 - (void) pauseRun;
 - (void) resumeRun;
+- (void) setPollingDelay:(unsigned long)numMicroseconds;
 
 - (void) sendCommand:(long)aCmd withOptions:(SBC_CmdOptionStruct*)optionBlock expectResponse:(BOOL)askForResponse;
 - (void) sendPayloadSize:(long)aSize;
@@ -418,12 +422,13 @@ extern NSString* SBC_LinkDoRangeChanged;
 extern NSString* SBC_LinkAddressModifierChanged;
 extern NSString* SBC_LinkRWTypeChanged;
 extern NSString* SBC_LinkInfoTypeChanged;
-extern NSString* ORSBC_LinkPingTask;
-extern NSString* ORSBC_LinkCBTest;
-extern NSString* ORSBC_LinkNumCBTextPointsChanged;
-extern NSString* ORSBC_LinkNumPayloadSizeChanged;
-extern NSString* ORSBC_LinkJobStatus;
-extern NSString* ORSBC_LinkErrorTimeOutChanged;
-extern NSString* ORSBC_CodeVersionChanged;
-extern NSString* ORSBC_SocketDroppedUnexpectedly;
+extern NSString* SBC_LinkPingTask;
+extern NSString* SBC_LinkCBTest;
+extern NSString* SBC_LinkNumCBTextPointsChanged;
+extern NSString* SBC_LinkNumPayloadSizeChanged;
+extern NSString* SBC_LinkJobStatus;
+extern NSString* SBC_LinkErrorTimeOutChanged;
+extern NSString* SBC_CodeVersionChanged;
+extern NSString* SBC_SocketDroppedUnexpectedly;
+extern NSString* SBC_LinkSbcPollingRateChanged;
 

@@ -73,14 +73,15 @@ NSString* SBC_LinkDoRangeChanged			= @"SBC_LinkDoRangeChanged";
 NSString* SBC_LinkAddressModifierChanged	= @"SBC_LinkAddressModifierChanged";
 NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 NSString* SBC_LinkInfoTypeChanged           = @"SBC_LinkInfoTypeChanged";
-NSString* ORSBC_LinkPingTask				= @"ORSBC_LinkPingTask";
-NSString* ORSBC_LinkCBTest					= @"ORSBC_LinkCBTest";
-NSString* ORSBC_LinkNumCBTextPointsChanged	= @"ORSBC_LinkNumCBTextPointsChanged";
-NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
-NSString* ORSBC_LinkJobStatus				= @"ORSBC_LinkJobStatus";
-NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
-NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
-NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly";
+NSString* SBC_LinkPingTask                  = @"SBC_LinkPingTask";
+NSString* SBC_LinkCBTest					= @"SBC_LinkCBTest";
+NSString* SBC_LinkNumCBTextPointsChanged	= @"SBC_LinkNumCBTextPointsChanged";
+NSString* SBC_LinkNumPayloadSizeChanged     = @"SBC_LinkNumPayloadSizeChanged";
+NSString* SBC_LinkJobStatus                 = @"SBC_LinkJobStatus";
+NSString* SBC_LinkErrorTimeOutChanged		= @"SBC_LinkErrorTimeOutChanged";
+NSString* SBC_CodeVersionChanged			= @"SBC_CodeVersionChanged";
+NSString* SBC_SocketDroppedUnexpectedly     = @"SBC_SocketDroppedUnexpectedly";
+NSString* SBC_LinkSbcPollingRateChanged     = @"SBC_LinkSbcPollingRateChanged";
 
 @interface SBCPacketWrapper : NSObject {
     NSMutableData* data;
@@ -186,7 +187,7 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
 - (void) setSbcCodeVersion:(long)aVersion
 {
     sbcCodeVersion = aVersion;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_CodeVersionChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:SBC_CodeVersionChanged object:self];
 }
 
 - (void) clearHistory
@@ -223,7 +224,7 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
 {
 	[[[self undoManager] prepareWithInvocationTarget:self] setErrorTimeOut:errorTimeOut];
     errorTimeOut = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_LinkErrorTimeOutChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkErrorTimeOutChanged object:self];
 }
 
 - (int) errorTimeOut
@@ -252,7 +253,7 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
     
     numTestPoints = num;
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_LinkNumCBTextPointsChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkNumCBTextPointsChanged object:self];
 }
 
 - (int) infoType
@@ -738,7 +739,7 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
 	[jobStatus release];
 	jobStatus = theJobStatus;
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_LinkJobStatus 
+	[[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkJobStatus 
 														object:jobDelegate 
 													  userInfo:[NSDictionary dictionaryWithObject:jobStatus forKey:@"jobStatus"]];
 	
@@ -776,8 +777,10 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
     [self setRange:			[decoder decodeIntForKey:	@"Range"]];
     [self setDoRange:		[decoder decodeBoolForKey:	@"DoRange"]];
     [self setReadWriteType: [decoder decodeIntForKey:   @"ReadWriteType"]];	
-    [self setAddressModifier: [decoder decodeIntForKey:   @"addressModifier"]];	
-    [self setErrorTimeOut:  [decoder decodeIntForKey:   @"errorTimeOut"]];	
+    [self setAddressModifier: [decoder decodeIntForKey: @"addressModifier"]];	
+    [self setErrorTimeOut:  [decoder decodeIntForKey:   @"errorTimeOut"]];
+    [self setSbcPollingRate:  [decoder decodeIntForKey: @"sbcPollingRate"]];
+	
 	socketLock = [[NSLock alloc] init];
 	
 	exitCBTest    = YES;
@@ -806,8 +809,10 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
 	[encoder encodeBool:verbose			forKey:@"Verbose"];
 	[encoder encodeBool:forceReload		forKey:@"ForceReload"];
     [encoder encodeInt:readWriteType    forKey:@"ReadWriteType"];
-    [encoder encodeInt:addressModifier    forKey:@"addressModifier"];
-    [encoder encodeInt:errorTimeOut    forKey:@"errorTimeOut"];
+    [encoder encodeInt:addressModifier  forKey:@"addressModifier"];
+    [encoder encodeInt:errorTimeOut     forKey:@"errorTimeOut"];
+    [encoder encodeInt:sbcPollingRate   forKey:@"sbcPollingRate"];
+    
 }
 
 
@@ -890,6 +895,20 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
 {
 	return throttle;
 }
+
+- (unsigned long) sbcPollingRate
+{
+    return sbcPollingRate;
+}
+- (void) setSbcPollingRate:(unsigned long)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSbcPollingRate:sbcPollingRate];
+    sbcPollingRate = aValue;
+  	[[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkSbcPollingRateChanged object:self];
+  
+}
+
+
 - (void) reloadClient
 {
 	[self setReloading:YES];
@@ -1017,7 +1036,7 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
 	if(aTask == pingTask){
 		[pingTask release];
 		pingTask = nil;
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_LinkPingTask object:self];
+		[[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkPingTask object:self];
 	}
 }
 
@@ -1054,7 +1073,7 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
     if([self isConnected]){
         [self disconnect];
         [self sbcConnectionDropped];
-        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORSBC_SocketDroppedUnexpectedly  object:self];
+        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SBC_SocketDroppedUnexpectedly  object:self];
     }
 }
 
@@ -1160,6 +1179,16 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
 		optionBlock.option[i]	= 0;
 	}
 	
+    optionBlock.option[0]	= sbcPollingRate;
+	[self sendCommand:kSBC_SetPollingDelay withOptions:&optionBlock expectResponse:YES];
+    if(optionBlock.option[0] == 0){
+        NSLog(@"SBC polling at fastest rate\n");
+    }
+    else {
+        NSLog(@"SBC polling at ~%luHz\n",optionBlock.option[0]);
+    }
+    
+    optionBlock.option[0]	= 0;//reset the option block
 	[self sendCommand:kSBC_StartRun withOptions:&optionBlock expectResponse:YES];
 	
 	if(optionBlock.option[0] == 1){
@@ -1207,6 +1236,20 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
 		[NSException raise:@"Run Didn't Pause" format:@"%@ failed to pause run",[self crateName]];	
 	}
 }
+
+- (void) setPollingDelay:(unsigned long)numMicroseconds
+{
+	SBC_CmdOptionStruct optionBlock;
+	int i;
+	for(i=0;i<kMaxOptions;i++){
+		//future pause options could be added here.
+		optionBlock.option[i]	= 0;
+	}
+    optionBlock.option[0]	= numMicroseconds;
+
+	[self sendCommand:kSBC_SetPollingDelay withOptions:&optionBlock expectResponse:NO];
+}
+
 
 - (void) resumeRun
 {
@@ -1770,7 +1813,7 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
 	if([self cbTestRunning]){
 		exitCBTest = YES;
 		[[ORGlobal sharedGlobal] removeRunVeto:@"CBTestInProgress"];
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_LinkCBTest object:self];
+		[[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkCBTest object:self];
 	}
 	if(socketfd){
 		close(socketfd);
@@ -1867,7 +1910,7 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
 		[aSequence setVerbose:aFlag];
 		[aSequence setTextToDelegate:YES];
 		[aSequence launch];
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_LinkPingTask object:self];
+		[[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkPingTask object:self];
 	}
 }
 
@@ -1954,7 +1997,7 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
 	
     payloadSize = aValue;
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_LinkNumPayloadSizeChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkNumPayloadSizeChanged object:self];
 }
 
 
@@ -2235,7 +2278,7 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
 		else if (bytesWritten < 0) {
             if (errno == EPIPE) {
                 [self disconnect];
-                [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORSBC_SocketDroppedUnexpectedly  object:self];
+                [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SBC_SocketDroppedUnexpectedly  object:self];
             }
 			[NSException raise:@"Write Error" format:@"Write Error(%s) %@ <%@> port: %d",strerror(errno),[self crateName],IPNumber,portNumber];
 		}
@@ -2289,7 +2332,7 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
 			if(timeout>0){
 				if((time(0)-t1)>timeout) {
 					[self disconnect];
-                    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORSBC_SocketDroppedUnexpectedly  object:self];
+                    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SBC_SocketDroppedUnexpectedly  object:self];
 					[NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];
 				}
 			}
@@ -2300,7 +2343,7 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
 	
 	if(n==0){
 		[self disconnect];
-        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORSBC_SocketDroppedUnexpectedly  object:self];
+        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SBC_SocketDroppedUnexpectedly  object:self];
 		[NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];
 	}
 	else if (n<0) {
@@ -2333,7 +2376,7 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
 						if(timeout>0){
 							if((time(0)-t1)>timeout) {
 								[self disconnect];
-                                [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORSBC_SocketDroppedUnexpectedly  object:self];
+                                [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SBC_SocketDroppedUnexpectedly  object:self];
 								[NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];
 							}
 						}
@@ -2342,7 +2385,7 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
 				} while (1);
 				if(n==0){
 					[self disconnect];
-                    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORSBC_SocketDroppedUnexpectedly  object:self];
+                    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SBC_SocketDroppedUnexpectedly  object:self];
 					[NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];
 				} 
 				else if (n<0) {
@@ -2393,7 +2436,7 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
 				if(timeout>0){
 					if((time(0)-t1)>timeout) {
 						[self disconnect];
-                        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORSBC_SocketDroppedUnexpectedly  object:self];
+                        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SBC_SocketDroppedUnexpectedly  object:self];
 						[NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];
 					}
 				}
@@ -2404,7 +2447,7 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
 		
         if(n==0){
             [self disconnect];
-            [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORSBC_SocketDroppedUnexpectedly  object:self];
+            [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:SBC_SocketDroppedUnexpectedly  object:self];
             [NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];
         } 
 		else if (n<0) {
@@ -2456,7 +2499,7 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
 {	
 	if(exitCBTest) {
 		[[ORGlobal sharedGlobal] removeRunVeto:@"CBTestInProgress"];
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_LinkCBTest object:self];
+		[[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkCBTest object:self];
 		return;
 	}
 	if(!cbTestRunning){
@@ -2471,7 +2514,7 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
 			exitCBTest = YES;
 			[[ORGlobal sharedGlobal] removeRunVeto:@"CBTestInProgress"];
 			
-			[[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_LinkCBTest object:self];
+			[[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkCBTest object:self];
 			return;
 		}
 	}
@@ -2495,7 +2538,7 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
 		lastInfoUpdate = [[NSDate date] retain];
 	}
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_LinkCBTest object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkCBTest object:self];
 }
 
 
@@ -2562,7 +2605,7 @@ NSString* ORSBC_SocketDroppedUnexpectedly   = @"ORSBC_SocketDroppedUnexpectedly"
 			}
 		}
 		cbTestRunning = NO;
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_LinkCBTest object:self];
+		[[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkCBTest object:self];
 	}
 	[pw release];
 }

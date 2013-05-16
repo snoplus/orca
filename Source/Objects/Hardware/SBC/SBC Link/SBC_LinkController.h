@@ -78,6 +78,7 @@
 	IBOutlet NSTextField*	status1Field;
 	IBOutlet NSPopUpButton* errorTimeOutPU;
 	IBOutlet NSButton*		clearHistoryButton;
+	IBOutlet NSPopUpButton* sbcPollingPU;
 
 	//Basic Ops
 	IBOutlet NSTextField*	functionAllowedField;
@@ -128,6 +129,7 @@
 - (void) startStatusChanged:(NSNotification*)aNote;
 - (void) setToggleCrateButtonState;
 - (void) loadModeChanged:(NSNotification*)aNote;
+- (void) sbcPollingTimeChanged:(NSNotification*)aNote;
 
 - (void) byteRateChanged:(NSNotification*)aNote;
 - (void) statusInfoChanged:(NSNotification*)aNote;
@@ -198,6 +200,7 @@
 - (IBAction) downloadDriverAction:(id)sender;
 - (IBAction) closeDriverInstallPanel:(id)sender;
 - (IBAction) getSbcCodeVersion:(id)sender;
+- (IBAction) sbcPollingTimeAction:(id)sender;
 
 #pragma mark ¥¥¥DataSource
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item;

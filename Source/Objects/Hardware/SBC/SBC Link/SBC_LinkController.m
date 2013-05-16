@@ -194,7 +194,7 @@
 
 	[notifyCenter addObserver : self
                      selector : @selector(statusInfoChanged:)
-                         name : ORSBC_LinkJobStatus
+                         name : SBC_LinkJobStatus
                        object : nil];
 	
 	[notifyCenter addObserver : self
@@ -296,34 +296,39 @@
 	
 	[notifyCenter addObserver : self
                      selector : @selector(pingTaskChanged:)
-                         name : ORSBC_LinkPingTask
+                         name : SBC_LinkPingTask
                        object : [model sbcLink]];
 	
 	[notifyCenter addObserver : self
                      selector : @selector(cbTestChanged:)
-                         name : ORSBC_LinkCBTest
+                         name : SBC_LinkCBTest
                        object : [model sbcLink]];
 	
 	[notifyCenter addObserver : self
                      selector : @selector(numTestPointsChanged:)
-                         name : ORSBC_LinkNumCBTextPointsChanged
+                         name : SBC_LinkNumCBTextPointsChanged
                        object : [model sbcLink]];
 	
 	[notifyCenter addObserver : self
                      selector : @selector(payloadSizeChanged:)
-                         name : ORSBC_LinkNumPayloadSizeChanged
+                         name : SBC_LinkNumPayloadSizeChanged
                        object : [model sbcLink]];
 	
 	[notifyCenter addObserver : self
                      selector : @selector(errorTimeOutChanged:)
-                         name : ORSBC_LinkErrorTimeOutChanged
+                         name : SBC_LinkErrorTimeOutChanged
                        object : [model sbcLink]];
 
 	[notifyCenter addObserver : self
                      selector : @selector(codeVersionChanged:)
-                         name : ORSBC_CodeVersionChanged
+                         name : SBC_CodeVersionChanged
                        object : [model sbcLink]];
 	
+	[notifyCenter addObserver : self
+                     selector : @selector(sbcPollingTimeChanged:)
+                         name : SBC_LinkSbcPollingRateChanged
+                       object : [model sbcLink]];    
+    
 }
 
 - (void) updateWindow
@@ -360,8 +365,14 @@
 	[self lamSlotChanged:nil];
 	[self errorTimeOutChanged:nil];
 	[self codeVersionChanged:nil];
-	
+	[self sbcPollingTimeChanged:nil];
 }
+
+- (void) sbcPollingTimeChanged:(NSNotification*)aNote
+{
+    [sbcPollingPU selectItemWithTag:[[model sbcLink] sbcPollingRate]];
+}
+
 
 - (void) codeVersionChanged:(NSNotification*)aNote
 {
@@ -621,12 +632,17 @@
 			theInfoString =                                        [NSString stringWithFormat: @"Connected     : %@\t\t# Records   : %d\n",[[model sbcLink] isConnected]?@"YES":@"NO ",theRunInfo.recordsTransfered];
 			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"Config loaded : %@\t\tWrap Arounds: %d\n",(theRunInfo.statusBits & kSBC_ConfigLoadedMask) ? @"YES":@"NO ",theRunInfo.wrapArounds]];
 			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"Running       : %@\t\tThrottle    : %lu\n",runState,[[model sbcLink] throttle]]];
-			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"Cycles * 10K  : %d\n",theRunInfo.readCycles/10000]];
+            if(theRunInfo.pollingRate==0){
+                theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"Cycles * 10K  : %-9u Polling     : Fastest\n",theRunInfo.readCycles/10000]];
+            }
+            else {
+                theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"Cycles * 10K  : %-9u Polling     : %u Hz\n",theRunInfo.readCycles/10000,theRunInfo.pollingRate]];
+            }
 			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"Lost Bytes    : %d\n",theRunInfo.lostByteCount]];
 			
-			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"CB Write Mark : %-9lu   Bus Errors  : %d\n",aWriteMark,theRunInfo.busErrorCount]];
-			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"CB Read Mark  : %-9lu   Err Count   : %d\n",aReadMark,theRunInfo.err_count]];
-			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"In Buffer Now : %-9d   Msg Count   : %d",theRunInfo.amountInBuffer,theRunInfo.msg_count]];
+			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"CB Write Mark : %-9lu Bus Errors  : %d\n",aWriteMark,theRunInfo.busErrorCount]];
+			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"CB Read Mark  : %-9lu Err Count   : %d\n",aReadMark,theRunInfo.err_count]];
+			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"In Buffer Now : %-9d Msg Count   : %d",theRunInfo.amountInBuffer,theRunInfo.msg_count]];
 		break;
 			
 		case 1:
@@ -733,6 +749,11 @@
 }
 
 #pragma mark ¥¥¥Actions
+- (IBAction) sbcPollingTimeAction:(id)sender
+{
+    [[model sbcLink] setSbcPollingRate:[[sender selectedItem]tag]];
+}
+
 - (IBAction) clearHistory:(id) sender
 {
 	[[model sbcLink] clearHistory];

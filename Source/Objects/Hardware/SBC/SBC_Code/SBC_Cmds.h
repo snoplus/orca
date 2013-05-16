@@ -61,6 +61,7 @@
 #define kSBC_ResumeRun         0x18
 #define kSBC_GeneralRead       0x19
 #define kSBC_GeneralWrite      0x20
+#define kSBC_SetPollingDelay   0x21
 #define kSBC_Exit              0xFFFFFFFF /*close socket and quit application*/
 
 typedef 
