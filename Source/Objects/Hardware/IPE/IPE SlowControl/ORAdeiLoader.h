@@ -16,6 +16,9 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
+//
+// 2009-2013: Till.Bergmann@kit.edu
+//
 
 #define kSensorType	0
 #define kControlType	1

@@ -16,6 +16,9 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
+//
+// 2009-2013: Till.Bergmann@kit.edu
+//
 @class ORPlotView;
 @class WebView;
 
@@ -27,6 +30,7 @@
 
 {
 	IBOutlet ORPlotView*		timingPlotter;   
+	IBOutlet NSButton*          rePostStillPendingRequestsCB;
 	IBOutlet NSPopUpButton*		manualTypePopup;
 	IBOutlet NSTextField*		manualPathTextField;
 	IBOutlet NSButton*			showDebugOutputCB;
@@ -69,6 +73,7 @@
 - (id) init;
 
 #pragma mark ***Interface Management
+- (void) rePostStillPendingRequestsChanged:(NSNotification*)aNote;
 - (void) manualTypeChanged:(NSNotification*)aNote;
 - (void) manualPathChanged:(NSNotification*)aNote;
 - (void) setpointRequestQueueChanged:(NSNotification*)aNote;
@@ -96,6 +101,7 @@
 - (void) drawDidClose:(NSNotification*)aNote;
 
 #pragma mark ***Actions
+- (IBAction) rePostStillPendingRequestsCBAction:(id)sender;
 - (IBAction) openChannelTableFileAction:(id)sender;
 - (IBAction) saveAsChannelTableFileAction:(id)sender;
 - (IBAction) manuallyCreateChannelAction:(id)sender;

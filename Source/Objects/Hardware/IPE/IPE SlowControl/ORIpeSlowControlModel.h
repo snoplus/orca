@@ -16,6 +16,9 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
+//
+// 2009-2013: Till.Bergmann@kit.edu
+//
 
 #pragma mark ***Imported Files
 #import "ORAdcProcessing.h"
@@ -384,6 +387,7 @@
     NSMutableArray* setpointRequestsQueue;
     NSString* manualPath;
     int manualType;
+    int rePostStillPendingRequests;
 }
 
 #pragma mark ***Initialization
@@ -401,6 +405,8 @@
 - (void) setChannelDataId:(int) aValue;
 
 #pragma mark ***Accessors
+- (int) rePostStillPendingRequests;
+- (void) setRePostStillPendingRequests:(int)aRePostStillPendingRequests;
 - (int) manualType;
 - (void) setManualType:(int)aManualType;
 - (NSString*) manualPath;
@@ -556,6 +562,7 @@
 @end
 
 #pragma mark •••Notification Strings
+extern NSString* ORIpeSlowControlModelRePostStillPendingRequestsChanged;
 extern NSString* ORIpeSlowControlModelManualTypeChanged;
 extern NSString* ORIpeSlowControlModelManualPathChanged;
 extern NSString* ORIpeSlowControlModelShowDebugOutputChanged;

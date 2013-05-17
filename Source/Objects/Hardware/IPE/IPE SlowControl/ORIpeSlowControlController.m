@@ -16,6 +16,9 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
+//
+// 2009-2013: Till.Bergmann@kit.edu
+//
 #pragma mark ***Imported Files
 #import <WebKit/WebKit.h>
 #import "ORIpeSlowControlController.h"
@@ -203,6 +206,11 @@
                          name : ORIpeSlowControlModelManualTypeChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(rePostStillPendingRequestsChanged:)
+                         name : ORIpeSlowControlModelRePostStillPendingRequestsChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -230,6 +238,12 @@
 	[self setpointRequestQueueChanged:nil];
 	[self manualTypeChanged:nil];
 	[self manualPathChanged:nil];
+	[self rePostStillPendingRequestsChanged:nil];
+}
+
+- (void) rePostStillPendingRequestsChanged:(NSNotification*)aNote
+{
+	[rePostStillPendingRequestsCB setIntValue: [model rePostStillPendingRequests]];
 }
 
 - (void) manualTypeChanged:(NSNotification*)aNote
@@ -421,6 +435,11 @@
 }
 
 #pragma mark ***Actions
+
+- (void) rePostStillPendingRequestsCBAction:(id)sender
+{
+	[model setRePostStillPendingRequests:[sender intValue]];	
+}
 - (IBAction) openChannelTableFileAction:(id)sender
 {
     NSOpenPanel *openPanel = [NSOpenPanel openPanel];

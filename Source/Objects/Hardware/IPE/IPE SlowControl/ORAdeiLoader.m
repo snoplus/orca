@@ -16,6 +16,9 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
+//
+// 2009-2013: Till.Bergmann@kit.edu
+//
 
 #import "ORAdeiLoader.h"
 
@@ -271,6 +274,7 @@
         [receivedData release];
 		receivedData = nil;
 		NSLogError(@"ADEI Loader",@"Connection Failed",[error localizedDescription], nil);
+        NSLog(@"ERROR:  ORAdeiLoader::ADEI Loader-Connection Failed (%@)\n",[error localizedDescription]);
     }
 }
 
@@ -285,7 +289,7 @@
 	if(dataFormat == kxmlFormat){
 		[self parseXMLData:receivedData];// --> fills 'resultArray'
 		if(adeiType==kControlType){
-            //DEBUG            NSLog(@"Received data after parseXML... (dataFormat: %i): BEGIN-%@-END\n",dataFormat,resultArray);
+            //DEBUG      NSLog(@"Received data after parseXML... (dataFormat: %i): BEGIN-%@-END\n",dataFormat,resultArray);
 			//NSMutableDictionary* dictionary = [resultArray objectAtIndex:0];//2013-04-xx it seems there had been a change in ADEI in the response format and ADEI seems to return all values of ALL items in the group! -tb-
                                                                               //the item (dict) with index=0 is now WRONG (for all items except the 0th)!
             int itemNum=0;
@@ -302,7 +306,7 @@
             #else
 			NSMutableDictionary* dictionary=0;
             for(id dict in resultArray){
-                //DEBUG                  NSLog(@"---------->dict is %@ \n",dict);
+                //DEBUG        NSLog(@"---------->dict is %@ \n",dict);
                 if([dict intForKey: @"id"] == itemNum){ dictionary=dict; break; }
             }
 
@@ -315,10 +319,22 @@
                 //[resultArray addObject:[NSMutableDictionary dictionaryWithObject:@"Error" forKey:@"Result"]];
                 //[resultArray addObject:[NSMutableDictionary dictionaryWithObject:@"Item does not exist - check item path!" forKey:@"Error"]];
                 [dictionary setObject:@"Error"	forKey:@"Result"];
-                [dictionary setObject:@"Item does not exist - check item path! :-("	forKey:@"Error"];
-			    [dictionary setObject:[NSNumber numberWithInt:kControlType]		forKey:@"Control"];
+                [dictionary setObject:@"Item not found - maybe it does not exist? - check item path! :-("	forKey:@"Error"];
+			    //[dictionary setObject:[NSNumber numberWithInt:kControlType]		forKey:@"Control"];//moved behind if... - see below -tb-
 			    [dictionary setObject:@"--"		forKey:@"Name"];
             }
+            
+            //this is brute force, try to avoid it ... -tb-
+//            if([dictionary objectForKey: @"Error"]){//if 'Error' was set, then set 'Result' to 'Error', too --- ORIpeSlowControlModel::polledItemResult:path: needs it -tb-
+//                if(![dictionary objectForKey: @"Result"])    [dictionary setObject:@"error"		forKey:@"Result"];
+//            }
+//                          NSLog(@"---------->dictionary is %@ \n",dictionary);
+                
+            if(![dictionary objectForKey: @"Control"])//quickfix to avoid control2sensor switch -tb- 2013-05-16 - should be fixed, leave it to be safe -tb-
+    		    [dictionary setObject:[NSNumber numberWithInt:kControlType]		forKey:@"Control"];
+                
+            //[dictionary setObject:@"OK"	forKey:@"Result"];//fullfill the error check in ORIpeSlowControlModel::polledItemResult:path: -> no 'Result' item now means: OK -tb-
+            
             
 			[dictionary setObject:host	forKey:@"URL"];
 			[dictionary setObject:path	forKey:@"Path"];
@@ -455,6 +471,7 @@ didStartElement:(NSString*) elementName
   qualifiedName:(NSString*) qName
 	 attributes:(NSDictionary*) attributeDict
 {
+    //DEBUG       NSLog(@"%@::%@   elementName  >>>%@<<<  namespaceURI  >>>%@<<<  attributeDict  >>>%@<<<\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),elementName,namespaceURI,attributeDict);//DEBUG OUTPUT -tb-
 	if(![elementName caseInsensitiveCompare:@"Value"]){//TODO: see comment in parser:didEndElement:... -tb
 		if(!resultArray)resultArray = [[NSMutableArray array] retain];
 		NSMutableDictionary* dictWithAdditions = [NSMutableDictionary dictionaryWithDictionary:attributeDict];
@@ -473,29 +490,89 @@ didStartElement:(NSString*) elementName
  qualifiedName:(NSString *)qName
 {    
     if(!resultArray)resultArray = [[NSMutableArray array] retain];
-    
-    if (![elementName caseInsensitiveCompare:@"Result"]) {//note: caseInsensitiveCompare: returns a 'NSComparisonResult' which may be -1, 0 or 1 ({NSOrderedAscending = -1, NSOrderedSame, NSOrderedDescending})-tb-
-                                                          //note: if pattern not found: NSOrderedAscending (==-1), all other cases mean: found
-        NSString* s = @"";
-        if(![resultInProgress caseInsensitiveCompare:@"OK"])s = @"OK";
-        else s = @"Error";
-        if([resultArray count]==0){
-            [resultArray addObject:[NSMutableDictionary dictionaryWithObject:s forKey:@"Result"]];
-        }
-        else {
-            [[resultArray objectAtIndex:0] setObject: s forKey:@"Result"];
-        }
-    }
-    else if (![elementName caseInsensitiveCompare:@"Error"]) {
-        if([resultInProgress length]){
+    //DEBUG      NSLog(@"%@::%@   elementName  >>>%@<<<  resultInProgress  >>>%@<<<\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),elementName,resultInProgress);//DEBUG OUTPUT -tb-
+
+
+
+    if(dataFormat == kmsgFormat){//we need to check this ONLY for set/send requests (not get requests - these might return a Error, too ... handle somewhere else -> see below) -tb- 2013-05
+        if (![elementName caseInsensitiveCompare:@"Result"]) {//note: caseInsensitiveCompare: returns a 'NSComparisonResult' which may be -1, 0 or 1 ({NSOrderedAscending = -1, NSOrderedSame, NSOrderedDescending})-tb-
+                                                              //note: if pattern not found: NSOrderedAscending (==-1), all other cases mean: found
+            NSString* s = @"";
+            //DEBUG  NSLog(@"%@::%@   [resultInProgress caseInsensitiveCompare:@ -OK- ]  >>>%@<<<  resultInProgress  >>>%@<<<\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),[resultInProgress caseInsensitiveCompare:@"OK"],resultInProgress);//DEBUG OUTPUT -tb-
+            if(resultInProgress){//resultInProgress may be (null), then ![resultInProgress caseInsensitiveCompare:@"OK"] would be true and set s=@"OK", which is wrong -tb- 2013-05
+                                 //this happens e.g. with this response (-> empty value for key 'result'): 
+                                 //<?xml version="1.0" encoding="UTF-8"?>.<result><Error>Failed to connect to cFPcom_Proxy running on ipepdvzeus.ka.fzk.de:12345</Error></result>
+                if(![resultInProgress caseInsensitiveCompare:@"OK"])s = @"OK";
+                else s = @"Error";
+            }else{
+                s = @"Error";
+            }
             if([resultArray count]==0){
-                [resultArray addObject:[NSMutableDictionary dictionaryWithObject:resultInProgress forKey:@"Error"]];
+                [resultArray addObject:[NSMutableDictionary dictionaryWithObject:s forKey:@"Result"]];
             }
             else {
-                [[resultArray objectAtIndex:0] setObject: resultInProgress forKey:@"Error"];
+                [[resultArray objectAtIndex:0] setObject: s forKey:@"Result"];
             }
         }
-   }
+        else if (![elementName caseInsensitiveCompare:@"Error"]) {
+            if([resultInProgress length]){
+                if([resultArray count]==0){
+                    [resultArray addObject:[NSMutableDictionary dictionaryWithObject:resultInProgress forKey:@"Error"]];
+                }
+                else {
+                    [[resultArray objectAtIndex:0] setObject: resultInProgress forKey:@"Error"];
+                }
+            }
+        }
+    }
+
+    if(dataFormat == kxmlFormat){//check for get requests - these might return a Error, too ... the 'result' item seems to be empty in this case -tb- 2013-05
+                                 //response examples (first: error, second: OK)(elementName  =  resultInProgress): 
+                                 //<?xml version="1.0" encoding="UTF-8"?>.<result><Error>Failed to connect to cFPcom_Proxy running on ipepdvzeus.ka.fzk.de:12345</Error></result>
+                                 // ->result=null, Error=Failed to connect to cFPcom_Proxy running on ipepdvzeus.ka.fzk.de:12345
+                                 //
+                                 //<?xml version="1.0" encoding="UTF-8"?>.<result><data> <Value value="10" timestamp="1368788523.3906" verified="1368796246.9688" write="1" obtained="1368796251.2489" db_server="test_zeus" db_name="cfp_test" db_group="3" id="2" name="Temp3"/>.</data></result>
+                                 // ->result=null, data=null, Value=' ' (why not null?), but has attribute list ()...
+
+                                 //   ->'result' is usually '(null)' -> ignore it
+                                 //   -> if 'Error' key found, copy to resultArray (and set result=Error) ...
+#if 0
+        if (![elementName caseInsensitiveCompare:@"Result"]) {//note: caseInsensitiveCompare: returns a 'NSComparisonResult' which may be -1, 0 or 1 ({NSOrderedAscending = -1, NSOrderedSame, NSOrderedDescending})-tb-
+                                                              //note: if pattern not found: NSOrderedAscending (==-1), all other cases mean: found
+            NSString* s = @"";
+            //DEBUG  NSLog(@"%@::%@   [resultInProgress caseInsensitiveCompare:@ -OK- ]  >>>%@<<<  resultInProgress  >>>%@<<<\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),[resultInProgress caseInsensitiveCompare:@"OK"],resultInProgress);//DEBUG OUTPUT -tb-
+            if(resultInProgress){//resultInProgress may be (null), then ![resultInProgress caseInsensitiveCompare:@"OK"] would be true and set s=@"OK", which is wrong -tb- 2013-05
+                                 //this happens e.g. with this response (-> empty value for key 'result'): 
+                                 //<?xml version="1.0" encoding="UTF-8"?>.<result><Error>Failed to connect to cFPcom_Proxy running on ipepdvzeus.ka.fzk.de:12345</Error></result>
+                                 //<?xml version="1.0" encoding="UTF-8"?>.<result>.<data> <Value value="10" timestamp="1368788523.3906" verified="1368796246.9688" write="1" obtained="1368796251.2489" db_server="test_zeus" db_name="cfp_test" db_group="3" id="2" name="Temp3"/>.</data></result>
+                if(![resultInProgress caseInsensitiveCompare:@"OK"])s = @"OK";
+                else s = @"Error";
+            }else{
+                s = @"Error";
+            }
+            if([resultArray count]==0){
+                [resultArray addObject:[NSMutableDictionary dictionaryWithObject:s forKey:@"Result"]];
+            }
+            else {
+                [[resultArray objectAtIndex:0] setObject: s forKey:@"Result"];
+            }
+        }
+#endif
+        if (![elementName caseInsensitiveCompare:@"Error"]) {
+            if([resultInProgress length]){
+                if([resultArray count]==0){//TODO: is this necessary? we don't rely on having it at index 0 -tb-
+                    [resultArray addObject:[NSMutableDictionary dictionaryWithObject:resultInProgress forKey:@"Error"]];
+                }
+                else {
+                    [[resultArray objectAtIndex:0] setObject: resultInProgress forKey:@"Error"];
+                }
+            }
+        }
+    }
+
+
+
+
     [resultInProgress release];
     resultInProgress = nil;
     
@@ -507,6 +584,7 @@ didStartElement:(NSString*) elementName
 foundCharacters:(NSString *)string
 {
     [resultInProgress appendString:string];
+    //DEBUG    NSLog(@"%@::%@     resultInProgress  >>>%@<<<\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd), resultInProgress);//DEBUG OUTPUT -tb-
 }
 
 + (NSString*) controlItemRequestStringUrl:(NSString*)aUrl itemPath:(NSString*)aPath;
