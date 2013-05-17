@@ -22,6 +22,7 @@
 #import "ORDataTypeAssigner.h"
 #import "ORDataPacket.h"
 #import "ORTimeRate.h"
+#import "ORAlarm.h"
 
 #pragma mark ¥¥¥Notification Strings
 NSString* ORMJDPreAmpModelAdcEnabledMaskChanged = @"ORMJDPreAmpModelAdcEnabledMaskChanged";
@@ -109,7 +110,16 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 	int i;
 	for(i=0;i<16;i++){
 		[timeRates[i] release];
-	}    [super dealloc];
+	}
+    for(i=0;i<2;i++){
+        [temperatureAlarm[i] clearAlarm];
+        [temperatureAlarm[i] release];
+    }
+    for(i=0;i<2;i++){
+        [adcAlarm[i] clearAlarm];
+        [adcAlarm[i] release];
+    }
+    [super dealloc];
 }
 
 - (void) sleep
@@ -652,14 +662,18 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
     }
 }
 
-
-- (void) readAdcs
+- (void) readAllAdcs
 {
-	[self readAdcsOnChip:0];
-	[self readAdcsOnChip:1];
+    [self readAllAdcs:NO];
 }
 
-- (void) readAdcsOnChip:(int)aChip
+- (void) readAllAdcs:(BOOL)verbose
+{
+	[self readAdcsOnChip:0 verbose:verbose];
+	[self readAdcsOnChip:1 verbose:verbose];
+}
+
+- (void) readAdcsOnChip:(int)aChip verbose:(BOOL)verbose
 {
     if(aChip<0 || aChip>1) return;
     
@@ -702,15 +716,18 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 			int voltage = readBack & 0xfff;
 			if(readBack & 0x1000) voltage |= 0xfffff000;
 
-			NSLog(@"Read voltage %f*%f*%d=%f on channel %d, for baseline %f and Rf %f\n", voltageBase, voltageMultiplier, voltage, voltageBase*voltageMultiplier*voltage, channelReadBack, [self baselineVoltage:((aChip*8)+channelReadBack)], [self feedBackResistor:((aChip*8)+channelReadBack)]);
+			if(verbose)NSLog(@"Read voltage %f*%f*%d=%f on channel %d, for baseline %f and Rf %f\n", voltageBase, voltageMultiplier, voltage, voltageBase*voltageMultiplier*voltage, channelReadBack, [self baselineVoltage:((aChip*8)+channelReadBack)], [self feedBackResistor:((aChip*8)+channelReadBack)]);
             
 			[self setAdc:(aChip*8)+i value:voltageBase*voltageMultiplier*voltage];
-
+            
+            [self checkAdcIsWithinLimits:(aChip*8)+i value:voltageBase*voltageMultiplier*voltage];
+            
 			voltageMultiplier = 2.;
 
 		}
 		else [self setAdc:(aChip*8)+i value:0.0];
 	}
+    
     
     
 	
@@ -720,13 +737,18 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 	timeMeasured[aChip] = ut_Time;
 }
 
-- (void) readTemperatures
+- (void) readAllTemperatures
 {
-	[self readTempOnChip:0];
-	[self readTempOnChip:1];
+    [self readAllTemperatures:NO];
 }
 
-- (void) readTempOnChip:(int)aChip // read temperature on ADC chips - niko
+- (void) readAllTemperatures:(BOOL) verbose
+{
+	[self readTempOnChip:0 verbose:verbose];
+	[self readTempOnChip:1 verbose:verbose];
+}
+
+- (void) readTempOnChip:(int)aChip verbose:(BOOL)verbose // read temperature on ADC chips - niko
 {
     if(aChip<0 || aChip>1) return;
     
@@ -776,9 +798,10 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
         float tempOnChip = tempMaxValue - (tempCode - tempMinCode)*tempMaxValue/(tempZeroCode - tempMinCode);
         
         
-        NSLog(@"chip %d, raw temp %d, temp %f on channel %d\n", aChip, tempCode, tempOnChip, channelReadBack);
+        if(verbose) NSLog(@"chip %d, raw temp %d, temp %f on channel %d\n", aChip, tempCode, tempOnChip, channelReadBack);
         
         [self setAdc:(aChip*8)+7 value:tempOnChip];
+        [self checkTempIsWithinLimits:aChip value:tempOnChip];
     }
     
     //get the time(UT!) for the data record.
@@ -787,15 +810,16 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 	timeMeasured[aChip] = ut_Time;
 }
 
+
 - (void) pollValues
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollValues) object:nil];
-	[self readAdcs];
+	[self readAllAdcs];
 	if(shipValues)[self shipRecords];
 	if(pollTime)[self performSelector:@selector(pollValues) withObject:nil afterDelay:pollTime];
 
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollValues) object:nil];
-	[self readTemperatures];
+	[self readAllTemperatures];
 	if(shipValues)[self shipRecords];
 	if(pollTime)[self performSelector:@selector(pollValues) withObject:nil afterDelay:pollTime];
 }
@@ -993,4 +1017,80 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 	}
 }
 
+
+#pragma mark ¥¥¥Alarms
+- (void) checkTempIsWithinLimits:(int)aChip value:(float)aTemperature
+{
+    float maxAllowedTemperature = 50; //<<-Nikko, set this or make a dialog field for it
+    if(aChip>=0 && aChip<2){
+        if(aTemperature >= maxAllowedTemperature){
+ 			if(!temperatureAlarm[aChip]){
+				temperatureAlarm[aChip] = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Preamp %lu Temperature",[self uniqueIdNumber]] severity:kRangeAlarm];
+                [temperatureAlarm[aChip] setHelpString:[NSString stringWithFormat:@"Preamp %lu has exceeded %.1f C. This alarm will be in effect until the temperature returns to normal limits. It can be silenced by acknowledging it.",[self uniqueIdNumber],maxAllowedTemperature]];
+				[temperatureAlarm[aChip] setSticky:YES];
+			}
+			[temperatureAlarm[aChip] postAlarm];
+        }
+        else {
+            [temperatureAlarm[aChip] clearAlarm];
+			[temperatureAlarm[aChip] release];
+			temperatureAlarm[aChip] = nil;
+        }
+    }
+}
+
+- (void) checkAdcIsWithinLimits:(int)anIndex value:(float)aValue
+{
+    if(anIndex != 5 || anIndex!=6 || anIndex!= 13 || anIndex!= 14)return;
+    
+    BOOL postAlarm = NO;
+    NSString* alarmName;
+    int alarmIndex = -1;
+    if(anIndex == 5){
+        alarmIndex = 0;
+        if(fabs(aValue - 12) >= 0.5){ //<---Niko, adjust this or make a dialog field 
+            alarmName  = [NSString stringWithFormat:@"Preamp %lu +12V Supply",[self uniqueIdNumber]];
+            postAlarm  = YES;
+        }
+    }
+    else if(anIndex == 6){
+        alarmIndex = 1;
+        if(fabs(aValue - 12) >= 0.5){ //<---Niko, adjust this or make a dialog field
+            alarmName = [NSString stringWithFormat:@"Preamp %lu -12V Supply",[self uniqueIdNumber]];
+            postAlarm  = YES;
+        }
+    }
+    else if(anIndex == 13){
+        alarmIndex = 2;
+        if(fabs(aValue - 24) >= 0.5){ //<---Niko, adjust this or make a dialog field
+            alarmName = [NSString stringWithFormat:@"Preamp %lu +24V Supply",[self uniqueIdNumber]];
+            postAlarm  = YES;
+        }
+    }
+    else if(anIndex == 14){
+        alarmIndex = 3;
+        if(fabs(aValue - 24) >= 0.5){ //<---Niko, adjust this or make a dialog field
+            alarmName = [NSString stringWithFormat:@"Preamp %lu -24V Supply",[self uniqueIdNumber]];
+            postAlarm  = YES;
+        }
+    }
+    
+    if(alarmIndex>=0 && alarmIndex<4){
+        if(postAlarm){
+ 			if(!adcAlarm[alarmIndex]){
+				adcAlarm[alarmIndex] = [[ORAlarm alloc] initWithName:alarmName severity:kRangeAlarm];
+                [adcAlarm[alarmIndex] setHelpString:[NSString stringWithFormat:@"Preamp %lu adc value exceeded limits. This alarm will be in effect until the adc value returns to normal limits. It can be silenced by acknowledging it.",[self uniqueIdNumber]]];
+				[adcAlarm[alarmIndex] setSticky:YES];
+			}
+			[adcAlarm[alarmIndex] postAlarm];
+        }
+        else {
+            [adcAlarm[alarmIndex] clearAlarm];
+			[adcAlarm[alarmIndex] release];
+			adcAlarm[alarmIndex] = nil;
+            
+        }
+    }
+
+}
 @end

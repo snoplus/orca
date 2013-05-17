@@ -22,6 +22,7 @@
 #import "ThresholdCalibrationTask.h"
 
 @class ORTimeRate;
+@class ORAlarm;
 
 #define kMJDPreAmpDacChannels   16	//if this ever changes, change the record length also
 #define kMJDPreAmpAdcChannels   16
@@ -49,6 +50,8 @@
 	unsigned long timeMeasured[2];
     unsigned long adcEnabledMask;
     ORTimeRate*		timeRates[16];
+    ORAlarm*		temperatureAlarm[2];
+    ORAlarm*		adcAlarm[4];
 }
 
 - (void) setUpArrays;
@@ -123,12 +126,18 @@
 //- (void) writeRangeForAdcChip:(int)index;
 - (void) writeRangeForAdcChip:(int)aChip withValue:(int)index;
 - (void) writeAdcChipRanges;
-- (void) readAdcsOnChip:(int)aChip;
-- (void) readTempOnChip:(int)aChip; // niko
-- (void) readAdcs;
-- (void) readTemperatures;
+- (void) readAdcsOnChip:(int)aChip verbose:(BOOL)verbose;
+- (void) readAllTemperatures:(BOOL)verbose;
+- (void) readAllTemperatures;
+- (void) readTempOnChip:(int)aChip verbose:(BOOL)verbose; // niko
+- (void) readAllAdcs;
+- (void) readAllAdcs:(BOOL)verbose;
 - (void) pollValues;
 - (unsigned long) writeAuxIOSPI:(unsigned long)aValue;
+
+#pragma mark ¥¥¥Alarms
+- (void) checkTempIsWithinLimits:(int)aChip value:(float)aTemperature;
+- (void) checkAdcIsWithinLimits:(int)anIndex value:(float)aValue;
 
 #pragma mark ¥¥¥Archival
 - (id)      initWithCoder:(NSCoder*)aDecoder;

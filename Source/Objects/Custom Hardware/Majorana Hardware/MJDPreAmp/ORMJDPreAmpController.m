@@ -775,12 +775,12 @@
 
 - (IBAction) readAdcs:(id)sender
 {
-	[model readAdcs]; 
+	[model readAllAdcs:YES];
 }
 
 - (IBAction) readTemperatures:(id)sender
 {
-	[model readTemperatures];
+	[model readAllTemperatures:YES];
 }
 
 - (IBAction) pollNowAction:(id)sender
