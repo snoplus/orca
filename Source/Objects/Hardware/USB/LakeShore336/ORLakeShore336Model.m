@@ -860,16 +860,16 @@ NSString* ORLakeShore336PollTimeChanged         = @"ORLakeShore336PollTimeChange
     if([lastRequest hasPrefix:@"*IDN"])NSLog(@"%@\n",theResponse);
     else if([lastRequest hasPrefix:@"KRDG?"]){
         NSString* channel = [lastRequest substringFromIndex:6];
-        if([channel isEqualToString:@"A"]){
+        if([channel hasPrefix:@"A"]){
             [[inputs objectAtIndex:0] setTemperature:[theResponse floatValue]];
         }
-        else if([channel isEqualToString:@"B"]){
+        else if([channel hasPrefix:@"B"]){
             [[inputs objectAtIndex:1] setTemperature:[theResponse floatValue]];
         }
-        else if([channel isEqualToString:@"C"]){
+        else if([channel hasPrefix:@"C"]){
             [[inputs objectAtIndex:2] setTemperature:[theResponse floatValue]];
         }
-        else if([channel isEqualToString:@"D"]){
+        else if([channel hasPrefix:@"D"]){
             [[inputs objectAtIndex:3] setTemperature:[theResponse floatValue]];
         }
        
