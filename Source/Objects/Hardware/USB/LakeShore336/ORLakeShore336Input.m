@@ -30,7 +30,7 @@ NSString* ORLakeShore336InputTemperatureChanged  = @"ORLakeShore336InputTemperat
 
 @synthesize channel,temperature, sensorType, autoRange, range, compensation, units;
 
-- (void) setTemperature:(int)aValue
+- (void) setTemperature:(float)aValue
 {
     temperature = aValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORLakeShore336InputTemperatureChanged object:self];

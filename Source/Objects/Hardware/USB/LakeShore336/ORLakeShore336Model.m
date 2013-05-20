@@ -284,8 +284,16 @@ NSString* ORLakeShore336PollTimeChanged         = @"ORLakeShore336PollTimeChange
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	if(pollTime == 0)return;
-	//[self queryAll];
+	[self queryAll];
 	[self performSelector:@selector(pollHardware) withObject:nil afterDelay:pollTime];
+}
+
+- (void) queryAll
+{
+    [self addCmdToQueue:@"KRDG? A"];
+    [self addCmdToQueue:@"KRDG? B"];
+    [self addCmdToQueue:@"KRDG? C"];
+    [self addCmdToQueue:@"KRDG? D"];
 }
 
 - (int) timeoutCount
@@ -850,6 +858,22 @@ NSString* ORLakeShore336PollTimeChanged         = @"ORLakeShore336PollTimeChange
     theResponse = [theResponse stringByReplacingOccurrencesOfString:@"\n" withString:@""];
     theResponse = [theResponse stringByReplacingOccurrencesOfString:@"\r" withString:@""];
     if([lastRequest hasPrefix:@"*IDN"])NSLog(@"%@\n",theResponse);
+    else if([lastRequest hasPrefix:@"KRDG?"]){
+        NSString* channel = [lastRequest substringFromIndex:6];
+        if([channel isEqualToString:@"A"]){
+            [[inputs objectAtIndex:0] setTemperature:[theResponse floatValue]];
+        }
+        else if([channel isEqualToString:@"B"]){
+            [[inputs objectAtIndex:1] setTemperature:[theResponse floatValue]];
+        }
+        else if([channel isEqualToString:@"C"]){
+            [[inputs objectAtIndex:2] setTemperature:[theResponse floatValue]];
+        }
+        else if([channel isEqualToString:@"D"]){
+            [[inputs objectAtIndex:3] setTemperature:[theResponse floatValue]];
+        }
+       
+    }
     else if([lastRequest hasPrefix:@"INTYPE"]){
        // int i = [NSString ]
         

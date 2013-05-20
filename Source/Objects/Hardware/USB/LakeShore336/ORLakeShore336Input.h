@@ -27,7 +27,7 @@ typedef enum  {
 @interface ORLakeShore336Input : NSObject
 {
     int     channel;
-    int     temperature;
+    float   temperature;
     ls336SensorTypeEnum sensorType;
     BOOL    autoRange;
     int     range;
@@ -42,7 +42,7 @@ typedef enum  {
 - (void)encodeWithCoder:(NSCoder*)encoder;
 
 @property (assign,nonatomic) int                    channel;
-@property (assign,nonatomic) int                    temperature;
+@property (assign,nonatomic) float                  temperature;
 @property (assign,nonatomic) ls336SensorTypeEnum    sensorType;
 @property (assign,nonatomic) BOOL                   autoRange;
 @property (assign,nonatomic) int                    range;

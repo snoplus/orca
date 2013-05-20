@@ -120,6 +120,7 @@
 - (void) systemTest;
 - (void) resetAndClear;
 - (void) pollHardware;
+- (void) queryAll;
 
 #pragma mark ***Delegate Methods
 - (void) netsocketConnected:(NetSocket*)inNetSocket;
