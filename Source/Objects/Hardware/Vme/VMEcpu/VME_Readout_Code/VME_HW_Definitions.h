@@ -43,5 +43,6 @@
 #define kCaen830   21
 #define kGretina4M 22
 #define kCaen1721  23
+#define kPollingTimeStamp  24
 
 #endif

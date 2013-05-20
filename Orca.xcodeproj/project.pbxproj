@@ -1903,6 +1903,13 @@
 		84992CB70DD21F3800E82DB4 /* ORHP3458aController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84992CB10DD21F3800E82DB4 /* ORHP3458aController.m */; };
 		84992CB80DD21F3800E82DB4 /* ORHP3458aModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84992CB20DD21F3800E82DB4 /* ORHP3458aModel.h */; };
 		84992CB90DD21F3800E82DB4 /* ORHP3458aModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84992CB30DD21F3800E82DB4 /* ORHP3458aModel.m */; };
+		8499786F1746C7C100BFEE3E /* ORPollingTimeStampDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 849978671746C7C100BFEE3E /* ORPollingTimeStampDecoder.h */; };
+		849978701746C7C100BFEE3E /* ORPollingTimeStampDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 849978681746C7C100BFEE3E /* ORPollingTimeStampDecoder.m */; };
+		849978711746C7C100BFEE3E /* ORPollingTimeStampModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 849978691746C7C100BFEE3E /* ORPollingTimeStampModel.h */; };
+		849978721746C7C100BFEE3E /* ORPollingTimeStampModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8499786A1746C7C100BFEE3E /* ORPollingTimeStampModel.m */; };
+		849978741746C7C100BFEE3E /* PollingTimeStamp.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8499786C1746C7C100BFEE3E /* PollingTimeStamp.gif */; };
+		84997878174A6B1D00BFEE3E /* ORPollingTimeStampReadout.hh in Headers */ = {isa = PBXBuildFile; fileRef = 84997876174A6B1D00BFEE3E /* ORPollingTimeStampReadout.hh */; };
+		84997879174A6DA500BFEE3E /* ORPollingTimeStampReadout.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84997875174A6B1C00BFEE3E /* ORPollingTimeStampReadout.cc */; };
 		84997E850CE37CBA002CFA70 /* ORVme64CrateController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84997E7C0CE37CBA002CFA70 /* ORVme64CrateController.h */; };
 		84997E860CE37CBA002CFA70 /* ORVme64CrateModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84997E7D0CE37CBA002CFA70 /* ORVme64CrateModel.h */; };
 		84997E870CE37CBA002CFA70 /* ORVme64CrateModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84997E7E0CE37CBA002CFA70 /* ORVme64CrateModel.m */; };
@@ -3160,6 +3167,7 @@
 				84AFEC4616B1707000EC343C /* ORCAEN1721Readout.hh in VME_Copy */,
 				84E703FC1726E60200F6DADB /* ORSIS3320Readout.cc in VME_Copy */,
 				84E703FD1726E60700F6DADB /* ORSIS3320Readout.hh in VME_Copy */,
+				84997879174A6DA500BFEE3E /* ORPollingTimeStampReadout.cc in VME_Copy */,
 				43ADFED510B6E2090044617C /* ORVVmeCard.cc in VME_Copy */,
 				43ADFED610B6E2090044617C /* ORVVmeCard.hh in VME_Copy */,
 				43ADFED710B6E2090044617C /* UniverseDriverInstall in VME_Copy */,
@@ -4887,6 +4895,13 @@
 		84992CB10DD21F3800E82DB4 /* ORHP3458aController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORHP3458aController.m; path = Source/Objects/Hardware/GPIB/HP3458a/ORHP3458aController.m; sourceTree = SOURCE_ROOT; };
 		84992CB20DD21F3800E82DB4 /* ORHP3458aModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORHP3458aModel.h; path = Source/Objects/Hardware/GPIB/HP3458a/ORHP3458aModel.h; sourceTree = SOURCE_ROOT; };
 		84992CB30DD21F3800E82DB4 /* ORHP3458aModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORHP3458aModel.m; path = Source/Objects/Hardware/GPIB/HP3458a/ORHP3458aModel.m; sourceTree = SOURCE_ROOT; };
+		849978671746C7C100BFEE3E /* ORPollingTimeStampDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORPollingTimeStampDecoder.h; sourceTree = "<group>"; };
+		849978681746C7C100BFEE3E /* ORPollingTimeStampDecoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORPollingTimeStampDecoder.m; sourceTree = "<group>"; };
+		849978691746C7C100BFEE3E /* ORPollingTimeStampModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORPollingTimeStampModel.h; sourceTree = "<group>"; };
+		8499786A1746C7C100BFEE3E /* ORPollingTimeStampModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORPollingTimeStampModel.m; sourceTree = "<group>"; };
+		8499786C1746C7C100BFEE3E /* PollingTimeStamp.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = PollingTimeStamp.gif; sourceTree = "<group>"; };
+		84997875174A6B1C00BFEE3E /* ORPollingTimeStampReadout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ORPollingTimeStampReadout.cc; sourceTree = "<group>"; };
+		84997876174A6B1D00BFEE3E /* ORPollingTimeStampReadout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ORPollingTimeStampReadout.hh; sourceTree = "<group>"; };
 		84997E7C0CE37CBA002CFA70 /* ORVme64CrateController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORVme64CrateController.h; path = Source/Objects/Hardware/Vme/VME64Crate/ORVme64CrateController.h; sourceTree = SOURCE_ROOT; };
 		84997E7D0CE37CBA002CFA70 /* ORVme64CrateModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORVme64CrateModel.h; path = Source/Objects/Hardware/Vme/VME64Crate/ORVme64CrateModel.h; sourceTree = SOURCE_ROOT; };
 		84997E7E0CE37CBA002CFA70 /* ORVme64CrateModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORVme64CrateModel.m; path = Source/Objects/Hardware/Vme/VME64Crate/ORVme64CrateModel.m; sourceTree = SOURCE_ROOT; };
@@ -9536,6 +9551,7 @@
 				8493CC300C99FA0700B46CD4 /* SBC Link */,
 				8493CC3B0C99FA0700B46CD4 /* SBC_Code */,
 				84A8B13F0D35702300263D31 /* SBC_LAM */,
+				849978641746C7C100BFEE3E /* PollingTimeStamp */,
 			);
 			name = SBC;
 			path = Source/Objects/Hardware/SBC;
@@ -9667,6 +9683,8 @@
 				43ADFE6710B6DBCF0044617C /* ORMTCReadout.hh */,
 				43ADFE6810B6DBCF0044617C /* ORShaperReadout.cc */,
 				43ADFE6910B6DBCF0044617C /* ORShaperReadout.hh */,
+				84997875174A6B1C00BFEE3E /* ORPollingTimeStampReadout.cc */,
+				84997876174A6B1D00BFEE3E /* ORPollingTimeStampReadout.hh */,
 				43ADFE6A10B6DBCF0044617C /* ORSIS3300Readout.cc */,
 				43ADFE6B10B6DBCF0044617C /* ORSIS3300Readout.hh */,
 				43ADFE6C10B6DBCF0044617C /* ORSIS3302Card.cc */,
@@ -9865,6 +9883,18 @@
 			name = HP3458a;
 			path = Source/Objects/Hardware/GPIB/HP3458a;
 			sourceTree = SOURCE_ROOT;
+		};
+		849978641746C7C100BFEE3E /* PollingTimeStamp */ = {
+			isa = PBXGroup;
+			children = (
+				849978671746C7C100BFEE3E /* ORPollingTimeStampDecoder.h */,
+				849978681746C7C100BFEE3E /* ORPollingTimeStampDecoder.m */,
+				849978691746C7C100BFEE3E /* ORPollingTimeStampModel.h */,
+				8499786A1746C7C100BFEE3E /* ORPollingTimeStampModel.m */,
+				8499786C1746C7C100BFEE3E /* PollingTimeStamp.gif */,
+			);
+			path = PollingTimeStamp;
+			sourceTree = "<group>";
 		};
 		84997E7B0CE37CBA002CFA70 /* VME64Crate */ = {
 			isa = PBXGroup;
@@ -14002,6 +14032,9 @@
 				84CED3971732FB9E000A84C2 /* ORLakeShore336Model.h in Headers */,
 				84CED39B1737EDF5000A84C2 /* ORLakeShore336Heater.h in Headers */,
 				84CED39F1737F3D9000A84C2 /* ORLakeShore336Input.h in Headers */,
+				8499786F1746C7C100BFEE3E /* ORPollingTimeStampDecoder.h in Headers */,
+				849978711746C7C100BFEE3E /* ORPollingTimeStampModel.h in Headers */,
+				84997878174A6B1D00BFEE3E /* ORPollingTimeStampReadout.hh in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14894,6 +14927,7 @@
 				84CED3931732FB9E000A84C2 /* LakeShore336.nib in Resources */,
 				84CED3941732FB9E000A84C2 /* LakeShore336.tif in Resources */,
 				843EB6F01741208D005CE36C /* CouchHistoryEventsMap.txt in Resources */,
+				849978741746C7C100BFEE3E /* PollingTimeStamp.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -15893,6 +15927,8 @@
 				849B9D7816DD044F003F3037 /* ORSIS3320Decoders.m in Sources */,
 				84CED3961732FB9E000A84C2 /* ORLakeShore336Controller.m in Sources */,
 				84CED3981732FB9E000A84C2 /* ORLakeShore336Model.m in Sources */,
+				849978701746C7C100BFEE3E /* ORPollingTimeStampDecoder.m in Sources */,
+				849978721746C7C100BFEE3E /* ORPollingTimeStampModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
