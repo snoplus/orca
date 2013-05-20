@@ -98,6 +98,7 @@
 - (id)   heater:(int)anIndex;
 - (NSMutableArray*)inputs;
 - (NSMutableArray*)heaters;
+- (BOOL) isConnected;
 
 #pragma mark •••Cmd Handling
 - (id) nextCmd;
@@ -118,6 +119,7 @@
 - (void) readIDString;
 - (void) systemTest;
 - (void) resetAndClear;
+- (void) pollHardware;
 
 #pragma mark ***Delegate Methods
 - (void) netsocketConnected:(NetSocket*)inNetSocket;
