@@ -746,8 +746,8 @@ void* readoutThread (void* p)
     dataIndex = 0;
     int32_t index = 0;
     uint32_t statusBits = 0;
-    static struct timeval ts1;
-    static struct timeval ts2;
+    struct timeval ts1;
+    struct timeval ts2;
     
     gettimeofday(&ts1,NULL);
     char timeToCycle = 1;
@@ -764,7 +764,7 @@ void* readoutThread (void* p)
                 //todo else EBUSY is ok, EINVAL and EFAULT are really bad
             }
             
-            /*if(minCycleTime>0){
+            if(minCycleTime>0){
                 gettimeofday(&ts2,NULL);
                 uint32_t timePast = (uint32_t)(((ts2.tv_sec - ts1.tv_sec) + ( ts2.tv_usec - ts1.tv_usec )/1E6) * 1E6);//microseconds
                 if(timePast > minCycleTime){
@@ -773,13 +773,13 @@ void* readoutThread (void* p)
                 }
                 else timeToCycle = 0;
             }
-            */
             
-            //if(timeToCycle){
+            
+            if(timeToCycle){
                 index = readHW(&crate_config,index,0); //nil for the lam data
                 cycles++;
                 commitData();
-            //}
+            }
             
             if(index>=crate_config.total_cards || index<0){
                 index = 0;
