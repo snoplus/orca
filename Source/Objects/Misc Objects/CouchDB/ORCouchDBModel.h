@@ -103,6 +103,7 @@
 - (void) recordEvent:(NSString*)eventName symbol:(NSString*)aSymbol comment:(NSString*)aComment;
 - (void) recordEvent:(NSString*)eventName symbol:(NSString*)aSymbol comment:(NSString*)aComment timeString:aDateString timeStamp:(unsigned long)aTimeStamp;
 
+- (void) processAlarmLog; //<<for temp use.. remove soon
 
 #pragma mark ***DB Access
 - (ORCouchDB*) statusDBRef;
