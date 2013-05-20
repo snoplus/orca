@@ -1067,13 +1067,13 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 - (void) startRunStage0:(NSNumber*)doInitBool
 {
 	if(startScript){
-		[startScript setSelectorOK:@selector(startRunStage1:) bad:@selector(runAbortFromScript) withObject:[NSNumber numberWithBool:doInitBool] target:self];
+		[startScript setSelectorOK:@selector(startRunStage1:) bad:@selector(runAbortFromScript) withObject:doInitBool target:self];
 		[self setStartScriptState:@"Running"];
 		if(![startScript runScript]){
 			[self runAbortFromScript];
 		}
 	}
-	else [self performSelector:@selector(startRunStage1:) withObject:[NSNumber numberWithBool:doInitBool] afterDelay:0];
+	else [self performSelector:@selector(startRunStage1:) withObject:doInitBool afterDelay:0];
 }
 
 - (void) startRunStage1:(NSNumber*)doInitBool
