@@ -56,6 +56,7 @@
 - (void) interfacesChanged:(NSNotification*)aNote;
 - (void) serialNumberChanged:(NSNotification*)aNote;
 - (void) pollTimeChanged:(NSNotification*)aNote;
+- (void) setButtonStates;
 
 #pragma mark •••Actions
 - (IBAction) serialNumberAction:(id)sender;
