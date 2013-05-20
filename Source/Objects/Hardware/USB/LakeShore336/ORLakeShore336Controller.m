@@ -126,6 +126,10 @@
 	[pollTimePopup selectItemWithTag: [model pollTime]];
 }
 
+- (IBAction) pollNowAction:(id)sender
+{
+    [model queryAll];
+}
 - (void) interfacesChanged:(NSNotification*)aNote
 {
 	[self populateInterfacePopup];

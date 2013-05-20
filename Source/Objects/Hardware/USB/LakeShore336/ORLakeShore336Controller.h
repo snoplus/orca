@@ -70,6 +70,7 @@
 - (IBAction) loadParamsAction:(id)sender;
 - (IBAction) lockAction:(id)sender;
 - (IBAction) pollTimeAction:(id)sender;
+- (IBAction) pollNowAction:(id)sender;
 
 - (void) populateInterfacePopup;
 - (void) validateInterfacePopup;
