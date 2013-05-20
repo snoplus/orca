@@ -46,6 +46,7 @@
 
 #pragma mark ¥¥¥Graphics
 - (void) setBackgroundImage:(NSImage *)newImage;
+- (void) drawBackground:(NSRect)aRect;
 - (void) drawContents:(NSRect)aRect;
 - (void) backgroundColorChanged:(NSNotification*)note;
 - (void) lineColorChanged:(NSNotification*)note;
