@@ -51,7 +51,8 @@
 	id				lastRequest;
 	ORAlarm*		timeoutAlarm;
 	int				timeoutCount;
-    
+    int             pollTime;
+   
     NSMutableArray* inputs;
     NSMutableArray* heaters;
     
@@ -67,6 +68,8 @@
 - (void) checkNoUsbAlarm;
 
 #pragma mark ***Accessors
+- (int)  pollTime;
+- (void) setPollTime:(int)aPollTime;
 - (ORUSBInterface*) usbInterface;
 - (void) setUsbInterface:(ORUSBInterface*)anInterface;
 - (NSString*) serialNumber;
@@ -142,4 +145,5 @@ extern NSString* ORLakeShore336Lock;
 extern NSString* ORLakeShore336PortClosedAfterTimeout;
 extern NSString* ORLakeShore336TimeoutCountChanged;
 extern NSString* ORLakeShore336IsValidChanged;
+extern NSString* ORLakeShore336PollTimeChanged;
 

@@ -41,6 +41,7 @@ NSString* ORLakeShore336Lock                    = @"ORLakeShore336Lock";
 NSString* ORLakeShore336IsValidChanged			= @"ORLakeShore336IsValidChanged";
 NSString* ORLakeShore336PortClosedAfterTimeout	= @"ORLakeShore336PortClosedAfterTimeout";
 NSString* ORLakeShore336TimeoutCountChanged     = @"ORLakeShore336TimeoutCountChanged";
+NSString* ORLakeShore336PollTimeChanged         = @"ORLakeShore336PollTimeChanged";
 
 @interface ORLakeShore336Model (private)
 - (void) processOneCommandFromQueue;
@@ -259,12 +260,34 @@ NSString* ORLakeShore336TimeoutCountChanged     = @"ORLakeShore336TimeoutCountCh
 }
 
 #pragma mark ***Accessors
+- (int) pollTime
+{
+    return pollTime;
+}
+
+- (void) setPollTime:(int)aPollTime
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setPollTime:pollTime];
+    pollTime = aPollTime;
+	[self pollHardware];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORLakeShore336PollTimeChanged object:self];
+}
+
 - (void) setTimeoutCount:(int)aValue
 {
     timeoutCount=aValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORLakeShore336TimeoutCountChanged object:self];
     
 }
+
+- (void) pollHardware
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	if(pollTime == 0)return;
+	//[self queryAll];
+	[self performSelector:@selector(pollHardware) withObject:nil afterDelay:pollTime];
+}
+
 - (int) timeoutCount
 {
 	return timeoutCount;
@@ -364,6 +387,7 @@ NSString* ORLakeShore336TimeoutCountChanged     = @"ORLakeShore336TimeoutCountCh
 {
     return usbConnected;
 }
+
 - (ORUSBInterface*) usbInterface
 {
 	return usbInterface;
@@ -504,6 +528,7 @@ NSString* ORLakeShore336TimeoutCountChanged     = @"ORLakeShore336TimeoutCountCh
 	}	
 }
 
+
 - (BOOL) isConnected
 {
 	switch(connectionProtocol){
@@ -534,9 +559,7 @@ NSString* ORLakeShore336TimeoutCountChanged     = @"ORLakeShore336TimeoutCountCh
 - (void) netsocketConnected:(NetSocket*)inNetSocket
 {
     if(inNetSocket == socket){
-        [self setIpConnected:[socket isConnected]];
-		if(ipConnected){
-		}
+        [self setIpConnected:YES];
     }
 }
 
@@ -551,7 +574,6 @@ NSString* ORLakeShore336TimeoutCountChanged     = @"ORLakeShore336TimeoutCountCh
 - (void) netsocketDisconnected:(NetSocket*)inNetSocket
 {
     if(inNetSocket == socket){
-        [self setIpConnected:[socket isConnected]];
         [self setIpConnected:NO];
 		[socket autorelease];
 		socket = nil;
@@ -808,11 +830,11 @@ NSString* ORLakeShore336TimeoutCountChanged     = @"ORLakeShore336TimeoutCountCh
         if(aCmd){
             if(![aCmd hasSuffix:@"\r"]) aCmd = [aCmd stringByAppendingString:@"\r"];
             
-            [self startTimeout:3];
             [self writeToDevice: aCmd];
             if([aCmd rangeOfString:@"?"].length != NSNotFound){
                 [self setLastRequest:aCmd];
                 [self readFromDevice];
+                [self startTimeout:3];
             }
             else {
                 [self setLastRequest:nil];
@@ -832,6 +854,10 @@ NSString* ORLakeShore336TimeoutCountChanged     = @"ORLakeShore336TimeoutCountCh
        // int i = [NSString ]
         
     }
+    if([lastRequest rangeOfString:@"?"].location!=NSNotFound){
+        [self cancelTimeout];
+    }
+    [self clearTimeoutAlarm];
     [self setLastRequest:nil];
     [self processOneCommandFromQueue];
 }

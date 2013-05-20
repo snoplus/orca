@@ -81,6 +81,10 @@
                          name : ORLakeShore336USBInterfaceChanged
 						object: nil];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(pollTimeChanged:)
+                         name : ORLakeShore336PollTimeChanged
+						object: model];
 }
 
 - (void) awakeFromNib
@@ -99,6 +103,7 @@
 	[self ipConnectedChanged:nil];
 	[self canChangeConnectionProtocolChanged:nil];
 	[self serialNumberChanged:nil];
+	[self pollTimeChanged:nil];
 }
 
 - (NSMutableArray*) inputs
@@ -114,6 +119,11 @@
 	if([model connectionProtocol] == kLakeShore336UseUSB){
 		[[self window] setTitle:[model title]];
 	}
+}
+
+- (void) pollTimeChanged:(NSNotification*)aNote
+{
+	[pollTimePopup selectItemWithTag: [model pollTime]];
 }
 
 - (void) interfacesChanged:(NSNotification*)aNote
@@ -167,12 +177,18 @@
 	[usbConnectButton setEnabled:!runInProgress || !locked];
 	[ipAddressTextField setEnabled:!locked];
 	[serialNumberPopup setEnabled:!locked];
+	[pollTimePopup		setEnabled:!locked];
 }
 
 #pragma mark •••Actions
+- (IBAction) pollTimeAction:(id)sender
+{
+	[model setPollTime:[[sender selectedItem] tag]];
+}
+
 - (IBAction) connectAction: (id) aSender
 {
-    [model connect ];
+    if(![model isConnected])[model connect];
 }
 
 - (IBAction) sendCommandAction:(id)sender

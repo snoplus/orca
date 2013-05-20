@@ -42,6 +42,7 @@
     IBOutlet NSButton*		sendCommandButton;
     IBOutlet NSButton*		loadParamsButton;
     IBOutlet ORCompositePlotView*	plotter;
+	IBOutlet NSPopUpButton* pollTimePopup;
 }
 
 #pragma mark •••Notifications
@@ -54,6 +55,7 @@
 - (void) ipAddressChanged:(NSNotification*)aNote;
 - (void) interfacesChanged:(NSNotification*)aNote;
 - (void) serialNumberChanged:(NSNotification*)aNote;
+- (void) pollTimeChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) serialNumberAction:(id)sender;
@@ -66,6 +68,7 @@
 - (IBAction) connectAction: (id) aSender;
 - (IBAction) loadParamsAction:(id)sender;
 - (IBAction) lockAction:(id)sender;
+- (IBAction) pollTimeAction:(id)sender;
 
 - (void) populateInterfacePopup;
 - (void) validateInterfacePopup;
