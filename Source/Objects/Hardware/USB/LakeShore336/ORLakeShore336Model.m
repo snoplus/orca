@@ -828,7 +828,7 @@ NSString* ORLakeShore336PollTimeChanged         = @"ORLakeShore336PollTimeChange
  	@synchronized(self){
         NSString* aCmd = [self nextCmd];
         if(aCmd){
-            if(![aCmd hasSuffix:@"\r"]) aCmd = [aCmd stringByAppendingString:@"\r"];
+            if(![aCmd hasSuffix:@"\n"]) aCmd = [aCmd stringByAppendingString:@"\n"];
             
             [self writeToDevice: aCmd];
             if([aCmd rangeOfString:@"?"].length != NSNotFound){
