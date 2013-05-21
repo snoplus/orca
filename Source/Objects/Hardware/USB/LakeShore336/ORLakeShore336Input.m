@@ -18,6 +18,7 @@
 //-------------------------------------------------------------
 
 #import "ORLakeShore336Input.h"
+#import "ORTimeRate.h"
 
 NSString* ORLakeShore336InputSensorTypeChanged   = @"ORLakeShore336InputSensorTypeChanged";
 NSString* ORLakeShore336InputAutoRangeChanged    = @"ORLakeShore336InputAutoRangeChanged";
@@ -29,11 +30,29 @@ NSString* ORLakeShore336InputTemperatureChanged  = @"ORLakeShore336InputTemperat
 @implementation ORLakeShore336Input
 
 @synthesize channel,temperature, sensorType, autoRange, range, compensation, units;
+@synthesize lowLimit,highLimit,minValue,maxValue,timeRate,timeMeasured;
+
+- (void) dealloc
+{
+    [timeRate release];
+    [super dealloc];
+}
 
 - (void) setTemperature:(float)aValue
 {
     temperature = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORLakeShore336InputTemperatureChanged object:self];
+
+    //get the time(UT!)
+    time_t	ut_Time;
+    time(&ut_Time);
+    timeMeasured = ut_Time;
+
+    if(timeRate == nil) self.timeRate = [[[ORTimeRate alloc] init] autorelease];
+    [timeRate addDataToTimeAverage:aValue];
+
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:channel] forKey:@"Index"];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORLakeShore336InputTemperatureChanged object:self userInfo:userInfo];
 }
 
 - (void) setSensorType:(ls336SensorTypeEnum)aValue
@@ -88,6 +107,18 @@ NSString* ORLakeShore336InputTemperatureChanged  = @"ORLakeShore336InputTemperat
     [self setRange:         [decoder decodeIntForKey:   @"range"]];
     [self setCompensation:  [decoder decodeBoolForKey:  @"compensation"]];
     [self setUnits:         [decoder decodeIntForKey:   @"units"]];
+    [self setLowLimit:      [decoder decodeFloatForKey: @"lowLimit"]];
+    [self setHighLimit:      [decoder decodeFloatForKey: @"highLimit"]];
+    [self setMinValue:      [decoder decodeFloatForKey: @"minValue"]];
+    [self setMaxValue:      [decoder decodeFloatForKey: @"maxValue"]];
+
+    if(lowLimit < 0.001 && highLimit < 0.001 && minValue < 0.001 && maxValue < 0.001){
+        lowLimit = 0;
+        highLimit = 350;
+        minValue = 0;
+        maxValue = 350;
+    }
+    
     [[self undoManager] enableUndoRegistration];
 	
     return self;
@@ -101,6 +132,22 @@ NSString* ORLakeShore336InputTemperatureChanged  = @"ORLakeShore336InputTemperat
     [encoder encodeInt:range            forKey:@"range"];
     [encoder encodeBool:compensation    forKey:@"compensation"];
     [encoder encodeInt:units            forKey:@"units"];
+    [encoder encodeFloat:lowLimit       forKey:@"lowLimit"];
+    [encoder encodeFloat:highLimit      forKey:@"highLimit"];
+    [encoder encodeFloat:minValue       forKey:@"minValue"];
+    [encoder encodeFloat:maxValue       forKey:@"maxValue"];
 }
 
+- (int) numberPointsInTimeRate
+{
+    return [timeRate count];
+}
+
+- (void) timeRateAtIndex:(int)i x:(double*)xValue y:(double*)yValue
+{
+    int count   = [timeRate count];
+    int index   = count-i-1;
+    *xValue     = [timeRate timeSampledAtIndex:index];
+    *yValue     = [timeRate valueAtIndex:index];
+}
 @end

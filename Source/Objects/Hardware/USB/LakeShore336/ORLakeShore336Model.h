@@ -22,6 +22,7 @@
 #import "ORLakeShore336Model.h"
 #import "ORUSB.h"
 #import "ORGroup.h"
+#import "ORAdcProcessing.h"
 
 #define kLakeShore336UseUSB	0
 #define kLakeShore336UseIP	1
@@ -34,18 +35,18 @@
 @class ORAlarm;
 @class ORSafeQueue;
 
-@interface ORLakeShore336Model : ORGroup <USBDevice> {
-	NSLock* localLock;
+@interface ORLakeShore336Model : ORGroup <USBDevice,ORAdcProcessing> {
+	NSLock*         localLock;
 	ORUSBInterface* usbInterface;
-    int connectionProtocol;
-    NSString* ipAddress;
-    BOOL usbConnected;
-    BOOL ipConnected;
-	NetSocket* socket;
-    BOOL canChangeConnectionProtocol;
-    NSString* serialNumber;
-	ORAlarm*  noUSBAlarm;
-	BOOL okToCheckUSB;
+    int             connectionProtocol;
+    NSString*       ipAddress;
+    BOOL            usbConnected;
+    BOOL            ipConnected;
+	NetSocket*      socket;
+    BOOL            canChangeConnectionProtocol;
+    NSString*       serialNumber;
+	ORAlarm*        noUSBAlarm;
+	BOOL            okToCheckUSB;
 	BOOL			isValid;
 	ORSafeQueue*	cmdQueue;
 	id				lastRequest;
@@ -99,6 +100,7 @@
 - (NSMutableArray*)inputs;
 - (NSMutableArray*)heaters;
 - (BOOL) isConnected;
+- (BOOL) anyInputsUsingTimeRate:(id)aTimeRate;
 
 #pragma mark •••Cmd Handling
 - (id) nextCmd;
@@ -135,6 +137,19 @@
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
+
+#pragma mark •••Adc Processing Protocol
+- (void) processIsStarting;
+- (void) processIsStopping;
+- (void) startProcessCycle;
+- (void) endProcessCycle;
+- (BOOL) processValue:(int)channel;
+- (void) setProcessOutput:(int)channel value:(int)value;
+- (NSString*) processingTitle;
+- (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit  channel:(int)channel;
+- (double) convertedValue:(int)channel;
+- (double) maxValueForChan:(int)channel;
+
 @end
 
 extern NSString* ORLakeShore336SerialNumberChanged;

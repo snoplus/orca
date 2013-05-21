@@ -18,7 +18,7 @@
 
 
 @class ORUSB;
-@class ORCompositePlotView;
+@class ORCompositeTimeLineView;
 
 @interface ORLakeShore336Controller : OrcaObjectController 
 {
@@ -41,7 +41,7 @@
     IBOutlet NSTextField*   commandField;
     IBOutlet NSButton*		sendCommandButton;
     IBOutlet NSButton*		loadParamsButton;
-    IBOutlet ORCompositePlotView*	plotter;
+    IBOutlet ORCompositeTimeLineView*	plotter;
 	IBOutlet NSPopUpButton* pollTimePopup;
 }
 
@@ -57,6 +57,8 @@
 - (void) serialNumberChanged:(NSNotification*)aNote;
 - (void) pollTimeChanged:(NSNotification*)aNote;
 - (void) setButtonStates;
+- (void) updateTimePlot:(NSNotification*)aNote;
+- (NSColor*) colorForDataSet:(int)set;
 
 #pragma mark •••Actions
 - (IBAction) serialNumberAction:(id)sender;

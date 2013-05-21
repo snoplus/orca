@@ -22,7 +22,7 @@ typedef enum  {
     kNTCRTD         = 3,
 } ls336SensorTypeEnum;
 
-
+@class ORTimeRate;
 
 @interface ORLakeShore336Input : NSObject
 {
@@ -33,9 +33,17 @@ typedef enum  {
     int     range;
     BOOL    compensation;
     int     units;
+    double   lowLimit;
+    double   highLimit;
+    double   minValue;
+    double   maxValue;
+    ORTimeRate*		timeRate;
+    unsigned long   timeMeasured;
 }
 
 - (NSUndoManager*) undoManager;
+- (int) numberPointsInTimeRate;
+- (void) timeRateAtIndex:(int)i x:(double*)xValue y:(double*)yValue;
 
 #pragma mark ***Archival
 - (id)initWithCoder:(NSCoder*)decoder;
@@ -48,6 +56,12 @@ typedef enum  {
 @property (assign,nonatomic) int                    range;
 @property (assign,nonatomic) BOOL                   compensation;
 @property (assign,nonatomic) int                    units;
+@property (assign,nonatomic) double                  lowLimit;
+@property (assign,nonatomic) double                  highLimit;
+@property (assign,nonatomic) double                  minValue;
+@property (assign,nonatomic) double                  maxValue;
+@property (retain)           ORTimeRate*             timeRate;
+@property (assign)           unsigned long           timeMeasured;
 
 @end
 

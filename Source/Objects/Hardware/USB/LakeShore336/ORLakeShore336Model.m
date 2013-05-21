@@ -260,6 +260,14 @@ NSString* ORLakeShore336PollTimeChanged         = @"ORLakeShore336PollTimeChange
 }
 
 #pragma mark ***Accessors
+- (BOOL) anyInputsUsingTimeRate:(id)aTimeRate
+{
+    for(id anInput in inputs){
+        if([anInput timeRate] == aTimeRate)return YES;
+    }
+    return NO;
+}
+
 - (int) pollTime
 {
     return pollTime;
@@ -826,6 +834,80 @@ NSString* ORLakeShore336PollTimeChanged         = @"ORLakeShore336PollTimeChange
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORLakeShore336PortClosedAfterTimeout object:self];
 	}
 	[timeoutAlarm postAlarm];
+}
+#pragma mark •••Bit Processing Protocol
+- (void) processIsStarting
+{
+}
+
+- (void) processIsStopping
+{
+}
+
+//note that everything called by these routines MUST be threadsafe
+- (void) startProcessCycle
+{
+}
+
+- (void) endProcessCycle
+{
+}
+
+- (BOOL) processValue:(int)channel
+{
+	return 1; //not used, just return true
+}
+
+- (void) setProcessOutput:(int)channel value:(int)value
+{
+}
+
+- (NSString*) identifier
+{
+    return [NSString stringWithFormat:@"LS336,%lu",[self uniqueIdNumber]];
+}
+
+- (NSString*) processingTitle
+{
+    return [self identifier];
+}
+
+- (double) convertedValue:(int)aChan
+{
+    if(aChan>=0 && aChan<4){
+        return [[inputs objectAtIndex:aChan] temperature];
+    }
+	return 0;
+}
+
+- (double) maxValueForChan:(int)aChan
+{
+    if(aChan>=0 && aChan<4){
+        return [[inputs objectAtIndex:aChan] maxValue];
+    }
+    else return 0;
+}
+
+- (double) minValueForChan:(int)aChan
+{
+    if(aChan>=0 && aChan<4){
+        return [[inputs objectAtIndex:aChan] minValue];
+    }
+    else return 0;
+}
+
+- (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit channel:(int)channel
+{
+	@synchronized(self){
+		if(channel>=0 && channel<4){
+			*theLowLimit  = [[inputs objectAtIndex:channel] lowLimit];
+			*theHighLimit = [[inputs objectAtIndex:channel] highLimit];
+		}
+		else {
+			*theLowLimit = 0;
+			*theHighLimit = 300;
+		}
+	}
 }
 
 @end

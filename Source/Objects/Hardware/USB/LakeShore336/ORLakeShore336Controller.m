@@ -23,6 +23,10 @@
 #import "ORUSBInterface.h"
 #import "ORLakeShore336Input.h"
 #import "ORLakeShore336Heater.h"
+#import "ORCompositePlotView.h"
+#import "ORTimeAxis.h"
+#import "ORTimeLinePlot.h"
+#import "ORTimeRate.h"
 
 @implementation ORLakeShore336Controller
 - (id) init
@@ -85,11 +89,37 @@
                      selector : @selector(pollTimeChanged:)
                          name : ORLakeShore336PollTimeChanged
 						object: model];
+    
+    [notifyCenter addObserver : self
+					 selector : @selector(updateTimePlot:)
+						 name : ORRateAverageChangedNotification
+					   object : nil];
+
 }
 
 - (void) awakeFromNib
 {
 	[self populateInterfacePopup];
+    
+    [[plotter yAxis] setRngLow:0. withHigh:350.];
+	[[plotter yAxis] setRngLimitsLow:0 withHigh:350 withMinRng:10];
+	[plotter setUseGradient:YES];
+    
+    [[plotter xAxis] setRngLow:0.0 withHigh:10000];
+	[[plotter xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
+    
+    int i;
+    for(i=0;i<4;i++){
+        ORTimeLinePlot* aPlot;
+        aPlot= [[ORTimeLinePlot alloc] initWithTag:0 andDataSource:self];
+        [plotter addPlot: aPlot];
+        [aPlot setName:[NSString stringWithFormat:@"Temp %c",'A'+i]];
+		[aPlot setLineColor:[self colorForDataSet:i]];
+        [aPlot release];
+    }
+    [plotter setShowLegend:YES];
+
+
 	[super awakeFromNib];
 }
 
@@ -104,6 +134,14 @@
 	[self canChangeConnectionProtocolChanged:nil];
 	[self serialNumberChanged:nil];
 	[self pollTimeChanged:nil];
+	[self updateTimePlot:nil];
+}
+
+- (void) updateTimePlot:(NSNotification*)aNote
+{
+	if(!aNote || [model anyInputsUsingTimeRate:[aNote object]]){
+		[plotter setNeedsDisplay:YES];
+	}
 }
 
 - (NSMutableArray*) inputs
@@ -182,6 +220,36 @@
 	[ipAddressTextField setEnabled:!locked];
 	[serialNumberPopup setEnabled:!locked];
 	[pollTimePopup		setEnabled:!locked];
+}
+
+
+#pragma mark •••Plot DataSource
+- (NSColor*) colorForDataSet:(int)set
+{
+	if(set==0)      return [NSColor redColor];
+	else if(set==1) return [NSColor orangeColor];
+	else if(set==2) return [NSColor blueColor];
+	else            return [NSColor blackColor];
+}
+
+- (int) numberPointsInPlot:(id)aPlotter
+{
+	int set = [aPlotter tag];
+    if(set>=0 && set<4) return [[[model inputs] objectAtIndex:set] numberPointsInTimeRate];
+    else return 0;
+}
+
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
+{
+	int set = [aPlotter tag];
+    if(set>=0 && set<4){
+        [[[model inputs] objectAtIndex:set] timeRateAtIndex:i x:xValue y:yValue];
+    }
+    else {
+        *xValue = 0;
+        *yValue = 0;
+        
+    }
 }
 
 #pragma mark •••Actions
