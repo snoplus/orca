@@ -111,7 +111,7 @@
     int i;
     for(i=0;i<4;i++){
         ORTimeLinePlot* aPlot;
-        aPlot= [[ORTimeLinePlot alloc] initWithTag:0 andDataSource:self];
+        aPlot= [[ORTimeLinePlot alloc] initWithTag:i andDataSource:self];
         [plotter addPlot: aPlot];
         [aPlot setName:[NSString stringWithFormat:@"Temp %c",'A'+i]];
 		[aPlot setLineColor:[self colorForDataSet:i]];
