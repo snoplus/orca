@@ -1916,6 +1916,7 @@
 		84997892174BA11400BFEE3E /* OREHS130nModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8499788A174BA11400BFEE3E /* OREHS130nModel.m */; };
 		84997895174BA2F600BFEE3E /* ORiSegHVCard.h in Headers */ = {isa = PBXBuildFile; fileRef = 84997893174BA2F500BFEE3E /* ORiSegHVCard.h */; };
 		84997896174BA2F600BFEE3E /* ORiSegHVCard.m in Sources */ = {isa = PBXBuildFile; fileRef = 84997894174BA2F500BFEE3E /* ORiSegHVCard.m */; };
+		84997897174BEAF000BFEE3E /* ORPollingTimeStampReadout.hh in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84997876174A6B1D00BFEE3E /* ORPollingTimeStampReadout.hh */; };
 		84997E850CE37CBA002CFA70 /* ORVme64CrateController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84997E7C0CE37CBA002CFA70 /* ORVme64CrateController.h */; };
 		84997E860CE37CBA002CFA70 /* ORVme64CrateModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84997E7D0CE37CBA002CFA70 /* ORVme64CrateModel.h */; };
 		84997E870CE37CBA002CFA70 /* ORVme64CrateModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84997E7E0CE37CBA002CFA70 /* ORVme64CrateModel.m */; };
@@ -3123,6 +3124,7 @@
 			dstSubfolderSpec = 7;
 			files = (
 				362F928B1681A05100F3ACB4 /* SNO.cc in VME_Copy */,
+				84997897174BEAF000BFEE3E /* ORPollingTimeStampReadout.hh in VME_Copy */,
 				84253FC412F0751A00472314 /* VmeSBCGeneralOperations.h in VME_Copy */,
 				43ADFEB910B6E2090044617C /* HW_Specific.icc in VME_Copy */,
 				840B00AA1206F70B009095A4 /* goScript in VME_Copy */,
