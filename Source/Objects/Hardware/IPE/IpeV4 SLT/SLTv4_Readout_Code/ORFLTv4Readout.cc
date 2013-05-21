@@ -492,7 +492,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                                 theEventData.histogramInfo  = pageAB & 0x1;//one bit
                                 
                                 //ship data record
-                                totalLength = 2 + (sizeof(katrinV4HistogramDataStruct)/sizeof(long)) + theEventData.histogramLength;// 2 = header + locationWord
+                                totalLength = 2 + (sizeof(katrinV4HistogramDataStruct)/sizeof(uint32_t)) + theEventData.histogramLength;// 2 = header + locationWord
                                 ensureDataCanHold(totalLength); 
                                 data[dataIndex++] = histogramId | totalLength;    
                                 data[dataIndex++] = location | chan<<8;
@@ -1233,7 +1233,7 @@ fprintf(stdout,"4x - readpr:%i, writeptr:%i\n",readptrx,writeptrx);fflush(stdout
                                 theEventData.histogramInfo  = pageAB & 0x1;//one bit
                                 
                                 //ship data record
-                                totalLength = 2 + (sizeof(katrinV4HistogramDataStruct)/sizeof(long)) + theEventData.histogramLength;// 2 = header + locationWord
+                                totalLength = 2 + (sizeof(katrinV4HistogramDataStruct)/sizeof(uint32_t)) + theEventData.histogramLength;// 2 = header + locationWord
                                 ensureDataCanHold(totalLength); 
                                 data[dataIndex++] = histogramId | totalLength;    
                                 data[dataIndex++] = location | chan<<8;
@@ -1338,7 +1338,7 @@ bool ORFLTv4Readout::Stop()
 				theEventData.histogramLength =2048;
 				
 				//ship data record
-				totalLength = 2 + (sizeof(katrinV4HistogramDataStruct)/sizeof(long)) + theEventData.histogramLength;// 2 = header + locationWord
+				totalLength = 2 + (sizeof(katrinV4HistogramDataStruct)/sizeof(uint32_t)) + theEventData.histogramLength;// 2 = header + locationWord
 				ensureDataCanHold(totalLength); 
 				data[dataIndex++] = histogramId | totalLength;    
 				data[dataIndex++] = location | chan<<8;
