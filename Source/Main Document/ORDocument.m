@@ -480,7 +480,7 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 				[self checkControllers];
 			}
 			else {
-				NSLogColor([NSColor redColor], @"Shift Down down....Dialogs NOT loaded.\n");
+				NSLogColor([NSColor redColor], @"Shift Key down....Dialogs NOT loaded.\n");
 			}
 		}
 		@catch(NSException* localException) {
