@@ -17,10 +17,10 @@
 //for the use of this software.
 //-------------------------------------------------------------
 @class ORAlarm;
-@class ORiSeg8ChanHV;
+@class ORiSegHVCard;
 
 @interface ORDetectorRamper : NSObject {
-	ORiSeg8ChanHV*		delegate;
+	ORiSegHVCard*		delegate;
 	short				channel;
     
     //user parameters
@@ -61,7 +61,7 @@
 - (NSString*) hwGoalString;
 - (void) execute;
 
-@property (nonatomic,assign) ORiSeg8ChanHV* delegate;
+@property (nonatomic,assign) ORiSegHVCard* delegate;
 @property (nonatomic,assign) short channel;
 @property (nonatomic,assign) short stepWait;
 @property (nonatomic,assign) int target;

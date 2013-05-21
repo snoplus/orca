@@ -19,9 +19,9 @@
 //-------------------------------------------------------------
 
 #pragma mark ***Imported Files
-#import "ORiSeg8ChanHV.h"
+#import "ORiSegHVCard.h"
 
-@interface OREHQ8060nModel : ORiSeg8ChanHV
+@interface OREHQ8060nModel : ORiSegHVCard
 {
 }
 

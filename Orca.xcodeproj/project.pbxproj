@@ -1322,12 +1322,10 @@
 		8457D12112F8816900D3E3B4 /* OREHS8260pController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8457D11912F8816900D3E3B4 /* OREHS8260pController.m */; };
 		8457D12412F8816900D3E3B4 /* OREHS8260pModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8457D11C12F8816900D3E3B4 /* OREHS8260pModel.h */; };
 		8457D12512F8816900D3E3B4 /* OREHS8260pModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8457D11D12F8816900D3E3B4 /* OREHS8260pModel.m */; };
-		8457D23912F9933400D3E3B4 /* ORiSeg8ChanHV.h in Headers */ = {isa = PBXBuildFile; fileRef = 8457D23712F9933400D3E3B4 /* ORiSeg8ChanHV.h */; };
-		8457D23A12F9933400D3E3B4 /* ORiSeg8ChanHV.m in Sources */ = {isa = PBXBuildFile; fileRef = 8457D23812F9933400D3E3B4 /* ORiSeg8ChanHV.m */; };
-		8457D25512F9986E00D3E3B4 /* ORiSeg8ChanHVController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8457D25312F9986E00D3E3B4 /* ORiSeg8ChanHVController.h */; };
-		8457D25612F9986E00D3E3B4 /* ORiSeg8ChanHVController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8457D25412F9986E00D3E3B4 /* ORiSeg8ChanHVController.m */; };
-		8457D37712F9AB8A00D3E3B4 /* ORiSeg8ChanHVDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 8457D37512F9AB8A00D3E3B4 /* ORiSeg8ChanHVDecoders.h */; };
-		8457D37812F9AB8A00D3E3B4 /* ORiSeg8ChanHVDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 8457D37612F9AB8A00D3E3B4 /* ORiSeg8ChanHVDecoders.m */; };
+		8457D25512F9986E00D3E3B4 /* ORiSegHVCardController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8457D25312F9986E00D3E3B4 /* ORiSegHVCardController.h */; };
+		8457D25612F9986E00D3E3B4 /* ORiSegHVCardController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8457D25412F9986E00D3E3B4 /* ORiSegHVCardController.m */; };
+		8457D37712F9AB8A00D3E3B4 /* ORiSegHVCardDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 8457D37512F9AB8A00D3E3B4 /* ORiSegHVCardDecoders.h */; };
+		8457D37812F9AB8A00D3E3B4 /* ORiSegHVCardDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 8457D37612F9AB8A00D3E3B4 /* ORiSegHVCardDecoders.m */; };
 		8458E8ED15DA89B5005C43A9 /* Mail.app in Resources */ = {isa = PBXBuildFile; fileRef = 8458E8EC15DA89B5005C43A9 /* Mail.app */; };
 		8458E8EE15DA89EF005C43A9 /* Mail.app in Sources */ = {isa = PBXBuildFile; fileRef = 8458E8EC15DA89B5005C43A9 /* Mail.app */; };
 		8458E91515DA8A2A005C43A9 /* ScriptingBridge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8458E91415DA8A2A005C43A9 /* ScriptingBridge.framework */; };
@@ -1910,6 +1908,14 @@
 		849978741746C7C100BFEE3E /* PollingTimeStamp.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8499786C1746C7C100BFEE3E /* PollingTimeStamp.gif */; };
 		84997878174A6B1D00BFEE3E /* ORPollingTimeStampReadout.hh in Headers */ = {isa = PBXBuildFile; fileRef = 84997876174A6B1D00BFEE3E /* ORPollingTimeStampReadout.hh */; };
 		84997879174A6DA500BFEE3E /* ORPollingTimeStampReadout.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84997875174A6B1C00BFEE3E /* ORPollingTimeStampReadout.cc */; };
+		8499788B174BA11400BFEE3E /* EHS130n.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84997883174BA11400BFEE3E /* EHS130n.nib */; };
+		8499788C174BA11400BFEE3E /* EHS130n.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84997884174BA11400BFEE3E /* EHS130n.tif */; };
+		8499788D174BA11400BFEE3E /* OREHS130nController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84997885174BA11400BFEE3E /* OREHS130nController.h */; };
+		8499788E174BA11400BFEE3E /* OREHS130nController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84997886174BA11400BFEE3E /* OREHS130nController.m */; };
+		84997891174BA11400BFEE3E /* OREHS130nModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84997889174BA11400BFEE3E /* OREHS130nModel.h */; };
+		84997892174BA11400BFEE3E /* OREHS130nModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8499788A174BA11400BFEE3E /* OREHS130nModel.m */; };
+		84997895174BA2F600BFEE3E /* ORiSegHVCard.h in Headers */ = {isa = PBXBuildFile; fileRef = 84997893174BA2F500BFEE3E /* ORiSegHVCard.h */; };
+		84997896174BA2F600BFEE3E /* ORiSegHVCard.m in Sources */ = {isa = PBXBuildFile; fileRef = 84997894174BA2F500BFEE3E /* ORiSegHVCard.m */; };
 		84997E850CE37CBA002CFA70 /* ORVme64CrateController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84997E7C0CE37CBA002CFA70 /* ORVme64CrateController.h */; };
 		84997E860CE37CBA002CFA70 /* ORVme64CrateModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84997E7D0CE37CBA002CFA70 /* ORVme64CrateModel.h */; };
 		84997E870CE37CBA002CFA70 /* ORVme64CrateModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84997E7E0CE37CBA002CFA70 /* ORVme64CrateModel.m */; };
@@ -4301,12 +4307,10 @@
 		8457D11912F8816900D3E3B4 /* OREHS8260pController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OREHS8260pController.m; path = Source/Objects/Hardware/HV/MPod/EHS8260p/OREHS8260pController.m; sourceTree = SOURCE_ROOT; };
 		8457D11C12F8816900D3E3B4 /* OREHS8260pModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OREHS8260pModel.h; path = Source/Objects/Hardware/HV/MPod/EHS8260p/OREHS8260pModel.h; sourceTree = SOURCE_ROOT; };
 		8457D11D12F8816900D3E3B4 /* OREHS8260pModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OREHS8260pModel.m; path = Source/Objects/Hardware/HV/MPod/EHS8260p/OREHS8260pModel.m; sourceTree = SOURCE_ROOT; };
-		8457D23712F9933400D3E3B4 /* ORiSeg8ChanHV.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORiSeg8ChanHV.h; sourceTree = "<group>"; };
-		8457D23812F9933400D3E3B4 /* ORiSeg8ChanHV.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORiSeg8ChanHV.m; sourceTree = "<group>"; };
-		8457D25312F9986E00D3E3B4 /* ORiSeg8ChanHVController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORiSeg8ChanHVController.h; path = "Source/Objects/Hardware/HV/MPod/MPod Base Classes/ORiSeg8ChanHVController.h"; sourceTree = SOURCE_ROOT; };
-		8457D25412F9986E00D3E3B4 /* ORiSeg8ChanHVController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORiSeg8ChanHVController.m; path = "Source/Objects/Hardware/HV/MPod/MPod Base Classes/ORiSeg8ChanHVController.m"; sourceTree = SOURCE_ROOT; };
-		8457D37512F9AB8A00D3E3B4 /* ORiSeg8ChanHVDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORiSeg8ChanHVDecoders.h; path = "Source/Objects/Hardware/HV/MPod/MPod Base Classes/ORiSeg8ChanHVDecoders.h"; sourceTree = SOURCE_ROOT; };
-		8457D37612F9AB8A00D3E3B4 /* ORiSeg8ChanHVDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORiSeg8ChanHVDecoders.m; path = "Source/Objects/Hardware/HV/MPod/MPod Base Classes/ORiSeg8ChanHVDecoders.m"; sourceTree = SOURCE_ROOT; };
+		8457D25312F9986E00D3E3B4 /* ORiSegHVCardController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORiSegHVCardController.h; path = "Source/Objects/Hardware/HV/MPod/MPod Base Classes/ORiSegHVCardController.h"; sourceTree = SOURCE_ROOT; };
+		8457D25412F9986E00D3E3B4 /* ORiSegHVCardController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORiSegHVCardController.m; path = "Source/Objects/Hardware/HV/MPod/MPod Base Classes/ORiSegHVCardController.m"; sourceTree = SOURCE_ROOT; };
+		8457D37512F9AB8A00D3E3B4 /* ORiSegHVCardDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORiSegHVCardDecoders.h; path = "Source/Objects/Hardware/HV/MPod/MPod Base Classes/ORiSegHVCardDecoders.h"; sourceTree = SOURCE_ROOT; };
+		8457D37612F9AB8A00D3E3B4 /* ORiSegHVCardDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORiSegHVCardDecoders.m; path = "Source/Objects/Hardware/HV/MPod/MPod Base Classes/ORiSegHVCardDecoders.m"; sourceTree = SOURCE_ROOT; };
 		8458E8EC15DA89B5005C43A9 /* Mail.app */ = {isa = PBXFileReference; lastKnownFileType = wrapper.application; name = Mail.app; path = /Applications/Mail.app; sourceTree = "<absolute>"; };
 		8458E91415DA8A2A005C43A9 /* ScriptingBridge.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ScriptingBridge.framework; path = ../../../../System/Library/Frameworks/ScriptingBridge.framework; sourceTree = SOURCE_ROOT; };
 		8458EA3315DBCFF6005C43A9 /* MPodCrate.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = MPodCrate.nib; path = Source/Objects/Hardware/HV/MPod/MPodCrate/MPodCrate.nib; sourceTree = SOURCE_ROOT; };
@@ -4902,6 +4906,14 @@
 		8499786C1746C7C100BFEE3E /* PollingTimeStamp.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = PollingTimeStamp.gif; sourceTree = "<group>"; };
 		84997875174A6B1C00BFEE3E /* ORPollingTimeStampReadout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ORPollingTimeStampReadout.cc; sourceTree = "<group>"; };
 		84997876174A6B1D00BFEE3E /* ORPollingTimeStampReadout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ORPollingTimeStampReadout.hh; sourceTree = "<group>"; };
+		84997883174BA11400BFEE3E /* EHS130n.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = EHS130n.nib; sourceTree = "<group>"; };
+		84997884174BA11400BFEE3E /* EHS130n.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = EHS130n.tif; sourceTree = "<group>"; };
+		84997885174BA11400BFEE3E /* OREHS130nController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OREHS130nController.h; sourceTree = "<group>"; };
+		84997886174BA11400BFEE3E /* OREHS130nController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OREHS130nController.m; sourceTree = "<group>"; };
+		84997889174BA11400BFEE3E /* OREHS130nModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OREHS130nModel.h; sourceTree = "<group>"; };
+		8499788A174BA11400BFEE3E /* OREHS130nModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OREHS130nModel.m; sourceTree = "<group>"; };
+		84997893174BA2F500BFEE3E /* ORiSegHVCard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORiSegHVCard.h; sourceTree = "<group>"; };
+		84997894174BA2F500BFEE3E /* ORiSegHVCard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORiSegHVCard.m; sourceTree = "<group>"; };
 		84997E7C0CE37CBA002CFA70 /* ORVme64CrateController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORVme64CrateController.h; path = Source/Objects/Hardware/Vme/VME64Crate/ORVme64CrateController.h; sourceTree = SOURCE_ROOT; };
 		84997E7D0CE37CBA002CFA70 /* ORVme64CrateModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORVme64CrateModel.h; path = Source/Objects/Hardware/Vme/VME64Crate/ORVme64CrateModel.h; sourceTree = SOURCE_ROOT; };
 		84997E7E0CE37CBA002CFA70 /* ORVme64CrateModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORVme64CrateModel.m; path = Source/Objects/Hardware/Vme/VME64Crate/ORVme64CrateModel.m; sourceTree = SOURCE_ROOT; };
@@ -8834,6 +8846,7 @@
 			isa = PBXGroup;
 			children = (
 				8472AA5412DB44B400DEEB02 /* MPod Base Classes */,
+				84997882174BA11200BFEE3E /* EHS130n */,
 				8472AA4B12DB44B300DEEB02 /* EHQ8060n */,
 				8457D11512F8816900D3E3B4 /* EHS8260p */,
 				8472AA5C12DB44B400DEEB02 /* MPod Controller */,
@@ -8868,12 +8881,12 @@
 				8472AA5A12DB44B400DEEB02 /* ORMPodProtocol.h */,
 				8472AA5912DB44B400DEEB02 /* ORMPodHVCard.h */,
 				8472AA5B12DB44B400DEEB02 /* ORMPodHVCard.m */,
-				8457D23712F9933400D3E3B4 /* ORiSeg8ChanHV.h */,
-				8457D23812F9933400D3E3B4 /* ORiSeg8ChanHV.m */,
-				8457D25312F9986E00D3E3B4 /* ORiSeg8ChanHVController.h */,
-				8457D25412F9986E00D3E3B4 /* ORiSeg8ChanHVController.m */,
-				8457D37512F9AB8A00D3E3B4 /* ORiSeg8ChanHVDecoders.h */,
-				8457D37612F9AB8A00D3E3B4 /* ORiSeg8ChanHVDecoders.m */,
+				84997893174BA2F500BFEE3E /* ORiSegHVCard.h */,
+				84997894174BA2F500BFEE3E /* ORiSegHVCard.m */,
+				8457D25312F9986E00D3E3B4 /* ORiSegHVCardController.h */,
+				8457D25412F9986E00D3E3B4 /* ORiSegHVCardController.m */,
+				8457D37512F9AB8A00D3E3B4 /* ORiSegHVCardDecoders.h */,
+				8457D37612F9AB8A00D3E3B4 /* ORiSegHVCardDecoders.m */,
 				8418376A156FC7AF004EC81F /* ORDetectorRamper.h */,
 				8418376B156FC7AF004EC81F /* ORDetectorRamper.m */,
 				8499A959151B594300CD7AAC /* NoMPodCratePowerHelp */,
@@ -9894,6 +9907,19 @@
 				8499786C1746C7C100BFEE3E /* PollingTimeStamp.gif */,
 			);
 			path = PollingTimeStamp;
+			sourceTree = "<group>";
+		};
+		84997882174BA11200BFEE3E /* EHS130n */ = {
+			isa = PBXGroup;
+			children = (
+				84997883174BA11400BFEE3E /* EHS130n.nib */,
+				84997884174BA11400BFEE3E /* EHS130n.tif */,
+				84997885174BA11400BFEE3E /* OREHS130nController.h */,
+				84997886174BA11400BFEE3E /* OREHS130nController.m */,
+				84997889174BA11400BFEE3E /* OREHS130nModel.h */,
+				8499788A174BA11400BFEE3E /* OREHS130nModel.m */,
+			);
+			path = EHS130n;
 			sourceTree = "<group>";
 		};
 		84997E7B0CE37CBA002CFA70 /* VME64Crate */ = {
@@ -13849,9 +13875,8 @@
 				842544F112F1FF9F00472314 /* BamDetectorView.h in Headers */,
 				8457D12012F8816900D3E3B4 /* OREHS8260pController.h in Headers */,
 				8457D12412F8816900D3E3B4 /* OREHS8260pModel.h in Headers */,
-				8457D23912F9933400D3E3B4 /* ORiSeg8ChanHV.h in Headers */,
-				8457D25512F9986E00D3E3B4 /* ORiSeg8ChanHVController.h in Headers */,
-				8457D37712F9AB8A00D3E3B4 /* ORiSeg8ChanHVDecoders.h in Headers */,
+				8457D25512F9986E00D3E3B4 /* ORiSegHVCardController.h in Headers */,
+				8457D37712F9AB8A00D3E3B4 /* ORiSegHVCardDecoders.h in Headers */,
 				EFB39FD0130BA1C5001220AC /* SNOPController.h in Headers */,
 				EFB39FD2130BA1C5001220AC /* SNOPDetectorView.h in Headers */,
 				EFB39FD4130BA1C5001220AC /* SNOPModel.h in Headers */,
@@ -14035,6 +14060,9 @@
 				8499786F1746C7C100BFEE3E /* ORPollingTimeStampDecoder.h in Headers */,
 				849978711746C7C100BFEE3E /* ORPollingTimeStampModel.h in Headers */,
 				84997878174A6B1D00BFEE3E /* ORPollingTimeStampReadout.hh in Headers */,
+				8499788D174BA11400BFEE3E /* OREHS130nController.h in Headers */,
+				84997891174BA11400BFEE3E /* OREHS130nModel.h in Headers */,
+				84997895174BA2F600BFEE3E /* ORiSegHVCard.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14928,6 +14956,8 @@
 				84CED3941732FB9E000A84C2 /* LakeShore336.tif in Resources */,
 				843EB6F01741208D005CE36C /* CouchHistoryEventsMap.txt in Resources */,
 				849978741746C7C100BFEE3E /* PollingTimeStamp.gif in Resources */,
+				8499788B174BA11400BFEE3E /* EHS130n.nib in Resources */,
+				8499788C174BA11400BFEE3E /* EHS130n.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -15762,9 +15792,8 @@
 				842544F212F1FF9F00472314 /* BamDetectorView.m in Sources */,
 				8457D12112F8816900D3E3B4 /* OREHS8260pController.m in Sources */,
 				8457D12512F8816900D3E3B4 /* OREHS8260pModel.m in Sources */,
-				8457D23A12F9933400D3E3B4 /* ORiSeg8ChanHV.m in Sources */,
-				8457D25612F9986E00D3E3B4 /* ORiSeg8ChanHVController.m in Sources */,
-				8457D37812F9AB8A00D3E3B4 /* ORiSeg8ChanHVDecoders.m in Sources */,
+				8457D25612F9986E00D3E3B4 /* ORiSegHVCardController.m in Sources */,
+				8457D37812F9AB8A00D3E3B4 /* ORiSegHVCardDecoders.m in Sources */,
 				EFB39FD1130BA1C5001220AC /* SNOPController.m in Sources */,
 				EFB39FD3130BA1C5001220AC /* SNOPDetectorView.m in Sources */,
 				EFB39FD5130BA1C5001220AC /* SNOPModel.m in Sources */,
@@ -15929,6 +15958,9 @@
 				84CED3981732FB9E000A84C2 /* ORLakeShore336Model.m in Sources */,
 				849978701746C7C100BFEE3E /* ORPollingTimeStampDecoder.m in Sources */,
 				849978721746C7C100BFEE3E /* ORPollingTimeStampModel.m in Sources */,
+				8499788E174BA11400BFEE3E /* OREHS130nController.m in Sources */,
+				84997892174BA11400BFEE3E /* OREHS130nModel.m in Sources */,
+				84997896174BA2F600BFEE3E /* ORiSegHVCard.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -18,9 +18,9 @@
 //-------------------------------------------------------------
 
 #pragma mark ***Imported Files
-#import "ORiSeg8ChanHVController.h"
+#import "ORiSegHVCardController.h"
 
-@interface OREHS8260pController : ORiSeg8ChanHVController 
+@interface OREHS8260pController : ORiSegHVCardController 
 {
 	IBOutlet   NSPopUpButton*	outputFailureBehaviorPU;
 	IBOutlet   NSPopUpButton*	currentTripBehaviorPU;

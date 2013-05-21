@@ -20,11 +20,11 @@
 
 #pragma mark ***Imported Files
 
-#import "ORiSeg8ChanHV.h"
+#import "ORiSegHVCard.h"
 
 @class ORDetectorRamper;
 
-@interface OREHS8260pModel : ORiSeg8ChanHV
+@interface OREHS8260pModel : ORiSegHVCard
 {
   @private
 	NSMutableArray* rampers;

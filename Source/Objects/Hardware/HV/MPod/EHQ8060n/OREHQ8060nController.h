@@ -18,9 +18,9 @@
 //-------------------------------------------------------------
 
 #pragma mark ***Imported Files
-#import "ORiSeg8ChanHVController.h"
+#import "ORiSegHVCardController.h"
 
-@interface OREHQ8060nController : ORiSeg8ChanHVController 
+@interface OREHQ8060nController : ORiSegHVCardController 
 {
 }
 
