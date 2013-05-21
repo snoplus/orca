@@ -101,6 +101,7 @@
 - (NSMutableArray*)heaters;
 - (BOOL) isConnected;
 - (BOOL) anyInputsUsingTimeRate:(id)aTimeRate;
+- (BOOL) anyHeatersUsingTimeRate:(id)aTimeRate;
 
 #pragma mark •••Cmd Handling
 - (id) nextCmd;

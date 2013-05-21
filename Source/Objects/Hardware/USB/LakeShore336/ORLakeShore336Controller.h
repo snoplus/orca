@@ -30,7 +30,6 @@
 	IBOutlet NSTextField*	ipAddressTextField;
 	IBOutlet NSTabView*		connectionProtocolTabView;
 	IBOutlet NSTextField*	connectionNoteTextField;
-    IBOutlet NSTableView*   inputTableView;
     IBOutlet NSButton* 		testButton;
     IBOutlet NSTextField*   lockDocField;
     IBOutlet NSButton*		lockButton;
@@ -59,6 +58,8 @@
 - (void) setButtonStates;
 - (void) updateTimePlot:(NSNotification*)aNote;
 - (NSColor*) colorForDataSet:(int)set;
+- (NSMutableArray*) inputs;
+- (NSMutableArray*) heaters;
 
 #pragma mark •••Actions
 - (IBAction) serialNumberAction:(id)sender;

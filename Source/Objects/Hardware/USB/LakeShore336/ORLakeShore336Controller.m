@@ -107,6 +107,7 @@
     
     [[plotter xAxis] setRngLow:0.0 withHigh:10000];
 	[[plotter xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
+ 
     
     int i;
     for(i=0;i<4;i++){
@@ -117,7 +118,17 @@
 		[aPlot setLineColor:[self colorForDataSet:i]];
         [aPlot release];
     }
-    [plotter setShowLegend:YES];
+    
+    for(i=0;i<2;i++){
+        ORTimeLinePlot* aPlot;
+        aPlot= [[ORTimeLinePlot alloc] initWithTag:i+4 andDataSource:self];
+        [plotter addPlot: aPlot];
+        [aPlot setName:[NSString stringWithFormat:@"Heater %d",i]];
+		[aPlot setLineColor:[self colorForDataSet:i+4]];
+        [aPlot release];
+    }
+
+    [plotter   setShowLegend:YES];
 
 
 	[super awakeFromNib];
@@ -139,7 +150,7 @@
 
 - (void) updateTimePlot:(NSNotification*)aNote
 {
-	if(!aNote || [model anyInputsUsingTimeRate:[aNote object]]){
+	if(!aNote || [model anyInputsUsingTimeRate:[aNote object]] || [model anyHeatersUsingTimeRate:[aNote object]]){
 		[plotter setNeedsDisplay:YES];
 	}
 }
@@ -147,6 +158,10 @@
 - (NSMutableArray*) inputs
 {
     return [model inputs];
+}
+- (NSMutableArray*) heaters
+{
+    return [model heaters];
 }
 
 #pragma mark •••Notifications
@@ -229,26 +244,41 @@
 	if(set==0)      return [NSColor redColor];
 	else if(set==1) return [NSColor orangeColor];
 	else if(set==2) return [NSColor blueColor];
+	else if(set==3) return [NSColor greenColor];
+	else if(set==4) return [NSColor blackColor];
+	else if(set==5) return [NSColor purpleColor];
 	else            return [NSColor blackColor];
 }
 
 - (int) numberPointsInPlot:(id)aPlotter
 {
 	int set = [aPlotter tag];
-    if(set>=0 && set<4) return [[[model inputs] objectAtIndex:set] numberPointsInTimeRate];
+    if(aPlotter == plotter){
+        if(set>=0 && set<4) return [[[model inputs] objectAtIndex:set] numberPointsInTimeRate];
+        else if(set>=4 && set<6)return [[[model heaters] objectAtIndex:set-4] numberPointsInTimeRate];
+        else return 0;
+    }
     else return 0;
 }
 
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
 	int set = [aPlotter tag];
-    if(set>=0 && set<4){
-        [[[model inputs] objectAtIndex:set] timeRateAtIndex:i x:xValue y:yValue];
+    if(aPlotter == plotter){
+        if(set>=0 && set<4){
+            [[[model inputs] objectAtIndex:set] timeRateAtIndex:i x:xValue y:yValue];
+        }
+        else if(set>=4 && set<6){
+            [[[model heaters] objectAtIndex:set-4] timeRateAtIndex:i x:xValue y:yValue];
+        }
+        else {
+            *xValue = 0;
+            *yValue = 0;
+        }
     }
     else {
         *xValue = 0;
         *yValue = 0;
-        
     }
 }
 

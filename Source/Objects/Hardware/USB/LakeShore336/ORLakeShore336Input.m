@@ -29,11 +29,21 @@ NSString* ORLakeShore336InputTemperatureChanged  = @"ORLakeShore336InputTemperat
 
 @implementation ORLakeShore336Input
 
-@synthesize channel,temperature, sensorType, autoRange, range, compensation, units;
+@synthesize label,channel,temperature, sensorType, autoRange, range, compensation, units;
 @synthesize lowLimit,highLimit,minValue,maxValue,timeRate,timeMeasured;
+- (id) init
+{
+    self = [super init];
+    lowLimit    = 0;
+    highLimit   = 350;
+    minValue    = 0;
+    maxValue    = 350;
+    return self;
+}
 
 - (void) dealloc
 {
+    [label release];
     [timeRate release];
     [super dealloc];
 }
@@ -102,6 +112,7 @@ NSString* ORLakeShore336InputTemperatureChanged  = @"ORLakeShore336InputTemperat
     
     [[self undoManager] disableUndoRegistration];
     [self setChannel:       [decoder decodeIntForKey:   @"channel"]];
+    [self setLabel:         [decoder decodeObjectForKey: @"label"]];
     [self setSensorType:    [decoder decodeIntForKey:   @"sensorType"]];
 	[self setAutoRange:     [decoder decodeBoolForKey:  @"autoRange"]];
     [self setRange:         [decoder decodeIntForKey:   @"range"]];
@@ -127,6 +138,7 @@ NSString* ORLakeShore336InputTemperatureChanged  = @"ORLakeShore336InputTemperat
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [encoder encodeInt:channel          forKey:@"channel"];
+    [encoder encodeObject:label         forKey:@"label"];
     [encoder encodeInt:sensorType       forKey:@"sensorType"];
     [encoder encodeBool:autoRange       forKey:@"autoRange"];
     [encoder encodeInt:range            forKey:@"range"];

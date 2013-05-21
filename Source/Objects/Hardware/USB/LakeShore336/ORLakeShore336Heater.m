@@ -18,15 +18,52 @@
 //-------------------------------------------------------------
 
 #import "ORLakeShore336Heater.h"
+#import "ORTimeRate.h"
 
 NSString* ORLakeShore336HeaterResistanceChanged       = @"ORLakeShore336HeaterResistanceChanged";
 NSString* ORLakeShore336HeaterMaxCurrentChanged       = @"ORLakeShore336HeaterMaxCurrentChanged";
 NSString* ORLakeShore336HeaterMaxUserCurrentChanged   = @"ORLakeShore336HeaterMaxUserCurrentChanged";
 NSString* ORLakeShore336HeaterCurrentOrPowerChanged   = @"ORLakeShore336HeaterCurrentOrPowerChanged";
+NSString* ORLakeShore336OutputChanged = @"ORLakeShore336OutputChanged";
 
 @implementation ORLakeShore336Heater
 
-@synthesize resistance, maxCurrent, maxUserCurrent, currentOrPower;
+@synthesize label,channel,output,resistance, maxCurrent, maxUserCurrent, currentOrPower;
+@synthesize lowLimit,highLimit,minValue,maxValue,timeRate,timeMeasured;
+
+- (id) init
+{
+    self = [super init];
+    lowLimit    = 0;
+    highLimit   = 100;
+    minValue    = 0;
+    maxValue    = 100;
+    return self;
+}
+
+- (void) dealloc
+{
+    [label release];
+    [timeRate release];
+    [super dealloc];
+}
+
+- (void) setOutput:(float)aValue
+{
+    output = aValue;
+    
+    //get the time(UT!)
+    time_t	ut_Time;
+    time(&ut_Time);
+    timeMeasured = ut_Time;
+    
+    if(timeRate == nil) self.timeRate = [[[ORTimeRate alloc] init] autorelease];
+    [timeRate addDataToTimeAverage:aValue];
+    
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:channel] forKey:@"Index"];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORLakeShore336OutputChanged object:self userInfo:userInfo];
+}
 
 - (void) setResistance:(int)aValue
 {
@@ -67,10 +104,23 @@ NSString* ORLakeShore336HeaterCurrentOrPowerChanged   = @"ORLakeShore336HeaterCu
     self = [super init];
     
     [[self undoManager] disableUndoRegistration];
+    [self setChannel:       [decoder decodeIntForKey:   @"channel"]];
     [self setResistance:        [decoder decodeIntForKey:   @"resistance"]];
 	[self setMaxCurrent:        [decoder decodeBoolForKey:  @"maxCurrent"]];
     [self setMaxUserCurrent:    [decoder decodeIntForKey:   @"maxUserCurrent"]];
     [self setCurrentOrPower:    [decoder decodeBoolForKey:  @"currentOrPower"]];
+    [self setLowLimit:      [decoder decodeFloatForKey: @"lowLimit"]];
+    [self setHighLimit:      [decoder decodeFloatForKey: @"highLimit"]];
+    [self setMinValue:      [decoder decodeFloatForKey: @"minValue"]];
+    [self setMaxValue:      [decoder decodeFloatForKey: @"maxValue"]];
+    [self setLabel:      [decoder decodeObjectForKey: @"label"]];
+    
+    if(lowLimit < 0.001 && highLimit < 0.001 && minValue < 0.001 && maxValue < 0.001){
+        lowLimit = 0;
+        highLimit = 100;
+        minValue = 0;
+        maxValue = 100;
+    }
     [[self undoManager] enableUndoRegistration];
 	
     return self;
@@ -78,10 +128,28 @@ NSString* ORLakeShore336HeaterCurrentOrPowerChanged   = @"ORLakeShore336HeaterCu
 
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
+    [encoder encodeInt:channel          forKey:@"channel"];
     [encoder encodeInt:resistance       forKey:@"resistance"];
     [encoder encodeBool:maxCurrent      forKey:@"maxCurrent"];
     [encoder encodeInt:maxUserCurrent   forKey:@"maxUserCurrent"];
     [encoder encodeBool:currentOrPower  forKey:@"currentOrPower"];
+    [encoder encodeFloat:lowLimit       forKey:@"lowLimit"];
+    [encoder encodeFloat:highLimit      forKey:@"highLimit"];
+    [encoder encodeFloat:minValue       forKey:@"minValue"];
+    [encoder encodeFloat:maxValue       forKey:@"maxValue"];
+    [encoder encodeObject:label         forKey:@"label"];
+}
+- (int) numberPointsInTimeRate
+{
+    return [timeRate count];
+}
+
+- (void) timeRateAtIndex:(int)i x:(double*)xValue y:(double*)yValue
+{
+    int count   = [timeRate count];
+    int index   = count-i-1;
+    *xValue     = [timeRate timeSampledAtIndex:index];
+    *yValue     = [timeRate valueAtIndex:index];
 }
 
 @end

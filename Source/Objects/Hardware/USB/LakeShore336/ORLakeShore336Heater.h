@@ -16,12 +16,23 @@
 //express or implied, or assume any liability or responsibility
 //for the use of this software.
 //-------------------------------------------------------------
+@class ORTimeRate;
+
 @interface ORLakeShore336Heater : NSObject
 {
-    int     resistance;
-    int     maxCurrent;
-    int     maxUserCurrent;
-    int     currentOrPower;
+    int             channel;
+    NSString*       label;
+    float           output;
+    int             resistance;
+    int             maxCurrent;
+    int             maxUserCurrent;
+    int             currentOrPower;
+    double          lowLimit;
+    double          highLimit;
+    double          minValue;
+    double          maxValue;
+    ORTimeRate*		timeRate;
+    unsigned long   timeMeasured;
 }
 
 - (NSUndoManager*) undoManager;
@@ -30,10 +41,22 @@
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 
-@property (assign,nonatomic) int    resistance;
-@property (assign,nonatomic) int    maxCurrent;
-@property (assign,nonatomic) int    maxUserCurrent;
-@property (assign,nonatomic) int    currentOrPower;
+- (int)  numberPointsInTimeRate;
+- (void) timeRateAtIndex:(int)i x:(double*)xValue y:(double*)yValue;
+
+@property (assign,nonatomic) NSString*      label;
+@property (assign,nonatomic) int            channel;
+@property (assign,nonatomic) float          output;
+@property (assign,nonatomic) int            resistance;
+@property (assign,nonatomic) int            maxCurrent;
+@property (assign,nonatomic) int            maxUserCurrent;
+@property (assign,nonatomic) double         lowLimit;
+@property (assign,nonatomic) double         highLimit;
+@property (assign,nonatomic) double         minValue;
+@property (assign,nonatomic) double         maxValue;
+@property (assign,nonatomic) int            currentOrPower;
+@property (retain)           ORTimeRate*    timeRate;
+@property (assign)           unsigned long  timeMeasured;
 
 @end
 
@@ -42,3 +65,4 @@ extern NSString* ORLakeShore336HeaterMaxCurrentChanged;
 extern NSString* ORLakeShore336HeaterMaxUserCurrentChanged;
 extern NSString* ORLakeShore336HeaterCompensationChanged;
 extern NSString* ORLakeShore336HeaterCurrentOrPowerChanged;
+extern NSString* ORLakeShore336OutputChanged;

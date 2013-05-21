@@ -267,6 +267,13 @@ NSString* ORLakeShore336PollTimeChanged         = @"ORLakeShore336PollTimeChange
     }
     return NO;
 }
+- (BOOL) anyHeatersUsingTimeRate:(id)aTimeRate
+{
+    for(id aHeater in heaters){
+        if([aHeater timeRate] == aTimeRate)return YES;
+    }
+    return NO;
+}
 
 - (int) pollTime
 {
@@ -302,6 +309,8 @@ NSString* ORLakeShore336PollTimeChanged         = @"ORLakeShore336PollTimeChange
     [self addCmdToQueue:@"KRDG? B"];
     [self addCmdToQueue:@"KRDG? C"];
     [self addCmdToQueue:@"KRDG? D"];
+    [self addCmdToQueue:@"HTR? 1"];
+    [self addCmdToQueue:@"HTR? 2"];
 }
 
 - (int) timeoutCount
@@ -674,6 +683,7 @@ NSString* ORLakeShore336PollTimeChanged         = @"ORLakeShore336PollTimeChange
         for(i=0;i<4;i++){
             ORLakeShore336Input* anInput = [[ORLakeShore336Input alloc] init];
             [anInput setChannel:i];
+            [anInput setLabel:[NSString stringWithFormat:@"%c",'A'+i]];
             [inputs addObject: anInput];
             [anInput release];
         }
@@ -683,7 +693,12 @@ NSString* ORLakeShore336PollTimeChanged         = @"ORLakeShore336PollTimeChange
         heaters = [[NSMutableArray array] retain];
         int i;
         for(i=0;i<2;i++){
-            [heaters addObject:[[[ORLakeShore336Heater alloc] init] autorelease]];
+            ORLakeShore336Heater* aHeater = [[ORLakeShore336Heater alloc] init];
+            [aHeater setChannel:i];
+            [aHeater setLabel:[NSString stringWithFormat:@"%d",i+1]];
+            [heaters addObject:aHeater];
+            [aHeater release];
+
         }
     }
 }
@@ -877,6 +892,9 @@ NSString* ORLakeShore336PollTimeChanged         = @"ORLakeShore336PollTimeChange
     if(aChan>=0 && aChan<4){
         return [[inputs objectAtIndex:aChan] temperature];
     }
+    else if(aChan>=4 && aChan<6){
+        return [[heaters objectAtIndex:aChan-4] temperature];
+    }
 	return 0;
 }
 
@@ -885,6 +903,9 @@ NSString* ORLakeShore336PollTimeChanged         = @"ORLakeShore336PollTimeChange
     if(aChan>=0 && aChan<4){
         return [[inputs objectAtIndex:aChan] maxValue];
     }
+    else if(aChan>=4 && aChan<6){
+        return [[heaters objectAtIndex:aChan-4] maxValue];
+    }
     else return 0;
 }
 
@@ -892,6 +913,9 @@ NSString* ORLakeShore336PollTimeChanged         = @"ORLakeShore336PollTimeChange
 {
     if(aChan>=0 && aChan<4){
         return [[inputs objectAtIndex:aChan] minValue];
+    }
+    else if(aChan>=4 && aChan<6){
+        return [[heaters objectAtIndex:aChan-4] minValue];
     }
     else return 0;
 }
@@ -902,6 +926,10 @@ NSString* ORLakeShore336PollTimeChanged         = @"ORLakeShore336PollTimeChange
 		if(channel>=0 && channel<4){
 			*theLowLimit  = [[inputs objectAtIndex:channel] lowLimit];
 			*theHighLimit = [[inputs objectAtIndex:channel] highLimit];
+		}
+		else if(channel>=4 && channel<6){
+			*theLowLimit  = [[heaters objectAtIndex:channel] lowLimit];
+			*theHighLimit = [[heaters objectAtIndex:channel] highLimit];
 		}
 		else {
 			*theLowLimit = 0;
@@ -942,19 +970,15 @@ NSString* ORLakeShore336PollTimeChanged         = @"ORLakeShore336PollTimeChange
     if([lastRequest hasPrefix:@"*IDN"])NSLog(@"%@\n",theResponse);
     else if([lastRequest hasPrefix:@"KRDG?"]){
         NSString* channel = [lastRequest substringFromIndex:6];
-        if([channel hasPrefix:@"A"]){
-            [[inputs objectAtIndex:0] setTemperature:[theResponse floatValue]];
-        }
-        else if([channel hasPrefix:@"B"]){
-            [[inputs objectAtIndex:1] setTemperature:[theResponse floatValue]];
-        }
-        else if([channel hasPrefix:@"C"]){
-            [[inputs objectAtIndex:2] setTemperature:[theResponse floatValue]];
-        }
-        else if([channel hasPrefix:@"D"]){
-            [[inputs objectAtIndex:3] setTemperature:[theResponse floatValue]];
-        }
-       
+        if([channel hasPrefix:@"A"])[[inputs objectAtIndex:0] setTemperature:[theResponse floatValue]];
+        else if([channel hasPrefix:@"B"])[[inputs objectAtIndex:1] setTemperature:[theResponse floatValue]];
+        else if([channel hasPrefix:@"C"])[[inputs objectAtIndex:2] setTemperature:[theResponse floatValue]];
+        else if([channel hasPrefix:@"D"])[[inputs objectAtIndex:3] setTemperature:[theResponse floatValue]];
+    }
+    else if([lastRequest hasPrefix:@"HTR?"]){
+        NSString* channel = [lastRequest substringFromIndex:5];
+        if([channel hasPrefix:@"1"])[[heaters objectAtIndex:0] setOutput:[theResponse floatValue]];
+        else if([channel hasPrefix:@"2"])[[heaters objectAtIndex:1] setOutput:[theResponse floatValue]];
     }
     else if([lastRequest hasPrefix:@"INTYPE"]){
        // int i = [NSString ]

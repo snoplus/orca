@@ -26,19 +26,20 @@ typedef enum  {
 
 @interface ORLakeShore336Input : NSObject
 {
-    int     channel;
-    float   temperature;
-    ls336SensorTypeEnum sensorType;
-    BOOL    autoRange;
-    int     range;
-    BOOL    compensation;
-    int     units;
-    double   lowLimit;
-    double   highLimit;
-    double   minValue;
-    double   maxValue;
+    int             channel;
+    NSString*       label;
+    float           temperature;
+    BOOL            autoRange;
+    int             range;
+    BOOL            compensation;
+    int             units;
+    double          lowLimit;
+    double          highLimit;
+    double          minValue;
+    double          maxValue;
     ORTimeRate*		timeRate;
     unsigned long   timeMeasured;
+    ls336SensorTypeEnum sensorType;
 }
 
 - (NSUndoManager*) undoManager;
@@ -49,6 +50,7 @@ typedef enum  {
 - (id)initWithCoder:(NSCoder*)decoder;
 - (void)encodeWithCoder:(NSCoder*)encoder;
 
+@property (assign,nonatomic) NSString*              label;
 @property (assign,nonatomic) int                    channel;
 @property (assign,nonatomic) float                  temperature;
 @property (assign,nonatomic) ls336SensorTypeEnum    sensorType;
