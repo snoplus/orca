@@ -138,6 +138,7 @@ enum {
     [labelAttributes release];
 	[[preferenceController window] close];
 	[preferenceController release];
+    [viewToScale release];
 
     [super dealloc];
 }
@@ -160,7 +161,9 @@ enum {
 
 - (void) setViewToScale:(id)aView
 {
-	viewToScale = aView; //don't retain
+    [aView retain];
+    [viewToScale release];
+	viewToScale = aView;
 }
 
 - (void) setPreferenceController:(id)aController
