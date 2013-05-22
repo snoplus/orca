@@ -566,9 +566,8 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 
 - (void) saveDocument:(id)sender
 {
-	[[ORGlobal sharedGlobal] setDocumentWasEdited:[self isDocumentEdited]];
+	if([self isDocumentEdited])[[ORGlobal sharedGlobal] setDocumentWasEdited:YES];
 	[super saveDocument:sender];
-	[[ORGlobal sharedGlobal] setDocumentWasEdited:NO];
 }
 
 

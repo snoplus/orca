@@ -668,7 +668,7 @@
 {
 	if([[model document] isDocumentEdited]){
 		[[model document] afterSaveDo:@selector(startRun) withTarget:self];
-        [[model document] saveDocument:[self document]];
+        [[model document] saveDocument:nil];
     }
 	else [self startRun];
 }

@@ -176,6 +176,7 @@ static const int currentVersion = 1;           // Current version
                 unsigned long runNumber = [[[aNotification userInfo] objectForKey:@"kRunNumber"] longValue];
                 [[self document] copyDocumentTo:[[configFolder finalDirectoryName]stringByExpandingTildeInPath] append:[NSString stringWithFormat:@"%lu",runNumber]];
                 savedFirstTime = YES;
+                [[ORGlobal sharedGlobal] setDocumentWasEdited:NO];
             }
 		}
 	}
