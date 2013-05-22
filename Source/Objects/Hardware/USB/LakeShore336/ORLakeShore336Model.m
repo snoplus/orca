@@ -879,45 +879,61 @@ NSString* ORLakeShore336PollTimeChanged         = @"ORLakeShore336PollTimeChange
 
 - (NSString*) identifier
 {
-    return [NSString stringWithFormat:@"LS336,%lu",[self uniqueIdNumber]];
+	NSString* s;
+ 	@synchronized(self){
+        s =  [NSString stringWithFormat:@"LS336,%lu",[self uniqueIdNumber]];
+    }
+    return s;
 }
 
 - (NSString*) processingTitle
 {
-    return [self identifier];
+	NSString* s;
+ 	@synchronized(self){
+        s =  [self identifier];
+    }
+    return s;
 }
 
 - (double) convertedValue:(int)aChan
 {
-    if(aChan>=0 && aChan<4){
-        return [[inputs objectAtIndex:aChan] temperature];
+    double theValue = 0;
+ 	@synchronized(self){
+        if(aChan>=0 && aChan<4){
+            theValue = [[inputs objectAtIndex:aChan] temperature];
+        }
+        else if(aChan>=4 && aChan<6){
+            theValue = [[heaters objectAtIndex:aChan-4] output];
+        }
     }
-    else if(aChan>=4 && aChan<6){
-        return [[heaters objectAtIndex:aChan-4] temperature];
-    }
-	return 0;
+    return theValue;
 }
-
 - (double) maxValueForChan:(int)aChan
 {
-    if(aChan>=0 && aChan<4){
-        return [[inputs objectAtIndex:aChan] maxValue];
+    double theValue = 0;
+ 	@synchronized(self){
+        if(aChan>=0 && aChan<4){
+            theValue = [[inputs objectAtIndex:aChan] maxValue];
+        }
+        else if(aChan>=4 && aChan<6){
+            theValue = [[heaters objectAtIndex:aChan-4] maxValue];
+        }
     }
-    else if(aChan>=4 && aChan<6){
-        return [[heaters objectAtIndex:aChan-4] maxValue];
-    }
-    else return 0;
+    return theValue;
 }
 
 - (double) minValueForChan:(int)aChan
 {
-    if(aChan>=0 && aChan<4){
-        return [[inputs objectAtIndex:aChan] minValue];
+    double theValue = 0;
+ 	@synchronized(self){
+        if(aChan>=0 && aChan<4){
+            theValue = [[inputs objectAtIndex:aChan] minValue];
+        }
+        else if(aChan>=4 && aChan<6){
+            theValue = [[heaters objectAtIndex:aChan-4] minValue];
+        }
     }
-    else if(aChan>=4 && aChan<6){
-        return [[heaters objectAtIndex:aChan-4] minValue];
-    }
-    else return 0;
+    return theValue;
 }
 
 - (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit channel:(int)channel
