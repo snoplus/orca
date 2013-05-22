@@ -43,6 +43,7 @@
 
 - (int)  numberPointsInTimeRate;
 - (void) timeRateAtIndex:(int)i x:(double*)xValue y:(double*)yValue;
+- (BOOL) maxUserCurrentEnabled;
 
 @property (assign,nonatomic) NSString*      label;
 @property (assign,nonatomic) int            channel;

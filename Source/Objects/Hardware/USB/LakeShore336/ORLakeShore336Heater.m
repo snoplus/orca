@@ -98,6 +98,11 @@ NSString* ORLakeShore336OutputChanged = @"ORLakeShore336OutputChanged";
     return [[NSApp delegate] undoManager];
 }
 
+- (BOOL) maxUserCurrentEnabled
+{
+    return (maxCurrent != 0);
+}
+
 #pragma mark ***Archival
 - (id)initWithCoder:(NSCoder*)decoder
 {
@@ -105,15 +110,15 @@ NSString* ORLakeShore336OutputChanged = @"ORLakeShore336OutputChanged";
     
     [[self undoManager] disableUndoRegistration];
     [self setChannel:       [decoder decodeIntForKey:   @"channel"]];
-    [self setResistance:        [decoder decodeIntForKey:   @"resistance"]];
-	[self setMaxCurrent:        [decoder decodeBoolForKey:  @"maxCurrent"]];
-    [self setMaxUserCurrent:    [decoder decodeIntForKey:   @"maxUserCurrent"]];
-    [self setCurrentOrPower:    [decoder decodeBoolForKey:  @"currentOrPower"]];
+    [self setResistance:    [decoder decodeIntForKey:   @"resistance"]];
+	[self setMaxCurrent:    [decoder decodeBoolForKey:  @"maxCurrent"]];
+    [self setMaxUserCurrent:[decoder decodeIntForKey:   @"maxUserCurrent"]];
+    [self setCurrentOrPower:[decoder decodeBoolForKey:  @"currentOrPower"]];
     [self setLowLimit:      [decoder decodeFloatForKey: @"lowLimit"]];
-    [self setHighLimit:      [decoder decodeFloatForKey: @"highLimit"]];
+    [self setHighLimit:     [decoder decodeFloatForKey: @"highLimit"]];
     [self setMinValue:      [decoder decodeFloatForKey: @"minValue"]];
     [self setMaxValue:      [decoder decodeFloatForKey: @"maxValue"]];
-    [self setLabel:      [decoder decodeObjectForKey: @"label"]];
+    [self setLabel:         [decoder decodeObjectForKey: @"label"]];
     
     if(lowLimit < 0.001 && highLimit < 0.001 && minValue < 0.001 && maxValue < 0.001){
         lowLimit = 0;

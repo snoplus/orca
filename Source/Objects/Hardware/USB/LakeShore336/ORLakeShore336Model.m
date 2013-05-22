@@ -728,6 +728,7 @@ NSString* ORLakeShore336PollTimeChanged         = @"ORLakeShore336PollTimeChange
     [self setConnectionProtocol:    [decoder decodeIntForKey:       @"connectionProtocol"]];
     [self setInputs:                [decoder decodeObjectForKey:    @"inputs"]];
     [self setHeaters:               [decoder decodeObjectForKey:    @"heaters"]];
+    [self setPollTime:              [decoder decodeIntForKey:       @"pollTime"]];
     [[self undoManager] enableUndoRegistration];
     
     [self setUpArrays];
@@ -741,6 +742,7 @@ NSString* ORLakeShore336PollTimeChanged         = @"ORLakeShore336PollTimeChange
     [encoder encodeObject:serialNumber      forKey:@"serialNumber"];
     [encoder encodeObject:ipAddress         forKey:@"ipAddress"];
     [encoder encodeInt:connectionProtocol   forKey:@"connectionProtocol"];
+    [encoder encodeInt:pollTime             forKey:@"pollTime"];
     [encoder encodeObject:inputs            forKey:@"inputs"];
     [encoder encodeObject:heaters           forKey:@"heaters"];
 }
@@ -944,8 +946,8 @@ NSString* ORLakeShore336PollTimeChanged         = @"ORLakeShore336PollTimeChange
 			*theHighLimit = [[inputs objectAtIndex:channel] highLimit];
 		}
 		else if(channel>=4 && channel<6){
-			*theLowLimit  = [[heaters objectAtIndex:channel] lowLimit];
-			*theHighLimit = [[heaters objectAtIndex:channel] highLimit];
+			*theLowLimit  = [[heaters objectAtIndex:channel-4] lowLimit];
+			*theHighLimit = [[heaters objectAtIndex:channel-4] highLimit];
 		}
 		else {
 			*theLowLimit = 0;
