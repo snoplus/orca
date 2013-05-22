@@ -310,7 +310,7 @@ NSString* ORLakeShore336PollTimeChanged         = @"ORLakeShore336PollTimeChange
     [self addCmdToQueue:@"KRDG? C"];
     [self addCmdToQueue:@"KRDG? D"];
     [self addCmdToQueue:@"HTR? 1"];
-    [self addCmdToQueue:@"HTR? 2"];
+    [self addCmdToQueue:@"HTR? 2"];    
 }
 
 - (int) timeoutCount

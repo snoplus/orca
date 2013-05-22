@@ -253,28 +253,19 @@
 - (int) numberPointsInPlot:(id)aPlotter
 {
 	int set = [aPlotter tag];
-    if(aPlotter == plotter){
-        if(set>=0 && set<4) return [[[model inputs] objectAtIndex:set] numberPointsInTimeRate];
-        else if(set>=4 && set<6)return [[[model heaters] objectAtIndex:set-4] numberPointsInTimeRate];
-        else return 0;
-    }
+    if(set>=0 && set<4) return [[[model inputs] objectAtIndex:set] numberPointsInTimeRate];
+    else if(set>=4 && set<6)return [[[model heaters] objectAtIndex:set-4] numberPointsInTimeRate];
     else return 0;
 }
 
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
 	int set = [aPlotter tag];
-    if(aPlotter == plotter){
-        if(set>=0 && set<4){
-            [[[model inputs] objectAtIndex:set] timeRateAtIndex:i x:xValue y:yValue];
-        }
-        else if(set>=4 && set<6){
-            [[[model heaters] objectAtIndex:set-4] timeRateAtIndex:i x:xValue y:yValue];
-        }
-        else {
-            *xValue = 0;
-            *yValue = 0;
-        }
+    if(set>=0 && set<4){
+        [[[model inputs] objectAtIndex:set] timeRateAtIndex:i x:xValue y:yValue];
+    }
+    else if(set>=4 && set<6){
+        [[[model heaters] objectAtIndex:set-4] timeRateAtIndex:i x:xValue y:yValue];
     }
     else {
         *xValue = 0;
