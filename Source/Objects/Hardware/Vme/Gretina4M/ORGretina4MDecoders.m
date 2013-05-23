@@ -150,6 +150,7 @@
 
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
+    unsigned long* headerStartPtr = ptr+2;
 	ptr++;
 
     NSString* title= @"Gretina4M Waveform Record\n\n";
@@ -166,7 +167,12 @@
 	// energy is in 2's complement, taking abs value if necessary
 	if (energy & 0x1000000) energy = (~energy & 0x1ffffff) + 1;
 	NSString* energyStr  = [NSString stringWithFormat:@"Energy  = %lu\n",energy/50]; //mah 10/21 added the /50 to be consistent with histogramed value
-    return [NSString stringWithFormat:@"%@%@%@%@%@",title,crate,card,chan,energyStr];               
+    NSString* header = @"Header (Raw)\n";
+    int i;
+    for(i=0;i<15;i++){
+        header = [header stringByAppendingFormat:@"%d: 0x%08lx\n",i,headerStartPtr[i]];
+    }
+    return [NSString stringWithFormat:@"%@%@%@%@%@%@",title,crate,card,chan,energyStr,header];
 }
 
 @end
