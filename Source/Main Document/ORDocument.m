@@ -318,6 +318,11 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 				[anObj addObjectInfoToArray:dataChain];
 			}
 		}
+		else if([anObj isKindOfClass:NSClassFromString(@"ORDataChainObjectWithGroup")]){//TODO: Mark, check if this is OK -tb- Till 2013-05-24
+			if([anObj respondsToSelector:@selector(addObjectInfoToArray:)]){
+				[anObj addObjectInfoToArray:dataChain];
+			}
+		}
 		else if([anObj isKindOfClass:NSClassFromString(@"ORGpibDeviceModel")]){
 			if([anObj respondsToSelector:@selector(addObjectInfoToArray:)]){
 				[anObj addObjectInfoToArray:gpib];
