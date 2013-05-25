@@ -759,11 +759,6 @@ static NSString *ORHVDirName 		= @"ORHVDirName";
     
 }
 
-- (unsigned long) uniqueIdNumber
-{
-    return [super uniqueIdNumber]-1; //start at zero for this object
-}
-
 - (NSString*) stateFileName
 {
     return [NSString stringWithFormat:@"HVState%lu",[self uniqueIdNumber]];
