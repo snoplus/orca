@@ -285,9 +285,12 @@ static IpeRegisterNamesStruct regSLTV4[kSltV4NumRegs] = {
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
 - (void) runIsAboutToStart:(NSNotification*)aNote;
+- (void) runStarted:(NSNotification*)aNote;
 - (void) runIsStopped:(NSNotification*)aNote;
 - (void) runIsBetweenSubRuns:(NSNotification*)aNote;
 - (void) runIsStartingSubRun:(NSNotification*)aNote;
+
+- (void) runIsAboutToChangeState:(NSNotification*)aNote;
 
 - (void) viewChanged:(NSNotification*)aNotification;
 
@@ -449,6 +452,7 @@ static IpeRegisterNamesStruct regSLTV4[kSltV4NumRegs] = {
 #pragma mark •••DataTaker
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void) saveReadOutList:(NSFileHandle*)aFile;
 - (void) loadReadOutList:(NSFileHandle*)aFile;

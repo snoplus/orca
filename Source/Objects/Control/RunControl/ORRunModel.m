@@ -1021,7 +1021,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     id nextObject = [self objectConnectedTo:ORRunModelRunControlConnection];
     [nextObject subRunTaskStarted:runInfo];
 
-    NSLog(@"Staring Run %@ (sub-run)\n",[self fullRunNumberString]);
+    NSLog(@"Starting Run %@ (sub-run)\n",[self fullRunNumberString]);
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRunStartSubRunNotification
                                                         object: self

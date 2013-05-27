@@ -663,15 +663,15 @@ void setHostTimeToFLTsAndSLT(int32_t* args)
 	    fprintf(stdout,"setHostTimeToFLTsAndSLT:   need to write SLT TIME!!! sltsec %u, sltsecsetpoint %u, \n", sltsec, secSetpoint);//TODO: DEBUG -tb-
 	    secSetpoint += 1;  //value will be taken after the NEXT second strobe, so we need the NEXT second
         srack->theSlt->setSecCounter->write(secSetpoint);
-        //TODO:
-        //TODO:
-        //TODO:
-        //TODO:
-        //sleep(1);
-        //TODO:
-        //TODO:
-        //TODO:
-        //TODO:
+        //TODO: workaround until SLT takes the second counter immediately over from setSec register -tb- 2013-05-24
+        //TODO: workaround until SLT takes the second counter immediately over from setSec register -tb- 2013-05-24
+        //TODO: workaround until SLT takes the second counter immediately over from setSec register -tb- 2013-05-24
+        //TODO: workaround until SLT takes the second counter immediately over from setSec register -tb- 2013-05-24
+        sleep(1);
+        //TODO: workaround until SLT takes the second counter immediately over from setSec register -tb- 2013-05-24
+        //TODO: workaround until SLT takes the second counter immediately over from setSec register -tb- 2013-05-24
+        //TODO: workaround until SLT takes the second counter immediately over from setSec register -tb- 2013-05-24
+        //TODO: workaround until SLT takes the second counter immediately over from setSec register -tb- 2013-05-24
     }
     else
     {

@@ -76,7 +76,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
     statusSize			= NSMakeSize(555,480);
     lowLevelSize		= NSMakeSize(555,400);
     cpuManagementSize	= NSMakeSize(475,450);
-    cpuTestsSize		= NSMakeSize(555,305);
+    cpuTestsSize		= NSMakeSize(555,355);
 	
 	[[self window] setTitle:@"IPE-DAQ-V4 SLT"];	
 	
@@ -297,7 +297,8 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 		case  1: [self resizeWindowToSize:statusSize];			break;
 		case  2: [self resizeWindowToSize:lowLevelSize];	    break;
 		case  3: [self resizeWindowToSize:cpuManagementSize];	break;
-		default: [self resizeWindowToSize:cpuTestsSize];	    break;
+		case  4: [self resizeWindowToSize:cpuTestsSize];        break;
+		default: [self resizeWindowToSize:controlSize];	    break;//default=largest size
     }
 }
 

@@ -41,9 +41,12 @@ typedef struct IpeRegisterNamesStruct {
     NSMutableArray* registers;
 	unsigned long   exceptionCount;
     BOOL		    present;
+    BOOL            isPartOfRun;
 }
 
 #pragma mark ¥¥¥Accessors
+- (BOOL) isPartOfRun;
+- (void) setIsPartOfRun:(BOOL)aPartOfRun;
 - (BOOL) present;
 - (void) setPresent:(BOOL)aPresent;
 - (id) theRegister:(unsigned int)index;

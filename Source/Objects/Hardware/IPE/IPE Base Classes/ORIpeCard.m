@@ -39,6 +39,15 @@ NSString* ORIpeCardExceptionCountChanged		= @"ORIpeCardExceptionCountChanged";
 }
 
 #pragma mark ¥¥¥Accessors
+- (BOOL) isPartOfRun
+{
+    return isPartOfRun;
+}
+
+- (void) setIsPartOfRun:(BOOL)aPartOfRun
+{
+    isPartOfRun=aPartOfRun;
+}
 
 - (BOOL) present
 {
@@ -51,6 +60,7 @@ NSString* ORIpeCardExceptionCountChanged		= @"ORIpeCardExceptionCountChanged";
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeCardPresentChanged object:self];
 }
+
 - (id) theRegister:(unsigned int)index
 {
 	return [registers objectAtIndex:index];

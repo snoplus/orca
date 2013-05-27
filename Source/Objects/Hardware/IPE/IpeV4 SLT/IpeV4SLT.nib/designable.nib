@@ -12,7 +12,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="2718"/>
+			<integer value="2"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -920,18 +920,18 @@ QXBwbGUgQ29tcHV0ZXIsIEluYy4sIDIwMDUAAAAAA</bytes>
 																	<reference key="NSTextColor" ref="600009329"/>
 																</object>
 															</object>
-															<object class="NSTextField" id="269601081">
+															<object class="NSTextField" id="1002349080">
 																<reference key="NSNextResponder" ref="428012323"/>
 																<int key="NSvFlags">256</int>
 																<string key="NSFrame">{{19, 86}, {114, 14}}</string>
 																<reference key="NSSuperview" ref="428012323"/>
 																<bool key="NSEnabled">YES</bool>
-																<object class="NSTextFieldCell" key="NSCell" id="541049949">
+																<object class="NSTextFieldCell" key="NSCell" id="427394338">
 																	<int key="NSCellFlags">67239424</int>
 																	<int key="NSCellFlags2">4325376</int>
 																	<string key="NSContents">Misc Ctrl Flags</string>
 																	<reference key="NSSupport" ref="26"/>
-																	<reference key="NSControlView" ref="269601081"/>
+																	<reference key="NSControlView" ref="1002349080"/>
 																	<reference key="NSBackgroundColor" ref="488801545"/>
 																	<reference key="NSTextColor" ref="600009329"/>
 																</object>
@@ -6211,7 +6211,7 @@ AAAAAAAAAAAAAHRleHQAAAAAQ29weXJpZ2h0IEFwcGxlIENvbXB1dGVyLCBJbmMuLCAyMDA1AAAAAA</
 						<object class="NSButton" id="159735087">
 							<reference key="NSNextResponder" ref="310352750"/>
 							<int key="NSvFlags">292</int>
-							<string key="NSFrame">{{10, 184}, {36, 41}}</string>
+							<string key="NSFrame">{{8, 22}, {36, 41}}</string>
 							<reference key="NSSuperview" ref="310352750"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="849001148">
@@ -7950,8 +7950,8 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<reference ref="56066726"/>
-							<reference ref="159735087"/>
 							<reference ref="936079253"/>
+							<reference ref="159735087"/>
 						</object>
 						<reference key="parent" ref="646525134"/>
 					</object>
@@ -9083,7 +9083,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<reference ref="565430063"/>
 							<reference ref="763343616"/>
 							<reference ref="613741404"/>
-							<reference ref="269601081"/>
+							<reference ref="1002349080"/>
 						</object>
 						<reference key="parent" ref="22103463"/>
 					</object>
@@ -11089,17 +11089,17 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">5717</int>
-						<reference key="object" ref="269601081"/>
+						<reference key="object" ref="1002349080"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="541049949"/>
+							<reference ref="427394338"/>
 						</object>
 						<reference key="parent" ref="1052149142"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">5718</int>
-						<reference key="object" ref="541049949"/>
-						<reference key="parent" ref="269601081"/>
+						<reference key="object" ref="427394338"/>
+						<reference key="parent" ref="1002349080"/>
 					</object>
 				</object>
 			</object>
@@ -11125,6 +11125,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					<string>2710.IBViewBoundsToFrameTransform</string>
 					<string>2710.ImportedFromIB2</string>
 					<string>2711.IBPluginDependency</string>
+					<string>2711.IBViewBoundsToFrameTransform</string>
 					<string>2711.ImportedFromIB2</string>
 					<string>2713.IBPluginDependency</string>
 					<string>2713.ImportedFromIB2</string>
@@ -11889,6 +11890,9 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					</object>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<object class="NSAffineTransform">
+						<bytes key="NSTransformStruct">P4AAAL+AAABBAAAAwtQAAA</bytes>
+					</object>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
@@ -13105,14 +13109,14 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					<string key="className">NSObject</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">Source/Objects/Hardware/HV/MPod/MPod Base Classes/ORiSeg8ChanHV.h</string>
+						<string key="minorKey">Source/Objects/Hardware/HV/MPod/MPod Base Classes/ORiSegHVCard.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSObject</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">Source/Objects/Hardware/HV/MPod/MPod Base Classes/ORiSeg8ChanHVController.h</string>
+						<string key="minorKey">Source/Objects/Hardware/HV/MPod/MPod Base Classes/ORiSegHVCardController.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -13394,6 +13398,13 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">Source/Objects/OrcaObject/ORGTIDGenerator.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Objects/OrcaObject/OROrderedObjManager.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -14838,6 +14849,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<string>readWriteTypeMatrixAction:</string>
 							<string>rebootHaltSelectionAction:</string>
 							<string>resetCrateBusAction:</string>
+							<string>sbcPollingTimeAction:</string>
 							<string>shutdownAction:</string>
 							<string>toggleCrateAction:</string>
 							<string>userNameAction:</string>
@@ -14847,6 +14859,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -14917,6 +14930,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<string>readWriteTypeMatrixAction:</string>
 							<string>rebootHaltSelectionAction:</string>
 							<string>resetCrateBusAction:</string>
+							<string>sbcPollingTimeAction:</string>
 							<string>shutdownAction:</string>
 							<string>toggleCrateAction:</string>
 							<string>userNameAction:</string>
@@ -15043,6 +15057,10 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
+								<string key="name">sbcPollingTimeAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
 								<string key="name">shutdownAction:</string>
 								<string key="candidateClassName">id</string>
 							</object>
@@ -15128,6 +15146,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<string>resetCrateBusButton</string>
 							<string>rootPassWordField</string>
 							<string>runInfoField</string>
+							<string>sbcPollingPU</string>
 							<string>setFilePathButton</string>
 							<string>shutdown1Field</string>
 							<string>shutdown2Field</string>
@@ -15201,6 +15220,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<string>NSButton</string>
 							<string>NSTextField</string>
 							<string>NSTextField</string>
+							<string>NSPopUpButton</string>
 							<string>NSButton</string>
 							<string>NSTextField</string>
 							<string>NSTextField</string>
@@ -15277,6 +15297,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<string>resetCrateBusButton</string>
 							<string>rootPassWordField</string>
 							<string>runInfoField</string>
+							<string>sbcPollingPU</string>
 							<string>setFilePathButton</string>
 							<string>shutdown1Field</string>
 							<string>shutdown2Field</string>
@@ -15517,6 +15538,10 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<object class="IBToOneOutletInfo">
 								<string key="name">runInfoField</string>
 								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">sbcPollingPU</string>
+								<string key="candidateClassName">NSPopUpButton</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">setFilePathButton</string>

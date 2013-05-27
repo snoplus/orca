@@ -764,7 +764,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
 //							fprintf(stderr,"---  diffsubsec is %i\n",diffsubsec);
 //							fprintf(stderr,"---  diffsubsec is %i, post trigg: %i  (  ((0x%08x=%i))  sltsubsec %i, evsubsec %i)\n",diffsubsec,postTriggerTime,sltsubseccount,sltsubseccount,sltsubsec,evsubsec);
 //							if(diffsubsec<postTriggerTime) fprintf(stderr,"---=============break\n");
-							if(diffsubsec<postTriggerTime) break; //FLT still recording ADC trace -> leave for(eventN ...)-loop -tb-
+							if(diffsubsec<postTriggerTime) break; //FLT still recording ADC trace -> leave for later for(eventN ...)-loop cycle ... -tb-
 						}
 						#endif
 						

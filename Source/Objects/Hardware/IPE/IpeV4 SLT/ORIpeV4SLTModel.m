@@ -266,6 +266,11 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
                        object : nil];
 	
     [notifyCenter addObserver : self
+                     selector : @selector(runStarted:)
+                         name : ORRunStartedNotification
+                       object : nil];
+	
+    [notifyCenter addObserver : self
                      selector : @selector(runIsStopped:)
                          name : ORRunStoppedNotification
                        object : nil];
@@ -280,6 +285,11 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
                          name : ORRunStartSubRunNotification
                        object : nil];
 
+   //TODO: testing the sequence of notifications -tb- 2013-05-15
+   [notifyCenter addObserver : self
+                    selector : @selector(runIsAboutToChangeState:)
+                        name : ORRunAboutToChangeState
+                      object : nil];
 
 
 
@@ -511,17 +521,37 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 }
 
 
+
+//#define SHOW_RUN_NOTIFICATIONS_AND_CALLS 1
 - (void) runIsAboutToStart:(NSNotification*)aNote
 {
+    #if SHOW_RUN_NOTIFICATIONS_AND_CALLS
+        //DEBUG
+                 NSLog(@"%@::%@  <-----------------N\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
+    #endif
 	//TODO: reset of timers probably should be done here -tb-2011-01
 	#if 0 
-		NSLog(@"%@::%@  called!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: debug -tb-
+		NSLog(@"%@::%@  called!  <---N\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: debug -tb-
+	#endif
+}
+
+- (void) runStarted:(NSNotification*)aNote
+{
+    #if SHOW_RUN_NOTIFICATIONS_AND_CALLS
+        //DEBUG
+                 NSLog(@"%@::%@  <-----------------N\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
+    #endif
+	#if 0
+		NSLog(@"%@::%@  called!  <----N\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: debug -tb-
 	#endif
 }
 
 - (void) runIsStopped:(NSNotification*)aNote
 {	
-	//NSLog(@"%@::%@  called!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: debug -tb-
+    #if SHOW_RUN_NOTIFICATIONS_AND_CALLS
+        //DEBUG
+                 NSLog(@"%@::%@  <-----------------N\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
+    #endif
 	//NSLog(@"%@::%@  [readOutGroup count] is %i!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[readOutGroup count]);//TODO: debug -tb-
 
 	//writing the SLT time counters is done in runTaskStopped:userInfo:   -tb-
@@ -529,20 +559,18 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	//the histogram (2060 int32_t's per histogram and one extra word) -tb-
 
 	// Stop all activities by software inhibit
-	if([readOutGroup count] == 0){//TODO: I don't understand this - remove it? -tb-
-		[self writeSetInhibit];
-	}
+	//if([readOutGroup count] == 0){//TODO: I don't understand this - remove it? -tb-
+	//	[self writeSetInhibit];
+	//}
 	
-	// TODO: Save dead time counters ?!
-	// Is it sensible to send a new package here?
-	// ak 18.7.07
-	// run counter is shipped in runTaskStopped:userInfo: -tb-
-	
-	//NSLog(@"Deadtime: %lld\n", [self readDeadTime]);
 }
 
 - (void) runIsBetweenSubRuns:(NSNotification*)aNote
 {
+    #if SHOW_RUN_NOTIFICATIONS_AND_CALLS
+        //DEBUG
+                 NSLog(@"%@::%@  <-----------------N\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
+    #endif
 	//NSLog(@"%@::%@  called!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: debug -tb-
 	[self shipSltSecondCounter: kStopSubRunType];
 	[self shipSltRunCounter: kStopSubRunType];
@@ -552,10 +580,54 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 
 - (void) runIsStartingSubRun:(NSNotification*)aNote
 {
+    #if SHOW_RUN_NOTIFICATIONS_AND_CALLS
+        //DEBUG
+                 NSLog(@"%@::%@  <-----------------N\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
+    #endif
 	//NSLog(@"%@::%@  called!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));
 	[self shipSltSecondCounter: kStartSubRunType];
 	[self shipSltRunCounter: kStartSubRunType];
 }
+
+
+- (void) runIsAboutToChangeState:(NSNotification*)aNote
+{
+    #if SHOW_RUN_NOTIFICATIONS_AND_CALLS
+        //DEBUG
+                 NSLog(@"%@::%@ Called runIsAboutToChangeState --- SLT <-------------------------N\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
+    #endif
+                 
+    int state = [[[aNote userInfo] objectForKey:@"State"] intValue];
+    
+    //NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
+    //NSLog(@"Called %@::%@   aNote:>>>%@<<<\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),aNote);//DEBUG -tb-
+	//aNote: >>>NSConcreteNotification 0x5a552d0 {name = ORRunAboutToChangeState; object = (ORRunModel,1) Decoders: ORRunDecoderForRun
+    // Connectors: "Run Control Connector"  ; userInfo = {State = 4;}}<<<
+	// states: 2,3,4: 2=starting, 3=stopping, 4=between subruns (0 = eRunStopped, 1 = eRunInProgress); see ORGlobal.h, enum 'eRunState'
+
+    #if SHOW_RUN_NOTIFICATIONS_AND_CALLS
+	/**/
+	id rc =  [aNote object];
+    NSLog(@"%@::%@ Calling object %@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),NSStringFromClass([rc class]));//DEBUG -tb-
+	switch (state) {
+		case eRunStarting://=2
+            NSLog(@"   Notification: go to  %@\n",@"eRunStarting");//DEBUG -tb-
+			break;
+		case eRunBetweenSubRuns://=4
+            NSLog(@"   Notification: go to  %@\n",@"eRunBetweenSubRuns");//DEBUG -tb-
+			break;
+		case eRunStopping://=3
+            NSLog(@"   Notification: go to  %@\n",@"eRunStopping");//DEBUG -tb-
+			break;
+		default:
+			break;
+	}
+	/**/
+    #endif
+
+}
+
+
 
 
 #pragma mark •••Accessors
@@ -1627,8 +1699,16 @@ return;
 }
 
 #pragma mark •••Data Taker
+
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+    #if SHOW_RUN_NOTIFICATIONS_AND_CALLS
+        //DEBUG
+                 NSLog(@"%@::%@ Called runTaskStarted --- SLT <-------------------------\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
+    #endif
+    
+    [self setIsPartOfRun: YES];
+
     [self clearExceptionCount];
 	
 	//check that we can actually run
@@ -1649,26 +1729,56 @@ return;
         //DEBUG         [self dumpSltSecondCounter:@"vor initBoard"];
         
         
-    //if cold start (not 'quick start' in RunControl) ...
-    if([[userInfo objectForKey:@"doinit"]intValue]){
-		[self initBoard];					
-	}	
-	
 	dataTakers = [[readOutGroup allObjects] retain];		//cache of data takers.
-	int runMode=0, countHistoMode=0, countNonHistoMode=0;
     
-        //DEBUG         [self dumpSltSecondCounter:@"FLT-runTaskStarted:"];
-        
+    //check: are there FLTs in histogram mode?
+	int runMode=0, countHistoMode=0, countNonHistoMode=0;
+    //DEBUG         [self dumpSltSecondCounter:@"FLT-runTaskStarted:"];
     //loop over Readout List
 	for(id obj in dataTakers){
-        [obj runTaskStarted:aDataPacket userInfo:userInfo];//configure FLTs, set histogramming FLTs to standby mode etc -tb-
         if([obj respondsToSelector:@selector(runMode)]){
             runMode=[obj runMode];
             if(runMode == kIpeFltV4_Histogram_DaqMode) countHistoMode++; else countNonHistoMode++;
         }
     }
-        //DEBUG         NSLog(@"%@::%@  countHistoMode:%i  countNonHistoMode:%i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),countHistoMode,countNonHistoMode);//DEBUG -tb-
-        //DEBUG         [self dumpSltSecondCounter:nil];
+    //DEBUG         NSLog(@"%@::%@  countHistoMode:%i  countNonHistoMode:%i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),countHistoMode,countNonHistoMode);//DEBUG -tb-
+    //DEBUG         [self dumpSltSecondCounter:nil];
+        
+        
+    //THIS IS A WORKAROUND FOR THE start-histo FLT BUG
+    //   (start-histo FLT BUG is: the FIRST histogram already starts recording BEFORE the next second strobe/1PPS, if the 'set standby mode' command was within this second)
+    //   (workaround: I set standby mode for all FLTs in histo-mode, then I will wait for the next second strobe  ---> this will produce a additional gap/delay of 1 second at beginning of run)
+    // -tb- 2013-05-24
+    //if there are FLTs in histogramming mode, I start them right before releasing inhibit -> now -tb-
+    if(countHistoMode){
+	    for(id obj in dataTakers){
+            if([[obj class] isSubclassOfClass: NSClassFromString(@"ORKatrinV4FLTModel")]){//or ORIpeV4FLTModel
+            //if([obj respondsToSelector:@selector(runMode)]){
+                runMode=[obj runMode];
+                if(runMode == kIpeFltV4_Histogram_DaqMode) [obj writeControlWithStandbyMode];// -> set the run mode
+            }
+        }
+        usleep(1000000);
+	}	
+        
+        
+    //if cold start (not 'quick start' in RunControl) ...
+    if([[userInfo objectForKey:@"doinit"]intValue]){
+		[self initBoard];
+        // 	initBoard does:
+        //    -	enable counters (if enabled in GUI)
+        //    -	load second register (may delay 1 second ...)
+        //    -	write control register (e.g. enable SW inhibit, GPS clock, etc.)
+        //    -	write interrupt mask (in low-level-tab) (currently unused)
+        //    -	clear status error bits
+        //    - print status and control reg
+	}	
+	
+
+    //loop over Readout List
+	for(id obj in dataTakers){
+        [obj runTaskStarted:aDataPacket userInfo:userInfo];//configure FLTs (sets run mode for non-histo-FLTs), set histogramming FLTs to standby mode etc -tb-
+    }
 
     //if there are FLTs in non-histogramming mode, the filter will start after next 1PPs - wait for it ... -tb-
     if(countNonHistoMode && [[userInfo objectForKey:@"doinit"]intValue]){
@@ -1726,6 +1836,10 @@ return;
 		[pmcLink takeData:aDataPacket userInfo:userInfo];
 	}
 	else {// the first time
+    #if SHOW_RUN_NOTIFICATIONS_AND_CALLS
+        //DEBUG
+                 NSLog(@"%@::%@   <------- \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
+    #endif
 		//TODO: -tb- [self writePageManagerReset];
 		//TODO: -tb- [self writeClrCnt];
         
@@ -1744,6 +1858,12 @@ return;
 
 - (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+    #if SHOW_RUN_NOTIFICATIONS_AND_CALLS
+        //DEBUG NSLog(@"%@::%@   <------- \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
+        //DEBUG
+                 NSLog(@"%@::%@ Called runIsStopping --- SLT <-------------------------\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
+    #endif
+
     for(id obj in dataTakers){
         [obj runIsStopping:aDataPacket userInfo:userInfo];
     }
@@ -1752,11 +1872,20 @@ return;
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+    #if SHOW_RUN_NOTIFICATIONS_AND_CALLS
+        //DEBUG
+                 NSLog(@"%@::%@ Called runTaskStopped --- SLT <-------------------------\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
+    #endif
+
+
 	[self writeSetInhibit]; //TODO: maybe move to readout loop to avoid dead time -tb-
 	[self shipSltSecondCounter: kStopRunType];
 	unsigned long long runcount = [self readRunTime];
 	[self shipSltEvent:kRunCounterType withType:kStopRunType eventCt:0 high: (runcount>>32)&0xffffffff low:(runcount)&0xffffffff ];
 	
+    //TODO: set a run control 'wait', if we record the hitrate counter -> wait for final hitrate event (... in change state notification callback ...) -tb-
+    
+    
     for(id obj in dataTakers){
 		[obj runTaskStopped:aDataPacket userInfo:userInfo];
     }	
@@ -1769,6 +1898,8 @@ return;
 	
 	[dataTakers release];
 	dataTakers = nil;
+
+    [self setIsPartOfRun: NO];
 
 }
 
@@ -1979,6 +2110,8 @@ return;
 
 - (void) tasksCompleted: (NSNotification*)aNote
 {
+        //DEBUG
+                 NSLog(@"%@::%@ Called tasksCompleted --- SLT <-------------------------\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
 	//nothing to do... this just removes a run-time exception
 }
 

@@ -289,8 +289,14 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 					   
 }
 
+
+//#define SHOW_RUN_NOTIFICATIONS_AND_CALLS 1
 - (void) runIsAboutToStop:(NSNotification*)aNote
 {
+    #if SHOW_RUN_NOTIFICATIONS_AND_CALLS
+        //DEBUG
+                 NSLog(@"%@::%@   --- FLT #%i<---------N\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[self stationNumber]);//DEBUG -tb-
+    #endif
     //NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
     //reset the 'sync with subruns' facility (should not be necessary without 'sending  eRunStarting twice' bug)
 	runControlState = eRunStopping;
@@ -300,6 +306,15 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (void) runIsAboutToChangeState:(NSNotification*)aNote
 {
     int state = [[[aNote userInfo] objectForKey:@"State"] intValue];
+
+    #if SHOW_RUN_NOTIFICATIONS_AND_CALLS
+        //DEBUG
+                 NSLog(@"%@::%@ Called runIsAboutToChangeState --- FLT #%i<-------------------------N\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[self stationNumber]);//DEBUG -tb-
+    #endif
+                 
+    
+    //is FLT  in data taker list of data task manager?
+    if(![self isPartOfRun]) return;
     
     //handle shipping final hitrate events
     //if(run is going to stop) set a 'wait'; release it after shipping the hitrate record; use a watchdog? -tb-
@@ -363,11 +378,11 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	}else{
 	    //catch errors
 	    if(runControlState==eRunStarting && lastState==eRunStarting){//should not happen! bug? -tb-
-		    NSLog(@"   Case 2: ERROR - runControlState==eRunStarting && lastState==eRunStarting\n");//DEBUG -tb-
+		    NSLog(@" %@::%@   Case 2: ERROR - runControlState==eRunStarting && lastState==eRunStarting\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
 		    return;
 		}
 	    if(syncWithRunControlCounterFlag>0){//should not happen! bug? -tb-
-		    NSLog(@"   Case 2: WARNING - syncWithRunControlCounterFlag>0 (%i) - did you send multiple stopRun commands?\n",syncWithRunControlCounterFlag);//DEBUG -tb-
+		    NSLog(@" %@::%@   Case 2: WARNING - syncWithRunControlCounterFlag>0 (%i) - did you send multiple stopRun commands?\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),syncWithRunControlCounterFlag);//DEBUG -tb-
 		    return;
 		}
 	    // case 2. (all other cases)
@@ -633,6 +648,7 @@ static double table[32]={
 
 - (void) setReceivedHistoCounter:(int)aReceivedHistoCounter
 {
+    //DEBUG                 NSLog(@"%@::%@   FLT #%i<------------- aReceivedHistoCounter: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[self stationNumber],aReceivedHistoCounter);//DEBUG -tb-
     receivedHistoCounter = aReceivedHistoCounter;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelReceivedHistoCounterChanged object:self];
 	if(syncWithRunControl && syncWithRunControlCounterFlag>0) [self syncWithRunControlCheckStopCondition];
@@ -783,7 +799,8 @@ static double table[32]={
 			//TODO: workaround - if set to kFifoStopOnFull the histogramming stops after some seconds - probably a FPGA bug? -tb-
 			if(fifoBehaviour == kFifoStopOnFull){
 				//NSLog(@"ORKatrinV4FLTModel message: due to a FPGA side effect histogramming mode should run with kFifoEnableOverFlow setting! -tb-\n");//TODO: fix it -tb-
-				NSLog(@"ORKatrinV4FLTModel message: switched FIFO behaviour to kFifoEnableOverFlow (required for histogramming mode)\n");//TODO: fix it -tb-
+		        //    -> removed automatic settings of FIFO length (64) and FIFO behaviour (stop on full) 2013-05 -tb-
+				NSLog(@"ORKatrinV4FLTModel  #%i WARNING: switched FIFO behaviour to kFifoEnableOverFlow (required for histogramming mode)\n", [self stationNumber]);//TODO: fix it -tb-
 				[self setFifoBehaviour: kFifoEnableOverFlow];
 			}
 			break;
@@ -798,12 +815,14 @@ static double table[32]={
 			break;
 			
 		// new modes after mode redesign 2011-01 -tb-
+		//    -> removed automatic settings of FIFO length (64) and FIFO behaviour (stop on full) 2013-05 -tb-
 		case kIpeFltV4_EnergyTraceSyncDaqMode:
 			[self setFltRunMode:kIpeFltV4Katrin_Run_Mode];
 			if(fifoBehaviour == kFifoEnableOverFlow){
-				NSLog(@"ORKatrinV4FLTModel message: switched FIFO behaviour to kFifoStopOnFull (required for sync'd energy+trace mode)\n");//TODO: fix it -tb-
-				[self setFifoBehaviour: kFifoStopOnFull];
-				//TODO: remember the state and restore it after a run -tb-
+				NSLog(@"ORKatrinV4FLTModel #%i WARNING: FIFO behaviour is kFifoEnableOverFlow (recommended is  kFifoStopOnFull for sync'd energy+trace mode)\n", [self stationNumber]);//TODO: fix it -tb-
+				//-tb- 2013-05 NSLog(@"ORKatrinV4FLTModel message: switched FIFO behaviour to kFifoStopOnFull (required for sync'd energy+trace mode)\n");//TODO: fix it -tb-
+				//-tb- 2013-05 [self setFifoBehaviour: kFifoStopOnFull];
+				//-tb- 2013-05 //TODO: remember the state and restore it after a run -tb-
 			}
 			readWaveforms = YES;
 			fifoLengthSetting = kFifoLength64;
@@ -813,7 +832,8 @@ static double table[32]={
 			NSLog(@"ORKatrinV4FLTModel WARNING: setRunMode: received a unknown DAQ run mode (%i)!\n",aRunMode);
 			break;
 	}
-	[self setFifoLength: fifoLengthSetting];
+    //    -> removed automatic settings of FIFO length (64) and FIFO behaviour (stop on full) 2013-05 -tb-
+	//-tb- 2013-05 [self setFifoLength: fifoLengthSetting];
 
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelRunModeChanged object:self];
@@ -2340,6 +2360,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 // this way we can delay a subrun start until all histograms have been received   -tb-
 - (BOOL) setFromDecodeStageReceivedHistoForChan:(short)aChan
 {
+    //DEBUG            NSLog(@"%@::%@   FLT #%i<------------- aChan: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[self stationNumber],aChan);//DEBUG -tb-
     int map = receivedHistoChanMap;
     if(aChan>=0 && aChan<kNumV4FLTChannels){
 		map |= 0x1<<aChan;
@@ -2429,6 +2450,13 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {	
+    #if SHOW_RUN_NOTIFICATIONS_AND_CALLS
+        //DEBUG
+                 NSLog(@"%@::%@ Called runTaskStarted --- FLT #%i<-------------------------\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[self stationNumber]);//DEBUG -tb-
+    #endif
+
+    [self setIsPartOfRun: YES];
+
     //NOTE: during this function the whole crate is set to 'INHIBIT' by the SLT -tb-
 	firstTime = YES;
 	
@@ -2450,9 +2478,11 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 		}
 	}
 
-	if(runMode == kIpeFltV4_Histogram_DaqMode){//FLTs in histogram mode always need to be set to standby mode (to restart the histogramming facility) -tb-
-    	[self writeControlWithStandbyMode];
-	}
+    //TODO: see workaround in SLT: for hist mode: between standby and histo-mode there needs to be a second strobe 2013-05 -tb-
+    //currently moved to SLT, as we need ONE second strobe wait for this workaround 
+	//if(runMode == kIpeFltV4_Histogram_DaqMode){//FLTs in histogram mode always need to be set to standby mode (to restart the histogramming facility) -tb-
+    //    [self writeControlWithStandbyMode];
+	//}
     
     //if cold start (not 'quick start' in RunControl) ...
     if([[userInfo objectForKey:@"doinit"]intValue]){
@@ -2478,9 +2508,11 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
     
 	if(runMode == kIpeFltV4_EnergyTraceSyncDaqMode){
 		if((fifoLength != kFifoLength64) || (fifoBehaviour != kFifoStopOnFull)){
-			[self setRunMode: runMode];// this sets all necessary settings
-			[self setFifoBehaviour: kFifoStopOnFull];
-			[self setFifoLength: kFifoLength64];
+            //-tb- 2013-05 -> removed automatic setting of kFifoStopOnFull, kFifoLength64
+			//-tb- 2013-05 [self setRunMode: runMode];// this sets all necessary settings
+			//-tb- 2013-05 [self setFifoBehaviour: kFifoStopOnFull];
+			//-tb- 2013-05 [self setFifoLength: kFifoLength64];
+			NSLog(@"ORKatrinV4FLTModel  #%i WARNING: recommended FIFO settings for this mode are: kFifoStopOnFull and kFifoLength64 \n", [self stationNumber]);
 		}
 	}
     
@@ -2513,6 +2545,10 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 -(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {	
 	if(firstTime){
+    #if SHOW_RUN_NOTIFICATIONS_AND_CALLS
+        //DEBUG
+                 NSLog(@"%@::%@   FLT #%i<---------\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[self stationNumber]);//DEBUG -tb-
+    #endif
 		firstTime = NO;
 		NSLogColor([NSColor redColor],@"Readout List Error: FLT %d must be a child of an SLT in the readout list\n",[self stationNumber]);
 	}
@@ -2520,6 +2556,10 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+    #if SHOW_RUN_NOTIFICATIONS_AND_CALLS
+        //DEBUG
+                 NSLog(@"%@::%@   FLT #%i<-------------stopped\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[self stationNumber]);//DEBUG -tb-
+    #endif
 	//[self writeRunControl:NO];// let it run, see runTaskStarted ... -tb-
 	//changed 2013-04-29 -tb- SLT will set inhibit anyway! for quick start we want to leave the current mode active (histogr. FLTs are restarted at runTaskStarted) [self writeControlWithStandbyMode];
 	//[self setLedOff:YES];
@@ -2532,6 +2572,17 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 	[self setHitRateTotal:0];
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelHitRateChanged object:self];
+
+    
+#if 0
+    //TODO:temporary test - remove it!!!!!!!!!!!!!!!!!!! -tb-
+	if(runMode == kIpeFltV4_Histogram_DaqMode){//FLTs in histogram mode always need to be set to standby mode (to restart the histogramming facility) -tb-
+    	[self writeControlWithStandbyMode];
+	}
+#endif
+
+    [self setIsPartOfRun: NO];
+
 }
 
 #pragma mark •••SBC readout control structure... Till, fill out as needed
