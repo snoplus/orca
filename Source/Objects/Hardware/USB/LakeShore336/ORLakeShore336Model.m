@@ -649,15 +649,27 @@ NSString* ORLakeShore336PollTimeChanged         = @"ORLakeShore336PollTimeChange
 
 - (void) systemTest
 {
-    if([self isConnected]){
-        [self addCmdToQueue:@"*TST?"];
-    }
+    [self addCmdToQueue:@"*TST?"];
 }
 
 - (void) resetAndClear
 {
-    if([self isConnected]){
-        [self writeToDevice:@"*RST;*CLS"];
+    [self writeToDevice:@"*RST;*CLS"];
+}
+
+- (void) loadHeaterParameters
+{
+    for(id aHeater in heaters){
+        [self writeToDevice:[aHeater heaterSetupString]];
+        [self writeToDevice:[aHeater pidSetupString]];
+        [self writeToDevice:[aHeater outputSetupString]];
+    }
+}
+
+- (void) loadInputParameters
+{
+    for(id anInput in inputs){
+        [self writeToDevice:[anInput inputSetupString]];
     }
 }
 
@@ -750,6 +762,7 @@ NSString* ORLakeShore336PollTimeChanged         = @"ORLakeShore336PollTimeChange
 #pragma mark ***Comm methods
 - (void) readFromDevice
 {
+    if(![self isConnected])return;
 	switch(connectionProtocol){
 		case kLakeShore336UseUSB:
 			if(usbInterface && [self getUSBController]){
@@ -776,6 +789,8 @@ NSString* ORLakeShore336PollTimeChanged         = @"ORLakeShore336PollTimeChange
 
 - (void) writeToDevice: (NSString*) aCommand
 {
+    if(![self isConnected])return;
+    
     if(![aCommand hasSuffix:@"\r"])aCommand = [aCommand stringByAppendingString:@"\r"];
 
 	switch(connectionProtocol){

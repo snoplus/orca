@@ -19,6 +19,7 @@
 
 @class ORUSB;
 @class ORCompositeTimeLineView;
+@class ORLakeShore336LinkView;
 
 @interface ORLakeShore336Controller : OrcaObjectController 
 {
@@ -42,6 +43,7 @@
     IBOutlet NSButton*		loadParamsButton;
     IBOutlet ORCompositeTimeLineView*	plotter;
 	IBOutlet NSPopUpButton* pollTimePopup;
+    IBOutlet ORLakeShore336LinkView* linkView;
 }
 
 #pragma mark •••Notifications
@@ -57,6 +59,7 @@
 - (void) pollTimeChanged:(NSNotification*)aNote;
 - (void) setButtonStates;
 - (void) updateTimePlot:(NSNotification*)aNote;
+- (void) updateLinkView:(NSNotification*)aNote;
 - (NSColor*) colorForDataSet:(int)set;
 - (NSMutableArray*) inputs;
 - (NSMutableArray*) heaters;
@@ -81,3 +84,8 @@
 
 @end
 
+@interface ORLakeShore336LinkView : NSView
+{
+}
+
+@end

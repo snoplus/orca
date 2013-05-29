@@ -94,6 +94,11 @@
 					 selector : @selector(updateTimePlot:)
 						 name : ORRateAverageChangedNotification
 					   object : nil];
+    
+    [notifyCenter addObserver : self
+					 selector : @selector(updateLinkView:)
+						 name : ORLakeShore336InputChanged
+					   object : nil];    
 
 }
 
@@ -130,7 +135,6 @@
 
     [plotter   setShowLegend:YES];
 
-
 	[super awakeFromNib];
 }
 
@@ -146,6 +150,12 @@
 	[self serialNumberChanged:nil];
 	[self pollTimeChanged:nil];
 	[self updateTimePlot:nil];
+	[self updateLinkView:nil];
+}
+
+- (void) updateLinkView:(NSNotification*)aNote
+{
+    [linkView setNeedsDisplay:YES];
 }
 
 - (void) updateTimePlot:(NSNotification*)aNote
@@ -315,7 +325,8 @@
 {
     [self endEditing];
 	@try {
-		//[model outputWaveformParams];
+		[model loadHeaterParameters];
+		[model loadInputParameters];
 	}
 	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
@@ -434,5 +445,31 @@
 						nil );				// other button
 	}
 }
+@end
 
+@implementation ORLakeShore336LinkView
+
+- (void) drawRect:(NSRect)dirtyRect
+{
+    [super drawRect:dirtyRect];
+    id model = [[[self window] windowController] model];
+    if([[model heaters] count]>1){
+        
+        [[NSColor redColor]set];
+        
+        float height     = [self bounds].size.height;
+        float cellHeight = 19;
+        int heater1Input = [[[model heaters] objectAtIndex:0] input];
+        
+        [NSBezierPath strokeLineFromPoint:NSMakePoint( 0,cellHeight + cellHeight/2.) toPoint:NSMakePoint(15,cellHeight + cellHeight/2.)];
+        [NSBezierPath strokeLineFromPoint:NSMakePoint(15,cellHeight + cellHeight/2.) toPoint:NSMakePoint(15,height - cellHeight/2. - heater1Input*cellHeight- 2)];
+        [NSBezierPath strokeLineFromPoint:NSMakePoint(0,height - cellHeight/2. - heater1Input*cellHeight- 2) toPoint:NSMakePoint(15,height -  cellHeight/2. - heater1Input*cellHeight - 2)];
+    
+        
+        int heater2Input = [[[model heaters] objectAtIndex:1] input];
+        [NSBezierPath strokeLineFromPoint:NSMakePoint( 0,cellHeight/2.) toPoint:NSMakePoint(25,cellHeight/2.)];
+        [NSBezierPath strokeLineFromPoint:NSMakePoint(25,cellHeight/2.) toPoint:NSMakePoint(25,height - cellHeight/2. - heater2Input*cellHeight - 2)];
+        [NSBezierPath strokeLineFromPoint:NSMakePoint(0,height - cellHeight/2. - heater2Input*cellHeight - 2) toPoint:NSMakePoint(25,height - cellHeight/2. - heater2Input*cellHeight - 2)];
+    }
+}
 @end

@@ -124,6 +124,8 @@
 - (void) resetAndClear;
 - (void) pollHardware;
 - (void) queryAll;
+- (void) loadHeaterParameters;
+- (void) loadInputParameters;
 
 #pragma mark ***Delegate Methods
 - (void) netsocketConnected:(NetSocket*)inNetSocket;

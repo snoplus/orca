@@ -20,17 +20,14 @@
 #import "ORLakeShore336Input.h"
 #import "ORTimeRate.h"
 
-NSString* ORLakeShore336InputSensorTypeChanged   = @"ORLakeShore336InputSensorTypeChanged";
-NSString* ORLakeShore336InputAutoRangeChanged    = @"ORLakeShore336InputAutoRangeChanged";
-NSString* ORLakeShore336InputRangeChanged        = @"ORLakeShore336InputRangeChanged";
-NSString* ORLakeShore336InputCompensationChanged = @"ORLakeShore336InputCompensationChanged";
-NSString* ORLakeShore336InputUnitsChanged        = @"ORLakeShore336InputUnitsChanged";
+
 NSString* ORLakeShore336InputTemperatureChanged  = @"ORLakeShore336InputTemperatureChanged";
 
 @implementation ORLakeShore336Input
 
 @synthesize label,channel,temperature, sensorType, autoRange, range, compensation, units;
 @synthesize lowLimit,highLimit,minValue,maxValue,timeRate,timeMeasured;
+@synthesize rangeStrings;
 - (id) init
 {
     self = [super init];
@@ -43,9 +40,15 @@ NSString* ORLakeShore336InputTemperatureChanged  = @"ORLakeShore336InputTemperat
 
 - (void) dealloc
 {
+    [rangeStrings release];
     [label release];
     [timeRate release];
     [super dealloc];
+}
+
+- (BOOL) sensorEnabled
+{
+    return sensorType>0;
 }
 
 - (void) setTemperature:(float)aValue
@@ -65,39 +68,133 @@ NSString* ORLakeShore336InputTemperatureChanged  = @"ORLakeShore336InputTemperat
     [[NSNotificationCenter defaultCenter] postNotificationName:ORLakeShore336InputTemperatureChanged object:self userInfo:userInfo];
 }
 
-- (void) setSensorType:(ls336SensorTypeEnum)aValue
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setSensorType:sensorType];
-    sensorType = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORLakeShore336InputSensorTypeChanged object:self];
-}
-
-- (void) setAutoRange:(BOOL)aValue
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setAutoRange:autoRange];
-    autoRange = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORLakeShore336InputAutoRangeChanged object:self];
-}
-
 - (void) setRange:(int)aValue
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setRange:range];
     range = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORLakeShore336InputRangeChanged object:self];
 }
 
 - (void) setCompensation:(BOOL)aValue
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setCompensation:compensation];
     compensation = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORLakeShore336InputCompensationChanged object:self];
 }
 
 - (void) setUnits:(int)aValue
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setUnits:units];
     units = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORLakeShore336InputUnitsChanged object:self];
+}
+
+- (void) setLowLimit:(double)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setLowLimit:lowLimit];
+    lowLimit = aValue;
+}
+
+- (void) setHighLimit:(double)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setHighLimit:highLimit];
+    highLimit = aValue;
+}
+
+- (void) setAutoRange:(BOOL)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setAutoRange:autoRange];
+    autoRange = aValue;
+    
+}
+- (void) setSensorType:(int)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSensorType:sensorType];
+    sensorType = aValue;
+    switch(sensorType){
+        case 0:
+            [self setRangeStrings:[NSArray arrayWithObjects:
+                                   @"--",
+                                   nil]];
+            break;
+        case 1:
+            [self setRangeStrings:[NSArray arrayWithObjects:
+                                   @"2.5 V",
+                                   @"10 V",
+                                   nil]];
+            break;
+        case 2:
+            [self setRangeStrings:[NSArray arrayWithObjects:
+                                   @"10 Ω",
+                                   @"30 Ω",
+                                   @"100 Ω",
+                                   @"300 Ω",
+                                   @"1 KΩ",
+                                   @"3 KΩ",
+                                   @"10 KΩ",
+                                   nil]];
+            break;
+            
+        case 3:
+            [self setRangeStrings:[NSArray arrayWithObjects:
+                                   @"10 Ω",
+                                   @"30 Ω",
+                                   @"100 Ω",
+                                   @"300 Ω",
+                                   @"1 KΩ",
+                                   @"3 KΩ",
+                                   @"10 KΩ",
+                                   @"30 KΩ",
+                                   @"100 KΩ",
+                                   nil]];
+            break;
+            
+        case 4:
+            [self setRangeStrings:[NSArray arrayWithObjects:
+                                   @"50 mV",
+                                   nil]];
+            break;
+            
+        default:
+            [self setRangeStrings:nil];
+            break;
+    }
+    
+}
+
+- (NSArray*) sensorTypes
+{
+    return [NSArray arrayWithObjects:
+            @"Disabled",
+            @"Diode",
+            @"Platinum RTD",
+            @"NTC RTD",
+            @"Thermocouple",
+            @"Capacitance",
+            nil
+            ];
+}
+
+- (int) range
+{
+    //have to limit range for different sensor types
+    switch(sensorType) {
+        case 0: return 0;
+        case 1:
+            if(range>=0 && range<=1)return range;
+            else return 0;
+            break;
+        case 2:
+            if(range>=0 && range<=6)return range;
+            else return 0;
+            break;
+        case 3:
+            if(range>=0 && range<=8)return range;
+            else return 0;
+            break;
+        case 4:
+            if(range==0)return range;
+            else return 0;
+            break;
+        default: return 0;
+    }
 }
 
 - (NSUndoManager*) undoManager
@@ -111,17 +208,17 @@ NSString* ORLakeShore336InputTemperatureChanged  = @"ORLakeShore336InputTemperat
     self = [super init];
     
     [[self undoManager] disableUndoRegistration];
-    [self setChannel:       [decoder decodeIntForKey:   @"channel"]];
+    [self setChannel:       [decoder decodeIntForKey:    @"channel"]];
     [self setLabel:         [decoder decodeObjectForKey: @"label"]];
-    [self setSensorType:    [decoder decodeIntForKey:   @"sensorType"]];
-	[self setAutoRange:     [decoder decodeBoolForKey:  @"autoRange"]];
-    [self setRange:         [decoder decodeIntForKey:   @"range"]];
-    [self setCompensation:  [decoder decodeBoolForKey:  @"compensation"]];
-    [self setUnits:         [decoder decodeIntForKey:   @"units"]];
-    [self setLowLimit:      [decoder decodeFloatForKey: @"lowLimit"]];
+    [self setSensorType:    [decoder decodeIntForKey:    @"sensorType"]];
+	[self setAutoRange:     [decoder decodeBoolForKey:   @"autoRange"]];
+    [self setRange:         [decoder decodeIntForKey:    @"range"]];
+    [self setCompensation:  [decoder decodeBoolForKey:   @"compensation"]];
+    [self setUnits:         [decoder decodeIntForKey:    @"units"]];
+    [self setLowLimit:      [decoder decodeFloatForKey:  @"lowLimit"]];
     [self setHighLimit:      [decoder decodeFloatForKey: @"highLimit"]];
-    [self setMinValue:      [decoder decodeFloatForKey: @"minValue"]];
-    [self setMaxValue:      [decoder decodeFloatForKey: @"maxValue"]];
+    [self setMinValue:      [decoder decodeFloatForKey:  @"minValue"]];
+    [self setMaxValue:      [decoder decodeFloatForKey:  @"maxValue"]];
 
     if(lowLimit < 0.001 && highLimit < 0.001 && minValue < 0.001 && maxValue < 0.001){
         lowLimit = 0;
@@ -139,17 +236,21 @@ NSString* ORLakeShore336InputTemperatureChanged  = @"ORLakeShore336InputTemperat
 {
     [encoder encodeInt:channel          forKey:@"channel"];
     [encoder encodeObject:label         forKey:@"label"];
-    [encoder encodeInt:sensorType       forKey:@"sensorType"];
     [encoder encodeBool:autoRange       forKey:@"autoRange"];
-    [encoder encodeInt:range            forKey:@"range"];
     [encoder encodeBool:compensation    forKey:@"compensation"];
     [encoder encodeInt:units            forKey:@"units"];
     [encoder encodeFloat:lowLimit       forKey:@"lowLimit"];
     [encoder encodeFloat:highLimit      forKey:@"highLimit"];
     [encoder encodeFloat:minValue       forKey:@"minValue"];
     [encoder encodeFloat:maxValue       forKey:@"maxValue"];
+    [encoder encodeInt:sensorType       forKey:@"sensorType"];
+    [encoder encodeInt:[self range]     forKey:@"range"];
 }
 
+- (NSString*) inputSetupString;
+{
+    return [NSString stringWithFormat:@"INTYPE %c,%d,%d,%d,%d,%d",'A'+channel,sensorType,autoRange,range,compensation,units];
+}
 - (int) numberPointsInTimeRate
 {
     return [timeRate count];

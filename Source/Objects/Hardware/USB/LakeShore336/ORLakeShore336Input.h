@@ -16,11 +16,6 @@
 //express or implied, or assume any liability or responsibility
 //for the use of this software.
 //-------------------------------------------------------------
-typedef enum  {
-    kDisabled       = 0,
-    kPlatinumRTD    = 2,
-    kNTCRTD         = 3,
-} ls336SensorTypeEnum;
 
 @class ORTimeRate;
 
@@ -39,37 +34,36 @@ typedef enum  {
     double          maxValue;
     ORTimeRate*		timeRate;
     unsigned long   timeMeasured;
-    ls336SensorTypeEnum sensorType;
+    int             sensorType;
+    NSArray*        rangeStrings;
 }
 
 - (NSUndoManager*) undoManager;
 - (int) numberPointsInTimeRate;
 - (void) timeRateAtIndex:(int)i x:(double*)xValue y:(double*)yValue;
+- (BOOL) sensorEnabled;
+- (NSString*) inputSetupString;
 
 #pragma mark ***Archival
 - (id)initWithCoder:(NSCoder*)decoder;
 - (void)encodeWithCoder:(NSCoder*)encoder;
 
-@property (assign,nonatomic) NSString*              label;
-@property (assign,nonatomic) int                    channel;
-@property (assign,nonatomic) float                  temperature;
-@property (assign,nonatomic) ls336SensorTypeEnum    sensorType;
-@property (assign,nonatomic) BOOL                   autoRange;
-@property (assign,nonatomic) int                    range;
-@property (assign,nonatomic) BOOL                   compensation;
-@property (assign,nonatomic) int                    units;
-@property (assign,nonatomic) double                  lowLimit;
-@property (assign,nonatomic) double                  highLimit;
-@property (assign,nonatomic) double                  minValue;
-@property (assign,nonatomic) double                  maxValue;
-@property (retain)           ORTimeRate*             timeRate;
-@property (assign)           unsigned long           timeMeasured;
+@property (assign,nonatomic) NSString*      label;
+@property (assign,nonatomic) int            channel;
+@property (assign,nonatomic) float          temperature;
+@property (assign,nonatomic) BOOL           autoRange;
+@property (assign,nonatomic) int            range;
+@property (assign,nonatomic) BOOL           compensation;
+@property (assign,nonatomic) int            units;
+@property (assign,nonatomic) double         lowLimit;
+@property (assign,nonatomic) double         highLimit;
+@property (assign,nonatomic) double         minValue;
+@property (assign,nonatomic) double         maxValue;
+@property (retain)           ORTimeRate*    timeRate;
+@property (assign)           unsigned long  timeMeasured;
+@property (assign,nonatomic) int            sensorType;
+@property (retain)           NSArray*       rangeStrings;
 
 @end
 
 extern NSString* ORLakeShore336InputTemperatureChanged;
-extern NSString* ORLakeShore336InputSensorTypeChanged;
-extern NSString* ORLakeShore336InputAutoRangeChanged;
-extern NSString* ORLakeShore336InputRangeChanged;
-extern NSString* ORLakeShore336InputCompensationChanged;
-extern NSString* ORLakeShore336InputUnitsChanged;

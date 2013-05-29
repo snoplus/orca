@@ -20,16 +20,14 @@
 #import "ORLakeShore336Heater.h"
 #import "ORTimeRate.h"
 
-NSString* ORLakeShore336HeaterResistanceChanged       = @"ORLakeShore336HeaterResistanceChanged";
-NSString* ORLakeShore336HeaterMaxCurrentChanged       = @"ORLakeShore336HeaterMaxCurrentChanged";
-NSString* ORLakeShore336HeaterMaxUserCurrentChanged   = @"ORLakeShore336HeaterMaxUserCurrentChanged";
-NSString* ORLakeShore336HeaterCurrentOrPowerChanged   = @"ORLakeShore336HeaterCurrentOrPowerChanged";
 NSString* ORLakeShore336OutputChanged = @"ORLakeShore336OutputChanged";
+NSString* ORLakeShore336InputChanged  = @"ORLakeShore336InputChanged";
 
 @implementation ORLakeShore336Heater
 
 @synthesize label,channel,output,resistance, maxCurrent, maxUserCurrent, currentOrPower;
-@synthesize lowLimit,highLimit,minValue,maxValue,timeRate,timeMeasured;
+@synthesize lowLimit,highLimit,minValue,maxValue,timeRate,timeMeasured,userMaxCurrentEnabled;
+@synthesize iValue,pValue,dValue,mode,input,powerUpEnable;
 
 - (id) init
 {
@@ -46,6 +44,19 @@ NSString* ORLakeShore336OutputChanged = @"ORLakeShore336OutputChanged";
     [label release];
     [timeRate release];
     [super dealloc];
+}
+
+- (NSString*) heaterSetupString;
+{
+    return [NSString stringWithFormat:@"HTRSET %d,%d,%d,+%5.3f,%d",channel+1,resistance+1,maxCurrent,maxUserCurrent,currentOrPower+1];
+}
+- (NSString*) pidSetupString;
+{
+    return [NSString stringWithFormat:@"PID %d,+%.1f,+%.1f,%d",channel+1,pValue,iValue,dValue];
+}
+- (NSString*) outputSetupString;
+{
+    return [NSString stringWithFormat:@"OUTMODE %d,%d,%d,%d",channel+1,mode,input,powerUpEnable];
 }
 
 - (void) setOutput:(float)aValue
@@ -69,28 +80,84 @@ NSString* ORLakeShore336OutputChanged = @"ORLakeShore336OutputChanged";
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setResistance:resistance];
      resistance= aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORLakeShore336HeaterResistanceChanged object:self];
 }
 
 - (void) setMaxCurrent:(int)aValue
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setMaxCurrent:maxCurrent];
     maxCurrent = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORLakeShore336HeaterMaxCurrentChanged object:self];
+    self.userMaxCurrentEnabled = (maxCurrent==0);
 }
 
-- (void) setMaxUserCurrent:(int)aValue
+- (void) setMaxUserCurrent:(float)aValue
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setMaxUserCurrent:maxUserCurrent];
     maxUserCurrent = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORLakeShore336HeaterMaxUserCurrentChanged object:self];
 }
 
 - (void) setCurrentOrPower:(int)aValue
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setCurrentOrPower:currentOrPower];
     currentOrPower = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORLakeShore336HeaterCurrentOrPowerChanged object:self];
+}
+
+
+- (void) setLowLimit:(double)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setLowLimit:lowLimit];
+    lowLimit = aValue;
+}
+
+- (void) setHighLimit:(double)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setHighLimit:highLimit];
+    highLimit = aValue;
+}
+
+- (void) setIValue:(float)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setIValue:iValue];
+    if(aValue<.1)aValue=.1;
+    else if(aValue>1000)aValue=1000;
+    iValue = aValue;
+}
+
+- (void) setPValue:(float)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setPValue:pValue];
+    if(aValue<.1)aValue=.1;
+    else if(aValue>1000)aValue=1000;
+    pValue = aValue;
+}
+
+- (void) setDValue:(unsigned short)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setDValue:dValue];
+    if(aValue>200)aValue=200;
+    dValue = aValue;
+}
+
+- (void) setMode:(int)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setMode:mode];
+    if(aValue<0)aValue=0;
+    else if(aValue>5)aValue=5;
+    mode = aValue;
+}
+
+- (void) setInput:(int)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setInput:input];
+    if(aValue<0)aValue=0;
+    else if(aValue>3)aValue=3;
+    input = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORLakeShore336InputChanged object:self ];
+}
+
+- (void) setPowerUpEnable:(BOOL)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setPowerUpEnable:powerUpEnable];
+     powerUpEnable = aValue;
 }
 
 - (NSUndoManager*) undoManager
@@ -98,10 +165,7 @@ NSString* ORLakeShore336OutputChanged = @"ORLakeShore336OutputChanged";
     return [[NSApp delegate] undoManager];
 }
 
-- (BOOL) maxUserCurrentEnabled
-{
-    return (maxCurrent != 0);
-}
+
 
 #pragma mark ***Archival
 - (id)initWithCoder:(NSCoder*)decoder
@@ -111,15 +175,21 @@ NSString* ORLakeShore336OutputChanged = @"ORLakeShore336OutputChanged";
     [[self undoManager] disableUndoRegistration];
     [self setChannel:       [decoder decodeIntForKey:   @"channel"]];
     [self setResistance:    [decoder decodeIntForKey:   @"resistance"]];
-	[self setMaxCurrent:    [decoder decodeBoolForKey:  @"maxCurrent"]];
+	[self setMaxCurrent:    [decoder decodeIntForKey:   @"maxCurrent"]];
     [self setMaxUserCurrent:[decoder decodeIntForKey:   @"maxUserCurrent"]];
     [self setCurrentOrPower:[decoder decodeBoolForKey:  @"currentOrPower"]];
     [self setLowLimit:      [decoder decodeFloatForKey: @"lowLimit"]];
     [self setHighLimit:     [decoder decodeFloatForKey: @"highLimit"]];
     [self setMinValue:      [decoder decodeFloatForKey: @"minValue"]];
     [self setMaxValue:      [decoder decodeFloatForKey: @"maxValue"]];
-    [self setLabel:         [decoder decodeObjectForKey: @"label"]];
-    
+    [self setPValue:        [decoder decodeFloatForKey: @"pValue"]];
+    [self setIValue:        [decoder decodeFloatForKey: @"iValue"]];
+    [self setDValue:        [decoder decodeIntForKey:   @"dValue"]];
+    [self setLabel:         [decoder decodeObjectForKey:@"label"]];
+    [self setMode:          [decoder decodeIntForKey:   @"mode"]];
+    [self setInput:         [decoder decodeIntForKey:   @"input"]];
+    [self setPowerUpEnable: [decoder decodeBoolForKey:  @"powerUpEnable"]];
+
     if(lowLimit < 0.001 && highLimit < 0.001 && minValue < 0.001 && maxValue < 0.001){
         lowLimit = 0;
         highLimit = 100;
@@ -135,15 +205,22 @@ NSString* ORLakeShore336OutputChanged = @"ORLakeShore336OutputChanged";
 {
     [encoder encodeInt:channel          forKey:@"channel"];
     [encoder encodeInt:resistance       forKey:@"resistance"];
-    [encoder encodeBool:maxCurrent      forKey:@"maxCurrent"];
+    [encoder encodeInt:maxCurrent       forKey:@"maxCurrent"];
     [encoder encodeInt:maxUserCurrent   forKey:@"maxUserCurrent"];
     [encoder encodeBool:currentOrPower  forKey:@"currentOrPower"];
     [encoder encodeFloat:lowLimit       forKey:@"lowLimit"];
     [encoder encodeFloat:highLimit      forKey:@"highLimit"];
     [encoder encodeFloat:minValue       forKey:@"minValue"];
     [encoder encodeFloat:maxValue       forKey:@"maxValue"];
+    [encoder encodeFloat:pValue         forKey:@"pValue"];
+    [encoder encodeFloat:iValue         forKey:@"iValue"];
+    [encoder encodeInt:dValue           forKey:@"dValue"];
     [encoder encodeObject:label         forKey:@"label"];
+    [encoder encodeInt:mode             forKey:@"mode"];
+    [encoder encodeInt:input            forKey:@"input"];
+    [encoder encodeBool:powerUpEnable   forKey:@"powerUpEnable"];
 }
+
 - (int) numberPointsInTimeRate
 {
     return [timeRate count];
@@ -158,3 +235,4 @@ NSString* ORLakeShore336OutputChanged = @"ORLakeShore336OutputChanged";
 }
 
 @end
+

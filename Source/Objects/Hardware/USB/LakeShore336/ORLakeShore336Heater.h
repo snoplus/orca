@@ -25,7 +25,7 @@
     float           output;
     int             resistance;
     int             maxCurrent;
-    int             maxUserCurrent;
+    float           maxUserCurrent;
     int             currentOrPower;
     double          lowLimit;
     double          highLimit;
@@ -33,6 +33,16 @@
     double          maxValue;
     ORTimeRate*		timeRate;
     unsigned long   timeMeasured;
+    BOOL            userMaxCurrentEnabled;
+    int             type;
+    int             mode;
+    int             input;
+    BOOL            powerUpEnable;
+    
+    //pid control values
+    float           pValue;
+    float           iValue;
+    unsigned short  dValue;
 }
 
 - (NSUndoManager*) undoManager;
@@ -43,27 +53,33 @@
 
 - (int)  numberPointsInTimeRate;
 - (void) timeRateAtIndex:(int)i x:(double*)xValue y:(double*)yValue;
-- (BOOL) maxUserCurrentEnabled;
+- (NSString*) heaterSetupString;
+- (NSString*) pidSetupString;
+- (NSString*) outputSetupString;
 
 @property (assign,nonatomic) NSString*      label;
 @property (assign,nonatomic) int            channel;
 @property (assign,nonatomic) float          output;
 @property (assign,nonatomic) int            resistance;
 @property (assign,nonatomic) int            maxCurrent;
-@property (assign,nonatomic) int            maxUserCurrent;
+@property (assign,nonatomic) float          maxUserCurrent;
 @property (assign,nonatomic) double         lowLimit;
 @property (assign,nonatomic) double         highLimit;
 @property (assign,nonatomic) double         minValue;
 @property (assign,nonatomic) double         maxValue;
 @property (assign,nonatomic) int            currentOrPower;
+@property (assign,nonatomic) BOOL           userMaxCurrentEnabled;
+@property (assign,nonatomic) int            mode;
+@property (assign,nonatomic) int            input;
+@property (assign,nonatomic) BOOL           powerUpEnable;
+@property (assign,nonatomic) float          pValue;
+@property (assign,nonatomic) float          iValue;
+@property (assign,nonatomic) unsigned short dValue;
+
 @property (retain)           ORTimeRate*    timeRate;
 @property (assign)           unsigned long  timeMeasured;
 
 @end
 
-extern NSString* ORLakeShore336HeaterResistanceChanged;
-extern NSString* ORLakeShore336HeaterMaxCurrentChanged;
-extern NSString* ORLakeShore336HeaterMaxUserCurrentChanged;
-extern NSString* ORLakeShore336HeaterCompensationChanged;
-extern NSString* ORLakeShore336HeaterCurrentOrPowerChanged;
 extern NSString* ORLakeShore336OutputChanged;
+extern NSString* ORLakeShore336InputChanged;
