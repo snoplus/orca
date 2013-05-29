@@ -30,6 +30,7 @@
 	@private
 		IBOutlet NSTabView*		tabView;	
 	    IBOutlet NSPopUpButton* useSLTtimePU;
+	    IBOutlet NSPopUpButton* useDmaBlockReadPU;
 	    IBOutlet NSButton*      useDmaBlockReadButton;
 	    IBOutlet NSTextField*   decayTimeTextField;
 	    IBOutlet NSPopUpButton* poleZeroCorrectionPU;
@@ -222,6 +223,7 @@
 #pragma mark •••Actions
 - (IBAction) useSLTtimePUAction:(id)sender;
 - (IBAction) useDmaBlockReadButtonAction:(id)sender;
+- (IBAction) useDmaBlockReadPUAction:(id)sender;
 - (IBAction) syncWithRunControlButtonAction:(id)sender;
 - (IBAction) decayTimeTextFieldAction:(id)sender;
 - (IBAction) poleZeroCorrectionPUAction:(id)sender;

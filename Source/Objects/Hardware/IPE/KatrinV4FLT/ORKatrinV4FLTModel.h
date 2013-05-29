@@ -23,6 +23,7 @@
 #import "ORIpeCard.h"
 #import "ORIpeV4FLTModel.h"
 #import "ORIpeV4SLTModel.h"
+#import "SLTv4_HW_Definitions.h"
 #import "ORHWWizard.h"
 #import "ORDataTaker.h"
 #import "ORKatrinV4FLTDefs.h"
@@ -109,7 +110,9 @@
     int boxcarLength;
     //int useSLTtime; // unused - use SLT value -tb-
     unsigned long   oldTriggerEnabledMask; //!< mask to temporarially store the enabled mask for later reuse.
-
+    
+    //buffer for summed histograms
+    katrinV4FullHistogramDataStruct histoBuf[24];
 }
 
 #pragma mark •••Initialization
@@ -364,8 +367,9 @@
 - (BOOL) bumpRateFromDecodeStage:(short)channel;
 - (BOOL) setFromDecodeStage:(short)aChan fifoFlags:(unsigned char)flags;
 
-//for sync of HW histogramming with
+//for sync of HW histogramming with sub-runs
 - (BOOL) setFromDecodeStageReceivedHistoForChan:(short)aChan;
+- (void) shipSumHistograms;
 
 #pragma mark •••Archival
 - (id) initWithCoder:(NSCoder*)decoder;

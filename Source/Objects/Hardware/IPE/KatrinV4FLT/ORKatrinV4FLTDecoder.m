@@ -432,7 +432,7 @@ startIndex=traceStart16;
  ------- ^ ^^^---------------------------crate
  -------------^ ^^^^---------------------card
  --------------------^^^^ ^^^^-----------channel
- ------------------------------^^^^------filterIndex 
+                                 ^^------boxcarLen  
                                     ^^^^-filterShapingLength  
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx sec
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx subSec
@@ -786,6 +786,8 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
         ^ ^^^---------------------------crate
              ^ ^^^^---------------------card
 			        ^^^^ ^^^^-----------channel
+                                 ^^------boxcarLen  (<-- not necessary; temporarily set to have same header for all except hitrate record -tb-)
+                                    ^^^^-filterShapingLength    (<-- not necessary; temporarily set to have same header for all except hitrate record -tb-)
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx readoutSec
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx refreshTime  (was recordingTimeSec)
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx firstBin

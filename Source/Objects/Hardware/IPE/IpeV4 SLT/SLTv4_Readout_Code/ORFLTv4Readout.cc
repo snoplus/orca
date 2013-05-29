@@ -64,9 +64,28 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
     uint32_t versionCFPGA = GetDeviceSpecificData()[7];
     uint32_t versionFPGA8 = GetDeviceSpecificData()[8];
     uint32_t filterShapingLength = GetDeviceSpecificData()[9];//TODO: need to change in the code below! -tb- 2011-04-01
-    uint32_t useDmaBlockRead = GetDeviceSpecificData()[10];//TODO: need to change in the code below! -tb- 2011-04-01
+    uint32_t useDmaBlockReadSetting = GetDeviceSpecificData()[10];//TODO: need to change in the code below! -tb- 2011-04-01
     uint32_t boxcarLen = GetDeviceSpecificData()[11];
 	
+
+
+    uint32_t useDmaBlockRead = 1; //if linked with DMA lib, force DMA mode -tb-
+    if(useDmaBlockReadSetting){//0=auto detect, 1=yes, 2=no
+       if(useDmaBlockReadSetting==2) useDmaBlockRead = 0;
+    }else{//auto detect
+        #ifdef PMC_LINK_WITH_DMA_LIB
+            #if PMC_LINK_WITH_DMA_LIB
+            useDmaBlockRead = 1; //if linked with DMA lib, force DMA mode -tb-
+            #else
+            useDmaBlockRead = 0;
+            #endif
+        #else
+            useDmaBlockRead = 0;
+        #endif
+    }
+
+
+
 	uint32_t location   = ((crate & 0x01e)<<21) | (((col+1) & 0x0000001f)<<16) | ((boxcarLen & 0x3)<<4)  | (filterShapingLength & 0xf)  ;  //TODO:  remove filterIndex (remove in decoders, too!) -tb-
 	//uint32_t location   = ((crate & 0x01e)<<21) | (((col+1) & 0x0000001f)<<16) | ((filterIndex & 0xf)<<4)  | (filterShapingLength & 0xf)  ;  //TODO:  remove filterIndex (remove in decoders, too!) -tb-
 
@@ -548,65 +567,6 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
 		
 		static uint32_t currFlt = col;// only for better readability (started using it since EnergyTraceSync mode for HW data buffering)  -tb-
 		
-        #if 0
-        //check timing
-        //TODO: hmm, this should be done even before SLT releases inhibit ... -tb-
-        if(0 /*runFlags & kSyncFltWithSltTimerFlag*/){ //TODO: FLT sec counter has only 13 bit, so this currently makes no sense; maybe after firmware redesign ... -tb-
-            GetDeviceSpecificData()[3] &= ~(kSyncFltWithSltTimerFlag);
-            uint32_t sltsubsec;
-            uint32_t sltsec1;
-            uint32_t sltsec2;
-            uint32_t fltsec;
-            sltsubsec   = srack->theSlt->subSecCounter->read();
-            sltsec1      = srack->theSlt->secCounter->read();
-            fltsec      = srack->theFlt[col]->secondCounter->read();
-            sltsubsec   = srack->theSlt->subSecCounter->read();
-            sltsec2      = srack->theSlt->secCounter->read();
-            int i;
-            for(i=0; i<10; i++){
-                if(sltsec1==fltsec && sltsec2==fltsec) break;//to be sure that the second strobe was not between reading sltsec1 and sltsec2
-                sltsubsec   = srack->theSlt->subSecCounter->read();
-                sltsec1      = srack->theSlt->secCounter->read();
-                srack->theFlt[col]->secondCounter->write(sltsec1);
-                fltsec      = srack->theFlt[col]->secondCounter->read();
-                sltsubsec   = srack->theSlt->subSecCounter->read();
-                sltsec2      = srack->theSlt->secCounter->read();
-                //debug fprintf(stdout,"ORFLTv4Readout.cc: Syncronizing FLT %i to secCounter %li!\n",col+1,sltsec1);fflush(stdout);
-            }
-        }
-        #endif
-        #if 0 // a temporary test -tb-
-        {
-            static int once=1;
-            if(once){
-            once=0;
-            uint32_t sltsec;
-            uint32_t sltsec1;
-            uint32_t sltsec2;
-            uint32_t sltsubsec;
-            uint32_t sltsubsec1;
-            uint32_t sltsubsec2;
-            uint32_t fltsec,fltsec1;
-            sltsubsec   = srack->theSlt->subSecCounter->read();
-            sltsec1=sltsec      = srack->theSlt->secCounter->read();
-            while(sltsec1 == sltsec){
-                sltsubsec   = srack->theSlt->subSecCounter->read();
-                sltsec      = srack->theSlt->secCounter->read();
-            }
-            fltsec1=fltsec = srack->theFlt[col]->secondCounter->read();
-            fprintf(stdout,"slt strobe:slt sec %i  slt sub  %i  fltsec:  %i\n",sltsec,sltsubsec,fltsec);
-            while(fltsec1==fltsec){
-                fltsec = srack->theFlt[col]->secondCounter->read();
-            }
-                sltsubsec   = srack->theSlt->subSecCounter->read();
-                sltsec      = srack->theSlt->secCounter->read();
-            fprintf(stdout,"FLT strobe:slt sec %i  slt sub  %i  fltsec:  %i\n",sltsec,sltsubsec,fltsec);
-            fflush(stdout);
-            sleep(1);
-            }
-        }
-        #endif
-        
         
         //READOUT MODES (energy, energy+trace, histogram)
         ////////////////////////////////////////////////////
@@ -686,7 +646,212 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                 else break;//fifo is empty, leave ...
             }//for(eventN=0; ...
         }
-        // --- 'ENERGY+TRACE (SYNC)' MODE ------------------------NEW: 2011-01-tb-------
+        // --- 'ENERGY+TRACE' MODE -------------------------tb-------   2013-05-29: THIS MODE NOW replaces 'ENERGY+TRACE' and 'ENERGY+TRACE (SYNC)'!!-tb-
+        else if((daqRunMode == kIpeFltV4_EnergyTraceDaqMode) || (daqRunMode == kIpeFltV4_VetoEnergyTraceDaqMode)){  //then fltRunMode == kIpeFltV4Katrin_Run_Mode resp. kIpeFltV4Katrin_Veto_Mode
+        //TODO: else if((daqRunMode == kIpeFltV4_EnergyTraceSyncDaqMode) || (daqRunMode == kIpeFltV4_VetoEnergyTraceSyncDaqMode)){  //then fltRunMode == kIpeFltV4Katrin_Run_Mode resp. kIpeFltV4Katrin_Veto_Mode
+			
+            //uint32_t status         = srack->theFlt[col]->status->read();
+            uint32_t fifoStatus;// = (status >> 24) & 0xf;
+            uint32_t fifoFlags;// =   FF, AF, AE, EF
+            uint32_t f1, f2;
+            
+            //TO DO... the number of events to read could (should) be made variable <-- depending on the readptr/witeptr -tb-
+            uint32_t eventN;
+            for(eventN=0;eventN<10;eventN++){
+                hw4::FltKatrinEventFIFOStatus* eventFIFOStatus = (hw4::FltKatrinEventFIFOStatus*)srack->theFlt[col]->eventFIFOStatus;//TODO: typing error in fdhwlib - remove cast after correction -tb-
+                //fifoStatus = srack->theFlt[col]->eventFIFOStatus->read();//reads to cache
+                fifoStatus = eventFIFOStatus->read();//reads to cache
+                //uint32_t fifoEmptyFlag = (fifoStatus>>28)&1;//srack->theFlt[col]->eventFIFOStatus->emptyFlag->getCache();
+                uint32_t fifoEmptyFlag = eventFIFOStatus->emptyFlag->getCache();
+                uint32_t fifoAlmostFull = eventFIFOStatus->almostFullFlag->getCache();
+                if(!fifoEmptyFlag){
+
+                    
+                    //should be something in the fifo, check the read/write pointers and read and package up to 10 events.
+                    //uint32_t writeptr = fifoStatus & 0x3ff;      //srack->theFlt[col]->eventFIFOStatus->writePointer->getCache();
+                    //uint32_t readptr = (fifoStatus >>16) & 0x3ff;//srack->theFlt[col]->eventFIFOStatus->readPointer->getCache();
+                    uint32_t writeptr = eventFIFOStatus->writePointer->getCache();
+                    uint32_t readptr  = eventFIFOStatus->readPointer->getCache();
+					//{//DEBUGGING CODE
+					//	eventFIFOStatus->read();
+					//	uint32_t writeptrx = eventFIFOStatus->writePointer->getCache();
+					//	uint32_t readptrx  = eventFIFOStatus->readPointer->getCache();
+					//	fprintf(stdout,"0 - readpr:%i, writeptr:%i\n",readptrx,writeptrx);fflush(stdout);
+					//}//DEBUGGING CODE END
+                    uint32_t diff = (writeptr-readptr+1024) % 512;
+					fifoFlags = (eventFIFOStatus->fullFlag->getCache()			<< 3) |
+								(eventFIFOStatus->almostFullFlag->getCache()	<< 2) |
+								(eventFIFOStatus->almostEmptyFlag->getCache()	<< 1) |
+								(eventFIFOStatus->emptyFlag->getCache());
+                    
+                    //depending on 'diff' the loop should start here -tb-
+					//TODO: maybe checking 'diff' is not necessary any more? (I used it at the beginning due to bad fifo counter problems) -tb-  2010/11/08
+                    
+                    if(diff>0){
+						//first buffer the data in the FIFO and the ADC pages ...
+                        hw4::FltKatrinEventFIFO1 *eventFIFO1 = srack->theFlt[col]->eventFIFO1;
+                        hw4::FltKatrinEventFIFO2 *eventFIFO2 = srack->theFlt[col]->eventFIFO2;
+                        FIFO1[col] =eventFIFO1->read();
+                        FIFO2[col] =eventFIFO2->read();
+                        f1 = FIFO1[col];
+                        f2 = FIFO2[col];
+						//uint32_t f3            = srack->theFlt[col]->eventFIFO3->read(eventchan);//TODO: for blocking trace mode (FW 2.1.1.4 and larger) this need to be moved to the end -tb-
+						//uint32_t f3            = srack->theFlt[col]->eventFIFO3->read(0);//TODO: for blocking trace mode (FW 2.1.1.4 and larger) this need to be moved to the end -tb-
+                        //uint32_t chmap = f1 >> 8;
+                        uint32_t evsubsec   = eventFIFO2->subSec->getCache();//(f2 >> 2) & 0x1ffffff; // 25 bit
+                        uint32_t adcoffset  = evsubsec & 0x7ff; // cut 11 ls bits (equal to % 2048)                                //evsubsec   = srack->theSlt->subSecCounter->read();
+						//if in DMA mode we need to leave some time (postTriggerTime) until the ADC trace is written to the FLT RAM
+						#if 1
+						if(useDmaBlockRead){//we poll the FIFO; typically we detect a event after 200 subsecs (=10 micro sec/usec) (150-250 subsec) (sometimes 1200-4000 subsec=60-200 usec - is Orca busy here?)
+						                    //as the HW is still recording the ADC trace (post trigg part with typically 1024 and up to 2048 subsec = 51,2-102,4 usec)
+							uint32_t sltsubseccount,sltsubsec1,sltsubsec2,sltsubsec;
+							int32_t diffsubsec;
+							sltsubseccount   = srack->theSlt->subSecCounter->read();
+							sltsubsec1 = sltsubseccount & 0x7ff;
+							sltsubsec2 = (sltsubseccount>>11) & 0x3fff;
+							sltsubsec   =  sltsubsec2 * 2000 + sltsubsec1;
+							diffsubsec = (sltsubsec-evsubsec+20000000) % 20000000;
+//							if(evsubsec>sltsubsec) fprintf(stderr,"---==============-------------------==============================_-----------------______________===========================\n");
+//							fprintf(stderr,"---  diffsubsec is %i\n",diffsubsec);
+//							fprintf(stderr,"---  diffsubsec is %i, post trigg: %i  (  ((0x%08x=%i))  sltsubsec %i, evsubsec %i)\n",diffsubsec,postTriggerTime,sltsubseccount,sltsubseccount,sltsubsec,evsubsec);
+//							if(diffsubsec<postTriggerTime) fprintf(stderr,"---=============break\n");
+							if(diffsubsec<postTriggerTime) break; //FLT still recording ADC trace -> leave for later for(eventN ...)-loop cycle ... -tb-
+						}
+						#endif
+						
+                        uint32_t chmap = eventFIFO1->channelMap->getCache();
+                        uint32_t fifoEventID      = ((f1&0xff)<<4) | (f2>>28);//( (f1 & 0xff) <<5 )  |  (f2 >>28);  //12 bit
+                        //uint32_t evsec      = (eventFIFO1->sec12downto5->getCache()<<5) | (eventFIFO2->sec4downto0->getCache());//( (f1 & 0xff) <<5 )  |  (f2 >>27);  //13 bit
+						uint32_t traceStart16;//start of trace in short array
+                                //if(wfRecordVersion == 0x2){ 
+                                    traceStart16 = (adcoffset + postTriggerTime + 1) % 2048;  //TODO: take this as standard from FW 2.1.1.4 on -tb-
+								//}
+                                //evsec      = srack->theSlt->secCounter->read();
+                        uint32_t precision  = eventFIFO2->timePrecision->getCache(); //TODO: we would need this for every channel in the channel mask -> move to FIFO3!!!! -tb-   !!!!!!!!
+						
+						uint32_t wfRecordVersion=0;//length: 4 bit (0..15) 0x1=raw trace, full length
+                        //wfRecordVersion = 0x1 ;//0x1=raw trace, full length, search within 4 time slots for trigger - OBSOLETE (I think this never was used ...)
+                        wfRecordVersion = 0x2 ;//0x2=always take adcoffset+post trigger time - recommended as default -tb-
+						//TODO: I would like to store the version of the readout code <------------------------------------!!!! use new functions "generalRead/Write   -tb-
+                        //else: full trigger search (not recommended)
+
+                        uint32_t eventchan, eventchanmask;
+						//now start loop to buffer FIFO and the ADC pages ...
+                        for(eventchan=0;eventchan<kNumChan;eventchan++){
+                            eventchanmask = (0x1L << eventchan);
+                            if((chmap & eventchanmask) && (triggerEnabledMask & eventchanmask)){
+                                uint32_t f3            = srack->theFlt[col]->eventFIFO3->read(eventchan);
+								FIFO3[col][eventchan] = f3;
+                                uint32_t pagenr        = (f3 >> 24) & 0x3f;
+                                uint32_t energy        = f3 & 0xfffff;
+				
+                                //static uint32_t waveformBuffer32[64*1024];
+                                //static uint32_t shipWaveformBuffer32[64*1024];
+                                //static uint16_t *waveformBuffer16 = (uint16_t *)(waveformBuffer32);
+                                //static uint16_t *shipWaveformBuffer16 = (uint16_t *)(shipWaveformBuffer32);
+                                uint32_t searchTrig,triggerPos = 0xffffffff;
+                                int32_t appendFlagPos = -1;
+                                
+                                srack->theSlt->pageSelect->write(0x100 | pagenr);
+                                
+								//read the raw trace
+								if(useDmaBlockRead){
+								    //DMA: readBlock
+								    //srack->theFlt[col]->ramData->readBlock(eventchan,(long unsigned int*)adctrace32[col][eventchan],1024); //memcopy w/o libPCIDMA
+								    srack->theFlt[col]->ramData->readBlock(eventchan,(long unsigned int*)adctrace32[col][eventchan],1024); //DMA with libPCIDMA, memcopy without
+								}else{
+								    //single access mode
+								    //read raw trace (use two loops as otherwise the FLT maybe has not yet written 'postTrigTIme' traces ... then we would read old data - see Elog XXX Florian)
+                                    uint32_t adccount, trigSlot;
+								    trigSlot = adcoffset/2;
+								    for(adccount=trigSlot; adccount<1024;adccount++){
+									    adctrace32[col][eventchan][adccount]= srack->theFlt[col]->ramData->read(eventchan,adccount);
+									    //shipWaveformBuffer32[adccount]= adctrace32[col][eventchan][adccount]; //TODO: not necessary any more? -tb-
+								    }
+								    for(adccount=0; adccount<trigSlot;adccount++){
+									    adctrace32[col][eventchan][adccount]= srack->theFlt[col]->ramData->read(eventchan,adccount);
+									    //shipWaveformBuffer32[adccount]= adctrace32[col][eventchan][adccount]; //TODO: not necessary any more? -tb-
+								    }
+								}
+								
+								//this was the old code (before 2012-03, DMA):
+							   #if 0
+								#if 1
+                                uint32_t adccount, trigSlot;
+								trigSlot = adcoffset/2;
+								for(adccount=trigSlot; adccount<1024;adccount++){
+									adctrace32[col][eventchan][adccount]= srack->theFlt[col]->ramData->read(eventchan,adccount);
+									//shipWaveformBuffer32[adccount]= adctrace32[col][eventchan][adccount]; //TODO: not necessary any more? -tb-
+								}
+								for(adccount=0; adccount<trigSlot;adccount++){
+									adctrace32[col][eventchan][adccount]= srack->theFlt[col]->ramData->read(eventchan,adccount);
+									//shipWaveformBuffer32[adccount]= adctrace32[col][eventchan][adccount]; //TODO: not necessary any more? -tb-
+								}
+								#else
+								//DMA: readBlock
+								#pragma message Using DMA mode!
+								;
+								//srack->theFlt[col]->ramData->readBlock(eventchan,(long unsigned int*)adctrace32[col][eventchan],1024); //memcopy w/o libPCIDMA
+								srack->theFlt[col]->ramData->readBlock(eventchan,(long unsigned int*)adctrace32[col][eventchan],1024); //DMA with libPCIDMA
+								//srack->theFlt[col]->histogramData->readBlock(eventchan,(long unsigned int*)adctrace32[col][eventchan],1024); //PCI burst  w/o libPCIDMA
+								#endif
+								/* old version; 2010-10-gap-in-trace-bug: PMC was reading too fast, so data was read faster than FLT could write -tb-
+								for(adccount=0; adccount<1024;adccount++){
+									shipWaveformBuffer32[adccount]= srack->theFlt[col]->ramData->read(eventchan,adccount);
+								}*/
+							   #endif
+							}
+						}
+						//if FIFO is full this (reading FIFO4) will release the current entry in the FIFO to allow the HW to record the next event -tb-
+						uint32_t f4            = srack->theFlt[col]->eventFIFO4->read(0);//TODO: for blocking trace mode (FW 2.1.1.4 and larger) this need to be moved to the end -tb-
+						FIFO4[col]=f4;
+						
+						//now ship the buffered data ...
+                        for(eventchan=0;eventchan<kNumChan;eventchan++){
+                            eventchanmask = (0x1L << eventchan);
+                            if((chmap & eventchanmask) && (triggerEnabledMask & eventchanmask)){
+                                uint32_t f3		= FIFO3[col][eventchan];
+                                uint32_t pagenr = (f3 >> 24) & 0x3f;
+                                uint32_t energy = f3 & 0xfffff;
+								uint32_t evsec	= FIFO4[col];//( (f1 & 0xff) <<5 )  |  (f2 >>27);  //13 bit
+       
+                                uint32_t waveformLength = 2048; 
+								uint32_t waveformLength32=waveformLength/2; //the waveform length is variable    
+								
+                                uint32_t eventFlags=0;//append page, append next page  TODO: currently not used <--------------------remove it -tb-
+
+                                //ship data record
+                                ensureDataCanHold(9 + waveformLength/2); 
+                                data[dataIndex++] = waveformId | (9 + waveformLength32);    
+                                //printf("FLT%i: waveformId is %i  loc+ev.chan %i\n",col+1,waveformId,  location | eventchan<<8);
+                                data[dataIndex++] = location | eventchan<<8;
+                                data[dataIndex++] = evsec;        //sec
+                                data[dataIndex++] = evsubsec;     //subsec
+                                data[dataIndex++] = chmap;
+                                data[dataIndex++] = (readptr & 0x3ff) | ((pagenr & 0x3f)<<10) | ((precision & 0x3)<<16)  | ((fifoFlags & 0xf)<<20) | ((fltRunMode & 0xf)<<24);        //event flags: event ID=read ptr (10 bit); pagenr (6 bit);; fifoFlags (4 bit);flt mode (4 bit)
+                                //data[dataIndex++] = energy; changed 2011-06-14 to add fifoEventID -tb-
+                                data[dataIndex++] = ((fifoEventID & 0xfff) << 20) | energy;
+                                //DEBUG:data[dataIndex++] = debugbuffer[col][eventchan];   //TODO: debug ... energy; for checking page counter I wrote out page counter instead of energy -tb-
+                                data[dataIndex++] = ((traceStart16 & 0x7ff)<<8) | eventFlags | (wfRecordVersion & 0xf);
+                                //data[dataIndex++] = ((traceStart16 & 0x7ff)<<8) |  (wfRecordVersion & 0xf);
+                                //data[dataIndex++] = 0;    //spare to remain byte compatible with the v3 record
+                                data[dataIndex++] = postTriggerTime /*for debugging -tb-*/   ;    //spare to remain byte compatible with the v3 record
+                                
+                                //TODO: SHIP TRIGGER POS and POSTTRIGG time !!! -tb-
+                                
+                                //ship waveform
+                                for(uint32_t i=0;i<waveformLength32;i++){
+                                    data[dataIndex++] = adctrace32[col][eventchan][i];
+                                }
+                                
+                            }
+                        }
+                    }
+                }//if(!fifoEmptyFlag)...
+                else break;//fifo is empty, leave loop ...
+            }//for(eventN=0; ...
+        }
+        // --- 'ENERGY+TRACE (SYNC)' MODE ------------------------NEW: 2011-01-tb-------   2013-05-29: THIS MODE NOW IS OBSOLETE!! (make all changes manually) -tb-
         else if((daqRunMode == kIpeFltV4_EnergyTraceSyncDaqMode) ){  //then fltRunMode == kIpeFltV4Katrin_Run_Mode resp. kIpeFltV4Katrin_Veto_Mode
         //TODO: else if((daqRunMode == kIpeFltV4_EnergyTraceSyncDaqMode) || (daqRunMode == kIpeFltV4_VetoEnergyTraceSyncDaqMode)){  //then fltRunMode == kIpeFltV4Katrin_Run_Mode resp. kIpeFltV4Katrin_Veto_Mode
 			// this mode ensures to read out according energy and trace (but will not catch all events at high rates)
@@ -921,6 +1086,8 @@ fprintf(stdout,"4x - readpr:%i, writeptr:%i\n",readptrx,writeptrx);fflush(stdout
                 else break;//fifo is empty, leave loop ...
             }//for(eventN=0; ...
         }
+
+#if 0 //old ENERGY+TRACE MODE (without waiting until postTriggerTime has elapsed) - commented out 2013-05-29   --> REMOVE IT 2015-05 -tb-
         // --- ENERGY+TRACE MODE ------------------------------
         else if((daqRunMode == kIpeFltV4_EnergyTraceDaqMode) || (daqRunMode == kIpeFltV4_VetoEnergyTraceDaqMode)){  //then fltRunMode == kIpeFltV4Katrin_Run_Mode resp. kIpeFltV4Katrin_Veto_Mode
             //uint32_t status         = srack->theFlt[col]->status->read();
@@ -1125,6 +1292,7 @@ fprintf(stdout,"4x - readpr:%i, writeptr:%i\n",readptrx,writeptrx);fflush(stdout
                 else break;//fifo is empty, leave loop ...
             }//for(eventN=0; ...
         }
+#endif
         // --- HISTOGRAM MODE ------------------------------
         else if(fltRunMode == kIpeFltV4Katrin_Histo_Mode) {    //then fltRunMode == kIpeFltV4Katrin_Histo_Mode
                 // buffer some data:

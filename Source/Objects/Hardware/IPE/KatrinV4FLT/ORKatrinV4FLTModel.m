@@ -402,7 +402,11 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (void) syncWithRunControlCheckStopCondition
 {
     //NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
-    if(syncWithRunControlCounterFlag >= receivedHistoCounter){
+    if(syncWithRunControlCounterFlag >= receivedHistoCounter){//the notification 'runAboutToChangeState' seems to be called every second, if a wait is active, so we need to check for >= (not ==) -tb-
+        //this is the sum histogram facility - see - (BOOL) setFromDecodeStageReceivedHistoForChan:(short)aChan
+            //NSLog(@"subrun-histo-summing: SHIP NOW <--------------\n");//DEBUG
+            [self shipSumHistograms];
+        //clear waits for run control
 	    [self releaseRunWait]; 
 	    syncWithRunControlCounterFlag=0;
 	}
@@ -2145,6 +2149,14 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 {
     self = [super initWithCoder:decoder];
 	
+    
+    if(runMode==kIpeFltV4_EnergyTraceSyncDaqMode){
+	    NSLog(@"%@::%@ WARNING: RunMode 'Energy+Trace (sync)' is obsolete - use 'Energy+Trace' instead (optionally with 'Stop on Full')!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//debug output -tb-
+        //TODO: in the future (maybe from 2014 on?) automatically switch to 'Energy+Trace' -tb-
+        //	[self setRunMode:			kIpeFltV4_EnergyTraceDaqMode];
+
+    }
+    
     [[self undoManager] disableUndoRegistration];
 	
     //[self setUseSLTtime:[decoder decodeIntForKey:@"useSLTtime"]];
@@ -2346,7 +2358,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 	//------------------
 	//added -tb- 04/29/13	
 	[objDictionary setObject:[NSNumber numberWithInt:boxcarLength]				forKey:@"BoxcarLength"];
-	[objDictionary setObject:[NSNumber numberWithInt:useDmaBlockRead]		    forKey:@"UseDmaBlockRead"];
+	[objDictionary setObject:[NSNumber numberWithInt:useDmaBlockRead]		    forKey:@"UseDmaBlockRead"];//0=auto, 1=yes, 2=no
 	[objDictionary setObject:[NSNumber numberWithInt:fifoLength]				forKey:@"FifoLength64"];
 	//------------------
 	
@@ -2367,8 +2379,20 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 		[self setReceivedHistoChanMap:map];
 	    //NSLog(@"DEBUG: in %@::%@: Received histogram for chan:%i  (trigger mask: %i)    \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),aChan,triggerEnabledMask);//TODO: DEBUG testing ...-tb-
 		//NSLog(@"Received histogram for chan:%i  (trigger mask: %i)\n",aChan,triggerEnabledMask);//DEBUG
+        if(shipSumHistogram){
+            //added to compute sum histograms for each end of subrun and in-between sequence
+		    //NSLog(@"Received histogram for chan:%i  (trigger mask: %i)\n",aChan,triggerEnabledMask);//DEBUG
+            //TODO: SKIP THE SUM HISTOGRAM SHIPPED FROM FLT!!!!!!!!
+            histoBuf[aChan].refreshTimeSec += histRecTime;
+		    //NSLog(@"subrun-histo-summing: Received histogram for chan:%i  (trigger mask: %i) current refreshTime: %i\n",aChan,triggerEnabledMask,histoBuf[aChan].refreshTimeSec);//DEBUG
+        }
 		if(triggerEnabledMask == (map & triggerEnabledMask)){ // 'triggerEnabledMask == map' is sufficient, but in simulation mode we may receive histograms from inactive channels ... -tb-
-		    //after all channels shipped histogram, increase counter
+		    //after all channels shipped histogram, ship sum histograms and increase counter
+            //ship sum histograms
+              //moved to syncWithRunControlCheckStopCondition
+		      //NSLog(@"subrun-histo-summing: SHIP NOW <--------------\n");//DEBUG
+              //[self shipSumHistograms];
+            //increase counter
 		    map=0;
 			[self setReceivedHistoChanMap:map];
 			[self setReceivedHistoCounter: receivedHistoCounter+1];
@@ -2377,6 +2401,30 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
     return YES;
 }
 
+- (void) shipSumHistograms
+{
+        int chan;
+        for(chan=0; chan<kNumV4FLTChannels; chan++){
+            if(triggerEnabledMask && (0x1<<chan)){//if this channel is active, ship histogram, then clear
+                //ship
+                // ... TODO ...
+                //clear histogram buffer
+                histoBuf[chan].readoutSec      =  0;
+                histoBuf[chan].refreshTimeSec  =  0;
+                /*
+                bzero(&(histoBuf[chan]), sizeof(katrinV4FullHistogramDataStruct));
+                histoBuf[chan].orcaHeader = histogramId | (sizeof(katrinV4FullHistogramDataStruct)/sizeof(int32_t));
+                histoBuf[chan].location =    ((crate & 0x01e)<<21) | (((station) & 0x1f)<<16) | ((boxcarLength & 0x3)<<4)  | (filterShapingLength & 0xf)      |    (chan<<8);
+                histoBuf[chan].firstBin =  0;
+                histoBuf[chan].lastBin =   2048;
+                histoBuf[chan].histogramLength =   2048;
+                histoBuf[chan].maxHistogramLength =   2048;
+                histoBuf[chan].binSize    =   histEBin;
+                histoBuf[chan].offsetEMin =   histEMin;
+                */
+            }
+        }
+}
 
 
 
@@ -2528,6 +2576,25 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 	}
 		
 	if(runMode == kIpeFltV4_Histogram_DaqMode){
+        //clear histogram buffers
+        uint32_t crate = [self crateNumber];
+        uint32_t station = [self stationNumber];
+        int chan;
+        for(chan=0; chan<kNumV4FLTChannels; chan++){
+            if(triggerEnabledMask && (0x1<<chan)){//if this channel is active, clear histogram buffer(s)
+                bzero(&(histoBuf[chan]), sizeof(katrinV4FullHistogramDataStruct));
+                histoBuf[chan].orcaHeader = histogramId | (sizeof(katrinV4FullHistogramDataStruct)/sizeof(int32_t));
+                histoBuf[chan].location =    ((crate & 0x01e)<<21) | (((station) & 0x1f)<<16) | ((boxcarLength & 0x3)<<4)  | (filterShapingLength & 0xf)      |    (chan<<8);
+                histoBuf[chan].readoutSec      =  0;
+                histoBuf[chan].refreshTimeSec  =  0;
+                histoBuf[chan].firstBin        =  0;
+                histoBuf[chan].lastBin         =   2048;
+                histoBuf[chan].histogramLength =   2048;
+                histoBuf[chan].maxHistogramLength =   2048;
+                histoBuf[chan].binSize    =   histEBin;
+                histoBuf[chan].offsetEMin =   histEMin;
+            }
+        }
 		//start polling histogramming mode status
 		[self performSelector:@selector(readHistogrammingStatus) 
 				   withObject:nil
@@ -2639,7 +2706,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 	configStruct->card_info[index].deviceSpecificData[7] = versionCFPGA;		//CFPGA version 0xPDDDVVRR //P=project, D=doc revision
 	configStruct->card_info[index].deviceSpecificData[8] = versionFPGA8;		//FPGA8 version 0xPDDDVVRR //V=version, R=revision
 	  //history: 2.1.1.4 added veto+redesign of FIFO
-	configStruct->card_info[index].deviceSpecificData[9] = [self filterShapingLength];		////replaces filterShapingLength -tb- 2011-04
+	configStruct->card_info[index].deviceSpecificData[9] = [self filterShapingLength];		////replaces filterLength -tb- 2011-04
 
 	configStruct->card_info[index].deviceSpecificData[10] = [self useDmaBlockRead];		////enables DMA access //TODO: - no plausibility checks yet!!! -tb- 2012-03
 	configStruct->card_info[index].deviceSpecificData[11] = [self boxcarLength];		////enables DMA access //TODO: - no plausibility checks yet!!! -tb- 2012-03

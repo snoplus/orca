@@ -31,6 +31,7 @@
 #define kIpeFltV4Katrin_Run_Mode			1
 #define kIpeFltV4Katrin_Histo_Mode			2
 #define kIpeFltV4Katrin_Veto_Mode			3
+#define kIpeFltV4Katrin_Bipolar_Mode		5
 //#define kIpeFltV4Katrin_Test_Mode			3   //TODO: see fpga8_package.vhd -tb-
 
 
@@ -46,7 +47,9 @@
 #define kIpeFltV4_VetoEnergyTraceSyncDaqMode	6
 // new modes after mode redesign 2011-01 -tb-
 #define kIpeFltV4_EnergyTraceSyncDaqMode		7
-#define kIpeFltV4_NumberOfDaqModes				8
+// new modes after mode redesign 2013-05 -tb-
+#define kIpeFltV4_BipolarEnergyDaqMode		    8
+#define kIpeFltV4_NumberOfDaqModes				9
 // kIpeFltV4_NumberOfDaqModes MUST be the number of daq modes; no gaps allowed! TODO: using a enum would be better -tb- <------NOTE!
 
 #else
@@ -84,6 +87,23 @@ typedef struct { // -tb- 2008-02-27
     uint32_t histogramID;
     uint32_t histogramInfo;
 } katrinV4HistogramDataStruct;
+
+
+typedef struct { // -tb- 2013-05-27 struct for histogram buffer (for summing up histograms)
+	uint32_t orcaHeader;
+	uint32_t location;
+	int32_t readoutSec;
+	int32_t refreshTimeSec;  
+	int32_t firstBin;
+	int32_t lastBin;
+	int32_t histogramLength; //don't use unsigned! - it may become negative, at least temporaryly -tb-
+    int32_t maxHistogramLength;
+    int32_t binSize;
+    int32_t offsetEMin;
+    uint32_t histogramID;
+    uint32_t histogramInfo;
+    uint32_t h[2048];
+} katrinV4FullHistogramDataStruct;
 
 
 #endif

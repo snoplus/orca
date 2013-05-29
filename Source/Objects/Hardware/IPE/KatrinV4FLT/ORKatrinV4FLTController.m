@@ -407,7 +407,8 @@
 }
 - (void) useDmaBlockReadChanged:(NSNotification*)aNote
 {
-	[useDmaBlockReadButton setIntValue: [model useDmaBlockRead]];
+	[useDmaBlockReadPU selectItemWithTag: [model useDmaBlockRead]];
+	//[useDmaBlockReadButton setIntValue: [model useDmaBlockRead]];//obsolete -tb-
 }
 
 - (void) syncWithRunControlChanged:(NSNotification*)aNote
@@ -1063,6 +1064,11 @@
 	//DEBUG -tb-    	NSLog(@"Called %@::%@! selected %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[sender indexOfSelectedItem]);//TODO: DEBUG -tb-
 	//[model setUseSLTtime:[sender intValue]];	
 	[model updateUseSLTtime];	
+}
+
+- (IBAction) useDmaBlockReadPUAction:(id)sender
+{
+	[model setUseDmaBlockRead:[[useDmaBlockReadPU selectedItem] tag]];	
 }
 
 - (void) useDmaBlockReadButtonAction:(id)sender
