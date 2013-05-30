@@ -42,7 +42,12 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 	[systemParams release];
 	[connectionHistory release];
     [IPNumber release];
-	[[ORSNMPQueue queue] removeObserver:self forKeyPath:@"operationCount"];
+    @try {
+        [[ORSNMPQueue queue] removeObserver:self forKeyPath:@"operationCount"];
+    }
+    @catch (NSException* e){
+        
+    }
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[super dealloc];
 }
