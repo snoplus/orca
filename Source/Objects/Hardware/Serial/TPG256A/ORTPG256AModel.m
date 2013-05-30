@@ -590,6 +590,10 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 				if(measurementState[channel] == kTPG256AMeasurementOK){
 					thePressure = [[parts objectAtIndex:1] floatValue];
 				}
+                else if(measurementState[channel] == kTPG256AMeasurementUnderRange){
+                    thePressure = 0;
+                }
+                
 				[self setPressure:channel value:thePressure];
 			}
 		}
