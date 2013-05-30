@@ -540,14 +540,14 @@
 - (IBAction) incChannelAction:(id)sender
 {	
 	int selectedChannel = [model selectedChannel] + 1;
-	if(selectedChannel>[model numberOfChannels])selectedChannel = 0;
+	if(selectedChannel>[model numberOfChannels]-1)selectedChannel = 0;
 	[model setSelectedChannel:selectedChannel];
 }
 
 - (IBAction) decChannelAction:(id)sender
 {
 	int selectedChannel = [model selectedChannel] - 1;
-	if(selectedChannel<0)selectedChannel = [model numberOfChannels];
+	if(selectedChannel<0)selectedChannel = [model numberOfChannels]-1;
 	[model setSelectedChannel:selectedChannel];
 }
 
