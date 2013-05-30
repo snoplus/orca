@@ -287,7 +287,7 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 {
 	if(index>=0 && index<6){
 		
-		if(aValue == 0) aValue = 1.0E3;
+		//if(aValue == 0) aValue = 1.0E3;
 		
 		pressure[index] = aValue * 0.750061683; //convert the value from mBar to Torr.
 		
