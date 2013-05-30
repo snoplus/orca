@@ -45,6 +45,7 @@
     IBOutlet NSButton*		reportStateButton;
     IBOutlet NSTextField*	captureDateField;
     IBOutlet NSTextField*	primaryRateField;
+	IBOutlet NSPopUpButton* runTypeScriptPU;
     IBOutlet NSButton*		startRunButton;
     IBOutlet NSButton*		stopRunButton;
     IBOutlet NSTextField*	runNumberField;
@@ -101,6 +102,8 @@
 - (IBAction) repeatRunCBAction:(id)sender;
 - (IBAction) runModeAction:(id)sender;
 - (IBAction) autoscaleMainColorScale:(id)sender;
+- (IBAction) selectedRunTypeScriptPUAction:(id)sender;
+
 
 #pragma mark •••Toolbar
 - (IBAction) openHelp:(NSToolbarItem*)item;

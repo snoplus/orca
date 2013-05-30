@@ -49,6 +49,7 @@
 - (void) savePrimaryMapFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 #endif
 - (void) scaleValueHistogram;
+- (void) populatePopups;
 @end
 
 
@@ -279,6 +280,11 @@
                        object: nil];
 
     [notifyCenter addObserver : self
+                     selector : @selector(selectedRunTypeScriptChanged:)
+                         name : ORRunModelSelectedRunTypeScriptChanged
+						object: nil];
+
+    [notifyCenter addObserver : self
                      selector : @selector(showNamesChanged:)
                          name : ORExperimentModelShowNamesChanged
 						object: model];
@@ -315,6 +321,7 @@
 	[self runTimeLimitChanged:nil];
 	[self repeatRunChanged:nil];
 	[self elapsedTimeChanged:nil];
+	[self populatePopups];
 	
 		//details
 	[self detailsLockChanged:nil];
@@ -363,6 +370,10 @@
 	[repeatRunCB setIntValue:[runControl repeatRun]];
 }
 
+- (void) selectedRunTypeScriptChanged:(NSNotification*)aNote
+{
+	[runTypeScriptPU selectItemAtIndex: [runControl selectedRunTypeScript]];
+}
 
 -(void) elapsedTimeChanged:(NSNotification*)aNotification
 {
@@ -470,6 +481,11 @@
 {
 	[self endEditing];
 	[runControl haltRun];
+}
+
+- (IBAction) selectedRunTypeScriptPUAction:(id)sender
+{
+	[runControl setSelectedRunTypeScript:[sender indexOfSelectedItem]];
 }
 
 - (IBAction) timeLimitTextAction:(id)sender
@@ -911,7 +927,7 @@
 		case kDisplayGains:			
 			[histogramTitle setStringValue:@"Gain Distribution"];		
 			[valueHistogramsPlot setXLabel:@"Gain Value"];	
-			[valueHistogramsPlot setYLabel:@"# Channels"];	
+			[valueHistogramsPlot setYLabel:@"# Channels"];
 		break;
 		default: break;
 	}
@@ -1026,6 +1042,25 @@
 @end
 
 @implementation ORExperimentController (private)
+- (void) populatePopups
+{
+	[[model undoManager] disableUndoRegistration];
+	
+	[runTypeScriptPU removeAllItems];
+    [runTypeScriptPU addItemWithTitle:@"Standard (Manual)"];
+    	
+    NSArray* runTypeScripts = [runControl collectObjectsOfClass:NSClassFromString(@"ORRunScriptModel")];
+    NSArray* runTypeSortedBySlot = [runTypeScripts sortedArrayUsingSelector:@selector(compare:)];
+    
+    int index = 1;
+    for(ORRunScriptModel* obj in runTypeSortedBySlot){
+		[runTypeScriptPU addItemWithTitle:[obj identifier]];
+        [obj setSelectionIndex:index];
+        index++;
+    }
+        
+	[[model undoManager] enableUndoRegistration];
+}
 
 - (void) scaleValueHistogram
 {
