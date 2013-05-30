@@ -575,6 +575,10 @@
 			else if([[aTableColumn identifier] isEqualToString:@"maxCurrent"]){
 				return [NSNumber numberWithFloat:[model maxCurrent:rowIndex]];
 			}
+			else if([[aTableColumn identifier] isEqualToString:@"outputMeasurementSenseVoltage"]){
+				float theVoltage = [model channel:rowIndex readParamAsFloat:[aTableColumn identifier]];
+				return [NSNumber numberWithFloat:theVoltage];
+			}
 			else if([[aTableColumn identifier] isEqualToString:@"outputMeasurementCurrent"]){
 				float theCurrent = [model channel:rowIndex readParamAsFloat:[aTableColumn identifier]] *1000000.;
 				return [NSNumber numberWithFloat:theCurrent];
