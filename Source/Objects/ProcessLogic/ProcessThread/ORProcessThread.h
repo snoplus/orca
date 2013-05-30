@@ -25,7 +25,6 @@
 @class ProcessElementSet;
 
 @interface ORProcessThread : NSObject {
-    NSRecursiveLock* processLock;
     NSMutableSet*    endNodes;
     BOOL             running;
     NSConditionLock* _cancelled;

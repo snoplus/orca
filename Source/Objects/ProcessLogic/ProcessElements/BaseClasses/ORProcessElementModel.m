@@ -32,7 +32,6 @@ NSString* ORProcessElementForceUpdateNotification   = @"ORProcessElementForceUpd
 - (id) init //designated initializer
 {
     self = [super init];
-    processLock = [[NSLock alloc] init];
     [self setUpNubs];
     return self;
 }
@@ -41,7 +40,6 @@ NSString* ORProcessElementForceUpdateNotification   = @"ORProcessElementForceUpd
 {
 	[highlightedAltImage release];
     [altImage release];
-	[processLock release];
     [super dealloc];
 }
 
@@ -376,14 +374,14 @@ NSString* ORProcessElementForceUpdateNotification   = @"ORProcessElementForceUpd
 - (void) setState:(int)value
 {
 	@try {
-		[processLock lock];     //start critical section
-		if(value != state){
-			state = value;
-			[self postStateChange];
-		}
+        @synchronized(self){
+            if(value != state){
+                state = value;
+                [self postStateChange];
+            }
+        }
 	}
 	@finally {
-		[processLock unlock];   //end critical section
 	}
 }
 
@@ -395,14 +393,14 @@ NSString* ORProcessElementForceUpdateNotification   = @"ORProcessElementForceUpd
 - (void) setEvaluatedState:(int)value
 {
 	@try {
-		[processLock lock];     //start critical section
-		if(value != evaluatedState){
-			evaluatedState = value;
-			[self postStateChange];
-		}
+        @synchronized(self){
+            if(value != evaluatedState){
+                evaluatedState = value;
+                [self postStateChange];
+            }
+        }
 	}
 	@finally {
-		[processLock unlock];   //end critical section
 	}
 }
 
@@ -486,7 +484,6 @@ NSString* ORProcessElementForceUpdateNotification   = @"ORProcessElementForceUpd
 	}
     [[self undoManager] enableUndoRegistration];
 	
-    processLock = [[NSLock alloc] init];
     [self setUpNubs];
 	
     return self;

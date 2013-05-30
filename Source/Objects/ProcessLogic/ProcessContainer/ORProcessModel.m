@@ -565,7 +565,7 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 
 - (void) startRun
 {
-	@synchronized(self){
+	//@synchronized(self){
 		
 		[self registerNotificationObservers];
 		
@@ -595,7 +595,7 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
                 }
             }
         }
-    }
+   // }
 }
 
 - (void) stopRun

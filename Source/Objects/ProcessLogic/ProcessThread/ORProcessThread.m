@@ -60,7 +60,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessThread);
 {
     self = [super init];
     [self registerNotificationObservers];
-    processLock = [[NSRecursiveLock alloc] init];
 	int i;
 	for(i=0;i<256;i++){
 		crBits[i] = nil;;
@@ -76,7 +75,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessThread);
 	for(i=0;i<256;i++){
 		[crBits[i] release];
 	}
-    [processLock release];
     [endNodes release];
     [_cancelled release];
     [super dealloc];
@@ -147,13 +145,13 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessThread);
     [endNodes makeObjectsPerformSelector:@selector(processIsStarting)];
 	
 	@try {
-		[processLock lock];     //begin critical section
-		if(!endNodes) endNodes = [[NSMutableSet alloc] init];
-		[endNodes addObjectsFromArray:trueEndNodes];
-		if(!running)[self start];
+        @synchronized(self){
+            if(!endNodes) endNodes = [[NSMutableSet alloc] init];
+            [endNodes addObjectsFromArray:trueEndNodes];
+            if(!running)[self start];
+        }
 	}
 	@finally {
-		[processLock unlock];   //end critical section
 	}
 }
 
@@ -177,16 +175,16 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessThread);
     [trueEndNodes makeObjectsPerformSelector:@selector(processIsStopping)];
 	
  	@try {
-		[processLock lock];     //begin critical section
-		[endNodes minusSet:objectSet];
-		if(![endNodes count]){
-			if(running)[self stop];
-			[endNodes release];
-			endNodes = nil;
-		}
+        @synchronized(self){
+            [endNodes minusSet:objectSet];
+            if(![endNodes count]){
+                if(running)[self stop];
+                [endNodes release];
+                endNodes = nil;
+            }
+        }
 	}
 	@finally {
-		[processLock unlock];   //end critical section
 	}
 }
 
@@ -195,31 +193,31 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessThread);
  	@try {
 		if(!aNode)return;
 		if(![aNode isTrueEndNode])return;
-		[processLock lock];     //begin critical section
-		if(!endNodes) endNodes = [[NSMutableSet alloc] init];
-		[aNode processIsStarting];
-		[endNodes addObject:aNode];
-		if(!running)[self start];
+        @synchronized(self){
+            if(!endNodes) endNodes = [[NSMutableSet alloc] init];
+            [aNode processIsStarting];
+            [endNodes addObject:aNode];
+            if(!running)[self start];
+        }
 	}
 	@finally {
-		[processLock unlock];   //end critical section
 	}
 }
 
 - (void) stopNode:(ORProcessEndNode*) aNode
 {
   	@try {
-		[processLock lock];     //begin critical section
-		[aNode processIsStopping];
-		[endNodes removeObject:aNode];
-		if([endNodes count] == 0){
-			if(running)[self stop];
-			[endNodes release];
-			endNodes = nil;
-		}
+        @synchronized(self){
+            [aNode processIsStopping];
+            [endNodes removeObject:aNode];
+            if([endNodes count] == 0){
+                if(running)[self stop];
+                [endNodes release];
+                endNodes = nil;
+            }
+        }
 	}
 	@finally {
-		[processLock unlock];   //end critical section
 	}
 }
 
@@ -227,11 +225,11 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessThread);
 {
     BOOL result = NO;
   	@try {
-		[processLock lock];     //begin critical section
-		result = [endNodes intersectsSet:[NSSet setWithArray:someNodes]];
+        @synchronized(self){
+            result = [endNodes intersectsSet:[NSSet setWithArray:someNodes]];
+        }
 	}
 	@finally {
-		[processLock unlock];   //end critical section
 	}
     return result;
 }
@@ -239,24 +237,24 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessThread);
 - (void) registerInputObject:(id)anObject
 {
    	@try {
-		[processLock lock];     //begin critical section
-		if(!inputs)inputs = [[ProcessElementSet alloc] retain];
-		[inputs addObject:anObject];
+        @synchronized(self){
+            if(!inputs)inputs = [[ProcessElementSet alloc] retain];
+            [inputs addObject:anObject];
+        }
 	}
 	@finally {
-		[processLock unlock];   //end critical section
 	}
 }
 
 - (void) registerOutputObject:(id)anObject
 {
    	@try {
-		[processLock lock];     //begin critical section
-		if(!outputs)outputs = [[ProcessElementSet alloc] retain];
-		[outputs addObject:anObject];
+        @synchronized(self){
+            if(!outputs)outputs = [[ProcessElementSet alloc] retain];
+            [outputs addObject:anObject];
+        }
 	}
 	@finally {
-		[processLock unlock];   //end critical section
 	}
 }
 
@@ -333,35 +331,31 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessThread);
 	running = YES;
     do {
         NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-        [processLock lock];     //begin critical section
-        
+            
         [allProcessElements makeObjectsPerformSelector:@selector(clearAlreadyEvaluatedFlag)];
-		
-        //tell all the input hw to store the current state
-		@try {
-			[allProcesses makeObjectsPerformSelector:@selector(startProcessCycle)];
-			[inputs startProcessCycle];
-		}
-		@catch(NSException* localException) {
-		}
-		
-		@try {
-			[endNodes makeObjectsPerformSelector:@selector(eval)];
-		}
-		@catch(NSException* localException) {
-		}
-		
-		@try {
-			//tell all the output hw to write out the current state
-			[outputs endProcessCycle];
-			[inputs endProcessCycle];
-			[allProcesses makeObjectsPerformSelector:@selector(endProcessCycle)];
-		}
-		@catch(NSException* localException) {
-		}
-		
-        [processLock unlock];   //end critical section
         
+        //tell all the input hw to store the current state
+        @try {
+            [allProcesses makeObjectsPerformSelector:@selector(startProcessCycle)];
+            [inputs startProcessCycle];
+        }
+        @catch(NSException* localException) {
+        }
+        
+        @try {
+            [endNodes makeObjectsPerformSelector:@selector(eval)];
+        }
+        @catch(NSException* localException) {
+        }
+        
+        @try {
+            //tell all the output hw to write out the current state
+            [outputs endProcessCycle];
+            [inputs endProcessCycle];
+            [allProcesses makeObjectsPerformSelector:@selector(endProcessCycle)];
+        }
+        @catch(NSException* localException) {
+        }
         [NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:.1]];
         
         [pool release];

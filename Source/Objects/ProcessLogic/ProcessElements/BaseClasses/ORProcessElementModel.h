@@ -35,7 +35,6 @@
 		unsigned long processID;
 	@private
         int         state;
-        NSLock*     processLock;
         NSString*   comment;
 		BOOL		partOfRun;
 }
