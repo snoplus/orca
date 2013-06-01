@@ -597,7 +597,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
                  NSLog(@"%@::%@ Called runIsAboutToChangeState --- SLT <-------------------------N\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
     #endif
                  
-    int state = [[[aNote userInfo] objectForKey:@"State"] intValue];
+    //int state = [[[aNote userInfo] objectForKey:@"State"] intValue];
     
     //NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
     //NSLog(@"Called %@::%@   aNote:>>>%@<<<\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),aNote);//DEBUG -tb-
@@ -1687,7 +1687,7 @@ return;
     //this is accessing the hardware and might fail
 	@try {
 	    [objDictionary setObject:[NSNumber numberWithUnsignedLong:[self readHwVersion]]		forKey:@"FPGAVersion"];
-	    [objDictionary setObject:[NSString stringWithFormat:@"0x%08x",[self readHwVersion]]		forKey:@"FPGAVersionString"];
+	    [objDictionary setObject:[NSString stringWithFormat:@"0x%08lx",[self readHwVersion]]		forKey:@"FPGAVersionString"];
 	    [objDictionary setObject:[NSNumber numberWithLong:[self getSBCCodeVersion]]		forKey:@"SBCCodeVersion"];
 	    [objDictionary setObject:[NSNumber numberWithLong:[self getSltPciDriverVersion]]		forKey:@"SLTDriverVersion"];
 	    [objDictionary setObject:[NSNumber numberWithLong:[self getSltkGetIsLinkedWithPCIDMALib]]		forKey:@"LinkedWithDMALib"];

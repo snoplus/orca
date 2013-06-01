@@ -317,7 +317,7 @@ followed by multiplicity data (20 longwords -- 1 pixel mask per card)
 	unsigned long startIndex= ShiftAndExtract(ptr[7],8,0x7ff);
 
 	//channel by channel histograms
-	unsigned long energy = ptr[6];
+	//unsigned long energy = ptr[6];
     uint32_t eventFlags     = ptr[7];
     //uint32_t traceStart16 = ShiftAndExtract(eventFlags,8,0x7ff);//start of trace in short array
     

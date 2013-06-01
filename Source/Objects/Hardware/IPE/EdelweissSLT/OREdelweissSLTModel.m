@@ -238,7 +238,7 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
     
     //store some vars
     int *wrIndex = &(dataReplyThreadData->wrIndex);//we cannot use references, we are in C, not C++
-    int *rdIndex = &(dataReplyThreadData->rdIndex);//we cannot use references, we are in C, not C++
+    //int *rdIndex = &(dataReplyThreadData->rdIndex);//we cannot use references, we are in C, not C++
 	int32_t debugCounter=0;
 	
 	//static int counterStatusPacket=0; //MAH commented out 9/17/2012 to get rid of compiler unused variable warning
@@ -444,7 +444,7 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
                     //print some output
 				    NSLog(@"      BB status packet: block %i , length (bytes) %i, FLT #%i, fiber #%i, status: 0x%04x 0x%04x ... \n",
                                  counter,BBblock->size_bytes,BBblock->fltIndex +1,BBblock->fiberIndex +1,BBblock->bb_status[0],BBblock->bb_status[1]);
-                    unsigned char*myptr=ptr;
+                    unsigned char* myptr = (unsigned char*)ptr;
                     //NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
 	                NSFont* aFont = [NSFont fontWithName:@"Monaco" size:11];
                     
@@ -3204,7 +3204,7 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
 -(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
         // -------TIMER-VARIABLES-----------
-        static struct timeval starttime, stoptime, currtime;//    struct timezone tz; is obsolete ... -tb-
+        static struct timeval starttime, /*stoptime,*/ currtime;//    struct timezone tz; is obsolete ... -tb-
         //struct timezone	timeZone;
 	    static double currDiffTime=0.0, lastDiffTime=0.0;
 

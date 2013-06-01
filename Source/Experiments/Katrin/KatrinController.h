@@ -88,6 +88,7 @@
 - (IBAction) lowLimitAction:(id)sender;
 - (IBAction) hiLimitAction:(id)sender;
 - (IBAction) vetoMapLockAction:(id)sender;
+- (void) toggleSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 
 #pragma mark ¥¥¥Detector Interface Management
 - (void) fpdOnlyModeChanged:(NSNotification*)aNote;

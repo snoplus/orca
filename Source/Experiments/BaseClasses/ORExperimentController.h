@@ -150,7 +150,8 @@
 - (void) runModeChanged:(NSNotification*)aNote;
 - (void) runTimeLimitChanged:(NSNotification*)aNote;
 - (void) repeatRunChanged:(NSNotification*)aNote;
-- (void) elapsedTimeChanged:(NSNotification*)aNotification;
+- (void) elapsedTimeChanged:(NSNotification*)aNote;
+- (void) selectedRunTypeScriptChanged:(NSNotification*)aNote;
 
 #pragma mark •••Details Interface Management
 - (void) histogramsUpdated:(NSNotification*)aNote;

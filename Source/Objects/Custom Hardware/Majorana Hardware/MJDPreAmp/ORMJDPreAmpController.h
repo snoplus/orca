@@ -94,6 +94,8 @@
 - (void) feedbackResistorChanged:(NSNotification*)aNote;
 - (void) baselineVoltageArrayChanged:(NSNotification*)aNote;
 - (void) baselineVoltageChanged:(NSNotification*)aNote;
+- (void) miscAttributesChanged:(NSNotification*)aNote;
+
 - (int) tagToAdc:(int)aTag;
 - (NSString*) nameForTag:(int)aTag;
 

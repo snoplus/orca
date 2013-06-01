@@ -289,12 +289,12 @@
                       @"Yes/Do it!",
                       nil,[self window],
                       self,
-                      @selector(_toggleSheetDidEnd:returnCode:contextInfo:),
+                      @selector(toggleSheetDidEnd:returnCode:contextInfo:),
                       nil,
                       nil,fpdOnlyMode?@"This will re-enable veto channels to the state they were before.":@"This will disable ALL Veto channels. The current state will be saved until ORCA quits.");
 }
 
-- (void) _toggleSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) toggleSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
     if(returnCode == NSAlertAlternateReturn){
         [model toggleFPDOnlyMode];
