@@ -23,9 +23,11 @@
 
 @class ORColorScale;
 @class ORSegmentGroup;
+@class ORBasicOpenGLView;
 
 @interface KatrinController : ORExperimentController {
  
+    IBOutlet ORBasicOpenGLView*  openGlView;
     IBOutlet ORColorScale*	secondaryColorScale;
 	IBOutlet NSTextField*   fpdOnlyModeField;
 	IBOutlet NSButton*      fpdOnlyModeButton;
@@ -35,7 +37,7 @@
     IBOutlet NSButton*		secondaryColorAxisLogCB;
     IBOutlet NSTextField*	secondaryRateField;
     IBOutlet NSTextField*	detectorTitle;
-
+    
 	//items in the  HW map tab view
 	IBOutlet NSPopUpButton* secondaryAdcClassNamePopup;
 	IBOutlet NSTextField*	secondaryMapFileTextField;
@@ -52,6 +54,7 @@
 	//items in the  details tab view
     IBOutlet NSTableView*	secondaryValuesView;
     IBOutlet NSPopUpButton*	viewTypePU;
+    IBOutlet NSTabView*     viewTabView;
 
 	IBOutlet NSTextField*	fltOrbSNField;
 	IBOutlet NSTextField*	osbSNField;
@@ -63,7 +66,7 @@
 	IBOutlet NSMatrix*		maxValueMatrix;
     
 	IBOutlet NSButton*		vetoMapLockButton;
-	
+    IBOutlet ORColorScale*  focalPlaneColorScale;
 	
 	NSView *blankView;
     NSSize detectorSize;
@@ -118,6 +121,8 @@
 - (void)tableView:(NSTableView *)aTableView setObjectValue:anObject 
             forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex;
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem;
+
+- (ORSegmentGroup*) segmentGroup:(int)aSet;
 
 
 @end

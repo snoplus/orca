@@ -30,6 +30,7 @@
 #import "ORPlotView.h"
 #import "ORTimeLinePlot.h"
 #import "OR1DHistoPlot.h"
+#import "ORBasicOpenGLView.h"
 
 #if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 @interface KatrinController (private)
@@ -46,6 +47,11 @@
     return self;
 }
 
+- (void) dealloc
+{
+    [super dealloc];
+}
+
 - (NSString*) defaultPrimaryMapFilePath
 {
 	return @"~/FocalPlaneMap";
@@ -59,7 +65,7 @@
 -(void) awakeFromNib
 {
 	
-	detectorSize		= NSMakeSize(800,750);
+	detectorSize		= NSMakeSize(800,770);
 	slowControlsSize    = NSMakeSize(525,320);
 	detailsSize			= NSMakeSize(655,589);
 	focalPlaneSize		= NSMakeSize(827,589);
@@ -69,7 +75,7 @@
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
 
 	[self populateClassNamePopup:secondaryAdcClassNamePopup];
-	
+
     [super awakeFromNib];
 	
 	if([[model segmentGroup:1] colorAxisAttributes])[[secondaryColorScale colorAxis] setAttributes:[[[[model segmentGroup:1] colorAxisAttributes] mutableCopy] autorelease]];
@@ -104,6 +110,11 @@
 	[aPlot1 release];
 }
 
+- (NSView*) viewToDisplay
+{
+    if([model viewType]==kUse3DView)return openGlView;
+    else return detectorView;
+}
 
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers
@@ -276,7 +287,27 @@
 {
 	[viewTypePU selectItemAtIndex:[model viewType]];
 	[detectorView setViewType:[model viewType]];
-	[detectorView makeAllSegments];	
+	[detectorView makeAllSegments];
+    if([model viewType] == kUse3DView){
+        [viewTabView selectTabViewItemAtIndex:1];
+        [[focalPlaneColorScale colorAxis] setViewToScale: openGlView];
+    }
+    else {
+        [viewTabView selectTabViewItemAtIndex:0];
+        [[focalPlaneColorScale colorAxis] setViewToScale: detectorView];
+  
+    }
+
+}
+
+- (ORSegmentGroup*) segmentGroup:(int)aSet
+{
+    return [model segmentGroup:aSet];
+}
+
+- (int) displayType
+{
+    return [model displayType];
 }
 
 #pragma mark ¥¥¥Actions
@@ -438,6 +469,7 @@
 {
 	[model setViewType:[sender indexOfSelectedItem]];
 }
+
 
 - (void) slowControlNameChanged:(NSNotification*)aNote
 {
@@ -694,6 +726,8 @@
 	int index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:@"orca.KatrinController.selectedtab"];
 }
+
+
 
 @end
 

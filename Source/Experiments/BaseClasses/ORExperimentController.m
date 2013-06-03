@@ -100,11 +100,15 @@
 
 }
 
+- (NSView*) viewToDisplay
+{
+    return detectorView;
+}
 
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[detectorView setDelegate:model];	
+	[detectorView setDelegate:model];
 }
 
 #pragma mark •••Subclass responsibility
@@ -424,7 +428,7 @@
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateForReplayMode) object:nil];
 	if([model replayMode]){
 		//[[model detector] loadTotalCounts];
-		[detectorView setNeedsDisplay:YES];
+		[[self viewToDisplay] setNeedsDisplay:YES];
 		[self performSelector:@selector(updateForReplayMode) withObject:nil afterDelay:.5];
 	}
 }
@@ -531,7 +535,7 @@
 - (IBAction) captureStateAction:(id)sender
 {
     [model captureState];
-	[detectorView setNeedsDisplay:YES];
+	[[self viewToDisplay] setNeedsDisplay:YES];
 }
 
 - (IBAction) reportConfigAction:(id)sender
@@ -685,7 +689,7 @@
 - (void) showNamesChanged:(NSNotification*)aNote
 {
 	[showNamesCB setIntValue: [model showNames]];
-	[detectorView setNeedsDisplay:YES];
+	[[self viewToDisplay] setNeedsDisplay:YES];
 }
 
 - (void) scaleAction:(NSNotification*)aNotification
@@ -737,7 +741,7 @@
 - (void) specialUpdate:(NSNotification*)aNote
 {
 	[model compileHistograms];
-	[detectorView setNeedsDisplay:YES];	
+	[[self viewToDisplay] setNeedsDisplay:YES];
 	[primaryValuesView reloadData];
 	[primaryTableView reloadData];
 	[valueHistogramsPlot setNeedsDisplay:YES];
@@ -752,7 +756,7 @@
 	[displayTypePU selectItemWithTag: [model displayType]];
 	[displayTypePU1 selectItemWithTag: [model displayType]];
 	[model compileHistograms];
-	[detectorView setNeedsDisplay:YES];
+	[[self viewToDisplay] setNeedsDisplay:YES];
 	[valueHistogramsPlot setNeedsDisplay:YES];
 	[self setDetectorTitle];
 	[self detectorLockChanged:nil];
@@ -786,14 +790,14 @@
 {
 	[primaryRateField setFloatValue:[[model segmentGroup:0] rate]];
 	[ratePlot setNeedsDisplay:YES];
-	[detectorView setNeedsDisplay:YES];
+	[[self viewToDisplay] setNeedsDisplay:YES];
 	[valueHistogramsPlot setNeedsDisplay:YES];
 }
 
 
 - (void) objectsChanged:(NSNotification*)aNote
 {
-	[detectorView setNeedsDisplay:YES];
+	[[self viewToDisplay] setNeedsDisplay:YES];
 }
 
 - (void) mapLockChanged:(NSNotification*)aNotification

@@ -83,6 +83,7 @@
 #pragma mark •••Subclass responsibility
 - (NSString*) defaultPrimaryMapFilePath;
 - (void) setDetectorTitle;
+- (NSView*) viewToDisplay;
 
 #pragma mark •••Actions
 - (IBAction) ignoreHWChecksAction:(id)sender;
