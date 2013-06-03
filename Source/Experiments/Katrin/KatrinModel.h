@@ -23,9 +23,10 @@
 #import "ORExperimentModel.h"
 #import "ORAdcProcessing.h"
 
-#define kUsePixelView 0
-#define kUseCrateView 1
-#define kUsePreampView 2
+#define kUsePixelView   0
+#define kUseCrateView   1
+#define kUsePreampView  2
+#define kUse3DView      3
 
 #define FLTORBSNFILE(aPath)		[NSString stringWithFormat:@"%@_FltOrbSN",	aPath]
 #define PREAMPSNFILE(aPath)		[NSString stringWithFormat:@"%@_PreampSN",	aPath]
