@@ -1006,6 +1006,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx histogramInfo (some flags; some spare fo
 				}
 			}
 		}
+		if(getHistoReceivedNoteFromDecodeStage)    [obj addToSumHistogram: someData];
 		if(getHistoReceivedNoteFromDecodeStage)    getHistoReceivedNoteFromDecodeStage  =  [obj setFromDecodeStageReceivedHistoForChan:chan ];
     }
     

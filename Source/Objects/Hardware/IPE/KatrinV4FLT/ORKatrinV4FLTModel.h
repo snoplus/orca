@@ -369,6 +369,8 @@
 
 //for sync of HW histogramming with sub-runs
 - (BOOL) setFromDecodeStageReceivedHistoForChan:(short)aChan;
+- (void) initSumHistogramBuffers;
+- (void) addToSumHistogram:(void*)someData;
 - (void) shipSumHistograms;
 
 #pragma mark •••Archival

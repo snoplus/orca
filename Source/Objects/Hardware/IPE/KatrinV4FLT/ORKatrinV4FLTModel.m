@@ -308,10 +308,10 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     int state = [[[aNote userInfo] objectForKey:@"State"] intValue];
 
     #if SHOW_RUN_NOTIFICATIONS_AND_CALLS
-        //DEBUG
-                 NSLog(@"%@::%@ Called runIsAboutToChangeState --- FLT #%i<-------------------------N\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[self stationNumber]);//DEBUG -tb-
+         //DEBUG
+                 NSLog(@"%@::%@ Called runIsAboutToChangeState --- FLT #%i [self isPartOfRun] %i<-------------------------N\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[self stationNumber],[self isPartOfRun]);//DEBUG -tb-
     #endif
-                 
+                
     
     //is FLT  in data taker list of data task manager?
     if(![self isPartOfRun]) return;
@@ -404,7 +404,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     //NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
     if(syncWithRunControlCounterFlag >= receivedHistoCounter){//the notification 'runAboutToChangeState' seems to be called every second, if a wait is active, so we need to check for >= (not ==) -tb-
         //this is the sum histogram facility - see - (BOOL) setFromDecodeStageReceivedHistoForChan:(short)aChan
-            //NSLog(@"subrun-histo-summing: SHIP NOW <--------------\n");//DEBUG
+            //DEBUG  NSLog(@"subrun-histo-summing: SHIP NOW <--------------\n");
             [self shipSumHistograms];
         //clear waits for run control
 	    [self releaseRunWait]; 
@@ -2370,6 +2370,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 // set the bit according to aChan in a channel map when received the according HW histogram (histogram mode);
 // when all active channels sent the histogram, the histogram counter is incremented
 // this way we can delay a subrun start until all histograms have been received   -tb-
+//2013: this is called from the decoder! -tb-
 - (BOOL) setFromDecodeStageReceivedHistoForChan:(short)aChan
 {
     //DEBUG            NSLog(@"%@::%@   FLT #%i<------------- aChan: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[self stationNumber],aChan);//DEBUG -tb-
@@ -2379,20 +2380,14 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 		[self setReceivedHistoChanMap:map];
 	    //NSLog(@"DEBUG: in %@::%@: Received histogram for chan:%i  (trigger mask: %i)    \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),aChan,triggerEnabledMask);//TODO: DEBUG testing ...-tb-
 		//NSLog(@"Received histogram for chan:%i  (trigger mask: %i)\n",aChan,triggerEnabledMask);//DEBUG
-        if(shipSumHistogram){
-            //added to compute sum histograms for each end of subrun and in-between sequence
+        //if(shipSumHistogram){
 		    //NSLog(@"Received histogram for chan:%i  (trigger mask: %i)\n",aChan,triggerEnabledMask);//DEBUG
-            //TODO: SKIP THE SUM HISTOGRAM SHIPPED FROM FLT!!!!!!!!
-            histoBuf[aChan].refreshTimeSec += histRecTime;
-		    //NSLog(@"subrun-histo-summing: Received histogram for chan:%i  (trigger mask: %i) current refreshTime: %i\n",aChan,triggerEnabledMask,histoBuf[aChan].refreshTimeSec);//DEBUG
-        }
+            // ... now the decoder is doing all actions (adding the histogram ...) ...
+              //histoBuf[aChan].refreshTimeSec += histMeasTime;
+		      //NSLog(@"subrun-histo-summing: Received histogram for chan:%i  (trigger mask: %i) current refreshTime: %i\n",aChan,triggerEnabledMask,histoBuf[aChan].refreshTimeSec);//DEBUG
+        //}
 		if(triggerEnabledMask == (map & triggerEnabledMask)){ // 'triggerEnabledMask == map' is sufficient, but in simulation mode we may receive histograms from inactive channels ... -tb-
 		    //after all channels shipped histogram, ship sum histograms and increase counter
-            //ship sum histograms
-              //moved to syncWithRunControlCheckStopCondition
-		      //NSLog(@"subrun-histo-summing: SHIP NOW <--------------\n");//DEBUG
-              //[self shipSumHistograms];
-            //increase counter
 		    map=0;
 			[self setReceivedHistoChanMap:map];
 			[self setReceivedHistoCounter: receivedHistoCounter+1];
@@ -2401,18 +2396,90 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
     return YES;
 }
 
-- (void) shipSumHistograms
+
+
+- (void) initSumHistogramBuffers
 {
+        //clear histogram buffers
+        uint32_t crate = [self crateNumber];
+        uint32_t station = [self stationNumber];
         int chan;
         for(chan=0; chan<kNumV4FLTChannels; chan++){
-            if(triggerEnabledMask && (0x1<<chan)){//if this channel is active, ship histogram, then clear
+            if(triggerEnabledMask & (0x1<<chan)){//if this channel is active, clear histogram buffer(s)
+                bzero(&(histoBuf[chan]), sizeof(katrinV4FullHistogramDataStruct));
+                histoBuf[chan].orcaHeader = histogramId | (sizeof(katrinV4FullHistogramDataStruct)/sizeof(int32_t));
+                histoBuf[chan].location =    ((crate & 0x01e)<<21) | (((station) & 0x1f)<<16) | ((boxcarLength & 0x3)<<4)  | (filterShapingLength & 0xf)      |    (chan<<8);
+                histoBuf[chan].readoutSec      =  0;
+                histoBuf[chan].refreshTimeSec  =  0;
+                histoBuf[chan].firstBin        =  0;
+                histoBuf[chan].lastBin         =   2048;
+                histoBuf[chan].histogramLength =   2048;
+                histoBuf[chan].maxHistogramLength =   2048;
+                histoBuf[chan].binSize    =   histEBin;
+                histoBuf[chan].offsetEMin =   histEMin;
+				histoBuf[chan].histogramID    = 0;
+				histoBuf[chan].histogramInfo  = 0x2;// bit1 means 'this is a sum histogram'
+            }
+        }
+}
+
+
+//2013: this is called from the decoder! -tb-
+- (void) addToSumHistogram:(void*)someData
+{
+
+    if(!shipSumHistogram) return;
+    
+    unsigned long* ptr = (unsigned long*)someData;
+
+	++ptr;											//crate, card,channel from second word
+	unsigned char chan		= (*ptr>>8) & 0xff;
+    
+		
+	//++ptr;		//point to event struct	
+	katrinV4FullHistogramDataStruct* ePtr = (katrinV4FullHistogramDataStruct*) someData;
+    
+    uint32_t* histoData = ePtr->h;
+    //ptr + (sizeof(katrinV4HistogramDataStruct)/sizeof(long));// points now to the histogram data -tb-
+   	int isSumHistogram = ePtr->histogramInfo & 0x2; //the bit1 marks the Sum Histograms
+
+    if(isSumHistogram){//avoid adding the already shipped histograms
+        return;
+    }
+    
+    
+    //DEBUG      NSLog(@"%@::%@   FLT #%i<------------- aChan: %i  isSumHistogram:%i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),card,chan,isSumHistogram);//DEBUG -tb-
+    
+    int i, firstBin = ePtr->firstBin;//first bin should always be 0 ... -tb-
+    for(i=0; i<ePtr->histogramLength;i++){ 
+        histoBuf[chan].h[firstBin+i] += histoData[i];
+    }
+    histoBuf[chan].refreshTimeSec += ePtr->refreshTimeSec;
+    histoBuf[chan].readoutSec      =  ePtr->readoutSec;
+              //histoBuf[aChan].refreshTimeSec += histMeasTime;
+		      //DEBUG   NSLog(@"    -------adding: Received histogram for chan:%i  (trigger mask: %i) current refreshTime: %i  readoutSec:%i\n",chan,triggerEnabledMask,histoBuf[chan].refreshTimeSec,histoBuf[chan].readoutSec);//DEBUG
+
+}
+
+
+- (void) shipSumHistograms
+{
+    if(!shipSumHistogram) return;
+    
+        int chan;
+        for(chan=0; chan<kNumV4FLTChannels; chan++){
+            if(triggerEnabledMask & (0x1<<chan)){//if this channel is active, ship histogram, then clear
+               //DEBUG  NSLog(@"%@::%@     FLT #%i  sizeof(katrinV4FullHistogramDataStruct): %i    -----> shipping chan %i  \n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),[self stationNumber], sizeof(katrinV4FullHistogramDataStruct),chan);//DEBUG -tb-
                 //ship
+                [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
+																object:[NSData dataWithBytes:(void*)&(histoBuf[chan]) length:sizeof(katrinV4FullHistogramDataStruct)]];
+
                 // ... TODO ...
                 //clear histogram buffer
                 histoBuf[chan].readoutSec      =  0;
                 histoBuf[chan].refreshTimeSec  =  0;
+                bzero(&(histoBuf[chan].h[0]), sizeof(uint32_t)*2048);
                 /*
-                bzero(&(histoBuf[chan]), sizeof(katrinV4FullHistogramDataStruct));
                 histoBuf[chan].orcaHeader = histogramId | (sizeof(katrinV4FullHistogramDataStruct)/sizeof(int32_t));
                 histoBuf[chan].location =    ((crate & 0x01e)<<21) | (((station) & 0x1f)<<16) | ((boxcarLength & 0x3)<<4)  | (filterShapingLength & 0xf)      |    (chan<<8);
                 histoBuf[chan].firstBin =  0;
@@ -2577,24 +2644,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 		
 	if(runMode == kIpeFltV4_Histogram_DaqMode){
         //clear histogram buffers
-        uint32_t crate = [self crateNumber];
-        uint32_t station = [self stationNumber];
-        int chan;
-        for(chan=0; chan<kNumV4FLTChannels; chan++){
-            if(triggerEnabledMask && (0x1<<chan)){//if this channel is active, clear histogram buffer(s)
-                bzero(&(histoBuf[chan]), sizeof(katrinV4FullHistogramDataStruct));
-                histoBuf[chan].orcaHeader = histogramId | (sizeof(katrinV4FullHistogramDataStruct)/sizeof(int32_t));
-                histoBuf[chan].location =    ((crate & 0x01e)<<21) | (((station) & 0x1f)<<16) | ((boxcarLength & 0x3)<<4)  | (filterShapingLength & 0xf)      |    (chan<<8);
-                histoBuf[chan].readoutSec      =  0;
-                histoBuf[chan].refreshTimeSec  =  0;
-                histoBuf[chan].firstBin        =  0;
-                histoBuf[chan].lastBin         =   2048;
-                histoBuf[chan].histogramLength =   2048;
-                histoBuf[chan].maxHistogramLength =   2048;
-                histoBuf[chan].binSize    =   histEBin;
-                histoBuf[chan].offsetEMin =   histEMin;
-            }
-        }
+        [self initSumHistogramBuffers];
 		//start polling histogramming mode status
 		[self performSelector:@selector(readHistogrammingStatus) 
 				   withObject:nil
@@ -2676,7 +2726,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 	runFlagsMask |= kFirstTimeFlag;          //bit 16 = "first time" flag
     if(runMode == kIpeFltV4_EnergyDaqMode | runMode == kIpeFltV4_EnergyTraceDaqMode)
         runFlagsMask |= kSyncFltWithSltTimerFlag;//bit 17 = "sync flt with slt timer" flag
-    if(shipSumHistogram == 1) runFlagsMask |= kShipSumHistogramFlag;//bit 18 = "ship sum histogram" flag
+    if((shipSumHistogram == 1) && (!syncWithRunControl)) runFlagsMask |= kShipSumHistogramFlag;//bit 18 = "ship sum histogram" flag   //2013-06 added (!syncWithRunControl) - if syncWithRunControl is set, this 'facility' will produce sum histograms (using the decoder) -tb-
 	
     
 	configStruct->card_info[index].deviceSpecificData[3] = runFlagsMask;	
