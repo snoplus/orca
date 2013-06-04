@@ -871,6 +871,7 @@ static void callback(CFReadStreamRef stream, CFStreamEventType type, ORCouchDBCh
         case kCFStreamEventEndEncountered:
             [delegate streamFinished];
             break;
+        default:break;
     }
 }
 
