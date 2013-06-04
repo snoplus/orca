@@ -497,7 +497,9 @@ NSString* ORCouchDBListenerModelStatusLogChanged =@"ORCouchDBListenerModelStatus
 					}
 				}
 				[theInvocation setTarget:obj];
-				[theInvocation invoke];
+				[theInvocation performSelectorOnMainThread:@selector(invoke)
+                                                withObject:nil
+                                             waitUntilDone:YES];
                 goodToGo = YES;
 			}
 			@catch(NSException* localException){
