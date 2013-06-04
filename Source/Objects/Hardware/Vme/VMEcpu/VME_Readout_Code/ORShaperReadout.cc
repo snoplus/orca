@@ -1,6 +1,7 @@
 #include "ORShaperReadout.hh"
 #include <errno.h>
-#include <sys/timeb.h>
+//#include <sys/timeb.h>
+#include <sys/time.h>
 
 bool ORShaperReadout::Readout(SBC_LAM_Data* lamData)
 {
@@ -43,6 +44,17 @@ bool ORShaperReadout::Readout(SBC_LAM_Data* lamData)
                         data[dataIndex++] = dataId | length;
                         data[dataIndex++] = locationMask | ((channel & 0x0000000f) << 12) | (aValue & 0x0fff);
 						if(shipTimeStamp){
+                            struct timeval ts;
+                            if(gettimeofday(&ts,NULL) ==0){
+  								data[dataIndex++] = ts.tv_sec;
+								data[dataIndex++] = ts.tv_usec;
+                            }
+							else {
+								data[dataIndex++] = 0xFFFFFFFF;
+								data[dataIndex++] = 0xFFFFFFFF;
+							}
+
+                            /* original
 							struct timeb mt;
 							if (ftime(&mt) == 0) {
 								data[dataIndex++] = mt.time;
@@ -53,6 +65,7 @@ bool ORShaperReadout::Readout(SBC_LAM_Data* lamData)
 								data[dataIndex++] = 0xFFFFFFFF;
 
 							}
+                             */
 						}
                     }
                 } 

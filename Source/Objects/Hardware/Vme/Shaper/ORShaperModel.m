@@ -1208,6 +1208,7 @@ NSString* ORShaperSettingsLock							= @"ORShaperSettingsLock";
 						short len = 2;
 						if(shipTimeStamp) {
 							len = 4;
+                            /*
 							struct timeb mt;
 							if (ftime(&mt) == 0) {
 								data[2] = mt.time;
@@ -1217,6 +1218,17 @@ NSString* ORShaperSettingsLock							= @"ORShaperSettingsLock";
 								data[2] = 0xffffffff;
 								data[3] = 0xffffffff;
 							}
+                             */
+                            struct timeval ts;
+                            if(gettimeofday(&ts,NULL) ==0){
+  								data[2] = ts.tv_sec;
+								data[3] = ts.tv_usec;
+                            }
+							else {
+								data[2] = 0xFFFFFFFF;
+								data[3] = 0xFFFFFFFF;
+							}
+
 						}
 						data[0] = dataId | len;
                         data[1] =  slotMask | ((channel & 0x0000000f) << 12) | (aValue & 0x0fff);
