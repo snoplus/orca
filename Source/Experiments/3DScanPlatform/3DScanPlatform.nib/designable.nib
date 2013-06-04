@@ -59,6 +59,7 @@
 							<string key="NSFrame">{{-7, -10}, {768, 688}}</string>
 							<reference key="NSSuperview" ref="694819408"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="1065202230"/>
 							<array class="NSMutableArray" key="NSTabViewItems">
 								<object class="NSTabViewItem" id="902069553">
 									<string key="NSIdentifier">1</string>
@@ -72,7 +73,7 @@
 												<string key="NSFrame">{{578, 589}, {42, 17}}</string>
 												<reference key="NSSuperview" ref="1065202230"/>
 												<reference key="NSWindow"/>
-												<reference key="NSNextKeyView" ref="11671906"/>
+												<reference key="NSNextKeyView" ref="1001197103"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSTextFieldCell" key="NSCell" id="1046601642">
 													<int key="NSCellFlags">68157504</int>
@@ -112,7 +113,7 @@
 												<string key="NSFrame">{{631, 564}, {86, 67}}</string>
 												<reference key="NSSuperview" ref="1065202230"/>
 												<reference key="NSWindow"/>
-												<reference key="NSNextKeyView" ref="698300081"/>
+												<reference key="NSNextKeyView" ref="692725622"/>
 												<string key="NSClassName">ORCardContainerView</string>
 												<string key="NSExtension">NSView</string>
 											</object>
@@ -122,6 +123,7 @@
 												<string key="NSFrame">{{9, 5}, {33, 43}}</string>
 												<reference key="NSSuperview" ref="1065202230"/>
 												<reference key="NSWindow"/>
+												<reference key="NSNextKeyView"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="872538880">
 													<int key="NSCellFlags">67108864</int>
@@ -156,8 +158,8 @@
 												<string key="NSFrame">{{-3, 46}, {754, 503}}</string>
 												<reference key="NSSuperview" ref="1065202230"/>
 												<reference key="NSWindow"/>
-												<reference key="NSNextKeyView" ref="956986310"/>
-												<string key="NSClassName">ORBasicOpenGLView</string>
+												<reference key="NSNextKeyView" ref="698300081"/>
+												<string key="NSClassName">OR3DScanPlatformView</string>
 											</object>
 											<object class="NSBox" id="1001197103">
 												<reference key="NSNextResponder" ref="1065202230"/>
@@ -165,6 +167,7 @@
 												<string key="NSFrame">{{629, 564}, {5, 67}}</string>
 												<reference key="NSSuperview" ref="1065202230"/>
 												<reference key="NSWindow"/>
+												<reference key="NSNextKeyView" ref="548103704"/>
 												<string key="NSOffsets">{0, 0}</string>
 												<object class="NSTextFieldCell" key="NSTitleCell">
 													<int key="NSCellFlags">67108864</int>
@@ -196,6 +199,7 @@
 												<string key="NSFrame">{{714, 564}, {5, 67}}</string>
 												<reference key="NSSuperview" ref="1065202230"/>
 												<reference key="NSWindow"/>
+												<reference key="NSNextKeyView" ref="11671906"/>
 												<string key="NSOffsets">{0, 0}</string>
 												<object class="NSTextFieldCell" key="NSTitleCell">
 													<int key="NSCellFlags">67108864</int>
@@ -219,6 +223,7 @@
 												<string key="NSFrame">{{631, 628}, {86, 5}}</string>
 												<reference key="NSSuperview" ref="1065202230"/>
 												<reference key="NSWindow"/>
+												<reference key="NSNextKeyView" ref="956986310"/>
 												<string key="NSOffsets">{0, 0}</string>
 												<object class="NSTextFieldCell" key="NSTitleCell">
 													<int key="NSCellFlags">67108864</int>
@@ -242,6 +247,7 @@
 												<string key="NSFrame">{{631, 562}, {86, 5}}</string>
 												<reference key="NSSuperview" ref="1065202230"/>
 												<reference key="NSWindow"/>
+												<reference key="NSNextKeyView" ref="343529488"/>
 												<string key="NSOffsets">{0, 0}</string>
 												<object class="NSTextFieldCell" key="NSTitleCell">
 													<int key="NSCellFlags">67108864</int>
@@ -552,6 +558,14 @@
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">./Classes/OR3DScanPlatformController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">OR3DScanPlatformView</string>
+					<string key="superclassName">ORBasicOpenGLView</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/OR3DScanPlatformView.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">

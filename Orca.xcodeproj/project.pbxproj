@@ -617,6 +617,8 @@
 		841DAAC507846CC20099BBF6 /* ORCamacControllerCard.m in Sources */ = {isa = PBXBuildFile; fileRef = 841DAAC307846CC20099BBF6 /* ORCamacControllerCard.m */; };
 		841DACE5175CF05B002542BD /* Katrin3DView.h in Headers */ = {isa = PBXBuildFile; fileRef = 841DACE3175CF05B002542BD /* Katrin3DView.h */; };
 		841DACE6175CF05B002542BD /* Katrin3DView.m in Sources */ = {isa = PBXBuildFile; fileRef = 841DACE4175CF05B002542BD /* Katrin3DView.m */; };
+		841DACF1175E2CB5002542BD /* OR3DScanPlatformView.h in Headers */ = {isa = PBXBuildFile; fileRef = 841DACEF175E2CB5002542BD /* OR3DScanPlatformView.h */; };
+		841DACF2175E2CB5002542BD /* OR3DScanPlatformView.m in Sources */ = {isa = PBXBuildFile; fileRef = 841DACF0175E2CB5002542BD /* OR3DScanPlatformView.m */; };
 		84200CA206764C120048DFB4 /* ORSubPlotController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84200CA006764C120048DFB4 /* ORSubPlotController.h */; };
 		84200CA306764C120048DFB4 /* ORSubPlotController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84200CA106764C120048DFB4 /* ORSubPlotController.m */; };
 		842042070F0C082D00720846 /* Continue.tif in Resources */ = {isa = PBXBuildFile; fileRef = 842042060F0C082D00720846 /* Continue.tif */; };
@@ -3858,6 +3860,8 @@
 		841DAAC307846CC20099BBF6 /* ORCamacControllerCard.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORCamacControllerCard.m; path = "Source/Objects/Hardware/Camac/Camac Base Classes/ORCamacControllerCard.m"; sourceTree = SOURCE_ROOT; };
 		841DACE3175CF05B002542BD /* Katrin3DView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Katrin3DView.h; sourceTree = "<group>"; };
 		841DACE4175CF05B002542BD /* Katrin3DView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Katrin3DView.m; sourceTree = "<group>"; };
+		841DACEF175E2CB5002542BD /* OR3DScanPlatformView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OR3DScanPlatformView.h; sourceTree = "<group>"; };
+		841DACF0175E2CB5002542BD /* OR3DScanPlatformView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OR3DScanPlatformView.m; sourceTree = "<group>"; };
 		84200CA006764C120048DFB4 /* ORSubPlotController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORSubPlotController.h; path = "Source/Objects/Data Processing/Data Objects/ORSubPlotController.h"; sourceTree = SOURCE_ROOT; };
 		84200CA106764C120048DFB4 /* ORSubPlotController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORSubPlotController.m; path = "Source/Objects/Data Processing/Data Objects/ORSubPlotController.m"; sourceTree = SOURCE_ROOT; };
 		842042060F0C082D00720846 /* Continue.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Continue.tif; path = "Source/Objects/Misc Objects/Views/ScriptView/Continue.tif"; sourceTree = SOURCE_ROOT; };
@@ -11211,6 +11215,8 @@
 				84BF74B717590CB000AF1F56 /* OR3DScanPlatformController.m */,
 				84BF74B817590CB000AF1F56 /* OR3DScanPlatformModel.h */,
 				84BF74B917590CB000AF1F56 /* OR3DScanPlatformModel.m */,
+				841DACEF175E2CB5002542BD /* OR3DScanPlatformView.h */,
+				841DACF0175E2CB5002542BD /* OR3DScanPlatformView.m */,
 			);
 			path = 3DScanPlatform;
 			sourceTree = "<group>";
@@ -14135,6 +14141,7 @@
 				841DACE5175CF05B002542BD /* Katrin3DView.h in Headers */,
 				B3808A8E1700F84B0019C27D /* ORCouchDBListenerController.h in Headers */,
 				B3808A901700F84B0019C27D /* ORCouchDBListenerModel.h in Headers */,
+				841DACF1175E2CB5002542BD /* OR3DScanPlatformView.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -16043,6 +16050,7 @@
 				841DACE6175CF05B002542BD /* Katrin3DView.m in Sources */,
 				B3808A8F1700F84B0019C27D /* ORCouchDBListenerController.m in Sources */,
 				B3808A911700F84B0019C27D /* ORCouchDBListenerModel.m in Sources */,
+				841DACF2175E2CB5002542BD /* OR3DScanPlatformView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
