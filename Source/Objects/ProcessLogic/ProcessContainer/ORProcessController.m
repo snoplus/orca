@@ -259,6 +259,7 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
 - (void) nextHeartBeatChanged:(NSNotification*)aNote
 {
     id theObj = [aNote object];
+    if(!aNote) theObj = model;
     if(theObj == model || [theObj masterProcess]){
         if([theObj heartbeatSeconds]){
             [nextHeartbeatField setStringValue:[NSString stringWithFormat:@"Next Heartbeat: %@",[[theObj nextHeartbeat]descriptionWithCalendarFormat:nil timeZone:nil locale:nil]]];
