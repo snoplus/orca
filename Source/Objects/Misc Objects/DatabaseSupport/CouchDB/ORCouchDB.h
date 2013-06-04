@@ -17,6 +17,10 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
+//Modes for Changesfeed
+#define kPolling        @"kPolling"
+#define kContinuousFeed  @"kContinuousPolling"
+
 @interface ORCouchDB : NSObject {
 	id					delegate;
 	NSOperationQueue*	queue;
@@ -45,12 +49,15 @@
 - (void) getDocumentId:(NSString*)anId tag:(NSString*)aTag;
 - (void) updateDocument:(NSDictionary*)aDict documentId:(NSString*)anId tag:(NSString*)aTag;
 - (void) updateDocument:(NSDictionary*)aDict documentId:(NSString*)anId attachmentData:(NSData*)someData attachmentName:(NSString*)aName tag:(NSString*)aTag;
+- (void) updateDocument:(NSDictionary*)aDict documentId:(NSString*)anId tag:(NSString*)aTag informingDelegate:(BOOL)ok;
 - (void) deleteDocumentId:(NSString*)anId tag:(NSString*)aTag;
 - (void) listTasks:(id)aDelegate tag:(NSString*)aTag;
 - (void) listDocuments:(id)aDelegate tag:(NSString*)aTag;
 - (void) processEachDoc:(id)aDelegate tag:(NSString*)aTag;
 - (void) renameDoc:(id)aDoc adc:(NSString*)oldName to:(NSString*)newName delegate:(id)aDelegate tag:(NSString*)aTag;
 - (void) updateEventCatalog:(NSDictionary*)aDict documentId:(NSString*)anId tag:(NSString*)aTag;
+- (NSOperation*) changesFeedMode:(NSString*)mode Tag:(NSString*)aTag;
+- (NSOperation*) changesFeedMode:(NSString*)mode Heartbeat:(NSUInteger)heartbeat Tag:(NSString*)aTag;
 
 #pragma mark ***CouchDB Checks
 - (BOOL) couchDBRunning;
@@ -152,7 +159,11 @@
 @end
 
 @interface ORCouchDBUpdateDocumentOp :ORCouchDBPutDocumentOp
+{
+    BOOL    informDelegate;
+}
 - (void) main;
+- (void) setInformDelegate:(BOOL)ok;
 @end
 
 @interface ORCouchDBUpdateEventCatalogOp :ORCouchDBPutDocumentOp
@@ -183,6 +194,33 @@
 
 @interface ORCouchDBDeleteDocumentOp :ORCouchDBGetDocumentOp
 - (void) main;
+@end
+
+#pragma mark ***Changes API
+@interface ORCouchDBChangesfeedOp : ORCouchDBOperation 
+{
+@private
+    NSMutableData* _inputBuffer;
+    NSURLConnection* _connection;
+    int _status;
+    BOOL _waitingForResponse;
+    id listeningMode;
+    NSUInteger heartbeat;
+    NSString*   filter;
+    
+}
+- (void) main;
+- (BOOL) isWaitingForResponse;
+- (void) setListeningMode:(NSString*)mode;
+- (void) setHeartbeat:(NSUInteger)beat;
+- (void) setFilter:(NSString*)aFilter;
+- (void) stop;
+- (void) streamReceivedResponse:(NSURLResponse *)aResponse;
+- (void) streamReceivedData:(NSData *)data;
+- (void) streamFailedWithError:(NSError *)error;
+- (void) streamFinished;
+- (void) performContinuousFeed;
+- (void) performPolling;
 @end
 
 //a thin wrapper around NSOperationQueue to make a shared queue for couch access

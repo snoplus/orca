@@ -2925,6 +2925,12 @@
 		9CF2C1BB0CC195E2002B279B /* ORL8013CrateModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CF2C1B10CC195E1002B279B /* ORL8013CrateModel.m */; };
 		B322A309146D64D000491347 /* ORTcpIpProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = B322A308146D64D000491347 /* ORTcpIpProtocol.h */; };
 		B33FBC93146F2A6A0046A733 /* edu.washington.npl.orca.VXIHardware.plist in Resources */ = {isa = PBXBuildFile; fileRef = B33FBC92146F2A6A0046A733 /* edu.washington.npl.orca.VXIHardware.plist */; };
+		B3805611172BE4A100B5B134 /* Changesfeed.tif in Resources */ = {isa = PBXBuildFile; fileRef = B3805610172BE4A100B5B134 /* Changesfeed.tif */; };
+		B3808A8C1700F84B0019C27D /* CouchDBListener.nib in Resources */ = {isa = PBXBuildFile; fileRef = B3808A861700F84B0019C27D /* CouchDBListener.nib */; };
+		B3808A8E1700F84B0019C27D /* ORCouchDBListenerController.h in Headers */ = {isa = PBXBuildFile; fileRef = B3808A881700F84B0019C27D /* ORCouchDBListenerController.h */; };
+		B3808A8F1700F84B0019C27D /* ORCouchDBListenerController.m in Sources */ = {isa = PBXBuildFile; fileRef = B3808A891700F84B0019C27D /* ORCouchDBListenerController.m */; };
+		B3808A901700F84B0019C27D /* ORCouchDBListenerModel.h in Headers */ = {isa = PBXBuildFile; fileRef = B3808A8A1700F84B0019C27D /* ORCouchDBListenerModel.h */; };
+		B3808A911700F84B0019C27D /* ORCouchDBListenerModel.m in Sources */ = {isa = PBXBuildFile; fileRef = B3808A8B1700F84B0019C27D /* ORCouchDBListenerModel.m */; };
 		B38DEE4814E02B40003914FF /* ADVME1314.gif in Resources */ = {isa = PBXBuildFile; fileRef = B38DEE4214E02B40003914FF /* ADVME1314.gif */; };
 		B38DEE4914E02B40003914FF /* ADVME1314.nib in Resources */ = {isa = PBXBuildFile; fileRef = B38DEE4314E02B40003914FF /* ADVME1314.nib */; };
 		B38DEE4A14E02B40003914FF /* ORADVME1314Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = B38DEE4414E02B40003914FF /* ORADVME1314Controller.h */; };
@@ -6054,6 +6060,12 @@
 		9CF2C1B10CC195E1002B279B /* ORL8013CrateModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORL8013CrateModel.m; path = "Source/Objects/Hardware/Camac/L8013 Crate/ORL8013CrateModel.m"; sourceTree = SOURCE_ROOT; };
 		B322A308146D64D000491347 /* ORTcpIpProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORTcpIpProtocol.h; sourceTree = "<group>"; };
 		B33FBC92146F2A6A0046A733 /* edu.washington.npl.orca.VXIHardware.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = edu.washington.npl.orca.VXIHardware.plist; sourceTree = "<group>"; };
+		B3805610172BE4A100B5B134 /* Changesfeed.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Changesfeed.tif; path = CouchDBListener/Changesfeed.tif; sourceTree = "<group>"; };
+		B3808A861700F84B0019C27D /* CouchDBListener.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = CouchDBListener.nib; path = CouchDBListener/CouchDBListener.nib; sourceTree = "<group>"; };
+		B3808A881700F84B0019C27D /* ORCouchDBListenerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCouchDBListenerController.h; path = CouchDBListener/ORCouchDBListenerController.h; sourceTree = "<group>"; };
+		B3808A891700F84B0019C27D /* ORCouchDBListenerController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCouchDBListenerController.m; path = CouchDBListener/ORCouchDBListenerController.m; sourceTree = "<group>"; };
+		B3808A8A1700F84B0019C27D /* ORCouchDBListenerModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCouchDBListenerModel.h; path = CouchDBListener/ORCouchDBListenerModel.h; sourceTree = "<group>"; };
+		B3808A8B1700F84B0019C27D /* ORCouchDBListenerModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCouchDBListenerModel.m; path = CouchDBListener/ORCouchDBListenerModel.m; sourceTree = "<group>"; };
 		B38DEE4214E02B40003914FF /* ADVME1314.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = ADVME1314.gif; sourceTree = "<group>"; };
 		B38DEE4314E02B40003914FF /* ADVME1314.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = ADVME1314.nib; sourceTree = "<group>"; };
 		B38DEE4414E02B40003914FF /* ORADVME1314Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORADVME1314Controller.h; sourceTree = "<group>"; };
@@ -7683,6 +7695,7 @@
 		842162EE043E6317005F64B1 /* Misc Objects */ = {
 			isa = PBXGroup;
 			children = (
+				B3808A931700F85C0019C27D /* CouchDBListener */,
 				84AB8BB30D2314A500EC39F2 /* CmdHistory */,
 				847E6C0D0CFF4BF400E963C6 /* ObjectProxy */,
 				2AAB08F808E36CCE00BB0792 /* Testing */,
@@ -12492,6 +12505,19 @@
 			path = "Source/Objects/Hardware/Camac/L8013 Crate";
 			sourceTree = SOURCE_ROOT;
 		};
+		B3808A931700F85C0019C27D /* CouchDBListener */ = {
+			isa = PBXGroup;
+			children = (
+				B3805610172BE4A100B5B134 /* Changesfeed.tif */,
+				B3808A861700F84B0019C27D /* CouchDBListener.nib */,
+				B3808A881700F84B0019C27D /* ORCouchDBListenerController.h */,
+				B3808A891700F84B0019C27D /* ORCouchDBListenerController.m */,
+				B3808A8A1700F84B0019C27D /* ORCouchDBListenerModel.h */,
+				B3808A8B1700F84B0019C27D /* ORCouchDBListenerModel.m */,
+			);
+			name = CouchDBListener;
+			sourceTree = "<group>";
+		};
 		B38DEE4114E02B40003914FF /* Advanet */ = {
 			isa = PBXGroup;
 			children = (
@@ -14107,6 +14133,8 @@
 				84BF74C317590CB000AF1F56 /* OR3DScanPlatformModel.h in Headers */,
 				84B71FF117591DD000BFA972 /* GLString.h in Headers */,
 				841DACE5175CF05B002542BD /* Katrin3DView.h in Headers */,
+				B3808A8E1700F84B0019C27D /* ORCouchDBListenerController.h in Headers */,
+				B3808A901700F84B0019C27D /* ORCouchDBListenerModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -15004,6 +15032,8 @@
 				8499788C174BA11400BFEE3E /* EHS130n.tif in Resources */,
 				84BF74BE17590CB000AF1F56 /* 3DScanPlatform.nib in Resources */,
 				84BF74BF17590CB000AF1F56 /* 3DScanPlatform.tif in Resources */,
+				B3808A8C1700F84B0019C27D /* CouchDBListener.nib in Resources */,
+				B3805611172BE4A100B5B134 /* Changesfeed.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -16011,6 +16041,8 @@
 				84BF74C417590CB000AF1F56 /* OR3DScanPlatformModel.m in Sources */,
 				84B71FF017591DD000BFA972 /* GLString.m in Sources */,
 				841DACE6175CF05B002542BD /* Katrin3DView.m in Sources */,
+				B3808A8F1700F84B0019C27D /* ORCouchDBListenerController.m in Sources */,
+				B3808A911700F84B0019C27D /* ORCouchDBListenerModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -22,7 +22,6 @@
 #import <YAJL/YAJLDocument.h>
 #import "SynthesizeSingleton.h"
 
-
 @implementation ORCouchDB
 
 @synthesize database,host,port,queue,delegate,username,pwd;
@@ -202,6 +201,16 @@
 	[anOp release];
 }
 
+- (void) updateDocument:(NSDictionary *)aDict documentId:(NSString *)anId tag:(NSString *)aTag informingDelegate:(BOOL)ok
+{
+    ORCouchDBUpdateDocumentOp* anOp = [[ORCouchDBUpdateDocumentOp alloc] initWithHost:host port:port database:database delegate:delegate tag:aTag];
+	[anOp setDocument:aDict documentID:anId];
+	[anOp setUsername:username];
+	[anOp setPwd:pwd];
+    [anOp setInformDelegate:ok];
+	[ORCouchDBQueue addOperation:anOp];
+	[anOp release];
+}
 - (void) updateEventCatalog:(NSDictionary*)aDict documentId:(NSString*)anId tag:(NSString*)aTag;
 {
 	ORCouchDBUpdateEventCatalogOp* anOp = [[ORCouchDBUpdateEventCatalogOp alloc] initWithHost:host port:port database:database delegate:delegate tag:aTag];
@@ -221,8 +230,23 @@
 	[ORCouchDBQueue addOperation:anOp];
 	[anOp release];
 }
-#pragma mark ***CouchDB Checks
 
+#pragma mark ***Changes API
+- (NSOperation*) changesFeedMode:(NSString*)mode Tag:(NSString*)aTag{
+    return [self changesFeedMode:mode Heartbeat:(NSUInteger)5000 Tag:aTag];
+}
+
+- (NSOperation*) changesFeedMode:(NSString*)mode Heartbeat:(NSUInteger)heartbeat Tag:(NSString*)aTag{
+    ORCouchDBChangesfeedOp* anOp=[[[ORCouchDBChangesfeedOp alloc] initWithHost:host port:port database:database delegate:delegate tag:aTag] autorelease];
+    [anOp setUsername:username];
+	[anOp setPwd:pwd];
+    [anOp setListeningMode:mode];
+    [anOp setHeartbeat:heartbeat];
+	[ORCouchDBQueue addOperation:anOp];
+	return anOp;
+}
+
+#pragma mark ***CouchDB Checks
 - (BOOL) couchDBRunning
 {
 	BOOL couchDBRunning = NO;
@@ -314,7 +338,7 @@
 	}
 	if(aBody)[request setHTTPBody:[[aBody yajl_JSONString] dataUsingEncoding:NSASCIIStringEncoding]];
 	NSData *data = [[[NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil] retain] autorelease];
-	
+    
 	if (data) {
 		YAJLDocument *document = [[[YAJLDocument alloc] initWithData:data parserOptions:YAJLParserOptionsNone error:nil] autorelease];
 		return [document root];
@@ -366,6 +390,9 @@
 {
 	if([self isCancelled])return;
 	id result = [self send:[NSString stringWithFormat:@"http://%@:%u/_all_dbs", host, port]];
+	for(id name in result){
+        NSLog([NSString stringWithFormat:@"%@\n",name]);
+	}
 	[self sendToDelegate:result];
 }
 @end
@@ -696,7 +723,7 @@
 		result = [NSDictionary dictionaryWithObjectsAndKeys:
 				  [NSString stringWithFormat:@"[%@] timeout",
 				   database],@"Message",nil];
-		[self sendToDelegate:result];
+		informDelegate=YES;
 	}
 	else if([result objectForKey:@"error"]){
 		//document doesn't exist. So just add it.
@@ -717,7 +744,12 @@
 			}
 		}
 	}
+    if (informDelegate) [self sendToDelegate:result];
 
+}
+- (void) setInformDelegate:(BOOL)ok
+{
+    informDelegate = ok;
 }
 @end
 
@@ -802,6 +834,259 @@
 }
 @end
 
+
+static void callback(CFReadStreamRef stream, CFStreamEventType type, ORCouchDBChangesfeedOp* delegate){
+    
+    UInt8 data[1024];
+    CFHTTPMessageRef aResponse;
+    int len;
+    NSURL* url;
+    int status;
+    NSHTTPURLResponse* response;
+    NSDictionary* header;
+    switch(type){
+        case kCFStreamEventHasBytesAvailable:
+            if([delegate isWaitingForResponse]){
+                aResponse = (CFHTTPMessageRef)CFReadStreamCopyProperty(stream, kCFStreamPropertyHTTPResponseHeader);
+                if (CFHTTPMessageIsHeaderComplete(aResponse)){
+                    url=[(NSURL*)CFHTTPMessageCopyRequestURL(aResponse) autorelease];
+                    status=CFHTTPMessageGetResponseStatusCode(aResponse);
+                    header=[(NSDictionary*)CFHTTPMessageCopyAllHeaderFields(aResponse) autorelease];
+                    response=[[[NSHTTPURLResponse alloc] initWithURL:url statusCode:status HTTPVersion:@"HTTP/1.1" headerFields:header]autorelease];
+                    [delegate streamReceivedResponse:response];
+                }
+                CFRelease(aResponse);
+                break;
+                
+            }
+            len=CFReadStreamRead(stream, data, sizeof(data));
+            if (len < 0) {
+                [delegate streamFailedWithError:[(NSError*) CFReadStreamCopyError(stream) autorelease]];
+            }
+            [delegate streamReceivedData:[NSData dataWithBytes:data length:len]];
+            break;
+        case kCFStreamEventErrorOccurred:
+            [delegate streamFailedWithError:[(NSError*) CFReadStreamCopyError(stream) autorelease]];
+            break;
+        case kCFStreamEventEndEncountered:
+            [delegate streamFinished];
+            break;
+    }
+}
+
+@interface ORCouchDBChangesfeedOp (private)
+- (void) _startConnection;
+- (void) _clearConnection;
+@end
+
+@implementation ORCouchDBChangesfeedOp (private)
+-(void) _clearConnection {
+    [self sendToDelegate:[NSString stringWithFormat:@"%@: Stopped", self]];
+    [_inputBuffer release];
+    _inputBuffer = nil;
+    _status = 0;
+}
+
+-(void) _startConnection {
+    if([self isCancelled]){
+        [self _clearConnection];
+        return;
+    }
+    
+    //get the current last_seq so we only receive changes from now on. if we want the complete history, set last_seq to 0
+    NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/_changes", host, port,database];
+    if(username && pwd){
+		httpString = [httpString stringByReplacingOccurrencesOfString:@"://" withString:[NSString stringWithFormat:@"://%@:%@@",username,pwd]];
+	}
+    id result = [self send:httpString];
+    NSNumber* last_seq;
+    last_seq=(NSNumber*)[result objectForKey:@"last_seq"];
+    //last_seq=[NSNumber numberWithInt:0];
+    
+    NSRunLoop* rl = [NSRunLoop currentRunLoop];
+    
+    
+    CFStringRef bodyString = CFSTR(""); // Usually used for POST data
+    CFDataRef bodyData = CFStringCreateExternalRepresentation(kCFAllocatorDefault, bodyString, kCFStringEncodingUTF8, 0);
+    
+    CFStringRef headerFieldName = CFSTR("content-type");
+    CFStringRef headerFieldValue = CFSTR("text/json");
+    
+    if (!heartbeat) {
+        heartbeat=(NSUInteger) 5000;
+    }
+    
+    NSString *options=[NSString stringWithFormat:@"?heartbeat=%u&feed=continuous&since=%@", heartbeat, last_seq];
+    if (filter) {
+        options = [options stringByAppendingString:[NSString stringWithFormat:@"&filter=%@", filter]];
+    }
+    httpString = [httpString stringByAppendingString:options];
+    CFStringRef url = (CFStringRef)httpString;
+    CFURLRef theURL = CFURLCreateWithString(kCFAllocatorDefault, url, NULL);
+    
+    CFStringRef requestMethod = CFSTR("GET");
+    CFHTTPMessageRef theRequest = CFHTTPMessageCreateRequest(kCFAllocatorDefault, requestMethod, theURL, kCFHTTPVersion1_1);
+    
+    CFHTTPMessageSetBody(theRequest, bodyData);
+    CFHTTPMessageSetHeaderFieldValue(theRequest, headerFieldName, headerFieldValue);
+    
+    CFReadStreamRef _stream = CFReadStreamCreateForHTTPRequest(kCFAllocatorDefault, theRequest);
+    
+    CFRelease(bodyData);
+    CFRelease(theURL);
+    CFRelease(theRequest);
+    
+    CFStreamClientContext theContext={0,self,NULL,NULL,NULL};
+    
+    CFReadStreamSetClient(_stream,
+                          kCFStreamEventHasBytesAvailable | kCFStreamEventErrorOccurred | kCFStreamEventEndEncountered
+                          , (CFReadStreamClientCallBack) &callback, &theContext);
+    
+    CFReadStreamScheduleWithRunLoop(_stream, [rl getCFRunLoop], kCFRunLoopDefaultMode);
+    
+    _waitingForResponse=TRUE;
+    
+    CFReadStreamOpen(_stream);
+    
+    while( ![self isCancelled] &&
+          [rl runMode:NSDefaultRunLoopMode
+           beforeDate:[NSDate dateWithTimeIntervalSinceNow:1.0]]);
+    
+    // When we reach here, we have been cancelled.
+    // The close of the stream removes it from the run list.
+    CFReadStreamClose(_stream);
+    CFRelease(_stream);
+    
+}
+@end
+
+@implementation ORCouchDBChangesfeedOp
+-(void) main
+{
+    if([listeningMode isEqualToString:kContinuousFeed]){
+        [self performContinuousFeed];
+    }
+    else if([listeningMode isEqualToString:kPolling]){
+        [self performPolling];
+    }
+    else{
+    [self performContinuousFeed]; // insert default here
+    }
+}
+
+-(void) setListeningMode:(NSString*)mode {
+    listeningMode=mode;
+}
+
+-(void) setHeartbeat:(NSUInteger)beat {
+    heartbeat=beat;
+}
+
+- (void) setFilter:(NSString*)aFilter{
+    filter = aFilter;
+}
+
+-(void) performContinuousFeed {
+    [self _startConnection];
+    [self stop];
+}
+
+-(BOOL) isWaitingForResponse {
+    return _waitingForResponse;
+}
+
+- (void) stop {
+    [self _clearConnection];
+    [self cancel];
+}
+
+- (void)streamReceivedResponse:(NSURLResponse *)aResponse {
+    _waitingForResponse=FALSE;
+    _status = (int) ((NSHTTPURLResponse*)aResponse).statusCode;
+    if (_status >= 300) {
+        [self stop];
+    }
+    [self sendToDelegate:[NSString stringWithFormat:@"%@: Got response, status %d", self, _status]];
+}
+
+- (void)streamReceivedData:(NSData *)data {
+    if ([self isCancelled]){
+        [self stop];
+        return;
+    }
+    
+    //NSLog(@"%@: Got %lu bytes\n", self, (unsigned long)data.length);
+    if (_inputBuffer == nil) {
+        _inputBuffer = [[NSMutableData alloc] init];
+    }
+    [_inputBuffer appendData: data];
+    
+    // In continuous mode, break input into lines and parse each as JSON:
+    const char* start = _inputBuffer.bytes;
+    const char* eol;
+    NSUInteger totalLengthProcessed = 0;
+    NSUInteger bufferLength = _inputBuffer.length;
+    // Remove empty lines
+    while ((bufferLength - totalLengthProcessed) > 0 && start[0] == '\n') {
+        totalLengthProcessed++;
+        start++;
+    }
+    while ((eol = strnstr(start, "\n", bufferLength-totalLengthProcessed)) != nil){
+    // Only if we have a complete line
+        ptrdiff_t lineLength = eol - start;
+        totalLengthProcessed += lineLength + 1;
+        if (lineLength > 0) {
+            // Only parse lines with > 0 length, others are the heartbeats.
+            NSData* chunk = [NSData dataWithBytes:start length:lineLength];
+            
+            // Parse the line and send to delegate:
+            if (chunk) {
+                YAJLDocument *document = [[[YAJLDocument alloc] initWithData:chunk parserOptions:YAJLParserOptionsNone error:nil] autorelease];
+                [self sendToDelegate:[document root]];
+            }
+        }
+        // Move the pointer
+        start += totalLengthProcessed;
+    }
+    // Remove the processed bytes from the buffer.
+    [_inputBuffer replaceBytesInRange: NSMakeRange(0, totalLengthProcessed) withBytes: NULL length: 0];
+}
+
+- (void)streamFailedWithError:(NSError *)error {
+    NSLog(@"%@: Got error %@\n", self, error);
+    [self stop];
+}
+
+- (void)streamFinished {
+    NSLog(@"%@ connection ended\n", self);
+    [self stop];
+}
+
+-(void) performPolling {
+	if([self isCancelled])return;
+	id result = [self send:[NSString stringWithFormat:@"http://%@:%u/%@/_changes", host, port,database]];
+    NSArray* query_results;
+    NSNumber* last_seq;
+    last_seq=(NSNumber*)[result objectForKey:@"last_seq"];
+    
+    while (![self isCancelled]) {
+        id result=[self send:[NSString stringWithFormat:@"http://%@:%u/%@/_changes?since=%@", host, port,database,last_seq]];
+        last_seq=(NSNumber*)[result objectForKey:@"last_seq"];
+        
+        query_results=[result objectForKey:@"results"];
+        if ([query_results count]){
+            for (id aChange in query_results) {
+                [self sendToDelegate:aChange];
+                //NSLog(@"change sent to delegate");
+            }
+        }
+        //NSLog(@"poll done, now sleep");
+        sleep(10);
+    }
+    //NSLog(@"feed stopped");
+    return;
+}
+@end
 
 //-----------------------------------------------------------
 //ORCouchQueue: A shared queue for couchdb access. You should 

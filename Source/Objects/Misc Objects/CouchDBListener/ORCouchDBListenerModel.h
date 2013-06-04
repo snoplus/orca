@@ -1,0 +1,147 @@
+//-------------------------------------------------------------------------
+//  ORCouchDBModel.h
+//
+//  Created by Thomas Stolz on 05/20/13.
+//  Copyright (c) 2006 CENPA, University of Washington. All rights reserved.
+//-----------------------------------------------------------
+//This program was prepared for the Regents of the University of 
+//Washington at the Center for Experimental Nuclear Physics and 
+//Astrophysics (CENPA) sponsored in part by the United States 
+//Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
+//The University has certain rights in the program pursuant to 
+//the contract and the program should not be copied or distributed 
+//outside your organization.  The DOE and the University of 
+//Washington reserve all rights in the program. Neither the authors,
+//University of Washington, or U.S. Government make any warranty, 
+//express or implied, or assume any liability or responsibility 
+//for the use of this software.
+//-------------------------------------------------------------
+
+#pragma mark ***Imported Files
+@class ORCouchDB;
+@class ORScriptRunner;
+
+
+@interface ORCouchDBListenerModel : OrcaObject {
+    
+    NSUInteger ignoreNextChanges;
+    
+    //Message Section
+    BOOL msgSectionReady;
+    NSString* statusLogString;
+    NSMutableDictionary* messageDict;
+    NSString* msgDocName;
+    
+    //CouchDB Configuration
+    NSString* hostName;
+    NSUInteger port;
+    NSString* databaseName;
+    NSString* userName;
+    NSString* password;
+    NSOperation* runningChangesfeed;
+    NSArray* databaseList;
+    NSUInteger heartbeat;
+    
+    //Script Section
+    BOOL scriptSectionReady;
+    NSString* scriptDocName;
+    NSString* commandDoc;
+    ORScriptRunner* scriptRunner;
+    NSString* script;
+    
+    //Command Section
+    BOOL cmdSectionReady;
+    NSString* cmdDocName;
+    NSArray* objectList;
+    NSMutableArray* cmdTableArray;
+    BOOL commonMethodsOnly;
+    NSMutableDictionary* cmdDict;
+    NSMutableDictionary* cmdUploadDict;
+    NSString* lastRev;
+    
+}
+
+#pragma mark ***Initialization
+- (id)   init;
+- (void) dealloc;
+
+#pragma mark ***Notifications
+- (void) registerNotificationObservers;
+
+#pragma mark ***Accessors
+- (void) ignoreNextChange;
+- (void) changeIgnored;
+
+//Message Section
+- (NSString*) getStatusLog;
+- (void) setStatusLog:(NSString*)log;
+- (void) log:(NSString*)message;
+
+//CouchDb Config
+- (void) setDatabaseName:(NSString*)name;
+- (void) setHostName:(NSString*)name;
+- (void) setPort:(NSUInteger)aPort;
+- (void) setUserName:(NSString*)name;
+- (void) setPassword:(NSString*)pwd;
+- (NSArray*) getDatabaseList;
+- (NSString*) getDatabase;
+- (NSUInteger) getHeartbeat;
+- (NSString*) getHostName;
+- (NSUInteger) getPort;
+- (NSString*) getUserName;
+- (BOOL) isListening;
+- (void) heartbeat:(NSUInteger)beat;
+
+
+//Command Section
+- (void) setCommonMethods:(BOOL)only;
+- (NSArray*) getObjectList;
+- (NSArray*) getMethodListForObjectID:(NSString*)objID;
+- (BOOL) commonMethodsOnly;
+- (NSMutableArray*) cmdTableArray;
+- (NSDictionary*) cmdDict;
+//- (void) setCmdDocName:(NSString*) name;
+
+#pragma mark ***DB Access
+- (void) startStopSession;
+- (void) startChangesfeed;
+- (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp;
+- (ORCouchDB*) statusDBRef;
+- (void) listDatabases;
+- (void) fetchCommandDocForCheck;
+- (void) uploadAllSections;
+- (void) sectionReady;
+
+#pragma mark ***Message Section
+- (void) uploadMsgSection;
+
+#pragma mark ***Command Section
+- (void) updateObjectList;
+- (BOOL) checkSyntax:(NSString*)key;
+- (BOOL) executeCommand:(NSString*)key value:(NSString*)val;
+- (void) setCommands:(NSMutableArray*)anArray;
+- (NSDictionary*) commandAtIndex:(int)index;
+- (NSUInteger) commandCount;
+- (void) addCommand;
+- (void) removeCommand:(int)index;
+//DB Interaction
+- (void) uploadCmdSection;
+- (void) createCmdDict;
+- (void) createCmdUploadDict;
+- (void) processCmdDocument:(NSDictionary*) doc;
+
+#pragma mark ***Script Section
+- (void) checkCommandDoc:(NSDictionary*)doc;
+- (BOOL) runScript:(NSString*) aScript;
+- (void) scriptRunnerDidFinish:(BOOL)finished returnValue:(NSNumber*)val;
+
+#pragma mark ***Archival
+- (id)   initWithCoder:(NSCoder*)decoder;
+- (void) encodeWithCoder:(NSCoder*)encoder;
+@end
+
+extern NSString* ORCouchDBListenerModelDatabaseListChanged;
+extern NSString* ORCouchDBListenerModelListeningChanged;
+extern NSString* ORCouchDBListenerModelObjectListChanged;
+extern NSString* ORCouchDBListenerModelCommandsChanged;
+extern NSString* ORCouchDBListenerModelStatusLogChanged;
