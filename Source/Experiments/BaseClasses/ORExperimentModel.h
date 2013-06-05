@@ -34,8 +34,9 @@
 	BOOL			somethingSelected;
 	int				displayType;
 	BOOL			scheduledToHistogram;
-    BOOL showNames;
-    BOOL ignoreHWChecks;
+    BOOL            showNames;
+    BOOL            ignoreHWChecks;
+    int             colorScaleType;
 }
 
 - (id) init;
@@ -48,6 +49,8 @@
 - (void) setIgnoreHWChecks:(BOOL)aIgnoreHWChecks;
 - (BOOL) showNames;
 - (void) setShowNames:(BOOL)aShowNames;
+- (int) colorScaleType;
+- (void) setColorScaleType:(int)aType;
 - (int) displayType;
 - (void) setDisplayType:(int)aDisplayType;
 - (NSString*) selectionString;
@@ -142,5 +145,6 @@ extern NSString* ExperimentDisplayUpdatedNeeded;
 extern NSString* ExperimentCollectedRates;
 extern NSString* ExperimentDisplayHistogramsUpdated;
 extern NSString* ExperimentModelSelectionChanged;
+extern NSString* ExperimentModelColorScaleTypeChanged;
 
 

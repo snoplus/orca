@@ -218,6 +218,14 @@
 	[self fpdOnlyModeChanged:nil];
 }
 
+- (void) colorScaleTypeChanged:(NSNotification*)aNote
+{
+    [super colorScaleTypeChanged:aNote];
+    [secondaryColorScale setUseRainBow:[model colorScaleType]==0];
+    [secondaryColorScale setStartColor:[primaryColorScale startColor]];
+    [secondaryColorScale setEndColor:[primaryColorScale endColor]];
+}
+
 - (void) lowLimitChanged:(NSNotification*)aNotification
 {
 	int i;

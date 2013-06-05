@@ -57,6 +57,7 @@
     IBOutlet NSMatrix*      runModeMatrix;
     IBOutlet NSProgressIndicator* 	runBar;
 	IBOutlet NSButton*		clearButton;
+    IBOutlet NSMatrix*      colorScaleMatrix;
 
 	//items in the  details tab view
 	IBOutlet NSPopUpButton*	displayTypePU1;
@@ -104,6 +105,7 @@
 - (IBAction) runModeAction:(id)sender;
 - (IBAction) autoscaleMainColorScale:(id)sender;
 - (IBAction) selectedRunTypeScriptPUAction:(id)sender;
+- (IBAction) colorScaleTypeAction:(id)sender;
 
 
 #pragma mark •••Toolbar
@@ -153,6 +155,7 @@
 - (void) repeatRunChanged:(NSNotification*)aNote;
 - (void) elapsedTimeChanged:(NSNotification*)aNote;
 - (void) selectedRunTypeScriptChanged:(NSNotification*)aNote;
+- (void) colorScaleTypeChanged:(NSNotification*)aNote;
 
 #pragma mark •••Details Interface Management
 - (void) histogramsUpdated:(NSNotification*)aNote;

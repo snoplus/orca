@@ -301,13 +301,19 @@
     [notifyCenter addObserver : self
                      selector : @selector(refreshSegmentTables:)
                          name : KSegmentChangedNotification
-						object: nil];	
+						object: nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(colorScaleTypeChanged:)
+                         name : ExperimentModelColorScaleTypeChanged
+						object: nil];    
 }
 
 - (void) updateWindow
 {
     [super updateWindow];
     [self miscAttributesChanged:nil];
+    [self colorScaleTypeChanged:nil];
     [self mapLockChanged:nil];
     [self detectorLockChanged:nil];
     [self hardwareCheckChanged:nil];
@@ -357,6 +363,41 @@
 	[timedRunCB setIntValue:[runControl timedRun]];
 	[repeatRunCB setEnabled:[runControl timedRun]];
 	[timeLimitField setEnabled:[runControl timedRun]];
+}
+
+
+
+- (void) colorScaleTypeChanged:(NSNotification*)aNote
+{
+    int colorScaleType = [model colorScaleType];
+	[colorScaleMatrix selectCellWithTag: colorScaleType];
+    [[self viewToDisplay] setNeedsDisplay:YES];
+    switch(colorScaleType){
+        case 0: /*rainbow -- nothing to do*/ break;
+
+        case 1:
+            [primaryColorScale setStartColor:[NSColor colorWithCalibratedRed:.5 green:.5 blue:1.0 alpha:1]];
+            [primaryColorScale setEndColor:  [NSColor redColor]];
+            break;
+
+        case 2:
+            [primaryColorScale setStartColor:[NSColor yellowColor]];
+            [primaryColorScale setEndColor:  [NSColor redColor]];
+        break;
+            
+        case 3:
+            [primaryColorScale setStartColor:[NSColor orangeColor]];
+            [primaryColorScale setEndColor:  [NSColor blueColor]];
+        break;
+            
+        case 4:
+            [primaryColorScale setStartColor:[NSColor colorWithCalibratedRed:1.0 green:.3 blue:.9 alpha:1]];
+            [primaryColorScale setEndColor:  [NSColor greenColor]];
+        break;
+
+    }
+
+    [primaryColorScale setUseRainBow:[model colorScaleType]==0];
 }
 
 - (void) runModeChanged:(NSNotification*)aNote
@@ -457,8 +498,12 @@
         [[primaryColorScale colorAxis] setRngLow:0 withHigh:maxValue];
     }
 }
+- (IBAction) colorScaleTypeAction:(id)sender
+{
+    [model setColorScaleType:[[sender selectedCell]tag]];
+}
 
-- (void) ignoreHWChecksAction:(id)sender
+- (IBAction) ignoreHWChecksAction:(id)sender
 {
 	[model setIgnoreHWChecks:[sender intValue]];	
 }
@@ -735,7 +780,8 @@
 
 - (void) refreshSegmentTables:(NSNotification*)aNote
 {
-	[primaryTableView reloadData];	
+	[primaryTableView reloadData];
+    [[self viewToDisplay] setNeedsDisplay:YES];
 }
 
 - (void) specialUpdate:(NSNotification*)aNote

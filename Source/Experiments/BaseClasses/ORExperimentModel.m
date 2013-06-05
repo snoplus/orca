@@ -40,6 +40,7 @@ NSString* ExperimentDisplayUpdatedNeeded			 	 = @"ExperimentDisplayUpdatedNeeded
 NSString* ExperimentCollectedRates						 = @"ExperimentCollectedRates";
 NSString* ExperimentDisplayHistogramsUpdated			 = @"ExperimentDisplayHistogramsUpdated";
 NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChanged";
+NSString* ExperimentModelColorScaleTypeChanged           = @"ExperimentModelColorScaleTypeChanged";
 
 
 @interface ORExperimentModel (private)
@@ -303,6 +304,17 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
 }
 
 #pragma mark •••Accessors
+- (int) colorScaleType
+{
+    return colorScaleType;
+}
+
+- (void) setColorScaleType:(int)aType
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setColorScaleType:colorScaleType];
+    colorScaleType = aType;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ExperimentModelColorScaleTypeChanged object:self];
+}
 
 - (BOOL) ignoreHWChecks
 {
@@ -502,6 +514,7 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
     [self setShowNames:		[decoder decodeBoolForKey:	@"ORExperimentModelShowNames"]];
     [self setDisplayType:	[decoder decodeIntForKey:   @"ExperimentModelDisplayType"]];	
     [self setCaptureDate:	[decoder decodeObjectForKey:@"ExperimentCaptureDate"]];
+    [self setColorScaleType:	[decoder decodeIntForKey:@"colorScaleType"]];
 	segmentGroups = [[decoder decodeObjectForKey:	 @"ExperimentSegmentGroups"] retain];
 	if([segmentGroups count] == 1)[[segmentGroups objectAtIndex:0] setMapEntries:[self setupMapEntries:0]];
 	else if([segmentGroups count] == 2){
@@ -530,6 +543,7 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
     [encoder encodeBool:ignoreHWChecks	forKey: @"ignoreHWChecks"];
     [encoder encodeBool:showNames		forKey: @"ORExperimentModelShowNames"];
     [encoder encodeInt:displayType		forKey: @"ExperimentModelDisplayType"];
+    [encoder encodeInt:colorScaleType   forKey: @"colorScaleType"];
     [encoder encodeObject:captureDate	forKey: @"ExperimentCaptureDate"];
     [encoder encodeObject:segmentGroups forKey: @"ExperimentSegmentGroups"];
 }

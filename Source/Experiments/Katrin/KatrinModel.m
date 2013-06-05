@@ -33,11 +33,11 @@ NSString* KatrinModelSlowControlIsConnectedChanged  = @"KatrinModelSlowControlIs
 NSString* KatrinModelSlowControlNameChanged			= @"KatrinModelSlowControlNameChanged";
 NSString* ORKatrinModelViewTypeChanged				= @"ORKatrinModelViewTypeChanged";
 NSString* ORKatrinModelSNTablesChanged				= @"ORKatrinModelSNTablesChanged";
-NSString* ORKatrinModelHiLimitChanged		= @"ORKatrinModelHiLimitChanged";
-NSString* ORKatrinModelLowLimitChanged		= @"ORKatrinModelLowLimitChanged";
-NSString* ORKatrinModelSlopeChanged			= @"ORKatrinModelSlopeChanged";
-NSString* ORKatrinModelInterceptChanged		= @"ORKatrinModelInterceptChanged";
-NSString* ORKatrinModelMaxValueChanged		= @"ORKatrinModelMaxValueChanged";
+NSString* ORKatrinModelHiLimitChanged               = @"ORKatrinModelHiLimitChanged";
+NSString* ORKatrinModelLowLimitChanged              = @"ORKatrinModelLowLimitChanged";
+NSString* ORKatrinModelSlopeChanged                 = @"ORKatrinModelSlopeChanged";
+NSString* ORKatrinModelInterceptChanged             = @"ORKatrinModelInterceptChanged";
+NSString* ORKatrinModelMaxValueChanged              = @"ORKatrinModelMaxValueChanged";
 
 static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 @interface KatrinModel (private)
