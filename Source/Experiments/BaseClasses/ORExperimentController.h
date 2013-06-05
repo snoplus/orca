@@ -58,6 +58,8 @@
     IBOutlet NSProgressIndicator* 	runBar;
 	IBOutlet NSButton*		clearButton;
     IBOutlet NSMatrix*      colorScaleMatrix;
+    IBOutlet NSColorWell*   custumColorWell1;
+    IBOutlet NSColorWell*   custumColorWell2;
 
 	//items in the  details tab view
 	IBOutlet NSPopUpButton*	displayTypePU1;
@@ -106,6 +108,8 @@
 - (IBAction) autoscaleMainColorScale:(id)sender;
 - (IBAction) selectedRunTypeScriptPUAction:(id)sender;
 - (IBAction) colorScaleTypeAction:(id)sender;
+- (IBAction) customColor1Action:(id)sender;
+- (IBAction) customColor2Action:(id)sender;
 
 
 #pragma mark •••Toolbar
@@ -149,7 +153,7 @@
 - (void) updateForReplayMode;
 - (void) newTotalRateAvailable:(NSNotification*)aNotification;
 - (void) miscAttributesChanged:(NSNotification*)aNotification;
-- (void) timedRunChangted:(NSNotification*)aNote;
+- (void) timedRunChanged:(NSNotification*)aNote;
 - (void) runModeChanged:(NSNotification*)aNote;
 - (void) runTimeLimitChanged:(NSNotification*)aNote;
 - (void) repeatRunChanged:(NSNotification*)aNote;

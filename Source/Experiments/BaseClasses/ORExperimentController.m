@@ -259,7 +259,7 @@
 
 
     [notifyCenter addObserver : self
-					 selector : @selector(timedRunChangted:)
+					 selector : @selector(timedRunChanged:)
 						 name : ORRunTimedRunChangedNotification
 					   object : nil];
 
@@ -307,6 +307,17 @@
                      selector : @selector(colorScaleTypeChanged:)
                          name : ExperimentModelColorScaleTypeChanged
 						object: nil];    
+
+    [notifyCenter addObserver : self
+                     selector : @selector(customColor1Changed:)
+                         name : ExperimentModelCustomColor1Changed
+						object: nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(customColor2Changed:)
+                         name : ExperimentModelCustomColor2Changed
+						object: nil];
+
 }
 
 - (void) updateWindow
@@ -325,8 +336,10 @@
 	[self displayTypeChanged:nil];	
 	[self primaryAdcClassNameChanged:nil];
 	[self selectionChanged:nil];
+	[self customColor1Changed:nil];
+	[self customColor2Changed:nil];
 
-	[self timedRunChangted:nil];
+	[self timedRunChanged:nil];
 	[self runModeChanged:nil];
 	[self runTimeLimitChanged:nil];
 	[self repeatRunChanged:nil];
@@ -358,13 +371,26 @@
 	[runModeMatrix setEnabled:runControl!=nil];
 }
 
-- (void) timedRunChangted:(NSNotification*)aNote
+- (void) timedRunChanged:(NSNotification*)aNote
 {
 	[timedRunCB setIntValue:[runControl timedRun]];
 	[repeatRunCB setEnabled:[runControl timedRun]];
 	[timeLimitField setEnabled:[runControl timedRun]];
 }
 
+- (void) customColor1Changed:(NSNotification*)aNote
+{
+    [custumColorWell1 setColor: [model customColor1]];
+    [primaryColorScale setStartColor: [model customColor1]];
+    [[self viewToDisplay] setNeedsDisplay:YES];
+}
+
+- (void) customColor2Changed:(NSNotification*)aNote
+{
+    [custumColorWell2 setColor: [model customColor2]];
+    [primaryColorScale setEndColor:   [model customColor2]];
+    [[self viewToDisplay] setNeedsDisplay:YES];
+}
 
 
 - (void) colorScaleTypeChanged:(NSNotification*)aNote
@@ -391,12 +417,16 @@
         break;
             
         case 4:
-            [primaryColorScale setStartColor:[NSColor colorWithCalibratedRed:1.0 green:.3 blue:.9 alpha:1]];
-            [primaryColorScale setEndColor:  [NSColor greenColor]];
+            [primaryColorScale setStartColor: [model customColor1]];
+            [primaryColorScale setEndColor:   [model customColor2]];
         break;
 
     }
+    
+    [custumColorWell1 setEnabled:[model colorScaleType]==4];
+    [custumColorWell2 setEnabled:[model colorScaleType]==4];
 
+    [self detectorLockChanged:nil]; //update the button status
     [primaryColorScale setUseRainBow:[model colorScaleType]==0];
 }
 
@@ -501,6 +531,16 @@
 - (IBAction) colorScaleTypeAction:(id)sender
 {
     [model setColorScaleType:[[sender selectedCell]tag]];
+}
+
+- (IBAction) customColor1Action:(id)sender
+{
+    [model setCustomColor1:[sender color]];
+}
+
+- (IBAction) customColor2Action:(id)sender
+{
+    [model setCustomColor2:[sender color]];
 }
 
 - (IBAction) ignoreHWChecksAction:(id)sender

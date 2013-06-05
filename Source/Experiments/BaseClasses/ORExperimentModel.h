@@ -37,6 +37,8 @@
     BOOL            showNames;
     BOOL            ignoreHWChecks;
     int             colorScaleType;
+    NSColor*        customColor1;
+    NSColor*        customColor2;
 }
 
 - (id) init;
@@ -49,6 +51,11 @@
 - (void) setIgnoreHWChecks:(BOOL)aIgnoreHWChecks;
 - (BOOL) showNames;
 - (void) setShowNames:(BOOL)aShowNames;
+- (NSColor*) customColor1;
+- (void) setCustomColor1:(NSColor*)aType;
+- (NSColor*) customColor2;
+- (void) setCustomColor2:(NSColor*)aType;
+
 - (int) colorScaleType;
 - (void) setColorScaleType:(int)aType;
 - (int) displayType;
@@ -146,5 +153,7 @@ extern NSString* ExperimentCollectedRates;
 extern NSString* ExperimentDisplayHistogramsUpdated;
 extern NSString* ExperimentModelSelectionChanged;
 extern NSString* ExperimentModelColorScaleTypeChanged;
+extern NSString* ExperimentModelCustomColor1Changed;
+extern NSString* ExperimentModelCustomColor2Changed;
 
 

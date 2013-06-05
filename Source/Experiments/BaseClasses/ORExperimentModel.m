@@ -41,6 +41,8 @@ NSString* ExperimentCollectedRates						 = @"ExperimentCollectedRates";
 NSString* ExperimentDisplayHistogramsUpdated			 = @"ExperimentDisplayHistogramsUpdated";
 NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChanged";
 NSString* ExperimentModelColorScaleTypeChanged           = @"ExperimentModelColorScaleTypeChanged";
+NSString* ExperimentModelCustomColor1Changed             = @"ExperimentModelCustomColor1Changed";
+NSString* ExperimentModelCustomColor2Changed             = @"ExperimentModelCustomColor2Changed";
 
 
 @interface ORExperimentModel (private)
@@ -316,6 +318,34 @@ NSString* ExperimentModelColorScaleTypeChanged           = @"ExperimentModelColo
     [[NSNotificationCenter defaultCenter] postNotificationName:ExperimentModelColorScaleTypeChanged object:self];
 }
 
+- (NSColor*) customColor1
+{
+    return customColor1;
+}
+
+- (void) setCustomColor1:(NSColor*)aType
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setCustomColor1:customColor1];
+    customColor1 = aType;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ExperimentModelCustomColor1Changed object:self];
+    
+}
+
+- (NSColor*) customColor2
+{
+    return customColor2;
+  
+}
+
+- (void) setCustomColor2:(NSColor*)aType
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setCustomColor2:customColor2];
+    customColor2 = aType;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ExperimentModelCustomColor2Changed object:self];
+    
+}
+
+
 - (BOOL) ignoreHWChecks
 {
     return ignoreHWChecks;
@@ -514,8 +544,17 @@ NSString* ExperimentModelColorScaleTypeChanged           = @"ExperimentModelColo
     [self setShowNames:		[decoder decodeBoolForKey:	@"ORExperimentModelShowNames"]];
     [self setDisplayType:	[decoder decodeIntForKey:   @"ExperimentModelDisplayType"]];	
     [self setCaptureDate:	[decoder decodeObjectForKey:@"ExperimentCaptureDate"]];
-    [self setColorScaleType:	[decoder decodeIntForKey:@"colorScaleType"]];
-	segmentGroups = [[decoder decodeObjectForKey:	 @"ExperimentSegmentGroups"] retain];
+    [self setColorScaleType:[decoder decodeIntForKey:   @"colorScaleType"]];
+    
+    NSColor* color1 = [decoder decodeObjectForKey:@"customColor1"];
+    if(color1)[self setCustomColor1:color1];
+    else [self setCustomColor1:[NSColor blueColor]];
+    
+    NSColor* color2 = [decoder decodeObjectForKey:@"customColor2"];
+    if(color2)[self setCustomColor2:color2];
+    else [self setCustomColor2:[NSColor blueColor]];
+    
+	segmentGroups = [[decoder decodeObjectForKey:       @"ExperimentSegmentGroups"] retain];
 	if([segmentGroups count] == 1)[[segmentGroups objectAtIndex:0] setMapEntries:[self setupMapEntries:0]];
 	else if([segmentGroups count] == 2){
 		[[segmentGroups objectAtIndex:0] setMapEntries:[self setupMapEntries:0]];
@@ -546,6 +585,8 @@ NSString* ExperimentModelColorScaleTypeChanged           = @"ExperimentModelColo
     [encoder encodeInt:colorScaleType   forKey: @"colorScaleType"];
     [encoder encodeObject:captureDate	forKey: @"ExperimentCaptureDate"];
     [encoder encodeObject:segmentGroups forKey: @"ExperimentSegmentGroups"];
+    [encoder encodeObject:customColor1  forKey: @"customColor1"];
+    [encoder encodeObject:customColor2  forKey: @"customColor2"];
 }
 
 - (NSMutableDictionary*) captureState
