@@ -387,6 +387,9 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 		}
 	    // case 2. (all other cases)
 		//NSLog(@"   Case 2: wait for 1 histogram\n");//DEBUG -tb-
+        if([self receivedHistoChanMap]){
+		    NSLog(@" %@::%@    WARNING - some of the single histograms already rceived, for others still awaiting: check that sum histograms all added the same amount of histograms. ([self receivedHistoChanMap]:%i) WARNING\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[self receivedHistoChanMap]);//DEBUG -tb-
+        }
 		[self syncWithRunControlStart: 1];
 	}
 }
@@ -401,10 +404,10 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (void) syncWithRunControlCheckStopCondition
 {
-    //NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
+    //DEBUG    NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
     if(syncWithRunControlCounterFlag >= receivedHistoCounter){//the notification 'runAboutToChangeState' seems to be called every second, if a wait is active, so we need to check for >= (not ==) -tb-
         //this is the sum histogram facility - see - (BOOL) setFromDecodeStageReceivedHistoForChan:(short)aChan
-            //DEBUG  NSLog(@"subrun-histo-summing: SHIP NOW <--------------\n");
+            //DEBUG              NSLog(@"%@::%@ subrun-histo-summing: SHIP NOW <--------------\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));
             [self shipSumHistograms];
         //clear waits for run control
 	    [self releaseRunWait]; 
@@ -675,6 +678,7 @@ static double table[32]={
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelReceivedHistoChanMapChanged object:self];
 }
+
 - (BOOL) activateDebuggingDisplays {return activateDebuggingDisplays;}
 - (void) setActivateDebuggingDisplays:(BOOL)aState
 {
@@ -2388,6 +2392,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
         //}
 		if(triggerEnabledMask == (map & triggerEnabledMask)){ // 'triggerEnabledMask == map' is sufficient, but in simulation mode we may receive histograms from inactive channels ... -tb-
 		    //after all channels shipped histogram, ship sum histograms and increase counter
+            //DEBUG  NSLog(@"DEBUG: in %@::%@: Received all single histograms according to map for chan:%i  (trigger mask: %i)    \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),aChan,triggerEnabledMask);//TODO: DEBUG testing ...-tb-
 		    map=0;
 			[self setReceivedHistoChanMap:map];
 			[self setReceivedHistoCounter: receivedHistoCounter+1];
