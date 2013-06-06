@@ -435,7 +435,6 @@
 - (id) initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 - (NSDictionary*) dataRecordDescription;
-- (void) appendEventDictionary:(NSMutableDictionary*)anEventDictionary topLevel:(NSMutableDictionary*)topLevel;
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Data Taker

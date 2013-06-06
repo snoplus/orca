@@ -444,14 +444,17 @@ void InitSLTPbus(void)
 	pbus->write(SLTInterruptMaskReg,0xffff);//reset SLT
 	printf("  Interrupt  mask 0x%08x  (wrote 0xffff) ... \n",pbus->read(SLTInterruptMaskReg));
 	
+    //check number of HW FIFOs
+	uint32_t controlReg= pbus->read(SLTControlReg);
+	printf("  SLTControlReg: 0x%08x  (->numFIFOs: %i) ... \n",controlReg,controlReg>>28);
  
  
      //find FLTs
 	int flt;
 	uint32_t val;
 	presentFLTMap = 0;
-	for(flt=0; flt<MAX_NUM_FLT_CARDS; flt++){
-	//for(flt=0; flt<16; flt++){ //TODO:  <-------------------USE ABOVE LINE!!!!! Sascha NEEDS TO FIX IT -tb-
+	//for(flt=0; flt<MAX_NUM_FLT_CARDS; flt++){
+	for(flt=0; flt<16; flt++){ //TODO:  <-------------------USE ABOVE LINE!!!!! Sascha NEEDS TO FIX IT -tb-
 	    val = pbus->read(FLTVersionReg(flt+1));
 	    printf("FLT#%i (idx %i): version 0x%08x\n",flt+1,flt,val);
 	    if(val!=0x1f000000 && val!=0xffffffff){
@@ -3777,13 +3780,19 @@ void RunSomeHardwareTests()
         printf("  This is NOT EDELWEISS FPGA configuration! Terminating!\n");
         exit(2);
     }
-    if(((version >> 16) & 0x0fff) >= 0x130){
-        printf("  SLT supports single FIFO: OK\n");
-    }else{
-        printf("  ERROR: SLT DOESNT support single FIFO - use newer firmware! - ERROR\n");
-        exit(2);
-    }
 
+
+    if(((version >> 16) & 0x0fff) >= 0x131){
+    }else{
+        //we support still single FIFO SLT versions - old multi-FIFO SLT versions do not work any more
+        if(((version >> 16) & 0x0fff) >= 0x130){
+            printf("  SLT supports single FIFO: OK\n");
+        }else{
+            printf("  ERROR: SLT DOESNT support single FIFO - use newer firmware! - ERROR\n");
+            exit(2);
+        }
+
+    }
 	//2.
 	//check more registers
     printf("\n");
@@ -3958,7 +3967,7 @@ void testFLTs()
 
 
  /*--------------------------------------------------------------------
- *    function:     InitHardwareFIFOs
+ *    function:     StopSLTFIFO
  *--------------------------------------------------------------------*/ //-tb-
 void StopSLTFIFO()
 {
@@ -4076,6 +4085,7 @@ void InitHardwareFIFOs(int warmStart)
 	printf("SLTControl: 0x%08x (OnLine: %i)\n",SLTControl, (SLTControl & 0x4000)>>14);
 			
 	for(i=0;i<FIFOREADER::maxNumFIFO;i++)
+	//for(i=0;i<FIFOREADER::maxNumFIFO;i++)
 	    if(FIFOREADER::FifoReader[i].readfifo){
 			//SLT csr register
 			BB0csr =  pbus->read(BBcsrReg(i));
@@ -4591,7 +4601,7 @@ int32_t main(int32_t argc, char *argv[])
     
 
     //--------- State machine:  go to streaming state  ------------------ 
-    //as we are now able to listen for K commands 
+    //as we are now able to stream data after a P command request 
     FIFOREADER::State =  frSTREAMING;
     //-------------------------------------------------------------- 
     

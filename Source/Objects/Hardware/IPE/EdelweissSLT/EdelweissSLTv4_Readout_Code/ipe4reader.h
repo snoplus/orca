@@ -576,9 +576,11 @@ public:
 	    initVars();
 	}
     uint32_t PixbusEnable;
+    uint32_t numHWFifos;
 	void initVars(){
 		//
 		PixbusEnable=0x0;
+        numHWFifos=0;
     }
     
     static void initSLTSETTINGS(){

@@ -2330,17 +2330,6 @@ for(chan=0; chan<6;chan++)
 }
 
 
-//what is the event dictionary? -tb-
-- (void) appendEventDictionary:(NSMutableDictionary*)anEventDictionary topLevel:(NSMutableDictionary*)topLevel
-{
-	NSDictionary* aDictionary;
-	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-				   [NSNumber numberWithLong:dataId],				@"dataId",
-				   [NSNumber numberWithLong:kNumV4FLTChannels],		@"maxChannels",
-				   nil];
-	
-	[anEventDictionary setObject:aDictionary forKey:@"EdelweissFLT"];
-}
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {

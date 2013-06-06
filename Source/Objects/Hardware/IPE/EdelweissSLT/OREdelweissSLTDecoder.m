@@ -279,6 +279,7 @@ followed by multiplicity data (20 longwords -- 1 pixel mask per card)
                                  ^-------append flag is in this record (append to previous record)
                                   ^------append next waveform record
                                     ^^^^-number which defines the content of the record (kind of version number)
+                                         0: ADC trace; bit0=1: UDP packet (bit1=0:status packet, bit1=1: data packet)
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx not yet defined ... named eventInfo (started to store there postTriggTime -tb-)
  
  followed by waveform data (up to 2048 16-bit words)
