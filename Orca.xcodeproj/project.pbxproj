@@ -2325,8 +2325,6 @@
 		84B6CD4C14B37E9700386BE1 /* ORRGA300Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B6CD4214B37E9700386BE1 /* ORRGA300Model.m */; };
 		84B6CD4D14B37E9700386BE1 /* RGA300.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84B6CD4314B37E9700386BE1 /* RGA300.nib */; };
 		84B6CD4E14B37E9700386BE1 /* RGA300.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B6CD4414B37E9700386BE1 /* RGA300.tif */; };
-		84B71FF017591DD000BFA972 /* GLString.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B71FEC17591DD000BFA972 /* GLString.m */; };
-		84B71FF117591DD000BFA972 /* GLString.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B71FED17591DD000BFA972 /* GLString.h */; };
 		84B71FF5175CC43800BFA972 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84B71FF4175CC43800BFA972 /* Accelerate.framework */; };
 		84B74AD00FEAAB460033E658 /* ftpExpectScript in Resources */ = {isa = PBXBuildFile; fileRef = 84B74ACF0FEAAB460033E658 /* ftpExpectScript */; };
 		84B74CE70FEBE9B90033E658 /* Caen965.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84B74CE10FEBE9B90033E658 /* Caen965.gif */; };
@@ -5361,8 +5359,6 @@
 		84B6CD4214B37E9700386BE1 /* ORRGA300Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORRGA300Model.m; path = Source/Objects/Hardware/Serial/RGA300/ORRGA300Model.m; sourceTree = SOURCE_ROOT; };
 		84B6CD4314B37E9700386BE1 /* RGA300.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = RGA300.nib; path = Source/Objects/Hardware/Serial/RGA300/RGA300.nib; sourceTree = SOURCE_ROOT; };
 		84B6CD4414B37E9700386BE1 /* RGA300.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = RGA300.tif; path = Source/Objects/Hardware/Serial/RGA300/RGA300.tif; sourceTree = SOURCE_ROOT; };
-		84B71FEC17591DD000BFA972 /* GLString.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GLString.m; sourceTree = "<group>"; };
-		84B71FED17591DD000BFA972 /* GLString.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLString.h; sourceTree = "<group>"; };
 		84B71FF4175CC43800BFA972 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Accelerate.framework; sourceTree = "<group>"; };
 		84B74ACF0FEAAB460033E658 /* ftpExpectScript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ftpExpectScript; sourceTree = "<group>"; };
 		84B74CE10FEBE9B90033E658 /* Caen965.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Caen965.gif; sourceTree = "<group>"; };
@@ -12237,8 +12233,6 @@
 				84F5E10C0A151D9300707A0F /* ORBasicOpenGLView.m */,
 				84F5E15C0A15245F00707A0F /* trackball.m */,
 				84F5E15D0A15245F00707A0F /* trackball.h */,
-				84B71FEC17591DD000BFA972 /* GLString.m */,
-				84B71FED17591DD000BFA972 /* GLString.h */,
 			);
 			name = OpenGLView;
 			path = "Source/Objects/Misc Objects/Views/OpenGLView";
@@ -14137,7 +14131,6 @@
 				84997895174BA2F600BFEE3E /* ORiSegHVCard.h in Headers */,
 				84BF74C117590CB000AF1F56 /* OR3DScanPlatformController.h in Headers */,
 				84BF74C317590CB000AF1F56 /* OR3DScanPlatformModel.h in Headers */,
-				84B71FF117591DD000BFA972 /* GLString.h in Headers */,
 				841DACE5175CF05B002542BD /* Katrin3DView.h in Headers */,
 				B3808A8E1700F84B0019C27D /* ORCouchDBListenerController.h in Headers */,
 				B3808A901700F84B0019C27D /* ORCouchDBListenerModel.h in Headers */,
@@ -16046,7 +16039,6 @@
 				84997892174BA11400BFEE3E /* OREHS130nModel.m in Sources */,
 				84997896174BA2F600BFEE3E /* ORiSegHVCard.m in Sources */,
 				84BF74C417590CB000AF1F56 /* OR3DScanPlatformModel.m in Sources */,
-				84B71FF017591DD000BFA972 /* GLString.m in Sources */,
 				841DACE6175CF05B002542BD /* Katrin3DView.m in Sources */,
 				B3808A8F1700F84B0019C27D /* ORCouchDBListenerController.m in Sources */,
 				B3808A911700F84B0019C27D /* ORCouchDBListenerModel.m in Sources */,
