@@ -20,19 +20,62 @@
 #import "OR3DScanPlatformView.h"
 
 @implementation OR3DScanPlatformView
+-(void) dealloc
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    [super dealloc];
+}
+- (void) awakeFromNib
+{
+    [super awakeFromNib];
+    [self performSelector:@selector(incRot) withObject:nil afterDelay:.1];
+}
+- ( void) incRot
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    rot += .5;
+    [self performSelector:@selector(incRot) withObject:nil afterDelay:.01];
+    [self setNeedsDisplay:YES];
+}
+
 - (void) draw3D:(NSRect)aRect
 {
     
     glRotatef(180, 0.0f, 1.0f, 0.0f);/* orbit the Y axis */
-    glRotatef(-50, 1.0f, 0.0f, 0.0f);/* orbit the Y axis */
+    glRotatef(-50, 1.0f, 0.0f, 0.0f);/* orbit the X axis */
 
-    glClearColor(0.9f, 0.9f, 0.9f, 0.0f);
+    glClearColor(0.93f, 0.93f, 0.93f, 0.0f);
     
 
 	glLineWidth(.1);
 	glColor3f (.8, .8, .8);
     float h=0;
-    float r = .7;
+    float r = 1.;
+    glBegin (GL_LINES);
+    int i;
+    float x1,y1,x2,y2;
+    for(i=0;i<360;i++){
+        if(i==0){
+            x1 = r*cos(i*3.1415/180.);
+            y2 = r*sin(i*3.1415/180.);
+        }
+        else {
+            x2 = r*cos(i*3.1415/180.);
+            y2 = r*sin(i*3.1415/180.);
+            glVertex3f(x1, y1, h);
+            glVertex3f(x2, y2, h);
+            x1=x2;
+            y1=y2;
+        }
+
+    }
+
+    glEnd();
+        
+    glRotatef(rot, 0.0f, 0.0f, 1.0f);/* orbit the X axis */
+    glTranslatef(1.0f,0.0f,0.0f);
+    r *= .3;
+    
     glBegin (GL_LINES);
     
     glVertex3f(-r, -r, h);
@@ -46,15 +89,10 @@
     
     glVertex3f(r, -r, h);
     glVertex3f(-r, -r, h);
-    
-    
-    glVertex3f(-r, 0, h);
-    glVertex3f(r, 0, h);
-    
-    glVertex3f(0, -r, h);
-    glVertex3f(0, r, h);
-    
+
     glEnd();
+
+    
     
 }
 @end

@@ -20,6 +20,7 @@
 
 @interface OR3DScanPlatformView : ORBasicOpenGLView
 {
+    float rot;
 }
 
 - (void) draw3D:(NSRect)aRect;

@@ -462,6 +462,11 @@ NSString* ORVXMLock							= @"ORVXMLock";
     [self sendCommand:@"setDM65"]; //make sure it is master
 }
 
+- (BOOL) acceptsGuardian: (OrcaObject *)aGuardian
+{
+	return	[super acceptsGuardian:aGuardian] || [aGuardian isMemberOfClass:NSClassFromString(@"OR3DScanPlatformModel")];
+}
+
 #pragma mark ***Archival
 - (id) initWithCoder:(NSCoder*)decoder
 {

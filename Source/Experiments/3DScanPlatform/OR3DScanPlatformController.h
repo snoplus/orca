@@ -19,19 +19,14 @@
 
 
 #pragma mark •••Forward Declarations
-@class ORBasicOpenGLView;
-
 @interface OR3DScanPlatformController : OrcaObjectController
 {
-    IBOutlet ORBasicOpenGLView*  view;
 	IBOutlet ORGroupView*   subComponentsView;
     IBOutlet NSButton*      lockButton;
-    float height[148];
 }
 
 - (id) init;
 - (void) awakeFromNib;
--(void)draw3D:(NSRect)aRect;
 
 #pragma mark ***Interface Management
 - (void) registerNotificationObservers;
@@ -40,6 +35,5 @@
 
 #pragma mark •••Actions
 - (IBAction) lockAction:(id) sender;
-
 @end
 

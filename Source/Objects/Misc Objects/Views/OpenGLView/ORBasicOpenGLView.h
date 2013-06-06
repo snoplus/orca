@@ -5,7 +5,6 @@
 #import <OpenGL/glext.h>
 #import <OpenGL/glu.h>
 
-#import "GLString.h"
 
 typedef struct {
     GLdouble x,y,z;
