@@ -171,6 +171,9 @@
 	else {
 		[catalogButton setIntValue:1];
 		[customButton setIntValue:0];
+        if([selectionPU indexOfSelectedItem]){
+            [self selectionAction:nil];
+        }
 	}
 	[self enableControls];
 }
@@ -187,6 +190,7 @@
 		[cal setCalibrationName:[selectionPU titleOfSelectedItem]];
 		[unarchiver finishDecoding];
 		[unarchiver release];
+        [model setCalibration:cal];
 		[self loadUI:cal];
 	}
 	else [self loadUI:nil];
