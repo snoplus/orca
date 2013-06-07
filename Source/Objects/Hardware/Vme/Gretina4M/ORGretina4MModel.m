@@ -1488,7 +1488,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 }
 - (void) writeTrapThreshold:(int)channel
 {
-    unsigned long theValue = (trapEnabled[channel]<<31) | trapThreshold[channel] & 0xFFFFFF;
+    unsigned long theValue = (trapEnabled[channel]<<31) | (trapThreshold[channel] & 0xFFFFFF);
     
     [[self adapter] writeLongBlock:&theValue
                          atAddress:[self baseAddress] + register_information[kTrapThreshold].offset + 4*channel
