@@ -385,6 +385,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 		    NSLog(@" %@::%@   Case 2: WARNING - syncWithRunControlCounterFlag>0 (%i) - did you send multiple stopRun commands?\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),syncWithRunControlCounterFlag);//DEBUG -tb-
 		    return;
 		}
+        if(lastState==eRunBetweenSubRuns) isBetweenSubruns=1; else isBetweenSubruns=0;
 	    // case 2. (all other cases)
 		//NSLog(@"   Case 2: wait for 1 histogram\n");//DEBUG -tb-
         if([self receivedHistoChanMap]){
@@ -2475,6 +2476,11 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
         for(chan=0; chan<kNumV4FLTChannels; chan++){
             if(triggerEnabledMask & (0x1<<chan)){//if this channel is active, ship histogram, then clear
                //DEBUG  NSLog(@"%@::%@     FLT #%i  sizeof(katrinV4FullHistogramDataStruct): %i    -----> shipping chan %i  \n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),[self stationNumber], sizeof(katrinV4FullHistogramDataStruct),chan);//DEBUG -tb-
+                //set the 'between subrun' flag
+                if(isBetweenSubruns)
+                    histoBuf[chan].histogramInfo  |=  0x04; //set bit 2
+                else
+                    histoBuf[chan].histogramInfo  &=  0xfffffffb; //set bit 2 so 0
                 //ship
                 [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
 																object:[NSData dataWithBytes:(void*)&(histoBuf[chan]) length:sizeof(katrinV4FullHistogramDataStruct)]];

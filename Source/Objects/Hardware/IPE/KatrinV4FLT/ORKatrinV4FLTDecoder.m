@@ -799,7 +799,8 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx offsetEMin
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx histogramID
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx histogramInfo (some flags; some spare for future extensions)
                                       ^-pageAB flag
-									 ^--is set for sum histogram
+									 ^--is set for sum histogram (mask 0x02)
+                                    ^---is set for between-subrun sum histogram (mask 0x04)
 </pre>
 
   * For more infos: see
@@ -923,12 +924,13 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx histogramInfo (some flags; some spare fo
             data[i+(ePtr->firstBin)]=*(ptr+i);
             //NSLog(@"Decoder: HistoEntry %i: bin %i val %i\n",i,i+(ePtr->firstBin),data[i+(ePtr->firstBin)]);
         }
-        NSMutableArray*  keyArray = [NSMutableArray arrayWithCapacity:5];
+        NSMutableArray*  keyArray = [NSMutableArray arrayWithCapacity:6];
         [keyArray insertObject:@"FLT" atIndex:0];
         [keyArray insertObject:@"Energy Histogram (HW) Summed" atIndex:1]; //TODO: 1. use better name 2. keep memory clean -tb-
         [keyArray insertObject:crateKey atIndex:2];
         [keyArray insertObject:stationKey atIndex:3];
         [keyArray insertObject:channelKey atIndex:4];
+        if(ePtr->histogramInfo & 0x4) [keyArray insertObject:@"BetweenSubruns" atIndex:5];
         
         [aDataSet mergeHistogram:  data  
                          numBins:  numBins  // is fixed in the current FPGA version -tb- 2008-03-13 

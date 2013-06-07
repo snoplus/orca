@@ -113,6 +113,7 @@
     
     //buffer for summed histograms
     katrinV4FullHistogramDataStruct histoBuf[24];
+    int32_t isBetweenSubruns;//temp variable used for shipping sum histograms -tb-
 }
 
 #pragma mark •••Initialization
