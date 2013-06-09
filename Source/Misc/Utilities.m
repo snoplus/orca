@@ -23,6 +23,8 @@
 #include <IOKit/network/IOEthernetInterface.h>
 #include <IOKit/network/IONetworkInterface.h>
 #include <IOKit/network/IOEthernetController.h>
+#import <SystemConfiguration/SystemConfiguration.h>
+
 NSString* fullVersion()
 {
 	CFBundleRef localInfoBundle = CFBundleGetMainBundle();
@@ -356,7 +358,11 @@ NSString* commonScriptMethodsByObj(id anObj,BOOL includeSuperClass)
 
 NSString* computerName()
 {
-	return [(NSString*)CSCopyMachineName() autorelease];
+	//return  [(NSString*)CSCopyMachineName() autorelease];
+    CFStringRef temp = SCDynamicStoreCopyComputerName(NULL,NULL);
+    NSString*   name = [NSString stringWithString:(NSString *)temp];
+    CFRelease(temp);
+    return name;
 }
 
 NSString* macAddress()

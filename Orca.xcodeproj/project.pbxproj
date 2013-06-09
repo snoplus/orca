@@ -1632,6 +1632,7 @@
 		847F948013D4AA31006B06B4 /* ORRad7Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 847F947813D4AA31006B06B4 /* ORRad7Model.m */; };
 		847F948113D4AA31006B06B4 /* Rad7.nib in Resources */ = {isa = PBXBuildFile; fileRef = 847F947913D4AA31006B06B4 /* Rad7.nib */; };
 		847F948213D4AA31006B06B4 /* Rad7.tif in Resources */ = {isa = PBXBuildFile; fileRef = 847F947A13D4AA31006B06B4 /* Rad7.tif */; };
+		8481E67917653766001AB905 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8481E67817653766001AB905 /* SystemConfiguration.framework */; };
 		848283C0112B14F100BA30ED /* OffSwitch.tif in Resources */ = {isa = PBXBuildFile; fileRef = 848283BE112B14F100BA30ED /* OffSwitch.tif */; };
 		848283C1112B14F100BA30ED /* OnSwitch.tif in Resources */ = {isa = PBXBuildFile; fileRef = 848283BF112B14F100BA30ED /* OnSwitch.tif */; };
 		848285B1112C5AD700BA30ED /* ORVHS4030Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 848285A5112C5AD600BA30ED /* ORVHS4030Controller.h */; };
@@ -4642,6 +4643,7 @@
 		847F947813D4AA31006B06B4 /* ORRad7Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORRad7Model.m; path = Source/Objects/Hardware/Serial/Rad7/ORRad7Model.m; sourceTree = SOURCE_ROOT; };
 		847F947913D4AA31006B06B4 /* Rad7.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Rad7.nib; path = Source/Objects/Hardware/Serial/Rad7/Rad7.nib; sourceTree = SOURCE_ROOT; };
 		847F947A13D4AA31006B06B4 /* Rad7.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Rad7.tif; path = Source/Objects/Hardware/Serial/Rad7/Rad7.tif; sourceTree = SOURCE_ROOT; };
+		8481E67817653766001AB905 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = ../../../../System/Library/Frameworks/SystemConfiguration.framework; sourceTree = "<group>"; };
 		848283BE112B14F100BA30ED /* OffSwitch.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = OffSwitch.tif; path = Source/Objects/ProcessLogic/ProcessElements/Inputs/PushButton/OffSwitch.tif; sourceTree = SOURCE_ROOT; };
 		848283BF112B14F100BA30ED /* OnSwitch.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = OnSwitch.tif; path = Source/Objects/ProcessLogic/ProcessElements/Inputs/PushButton/OnSwitch.tif; sourceTree = SOURCE_ROOT; };
 		848285A5112C5AD600BA30ED /* ORVHS4030Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORVHS4030Controller.h; path = Source/Objects/Hardware/Vme/VHS4030/ORVHS4030Controller.h; sourceTree = SOURCE_ROOT; };
@@ -6231,6 +6233,7 @@
 				8475EC0B14759D53003A165D /* libusb-1.0.a in Frameworks */,
 				8458E91515DA8A2A005C43A9 /* ScriptingBridge.framework in Frameworks */,
 				84B71FF5175CC43800BFA972 /* Accelerate.framework in Frameworks */,
+				8481E67917653766001AB905 /* SystemConfiguration.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6240,6 +6243,7 @@
 		1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				8481E67817653766001AB905 /* SystemConfiguration.framework */,
 				8458E91415DA8A2A005C43A9 /* ScriptingBridge.framework */,
 				84B71FF4175CC43800BFA972 /* Accelerate.framework */,
 				EF37879112DFFF81003C814E /* YAJL.framework */,
@@ -16369,7 +16373,7 @@
 					"-lz",
 				);
 				PRODUCT_NAME = Orca;
-				SDKROOT = macosx;
+				SDKROOT = macosx10.7;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wmost";
 				WRAPPER_EXTENSION = app;
