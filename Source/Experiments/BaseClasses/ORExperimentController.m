@@ -123,6 +123,16 @@
     [super registerNotificationObservers];
     
     [notifyCenter addObserver : self
+                     selector : @selector(populatePopups)
+                         name : ORGroupObjectsAdded
+                       object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(populatePopups)
+                         name : ORGroupObjectsRemoved
+                       object : nil];
+
+    [notifyCenter addObserver : self
                      selector : @selector(objectsChanged:)
                          name : ExperimentDisplayUpdatedNeeded
                        object : model];
