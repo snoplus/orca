@@ -89,6 +89,13 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 	[operationStatusField setTimeOut:3];
 	[operationStatusField setStringValue: [operationStatusField stringValue]];
 }
+
+- (BOOL) deploymentVersion {return deploymentVersion;}
+- (void) setDeploymentVersion:(BOOL) aFlag
+{
+    deploymentVersion = aFlag;
+}
+
 - (NSOperationQueue*) queue
 {
 	return queue;
@@ -195,8 +202,10 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 	ORBuildOrcaOp* aBuildOp = [[ORBuildOrcaOp alloc] initAtPath:anUpdatePath delegate:self];
 	[queue addOperation:aBuildOp];
 	[aBuildOp release];
-	
-	NSString* aPath = [anUpdatePath stringByAppendingPathComponent:@"build/Development/Orca.app/Contents/MacOS/Orca"];
+	NSString* aPath;
+    
+	if(deploymentVersion)aPath = [anUpdatePath stringByAppendingPathComponent:@"build/Deployment/Orca.app/Contents/MacOS/Orca"];
+    else aPath = [anUpdatePath stringByAppendingPathComponent:@"build/Development/Orca.app/Contents/MacOS/Orca"];
 	[self restart:aPath];
 }
 
@@ -379,6 +388,12 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 		NSString* binPath = appPath();
 		NSString* dir = [kOldBinaryPath stringByExpandingTildeInPath];
 		if(binPath){
+            if([binPath rangeOfString:@"Development"].location == NSNotFound){
+                [delegate setDeploymentVersion:YES];
+            }
+            else {
+                [delegate setDeploymentVersion:NO];
+            }
 			NSString* archivePath = [dir stringByAppendingPathComponent:[@"Orca" stringByAppendingFormat:@"%@.tar",fullVersion()]];
 			
 			//check if already archived. if so, then skip this
@@ -698,8 +713,11 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 			NSString* thePath = [[srcPath stringByExpandingTildeInPath] stringByAppendingPathComponent:@"Orca"]; 
 			[task setCurrentDirectoryPath:thePath];
 			[task setLaunchPath: @"/usr/bin/xcodebuild"];
+            NSString* buidType;
+            if([delegate deploymentVersion]) buidType = @"Deployment";
+            else                             buidType = @"Development";
 			NSArray* arguments = [NSArray arrayWithObjects: @"-configuration", 
-								  @"Development",
+								  buidType,
 								  nil];
 			
 			[task setArguments: arguments];
