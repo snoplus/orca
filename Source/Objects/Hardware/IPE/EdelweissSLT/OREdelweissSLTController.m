@@ -787,6 +787,7 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	[[miscCntrlBitsMatrix cellWithTag:0] setIntValue:value & kCtrlInvert];
 	[[miscCntrlBitsMatrix cellWithTag:1] setIntValue:value & kCtrlLedOff];
 	[[miscCntrlBitsMatrix cellWithTag:2] setIntValue:value & kCtrlOnLine];
+	[controlRegNumFifosTextField setIntValue:(value & kCtrlNumFIFOs)>>28];
 }
 
 - (void) populatePullDown
@@ -953,6 +954,18 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 - (IBAction) readPixelBusEnableRegButtonAction:(id)sender
 {
 	[model readPixelBusEnableReg];	
+}
+
+
+
+- (IBAction) writeControlRegButtonAction:(id)sender
+{
+	[model writeControlReg];	
+}
+
+- (IBAction) readControlRegButtonAction:(id)sender
+{
+	[model readControlReg];	
 }
 
 

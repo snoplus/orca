@@ -47,6 +47,7 @@
 #define kCtrlInvert 	(0x00000001 << 16) //RW
 #define kCtrlLedOff 	(0x00000001 << 15) //RW
 #define kCtrlOnLine		(0x00000001 << 14) //RW
+#define kCtrlNumFIFOs	(0x0000000f << 28) //RW
 
 //status reg bit masks
 #define kEWStatusIrq			(0x00000001 << 31) //R - cleared on W

@@ -453,8 +453,8 @@ void InitSLTPbus(void)
 	int flt;
 	uint32_t val;
 	presentFLTMap = 0;
-	//for(flt=0; flt<MAX_NUM_FLT_CARDS; flt++){
-	for(flt=0; flt<16; flt++){ //TODO:  <-------------------USE ABOVE LINE!!!!! Sascha NEEDS TO FIX IT -tb-
+	for(flt=0; flt<MAX_NUM_FLT_CARDS; flt++){
+	//for(flt=0; flt<16; flt++){ //TODO:  <-------------------USE ABOVE LINE!!!!! Sascha NEEDS TO FIX IT -tb-
 	    val = pbus->read(FLTVersionReg(flt+1));
 	    printf("FLT#%i (idx %i): version 0x%08x\n",flt+1,flt,val);
 	    if(val!=0x1f000000 && val!=0xffffffff){
@@ -3789,7 +3789,16 @@ void RunSomeHardwareTests()
             printf("  SLT supports single FIFO: OK\n");
         }else{
             printf("  ERROR: SLT DOESNT support single FIFO - use newer firmware! - ERROR\n");
-            exit(2);
+            printf("  ERROR: check SLT revision number - continuing - ERROR\n");
+            //TODO: update SLT revision register -tb- 2013-06
+            //TODO: update SLT revision register -tb- 2013-06
+            //TODO: update SLT revision register -tb- 2013-06
+            //TODO: update SLT revision register -tb- 2013-06
+            //TODO: update SLT revision register -tb- 2013-06
+            //TODO: update SLT revision register -tb- 2013-06
+            //TODO: update SLT revision register -tb- 2013-06
+            //sleep(1);
+            //exit(2);
         }
 
     }

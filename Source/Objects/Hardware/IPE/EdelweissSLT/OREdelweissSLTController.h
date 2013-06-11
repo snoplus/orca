@@ -52,6 +52,8 @@
 	IBOutlet   NSTextField* chargeBBFileTextField;
     
         //control reg tab
+		IBOutlet NSButton*		writeControlRegButton;
+	    IBOutlet NSTextField*   controlRegNumFifosTextField;
 	    IBOutlet NSMatrix*		pixelBusEnableRegMatrix;
 	    IBOutlet NSTextField*	pixelBusEnableRegTextField;
 		
@@ -246,6 +248,9 @@
 - (IBAction) pixelBusEnableRegMatrixAction:(id)sender;
 - (IBAction) writePixelBusEnableRegButtonAction:(id)sender;
 - (IBAction) readPixelBusEnableRegButtonAction:(id)sender;
+- (IBAction) writeControlRegButtonAction:(id)sender;
+- (IBAction) readControlRegButtonAction:(id)sender;
+
 
 - (IBAction) selectedFifoIndexPUAction:(id)sender;
 
