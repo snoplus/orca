@@ -43,6 +43,7 @@
     [gradient release];
 	[backgroundImage release];
 	[comment release];
+    [delegate release];
     [super dealloc];
 }
 
@@ -84,6 +85,9 @@
 
 - (void) setDelegate:(id)aDelegate
 {
+    //normally we wouldn't retain a delegate, but in this case the delegate is a datasource and it was getting released out from under this object in some cases.
+    [aDelegate retain];
+    [delegate release];
     delegate = aDelegate;
 }
 
