@@ -127,7 +127,7 @@ enum {
     
     pinVal    	= 0;
     invertPin 	= NO;
-
+    ownViewToScale = NO;
     [self setDefaults];
     return self;
 }
@@ -138,7 +138,7 @@ enum {
     [labelAttributes release];
 	[[preferenceController window] close];
 	[preferenceController release];
-    [viewToScale release];
+    if(ownViewToScale)[viewToScale release];
 
     [super dealloc];
 }
@@ -161,6 +161,7 @@ enum {
 
 - (void) setViewToScale:(id)aView
 {
+    ownViewToScale = YES;
     [aView retain];
     [viewToScale release];
 	viewToScale = aView;
@@ -1302,7 +1303,8 @@ enum {
 - (id) calibration
 {
 	if ([viewToScale respondsToSelector:@selector(dataSource)]){
-		if([[viewToScale dataSource] respondsToSelector:@selector(model)]){
+        id theDataSource = [viewToScale dataSource];
+		if([theDataSource respondsToSelector:@selector(model)]){
 			id theCalibration = [[[viewToScale dataSource] model] calibration];
 			if(![theCalibration ignoreCalibration]) return theCalibration;
 			else return nil;

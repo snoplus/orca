@@ -25,6 +25,7 @@ long roundToLong(double x);
 @interface ORAxis : NSView <NSCoding>
 {
 	IBOutlet NSView*	    viewToScale;
+    BOOL                    ownViewToScale;
 	int						gridCount;
 	float					gridArray[kMaxLongTicks];	// array for storing long tick locations
 	int						lowOffset;					// pixel position of scale start
