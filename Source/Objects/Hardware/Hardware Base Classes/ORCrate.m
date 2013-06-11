@@ -443,7 +443,7 @@ NSString* ORCrateModelCrateNumberChanged	= @"ORCrateModelCrateNumberChanged";
 		float x = (i*[self objWidth])+[self objWidth]/2. - textSize.width/2;
         
         [slotLabel drawInRect:NSMakeRect(x,2,textSize.width,textSize.height)];
-
+        [slotLabel release];
         
     }
 }
