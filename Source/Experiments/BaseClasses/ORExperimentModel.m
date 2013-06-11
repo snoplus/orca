@@ -55,6 +55,8 @@ NSString* ExperimentModelCustomColor2Changed             = @"ExperimentModelCust
 - (id) init
 {
     self = [super init];
+    [self setCustomColor1:[NSColor blueColor]];
+    [self setCustomColor2:[NSColor whiteColor]];
 	[self makeSegmentGroups];
     return self;
 }
@@ -74,7 +76,9 @@ NSString* ExperimentModelCustomColor2Changed             = @"ExperimentModelCust
    
     [captureDate release];
     [problemArray release];
-
+    [customColor1 release];
+    [customColor2 release];
+    
     [super dealloc];
 }
 
@@ -323,10 +327,12 @@ NSString* ExperimentModelCustomColor2Changed             = @"ExperimentModelCust
     return customColor1;
 }
 
-- (void) setCustomColor1:(NSColor*)aType
+- (void) setCustomColor1:(NSColor*)aColor
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setCustomColor1:customColor1];
-    customColor1 = aType;
+    [aColor retain];
+    [customColor1 release];
+    customColor1 = aColor;
     [[NSNotificationCenter defaultCenter] postNotificationName:ExperimentModelCustomColor1Changed object:self];
     
 }
@@ -337,10 +343,12 @@ NSString* ExperimentModelCustomColor2Changed             = @"ExperimentModelCust
   
 }
 
-- (void) setCustomColor2:(NSColor*)aType
+- (void) setCustomColor2:(NSColor*)aColor
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setCustomColor2:customColor2];
-    customColor2 = aType;
+    [aColor retain];
+    [customColor2 release];
+    customColor2 = aColor;
     [[NSNotificationCenter defaultCenter] postNotificationName:ExperimentModelCustomColor2Changed object:self];
     
 }

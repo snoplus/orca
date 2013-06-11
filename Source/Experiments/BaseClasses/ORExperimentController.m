@@ -334,7 +334,6 @@
 {
     [super updateWindow];
     [self miscAttributesChanged:nil];
-    [self colorScaleTypeChanged:nil];
     [self mapLockChanged:nil];
     [self detectorLockChanged:nil];
     [self hardwareCheckChanged:nil];
@@ -355,6 +354,7 @@
 	[self repeatRunChanged:nil];
 	[self elapsedTimeChanged:nil];
 	[self populatePopups];
+    [self colorScaleTypeChanged:nil];
 	
 		//details
 	[self detailsLockChanged:nil];
