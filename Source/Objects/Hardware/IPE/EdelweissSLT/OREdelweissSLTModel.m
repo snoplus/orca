@@ -2305,9 +2305,9 @@ for(l=0;l<2500;l++){
 {
     NSString *cmd = [[NSString alloc] initWithFormat: @"KWC_chargeBBFile_%@", [self chargeBBFile]];
 	//debug 
-    NSLog(@" %@::%@ senf KCommand:%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd), cmd);//TODO: DEBUG -tb-
+    NSLog(@" %@::%@ send KCommand:%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd), cmd);//TODO: DEBUG -tb-
     [cmd autorelease]; //MAH 06/11/13 added autorelease to prevent memory leak
-	return [self sendUDPDataCommandString:  cmd];
+	return [self sendUDPDataCommandString:  cmd];	
 }
 
 
@@ -2411,6 +2411,8 @@ for(l=0;l<2500;l++){
 {
 //DEBUG OUTPUT: 	
 NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+    [self readControlReg];
+    [self readPixelBusEnableReg];
 }
 
 
@@ -2583,7 +2585,7 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 
 - (void) readAllStatus
 {
-	//[self readControlReg];
+	[self readControlReg];
 	[self readStatusReg];
 	//[self readReadOutControlReg];
 	[self getTime];
@@ -2594,7 +2596,9 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 
 - (unsigned long) readControlReg
 {
-	return [self readReg:kSltV4ControlReg];
+	unsigned long data = [self readReg:kSltV4ControlReg];
+    [self setControlReg: data];
+	return data;
 }
 
 
@@ -2611,6 +2615,7 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 	NSLogFont(aFont,@"OnLine  : 0x%02x\n",(data & kCtrlOnLine) >> 14);
 	NSLogFont(aFont,@"LedOff  : 0x%02x\n",(data & kCtrlLedOff) >> 15);
 	NSLogFont(aFont,@"Invert  : 0x%02x\n",(data & kCtrlInvert) >> 16);
+	NSLogFont(aFont,@"NumFIFOs: 0x%02x\n",(data & kCtrlNumFIFOs) >> 28);
 }
 
 
