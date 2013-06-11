@@ -552,7 +552,7 @@ NSString* ExperimentModelCustomColor2Changed             = @"ExperimentModelCust
     
     NSColor* color2 = [decoder decodeObjectForKey:@"customColor2"];
     if(color2)[self setCustomColor2:color2];
-    else [self setCustomColor2:[NSColor blueColor]];
+    else [self setCustomColor2:[NSColor whiteColor]];
     
 	segmentGroups = [[decoder decodeObjectForKey:       @"ExperimentSegmentGroups"] retain];
 	if([segmentGroups count] == 1)[[segmentGroups objectAtIndex:0] setMapEntries:[self setupMapEntries:0]];

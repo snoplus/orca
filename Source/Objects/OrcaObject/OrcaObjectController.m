@@ -39,6 +39,7 @@ NSString* ORModelChangedNotification = @"ORModelChangedNotification";
 - (void) dealloc
 {
 	[[self window] close];
+    [model release];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [super dealloc];
 }
@@ -76,7 +77,8 @@ NSString* ORModelChangedNotification = @"ORModelChangedNotification";
 		
 		NSNotificationCenter* nc = [NSNotificationCenter defaultCenter];
 		[nc removeObserver:self];
-		
+		[aModel retain];
+        [model release];
         model =  aModel;
 		
 		if(model){
