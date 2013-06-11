@@ -2306,7 +2306,8 @@ for(l=0;l<2500;l++){
     NSString *cmd = [[NSString alloc] initWithFormat: @"KWC_chargeBBFile_%@", [self chargeBBFile]];
 	//debug 
     NSLog(@" %@::%@ senf KCommand:%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd), cmd);//TODO: DEBUG -tb-
-	return [self sendUDPDataCommandString:  cmd];	
+    [cmd autorelease]; //MAH 06/11/13 added autorelease to prevent memory leak
+	return [self sendUDPDataCommandString:  cmd];
 }
 
 
