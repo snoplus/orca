@@ -2238,7 +2238,7 @@ static NSString *ORRunTypeNames 	= @"ORRunTypeNames";
 		float y = totalHeight-(i*[self objWidth])+[self objWidth]/2. - textSize.height/2;
         
         [slotLabel drawInRect:NSMakeRect(2,y,textSize.width,textSize.height)];
-        
+        [slotLabel release];
         
     }
 }
