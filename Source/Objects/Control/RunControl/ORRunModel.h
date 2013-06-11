@@ -95,7 +95,6 @@
 		NSThread* readoutThread;
     
         NSMutableArray* objectsRequestingStateChangeWait;
-        NSMutableArray* runTypeScripts;
         int selectedRunTypeScript;
         int savedSelectedRunTypeScript;
 }
