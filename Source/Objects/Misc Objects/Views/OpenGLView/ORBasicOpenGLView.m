@@ -358,7 +358,6 @@ ORBasicOpenGLView * gTrackingViewInfo = NULL;
 	stanStringAttrib = [[NSMutableDictionary dictionary] retain];
 	[stanStringAttrib setObject:font forKey:NSFontAttributeName];
 	[stanStringAttrib setObject:[NSColor whiteColor] forKey:NSForegroundColorAttributeName];
-	[font release];
 }
 
 
