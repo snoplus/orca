@@ -32,16 +32,15 @@
 	int opState;
 	NSOperationQueue* queue;
 	BOOL useFallBackConfig;
-    BOOL deploymentVersion;
 }
 
 + (ORArchive*) sharedArchive;
++ (NSString*) binPath;
++ (BOOL) deploymentVersion;
 - (NSOperationQueue*) queue;
 - (void) registerNotificationObservers;
 - (void) securityStateChanged:(NSNotification*)aNote;
 - (void) lockChanged:(NSNotification*)aNote;
-- (BOOL) deploymentVersion;
-- (void) setDeploymentVersion:(BOOL) aFlag;
 - (IBAction) archiveThisOrca:(id)sender;
 - (IBAction) startOldOrca:(id)sender;
 - (IBAction) lockAction:(id)sender;

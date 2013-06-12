@@ -36,6 +36,21 @@ NSString*  ArchiveLock = @"ArchiveLock";
 #pragma mark ¥¥¥Inialization
 
 SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
++ (NSString*) binPath
+{
+    return appPath();
+}
+
++ (BOOL) deploymentVersion
+{
+    NSString* binPath = appPath();
+    if([binPath rangeOfString:@"Deployment" options:NSCaseInsensitiveSearch].location != NSNotFound){
+        return YES;
+    }
+    else {
+        return NO;
+    }
+}
 
 -(id) init
 {
@@ -88,12 +103,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 {
 	[operationStatusField setTimeOut:3];
 	[operationStatusField setStringValue: [operationStatusField stringValue]];
-}
-
-- (BOOL) deploymentVersion {return deploymentVersion;}
-- (void) setDeploymentVersion:(BOOL) aFlag
-{
-    deploymentVersion = aFlag;
 }
 
 - (NSOperationQueue*) queue
@@ -198,13 +207,12 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 	[queue addOperation:aCleanOp];
 	[aCleanOp release];
 
-    
 	ORBuildOrcaOp* aBuildOp = [[ORBuildOrcaOp alloc] initAtPath:anUpdatePath delegate:self];
 	[queue addOperation:aBuildOp];
 	[aBuildOp release];
 	NSString* aPath;
     
-	if(deploymentVersion)aPath = [anUpdatePath stringByAppendingPathComponent:@"build/Deployment/Orca.app/Contents/MacOS/Orca"];
+	if([ORArchive deploymentVersion])aPath = [anUpdatePath stringByAppendingPathComponent:@"build/Deployment/Orca.app/Contents/MacOS/Orca"];
     else aPath = [anUpdatePath stringByAppendingPathComponent:@"build/Development/Orca.app/Contents/MacOS/Orca"];
 	[self restart:aPath];
 }
@@ -388,12 +396,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 		NSString* binPath = appPath();
 		NSString* dir = [kOldBinaryPath stringByExpandingTildeInPath];
 		if(binPath){
-            if([binPath rangeOfString:@"Development"].location == NSNotFound){
-                [delegate setDeploymentVersion:YES];
-            }
-            else {
-                [delegate setDeploymentVersion:NO];
-            }
+            NSLog(@"Archiving:%@\n",binPath);
+
 			NSString* archivePath = [dir stringByAppendingPathComponent:[@"Orca" stringByAppendingFormat:@"%@.tar",fullVersion()]];
 			
 			//check if already archived. if so, then skip this
@@ -555,9 +559,10 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 		}
 		
 		NSTask* task = [[NSTask alloc] init];
+        NSLog(@"Restarting: %@\n",binPath);
 		[task setCurrentDirectoryPath:[[binPath stringByExpandingTildeInPath] stringByDeletingLastPathComponent]];
 		[task setLaunchPath: binPath];
-		NSArray* arguments = [NSArray arrayWithObjects: @"-startup",@"NoKill", nil];
+		NSArray* arguments = [NSArray arrayWithObjects: @"-startup",@"Kill", nil];
 		if(configFile){
 			arguments = [arguments arrayByAddingObjectsFromArray:[NSArray arrayWithObjects: @"-config",newLocation, nil]];
 		}
@@ -714,9 +719,15 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 			[task setCurrentDirectoryPath:thePath];
 			[task setLaunchPath: @"/usr/bin/xcodebuild"];
             NSString* buidType;
-            if([delegate deploymentVersion]) buidType = @"Deployment";
-            else                             buidType = @"Development";
-			NSArray* arguments = [NSArray arrayWithObjects: @"-configuration", 
+            if([delegate deploymentVersion]){
+                NSLog(@"Building Deployment target\n");
+                buidType = @"Deployment";
+            }
+            else {
+                NSLog(@"Building Development target\n");
+                buidType = @"Development";
+            }
+			NSArray* arguments = [NSArray arrayWithObjects: @"-configuration",
 								  buidType,
 								  nil];
 			
