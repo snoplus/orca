@@ -745,6 +745,8 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
         if([controller window] == [aNote object]){
             //[controller retain];
 			@try {
+                [[NSNotificationCenter defaultCenter] removeObserver:controller];
+                [controller setModel:nil];
 				[orcaControllers removeObject:controller];
 			}
 			@catch(NSException* localException) {
