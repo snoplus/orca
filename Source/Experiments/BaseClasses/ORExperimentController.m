@@ -524,13 +524,16 @@
     float maxValue = -99999;
     for(i=0;i<n;i++){
         float aValue = maxValue;
-        switch([model displayType]){
-            case kDisplayThresholds:	aValue = [[model segmentGroup:0] getThreshold:i];     break;
-            case kDisplayGains:			aValue = [[model segmentGroup:0] getGain:i];          break;
-            case kDisplayRates:			aValue = [[model segmentGroup:0] getRate:i];		  break;
-            case kDisplayTotalCounts:	aValue = [[model segmentGroup:0] getTotalCounts:i];   break;
-            default:	break;
+        if([[model segmentGroup:0] online:i]){
+            switch([model displayType]){
+                case kDisplayThresholds:	aValue = [[model segmentGroup:0] getThreshold:i];     break;
+                case kDisplayGains:			aValue = [[model segmentGroup:0] getGain:i];          break;
+                case kDisplayRates:			aValue = [[model segmentGroup:0] getRate:i];		  break;
+                case kDisplayTotalCounts:	aValue = [[model segmentGroup:0] getTotalCounts:i];   break;
+                default:	break;
+            }
         }
+        else aValue = 0;
         if(aValue>maxValue)maxValue = aValue;
     }
     if(maxValue != -99999){
