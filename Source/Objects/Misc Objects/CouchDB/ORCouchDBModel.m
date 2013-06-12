@@ -1187,19 +1187,21 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 					
 				for(id aMonitor in dataMonitors){
 					NSArray* objs1d = [[aMonitor  collectObjectsOfClass:[OR1DHisto class]] retain];
+                    NSString* baseMonitorName = [NSString stringWithFormat:@"Monitor%lu",[aMonitor uniqueIdNumber]];
 					@try {
 						for(id aDataSet in objs1d){
 							unsigned long start,end;
 							NSString* s = [aDataSet getnonZeroDataAsStringWithStart:&start end:&end];
+                            NSString* dataSetName = [baseMonitorName stringByAppendingFormat:@",%@",[aDataSet fullName]];
 							NSDictionary* dataInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-														[aDataSet fullName],										@"name",
+                                                        dataSetName,                                                @"name",
 														[NSNumber numberWithUnsignedLong:[aDataSet totalCounts]],	@"counts",
 														[NSNumber numberWithUnsignedLong:start],					@"start",
 														[NSNumber numberWithUnsignedLong:[aDataSet numberBins]],	@"length",
 														s,															@"PlotData",
 														@"Histogram1D",												@"type",
 														 nil];
-							NSString* dataName = [[[aDataSet fullName] lowercaseString] stringByReplacingOccurrencesOfString:@" " withString:@""];
+							NSString* dataName = [[dataSetName lowercaseString] stringByReplacingOccurrencesOfString:@" " withString:@""];
 
 							[[self statusDBRef] updateDocument:dataInfo documentId:dataName tag:kDocumentAdded];
 							
