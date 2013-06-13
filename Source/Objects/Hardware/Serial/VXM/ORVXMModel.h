@@ -52,7 +52,6 @@
 		BOOL			waiting;
 		BOOL			useCmdQueue;
 		BOOL			queryInProgress;
-        BOOL            continueQueries;
 }
 
 #pragma mark ***Initialization
@@ -155,13 +154,11 @@ extern NSString* ORVXMModelListItemsRemoved;
 @interface ORVXMMotorCmd : NSObject
 {
 	BOOL waitToSendNextCmd;
-    BOOL doQueries;
 	NSString* cmd;
 	NSString* description;
 }
 
 @property (nonatomic,assign) BOOL waitToSendNextCmd;
-@property (nonatomic,assign) BOOL doQueries;
 @property (nonatomic,retain) NSString* cmd;
 @property (nonatomic,retain) NSString* description;
 @end
