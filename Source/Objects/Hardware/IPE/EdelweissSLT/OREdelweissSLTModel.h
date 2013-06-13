@@ -438,6 +438,7 @@
 - (long)		getSBCCodeVersion;
 - (long)		getFdhwlibVersion;
 - (long)		getSltPciDriverVersion;
+- (long)		getPresentFLTsMap;
 
 #pragma mark *** Archival
 - (id)   initWithCoder:(NSCoder*)decoder;

@@ -2699,6 +2699,18 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 	return theVersion;
 }
 
+- (long) getPresentFLTsMap
+{
+	/*uint32_t*/ long theMap = 0;
+	if(![pmcLink isConnected]){
+		[NSException raise:@"Not Connected" format:@"Socket not connected."];
+	}
+	else {
+		[pmcLink readGeneral:&theMap operation:kGetPresentFLTsMap numToRead:1];
+	}
+	return theMap;
+}
+
 //TODO: remove this, never usd -tb-
 - (void) readEventStatus:(unsigned long*)eventStatusBuffer
 {

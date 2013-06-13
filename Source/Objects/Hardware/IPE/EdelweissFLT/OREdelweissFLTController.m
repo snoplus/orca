@@ -55,10 +55,11 @@
 	[super awakeFromNib];
 	
     settingSize			= NSMakeSize(670,790);
+    triggerSize			= NSMakeSize(670,790);
+    rateSize			= NSMakeSize(670,790);
     BBAccessSize		= NSMakeSize(670,790);
-    rateSize			= NSMakeSize(490,760);
-    testSize			= NSMakeSize(400,420);
-    lowlevelSize		= NSMakeSize(400,420);
+    testSize			= NSMakeSize(450,420);
+    lowlevelSize		= NSMakeSize(450,420);
 	
 	rateFormatter = [[NSNumberFormatter alloc] init];
 	[rateFormatter setFormat:@"##0.00"];
@@ -80,7 +81,13 @@
 	[self populatePullDown];
 	[self updateWindow];
 	
-	[rate0 setNumber:24 height:10 spacing:6];
+	[rate0 setNumber:18 height:10 spacing:6];
+    
+    //Trigger tab view
+    [heatChannelsTextField setFrameCenterRotation:90.0];
+    [ionChannelsTextField setFrameCenterRotation:90.0];
+    [heatChannelsTextField2 setFrameCenterRotation:90.0];
+    [ionChannelsTextField2 setFrameCenterRotation:90.0];
 
 }
 
@@ -1231,10 +1238,11 @@
     [[self window] setContentView:blankView];
     switch([tabView indexOfTabViewItem:tabViewItem]){
         case  0: [self resizeWindowToSize:settingSize];     break;
-		case  1: [self resizeWindowToSize:BBAccessSize];	    break;
+		case  1: [self resizeWindowToSize:triggerSize];	    break;
 		case  2: [self resizeWindowToSize:rateSize];	    break;
-		case  3: [self resizeWindowToSize:testSize];        break;
-		case  4: [self resizeWindowToSize:lowlevelSize];	break;
+		case  3: [self resizeWindowToSize:BBAccessSize];	break;
+		case  4: [self resizeWindowToSize:testSize];        break;
+		case  5: [self resizeWindowToSize:lowlevelSize];	break;
 		default: [self resizeWindowToSize:testSize];	    break;
     }
     [[self window] setContentView:totalView];

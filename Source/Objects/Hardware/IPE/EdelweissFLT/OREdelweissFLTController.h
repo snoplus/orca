@@ -42,6 +42,13 @@
 	IBOutlet   NSMatrix* signaMatrix;
 	IBOutlet   NSMatrix* adcRgForBBAccessMatrix;
     
+    //Trigger Tab
+	IBOutlet   NSTextField* heatChannelsTextField;
+	IBOutlet   NSTextField* ionChannelsTextField;
+	IBOutlet   NSTextField* heatChannelsTextField2;
+	IBOutlet   NSTextField* ionChannelsTextField2;
+    //IBOutlet NSButton*		settingLockButton;
+    
     //BB access tab
 	IBOutlet   NSButton*    writeToBBModeCB;
     IBOutlet   NSProgressIndicator*	writeToBBModeIndicator;
@@ -130,8 +137,9 @@
 		
 		NSNumberFormatter*		rateFormatter;
 		NSSize					settingSize;
-		NSSize					BBAccessSize;
+		NSSize					triggerSize;
 		NSSize					rateSize;
+		NSSize					BBAccessSize;
 		NSSize					testSize;
 		NSSize					lowlevelSize;
 		NSView*					blankView;

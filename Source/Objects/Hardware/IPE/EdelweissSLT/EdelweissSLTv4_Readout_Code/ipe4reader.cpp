@@ -427,11 +427,25 @@ void InitSLTPbus(void)
     //reset SLT and FIFOs
 	//pbus->write(SLTCommandReg,0x2);//reset SLT - is this necessary? -tb-
 	//usleep(100);
+    
+    //check number of HW FIFOs
+	uint32_t controlReg= pbus->read(SLTControlReg);
+    int numHWFifos=0;
+    numHWFifos = controlReg>>28;
+    if(numHWFifos==0) numHWFifos=1;//for old firmware versions
+	printf("  SLTControlReg: 0x%08x  (->numFIFOs: %i) ... availableFifos: %i\n",controlReg,controlReg>>28,numHWFifos);
+ 
+    SLTSETTINGS::SLT->numHWFifos = numHWFifos; 
+    FIFOREADER::availableNumFIFO = numHWFifos; 
+    
+    
+    
+    
     //reset FIFOs
 	int fifo;
 	//for(fifo=0; fifo<20; fifo++){
 	//TODO: only one FIFO !
-	for(fifo=0; fifo<FIFOREADER::maxNumFIFO; fifo++)
+	for(fifo=0; fifo<numHWFifos; fifo++)
 	{
 		//if(presentFLTMap & bit[fifo])
 		{
@@ -444,17 +458,13 @@ void InitSLTPbus(void)
 	pbus->write(SLTInterruptMaskReg,0xffff);//reset SLT
 	printf("  Interrupt  mask 0x%08x  (wrote 0xffff) ... \n",pbus->read(SLTInterruptMaskReg));
 	
-    //check number of HW FIFOs
-	uint32_t controlReg= pbus->read(SLTControlReg);
-	printf("  SLTControlReg: 0x%08x  (->numFIFOs: %i) ... \n",controlReg,controlReg>>28);
- 
- 
+
      //find FLTs
 	int flt;
 	uint32_t val;
 	presentFLTMap = 0;
 	for(flt=0; flt<MAX_NUM_FLT_CARDS; flt++){
-	//for(flt=0; flt<16; flt++){ //TODO:  <-------------------USE ABOVE LINE!!!!! Sascha NEEDS TO FIX IT -tb-
+	//for(flt=0; flt<16; flt++){ //TODO:  <-------------------USE ABOVE LINE!!!!! Sascha NEEDS TO FIX IT -tb-  DONE 2013-06 -tb-
 	    val = pbus->read(FLTVersionReg(flt+1));
 	    printf("FLT#%i (idx %i): version 0x%08x\n",flt+1,flt,val);
 	    if(val!=0x1f000000 && val!=0xffffffff){
@@ -497,7 +507,8 @@ void write_code_horloge(int code_acqi)
 //#include "ipe4structure.h"
 //#include "ipe4reader.h"
 
-FIFOREADER *FIFOREADER::FifoReader = 0;//init  static member
+FIFOREADER *FIFOREADER::FifoReader = 0;     //init  static member
+int FIFOREADER::availableNumFIFO = 0;//init  static member
 SLTSETTINGS *SLTSETTINGS::SLT = 0;//init  static member
 
 FLTSETTINGS *FLTSETTINGS::FLT = 0;//init  static member
@@ -1134,7 +1145,7 @@ printf("    inet_aton(MY_UDP_SERVER_IP_ADDR %s, &servaddr.sin_addr ... 0x%08x );
 void FIFOREADER::initAllUDPServerSockets(void)
 {
     int iFifo;
-	for(iFifo=0; iFifo<FIFOREADER::maxNumFIFO; iFifo++) if(FIFOREADER::FifoReader[iFifo].readfifo){
+	for(iFifo=0; iFifo<availableNumFIFO; iFifo++) if(FIFOREADER::FifoReader[iFifo].readfifo){
 		FIFOREADER &fr=FIFOREADER::FifoReader[iFifo];
 		//init UDP server socket
 		if(fr.initUDPServerSocket() != 0){
@@ -2389,6 +2400,9 @@ int handleUDPCommandPacket(unsigned char *buffer, int len, int iFifo)
   globals: scan string (line of a file)
   --------------------------------------------------------------------*/
 
+//returns 1 if the pattern was found; if retval!=NULL the integer after the pattern will be returned in retval (use retval==0 to just check for the pattern)
+//it is assumed to find a index after the patterd, succeeded by a '):', then the value returned for 'retval' ... 
+//the index is returned in 'index'
 int searchIndexAndUInt32InString(char *mystring, const char *pattern, int *index, uint32_t *retval)
 {
     //searching 'pattern(XXX):   YYY', returns index=XXX or index=XXX-1 if XXX is preceeded by '#', returns retval=YYY (YYY may be decimal or hex)
@@ -2409,6 +2423,7 @@ int searchIndexAndUInt32InString(char *mystring, const char *pattern, int *index
 	//sscanf(pch,"%x",retval);  //this cannot scan decimal values
     //fprintf(stdout,"retval %i\n",*retval);
         //test  fprintf(stdout,"sizeof(strtoul) is %i\n",   sizeof(strtoul(pch,&endptr,0)));  ->result: 4 (32-bit machine), 8 (64 bit machine)
+    if(retval==NULL) return 1;
     *retval = strtoul(pch,&endptr,0);  //this scans decimal or hex integers (returns 64 bit integer on 64-bit machines, 32 bit integer on 32-bit machines!!!, but there is no strtoui)
         //fprintf(stdout,"retval after strtoul %i\n",*retval);
         if(endptr==pch) fprintf(stdout,"searchIndexAndUInt32InString: config file PARSER ERROR! endptr==pch, NO= SUCCESS, retval %i\n",*retval);
@@ -2417,34 +2432,36 @@ int searchIndexAndUInt32InString(char *mystring, const char *pattern, int *index
 }
 
 
-
+//returns 1 if the pattern was found; if retval!=NULL the integer after the pattern will be returned in retval (use retval==0 to just check for the pattern)
 int searchIntInString(char *mystring, const char *pattern, int *retval)
 {
 	char *pch;
 	pch = strstr(mystring,pattern); //TODO: use strnstr (not available for SUSE 10.3) -tb-
 	if(pch == NULL) return 0;
 	pch += strlen(pattern);
-	sscanf(pch,"%i",retval);
+	if(retval!=NULL) sscanf(pch,"%i",retval);
 	return 1; //success
 }
 
+//returns 1 if the pattern was found; if retval!=NULL the integer after the pattern will be returned in retval (use retval==0 to just check for the pattern)
 int searchHex32InString(char *mystring, const char *pattern, uint32_t *retval)
 {
 	char *pch;
 	pch = strstr(mystring,pattern);
 	if(pch == NULL) return 0;
 	pch += strlen(pattern);
-	sscanf(pch,"%x",retval);
+	if(retval!=NULL) sscanf(pch,"%x",retval);
 	return 1; //success
 }
 
+//returns 1 if the pattern was found; if retval!=NULL the integer after the pattern will be returned in retval (use retval==0 to just check for the pattern)
 int searchStringInString(char *mystring, const char *pattern, char *retval)
 {
 	char *pch;
 	pch = strstr(mystring,pattern);
 	if(pch == NULL) return 0;
 	pch += strlen(pattern);
-	sscanf(pch,"%s",retval);
+	if(retval!=NULL) sscanf(pch,"%s",retval);
 	return 1; //success
 }
 
@@ -2491,8 +2508,9 @@ int readConfigFile(char *filename)
 }
 
 
-int parseConfigFileLine(char *line)
+int parseConfigFileLine(char *line, int flags)
 {
+    int checkFIFOREADERState = flags & kCheckFIFOREADERState;// for some settings it is not allowed to change them when the FIFO reader is streaming (state==frSTREAMING) -tb-
     int wasFound=0;
     char *mystring=line;
     
@@ -2593,10 +2611,20 @@ int parseConfigFileLine(char *line)
 			  for(iFifo=0; iFifo<FIFOREADER::maxNumFIFO; iFifo++){
 			      FIFOREADER &fr = FIFOREADER::FifoReader[iFifo];
 				  
-				  //this is obsolete since we have one FIFO for all FLTs and this FIFO is always on!
+				  //this is obsolete since we have one FIFO for all FLTs and this FIFO is always on! 2012 -tb-
+                  //this is not obsolete any more 2013-06 -tb-
 				  //config file line example:
 				  //readfifo(0): 1                       # switches reading of this FIFO on (1) or off (0)
 				  sprintf(pattern,"readfifo(%i):",iFifo);
+                  if(checkFIFOREADERState){//wet allow to switch on and off a FIFO during streaming, but this requires proper initialization 2013-06 -tb-
+                      //TODO:
+                      //TODO:
+                      //TODO:
+                      //TODO:   handle switching on and off a FIFO during stream mode 2013-06-13 -tb-
+                      //TODO:
+                      //TODO:
+                      //TODO:
+                  }
 				  wasFound = searchIntInString(mystring,pattern,&fr.readfifo);
 				  if(wasFound) printf("%s 0x%x\n",pattern,fr.readfifo);
 				  if(wasFound) return wasFound;
@@ -3694,7 +3722,7 @@ void FIFOREADER::readFIFOtoFIFObuffer(void)
         //printf("   *3**FIFOStatusTSPtr: %u synchroWordPosHint: %i   (synchroWordPosHint - currentBlockSize)   %i ((synchroWordPosHint - currentBlockSize) <= 0)%i***\n",FIFOStatusTSPtr,synchroWordPosHint,(synchroWordPosHint - currentBlockSize), ((synchroWordPosHint - currentBlockSize) <= 0));//DEBUG output -tb-
         }
 
-        #if 1
+        #if 0
         //use DMA
         pbus->readBlock(FIFOAddr(numfifo), (unsigned long*)&FIFObuf32[pushIndexFIFObuf32], FIFOBlockSize);
 		//TODO: change readBlock signature in fdhwlib !!!!! -tb-
@@ -3726,7 +3754,7 @@ if(1){ //DEBUG search explicitly for header ...
         //use single access
         int i; 
         uint32_t val;
-        for(i=0; i<currentBlockSize; i++){
+        for(i=0; i<FIFOBlockSize; i++){
             val = pbus->read(FIFOAddr(numfifo));
             FIFObuf32[pushIndexFIFObuf32 +i] = val;
         }
@@ -3808,7 +3836,8 @@ void RunSomeHardwareTests()
     printf("check more registers\n");
     printf("----------------------------\n");
 	uint32_t PAEOffset=0, PAFOffset;
-	for(i=0;i<FIFOREADER::maxNumFIFO;i++)if(FIFOREADER::FifoReader[i].readfifo){
+	//for(i=0;i<FIFOREADER::maxNumFIFO;i++)if(FIFOREADER::FifoReader[i].readfifo){
+	for(i=0;i<FIFOREADER::availableNumFIFO;i++)if(FIFOREADER::FifoReader[i].readfifo){
 	    PAEOffset = pbus->read(PAEOffsetReg(i));
 	    PAFOffset = pbus->read(PAFOffsetReg(i));
         printf("Fifo(%i): PAEOffset: 0x%08x, PAFOffset: 0x%08x\n", i,  PAEOffset, PAFOffset);
@@ -3816,7 +3845,7 @@ void RunSomeHardwareTests()
 
     
     //3.
-    //reset SLT - sometimes the CmdFIFO doesnt work (is blocked) - in this case a resetSLT command helped!
+    //reset SLT - sometimes the CmdFIFO doesnt work (is blocked) - in this case a resetSLT command helped! -tb- 2013-04
     printf("Send SLT RESET Command.\n");
     printf("----------------------------\n");
     pbus->write(SLTCommandReg,0x2);//this is the SltRes flag
@@ -4035,7 +4064,8 @@ void InitHardwareFIFOs(int warmStart)
 	//0.
 	// init/reset
 	//read FIFO length
-	for(i=0;i<FIFOREADER::maxNumFIFO;i++)
+	//for(i=0;i<FIFOREADER::maxNumFIFO;i++)
+	for(i=0;i<FIFOREADER::availableNumFIFO;i++)
 	    if(FIFOREADER::FifoReader[i].readfifo){
 			FIFOMode =  pbus->read(FIFOModeReg(i));
 			printf("FIFOMode(%i): 0x%08x (length %u)\n",i,FIFOMode, FIFOMode & 0x00ffffff);
@@ -4061,7 +4091,7 @@ void InitHardwareFIFOs(int warmStart)
     }
 	
 	//reset FIFO (pointers), read FIFO length
-	for(i=0;i<FIFOREADER::maxNumFIFO;i++)
+	for(i=0;i<FIFOREADER::availableNumFIFO;i++)
 	    if(FIFOREADER::FifoReader[i].readfifo){
 			FIFOMode =  pbus->read(FIFOModeReg(i));
 			printf("FIFOMode(%i): 0x%08x (length %u)\n",i,FIFOMode, FIFOMode & 0x00ffffff);
@@ -4093,7 +4123,7 @@ void InitHardwareFIFOs(int warmStart)
 	SLTControl =  pbus->read(SLTControlReg);
 	printf("SLTControl: 0x%08x (OnLine: %i)\n",SLTControl, (SLTControl & 0x4000)>>14);
 			
-	for(i=0;i<FIFOREADER::maxNumFIFO;i++)
+	for(i=0;i<FIFOREADER::availableNumFIFO;i++)
 	//for(i=0;i<FIFOREADER::maxNumFIFO;i++)
 	    if(FIFOREADER::FifoReader[i].readfifo){
 			//SLT csr register
@@ -4182,6 +4212,7 @@ void InitSemaphore()
 /*--------------------------------------------------------------------
   signalHandler: try to stop main readout loop after first call,
                  call exit after 2nd call
+                 example: killall -s SIGTERM ipe4reader
   --------------------------------------------------------------------*/
 
 void  signalHandler(int signum)
@@ -4274,7 +4305,7 @@ int32_t main(int32_t argc, char *argv[])
 
 
 
-	//init buffers etc.
+	//init FIFOREADER class etc. (buffer allocation: later! after reading config file!)
 	FIFOREADER::initFIFOREADERList();
 	
 	//init SLT settings 
@@ -4371,6 +4402,12 @@ int32_t main(int32_t argc, char *argv[])
     printf("-----------------INIT PBus  ----------------------\n");
     InitSLTPbus();  //initialize PBus
     
+
+    //now we already got the config file and know how many FIFOs the user intended to use;
+    //  AND we know from SLT Control Reg, how many FIFOs the SLT is able to provide!
+	//now init  FIFOREADER buffers: 
+    FIFOREADER::availableNumFIFO = SLTSETTINGS::SLT->numHWFifos; 
+	FIFOREADER::initFIFOREADERBuffers();
 
 
     
@@ -4525,7 +4562,7 @@ int32_t main(int32_t argc, char *argv[])
 	FIFOREADER *fr = FIFOREADER::FifoReader;
 	#if 1 //we init the Trame_status_udp with prev. recorded UDP status packet in buf_status284 (of len buf_status284_len)
         //TODO: fake Opera status
-	for(iFifo=0; iFifo<FIFOREADER::maxNumFIFO; iFifo++){
+	for(iFifo=0; iFifo<FIFOREADER::maxNumFIFO; iFifo++){//here we can use FIFOREADER::maxNumFIFO instead of FIFOREADER::availableNumFIFO -tb-
 
         for(i=0; i< buf_status284_len; i++){
             ((char*)(  &FIFOREADER::FifoReader[iFifo].Trame_status_udp ))[i] = buf_status284[i];
@@ -4638,7 +4675,7 @@ int32_t main(int32_t argc, char *argv[])
         //if in streaming state
         //-----------------------
         if(FIFOREADER::State == frSTREAMING){
-			for(iFifo=0; iFifo<FIFOREADER::maxNumFIFO; iFifo++) if(FIFOREADER::FifoReader[iFifo].readfifo){
+			for(iFifo=0; iFifo<FIFOREADER::availableNumFIFO; iFifo++) if(FIFOREADER::FifoReader[iFifo].readfifo){
 				//check FIFObuf
 				if(show_debug_info>1) printf("main: FIFObuf32avail(%i): %i\n",iFifo, FifoReader[iFifo].FIFObuf32avail);//DEBUG output -tb-
 				#if 1
@@ -4677,7 +4714,7 @@ int32_t main(int32_t argc, char *argv[])
 		    //
 		    // 1.
 		    //./
-	        for(iFifo=0; iFifo<FIFOREADER::maxNumFIFO; iFifo++) if(FIFOREADER::FifoReader[iFifo].readfifo){
+	        for(iFifo=0; iFifo<FIFOREADER::availableNumFIFO; iFifo++) if(FIFOREADER::FifoReader[iFifo].readfifo){
 			    //check FIFObuf
 			   if(show_debug_info>1) printf("main: FIFObuf32avail(%i): %i\n",iFifo, FifoReader[iFifo].FIFObuf32avail);//DEBUG output -tb-
 			   
@@ -4695,7 +4732,7 @@ int32_t main(int32_t argc, char *argv[])
 	        //if in streaming state
             if(show_debug_info>=1){
                 if(FIFOREADER::State == frSTREAMING){
-                    for(iFifo=0; iFifo<FIFOREADER::maxNumFIFO; iFifo++){
+                    for(iFifo=0; iFifo<FIFOREADER::availableNumFIFO; iFifo++){
                         if(FifoReader[iFifo].readfifo){
                             uint32_t FIFOMode =  pbus->read(FIFOModeReg(iFifo));
                             printf("    FIFOMode %i: 0x%08x (length %u)\n",iFifo, FIFOMode, FIFOMode & 0x00ffffff);
@@ -4736,7 +4773,7 @@ int32_t main(int32_t argc, char *argv[])
 			}
         }
         //listen for UDP packets (commands) on server socket
-	    for(iFifo=0; iFifo<FIFOREADER::maxNumFIFO; iFifo++) if(FIFOREADER::FifoReader[iFifo].readfifo){
+	    for(iFifo=0; iFifo<FIFOREADER::availableNumFIFO; iFifo++) if(FIFOREADER::FifoReader[iFifo].readfifo){
 		    FIFOREADER &fr=FIFOREADER::FifoReader[iFifo];
 			int numRead=0;
 			while( (   numRead = fr.recvfromServer(UInBuffer,sizeof(UInBuffer)) ) >0 ){
@@ -4803,7 +4840,7 @@ int32_t main(int32_t argc, char *argv[])
                     FIFOREADER::FifoReader[0].isSynchronized = 0;
                     FIFOREADER::FifoReader[0].udpdataCounter = 0;
                     //start hardware
-                    printf("DO A WARM START OF STREAM LOOP\n");
+                    printf("DO A QUICK START OF STREAM LOOP\n");
                     InitHardwareFIFOs(/*warmStart=*/ 1 );
                 }
                 if(FIFOREADER::State == frIDLE){//start streaming command (coldStart command)
@@ -4827,7 +4864,8 @@ int32_t main(int32_t argc, char *argv[])
         //-----------------------
 		if(kbhit()){
 		    int key = getchar();
-		    continueLoop=0;
+            if(key=='q' || key=='Q' || key=='e' || key=='E' || key=='x' || key=='X'  || key==' '  || key==27 /*ESC*/ )
+    		    continueLoop=0;
             printf("You pressed %i = '%c'!\n", key, key);		    
             if(kbhit()){key = getchar();printf("2 You pressed %i = '%c'!\n", key, key);	}	    
 		}

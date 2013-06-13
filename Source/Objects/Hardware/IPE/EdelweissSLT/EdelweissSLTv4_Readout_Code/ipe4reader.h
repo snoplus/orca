@@ -157,8 +157,8 @@ UDPStructIPECrateStatus2;
 void chargeBBWithFile(char * filename, int fromFifo=-1);
 void handleKCommand(char *buffer, int len, struct sockaddr_in *sockaddr_from, int fromFifo=-1);
 int readConfigFile(char *filename);
-int parseConfigFileLine(char *line);
-
+int parseConfigFileLine(char *line, int flags=0);
+#define kCheckFIFOREADERState 0x00000001
 
 /*--------------------------------------------------------------------
   globals and functions for hardware access
@@ -340,7 +340,7 @@ public:
     static void endAllUDPServerSockets(void);
 
 	
-	void initVars(){
+	void initVars(){//called from the ctor!
 		//globals for config file options
 		readfifo=0;  //set to 1 to activate readout
 		numfifo=0;   //my index
@@ -374,24 +374,11 @@ public:
 		//for use of dummy status bits
 		use_dummy_status_bits = 0;
 		
-		//FIFO buffer in RAM (malloc: request space; if failed try to alloc the half of this space etc. )
-        uint32_t  i,size=Preferred_FIFObuf8len;
-        for(i=0;i<10;i++){// try to allocate preferred memory; whwn failed, try to allocate the half size - up to ten tries
-                printf("FIFOREADER::initVars: try to allocate %u byte (of %u requested bytes)\n",size, Preferred_FIFObuf8len);
-	        FIFObuf8=(char *)malloc(sizeof(char)*size);
-            if(FIFObuf8==NULL){//failed
-                size = size/2;
-                size = (size/4)*4;//multiple of 4 as we want to store uint32_t's
-                if(size==0){ printf("FIFOREADER::initVars: Failed with malloc(...), exiting!\n"); exit(123); }
-            }else{//success
-                printf("FIFOREADER::initVars: allocated %u byte (of %u requested bytes) - OK\n",size, Preferred_FIFObuf8len);
-                FIFObuf8len=size;
-                if(size<0x10000){ printf("WARNING:   !!! allocated memory is <65536; BUFFER (probably) TOO SMALL!!\n"); /*exit(123);*/ }
-                break;
-            }
-        }
+        //init with 0
+	    FIFObuf8 = (char *)0;
 	    FIFObuf16 = (uint16_t *)FIFObuf8;
 	    FIFObuf32 = (uint32_t *)FIFObuf8;
+        FIFObuf8len = 0;
         FIFObuf16len = FIFObuf8len / 2;
         FIFObuf32len = FIFObuf8len / 4;
 	    popIndexFIFObuf32=0;
@@ -419,6 +406,45 @@ public:
         isSynchronized = 0;
 	}
 	
+    
+    int allocateFIFOBufferBytes(uint32_t preferredSizeInBytes){
+        if(FIFObuf8len>0 || FIFObuf8!=NULL){
+            printf("FIFOREADER::allocateFIFOBufferBytes: WARNING - buffer for FIFO %i already allocated!\n",numfifo);
+            return FIFObuf8len;
+        }
+        
+		//FIFO buffer in RAM (malloc: request space; if failed try to alloc the half of this space etc. )
+        //old:  uint32_t  i,size=Preferred_FIFObuf8len;
+        uint32_t  i,size=preferredSizeInBytes;
+        for(i=0;i<10;i++){// try to allocate preferred memory; whwn failed, try to allocate the half size - up to ten tries
+                printf("FIFOREADER::initVars: try to allocate %u byte (of %u requested bytes)\n",size, Preferred_FIFObuf8len);
+	        FIFObuf8=(char *)malloc(sizeof(char)*size);
+            if(FIFObuf8==NULL){//failed
+                size = size/2;
+                size = (size/4)*4;//multiple of 4 as we want to store uint32_t's
+                if(size==0){ printf("FIFOREADER::allocateFIFOBufferBytes: ERROR: Failed with malloc(...), exiting!\n"); exit(123); }
+            }else{//success
+                printf("FIFOREADER::initVars: allocated %u byte (of %u requested bytes) - OK\n",size, Preferred_FIFObuf8len);
+                FIFObuf8len=size;
+                if(size<0x10000){ printf("WARNING:   !!! allocated memory is <65536; BUFFER (probably) TOO SMALL!!\n"); /*exit(123);*/ }
+                break;
+            }
+        }
+	    FIFObuf16 = (uint16_t *)FIFObuf8;
+	    FIFObuf32 = (uint32_t *)FIFObuf8;
+        FIFObuf16len = FIFObuf8len / 2;
+        FIFObuf32len = FIFObuf8len / 4;
+	    popIndexFIFObuf32=0;
+	    pushIndexFIFObuf32=0;
+	    FIFObuf32avail=0;
+	    FIFObuf32counter=0;
+	    FIFObuf32counterlast=0;
+        synchroWordPosHint=0;
+        
+        return FIFObuf8len;
+    }
+    
+    
 	//FIFOREADER as state machine: the state
     static int	State;
      
@@ -545,9 +571,10 @@ public:
 	
 
 	/*--------------------------------------------------------------------
-	 vars for FIFO list
+	 vars for FIFO list and initialization
 	 --------------------------------------------------------------------*/
 	 static void initFIFOREADERList(){
+         availableNumFIFO = 0;
 	     FifoReader = new FIFOREADER[maxNumFIFO];
 		 if(FifoReader==0){ printf("initFIFOREADERList: cannot allocate memory!\n"); exit(1); }
 		 
@@ -556,8 +583,62 @@ public:
 			 FifoReader[i].numfifo=i;
 	     }
 	 }
+
+	 int initBuffer(){
+         int i=numfifo;
+         int retval=0;
+			 if(readfifo){
+                 if(numfifo<0 || numfifo>=availableNumFIFO){
+                     printf("FIFOREADER::initBuffer: ERROR: FIFO w. index %i NOT AVAILABLE - DISABLED FIFO %i... check your configuration!\n",i,i);
+                     readfifo = 0; //disabling this FIFO
+                     return 0;
+                 }
+                 retval=FifoReader[i].allocateFIFOBufferBytes(Preferred_FIFObuf8len);
+                 printf("FIFOREADER::initBuffer: use FIFO w. index %i - allocated buffer with %i bytes ...\n",i,retval);
+             }else{
+                 printf("FIFOREADER::initBuffer: FIFO  %i - not activated\n",i);
+             }
+
+         return retval;
+     }
+
+	 void freeBuffer(){
+        free(FIFObuf8);
+        //init with 0
+	    FIFObuf8 = (char *)0;
+	    FIFObuf16 = (uint16_t *)FIFObuf8;
+	    FIFObuf32 = (uint32_t *)FIFObuf8;
+        FIFObuf8len = 0;
+        FIFObuf16len = FIFObuf8len / 2;
+        FIFObuf32len = FIFObuf8len / 4;
+	    popIndexFIFObuf32=0;
+	    pushIndexFIFObuf32=0;
+	    FIFObuf32avail=0;
+	    FIFObuf32counter=0;
+	    FIFObuf32counterlast=0;
+        synchroWordPosHint=0;
+        if(readfifo) readfifo = 0;
+     }
+     
+     
+	 static void initFIFOREADERBuffers(){
+		 for(int i=0; i<maxNumFIFO; i++){
+		     //no, ctor calls initVars ... FifoReader[i].initVars();
+			 //if(FifoReader[i].readfifo){  //initFIFOREADERBuffer will check this ...
+                 //printf("FIFOREADER::initFIFOREADERBuffers: use FIFO w. index %i - allocate buffer ...\n",i);
+                 FifoReader[i].initBuffer();
+             //}
+	     }
+         //FifoReader[0].initBuffer();// test to allocate buffer twice, should be refused ...  -tb-
+         //exit(9);
+     }
+
      static FIFOREADER	* FifoReader;
-	 static const int maxNumFIFO = 1; //FIFOREADER::maxNumFIFO
+	 static const int maxNumFIFO = 16; //FIFOREADER::maxNumFIFO
+	 static int availableNumFIFO; //FIFOREADER::maxNumFIFO
+     
+	 //results in following error: static int maxNumFIFO = 1; //FIFOREADER::maxNumFIFO
+     //ipe4reader.h:560: error: ISO C++ forbids in-class initialization of non-const static member ‘maxNumFIFO’
 };
 
 

@@ -164,8 +164,8 @@ void FindHardware(void)
         int flt;
         uint32_t val;
         presentFLTMap = 0;
-        //for(flt=0; flt<MAX_NUM_FLT_CARDS; flt++){
-        for(flt=0; flt<16; flt++){ //TODO:  <-------------------USE ABOVE LINE!!!!! Sascha NEEDS TO FIX IT -tb-
+        for(flt=0; flt<MAX_NUM_FLT_CARDS; flt++){
+        //for(flt=0; flt<16; flt++){ //TODO:  <-------------------USE ABOVE LINE!!!!! Sascha NEEDS TO FIX IT -tb-  DONE 2013-06 -tb-
             val = pbus->read(FLTVersionReg(flt+1));
             //printf("FLT#%i (idx %i): version 0x%08x\n",flt+1,flt,val);
             if(val!=0x1f000000 && val!=0xffffffff){
@@ -198,6 +198,7 @@ void ReleaseHardware(void)
     //release / close device driver(s)
     pbus->free();
     pbus = 0;
+    presentFLTMap=0;
 }
 
 
@@ -515,6 +516,9 @@ void doGeneralReadOp(SBC_Packet* aPacket,uint8_t reply)
 		break;
 		case kGetSltPciDriverVersion:
 			if(numLongs == 1) *lPtr = getSltLinuxKernelDriverVersion(); 
+		break;
+		case kGetPresentFLTsMap:
+			if(numLongs == 1) *lPtr = presentFLTMap; 
 		break;
 		default:
 			for(i=0;i<numLongs;i++)*lPtr++ = 0; //undefined operation so just return zeros
