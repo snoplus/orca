@@ -252,7 +252,8 @@
                          faces:(int[][3])faces faceNormals:(int[][3])faceNormals
                     faceColors:(float[][3])faceColors numFaces:(int)fSz
 {
-    for(int i=0; i<fSz; i++)
+    int i;
+    for(i=0; i<fSz; i++)
     {
         glColor3f(faceColors[i][0], faceColors[i][1], faceColors[i][2]);
         glBegin(GL_POLYGON);
