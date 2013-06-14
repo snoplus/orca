@@ -474,7 +474,7 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
         [cachedDataTakers[i] runTaskStopped:aDataPacket userInfo:userInfo];
 		[cachedDataTakers[i] release];
     }
-    free(cachedDataTakers);
+    if(cachedNumberDataTakers) free(cachedDataTakers);
     [self putDataInQueue:aDataPacket force:YES];	//last data packet for this run
     [aDataPacket addCachedData];					//data from other threads
     [self shipPendingRecords:aDataPacket];
