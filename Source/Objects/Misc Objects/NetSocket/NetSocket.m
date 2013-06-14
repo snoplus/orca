@@ -1015,17 +1015,19 @@ static void _cfsocketCallback( CFSocketRef inCFSocketRef, CFSocketCallBackType i
     if( amountSent == [mOutgoingBuffer length] ){
 		// We managed to write the entire outgoing buffer to the socket
 		// Disable the write callback for now since we know we are writable
+        mBufferStatus = kNetSocketSentAll;
 		CFSocketDisableCallBacks( mCFSocketRef, kCFSocketWriteCallBack );
     }
     else if( amountSent >= 0 ){
 	    // We managed to write some of our buffer to the socket
 	    // Enable the write callback on our CFSocketRef so we know when the socket is writable again
+        mBufferStatus = kNetSocketSentSome;
 	    CFSocketEnableCallBacks( mCFSocketRef, kCFSocketWriteCallBack );
 	}
     else if( errno == EWOULDBLOCK ){
 	    // No data has actually been written here
 	    amountSent = 0;
-	    
+        mBufferStatus = kNetSocketBlocked;
 	    // Enable the write callback on our CFSocketRef so we know when the socket is writable again
 	    CFSocketEnableCallBacks( mCFSocketRef, kCFSocketWriteCallBack );
 	}
@@ -1046,9 +1048,13 @@ static void _cfsocketCallback( CFSocketRef inCFSocketRef, CFSocketCallBackType i
 		if( [mDelegate respondsToSelector:@selector( netsocketDataSent:length: )] )
 			[mDelegate netsocketDataSent:self length:amountSent];
     
-		else if( [mDelegate respondsToSelector:@selector( netsocketDataInOutgoingBuffer:length: )] )
-				[mDelegate netsocketDataInOutgoingBuffer:self length:len];
     }
+    if( [mDelegate respondsToSelector:@selector( netsocketDataInOutgoingBuffer:length: )] )
+        [mDelegate netsocketDataInOutgoingBuffer:self length:len];
+    if( [mDelegate respondsToSelector:@selector( netsocket:status: )] )
+        [mDelegate netsocket:self status:mBufferStatus];
+   
+
 	[mLock unlock];
 }
 

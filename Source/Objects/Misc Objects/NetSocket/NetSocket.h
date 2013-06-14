@@ -6,18 +6,22 @@
 
 
 #import <netinet/in.h>
+#define kNetSocketSentAll  0
+#define kNetSocketSentSome 1
+#define kNetSocketBlocked  2
 
 @interface NetSocket : NSObject 
 {
-	CFSocketRef	    mCFSocketRef;
+	CFSocketRef	     mCFSocketRef;
 	CFRunLoopSourceRef  mCFSocketRunLoopSourceRef;
-	id				mDelegate;
-	NSTimer*	    mConnectionTimer;
-	BOOL		    mSocketConnected;
-	BOOL		    mSocketListening;
-	NSMutableData*  mOutgoingBuffer;
-	NSMutableData*  mIncomingBuffer;
-	NSRecursiveLock*			mLock;
+	id				 mDelegate;
+	NSTimer*	     mConnectionTimer;
+	BOOL		     mSocketConnected;
+	BOOL		     mSocketListening;
+	NSMutableData*   mOutgoingBuffer;
+	NSMutableData*   mIncomingBuffer;
+	NSRecursiveLock* mLock;
+    int              mBufferStatus;
 }
 
 // Creation
@@ -93,4 +97,5 @@
 - (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(unsigned)inAmount;
 - (void) netsocketDataSent:(NetSocket*)inNetSocket length:(long)amount;
 - (void) netsocketDataInOutgoingBuffer:(NetSocket*)inNetSocket length:(long)amount;
+- (void) netsocket:(NetSocket*)inNetSocket status:(int)status;
 @end

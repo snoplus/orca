@@ -27,6 +27,7 @@
     NSDate*			timeConnected;
     unsigned long	amountInBuffer;
     unsigned long	totalSent;
+    int             socketStatus;
 }
 
 #pragma mark •••Inialization
@@ -49,7 +50,7 @@
 - (BOOL) isConnected;
 - (void) clearCounts;
 - (void) netsocketDataSent:(NetSocket*)insocket length:(unsigned long)length;
-
+- (int) socketStatus;
 @end
 
 @interface NSObject (ORSocketClient_Catagory)

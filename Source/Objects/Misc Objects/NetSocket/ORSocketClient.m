@@ -117,12 +117,15 @@
     }
 }
 
-
 - (void)writeData:(NSData*)inData
 {
     [socket writeData:inData];
 }
 
+- (int) socketStatus
+{
+    return socketStatus;
+}
 
 - (void)netsocketDisconnected:(NetSocket*)insocket
 {	
@@ -141,6 +144,13 @@
     [self setAmountInBuffer:length];
 }
 
+- (void) netsocket:(NetSocket*)inNetSocket status:(int)status
+{
+    socketStatus = status;
+    if([delegate respondsToSelector:@selector(clientDataChanged:)]){
+	    [delegate clientDataChanged:self];
+    }   
+}
 - (BOOL) isConnected
 {
 	return [socket isConnected];
