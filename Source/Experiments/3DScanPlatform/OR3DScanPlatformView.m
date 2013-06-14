@@ -18,6 +18,9 @@
 
 
 #import "OR3DScanPlatformView.h"
+#import "OR3DScanPlatformController.h"
+#import "ORVXMMotor.h"
+#include "math.h"
 
 @implementation OR3DScanPlatformView
 -(void) dealloc
@@ -25,74 +28,327 @@
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
     [super dealloc];
 }
+
 - (void) awakeFromNib
 {
     [super awakeFromNib];
-    [self performSelector:@selector(incRot) withObject:nil afterDelay:.1];
 }
-- ( void) incRot
+
+- (void) resetCamera
 {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self];
-    rot += .5;
-    [self performSelector:@selector(incRot) withObject:nil afterDelay:.01];
-    [self setNeedsDisplay:YES];
+    camera.aperture = 40;
+    camera.rotPoint = gOrigin;
+    
+    camera.viewPos.x = 0.0;
+    camera.viewPos.y = 0.0;
+    camera.viewPos.z = -10.0;
+    camera.viewDir.x = -camera.viewPos.x;
+    camera.viewDir.y = -camera.viewPos.y;
+    camera.viewDir.z = -camera.viewPos.z;
+    
+    camera.viewUp.x = 0;
+    camera.viewUp.y = 1;
+    camera.viewUp.z = 0;
+}
+
+- (void) cubeScaleX:(float)sx scaleY:(float)sy scaleZ:(float)sz
+         translateX:(float)tx translateY:(float)ty translateZ:(float)tz
+         rotateAngle:(float)ra rotateX:(float)rx rotateY:(float)ry rotateZ:(float)rz
+{
+    glPushMatrix();
+    glRotatef(ra,rx,ry,rz);
+    glTranslatef(tx,ty,tz);
+    glScalef(sx,sy,sz);
+        
+    GLfloat vertices[8][3] = {{-1,-1,1},{1,-1,1},{1,1,1},{-1,1,1},
+        {-1,-1,-1},{1,-1,-1},{1,1,-1},{-1,1,-1}};
+    glEnable(GL_RESCALE_NORMAL);
+    GLfloat normals[6][3] = {{0,0,1},{0,0,-1},{-1,0,0},{1,0,0},{0,-1,0},{0,1,0}};
+    
+    GLint link[6][4] = {{0,1,2,3},{4,7,6,5},{4,0,3,7},{5,6,2,1},{4,5,1,0},{7,3,2,6}};
+    
+	int i;
+	for(i=0; i<6; i++)
+	{
+        glBegin(GL_POLYGON);
+            glNormal3f(normals[i][0],normals[i][1],normals[i][2]);
+            glVertex3f(vertices[link[i][0]][0],vertices[link[i][0]][1],vertices[link[i][0]][2]);
+            glVertex3f(vertices[link[i][1]][0],vertices[link[i][1]][1],vertices[link[i][1]][2]);
+            glVertex3f(vertices[link[i][2]][0],vertices[link[i][2]][1],vertices[link[i][2]][2]);
+            glVertex3f(vertices[link[i][3]][0],vertices[link[i][3]][1],vertices[link[i][3]][2]);
+        glEnd();
+	}
+    
+    glPopMatrix();
+}
+
+- (void) crossProductVector1:(GLfloat*)v1 vector2:(GLfloat*)v2 result:(GLfloat*)result
+{
+    result[0] = v1[1]*v2[2] - v1[2]*v2[1];
+    result[1] = -1*(v1[0]*v2[2] - v1[2]*v2[0]);
+    result[2] = v1[0]*v2[1] - v1[1]*v2[0];
+}
+
+//vector1 = point1 to point2, vector2 = point1 to point3, vector1 x vector2 (make sure point order is right)
+- (void) unitNormalPoint1:(GLfloat*)p1 point2:(GLfloat*)p2 point3:(GLfloat*)p3 result:(GLfloat*)result
+{
+    GLfloat v1[3] = {p2[0]-p1[0], p2[1]-p1[1], p2[2]-p1[2]};
+    GLfloat v2[3] = {p3[0]-p1[0], p3[1]-p1[1], p3[2]-p1[2]};
+    [self crossProductVector1:v1 vector2:v2 result:result];
+    double magnitude = sqrtf(result[0]*result[0]+result[1]*result[1]+result[2]*result[2]);
+    result[0] /= magnitude;
+    result[1] /= magnitude;
+    result[2] /= magnitude;
+}
+
+- (void) partialConeInnerRadiusLower:(float)irLower outerRadiusLower:(float)orLower 
+                    innerRadiusUpper:(float)irUpper outerRadiusUpper:(float)orUpper height:(float)height
+                          translateX:(float)tx translateY:(float)ty translateZ:(float)tz
+{
+    glPushMatrix();
+    //glRotatef(ra,rx,ry,rz);
+    glTranslatef(tx,ty,tz);
+    //glScalef(sx,sy,sz);
+    
+	const GLint NUMVERTS = 50;
+	GLfloat outerCircleLower[NUMVERTS][2], innerCircleLower[NUMVERTS][2], 
+        outerCircleUpper[NUMVERTS][2], innerCircleUpper[NUMVERTS][2]; //x and z coordinates
+	GLdouble y1 = -height/2, y2 = height/2;
+    
+    glEnable(GL_RESCALE_NORMAL);
+    
+    const GLdouble PI = 3.14159265359;
+    
+	GLdouble theta = 0;
+    int i;
+	for(i=0; i<NUMVERTS; i++)
+	{
+		outerCircleLower[i][0] = orLower*cosf(theta);
+		outerCircleLower[i][1] = orLower*sinf(theta);
+		theta += (2*PI) / (NUMVERTS-1); //necessary so that both end points are included
+	}
+    
+	theta = 0;
+	for(i=0; i<NUMVERTS; i++)
+	{
+		innerCircleLower[i][0] = irLower*cosf(theta);
+		innerCircleLower[i][1] = irLower*sinf(theta);
+		theta += (2*PI) / (NUMVERTS-1); 
+	}
+    
+    for(i=0; i<NUMVERTS; i++)
+	{
+		outerCircleUpper[i][0] = orUpper*cosf(theta);
+		outerCircleUpper[i][1] = orUpper*sinf(theta);
+		theta += (2*PI) / (NUMVERTS-1);
+	}
+    
+	theta = 0;
+	for(i=0; i<NUMVERTS; i++)
+	{
+		innerCircleUpper[i][0] = irUpper*cosf(theta);
+		innerCircleUpper[i][1] = irUpper*sinf(theta);
+		theta += (2*PI) / (NUMVERTS-1); 
+	}    
+    
+	//bottom strip
+    glBegin(GL_QUAD_STRIP);
+    glNormal3f(0,-1,0);
+	for(i=0; i<NUMVERTS; i++)
+	{
+        glVertex3f(innerCircleLower[i][0],y1,innerCircleLower[i][1]);
+		glVertex3f(outerCircleLower[i][0],y1,outerCircleLower[i][1]);
+	}
+	glEnd();
+    
+    //glColor3f(1.0f,0.0f,0.0f);
+	//top strip
+    glNormal3f(0,1,0);
+	glBegin(GL_QUAD_STRIP);
+	for(i=0; i<NUMVERTS; i++)
+	{
+        glVertex3f(outerCircleUpper[i][0],y2,outerCircleUpper[i][1]);
+        glVertex3f(innerCircleUpper[i][0],y2,innerCircleUpper[i][1]);
+	}
+	glEnd();
+    
+	//glColor3f(1.0f,1.0f,0.0f);
+	//side strip: inner
+	glBegin(GL_TRIANGLE_STRIP);
+    GLfloat result[3], point1[3], point2[3], point3[3];
+	for(i=0; i<NUMVERTS; i++)
+	{
+        point1[0] = innerCircleUpper[i][0];
+        point1[1] = y2;
+        point1[2] = innerCircleUpper[i][1];
+        
+        point2[0] = innerCircleLower[i][0];
+        point2[1] = y1;
+        point2[2] = innerCircleLower[i][1];
+        if(i==0)
+        {
+            point3[0] = innerCircleLower[NUMVERTS-2][0];
+            point3[1] = y1;
+            point3[2] = innerCircleLower[NUMVERTS-2][1];
+            [self unitNormalPoint1:point1 point2:point2 point3:point3 result:result];
+        }
+        else
+        {
+            point3[0] = innerCircleLower[i-1][0];
+            point3[1] = y1;
+            point3[2] = innerCircleLower[i-1][1];
+            [self unitNormalPoint1:point1 point2:point2 point3:point3 result:result];
+        }
+        glNormal3f(result[0],result[1],result[2]);
+        glVertex3f(point1[0],point1[1],point1[2]);
+		glVertex3f(point2[0],point2[1],point2[2]);
+	}
+	glEnd();
+    
+	//side strip: outer
+	glBegin(GL_TRIANGLE_STRIP);
+    
+    for(i=0; i<NUMVERTS; i++)
+	{
+        point1[0] = outerCircleLower[i][0];
+        point1[1] = y1;
+        point1[2] = outerCircleLower[i][1];
+        
+        point2[0] = outerCircleUpper[i][0];
+        point2[1] = y2;
+        point2[2] = outerCircleUpper[i][1];
+        if(i==0)
+        {
+            point3[0] = outerCircleUpper[NUMVERTS-2][0];
+            point3[1] = y2;
+            point3[2] = outerCircleUpper[NUMVERTS-2][1];
+            [self unitNormalPoint1:point1 point2:point3 point3:point2 result:result];
+        }
+        else
+        {
+            point3[0] = outerCircleUpper[i-1][0];
+            point3[1] = y2;
+            point3[2] = outerCircleUpper[i-1][1];
+            [self unitNormalPoint1:point1 point2:point3 point3:point2 result:result];
+        }
+        glNormal3f(result[0],result[1],result[2]);
+        glVertex3f(point1[0],point1[1],point1[2]);
+		glVertex3f(point2[0],point2[1],point2[2]);
+	}
+	glEnd();
+    
+    glPopMatrix();
+    
+}
+
+- (void) cylinderInnerRadius:(float)ir outerRadius:(float)or height:(float)height 
+         translateX:(float)tx translateY:(float)ty translateZ:(float)tz
+{    
+    [self partialConeInnerRadiusLower:ir outerRadiusLower:or innerRadiusUpper:ir outerRadiusUpper:or 
+                               height:height translateX:tx translateY:ty translateZ:tz];
+}
+
+- (void) processOpenGLvertices:(float[][3])vertices normals:(float[][3])normals
+                         faces:(int[][3])faces faceNormals:(int[][3])faceNormals
+                    faceColors:(float[][3])faceColors numFaces:(int)fSz
+{
+    for(int i=0; i<fSz; i++)
+    {
+        glColor3f(faceColors[i][0], faceColors[i][1], faceColors[i][2]);
+        glBegin(GL_POLYGON);
+            glNormal3f(normals[faceNormals[i][0]][0], normals[faceNormals[i][0]][1], normals[faceNormals[i][0]][2]);
+            glVertex3f(vertices[faces[i][0]][0], vertices[faces[i][0]][1],
+                vertices[faces[i][0]][2]);
+            glNormal3f(normals[faceNormals[i][1]][0], normals[faceNormals[i][1]][1],
+                normals[faceNormals[i][1]][2]);
+            glVertex3f(vertices[faces[i][1]][0], vertices[faces[i][1]][1],
+                vertices[faces[i][1]][2]);
+            glNormal3f(normals[faceNormals[i][2]][0], normals[faceNormals[i][2]][1],
+                normals[faceNormals[i][2]][2]);
+            glVertex3f(vertices[faces[i][2]][0], vertices[faces[i][2]][1],
+                vertices[faces[i][2]][2]);
+        glEnd();
+    }
+}
+
+- (void) openGLCode
+{
+    float vertices[8][3] = {
+        {0.503187, 0, -0.883433}, {-1, 0, 0.481758}, {-1, 0, -0.883433}, {0.503187, 0, 0.481758}, {0.503187, 0.786439, 0.481758}, {0.503187, 0.786439, -0.883433},
+        {-1, 0.786439, -0.883433}, {-1, 0.786439, 0.481758}
+    };
+    
+    float normals[6][3] = {
+        {0, -1, -0}, {1, 0, -0}, {0, 0, -1}, {-1, 0, -0}, {0, 0, 1}, {0, 1, -0}
+    };
+    
+    int faces[12][3] = {
+        {0, 1, 2}, {1, 0, 3}, {0, 4, 3}, {4, 0, 5}, {0, 6, 5}, {6, 0, 2},
+        {1, 6, 2}, {6, 1, 7}, {1, 4, 7}, {4, 1, 3}, {4, 6, 7},
+        {6, 4, 5}
+    };
+    
+    int faceNormals[12][3] = {
+        {0, 0, 0}, {0, 0, 0}, {1, 1, 1}, {1, 1, 1}, {2, 2, 2}, {2, 2, 2},
+        {3, 3, 3}, {3, 3, 3}, {4, 4, 4}, {4, 4, 4}, {5, 5, 5},
+        {5, 5, 5}
+    };
+    
+    float faceColors[12][3] = {
+        {0.117647, 0.737255, 0.160784}, {0.117647, 0.737255, 0.160784}, {0.117647, 0.737255, 0.160784}, {0.117647, 0.737255, 0.160784}, {0.117647, 0.737255, 0.160784}, {0.117647, 0.737255, 0.160784},
+        {0.819608, 0, 0.972549}, {0.819608, 0, 0.972549}, {0.984314, 0, 0.027451}, {0.984314, 0, 0.027451}, {0.117647, 0.737255, 0.160784},
+        {0.117647, 0.737255, 0.160784}
+    };
+    
+    [self processOpenGLvertices:vertices normals:normals faces:faces faceNormals:faceNormals faceColors:faceColors numFaces:12];
 }
 
 - (void) draw3D:(NSRect)aRect
-{
+{    
+    double rot = [delegate getRotation];
+    double trans = [delegate getTrans];
     
-    glRotatef(180, 0.0f, 1.0f, 0.0f);/* orbit the Y axis */
-    glRotatef(-50, 1.0f, 0.0f, 0.0f);/* orbit the X axis */
+    glRotatef(170, 0.0f, 1.0f, 0.0f);/* orbit the Y axis */
+    glRotatef(45, 1.0f, 0.0f, 0.0f);/* orbit the X axis */
 
     glClearColor(0.93f, 0.93f, 0.93f, 0.0f);
     
+    [self addLighting];
+    [self shinyLighting];
+    
+    //glColor3f(1,0,0);
+    //[self openGLCode];
+    
+    glColor3f(191.0/255,193.0/255,194.0/255); //detector
+    [self cylinderInnerRadius:0 outerRadius:.5 height:2.57 translateX:0 translateY:0 translateZ:0];
 
-	glLineWidth(.1);
-	glColor3f (.8, .8, .8);
-    float h=0;
-    float r = 1.;
-    glBegin (GL_LINES);
-    int i;
-    float x1,y1,x2,y2;
-    for(i=0;i<360;i++){
-        if(i==0){
-            x1 = r*cos(i*3.1415/180.);
-            y2 = r*sin(i*3.1415/180.);
-        }
-        else {
-            x2 = r*cos(i*3.1415/180.);
-            y2 = r*sin(i*3.1415/180.);
-            glVertex3f(x1, y1, h);
-            glVertex3f(x2, y2, h);
-            x1=x2;
-            y1=y2;
-        }
-
-    }
-
-    glEnd();
-        
-    glRotatef(rot, 0.0f, 0.0f, 1.0f);/* orbit the X axis */
-    glTranslatef(1.0f,0.0f,0.0f);
-    r *= .3;
+    glColor3f(135.0/255,115.0/255,85.0/255); //cone on top of dewar
+    [self partialConeInnerRadiusLower:0 outerRadiusLower:2.57 innerRadiusUpper:0 outerRadiusUpper:.55 height:2 translateX:0 translateY:-2.2 translateZ:0];
+    glColor3f(135.0/255,115.0/255,85.0/255); //dewar
+    [self cylinderInnerRadius:0 outerRadius:2.57 height:4.29 translateX:0 translateY:-5.3 translateZ:0];
     
-    glBegin (GL_LINES);
+    [self regularLighting];
     
-    glVertex3f(-r, -r, h);
-    glVertex3f(-r, r, h);
+    glColor3f(151.0/255,105.0/255,79.0/255); //motor
+    [self cubeScaleX:.3 scaleY:.15 scaleZ:.3 translateX:2.2 translateY:.25 translateZ:0
+         rotateAngle:rot rotateX:0 rotateY:1 rotateZ:0];
+    glColor3f(205.0/255,170.0/255,125.0/255); //scanner
+    [self cubeScaleX:.2 scaleY:.6 scaleZ:.2 translateX:2.25 translateY:1 translateZ:0
+         rotateAngle:rot rotateX:0 rotateY:1 rotateZ:0];
+    glColor3f(92.0/255,51.0/255,23.0/255); //moving part
+    [self cubeScaleX:.1 scaleY:.1 scaleZ: .1 translateX: 2.1 translateY:.5+trans translateZ:0
+         rotateAngle:rot rotateX:0 rotateY:1 rotateZ:0];
     
-    glVertex3f(-r, r, h);
-    glVertex3f(r, r, h);
+    glColor3f(204.0/255,204.0/255,204.0/255); //line at 0
+    [self cubeScaleX:1.25 scaleY:.001 scaleZ:.01 translateX:1.25 translateY:.2 translateZ:0 rotateAngle:0 rotateX:0 rotateY:0 rotateZ:0];
+    glColor3f(204.0/255,204.0/255,204.0/255); //line at detector
+    [self cubeScaleX:1.25 scaleY:.001 scaleZ:.01 translateX:1.25 translateY:.2 translateZ:0 rotateAngle:rot rotateX:0 rotateY:1 rotateZ:0];
     
-    glVertex3f(r, r, h);
-    glVertex3f(r, -r, h);
-    
-    glVertex3f(r, -r, h);
-    glVertex3f(-r, -r, h);
-
-    glEnd();
-
-    
-    
+    glColor3f(150.0/255,150.0/255,150.0/255); //trackOuter
+	[self cylinderInnerRadius:2.35 outerRadius:2.5 height:.17 translateX:0 translateY:0 translateZ:0];
+    glColor3f(194.0/255,194.0/255,194.0/255); //trackMiddle
+	[self cylinderInnerRadius:2.05 outerRadius:2.35 height:.05 translateX:0 translateY:0 translateZ:0];
+    glColor3f(150.0/255,150.0/255,150.0/255); //trackInner
+	[self cylinderInnerRadius:1.9 outerRadius:2.05 height:.17 translateX:0 translateY:0 translateZ:0];
 }
 @end

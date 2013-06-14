@@ -20,9 +20,24 @@
 
 @interface OR3DScanPlatformView : ORBasicOpenGLView
 {
-    float rot;
+    int pyramidCount;
 }
 
+- (void) dealloc;
+- (void) awakeFromNib;
+//- (void) incRot;
+- (void) resetCamera;
+
+- (void) cubeScaleX:(float)sx scaleY:(float)sy scaleZ:(float)sz
+         translateX:(float)tx translateY:(float)ty translateZ:(float)tz
+        rotateAngle:(float)ra rotateX:(float)rx rotateY:(float)ry rotateZ:(float)rz;
+- (void) crossProductVector1:(GLfloat*)v1 vector2:(GLfloat*)v2 result:(GLfloat*)result;
+- (void) unitNormalPoint1:(GLfloat*)p1 point2:(GLfloat*)p2 point3:(GLfloat*)p3 result:(GLfloat*)result;
+- (void) partialConeInnerRadiusLower:(float)irLower outerRadiusLower:(float)orLower
+                    innerRadiusUpper:(float)irUpper outerRadiusUpper:(float)orUpper height:(float)height
+                          translateX:(float)tx translateY:(float)ty translateZ:(float)tz;
+- (void) cylinderInnerRadius:(float)ir outerRadius:(float)or height:(float)height
+                  translateX:(float)tx translateY:(float)ty translateZ:(float)tz;
 - (void) draw3D:(NSRect)aRect;
 
 @end

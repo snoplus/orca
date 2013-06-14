@@ -18,6 +18,8 @@
 //-------------------------------------------------------------
 #import "OROrderedObjHolding.h"
 
+@class ORVXMModel;
+
 //-----------------------------------
 @interface OR3DScanPlatformModel : ORGroup <OROrderedObjHolding>
 {
@@ -30,6 +32,8 @@
 #pragma mark ***Notificatons
 - (void) registerNotificationObservers;
 - (void) motorChanged:(NSNotification*)aNote;
+
+- (ORVXMModel*) findMotorModel;
 
 #pragma mark ***Archival
 - (id)initWithCoder:(NSCoder*)decoder;

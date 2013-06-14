@@ -22,10 +22,9 @@
 #import "ORVXMMotor.h"
 
 @interface OR3DScanPlatformModel (private)
-- (ORVXMModel*) findMotorModel;
+
 - (id) findObject:(NSString*)aClassName;
 @end
-
 
 NSString* OR3DScanPlatformLock  = @"OR3DScanPlatformLock";
 
@@ -97,8 +96,6 @@ NSString* OR3DScanPlatformLock  = @"OR3DScanPlatformLock";
 	}	
 	
 }
-
-
 
 - (void) motorChanged:(NSNotification*)aNote
 {
@@ -186,11 +183,12 @@ NSString* OR3DScanPlatformLock  = @"OR3DScanPlatformLock";
 	}
 }
 
+- (ORVXMModel*)     findMotorModel		{ return [self findObject:@"ORVXMModel"];     }
+
 @end
 
 
 @implementation OR3DScanPlatformModel (private)
-- (ORVXMModel*)     findMotorModel		{ return [self findObject:@"ORVXMModel"];     }
 
 - (id) findObject:(NSString*)aClassName
 {

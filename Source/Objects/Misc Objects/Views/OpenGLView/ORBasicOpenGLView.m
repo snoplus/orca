@@ -360,5 +360,53 @@ ORBasicOpenGLView * gTrackingViewInfo = NULL;
 	[stanStringAttrib setObject:[NSColor whiteColor] forKey:NSForegroundColorAttributeName];
 }
 
+//points or polygons must have unit normal vectors specified for lighting to work
+- (void) addLighting
+{
+    glEnable(GL_DEPTH_TEST);
+    
+    GLfloat ambientLight[] = {.3,.3,.3,1};
+    GLfloat diffuseLight[] = {.7,.7,.7,1};
+    GLfloat specular[] = {1,1,1,1};
+    GLfloat lightPos[] = {-50,50,100,1};
+    
+    glLightfv(GL_LIGHT0,GL_AMBIENT,ambientLight);
+    glLightfv(GL_LIGHT0,GL_DIFFUSE,diffuseLight);
+    glLightfv(GL_LIGHT0,GL_SPECULAR,specular);
+    glLightfv(GL_LIGHT0,GL_POSITION,lightPos);
+    
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    
+    glEnable(GL_COLOR_MATERIAL);
+}
+
+//called after addLighting to give shininess to objects
+- (void) shinyLighting
+{
+    GLfloat ambient[] = {.19225,.19225,.19225,1};
+    GLfloat diffuse[] = {.50754,.50754,.50754};
+    GLfloat specular[] = {.508273,.508273,.508273};
+    GLfloat shine = .4 * 128;
+    
+    glMaterialfv(GL_FRONT,GL_AMBIENT,ambient);
+    glMaterialfv(GL_FRONT,GL_DIFFUSE,diffuse);
+    glMaterialfv(GL_FRONT,GL_SPECULAR,specular);
+    glMaterialfv(GL_FRONT,GL_SHININESS,&shine);
+}
+
+//called after addLighting to give materials regular lighting properties
+- (void) regularLighting
+{
+    GLfloat ambient[] = {.19225,.19225,.19225,1};
+    GLfloat diffuse[] = {.50754,.50754,.50754};
+    GLfloat specular[] = {0,0,0};
+    GLfloat shine = 0;
+    
+    glMaterialfv(GL_FRONT,GL_AMBIENT,ambient);
+    glMaterialfv(GL_FRONT,GL_DIFFUSE,diffuse);
+    glMaterialfv(GL_FRONT,GL_SPECULAR,specular);
+    glMaterialfv(GL_FRONT,GL_SHININESS,&shine);
+}
 
 @end

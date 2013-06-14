@@ -60,5 +60,9 @@ typedef struct {
 - (void) draw3D:(NSRect)rect;
 
 - (void) prepareOpenGL;
+
+- (void) addLighting;
+- (void) shinyLighting;
+- (void) regularLighting;
 @end
 

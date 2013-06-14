@@ -22,11 +22,16 @@
 #pragma mark •••Imported Files
 #import "OR3DScanPlatformController.h"
 #import "OR3DScanPlatformModel.h"
+#import "OR3DScanPlatformView.h"
+#import "ORVXMModel.h"
+#import "ORVXMMotor.h"
+#include "math.h"
 
 @implementation OR3DScanPlatformController
 - (id) init
 {
     self = [super initWithWindowNibName:@"3DScanPlatform"];
+    
     return self;
 }
 
@@ -38,8 +43,28 @@
 
 - (void) awakeFromNib
 {
-	[subComponentsView setGroup:model];
+    conversion = 1;
+    MOTORNUM = 1;
+    currentAngle = motorAngle = fmodf([[self findModelMotor] motorPosition],360);
+    rotation = 0;
+    
+    inc = true;
+    dec = false;
+    
+    [currentAngleText setFloatValue:currentAngle];
+	
+    [subComponentsView setGroup:model];
 	[super awakeFromNib];
+}
+
+- (double) getRotation
+{
+    return rotation;
+}
+
+- (double) getTrans
+{
+    return trans;
 }
 
 #pragma mark •••Notifications
@@ -72,7 +97,16 @@
                      selector : @selector(groupChanged:)
                          name : OROrcaObjectMoved
                        object : nil];
-	
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(motorTargetChanged:)
+                         name : ORVXMMotorTargetChanged
+                       object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(motorPositionChanged:)
+                         name : ORVXMMotorPositionChanged
+                       object : nil];
 }
 
 - (void) updateWindow
@@ -96,6 +130,79 @@
     [lockButton setState: locked];
 }
 
+- (void) motorTargetChanged:(NSNotification*)aNotification
+{
+    if([aNotification object] == [model findMotorModel])
+    {
+        if([[aNotification userInfo] objectForKey:@"VMXMotor"] == [[model findMotorModel] motor:MOTORNUM])
+        {
+            int angle = (ceil([[self findModelMotor] targetPosition] / conversion));
+            [targetAngleText setIntValue:angle];
+        }
+    }
+}
+
+- (void) motorPositionChanged:(NSNotification*)aNotification
+{
+    //NSLog(@"motorAngle=%.3f",motorAngle);
+    motorAngle = fmodf([[self findModelMotor] motorPosition],360);
+    //NSLog(@"motorAngle=%.3f",motorAngle);
+    
+    if(![[model findMotorModel] isMoving])
+    {
+        [goButton setEnabled:YES];
+        [homePlusButton setEnabled:YES];
+        [homeMinusButton setEnabled:YES];
+    }
+    
+    [self performSelector:@selector(updateRotation) withObject:nil afterDelay:.1];
+
+    /*if(currentAngle > targetAngle + .5 || currentAngle < targetAngle - .5)
+    {
+        rotation = targetAngle;
+        currentAngle = targetAngle;
+        [currentAngleText setFloatValue:currentAngle];
+        [view3D setNeedsDisplay:YES];
+    }*/
+}
+
+- (void) updateRotation
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    
+    if(currentAngle < motorAngle)
+    {
+        rotation += .5;
+        currentAngle += .5;
+    }
+    else
+    {
+        rotation -= .5;
+        currentAngle -= .5;
+    }
+    
+    if(inc)
+        trans += .01;
+    if(dec)
+        trans -= .01;
+    if(inc && trans>.9)
+    {
+        inc = false;
+        dec = true;
+    }
+    if(dec && trans<.1)
+    {
+        inc = true;
+        dec = false;
+    }
+    
+    [currentAngleText setFloatValue:currentAngle];
+    [view3D setNeedsDisplay:YES];
+    
+    if(currentAngle > motorAngle + .5 || currentAngle < motorAngle - .5)
+        [self performSelector:@selector(updateRotation) withObject:nil afterDelay:.02];
+}
+
 - (void) checkGlobalSecurity
 {
     BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
@@ -109,4 +216,47 @@
     [gSecurity tryToSetLock:OR3DScanPlatformLock to:[sender intValue] forWindow:[self window]];
 }
 
+- (IBAction) angleAction:(id) sender
+{
+    int steps = floor(conversion * [sender floatValue]);
+    [[self findModelMotor] setTargetPosition:steps];
+}
+
+- (IBAction) goAction:(id) sender
+{
+    [[model findMotorModel] move:MOTORNUM dx:[[self findModelMotor] targetPosition]];
+    if([[model findMotorModel] isMoving])
+    {
+        [goButton setEnabled:NO];
+        [homePlusButton setEnabled:NO];
+        [homeMinusButton setEnabled:NO];
+    }
+}
+
+- (IBAction) homePlusAction:(id) sender
+{
+    [[model findMotorModel] goHome:MOTORNUM plusDirection:YES];
+    if([[model findMotorModel] isMoving])
+    {
+        [goButton setEnabled:NO];
+        [homePlusButton setEnabled:NO];
+        [homeMinusButton setEnabled:NO];
+    }
+}
+
+- (IBAction) homeMinusAction:(id) sender
+{
+    [[model findMotorModel] goHome:MOTORNUM plusDirection:NO];
+    if([[model findMotorModel] isMoving])
+    {
+        [goButton setEnabled:NO];
+        [homePlusButton setEnabled:NO];
+        [homeMinusButton setEnabled:NO];
+    }
+}
+
+- (ORVXMMotor*) findModelMotor
+{
+    return [[model findMotorModel] motor:MOTORNUM];
+}
 @end
