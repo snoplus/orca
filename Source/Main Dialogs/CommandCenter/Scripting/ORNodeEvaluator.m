@@ -72,6 +72,8 @@
 - (id)		writeLine:(id) p;
 - (id)		deleteFile:(id) p;
 - (id)		getStringFromFile:(id) p;
+- (id)      confirmWithUser:(id) p;
+- (id)      confirmWithUserTimeout:(id) p;
 
 - (NSMutableDictionary*) makeSymbolTable;
 - (NSComparisonResult) compare:(id)a to:(id)b;
@@ -90,6 +92,7 @@
 	self = [super init];
 	if(self) {
 		functionTable = [aFunctionTable retain];
+		_two  = [[NSDecimalNumber alloc] initWithInt:2];
 		_one  = [[NSDecimalNumber one] retain];
 		_zero = [[NSDecimalNumber zero] retain];
 		switchLevel = 0;
@@ -105,6 +108,7 @@
 	[logFileHandle release];
 	[functionTable release];
 	[symbolTable release];
+	[_two release];
 	[_one release];
 	[_zero release];
 	[parsedNodes release];
@@ -121,6 +125,16 @@
 
 
 #pragma mark •••Accessors
+- (void) setUserResult:(int)aResult
+{
+    switch(aResult){
+        case 0:  userResult = _zero; break;
+        case 1:  userResult = _one; break;
+        default: userResult = _two; break;
+    }
+    userResponded = YES;
+}
+
 - (NSString*) functionName
 {
 	return functionName;
@@ -552,6 +566,8 @@
 			//built-in funcs
 		case SLEEP:			return [self sleepFunc:p];
 		case TIME:			return [self timeFunc];
+		case CONFIRM:       return [self confirmWithUser:p];
+		case kConfirmTimeOut:	return [self confirmWithUserTimeout:p];
 		case NSDICTIONARY:	return [NSMutableDictionary dictionary];
         case NSDATECOMPONENTS:
         {
@@ -884,6 +900,80 @@
 	NSString* s = NodeValue(0);
 	s = [s stringByExpandingTildeInPath];
 	return [NSString stringWithContentsOfFile:s encoding:NSASCIIStringEncoding error:nil];
+}
+
+- (id)      confirmWithUser:(id) p
+{
+    userResponded = NO;
+    [self performSelectorOnMainThread:@selector(startConfirmSheet:) withObject:NodeValue(0) waitUntilDone:NO];
+	do {
+		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+		if([self exitNow]){
+			[pool release];
+			break;
+		}
+		else {
+            if(userResponded){
+                [pool release];
+                break;
+            }
+		}
+        [NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:.1]];
+		[pool release];
+	} while(1);
+    [confirmController close];
+    [confirmController release];
+    confirmController = nil;
+    return userResult;
+}
+
+- (id) confirmWithUserTimeout:(id)p
+{
+	//return _zero if user canceled.
+	//return _one if user confirmed.
+	//return _two if timed-out.
+    userResponded = NO;
+    [self performSelectorOnMainThread:@selector(startConfirmSheet:) withObject:NodeValue(0) waitUntilDone:NO];
+	float timeOut = [NodeValue(1) floatValue];
+	do {
+		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+		@try {
+			if([self exitNow]){
+                break;
+			}
+            else if(userResponded)break;
+
+			[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:.1]];
+			timeOut -= .1;
+			if(timeOut <= 0){
+				[self setUserResult:2];
+                [pool release];
+                break;
+			}
+            [confirmController performSelectorOnMainThread:@selector(setTimeToGo:) withObject:[NSNumber numberWithFloat:timeOut] waitUntilDone:NO];
+
+		}
+		@catch(NSException* localException) {
+		}
+		
+		[pool release];
+		
+	}while(1);
+    
+    [confirmController close];
+    [confirmController release];
+    confirmController = nil;
+    
+	return userResult;
+}
+
+
+- (void) startConfirmSheet:(id)aString
+{
+    confirmController = [[ORScriptUserConfirmController alloc] initWithDelegate:self
+                                                                       title:[NSString stringWithFormat:@"%@\nRequests Confirmation",[delegate scriptName]]
+                                                               confirmString:aString];
+	[confirmController showWindow:self];
 }
 
 - (id) arrayAssignment:(id)p leftBranch:(id)leftNode withValue:(id)aValue
@@ -1486,7 +1576,7 @@
 				case WAITUNTIL:			line = [NSMutableString stringWithString:@"[waituntil]"];	break;				
 				case ALARM:				line = [NSMutableString stringWithString:@"[alarm]"];		break;				
 				case CLEAR:				line = [NSMutableString stringWithString:@"[clear]"];		break;				
-				case kWaitTimeOut:		line = [NSMutableString stringWithString:@"[waittimeout]"];	break;				
+				case kWaitTimeOut:		line = [NSMutableString stringWithString:@"[waittimeout]"];	break;
                 case FIND:				line = [NSMutableString stringWithString:@"[find]"];		break;
                 case LEFT_ASSIGN:		line = [NSMutableString stringWithString:@"[<<=]"];			break;
                 case RIGHT_ASSIGN:		line = [NSMutableString stringWithString:@"[>>=]"];			break;
@@ -1502,6 +1592,8 @@
 				case MAKERECT:			line = [NSMutableString stringWithString:@"[rect]"];		break;
 				case MAKESIZE:			line = [NSMutableString stringWithString:@"[size]"];		break;
 				case MAKERANGE:			line = [NSMutableString stringWithString:@"[range]"];		break;
+				case CONFIRM:			line = [NSMutableString stringWithString:@"[confirm]"];		break;
+				case kConfirmTimeOut:	line = [NSMutableString stringWithString:@"[confirmtimeout]"];	break;
                 case ',':				line = [NSMutableString stringWithString:@"[,]"];			break;
 				default:				line = [NSMutableString stringWithString:@"[??]"];			break;
             }
@@ -1655,3 +1747,49 @@
 }
 @end
 
+@implementation ORScriptUserConfirmController
+
+     @synthesize delegate,confirmString,title;
+     
+- (id) initWithDelegate:(id)aDelegate title:(NSString*)aTitle confirmString:(NSString*)aString
+{    
+	if(!(self = [super initWithWindowNibName: @"UserConfirm"]))return nil;
+    self.delegate = aDelegate;
+    self.title = aTitle;
+    self.confirmString = aString;
+	return self;
+}
+     
+- (void) dealloc
+{
+    self.confirmString = nil;
+    self.title = nil;
+    [super dealloc];
+}
+
+- (void) setTimeToGo:(NSNumber*)aTime
+{
+    if(aTime){
+        [timeOutField setStringValue: [NSString stringWithFormat:@"Timeout: %d s",[aTime intValue]]];
+    }
+    else {
+        [timeOutField setStringValue:@""];
+    }
+}
+
+- (void) awakeFromNib
+{
+    [confirmStringField setStringValue:confirmString];
+    [titleField setStringValue:title];
+    [super awakeFromNib];
+}
+- (IBAction) confirmAction:(id)sender
+{
+    [delegate setUserResult:1];
+}
+
+- (IBAction) cancelAction:(id)sender
+{
+    [delegate setUserResult:0];
+}
+@end

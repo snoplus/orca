@@ -64,6 +64,7 @@
 		<string>clearAlarm</string>
 		<string>time</string>
 		<string>shell</string>
+		<string>confirm</string>
 	</array>
 	<key>Constants</key>
 	<array>

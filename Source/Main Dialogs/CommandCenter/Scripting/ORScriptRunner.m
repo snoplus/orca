@@ -199,7 +199,7 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 - (void) stop
 {
 	stopThread = YES;
-	exitNow = YES;;
+	exitNow = YES;
 }
 
 - (void) setFinishCallBack:(id)aTarget selector:(SEL)aSelector

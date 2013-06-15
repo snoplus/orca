@@ -22,5 +22,6 @@ enum {
 	kConditional,
 	kArrayListAssign,
 	kArrayAssign,
-	kWaitTimeOut
+	kWaitTimeOut,
+    kConfirmTimeOut
 };

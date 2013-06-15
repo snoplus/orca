@@ -18,12 +18,15 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
+@class ORScriptUserConfirmController;
+
 @interface ORNodeEvaluator : NSObject {
 	NSMutableDictionary* symbolTable;
 	NSMutableDictionary* argValueDicionary;
 	NSArray*			 parsedNodes;
 	NSDecimalNumber*	 _one;
 	NSDecimalNumber*	 _zero;
+	NSDecimalNumber*	 _two;
 	NSDictionary*		 functionTable;
 	NSMutableDictionary* sysCallTable;
 	unsigned short       switchLevel;
@@ -35,6 +38,9 @@
 	ORNodeEvaluator*	 functionEvaluator;
 	int					 functionLevel;
 	NSString*			 functionName;
+    BOOL                 userResponded;
+    id                   userResult;
+    ORScriptUserConfirmController* confirmController;
 }
 
 #pragma mark •••Initialization
@@ -45,8 +51,9 @@
 #pragma mark •••Accessors
 - (ORNodeEvaluator*) functionEvaluator;
 - (void) setDelegate:(id)aDelegate;
-- (NSString*) scriptName;
-- (BOOL)	exitNow;
+- (NSString*)   scriptName;
+- (BOOL)        exitNow;
+- (void)        setUserResult:(int)aResult;
 
 #pragma mark •••Symbol Table Routines
 - (void) setFunctionLevel:(int)aLevel;
@@ -104,4 +111,23 @@
 @interface OrcaObjectController (ORNodeEvaluation)
 - (NSComparisonResult)compare:(NSNumber *)otherNumber;
 - (BOOL)	exitNow;
+@end
+
+@interface ORScriptUserConfirmController : NSWindowController
+{
+    IBOutlet NSTextField* confirmStringField;
+    IBOutlet NSTextField* titleField;
+    IBOutlet NSTextField* timeOutField;
+    id delegate;
+    NSString* title;
+    NSString* confirmString;
+}
+- (id) initWithDelegate:(id)aDelegate title:(NSString*)aTitle confirmString:(NSString*)aString;
+- (void) setTimeToGo:(NSNumber*)aTime;
+- (IBAction) confirmAction:(id)sender;
+- (IBAction) cancelAction:(id)sender;
+
+@property (assign) id delegate;
+@property (copy) NSString* confirmString;
+@property (copy) NSString* title;
 @end
