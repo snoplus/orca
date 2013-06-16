@@ -1796,7 +1796,8 @@
 	if(!(self = [super initWithWindowNibName: @"UserConfirm"]))return nil;
     self.delegate = aDelegate;
     self.title = aTitle;
-    self.confirmString = [[aString componentsSeparatedByString:@"\\n"] componentsJoinedByString:@"\n"]; //have to convert the newLine string into actual new line char
+    NSString* s = [[aString componentsSeparatedByString:@"\\n"] componentsJoinedByString:@"\n"]; //have to convert the newLine string into actual new line char
+    self.confirmString = [[s componentsSeparatedByString:@"\\r"] componentsJoinedByString:@"\r"]; //have to convert the newLine string into actual new line char
 	return self;
 }
      
