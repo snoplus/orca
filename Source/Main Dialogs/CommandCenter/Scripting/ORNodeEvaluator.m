@@ -1796,7 +1796,7 @@
 	if(!(self = [super initWithWindowNibName: @"UserConfirm"]))return nil;
     self.delegate = aDelegate;
     self.title = aTitle;
-    self.confirmString = aString;
+    self.confirmString = [[aString componentsSeparatedByString:@"\\n"] componentsJoinedByString:@"\n"]; //have to convert the newLine string into actual new line char
 	return self;
 }
      
@@ -1809,12 +1809,8 @@
 
 - (void) setTimeToGo:(NSNumber*)aTime
 {
-    if(aTime){
-        [timeOutField setStringValue: [NSString stringWithFormat:@"Timeout: %d s",[aTime intValue]]];
-    }
-    else {
-        [timeOutField setStringValue:@""];
-    }
+    if(aTime)[timeOutField setStringValue: [NSString stringWithFormat:@"Timeout: %d s",[aTime intValue]]];
+    else     [timeOutField setStringValue:@""];
 }
 
 - (void) awakeFromNib
@@ -1823,6 +1819,7 @@
     [titleField setStringValue:title];
     [super awakeFromNib];
 }
+
 - (IBAction) confirmAction:(id)sender
 {
     [delegate setUserResult:1];
