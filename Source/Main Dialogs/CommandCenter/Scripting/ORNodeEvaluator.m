@@ -1844,15 +1844,16 @@
     self.delegate       = aDelegate;
     self.title          = aTitle;
     self.variableList  = aString;
+    self.inputFields = [NSMutableDictionary dictionary];
 	return self;
 }
 
 - (void) dealloc
 {
-    self.variableList = nil;
-    self.title = nil;
-    self.inputFields = nil;
-    self.title = nil;
+    self.variableList   = nil;
+    self.title          = nil;
+    self.inputFields    = nil;
+    self.title          = nil;
     [super dealloc];
 }
 
@@ -1863,7 +1864,6 @@
     NSArray* variables = [variableList componentsSeparatedByString:@","];
     int variableCount = [variables count];
     
-    if(!inputFields)self.inputFields = [NSMutableDictionary dictionary];
     NSRect windowFrame = [[self window] frame];
     float yStart = 30;
     float y = yStart;
@@ -1873,13 +1873,22 @@
     BOOL reset = NO;
     for(id aName in variables){
         if([inputFields objectForKey:aName])continue; //prevent duplicates
+        id theObj = [delegate valueForSymbol:aName];
+        //restrict the kind of class that can be used.
+        if(![theObj isKindOfClass:NSClassFromString(@"NSDecimalNumber")] &&
+           ![theObj isKindOfClass:NSClassFromString(@"NSString")])continue;
+
+        NSString* className = nil;
+        if([theObj isKindOfClass:NSClassFromString(@"NSDecimalNumber")])    className = @"NSDecimalNumber";
+        else if([theObj isKindOfClass:NSClassFromString(@"NSString")])      className = @"NSString";
+        
         NSTextField* labelField = [[NSTextField alloc] initWithFrame:NSMakeRect(x,y,75,20)];
         NSTextField* textField = [[NSTextField alloc] initWithFrame:NSMakeRect(x+80,y,75,20)];
         
         [labelField setAutoresizingMask: NSViewMinYMargin];
         [textField setAutoresizingMask: NSViewMinYMargin];
         
-        [textField setObjectValue:[delegate valueForSymbol:aName]];
+        
         [self.window.contentView addSubview:labelField];
         [self.window.contentView addSubview:textField];
         [labelField setBezeled:NO];
@@ -1887,9 +1896,14 @@
         [labelField setDrawsBackground:NO];
         [labelField setAlignment:NSRightTextAlignment];
         [textField setAlignment:NSRightTextAlignment];
-        [inputFields setObject:textField forKey:aName];
+                
         [labelField setObjectValue:[NSString stringWithFormat:@"%@:",aName]];
-        
+        [textField setObjectValue:theObj];
+
+        //make a small dictionary so we can get the values and classNames later.
+        [inputFields setObject:[NSDictionary dictionaryWithObjectsAndKeys:textField,@"textField",className,@"className", nil]
+                        forKey:aName];
+
         [labelField release];
         [textField release];
         y -= dy;
@@ -1907,12 +1921,15 @@
     [[self window]center];
     [super awakeFromNib];
 }
+
 - (IBAction) confirmAction:(id)sender
 {
     for(id aKey in [inputFields allKeys]){
-        NSString* s = [[inputFields objectForKey:aKey] stringValue];
-        NSDecimalNumber* aNumber = [[NSDecimalNumber alloc] initWithString:s];
-        [delegate setValue:aNumber forSymbol:aKey];
+        NSTextField* aTextField = [[inputFields objectForKey:aKey] objectForKey:@"textField"];
+        NSString* aClassName    = [[inputFields objectForKey:aKey] objectForKey:@"className"];
+        id newValue= [aTextField stringValue];
+        if([aClassName isEqualToString:@"NSDecimalNumber"])newValue = [[NSDecimalNumber alloc] initWithString:newValue];
+        if(newValue) [delegate setValue:newValue forSymbol:aKey];
     }
 
     [delegate setUserResult:1];
