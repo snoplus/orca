@@ -122,6 +122,7 @@ E			[Ee][+-]?{D}+
 "nsfilemanager"		return NSFILEMANAGER;
 "import"			return IMPORT;
 "confirm"			return CONFIRM;
+"request"			return REQUEST;
 
 {L}({L}|{D})*   {
                 strncpy(OrcaScriptlval.symKey,yytext,yyleng);

@@ -40,7 +40,7 @@
 	NSString*			 functionName;
     BOOL                 userResponded;
     id                   userResult;
-    ORScriptUserConfirmController* confirmController;
+    NSWindowController* userDialogController;
 }
 
 #pragma mark •••Initialization
@@ -130,4 +130,23 @@
 @property (assign) id delegate;
 @property (copy) NSString* confirmString;
 @property (copy) NSString* title;
+@end
+
+
+@interface ORScriptUserRequestController : NSWindowController
+{
+    IBOutlet NSTextField* titleField;
+    id delegate;
+    NSString* title;
+    NSString* variableList;
+    NSMutableDictionary* inputFields;
+}
+- (id) initWithDelegate:(id)aDelegate title:(NSString*)aTitle variableList:(NSString*)aString;
+- (IBAction) confirmAction:(id)sender;
+- (IBAction) cancelAction:(id)sender;
+
+@property (assign) id delegate;
+@property (copy) NSString* variableList;
+@property (copy) NSString* title;
+@property (retain) NSMutableDictionary* inputFields;
 @end

@@ -74,6 +74,10 @@
 - (id)		getStringFromFile:(id) p;
 - (id)      confirmWithUser:(id) p;
 - (id)      confirmWithUserTimeout:(id) p;
+- (id)      requestFromUser:(id) p;
+- (void)    startConfirmSheet:(id)aString;
+- (void)    startRequestSheet:(id)aString;
+
 
 - (NSMutableDictionary*) makeSymbolTable;
 - (NSComparisonResult) compare:(id)a to:(id)b;
@@ -278,6 +282,7 @@
 	if(!symbolTable)symbolTable = [[self makeSymbolTable] retain];
 	[symbolTable addEntriesFromDictionary:aSymbolTable];
 }
+
 
 - (id) valueForSymbol:(NSString*) aKey
 {
@@ -567,6 +572,7 @@
 		case SLEEP:			return [self sleepFunc:p];
 		case TIME:			return [self timeFunc];
 		case CONFIRM:       return [self confirmWithUser:p];
+		case REQUEST:       return [self requestFromUser:p];
 		case kConfirmTimeOut:	return [self confirmWithUserTimeout:p];
 		case NSDICTIONARY:	return [NSMutableDictionary dictionary];
         case NSDATECOMPONENTS:
@@ -901,6 +907,39 @@
 	s = [s stringByExpandingTildeInPath];
 	return [NSString stringWithContentsOfFile:s encoding:NSASCIIStringEncoding error:nil];
 }
+- (id) requestFromUser:(id) p
+{
+    userResponded = NO;
+    [self performSelectorOnMainThread:@selector(startRequestSheet:) withObject:NodeValue(0) waitUntilDone:NO];
+	do {
+		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+		if([self exitNow]){
+			[pool release];
+			break;
+		}
+		else {
+            if(userResponded){
+                [pool release];
+                break;
+            }
+		}
+        [NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:.1]];
+		[pool release];
+	} while(1);
+    [userDialogController close];
+    [userDialogController release];
+    userDialogController = nil;
+    return userResult;
+    return userResult;
+}
+
+- (void) startRequestSheet:(id)aString
+{
+    userDialogController = [[ORScriptUserRequestController alloc] initWithDelegate:self
+                                                                          title:[NSString stringWithFormat:@"%@\nRequests Input",[delegate scriptName]]
+                                                                  variableList:aString];
+	[userDialogController showWindow:self];
+}
 
 - (id)      confirmWithUser:(id) p
 {
@@ -921,9 +960,9 @@
         [NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:.1]];
 		[pool release];
 	} while(1);
-    [confirmController close];
-    [confirmController release];
-    confirmController = nil;
+    [userDialogController close];
+    [userDialogController release];
+    userDialogController = nil;
     return userResult;
 }
 
@@ -950,7 +989,7 @@
                 [pool release];
                 break;
 			}
-            [confirmController performSelectorOnMainThread:@selector(setTimeToGo:) withObject:[NSNumber numberWithFloat:timeOut] waitUntilDone:NO];
+            [userDialogController performSelectorOnMainThread:@selector(setTimeToGo:) withObject:[NSNumber numberWithFloat:timeOut] waitUntilDone:NO];
 
 		}
 		@catch(NSException* localException) {
@@ -960,9 +999,9 @@
 		
 	}while(1);
     
-    [confirmController close];
-    [confirmController release];
-    confirmController = nil;
+    [userDialogController close];
+    [userDialogController release];
+    userDialogController = nil;
     
 	return userResult;
 }
@@ -970,10 +1009,10 @@
 
 - (void) startConfirmSheet:(id)aString
 {
-    confirmController = [[ORScriptUserConfirmController alloc] initWithDelegate:self
+    userDialogController = [[ORScriptUserConfirmController alloc] initWithDelegate:self
                                                                        title:[NSString stringWithFormat:@"%@\nRequests Confirmation",[delegate scriptName]]
                                                                confirmString:aString];
-	[confirmController showWindow:self];
+	[userDialogController showWindow:self];
 }
 
 - (id) arrayAssignment:(id)p leftBranch:(id)leftNode withValue:(id)aValue
@@ -1592,6 +1631,7 @@
 				case MAKERECT:			line = [NSMutableString stringWithString:@"[rect]"];		break;
 				case MAKESIZE:			line = [NSMutableString stringWithString:@"[size]"];		break;
 				case MAKERANGE:			line = [NSMutableString stringWithString:@"[range]"];		break;
+				case REQUEST:			line = [NSMutableString stringWithString:@"[request]"];		break;
 				case CONFIRM:			line = [NSMutableString stringWithString:@"[confirm]"];		break;
 				case kConfirmTimeOut:	line = [NSMutableString stringWithString:@"[confirmtimeout]"];	break;
                 case ',':				line = [NSMutableString stringWithString:@"[,]"];			break;
@@ -1785,6 +1825,96 @@
 }
 - (IBAction) confirmAction:(id)sender
 {
+    [delegate setUserResult:1];
+}
+
+- (IBAction) cancelAction:(id)sender
+{
+    [delegate setUserResult:0];
+}
+@end
+
+@implementation ORScriptUserRequestController
+
+@synthesize delegate,variableList,title,inputFields;
+
+- (id) initWithDelegate:(id)aDelegate title:(NSString*)aTitle variableList:(NSString*)aString
+{
+	if(!(self = [super initWithWindowNibName: @"UserRequest"]))return nil;
+    self.delegate       = aDelegate;
+    self.title          = aTitle;
+    self.variableList  = aString;
+	return self;
+}
+
+- (void) dealloc
+{
+    self.variableList = nil;
+    self.title = nil;
+    self.inputFields = nil;
+    self.title = nil;
+    [super dealloc];
+}
+
+- (void) awakeFromNib
+{
+    [titleField setStringValue:title];
+    
+    NSArray* variables = [variableList componentsSeparatedByString:@","];
+    int variableCount = [variables count];
+    
+    if(!inputFields)self.inputFields = [NSMutableDictionary dictionary];
+    NSRect windowFrame = [[self window] frame];
+    float yStart = 30;
+    float y = yStart;
+    float x = 5;
+    float dy = 24;
+    int count = 0;
+    BOOL reset = NO;
+    for(id aName in variables){
+        if([inputFields objectForKey:aName])continue; //prevent duplicates
+        NSTextField* labelField = [[NSTextField alloc] initWithFrame:NSMakeRect(x,y,75,20)];
+        NSTextField* textField = [[NSTextField alloc] initWithFrame:NSMakeRect(x+80,y,75,20)];
+        
+        [labelField setAutoresizingMask: NSViewMinYMargin];
+        [textField setAutoresizingMask: NSViewMinYMargin];
+        
+        [textField setObjectValue:[delegate valueForSymbol:aName]];
+        [self.window.contentView addSubview:labelField];
+        [self.window.contentView addSubview:textField];
+        [labelField setBezeled:NO];
+        [labelField setEditable:NO];
+        [labelField setDrawsBackground:NO];
+        [labelField setAlignment:NSRightTextAlignment];
+        [textField setAlignment:NSRightTextAlignment];
+        [inputFields setObject:textField forKey:aName];
+        [labelField setObjectValue:[NSString stringWithFormat:@"%@:",aName]];
+        
+        [labelField release];
+        [textField release];
+        y -= dy;
+        if(!reset && (++count >= (int)(variableCount/2. +.5))){
+            x = 85 + 75 + 10;
+            y = yStart;
+            reset = YES;
+        }
+    }
+    float windowX = windowFrame.origin.x;
+    float windowY = windowFrame.origin.y;
+    float h = windowFrame.size.height + count * dy - 4;
+    float w = windowFrame.size.width;
+    [[self window] setFrame:NSMakeRect(windowX,windowY,w,h) display:YES];
+    [[self window]center];
+    [super awakeFromNib];
+}
+- (IBAction) confirmAction:(id)sender
+{
+    for(id aKey in [inputFields allKeys]){
+        NSString* s = [[inputFields objectForKey:aKey] stringValue];
+        NSDecimalNumber* aNumber = [[NSDecimalNumber alloc] initWithString:s];
+        [delegate setValue:aNumber forSymbol:aKey];
+    }
+
     [delegate setUserResult:1];
 }
 

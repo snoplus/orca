@@ -675,6 +675,7 @@
 		842544F212F1FF9F00472314 /* BamDetectorView.m in Sources */ = {isa = PBXBuildFile; fileRef = 842544E812F1FF9E00472314 /* BamDetectorView.m */; };
 		842544F312F1FF9F00472314 /* edu.washington.npl.orca.BamDetector.plist in Resources */ = {isa = PBXBuildFile; fileRef = 842544E912F1FF9E00472314 /* edu.washington.npl.orca.BamDetector.plist */; };
 		84256535176CF86600F360E4 /* UserConfirm.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84256534176CF86600F360E4 /* UserConfirm.xib */; };
+		84256537176D348400F360E4 /* UserRequest.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84256536176D348300F360E4 /* UserRequest.xib */; };
 		84258D8D12FDAA0E00A15D82 /* Heartbeat.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84258D8C12FDAA0E00A15D82 /* Heartbeat.tif */; };
 		842702810B5EE938009176B4 /* katrin.gif in Resources */ = {isa = PBXBuildFile; fileRef = 842702800B5EE937009176B4 /* katrin.gif */; };
 		84281C7E0D7E19C50021B820 /* ORIP320Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84281C7C0D7E19C50021B820 /* ORIP320Decoders.h */; };
@@ -3921,6 +3922,7 @@
 		842544E812F1FF9E00472314 /* BamDetectorView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BamDetectorView.m; path = Source/Experiments/BamDectector/BamDetectorView.m; sourceTree = SOURCE_ROOT; };
 		842544E912F1FF9E00472314 /* edu.washington.npl.orca.BamDetector.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = edu.washington.npl.orca.BamDetector.plist; path = Source/Experiments/BamDectector/edu.washington.npl.orca.BamDetector.plist; sourceTree = SOURCE_ROOT; };
 		84256534176CF86600F360E4 /* UserConfirm.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UserConfirm.xib; sourceTree = "<group>"; };
+		84256536176D348300F360E4 /* UserRequest.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UserRequest.xib; sourceTree = "<group>"; };
 		84258D8C12FDAA0E00A15D82 /* Heartbeat.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Heartbeat.tif; path = Source/Preferences/Heartbeat.tif; sourceTree = SOURCE_ROOT; };
 		842702800B5EE937009176B4 /* katrin.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = katrin.gif; path = Source/Experiments/Katrin/katrin.gif; sourceTree = SOURCE_ROOT; };
 		84281C7C0D7E19C50021B820 /* ORIP320Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORIP320Decoders.h; path = Source/Objects/Hardware/Vme/IPCarrier/IP320/ORIP320Decoders.h; sourceTree = SOURCE_ROOT; };
@@ -6812,6 +6814,7 @@
 				8419227D0F0BC18800EF1C1C /* ORScriptIDEController.h */,
 				841922800F0BC1E300EF1C1C /* ScriptIDE.nib */,
 				84256534176CF86600F360E4 /* UserConfirm.xib */,
+				84256536176D348300F360E4 /* UserRequest.xib */,
 				84080D240B3C7FBE009D3704 /* ORScriptRunner.h */,
 				84080D250B3C7FBE009D3704 /* ORScriptRunner.m */,
 				84C281D10B45BDEA00C9CDA9 /* ORNodeEvaluator.h */,
@@ -15042,6 +15045,7 @@
 				B3808A8C1700F84B0019C27D /* CouchDBListener.nib in Resources */,
 				B3805611172BE4A100B5B134 /* Changesfeed.tif in Resources */,
 				84256535176CF86600F360E4 /* UserConfirm.xib in Resources */,
+				84256537176D348400F360E4 /* UserRequest.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

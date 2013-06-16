@@ -65,6 +65,7 @@
 		<string>time</string>
 		<string>shell</string>
 		<string>confirm</string>
+		<string>request</string>
 	</array>
 	<key>Constants</key>
 	<array>
