@@ -231,7 +231,7 @@
     }
 	if(random()%500 > 495 ){
 		 
-		unsigned long data[2048];
+		unsigned long data[2050];
         data[0] = dataIdWaveform | (2048+2);
         data[1] = 0; //card 0, chan 0
         [aDataPacket addLongsToFrameBuffer:data length:2];
@@ -257,7 +257,7 @@
 		}
         [aDataPacket addLongsToFrameBuffer:data length:2048];
 
-        data[0] = dataIdWaveform | (2048+2);
+        data[0] = dataIdWaveform | (2050+2);
         data[1] = 0x00001000; //card 0, chan 1
         [aDataPacket addLongsToFrameBuffer:data length:2];
 		radians = 0;
