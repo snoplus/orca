@@ -49,7 +49,7 @@
 	unsigned long	dataId;
 	unsigned long timeMeasured[2];
     unsigned long adcEnabledMask;
-    ORTimeRate*		timeRates[16];
+    ORTimeRate*		timeRates[32]; //fix this array bounds to be equal to the number of plotlines
     ORAlarm*		temperatureAlarm[2];
     ORAlarm*		adcAlarm[4];
 }

@@ -41,33 +41,37 @@
 
 - (int) tagToAdc:(int)aTag
 {
-    NSAssert(aTag>=0 && aTag<16 , @"Tag out of Bounds");
-    int tagConversion[16] = {0,1,2,3,4,8,9,10,11,12,7,15,5,6,13,14};
-    return tagConversion[aTag];
+    if(aTag>=0 && aTag<16){
+        int tagConversion[16] = {0,1,2,3,4,8,9,10,11,12,7,15,5,6,13,14};
+        return tagConversion[aTag];
+    }
+    else return 0;
 }
 
 - (NSString*) nameForTag:(int)aTag
 {
-    NSAssert(aTag>=0 && aTag<16 , @"Tag out of Bounds");
-    NSString* tagString[16] = {
-        @"Adc0",
-        @"Adc1",
-        @"Adc2",
-        @"Adc3",
-        @"Adc4",
-        @"Adc8",
-        @"Adc9",
-        @"Adc10",
-        @"Adc11",
-        @"Adc12",
-        @"Adc7",
-        @"Adc15",
-        @"Adc5",
-        @"Adc6",
-        @"Adc13",
-        @"Adc14"
-    };
-    return tagString[aTag];
+    if(aTag>=0 && aTag<16){
+        NSString* tagString[16] = {
+            @"Adc0",
+            @"Adc1",
+            @"Adc2",
+            @"Adc3",
+            @"Adc4",
+            @"Adc8",
+            @"Adc9",
+            @"Adc10",
+            @"Adc11",
+            @"Adc12",
+            @"Adc7",
+            @"Adc15",
+            @"Adc5",
+            @"Adc6",
+            @"Adc13",
+            @"Adc14"
+        };
+        return tagString[aTag];
+    }
+    else return @"?";
 }
 
 
