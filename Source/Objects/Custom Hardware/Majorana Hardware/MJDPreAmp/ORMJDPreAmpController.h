@@ -52,6 +52,8 @@
         IBOutlet ORCompositeTimeLineView*	plotter1;
         IBOutlet ORCompositeTimeLineView*	plotter2;
         IBOutlet ORCompositeTimeLineView*	plotter3;
+        IBOutlet ORCompositeTimeLineView*	plotter4;
+        IBOutlet ORCompositeTimeLineView*	plotter5;
 }
 
 #pragma mark ¥¥¥Initialization

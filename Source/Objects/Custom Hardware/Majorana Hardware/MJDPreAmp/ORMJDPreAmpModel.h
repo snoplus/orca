@@ -124,7 +124,7 @@
 - (void) writeAmplitudes;
 - (void) zeroAmplitudes;
 //- (void) writeRangeForAdcChip:(int)index;
-- (void) writeRangeForAdcChip:(int)aChip withValue:(int)index;
+- (void) writeRangeForAdcChip:(int)aChip withValue:(int)index; // niko
 - (void) writeAdcChipRanges;
 - (void) readAdcsOnChip:(int)aChip verbose:(BOOL)verbose;
 - (void) readAllTemperatures:(BOOL)verbose;

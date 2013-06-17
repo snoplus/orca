@@ -103,7 +103,12 @@
     [[plotter2 yAxis] setRngLow:0.0 withHigh:300.];
     [[plotter2 yAxis] setRngLimitsLow:0.0 withHigh:60 withMinRng:4]; // up to 60 degrees on chip - niko
     [[plotter3 yAxis] setRngLow:0.0 withHigh:300.];
-    [[plotter3 yAxis] setRngLimitsLow:0.0 withHigh:30 withMinRng:4]; // up to 24V - niko
+    [[plotter3 yAxis] setRngLimitsLow:-30. withHigh:30. withMinRng:4]; // up to +/-24V - niko
+    
+    [[plotter4 yAxis] setRngLow:0.0 withHigh:300.];
+    [[plotter4 yAxis] setRngLimitsLow:-15. withHigh:0. withMinRng:4]; // rail of preamp at -11V - niko
+    [[plotter5 yAxis] setRngLow:0.0 withHigh:300.];
+    [[plotter5 yAxis] setRngLimitsLow:-15. withHigh:0. withMinRng:4]; // rail of preamp at -11V - niko
    
     
     [[plotter0 xAxis] setRngLow:0.0 withHigh:10000];
@@ -114,6 +119,11 @@
 	[[plotter2 xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
     [[plotter3 xAxis] setRngLow:0.0 withHigh:10000];
 	[[plotter3 xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
+    
+    [[plotter4 xAxis] setRngLow:0.0 withHigh:10000];
+	[[plotter4 xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
+    [[plotter5 xAxis] setRngLow:0.0 withHigh:10000];
+	[[plotter5 xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
 	
 	NSColor* color[5] = {
 		[NSColor redColor],
@@ -163,11 +173,37 @@
 		[aPlot release];
         tag++;
 	}
+    
+    for(i=0;i<5;i++){
+		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:tag andDataSource:self];
+		[plotter0 addPlot: aPlot];
+		[aPlot setLineColor:color[i]];
+		[aPlot setName:[self nameForTag:tag]];
+		[(ORTimeAxis*)[plotter4 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
+		[aPlot release];
+        tag++;
+	}
+    for(i=0;i<5;i++){
+		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:tag andDataSource:self];
+		[plotter0 addPlot: aPlot];
+		[aPlot setLineColor:color[i]];
+		[aPlot setName:[self nameForTag:tag]];
+		[(ORTimeAxis*)[plotter5 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
+		[aPlot release];
+        tag++;
+	}
+
+
 	
-	[plotter0 setShowLegend:YES];
+	//[plotter0 setShowLegend:YES];
+	//[plotter1 setShowLegend:YES];
+    [plotter0 setShowLegend:YES];
 	[plotter1 setShowLegend:YES];
 	[plotter2 setShowLegend:YES];
 	[plotter3 setShowLegend:YES];
+    
+    [plotter4 setShowLegend:YES];
+	[plotter5 setShowLegend:YES];
 }
 
 - (void) setModel:(id)aModel
@@ -449,6 +485,39 @@
 			[[plotter3 yAxis] setNeedsDisplay:YES];
 		}
 	}
+    
+    if(aNote == nil || [key isEqualToString:@"XAttributes4"]){
+		if(aNote==nil)attrib = [model miscAttributesForKey:@"XAttributes4"];
+		if(attrib){
+			[(ORAxis*)[plotter4 xAxis] setAttributes:attrib];
+			[plotter4 setNeedsDisplay:YES];
+			[[plotter4 xAxis] setNeedsDisplay:YES];
+		}
+	}
+	if(aNote == nil || [key isEqualToString:@"YAttributes4"]){
+		if(aNote==nil)attrib = [model miscAttributesForKey:@"YAttributes4"];
+		if(attrib){
+			[(ORAxis*)[plotter4 yAxis] setAttributes:attrib];
+			[plotter4 setNeedsDisplay:YES];
+			[[plotter4 yAxis] setNeedsDisplay:YES];
+		}
+	}
+    if(aNote == nil || [key isEqualToString:@"XAttributes5"]){
+		if(aNote==nil)attrib = [model miscAttributesForKey:@"XAttributes5"];
+		if(attrib){
+			[(ORAxis*)[plotter5 xAxis] setAttributes:attrib];
+			[plotter5 setNeedsDisplay:YES];
+			[[plotter5 xAxis] setNeedsDisplay:YES];
+		}
+	}
+	if(aNote == nil || [key isEqualToString:@"YAttributes5"]){
+		if(aNote==nil)attrib = [model miscAttributesForKey:@"YAttributes5"];
+		if(attrib){
+			[(ORAxis*)[plotter5 yAxis] setAttributes:attrib];
+			[plotter5 setNeedsDisplay:YES];
+			[[plotter5 yAxis] setNeedsDisplay:YES];
+		}
+	}
 }
 - (void) updateTimePlot:(NSNotification*)aNote
 {
@@ -464,6 +533,13 @@
 	}
     else if(!aNote || ([aNote object] == [model timeRate:3])){
 		[plotter3 setNeedsDisplay:YES];
+	}
+    
+    else if(!aNote || ([aNote object] == [model timeRate:4])){
+		[plotter4 setNeedsDisplay:YES];
+	}
+    else if(!aNote || ([aNote object] == [model timeRate:5])){
+		[plotter5 setNeedsDisplay:YES];
 	}
 }
 
