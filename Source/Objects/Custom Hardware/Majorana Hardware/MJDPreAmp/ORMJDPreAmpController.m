@@ -916,11 +916,19 @@
     
     float multiplier = 1000.; // nA to pA conversion - niko
     
-    if((adc < 5) || ((adc > 7) && (adc < 13))){ // first stage ouput values
+    //if((adc < 5) || ((adc > 7) && (adc < 13))){ // first stage ouput values
 
-        *yValue = -multiplier*([[model timeRate:adc] valueAtIndex:index]-[model baselineVoltage:adc])/[model feedBackResistor:adc];
+    //    *yValue = -multiplier*([[model timeRate:adc] valueAtIndex:index]-[model baselineVoltage:adc])/[model feedBackResistor:adc];
         
         //NSLog(@"channel %d, adc %f , baseline %f, Rf %f, current %f\n", adc, [[model timeRate:adc] valueAtIndex:index], [model baselineVoltage:adc], [model feedBackResistor:adc], *yValue );
+    //}
+    if(adc > 14){
+        
+        if(adc < 20) adc = adc - 15;
+        else adc = adc - 12;
+            
+        *yValue = -multiplier*([[model timeRate:adc] valueAtIndex:index]-[model baselineVoltage:adc])/[model feedBackResistor:adc];
+        
     }
     else
         *yValue = [[model timeRate:adc] valueAtIndex:index];
