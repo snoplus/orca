@@ -3478,7 +3478,7 @@
 												<object class="NSTextFieldCell" key="NSCell" id="194847307">
 													<int key="NSCellFlags">67108864</int>
 													<int key="NSCellFlags2">138412032</int>
-													<string key="NSContents">baseline, ADC0-4</string>
+													<string key="NSContents">Baseline, ADC0-4</string>
 													<reference key="NSSupport" ref="312140822"/>
 													<reference key="NSControlView" ref="833065208"/>
 													<reference key="NSBackgroundColor" ref="941427285"/>
@@ -3498,7 +3498,7 @@
 												<object class="NSTextFieldCell" key="NSCell" id="722852927">
 													<int key="NSCellFlags">67108864</int>
 													<int key="NSCellFlags2">138412032</int>
-													<string key="NSContents">baseline, ADC8-12</string>
+													<string key="NSContents">Baseline, ADC8-12</string>
 													<reference key="NSSupport" ref="312140822"/>
 													<reference key="NSControlView" ref="409226366"/>
 													<reference key="NSBackgroundColor" ref="941427285"/>
@@ -4056,14 +4056,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">plotter1</string>
-						<reference key="source" ref="517384902"/>
-						<reference key="destination" ref="337822817"/>
-					</object>
-					<int key="connectionID">2467</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
 						<string key="label">plotter2</string>
 						<reference key="source" ref="517384902"/>
 						<reference key="destination" ref="883463749"/>
@@ -4136,11 +4128,19 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">plotter5</string>
+						<string key="label">plotter1</string>
 						<reference key="source" ref="517384902"/>
 						<reference key="destination" ref="302140500"/>
 					</object>
-					<int key="connectionID">2528</int>
+					<int key="connectionID">2530</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">plotter5</string>
+						<reference key="source" ref="517384902"/>
+						<reference key="destination" ref="337822817"/>
+					</object>
+					<int key="connectionID">2531</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -7015,7 +7015,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">2528</int>
+			<int key="maxID">2531</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">

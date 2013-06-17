@@ -41,8 +41,9 @@
 
 - (int) tagToAdc:(int)aTag
 {
-    if(aTag>=0 && aTag<16){
-        int tagConversion[16] = {0,1,2,3,4,8,9,10,11,12,7,15,5,6,13,14};
+    if(aTag>=0 && aTag<26){
+        //int tagConversion[16] = {0,1,2,3,4,8,9,10,11,12,7,15,5,6,13,14};
+        int tagConversion[26] = {0,1,2,3,4,8,9,10,11,12,7,15,5,6,13,14,15,16,17,18,19,20,21,22,23,24};
         return tagConversion[aTag];
     }
     else return 0;
@@ -50,8 +51,8 @@
 
 - (NSString*) nameForTag:(int)aTag
 {
-    if(aTag>=0 && aTag<16){
-        NSString* tagString[16] = {
+    if(aTag>=0 && aTag<26){
+        NSString* tagString[26] = {
             @"Adc0",
             @"Adc1",
             @"Adc2",
@@ -67,7 +68,17 @@
             @"Adc5",
             @"Adc6",
             @"Adc13",
-            @"Adc14"
+            @"Adc14",
+            @"leakage0",
+            @"leakage1",
+            @"leakage2",
+            @"leakage3",
+            @"leakage4",
+            @"leakage8",
+            @"leakage9",
+            @"leakage10",
+            @"leakage11",
+            @"leakage12"
         };
         return tagString[aTag];
     }
@@ -99,22 +110,21 @@
  		[[feedBackResistorMatrix cellAtRow:chan column:0] setTag:chan];
 	}
     
+    //[[plotter0 yAxis] setRngLimitsLow:-300.0 withHigh:500 withMinRng:4];
     [[plotter0 yAxis] setRngLow:0.0 withHigh:300.];
-	//[[plotter0 yAxis] setRngLimitsLow:-300.0 withHigh:500 withMinRng:4];
-    [[plotter0 yAxis] setRngLimitsLow:0.0 withHigh:150 withMinRng:4]; // up to 150 pA leakage current - niko
+    [[plotter0 yAxis] setRngLimitsLow:-15. withHigh:0. withMinRng:4]; // rail of preamp at -11V - niko
     [[plotter1 yAxis] setRngLow:0.0 withHigh:300.];
-    [[plotter1 yAxis] setRngLimitsLow:0.0 withHigh:150 withMinRng:4]; // up to 150 pA leakage current - niko
+    [[plotter1 yAxis] setRngLimitsLow:-15. withHigh:0. withMinRng:4]; // rail of preamp at -11V - niko
     [[plotter2 yAxis] setRngLow:0.0 withHigh:300.];
     [[plotter2 yAxis] setRngLimitsLow:0.0 withHigh:60 withMinRng:4]; // up to 60 degrees on chip - niko
     [[plotter3 yAxis] setRngLow:0.0 withHigh:300.];
     [[plotter3 yAxis] setRngLimitsLow:-30. withHigh:30. withMinRng:4]; // up to +/-24V - niko
-    
     [[plotter4 yAxis] setRngLow:0.0 withHigh:300.];
-    [[plotter4 yAxis] setRngLimitsLow:-15. withHigh:0. withMinRng:4]; // rail of preamp at -11V - niko
+    [[plotter4 yAxis] setRngLimitsLow:0.0 withHigh:150 withMinRng:4]; // up to 150 pA leakage current - niko
     [[plotter5 yAxis] setRngLow:0.0 withHigh:300.];
-    [[plotter5 yAxis] setRngLimitsLow:-15. withHigh:0. withMinRng:4]; // rail of preamp at -11V - niko
+    [[plotter5 yAxis] setRngLimitsLow:0.0 withHigh:150 withMinRng:4]; // up to 150 pA leakage current - niko
+
    
-    
     [[plotter0 xAxis] setRngLow:0.0 withHigh:10000];
 	[[plotter0 xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
     [[plotter1 xAxis] setRngLow:0.0 withHigh:10000];
@@ -123,12 +133,11 @@
 	[[plotter2 xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
     [[plotter3 xAxis] setRngLow:0.0 withHigh:10000];
 	[[plotter3 xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
-    
     [[plotter4 xAxis] setRngLow:0.0 withHigh:10000];
 	[[plotter4 xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
     [[plotter5 xAxis] setRngLow:0.0 withHigh:10000];
 	[[plotter5 xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
-	
+    
 	NSColor* color[5] = {
 		[NSColor redColor],
 		[NSColor greenColor],
@@ -177,7 +186,6 @@
 		[aPlot release];
         tag++;
 	}
-    
     for(i=0;i<5;i++){
 		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:tag andDataSource:self];
 		[plotter0 addPlot: aPlot];
@@ -198,16 +206,13 @@
 	}
 
 
-	
-	//[plotter0 setShowLegend:YES];
-	//[plotter1 setShowLegend:YES];
     [plotter0 setShowLegend:YES];
 	[plotter1 setShowLegend:YES];
 	[plotter2 setShowLegend:YES];
 	[plotter3 setShowLegend:YES];
-    
     [plotter4 setShowLegend:YES];
 	[plotter5 setShowLegend:YES];
+    
 }
 
 - (void) setModel:(id)aModel
@@ -416,6 +421,21 @@
 	
 	if(aNotification == nil || [aNotification object] == [plotter3 yAxis]){
 		[model setMiscAttributes:[(ORAxis*)[plotter3 yAxis]attributes] forKey:@"YAttributes3"];
+	};
+    
+    if(aNotification == nil || [aNotification object] == [plotter4 xAxis]){
+		[model setMiscAttributes:[(ORAxis*)[plotter4 xAxis]attributes] forKey:@"XAttributes4"];
+	};
+	
+	if(aNotification == nil || [aNotification object] == [plotter4 yAxis]){
+		[model setMiscAttributes:[(ORAxis*)[plotter4 yAxis]attributes] forKey:@"YAttributes4"];
+	};
+    if(aNotification == nil || [aNotification object] == [plotter5 xAxis]){
+		[model setMiscAttributes:[(ORAxis*)[plotter5 xAxis]attributes] forKey:@"XAttributes5"];
+	};
+	
+	if(aNotification == nil || [aNotification object] == [plotter5 yAxis]){
+		[model setMiscAttributes:[(ORAxis*)[plotter5 yAxis]attributes] forKey:@"YAttributes5"];
 	};
 }
 
