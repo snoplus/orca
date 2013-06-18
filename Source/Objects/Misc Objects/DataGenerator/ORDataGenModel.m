@@ -218,7 +218,7 @@
         unsigned long aValue = (100*chan) + ((random()%500 + random()%500 + random()%500+ random()%500)/4);
         if(card==0 && chan ==0)aValue = 100;
         unsigned long data[3];
-        data[0] = dataId1D | 3;
+        data[0] = dataId1D | 2;
         data[1] = (card<<16) | (chan << 12) | (aValue & 0x0fff);
         [aDataPacket addLongsToFrameBuffer:data length:2];
 
@@ -244,7 +244,7 @@
 		int toggle = 0;
 		for(i=0;i<2048;i++){
 			count++;
-			data[i] = (50+(long)(a*sinf(radians) + b*sinf(2*radians))) & 0x0fffffff;
+			data[i+2] = (50+(long)(a*sinf(radians) + b*sinf(2*radians))) & 0x0fffffff;
 			if(i<512)data[i]  |= 0x10000000;
 			if(i<1024)data[i] |= 0x20000000;
 			if(i<1563)data[i] |= 0x40000000;
@@ -255,18 +255,18 @@
 			if(toggle)data[i] |= 0x80000000;
 			radians += delta;
 		}
-        [aDataPacket addLongsToFrameBuffer:data length:2048];
+        [aDataPacket addLongsToFrameBuffer:data length:2050];
 
-        data[0] = dataIdWaveform | (2050+2);
+        data[0] = dataIdWaveform | 2050;
         data[1] = 0x00001000; //card 0, chan 1
         [aDataPacket addLongsToFrameBuffer:data length:2];
 		radians = 0;
 		delta = 2*3.141592/360.;
 		for(i=0;i<2048;i++){
-			data[i] = 50+(long)(a*sinf(4*radians));
+			data[i+2] = 50+(long)(a*sinf(4*radians));
 			radians += delta;
 		}
-        [aDataPacket addLongsToFrameBuffer:data length:2048];
+        [aDataPacket addLongsToFrameBuffer:data length:2050];
 
 	}
 }
