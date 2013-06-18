@@ -31,7 +31,6 @@
 	BOOL isConnected;
 	unsigned long byteCount;
 	NetSocket* socket;
-    NSConditionLock* timeToStopProcessThread;
 
     BOOL threadRunning;
     NSMutableData* dataToProcess;
@@ -46,6 +45,7 @@
 	NSMutableArray* dataArray;
 	BOOL runEnded;
 	BOOL scheduledForUpdate;
+    BOOL timeToQuit;
 }
 
 #pragma mark ***Initialization

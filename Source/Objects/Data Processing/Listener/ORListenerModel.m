@@ -69,7 +69,6 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
-	[timeToStopProcessThread release];
 	[remoteHost release];
     [socket setDelegate:nil];
 	[socket release];
@@ -372,24 +371,19 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
     if(![socket isConnected])return;
 	
 	BOOL flushMessagePrintedOnce = NO;
-    BOOL timeToQuit              = NO;
     threadRunning                = YES;
     do {
         NSAutoreleasePool *pool = [[NSAutoreleasePool allocWithZone:nil] init];
         @synchronized(self){
             [self processDataBuffer];
 
-            if([timeToStopProcessThread condition]){
+            if(timeToQuit){
                 unsigned long numBytesLeft = [dataToProcess length];
                 if(!flushMessagePrintedOnce){
-                    if(numBytesLeft){
-                        NSLog(@"flushing %d bytes from listening queue\n",numBytesLeft);
-                    }
+                    if(numBytesLeft) NSLog(@"flushing %d bytes from listening queue\n",numBytesLeft);
                     flushMessagePrintedOnce = YES;						
                 }
-                if(numBytesLeft == 0){
-                    timeToQuit = YES;
-                }
+                if(numBytesLeft == 0)break;
             }
         }
         [NSThread sleepForTimeInterval:.01];
@@ -422,9 +416,13 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
                         runDataID = [[currentDecoder headerObject:@"dataDescription",@"ORRunModel",@"Run",@"dataId",nil] longValue];
 						id nextObject = [self objectConnectedTo:ORListenerConnector];
 						[nextObject runTaskStarted:runInfo];
+                        [dataArray addObject:[NSData dataWithBytes:p length:recordLength*sizeof(long)]];
+
 						firstTime = NO;
                         p += recordLength;
                         bytesProcessed = recordLength*sizeof(long);
+                        longsInBuffer -= recordLength;
+
 					}
                     else break;
 				}
@@ -445,17 +443,19 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 					needToSwap = [currentDecoder needToSwap];
 					runDataID = [[currentDecoder headerObject:@"dataDescription",@"ORRunModel",@"Run",@"dataId",nil] longValue];
 				}
-				else if(dataId == runDataID){
-					[self processRunRecord:p];
-				}
+				else if(dataId == runDataID)[self processRunRecord:p];
 				
 				[dataArray addObject:[NSData dataWithBytes:p length:recordLength*sizeof(long)]];
 				
-				p += recordLength;
-				bytesProcessed += recordLength*sizeof(long);
-				longsInBuffer -= recordLength;
+				p               += recordLength;
+				bytesProcessed  += recordLength * sizeof(long);
+				longsInBuffer   -= recordLength;
 				if(runEnded)break;
 			}
+            else if(timeToQuit){
+                [dataToProcess release];
+                dataToProcess = nil;
+            }
 			else break;
 		}
 
@@ -478,10 +478,8 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 - (void) startProcessing
 {
     if(!threadRunning && [socket isConnected]){
+        timeToQuit  = NO;
         [self setByteCount:0];
-        //set up the process thread control lock
-        if( timeToStopProcessThread ) [ timeToStopProcessThread release ];
-        timeToStopProcessThread  = [[ NSConditionLock alloc ] initWithCondition: NO ];
         [NSThread detachNewThreadSelector:@selector(processDataFromQueue) toTarget:self withObject:nil];
     }        
 }
@@ -489,8 +487,8 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 - (void) stopProcessing
 {
     if(threadRunning){
-        [timeToStopProcessThread unlockWithCondition: YES];
-        
+        timeToQuit = YES;
+
         //....wait for processing to finish.....
         //wait for the processing thread to exit.
         NSTimeInterval t0 = [NSDate timeIntervalSinceReferenceDate];
