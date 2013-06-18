@@ -922,7 +922,7 @@
         
         //NSLog(@"channel %d, adc %f , baseline %f, Rf %f, current %f\n", adc, [[model timeRate:adc] valueAtIndex:index], [model baselineVoltage:adc], [model feedBackResistor:adc], *yValue );
     //}
-    if(adc > 14){
+    if(adc > 15){
         
         if(adc < 20) adc = adc - 16;
         else adc = adc - 13;
