@@ -218,7 +218,7 @@
         unsigned long aValue = (100*chan) + ((random()%500 + random()%500 + random()%500+ random()%500)/4);
         if(card==0 && chan ==0)aValue = 100;
         unsigned long data[3];
-        data[0] = dataId1D | 2;
+        data[0] = dataId1D | 3;
         data[1] = (card<<16) | (chan << 12) | (aValue & 0x0fff);
         [aDataPacket addLongsToFrameBuffer:data length:2];
 
