@@ -1926,7 +1926,7 @@
         NSTextField* aTextField = [[inputFields objectForKey:aKey] objectForKey:@"textField"];
         NSString* aClassName    = [[inputFields objectForKey:aKey] objectForKey:@"className"];
         id newValue= [aTextField stringValue];
-        if([aClassName isEqualToString:@"NSDecimalNumber"])newValue = [[NSDecimalNumber alloc] initWithString:newValue];
+        if([aClassName isEqualToString:@"NSDecimalNumber"])newValue = [[[NSDecimalNumber alloc] initWithString:newValue]autorelease];
         if(newValue) [delegate setValue:newValue forSymbol:aKey];
     }
 
