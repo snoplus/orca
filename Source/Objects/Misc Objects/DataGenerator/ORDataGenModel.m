@@ -241,9 +241,9 @@
 		 short b = random()%20;
 		int count = 0;
 		int toggle = 0;
-		for(i=0;i<2048;i++){
+		for(i=2;i<2050;i++){
 			count++;
-			data[i+2] = (50+(long)(a*sinf(radians) + b*sinf(2*radians))) & 0x0fffffff;
+			data[i] = (50+(long)(a*sinf(radians) + b*sinf(2*radians))) & 0x0fffffff;
 			if(i<512)data[i]  |= 0x10000000;
 			if(i<1024)data[i] |= 0x20000000;
 			if(i<1563)data[i] |= 0x40000000;
@@ -260,8 +260,8 @@
         data[1] = 0x00001000; //card 0, chan 1
 		radians = 0;
 		delta = 2*3.141592/360.;
-		for(i=0;i<2048;i++){
-			data[i+2] = 50+(long)(a*sinf(4*radians));
+		for(i=2;i<2050;i++){
+			data[i] = 50+(long)(a*sinf(4*radians));
 			radians += delta;
 		}
         [aDataPacket addLongsToFrameBuffer:data length:2050];
