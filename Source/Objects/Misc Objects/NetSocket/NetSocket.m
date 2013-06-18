@@ -1045,14 +1045,19 @@ static void _cfsocketCallback( CFSocketRef inCFSocketRef, CFSocketCallBackType i
     // If our outgoing buffer is empty, notify our delegate
     unsigned long len = [mOutgoingBuffer length];
     if( len == 0 ){
-		if( [mDelegate respondsToSelector:@selector( netsocketDataSent:length: )] )
+		if( [mDelegate respondsToSelector:@selector( netsocketDataSent:length: )] ){
 			[mDelegate netsocketDataSent:self length:amountSent];
-    
+        }
     }
-    if( [mDelegate respondsToSelector:@selector( netsocketDataInOutgoingBuffer:length: )] )
-        [mDelegate netsocketDataInOutgoingBuffer:self length:len];
-    if( [mDelegate respondsToSelector:@selector( netsocket:status: )] )
-        [mDelegate netsocket:self status:mBufferStatus];
+    if( [mDelegate respondsToSelector:@selector( netsocketDataInOutgoingBuffer:length: )] ){
+            [mDelegate netsocketDataInOutgoingBuffer:self length:len];
+    }
+    if(mBufferStatus!=mOldBufferStatus){
+        if( [mDelegate respondsToSelector:@selector( netsocket:status: )] ){
+            [mDelegate netsocket:self status:mBufferStatus];
+        }
+        mOldBufferStatus = mBufferStatus;
+    }
    
 
 	[mLock unlock];

@@ -22,6 +22,7 @@
 	NSMutableData*   mIncomingBuffer;
 	NSRecursiveLock* mLock;
     int              mBufferStatus;
+    int              mOldBufferStatus;
 }
 
 // Creation
