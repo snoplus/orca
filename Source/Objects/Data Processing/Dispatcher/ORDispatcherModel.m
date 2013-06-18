@@ -389,12 +389,14 @@ NSString* ORDispatcherLock                      = @"ORDispatcherLock";
 - (void) processData:(NSArray*)dataArray decoder:(ORDecoder*)aDecoder;
 {
 	if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
-        for(ORDispatcherClient* aClient in clients){
-            for(id d in dataArray){
+        for(id d in dataArray){
+            for(ORDispatcherClient* aClient in clients){
                 if([aClient socketStatus] != kNetSocketBlocked){
                     [aClient writeData:d];
                 }
+                else [aClient setAmountBlocked:[d length]];
             }
+
         }
 	}    
 }
