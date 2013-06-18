@@ -43,7 +43,7 @@
 {
     if(aTag>=0 && aTag<26){
         //int tagConversion[16] = {0,1,2,3,4,8,9,10,11,12,7,15,5,6,13,14};
-        int tagConversion[26] = {0,1,2,3,4,8,9,10,11,12,7,15,5,6,13,14,15,16,17,18,19,20,21,22,23,24};
+        int tagConversion[26] = {0,1,2,3,4,8,9,10,11,12,7,15,5,6,13,14,16,17,18,19,20,21,22,23,24,25};
         return tagConversion[aTag];
     }
     else return 0;
@@ -924,8 +924,8 @@
     //}
     if(adc > 14){
         
-        if(adc < 20) adc = adc - 15;
-        else adc = adc - 12;
+        if(adc < 20) adc = adc - 16;
+        else adc = adc - 13;
             
         *yValue = -multiplier*([[model timeRate:adc] valueAtIndex:index]-[model baselineVoltage:adc])/[model feedBackResistor:adc];
         
