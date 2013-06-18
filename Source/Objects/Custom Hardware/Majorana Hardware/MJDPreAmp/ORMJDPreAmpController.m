@@ -188,7 +188,7 @@
 	}
     for(i=0;i<5;i++){
 		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:tag andDataSource:self];
-		[plotter0 addPlot: aPlot];
+		[plotter4 addPlot: aPlot];
 		[aPlot setLineColor:color[i]];
 		[aPlot setName:[self nameForTag:tag]];
 		[(ORTimeAxis*)[plotter4 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
@@ -197,7 +197,7 @@
 	}
     for(i=0;i<5;i++){
 		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:tag andDataSource:self];
-		[plotter0 addPlot: aPlot];
+		[plotter5 addPlot: aPlot];
 		[aPlot setLineColor:color[i]];
 		[aPlot setName:[self nameForTag:tag]];
 		[(ORTimeAxis*)[plotter5 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
@@ -922,16 +922,23 @@
         
         //NSLog(@"channel %d, adc %f , baseline %f, Rf %f, current %f\n", adc, [[model timeRate:adc] valueAtIndex:index], [model baselineVoltage:adc], [model feedBackResistor:adc], *yValue );
     //}
-    if(adc > 15){
+    
+    
+    //if(adc > 15){
         
-        if(adc < 20) adc = adc - 16;
-        else adc = adc - 13;
+    //    if(adc < 21) adc = adc - 16;
+    //    else adc = adc - 13;
             
-        *yValue = -multiplier*([[model timeRate:adc] valueAtIndex:index]-[model baselineVoltage:adc])/[model feedBackResistor:adc];
-        
-    }
-    else
-        *yValue = [[model timeRate:adc] valueAtIndex:index];
+    //    *yValue = -multiplier*([[model timeRate:adc] valueAtIndex:index]-[model baselineVoltage:adc])/[model feedBackResistor:adc];
+    //}
+    //else
+    //    *yValue = [[model timeRate:adc] valueAtIndex:index];
+    
+    
+    if(adc > 15) *yValue = 100.;
+    else *yValue = [[model timeRate:adc] valueAtIndex:index];
+    
+    
        
 }
 @end
