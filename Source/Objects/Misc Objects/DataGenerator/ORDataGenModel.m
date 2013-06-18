@@ -234,7 +234,6 @@
 		unsigned long data[2050];
         data[0] = dataIdWaveform | (2048+2);
         data[1] = 0; //card 0, chan 0
-        [aDataPacket addLongsToFrameBuffer:data length:2];
 		int i;
 		float radians = 0;
 		float delta = 2*3.141592/360.;
@@ -259,7 +258,6 @@
 
         data[0] = dataIdWaveform | 2050;
         data[1] = 0x00001000; //card 0, chan 1
-        [aDataPacket addLongsToFrameBuffer:data length:2];
 		radians = 0;
 		delta = 2*3.141592/360.;
 		for(i=0;i<2048;i++){
