@@ -924,21 +924,27 @@
     //}
     
     
-    //if(adc > 15){
+    if(adc > 15){
         
-    //    if(adc < 21) adc = adc - 16;
-    //    else adc = adc - 13;
-            
-    //    *yValue = -multiplier*([[model timeRate:adc] valueAtIndex:index]-[model baselineVoltage:adc])/[model feedBackResistor:adc];
-    //}
-    //else
-    //    *yValue = [[model timeRate:adc] valueAtIndex:index];
+        if(adc < 21) //adc = adc - 16;
+            //*yValue = -multiplier*([[model timeRate:adc] valueAtIndex:index]-[model baselineVoltage:adc-16])/[model feedBackResistor:adc-16];
+            *yValue = 100.;
+        else //adc = adc - 13;            
+            //*yValue = -multiplier*([[model timeRate:adc] valueAtIndex:index]-[model baselineVoltage:adc-13])/[model feedBackResistor:adc-13];
+            *yValue = 100.;
+    }
+    else
+        *yValue = [[model timeRate:adc] valueAtIndex:index];
+        
     
     
-    if(adc > 15) *yValue = 100.;
-    else *yValue = [[model timeRate:adc] valueAtIndex:index];
+
     
+    //if(adc > 15) *yValue = 100.;
+    //else *yValue = [[model timeRate:adc] valueAtIndex:index];
     
+    //NSLog(@"channel %d, adc %f , baseline %f, Rf %f, current %f\n", adc, [[model timeRate:adc] valueAtIndex:index], [model baselineVoltage:adc], [model feedBackResistor:adc], *yValue );
+
        
 }
 @end

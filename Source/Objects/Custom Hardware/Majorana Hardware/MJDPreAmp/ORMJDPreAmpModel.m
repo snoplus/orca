@@ -108,7 +108,7 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
     [adcs release];
     [dacs release];
 	int i;
-	for(i=0;i<16;i++){
+	for(i=0;i<26;i++){
 		[timeRates[i] release];
 	}
     for(i=0;i<2;i++){
@@ -915,7 +915,7 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 	
     if(!dacs || !amplitudes || !feedBackResistors || !baselineVoltages)	[self setUpArrays];
 
-    for(i=0;i<16;i++)timeRates[i] = [[ORTimeRate alloc] init];
+    for(i=0;i<26;i++)timeRates[i] = [[ORTimeRate alloc] init];
 
     [[self undoManager] enableUndoRegistration];
     
