@@ -180,10 +180,10 @@
 			
 			[aDataPacket addLongsToFrameBuffer:data length:3];	
 		}
-		nextBurst = [burstTimer microseconds] + random_range(1,1000000);
+		nextBurst = [burstTimer microseconds] + random_range(1000000,10000000);
 	}
 	
-     if(random()%500 > 480 ){
+     if(random()%500 > 450 ){
         
 		 NSDate* now = [NSDate date];
 		 if([now timeIntervalSinceDate:lastTime] >= 1){
@@ -229,7 +229,7 @@
         data[2] = (aValue & 0x0fff);
         [aDataPacket addLongsToFrameBuffer:data length:3];
     }
-	if(random()%500 > 495 ){
+	if(random()%500 > 498 ){
 		 
 		unsigned long data[2050];
         data[0] = dataIdWaveform | (2048+2);
