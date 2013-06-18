@@ -22,7 +22,6 @@
 
 #pragma mark ***Forward Declarations
 @class NetSocket;
-@class ORSafeQueue;
 @class ORDecoder;
 
 @interface ORListenerModel : ORDataChainObject
@@ -33,11 +32,8 @@
 	unsigned long byteCount;
 	NetSocket* socket;
     NSConditionLock* timeToStopProcessThread;
-    NSLock* readingLock;
 
     BOOL threadRunning;
-	unsigned long queueCount;
-	ORSafeQueue* transferQueue;
     NSMutableData* dataToProcess;
     BOOL docLoaded;
 	BOOL autoReconnect;
@@ -66,10 +62,6 @@
 - (void) setConnectAtStart:(BOOL)aConnectAtStart;
 - (BOOL) autoReconnect;
 - (void) setAutoReconnect:(BOOL)aAutoReconnect;
-- (ORSafeQueue*) transferQueue;
-- (void) setTransferQueue:(ORSafeQueue*)aTransferQueue;
-- (unsigned long) queueCount;
-- (void) setQueueCount:(unsigned long)aQueueCount;
 - (NetSocket*) socket;
 - (void) setSocket:(NetSocket*)aSocket;
 

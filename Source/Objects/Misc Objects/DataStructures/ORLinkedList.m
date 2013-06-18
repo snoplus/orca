@@ -218,6 +218,7 @@ instance vars of ORLinkedList:
     
     //is malloc okay in context of obj c??
     newNode = malloc(NODESIZE);
+    if(!newNode)return NO;
     
     //now we do the linking -- a little harder to see when using a struct.
     newNode->data = [obj retain];

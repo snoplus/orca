@@ -137,7 +137,15 @@
     NSString* s = firstKey;
 	id result = [fileHeader objectForKey:s];
 	while((s = va_arg(myArgs, NSString *))) {
-		result = [result objectForKey:s];
+        if([result isKindOfClass:NSClassFromString(@"NSDictionary")]){
+            result = [result objectForKey:s];
+        }
+        else if([result isKindOfClass:NSClassFromString(@"NSArray")]){
+            int index = [s intValue];
+            int count = [result count];
+            if(index<count) result = [result objectAtIndex:index];
+            else result = nil;
+        }
     }
     va_end(myArgs);
 	return result;
@@ -280,6 +288,7 @@
 - (BOOL) legalData:(NSData*)someData
 {
 	unsigned long* p = (unsigned long*)[someData bytes];
+    if(!p)return NO;
 	needToSwap = NO;
 	unsigned long theDataId;
 	if((*p & 0xffff0000) == 0x3C3F0000){
@@ -323,7 +332,14 @@
 	if(needToSwap)	headerLength = CFSwapInt32(headerLength);			
 	p++;	 //point to header itself
 	NSString* theHeader = [[NSString alloc] initWithBytes:p length:headerLength encoding:NSASCIIStringEncoding];
-	[self setFileHeader:[theHeader propertyList]];
+    id plist = nil;
+    @try  {
+        plist = [theHeader propertyList];
+    }
+    @catch (NSException* e){
+        
+    }
+	[self setFileHeader:plist];
 	[theHeader release];
 }
 
