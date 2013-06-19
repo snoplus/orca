@@ -273,7 +273,7 @@ followed by multiplicity data (20 longwords -- 1 pixel mask per card)
  -----------------^^---------------------precision
  --------------------^^^^ ^^-------------number of page in hardware buffer
  ---------------------------^^ ^^^^ ^^^^-readPtr (0..1024)
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx energy
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx numfifo
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx eventFlags
                  ^^^ ^^^^ ^^^^-----------traceStart16 (first trace value in short array, 11 bit, 0..2047)
                                  ^-------append flag is in this record (append to previous record)
@@ -457,7 +457,7 @@ if(eventFlags & 0x1){
     uint32_t subsec         = ptr[3]; // ShiftAndExtract(ptr[1],0,0xffffffff);
     uint32_t chmap          = ptr[4];
     uint32_t eventID        = ptr[5];
-    uint32_t energy         = ptr[6];
+    uint32_t numfifo        = ptr[6];
     uint32_t eventFlags     = ptr[7];
     uint32_t traceStart16 = ShiftAndExtract(eventFlags,8,0x7ff);//start of trace in short array
     
@@ -471,7 +471,7 @@ if(eventFlags & 0x1){
     NSString* chan      = [NSString stringWithFormat:@"Channel    = %lu\n",(*ptr>>8) & 0xf];
     NSString* secStr    = [NSString stringWithFormat:@"Sec        = %d\n", sec];
     NSString* subsecStr = [NSString stringWithFormat:@"SubSec     = %d\n", subsec];
-    NSString* energyStr = [NSString stringWithFormat:@"Energy     = %d\n", energy];
+    NSString* energyStr = [NSString stringWithFormat:@"NumFIFO     = %d\n", numfifo];
     NSString* chmapStr  = [NSString stringWithFormat:@"ChannelMap = 0x%x\n", chmap];
     NSString* eventIDStr= [NSString stringWithFormat:@"ReadPtr,Pg#= %d,%d\n", ShiftAndExtract(eventID,0,0x3ff),ShiftAndExtract(eventID,10,0x3f)];
     NSString* offsetStr = [NSString stringWithFormat:@"Offset16   = %d\n", traceStart16];

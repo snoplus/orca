@@ -31,10 +31,12 @@
 // VERSION_IPE4_HW is 1934 which means IPE4  (1=I, 9=P, 3=E, 4=4)
 // VERSION_IPE4_SW is the version of the readout software (this file)
 #define VERSION_IPE4_HW      1934200
-#define VERSION_IPE4_SW            9
+#define VERSION_IPE4_SW           10
 #define VERSION_IPE4READOUT (VERSION_IPE4_HW + VERSION_IPE4_SW)
 
 /* History:
+version 2: 2013 June
+           multi FIFO on SLT; FLT-Trigger
 version 1: 2013 January
            changed name from ipe4reader6 to ipe4reader;
            added ipe4reader to Orca svn repository
@@ -147,6 +149,45 @@ int kill_ipe4reader_instances(void)
 	return val;
 }
 
+
+   /* 
+     fifoReadsFLTIndex: FIFO-to-FLT mapping
+     --------------------------------------------------------------------*/
+//FIFO-to-FLT mapping 
+int fifoReadsFLTIndexChecker(int fltIndex, int numfifo, int availableNumFIFO, int maxNumFIFO)
+{
+    if(availableNumFIFO==0) return 1;//this was the 'old' firmware: all FLTs to one FIFO (however, 'availableNumFIFO' should be 1)
+    
+    if(availableNumFIFO==1){
+        if(numfifo==0 && fltIndex>=0 && fltIndex<maxNumFIFO)
+            return 1;
+        else
+            return 0;
+    }
+    
+    if(availableNumFIFO==8){//mapping: fifo0=FLT0,1; fifo1=FLT2,3; fifo2=FLT4,5; fifo3=FLT6,7; ...
+        if(fltIndex>=0 && fltIndex<maxNumFIFO){
+            return (fltIndex >>1) == numfifo;
+        }else
+            return 0;
+    }
+    
+    if(availableNumFIFO==4){//mapping: fifo0=FLT0,1,2,3; fifo1=FLT4,5,6,7; fifo2=FLT8,9,10,11; fifo3=FLT12,13,14,15
+        if(fltIndex>=0 && fltIndex<maxNumFIFO){
+            return (fltIndex >> 2) == numfifo;
+        }else
+            return 0;
+    }
+    
+    if(availableNumFIFO==2){//mapping: fifo0=FLT0,1,2,3,4,5,6,7; fifo1=FLT8,9,10,11,12,13,14,15
+        if(fltIndex>=0 && fltIndex<maxNumFIFO){
+            return (fltIndex >> 3) == numfifo;
+        }else
+            return 0;
+    }
+    
+    return 0;
+}
 
 /*--------------------------------------------------------------------
   includes
@@ -477,6 +518,10 @@ void sendCommandFifo(unsigned char * buffer, int len)
 	//if(sltSemaphore){	    releaseHWSemaphore();	}
 	releaseHWSemaphoreWith(sltSemaphore);
 }
+
+
+
+
 
 /*--------------------------------------------------------------------
   globals

@@ -47,8 +47,10 @@ enum IpeV4Enum {
 	kSltV4ControlReg,
 	kSltV4StatusReg,
 	kSltV4CommandReg,
-	kSltV4InterruptMaskReg,
-	kSltV4InterruptRequestReg,
+	kSltV4StatusLowReg, //new for rev. 2.00
+	kSltV4StatusHighReg,//new for rev. 2.00
+	//removed for rev. 2.00 kSltV4InterruptMaskReg,
+	//removed for rev. 2.00 kSltV4InterruptRequestReg,
 	//kSltV4RequestSemaphoreReg,
 	kSltV4RevisionReg,
 	kSltV4PixelBusErrorReg,
@@ -56,15 +58,20 @@ enum IpeV4Enum {
 	//kSltV4PixelBusTestReg,
 	//kSltV4AuxBusTestReg,
 	//kSltV4DebugStatusReg,
-kSltV4BBOpenedReg,
-kSltV4SemaphoreReg,
-kSltV4CmdFIFOReg,
-kSltV4CmdFIFOStatusReg,
-kSltV4OperaStatusReg0Reg,
-kSltV4OperaStatusReg1Reg,
-kSltV4OperaStatusReg2Reg,
-kSltV4TimeLowReg,
-kSltV4TimeHighReg,
+    kSltV4FIFOUsedReg,
+    //removed for rev. 2.00 kSltV4BBOpenedReg,
+    kSltV4TestReg,
+    
+    //BB command FIFO + Opera stuff
+    kSltV4SemaphoreReg,
+    kSltV4CmdFIFOReg,
+    kSltV4CmdFIFOStatusReg,
+    kSltV4OperaStatusReg0Reg,
+    kSltV4OperaStatusReg1Reg,
+    kSltV4OperaStatusReg2Reg,
+    
+    kSltV4TimeLowReg,
+    kSltV4TimeHighReg,
 	
 kSltV4EventFIFOReg,
 kSltV4EventFIFOStatusReg,
@@ -118,8 +125,10 @@ static IpeRegisterNamesStruct regV4[kSltV4NumRegs] = {
 {@"Control",			0xa80000,		1,			kIpeRegReadable | kIpeRegWriteable },
 {@"Status",				0xa80004,		1,			kIpeRegReadable },
 {@"Command",			0xa80008,		1,			kIpeRegWriteable },
-{@"Interrupt Mask",		0xA8000C,		1,			kIpeRegReadable | kIpeRegWriteable },
-{@"Interrupt Request",	0xA80010,		1,			kIpeRegReadable },
+{@"Status Low",			0xa80010,		1,			kIpeRegReadable | kIpeRegWriteable },//new for rev. 2.00
+{@"Status High",		0xa80014,		1,			kIpeRegReadable | kIpeRegWriteable },//new for rev. 2.00
+//removed for rev. 2.00 {@"Interrupt Mask",		0xA8000C,		1,			kIpeRegReadable | kIpeRegWriteable },
+//removed for rev. 2.00 {@"Interrupt Request",	0xA80010,		1,			kIpeRegReadable },
 //HEAT {@"Request Semaphore",	0xA80014,		3,			kIpeRegReadable },
 {@"Revision",			0xa80020,		1,			kIpeRegReadable },
 {@"Pixel Bus Error",	0xA80024,		1,			kIpeRegReadable },			
@@ -127,13 +136,17 @@ static IpeRegisterNamesStruct regV4[kSltV4NumRegs] = {
 //HEAT {@"Pixel Bus Test",		0xA8002C, 		1, 			kIpeRegReadable | kIpeRegWriteable },
 //HEAT {@"Aux Bus Test",		0xA80030, 		1, 			kIpeRegReadable | kIpeRegWriteable },
 //HEAT {@"Debug Status",		0xA80034,  		1, 			kIpeRegReadable | kIpeRegWriteable },
-{@"BB Opened",			0xA80034,  		1, 			kIpeRegReadable },
+{@"FIFO Used",			0xA80034,  		1, 			kIpeRegReadable },
+//removed for rev. 2.00 {@"BB Opened",			0xA80034,  		1, 			kIpeRegReadable },
+{@"Test",		    	0xA80038,  		1, 			kIpeRegReadable | kIpeRegWriteable },
+
 {@"Semaphore",			0xB00000,		1,			kIpeRegReadable | kIpeRegWriteable },
 {@"CmdFIFO",			0xB00004,		1,			kIpeRegReadable | kIpeRegWriteable },
 {@"CmdFIFOStatus",		0xB00008,		1,			kIpeRegReadable | kIpeRegWriteable },
 {@"OperaStatusReg0",	0xB0000C,		1,			kIpeRegReadable | kIpeRegWriteable },
 {@"OperaStatusReg1",	0xB00010,		1,			kIpeRegReadable | kIpeRegWriteable },
 {@"OperaStatusReg2",	0xB00014,		1,			kIpeRegReadable | kIpeRegWriteable },
+
 {@"TimeLow",			0xB00018,		1,			kIpeRegReadable },
 {@"TimeHigh",			0xB0001C,		1,			kIpeRegReadable },
 
@@ -214,6 +227,7 @@ typedef struct{
     char adcBufReceivedFlag[2][kMaxNumUDPDataPackets];//flag which marks that this packet was received
     int  hasDataPackets[2];
     int  hasDataBytes[2];
+    int  numfifo[2];
     int  numADCsInDataStream[2];
     
     int isSynchronized,wrIndex, rdIndex;
@@ -387,8 +401,10 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
                     dataReplyThreadData->numDataPackets[*wrIndex]=0;
 
                     //store some infos from status packet in buffer -> added 2013-04: store ALL status packets -tb-
-                    uint32_t numADCsInDataStream=crateStatusBlock->numADCs;
-                    if(numADCsInDataStream>0) NSLog(@"      numADCs In Data Stream: %i \n",numADCsInDataStream);
+                    uint32_t numfifo= (crateStatusBlock->numFIFOnumADCs >> 16) & 0xffff;
+                    uint32_t numADCsInDataStream=crateStatusBlock->numFIFOnumADCs & 0xffff;
+                    if(numADCsInDataStream>0) NSLog(@"  numfifo: %i    numADCs In Data Stream: %i \n",numfifo, numADCsInDataStream);
+                    dataReplyThreadData->numfifo[*wrIndex]=numfifo;
                     dataReplyThreadData->numADCsInDataStream[*wrIndex]=numADCsInDataStream;
                     //    we buffer the whole crate status block ...
                     memcpy(&(dataReplyThreadData->crateStatusBlock[*wrIndex]), crateStatusBlock, sizeof(TypeIpeCrateStatusBlock));
@@ -522,6 +538,9 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
 
 #pragma mark ***External Strings
 
+NSString* OREdelweissSLTModelLowLevelRegInHexChanged = @"OREdelweissSLTModelLowLevelRegInHexChanged";
+NSString* OREdelweissSLTModelStatusRegHighChanged = @"OREdelweissSLTModelStatusRegHighChanged";
+NSString* OREdelweissSLTModelStatusRegLowChanged = @"OREdelweissSLTModelStatusRegLowChanged";
 NSString* OREdelweissSLTModelTakeADCChannelDataChanged = @"OREdelweissSLTModelTakeADCChannelDataChanged";
 NSString* OREdelweissSLTModelTakeRawUDPDataChanged = @"OREdelweissSLTModelTakeRawUDPDataChanged";
 NSString* OREdelweissSLTModelChargeBBFileChanged = @"OREdelweissSLTModelChargeBBFileChanged";
@@ -707,6 +726,44 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 }
 
 #pragma mark •••Accessors
+
+- (int) lowLevelRegInHex
+{
+    return lowLevelRegInHex;
+}
+
+- (void) setLowLevelRegInHex:(int)aLowLevelRegInHex
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setLowLevelRegInHex:lowLevelRegInHex];
+    
+    lowLevelRegInHex = aLowLevelRegInHex;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelLowLevelRegInHexChanged object:self];
+}
+
+- (unsigned long) statusHighReg
+{
+    return statusHighReg;
+}
+
+- (void) setStatusHighReg:(unsigned long)aStatusRegHigh
+{
+    statusHighReg = aStatusRegHigh;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelStatusRegHighChanged object:self];
+}
+
+- (unsigned long) statusLowReg
+{
+    return statusLowReg;
+}
+
+- (void) setStatusLowReg:(unsigned long)aStatusRegLow
+{
+    statusLowReg = aStatusRegLow;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelStatusRegLowChanged object:self];
+}
 
 - (int) takeADCChannelData
 {
@@ -2627,6 +2684,23 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 	return data;
 }
 
+- (unsigned long) readStatusLowReg
+{
+	unsigned long data = [self readReg:kSltV4StatusLowReg];
+//DEBUG OUTPUT:  	NSLog(@"   %@::%@: kSltV4StatusReg: 0x%08x \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),data);//TODO: DEBUG testing ...-tb-
+	[self setStatusLowReg:data];
+	return data;
+}
+
+- (unsigned long) readStatusHighReg
+{
+	unsigned long data = [self readReg:kSltV4StatusHighReg];
+//DEBUG OUTPUT:  	NSLog(@"   %@::%@: kSltV4StatusReg: 0x%08x \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),data);//TODO: DEBUG testing ...-tb-
+	[self setStatusHighReg:data];
+	return data;
+}
+
+
 - (void) printStatusReg
 {
 	unsigned long data = [self readStatusReg];
@@ -2635,6 +2709,33 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 	NSLogFont(aFont,@"IRQ           : 0x%02x\n",ExtractValue(data,kEWStatusIrq,31));
 	NSLogFont(aFont,@"PixErr        : 0x%02x\n",ExtractValue(data,kEWStatusPixErr,16));
 	NSLogFont(aFont,@"FLT0..15 Requ.: 0x%04x\n",ExtractValue(data,0xffff,0));
+}
+
+- (void) printStatusLowHighReg
+{
+//DEBUG OUTPUT:
+  	NSLog(@"   %@::%@: UNDER CONSTRUCTION \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+
+	unsigned long low = [self readStatusLowReg];
+	unsigned long high = [self readStatusHighReg];
+	NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
+	NSLogFont(aFont,@"----Status Low Register %@ is 0x%08x ----\n",[self fullID],low);
+	NSLogFont(aFont,@"FifoReq0..7 Requ.: 0x%04x\n",ExtractValue(low,0xffff,0));
+	NSLogFont(aFont,@"FLTrq           : 0x%02x\n",ExtractValue(low,0x1<<15,15));
+	NSLogFont(aFont,@"FLTto           : 0x%02x\n",ExtractValue(low,0x1<<16,16));
+	NSLogFont(aFont,@"FLTPixErr       : 0x%02x\n",ExtractValue(low,0x1<<17,17));
+	NSLogFont(aFont,@"PPS Err         : 0x%02x\n",ExtractValue(low,0x1<<18,18));
+	NSLogFont(aFont,@"Clock Err       : 0x%02x\n",ExtractValue(low,0xf<<19,19));
+	NSLogFont(aFont,@"GPS Err         : 0x%02x\n",ExtractValue(low,0x1<<23,23));
+	NSLogFont(aFont,@"VTT Err         : 0x%02x\n",ExtractValue(low,0x1<<24,24));
+	NSLogFont(aFont,@"Fan Err         : 0x%02x\n",ExtractValue(low,0x1<<25,25));
+    
+//	NSLogFont(aFont,@"IRQ           : 0x%02x\n",ExtractValue(low,kEWStatusIrq,15));
+//	NSLogFont(aFont,@"PixErr        : 0x%02x\n",ExtractValue(low,kEWStatusPixErr2013,16));
+	NSLogFont(aFont,@"----Status High Register %@ is 0x%08x ----\n",[self fullID],high);
+	NSLogFont(aFont,@"FLT0..19 Requ.: 0x%05x\n",ExtractValue(high,0xfffff,0));
+	NSLogFont(aFont,@"SW IR         : 0x%02x\n",ExtractValue(high,0x1<<31,31));
+
 }
 
 
@@ -2742,7 +2843,7 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 
 //DEBUG OUTPUT: 	NSLog(@"WARNING: %@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
 
-
+#if 0 //deprecated 2013-06 -tb-
 - (void) writeInterruptMask
 {
 	[self writeReg:kSltV4InterruptMaskReg value:interruptMask];
@@ -2778,6 +2879,8 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 		NSLogFont(aFont,@"0x%04x\n",data & 0xffff);
 	}
 }
+#endif
+
 
 - (unsigned long) readHwVersion
 {
@@ -2827,7 +2930,6 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 
 
 	[self writeControlReg];
-	[self writeInterruptMask];
 	[self writePixelBusEnableReg];
 	//-----------------------------------------------
 	//board doesn't appear to start without this stuff
@@ -2871,6 +2973,7 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 	//-----------------------------------------------
 	
 	[self printStatusReg];
+	[self printStatusLowHighReg];
 	[self printControlReg];
 }
 
@@ -2940,6 +3043,7 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
 	
+	[self setLowLevelRegInHex:[decoder decodeIntForKey:@"lowLevelRegInHex"]];
 	[self setTakeADCChannelData:[decoder decodeIntForKey:@"takeADCChannelData"]];
 	[self setTakeRawUDPData:[decoder decodeIntForKey:@"takeRawUDPData"]];
 	[self setChargeBBFile:[decoder decodeObjectForKey:@"chargeBBFile"]];
@@ -3011,6 +3115,7 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 {
 	[super encodeWithCoder:encoder];
 	
+	[encoder encodeInt:lowLevelRegInHex forKey:@"lowLevelRegInHex"];
 	[encoder encodeInt:takeADCChannelData forKey:@"takeADCChannelData"];
 	[encoder encodeInt:takeRawUDPData forKey:@"takeRawUDPData"];
 	[encoder encodeObject:chargeBBFile forKey:@"chargeBBFile"];
@@ -3299,10 +3404,11 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
             //check for data
             int *rdIndex = &(dataReplyThreadData.rdIndex);//we cannot use references, we are in C, not C++
             if(*rdIndex>=0){
-			    NSLog(@"   ReadBuffer:   %i   hasPackets: %i   hasBytes: %i  numADCsInDataStream: %i numStatPak: %i\n",*rdIndex, 
+			    NSLog(@"   ReadBuffer:   %i   hasPackets: %i   hasBytes: %i  numADCsInDataStream: %i numfifo: %i numStatPak: %i\n",*rdIndex, 
                     dataReplyThreadData.hasDataPackets[*rdIndex],
                     dataReplyThreadData.hasDataBytes[*rdIndex],
                     dataReplyThreadData.numADCsInDataStream[*rdIndex],
+                    dataReplyThreadData.numfifo[*rdIndex],
                     dataReplyThreadData.numStatusPackets[*rdIndex]);
             }else{
 			    NSLog(@"   ReadBuffer:   %i   \n",*rdIndex);
@@ -3354,6 +3460,7 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
                     const int MaxUDPPacketSizeBytes=1444;
                     int M=(MaxUDPPacketSizeBytes-4) / 2;//max. number of shorts (1444-4)/2=720
                     int NA=dataReplyThreadData.numADCsInDataStream[*rdIndex];//TODO: take from crate status packet -tb-
+                    int numfifo=dataReplyThreadData.numfifo[*rdIndex];//TODO: take from crate status packet -tb-
                     int     i, j, j_swapit, toffset;
                     int64_t K,t;
                     //for(i=0; i<NA; i++) adcTraceBufCount[*rdIndex][i]=0;
@@ -3441,7 +3548,7 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
 							[theADCTraceData appendBytes:&headerData length:4];		           
                             headerData = i; //event ID
 							[theADCTraceData appendBytes:&headerData length:4];		           
-                            headerData = 234; //energy
+                            headerData = numfifo; //numfifo (was energy)
 							[theADCTraceData appendBytes:&headerData length:4];		           
                             uint32_t eventFlags     = 0;//0 = ADC trace
 							[theADCTraceData appendBytes:&eventFlags length:4];		           

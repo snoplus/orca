@@ -48,6 +48,15 @@
 	IBOutlet   NSTextField* heatChannelsTextField2;
 	IBOutlet   NSTextField* ionChannelsTextField2;
     //IBOutlet NSButton*		settingLockButton;
+	IBOutlet   NSMatrix*    channelNameMatrix;
+	IBOutlet   NSMatrix*    negPosPolarityMatrix;
+	IBOutlet   NSMatrix*    gapMatrix;
+	IBOutlet   NSMatrix*    downSamplingMatrix;
+	IBOutlet   NSMatrix*    shapingLengthMatrix;
+		IBOutlet NSMatrix*		hitRateEnableMatrix;
+		IBOutlet NSPopUpButton*	hitRateLengthPU;
+		IBOutlet NSButton*		hitRateAllButton;
+		IBOutlet NSButton*		hitRateNoneButton;
     
     //BB access tab
 	IBOutlet   NSButton*    writeToBBModeCB;
@@ -85,6 +94,10 @@
 	    IBOutlet NSButton*      fastWriteCB;
 	    IBOutlet NSTextField*   streamMaskTextField;
 		IBOutlet NSMatrix*		streamMaskMatrix;
+	    IBOutlet NSTextField*   heatTriggerMaskTextField;
+		IBOutlet NSMatrix*		heatTriggerMaskMatrix;
+	    IBOutlet NSTextField*   ionTriggerMaskTextField;
+		IBOutlet NSMatrix*		ionTriggerMaskMatrix;
 		
 		IBOutlet NSMatrix*		fiberEnableMaskMatrix;
 		IBOutlet NSMatrix*		BBv1MaskMatrix;
@@ -109,10 +122,6 @@
 		IBOutlet NSMatrix*		gainTextFields;
 		IBOutlet NSMatrix*		thresholdTextFields;
 		IBOutlet NSMatrix*		triggerEnabledCBs;
-		IBOutlet NSMatrix*		hitRateEnabledCBs;
-		IBOutlet NSPopUpButton*	hitRateLengthPU;
-		IBOutlet NSButton*		hitRateAllButton;
-		IBOutlet NSButton*		hitRateNoneButton;
 		IBOutlet NSButton*		triggersAllButton;
 		IBOutlet NSButton*		triggersNoneButton;
 		IBOutlet NSButton*		defaultsButton;
@@ -151,7 +160,11 @@
 		IBOutlet NSTextField* 	regWriteValueTextField;
 		IBOutlet NSButton*		regWriteButton;
 		IBOutlet NSButton*		regReadButton;
+		IBOutlet NSFormatter* 	regWriteValueTextFieldFormatter;
+	    IBOutlet NSPopUpButton* lowLevelRegInHexPU;
 	
+    
+    
 		IBOutlet NSButton*      noiseFloorButton;
 		//offset panel
 		IBOutlet NSPanel*				noiseFloorPanel;
@@ -172,6 +185,10 @@
 - (void) updateButtons;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+- (void) heatTriggerMaskChanged:(NSNotification*)aNote;
+- (void) ionTriggerMaskChanged:(NSNotification*)aNote;
+- (void) triggerParameterChanged:(NSNotification*)aNote;
+- (void) lowLevelRegInHexChanged:(NSNotification*)aNote;
 - (void) writeToBBModeChanged:(NSNotification*)aNote;
 - (void) wCmdArg2Changed:(NSNotification*)aNote;
 - (void) wCmdArg1Changed:(NSNotification*)aNote;
@@ -229,6 +246,7 @@
 - (void) triggerEnabledChanged:(NSNotification*)aNote;
 
 - (void) hitRateLengthChanged:(NSNotification*)aNote;
+- (void) hitRateEnabledMaskChanged:(NSNotification*)aNote;
 - (void) hitRateChanged:(NSNotification*)aNote;
 - (void) scaleAction:(NSNotification*)aNote;
 - (void) updateTimePlot:(NSNotification*)aNote;
@@ -241,6 +259,9 @@
 - (void) selectedChannelValueChanged:(NSNotification*) aNote;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+- (IBAction) heatTriggerMaskTextFieldAction:(id)sender;
+- (IBAction) ionTriggerMaskTextFieldAction:(id)sender;
+- (IBAction) lowLevelRegInHexPUAction:(id)sender;
 - (IBAction) writeToBBModeCBAction:(id)sender;
 - (IBAction) wCmdArg2TextFieldAction:(id)sender;
 - (IBAction) wCmdArg1TextFieldAction:(id)sender;
@@ -289,12 +310,42 @@
 - (void) readFiberDelaysButtonAction:(id)sender;
 - (IBAction) fiberDelaysTextFieldAction:(id)sender;
 - (IBAction) fiberDelaysMatrixAction:(id)sender;
+
 - (IBAction) streamMaskEnableAllAction:(id)sender;
 - (IBAction) streamMaskEnableNoneAction:(id)sender;
 - (IBAction) streamMaskTextFieldAction:(id)sender;
 - (IBAction) streamMaskMatrixAction:(id)sender;
 - (IBAction) writeStreamMaskRegisterButtonAction:(id)sender;
 - (IBAction) readStreamMaskRegisterButtonAction:(id)sender;
+
+- (IBAction) heatTriggerMaskEnableAllAction:(id)sender;
+- (IBAction) heatTriggerMaskEnableNoneAction:(id)sender;
+- (IBAction) heatTriggerMaskTextFieldAction:(id)sender;
+- (IBAction) heatTriggerMaskMatrixAction:(id)sender;
+- (IBAction) writeHeatTriggerMaskRegisterButtonAction:(id)sender;
+- (IBAction) readHeatTriggerMaskRegisterButtonAction:(id)sender;
+
+- (IBAction) ionTriggerMaskEnableAllAction:(id)sender;
+- (IBAction) ionTriggerMaskEnableNoneAction:(id)sender;
+- (IBAction) ionTriggerMaskTextFieldAction:(id)sender;
+- (IBAction) ionTriggerMaskMatrixAction:(id)sender;
+- (IBAction) writeIonTriggerMaskRegisterButtonAction:(id)sender;
+- (IBAction) readIonTriggerMaskRegisterButtonAction:(id)sender;
+
+- (IBAction) readTriggerParametersButtonAction:(id)sender;
+- (IBAction) writeTriggerParametersButtonAction:(id)sender;
+- (IBAction) dumpTriggerParametersButtonAction:(id)sender;
+
+- (IBAction) triggerEnabledMatrixAction:(id)sender;
+- (IBAction) enableAllTriggersAction: (id) sender;
+- (IBAction) enableNoTriggersAction: (id) sender;
+
+- (IBAction) negPosPolarityMatrixAction:(id)sender;
+- (IBAction) gapMatrixAction:(id)sender;
+- (IBAction) downSamplingMatrixAction:(id)sender;
+- (IBAction) shapingLengthMatrixAction:(id)sender;
+
+
 - (IBAction) selectFiberTrigPUAction:(id)sender;
 - (IBAction) BBv1MaskMatrixAction:(id)sender;
 - (IBAction) fiberEnableMaskMatrixAction:(id)sender;
@@ -316,6 +367,7 @@
 - (IBAction) analogOffsetAction:(id)sender;
 - (IBAction) interruptMaskAction:(id)sender;
 - (IBAction) initBoardButtonAction:(id)sender;
+- (IBAction) readAllButtonAction:(id)sender;
 - (IBAction) reportButtonAction:(id)sender;
 - (IBAction) gainAction:(id)sender;
 - (IBAction) triggerEnableAction:(id)sender;
@@ -326,13 +378,12 @@
 - (IBAction) versionAction: (id) sender;
 - (IBAction) testAction: (id) sender;
 - (IBAction) resetAction: (id) sender;
+- (IBAction) hitRateEnableMatrixAction: (id) sender;
 - (IBAction) hitRateLengthAction: (id) sender;
 - (IBAction) hitRateAllAction: (id) sender;
 - (IBAction) hitRateNoneAction: (id) sender;
 - (IBAction) testEnabledAction:(id)sender;
 - (IBAction) statusAction:(id)sender;
-- (IBAction) enableAllTriggersAction: (id) sender;
-- (IBAction) enableNoTriggersAction: (id) sender;
 - (IBAction) readThresholdsGains:(id)sender;
 - (IBAction) writeThresholdsGains:(id)sender;
 - (IBAction) selectRegisterAction:(id) aSender;

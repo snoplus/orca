@@ -12,15 +12,15 @@
 #define kIpeFlt_PageNumber 10		// Page Number          bits 14..10
 #define kIpeFlt_RegId 0				// Register Id          bits 14.. 0
 
+#define kNumEWFLTs   20
 
 
 //TODO: for EW: 6 or 36??? -tb-
-//TODO: remove kNumV4FLTChannels!!!!!!! legacy!!!  -tb-
-//TODO: remove kNumV4FLTChannels!!!!!!! legacy!!!  -tb-
-//TODO: remove kNumV4FLTChannels!!!!!!! legacy!!!  -tb-
-//TODO: remove kNumV4FLTChannels!!!!!!! legacy!!!  -tb-
-//TODO: remove kNumV4FLTChannels!!!!!!! legacy!!!  -tb-
-#define kNumV4FLTChannels 24
+#define kNumEWFLTChannels   36
+#define kNumEWFLTHeatIonChannels   18
+//#define kNumV4FLTChannels 24  //replace by kNumEWFLTHeatIonChannels
+#define kNumEWFLTHeatChannels       6
+#define kNumEWFLTIonChannels       12
 #define kNumEWFLTFibers   6
 #define kNumBBStatusBufferLength32   30
 #define kNumBBStatusBufferLength16   (kNumBBStatusBufferLength32*2)
@@ -46,6 +46,21 @@
 #define kEWFlt_ControlReg_tpix_Shift	6
 #define kEWFlt_ControlReg_tpix_Mask	0x1
 
+// Trigger Parameter register bits
+#define kEWFlt_TriggParReg_Enable_Shift	    15
+#define kEWFlt_TriggParReg_Enable_Mask		0x1
+#define kEWFlt_TriggParReg_Polarity_Shift	13
+#define kEWFlt_TriggParReg_Polarity_Mask	0x3
+#define kEWFlt_TriggParReg_NegPolarity_Shift	14
+#define kEWFlt_TriggParReg_NegPolarity_Mask	   0x1
+#define kEWFlt_TriggParReg_PosPolarity_Shift	13
+#define kEWFlt_TriggParReg_PosPolarity_Mask	   0x1
+#define kEWFlt_TriggParReg_Gap_Shift	    10
+#define kEWFlt_TriggParReg_Gap_Mask	        0x7
+#define kEWFlt_TriggParReg_DownSamp_Shift   8
+#define kEWFlt_TriggParReg_DownSamp_Mask	0x3
+#define kEWFlt_TriggParReg_ShapingL_Shift   0
+#define kEWFlt_TriggParReg_ShapingL_Mask	0xff
 
 
 // Position of the bit fields

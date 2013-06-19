@@ -1436,7 +1436,7 @@ int sendChargeBBStatus(uint32_t prog_status,int numFifo)
                 crateStatusBlock.prog_status         = prog_status;
                 crateStatusBlock.internal_error_info = 0;
                 crateStatusBlock.ipe4reader_status   = FIFOREADER::State;
-                crateStatusBlock.numADCs = 0;
+                crateStatusBlock.numFIFOnumADCs = 0;
                 crateStatusBlock.spare2 = 2;
                 //append status to payload
                 statusScheduler.appendDataSendIfFull((char*)&crateStatusBlock,sizeof(crateStatusBlock));
@@ -3024,7 +3024,7 @@ int FIFOREADER::writeToAsciiFile(const char *buf, size_t n, int udpdataSec)
 
 
 /*--------------------------------------------------------------------
- *    macro used in:     FIFOREADER::scanFIFObuffer
+ *    function used in:     FIFOREADER::scanFIFObuffer
  *    purpose:      scan scan status bits in ADC data
  *    author:       Till Bergmann, 2011
  *
@@ -3033,7 +3033,7 @@ int FIFOREADER::writeToAsciiFile(const char *buf, size_t n, int udpdataSec)
 //make it global: is 3 for BB2, 2 for BBv21 mode!!!!!!!!!! -tb-
 //int	Nb_mots_lecture=3;					//marche pour un seul bolo	// nombre de mots total relut dans les data de la fifo:   -tb- d.h. Anzahl 32-bit-Worte(FIFO-Worte) pro (Time-)Sample (Sample=alle ADC-Kanaele
 
-int rereadNumADCsInDataStream()
+int FIFOREADER::rereadNumADCsInDataStream()
 {
                 int numADCsInDataStream = 0;
                 int currPixBusEnable = 0;
@@ -3044,7 +3044,7 @@ int rereadNumADCsInDataStream()
 	              //FLT
 	              for(flt=0; flt<20; flt++){
                       ADCsinFLT[flt]=0;
-	                  if( (presentFLTMap & bit[flt])  &&   (currPixBusEnable & bit[flt])){//if FLT is present AND FLT set in pixbusenable reg ...
+	                  if( fifoReadsFLTIndex(flt) && (presentFLTMap & bit[flt])  &&   (currPixBusEnable & bit[flt])){//if FLT is present AND FLT set in pixbusenable reg ...
 	                      //printf("populateIPECrateStatusPacket: FLT %i is present\n",flt);
 						  StreamMask_1[flt]= pbus->read(FLTStreamMask_1Reg(flt+1));
 						  StreamMask_2[flt]= pbus->read(FLTStreamMask_2Reg(flt+1));
@@ -3066,6 +3066,45 @@ int rereadNumADCsInDataStream()
 	              }
                   //printf("counting ADC channels: total sum #ADCs: %i\n",numADCsInDataStream);
     return numADCsInDataStream;
+}
+
+int FIFOREADER::fifoReadsFLTIndex(int fltIndex)
+{
+    return fifoReadsFLTIndexChecker(fltIndex, numfifo, availableNumFIFO, maxNumFIFO);
+#if 0
+    //this is now in ipe4tbtools.h/.cpp as int fifoReadsFLTIndexChecker(int fltIndex, int numfifo, int availableNumFIFO, int maxNumFIFO); -tb-
+    if(availableNumFIFO==0) return 1;//this was the 'old' firmware: all FLTs to one FIFO (however, 'availableNumFIFO' should be 1)
+    
+    if(availableNumFIFO==1){
+        if(numfifo==0 && fltIndex>=0 && fltIndex<maxNumFIFO)
+            return 1;
+        else
+            return 0;
+    }
+    
+    if(availableNumFIFO==8){//mapping: fifo0=FLT0,1; fifo1=FLT2,3; fifo2=FLT4,5; fifo3=FLT6,7; ...
+        if(fltIndex>=0 && fltIndex<maxNumFIFO){
+            return (fltIndex >>1) == numfifo;
+        }else
+            return 0;
+    }
+    
+    if(availableNumFIFO==4){//mapping: fifo0=FLT0,1,2,3; fifo1=FLT4,5,6,7; fifo2=FLT8,9,10,11; fifo3=FLT12,13,14,15
+        if(fltIndex>=0 && fltIndex<maxNumFIFO){
+            return (fltIndex >> 2) == numfifo;
+        }else
+            return 0;
+    }
+    
+    if(availableNumFIFO==2){//mapping: fifo0=FLT0,1,2,3,4,5,6,7; fifo1=FLT8,9,10,11,12,13,14,15
+        if(fltIndex>=0 && fltIndex<maxNumFIFO){
+            return (fltIndex >> 3) == numfifo;
+        }else
+            return 0;
+    }
+    
+    return 0;
+#endif
 }
 
 /*--------------------------------------------------------------------
@@ -3375,7 +3414,7 @@ void FIFOREADER::scanFIFObuffer(void)
                 crateStatusBlock.prog_status         = 0;
                 crateStatusBlock.internal_error_info = 0;
                 crateStatusBlock.ipe4reader_status   = FIFOREADER::State;
-                crateStatusBlock.numADCs = numADCsInDataStream;
+                crateStatusBlock.numFIFOnumADCs = ((numfifo & 0xffff)<<16) | (numADCsInDataStream & 0xffff);
                 crateStatusBlock.spare2 = 2;
                 //append status to payload
                 statusScheduler.appendDataSendIfFull((char*)&crateStatusBlock,sizeof(crateStatusBlock));
@@ -3722,7 +3761,7 @@ void FIFOREADER::readFIFOtoFIFObuffer(void)
         //printf("   *3**FIFOStatusTSPtr: %u synchroWordPosHint: %i   (synchroWordPosHint - currentBlockSize)   %i ((synchroWordPosHint - currentBlockSize) <= 0)%i***\n",FIFOStatusTSPtr,synchroWordPosHint,(synchroWordPosHint - currentBlockSize), ((synchroWordPosHint - currentBlockSize) <= 0));//DEBUG output -tb-
         }
 
-        #if 0
+        #if 1
         //use DMA
         pbus->readBlock(FIFOAddr(numfifo), (unsigned long*)&FIFObuf32[pushIndexFIFObuf32], FIFOBlockSize);
 		//TODO: change readBlock signature in fdhwlib !!!!! -tb-
@@ -3811,6 +3850,7 @@ void RunSomeHardwareTests()
 
 
     if(((version >> 16) & 0x0fff) >= 0x131){
+        printf("  Message: SLT supports single and multi FIFO (current configuration: number of FIFOs is %i)\n",SLTSETTINGS::SLT->numHWFifos);
     }else{
         //we support still single FIFO SLT versions - old multi-FIFO SLT versions do not work any more
         if(((version >> 16) & 0x0fff) >= 0x130){
@@ -3826,7 +3866,7 @@ void RunSomeHardwareTests()
             //TODO: update SLT revision register -tb- 2013-06
             //TODO: update SLT revision register -tb- 2013-06
             //sleep(1);
-            //exit(2);
+            exit(2);
         }
 
     }
@@ -4400,7 +4440,7 @@ int32_t main(int32_t argc, char *argv[])
 	    
     //----------------------------------------------------------- 
     printf("-----------------INIT PBus  ----------------------\n");
-    InitSLTPbus();  //initialize PBus
+    InitSLTPbus();  //initialize PBus and SLT
     
 
     //now we already got the config file and know how many FIFOs the user intended to use;

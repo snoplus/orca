@@ -29,6 +29,8 @@
 	
     //BB commands
     IBOutlet   NSTextField* eventFifoStatusRegTextField;
+	IBOutlet   NSTextField* statusHighRegTextField;
+	IBOutlet   NSTextField* statusLowRegTextField;
 	IBOutlet   NSButton* useBroadcastIdBBCB;
 	IBOutlet   NSTextField* idBBforWCommandTextField;
 	IBOutlet   NSTextField* crateUDPDataCommandTextField;
@@ -116,6 +118,8 @@
 		IBOutlet NSPopUpButton*	registerPopUp;
 		IBOutlet NSStepper* 	regWriteValueStepper;
 		IBOutlet NSTextField* 	regWriteValueTextField;
+		IBOutlet NSFormatter* 	regWriteValueTextFieldFormatter;
+	    IBOutlet NSPopUpButton* lowLevelRegInHexPU;
 		IBOutlet NSButton*		regWriteButton;
 		IBOutlet NSButton*		regReadButton;
 		//IBOutlet NSPopUpButton*	indexPopUp;
@@ -166,6 +170,9 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+- (void) lowLevelRegInHexChanged:(NSNotification*)aNote;
+- (void) statusHighRegChanged:(NSNotification*)aNote;
+- (void) statusLowRegChanged:(NSNotification*)aNote;
 - (void) takeADCChannelDataChanged:(NSNotification*)aNote;
 - (void) takeRawUDPDataChanged:(NSNotification*)aNote;
 - (void) chargeBBFileChanged:(NSNotification*)aNote;
@@ -225,6 +232,9 @@
 - (void) enableRegControls;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+- (IBAction) lowLevelRegInHexPUAction:(id)sender;
+- (IBAction) statusHighRegTextFieldAction:(id)sender;
+- (IBAction) statusLowRegTextFieldAction:(id)sender;
 - (IBAction) chargeBBFileTextFieldAction:(id)sender;
 - (IBAction) useBroadcastIdBBCBAction:(id)sender;
 - (IBAction) idBBforWCommandTextFieldAction:(id)sender;

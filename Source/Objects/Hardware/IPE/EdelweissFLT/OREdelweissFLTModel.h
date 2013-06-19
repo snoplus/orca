@@ -64,15 +64,18 @@
 {
     // Hardware configuration
     //int				fltRunMode;		replaced by flt ModeFlags -tb-
-    NSMutableArray* thresholds;     //!< Array to keep the threshold of all 24 channel
+    NSMutableArray* thresholds;     //!< Array to keep the threshold of all 18 (==kNumEWFLTHeatIonChannels) channels
+    NSMutableArray* triggerParameter;     //!< Array to keep the trigger parameters (heat+ion) - currently used for save/load only -tb-
+    uint32_t        triggerPar[kNumEWFLTHeatIonChannels];//!< Array to keep the trigger parameters (heat+ion)
+	unsigned long	hitRateEnabledMask;	//!< mask to store the activated trigger rate measurement
     NSMutableArray* gains;			//!< Aarry to keep the gains
     unsigned long	dataId;         //!< Id used to identify energy data set (run mode)
 	unsigned long	waveFormId;		//!< Id used to identify energy+trace data set (debug mode)
 	unsigned long	hitRateId;
 	unsigned long	histogramId;
 	unsigned short	hitRateLength;		//!< Sampling time of the hitrate measurement (1..32 seconds)
-	float			hitRate[kNumV4FLTChannels];	//!< Actual value of the trigger rate measurement
-	BOOL			hitRateOverFlow[kNumV4FLTChannels];	//!< Overflow of hardware trigger rate register
+	float			hitRate[kNumEWFLTHeatIonChannels];	//!< Actual value of the trigger rate measurement
+	BOOL			hitRateOverFlow[kNumEWFLTHeatIonChannels];	//!< Overflow of hardware trigger rate register
 	float			hitRateTotal;	//!< Sum trigger rate of all channels 
 	
 	BOOL			firstTime;		//!< Event loop: Flag to identify the first readout loop for initialization purpose
@@ -110,18 +113,19 @@
 	                    //TODO: meaning runMode changed (compared to KATRIN); for EW we have several mode flags -tb-
     
 	
+    //TODO: obsolete (?) - remove it -tb- 2013-06
 	BOOL noiseFloorRunning;
 	int noiseFloorState;
 	long noiseFloorOffset;
     int targetRate;
-	long noiseFloorLow[kNumV4FLTChannels];
-	long noiseFloorHigh[kNumV4FLTChannels];
-	long noiseFloorTestValue[kNumV4FLTChannels];
-	BOOL oldEnabled[kNumV4FLTChannels];
-	long oldThreshold[kNumV4FLTChannels];
-	long newThreshold[kNumV4FLTChannels];
+	long noiseFloorLow[kNumEWFLTHeatIonChannels];
+	long noiseFloorHigh[kNumEWFLTHeatIonChannels];
+	long noiseFloorTestValue[kNumEWFLTHeatIonChannels];
+	BOOL oldEnabled[kNumEWFLTHeatIonChannels];
+	long oldThreshold[kNumEWFLTHeatIonChannels];
+	long newThreshold[kNumEWFLTHeatIonChannels];
 	
-	unsigned long eventCount[kNumV4FLTChannels];
+	unsigned long eventCount[kNumEWFLTHeatIonChannels];
 	
     //EDELWEISS vars
     int fltModeFlags; //TODO: unused, using "uint32_t controlRegister"
@@ -166,6 +170,9 @@
     unsigned int wCmdArg1;
     unsigned int wCmdArg2;
     int writeToBBMode;
+    int lowLevelRegInHex;
+    uint64_t ionTriggerMask;
+    uint64_t heatTriggerMask;
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
@@ -176,6 +183,8 @@
 - (short) getNumberRegisters;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+- (int) lowLevelRegInHex;
+- (void) setLowLevelRegInHex:(int)aLowLevelRegInHex;
 - (int) writeToBBMode;
 - (void) setWriteToBBMode:(int)aWriteToBBMode;
 - (unsigned int) wCmdArg2;
@@ -269,6 +278,20 @@
 - (int) streamMaskForFiber:(int)aFiber chan:(int)aChan;
 - (void) setStreamMask:(uint64_t)aStreamMask;
 //- (void) setStreamMaskForFiber:(int)aFiber chan:(int)aChan;
+
+- (uint64_t) ionTriggerMask;
+- (uint32_t) ionTriggerMask1;
+- (uint32_t) ionTriggerMask2;
+- (int) ionTriggerMaskForFiber:(int)aFiber chan:(int)aChan;
+- (void) setIonTriggerMask:(uint64_t)aIonTriggerMask;
+
+- (uint64_t) heatTriggerMask;
+- (uint32_t) heatTriggerMask1;
+- (uint32_t) heatTriggerMask2;
+- (int) heatTriggerMaskForFiber:(int)aFiber chan:(int)aChan;
+- (void) setHeatTriggerMask:(uint64_t)aHeatTriggerMask;
+
+
 - (int) targetRate;
 - (void) setTargetRate:(int)aTargetRate;
 - (int) runMode;
@@ -311,17 +334,39 @@
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherCard;
 
-- (NSMutableArray*) gains;
 - (NSMutableArray*) thresholds;
-- (void) setGains:(NSMutableArray*)aGains;
 - (void) setThresholds:(NSMutableArray*)aThresholds;
+- (NSMutableArray*) triggerParameter;
+- (void) setTriggerParameter:(NSMutableArray*)aTriggerParameter;
+
+- (unsigned long) hitRateEnabledMask;
+- (void) setHitRateEnabledMask:(unsigned long)aMask;
+- (void) setHitRateEnabled:(unsigned short) aChan withValue:(BOOL) aState;
+- (BOOL) hitRateEnabled:(unsigned short) aChan;
+
+- (NSMutableArray*) gains;
+- (void) setGains:(NSMutableArray*)aGains;
+
+- (void) readTriggerParameters;
+- (void) writeTriggerParameters;
+- (void) dumpTriggerParameters;
 
 - (unsigned long)threshold:(unsigned short) aChan;
 - (unsigned short)gain:(unsigned short) aChan;
-- (BOOL) triggerEnabled:(unsigned short) aChan;
 - (void) setThreshold:(unsigned short) aChan withValue:(unsigned long) aThreshold;
 - (void) setGain:(unsigned short) aChan withValue:(unsigned short) aGain;
+- (BOOL) triggerEnabled:(unsigned short) aChan;
 - (void) setTriggerEnabled:(unsigned short) aChan withValue:(BOOL) aState;
+- (BOOL) negPolarity:(unsigned short) aChan;
+- (void) setNegPolarity:(unsigned short) aChan withValue:(BOOL) aState;
+- (BOOL) posPolarity:(unsigned short) aChan;
+- (void) setPosPolarity:(unsigned short) aChan withValue:(BOOL) aState;
+- (int) gapLength:(unsigned short) aChan;
+- (void) setGapLength:(unsigned short) aChan withValue:(int) aLength;
+- (int) downSampling:(unsigned short) aChan;
+- (void) setDownSampling:(unsigned short) aChan withValue:(int) aValue;
+- (int) shapingLength:(unsigned short) aChan;
+- (void) setShapingLength:(unsigned short) aChan withValue:(int) aLength;
 
 - (void) enableAllHitRates:(BOOL)aState;
 - (void) enableAllTriggers:(BOOL)aState;
@@ -376,6 +421,7 @@
 
 - (void) loadThresholdsAndGains;
 - (void) initBoard;
+- (void) readAll;
 - (void) writeInterruptMask;
 - (void) readHitRates;
 - (void) writeTestPattern:(unsigned long*)mask length:(int)len;
@@ -387,6 +433,11 @@
 - (void) writeControl;
 - (void) writeStreamMask;
 - (void) readStreamMask;
+- (void) writeIonTriggerMask;
+- (void) readIonTriggerMask;
+- (void) writeHeatTriggerMask;
+- (void) readHeatTriggerMask;
+
 - (void) writeFiberDelays;
 - (void) readFiberDelays;
 - (void) writeCommandResync;
@@ -475,6 +526,11 @@
 				  n:(int) n;
 @end
 
+extern NSString* OREdelweissFLTModelHeatTriggerMaskChanged;
+extern NSString* OREdelweissFLTModelIonTriggerMaskChanged;
+extern NSString* OREdelweissFLTModelTriggerParameterChanged;
+extern NSString* OREdelweissFLTModelTriggerEnabledMaskChanged;
+extern NSString* OREdelweissFLTModelLowLevelRegInHexChanged;
 extern NSString* OREdelweissFLTModelWriteToBBModeChanged;
 extern NSString* OREdelweissFLTModelWCmdArg2Changed;
 extern NSString* OREdelweissFLTModelWCmdArg1Changed;
@@ -525,6 +581,7 @@ extern NSString* OREdelweissFLTModelTestEnabledArrayChanged;
 extern NSString* OREdelweissFLTModelTestStatusArrayChanged;
 extern NSString* OREdelweissFLTModelHitRateChanged;
 extern NSString* OREdelweissFLTModelHitRateLengthChanged;
+extern NSString* OREdelweissFLTModelHitRateEnabledMaskChanged;
 extern NSString* OREdelweissFLTModelGainChanged;
 extern NSString* OREdelweissFLTModelThresholdChanged;
 extern NSString* OREdelweissFLTChan;

@@ -320,6 +320,8 @@ public:
 	//FIFO data handling
 	void readFIFOtoFIFObuffer(void);
     void scanFIFObuffer(void);	
+    int rereadNumADCsInDataStream();
+    int fifoReadsFLTIndex(int fltIndex);
     int openAsciiFile(int udpdataSec, int write2file_len_sec);
     int openBinaryFile(int utc, int write2file_len_sec);
     int writeToAsciiFile(const char *buf, size_t n, int udpdataSec);

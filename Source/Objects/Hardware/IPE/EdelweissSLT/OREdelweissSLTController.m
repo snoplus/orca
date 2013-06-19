@@ -321,9 +321,52 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
                          name : OREdelweissSLTModelTakeADCChannelDataChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(statusLowRegChanged:)
+                         name : OREdelweissSLTModelStatusRegLowChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(statusHighRegChanged:)
+                         name : OREdelweissSLTModelStatusRegHighChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(lowLevelRegInHexChanged:)
+                         name : OREdelweissSLTModelLowLevelRegInHexChanged
+						object: model];
+
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+
+- (void) lowLevelRegInHexChanged:(NSNotification*)aNote
+{
+	//[lowLevelRegInHexPU setIntValue: [model lowLevelRegInHex]];
+    [self endEditing];
+	[lowLevelRegInHexPU selectItemAtIndex: [model lowLevelRegInHex]];
+    if([model lowLevelRegInHex]){
+        [regWriteValueTextField setFormatter: regWriteValueTextFieldFormatter];
+    }else {
+        [regWriteValueTextField setFormatter: nil];
+    }
+
+    [self writeValueChanged:nil];
+}
+
+- (void) statusHighRegChanged:(NSNotification*)aNote
+{
+  	NSLog(@"   %@::%@: UNDER CONSTRUCTION \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+return;
+	[statusHighRegTextField setIntValue: [model statusHighReg]];
+}
+
+- (void) statusLowRegChanged:(NSNotification*)aNote
+{
+  	NSLog(@"   %@::%@: UNDER CONSTRUCTION \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+return;
+	[statusLowRegTextField setIntValue: [model statusLowReg]];
+}
 
 - (void) takeADCChannelDataChanged:(NSNotification*)aNote
 {
@@ -678,6 +721,9 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	[self chargeBBFileChanged:nil];
 	[self takeRawUDPDataChanged:nil];
 	[self takeADCChannelDataChanged:nil];
+	[self statusLowRegChanged:nil];
+	[self statusHighRegChanged:nil];
+	[self lowLevelRegInHexChanged:nil];
 }
 
 
@@ -757,7 +803,7 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 - (void) writeValueChanged:(NSNotification*) aNote
 {
 	[self updateStepper:regWriteValueStepper setting:[model writeValue]];
-	[regWriteValueTextField setIntValue:[model writeValue]];
+    [regWriteValueTextField setIntValue:[model writeValue]];
 }
 
 - (void) displayEventLoopChanged:(NSNotification*) aNote
@@ -826,6 +872,22 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 }
 
 #pragma mark ***Actions
+
+- (void) lowLevelRegInHexPUAction:(id)sender /*lowLevelRegInHexPU*/
+{
+	//[model setLowLevelRegInHex:[sender intValue]];	
+	[model setLowLevelRegInHex:[sender indexOfSelectedItem]];	
+}
+
+- (void) statusHighRegTextFieldAction:(id)sender
+{
+	[model setStatusHighReg:[sender intValue]];	
+}
+
+- (void) statusLowRegTextFieldAction:(id)sender
+{
+	[model setStatusLowReg:[sender intValue]];	
+}
 
 - (void) takeADCChannelDataCBAction:(id)sender
 {
@@ -1299,11 +1361,12 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	@try {
 		NSLogFont(aFont, @"Board ID: %lld\n",[model readBoardID]);
 		[model printStatusReg];
+		[model printStatusLowHighReg];
 		[model printControlReg];
 		NSLogFont(aFont,@"--------------------------------------\n");
 		NSLogFont(aFont,@"SLT Time   : %lld\n",[model getTime]);
-		[model printInterruptMask];
-		[model printInterruptRequests];
+		//[model printInterruptMask];
+		//[model printInterruptRequests];
 	    long fdhwlibVersion = [model getFdhwlibVersion];  //TODO: write a method [model printFdhwlibVersion];
 	    int ver=(fdhwlibVersion>>16) & 0xff,maj =(fdhwlibVersion>>8) & 0xff,min = fdhwlibVersion & 0xff;
 	    NSLogFont(aFont,@"%@: SBC PrPMC running with fdhwlib version: %i.%i.%i (0x%08x)\n",[model fullID],ver,maj,min, fdhwlibVersion);
@@ -1335,7 +1398,12 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (IBAction) writeValueAction:(id) aSender
 {
+    //sender is regWriteValueTextField
+  	//NSLog(@"   %@::%@:  regWriteValueTextField:%@ (%@)\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),regWriteValueTextField,[regWriteValueTextField stringValue]);//TODO: DEBUG testing ...-tb-
 	[self endEditing];
+    //unsigned long converted = strtoul([[regWriteValueTextField stringValue] UTF8String] , 0,0);
+  	//NSLog(@"   %@::%@:  converted:%i (0x%x)\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),converted,converted);//TODO: DEBUG testing ...-tb-
+    // -> instead I use the OHexFormatter 2013-06 -tb-
     // Make sure that value has changed.
     if ([aSender intValue] != [model writeValue]){
 		[[model undoManager] setActionName:@"Set Write Value"]; // Set undo name.

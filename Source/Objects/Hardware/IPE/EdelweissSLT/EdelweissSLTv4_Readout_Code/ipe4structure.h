@@ -690,7 +690,7 @@ typedef struct {
 	uint32_t internal_error_info;
 	uint32_t ipe4reader_status;
 	uint32_t version;          // _may_ be useful in some particular cases (version of C code/firmware/hardware?) 
-	uint32_t numADCs;           // total number of ADCs in the UDP data packets
+	uint32_t numFIFOnumADCs;           // total number of ADCs in the UDP data packets
 	uint32_t spare2;           // reserved for future usage
 } TypeIpeCrateStatusBlock;
 
@@ -867,4 +867,10 @@ while(a1&0x4000) {k++;
 	}
 //  pour retrouver les valeurs signe (le compresseur ne marche qu'avec des entiers non signes sur 14 bit) faire a = (a - 0x2000) 
 */
+
+
+
+
+
+
 

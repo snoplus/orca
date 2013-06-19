@@ -52,6 +52,8 @@
 //status reg bit masks
 #define kEWStatusIrq			(0x00000001 << 31) //R - cleared on W
 #define kEWStatusPixErr		(0x00000001 << 16) //R - cleared on W
+//status low/high new 2013/doc rev. 200 -tb-
+#define kEWStatusPixErr2013		(0x00000001 << 16) //R - cleared on W
 
 
 //Cmd reg bit masks
@@ -132,7 +134,9 @@
 		PMC_Link*		pmcLink;
         
 		unsigned long controlReg;
-		unsigned long statusReg;
+		unsigned long statusReg;//deprecated 2013-06 -tb-
+        unsigned long statusLowReg; //was statusRegLow
+        unsigned long statusHighReg;//was statusRegHigh
 		unsigned long long clockTime;
 		
         NSString* sltScriptArguments;
@@ -203,6 +207,7 @@
     int idBBforWCommand;
     bool useBroadcastIdBB;
     NSString * chargeBBFile;
+    int lowLevelRegInHex;
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
@@ -220,6 +225,12 @@
 - (void) runIsStartingSubRun:(NSNotification*)aNote;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+- (int) lowLevelRegInHex;
+- (void) setLowLevelRegInHex:(int)aLowLevelRegInHex;
+- (unsigned long) statusHighReg;
+- (void) setStatusHighReg:(unsigned long)aStatusRegHigh;
+- (unsigned long) statusLowReg;
+- (void) setStatusLowReg:(unsigned long)aStatusRegLow;
 - (int) takeADCChannelData;
 - (void) setTakeADCChannelData:(int)aTakeADCChannelData;
 - (int) takeRawUDPData;
@@ -393,7 +404,10 @@
 - (void)		  writeControlReg;
 - (void)		  printControlReg;
 - (unsigned long) readStatusReg;
+- (unsigned long) readStatusLowReg;
+- (unsigned long) readStatusHighReg;
 - (void)		  printStatusReg;
+- (void)          printStatusLowHighReg;
 
 - (void) writePixelBusEnableReg;
 - (void) readPixelBusEnableReg;
@@ -406,12 +420,16 @@
 - (void) readEventStatus:(unsigned long*)eventStatusBuffer;
 - (void) readEventFifoStatusReg;
 
+#if 0 //deprecated 2013-06 -tb-
 - (void)		  writeInterruptMask;
 - (void)		  readInterruptMask;
 - (void)		  readInterruptRequest;
 - (void)		  printInterruptRequests;
 - (void)		  printInterruptMask;
 - (void)		  printInterrupt:(int)regIndex;
+#endif
+
+
 //- (void)		  dumpTriggerRAM:(int)aPageIndex;
 
 - (void)		  writeReg:(int)index value:(unsigned long)aValue;
@@ -483,6 +501,9 @@
 
 @end
 
+extern NSString* OREdelweissSLTModelLowLevelRegInHexChanged;
+extern NSString* OREdelweissSLTModelStatusRegHighChanged;
+extern NSString* OREdelweissSLTModelStatusRegLowChanged;
 extern NSString* OREdelweissSLTModelTakeADCChannelDataChanged;
 extern NSString* OREdelweissSLTModelTakeRawUDPDataChanged;
 extern NSString* OREdelweissSLTModelChargeBBFileChanged;

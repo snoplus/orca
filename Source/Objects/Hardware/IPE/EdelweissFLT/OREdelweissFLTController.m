@@ -153,6 +153,11 @@
 					   object : model];
 	
     [notifyCenter addObserver : self
+					 selector : @selector(hitRateEnabledMaskChanged:)
+						 name : OREdelweissFLTModelHitRateEnabledMaskChanged
+					   object : model];
+	
+    [notifyCenter addObserver : self
 					 selector : @selector(scaleAction:)
 						 name : ORAxisRangeChangedNotification
 					   object : nil];
@@ -410,9 +415,48 @@
                          name : OREdelweissFLTModelWriteToBBModeChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(lowLevelRegInHexChanged:)
+                         name : OREdelweissFLTModelLowLevelRegInHexChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(ionTriggerMaskChanged:)
+                         name : OREdelweissFLTModelIonTriggerMaskChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(heatTriggerMaskChanged:)
+                         name : OREdelweissFLTModelHeatTriggerMaskChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(triggerParameterChanged:)
+                         name : OREdelweissFLTModelTriggerParameterChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(triggerEnabledChanged:)
+                         name : OREdelweissFLTModelTriggerEnabledMaskChanged
+						object: model];
+
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+
+- (void) lowLevelRegInHexChanged:(NSNotification*)aNote
+{
+	//[lowLevelRegInHexPU setIntValue: [model lowLevelRegInHex]];
+    [self endEditing];
+	[lowLevelRegInHexPU selectItemAtIndex: [model lowLevelRegInHex]];
+    if([model lowLevelRegInHex]){
+        [regWriteValueTextField setFormatter: regWriteValueTextFieldFormatter];
+    }else {
+        [regWriteValueTextField setFormatter: nil];
+    }
+
+    [self writeValueChanged:nil];
+}
 
 - (void) writeToBBModeChanged:(NSNotification*)aNote
 {
@@ -741,6 +785,81 @@
 	//debug NSLog(@"%016qx done.\n",val);
 }
 
+
+- (void) heatTriggerMaskChanged:(NSNotification*)aNote
+{
+	//[heatTriggerMaskTextField setIntValue: [model heatTriggerMask]];
+	[heatTriggerMaskTextField setStringValue: [NSString stringWithFormat:@"0x%016qx",[model heatTriggerMask]]];
+	//[streamMaskTextField setStringValue: [NSString stringWithFormat:@"0x1234000012340000"]];
+//DEBUG OUTPUT:  	NSLog(@"%@::%@: UNDER CONSTRUCTION! 0x%016qx 0x%032qx 0x%016llx \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model streamMask],[model streamMask],[model streamMask]);//TODO: DEBUG testing ...-tb-
+
+	uint64_t chan, fib;
+    //uint64_t val=[model streamMask];
+	for(fib=0;fib<6;fib++){
+		//debug NSString *s = [NSString stringWithFormat:@"fib %llu:",fib];
+	    for(chan=0;chan<6;chan++){
+		    if([model heatTriggerMaskForFiber:fib chan:chan]) [[heatTriggerMaskMatrix cellAtRow:fib column: chan] setIntValue: 1];
+			else  [[heatTriggerMaskMatrix cellAtRow:fib column: chan] setIntValue: 0];
+			
+			//debug s=[s stringByAppendingString: [NSString stringWithFormat: @"%u",[model streamMaskForFiber:fib chan:chan]]];
+			#if 0
+		    if([model streamMaskForFiber:fib chan:chan]){ 
+			    //val |= ((0x1LL<<chan) << (fib*8));
+				s=[s stringByAppendingString: @"1"];
+			}else{
+				s=[s stringByAppendingString: @"0"];
+			}
+			#endif
+		}
+		//debug NSLog(@"%@\n",s);
+	}
+	//debug NSLog(@"%016qx done.\n",val);
+}
+
+- (void) ionTriggerMaskChanged:(NSNotification*)aNote
+{
+	//[ionTriggerMaskTextField setIntValue: [model ionTriggerMask]];
+	[ionTriggerMaskTextField setStringValue: [NSString stringWithFormat:@"0x%016qx",[model ionTriggerMask]]];
+	uint64_t chan, fib;
+	for(fib=0;fib<6;fib++){
+		//debug NSString *s = [NSString stringWithFormat:@"fib %llu:",fib];
+	    for(chan=0;chan<6;chan++){
+		    if([model ionTriggerMaskForFiber:fib chan:chan]) [[ionTriggerMaskMatrix cellAtRow:fib column: chan] setIntValue: 1];
+			else  [[ionTriggerMaskMatrix cellAtRow:fib column: chan] setIntValue: 0];
+		}
+	}
+}
+
+
+- (void) triggerParameterChanged:(NSNotification*)aNote
+{
+    //DEBUG: OUTPUT:      	NSLog(@"%@::%@: UNDER CONSTRUCTION!   \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
+	//[selectFiberTrigPU setIntValue: [model selectFiberTrig]];
+	
+    //[selectFiberTrigPU selectItemAtIndex: [model selectFiberTrig]];
+    
+    //negPosPolarityMatrix
+    int i;
+    for(i=0;i<kNumEWFLTHeatIonChannels;i++){
+        [[negPosPolarityMatrix cellAtRow:i column:0] setIntValue: [model negPolarity:i]];
+        [[negPosPolarityMatrix cellAtRow:i column:1] setIntValue: [model posPolarity:i]];
+    }    
+    //gapMatrix
+    for(i=0;i<kNumEWFLTHeatIonChannels;i++){
+        [[gapMatrix cellAtRow:i column:0] selectItemAtIndex: [model gapLength:i]];
+    }    
+	//downSamplingMatrix
+    for(i=0;i<kNumEWFLTHeatIonChannels;i++){
+        [[downSamplingMatrix cellAtRow:i column:0] selectItemAtIndex: [model downSampling:i]];
+    }    
+	//shapingLengthMatrix
+    for(i=0;i<kNumEWFLTHeatIonChannels;i++){
+        [[shapingLengthMatrix cellAtRow:i column:0] setIntValue: [model shapingLength:i]];
+    }    
+
+}
+
+
 - (void) selectFiberTrigChanged:(NSNotification*)aNote
 {
     //DEBUG: OUTPUT:  	NSLog(@"%@::%@: UNDER CONSTRUCTION! [model selectFiberTrig] is %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model selectFiberTrig]);//TODO : DEBUG testing ...-tb-
@@ -858,9 +977,7 @@
     [super updateWindow];
     [self slotChanged:nil];
 	[self modeChanged:nil];
-	[self gainArrayChanged:nil];
-	[self thresholdArrayChanged:nil];
-	[self triggersEnabledArrayChanged:nil];
+	[self gainArrayChanged:nil];//TODO: obsolete -tb- 2013
 	[self hitRateLengthChanged:nil];
 	[self hitRateChanged:nil];
     [self updateTimePlot:nil];
@@ -920,6 +1037,15 @@
 	[self wCmdArg1Changed:nil];
 	[self wCmdArg2Changed:nil];
 	[self writeToBBModeChanged:nil];
+    
+    //trigger settings
+	[self thresholdArrayChanged:nil];
+	[self triggerEnabledChanged:nil];
+	[self lowLevelRegInHexChanged:nil];
+	[self ionTriggerMaskChanged:nil];
+	[self heatTriggerMaskChanged:nil];
+    [self hitRateEnabledMaskChanged:nil];
+    [self triggerParameterChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -951,8 +1077,18 @@
     [gainTextFields setEnabled:!lockedOrRunningMaintenance];
     [thresholdTextFields setEnabled:!lockedOrRunningMaintenance];
     [triggerEnabledCBs setEnabled:!lockedOrRunningMaintenance];
-    [hitRateEnabledCBs setEnabled:!lockedOrRunningMaintenance];
+    [hitRateEnableMatrix setEnabled:!lockedOrRunningMaintenance];
 	
+    //TODO: add new GUI elements -tb- 3013
+    //TODO: add new GUI elements -tb- 3013
+    //TODO: add new GUI elements -tb- 3013
+    //TODO: add new GUI elements -tb- 3013
+    //TODO: add new GUI elements -tb- 3013
+    //TODO: add new GUI elements -tb- 3013
+    //TODO: add new GUI elements -tb- 3013
+    //TODO: add new GUI elements -tb- 3013
+    
+    
 	[versionButton setEnabled:!runInProgress];
 	[testButton setEnabled:!runInProgress];
 	[statusButton setEnabled:!runInProgress];
@@ -1116,10 +1252,24 @@
 - (void) triggerEnabledChanged:(NSNotification*)aNotification
 {
 	int i;
-	for(i=0;i<kNumV4FLTChannels;i++){
+	for(i=0;i<kNumEWFLTHeatIonChannels;i++){
 		[[triggerEnabledCBs cellWithTag:i] setState: [model triggerEnabled:i]];
 	}
 }
+
+
+//TODO: unused - remove it -tb- 2013-06
+- (void) triggersEnabledArrayChanged:(NSNotification*)aNotification
+{
+    //DEBUG 	
+    NSLog(@"%@::%@  OBSOLETE (use triggerEnabledChanged)\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+	short chan;
+	for(chan=0;chan<kNumEWFLTHeatIonChannels;chan++){
+		[[triggerEnabledCBs cellWithTag:chan] setIntValue: [model triggerEnabled:chan]];
+		
+	}
+}
+
 
 - (void) thresholdChanged:(NSNotification*)aNotification
 {
@@ -1131,13 +1281,13 @@
 - (void) slotChanged:(NSNotification*)aNotification
 {
     //DEBUG 	NSLog(@"%@::%@ \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
-	// Set title of FLT configuration window, ak 15.6.07
+	// Set title of FLT configuration window 
 	[[self window] setTitle:[NSString stringWithFormat:@"IPE-DAQ-V4 EDELWEISS FLT Card (Slot %d, FLT# %d)",[model slot]+1,[model stationNumber]]];
     [fltSlotNumTextField setStringValue: [NSString stringWithFormat:@"FLT# %d",[model stationNumber]]];
 	//[fltSlotNumMatrix setSe];
     //[[fltSlotNumMatrix cellWithTag:[model stationNumber]] setIntValue:1];
-	short chan;
-	for(chan=0;chan<kNumV4FLTChannels;chan++){
+	short chan;//'chan' is slot number -tb-
+	for(chan=0;chan<kNumEWFLTs;chan++){
 	    if(chan==[model stationNumber]-1)
 	        [[fltSlotNumMatrix cellAtRow:0 column:chan] setState:1];
 		else
@@ -1148,7 +1298,7 @@
 - (void) gainArrayChanged:(NSNotification*)aNotification
 {
 	short chan;
-	for(chan=0;chan<kNumV4FLTChannels;chan++){
+	for(chan=0;chan<kNumEWFLTHeatIonChannels;chan++){
 		[[gainTextFields cellWithTag:chan] setIntValue: [model gain:chan]];
 		
 	}	
@@ -1157,17 +1307,8 @@
 - (void) thresholdArrayChanged:(NSNotification*)aNotification
 {
 	short chan;
-	for(chan=0;chan<kNumV4FLTChannels;chan++){
+	for(chan=0;chan<kNumEWFLTHeatIonChannels;chan++){
 		[[thresholdTextFields cellWithTag:chan] setIntValue: [(OREdelweissFLTModel*)model threshold:chan]];
-	}
-}
-
-- (void) triggersEnabledArrayChanged:(NSNotification*)aNotification
-{
-	short chan;
-	for(chan=0;chan<kNumV4FLTChannels;chan++){
-		[[triggerEnabledCBs cellWithTag:chan] setIntValue: [model triggerEnabled:chan]];
-		
 	}
 }
 
@@ -1183,10 +1324,21 @@
 	[hitRateLengthPU selectItemWithTag:[model hitRateLength]];
 }
 
+- (void) hitRateEnabledMaskChanged:(NSNotification*)aNote
+{
+//DEBUG OUTPUT: 	NSLog(@"%@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+	//[hitRateLengthPU selectItemWithTag:[model hitRateLength]];
+    //hitRateEnableMatrix
+    int i;
+    for(i=0;i<kNumEWFLTHeatIonChannels;i++){
+        [[hitRateEnableMatrix cellAtRow:i column:0] setIntValue: [model hitRateEnabled:i]];
+    }    
+}
+
 - (void) hitRateChanged:(NSNotification*)aNote
 {
 	int chan;
-	for(chan=0;chan<kNumV4FLTChannels;chan++){
+	for(chan=0;chan<kNumEWFLTHeatIonChannels;chan++){
 		id theCell = [rateTextFields cellWithTag:chan];
 		if([model hitRateOverFlow:chan]){
 			[theCell setFormatter: nil];
@@ -1222,7 +1374,10 @@
 
 - (void) writeValueChanged:(NSNotification*) aNote
 {
+    //DEBUG    
+    NSLog(@"%@::%@ lowLevelRegInHexPU intVal %i\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),[lowLevelRegInHexPU intValue]);//TODO: DEBUG testing ...-tb-
     [regWriteValueTextField setIntValue: [model writeValue]];
+    [regWriteValueTextField setNeedsDisplay: YES];
 }
 
 - (void) selectedChannelValueChanged:(NSNotification*) aNote
@@ -1254,6 +1409,13 @@
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+- (void) lowLevelRegInHexPUAction:(id)sender /*lowLevelRegInHexPU*/
+{
+    //DEBUG    
+    NSLog(@"%@::%@ lowLevelRegInHexPU intVal %i\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),[lowLevelRegInHexPU intValue]);//TODO: DEBUG testing ...-tb-
+	//[model setLowLevelRegInHex:[sender intValue]];	
+	[model setLowLevelRegInHex:[sender indexOfSelectedItem]];	
+}
 
 - (void) writeToBBModeCBAction:(id)sender
 {
@@ -1759,6 +1921,213 @@
 }
 
 
+- (IBAction) heatTriggerMaskEnableAllAction:(id)sender
+{	[model setHeatTriggerMask:0x00003f3f3f3f3f3fLL];	 }
+
+- (IBAction) heatTriggerMaskEnableNoneAction:(id)sender
+{	[model setHeatTriggerMask:0x0];	 }
+
+
+- (IBAction) heatTriggerMaskTextFieldAction:(id)sender
+{
+	//[model setHeatTriggerMask:[sender intValue]];	
+}
+
+- (IBAction) heatTriggerMaskMatrixAction:(id)sender
+{
+	//[model setHeatTriggerMask:[sender intValue]];	
+	uint64_t chan, fib;
+    uint64_t val=0;
+	for(fib=0;fib<6;fib++){
+		//debug NSString *s = [NSString stringWithFormat:@"fib %lli:",fib];
+	    for(chan=0;chan<6;chan++){
+		    if([[heatTriggerMaskMatrix cellAtRow:fib column: chan] intValue]){ 
+			    val |= ((0x1LL<<chan) << (fib*8));// see - (int) streamMaskForFiber:(int)aFiber chan:(int)aChan;
+				//debug s=[s stringByAppendingString: @"1"];
+			}else{
+				//debug s=[s stringByAppendingString: @"0"];
+			}
+		}
+		//debug NSLog(@"%@\n",s);
+	}
+	//debug NSLog(@"%016qx done.\n",val);
+	[model setHeatTriggerMask:val];
+}
+
+
+- (IBAction) writeHeatTriggerMaskRegisterButtonAction:(id)sender
+{
+	[self endEditing];
+	@try {
+	    [model writeHeatTriggerMask];	
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Exception '%@'-'%@' in %@::%@ ; FLT (%d) \n",[localException name],[localException reason],NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model stationNumber]);
+        NSRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
+                        localException,[model stationNumber]);
+	}
+}
+
+- (IBAction) readHeatTriggerMaskRegisterButtonAction:(id)sender
+{
+	[self endEditing];
+	@try {
+	    [model readHeatTriggerMask];	
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Exception '%@'-'%@' in %@::%@ ; FLT (%d) \n",[localException name],[localException reason],NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model stationNumber]);
+        NSRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
+                        localException,[model stationNumber]);
+	}
+}
+
+
+
+- (IBAction) ionTriggerMaskEnableAllAction:(id)sender;
+{	[model setIonTriggerMask:0x00003f3f3f3f3f3fLL];	 }
+
+- (IBAction) ionTriggerMaskEnableNoneAction:(id)sender;
+{	[model setIonTriggerMask:0x0];	 }
+
+
+- (void) ionTriggerMaskTextFieldAction:(id)sender
+{
+	//[model setIonTriggerMask:[sender intValue]];	
+}
+
+- (IBAction) ionTriggerMaskMatrixAction:(id)sender
+{
+	uint64_t chan, fib;
+    uint64_t val=0;
+	for(fib=0;fib<6;fib++){
+		//debug NSString *s = [NSString stringWithFormat:@"fib %lli:",fib];
+	    for(chan=0;chan<6;chan++){
+		    if([[ionTriggerMaskMatrix cellAtRow:fib column: chan] intValue]){ 
+			    val |= ((0x1LL<<chan) << (fib*8));// see - (int) streamMaskForFiber:(int)aFiber chan:(int)aChan;
+				//debug s=[s stringByAppendingString: @"1"];
+			}else{
+				//debug s=[s stringByAppendingString: @"0"];
+			}
+		}
+		//debug NSLog(@"%@\n",s);
+	}
+	//debug NSLog(@"%016qx done.\n",val);
+	[model setIonTriggerMask:val];
+}
+
+
+- (IBAction) writeIonTriggerMaskRegisterButtonAction:(id)sender
+{
+	[self endEditing];
+	@try {
+	    [model writeIonTriggerMask];	
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Exception '%@'-'%@' in %@::%@ ; FLT (%d) \n",[localException name],[localException reason],NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model stationNumber]);
+        NSRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
+                        localException,[model stationNumber]);
+	}
+}
+
+- (IBAction) readIonTriggerMaskRegisterButtonAction:(id)sender
+{
+	[self endEditing];
+	@try {
+	    [model readIonTriggerMask];	
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Exception '%@'-'%@' in %@::%@ ; FLT (%d) \n",[localException name],[localException reason],NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model stationNumber]);
+        NSRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
+                        localException,[model stationNumber]);
+	}
+}
+
+- (IBAction) readTriggerParametersButtonAction:(id)sender
+{
+//DEBUG OUTPUT:
+ 	NSLog(@"%@::%@: UNDER CONSTRUCTION!   \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+    [model readTriggerParameters];
+}
+
+- (IBAction) writeTriggerParametersButtonAction:(id)sender
+{
+//DEBUG OUTPUT:
+ 	NSLog(@"%@::%@: UNDER CONSTRUCTION!   \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+    [model writeTriggerParameters];
+}
+
+- (IBAction) dumpTriggerParametersButtonAction:(id)sender
+{
+//DEBUG OUTPUT: 	NSLog(@"%@::%@: UNDER CONSTRUCTION!   \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+    [model dumpTriggerParameters];
+}
+
+- (IBAction) triggerEnabledMatrixAction:(id)sender
+{
+
+//using triggerEnableAction!!!
+
+//DEBUG OUTPUT:
+ 	NSLog(@"%@::%@: UNDER CONSTRUCTION!   \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+}
+
+- (IBAction) negPosPolarityMatrixAction:(id)sender
+{
+    //negPosPolarityMatrix
+    //DEBUG: OUTPUT:  	    NSLog(@"%@::%@: UNDER CONSTRUCTION! negPosPolarityMatrix: col is %i, row is %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[negPosPolarityMatrix selectedColumn],[negPosPolarityMatrix selectedRow]);//TODO : DEBUG testing ...-tb-
+    //DEBUG: OUTPUT:  	    NSLog(@"%@::%@: UNDER CONSTRUCTION! negPosPolarityMatrix: selectedCell %@ , state %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[negPosPolarityMatrix selectedCell],[[negPosPolarityMatrix selectedCell] intValue]);//TODO : DEBUG testing ...-tb-
+    unsigned int col, row, state;
+    col=[negPosPolarityMatrix selectedColumn];
+    row=[negPosPolarityMatrix selectedRow];
+    state = [[negPosPolarityMatrix selectedCell] intValue];
+    if(row>=kNumEWFLTHeatIonChannels) return;
+    if(col==0) [model setNegPolarity:row withValue:state];
+    else       [model setPosPolarity:row withValue:state];
+}
+
+- (IBAction) gapMatrixAction:(id)sender
+{
+    //gapMatrix
+    //DEBUG: OUTPUT:  	    NSLog(@"%@::%@: UNDER CONSTRUCTION! sender: %@, col is %i, row is %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),sender,[sender selectedColumn],[sender selectedRow]);//TODO : DEBUG testing ...-tb-
+    unsigned int col, row, state;
+    col=[gapMatrix selectedColumn];
+    row=[gapMatrix selectedRow];
+    //state = [[gapMatrix selectedCell] intValue];
+    state = [[gapMatrix selectedCell] indexOfSelectedItem];
+    //DEBUG: OUTPUT:  	    NSLog(@"%@::%@: UNDER CONSTRUCTION!  selectedCell %@ , state %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[gapMatrix selectedCell],state);//TODO : DEBUG testing ...-tb-
+    if(row>=kNumEWFLTHeatIonChannels) return;
+    [model setGapLength:row withValue:state];
+}
+
+- (IBAction) downSamplingMatrixAction:(id)sender
+{
+    //downSamplingMatrix
+    //DEBUG: OUTPUT:  	    NSLog(@"%@::%@: UNDER CONSTRUCTION!  col is %i, row is %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[downSamplingMatrix selectedColumn],[downSamplingMatrix selectedRow]);//TODO : DEBUG testing ...-tb-
+    unsigned int col, row, state;
+    col=[downSamplingMatrix selectedColumn];
+    row=[downSamplingMatrix selectedRow];
+    //state = [[gapMatrix selectedCell] intValue];
+    state = [[downSamplingMatrix selectedCell] indexOfSelectedItem];
+    //DEBUG: OUTPUT:  	    NSLog(@"%@::%@: UNDER CONSTRUCTION!  selectedCell %@ , state %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[sender selectedCell],state);//TODO : DEBUG testing ...-tb-
+    if(row>=kNumEWFLTHeatIonChannels) return;
+    [model setDownSampling:row withValue:state];
+}
+
+
+- (IBAction) shapingLengthMatrixAction:(id)sender
+{
+    //downSamplingMatrix
+    //DEBUG: OUTPUT:  	       NSLog(@"%@::%@: UNDER CONSTRUCTION!  col is %i, row is %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[shapingLengthMatrix selectedColumn],[shapingLengthMatrix selectedRow]);//TODO : DEBUG testing ...-tb-
+    unsigned int col, row, state;
+    col=[shapingLengthMatrix selectedColumn];
+    row=[shapingLengthMatrix selectedRow];
+    //state = [[gapMatrix selectedCell] intValue];
+    state = [[shapingLengthMatrix selectedCell] intValue];
+    //DEBUG: OUTPUT:  	        NSLog(@"%@::%@: UNDER CONSTRUCTION!  selectedCell %@ , state %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[sender selectedCell],state);//TODO : DEBUG testing ...-tb-
+    if(row>=kNumEWFLTHeatIonChannels) return;
+    [model setShapingLength:row withValue:state];
+}
+
 
 - (void) selectFiberTrigPUAction:(id)sender
 {
@@ -1925,7 +2294,9 @@
 
 - (IBAction) gapLengthAction:(id)sender
 {
-	[model setGapLength:[sender indexOfSelectedItem]];	
+    //DEBUG: OUTPUT:  	
+    NSLog(@"%@::%@: DEPRECATED \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
+	//[model setGapLength:[sender indexOfSelectedItem]];	
 }
 
 
@@ -2013,7 +2384,7 @@
 		NSLogFont(aFont,   @"FLT (station %d)\n",[model stationNumber]); // ak, 5.10.07
 		NSLogFont(aFont,   @"chan | Gain | Threshold\n");
 		NSLogFont(aFont,   @"-----------------------\n");
-		for(i=0;i<kNumV4FLTChannels;i++){
+		for(i=0;i<kNumEWFLTHeatIonChannels;i++){
 			//NSLogFont(aFont,@"%4d | %4d | %4d \n",i,[model readGain:i],[model readThreshold:i]);
 			//NSLog(@"%d: %d\n",i,[model readGain:i]);
 		}
@@ -2093,6 +2464,19 @@
 	}
 }
 
+- (IBAction) readAllButtonAction:(id)sender
+{
+	[self endEditing];
+	@try {
+		[model readAll];
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Exception readAll FLT (%d) status\n",[model stationNumber]);
+        NSRunAlertPanel([localException name], @"%@\nReading of FLT%d configuration failed", @"OK", nil, nil,
+                        localException,[model stationNumber]);
+	}
+}
+
 - (IBAction) settingLockAction:(id) sender
 {
     [gSecurity tryToSetLock:OREdelweissFLTSettingsLock to:[sender intValue] forWindow:[self window]];
@@ -2140,6 +2524,11 @@
         NSRunAlertPanel([localException name], @"%@\nFLT%d Access failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
+}
+
+- (IBAction) hitRateEnableMatrixAction: (id) sender
+{
+	[model setHitRateEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
 - (IBAction) hitRateLengthAction: (id) sender
@@ -2201,10 +2590,13 @@
 - (IBAction) writeValueAction:(id) aSender
 {
 	[self endEditing];
+	[model setWriteValue:[aSender intValue]]; // Set new value
+    #if 0
     if ([aSender intValue] != [model writeValue]){
 		[[model undoManager] setActionName:@"Set Write Value"]; // Set undo name.
 		[model setWriteValue:[aSender intValue]]; // Set new value
     }
+    #endif
 }
 
 - (IBAction) readRegAction: (id) sender

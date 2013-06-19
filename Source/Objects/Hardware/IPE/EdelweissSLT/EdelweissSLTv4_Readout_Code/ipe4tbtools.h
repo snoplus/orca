@@ -47,6 +47,7 @@ int count_ipe4reader_instances(void);
 int kill_ipe4reader_instances(void);
 
 
+int fifoReadsFLTIndexChecker(int fltIndex, int numfifo, int availableNumFIFO, int maxNumFIFO);
 
 
 /*--------------------------------------------------------------------
