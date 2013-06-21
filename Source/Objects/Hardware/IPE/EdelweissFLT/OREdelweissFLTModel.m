@@ -36,6 +36,7 @@
 
 //#import "ipe4tbtools.cpp"
 
+NSString* OREdelweissFLTModelIonToHeatDelayChanged = @"OREdelweissFLTModelIonToHeatDelayChanged";
 NSString* OREdelweissFLTModelHeatTriggerMaskChanged = @"OREdelweissFLTModelHeatTriggerMaskChanged";
 NSString* OREdelweissFLTModelIonTriggerMaskChanged = @"OREdelweissFLTModelIonTriggerMaskChanged";
 NSString* OREdelweissFLTModelTriggerParameterChanged = @"OREdelweissFLTModelTriggerParameterChanged";
@@ -156,17 +157,21 @@ enum IpeFLTV4Enum{
 	*/
 	kFLTV4HeatTriggerMask_1Reg,     	
 	kFLTV4HeatTriggerMask_2Reg,   	
-	kFLTV4HeatTriggPart1Reg, 	
-	kFLTV4HeatTriggPart2Reg, 	
-	kFLTV4IonTriggPart1Reg,		
-	kFLTV4IonTriggPart2Reg,	
+	kFLTV4HeatTriggParReg, 	
+	kFLTV4IonTriggParReg,		
 		
-	kFLTV4ThresholdReg,
+	kFLTV4HeatThresholdsReg,
+	kFLTV4IonThresholdsReg,
+	//kFLTV4ThresholdReg,
 
+	kFLTV4TriggChannelsReg,
+	kFLTV4TriggEnergyReg,
 	kFLTV4TotalTriggerNReg,
 
 	kFLTV4Delays120meas,
 
+	kFLTV4HitRateReg,
+	
 	kFLTV4BBStatusReg,
 	
 	kFLTV4RAMDataReg,
@@ -217,18 +222,22 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	*/
 	{@"HeatTriggerMask_1",  0x000048>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 	{@"HeatTriggerMask_2",  0x00004C>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-	{@"HeatTriggPart1",     0x000050>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-	{@"HeatTriggPart2",     0x000054>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-	{@"IonTriggPart1",		0x000058>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-	{@"IonTriggPart2",		0x00005C>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+	{@"HeatTriggPar",       0x000050>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+	{@"IonTriggPar",		0x000054>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 
-	{@"Threshold",          0x002080>>2,		-1,				kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel},
+	{@"HeatThresholds",     0x000058>>2,		-1,				kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel},
+	{@"IonThresholds",      0x00005C>>2,		-1,				kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel},
+	//{@"Threshold",          0x002080>>2,		-1,				kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel},
 	
+	{@"TriggerChannels",	0x000078>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+	{@"TriggerEnergy",  	0x000080>>2,		-1,				kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel},
 	{@"TotalTriggerN",		0x000084>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 
 	{@"Delays120meas",		0x000088>>2,		-1,				kIpeRegReadable },
 
 	{@"BBStatus",		    0x001400>>2,		30,				kIpeRegReadable | kIpeRegNeedsChannel},
+
+	{@"HitRate",		    0x001000>>2,		18,				kIpeRegReadable | kIpeRegNeedsChannel},
 
 	{@"RAMData",		    0x003000>>2,		1024,				kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel},
 
@@ -308,6 +317,18 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (short) getNumberRegisters{ return kFLTV4NumRegs; }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+
+- (int) ionToHeatDelay
+{
+    return ionToHeatDelay;
+}
+
+- (void) setIonToHeatDelay:(int)aIonToHeatDelay
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setIonToHeatDelay:ionToHeatDelay];
+    ionToHeatDelay = [self restrictIntValue:aIonToHeatDelay min:0 max:2047];
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelIonToHeatDelayChanged object:self];
+}
 - (int) lowLevelRegInHex
 {
     return lowLevelRegInHex;
@@ -1330,7 +1351,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (void) setPostTriggerTime:(unsigned long)aPostTriggerTime
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setPostTriggerTime:postTriggerTime];
-    postTriggerTime = [self restrictIntValue:aPostTriggerTime min:6 max:2047];//min 6 is found 'experimental' -tb-
+    postTriggerTime = [self restrictIntValue:aPostTriggerTime min:0 max:2047];//min 6 was found 'experimental' for KATRIN -tb-
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelPostTriggerTimeChanged object:self];
 }
 
@@ -1452,8 +1473,16 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
         NSLog(@"----------------------------\n");
     int i;
     for(i=0;i<kNumEWFLTHeatIonChannels;i++){
+        unsigned int val=[self readTriggerPar:i];
+        [self setTriggerPar: i withValue: val];
+        //triggerPar[i]=val;
         NSLog(@"TriggerParameter[%i]: 0x%08x\n",i,triggerPar[i]);
     }    
+    
+    //[[NSNotificationCenter defaultCenter]postNotificationName:OREdelweissFLTModelTriggerParameterChanged object:self];
+
+    //TODO: make own action -tb-
+    [self readThresholds];
 }
 
 - (void) writeTriggerParameters
@@ -1463,7 +1492,11 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     int i;
     for(i=0;i<kNumEWFLTHeatIonChannels;i++){
         NSLog(@"TriggerParameter[%i]: 0x%08x\n",i,triggerPar[i]);
+        [self writeTriggerPar:i value:triggerPar[i]];
     }    
+
+    //TODO: make own action -tb-
+    [self writeThresholds];
 }
 
 - (void) dumpTriggerParameters
@@ -1475,6 +1508,29 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
         NSLog(@"TriggerParameter[%i]: 0x%08x\n",i,triggerPar[i]);
     }    
 }
+
+- (void) setTriggerPar:(unsigned short)chan  withValue:(uint32_t) val
+{
+    if(chan>=kNumEWFLTHeatIonChannels){
+        //DEBUG OUTPUT:
+        NSLog(@"%@::%@: chan %i out of range (0...%i) \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),chan,kNumEWFLTHeatIonChannels-1);//TODO : DEBUG testing ...-tb-
+        return;
+    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setTriggerPar:chan withValue:triggerPar[chan]];
+    triggerPar[chan]=val;
+    [[NSNotificationCenter defaultCenter]postNotificationName:OREdelweissFLTModelTriggerParameterChanged object:self];
+    [[NSNotificationCenter defaultCenter]postNotificationName:OREdelweissFLTModelTriggerEnabledMaskChanged object:self];
+}
+
+- (uint32_t) triggerPar:(unsigned short)chan
+{
+    if(chan<kNumEWFLTHeatIonChannels) return triggerPar[chan];
+    return 0;
+}
+
+
+
+
 
 -(unsigned long) threshold:(unsigned short) aChan
 {
@@ -1489,11 +1545,11 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 -(void) setThreshold:(unsigned short) aChan withValue:(unsigned long) aThreshold
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setThreshold:aChan withValue:[self threshold:aChan]];
-	aThreshold = [self restrictIntValue:aThreshold min:0 max:0xfffff];
-    [thresholds replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aThreshold]];
+	aThreshold = [self restrictUnsignedIntValue:aThreshold min:0 max:0xffffffff];
+    [thresholds replaceObjectAtIndex:aChan withObject:[NSNumber numberWithUnsignedInt:aThreshold]];
 	
     NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
-    [userInfo setObject:[NSNumber numberWithInt:aChan] forKey: OREdelweissFLTChan];
+    [userInfo setObject:[NSNumber numberWithUnsignedInt:aChan] forKey: OREdelweissFLTChan];
 	
     [[NSNotificationCenter defaultCenter]
 	 postNotificationName:OREdelweissFLTModelThresholdChanged
@@ -1826,6 +1882,13 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	else					  return aValue;
 }
 
+- (unsigned int) restrictUnsignedIntValue:(unsigned int)aValue min:(unsigned int)aMinValue max:(unsigned int)aMaxValue;
+{
+	if(aValue<aMinValue)	  return aMinValue;
+	else if(aValue>aMaxValue) return aMaxValue;
+	else					  return aValue;
+}
+
 - (float) restrictFloatValue:(int)aValue min:(float)aMinValue max:(float)aMaxValue
 {
 	if(aValue<aMinValue)	  return aMinValue;
@@ -1917,6 +1980,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	[self readFiberDelays];
 }
 
+
+
 - (unsigned long) readStatus
 {
     unsigned long status = [self readReg: kFLTV4StatusReg ];
@@ -2004,6 +2069,8 @@ exit(66);
 	[self writeReg: kFLTV4ControlReg value:aValue];
 }
 
+
+
 - (void) writeStreamMask
 {
     //NSLog(@"%@::%@:   kFLTV4ControlReg: 0x%016qx \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[self streamMask]);//TODO: DEBUG testing ...-tb-
@@ -2064,6 +2131,50 @@ exit(66);
 	[self setHeatTriggerMask: theMask];
 }
 
+
+
+	
+- (void) writePostTriggerTimeAndIonToHeatDelay
+{
+	unsigned long aValue =	((postTriggerTime & 0xffff)<<16) | (ionToHeatDelay & 0xffff);
+//DEBUG OUTPUT:
+ 	NSLog(@"%@::%@:   kFLTV4Ion2HeatDelayReg: 0x%08x \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),aValue);//TODO: DEBUG testing ...-tb-
+    //DEBUG OUTPUT: 	NSLog(@"%@::%@:   selectFiberTrig: 0x%08x \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),selectFiberTrig);//TODO: DEBUG testing ...-tb-
+	
+	[self writeReg: kFLTV4Ion2HeatDelayReg value:aValue];
+}
+
+- (void) readPostTriggerTimeAndIonToHeatDelay;
+{
+    unsigned long aValue = 0;
+	aValue = [self readReg: kFLTV4Ion2HeatDelayReg];
+    [self setPostTriggerTime: aValue>>16];
+    [self setIonToHeatDelay: aValue & 0xffff];
+}
+
+
+- (void) writeTriggerPar:(int)i value:(unsigned int)aValue
+{
+	//aValue &= 0xfffff;
+    if(i>=0 && i<kNumEWFLTHeatChannels)
+    	[self writeReg: kFLTV4HeatTriggParReg channel:i value:aValue];
+    if(i>=kNumEWFLTHeatChannels && i<(kNumEWFLTHeatChannels+kNumEWFLTIonChannels))
+    	[self writeReg: kFLTV4IonTriggParReg channel:i-kNumEWFLTHeatChannels value:aValue];
+}
+
+- (unsigned int) readTriggerPar:(int)i
+{
+    if(i>=0 && i<kNumEWFLTHeatChannels)
+	    return [self readReg:kFLTV4HeatTriggParReg channel:i];
+    if(i>=kNumEWFLTHeatChannels && i<(kNumEWFLTHeatChannels+kNumEWFLTIonChannels))
+        return [self readReg:kFLTV4IonTriggParReg channel:i-kNumEWFLTHeatChannels];
+	return 0;
+}
+
+
+
+
+
 - (void) writeFiberDelays
 {
  	//NSLog(@"%@::%@ \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG testing ...-tb-
@@ -2100,21 +2211,38 @@ exit(66);
  	NSLog(@"%@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
     unsigned long totalTriggerN = [self readReg:kFLTV4TotalTriggerNReg];
  	NSLog(@" totalTriggerN: %i\n",totalTriggerN);//TODO: DEBUG testing ...-tb-
- 	NSLog(@" selectFiberTrig: %i\n",selectFiberTrig);//TODO: DEBUG testing ...-tb-
-	int num=128;//MUST be > 48!
-	int shownum=6;//MUST be > 48!
+    unsigned long TriggChannels = [self readReg:kFLTV4TriggChannelsReg];
+ 	NSLog(@" TriggChannels: 0x%08x\n",TriggChannels);//TODO: DEBUG testing ...-tb-
+ 	NSLog(@"     adress:   0x%x\n",TriggChannels & 0x7ff);//TODO: DEBUG testing ...-tb-
+ 	NSLog(@"     heatMask: 0x%x\n",(TriggChannels >>12) & 0x3f);//TODO: DEBUG testing ...-tb-
+ 	NSLog(@"     ionMask:  0x%x\n",(TriggChannels >>18) & 0xfff);//TODO: DEBUG testing ...-tb-
+    uint32_t allTriggerMask = (TriggChannels >>12) & 0x3ffff;
+ 	NSLog(@"     allTriggerMask:  0x%x\n",allTriggerMask);//TODO: DEBUG testing ...-tb-
+ 	NSLog(@" selectFiberTrig (obsolete?): %i\n",selectFiberTrig);//TODO: DEBUG testing ...-tb-
+	int num=2048;//MUST be > 48 (DMA block size)! max. 2048
+	int shownum=2048;//MUST be < num!
+	int numChan=kNumEWFLTHeatIonChannels;
+	numChan=1;
 
     #if 1
     //uint32_t buf[2048];
     unsigned long  buf[2048];
     int i,chan;
-    for(chan=0; chan<6;chan++){
-        //unsigned long address=  [self regAddress:kFLTV4RAMDataReg channel: chan index:i]  ;
-        //unsigned long address=  [self regAddress:kFLTV4RAMDataReg ]  ;
-        unsigned long address=  [self regAddress: kFLTV4RAMDataReg   channel: chan]  ;
-	    [self readBlock: address dataBuffer: buf length: num  increment: 1 ];
-	    for (i=0; i<shownum; i++) {
- 	        NSLog(@" adcval chan: %i index %i: 0x%08x\n",chan,i,buf[i]);//TODO: DEBUG testing ...-tb-
+    for(chan=0; chan<numChan;chan++){
+        if(allTriggerMask & (0x1<<chan)){
+            //-----> NSLog(@" ------------- chan: %i \n",chan);
+            unsigned long energy=[self readReg: kFLTV4TriggEnergyReg channel:chan];
+            unsigned long energy2=(~(0xff000000 | energy))+1;
+            printf(" ------------- chan: %i -> energy %lu (0x%08x) energy2 %li  (0x%08x) \n",chan,energy,energy,energy2,energy2);
+            NSLog(@" ------------- chan: %i -> energy %lu (0x%08x) energy2 %li  (0x%08x) \n",chan,energy,energy,energy2,energy2);
+            //unsigned long address=  [self regAddress:kFLTV4RAMDataReg channel: chan index:i]  ;
+            //unsigned long address=  [self regAddress:kFLTV4RAMDataReg ]  ;
+            unsigned long address=  [self regAddress: kFLTV4RAMDataReg   channel: chan]  ;
+	        [self readBlock: address dataBuffer: buf length: num  increment: 1 ];
+    	    for (i=0; i<shownum; i++) {
+ 	            //-----> NSLog(@" adcval chan: %i index %i: 0x%08x\n",chan,i,buf[i]);//TODO: DEBUG testing ...-tb-
+ 	            printf(" adcval chan: %i index %i: 0x%08x\n",chan,i,buf[i]);//TODO: DEBUG testing ...-tb-
+            }
         }
 	}
     #else
@@ -2188,16 +2316,40 @@ for(chan=0; chan<6;chan++)
 
 }
 
+- (void) writeThresholds
+{
+    int i;
+    for(i=0;i<kNumEWFLTHeatIonChannels;i++){
+        uint32_t val=[self threshold:i];
+        [self writeThreshold: i value: val];
+    }
+}
+
+- (void) readThresholds
+{
+    int i;
+    for(i=0;i<kNumEWFLTHeatIonChannels;i++){
+        uint32_t val=[self readThreshold:i];
+        [self setThreshold: i withValue: val];
+    }    
+}
 
 - (void) writeThreshold:(int)i value:(unsigned int)aValue
 {
-	aValue &= 0xfffff;
-	[self writeReg: kFLTV4ThresholdReg channel:i value:aValue];
+	//aValue &= 0xfffff;
+    if(i>=0 && i<kNumEWFLTHeatChannels)
+    	[self writeReg: kFLTV4HeatThresholdsReg channel:i value:aValue];
+    if(i>=kNumEWFLTHeatChannels && i<(kNumEWFLTHeatChannels+kNumEWFLTIonChannels))
+    	[self writeReg: kFLTV4IonThresholdsReg channel:i-kNumEWFLTHeatChannels value:aValue];
 }
 
 - (unsigned int) readThreshold:(int)i
 {
-	return [self readReg:kFLTV4ThresholdReg channel:i] & 0xfffff;
+    if(i>=0 && i<kNumEWFLTHeatChannels)
+	    return [self readReg:kFLTV4HeatThresholdsReg channel:i];
+    if(i>=kNumEWFLTHeatChannels && i<(kNumEWFLTHeatChannels+kNumEWFLTIonChannels))
+        return [self readReg:kFLTV4IonThresholdsReg channel:i-kNumEWFLTHeatChannels];
+	return 0;
 }
 
 
@@ -2424,6 +2576,7 @@ for(chan=0; chan<6;chan++)
 	
     [[self undoManager] disableUndoRegistration];
     
+    [self setIonToHeatDelay:[decoder decodeIntForKey:@"ionToHeatDelay"]];
     [self setLowLevelRegInHex:[decoder decodeIntForKey:@"lowLevelRegInHex"]];
     [self setWriteToBBMode:[decoder decodeIntForKey:@"writeToBBMode"]];
     [self setWCmdArg2:[decoder decodeIntForKey:@"wCmdArg2"]];
@@ -2533,6 +2686,7 @@ for(chan=0; chan<6;chan++)
 {
     [super encodeWithCoder:encoder];
 	
+    [encoder encodeInt:ionToHeatDelay forKey:@"ionToHeatDelay"];
     [encoder encodeInt:lowLevelRegInHex forKey:@"lowLevelRegInHex"];
     [encoder encodeInt:writeToBBMode forKey:@"writeToBBMode"];
     [encoder encodeInt:wCmdArg2 forKey:@"wCmdArg2"];
@@ -2712,6 +2866,7 @@ for(chan=0; chan<6;chan++)
     [objDictionary setObject:gains											forKey:@"gains"];
     [objDictionary setObject:[NSNumber numberWithInt:runMode]				forKey:@"runMode"];
     [objDictionary setObject:[NSNumber numberWithLong:postTriggerTime]		forKey:@"postTriggerTime"];
+    [objDictionary setObject:[NSNumber numberWithLong:ionToHeatDelay]		forKey:@"ionToHeatDelay"];
     [objDictionary setObject:[NSNumber numberWithLong:fifoBehaviour]		forKey:@"fifoBehaviour"];
     [objDictionary setObject:[NSNumber numberWithLong:analogOffset]			forKey:@"analogOffset"];
     [objDictionary setObject:[NSNumber numberWithLong:hitRateLength]		forKey:@"hitRateLength"];

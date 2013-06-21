@@ -126,6 +126,13 @@
 						 name : OREdelweissFLTModelThresholdChanged
 					   object : model];
 	
+    #if 0
+    [notifyCenter addObserver : self
+					 selector : @selector(thresholdArrayChanged:)
+						 name : OREdelweissFLTModelThresholdsChanged
+					   object : model];
+    #endif
+	
     [notifyCenter addObserver : self
 					 selector : @selector(gainChanged:)
 						 name : OREdelweissFLTModelGainChanged
@@ -135,11 +142,6 @@
     [notifyCenter addObserver : self
 					 selector : @selector(gainArrayChanged:)
 						 name : OREdelweissFLTModelGainsChanged
-					   object : model];
-	
-    [notifyCenter addObserver : self
-					 selector : @selector(thresholdArrayChanged:)
-						 name : OREdelweissFLTModelThresholdsChanged
 					   object : model];
 	
     [notifyCenter addObserver : self
@@ -440,9 +442,19 @@
                          name : OREdelweissFLTModelTriggerEnabledMaskChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(ionToHeatDelayChanged:)
+                         name : OREdelweissFLTModelIonToHeatDelayChanged
+						object: model];
+
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+
+- (void) ionToHeatDelayChanged:(NSNotification*)aNote
+{
+	[ionToHeatDelayTextField setIntValue: [model ionToHeatDelay]];
+}
 
 - (void) lowLevelRegInHexChanged:(NSNotification*)aNote
 {
@@ -814,6 +826,7 @@
 		//debug NSLog(@"%@\n",s);
 	}
 	//debug NSLog(@"%016qx done.\n",val);
+    [self channelNameMatrixChanged:nil];
 }
 
 - (void) ionTriggerMaskChanged:(NSNotification*)aNote
@@ -828,6 +841,39 @@
 			else  [[ionTriggerMaskMatrix cellAtRow:fib column: chan] setIntValue: 0];
 		}
 	}
+    
+    [self channelNameMatrixChanged:nil];
+}
+
+- (void) channelNameMatrixChanged:(NSNotification*)aNote
+{
+    //DEBUG: OUTPUT:      	
+    NSLog(@"%@::%@: UNDER CONSTRUCTION!   \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
+
+    int fiber, chan, countHeat=0, countIon=0;
+    for(fiber=0; fiber<kNumEWFLTFibers; fiber++){
+        for(chan=0; chan<kNumEWFLTADCperFiber; chan++){
+            //heat channels
+            if([model heatTriggerMaskForFiber:fiber chan:chan] && countHeat<kNumEWFLTHeatChannels){
+                [[channelNameMatrix cellAtRow:countHeat column:0] setStringValue:[NSString stringWithFormat:@"%i/%i",fiber+1,chan+1]];
+                countHeat++;
+            }
+            //ion channels
+            if([model ionTriggerMaskForFiber:fiber chan:chan] && countIon<kNumEWFLTIonChannels){
+                [[channelNameMatrix cellAtRow:countIon+kNumEWFLTHeatChannels column:0] setStringValue:[NSString stringWithFormat:@"%i/%i",fiber+1,chan+1]];
+                countIon++;
+            }
+        }
+    }
+    //clear unused text fields
+    while(countHeat<kNumEWFLTHeatChannels){
+        [[channelNameMatrix cellAtRow:countHeat column:0] setStringValue:@"-"];
+        countHeat++;
+    }
+    while(countIon<kNumEWFLTIonChannels){
+        [[channelNameMatrix cellAtRow:countIon+kNumEWFLTHeatChannels column:0] setStringValue:@"-"];
+        countIon++;
+    }
 }
 
 
@@ -1040,12 +1086,15 @@
     
     //trigger settings
 	[self thresholdArrayChanged:nil];
+	//[self thresholdChanged:nil];
 	[self triggerEnabledChanged:nil];
 	[self lowLevelRegInHexChanged:nil];
 	[self ionTriggerMaskChanged:nil];
 	[self heatTriggerMaskChanged:nil];
+    //[self channelNameMatrixChanged:nil]; -> called by ionTriggerMaskChanged and heatTriggerMaskChanged
     [self hitRateEnabledMaskChanged:nil];
     [self triggerParameterChanged:nil];
+	[self ionToHeatDelayChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -1271,12 +1320,6 @@
 }
 
 
-- (void) thresholdChanged:(NSNotification*)aNotification
-{
-	int chan = [[[aNotification userInfo] objectForKey:OREdelweissFLTChan] intValue];
-	[[thresholdTextFields cellWithTag:chan] setIntValue: [(OREdelweissFLTModel*)model threshold:chan]];
-}
-
 
 - (void) slotChanged:(NSNotification*)aNotification
 {
@@ -1304,8 +1347,19 @@
 	}	
 }
 
+
+//call for change of single threshold
+- (void) thresholdChanged:(NSNotification*)aNotification
+{
+	int chan = [[[aNotification userInfo] objectForKey:OREdelweissFLTChan] intValue];
+	[[thresholdTextFields cellWithTag:chan] setIntValue: [(OREdelweissFLTModel*)model threshold:chan]];
+}
+
+
+//call for update of all thresholds
 - (void) thresholdArrayChanged:(NSNotification*)aNotification
 {
+    //DEBUG 	    NSLog(@"%@::%@ is OBSOLETE!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
 	short chan;
 	for(chan=0;chan<kNumEWFLTHeatIonChannels;chan++){
 		[[thresholdTextFields cellWithTag:chan] setIntValue: [(OREdelweissFLTModel*)model threshold:chan]];
@@ -1409,6 +1463,11 @@
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+
+- (void) ionToHeatDelayTextFieldAction:(id)sender
+{
+	[model setIonToHeatDelay:[sender intValue]];	
+}
 - (void) lowLevelRegInHexPUAction:(id)sender /*lowLevelRegInHexPU*/
 {
     //DEBUG    
@@ -2062,6 +2121,12 @@
     [model dumpTriggerParameters];
 }
 
+
+- (IBAction) readPostTriggerTimeAndIonToHeatDelayButtonAction:(id)sender{[model readPostTriggerTimeAndIonToHeatDelay];}
+- (IBAction) writePostTriggerTimeAndIonToHeatDelayButtonAction:(id)sender{[model writePostTriggerTimeAndIonToHeatDelay];}
+
+
+
 - (IBAction) triggerEnabledMatrixAction:(id)sender
 {
 
@@ -2420,11 +2485,23 @@
 
 - (IBAction) thresholdAction:(id)sender
 {
-	if([sender intValue] != [(OREdelweissFLTModel*)model threshold:[[sender selectedCell] tag]]){
-		[[self undoManager] setActionName: @"Set Threshold"];
-		[model setThreshold:[[sender selectedCell] tag] withValue:[sender intValue]];
-	}
+//	if([sender intValue] != [(OREdelweissFLTModel*)model threshold:[[sender selectedCell] tag]]){
+//		[[self undoManager] setActionName: @"Set Threshold"];
+//		[model setThreshold:[[sender selectedCell] tag] withValue:[sender intValue]];
+//	}
+    unsigned int col, row, state;
+    col=[sender selectedColumn];
+    row=[sender selectedRow];
+    state = [[sender selectedCell] intValue];
+    //DEBUG: OUTPUT:  
+    	       NSLog(@"%@::%@: UNDER CONSTRUCTION!    selectedCell %@ , state %i ,col is %i, row is %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[sender selectedCell],state,col,row);//TODO : DEBUG testing ...-tb-
+    if(row>=kNumEWFLTHeatIonChannels) return;
+    [model setThreshold:row withValue:state];
+
 }
+
+- (IBAction) readThresholdsButtonAction:(id)sender{ [model readThresholds]; }
+- (IBAction) writeThresholdsButtonAction:(id)sender{ [model writeThresholds]; }
 
 
 - (IBAction) triggerEnableAction:(id)sender

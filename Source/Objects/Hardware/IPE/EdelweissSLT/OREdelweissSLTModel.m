@@ -735,9 +735,8 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 - (void) setLowLevelRegInHex:(int)aLowLevelRegInHex
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setLowLevelRegInHex:lowLevelRegInHex];
-    
-    lowLevelRegInHex = aLowLevelRegInHex;
 
+    lowLevelRegInHex = aLowLevelRegInHex;
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelLowLevelRegInHexChanged object:self];
 }
 
@@ -749,7 +748,6 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 - (void) setStatusHighReg:(unsigned long)aStatusRegHigh
 {
     statusHighReg = aStatusRegHigh;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelStatusRegHighChanged object:self];
 }
 
@@ -761,7 +759,6 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 - (void) setStatusLowReg:(unsigned long)aStatusRegLow
 {
     statusLowReg = aStatusRegLow;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelStatusRegLowChanged object:self];
 }
 
@@ -787,9 +784,7 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 - (void) setTakeRawUDPData:(int)aTakeRawUDPData
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setTakeRawUDPData:takeRawUDPData];
-    
     takeRawUDPData = aTakeRawUDPData;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelTakeRawUDPDataChanged object:self];
 }
 
@@ -802,10 +797,8 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 - (void) setChargeBBFile:(NSString *)aChargeBBFile
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setChargeBBFile:chargeBBFile];
-    
     [chargeBBFile autorelease];
     chargeBBFile = [aChargeBBFile copy];    
-
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelChargeBBFileChanged object:self];
 }
 
@@ -817,9 +810,7 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 - (void) setUseBroadcastIdBB:(bool)aUseBroadcastIdBB
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setUseBroadcastIdBB:useBroadcastIdBB];
-    
     useBroadcastIdBB = aUseBroadcastIdBB;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelUseBroadcastIdBBChanged object:self];
 }
 
@@ -831,9 +822,7 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 - (void) setIdBBforWCommand:(int)aIdBBforWCommand
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setIdBBforWCommand:idBBforWCommand];
-    
     idBBforWCommand = aIdBBforWCommand;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelIdBBforWCommandChanged object:self];
 }
 
@@ -845,9 +834,7 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 - (void) setTakeEventData:(int)aTakeEventData
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setTakeEventData:takeEventData];
-    
     takeEventData = aTakeEventData;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelTakeEventDataChanged object:self];
 }
 
@@ -859,9 +846,7 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 - (void) setTakeUDPstreamData:(int)aTakeUDPstreamData
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setTakeUDPstreamData:takeUDPstreamData];
-    
     takeUDPstreamData = aTakeUDPstreamData;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelTakeUDPstreamDataChanged object:self];
 }
 
@@ -889,9 +874,7 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 - (void) setBBCmdFFMask:(uint32_t)aBBCmdFFMask
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setBBCmdFFMask:BBCmdFFMask];
-    
     BBCmdFFMask = aBBCmdFFMask & 0xff;//is only 8 bit
-
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelBBCmdFFMaskChanged object:self];
 }
 
@@ -905,7 +888,6 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setCmdWArg4:cmdWArg4];
     cmdWArg4 = aCmdWArg4;
     if(cmdWArg4<0) cmdWArg4=0;     if(cmdWArg4>0xff) cmdWArg4=0xff; 
-
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelCmdWArg4Changed object:self];
 }
 
@@ -917,10 +899,8 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 - (void) setCmdWArg3:(int)aCmdWArg3
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setCmdWArg3:cmdWArg3];
-    
     cmdWArg3 = aCmdWArg3;
     if(cmdWArg3<0) cmdWArg3=0;     if(cmdWArg3>0xff) cmdWArg3=0xff; 
-
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelCmdWArg3Changed object:self];
 }
 
@@ -932,10 +912,8 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 - (void) setCmdWArg2:(int)aCmdWArg2
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setCmdWArg2:cmdWArg2];
-    
     cmdWArg2 = aCmdWArg2;
     if(cmdWArg2<0) cmdWArg2=0;     if(cmdWArg2>0xff) cmdWArg2=0xff; 
-
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelCmdWArg2Changed object:self];
 }
 
@@ -947,10 +925,8 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 - (void) setCmdWArg1:(int)aCmdWArg1
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setCmdWArg1:cmdWArg1];
-    
     cmdWArg1 = aCmdWArg1;
     if(cmdWArg1<0) cmdWArg1=0;     if(cmdWArg1>0xff) cmdWArg1=0xff; 
-
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelCmdWArg1Changed object:self];
 }
 
@@ -962,11 +938,9 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 - (void) setSltDAQMode:(int)aSltDAQMode
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setSltDAQMode:sltDAQMode];
-    
     sltDAQMode = aSltDAQMode;
     if(sltDAQMode<0) sltDAQMode=0;
     if(sltDAQMode>4) sltDAQMode=4;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelSltDAQModeChanged object:self];
 }
 
@@ -978,9 +952,7 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 - (void) setNumRequestedUDPPackets:(int)aNumRequestedUDPPackets
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setNumRequestedUDPPackets:numRequestedUDPPackets];
-    
     numRequestedUDPPackets = aNumRequestedUDPPackets;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelNumRequestedUDPPacketsChanged object:self];
 }
 
@@ -993,7 +965,6 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 {
     isListeningOnDataServerSocket = aIsListeningOnDataServerSocket;
 	dataReplyThreadData.isListeningOnDataServerSocket=isListeningOnDataServerSocket;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelIsListeningOnDataServerSocketChanged object:self];
 }
 
@@ -1016,9 +987,7 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 - (void) setCrateUDPDataReplyPort:(int)aCrateUDPDataReplyPort
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setCrateUDPDataReplyPort:crateUDPDataReplyPort];
-    
     crateUDPDataReplyPort = aCrateUDPDataReplyPort;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelCrateUDPDataReplyPortChanged object:self];
 }
 
@@ -1030,10 +999,8 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 - (void) setCrateUDPDataIP:(NSString*)aCrateUDPDataIP
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setCrateUDPDataIP:crateUDPDataIP];
-    
     [crateUDPDataIP autorelease];
     crateUDPDataIP = [aCrateUDPDataIP copy];    
-
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelCrateUDPDataIPChanged object:self];
 }
 
@@ -1045,9 +1012,7 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 - (void) setCrateUDPDataPort:(int)aCrateUDPDataPort
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setCrateUDPDataPort:crateUDPDataPort];
-    
     crateUDPDataPort = aCrateUDPDataPort;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelCrateUDPDataPortChanged object:self];
 }
 
@@ -1059,7 +1024,6 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 - (void) setEventFifoStatusReg:(unsigned long)aEventFifoStatusReg
 {
     eventFifoStatusReg = aEventFifoStatusReg;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelEventFifoStatusRegChanged object:self];
 }
 
@@ -1083,9 +1047,7 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 - (void) setSelectedFifoIndex:(int)aSelectedFifoIndex
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setSelectedFifoIndex:selectedFifoIndex];
-    
     selectedFifoIndex = aSelectedFifoIndex;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelSelectedFifoIndexChanged object:self];
 }
 
@@ -1097,7 +1059,6 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 - (void) setIsListeningOnServerSocket:(int)aIsListeningOnServerSocket
 {
     isListeningOnServerSocket = aIsListeningOnServerSocket;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelIsListeningOnServerSocketChanged object:self];
 }
 
@@ -1110,10 +1071,8 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 - (void) setCrateUDPCommand:(NSString*)aCrateUDPCommand
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setCrateUDPCommand:crateUDPCommand];
-    
     [crateUDPCommand autorelease];
     crateUDPCommand = [aCrateUDPCommand copy];    
-
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelCrateUDPCommandChanged object:self];
 }
 
@@ -1125,9 +1084,7 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 - (void) setCrateUDPReplyPort:(int)aCrateUDPReplyPort
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setCrateUDPReplyPort:crateUDPReplyPort];
-    
     crateUDPReplyPort = aCrateUDPReplyPort;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelCrateUDPReplyPortChanged object:self];
 }
 
@@ -1140,11 +1097,9 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 - (void) setCrateUDPCommandIP:(NSString*)aCrateUDPCommandIP
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setCrateUDPCommandIP:crateUDPCommandIP];
-    
     //crateUDPCommandIP = aCrateUDPCommandIP;
     [crateUDPCommandIP autorelease];
     crateUDPCommandIP = [aCrateUDPCommandIP copy];    
-
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelCrateUDPCommandIPChanged object:self];
 }
 
@@ -1156,9 +1111,7 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 - (void) setCrateUDPCommandPort:(int)aCrateUDPCommandPort
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setCrateUDPCommandPort:crateUDPCommandPort];
-    
     crateUDPCommandPort = aCrateUDPCommandPort;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelCrateUDPCommandPortChanged object:self];
 }
 - (BOOL) secondsSetInitWithHost
@@ -1183,7 +1136,7 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 {
 	if(!aSltScriptArguments)aSltScriptArguments = @"";
     [[[self undoManager] prepareWithInvocationTarget:self] setSltScriptArguments:sltScriptArguments];
-    
+
     [sltScriptArguments autorelease];
     sltScriptArguments = [aSltScriptArguments copy];    
 
@@ -1201,7 +1154,6 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 {
     clockTime = aClockTime;
  	//NSLog(@"   %@::%@:   clockTime: 0x%016qx from aClockTime: 0x%016qx   \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),clockTime , aClockTime);//TODO: DEBUG testing ...-tb-
-
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelClockTimeChanged object:self];
 }
 
@@ -1214,7 +1166,6 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 - (void) setStatusReg:(unsigned long)aStatusReg
 {
     statusReg = aStatusReg;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelStatusRegChanged object:self];
 }
 

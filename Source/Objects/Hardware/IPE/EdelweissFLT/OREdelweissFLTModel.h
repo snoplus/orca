@@ -173,6 +173,7 @@
     int lowLevelRegInHex;
     uint64_t ionTriggerMask;
     uint64_t heatTriggerMask;
+    int ionToHeatDelay;
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
@@ -183,6 +184,8 @@
 - (short) getNumberRegisters;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+- (int) ionToHeatDelay;
+- (void) setIonToHeatDelay:(int)aIonToHeatDelay;
 - (int) lowLevelRegInHex;
 - (void) setLowLevelRegInHex:(int)aLowLevelRegInHex;
 - (int) writeToBBMode;
@@ -301,8 +304,8 @@
 - (void) setStoreDataInRam:(BOOL)aStoreDataInRam;
 - (int) filterLength;
 - (void) setFilterLength:(int)aFilterLength;
-- (int) gapLength;
-- (void) setGapLength:(int)aGapLength;
+- (int) gapLength;//TODO: obsolete - remove it -tb- 2013-06
+- (void) setGapLength:(int)aGapLength;//TODO: obsolete - remove it -tb- 2013-06
 - (unsigned long) postTriggerTime;
 - (void) setPostTriggerTime:(unsigned long)aPostTriggerTime;
 - (int) fifoBehaviour;
@@ -350,6 +353,8 @@
 - (void) readTriggerParameters;
 - (void) writeTriggerParameters;
 - (void) dumpTriggerParameters;
+- (void) setTriggerPar:(unsigned short)chan  withValue:(uint32_t) val;
+- (uint32_t) triggerPar:(unsigned short)chan;
 
 - (unsigned long)threshold:(unsigned short) aChan;
 - (unsigned short)gain:(unsigned short) aChan;
@@ -390,6 +395,7 @@
 - (unsigned short) selectedChannelValue;
 - (void) setSelectedChannelValue:(unsigned short) aValue;
 - (int) restrictIntValue:(int)aValue min:(int)aMinValue max:(int)aMaxValue;
+- (unsigned int) restrictUnsignedIntValue:(unsigned int)aValue min:(unsigned int)aMinValue max:(unsigned int)aMaxValue;
 - (float) restrictFloatValue:(int)aValue min:(float)aMinValue max:(float)aMaxValue;
 
 
@@ -437,6 +443,10 @@
 - (void) readIonTriggerMask;
 - (void) writeHeatTriggerMask;
 - (void) readHeatTriggerMask;
+- (void) writePostTriggerTimeAndIonToHeatDelay;
+- (void) readPostTriggerTimeAndIonToHeatDelay;
+- (void) writeTriggerPar:(int)i value:(unsigned int)aValue;
+- (unsigned int) readTriggerPar:(int)i;
 
 - (void) writeFiberDelays;
 - (void) readFiberDelays;
@@ -458,6 +468,8 @@
 
 /** Print result of hardware statistics for all channels */
 - (void) printStatistics; // ak, 7.10.07
+- (void) writeThresholds;
+- (void) readThresholds;
 - (void) writeThreshold:(int)i value:(unsigned int)aValue;
 - (unsigned int) readThreshold:(int)i;
 - (void) writeTriggerControl;
@@ -526,6 +538,7 @@
 				  n:(int) n;
 @end
 
+extern NSString* OREdelweissFLTModelIonToHeatDelayChanged;
 extern NSString* OREdelweissFLTModelHeatTriggerMaskChanged;
 extern NSString* OREdelweissFLTModelIonTriggerMaskChanged;
 extern NSString* OREdelweissFLTModelTriggerParameterChanged;

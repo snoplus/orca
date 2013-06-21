@@ -22,6 +22,7 @@
 #define kNumEWFLTHeatChannels       6
 #define kNumEWFLTIonChannels       12
 #define kNumEWFLTFibers   6
+#define kNumEWFLTADCperFiber   6
 #define kNumBBStatusBufferLength32   30
 #define kNumBBStatusBufferLength16   (kNumBBStatusBufferLength32*2)
 #define kNumBBStatusLength16   58

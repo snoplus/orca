@@ -31,6 +31,7 @@
     
         //FLT settings
         IBOutlet NSButton*		settingLockButton;
+	IBOutlet   NSTextField* ionToHeatDelayTextField;
 	IBOutlet   NSTextField* wCmdArg2TextField;
 	IBOutlet   NSTextField* wCmdArg1TextField;
 	IBOutlet   NSTextField* wCmdCodeTextField;
@@ -185,8 +186,10 @@
 - (void) updateButtons;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+- (void) ionToHeatDelayChanged:(NSNotification*)aNote;
 - (void) heatTriggerMaskChanged:(NSNotification*)aNote;
 - (void) ionTriggerMaskChanged:(NSNotification*)aNote;
+- (void) channelNameMatrixChanged:(NSNotification*)aNote;
 - (void) triggerParameterChanged:(NSNotification*)aNote;
 - (void) lowLevelRegInHexChanged:(NSNotification*)aNote;
 - (void) writeToBBModeChanged:(NSNotification*)aNote;
@@ -259,6 +262,7 @@
 - (void) selectedChannelValueChanged:(NSNotification*) aNote;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+- (IBAction) ionToHeatDelayTextFieldAction:(id)sender;
 - (IBAction) heatTriggerMaskTextFieldAction:(id)sender;
 - (IBAction) ionTriggerMaskTextFieldAction:(id)sender;
 - (IBAction) lowLevelRegInHexPUAction:(id)sender;
@@ -336,6 +340,9 @@
 - (IBAction) writeTriggerParametersButtonAction:(id)sender;
 - (IBAction) dumpTriggerParametersButtonAction:(id)sender;
 
+- (IBAction) readPostTriggerTimeAndIonToHeatDelayButtonAction:(id)sender;
+- (IBAction) writePostTriggerTimeAndIonToHeatDelayButtonAction:(id)sender;
+
 - (IBAction) triggerEnabledMatrixAction:(id)sender;
 - (IBAction) enableAllTriggersAction: (id) sender;
 - (IBAction) enableNoTriggersAction: (id) sender;
@@ -373,6 +380,9 @@
 - (IBAction) triggerEnableAction:(id)sender;
 
 - (IBAction) thresholdAction:(id)sender;
+- (IBAction) readThresholdsButtonAction:(id)sender;
+- (IBAction) writeThresholdsButtonAction:(id)sender;
+
 - (IBAction) settingLockAction:(id) sender;
 - (IBAction) modeAction: (id) sender;
 - (IBAction) versionAction: (id) sender;
