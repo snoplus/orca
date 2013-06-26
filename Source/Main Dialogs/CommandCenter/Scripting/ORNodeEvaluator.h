@@ -150,3 +150,20 @@
 @property (copy) NSString* title;
 @property (retain) NSMutableDictionary* inputFields;
 @end
+
+@interface ORScriptUserStatusController : NSWindowController
+{
+    IBOutlet NSTextField* titleField;
+    id delegate;
+    NSString* title;
+    NSString* variableList;
+    NSMutableDictionary* valueFields;
+}
+- (id) initWithDelegate:(id)aDelegate variableList:(NSString*)aString;
+- (void) refresh;
+
+@property (assign) id delegate;
+@property (copy) NSString* variableList;
+@property (copy) NSString* title;
+@property (retain) NSMutableDictionary* valueFields;
+@end

@@ -123,6 +123,7 @@ E			[Ee][+-]?{D}+
 "import"			return IMPORT;
 "confirm"			return CONFIRM;
 "request"			return REQUEST;
+"show"              return SHOW;
 
 {L}({L}|{D})*   {
                 strncpy(OrcaScriptlval.symKey,yytext,yyleng);

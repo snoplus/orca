@@ -77,6 +77,7 @@
 - (id)      requestFromUser:(id) p;
 - (void)    startConfirmSheet:(id)aString;
 - (void)    startRequestSheet:(id)aString;
+- (id)      showStatusDialog:(id) p;
 
 
 - (NSMutableDictionary*) makeSymbolTable;
@@ -277,7 +278,11 @@
 
 - (void) setSymbolTable:(NSDictionary*)aSymbolTable
 {
-	if(!aSymbolTable)return;
+	if(!aSymbolTable){
+        [symbolTable release];
+        symbolTable = nil;
+        return;
+    }
 	
 	if(!symbolTable)symbolTable = [[self makeSymbolTable] retain];
 	[symbolTable addEntriesFromDictionary:aSymbolTable];
@@ -574,6 +579,7 @@
 		case CONFIRM:       return [self confirmWithUser:p];
 		case REQUEST:       return [self requestFromUser:p];
 		case kConfirmTimeOut:	return [self confirmWithUserTimeout:p];
+		case SHOW:          return [self showStatusDialog:p];
 		case NSDICTIONARY:	return [NSMutableDictionary dictionary];
         case NSDATECOMPONENTS:
         {
@@ -907,6 +913,7 @@
 	s = [s stringByExpandingTildeInPath];
 	return [NSString stringWithContentsOfFile:s encoding:NSASCIIStringEncoding error:nil];
 }
+
 - (id) requestFromUser:(id) p
 {
     userResponded = NO;
@@ -930,7 +937,6 @@
     [userDialogController release];
     userDialogController = nil;
     return userResult;
-    return userResult;
 }
 
 - (void) startRequestSheet:(id)aString
@@ -941,7 +947,15 @@
 	[userDialogController showWindow:self];
 }
 
-- (id)      confirmWithUser:(id) p
+
+- (id) showStatusDialog:(id) p
+{
+    id statusDialogController = [[ORScriptUserStatusController alloc] initWithDelegate:self variableList:NodeValue(0)];
+	[statusDialogController showWindow:self];
+    return [statusDialogController autorelease];
+}
+
+- (id) confirmWithUser:(id) p
 {
     userResponded = NO;
     [self performSelectorOnMainThread:@selector(startConfirmSheet:) withObject:NodeValue(0) waitUntilDone:NO];
@@ -1836,7 +1850,7 @@
 
 @synthesize delegate,variableList,title,inputFields;
 
-- (id) initWithDelegate:(id)aDelegate title:(NSString*)aTitle variableList:(NSString*)aString
+- (id) initWithDelegate:(id)aDelegate  title:(NSString*)aTitle variableList:(NSString*)aString
 {
 	if(!(self = [super initWithWindowNibName: @"UserRequest"]))return nil;
     self.delegate       = aDelegate;
@@ -1851,7 +1865,6 @@
     self.variableList   = nil;
     self.title          = nil;
     self.inputFields    = nil;
-    self.title          = nil;
     [super dealloc];
 }
 
@@ -1936,5 +1949,109 @@
 - (IBAction) cancelAction:(id)sender
 {
     [delegate setUserResult:0];
+}
+@end
+
+@implementation ORScriptUserStatusController
+
+@synthesize delegate,variableList,title,valueFields;
+
+- (id) initWithDelegate:(id)aDelegate variableList:(NSString*)aString
+{
+	if(!(self = [super initWithWindowNibName: @"UserStatus"]))return nil;
+    self.delegate       = aDelegate;
+    self.title          = [aDelegate scriptName];
+    self.variableList  = aString;
+    self.valueFields = [NSMutableDictionary dictionary];
+	return self;
+}
+
+- (void) dealloc
+{
+    self.variableList   = nil;
+    self.title          = nil;
+    self.valueFields    = nil;
+    [super dealloc];
+}
+
+- (void) awakeFromNib
+{
+    [titleField setStringValue:title];
+    
+    NSArray* variables = [variableList componentsSeparatedByString:@","];
+    int variableCount  = [variables count];
+    
+    NSRect windowFrame = [[self window] frame];
+    float yStart = 20;
+    float y = yStart;
+    float x = 5;
+    float dy = 24;
+    int count = 0;
+    BOOL reset = NO;
+    [[self window] setTitle:[delegate scriptName]];
+    for(id aName in variables){
+        if([valueFields objectForKey:aName])continue; //prevent duplicates
+        id theObj = [delegate valueForSymbol:aName];
+        //restrict the kind of class that can be used.
+        if(![theObj isKindOfClass:NSClassFromString(@"NSDecimalNumber")] &&
+           ![theObj isKindOfClass:NSClassFromString(@"NSString")])continue;
+        
+        NSString* className = nil;
+        if([theObj isKindOfClass:NSClassFromString(@"NSDecimalNumber")])    className = @"NSDecimalNumber";
+        else if([theObj isKindOfClass:NSClassFromString(@"NSString")])      className = @"NSString";
+        
+        NSTextField* labelField = [[NSTextField alloc] initWithFrame:NSMakeRect(x,y,75,20)];
+        NSTextField* textField = [[NSTextField alloc] initWithFrame:NSMakeRect(x+80,y,75,20)];
+        
+        [labelField setAutoresizingMask: NSViewMinYMargin];
+        [textField setAutoresizingMask: NSViewMinYMargin];
+        
+        
+        [self.window.contentView addSubview:labelField];
+        [self.window.contentView addSubview:textField];
+        [labelField setBezeled:NO];
+        [labelField setEditable:NO];
+        [labelField setDrawsBackground:NO];
+
+        [textField setBezeled:NO];
+        [textField setEditable:NO];
+        [textField setDrawsBackground:NO];
+
+        [labelField setAlignment:NSRightTextAlignment];
+        [textField setAlignment:NSLeftTextAlignment];
+        
+        [labelField setObjectValue:[NSString stringWithFormat:@"%@:",aName]];
+        [textField setObjectValue:theObj];
+        
+        //make a small dictionary so we can get the values and classNames later.
+        [valueFields setObject:[NSDictionary dictionaryWithObjectsAndKeys:textField,@"textField",className,@"className", nil] forKey:aName];
+        
+        [labelField release];
+        [textField release];
+        y -= dy;
+        if(!reset && (++count >= (int)(variableCount/2. +.5))){
+            x = 85 + 75 + 10;
+            y = yStart;
+            reset = YES;
+        }
+    }
+    float windowX = windowFrame.origin.x;
+    float windowY = windowFrame.origin.y;
+    float h = windowFrame.size.height + count * dy - 4;
+    float w = windowFrame.size.width;
+    [[self window] setFrame:NSMakeRect(windowX,windowY,w,h) display:YES];
+    [[self window]center];
+    [super awakeFromNib];
+}
+
+- (void) refresh
+{    
+    for(id aName in [valueFields allKeys]){
+        id theObj = [delegate valueForSymbol:aName];
+        if(theObj){
+            id dictionary = [valueFields objectForKey:aName];
+            [[dictionary objectForKey:@"textField"] setObjectValue:theObj];
+        }
+    }
 }
 @end

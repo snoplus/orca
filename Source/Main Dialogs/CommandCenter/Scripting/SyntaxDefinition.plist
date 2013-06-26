@@ -66,6 +66,7 @@
 		<string>shell</string>
 		<string>confirm</string>
 		<string>request</string>
+		<string>show</string>
 	</array>
 	<key>Constants</key>
 	<array>

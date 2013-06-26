@@ -597,6 +597,7 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 	}
 	running = NO;
 	[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORScriptRunnerRunningChanged object:self userInfo:nil waitUntilDone:YES];
+    [eval setSymbolTable:nil];
 	[pool release];
 	[scriptThread release];
 	scriptThread = nil;
