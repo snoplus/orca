@@ -1126,6 +1126,7 @@
 		843A7673070DD7B800B9FAA1 /* Trigger32.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8467E6A906480F0A00A35E6A /* Trigger32.nib */; };
 		843A781F0711B10E00B9FAA1 /* NSDictionary+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 843A781D0711B10E00B9FAA1 /* NSDictionary+Extensions.h */; };
 		843A78200711B10E00B9FAA1 /* NSDictionary+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 843A781E0711B10E00B9FAA1 /* NSDictionary+Extensions.m */; };
+		843B8F911779F6630040DDFE /* UserStatus.xib in Resources */ = {isa = PBXBuildFile; fileRef = 843B8F901779F6630040DDFE /* UserStatus.xib */; };
 		843CDF58071C9CF4009D7D30 /* RandomPulser.nib in Resources */ = {isa = PBXBuildFile; fileRef = 843CDF57071C9CF4009D7D30 /* RandomPulser.nib */; };
 		843CDF64071C9DB3009D7D30 /* ORRandomPulserModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 843CDF60071C9DB3009D7D30 /* ORRandomPulserModel.m */; };
 		843CDF65071C9DB3009D7D30 /* ORRandomPulserController.h in Headers */ = {isa = PBXBuildFile; fileRef = 843CDF61071C9DB3009D7D30 /* ORRandomPulserController.h */; };
@@ -4097,6 +4098,7 @@
 		843A54D607BBE7A500534C27 /* OR4ChanTriggerModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = OR4ChanTriggerModel.m; sourceTree = "<group>"; };
 		843A781D0711B10E00B9FAA1 /* NSDictionary+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+Extensions.h"; sourceTree = "<group>"; };
 		843A781E0711B10E00B9FAA1 /* NSDictionary+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+Extensions.m"; sourceTree = "<group>"; };
+		843B8F901779F6630040DDFE /* UserStatus.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UserStatus.xib; sourceTree = "<group>"; };
 		843CA9BE053E011B005F64B1 /* English */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = English; path = English.lproj/notice.gif; sourceTree = "<group>"; };
 		843CDEBC03BE2B2D00C39F5F /* ORPreferencesController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORPreferencesController.h; sourceTree = "<group>"; };
 		843CDEBD03BE2B2D00C39F5F /* ORPreferencesController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORPreferencesController.m; sourceTree = "<group>"; };
@@ -6815,6 +6817,7 @@
 				841922800F0BC1E300EF1C1C /* ScriptIDE.nib */,
 				84256534176CF86600F360E4 /* UserConfirm.xib */,
 				84256536176D348300F360E4 /* UserRequest.xib */,
+				843B8F901779F6630040DDFE /* UserStatus.xib */,
 				84080D240B3C7FBE009D3704 /* ORScriptRunner.h */,
 				84080D250B3C7FBE009D3704 /* ORScriptRunner.m */,
 				84C281D10B45BDEA00C9CDA9 /* ORNodeEvaluator.h */,
@@ -15046,6 +15049,7 @@
 				B3805611172BE4A100B5B134 /* Changesfeed.tif in Resources */,
 				84256535176CF86600F360E4 /* UserConfirm.xib in Resources */,
 				84256537176D348400F360E4 /* UserRequest.xib in Resources */,
+				843B8F911779F6630040DDFE /* UserStatus.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
