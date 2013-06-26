@@ -500,7 +500,6 @@
 - (void) runNumberChanged:(NSNotification*)aNotification
 {
 	[runNumberText setIntValue:[model runNumber]];
-	[runNumberStepper setIntValue:[model runNumber]];
 	if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
 		[runNumberField setStringValue:[model fullRunNumberString]];
 	}
@@ -613,7 +612,6 @@
 {
     BOOL locked = [gSecurity isLocked:ORRunNumberLock];
     [runNumberLockButton setState: locked];
-    [runNumberStepper setEnabled: !locked];
     [runNumberText setEnabled: !locked];
     [runNumberDirButton setEnabled: !locked];
 }
@@ -782,10 +780,33 @@
 
 - (IBAction) runNumberAction:(id)sender
 {
-    if([sender intValue] != [model runNumber]){
-        [[self undoManager] setActionName: @"Set Run Number"];
-        [model setRunNumber:[sender intValue]];
+    [self endEditing];
+    if([runNumberText intValue] != [model runNumber]){
+        NSBeginAlertSheet(@"Do you REALLY want to change the Run Number?",
+                          @"Cancel",
+                          @"Yes/Change It",
+                          nil,[self window],
+                          self,
+                          @selector(_changeRunNumberDidEnd:returnCode:contextInfo:),
+                          nil,
+                          nil,@"Having a unique run number is important for most experiments. If you change it you may end up with data with duplicate run numbers.");
     }
+}
+
+- (void) _changeRunNumberDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+    if(returnCode == NSAlertAlternateReturn){
+        //have to do this after the alert actually closes, hence the delay to the next cycle of the event loop
+        [self performSelector:@selector(deferredRunNumberChange) withObject:nil afterDelay:0];
+    }
+    else {
+        [runNumberText setIntValue:[model runNumber]];
+    }
+}
+
+- (void) deferredRunNumberChange
+{
+    [model setRunNumber:[runNumberText intValue]];
 }
 
 - (IBAction) runModeAction:(id)sender
@@ -799,37 +820,55 @@
 
 - (IBAction) chooseDir:(id)sender
 {
+    NSBeginAlertSheet(@"Do you REALLY want to change the Run Number Folder?",
+                      @"Cancel",
+                      @"Yes/Select New Location",
+                      nil,[self window],
+                      self,
+                      @selector(_chooseDirAlertDidEnd:returnCode:contextInfo:),
+                      nil,
+                      nil,@"Having a unique run number is important for most experiments. If you change the run number folder you may end up with duplicate run numbers.");
+}
 
-    NSString* startDir = NSHomeDirectory(); //default to home
-    if([model definitionsFilePath]){
-        startDir = [[model definitionsFilePath]stringByDeletingLastPathComponent];
-        if([startDir length] == 0){
-            startDir = NSHomeDirectory();
-        }
+- (void) _chooseDirAlertDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+    if(returnCode == NSAlertAlternateReturn){
+        //have to do this after the alert actually closes, hence the delay to the next cycle of the event loop
+        [self performSelector:@selector(deferredChooseDir) withObject:nil afterDelay:0];
     }
-    NSOpenPanel *openPanel = [NSOpenPanel openPanel];
-    [openPanel setCanChooseDirectories:YES];
-    [openPanel setCanChooseFiles:NO];
-    [openPanel setAllowsMultipleSelection:NO];
-    [openPanel setPrompt:@"Choose"];
-    
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-    [openPanel setDirectoryURL:[NSURL fileURLWithPath:startDir]];
-    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
-        if (result == NSFileHandlingPanelOKButton){
-            NSString* dirName = [[[openPanel URL]path] stringByAbbreviatingWithTildeInPath];
-            [model setDirName:dirName];
+}
+- (void) deferredChooseDir
+{
+        NSString* startDir = NSHomeDirectory(); //default to home
+        if([model definitionsFilePath]){
+            startDir = [[model definitionsFilePath]stringByDeletingLastPathComponent];
+            if([startDir length] == 0){
+                startDir = NSHomeDirectory();
+            }
         }
-    }];
-#else
-    [openPanel beginSheetForDirectory:startDir
-                                 file:nil
-                                types:nil
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(openPanelDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif
+        NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+        [openPanel setCanChooseDirectories:YES];
+        [openPanel setCanChooseFiles:NO];
+        [openPanel setAllowsMultipleSelection:NO];
+        [openPanel setPrompt:@"Choose"];
+        
+    #if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+        [openPanel setDirectoryURL:[NSURL fileURLWithPath:startDir]];
+        [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+            if (result == NSFileHandlingPanelOKButton){
+                NSString* dirName = [[[openPanel URL]path] stringByAbbreviatingWithTildeInPath];
+                [model setDirName:dirName];
+            }
+        }];
+    #else
+        [openPanel beginSheetForDirectory:startDir
+                                     file:nil
+                                    types:nil
+                           modalForWindow:[self window]
+                            modalDelegate:self
+                           didEndSelector:@selector(openPanelDidEnd:returnCode:contextInfo:)
+                              contextInfo:NULL];
+    #endif
 }
 
 - (IBAction) definitionsFileAction:(id)sender
@@ -841,8 +880,6 @@
             startDir = NSHomeDirectory();
         }
     }
-
-
 
     NSOpenPanel *openPanel = [NSOpenPanel openPanel];
     [openPanel setCanChooseDirectories:NO];

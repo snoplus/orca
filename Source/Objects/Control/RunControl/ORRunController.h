@@ -65,7 +65,6 @@
     
     IBOutlet NSButton*    runNumberDirButton;
     IBOutlet NSTextField* runNumberDirField;
-    IBOutlet NSStepper*   runNumberStepper;
     IBOutlet NSTextField* runNumberText;
     
     IBOutlet NSMatrix*      runTypeMatrix;
@@ -108,7 +107,6 @@
 - (IBAction) timedRunCBAction:(id)sender;
 - (IBAction) repeatRunCBAction:(id)sender;
 - (IBAction) quickStartCBAction:(id)sender;
-- (IBAction) chooseDir:(id)sender;
 - (IBAction) runNumberAction:(id)sender;
 - (IBAction) runModeAction:(id)sender;
 - (IBAction) runTypeAction:(id)sender;
@@ -124,6 +122,11 @@
 - (IBAction) startNewSubRunAction:(id)sender;
 - (IBAction) prepareForSubRunAction:(id)sender;
 - (IBAction) forceClearWaitsAction:(id)sender;
+- (IBAction) chooseDir:(id)sender;
+- (void) _chooseDirAlertDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) _changeRunNumberDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) deferredRunNumberChange;
+- (void) deferredChooseDir;
 
 #pragma mark ¥¥¥Interface Management
 - (void) selectedRunTypeScriptChanged:(NSNotification*)aNote;
