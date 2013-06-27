@@ -392,9 +392,9 @@
 	//[NSBezierPath strokeRect:bounds];
 }
 
-- (NSData*) plotAsPDFData
+- (NSData*) plotAsPDFData:(NSRect)aRect
 {
-	return [viewForPDF dataWithPDFInsideRect: [viewForPDF bounds]];
+	return [viewForPDF dataWithPDFInsideRect: aRect];
 }
 
 

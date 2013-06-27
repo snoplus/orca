@@ -247,7 +247,7 @@
 - (int) numberOfPlots					      { return [plotView numberOfPlots]; }
 - (void) enableCursorRects					  { [plotView enableCursorRects]; }
 - (void) disableCursorRects					  { [plotView disableCursorRects]; }
-- (NSData*) plotAsPDFData					  { return [plotView plotAsPDFData]; }
+- (NSData*) plotAsPDFData					  { return [plotView plotAsPDFData:[self bounds]]; }
 - (void) setUseGradient:(BOOL)state			  { [plotView setUseGradient:state]; }
 - (void) setBackgroundColor:(NSColor*)aColor  { [plotView setBackgroundColor:aColor]; }
 - (void) addPlot:(id)aPlot					  { [plotView addPlot:aPlot]; }

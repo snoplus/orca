@@ -109,7 +109,7 @@
 #pragma mark ***Drawing
 - (void) drawBackground;
 - (void) drawRect:(NSRect)rect; 
-- (NSData*) plotAsPDFData;
+- (NSData*) plotAsPDFData:(NSRect)aRect;
 - (void) drawComment;
 
 #pragma mark ***Component Switching
