@@ -670,7 +670,9 @@ NSString* ORLakeShore336PollTimeChanged         = @"ORLakeShore336PollTimeChange
 {
     for(id anInput in inputs){
         [self writeToDevice:[anInput inputSetupString]];
+        [self writeToDevice:[anInput setPointString]];
     }
+    
 }
 
 - (void) setInputs:(NSMutableArray*)anArray

@@ -28,6 +28,7 @@
     int             range;
     BOOL            compensation;
     int             units;
+    float           setPoint;
     double          lowLimit;
     double          highLimit;
     double          minValue;
@@ -43,6 +44,7 @@
 - (void) timeRateAtIndex:(int)i x:(double*)xValue y:(double*)yValue;
 - (BOOL) sensorEnabled;
 - (NSString*) inputSetupString;
+- (NSString*) setPointString;
 
 #pragma mark ***Archival
 - (id)initWithCoder:(NSCoder*)decoder;
@@ -61,6 +63,7 @@
 @property (assign,nonatomic) double         maxValue;
 @property (retain)           ORTimeRate*    timeRate;
 @property (assign)           unsigned long  timeMeasured;
+@property (assign,nonatomic) float          setPoint;
 @property (assign,nonatomic) int            sensorType;
 @property (retain)           NSArray*       rangeStrings;
 

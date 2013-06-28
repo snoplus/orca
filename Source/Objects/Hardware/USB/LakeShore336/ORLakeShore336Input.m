@@ -27,7 +27,7 @@ NSString* ORLakeShore336InputTemperatureChanged  = @"ORLakeShore336InputTemperat
 
 @synthesize label,channel,temperature, sensorType, autoRange, range, compensation, units;
 @synthesize lowLimit,highLimit,minValue,maxValue,timeRate,timeMeasured;
-@synthesize rangeStrings;
+@synthesize rangeStrings,setPoint;
 - (id) init
 {
     self = [super init];
@@ -66,6 +66,12 @@ NSString* ORLakeShore336InputTemperatureChanged  = @"ORLakeShore336InputTemperat
     NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:channel] forKey:@"Index"];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ORLakeShore336InputTemperatureChanged object:self userInfo:userInfo];
+}
+
+- (void) setSetPoint:(float)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSetPoint:setPoint];
+    setPoint = aValue;
 }
 
 - (void) setRange:(int)aValue
@@ -219,6 +225,7 @@ NSString* ORLakeShore336InputTemperatureChanged  = @"ORLakeShore336InputTemperat
     [self setHighLimit:      [decoder decodeFloatForKey: @"highLimit"]];
     [self setMinValue:      [decoder decodeFloatForKey:  @"minValue"]];
     [self setMaxValue:      [decoder decodeFloatForKey:  @"maxValue"]];
+    [self setSetPoint:      [decoder decodeFloatForKey:  @"setPoint"]];
 
     if(lowLimit < 0.001 && highLimit < 0.001 && minValue < 0.001 && maxValue < 0.001){
         lowLimit = 0;
@@ -245,12 +252,20 @@ NSString* ORLakeShore336InputTemperatureChanged  = @"ORLakeShore336InputTemperat
     [encoder encodeFloat:maxValue       forKey:@"maxValue"];
     [encoder encodeInt:sensorType       forKey:@"sensorType"];
     [encoder encodeInt:[self range]     forKey:@"range"];
+    [encoder encodeFloat:setPoint       forKey:@"setPoint"];
 }
 
 - (NSString*) inputSetupString;
 {
     return [NSString stringWithFormat:@"INTYPE %c,%d,%d,%d,%d,%d",'A'+channel,sensorType,autoRange,range,compensation,units];
 }
+
+- (NSString*) setPointString;
+{
+    return [NSString stringWithFormat:@"SETP %d,%@%f.2",channel+1,setPoint>0?@"+":@"-",setPoint];
+}
+
+
 - (int) numberPointsInTimeRate
 {
     return [timeRate count];
