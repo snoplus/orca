@@ -2049,6 +2049,8 @@
 {
     for(id aName in [valueFields allKeys]){
         id theObj = [delegate valueForSymbol:aName];
+        if(![theObj isKindOfClass:NSClassFromString(@"NSDecimalNumber")] &&
+           ![theObj isKindOfClass:NSClassFromString(@"NSString")])continue;
         if(theObj){
             id dictionary = [valueFields objectForKey:aName];
             [[dictionary objectForKey:@"textField"] setObjectValue:theObj];
