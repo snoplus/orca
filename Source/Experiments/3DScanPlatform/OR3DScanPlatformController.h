@@ -26,41 +26,64 @@
 {
 	IBOutlet ORGroupView*           subComponentsView;
     IBOutlet NSButton*              lockButton;
-    IBOutlet NSTextField*           targetAngleText;
-    IBOutlet NSButton*              goButton;
     IBOutlet OR3DScanPlatformView*  view3D;
-    IBOutlet NSButton*              homePlusButton;
-    IBOutlet NSButton*              homeMinusButton;
-    IBOutlet NSTextField*           currentAngleText;
     
-    double conversion; //steps per angle
-    int MOTORNUM;
+    IBOutlet NSTextField*           rotationSpeedText;
+    IBOutlet NSTextField*           currentAngleText;
+    IBOutlet NSTextField*           targetAngleText;
+    IBOutlet NSButton*              rotationGoButton;
+    IBOutlet NSButton*              rotationHomeButton;
+    
+    IBOutlet NSTextField*           zSpeedText;
+    IBOutlet NSTextField*           currentZText;
+    IBOutlet NSTextField*           targetZText;
+    IBOutlet NSButton*              zGoButton;
+    IBOutlet NSButton*              zHomeButton;
+    
+    IBOutlet NSButton*              stopButton;
+    
+    double rotationConversion; //steps per angle
+    double zConversion; //steps per block of OpenGL space
+    int rotatingMotorNum;
+    int zMotorNum;
     
     double currentAngle;
-    double motorAngle;
+    int motorAngle;
+    double currentZ, motorZ;
+    
     double rotation; //how much model should rotate when displayed
     double trans; //how much model moves in z direction
-    bool inc, dec;
+    
+    double rotationSpeed, translationSpeed;
 }
 
 - (id) init;
 - (void) awakeFromNib;
 - (double) getRotation;
 - (double) getTrans;
-- (ORVXMMotor*) findModelMotor;
+- (void) updateButtons;
+- (ORVXMMotor*) rotatingMotor;
+- (ORVXMMotor*) zMotor;
 
 #pragma mark ***Interface Management
 - (void) registerNotificationObservers;
 - (void) lockChanged:(NSNotification*)aNote;
 - (void) groupChanged:(NSNotification*)aNote;
+- (void) cmdTypeExecutingChanged:(NSNotification*)aNotification;
+- (void) motorSpeedChanged:(NSNotification*)aNotification;
 - (void) motorTargetChanged:(NSNotification*)aNotification;
 - (void) motorPositionChanged:(NSNotification*)aNotification;
 
 #pragma mark •••Actions
 - (IBAction) lockAction:(id) sender;
 - (IBAction) angleAction:(id) sender;
-- (IBAction) goAction:(id) sender;
-- (IBAction) homePlusAction:(id) sender;
-- (IBAction) homeMinusAction:(id) sender;
+- (IBAction) zAction:(id)sender;
+- (IBAction) rotationSpeedAction:(id)sender;
+- (IBAction) zSpeedAction:(id)sender;
+- (IBAction) rotationGoAction:(id) sender;
+- (IBAction) zGoAction:(id) sender;
+- (IBAction) stopAction:(id) sender;
+- (IBAction) zHomeAction:(id) sender;
+- (IBAction) rotationHomeAction:(id) sender;
 
 @end

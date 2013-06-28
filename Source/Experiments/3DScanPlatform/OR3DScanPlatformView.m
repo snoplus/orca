@@ -20,11 +20,15 @@
 #import "OR3DScanPlatformView.h"
 #import "OR3DScanPlatformController.h"
 #import "ORVXMMotor.h"
+#import "OROpenGLObject.h"
 #include "math.h"
 
 @implementation OR3DScanPlatformView
 -(void) dealloc
 {
+    [leadBrick release];
+    [source release];
+    
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
     [super dealloc];
 }
@@ -32,11 +36,21 @@
 - (void) awakeFromNib
 {
     [super awakeFromNib];
+    
+    NSBundle* mainBundle = [NSBundle mainBundle];
+	NSString* leadBrickPath = [mainBundle pathForResource: @"LeadBrick" ofType: @"obj"];
+    NSString* sourcePath = [mainBundle pathForResource:@"SourceModel" ofType:@"obj"];
+    
+    leadBrick = [[OROpenGLObject alloc] init];
+    [leadBrick createObjectFromFile:leadBrickPath];
+    
+    source = [[OROpenGLObject alloc] init];
+    [source createObjectFromFile:sourcePath];
 }
 
 - (void) resetCamera
 {
-    camera.aperture = 40;
+    camera.aperture = 50;
     camera.rotPoint = gOrigin;
     
     camera.viewPos.x = 0.0;
@@ -248,62 +262,6 @@
                                height:height translateX:tx translateY:ty translateZ:tz];
 }
 
-- (void) processOpenGLvertices:(float[][3])vertices normals:(float[][3])normals
-                         faces:(int[][3])faces faceNormals:(int[][3])faceNormals
-                    faceColors:(float[][3])faceColors numFaces:(int)fSz
-{
-    int i;
-    for(i=0; i<fSz; i++)
-    {
-        glColor3f(faceColors[i][0], faceColors[i][1], faceColors[i][2]);
-        glBegin(GL_POLYGON);
-            glNormal3f(normals[faceNormals[i][0]][0], normals[faceNormals[i][0]][1], normals[faceNormals[i][0]][2]);
-            glVertex3f(vertices[faces[i][0]][0], vertices[faces[i][0]][1],
-                vertices[faces[i][0]][2]);
-            glNormal3f(normals[faceNormals[i][1]][0], normals[faceNormals[i][1]][1],
-                normals[faceNormals[i][1]][2]);
-            glVertex3f(vertices[faces[i][1]][0], vertices[faces[i][1]][1],
-                vertices[faces[i][1]][2]);
-            glNormal3f(normals[faceNormals[i][2]][0], normals[faceNormals[i][2]][1],
-                normals[faceNormals[i][2]][2]);
-            glVertex3f(vertices[faces[i][2]][0], vertices[faces[i][2]][1],
-                vertices[faces[i][2]][2]);
-        glEnd();
-    }
-}
-
-- (void) openGLCode
-{
-    float vertices[8][3] = {
-        {0.503187, 0, -0.883433}, {-1, 0, 0.481758}, {-1, 0, -0.883433}, {0.503187, 0, 0.481758}, {0.503187, 0.786439, 0.481758}, {0.503187, 0.786439, -0.883433},
-        {-1, 0.786439, -0.883433}, {-1, 0.786439, 0.481758}
-    };
-    
-    float normals[6][3] = {
-        {0, -1, -0}, {1, 0, -0}, {0, 0, -1}, {-1, 0, -0}, {0, 0, 1}, {0, 1, -0}
-    };
-    
-    int faces[12][3] = {
-        {0, 1, 2}, {1, 0, 3}, {0, 4, 3}, {4, 0, 5}, {0, 6, 5}, {6, 0, 2},
-        {1, 6, 2}, {6, 1, 7}, {1, 4, 7}, {4, 1, 3}, {4, 6, 7},
-        {6, 4, 5}
-    };
-    
-    int faceNormals[12][3] = {
-        {0, 0, 0}, {0, 0, 0}, {1, 1, 1}, {1, 1, 1}, {2, 2, 2}, {2, 2, 2},
-        {3, 3, 3}, {3, 3, 3}, {4, 4, 4}, {4, 4, 4}, {5, 5, 5},
-        {5, 5, 5}
-    };
-    
-    float faceColors[12][3] = {
-        {0.117647, 0.737255, 0.160784}, {0.117647, 0.737255, 0.160784}, {0.117647, 0.737255, 0.160784}, {0.117647, 0.737255, 0.160784}, {0.117647, 0.737255, 0.160784}, {0.117647, 0.737255, 0.160784},
-        {0.819608, 0, 0.972549}, {0.819608, 0, 0.972549}, {0.984314, 0, 0.027451}, {0.984314, 0, 0.027451}, {0.117647, 0.737255, 0.160784},
-        {0.117647, 0.737255, 0.160784}
-    };
-    
-    [self processOpenGLvertices:vertices normals:normals faces:faces faceNormals:faceNormals faceColors:faceColors numFaces:12];
-}
-
 - (void) draw3D:(NSRect)aRect
 {    
     double rot = [delegate getRotation];
@@ -317,9 +275,6 @@
     [self addLighting];
     [self shinyLighting];
     
-    //glColor3f(1,0,0);
-    //[self openGLCode];
-    
     glColor3f(191.0/255,193.0/255,194.0/255); //detector
     [self cylinderInnerRadius:0 outerRadius:.5 height:2.57 translateX:0 translateY:0 translateZ:0];
 
@@ -331,14 +286,10 @@
     [self regularLighting];
     
     glColor3f(151.0/255,105.0/255,79.0/255); //motor
-    [self cubeScaleX:.3 scaleY:.15 scaleZ:.3 translateX:2.2 translateY:.25 translateZ:0
+    [self cubeScaleX:.3 scaleY:.05 scaleZ:.3 translateX:2.2 translateY:.1 translateZ:0
          rotateAngle:rot rotateX:0 rotateY:1 rotateZ:0];
-    glColor3f(205.0/255,170.0/255,125.0/255); //scanner
-    [self cubeScaleX:.2 scaleY:.6 scaleZ:.2 translateX:2.25 translateY:1 translateZ:0
-         rotateAngle:rot rotateX:0 rotateY:1 rotateZ:0];
-    glColor3f(92.0/255,51.0/255,23.0/255); //moving part
-    [self cubeScaleX:.1 scaleY:.1 scaleZ: .1 translateX: 2.1 translateY:.5+trans translateZ:0
-         rotateAngle:rot rotateX:0 rotateY:1 rotateZ:0];
+    [leadBrick drawScaleX:.5 scaleY:.5 scaleZ:.5 translateX:2.1 translateY:.82+trans translateZ:-.18 rotateAngle:rot rotateX:0 rotateY:1 rotateZ:0];
+    [source drawScaleX:2.5 scaleY:2.5 scaleZ:2.5 translateX:2.5 translateY:.15 translateZ:-.2 rotateAngle:rot rotateX:0 rotateY:1 rotateZ:0];
     
     glColor3f(204.0/255,204.0/255,204.0/255); //line at 0
     [self cubeScaleX:1.25 scaleY:.001 scaleZ:.01 translateX:1.25 translateY:.2 translateZ:0 rotateAngle:0 rotateX:0 rotateY:0 rotateZ:0];

@@ -17,10 +17,14 @@
 //for the use of this software.
 
 #import "ORBasicOpenGLView.h"
+#import "OROpenGLObject.h"
 
 @interface OR3DScanPlatformView : ORBasicOpenGLView
 {
     int pyramidCount;
+    
+    OROpenGLObject* leadBrick;
+    OROpenGLObject* source;
 }
 
 - (void) dealloc;

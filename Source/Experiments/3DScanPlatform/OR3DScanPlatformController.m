@@ -43,15 +43,24 @@
 
 - (void) awakeFromNib
 {
-    conversion = 1;
-    MOTORNUM = 1;
-    currentAngle = motorAngle = fmodf([[self findModelMotor] motorPosition],360);
+    rotationConversion = .5;
+    zConversion = 31500;
+    rotatingMotorNum = 1;
+    zMotorNum = 0;
+    
+    currentAngle = 0;
+    motorAngle = 0;
+    currentZ = 0;
+    motorZ = 0;
     rotation = 0;
-    
-    inc = true;
-    dec = false;
-    
+    trans = 0;
+
     [currentAngleText setFloatValue:currentAngle];
+    [currentZText setFloatValue:currentZ];
+    [rotationSpeedText setIntValue:[[self rotatingMotor] motorSpeed]];
+    [zSpeedText setIntValue:[[self zMotor] motorSpeed]];
+    [targetAngleText setIntValue:[[self rotatingMotor] targetPosition]];
+    [targetZText setIntValue:[[self zMotor] targetPosition]];
 	
     [subComponentsView setGroup:model];
 	[super awakeFromNib];
@@ -107,6 +116,16 @@
                      selector : @selector(motorPositionChanged:)
                          name : ORVXMMotorPositionChanged
                        object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(cmdTypeExecutingChanged:)
+                         name : ORVXMModelCmdTypeExecutingChanged
+						object: nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(motorSpeedChanged:)
+                         name : ORVXMMotorSpeedChanged
+						object: nil];
 }
 
 - (void) updateWindow
@@ -130,46 +149,86 @@
     [lockButton setState: locked];
 }
 
+- (void) updateButtons
+{	
+    int cmdExecuting = [[model findMotorModel] cmdTypeExecuting];
+
+	[stopButton setEnabled:cmdExecuting];
+    
+    [rotationGoButton setEnabled:!cmdExecuting];
+	[zGoButton setEnabled:!cmdExecuting];
+    [zHomeButton setEnabled:!cmdExecuting];
+    [rotationHomeButton setEnabled:!cmdExecuting];
+}
+
+- (void) cmdTypeExecutingChanged:(NSNotification*)aNotification
+{
+    [self updateButtons];
+}
+
 - (void) motorTargetChanged:(NSNotification*)aNotification
 {
     if([aNotification object] == [model findMotorModel])
     {
-        if([[aNotification userInfo] objectForKey:@"VMXMotor"] == [[model findMotorModel] motor:MOTORNUM])
+        if([[aNotification userInfo] objectForKey:@"VMXMotor"] == [self rotatingMotor])
         {
-            int angle = (ceil([[self findModelMotor] targetPosition] / conversion));
+            int angle = (ceil([[self rotatingMotor] targetPosition] / rotationConversion));
             [targetAngleText setIntValue:angle];
         }
+        
+        else if([[aNotification userInfo] objectForKey:@"VMXMotor"] == [self zMotor])
+        {
+            [targetZText setIntValue:[[self zMotor] targetPosition]];
+        }
+    }
+}
+
+- (void) motorSpeedChanged:(NSNotification*)aNotification
+{
+    if([aNotification object] == [model findMotorModel])
+    {
+        if([[aNotification userInfo] objectForKey:@"VMXMotor"] == [self rotatingMotor])
+            [rotationSpeedText setIntValue:[[self rotatingMotor] motorSpeed]];
+        
+        else if([[aNotification userInfo] objectForKey:@"VMXMotor"] == [self zMotor])
+            [zSpeedText setIntValue:[[self zMotor] motorSpeed]];
     }
 }
 
 - (void) motorPositionChanged:(NSNotification*)aNotification
 {
-    //NSLog(@"motorAngle=%.3f",motorAngle);
-    motorAngle = fmodf([[self findModelMotor] motorPosition],360);
-    //NSLog(@"motorAngle=%.3f",motorAngle);
-    
-    if(![[model findMotorModel] isMoving])
+    if([aNotification object] == [model findMotorModel])
     {
-        [goButton setEnabled:YES];
-        [homePlusButton setEnabled:YES];
-        [homeMinusButton setEnabled:YES];
+        if([[aNotification userInfo] objectForKey:@"VMXMotor"] == [self rotatingMotor])
+        {            
+            if([[self rotatingMotor] absoluteMotion])
+                motorAngle = [[self rotatingMotor] motorPosition] / rotationConversion;
+            else
+                motorAngle += [[self rotatingMotor] targetPosition] / rotationConversion;
+    
+            rotationSpeed = 100;
+            if(currentAngle >= motorAngle + .5 || currentAngle <= motorAngle - .5)
+                [self performSelector:@selector(updateRotation) withObject:nil afterDelay:.01];
+        }
+        
+        else if([[aNotification userInfo] objectForKey:@"VMXMotor"] == [self zMotor])
+        {
+            if([[self zMotor] absoluteMotion])
+                motorZ = [[self zMotor] motorPosition];
+            else
+                motorZ += [[self zMotor] targetPosition];
+            
+            translationSpeed = 10000;
+            if(currentZ >= motorZ + 100 || currentZ <= motorZ - 100)
+                [self performSelector:@selector(updateTranslation) withObject:nil afterDelay:.01];
+        }
     }
-    
-    [self performSelector:@selector(updateRotation) withObject:nil afterDelay:.1];
-
-    /*if(currentAngle > targetAngle + .5 || currentAngle < targetAngle - .5)
-    {
-        rotation = targetAngle;
-        currentAngle = targetAngle;
-        [currentAngleText setFloatValue:currentAngle];
-        [view3D setNeedsDisplay:YES];
-    }*/
 }
 
 - (void) updateRotation
 {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self];
-    
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateRotation) object:nil];
+
     if(currentAngle < motorAngle)
     {
         rotation += .5;
@@ -181,26 +240,33 @@
         currentAngle -= .5;
     }
     
-    if(inc)
-        trans += .01;
-    if(dec)
-        trans -= .01;
-    if(inc && trans>.9)
-    {
-        inc = false;
-        dec = true;
-    }
-    if(dec && trans<.1)
-    {
-        inc = true;
-        dec = false;
-    }
-    
     [currentAngleText setFloatValue:currentAngle];
     [view3D setNeedsDisplay:YES];
     
-    if(currentAngle > motorAngle + .5 || currentAngle < motorAngle - .5)
-        [self performSelector:@selector(updateRotation) withObject:nil afterDelay:.02];
+    if(currentAngle >= motorAngle + .5 || currentAngle <= motorAngle - .5)
+        [self performSelector:@selector(updateRotation) withObject:nil afterDelay:.5/rotationSpeed];
+}
+
+- (void) updateTranslation
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateTranslation) object:nil];
+    
+    if(currentZ < motorZ)
+    {
+        trans += 100 / zConversion;
+        currentZ += 100;
+    }
+    else
+    {
+        trans -= 100 / zConversion;
+        currentZ -= 100;
+    }
+    
+    [currentZText setFloatValue:currentZ];
+    [view3D setNeedsDisplay:YES];
+    
+    if(currentZ >= motorZ + 100 || currentZ <= motorZ - 100)
+        [self performSelector:@selector(updateTranslation) withObject:nil afterDelay:100/translationSpeed];
 }
 
 - (void) checkGlobalSecurity
@@ -218,45 +284,72 @@
 
 - (IBAction) angleAction:(id) sender
 {
-    int steps = floor(conversion * [sender floatValue]);
-    [[self findModelMotor] setTargetPosition:steps];
+    int steps = floor(rotationConversion * [sender floatValue]);
+    [[self rotatingMotor] setTargetPosition:steps];
 }
 
-- (IBAction) goAction:(id) sender
+- (IBAction) zAction:(id)sender
 {
-    [[model findMotorModel] move:MOTORNUM dx:[[self findModelMotor] targetPosition]];
-    if([[model findMotorModel] isMoving])
-    {
-        [goButton setEnabled:NO];
-        [homePlusButton setEnabled:NO];
-        [homeMinusButton setEnabled:NO];
-    }
+    [[self zMotor] setTargetPosition:[sender floatValue]];
 }
 
-- (IBAction) homePlusAction:(id) sender
+- (IBAction) zSpeedAction:(id)sender
 {
-    [[model findMotorModel] goHome:MOTORNUM plusDirection:YES];
-    if([[model findMotorModel] isMoving])
-    {
-        [goButton setEnabled:NO];
-        [homePlusButton setEnabled:NO];
-        [homeMinusButton setEnabled:NO];
-    }
+    [[self zMotor] setMotorSpeed:[sender intValue]];
 }
 
-- (IBAction) homeMinusAction:(id) sender
+- (IBAction) rotationSpeedAction:(id) sender
 {
-    [[model findMotorModel] goHome:MOTORNUM plusDirection:NO];
-    if([[model findMotorModel] isMoving])
-    {
-        [goButton setEnabled:NO];
-        [homePlusButton setEnabled:NO];
-        [homeMinusButton setEnabled:NO];
-    }
+    [[self rotatingMotor] setMotorSpeed:[sender intValue]];
 }
 
-- (ORVXMMotor*) findModelMotor
+- (IBAction) rotationGoAction:(id) sender
 {
-    return [[model findMotorModel] motor:MOTORNUM];
+    [self endEditing];
+    [[self rotatingMotor] setAbsoluteMotion:YES];
+    [[model findMotorModel] move:rotatingMotorNum to:[[self rotatingMotor] targetPosition] speed:[[self rotatingMotor] motorSpeed]];
+
+    motorAngle = [[self rotatingMotor] targetPosition] / rotationConversion;              //start animating when go is pressed
+    rotationSpeed = [[self rotatingMotor] motorSpeed];
+    if(currentAngle >= motorAngle + .5 || currentAngle <= motorAngle - .5)
+        [self performSelector:@selector(updateRotation) withObject:nil afterDelay:.01];
 }
+
+- (IBAction) zGoAction:(id)sender
+{
+    [self endEditing];
+    [[self zMotor] setAbsoluteMotion:YES];
+    [[model findMotorModel] move:zMotorNum to:[[self zMotor] targetPosition] speed:[[self zMotor] motorSpeed]];
+    
+    motorZ = [[self zMotor] targetPosition];
+    translationSpeed = [[self zMotor] motorSpeed];
+    if(currentZ >= motorZ + 100 || currentZ <= motorZ - 100)
+        [self performSelector:@selector(updateTranslation) withObject:nil afterDelay:.01];
+}
+
+- (IBAction) stopAction:(id)sender
+{
+    [[model findMotorModel] stopAllMotion];
+}
+
+- (IBAction) zHomeAction:(id) sender
+{
+    [[model findMotorModel] goHome:zMotorNum plusDirection:NO];
+}
+
+- (IBAction) rotationHomeAction:(id) sender
+{
+    [[model findMotorModel] goHome:rotatingMotorNum plusDirection:NO];
+}
+
+- (ORVXMMotor*) rotatingMotor
+{
+    return [[model findMotorModel] motor:rotatingMotorNum];
+}
+
+- (ORVXMMotor*) zMotor
+{
+    return [[model findMotorModel] motor:zMotorNum];
+}
+
 @end
