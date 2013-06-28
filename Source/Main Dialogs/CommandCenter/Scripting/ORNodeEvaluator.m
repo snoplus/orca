@@ -950,8 +950,8 @@
 
 - (id) showStatusDialog:(id) p
 {
-    id statusDialogController = [[ORScriptUserStatusController alloc] initWithDelegate:self variableList:NodeValue(0)];
-	[statusDialogController showWindow:self];
+    NSWindowController* statusDialogController = [[ORScriptUserStatusController alloc] initWithDelegate:self variableList:NodeValue(0)];
+	[statusDialogController performSelectorOnMainThread:@selector(showWindow:) withObject:self waitUntilDone:YES];
     return [statusDialogController autorelease];
 }
 
@@ -1995,11 +1995,7 @@
         //restrict the kind of class that can be used.
         if(![theObj isKindOfClass:NSClassFromString(@"NSDecimalNumber")] &&
            ![theObj isKindOfClass:NSClassFromString(@"NSString")])continue;
-        
-        NSString* className = nil;
-        if([theObj isKindOfClass:NSClassFromString(@"NSDecimalNumber")])    className = @"NSDecimalNumber";
-        else if([theObj isKindOfClass:NSClassFromString(@"NSString")])      className = @"NSString";
-        
+                
         NSTextField* labelField = [[NSTextField alloc] initWithFrame:NSMakeRect(x,y,75,20)];
         NSTextField* textField = [[NSTextField alloc] initWithFrame:NSMakeRect(x+80,y,75,20)];
         
@@ -2024,7 +2020,7 @@
         [textField setObjectValue:theObj];
         
         //make a small dictionary so we can get the values and classNames later.
-        [valueFields setObject:[NSDictionary dictionaryWithObjectsAndKeys:textField,@"textField",className,@"className", nil] forKey:aName];
+        [valueFields setObject:[NSDictionary dictionaryWithObjectsAndKeys:textField,@"textField", nil] forKey:aName];
         
         [labelField release];
         [textField release];
@@ -2045,7 +2041,12 @@
 }
 
 - (void) refresh
-{    
+{
+    [self performSelectorOnMainThread:@selector(refreshOnMainThread) withObject:nil waitUntilDone:NO];
+}
+
+- (void) refreshOnMainThread
+{
     for(id aName in [valueFields allKeys]){
         id theObj = [delegate valueForSymbol:aName];
         if(theObj){
