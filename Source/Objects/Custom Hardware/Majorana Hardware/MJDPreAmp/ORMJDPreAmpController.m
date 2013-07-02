@@ -914,7 +914,7 @@
     *xValue = [[model timeRate:adc] timeSampledAtIndex:index];
     //*yValue = [[model timeRate:adc] valueAtIndex:index];
     
-    float multiplier = 1000.; // nA to pA conversion - niko
+   // float multiplier = 1000.; // nA to pA conversion - niko
     
     //if((adc < 5) || ((adc > 7) && (adc < 13))){ // first stage ouput values
 

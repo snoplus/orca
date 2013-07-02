@@ -161,6 +161,7 @@
 }
 - (id) initWithDelegate:(id)aDelegate variableList:(NSString*)aString;
 - (void) refresh;
+- (void) refreshOnMainThread;
 
 @property (assign) id delegate;
 @property (copy) NSString* variableList;

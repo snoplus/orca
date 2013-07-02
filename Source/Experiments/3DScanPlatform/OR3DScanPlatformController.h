@@ -64,6 +64,8 @@
 - (void) updateButtons;
 - (ORVXMMotor*) rotatingMotor;
 - (ORVXMMotor*) zMotor;
+- (void) updateTranslation;
+- (void) updateRotation;
 
 #pragma mark ***Interface Management
 - (void) registerNotificationObservers;

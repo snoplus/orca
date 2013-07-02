@@ -27,6 +27,7 @@
 //  faces (f)
 
 #import "OROpenGLObject.h"
+#include <GLUT/glut.h>                  //Allows access to the glut library
 
 @implementation OROpenGLObject
 

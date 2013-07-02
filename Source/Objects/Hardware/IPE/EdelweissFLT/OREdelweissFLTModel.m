@@ -2233,7 +2233,7 @@ exit(66);
             //-----> NSLog(@" ------------- chan: %i \n",chan);
             unsigned long energy=[self readReg: kFLTV4TriggEnergyReg channel:chan];
             unsigned long energy2=(~(0xff000000 | energy))+1;
-            printf(" ------------- chan: %i -> energy %lu (0x%08x) energy2 %li  (0x%08x) \n",chan,energy,energy,energy2,energy2);
+            printf(" ------------- chan: %i -> energy %lu (0x%08lx) energy2 %li  (0x%08lx) \n",chan,energy,energy,energy2,energy2);
             NSLog(@" ------------- chan: %i -> energy %lu (0x%08x) energy2 %li  (0x%08x) \n",chan,energy,energy,energy2,energy2);
             //unsigned long address=  [self regAddress:kFLTV4RAMDataReg channel: chan index:i]  ;
             //unsigned long address=  [self regAddress:kFLTV4RAMDataReg ]  ;
@@ -2241,7 +2241,7 @@ exit(66);
 	        [self readBlock: address dataBuffer: buf length: num  increment: 1 ];
     	    for (i=0; i<shownum; i++) {
  	            //-----> NSLog(@" adcval chan: %i index %i: 0x%08x\n",chan,i,buf[i]);//TODO: DEBUG testing ...-tb-
- 	            printf(" adcval chan: %i index %i: 0x%08x\n",chan,i,buf[i]);//TODO: DEBUG testing ...-tb-
+ 	            printf(" adcval chan: %i index %i: 0x%08lx\n",chan,i,buf[i]);//TODO: DEBUG testing ...-tb-
             }
         }
 	}

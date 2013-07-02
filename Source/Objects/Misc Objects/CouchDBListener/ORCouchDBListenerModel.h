@@ -109,6 +109,7 @@
 - (ORCouchDB*) statusDBRef;
 - (void) listDatabases;
 - (void) fetchCommandDocForCheck;
+- (void) fetchCmdDocForCheck;
 - (void) uploadAllSections;
 - (void) sectionReady;
 
@@ -120,6 +121,7 @@
 - (BOOL) checkSyntax:(NSString*)key;
 - (BOOL) executeCommand:(NSString*)key value:(NSString*)val;
 - (void) setCommands:(NSMutableArray*)anArray;
+- (void) setDefaults;
 - (NSDictionary*) commandAtIndex:(int)index;
 - (NSUInteger) commandCount;
 - (void) addCommand;
