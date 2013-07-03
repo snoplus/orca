@@ -1993,6 +1993,12 @@
 		849B9D7916DD044F003F3037 /* ORSIS3320Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 849B9D7116DD044F003F3037 /* ORSIS3320Model.h */; };
 		849B9D7B16DD044F003F3037 /* SIS3320.nib in Resources */ = {isa = PBXBuildFile; fileRef = 849B9D7316DD044F003F3037 /* SIS3320.nib */; };
 		849B9D7C16DD044F003F3037 /* SIS3320Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 849B9D7416DD044F003F3037 /* SIS3320Card.gif */; };
+		849BD1A21781EDCA00BE0330 /* ApcUps.nib in Resources */ = {isa = PBXBuildFile; fileRef = 849BD19C1781EDCA00BE0330 /* ApcUps.nib */; };
+		849BD1A31781EDCA00BE0330 /* ApcUpsIcon.tif in Resources */ = {isa = PBXBuildFile; fileRef = 849BD19D1781EDCA00BE0330 /* ApcUpsIcon.tif */; };
+		849BD1A41781EDCA00BE0330 /* ORApcUpsController.h in Headers */ = {isa = PBXBuildFile; fileRef = 849BD19E1781EDCA00BE0330 /* ORApcUpsController.h */; };
+		849BD1A51781EDCA00BE0330 /* ORApcUpsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 849BD19F1781EDCA00BE0330 /* ORApcUpsController.m */; };
+		849BD1A61781EDCA00BE0330 /* ORApcUpsModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 849BD1A01781EDCA00BE0330 /* ORApcUpsModel.h */; };
+		849BD1A71781EDCA00BE0330 /* ORApcUpsModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 849BD1A11781EDCA00BE0330 /* ORApcUpsModel.m */; };
 		849C68010A2CC20B00511E30 /* CCUSB.nib in Resources */ = {isa = PBXBuildFile; fileRef = 849C67FD0A2CC20B00511E30 /* CCUSB.nib */; };
 		849C68020A2CC20B00511E30 /* CCUSB.tif in Resources */ = {isa = PBXBuildFile; fileRef = 849C67FE0A2CC20B00511E30 /* CCUSB.tif */; };
 		849C68030A2CC20B00511E30 /* ORCCUSBModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 849C67FF0A2CC20B00511E30 /* ORCCUSBModel.h */; };
@@ -5019,6 +5025,12 @@
 		849B9D7216DD044F003F3037 /* ORSIS3320Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORSIS3320Model.m; sourceTree = "<group>"; };
 		849B9D7316DD044F003F3037 /* SIS3320.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = SIS3320.nib; sourceTree = "<group>"; };
 		849B9D7416DD044F003F3037 /* SIS3320Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = SIS3320Card.gif; sourceTree = "<group>"; };
+		849BD19C1781EDCA00BE0330 /* ApcUps.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = ApcUps.nib; sourceTree = "<group>"; };
+		849BD19D1781EDCA00BE0330 /* ApcUpsIcon.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = ApcUpsIcon.tif; sourceTree = "<group>"; };
+		849BD19E1781EDCA00BE0330 /* ORApcUpsController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORApcUpsController.h; sourceTree = "<group>"; };
+		849BD19F1781EDCA00BE0330 /* ORApcUpsController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORApcUpsController.m; sourceTree = "<group>"; };
+		849BD1A01781EDCA00BE0330 /* ORApcUpsModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORApcUpsModel.h; sourceTree = "<group>"; };
+		849BD1A11781EDCA00BE0330 /* ORApcUpsModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORApcUpsModel.m; sourceTree = "<group>"; };
 		849C67FD0A2CC20B00511E30 /* CCUSB.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = CCUSB.nib; sourceTree = "<group>"; };
 		849C67FE0A2CC20B00511E30 /* CCUSB.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = CCUSB.tif; path = Source/Objects/Hardware/Camac/CCUSB/CCUSB.tif; sourceTree = SOURCE_ROOT; };
 		849C67FF0A2CC20B00511E30 /* ORCCUSBModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORCCUSBModel.h; sourceTree = "<group>"; };
@@ -10171,6 +10183,19 @@
 			path = SIS3320;
 			sourceTree = "<group>";
 		};
+		849BD19B1781EDCA00BE0330 /* ApcUps */ = {
+			isa = PBXGroup;
+			children = (
+				849BD19C1781EDCA00BE0330 /* ApcUps.nib */,
+				849BD19D1781EDCA00BE0330 /* ApcUpsIcon.tif */,
+				849BD19E1781EDCA00BE0330 /* ORApcUpsController.h */,
+				849BD19F1781EDCA00BE0330 /* ORApcUpsController.m */,
+				849BD1A01781EDCA00BE0330 /* ORApcUpsModel.h */,
+				849BD1A11781EDCA00BE0330 /* ORApcUpsModel.m */,
+			);
+			path = ApcUps;
+			sourceTree = "<group>";
+		};
 		849C67FC0A2CC06F00511E30 /* CCUSB */ = {
 			isa = PBXGroup;
 			children = (
@@ -10655,6 +10680,7 @@
 		84B28D4C0F4C651C00E2B056 /* Internet */ = {
 			isa = PBXGroup;
 			children = (
+				849BD19B1781EDCA00BE0330 /* ApcUps */,
 				848E59101472B34400A70AB4 /* TTCPX400DP */,
 				8494C01C1316CEBA00151E7B /* BootBar */,
 				84BA5F240F70388C00CF92D6 /* ZupSupply */,
@@ -14169,6 +14195,8 @@
 				841DACF1175E2CB5002542BD /* OR3DScanPlatformView.h in Headers */,
 				43D7CB89177C84AC00ED4736 /* OROpenGLObject.h in Headers */,
 				43D7CB8D177CBDF600ED4736 /* ORVertex.h in Headers */,
+				849BD1A41781EDCA00BE0330 /* ORApcUpsController.h in Headers */,
+				849BD1A61781EDCA00BE0330 /* ORApcUpsModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -15072,6 +15100,8 @@
 				43D7CB95177DC9D500ED4736 /* LeadBrick.mtl in Resources */,
 				43D7CB96177DC9D500ED4736 /* SourceModel.mtl in Resources */,
 				43D7CB98177DD0C100ED4736 /* 3DScanPlatform.tiff in Resources */,
+				849BD1A21781EDCA00BE0330 /* ApcUps.nib in Resources */,
+				849BD1A31781EDCA00BE0330 /* ApcUpsIcon.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -16083,6 +16113,8 @@
 				841DACF2175E2CB5002542BD /* OR3DScanPlatformView.m in Sources */,
 				43D7CB8A177C84AC00ED4736 /* OROpenGLObject.m in Sources */,
 				43D7CB8E177CBDF600ED4736 /* ORVertex.m in Sources */,
+				849BD1A51781EDCA00BE0330 /* ORApcUpsController.m in Sources */,
+				849BD1A71781EDCA00BE0330 /* ORApcUpsModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
