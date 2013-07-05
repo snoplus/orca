@@ -20,17 +20,21 @@
 
 
 #pragma mark •••Imported Files
+#import "ORAdcProcessing.h"
 
-#define kApcUpsPort 23
+#define kApcUpsPort             23
+#define kNumApcUpsAdcChannels    8 
 
 @class NetSocket;
 @class ORAlarm;
 @class ORTimeRate;
 
-@interface ORApcUpsModel : OrcaObject 
+@interface ORApcUpsModel : OrcaObject <ORAdcProcessing>
 {
 	NSLock*     localLock;
     NSString*   ipAddress;
+    NSString*   password;
+    NSString*   username;
     BOOL        isConnected;
 	NetSocket*  socket;
     BOOL        statusSentOnce;
@@ -43,6 +47,11 @@
     NSDate*     nextPollScheduled;
     ORTimeRate*		timeRate[8];
     BOOL        dataValid;
+    ORAlarm*    dataInValidAlarm;
+    
+    float lowLimit[kNumApcUpsAdcChannels];
+    float hiLimit[kNumApcUpsAdcChannels];
+
 }
 
 #pragma mark ***Accessors
@@ -71,9 +80,30 @@
 - (int) channelForName:(NSString*)aName;
 - (id) phaseKey:(NSString*)aPhaseKey valueKey:(NSString*)aValueKey;
 - (id) valueForKeyInSingleValueDictionary:(NSString*)aKey;
+- (NSString*) nameForIndexInProcessTable:(int)i;
 
 - (id) phaseKey:(NSString*)aPhaseKey valueKey:(NSString*)aValueKey;
 - (id) valueForKeyInSingleValueDictionary:(NSString*)aKey;
+
+#pragma mark •••Process Limits
+- (float) lowLimit:(int)i;
+- (void)  setLowLimit:(int)i value:(float)aValue;
+- (float) hiLimit:(int)i;
+- (void)  setHiLimit:(int)i value:(float)aValue;
+
+#pragma mark •••Bit Processing Protocol
+- (void) startProcessCycle;
+- (void) endProcessCycle;
+- (void) processIsStarting;
+- (void) processIsStopping;
+- (NSString*) identifier;
+- (NSString*) processingTitle;
+- (BOOL) processValue:(int)channel;
+- (double) convertedValue:(int)aChan;
+- (void) setProcessOutput:(int)aChan value:(int)aValue;
+- (double) maxValueForChan:(int)aChan;
+- (double) minValueForChan:(int)aChan;
+- (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit channel:(int)channel;
 
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
@@ -82,14 +112,20 @@
 @property (retain) NSMutableDictionary* singleValueDictionary;
 @property (retain) NSMutableDictionary* phaseDictionary;
 @property (assign,nonatomic) BOOL dataValid;
+@property (retain,nonatomic) NSString* username;
+@property (retain,nonatomic) NSString* password;
 @property (retain,nonatomic) NSDate* lastTimePolled;
 @property (retain,nonatomic) NSDate* nextPollScheduled;
 @end
 
 extern NSString* ORApcUpsIsConnectedChanged;
 extern NSString* ORApcUpsIpAddressChanged;
+extern NSString* ORApcUpsUsernameChanged;
+extern NSString* ORApcUpsPasswordChanged;
 extern NSString* ORApcUpsRefreshTables;
 extern NSString* ORApcUpsPollingTimesChanged;
 extern NSString* ORApcUpsDataValidChanged;
 extern NSString* ORApcUpsTimedOut;
 extern NSString* ORApcUpsLock;
+extern NSString* ORApcUpsHiLimitChanged;
+extern NSString* ORApcUpsLowLimitChanged;

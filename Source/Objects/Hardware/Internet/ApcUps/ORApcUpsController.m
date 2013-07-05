@@ -73,11 +73,10 @@
     [plotter0 setShowLegend:YES];
     [plotter1 setShowLegend:YES];
 
-    [[plotter0 yAxis] setRngLow:0.0 withHigh:60];
-	[[plotter0 yAxis] setRngLimitsLow:0.0 withHigh:60 withMinRng:4];
+    [[plotter0 yAxis] setRngLow:0.0 withHigh:300];
+	[[plotter0 yAxis] setRngLimitsLow:0.0 withHigh:300 withMinRng:4];
     [[plotter1 yAxis] setRngLow:0.0 withHigh:150.];
 	[[plotter1 yAxis] setRngLimitsLow:0.0 withHigh:150 withMinRng:4];
-
 }
 
 - (void) registerNotificationObservers
@@ -138,7 +137,29 @@
     [notifyCenter addObserver : self
 					 selector : @selector(dataValidChanged:)
 						 name : ORApcUpsDataValidChanged
-					   object : model];    
+					   object : model];
+
+    [notifyCenter addObserver : self
+					 selector : @selector(passwordChanged:)
+						 name : ORApcUpsPasswordChanged
+					   object : model];
+
+    [notifyCenter addObserver : self
+					 selector : @selector(usernameChanged:)
+						 name : ORApcUpsUsernameChanged
+					   object : model];
+    
+    [notifyCenter addObserver : self
+					 selector : @selector(refreshProcessTable:)
+						 name : ORApcUpsLowLimitChanged
+					   object : model];
+
+    [notifyCenter addObserver : self
+					 selector : @selector(refreshProcessTable:)
+						 name : ORApcUpsHiLimitChanged
+					   object : model];
+
+    
 }
 
 
@@ -148,11 +169,14 @@
     
     [self settingsLockChanged:nil];
 	[self ipAddressChanged:nil];
+	[self usernameChanged:nil];
+	[self passwordChanged:nil];
 	[self isConnectedChanged:nil];
 	[self refreshTables:nil];
 	[self pollingTimesChanged:nil];
 	[self dataValidChanged:nil];
 	[self updateTimePlot:nil];
+    [self refreshProcessTable:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -229,8 +253,19 @@
     }
     else {
         [dataValidField setTextColor:[NSColor redColor]];
-        [dataValidField setStringValue: @"Nothing returned"];
+        [dataValidField setStringValue: @"Data Invalid"];
     }
+    [self refreshTables:nil];
+}
+
+- (void) passwordChanged:(NSNotification*)aNote
+{
+	[passwordField setStringValue: [model password]];
+}
+
+- (void) usernameChanged:(NSNotification*)aNote
+{
+	[usernameField setStringValue: [model username]];
 }
 
 - (void) isConnectedChanged:(NSNotification*)aNote
@@ -245,6 +280,10 @@
     [powerTableView reloadData];
     [loadTableView reloadData];
     [batteryTableView reloadData];
+}
+- (void) refreshProcessTable:(NSNotification*)aNote
+{
+    [processTableView reloadData];
 }
 
 - (void) ipAddressChanged:(NSNotification*)aNote
@@ -263,6 +302,8 @@
     BOOL locked			= [gSecurity isLocked:ORApcUpsLock];
 
 	[ipAddressField setEnabled:!locked];
+	[usernameField setEnabled:!locked];
+	[passwordField setEnabled:!locked];
     [dialogLock setState: locked];
 }
 
@@ -270,6 +311,16 @@
 - (IBAction) ipAddressAction:(id)sender
 {
 	[model setIpAddress:[sender stringValue]];	
+}
+
+- (IBAction) usernameAction:(id)sender
+{
+	[model setUsername:[sender stringValue]];
+}
+
+- (IBAction) passwordAction:(id)sender
+{
+	[model setPassword:[sender stringValue]];
 }
 
 - (IBAction) connectAction:(id)sender
@@ -289,29 +340,52 @@
     if(aTableView == powerTableView){
         if([[aTableColumn identifier] isEqualToString:@"Name"]) return [model nameAtIndexInPowerTable:rowIndex];
         else {
-            if(rowIndex==4){
-                if([[aTableColumn identifier] isEqualToString:@"L1"]) return [model valueForKeyInSingleValueDictionary:[model keyForIndexInPowerTable:rowIndex]];
-                else return @"";
+            if([model dataValid]){
+                if(rowIndex==4){
+                    if([[aTableColumn identifier] isEqualToString:@"L1"]) return [model valueForKeyInSingleValueDictionary:[model keyForIndexInPowerTable:rowIndex]];
+                    else return @"";
+                }
+                else return [model phaseKey:[aTableColumn identifier] valueKey:[model keyForIndexInPowerTable:rowIndex]];
             }
-            else return [model phaseKey:[aTableColumn identifier] valueKey:[model keyForIndexInPowerTable:rowIndex]];
+            else return @"?";
         }
     }
     else if(aTableView == loadTableView){
         if([[aTableColumn identifier] isEqualToString:@"Name"]) return [model nameForIndexInLoadTable:rowIndex];
         else {
-            if(rowIndex==4){
-                if([[aTableColumn identifier] isEqualToString:@"L1"]) return [model valueForKeyInSingleValueDictionary:[model keyForIndexInLoadTable:rowIndex]];
+            if([model dataValid]){
+                if(rowIndex==4){
+                    if([[aTableColumn identifier] isEqualToString:@"L1"]) return [model valueForKeyInSingleValueDictionary:[model keyForIndexInLoadTable:rowIndex]];
+                }
+               else return [model phaseKey:[aTableColumn identifier] valueKey:[model keyForIndexInLoadTable:rowIndex]];
             }
-           else return [model phaseKey:[aTableColumn identifier] valueKey:[model keyForIndexInLoadTable:rowIndex]];
+            else return @"?";
         }
     }
     else if(aTableView == batteryTableView){
         if([[aTableColumn identifier] isEqualToString:@"Name"]) return [model nameForIndexInBatteryTable:rowIndex];
         else {
-            return [model valueForKeyInSingleValueDictionary:[model keyForIndexInBatteryTable:rowIndex]];
+            if([model dataValid]){
+                return [model valueForKeyInSingleValueDictionary:[model keyForIndexInBatteryTable:rowIndex]];
+            }
+            else return @"?";           
         }
     }
+    else if(aTableView == processTableView){
+        if([[aTableColumn identifier] isEqualToString:@"Name"]) return [model nameForIndexInProcessTable:rowIndex];
+        else if([[aTableColumn identifier] isEqualToString:@"Channel"]) return [NSNumber numberWithInt:rowIndex];
+        else if([[aTableColumn identifier] isEqualToString:@"LowLimit"]) return [NSNumber numberWithFloat:[model lowLimit:rowIndex]];
+        else if([[aTableColumn identifier] isEqualToString:@"HiLimit"]) return [NSNumber numberWithFloat:[model hiLimit:rowIndex]];
+    }
+
     return nil;
+}
+- (void) tableView:(NSTableView *) aTableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
+{
+    if(aTableView == processTableView){
+        if([[aTableColumn identifier] isEqualToString:@"LowLimit"])      [model setLowLimit:rowIndex value:[object floatValue]];
+        else if([[aTableColumn identifier] isEqualToString:@"HiLimit"])  [model setHiLimit:rowIndex value:[object floatValue]];
+    }
 }
 
 //
@@ -323,6 +397,9 @@
     }
     else if(aTableView == batteryTableView){
         return 4;
+    }
+    else if(aTableView == processTableView){
+        return kNumApcUpsAdcChannels;
     }
     else return 0;
 }

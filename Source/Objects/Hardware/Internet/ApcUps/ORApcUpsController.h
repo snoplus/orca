@@ -28,12 +28,15 @@
     IBOutlet NSTableView*   batteryTableView;
 	IBOutlet NSTextField*	ipConnectedField;
 	IBOutlet NSTextField*	ipAddressField;
+	IBOutlet NSTextField*	usernameField;
+	IBOutlet NSTextField*	passwordField;
 	IBOutlet NSButton*		ipConnectButton;
 	IBOutlet NSButton*		dialogLock;
 	IBOutlet NSTextField*   lastPolledField;
 	IBOutlet NSTextField*	nextPollField;
     IBOutlet NSTextField*   dataValidField;
-    
+    IBOutlet NSTableView*   processTableView;
+
 	IBOutlet ORTimedTextField*	timedOutField;
 	IBOutlet ORCompositeTimeLineView*   plotter0;
 	IBOutlet ORCompositeTimeLineView*   plotter1;
@@ -45,9 +48,14 @@
 - (void) refreshTables:(NSNotification*)aNote;
 - (void) pollingTimesChanged:(NSNotification*)aNote;
 - (void) dataValidChanged:(NSNotification*)aNote;
+- (void) usernameChanged:(NSNotification*)aNote;
+- (void) passwordChanged:(NSNotification*)aNote;
+- (void) refreshProcessTable:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) ipAddressAction:(id)sender;
+- (IBAction) usernameAction:(id)sender;
+- (IBAction) passwordAction:(id)sender;
 - (IBAction) connectAction:(id)sender;
 - (IBAction) dialogLockAction:(id)sender;
 
