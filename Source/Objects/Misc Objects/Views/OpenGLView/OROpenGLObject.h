@@ -30,17 +30,18 @@
     NSMutableArray *normals;
  
     NSMutableDictionary *colors;
+    
+    float orientAngle, orientX, orientY, orientZ; //orientation information
 }
 
-- (id) init;
+- (id) initFromFile:(NSString*)inputFile; //fails to init with invalid files, only processes commands mtllib, usemtl, v, vn, f
 - (void) dealloc;
- 
-- (BOOL) createObjectFromFile:(NSString*)inputFile; //returns false if not valid files
 
-- (void) parseFacesFirst:(NSString*)first Second:(NSString*)second Third:(NSString*)third currentColor:(NSString*)currentColor;
-- (void) normalize:(NSMutableArray*)v;
+- (BOOL) parseFaces:(NSArray*)currentLine color:(NSString*)currentColor; //returns false is invalid input, parses both triangles and other polygons
+- (void) divideByLargest:(NSMutableArray*)v; //get arrays down to normal sizes
 - (BOOL) importColors:(NSString*)file; //returns false if not valid file
 
+- (void) orientAngle:(float)angle x:(float)x y:(float)y z:(float)z;
 - (void) drawScaleX:(float)sx scaleY:(float)sy scaleZ:(float)sz
         translateX:(float)tx translateY:(float)ty translateZ:(float)tz
         rotateAngle:(float)ra rotateX:(float)rx rotateY:(float)ry rotateZ:(float)rz;

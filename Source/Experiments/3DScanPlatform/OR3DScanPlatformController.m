@@ -43,7 +43,7 @@
 
 - (void) awakeFromNib
 {
-    rotationConversion = .5;
+    rotationConversion = 1;
     zConversion = 31500;
     rotatingMotorNum = 1;
     zMotorNum = 0;
@@ -54,6 +54,8 @@
     motorZ = 0;
     rotation = 0;
     trans = 0;
+    
+    maxZ = 16551;
 
     [currentAngleText setFloatValue:currentAngle];
     [currentZText setFloatValue:currentZ];
@@ -150,15 +152,21 @@
 }
 
 - (void) updateButtons
-{	
+{
+    //BOOL locked = [gSecurity isLocked:ORVXMLock];
+    BOOL locked = NO;
     int cmdExecuting = [[model findMotorModel] cmdTypeExecuting];
 
 	[stopButton setEnabled:cmdExecuting];
     
-    [rotationGoButton setEnabled:!cmdExecuting];
-	[zGoButton setEnabled:!cmdExecuting];
-    [zHomeButton setEnabled:!cmdExecuting];
-    [rotationHomeButton setEnabled:!cmdExecuting];
+    [rotationGoAbsButton setEnabled:!locked && !cmdExecuting];
+    [rotationGoRelButton setEnabled:!locked && !cmdExecuting];
+    [rotationHomePlusButton setEnabled:!locked && !cmdExecuting];
+    [rotationHomeMinusButton setEnabled:!locked && !cmdExecuting];
+	[zGoAbsButton setEnabled:!locked && !cmdExecuting];
+    [zGoRelButton setEnabled:!locked && !cmdExecuting];
+    [zHomePlusButton setEnabled:!locked && !cmdExecuting];
+    [zHomeMinusButton setEnabled:!locked && !cmdExecuting];
 }
 
 - (void) cmdTypeExecutingChanged:(NSNotification*)aNotification
@@ -303,25 +311,49 @@
     [[self rotatingMotor] setMotorSpeed:[sender intValue]];
 }
 
-- (IBAction) rotationGoAction:(id) sender
+- (IBAction) rotationGoAbsAction:(id) sender
 {
     [self endEditing];
     [[self rotatingMotor] setAbsoluteMotion:YES];
     [[model findMotorModel] move:rotatingMotorNum to:[[self rotatingMotor] targetPosition] speed:[[self rotatingMotor] motorSpeed]];
-
-    motorAngle = [[self rotatingMotor] targetPosition] / rotationConversion;              //start animating when go is pressed
+    
+    motorAngle = [[self rotatingMotor] targetPosition] / rotationConversion; //start animating when go is pressed
     rotationSpeed = [[self rotatingMotor] motorSpeed];
     if(currentAngle >= motorAngle + .5 || currentAngle <= motorAngle - .5)
         [self performSelector:@selector(updateRotation) withObject:nil afterDelay:.01];
 }
 
-- (IBAction) zGoAction:(id)sender
+- (IBAction) zGoAbsAction:(id)sender
 {
     [self endEditing];
     [[self zMotor] setAbsoluteMotion:YES];
     [[model findMotorModel] move:zMotorNum to:[[self zMotor] targetPosition] speed:[[self zMotor] motorSpeed]];
     
-    motorZ = [[self zMotor] targetPosition];
+    motorZ = [[self zMotor] targetPosition]; //start animating when go is pressed
+    translationSpeed = [[self zMotor] motorSpeed];
+    if(currentZ >= motorZ + 100 || currentZ <= motorZ - 100)
+        [self performSelector:@selector(updateTranslation) withObject:nil afterDelay:.01];
+}
+
+- (IBAction) rotationGoRelAction:(id)sender
+{
+    [self endEditing];
+    [[self rotatingMotor] setAbsoluteMotion:YES];
+    [[model findMotorModel] move:rotatingMotorNum dx:[[self rotatingMotor] targetPosition] speed:[[self rotatingMotor] motorSpeed]];
+    
+    motorAngle += [[self rotatingMotor] targetPosition] / rotationConversion; //start animating when go is pressed
+    rotationSpeed = [[self rotatingMotor] motorSpeed];
+    if(currentAngle >= motorAngle + .5 || currentAngle <= motorAngle - .5)
+        [self performSelector:@selector(updateRotation) withObject:nil afterDelay:.01];
+}
+
+- (IBAction) zGoRelAction:(id)sender
+{
+    [self endEditing];
+    [[self zMotor] setAbsoluteMotion:YES];
+    [[model findMotorModel] move:zMotorNum dx:[[self zMotor] targetPosition] speed:[[self zMotor] motorSpeed]];
+    
+    motorZ += [[self zMotor] targetPosition]; //start animating when go is pressed
     translationSpeed = [[self zMotor] motorSpeed];
     if(currentZ >= motorZ + 100 || currentZ <= motorZ - 100)
         [self performSelector:@selector(updateTranslation) withObject:nil afterDelay:.01];
@@ -332,14 +364,38 @@
     [[model findMotorModel] stopAllMotion];
 }
 
-- (IBAction) zHomeAction:(id) sender
+- (IBAction) rotationHomePlusAction:(id) sender
 {
-    [[model findMotorModel] goHome:zMotorNum plusDirection:NO];
+    [[model findMotorModel] goHome:rotatingMotorNum plusDirection:YES];
+    
+    //potentially animate when button is pressed
 }
 
-- (IBAction) rotationHomeAction:(id) sender
+- (IBAction) zHomePlusAction:(id) sender
+{
+    [[model findMotorModel] goHome:zMotorNum plusDirection:YES];
+    
+    motorZ = maxZ; //start animating when button is pressed
+    translationSpeed = [[self zMotor] motorSpeed];
+    if(currentZ >= motorZ + 100 || currentZ <= motorZ - 100)
+        [self performSelector:@selector(updateTranslation) withObject:nil afterDelay:.01];
+}
+
+- (IBAction) rotationHomeMinusAction:(id)sender
 {
     [[model findMotorModel] goHome:rotatingMotorNum plusDirection:NO];
+
+    //potentially animate when button is pressed
+}
+
+- (IBAction) zHomeMinusAction:(id)sender
+{
+    [[model findMotorModel] goHome:zMotorNum plusDirection:NO];
+    
+    motorZ = 0; //start animating when button is pressed
+    translationSpeed = [[self zMotor] motorSpeed];
+    if(currentZ >= motorZ + 100 || currentZ <= motorZ - 100)
+        [self performSelector:@selector(updateTranslation) withObject:nil afterDelay:.01];
 }
 
 - (ORVXMMotor*) rotatingMotor

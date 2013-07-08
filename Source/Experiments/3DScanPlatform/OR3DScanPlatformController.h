@@ -31,14 +31,18 @@
     IBOutlet NSTextField*           rotationSpeedText;
     IBOutlet NSTextField*           currentAngleText;
     IBOutlet NSTextField*           targetAngleText;
-    IBOutlet NSButton*              rotationGoButton;
-    IBOutlet NSButton*              rotationHomeButton;
+    IBOutlet NSButton*              rotationGoAbsButton;
+    IBOutlet NSButton*              rotationGoRelButton;
+    IBOutlet NSButton*              rotationHomePlusButton;
+    IBOutlet NSButton*              rotationHomeMinusButton;
     
     IBOutlet NSTextField*           zSpeedText;
     IBOutlet NSTextField*           currentZText;
     IBOutlet NSTextField*           targetZText;
-    IBOutlet NSButton*              zGoButton;
-    IBOutlet NSButton*              zHomeButton;
+    IBOutlet NSButton*              zGoAbsButton;
+    IBOutlet NSButton*              zGoRelButton;
+    IBOutlet NSButton*              zHomePlusButton;
+    IBOutlet NSButton*              zHomeMinusButton;
     
     IBOutlet NSButton*              stopButton;
     
@@ -53,6 +57,7 @@
     
     double rotation; //how much model should rotate when displayed
     double trans; //how much model moves in z direction
+    int maxZ;
     
     double rotationSpeed, translationSpeed;
 }
@@ -78,14 +83,20 @@
 
 #pragma mark •••Actions
 - (IBAction) lockAction:(id) sender;
-- (IBAction) angleAction:(id) sender;
-- (IBAction) zAction:(id)sender;
-- (IBAction) rotationSpeedAction:(id)sender;
-- (IBAction) zSpeedAction:(id)sender;
-- (IBAction) rotationGoAction:(id) sender;
-- (IBAction) zGoAction:(id) sender;
 - (IBAction) stopAction:(id) sender;
-- (IBAction) zHomeAction:(id) sender;
-- (IBAction) rotationHomeAction:(id) sender;
+
+- (IBAction) angleAction:(id) sender;
+- (IBAction) rotationSpeedAction:(id)sender;
+- (IBAction) rotationGoAbsAction:(id) sender;
+- (IBAction) rotationGoRelAction:(id) sender;
+- (IBAction) rotationHomePlusAction:(id) sender;
+- (IBAction) rotationHomeMinusAction:(id) sender;
+
+- (IBAction) zAction:(id)sender;
+- (IBAction) zSpeedAction:(id)sender;
+- (IBAction) zGoAbsAction:(id) sender;
+- (IBAction) zGoRelAction:(id) sender;
+- (IBAction) zHomePlusAction:(id) sender;
+- (IBAction) zHomeMinusAction:(id) sender;
 
 @end

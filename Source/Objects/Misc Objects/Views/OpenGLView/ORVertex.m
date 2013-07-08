@@ -32,13 +32,6 @@
     return self;
 }
 
-- (void) subtractOne
-{
-    x -= 1;
-    y -= 1;
-    z -= 1;
-}
-
 - (float) largestAbsolute
 {
     if(fabs(x) > fabs(y))

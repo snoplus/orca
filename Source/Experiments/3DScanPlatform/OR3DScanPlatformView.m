@@ -26,8 +26,8 @@
 @implementation OR3DScanPlatformView
 -(void) dealloc
 {
-    [leadBrick release];
-    [source release];
+    [zComponent release];
+    [angularComponent release];
     
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
     [super dealloc];
@@ -38,14 +38,11 @@
     [super awakeFromNib];
     
     NSBundle* mainBundle = [NSBundle mainBundle];
-	NSString* leadBrickPath = [mainBundle pathForResource: @"LeadBrick" ofType: @"obj"];
-    NSString* sourcePath = [mainBundle pathForResource:@"SourceModel" ofType:@"obj"];
+	NSString* zComponentPath = [mainBundle pathForResource: @"ZComponent" ofType: @"obj"];
+    NSString* angularComponentPath = [mainBundle pathForResource:@"AngularComponent" ofType:@"obj"];
     
-    leadBrick = [[OROpenGLObject alloc] init];
-    [leadBrick createObjectFromFile:leadBrickPath];
-    
-    source = [[OROpenGLObject alloc] init];
-    [source createObjectFromFile:sourcePath];
+    zComponent = [[OROpenGLObject alloc] initFromFile:zComponentPath];
+    angularComponent = [[OROpenGLObject alloc] initFromFile:angularComponentPath];
 }
 
 - (void) resetCamera
@@ -277,7 +274,7 @@
     
     glColor3f(191.0/255,193.0/255,194.0/255); //detector
     [self cylinderInnerRadius:0 outerRadius:.5 height:2.57 translateX:0 translateY:0 translateZ:0];
-
+     
     glColor3f(135.0/255,115.0/255,85.0/255); //cone on top of dewar
     [self partialConeInnerRadiusLower:0 outerRadiusLower:2.57 innerRadiusUpper:0 outerRadiusUpper:.55 height:2 translateX:0 translateY:-2.2 translateZ:0];
     glColor3f(135.0/255,115.0/255,85.0/255); //dewar
@@ -285,11 +282,8 @@
     
     [self regularLighting];
     
-    glColor3f(151.0/255,105.0/255,79.0/255); //motor
-    [self cubeScaleX:.3 scaleY:.05 scaleZ:.3 translateX:2.2 translateY:.1 translateZ:0
-         rotateAngle:rot rotateX:0 rotateY:1 rotateZ:0];
-    [leadBrick drawScaleX:.5 scaleY:.5 scaleZ:.5 translateX:2.1 translateY:.82+trans translateZ:-.18 rotateAngle:rot rotateX:0 rotateY:1 rotateZ:0];
-    [source drawScaleX:2.5 scaleY:2.5 scaleZ:2.5 translateX:2.5 translateY:.15 translateZ:-.2 rotateAngle:rot rotateX:0 rotateY:1 rotateZ:0];
+    [zComponent drawScaleX:1 scaleY:1 scaleZ:1 translateX:1.8 translateY:.82+trans translateZ:0 rotateAngle:rot rotateX:0 rotateY:1 rotateZ:0];
+    [angularComponent drawScaleX:2.5 scaleY:2.5 scaleZ:2.5 translateX:2.8 translateY:.15 translateZ:.65 rotateAngle:rot rotateX:0 rotateY:1 rotateZ:0];
     
     glColor3f(204.0/255,204.0/255,204.0/255); //line at 0
     [self cubeScaleX:1.25 scaleY:.001 scaleZ:.01 translateX:1.25 translateY:.2 translateZ:0 rotateAngle:0 rotateX:0 rotateY:0 rotateZ:0];

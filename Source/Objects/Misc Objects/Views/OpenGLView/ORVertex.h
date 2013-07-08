@@ -3,6 +3,8 @@
 //  ORCA
 //
 //  Created by Laura Wendlandt on 6/28/13.
+//.obj specification info: http://paulbourke.net/dataformats/obj/
+//.mtl specification info: http://www.fileformat.info/format/material/
 //
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of
@@ -26,7 +28,6 @@
 }
 
 - (id) initWithX:(float)myX Y:(float)myY Z:(float)myZ;
-- (void) subtractOne; //subtracts one from x, y, and z (used to resolve indexing problems)
 - (float) largestAbsolute; //returns largest absolute value of x, y, and z
 - (void) divideAllBy:(float)num;
 

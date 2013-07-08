@@ -23,13 +23,12 @@
 {
     int pyramidCount;
     
-    OROpenGLObject* leadBrick;
-    OROpenGLObject* source;
+    OROpenGLObject* zComponent;
+    OROpenGLObject* angularComponent;
 }
 
 - (void) dealloc;
 - (void) awakeFromNib;
-//- (void) incRot;
 - (void) resetCamera;
 
 - (void) cubeScaleX:(float)sx scaleY:(float)sy scaleZ:(float)sz
