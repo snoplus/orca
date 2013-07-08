@@ -158,6 +158,10 @@
 		4322E9B217830004008E78A4 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4322E9B117830004008E78A4 /* GLUT.framework */; };
 		4325BA38109F6378009E15B9 /* GermaniumHighE in Resources */ = {isa = PBXBuildFile; fileRef = 4325BA37109F6378009E15B9 /* GermaniumHighE */; };
 		4325BA3A109F6381009E15B9 /* GermaniumLowE in Resources */ = {isa = PBXBuildFile; fileRef = 4325BA39109F6381009E15B9 /* GermaniumLowE */; };
+		432D17EC17820CD500557918 /* AngularComponent.mtl in Resources */ = {isa = PBXBuildFile; fileRef = 432D17EB17820CD500557918 /* AngularComponent.mtl */; };
+		432D17EE17820CDB00557918 /* AngularComponent.obj in Resources */ = {isa = PBXBuildFile; fileRef = 432D17ED17820CDB00557918 /* AngularComponent.obj */; };
+		432D17F117820D0700557918 /* ZComponent.mtl in Resources */ = {isa = PBXBuildFile; fileRef = 432D17EF17820D0700557918 /* ZComponent.mtl */; };
+		432D17F217820D0700557918 /* ZComponent.obj in Resources */ = {isa = PBXBuildFile; fileRef = 432D17F017820D0700557918 /* ZComponent.obj */; };
 		4342D59411ECB8AD007EFFB1 /* ORCAEN775Readout.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 4342D59211ECB8AD007EFFB1 /* ORCAEN775Readout.cc */; };
 		4342D59511ECB8AD007EFFB1 /* ORCAEN775Readout.hh in Headers */ = {isa = PBXBuildFile; fileRef = 4342D59311ECB8AD007EFFB1 /* ORCAEN775Readout.hh */; };
 		4342D5F311ECC4D0007EFFB1 /* ORCAEN775Readout.hh in VME_Copy */ = {isa = PBXBuildFile; fileRef = 4342D59311ECB8AD007EFFB1 /* ORCAEN775Readout.hh */; };
@@ -234,10 +238,6 @@
 		43D7CB8A177C84AC00ED4736 /* OROpenGLObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 43D7CB88177C84AC00ED4736 /* OROpenGLObject.m */; };
 		43D7CB8D177CBDF600ED4736 /* ORVertex.h in Headers */ = {isa = PBXBuildFile; fileRef = 43D7CB8B177CBDF500ED4736 /* ORVertex.h */; };
 		43D7CB8E177CBDF600ED4736 /* ORVertex.m in Sources */ = {isa = PBXBuildFile; fileRef = 43D7CB8C177CBDF600ED4736 /* ORVertex.m */; };
-		43D7CB91177DC94600ED4736 /* LeadBrick.obj in Resources */ = {isa = PBXBuildFile; fileRef = 43D7CB8F177DC94500ED4736 /* LeadBrick.obj */; };
-		43D7CB92177DC94600ED4736 /* SourceModel.obj in Resources */ = {isa = PBXBuildFile; fileRef = 43D7CB90177DC94500ED4736 /* SourceModel.obj */; };
-		43D7CB95177DC9D500ED4736 /* LeadBrick.mtl in Resources */ = {isa = PBXBuildFile; fileRef = 43D7CB93177DC9D400ED4736 /* LeadBrick.mtl */; };
-		43D7CB96177DC9D500ED4736 /* SourceModel.mtl in Resources */ = {isa = PBXBuildFile; fileRef = 43D7CB94177DC9D400ED4736 /* SourceModel.mtl */; };
 		43D7CB98177DD0C100ED4736 /* 3DScanPlatform.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 43D7CB97177DD0C000ED4736 /* 3DScanPlatform.tiff */; };
 		43E9ED461339044100888F93 /* ORAuxHw.h in Headers */ = {isa = PBXBuildFile; fileRef = 43E9ED441339044100888F93 /* ORAuxHw.h */; };
 		43E9ED471339044100888F93 /* ORAuxHw.m in Sources */ = {isa = PBXBuildFile; fileRef = 43E9ED451339044100888F93 /* ORAuxHw.m */; };
@@ -1993,12 +1993,6 @@
 		849B9D7916DD044F003F3037 /* ORSIS3320Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 849B9D7116DD044F003F3037 /* ORSIS3320Model.h */; };
 		849B9D7B16DD044F003F3037 /* SIS3320.nib in Resources */ = {isa = PBXBuildFile; fileRef = 849B9D7316DD044F003F3037 /* SIS3320.nib */; };
 		849B9D7C16DD044F003F3037 /* SIS3320Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 849B9D7416DD044F003F3037 /* SIS3320Card.gif */; };
-		849BD1A21781EDCA00BE0330 /* ApcUps.nib in Resources */ = {isa = PBXBuildFile; fileRef = 849BD19C1781EDCA00BE0330 /* ApcUps.nib */; };
-		849BD1A31781EDCA00BE0330 /* ApcUpsIcon.tif in Resources */ = {isa = PBXBuildFile; fileRef = 849BD19D1781EDCA00BE0330 /* ApcUpsIcon.tif */; };
-		849BD1A41781EDCA00BE0330 /* ORApcUpsController.h in Headers */ = {isa = PBXBuildFile; fileRef = 849BD19E1781EDCA00BE0330 /* ORApcUpsController.h */; };
-		849BD1A51781EDCA00BE0330 /* ORApcUpsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 849BD19F1781EDCA00BE0330 /* ORApcUpsController.m */; };
-		849BD1A61781EDCA00BE0330 /* ORApcUpsModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 849BD1A01781EDCA00BE0330 /* ORApcUpsModel.h */; };
-		849BD1A71781EDCA00BE0330 /* ORApcUpsModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 849BD1A11781EDCA00BE0330 /* ORApcUpsModel.m */; };
 		849C68010A2CC20B00511E30 /* CCUSB.nib in Resources */ = {isa = PBXBuildFile; fileRef = 849C67FD0A2CC20B00511E30 /* CCUSB.nib */; };
 		849C68020A2CC20B00511E30 /* CCUSB.tif in Resources */ = {isa = PBXBuildFile; fileRef = 849C67FE0A2CC20B00511E30 /* CCUSB.tif */; };
 		849C68030A2CC20B00511E30 /* ORCCUSBModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 849C67FF0A2CC20B00511E30 /* ORCCUSBModel.h */; };
@@ -3415,6 +3409,10 @@
 		4322E9B117830004008E78A4 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = ../../../../System/Library/Frameworks/GLUT.framework; sourceTree = "<group>"; };
 		4325BA37109F6378009E15B9 /* GermaniumHighE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = GermaniumHighE; path = Source/Objects/Hardware/GPIB/HPPulser/GermaniumHighE; sourceTree = SOURCE_ROOT; };
 		4325BA39109F6381009E15B9 /* GermaniumLowE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = GermaniumLowE; path = Source/Objects/Hardware/GPIB/HPPulser/GermaniumLowE; sourceTree = SOURCE_ROOT; };
+		432D17EB17820CD500557918 /* AngularComponent.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = AngularComponent.mtl; sourceTree = "<group>"; };
+		432D17ED17820CDB00557918 /* AngularComponent.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = AngularComponent.obj; sourceTree = "<group>"; };
+		432D17EF17820D0700557918 /* ZComponent.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ZComponent.mtl; sourceTree = "<group>"; };
+		432D17F017820D0700557918 /* ZComponent.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ZComponent.obj; sourceTree = "<group>"; };
 		4342D59211ECB8AD007EFFB1 /* ORCAEN775Readout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ORCAEN775Readout.cc; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAEN775Readout.cc; sourceTree = SOURCE_ROOT; };
 		4342D59311ECB8AD007EFFB1 /* ORCAEN775Readout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ORCAEN775Readout.hh; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAEN775Readout.hh; sourceTree = SOURCE_ROOT; };
 		4398E6B711B7E36400FC4DDE /* ORCAEN785Readout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ORCAEN785Readout.cc; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAEN785Readout.cc; sourceTree = SOURCE_ROOT; };
@@ -3470,10 +3468,6 @@
 		43D7CB88177C84AC00ED4736 /* OROpenGLObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OROpenGLObject.m; sourceTree = "<group>"; };
 		43D7CB8B177CBDF500ED4736 /* ORVertex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORVertex.h; sourceTree = "<group>"; };
 		43D7CB8C177CBDF600ED4736 /* ORVertex.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORVertex.m; sourceTree = "<group>"; };
-		43D7CB8F177DC94500ED4736 /* LeadBrick.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LeadBrick.obj; sourceTree = "<group>"; };
-		43D7CB90177DC94500ED4736 /* SourceModel.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SourceModel.obj; sourceTree = "<group>"; };
-		43D7CB93177DC9D400ED4736 /* LeadBrick.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LeadBrick.mtl; sourceTree = "<group>"; };
-		43D7CB94177DC9D400ED4736 /* SourceModel.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SourceModel.mtl; sourceTree = "<group>"; };
 		43D7CB97177DD0C000ED4736 /* 3DScanPlatform.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = 3DScanPlatform.tiff; sourceTree = "<group>"; };
 		43E9ED441339044100888F93 /* ORAuxHw.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORAuxHw.h; path = "Source/Objects/Hardware/Hardware Base Classes/ORAuxHw.h"; sourceTree = SOURCE_ROOT; };
 		43E9ED451339044100888F93 /* ORAuxHw.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORAuxHw.m; path = "Source/Objects/Hardware/Hardware Base Classes/ORAuxHw.m"; sourceTree = SOURCE_ROOT; };
@@ -5025,12 +5019,6 @@
 		849B9D7216DD044F003F3037 /* ORSIS3320Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORSIS3320Model.m; sourceTree = "<group>"; };
 		849B9D7316DD044F003F3037 /* SIS3320.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = SIS3320.nib; sourceTree = "<group>"; };
 		849B9D7416DD044F003F3037 /* SIS3320Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = SIS3320Card.gif; sourceTree = "<group>"; };
-		849BD19C1781EDCA00BE0330 /* ApcUps.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = ApcUps.nib; sourceTree = "<group>"; };
-		849BD19D1781EDCA00BE0330 /* ApcUpsIcon.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = ApcUpsIcon.tif; sourceTree = "<group>"; };
-		849BD19E1781EDCA00BE0330 /* ORApcUpsController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORApcUpsController.h; sourceTree = "<group>"; };
-		849BD19F1781EDCA00BE0330 /* ORApcUpsController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORApcUpsController.m; sourceTree = "<group>"; };
-		849BD1A01781EDCA00BE0330 /* ORApcUpsModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORApcUpsModel.h; sourceTree = "<group>"; };
-		849BD1A11781EDCA00BE0330 /* ORApcUpsModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORApcUpsModel.m; sourceTree = "<group>"; };
 		849C67FD0A2CC20B00511E30 /* CCUSB.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = CCUSB.nib; sourceTree = "<group>"; };
 		849C67FE0A2CC20B00511E30 /* CCUSB.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = CCUSB.tif; path = Source/Objects/Hardware/Camac/CCUSB/CCUSB.tif; sourceTree = SOURCE_ROOT; };
 		849C67FF0A2CC20B00511E30 /* ORCCUSBModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORCCUSBModel.h; sourceTree = "<group>"; };
@@ -10183,19 +10171,6 @@
 			path = SIS3320;
 			sourceTree = "<group>";
 		};
-		849BD19B1781EDCA00BE0330 /* ApcUps */ = {
-			isa = PBXGroup;
-			children = (
-				849BD19C1781EDCA00BE0330 /* ApcUps.nib */,
-				849BD19D1781EDCA00BE0330 /* ApcUpsIcon.tif */,
-				849BD19E1781EDCA00BE0330 /* ORApcUpsController.h */,
-				849BD19F1781EDCA00BE0330 /* ORApcUpsController.m */,
-				849BD1A01781EDCA00BE0330 /* ORApcUpsModel.h */,
-				849BD1A11781EDCA00BE0330 /* ORApcUpsModel.m */,
-			);
-			path = ApcUps;
-			sourceTree = "<group>";
-		};
 		849C67FC0A2CC06F00511E30 /* CCUSB */ = {
 			isa = PBXGroup;
 			children = (
@@ -10680,7 +10655,6 @@
 		84B28D4C0F4C651C00E2B056 /* Internet */ = {
 			isa = PBXGroup;
 			children = (
-				849BD19B1781EDCA00BE0330 /* ApcUps */,
 				848E59101472B34400A70AB4 /* TTCPX400DP */,
 				8494C01C1316CEBA00151E7B /* BootBar */,
 				84BA5F240F70388C00CF92D6 /* ZupSupply */,
@@ -11255,11 +11229,11 @@
 		84BF74B217590CAF00AF1F56 /* 3DScanPlatform */ = {
 			isa = PBXGroup;
 			children = (
+				432D17EF17820D0700557918 /* ZComponent.mtl */,
+				432D17F017820D0700557918 /* ZComponent.obj */,
+				432D17ED17820CDB00557918 /* AngularComponent.obj */,
+				432D17EB17820CD500557918 /* AngularComponent.mtl */,
 				43D7CB97177DD0C000ED4736 /* 3DScanPlatform.tiff */,
-				43D7CB93177DC9D400ED4736 /* LeadBrick.mtl */,
-				43D7CB94177DC9D400ED4736 /* SourceModel.mtl */,
-				43D7CB8F177DC94500ED4736 /* LeadBrick.obj */,
-				43D7CB90177DC94500ED4736 /* SourceModel.obj */,
 				84BF74B317590CB000AF1F56 /* 3DScanPlatform.nib */,
 				84BF74B617590CB000AF1F56 /* OR3DScanPlatformController.h */,
 				84BF74B717590CB000AF1F56 /* OR3DScanPlatformController.m */,
@@ -14195,8 +14169,6 @@
 				841DACF1175E2CB5002542BD /* OR3DScanPlatformView.h in Headers */,
 				43D7CB89177C84AC00ED4736 /* OROpenGLObject.h in Headers */,
 				43D7CB8D177CBDF600ED4736 /* ORVertex.h in Headers */,
-				849BD1A41781EDCA00BE0330 /* ORApcUpsController.h in Headers */,
-				849BD1A61781EDCA00BE0330 /* ORApcUpsModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -15095,13 +15067,11 @@
 				84BF74BE17590CB000AF1F56 /* 3DScanPlatform.nib in Resources */,
 				B3808A8C1700F84B0019C27D /* CouchDBListener.nib in Resources */,
 				B3805611172BE4A100B5B134 /* Changesfeed.tif in Resources */,
-				43D7CB91177DC94600ED4736 /* LeadBrick.obj in Resources */,
-				43D7CB92177DC94600ED4736 /* SourceModel.obj in Resources */,
-				43D7CB95177DC9D500ED4736 /* LeadBrick.mtl in Resources */,
-				43D7CB96177DC9D500ED4736 /* SourceModel.mtl in Resources */,
 				43D7CB98177DD0C100ED4736 /* 3DScanPlatform.tiff in Resources */,
-				849BD1A21781EDCA00BE0330 /* ApcUps.nib in Resources */,
-				849BD1A31781EDCA00BE0330 /* ApcUpsIcon.tif in Resources */,
+				432D17EC17820CD500557918 /* AngularComponent.mtl in Resources */,
+				432D17EE17820CDB00557918 /* AngularComponent.obj in Resources */,
+				432D17F117820D0700557918 /* ZComponent.mtl in Resources */,
+				432D17F217820D0700557918 /* ZComponent.obj in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -16113,8 +16083,6 @@
 				841DACF2175E2CB5002542BD /* OR3DScanPlatformView.m in Sources */,
 				43D7CB8A177C84AC00ED4736 /* OROpenGLObject.m in Sources */,
 				43D7CB8E177CBDF600ED4736 /* ORVertex.m in Sources */,
-				849BD1A51781EDCA00BE0330 /* ORApcUpsController.m in Sources */,
-				849BD1A71781EDCA00BE0330 /* ORApcUpsModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
