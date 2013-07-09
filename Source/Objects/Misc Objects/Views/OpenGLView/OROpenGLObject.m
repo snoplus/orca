@@ -163,7 +163,7 @@
     int i;
     for(i=1; i<[currentLine count]; i++)
     {
-        if([regex numberOfMatchesInString:[currentLine objectAtIndex:i] options:nil range:NSMakeRange(0, [[currentLine objectAtIndex:i] length])]==0)
+        if([regex numberOfMatchesInString:[currentLine objectAtIndex:i] options:0 range:NSMakeRange(0, [[currentLine objectAtIndex:i] length])]==0)
             return NO;
         
         NSArray *components = [[currentLine objectAtIndex:i] componentsSeparatedByString:@"/"];
