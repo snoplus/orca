@@ -123,4 +123,22 @@
 {
     return [self count];
 }
+
+- (id) pop
+{
+    id temp = [self lastObject];
+    [self removeLastObject];
+    return temp;
+}
+
+- (void) push:(id)object
+{
+    [self addObject:object];
+}
+
+- (id) top
+{
+    return [self lastObject];
+}
+
 @end

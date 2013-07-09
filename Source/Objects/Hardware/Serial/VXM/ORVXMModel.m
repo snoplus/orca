@@ -89,6 +89,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
     [listFile  release];
 	[customCmd release];
     [buffer release];
+    [motorToQueryStack release];
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[super dealloc];
 }
@@ -727,11 +728,8 @@ NSString* ORVXMLock							= @"ORVXMLock";
 
 - (int) motorToQuery
 {
-	int i;
-	for(i=0;i<kNumVXMMotors;i++){
-		if(motorToQueryMask & (1<<i)) return i;
-	}
-	return -1;
+    if([motorToQueryStack count]==0) return -1;
+    else return [[motorToQueryStack top] intValue];
 }
 
 #pragma mark ***Command Handling
@@ -806,9 +804,9 @@ NSString* ORVXMLock							= @"ORVXMLock";
 			}
 
 			if([aCmd length]>0 && [aCmd rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"+-0123456789"]].location==0) {
-                
-				ORVXMMotor* aMotor = [motors objectAtIndex:[self motorToQuery]];
-				[aMotor setMotorPosition:[aCmd floatValue]];
+                int motorIndex = [self motorToQuery];
+				ORVXMMotor* aMotor = [motors objectAtIndex:motorIndex];
+                [aMotor setMotorPosition:[aCmd floatValue]];
 				if([aMotor hasMoved] && shipRecords)[self shipMotorState:[self motorToQuery]];
 				
 				int nextMotor = [self nextMotorToQuery];
@@ -977,37 +975,23 @@ NSString* ORVXMLock							= @"ORVXMLock";
 	[self performSelector:@selector(queryPositionsDeferred) withObject:nil afterDelay:.1];
 }
 - (void) queryPositionsDeferred
-{
-    
-	int i;
-	motorToQueryMask = 0;
-	for(i=0;i<kNumVXMMotors;i++) {
-		if([[self motor:i] motorEnabled]){
-			motorToQueryMask |= (1<<i);
-		}
-	}
-	[self queryPosition];
-	
+{	
+    motorToQueryStack = [[NSMutableArray alloc] init];
+    int i;
+    for(i=kNumVXMMotors; i>=0; i--)
+    {
+        if([[self motor:i] motorEnabled])
+            [motorToQueryStack push:[NSNumber numberWithInt:i]];
+    }
+    [self queryPosition];
 }
 
 - (int) nextMotorToQuery
 {
-	if(motorToQueryMask == 0)return -1;
-	int i;
-	for(i=0;i<kNumVXMMotors;i++) {
-		if(motorToQueryMask & (1<<i)){
-			motorToQueryMask &= ~(1<<i);
-            break;
-		}
-	}
-	if(motorToQueryMask == 0)return -1;
-
-	for(i=0;i<kNumVXMMotors;i++) {
-		if(motorToQueryMask & (1<<i)){
-			return i;
-		}
-	}
-	return -1;
+    if([motorToQueryStack count]==0) return -1;
+    [motorToQueryStack pop];
+    if([motorToQueryStack count]==0) return -1;
+    else return [[motorToQueryStack top] intValue];
 }
 
 - (void) queryPosition

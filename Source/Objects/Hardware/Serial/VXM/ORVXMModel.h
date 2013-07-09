@@ -35,7 +35,7 @@
         NSMutableString* buffer;
 		NSMutableArray*	motors;
         unsigned long	dataId;
-        int             motorToQueryMask;
+        NSMutableArray* motorToQueryStack;
 		NSMutableArray* cmdList;
 		BOOL			displayRaw;
 		int				syncWithRun;
