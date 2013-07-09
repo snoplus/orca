@@ -48,10 +48,25 @@
         NSLog(@"Error: nothing in file\n");
         return self;
     }
-    
-    //delete comments
+ 
+//delete comments
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    int start, end;
+    for(i=0; i<[inputData length]; i++)
+    {
+        if([inputData characterAtIndex:i] == '#')
+        {
+            start = i;
+            while([inputData characterAtIndex:i] != '\n')
+                i++;
+            end = i;
+            [inputData deleteCharactersInRange:NSMakeRange(start, (end-start)+1)];
+        }
+    }
+#else
     NSRegularExpression* regex = [NSRegularExpression regularExpressionWithPattern:@"#([^\n]*)(\n|$)" options:NSRegularExpressionCaseInsensitive error:nil];
     [regex replaceMatchesInString:inputData options:0 range:NSMakeRange(0,[inputData length]) withTemplate:@"\n"];
+#endif
 
     NSArray* lines = [inputData componentsSeparatedByString:@"\n"];
     NSMutableArray* words = [NSMutableArray arrayWithCapacity:[lines count]];
@@ -157,14 +172,20 @@
 { 
     NSMutableArray *faceNumbers = [NSMutableArray arrayWithCapacity:[currentLine count]];
     NSMutableArray *faceNormalNumbers = [NSMutableArray arrayWithCapacity:[currentLine count]];
-    
+
+//check to see if faces are in correct format
+#if !(defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6) // not 10.6
     NSRegularExpression* regex = [NSRegularExpression regularExpressionWithPattern:@"[0-9]+/[0-9]*/[0-9]+" options:NSRegularExpressionCaseInsensitive error:nil];
+#endif
 
     int i;
     for(i=1; i<[currentLine count]; i++)
     {
-        if([regex numberOfMatchesInString:[currentLine objectAtIndex:i] options:0 range:NSMakeRange(0, [[currentLine objectAtIndex:i] length])]==0)
-            return NO;
+        
+#if !(defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6) // not 10.6
+    if([regex numberOfMatchesInString:[currentLine objectAtIndex:i] options:0 range:NSMakeRange(0, [[currentLine objectAtIndex:i] length])]==0)
+        return NO;
+#endif
         
         NSArray *components = [[currentLine objectAtIndex:i] componentsSeparatedByString:@"/"];
  
