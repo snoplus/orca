@@ -912,9 +912,9 @@
     int count = [[model timeRate:adc] count];
     int index = count-i-1;
     *xValue = [[model timeRate:adc] timeSampledAtIndex:index];
-    //*yValue = [[model timeRate:adc] valueAtIndex:index];
+    *yValue = [[model timeRate:adc] valueAtIndex:index];
     
-   // float multiplier = 1000.; // nA to pA conversion - niko
+    
     
     //if((adc < 5) || ((adc > 7) && (adc < 13))){ // first stage ouput values
 
@@ -923,20 +923,15 @@
         //NSLog(@"channel %d, adc %f , baseline %f, Rf %f, current %f\n", adc, [[model timeRate:adc] valueAtIndex:index], [model baselineVoltage:adc], [model feedBackResistor:adc], *yValue );
     //}
     
-    
-    if(adc > 15){
-        
-        if(adc < 21) //adc = adc - 16;
-            //*yValue = -multiplier*([[model timeRate:adc] valueAtIndex:index]-[model baselineVoltage:adc-16])/[model feedBackResistor:adc-16];
-            *yValue = 100.;
-        else //adc = adc - 13;            
-            //*yValue = -multiplier*([[model timeRate:adc] valueAtIndex:index]-[model baselineVoltage:adc-13])/[model feedBackResistor:adc-13];
-            *yValue = 100.;
+    /*
+    if(adc > 15){//for leakage current
+        *yValue = - multiplier * ([[model timeRate:adc] valueAtIndex:index]);
     }
     else
+     
         *yValue = [[model timeRate:adc] valueAtIndex:index];
         
-    
+    */
     
 
     

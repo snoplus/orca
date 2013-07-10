@@ -51,6 +51,7 @@
     unsigned long adcEnabledMask;
     ORTimeRate*		timeRates[26]; //fix this array bounds to be equal to the number of plotlines - set to 26 - niko
     ORAlarm*		temperatureAlarm[2];
+    ORAlarm*		leakageCurrentAlarm[10];
     ORAlarm*		adcAlarm[4];
 }
 
@@ -65,6 +66,7 @@
 - (void) setBaselineVoltages:(NSMutableArray*)anArray;
 - (float) baselineVoltage:(unsigned short) aChan;
 - (void) setBaselineVoltage:(int) aChan value:(float) aValue;
+- (void) updateLeakageCurrent:(int) aChan;
 
 - (ORTimeRate*)timeRate:(int)index;
 - (unsigned long) adcEnabledMask;
@@ -137,6 +139,7 @@
 
 #pragma mark ¥¥¥Alarms
 - (void) checkTempIsWithinLimits:(int)aChip value:(float)aTemperature;
+- (void) checkLeakageCurrentIsWithinLimits:(int)aChan value:(float)aLeakageCurrent;
 - (void) checkAdcIsWithinLimits:(int)anIndex value:(float)aValue;
 
 #pragma mark ¥¥¥Archival

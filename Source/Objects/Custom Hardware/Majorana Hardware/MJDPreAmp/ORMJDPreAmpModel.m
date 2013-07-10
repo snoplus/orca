@@ -296,6 +296,11 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 		NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
 		[userInfo setObject:[NSNumber numberWithFloat:aChan] forKey: @"Channel"];
         
+        //update leakage current for relevant channels
+        if((aChan < 5) || ((aChan > 7) && (aChan < 13))){
+            [self updateLeakageCurrent:aChan];
+        }
+        
  		[[NSNotificationCenter defaultCenter] postNotificationName:ORMJDFeedBackResistorChanged
 															object:self
 														  userInfo: userInfo];
@@ -334,11 +339,44 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 		NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
 		[userInfo setObject:[NSNumber numberWithFloat:aChan] forKey: @"Channel"];
         
+        //Plot baseline voltages for 0-4 and 8-12
+        if( (aChan < 5) || ((aChan > 7) && (aChan < 13))){ // first stage ouput values
+            if(timeRates[aChan] == nil) timeRates[aChan] = [[ORTimeRate alloc] init];
+            [timeRates[aChan] addDataToTimeAverage:aValue];
+            //also need to update the leakage current
+            [self updateLeakageCurrent:aChan];
+        }
+        
  		[[NSNotificationCenter defaultCenter] postNotificationName:ORMJDBaselineVoltageChanged
 															object:self
 														  userInfo: userInfo];
         
 	}
+}
+
+- (void) updateLeakageCurrent:(int) aChan
+{//value returned in picoamps
+    int currentChan;
+    float leakageCurrent;
+    float nanoToPico = 1000.;
+    
+    //for channels 0-4 or 8-12, plot the leakage current
+    //leakage current channel corresponds to aChan + 16 for 0-14, aChan+13 for 8-12
+    if (aChan < 5){
+        currentChan = aChan + 16;
+    }
+    else if ((aChan > 7) && (aChan < 13)) {
+        currentChan = aChan + 13;
+    }
+    else return;
+    
+    //leakage current is (first stage output voltage - baseline voltage)/feedback resistance
+    leakageCurrent = -nanoToPico*([self adc:aChan] - [self baselineVoltage:aChan])/ [self feedBackResistor:aChan];//in picoamps
+    
+    if(timeRates[currentChan] == nil) timeRates[currentChan] = [[ORTimeRate alloc] init];
+    [timeRates[currentChan] addDataToTimeAverage:leakageCurrent];
+    
+    [self checkLeakageCurrentIsWithinLimits:aChan value:leakageCurrent];
 }
 
 
@@ -376,14 +414,25 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 		NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
 		[userInfo setObject:[NSNumber numberWithFloat:aChan] forKey: @"Channel"];
 
-        if(timeRates[aChan] == nil) timeRates[aChan] = [[ORTimeRate alloc] init];
-		[timeRates[aChan] addDataToTimeAverage:aValue];
-
+        
+        //for temperature & operating voltages plot raw ADC value
+        //Corresponds to indices 5-6 & 13-14 (operating voltages for chips 1&2, respectively) and 7 & 15 (temp for chips 1&2)
+        if( ((aChan > 4) && (aChan < 8)) || ((aChan > 12) && (aChan < 16))){
+            if(timeRates[aChan] == nil) timeRates[aChan] = [[ORTimeRate alloc] init];
+            [timeRates[aChan] addDataToTimeAverage:aValue];
+        }
+        //for channels 0-4 or 8-12, update the leakage current timeRate
+        else if((aChan < 5) || ((aChan > 7) && (aChan < 13))){
+            [self updateLeakageCurrent:aChan];
+        }
         
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpAdcChanged
 															object:self
 														  userInfo: userInfo];
 	}
+    
+    
+    
 }
 
 - (BOOL) loopForever
@@ -1036,6 +1085,37 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 			[temperatureAlarm[aChip] release];
 			temperatureAlarm[aChip] = nil;
         }
+    }
+}
+
+- (void) checkLeakageCurrentIsWithinLimits:(int)aChan value:(float)aLeakageCurrent
+{
+    float maxAllowedLeakageCurrent = 50;//pA
+    int alarmIndex = -1;
+    NSString* alarmName;
+    
+    if ((aChan < 5)) {
+        alarmIndex = aChan;
+    }
+    else if ((aChan > 7) && (aChan < 13)){
+        alarmIndex = aChan - 3;
+    }
+    else return;
+    
+    alarmName  = [NSString stringWithFormat:@"Preamp %lu Channel %d Leakage Current",[self uniqueIdNumber], aChan];
+
+    if(aLeakageCurrent >= maxAllowedLeakageCurrent){
+        if(!leakageCurrentAlarm[alarmIndex]){
+            leakageCurrentAlarm[alarmIndex] = [[ORAlarm alloc] initWithName:alarmName severity:kRangeAlarm];
+            [leakageCurrentAlarm[alarmIndex] setHelpString:[NSString stringWithFormat:@"Preamp %lu Channel %d leakage current value exceeded limits. This alarm will be in effect until the leakage current returns to normal limits. It can be silenced by acknowledging it.",[self uniqueIdNumber], aChan]];
+            [leakageCurrentAlarm[alarmIndex] setSticky:YES];
+        }
+        [leakageCurrentAlarm[alarmIndex] postAlarm];
+    }
+    else {
+        [leakageCurrentAlarm[alarmIndex] clearAlarm];
+        [leakageCurrentAlarm[alarmIndex] release];
+        leakageCurrentAlarm[alarmIndex] = nil;
     }
 }
 
