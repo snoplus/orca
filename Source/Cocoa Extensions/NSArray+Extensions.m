@@ -128,9 +128,9 @@
 {
     if([self count]==0)return nil;
     else {
-        id temp = [self lastObject];
+        id temp = [[self lastObject] retain];
         [self removeLastObject];
-        return temp;
+        return [temp autorelease];
     }
 }
 
