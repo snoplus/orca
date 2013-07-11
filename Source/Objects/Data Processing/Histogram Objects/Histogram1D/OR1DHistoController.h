@@ -39,6 +39,7 @@
 - (OR1dFitController*) fitController;
 - (id) curve:(int)c roi:(int)g;
 - (id) curve:(int)c gate:(int)g; //for backward compatiblity with scripts
+- (id) calibrationPanel;
 
 #pragma mark ¥¥¥Alarms
 - (IBAction) calibrate:(id)sender;

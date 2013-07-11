@@ -89,6 +89,10 @@
 										  didEndSelector:@selector(_calibrationDidEnd:returnCode:contextInfo:)
 											 contextInfo:nil] retain];
 }
+- (id) calibrationPanel
+{
+    return calibrationPanel;
+}
 
 - (IBAction) copy:(id)sender
 {
