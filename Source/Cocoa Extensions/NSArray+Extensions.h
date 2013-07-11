@@ -31,7 +31,9 @@
 - (NSMutableArray*) children;
 - (unsigned) numberOfChildren;
 - (void) moveObject:(id)anObj toIndex:(unsigned)newIndex;
-- (id) pop; //implements stack behavior, throws NSRangeException and returns nil if nothing to pop
-- (void) push:(id)object; //implements stack behavior
-- (id) top; //implements stack behavior
+
+//implements stack behavior
+- (id)   pop;
+- (void) push:(id)object;
+- (id)   peek;
 @end

@@ -126,9 +126,12 @@
 
 - (id) pop
 {
-    id temp = [self lastObject];
-    [self removeLastObject];
-    return temp;
+    if([self count]==0)return nil;
+    else {
+        id temp = [self lastObject];
+        [self removeLastObject];
+        return temp;
+    }
 }
 
 - (void) push:(id)object
@@ -136,9 +139,9 @@
     [self addObject:object];
 }
 
-- (id) top
+- (id) peek
 {
-    return [self lastObject];
+    if([self count]) return [self lastObject];
+    else             return nil;
 }
-
 @end
