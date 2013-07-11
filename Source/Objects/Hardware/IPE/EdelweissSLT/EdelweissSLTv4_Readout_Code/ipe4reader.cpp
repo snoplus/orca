@@ -4065,7 +4065,9 @@ void StopSLTFIFO()
 	SLTControl =  pbus->read(SLTControlReg);
 	printf("    SLTControl: 0x%08x (OnLine: %i)\n",SLTControl, (SLTControl & 0x4000)>>14);
 
-int i=0;
+        int i=0;
+        for(i=0; i<FIFOREADER::availableNumFIFO; i++) if(FIFOREADER::FifoReader[i].readfifo){
+
 			//SLT csr register
 			BB0csr =  pbus->read(BBcsrReg(i));
 			printf("    BBcsrReg(%i): 0x%08x (BBEn: %i)\n",i,BB0csr, (BB0csr & 0x2)>>1);
@@ -4074,6 +4076,7 @@ int i=0;
 			pbus->write(BBcsrReg(i), (0x08 + 0x04));
 			BB0csr =  pbus->read(BBcsrReg(i));
 			printf("    BBcsrReg(%i): 0x%08x (BBEn: %i)\n",i,BB0csr, (BB0csr & 0x2)>>1);
+        }
 }
 
  /*--------------------------------------------------------------------
@@ -4865,9 +4868,10 @@ int32_t main(int32_t argc, char *argv[])
                     StopSLTFIFO();
                     FIFOREADER::State = frINITIALIZED;
                     //clear FIFO buffer
-                    FIFOREADER::FifoReader[0].clearFifoBuf32();
-                    FIFOREADER::FifoReader[0].isSynchronized = 0;
-                    FIFOREADER::FifoReader[0].udpdataCounter = 0;
+                    FIFOREADER::clearAllFifoBuf32();
+                    FIFOREADER::resetAllSynchronizingAndPackaging();
+                    //FIFOREADER::FifoReader[0].isSynchronized = 0;
+                    //FIFOREADER::FifoReader[0].udpdataCounter = 0;
 
                 }
             }
@@ -4876,9 +4880,10 @@ int32_t main(int32_t argc, char *argv[])
                     FIFOREADER::State = frSTREAMING;
                     //TODO: clear buffers + FIFOs? -tb-
                     //clear FIFO buffer
-                    FIFOREADER::FifoReader[0].clearFifoBuf32();
-                    FIFOREADER::FifoReader[0].isSynchronized = 0;
-                    FIFOREADER::FifoReader[0].udpdataCounter = 0;
+                    FIFOREADER::clearAllFifoBuf32();
+                    FIFOREADER::resetAllSynchronizingAndPackaging();
+                    //FIFOREADER::FifoReader[0].isSynchronized = 0;
+                    //FIFOREADER::FifoReader[0].udpdataCounter = 0;
                     //start hardware
                     printf("DO A QUICK START OF STREAM LOOP\n");
                     InitHardwareFIFOs(/*warmStart=*/ 1 );

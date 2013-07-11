@@ -3411,6 +3411,7 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
                     const int MaxUDPPacketSizeBytes=1444;
                     int M=(MaxUDPPacketSizeBytes-4) / 2;//max. number of shorts (1444-4)/2=720
                     int NA=dataReplyThreadData.numADCsInDataStream[*rdIndex];//TODO: take from crate status packet -tb-
+if(NA==0) NA=6;//TODO: dirty workaround -tb-
                     int numfifo=dataReplyThreadData.numfifo[*rdIndex];//TODO: take from crate status packet -tb-
                     int     i, j, j_swapit, toffset;
                     int64_t K,t;

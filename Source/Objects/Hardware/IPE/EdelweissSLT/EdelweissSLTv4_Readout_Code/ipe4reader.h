@@ -503,6 +503,23 @@ public:
 	/*--------------------------------------------------------------------
 	 vars and functions for FIFO buffer
 	 --------------------------------------------------------------------*/
+    static void resetAllSynchronizingAndPackaging(){
+        int i=0;
+        for(i=0; i<FIFOREADER::availableNumFIFO; i++) 
+            if(FIFOREADER::FifoReader[i].readfifo) FIFOREADER::FifoReader[i].resetSynchronizingAndPackaging();
+    }
+    
+    static void clearAllFifoBuf32(){
+        int i=0;
+        for(i=0; i<FIFOREADER::availableNumFIFO; i++) 
+            if(FIFOREADER::FifoReader[i].readfifo) FIFOREADER::FifoReader[i].clearFifoBuf32();
+    }
+    
+    void resetSynchronizingAndPackaging(){
+        isSynchronized = 0;
+        udpdataCounter = 0;
+    }
+    
     void clearFifoBuf32(){
         waitingForSynchroWord = 0;
         synchroWordPosHint=0;

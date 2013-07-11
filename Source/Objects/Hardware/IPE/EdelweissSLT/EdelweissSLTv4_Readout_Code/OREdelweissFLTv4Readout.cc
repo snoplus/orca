@@ -361,8 +361,9 @@ fprintf(stderr,"ORFLTv4Readout::Readout(SBC_LAM_Data* lamData): location %i, Get
 #if 1
                                 pbus->readBlock(FLTRAMDataReg(currFlt+1,chan),(unsigned long*)waveformBuffer32,waveformLength);
                                 
+                                #if 0 //this was a workaround ...
 								for(adccount=0; adccount<waveformLength;adccount++){ //kNumV4FLTADCPageSize32 is 1024; waveformLength is 2048
-			            pbus->read(FLTRAMDataReg(currFlt+1,chan)+0);//dummy
+			            //pbus->read(FLTRAMDataReg(currFlt+1,chan)+0);//dummy
 					    
                                     //waveformBuffer32[adccount]  = pbus->read(FLTRAMDataReg(currFlt+1,chan)+adccount);
                                     if(adccount<5){fprintf(stdout,"1RAMDataReg for flt #%i, chan %i (location 0x%x,colSlot %i,crate %i):  addr 0x%08x   value:", currFlt+1,chan,location,col,crate ,FLTRAMDataReg(currFlt+1,0)+adccount);
@@ -370,6 +371,7 @@ fprintf(stderr,"ORFLTv4Readout::Readout(SBC_LAM_Data* lamData): location %i, Get
 						            }
                                     //shipWaveformBuffer32[adccount]  = (adccount*2)  | ((adccount*2+1)<<16);
 								}
+                                #endif
 #else
 								for(adccount=0; adccount<waveformLength;adccount++){ //kNumV4FLTADCPageSize32 is 1024; waveformLength is 2048
 								    

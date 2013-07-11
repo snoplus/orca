@@ -2222,7 +2222,7 @@ exit(66);
 	int num=2048;//MUST be > 48 (DMA block size)! max. 2048
 	int shownum=2048;//MUST be < num!
 	int numChan=kNumEWFLTHeatIonChannels;
-	numChan=1;
+	//numChan=1;
 
     #if 1
     //uint32_t buf[2048];

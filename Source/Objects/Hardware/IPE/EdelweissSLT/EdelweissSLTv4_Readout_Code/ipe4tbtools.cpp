@@ -172,9 +172,21 @@ int fifoReadsFLTIndexChecker(int fltIndex, int numfifo, int availableNumFIFO, in
             return 0;
     }
     
+    #if 0
+    //removed:
+    //mapping was previously: fifo0=FLT0,1,2,3; fifo1=FLT4,5,6,7; fifo2=FLT8,9,10,11; fifo3=FLT12,13,14,15  ---> then mapping is: return (fltIndex >> 2) == numfifo;
     if(availableNumFIFO==4){//mapping: fifo0=FLT0,1,2,3; fifo1=FLT4,5,6,7; fifo2=FLT8,9,10,11; fifo3=FLT12,13,14,15
         if(fltIndex>=0 && fltIndex<maxNumFIFO){
             return (fltIndex >> 2) == numfifo;
+        }else
+            return 0;
+    }
+    #endif
+
+    //2013-07-11: this is currently the only existing version -tb-
+    if(availableNumFIFO==4){//mapping: fifo0=FLT0,1,2,3,4; fifo1=FLT5,6,7,8,9; fifo2=FLT10,11,12,13,14; fifo3=FLT15,16,17,18,19
+        if(fltIndex>=0 && fltIndex<maxNumFIFO){
+            return (fltIndex / 5) == numfifo;
         }else
             return 0;
     }
