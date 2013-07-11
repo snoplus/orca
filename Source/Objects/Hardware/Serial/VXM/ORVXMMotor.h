@@ -39,6 +39,7 @@
         int				motorSpeed;
 		BOOL			motorEnabled;
 		BOOL			absoluteMotion;
+        NSString*       axis;
 }
 
 #pragma mark ***Accessors
@@ -62,6 +63,8 @@
 - (BOOL) hasMoved;
 - (int) targetPosition;
 - (void) setTargetPosition:(int)aPosition;
+- (NSString*) axis;
+- (void) setAxis:(NSString*)aString;
 @end
 
 extern NSString* ORVXMMotorAbsMotionChanged;

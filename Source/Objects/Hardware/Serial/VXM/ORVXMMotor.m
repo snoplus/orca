@@ -165,6 +165,17 @@ NSString* ORVXMMotorAbsMotionChanged	= @"ORVXMMotorAbsMotionChanged";
 	return absoluteMotion;
 }
 
+- (NSString*) axis
+{
+    return axis;
+}
+
+- (void) setAxis:(NSString*)aString
+{
+    [axis autorelease];
+    axis = [aString copy];
+}
+
 - (void) setAbsoluteMotion:(BOOL)aState
 {
 	[[[owner undoManager] prepareWithInvocationTarget:self] setAbsoluteMotion:absoluteMotion];

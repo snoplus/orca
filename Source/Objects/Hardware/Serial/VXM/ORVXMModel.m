@@ -54,7 +54,6 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (void) timeout;
 - (void) process_response:(NSString*)theResponse;
 - (void) startTimeOut;
-- (int)  motorToQuery;
 - (void) makeMotors;
 - (void) addCmdToQueue:(NSString*)aCmdString description:(NSString*)aDescription waitToSend:(BOOL)waitToSendNextCmd;
 - (void) processNextCommand;
@@ -63,9 +62,8 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (void) runStopping:(NSNotification*)aNote;
 - (void) stopRun;
 - (void) delayedRunStop;
-- (void) queryPosition;
+- (BOOL) sendNextMotorQuery;
 - (void) queryPositions;
-- (int) nextMotorToQuery;
 - (void) sendCommand:(NSString*)aCmd;
 - (void) queryPositionsDeferred;
 @end
@@ -147,10 +145,9 @@ NSString* ORVXMLock							= @"ORVXMLock";
     }
 }
 
-- (void) shipMotorState:(int)motorIndex
+- (void) shipMotorState:(id)aMotor
 {
-	if( [[ORGlobal sharedGlobal] runInProgress] && (motorIndex < [motors count])){
-		ORVXMMotor* aMotor = [motors objectAtIndex:motorIndex];
+	if( [[ORGlobal sharedGlobal] runInProgress] && aMotor){
 		//get the time(UT!)
 		time_t	ut_time;
 		time(&ut_time);
@@ -158,7 +155,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 		unsigned long data[5];
 		data[0] = dataId | 5;
 		data[1] = ut_time;
-		data[2] = (motorIndex<<16) | ([self uniqueIdNumber]&0x0000fffff);
+		data[2] = ([aMotor motorId]<<16) | ([self uniqueIdNumber]&0x0000fffff);
 		//encode the position 
 		union {
 			long asLong;
@@ -489,9 +486,11 @@ NSString* ORVXMLock							= @"ORVXMLock";
 	motors   = [[decoder decodeObjectForKey:@"motors"] retain];
 	if(!motors)[self makeMotors];
 	int i = 0;
+    NSString* motorAxis[4] = {@"X",@"Y",@"Z",@"T"};
 	for(id aMotor in motors){
 		[aMotor setOwner:self];
 		[aMotor setMotorId:i];
+        [aMotor setAxis:motorAxis[i]];
 		i++;
 	}
 	[[self undoManager] enableUndoRegistration];
@@ -502,11 +501,11 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeBool:useCmdQueue		forKey:@"useCmdQueue"];
-    [encoder encodeObject:customCmd		forKey:@"customCmd"];
-    [encoder encodeBool:shipRecords		forKey:@"shipRecords"];
-    [encoder encodeInt:repeatCount		forKey:@"repeatCount"];
-    [encoder encodeInt:numTimesToRepeat forKey:@"numTimesToRepeat"];
+    [encoder encodeBool:useCmdQueue		forKey: @"useCmdQueue"];
+    [encoder encodeObject:customCmd		forKey: @"customCmd"];
+    [encoder encodeBool:shipRecords		forKey: @"shipRecords"];
+    [encoder encodeInt:repeatCount		forKey: @"repeatCount"];
+    [encoder encodeInt:numTimesToRepeat forKey: @"numTimesToRepeat"];
     [encoder encodeBool:stopRunWhenDone forKey: @"stopRunWhenDone"];
     [encoder encodeBool:repeatCmds		forKey: @"repeatCmds"];
     [encoder encodeInt:syncWithRun		forKey: @"syncWithRun"];
@@ -726,11 +725,6 @@ NSString* ORVXMLock							= @"ORVXMLock";
 
 @implementation ORVXMModel (private)
 
-- (int) motorToQuery
-{
-    if([motorToQueryStack count]==0) return -1;
-    else return [[motorToQueryStack top] intValue];
-}
 
 #pragma mark ***Command Handling
 - (void) timeout
@@ -794,7 +788,6 @@ NSString* ORVXMLock							= @"ORVXMLock";
                 aCmd = [aCmd substringFromIndex:1];
 			}
 
-            
             //query reponse
 			if([aCmd hasPrefix:@"X"] ||
 			   [aCmd hasPrefix:@"Y"] ||
@@ -804,16 +797,15 @@ NSString* ORVXMLock							= @"ORVXMLock";
 			}
 
 			if([aCmd length]>0 && [aCmd rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"+-0123456789"]].location==0) {
-                int motorIndex = [self motorToQuery];
-				ORVXMMotor* aMotor = [motors objectAtIndex:motorIndex];
-                [aMotor setMotorPosition:[aCmd floatValue]];
-				if([aMotor hasMoved] && shipRecords)[self shipMotorState:[self motorToQuery]];
-				
-				int nextMotor = [self nextMotorToQuery];
-				if(nextMotor>=0){
-					[self queryPosition];
+                
+                
+                ORVXMMotor* aMotor = [motorToQueryStack pop];
+                if(aMotor){
+                    [aMotor setMotorPosition:[aCmd floatValue]];
+                    if([aMotor hasMoved] && shipRecords)[self shipMotorState:aMotor];
 				}
-				else {
+                
+                if(![self sendNextMotorQuery]){
 					//all motors queried. 
 					queryInProgress = NO;
 					[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
@@ -974,41 +966,31 @@ NSString* ORVXMLock							= @"ORVXMLock";
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[self performSelector:@selector(queryPositionsDeferred) withObject:nil afterDelay:.1];
 }
+
 - (void) queryPositionsDeferred
 {	
     motorToQueryStack = [[NSMutableArray alloc] init];
     int i;
-    for(i=kNumVXMMotors; i>=0; i--)
-    {
-        if([[self motor:i] motorEnabled])
-            [motorToQueryStack push:[NSNumber numberWithInt:i]];
+    for(i=kNumVXMMotors; i>=0; i--){
+        id aMotor = [self motor:i];
+        if([aMotor motorEnabled]){
+            [motorToQueryStack push:aMotor];
+        }
     }
-    [self queryPosition];
+    [self sendNextMotorQuery];
 }
 
-- (int) nextMotorToQuery
-{
-    if([motorToQueryStack count]==0) return -1;
-    [motorToQueryStack pop];
-    if([motorToQueryStack count]==0) return -1;
-    else return [[motorToQueryStack top] intValue];
-}
-
-- (void) queryPosition
+- (BOOL) sendNextMotorQuery
 {
     if([serialPort isOpen]){
-		NSString* cmd = nil;
-		switch([self motorToQuery]){
-			case 0: cmd = @"X"; break;
-			case 1: cmd = @"Y"; break;
-			case 2: cmd = @"Z"; break;
-			case 3: cmd = @"T"; break;
-		}
-		if(cmd){
-			[self sendCommand:cmd];
+        ORVXMMotor* aMotor = [motorToQueryStack peek];
+		if(aMotor){
+			[self sendCommand:[aMotor axis]];
 			[self startTimeOut];
+            return YES; //query was sent
 		}
     }
+    return NO; //no queries to be done
 }
 
 @end

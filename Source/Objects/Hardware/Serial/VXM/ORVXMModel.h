@@ -104,7 +104,7 @@
 - (void) setDataId: (unsigned long) DataId;
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherVXM;
-- (void) shipMotorState:(int)aMotorIndex;
+- (void) shipMotorState:(id)aMotor;
 
 #pragma mark ***Motor Commands
 - (void) manualStart;
