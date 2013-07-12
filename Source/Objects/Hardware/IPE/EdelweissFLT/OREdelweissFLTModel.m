@@ -235,9 +235,9 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 	{@"Delays120meas",		0x000088>>2,		-1,				kIpeRegReadable },
 
-	{@"BBStatus",		    0x001400>>2,		30,				kIpeRegReadable | kIpeRegNeedsChannel},
-
 	{@"HitRate",		    0x001000>>2,		18,				kIpeRegReadable | kIpeRegNeedsChannel},
+
+	{@"BBStatus",		    0x001400>>2,		30,				kIpeRegReadable | kIpeRegNeedsChannel},
 
 	{@"RAMData",		    0x003000>>2,		1024,				kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel},
 
@@ -2946,13 +2946,13 @@ for(chan=0; chan<6;chan++)
 	}
 #endif	
 
-    //if([[userInfo objectForKey:@"doinit"]intValue]){
+    if([[userInfo objectForKey:@"doinit"]intValue]){
 //TODO: remove the obsolete commands -tb-    
 	//[self setLedOff:NO];
 	//[self writeRunControl:YES]; // writes to run control register (was NO, but this causes the first few noise events -tb-)
 	//[self reset];               // Write 1 to all reset/clear flags of the FLTv4 command register.
-	[self initBoard];           // writes control reg + hr control reg + PostTrigg + thresh+gains + offset + triggControl + hr mask + enab.statistics
-	//}
+	  [self initBoard];           // writes control reg + hr control reg + PostTrigg + thresh+gains + offset + triggControl + hr mask + enab.statistics
+	}
 	
 	
 	if(0 & ratesEnabled){//TODO: disabled ... -tb-

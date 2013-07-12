@@ -3184,7 +3184,11 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 NSLog(@"WARNING: %@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
 
 
-
+    if(takeEventData || [[userInfo objectForKey:@"doinit"]intValue]){
+       accessAllowedToHardwareAndSBC = YES;
+    }else{
+       accessAllowedToHardwareAndSBC = NO;
+    }
 
     [self clearExceptionCount];
 	
@@ -3196,7 +3200,10 @@ NSLog(@"WARNING: %@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class])
     }
 	
     if(takeUDPstreamData){
-        savedUDPSocketState = [self isOpenDataCommandSocket] || ([self isListeningOnDataServerSocket]<<1);
+        savedUDPSocketState = [self isOpenDataCommandSocket] | ([self isListeningOnDataServerSocket]<<1);
+        //savedUDPSocketState=0;
+        //if([self isOpenDataCommandSocket]) savedUDPSocketState=0x1;
+        //if([self isListeningOnDataServerSocket]) savedUDPSocketState|=0x2;
 
 NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),savedUDPSocketState);//TODO: DEBUG testing ...-tb-
          
@@ -3223,10 +3230,12 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
 	
     
     //warm or cold start?
+    //  for QuickStart: do not access the hardware (at least not registers relevant for SAMBA) -tb-
     if([[userInfo objectForKey:@"doinit"]intValue]){
+        [self initBoard];		
         //event mode
         if(takeEventData){
-		    [self initBoard];		
+		    //[self initBoard];		
         }
         //UDP data stream mode
         if(takeUDPstreamData){
@@ -3257,7 +3266,12 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
 	
 
 	
-	[self readStatusReg];
+	//TODO: temporarily disabled ... [self readStatusReg];
+    if(accessAllowedToHardwareAndSBC){
+        [self readStatusReg];	
+    }
+    
+    
 //TODO: UNDER construction -tb-
 //TODO: UNDER construction -tb-
 //TODO: UNDER construction -tb-
@@ -3269,9 +3283,11 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
 	lastDisplayRate = 0;
 	lastSimSec = 0;
 	
-	//load all the data needed for the eCPU to do the HW read-out.
-	[self load_HW_Config];
-	[pmcLink runTaskStarted:aDataPacket userInfo:userInfo];
+    if(accessAllowedToHardwareAndSBC){
+	    //load all the data needed for the eCPU to do the HW read-out.
+	    [self load_HW_Config];
+	    [pmcLink runTaskStarted:aDataPacket userInfo:userInfo];
+    }
 	
 }
 
@@ -3288,7 +3304,8 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
 	if(!first){
 		//event readout controlled by the SLT cpu now. ORCA reads out 
 		//the resulting data from a generic circular buffer in the pmc code.
-		[pmcLink takeData:aDataPacket userInfo:userInfo];
+        if(accessAllowedToHardwareAndSBC)
+    		[pmcLink takeData:aDataPacket userInfo:userInfo];
         
         
         //additionally we generate events here
@@ -3411,7 +3428,16 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
                     const int MaxUDPPacketSizeBytes=1444;
                     int M=(MaxUDPPacketSizeBytes-4) / 2;//max. number of shorts (1444-4)/2=720
                     int NA=dataReplyThreadData.numADCsInDataStream[*rdIndex];//TODO: take from crate status packet -tb-
+
+
 if(NA==0) NA=6;//TODO: dirty workaround -tb-
+//TODO: dirty workaround -tb-
+//TODO: dirty workaround -tb-
+//TODO: dirty workaround -tb-
+//TODO: dirty workaround -tb-
+//TODO: dirty workaround -tb-
+//TODO: I could try to detect num of ADCs by checking number of bytes in buffer - need to sum up all UDP data packet size (without header) -tb-
+
                     int numfifo=dataReplyThreadData.numfifo[*rdIndex];//TODO: take from crate status packet -tb-
                     int     i, j, j_swapit, toffset;
                     int64_t K,t;
@@ -3539,10 +3565,14 @@ if(NA==0) NA=6;//TODO: dirty workaround -tb-
 	else {// the first time
 		//TODO: -tb- [self writePageManagerReset];
 		//TODO: -tb- [self writeClrCnt];
-		unsigned long long runcount = [self getTime];
-		[self shipSltEvent:kRunCounterType withType:kStartRunType eventCt:0 high: (runcount>>32)&0xffffffff low:(runcount)&0xffffffff ];
+        if(accessAllowedToHardwareAndSBC){
 
-		[self shipSltSecondCounter: kStartRunType];
+		    unsigned long long runcount = [self getTime];
+		    [self shipSltEvent:kRunCounterType withType:kStartRunType eventCt:0 high: (runcount>>32)&0xffffffff low:(runcount)&0xffffffff ];
+
+		    [self shipSltSecondCounter: kStartRunType];
+        }
+        
 		first = NO;
         
         //init timer
@@ -3629,21 +3659,25 @@ if((len % 4) != 0){
     for(id obj in dataTakers){
         [obj runIsStopping:aDataPacket userInfo:userInfo];
     }
-	[pmcLink runIsStopping:aDataPacket userInfo:userInfo];
+    
+    if(accessAllowedToHardwareAndSBC)
+    	[pmcLink runIsStopping:aDataPacket userInfo:userInfo];
 }
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-
-	[self shipSltSecondCounter: kStopRunType];
-	unsigned long long runcount = [self getTime];
-	[self shipSltEvent:kRunCounterType withType:kStopRunType eventCt:0 high: (runcount>>32)&0xffffffff low:(runcount)&0xffffffff ];
-	
+    if(accessAllowedToHardwareAndSBC){
+	    [self shipSltSecondCounter: kStopRunType];
+	    unsigned long long runcount = [self getTime];
+	    [self shipSltEvent:kRunCounterType withType:kStopRunType eventCt:0 high: (runcount>>32)&0xffffffff low:(runcount)&0xffffffff ];
+	}
+    
     for(id obj in dataTakers){
 		[obj runTaskStopped:aDataPacket userInfo:userInfo];
     }	
-	
-	[pmcLink runTaskStopped:aDataPacket userInfo:userInfo];
+
+    if(accessAllowedToHardwareAndSBC)	
+    	[pmcLink runTaskStopped:aDataPacket userInfo:userInfo];
 	
 	if(pollingWasRunning) {
 		[poller runWithTarget:self selector:@selector(readAllStatus)];

@@ -121,6 +121,7 @@
 		ORReadOutList*	readOutGroup;
 		NSArray*		dataTakers;			//cache of data takers.
 		BOOL			first;
+        BOOL            accessAllowedToHardwareAndSBC;
 		// ak, 9.12.07
 		BOOL            displayTrigger;    //< Display pixel and timing view of trigger data
 		BOOL            displayEventLoop;  //< Display the event loop parameter
