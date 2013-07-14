@@ -212,7 +212,6 @@
             }
             else {
                 NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Problem in queryString error code is : %d, query is : %s -in ObjC : %@-\n", theQueryCode, theCQuery, query] forKey:@"Description"];
-                NSLog(@"%s\n", mysql_error(mConnection));
                 e = [NSException exceptionWithName: @"SQL Exception"
                                                          reason: [self getLastErrorMessage]
                                                        userInfo: userInfo];
