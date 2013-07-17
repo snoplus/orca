@@ -703,6 +703,7 @@ public:
 	
 	//FLT Control register
 	uint32_t fiberEnable;
+	uint32_t fiberBlockOutMask;//FiberOutMask register
 	uint32_t BBversionMask;
 	uint32_t controlVetoFlag;
 	uint32_t mode; // tramp,tord = 00: Normal; 01: TM-Order; 10: TM-Ramp; 11: Ramp Ordered
@@ -725,6 +726,7 @@ public:
 	void initVars(){
 		// FLT registers (HW)
 		fiberEnable=0x0;
+        fiberBlockOutMask=0x3f;
 		BBversionMask=0x0;
         controlVetoFlag =0x0;
 		mode =0x0;

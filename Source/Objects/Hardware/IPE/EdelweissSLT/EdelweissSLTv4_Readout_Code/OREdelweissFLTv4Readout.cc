@@ -1,6 +1,17 @@
 #include "OREdelweissFLTv4Readout.hh"
 #include "EdelweissSLTv4_HW_Definitions.h"
 
+//for including ipe4tbtools.h/.cpp:
+#include "ipe4structure.h"//for code_acqui_EDW_BB2, code_synchro_100000
+//#include "HW_Readout.h"//for pbus
+class Pbus;
+//class hw4::SubrackKatrin;
+extern Pbus *pbus;              //for register access with fdhwlib
+//Pbus *pbus=0;              //for register access with fdhwlib
+#include "ipe4tbtools.h"
+extern int (*sendChargeBBStatusFunctionPtr)(uint32_t prog_status,int numFifo); //defined in HW_Readout.cpp through #include "ipe4tbtools.cpp"
+//#include "ipe4tbtools.cpp"
+
 #ifndef PMC_COMPILE_IN_SIMULATION_MODE
 	#define PMC_COMPILE_IN_SIMULATION_MODE 0
 #endif
@@ -23,7 +34,8 @@
 //TODO: move to HW_Readout.cc -tb-
 //TODO: move to HW_Readout.cc -tb-
 
-
+//moved to ipe4tbtools -tb-
+#if 0
     //SLT registers
 	static const uint32_t SLTControlReg     = 0xa80000 >> 2;
 	static const uint32_t SLTStatusReg      = 0xa80004 >> 2;
@@ -85,6 +97,8 @@ inline unsigned long BBcsrReg(int numFIFO){
 	static const uint32_t FLTCommandRegBase     = 0x000008 >> 2;
 	static const uint32_t FLTVersionRegBase     = 0x00000c >> 2;
 	
+	static const uint32_t FLTFiberOutMaskRegBase  = 0x000018 >> 2;
+    
 	static const uint32_t FLTFiberSet_1RegBase  = 0x000024 >> 2;
 	static const uint32_t FLTFiberSet_2RegBase  = 0x000028 >> 2;
 	static const uint32_t FLTStreamMask_1RegBase  = 0x00002c >> 2;
@@ -123,6 +137,10 @@ inline unsigned long FLTCommandReg(int numFLT){
 
 inline unsigned long FLTVersionReg(int numFLT){
     return FLTVersionRegBase | ((numFLT & 0x3f) <<17);  
+}
+
+inline unsigned long FLTFiberOutMaskReg(int numFLT){
+    return FLTFiberOutMaskRegBase | ((numFLT & 0x3f) <<17);  
 }
 
 inline unsigned long FLTFiberSet_1Reg(int numFLT){
@@ -166,6 +184,8 @@ inline unsigned long FLTRAMDataReg(int numFLT, int numChan){
     return FLTRAMDataRegBase | ((numFLT & 0x3f) <<17) | ((numChan & 0x1f) <<12); 
 }
 
+
+#endif
 //TODO: move to HW_Readout.cc -tb-
 //TODO: move to HW_Readout.cc -tb-
 //TODO: move to HW_Readout.cc -tb-

@@ -754,7 +754,7 @@ typedef struct{
 UDPStructIPECrateStatus;
 
 
-UDPStructIPECrateStatus IPECrateStatusPacket;
+//moved to ipe4reader.cpp globals -tb-UDPStructIPECrateStatus IPECrateStatusPacket;
 
 
 //struct def of UDPStructIPECrateStatus in human readable format

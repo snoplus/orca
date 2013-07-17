@@ -166,8 +166,11 @@ int kbhit(void)
 class Pbus;
 Pbus *pbus=0;              //for register access with fdhwlib
 uint32_t presentFLTMap =0; // store a map of the present FLT cards
+UDPStructIPECrateStatus IPECrateStatusPacket;//global struct for sending status (percentage) of charging BB -tb-
+
 
 #include "ipe4tbtools.h" //better include in ipe4reader.h? -tb-
+int (*sendChargeBBStatusFunctionPtr)(uint32_t prog_status,int numFifo) = 0;
 #include "ipe4tbtools.cpp"  //NEEDS Pbus * pbus!!!
 //moved behind: sendChargeBBStatusFunctionPtr = &(sendChargeBBStatus); //from "ipe4reader.h"
 
@@ -2855,6 +2858,14 @@ int parseConfigFileLine(char *line, int flags)
                   return wasFound;
               }
               
+			  sprintf(pattern,"FLTfiberBlockOutMask(");
+              wasFound = searchIndexAndUInt32InString(mystring,pattern,&index,&value);
+              if(wasFound){
+                  FLTSETTINGS::FLT[index].fiberBlockOutMask = value;
+                  printf("%s%i): 0x%x\n",pattern,index,FLTSETTINGS::FLT[index].fiberBlockOutMask);
+                  return wasFound;
+              }
+              
                   
               //(2)   scan loop over FLT index (old)
 	          //char pattern[2000];
@@ -4023,7 +4034,10 @@ uint32_t InitFLTs()
         printf("------FLTcontrol: 0x%08x\n",FLTcontrol);
 
 
+        //fiberOutMask
+        pbus->write(FLTStreamMask_1Reg(fltID),FLT.fiberBlockOutMask); // 0x0000003f);
 
+        //stream mask etc.
         uint32_t FLTStreamMask_1;
         uint32_t FLTStreamMask_2;
 	    FLTStreamMask_1 =  pbus->read(FLTStreamMask_1Reg(fltID));

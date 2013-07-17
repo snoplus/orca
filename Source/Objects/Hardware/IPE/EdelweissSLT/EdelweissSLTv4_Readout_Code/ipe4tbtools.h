@@ -19,6 +19,8 @@
 /*--------------------------------------------------------------------
   includes
   --------------------------------------------------------------------*/
+#include <sys/types.h>//for uint32_t ? -tb-
+#include <stdint.h>  //for uint32_t etc.
 
 
 
@@ -102,13 +104,13 @@ int fifoReadsFLTIndexChecker(int fltIndex, int numfifo, int availableNumFIFO, in
 
 
 	
-inline uint32_t FIFOStatusReg(int numFIFO);
+uint32_t FIFOStatusReg(int numFIFO);
 
-inline uint32_t FIFOModeReg(int numFIFO);
-inline uint32_t FIFOAddr(int numFIFO);
-inline uint32_t PAEOffsetReg(int numFIFO);
-inline uint32_t PAFOffsetReg(int numFIFO);
-inline uint32_t BBcsrReg(int numFIFO);
+uint32_t FIFOModeReg(int numFIFO);
+uint32_t FIFOAddr(int numFIFO);
+uint32_t PAEOffsetReg(int numFIFO);
+uint32_t PAFOffsetReg(int numFIFO);
+uint32_t BBcsrReg(int numFIFO);
 
     //FLT registers
 	static const uint32_t FLTStatusRegBase      = 0x000000 >> 2;
@@ -116,6 +118,8 @@ inline uint32_t BBcsrReg(int numFIFO);
 	static const uint32_t FLTCommandRegBase     = 0x000008 >> 2;
 	static const uint32_t FLTVersionRegBase     = 0x00000c >> 2;
 	
+	static const uint32_t FLTFiberOutMaskRegBase  = 0x000018 >> 2;
+
 	static const uint32_t FLTFiberSet_1RegBase  = 0x000024 >> 2;
 	static const uint32_t FLTFiberSet_2RegBase  = 0x000028 >> 2;
 	static const uint32_t FLTStreamMask_1RegBase  = 0x00002c >> 2;
@@ -137,20 +141,21 @@ inline uint32_t BBcsrReg(int numFIFO);
 // (NOT from 0 ... 19!!!)
 //
 	//TODO: 0x3f or 0x1f?????????????
-inline uint32_t FLTStatusReg(int numFLT);
-inline uint32_t FLTControlReg(int numFLT);
-inline uint32_t FLTCommandReg(int numFLT);
-inline uint32_t FLTVersionReg(int numFLT);
-inline uint32_t FLTFiberSet_1Reg(int numFLT);
-inline uint32_t FLTFiberSet_2Reg(int numFLT);
-inline uint32_t FLTStreamMask_1Reg(int numFLT);
-inline uint32_t FLTStreamMask_2Reg(int numFLT);
-inline uint32_t FLTTriggerMask_1Reg(int numFLT);
-inline uint32_t FLTTriggerMask_2Reg(int numFLT);
-inline uint32_t FLTAccessTestReg(int numFLT);
-inline uint32_t FLTBBStatusReg(int numFLT, int numChan);
-inline uint32_t FLTTotalTriggerNReg(int numFLT);
-inline uint32_t FLTRAMDataReg(int numFLT, int numChan);
+uint32_t FLTStatusReg(int numFLT);
+uint32_t FLTControlReg(int numFLT);
+uint32_t FLTCommandReg(int numFLT);
+uint32_t FLTVersionReg(int numFLT);
+uint32_t FLTFiberOutMaskReg(int numFLT);
+uint32_t FLTFiberSet_1Reg(int numFLT);
+uint32_t FLTFiberSet_2Reg(int numFLT);
+uint32_t FLTStreamMask_1Reg(int numFLT);
+uint32_t FLTStreamMask_2Reg(int numFLT);
+uint32_t FLTTriggerMask_1Reg(int numFLT);
+uint32_t FLTTriggerMask_2Reg(int numFLT);
+uint32_t FLTAccessTestReg(int numFLT);
+uint32_t FLTBBStatusReg(int numFLT, int numChan);
+uint32_t FLTTotalTriggerNReg(int numFLT);
+uint32_t FLTRAMDataReg(int numFLT, int numChan);
 
 
 
@@ -158,7 +163,8 @@ inline uint32_t FLTRAMDataReg(int numFLT, int numChan);
 /*--------------------------------------------------------------------
  *    function prototypes (moved from ipe4reader to provide access for OrcaReadout)
  *--------------------------------------------------------------------*/ //-tb-
-int (*sendChargeBBStatusFunctionPtr)(uint32_t prog_status,int numFifo) = 0;
+extern int (*sendChargeBBStatusFunctionPtr)(uint32_t prog_status,int numFifo);
+//int (*sendChargeBBStatusFunctionPtr)(uint32_t prog_status,int numFifo) = 0;
 //for testing :int (*sendChargeBBStatusFunctionPtr)(uint32_t prog_status,int numFifo) = (int (*)(uint32_t ,int ))23;
 
 void sendCommandFifo(unsigned char * buffer, int len);

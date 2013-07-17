@@ -98,6 +98,7 @@ extern "C" {
 #include "ipe4structure.h"
 #include "ipe4reader.h"
 #include "ipe4tbtools.h" //better include in HW_Readout.h? here: MUST follow "ipe4structure.h" (and HW_Readout.h for pbus) -tb-
+int (*sendChargeBBStatusFunctionPtr)(uint32_t prog_status,int numFifo) = 0;
 #include "ipe4tbtools.cpp"
 
 void SwapLongBlock(void* p, int32_t n);
@@ -109,6 +110,9 @@ extern int32_t  dataIndex;
 extern int32_t* data;
 
 //hw4::SubrackKatrin* get_sub_rack() { return srack; }
+
+
+Pbus *pbus=0;              //for register access with fdhwlib
 
 
 

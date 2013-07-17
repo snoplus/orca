@@ -2,6 +2,10 @@
 #define _ORFLTv4Readout_hh_
 #include "ORVCard.hh"
 #include <iostream>
+//#include <sys/types.h>  //for uint32_t ? -tb-
+//#include <unistd.h>
+#include <sys/types.h>//for uint32_t ? -tb-
+#include <stdint.h>   //for uint32_t ? -tb-
 
 
 /** For every card in the Orca configuration one instance of ORFLTv4Readout is constructed.
