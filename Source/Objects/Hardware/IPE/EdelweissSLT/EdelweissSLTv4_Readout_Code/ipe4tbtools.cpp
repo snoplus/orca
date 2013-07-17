@@ -283,6 +283,8 @@ int fifoReadsFLTIndexChecker(int fltIndex, int numfifo, int availableNumFIFO, in
 	static const uint32_t FLTCommandRegBase     = 0x000008 >> 2;
 	static const uint32_t FLTVersionRegBase     = 0x00000c >> 2;
 	
+	static const uint32_t FLTFiberOutMaskRegBase  = 0x000018 >> 2;
+    
 	static const uint32_t FLTFiberSet_1RegBase  = 0x000024 >> 2;
 	static const uint32_t FLTFiberSet_2RegBase  = 0x000028 >> 2;
 	static const uint32_t FLTStreamMask_1RegBase  = 0x00002c >> 2;
@@ -313,27 +315,27 @@ int fifoReadsFLTIndexChecker(int fltIndex, int numfifo, int availableNumFIFO, in
 //SLT registers
 
 	
-inline uint32_t FIFOStatusReg(int numFIFO){
+uint32_t FIFOStatusReg(int numFIFO){
     return FIFO0StatusReg | ((numFIFO & 0xf) <<14);  //PCI adress would be <<16, but we use Pbus adress -tb-
 }
 
-inline uint32_t FIFOModeReg(int numFIFO){
+uint32_t FIFOModeReg(int numFIFO){
     return FIFO0ModeReg | ((numFIFO & 0xf) <<14);  //PCI adress would be <<16, but we use Pbus adress -tb-
 }
 
-inline uint32_t FIFOAddr(int numFIFO){
+uint32_t FIFOAddr(int numFIFO){
     return FIFO0Addr | ((numFIFO & 0xf) <<14);  //PCI adress would be <<16, but we use Pbus adress -tb-
 }
 
-inline uint32_t PAEOffsetReg(int numFIFO){
+uint32_t PAEOffsetReg(int numFIFO){
     return BB0PAEOffsetReg | ((numFIFO & 0xf) <<14);  //PCI adress would be <<16, but we use Pbus adress -tb-
 }
 
-inline uint32_t PAFOffsetReg(int numFIFO){
+uint32_t PAFOffsetReg(int numFIFO){
     return BB0PAFOffsetReg | ((numFIFO & 0xf) <<14);  //PCI adress would be <<16, but we use Pbus adress -tb-
 }
 
-inline uint32_t BBcsrReg(int numFIFO){
+uint32_t BBcsrReg(int numFIFO){
     return BB0csrReg | ((numFIFO & 0xf) <<14);  //PCI adress would be <<16, but we use Pbus adress -tb-
 }
 
@@ -353,60 +355,64 @@ inline uint32_t BBcsrReg(int numFIFO){
 // (NOT from 0 ... 19!!!)
 //
 	//TODO: 0x3f or 0x1f?????????????
-inline uint32_t FLTStatusReg(int numFLT){
+uint32_t FLTStatusReg(int numFLT){
     return FLTStatusRegBase | ((numFLT & 0x3f) <<17);  //PCI adress would be <<16, but we use Pbus adress -tb-
 }
 
-inline uint32_t FLTControlReg(int numFLT){
+uint32_t FLTControlReg(int numFLT){
     return FLTControlRegBase | ((numFLT & 0x3f) <<17);  
 }
 
-inline uint32_t FLTCommandReg(int numFLT){
+uint32_t FLTCommandReg(int numFLT){
     return FLTCommandRegBase | ((numFLT & 0x3f) <<17);  
 }
 
-inline uint32_t FLTVersionReg(int numFLT){
+uint32_t FLTVersionReg(int numFLT){
     return FLTVersionRegBase | ((numFLT & 0x3f) <<17);  
 }
 
-inline uint32_t FLTFiberSet_1Reg(int numFLT){
+uint32_t FLTFiberOutMaskReg(int numFLT){
+    return FLTFiberOutMaskRegBase | ((numFLT & 0x3f) <<17);  
+}
+
+uint32_t FLTFiberSet_1Reg(int numFLT){
     return FLTFiberSet_1RegBase | ((numFLT & 0x3f) <<17);  
 }
 
-inline uint32_t FLTFiberSet_2Reg(int numFLT){
+uint32_t FLTFiberSet_2Reg(int numFLT){
     return FLTFiberSet_2RegBase | ((numFLT & 0x3f) <<17);  
 }
 
-inline uint32_t FLTStreamMask_1Reg(int numFLT){
+uint32_t FLTStreamMask_1Reg(int numFLT){
     return FLTStreamMask_1RegBase | ((numFLT & 0x3f) <<17);  
 }
 
-inline uint32_t FLTStreamMask_2Reg(int numFLT){
+uint32_t FLTStreamMask_2Reg(int numFLT){
     return FLTStreamMask_2RegBase | ((numFLT & 0x3f) <<17);  
 }
 
-inline uint32_t FLTTriggerMask_1Reg(int numFLT){
+uint32_t FLTTriggerMask_1Reg(int numFLT){
     return FLTTriggerMask_1RegBase | ((numFLT & 0x3f) <<17);  
 }
 
-inline uint32_t FLTTriggerMask_2Reg(int numFLT){
+uint32_t FLTTriggerMask_2Reg(int numFLT){
     return FLTTriggerMask_2RegBase | ((numFLT & 0x3f) <<17);  
 }
 
-inline uint32_t FLTAccessTestReg(int numFLT){
+uint32_t FLTAccessTestReg(int numFLT){
     return FLTAccessTestRegBase | ((numFLT & 0x3f) <<17); 
 }
 
-inline uint32_t FLTBBStatusReg(int numFLT, int numChan){
+uint32_t FLTBBStatusReg(int numFLT, int numChan){
     return FLTBBStatusRegBase | ((numFLT & 0x3f) <<17) | ((numChan & 0x1f) <<12); 
 }
 
-inline uint32_t FLTTotalTriggerNReg(int numFLT){
+uint32_t FLTTotalTriggerNReg(int numFLT){
     return FLTTotalTriggerNRegBase | ((numFLT & 0x3f) <<17);  
 }
 
 
-inline uint32_t FLTRAMDataReg(int numFLT, int numChan){
+uint32_t FLTRAMDataReg(int numFLT, int numChan){
     return FLTRAMDataRegBase | ((numFLT & 0x3f) <<17) | ((numChan & 0x1f) <<12); 
 }
 
@@ -810,7 +816,7 @@ printf("***********   bilan de chargement :  numserie=%d  j=%d  err=%d  ********
 
 //try:
 	//envoie_commande_horloge( 30,  0,  1,  8,  2, 3); //2013-07 changed to X=20 -tb-
-	envoie_commande_horloge( 20,  0,  1,  8,  2, 3);
+	envoie_commande_horloge( 20,  0,  3,  8,  2, 3);
 
 //int Table_nb_synchro[8]=_valeur_synchro;
 //Nb_synchro=Table_nb_synchro[Code_synchro&0x3];//this was in void envoie_commande_horloge(void) but is probably not necessary (?) -tb-
