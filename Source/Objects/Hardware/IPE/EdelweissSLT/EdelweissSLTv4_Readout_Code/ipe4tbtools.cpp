@@ -809,7 +809,7 @@ printf("***********   bilan de chargement :  numserie=%d  j=%d  err=%d  ********
 //cmd 255 (6 octets) 1E 0 0 1 8 2 
 
 //try:
-envoie_commande_horloge( 30,  0,  1,  8,  2, 3);
+envoie_commande_horloge( 20,  0,  1,  8,  2, 3);
 
 //int Table_nb_synchro[8]=_valeur_synchro;
 //Nb_synchro=Table_nb_synchro[Code_synchro&0x3];//this was in void envoie_commande_horloge(void) but is probably not necessary (?) -tb-
