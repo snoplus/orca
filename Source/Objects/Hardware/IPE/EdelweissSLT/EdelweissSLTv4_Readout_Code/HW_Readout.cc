@@ -472,6 +472,25 @@ void doGeneralWriteOp(SBC_Packet* aPacket,uint8_t reply)
             sendCommandFifo(buf,dataToWrite[0]);
             }
 		break;
+		case kChargeBBWithFile:
+            {
+            char* buf=(char*)&dataToWrite[1]; 
+			//if(numLongs == 1) *lPtr = kCodeVersion;
+            //if(num!=2) ERROR ...
+            //DEBUG
+                           fprintf(stderr,"kChargeBBWithFile reply %i, num %i\n",reply,num);
+            //DEBUG
+                           fprintf(stderr,"   args 0x%x 0x%x ...\n",dataToWrite[0],dataToWrite[1]);
+            //DEBUG
+                           if(dataToWrite[0]>1)fprintf(stderr,"   filename: %s  \n",buf);
+            //DEBUG  
+              //int i; for(i=0; i<  dataToWrite[0];i++){                   int val=*(buf+i) & 0xff;
+              //    fprintf(stderr,"   byte %i: 0x%x  ...\n",i,val);            }
+            //KATRIN example: setHostTimeToFLTsAndSLT(dataToWrite); , option kSetHostTimeToFLTsAndSLT
+            chargeBBWithFile(buf,-1);
+            //sendCommandFifo(buf,dataToWrite[0]);
+            }
+		break;
 		//nothing defined yet
 		default:
 		break;

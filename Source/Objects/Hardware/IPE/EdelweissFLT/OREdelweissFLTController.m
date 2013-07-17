@@ -447,9 +447,33 @@
                          name : OREdelweissFLTModelIonToHeatDelayChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(chargeBBFileChanged:)
+                         name : OREdelweissFLTModelChargeBBFileChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(BB0x0ACmdMaskChanged:)
+                         name : OREdelweissFLTModelBB0x0ACmdMaskChanged
+						object: model];
+
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+
+- (void) BB0x0ACmdMaskChanged:(NSNotification*)aNote
+{
+	[BB0x0ACmdMaskTextField setIntValue: (int)[model BB0x0ACmdMask]];
+   	int i;
+	for(i=0;i<8;i++){
+		[[BB0x0ACmdMaskMatrix cellWithTag:i] setIntValue: ([model BB0x0ACmdMask] & (0x1 <<i))];//cellWithTag:i is not defined for all i, but it works anyway
+	}    
+}
+
+- (void) chargeBBFileChanged:(NSNotification*)aNote
+{
+	[chargeBBFileTextField setStringValue: [model chargeBBFile]];
+}
 
 - (void) ionToHeatDelayChanged:(NSNotification*)aNote
 {
@@ -606,14 +630,30 @@
 - (void) useBroadcastIdforBBAccessChanged:(NSNotification*)aNote
 {
 	[useBroadcastIdforBBAccessCB setIntValue: [model useBroadcastIdforBBAccess]];
+    if([model useBroadcastIdforBBAccess]){
+    	[idBBforWCommandTextField setStringValue: @"0xFF"];
+    	[idBBforAlimCommandTextField setStringValue: @"0xFF"];
+    }else{
+        int fiber = [model fiberSelectForBBAccess];
+    	[idBBforWCommandTextField setIntValue: [model idBBforBBAccessForFiber:fiber]];
+    	[idBBforAlimCommandTextField setIntValue: [model idBBforBBAccessForFiber:fiber]];
+    }
 }
 
 - (void) idBBforBBAccessChanged:(NSNotification*)aNote
 {
     int fiber = [model fiberSelectForBBAccess];
 	[idBBforBBAccessTextField setIntValue: [model idBBforBBAccessForFiber:fiber]];
-	[idBBforWCommandTextField setIntValue: [model idBBforBBAccessForFiber:fiber]];
-	[idBBforAlimCommandTextField setIntValue: [model idBBforBBAccessForFiber:fiber]];
+	//[idBBforWCommandTextField setIntValue: [model idBBforBBAccessForFiber:fiber]];
+	//[idBBforAlimCommandTextField setIntValue: [model idBBforBBAccessForFiber:fiber]];
+    if([model useBroadcastIdforBBAccess]){
+    	[idBBforWCommandTextField setStringValue: @"0xFF"];
+    	[idBBforAlimCommandTextField setStringValue: @"0xFF"];
+    }else{
+        int fiber = [model fiberSelectForBBAccess];
+    	[idBBforWCommandTextField setIntValue: [model idBBforBBAccessForFiber:fiber]];
+    	[idBBforAlimCommandTextField setIntValue: [model idBBforBBAccessForFiber:fiber]];
+    }
 }
 
 
@@ -1095,6 +1135,8 @@
     [self hitRateEnabledMaskChanged:nil];
     [self triggerParameterChanged:nil];
 	[self ionToHeatDelayChanged:nil];
+	[self chargeBBFileChanged:nil];
+	[self BB0x0ACmdMaskChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -1463,6 +1505,76 @@
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+- (IBAction) sendBB0x0ABloqueAction:(id)sender
+{
+    [self endEditing];
+	//debug     NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+    int fiber = [model fiberSelectForBBAccess];
+    int idBB=[model idBBforBBAccessForFiber:fiber];
+    if([model useBroadcastIdforBBAccess]) idBB=0xff;
+    [model sendWCommandIdBB:idBB  cmd:0x0A arg1:0  arg2:0x00];
+}
+
+- (IBAction) sendBB0x0ADebloqueAction:(id)sender
+{
+    [self endEditing];
+	//debug     NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+    int fiber = [model fiberSelectForBBAccess];
+    int idBB=[model idBBforBBAccessForFiber:fiber];
+    if([model useBroadcastIdforBBAccess]) idBB=0xff;
+    [model sendWCommandIdBB:idBB  cmd:0x0A arg1:0  arg2:0x06];
+}
+
+- (IBAction) sendBB0x0ADemarrageAction:(id)sender
+{
+    [self endEditing];
+	//debug     NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+    int fiber = [model fiberSelectForBBAccess];
+    int idBB=[model idBBforBBAccessForFiber:fiber];
+    if([model useBroadcastIdforBBAccess]) idBB=0xff;
+    [model sendWCommandIdBB:idBB  cmd:0x0A arg1:0  arg2:0x07];
+}
+
+- (IBAction) sendBB0x0ACmdAction:(id)sender //send 0x0A Command
+{
+    [self endEditing];
+	//debug     NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+    int fiber = [model fiberSelectForBBAccess];
+    int idBB=[model idBBforBBAccessForFiber:fiber];
+    if([model useBroadcastIdforBBAccess]) idBB=0xff;
+    [model sendWCommandIdBB:idBB  cmd:0x0A arg1:0  arg2:[model BB0x0ACmdMask]];
+}
+
+
+
+
+- (void) BB0x0ACmdMaskTextFieldAction:(id)sender
+{
+	[model setBB0x0ACmdMask:[sender intValue]];	//BB0x0ACmdMaskTextField
+}
+
+- (IBAction) BB0x0ACmdMaskMatrixAction:(id)sender
+{
+	//debug 
+    NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+	int i,val=0;
+	for(i=0;i<8;i++){
+        //NSLog(@"Called %@::%@   cell with tag %i, id:%p intVal:%i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),i,[sender cellWithTag:i],[[sender cellWithTag:i] intValue]);//TODO: DEBUG -tb-
+        ////cellWithTag:i is not defined for all i, but it works anyway: it returns 0 and [0 intValue] is 0, so nothing is set in this case -tb-
+        if([[BB0x0ACmdMaskMatrix cellWithTag:i] intValue]) val |= (0x1<<i);
+	}
+	[model setBB0x0ACmdMask:val];
+}
+
+- (IBAction) chargeBBFileCommandSendButtonAction:(id)sender;
+{
+	[model chargeBBWithFile: [model chargeBBFile]];	
+}
+
+- (void) chargeBBFileTextFieldAction:(id)sender
+{
+	[model setChargeBBFile:[sender stringValue]];	
+}
 
 - (void) ionToHeatDelayTextFieldAction:(id)sender
 {
@@ -1495,6 +1607,7 @@
 {
 	[model setWCmdCode:[sender intValue]];	
 }
+
 - (IBAction) sendWCommandButtonAction:(id)sender
 {
     //DEBUG    NSLog(@"%@::%@ intVal %i\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),[sender intValue]);//TODO: DEBUG testing ...-tb-

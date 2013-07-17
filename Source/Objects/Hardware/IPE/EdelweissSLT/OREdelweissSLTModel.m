@@ -2383,6 +2383,33 @@ for(l=0;l<2500;l++){
 
 #pragma mark ***HW Access
 
+- (int)           chargeBBWithFile:(char*)data numBytes:(int) numBytes
+{
+
+
+    //DEBUG 	    
+    NSLog(@"%@::%@ \n", NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+
+
+   long buf32[1024+2]; //cannot exceed size of cmd FIFO
+   //uint32_t buf32[257]; //cannot exceed size of cmd FIFO
+   int num32ToSend = (numBytes+3)/4 + 1;//round up if not multiple of 4; add 1 for first word containing numBytes
+   if(numBytes>1024+2) return -1;
+   buf32[0]=numBytes;
+   char* buf=(char*)&buf32[1];
+   int i;
+   for(i=0; i<numBytes; i++) buf[i]=data[i];
+   
+	if(![pmcLink isConnected]){
+		[NSException raise:@"Not Connected" format:@"Socket not connected."];
+	}
+	else {
+		[pmcLink writeGeneral:buf32 operation:kChargeBBWithFile numToWrite:num32ToSend];
+	}
+   
+   
+   return 0;
+}
 
 //this uses a general read command
 - (int)          writeToCmdFIFO:(char*)data numBytes:(int) numBytes

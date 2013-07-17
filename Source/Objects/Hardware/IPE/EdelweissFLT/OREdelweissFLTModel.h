@@ -174,6 +174,8 @@
     uint64_t ionTriggerMask;
     uint64_t heatTriggerMask;
     int ionToHeatDelay;
+    NSString* chargeBBFile;
+    uint32_t BB0x0ACmdMask;
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
@@ -184,6 +186,10 @@
 - (short) getNumberRegisters;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+- (uint32_t) BB0x0ACmdMask;
+- (void) setBB0x0ACmdMask:(uint32_t)aBB0x0ACmdMask;
+- (NSString*) chargeBBFile;
+- (void) setChargeBBFile:(NSString*)aChargeBBFile;
 - (int) ionToHeatDelay;
 - (void) setIonToHeatDelay:(int)aIonToHeatDelay;
 - (int) lowLevelRegInHex;
@@ -455,6 +461,7 @@
 - (void) writeCommandSoftwareTrigger;
 - (void) readTriggerData;
 
+- (void) chargeBBWithFile:(NSString*) aFile;	
 - (void) sendWCommand;
 - (void) sendWCommandIdBB:(int) idBB cmd:(int) cmd arg1:(int) arg1  arg2:(int) arg2;
 - (void) readBBStatusForBBAccess;//BB access tab
@@ -538,6 +545,8 @@
 				  n:(int) n;
 @end
 
+extern NSString* OREdelweissFLTModelBB0x0ACmdMaskChanged;
+extern NSString* OREdelweissFLTModelChargeBBFileChanged;
 extern NSString* OREdelweissFLTModelIonToHeatDelayChanged;
 extern NSString* OREdelweissFLTModelHeatTriggerMaskChanged;
 extern NSString* OREdelweissFLTModelIonTriggerMaskChanged;

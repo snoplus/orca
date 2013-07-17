@@ -36,6 +36,8 @@
 
 //#import "ipe4tbtools.cpp"
 
+NSString* OREdelweissFLTModelBB0x0ACmdMaskChanged = @"OREdelweissFLTModelBB0x0ACmdMaskChanged";
+NSString* OREdelweissFLTModelChargeBBFileChanged = @"OREdelweissFLTModelChargeBBFileChanged";
 NSString* OREdelweissFLTModelIonToHeatDelayChanged = @"OREdelweissFLTModelIonToHeatDelayChanged";
 NSString* OREdelweissFLTModelHeatTriggerMaskChanged = @"OREdelweissFLTModelHeatTriggerMaskChanged";
 NSString* OREdelweissFLTModelIonTriggerMaskChanged = @"OREdelweissFLTModelIonTriggerMaskChanged";
@@ -265,6 +267,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (void) dealloc
 {	
+    [chargeBBFile release];
     [statusBitsBBData release];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
     [testEnabledArray release];
@@ -317,6 +320,33 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (short) getNumberRegisters{ return kFLTV4NumRegs; }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+
+- (uint32_t) BB0x0ACmdMask
+{
+    return BB0x0ACmdMask;
+}
+
+- (void) setBB0x0ACmdMask:(uint32_t)aBB0x0ACmdMask
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setBB0x0ACmdMask:BB0x0ACmdMask];
+    BB0x0ACmdMask = aBB0x0ACmdMask;
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelBB0x0ACmdMaskChanged object:self];
+}
+
+- (NSString*) chargeBBFile
+{
+    return chargeBBFile;
+}
+
+- (void) setChargeBBFile:(NSString*)aChargeBBFile
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setChargeBBFile:chargeBBFile];
+    
+    [chargeBBFile autorelease];
+    chargeBBFile = [aChargeBBFile copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelChargeBBFileChanged object:self];
+}
 
 - (int) ionToHeatDelay
 {
@@ -2205,6 +2235,219 @@ exit(66);
 - (void) writeCommandSoftwareTrigger
 {	[self writeReg: kFLTV4CommandReg value:kIpeFlt_Cmd_SWTrig];   }
 
+
+
+
+
+- (void) chargeBBWithFile:(NSString*) aFile
+{
+    //DEBUG 	    
+    NSLog(@"%@::%@  test: %@\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),aFile);//TODO: DEBUG testing ...-tb-
+    char filename[4*1024+1];
+    int numBytes=0;
+    if([aFile getCString: filename maxLength: 4*1024 encoding:NSASCIIStringEncoding]){//or use [... cStringUsingEncoding: NSASCIIStringEncoding]
+        numBytes=strlen(filename)+1;//+1 : I need the terminating /0
+        OREdelweissSLTModel *slt=0;
+        slt=[[self crate] adapter];
+        [slt   chargeBBWithFile:filename numBytes:numBytes];
+    }else{
+        NSLog(@"%@::%@  ERROR: could not convert filename: %@ - BB NOT CHARGED!\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),aFile);//TODO: DEBUG testing ...-tb-
+    }
+}
+
+
+- (void) sendWCommand
+{
+    OREdelweissSLTModel *slt=0;
+    slt=[[self crate] adapter];
+    //DEBUG 	    
+    NSLog(@"%@::%@  test: %@\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),NSStringFromClass([slt class]));//TODO: DEBUG testing ...-tb-
+
+    char bytes[16];
+    int i=0;
+    /*
+    //a test
+    bytes[i]=0xf0;     i++;
+    bytes[i]=0x01;     i++;
+    bytes[i]=0x02;     i++;
+    bytes[i]=0x03;     i++;
+    bytes[i]=0x04;     i++;
+    bytes[i]=0x05;     i++;
+    bytes[i]=0x23;     i++;
+    */
+
+    /*a other test: switch to IdMode
+    bytes[i]='W';      i++;
+    bytes[i]=0xf0;     i++;
+    bytes[i]=0x11;     i++;
+    bytes[i]=0x08;     i++;
+    bytes[i]=0x00;     i++;
+    bytes[i]=0x01;     i++; //1=IdMode on; 2=off
+    */
+    bytes[i]='W';      i++;
+    bytes[i]=0xf0;     i++;
+    if([self useBroadcastIdforBBAccess]){  bytes[i]=0xff;     i++;}
+    else                                {  bytes[i]=0xff & [self idBBforBBAccessForFiber:  fiberSelectForBBAccess];     i++;}
+    bytes[i]=0xff & wCmdCode;     i++;
+    bytes[i]=0xff & wCmdArg1;     i++;
+    bytes[i]=0xff & wCmdArg2;     i++; //1=IdMode on; 2=off
+    [slt writeToCmdFIFO:bytes numBytes:i];
+
+}
+
+- (void) sendWCommandIdBB:(int) idBB cmd:(int) cmd arg1:(int) arg1  arg2:(int) arg2
+{
+
+    //DEBUG 	    
+    NSLog(@"%@::%@  write 0x%x  0x%x  0x%x  0x%x \n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),
+    0xff & idBB,  0xff & cmd  ,  0xff & arg1  ,  0xff & arg2  );//TODO: DEBUG testing ...-tb-
+
+
+    OREdelweissSLTModel *slt=0;
+    slt=[[self crate] adapter];
+    char bytes[16];
+    int i=0;
+    bytes[i]='W';      i++;
+    bytes[i]=0xf0;     i++;
+    bytes[i]=0xff & idBB;     i++;
+    bytes[i]=0xff & cmd;     i++;
+    bytes[i]=0xff & arg1;     i++;
+    bytes[i]=0xff & arg2;     i++;
+    [slt writeToCmdFIFO:bytes numBytes:i];
+
+}
+
+
+//for call from "BB Access"
+- (void) readBBStatusForBBAccess
+{
+    int fiber = [self fiberSelectForBBAccess];
+
+        //DEBUG OUTPUT:           NSLog(@"%@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
+        NSLog(@"  read from fiber in #%i\n",fiberSelectForBBAccess);//TODO : DEBUG testing ...-tb-
+        
+        //uint32_t BBStatus32[30];
+        //uint16_t *BBStatus16 = (uint16_t *)BBStatus32;
+        uint32_t *BBStatus32=statusBitsBB[fiber];
+        uint16_t *BBStatus16 = (uint16_t *)&BBStatus32[0];
+        
+        int i;
+        
+        @try{//I could omit it here because I catch exceptions in the controller (see comment below) -tb-
+        
+        #if 0
+        for(i=0;i<30;i++){
+            //BBStatus32[i]=i*2+i*0x10000; // for testing without hardware
+            BBStatus32[i]= [self readReg:kFLTV4BBStatusReg channel:fiberSelectForBBStatusBits  index:i];
+        }
+        #else
+        unsigned long address = [self regAddress:kFLTV4BBStatusReg channel:fiber index:0];
+        [self readBlock: address
+		     dataBuffer: (unsigned long*) BBStatus32
+			     length:  30 
+		      increment:  0];
+        #endif
+        
+        }
+		@catch(NSException* e){
+			NSLog(@"Could not read status bits because of exception -%@- with reason -%@-\n",[e name],[e reason]);
+            [e raise];//give exception over to higher/calling level -tb-
+            return;
+		}
+        
+        // we re-use this notification, it will have the same effect ...
+        [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelFiberSelectForBBAccessChanged object:self];
+        
+        
+        
+		//	NSFont* aFont = [NSFont userFixedPitchFontOfSize:9];
+        NSFont* aFont = [NSFont fontWithName:@"Monaco" size:9];
+
+        NSLogFont(aFont,@"Read BBStatBits of fiber #%i \n",fiber+1);
+        NSString *s = [[NSString alloc] initWithString: @""];
+        for(i=0;i<58;i++){
+            //BBStatus16[i]=i*2+i*0x10000;
+            s = [s stringByAppendingFormat:@"(%2i) 0x%04x; ", i,BBStatus16[i] ];
+            if( ((i+1) % 10)== 0){
+                NSLogFont(aFont,@"BBStatBits:%@\n",s);
+                s=@"";
+            }
+        }
+        if([s length]!= 0)        NSLogFont(aFont,@"BBStatBits:%@\n",s);
+        
+        
+        
+        
+}
+
+
+//for call from "Low Level"
+- (void) readBBStatusBits
+{
+
+static int counter=0;
+        //DEBUG OUTPUT:           NSLog(@"%@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
+        //NSLog(@"  read from fiber in #%i\n",fiberSelectForBBStatusBits);//TODO : DEBUG testing ...-tb-
+        
+        uint32_t BBStatus32[30];
+        uint16_t *BBStatus16 = (uint16_t *)BBStatus32;
+        
+        int i;
+        
+        @try{//I could omit it here because I catch exceptions in the controller (see comment below) -tb-
+        
+        #if 0
+        for(i=0;i<30;i++){
+            //BBStatus32[i]=i*2+i*0x10000; // for testing without hardware
+            BBStatus32[i]= [self readReg:kFLTV4BBStatusReg channel:fiberSelectForBBStatusBits  index:i];
+        }
+        #else
+        unsigned long address = [self regAddress:kFLTV4BBStatusReg channel:fiberSelectForBBStatusBits index:0];
+        [self readBlock: address
+		     dataBuffer: (unsigned long*) BBStatus32
+			     length:  30 
+		      increment:  0];
+        #endif
+        
+        }
+		@catch(NSException* e){
+			NSLog(@"Could not read status bits because of exception -%@- with reason -%@-\n",[e name],[e reason]);
+            [e raise];//give exception over to higher/calling level -tb-
+            return;
+		}
+        
+        
+        
+        
+		//	NSFont* aFont = [NSFont userFixedPitchFontOfSize:9];
+        NSFont* aFont = [NSFont fontWithName:@"Monaco" size:9];
+
+        NSLogFont(aFont,@"Read BBStatBits of fiber #%i (callCode %i)\n",fiberSelectForBBStatusBits+1,counter);
+counter++;
+        NSString *s = [[NSString alloc] initWithString: @""];
+        for(i=0;i<58;i++){
+            //BBStatus16[i]=i*2+i*0x10000;
+            s = [s stringByAppendingFormat:@"(%2i) 0x%04x; ", i,BBStatus16[i] ];
+            if( ((i+1) % 10)== 0){
+                NSLogFont(aFont,@"BBStatBits:%@\n",s);
+                s=@"";
+            }
+        }
+        if([s length]!= 0)        NSLogFont(aFont,@"BBStatBits:%@\n",s);
+        
+        
+        
+        
+}
+
+- (void) readAllBBStatusBits
+{
+        //DEBUG OUTPUT:         
+        NSLog(@"%@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
+}
+
+
+
 - (void) readTriggerData
 {
 //DEBUG OUTPUT:
@@ -2576,6 +2819,8 @@ for(chan=0; chan<6;chan++)
 	
     [[self undoManager] disableUndoRegistration];
     
+    [self setBB0x0ACmdMask:[decoder decodeIntForKey:@"BB0x0ACmdMask"]];
+    [self setChargeBBFile:[decoder decodeObjectForKey:@"chargeBBFile"]];
     [self setIonToHeatDelay:[decoder decodeIntForKey:@"ionToHeatDelay"]];
     [self setLowLevelRegInHex:[decoder decodeIntForKey:@"lowLevelRegInHex"]];
     [self setWriteToBBMode:[decoder decodeIntForKey:@"writeToBBMode"]];
@@ -2686,6 +2931,8 @@ for(chan=0; chan<6;chan++)
 {
     [super encodeWithCoder:encoder];
 	
+    [encoder encodeInt:BB0x0ACmdMask forKey:@"BB0x0ACmdMask"];
+    [encoder encodeObject:chargeBBFile forKey:@"chargeBBFile"];
     [encoder encodeInt:ionToHeatDelay forKey:@"ionToHeatDelay"];
     [encoder encodeInt:lowLevelRegInHex forKey:@"lowLevelRegInHex"];
     [encoder encodeInt:writeToBBMode forKey:@"writeToBBMode"];
@@ -3255,197 +3502,6 @@ for(chan=0; chan<6;chan++)
 		case 0xc:  return @"Full";			break;
 		default:   return @"UNKNOWN";		break;
 	}
-}
-
-
-- (void) sendWCommand
-{
-    OREdelweissSLTModel *slt=0;
-    slt=[[self crate] adapter];
-    //DEBUG 	    
-    NSLog(@"%@::%@  test: %@\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),NSStringFromClass([slt class]));//TODO: DEBUG testing ...-tb-
-
-    char bytes[16];
-    int i=0;
-    /*
-    //a test
-    bytes[i]=0xf0;     i++;
-    bytes[i]=0x01;     i++;
-    bytes[i]=0x02;     i++;
-    bytes[i]=0x03;     i++;
-    bytes[i]=0x04;     i++;
-    bytes[i]=0x05;     i++;
-    bytes[i]=0x23;     i++;
-    */
-
-    /*a other test: switch to IdMode
-    bytes[i]='W';      i++;
-    bytes[i]=0xf0;     i++;
-    bytes[i]=0x11;     i++;
-    bytes[i]=0x08;     i++;
-    bytes[i]=0x00;     i++;
-    bytes[i]=0x01;     i++; //1=IdMode on; 2=off
-    */
-    bytes[i]='W';      i++;
-    bytes[i]=0xf0;     i++;
-    if([self useBroadcastIdforBBAccess]){  bytes[i]=0xff;     i++;}
-    else                                {  bytes[i]=0xff & [self idBBforBBAccessForFiber:  fiberSelectForBBAccess];     i++;}
-    bytes[i]=0xff & wCmdCode;     i++;
-    bytes[i]=0xff & wCmdArg1;     i++;
-    bytes[i]=0xff & wCmdArg2;     i++; //1=IdMode on; 2=off
-    [slt writeToCmdFIFO:bytes numBytes:i];
-
-}
-
-- (void) sendWCommandIdBB:(int) idBB cmd:(int) cmd arg1:(int) arg1  arg2:(int) arg2
-{
-
-    //DEBUG 	    
-    NSLog(@"%@::%@  write 0x%x  0x%x  0x%x  0x%x \n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),
-    0xff & idBB,  0xff & cmd  ,  0xff & arg1  ,  0xff & arg2  );//TODO: DEBUG testing ...-tb-
-
-
-    OREdelweissSLTModel *slt=0;
-    slt=[[self crate] adapter];
-    char bytes[16];
-    int i=0;
-    bytes[i]='W';      i++;
-    bytes[i]=0xf0;     i++;
-    bytes[i]=0xff & idBB;     i++;
-    bytes[i]=0xff & cmd;     i++;
-    bytes[i]=0xff & arg1;     i++;
-    bytes[i]=0xff & arg2;     i++;
-    [slt writeToCmdFIFO:bytes numBytes:i];
-
-}
-
-
-//for call from "BB Access"
-- (void) readBBStatusForBBAccess
-{
-    int fiber = [self fiberSelectForBBAccess];
-
-        //DEBUG OUTPUT:           NSLog(@"%@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
-        NSLog(@"  read from fiber in #%i\n",fiberSelectForBBAccess);//TODO : DEBUG testing ...-tb-
-        
-        //uint32_t BBStatus32[30];
-        //uint16_t *BBStatus16 = (uint16_t *)BBStatus32;
-        uint32_t *BBStatus32=statusBitsBB[fiber];
-        uint16_t *BBStatus16 = (uint16_t *)&BBStatus32[0];
-        
-        int i;
-        
-        @try{//I could omit it here because I catch exceptions in the controller (see comment below) -tb-
-        
-        #if 0
-        for(i=0;i<30;i++){
-            //BBStatus32[i]=i*2+i*0x10000; // for testing without hardware
-            BBStatus32[i]= [self readReg:kFLTV4BBStatusReg channel:fiberSelectForBBStatusBits  index:i];
-        }
-        #else
-        unsigned long address = [self regAddress:kFLTV4BBStatusReg channel:fiber index:0];
-        [self readBlock: address
-		     dataBuffer: (unsigned long*) BBStatus32
-			     length:  30 
-		      increment:  0];
-        #endif
-        
-        }
-		@catch(NSException* e){
-			NSLog(@"Could not read status bits because of exception -%@- with reason -%@-\n",[e name],[e reason]);
-            [e raise];//give exception over to higher/calling level -tb-
-            return;
-		}
-        
-        // we re-use this notification, it will have the same effect ...
-        [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelFiberSelectForBBAccessChanged object:self];
-        
-        
-        
-		//	NSFont* aFont = [NSFont userFixedPitchFontOfSize:9];
-        NSFont* aFont = [NSFont fontWithName:@"Monaco" size:9];
-
-        NSLogFont(aFont,@"Read BBStatBits of fiber #%i \n",fiber+1);
-        NSString *s = [[NSString alloc] initWithString: @""];
-        for(i=0;i<58;i++){
-            //BBStatus16[i]=i*2+i*0x10000;
-            s = [s stringByAppendingFormat:@"(%2i) 0x%04x; ", i,BBStatus16[i] ];
-            if( ((i+1) % 10)== 0){
-                NSLogFont(aFont,@"BBStatBits:%@\n",s);
-                s=@"";
-            }
-        }
-        if([s length]!= 0)        NSLogFont(aFont,@"BBStatBits:%@\n",s);
-        
-        
-        
-        
-}
-
-
-//for call from "Low Level"
-- (void) readBBStatusBits
-{
-
-static int counter=0;
-        //DEBUG OUTPUT:           NSLog(@"%@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
-        //NSLog(@"  read from fiber in #%i\n",fiberSelectForBBStatusBits);//TODO : DEBUG testing ...-tb-
-        
-        uint32_t BBStatus32[30];
-        uint16_t *BBStatus16 = (uint16_t *)BBStatus32;
-        
-        int i;
-        
-        @try{//I could omit it here because I catch exceptions in the controller (see comment below) -tb-
-        
-        #if 0
-        for(i=0;i<30;i++){
-            //BBStatus32[i]=i*2+i*0x10000; // for testing without hardware
-            BBStatus32[i]= [self readReg:kFLTV4BBStatusReg channel:fiberSelectForBBStatusBits  index:i];
-        }
-        #else
-        unsigned long address = [self regAddress:kFLTV4BBStatusReg channel:fiberSelectForBBStatusBits index:0];
-        [self readBlock: address
-		     dataBuffer: (unsigned long*) BBStatus32
-			     length:  30 
-		      increment:  0];
-        #endif
-        
-        }
-		@catch(NSException* e){
-			NSLog(@"Could not read status bits because of exception -%@- with reason -%@-\n",[e name],[e reason]);
-            [e raise];//give exception over to higher/calling level -tb-
-            return;
-		}
-        
-        
-        
-        
-		//	NSFont* aFont = [NSFont userFixedPitchFontOfSize:9];
-        NSFont* aFont = [NSFont fontWithName:@"Monaco" size:9];
-
-        NSLogFont(aFont,@"Read BBStatBits of fiber #%i (callCode %i)\n",fiberSelectForBBStatusBits+1,counter);
-counter++;
-        NSString *s = [[NSString alloc] initWithString: @""];
-        for(i=0;i<58;i++){
-            //BBStatus16[i]=i*2+i*0x10000;
-            s = [s stringByAppendingFormat:@"(%2i) 0x%04x; ", i,BBStatus16[i] ];
-            if( ((i+1) % 10)== 0){
-                NSLogFont(aFont,@"BBStatBits:%@\n",s);
-                s=@"";
-            }
-        }
-        if([s length]!= 0)        NSLogFont(aFont,@"BBStatBits:%@\n",s);
-        
-        
-        
-        
-}
-
-- (void) readAllBBStatusBits
-{
-        //DEBUG OUTPUT:         
-        NSLog(@"%@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
 }
 
 

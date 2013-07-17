@@ -154,6 +154,7 @@ UDPStructIPECrateStatus2;
  *    function prototypes
  *        
  *--------------------------------------------------------------------*/ //-tb-
+int sendChargeBBStatus(uint32_t prog_status,int numFifo);
 void chargeBBWithFile(char * filename, int fromFifo=-1);
 void handleKCommand(char *buffer, int len, struct sockaddr_in *sockaddr_from, int fromFifo=-1);
 int readConfigFile(char *filename);

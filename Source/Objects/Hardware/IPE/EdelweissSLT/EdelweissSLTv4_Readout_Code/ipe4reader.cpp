@@ -91,7 +91,7 @@ version 1: 2011 July
  *    function prototypes
  *       TODO: function prototypes: move to include file somewhen in the future  -tb-
  *--------------------------------------------------------------------*/ //-tb-
-void envoie_commande_horloge(void);
+//moved to ipe4tbtools.h/.cpp: void envoie_commande_horloge(void);
 
 
 
@@ -169,6 +169,7 @@ uint32_t presentFLTMap =0; // store a map of the present FLT cards
 
 #include "ipe4tbtools.h" //better include in ipe4reader.h? -tb-
 #include "ipe4tbtools.cpp"  //NEEDS Pbus * pbus!!!
+//moved behind: sendChargeBBStatusFunctionPtr = &(sendChargeBBStatus); //from "ipe4reader.h"
 
 
 #if 0
@@ -1200,6 +1201,10 @@ void FIFOREADER::endAllUDPServerSockets(void)
  *    author:       Till Bergmann, 2011
  *
  *--------------------------------------------------------------------*/ //-tb-
+ 
+ 
+ 
+ /*
 int requestHWSemaphore(void)
 {
     uint32_t sltSemaphore;
@@ -1231,6 +1236,8 @@ void releaseHWSemaphoreWith(uint32_t bitmap)
 {
 	pbus->write(SLTSemaphoreReg ,  bitmap);
 }
+*/
+
 
 /*--------------------------------------------------------------------
  *    function:     sendCommandFifo
@@ -1240,6 +1247,8 @@ void releaseHWSemaphoreWith(uint32_t bitmap)
  *--------------------------------------------------------------------*/ //-tb-
 //write_word to FPGA: Inbuf: will be sent to FPGA, status=number of bytes to be sent -tb-
 //this is the counterpart of void	envoie_commande(unsigned char * Inbuf,int status) in cew.c
+
+/*
 void sendCommandFifo(unsigned char * buffer, int len)
 {
 
@@ -1296,9 +1305,13 @@ void sendCommandFifo(unsigned char * buffer, int len)
 	//if(sltSemaphore){	    releaseHWSemaphore();	}
 	releaseHWSemaphoreWith(sltSemaphore);
 }
+
+
+*/
 #endif  //moved to ipe4tbtools
 
 
+#if 0 //moved to ipe4tbtools
 /*--------------------------------------------------------------------
  *    function:     envoie_commande_standard_BBv2
  *    purpose:      restart bolo box (BB)
@@ -1320,12 +1333,17 @@ void envoie_commande_standard_BBv2(void)
 	//envoie_commande(buf,8);
 	sendCommandFifo(buf,8);
 }
+#endif //moved to ipe4tbtools
 
+
+#if 0 //UNUSED -tb-
 /*--------------------------------------------------------------------
  *    function:     lecture_data_FIFO_microbbv2  //TODO: what is this function for???? -tb-
  *    purpose:      read back a copy of the micro code????????
  *    author:       from cew.c, modified by Till Bergmann, 2011
  *--------------------------------------------------------------------*/ //-tb-
+ 
+/*
 int  lecture_data_FIFO_microbbv2(void)
 {
 int i,j;
@@ -1381,7 +1399,8 @@ for(j=0;j<1000;j++)	// je lit au maxi 1000 fois la fifo pour aller moins vite
 	return 3; //TODO: fake return value to continue in programme_bbv2() -tb-
 return mot;		// le dernier s'il y en a plusieurs
 }
-
+*/
+#endif  //UNUSED -tb-
 
 /*--------------------------------------------------------------------
  *    function:     sendChargeBBStatus
@@ -1447,6 +1466,13 @@ int sendChargeBBStatus(uint32_t prog_status,int numFifo)
 }
 
 
+
+#if 0 //moved to tbtools
+
+
+//sendChargeBBStatusFunctionPtr = sendChargeBBStatus; //from "ipe4reader.h"
+
+
 /*--------------------------------------------------------------------
  *    function:     chargeBBWithFILEPtr
  *    purpose:      reload BB FPGA configuration from FILE* pointer (called from chargeBBWithFile)
@@ -1507,7 +1533,7 @@ int chargeBBWithFILEPtr(FILE * fichier,int * numserie, int numFifo)
 	uint32_t  size;
 	//TODO: needed?   _send_status_programmation(2)
 	//#define _send_status_programmation(n)	{kill(pid,SIGUSR1); Trame_status_udp.status_opera.micro_bbv2=n;	_SEND_UDP_clients_status(&Trame_status_udp,sizeof(Structure_trame_status))}
-    sendChargeBBStatus(2, numFifo);
+    if(sendChargeBBStatusFunctionPtr) sendChargeBBStatusFunctionPtr(2, numFifo);
 	
 	usleep(500000);			// je rajoute 500 msec au debut
 	//TODO: needed? vide_data_FIFO();		// pour vider la fifo
@@ -1539,6 +1565,7 @@ int chargeBBWithFILEPtr(FILE * fichier,int * numserie, int numFifo)
     
     *numserie=3;
     #if 0
+    /*
 	for(i=0;i<10;i++)		// je fais une boucle en attendant le numero de serie
 	{
 		*numserie=lecture_data_FIFO_microbbv2();
@@ -1546,6 +1573,7 @@ int chargeBBWithFILEPtr(FILE * fichier,int * numserie, int numFifo)
 	}
 	printf(" ---> (i=%d) nmserie = %d  \n",i,*numserie);
 	if(*numserie<3)	return -1;
+    */
 	#endif
     
 	//TODO: needed?   _send_status_programmation(*numserie)
@@ -1577,7 +1605,7 @@ int chargeBBWithFILEPtr(FILE * fichier,int * numserie, int numFifo)
 		    printf("--> %d%c (a:%i)\n",(int)(a/2.5),'%',a);//TODO: use next line instead of this line -tb-
 		    //printf("--> %d%c \n",(int)(a/2.5),'%');
 			//TODO: needed?   _send_status_programmation(*numserie + (((int)(a/2.5))<<8)) 
-            sendChargeBBStatus(   *numserie + (((int)(a/2.5))<<8)   , numFifo);
+            if(sendChargeBBStatusFunctionPtr) sendChargeBBStatusFunctionPtr(   *numserie + (((int)(a/2.5))<<8)   , numFifo);
 		}
 //TODO:test -tb-		if(lecture_data_FIFO_microbbv2()!=-1) return -3;		// erreur durant l'emission des data
 		n=fread(filebuf,1,1000,fichier);
@@ -1594,7 +1622,7 @@ int chargeBBWithFILEPtr(FILE * fichier,int * numserie, int numFifo)
 	}
 	printf(" programmation de la BBv2 terminee \n");
 	//TODO: needed?   _send_status_programmation(*numserie+ (100<<8)) 
-    sendChargeBBStatus(   *numserie + (100<<8)  , numFifo);
+    if(sendChargeBBStatusFunctionPtr) sendChargeBBStatusFunctionPtr(   *numserie + (100<<8)  , numFifo);
 	usleep(50000);	pbus->write(CmdFIFOReg ,  256);//  une data a zero
 	usleep(50000);	pbus->write(CmdFIFOReg ,  256);//  une data a zero
 	//usleep(50000);	write_word(driver_fpga,REG_CMD, (uint32_t) 256);	//  une data a zero
@@ -1607,11 +1635,11 @@ int chargeBBWithFILEPtr(FILE * fichier,int * numserie, int numFifo)
 	printf("on attend 2 pour terminer : ");
 //TODO: test -tb-
 return 0;
-	if(lecture_data_FIFO_microbbv2()!=2) return -4;
-	printf("\n");
-	printf("\n");
+    //removed this: -tb-
+	//if(lecture_data_FIFO_microbbv2()!=2) return -4;
+	//printf("\n");
 	//TODO: needed?   _send_status_programmation(*numserie+ (101<<8)) 
-	return 0;
+	//return 0;
 }
 
 /*--------------------------------------------------------------------
@@ -1626,6 +1654,7 @@ return 0;
 void chargeBBWithFile(char * filename, int fromFifo)
 {
     printf("chargeBBWithFile: >%s<, requested for FIFO %i\n",filename,fromFifo);//DEBUG
+    //printf("------------> sendChargeBBStatusFunctionPtr is %p\n",sendChargeBBStatusFunctionPtr); exit(9);
 
 
 FILE *mon_fichier;
@@ -1649,7 +1678,53 @@ if( (mon_fichier = fopen(filename,"rw")) )
     if(!mon_fichier) printf("    ERROR: could not open file: %s\n",filename);
     
 printf("***********   bilan de chargement :  numserie=%d  j=%d  err=%d  ********\n",numserie,j,err);
-envoie_commande_horloge();
+//envoie_commande_horloge();
+envoie_commande_horloge( X,  Retard,  Masque_BB,  Code_acqui,  Code_synchro, Nb_mots_lecture);
+// is usually:
+//Horloge: x=30 retard=0 Code_acqui=8 masque_BB=1  Nb_mots=3 Code_synchro=2, Nb_synchro=100000
+//cmd 255 (6 octets) 1E 0 0 1 8 2 
+
+//this was in envoie_commande_horloge(void):
+int Table_nb_synchro[8]=_valeur_synchro;
+Nb_synchro=Table_nb_synchro[Code_synchro&0x3];//this was in void envoie_commande_horloge(void) but is probably not necessary (?) -tb-
+//TODO: led_B(_vert);
+return;
+}
+
+
+#endif //moved to tbtools
+
+void chargeBBWithFileOLD(char * filename, int fromFifo)
+{
+    printf("chargeBBWithFileOLD: >%s<, requested for FIFO %i\n",filename,fromFifo);//DEBUG
+    //printf("------------> sendChargeBBStatusFunctionPtr is %p\n",sendChargeBBStatusFunctionPtr); exit(9);
+
+
+FILE *mon_fichier;
+int j=0,err=0;
+int numserie;
+//TODO: ? led_B(_rouge);
+
+				
+//TODO: _send_status_programmation(2)
+printf("fichier %s ",filename);   // was /var/bbv2.rbf
+if( (mon_fichier = fopen(filename,"rw")) )
+	{
+	for(j=0;j<10;j++)		// j'essaye 10 fois
+		{
+		envoie_commande_standard_BBv2();
+		err=chargeBBWithFILEPtr(mon_fichier,&numserie,fromFifo);
+		if(!err) break;
+		}
+	}
+    
+    if(!mon_fichier) printf("    ERROR: could not open file: %s\n",filename);
+    
+printf("***********   bilan de chargement :  numserie=%d  j=%d  err=%d  ********\n",numserie,j,err);
+//envoie_commande_horloge();
+envoie_commande_horloge( X,  Retard,  Masque_BB,  Code_acqui,  Code_synchro, Nb_mots_lecture);
+int Table_nb_synchro[8]=_valeur_synchro;
+Nb_synchro=Table_nb_synchro[Code_synchro&0x3];//this was in void envoie_commande_horloge(void) but is probably not necessary (?) -tb-
 //TODO: led_B(_vert);
 return;
 }
@@ -1659,11 +1734,8 @@ return;
 
 
 
-
-
-
 //TODO: the following block may be removed as soon as mise_a_jour_bbv2 in 'int handleUDPCommandPacket(unsigned char *buffer, int len, int iFifo)' is removed -tb-
-#if 1
+#if 0
 
 
 // DEPRECATED, USE programme_bb (see above) -tb-
@@ -1720,6 +1792,7 @@ int programme_bbv2(FILE * fichier,int * numserie)
 	b=0x0120;
 	
 	for(i=0;i<10;i++)	write_word(driver_fpga,REG_CMD,b++);		// ici avec _attente_cmd_vide ca ne marche pas
+    /* removed ...
 	for(i=0;i<10;i++)		// je fais une boucle en attendant le numero de serie
 	{
 		*numserie=lecture_data_FIFO_microbbv2();
@@ -1727,7 +1800,8 @@ int programme_bbv2(FILE * fichier,int * numserie)
 	}
 	printf(" ---> (i=%d) nmserie = %d  \n",i,*numserie);
 	if(*numserie<3)	return -1;
-	
+	*/
+    *numserie=3; //skipping reading *numserie=lecture_data_FIFO_microbbv2(); -tb-
 	//TODO: needed?   _send_status_programmation(*numserie)
 	
 	size = fsize(fichier);
@@ -1775,11 +1849,13 @@ int programme_bbv2(FILE * fichier,int * numserie)
 	printf("on attend 2 pour terminer : ");
 //TODO: test -tb-
 return 0;
+/*removed -tb-
 	if(lecture_data_FIFO_microbbv2()!=2) return -4;
 	printf("\n");
 	printf("\n");
 	//TODO: needed?   _send_status_programmation(*numserie+ (101<<8)) 
 	return 0;
+*/
 }
 
 
@@ -1840,7 +1916,7 @@ return;
 
 
 
-
+#if 0 //moved to ipe4tbtools.h/.cpp -tb-
 /*--------------------------------------------------------------------
  *    function:     envoie_commande_horloge
  *    purpose:      send command to OPERA (horloge=send over clock line)
@@ -1873,6 +1949,7 @@ void envoie_commande_horloge(void)
 	sendCommandFifo(buf,8);   //envoie_commande(buf,8);
 }
 
+#endif //moved to ipe4tbtools.h/.cpp -tb-
 
 
 
@@ -2090,7 +2167,7 @@ void populateIPECrateStatusPacket()
 	          if(  (foundPos=strstr(buffer,"chargeBBFile"))  ){
 	              printf("handleKCommand: KWC >%s< command 9!\n",foundPos);//DEBUG
                   if(len >= sizeof("KWC_chargeBBFile_"))//filename must be at least one character
-                      chargeBBWithFile( foundPos + sizeof("chargeBBFile") , fromFifo);//sizeof("chargeBBFile") counts the ending \0, but I anyway need to skip one '_'
+                      chargeBBWithFileOLD( foundPos + sizeof("chargeBBFile") , fromFifo);//sizeof("chargeBBFile") counts the ending \0, but I anyway need to skip one '_'
                   else
                       printf("   ERROR: KWC >%s< command without filename!\n",buffer);//DEBUG
 		          }
@@ -2277,6 +2354,7 @@ int handleUDPCommandPacket(unsigned char *buffer, int len, int iFifo)
     //***	mise a jour FPGA		Q		2	
 	
 	// handle the command
+int Table_nb_synchro[8]=_valeur_synchro;//remove it -tb-
 	
     switch(buffer[0]){
 		case 'K' :	printf("  command K : KIT-IPE-Crate command -->");
@@ -2307,7 +2385,10 @@ int handleUDPCommandPacket(unsigned char *buffer, int len, int iFifo)
 					Masque_BB=buffer[5];
 					Code_acqui=buffer[6];
 					Code_synchro=buffer[7];
-					envoie_commande_horloge();  //TODO: use function parameters to hand over arguments !!! rewrite envoie_commande_horloge()  -tb-
+					//envoie_commande_horloge();  //TODO: use function parameters to hand over arguments !!! rewrite envoie_commande_horloge()  -tb-
+                    envoie_commande_horloge( X,  Retard,  Masque_BB,  Code_acqui,  Code_synchro, Nb_mots_lecture);
+	                //int Table_nb_synchro[8]=_valeur_synchro;
+                    Nb_synchro=Table_nb_synchro[Code_synchro&0x3];//this was in void envoie_commande_horloge(void) but is probably not necessary (?) -tb-
 					break;
                     // if( _code_acqui_simple(Code_acqui) == code_acqui_veto )	while(1)	lecture_data_FIFO_veto();
 					break;
@@ -2339,12 +2420,18 @@ int handleUDPCommandPacket(unsigned char *buffer, int len, int iFifo)
 					Masque_BB=InBuffer[5];
 					Code_acqui=InBuffer[6];
 					Code_synchro=InBuffer[7];
-					envoie_commande_horloge();
+					//envoie_commande_horloge();
+                    envoie_commande_horloge( X,  Retard,  Masque_BB,  Code_acqui,  Code_synchro, Nb_mots_lecture);
+	                int Table_nb_synchro[8]=_valeur_synchro;
+                    Nb_synchro=Table_nb_synchro[Code_synchro&0x3];//this was in void envoie_commande_horloge(void) but is probably not necessary (?) -tb-
 					break;
                     // if( _code_acqui_simple(Code_acqui) == code_acqui_veto )	while(1)	lecture_data_FIFO_veto();
 					break;
 		#endif
 		
+        #if 0
+        /*
+        //deprecated; use K command 'KWC_chargeBBFile_...' to charge BBs (see  void handleKCommand(...)) -tb-
 		case 'Q' :      // commande de   mise a jour
 					printf("code Q  redemarrage  ( code=%d ) ",buffer[1]);
 					printf("Restart command not yet supported! -tb-\n ");
@@ -2352,7 +2439,7 @@ int handleUDPCommandPacket(unsigned char *buffer, int len, int iFifo)
                     //TODO: mise_a_jour_bbv2 is deprecated but left for cew_controle -tb-
                     //TODO: remove it -tb-
                     //TODO: remove it -tb-
-					mise_a_jour_bbv2(0 /* if second command byte was 3, see below*/);
+					mise_a_jour_bbv2(0 );// if second command byte was 3, see below
 					//sauve_config is a QPushButton defined in ui_commande.h which calls sauve_config() -tb-
 					
 					#if 0
@@ -2372,6 +2459,8 @@ int handleUDPCommandPacket(unsigned char *buffer, int len, int iFifo)
 							}
 					#endif
 					break;
+        */
+        #endif
 
 		case 'R' :     
 					//redemande_trames(inBuf_mot[1]);
@@ -4309,6 +4398,9 @@ int32_t main(int32_t argc, char *argv[])
     
     //install signalhandler (without signalhandler ipe4reader corrupted the terminal echo (=typing not possible any more) - on PrPMC) -tb-
     signal(SIGTERM,signalHandler);
+
+    //set function pointer for charging BBs
+    sendChargeBBStatusFunctionPtr = sendChargeBBStatus; //sendChargeBBStatusFunctionPtr from "ipe4tbtools.h", sendChargeBBStatus in "ipe4reader.h/.cpp" defined
 
 
 	if(argc==2){

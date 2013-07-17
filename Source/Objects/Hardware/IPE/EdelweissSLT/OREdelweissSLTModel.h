@@ -396,6 +396,7 @@
 #pragma mark ***HW Access
 //note that most of these method can raise 
 //exceptions either directly or indirectly
+- (int)           chargeBBWithFile:(char*)data numBytes:(int) numBytes;
 - (int)           writeToCmdFIFO:(char*)data numBytes:(int) numBytes;
 - (void)		  readAllControlSettingsFromHW;
 

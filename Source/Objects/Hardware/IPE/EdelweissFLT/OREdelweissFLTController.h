@@ -60,6 +60,9 @@
 		IBOutlet NSButton*		hitRateNoneButton;
     
     //BB access tab
+	IBOutlet   NSTextField* BB0x0ACmdMaskTextField; //Alim/0x0A command
+	IBOutlet   NSMatrix*    BB0x0ACmdMaskMatrix; //Alim/0x0A command
+	IBOutlet   NSTextField* chargeBBFileTextField;
 	IBOutlet   NSButton*    writeToBBModeCB;
     IBOutlet   NSProgressIndicator*	writeToBBModeIndicator;
 	IBOutlet   NSMatrix* adcValueForBBAccessMatrix;
@@ -186,6 +189,9 @@
 - (void) updateButtons;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+- (void) BB0x0ACmdMaskChanged:(NSNotification*)aNote;
+
+- (void) chargeBBFileChanged:(NSNotification*)aNote;
 - (void) ionToHeatDelayChanged:(NSNotification*)aNote;
 - (void) heatTriggerMaskChanged:(NSNotification*)aNote;
 - (void) ionTriggerMaskChanged:(NSNotification*)aNote;
@@ -262,6 +268,14 @@
 - (void) selectedChannelValueChanged:(NSNotification*) aNote;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+- (IBAction) sendBB0x0ABloqueAction:(id)sender;
+- (IBAction) sendBB0x0ADebloqueAction:(id)sender;
+- (IBAction) sendBB0x0ADemarrageAction:(id)sender;
+- (IBAction) sendBB0x0ACmdAction:(id)sender;
+- (IBAction) BB0x0ACmdMaskTextFieldAction:(id)sender;
+- (IBAction) BB0x0ACmdMaskMatrixAction:(id)sender;
+- (IBAction) chargeBBFileCommandSendButtonAction:(id)sender;
+- (IBAction) chargeBBFileTextFieldAction:(id)sender;
 - (IBAction) ionToHeatDelayTextFieldAction:(id)sender;
 - (IBAction) heatTriggerMaskTextFieldAction:(id)sender;
 - (IBAction) ionTriggerMaskTextFieldAction:(id)sender;

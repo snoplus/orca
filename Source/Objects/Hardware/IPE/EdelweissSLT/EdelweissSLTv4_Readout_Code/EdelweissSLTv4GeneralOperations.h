@@ -25,6 +25,7 @@
 #define kGetSltPciDriverVersion 0x03  //TODO: only for Linux implemented 2012-03 -tb-
 #define kWriteToCmdFIFO         0x04
 #define kGetPresentFLTsMap      0x05
+#define kChargeBBWithFile       0x06
 // see: HW_Readout.cc
 // void doGeneralWriteOp(SBC_Packet* aPacket,uint8_t reply)
 // and
