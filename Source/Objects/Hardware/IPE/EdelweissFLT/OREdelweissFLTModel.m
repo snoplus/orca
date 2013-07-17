@@ -335,6 +335,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (NSString*) chargeBBFile
 {
+	if(!chargeBBFile) return @"";
     return chargeBBFile;
 }
 
