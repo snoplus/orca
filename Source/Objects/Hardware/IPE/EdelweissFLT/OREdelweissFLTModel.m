@@ -2251,6 +2251,7 @@ exit(66);
         OREdelweissSLTModel *slt=0;
         slt=[[self crate] adapter];
         [slt   chargeBBWithFile:filename numBytes:numBytes];
+        NSLog(@"%@::%@  loading %@ - BB CHARGED - DONE!\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),aFile);//TODO: DEBUG testing ...-tb-
     }else{
         NSLog(@"%@::%@  ERROR: could not convert filename: %@ - BB NOT CHARGED!\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),aFile);//TODO: DEBUG testing ...-tb-
     }

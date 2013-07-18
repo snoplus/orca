@@ -2404,7 +2404,11 @@ for(l=0;l<2500;l++){
 		[NSException raise:@"Not Connected" format:@"Socket not connected."];
 	}
 	else {
+        NSLog(@"%@::%@ buf32[0] before: %i (0x%08x)\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),buf32[0],buf32[0]);//TODO: DEBUG testing ...-tb-    
+        NSLog(@"%@::%@ buf32[1] before: %i (0x%08x)\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),buf32[1],buf32[1]);//TODO: DEBUG testing ...-tb-    
 		[pmcLink writeGeneral:buf32 operation:kChargeBBWithFile numToWrite:num32ToSend];
+        NSLog(@"%@::%@ buf32[0] after: %i (0x%08x)\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),buf32[0],buf32[0]);//TODO: DEBUG testing ...-tb-    
+        NSLog(@"%@::%@ buf32[1] after: %i (0x%08x)\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),buf32[1],buf32[1]);//TODO: DEBUG testing ...-tb-    
 	}
    
    

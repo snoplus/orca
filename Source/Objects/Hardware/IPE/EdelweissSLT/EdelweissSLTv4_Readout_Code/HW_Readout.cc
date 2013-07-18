@@ -491,7 +491,9 @@ void doGeneralWriteOp(SBC_Packet* aPacket,uint8_t reply)
               //int i; for(i=0; i<  dataToWrite[0];i++){                   int val=*(buf+i) & 0xff;
               //    fprintf(stderr,"   byte %i: 0x%x  ...\n",i,val);            }
             //KATRIN example: setHostTimeToFLTsAndSLT(dataToWrite); , option kSetHostTimeToFLTsAndSLT
+            snprintf(aPacket->message, kSBC_MaxMessageSizeBytes, "PMC-doGeneralWriteOp-called with kChargeBBWithFile");
             chargeBBWithFile(buf,-1);
+            dataToWrite[1]=0x74696c6c;//=till in ascii
             //sendCommandFifo(buf,dataToWrite[0]);
             }
 		break;
