@@ -2314,9 +2314,9 @@ NSString* SBC_LinkSbcPollingRateChanged     = @"SBC_LinkSbcPollingRateChanged";
 		[NSException raise:@"Read Error" format:@"Read Error %@ <%@>: %s",[self crateName], IPNumber,strerror(errno)];
 	}
 	else if (selectionResult == kSelectionTimeout) {
-		[NSException raise:@"ConnectionTimeOut" format:@"Read from %@ <%@> port: %d timed out",[self crateName],IPNumber,portNumber];
+		[NSException raise:@"ConnectionTimeOut" format:@"Read from %@ <%@> port: %d timed out (A)",[self crateName],IPNumber,portNumber];
 	}
-	if(aPacket->message[0])NSLog(@"%s\n",aPacket->message);
+	if(aPacket->message[0])NSLog(@"socket message:%s\n",aPacket->message);
 } 
 
 - (void) readSocket:(int)aSocket buffer:(SBC_Packet*)aPacket
@@ -2399,7 +2399,7 @@ NSString* SBC_LinkSbcPollingRateChanged     = @"SBC_LinkSbcPollingRateChanged";
                 [NSException raise:@"Read Error" format:@"Read Error %@ <%@>: %s",[self crateName],IPNumber,strerror(errno)];
             }
             else if (selectionResult == kSelectionTimeout) {
-                [NSException raise:@"ConnectionTimeOut" format:@"Read from %@ <%@> port: %d timed out",[self crateName],IPNumber,portNumber];
+                [NSException raise:@"ConnectionTimeOut" format:@"Read from %@ <%@> port: %d timed out (B)",[self crateName],IPNumber,portNumber];
             }
             
         }
@@ -2426,7 +2426,7 @@ NSString* SBC_LinkSbcPollingRateChanged     = @"SBC_LinkSbcPollingRateChanged";
             [NSException raise:@"Read Error" format:@"Read Error %@ <%@>: %s",[self crateName],IPNumber,strerror(errno)];
         }
         else if (selectionResult == kSelectionTimeout) {
-            [NSException raise:@"ConnectionTimeOut" format:@"Read from %@ <%@> port: %d timed out",[self crateName],IPNumber,portNumber];
+            [NSException raise:@"ConnectionTimeOut" format:@"Read from %@ <%@> port: %d timed out (C)",[self crateName],IPNumber,portNumber];
         }
 		time_t t1 = time(0);
 		do {
