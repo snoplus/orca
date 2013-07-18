@@ -77,7 +77,7 @@ Followed by the rest of the channel values
 		theData.asLong = ptr[5+theChan]; //act Voltage
 		theString = [theString stringByAppendingFormat:@"Act Voltage (%c%d): %.2f V\n",polarity?'+':'-',theChan,theData.asFloat];
 		theData.asLong = ptr[6+theChan]; //act Current
-		theString = [theString stringByAppendingFormat:@"Act Current (%d): %.3f mA\n",theChan,theData.asFloat*1000.];
+		theString = [theString stringByAppendingFormat:@"Act Current (%d): %.3f mA\n",theChan,theData.asFloat*1000000.];
 	}
 	return theString;
 }

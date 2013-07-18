@@ -168,6 +168,7 @@ NSString* ORiSegHVCardChannelReadParamsChanged = @"ORiSegHVCardChannelReadParams
 {
 	NSArray* syncParams = [NSArray arrayWithObjects:
 						   @"outputMeasurementSenseVoltage",
+						   @"outputCurrent",
 						   nil];
 
 	syncParams = [self addChannelNumbersToParams:syncParams];
@@ -392,7 +393,7 @@ NSString* ORiSegHVCardChannelReadParamsChanged = @"ORiSegHVCardChannelReadParams
 - (void) writeMaxCurrent:(short)channel
 {    
 	if([self channelInBounds:channel]){
-		NSString* cmd = [NSString stringWithFormat:@"outputCurrent.u%d F %f",[self slotChannelValue:channel],maxCurrent[channel]/1000.];
+		NSString* cmd = [NSString stringWithFormat:@"outputCurrent.u%d F %f",[self slotChannelValue:channel],maxCurrent[channel]/1000000.];
 		[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
     }
 }
@@ -590,6 +591,7 @@ NSString* ORiSegHVCardChannelReadParamsChanged = @"ORiSegHVCardChannelReadParams
 			if(theChannel>=0 && theChannel<[self numberOfChannels]){
 				NSString* name = [anEntry objectForKey:@"Name"];
 				if([name isEqualToString:@"outputMeasurementSenseVoltage"])	[self setTarget:theChannel withValue:[[anEntry objectForKey:@"Value"] intValue]];
+				if([name isEqualToString:@"outputCurrent"])	[self setMaxCurrent:theChannel withValue:[[anEntry objectForKey:@"Value"] floatValue]*1000000.];
 			}
 		}
 	}
@@ -902,7 +904,7 @@ NSString* ORiSegHVCardChannelReadParamsChanged = @"ORiSegHVCardChannelReadParams
 	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Max Current"];
-    [p setFormat:@"##0" upperLimit:1000 lowerLimit:0 stepSize:1 units:@"mA"];
+    [p setFormat:@"##0" upperLimit:1000 lowerLimit:0 stepSize:1 units:@"uA"];
     [p setSetMethod:@selector(setMaxCurrent:withValue:) getMethod:@selector(maxCurrent:)];
 	[p setInitMethodSelector:@selector(loadAllValues)];
     [a addObject:p];

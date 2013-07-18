@@ -49,9 +49,16 @@
 	
 	[[currentPlotter yAxis] setRngLimitsLow:0 withHigh:10000 withMinRng:10];
 	[[voltagePlotter yAxis] setRngLimitsLow:0 withHigh:10000 withMinRng:10];
-	[[currentPlotter yAxis] setLabel:@"Current (uA)"];
+	[[currentPlotter yAxis] setLabel:@"Current (µA)"];
 	[[voltagePlotter yAxis] setLabel:@"Voltage (V)"];
 	ORTimeLinePlot* aPlot;
+	
+	NSNumberFormatter* formatter = [[[NSNumberFormatter alloc] init] autorelease];
+	[formatter setFormat:@"#0"];
+	[maxCurrentField setFormatter:formatter];
+	
+	NSTableColumn* maxCurrentColumn = [hvTableView tableColumnWithIdentifier:@"maxCurrent"];
+	[[maxCurrentColumn dataCell] setFormatter:formatter];
 	
 	int i;
 	NSColor* aColor = [NSColor redColor];
@@ -214,6 +221,7 @@
 	[selectedChannelField setIntValue: [model selectedChannel]];
 	[hvTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:[model selectedChannel]] byExtendingSelection:NO];
 	[self targetChanged:nil];
+	[self maxCurrentChanged:nil];
     [self channelReadParamsChanged:nil];
 }
 
