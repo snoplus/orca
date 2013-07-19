@@ -42,7 +42,10 @@ NSString* ORVXMMotorAbsMotionChanged	= @"ORVXMMotorAbsMotionChanged";
 
     return self;
 }
-
+- (NSString*) description
+{
+    return [NSString stringWithFormat:@"id:%d  axis:%@  position:%d",motorId,axis,motorPosition];
+}
 - (int) motorId 
 {
 	return motorId;
