@@ -799,7 +799,8 @@ if( (mon_fichier = fopen(filename,"rw")) )
 	{
 	for(j=0;j<10;j++)		// j'essaye 10 fois
 		{
-		envoie_commande_standard_BBv2();
+		//envoie_commande_standard_BBv2();
+	    envoie_commande_horloge( 20,  0,  3,  8,  2, 3);
 		err=chargeBBWithFILEPtr(mon_fichier,&numserie,fromFifo);
 		if(!err) break;
 		}
