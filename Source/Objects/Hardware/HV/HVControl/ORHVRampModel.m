@@ -322,6 +322,8 @@ static NSString* ORHVRampConnector				= @"HV Ramp Connector";
 
 - (void) pollHardware:(ORHVRampModel*)theModel
 {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware:) object:self];
+
     @try { 
         
         if([self interfaceObj]){ //no sense in doing anything if not connected.
@@ -419,7 +421,6 @@ static NSString* ORHVRampConnector				= @"HV Ramp Connector";
         //catch this here to prevent it from falling thru, but nothing to do.
 		
 	}
-	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	if(pollingState!=0){
 		[self performSelector:@selector(pollHardware:) withObject:self afterDelay:pollingState];
 	}
@@ -644,8 +645,6 @@ static NSString* ORHVRampConnector				= @"HV Ramp Connector";
 {
     if(pollingState!=0){        
         NSLog(@"Polling HV every %.0f seconds.\n",pollingState);
-		[NSObject cancelPreviousPerformRequestsWithTarget:self];
-		[self performSelector:@selector(pollHardware:) withObject:self afterDelay:pollingState];
 		[self pollHardware:self];
 		[hvNoCurrentCheckAlarm clearAlarm];
     }
