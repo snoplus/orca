@@ -362,6 +362,21 @@
 						object: model];
 
     [notifyCenter addObserver : self
+                     selector : @selector(polarDacChanged:)
+                         name : OREdelweissFLTModelPolarDacChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(triDacChanged:)
+                         name : OREdelweissFLTModelTriDacChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(rectDacChanged:)
+                         name : OREdelweissFLTModelRectDacChanged
+						object: model];
+
+    [notifyCenter addObserver : self
                      selector : @selector(adcRgForBBAccessChanged:)
                          name : OREdelweissFLTModelAdcRgForBBAccessChanged
 						object: model];
@@ -625,6 +640,32 @@
 }
 
 
+- (void) polarDacChanged:(NSNotification*)aNote
+{
+    int fiber = [model fiberSelectForBBAccess];
+      //not set ...int fiber = [[[aNote userInfo] objectForKey:OREdelweissFLTFiber] intValue];
+    int index = [[[aNote userInfo] objectForKey:OREdelweissFLTIndex] intValue];
+	[[polarDacMatrix cellWithTag:index] setIntValue: [model polarDacForFiber: fiber atIndex:index]];
+}
+
+- (void) triDacChanged:(NSNotification*)aNote
+{
+    int fiber = [model fiberSelectForBBAccess];
+      //not set ...int fiber = [[[aNote userInfo] objectForKey:OREdelweissFLTFiber] intValue];
+    int index = [[[aNote userInfo] objectForKey:OREdelweissFLTIndex] intValue];
+	[[triDacMatrix cellWithTag:index] setIntValue: [model triDacForFiber: fiber atIndex:index]];
+}
+
+- (void) rectDacChanged:(NSNotification*)aNote
+{
+    int fiber = [model fiberSelectForBBAccess];
+      //not set ...int fiber = [[[aNote userInfo] objectForKey:OREdelweissFLTFiber] intValue];
+    int index = [[[aNote userInfo] objectForKey:OREdelweissFLTIndex] intValue];
+	[[rectDacMatrix cellWithTag:index] setIntValue: [model rectDacForFiber: fiber atIndex:index]];
+}
+
+
+
 
 
 - (void) useBroadcastIdforBBAccessChanged:(NSNotification*)aNote
@@ -684,6 +725,15 @@
 	//[self adcValueForBBAccessChanged:nil];
     for(index=0;index<6;index++)
     	[[adcValueForBBAccessMatrix cellWithTag:index] setIntValue: [model adcValueForBBAccessForFiber: fiber atIndex:index]];
+    
+    for(index=0;index<12;index++)
+    	[[polarDacMatrix cellWithTag:index] setIntValue: [model polarDacForFiber: fiber atIndex:index]];
+    
+    for(index=0;index<6;index++)
+    	[[triDacMatrix cellWithTag:index] setIntValue: [model triDacForFiber: fiber atIndex:index]];
+    
+    for(index=0;index<6;index++)
+    	[[rectDacMatrix cellWithTag:index] setIntValue: [model rectDacForFiber: fiber atIndex:index]];
     
 	/*
     [self adcRgForBBAccessChanged:nil];
@@ -1720,9 +1770,13 @@
     int fiber = [model fiberSelectForBBAccess];
     int index = [[sender selectedCell] tag];
     [model setAdcValueForBBAccessForFiber: fiber atIndex:index to:[sender intValue]];
+    
+    //if "Write Changes to BB" is selected ...
+    //adc value is read only!
+    //if([model writeToBBMode]) [model writeAdcValueForBBAccessForFiber:fiber atIndex:index];
 }
 
-- (void) adcMultForBBAccessMatrixAction:(id)sender
+- (void) adcMultForBBAccessMatrixAction:(id)sender  //gain  (gain+freq=filter)
 {
 	//[model setAdcMultForBBAccess:[sender intValue]];	
     int fiber = [model fiberSelectForBBAccess];
@@ -1741,7 +1795,7 @@
 
 
 
-- (void) adcFreqkHzForBBAccessMatrixAction:(id)sender
+- (void) adcFreqkHzForBBAccessMatrixAction:(id)sender //freq (gain+freq=filter)
 {
 
 //	[model setAdcFreqkHzForBBAccess:[sender intValue]];	
@@ -1758,6 +1812,49 @@
     if([model writeToBBMode]) [model writeAdcFilterForBBAccessForFiber:fiber atIndex:index];
 
 }
+
+
+- (void) polarDacMatrixAction:(id)sender
+{
+
+//	[model setAdcFreqkHzForBBAccess:[sender intValue]];	
+    int fiber = [model fiberSelectForBBAccess];
+    int index = [[sender selectedCell] tag];
+        //DEBUG OUTPUT: 	        NSLog(@"%@::%@: tag %i,   intVal %i , fib %i, idx %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),
+            //[[sender selectedCell] tag],[sender intValue],fiber,index);//TODO : DEBUG testing ...-tb-
+	//if([sender intValue] != [model adcFreqkHzForBBAccessForFiber:fiber atIndex:index]){
+		//[[self undoManager] setActionName: @"Set Threshold"];
+		[model setPolarDacForFiber: fiber atIndex:[[sender selectedCell] tag] to:[sender intValue]];
+	//}
+    
+    //if "Write Changes to BB" is selected ...
+    if([model writeToBBMode]) [model writePolarDacForFiber:fiber atIndex:index];
+
+}
+
+- (void) triDacMatrixAction:(id)sender
+{
+    int fiber = [model fiberSelectForBBAccess];
+    int index = [[sender selectedCell] tag];
+    [model setTriDacForFiber: fiber atIndex:[[sender selectedCell] tag] to:[sender intValue]];
+
+    //if "Write Changes to BB" is selected ...
+    if([model writeToBBMode]) [model writeTriDacForFiber:fiber atIndex:index];
+}
+
+- (void) rectDacMatrixAction:(id)sender
+{
+    int fiber = [model fiberSelectForBBAccess];
+    int index = [[sender selectedCell] tag];
+    [model setRectDacForFiber: fiber atIndex:[[sender selectedCell] tag] to:[sender intValue]];
+
+    //if "Write Changes to BB" is selected ...
+    if([model writeToBBMode]) [model writeRectDacForFiber:fiber atIndex:index];
+}
+
+
+
+
 
 - (void) useBroadcastIdforBBAccessCBAction:(id)sender
 {
@@ -1791,6 +1888,9 @@
 		if([[sender cellWithTag:i] intValue]) val |= (0x1<<i);
 	}
 	[model setRelaisStatesBBForFiber:fiber to:val];
+    
+    //if "Write Changes to BB" is selected ...
+    if([model writeToBBMode]) [model writeRelaisStatesForBBAccessForFiber:fiber];
 }
 
 - (void) fiberSelectForBBStatusBitsPUAction:(id)sender

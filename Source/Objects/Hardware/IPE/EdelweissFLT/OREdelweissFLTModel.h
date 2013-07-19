@@ -216,12 +216,12 @@
 - (int) adcRgForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex;
 - (void) setAdcRgForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex to:(int)aAdcRgForBBAccess;
 - (void) writeAdcRgForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex;//HW access for Regul Parameter
-
 - (int) adcRtForFiber:(int)aFiber;
 - (void) setAdcRtForFiber:(int)aFiber to:(int)aAdcRt;
 - (void) writeAdcRtForBBAccessForFiber:(int)aFiber;//HW access Rt
 - (int) adcValueForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex;
 - (void) setAdcValueForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex to:(int)aAdcValueForBBAccess;
+- (void) writeAdcValueForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex;//HW access 
 - (int) adcMultForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex; //TODO: change name to 'gains' (instead of Mult)
 - (void) setAdcMultForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex to:(int)aAdcMultForBBAccess;
 - (int) adcFreqkHzForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex;
@@ -235,6 +235,19 @@
 - (void) setFiberSelectForBBAccess:(int)aFiberSelectForBBAccess;
 - (int) relaisStatesBBForFiber:(int)aFiber;
 - (void) setRelaisStatesBBForFiber:(int)aFiber to:(int)aRelaisStatesBB;
+- (void) writeRelaisStatesForBBAccessForFiber:(int)aFiber;//HW access Relais
+
+- (int) polarDacForFiber:(int)aFiber atIndex:(int)aIndex;  // DAC = polar_dac (cew_control name)
+- (void) setPolarDacForFiber:(int)aFiber atIndex:(int)aIndex to:(int)aDacValue;
+- (void) writePolarDacForFiber:(int)aFiber atIndex:(int)aIndex;//HW access
+
+- (int) triDacForFiber:(int)aFiber atIndex:(int)aIndex;
+- (void) setTriDacForFiber:(int)aFiber atIndex:(int)aIndex to:(int)aDacValue;
+- (void) writeTriDacForFiber:(int)aFiber atIndex:(int)aIndex;//HW access
+
+- (int) rectDacForFiber:(int)aFiber atIndex:(int)aIndex;
+- (void) setRectDacForFiber:(int)aFiber atIndex:(int)aIndex to:(int)aDacValue;
+- (void) writeRectDacForFiber:(int)aFiber atIndex:(int)aIndex;//HW access
 
 //BB status bit buffer
 - (uint32_t) statusBB32forFiber:(int)aFiber atIndex:(int)aIndex;
@@ -566,6 +579,9 @@ extern NSString* OREdelweissFLTModelStatusBitsBBDataChanged;
 extern NSString* OREdelweissFLTModelAdcRtForBBAccessChanged;
 extern NSString* OREdelweissFLTModelAdcRgForBBAccessChanged;
 extern NSString* OREdelweissFLTModelAdcValueForBBAccessChanged;
+extern NSString* OREdelweissFLTModelPolarDacChanged;
+extern NSString* OREdelweissFLTModelTriDacChanged;
+extern NSString* OREdelweissFLTModelRectDacChanged;
 extern NSString* OREdelweissFLTModelAdcMultForBBAccessChanged;
 extern NSString* OREdelweissFLTModelAdcFreqkHzForBBAccessChanged;
 extern NSString* OREdelweissFLTFiber;

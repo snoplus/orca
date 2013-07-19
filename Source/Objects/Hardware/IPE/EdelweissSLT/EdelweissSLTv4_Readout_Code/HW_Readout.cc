@@ -478,6 +478,35 @@ void doGeneralWriteOp(SBC_Packet* aPacket,uint8_t reply)
 		break;
 		case kChargeBBWithFile:
             {
+            //fork test BEGIN
+            pid_t cpid;
+            int flag=0;
+                   pbus->write(FLTAccessTestReg(1),flag);
+            cpid = fork();
+            if (cpid == -1) {
+               perror("fork");
+               printf("fork() failed\n");
+               //exit(EXIT_FAILURE);
+            }else{
+               if (cpid == 0) {    /* Child reads from pipe */
+                   flag=pbus->read(FLTAccessTestReg(1));
+                   printf("fork(): this is the child process - busy ... (flag:%i)\n",flag);
+                   sleep(3);
+                   flag=pbus->read(FLTAccessTestReg(1));
+                   printf("fork(): this is the child process - done ... (flag:%i)\n",flag);
+                   _exit(EXIT_SUCCESS);
+
+               } else {            /* Parent writes argv[1] to pipe */
+                   sleep(1);
+                   flag=1;
+                   pbus->write(FLTAccessTestReg(1),flag);
+                   flag=pbus->read(FLTAccessTestReg(1));
+                   printf("fork(): this is the parent process - continue ... (flag:%i)\n",flag);
+                   //wait(NULL);             /* Wait for child */
+                   //exit(EXIT_SUCCESS);
+               }
+            }
+            //fork test END
             char* buf=(char*)&dataToWrite[1]; 
 			//if(numLongs == 1) *lPtr = kCodeVersion;
             //if(num!=2) ERROR ...

@@ -57,6 +57,9 @@ NSString* OREdelweissFLTModelStatusBitsBBDataChanged = @"OREdelweissFLTModelStat
 NSString* OREdelweissFLTModelAdcRtForBBAccessChanged = @"OREdelweissFLTModelAdcRtForBBAccessChanged";
 NSString* OREdelweissFLTModelAdcRgForBBAccessChanged = @"OREdelweissFLTModelAdcRgForBBAccessChanged";
 NSString* OREdelweissFLTModelAdcValueForBBAccessChanged = @"OREdelweissFLTModelAdcValueForBBAccessChanged";
+NSString* OREdelweissFLTModelPolarDacChanged = @"OREdelweissFLTModelPolarDacChanged";
+NSString* OREdelweissFLTModelTriDacChanged = @"OREdelweissFLTModelTriDacChanged";
+NSString* OREdelweissFLTModelRectDacChanged = @"OREdelweissFLTModelRectDacChanged";
 NSString* OREdelweissFLTModelAdcMultForBBAccessChanged = @"OREdelweissFLTModelAdcMultForBBAccessChanged";
 NSString* OREdelweissFLTModelAdcFreqkHzForBBAccessChanged = @"OREdelweissFLTModelAdcFreqkHzForBBAccessChanged";
 NSString* OREdelweissFLTFiber = @"OREdelweissFLTFiber";
@@ -606,7 +609,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     uint16_t val = [self statusBB16forFiber: aFiber atIndex: (kBBstatusRg + aIndex)];
     
     int idBB = 0xff;
-    if(![self useBroadcastIdforBBAccess]) [self idBBforBBAccessForFiber:aFiber];
+    if(![self useBroadcastIdforBBAccess])  idBB=[self idBBforBBAccessForFiber:aFiber];
     int cmd = kBBcmdSetRg+aIndex;
     int arg1 = (val >> 8) & 0xff;
     int arg2 = val & 0xff;
@@ -648,7 +651,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     uint16_t val = [self statusBB16forFiber: aFiber atIndex: (kBBstatusRt)];
     
     int idBB = 0xff;
-    if(![self useBroadcastIdforBBAccess]) [self idBBforBBAccessForFiber:aFiber];
+    if(![self useBroadcastIdforBBAccess]) idBB=[self idBBforBBAccessForFiber:aFiber];
     int cmd = kBBcmdSetRt;
     int arg1 = (val >> 8) & 0xff;
     int arg2 = val & 0xff;
@@ -679,6 +682,24 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [userInfo setObject:[NSNumber numberWithInt:aIndex] forKey: OREdelweissFLTIndex];
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelAdcValueForBBAccessChanged object:self userInfo: userInfo];
 }
+
+
+//adc value is read only!
+- (void) writeAdcValueForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex  //HW access 
+{
+/*
+    uint16_t val = [self statusBB16forFiber: aFiber atIndex: (kBBstatusADCValue + aIndex)];
+    
+    int idBB = 0xff;
+    if(![self useBroadcastIdforBBAccess])  idBB=[self idBBforBBAccessForFiber:aFiber];
+    int cmd = XXXXXXXXX+aIndex;
+    int arg1 = (val >> 8) & 0xff;
+    int arg2 = val & 0xff;
+    
+    [self sendWCommandIdBB:idBB cmd:cmd arg1:arg1  arg2: arg2];
+*/
+}
+
 
 - (int) adcMultForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex
 {
@@ -752,7 +773,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     uint16_t val = [self statusBB16forFiber: aFiber atIndex: (kBBstatusFilter + aIndex)];
     
     int idBB = 0xff;
-    if(![self useBroadcastIdforBBAccess]) [self idBBforBBAccessForFiber:aFiber];
+    if(![self useBroadcastIdforBBAccess]) idBB=[self idBBforBBAccessForFiber:aFiber];
     int cmd = kBBcmdSetFilter+aIndex;
     int arg1 = (val >> 8) & 0xff;
     int arg2 = val & 0xff;
@@ -842,7 +863,138 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelRelaisStatesBBChanged object:self];
 }
 
-- (uint32_t) statusBB32forFiber:(int)aFiber atIndex:(int)aIndex
+- (void) writeRelaisStatesForBBAccessForFiber:(int)aFiber//HW access
+{
+    uint16_t val = [self statusBB16forFiber: aFiber atIndex: (kBBstatusRelais)];
+    
+    int idBB = 0xff;
+    if(![self useBroadcastIdforBBAccess]) idBB=[self idBBforBBAccessForFiber:aFiber];
+    int cmd = kBBcmdSetRelais;
+    int arg1 = (val >> 8) & 0xff;
+    int arg2 = val & 0xff;
+    
+    [self sendWCommandIdBB:idBB cmd:cmd arg1:arg1  arg2: arg2];
+
+}
+
+
+
+
+
+
+
+- (int) polarDacForFiber:(int)aFiber atIndex:(int)aIndex   // DAC = polar_dac (cew_control name)
+{
+    //return adcValueForBBAccess;
+    uint16_t currVal = [self statusBB16forFiber: aFiber atIndex: (kBBstatusDAC + aIndex)];
+    return currVal;
+}
+
+- (void) setPolarDacForFiber:(int)aFiber atIndex:(int)aIndex to:(int)aDacValue  // DAC = polar_dac (cew_control name)
+{
+    int oldVal = [self polarDacForFiber:aFiber atIndex:aIndex];
+    [[[self undoManager] prepareWithInvocationTarget:self] setPolarDacForFiber: aFiber atIndex:aIndex to: oldVal];
+    
+    [self setStatusBB16forFiber:aFiber atIndex:(kBBstatusDAC + aIndex) to: aDacValue];
+
+    NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+    [userInfo setObject:[NSNumber numberWithInt:aIndex] forKey: OREdelweissFLTIndex];
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelPolarDacChanged  object:self userInfo: userInfo];
+}
+
+- (void) writePolarDacForFiber:(int)aFiber atIndex:(int)aIndex  //HW access
+{
+    uint16_t val = [self statusBB16forFiber: aFiber atIndex: (kBBstatusDAC + aIndex)];
+    
+    int idBB = 0xff;
+    if(![self useBroadcastIdforBBAccess]) idBB=[self idBBforBBAccessForFiber:aFiber];
+    int cmd = kBBcmdSetDAC+aIndex;
+    int arg1 = (val >> 8) & 0xff;
+    int arg2 = val & 0xff;
+    
+    [self sendWCommandIdBB:idBB cmd:cmd arg1:arg1  arg2: arg2];
+
+}
+
+
+
+
+- (int) triDacForFiber:(int)aFiber atIndex:(int)aIndex
+{
+    uint16_t currVal = [self statusBB16forFiber: aFiber atIndex: (kBBstatusTri + aIndex)];
+    return currVal;
+}
+
+- (void) setTriDacForFiber:(int)aFiber atIndex:(int)aIndex to:(int)aDacValue
+{
+    int oldVal = [self triDacForFiber:aFiber atIndex:aIndex];
+    [[[self undoManager] prepareWithInvocationTarget:self] setTriDacForFiber: aFiber atIndex:aIndex to: oldVal];
+    
+    [self setStatusBB16forFiber:aFiber atIndex:(kBBstatusTri + aIndex) to: aDacValue];
+
+    NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+    [userInfo setObject:[NSNumber numberWithInt:aIndex] forKey: OREdelweissFLTIndex];
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelTriDacChanged  object:self userInfo: userInfo];
+}
+
+- (void) writeTriDacForFiber:(int)aFiber atIndex:(int)aIndex//HW access
+{
+    uint16_t val = [self statusBB16forFiber: aFiber atIndex: (kBBstatusTri + aIndex)];
+    
+    int idBB = 0xff;
+    if(![self useBroadcastIdforBBAccess]) idBB=[self idBBforBBAccessForFiber:aFiber];
+    int cmd = kBBcmdSetTri+aIndex;
+    int arg1 = (val >> 8) & 0xff;
+    int arg2 = val & 0xff;
+    
+    [self sendWCommandIdBB:idBB cmd:cmd arg1:arg1  arg2: arg2];
+
+}
+
+
+
+
+
+- (int) rectDacForFiber:(int)aFiber atIndex:(int)aIndex
+{
+    uint16_t currVal = [self statusBB16forFiber: aFiber atIndex: (kBBstatusRect + aIndex)];
+    return currVal;
+}
+
+- (void) setRectDacForFiber:(int)aFiber atIndex:(int)aIndex to:(int)aDacValue
+{
+    int oldVal = [self rectDacForFiber:aFiber atIndex:aIndex];
+    [[[self undoManager] prepareWithInvocationTarget:self] setRectDacForFiber: aFiber atIndex:aIndex to: oldVal];
+    
+    [self setStatusBB16forFiber:aFiber atIndex:(kBBstatusRect + aIndex) to: aDacValue];
+
+    NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+    [userInfo setObject:[NSNumber numberWithInt:aIndex] forKey: OREdelweissFLTIndex];
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelRectDacChanged  object:self userInfo: userInfo];
+}
+
+- (void) writeRectDacForFiber:(int)aFiber atIndex:(int)aIndex//HW access
+{
+    uint16_t val = [self statusBB16forFiber: aFiber atIndex: (kBBstatusRect + aIndex)];
+    
+    int idBB = 0xff;
+    if(![self useBroadcastIdforBBAccess]) idBB=[self idBBforBBAccessForFiber:aFiber];
+    int cmd = kBBcmdSetRect+aIndex;
+    int arg1 = (val >> 8) & 0xff;
+    int arg2 = val & 0xff;
+    
+    [self sendWCommandIdBB:idBB cmd:cmd arg1:arg1  arg2: arg2];
+
+}
+
+
+
+
+
+
+//BB status bit buffer
+
+- (uint32_t) statusBB32forFiber:(int)aFiber atIndex:(int)aIndex   
 {
     return statusBitsBB[aFiber][aIndex];
 }

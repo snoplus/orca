@@ -60,6 +60,9 @@
 		IBOutlet NSButton*		hitRateNoneButton;
     
     //BB access tab
+	IBOutlet   NSMatrix*    polarDacMatrix;
+	IBOutlet   NSMatrix*    triDacMatrix;
+	IBOutlet   NSMatrix*    rectDacMatrix;
 	IBOutlet   NSTextField* BB0x0ACmdMaskTextField; //Alim/0x0A command
 	IBOutlet   NSMatrix*    BB0x0ACmdMaskMatrix; //Alim/0x0A command
 	IBOutlet   NSTextField* chargeBBFileTextField;
@@ -213,6 +216,11 @@
 - (void) adcMultForBBAccessChanged:(NSNotification*)aNote;
 - (void) adcFreqkHzForBBAccessChanged:(NSNotification*)aNote;
 - (void) useBroadcastIdforBBAccessChanged:(NSNotification*)aNote;
+- (void) polarDacChanged:(NSNotification*)aNote;
+- (void) triDacChanged:(NSNotification*)aNote;
+- (void) rectDacChanged:(NSNotification*)aNote;
+
+
 - (void) idBBforBBAccessChanged:(NSNotification*)aNote;
 - (void) fiberSelectForBBAccessChanged:(NSNotification*)aNote;
 - (void) relaisStatesBBChanged:(NSNotification*)aNote;
@@ -296,10 +304,15 @@
 - (IBAction) dumpBBStatusBBAccessTextFieldAction:(id)sender;
 - (IBAction) adcRgForBBAccessMatrixAction:(id)sender;
 - (IBAction) adcValueForBBAccessMatrixAction:(id)sender;
-- (IBAction) adcMultForBBAccessMatrixAction:(id)sender;
+
+- (IBAction) adcMultForBBAccessMatrixAction:(id)sender;    //gain (gain+freq=filter)
+- (IBAction) adcFreqkHzForBBAccessMatrixAction:(id)sender; //freq (gain+freq=filter)
+
+- (IBAction) polarDacMatrixAction:(id)sender;
+- (IBAction) triDacMatrixAction:(id)sender;
+- (IBAction) rectDacMatrixAction:(id)sender;
 
 
-- (IBAction) adcFreqkHzForBBAccessMatrixAction:(id)sender;
 - (IBAction) useBroadcastIdforBBAccessCBAction:(id)sender;
 - (IBAction) idBBforBBAccessTextFieldAction:(id)sender;
 - (IBAction) fiberSelectForBBAccessPUAction:(id)sender;

@@ -586,7 +586,7 @@ Structure_trame_status;
 #define kBBcmdSetIdentMode 0x08
 #define kBBcmdAlim         0x0a  //kBBstatusAlim=1
 #define kBBcmdSetRelais    0x1d  //kBBstatusRelais=36
-#define kBBcmdSetRefDAC    0x1e  //kBBstatusRefDAC=37
+#define kBBcmdSetRefDAC    0x1e  //kBBstatusRefDAC=37   = ref  (in cew_control, near relais settings)
 
 //ARRAYS:
 
@@ -602,7 +602,7 @@ Structure_trame_status;
 #define kBBcmdSetFilter    0x31
 
 
-//Rg + Rt (controle de la regulation du point de fonctionnement avec les DAC)
+//Rg + Rt (controle de la regulation du point de fonctionnement avec les DAC)  (g=gain (?), t=time=time steps (?))
 #define kBBcmdSetRt        0x38
 //Rt is reg. tous? (in BBstatus at index 5=status_regul/kBBstatusRt)
 #define kBBcmdSetRg        0x39
