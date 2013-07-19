@@ -78,6 +78,7 @@
 - (void)    startConfirmSheet:(id)aString;
 - (void)    startRequestSheet:(id)aString;
 - (id)      showStatusDialog:(id) p;
+- (id)      genRandom:(id) p;
 
 
 - (NSMutableDictionary*) makeSymbolTable;
@@ -594,7 +595,13 @@
                      NSSecondCalendarUnit
                            fromDate:[NSDate date]];
         }
-		case NSARRAY:		return [NSMutableArray array];
+		case NSARRAY:           return [NSMutableArray array];
+        case SEEDRANDOM:        {
+            time_t t;
+            time(&t);
+            srand((unsigned int)t);
+        }
+        case RANDOM:            return [self genRandom:p];
 		case NSFILEMANAGER:		return [NSFileManager defaultManager];
 		case STRINGFROMFILE:	return [self getStringFromFile:p];
 		case WRITELINETOFILE:	return [self writeLine:p];
@@ -1412,6 +1419,13 @@
 	return [NSDecimalNumber numberWithDouble:theTime];
 }
 
+- (id) genRandom:(id) p
+{
+    long minValue = [NodeValue(0) longValue];
+    long maxValue = [NodeValue(1) longValue];
+	long result =  (rand() % ((maxValue +1) - minValue)) + minValue;
+    return [NSDecimalNumber numberWithLong:result];
+}
 
 - (id) postAlarm:(id)p
 {
@@ -1647,6 +1661,8 @@
 				case MAKERANGE:			line = [NSMutableString stringWithString:@"[range]"];		break;
 				case REQUEST:			line = [NSMutableString stringWithString:@"[request]"];		break;
 				case CONFIRM:			line = [NSMutableString stringWithString:@"[confirm]"];		break;
+				case SEEDRANDOM:		line = [NSMutableString stringWithString:@"[seedRandom]"];		break;
+				case RANDOM:            line = [NSMutableString stringWithString:@"[random]"];		break;
 				case kConfirmTimeOut:	line = [NSMutableString stringWithString:@"[confirmtimeout]"];	break;
                 case ',':				line = [NSMutableString stringWithString:@"[,]"];			break;
 				default:				line = [NSMutableString stringWithString:@"[??]"];			break;

@@ -67,6 +67,8 @@
 		<string>confirm</string>
 		<string>request</string>
 		<string>show</string>
+		<string>seedRandom</string>
+		<string>random</string>
 	</array>
 	<key>Constants</key>
 	<array>
