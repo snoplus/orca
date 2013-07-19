@@ -29,5 +29,6 @@
 + (id) invoke:(NSString*)args withTarget:(id)aTarget;
 - (BOOL) setArgument:(int)argIndex to:(id)aVal;
 - (id) returnValue;
+- (void) invokeWithNoUndoOnTarget:(id)aTarget;
 
 @end

@@ -793,9 +793,7 @@
 	@try {
 		id target = NodeValue(0);
 		if(target != _zero){
-			[[self undoManager] disableUndoRegistration];
 			result =  [NSInvocation invoke:argList withTarget:target];
-            [[self undoManager] enableUndoRegistration];
 		}
 	}
 	@catch (NSException* localException){

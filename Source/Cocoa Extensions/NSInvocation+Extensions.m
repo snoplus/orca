@@ -328,8 +328,7 @@
 		}
 		if(ok){
 			[theInvocation retainArguments];
-			[theInvocation performSelectorOnMainThread:@selector(invokeWithTarget:) withObject:aTarget waitUntilDone:YES];
-			//[theInvocation invokeWithTarget:aTarget];
+			[theInvocation performSelectorOnMainThread:@selector(invokeWithNoUndoOnTarget:) withObject:aTarget waitUntilDone:YES];
 			if(returnLength!=0){
 				result =  [theInvocation returnValue];
 			}
@@ -342,4 +341,11 @@
 	return result;
 }
 
+- (void) invokeWithNoUndoOnTarget:(id)aTarget
+{
+    NSUndoManager* undoer = [[[NSApp delegate]document] undoManager];
+    [undoer disableUndoRegistration];
+    [self invokeWithTarget:aTarget];
+    [undoer enableUndoRegistration];
+}
 @end
