@@ -31,8 +31,8 @@
     unsigned long dataId;
     unsigned long 	overFlow;
     unsigned int 	numberBins;
-    unsigned long* 	histogram;
-    unsigned long* 	pausedHistogram;
+    NSMutableData* 	histogram;
+    NSData*         pausedHistogram;
 	NSMutableArray* rois;
 }
 

@@ -1189,7 +1189,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 					NSArray* objs1d = [[aMonitor  collectObjectsOfClass:[OR1DHisto class]] retain];
                     NSString* baseMonitorName = [NSString stringWithFormat:@"Monitor%lu",[aMonitor uniqueIdNumber]];
 					@try {
-						for(id aDataSet in objs1d){
+						for(OR1DHisto* aDataSet in objs1d){
 							unsigned long start,end;
 							NSString* s = [aDataSet getnonZeroDataAsStringWithStart:&start end:&end];
                             NSString* dataSetName = [baseMonitorName stringByAppendingFormat:@",%@",[aDataSet fullName]];

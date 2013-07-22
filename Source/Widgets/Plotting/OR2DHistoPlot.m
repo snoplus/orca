@@ -51,7 +51,7 @@
     
     unsigned short numBinsPerSide;
     unsigned short dataXMin,dataXMax,dataYMin,dataYMax;
-	unsigned long* data = [dataSource plotter:self numberBinsPerSide:&numBinsPerSide];
+	NSData* data = [dataSource plotter:self numberBinsPerSide:&numBinsPerSide];
     [dataSource plotter:self xMin:&dataXMin xMax:&dataXMax yMin:&dataYMin yMax:&dataYMax];
     
     if(!data)return;
@@ -79,7 +79,7 @@
 	BOOL aLog       = [[colorScale colorAxis] isLog];
 	BOOL aInt       = [[colorScale colorAxis] integer];
 	double aMinPad  = [[colorScale colorAxis] minPad];
-	
+	unsigned long* dataPtr = (unsigned long*)[data bytes];
 	int iy;
     for (iy=minY; iy<=maxY;++iy) {
         
@@ -89,7 +89,7 @@
 			float x = [mXScale getPixAbs:(float)ix-.5];
             
             /* Get the data value for this point and increment to next point */
-            unsigned long z = data[ix + iy*numBinsPerSide];
+            unsigned long z = dataPtr[ix + iy*numBinsPerSide];
             if(z){
                 int colorIndex = [colorScale getFastColorIndexForValue:z log:aLog integer:aInt minPad:aMinPad];
 				if(colorIndex<0)colorIndex = 0;
@@ -147,9 +147,10 @@
 		unsigned short dataXMin,dataXMax,dataYMin,dataYMax;
 		[dataSource plotter:self xMin:&dataXMin xMax:&dataXMax yMin:&dataYMin yMax:&dataYMax];
 		unsigned short numBinsPerSide;
-		unsigned long* data = [dataSource plotter:self numberBinsPerSide:&numBinsPerSide];
+		NSData* data = [dataSource plotter:self numberBinsPerSide:&numBinsPerSide];
+        unsigned long* dataPtr = (unsigned long*)[data bytes];
 		if(x>=dataXMin && x<=dataXMax && y>=dataYMin && y<=dataYMax){
-			z = data[(int)x + (int)y*numBinsPerSide];
+			z = dataPtr[(int)x + (int)y*numBinsPerSide];
 		}
 		NSString* cursorPositionString = [NSString stringWithFormat:@"x:%3.0f y:%3.0f z:%lu",x,y,z];
 		s = [[NSAttributedString alloc] initWithString:cursorPositionString attributes:attrsDictionary];
@@ -219,13 +220,14 @@
 	double maxXChannel = 0;
 	unsigned short dataXMin,dataXMax,dataYMin,dataYMax;
     unsigned short numberBinsPerSide;
-	unsigned long* data = [dataSource plotter:self numberBinsPerSide:&numberBinsPerSide];
+	NSData* data = [dataSource plotter:self numberBinsPerSide:&numberBinsPerSide];
+    unsigned long* dataPtr = (unsigned long*)[data bytes];
 	[dataSource plotter:self xMin:&dataXMin xMax:&dataXMax yMin:&dataYMin yMax:&dataYMax];
 	unsigned short val = 0;
     int x,y;
 	for (y=dataYMin; y<dataYMax;++y) {	
 		for (x=dataXMin; x<dataXMax;++x) {	
-			val = data[x+y*numberBinsPerSide];
+			val = dataPtr[x+y*numberBinsPerSide];
 			if(val>maxValue){
 				maxValue = val;
 				maxXChannel = x;
@@ -241,12 +243,13 @@
     int x,y;
     unsigned short numberBinsPerSide;
 	unsigned short dataXMin,dataXMax,dataYMin,dataYMax;
-	unsigned long* data = [dataSource plotter:self numberBinsPerSide:&numberBinsPerSide];
+	NSData* data = [dataSource plotter:self numberBinsPerSide:&numberBinsPerSide];
+    unsigned long* dataPtr = (unsigned long*)[data bytes];
 	[dataSource plotter:self xMin:&dataXMin xMax:&dataXMax yMin:&dataYMin yMax:&dataYMax];
 	unsigned short val = 0;
 	for (y=dataYMin; y<dataYMax;++y) {	
 		for (x=dataXMin; x<dataXMax;++x) {	
-			val = data[x+y*numberBinsPerSide];
+			val = dataPtr[x+y*numberBinsPerSide];
 			if(val>maxValue)maxValue = val;
 		}
 	}
@@ -267,13 +270,14 @@
     unsigned short numberBinsPerSide = 256; //default
     int x;
 	unsigned short dataXMin,dataXMax,dataYMin,dataYMax;
-	unsigned long* data = [dataSource plotter:self numberBinsPerSide:&numberBinsPerSide];
+	NSData* data = [dataSource plotter:self numberBinsPerSide:&numberBinsPerSide];
+    unsigned long* dataPtr = (unsigned long*)[data bytes];
 	[dataSource plotter:self xMin:&dataXMin xMax:&dataXMax yMin:&dataYMin yMax:&dataYMax];
 	y +=  dataYMin;
 	NSMutableString* s = [NSMutableString stringWithFormat:@"%ld ",y];
 	unsigned short val = 0;
 	for (x=dataXMin; x<dataXMax;++x) {	
-		val = data[x+y*numberBinsPerSide];
+		val = dataPtr[x+y*numberBinsPerSide];
 		[s appendFormat:@"%d ",val];
 	}
 	[s appendString:@"\n"];

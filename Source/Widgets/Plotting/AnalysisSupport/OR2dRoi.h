@@ -24,7 +24,7 @@
 @interface NSObject (OR2dRoiDataSourceMethods)
 - (int)   numberPointsInPlot:(id)aPlot;
 - (void) plotter:(id)aPlot index:(int)index x:(double*)x y:(double*)y;
-- (unsigned long*) plotter:(id)aPlotter numberBinsPerSide:(unsigned short*)xValue;
+- (NSData*) plotter:(id)aPlotter numberBinsPerSide:(unsigned short*)xValue;
 - (void) plotter:(id) aPlotter xMin:(unsigned short*)aMinX xMax:(unsigned short*)aMaxX yMin:(unsigned short*)aMinY yMax:(unsigned short*)aMaxY;
 - (id)    plotView;
 - (id)    topPlot;

@@ -116,8 +116,8 @@ NSString* OR2dRoiCurveFitChanged = @"OR2dRoiCurveFitChanged";
 		[channelPath closePath];
 		
 		unsigned short numBinsPerSide;
-		unsigned long* data = [dataSource plotter:aPlot numberBinsPerSide:&numBinsPerSide];
-		
+		NSData* data = [dataSource plotter:aPlot numberBinsPerSide:&numBinsPerSide];
+		unsigned long* dataPtr = (unsigned long*)[data bytes];
 		long sumVal  = 0;
 		long maxVal  = 0;
 		long xLoc    = 0;
@@ -140,7 +140,7 @@ NSString* OR2dRoiCurveFitChanged = @"OR2dRoiCurveFitChanged";
 			for (x=xStart; x<xEnd; ++x) {
 				if([channelPath containsPoint:NSMakePoint(x,y)]){
 					++count;
-					unsigned long z = data[x + y*numBinsPerSide];
+					unsigned long z = dataPtr[x + y*numBinsPerSide];
 					if(z > maxVal){
 						maxVal = z;
 						xLoc = x;

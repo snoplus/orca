@@ -39,7 +39,7 @@ NSString* ORManualPlot2DModelPlotTitleChanged	= @"ORManualPlot2DModelPlotTitleCh
 
 - (void) dealloc
 {
-    [self freeHistogram];
+    [histogram release];
     [xTitle release];
     [yTitle release];
     [plotTitle release];
@@ -59,20 +59,11 @@ NSString* ORManualPlot2DModelPlotTitleChanged	= @"ORManualPlot2DModelPlotTitleCh
 	return [self fullID];
 }
 
-- (void) freeHistogram
-{
-    if(histogram) {
-        free(histogram);
-        histogram = 0;
-    }
-}
-
 - (void) clear
 {
 	[dataSetLock lock];
-    if(histogram){
-        memset(histogram,0,numberBinsPerSide*numberBinsPerSide*sizeof(long));
-    }
+    [histogram release];
+    histogram = [[NSMutableData dataWithLength:numberBinsPerSide*numberBinsPerSide*sizeof(long)]retain];
     maxX = numberBinsPerSide-1;
     minX = 0;
     maxY = numberBinsPerSide-1;
@@ -93,8 +84,10 @@ NSString* ORManualPlot2DModelPlotTitleChanged	= @"ORManualPlot2DModelPlotTitleCh
 	}
 	[dataSetLock lock];
     numberBinsPerSide = bins;
-    [self freeHistogram];
-    histogram = (unsigned long*)malloc(numberBinsPerSide*numberBinsPerSide*sizeof(unsigned long));
+    
+    [histogram release];
+    histogram = [[NSMutableData dataWithLength:numberBinsPerSide*numberBinsPerSide*sizeof(long)]retain];
+    
 	[dataSetLock unlock];
     [self clear];
 }
@@ -104,9 +97,12 @@ NSString* ORManualPlot2DModelPlotTitleChanged	= @"ORManualPlot2DModelPlotTitleCh
 	unsigned long theResult = 0;
 	if(aXBin<numberBinsPerSide && aYBin<numberBinsPerSide){
 		[dataSetLock lock];
-		aXBin = aXBin % numberBinsPerSide;   // Error Check Our x Value
-		aYBin = aYBin % numberBinsPerSide;   // Error Check Our y Value
-		theResult =  histogram[aXBin + aYBin*numberBinsPerSide];
+        unsigned long* histogramPtr = (unsigned long*)[histogram bytes];
+        if(histogramPtr){
+            aXBin = aXBin % numberBinsPerSide;   // Error Check Our x Value
+            aYBin = aYBin % numberBinsPerSide;   // Error Check Our y Value
+            theResult =  histogramPtr[aXBin + aYBin*numberBinsPerSide];
+        }
 		[dataSetLock unlock];
 	}
 	return theResult;
@@ -114,9 +110,10 @@ NSString* ORManualPlot2DModelPlotTitleChanged	= @"ORManualPlot2DModelPlotTitleCh
 
 - (void) setBinAtX:(int)aXBin y:(int)aYBin to:(unsigned long)aValue;
 {
-	if(histogram && aXBin<numberBinsPerSide && aYBin<numberBinsPerSide){
+    unsigned long* histogramPtr = (unsigned long*)[histogram bytes];
+	if(histogramPtr && aXBin<numberBinsPerSide && aYBin<numberBinsPerSide){
 		[dataSetLock lock];	
-		histogram[aXBin + aYBin*numberBinsPerSide] = aValue;
+		histogramPtr[aXBin + aYBin*numberBinsPerSide] = aValue;
 		[dataSetLock unlock];	
 		[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORManualPlot2DDataChanged object:self];
 	}
@@ -124,9 +121,10 @@ NSString* ORManualPlot2DModelPlotTitleChanged	= @"ORManualPlot2DModelPlotTitleCh
 
 - (void) incrementBinAtX:(int)aXBin y:(int)aYBin by:(unsigned long)incValue;
 {
-	if(histogram && aXBin<numberBinsPerSide && aYBin<numberBinsPerSide){
+    unsigned long* histogramPtr = (unsigned long*)[histogram bytes];
+	if(histogramPtr && aXBin<numberBinsPerSide && aYBin<numberBinsPerSide){
 		[dataSetLock lock];	
-		histogram[aXBin + aYBin*numberBinsPerSide]+=incValue;
+		histogramPtr[aXBin + aYBin*numberBinsPerSide]+=incValue;
 		[dataSetLock unlock];	
 		[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORManualPlot2DDataChanged object:self];
 	}
@@ -224,7 +222,7 @@ NSString* ORManualPlot2DModelPlotTitleChanged	= @"ORManualPlot2DModelPlotTitleCh
 	}
 	return rois;
 }
-- (unsigned long*) plotter:(id)aPlotter numberBinsPerSide:(unsigned short*)xValue
+- (NSData*) plotter:(id)aPlotter numberBinsPerSide:(unsigned short*)xValue
 {
     return [self getDataSetAndNumBinsPerSize:xValue];
 }
@@ -234,11 +232,10 @@ NSString* ORManualPlot2DModelPlotTitleChanged	= @"ORManualPlot2DModelPlotTitleCh
     [self getXMin:aMinX xMax:aMaxX yMin:aMinY yMax:aMaxY];
 }
 
-- (unsigned long*) getDataSetAndNumBinsPerSize:(unsigned short*)value
+- (NSData*) getDataSetAndNumBinsPerSize:(unsigned short*)value
 {
     *value = numberBinsPerSide;
-    return histogram;
-    
+    return[[histogram retain] autorelease];
 }
 
 - (void) getXMin:(unsigned short*)aMinX xMax:(unsigned short*)aMaxX yMin:(unsigned short*)aMinY yMax:(unsigned short*)aMaxY

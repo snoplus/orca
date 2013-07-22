@@ -1676,7 +1676,18 @@ Table: Histogram2Ds
 							if(dataset_id) {
 								if(lastCounts != countsNow){
 									NSData* theData = [aDataSet getNonZeroRawDataWithStart:&start end:&end];
-									NSString* dataStr = [aDataSet getnonZeroDataAsStringWithStart:&start end:&end];
+                                    //also need it as a string for couchdb
+                                    int n = [theData length]/4;
+                                    NSMutableString* dataStr = [NSMutableString stringWithCapacity:n*64];
+                                    unsigned long* dataPtr = (unsigned long*)[theData bytes];
+                                    if(dataPtr){
+                                        int i;
+                                        for(i=0;i<n;i++)[dataStr appendFormat:@"%lu,",dataPtr[i]];
+                                        if([dataStr length]>0)[dataStr deleteCharactersInRange:NSMakeRange([dataStr length]-1,1)];
+                                    }
+                                    if([dataStr length]==0)[dataStr appendString: @"0"];
+                                    
+                                    
 									NSString* convertedData = [sqlConnection quoteObject:theData];
 									NSString* theQuery = [NSString stringWithFormat:@"UPDATE Histogram1Ds SET counts=%lu,start=%lu,end=%lu,data=%@,datastr=%@ WHERE dataset_id=%@",
 														  [aDataSet totalCounts],

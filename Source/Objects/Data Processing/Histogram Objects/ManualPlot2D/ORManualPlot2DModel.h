@@ -21,7 +21,7 @@
 {
 	NSLock*			dataSetLock;
 	unsigned short  numberBinsPerSide;
-    unsigned long*  histogram; //actually a 2D array stuffed into a 1D
+    NSMutableData*  histogram; //actually a 2D array stuffed into a 1D
     BOOL			scheduledForUpdate;
     NSString*		xTitle;
     NSString*		yTitle;
@@ -30,7 +30,6 @@
 	NSMutableArray* rois;
 }
 
-- (void) freeHistogram;
 - (void) clear;
 
 #pragma mark ***Accessors
@@ -53,9 +52,9 @@ commonScriptMethods;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 
 #pragma mark •••Data Source Methods
-- (unsigned long*) getDataSetAndNumBinsPerSize:(unsigned short*)value;
+- (NSData*) getDataSetAndNumBinsPerSize:(unsigned short*)value;
 - (void) getXMin:(unsigned short*)aMinX xMax:(unsigned short*)aMaxX yMin:(unsigned short*)aMinY yMax:(unsigned short*)aMaxY;
-- (unsigned long*) plotter:(id)aPlotter numberBinsPerSide:(unsigned short*)xValue;
+- (NSData*) plotter:(id)aPlotter numberBinsPerSide:(unsigned short*)xValue;
 - (void) plotter:(id)aPlotter xMin:(unsigned short*)aMinX xMax:(unsigned short*)aMaxX yMin:(unsigned short*)aMinY yMax:(unsigned short*)aMaxY;
 @end
 

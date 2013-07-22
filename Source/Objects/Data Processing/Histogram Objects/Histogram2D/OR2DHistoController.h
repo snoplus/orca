@@ -36,7 +36,7 @@
 - (NSMutableArray*) roiArrayForPlotter:(id)aPlot;
 
 #pragma mark ¥¥¥Data Source
-- (unsigned long*) plotter:(id)aPlotter numberBinsPerSide:(unsigned short*)xValue;
+- (NSData*) plotter:(id)aPlotter numberBinsPerSide:(unsigned short*)xValue;
 - (void) plotter:(id)aPlotter xMin:(unsigned short*)aMinX xMax:(unsigned short*)aMaxX yMin:(unsigned short*)aMinY yMax:(unsigned short*)aMaxY;
 
 @end

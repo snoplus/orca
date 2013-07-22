@@ -39,18 +39,12 @@
 
 - (void) dealloc
 {
-    [self freeHistogram];
+    [histogram release];
 	[rois release];
     [super dealloc];
 }
 
-- (void) freeHistogram
-{
-    if(histogram) {
-        free(histogram);
-        histogram = 0;
-    }
-}
+
 
 #pragma mark ¥¥¥Accessors
 
@@ -75,8 +69,8 @@
 {
 	[dataSetLock lock];
     numberBinsPerSide = bins;
-    [self freeHistogram];
-    histogram = (unsigned long*)malloc(numberBinsPerSide*numberBinsPerSide*sizeof(unsigned long));
+    [histogram release];
+    histogram = [[NSMutableData dataWithLength:numberBinsPerSide*numberBinsPerSide*sizeof(unsigned long)]retain];
 	[dataSetLock unlock];
     [self clear];
 }
@@ -87,7 +81,8 @@
 	[dataSetLock lock];
     aXBin = aXBin % numberBinsPerSide;   // Error Check Our x Value
     aYBin = aYBin % numberBinsPerSide;   // Error Check Our y Value
-    theResult =  histogram[aXBin + aYBin*numberBinsPerSide];
+    unsigned long* histogramPtr = (unsigned long*)[histogram bytes];
+    if(histogramPtr) theResult =  histogramPtr[aXBin + aYBin*numberBinsPerSide];
 	[dataSetLock unlock];
 	return theResult;
 }
@@ -175,9 +170,9 @@
 -(void)clear
 {
 	[dataSetLock lock];
-    if(histogram){
-        memset(histogram,0,numberBinsPerSide*numberBinsPerSide*sizeof(long));
-    }
+    [histogram release];
+    histogram = [[NSMutableData dataWithLength:numberBinsPerSide*numberBinsPerSide*sizeof(unsigned long)]retain];
+    
     minX = numberBinsPerSide;
     maxX = 0;
     minY = numberBinsPerSide;
@@ -202,10 +197,10 @@
 
 
 #pragma mark ¥¥¥Data Source Methods
-- (unsigned long*) getDataSetAndNumBinsPerSize:(unsigned short*)value
+- (NSData*) getDataSetAndNumBinsPerSize:(unsigned short*)value
 {
     *value = numberBinsPerSide;
-    return histogram;
+    return [[histogram retain] autorelease];
     
 }
 
@@ -228,11 +223,12 @@
         [self setNumberBinsPerSide:(unsigned short)pow((double)num,.5)];
     }
 	[dataSetLock lock];
-	if(histogram){
+    unsigned long* hitogramPtr = (unsigned long*)[histogram bytes];
+	if(hitogramPtr){
 		int i;
 		for(i=0;i<num;i++){
-			histogram[i] += ptr[i];
-			if(histogram[i]){
+			hitogramPtr[i] += ptr[i];
+			if(hitogramPtr[i]){
 				unsigned short y = i/numberBinsPerSide;
 				unsigned short x = i%numberBinsPerSide;
 				
@@ -254,10 +250,11 @@
     }
 	if(histogram){
 		[dataSetLock lock];
+        unsigned long* histogramPtr = (unsigned long*)[histogram bytes];
 		int i;
 		for(i=0;i<num;i++){
-			histogram[i] = ptr[i];
-			if(histogram[i]){
+			histogramPtr[i] = ptr[i];
+			if(histogramPtr[i]){
 				unsigned short y = i/numberBinsPerSide;
 				unsigned short x = i%numberBinsPerSide;
 				
@@ -283,8 +280,9 @@
     if(aYValue >= numberBinsPerSide) aYValue = numberBinsPerSide-1;
     //aXValue = aXValue % numberBinsPerSide;   // Error Check Our x Value
     //aYValue = aYValue % numberBinsPerSide;   // Error Check Our y Value
-	if(histogram){
-		++histogram[aXValue+aYValue*numberBinsPerSide];
+    unsigned long* histogramPtr = (unsigned long*)[histogram bytes];
+	if(histogramPtr){
+		++histogramPtr[aXValue+aYValue*numberBinsPerSide];
 	}
     [self incrementTotalCounts];
     if(aXValue<minX)minX = aXValue;
@@ -304,8 +302,9 @@
     if(aYValue >= numberBinsPerSide) aYValue = numberBinsPerSide-1;
     //aXValue = aXValue % numberBinsPerSide;   // Error Check Our x Value
     //aYValue = aYValue % numberBinsPerSide;   // Error Check Our y Value
-    if(histogram){
-		histogram[aXValue+aYValue*numberBinsPerSide] = aZValue;
+    unsigned long* histogramPtr = (unsigned long*)[histogram bytes];
+    if(histogramPtr){
+		histogramPtr[aXValue+aYValue*numberBinsPerSide] = aZValue;
 	}
     [self incrementTotalCounts];
     if(aXValue<minX)minX = aXValue;
@@ -319,7 +318,8 @@
 
 - (void) sumX:(unsigned short)aXValue y:(unsigned short)aYValue z:(unsigned short)aZValue
 {
-    if(!histogram){
+    unsigned long* histogramPtr = (unsigned long*)[histogram bytes];
+    if(!histogramPtr){
         [self setNumberBinsPerSide:512]; //default
     }
 	[dataSetLock lock];
@@ -327,8 +327,8 @@
     if(aYValue >= numberBinsPerSide) aYValue = numberBinsPerSide-1;
     //aXValue = aXValue % numberBinsPerSide;   // Error Check Our x Value
     //aYValue = aYValue % numberBinsPerSide;   // Error Check Our y Value
-    if(histogram){
-		histogram[aXValue+aYValue*numberBinsPerSide] += aZValue;
+    if(histogramPtr){
+		histogramPtr[aXValue+aYValue*numberBinsPerSide] += aZValue;
 	}
     [self incrementTotalCounts];
     if(aXValue<minX)minX = aXValue;
@@ -353,7 +353,7 @@
 {
 	NSData* theRawData;
 	[dataSetLock lock];
-	theRawData =  [NSData dataWithBytes:histogram length:sizeof(long)*numberBinsPerSide*numberBinsPerSide];
+    theRawData = [NSData dataWithData:histogram];
 	[dataSetLock unlock];
 	return theRawData;
 }
@@ -396,9 +396,10 @@ static NSString *OR2DHistoNumberXBins	= @"OR2DHistoNumberXBins";
 	return rois;
 }
 
-- (unsigned long*) plotter:(id)aPlotter numberBinsPerSide:(unsigned short*)xValue
+- (NSData*) plotter:(id)aPlotter numberBinsPerSide:(unsigned short*)xValue
 {
-    return [self getDataSetAndNumBinsPerSize:xValue];
+    *xValue = numberBinsPerSide;
+    return [[histogram retain] autorelease];
 }
 
 - (void) plotter:(id)aPlotter xMin:(unsigned short*)aMinX xMax:(unsigned short*)aMaxX yMin:(unsigned short*)aMinY yMax:(unsigned short*)aMaxY

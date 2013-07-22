@@ -194,7 +194,7 @@
 }
 
 #pragma mark •••Data Source
-- (unsigned long*) plotter:(id)aPlotter numberBinsPerSide:(unsigned short*)xValue
+- (NSData*) plotter:(id)aPlotter numberBinsPerSide:(unsigned short*)xValue
 {
     return [model getDataSetAndNumBinsPerSize:xValue];
 }

@@ -31,11 +31,10 @@
     unsigned long       dataId;
     unsigned short      numberBinsPerSide;
     unsigned short      minX,maxX,minY,maxY;
-    unsigned long*      histogram; //actually a 2D array stuffed into a 1D
+    NSMutableData*     histogram; //actually a 2D array stuffed into a 1D
 	NSMutableArray*		rois;
 }
 
-- (void) freeHistogram;
 
 #pragma mark ¥¥¥Accessors
 - (unsigned long) dataId;
@@ -63,9 +62,9 @@
 
 #pragma mark ¥¥¥Data Source Methods
 - (id)   name;
-- (unsigned long*) getDataSetAndNumBinsPerSize:(unsigned short*)value;
+- (NSData*) getDataSetAndNumBinsPerSize:(unsigned short*)value;
 - (void) getXMin:(unsigned short*)aMinX xMax:(unsigned short*)aMaxX yMin:(unsigned short*)aMinY yMax:(unsigned short*)aMaxY;
-- (unsigned long*) plotter:(id)aPlotter numberBinsPerSide:(unsigned short*)xValue;
+- (NSData*) plotter:(id)aPlotter numberBinsPerSide:(unsigned short*)xValue;
 - (void) plotter:(id)aPlotter xMin:(unsigned short*)aMinX xMax:(unsigned short*)aMaxX yMin:(unsigned short*)aMinY yMax:(unsigned short*)aMaxY;
 @end
 

@@ -31,16 +31,13 @@
     self = [super init];
     numberBins = 4096;
     overFlow = 0;
-    histogram = nil;
     return self;    
 }
 
 - (void) dealloc
 {
-    if(histogram)free(histogram);
-    histogram = nil;
-    if(pausedHistogram)free(pausedHistogram);
-    pausedHistogram = nil;
+    [histogram release];
+    [pausedHistogram release];
 	[rois release];
     [super dealloc];
 }
@@ -53,12 +50,8 @@
 	[super setPaused:aPaused];
 	[dataSetLock lock];
 	if([self paused]){
-		if(pausedHistogram) {
-			free(pausedHistogram);
-			pausedHistogram = 0;
-		}
-		pausedHistogram = malloc(numberBins*sizeof(unsigned long));
-		if(pausedHistogram) memcpy(pausedHistogram,histogram,numberBins*sizeof(unsigned long));
+        [pausedHistogram release];
+        pausedHistogram = [[NSData dataWithData:histogram] retain];
 	}
 	[dataSetLock unlock];
 	
@@ -76,13 +69,9 @@
 -(void)setNumberBins:(int)aNumberBins
 {
 	[dataSetLock lock];
-    if(histogram) {
-        free(histogram);
-        histogram = 0;
-    }
+    [histogram release];
     numberBins = aNumberBins;
-    histogram = malloc(numberBins*sizeof(unsigned long));
-    if(histogram)memset(histogram,0,numberBins*sizeof(unsigned long));
+    histogram = [[NSMutableData dataWithLength:numberBins*sizeof(unsigned long)] retain];
 	[dataSetLock unlock];
 }
 
@@ -103,8 +92,8 @@
 	[dataSetLock lock];
 	
 	unsigned long* histogramPtr;
-	if([self paused])histogramPtr = pausedHistogram;
-	else histogramPtr = histogram;
+	if([self paused])histogramPtr = (unsigned long*)[pausedHistogram bytes];
+	else             histogramPtr = (unsigned long*)[histogram bytes];;
 	
 	if(aChan<numberBins)theValue = histogramPtr[aChan];
 	else theValue = 0;
@@ -117,7 +106,8 @@
 -(void)clear
 {
 	[dataSetLock lock];
-    memset(histogram,0,sizeof(unsigned long)*numberBins);
+    [histogram release];
+    histogram = [[NSMutableData dataWithLength:numberBins*sizeof(unsigned long)] retain];
     overFlow = 0;
     [self setTotalCounts:0];
 	[dataSetLock unlock];
@@ -128,9 +118,11 @@
 {
 	[dataSetLock lock];
     fprintf( aFile, "WAVES/I/N=(%d) '%s'\nBEGIN\n",numberBins,[shortName cStringUsingEncoding:NSASCIIStringEncoding]);
+    unsigned long* histogramPtr = (unsigned long*)[histogram bytes];
+    unsigned long n = [histogram length]/sizeof(unsigned long);
     int i;
-    for (i=0; i<numberBins; ++i) {
-        fprintf(aFile, "%ld\n",histogram[i]);
+    for (i=0; i<n; ++i) {
+        fprintf(aFile, "%ld\n",histogramPtr[i]);
     }
     fprintf(aFile, "END\n\n");
 	[dataSetLock unlock];
@@ -191,13 +183,14 @@
         [self setNumberBins:4096];
     }
 	[dataSetLock lock];
-	if(histogram){
+    unsigned long* histogramPtr = (unsigned long*)[histogram bytes];
+	if(histogramPtr){
 		if(aValue>=numberBins){
 			++overFlow;
-			++histogram[numberBins-1];
+			++histogramPtr[numberBins-1];
 		}
 		else {
-			++histogram[aValue];
+			++histogramPtr[aValue];
 		}
 	}
 	[dataSetLock unlock];
@@ -212,13 +205,14 @@
         [self setNumberBins:4096];
     }
 	[dataSetLock lock];
-	if(histogram){
+    unsigned long* histogramPtr = (unsigned long*)[histogram bytes];
+	if(histogramPtr){
 		if(aValue>=numberBins){
 			overFlow += aWeight;
-			histogram[numberBins-1] += aWeight;
+			histogramPtr[numberBins-1] += aWeight;
 		}
 		else {
-			histogram[aValue] += aWeight;
+			histogramPtr[aValue] += aWeight;
 		}
 	}
 	[dataSetLock unlock];
@@ -244,7 +238,9 @@
 {
 	[dataSetLock lock];
 	NSData* theData = nil;
-	if(histogram){
+    NSData* tempHistoryRef = [histogram retain];
+    unsigned long* histogramPtr = (unsigned long*)[tempHistoryRef bytes];
+	if(histogramPtr){
 		BOOL atLeastOne = NO;
 		unsigned long n = [self numberBins];
 		unsigned long theFirstOne = 0;
@@ -252,14 +248,14 @@
 		if(n>0){
 			unsigned long i;
 			for(i=0;i<n;i++){
-				if(histogram[i]!=0){
+				if(histogramPtr[i]!=0){
 					theFirstOne = i;
 					atLeastOne = YES;
 					break;
 				}
 			}
 			for(i=n-1;i>0;i--){
-				if(histogram[i]!=0){
+				if(histogramPtr[i]!=0){
 					theLastOne = i;
 					break;
 				}
@@ -268,7 +264,7 @@
 		if(atLeastOne){
 			*start = theFirstOne;
 			*end = theLastOne;
-			theData =  [NSData dataWithBytes:&histogram[theFirstOne] length:(theLastOne-theFirstOne+1)*sizeof(long)];
+			theData =  [NSData dataWithBytes:&histogramPtr[theFirstOne] length:(theLastOne-theFirstOne+1)*sizeof(long)];
 		}
 		else {
 			*start = 0;
@@ -278,23 +274,18 @@
 
 		}
 	}
+    [tempHistoryRef release];
 	[dataSetLock unlock];
 	return theData;
 }
 
 - (void) loadData:(NSData*)someData;
 {
-    if(!histogram){
-        [self setNumberBins:[someData length]/4];
-    }
 		
 	[dataSetLock lock];
-    
-	unsigned long* lPtr = (unsigned long*)[someData bytes];
-	int i;
-	if(histogram){
-		for(i=0;i<[someData length]/4;i++)histogram[i] = *lPtr++;
-	}
+    [histogram release];
+    histogram = [[NSMutableData dataWithData:someData] retain];
+    numberBins = [histogram length]/sizeof(unsigned long);
 	[dataSetLock unlock];
 	[self incrementTotalCounts];	
 }
@@ -306,9 +297,10 @@
     }
 	[dataSetLock lock];
     int i;
-	if(histogram){
+    unsigned long* histogramPtr = (unsigned long*)[histogram bytes];
+	if(histogramPtr){
 		for(i=0;i<numBins;i++){
-			histogram[i] += ptr[i];
+			histogramPtr[i] += ptr[i];
 		}
 	}
 	[dataSetLock unlock];
@@ -327,13 +319,15 @@
     }
 	[dataSetLock lock];
 	if(histogram){
+        unsigned long* histogramPtr = (unsigned long*)[histogram bytes];
 		int i,index;
 		for( (index=firstBin,i=0); i<numBins; (index+=stepSize,i++) ){
 			if(index>=numberBins){
 				overFlow += ptr[i];
-				histogram[numberBins-1] += ptr[i];
-			}else{
-				histogram[index] += ptr[i];
+				histogramPtr[numberBins-1] += ptr[i];
+			}
+            else {
+				histogramPtr[index] += ptr[i];
 			}
 		}
 	}
