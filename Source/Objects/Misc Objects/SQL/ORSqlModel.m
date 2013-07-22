@@ -114,6 +114,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	if(!stealthMode)[self removeMachineName];
+    [[ORSqlDBQueue queue]cancelAllOperations];
 	[[ORSqlDBQueue queue] waitUntilAllOperationsAreFinished];
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[super sleep];
@@ -1330,6 +1331,7 @@ Table: Histogram2Ds
 - (void) main
 {
 	@try {
+        if([self isCancelled])return;
 		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
 		if([sqlConnection isConnected]){
 			NSString* name			 = computerName();
@@ -1376,6 +1378,7 @@ Table: Histogram2Ds
 - (void) main
 {
 	@try {	
+        if([self isCancelled])return;
 		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
 		if([sqlConnection isConnected]){
 			[sqlConnection queryString:[NSString stringWithFormat:@"DELETE from machines where hw_address = %@",[sqlConnection quoteObject:macAddress()]]];
@@ -1392,6 +1395,7 @@ Table: Histogram2Ds
 - (void) main
 {
 	@try {	
+        if([self isCancelled])return;
 		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
 		if([sqlConnection isConnected]){
 			unsigned long uptime = (unsigned long)[[[NSApp delegate] memoryWatcher] accurateUptime];
@@ -1437,6 +1441,7 @@ Table: Histogram2Ds
 - (void) main
 {
 	@try {
+        if([self isCancelled])return;
 		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
 		if([sqlConnection isConnected]){
 			//get our machine id using our MAC Address
@@ -1503,6 +1508,7 @@ Table: Histogram2Ds
 - (void) main
 {
 	@try {
+        if([self isCancelled])return;
 		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
 		if([sqlConnection isConnected]){
 			//get our machine id using our MAC Address
@@ -1552,6 +1558,7 @@ Table: Histogram2Ds
 - (void) main
 {
 	@try {
+        if([self isCancelled])return;
 		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
 		if([sqlConnection isConnected]){
 			//get our machine id using our MAC Address
@@ -1601,6 +1608,7 @@ Table: Histogram2Ds
 - (void) main
 {
 	@try {
+        if([self isCancelled])return;
 		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
 		if([sqlConnection isConnected]){
 			//get our machine id using our MAC Address
@@ -1652,6 +1660,7 @@ Table: Histogram2Ds
 - (void) main
 {
 	@try {
+        if([self isCancelled])return;
 		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
 		if([sqlConnection isConnected]){
 			//get our machine_id using our MAC Address
@@ -1853,6 +1862,7 @@ Table: Histogram2Ds
 - (void) main
 {
 	@try {
+        if([self isCancelled])return;
 		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
 		if([sqlConnection isConnected]){
 			if([experiment isKindOfClass:NSClassFromString(@"ORExperimentModel")]) {
@@ -1935,6 +1945,7 @@ Table: Histogram2Ds
 - (void) main
 {
 	@try {			
+        if([self isCancelled])return;
 		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
 		if([sqlConnection isConnected]){
 			//get our machine_id using our MAC Address
@@ -1984,6 +1995,7 @@ Table: Histogram2Ds
 
 - (void) main
 {
+    if([self isCancelled])return;
 	ORExperimentModel* experiment = (ORExperimentModel*)[[delegate nextObject] retain];
 	@try {			
 		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
@@ -2046,6 +2058,7 @@ Table: Histogram2Ds
 - (void) main
 {
 	@try {
+        if([self isCancelled])return;
 		//get our machine_id using our MAC Address
 		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
 		if([sqlConnection isConnected]){		ORSqlResult* theResult  = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = %@",[sqlConnection quoteObject:macAddress()]]];

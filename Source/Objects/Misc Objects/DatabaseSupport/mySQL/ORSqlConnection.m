@@ -199,7 +199,8 @@
 - (ORSqlResult*) queryString:(NSString *) query
 {
 	ORSqlResult*	theResult = nil;
-        
+    if([query length]==0)return theResult;
+    
 	NSException* e;
 	@synchronized(self){
         if(mConnection){
