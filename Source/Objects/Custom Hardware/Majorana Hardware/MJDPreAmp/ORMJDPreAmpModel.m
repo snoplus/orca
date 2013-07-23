@@ -703,7 +703,7 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 		unsigned long adcBase[2] = {kADC1, kADC2};
 		
 		//unsigned long aValue = adcBase[index] | rangeValue[index][adcRange[index]];
-        unsigned long aValue = adcBase[aChip] | rangeValue[0][index]; // first register on chip
+        unsigned long aValue = adcBase[aChip] | rangeValue[0][index]; // first register on chip - niko
         [self writeAuxIOSPI:aValue];
         
         aValue = adcBase[aChip] | rangeValue[1][index]; // second register on chip
@@ -1070,7 +1070,7 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 #pragma mark ¥¥¥Alarms
 - (void) checkTempIsWithinLimits:(int)aChip value:(float)aTemperature
 {
-    float maxAllowedTemperature = 50; //<<-Nikko, set this or make a dialog field for it
+    float maxAllowedTemperature = 50; //<<-Niko, set this or make a dialog field for it
     if(aChip>=0 && aChip<2){
         if(aTemperature >= maxAllowedTemperature){
  			if(!temperatureAlarm[aChip]){

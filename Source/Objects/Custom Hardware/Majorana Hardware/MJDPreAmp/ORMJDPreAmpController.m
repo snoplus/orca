@@ -112,17 +112,17 @@
     
     //[[plotter0 yAxis] setRngLimitsLow:-300.0 withHigh:500 withMinRng:4];
     [[plotter0 yAxis] setRngLow:0.0 withHigh:300.];
-    [[plotter0 yAxis] setRngLimitsLow:-15. withHigh:0. withMinRng:4]; // rail of preamp at -11V - niko
+    [[plotter0 yAxis] setRngLimitsLow:-15. withHigh:0. withMinRng:4]; // rail of preamp at -12V - niko
     [[plotter1 yAxis] setRngLow:0.0 withHigh:300.];
-    [[plotter1 yAxis] setRngLimitsLow:-15. withHigh:0. withMinRng:4]; // rail of preamp at -11V - niko
+    [[plotter1 yAxis] setRngLimitsLow:-15. withHigh:0. withMinRng:4]; // rail of preamp at -12V - niko
     [[plotter2 yAxis] setRngLow:0.0 withHigh:300.];
     [[plotter2 yAxis] setRngLimitsLow:0.0 withHigh:60 withMinRng:4]; // up to 60 degrees on chip - niko
     [[plotter3 yAxis] setRngLow:0.0 withHigh:300.];
     [[plotter3 yAxis] setRngLimitsLow:-30. withHigh:30. withMinRng:4]; // up to +/-24V - niko
     [[plotter4 yAxis] setRngLow:0.0 withHigh:300.];
-    [[plotter4 yAxis] setRngLimitsLow:0.0 withHigh:150 withMinRng:4]; // up to 150 pA leakage current - niko
+    [[plotter4 yAxis] setRngLimitsLow:-50 withHigh:150 withMinRng:4]; // up to 150 pA leakage current - niko
     [[plotter5 yAxis] setRngLow:0.0 withHigh:300.];
-    [[plotter5 yAxis] setRngLimitsLow:0.0 withHigh:150 withMinRng:4]; // up to 150 pA leakage current - niko
+    [[plotter5 yAxis] setRngLimitsLow:-50 withHigh:150 withMinRng:4]; // up to 150 pA leakage current - niko
 
    
     [[plotter0 xAxis] setRngLow:0.0 withHigh:10000];
@@ -911,35 +911,24 @@
     int adc = [self tagToAdc:[aPlotter tag]];
     int count = [[model timeRate:adc] count];
     int index = count-i-1;
+    float multiplier = 1000.;
+    
+    // first stage output values
     *xValue = [[model timeRate:adc] timeSampledAtIndex:index];
     *yValue = [[model timeRate:adc] valueAtIndex:index];
-    
-    
-    
-    //if((adc < 5) || ((adc > 7) && (adc < 13))){ // first stage ouput values
 
-    //    *yValue = -multiplier*([[model timeRate:adc] valueAtIndex:index]-[model baselineVoltage:adc])/[model feedBackResistor:adc];
-        
-        //NSLog(@"channel %d, adc %f , baseline %f, Rf %f, current %f\n", adc, [[model timeRate:adc] valueAtIndex:index], [model baselineVoltage:adc], [model feedBackResistor:adc], *yValue );
-    //}
     
-    /*
-    if(adc > 15){//for leakage current
-        *yValue = - multiplier * ([[model timeRate:adc] valueAtIndex:index]);
+    if(adc > 15){ // leakage currents
+        
+        if(adc < 21){ //adc = adc - 16;
+            *yValue = -multiplier*([[model timeRate:adc-16] valueAtIndex:index]-[model baselineVoltage:adc-16])/[model feedBackResistor:adc-16];
+            //*yValue = 100.;
+            //NSLog(@"adc %d, value %f, baseline %f, resistor %f, current %f\n",adc,[[model timeRate:adc-16] valueAtIndex:index],[model baselineVoltage:adc-16],[model feedBackResistor:adc-16],*yValue);
+        }
+        else //adc = adc - 13;
+            *yValue = -multiplier*([[model timeRate:adc-13] valueAtIndex:index]-[model baselineVoltage:adc-13])/[model feedBackResistor:adc-13];
+            //*yValue = 100.;
     }
-    else
-     
-        *yValue = [[model timeRate:adc] valueAtIndex:index];
-        
-    */
-    
-
-    
-    //if(adc > 15) *yValue = 100.;
-    //else *yValue = [[model timeRate:adc] valueAtIndex:index];
-    
-    //NSLog(@"channel %d, adc %f , baseline %f, Rf %f, current %f\n", adc, [[model timeRate:adc] valueAtIndex:index], [model baselineVoltage:adc], [model feedBackResistor:adc], *yValue );
-
        
 }
 @end
