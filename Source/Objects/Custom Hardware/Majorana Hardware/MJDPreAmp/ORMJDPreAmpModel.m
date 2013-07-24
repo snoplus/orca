@@ -720,6 +720,8 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 {
 	[self readAdcsOnChip:0 verbose:verbose];
 	[self readAdcsOnChip:1 verbose:verbose];
+    [self readTempOnChip:0 verbose:verbose];
+	[self readTempOnChip:1 verbose:verbose];
 }
 
 - (void) readAdcsOnChip:(int)aChip verbose:(BOOL)verbose
@@ -745,7 +747,8 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
     //have to select a channel to be digitized, then the next time a selection is done the last channel can be read
     int i;
     unsigned long readBack;
-	for(i=0;i<8;i++){
+    //only read the first 7 channels - channel 8 is temperature, which has a different range
+	for(i=0;i<7;i++){
 		if(adcEnabledMask&(0x1<<((aChip*8)+i))){
 
 			int j;
@@ -1121,7 +1124,7 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 
 - (void) checkAdcIsWithinLimits:(int)anIndex value:(float)aValue
 {
-    if(anIndex != 5 || anIndex!=6 || anIndex!= 13 || anIndex!= 14)return;
+    if(anIndex != 5 && anIndex!=6 && anIndex!= 13 && anIndex!= 14)return;
     
     BOOL postAlarm = NO;
     NSString* alarmName;
@@ -1135,7 +1138,7 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
     }
     else if(anIndex == 6){
         alarmIndex = 1;
-        if(fabs(aValue - 12) >= 0.5){ //<---Niko, adjust this or make a dialog field
+        if(fabs(aValue + 12) >= 0.5){ //<---Niko, adjust this or make a dialog field
             alarmName = [NSString stringWithFormat:@"Preamp %lu -12V Supply",[self uniqueIdNumber]];
             postAlarm  = YES;
         }
@@ -1149,7 +1152,7 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
     }
     else if(anIndex == 14){
         alarmIndex = 3;
-        if(fabs(aValue - 24) >= 0.5){ //<---Niko, adjust this or make a dialog field
+        if(fabs(aValue + 24) >= 0.5){ //<---Niko, adjust this or make a dialog field
             alarmName = [NSString stringWithFormat:@"Preamp %lu -24V Supply",[self uniqueIdNumber]];
             postAlarm  = YES;
         }
