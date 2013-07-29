@@ -436,7 +436,13 @@ NSString* ORAdcModelHighConnection		= @"ORAdcModelHighConnection";
     if([hwObject respondsToSelector:@selector(dataForChannelValid:)]){
         isValid = [hwObject dataForChannelValid:[self bit]];
     }
-    if(isValid)return [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:[self hwValue]] forKey:[self iconLabel]];
+    if(isValid){
+        NSString* theName = [self iconLabel];
+        if([theName rangeOfString:@","].location!=NSNotFound){
+            theName = [theName stringByReplacingOccurrencesOfString:@"," withString:@"_"];
+        }
+        return [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:[self hwValue]] forKey:theName];
+    }
     else return nil;
 }
 @end
