@@ -50,10 +50,10 @@
     camera.aperture = 50;
     camera.rotPoint = gOrigin;
     
-    camera.viewPos.x = 0.0;
-    camera.viewPos.y = 0.0;
-    camera.viewPos.z = -10.0;
-    camera.viewDir.x = -camera.viewPos.x;
+    camera.viewPos.x = 3;
+    camera.viewPos.y = 0;
+    camera.viewPos.z = -10;
+    camera.viewDir.x = -2.5;
     camera.viewDir.y = -camera.viewPos.y;
     camera.viewDir.z = -camera.viewPos.z;
     
@@ -93,6 +93,7 @@
     glPopMatrix();
 }
 
+//result = v1 x v2
 - (void) crossProductVector1:(GLfloat*)v1 vector2:(GLfloat*)v2 result:(GLfloat*)result
 {
     result[0] = v1[1]*v2[2] - v1[2]*v2[1];
@@ -172,7 +173,6 @@
 	}
 	glEnd();
     
-    //glColor3f(1.0f,0.0f,0.0f);
 	//top strip
     glNormal3f(0,1,0);
 	glBegin(GL_QUAD_STRIP);
@@ -183,7 +183,6 @@
 	}
 	glEnd();
     
-	//glColor3f(1.0f,1.0f,0.0f);
 	//side strip: inner
 	glBegin(GL_TRIANGLE_STRIP);
     GLfloat result[3], point1[3], point2[3], point3[3];
@@ -260,12 +259,12 @@
 }
 
 - (void) draw3D:(NSRect)aRect
-{    
+{
     double rot = [delegate getRotation];
     double trans = [delegate getTrans];
     
-    glRotatef(170, 0.0f, 1.0f, 0.0f);/* orbit the Y axis */
-    glRotatef(45, 1.0f, 0.0f, 0.0f);/* orbit the X axis */
+    glRotatef(170, 0.0f, 1.0f, 0.0f); //orbit the Y axis
+    glRotatef(45, 1.0f, 0.0f, 0.0f); //orbit the X axis
 
     glClearColor(0.93f, 0.93f, 0.93f, 0.0f);
     
