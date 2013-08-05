@@ -124,6 +124,7 @@
 	NSMutableDictionary* okToBiasConstraints;
 	NSMutableDictionary* continuedBiasConstraints;
 	BOOL				 checkCF6Now;
+	BOOL				 couchPostScheduled;
 }
 
 #pragma mark ***Accessors

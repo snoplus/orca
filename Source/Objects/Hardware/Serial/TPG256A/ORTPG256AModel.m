@@ -50,6 +50,7 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 - (void) processOneCommandFromQueue;
 - (void) process_response:(NSString*)theResponse;
 - (void) pollPressures;
+- (void) postCouchDBRecord;
 @end
 
 @implementation ORTPG256AModel
@@ -609,9 +610,26 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollPressures) object:nil];
 	if(pollTime){
 		[self readPressures];
+        [self postCouchDBRecord];
 		[self performSelector:@selector(pollPressures) withObject:nil afterDelay:pollTime];
 	}
 }
 
+- (void) postCouchDBRecord
+{
+    NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
+                            [NSArray arrayWithObjects:
+                             [NSString stringWithFormat:@"%.2E",pressure[0]],
+                             [NSString stringWithFormat:@"%.2E",pressure[1]],
+                             [NSString stringWithFormat:@"%.2E",pressure[2]],
+                             [NSString stringWithFormat:@"%.2E",pressure[3]],
+                             [NSString stringWithFormat:@"%.2E",pressure[4]],
+                             [NSString stringWithFormat:@"%.2E",pressure[5]],
+                             [NSString stringWithFormat:@"%.2E",pressure[6]],
+                             nil],                                          @"processValue",
+                            [NSNumber numberWithInt:    pollTime],          @"pollTime",
+                            nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
+}
 
 @end

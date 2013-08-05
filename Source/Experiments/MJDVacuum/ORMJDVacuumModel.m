@@ -55,6 +55,7 @@
 - (ORVacuumValueLabel*) regionValueObj:(int)aRegion;
 - (BOOL) valueValidForRegion:(int)aRegion;
 - (BOOL) region:(int)aRegion valueHigherThan:(double)aValue;
+- (void) postCouchRecord;
 
 - (ORMks660BModel*)    findBaratron;
 - (ORRGA300Model*)     findRGA;
@@ -975,6 +976,50 @@ NSString* ORMJDVacuumModelConstraintsChanged		= @"ORMJDVacuumModelConstraintsCha
 			[aLabel setControlColor:regionColor[regionTag]];
 		}
 	}
+    
+    if(!couchPostScheduled){
+        couchPostScheduled = YES;
+        [self performSelector:@selector(postCouchRecord) withObject:nil afterDelay:5];
+    }
+}
+
+- (void)postCouchRecord
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(postCouchRecord) object:nil];
+
+    couchPostScheduled = NO;
+    NSMutableDictionary* values = [NSMutableDictionary dictionary];
+    NSMutableArray* regionColors = [NSMutableArray array];
+    int i;
+    for(i=0;i<kNumberPriorityRegions;i++){
+        NSArray* pipes = [self pipesForRegion:i];
+        for(id aPipe in pipes){
+            [regionColors addObject:[aPipe rgbString]];
+        }
+    }
+    
+    NSMutableArray* gvStates = [NSMutableArray array];
+    for(ORVacuumGateValve* aGateValve in [self gateValves]){
+        [gvStates addObject:[NSArray arrayWithObjects:
+                             [NSNumber numberWithInt:[aGateValve state]],
+                             [NSNumber numberWithInt:[aGateValve constraintCount]],
+                             nil]];
+    }
+    
+    NSMutableArray* valueLabels = [NSMutableArray array];
+    for(ORVacuumStatusLabel* aLabel in [self statusLabels]){
+        [valueLabels addObject:[NSArray arrayWithObjects:[aLabel label],[aLabel displayString],nil]];
+    }
+    for(ORVacuumDynamicLabel* aLabel in [self valueLabels]){
+        [valueLabels addObject:[NSArray arrayWithObjects:[aLabel label],[aLabel displayString],nil]];
+    }
+    
+    [values setObject: valueLabels         forKey:@"DynamicLabels"];
+    [values setObject: regionColors         forKey:@"RegionColors"];
+    [values setObject: gvStates             forKey:@"GateValves"];
+    [values setObject: [NSNumber numberWithBool:[self detectorsBiased]] forKey:@"DetectorsBiased"];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
 }
 
 - (void) colorRegionsConnectedTo:(int)aRegion withColor:(NSColor*)aColor

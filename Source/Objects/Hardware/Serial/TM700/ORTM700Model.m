@@ -76,6 +76,7 @@ NSString* ORTM700ConstraintsChanged			= @"ORTM700ConstraintsChanged";
 - (NSString*) extractString:(NSString*)aCommand;
 - (void)	pollHardware;
 - (void)	clearDelay;
+- (void)    postCouchDBRecord;
 @end
 
 @implementation ORTM700Model
@@ -765,6 +766,28 @@ NSString* ORTM700ConstraintsChanged			= @"ORTM700ConstraintsChanged";
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
 	[self updateAll];
+    [self postCouchDBRecord];
 	[self performSelector:@selector(pollHardware) withObject:nil afterDelay:pollTime];
+}
+
+- (void) postCouchDBRecord
+{
+    
+    NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
+                            [NSNumber numberWithBool:   stationPower],      @"stationPower",
+                            [NSNumber numberWithBool:   motorPower],        @"motorPower",
+                            [NSNumber numberWithInt:    setRotorSpeed],     @"setRotorSpeed",
+                            [NSNumber numberWithInt:    actualRotorSpeed],  @"actualRotorSpeed",
+                            [NSNumber numberWithFloat:  motorCurrent],      @"motorCurrent",
+                            [NSNumber numberWithBool:   driveUnitOverTemp], @"driveUnitOverTemp",
+                            [NSNumber numberWithBool:   turboPumpOverTemp], @"turboPumpOverTemp",
+                            [NSNumber numberWithInt:    runUpTime],         @"runUpTime",
+                            [NSNumber numberWithInt:    pollTime],          @"pollTime",
+                            [NSArray arrayWithObjects:
+                                [NSNumber numberWithBool:speedAttained],
+                                speedAttained?@"True":@"False",
+                             nil], @"processValue",
+                            nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
 }
 @end

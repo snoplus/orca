@@ -130,6 +130,7 @@
         float   sensitivityFactor;
 		NSMutableDictionary* filamentConstraints;
 		NSMutableDictionary* cemConstraints;
+        BOOL scheduledForCouchPost;
 }
 
 #pragma mark •••Initialization

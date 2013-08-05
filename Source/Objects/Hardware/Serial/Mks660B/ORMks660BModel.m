@@ -51,6 +51,7 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 - (BOOL) decodePressure:(NSString*)theResponse;
 - (BOOL) decodeFullScale:(NSString*)theResponse;
 - (BOOL) decodeHysteresis:(NSString*)theResponse;
+- (void) postCouchDBRecord;
 @end
 
 @implementation ORMks660BModel
@@ -573,11 +574,12 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
 	
 	[self readPressure];
-		
+    [self postCouchDBRecord];
 	if(pollTime!=0){
 		[self performSelector:@selector(pollHardware) withObject:nil afterDelay:pollTime];
 	}
 }
+
 #pragma mark •••Adc Processing Protocol
 - (void) processIsStarting
 {
@@ -674,6 +676,15 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 
 @implementation ORMks660BModel (private)
 
+- (void) postCouchDBRecord
+{
+    NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
+                            [NSNumber numberWithFloat:pressure],  @"pressure",
+                            [NSNumber numberWithInt:  pollTime],  @"pollTime",
+                            [NSArray arrayWithObjects:[NSNumber numberWithFloat:pressure],nil], @"processValue",
+                           nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
+}
 
 - (void) clearDelay
 {

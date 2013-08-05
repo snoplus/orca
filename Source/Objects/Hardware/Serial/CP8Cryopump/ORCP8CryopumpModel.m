@@ -80,6 +80,7 @@ NSString* ORCP8CryopumpModelConstraintsChanged				= @"ORCP8CryopumpModelConstrai
 - (void) process_response:(NSString*)theResponse;
 - (unsigned char) checkSum:(NSString*)aCmd;
 - (void) clearDelay;
+- (void) postCouchDBRecord;
 @end
 
 @implementation ORCP8CryopumpModel
@@ -1062,6 +1063,7 @@ NSString* ORCP8CryopumpModelConstraintsChanged				= @"ORCP8CryopumpModelConstrai
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
 
 	[self readAllHardware];
+    [self postCouchDBRecord];
 
 	if(pollTime!=0){
 		[self performSelector:@selector(pollHardware) withObject:nil afterDelay:pollTime];
@@ -1144,7 +1146,39 @@ NSString* ORCP8CryopumpModelConstraintsChanged				= @"ORCP8CryopumpModelConstrai
 @end
 
 @implementation ORCP8CryopumpModel (private)
+- (void) postCouchDBRecord
+{
+    NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
+                            [NSNumber numberWithInt:  pollTime],                @"pollTime",
+                            [NSNumber numberWithInt:  secondStageTempControl],  @"secondStageTempControl",
+                            [NSNumber numberWithBool:  roughingInterlock],      @"roughingInterlock",
+                            [NSNumber numberWithBool:  standbyMode],            @"standbyMode",
+                            [NSNumber numberWithInt:  repurgeTime],             @"repurgeTime",
+                            [NSNumber numberWithInt:  pumpsPerCompressor],      @"pumpsPerCompressor",
+                            [NSNumber numberWithInt:  restartTemperature],      @"restartTemperature",
+                            [NSNumber numberWithInt:  rateOfRiseCycles],        @"rateOfRiseCycles",
+                            [NSNumber numberWithInt:  rateOfRise],              @"rateOfRise",
+                            [NSNumber numberWithInt:  roughToPressure],         @"roughToPressure",
+                            
+                            [NSNumber numberWithInt:  repurgeCycles],           @"repurgeCycles",
+                            [NSNumber numberWithInt:  extendedPurgeTime],       @"extendedPurgeTime",
+                            [NSNumber numberWithInt:  pumpRestartDelay],        @"pumpRestartDelay",
+                            [NSNumber numberWithInt:  regenerationStartDelay],  @"regenerationStartDelay",
+                            [NSNumber numberWithInt:  powerFailureRecovery],    @"powerFailureRecovery",
+                            [NSNumber numberWithInt:  roughToPressure],         @"roughToPressure",
 
+                            [NSNumber numberWithInt:  powerFailureRecovery],    @"powerFailureRecovery",
+                            [NSNumber numberWithInt:  lastRateOfRaise],         @"lastRateOfRaise",
+                            [NSNumber numberWithInt:  firstStageControlMethod], @"firstStageControlMethod",
+                            [NSNumber numberWithInt:  firstStageControlTemp],   @"firstStageControlTemp",
+                            [NSArray arrayWithObjects:
+                                 [NSNumber numberWithInt:roughValveStatus],
+                                 [NSNumber numberWithInt:purgeStatus],
+                                 [self auxStatusString:0],
+                              nil],                                             @"processValue",
+                            nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
+}
 
 - (void) clearDelay
 {

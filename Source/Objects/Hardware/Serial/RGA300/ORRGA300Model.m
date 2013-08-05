@@ -114,11 +114,13 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 - (void) setCurrentAmuIndex:(int)aValue;
 - (void) setScanData:(NSData*)aScanData;
 - (void) addTableData:(NSData*)data;
+- (void) postCouchDBRecord;
 @end
 
 @implementation ORRGA300Model
 - (void) dealloc
 {
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
     [scanData release];
 	[inComingData release];
 	[amus release];
@@ -128,6 +130,7 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 
 - (void)sleep
 {
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
     [super sleep];
 }
 
@@ -450,6 +453,7 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
     [encoder encodeInt:ionizerIonEnergy			forKey:@"ionizerIonEnergy"];
     [encoder encodeFloat:ionizerEmissionCurrent	forKey:@"ionizerEmissionCurrent1"];
     [encoder encodeObject:amus					forKey:@"amus"];
+    [self postCouchDBRecord];
 }
 
 #pragma mark •••Commands
@@ -589,6 +593,7 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 {
 	[self addCmdToQueue:@"FL0"];
 	[self addCmdToQueue:@"FL?"];
+
 }
 
 - (void) sendIonizerParameters 
@@ -765,6 +770,29 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 @end
 
 @implementation ORRGA300Model (private)
+- (void) postCouchDBRecord
+{
+    scheduledForCouchPost = NO;
+    NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
+                            [NSNumber numberWithInt:    99999999999],               @"pollTime", //force nearly infinite valid time
+                            [NSNumber numberWithBool:  [serialPort isOpen]],        @"portOpen",
+                            [NSNumber numberWithFloat:  elecMultGain],              @"elecMultGain",
+                            [NSNumber numberWithInt:    opMode],                    @"opMode",
+                            [NSNumber numberWithFloat:  elecMultGain],              @"elecMultGain",
+                            [NSNumber numberWithInt:    noiseFloorSetting],         @"noiseFloorSetting",
+                            [NSNumber numberWithInt:    ionizerElectronEnergy],     @"ionizerElectronEnergy",
+                            [NSNumber numberWithInt:    ionizerDegassTime],         @"ionizerDegassTime",
+                            [NSNumber numberWithInt:    elecMultHVBias],            @"elecMultHVBias",
+                            [NSNumber numberWithInt:    ionizerFocusPlateVoltage],  @"ionizerFocusPlateVoltage",
+                            [NSNumber numberWithInt:    ionizerIonEnergy],          @"ionizerIonEnergy",
+                            [NSNumber numberWithFloat:  ionizerEmissionCurrent],    @"ionizerEmissionCurrent",
+                            
+                            [NSArray arrayWithObjects:
+                             [self auxStatusString:0],
+                             nil],                                                  @"processValue",
+                            nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
+}
 
 - (void) setCurrentAmuIndex:(int)aValue
 {
@@ -857,6 +885,10 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 			[self processOneCommandFromQueue];
 		}
 	}
+    if(!scheduledForCouchPost){
+        scheduledForCouchPost = YES;
+        [self performSelector:@selector(postCouchDBRecord) withObject:nil afterDelay:5];
+    }
 }
 
 - (void) processReceivedString:(NSString*)aString
