@@ -1020,6 +1020,7 @@ NSString* ORMJDVacuumModelConstraintsChanged		= @"ORMJDVacuumModelConstraintsCha
     [values setObject: [NSNumber numberWithBool:[self detectorsBiased]] forKey:@"DetectorsBiased"];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
+    [self performSelector:@selector(postCouchRecord) withObject:nil afterDelay:5];
 }
 
 - (void) colorRegionsConnectedTo:(int)aRegion withColor:(NSColor*)aColor
