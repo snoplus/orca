@@ -774,7 +774,7 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 {
     scheduledForCouchPost = NO;
     NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
-                            [NSNumber numberWithInt:    99999999999],               @"pollTime", //force nearly infinite valid time
+                            [NSNumber numberWithInt:    999999],               @"pollTime", //force nearly infinite valid time
                             [NSNumber numberWithBool:  [serialPort isOpen]],        @"portOpen",
                             [NSNumber numberWithFloat:  elecMultGain],              @"elecMultGain",
                             [NSNumber numberWithInt:    opMode],                    @"opMode",
