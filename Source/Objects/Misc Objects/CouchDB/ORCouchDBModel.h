@@ -62,6 +62,8 @@
 - (void) statusLogChanged:(NSNotification*)aNote;
 - (void) runStarted:(NSNotification*)aNote;
 - (void) runStopped:(NSNotification*)aNote;
+- (void) addObjectValueRecord:(NSNotification*)aNote;
+- (void) addObject:(OrcaObject*)anObj valueDictionary:(NSDictionary*)aDictionary;
 
 #pragma mark ***Accessors
 - (int) changedCount;

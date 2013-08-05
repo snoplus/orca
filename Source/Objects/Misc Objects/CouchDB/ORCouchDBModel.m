@@ -216,8 +216,13 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 	[notifyCenter addObserver : self
 					 selector : @selector(processElementStateChanged:)
 						 name : ORProcessElementStateChangedNotification
-					   object : nil];	
-	
+					   object : nil];
+
+    [notifyCenter addObserver : self
+					 selector : @selector(addObjectValueRecord:)
+						 name : @"ORCouchDBAddObjectRecord"
+					   object : nil];
+    
 }
 
 - (void) applicationIsTerminating:(NSNotification*)aNote
@@ -1078,6 +1083,43 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 - (void) runOptionsOrTimeChanged:(NSNotification*)aNote
 {
 	[self updateRunState:[aNote object]];
+}
+
+- (void) addObjectValueRecord:(NSNotification*)aNote
+{
+    [self addObject:[aNote object] valueDictionary:[aNote userInfo]];
+}
+
+- (void) addObject:(OrcaObject*)anObj valueDictionary:(NSDictionary*)aDictionary
+{
+ //these are special records that any object can insert into the database via this notification
+ //the userInfo should just be a dictionary that you want to go into the database
+        
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    dateFormatter.dateFormat = @"yyyy/MM/dd HH:mm:ss";
+    
+    NSTimeZone* gmt = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];
+    [dateFormatter setTimeZone:gmt];
+    NSString*   lastTimeStamp       = [dateFormatter stringFromDate:[NSDate date]];
+    NSDate*     gmtTime             = [dateFormatter dateFromString:lastTimeStamp];
+    unsigned long secondsSince1970  = [gmtTime timeIntervalSince1970];
+    [dateFormatter release];
+    
+    NSString* anId = [anObj fullID];
+    if([anId length] && aDictionary){
+        if(![lastTimeStamp length]) lastTimeStamp = @"0";
+        
+        NSMutableDictionary* aRecord = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                            anId,           @"name",
+                                            anId,			@"title",
+                                            lastTimeStamp,	@"timestamp",
+                                            [NSNumber numberWithUnsignedLong: secondsSince1970],		@"time",
+                                            nil];
+        
+        [aRecord addEntriesFromDictionary:aDictionary];
+        [[self statusDBRef] updateDocument:aRecord documentId:anId tag:kDocumentAdded];
+    }
+
 }
 
 - (void) updateRunInfo
