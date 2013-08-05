@@ -6365,8 +6365,8 @@
 				F51E693F03AE4775015F64B1 /* Source */,
 				2A37F4B8FDCFA73011CA2CEA /* Resources */,
 				84F7FB520AE5558900A5AA4C /* Libraries */,
-				2A37F4C3FDCFA73011CA2CEA /* Frameworks */,
 				19C28FB0FE9D524F11CA2CBB /* Products */,
+				2A37F4C3FDCFA73011CA2CEA /* Frameworks */,
 				8434A363055B3288002D3102 /* Info.plist */,
 			);
 			name = Orca;
@@ -16269,7 +16269,7 @@
 					"-lnetsnmp",
 				);
 				PRODUCT_NAME = Orca;
-				SDKROOT = "";
+				SDKROOT = macosx10.7;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wmost";
 				WRAPPER_EXTENSION = app;
@@ -16341,7 +16341,7 @@
 					"-lz",
 				);
 				PRODUCT_NAME = Orca;
-				SDKROOT = macosx;
+				SDKROOT = macosx10.7;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wmost";
 				WRAPPER_EXTENSION = app;
@@ -16409,7 +16409,7 @@
 					"-lz",
 				);
 				PRODUCT_NAME = Orca;
-				SDKROOT = macosx;
+				SDKROOT = macosx10.7;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wmost";
 				WRAPPER_EXTENSION = app;
