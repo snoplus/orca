@@ -116,10 +116,12 @@ typedef struct  {
 	NSPoint startPt;
 	NSPoint endPt;
 	NSColor* regionColor;
+    NSString* rgbString;
 }
 @property (nonatomic,assign) NSPoint startPt;
 @property (nonatomic,assign) NSPoint endPt;
 @property (nonatomic,retain) NSColor* regionColor;
+@property (nonatomic,copy)   NSString* rgbString;
 - (id) initWithDelegate:(id)aDelegate regionTag:(int)aTag startPt:(NSPoint)aStartPt endPt:(NSPoint)anEndPt;
 @end
 

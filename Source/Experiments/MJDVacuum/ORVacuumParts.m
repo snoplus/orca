@@ -53,12 +53,13 @@ NSString* ORVacuumConstraintChanged = @"ORVacuumConstraintChanged";
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
 @implementation ORVacuumPipe
-@synthesize startPt,endPt,regionColor;
+@synthesize startPt,endPt,regionColor,rgbString;
 - (id) initWithDelegate:(id)aDelegate regionTag:(int)aTag startPt:(NSPoint)aStartPt endPt:(NSPoint)anEndPt
 {
 	self = [super initWithDelegate:aDelegate partTag:aTag regionTag:aTag];
 	self.startPt		 = aStartPt;
 	self.endPt			 = anEndPt;
+	self.rgbString       = @"eeeeee";
 	self.regionColor = [NSColor lightGrayColor]; //default
 	[self normalize];
 	return self;
@@ -67,6 +68,7 @@ NSString* ORVacuumConstraintChanged = @"ORVacuumConstraintChanged";
 - (void) dealloc
 {
 	self.regionColor = nil;
+	self.rgbString   = nil;
 	[super dealloc];
 }
 
@@ -76,6 +78,14 @@ NSString* ORVacuumConstraintChanged = @"ORVacuumConstraintChanged";
 		[aColor retain];
 		[regionColor release];
 		regionColor = aColor;
+        
+        //also store as rbg string for couchdb records
+        float red,green,blue,alpha;
+        NSColor* convertedColor = [aColor colorUsingColorSpaceName:NSDeviceRGBColorSpace];
+        [convertedColor getRed:&red green:&green blue:&blue alpha:&alpha];
+        self.rgbString = [NSString stringWithFormat:@"#%02x%02x%02x",(int)(red*255),(int)(green*255),(int)(blue*255)];
+
+        
 		[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORVacuumPartChanged object:dataSource];
 	}
 	
