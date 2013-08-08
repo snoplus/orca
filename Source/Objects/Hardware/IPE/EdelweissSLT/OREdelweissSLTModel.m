@@ -2415,7 +2415,7 @@ for(l=0;l<2500;l++){
    return 0;
 }
 
-//this uses a general read command
+//this uses a general write command
 - (int)          writeToCmdFIFO:(char*)data numBytes:(int) numBytes
 {
 

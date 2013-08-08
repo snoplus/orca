@@ -837,11 +837,13 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelFiberSelectForBBAccessChanged object:self];
 }
 
+
+//relais state now contains: ref, ADC1..4,relais1/2,mez1/2
 - (int) relaisStatesBBForFiber:(int)aFiber
 {
     //return relaisStatesBB;
     int off = kBBstatusRelais;
-    uint16_t mask = 0x0007;
+    uint16_t mask = 0xffff;
     int shift = 0;
     uint16_t currVal = [self statusBB16forFiber: aFiber atIndex: off];
     return (currVal & mask) >> shift;
@@ -854,7 +856,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [[[self undoManager] prepareWithInvocationTarget:self] setRelaisStatesBBForFiber: aFiber to: oldVal];
     
     int off = kBBstatusRelais;
-    uint16_t mask = 0x0007;
+    uint16_t mask = 0xffff;
     int shift = 0;
     
     //set new value
@@ -876,6 +878,112 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [self sendWCommandIdBB:idBB cmd:cmd arg1:arg1  arg2: arg2];
 
 }
+
+
+- (int) refForBBAccessForFiber:(int)aFiber
+{
+    int currVal = [self relaisStatesBBForFiber:aFiber];
+    uint16_t mask = kBBRefMask;
+    int shift = kBBRefShift;
+    return (currVal & mask) >> shift;
+}
+
+- (void) setRefForBBAccessForFiber:(int)aFiber to:(int)aValue
+{
+    int off = kBBstatusRelais;
+    uint16_t mask = kBBRefMask;
+    int shift = kBBRefShift;
+    //set new value
+    [self setStatusBB16forFiber:aFiber atOffset:off index:0 mask:mask shift:shift to:aValue];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelRelaisStatesBBChanged object:self];
+}
+
+- (int) adcOnOffForBBAccessForFiber:(int)aFiber
+{
+    #if 0
+    int currVal = [self relaisStatesBBForFiber:aFiber];
+    uint16_t mask = kBBADCMask;
+    int shift = kBBADCShift;
+    return (currVal & mask) >> shift;
+    #else
+    int off = kBBstatusRelais;
+    uint16_t mask = kBBADCMask;
+    int shift = kBBADCShift;
+    return [self statusBB16forFiber:aFiber atOffset:off index:0 mask:mask shift:shift];
+    #endif
+}
+
+- (void) setAdcOnOffForBBAccessForFiber:(int)aFiber to:(int)aValue
+{
+    int off = kBBstatusRelais;
+    uint16_t mask = kBBADCMask;
+    int shift = kBBADCShift;
+    //set new value
+    [self setStatusBB16forFiber:aFiber atOffset:off index:0 mask:mask shift:shift to:aValue];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelRelaisStatesBBChanged object:self];
+}
+
+
+- (int) relais1ForBBAccessForFiber:(int)aFiber
+{
+    int off = kBBstatusRelais;
+    uint16_t mask = kBBRelais1Mask;
+    int shift = kBBRelais1Shift;
+    return [self statusBB16forFiber:aFiber atOffset:off index:0 mask:mask shift:shift];
+}
+
+- (void) setRelais1ForBBAccessForFiber:(int)aFiber to:(int)aValue
+{
+    int off = kBBstatusRelais;
+    uint16_t mask = kBBRelais1Mask;
+    int shift = kBBRelais1Shift;
+    //set new value
+    [self setStatusBB16forFiber:aFiber atOffset:off index:0 mask:mask shift:shift to:aValue];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelRelaisStatesBBChanged object:self];
+}
+
+- (int) relais2ForBBAccessForFiber:(int)aFiber
+{
+    int off = kBBstatusRelais;
+    uint16_t mask = kBBRelais2Mask;
+    int shift = kBBRelais2Shift;
+    return [self statusBB16forFiber:aFiber atOffset:off index:0 mask:mask shift:shift];
+}
+
+- (void) setRelais2ForBBAccessForFiber:(int)aFiber to:(int)aValue
+{
+    int off = kBBstatusRelais;
+    uint16_t mask = kBBRelais2Mask;
+    int shift = kBBRelais2Shift;
+    //set new value
+    [self setStatusBB16forFiber:aFiber atOffset:off index:0 mask:mask shift:shift to:aValue];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelRelaisStatesBBChanged object:self];
+}
+
+- (int) mezForBBAccessForFiber:(int)aFiber
+{
+    int off = kBBstatusRelais;
+    uint16_t mask = kBBMezMask;
+    int shift = kBBMezShift;
+    return [self statusBB16forFiber:aFiber atOffset:off index:0 mask:mask shift:shift];
+}
+
+- (void) setMezForBBAccessForFiber:(int)aFiber to:(int)aValue
+{
+    int off = kBBstatusRelais;
+    uint16_t mask = kBBMezMask;
+    int shift = kBBMezShift;
+    //set new value
+    [self setStatusBB16forFiber:aFiber atOffset:off index:0 mask:mask shift:shift to:aValue];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelRelaisStatesBBChanged object:self];
+}
+
+
 
 
 

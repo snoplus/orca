@@ -168,6 +168,7 @@ extern int (*sendChargeBBStatusFunctionPtr)(uint32_t prog_status,int numFifo);
 //for testing :int (*sendChargeBBStatusFunctionPtr)(uint32_t prog_status,int numFifo) = (int (*)(uint32_t ,int ))23;
 
 void sendCommandFifo(unsigned char * buffer, int len);
+void sendCommandFifoUnblockFiber(unsigned char * buffer, int len, int flt, int fiber);
 void envoie_commande_standard_BBv2(void);
 //void envoie_commande_horloge(void);
 void envoie_commande_horloge(int X, int Retard, int Masque_BB, int Code_acqui, int Code_synchro, int Nb_mots_lecture);

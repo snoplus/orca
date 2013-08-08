@@ -236,6 +236,16 @@
 - (int) relaisStatesBBForFiber:(int)aFiber;
 - (void) setRelaisStatesBBForFiber:(int)aFiber to:(int)aRelaisStatesBB;
 - (void) writeRelaisStatesForBBAccessForFiber:(int)aFiber;//HW access Relais
+- (int) refForBBAccessForFiber:(int)aFiber;
+- (void) setRefForBBAccessForFiber:(int)aFiber to:(int)aValue;
+- (int) adcOnOffForBBAccessForFiber:(int)aFiber;
+- (void) setAdcOnOffForBBAccessForFiber:(int)aFiber to:(int)aValue;
+- (int) relais1ForBBAccessForFiber:(int)aFiber;
+- (void) setRelais1ForBBAccessForFiber:(int)aFiber to:(int)aValue;
+- (int) relais2ForBBAccessForFiber:(int)aFiber;
+- (void) setRelais2ForBBAccessForFiber:(int)aFiber to:(int)aValue;
+- (int) mezForBBAccessForFiber:(int)aFiber;
+- (void) setMezForBBAccessForFiber:(int)aFiber to:(int)aValue;
 
 - (int) polarDacForFiber:(int)aFiber atIndex:(int)aIndex;  // DAC = polar_dac (cew_control name)
 - (void) setPolarDacForFiber:(int)aFiber atIndex:(int)aIndex to:(int)aDacValue;

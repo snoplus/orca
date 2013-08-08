@@ -644,12 +644,28 @@ Structure_trame_status;
 #define kBBstatusFilter   12
 #define kBBstatusADCValue 18
 #define kBBstatusDAC      24
-#define kBBstatusRelais   36
+#define kBBstatusRelais   36  //this contains now: ref, ADC 1..4 on/off, relais 1, relais 2, mez. 1, mez. 2
 #define kBBstatusRefDAC   37  //????
 #define kBBstatusTri      38
 #define kBBstatusRect     44
 #define kBBstatusRetard   50
 
+//bit fields
+//for #define kBBstatusRelais   36  //this contains now: ref, ADC 1..4 on/off, relais 1, relais 2, mez. 1, mez. 
+#define kBBRefMask        0x1
+#define kBBRefShift       0
+#define kBBADCMask        0x1e
+#define kBBADCShift       1    //ADC 1..4
+#define kBBRelais1Mask    0x60  //ADC 1..4
+#define kBBRelais1Shift   5
+#define kBBRelais2Mask    0x180
+#define kBBRelais2Shift   7
+#define kBBMezMask        0x600
+#define kBBMezShift       9
+//#define kBBMez1Mask       0x200
+//#define kBBMez1Shift      9
+//#define kBBMez2Mask       0x400
+//#define kBBMez2Shift      10
 
 
 //-----------------------------------------------------------------------------------------------------------tb-

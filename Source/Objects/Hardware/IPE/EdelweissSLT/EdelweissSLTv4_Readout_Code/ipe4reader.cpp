@@ -2019,6 +2019,73 @@ void populateIPECrateStatusPacket()
 }
 
 /*--------------------------------------------------------------------
+ *    function:     tools for handleKCommand
+ *    purpose:      
+ *
+ *
+ *    author:        Till Bergmann, 2013
+ *
+ *--------------------------------------------------------------------*/ //-tb-
+void parse_sendBBCmd_string(char *buffer, unsigned char* cmdbuf, int* lencmdbuf, int* flt, int* fiber)
+{
+    //scan strings of format: KWC_sendBBCmd_0xAA_0xBB_0xCC_ ...(up to 255 values) ..._0xZZ_FLT_0xNN_FIBER_0xMM
+    //example:
+    //    KWC_sendBBCmd_0xAA_0xBB_0xCC_0xCC_0x01_9
+    //    KWC_sendBBCmd_0xAA_0xBB_0xCC_0xCC_0x01_9_FLT_1_FIBER_2
+    *flt=-1;
+    *fiber=-1;
+    
+    char *foundPos=0;
+
+    //first value is dummy (is usually 'W' or 'h' and is ignored)
+    cmdbuf[0]=0;
+    *lencmdbuf=1;
+
+    
+    char *startptr, *endptr;
+    unsigned long value;
+    unsigned char ch;
+    int i;
+    foundPos=strstr(buffer,"sendBBCmd");
+    startptr=foundPos+sizeof("sendBBCmd");// accept other delimiter than '_'
+    for(i=1; i<256; i++){
+        if((*(startptr-1)=='\0') || (*startptr=='\0')) break; //{ printf("end of conversion2!\n"); break; }
+        errno=0;
+        value = strtoul((const char *)startptr,&endptr,0);
+        //printf("%i: value is %i!  (errno:%i, EINVAL:%i, startptr:%p, endptr:%p,   *lencmdbuf:%i)\n",i,value,errno,EINVAL,startptr,endptr,*lencmdbuf);
+        if(startptr==endptr) break; //{ printf("end of conversion3!\n"); break; }
+        ch=value;
+        cmdbuf[i]=ch;
+        if(errno==EINVAL) break; //{ printf("end of conversion4!\n"); break; }
+        (*lencmdbuf)++;
+        startptr=endptr+1;// accept other delimiter than '_'
+    //printf("---2  startptr:%s\n",startptr);
+    }
+
+    //printf("end of conversion, found %i items (and one dummy item at index 0) !\n",*lencmdbuf  -1); 
+    
+    foundPos=strcasestr(buffer,"FLT");
+    if(foundPos){
+        foundPos+=sizeof("FLT");
+        if((*(foundPos-1)!='\0') || (*foundPos!='\0')) value = strtoul((const char *)foundPos,&endptr,0);
+        if(foundPos==endptr) {} //{ printf("end of conversion3!\n"); }
+        else *flt = value;
+    }
+    //printf("FLT is %i!\n",*flt);
+    
+    foundPos=strcasestr(buffer,"FIBER");
+    if(foundPos){
+        foundPos+=sizeof("FIBER");
+        if((*(foundPos-1)!='\0') || (*foundPos!='\0')) value=strtoul((const char *)foundPos,&endptr,0);
+        if(foundPos==endptr) {} //{ printf("end of conversion3!\n"); }
+        else *fiber = value;
+    }
+    //printf("FIBER is %i!\n",*fiber);
+    
+    
+}
+
+/*--------------------------------------------------------------------
  *    function:     handleKCommand
  *    purpose:      handle command sent from cew_controle/Samba in a UDP packet
  *
@@ -2080,7 +2147,7 @@ void populateIPECrateStatusPacket()
               //make more flexible and allow omitting leading zeros
               char *startptr, *endptr;
               startptr=&buffer[3];
-              // accept other deliminiter than '_' if(*startptr!='_'){printf("handleKCommand:_ This is not a valid KW command!\n"); return; }
+              // accept other delimiter than '_' if(*startptr!='_'){printf("handleKCommand:_ This is not a valid KW command!\n"); return; }
               startptr=&buffer[4];
 	          address = strtoul((const char *)&buffer[4],&endptr,0);
               if(address==0){printf("handleKCommand:1 This is not a valid KW command!\n"); return; }
@@ -2173,7 +2240,33 @@ void populateIPECrateStatusPacket()
                       chargeBBWithFileOLD( foundPos + sizeof("chargeBBFile") , fromFifo);//sizeof("chargeBBFile") counts the ending \0, but I anyway need to skip one '_'
                   else
                       printf("   ERROR: KWC >%s< command without filename!\n",buffer);//DEBUG
-		          }
+              }
+	          else 
+	          if(  (foundPos=strstr(buffer,"sendBBCmd"))  ){
+	              printf("handleKCommand: KWC >%s< command 10!\n",foundPos);//DEBUG
+                  //format: KWC_sendBBCmd_0xAA_0xBB_0xCC_ ...(up to 255 values) ..._0xZZ_FLT_0xNN_FIBER_0xMM
+                  //example:
+                  //    KWC_sendBBCmd_0xAA_0xBB_0xCC_0xCC_0x01_9
+                  //    KWC_sendBBCmd_0xAA_0xBB_0xCC_0xCC_0x01_9_FLT_1_FIBER_2
+                  if(len >= sizeof("KWC_sendBBCmd_")){//filename must be at least one character
+                      unsigned char cmdbuf[256];
+                      int lencmdbuf=0;
+                      int flt=-1;
+                      int fiber=-1;
+                      parse_sendBBCmd_string(buffer, cmdbuf, &lencmdbuf, &flt, &fiber);
+                      printf("   Scanned arguments: lencmds: %i, FLT:%i  FIBER: %i\n",lencmdbuf, flt,fiber);//DEBUG
+                      //{int i; for(i=0; i<lencmdbuf; i++) printf("   Scanned argument %i:  %i\n",i,cmdbuf[i]); }
+                      if(flt==-1 || fiber==-1){
+	                      sendCommandFifo(cmdbuf,8);   //envoie_commande(buf,8);
+                      }else{
+	                      sendCommandFifoUnblockFiber(cmdbuf,8,flt, fiber);   //envoie_commande(buf,8);
+                      }
+  
+                      //chargeBBWithFileOLD( foundPos + sizeof("chargeBBFile") , fromFifo);//sizeof("chargeBBFile") counts the ending \0, but I anyway need to skip one '_'
+                  }
+                  else
+                      printf("   ERROR: KWC >%s< command without arguments!\n",buffer);//DEBUG
+              }
 	          else 
               {
 	              printf("handleKCommand: WARNING KWC >%s< command unknown!\n",buffer);//DEBUG

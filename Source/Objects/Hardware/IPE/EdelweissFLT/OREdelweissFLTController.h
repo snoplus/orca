@@ -77,9 +77,16 @@
 	IBOutlet   NSTextField* idBBforWCommandTextField;//clone of idBBforBBAccessTextField
 	IBOutlet   NSTextField* idBBforAlimCommandTextField;//clone of idBBforBBAccessTextField
 	IBOutlet   NSPopUpButton* fiberSelectForBBAccessPU;
-	IBOutlet   NSMatrix* relaisStatesBBMatrix;
-	    IBOutlet   NSPopUpButton* fiberSelectForBBStatusBitsPU;
-	    IBOutlet NSButton*      tpixCB;
+	IBOutlet   NSMatrix* relaisStatesBBMatrix;//obsolete
+	  IBOutlet   NSButton* refBBCheckBox;//is in relaisState
+	  IBOutlet   NSMatrix* adcOnOffBBMatrix;//is in relaisState
+      IBOutlet   NSPopUpButton* relais1PU;//is in relaisState
+      IBOutlet   NSPopUpButton* relais2PU;//is in relaisState
+	  IBOutlet   NSMatrix* mezOnOffBBMatrix;//is in relaisState
+    IBOutlet   NSPopUpButton* fiberSelectForBBStatusBitsPU;
+        
+        
+	    IBOutlet NSButton*      tpixCB;//TODO: obsolete? -tb-
 //	IBOutlet   No Outlet* swTriggerIsRepeatingNo Outlet;
 		
 	IBOutlet   NSTextField* repeatSWTriggerModeTextField;
@@ -317,6 +324,11 @@
 - (IBAction) idBBforBBAccessTextFieldAction:(id)sender;
 - (IBAction) fiberSelectForBBAccessPUAction:(id)sender;
 - (IBAction) relaisStatesBBMatrixAction:(id)sender;
+- (IBAction) refBBCheckBoxAction:(id)sender;
+- (IBAction) adcOnOffBBMatrixAction:(id)sender;
+- (IBAction) relais1PUAction:(id)sender;
+- (IBAction) relais2PUAction:(id)sender;
+- (IBAction) mezOnOffBBMatrixAction:(id)sender;
 - (IBAction) fiberSelectForBBStatusBitsPUAction:(id)sender;
 - (IBAction) readBBStatusBitsButtonAction:(id)sender;
 - (IBAction) readAllBBStatusBitsButtonAction:(id)sender;

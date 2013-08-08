@@ -767,11 +767,29 @@
 //	[relaisStatesBB<custom> setIntValue: [model relaisStatesBB]];
     int fiber = [model fiberSelectForBBAccess];
 	int i;
+    /* //obsolete 2013-08-08
     int32_t relaisStates = [model relaisStatesBBForFiber:fiber];
         //DEBUG OUTPUT: 	        NSLog(@"%@::%@: UNDER CONSTRUCTION! fiberOutMask  %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),fiberOutMask);//TODO : DEBUG testing ...-tb-
 	for(i=0;i<3;i++){
 		[[relaisStatesBBMatrix cellWithTag:i] setIntValue: (relaisStates&(0x1<<i)) ];
-	}    
+	} 
+    */   
+    [refBBCheckBox setIntValue:[model refForBBAccessForFiber:fiber]];
+    
+    int32_t adcOnOfVal = [model adcOnOffForBBAccessForFiber:fiber];
+        //DEBUG OUTPUT: 	        NSLog(@"%@::%@: UNDER CONSTRUCTION! fiberOutMask  %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),fiberOutMask);//TODO : DEBUG testing ...-tb-
+	for(i=0;i<[adcOnOffBBMatrix numberOfColumns];i++){
+		[[adcOnOffBBMatrix cellAtRow:0 column:i] setIntValue: (adcOnOfVal&(0x1<<i)) ];
+	} 
+    
+    [relais1PU selectItemAtIndex:[model relais1ForBBAccessForFiber:fiber]];
+    [relais2PU selectItemAtIndex:[model relais2ForBBAccessForFiber:fiber]];
+
+    int32_t mezVal = [model mezForBBAccessForFiber:fiber];
+        //DEBUG OUTPUT: 	        NSLog(@"%@::%@: UNDER CONSTRUCTION! fiberOutMask  %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),fiberOutMask);//TODO : DEBUG testing ...-tb-
+	for(i=0;i<[mezOnOffBBMatrix numberOfColumns];i++){
+		[[mezOnOffBBMatrix cellAtRow:0 column:i] setIntValue: (mezVal&(0x1<<i)) ];
+	} 
 }
 
 - (void) fiberSelectForBBStatusBitsChanged:(NSNotification*)aNote
@@ -1888,6 +1906,70 @@
 		if([[sender cellWithTag:i] intValue]) val |= (0x1<<i);
 	}
 	[model setRelaisStatesBBForFiber:fiber to:val];
+    
+    //if "Write Changes to BB" is selected ...
+    if([model writeToBBMode]) [model writeRelaisStatesForBBAccessForFiber:fiber];
+}
+
+
+
+- (IBAction) refBBCheckBoxAction:(id)sender
+{
+    int fiber = [model fiberSelectForBBAccess];
+	int val=0;
+	if([sender intValue]) val  =  0x1 ;
+	[model setRefForBBAccessForFiber:fiber to:val];
+    
+    //if "Write Changes to BB" is selected ...
+    if([model writeToBBMode]) [model writeRelaisStatesForBBAccessForFiber:fiber];
+}
+
+- (IBAction) adcOnOffBBMatrixAction:(id)sender;
+{
+    int fiber = [model fiberSelectForBBAccess];
+	int i, val=0;
+	for(i=0;i<[adcOnOffBBMatrix numberOfColumns];i++){
+		if([[sender cellAtRow:0 column:i] intValue]) val |= (0x1<<i);
+	}
+	[model setAdcOnOffForBBAccessForFiber:fiber to:val];
+    
+    //if "Write Changes to BB" is selected ...
+    if([model writeToBBMode]) [model writeRelaisStatesForBBAccessForFiber:fiber];
+}
+
+- (IBAction) relais1PUAction:(id)sender
+{
+    //DEBUG 	
+    NSLog(@"%@::%@ - selItemIndex: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[sender indexOfSelectedItem]);//TODO: DEBUG testing ...-tb-
+
+    int fiber = [model fiberSelectForBBAccess];
+	[model setRelais1ForBBAccessForFiber:fiber to:[sender indexOfSelectedItem]];
+    
+    //if "Write Changes to BB" is selected ...
+    if([model writeToBBMode]) [model writeRelaisStatesForBBAccessForFiber:fiber];
+}
+
+- (IBAction) relais2PUAction:(id)sender
+{
+    //DEBUG 	
+    NSLog(@"%@::%@ - selItemIndex: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[sender indexOfSelectedItem]);//TODO: DEBUG testing ...-tb-
+
+    int fiber = [model fiberSelectForBBAccess];
+	[model setRelais2ForBBAccessForFiber:fiber to:[sender indexOfSelectedItem]];
+    
+    //if "Write Changes to BB" is selected ...
+    if([model writeToBBMode]) [model writeRelaisStatesForBBAccessForFiber:fiber];
+}
+
+
+- (IBAction) mezOnOffBBMatrixAction:(id)sender;
+{
+    int fiber = [model fiberSelectForBBAccess];
+	int i, val=0;
+	for(i=0;i<2;i++){
+		if([[sender cellWithTag:i] intValue]) val |= (0x1<<i);
+	}
+	[model setMezForBBAccessForFiber:fiber to:val];
     
     //if "Write Changes to BB" is selected ...
     if([model writeToBBMode]) [model writeRelaisStatesForBBAccessForFiber:fiber];

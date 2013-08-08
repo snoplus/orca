@@ -537,6 +537,84 @@ void sendCommandFifo(unsigned char * buffer, int len)
 	releaseHWSemaphoreWith(sltSemaphore);
 }
 
+/*--------------------------------------------------------------------
+ *    function:     sendCommandFifoBlockFibers
+ *    purpose:      write command to command FIFO
+ *    author:       taken from envoie_commande from cew.c, modified by Till Bergmann, 2011
+ *
+ *--------------------------------------------------------------------*/ //-tb-
+//write_word to FPGA: Inbuf: will be sent to FPGA, status=number of bytes to be sent -tb-
+//this is the counterpart of void	envoie_commande(unsigned char * Inbuf,int status) in cew.c
+//
+// NOTE: the first byte should be 'W' or 'h' (or anything else - it will be dropped/ignored!) 
+//
+void sendCommandFifoUnblockFiber(unsigned char * buffer, int len, int flt, int fiber)
+{
+
+    uint32_t cmdFifoStatus;
+    unsigned char Code_Commande;
+    uint32_t b;
+    int i;
+	
+	//wait until command FIFO is empty
+	const int MAXWAIT=25;
+	for(i=0; i< MAXWAIT; i++){
+	    cmdFifoStatus = pbus->read(CmdFIFOStatusReg);
+		if (cmdFifoStatus & 0x8000) {
+			break; //cmd FIFO empty, leave loop
+		}
+		usleep(10);
+	}
+	if(i==MAXWAIT){
+	    printf("WARNING: cmd FIFO still not empty, continue to send command anyway! This may be caused by a error!\n");
+	}
+	
+    //this errourously was sent out for each FIFO command, removed 2011-12-23
+	//pbus->write(CmdFIFOReg ,  0x00f0);
+	
+	//try to request the HW semaphore
+    uint32_t sltSemaphore=0;
+    sltSemaphore = requestHWSemaphoreWaitUsec(100);// argument is 'usec': "wait max usec time" (e.g. usec = 100 means wait max. 100 usec = 0.1 msec)
+	if(!sltSemaphore){
+	    printf("ERROR: HW semaphore request timeout in void sendCommandFifo()! Could not send command! ERROR!\n");//TODO: use debug level setting -tb-
+		return;
+	}
+	
+    //unblock the fiber
+    uint32_t mask= ~(0x1 << fiber) & 0x3f;
+    printf("sendCommandFifoUnblockFiber:0x%08x\n",mask);//TODO: use debug level setting -tb-
+    pbus->write(FLTFiberOutMaskReg(flt) ,  mask);
+
+    
+	//now write command to cmd FIFO
+    Code_Commande = buffer[1];
+ 	//  d'abord un mot de 8 bit precede de 0 en bit 9 pour indiquer le 1er mot
+	//write_word(driver_fpga,REG_CMD, (unsigned long) Code_Commande);
+	pbus->write(CmdFIFOReg ,  Code_Commande);  //this is either 255/0xff or 240/0xf0 (commande 'W')
+
+	printf("cmd %u (%d octets) ",Code_Commande,len-2);//TODO: use debug level setting -tb-
+	//  les mots suivants par mots de 8 bit
+	for(i=2;i<len;i++){
+		b=buffer[i];
+        // En fait, c'est le msb d'abors
+		printf("%lX ",b);
+		b=b+0x0100;
+		//write_word(driver_fpga,REG_CMD, b);
+		pbus->write(CmdFIFOReg ,  b);
+	}
+	b=0x200;
+	pbus->write(CmdFIFOReg ,  b);
+	printf("\n");
+
+    //block the fiber
+    pbus->write(FLTFiberOutMaskReg(flt) ,  0x3f);
+
+
+    //release semaphore
+	//if(sltSemaphore){	    releaseHWSemaphore();	}
+	releaseHWSemaphoreWith(sltSemaphore);
+}
+
 
 /*--------------------------------------------------------------------
  *    function:     envoie_commande_standard_BBv2
