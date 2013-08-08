@@ -618,16 +618,14 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 - (void) postCouchDBRecord
 {
     NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
-                            [NSArray arrayWithObjects:
-                             [NSString stringWithFormat:@"%.2E",pressure[0]],
-                             [NSString stringWithFormat:@"%.2E",pressure[1]],
-                             [NSString stringWithFormat:@"%.2E",pressure[2]],
-                             [NSString stringWithFormat:@"%.2E",pressure[3]],
-                             [NSString stringWithFormat:@"%.2E",pressure[4]],
-                             [NSString stringWithFormat:@"%.2E",pressure[5]],
-                             [NSString stringWithFormat:@"%.2E",pressure[6]],
-                             nil],                                          @"processValue",
-                            [NSNumber numberWithInt:    pollTime],          @"pollTime",
+                             [NSString stringWithFormat:@"%.2E",pressure[0]], @"chan 0",
+                             [NSString stringWithFormat:@"%.2E",pressure[1]], @"chan 1",
+                             [NSString stringWithFormat:@"%.2E",pressure[2]], @"chan 2",
+                             [NSString stringWithFormat:@"%.2E",pressure[3]], @"chan 3",
+                             [NSString stringWithFormat:@"%.2E",pressure[4]], @"chan 4",
+                             [NSString stringWithFormat:@"%.2E",pressure[5]], @"chan 5",
+                             [NSString stringWithFormat:@"%.2E",pressure[6]], @"chan 6",
+                             [NSNumber numberWithInt:    pollTime],           @"pollTime",
                             nil];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
 }

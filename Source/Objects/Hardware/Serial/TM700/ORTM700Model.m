@@ -783,10 +783,7 @@ NSString* ORTM700ConstraintsChanged			= @"ORTM700ConstraintsChanged";
                             [NSNumber numberWithBool:   turboPumpOverTemp], @"turboPumpOverTemp",
                             [NSNumber numberWithInt:    runUpTime],         @"runUpTime",
                             [NSNumber numberWithInt:    pollTime],          @"pollTime",
-                            [NSArray arrayWithObjects:
-                                [NSNumber numberWithBool:speedAttained],
-                                speedAttained?@"True":@"False",
-                             nil], @"processValue",
+                            [NSNumber numberWithBool:   speedAttained],     @"speedAttained",
                             nil];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
 }

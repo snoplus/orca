@@ -786,10 +786,7 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
                             [NSNumber numberWithInt:    ionizerFocusPlateVoltage],  @"ionizerFocusPlateVoltage",
                             [NSNumber numberWithInt:    ionizerIonEnergy],          @"ionizerIonEnergy",
                             [NSNumber numberWithFloat:  ionizerEmissionCurrent],    @"ionizerEmissionCurrent",
-                            
-                            [NSArray arrayWithObjects:
-                             [self auxStatusString:0],
-                             nil],                                                  @"processValue",
+                            [self auxStatusString:0],                               @"statusString",
                             nil];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
 }

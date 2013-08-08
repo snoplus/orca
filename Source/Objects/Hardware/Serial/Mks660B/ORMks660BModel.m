@@ -681,7 +681,6 @@ NSString* ORMks660BLock = @"ORMks660BLock";
     NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
                             [NSNumber numberWithFloat:pressure],  @"pressure",
                             [NSNumber numberWithInt:  pollTime],  @"pollTime",
-                            [NSArray arrayWithObjects:[NSNumber numberWithFloat:pressure],nil], @"processValue",
                            nil];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
 }

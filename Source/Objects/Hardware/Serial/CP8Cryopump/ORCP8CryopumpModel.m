@@ -1171,11 +1171,9 @@ NSString* ORCP8CryopumpModelConstraintsChanged				= @"ORCP8CryopumpModelConstrai
                             [NSNumber numberWithInt:  lastRateOfRaise],         @"lastRateOfRaise",
                             [NSNumber numberWithInt:  firstStageControlMethod], @"firstStageControlMethod",
                             [NSNumber numberWithInt:  firstStageControlTemp],   @"firstStageControlTemp",
-                            [NSArray arrayWithObjects:
-                                 [NSNumber numberWithInt:roughValveStatus],
-                                 [NSNumber numberWithInt:purgeStatus],
-                                 [self auxStatusString:0],
-                              nil],                                             @"processValue",
+                            [NSNumber numberWithInt:  roughValveStatus],        @"roughValveStatus",
+                            [NSNumber numberWithInt:  purgeStatus],             @"purgeStatus",
+                            [self auxStatusString:0],                           @"statusString",
                             nil];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
 }
