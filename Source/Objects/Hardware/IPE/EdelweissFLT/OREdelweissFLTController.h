@@ -35,13 +35,6 @@
 	IBOutlet   NSTextField* wCmdArg2TextField;
 	IBOutlet   NSTextField* wCmdArg1TextField;
 	IBOutlet   NSTextField* wCmdCodeTextField;
-	IBOutlet   NSTextField* adcRtTextField;
-    
-	IBOutlet   NSMatrix* dacbMatrix;
-	IBOutlet   NSMatrix* signbMatrix;
-	IBOutlet   NSMatrix* dacaMatrix;
-	IBOutlet   NSMatrix* signaMatrix;
-	IBOutlet   NSMatrix* adcRgForBBAccessMatrix;
     
     //Trigger Tab
 	IBOutlet   NSTextField* heatChannelsTextField;
@@ -60,6 +53,17 @@
 		IBOutlet NSButton*		hitRateNoneButton;
     
     //BB access tab
+	IBOutlet   NSTextField* adcRtTextField;
+	IBOutlet   NSStepper*   adcRtStepper;
+	IBOutlet   NSTextField* D2TextField;
+	IBOutlet   NSTextField* D3TextField;
+    
+	IBOutlet   NSMatrix* dacbMatrix;
+	IBOutlet   NSMatrix* signbMatrix;
+	IBOutlet   NSMatrix* dacaMatrix;
+	IBOutlet   NSMatrix* signaMatrix;
+	IBOutlet   NSMatrix* adcRgForBBAccessMatrix;
+
 	IBOutlet   NSMatrix*    polarDacMatrix;
 	IBOutlet   NSMatrix*    triDacMatrix;
 	IBOutlet   NSMatrix*    rectDacMatrix;
@@ -213,6 +217,8 @@
 - (void) wCmdArg1Changed:(NSNotification*)aNote;
 - (void) wCmdCodeChanged:(NSNotification*)aNote;
 - (void) adcRtChanged:(NSNotification*)aNote;
+- (void) D2Changed:(NSNotification*)aNote;
+- (void) D3Changed:(NSNotification*)aNote;
 - (void) dacbChanged:(NSNotification*)aNote;
 - (void) signbChanged:(NSNotification*)aNote;
 - (void) dacaChanged:(NSNotification*)aNote;
@@ -302,6 +308,11 @@
 - (IBAction) sendWCommandButtonAction:(id)sender;
 
 - (IBAction) adcRtTextFieldAction:(id)sender;
+- (IBAction) adcRtStepperAction:(id)sender;
+
+- (IBAction) D2TextFieldAction:(id)sender;
+- (IBAction) D3TextFieldAction:(id)sender;
+
 
 - (IBAction) dacbMatrixAction:(id)sender;
 - (IBAction) signbMatrixAction:(id)sender;

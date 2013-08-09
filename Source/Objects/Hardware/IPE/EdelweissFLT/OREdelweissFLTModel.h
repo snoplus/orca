@@ -219,6 +219,12 @@
 - (int) adcRtForFiber:(int)aFiber;
 - (void) setAdcRtForFiber:(int)aFiber to:(int)aAdcRt;
 - (void) writeAdcRtForBBAccessForFiber:(int)aFiber;//HW access Rt
+- (int) D2ForFiber:(int)aFiber;
+- (void) setD2ForFiber:(int)aFiber to:(int)aAdcRt;
+- (void) writeD2ForBBAccessForFiber:(int)aFiber;//HW access D2
+- (int) D3ForFiber:(int)aFiber;
+- (void) setD3ForFiber:(int)aFiber to:(int)aAdcRt;
+- (void) writeD3ForBBAccessForFiber:(int)aFiber;//HW access D3
 - (int) adcValueForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex;
 - (void) setAdcValueForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex to:(int)aAdcValueForBBAccess;
 - (void) writeAdcValueForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex;//HW access 
@@ -581,6 +587,8 @@ extern NSString* OREdelweissFLTModelWCmdArg2Changed;
 extern NSString* OREdelweissFLTModelWCmdArg1Changed;
 extern NSString* OREdelweissFLTModelWCmdCodeChanged;
 extern NSString* OREdelweissFLTModelAdcRtChanged;
+extern NSString* OREdelweissFLTModelD2Changed;
+extern NSString* OREdelweissFLTModelD3Changed;
 extern NSString* OREdelweissFLTModelDacbChanged;
 extern NSString* OREdelweissFLTModelSignbChanged;
 extern NSString* OREdelweissFLTModelDacaChanged;

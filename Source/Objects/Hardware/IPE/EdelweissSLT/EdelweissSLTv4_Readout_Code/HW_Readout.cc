@@ -96,7 +96,7 @@ extern "C" {
 
 
 #include "ipe4structure.h"
-#include "ipe4reader.h"
+//#include "ipe4reader.h"
 #include "ipe4tbtools.h" //better include in HW_Readout.h? here: MUST follow "ipe4structure.h" (and HW_Readout.h for pbus) -tb-
 int (*sendChargeBBStatusFunctionPtr)(uint32_t prog_status,int numFifo) = 0;
 #include "ipe4tbtools.cpp"
@@ -453,7 +453,7 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply)  // 'simulation' version -tb
 //----------------------------------------------------------------
 
 void doGeneralWriteOp(SBC_Packet* aPacket,uint8_t reply)
-{
+{ 
 	SBC_WriteBlockStruct* p = (SBC_WriteBlockStruct*)aPacket->payload;
 	if(needToSwap)SwapLongBlock(p,sizeof(SBC_WriteBlockStruct)/sizeof(int32_t));
 	int32_t operation = p->address;

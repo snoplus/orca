@@ -2248,6 +2248,8 @@ void parse_sendBBCmd_string(char *buffer, unsigned char* cmdbuf, int* lencmdbuf,
                   //example:
                   //    KWC_sendBBCmd_0xAA_0xBB_0xCC_0xCC_0x01_9
                   //    KWC_sendBBCmd_0xAA_0xBB_0xCC_0xCC_0x01_9_FLT_1_FIBER_2
+                  // real example (sets ref and adc1...4 to ON):
+                  //    KWC_sendBBCmd_0xF0_0x1d_0x00_0x1f_FLT_1_FIBER_2
                   if(len >= sizeof("KWC_sendBBCmd_")){//filename must be at least one character
                       unsigned char cmdbuf[256];
                       int lencmdbuf=0;
@@ -2257,15 +2259,49 @@ void parse_sendBBCmd_string(char *buffer, unsigned char* cmdbuf, int* lencmdbuf,
                       printf("   Scanned arguments: lencmds: %i, FLT:%i  FIBER: %i\n",lencmdbuf, flt,fiber);//DEBUG
                       //{int i; for(i=0; i<lencmdbuf; i++) printf("   Scanned argument %i:  %i\n",i,cmdbuf[i]); }
                       if(flt==-1 || fiber==-1){
-	                      sendCommandFifo(cmdbuf,8);   //envoie_commande(buf,8);
+	                      sendCommandFifo(cmdbuf,lencmdbuf);   //envoie_commande(buf,8);
                       }else{
-	                      sendCommandFifoUnblockFiber(cmdbuf,8,flt, fiber);   //envoie_commande(buf,8);
+	                      sendCommandFifoUnblockFiber(cmdbuf,lencmdbuf,flt, fiber);   //envoie_commande(buf,8);
                       }
   
                       //chargeBBWithFileOLD( foundPos + sizeof("chargeBBFile") , fromFifo);//sizeof("chargeBBFile") counts the ending \0, but I anyway need to skip one '_'
                   }
                   else
                       printf("   ERROR: KWC >%s< command without arguments!\n",buffer);//DEBUG
+              }
+              else
+	          if(  (foundPos=strstr(buffer,"startFIFO"))  ){
+	              printf("handleKCommand: KWC >%s< command 11!\n",foundPos);//DEBUG
+                  if(len > strlen("KWC_startFIFO_")){//must have at least one character as argument
+                      printf("   messg: KWC >%s< command - length OK (strlen:%i should be >=15)!\n",buffer,strlen(buffer));//DEBUG
+                      char *startptr, *endptr;
+                      unsigned long value=0;
+                      startptr=foundPos+strlen("startFIFO ");
+                      printf("   startptr:   >%s<  \n",startptr);//DEBUG
+                      value = strtoul((const char *)startptr,&endptr,0);
+                      printf("   value is %u, startptr: %p, endptr %p  \n",value,startptr,endptr);//DEBUG
+                      FIFOREADER::startFIFO(value);
+                      pbus->write(BBcsrReg(value),0xc);//c=0x8+0x4=mres+pres
+
+                  }
+                  else
+                      printf("   ERROR: KWC >%s< command without parameter!\n",buffer);//DEBUG
+              }
+	          else 
+	          if(  (foundPos=strstr(buffer,"stopFIFO"))  ){
+	              printf("handleKCommand: KWC >%s< command 11!\n",foundPos);//DEBUG
+                  if(len > strlen("KWC_stopFIFO_")){//must have at least one character as argument
+                      printf("   messg: KWC >%s< command - length OK (strlen:%i should be >=14)!\n",buffer,strlen(buffer));//DEBUG
+                      char *startptr, *endptr;
+                      unsigned long value=0;
+                      startptr=foundPos+strlen("stopFIFO ");
+                      printf("   startptr:   >%s<  \n",startptr);//DEBUG
+                      value = strtoul((const char *)startptr,&endptr,0);
+                      printf("   value is %u, startptr: %p, endptr %p  \n",value,startptr,endptr);//DEBUG
+                      FIFOREADER::stopFIFO(value);
+                  }
+                  else
+                      printf("   ERROR: KWC >%s< command without parameter!\n",buffer);//DEBUG
               }
 	          else 
               {
@@ -2801,12 +2837,12 @@ int parseConfigFileLine(char *line, int flags)
 				  //config file line example:
 				  //readfifo(0): 1                       # switches reading of this FIFO on (1) or off (0)
 				  sprintf(pattern,"readfifo(%i):",iFifo);
-                  if(checkFIFOREADERState){//wet allow to switch on and off a FIFO during streaming, but this requires proper initialization 2013-06 -tb-
+                  if(checkFIFOREADERState){//we allow to switch on and off a FIFO during streaming, but this requires proper initialization 2013-06 -tb-
                       //TODO:
                       //TODO:
                       //TODO:
                       //TODO:   handle switching on and off a FIFO during stream mode 2013-06-13 -tb-
-                      //TODO:
+                      //TODO:   -> currently not used (checkFIFOREADERState resp. flag) -> used KWC_start/stopFIFO_0xXY, see handleKCommand -tb- 2013-08-09
                       //TODO:
                       //TODO:
                   }
@@ -4128,7 +4164,7 @@ uint32_t InitFLTs()
 
 
         //fiberOutMask
-        pbus->write(FLTStreamMask_1Reg(fltID),FLT.fiberBlockOutMask); // 0x0000003f);
+        pbus->write(FLTFiberOutMaskReg(fltID),FLT.fiberBlockOutMask); // 0x0000003f);
 
         //stream mask etc.
         uint32_t FLTStreamMask_1;

@@ -420,14 +420,14 @@ public:
         //old:  uint32_t  i,size=Preferred_FIFObuf8len;
         uint32_t  i,size=preferredSizeInBytes;
         for(i=0;i<10;i++){// try to allocate preferred memory; whwn failed, try to allocate the half size - up to ten tries
-                printf("FIFOREADER::initVars: try to allocate %u byte (of %u requested bytes)\n",size, Preferred_FIFObuf8len);
+                printf("FIFOREADER::allocateFIFOBufferBytes: try to allocate %u byte (of %u requested bytes)\n",size, Preferred_FIFObuf8len);
 	        FIFObuf8=(char *)malloc(sizeof(char)*size);
             if(FIFObuf8==NULL){//failed
                 size = size/2;
                 size = (size/4)*4;//multiple of 4 as we want to store uint32_t's
                 if(size==0){ printf("FIFOREADER::allocateFIFOBufferBytes: ERROR: Failed with malloc(...), exiting!\n"); exit(123); }
             }else{//success
-                printf("FIFOREADER::initVars: allocated %u byte (of %u requested bytes) - OK\n",size, Preferred_FIFObuf8len);
+                printf("FIFOREADER::allocateFIFOBufferBytes: allocated %u byte (of %u requested bytes) for FIFO %i - OK\n",size, Preferred_FIFObuf8len,numfifo);
                 FIFObuf8len=size;
                 if(size<0x10000){ printf("WARNING:   !!! allocated memory is <65536; BUFFER (probably) TOO SMALL!!\n"); /*exit(123);*/ }
                 break;
@@ -504,6 +504,39 @@ public:
 	/*--------------------------------------------------------------------
 	 vars and functions for FIFO buffer
 	 --------------------------------------------------------------------*/
+    static void startFIFO(unsigned int i){
+        if(i<FIFOREADER::availableNumFIFO){ 
+            if(FIFOREADER::FifoReader[i].readfifo){
+                //FIFO i is already running
+                printf("WARNING:   FIFO %i already running!\n",i);
+            }
+            else
+            {
+                FifoReader[i].readfifo=1;
+                //FifoReader[i].allocateFIFOBufferBytes(Preferred_FIFObuf8len);//allocateFIFOBufferBytes or initBuffer ...
+                FifoReader[i].initBuffer();
+                FifoReader[i].clearFifoBuf32();
+                FifoReader[i].resetSynchronizingAndPackaging();
+            }
+        }
+    }
+    
+    static void stopFIFO(unsigned int i){
+        if(i<FIFOREADER::availableNumFIFO){ 
+            if(!FIFOREADER::FifoReader[i].readfifo){
+                //FIFO i is not running
+                printf("WARNING:   FIFO %i is not running!\n",i);
+            }
+            else
+            {
+                FifoReader[i].clearFifoBuf32();
+                FifoReader[i].resetSynchronizingAndPackaging();
+                FifoReader[i].freeBuffer();
+                FifoReader[i].readfifo=0;
+            }
+        }
+    }
+    
     static void resetAllSynchronizingAndPackaging(){
         int i=0;
         for(i=0; i<FIFOREADER::availableNumFIFO; i++) 
@@ -623,6 +656,8 @@ public:
      }
 
 	 void freeBuffer(){
+        //if(show_debug_info>=1) 
+        printf("FIFOREADER::freeBuffer:  FIFO w. index %i - free buffer with %i bytes ...\n",numfifo,FIFObuf8len);
         free(FIFObuf8);
         //init with 0
 	    FIFObuf8 = (char *)0;

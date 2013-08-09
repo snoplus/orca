@@ -49,6 +49,8 @@ NSString* OREdelweissFLTModelWCmdArg2Changed = @"OREdelweissFLTModelWCmdArg2Chan
 NSString* OREdelweissFLTModelWCmdArg1Changed = @"OREdelweissFLTModelWCmdArg1Changed";
 NSString* OREdelweissFLTModelWCmdCodeChanged = @"OREdelweissFLTModelWCmdCodeChanged";
 NSString* OREdelweissFLTModelAdcRtChanged = @"OREdelweissFLTModelAdcRtChanged";
+NSString* OREdelweissFLTModelD2Changed = @"OREdelweissFLTModelD2Changed";
+NSString* OREdelweissFLTModelD3Changed = @"OREdelweissFLTModelD3Changed";
 NSString* OREdelweissFLTModelDacbChanged = @"OREdelweissFLTModelDacbChanged";
 NSString* OREdelweissFLTModelSignbChanged = @"OREdelweissFLTModelSignbChanged";
 NSString* OREdelweissFLTModelDacaChanged = @"OREdelweissFLTModelDacaChanged";
@@ -660,6 +662,92 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 }
 
+
+
+- (int) D2ForFiber:(int)aFiber
+{
+    //return adcRt;
+    int off = kBBstatusD2;
+    uint16_t mask = 0xffff;
+    int shift = 0;
+    uint16_t currVal = [self statusBB16forFiber: aFiber atIndex: off];
+    return (currVal & mask) >> shift;
+}
+
+- (void) setD2ForFiber:(int)aFiber to:(int)aValue
+{
+    //undo
+    int oldVal = [self relaisStatesBBForFiber:aFiber];
+    [[[self undoManager] prepareWithInvocationTarget:self] setD2ForFiber: aFiber to: oldVal];
+    
+    int off = kBBstatusD2;
+    uint16_t mask = 0xffff;
+    int shift = 0;
+    
+    //set new value
+    [self setStatusBB16forFiber:aFiber atOffset:off index:0 mask:mask shift:shift to:aValue];
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelD2Changed object:self];
+}
+
+
+- (void) writeD2ForBBAccessForFiber:(int)aFiber//HW access
+{
+    uint16_t val = [self statusBB16forFiber: aFiber atIndex: (kBBstatusD2)];
+    
+    int idBB = 0xff;
+    if(![self useBroadcastIdforBBAccess]) idBB=[self idBBforBBAccessForFiber:aFiber];
+    int cmd = kBBcmdSetD2;
+    int arg1 = (val >> 8) & 0xff;
+    int arg2 = val & 0xff;
+    
+    [self sendWCommandIdBB:idBB cmd:cmd arg1:arg1  arg2: arg2];
+
+}
+
+
+
+
+- (int) D3ForFiber:(int)aFiber
+{
+    //return adcRt;
+    int off = kBBstatusD3;
+    uint16_t mask = 0xffff;
+    int shift = 0;
+    uint16_t currVal = [self statusBB16forFiber: aFiber atIndex: off];
+    return (currVal & mask) >> shift;
+}
+
+- (void) setD3ForFiber:(int)aFiber to:(int)aValue
+{
+    //undo
+    int oldVal = [self relaisStatesBBForFiber:aFiber];
+    [[[self undoManager] prepareWithInvocationTarget:self] setD3ForFiber: aFiber to: oldVal];
+    
+    int off = kBBstatusD3;
+    uint16_t mask = 0xffff;
+    int shift = 0;
+    
+    //set new value
+    [self setStatusBB16forFiber:aFiber atOffset:off index:0 mask:mask shift:shift to:aValue];
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelD3Changed object:self];
+}
+
+
+- (void) writeD3ForBBAccessForFiber:(int)aFiber//HW access
+{
+    uint16_t val = [self statusBB16forFiber: aFiber atIndex: (kBBstatusD3)];
+    
+    int idBB = 0xff;
+    if(![self useBroadcastIdforBBAccess]) idBB=[self idBBforBBAccessForFiber:aFiber];
+    int cmd = kBBcmdSetD3;
+    int arg1 = (val >> 8) & 0xff;
+    int arg2 = val & 0xff;
+    
+    [self sendWCommandIdBB:idBB cmd:cmd arg1:arg1  arg2: arg2];
+
+}
 
 
 
