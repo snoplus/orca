@@ -755,16 +755,19 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (int) adcValueForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex
 {
     //return adcValueForBBAccess;
-    uint16_t currVal = [self statusBB16forFiber: aFiber atIndex: (kBBstatusADCValue + aIndex)];
+    int currVal = [self statusBB16forFiber: aFiber atIndex: (kBBstatusADCValue + aIndex)];
+    currVal -= 0x8000; //Edelweiss 16 bit mapping: mapping reg. value 0x0000...0xffff to phys. value -0x8000...0x7fff(=-32768...32767)
     return currVal;
 }
 
+//TODO: the adc values are read only ... -tb-
 - (void) setAdcValueForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex to:(int)aAdcValueForBBAccess
 {
     int oldVal = [self adcValueForBBAccessForFiber:aFiber atIndex:aIndex];
     [[[self undoManager] prepareWithInvocationTarget:self] setAdcValueForBBAccessForFiber: aFiber atIndex:aIndex to: oldVal];
     
-    [self setStatusBB16forFiber:aFiber atIndex:(kBBstatusADCValue + aIndex) to: aAdcValueForBBAccess];
+    aAdcValueForBBAccess=[self restrictIntValue:   aAdcValueForBBAccess   min:-0x8000 max:0x7fff];
+    [self setStatusBB16forFiber:aFiber atIndex:(kBBstatusADCValue + aIndex) to: aAdcValueForBBAccess+0x8000];
 
     NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
     [userInfo setObject:[NSNumber numberWithInt:aIndex] forKey: OREdelweissFLTIndex];
@@ -1082,7 +1085,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (int) polarDacForFiber:(int)aFiber atIndex:(int)aIndex   // DAC = polar_dac (cew_control name)
 {
     //return adcValueForBBAccess;
-    uint16_t currVal = [self statusBB16forFiber: aFiber atIndex: (kBBstatusDAC + aIndex)];
+    int currVal = [self statusBB16forFiber: aFiber atIndex: (kBBstatusDAC + aIndex)];
+    currVal -= 0x8000; //Edelweiss 16 bit mapping: mapping reg. value 0x0000...0xffff to phys. value -0x8000...0x7fff(=-32768...32767)
     return currVal;
 }
 
@@ -1091,7 +1095,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     int oldVal = [self polarDacForFiber:aFiber atIndex:aIndex];
     [[[self undoManager] prepareWithInvocationTarget:self] setPolarDacForFiber: aFiber atIndex:aIndex to: oldVal];
     
-    [self setStatusBB16forFiber:aFiber atIndex:(kBBstatusDAC + aIndex) to: aDacValue];
+    aDacValue=[self restrictIntValue:   aDacValue   min:-0x8000 max:0x7fff];
+    [self setStatusBB16forFiber:aFiber atIndex:(kBBstatusDAC + aIndex) to: aDacValue+0x8000];
 
     NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
     [userInfo setObject:[NSNumber numberWithInt:aIndex] forKey: OREdelweissFLTIndex];
@@ -1117,7 +1122,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (int) triDacForFiber:(int)aFiber atIndex:(int)aIndex
 {
-    uint16_t currVal = [self statusBB16forFiber: aFiber atIndex: (kBBstatusTri + aIndex)];
+    int currVal = [self statusBB16forFiber: aFiber atIndex: (kBBstatusTri + aIndex)];
+    currVal -= 0x8000; //Edelweiss 16 bit mapping: mapping reg. value 0x0000...0xffff to phys. value -0x8000...0x7fff(=-32768...32767)
     return currVal;
 }
 
@@ -1126,7 +1132,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     int oldVal = [self triDacForFiber:aFiber atIndex:aIndex];
     [[[self undoManager] prepareWithInvocationTarget:self] setTriDacForFiber: aFiber atIndex:aIndex to: oldVal];
     
-    [self setStatusBB16forFiber:aFiber atIndex:(kBBstatusTri + aIndex) to: aDacValue];
+    aDacValue=[self restrictIntValue:   aDacValue   min:-0x8000 max:0x7fff];
+    [self setStatusBB16forFiber:aFiber atIndex:(kBBstatusTri + aIndex) to: aDacValue+0x8000];
 
     NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
     [userInfo setObject:[NSNumber numberWithInt:aIndex] forKey: OREdelweissFLTIndex];
@@ -1153,7 +1160,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (int) rectDacForFiber:(int)aFiber atIndex:(int)aIndex
 {
-    uint16_t currVal = [self statusBB16forFiber: aFiber atIndex: (kBBstatusRect + aIndex)];
+    int currVal = [self statusBB16forFiber: aFiber atIndex: (kBBstatusRect + aIndex)];
+    currVal -= 0x8000; //Edelweiss 16 bit mapping: mapping reg. value 0x0000...0xffff to phys. value -0x8000...0x7fff(=-32768...32767)
     return currVal;
 }
 
@@ -1162,7 +1170,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     int oldVal = [self rectDacForFiber:aFiber atIndex:aIndex];
     [[[self undoManager] prepareWithInvocationTarget:self] setRectDacForFiber: aFiber atIndex:aIndex to: oldVal];
     
-    [self setStatusBB16forFiber:aFiber atIndex:(kBBstatusRect + aIndex) to: aDacValue];
+    aDacValue=[self restrictIntValue:   aDacValue   min:-0x8000 max:0x7fff];
+    [self setStatusBB16forFiber:aFiber atIndex:(kBBstatusRect + aIndex) to: aDacValue+0x8000];
 
     NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
     [userInfo setObject:[NSNumber numberWithInt:aIndex] forKey: OREdelweissFLTIndex];

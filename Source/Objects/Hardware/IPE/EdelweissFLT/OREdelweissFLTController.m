@@ -665,6 +665,7 @@
 	[[polarDacMatrix cellWithTag:index] setIntValue: [model polarDacForFiber: fiber atIndex:index]];
 }
 
+
 - (void) triDacChanged:(NSNotification*)aNote
 {
     int fiber = [model fiberSelectForBBAccess];
