@@ -265,6 +265,8 @@
 - (void) setRectDacForFiber:(int)aFiber atIndex:(int)aIndex to:(int)aDacValue;
 - (void) writeRectDacForFiber:(int)aFiber atIndex:(int)aIndex;//HW access
 
+- (double) temperatureBBforBBAccessForFiber:(int)aFiber;
+
 //BB status bit buffer
 - (uint32_t) statusBB32forFiber:(int)aFiber atIndex:(int)aIndex;
 - (void) setStatusBB32forFiber:(int)aFiber atIndex:(int)aIndex to:(uint32_t)aValue;

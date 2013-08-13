@@ -1186,6 +1186,14 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 
 
+- (double) temperatureBBforBBAccessForFiber:(int)aFiber 
+{
+    uint16_t currVal = [self statusBB16forFiber: aFiber atIndex: kBBstatusTemperature];
+    return     (((double)((currVal>>4)&0xfff))/16.);
+}
+
+
+
 
 
 //BB status bit buffer
@@ -2705,7 +2713,7 @@ exit(66);
             return;
 		}
         
-        // we re-use this notification, it will have the same effect ...
+        // we re-use this notification, it will have the same effect as OREdelweissFLTModelStatusBitsBBDataChanged ...
         [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelFiberSelectForBBAccessChanged object:self];
         
         

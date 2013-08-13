@@ -337,6 +337,11 @@
 						object: model];
 
     [notifyCenter addObserver : self
+                     selector : @selector(statusBitsBBDataChanged:)   //could/should use fiberSelectForBBAccessChanged -tb-
+                         name : OREdelweissFLTModelStatusBitsBBDataChanged
+						object: model];
+
+    [notifyCenter addObserver : self
                      selector : @selector(idBBforBBAccessChanged:)
                          name : OREdelweissFLTModelIdBBforBBAccessChanged
 						object: model];
@@ -381,11 +386,6 @@
                          name : OREdelweissFLTModelAdcRgForBBAccessChanged
 						object: model];
 
-
-    [notifyCenter addObserver : self
-                     selector : @selector(statusBitsBBDataChanged:)
-                         name : OREdelweissFLTModelStatusBitsBBDataChanged
-						object: model];
 
     [notifyCenter addObserver : self
                      selector : @selector(signaChanged:)
@@ -564,12 +564,6 @@
 	[D3TextField setIntValue: [model D3ForFiber:fiber]];
 }
 
-- (void) statusBitsBBDataChanged:(NSNotification*)aNote
-{
-
-//TODO: call this after initFromCoder ...
-	//[statusBitsBBArrayNo Outlet setObjectValue: [model statusBitsBBData]];
-}
 
 
 
@@ -690,6 +684,17 @@
 
 
 
+- (void) temperatureChanged:(NSNotification*)aNote
+{
+    int fiber = [model fiberSelectForBBAccess];
+	[temperatureTextField setDoubleValue: [model temperatureBBforBBAccessForFiber: fiber]];
+}
+
+
+
+
+
+
 
 - (void) useBroadcastIdforBBAccessChanged:(NSNotification*)aNote
 {
@@ -718,6 +723,14 @@
     	[idBBforWCommandTextField setIntValue: [model idBBforBBAccessForFiber:fiber]];
     	[idBBforAlimCommandTextField setIntValue: [model idBBforBBAccessForFiber:fiber]];
     }
+}
+
+- (void) statusBitsBBDataChanged:(NSNotification*)aNote
+{
+
+//TODO: call this after initFromCoder ...
+	//[statusBitsBBArrayNo Outlet setObjectValue: [model statusBitsBBData]];
+    [self fiberSelectForBBAccessChanged: aNote];
 }
 
 
@@ -784,6 +797,8 @@
     [self D2Changed:nil];
     [self D3Changed:nil];
 	[self idBBforBBAccessChanged:nil];
+    
+    [self temperatureChanged:nil];
 
 }
 
@@ -1194,7 +1209,8 @@
 	[self fiberOutMaskChanged:nil];
 	[self fiberSelectForBBStatusBitsChanged:nil];
 	[self useBroadcastIdforBBAccessChanged:nil];
-	[self statusBitsBBDataChanged:nil];//?? still needed? -tb-
+    
+	//[self statusBitsBBDataChanged:nil];//?? still needed? -tb- (no, same as fiberSelectForBBAccessChanged)
     
 	[self fiberSelectForBBAccessChanged:nil];
       //<--- this calls the following commented methods

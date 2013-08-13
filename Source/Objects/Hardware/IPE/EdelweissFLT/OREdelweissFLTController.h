@@ -68,6 +68,8 @@
 	IBOutlet   NSMatrix*    triDacMatrix;
 	IBOutlet   NSMatrix*    rectDacMatrix;
 	IBOutlet   NSTextField* BB0x0ACmdMaskTextField; //Alim/0x0A command
+	IBOutlet   NSTextField* temperatureTextField; //Alim/0x0A command
+    
 	IBOutlet   NSMatrix*    BB0x0ACmdMaskMatrix; //Alim/0x0A command
 	IBOutlet   NSTextField* chargeBBFileTextField;
 	IBOutlet   NSButton*    writeToBBModeCB;
@@ -223,7 +225,6 @@
 - (void) signbChanged:(NSNotification*)aNote;
 - (void) dacaChanged:(NSNotification*)aNote;
 - (void) signaChanged:(NSNotification*)aNote;
-- (void) statusBitsBBDataChanged:(NSNotification*)aNote;
 - (void) adcRgForBBAccessChanged:(NSNotification*)aNote;
 - (void) adcValueForBBAccessChanged:(NSNotification*)aNote;
 - (void) adcMultForBBAccessChanged:(NSNotification*)aNote;
@@ -232,9 +233,11 @@
 - (void) polarDacChanged:(NSNotification*)aNote;
 - (void) triDacChanged:(NSNotification*)aNote;
 - (void) rectDacChanged:(NSNotification*)aNote;
+- (void) temperatureChanged:(NSNotification*)aNote;
 
 
 - (void) idBBforBBAccessChanged:(NSNotification*)aNote;
+- (void) statusBitsBBDataChanged:(NSNotification*)aNote;
 - (void) fiberSelectForBBAccessChanged:(NSNotification*)aNote;
 - (void) relaisStatesBBChanged:(NSNotification*)aNote;
 - (void) fiberSelectForBBStatusBitsChanged:(NSNotification*)aNote;
