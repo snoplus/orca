@@ -53,8 +53,9 @@
 		IBOutlet NSButton*		hitRateNoneButton;
     
     //BB access tab
-	IBOutlet   NSTextField* adcRtTextField;
-	IBOutlet   NSStepper*   adcRtStepper;
+	IBOutlet   NSTextField* RgTextField;
+	IBOutlet   NSTextField* RtTextField;
+	IBOutlet   NSStepper*   RtStepper;
 	IBOutlet   NSTextField* D2TextField;
 	IBOutlet   NSTextField* D3TextField;
     
@@ -218,7 +219,7 @@
 - (void) wCmdArg2Changed:(NSNotification*)aNote;
 - (void) wCmdArg1Changed:(NSNotification*)aNote;
 - (void) wCmdCodeChanged:(NSNotification*)aNote;
-- (void) adcRtChanged:(NSNotification*)aNote;
+- (void) RtRgChanged:(NSNotification*)aNote;
 - (void) D2Changed:(NSNotification*)aNote;
 - (void) D3Changed:(NSNotification*)aNote;
 - (void) dacbChanged:(NSNotification*)aNote;
@@ -310,8 +311,9 @@
 - (IBAction) wCmdCodeTextFieldAction:(id)sender;
 - (IBAction) sendWCommandButtonAction:(id)sender;
 
-- (IBAction) adcRtTextFieldAction:(id)sender;
-- (IBAction) adcRtStepperAction:(id)sender;
+- (IBAction) RgTextFieldAction:(id)sender;
+- (IBAction) RtTextFieldAction:(id)sender;
+- (IBAction) RtStepperAction:(id)sender;
 
 - (IBAction) D2TextFieldAction:(id)sender;
 - (IBAction) D3TextFieldAction:(id)sender;

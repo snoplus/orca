@@ -408,7 +408,7 @@
 						object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(adcRtChanged:)
+                     selector : @selector(RgRtChanged:)
                          name : OREdelweissFLTModelAdcRtChanged
 						object: model];
 
@@ -544,12 +544,13 @@
 	[wCmdCodeTextField setIntValue: [model wCmdCode]];
 }
 
-- (void) adcRtChanged:(NSNotification*)aNote
+- (void) RgRtChanged:(NSNotification*)aNote
 {
     int fiber = [model fiberSelectForBBAccess];
-	[adcRtTextField setIntValue: [model adcRtForFiber:fiber]];
-	[adcRtStepper setIntValue: [model adcRtForFiber:fiber]];
+	[RtTextField setIntValue: [model RtForFiber:fiber]];
+	[RtStepper setIntValue: [model RtForFiber:fiber]];
     //DEBUG 	    NSLog(@"%@::%@ fiber %i val %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),fiber,[model adcRtForFiber:fiber]);//TODO: DEBUG testing ...-tb-
+	[RgTextField setIntValue: [model RgForFiber:fiber]];
 }
 
 - (void) D2Changed:(NSNotification*)aNote
@@ -794,7 +795,7 @@
         
         
 	//[self adcRtForBBAccessChanged:nil];
-    [self adcRtChanged:nil];
+    [self RgRtChanged:nil];
     [self D2Changed:nil];
     [self D3Changed:nil];
 	[self idBBforBBAccessChanged:nil];
@@ -1228,7 +1229,7 @@
 	[self dacbChanged:nil];
       */
 	//[self adcRtForBBAccessChanged:nil];
-	[self adcRtChanged:nil];
+	[self RgRtChanged:nil];
 	[self wCmdCodeChanged:nil];
 	[self wCmdArg1Changed:nil];
 	[self wCmdArg2Changed:nil];
@@ -1725,24 +1726,34 @@
     [model sendWCommand];
 }
 
-- (void) adcRtTextFieldAction:(id)sender
+- (void) RgTextFieldAction:(id)sender
 {
     //DEBUG 	    NSLog(@"%@::%@ intVal %i\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),[sender intValue]);//TODO: DEBUG testing ...-tb-
 
     int fiber = [model fiberSelectForBBAccess];
-	[model setAdcRtForFiber:fiber to:[sender intValue]];	
+	[model setRgForFiber:fiber to:[sender intValue]];	
     //if "Write Changes to BB" is selected ...
-    if([model writeToBBMode]) [model writeAdcRtForBBAccessForFiber:fiber];
+    if([model writeToBBMode]) [model writeRgRtForBBAccessForFiber:fiber];
 }
 
-- (void) adcRtStepperAction:(id)sender
+- (void) RtTextFieldAction:(id)sender
+{
+    //DEBUG 	    NSLog(@"%@::%@ intVal %i\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),[sender intValue]);//TODO: DEBUG testing ...-tb-
+
+    int fiber = [model fiberSelectForBBAccess];
+	[model setRtForFiber:fiber to:[sender intValue]];	
+    //if "Write Changes to BB" is selected ...
+    if([model writeToBBMode]) [model writeRgRtForBBAccessForFiber:fiber];
+}
+
+- (void) RtStepperAction:(id)sender
 {
     //DEBUG    NSLog(@"%@::%@ intVal %i\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),[sender intValue]);//TODO: DEBUG testing ...-tb-
 
     int fiber = [model fiberSelectForBBAccess];
-	[model setAdcRtForFiber:fiber to:[sender intValue]];	
+	[model setRtForFiber:fiber to:[sender intValue]];	
     //if "Write Changes to BB" is selected ...
-    if([model writeToBBMode]) [model writeAdcRtForBBAccessForFiber:fiber];
+    if([model writeToBBMode]) [model writeRgRtForBBAccessForFiber:fiber];
 }
 
 

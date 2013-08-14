@@ -216,9 +216,11 @@
 - (int) adcRgForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex;
 - (void) setAdcRgForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex to:(int)aAdcRgForBBAccess;
 - (void) writeAdcRgForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex;//HW access for Regul Parameter
-- (int) adcRtForFiber:(int)aFiber;
-- (void) setAdcRtForFiber:(int)aFiber to:(int)aAdcRt;
-- (void) writeAdcRtForBBAccessForFiber:(int)aFiber;//HW access Rt
+- (int) RgForFiber:(int)aFiber;
+- (void) setRgForFiber:(int)aFiber to:(int)aAdcRg;
+- (int) RtForFiber:(int)aFiber;
+- (void) setRtForFiber:(int)aFiber to:(int)aAdcRt;
+- (void) writeRgRtForBBAccessForFiber:(int)aFiber;//HW access Rt
 - (int) D2ForFiber:(int)aFiber;
 - (void) setD2ForFiber:(int)aFiber to:(int)aAdcRt;
 - (void) writeD2ForBBAccessForFiber:(int)aFiber;//HW access D2

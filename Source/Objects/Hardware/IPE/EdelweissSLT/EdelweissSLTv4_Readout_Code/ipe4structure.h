@@ -605,6 +605,7 @@ Structure_trame_status;
 //Rg + Rt (controle de la regulation du point de fonctionnement avec les DAC)  (g=gain (?), t=time=time steps (?))
 #define kBBcmdSetRt        0x38
 //Rt is reg. tous? (in BBstatus at index 5=status_regul/kBBstatusRt)
+
 #define kBBcmdSetRg        0x39
 //base for Rg for ADC1...6  (in BBstatus at index 6=status_regul+1/kBBstatusRg)
 //format: 0xBB 0xCmd 0xBT 0xSR with: B=bottom dac value (dacb), T=top dac value (daca),  S=signs (bit0/bit1 = top/bottom resp. sa/sb sign), R=Rg value
@@ -618,7 +619,7 @@ Structure_trame_status;
 // The BB status packet is a array of 57 shorts, this are the (start) indices for the according setting blocks
 // e.g. status_filtre is 12 (and next index 18 -> block of 6 values):
 //    each word contains: freq in bits 4...7, gains (multiplier) in bits0...3
-// Ofter writing the command 0xf0 0xff 0x31 0x12 0x34 we will find the value 0x1234 in the short 'BBstatusArray[status_filtre=12]'
+// After writing the command 0xf0 0xff 0x31 0x12 0x34 we will find the value 0x1234 in the short 'BBstatusArray[status_filtre=12]'
 // etc.
 // #define	status_nserie	0
 // #define	status_alim		1

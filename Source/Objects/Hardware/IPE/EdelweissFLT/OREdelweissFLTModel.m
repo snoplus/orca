@@ -606,6 +606,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelAdcRgForBBAccessChanged object:self  userInfo: userInfo];
 }
 
+//dont confuse adcRg with Rg! -tb-
 - (void) writeAdcRgForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex//HW access
 {
     uint16_t val = [self statusBB16forFiber: aFiber atIndex: (kBBstatusRg + aIndex)];
@@ -621,24 +622,51 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 }
 
 
-- (int) adcRtForFiber:(int)aFiber
+//dont confuse adcRg with Rg! -tb-
+- (int) RgForFiber:(int)aFiber
 {
     //return adcRt;
     int off = kBBstatusRt;
-    uint16_t mask = 0xffff;
+    uint16_t mask = 0x0f00;
+    int shift = 8;
+    uint16_t currVal = [self statusBB16forFiber: aFiber atIndex: off];
+    return (currVal & mask) >> shift;
+} 
+
+- (void) setRgForFiber:(int)aFiber to:(int)aAdcRg
+{
+    //undo
+    int oldVal = [self RgForFiber:aFiber];
+    [[[self undoManager] prepareWithInvocationTarget:self] setRgForFiber: aFiber to: oldVal];
+    
+    int off = kBBstatusRt;
+    uint16_t mask = 0x0f00;
+    int shift = 8;
+    
+    //set new value
+    [self setStatusBB16forFiber:aFiber atOffset:off index:0 mask:mask shift:shift to:aAdcRg];
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelAdcRtChanged object:self];
+}
+
+- (int) RtForFiber:(int)aFiber
+{
+    //return adcRt;
+    int off = kBBstatusRt;
+    uint16_t mask = 0x000f;
     int shift = 0;
     uint16_t currVal = [self statusBB16forFiber: aFiber atIndex: off];
     return (currVal & mask) >> shift;
 }
 
-- (void) setAdcRtForFiber:(int)aFiber to:(int)aAdcRt
+- (void) setRtForFiber:(int)aFiber to:(int)aAdcRt
 {
     //undo
-    int oldVal = [self relaisStatesBBForFiber:aFiber];
-    [[[self undoManager] prepareWithInvocationTarget:self] setAdcRtForFiber: aFiber to: oldVal];
+    int oldVal = [self RtForFiber:aFiber];
+    [[[self undoManager] prepareWithInvocationTarget:self] setRtForFiber: aFiber to: oldVal];
     
     int off = kBBstatusRt;
-    uint16_t mask = 0xffff;
+    uint16_t mask = 0x000f;
     int shift = 0;
     
     //set new value
@@ -648,7 +676,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 }
 
 
-- (void) writeAdcRtForBBAccessForFiber:(int)aFiber//HW access
+- (void) writeRgRtForBBAccessForFiber:(int)aFiber//HW access
 {
     uint16_t val = [self statusBB16forFiber: aFiber atIndex: (kBBstatusRt)];
     
