@@ -37,8 +37,10 @@
 @class ORDataPacket;
 @class TimedWorker;
 @class ORIpeFLTModel;
+@class OREdelweissFLTModel;
 @class PMC_Link;
 @class SBC_Link;
+@class ORSBCLinkJobStatus;
 
 #define IsBitSet(A,B) (((A) & (B)) == (B))
 #define ExtractValue(A,B,C) (((A) & (B)) >> (C))
@@ -209,6 +211,9 @@
     bool useBroadcastIdBB;
     NSString * chargeBBFile;
     int lowLevelRegInHex;
+    
+    //BB charging
+    OREdelweissFLTModel *fltChargingBB;
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
@@ -397,6 +402,8 @@
 //note that most of these method can raise 
 //exceptions either directly or indirectly
 - (int)           chargeBBWithFile:(char*)data numBytes:(int) numBytes;
+- (int)           chargeBBusingSBCinBackgroundWithData:(NSData*)theData   forFLT:(OREdelweissFLTModel*) aFLT;
+- (void)          chargeBBStatus:(ORSBCLinkJobStatus*) jobStatus;
 - (int)           writeToCmdFIFO:(char*)data numBytes:(int) numBytes;
 - (void)		  readAllControlSettingsFromHW;
 

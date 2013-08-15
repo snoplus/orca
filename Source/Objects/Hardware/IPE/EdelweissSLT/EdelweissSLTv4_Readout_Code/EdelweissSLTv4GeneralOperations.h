@@ -32,4 +32,22 @@
 // void doGeneralReadOp(SBC_Packet* aPacket,uint8_t reply)
 // -tb-
 
+
+
+//SLT commands
+#define kEdelweissSLTchargeBB		0x01
+
+
+
+
+typedef struct {
+	uint32_t errorCode;		/*filled on return*/
+	int32_t fileSize;		/*zero on return*/
+	//raw file data will follow
+} EdelweissSLTchargeBBStruct;
+
+
+
+
+
 #endif

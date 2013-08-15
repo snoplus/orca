@@ -38,6 +38,9 @@ extern "C" {
 //#include "SBC_Cmds.h"
 	
 void processHWCommand(SBC_Packet* aPacket);
+void processChargeBBCommand(SBC_Packet* aPacket);
+void chargeBB(SBC_Packet* aPacket);
+
 void FindHardware(void);
 void ReleaseHardware(void);
 void doWriteBlock(SBC_Packet* aPacket,uint8_t reply);
@@ -46,6 +49,8 @@ void doGeneralWriteOp(SBC_Packet* aPacket,uint8_t reply);
 void doGeneralReadOp(SBC_Packet* aPacket,uint8_t reply);
 
 int getSltLinuxKernelDriverVersion(void);
+
+
 #ifdef __cplusplus
 }
 #endif

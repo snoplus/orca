@@ -63,6 +63,7 @@ extern "C" {
 #include "CircularBuffer.h"
 #include "EdelweissSLTv4_HW_Definitions.h"
 #include "EdelweissSLTv4GeneralOperations.h"
+#include "SBC_Job.h"
 #ifdef __cplusplus
 }
 #endif
@@ -109,6 +110,10 @@ extern char needToSwap;
 extern int32_t  dataIndex;
 extern int32_t* data;
 
+//from SBC_Readout.c ...
+extern SBC_JOB		sbc_job;
+extern pthread_mutex_t jobInfoMutex;
+
 //hw4::SubrackKatrin* get_sub_rack() { return srack; }
 
 
@@ -123,13 +128,87 @@ Pbus *pbus=0;              //for register access with fdhwlib
 
 void processHWCommand(SBC_Packet* aPacket)
 {
+    printf("Called SLT::processHWCommand(SBC_Packet* aPacket)\n");
+	/*look at the first word to get the destination*/
+	//int32_t destination = aPacket->cmdHeader.destination;// we have only the PMC of the IPE4 crate -tb-
     /*look at the first word to get the destination*/
     int32_t aCmdID = aPacket->cmdHeader.cmdID;
     
     switch(aCmdID){
-            //        default:              processUnknownCommand(aPacket); break;
+		case kEdelweissSLTchargeBB:		processChargeBBCommand(aPacket); break;
+		default:			break;
+        //        default:              processUnknownCommand(aPacket); break;
     }
 }
+
+
+void processChargeBBCommand(SBC_Packet* aPacket)
+{
+    printf("Called SLT::processChargeBBCommand(SBC_Packet* aPacket)\n");
+    startJob(&chargeBB,aPacket);
+}
+
+//this should maybe go to OREdelweissSLTv4Readout.cc (?) -tb-
+void chargeBB(SBC_Packet* aPacket)// see void loadXL2Xilinx_penn(SBC_Packet* aPacket)
+{
+	//
+	//this function is meant to be launched as a job
+	//
+	EdelweissSLTchargeBBStruct* p = (EdelweissSLTchargeBBStruct*)aPacket->payload;
+	//swap if needed, but note that we don't swap the data file part
+	if(needToSwap) SwapLongBlock(p,sizeof(EdelweissSLTchargeBBStruct)/sizeof(int32_t));
+	
+	//pull the addresses and other data from the payload
+	uint32_t length					= p->fileSize;
+	uint8_t* charData				= (uint8_t*)p;			//recast p so we can treat it like a char ptr.
+	charData += sizeof(EdelweissSLTchargeBBStruct);				//point to the clock file data
+	
+	char  errorMessage[80];
+	memset(errorMessage,'\0',80);		
+	uint32_t  errorFlag	 = 0;
+	uint8_t  finalStatus = 0; //assume failure
+    
+    //now do the loading
+    uint32_t i;
+    for(i=0; i<100; i++){
+			
+        if(sbc_job.killJobNow){
+            //FATAL_ERROR(666,"Job Killed. Early Exit.")
+            strncpy(errorMessage,"Job Killed. Early Exit.",80);	errorFlag = 666;	goto earlyExit;
+        }
+			
+        usleep(100000);
+        
+        //job monitoring
+        strcpy(errorMessage,"chargeBB: loop running.");	
+        printf("loop: %i; error message: %s\n",i,errorMessage);	
+	    strncpy(sbc_job.message,errorMessage,255);
+        pthread_mutex_lock (&jobInfoMutex);     //begin critical section
+        sbc_job.progress = i;			        //percent done
+        pthread_mutex_unlock (&jobInfoMutex);   //end critical section
+    }
+    
+    //job done -> success
+    finalStatus=1;//flags success
+    strcpy(errorMessage,"chargeBB: loop finished.");		
+
+
+	earlyExit://no success
+
+
+	pthread_mutex_lock (&jobInfoMutex);     //begin critical section
+	sbc_job.progress    = 100;
+	sbc_job.running     = 0;
+	sbc_job.killJobNow  = 0;
+	sbc_job.finalStatus = finalStatus;
+	strncpy(sbc_job.message,errorMessage,255);
+	sbc_job.message[255] = '\0';
+    pthread_mutex_unlock (&jobInfoMutex);   //end critical section
+	
+
+
+}
+
 
 void FindHardware(void)
 {

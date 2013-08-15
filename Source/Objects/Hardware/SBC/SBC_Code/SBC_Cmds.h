@@ -36,6 +36,7 @@
 #define kSBC_Process           0x1
 #define kAcqirisDC440          0x2
 #define kSNO				   0x3
+#define kPMC				   0x4
 
 /* SBC commands */
 #define kSBC_Command           0x01
@@ -66,7 +67,7 @@
 
 typedef 
     struct {
-        uint32_t destination;    /*should be kSBC_Command*/
+        uint32_t destination;    /*should be kSBC_Command*/  /*or kSBC_Process ? -tb- */
         uint32_t cmdID;
         uint32_t numberBytesinPayload;
     }

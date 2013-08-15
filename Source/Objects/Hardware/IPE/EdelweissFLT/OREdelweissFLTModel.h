@@ -176,6 +176,8 @@
     int ionToHeatDelay;
     NSString* chargeBBFile;
     uint32_t BB0x0ACmdMask;
+    NSString* chargeBBFileForFiber[6];
+    int progressOfChargeBB;
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
@@ -186,6 +188,11 @@
 - (short) getNumberRegisters;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+- (int) progressOfChargeBB;
+- (void) setProgressOfChargeBB:(int)aProgressOfChargeBB;
+- (NSString*) chargeBBFileForFiber:(int) aFiber;
+- (void) setChargeBBFile:(NSString*)aChargeBBFileForFiber forFiber:(int) aFiber;
+  - (int) chargeBBWithDataFromFile:(NSString*)aFilename;
 - (uint32_t) BB0x0ACmdMask;
 - (void) setBB0x0ACmdMask:(uint32_t)aBB0x0ACmdMask;
 - (NSString*) chargeBBFile;
@@ -578,6 +585,8 @@
 				  n:(int) n;
 @end
 
+extern NSString* OREdelweissFLTModelProgressOfChargeBBChanged;
+extern NSString* OREdelweissFLTModelChargeBBFileForFiberChanged;
 extern NSString* OREdelweissFLTModelBB0x0ACmdMaskChanged;
 extern NSString* OREdelweissFLTModelChargeBBFileChanged;
 extern NSString* OREdelweissFLTModelIonToHeatDelayChanged;

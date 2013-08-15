@@ -31,6 +31,8 @@
     
         //FLT settings
         IBOutlet NSButton*		settingLockButton;
+	IBOutlet   NSProgressIndicator* progressOfChargeBBIndicator;
+	IBOutlet   NSTextField* chargeBBFileForFiberTextField;
 	IBOutlet   NSTextField* ionToHeatDelayTextField;
 	IBOutlet   NSTextField* wCmdArg2TextField;
 	IBOutlet   NSTextField* wCmdArg1TextField;
@@ -206,6 +208,8 @@
 - (void) updateButtons;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+- (void) progressOfChargeBBChanged:(NSNotification*)aNote;
+- (void) chargeBBFileForFiberChanged:(NSNotification*)aNote;
 - (void) BB0x0ACmdMaskChanged:(NSNotification*)aNote;
 
 - (void) chargeBBFileChanged:(NSNotification*)aNote;
@@ -219,7 +223,7 @@
 - (void) wCmdArg2Changed:(NSNotification*)aNote;
 - (void) wCmdArg1Changed:(NSNotification*)aNote;
 - (void) wCmdCodeChanged:(NSNotification*)aNote;
-- (void) RtRgChanged:(NSNotification*)aNote;
+- (void) RgRtChanged:(NSNotification*)aNote;
 - (void) D2Changed:(NSNotification*)aNote;
 - (void) D3Changed:(NSNotification*)aNote;
 - (void) dacbChanged:(NSNotification*)aNote;
@@ -293,6 +297,10 @@
 - (void) selectedChannelValueChanged:(NSNotification*) aNote;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+- (IBAction) selectChargeBBFileForFiberAction:(id) sender;
+- (void) selectChargeBBFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+- (IBAction) chargeBBFileForFiberTextFieldAction:(id)sender;
+- (void) chargeBBFileForFiberButtonAction:(id) sender;
 - (IBAction) sendBB0x0ABloqueAction:(id)sender;
 - (IBAction) sendBB0x0ADebloqueAction:(id)sender;
 - (IBAction) sendBB0x0ADemarrageAction:(id)sender;

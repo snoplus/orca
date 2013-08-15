@@ -22,6 +22,7 @@
 #import "ORGlobal.h"
 #import "ORCrate.h"
 #import "OREdelweissSLTModel.h"
+#import "OREdelweissFLTModel.h"
 #import "EdelweissSLTv4_HW_Definitions.h"
 #import "EdelweissSLTv4GeneralOperations.h"
 #import "ipe4structure.h"
@@ -43,35 +44,35 @@
 
 
 //IPE V4 register definitions
-enum IpeV4Enum {
-	kSltV4ControlReg,
-	kSltV4StatusReg,
-	kSltV4CommandReg,
-	kSltV4StatusLowReg, //new for rev. 2.00
-	kSltV4StatusHighReg,//new for rev. 2.00
+enum EdelweissSLTV4Enum {
+	kEWSltV4ControlReg,
+	kEWSltV4StatusReg,
+	kEWSltV4CommandReg,
+	kEWSltV4StatusLowReg, //new for rev. 2.00
+	kEWSltV4StatusHighReg,//new for rev. 2.00
 	//removed for rev. 2.00 kSltV4InterruptMaskReg,
 	//removed for rev. 2.00 kSltV4InterruptRequestReg,
 	//kSltV4RequestSemaphoreReg,
-	kSltV4RevisionReg,
-	kSltV4PixelBusErrorReg,
-	kSltV4PixelBusEnableReg,
+	kEWSltV4RevisionReg,
+	kEWSltV4PixelBusErrorReg,
+	kEWSltV4PixelBusEnableReg,
 	//kSltV4PixelBusTestReg,
 	//kSltV4AuxBusTestReg,
 	//kSltV4DebugStatusReg,
-    kSltV4FIFOUsedReg,
+    kEWSltV4FIFOUsedReg,
     //removed for rev. 2.00 kSltV4BBOpenedReg,
-    kSltV4TestReg,
+    kEWSltV4TestReg,
     
     //BB command FIFO + Opera stuff
-    kSltV4SemaphoreReg,
-    kSltV4CmdFIFOReg,
-    kSltV4CmdFIFOStatusReg,
-    kSltV4OperaStatusReg0Reg,
-    kSltV4OperaStatusReg1Reg,
-    kSltV4OperaStatusReg2Reg,
+    kEWSltV4SemaphoreReg,
+    kEWSltV4CmdFIFOReg,
+    kEWSltV4CmdFIFOStatusReg,
+    kEWSltV4OperaStatusReg0Reg,
+    kEWSltV4OperaStatusReg1Reg,
+    kEWSltV4OperaStatusReg2Reg,
     
-    kSltV4TimeLowReg,
-    kSltV4TimeHighReg,
+    kEWSltV4TimeLowReg,
+    kEWSltV4TimeHighReg,
 	
 kSltV4EventFIFOReg,
 kSltV4EventFIFOStatusReg,
@@ -100,12 +101,12 @@ kSltV4EventNumberReg,
 	kSltV4TPShapeReg,
 	*/
 	
-	kSltV4I2CCommandReg,
-	kSltV4EPCCommandReg,
-	kSltV4BoardIDLoReg,
-	kSltV4BoardIDHiReg,
-	kSltV4PROMsControlReg,
-	kSltV4PROMsBufferReg,
+	kEWSltV4I2CCommandReg,
+	kEWSltV4EPCCommandReg,
+	kEWSltV4BoardIDLoReg,
+	kEWSltV4BoardIDHiReg,
+	kEWSltV4PROMsControlReg,
+	kEWSltV4PROMsBufferReg,
 	//kSltV4TriggerDataReg,
 	//kSltV4ADCDataReg,
 kSltV4BBxDataFIFOReg,
@@ -118,10 +119,10 @@ kSltV4BBxRequestReg,
 kSltV4BBxMaskReg,
 	
 	
-	kSltV4NumRegs //must be last
+	kEWSltV4NumRegs //must be last
 };
 
-static IpeRegisterNamesStruct regV4[kSltV4NumRegs] = {
+static IpeRegisterNamesStruct regV4[kEWSltV4NumRegs] = {
 {@"Control",			0xa80000,		1,			kIpeRegReadable | kIpeRegWriteable },
 {@"Status",				0xa80004,		1,			kIpeRegReadable },
 {@"Command",			0xa80008,		1,			kIpeRegWriteable },
@@ -1192,10 +1193,10 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 }
 
 
-- (void) writeEvRes				{ [self writeReg:kSltV4CommandReg value:kEWCmdEvRes];   }
-- (void) writeFwCfg				{ [self writeReg:kSltV4CommandReg value:kEWCmdFwCfg];   }
-- (void) writeSltReset			{ [self writeReg:kSltV4CommandReg value:kEWCmdSltReset];   }
-- (void) writeFltReset			{ [self writeReg:kSltV4CommandReg value:kEWCmdFltReset];   }
+- (void) writeEvRes				{ [self writeReg:kEWSltV4CommandReg value:kEWCmdEvRes];   }
+- (void) writeFwCfg				{ [self writeReg:kEWSltV4CommandReg value:kEWCmdFwCfg];   }
+- (void) writeSltReset			{ [self writeReg:kEWSltV4CommandReg value:kEWCmdSltReset];   }
+- (void) writeFltReset			{ [self writeReg:kEWSltV4CommandReg value:kEWCmdFltReset];   }
 
 - (id) controllerCard		{ return self;	  }
 - (SBC_Link*)sbcLink		{ return pmcLink; } 
@@ -2415,6 +2416,83 @@ for(l=0;l<2500;l++){
    return 0;
 }
 
+
+- (int)           chargeBBusingSBCinBackgroundWithData:(NSData*)theData forFLT:(OREdelweissFLTModel*) aFLT
+{
+
+    fltChargingBB = aFLT;
+
+    //DEBUG 	    
+    NSLog(@"%@::%@ data length: %i\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),[theData length]);//TODO: DEBUG testing ...-tb-
+
+	if(![pmcLink isConnected]){
+		NSLog(@"   ERROR: Crate Computer (PMC) Not Connected!\n"); 
+		//[NSException raise:@"Not Connected" format:@"Socket not connected."];
+        return 0;
+	}
+   
+   
+	
+	NSLog(@"Charge BB FPGA\n");
+	
+	unsigned long numLongs		= ceil([theData length]/4.0); //round up to long word boundary
+	SBC_Packet aPacket;
+	aPacket.cmdHeader.destination			= kPMC;//kSBC_Command;//kSBC_Process;
+	aPacket.cmdHeader.cmdID					= kEdelweissSLTchargeBB;
+	aPacket.cmdHeader.numberBytesinPayload	= sizeof(EdelweissSLTchargeBBStruct) + numLongs*sizeof(long);
+	
+	EdelweissSLTchargeBBStruct* payloadPtr	= (EdelweissSLTchargeBBStruct*)aPacket.payload;
+	payloadPtr->fileSize					= [theData length];
+	
+	const char* dataPtr						= (const char*)[theData bytes];
+	//really should be an error check here that the file isn't bigger than the max payload size
+	char* p = (char*)payloadPtr + sizeof(EdelweissSLTchargeBBStruct);
+	bcopy(dataPtr, p, [theData length]);
+	
+	@try {
+		//launch the load job. The response will be a job status record
+		[pmcLink send:&aPacket receive:&aPacket];
+		SBC_JobStatusStruct *responsePtr = (SBC_JobStatusStruct*)aPacket.payload;
+		long running = responsePtr->running;
+		if(running){
+			NSLog(@"BB charge in progress on the SBC on the IPE crate.\n");
+			[pmcLink monitorJobFor:self statusSelector:@selector(chargeBBStatus:)];
+		}
+//			NSLog(@"Error Code: %d %s\n",errorCode,aPacket.message);
+//			[NSException raise:@"Xilinx load failed" format:@"%d",errorCode];
+//		}
+//		else NSLog(@"Looks like success.\n");
+	}
+	@catch(NSException* localException) {
+		NSLog(@"BB charge failed. %@\n",localException);
+		[NSException raise:@"BB charge Failed" format:@"%@",localException];
+	}
+   
+   
+   
+   
+   
+   return 0;
+}
+
+- (void) chargeBBStatus:(ORSBCLinkJobStatus*) jobStatus
+{
+	if(![jobStatus running]){
+		NSLog(@"%@   progress: %i\n",[jobStatus message],[jobStatus  progress]);
+        if(fltChargingBB) [fltChargingBB setProgressOfChargeBB: [jobStatus  progress]];
+        usleep(10000);
+        if(fltChargingBB) [fltChargingBB setProgressOfChargeBB: 0];
+	}
+    else{
+		NSLog(@"progress: %i\n",[jobStatus  progress]);
+        if(fltChargingBB) [fltChargingBB setProgressOfChargeBB: [jobStatus  progress]];
+    }
+}
+
+
+
+
+
 //this uses a general write command
 - (int)          writeToCmdFIFO:(char*)data numBytes:(int) numBytes
 {
@@ -2635,7 +2713,7 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 
 - (unsigned long) readControlReg
 {
-	unsigned long data = [self readReg:kSltV4ControlReg];
+	unsigned long data = [self readReg:kEWSltV4ControlReg];
     [self setControlReg: data];
 	return data;
 }
@@ -2643,7 +2721,7 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 
 - (void) writeControlReg
 {
-	[self writeReg:kSltV4ControlReg value:controlReg];
+	[self writeReg:kEWSltV4ControlReg value:controlReg];
 }
 
 - (void) printControlReg
@@ -2660,24 +2738,24 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 
 - (unsigned long) readStatusReg
 {
-	unsigned long data = [self readReg:kSltV4StatusReg];
-//DEBUG OUTPUT:  	NSLog(@"   %@::%@: kSltV4StatusReg: 0x%08x \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),data);//TODO: DEBUG testing ...-tb-
+	unsigned long data = [self readReg:kEWSltV4StatusReg];
+//DEBUG OUTPUT:  	NSLog(@"   %@::%@: kEWSltV4StatusReg: 0x%08x \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),data);//TODO: DEBUG testing ...-tb-
 	[self setStatusReg:data];
 	return data;
 }
 
 - (unsigned long) readStatusLowReg
 {
-	unsigned long data = [self readReg:kSltV4StatusLowReg];
-//DEBUG OUTPUT:  	NSLog(@"   %@::%@: kSltV4StatusReg: 0x%08x \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),data);//TODO: DEBUG testing ...-tb-
+	unsigned long data = [self readReg:kEWSltV4StatusLowReg];
+//DEBUG OUTPUT:  	NSLog(@"   %@::%@: kEWSltV4StatusReg: 0x%08x \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),data);//TODO: DEBUG testing ...-tb-
 	[self setStatusLowReg:data];
 	return data;
 }
 
 - (unsigned long) readStatusHighReg
 {
-	unsigned long data = [self readReg:kSltV4StatusHighReg];
-//DEBUG OUTPUT:  	NSLog(@"   %@::%@: kSltV4StatusReg: 0x%08x \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),data);//TODO: DEBUG testing ...-tb-
+	unsigned long data = [self readReg:kEWSltV4StatusHighReg];
+//DEBUG OUTPUT:  	NSLog(@"   %@::%@: kEWSltV4StatusReg: 0x%08x \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),data);//TODO: DEBUG testing ...-tb-
 	[self setStatusHighReg:data];
 	return data;
 }
@@ -2725,13 +2803,13 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 
 - (void) writePixelBusEnableReg
 {
-	[self writeReg:kSltV4PixelBusEnableReg value: [self pixelBusEnableReg]];
+	[self writeReg:kEWSltV4PixelBusEnableReg value: [self pixelBusEnableReg]];
 }
 
 - (void) readPixelBusEnableReg
 {
     unsigned long val;
-	val = [self readReg:kSltV4PixelBusEnableReg];
+	val = [self readReg:kEWSltV4PixelBusEnableReg];
 	[self setPixelBusEnableReg:val];	
 }
 
@@ -2814,8 +2892,8 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 
 - (unsigned long long) readBoardID
 {
-	unsigned long low = [self readReg:kSltV4BoardIDLoReg];
-	unsigned long hi  = [self readReg:kSltV4BoardIDHiReg];
+	unsigned long low = [self readReg:kEWSltV4BoardIDLoReg];
+	unsigned long hi  = [self readReg:kEWSltV4BoardIDHiReg];
 	BOOL crc =(hi & 0x80000000)==0x80000000;
 	if(crc){
 		return (unsigned long long)(hi & 0xffff)<<32 | low;
@@ -2868,7 +2946,7 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 {
 	unsigned long value;
 	@try {
-		[self setHwVersion:[self readReg: kSltV4RevisionReg]];	
+		[self setHwVersion:[self readReg: kEWSltV4RevisionReg]];	
 	}
 	@catch (NSException* e){
 	}
@@ -2878,12 +2956,12 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 
 - (unsigned long) readTimeLow
 {
-	return [self readReg:kSltV4TimeLowReg];
+	return [self readReg:kEWSltV4TimeLowReg];
 }
 
 - (unsigned long) readTimeHigh
 {
-	return [self readReg:kSltV4TimeHighReg];
+	return [self readReg:kEWSltV4TimeHighReg];
 }
 
 - (unsigned long long) getTime

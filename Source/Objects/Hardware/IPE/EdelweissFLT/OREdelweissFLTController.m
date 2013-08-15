@@ -88,6 +88,9 @@
     [ionChannelsTextField setFrameCenterRotation:90.0];
     [heatChannelsTextField2 setFrameCenterRotation:90.0];
     [ionChannelsTextField2 setFrameCenterRotation:90.0];
+    
+    [progressOfChargeBBIndicator setIndeterminate:NO];
+
 
 }
 
@@ -482,9 +485,37 @@
                          name : OREdelweissFLTModelBB0x0ACmdMaskChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(chargeBBFileForFiberChanged:)
+                         name : OREdelweissFLTModelChargeBBFileForFiberChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(progressOfChargeBBChanged:)
+                         name : OREdelweissFLTModelProgressOfChargeBBChanged
+						object: model];
+
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+
+- (void) progressOfChargeBBChanged:(NSNotification*)aNote
+{
+    if([model progressOfChargeBB]==0){
+	    //[progressOfChargeBBIndicator startAnimation: self];
+    }
+	    //[progressOfChargeBBIndicator startAnimation: self];
+    [progressOfChargeBBIndicator setDoubleValue: (double)[model progressOfChargeBB]];
+
+}
+
+- (void) chargeBBFileForFiberChanged:(NSNotification*)aNote
+{
+    int fiber = [model fiberSelectForBBAccess];
+    //DEBUG 	    
+    NSLog(@"%@::%@ fiber is %i string is %@\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),fiber,[model chargeBBFileForFiber:fiber]);//TODO: DEBUG testing ...-tb-
+	[chargeBBFileForFiberTextField setStringValue: [model chargeBBFileForFiber:fiber]];
+}
 
 - (void) BB0x0ACmdMaskChanged:(NSNotification*)aNote
 {
@@ -801,6 +832,9 @@
 	[self idBBforBBAccessChanged:nil];
     
     [self temperatureChanged:nil];
+    
+    [self chargeBBFileForFiberChanged:nil];
+
 
 }
 
@@ -1248,6 +1282,8 @@
 	[self ionToHeatDelayChanged:nil];
 	[self chargeBBFileChanged:nil];
 	[self BB0x0ACmdMaskChanged:nil];
+	[self chargeBBFileForFiberChanged:nil];
+	[self progressOfChargeBBChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -1616,6 +1652,71 @@
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+
+- (void) selectChargeBBFileForFiberAction:(id) sender
+{
+    int fiber = [model fiberSelectForBBAccess];
+
+	NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+    [openPanel setCanChooseDirectories:NO];
+    [openPanel setCanChooseFiles:YES];
+    [openPanel setAllowsMultipleSelection:NO];
+    [openPanel setPrompt:@"Choose"];
+    NSString* startingDir;
+	
+	NSString* fullPath = [[model chargeBBFileForFiber:fiber] stringByExpandingTildeInPath];
+    if(fullPath)	startingDir = [[model chargeBBFileForFiber:fiber] stringByDeletingLastPathComponent];
+    else			startingDir = NSHomeDirectory();
+	
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            [model setChargeBBFile:[[openPanel URL] path] forFiber:fiber];
+            NSLog(@"BB FPGA config file set to: %@\n",[[[[openPanel URL] path] stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]);
+       }
+    }];
+#else 	
+    [openPanel beginSheetForDirectory:startingDir
+                                 file:nil
+                                types:nil
+                       modalForWindow:[self window]
+                        modalDelegate:self
+                       didEndSelector:@selector(selectChargeBBFileDidEnd:returnCode:contextInfo:)
+                          contextInfo:NULL];
+#endif
+}
+
+- (void) selectChargeBBFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+{
+    if(returnCode){
+        int fiber = [model fiberSelectForBBAccess];
+        [model setChargeBBFile:[[sheet filenames] objectAtIndex:0]  forFiber:fiber];
+		NSLog(@"BB FPGA config file set to: %@\n",[[[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]);
+    }
+}
+
+
+
+- (void) chargeBBFileForFiberTextFieldAction:(id)sender
+{
+    int fiber = [model fiberSelectForBBAccess];
+    //NSLog(@"%@::%@ fiber is %i string is %@\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),fiber,[model chargeBBFileForFiber:fiber]);//TODO: DEBUG testing ...-tb-
+    //NSLog(@"%@::%@ fiber is %i, new string is %@\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),fiber,[sender stringValue]);//TODO: DEBUG testing ...-tb-
+	[model setChargeBBFile:[sender stringValue] forFiber:fiber];	
+}
+
+- (void) chargeBBFileForFiberButtonAction:(id) sender
+{
+    int fiber = [model fiberSelectForBBAccess];
+    NSLog(@"%@::%@ fiber is %i string is %@\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),fiber,[model chargeBBFileForFiber:fiber]);//TODO: DEBUG testing ...-tb-
+    int len = [model chargeBBWithDataFromFile: [model chargeBBFileForFiber:fiber]];
+    NSLog(@"%@::%@ bytes loaded: %i \n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),len);//TODO: DEBUG testing ...-tb-
+     
+
+}
+
+
 - (IBAction) sendBB0x0ABloqueAction:(id)sender
 {
     [self endEditing];

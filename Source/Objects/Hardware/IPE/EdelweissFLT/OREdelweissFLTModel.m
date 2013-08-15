@@ -36,6 +36,8 @@
 
 //#import "ipe4tbtools.cpp"
 
+NSString* OREdelweissFLTModelProgressOfChargeBBChanged = @"OREdelweissFLTModelProgressOfChargeBBChanged";
+NSString* OREdelweissFLTModelChargeBBFileForFiberChanged = @"OREdelweissFLTModelChargeBBFileForFiberChanged";
 NSString* OREdelweissFLTModelBB0x0ACmdMaskChanged = @"OREdelweissFLTModelBB0x0ACmdMaskChanged";
 NSString* OREdelweissFLTModelChargeBBFileChanged = @"OREdelweissFLTModelChargeBBFileChanged";
 NSString* OREdelweissFLTModelIonToHeatDelayChanged = @"OREdelweissFLTModelIonToHeatDelayChanged";
@@ -272,6 +274,12 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (void) dealloc
 {	
+    [chargeBBFileForFiber[0] release];//sorry, this is awfuel, but it was a quick hack -tb-
+    [chargeBBFileForFiber[1] release];
+    [chargeBBFileForFiber[2] release];
+    [chargeBBFileForFiber[3] release];
+    [chargeBBFileForFiber[4] release];
+    [chargeBBFileForFiber[5] release];
     [chargeBBFile release];
     [statusBitsBBData release];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
@@ -325,6 +333,65 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (short) getNumberRegisters{ return kFLTV4NumRegs; }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+
+- (int) progressOfChargeBB
+{
+    return progressOfChargeBB;
+}
+
+- (void) setProgressOfChargeBB:(int)aProgressOfChargeBB
+{
+    progressOfChargeBB = aProgressOfChargeBB;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelProgressOfChargeBBChanged object:self];
+}
+
+- (NSString*) chargeBBFileForFiber:(int) aFiber
+{
+    aFiber=[self restrictIntValue:   aFiber   min:0 max:5];
+    if(!chargeBBFileForFiber[aFiber]) return @"";
+    return chargeBBFileForFiber[aFiber];
+}
+
+- (void) setChargeBBFile:(NSString*)aChargeBBFileForFiber forFiber:(int) aFiber
+{
+    aFiber=[self restrictIntValue:   aFiber   min:0 max:5];
+    if(!aChargeBBFileForFiber) aChargeBBFileForFiber=@"";
+    [[[self undoManager] prepareWithInvocationTarget:self] setChargeBBFile:chargeBBFileForFiber[aFiber] forFiber: aFiber];
+    
+    //Mark, what is better? I found both implementations ... Till (2013-08)
+    #if 1
+    [chargeBBFileForFiber[aFiber] autorelease];
+    chargeBBFileForFiber[aFiber] = [aChargeBBFileForFiber copy];    
+    #else
+    [aChargeBBFileForFiber retain]; 
+    [chargeBBFileForFiber[aFiber] release];
+    chargeBBFileForFiber[aFiber] = aChargeBBFileForFiber;    
+    #endif
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelChargeBBFileForFiberChanged object:self];
+}
+
+
+- (int) chargeBBWithDataFromFile:(NSString*)aFilename  //should move this to "HW access"? -tb-
+{
+    NSLog(@"%@::%@  \n", NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+	NSData* theData = [NSData dataWithContentsOfFile:aFilename];
+	if(![theData length]){
+		//[NSException raise:@"No BB FPGA Configuration Data" format:@"Couldn't open BB ConfigurationFile: %@",[aFilename stringByAbbreviatingWithTildeInPath]];
+		NSLog(@"%@::%@ ERROR: No BB FPGA Configuration Data - Couldn't open BB ConfigurationFile: %@\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),[aFilename stringByAbbreviatingWithTildeInPath]);
+		return 0;
+	}
+    
+    OREdelweissSLTModel *slt=0;
+    slt=[[self crate] adapter];
+
+    [slt chargeBBusingSBCinBackgroundWithData:theData forFLT:self];
+
+
+    return [theData length];
+}
+
 
 - (uint32_t) BB0x0ACmdMask
 {
@@ -3214,6 +3281,12 @@ for(chan=0; chan<6;chan++)
 	
     [[self undoManager] disableUndoRegistration];
     
+    [self setChargeBBFile:[decoder decodeObjectForKey:@"chargeBBFileForFiber0"] forFiber:0 ];
+    [self setChargeBBFile:[decoder decodeObjectForKey:@"chargeBBFileForFiber1"] forFiber:1 ];
+    [self setChargeBBFile:[decoder decodeObjectForKey:@"chargeBBFileForFiber2"] forFiber:2 ];
+    [self setChargeBBFile:[decoder decodeObjectForKey:@"chargeBBFileForFiber3"] forFiber:3 ];
+    [self setChargeBBFile:[decoder decodeObjectForKey:@"chargeBBFileForFiber4"] forFiber:4 ];
+    [self setChargeBBFile:[decoder decodeObjectForKey:@"chargeBBFileForFiber5"] forFiber:5 ];
     [self setBB0x0ACmdMask:[decoder decodeIntForKey:@"BB0x0ACmdMask"]];
     [self setChargeBBFile:[decoder decodeObjectForKey:@"chargeBBFile"]];
     [self setIonToHeatDelay:[decoder decodeIntForKey:@"ionToHeatDelay"]];
@@ -3326,6 +3399,12 @@ for(chan=0; chan<6;chan++)
 {
     [super encodeWithCoder:encoder];
 	
+    [encoder encodeObject:chargeBBFileForFiber[0] forKey:@"chargeBBFileForFiber0"];
+    [encoder encodeObject:chargeBBFileForFiber[1] forKey:@"chargeBBFileForFiber1"];
+    [encoder encodeObject:chargeBBFileForFiber[2] forKey:@"chargeBBFileForFiber2"];
+    [encoder encodeObject:chargeBBFileForFiber[3] forKey:@"chargeBBFileForFiber3"];
+    [encoder encodeObject:chargeBBFileForFiber[4] forKey:@"chargeBBFileForFiber4"];
+    [encoder encodeObject:chargeBBFileForFiber[5] forKey:@"chargeBBFileForFiber5"];
     [encoder encodeInt:BB0x0ACmdMask forKey:@"BB0x0ACmdMask"];
     [encoder encodeObject:chargeBBFile forKey:@"chargeBBFile"];
     [encoder encodeInt:ionToHeatDelay forKey:@"ionToHeatDelay"];
