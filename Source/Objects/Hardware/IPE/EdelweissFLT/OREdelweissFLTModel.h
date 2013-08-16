@@ -502,6 +502,7 @@
 
 - (void) devTabButtonAction;
 
+- (void) killChargeBBJobButtonAction;
 - (void) chargeBBWithFile:(NSString*) aFile;	
 - (void) sendWCommand;
 - (void) sendWCommandIdBB:(int) idBB cmd:(int) cmd arg1:(int) arg1  arg2:(int) arg2;

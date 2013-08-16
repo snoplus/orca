@@ -2699,6 +2699,12 @@ exit(66);
 - (void) devTabButtonAction
 {
     //DEBUG 	    
+    NSLog(@"%@::%@  THIS IS A TEST BUTTON  \n", NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+}
+
+- (void) killChargeBBJobButtonAction
+{
+    //DEBUG 	    
     NSLog(@"%@::%@   \n", NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
     
     [[[self crate] adapter] killSBCJob];

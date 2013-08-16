@@ -299,6 +299,7 @@
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
 - (IBAction) devTabButtonAction:(id) sender;
+- (IBAction) killChargeBBJobButtonAction:(id) sender;
 - (IBAction) selectChargeBBFileForFiberAction:(id) sender;
 - (void) selectChargeBBFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 - (IBAction) chargeBBFileForFiberTextFieldAction:(id)sender;

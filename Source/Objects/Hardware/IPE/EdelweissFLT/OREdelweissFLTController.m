@@ -1671,6 +1671,9 @@
 - (IBAction) devTabButtonAction:(id) sender
 {  [model devTabButtonAction]; }
 
+- (IBAction) killChargeBBJobButtonAction:(id) sender
+{  [model killChargeBBJobButtonAction]; }
+
 - (void) selectChargeBBFileForFiberAction:(id) sender
 {
     int fiber = [model fiberSelectForBBAccess];
