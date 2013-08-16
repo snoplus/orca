@@ -1380,7 +1380,7 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 
 - (short) getNumberRegisters			
 { 
-    return kSltV4NumRegs; 
+    return kEWSltV4NumRegs; 
 }
 
 - (NSString*) getRegisterName: (short) anIndex
@@ -2478,18 +2478,45 @@ for(l=0;l<2500;l++){
 - (void) chargeBBStatus:(ORSBCLinkJobStatus*) jobStatus
 {
 	if(![jobStatus running]){
-		NSLog(@"%@   progress: %i\n",[jobStatus message],[jobStatus  progress]);
+		NSLog(@"SLT job NOT running: job message: %@   progress: %i finalStatus: %i\n",[jobStatus message],[jobStatus  progress],[jobStatus  finalStatus]);
         if(fltChargingBB) [fltChargingBB setProgressOfChargeBB: [jobStatus  progress]];
+        if([jobStatus  finalStatus]==666){//job killed
+            if(fltChargingBB) [fltChargingBB setProgressOfChargeBB: 101];
+        }
         usleep(10000);
         if(fltChargingBB) [fltChargingBB setProgressOfChargeBB: 0];
 	}
     else{
-		NSLog(@"progress: %i\n",[jobStatus  progress]);
+		//NSLog(@"SLT: %@   progress: %i\n",[jobStatus message],[jobStatus  progress]);
+		NSLog(@"SLT job running: job message: %@   progress: %i finalStatus: %i\n",[jobStatus message],[jobStatus  progress],[jobStatus  finalStatus]);
         if(fltChargingBB) [fltChargingBB setProgressOfChargeBB: [jobStatus  progress]];
     }
 }
 
 
+- (void) killSBCJob
+{
+	SBC_Packet aPacket;
+	aPacket.cmdHeader.destination			= kSBC_Process;//kSBC_Command;//kSBC_Process;
+	aPacket.cmdHeader.cmdID					= kSBC_KillJob;
+	aPacket.cmdHeader.numberBytesinPayload	= 0;//sizeof(EdelweissSLTchargeBBStruct) + numLongs*sizeof(long);
+
+	@try {
+		//launch the load job. The response will be a job status record
+        NSLog(@"Sending kSBC_KillJob.\n");
+		[pmcLink send:&aPacket receive:&aPacket];
+        NSLog(@"Sent kSBC_KillJob.\n");
+//			NSLog(@"Error Code: %d %s\n",errorCode,aPacket.message);
+//			[NSException raise:@"Xilinx load failed" format:@"%d",errorCode];
+//		}
+//		else NSLog(@"Looks like success.\n");
+	}
+	@catch(NSException* localException) {
+		NSLog(@"kSBC_KillJob command failed. %@\n",localException);
+		[NSException raise:@"kSBC_KillJob command failed" format:@"%@",localException];
+	}
+
+}
 
 
 

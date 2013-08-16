@@ -20,7 +20,8 @@
 
 #pragma mark •••Imported Files
 #import "ORIpeV4CrateModel.h"
-#import "ORIpeV4SLTModel.h"
+//#import "ORIpeV4SLTModel.h"
+#import "ORIpeCard.h"
 
 NSString* ORIpeV4CrateModelUnlockedStopButtonChanged = @"ORIpeV4CrateModelUnlockedStopButtonChanged";
 NSString* ORIpeV4CrateModelSnmpPowerSupplyIPChanged = @"ORIpeV4CrateModelSnmpPowerSupplyIPChanged";

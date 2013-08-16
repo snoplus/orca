@@ -342,7 +342,6 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (void) setProgressOfChargeBB:(int)aProgressOfChargeBB
 {
     progressOfChargeBB = aProgressOfChargeBB;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelProgressOfChargeBBChanged object:self];
 }
 
@@ -2697,6 +2696,13 @@ exit(66);
 {	[self writeReg: kFLTV4CommandReg value:kIpeFlt_Cmd_SWTrig];   }
 
 
+- (void) devTabButtonAction
+{
+    //DEBUG 	    
+    NSLog(@"%@::%@   \n", NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+    
+    [[[self crate] adapter] killSBCJob];
+}
 
 
 

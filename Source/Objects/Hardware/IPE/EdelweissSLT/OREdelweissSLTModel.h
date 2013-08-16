@@ -404,6 +404,7 @@
 - (int)           chargeBBWithFile:(char*)data numBytes:(int) numBytes;
 - (int)           chargeBBusingSBCinBackgroundWithData:(NSData*)theData   forFLT:(OREdelweissFLTModel*) aFLT;
 - (void)          chargeBBStatus:(ORSBCLinkJobStatus*) jobStatus;
+- (void)          killSBCJob;
 - (int)           writeToCmdFIFO:(char*)data numBytes:(int) numBytes;
 - (void)		  readAllControlSettingsFromHW;
 

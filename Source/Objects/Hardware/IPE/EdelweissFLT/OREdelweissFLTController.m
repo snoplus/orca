@@ -503,10 +503,25 @@
 {
     if([model progressOfChargeBB]==0){
 	    //[progressOfChargeBBIndicator startAnimation: self];
+        [progressOfChargeBBIndicator setDoubleValue: 0.0];
+        //[progressOfChargeBBTextField setIntValue: [model progressOfChargeBB]];
     }
+    else if([model progressOfChargeBB]==100){
 	    //[progressOfChargeBBIndicator startAnimation: self];
-    [progressOfChargeBBIndicator setDoubleValue: (double)[model progressOfChargeBB]];
-
+        [progressOfChargeBBIndicator setDoubleValue: 100.0];
+        [progressOfChargeBBTextField setStringValue: @"OK"];
+    }
+    else if([model progressOfChargeBB]>100){
+	    //[progressOfChargeBBIndicator startAnimation: self];
+        [progressOfChargeBBIndicator setDoubleValue: 0.0];
+        [progressOfChargeBBTextField setStringValue: @"Killed"];
+    }
+    else
+    {
+	    //[progressOfChargeBBIndicator startAnimation: self];
+        [progressOfChargeBBIndicator setDoubleValue: (double)[model progressOfChargeBB]];
+        [progressOfChargeBBTextField setIntValue: [model progressOfChargeBB]];
+    }
 }
 
 - (void) chargeBBFileForFiberChanged:(NSNotification*)aNote
@@ -1652,6 +1667,9 @@
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+
+- (IBAction) devTabButtonAction:(id) sender
+{  [model devTabButtonAction]; }
 
 - (void) selectChargeBBFileForFiberAction:(id) sender
 {

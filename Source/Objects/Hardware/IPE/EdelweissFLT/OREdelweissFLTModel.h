@@ -21,7 +21,6 @@
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Imported Files
 #import "ORIpeCard.h"
-#import "ORIpeV4SLTModel.h"
 #import "ORHWWizard.h"
 #import "ORDataTaker.h"
 #import "OREdelweissFLTDefs.h"
@@ -500,6 +499,8 @@
 - (void) writeCommandTrigEvCounterReset;
 - (void) writeCommandSoftwareTrigger;
 - (void) readTriggerData;
+
+- (void) devTabButtonAction;
 
 - (void) chargeBBWithFile:(NSString*) aFile;	
 - (void) sendWCommand;

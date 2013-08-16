@@ -32,6 +32,7 @@
         //FLT settings
         IBOutlet NSButton*		settingLockButton;
 	IBOutlet   NSProgressIndicator* progressOfChargeBBIndicator;
+	IBOutlet   NSTextField* progressOfChargeBBTextField;
 	IBOutlet   NSTextField* chargeBBFileForFiberTextField;
 	IBOutlet   NSTextField* ionToHeatDelayTextField;
 	IBOutlet   NSTextField* wCmdArg2TextField;
@@ -297,6 +298,7 @@
 - (void) selectedChannelValueChanged:(NSNotification*) aNote;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+- (IBAction) devTabButtonAction:(id) sender;
 - (IBAction) selectChargeBBFileForFiberAction:(id) sender;
 - (void) selectChargeBBFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 - (IBAction) chargeBBFileForFiberTextFieldAction:(id)sender;
