@@ -39,7 +39,6 @@
 	ORUSBInterface* usbInterface;
     int connectionProtocol;
     NSString* ipAddress;
-    BOOL usbConnected;
     BOOL ipConnected;
 	NetSocket* socket;
 	BOOL mEOT;
@@ -70,8 +69,6 @@
 - (void) setSocket:(NetSocket*)aSocket;
 - (BOOL) ipConnected;
 - (void) setIpConnected:(BOOL)aIpConnected;
-- (BOOL) usbConnected;
-- (void) setUsbConnected:(BOOL)aUsbConnected;
 - (NSString*) ipAddress;
 - (void) setIpAddress:(NSString*)aIpAddress;
 - (int) connectionProtocol;
@@ -115,7 +112,6 @@
 extern NSString* ORPulser33220ModelSerialNumberChanged;
 extern NSString* ORPulser33220ModelCanChangeConnectionProtocolChanged;
 extern NSString* ORPulser33220ModelIpConnectedChanged;
-extern NSString* ORPulser33220ModelUsbConnectedChanged;
 extern NSString* ORPulser33220ModelIpAddressChanged;
 extern NSString* ORPulser33220ModelConnectionProtocolChanged;
 extern NSString* ORPulser33220ModelUSBInterfaceChanged;

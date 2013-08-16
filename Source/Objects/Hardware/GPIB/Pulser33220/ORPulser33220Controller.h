@@ -28,14 +28,12 @@
 {
 	IBOutlet NSMatrix*		connectionProtocolMatrix;
 	IBOutlet NSTextField*	ipConnectedTextField;
-	IBOutlet NSTextField*	usbConnectedTextField;
 	IBOutlet NSTextField*	ipAddressTextField;
 	IBOutlet NSTabView*		connectionProtocolTabView;
 	IBOutlet NSTextField*	connectionNoteTextField;
 
 	IBOutlet NSPopUpButton* serialNumberPopup;
 	IBOutlet NSButton*		ipConnectButton;
-	IBOutlet NSButton*		usbConnectButton;
 	IBOutlet NSButton*		remoteButton;
 }
 
@@ -45,7 +43,6 @@
 #pragma mark ***Interface Management
 - (void) canChangeConnectionProtocolChanged:(NSNotification*)aNote;
 - (void) ipConnectedChanged:(NSNotification*)aNote;
-- (void) usbConnectedChanged:(NSNotification*)aNote;
 - (void) ipAddressChanged:(NSNotification*)aNote;
 - (void) interfacesChanged:(NSNotification*)aNote;
 - (void) serialNumberChanged:(NSNotification*)aNote;

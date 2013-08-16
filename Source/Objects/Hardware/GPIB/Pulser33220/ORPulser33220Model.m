@@ -29,7 +29,6 @@
 NSString* ORPulser33220ModelSerialNumberChanged = @"ORPulser33220ModelSerialNumberChanged";
 NSString* ORPulser33220ModelCanChangeConnectionProtocolChanged = @"ORPulser33220ModelCanChangeConnectionProtocolChanged";
 NSString* ORPulser33220ModelIpConnectedChanged	= @"ORPulser33220ModelIpConnectedChanged";
-NSString* ORPulser33220ModelUsbConnectedChanged = @"ORPulser33220ModelUsbConnectedChanged";
 NSString* ORPulser33220ModelIpAddressChanged	= @"ORPulser33220ModelIpAddressChanged";
 NSString* ORPulser33220ModelConnectionProtocolChanged = @"ORPulser33220ModelConnectionProtocolChanged";
 NSString* ORPulserUSBInConnection				= @"ORPulserUSBInConnection";
@@ -308,20 +307,10 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
     [[NSNotificationCenter defaultCenter] postNotificationName:ORPulser33220ModelIpConnectedChanged object:self];
 }
 
-- (BOOL) usbConnected
-{
-    return usbConnected;
-}
+
 - (ORUSBInterface*) usbInterface
 {
 	return usbInterface;
-}
-
-- (void) setUsbConnected:(BOOL)aUsbConnected
-{
-    usbConnected = aUsbConnected;
-	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORPulser33220ModelUsbConnectedChanged object:self];
 }
 
 - (NSString*) ipAddress
@@ -573,8 +562,8 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 			return [super isConnected];		
 			break;
 		case kHPPulserUseUSB: 
-			if(!usbConnected && !usbInterface)[self connectUSB];
-			return YES;	
+			if(!usbInterface)[self connectUSB];
+			return (usbInterface && [self getUSBController]);	
 			break;
 		case kHPPulserUseIP: 
 			if(!ipConnected && !socket) [self connectIP]; 

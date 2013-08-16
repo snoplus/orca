@@ -45,12 +45,7 @@
                      selector : @selector(ipAddressChanged:)
                          name : ORPulser33220ModelIpAddressChanged
 						object: model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(usbConnectedChanged:)
-                         name : ORPulser33220ModelUsbConnectedChanged
-						object: model];
-	
+		
     [notifyCenter addObserver : self
                      selector : @selector(ipConnectedChanged:)
                          name : ORPulser33220ModelIpConnectedChanged
@@ -95,7 +90,6 @@
     
     [self connectionProtocolChanged:nil];
 	[self ipAddressChanged:nil];
-	[self usbConnectedChanged:nil];
 	[self ipConnectedChanged:nil];
 	[self canChangeConnectionProtocolChanged:nil];
 	[self serialNumberChanged:nil];
@@ -127,11 +121,6 @@
 - (void) ipConnectedChanged:(NSNotification*)aNote
 {
 	[ipConnectedTextField setStringValue: [model ipConnected]?@"Connected":@"Not Connected"];
-}
-
-- (void) usbConnectedChanged:(NSNotification*)aNote
-{
-	[usbConnectedTextField setStringValue: [model usbConnected]?@"Connected":@"Not Connected"];
 }
 
 - (void) ipAddressChanged:(NSNotification*)aNote
@@ -167,7 +156,6 @@
 	
 	[connectionProtocolMatrix setEnabled:!runInProgress || !locked];
 	[ipConnectButton setEnabled:!runInProgress || !locked];
-	[usbConnectButton setEnabled:!runInProgress || !locked];
     [remoteButton setEnabled:!locked && !loading];
 	[ipAddressTextField setEnabled:!locked];
 	[serialNumberPopup setEnabled:!locked];
