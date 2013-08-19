@@ -54,6 +54,7 @@
         IBOutlet ORCompositeTimeLineView*	plotter3;
         IBOutlet ORCompositeTimeLineView*	plotter4;
         IBOutlet ORCompositeTimeLineView*	plotter5;
+        BOOL     scheduledToUpdatePlot;
 }
 
 #pragma mark ¥¥¥Initialization
@@ -91,7 +92,6 @@
 - (void) displayFrequency;
 - (void) adcArrayChanged:(NSNotification*)aNote;
 - (void) adcChanged:(NSNotification*)aNote;
-- (void) adcRangeChanged:(NSNotification*)aNote;
 - (void) feedbackResistorArrayChanged:(NSNotification*)aNote;
 - (void) feedbackResistorChanged:(NSNotification*)aNote;
 - (void) baselineVoltageArrayChanged:(NSNotification*)aNote;
@@ -106,7 +106,6 @@
 - (IBAction) pollNowAction:(id)sender;
 - (IBAction) shipValuesAction:(id)sender;
 - (IBAction) pollTimeAction:(id)sender;
-- (IBAction) adcRangeAction:(id)sender;
 - (IBAction) amplitudesAction:(id)sender;
 - (IBAction) loopForeverAction:(id)sender;
 - (IBAction) pulseCountAction:(id)sender;
@@ -122,7 +121,6 @@
 - (IBAction) startPulserAction:(id)sender;
 - (IBAction) stopPulserAction:(id)sender;
 - (IBAction) readAdcs:(id)sender;
-- (IBAction) readTemperatures:(id)sender;
 - (IBAction) feedBackResistorAction:(id)sender;
 - (IBAction) baselineVoltageAction:(id)sender;
 

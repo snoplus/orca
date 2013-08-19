@@ -36,6 +36,7 @@
 
 - (void) dealloc
 {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
     [super dealloc];
 }
 
@@ -53,32 +54,32 @@
 {
     if(aTag>=0 && aTag<26){
         NSString* tagString[26] = {
-            @"Adc0",
-            @"Adc1",
-            @"Adc2",
-            @"Adc3",
-            @"Adc4",
-            @"Adc8",
-            @"Adc9",
-            @"Adc10",
-            @"Adc11",
-            @"Adc12",
+            @"Baseline0",
+            @"Baseline1",
+            @"Baseline2",
+            @"Baseline3",
+            @"Baseline4",
+            @"Baseline8",
+            @"Baseline9",
+            @"Baseline10",
+            @"Baseline11",
+            @"Baseline12",
             @"Adc7",
             @"Adc15",
             @"Adc5",
             @"Adc6",
             @"Adc13",
             @"Adc14",
-            @"leakage0",
-            @"leakage1",
-            @"leakage2",
-            @"leakage3",
-            @"leakage4",
-            @"leakage8",
-            @"leakage9",
-            @"leakage10",
-            @"leakage11",
-            @"leakage12"
+            @"Leakage0",
+            @"Leakage1",
+            @"Leakage2",
+            @"Leakage3",
+            @"Leakage4",
+            @"Leakage8",
+            @"Leakage9",
+            @"Leakage10",
+            @"Leakage11",
+            @"Leakage12"
         };
         return tagString[aTag];
     }
@@ -204,7 +205,12 @@
 		[aPlot release];
         tag++;
 	}
-
+    [plotter0 setPlotTitle:@"Baseline, ADC0-4"];
+    [plotter1 setPlotTitle:@"Baseline, ADC5-8"];
+    [plotter2 setPlotTitle:@"On-chip Temperature"];
+    [plotter3 setPlotTitle:@"Operating Voltages"];
+    [plotter4 setPlotTitle:@"Leakage Current, ADC0-4"];
+    [plotter5 setPlotTitle:@"Leakage Current, ADC5-8"];
 
     [plotter0 setShowLegend:YES];
 	[plotter1 setShowLegend:YES];
@@ -277,11 +283,6 @@
     [notifyCenter addObserver : self
                      selector : @selector(enabledChanged:)
                          name : ORMJDPreAmpEnabledChanged
-						object: model];
-
-	[notifyCenter addObserver : self
-                     selector : @selector(adcRangeChanged:)
-                         name : ORMJDPreAmpAdcRangeChanged
 						object: model];
 	
 	[notifyCenter addObserver : self
@@ -378,7 +379,6 @@
 	[self attenuatedChanged:nil];
 	[self finalAttenuatedChanged:nil];
 	[self enabledChanged:nil];
-	[self adcRangeChanged:nil];
 	[self pulseCountChanged:nil];
 	[self loopForeverChanged:nil];
 	[self adcArrayChanged:nil];
@@ -395,48 +395,45 @@
 {
 	if(aNotification == nil || [aNotification object] == [plotter0 xAxis]){
 		[model setMiscAttributes:[(ORAxis*)[plotter0 xAxis]attributes] forKey:@"XAttributes0"];
-	};
-	
+	}
 	if(aNotification == nil || [aNotification object] == [plotter0 yAxis]){
 		[model setMiscAttributes:[(ORAxis*)[plotter0 yAxis]attributes] forKey:@"YAttributes0"];
-	};
+	}
     
 	if(aNotification == nil || [aNotification object] == [plotter1 xAxis]){
 		[model setMiscAttributes:[(ORAxis*)[plotter1 xAxis]attributes] forKey:@"XAttributes1"];
-	};
-	
+	}
 	if(aNotification == nil || [aNotification object] == [plotter1 yAxis]){
 		[model setMiscAttributes:[(ORAxis*)[plotter1 yAxis]attributes] forKey:@"YAttributes1"];
-	};
+	}
+    
     if(aNotification == nil || [aNotification object] == [plotter2 xAxis]){
 		[model setMiscAttributes:[(ORAxis*)[plotter2 xAxis]attributes] forKey:@"XAttributes2"];
-	};
-	
+	}
 	if(aNotification == nil || [aNotification object] == [plotter2 yAxis]){
 		[model setMiscAttributes:[(ORAxis*)[plotter2 yAxis]attributes] forKey:@"YAttributes2"];
-	};
+	}
+    
     if(aNotification == nil || [aNotification object] == [plotter3 xAxis]){
 		[model setMiscAttributes:[(ORAxis*)[plotter3 xAxis]attributes] forKey:@"XAttributes3"];
-	};
-	
+	}
 	if(aNotification == nil || [aNotification object] == [plotter3 yAxis]){
 		[model setMiscAttributes:[(ORAxis*)[plotter3 yAxis]attributes] forKey:@"YAttributes3"];
-	};
+	}
     
     if(aNotification == nil || [aNotification object] == [plotter4 xAxis]){
 		[model setMiscAttributes:[(ORAxis*)[plotter4 xAxis]attributes] forKey:@"XAttributes4"];
-	};
-	
+	}
 	if(aNotification == nil || [aNotification object] == [plotter4 yAxis]){
 		[model setMiscAttributes:[(ORAxis*)[plotter4 yAxis]attributes] forKey:@"YAttributes4"];
-	};
+	}
+    
     if(aNotification == nil || [aNotification object] == [plotter5 xAxis]){
 		[model setMiscAttributes:[(ORAxis*)[plotter5 xAxis]attributes] forKey:@"XAttributes5"];
-	};
-	
+	}
 	if(aNotification == nil || [aNotification object] == [plotter5 yAxis]){
 		[model setMiscAttributes:[(ORAxis*)[plotter5 yAxis]attributes] forKey:@"YAttributes5"];
-	};
+	}
 }
 
 - (void) miscAttributesChanged:(NSNotification*)aNote
@@ -445,126 +442,59 @@
 	NSString*				key = [[aNote userInfo] objectForKey:ORMiscAttributeKey];
 	NSMutableDictionary* attrib = [model miscAttributesForKey:key];
 	
-	if(aNote == nil || [key isEqualToString:@"XAttributes0"]){
-		if(aNote==nil)attrib = [model miscAttributesForKey:@"XAttributes0"];
-		if(attrib){
-			[(ORAxis*)[plotter0 xAxis] setAttributes:attrib];
-			[plotter0 setNeedsDisplay:YES];
-			[[plotter0 xAxis] setNeedsDisplay:YES];
-		}
-	}
-	if(aNote == nil || [key isEqualToString:@"YAttributes0"]){
-		if(aNote==nil)attrib = [model miscAttributesForKey:@"YAttributes0"];
-		if(attrib){
-			[(ORAxis*)[plotter0 yAxis] setAttributes:attrib];
-			[plotter0 setNeedsDisplay:YES];
-			[[plotter0 yAxis] setNeedsDisplay:YES];
-		}
-	}
-	if(aNote == nil || [key isEqualToString:@"XAttributes1"]){
-		if(aNote==nil)attrib = [model miscAttributesForKey:@"XAttributes1"];
-		if(attrib){
-			[(ORAxis*)[plotter1 xAxis] setAttributes:attrib];
-			[plotter1 setNeedsDisplay:YES];
-			[[plotter1 xAxis] setNeedsDisplay:YES];
-		}
-	}
-	if(aNote == nil || [key isEqualToString:@"YAttributes1"]){
-		if(aNote==nil)attrib = [model miscAttributesForKey:@"YAttributes1"];
-		if(attrib){
-			[(ORAxis*)[plotter1 yAxis] setAttributes:attrib];
-			[plotter1 setNeedsDisplay:YES];
-			[[plotter1 yAxis] setNeedsDisplay:YES];
-		}
-	}
-    if(aNote == nil || [key isEqualToString:@"XAttributes2"]){
-		if(aNote==nil)attrib = [model miscAttributesForKey:@"XAttributes2"];
-		if(attrib){
-			[(ORAxis*)[plotter2 xAxis] setAttributes:attrib];
-			[plotter2 setNeedsDisplay:YES];
-			[[plotter2 xAxis] setNeedsDisplay:YES];
-		}
-	}
-	if(aNote == nil || [key isEqualToString:@"YAttributes2"]){
-		if(aNote==nil)attrib = [model miscAttributesForKey:@"YAttributes2"];
-		if(attrib){
-			[(ORAxis*)[plotter2 yAxis] setAttributes:attrib];
-			[plotter2 setNeedsDisplay:YES];
-			[[plotter2 yAxis] setNeedsDisplay:YES];
-		}
-	}
-    if(aNote == nil || [key isEqualToString:@"XAttributes3"]){
-		if(aNote==nil)attrib = [model miscAttributesForKey:@"XAttributes3"];
-		if(attrib){
-			[(ORAxis*)[plotter3 xAxis] setAttributes:attrib];
-			[plotter3 setNeedsDisplay:YES];
-			[[plotter3 xAxis] setNeedsDisplay:YES];
-		}
-	}
-	if(aNote == nil || [key isEqualToString:@"YAttributes3"]){
-		if(aNote==nil)attrib = [model miscAttributesForKey:@"YAttributes3"];
-		if(attrib){
-			[(ORAxis*)[plotter3 yAxis] setAttributes:attrib];
-			[plotter3 setNeedsDisplay:YES];
-			[[plotter3 yAxis] setNeedsDisplay:YES];
-		}
-	}
+	if(aNote == nil || [key isEqualToString:@"XAttributes0"])[self setPlot:plotter0 xAttributes:attrib];
+	if(aNote == nil || [key isEqualToString:@"YAttributes0"])[self setPlot:plotter0 yAttributes:attrib];
     
-    if(aNote == nil || [key isEqualToString:@"XAttributes4"]){
-		if(aNote==nil)attrib = [model miscAttributesForKey:@"XAttributes4"];
-		if(attrib){
-			[(ORAxis*)[plotter4 xAxis] setAttributes:attrib];
-			[plotter4 setNeedsDisplay:YES];
-			[[plotter4 xAxis] setNeedsDisplay:YES];
-		}
-	}
-	if(aNote == nil || [key isEqualToString:@"YAttributes4"]){
-		if(aNote==nil)attrib = [model miscAttributesForKey:@"YAttributes4"];
-		if(attrib){
-			[(ORAxis*)[plotter4 yAxis] setAttributes:attrib];
-			[plotter4 setNeedsDisplay:YES];
-			[[plotter4 yAxis] setNeedsDisplay:YES];
-		}
-	}
-    if(aNote == nil || [key isEqualToString:@"XAttributes5"]){
-		if(aNote==nil)attrib = [model miscAttributesForKey:@"XAttributes5"];
-		if(attrib){
-			[(ORAxis*)[plotter5 xAxis] setAttributes:attrib];
-			[plotter5 setNeedsDisplay:YES];
-			[[plotter5 xAxis] setNeedsDisplay:YES];
-		}
-	}
-	if(aNote == nil || [key isEqualToString:@"YAttributes5"]){
-		if(aNote==nil)attrib = [model miscAttributesForKey:@"YAttributes5"];
-		if(attrib){
-			[(ORAxis*)[plotter5 yAxis] setAttributes:attrib];
-			[plotter5 setNeedsDisplay:YES];
-			[[plotter5 yAxis] setNeedsDisplay:YES];
-		}
-	}
+	if(aNote == nil || [key isEqualToString:@"XAttributes1"])[self setPlot:plotter1 xAttributes:attrib];
+	if(aNote == nil || [key isEqualToString:@"YAttributes1"])[self setPlot:plotter1 yAttributes:attrib];
+    
+    if(aNote == nil || [key isEqualToString:@"XAttributes2"])[self setPlot:plotter2 xAttributes:attrib];
+	if(aNote == nil || [key isEqualToString:@"YAttributes2"])[self setPlot:plotter2 yAttributes:attrib];
+    
+    if(aNote == nil || [key isEqualToString:@"XAttributes3"])[self setPlot:plotter3 xAttributes:attrib];
+	if(aNote == nil || [key isEqualToString:@"YAttributes3"])[self setPlot:plotter3 yAttributes:attrib];
+    
+    if(aNote == nil || [key isEqualToString:@"XAttributes4"])[self setPlot:plotter3 xAttributes:attrib];
+	if(aNote == nil || [key isEqualToString:@"YAttributes4"])[self setPlot:plotter4 yAttributes:attrib];
+    
+    if(aNote == nil || [key isEqualToString:@"XAttributes5"])[self setPlot:plotter4 xAttributes:attrib];
+	if(aNote == nil || [key isEqualToString:@"YAttributes5"])[self setPlot:plotter5 yAttributes:attrib];
 }
+
+- (void) setPlot:(id)aPlotter xAttributes:(id)attrib
+{
+    if(attrib){
+        [(ORAxis*)[aPlotter xAxis] setAttributes:attrib];
+        [aPlotter setNeedsDisplay:YES];
+        [[aPlotter yAxis] setNeedsDisplay:YES];
+    }
+}
+- (void) setPlot:(id)aPlotter yAttributes:(id)attrib
+{
+    if(attrib){
+        [(ORAxis*)[aPlotter yAxis] setAttributes:attrib];
+        [aPlotter setNeedsDisplay:YES];
+        [[aPlotter yAxis] setNeedsDisplay:YES];
+    }
+}
+
 - (void) updateTimePlot:(NSNotification*)aNote
 {
-	if(!aNote || ([aNote object] == [model timeRate:0])){
-		[plotter0 setNeedsDisplay:YES];
-	}
-	else if(!aNote || ([aNote object] == [model timeRate:1])){
-		[plotter1 setNeedsDisplay:YES];
-	}
+    if(!scheduledToUpdatePlot){
+        scheduledToUpdatePlot=YES;
+        [self performSelector:@selector(deferredPlotUpdate) withObject:nil afterDelay:2];
+    }
+}
 
-	else if(!aNote || ([aNote object] == [model timeRate:2])){
-		[plotter2 setNeedsDisplay:YES];
-	}
-    else if(!aNote || ([aNote object] == [model timeRate:3])){
-		[plotter3 setNeedsDisplay:YES];
-	}
-    
-    else if(!aNote || ([aNote object] == [model timeRate:4])){
-		[plotter4 setNeedsDisplay:YES];
-	}
-    else if(!aNote || ([aNote object] == [model timeRate:5])){
-		[plotter5 setNeedsDisplay:YES];
-	}
+- (void) deferredPlotUpdate
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(deferredPlotUpdate) object:nil];
+    scheduledToUpdatePlot = NO;
+    [plotter0 setNeedsDisplay:YES];
+    [plotter1 setNeedsDisplay:YES];
+    [plotter2 setNeedsDisplay:YES];
+    [plotter3 setNeedsDisplay:YES];
+    [plotter4 setNeedsDisplay:YES];
 }
 
 - (void) adcEnabledMaskChanged:(NSNotification*)aNote
@@ -588,12 +518,6 @@
 - (void) shipValuesChanged:(NSNotification*)aNote
 {
 	[shipValuesCB setIntValue: [model shipValues]];
-}
-
-- (void) adcRangeChanged:(NSNotification*)aNote
-{
-	[adcRange0PU selectItemAtIndex: [model adcRange:0]];
-	[adcRange1PU selectItemAtIndex: [model adcRange:1]];
 }
 
 - (void) adcArrayChanged:(NSNotification*)aNote
@@ -868,19 +792,9 @@
 	[model stopPulser];
 }
 
-- (IBAction) adcRangeAction:(id)sender
-{
-	[model setAdcRange:[sender tag] value:[sender indexOfSelectedItem]]; 
-}
-
 - (IBAction) readAdcs:(id)sender
 {
 	[model readAllAdcs:YES];
-}
-
-- (IBAction) readTemperatures:(id)sender
-{
-	[model readAllTemperatures:YES];
 }
 
 - (IBAction) pollNowAction:(id)sender

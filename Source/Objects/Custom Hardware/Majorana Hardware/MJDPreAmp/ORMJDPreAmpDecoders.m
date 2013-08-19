@@ -30,8 +30,7 @@
 //
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 //                          ^^^^ ^^^^ ^^^^- device id
-// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  unix time of measurement (group 0)
-// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  unix time of measurement (group 1)
+// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  unix time of measurement
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  enabled adc mask
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  adc chan 0 encoded as a float
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  adc chan 1 encoded as a float
@@ -64,11 +63,10 @@ static NSString* kMJDPreAmpUnit[21] = {
 	}theValue;
 	int ident = dataPtr[1] & 0xfff;
 	int i;
-	int index = 5;
-	for(i=0;i<kMJDPreAmpDacChannels;i++){
+	int index = 4;
+	for(i=0;i<kMJDPreAmpAdcChannels;i++){
 		unsigned long theTime;
-		if(i<8) theTime = dataPtr[2];
-		else    theTime = dataPtr[3];
+		theTime = dataPtr[2];
 		theValue.asLong = dataPtr[index]; //encoded as float, use union to convert
 		
 		[aDataSet loadTimeSeries:theValue.asFloat										
@@ -96,14 +94,12 @@ static NSString* kMJDPreAmpUnit[21] = {
 		
 	NSCalendarDate* date1 = [NSCalendarDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[2]];
 	[date1 setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
+    theString = [theString stringByAppendingFormat:@"TimeStamp: %@\n",date1];
 
-	NSCalendarDate* date2 = [NSCalendarDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[3]];
-	[date2 setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
-
-	unsigned long enabledMask = dataPtr[4];
-	int index = 5;
+	unsigned long enabledMask = dataPtr[3];
+	int index = 4;
 	int i;
-	for(i=0;i<kMJDPreAmpDacChannels;i++){
+	for(i=0;i<kMJDPreAmpAdcChannels;i++){
 		if(enabledMask & (0x1<<i)){
 			theData.asLong = dataPtr[index];
 			theString = [theString stringByAppendingFormat:@"%d: %.3f\n",i,theData.asFloat];

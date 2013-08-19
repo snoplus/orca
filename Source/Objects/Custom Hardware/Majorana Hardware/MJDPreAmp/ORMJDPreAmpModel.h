@@ -41,18 +41,18 @@
     BOOL attenuated[2];
     BOOL finalAttenuated[2];
     BOOL enabled[2];
-    int adcRange[2];
     unsigned short pulseCount;
     BOOL loopForever;
     int pollTime;
     BOOL shipValues;
 	unsigned long	dataId;
-	unsigned long timeMeasured[2];
+	unsigned long timeMeasured;
     unsigned long adcEnabledMask;
-    ORTimeRate*		timeRates[26]; //fix this array bounds to be equal to the number of plotlines - set to 26 - niko
+    ORTimeRate*		timeRates[26];
     ORAlarm*		temperatureAlarm[2];
     ORAlarm*		leakageCurrentAlarm[10];
     ORAlarm*		adcAlarm[4];
+    BOOL rangesHaveBeenSet;
 }
 
 - (void) setUpArrays;
@@ -85,9 +85,7 @@
 - (void) setPulseCount:(unsigned short)aPulseCount;
 - (BOOL) enabled:(int)index;
 - (void) setEnabled:(int)index value:(BOOL)aEnabled;
-- (int) adcRange:(int)index;
-- (void) setAdcRange:(int)index value:(int)aValue;
-- (unsigned long) timeMeasured:(int)index;
+- (unsigned long) timeMeasured;
 
 - (BOOL) attenuated:(int)index;
 - (void) setAttenuated:(int)index value:(BOOL)aAttenuated;
@@ -125,13 +123,7 @@
 - (void) writeAmplitude:(int)index;
 - (void) writeAmplitudes;
 - (void) zeroAmplitudes;
-//- (void) writeRangeForAdcChip:(int)index;
-- (void) writeRangeForAdcChip:(int)aChip withValue:(int)index; // niko
-- (void) writeAdcChipRanges;
-- (void) readAdcsOnChip:(int)aChip verbose:(BOOL)verbose;
-- (void) readAllTemperatures:(BOOL)verbose;
-- (void) readAllTemperatures;
-- (void) readTempOnChip:(int)aChip verbose:(BOOL)verbose; // niko
+- (void) writeAdcRanges;
 - (void) readAllAdcs;
 - (void) readAllAdcs:(BOOL)verbose;
 - (void) pollValues;
@@ -166,7 +158,6 @@ extern NSString* MJDPreAmpSettingsLock;
 extern NSString* ORMJDPreAmpDacChanged;
 extern NSString* ORMJDPreAmpAmplitudeChanged;
 extern NSString* ORMJDPreAmpAdcChanged;
-extern NSString* ORMJDPreAmpAdcRangeChanged;
 extern NSString* ORMJDFeedBackResistorArrayChanged;
 extern NSString* ORMJDBaselineVoltageArrayChanged;
 extern NSString* ORMJDFeedBackResistorChanged;

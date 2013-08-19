@@ -43,7 +43,6 @@ NSString* ORMJDPreAmpAmplitudeArrayChanged	= @"ORMJDPreAmpAmplitudeArrayChanged"
 NSString* ORMJDPreAmpAmplitudeChanged		= @"ORMJDPreAmpAmplitudeChanged";
 NSString* MJDPreAmpSettingsLock				= @"MJDPreAmpSettingsLock";
 NSString* ORMJDPreAmpAdcChanged				= @"ORMJDPreAmpAdcChanged";
-NSString* ORMJDPreAmpAdcRangeChanged		= @"ORMJDPreAmpAdcRangeChanged";
 NSString* ORMJDFeedBackResistorArrayChanged = @"ORMJDFeedBackResistorArrayChanged";
 NSString* ORMJDBaselineVoltageArrayChanged  = @"ORMJDBaselineVoltageArrayChanged";
 NSString* ORMJDFeedBackResistorChanged      = @"ORMJDFeedBackResistorChanged";
@@ -69,17 +68,6 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 #define kADC1		0xE0000000
 #define kADC2		0xE1000000
 
-#define kADCRange10Reg1		0x00A00000
-#define kADCRange5Reg1		0x00AAA000
-//#define kADCRange2_5Reg1	0x00BA40
-#define kADCRange2_5Reg1	0x00B54000 // niko
-
-#define kADCRange10Reg2		0x00C00000
-#define kADCRange5Reg2		0x00CAA000
-//#define kADCRange2_5Reg2	0x00DA40
-#define kADCRange2_5Reg2	0x00D54000 // niko
-
-
 #define kReadAdcChannel0 0x00801000 // 8 single-ended inputs mode
 #define kReadAdcChannel1 0x00841000
 #define kReadAdcChannel2 0x00881000
@@ -90,6 +78,44 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 #define kReadAdcChannel7 0x009C1000
 
 #define kReadTempChannel7 0x009F1000 // 7 pseudo-differential inputs mode, temperature read out from channel 7 - niko
+
+//new stuff
+
+#define kControlReg  0x4
+#define kRangeReg1   0x5
+#define kRangeReg2   0x6
+
+#define kBipolar10V     0x0
+#define kBipolar5V      0x1
+#define kBipolar2_5V    0x2
+#define kUniploar10V    0x3
+
+#define kSingleEnded 0x0
+#define kPseudoDiff  0x3
+
+struct {
+    unsigned long adcSelection;
+    unsigned long mode;
+    float slope;
+    float intercept;
+} mjdPreAmpTable[16] = {
+    {kADC1,kSingleEnded,2*24/4096.,0},
+    {kADC1,kSingleEnded,2*24/4096.,0},
+    {kADC1,kSingleEnded,2*24/4096.,0},
+    {kADC1,kSingleEnded,2*24/4096.,0},
+    {kADC1,kSingleEnded,2*24/4096.,0},
+    {kADC1,kSingleEnded,4*12/4096.,0},
+    {kADC1,kSingleEnded,4*12/4096.,0},
+    {kADC1,kPseudoDiff,-0.4494,2387.82},
+    {kADC2,kSingleEnded,2*24/4096.,0},
+    {kADC2,kSingleEnded,2*24/4096.,0},
+    {kADC2,kSingleEnded,2*24/4096.,0},
+    {kADC2,kSingleEnded,2*24/4096.,0},
+    {kADC2,kSingleEnded,2*24/4096.,0},
+    {kADC2,kSingleEnded,4*12/4096.,0},
+    {kADC2,kSingleEnded,4*12/4096.,0},
+    {kADC2,kPseudoDiff,-0.4494,2387.82},
+};
 
 
 @implementation ORMJDPreAmpModel
@@ -248,24 +274,6 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 	}
 }
 
-- (int) adcRange:(int)index
-{
-	if(index>=0 && index<2) return adcRange[index];
-	else return 0;
-}
-
-- (void) setAdcRange:(int)index value:(int)aValue
-{	
-	if(index<0 || index>1) return;
-	if(aValue<0)	  aValue = 0;
-	else if(aValue>2) aValue = 2;
-	[[[self undoManager] prepareWithInvocationTarget:self] setAdcRange:index value:[self adcRange:index]];
-	adcRange[index] = aValue;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpAdcRangeChanged
-															object:self];
-		
-}
-
 - (NSMutableArray*) feedBackResistors
 {
     return feedBackResistors;
@@ -281,7 +289,7 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 }
 - (float) feedBackResistor:(unsigned short) aChan
 {
-    if(aChan<[feedBackResistors count]){
+    if(aChan<kMJDPreAmpAdcChannels){
         return [[feedBackResistors objectAtIndex:aChan] floatValue];
 	}
 	else return 0.0;
@@ -289,7 +297,7 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 }
 - (void) setFeedBackResistor:(int) aChan value:(float) aValue
 {
-    if(aChan<[feedBackResistors count]){
+    if(aChan<kMJDPreAmpAdcChannels){
 		[[[self undoManager] prepareWithInvocationTarget:self] setFeedBackResistor:aChan value:[self feedBackResistor:aChan]];
 		[feedBackResistors replaceObjectAtIndex:aChan withObject:[NSNumber numberWithFloat:aValue]];
         
@@ -396,10 +404,8 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 
 - (float) adc:(unsigned short) aChan
 {
-	if(aChan<[adcs count]){
-		if(adcEnabledMask & (0x1<<aChan)){
-		return [[adcs objectAtIndex:aChan] floatValue];
-		}
+	if(aChan<kMJDPreAmpAdcChannels){
+		if(adcEnabledMask & (0x1<<aChan))return [[adcs objectAtIndex:aChan] floatValue];
 		else return 0.0;
 	}
 	else return 0.0;
@@ -407,12 +413,16 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 
 - (void) setAdc:(int) aChan value:(float) aValue
 {
-	if(aChan<[adcs count]){
-		[[[self undoManager] prepareWithInvocationTarget:self] setAdc:aChan value:[self adc:aChan]];
+	if(aChan<kMJDPreAmpAdcChannels){
 		[adcs replaceObjectAtIndex:aChan withObject:[NSNumber numberWithFloat:aValue]];
 	
 		NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
 		[userInfo setObject:[NSNumber numberWithFloat:aChan] forKey: @"Channel"];
+
+        if(timeRates[aChan] == nil){
+            timeRates[aChan] = [[ORTimeRate alloc] init];
+        }
+		[timeRates[aChan] addDataToTimeAverage:aValue];
 
         
         //for temperature & operating voltages plot raw ADC value
@@ -580,10 +590,9 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 													  userInfo: userInfo];
 }
 
-- (unsigned long) timeMeasured:(int)index
+- (unsigned long) timeMeasured
 {
-	if(index>=0 && index<2)return timeMeasured[index];
-	else return 0;
+	return timeMeasured;
 }
 - (NSMutableArray*) amplitudes
 {
@@ -682,33 +691,29 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 	[self writeAuxIOSPI:(kDAC2 | zeroAllOctalChips)];
 }
 
-- (void) writeAdcChipRanges
+- (void) writeAdcRanges
 {
-	//[self writeRangeForAdcChip:0];
-	//[self writeRangeForAdcChip:1];
-    [self writeRangeForAdcChip:0 withValue:0]; // 10V range by default - niko
-	[self writeRangeForAdcChip:1 withValue:0];
-}
-
-//- (void) writeRangeForAdcChip:(int)index - niko
-- (void) writeRangeForAdcChip:(int)aChip withValue:(int)index
-{
-	//if(index>=0 && index<2){
-    if(index>=0 && index<3){
-        
-        unsigned long rangeValue[2][3] = {
-	  		{kADCRange10Reg1, kADCRange5Reg1, kADCRange2_5Reg1},
-	  		{kADCRange10Reg2, kADCRange5Reg2, kADCRange2_5Reg2}
-	  	};
-		unsigned long adcBase[2] = {kADC1, kADC2};
-		
-		//unsigned long aValue = adcBase[index] | rangeValue[index][adcRange[index]];
-        unsigned long aValue = adcBase[aChip] | rangeValue[0][index]; // first register on chip - niko
-        [self writeAuxIOSPI:aValue];
-        
-        aValue = adcBase[aChip] | rangeValue[1][index]; // second register on chip
-        [self writeAuxIOSPI:aValue];
-    }
+    rangesHaveBeenSet = YES;
+    //the control word is mapped to bits 23 - bit 8 of the 32 bit word sent to the
+    //controller
+    
+    //both chips are set up the same. so we only have to 
+    unsigned long controlWord;    
+    controlWord =   (kRangeReg1      << 13)  |
+                    (kBipolar10V     << 11)  |        //chan 0
+                    (kBipolar10V     << 9)   |        //chan 1
+                    (kBipolar10V     << 7)   |        //chan 2
+                    (kBipolar2_5V    << 5);           //chan 3
+    [self writeAuxIOSPI:kADC1 | (controlWord<<8)];  //shift to bit 8 + add the adc sel
+    [self writeAuxIOSPI:kADC2 | (controlWord<<8)];  //shift to bit 8 + add the adc sel
+    
+    controlWord =   (kRangeReg2      << 13)  |
+                    (kBipolar10V     << 11)  |        //chan 4
+                    (kBipolar10V     << 9)   |        //chan 5
+                    (kBipolar10V     << 7)   |        //chan 6
+                    (kBipolar2_5V    << 5);           //chan 7
+    [self writeAuxIOSPI:kADC1 | (controlWord<<8)];  //shift to bit 8 + add the adc sel
+    [self writeAuxIOSPI:kADC2 | (controlWord<<8)];  //shift to bit 8 + add the adc sel
 }
 
 - (void) readAllAdcs
@@ -718,160 +723,46 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 
 - (void) readAllAdcs:(BOOL)verbose
 {
-	[self readAdcsOnChip:0 verbose:verbose];
-	[self readAdcsOnChip:1 verbose:verbose];
-    [self readTempOnChip:0 verbose:verbose];
-	[self readTempOnChip:1 verbose:verbose];
-}
+    if(!rangesHaveBeenSet)[self writeAdcRanges];
 
-- (void) readAdcsOnChip:(int)aChip verbose:(BOOL)verbose
-{
-    if(aChip<0 || aChip>1) return;
-    
-    //[self writeRangeForAdcChip:aChip ];
-    [self writeRangeForAdcChip:aChip withValue:0]; // use 10V range for baseline values
-    
-    //float voltageMultiplier = 10./pow(2.,adcRange[aChip]+12); 
-    float voltageBase = 20./pow(2.,13); // 13 bits ADC, hardcoded 10V range - niko
-    
-    float voltageMultiplier = 2.; // account for voltage multiplier of 2 for +/-12V hard wired on ADC chip 1 and for first five channels of both ADC chips - niko
-    
-    unsigned long adcBase = kADC1;
-    if(aChip) adcBase = kADC2;
-	
-    unsigned long channelSelect[8] = {
-		kReadAdcChannel0,kReadAdcChannel1,kReadAdcChannel2,kReadAdcChannel3,
-		kReadAdcChannel4,kReadAdcChannel5,kReadAdcChannel6,kReadAdcChannel7,
-	};
-    
-    //have to select a channel to be digitized, then the next time a selection is done the last channel can be read
-    int i;
-    unsigned long readBack;
-    //only read the first 7 channels - channel 8 is temperature, which has a different range
-	for(i=0;i<7;i++){
-		if(adcEnabledMask&(0x1<<((aChip*8)+i))){
-
-			int j;
-			for(j=0;j<4;j++) readBack = [self writeAuxIOSPI:adcBase | channelSelect[i]];
+    int chan;
+	for(chan=0;chan<16;chan++){
+		if(adcEnabledMask & (0x1<<chan)){
+            unsigned long controlWord = (kControlReg << 13)    |            //sel the chan set
+                                        (chan<<10)             |            //set chan
+                                        (mjdPreAmpTable[chan].mode << 8);   //set mode, other bits are zero
             
-			readBack = ~readBack;
-			int channelReadBack = (readBack & 0xE000) >> 13;
- 
-			if(channelReadBack != i) {
-			  NSLog(@"Warning! channelReadBack = %d, not %d\n", channelReadBack, i);
-			}
-
-			if(aChip && (channelReadBack == 5 || channelReadBack == 6)){ // account for voltage multiplier of 4 for +/-24V - niko
-			  voltageMultiplier *= 2.;
-			}
-
-			int voltage = readBack & 0xfff;
-			if(readBack & 0x1000) voltage |= 0xfffff000;
-
-			if(verbose)NSLog(@"Read voltage %f*%f*%d=%f on channel %d, for baseline %f and Rf %f\n", voltageBase, voltageMultiplier, voltage, voltageBase*voltageMultiplier*voltage, channelReadBack, [self baselineVoltage:((aChip*8)+channelReadBack)], [self feedBackResistor:((aChip*8)+channelReadBack)]);
+            unsigned long rawAdcValue = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection << 13) | (controlWord<<8)];
             
-			[self setAdc:(aChip*8)+i value:voltageBase*voltageMultiplier*voltage];
+			int decodedChannel = (rawAdcValue & 0xE000) >> 13; //use the whichever chan was converted, my be diff than the one selected above.
+                        
+            long adcValue;
+            if(rawAdcValue & 0x1000)adcValue = -(~rawAdcValue & 0x1FFF) + 1;
+            else adcValue                    = rawAdcValue & 0x1FFF;
             
-            [self checkAdcIsWithinLimits:(aChip*8)+i value:voltageBase*voltageMultiplier*voltage];
+            float convertedValue = adcValue*mjdPreAmpTable[decodedChannel].slope + adcValue*mjdPreAmpTable[decodedChannel].intercept;
             
-			voltageMultiplier = 2.;
-
+			if(verbose)NSLog(@"%d: %.2f (0x%08x)\n",decodedChannel,convertedValue,rawAdcValue);
+            
+			[self setAdc:decodedChannel value:convertedValue];
+            [self checkAdcIsWithinLimits:decodedChannel value:convertedValue];
+                    
 		}
-		else [self setAdc:(aChip*8)+i value:0.0];
+		else [self setAdc:chan value:0.0];
 	}
     
-    
-    
-	
-	//get the time(UT!) for the data record. 
+	//get the time(UT!) for the data record.
 	time_t	ut_Time;
 	time(&ut_Time);
-	timeMeasured[aChip] = ut_Time;
+	timeMeasured = ut_Time;
 }
-
-- (void) readAllTemperatures
-{
-    [self readAllTemperatures:NO];
-}
-
-- (void) readAllTemperatures:(BOOL) verbose
-{
-	[self readTempOnChip:0 verbose:verbose];
-	[self readTempOnChip:1 verbose:verbose];
-}
-
-- (void) readTempOnChip:(int)aChip verbose:(BOOL)verbose // read temperature on ADC chips - niko
-{
-    if(aChip<0 || aChip>1) return;
-    
-    [self writeRangeForAdcChip:aChip withValue:2]; // use 2.5V range for temperatures
-
-    unsigned long adcBase = kADC1;
-    if(aChip) adcBase = kADC2;
-
-    unsigned long channelSelect = kReadTempChannel7;
-
-    unsigned long readBack;
-    
-    if(adcEnabledMask&(0x1<<((aChip*8)+7))){
-        
-        int j;
-        for(j=0;j<4;j++) readBack = [self writeAuxIOSPI:adcBase | channelSelect];
-        
-        //readBack = [self writeAuxIOSPI:adcBase | channelSelect];
-        //sleep(1);
-        //readBack = [self writeAuxIOSPI:adcBase | channelSelect];
-        //readBack = [self writeAuxIOSPI:adcBase | channelSelect];
-        //readBack = [self writeAuxIOSPI:adcBase | channelSelect];
-
-        readBack = ~readBack;
-        int channelReadBack = (readBack & 0xE000) >> 13;
-        
-        if(channelReadBack != 7){
-            NSLog(@"Warning! channelReadBack = %d, not %d\n", channelReadBack, 7);
-        }
-        
-        int tempCode = readBack & 0xfff;
-        if(readBack & 0x1000) tempCode |= 0xfffff000;
-
-        
-        tempCode += pow(2.,12); // not sure about that, but seems to work - niko
-
-        
-        // rough temperature-code calibration from curve in doc for 10V range
-        //int tempMinCode = 4350;
-        //int tempZeroCode = 4395;
-        //float tempMaxValue = 80.;
-        // rough temperature-code calibration from curve in doc for 2.5V range
-        int tempMinCode = 5140;
-        int tempZeroCode = 5320;
-        float tempMaxValue = 80.;
-        
-        float tempOnChip = tempMaxValue - (tempCode - tempMinCode)*tempMaxValue/(tempZeroCode - tempMinCode);
-        
-        
-        if(verbose) NSLog(@"chip %d, raw temp %d, temp %f on channel %d\n", aChip, tempCode, tempOnChip, channelReadBack);
-        
-        [self setAdc:(aChip*8)+7 value:tempOnChip];
-        [self checkTempIsWithinLimits:aChip value:tempOnChip];
-    }
-    
-    //get the time(UT!) for the data record.
-	time_t	ut_Time;
-	time(&ut_Time);
-	timeMeasured[aChip] = ut_Time;
-}
-
 
 - (void) pollValues
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollValues) object:nil];
+        
 	[self readAllAdcs];
-	if(shipValues)[self shipRecords];
-	if(pollTime)[self performSelector:@selector(pollValues) withObject:nil afterDelay:pollTime];
-
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollValues) object:nil];
-	[self readAllTemperatures];
+    
 	if(shipValues)[self shipRecords];
 	if(pollTime)[self performSelector:@selector(pollValues) withObject:nil afterDelay:pollTime];
 }
@@ -951,7 +842,6 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 		[self setEnabled:i		   value:[decoder decodeBoolForKey:[NSString stringWithFormat: @"enabled%d",i]]];
 		[self setAttenuated:i      value:[decoder decodeBoolForKey:[NSString stringWithFormat: @"attenuated%d",i]]];
 		[self setFinalAttenuated:i value:[decoder decodeBoolForKey:[NSString stringWithFormat: @"finalAttenuated%d",i]]];
-		[self setAdcRange:i        value:[decoder decodeIntForKey: [NSString stringWithFormat: @"adcRange%d",i]]];
 	}
 	
     [self setLoopForever:	[decoder decodeBoolForKey:   @"loopForever"]];
@@ -966,8 +856,6 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
     [self setBaselineVoltages:	[decoder decodeObjectForKey: @"baselineVoltages"]];
 	
     if(!dacs || !amplitudes || !feedBackResistors || !baselineVoltages)	[self setUpArrays];
-
-    for(i=0;i<26;i++)timeRates[i] = [[ORTimeRate alloc] init];
 
     [[self undoManager] enableUndoRegistration];
     
@@ -985,7 +873,6 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 		[encoder encodeBool:enabled[i]			forKey:[NSString stringWithFormat:@"enabled%d",i]];
 		[encoder encodeBool:attenuated[i]		forKey:[NSString stringWithFormat:@"attenuated%d",i]];
 		[encoder encodeBool:finalAttenuated[i]	forKey:[NSString stringWithFormat:@"finalAttenuated%d",i]];
-		[encoder encodeInt:adcRange[i]			forKey:[NSString stringWithFormat:@"adcRange%d",i]];
 	}
 	
 	[encoder encodeBool:loopForever		forKey:@"loopForever"];
@@ -1047,9 +934,8 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 		
 		data[0] = dataId | kMJDPreAmpDataRecordLen;
 		data[1] = [self uniqueIdNumber]&0xfff;
-		data[2] = timeMeasured[0];
-		data[3] = timeMeasured[1];
-		data[4] = adcEnabledMask;
+		data[2] = timeMeasured;
+		data[3] = adcEnabledMask;
 		
 		union {
 			float asFloat;
