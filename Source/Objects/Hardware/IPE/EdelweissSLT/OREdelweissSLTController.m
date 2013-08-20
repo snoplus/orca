@@ -366,14 +366,16 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (void) statusHighRegChanged:(NSNotification*)aNote
 {
-  	NSLog(@"   %@::%@: UNDER CONSTRUCTION \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+            //DEBUG OUTPUT:
+            static int debFlag=1;if(debFlag) NSLog(@"   %@::%@: UNDER CONSTRUCTION \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));debFlag=0;//TODO: DEBUG testing ...-tb-
 return;
 	[statusHighRegTextField setIntValue: [model statusHighReg]];
 }
 
 - (void) statusLowRegChanged:(NSNotification*)aNote
 {
-  	NSLog(@"   %@::%@: UNDER CONSTRUCTION \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+            //DEBUG OUTPUT:
+            static int debFlag=1;if(debFlag) NSLog(@"   %@::%@: UNDER CONSTRUCTION \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));debFlag=0;//TODO: DEBUG testing ...-tb-
 return;
 	[statusLowRegTextField setIntValue: [model statusLowReg]];
 }
@@ -395,15 +397,13 @@ return;
 
 - (void) useBroadcastIdBBChanged:(NSNotification*)aNote
 {
-	//debug 
-    NSLog(@"Called %@::%@! %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model useBroadcastIdBB]);//TODO: DEBUG -tb-
+	//debug     NSLog(@"Called %@::%@! %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model useBroadcastIdBB]);//TODO: DEBUG -tb-
 	[useBroadcastIdBBCB setIntValue: [model useBroadcastIdBB]];
 }
 
 - (void) idBBforWCommandChanged:(NSNotification*)aNote
 {
-	//debug 
-    NSLog(@"Called %@::%@! %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model idBBforWCommand]);//TODO: DEBUG -tb-
+	//debug     NSLog(@"Called %@::%@! %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model idBBforWCommand]);//TODO: DEBUG -tb-
 	[idBBforWCommandTextField setIntValue: [model idBBforWCommand]];
 }
 

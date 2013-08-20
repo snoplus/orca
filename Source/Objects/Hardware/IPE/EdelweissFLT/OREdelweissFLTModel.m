@@ -1755,7 +1755,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	readWaveforms = YES;
 	
             //DEBUG OUTPUT:
- 	        NSLog(@"%@::%@: mode 0x%016llx \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),runMode);//TODO: DEBUG testing ...-tb-
+            static int debFlag=1;if(debFlag) NSLog(@"%@::%@: mode 0x%016llx \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),runMode);debFlag=0;//TODO: DEBUG testing ...-tb-
 	
 	switch (runMode) {
 		case kIpeFltV4_EventDaqMode:

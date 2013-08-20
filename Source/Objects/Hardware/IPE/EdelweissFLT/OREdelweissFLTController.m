@@ -527,8 +527,7 @@
 - (void) chargeBBFileForFiberChanged:(NSNotification*)aNote
 {
     int fiber = [model fiberSelectForBBAccess];
-    //DEBUG 	    
-    NSLog(@"%@::%@ fiber is %i string is %@\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),fiber,[model chargeBBFileForFiber:fiber]);//TODO: DEBUG testing ...-tb-
+    //DEBUG    NSLog(@"%@::%@ fiber is %i string is %@\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),fiber,[model chargeBBFileForFiber:fiber]);//TODO: DEBUG testing ...-tb-
 	[chargeBBFileForFiberTextField setStringValue: [model chargeBBFileForFiber:fiber]];
 }
 
@@ -785,8 +784,7 @@
 //this is the most important updater!
 - (void) fiberSelectForBBAccessChanged:(NSNotification*)aNote
 {
-        //DEBUG OUTPUT: 	        
-        NSLog(@"%@::%@: fiberSelectForBBAccess %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model fiberSelectForBBAccess]);//TODO : DEBUG testing ...-tb-
+        //DEBUG OUTPUT:         NSLog(@"%@::%@: fiberSelectForBBAccess %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model fiberSelectForBBAccess]);//TODO : DEBUG testing ...-tb-
 	//[fiberSelectForBBAccessPU setIntValue: [model fiberSelectForBBAccess]];
     int fiber = [model fiberSelectForBBAccess];
 	[fiberSelectForBBAccessPU selectItemAtIndex: fiber];
@@ -1046,8 +1044,7 @@
 
 - (void) channelNameMatrixChanged:(NSNotification*)aNote
 {
-    //DEBUG: OUTPUT:      	
-    NSLog(@"%@::%@: UNDER CONSTRUCTION!   \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
+    //DEBUG: OUTPUT:    NSLog(@"%@::%@: UNDER CONSTRUCTION!   \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
 
     int fiber, chan, countHeat=0, countIon=0;
     for(fiber=0; fiber<kNumEWFLTFibers; fiber++){
@@ -1632,8 +1629,7 @@
 
 - (void) writeValueChanged:(NSNotification*) aNote
 {
-    //DEBUG    
-    NSLog(@"%@::%@ lowLevelRegInHexPU intVal %i\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),[lowLevelRegInHexPU intValue]);//TODO: DEBUG testing ...-tb-
+    //DEBUG        NSLog(@"%@::%@ lowLevelRegInHexPU intVal %i\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),[lowLevelRegInHexPU intValue]);//TODO: DEBUG testing ...-tb-
     [regWriteValueTextField setIntValue: [model writeValue]];
     [regWriteValueTextField setNeedsDisplay: YES];
 }
