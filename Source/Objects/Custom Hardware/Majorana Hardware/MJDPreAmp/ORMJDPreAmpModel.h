@@ -55,12 +55,15 @@
     ORAlarm*		temperatureAlarm[2];
     ORAlarm*		leakageCurrentAlarm[kMJDPreAmpLeakageCurrentChannels];
     ORAlarm*		adcAlarm[kMJDPreAmpAdcChannels];
-    BOOL rangesHaveBeenSet;
+    BOOL            rangesHaveBeenSet;
+    NSString*       preampName;
 }
 
 - (void) setUpArrays;
 
 #pragma mark ¥¥¥Accessors
+- (NSString*) preampName;
+- (void) setPreampName:(NSString*)aPreampName;
 - (NSMutableArray*) feedBackResistors;
 - (void) setFeedBackResistors:(NSMutableArray*)anArray;
 - (float) feedBackResistor:(unsigned short) aChan;
@@ -142,6 +145,7 @@
 @end
 
 #pragma mark ¥¥¥External Strings
+extern NSString* ORMJDPreAmpModelPreampNameChanged;
 extern NSString* ORMJDPreAmpModelAdcEnabledMaskChanged;
 extern NSString*  ORMJDPreAmpModelPollTimeChanged;
 extern NSString* ORMJDPreAmpModelShipValuesChanged;

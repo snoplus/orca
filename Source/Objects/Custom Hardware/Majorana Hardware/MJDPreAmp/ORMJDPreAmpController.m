@@ -338,6 +338,11 @@
 					 selector : @selector(updateTimePlot:)
 						 name : ORRateAverageChangedNotification
 					   object : nil];
+    [notifyCenter addObserver : self
+                     selector : @selector(preampNameChanged:)
+                         name : ORMJDPreAmpModelPreampNameChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -361,9 +366,15 @@
 	[self updateTimePlot:nil];
 	[self baselineVoltageArrayChanged:nil];
 	[self feedbackResistorArrayChanged:nil];
+	[self preampNameChanged:nil];
 }
 
 #pragma mark ¥¥¥Interface Management
+
+- (void) preampNameChanged:(NSNotification*)aNote
+{
+	[preampNameField setStringValue: [model preampName]];
+}
 - (void) scaleAction:(NSNotification*)aNotification
 {
 	if(aNotification == nil || [aNotification object] == [baselinePlot0 xAxis]){
@@ -665,6 +676,11 @@
 }
 
 #pragma mark ¥¥¥Actions
+
+- (void) preampNameAction:(id)sender
+{
+	[model setPreampName:[sender stringValue]];	
+}
 - (void) adcEnabledMaskAction:(id)sender
 {
 	unsigned short mask = 0;

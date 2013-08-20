@@ -23,6 +23,7 @@
 {
     @private
 		IBOutlet NSButton*		settingsLockButton;
+        IBOutlet NSTextField*   preampNameField;
 		IBOutlet NSMatrix*		adcEnabledMaskMatrix;
 		IBOutlet NSButton*		shipValuesCB;
 		IBOutlet NSPopUpButton* pollTimePU;
@@ -65,6 +66,7 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ¥¥¥Interface Management
+- (void) preampNameChanged:(NSNotification*)aNote;
 - (void) updateTimePlot:(NSNotification*)aNotification;
 - (void) scaleAction:(NSNotification*)aNotification;
 - (void) adcEnabledMaskChanged:(NSNotification*)aNote;
@@ -97,6 +99,7 @@
 - (NSString*) adcName:(int)adcIndex;
 
 #pragma mark ¥¥¥Actions
+- (IBAction) preampNameAction:(id)sender;
 - (IBAction) adcEnabledMaskAction:(id)sender;
 - (IBAction) pollNowAction:(id)sender;
 - (IBAction) shipValuesAction:(id)sender;

@@ -25,6 +25,7 @@
 #import "ORAlarm.h"
 
 #pragma mark ¥¥¥Notification Strings
+NSString* ORMJDPreAmpModelPreampNameChanged = @"ORMJDPreAmpModelPreampNameChanged";
 NSString* ORMJDPreAmpModelAdcEnabledMaskChanged = @"ORMJDPreAmpModelAdcEnabledMaskChanged";
 NSString* ORMJDPreAmpModelPollTimeChanged	= @"ORMJDPreAmpModelPollTimeChanged";
 NSString* ORMJDPreAmpModelShipValuesChanged = @"ORMJDPreAmpModelShipValuesChanged";
@@ -127,6 +128,7 @@ struct {
 
 - (void) dealloc
 {
+    [preampName release];
     [dacs release];
 	int i;
 	for(i=0;i<kMJDPreAmpAdcChannels;i++){
@@ -215,6 +217,23 @@ struct {
 }
 
 #pragma mark ¥¥¥Accessors
+
+- (NSString*) preampName
+{
+    if(!preampName) return @"";
+    else return preampName;
+}
+
+- (void) setPreampName:(NSString*)aPreampName
+{
+    if(!aPreampName)aPreampName = @"";
+    [[[self undoManager] prepareWithInvocationTarget:self] setPreampName:preampName];
+    
+    [preampName autorelease];
+    preampName = [aPreampName copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpModelPreampNameChanged object:self];
+}
 - (ORTimeRate*)adcHistory:(int)index
 {
     if(index>=0 && index<kMJDPreAmpAdcChannels)return adcHistory[index];
@@ -799,6 +818,7 @@ struct {
     self = [super initWithCoder:decoder];
 	
     [[self undoManager] disableUndoRegistration];
+    [self setPreampName:    [decoder decodeObjectForKey:@"preampName"]];
     [self setAdcEnabledMask:[decoder decodeInt32ForKey:@"adcEnabledMask"]];
     [self setShipValues:	[decoder decodeBoolForKey: @"shipValues"]];
 	[self setPollTime:		[decoder decodeIntForKey:  @"pollTime"]];
@@ -830,6 +850,7 @@ struct {
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+	[encoder encodeObject:preampName    forKey:@"preampName"];
 	[encoder encodeInt32:adcEnabledMask forKey:@"adcEnabledMask"];
 	[encoder encodeBool:shipValues		forKey:@"shipValues"];
 	[encoder encodeInt:pollTime			forKey:@"pollTime"];
@@ -1052,9 +1073,15 @@ struct {
 
 - (void) postCouchDBRecord
 {
+    NSString* theTitle;
+    
+    if([preampName length]>0)theTitle = [self preampName];
+    else theTitle = [NSString stringWithFormat:@"PreAmp%ld",[self uniqueIdNumber]];
+    
     NSDictionary* adcsForHistory = [NSDictionary dictionaryWithObjectsAndKeys:
+                                    
         [NSString stringWithFormat:@"PreAmp%ld",[self uniqueIdNumber]],@"name",
-        [NSString stringWithFormat:@"PreAmp%ld",[self uniqueIdNumber]],@"title",
+        theTitle,@"title",
         [NSArray arrayWithObjects:
             [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%f",adcs[0]]  forKey:@"Baseline0"] ,
             [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%f",adcs[1]]  forKey:@"Baseline1"] ,
