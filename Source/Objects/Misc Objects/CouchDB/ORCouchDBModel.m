@@ -222,6 +222,12 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 					 selector : @selector(addObjectValueRecord:)
 						 name : @"ORCouchDBAddObjectRecord"
 					   object : nil];
+
+    [notifyCenter addObserver : self
+					 selector : @selector(addAdcsToHistoryRecord:)
+						 name : @"ORCouchDBAddHistoryAdcRecord"
+					   object : nil];
+
     
 }
 
@@ -1121,6 +1127,43 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
     }
 
 }
+
+- (void) addAdcsToHistoryRecord:(NSNotification*)aNote
+{
+    [self addObject:[aNote object] adcDictionary:[aNote userInfo]];
+}
+
+- (void) addObject:(OrcaObject*)anObj adcDictionary:(NSDictionary*)aDictionary
+{
+    //these are special records that any object can insert into the database via this notification
+    //the userInfo should just be a dictionary that you want to go into the database
+    
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    dateFormatter.dateFormat = @"yyyy/MM/dd HH:mm:ss";
+    
+    NSTimeZone* gmt = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];
+    [dateFormatter setTimeZone:gmt];
+    NSString*   lastTimeStamp       = [dateFormatter stringFromDate:[NSDate date]];
+    NSDate*     gmtTime             = [dateFormatter dateFromString:lastTimeStamp];
+    unsigned long secondsSince1970  = [gmtTime timeIntervalSince1970];
+    [dateFormatter release];
+    
+    NSString* anId = [anObj fullID];
+    if([anId length] && aDictionary){
+        if(![lastTimeStamp length]) lastTimeStamp = @"0";
+ 
+        
+        NSMutableDictionary* aRecord = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                        lastTimeStamp,	@"timestamp",
+                                        [NSNumber numberWithUnsignedLong: secondsSince1970],		@"time",
+                                        nil];
+        
+        [aRecord addEntriesFromDictionary:aDictionary];
+        [[self historyDBRef] addDocument:aRecord tag:kDocumentAdded];
+    }
+    
+}
+
 
 - (void) updateRunInfo
 {

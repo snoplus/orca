@@ -51,6 +51,7 @@ NSString* ORMJDBaselineVoltageChanged		= @"ORMJDBaselineVoltageChanged";
 #pragma mark ¥¥¥Local Strings
 static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 
+#pragma mark ¥¥¥Local Definitions
 #define kDAC1 0x80000000
 #define kDAC2 0x81000000
 #define kDAC3 0x82000000
@@ -64,30 +65,17 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 #define kPulserLoopForever  (0x1<<23)
 #define kPulserUseLoopCount (0x1<<22)
 
-#define kADC1		0xE0000000
-#define kADC2		0xE1000000
-
-#define kReadAdcChannel0 0x00801000 // 8 single-ended inputs mode
-#define kReadAdcChannel1 0x00841000
-#define kReadAdcChannel2 0x00881000
-#define kReadAdcChannel3 0x008C1000
-#define kReadAdcChannel4 0x00901000
-#define kReadAdcChannel5 0x00941000
-#define kReadAdcChannel6 0x00981000
-#define kReadAdcChannel7 0x009C1000
-
-#define kReadTempChannel7 0x009F1000 // 7 pseudo-differential inputs mode, temperature read out from channel 7 - niko
-
-//new stuff
+#define kADC1		 0xE0000000
+#define kADC2		 0xE1000000
 
 #define kControlReg  0x4
 #define kRangeReg1   0x5
 #define kRangeReg2   0x6
 
-#define kBipolar10V     0x0
-#define kBipolar5V      0x1
-#define kBipolar2_5V    0x2
-#define kUniploar10V    0x3
+#define kBipolar10V  0x0
+#define kBipolar5V   0x1
+#define kBipolar2_5V 0x2
+#define kUniploar10V 0x3
 
 #define kSingleEnded 0x0
 #define kPseudoDiff  0x3
@@ -118,12 +106,14 @@ struct {
     {kADC2,NO, -1,kPseudoDiff,-0.4494,2387.82}, //1,7
 };
 
+#pragma mark ¥¥¥Private Implementation
 @interface ORMJDPreAmpModel (private)
 - (void) updateTrends;
 - (void) calculateLeakageCurrentForAdc:(int) aChan;
 - (void) postCouchDBRecord;
 @end
 
+#pragma mark ¥¥¥Implementation
 @implementation ORMJDPreAmpModel
 #pragma mark ¥¥¥initialization
 - (id) init //designated initializer
@@ -698,7 +688,7 @@ struct {
             unsigned long controlWord = (kControlReg << 13)    |            //sel the chan set
                                         ((chan%2)<<10)         |            //set chan
                                         (0x1 << 4)             |            //use internal voltage reference for conversion
-                                       (mjdPreAmpTable[chan].mode << 8);    //set mode, other bits are zero
+                                        (mjdPreAmpTable[chan].mode << 8);    //set mode, other bits are zero
             
             unsigned long rawAdcValue = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection << 13) | (controlWord<<8)];
             
@@ -737,7 +727,7 @@ struct {
         
 	[self readAllAdcs];
     [self updateTrends];
-    //[self postCouchDBRecord];
+    [self postCouchDBRecord];
 
 	if(shipValues)[self shipRecords];
 	if(pollTime)[self performSelector:@selector(pollValues) withObject:nil afterDelay:pollTime];
@@ -1028,6 +1018,7 @@ struct {
 }
 @end
 
+#pragma mark ¥¥¥Private Implementation
 @implementation ORMJDPreAmpModel (private)
 - (void) updateTrends
 {
@@ -1061,36 +1052,45 @@ struct {
 
 - (void) postCouchDBRecord
 {
-    NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
-                            [NSString stringWithFormat:@"%f",adcs[0]],  @"Baseline0",
-                            [NSString stringWithFormat:@"%f",adcs[1]],  @"Baseline1",
-                            [NSString stringWithFormat:@"%f",adcs[2]],  @"Baseline2",
-                            [NSString stringWithFormat:@"%f",adcs[3]],  @"Baseline3",
-                            [NSString stringWithFormat:@"%f",adcs[4]],  @"Baseline4",
-                            [NSString stringWithFormat:@"%f",adcs[5]],  @"+12V",
-                            [NSString stringWithFormat:@"%f",adcs[6]],  @"-12V",
-                            [NSString stringWithFormat:@"%f",adcs[7]],  @"Temp1",
-                            [NSString stringWithFormat:@"%f",adcs[8]],  @"Baseline5",
-                            [NSString stringWithFormat:@"%f",adcs[9]],  @"Baseline6",
-                            [NSString stringWithFormat:@"%f",adcs[10]], @"Baseline7",
-                            [NSString stringWithFormat:@"%f",adcs[11]], @"Baseline8",
-                            [NSString stringWithFormat:@"%f",adcs[12]], @"Baseline9",
-                            [NSString stringWithFormat:@"%f",adcs[13]], @"+24V",
-                            [NSString stringWithFormat:@"%f",adcs[14]], @"-24V",
-                            [NSString stringWithFormat:@"%f",adcs[15]], @"Temp2",
-                            [NSString stringWithFormat:@"%f",leakageCurrents[0]],  @"Leakage0",
-                            [NSString stringWithFormat:@"%f",leakageCurrents[1]],  @"Leakage1",
-                            [NSString stringWithFormat:@"%f",leakageCurrents[2]],  @"Leakage2",
-                            [NSString stringWithFormat:@"%f",leakageCurrents[3]],  @"Leakage3",
-                            [NSString stringWithFormat:@"%f",leakageCurrents[4]],  @"Leakage4",
-                            [NSString stringWithFormat:@"%f",leakageCurrents[5]],  @"Leakage5",
-                            [NSString stringWithFormat:@"%f",leakageCurrents[6]],  @"Leakage6",
-                            [NSString stringWithFormat:@"%f",leakageCurrents[7]],  @"Leakage7",
-                            [NSString stringWithFormat:@"%f",leakageCurrents[8]],  @"Leakage8",
-                            [NSString stringWithFormat:@"%f",leakageCurrents[9]],  @"Leakage9",
-                            [NSString stringWithFormat:@"%f",leakageCurrents[10]], @"Leakage10",
-                            nil];
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddHistoryRecord" object:self userInfo:values];
+    NSDictionary* adcsForHistory = [NSDictionary dictionaryWithObjectsAndKeys:
+        [NSString stringWithFormat:@"PreAmp%ld",[self uniqueIdNumber]],@"name",
+        [NSString stringWithFormat:@"PreAmp%ld",[self uniqueIdNumber]],@"title",
+        [NSArray arrayWithObjects:
+            [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%f",adcs[0]]  forKey:@"Baseline0"] ,
+            [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%f",adcs[1]]  forKey:@"Baseline1"] ,
+            [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%f",adcs[2]]  forKey:@"Baseline2"] ,
+            [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%f",adcs[3]]  forKey:@"Baseline3"] ,
+            [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%f",adcs[4]]  forKey:@"Baseline4"] ,
+            [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%f",adcs[8]]  forKey:@"Baseline5"] ,
+            [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%f",adcs[9]]  forKey:@"Baseline6"] ,
+            [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%f",adcs[10]] forKey:@"Baseline7"] ,
+            [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%f",adcs[11]] forKey:@"Baseline8"] ,
+            [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%f",adcs[11]] forKey:@"Baseline9"] ,
+    
+            [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%f",adcs[13]] forKey:@"+24V"],
+            [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%f",adcs[14]] forKey:@"-24V"],
+            [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%f",adcs[5]]  forKey:@"+12V"],
+            [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%f",adcs[6]]  forKey:@"-12V"],
+  
+            [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%f",adcs[7]]  forKey:@"Temp1"],
+            [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%f",adcs[15]] forKey:@"Temp2"],
+    
+            [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%f",leakageCurrents[0]] forKey:@"Leakage0"],
+            [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%f",leakageCurrents[1]] forKey:@"Leakage1"],
+            [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%f",leakageCurrents[2]] forKey:@"Leakage2"],
+            [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%f",leakageCurrents[3]] forKey:@"Leakage3"],
+            [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%f",leakageCurrents[4]] forKey:@"Leakage4"],
+            [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%f",leakageCurrents[5]] forKey:@"Leakage5"],
+            [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%f",leakageCurrents[6]] forKey:@"Leakage6"],
+            [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%f",leakageCurrents[7]] forKey:@"Leakage7"],
+            [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%f",leakageCurrents[8]] forKey:@"Leakage8"],
+            [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%f",leakageCurrents[9]] forKey:@"Leakage9"],
+            nil
+        ],@"adcs",
+        nil
+        ];
+    
+     [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddHistoryAdcRecord" object:self userInfo:adcsForHistory];
 }
 
 @end
