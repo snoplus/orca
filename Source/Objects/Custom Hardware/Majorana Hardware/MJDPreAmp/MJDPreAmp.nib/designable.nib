@@ -151,7 +151,7 @@
 										<object class="NSButton" id="283322062">
 											<reference key="NSNextResponder" ref="45368373"/>
 											<int key="NSvFlags">268</int>
-											<string key="NSFrame">{{170, 8}, {91, 28}}</string>
+											<string key="NSFrame">{{169, 9}, {91, 28}}</string>
 											<reference key="NSSuperview" ref="45368373"/>
 											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="479256405"/>
@@ -290,6 +290,7 @@
 											<string key="NSFrame">{{283, 14}, {100, 18}}</string>
 											<reference key="NSSuperview" ref="45368373"/>
 											<reference key="NSWindow"/>
+											<reference key="NSNextKeyView"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSButtonCell" key="NSCell" id="900811765">
 												<int key="NSCellFlags">67108864</int>
@@ -310,13 +311,13 @@
 											<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 										</object>
 									</object>
-									<string key="NSFrame">{{1, 1}, {399, 42}}</string>
+									<string key="NSFrame">{{1, 1}, {399, 47}}</string>
 									<reference key="NSSuperview" ref="326600382"/>
 									<reference key="NSWindow"/>
 									<reference key="NSNextKeyView" ref="5770624"/>
 								</object>
 							</object>
-							<string key="NSFrame">{{168, 16}, {401, 58}}</string>
+							<string key="NSFrame">{{168, 16}, {401, 49}}</string>
 							<reference key="NSSuperview" ref="458091468"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="45368373"/>
@@ -343,7 +344,7 @@
 							<reference key="NSContentView" ref="45368373"/>
 							<int key="NSBorderType">1</int>
 							<int key="NSBoxType">0</int>
-							<int key="NSTitlePosition">2</int>
+							<int key="NSTitlePosition">0</int>
 							<bool key="NSTransparent">NO</bool>
 						</object>
 						<object class="NSTabView" id="717710118">
@@ -378,7 +379,7 @@
 																<string key="NSFrame">{{434, 15}, {88, 22}}</string>
 																<reference key="NSSuperview" ref="20940888"/>
 																<reference key="NSWindow"/>
-																<reference key="NSNextKeyView" ref="717710118"/>
+																<reference key="NSNextKeyView" ref="864916166"/>
 																<int key="NSTag">1</int>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSPopUpButtonCell" key="NSCell" id="463663793">
@@ -3271,7 +3272,7 @@
 												<string key="NSFrame">{{603, 482}, {101, 28}}</string>
 												<reference key="NSSuperview" ref="792145836"/>
 												<reference key="NSWindow"/>
-												<reference key="NSNextKeyView"/>
+												<reference key="NSNextKeyView" ref="330352942"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="431033027">
 													<int key="NSCellFlags">67108864</int>
@@ -3534,6 +3535,7 @@
 												<int key="NSvFlags">274</int>
 												<string key="NSFrame">{{362, 448}, {330, 138}}</string>
 												<reference key="NSSuperview" ref="644504553"/>
+												<reference key="NSNextKeyView" ref="302140500"/>
 												<string key="NSClassName">ORCompositeTimeLineView</string>
 											</object>
 											<object class="NSCustomView" id="337822817">
@@ -3541,6 +3543,7 @@
 												<int key="NSvFlags">274</int>
 												<string key="NSFrame">{{362, 293}, {330, 147}}</string>
 												<reference key="NSSuperview" ref="644504553"/>
+												<reference key="NSNextKeyView" ref="883463749"/>
 												<string key="NSClassName">ORCompositeTimeLineView</string>
 											</object>
 											<object class="NSCustomView" id="302140500">
@@ -3556,6 +3559,7 @@
 												<int key="NSvFlags">274</int>
 												<string key="NSFrame">{{2, 152}, {700, 133}}</string>
 												<reference key="NSSuperview" ref="644504553"/>
+												<reference key="NSNextKeyView" ref="810025215"/>
 												<string key="NSClassName">ORCompositeTimeLineView</string>
 											</object>
 											<object class="NSCustomView" id="810025215">
@@ -3563,7 +3567,7 @@
 												<int key="NSvFlags">274</int>
 												<string key="NSFrame">{{2, 2}, {700, 142}}</string>
 												<reference key="NSSuperview" ref="644504553"/>
-												<reference key="NSNextKeyView" ref="717710118"/>
+												<reference key="NSNextKeyView" ref="864916166"/>
 												<string key="NSClassName">ORCompositeTimeLineView</string>
 											</object>
 											<object class="NSCustomView" id="686599428">
@@ -3576,6 +3580,7 @@
 											</object>
 										</object>
 										<string key="NSFrame">{{10, 25}, {709, 592}}</string>
+										<reference key="NSNextKeyView" ref="686599428"/>
 									</object>
 									<string key="NSLabel">Charts</string>
 									<reference key="NSColor" ref="941427285"/>
@@ -4004,22 +4009,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">plotter2</string>
-						<reference key="source" ref="517384902"/>
-						<reference key="destination" ref="883463749"/>
-					</object>
-					<int key="connectionID">2468</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">plotter3</string>
-						<reference key="source" ref="517384902"/>
-						<reference key="destination" ref="810025215"/>
-					</object>
-					<int key="connectionID">2469</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
 						<string key="label">baselineVoltageMatrix</string>
 						<reference key="source" ref="517384902"/>
 						<reference key="destination" ref="314474782"/>
@@ -4052,35 +4041,51 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">plotter0</string>
-						<reference key="source" ref="517384902"/>
-						<reference key="destination" ref="686599428"/>
-					</object>
-					<int key="connectionID">2466</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">plotter4</string>
+						<string key="label">leakageCurrentPlot0</string>
 						<reference key="source" ref="517384902"/>
 						<reference key="destination" ref="97293222"/>
 					</object>
-					<int key="connectionID">2527</int>
+					<int key="connectionID">2532</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">plotter1</string>
-						<reference key="source" ref="517384902"/>
-						<reference key="destination" ref="302140500"/>
-					</object>
-					<int key="connectionID">2530</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">plotter5</string>
+						<string key="label">leakageCurrentPlot1</string>
 						<reference key="source" ref="517384902"/>
 						<reference key="destination" ref="337822817"/>
 					</object>
-					<int key="connectionID">2531</int>
+					<int key="connectionID">2533</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">baselinePlot0</string>
+						<reference key="source" ref="517384902"/>
+						<reference key="destination" ref="686599428"/>
+					</object>
+					<int key="connectionID">2534</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">baselinePlot1</string>
+						<reference key="source" ref="517384902"/>
+						<reference key="destination" ref="302140500"/>
+					</object>
+					<int key="connectionID">2535</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">temperaturePlot</string>
+						<reference key="source" ref="517384902"/>
+						<reference key="destination" ref="883463749"/>
+					</object>
+					<int key="connectionID">2536</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">voltagePlot</string>
+						<reference key="source" ref="517384902"/>
+						<reference key="destination" ref="810025215"/>
+					</object>
+					<int key="connectionID">2537</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -6822,7 +6827,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">2531</int>
+			<int key="maxID">2537</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -7014,7 +7019,6 @@
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>adcEnabledMaskAction:</string>
-							<string>adcRangeAction:</string>
 							<string>amplitudesAction:</string>
 							<string>attenuatedAction:</string>
 							<string>baselineVoltageAction:</string>
@@ -7030,7 +7034,6 @@
 							<string>pulseLowTimeAction:</string>
 							<string>pulserMaskAction:</string>
 							<string>readAdcs:</string>
-							<string>readTemperatures:</string>
 							<string>settingsLockAction:</string>
 							<string>shipValuesAction:</string>
 							<string>startPulserAction:</string>
@@ -7039,8 +7042,6 @@
 						</object>
 						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>id</string>
-							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -7069,7 +7070,6 @@
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>adcEnabledMaskAction:</string>
-							<string>adcRangeAction:</string>
 							<string>amplitudesAction:</string>
 							<string>attenuatedAction:</string>
 							<string>baselineVoltageAction:</string>
@@ -7085,7 +7085,6 @@
 							<string>pulseLowTimeAction:</string>
 							<string>pulserMaskAction:</string>
 							<string>readAdcs:</string>
-							<string>readTemperatures:</string>
 							<string>settingsLockAction:</string>
 							<string>shipValuesAction:</string>
 							<string>startPulserAction:</string>
@@ -7096,10 +7095,6 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<object class="IBActionInfo">
 								<string key="name">adcEnabledMaskAction:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">adcRangeAction:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
@@ -7163,10 +7158,6 @@
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
-								<string key="name">readTemperatures:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
 								<string key="name">settingsLockAction:</string>
 								<string key="candidateClassName">id</string>
 							</object>
@@ -7199,6 +7190,8 @@
 							<string>amplitudesMatrix</string>
 							<string>attenuated0PU</string>
 							<string>attenuated1PU</string>
+							<string>baselinePlot0</string>
+							<string>baselinePlot1</string>
 							<string>baselineVoltageMatrix</string>
 							<string>dacsMatrix</string>
 							<string>enabled0PU</string>
@@ -7207,13 +7200,9 @@
 							<string>finalAttenuated0PU</string>
 							<string>finalAttenuated1PU</string>
 							<string>frequencyField</string>
+							<string>leakageCurrentPlot0</string>
+							<string>leakageCurrentPlot1</string>
 							<string>loopForeverPU</string>
-							<string>plotter0</string>
-							<string>plotter1</string>
-							<string>plotter2</string>
-							<string>plotter3</string>
-							<string>plotter4</string>
-							<string>plotter5</string>
 							<string>pollNowButton</string>
 							<string>pollTimePU</string>
 							<string>pulseCountField</string>
@@ -7224,6 +7213,8 @@
 							<string>shipValuesCB</string>
 							<string>startPulserButton</string>
 							<string>stopPulserButton</string>
+							<string>temperaturePlot</string>
+							<string>voltagePlot</string>
 						</object>
 						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
@@ -7234,6 +7225,8 @@
 							<string>NSMatrix</string>
 							<string>NSPopUpButton</string>
 							<string>NSPopUpButton</string>
+							<string>ORCompositeTimeLineView</string>
+							<string>ORCompositeTimeLineView</string>
 							<string>NSMatrix</string>
 							<string>NSMatrix</string>
 							<string>NSPopUpButton</string>
@@ -7242,13 +7235,9 @@
 							<string>NSPopUpButton</string>
 							<string>NSPopUpButton</string>
 							<string>NSTextField</string>
+							<string>ORCompositeTimeLineView</string>
+							<string>ORCompositeTimeLineView</string>
 							<string>NSPopUpButton</string>
-							<string>ORCompositeTimeLineView</string>
-							<string>ORCompositeTimeLineView</string>
-							<string>ORCompositeTimeLineView</string>
-							<string>ORCompositeTimeLineView</string>
-							<string>ORCompositeTimeLineView</string>
-							<string>ORCompositeTimeLineView</string>
 							<string>NSButton</string>
 							<string>NSPopUpButton</string>
 							<string>NSTextField</string>
@@ -7259,6 +7248,8 @@
 							<string>NSButton</string>
 							<string>NSButton</string>
 							<string>NSButton</string>
+							<string>ORCompositeTimeLineView</string>
+							<string>ORCompositeTimeLineView</string>
 						</object>
 					</object>
 					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
@@ -7272,6 +7263,8 @@
 							<string>amplitudesMatrix</string>
 							<string>attenuated0PU</string>
 							<string>attenuated1PU</string>
+							<string>baselinePlot0</string>
+							<string>baselinePlot1</string>
 							<string>baselineVoltageMatrix</string>
 							<string>dacsMatrix</string>
 							<string>enabled0PU</string>
@@ -7280,13 +7273,9 @@
 							<string>finalAttenuated0PU</string>
 							<string>finalAttenuated1PU</string>
 							<string>frequencyField</string>
+							<string>leakageCurrentPlot0</string>
+							<string>leakageCurrentPlot1</string>
 							<string>loopForeverPU</string>
-							<string>plotter0</string>
-							<string>plotter1</string>
-							<string>plotter2</string>
-							<string>plotter3</string>
-							<string>plotter4</string>
-							<string>plotter5</string>
 							<string>pollNowButton</string>
 							<string>pollTimePU</string>
 							<string>pulseCountField</string>
@@ -7297,6 +7286,8 @@
 							<string>shipValuesCB</string>
 							<string>startPulserButton</string>
 							<string>stopPulserButton</string>
+							<string>temperaturePlot</string>
+							<string>voltagePlot</string>
 						</object>
 						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
@@ -7327,6 +7318,14 @@
 							<object class="IBToOneOutletInfo">
 								<string key="name">attenuated1PU</string>
 								<string key="candidateClassName">NSPopUpButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">baselinePlot0</string>
+								<string key="candidateClassName">ORCompositeTimeLineView</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">baselinePlot1</string>
+								<string key="candidateClassName">ORCompositeTimeLineView</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">baselineVoltageMatrix</string>
@@ -7361,32 +7360,16 @@
 								<string key="candidateClassName">NSTextField</string>
 							</object>
 							<object class="IBToOneOutletInfo">
+								<string key="name">leakageCurrentPlot0</string>
+								<string key="candidateClassName">ORCompositeTimeLineView</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">leakageCurrentPlot1</string>
+								<string key="candidateClassName">ORCompositeTimeLineView</string>
+							</object>
+							<object class="IBToOneOutletInfo">
 								<string key="name">loopForeverPU</string>
 								<string key="candidateClassName">NSPopUpButton</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">plotter0</string>
-								<string key="candidateClassName">ORCompositeTimeLineView</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">plotter1</string>
-								<string key="candidateClassName">ORCompositeTimeLineView</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">plotter2</string>
-								<string key="candidateClassName">ORCompositeTimeLineView</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">plotter3</string>
-								<string key="candidateClassName">ORCompositeTimeLineView</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">plotter4</string>
-								<string key="candidateClassName">ORCompositeTimeLineView</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">plotter5</string>
-								<string key="candidateClassName">ORCompositeTimeLineView</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">pollNowButton</string>
@@ -7427,6 +7410,14 @@
 							<object class="IBToOneOutletInfo">
 								<string key="name">stopPulserButton</string>
 								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">temperaturePlot</string>
+								<string key="candidateClassName">ORCompositeTimeLineView</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">voltagePlot</string>
+								<string key="candidateClassName">ORCompositeTimeLineView</string>
 							</object>
 						</object>
 					</object>

@@ -28,7 +28,6 @@
 NSString* ORMJDPreAmpModelAdcEnabledMaskChanged = @"ORMJDPreAmpModelAdcEnabledMaskChanged";
 NSString* ORMJDPreAmpModelPollTimeChanged	= @"ORMJDPreAmpModelPollTimeChanged";
 NSString* ORMJDPreAmpModelShipValuesChanged = @"ORMJDPreAmpModelShipValuesChanged";
-NSString* ORMJDPreAmpAdcArrayChanged		= @"ORMJDPreAmpAdcArrayChanged";
 NSString* ORMJDPreAmpLoopForeverChanged		= @"ORMJDPreAmpLoopForeverChanged";
 NSString* ORMJDPreAmpPulseCountChanged		= @"ORMJDPreAmpPulseCountChanged";
 NSString* ORMJDPreAmpEnabledChanged			= @"ORMJDPreAmpEnabledChanged";
@@ -96,25 +95,27 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 struct {
     unsigned long adcSelection;
     unsigned long mode;
+    BOOL calculateLeakageCurrent;
+    int leakageCurrentIndex;
     float slope;
     float intercept;
 } mjdPreAmpTable[16] = {
-    {kADC1,kSingleEnded,2*20/8192.,0},
-    {kADC1,kSingleEnded,2*20/8192.,0},
-    {kADC1,kSingleEnded,2*20/8192.,0},
-    {kADC1,kSingleEnded,2*20/8192.,0},
-    {kADC1,kSingleEnded,2*20/8192.,0},
-    {kADC1,kSingleEnded,2*20/8192.,0},
-    {kADC1,kSingleEnded,2*20/8192.,0},
-    {kADC1,kPseudoDiff,-0.4494,2387.82},
-    {kADC2,kSingleEnded,2*20/8192.,0},
-    {kADC2,kSingleEnded,2*20/8192.,0},
-    {kADC2,kSingleEnded,2*20/8192.,0},
-    {kADC2,kSingleEnded,2*20/8192.,0},
-    {kADC2,kSingleEnded,2*20/8192.,0},
-    {kADC2,kSingleEnded,4*20/8192.,0},
-    {kADC2,kSingleEnded,4*20/8192.,0},
-    {kADC2,kPseudoDiff,-0.4494,2387.82},
+    {kADC1,YES, 0,kSingleEnded,2*20/8192.,0},
+    {kADC1,YES, 1,kSingleEnded,2*20/8192.,0},
+    {kADC1,YES, 2,kSingleEnded,2*20/8192.,0},
+    {kADC1,YES, 3,kSingleEnded,2*20/8192.,0},
+    {kADC1,YES, 4,kSingleEnded,2*20/8192.,0},
+    {kADC1,NO, -1,kSingleEnded,2*20/8192.,0},
+    {kADC1,NO, -1,kSingleEnded,2*20/8192.,0},
+    {kADC1,NO, -1,kPseudoDiff,-0.4494,2387.82},
+    {kADC2,YES, 5,kSingleEnded,2*20/8192.,0},
+    {kADC2,YES, 6,kSingleEnded,2*20/8192.,0},
+    {kADC2,YES, 7,kSingleEnded,2*20/8192.,0},
+    {kADC2,YES, 8,kSingleEnded,2*20/8192.,0},
+    {kADC2,YES, 9,kSingleEnded,2*20/8192.,0},
+    {kADC2,NO, -1,kSingleEnded,4*20/8192.,0},
+    {kADC2,NO, -1,kSingleEnded,4*20/8192.,0},
+    {kADC2,NO, -1,kPseudoDiff,-0.4494,2387.82},
 };
 
 
@@ -132,16 +133,21 @@ struct {
 - (void) dealloc
 {
     [adcs release];
+    [leakageCurrents release];
     [dacs release];
 	int i;
-	for(i=0;i<26;i++){
-		[timeRates[i] release];
+	for(i=0;i<kMJDPreAmpAdcChannels;i++){
+		[adcHistory[i] release];
+	}
+    
+    for(i=0;i<kMJDPreAmpLeakageCurrentChannels;i++){
+		[leakageCurrentHistory[i] release];
 	}
     for(i=0;i<2;i++){
         [temperatureAlarm[i] clearAlarm];
         [temperatureAlarm[i] release];
     }
-    for(i=0;i<2;i++){
+    for(i=0;i<kMJDPreAmpAdcChannels;i++){
         [adcAlarm[i] clearAlarm];
         [adcAlarm[i] release];
     }
@@ -178,13 +184,7 @@ struct {
 			[amplitudes addObject:[NSNumber numberWithInt:0]];
 		}	
 	}
-	if(!adcs){
-		[self setAdcs:[NSMutableArray arrayWithCapacity:kMJDPreAmpDacChannels]];
-		int i;
-		for(i=0;i<kMJDPreAmpAdcChannels;i++){
-			[adcs addObject:[NSNumber numberWithInt:0]];
-		}	
-	}
+
     if(!feedBackResistors){
 		[self setFeedBackResistors:[NSMutableArray arrayWithCapacity:kMJDPreAmpAdcChannels]];
 		int i;
@@ -222,10 +222,18 @@ struct {
 }
 
 #pragma mark ¥¥¥Accessors
-- (ORTimeRate*)timeRate:(int)index
+- (ORTimeRate*)adcHistory:(int)index
 {
-	return timeRates[index];
+    if(index>=0 && index<kMJDPreAmpAdcChannels)return adcHistory[index];
+    else return nil;
 }
+
+- (ORTimeRate*)leakageCurrentHistory:(int)index
+{
+    if(index>=0 && index<kMJDPreAmpLeakageCurrentChannels)return leakageCurrentHistory[index];
+    else return nil;
+}
+
 
 - (unsigned long) adcEnabledMask
 {
@@ -305,8 +313,8 @@ struct {
 		[userInfo setObject:[NSNumber numberWithFloat:aChan] forKey: @"Channel"];
         
         //update leakage current for relevant channels
-        if((aChan < 5) || ((aChan > 7) && (aChan < 13))){
-            [self updateLeakageCurrent:aChan];
+        if(mjdPreAmpTable[aChan].calculateLeakageCurrent){
+            [self calculateLeakageCurrentForAdc:aChan];
         }
         
  		[[NSNotificationCenter defaultCenter] postNotificationName:ORMJDFeedBackResistorChanged
@@ -330,6 +338,7 @@ struct {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDBaselineVoltageArrayChanged object:self];
   
 }
+
 - (float) baselineVoltage:(unsigned short) aChan
 {
     if(aChan<[baselineVoltages count]){
@@ -338,6 +347,7 @@ struct {
 	else return 0.0;
  
 }
+
 - (void) setBaselineVoltage:(int) aChan value:(float) aValue
 {
     if(aChan<[baselineVoltages count]){
@@ -347,12 +357,8 @@ struct {
 		NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
 		[userInfo setObject:[NSNumber numberWithFloat:aChan] forKey: @"Channel"];
         
-        //Plot baseline voltages for 0-4 and 8-12
-        if( (aChan < 5) || ((aChan > 7) && (aChan < 13))){ // first stage ouput values
-            if(timeRates[aChan] == nil) timeRates[aChan] = [[ORTimeRate alloc] init];
-            [timeRates[aChan] addDataToTimeAverage:aValue];
-            //also need to update the leakage current
-            [self updateLeakageCurrent:aChan];
+        if(mjdPreAmpTable[aChan].calculateLeakageCurrent){
+            [self calculateLeakageCurrentForAdc:aChan];
         }
         
  		[[NSNotificationCenter defaultCenter] postNotificationName:ORMJDBaselineVoltageChanged
@@ -362,29 +368,18 @@ struct {
 	}
 }
 
-- (void) updateLeakageCurrent:(int) aChan
-{//value returned in picoamps
-    int currentChan;
-    float leakageCurrent;
+- (void) calculateLeakageCurrentForAdc:(int) adcChan
+{
+    //value returned in picoamps
     float nanoToPico = 1000.;
     
-    //for channels 0-4 or 8-12, plot the leakage current
-    //leakage current channel corresponds to aChan + 16 for 0-14, aChan+13 for 8-12
-    if (aChan < 5){
-        currentChan = aChan + 16;
+    int currentChan = mjdPreAmpTable[adcChan].leakageCurrentIndex;
+    if(currentChan>0){
+        //leakage current is (first stage output voltage - baseline voltage)/feedback resistance
+        float leakageCurrent = -nanoToPico*([self adc:adcChan] - [self baselineVoltage:adcChan])/ [self feedBackResistor:adcChan];//in picoamps
+        [self setLeakageCurrent:currentChan value:leakageCurrent];
+        [self checkLeakageCurrentIsWithinLimits:currentChan];
     }
-    else if ((aChan > 7) && (aChan < 13)) {
-        currentChan = aChan + 13;
-    }
-    else return;
-    
-    //leakage current is (first stage output voltage - baseline voltage)/feedback resistance
-    leakageCurrent = -nanoToPico*([self adc:aChan] - [self baselineVoltage:aChan])/ [self feedBackResistor:aChan];//in picoamps
-    
-    if(timeRates[currentChan] == nil) timeRates[currentChan] = [[ORTimeRate alloc] init];
-    [timeRates[currentChan] addDataToTimeAverage:leakageCurrent];
-    
-    [self checkLeakageCurrentIsWithinLimits:aChan value:leakageCurrent];
 }
 
 
@@ -393,13 +388,9 @@ struct {
     return adcs;
 }
 
-- (void) setAdcs:(NSMutableArray*)aAdcs
+- (NSMutableArray*) leakageCurrents
 {
-    [aAdcs retain];
-    [adcs release];
-    adcs = aAdcs;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpAdcArrayChanged object:self];
+    return leakageCurrents;
 }
 
 - (float) adc:(unsigned short) aChan
@@ -411,38 +402,57 @@ struct {
 	else return 0.0;
 }
 
+- (float) leakageCurrent:(unsigned short) aChan
+{
+	if(aChan<kMJDPreAmpLeakageCurrentChannels){
+		if(adcEnabledMask & (0x1<<aChan))return [[leakageCurrents objectAtIndex:aChan] floatValue];
+		else return 0.0;
+	}
+	else return 0.0;
+}
+
+
 - (void) setAdc:(int) aChan value:(float) aValue
 {
 	if(aChan<kMJDPreAmpAdcChannels){
+        
+        if(!adcs){
+            adcs = [[NSMutableArray arrayWithCapacity:kMJDPreAmpAdcChannels] retain];
+            int i;
+            for(i=0;i<kMJDPreAmpAdcChannels;i++)[adcs addObject:[NSNumber numberWithInt:0]];
+        }
+        
 		[adcs replaceObjectAtIndex:aChan withObject:[NSNumber numberWithFloat:aValue]];
 	
 		NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
 		[userInfo setObject:[NSNumber numberWithFloat:aChan] forKey: @"Channel"];
 
-        if(timeRates[aChan] == nil){
-            timeRates[aChan] = [[ORTimeRate alloc] init];
-        }
-		[timeRates[aChan] addDataToTimeAverage:aValue];
-
+        if(!adcHistory[aChan]) adcHistory[aChan] = [[ORTimeRate alloc] init];
         
-        //for temperature & operating voltages plot raw ADC value
-        //Corresponds to indices 5-6 & 13-14 (operating voltages for chips 1&2, respectively) and 7 & 15 (temp for chips 1&2)
-        if( ((aChan > 4) && (aChan < 8)) || ((aChan > 12) && (aChan < 16))){
-            if(timeRates[aChan] == nil) timeRates[aChan] = [[ORTimeRate alloc] init];
-            [timeRates[aChan] addDataToTimeAverage:aValue];
-        }
-        //for channels 0-4 or 8-12, update the leakage current timeRate
-        else if((aChan < 5) || ((aChan > 7) && (aChan < 13))){
-            [self updateLeakageCurrent:aChan];
-        }
+		[adcHistory[aChan] addDataToTimeAverage:aValue];
+        
+        if(mjdPreAmpTable[aChan].calculateLeakageCurrent){
+            [self calculateLeakageCurrentForAdc:aChan];
+            int     leakageIndex = mjdPreAmpTable[aChan].leakageCurrentIndex;
+            float   aValue = [self leakageCurrent:leakageIndex];
+            if(!leakageCurrentHistory[aChan]) leakageCurrentHistory[leakageIndex] = [[ORTimeRate alloc] init];
+            [leakageCurrentHistory[leakageIndex] addDataToTimeAverage:aValue];
+       }
         
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpAdcChanged
 															object:self
 														  userInfo: userInfo];
 	}
-    
-    
-    
+}
+
+- (void) setLeakageCurrent:(int) aChan value:(float) aValue
+{
+    if(!leakageCurrents){
+        leakageCurrents = [[NSMutableArray arrayWithCapacity:kMJDPreAmpLeakageCurrentChannels] retain];
+        int i;
+        for(i=0;i<kMJDPreAmpLeakageCurrentChannels;i++)[leakageCurrents addObject:[NSNumber numberWithInt:0]];
+    }
+    [leakageCurrents replaceObjectAtIndex:aChan withObject:[NSNumber numberWithFloat:aValue]];
 }
 
 - (BOOL) loopForever
@@ -745,12 +755,14 @@ struct {
 			if(verbose)NSLog(@"%d: %.2f (0x%08x)\n",decodedChannel,convertedValue,rawAdcValue);
             
 			[self setAdc:decodedChannel value:convertedValue];
-            [self checkAdcIsWithinLimits:decodedChannel value:convertedValue];
+            [self checkAdcIsWithinLimits:decodedChannel];
                     
 		}
 		else [self setAdc:chan value:0.0];
 	}
     
+    [self checkTempIsWithinLimits];
+
 	//get the time(UT!) for the data record.
 	time_t	ut_Time;
 	time(&ut_Time);
@@ -850,7 +862,6 @@ struct {
 	[self setPulseLowTime:	[decoder decodeIntForKey:    @"pulseLowTime"]];
 	[self setPulserMask:	[decoder decodeIntForKey:    @"pulserMask"]];
     [self setDacs:			[decoder decodeObjectForKey: @"dacs"]];
-	[self setAdcs:			[decoder decodeObjectForKey: @"adcs"]];
     [self setAmplitudes:	[decoder decodeObjectForKey: @"amplitudes"]];
     [self setFeedBackResistors:	[decoder decodeObjectForKey: @"feedBackResistors"]];
     [self setBaselineVoltages:	[decoder decodeObjectForKey: @"baselineVoltages"]];
@@ -882,7 +893,6 @@ struct {
 	[encoder encodeInt:pulserMask		forKey:@"pulserMask"];
 	[encoder encodeObject:dacs			forKey:@"dacs"];
 	[encoder encodeObject:amplitudes	forKey:@"amplitudes"];
-	[encoder encodeObject:adcs			forKey:@"adcs"];
 	[encoder encodeObject:feedBackResistors			forKey:@"feedBackResistors"];
 	[encoder encodeObject:baselineVoltages			forKey:@"baselineVoltages"];
 }
@@ -951,16 +961,20 @@ struct {
 		}
 		
 		[[NSNotificationCenter defaultCenter] postNotificationName: ORQueueRecordForShippingNotification 
-															object: [NSData dataWithBytes:data length:sizeof(long)*kMJDPreAmpDataRecordLen]];
+                                object: [NSData dataWithBytes:data length:sizeof(long)*kMJDPreAmpDataRecordLen]];
 	}
 }
 
 
 #pragma mark ¥¥¥Alarms
-- (void) checkTempIsWithinLimits:(int)aChip value:(float)aTemperature
+- (void) checkTempIsWithinLimits
 {
     float maxAllowedTemperature = 50; //<<-Niko, set this or make a dialog field for it
-    if(aChip>=0 && aChip<2){
+    int aChip;
+    float aTemperature;
+    for(aChip=0;aChip<2;aChip++){
+        if(aChip == 0)  aTemperature = [self adc:7];
+        else            aTemperature = [self adc:15];
         if(aTemperature >= maxAllowedTemperature){
  			if(!temperatureAlarm[aChip]){
 				temperatureAlarm[aChip] = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Preamp %lu Temperature",[self uniqueIdNumber]] severity:kRangeAlarm];
@@ -977,89 +991,75 @@ struct {
     }
 }
 
-- (void) checkLeakageCurrentIsWithinLimits:(int)aChan value:(float)aLeakageCurrent
+- (void) checkLeakageCurrentIsWithinLimits:(int)aChan
 {
-    float maxAllowedLeakageCurrent = 50;//pA
-    int alarmIndex = -1;
-    NSString* alarmName;
-    
-    if ((aChan < 5)) {
-        alarmIndex = aChan;
-    }
-    else if ((aChan > 7) && (aChan < 13)){
-        alarmIndex = aChan - 3;
-    }
-    else return;
-    
-    alarmName  = [NSString stringWithFormat:@"Preamp %lu Channel %d Leakage Current",[self uniqueIdNumber], aChan];
-
+    float maxAllowedLeakageCurrent = 50;//pA    
+    NSString* alarmName  = [NSString stringWithFormat:@"Preamp %lu Channel %d Leakage Current",[self uniqueIdNumber], aChan];
+    float aLeakageCurrent = [self leakageCurrent:aChan];
     if(aLeakageCurrent >= maxAllowedLeakageCurrent){
-        if(!leakageCurrentAlarm[alarmIndex]){
-            leakageCurrentAlarm[alarmIndex] = [[ORAlarm alloc] initWithName:alarmName severity:kRangeAlarm];
-            [leakageCurrentAlarm[alarmIndex] setHelpString:[NSString stringWithFormat:@"Preamp %lu Channel %d leakage current value exceeded limits. This alarm will be in effect until the leakage current returns to normal limits. It can be silenced by acknowledging it.",[self uniqueIdNumber], aChan]];
-            [leakageCurrentAlarm[alarmIndex] setSticky:YES];
+        if(!leakageCurrentAlarm[aChan]){
+            leakageCurrentAlarm[aChan] = [[ORAlarm alloc] initWithName:alarmName severity:kRangeAlarm];
+            [leakageCurrentAlarm[aChan] setHelpString:[NSString stringWithFormat:@"Preamp %lu Channel %d leakage current value exceeded limits. This alarm will be in effect until the leakage current returns to normal limits. It can be silenced by acknowledging it.",[self uniqueIdNumber], aChan]];
+            [leakageCurrentAlarm[aChan] setSticky:YES];
         }
-        [leakageCurrentAlarm[alarmIndex] postAlarm];
+        [leakageCurrentAlarm[aChan] postAlarm];
     }
     else {
-        [leakageCurrentAlarm[alarmIndex] clearAlarm];
-        [leakageCurrentAlarm[alarmIndex] release];
-        leakageCurrentAlarm[alarmIndex] = nil;
+        [leakageCurrentAlarm[aChan] clearAlarm];
+        [leakageCurrentAlarm[aChan] release];
+        leakageCurrentAlarm[aChan] = nil;
     }
 }
 
-- (void) checkAdcIsWithinLimits:(int)anIndex value:(float)aValue
+- (void) checkAdcIsWithinLimits:(int)anIndex
 {
     if(anIndex != 5 && anIndex!=6 && anIndex!= 13 && anIndex!= 14)return;
-    
+    float aValue = [self adc:anIndex];
     BOOL postAlarm = NO;
     NSString* alarmName;
-    int alarmIndex = -1;
-    if(anIndex == 5){
-        alarmIndex = 0;
-        if(fabs(aValue - 12) >= 0.5){ //<---Niko, adjust this or make a dialog field 
-            alarmName  = [NSString stringWithFormat:@"Preamp %lu +12V Supply",[self uniqueIdNumber]];
-            postAlarm  = YES;
-        }
-    }
-    else if(anIndex == 6){
-        alarmIndex = 1;
-        if(fabs(aValue + 12) >= 0.5){ //<---Niko, adjust this or make a dialog field
-            alarmName = [NSString stringWithFormat:@"Preamp %lu -12V Supply",[self uniqueIdNumber]];
-            postAlarm  = YES;
-        }
-    }
-    else if(anIndex == 13){
-        alarmIndex = 2;
-        if(fabs(aValue - 24) >= 0.5){ //<---Niko, adjust this or make a dialog field
-            alarmName = [NSString stringWithFormat:@"Preamp %lu +24V Supply",[self uniqueIdNumber]];
-            postAlarm  = YES;
-        }
-    }
-    else if(anIndex == 14){
-        alarmIndex = 3;
-        if(fabs(aValue + 24) >= 0.5){ //<---Niko, adjust this or make a dialog field
-            alarmName = [NSString stringWithFormat:@"Preamp %lu -24V Supply",[self uniqueIdNumber]];
-            postAlarm  = YES;
-        }
+    switch(anIndex){
+        case 5:
+            if(fabs(aValue - 12) >= 0.5){  
+                alarmName  = [NSString stringWithFormat:@"Preamp %lu +12V Supply",[self uniqueIdNumber]];
+                postAlarm  = YES;
+            }
+        break;
+            
+        case 6:
+            if(fabs(aValue + 12) >= 0.5){ 
+                alarmName = [NSString stringWithFormat:@"Preamp %lu -12V Supply",[self uniqueIdNumber]];
+                postAlarm  = YES;
+            }
+        break;
+            
+        case 13:
+            if(fabs(aValue - 24) >= 0.5){
+                alarmName = [NSString stringWithFormat:@"Preamp %lu +24V Supply",[self uniqueIdNumber]];
+                postAlarm  = YES;
+            }
+        break;
+            
+        case 14:
+            if(fabs(aValue + 24) >= 0.5){
+                alarmName = [NSString stringWithFormat:@"Preamp %lu -24V Supply",[self uniqueIdNumber]];
+                postAlarm  = YES;
+            }
+        break;
     }
     
-    if(alarmIndex>=0 && alarmIndex<4){
-        if(postAlarm){
- 			if(!adcAlarm[alarmIndex]){
-				adcAlarm[alarmIndex] = [[ORAlarm alloc] initWithName:alarmName severity:kRangeAlarm];
-                [adcAlarm[alarmIndex] setHelpString:[NSString stringWithFormat:@"Preamp %lu adc value exceeded limits. This alarm will be in effect until the adc value returns to normal limits. It can be silenced by acknowledging it.",[self uniqueIdNumber]]];
-				[adcAlarm[alarmIndex] setSticky:YES];
-			}
-			[adcAlarm[alarmIndex] postAlarm];
+    if(postAlarm){
+        if(!adcAlarm[anIndex]){
+            adcAlarm[anIndex] = [[ORAlarm alloc] initWithName:alarmName severity:kRangeAlarm];
+            [adcAlarm[anIndex] setHelpString:[NSString stringWithFormat:@"Preamp %lu adc value exceeded limits (was at %.2f). This alarm will be in effect until the adc value returns to normal limits. It can be silenced by acknowledging it.",[self uniqueIdNumber],aValue]];
+            [adcAlarm[anIndex] setSticky:YES];
         }
-        else {
-            [adcAlarm[alarmIndex] clearAlarm];
-			[adcAlarm[alarmIndex] release];
-			adcAlarm[alarmIndex] = nil;
-            
-        }
+        [adcAlarm[anIndex] postAlarm];
     }
-
+    else {
+        [adcAlarm[anIndex] clearAlarm];
+        [adcAlarm[anIndex] release];
+        adcAlarm[anIndex] = nil;
+        
+    }
 }
 @end

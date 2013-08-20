@@ -40,52 +40,31 @@
     [super dealloc];
 }
 
-- (int) tagToAdc:(int)aTag
+- (NSString*) adcName:(int)adcIndex
 {
-    if(aTag>=0 && aTag<26){
-        //int tagConversion[16] = {0,1,2,3,4,8,9,10,11,12,7,15,5,6,13,14};
-        int tagConversion[26] = {0,1,2,3,4,8,9,10,11,12,7,15,5,6,13,14,16,17,18,19,20,21,22,23,24,25};
-        return tagConversion[aTag];
-    }
-    else return 0;
-}
-
-- (NSString*) nameForTag:(int)aTag
-{
-    if(aTag>=0 && aTag<26){
-        NSString* tagString[26] = {
+    if(adcIndex>=0 && adcIndex<kMJDPreAmpAdcChannels){
+        NSString* tagString[kMJDPreAmpAdcChannels] = {
             @"Baseline0",
             @"Baseline1",
             @"Baseline2",
             @"Baseline3",
             @"Baseline4",
+            @"+12V",
+            @"-12V",
+            @"Temp 1",           
             @"Baseline8",
             @"Baseline9",
             @"Baseline10",
             @"Baseline11",
             @"Baseline12",
-            @"Adc7",
-            @"Adc15",
-            @"Adc5",
-            @"Adc6",
-            @"Adc13",
-            @"Adc14",
-            @"Leakage0",
-            @"Leakage1",
-            @"Leakage2",
-            @"Leakage3",
-            @"Leakage4",
-            @"Leakage8",
-            @"Leakage9",
-            @"Leakage10",
-            @"Leakage11",
-            @"Leakage12"
+            @"+24V",
+            @"-24V",
+            @"Temp 2",
         };
-        return tagString[aTag];
+        return tagString[adcIndex];
     }
     else return @"?";
 }
-
 
 - (void) awakeFromNib
 {
@@ -111,33 +90,33 @@
  		[[feedBackResistorMatrix cellAtRow:chan column:0] setTag:chan];
 	}
     
-    //[[plotter0 yAxis] setRngLimitsLow:-300.0 withHigh:500 withMinRng:4];
-    [[plotter0 yAxis] setRngLow:0.0 withHigh:300.];
-    [[plotter0 yAxis] setRngLimitsLow:-15. withHigh:0. withMinRng:4]; // rail of preamp at -12V - niko
-    [[plotter1 yAxis] setRngLow:0.0 withHigh:300.];
-    [[plotter1 yAxis] setRngLimitsLow:-15. withHigh:0. withMinRng:4]; // rail of preamp at -12V - niko
-    [[plotter2 yAxis] setRngLow:0.0 withHigh:300.];
-    [[plotter2 yAxis] setRngLimitsLow:0.0 withHigh:60 withMinRng:4]; // up to 60 degrees on chip - niko
-    [[plotter3 yAxis] setRngLow:0.0 withHigh:300.];
-    [[plotter3 yAxis] setRngLimitsLow:-30. withHigh:30. withMinRng:4]; // up to +/-24V - niko
-    [[plotter4 yAxis] setRngLow:0.0 withHigh:300.];
-    [[plotter4 yAxis] setRngLimitsLow:-50 withHigh:150 withMinRng:4]; // up to 150 pA leakage current - niko
-    [[plotter5 yAxis] setRngLow:0.0 withHigh:300.];
-    [[plotter5 yAxis] setRngLimitsLow:-50 withHigh:150 withMinRng:4]; // up to 150 pA leakage current - niko
+    //[[baselinePlot0 yAxis] setRngLimitsLow:-300.0 withHigh:500 withMinRng:4];
+    [[baselinePlot0 yAxis] setRngLow:0.0 withHigh:300.];
+    [[baselinePlot0 yAxis] setRngLimitsLow:-15. withHigh:0. withMinRng:4]; // rail of preamp at -12V - niko
+    [[baselinePlot1 yAxis] setRngLow:0.0 withHigh:300.];
+    [[baselinePlot1 yAxis] setRngLimitsLow:-15. withHigh:0. withMinRng:4]; // rail of preamp at -12V - niko
+    [[temperaturePlot yAxis] setRngLow:0.0 withHigh:300.];
+    [[temperaturePlot yAxis] setRngLimitsLow:0.0 withHigh:60 withMinRng:4]; // up to 60 degrees on chip - niko
+    [[voltagePlot yAxis] setRngLow:0.0 withHigh:300.];
+    [[voltagePlot yAxis] setRngLimitsLow:-30. withHigh:30. withMinRng:4]; // up to +/-24V - niko
+    [[leakageCurrentPlot0 yAxis] setRngLow:0.0 withHigh:300.];
+    [[leakageCurrentPlot0 yAxis] setRngLimitsLow:-50 withHigh:150 withMinRng:4]; // up to 150 pA leakage current - niko
+    [[leakageCurrentPlot1 yAxis] setRngLow:0.0 withHigh:300.];
+    [[leakageCurrentPlot1 yAxis] setRngLimitsLow:-50 withHigh:150 withMinRng:4]; // up to 150 pA leakage current - niko
 
    
-    [[plotter0 xAxis] setRngLow:0.0 withHigh:10000];
-	[[plotter0 xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
-    [[plotter1 xAxis] setRngLow:0.0 withHigh:10000];
-	[[plotter1 xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
-    [[plotter2 xAxis] setRngLow:0.0 withHigh:10000];
-	[[plotter2 xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
-    [[plotter3 xAxis] setRngLow:0.0 withHigh:10000];
-	[[plotter3 xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
-    [[plotter4 xAxis] setRngLow:0.0 withHigh:10000];
-	[[plotter4 xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
-    [[plotter5 xAxis] setRngLow:0.0 withHigh:10000];
-	[[plotter5 xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
+    [[baselinePlot0 xAxis] setRngLow:0.0 withHigh:10000];
+	[[baselinePlot0 xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
+    [[baselinePlot1 xAxis] setRngLow:0.0 withHigh:10000];
+	[[baselinePlot1 xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
+    [[temperaturePlot xAxis] setRngLow:0.0 withHigh:10000];
+	[[temperaturePlot xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
+    [[voltagePlot xAxis] setRngLow:0.0 withHigh:10000];
+	[[voltagePlot xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
+    [[leakageCurrentPlot0 xAxis] setRngLow:0.0 withHigh:10000];
+	[[leakageCurrentPlot0 xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
+    [[leakageCurrentPlot1 xAxis] setRngLow:0.0 withHigh:10000];
+	[[leakageCurrentPlot1 xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
     
 	NSColor* color[5] = {
 		[NSColor redColor],
@@ -147,77 +126,77 @@
 		[NSColor blackColor],
 	};
     
+    //first the plots for the adc values
 	int i;
-    int tag=0;
 	for(i=0;i<5;i++){
-		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:tag andDataSource:self];
-		[plotter0 addPlot: aPlot];
+		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:i andDataSource:self];
+		[baselinePlot0 addPlot: aPlot];
 		[aPlot setLineColor:color[i]];
-		[aPlot setName:[self nameForTag:tag]];
-		[(ORTimeAxis*)[plotter0 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
+		[aPlot setName:[self adcName:i]];
+		[(ORTimeAxis*)[baselinePlot0 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 		[aPlot release];
-        tag++;
 	}
 
-	for(i=0;i<5;i++){
-		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:tag andDataSource:self];
-		[plotter1 addPlot: aPlot];
-		[aPlot setLineColor:color[i]];
-		[aPlot setName:[self nameForTag:tag]];
-		[(ORTimeAxis*)[plotter1 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
+	for(i=8;i<13;i++){
+		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:i andDataSource:self];
+		[baselinePlot1 addPlot: aPlot];
+		[aPlot setLineColor:color[i-8]];
+		[aPlot setName:[self adcName:i]];
+		[(ORTimeAxis*)[baselinePlot1 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 		[aPlot release];
-        tag++;
 	}
     
 	for(i=0;i<2;i++){
-		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:tag andDataSource:self];
-		[plotter2 addPlot: aPlot];
+        int tag[2] = {7,15};
+		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:tag[i] andDataSource:self];
+		[temperaturePlot addPlot: aPlot];
 		[aPlot setLineColor:color[i]];
-		[aPlot setName:[self nameForTag:tag]];
-		[(ORTimeAxis*)[plotter2 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
+		[aPlot setName:[self adcName:tag[i]]];
+		[(ORTimeAxis*)[temperaturePlot xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 		[aPlot release];
-        tag++;
 	}
 	for(i=0;i<4;i++){
-		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:tag andDataSource:self];
-		[plotter3 addPlot: aPlot];
+        int tag[4] = {5,6,13,14};
+		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:tag[i] andDataSource:self];
+		[voltagePlot addPlot: aPlot];
 		[aPlot setLineColor:color[i]];
-		[aPlot setName:[self nameForTag:tag]];
-		[(ORTimeAxis*)[plotter3 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
+		[aPlot setName:[self adcName:tag[i]]];
+		[(ORTimeAxis*)[voltagePlot xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 		[aPlot release];
-        tag++;
 	}
+    
+    
+    //the plots for the computed values
     for(i=0;i<5;i++){
-		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:tag andDataSource:self];
-		[plotter4 addPlot: aPlot];
+		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:i andDataSource:self];
+		[leakageCurrentPlot0 addPlot: aPlot];
 		[aPlot setLineColor:color[i]];
-		[aPlot setName:[self nameForTag:tag]];
-		[(ORTimeAxis*)[plotter4 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
+		[aPlot setName:[NSString stringWithFormat:@"Leakage %d",i]];
+		[(ORTimeAxis*)[leakageCurrentPlot0 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 		[aPlot release];
-        tag++;
 	}
-    for(i=0;i<5;i++){
-		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:tag andDataSource:self];
-		[plotter5 addPlot: aPlot];
-		[aPlot setLineColor:color[i]];
-		[aPlot setName:[self nameForTag:tag]];
-		[(ORTimeAxis*)[plotter5 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
+    for(i=5;i<10;i++){
+		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:i andDataSource:self];
+		[leakageCurrentPlot1 addPlot: aPlot];
+		[aPlot setLineColor:color[i-5]];
+		[aPlot setName:[NSString stringWithFormat:@"Leakage %d",i]];
+		[(ORTimeAxis*)[leakageCurrentPlot1 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 		[aPlot release];
-        tag++;
 	}
-    [plotter0 setPlotTitle:@"Baseline, ADC0-4"];
-    [plotter1 setPlotTitle:@"Baseline, ADC5-8"];
-    [plotter2 setPlotTitle:@"On-chip Temperature"];
-    [plotter3 setPlotTitle:@"Operating Voltages"];
-    [plotter4 setPlotTitle:@"Leakage Current, ADC0-4"];
-    [plotter5 setPlotTitle:@"Leakage Current, ADC5-8"];
+    
+    [baselinePlot0 setPlotTitle:@"Baselines, ADC0-4"];
+    [baselinePlot1 setPlotTitle:@"Baselines, ADC5-8"];
+    [temperaturePlot setPlotTitle:@"On-chip Temperatures"];
+    [voltagePlot setPlotTitle:@"Operating Voltages"];
+    [leakageCurrentPlot0 setPlotTitle:@"Leakage Currents, ADC0-4"];
+    [leakageCurrentPlot1 setPlotTitle:@"Leakage Currents, ADC5-8"];
 
-    [plotter0 setShowLegend:YES];
-	[plotter1 setShowLegend:YES];
-	[plotter2 setShowLegend:YES];
-	[plotter3 setShowLegend:YES];
-    [plotter4 setShowLegend:YES];
-	[plotter5 setShowLegend:YES];
+    [baselinePlot0 setShowLegend:YES];
+	[baselinePlot1 setShowLegend:YES];
+	[temperaturePlot setShowLegend:YES];
+	[voltagePlot setShowLegend:YES];
+    [leakageCurrentPlot0 setShowLegend:YES];
+	[leakageCurrentPlot1 setShowLegend:YES];
     
 }
 
@@ -310,11 +289,6 @@
                          name : ORMJDPreAmpAdcChanged
 						object: model];
 
-	[notifyCenter addObserver : self
-                     selector : @selector(adcArrayChanged:)
-                         name : ORMJDPreAmpAdcArrayChanged
-						object: model];
-
     [notifyCenter addObserver : self
                      selector : @selector(feedbackResistorArrayChanged:)
                          name : ORMJDFeedBackResistorArrayChanged
@@ -381,7 +355,6 @@
 	[self enabledChanged:nil];
 	[self pulseCountChanged:nil];
 	[self loopForeverChanged:nil];
-	[self adcArrayChanged:nil];
 	[self shipValuesChanged:nil];
 	[self pollTimeChanged:nil];
 	[self adcEnabledMaskChanged:nil];
@@ -393,46 +366,46 @@
 #pragma mark ¥¥¥Interface Management
 - (void) scaleAction:(NSNotification*)aNotification
 {
-	if(aNotification == nil || [aNotification object] == [plotter0 xAxis]){
-		[model setMiscAttributes:[(ORAxis*)[plotter0 xAxis]attributes] forKey:@"XAttributes0"];
+	if(aNotification == nil || [aNotification object] == [baselinePlot0 xAxis]){
+		[model setMiscAttributes:[(ORAxis*)[baselinePlot0 xAxis]attributes] forKey:@"XAttributes0"];
 	}
-	if(aNotification == nil || [aNotification object] == [plotter0 yAxis]){
-		[model setMiscAttributes:[(ORAxis*)[plotter0 yAxis]attributes] forKey:@"YAttributes0"];
-	}
-    
-	if(aNotification == nil || [aNotification object] == [plotter1 xAxis]){
-		[model setMiscAttributes:[(ORAxis*)[plotter1 xAxis]attributes] forKey:@"XAttributes1"];
-	}
-	if(aNotification == nil || [aNotification object] == [plotter1 yAxis]){
-		[model setMiscAttributes:[(ORAxis*)[plotter1 yAxis]attributes] forKey:@"YAttributes1"];
+	if(aNotification == nil || [aNotification object] == [baselinePlot0 yAxis]){
+		[model setMiscAttributes:[(ORAxis*)[baselinePlot0 yAxis]attributes] forKey:@"YAttributes0"];
 	}
     
-    if(aNotification == nil || [aNotification object] == [plotter2 xAxis]){
-		[model setMiscAttributes:[(ORAxis*)[plotter2 xAxis]attributes] forKey:@"XAttributes2"];
+	if(aNotification == nil || [aNotification object] == [baselinePlot1 xAxis]){
+		[model setMiscAttributes:[(ORAxis*)[baselinePlot1 xAxis]attributes] forKey:@"XAttributes1"];
 	}
-	if(aNotification == nil || [aNotification object] == [plotter2 yAxis]){
-		[model setMiscAttributes:[(ORAxis*)[plotter2 yAxis]attributes] forKey:@"YAttributes2"];
-	}
-    
-    if(aNotification == nil || [aNotification object] == [plotter3 xAxis]){
-		[model setMiscAttributes:[(ORAxis*)[plotter3 xAxis]attributes] forKey:@"XAttributes3"];
-	}
-	if(aNotification == nil || [aNotification object] == [plotter3 yAxis]){
-		[model setMiscAttributes:[(ORAxis*)[plotter3 yAxis]attributes] forKey:@"YAttributes3"];
+	if(aNotification == nil || [aNotification object] == [baselinePlot1 yAxis]){
+		[model setMiscAttributes:[(ORAxis*)[baselinePlot1 yAxis]attributes] forKey:@"YAttributes1"];
 	}
     
-    if(aNotification == nil || [aNotification object] == [plotter4 xAxis]){
-		[model setMiscAttributes:[(ORAxis*)[plotter4 xAxis]attributes] forKey:@"XAttributes4"];
+    if(aNotification == nil || [aNotification object] == [temperaturePlot xAxis]){
+		[model setMiscAttributes:[(ORAxis*)[temperaturePlot xAxis]attributes] forKey:@"XAttributes2"];
 	}
-	if(aNotification == nil || [aNotification object] == [plotter4 yAxis]){
-		[model setMiscAttributes:[(ORAxis*)[plotter4 yAxis]attributes] forKey:@"YAttributes4"];
+	if(aNotification == nil || [aNotification object] == [temperaturePlot yAxis]){
+		[model setMiscAttributes:[(ORAxis*)[temperaturePlot yAxis]attributes] forKey:@"YAttributes2"];
 	}
     
-    if(aNotification == nil || [aNotification object] == [plotter5 xAxis]){
-		[model setMiscAttributes:[(ORAxis*)[plotter5 xAxis]attributes] forKey:@"XAttributes5"];
+    if(aNotification == nil || [aNotification object] == [voltagePlot xAxis]){
+		[model setMiscAttributes:[(ORAxis*)[voltagePlot xAxis]attributes] forKey:@"XAttributes3"];
 	}
-	if(aNotification == nil || [aNotification object] == [plotter5 yAxis]){
-		[model setMiscAttributes:[(ORAxis*)[plotter5 yAxis]attributes] forKey:@"YAttributes5"];
+	if(aNotification == nil || [aNotification object] == [voltagePlot yAxis]){
+		[model setMiscAttributes:[(ORAxis*)[voltagePlot yAxis]attributes] forKey:@"YAttributes3"];
+	}
+    
+    if(aNotification == nil || [aNotification object] == [leakageCurrentPlot0 xAxis]){
+		[model setMiscAttributes:[(ORAxis*)[leakageCurrentPlot0 xAxis]attributes] forKey:@"XAttributes4"];
+	}
+	if(aNotification == nil || [aNotification object] == [leakageCurrentPlot0 yAxis]){
+		[model setMiscAttributes:[(ORAxis*)[leakageCurrentPlot0 yAxis]attributes] forKey:@"YAttributes4"];
+	}
+    
+    if(aNotification == nil || [aNotification object] == [leakageCurrentPlot1 xAxis]){
+		[model setMiscAttributes:[(ORAxis*)[leakageCurrentPlot1 xAxis]attributes] forKey:@"XAttributes5"];
+	}
+	if(aNotification == nil || [aNotification object] == [leakageCurrentPlot1 yAxis]){
+		[model setMiscAttributes:[(ORAxis*)[leakageCurrentPlot1 yAxis]attributes] forKey:@"YAttributes5"];
 	}
 }
 
@@ -442,23 +415,23 @@
 	NSString*				key = [[aNote userInfo] objectForKey:ORMiscAttributeKey];
 	NSMutableDictionary* attrib = [model miscAttributesForKey:key];
 	
-	if(aNote == nil || [key isEqualToString:@"XAttributes0"])[self setPlot:plotter0 xAttributes:attrib];
-	if(aNote == nil || [key isEqualToString:@"YAttributes0"])[self setPlot:plotter0 yAttributes:attrib];
+	if(aNote == nil || [key isEqualToString:@"XAttributes0"])[self setPlot:baselinePlot0 xAttributes:attrib];
+	if(aNote == nil || [key isEqualToString:@"YAttributes0"])[self setPlot:baselinePlot0 yAttributes:attrib];
     
-	if(aNote == nil || [key isEqualToString:@"XAttributes1"])[self setPlot:plotter1 xAttributes:attrib];
-	if(aNote == nil || [key isEqualToString:@"YAttributes1"])[self setPlot:plotter1 yAttributes:attrib];
+	if(aNote == nil || [key isEqualToString:@"XAttributes1"])[self setPlot:baselinePlot1 xAttributes:attrib];
+	if(aNote == nil || [key isEqualToString:@"YAttributes1"])[self setPlot:baselinePlot1 yAttributes:attrib];
     
-    if(aNote == nil || [key isEqualToString:@"XAttributes2"])[self setPlot:plotter2 xAttributes:attrib];
-	if(aNote == nil || [key isEqualToString:@"YAttributes2"])[self setPlot:plotter2 yAttributes:attrib];
+    if(aNote == nil || [key isEqualToString:@"XAttributes2"])[self setPlot:temperaturePlot xAttributes:attrib];
+	if(aNote == nil || [key isEqualToString:@"YAttributes2"])[self setPlot:temperaturePlot yAttributes:attrib];
     
-    if(aNote == nil || [key isEqualToString:@"XAttributes3"])[self setPlot:plotter3 xAttributes:attrib];
-	if(aNote == nil || [key isEqualToString:@"YAttributes3"])[self setPlot:plotter3 yAttributes:attrib];
+    if(aNote == nil || [key isEqualToString:@"XAttributes3"])[self setPlot:voltagePlot xAttributes:attrib];
+	if(aNote == nil || [key isEqualToString:@"YAttributes3"])[self setPlot:voltagePlot yAttributes:attrib];
     
-    if(aNote == nil || [key isEqualToString:@"XAttributes4"])[self setPlot:plotter3 xAttributes:attrib];
-	if(aNote == nil || [key isEqualToString:@"YAttributes4"])[self setPlot:plotter4 yAttributes:attrib];
+    if(aNote == nil || [key isEqualToString:@"XAttributes4"])[self setPlot:voltagePlot xAttributes:attrib];
+	if(aNote == nil || [key isEqualToString:@"YAttributes4"])[self setPlot:leakageCurrentPlot0 yAttributes:attrib];
     
-    if(aNote == nil || [key isEqualToString:@"XAttributes5"])[self setPlot:plotter4 xAttributes:attrib];
-	if(aNote == nil || [key isEqualToString:@"YAttributes5"])[self setPlot:plotter5 yAttributes:attrib];
+    if(aNote == nil || [key isEqualToString:@"XAttributes5"])[self setPlot:leakageCurrentPlot0 xAttributes:attrib];
+	if(aNote == nil || [key isEqualToString:@"YAttributes5"])[self setPlot:leakageCurrentPlot1 yAttributes:attrib];
 }
 
 - (void) setPlot:(id)aPlotter xAttributes:(id)attrib
@@ -490,11 +463,11 @@
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(deferredPlotUpdate) object:nil];
     scheduledToUpdatePlot = NO;
-    [plotter0 setNeedsDisplay:YES];
-    [plotter1 setNeedsDisplay:YES];
-    [plotter2 setNeedsDisplay:YES];
-    [plotter3 setNeedsDisplay:YES];
-    [plotter4 setNeedsDisplay:YES];
+    [baselinePlot0 setNeedsDisplay:YES];
+    [baselinePlot1 setNeedsDisplay:YES];
+    [temperaturePlot setNeedsDisplay:YES];
+    [voltagePlot setNeedsDisplay:YES];
+    [leakageCurrentPlot0 setNeedsDisplay:YES];
 }
 
 - (void) adcEnabledMaskChanged:(NSNotification*)aNote
@@ -518,14 +491,6 @@
 - (void) shipValuesChanged:(NSNotification*)aNote
 {
 	[shipValuesCB setIntValue: [model shipValues]];
-}
-
-- (void) adcArrayChanged:(NSNotification*)aNote
-{
-	short chan;
-	for(chan=0;chan<kMJDPreAmpDacChannels;chan++){
-		[[adcMatrix cellWithTag:chan] setFloatValue: [model adc:chan]]; 
-	}
 }
 
 - (void) adcChanged:(NSNotification*)aNote
@@ -813,36 +778,32 @@
   
 }
 
-
 #pragma mark ¥¥¥Data Source
 - (int) numberPointsInPlot:(id)aPlotter
 {
-	return [[model timeRate:[aPlotter tag]] count];
+    if(aPlotter == leakageCurrentPlot0 || aPlotter == leakageCurrentPlot1){
+        return [[model leakageCurrentHistory:[aPlotter tag]] count];
+    }
+    else {
+        return [[model adcHistory:[aPlotter tag]] count];
+    }
 }
 
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
-    int adc = [self tagToAdc:[aPlotter tag]];
-    int count = [[model timeRate:adc] count];
-    int index = count-i-1;
-    float multiplier = 1000.;
-    
-    // first stage output values
-    *xValue = [[model timeRate:adc] timeSampledAtIndex:index];
-    *yValue = [[model timeRate:adc] valueAtIndex:index];
-
-    
-    if(adc > 15){ // leakage currents
-        
-        if(adc < 21){ //adc = adc - 16;
-            *yValue = -multiplier*([[model timeRate:adc-16] valueAtIndex:index]-[model baselineVoltage:adc-16])/[model feedBackResistor:adc-16];
-            //*yValue = 100.;
-            //NSLog(@"adc %d, value %f, baseline %f, resistor %f, current %f\n",adc,[[model timeRate:adc-16] valueAtIndex:index],[model baselineVoltage:adc-16],[model feedBackResistor:adc-16],*yValue);
-        }
-        else //adc = adc - 13;
-            *yValue = -multiplier*([[model timeRate:adc-13] valueAtIndex:index]-[model baselineVoltage:adc-13])/[model feedBackResistor:adc-13];
-            //*yValue = 100.;
+    if(aPlotter == leakageCurrentPlot0 || aPlotter == leakageCurrentPlot1){
+        int tag = [aPlotter tag];
+        int count = [[model leakageCurrentHistory:tag] count];
+        int index = count-i-1;        
+        *xValue = [[model leakageCurrentHistory:tag] timeSampledAtIndex:index];
+        *yValue = [[model leakageCurrentHistory:tag] valueAtIndex:index];
     }
-       
+    else {
+        int tag = [aPlotter tag];
+        int count = [[model adcHistory:tag] count];
+        int index = count-i-1;
+        *xValue = [[model adcHistory:tag] timeSampledAtIndex:index];
+        *yValue = [[model adcHistory:tag] valueAtIndex:index];
+    }
 }
 @end

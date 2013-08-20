@@ -48,12 +48,12 @@
 		IBOutlet NSPopUpButton* adcRange0PU;
 		IBOutlet NSPopUpButton* adcRange1PU;
 		IBOutlet NSButton*		pollNowButton;
-        IBOutlet ORCompositeTimeLineView*	plotter0;
-        IBOutlet ORCompositeTimeLineView*	plotter1;
-        IBOutlet ORCompositeTimeLineView*	plotter2;
-        IBOutlet ORCompositeTimeLineView*	plotter3;
-        IBOutlet ORCompositeTimeLineView*	plotter4;
-        IBOutlet ORCompositeTimeLineView*	plotter5;
+        IBOutlet ORCompositeTimeLineView*	baselinePlot0;
+        IBOutlet ORCompositeTimeLineView*	baselinePlot1;
+        IBOutlet ORCompositeTimeLineView*	temperaturePlot;
+        IBOutlet ORCompositeTimeLineView*	voltagePlot;
+        IBOutlet ORCompositeTimeLineView*	leakageCurrentPlot0;
+        IBOutlet ORCompositeTimeLineView*	leakageCurrentPlot1;
         BOOL     scheduledToUpdatePlot;
 }
 
@@ -72,7 +72,6 @@
 - (void) adcEnabledMaskChanged:(NSNotification*)aNote;
 - (void) shipValuesChanged:(NSNotification*)aNote;
 - (void) pollTimeChanged:(NSNotification*)aNote;
-- (void) adcArrayChanged:(NSNotification*)aNote;
 - (void) loopForeverChanged:(NSNotification*)aNote;
 - (void) pulseCountChanged:(NSNotification*)aNote;
 - (void) amplitudeChanged:(NSNotification*)aNote;
@@ -90,7 +89,6 @@
 - (void) settingsLockChanged:(NSNotification *)notification;
 - (void) updateButtons;
 - (void) displayFrequency;
-- (void) adcArrayChanged:(NSNotification*)aNote;
 - (void) adcChanged:(NSNotification*)aNote;
 - (void) feedbackResistorArrayChanged:(NSNotification*)aNote;
 - (void) feedbackResistorChanged:(NSNotification*)aNote;
@@ -98,8 +96,7 @@
 - (void) baselineVoltageChanged:(NSNotification*)aNote;
 - (void) miscAttributesChanged:(NSNotification*)aNote;
 
-- (int) tagToAdc:(int)aTag;
-- (NSString*) nameForTag:(int)aTag;
+- (NSString*) adcName:(int)adcIndex;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) adcEnabledMaskAction:(id)sender;

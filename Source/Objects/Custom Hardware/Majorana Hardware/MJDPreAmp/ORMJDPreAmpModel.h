@@ -24,13 +24,15 @@
 @class ORTimeRate;
 @class ORAlarm;
 
-#define kMJDPreAmpDacChannels   16	//if this ever changes, change the record length also
-#define kMJDPreAmpAdcChannels   16
-#define kMJDPreAmpDataRecordLen 21
+#define kMJDPreAmpDacChannels               16	//if this ever changes, change the record length also
+#define kMJDPreAmpAdcChannels               16
+#define kMJDPreAmpLeakageCurrentChannels    10
+#define kMJDPreAmpDataRecordLen             20
 
 
 @interface ORMJDPreAmpModel : OrcaObject {
     NSMutableArray* adcs;
+    NSMutableArray* leakageCurrents;
     NSMutableArray* feedBackResistors;
     NSMutableArray* baselineVoltages;
     NSMutableArray* dacs;
@@ -48,10 +50,11 @@
 	unsigned long	dataId;
 	unsigned long timeMeasured;
     unsigned long adcEnabledMask;
-    ORTimeRate*		timeRates[26];
+    ORTimeRate*		adcHistory[kMJDPreAmpAdcChannels];
+    ORTimeRate*		leakageCurrentHistory[kMJDPreAmpLeakageCurrentChannels];
     ORAlarm*		temperatureAlarm[2];
-    ORAlarm*		leakageCurrentAlarm[10];
-    ORAlarm*		adcAlarm[4];
+    ORAlarm*		leakageCurrentAlarm[kMJDPreAmpLeakageCurrentChannels];
+    ORAlarm*		adcAlarm[kMJDPreAmpAdcChannels];
     BOOL rangesHaveBeenSet;
 }
 
@@ -66,9 +69,10 @@
 - (void) setBaselineVoltages:(NSMutableArray*)anArray;
 - (float) baselineVoltage:(unsigned short) aChan;
 - (void) setBaselineVoltage:(int) aChan value:(float) aValue;
-- (void) updateLeakageCurrent:(int) aChan;
+- (void) calculateLeakageCurrentForAdc:(int) aChan;
 
-- (ORTimeRate*)timeRate:(int)index;
+- (ORTimeRate*)adcHistory:(int)index;
+- (ORTimeRate*)leakageCurrentHistory:(int)index;
 - (unsigned long) adcEnabledMask;
 - (void) setAdcEnabledMask:(unsigned long)aAdcEnabledMask;
 - (BOOL) shipValues;
@@ -76,9 +80,10 @@
 - (int) pollTime;
 - (void) setPollTime:(int)aPollTime;
 - (NSMutableArray*) adcs;
-- (void) setAdcs:(NSMutableArray*)aAdcs;
+- (NSMutableArray*) leakageCurrents;
 - (float) adc:(unsigned short) aChan;
 - (void) setAdc:(int) aChan value:(float) aValue;
+- (void) setLeakageCurrent:(int) aChan value:(float) aValue;
 - (BOOL) loopForever;
 - (void) setLoopForever:(BOOL)aLoopForever;
 - (unsigned short) pulseCount;
@@ -130,9 +135,9 @@
 - (unsigned long) writeAuxIOSPI:(unsigned long)aValue;
 
 #pragma mark ¥¥¥Alarms
-- (void) checkTempIsWithinLimits:(int)aChip value:(float)aTemperature;
-- (void) checkLeakageCurrentIsWithinLimits:(int)aChan value:(float)aLeakageCurrent;
-- (void) checkAdcIsWithinLimits:(int)anIndex value:(float)aValue;
+- (void) checkTempIsWithinLimits;
+- (void) checkLeakageCurrentIsWithinLimits:(int)aChan;
+- (void) checkAdcIsWithinLimits:(int)anIndex;
 
 #pragma mark ¥¥¥Archival
 - (id)      initWithCoder:(NSCoder*)aDecoder;
@@ -143,7 +148,6 @@
 extern NSString* ORMJDPreAmpModelAdcEnabledMaskChanged;
 extern NSString*  ORMJDPreAmpModelPollTimeChanged;
 extern NSString* ORMJDPreAmpModelShipValuesChanged;
-extern NSString* ORMJDPreAmpAdcArrayChanged;
 extern NSString* ORMJDPreAmpLoopForeverChanged;
 extern NSString* ORMJDPreAmpPulseCountChanged;
 extern NSString* ORMJDPreAmpEnabledChanged;
