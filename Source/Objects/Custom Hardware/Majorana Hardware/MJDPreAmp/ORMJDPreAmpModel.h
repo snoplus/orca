@@ -119,6 +119,7 @@
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherObject;
 - (void) shipRecords;
+- (void) updateTrends;
 
 #pragma mark ¥¥¥HW Access
 - (void) startPulser;

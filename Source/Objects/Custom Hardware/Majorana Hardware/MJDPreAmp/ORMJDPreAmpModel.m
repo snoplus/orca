@@ -427,18 +427,7 @@ struct {
 		NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
 		[userInfo setObject:[NSNumber numberWithFloat:aChan] forKey: @"Channel"];
 
-        if(!adcHistory[aChan]) adcHistory[aChan] = [[ORTimeRate alloc] init];
-        
-		[adcHistory[aChan] addDataToTimeAverage:aValue];
-        
-        if(mjdPreAmpTable[aChan].calculateLeakageCurrent){
-            [self calculateLeakageCurrentForAdc:aChan];
-            int     leakageIndex = mjdPreAmpTable[aChan].leakageCurrentIndex;
-            float   aValue = [self leakageCurrent:leakageIndex];
-            if(!leakageCurrentHistory[aChan]) leakageCurrentHistory[leakageIndex] = [[ORTimeRate alloc] init];
-            [leakageCurrentHistory[leakageIndex] addDataToTimeAverage:aValue];
-       }
-        
+         
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpAdcChanged
 															object:self
 														  userInfo: userInfo];
@@ -736,7 +725,7 @@ struct {
     if(!rangesHaveBeenSet)[self writeAdcRanges];
 
     int chan;
-	for(chan=0;chan<16;chan++){
+	for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
 		if(adcEnabledMask & (0x1<<chan)){
             unsigned long controlWord = (kControlReg << 13)    |            //sel the chan set
                                         (chan<<10)             |            //set chan
@@ -744,7 +733,7 @@ struct {
             
             unsigned long rawAdcValue = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection << 13) | (controlWord<<8)];
             
-			int decodedChannel = (rawAdcValue & 0xE000) >> 13; //use the whichever chan was converted, my be diff than the one selected above.
+			int decodedChannel = (rawAdcValue & 0xE000) >> 13; //use the whichever chan was converted, may be diff than the one selected above.
                         
             long adcValue;
             if(rawAdcValue & 0x1000)adcValue = -(~rawAdcValue & 0x1FFF) + 1;
@@ -756,7 +745,11 @@ struct {
             
 			[self setAdc:decodedChannel value:convertedValue];
             [self checkAdcIsWithinLimits:decodedChannel];
-                    
+            
+            if(mjdPreAmpTable[chan].calculateLeakageCurrent){
+                [self calculateLeakageCurrentForAdc:chan];
+             }
+        
 		}
 		else [self setAdc:chan value:0.0];
 	}
@@ -774,11 +767,28 @@ struct {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollValues) object:nil];
         
 	[self readAllAdcs];
+    [self updateTrends];
     
 	if(shipValues)[self shipRecords];
 	if(pollTime)[self performSelector:@selector(pollValues) withObject:nil afterDelay:pollTime];
 }
 
+- (void) updateTrends
+{
+    int chan;
+	for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
+
+        if(!adcHistory[chan]) adcHistory[chan] = [[ORTimeRate alloc] init];
+        [adcHistory[chan] addDataToTimeAverage:[self adc:chan]];
+        
+        if(mjdPreAmpTable[chan].calculateLeakageCurrent){
+            int     leakageIndex = mjdPreAmpTable[chan].leakageCurrentIndex;
+            float   aValue       = [self leakageCurrent:leakageIndex];
+            if(!leakageCurrentHistory[leakageIndex]) leakageCurrentHistory[leakageIndex] = [[ORTimeRate alloc] init];
+            [leakageCurrentHistory[leakageIndex] addDataToTimeAverage:aValue];
+        }
+    }
+}
 
 - (void) stopPulser
 {
