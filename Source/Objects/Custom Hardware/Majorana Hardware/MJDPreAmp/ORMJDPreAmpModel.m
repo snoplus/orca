@@ -128,6 +128,7 @@ struct {
 
 - (void) dealloc
 {
+    [lastDataBaseUpdate release];
     [preampName release];
     [dacs release];
 	int i;
@@ -705,7 +706,7 @@ struct {
 	for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
 		if(adcEnabledMask & (0x1<<chan)){
             unsigned long controlWord = (kControlReg << 13)    |            //sel the chan set
-                                        ((chan%2)<<10)         |            //set chan
+                                        ((chan%8)<<10)         |            //set chan
                                         (0x1 << 4)             |            //use internal voltage reference for conversion
                                         (mjdPreAmpTable[chan].mode << 8);    //set mode, other bits are zero
             
@@ -1073,52 +1074,59 @@ struct {
 
 - (void) postCouchDBRecord
 {
-    NSString* theTitle;
-    
-    if([preampName length]>0)theTitle = [self preampName];
-    else theTitle = [NSString stringWithFormat:@"PreAmp%ld",[self uniqueIdNumber]];
-    
-    NSDictionary* adcsForHistory = [NSDictionary dictionaryWithObjectsAndKeys:
-                                    
-        [NSString stringWithFormat:@"PreAmp%ld",[self uniqueIdNumber]],@"name",
-        theTitle,@"title",
-        [NSArray arrayWithObjects:
-         
-            [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[0]]  forKey:@"Baseline0"] ,
-            [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[1]]  forKey:@"Baseline1"] ,
-            [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[2]]  forKey:@"Baseline2"] ,
-            [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[3]]  forKey:@"Baseline3"] ,
-            [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[4]]  forKey:@"Baseline4"] ,
-            [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[8]]  forKey:@"Baseline5"] ,
-            [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[9]]  forKey:@"Baseline6"] ,
-            [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[10]] forKey:@"Baseline7"] ,
-            [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[11]] forKey:@"Baseline8"] ,
-            [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[12]] forKey:@"Baseline9"] ,
-    
-            [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[13]] forKey:@"+24V"],
-            [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[14]] forKey:@"-24V"],
-            [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[5]]  forKey:@"+12V"],
-            [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[6]]  forKey:@"-12V"],
-  
-            [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[7]]  forKey:@"Temp1"],
-            [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[15]] forKey:@"Temp2"],
-    
-            [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:leakageCurrents[0]] forKey:@"Leakage0"],
-            [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:leakageCurrents[1]] forKey:@"Leakage1"],
-            [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:leakageCurrents[2]] forKey:@"Leakage2"],
-            [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:leakageCurrents[3]] forKey:@"Leakage3"],
-            [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:leakageCurrents[4]] forKey:@"Leakage4"],
-            [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:leakageCurrents[5]] forKey:@"Leakage5"],
-            [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:leakageCurrents[6]] forKey:@"Leakage6"],
-            [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:leakageCurrents[7]] forKey:@"Leakage7"],
-            [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:leakageCurrents[8]] forKey:@"Leakage8"],
-            [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:leakageCurrents[9]] forKey:@"Leakage9"],
+    NSDate* now = [NSDate date];
+    if(!lastDataBaseUpdate || [now timeIntervalSinceDate:lastDataBaseUpdate] >= 60){
+        
+        [lastDataBaseUpdate release];
+        lastDataBaseUpdate = [now retain];
+        
+        NSString* theTitle;
+        
+        if([preampName length]>0)theTitle = [self preampName];
+        else theTitle = [NSString stringWithFormat:@"PreAmp%ld",[self uniqueIdNumber]];
+        
+        NSDictionary* adcsForHistory = [NSDictionary dictionaryWithObjectsAndKeys:
+                                        
+            [NSString stringWithFormat:@"PreAmp%ld",[self uniqueIdNumber]],@"name",
+            theTitle,@"title",
+            [NSArray arrayWithObjects:
+             
+                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[0]]  forKey:@"Baseline0"] ,
+                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[1]]  forKey:@"Baseline1"] ,
+                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[2]]  forKey:@"Baseline2"] ,
+                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[3]]  forKey:@"Baseline3"] ,
+                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[4]]  forKey:@"Baseline4"] ,
+                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[8]]  forKey:@"Baseline5"] ,
+                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[9]]  forKey:@"Baseline6"] ,
+                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[10]] forKey:@"Baseline7"] ,
+                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[11]] forKey:@"Baseline8"] ,
+                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[12]] forKey:@"Baseline9"] ,
+        
+                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[13]] forKey:@"+24V"],
+                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[14]] forKey:@"-24V"],
+                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[5]]  forKey:@"+12V"],
+                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[6]]  forKey:@"-12V"],
+      
+                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[7]]  forKey:@"Temp1"],
+                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[15]] forKey:@"Temp2"],
+        
+                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:leakageCurrents[0]] forKey:@"Leakage0"],
+                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:leakageCurrents[1]] forKey:@"Leakage1"],
+                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:leakageCurrents[2]] forKey:@"Leakage2"],
+                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:leakageCurrents[3]] forKey:@"Leakage3"],
+                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:leakageCurrents[4]] forKey:@"Leakage4"],
+                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:leakageCurrents[5]] forKey:@"Leakage5"],
+                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:leakageCurrents[6]] forKey:@"Leakage6"],
+                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:leakageCurrents[7]] forKey:@"Leakage7"],
+                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:leakageCurrents[8]] forKey:@"Leakage8"],
+                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:leakageCurrents[9]] forKey:@"Leakage9"],
+                nil
+            ],@"adcs",
             nil
-        ],@"adcs",
-        nil
-        ];
-    
-     [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddHistoryAdcRecord" object:self userInfo:adcsForHistory];
+            ];
+        
+         [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddHistoryAdcRecord" object:self userInfo:adcsForHistory];
+    }
 }
 
 @end

@@ -57,6 +57,7 @@
     ORAlarm*		adcAlarm[kMJDPreAmpAdcChannels];
     BOOL            rangesHaveBeenSet;
     NSString*       preampName;
+    NSDate*         lastDataBaseUpdate;
 }
 
 - (void) setUpArrays;
