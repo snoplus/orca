@@ -31,8 +31,8 @@
 
 
 @interface ORMJDPreAmpModel : OrcaObject {
-    NSMutableArray* adcs;
-    NSMutableArray* leakageCurrents;
+    float adcs[kMJDPreAmpAdcChannels];
+    float leakageCurrents[kMJDPreAmpLeakageCurrentChannels];
     NSMutableArray* feedBackResistors;
     NSMutableArray* baselineVoltages;
     NSMutableArray* dacs;
@@ -69,7 +69,6 @@
 - (void) setBaselineVoltages:(NSMutableArray*)anArray;
 - (float) baselineVoltage:(unsigned short) aChan;
 - (void) setBaselineVoltage:(int) aChan value:(float) aValue;
-- (void) calculateLeakageCurrentForAdc:(int) aChan;
 
 - (ORTimeRate*)adcHistory:(int)index;
 - (ORTimeRate*)leakageCurrentHistory:(int)index;
@@ -79,8 +78,6 @@
 - (void) setShipValues:(BOOL)aShipValues;
 - (int) pollTime;
 - (void) setPollTime:(int)aPollTime;
-- (NSMutableArray*) adcs;
-- (NSMutableArray*) leakageCurrents;
 - (float) adc:(unsigned short) aChan;
 - (void) setAdc:(int) aChan value:(float) aValue;
 - (void) setLeakageCurrent:(int) aChan value:(float) aValue;
@@ -119,7 +116,6 @@
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherObject;
 - (void) shipRecords;
-- (void) updateTrends;
 
 #pragma mark ¥¥¥HW Access
 - (void) startPulser;

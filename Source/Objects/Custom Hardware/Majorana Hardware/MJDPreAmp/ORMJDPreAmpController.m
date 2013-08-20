@@ -81,7 +81,8 @@
         
 		[[baselineVoltageMatrix cellAtRow:chan column:0] setTag:chan];
 		[[baselineVoltageMatrix cellAtRow:chan column:0] setFormatter:aFormat];
-       
+    }
+    for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
 		[[adcMatrix cellAtRow:chan column:0] setTag:chan];
 		[[adcMatrix cellAtRow:chan column:0] setFormatter:aFormat];
 		[[adcEnabledMaskMatrix cellAtRow:chan column:0] setTag:chan];
@@ -90,7 +91,6 @@
  		[[feedBackResistorMatrix cellAtRow:chan column:0] setTag:chan];
 	}
     
-    //[[baselinePlot0 yAxis] setRngLimitsLow:-300.0 withHigh:500 withMinRng:4];
     [[baselinePlot0 yAxis] setRngLow:0.0 withHigh:300.];
     [[baselinePlot0 yAxis] setRngLimitsLow:-15. withHigh:0. withMinRng:4]; // rail of preamp at -12V - niko
     [[baselinePlot1 yAxis] setRngLow:0.0 withHigh:300.];

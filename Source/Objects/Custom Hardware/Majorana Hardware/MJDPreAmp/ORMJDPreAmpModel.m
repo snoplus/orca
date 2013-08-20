@@ -118,6 +118,11 @@ struct {
     {kADC2,NO, -1,kPseudoDiff,-0.4494,2387.82}, //1,7
 };
 
+@interface ORMJDPreAmpModel (private)
+- (void) updateTrends;
+- (void) calculateLeakageCurrentForAdc:(int) aChan;
+- (void) postCouchDBRecord;
+@end
 
 @implementation ORMJDPreAmpModel
 #pragma mark ¥¥¥initialization
@@ -132,8 +137,6 @@ struct {
 
 - (void) dealloc
 {
-    [adcs release];
-    [leakageCurrents release];
     [dacs release];
 	int i;
 	for(i=0;i<kMJDPreAmpAdcChannels;i++){
@@ -368,35 +371,12 @@ struct {
 	}
 }
 
-- (void) calculateLeakageCurrentForAdc:(int) adcChan
-{
-    //value returned in picoamps
-    float nanoToPico = 1000.;
-    
-    int currentChan = mjdPreAmpTable[adcChan].leakageCurrentIndex;
-    if(currentChan>0){
-        //leakage current is (first stage output voltage - baseline voltage)/feedback resistance
-        float leakageCurrent = -nanoToPico*([self adc:adcChan] - [self baselineVoltage:adcChan])/ [self feedBackResistor:adcChan];//in picoamps
-        [self setLeakageCurrent:currentChan value:leakageCurrent];
-        [self checkLeakageCurrentIsWithinLimits:currentChan];
-    }
-}
 
-
-- (NSMutableArray*) adcs
-{
-    return adcs;
-}
-
-- (NSMutableArray*) leakageCurrents
-{
-    return leakageCurrents;
-}
 
 - (float) adc:(unsigned short) aChan
 {
 	if(aChan<kMJDPreAmpAdcChannels){
-		if(adcEnabledMask & (0x1<<aChan))return [[adcs objectAtIndex:aChan] floatValue];
+		if(adcEnabledMask & (0x1<<aChan))return adcs[aChan];
 		else return 0.0;
 	}
 	else return 0.0;
@@ -404,8 +384,8 @@ struct {
 
 - (float) leakageCurrent:(unsigned short) aChan
 {
-	if(aChan<kMJDPreAmpLeakageCurrentChannels){
-		if(adcEnabledMask & (0x1<<aChan))return [[leakageCurrents objectAtIndex:aChan] floatValue];
+	if(aChan>=0 && aChan<kMJDPreAmpLeakageCurrentChannels){
+		if(adcEnabledMask & (0x1<<aChan))return leakageCurrents[aChan];
 		else return 0.0;
 	}
 	else return 0.0;
@@ -414,15 +394,9 @@ struct {
 
 - (void) setAdc:(int) aChan value:(float) aValue
 {
-	if(aChan<kMJDPreAmpAdcChannels){
+	if(aChan>=0 && aChan<kMJDPreAmpAdcChannels){
         
-        if(!adcs){
-            adcs = [[NSMutableArray arrayWithCapacity:kMJDPreAmpAdcChannels] retain];
-            int i;
-            for(i=0;i<kMJDPreAmpAdcChannels;i++)[adcs addObject:[NSNumber numberWithInt:0]];
-        }
-        
-		[adcs replaceObjectAtIndex:aChan withObject:[NSNumber numberWithFloat:aValue]];
+		adcs[aChan] = aValue;
 	
 		NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
 		[userInfo setObject:[NSNumber numberWithFloat:aChan] forKey: @"Channel"];
@@ -436,12 +410,7 @@ struct {
 
 - (void) setLeakageCurrent:(int) aChan value:(float) aValue
 {
-    if(!leakageCurrents){
-        leakageCurrents = [[NSMutableArray arrayWithCapacity:kMJDPreAmpLeakageCurrentChannels] retain];
-        int i;
-        for(i=0;i<kMJDPreAmpLeakageCurrentChannels;i++)[leakageCurrents addObject:[NSNumber numberWithInt:0]];
-    }
-    [leakageCurrents replaceObjectAtIndex:aChan withObject:[NSNumber numberWithFloat:aValue]];
+    leakageCurrents[aChan] = aValue;
 }
 
 - (BOOL) loopForever
@@ -632,7 +601,6 @@ struct {
 }
 
 #pragma mark ¥¥¥HW Access
-
 - (void) writeFetVdsToHW
 {
 	int i;
@@ -728,7 +696,7 @@ struct {
 	for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
 		if(adcEnabledMask & (0x1<<chan)){
             unsigned long controlWord = (kControlReg << 13)    |            //sel the chan set
-                                        (chan<<10)             |            //set chan
+                                        ((chan%2)<<10)         |           //set chan
                                         (mjdPreAmpTable[chan].mode << 8);   //set mode, other bits are zero
             
             unsigned long rawAdcValue = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection << 13) | (controlWord<<8)];
@@ -768,27 +736,12 @@ struct {
         
 	[self readAllAdcs];
     [self updateTrends];
-    
+    //[self postCouchDBRecord];
+
 	if(shipValues)[self shipRecords];
 	if(pollTime)[self performSelector:@selector(pollValues) withObject:nil afterDelay:pollTime];
 }
 
-- (void) updateTrends
-{
-    int chan;
-	for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
-
-        if(!adcHistory[chan]) adcHistory[chan] = [[ORTimeRate alloc] init];
-        [adcHistory[chan] addDataToTimeAverage:[self adc:chan]];
-        
-        if(mjdPreAmpTable[chan].calculateLeakageCurrent){
-            int     leakageIndex = mjdPreAmpTable[chan].leakageCurrentIndex;
-            float   aValue       = [self leakageCurrent:leakageIndex];
-            if(!leakageCurrentHistory[leakageIndex]) leakageCurrentHistory[leakageIndex] = [[ORTimeRate alloc] init];
-            [leakageCurrentHistory[leakageIndex] addDataToTimeAverage:aValue];
-        }
-    }
-}
 
 - (void) stopPulser
 {
@@ -1072,4 +1025,71 @@ struct {
         
     }
 }
+@end
+
+@implementation ORMJDPreAmpModel (private)
+- (void) updateTrends
+{
+    int chan;
+	for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
+        
+        if(!adcHistory[chan]) adcHistory[chan] = [[ORTimeRate alloc] init];
+        [adcHistory[chan] addDataToTimeAverage:[self adc:chan]];
+        
+        if(mjdPreAmpTable[chan].calculateLeakageCurrent){
+            int     leakageIndex = mjdPreAmpTable[chan].leakageCurrentIndex;
+            float   aValue       = [self leakageCurrent:leakageIndex];
+            if(!leakageCurrentHistory[leakageIndex]) leakageCurrentHistory[leakageIndex] = [[ORTimeRate alloc] init];
+            [leakageCurrentHistory[leakageIndex] addDataToTimeAverage:aValue];
+        }
+    }
+}
+- (void) calculateLeakageCurrentForAdc:(int) adcChan
+{
+    //value returned in picoamps
+    float nanoToPico = 1000.;
+    
+    int currentChan = mjdPreAmpTable[adcChan].leakageCurrentIndex;
+    if(currentChan>0){
+        //leakage current is (first stage output voltage - baseline voltage)/feedback resistance
+        float leakageCurrent = -nanoToPico*([self adc:adcChan] - [self baselineVoltage:adcChan])/ [self feedBackResistor:adcChan];//in picoamps
+        [self setLeakageCurrent:currentChan value:leakageCurrent];
+        [self checkLeakageCurrentIsWithinLimits:currentChan];
+    }
+}
+
+- (void) postCouchDBRecord
+{
+    NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
+                            [NSString stringWithFormat:@"%f",adcs[0]],  @"Baseline0",
+                            [NSString stringWithFormat:@"%f",adcs[1]],  @"Baseline1",
+                            [NSString stringWithFormat:@"%f",adcs[2]],  @"Baseline2",
+                            [NSString stringWithFormat:@"%f",adcs[3]],  @"Baseline3",
+                            [NSString stringWithFormat:@"%f",adcs[4]],  @"Baseline4",
+                            [NSString stringWithFormat:@"%f",adcs[5]],  @"+12V",
+                            [NSString stringWithFormat:@"%f",adcs[6]],  @"-12V",
+                            [NSString stringWithFormat:@"%f",adcs[7]],  @"Temp1",
+                            [NSString stringWithFormat:@"%f",adcs[8]],  @"Baseline5",
+                            [NSString stringWithFormat:@"%f",adcs[9]],  @"Baseline6",
+                            [NSString stringWithFormat:@"%f",adcs[10]], @"Baseline7",
+                            [NSString stringWithFormat:@"%f",adcs[11]], @"Baseline8",
+                            [NSString stringWithFormat:@"%f",adcs[12]], @"Baseline9",
+                            [NSString stringWithFormat:@"%f",adcs[13]], @"+24V",
+                            [NSString stringWithFormat:@"%f",adcs[14]], @"-24V",
+                            [NSString stringWithFormat:@"%f",adcs[15]], @"Temp2",
+                            [NSString stringWithFormat:@"%f",leakageCurrents[0]],  @"Leakage0",
+                            [NSString stringWithFormat:@"%f",leakageCurrents[1]],  @"Leakage1",
+                            [NSString stringWithFormat:@"%f",leakageCurrents[2]],  @"Leakage2",
+                            [NSString stringWithFormat:@"%f",leakageCurrents[3]],  @"Leakage3",
+                            [NSString stringWithFormat:@"%f",leakageCurrents[4]],  @"Leakage4",
+                            [NSString stringWithFormat:@"%f",leakageCurrents[5]],  @"Leakage5",
+                            [NSString stringWithFormat:@"%f",leakageCurrents[6]],  @"Leakage6",
+                            [NSString stringWithFormat:@"%f",leakageCurrents[7]],  @"Leakage7",
+                            [NSString stringWithFormat:@"%f",leakageCurrents[8]],  @"Leakage8",
+                            [NSString stringWithFormat:@"%f",leakageCurrents[9]],  @"Leakage9",
+                            [NSString stringWithFormat:@"%f",leakageCurrents[10]], @"Leakage10",
+                            nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddHistoryRecord" object:self userInfo:values];
+}
+
 @end
