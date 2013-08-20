@@ -709,7 +709,7 @@ struct {
             
             float convertedValue = adcValue*mjdPreAmpTable[decodedChannel].slope + adcValue*mjdPreAmpTable[decodedChannel].intercept;
             
-			if(verbose)NSLog(@"%d: %.2f (0x%08x)\n",decodedChannel,convertedValue,rawAdcValue);
+			if(verbose)NSLog(@"%d: %.2f (0x%08x)\n",decodedChannel,convertedValue,rawAdcValue&0x1FFF);
             
 			[self setAdc:decodedChannel value:convertedValue];
             [self checkAdcIsWithinLimits:decodedChannel];
