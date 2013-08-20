@@ -1086,7 +1086,6 @@ struct {
         else theTitle = [NSString stringWithFormat:@"PreAmp%ld",[self uniqueIdNumber]];
         
         NSDictionary* adcsForHistory = [NSDictionary dictionaryWithObjectsAndKeys:
-                                        
             [NSString stringWithFormat:@"PreAmp%ld",[self uniqueIdNumber]],@"name",
             theTitle,@"title",
             [NSArray arrayWithObjects:
@@ -1125,7 +1124,43 @@ struct {
             nil
             ];
         
-         [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddHistoryAdcRecord" object:self userInfo:adcsForHistory];
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddHistoryAdcRecord" object:self userInfo:adcsForHistory];
+        
+            //we also post a snapshot to the machine database
+            NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
+                [NSNumber numberWithDouble:adcs[0]],            @"Baseline0",
+                [NSNumber numberWithDouble:adcs[1]],            @"Baseline1",
+                [NSNumber numberWithDouble:adcs[2]],            @"Baseline2",
+                [NSNumber numberWithDouble:adcs[3]],            @"Baseline3",
+                [NSNumber numberWithDouble:adcs[4]],            @"Baseline4",
+                [NSNumber numberWithDouble:adcs[8]],            @"Baseline5",
+                [NSNumber numberWithDouble:adcs[9]],            @"Baseline6",
+                [NSNumber numberWithDouble:adcs[10]],           @"Baseline7",
+                [NSNumber numberWithDouble:adcs[11]],           @"Baseline8",
+                [NSNumber numberWithDouble:adcs[12]],           @"Baseline9",
+                
+                [NSNumber numberWithDouble:adcs[13]],           @"+24V",
+                [NSNumber numberWithDouble:adcs[14]],           @"-24V",
+                [NSNumber numberWithDouble:adcs[5]],            @"+12V",
+                [NSNumber numberWithDouble:adcs[6]],            @"-12V",
+                
+                [NSNumber numberWithDouble:adcs[7]],            @"Temp1",
+                [NSNumber numberWithDouble:adcs[15]],           @"Temp2",
+                
+                [NSNumber numberWithDouble:leakageCurrents[0]], @"Leakage0",
+                [NSNumber numberWithDouble:leakageCurrents[1]], @"Leakage1",
+                [NSNumber numberWithDouble:leakageCurrents[2]], @"Leakage2",
+                [NSNumber numberWithDouble:leakageCurrents[3]], @"Leakage3",
+                [NSNumber numberWithDouble:leakageCurrents[4]], @"Leakage4",
+                [NSNumber numberWithDouble:leakageCurrents[5]], @"Leakage5",
+                [NSNumber numberWithDouble:leakageCurrents[6]], @"Leakage6",
+                [NSNumber numberWithDouble:leakageCurrents[7]], @"Leakage7",
+                [NSNumber numberWithDouble:leakageCurrents[8]], @"Leakage8",
+                [NSNumber numberWithDouble:leakageCurrents[9]], @"Leakage9",
+                [NSNumber numberWithInt:    pollTime],          @"pollTime",
+                    nil];
+ 
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
     }
 }
 
