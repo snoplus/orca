@@ -2452,14 +2452,16 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	[self writeFiberOutMask];//TODO: is this necessary? we want event mode but this is for stream mode -tb-
 	[self writeFiberDelays];
     
-	[self loadThresholdsAndGains]; //TODO:
-	//!!!: xxx
-	//???: yyy
-	[self writeTriggerControl];			//TODO:   (for v4 this needs to be implemented by DENIS)-tb- //set trigger mask
-	[self enableStatistics];			//TODO: OBSOLETE -tb- enable hardware ADC statistics, ak 7.1.07
 	
-    [self writeIonTriggerMask];
+    [self initTrigger];
+}
+
+- (void) initTrigger
+{
     [self writeHeatTriggerMask];
+    [self writeIonTriggerMask];
+    [self writeTriggerParameters];
+    [self writePostTriggerTimeAndIonToHeatDelay];
 }
 
 - (void) readAll
@@ -3657,6 +3659,8 @@ for(chan=0; chan<6;chan++)
 //TODO: runTaskStarted UNDER CONSTRUCTION -tb- 
 //TODO: runTaskStarted UNDER CONSTRUCTION -tb- 
 
+    [self setIsPartOfRun: YES];
+
 	firstTime = YES;
 	
     [self clearExceptionCount];
@@ -3746,6 +3750,10 @@ for(chan=0; chan<6;chan++)
 
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelHitRateChanged object:self];
+    
+    [self setIsPartOfRun: NO];
+
+
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢SBC readout control structure... Till, fill out as needed

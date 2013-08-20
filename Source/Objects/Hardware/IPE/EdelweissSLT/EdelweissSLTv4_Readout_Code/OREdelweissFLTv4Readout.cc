@@ -302,7 +302,9 @@ fprintf(stderr,"ORFLTv4Readout::Readout(SBC_LAM_Data* lamData): location %i, Get
         
         
         // --- TRIGGER EVENT MODE ------------------------------
-        if(1 || daqRunMode == kIpeFltV4_EventDaqMode){  //then fltRunMode == kIpeFltV4Katrin_Run_Mode resp. kIpeFltV4Katrin_Veto_Mode
+//DISABLED ---> 2013-08-19 -tb-
+return true;
+        if(daqRunMode == kIpeFltV4_EventDaqMode){  //then fltRunMode == kIpeFltV4Katrin_Run_Mode resp. kIpeFltV4Katrin_Veto_Mode
             uint32_t status         = 0;//pbus->read(FIFOStatusReg(currFlt+1));
             uint32_t totalTriggerN  = pbus->read(FLTTotalTriggerNReg(currFlt+1));
             //uint32_t status         = srack->theFlt[col]->status->read();

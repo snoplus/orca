@@ -336,9 +336,19 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
                          name : OREdelweissSLTModelLowLevelRegInHexChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(resetEventCounterAtRunStartChanged:)
+                         name : OREdelweissSLTModelResetEventCounterAtRunStartChanged
+						object: model];
+
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+
+- (void) resetEventCounterAtRunStartChanged:(NSNotification*)aNote
+{
+	[resetEventCounterAtRunStartCB setIntValue: [model resetEventCounterAtRunStart]];
+}
 
 - (void) lowLevelRegInHexChanged:(NSNotification*)aNote
 {
@@ -724,6 +734,7 @@ return;
 	[self statusLowRegChanged:nil];
 	[self statusHighRegChanged:nil];
 	[self lowLevelRegInHexChanged:nil];
+	[self resetEventCounterAtRunStartChanged:nil];
 }
 
 
@@ -872,6 +883,11 @@ return;
 }
 
 #pragma mark ***Actions
+
+- (void) resetEventCounterAtRunStartCBAction:(id)sender
+{
+	[model setResetEventCounterAtRunStart:[sender intValue]];	
+}
 
 - (void) lowLevelRegInHexPUAction:(id)sender /*lowLevelRegInHexPU*/
 {

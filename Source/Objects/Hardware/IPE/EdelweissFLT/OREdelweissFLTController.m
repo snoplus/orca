@@ -2480,6 +2480,27 @@
 }
 
 
+
+//trigger
+- (IBAction) writeAllTriggerParameterButtonAction:(id)sender
+{
+	[self endEditing];
+	@try {
+	    [model initTrigger];	
+	    //[model writeHeatTriggerMask];	
+	    //[model writeIonTriggerMask];	
+        //[model writeTriggerParameters];
+        //[model writePostTriggerTimeAndIonToHeatDelay];
+        //...? what else?
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Exception '%@'-'%@' in %@::%@ ; FLT (%d) \n",[localException name],[localException reason],NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model stationNumber]);
+        NSRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
+                        localException,[model stationNumber]);
+	}
+}
+
+
 - (IBAction) heatTriggerMaskEnableAllAction:(id)sender
 {	[model setHeatTriggerMask:0x00003f3f3f3f3f3fLL];	 }
 
@@ -2610,8 +2631,9 @@
 
 - (IBAction) writeTriggerParametersButtonAction:(id)sender
 {
-//DEBUG OUTPUT:
- 	NSLog(@"%@::%@: UNDER CONSTRUCTION!   \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+//DEBUG OUTPUT: 	NSLog(@"%@::%@: UNDER CONSTRUCTION!   \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+
+    //TODO: use try...catch -tb-
     [model writeTriggerParameters];
 }
 
@@ -2621,7 +2643,7 @@
     [model dumpTriggerParameters];
 }
 
-
+    //TODO: use try...catch -tb-
 - (IBAction) readPostTriggerTimeAndIonToHeatDelayButtonAction:(id)sender{[model readPostTriggerTimeAndIonToHeatDelay];}
 - (IBAction) writePostTriggerTimeAndIonToHeatDelayButtonAction:(id)sender{[model writePostTriggerTimeAndIonToHeatDelay];}
 

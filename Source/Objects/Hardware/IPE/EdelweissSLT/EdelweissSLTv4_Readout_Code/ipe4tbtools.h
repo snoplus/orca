@@ -102,6 +102,10 @@ int fifoReadsFLTIndexChecker(int fltIndex, int numfifo, int availableNumFIFO, in
 	static const uint32_t SLTTimeLowReg     = 0xb00018 >> 2;
 	static const uint32_t SLTTimeHighReg    = 0xb0001c >> 2;
 
+	static const uint32_t SLTEventFIFOReg       = 0xb80000 >> 2;
+	static const uint32_t SLTEventFIFOStatusReg = 0xb80004 >> 2;
+	static const uint32_t SLTEventFIFONumReg    = 0xb80008 >> 2;
+
 
 	
 uint32_t FIFOStatusReg(int numFIFO);

@@ -381,12 +381,16 @@
 - (IBAction) fiberDelaysTextFieldAction:(id)sender;
 - (IBAction) fiberDelaysMatrixAction:(id)sender;
 
+//streaming
 - (IBAction) streamMaskEnableAllAction:(id)sender;
 - (IBAction) streamMaskEnableNoneAction:(id)sender;
 - (IBAction) streamMaskTextFieldAction:(id)sender;
 - (IBAction) streamMaskMatrixAction:(id)sender;
 - (IBAction) writeStreamMaskRegisterButtonAction:(id)sender;
 - (IBAction) readStreamMaskRegisterButtonAction:(id)sender;
+
+//trigger
+- (IBAction) writeAllTriggerParameterButtonAction:(id)sender;
 
 - (IBAction) heatTriggerMaskEnableAllAction:(id)sender;
 - (IBAction) heatTriggerMaskEnableNoneAction:(id)sender;

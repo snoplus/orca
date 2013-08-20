@@ -472,6 +472,7 @@
 
 - (void) loadThresholdsAndGains;
 - (void) initBoard;
+- (void) initTrigger;
 - (void) readAll;
 - (void) writeInterruptMask;
 - (void) readHitRates;

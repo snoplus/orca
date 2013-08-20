@@ -29,6 +29,7 @@
 	
     //BB commands
     IBOutlet   NSTextField* eventFifoStatusRegTextField;
+	IBOutlet   NSButton* resetEventCounterAtRunStartCB;
 	IBOutlet   NSTextField* statusHighRegTextField;
 	IBOutlet   NSTextField* statusLowRegTextField;
 	IBOutlet   NSButton* useBroadcastIdBBCB;
@@ -170,6 +171,7 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+- (void) resetEventCounterAtRunStartChanged:(NSNotification*)aNote;
 - (void) lowLevelRegInHexChanged:(NSNotification*)aNote;
 - (void) statusHighRegChanged:(NSNotification*)aNote;
 - (void) statusLowRegChanged:(NSNotification*)aNote;
@@ -232,6 +234,7 @@
 - (void) enableRegControls;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+- (IBAction) resetEventCounterAtRunStartCBAction:(id)sender;
 - (IBAction) lowLevelRegInHexPUAction:(id)sender;
 - (IBAction) statusHighRegTextFieldAction:(id)sender;
 - (IBAction) statusLowRegTextFieldAction:(id)sender;

@@ -539,6 +539,7 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
 
 #pragma mark ***External Strings
 
+NSString* OREdelweissSLTModelResetEventCounterAtRunStartChanged = @"OREdelweissSLTModelResetEventCounterAtRunStartChanged";
 NSString* OREdelweissSLTModelLowLevelRegInHexChanged = @"OREdelweissSLTModelLowLevelRegInHexChanged";
 NSString* OREdelweissSLTModelStatusRegHighChanged = @"OREdelweissSLTModelStatusRegHighChanged";
 NSString* OREdelweissSLTModelStatusRegLowChanged = @"OREdelweissSLTModelStatusRegLowChanged";
@@ -727,6 +728,20 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 }
 
 #pragma mark •••Accessors
+
+- (int) resetEventCounterAtRunStart
+{
+    return resetEventCounterAtRunStart;
+}
+
+- (void) setResetEventCounterAtRunStart:(int)aResetEventCounterAtRunStart
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setResetEventCounterAtRunStart:resetEventCounterAtRunStart];
+    
+    resetEventCounterAtRunStart = aResetEventCounterAtRunStart;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelResetEventCounterAtRunStartChanged object:self];
+}
 
 - (int) lowLevelRegInHex
 {
@@ -978,6 +993,8 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 - (void) setRequestStoppingDataServerSocket:(int)aValue
 {
     requestStoppingDataServerSocket = aValue;
+    dataReplyThreadData.stopNow=aValue;
+
 }
 
 - (int) crateUDPDataReplyPort
@@ -3130,6 +3147,7 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
 	
+	[self setResetEventCounterAtRunStart:[decoder decodeIntForKey:@"resetEventCounterAtRunStart"]];
 	[self setLowLevelRegInHex:[decoder decodeIntForKey:@"lowLevelRegInHex"]];
 	[self setTakeADCChannelData:[decoder decodeIntForKey:@"takeADCChannelData"]];
 	[self setTakeRawUDPData:[decoder decodeIntForKey:@"takeRawUDPData"]];
@@ -3202,6 +3220,7 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 {
 	[super encodeWithCoder:encoder];
 	
+	[encoder encodeInt:resetEventCounterAtRunStart forKey:@"resetEventCounterAtRunStart"];
 	[encoder encodeInt:lowLevelRegInHex forKey:@"lowLevelRegInHex"];
 	[encoder encodeInt:takeADCChannelData forKey:@"takeADCChannelData"];
 	[encoder encodeInt:takeRawUDPData forKey:@"takeRawUDPData"];
@@ -3384,18 +3403,21 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
             //[self sendUDPDataCommandRequestPackets:  numRequestedUDPPackets];
             //[self performSelector:@selector(loopCommandRequestUDPData) withObject:nil afterDelay: 10.0];//repeat every 10 seconds
         }
-
-
 	}	
 	
+    
+    
+    partOfRunFLTMask = 0;
 	dataTakers = [[readOutGroup allObjects] retain];		//cache of data takers.
 	
 	for(id obj in dataTakers){ //the SLT calls runTaskStarted:userInfo: for all FLTs -tb-
         [obj runTaskStarted:aDataPacket userInfo:userInfo];
-         #if 0
-        if([obj  isSubclassOfClass: NSClassFromString(@"OREdelweissFLTModel")]){
+         #if 1
+        if([[obj class]  isSubclassOfClass: NSClassFromString(@"OREdelweissFLTModel")]){
             //DEBUG
-            NSLog(@"    %@::%@: found a OREdelweissFLTModel data taker! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+            //NSLog(@"    %@::%@: found a OREdelweissFLTModel data taker! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+            partOfRunFLTMask |= 0x1 << ([obj stationNumber]-1);
+            //NSLog(@"         data taker! stationNumber: %i flt mask:0x%08x\n" ,[obj stationNumber],partOfRunFLTMask);//TODO: DEBUG testing ...-tb-
         }
          #endif
     }
@@ -3404,6 +3426,9 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
 	
 	//TODO: temporarily disabled ... [self readStatusReg];
     if(accessAllowedToHardwareAndSBC){
+        //reset event FIFO and counter(s)
+        if(resetEventCounterAtRunStart)[self writeEvRes];
+        //display status
         [self readStatusReg];	
     }
     
@@ -3458,7 +3483,9 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
         currDiffTime =      (  (double)(currtime.tv_sec  - starttime.tv_sec)  ) +
                     ( ((double)(currtime.tv_usec - starttime.tv_usec)) * 0.000001 );
         double elapsedTime = currDiffTime - lastDiffTime;
-		if(elapsedTime >= 0.5){// ----> x= this value (e.g. 1.0/0.5 ...)
+        
+        //if takeUDPstreamData is checked, check every 0.5 sec. the UDP buffer ...
+        if(takeUDPstreamData) if(elapsedTime >= 0.5){// ----> x= this value (e.g. 1.0/0.5 ...)
 		    //code to be executed every x seconds -BEGIN
 		    //
 		    // 
@@ -3940,7 +3967,7 @@ if((len % 4) != 0){
 
 - (void) loadReadOutList:(NSFileHandle*)aFile
 {
-    [self setReadOutGroup:[[[ORReadOutList alloc] initWithIdentifier:@"cPCI"]autorelease]];
+    [self setReadOutGroup:[[[ORReadOutList alloc] initWithIdentifier:@"cPCI"]autorelease]]; // ????? -tb-
     [readOutGroup loadUsingFile:aFile];
 }
 /*
@@ -4068,11 +4095,19 @@ if((len % 4) != 0){
 	configStruct->total_cards++;
 	configStruct->card_info[index].hw_type_id	= kSLTv4EW;	//should be unique
 	configStruct->card_info[index].hw_mask[0] 	= eventDataId;
-	configStruct->card_info[index].hw_mask[1] 	= multiplicityId;
+	configStruct->card_info[index].hw_mask[1] 	= waveFormId;
 	configStruct->card_info[index].slot			= [self stationNumber];
 	configStruct->card_info[index].crate		= [self crateNumber];
 	configStruct->card_info[index].add_mod		= 0;		//not needed for this HW
 	
+	configStruct->card_info[index].deviceSpecificData[0] = partOfRunFLTMask;	
+    
+	unsigned long runFlagsMask = 0;
+	runFlagsMask |= kFirstTimeFlag;          //bit 16 = "first time" flag
+    if(takeEventData)  runFlagsMask |= kTakeEventDataFlag;
+	configStruct->card_info[index].deviceSpecificData[3] = runFlagsMask;	
+    
+
 	configStruct->card_info[index].num_Trigger_Indexes = 1;	//Just 1 group of objects controlled by SLT
     int nextIndex = index+1;
     

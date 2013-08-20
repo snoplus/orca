@@ -118,7 +118,7 @@ extern pthread_mutex_t jobInfoMutex;
 
 
 Pbus *pbus=0;              //for register access with fdhwlib
-
+uint32_t presentFLTMap =0;
 
 
 #if !PMC_COMPILE_IN_SIMULATION_MODE

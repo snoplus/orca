@@ -1636,6 +1636,7 @@ int chargeBBWithFILEPtr(FILE * fichier,int * numserie, int numFifo)
 	//-tb- old code: b=0x200;  write_word(driver_fpga,REG_CMD, b);  //fin de commande 
 	usleep(500000);	// laisser le temps pour lire le message d'erreur eventuel
 	printf("on attend 2 pour terminer : ");
+    if(sendChargeBBStatusFunctionPtr) sendChargeBBStatusFunctionPtr(   *numserie + (101<<8)  , numFifo);
 //TODO: test -tb-
 return 0;
     //removed this: -tb-

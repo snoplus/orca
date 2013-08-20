@@ -205,6 +205,7 @@
     int takeADCChannelData;
     int takeEventData;
     int savedUDPSocketState;
+    uint32_t partOfRunFLTMask;
     
     //BB interface
     int idBBforWCommand;
@@ -214,6 +215,7 @@
     
     //BB charging
     OREdelweissFLTModel *fltChargingBB;
+    int resetEventCounterAtRunStart;
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
@@ -231,6 +233,8 @@
 - (void) runIsStartingSubRun:(NSNotification*)aNote;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+- (int) resetEventCounterAtRunStart;
+- (void) setResetEventCounterAtRunStart:(int)aResetEventCounterAtRunStart;
 - (int) lowLevelRegInHex;
 - (void) setLowLevelRegInHex:(int)aLowLevelRegInHex;
 - (unsigned long) statusHighReg;
@@ -511,6 +515,7 @@
 
 @end
 
+extern NSString* OREdelweissSLTModelResetEventCounterAtRunStartChanged;
 extern NSString* OREdelweissSLTModelLowLevelRegInHexChanged;
 extern NSString* OREdelweissSLTModelStatusRegHighChanged;
 extern NSString* OREdelweissSLTModelStatusRegLowChanged;
