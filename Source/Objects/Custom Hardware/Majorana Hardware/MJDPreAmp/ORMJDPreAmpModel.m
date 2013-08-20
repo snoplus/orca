@@ -696,8 +696,9 @@ struct {
 	for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
 		if(adcEnabledMask & (0x1<<chan)){
             unsigned long controlWord = (kControlReg << 13)    |            //sel the chan set
-                                        ((chan%2)<<10)         |           //set chan
-                                        (mjdPreAmpTable[chan].mode << 8);   //set mode, other bits are zero
+                                        ((chan%2)<<10)         |            //set chan
+                                        (0x1 << 4)             |            //use internal voltage reference for conversion
+                                       (mjdPreAmpTable[chan].mode << 8);    //set mode, other bits are zero
             
             unsigned long rawAdcValue = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection << 13) | (controlWord<<8)];
             
