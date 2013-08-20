@@ -495,8 +495,16 @@
 
 - (void) adcChanged:(NSNotification*)aNote
 {
-	int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
-	[[adcMatrix cellWithTag:chan] setFloatValue: [model adc:chan]];
+    if(!aNote){
+        int chan;
+        for(chan=0;chan<kMJDPreAmpDacChannels;chan++){
+            [[adcMatrix cellWithTag:chan] setFloatValue: [model adc:chan]];
+        }
+    }
+    else {
+        int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        [[adcMatrix cellWithTag:chan] setFloatValue: [model adc:chan]];
+    }
 }
 
 - (void) feedbackResistorArrayChanged:(NSNotification*)aNote
