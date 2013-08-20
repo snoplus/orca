@@ -45,8 +45,6 @@
 		IBOutlet NSTextField*   frequencyField;
 		IBOutlet NSButton*		startPulserButton;
 		IBOutlet NSButton*		stopPulserButton;
-		IBOutlet NSPopUpButton* adcRange0PU;
-		IBOutlet NSPopUpButton* adcRange1PU;
 		IBOutlet NSButton*		pollNowButton;
         IBOutlet ORCompositeTimeLineView*	baselinePlot0;
         IBOutlet ORCompositeTimeLineView*	baselinePlot1;

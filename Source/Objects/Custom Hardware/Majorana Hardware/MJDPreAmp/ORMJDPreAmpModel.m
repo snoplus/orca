@@ -100,22 +100,22 @@ struct {
     float slope;
     float intercept;
 } mjdPreAmpTable[16] = {
-    {kADC1,YES, 0,kSingleEnded,2*20/8192.,0},
-    {kADC1,YES, 1,kSingleEnded,2*20/8192.,0},
-    {kADC1,YES, 2,kSingleEnded,2*20/8192.,0},
-    {kADC1,YES, 3,kSingleEnded,2*20/8192.,0},
-    {kADC1,YES, 4,kSingleEnded,2*20/8192.,0},
-    {kADC1,NO, -1,kSingleEnded,2*20/8192.,0},
-    {kADC1,NO, -1,kSingleEnded,2*20/8192.,0},
-    {kADC1,NO, -1,kPseudoDiff,-0.4494,2387.82},
-    {kADC2,YES, 5,kSingleEnded,2*20/8192.,0},
-    {kADC2,YES, 6,kSingleEnded,2*20/8192.,0},
-    {kADC2,YES, 7,kSingleEnded,2*20/8192.,0},
-    {kADC2,YES, 8,kSingleEnded,2*20/8192.,0},
-    {kADC2,YES, 9,kSingleEnded,2*20/8192.,0},
-    {kADC2,NO, -1,kSingleEnded,4*20/8192.,0},
-    {kADC2,NO, -1,kSingleEnded,4*20/8192.,0},
-    {kADC2,NO, -1,kPseudoDiff,-0.4494,2387.82},
+    {kADC1,YES, 0,kSingleEnded,2*20/8192.,0},   //0,0
+    {kADC1,YES, 1,kSingleEnded,2*20/8192.,0},   //0,1
+    {kADC1,YES, 2,kSingleEnded,2*20/8192.,0},   //0,2
+    {kADC1,YES, 3,kSingleEnded,2*20/8192.,0},   //0,3
+    {kADC1,YES, 4,kSingleEnded,2*20/8192.,0},   //0,4
+    {kADC1,NO, -1,kSingleEnded,2*20/8192.,0},   //0,5
+    {kADC1,NO, -1,kSingleEnded,2*20/8192.,0},   //0,6
+    {kADC1,NO, -1,kPseudoDiff,-0.4494,2387.82}, //0,7
+    {kADC2,YES, 5,kSingleEnded,2*20/8192.,0},   //1,0
+    {kADC2,YES, 6,kSingleEnded,2*20/8192.,0},   //1,1
+    {kADC2,YES, 7,kSingleEnded,2*20/8192.,0},   //1,2
+    {kADC2,YES, 8,kSingleEnded,2*20/8192.,0},   //1,3
+    {kADC2,YES, 9,kSingleEnded,2*20/8192.,0},   //1,4
+    {kADC2,NO, -1,kSingleEnded,4*20/8192.,0},   //1,5
+    {kADC2,NO, -1,kSingleEnded,4*20/8192.,0},   //1,6
+    {kADC2,NO, -1,kPseudoDiff,-0.4494,2387.82}, //1,7
 };
 
 
@@ -710,20 +710,20 @@ struct {
     //both chips are set up the same. so we only have to 
     unsigned long controlWord;    
     controlWord =   (kRangeReg1      << 13)  |
-                    (kBipolar10V     << 11)  |        //chan 0
-                    (kBipolar10V     << 9)   |        //chan 1
-                    (kBipolar10V     << 7)   |        //chan 2
-                    (kBipolar2_5V    << 5);           //chan 3
-    [self writeAuxIOSPI:kADC1 | (controlWord<<8)];  //shift to bit 8 + add the adc sel
-    [self writeAuxIOSPI:kADC2 | (controlWord<<8)];  //shift to bit 8 + add the adc sel
+                    (kBipolar10V     << 11)  |       //chan 0
+                    (kBipolar10V     << 9)   |       //chan 1
+                    (kBipolar10V     << 7)   |       //chan 2
+                    (kBipolar10V     << 5);           //chan 3
+    [self writeAuxIOSPI:kADC1 | (controlWord<<8)];   //shift to bit 8 + add the adc sel
+    [self writeAuxIOSPI:kADC2 | (controlWord<<8)];   //shift to bit 8 + add the adc sel
     
     controlWord =   (kRangeReg2      << 13)  |
                     (kBipolar10V     << 11)  |        //chan 4
                     (kBipolar10V     << 9)   |        //chan 5
                     (kBipolar10V     << 7)   |        //chan 6
                     (kBipolar2_5V    << 5);           //chan 7
-    [self writeAuxIOSPI:kADC1 | (controlWord<<8)];  //shift to bit 8 + add the adc sel
-    [self writeAuxIOSPI:kADC2 | (controlWord<<8)];  //shift to bit 8 + add the adc sel
+    [self writeAuxIOSPI:kADC1 | (controlWord<<8)];    //shift to bit 8 + add the adc sel
+    [self writeAuxIOSPI:kADC2 | (controlWord<<8)];    //shift to bit 8 + add the adc sel
 }
 
 - (void) readAllAdcs
