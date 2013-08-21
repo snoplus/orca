@@ -96,7 +96,7 @@ struct {
     {kADC1,YES, 4,kSingleEnded,2*20/8192.,0},   //0,4
     {kADC1,NO, -1,kSingleEnded,2*20/8192.,0},   //0,5
     {kADC1,NO, -1,kSingleEnded,2*20/8192.,0},   //0,6
-    {kADC1,NO, -1,kPseudoDiff,-0.4494,2387.82}, //0,7
+    {kADC1,NO, -1,kPseudoDiff, -0.47,  2498},   //0,7
     {kADC2,YES, 5,kSingleEnded,2*20/8192.,0},   //1,0
     {kADC2,YES, 6,kSingleEnded,2*20/8192.,0},   //1,1
     {kADC2,YES, 7,kSingleEnded,2*20/8192.,0},   //1,2
@@ -104,7 +104,7 @@ struct {
     {kADC2,YES, 9,kSingleEnded,2*20/8192.,0},   //1,4
     {kADC2,NO, -1,kSingleEnded,4*20/8192.,0},   //1,5
     {kADC2,NO, -1,kSingleEnded,4*20/8192.,0},   //1,6
-    {kADC2,NO, -1,kPseudoDiff,-0.4494,2387.82}, //1,7
+    {kADC2,NO, -1,kPseudoDiff, -0.47,  2498},   //1,7
 };
 
 #pragma mark ¥¥¥Private Implementation
@@ -710,15 +710,22 @@ struct {
                                         (0x1 << 4)             |            //use internal voltage reference for conversion
                                         (mjdPreAmpTable[chan].mode << 8);    //set mode, other bits are zero
             
-            unsigned long rawAdcValue = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection << 13) | (controlWord<<8)];
+            unsigned long rawAdcValue = [self writeAuxIOSPI:mjdPreAmpTable[chan].adcSelection | (controlWord<<8)];
+            //-------------------------------------------------------
+            //don't like the following, but seems we have no choice
+            rawAdcValue = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+            rawAdcValue = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+            rawAdcValue = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+            //-------------------------------------------------------
             
-			int decodedChannel = (rawAdcValue & 0xE000) >> 13; //use the whichever chan was converted, may be diff than the one selected above.
-                        
+			int decodedChannel = (rawAdcValue & 0xE000) >> 13;                      //use the whichever chan was converted, may be diff than the one selected above.
+            if(mjdPreAmpTable[chan].adcSelection & 0x1000000) decodedChannel += 8;  //two adc chips, so the second chip is offset by 8 to get the right adc index
+            
             long adcValue;
             if(rawAdcValue & 0x1000)adcValue = -(~rawAdcValue & 0x1FFF) + 1;
             else adcValue                    = rawAdcValue & 0x1FFF;
             
-            float convertedValue = adcValue*mjdPreAmpTable[decodedChannel].slope + adcValue*mjdPreAmpTable[decodedChannel].intercept;
+            float convertedValue = adcValue*mjdPreAmpTable[decodedChannel].slope + mjdPreAmpTable[decodedChannel].intercept;
             
 			if(verbose)NSLog(@"%d: %.2f (0x%08x)\n",decodedChannel,convertedValue,rawAdcValue&0x1FFF);
             
@@ -1074,17 +1081,17 @@ struct {
 
 - (void) postCouchDBRecord
 {
+    NSString* theTitle;
+    if([preampName length]>0)theTitle = [self preampName];
+    else theTitle = [NSString stringWithFormat:@"PreAmp%ld",[self uniqueIdNumber]];
+    
     NSDate* now = [NSDate date];
     if(!lastDataBaseUpdate || [now timeIntervalSinceDate:lastDataBaseUpdate] >= 60){
         
         [lastDataBaseUpdate release];
         lastDataBaseUpdate = [now retain];
         
-        NSString* theTitle;
-        
-        if([preampName length]>0)theTitle = [self preampName];
-        else theTitle = [NSString stringWithFormat:@"PreAmp%ld",[self uniqueIdNumber]];
-        
+         
         NSDictionary* adcsForHistory = [NSDictionary dictionaryWithObjectsAndKeys:
             [NSString stringWithFormat:@"PreAmp%ld",[self uniqueIdNumber]],@"name",
             theTitle,@"title",
@@ -1125,43 +1132,43 @@ struct {
             ];
         
             [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddHistoryAdcRecord" object:self userInfo:adcsForHistory];
-        
-            //we also post a snapshot to the machine database
-            NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
-                [NSNumber numberWithDouble:adcs[0]],            @"Baseline0",
-                [NSNumber numberWithDouble:adcs[1]],            @"Baseline1",
-                [NSNumber numberWithDouble:adcs[2]],            @"Baseline2",
-                [NSNumber numberWithDouble:adcs[3]],            @"Baseline3",
-                [NSNumber numberWithDouble:adcs[4]],            @"Baseline4",
-                [NSNumber numberWithDouble:adcs[8]],            @"Baseline5",
-                [NSNumber numberWithDouble:adcs[9]],            @"Baseline6",
-                [NSNumber numberWithDouble:adcs[10]],           @"Baseline7",
-                [NSNumber numberWithDouble:adcs[11]],           @"Baseline8",
-                [NSNumber numberWithDouble:adcs[12]],           @"Baseline9",
-                
-                [NSNumber numberWithDouble:adcs[13]],           @"+24V",
-                [NSNumber numberWithDouble:adcs[14]],           @"-24V",
-                [NSNumber numberWithDouble:adcs[5]],            @"+12V",
-                [NSNumber numberWithDouble:adcs[6]],            @"-12V",
-                
-                [NSNumber numberWithDouble:adcs[7]],            @"Temp1",
-                [NSNumber numberWithDouble:adcs[15]],           @"Temp2",
-                
-                [NSNumber numberWithDouble:leakageCurrents[0]], @"Leakage0",
-                [NSNumber numberWithDouble:leakageCurrents[1]], @"Leakage1",
-                [NSNumber numberWithDouble:leakageCurrents[2]], @"Leakage2",
-                [NSNumber numberWithDouble:leakageCurrents[3]], @"Leakage3",
-                [NSNumber numberWithDouble:leakageCurrents[4]], @"Leakage4",
-                [NSNumber numberWithDouble:leakageCurrents[5]], @"Leakage5",
-                [NSNumber numberWithDouble:leakageCurrents[6]], @"Leakage6",
-                [NSNumber numberWithDouble:leakageCurrents[7]], @"Leakage7",
-                [NSNumber numberWithDouble:leakageCurrents[8]], @"Leakage8",
-                [NSNumber numberWithDouble:leakageCurrents[9]], @"Leakage9",
-                [NSNumber numberWithInt:    pollTime],          @"pollTime",
-                    nil];
- 
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
     }
+    //we also post a snapshot to the machine database
+    NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
+                            [NSNumber numberWithDouble:adcs[0]],            @"Baseline0",
+                            [NSNumber numberWithDouble:adcs[1]],            @"Baseline1",
+                            [NSNumber numberWithDouble:adcs[2]],            @"Baseline2",
+                            [NSNumber numberWithDouble:adcs[3]],            @"Baseline3",
+                            [NSNumber numberWithDouble:adcs[4]],            @"Baseline4",
+                            [NSNumber numberWithDouble:adcs[8]],            @"Baseline5",
+                            [NSNumber numberWithDouble:adcs[9]],            @"Baseline6",
+                            [NSNumber numberWithDouble:adcs[10]],           @"Baseline7",
+                            [NSNumber numberWithDouble:adcs[11]],           @"Baseline8",
+                            [NSNumber numberWithDouble:adcs[12]],           @"Baseline9",
+                            
+                            [NSNumber numberWithDouble:adcs[13]],           @"+24V",
+                            [NSNumber numberWithDouble:adcs[14]],           @"-24V",
+                            [NSNumber numberWithDouble:adcs[5]],            @"+12V",
+                            [NSNumber numberWithDouble:adcs[6]],            @"-12V",
+                            
+                            [NSNumber numberWithDouble:adcs[7]],            @"Temp1",
+                            [NSNumber numberWithDouble:adcs[15]],           @"Temp2",
+                            
+                            [NSNumber numberWithDouble:leakageCurrents[0]], @"Leakage0",
+                            [NSNumber numberWithDouble:leakageCurrents[1]], @"Leakage1",
+                            [NSNumber numberWithDouble:leakageCurrents[2]], @"Leakage2",
+                            [NSNumber numberWithDouble:leakageCurrents[3]], @"Leakage3",
+                            [NSNumber numberWithDouble:leakageCurrents[4]], @"Leakage4",
+                            [NSNumber numberWithDouble:leakageCurrents[5]], @"Leakage5",
+                            [NSNumber numberWithDouble:leakageCurrents[6]], @"Leakage6",
+                            [NSNumber numberWithDouble:leakageCurrents[7]], @"Leakage7",
+                            [NSNumber numberWithDouble:leakageCurrents[8]], @"Leakage8",
+                            [NSNumber numberWithDouble:leakageCurrents[9]], @"Leakage9",
+                            theTitle,                                       @"HistoryTitle",
+                            [NSNumber numberWithInt:    pollTime],          @"pollTime",
+                            nil];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
 }
 
 @end
