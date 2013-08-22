@@ -29,8 +29,8 @@
 #define kMJDPreAmpLeakageCurrentChannels    10
 #define kMJDPreAmpDataRecordLen             20
 
-
 @interface ORMJDPreAmpModel : OrcaObject {
+    NSString* detectorName[kMJDPreAmpAdcChannels];
     float adcs[kMJDPreAmpAdcChannels];
     float leakageCurrents[kMJDPreAmpLeakageCurrentChannels];
     NSMutableArray* feedBackResistors;
@@ -56,15 +56,14 @@
     ORAlarm*		leakageCurrentAlarm[kMJDPreAmpLeakageCurrentChannels];
     ORAlarm*		adcAlarm[kMJDPreAmpAdcChannels];
     BOOL            rangesHaveBeenSet;
-    NSString*       preampName;
     NSDate*         lastDataBaseUpdate;
 }
 
 - (void) setUpArrays;
 
 #pragma mark ¥¥¥Accessors
-- (NSString*) preampName;
-- (void) setPreampName:(NSString*)aPreampName;
+- (NSString*) detectorName:(int)i;
+- (void) setDetector:(int)i name:(NSString*)aName;
 - (NSMutableArray*) feedBackResistors;
 - (void) setFeedBackResistors:(NSMutableArray*)anArray;
 - (float) feedBackResistor:(unsigned short) aChan;
@@ -146,7 +145,6 @@
 @end
 
 #pragma mark ¥¥¥External Strings
-extern NSString* ORMJDPreAmpModelPreampNameChanged;
 extern NSString* ORMJDPreAmpModelAdcEnabledMaskChanged;
 extern NSString*  ORMJDPreAmpModelPollTimeChanged;
 extern NSString* ORMJDPreAmpModelShipValuesChanged;
@@ -168,6 +166,7 @@ extern NSString* ORMJDFeedBackResistorArrayChanged;
 extern NSString* ORMJDBaselineVoltageArrayChanged;
 extern NSString* ORMJDFeedBackResistorChanged;
 extern NSString* ORMJDBaselineVoltageChanged;
+extern NSString* ORMJDPreAmpModelDetectorNameChanged;
 
 @interface NSObject (ORMJDPreAmpModel)
 - (unsigned long) writeAuxIOSPI:(unsigned long)spiData;

@@ -25,7 +25,6 @@
 #import "ORAlarm.h"
 
 #pragma mark ¥¥¥Notification Strings
-NSString* ORMJDPreAmpModelPreampNameChanged = @"ORMJDPreAmpModelPreampNameChanged";
 NSString* ORMJDPreAmpModelAdcEnabledMaskChanged = @"ORMJDPreAmpModelAdcEnabledMaskChanged";
 NSString* ORMJDPreAmpModelPollTimeChanged	= @"ORMJDPreAmpModelPollTimeChanged";
 NSString* ORMJDPreAmpModelShipValuesChanged = @"ORMJDPreAmpModelShipValuesChanged";
@@ -47,6 +46,7 @@ NSString* ORMJDFeedBackResistorArrayChanged = @"ORMJDFeedBackResistorArrayChange
 NSString* ORMJDBaselineVoltageArrayChanged  = @"ORMJDBaselineVoltageArrayChanged";
 NSString* ORMJDFeedBackResistorChanged      = @"ORMJDFeedBackResistorChanged";
 NSString* ORMJDBaselineVoltageChanged		= @"ORMJDBaselineVoltageChanged";
+NSString* ORMJDPreAmpModelDetectorNameChanged		= @"ORMJDPreAmpModelDetectorNameChanged";
 
 
 #pragma mark ¥¥¥Local Strings
@@ -82,10 +82,10 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 #define kPseudoDiff  0x3
 
 struct {
-    unsigned long adcSelection;
     unsigned long mode;
     BOOL calculateLeakageCurrent;
     int leakageCurrentIndex;
+    unsigned long adcSelection;
     float slope;
     float intercept;
 } mjdPreAmpTable[16] = {
@@ -129,11 +129,11 @@ struct {
 - (void) dealloc
 {
     [lastDataBaseUpdate release];
-    [preampName release];
     [dacs release];
 	int i;
 	for(i=0;i<kMJDPreAmpAdcChannels;i++){
 		[adcHistory[i] release];
+		[detectorName[i] release];
 	}
     
     for(i=0;i<kMJDPreAmpLeakageCurrentChannels;i++){
@@ -218,23 +218,26 @@ struct {
 }
 
 #pragma mark ¥¥¥Accessors
-
-- (NSString*) preampName
+- (NSString*) detectorName:(int)i
 {
-    if(!preampName) return @"";
-    else return preampName;
+    if(i>=0 && i<kMJDPreAmpAdcChannels){
+        if(!detectorName[i].length)return @"";
+        else return detectorName[i];
+    }
+    else return @"";
+}
+- (void) setDetector:(int)i name:(NSString*)aName
+{
+    if(i>=0 && i<kMJDPreAmpAdcChannels){
+        [[[self undoManager] prepareWithInvocationTarget:self] setDetector: i name:detectorName[i]];
+        
+        [detectorName[i] autorelease];
+        detectorName[i] = [aName copy];
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpModelDetectorNameChanged object:self];
+    }
 }
 
-- (void) setPreampName:(NSString*)aPreampName
-{
-    if(!aPreampName)aPreampName = @"";
-    [[[self undoManager] prepareWithInvocationTarget:self] setPreampName:preampName];
-    
-    [preampName autorelease];
-    preampName = [aPreampName copy];    
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpModelPreampNameChanged object:self];
-}
 - (ORTimeRate*)adcHistory:(int)index
 {
     if(index>=0 && index<kMJDPreAmpAdcChannels)return adcHistory[index];
@@ -718,7 +721,7 @@ struct {
             rawAdcValue = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
             //-------------------------------------------------------
             
-			int decodedChannel = (rawAdcValue & 0xE000) >> 13;                      //use the whichever chan was converted, may be diff than the one selected above.
+			int decodedChannel = (~rawAdcValue & 0xE000) >> 13;                      //use the whichever chan was converted, may be diff than the one selected above.
             if(mjdPreAmpTable[chan].adcSelection & 0x1000000) decodedChannel += 8;  //two adc chips, so the second chip is offset by 8 to get the right adc index
             
             long adcValue;
@@ -826,7 +829,6 @@ struct {
     self = [super initWithCoder:decoder];
 	
     [[self undoManager] disableUndoRegistration];
-    [self setPreampName:    [decoder decodeObjectForKey:@"preampName"]];
     [self setAdcEnabledMask:[decoder decodeInt32ForKey:@"adcEnabledMask"]];
     [self setShipValues:	[decoder decodeBoolForKey: @"shipValues"]];
 	[self setPollTime:		[decoder decodeIntForKey:  @"pollTime"]];
@@ -837,7 +839,9 @@ struct {
 		[self setAttenuated:i      value:[decoder decodeBoolForKey:[NSString stringWithFormat: @"attenuated%d",i]]];
 		[self setFinalAttenuated:i value:[decoder decodeBoolForKey:[NSString stringWithFormat: @"finalAttenuated%d",i]]];
 	}
-	
+	for(i=0;i<kMJDPreAmpAdcChannels;i++){
+        [self setDetector:i name:[decoder decodeObjectForKey:   [NSString stringWithFormat:@"detectorName%d",i]]];
+    }
     [self setLoopForever:	[decoder decodeBoolForKey:   @"loopForever"]];
     [self setPulseCount:	[decoder decodeIntForKey:    @"pulseCount"]];
 	[self setPulseHighTime:	[decoder decodeIntForKey:    @"pulseHighTime"]];
@@ -858,7 +862,6 @@ struct {
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-	[encoder encodeObject:preampName    forKey:@"preampName"];
 	[encoder encodeInt32:adcEnabledMask forKey:@"adcEnabledMask"];
 	[encoder encodeBool:shipValues		forKey:@"shipValues"];
 	[encoder encodeInt:pollTime			forKey:@"pollTime"];
@@ -868,7 +871,10 @@ struct {
 		[encoder encodeBool:attenuated[i]		forKey:[NSString stringWithFormat:@"attenuated%d",i]];
 		[encoder encodeBool:finalAttenuated[i]	forKey:[NSString stringWithFormat:@"finalAttenuated%d",i]];
 	}
-	
+    for(i=0;i<kMJDPreAmpAdcChannels;i++){
+		[encoder encodeObject:detectorName[i]	forKey:[NSString stringWithFormat:@"detectorName%d",i]];
+    }
+
 	[encoder encodeBool:loopForever		forKey:@"loopForever"];
 	[encoder encodeInt:pulseCount		forKey:@"pulseCount"];
 	[encoder encodeInt:pulseHighTime	forKey:@"pulseHighTime"];
@@ -1080,59 +1086,46 @@ struct {
 }
 
 - (void) postCouchDBRecord
-{
-    NSString* theTitle;
-    if([preampName length]>0)theTitle = [self preampName];
-    else theTitle = [NSString stringWithFormat:@"PreAmp%ld",[self uniqueIdNumber]];
-    
+{    
     NSDate* now = [NSDate date];
     if(!lastDataBaseUpdate || [now timeIntervalSinceDate:lastDataBaseUpdate] >= 60){
         
         [lastDataBaseUpdate release];
         lastDataBaseUpdate = [now retain];
+        NSString* machineName = computerName();
         
-         
-        NSDictionary* adcsForHistory = [NSDictionary dictionaryWithObjectsAndKeys:
-            [NSString stringWithFormat:@"PreAmp%ld",[self uniqueIdNumber]],@"name",
-            theTitle,@"title",
-            [NSArray arrayWithObjects:
-             
-                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[0]]  forKey:@"Baseline0"] ,
-                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[1]]  forKey:@"Baseline1"] ,
-                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[2]]  forKey:@"Baseline2"] ,
-                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[3]]  forKey:@"Baseline3"] ,
-                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[4]]  forKey:@"Baseline4"] ,
-                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[8]]  forKey:@"Baseline5"] ,
-                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[9]]  forKey:@"Baseline6"] ,
-                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[10]] forKey:@"Baseline7"] ,
-                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[11]] forKey:@"Baseline8"] ,
-                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[12]] forKey:@"Baseline9"] ,
-        
-                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[13]] forKey:@"+24V"],
-                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[14]] forKey:@"-24V"],
-                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[5]]  forKey:@"+12V"],
-                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[6]]  forKey:@"-12V"],
-      
-                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[7]]  forKey:@"Temp1"],
-                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[15]] forKey:@"Temp2"],
-        
-                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:leakageCurrents[0]] forKey:@"Leakage0"],
-                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:leakageCurrents[1]] forKey:@"Leakage1"],
-                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:leakageCurrents[2]] forKey:@"Leakage2"],
-                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:leakageCurrents[3]] forKey:@"Leakage3"],
-                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:leakageCurrents[4]] forKey:@"Leakage4"],
-                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:leakageCurrents[5]] forKey:@"Leakage5"],
-                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:leakageCurrents[6]] forKey:@"Leakage6"],
-                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:leakageCurrents[7]] forKey:@"Leakage7"],
-                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:leakageCurrents[8]] forKey:@"Leakage8"],
-                [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:leakageCurrents[9]] forKey:@"Leakage9"],
-                nil
-            ],@"adcs",
-            nil
-            ];
-        
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddHistoryAdcRecord" object:self userInfo:adcsForHistory];
+        //just ten detectors per premap
+        int i;
+        for(i=0;i<10;i++){
+            int detectorToAdc[10]   = {0,1,2,3,4,8,9,10,11,12};
+            int tempChanToUse[10]   = {7,7,7,7,7,15,15,15,15,15};
+            int detectorAdcChannel = detectorToAdc[i];
+            int tempAdcChannel     = tempChanToUse[i];
+            if((detectorName[i].length!=0) && (adcEnabledMask & (0x1 << detectorAdcChannel))){
+                NSDictionary* historyRecord = [NSDictionary dictionaryWithObjectsAndKeys:
+                    [NSString stringWithFormat:@"PreAmp%ld",[self uniqueIdNumber]], @"preamp",
+                    detectorName[i],                                                @"title",
+                    machineName,                                                    @"machine",
+                    [NSNumber numberWithInt:detectorAdcChannel],                    @"adcIndex",
+                    [NSArray arrayWithObjects:
+                        [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[detectorAdcChannel]] forKey:@"Baseline Current"] ,
+                        [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:leakageCurrents[i]]       forKey:@"Leakage Current"],
+                        [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[tempAdcChannel]]     forKey:@"Adc Temperature"],
+                         nil
+                    ],@"adcs",
+                    nil
+                    ];
+                
+                NSDictionary* dataBaseRecord = [NSDictionary dictionaryWithObjectsAndKeys:
+                                                @"mjd_detectors",@"CustomDataBase",
+                                                historyRecord,   @"DataBaseRecord",
+                                                nil];
+
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddHistoryAdcRecord" object:self userInfo:dataBaseRecord];
+            }
+        }
     }
+    
     //we also post a snapshot to the machine database
     NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
                             [NSNumber numberWithDouble:adcs[0]],            @"Baseline0",
@@ -1140,6 +1133,7 @@ struct {
                             [NSNumber numberWithDouble:adcs[2]],            @"Baseline2",
                             [NSNumber numberWithDouble:adcs[3]],            @"Baseline3",
                             [NSNumber numberWithDouble:adcs[4]],            @"Baseline4",
+                            
                             [NSNumber numberWithDouble:adcs[8]],            @"Baseline5",
                             [NSNumber numberWithDouble:adcs[9]],            @"Baseline6",
                             [NSNumber numberWithDouble:adcs[10]],           @"Baseline7",
@@ -1164,7 +1158,7 @@ struct {
                             [NSNumber numberWithDouble:leakageCurrents[7]], @"Leakage7",
                             [NSNumber numberWithDouble:leakageCurrents[8]], @"Leakage8",
                             [NSNumber numberWithDouble:leakageCurrents[9]], @"Leakage9",
-                            theTitle,                                       @"HistoryTitle",
+                            
                             [NSNumber numberWithInt:    pollTime],          @"pollTime",
                             nil];
     

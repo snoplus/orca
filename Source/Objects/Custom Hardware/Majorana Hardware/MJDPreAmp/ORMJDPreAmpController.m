@@ -85,6 +85,9 @@
     for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
 		[[adcMatrix cellAtRow:chan column:0] setTag:chan];
 		[[adcMatrix cellAtRow:chan column:0] setFormatter:aFormat];
+        [[detectorNameMatrix cellAtRow:chan column:0] setTag:chan];
+
+        
 		[[adcEnabledMaskMatrix cellAtRow:chan column:0] setTag:chan];
         
 		[[feedBackResistorMatrix cellAtRow:chan column:0] setFormatter:aFormat];
@@ -338,10 +341,11 @@
 					 selector : @selector(updateTimePlot:)
 						 name : ORRateAverageChangedNotification
 					   object : nil];
+    
     [notifyCenter addObserver : self
-                     selector : @selector(preampNameChanged:)
-                         name : ORMJDPreAmpModelPreampNameChanged
-						object: model];
+					 selector : @selector(detectorNameChanged:)
+						 name : ORMJDPreAmpModelDetectorNameChanged
+					   object : nil];
 
 }
 
@@ -366,15 +370,11 @@
 	[self updateTimePlot:nil];
 	[self baselineVoltageArrayChanged:nil];
 	[self feedbackResistorArrayChanged:nil];
-	[self preampNameChanged:nil];
+	[self detectorNameChanged:nil];
 }
 
 #pragma mark ¥¥¥Interface Management
 
-- (void) preampNameChanged:(NSNotification*)aNote
-{
-	[preampNameField setStringValue: [model preampName]];
-}
 - (void) scaleAction:(NSNotification*)aNotification
 {
 	if(aNotification == nil || [aNotification object] == [baselinePlot0 xAxis]){
@@ -516,6 +516,14 @@
         int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
         [[adcMatrix cellWithTag:chan] setFloatValue: [model adc:chan]];
     }
+}
+
+- (void) detectorNameChanged:(NSNotification*)aNote
+{
+ 	short chan;
+	for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
+		[[detectorNameMatrix cellWithTag:chan] setStringValue: [model detectorName:chan]];
+	}
 }
 
 - (void) feedbackResistorArrayChanged:(NSNotification*)aNote
@@ -676,11 +684,6 @@
 }
 
 #pragma mark ¥¥¥Actions
-
-- (void) preampNameAction:(id)sender
-{
-	[model setPreampName:[sender stringValue]];	
-}
 - (void) adcEnabledMaskAction:(id)sender
 {
 	unsigned short mask = 0;
@@ -710,6 +713,12 @@
 - (void) pulseCountAction:(id)sender
 {
 	[model setPulseCount:[sender intValue]];	
+}
+
+#pragma mark ¥¥¥Actions
+- (IBAction) detectorNameAction:(id)sender
+{
+   	[model setDetector:[[sender selectedCell] tag] name:[sender stringValue]];
 }
 
 - (IBAction) enabledAction:(id)sender

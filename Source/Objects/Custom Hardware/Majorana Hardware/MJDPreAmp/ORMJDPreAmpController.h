@@ -23,7 +23,6 @@
 {
     @private
 		IBOutlet NSButton*		settingsLockButton;
-        IBOutlet NSTextField*   preampNameField;
 		IBOutlet NSMatrix*		adcEnabledMaskMatrix;
 		IBOutlet NSButton*		shipValuesCB;
 		IBOutlet NSPopUpButton* pollTimePU;
@@ -42,7 +41,8 @@
 		IBOutlet NSTextField*   pulseLowTimeField;
 		IBOutlet NSMatrix*		dacsMatrix;
 		IBOutlet NSMatrix*		amplitudesMatrix;
-		IBOutlet NSMatrix*		pulserMaskMatrix;
+        IBOutlet NSMatrix*		pulserMaskMatrix;
+        IBOutlet NSMatrix*		detectorNameMatrix;
 		IBOutlet NSTextField*   frequencyField;
 		IBOutlet NSButton*		startPulserButton;
 		IBOutlet NSButton*		stopPulserButton;
@@ -66,7 +66,6 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ¥¥¥Interface Management
-- (void) preampNameChanged:(NSNotification*)aNote;
 - (void) updateTimePlot:(NSNotification*)aNotification;
 - (void) scaleAction:(NSNotification*)aNotification;
 - (void) adcEnabledMaskChanged:(NSNotification*)aNote;
@@ -95,11 +94,12 @@
 - (void) baselineVoltageArrayChanged:(NSNotification*)aNote;
 - (void) baselineVoltageChanged:(NSNotification*)aNote;
 - (void) miscAttributesChanged:(NSNotification*)aNote;
+- (void) detectorNameChanged:(NSNotification*)aNote;
 
 - (NSString*) adcName:(int)adcIndex;
 
 #pragma mark ¥¥¥Actions
-- (IBAction) preampNameAction:(id)sender;
+- (IBAction) detectorNameAction:(id)sender;
 - (IBAction) adcEnabledMaskAction:(id)sender;
 - (IBAction) pollNowAction:(id)sender;
 - (IBAction) shipValuesAction:(id)sender;

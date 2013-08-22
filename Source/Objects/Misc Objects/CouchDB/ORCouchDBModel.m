@@ -105,6 +105,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 	[docList release];
     [replicationAlarm release];
 	[replicationAlarm clearAlarm];
+    [customDataBases release];
 
 	[super dealloc];
 }
@@ -477,27 +478,52 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 
 - (ORCouchDB*) statusDBRef
 {
-	return [ORCouchDB couchHost:@"localhost" port:kCouchDBPort username:userName pwd:password database:[self databaseName] delegate:self];
+    return [self statusDBRef:[self databaseName]];
+}
+
+- (ORCouchDB*) statusDBRef:(NSString*)aDatabaseName
+{
+	return [ORCouchDB couchHost:@"localhost" port:kCouchDBPort username:userName pwd:password database:aDatabaseName delegate:self];
 }
 
 - (ORCouchDB*) historyDBRef
 {
-	return [ORCouchDB couchHost:@"localhost" port:kCouchDBPort username:userName pwd:password database:[self historyDatabaseName] delegate:self];
+    return [self historyDBRef:[self historyDatabaseName]];
+}
+
+- (ORCouchDB*) historyDBRef:(NSString*)aDatabaseName
+{
+	return [ORCouchDB couchHost:@"localhost" port:kCouchDBPort username:userName pwd:password database:aDatabaseName delegate:self];
 }
 
 - (ORCouchDB*) remoteHistoryDBRef
 {
+    return [self remoteHistoryDBRef:[self historyDatabaseName]];
+}
+
+- (ORCouchDB*) remoteHistoryDBRef:(NSString*)aDatabaseName
+{
     if([remoteHostName length]==0)return nil;
-	else return [ORCouchDB couchHost:remoteHostName port:kCouchDBPort username:userName pwd:password database:[self historyDatabaseName] delegate:self];
+	else return [ORCouchDB couchHost:remoteHostName port:kCouchDBPort username:userName pwd:password database:aDatabaseName delegate:self];
 }
 
 - (ORCouchDB*) remoteDBRef
 {
+    return [self remoteDBRef:[self databaseName]];
+
+}
+- (ORCouchDB*) remoteDBRef:(NSString*)aDatabaseName
+{
     if([remoteHostName length]==0)return nil;
-	else return [ORCouchDB couchHost:remoteHostName port:kCouchDBPort username:userName pwd:password database:[self databaseName] delegate:self];
+	else return [ORCouchDB couchHost:remoteHostName port:kCouchDBPort username:userName pwd:password database:aDatabaseName delegate:self];
 }
 
 - (void) createDatabase
+{
+    [self createDatabase:[self statusDBRef]];
+}
+
+- (void) createDatabase:(ORCouchDB*)aDBRef;
 {
 	//set up the views
 	NSString* aMap;
@@ -535,47 +561,16 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 				  aViewDictionary,@"views",
 				  nil];	
 		
-	[[self statusDBRef] createDatabase:kCreateDB views:dbViews];
-    //----temp----
-    if([NSEvent modifierFlags] & (NSCommandKeyMask | NSAlternateKeyMask | NSControlKeyMask | NSShiftKeyMask)){
-        [self processAlarmLog]; //remove at some point.
-    }
-    //---------
-}
-
-- (void) processAlarmLog
-{
-    NSString* contents = [[ORStatusController sharedStatusController] alarmLogContents];
-    NSArray* lines = [contents componentsSeparatedByString:@"\n"];
-    for(id aLine in lines){
-        if([aLine rangeOfString:@"ORCA started"].location != NSNotFound){
-            
-            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-            dateFormatter.dateFormat = @"MMddyy HH:mm:ss";
-            
-            NSDate* date = [dateFormatter dateFromString:[aLine substringToIndex:15]];
-
-            
-            NSTimeZone *gmt = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];
-            [dateFormatter setTimeZone:gmt];
-            NSString* timeString = [dateFormatter stringFromDate:date];
-            NSDate* gmtTime = [dateFormatter dateFromString:timeString];
-            unsigned long secondsSince1970 = [gmtTime timeIntervalSince1970];
-            [dateFormatter release];
-
-            NSDateFormatter* dateFormatter2 = [[NSDateFormatter alloc] init];
-            dateFormatter2.dateFormat = @"yyyy/MM/dd HH:mm:ss";
-            NSString* lastTimeStamp = [dateFormatter2 stringFromDate:gmtTime];
-            [dateFormatter2 release];
-
-            
-            [self recordEvent:@"Restart" symbol:@"O" comment:@"ORCA restarted" timeString:lastTimeStamp timeStamp:secondsSince1970];
-        }
-    }
+	[aDBRef createDatabase:kCreateDB views:dbViews];
 }
 
 - (void) createHistoryDatabase
-{			
+{
+    [self createHistoryDatabase:[self historyDBRef]];
+}
+
+- (void) createHistoryDatabase:(ORCouchDB*)aDBRef;
+{
 	NSString*     aMap;
 	NSString*     aReduce;
 	NSDictionary* aMapDictionary;
@@ -615,20 +610,24 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 							  aViewDictionary,@"views",
                              nil];
 	
-	[[self historyDBRef] createDatabase:kCreateDB views:dbViews];
-	
+	[aDBRef createDatabase:kCreateDB views:dbViews];
 }
 
 - (void) createRemoteDataBases;
 {			
-	[[self remoteHistoryDBRef] createDatabase:kCreateRemoteDB views:nil];
-	[[self remoteDBRef] createDatabase:kCreateRemoteDB views:nil];
-}
+	[[self remoteHistoryDBRef]  createDatabase:kCreateRemoteDB views:nil];
+	[[self remoteDBRef]         createDatabase:kCreateRemoteDB views:nil];
+    for(id aKey in [customDataBases allKeys]){
+        [[self remoteHistoryDBRef:aKey]  createDatabase:kCreateRemoteDB views:nil];
+    }}
 
 - (void) replicate:(BOOL)continuously
 {			
-	[[self remoteHistoryDBRef] replicateLocalDatabase:kReplicateDB continous:continuously];
-	[[self remoteDBRef] replicateLocalDatabase:kReplicateDB continous:continuously];
+	[[self remoteHistoryDBRef]  replicateLocalDatabase:kReplicateDB continous:continuously];
+	[[self remoteDBRef]         replicateLocalDatabase:kReplicateDB continous:continuously];
+    for(id aKey in [customDataBases allKeys]){
+        [[self remoteHistoryDBRef:aKey]  replicateLocalDatabase:kReplicateDB continous:YES];
+    }
 }
 
 
@@ -1017,7 +1016,10 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 
 - (void) compactDatabase
 {
-	if(!sweepInProgress)[[self statusDBRef] compactDatabase:self tag:kCompactDB];
+	if(!sweepInProgress){
+        [[self statusDBRef]  compactDatabase:self tag:kCompactDB];
+        [[self historyDBRef] compactDatabase:self tag:kCompactDB];
+    }
 	[self performSelector:@selector(updateDatabaseStats) withObject:nil afterDelay:4];
 }
 
@@ -1098,9 +1100,23 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 
 - (void) addObject:(OrcaObject*)anObj valueDictionary:(NSDictionary*)aDictionary
 {
+    NSString* customDataBase = [aDictionary objectForKey:@"CustomDataBase"];
+    if(customDataBase){
+        aDictionary = [aDictionary objectForKey:@"DataBaseRecord"];
+        [self addObject:anObj valueDictionary:aDictionary dataBaseRef:[self statusDBRef:customDataBase]];
+    }
+    else {
+        [self addObject:anObj valueDictionary:aDictionary dataBaseRef:[self statusDBRef]];
+    }
+}
+
+- (void) addObject:(OrcaObject*)anObj valueDictionary:(NSDictionary*)aDictionary dataBaseRef:(ORCouchDB*)aDataBaseRef
+{
  //these are special records that any object can insert into the database via this notification
  //the userInfo should just be a dictionary that you want to go into the database
-        
+    
+    [self checkDataBaseExists:aDataBaseRef];
+
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     dateFormatter.dateFormat = @"yyyy/MM/dd HH:mm:ss";
     
@@ -1123,9 +1139,24 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
                                             nil];
         
         [aRecord addEntriesFromDictionary:aDictionary];
-        [[self statusDBRef] updateDocument:aRecord documentId:anId tag:kDocumentAdded];
+        [aDataBaseRef updateDocument:aRecord documentId:anId tag:kDocumentAdded];
     }
+}
 
+- (void) checkDataBaseExists:(ORCouchDB*)aDataBase
+{
+    //this is mainly to help make sure that custom databases are created. The machine and normal history databases should take careof themselves. 
+    if(!customDataBases)customDataBases = [[NSMutableDictionary dictionary]retain];
+    NSString* dbName = [aDataBase database];
+    if(![customDataBases objectForKey:dbName]){
+        if([dbName hasPrefix:@"history"]){
+            [self createHistoryDatabase:aDataBase];
+        }
+        else {
+            [self createDatabase:aDataBase];
+        }
+        [customDataBases setObject:dbName forKey:dbName];
+    }
 }
 
 - (void) addAdcsToHistoryRecord:(NSNotification*)aNote
@@ -1135,6 +1166,20 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 
 - (void) addObject:(OrcaObject*)anObj adcDictionary:(NSDictionary*)aDictionary
 {
+    NSString* customDataBase = [aDictionary objectForKey:@"CustomDataBase"];
+    if(customDataBase){
+        aDictionary = [aDictionary objectForKey:@"DataBaseRecord"];
+        [self addObject:anObj adcDictionary:aDictionary dataBaseRef:[self historyDBRef:[@"history_" stringByAppendingString:customDataBase]]];
+    }
+    else {
+        [self addObject:anObj adcDictionary:aDictionary dataBaseRef:[self historyDBRef]];
+    }
+}
+
+- (void) addObject:(OrcaObject*)anObj adcDictionary:(NSDictionary*)aDictionary dataBaseRef:(ORCouchDB*)aDataBaseRef
+{
+    [self checkDataBaseExists:aDataBaseRef];
+    
     //these are special records that any object can insert into the database via this notification
     //the userInfo should just be a dictionary that you want to go into the database
     
@@ -1159,11 +1204,9 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
                                         nil];
         
         [aRecord addEntriesFromDictionary:aDictionary];
-        [[self historyDBRef] addDocument:aRecord tag:kDocumentAdded];
+        [aDataBaseRef addDocument:aRecord tag:kDocumentAdded];
     }
-    
 }
-
 
 - (void) updateRunInfo
 {
@@ -1174,6 +1217,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 		[self updateDataSets];
 	}
 }
+
 - (void) updateRunState:(ORRunModel*)rc
 {
 	if(!stealthMode){
@@ -1317,6 +1361,8 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
     [self setRemoteHostName:[decoder decodeObjectForKey:@"RemoteHostName"]];
     [self setStealthMode:[decoder decodeBoolForKey:@"stealthMode"]];
     
+    customDataBases = [[decoder decodeObjectForKey:@"customDataBases"] retain];
+    
     wasReplicationRunning = [decoder decodeBoolForKey:@"wasReplicationRunning"];
 	if(wasReplicationRunning){
         [self performSelector:@selector(startReplication) withObject:nil afterDelay:4];
@@ -1339,6 +1385,8 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
     [encoder encodeObject:userName forKey:@"UserName"];
     [encoder encodeObject:remoteHostName forKey:@"RemoteHostName"];
     [encoder encodeBool:wasReplicationRunning forKey:@"wasReplicationRunning"];
+    [encoder encodeObject:customDataBases forKey:@"customDataBases"];
+
 }
 @end
 

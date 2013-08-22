@@ -48,6 +48,7 @@
     BOOL wasReplicationRunning;
     int replicationCheckCount;
     ORAlarm* replicationAlarm;
+    NSMutableDictionary* customDataBases;
 }
 
 #pragma mark ***Initialization
@@ -64,8 +65,10 @@
 - (void) runStopped:(NSNotification*)aNote;
 - (void) addObjectValueRecord:(NSNotification*)aNote;
 - (void) addObject:(OrcaObject*)anObj valueDictionary:(NSDictionary*)aDictionary;
+- (void) addObject:(OrcaObject*)anObj valueDictionary:(NSDictionary*)aDictionary dataBaseRef:(ORCouchDB*)aDataBaseRef;
 - (void) addAdcsToHistoryRecord:(NSNotification*)aNote;
 - (void) addObject:(OrcaObject*)anObj adcDictionary:(NSDictionary*)aDictionary;
+- (void) addObject:(OrcaObject*)anObj adcDictionary:(NSDictionary*)aDictionary dataBaseRef:(ORCouchDB*)aDataBaseRef;
 
 #pragma mark ***Accessors
 - (int) changedCount;
@@ -106,15 +109,20 @@
 - (void) checkReplication;
 - (void) recordEvent:(NSString*)eventName symbol:(NSString*)aSymbol comment:(NSString*)aComment;
 - (void) recordEvent:(NSString*)eventName symbol:(NSString*)aSymbol comment:(NSString*)aComment timeString:aDateString timeStamp:(unsigned long)aTimeStamp;
-
-- (void) processAlarmLog; //<<for temp use.. remove soon
+- (void) checkDataBaseExists:(ORCouchDB*)aDataBase;
 
 #pragma mark ***DB Access
 - (ORCouchDB*) statusDBRef;
 - (ORCouchDB*) historyDBRef;
-- (ORCouchDB*) remoteHistoryDBRef;
+- (ORCouchDB*) statusDBRef:(NSString*)aName;
+- (ORCouchDB*) historyDBRef:(NSString*)aName;
+
+- (ORCouchDB*) remoteDBRef:(NSString*)aDatabaseName;
 - (ORCouchDB*) remoteDBRef;
+- (ORCouchDB*) remoteHistoryDBRef;
+- (ORCouchDB*) remoteHistoryDBRef:(NSString*)aDatabaseName;
 - (void) createDatabase;
+- (void) createHistoryDatabase:(ORCouchDB*)aDBRef;
 - (void) createHistoryDatabase;
 - (void) createRemoteDataBases;
 - (void) startReplication;
