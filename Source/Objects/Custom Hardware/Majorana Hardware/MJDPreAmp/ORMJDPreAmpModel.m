@@ -729,7 +729,7 @@ struct {
             if(rawAdcValue & 0x1000)adcValue = -(~rawAdcValue & 0x1FFF) + 1;
             else adcValue                    = rawAdcValue & 0x1FFF;
             
-            float convertedValue = adcValue*mjdPreAmpTable[decodedChannel].slope + mjdPreAmpTable[decodedChannel].intercept;
+            float convertedValue = -adcValue*mjdPreAmpTable[decodedChannel].slope + mjdPreAmpTable[decodedChannel].intercept;
             
 			if(verbose)NSLog(@"%d: %.2f (0x%08x)\n",decodedChannel,convertedValue,rawAdcValue&0x1FFF);
             
