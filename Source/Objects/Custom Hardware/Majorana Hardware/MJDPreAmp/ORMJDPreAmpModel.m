@@ -83,10 +83,10 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 
 
 struct {
-    unsigned long mode;
+    unsigned long adcSelection;
     BOOL calculateLeakageCurrent;
     int leakageCurrentIndex;
-    unsigned long adcSelection;
+    unsigned long mode;
     float slope;
     float intercept;
 } mjdPreAmpTable[16] = {
