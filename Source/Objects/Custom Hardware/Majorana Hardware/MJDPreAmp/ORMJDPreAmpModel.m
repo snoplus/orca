@@ -398,7 +398,7 @@ struct {
 
 - (float) leakageCurrent:(unsigned short) aChan
 {
-	if(aChan>=0 && aChan<kMJDPreAmpLeakageCurrentChannels){
+	if(aChan<kMJDPreAmpLeakageCurrentChannels){
 		if(adcEnabledMask & (0x1<<aChan))return leakageCurrents[aChan];
 		else return 0.0;
 	}
