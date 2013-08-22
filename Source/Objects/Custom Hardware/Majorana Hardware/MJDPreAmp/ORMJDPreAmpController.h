@@ -95,6 +95,8 @@
 - (void) baselineVoltageChanged:(NSNotification*)aNote;
 - (void) miscAttributesChanged:(NSNotification*)aNote;
 - (void) detectorNameChanged:(NSNotification*)aNote;
+- (void) setPlot:(id)aPlotter xAttributes:(id)attrib;
+- (void) setPlot:(id)aPlotter yAttributes:(id)attrib;
 
 - (NSString*) adcName:(int)adcIndex;
 
