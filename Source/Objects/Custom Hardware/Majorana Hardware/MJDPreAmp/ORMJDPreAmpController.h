@@ -97,6 +97,7 @@
 - (void) detectorNameChanged:(NSNotification*)aNote;
 - (void) setPlot:(id)aPlotter xAttributes:(id)attrib;
 - (void) setPlot:(id)aPlotter yAttributes:(id)attrib;
+- (void) deferredPlotUpdate;
 
 - (NSString*) adcName:(int)adcIndex;
 
