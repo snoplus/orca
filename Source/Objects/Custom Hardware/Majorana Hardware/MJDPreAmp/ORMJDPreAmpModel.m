@@ -81,6 +81,7 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 #define kSingleEnded 0x0
 #define kPseudoDiff  0x3
 
+
 struct {
     unsigned long mode;
     BOOL calculateLeakageCurrent;
