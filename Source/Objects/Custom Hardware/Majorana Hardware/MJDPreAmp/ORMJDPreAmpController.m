@@ -479,6 +479,7 @@
     [temperaturePlot setNeedsDisplay:YES];
     [voltagePlot setNeedsDisplay:YES];
     [leakageCurrentPlot0 setNeedsDisplay:YES];
+    [leakageCurrentPlot1 setNeedsDisplay:YES];
 }
 
 - (void) adcEnabledMaskChanged:(NSNotification*)aNote
@@ -522,6 +523,9 @@
 {
  	short chan;
 	for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
+        if(chan>=5 && chan<=7) continue;
+        if(chan>=13 && chan<=15) continue;
+        
 		[[detectorNameMatrix cellWithTag:chan] setStringValue: [model detectorName:chan]];
 	}
 }
