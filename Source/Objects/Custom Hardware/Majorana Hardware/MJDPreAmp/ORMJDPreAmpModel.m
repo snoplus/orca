@@ -89,23 +89,24 @@ struct {
     unsigned long mode;
     float slope;
     float intercept;
+    unsigned long adcOffset;
 } mjdPreAmpTable[16] = {
-    {kADC1,YES, 0,kSingleEnded,2*20/8192.,0},   //0,0
-    {kADC1,YES, 1,kSingleEnded,2*20/8192.,0},   //0,1
-    {kADC1,YES, 2,kSingleEnded,2*20/8192.,0},   //0,2
-    {kADC1,YES, 3,kSingleEnded,2*20/8192.,0},   //0,3
-    {kADC1,YES, 4,kSingleEnded,2*20/8192.,0},   //0,4
-    {kADC1,NO, -1,kSingleEnded,2*20/8192.,0},   //0,5
-    {kADC1,NO, -1,kSingleEnded,2*20/8192.,0},   //0,6
-    {kADC1,NO, -1,kPseudoDiff, -0.47,  2498},   //0,7
-    {kADC2,YES, 5,kSingleEnded,2*20/8192.,0},   //1,0
-    {kADC2,YES, 6,kSingleEnded,2*20/8192.,0},   //1,1
-    {kADC2,YES, 7,kSingleEnded,2*20/8192.,0},   //1,2
-    {kADC2,YES, 8,kSingleEnded,2*20/8192.,0},   //1,3
-    {kADC2,YES, 9,kSingleEnded,2*20/8192.,0},   //1,4
-    {kADC2,NO, -1,kSingleEnded,4*20/8192.,0},   //1,5
-    {kADC2,NO, -1,kSingleEnded,4*20/8192.,0},   //1,6
-    {kADC2,NO, -1,kPseudoDiff, -0.47,  2498},   //1,7
+    {kADC1,YES, 0, kSingleEnded, 2*20/8192., 0, 0},   //0,0
+    {kADC1,YES, 1, kSingleEnded, 2*20/8192., 0, 0},   //0,1
+    {kADC1,YES, 2, kSingleEnded, 2*20/8192., 0, 0},   //0,2
+    {kADC1,YES, 3, kSingleEnded, 2*20/8192., 0, 0},   //0,3
+    {kADC1,YES, 4, kSingleEnded, 2*20/8192., 0, 0},   //0,4
+    {kADC1,NO, -1, kSingleEnded, 2*20/8192., 0, 0},   //0,5
+    {kADC1,NO, -1, kSingleEnded, 2*20/8192., 0, 0},   //0,6
+    {kADC1,NO, -1, kPseudoDiff,    -0.47, 2498, 4096},//0,7
+    {kADC2,YES, 5, kSingleEnded, 2*20/8192., 0, 0},   //1,0
+    {kADC2,YES, 6, kSingleEnded, 2*20/8192., 0, 0},   //1,1
+    {kADC2,YES, 7, kSingleEnded, 2*20/8192., 0, 0},   //1,2
+    {kADC2,YES, 8, kSingleEnded, 2*20/8192., 0, 0},   //1,3
+    {kADC2,YES, 9, kSingleEnded, 2*20/8192., 0, 0},   //1,4
+    {kADC2,NO, -1, kSingleEnded, 4*20/8192., 0, 0},   //1,5
+    {kADC2,NO, -1, kSingleEnded, 4*20/8192., 0, 0},   //1,6
+    {kADC2,NO, -1, kPseudoDiff,   -0.47,  2498, 4096},//1,7
 };
 
 #pragma mark ¥¥¥Private Implementation
@@ -728,6 +729,8 @@ struct {
             long adcValue;
             if(rawAdcValue & 0x1000)adcValue = -(~rawAdcValue & 0x1FFF) + 1;
             else adcValue                    = rawAdcValue & 0x1FFF;
+            
+            adcValue += mjdPreAmpTable[decodedChannel].adcOffset;
             
             float convertedValue = -adcValue*mjdPreAmpTable[decodedChannel].slope + mjdPreAmpTable[decodedChannel].intercept;
             
