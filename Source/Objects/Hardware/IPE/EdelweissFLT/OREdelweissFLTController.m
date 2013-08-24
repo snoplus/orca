@@ -18,7 +18,7 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Imported Files
+#pragma mark •••Imported Files
 #import "OREdelweissFLTController.h"
 #import "OREdelweissFLTModel.h"
 #import "OREdelweissFLTDefs.h"
@@ -34,7 +34,7 @@
 
 @implementation OREdelweissFLTController
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
+#pragma mark •••Initialization
 -(id)init
 {
     self = [super initWithWindowNibName:@"EdelweissFLT"];
@@ -42,7 +42,7 @@
     return self;
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
+#pragma mark •••Initialization
 - (void) dealloc
 {
 	[rateFormatter release];
@@ -94,9 +94,9 @@
 
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+#pragma mark •••Accessors
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Notifications
+#pragma mark •••Notifications
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
@@ -497,7 +497,7 @@
 
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+#pragma mark •••Interface Management
 
 - (void) progressOfChargeBBChanged:(NSNotification*)aNote
 {
@@ -1662,7 +1662,7 @@
     
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+#pragma mark •••Actions
 
 - (IBAction) devTabButtonAction:(id) sender
 {  [model devTabButtonAction]; }
@@ -1704,7 +1704,9 @@
 #endif
 }
 
-- (void) selectChargeBBFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre 10.6-specific
+- (void) selectChargeBBFile
+:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode){
         int fiber = [model fiberSelectForBBAccess];
@@ -1712,7 +1714,7 @@
 		NSLog(@"BB FPGA config file set to: %@\n",[[[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]);
     }
 }
-
+#endif
 
 
 - (void) chargeBBFileForFiberTextFieldAction:(id)sender
@@ -3270,7 +3272,7 @@
     [super decDialog:sender];
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Plot DataSource
+#pragma mark •••Plot DataSource
 - (int) numberPointsInPlot:(id)aPlotter
 {
 	return [[model  totalRate]count];
