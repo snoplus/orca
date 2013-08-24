@@ -29,7 +29,7 @@
  ^^^^ ^^^^ ^^^^ ^^----------------------- Data ID (from header)
  -----------------^^ ^^^^ ^^^^ ^^^^ ^^^^- length
  ..
- .. TBD.....
+ .. what follows is the data read from the card. Note that it may contain many waveforms.....
  */
 
 @implementation ORSIS3320WaveformDecoder
@@ -61,37 +61,56 @@
 	NSString* crateKey		= [self getCrateKey: crate];
 	NSString* cardKey		= [self getCardKey: card];
 	NSString* channelKey	= [self getChannelKey: channel];
-		
-	NSMutableData* tmpData = [NSMutableData dataWithBytes:someData length:(length-3)*sizeof(long)];
-	unsigned short* dp = (unsigned short*)[tmpData bytes];
-	int i;
-	for(i=24;i<length-24;i++){ //skip the ORCA header(4 shorts) and the hw header (20 shorts)
-		*dp++ = ptr[i] & 0xfff;
-		*dp++ = (ptr[i]>>16) & 0xfff;
-	}
-	[aDataSet loadWaveform:tmpData
-					offset:0 //bytes!
-				  unitSize:2 //unit size in bytes!
-					sender:self  
-				  withKeys:@"SIS3320", @"Waveforms",crateKey,cardKey,channelKey,nil];
-	
-	//get the actual object
-	if(getRatesFromDecodeStage){
-		NSString* aKey = [crateKey stringByAppendingString:cardKey];
-		if(!actualSIS3320Cards)actualSIS3320Cards = [[NSMutableDictionary alloc] init];
-		ORSIS3320Model* obj = [actualSIS3320Cards objectForKey:aKey];
-		if(!obj){
-			NSArray* listOfCards = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORSIS3320Model")];
-			for(ORSIS3320Model* aCard in listOfCards){
-				if([aCard slot] == card){
-					[actualSIS3320Cards setObject:aCard forKey:aKey];
-					obj = aCard;
-					break;
-				}
-			}
-		}
-		getRatesFromDecodeStage = [obj bumpRateFromDecodeStage:channel];
-	}
+    
+    //-----------------------------------------------------------
+    //set up for sending the record count for the data monitor
+    ORSIS3320Model* obj = nil;
+    //get the actual object
+    if(getRatesFromDecodeStage){
+        NSString* aKey = [crateKey stringByAppendingString:cardKey];
+        if(!actualSIS3320Cards)actualSIS3320Cards = [[NSMutableDictionary alloc] init];
+        obj = [actualSIS3320Cards objectForKey:aKey];
+        if(!obj){
+            NSArray* listOfCards = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORSIS3320Model")];
+            for(ORSIS3320Model* aCard in listOfCards){
+                if([aCard slot] == card){
+                    [actualSIS3320Cards setObject:aCard forKey:aKey];
+                    obj = aCard;
+                    break;
+                }
+            }
+        }
+    }
+    //-----------------------------------------------------------
+    
+	unsigned long startIndex = 2;
+    do {
+        unsigned long indexToDataSize = startIndex+9; //point to the word holding the record size
+        unsigned long indexToData = startIndex + 10;
+        unsigned long numberOfSamples = ptr[indexToDataSize] & 0x0000FFFF; //num of shorts
+        unsigned long recordSizeInLongs = numberOfSamples/2;
+        if(recordSizeInLongs){
+            NSMutableData* tmpData = [NSMutableData dataWithBytes:someData length:recordSizeInLongs*sizeof(long)];
+            unsigned short* dp = (unsigned short*)[tmpData bytes];
+            int i;
+            for(i=indexToData;i<recordSizeInLongs;i++){
+                *dp++ = ptr[i] & 0xfff;
+                *dp++ = (ptr[i]>>16) & 0xfff;
+            }
+            [aDataSet loadWaveform:tmpData
+                            offset:0 //bytes!
+                          unitSize:2 //unit size in bytes!
+                            sender:self
+                          withKeys:@"SIS3320", @"Waveforms",crateKey,cardKey,channelKey,nil];
+            
+            //get the actual object
+            if(getRatesFromDecodeStage){
+                 getRatesFromDecodeStage = [obj bumpRateFromDecodeStage:channel];
+            }
+        }
+        startIndex += recordSizeInLongs + 10; //header is 10 long words
+        
+    }while(startIndex<length);
 
     return length; //must return number of longs
 }
