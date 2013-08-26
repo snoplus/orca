@@ -38,6 +38,7 @@
 	IBOutlet NSMatrix*		preTriggerDelayMatrix;
 	IBOutlet NSMatrix*      endAddressThresholdMatrix;
 
+    IBOutlet NSMatrix*		onlineMaskMatrix;
     IBOutlet NSMatrix*      invertInputMatrix;
 	IBOutlet NSMatrix*      enableErrorCorrectionMatrix;
 	IBOutlet NSMatrix*      saveAlwaysMatrix;
@@ -153,6 +154,7 @@
 - (void) sumGChanged:(NSNotification*)aNote;
 - (void) peakingTimeChanged:(NSNotification*)aNote;
 - (void) endAddressThresholdChanged:(NSNotification*)aNote;
+- (void) onlineMaskChanged:(NSNotification*)aNote;
 
 
 
@@ -173,6 +175,7 @@
 - (void) updateTimePlot:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) onlineAction:(id)sender;
 - (IBAction) accGate1LengthAction:(id)sender;
 - (IBAction) accGate1StartIndexAction:(id)sender;
 - (IBAction) accGate2LengthAction:(id)sender;

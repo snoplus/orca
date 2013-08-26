@@ -30,6 +30,7 @@
 #import "ORVmeReadWriteCommand.h"
 #import "ORCommandList.h"
 
+NSString* ORSIS3320ModelOnlineChanged                  = @"ORSIS3320ModelOnlineChanged";
 NSString* ORSIS3320ModelAccGate1LengthChanged          = @"ORSIS3320ModelAccGate1LengthChanged";
 NSString* ORSIS3320ModelAccGate1StartIndexChanged        = @"ORSIS3320ModelAccGate1StartIndexChanged";
 NSString* ORSIS3320ModelAccGate2LengthChanged          = @"ORSIS3320ModelAccGate2LengthChanged";
@@ -525,6 +526,34 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 }
 
 #pragma mark ***Accessors
+- (unsigned char)onlineMask {
+	
+    return onlineMask;
+}
+
+- (void)setOnlineMask:(unsigned char)anOnlineMask {
+    [[[self undoManager] prepareWithInvocationTarget:self] setOnlineMask:[self onlineMask]];
+	
+    onlineMask = anOnlineMask;
+	    
+    [[NSNotificationCenter defaultCenter]
+	 postNotificationName:ORSIS3320ModelOnlineChanged
+	 object:self];
+	
+}
+
+- (BOOL)onlineMaskBit:(int)bit
+{
+	return onlineMask&(1<<bit);
+}
+
+- (void) setOnlineMaskBit:(int)bit withValue:(BOOL)aValue
+{
+	unsigned char aMask = onlineMask;
+	if(aValue)aMask |= (1<<bit);
+	else aMask &= ~(1<<bit);
+	[self setOnlineMask:aMask];
+}
 
 - (unsigned long) bufferStart:(int)aGroup
 {
@@ -2023,7 +2052,14 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 {
     NSMutableArray* a = [NSMutableArray array];
     ORHWWizParam* p;
-	
+    
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Online"];
+    [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
+    [p setSetMethod:@selector(setOnlineMaskBit:withValue:) getMethod:@selector(onlineMaskBit:)];
+    [p setActionMask:kAction_Set_Mask|kAction_Restore_Mask];
+    [a addObject:p];
+
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Clock Source"];
     [p setFormat:@"##0" upperLimit:3 lowerLimit:0 stepSize:1 units:@""];
@@ -2100,7 +2136,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 	else if([param isEqualToString:@"Max Events"])				return [cardDictionary objectForKey:@"maxEvents"];
     else if([param isEqualToString:@"Pretrigger Delay"])			return [cardDictionary objectForKey:@"preTriggerDelay"];
     else if([param isEqualToString:@"Trigger Gate Delay"])			return [cardDictionary objectForKey:@"triggerGateLength"];
-
+    else if([param isEqualToString:@"Online"]) return [cardDictionary objectForKey:@"onlineMask"];
     else return nil;
 }
 
@@ -2248,6 +2284,8 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
     for(i=0;i<kNumSIS3320Groups;i++){
         configStruct->card_info[index].deviceSpecificData[i]	= [self endAddressThreshold:i];
     }
+    configStruct->card_info[index].deviceSpecificData[kNumSIS3320Groups] = onlineMask;
+
 	configStruct->card_info[index].num_Trigger_Indexes		= 0;
 	
 	configStruct->card_info[index].next_Card_Index 	= index+1;	
@@ -2296,7 +2334,9 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
     [self setTriggerOutMask:            [decoder decodeIntForKey:  @"triggerOutMask"]];
     [self setExtendedTriggerMask:       [decoder decodeIntForKey:  @"extendedTriggerMask"]];
     [self setClockSource:               [decoder decodeIntForKey:  @"clockSource"]];
- 	
+
+    [self setOnlineMask:                [decoder decodeIntForKey:  @"onlineMask"]];
+
     int i;
     for(i=0;i<4;i++){
           [self setBufferStart:i      withValue: [decoder decodeInt32ForKey:[NSString stringWithFormat:@"bufferStart%d",i]]];
@@ -2364,8 +2404,10 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
     [encoder encodeInt:triggerOutMask           forKey:@"triggerOutMask"];
     [encoder encodeInt:extendedTriggerMask      forKey:@"extendedTriggerMask"];
     [encoder encodeInt:clockSource				forKey:@"clockSource"];
-    
+    [encoder encodeInt:onlineMask               forKey:@"onlineMask"];
+
     int i;
+
     for(i=0;i<kNumSIS3320Groups;i++){
         [encoder encodeInt32:bufferStart[i]             forKey:[NSString stringWithFormat:@"bufferStart%d",i]];
         [encoder encodeInt32:bufferLength[i]            forKey:[NSString stringWithFormat:@"bufferLength%d",i]];
@@ -2421,7 +2463,9 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
     if(sumGs)			[objDictionary setObject:sumGs							forKey:@"sumGs"];
     
     [objDictionary setObject:[NSNumber numberWithLong:clockSource]				forKey:@"clockSource"];
-    [objDictionary setObject: preTriggerDelays		forKey:@"preTriggerDelays"];
+    
+    [objDictionary setObject:[NSNumber numberWithInt:onlineMask] forKey:@"onlineMask"];
+    [objDictionary setObject: preTriggerDelays		    forKey:@"preTriggerDelays"];
     [objDictionary setObject: triggerGateLengths		forKey:@"triggerGateLengths"];
 
 	return objDictionary;

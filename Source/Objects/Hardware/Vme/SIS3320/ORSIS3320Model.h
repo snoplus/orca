@@ -91,6 +91,7 @@
 
 	ORRateGroup*	waveFormRateGroup;
 	unsigned long 	waveFormCount[kNumSIS3320Channels];
+    unsigned long	onlineMask;
 
 	//cached when taking data from Mac
 	unsigned long	location;
@@ -107,6 +108,10 @@
 - (void) initParams;
 
 #pragma mark ***Accessors
+- (unsigned char)   onlineMask;
+- (void)	    setOnlineMask:(unsigned char)anOnlineMask;
+- (BOOL)	    onlineMaskBit:(int)bit;
+- (void)	    setOnlineMaskBit:(int)bit withValue:(BOOL)aValue;
 - (unsigned long) accGate1Length:(int)anIndex;
 - (void) setAccGate1Length:(int)anIndex withValue:(unsigned long)aValue;
 - (unsigned long) accGate2Length:(int)anIndex;
@@ -284,6 +289,7 @@
 - (NSArray*) autoTests ;
 @end
 
+extern NSString* ORSIS3320ModelOnlineChanged;
 extern NSString* ORSIS3320ModelAccGate1LengthChanged;
 extern NSString* ORSIS3320ModelAccGate1StartIndexChanged;
 extern NSString* ORSIS3320ModelAccGate2LengthChanged;

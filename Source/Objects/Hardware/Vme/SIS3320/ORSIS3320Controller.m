@@ -373,6 +373,11 @@
 					 selector : @selector(miscAttributesChanged:)
 						 name : ORMiscAttributesChanged
 					   object : model];
+    
+    [notifyCenter addObserver : self
+					 selector : @selector(onlineMaskChanged:)
+						 name : ORSIS3320ModelOnlineChanged
+					   object : model];
 
     [self registerRates];
 }
@@ -451,9 +456,21 @@
 	[self accGate7LengthChanged:nil];
 	[self accGate8StartIndexChanged:nil];
 	[self accGate8LengthChanged:nil];
+    [self onlineMaskChanged:nil];
 }
 
 #pragma mark •••Interface Management
+- (void) onlineMaskChanged:(NSNotification*)aNotification
+{
+	short i;
+	unsigned char theMask = [model onlineMask];
+	for(i=0;i<kNumSIS3320Channels;i++){
+		BOOL bitSet = (theMask&(1<<i))>0;
+		if(bitSet != [[onlineMaskMatrix cellWithTag:i] intValue]){
+			[[onlineMaskMatrix cellWithTag:i] setState:bitSet];
+		}
+	}
+}
 
 - (void) accGate1StartIndexChanged:(NSNotification*)aNote
 {
@@ -808,6 +825,7 @@
     BOOL locked = [gSecurity isLocked:ORSIS3320SettingsLock];
     
     [settingLockButton			setState: locked];
+    [onlineMaskMatrix           setEnabled:!lockedOrRunningMaintenance];
     [addressText				setEnabled:!locked && !runInProgress];
 	[clockSourcePU				setEnabled:!lockedOrRunningMaintenance];
     [initButton					setEnabled:!lockedOrRunningMaintenance];
@@ -926,6 +944,15 @@
 }
 
 #pragma mark •••Actions
+
+- (IBAction) onlineAction:(id)sender
+{
+	if([sender intValue] != [model onlineMaskBit:[[sender selectedCell] tag]]){
+		[[self undoManager] setActionName: @"Set Online Mask"];
+		[model setOnlineMaskBit:[[sender selectedCell] tag] withValue:[sender intValue]];
+	}
+}
+
 - (IBAction) accGate1LengthAction:(id)sender      { [model setAccGate1Length:   [[sender selectedCell] tag] withValue:[sender intValue]]; }
 - (IBAction) accGate1StartIndexAction:(id)sender    { [model setAccGate1StartIndex: [[sender selectedCell] tag] withValue:[sender intValue]]; }
 - (IBAction) accGate2LengthAction:(id)sender      { [model setAccGate2Length:   [[sender selectedCell] tag] withValue:[sender intValue]]; }
