@@ -1578,7 +1578,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 						numToRead:1
                        withAddMod:addressModifier
                     usingAddSpace:0x01];
-	return aValue;
+	return (aValue & 0x3ffffc) >>1; //divide by two to address offset from head of memory (in long words).
 }
 
 
@@ -2132,43 +2132,95 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 	//[self reset];
 	[self initBoard];
 	[self armBank1];
-    
+    unsigned long status = [self readAcqRegister] & 0xc0000;
+    NSLog(@"status word: 0x%0x\n",status);
+
 	isRunning		= NO;
 }
 
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+    // --- since this is where the readout takes place, i (GCRich) am commenting
+    // --- as i process it, looking for potential issues with the routine
+    // --- that may lead to missed events, which have been observed (Aug2013)
+    // --- my comments have a leading '---'
+    
+    // --- TODO: utilize dual banked memory so bank 1 can be read out while data is collected in bank 2
+    // --- this requires switching sampling to the alt bank at the begin of a readout
+    // --- we then have to make sure the NextSampleAddress register that is accessed corresponds to the ORIGINAL bank, not the now-active alt bank
+    
     @try {
 		isRunning		= YES;
-		unsigned long status = [self readAcqRegister] & 0xc0000;
+		unsigned long status = [self readAcqRegister];
 		if((status & kEndAddressThresholdFlag) == kEndAddressThresholdFlag){
+            
+            // --- if we're here, we're going to do a readout
+            // --- let's be safe and disable sampling while this happens
+            // --- ultimately, it WILL be important to not sample between populating 'endSampleAddress' and the actual transfer of data
+            
+            if(bank1Armed)  [self armBank2];
+            else            [self armBank1];
+
             int i;
 			for (i=0;i<8;i++) {
-                unsigned long endSampleAddress = [self readNextAdcAddress:i] & 0xffffff;
-                if (endSampleAddress != 0) {
-                    unsigned long data[511+10+2]; //max length plus Orca header
-                    unsigned long numLongsToRead = bufferLength[i/2]/2 + 10;
+                unsigned long endSampleAddress = [self readNextAdcAddress:i];
+                unsigned long endAddressThreshold = [self endAddressThreshold:i/2];
+                if (endAddressThreshold>0 && (endSampleAddress != 0)) {
+                    
+                    
+                    
+                    //unsigned long numLongsToRead = bufferLength[i/2]/2 + 10;
+                    // --- think more about this, at first glance it could be important
+                    // --- bufferLength is defined for each ADC group (e.g., 1&2, 3&4..)
+                    // --- the '+10' is suggestive of the header data on each 3320 N/G event
+                    // --- if i recall correctly, there are 10 words preceeding any waveform samples
+                    
+                    // --- the amount of data to read really should be determined based on
+                    // --- the 'endSampleAddress' data member
+                    
+                    // --- confirmed that numLongsToRead seems to be the legnth of an event, in words
+                    // --- HOWEVER, this shouldn't correspond to the amount of data we actually want to transfer
+                    // --- we want to read from the start of the memory bank for the channel, which might be specified by adcMemoryPage[channel]
+                    // --- and end the read at the address contained, at this point in the code, in endSampleAddress
+                    // --- so, i suggest the following line with an alternative definition of numLongsToRead
+                    unsigned long numLongsToRead = endSampleAddress;
+                    
+                    // --- note: we'll now be reading potentially many events
+                    // --- this may not jive with the hardcoded-length data array
+                    // --- so move the definition of the data array to below this point and size it appropriately..
+                    
+                    
+                    unsigned long data[ numLongsToRead + 10 + 2 ]; //max length plus Orca header
+                    // --- in theory, this should perhaps be .. 8 MB, if size is fixed
+                    // --- NOTE THIS NOW WILL HOLD MORE THAN A SINGLE EVENT
+                    
+                    unsigned int nWordsPerEvent = bufferLength[i/2]/2 + 10;
+                    // --- now we can determine the number of events we read
+                    // --- this assumes that all events are of equal length (i.e., ALL or NO events record waveforms, options for 'if pileup' or 'first event of buffer' are not selected)
+                    unsigned int nEventsInTransferredData = ceil(numLongsToRead / (float)nWordsPerEvent);
+                    waveFormCount[i] += nEventsInTransferredData;
+                   
+                    
                     data[0] = dataId | (2 + numLongsToRead);
                     data[1] = location;
                     [[self adapter] readLongBlock:&data[2]
-                                        atAddress:baseAddress + adcMemoryPage[i]
-                                        numToRead:numLongsToRead
+                                        atAddress:baseAddress + adcMemoryPage[i] // --- this is in line with my code, adcMemoryPage[1] is equivalent to SIS3320_ADC1_OFFSET in Struck's header
+                                        numToRead:numLongsToRead // --- this is actually the number of 32bit words to read.. check that this is ok
                                        withAddMod:addressModifier
                                     usingAddSpace:0x01];
                     [aDataPacket addLongsToFrameBuffer:data length:2 + numLongsToRead];
-                    ++waveFormCount[i];
-
+                     
+                    
 				}
 			}
-            if(bank1Armed)  [self armBank2];
-            else            [self armBank1];
+            
 		}
 	}
 	@catch(NSException* localException) {
 		[self incExceptionCount];
 		[localException raise];
 	}
-  
+    
 }
 
 
@@ -2194,7 +2246,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 	configStruct->card_info[index].base_add					= baseAddress;
     int i;
     for(i=0;i<kNumSIS3320Groups;i++){
-        configStruct->card_info[index].deviceSpecificData[i]	= bufferLength[i]/2; //longs
+        configStruct->card_info[index].deviceSpecificData[i]	= [self endAddressThreshold:i];
     }
 	configStruct->card_info[index].num_Trigger_Indexes		= 0;
 	

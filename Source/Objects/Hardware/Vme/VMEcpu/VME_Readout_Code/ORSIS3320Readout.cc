@@ -50,7 +50,11 @@ bool ORSIS3320Readout::Readout(SBC_LAM_Data* /*lam_data*/)
 		LogBusError("Rd Status Err: SIS3320 0x%04x %s", GetBaseAddress() + kAcquisitionControlReg,strerror(errno));
 	}
     else if((status & kEndAddressThresholdFlag) == kEndAddressThresholdFlag){
+        
         //if we get here, there may be something to read out
+        if(fBankOneArmed)  armBank2();
+        else               armBank1();
+        
         for (size_t i=0;i<kNumberOfChannels;i++) {
             uint32_t endSampleAddress = 0;
             
@@ -61,10 +65,13 @@ bool ORSIS3320Readout::Readout(SBC_LAM_Data* /*lam_data*/)
                 LogBusError("Rd End Add Err: SIS3320 0x%04x %s", GetBaseAddress() + GetNextBankSampleRegisterOffset(i),strerror(errno));
             }
 
-            endSampleAddress &= 0xffffff;
+            endSampleAddress = (endSampleAddress & 0x3ffffc) >>1;
             
-            if (endSampleAddress != 0) {
-                uint32_t numLongsToRead = GetDeviceSpecificData()[i/2]+10; //longs
+            uint32_t endAddressThreshold = GetDeviceSpecificData()[i/2];
+            
+            if (endAddressThreshold>0 && endSampleAddress != 0) {
+                uint32_t numLongsToRead = endSampleAddress;
+                
                 ensureDataCanHold(numLongsToRead+2);
                 
                 uint32_t savedDataStart = dataIndex;
@@ -89,8 +96,6 @@ bool ORSIS3320Readout::Readout(SBC_LAM_Data* /*lam_data*/)
                 }
             }
         }
-        if(fBankOneArmed)  armBank2();
-        else               armBank1();
     }
     return true;
 }

@@ -61,6 +61,7 @@
 	NSString* crateKey		= [self getCrateKey: crate];
 	NSString* cardKey		= [self getCardKey: card];
 	NSString* channelKey	= [self getChannelKey: channel];
+
     
     //-----------------------------------------------------------
     //set up for sending the record count for the data monitor
