@@ -706,35 +706,72 @@ struct {
 - (void) readAllAdcs:(BOOL)verbose
 {
     if(!rangesHaveBeenSet)[self writeAdcRanges];
-
+    unsigned long rawAdcValue[16];
     int chan;
+    if(![self controllerIsSBC]){
+        for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
+            if(adcEnabledMask & (0x1<<chan)){
+                unsigned long controlWord = (kControlReg << 13)    |            //sel the chan set
+                                            ((chan%8)<<10)         |            //set chan
+                                            (0x1 << 4)             |            //use internal voltage reference for conversion
+                                            (mjdPreAmpTable[chan].mode << 8);    //set mode, other bits are zero
+                
+                //-------------------------------------------------------
+                //don't like the following where we have to read four times, but seems we have no choice
+                rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                //-------------------------------------------------------
+            }
+        }
+    }
+    else {
+        //if an SBC is available we pass the request to read the adcs
+        //to it. 
+        SBC_Packet aPacket;
+        aPacket.cmdHeader.destination	= kMJD;
+        aPacket.cmdHeader.cmdID			= kMJDReadPreamps;
+        aPacket.cmdHeader.numberBytesinPayload	= (16 + 2)*sizeof(long);
+        
+        unsigned long* payloadPtr = (unsigned long*) aPacket.payload;
+        payloadPtr[0] = [self baseAddress];
+        payloadPtr[1] = adcEnabledMask;
+        for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
+            if(adcEnabledMask & (0x1<<chan)){
+                unsigned long controlWord = (kControlReg << 13)    |            //sel the chan set
+                                            ((chan%8)<<10)         |            //set chan
+                                            (0x1 << 4)             |            //use internal voltage reference for conversion
+                                            (mjdPreAmpTable[chan].mode << 8);    //set mode, other bits are zero
+                payloadPtr[2+chan] = controlWord;
+            }
+            else payloadPtr[2+chan] = 0;
+        }
+        @try {
+            [[[[self objectConnectedTo:MJDPreAmpInputConnector] adapter] sbcLink] send:&aPacket receive:&aPacket];
+            unsigned long* payloadPtr = (unsigned long*) aPacket.payload;
+            for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
+                rawAdcValue[chan] = payloadPtr[chan+2];
+            }
+        }
+        @catch(NSException* e){
+            
+        }
+    }
 	for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
 		if(adcEnabledMask & (0x1<<chan)){
-            unsigned long controlWord = (kControlReg << 13)    |            //sel the chan set
-                                        ((chan%8)<<10)         |            //set chan
-                                        (0x1 << 4)             |            //use internal voltage reference for conversion
-                                        (mjdPreAmpTable[chan].mode << 8);    //set mode, other bits are zero
-            
-            unsigned long rawAdcValue = [self writeAuxIOSPI:mjdPreAmpTable[chan].adcSelection | (controlWord<<8)];
-            //-------------------------------------------------------
-            //don't like the following, but seems we have no choice
-            rawAdcValue = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
-            rawAdcValue = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
-            rawAdcValue = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
-            //-------------------------------------------------------
-            
-			int decodedChannel = (~rawAdcValue & 0xE000) >> 13;                      //use the whichever chan was converted, may be diff than the one selected above.
+			int decodedChannel = (~rawAdcValue[chan] & 0xE000) >> 13;                      //use the whichever chan was converted, may be diff than the one selected above.
             if(mjdPreAmpTable[chan].adcSelection & 0x1000000) decodedChannel += 8;  //two adc chips, so the second chip is offset by 8 to get the right adc index
             
             long adcValue;
-            if(rawAdcValue & 0x1000)adcValue = -(~rawAdcValue & 0x1FFF) + 1;
-            else adcValue                    = rawAdcValue & 0x1FFF;
+            if(rawAdcValue[chan] & 0x1000)adcValue = -(~rawAdcValue[chan] & 0x1FFF) + 1;
+            else adcValue                    = rawAdcValue[chan] & 0x1FFF;
             
             adcValue += mjdPreAmpTable[decodedChannel].adcOffset;
             
             float convertedValue = -adcValue*mjdPreAmpTable[decodedChannel].slope + mjdPreAmpTable[decodedChannel].intercept;
             
-			if(verbose)NSLog(@"%d: %.2f (0x%08x)\n",decodedChannel,convertedValue,rawAdcValue&0x1FFF);
+			if(verbose)NSLog(@"%d: %.2f (0x%08x)\n",decodedChannel,convertedValue,rawAdcValue[chan]&0x1FFF);
             
 			[self setAdc:decodedChannel value:convertedValue];
             [self checkAdcIsWithinLimits:decodedChannel];
@@ -754,7 +791,28 @@ struct {
 	time(&ut_Time);
 	timeMeasured = ut_Time;
 }
+         
+- (BOOL) controllerIsSBC
+{
+    id connectedObj = [self objectConnectedTo:MJDPreAmpInputConnector];
+	if([connectedObj respondsToSelector:@selector(adapter)]){
+		id theController =  [connectedObj adapter];
+        if([theController isKindOfClass:NSClassFromString(@"ORVmecpuModel")])return YES;
+        else return NO;
+	}
+    else return NO;
+}
+    
+- (unsigned long) baseAddress
+{
+    id connectedObj = [self objectConnectedTo:MJDPreAmpInputConnector];
+    if([connectedObj respondsToSelector:@selector(baseAddress)]){
+        return [connectedObj baseAddress];
+    }
+    else return 0;
+}
 
+         
 - (void) pollValues
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollValues) object:nil];

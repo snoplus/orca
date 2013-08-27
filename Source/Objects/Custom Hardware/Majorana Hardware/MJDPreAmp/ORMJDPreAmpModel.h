@@ -20,6 +20,7 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORHWWizard.h"
 #import "ThresholdCalibrationTask.h"
+#import "MJDCmds.h"
 
 @class ORTimeRate;
 @class ORAlarm;
@@ -121,6 +122,7 @@
 - (void) shipRecords;
 
 #pragma mark ¥¥¥HW Access
+- (BOOL) controllerIsSBC;
 - (void) startPulser;
 - (void) stopPulser;
 - (void) writeFetVds:(int)index;
@@ -170,4 +172,8 @@ extern NSString* ORMJDPreAmpModelDetectorNameChanged;
 
 @interface NSObject (ORMJDPreAmpModel)
 - (unsigned long) writeAuxIOSPI:(unsigned long)spiData;
+- (id) adapter;
+- (id) sbcLink;
+- (unsigned long) baseAddress;
+- (void) send:(SBC_Packet*)aSendPacket receive:(SBC_Packet*)aReceivePacket;
 @end
