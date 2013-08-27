@@ -37,6 +37,7 @@
 #define kAcqirisDC440          0x2
 #define kSNO				   0x3
 #define kPMC				   0x4
+#define kMJD                   0x5
 
 /* SBC commands */
 #define kSBC_Command           0x01
@@ -63,6 +64,7 @@
 #define kSBC_GeneralRead       0x19
 #define kSBC_GeneralWrite      0x20
 #define kSBC_SetPollingDelay   0x21
+
 #define kSBC_Exit              0xFFFFFFFF /*close socket and quit application*/
 
 typedef 
@@ -216,5 +218,6 @@ typedef
          uint32_t wrapArounds;
     }
 BufferInfo;
+
 
 #endif
