@@ -32,6 +32,7 @@
 #include "CircularBuffer.h"
 #include "VME_HW_Definitions.h"
 #include "SNO.h"
+#include "MJD.h"
 #include "universe_api.h"
 #include "VmeSBCGeneralOperations.h"
 
@@ -59,6 +60,7 @@ void processHWCommand(SBC_Packet* aPacket)
 	int32_t destination = aPacket->cmdHeader.destination;
 	switch(destination){
 		case kSNO:		processSNOCommand(aPacket); break;
+		case kMJD:		processMJDCommand(aPacket); break;
 		default:			break;
 	}
 }
