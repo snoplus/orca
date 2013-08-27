@@ -2467,6 +2467,11 @@
 		84C37D2F0EF834DD00E77E09 /* SNOModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84C37D290EF834DD00E77E09 /* SNOModel.h */; };
 		84C37D300EF834DD00E77E09 /* SNOModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C37D2A0EF834DD00E77E09 /* SNOModel.m */; };
 		84C37E250EF8408F00E77E09 /* ORPSUPTubePosition.h in Headers */ = {isa = PBXBuildFile; fileRef = 84C37E240EF8408F00E77E09 /* ORPSUPTubePosition.h */; };
+		84C3B28D17CBBF28002916F5 /* MJDCmds.h in Headers */ = {isa = PBXBuildFile; fileRef = 84C3B28C17CBBF26002916F5 /* MJDCmds.h */; };
+		84C3B28E17CBCC1A002916F5 /* MJDCmds.h in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84C3B28C17CBBF26002916F5 /* MJDCmds.h */; };
+		84C3B29217CCD1BF002916F5 /* MJD.h in Headers */ = {isa = PBXBuildFile; fileRef = 84C3B29017CCD1BC002916F5 /* MJD.h */; };
+		84C3B29317CCD356002916F5 /* MJD.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84C3B28F17CCD1B7002916F5 /* MJD.cc */; };
+		84C3B29417CCD358002916F5 /* MJD.h in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84C3B29017CCD1BC002916F5 /* MJD.h */; };
 		84C4CB6F0FB071BC00725AC3 /* M927.rbf in Resources */ = {isa = PBXBuildFile; fileRef = 84C4CB6E0FB071BC00725AC3 /* M927.rbf */; };
 		84C4CB830FB0725800725AC3 /* M927.rbf in CopyFiles */ = {isa = PBXBuildFile; fileRef = 84C4CB6E0FB071BC00725AC3 /* M927.rbf */; };
 		84C5332A0652BA6B00E4731F /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84C533280652BA6B00E4731F /* MainMenu.nib */; };
@@ -3150,6 +3155,7 @@
 			dstSubfolderSpec = 7;
 			files = (
 				362F928B1681A05100F3ACB4 /* SNO.cc in VME_Copy */,
+				84C3B28E17CBCC1A002916F5 /* MJDCmds.h in VME_Copy */,
 				84997897174BEAF000BFEE3E /* ORPollingTimeStampReadout.hh in VME_Copy */,
 				84253FC412F0751A00472314 /* VmeSBCGeneralOperations.h in VME_Copy */,
 				43ADFEB910B6E2090044617C /* HW_Specific.icc in VME_Copy */,
@@ -3210,6 +3216,8 @@
 				84BC4F4F127B1C3500965056 /* HW_Readout.c in VME_Copy */,
 				84BA99050E91288800E19946 /* SNOCmds.h in VME_Copy */,
 				84BA99070E91288800E19946 /* SNO.h in VME_Copy */,
+				84C3B29317CCD356002916F5 /* MJD.cc in VME_Copy */,
+				84C3B29417CCD358002916F5 /* MJD.h in VME_Copy */,
 			);
 			name = VME_Copy;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -5541,6 +5549,9 @@
 		84C37D290EF834DD00E77E09 /* SNOModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SNOModel.h; path = Source/Experiments/SNO/SNOModel.h; sourceTree = SOURCE_ROOT; };
 		84C37D2A0EF834DD00E77E09 /* SNOModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SNOModel.m; path = Source/Experiments/SNO/SNOModel.m; sourceTree = SOURCE_ROOT; };
 		84C37E240EF8408F00E77E09 /* ORPSUPTubePosition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORPSUPTubePosition.h; sourceTree = "<group>"; };
+		84C3B28C17CBBF26002916F5 /* MJDCmds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MJDCmds.h; sourceTree = "<group>"; };
+		84C3B28F17CCD1B7002916F5 /* MJD.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MJD.cc; sourceTree = "<group>"; };
+		84C3B29017CCD1BC002916F5 /* MJD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MJD.h; sourceTree = "<group>"; };
 		84C4939A04059AEA005F64B1 /* ORGpibEnetController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORGpibEnetController.h; sourceTree = "<group>"; };
 		84C4939B04059AEA005F64B1 /* ORGpibEnetController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORGpibEnetController.m; sourceTree = "<group>"; };
 		84C4939E04059AEA005F64B1 /* ORGpibEnetModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORGpibEnetModel.h; sourceTree = "<group>"; };
@@ -9719,11 +9730,10 @@
 		8493CC7D0C99FA4B00B46CD4 /* VME_Readout_Code */ = {
 			isa = PBXGroup;
 			children = (
-				362F928A16819FCE00F3ACB4 /* SNO.cc */,
-				84253F8612F073C300472314 /* VmeSBCGeneralOperations.h */,
 				43ADFE5610B6DBCF0044617C /* HW_Specific.icc */,
 				43ADFE5710B6DBCF0044617C /* HWMakefile.mk */,
 				840B00721206F556009095A4 /* goScript */,
+				84253F8612F073C300472314 /* VmeSBCGeneralOperations.h */,
 				8471C2F11250CF0C003A8DFB /* ORCAEN260Readout.cc */,
 				8471C2F21250CF0C003A8DFB /* ORCAEN260Readout.hh */,
 				84BF445C1187ACEE00F55216 /* ORCAEN1785Readout.cc */,
@@ -9777,10 +9787,14 @@
 				84CEDD1E0CDA7DB7002CFD3A /* VME_HW_Definitions.h */,
 				8493CC800C99FA4B00B46CD4 /* HW_Readout.h */,
 				84BC4F4D127B1C2000965056 /* HW_Readout.c */,
-				84BA99000E91279000E19946 /* SNOCmds.h */,
 				843F28F811ECFEED0077E55B /* ORDataGenReadout.hh */,
 				43ADFE5E10B6DBCF0044617C /* ORDataGenReadout.cc */,
+				84BA99000E91279000E19946 /* SNOCmds.h */,
 				84BA98FB0E91260500E19946 /* SNO.h */,
+				362F928A16819FCE00F3ACB4 /* SNO.cc */,
+				84C3B28C17CBBF26002916F5 /* MJDCmds.h */,
+				84C3B28F17CCD1B7002916F5 /* MJD.cc */,
+				84C3B29017CCD1BC002916F5 /* MJD.h */,
 			);
 			name = VME_Readout_Code;
 			path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code;
@@ -14169,6 +14183,8 @@
 				841DACF1175E2CB5002542BD /* OR3DScanPlatformView.h in Headers */,
 				43D7CB89177C84AC00ED4736 /* OROpenGLObject.h in Headers */,
 				43D7CB8D177CBDF600ED4736 /* ORVertex.h in Headers */,
+				84C3B28D17CBBF28002916F5 /* MJDCmds.h in Headers */,
+				84C3B29217CCD1BF002916F5 /* MJD.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
