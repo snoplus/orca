@@ -747,16 +747,16 @@ struct {
                                                 (chan<<10)         |             //set chan
                                                 (0x1 << 4)             |             //use internal voltage reference for conversion
                                                 (mjdPreAmpTable[adcIndex].mode << 8);    //set mode, other bits are zero
-                    p->adc[adcIndex] = mjdPreAmpTable[adcIndex].adcSelection | (controlWord<<8);
+                    p->adc[chan] = mjdPreAmpTable[adcIndex].adcSelection | (controlWord<<8);
                 }
-                else p->adc[adcIndex] = 0;
+                else p->adc[chan] = 0;
             }
             @try {
                 [[[[self objectConnectedTo:MJDPreAmpInputConnector] adapter] sbcLink] send:&aPacket receive:&aPacket];
                 GRETINA4_PreAmpReadStruct* p = (GRETINA4_PreAmpReadStruct*) aPacket.payload;
                 for(chan=0;chan<8;chan++){
                     int adcIndex = chan + (chip*8);
-                   if(adcEnabledMask & (0x1<<adcIndex))rawAdcValue[adcIndex] = p->adc[adcIndex];
+                   if(adcEnabledMask & (0x1<<adcIndex))rawAdcValue[adcIndex] = p->adc[chan];
                     else                               rawAdcValue[adcIndex] = 0;
                 }
             }
@@ -767,21 +767,21 @@ struct {
     }
 	for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
 		if(adcEnabledMask & (0x1<<chan)){
-			int decodedChannel = (~rawAdcValue[chan] & 0xE000) >> 13;                      //use the whichever chan was converted, may be diff than the one selected above.
-            if(mjdPreAmpTable[decodedChannel].adcSelection & 0x1000000) decodedChannel += 8;  //two adc chips, so the second chip is offset by 8 to get the right adc index
+			//int decodedChannel = (~rawAdcValue[chan] & 0xE000) >> 13;                      //use the whichever chan was converted, may be diff than the one selected above.
+            //if(mjdPreAmpTable[decodedChannel].adcSelection & 0x1000000) decodedChannel += 8;  //two adc chips, so the second chip is offset by 8 to get the right adc index
             
             long adcValue;
             if(rawAdcValue[chan] & 0x1000)adcValue = -(~rawAdcValue[chan] & 0x1FFF) + 1;
             else                          adcValue = rawAdcValue[chan] & 0x1FFF;
             
-            adcValue += mjdPreAmpTable[decodedChannel].adcOffset;
+            adcValue += mjdPreAmpTable[chan].adcOffset;
             
-            float convertedValue = -adcValue*mjdPreAmpTable[decodedChannel].slope + mjdPreAmpTable[decodedChannel].intercept;
+            float convertedValue = -adcValue*mjdPreAmpTable[chan].slope + mjdPreAmpTable[chan].intercept;
             
-			if(verbose)NSLog(@"%d: %.2f (0x%08x)\n",decodedChannel,convertedValue,rawAdcValue[chan]&0x1FFF);
+			if(verbose)NSLog(@"%d: %.2f (0x%08x)\n",chan,convertedValue,rawAdcValue[chan]&0x1FFF);
             
-			[self setAdc:decodedChannel value:convertedValue];
-            [self checkAdcIsWithinLimits:decodedChannel];
+			[self setAdc:chan value:convertedValue];
+            [self checkAdcIsWithinLimits:chan];
             
             if(mjdPreAmpTable[chan].calculateLeakageCurrent){
                 [self calculateLeakageCurrentForAdc:chan];
