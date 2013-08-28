@@ -81,32 +81,36 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 #define kSingleEnded 0x0
 #define kPseudoDiff  0x3
 
+#define kTwosComplement 0x0
+#define kStraightBinary 0x1
 
 struct {
     unsigned long adcSelection;
     BOOL calculateLeakageCurrent;
     int leakageCurrentIndex;
     unsigned long mode;
+	BOOL  conversionType;
     float slope;
     float intercept;
     unsigned long adcOffset;
 } mjdPreAmpTable[16] = {
-    {kADC1,YES, 0, kSingleEnded, 2*20/8192., 0, 0},   //0,0
-    {kADC1,YES, 1, kSingleEnded, 2*20/8192., 0, 0},   //0,1
-    {kADC1,YES, 2, kSingleEnded, 2*20/8192., 0, 0},   //0,2
-    {kADC1,YES, 3, kSingleEnded, 2*20/8192., 0, 0},   //0,3
-    {kADC1,YES, 4, kSingleEnded, 2*20/8192., 0, 0},   //0,4
-    {kADC1,NO, -1, kSingleEnded, 2*20/8192., 0, 0},   //0,5
-    {kADC1,NO, -1, kSingleEnded, 2*20/8192., 0, 0},   //0,6
-    {kADC1,NO, -1, kPseudoDiff,    -0.47, 2498, 4096},//0,7
-    {kADC2,YES, 5, kSingleEnded, 2*20/8192., 0, 0},   //1,0
-    {kADC2,YES, 6, kSingleEnded, 2*20/8192., 0, 0},   //1,1
-    {kADC2,YES, 7, kSingleEnded, 2*20/8192., 0, 0},   //1,2
-    {kADC2,YES, 8, kSingleEnded, 2*20/8192., 0, 0},   //1,3
-    {kADC2,YES, 9, kSingleEnded, 2*20/8192., 0, 0},   //1,4
-    {kADC2,NO, -1, kSingleEnded, 4*20/8192., 0, 0},   //1,5
-    {kADC2,NO, -1, kSingleEnded, 4*20/8192., 0, 0},   //1,6
-    {kADC2,NO, -1, kPseudoDiff,   -0.47,  2498, 4096},//1,7
+    {kADC1,YES, 0, kSingleEnded, kTwosComplement, 2*20/8192., 0, 0},   //0,0
+    {kADC1,YES, 1, kSingleEnded, kTwosComplement,2*20/8192., 0, 0},   //0,1
+    {kADC1,YES, 2, kSingleEnded, kTwosComplement,2*20/8192., 0, 0},   //0,2
+    {kADC1,YES, 3, kSingleEnded, kTwosComplement,2*20/8192., 0, 0},   //0,3
+    {kADC1,YES, 4, kSingleEnded, kTwosComplement,2*20/8192., 0, 0},   //0,4
+    {kADC1,NO, -1, kSingleEnded, kTwosComplement,2*20/8192., 0, 0},   //0,5
+    {kADC1,NO, -1, kSingleEnded, kTwosComplement,2*20/8192., 0, 0},   //0,6
+    {kADC1,NO, -1, kPseudoDiff,  kTwosComplement,  1, 0, 0},//0,7 <<-- temperary no conversion to see the raw adc value
+    //{kADC1,NO, -1, kPseudoDiff,kStraightBinary,    -0.47, 2498, 4096},//0,7
+    {kADC2,YES, 5, kSingleEnded, kTwosComplement,2*20/8192., 0, 0},   //1,0
+    {kADC2,YES, 6, kSingleEnded, kTwosComplement,2*20/8192., 0, 0},   //1,1
+    {kADC2,YES, 7, kSingleEnded, kTwosComplement,2*20/8192., 0, 0},   //1,2
+    {kADC2,YES, 8, kSingleEnded, kTwosComplement,2*20/8192., 0, 0},   //1,3
+    {kADC2,YES, 9, kSingleEnded, kTwosComplement,2*20/8192., 0, 0},   //1,4
+    {kADC2,NO, -1, kSingleEnded, kTwosComplement,4*20/8192., 0, 0},   //1,5
+    {kADC2,NO, -1, kSingleEnded, kTwosComplement,4*20/8192., 0, 0},   //1,6
+    {kADC2,NO, -1, kPseudoDiff,  kTwosComplement, -0.47,  2498, 4096},//1,7
 };
 
 #pragma mark ¥¥¥Private Implementation
@@ -693,7 +697,7 @@ struct {
                     (kBipolar10V     << 11)  |        //chan 4
                     (kBipolar10V     << 9)   |        //chan 5
                     (kBipolar10V     << 7)   |        //chan 6
-                    (kBipolar2_5V    << 5);           //chan 7
+                    (kBipolar2_5V    << 5);           //chan 7 -- temperature
     [self writeAuxIOSPI:kADC1 | (controlWord<<8)];    //shift to bit 8 + add the adc sel
     [self writeAuxIOSPI:kADC2 | (controlWord<<8)];    //shift to bit 8 + add the adc sel
 }
@@ -713,6 +717,7 @@ struct {
             if(adcEnabledMask & (0x1<<chan)){
                 unsigned long controlWord = (kControlReg << 13)    |            //sel the chan set
                                             ((chan%8)<<10)         |            //set chan
+				       (mjdPreAmpTable[chan].conversionType << 5)   |  
                                             (0x1 << 4)             |            //use internal voltage reference for conversion
                                             (mjdPreAmpTable[chan].mode << 8);    //set mode, other bits are zero
                 
@@ -746,7 +751,8 @@ struct {
                     unsigned long controlWord = (kControlReg << 13)    |             //sel the chan set
                                                 (chan<<10)         |             //set chan
                                                 (0x1 << 4)             |             //use internal voltage reference for conversion
-                                                (mjdPreAmpTable[adcIndex].mode << 8);    //set mode, other bits are zero
+												(mjdPreAmpTable[chan].conversionType << 5)   |  
+												(mjdPreAmpTable[adcIndex].mode << 8);    //set mode, other bits are zero
                     p->adc[chan] = mjdPreAmpTable[adcIndex].adcSelection | (controlWord<<8);
                 }
                 else p->adc[chan] = 0;
@@ -771,12 +777,16 @@ struct {
             //if(mjdPreAmpTable[decodedChannel].adcSelection & 0x1000000) decodedChannel += 8;  //two adc chips, so the second chip is offset by 8 to get the right adc index
             
             long adcValue;
-            if(rawAdcValue[chan] & 0x1000)adcValue = -(~rawAdcValue[chan] & 0x1FFF) + 1;
-            else                          adcValue = rawAdcValue[chan] & 0x1FFF;
+            if(mjdPreAmpTable[chan].conversionType == kTwosComplement){
+			   if(rawAdcValue[chan] & 0x1000)adcValue = (~rawAdcValue[chan] & 0x1FFF) + 1;
+			   else                          adcValue = -rawAdcValue[chan] & 0x1FFF;
+			}
+			else {
+				adcValue = rawAdcValue[chan] & 0x1FFF;
+			}
+            //adcValue += mjdPreAmpTable[chan].adcOffset;
             
-            adcValue += mjdPreAmpTable[chan].adcOffset;
-            
-            float convertedValue = -adcValue*mjdPreAmpTable[chan].slope + mjdPreAmpTable[chan].intercept;
+            float convertedValue = adcValue*mjdPreAmpTable[chan].slope + mjdPreAmpTable[chan].intercept;
             
 			if(verbose)NSLog(@"%d: %.2f (0x%08x)\n",chan,convertedValue,rawAdcValue[chan]&0x1FFF);
             
