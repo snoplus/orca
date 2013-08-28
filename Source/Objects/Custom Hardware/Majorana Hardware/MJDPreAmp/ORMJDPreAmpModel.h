@@ -19,7 +19,6 @@
 
 #pragma mark ¥¥¥Imported Files
 #import "ORHWWizard.h"
-#import "ThresholdCalibrationTask.h"
 #import "MJDCmds.h"
 
 @class ORTimeRate;

@@ -734,24 +734,25 @@ struct {
         aPacket.cmdHeader.cmdID			= kMJDReadPreamps;
         aPacket.cmdHeader.numberBytesinPayload	= (16 + 2)*sizeof(long);
         
-        unsigned long* payloadPtr = (unsigned long*) aPacket.payload;
-        payloadPtr[0] = [self baseAddress];
-        payloadPtr[1] = adcEnabledMask;
+        GRETINA4_PreAmpReadStruct* p = (GRETINA4_PreAmpReadStruct*) aPacket.payload;
+        p->baseAddress      = [self baseAddress];
+        p->readEnabledMask  = adcEnabledMask;
         for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
             if(adcEnabledMask & (0x1<<chan)){
-                unsigned long controlWord = (kControlReg << 13)    |            //sel the chan set
-                                            ((chan%8)<<10)         |            //set chan
-                                            (0x1 << 4)             |            //use internal voltage reference for conversion
+                unsigned long controlWord = (kControlReg << 13)    |             //sel the chan set
+                                            ((chan%8)<<10)         |             //set chan
+                                            (0x1 << 4)             |             //use internal voltage reference for conversion
                                             (mjdPreAmpTable[chan].mode << 8);    //set mode, other bits are zero
-                payloadPtr[2+chan] = mjdPreAmpTable[chan].adcSelection | (controlWord<<8);
+                p->adc[chan] = mjdPreAmpTable[chan].adcSelection | (controlWord<<8);
             }
-            else payloadPtr[2+chan] = 0;
+            else p->adc[chan] = 0;
         }
         @try {
             [[[[self objectConnectedTo:MJDPreAmpInputConnector] adapter] sbcLink] send:&aPacket receive:&aPacket];
-            unsigned long* payloadPtr = (unsigned long*) aPacket.payload;
+            GRETINA4_PreAmpReadStruct* p = (GRETINA4_PreAmpReadStruct*) aPacket.payload;
             for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
-                rawAdcValue[chan] = payloadPtr[chan+2];
+                if(adcEnabledMask & (0x1<<chan))rawAdcValue[chan] = p->adc[chan];
+                else                            rawAdcValue[chan] = 0;
             }
         }
         @catch(NSException* e){
@@ -765,7 +766,7 @@ struct {
             
             long adcValue;
             if(rawAdcValue[chan] & 0x1000)adcValue = -(~rawAdcValue[chan] & 0x1FFF) + 1;
-            else adcValue                    = rawAdcValue[chan] & 0x1FFF;
+            else                          adcValue = rawAdcValue[chan] & 0x1FFF;
             
             adcValue += mjdPreAmpTable[decodedChannel].adcOffset;
             
