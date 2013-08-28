@@ -29,8 +29,9 @@
 
 typedef struct {
     uint32_t baseAddress;
+    uint32_t chip;              /*0 or 1 so we know the channel offset*/
     uint32_t readEnabledMask;
-    uint32_t adc[16];           /*spiData to SBC .. adcData upon return*/
+    uint32_t adc[8];           /*spiData to SBC .. adcData upon return*/
 }
 GRETINA4_PreAmpReadStruct;
 

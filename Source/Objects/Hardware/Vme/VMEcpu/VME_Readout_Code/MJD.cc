@@ -73,17 +73,21 @@ void readPreAmpAdcs(SBC_Packet* aPacket)
     if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
     
     uint32_t baseAddress = p->baseAddress;
+    uint32_t chip        = p->chip;
     
     uint32_t i;
-    for(i=0;i<16;i++){
+    for(i=0;i<8;i++){
+        uint32_t rawValue = 0;
         if(p->readEnabledMask & (0x1<<i)){
             //don't like it, but have to do this four times
-            p->adc[i] = writeAuxIOSPI(baseAddress,p->adc[i]);
-            p->adc[i] = writeAuxIOSPI(baseAddress,p->adc[i]);
-            p->adc[i] = writeAuxIOSPI(baseAddress,p->adc[i]);
-            p->adc[i] = writeAuxIOSPI(baseAddress,p->adc[i]);
+            rawValue = writeAuxIOSPI(baseAddress,p->adc[i]);
+            rawValue = writeAuxIOSPI(baseAddress,p->adc[i]);
+            rawValue = writeAuxIOSPI(baseAddress,p->adc[i]);
+            rawValue = writeAuxIOSPI(baseAddress,p->adc[i]);
         }
-        else p->adc[i]=0;
+        else rawValue=0;
+        p->adc[i] = rawValue;
+        
     }
     if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
     if (writeBuffer(aPacket) < 0) {

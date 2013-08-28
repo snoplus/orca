@@ -728,35 +728,41 @@ struct {
     }
     else {
         //if an SBC is available we pass the request to read the adcs
-        //to it. 
-        SBC_Packet aPacket;
-        aPacket.cmdHeader.destination	= kMJD;
-        aPacket.cmdHeader.cmdID			= kMJDReadPreamps;
-        aPacket.cmdHeader.numberBytesinPayload	= (16 + 2)*sizeof(long);
-        
-        GRETINA4_PreAmpReadStruct* p = (GRETINA4_PreAmpReadStruct*) aPacket.payload;
-        p->baseAddress      = [self baseAddress];
-        p->readEnabledMask  = adcEnabledMask;
-        for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
-            if(adcEnabledMask & (0x1<<chan)){
-                unsigned long controlWord = (kControlReg << 13)    |             //sel the chan set
-                                            ((chan%8)<<10)         |             //set chan
-                                            (0x1 << 4)             |             //use internal voltage reference for conversion
-                                            (mjdPreAmpTable[chan].mode << 8);    //set mode, other bits are zero
-                p->adc[chan] = mjdPreAmpTable[chan].adcSelection | (controlWord<<8);
-            }
-            else p->adc[chan] = 0;
-        }
-        @try {
-            [[[[self objectConnectedTo:MJDPreAmpInputConnector] adapter] sbcLink] send:&aPacket receive:&aPacket];
-            GRETINA4_PreAmpReadStruct* p = (GRETINA4_PreAmpReadStruct*) aPacket.payload;
-            for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
-                if(adcEnabledMask & (0x1<<chan))rawAdcValue[chan] = p->adc[chan];
-                else                            rawAdcValue[chan] = 0;
-            }
-        }
-        @catch(NSException* e){
+        //to it.
+        int chip;
+        for(chip=0;chip<2;chip++){
+            SBC_Packet aPacket;
+            aPacket.cmdHeader.destination	= kMJD;
+            aPacket.cmdHeader.cmdID			= kMJDReadPreamps;
+            aPacket.cmdHeader.numberBytesinPayload	= (8 + 2)*sizeof(long);
             
+            GRETINA4_PreAmpReadStruct* p = (GRETINA4_PreAmpReadStruct*) aPacket.payload;
+            p->baseAddress      = [self baseAddress];
+            p->chip             = chip;
+            p->readEnabledMask  = adcEnabledMask;
+            for(chan=0;chan<8;chan++){
+                int adcIndex = chan + (chip*8);
+                if(adcEnabledMask & (0x1<<adcIndex)){
+                    unsigned long controlWord = (kControlReg << 13)    |             //sel the chan set
+                                                (chan<<10)         |             //set chan
+                                                (0x1 << 4)             |             //use internal voltage reference for conversion
+                                                (mjdPreAmpTable[adcIndex].mode << 8);    //set mode, other bits are zero
+                    p->adc[adcIndex] = mjdPreAmpTable[adcIndex].adcSelection | (controlWord<<8);
+                }
+                else p->adc[adcIndex] = 0;
+            }
+            @try {
+                [[[[self objectConnectedTo:MJDPreAmpInputConnector] adapter] sbcLink] send:&aPacket receive:&aPacket];
+                GRETINA4_PreAmpReadStruct* p = (GRETINA4_PreAmpReadStruct*) aPacket.payload;
+                for(chan=0;chan<8;chan++){
+                    int adcIndex = chan + (chip*8);
+                   if(adcEnabledMask & (0x1<<adcIndex))rawAdcValue[adcIndex] = p->adc[adcIndex];
+                    else                               rawAdcValue[adcIndex] = 0;
+                }
+            }
+            @catch(NSException* e){
+                
+            }
         }
     }
 	for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
