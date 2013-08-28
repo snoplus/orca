@@ -63,47 +63,49 @@
 	
 	int i;
 	for(i=0;i<8;i++){
-		[[gtMatrix cellAtRow:i column:0] setTag:i];
-		[[triggerOutMatrix cellAtRow:i column:0] setTag:i];
+		[[gtMatrix              cellAtRow:i column:0] setTag:i];
+		[[triggerOutMatrix      cellAtRow:i column:0] setTag:i];
 		[[extendedTriggerMatrix cellAtRow:i column:0] setTag:i];
-		[[thresholdMatrix cellAtRow:i column:0] setTag:i];
-		[[sumGMatrix cellAtRow:i column:0] setTag:i];
-		[[peakingTimeMatrix cellAtRow:i column:0] setTag:i];
-		[[dacValueMatrix cellAtRow:i column:0] setTag:i];
+		[[thresholdMatrix       cellAtRow:i column:0] setTag:i];
+		[[sumGMatrix            cellAtRow:i column:0] setTag:i];
+		[[peakingTimeMatrix     cellAtRow:i column:0] setTag:i];
+		[[dacValueMatrix        cellAtRow:i column:0] setTag:i];
+		[[trigPulseLenMatrix    cellAtRow:i column:0] setTag:i];
 	}
 	
 	for(i=0;i<4;i++){
-		[[trigPulseLenMatrix            cellAtRow:i column:0] setTag:i];
         [[endAddressThresholdMatrix     cellAtRow:i column:0] setTag:i];
+        [[bufferStartMatrix             cellAtRow:i column:0] setTag:i];
+        [[bufferLengthMatrix            cellAtRow:i column:0] setTag:i];
+        
+        [[accGate1LengthMatrix          cellAtRow:i column:0] setTag:i];
+        [[accGate1StartIndexMatrix      cellAtRow:i column:0] setTag:i];
+        [[accGate2LengthMatrix          cellAtRow:i column:0] setTag:i];
+        [[accGate2StartIndexMatrix      cellAtRow:i column:0] setTag:i];
+        [[accGate3LengthMatrix          cellAtRow:i column:0] setTag:i];
+        [[accGate3StartIndexMatrix      cellAtRow:i column:0] setTag:i];
+        [[accGate4LengthMatrix          cellAtRow:i column:0] setTag:i];
+        [[accGate4StartIndexMatrix      cellAtRow:i column:0] setTag:i];
+        [[accGate5LengthMatrix          cellAtRow:i column:0] setTag:i];
+        [[accGate5StartIndexMatrix      cellAtRow:i column:0] setTag:i];
+        [[accGate6LengthMatrix          cellAtRow:i column:0] setTag:i];
+        [[accGate6StartIndexMatrix      cellAtRow:i column:0] setTag:i];
+        [[accGate7LengthMatrix          cellAtRow:i column:0] setTag:i];
+        [[accGate7StartIndexMatrix      cellAtRow:i column:0] setTag:i];
+        [[accGate8LengthMatrix          cellAtRow:i column:0] setTag:i];
+        [[accGate8StartIndexMatrix      cellAtRow:i column:0] setTag:i];
+
+    }
+    for(i=0;i<2;i++){
         [[invertInputMatrix             cellAtRow:i column:0] setTag:i];
         [[enableErrorCorrectionMatrix   cellAtRow:i column:0] setTag:i];
         [[saveAlwaysMatrix              cellAtRow:i column:0] setTag:i];
         [[saveIfPileUpMatrix            cellAtRow:i column:0] setTag:i];
         [[saveFIRTriggerMatrix          cellAtRow:i column:0] setTag:i];
         [[saveFirstEventMatrix          cellAtRow:i column:0] setTag:i];
-        [[bufferStartMatrix             cellAtRow:i column:0] setTag:i];
-        [[bufferLengthMatrix            cellAtRow:i column:0] setTag:i];
         [[triggerModeMatrix             cellAtRow:i column:0] setTag:i];
-        
-        [[accGate1LengthMatrix        cellAtRow:i column:0] setTag:i];
-        [[accGate1StartIndexMatrix      cellAtRow:i column:0] setTag:i];
-        [[accGate2LengthMatrix        cellAtRow:i column:0] setTag:i];
-        [[accGate2StartIndexMatrix      cellAtRow:i column:0] setTag:i];
-        [[accGate3LengthMatrix        cellAtRow:i column:0] setTag:i];
-        [[accGate3StartIndexMatrix      cellAtRow:i column:0] setTag:i];
-        [[accGate4LengthMatrix        cellAtRow:i column:0] setTag:i];
-        [[accGate4StartIndexMatrix      cellAtRow:i column:0] setTag:i];
-        [[accGate5LengthMatrix        cellAtRow:i column:0] setTag:i];
-        [[accGate5StartIndexMatrix      cellAtRow:i column:0] setTag:i];
-        [[accGate6LengthMatrix        cellAtRow:i column:0] setTag:i];
-        [[accGate6StartIndexMatrix      cellAtRow:i column:0] setTag:i];
-        [[accGate7LengthMatrix        cellAtRow:i column:0] setTag:i];
-        [[accGate7StartIndexMatrix      cellAtRow:i column:0] setTag:i];
-        [[accGate8LengthMatrix        cellAtRow:i column:0] setTag:i];
-        [[accGate8StartIndexMatrix      cellAtRow:i column:0] setTag:i];
-
     }
-    
+
     [rate0 setNumber:8 height:10 spacing:5];
 
 	[super awakeFromNib];
@@ -470,6 +472,7 @@
 			[[onlineMaskMatrix cellWithTag:i] setState:bitSet];
 		}
 	}
+    [self settingsLockChanged:aNotification];
 }
 
 - (void) accGate1StartIndexChanged:(NSNotification*)aNote
@@ -816,13 +819,14 @@
     BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
     [gSecurity setLock:ORSIS3320SettingsLock to:secure];
     [settingLockButton setEnabled:secure];
+
 }
 
 - (void) settingsLockChanged:(NSNotification*)aNotification
 {
-    BOOL runInProgress = [gOrcaGlobals runInProgress];
+    BOOL runInProgress              = [gOrcaGlobals runInProgress];
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORSIS3320SettingsLock];
-    BOOL locked = [gSecurity isLocked:ORSIS3320SettingsLock];
+    BOOL locked                     = [gSecurity isLocked:ORSIS3320SettingsLock];
     
     [settingLockButton			setState: locked];
     [onlineMaskMatrix           setEnabled:!lockedOrRunningMaintenance];
@@ -832,17 +836,60 @@
     [resetButton				setEnabled:!lockedOrRunningMaintenance];
     [triggerButton				setEnabled:!lockedOrRunningMaintenance];
     [clearTimeStampButton		setEnabled:!lockedOrRunningMaintenance];
-    [triggerModeMatrix          setEnabled:!lockedOrRunningMaintenance];
-    [enableErrorCorrectionMatrix setEnabled:!lockedOrRunningMaintenance];
- 	[saveAlwaysMatrix           setEnabled:!lockedOrRunningMaintenance];
-	[saveIfPileUpMatrix         setEnabled:!lockedOrRunningMaintenance];
-	[saveFIRTriggerMatrix       setEnabled:!lockedOrRunningMaintenance];
-	[saveFirstEventMatrix       setEnabled:!lockedOrRunningMaintenance];
-	[triggerGateLengthMatrix	setEnabled:!lockedOrRunningMaintenance];
-	[preTriggerDelayMatrix		setEnabled:!lockedOrRunningMaintenance];
-	[thresholdMatrix			setEnabled:!lockedOrRunningMaintenance];
-	[endAddressThresholdMatrix  setEnabled:!lockedOrRunningMaintenance];
 	[regDumpButton				setEnabled:!lockedOrRunningMaintenance];
+	[gtMatrix				    setEnabled:!lockedOrRunningMaintenance];
+    
+    int i;
+	for(i=0;i<8;i++){
+        BOOL chanEnabled = [model onlineMaskBit:i];
+		[[thresholdMatrix           cellAtRow:i column:0] setEnabled:!lockedOrRunningMaintenance & chanEnabled];
+		[[gtMatrix                  cellAtRow:i column:0] setEnabled:!lockedOrRunningMaintenance & chanEnabled];
+		[[triggerOutMatrix          cellAtRow:i column:0] setEnabled:!lockedOrRunningMaintenance & chanEnabled];
+		[[extendedTriggerMatrix     cellAtRow:i column:0] setEnabled:!lockedOrRunningMaintenance & chanEnabled];
+		[[sumGMatrix                cellAtRow:i column:0] setEnabled:!lockedOrRunningMaintenance & chanEnabled];
+		[[peakingTimeMatrix         cellAtRow:i column:0] setEnabled:!lockedOrRunningMaintenance & chanEnabled];
+		[[dacValueMatrix            cellAtRow:i column:0] setEnabled:!lockedOrRunningMaintenance & chanEnabled];
+		[[trigPulseLenMatrix        cellAtRow:i column:0] setEnabled:!lockedOrRunningMaintenance & chanEnabled];
+	}
+    for(i=0;i<4;i++){
+        BOOL groupEnabled = [model onlineMaskBit:i*2] || [model onlineMaskBit:i*2+1];
+        [[preTriggerDelayMatrix         cellAtRow:i column:0] setEnabled:!lockedOrRunningMaintenance & groupEnabled];
+        [[triggerGateLengthMatrix       cellAtRow:i column:0] setEnabled:!lockedOrRunningMaintenance & groupEnabled];
+        [[endAddressThresholdMatrix     cellAtRow:i column:0] setEnabled:!lockedOrRunningMaintenance & groupEnabled];
+        [[bufferStartMatrix             cellAtRow:i column:0] setEnabled:!lockedOrRunningMaintenance & groupEnabled];
+        [[bufferLengthMatrix            cellAtRow:i column:0] setEnabled:!lockedOrRunningMaintenance & groupEnabled];
+        
+        [[accGate1LengthMatrix          cellAtRow:i column:0] setEnabled:!lockedOrRunningMaintenance & groupEnabled];
+        [[accGate1StartIndexMatrix      cellAtRow:i column:0] setEnabled:!lockedOrRunningMaintenance & groupEnabled];
+        [[accGate2LengthMatrix          cellAtRow:i column:0] setEnabled:!lockedOrRunningMaintenance & groupEnabled];
+        [[accGate2StartIndexMatrix      cellAtRow:i column:0] setEnabled:!lockedOrRunningMaintenance & groupEnabled];
+        [[accGate3LengthMatrix          cellAtRow:i column:0] setEnabled:!lockedOrRunningMaintenance & groupEnabled];
+        [[accGate3StartIndexMatrix      cellAtRow:i column:0] setEnabled:!lockedOrRunningMaintenance & groupEnabled];
+        [[accGate4LengthMatrix          cellAtRow:i column:0] setEnabled:!lockedOrRunningMaintenance & groupEnabled];
+        [[accGate4StartIndexMatrix      cellAtRow:i column:0] setEnabled:!lockedOrRunningMaintenance & groupEnabled];
+        [[accGate5LengthMatrix          cellAtRow:i column:0] setEnabled:!lockedOrRunningMaintenance & groupEnabled];
+        [[accGate5StartIndexMatrix      cellAtRow:i column:0] setEnabled:!lockedOrRunningMaintenance & groupEnabled];
+        [[accGate6LengthMatrix          cellAtRow:i column:0] setEnabled:!lockedOrRunningMaintenance & groupEnabled];
+        [[accGate6StartIndexMatrix      cellAtRow:i column:0] setEnabled:!lockedOrRunningMaintenance & groupEnabled];
+        [[accGate7LengthMatrix          cellAtRow:i column:0] setEnabled:!lockedOrRunningMaintenance & groupEnabled];
+        [[accGate7StartIndexMatrix      cellAtRow:i column:0] setEnabled:!lockedOrRunningMaintenance & groupEnabled];
+        [[accGate8LengthMatrix          cellAtRow:i column:0] setEnabled:!lockedOrRunningMaintenance & groupEnabled];
+        [[accGate8StartIndexMatrix      cellAtRow:i column:0] setEnabled:!lockedOrRunningMaintenance & groupEnabled];
+    }
+    
+    for(i=0;i<2;i++){
+        
+        BOOL groupEnabled = [model onlineMaskBit:i*2] || [model onlineMaskBit:i*2+1] || [model onlineMaskBit:i*2+2] || [model onlineMaskBit:i*2+3];
+
+        [[invertInputMatrix             cellAtRow:i column:0] setEnabled:!lockedOrRunningMaintenance & groupEnabled];
+        [[enableErrorCorrectionMatrix   cellAtRow:i column:0] setEnabled:!lockedOrRunningMaintenance & groupEnabled];
+        [[saveAlwaysMatrix              cellAtRow:i column:0] setEnabled:!lockedOrRunningMaintenance & groupEnabled];
+        [[saveIfPileUpMatrix            cellAtRow:i column:0] setEnabled:!lockedOrRunningMaintenance & groupEnabled];
+        [[saveFIRTriggerMatrix          cellAtRow:i column:0] setEnabled:!lockedOrRunningMaintenance & groupEnabled];
+        [[saveFirstEventMatrix          cellAtRow:i column:0] setEnabled:!lockedOrRunningMaintenance & groupEnabled];
+        [[triggerModeMatrix             cellAtRow:i column:0] setEnabled:!lockedOrRunningMaintenance & groupEnabled];
+    }
+
 }
 
 - (void) setModel:(id)aModel

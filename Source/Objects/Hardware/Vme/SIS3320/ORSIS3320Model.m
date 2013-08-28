@@ -544,7 +544,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 
 - (BOOL)onlineMaskBit:(int)bit
 {
-	return onlineMask&(1<<bit);
+	return (onlineMask>>bit)&0x1;
 }
 
 - (void) setOnlineMaskBit:(int)bit withValue:(BOOL)aValue
