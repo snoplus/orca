@@ -743,7 +743,7 @@ struct {
                                             ((chan%8)<<10)         |            //set chan
                                             (0x1 << 4)             |            //use internal voltage reference for conversion
                                             (mjdPreAmpTable[chan].mode << 8);    //set mode, other bits are zero
-                payloadPtr[2+chan] = controlWord;
+                payloadPtr[2+chan] = mjdPreAmpTable[chan].adcSelection | (controlWord<<8);
             }
             else payloadPtr[2+chan] = 0;
         }
