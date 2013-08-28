@@ -778,15 +778,15 @@ struct {
             
             long adcValue;
             if(mjdPreAmpTable[chan].conversionType == kTwosComplement){
-			   if(rawAdcValue[chan] & 0x1000)adcValue = (~rawAdcValue[chan] & 0x1FFF) + 1;
-			   else                          adcValue = -rawAdcValue[chan] & 0x1FFF;
+			   if(rawAdcValue[chan] & 0x1000)adcValue = -(~rawAdcValue[chan] & 0x1FFF) + 1;
+			   else                          adcValue = rawAdcValue[chan] & 0x1FFF;
 			}
 			else {
 				adcValue = rawAdcValue[chan] & 0x1FFF;
 			}
             //adcValue += mjdPreAmpTable[chan].adcOffset;
             
-            float convertedValue = adcValue*mjdPreAmpTable[chan].slope + mjdPreAmpTable[chan].intercept;
+            float convertedValue = -adcValue*mjdPreAmpTable[chan].slope + mjdPreAmpTable[chan].intercept;
             
 			if(verbose)NSLog(@"%d: %.2f (0x%08x)\n",chan,convertedValue,rawAdcValue[chan]&0x1FFF);
             
