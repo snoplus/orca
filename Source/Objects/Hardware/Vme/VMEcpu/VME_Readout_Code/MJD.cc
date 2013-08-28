@@ -78,7 +78,7 @@ void readPreAmpAdcs(SBC_Packet* aPacket)
     uint32_t i;
     for(i=0;i<8;i++){
         uint32_t rawValue = 0;
-        if(p->readEnabledMask & (0x1<<i)){
+        if(p->readEnabledMask & (0x1<<(i+(chip*8)))){
             //don't like it, but have to do this four times
             rawValue = writeAuxIOSPI(baseAddress,p->adc[i]);
             rawValue = writeAuxIOSPI(baseAddress,p->adc[i]);
