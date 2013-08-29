@@ -347,6 +347,11 @@
 						 name : ORMJDPreAmpModelDetectorNameChanged
 					   object : nil];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(useSBCChanged:)
+                         name : ORMJDPreAmpModelUseSBCChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -371,9 +376,15 @@
 	[self baselineVoltageArrayChanged:nil];
 	[self feedbackResistorArrayChanged:nil];
 	[self detectorNameChanged:nil];
+	[self useSBCChanged:nil];
 }
 
 #pragma mark ¥¥¥Interface Management
+
+- (void) useSBCChanged:(NSNotification*)aNote
+{
+	[useSBCCB setIntValue: [model useSBC]];
+}
 
 - (void) scaleAction:(NSNotification*)aNotification
 {
@@ -688,6 +699,11 @@
 }
 
 #pragma mark ¥¥¥Actions
+
+- (void) useSBCAction:(id)sender
+{
+	[model setUseSBC:[sender intValue]];
+}
 - (void) adcEnabledMaskAction:(id)sender
 {
 	unsigned short mask = 0;

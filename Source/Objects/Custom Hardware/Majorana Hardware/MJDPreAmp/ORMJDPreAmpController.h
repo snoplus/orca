@@ -23,6 +23,7 @@
 {
     @private
 		IBOutlet NSButton*		settingsLockButton;
+        IBOutlet NSButton*      useSBCCB;
 		IBOutlet NSMatrix*		adcEnabledMaskMatrix;
 		IBOutlet NSButton*		shipValuesCB;
 		IBOutlet NSPopUpButton* pollTimePU;
@@ -66,6 +67,7 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ¥¥¥Interface Management
+- (void) useSBCChanged:(NSNotification*)aNote;
 - (void) updateTimePlot:(NSNotification*)aNotification;
 - (void) scaleAction:(NSNotification*)aNotification;
 - (void) adcEnabledMaskChanged:(NSNotification*)aNote;
@@ -102,6 +104,7 @@
 - (NSString*) adcName:(int)adcIndex;
 
 #pragma mark ¥¥¥Actions
+- (IBAction) useSBCAction:(id)sender;
 - (IBAction) detectorNameAction:(id)sender;
 - (IBAction) adcEnabledMaskAction:(id)sender;
 - (IBAction) pollNowAction:(id)sender;

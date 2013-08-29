@@ -57,11 +57,14 @@
     ORAlarm*		adcAlarm[kMJDPreAmpAdcChannels];
     BOOL            rangesHaveBeenSet;
     NSDate*         lastDataBaseUpdate;
+    BOOL            useSBC;
 }
 
 - (void) setUpArrays;
 
 #pragma mark ¥¥¥Accessors
+- (BOOL) useSBC;
+- (void) setUseSBC:(BOOL)aUseSBC;
 - (NSString*) detectorName:(int)i;
 - (void) setDetector:(int)i name:(NSString*)aName;
 - (NSMutableArray*) feedBackResistors;
@@ -146,6 +149,7 @@
 @end
 
 #pragma mark ¥¥¥External Strings
+extern NSString* ORMJDPreAmpModelUseSBCChanged;
 extern NSString* ORMJDPreAmpModelAdcEnabledMaskChanged;
 extern NSString*  ORMJDPreAmpModelPollTimeChanged;
 extern NSString* ORMJDPreAmpModelShipValuesChanged;

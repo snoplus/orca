@@ -25,6 +25,7 @@
 #import "ORAlarm.h"
 
 #pragma mark ¥¥¥Notification Strings
+NSString* ORMJDPreAmpModelUseSBCChanged = @"ORMJDPreAmpModelUseSBCChanged";
 NSString* ORMJDPreAmpModelAdcEnabledMaskChanged = @"ORMJDPreAmpModelAdcEnabledMaskChanged";
 NSString* ORMJDPreAmpModelPollTimeChanged	= @"ORMJDPreAmpModelPollTimeChanged";
 NSString* ORMJDPreAmpModelShipValuesChanged = @"ORMJDPreAmpModelShipValuesChanged";
@@ -225,6 +226,20 @@ struct {
 }
 
 #pragma mark ¥¥¥Accessors
+
+- (BOOL) useSBC
+{
+    return useSBC;
+}
+
+- (void) setUseSBC:(BOOL)aUseSBC
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setUseSBC:useSBC];
+    
+    useSBC = aUseSBC;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpModelUseSBCChanged object:self];
+}
 - (NSString*) detectorName:(int)i
 {
     if(i>=0 && i<kMJDPreAmpAdcChannels){
@@ -714,26 +729,7 @@ struct {
     if(!rangesHaveBeenSet)[self writeAdcRanges];
     unsigned long rawAdcValue[16];
     int chan;
-	if(![self controllerIsSBC]){
-        for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
-            if(adcEnabledMask & (0x1<<chan)){
-                unsigned long controlWord = (kControlReg << 13)    |            //sel the chan set
-                                            ((chan%8)<<10)         |            //set chan
-				       (mjdPreAmpTable[chan].conversionType << 5)   |  
-                                            (0x1 << 4)             |            //use internal voltage reference for conversion
-                                            (mjdPreAmpTable[chan].mode << 8);    //set mode, other bits are zero
-                
-                //-------------------------------------------------------
-                //don't like the following where we have to read four times, but seems we have no choice
-                rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
-                rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
-                rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
-                rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
-                //-------------------------------------------------------
-            }
-        }
-    }
-    else {
+	if([self controllerIsSBC] && useSBC ){
         //if an SBC is available we pass the request to read the adcs
         //to it.
         int chip;
@@ -751,10 +747,10 @@ struct {
                 int adcIndex = chan + (chip*8);
                 if(adcEnabledMask & (0x1<<adcIndex)){
                     unsigned long controlWord = (kControlReg << 13)    |             //sel the chan set
-                                                (chan<<10)         |             //set chan
-                                                (0x1 << 4)             |             //use internal voltage reference for conversion
-												(mjdPreAmpTable[chan].conversionType << 5)   |  
-												(mjdPreAmpTable[adcIndex].mode << 8);    //set mode, other bits are zero
+                    (chan<<10)         |             //set chan
+                    (0x1 << 4)             |             //use internal voltage reference for conversion
+                    (mjdPreAmpTable[chan].conversionType << 5)   |
+                    (mjdPreAmpTable[adcIndex].mode << 8);    //set mode, other bits are zero
                     p->adc[chan] = mjdPreAmpTable[adcIndex].adcSelection | (controlWord<<8);
                 }
                 else p->adc[chan] = 0;
@@ -764,7 +760,7 @@ struct {
                 GRETINA4_PreAmpReadStruct* p = (GRETINA4_PreAmpReadStruct*) aPacket.payload;
                 for(chan=0;chan<8;chan++){
                     int adcIndex = chan + (chip*8);
-                   if(adcEnabledMask & (0x1<<adcIndex))rawAdcValue[adcIndex] = p->adc[chan];
+                    if(adcEnabledMask & (0x1<<adcIndex))rawAdcValue[adcIndex] = p->adc[chan];
                     else                               rawAdcValue[adcIndex] = 0;
                 }
             }
@@ -772,6 +768,27 @@ struct {
                 
             }
         }
+
+    }
+    else {
+        for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
+            if(adcEnabledMask & (0x1<<chan)){
+                unsigned long controlWord = (kControlReg << 13)    |            //sel the chan set
+                ((chan%8)<<10)         |            //set chan
+                (mjdPreAmpTable[chan].conversionType << 5)   |
+                (0x1 << 4)             |            //use internal voltage reference for conversion
+                (mjdPreAmpTable[chan].mode << 8);    //set mode, other bits are zero
+                
+                //-------------------------------------------------------
+                //don't like the following where we have to read four times, but seems we have no choice
+                rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                //-------------------------------------------------------
+            }
+        }
+
     }
 	for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
 		if(adcEnabledMask & (0x1<<chan)){
@@ -909,6 +926,7 @@ struct {
     self = [super initWithCoder:decoder];
 	
     [[self undoManager] disableUndoRegistration];
+    [self setUseSBC:[decoder decodeBoolForKey:@"useSBC"]];
     [self setAdcEnabledMask:[decoder decodeInt32ForKey:@"adcEnabledMask"]];
     [self setShipValues:	[decoder decodeBoolForKey: @"shipValues"]];
 	[self setPollTime:		[decoder decodeIntForKey:  @"pollTime"]];
@@ -942,6 +960,7 @@ struct {
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+	[encoder encodeBool:useSBC forKey:@"useSBC"];
 	[encoder encodeInt32:adcEnabledMask forKey:@"adcEnabledMask"];
 	[encoder encodeBool:shipValues		forKey:@"shipValues"];
 	[encoder encodeInt:pollTime			forKey:@"pollTime"];
