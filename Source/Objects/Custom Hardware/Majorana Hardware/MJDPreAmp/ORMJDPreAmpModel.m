@@ -102,8 +102,7 @@ struct {
     {kADC1,YES, 4, kSingleEnded, kTwosComplement,2*20/8192., 0, 0},   //0,4
     {kADC1,NO, -1, kSingleEnded, kTwosComplement,2*20/8192., 0, 0},   //0,5
     {kADC1,NO, -1, kSingleEnded, kTwosComplement,2*20/8192., 0, 0},   //0,6
-    //{kADC1,NO, -1, kPseudoDiff,  kTwosComplement,  1, 0, 0},//0,7 <<-- temperary no conversion to see the raw adc value
-    {kADC1,NO, -1, kPseudoDiff,  kTwosComplement,-0.47,2498, 4096},//0,7
+    {kADC1,NO, -1, kPseudoDiff,  kTwosComplement,-0.47,2498, 4096},	  //0,7
     {kADC2,YES, 5, kSingleEnded, kTwosComplement,2*20/8192., 0, 0},   //1,0
     {kADC2,YES, 6, kSingleEnded, kTwosComplement,2*20/8192., 0, 0},   //1,1
     {kADC2,YES, 7, kSingleEnded, kTwosComplement,2*20/8192., 0, 0},   //1,2
@@ -111,8 +110,7 @@ struct {
     {kADC2,YES, 9, kSingleEnded, kTwosComplement,2*20/8192., 0, 0},   //1,4
     {kADC2,NO, -1, kSingleEnded, kTwosComplement,4*20/8192., 0, 0},   //1,5
     {kADC2,NO, -1, kSingleEnded, kTwosComplement,4*20/8192., 0, 0},   //1,6
-    {kADC2,NO, -1, kPseudoDiff,  kTwosComplement,-0.47,2498, 4096}//1,7
-	//{kADC2,NO, -1, kPseudoDiff,  kTwosComplement, 1,  0, 0}
+    {kADC2,NO, -1, kPseudoDiff,  kTwosComplement,-0.47,2498, 4096}	  //1,7
 };
 
 #pragma mark ¥¥¥Private Implementation
@@ -714,7 +712,6 @@ struct {
                     (kBipolar10V     << 9)   |        //chan 5
                     (kBipolar10V     << 7)   |        //chan 6
                     (kBipolar2_5V    << 5);           //chan 7 -- temperature
-					//(kBipolar10V    << 5);           //chan 7 -- temperature
     [self writeAuxIOSPI:kADC1 | (controlWord<<8)];    //shift to bit 8 + add the adc sel
     [self writeAuxIOSPI:kADC2 | (controlWord<<8)];    //shift to bit 8 + add the adc sel
 }
@@ -737,7 +734,7 @@ struct {
             SBC_Packet aPacket;
             aPacket.cmdHeader.destination	= kMJD;
             aPacket.cmdHeader.cmdID			= kMJDReadPreamps;
-            aPacket.cmdHeader.numberBytesinPayload	= (8 + 2)*sizeof(long);
+            aPacket.cmdHeader.numberBytesinPayload	= (8 + 3)*sizeof(long);
             
             GRETINA4_PreAmpReadStruct* p = (GRETINA4_PreAmpReadStruct*) aPacket.payload;
             p->baseAddress      = [self baseAddress];
@@ -747,11 +744,11 @@ struct {
                 int adcIndex = chan + (chip*8);
                 if(adcEnabledMask & (0x1<<adcIndex)){
                     unsigned long controlWord = (kControlReg << 13)    |             //sel the chan set
-                    (chan<<10)         |             //set chan
-                    (0x1 << 4)             |             //use internal voltage reference for conversion
-                    (mjdPreAmpTable[chan].conversionType << 5)   |
-                    (mjdPreAmpTable[adcIndex].mode << 8);    //set mode, other bits are zero
-                    p->adc[chan] = mjdPreAmpTable[adcIndex].adcSelection | (controlWord<<8);
+												(chan<<10)         |             //set chan
+												(0x1 << 4)             |             //use internal voltage reference for conversion
+												(mjdPreAmpTable[adcIndex].conversionType << 5)   |
+												(mjdPreAmpTable[adcIndex].mode << 8);    //set mode, other bits are zero
+                    p->adc[chan] = (mjdPreAmpTable[adcIndex].adcSelection | (controlWord<<8));
                 }
                 else p->adc[chan] = 0;
             }
@@ -774,10 +771,10 @@ struct {
         for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
             if(adcEnabledMask & (0x1<<chan)){
                 unsigned long controlWord = (kControlReg << 13)    |            //sel the chan set
-                ((chan%8)<<10)         |            //set chan
-                (mjdPreAmpTable[chan].conversionType << 5)   |
-                (0x1 << 4)             |            //use internal voltage reference for conversion
-                (mjdPreAmpTable[chan].mode << 8);    //set mode, other bits are zero
+											((chan%8)<<10)         |            //set chan
+											(mjdPreAmpTable[chan].conversionType << 5)   |
+											(0x1 << 4)             |            //use internal voltage reference for conversion
+											(mjdPreAmpTable[chan].mode << 8);    //set mode, other bits are zero
                 
                 //-------------------------------------------------------
                 //don't like the following where we have to read four times, but seems we have no choice

@@ -82,8 +82,8 @@ void readPreAmpAdcs(SBC_Packet* aPacket)
             //don't like it, but have to do this four times
             rawValue = writeAuxIOSPI(baseAddress,p->adc[i]);
             rawValue = writeAuxIOSPI(baseAddress,p->adc[i]);
-            rawValue = writeAuxIOSPI(baseAddress,p->adc[i]);
-            rawValue = writeAuxIOSPI(baseAddress,p->adc[i]);
+			rawValue = writeAuxIOSPI(baseAddress,p->adc[i]);
+			rawValue = writeAuxIOSPI(baseAddress,p->adc[i]);
         }
         else rawValue=0;
         p->adc[i] = rawValue;
@@ -107,18 +107,16 @@ uint32_t writeAuxIOSPI(uint32_t baseAddress,uint32_t spiData)
     if(device!=0){
         
         uint32_t auxIORead   = /*baseAddress +*/ 0x800;
-        uint32_t auxIOWrite  = /*baseAddress +*/  0x804;
-        uint32_t auxIOConfig = /*baseAddress +*/  0x808;
+        uint32_t auxIOWrite  = /*baseAddress +*/ 0x804;
+        uint32_t auxIOConfig = /*baseAddress +*/ 0x808;
         
         // Set AuxIO to mode 3 and set bits 0-3 to OUT (bit 0 is under FPGA control)
         uint32_t valueToWrite = 0x3025;
-        printf("write 0x%08x to 0x%08x\n",0x3025,auxIOConfig);
         write_device(device, (char*)(&valueToWrite), 4, auxIOConfig);
 
         // Read kAuxIOWrite to preserve bit 0, and zero bits used in SPI protocol
         uint32_t spiBase;
-        printf("read 0x%08x\n",auxIOWrite);
-       read_device(device,(char*)(&spiBase),4,auxIOWrite);
+		read_device(device,(char*)(&spiBase),4,auxIOWrite);
         
         spiBase = spiBase & ~(kSPIData | kSPIClock | kSPIChipSelect);
         
@@ -126,8 +124,7 @@ uint32_t writeAuxIOSPI(uint32_t baseAddress,uint32_t spiData)
         
         // set kSPIChipSelect to signify that we are starting
         valueToWrite = kSPIChipSelect | kSPIClock | kSPIData;
-        printf("write 0x%08x to 0x%08x\n",valueToWrite,auxIOWrite);
-       write_device(device, (char*)(&valueToWrite), 4, auxIOWrite);
+		write_device(device, (char*)(&valueToWrite), 4, auxIOWrite);
         
         // now write spiData starting from MSB on kSPIData, pulsing kSPIClock
         // each iteration
@@ -137,12 +134,9 @@ uint32_t writeAuxIOSPI(uint32_t baseAddress,uint32_t spiData)
             if( (spiData & 0x80000000) != 0) rawValueToWrite &= (~kSPIData);
             //toggle the kSPIClock bit
             valueToWrite = rawValueToWrite | kSPIClock;
-            printf("write 0x%08x to 0x%08x\n",valueToWrite,auxIOWrite);
             write_device(device, (char*)(&valueToWrite), 4, auxIOWrite);
-            printf("write 0x%08x to 0x%08x\n",rawValueToWrite,auxIOWrite);
-           write_device(device, (char*)(&rawValueToWrite), 4, auxIOWrite);
+            write_device(device, (char*)(&rawValueToWrite), 4, auxIOWrite);
             
-            printf("read 0x%08x\n",auxIORead);
             read_device(device,(char*)(&valueRead),4,auxIORead);
            
             readBack |= ((valueRead & kSPIRead) > 0) << (31-i);
@@ -150,7 +144,6 @@ uint32_t writeAuxIOSPI(uint32_t baseAddress,uint32_t spiData)
         }
         // unset kSPIChipSelect to signify that we are done
         valueToWrite = kSPIClock | kSPIData;
-        printf("write 0x%08x to 0x%08x\n",valueToWrite,auxIOWrite);
         write_device(device, (char*)(&valueToWrite), 4, auxIOWrite);
         close_device(device);
     }
