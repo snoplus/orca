@@ -23,6 +23,7 @@
 #import "XL3_Cmds.h"
 #import "ORDataTaker.h"
 #import "VME_eCPU_Config.h"
+#import "SNOPModel.h"
 
 typedef struct  {
 	NSString*	regName;
@@ -50,6 +51,7 @@ enum {
 @class XL3_Link;
 @class ORCommandList;
 @class ORCouchDB;
+
 
 @interface ORXL3Model : ORSNOCard <ORDataTaker>
 {
@@ -126,6 +128,7 @@ enum {
     BOOL _isXl3VltThresholdInInit;
     int _xl3LinkTimeOut;
     BOOL _xl3InitInProgress;
+    id <snotDbDelegate> _snotDb;
     
     mb_t safe_bundle[16];
     mb_t ecal_bundle[16];
@@ -190,6 +193,8 @@ enum {
 @property (nonatomic,assign) BOOL xl3InitInProgress;
 @property (assign) unsigned long ecal_received; //set accross multiple threads
 @property (nonatomic,assign) bool ecalToOrcaInProgress;
+@property (weak) id snotDb;
+
 
 #pragma mark •••Initialization
 - (id)   init;

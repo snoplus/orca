@@ -123,7 +123,9 @@ xl3LinkTimeOut = _xl3LinkTimeOut,
 xl3InitInProgress = _xl3InitInProgress,
 ecal_received = _ecal_received,
 ecalToOrcaInProgress = _ecalToOrcaInProgress,
-isTriggerON = _isTriggerON;
+isTriggerON = _isTriggerON,
+snotDb = _snotDb;
+
 
 #pragma mark •••Initialization
 - (id) init

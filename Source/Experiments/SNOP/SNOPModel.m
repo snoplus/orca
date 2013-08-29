@@ -35,15 +35,17 @@ static NSString* SNOPDbConnector	= @"SNOPDbConnector";
 NSString* ORSNOPModelOrcaDBIPAddressChanged = @"ORSNOPModelOrcaDBIPAddressChanged";
 NSString* ORSNOPModelDebugDBIPAddressChanged = @"ORSNOPModelDebugDBIPAddressChanged";
 
-#define kMorcaDocumentAdded     @"kMorcaDocumentAdded"
-#define kMorcaDocumentGot       @"kMorcaDocumentGot"
-#define kMorcaCrateDocGot       @"kMorcaCrateDocGot"
-#define kMorcaCrateDocUpdated   @"kMorcaCrateDocUpdated"
+#define kOrcaRunDocumentAdded   @"kOrcaRunDocumentAdded"
+#define kOrcaRunDocumentUpdated @"kOrcaRunDocumentUpdated"
+
 #define kMorcaCompactDB         @"kMorcaCompactDB"
 
 @interface SNOPModel (private)
 - (void) morcaUpdateDBDict;
 - (void) morcaUpdatePushDocs:(unsigned int) crate;
+- (NSString*) stringDateFromDate:(NSDate*)aDate;
+- (void) _runDocumentWorker;
+- (void) _runEndDocumentWorker:(NSDictionary*)runDoc;
 @end
 
 @implementation SNOPModel
@@ -64,7 +66,9 @@ debugDBConnectionHistory = _debugDBConnectionHistory,
 debugDBIPNumberIndex = _debugDBIPNumberIndex,
 debugDBPingTask = _debugDBPingTask,
 epedDataId = _epedDataId,
-rhdrDataId = _rhdrDataId;
+rhdrDataId = _rhdrDataId,
+runDocument = _runDocument;
+
 
 #pragma mark ¥¥¥Initialization
 
@@ -191,14 +195,19 @@ rhdrDataId = _rhdrDataId;
 
 - (void) runStarted:(NSNotification*)aNote
 {
-    //orcadb run document
+    self.runDocument = nil;
+    [NSThread detachNewThreadSelector:@selector(_runDocumentWorker) toTarget:self withObject:nil];
+
     [self updateRHDRSruct];
     [self shipRHDRRecord];
 }
 
 - (void) runStopped:(NSNotification*)aNote
 {
-    //orcadb run document update
+    [NSThread detachNewThreadSelector:@selector(_runEndDocumentWorker:)
+                             toTarget:self
+                           withObject:[[self.runDocument copy] autorelease]];
+    self.runDocument = nil;
 }
 
 // orca script helper (will come from DB)
@@ -454,89 +463,75 @@ rhdrDataId = _rhdrDataId;
 	}
 }
 
-- (ORCouchDB*) orcaDBRef
-{
-	return [ORCouchDB couchHost:[self orcaDBIPAddress] port:self.orcaDBPort username:self.orcaDBUserName
-                            pwd:self.orcaDBPassword database:self.orcaDBName delegate:self];
-}
-
 - (void) orcaUpdateDB {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(orcaUpdateDB) object:nil];
     //[self orcaUpdateDBDict];
     //[self performSelector:@selector(morcaUpdatePushDocs) withObject:nil afterDelay:0.2];
 }
 
-- (void) morcaCompactDB {
-//    [[self morcaDBRef] compactDatabase:self tag:kMorcaCompactDB];
-}
-
 - (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp
 {
-	@synchronized(self){
-		if([aResult isKindOfClass:[NSDictionary class]]){
+	@synchronized(self) {
+    if ([aResult isKindOfClass:[NSDictionary class]]) {
+        NSString* message = [aResult objectForKey:@"Message"];
+        if (message) {
             /*
-			NSString* message = [aResult objectForKey:@"Message"];
-			if(message){
-				if([aTag isEqualToString:kMorcaCrateDocGot]){
-					NSLog(@"CouchDB Message getting a crate doc:");
-				}
-				[aResult prettyPrint:@"CouchDB Message:"];
-			}
-			else {
-				if([aTag isEqualToString:kMorcaDocumentAdded]){
-                    if ([self morcaIsVerbose]) {
-                        [aResult prettyPrint:@"CouchDB push doc to DB"];
-                    }
-					//ignore
-				}
-				else if([aTag isEqualToString:kMorcaDocumentGot]){
-					//[aResult prettyPrint:@"CouchDB Sent Doc:"];
-				}
-				else if([aTag rangeOfString:kMorcaCrateDocGot].location != NSNotFound){
-                    //int key = [[[aResult objectForKey:@"rows"] objectAtIndex:0] objectForKey:@"key"];
-                    if ([[aResult objectForKey:@"rows"] count] && [[[aResult objectForKey:@"rows"] objectAtIndex:0] objectForKey:@"key"]){
-                        [morcaDBDict setObject:[[[aResult objectForKey:@"rows"] objectAtIndex:0] objectForKey:@"doc"]
-                            forKey:[[[[aResult objectForKey:@"rows"] objectAtIndex:0] objectForKey:@"key"] stringValue]];
-                    }
-                    else {
-                        [morcaDBDict removeObjectForKey:[[aTag componentsSeparatedByString:@"."] objectAtIndex:1]];
-                    }
-                    if ([self morcaIsVerbose]) {
-                        [aResult prettyPrint:@"CouchDB pull doc from DB"];
-                    }
-                    [self morcaUpdatePushDocs:[[[aTag componentsSeparatedByString:@"."] objectAtIndex:1] intValue]];
-				}
-                else if([aTag isEqualToString:kMorcaCrateDocUpdated]){
-                    if ([self morcaIsVerbose]) {                    
-                        [aResult prettyPrint:@"CouchDB Compacted:"];
-                    }
-				}
-                else if([aTag isEqualToString:kMorcaCompactDB]){
-                    if ([self morcaIsVerbose]) {                    
-                        [aResult prettyPrint:@"CouchDB Compacted:"];
-                    }
-				}
-				else if([aTag isEqualToString:@"Message"]){
-					[aResult prettyPrint:@"CouchDB Message:"];
-				}
-				else {
-					[aResult prettyPrint:@"CouchDB"];
-				}
-			}
-            */
-		}
-		else if([aResult isKindOfClass:[NSArray class]]){
-            /*
-			if([aTag isEqualToString:kListDB]){
-				[aResult prettyPrint:@"CouchDB List:"];
-			else [aResult prettyPrint:@"CouchDB"];
+            if([aTag isEqualToString:kMorcaCrateDocGot]){
+                NSLog(@"CouchDB Message getting a crate doc:");
+            }
              */
+            [aResult prettyPrint:@"CouchDB Message:"];
+            return;
+        }
+
+        if ([aTag isEqualToString:kOrcaRunDocumentAdded]) {
+            NSMutableDictionary* runDoc = [[[self runDocument] mutableCopy] autorelease];
+            [runDoc setObject:[aResult objectForKey:@"id"] forKey:@"_id"];
+            //[runDoc setObject:[aResult objectForKey:@"rev"] forKey:@"_rev"];
+            //[runDoc setObject:[aResult objectForKey:@"ok"] forKey:@"ok"];
+            self.runDocument = runDoc;
+            //[aResult prettyPrint:@"CouchDB Ack Doc:"];
+        }
+        else if ([aTag isEqualToString:kOrcaRunDocumentUpdated]) {
+            //there was error
+            //[aResult prettyPrint:@"couchdb update doc:"];
+        }
+        /*
+        else if([aTag rangeOfString:kMorcaCrateDocGot].location != NSNotFound){
+            //int key = [[[aResult objectForKey:@"rows"] objectAtIndex:0] objectForKey:@"key"];
+            if ([[aResult objectForKey:@"rows"] count] && [[[aResult objectForKey:@"rows"] objectAtIndex:0] objectForKey:@"key"]){
+                [morcaDBDict setObject:[[[aResult objectForKey:@"rows"] objectAtIndex:0] objectForKey:@"doc"]
+                    forKey:[[[[aResult objectForKey:@"rows"] objectAtIndex:0] objectForKey:@"key"] stringValue]];
+            }
+            else {
+                [morcaDBDict removeObjectForKey:[[aTag componentsSeparatedByString:@"."] objectAtIndex:1]];
+            }
+            if ([self morcaIsVerbose]) {
+                [aResult prettyPrint:@"CouchDB pull doc from DB"];
+            }
+            [self morcaUpdatePushDocs:[[[aTag componentsSeparatedByString:@"."] objectAtIndex:1] intValue]];
+        }
+         */
+        else if ([aTag isEqualToString:@"Message"]) {
+            [aResult prettyPrint:@"CouchDB Message:"];
+        }
+        else {
             [aResult prettyPrint:@"CouchDB"];
-		}
-		else {
-			NSLog(@"%@\n",aResult);
-		}
-	}
+        }
+    }
+    else if ([aResult isKindOfClass:[NSArray class]]) {
+        /*
+        if([aTag isEqualToString:kListDB]){
+            [aResult prettyPrint:@"CouchDB List:"];
+        else [aResult prettyPrint:@"CouchDB"];
+         */
+        [aResult prettyPrint:@"CouchDB"];
+    }
+    else {
+        NSLog(@"%@\n",aResult);
+    }
+
+	} // synchronized
 }
 
 
@@ -723,6 +718,32 @@ rhdrDataId = _rhdrDataId;
 }
 
 
+#pragma mark ¥¥¥SnotDbDelegate
+
+- (ORCouchDB*) orcaDbRef:(id)aCouchDelegate
+{
+    ORCouchDB* result = [ORCouchDB couchHost:self.orcaDBIPAddress
+                                        port:self.orcaDBPort
+                                    username:self.orcaDBUserName
+                                         pwd:self.orcaDBPassword
+                                    database:self.orcaDBName
+                                    delegate:self];
+
+    if (aCouchDelegate)
+        [result setDelegate:aCouchDelegate];
+    
+    return [[result retain] autorelease];
+}
+
+- (ORCouchDB*) debugDbRef:(id)aCouchDelegate
+{
+    return nil;
+}
+
+
+#pragma mark ¥¥¥OrcaScript helpers
+
+
 - (void) zeroPedestalMasks
 {
     [[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")]
@@ -742,6 +763,115 @@ rhdrDataId = _rhdrDataId;
 @end
 
 @implementation SNOPModel (private)
+
+- (NSString*) stringDateFromDate:(NSDate*)aDate
+{
+    NSDateFormatter* snotDateFormatter = [[NSDateFormatter alloc] init];
+    [snotDateFormatter setDateFormat:@"yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'SS'Z'"];
+    snotDateFormatter.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
+    NSDate* strDate;
+    if (!aDate)
+        strDate = [NSDate date];
+    else
+        strDate = aDate;
+    NSString* result = [snotDateFormatter stringFromDate:strDate];
+    [snotDateFormatter release];
+    strDate = nil;
+    return [[result retain] autorelease];
+}
+
+- (void) _runDocumentWorker
+{
+    NSAutoreleasePool* runDocPool = [[NSAutoreleasePool alloc] init];
+    NSMutableDictionary* runDocDict = [NSMutableDictionary dictionaryWithCapacity:100];
+    
+    unsigned int run_number = 0;
+    NSMutableString* runStartString = [NSMutableString string];
+    NSArray* runObjects = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    ORRunModel* rc;
+	if([runObjects count]){
+        rc = [runObjects objectAtIndex:0];
+        run_number = [rc runNumber];
+    }
+    NSNumber* runNumber = [NSNumber numberWithUnsignedInt:run_number];
+
+    [runDocDict setObject:@"run" forKey:@"doc_type"];
+    [runDocDict setObject:[self stringDateFromDate:nil] forKey:@"time_stamp"];
+    [runDocDict setObject:runNumber forKey:@"run_number"];
+    [runDocDict setObject:@"starting" forKey:@"run_status"];
+    
+    //[runDocDict setObject:runStartString forKey:@"run_start"];
+    [runDocDict setObject:[self stringDateFromDate:nil] forKey:@"run_start"];
+
+    [runDocDict setObject:@"" forKey:@"run_stop"];
+
+    self.runDocument = runDocDict;
+    [[self orcaDbRef:self] addDocument:runDocDict tag:kOrcaRunDocumentAdded];
+
+    //wait for main thread to receive acknowledgement from couchdb
+    NSDate* timeout = [NSDate dateWithTimeIntervalSinceNow:2.0];
+    while ([timeout timeIntervalSinceNow] > 0 && ![self.runDocument objectForKey:@"_id"]) {
+        [NSThread sleepForTimeInterval:0.1];
+    }
+    
+    //if failed emit alarm and give up
+    
+    runDocDict = [[[self runDocument] mutableCopy] autorelease];
+    if (rc) {
+        NSDate* runStart = [[[rc startTime] copy] autorelease];
+        [runStartString setString:[self stringDateFromDate:runStart]];
+    }
+    [runDocDict setObject:@"in progress" forKey:@"run_status"];
+
+    
+    //what else?
+    //mtcd
+    //crates
+    //cable doc should go here...
+    
+    //order matters
+    //self.runDocument = runDocDict;
+    [[self orcaDbRef:self] updateDocument:runDocDict documentId:[runDocDict objectForKey:@"_id"] tag:kOrcaRunDocumentUpdated];
+
+    
+    /*
+     expert_flag = BooleanProperty()
+     mtc_doc = StringProperty()
+     hv_doc = StringProperty()
+     run_type_doc = StringProperty()
+     source_doc = StringProperty()
+     crate = ListProperty()
+     sub_run_number = IntegerProperty()?
+     run_stop = DateTimeProperty()? to be updated with the run status update to "done"
+     */
+    
+    
+    // run document links to crate documents (we need doc IDs)
+    
+    [runDocPool release];
+}
+
+
+- (void) _runEndDocumentWorker:(NSDictionary*)runDoc
+{
+    NSAutoreleasePool* runDocPool = [[NSAutoreleasePool alloc] init];
+    NSMutableDictionary* runDocDict = [[runDoc mutableCopy] autorelease];
+
+    [runDocDict setObject:@"done" forKey:@"run_status"];
+    [runDocDict setObject:[self stringDateFromDate:nil] forKey:@"run_stop"];
+
+    //after run stats
+    //alarm logs
+    //end of run xl3 logs
+    //ellie
+
+    [[self orcaDbRef:self] updateDocument:runDocDict
+                               documentId:[runDocDict objectForKey:@"_id"]
+                                      tag:kOrcaRunDocumentUpdated];
+    
+    [runDocPool release];
+}
+
 - (void) morcaUpdateDBDict
 {
     /*

@@ -27,12 +27,18 @@
 @class ORDataSet;
 @class ORCouchDB;
 
+@protocol snotDbDelegate <NSObject>
+@required
+- (ORCouchDB*) orcaDbRef:(id)aCouchDelegate;
+- (ORCouchDB*) debugDbRef:(id)aCouchDelegate;
+@end
+
 #define kUseTubeView	0
 #define kUseCrateView	1
 #define kUsePSUPView	2
 #define kNumTubes	20 //XL3s
 
-@interface SNOPModel: ORExperimentModel
+@interface SNOPModel: ORExperimentModel <snotDbDelegate>
 {
 	int viewType;
 
@@ -76,6 +82,9 @@
         unsigned long long runMask;
         unsigned long gtCrateMask;
     } _rhdrStruct;
+    
+    NSDictionary* _runDocument;
+    NSMutableDictionary* _runTypeDocumentPhysics;
 }
 
 @property (nonatomic,copy) NSString* orcaDBUserName;
@@ -99,6 +108,8 @@
 @property (nonatomic,assign) unsigned long epedDataId;
 @property (nonatomic,assign) unsigned long rhdrDataId;
 
+@property (copy) NSDictionary* runDocument;
+
 - (void) initOrcaDBConnectionHistory;
 - (void) clearOrcaDBConnectionHistory;
 - (id) orcaDBConnectionHistoryItem:(unsigned int)index;
@@ -110,7 +121,6 @@
 - (void) debugDBPing;
 
 - (void) taskFinished:(NSTask*)aTask;
-- (ORCouchDB*) orcaDBRef;
 - (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp;
 
 #pragma mark ¥¥orcascript helpers
@@ -152,6 +162,11 @@
 - (void) syncDataIdsWith:(id)anotherObj;
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (NSDictionary*) dataRecordDescription;
+
+#pragma mark ¥¥¥SnotDbDelegate
+- (ORCouchDB*) orcaDbRef:(id)aCouchDelegate;
+- (ORCouchDB*) debugDbRef:(id)aCouchDelegate;
+
 @end
 
 @interface SNOPDecoderForRHDR : ORVmeCardDecoder {

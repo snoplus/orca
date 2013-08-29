@@ -39,7 +39,11 @@
     IBOutlet NSComboBox *orcaDBIPAddressPU;
     IBOutlet NSComboBox *debugDBIPAddressPU;
     IBOutlet NSMatrix* hvStatusMatrix;
+    
+    NSImage* _runStopImg;
 }
+
+@property (nonatomic,retain) NSImage* runStopImg;
 
 #pragma mark ¥¥¥Initialization
 - (void) registerNotificationObservers;

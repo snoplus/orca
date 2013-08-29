@@ -30,6 +30,10 @@
 NSString* ORSNOPRequestHVStatus = @"ORSNOPRequestHVStatus";
 
 @implementation SNOPController
+
+@synthesize
+runStopImg = _runStopImg;
+
 #pragma mark ¥¥¥Initialization
 -(id)init
 {
@@ -56,7 +60,7 @@ NSString* ORSNOPRequestHVStatus = @"ORSNOPRequestHVStatus";
 	blankView = [[NSView alloc] init];
     [tabView setFocusRingType:NSFocusRingTypeNone];
 	[self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
-
+    
 	[super awakeFromNib];
 }
 
