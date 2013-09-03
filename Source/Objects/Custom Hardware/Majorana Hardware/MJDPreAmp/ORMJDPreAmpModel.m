@@ -241,10 +241,19 @@ struct {
 - (NSString*) detectorName:(int)i
 {
     if(i>=0 && i<kMJDPreAmpAdcChannels){
-        if(!detectorName[i].length)return @"";
-        else return detectorName[i];
+        switch(i){
+            case 5:  return @"+12V";
+            case 6:  return @"-12V";
+            case 7:  return @"Temp Chip 1";
+            case 13: return @"+24V";
+            case 14: return @"-24V";
+            case 15: return @"Temp Chip 2";
+            default: if(!detectorName[i].length)return @"";
+                     else return detectorName[i];
+
+        }
     }
-    else return @"";
+    else return @"??";
 }
 - (void) setDetector:(int)i name:(NSString*)aName
 {

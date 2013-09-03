@@ -59,7 +59,7 @@
             @"Baseline12",
             @"+24V",
             @"-24V",
-            @"Temp 2",
+            @"Temp 2"
         };
         return tagString[adcIndex];
     }
@@ -182,22 +182,22 @@
 		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:i andDataSource:self];
 		[leakageCurrentPlot1 addPlot: aPlot];
 		[aPlot setLineColor:color[i-5]];
-		[aPlot setName:[NSString stringWithFormat:@"Leakage %d",i]];
+		[aPlot setName:[NSString stringWithFormat:@"Leakage %d",i+3]];
 		[(ORTimeAxis*)[leakageCurrentPlot1 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 		[aPlot release];
 	}
     
-    [baselinePlot0 setPlotTitle:@"Baselines, ADC0-4"];
-    [baselinePlot1 setPlotTitle:@"Baselines, ADC5-8"];
-    [temperaturePlot setPlotTitle:@"On-chip Temperatures"];
-    [voltagePlot setPlotTitle:@"Operating Voltages"];
+    [baselinePlot0       setPlotTitle:@"Baselines, ADC0-4"];
+    [baselinePlot1       setPlotTitle:@"Baselines, ADC8-12"];
+    [temperaturePlot     setPlotTitle:@"On-chip Temperatures"];
+    [voltagePlot         setPlotTitle:@"Operating Voltages"];
     [leakageCurrentPlot0 setPlotTitle:@"Leakage Currents, ADC0-4"];
-    [leakageCurrentPlot1 setPlotTitle:@"Leakage Currents, ADC5-8"];
+    [leakageCurrentPlot1 setPlotTitle:@"Leakage Currents, ADC8-12"];
 
-    [baselinePlot0 setShowLegend:YES];
-	[baselinePlot1 setShowLegend:YES];
-	[temperaturePlot setShowLegend:YES];
-	[voltagePlot setShowLegend:YES];
+    [baselinePlot0       setShowLegend:YES];
+	[baselinePlot1       setShowLegend:YES];
+	[temperaturePlot     setShowLegend:YES];
+	[voltagePlot         setShowLegend:YES];
     [leakageCurrentPlot0 setShowLegend:YES];
 	[leakageCurrentPlot1 setShowLegend:YES];
     
@@ -534,10 +534,7 @@
 {
  	short chan;
 	for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
-        if(chan>=5 && chan<=7) continue;
-        if(chan>=13 && chan<=15) continue;
-        
-		[[detectorNameMatrix cellWithTag:chan] setStringValue: [model detectorName:chan]];
+        [[detectorNameMatrix cellWithTag:chan] setStringValue: [model detectorName:chan]];
 	}
 }
 
