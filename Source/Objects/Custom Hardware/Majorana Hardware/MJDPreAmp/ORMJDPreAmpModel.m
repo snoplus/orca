@@ -1183,11 +1183,15 @@ struct {
     
     int currentChan = mjdPreAmpTable[adcChan].leakageCurrentIndex;
     if(currentChan>0){
-        //leakage current is (first stage output voltage - baseline voltage)/feedback resistance
-        float leakageCurrent = -nanoToPico*([self adc:adcChan] - [self baselineVoltage:adcChan])/ [self feedBackResistor:adcChan];//in picoamps
-        [self setLeakageCurrent:currentChan value:leakageCurrent];
-        [self checkLeakageCurrentIsWithinLimits:currentChan];
+        if([self feedBackResistor:adcChan] != 0){
+            //leakage current is (first stage output voltage - baseline voltage)/feedback resistance
+            float leakageCurrent = -nanoToPico*([self adc:adcChan] - [self baselineVoltage:adcChan])/ [self feedBackResistor:adcChan];//in picoamps
+            [self setLeakageCurrent:currentChan value:leakageCurrent];
+            [self checkLeakageCurrentIsWithinLimits:currentChan];
+        }
+        else  [self setLeakageCurrent:currentChan value:0];
     }
+    
 }
 
 - (void) postCouchDBRecord
@@ -1213,9 +1217,9 @@ struct {
                     machineName,                                                    @"machine",
                     [NSNumber numberWithInt:detectorAdcChannel],                    @"adcIndex",
                     [NSArray arrayWithObjects:
-                        [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[detectorAdcChannel]] forKey:@"Baseline Current"] ,
-                        [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:leakageCurrents[i]]       forKey:@"Leakage Current"],
-                        [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:adcs[tempAdcChannel]]     forKey:@"Adc Temperature"],
+                        [NSDictionary dictionaryWithObject:[NSNumber numberWithFloat:adcs[detectorAdcChannel]] forKey:@"Baseline Current"] ,
+                        [NSDictionary dictionaryWithObject:[NSNumber numberWithFloat:leakageCurrents[i]]       forKey:@"Leakage Current"],
+                        [NSDictionary dictionaryWithObject:[NSNumber numberWithFloat:adcs[tempAdcChannel]]     forKey:@"Adc Temperature"],
                          nil
                     ],@"adcs",
                     nil
@@ -1233,36 +1237,36 @@ struct {
     
     //we also post a snapshot to the machine database
     NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
-                            [NSNumber numberWithDouble:adcs[0]],            @"Baseline0",
-                            [NSNumber numberWithDouble:adcs[1]],            @"Baseline1",
-                            [NSNumber numberWithDouble:adcs[2]],            @"Baseline2",
-                            [NSNumber numberWithDouble:adcs[3]],            @"Baseline3",
-                            [NSNumber numberWithDouble:adcs[4]],            @"Baseline4",
+                            [NSNumber numberWithFloat:adcs[0]],            @"Baseline0",
+                            [NSNumber numberWithFloat:adcs[1]],            @"Baseline1",
+                            [NSNumber numberWithFloat:adcs[2]],            @"Baseline2",
+                            [NSNumber numberWithFloat:adcs[3]],            @"Baseline3",
+                            [NSNumber numberWithFloat:adcs[4]],            @"Baseline4",
                             
-                            [NSNumber numberWithDouble:adcs[8]],            @"Baseline5",
-                            [NSNumber numberWithDouble:adcs[9]],            @"Baseline6",
-                            [NSNumber numberWithDouble:adcs[10]],           @"Baseline7",
-                            [NSNumber numberWithDouble:adcs[11]],           @"Baseline8",
-                            [NSNumber numberWithDouble:adcs[12]],           @"Baseline9",
+                            [NSNumber numberWithFloat:adcs[8]],            @"Baseline5",
+                            [NSNumber numberWithFloat:adcs[9]],            @"Baseline6",
+                            [NSNumber numberWithFloat:adcs[10]],           @"Baseline7",
+                            [NSNumber numberWithFloat:adcs[11]],           @"Baseline8",
+                            [NSNumber numberWithFloat:adcs[12]],           @"Baseline9",
                             
-                            [NSNumber numberWithDouble:adcs[13]],           @"+24V",
-                            [NSNumber numberWithDouble:adcs[14]],           @"-24V",
-                            [NSNumber numberWithDouble:adcs[5]],            @"+12V",
-                            [NSNumber numberWithDouble:adcs[6]],            @"-12V",
+                            [NSNumber numberWithFloat:adcs[13]],           @"+24V",
+                            [NSNumber numberWithFloat:adcs[14]],           @"-24V",
+                            [NSNumber numberWithFloat:adcs[5]],            @"+12V",
+                            [NSNumber numberWithFloat:adcs[6]],            @"-12V",
                             
-                            [NSNumber numberWithDouble:adcs[7]],            @"Temp1",
-                            [NSNumber numberWithDouble:adcs[15]],           @"Temp2",
+                            [NSNumber numberWithFloat:adcs[7]],            @"Temp1",
+                            [NSNumber numberWithFloat:adcs[15]],           @"Temp2",
                             
-                            [NSNumber numberWithDouble:leakageCurrents[0]], @"Leakage0",
-                            [NSNumber numberWithDouble:leakageCurrents[1]], @"Leakage1",
-                            [NSNumber numberWithDouble:leakageCurrents[2]], @"Leakage2",
-                            [NSNumber numberWithDouble:leakageCurrents[3]], @"Leakage3",
-                            [NSNumber numberWithDouble:leakageCurrents[4]], @"Leakage4",
-                            [NSNumber numberWithDouble:leakageCurrents[5]], @"Leakage5",
-                            [NSNumber numberWithDouble:leakageCurrents[6]], @"Leakage6",
-                            [NSNumber numberWithDouble:leakageCurrents[7]], @"Leakage7",
-                            [NSNumber numberWithDouble:leakageCurrents[8]], @"Leakage8",
-                            [NSNumber numberWithDouble:leakageCurrents[9]], @"Leakage9",
+                            [NSNumber numberWithFloat:leakageCurrents[0]], @"Leakage0",
+                            [NSNumber numberWithFloat:leakageCurrents[1]], @"Leakage1",
+                            [NSNumber numberWithFloat:leakageCurrents[2]], @"Leakage2",
+                            [NSNumber numberWithFloat:leakageCurrents[3]], @"Leakage3",
+                            [NSNumber numberWithFloat:leakageCurrents[4]], @"Leakage4",
+                            [NSNumber numberWithFloat:leakageCurrents[5]], @"Leakage5",
+                            [NSNumber numberWithFloat:leakageCurrents[6]], @"Leakage6",
+                            [NSNumber numberWithFloat:leakageCurrents[7]], @"Leakage7",
+                            [NSNumber numberWithFloat:leakageCurrents[8]], @"Leakage8",
+                            [NSNumber numberWithFloat:leakageCurrents[9]], @"Leakage9",
                             
                             [NSNumber numberWithInt:    pollTime],          @"pollTime",
                             nil];
