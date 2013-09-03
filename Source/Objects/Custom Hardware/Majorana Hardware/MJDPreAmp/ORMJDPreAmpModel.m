@@ -1206,10 +1206,10 @@ struct {
             int tempChanToUse[10]   = {7,7,7,7,7,15,15,15,15,15};
             int detectorAdcChannel = detectorToAdc[i];
             int tempAdcChannel     = tempChanToUse[i];
-            if((detectorName[i].length!=0) && (adcEnabledMask & (0x1 << detectorAdcChannel))){
+            if((detectorName[detectorAdcChannel].length!=0) && (adcEnabledMask & (0x1 << detectorAdcChannel))){
                 NSDictionary* historyRecord = [NSDictionary dictionaryWithObjectsAndKeys:
                     [NSString stringWithFormat:@"PreAmp%ld",[self uniqueIdNumber]], @"preamp",
-                    detectorName[i],                                                @"title",
+                    detectorName[detectorAdcChannel],                               @"title",
                     machineName,                                                    @"machine",
                     [NSNumber numberWithInt:detectorAdcChannel],                    @"adcIndex",
                     [NSArray arrayWithObjects:
