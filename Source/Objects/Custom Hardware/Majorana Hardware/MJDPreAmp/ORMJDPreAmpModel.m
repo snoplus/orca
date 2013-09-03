@@ -1217,7 +1217,7 @@ struct {
                     machineName,                                                    @"machine",
                     [NSNumber numberWithInt:detectorAdcChannel],                    @"adcIndex",
                     [NSArray arrayWithObjects:
-                        [NSDictionary dictionaryWithObject:[NSNumber numberWithFloat:adcs[detectorAdcChannel]] forKey:@"Baseline Current"] ,
+                        [NSDictionary dictionaryWithObject:[NSNumber numberWithFloat:adcs[detectorAdcChannel]] forKey:@"Baseline Voltage"] ,
                         [NSDictionary dictionaryWithObject:[NSNumber numberWithFloat:leakageCurrents[i]]       forKey:@"Leakage Current"],
                         [NSDictionary dictionaryWithObject:[NSNumber numberWithFloat:adcs[tempAdcChannel]]     forKey:@"Adc Temperature"],
                          nil
