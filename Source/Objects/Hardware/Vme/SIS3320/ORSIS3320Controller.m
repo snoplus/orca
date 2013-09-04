@@ -879,7 +879,7 @@
     
     for(i=0;i<2;i++){
         
-        BOOL groupEnabled = [model onlineMaskBit:i*2] || [model onlineMaskBit:i*2+1] || [model onlineMaskBit:i*2+2] || [model onlineMaskBit:i*2+3];
+        BOOL groupEnabled = [model onlineMaskBit:i] || [model onlineMaskBit:i+2] || [model onlineMaskBit:i+4] || [model onlineMaskBit:i*6];
 
         [[invertInputMatrix             cellAtRow:i column:0] setEnabled:!lockedOrRunningMaintenance & groupEnabled];
         [[enableErrorCorrectionMatrix   cellAtRow:i column:0] setEnabled:!lockedOrRunningMaintenance & groupEnabled];
