@@ -105,16 +105,22 @@
         [s drawAtPoint:NSMakePoint(x,y)];
         [s release];
         
+        if(baseline<1024)reColor = [NSColor blackColor];
+        else             reColor = [NSColor redColor];
+        
         NSString* bls = [NSString stringWithFormat:@"%d",baseline];
-        theAttributes = [NSDictionary dictionaryWithObjectsAndKeys:theFont,NSFontAttributeName,[NSColor blackColor],NSForegroundColorAttributeName,nil];
+        theAttributes = [NSDictionary dictionaryWithObjectsAndKeys:theFont,NSFontAttributeName,reColor,NSForegroundColorAttributeName,nil];
         s = [[NSAttributedString alloc] initWithString:bls attributes:theAttributes];
         stringSize = [s size];
         x = MAX(kBugPad/2.,kBugPad/2. + (preRisingEdgeBugX-kBugPad/2.)/2. - stringSize.width/2.);
         [s drawAtPoint:NSMakePoint(x,b.size.height-stringSize.height-5)];
         [s release];
 
+        if([flatTopField intValue]<1024)reColor = [NSColor blackColor];
+        else                            reColor = [NSColor redColor];
+        
         NSString* fts = [NSString stringWithFormat:@"%d",[flatTopField intValue]];
-        theAttributes = [NSDictionary dictionaryWithObjectsAndKeys:theFont,NSFontAttributeName,[NSColor blackColor],NSForegroundColorAttributeName,nil];
+        theAttributes = [NSDictionary dictionaryWithObjectsAndKeys:theFont,NSFontAttributeName,reColor,NSForegroundColorAttributeName,nil];
         s = [[NSAttributedString alloc] initWithString:fts attributes:theAttributes];
         stringSize = [s size];
         x = postRisingEdgeBugX + (b.size.width-postRisingEdgeBugX)/2. - stringSize.width/2.;
