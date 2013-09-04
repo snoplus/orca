@@ -745,25 +745,25 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 		poleZeroMult[i]	    = 0x600;
 		pzTraceEnabled[i]	= NO;
 		triggerMode[i]		= 0x0;
-		ledThreshold[i]		= 0x1FFFF;
-		mrpsrt[i]           = 0x0;
-		ftCnt[i]            = 252;
-		mrpsdv[i]           = 0x0;
-		chpsrt[i]           = 0x0;
-		chpsdv[i]           = 0x0;
-		prerecnt[i]         = 499;
-		postrecnt[i]        = 530;
-		tpol[i]             = 0x3;
+		ledThreshold[i]		= 0x1FFFF;//spec default: maximum (0x1FFFF)
+		mrpsrt[i]           = 0x0;//spec default: 0
+		ftCnt[i]            = 252;//spec default: 256
+		mrpsdv[i]           = 0x0;//spec default: 0
+		chpsrt[i]           = 0x0;//spec default: 0
+		chpsdv[i]           = 0x0;//spec default: 0
+		prerecnt[i]         = 499;//spec default: 512
+		postrecnt[i]        = 530;//spec default: 512
+		tpol[i]             = 0x3;//spec default: 0
 		presumEnabled[i]    = 0x0;
 		trapThreshold[i]		= 0x10;
 	}
     
-    noiseWindow     = 0x40;
-    externalWindow  = 0x190;
-    pileUpWindow    = 0x400;
-    extTrigLength   = 0x190;
-    collectionTime  = 0x1C2;
-    integrateTime = 0x1C2;
+    noiseWindow     = 0x40;//spec default: 0x40
+    externalWindow  = 0x190;//spec default: 0x190
+    pileUpWindow    = 0x400;//spec default: 0x400
+    extTrigLength   = 0x190;//spec default: 0x190
+    collectionTime  = 0x1C2;//spec default: 0x1C2
+    integrateTime = 0x1C2;//spec default: 0x1C2
 	
     
  
@@ -950,7 +950,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) setFtCnt:(short)chan withValue:(short)aValue
 {
 	if(aValue<0)aValue=0;
-	else if(aValue>2043)aValue = 2043; //HW = user + 4
+	else if(aValue>1021)aValue = 2043; //HW = user + 4
     [[[self undoManager] prepareWithInvocationTarget:self] setFtCnt:chan withValue:ftCnt[chan]];
 	ftCnt[chan] = aValue;
     NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
@@ -1361,13 +1361,12 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     if(forceEnable)	startStop= enabled[chan];
     else			startStop = NO;
 
-    unsigned long theValue = (pzTraceEnabled[chan]    << 14)  |
-                             (poleZeroEnabled[chan]   << 13)  |
-                             ((tpol[chan] & 0x3)      << 10)  |
-                             (triggerMode[chan]       << 4)   |
-							 (presumEnabled[chan]     << 3)   |
-							 (pileUp[chan]            << 2)	  |
-                             (debug[chan]             << 1)   |
+    unsigned long theValue = ((pzTraceEnabled[chan] & 0x1)  << 14)  |
+                             ((poleZeroEnabled[chan]& 0x1)  << 13)  |
+                             ((tpol[chan]           & 0x3)  << 10)  |
+                             ((triggerMode[chan]    & 0x1)  << 4)   |
+							 (presumEnabled[chan]           << 3)   |
+							 (pileUp[chan]                  << 2)	  |
                              startStop;
     
     [[self adapter] writeLongBlock:&theValue
@@ -1375,6 +1374,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
+    
     unsigned long readBackValue = [self readControlReg:chan];
     if((readBackValue & 0xC17) != (theValue & 0xC17)){
         NSLogColor([NSColor redColor],@"Channel %d status reg readback != writeValue (0x%08x != 0x%08x)\n",chan,readBackValue & 0xC17,theValue & 0xC17);
