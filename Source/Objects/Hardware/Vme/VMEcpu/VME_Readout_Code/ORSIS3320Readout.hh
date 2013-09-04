@@ -4,7 +4,8 @@ class ORSIS3320Readout: public ORVVmeCard
 {
 public:
 	ORSIS3320Readout(SBC_card_info* card_info);
-	virtual ~ORSIS3320Readout() {}
+//	virtual ~ORSIS3320Readout() {}
+    ~ORSIS3320Readout(); // now non-virtual because we need to free allocated dataBuffer upon cleanup
 	
 	virtual bool Readout(SBC_LAM_Data* /* lam_data*/);  
 	
@@ -15,6 +16,13 @@ public:
         kAcquisitionControlReg	 = 0x10,
         kEndAddressThresholdFlag = 0x80000
 	};
+    
+    // perhaps some care should be taken to make accesses to this quick like a puma
+    // make it a static member? does that help?
+    // where in memory does it wind up when declared as it is?
+    static const uint32_t SIS3320_previousBankEndSampleAddress[ 8 ];
+    
+
 	
 	
 protected:
@@ -27,4 +35,6 @@ protected:
     virtual void armBank2();
 	
 	bool	 fBankOneArmed;
+    
+    uint32_t* dataBuffer; // if allocated, will be 8 MB array for storing large amounts of data from 3320
 };
