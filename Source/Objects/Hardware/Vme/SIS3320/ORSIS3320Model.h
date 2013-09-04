@@ -92,7 +92,7 @@
 	ORRateGroup*	waveFormRateGroup;
 	unsigned long 	waveFormCount[kNumSIS3320Channels];
     unsigned long	onlineMask;
-
+    ORAlarm*        dataRateAlarm;
 	//cached when taking data from Mac
 	unsigned long	location;
 	id				theController;
@@ -276,6 +276,11 @@
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;
 - (BOOL) bumpRateFromDecodeStage:(short)channel;
+
+// bump the decoded event count by a number specified by nDecodedEvents
+- (BOOL) bumpRateFromDecodeStage:(short)channel nDecodedEvents:(int)bumpNumber;
+
+
 - (unsigned long) waveFormCount:(int)aChannel;
 -(void) startRates;
 - (void) clearWaveFormCounts;

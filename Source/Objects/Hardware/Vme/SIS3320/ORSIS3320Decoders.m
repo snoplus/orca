@@ -53,7 +53,7 @@
 	
 	unsigned long* ptr = (unsigned long*)someData;
 	unsigned long length = ExtractLength(*ptr);
-	
+        	
 	int crate	= ShiftAndExtract(ptr[1],21,0xf);
 	int card	= ShiftAndExtract(ptr[1],16,0x1f);
 	int channel = ShiftAndExtract(ptr[1],8,0xff);
@@ -62,7 +62,6 @@
 	NSString* cardKey		= [self getCardKey: card];
 	NSString* channelKey	= [self getChannelKey: channel];
 
-    
     //-----------------------------------------------------------
     //set up for sending the record count for the data monitor
     ORSIS3320Model* obj = nil;
@@ -88,23 +87,29 @@
     do {
         unsigned long indexToDataSize = startIndex+9; //point to the word holding the record size
         unsigned long indexToData = startIndex + 10;
-        unsigned long numberOfSamples = ptr[indexToDataSize] & 0x0000FFFF; //num of shorts
-        unsigned long recordSizeInLongs = numberOfSamples/2;
+        
+        unsigned long numberOfSamples   = 0; 
+        unsigned long headerCheck       = (ptr[ indexToDataSize] & 0xffff0000) >> 16;
+        
+        if( headerCheck == 0xdada )      numberOfSamples = ptr[indexToDataSize] & 0xffff;   //health header, with samples
+        else if( headerCheck == 0xeded ) numberOfSamples = 0;                               //just the header, no samples
+        else                             break;                                             //this is bad... don't do any processing
+        
+        unsigned long recordSizeInLongs = ceil((float)numberOfSamples/2);
         if(recordSizeInLongs){
-            NSMutableData* tmpData = [NSMutableData dataWithBytes:someData length:recordSizeInLongs*sizeof(long)];
-            unsigned short* dp = (unsigned short*)[tmpData bytes];
-            int i;
-            for(i=indexToData;i<recordSizeInLongs;i++){
-                *dp++ = ptr[i] & 0xfff;
-                *dp++ = (ptr[i]>>16) & 0xfff;
-            }
-            [aDataSet loadWaveform:tmpData
-                            offset:0 //bytes!
-                          unitSize:2 //unit size in bytes!
-                            sender:self
-                          withKeys:@"SIS3320", @"Waveforms",crateKey,cardKey,channelKey,nil];
-            
-            //get the actual object
+                NSMutableData* tmpData = [NSMutableData dataWithBytes:someData length:recordSizeInLongs*sizeof(long)];
+                unsigned short* dp = (unsigned short*)[tmpData bytes];
+                int i;
+                for( i = indexToData; i < indexToData + recordSizeInLongs; i++ ){
+                    *dp++ = ptr[i] & 0xffff;
+                    *dp++ = (ptr[i]>>16) & 0xffff;
+                }
+                [aDataSet loadWaveform:tmpData
+                                offset:0 //bytes!
+                              unitSize:2 //unit size in bytes!
+                                sender:self
+                              withKeys:@"SIS3320", @"Waveforms",crateKey,cardKey,channelKey,nil];
+
             if(getRatesFromDecodeStage){
                  getRatesFromDecodeStage = [obj bumpRateFromDecodeStage:channel];
             }

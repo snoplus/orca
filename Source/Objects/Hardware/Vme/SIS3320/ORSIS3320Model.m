@@ -496,6 +496,8 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 	[peakingTimes release];
     [endAddressThresholds release];
 	[thresholds release];
+    [dataRateAlarm clearAlarm];
+    [dataRateAlarm release];
     [super dealloc];
 }
 
@@ -583,6 +585,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 {
     if(aBufferLength>1022)aBufferLength= 1022;
     [[[self undoManager] prepareWithInvocationTarget:self] setBufferLength:aGroup withValue:bufferLength[aGroup]];
+    aBufferLength = aBufferLength/2 * 2;
     
     bufferLength[aGroup] = aBufferLength;
 
@@ -823,7 +826,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
     if(aGroup>=0 && aGroup<kNumSIS3320Groups){
         if(aTriggerGateLength<1)aTriggerGateLength = 1;
         else if(aTriggerGateLength>1022)aTriggerGateLength = 1022;
-        
+        aTriggerGateLength = aTriggerGateLength/2 * 2; //make a multiple of two.
         [[[self undoManager] prepareWithInvocationTarget:self] setTriggerGateLength:aGroup withValue:[self triggerGateLength:aGroup]];
         int triggerGateLength = [self limitIntValue:aTriggerGateLength min:0 max:65535];
         [triggerGateLengths replaceObjectAtIndex:aGroup withObject:[NSNumber numberWithInt:triggerGateLength]];
@@ -1515,10 +1518,18 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 	}
 }
 
+
+// modified 8/28/13 to write high values to threshold addresses for disabled channels
 - (void) writeEndAddressThreshold:(int)aGroup
 {
 	if(aGroup>=0 && aGroup<kNumSIS3320Groups){
-		unsigned long aValue = [self endAddressThreshold:aGroup];
+		unsigned long aValue;
+        
+        if( onlineMask & ( 0x1 << (2*aGroup) ) || onlineMask & ( 0x1 << (2*aGroup + 1) ) )
+            aValue = [self endAddressThreshold:aGroup];
+        else
+            aValue = 0x7777; // just to make sure it isn't 0
+        
 		[[self adapter] writeLongBlock:&aValue
 							 atAddress:[self baseAddress] + endAddressThresholdAddress[aGroup]
 							numToWrite:1
@@ -1596,7 +1607,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 						numToRead:1
                        withAddMod:addressModifier
                     usingAddSpace:0x01];
-	return aValue;
+	return ( aValue & 0x3ffffc ) >> 1; // divide by two to deal with offset
 }
 
 - (unsigned long) readNextAdcAddress:(int)aChannel
@@ -1612,15 +1623,28 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 
 
 
+
+
 - (void) writeDacOffsets
 {
+    
+    // modified 8/28/13 to write offsets supplied by user iff channel enabled
+    // else, write something low + combo with high trigger threshold to prevent errant triggering
+    
+    unsigned int disabledChanOffset = 0xBB8; // 3000. change if needed.
+    
 	unsigned long dataWord;
 	unsigned long max_timeout, timeout_cnt;
 	
 	int i;
 	for (i=0;i<kNumSIS3320Channels;i++) {	
 		
-		dataWord =  [self dacValue:i] ;
+        if( onlineMask & ( 0x1 << i ) )
+            dataWord =  [self dacValue:i];
+        else
+            dataWord = disabledChanOffset;
+        
+        
 		[[self adapter] writeLongBlock:&dataWord
 							 atAddress:baseAddress + kDacDataReg
 							numToWrite:1
@@ -1805,12 +1829,23 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 	}
 }
 
+
+// modified 8/28/13 to write appropriate, predefined values to disabled channels
 - (void) writeThreshold:(int)aChannel
 {
 	unsigned long theThresholdValue =  ([self threshold:aChannel]+0x10000) & 0x1ffff;
 	unsigned long gt                = (gtMask >> aChannel) & 0x1;
 	unsigned long disableTrigOut    = !(triggerOutMask >> aChannel) & 0x1;
 	unsigned long extendedTrigMode  = (extendedTriggerMask >> aChannel) & 0x1;
+    
+    if( !(onlineMask & ( 0x1 << aChannel )) ) {
+        theThresholdValue = 0x1FFFF;
+        gt = 0;
+        disableTrigOut = 1;
+        extendedTrigMode = 0;
+        
+    }
+    
 	unsigned long writeValue =	(extendedTrigMode << 24) |
 								(gt << 25)               | 
 								(disableTrigOut << 26)          |
@@ -2156,6 +2191,10 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
         [NSException raise:@"Not Connected" format:@"No Crate controller detected."];
     }
     
+    [dataRateAlarm clearAlarm];
+    [dataRateAlarm release];
+    dataRateAlarm = nil;
+    
     // first add our description to the data description
     [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORSIS3320Model"];
         
@@ -2176,56 +2215,33 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-    // --- since this is where the readout takes place, i (GCRich) am commenting
-    // --- as i process it, looking for potential issues with the routine
-    // --- that may lead to missed events, which have been observed (Aug2013)
-    // --- my comments have a leading '---'
-    
-    // --- TODO: utilize dual banked memory so bank 1 can be read out while data is collected in bank 2
-    // --- this requires switching sampling to the alt bank at the begin of a readout
-    // --- we then have to make sure the NextSampleAddress register that is accessed corresponds to the ORIGINAL bank, not the now-active alt bank
-    
     @try {
 		isRunning		= YES;
 		unsigned long status = [self readAcqRegister];
-		if((status & kEndAddressThresholdFlag) == kEndAddressThresholdFlag){
-            
-            // --- if we're here, we're going to do a readout
-            // --- let's be safe and disable sampling while this happens
-            // --- ultimately, it WILL be important to not sample between populating 'endSampleAddress' and the actual transfer of data
-            
+		if(!dataRateAlarm && ((status & kEndAddressThresholdFlag) == kEndAddressThresholdFlag)){
+                
             if(bank1Armed)  [self armBank2];
             else            [self armBank1];
 
             int i;
 			for (i=0;i<8;i++) {
-                unsigned long endSampleAddress = [self readNextAdcAddress:i];
-                unsigned long endAddressThreshold = [self endAddressThreshold:i/2];
-                if (endAddressThreshold>0 && (endSampleAddress != 0)) {
-                    
-                    
-                    
-                    //unsigned long numLongsToRead = bufferLength[i/2]/2 + 10;
-                    // --- think more about this, at first glance it could be important
-                    // --- bufferLength is defined for each ADC group (e.g., 1&2, 3&4..)
-                    // --- the '+10' is suggestive of the header data on each 3320 N/G event
-                    // --- if i recall correctly, there are 10 words preceeding any waveform samples
-                    
-                    // --- the amount of data to read really should be determined based on
-                    // --- the 'endSampleAddress' data member
-                    
-                    // --- confirmed that numLongsToRead seems to be the legnth of an event, in words
-                    // --- HOWEVER, this shouldn't correspond to the amount of data we actually want to transfer
-                    // --- we want to read from the start of the memory bank for the channel, which might be specified by adcMemoryPage[channel]
-                    // --- and end the read at the address contained, at this point in the code, in endSampleAddress
-                    // --- so, i suggest the following line with an alternative definition of numLongsToRead
-                    unsigned long numLongsToRead = endSampleAddress;
-                    
-                    // --- note: we'll now be reading potentially many events
-                    // --- this may not jive with the hardcoded-length data array
-                    // --- so move the definition of the data array to below this point and size it appropriately..
-                    
-                    
+                
+
+                if( !(onlineMask & ( 0x1 << i )) ) continue;
+                                
+                unsigned long endSampleAddressPrevBank = [self readPreviousAdcAddress:i];
+
+                if( endSampleAddressPrevBank != 0 ) {
+                    unsigned long numLongsToRead = endSampleAddressPrevBank;
+                    if(numLongsToRead+2 > 0x3FFFF){ //can't have a record larger than the max ORCA record size.
+                        if(!dataRateAlarm){
+                            dataRateAlarm = [[ORAlarm alloc] initWithName:@"SIS3320 Rate Too High" severity:kHardwareAlarm];
+                            [dataRateAlarm setHelpString:@"Data Rate is too high to take data via the Mac. Use the SBC.\n\nThis alarm will remain until you restart the run with a lower rate. No data will be taken at this rate. You may acknowledge the alarm to silence it"];
+                            [dataRateAlarm setSticky:YES];
+                        }
+                        [dataRateAlarm postAlarm];
+                        break;
+                    }
                     unsigned long data[ numLongsToRead + 10 + 2 ]; //max length plus Orca header
                     // --- in theory, this should perhaps be .. 8 MB, if size is fixed
                     // --- NOTE THIS NOW WILL HOLD MORE THAN A SINGLE EVENT
@@ -2236,7 +2252,6 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
                     unsigned int nEventsInTransferredData = ceil(numLongsToRead / (float)nWordsPerEvent);
                     waveFormCount[i] += nEventsInTransferredData;
                    
-                    
                     data[0] = dataId | (2 + numLongsToRead);
                     data[1] = location;
                     [[self adapter] readLongBlock:&data[2]
@@ -2245,13 +2260,14 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
                                        withAddMod:addressModifier
                                     usingAddSpace:0x01];
                     [aDataPacket addLongsToFrameBuffer:data length:2 + numLongsToRead];
-                     
                     
 				}
-			}
-            
+			}        
 		}
 	}
+    
+    
+    
 	@catch(NSException* localException) {
 		[self incExceptionCount];
 		[localException raise];
@@ -2268,6 +2284,9 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 	[self disarmSamplingLogic];
 	isRunning = NO;
     [waveFormRateGroup stop];
+    [dataRateAlarm clearAlarm];
+    [dataRateAlarm release];
+    dataRateAlarm = nil;
 }
 
 //this is the data structure for the new SBCs (i.e. VX704 from Concurrent)
@@ -2301,6 +2320,17 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
     ++waveFormCount[channel];
     return YES;
 }
+
+
+// bump the decoded event count by a number specified by nDecodedEvents
+- (BOOL) bumpRateFromDecodeStage:(short)channel nDecodedEvents:(int)bumpNumber
+{
+    if( isRunning ) return NO;
+    
+    waveFormCount[channel] += bumpNumber;
+    return YES;
+}
+
 
 - (unsigned long) waveFormCount:(int)aChannel
 {
