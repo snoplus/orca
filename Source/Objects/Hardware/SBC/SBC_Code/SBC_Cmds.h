@@ -175,7 +175,7 @@ typedef
 SBC_LAM_Data;
 
 
-#define kSBC_MaxPayloadSizeBytes    2024*1024
+#define kSBC_MaxPayloadSizeBytes    2*1024*1024
 #define kSBC_MaxMessageSizeBytes    256
 typedef 
     struct {
