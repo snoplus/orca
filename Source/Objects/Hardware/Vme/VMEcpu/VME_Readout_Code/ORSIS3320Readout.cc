@@ -108,7 +108,7 @@ bool ORSIS3320Readout::Readout(SBC_LAM_Data* /*lam_data*/)
                 uint32_t savedDataStart = dataIndex;
                 
                 data[dataIndex++] = dataId | (numLongsToRead+2);
-                data[dataIndex++] = location;
+                data[dataIndex++] = location | (i<<8);
                 
         
                 int32_t bytesRead = DMARead( GetBaseAddress() + GetADCBufferRegisterOffset(i),
@@ -185,7 +185,7 @@ bool ORSIS3320Readout::Readout(SBC_LAM_Data* /*lam_data*/)
                         
                         // now form the ORCA data packet..
                         data[dataIndex++] = dataId | (positionFromOffset + 2);
-                        data[dataIndex++] = location | 0x80000000;
+                        data[dataIndex++] = location | (i<<8) | 0x80000000;
                                                 
                         memcpy( (void*)&(data[dataIndex]), (void*)&(dataBuffer[offsetInBuffer]), (size_t)4*(positionFromOffset) );
                         dataIndex += positionFromOffset;

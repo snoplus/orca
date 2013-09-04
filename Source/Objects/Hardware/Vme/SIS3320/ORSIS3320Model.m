@@ -2253,7 +2253,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
                     waveFormCount[i] += nEventsInTransferredData;
                    
                     data[0] = dataId | (2 + numLongsToRead);
-                    data[1] = location;
+                    data[1] = location | (i<<8);
                     [[self adapter] readLongBlock:&data[2]
                                         atAddress:baseAddress + adcMemoryPage[i] // --- this is in line with my code, adcMemoryPage[1] is equivalent to SIS3320_ADC1_OFFSET in Struck's header
                                         numToRead:numLongsToRead // --- this is actually the number of 32bit words to read.. check that this is ok
