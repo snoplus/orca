@@ -1235,6 +1235,8 @@ NSString* ORCV1721ModelBufferCheckChanged                 = @"ORCV1721ModelBuffe
 {
 	@try {
 		unsigned long status;
+        
+		isRunning = YES;
 
 		[controller readLongBlock:&status
 						atAddress:statusReg
