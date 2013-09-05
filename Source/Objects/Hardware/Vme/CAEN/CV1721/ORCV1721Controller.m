@@ -306,7 +306,7 @@ int chanConfigToMaskBit1721[kNumChanConfigBits] = {1,3,6};
 - (void) eventSizeChanged:(NSNotification*)aNote
 {
 	[eventSizePopUp selectItemAtIndex:	[model eventSize]];
-	[eventSizeTextField setIntValue:	4*1024*1024./powf(2.,(float)[model eventSize]) / 2];
+	[eventSizeTextField setIntValue:	2*1024*1024./powf(2.,(float)[model eventSize])];
 	
 }
 
@@ -851,7 +851,7 @@ int chanConfigToMaskBit1721[kNumChanConfigBits] = {1,3,6};
 
 - (IBAction) customSizeAction:(id)sender
 {
-	NSUInteger maxNumSamples = (NSUInteger) 1024 * 1024./powf(2.,(float)[model eventSize]) / 2;
+	NSUInteger maxNumSamples = (NSUInteger) 2*1024*1024./powf(2.,(float)[model eventSize]) ;
 	if(maxNumSamples > [sender intValue]) {
 		//todo /4 in std mode /5 in packed mode
 		[model setCustomSize:([sender intValue] / 4)];
