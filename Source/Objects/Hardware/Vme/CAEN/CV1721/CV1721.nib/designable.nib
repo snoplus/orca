@@ -2,10 +2,10 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">12C60</string>
+		<string key="IBDocument.SystemVersion">12E55</string>
 		<string key="IBDocument.InterfaceBuilderVersion">3084</string>
-		<string key="IBDocument.AppKitVersion">1187.34</string>
-		<string key="IBDocument.HIToolboxVersion">625.00</string>
+		<string key="IBDocument.AppKitVersion">1187.39</string>
+		<string key="IBDocument.HIToolboxVersion">626.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
 			<string key="NS.object.0">3084</string>
@@ -76,7 +76,6 @@
 							<string key="NSFrame">{{-7, -10}, {789, 510}}</string>
 							<reference key="NSSuperview" ref="162018661"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="879068168"/>
 							<object class="NSMutableArray" key="NSTabViewItems">
 								<bool key="EncodedWithXMLCoder">YES</bool>
 								<object class="NSTabViewItem" id="979130861">
@@ -4762,13 +4761,12 @@ OAA</bytes>
 																	<string key="NSKeyEquivalent"/>
 																	<int key="NSPeriodicDelay">400</int>
 																	<int key="NSPeriodicInterval">75</int>
-																	<object class="NSMenuItem" key="NSMenuItem" id="553524465">
+																	<object class="NSMenuItem" key="NSMenuItem" id="40578353">
 																		<reference key="NSMenu" ref="784915906"/>
-																		<string key="NSTitle">1024</string>
+																		<string key="NSTitle">1</string>
 																		<string key="NSKeyEquiv"/>
 																		<int key="NSKeyEquivModMask">1048576</int>
 																		<int key="NSMnemonicLoc">2147483647</int>
-																		<int key="NSState">1</int>
 																		<reference key="NSOnImage" ref="780663861"/>
 																		<reference key="NSMixedImage" ref="1009897319"/>
 																		<string key="NSAction">_popUpItemAction:</string>
@@ -4779,17 +4777,7 @@ OAA</bytes>
 																		<string key="NSTitle">OtherViews</string>
 																		<object class="NSMutableArray" key="NSMenuItems">
 																			<bool key="EncodedWithXMLCoder">YES</bool>
-																			<object class="NSMenuItem" id="40578353">
-																				<reference key="NSMenu" ref="784915906"/>
-																				<string key="NSTitle">1</string>
-																				<string key="NSKeyEquiv"/>
-																				<int key="NSKeyEquivModMask">1048576</int>
-																				<int key="NSMnemonicLoc">2147483647</int>
-																				<reference key="NSOnImage" ref="780663861"/>
-																				<reference key="NSMixedImage" ref="1009897319"/>
-																				<string key="NSAction">_popUpItemAction:</string>
-																				<reference key="NSTarget" ref="69742016"/>
-																			</object>
+																			<reference ref="40578353"/>
 																			<object class="NSMenuItem" id="19752092">
 																				<reference key="NSMenu" ref="784915906"/>
 																				<string key="NSTitle">2</string>
@@ -4889,10 +4877,8 @@ OAA</bytes>
 																				<string key="NSAction">_popUpItemAction:</string>
 																				<reference key="NSTarget" ref="69742016"/>
 																			</object>
-																			<reference ref="553524465"/>
 																		</object>
 																	</object>
-																	<int key="NSSelectedIndex">10</int>
 																	<int key="NSPreferredEdge">1</int>
 																	<bool key="NSUsesItemFromMenu">YES</bool>
 																	<bool key="NSAltersState">YES</bool>
@@ -5026,7 +5012,6 @@ OAA</bytes>
 																<string key="NSFrame">{{14, 16}, {140, 18}}</string>
 																<reference key="NSSuperview" ref="676366417"/>
 																<reference key="NSWindow"/>
-																<reference key="NSNextKeyView"/>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSButtonCell" key="NSCell" id="604147256">
 																	<int key="NSCellFlags">67108864</int>
@@ -7971,7 +7956,7 @@ AAEAAQABA</bytes>
 					<reference key="NSSuperview"/>
 					<reference key="NSWindow"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {2560, 1578}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1920, 1178}}</string>
 				<string key="NSMinSize">{270, 226}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<bool key="NSWindowIsRestorable">YES</bool>
@@ -10451,7 +10436,6 @@ AAEAAQABA</bytes>
 							<reference ref="325632543"/>
 							<reference ref="1055442138"/>
 							<reference ref="803627280"/>
-							<reference ref="553524465"/>
 						</object>
 						<reference key="parent" ref="69742016"/>
 					</object>
@@ -10503,11 +10487,6 @@ AAEAAQABA</bytes>
 					<object class="IBObjectRecord">
 						<int key="objectID">1698</int>
 						<reference key="object" ref="803627280"/>
-						<reference key="parent" ref="784915906"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">1699</int>
-						<reference key="object" ref="553524465"/>
 						<reference key="parent" ref="784915906"/>
 					</object>
 					<object class="IBObjectRecord">
@@ -12201,7 +12180,6 @@ AAEAAQABA</bytes>
 					<string>1696.IBPluginDependency</string>
 					<string>1697.IBPluginDependency</string>
 					<string>1698.IBPluginDependency</string>
-					<string>1699.IBPluginDependency</string>
 					<string>1706.IBPluginDependency</string>
 					<string>1707.IBPluginDependency</string>
 					<string>1710.IBPluginDependency</string>
@@ -12486,7 +12464,6 @@ AAEAAQABA</bytes>
 				</object>
 				<object class="NSArray" key="dict.values">
 					<bool key="EncodedWithXMLCoder">YES</bool>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
