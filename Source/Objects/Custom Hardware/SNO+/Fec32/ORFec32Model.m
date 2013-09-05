@@ -280,9 +280,9 @@ NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageSt
 - (void) setPedEnabledMask:(unsigned long) aMask
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setPedEnabledMask:pedEnabledMask];
+    //NSLog(@"FEC (%d,%d), mask 0x%08x.\n", [self crateNumber], [self stationNumber], aMask);
     pedEnabledMask = aMask;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORFecPedEnabledMaskChanged object:self];
-	
 }
 
 - (unsigned long) seqDisabledMask
@@ -295,7 +295,6 @@ NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageSt
     [[[self undoManager] prepareWithInvocationTarget:self] setSeqDisabledMask:seqDisabledMask];
     seqDisabledMask = aMask;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORFecSeqDisabledMaskChanged object:self];
-	
 }
 
 - (BOOL) seqDisabled:(short)chan

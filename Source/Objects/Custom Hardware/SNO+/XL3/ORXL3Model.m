@@ -4527,6 +4527,8 @@ void SwapLongBlock(void* p, int32_t n)
     for (id aFec in fecs) {
         data[0] = 1 << [aFec stationNumber];
         data[1] = [aFec pedEnabledMask];
+
+        //NSLog(@"%@ Set Pedestal slot %d, mask 0x%08x.\n", [[self xl3Link] crateName], [aFec stationNumber], [aFec pedEnabledMask]);
         
         if ([xl3Link needToSwap]) {
             data[0] = swapLong(data[0]);
@@ -4534,9 +4536,16 @@ void SwapLongBlock(void* p, int32_t n)
         }
 
         @try {
-            [[self xl3Link] sendCommand:SET_CRATE_PEDESTALS_ID withPayload:&payload expectResponse:YES];
-            if ([xl3Link needToSwap]) *data = swapLong(*data);
-            if (*data != 0) error_flag = YES;
+            //[[self xl3Link] sendCommand:SET_CRATE_PEDESTALS_ID withPayload:&payload expectResponse:YES];
+            //if ([xl3Link needToSwap]) *data = swapLong(*data);
+            //if (*data != 0) error_flag = YES;
+            
+            //the following is a workaround until set_crate_pedestal is fixed on XL3 side
+            unsigned long aValue = [aFec pedEnabledMask];
+            unsigned long xl3Address = FEC_SEL * [aFec stationNumber] | 0x23 | WRITE_REG; //FEC PED ENABLE
+            [xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
+            if ([xl3Link needToSwap]) aValue = swapLong(aValue);
+            //if (aValue != 0) error_flag = YES;
         }
         @catch (NSException* e) {
             error_flag = YES;
