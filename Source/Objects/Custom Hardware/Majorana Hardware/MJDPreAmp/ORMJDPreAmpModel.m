@@ -1282,7 +1282,7 @@ struct {
   
     NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
                             names,                                         @"detectorNames",
-                            baselines,                                     @"baselineVoltages",
+                            baselines,                                     @"baselineAtZeroVolts",
                             leakages,                                      @"leakageCurrents",
                             temperatures,                                  @"temperatures",
                             baselineVoltages,                              @"baselineVoltages",
