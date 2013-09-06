@@ -1261,6 +1261,7 @@ struct {
                          [NSNumber numberWithFloat:leakageCurrents[8]],
                          [NSNumber numberWithFloat:leakageCurrents[9]],
                           nil];
+    
     NSArray* names = [NSArray arrayWithObjects:
                           [self detectorName:0],
                           [self detectorName:1],
@@ -1284,6 +1285,8 @@ struct {
                             baselines,                                     @"baselineVoltages",
                             leakages,                                      @"leakageCurrents",
                             temperatures,                                  @"temperatures",
+                            baselineVoltages,                              @"baselineVoltages",
+                            feedBackResistors,                             @"feedBackResistors",
                             [NSNumber numberWithFloat:adcs[13]],           @"+24V",
                             [NSNumber numberWithFloat:adcs[14]],           @"-24V",
                             [NSNumber numberWithFloat:adcs[5]],            @"+12V",
