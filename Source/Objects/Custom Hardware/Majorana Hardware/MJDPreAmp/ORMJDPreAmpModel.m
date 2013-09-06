@@ -253,7 +253,7 @@ struct {
 
         }
     }
-    else return @"??";
+    else return @"";
 }
 - (void) setDetector:(int)i name:(NSString*)aName
 {
@@ -1236,39 +1236,59 @@ struct {
     }
     
     //we also post a snapshot to the machine database
+    NSArray* baselines = [NSArray arrayWithObjects:
+                          [NSNumber numberWithFloat:adcs[0]],
+                          [NSNumber numberWithFloat:adcs[1]],
+                          [NSNumber numberWithFloat:adcs[2]],
+                          [NSNumber numberWithFloat:adcs[3]],
+                          [NSNumber numberWithFloat:adcs[4]],
+                          
+                          [NSNumber numberWithFloat:adcs[8]],
+                          [NSNumber numberWithFloat:adcs[9]],
+                          [NSNumber numberWithFloat:adcs[10]],
+                          [NSNumber numberWithFloat:adcs[11]],
+                          [NSNumber numberWithFloat:adcs[12]],
+                          nil];
+    NSArray* leakages = [NSArray arrayWithObjects:
+                         [NSNumber numberWithFloat:leakageCurrents[0]],
+                         [NSNumber numberWithFloat:leakageCurrents[1]],
+                         [NSNumber numberWithFloat:leakageCurrents[2]],
+                         [NSNumber numberWithFloat:leakageCurrents[3]],
+                         [NSNumber numberWithFloat:leakageCurrents[4]],
+                         [NSNumber numberWithFloat:leakageCurrents[5]],
+                         [NSNumber numberWithFloat:leakageCurrents[6]],
+                         [NSNumber numberWithFloat:leakageCurrents[7]],
+                         [NSNumber numberWithFloat:leakageCurrents[8]],
+                         [NSNumber numberWithFloat:leakageCurrents[9]],
+                          nil];
+    NSArray* names = [NSArray arrayWithObjects:
+                          [self detectorName:0],
+                          [self detectorName:1],
+                          [self detectorName:2],
+                          [self detectorName:3],
+                          [self detectorName:4],
+                          [self detectorName:8],
+                          [self detectorName:9],
+                          [self detectorName:10],
+                          [self detectorName:11],
+                          [self detectorName:12],
+                             nil];
+   
+    NSArray* temperatures = [NSArray arrayWithObjects:
+                         [NSNumber numberWithFloat:adcs[7]],
+                         [NSNumber numberWithFloat:adcs[15]],
+                         nil];
+  
     NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
-                            [NSNumber numberWithFloat:adcs[0]],            @"Baseline0",
-                            [NSNumber numberWithFloat:adcs[1]],            @"Baseline1",
-                            [NSNumber numberWithFloat:adcs[2]],            @"Baseline2",
-                            [NSNumber numberWithFloat:adcs[3]],            @"Baseline3",
-                            [NSNumber numberWithFloat:adcs[4]],            @"Baseline4",
-                            
-                            [NSNumber numberWithFloat:adcs[8]],            @"Baseline5",
-                            [NSNumber numberWithFloat:adcs[9]],            @"Baseline6",
-                            [NSNumber numberWithFloat:adcs[10]],           @"Baseline7",
-                            [NSNumber numberWithFloat:adcs[11]],           @"Baseline8",
-                            [NSNumber numberWithFloat:adcs[12]],           @"Baseline9",
-                            
+                            names,                                         @"detectorNames",
+                            baselines,                                     @"baselineVoltages",
+                            leakages,                                      @"leakageCurrents",
+                            temperatures,                                  @"temperatures",
                             [NSNumber numberWithFloat:adcs[13]],           @"+24V",
                             [NSNumber numberWithFloat:adcs[14]],           @"-24V",
                             [NSNumber numberWithFloat:adcs[5]],            @"+12V",
                             [NSNumber numberWithFloat:adcs[6]],            @"-12V",
-                            
-                            [NSNumber numberWithFloat:adcs[7]],            @"Temp1",
-                            [NSNumber numberWithFloat:adcs[15]],           @"Temp2",
-                            
-                            [NSNumber numberWithFloat:leakageCurrents[0]], @"Leakage0",
-                            [NSNumber numberWithFloat:leakageCurrents[1]], @"Leakage1",
-                            [NSNumber numberWithFloat:leakageCurrents[2]], @"Leakage2",
-                            [NSNumber numberWithFloat:leakageCurrents[3]], @"Leakage3",
-                            [NSNumber numberWithFloat:leakageCurrents[4]], @"Leakage4",
-                            [NSNumber numberWithFloat:leakageCurrents[5]], @"Leakage5",
-                            [NSNumber numberWithFloat:leakageCurrents[6]], @"Leakage6",
-                            [NSNumber numberWithFloat:leakageCurrents[7]], @"Leakage7",
-                            [NSNumber numberWithFloat:leakageCurrents[8]], @"Leakage8",
-                            [NSNumber numberWithFloat:leakageCurrents[9]], @"Leakage9",
-                            
-                            [NSNumber numberWithInt:    pollTime],          @"pollTime",
+                            [NSNumber numberWithInt:    pollTime],         @"pollTime",
                             nil];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
