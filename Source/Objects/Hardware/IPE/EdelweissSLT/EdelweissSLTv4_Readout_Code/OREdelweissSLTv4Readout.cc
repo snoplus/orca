@@ -34,6 +34,8 @@ bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
     uint32_t readbuffer32[2048];
     uint32_t shipbuffer32[2048];
     uint16_t *shipbuffer16=(uint16_t *)shipbuffer32;
+    uint32_t shipdebugbuffer32[2048];
+    uint16_t *shipdebugbuffer16=(uint16_t *)shipdebugbuffer32;
     
     int32_t leaf_index;
     //read out the children flts that are in the readout list
@@ -124,7 +126,10 @@ fprintf(stderr,"OREWSLTv4Readout::Readout(SBC_LAM_Data* lamData): location %i, G
                                 uint32_t address=  FLTRAMDataReg(flt+1, chan)  ;
                                 pbus->readBlock(address, (unsigned long *) readbuffer32, waveformLength);//read 2048 word32s
                                 {   int i;
-                                    for(i=0; i<waveformLength; i++) shipbuffer16[i]=(uint16_t)((uint32_t)(readbuffer32[i] & 0xffff));
+                                    for(i=0; i<waveformLength; i++){
+                                        shipbuffer16[i]=(uint16_t)((uint32_t)(readbuffer32[i] & 0xffff));
+                                        shipdebugbuffer16[i]=(uint16_t)((uint32_t)((readbuffer32[i]>>16) & 0xffff));
+                                    }
                                 }
 
                                 //prepare the record
@@ -157,6 +162,34 @@ fprintf(stderr,"OREWSLTv4Readout::Readout(SBC_LAM_Data* lamData): location %i, G
                                 for(uint32_t i=0;i<waveformLength32;i++){
                                     //TESTING data[dataIndex++] = chan;//adctrace32[col][eventchan][i];
                                     data[dataIndex++] = shipbuffer32[i];
+                                }
+                                
+                                uint32_t debugFlag=1;
+                                if(debugFlag && (chan>=6) && (chan<=17)){
+                                    //ship data record
+                                    ensureDataCanHold(9 + waveformLength/2); 
+                                    location   = ((crate & 0x01e)<<21) | (((flt+1) & 0x0000001f)<<16)  | (((chan+32) & 0xff) << 8); // | ((filterIndex & 0xf)<<4)  | (filterShapingLength & 0xf)  ;
+
+                                    data[dataIndex++] = waveFormId | (9 + waveformLength32);    
+                                    //printf("FLT%i: waveformId is %i  loc+ev.chan %i\n",col+1,waveformId,  location | eventchan<<8);
+                                    data[dataIndex++] = location;
+                                    data[dataIndex++] = eventFifo0;              //sec
+                                    data[dataIndex++] = eventFifo1 & 0xffff;     //subsec
+                                    data[dataIndex++] = eventFifo2;              //channel map
+                                    data[dataIndex++] = eventID;        //event flags: event ID=read ptr (10 bit); pagenr (6 bit);; fifoFlags (4 bit);flt mode (4 bit)
+                                    //data[dataIndex++] = energy; changed 2011-06-14 to add fifoEventID -tb-
+                                    data[dataIndex++] = eventFifo3;//energy
+                                    //DEBUG:data[dataIndex++] = debugbuffer[col][eventchan];   //TODO: debug ... energy; for checking page counter I wrote out page counter instead of energy -tb-
+                                    //      data[dataIndex++] = ((traceStart16 & 0x7ff)<<8) | eventFlags | (wfRecordVersion & 0xf);
+                                    data[dataIndex++] =  (wfRecordVersion & 0xf);//eventFlags
+                                    //data[dataIndex++] = ((traceStart16 & 0x7ff)<<8) |  (wfRecordVersion & 0xf);
+                                    //data[dataIndex++] = 0;    //spare to remain byte compatible with the v3 record
+                                    data[dataIndex++] = 0;//postTriggerTime /*for debugging -tb-*/   ;    //spare to remain byte compatible with the v3 record
+                                    //ship waveform
+                                    for(uint32_t i=0;i<waveformLength32;i++){
+                                        //TESTING data[dataIndex++] = chan;//adctrace32[col][eventchan][i];
+                                        data[dataIndex++] = shipdebugbuffer32[i];
+                                    }
                                 }
                     
                     
