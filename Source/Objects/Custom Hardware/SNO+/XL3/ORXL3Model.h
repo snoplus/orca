@@ -193,7 +193,7 @@ enum {
 @property (nonatomic,assign) BOOL xl3InitInProgress;
 @property (assign) unsigned long ecal_received; //set accross multiple threads
 @property (nonatomic,assign) bool ecalToOrcaInProgress;
-@property (weak) id snotDb;
+@property (assign) id snotDb;//I replaced 'weak' by 'assign' to get Orca compiled under 10.6 (-tb- 2013-09)
 
 
 #pragma mark •••Initialization
