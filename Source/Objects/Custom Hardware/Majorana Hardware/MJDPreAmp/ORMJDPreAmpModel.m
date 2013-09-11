@@ -1197,17 +1197,19 @@ struct {
 - (void) postCouchDBRecord
 {    
     NSDate* now = [NSDate date];
+    int detectorToAdc[10]   = {0,1,2,3,4,8,9,10,11,12};
+    int tempChanToUse[10]   = {7,7,7,7,7,15,15,15,15,15};
+    NSString* machineName = computerName();
     if(!lastDataBaseUpdate || [now timeIntervalSinceDate:lastDataBaseUpdate] >= 60){
         
         [lastDataBaseUpdate release];
         lastDataBaseUpdate = [now retain];
-        NSString* machineName = computerName();
+ 
+ 
         
         //just ten detectors per premap
         int i;
         for(i=0;i<10;i++){
-            int detectorToAdc[10]   = {0,1,2,3,4,8,9,10,11,12};
-            int tempChanToUse[10]   = {7,7,7,7,7,15,15,15,15,15};
             int detectorAdcChannel = detectorToAdc[i];
             int tempAdcChannel     = tempChanToUse[i];
             if((detectorName[detectorAdcChannel].length!=0) && (adcEnabledMask & (0x1 << detectorAdcChannel))){
@@ -1236,65 +1238,44 @@ struct {
     }
     
     //we also post a snapshot to the machine database
-    NSArray* baselines = [NSArray arrayWithObjects:
-                          [NSNumber numberWithFloat:adcs[0]],
-                          [NSNumber numberWithFloat:adcs[1]],
-                          [NSNumber numberWithFloat:adcs[2]],
-                          [NSNumber numberWithFloat:adcs[3]],
-                          [NSNumber numberWithFloat:adcs[4]],
-                          
-                          [NSNumber numberWithFloat:adcs[8]],
-                          [NSNumber numberWithFloat:adcs[9]],
-                          [NSNumber numberWithFloat:adcs[10]],
-                          [NSNumber numberWithFloat:adcs[11]],
-                          [NSNumber numberWithFloat:adcs[12]],
-                          nil];
-    NSArray* leakages = [NSArray arrayWithObjects:
-                         [NSNumber numberWithFloat:leakageCurrents[0]],
-                         [NSNumber numberWithFloat:leakageCurrents[1]],
-                         [NSNumber numberWithFloat:leakageCurrents[2]],
-                         [NSNumber numberWithFloat:leakageCurrents[3]],
-                         [NSNumber numberWithFloat:leakageCurrents[4]],
-                         [NSNumber numberWithFloat:leakageCurrents[5]],
-                         [NSNumber numberWithFloat:leakageCurrents[6]],
-                         [NSNumber numberWithFloat:leakageCurrents[7]],
-                         [NSNumber numberWithFloat:leakageCurrents[8]],
-                         [NSNumber numberWithFloat:leakageCurrents[9]],
-                          nil];
+    NSMutableDictionary* theRecord = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                      [NSString stringWithFormat:@"%@",[self fullID]], @"object",
+                                      machineName,                                     @"machine",
+                                      nil];
+    NSMutableArray* detectorArray = [NSMutableArray array];
     
-    NSArray* names = [NSArray arrayWithObjects:
-                          [self detectorName:0],
-                          [self detectorName:1],
-                          [self detectorName:2],
-                          [self detectorName:3],
-                          [self detectorName:4],
-                          [self detectorName:8],
-                          [self detectorName:9],
-                          [self detectorName:10],
-                          [self detectorName:11],
-                          [self detectorName:12],
-                             nil];
-   
+    int i;
+    for(i=0;i<10;i++){
+        int detectorAdcChannel = detectorToAdc[i];
+        if((detectorName[detectorAdcChannel].length!=0) && (adcEnabledMask & (0x1 << detectorAdcChannel))){
+            NSDictionary* detectorInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                                          [NSNumber numberWithInt:detectorAdcChannel],          @"channel",
+                                          [NSNumber numberWithFloat:adcs[detectorAdcChannel]],  @"baselineVoltage",
+                                          [feedBackResistors objectAtIndex:i],                  @"feedBackResistors",
+                                          [baselineVoltages objectAtIndex:i],                   @"baselineAtZeroVolts",
+                                          [NSNumber numberWithFloat:leakageCurrents[i]],        @"leakageCurrent",
+                                          [self detectorName:detectorAdcChannel],               @"detectorName",
+                                          nil];
+            [detectorArray addObject:detectorInfo];
+        }
+    }
+    
     NSArray* temperatures = [NSArray arrayWithObjects:
                          [NSNumber numberWithFloat:adcs[7]],
                          [NSNumber numberWithFloat:adcs[15]],
                          nil];
   
-    NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
-                            names,                                         @"detectorNames",
-                            baselines,                                     @"baselineAtZeroVolts",
-                            leakages,                                      @"leakageCurrents",
-                            temperatures,                                  @"temperatures",
-                            baselineVoltages,                              @"baselineVoltages",
-                            feedBackResistors,                             @"feedBackResistors",
-                            [NSNumber numberWithFloat:adcs[13]],           @"+24V",
-                            [NSNumber numberWithFloat:adcs[14]],           @"-24V",
-                            [NSNumber numberWithFloat:adcs[5]],            @"+12V",
-                            [NSNumber numberWithFloat:adcs[6]],            @"-12V",
-                            [NSNumber numberWithInt:    pollTime],         @"pollTime",
-                            nil];
+    if([detectorArray count])[theRecord setObject:detectorArray forKey:@"detectors"];
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
+    [theRecord setObject:temperatures                        forKey:@"temperatures"];
+    [theRecord setObject:[NSNumber numberWithFloat:adcs[13]] forKey:@"+24V"];
+    [theRecord setObject:[NSNumber numberWithFloat:adcs[14]] forKey:@"-24V"];
+    [theRecord setObject:[NSNumber numberWithFloat:adcs[5]]  forKey:@"+12V"];
+    [theRecord setObject:[NSNumber numberWithFloat:adcs[6]]  forKey:@"-12V"];
+    [theRecord setObject:[NSNumber numberWithInt:pollTime]   forKey:@"pollTime"];
+    
+     
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:theRecord];
 }
 
 @end
