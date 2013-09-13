@@ -136,7 +136,9 @@ fprintf(stderr,"OREWSLTv4Readout::Readout(SBC_LAM_Data* lamData): location %i, G
                                 uint32_t eventFlags=0;//append page, append next page  TODO: currently not used <--------------------remove it -tb-
     	                        location   = ((crate & 0x01e)<<21) | (((flt+1) & 0x0000001f)<<16)  | ((chan & 0xff) << 8); // | ((filterIndex & 0xf)<<4)  | (filterShapingLength & 0xf)  ;
 
-                             
+                                uint32_t shapingLength=0;
+                                if(chan<18)
+                                    shapingLength= pbus->read(FLTTriggParReg(flt+1,chan)) & 0xff;
 
                                 //ship data record
                                 ensureDataCanHold(9 + waveformLength/2); 
@@ -154,7 +156,7 @@ fprintf(stderr,"OREWSLTv4Readout::Readout(SBC_LAM_Data* lamData): location %i, G
                                 data[dataIndex++] =  (wfRecordVersion & 0xf);//eventFlags
                                 //data[dataIndex++] = ((traceStart16 & 0x7ff)<<8) |  (wfRecordVersion & 0xf);
                                 //data[dataIndex++] = 0;    //spare to remain byte compatible with the v3 record
-                                data[dataIndex++] = 0;//postTriggerTime /*for debugging -tb-*/   ;    //spare to remain byte compatible with the v3 record
+                                data[dataIndex++] = shapingLength;//0;//postTriggerTime /*for debugging -tb-*/   ;    //spare to remain byte compatible with the v3 record
                                 
                                 //TODO: SHIP TRIGGER POS and POSTTRIGG time !!! -tb-
                                 

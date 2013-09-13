@@ -3161,7 +3161,7 @@
 {
 	if([sender indexOfSelectedItem] != [model hitRateLength]){
         [self endEditing];
-		[[self undoManager] setActionName: @"Set Hit Rate Length"]; 
+		[[self undoManager] setActionName: @"Set Hit Rate Period"]; 
 		[model setHitRateLength:[[sender selectedItem] tag]];
 	}
 }

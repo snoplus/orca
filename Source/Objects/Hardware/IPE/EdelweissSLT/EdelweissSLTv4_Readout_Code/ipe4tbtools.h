@@ -138,6 +138,10 @@ uint32_t BBcsrReg(int numFIFO);
 	static const uint32_t FLTBBStatusRegBase    = 0x00001400 >> 2;
 
 	static const uint32_t FLTRAMDataRegBase     = 0x00003000 >> 2;
+
+
+	static const uint32_t FLTHeatTriggParRegBase     = 0x00000050 >> 2;
+	static const uint32_t FLTIonTriggParRegBase     = 0x00000050 >> 2;
 	
 // 
 // NOTE: numFLT from 1...20  !!!!!!!!!!!!
@@ -160,6 +164,9 @@ uint32_t FLTAccessTestReg(int numFLT);
 uint32_t FLTBBStatusReg(int numFLT, int numChan);
 uint32_t FLTTotalTriggerNReg(int numFLT);
 uint32_t FLTRAMDataReg(int numFLT, int numChan);
+uint32_t FLTHeatTriggParReg(int numFLT, int numChan);
+uint32_t FLTIonTriggParReg(int numFLT, int numChan);
+uint32_t FLTTriggParReg(int numFLT, int numChan);
 
 
 

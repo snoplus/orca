@@ -323,11 +323,11 @@ followed by multiplicity data (20 longwords -- 1 pixel mask per card)
     uint32_t eventFlags     = ptr[7];
     //uint32_t traceStart16 = ShiftAndExtract(eventFlags,8,0x7ff);//start of trace in short array
     
+#define kPageLength (64*1024)
     
 #if 0
 
 
-#define kPageLength (64*1024)
 
 	int page = energy/kPageLength;
 	int startPage = page*kPageLength;
@@ -416,8 +416,25 @@ if((eventFlags4bit == 0x1) || (eventFlags4bit == 0x3)){//raw UDP packet
 
 
 
-
-
+    if(eventFlags4bit == 0x2){//FLT event
+        uint32_t energy         = ptr[6] & 0x00ffffff;
+        uint32_t shapingLength  = ptr[8] & 0x000000ff;
+        printf("energy:0x%08x sL:%i\n",energy,shapingLength);
+        if(energy && 0x00800000){//energy is negative
+            energy = ~(energy | 0xff000000);
+	        //channel by channel histograms
+            if(shapingLength>0) energy=energy/shapingLength;
+	        [aDataSet histogram:energy 
+				        numBins:kPageLength sender:self  
+			           withKeys:@"IPE-SLT-EW", @"FLT-Event", @"Energy (neg)" , crateKey,stationKey,channelKey,nil];
+        }else{//energy is positive
+	        //channel by channel histograms
+            if(shapingLength>0) energy=energy/shapingLength;
+	        [aDataSet histogram:energy 
+				        numBins:kPageLength sender:self  
+			           withKeys:@"IPE-SLT-EW", @"FLT-Event", @"Energy (pos)" , crateKey,stationKey,channelKey,nil];
+        }
+    }
 
 
 

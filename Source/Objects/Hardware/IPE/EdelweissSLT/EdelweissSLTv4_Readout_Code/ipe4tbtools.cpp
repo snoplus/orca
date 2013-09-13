@@ -416,6 +416,23 @@ uint32_t FLTRAMDataReg(int numFLT, int numChan){
     return FLTRAMDataRegBase | ((numFLT & 0x3f) <<17) | ((numChan & 0x1f) <<12); 
 }
 
+uint32_t FLTHeatTriggParReg(int numFLT, int numChan){
+    return FLTHeatTriggParRegBase | ((numFLT & 0x3f) <<17) | ((numChan & 0x1f) <<12); 
+}
+
+uint32_t FLTIonTriggParReg(int numFLT, int numChan){
+    return FLTIonTriggParRegBase | ((numFLT & 0x3f) <<17) | ((numChan & 0x1f) <<12); 
+}
+
+uint32_t FLTTriggParReg(int numFLT, int numChan){
+    if(numChan>=0 && numChan<6)
+        return FLTHeatTriggParRegBase | ((numFLT & 0x3f) <<17) | ((numChan & 0x1f) <<12); 
+    if(numChan>=6 && numChan<18)
+        return FLTIonTriggParRegBase | ((numFLT & 0x3f) <<17) | (((numChan-6) & 0x1f) <<12); 
+    //fallback
+    return FLTIonTriggParRegBase | ((numFLT & 0x3f) <<17);
+}
+
 
 
 

@@ -3869,6 +3869,13 @@ for(chan=0; chan<6;chan++)
     [a addObject:p];
 	
     p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Shaping Length"];
+    [p setFormat:@"##0" upperLimit:0xff lowerLimit:6 stepSize:1 units:@"raw"];
+    [p setSetMethod:@selector(setShapingLength:withValue:) getMethod:@selector(shapingLength:)];
+	[p setCanBeRamped:YES];
+    [a addObject:p];
+	
+    p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Gain"];
     [p setFormat:@"##0" upperLimit:0xfff lowerLimit:0 stepSize:1 units:@"raw"];
     [p setSetMethod:@selector(setGain:withValue:) getMethod:@selector(gain:)];
@@ -3918,13 +3925,13 @@ for(chan=0; chan<6;chan++)
     [p setFormat:@"##0" upperLimit:7 lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setGapLength:) getMethod:@selector(gapLength)];
     [a addObject:p];			
-
+#if 0
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"FilterLength"];
     [p setFormat:@"##0" upperLimit:7 lowerLimit:2 stepSize:1 units:@""];
     [p setSetMethod:@selector(setFilterLength:) getMethod:@selector(filterLength)];
     [a addObject:p];			
-	
+#endif
 	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setUseValue:NO];
