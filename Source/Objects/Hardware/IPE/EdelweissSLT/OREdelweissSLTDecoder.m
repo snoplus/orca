@@ -420,7 +420,7 @@ if((eventFlags4bit == 0x1) || (eventFlags4bit == 0x3)){//raw UDP packet
         uint32_t energy         = ptr[6] & 0x00ffffff;
         uint32_t shapingLength  = ptr[8] & 0x000000ff;
         printf("energy:0x%08x sL:%i flt:%i chan:%i\n",energy,shapingLength,card,trigChan);
-        if(energy && 0x00800000){//energy is negative
+        if(energy & 0x00800000){//energy is negative
             energy = ~(energy | 0xff000000);
 	        //channel by channel histograms
             if(shapingLength>0) energy=energy/shapingLength;
