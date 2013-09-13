@@ -52,6 +52,7 @@
 	IBOutlet   NSMatrix*    shapingLengthMatrix;
 		IBOutlet NSMatrix*		hitRateEnableMatrix;
 		IBOutlet NSPopUpButton*	hitRateLengthPU;
+		IBOutlet NSTextField*	hitRateLengthTextField;
 		IBOutlet NSButton*		hitRateAllButton;
 		IBOutlet NSButton*		hitRateNoneButton;
     
@@ -76,6 +77,8 @@
     
 	IBOutlet   NSMatrix*    BB0x0ACmdMaskMatrix; //Alim/0x0A command
 	IBOutlet   NSTextField* chargeBBFileTextField;
+	IBOutlet   NSPopUpButton* pollBBStatusIntervallPU;
+    IBOutlet   NSProgressIndicator*	pollBBStatusIntervallIndicator;
 	IBOutlet   NSButton*    writeToBBModeCB;
     IBOutlet   NSProgressIndicator*	writeToBBModeIndicator;
 	IBOutlet   NSMatrix* adcValueForBBAccessMatrix;
@@ -94,6 +97,7 @@
       IBOutlet   NSPopUpButton* relais2PU;//is in relaisState
 	  IBOutlet   NSMatrix* mezOnOffBBMatrix;//is in relaisState
     IBOutlet   NSPopUpButton* fiberSelectForBBStatusBitsPU;
+	IBOutlet   NSTextField* statusAlimBBTextField;
         
         
 	    IBOutlet NSButton*      tpixCB;//TODO: obsolete? -tb-
@@ -209,6 +213,7 @@
 - (void) updateButtons;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+- (void) pollBBStatusIntervallChanged:(NSNotification*)aNote;
 - (void) progressOfChargeBBChanged:(NSNotification*)aNote;
 - (void) chargeBBFileForFiberChanged:(NSNotification*)aNote;
 - (void) BB0x0ACmdMaskChanged:(NSNotification*)aNote;
@@ -298,6 +303,7 @@
 - (void) selectedChannelValueChanged:(NSNotification*) aNote;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+- (IBAction) pollBBStatusIntervallPUAction:(id)sender;
 - (IBAction) devTabButtonAction:(id) sender;
 - (IBAction) killChargeBBJobButtonAction:(id) sender;
 - (IBAction) selectChargeBBFileForFiberAction:(id) sender;
@@ -459,6 +465,8 @@
 - (IBAction) resetAction: (id) sender;
 - (IBAction) hitRateEnableMatrixAction: (id) sender;
 - (IBAction) hitRateLengthAction: (id) sender;
+- (IBAction) hitRateLengthTextFieldAction: (id) sender;
+- (IBAction) writeHitRateLengthButtonAction: (id) sender;
 - (IBAction) hitRateAllAction: (id) sender;
 - (IBAction) hitRateNoneAction: (id) sender;
 - (IBAction) testEnabledAction:(id)sender;

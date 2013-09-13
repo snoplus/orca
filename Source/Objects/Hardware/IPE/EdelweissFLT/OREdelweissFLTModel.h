@@ -72,7 +72,7 @@
 	unsigned long	waveFormId;		//!< Id used to identify energy+trace data set (debug mode)
 	unsigned long	hitRateId;
 	unsigned long	histogramId;
-	unsigned short	hitRateLength;		//!< Sampling time of the hitrate measurement (1..32 seconds)
+	unsigned short	hitRateLength;		//!< Sampling time of the hitrate measurement (hitrate period, 8 bit, 0..255 seconds)
 	float			hitRate[kNumEWFLTHeatIonChannels];	//!< Actual value of the trigger rate measurement
 	BOOL			hitRateOverFlow[kNumEWFLTHeatIonChannels];	//!< Overflow of hardware trigger rate register
 	float			hitRateTotal;	//!< Sum trigger rate of all channels 
@@ -177,6 +177,7 @@
     uint32_t BB0x0ACmdMask;
     NSString* chargeBBFileForFiber[6];
     int progressOfChargeBB;
+    int pollBBStatusIntervall;
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
@@ -187,6 +188,8 @@
 - (short) getNumberRegisters;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+- (int) pollBBStatusIntervall;
+- (void) setPollBBStatusIntervall:(int)aPollBBStatusIntervall;
 - (int) progressOfChargeBB;
 - (void) setProgressOfChargeBB:(int)aProgressOfChargeBB;
 - (NSString*) chargeBBFileForFiber:(int) aFiber;
@@ -475,12 +478,14 @@
 - (void) initTrigger;
 - (void) readAll;
 - (void) writeInterruptMask;
+- (void) pollBBStatus;
 - (void) readHitRates;
 - (void) writeTestPattern:(unsigned long*)mask length:(int)len;
 - (void) rewindTestPattern;
 - (void) writeNextPattern:(unsigned long)aValue;
 - (unsigned long) readStatus;
 - (unsigned long) readControl;
+- (void) writeRunControl;
 - (unsigned long) readTotalTriggerNRegister;
 - (void) writeControl;
 - (void) writeStreamMask;
@@ -588,6 +593,7 @@
 				  n:(int) n;
 @end
 
+extern NSString* OREdelweissFLTModelPollBBStatusIntervallChanged;
 extern NSString* OREdelweissFLTModelProgressOfChargeBBChanged;
 extern NSString* OREdelweissFLTModelChargeBBFileForFiberChanged;
 extern NSString* OREdelweissFLTModelBB0x0ACmdMaskChanged;

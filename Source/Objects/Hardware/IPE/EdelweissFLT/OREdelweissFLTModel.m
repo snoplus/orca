@@ -36,6 +36,7 @@
 
 //#import "ipe4tbtools.cpp"
 
+NSString* OREdelweissFLTModelPollBBStatusIntervallChanged = @"OREdelweissFLTModelPollBBStatusIntervallChanged";
 NSString* OREdelweissFLTModelProgressOfChargeBBChanged = @"OREdelweissFLTModelProgressOfChargeBBChanged";
 NSString* OREdelweissFLTModelChargeBBFileForFiberChanged = @"OREdelweissFLTModelChargeBBFileForFiberChanged";
 NSString* OREdelweissFLTModelBB0x0ACmdMaskChanged = @"OREdelweissFLTModelBB0x0ACmdMaskChanged";
@@ -333,6 +334,26 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (short) getNumberRegisters{ return kFLTV4NumRegs; }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+
+- (int) pollBBStatusIntervall
+{
+    return pollBBStatusIntervall;
+}
+
+- (void) setPollBBStatusIntervall:(int)aPollBBStatusIntervall
+{
+    if(pollBBStatusIntervall!=0 && aPollBBStatusIntervall==0){//change from >0 to 0
+	    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollBBStatus) object:nil];
+    }
+        //DEBUG OUTPUT:                   NSLog(@"%@::%@: aPollBBStatusIntervall %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),aPollBBStatusIntervall);//TODO : DEBUG testing ...-tb-
+    [[[self undoManager] prepareWithInvocationTarget:self] setPollBBStatusIntervall:pollBBStatusIntervall];
+    pollBBStatusIntervall = aPollBBStatusIntervall;
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelPollBBStatusIntervallChanged object:self];
+    
+    if(pollBBStatusIntervall>0){//change from 0 to >0
+	    [self pollBBStatus];
+    }
+}
 
 - (int) progressOfChargeBB
 {
@@ -1894,7 +1915,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (void) setHitRateLength:(unsigned short)aHitRateLength
 {	
     [[[self undoManager] prepareWithInvocationTarget:self] setHitRateLength:hitRateLength];
-    hitRateLength = [self restrictIntValue:aHitRateLength min:0 max:6]; //0->1sec, 1->2, 2->4 .... 6->32sec
+    hitRateLength = [self restrictIntValue:aHitRateLength min:1 max:256]; //0->1sec, 1->2, 2->3 .... sec
 
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelHitRateLengthChanged object:self];
 }
@@ -2462,6 +2483,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [self writeIonTriggerMask];
     [self writeTriggerParameters];
     [self writePostTriggerTimeAndIonToHeatDelay];
+    [self writeRunControl];//this is the hitrate period
+
 }
 
 - (void) readAll
@@ -2498,28 +2521,9 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	return control;
 }
 
-//TODO: OBSOLETE for EW - remove it! -tb-
-//TODO: better use the STANDBY flag of the FLT -tb- 2010-01-xx     !!!!!!!!!!!!!!!!!
-- (void) writeRunControl:(BOOL)startSampling
+- (void) writeRunControl
 {
-        NSLog(@"%@::%@: DO NOT CALL!!! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
-        NSLog(@"%@::%@: DO NOT CALL!!! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
-        NSLog(@"%@::%@: DO NOT CALL!!! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
-        NSLog(@"%@::%@: DO NOT CALL!!! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
-        NSLog(@"%@::%@: DO NOT CALL!!! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
-        NSLog(@"%@::%@: DO NOT CALL!!! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
-
-return;
-exit(66);
-	unsigned long aValue = 
-	((filterLength & 0xf)<<8)		| 
-	((gapLength & 0xf)<<4)			| 
-	// -tb- ((runBoxCarFilter & 0x1)<<2)	|
-	((startSampling & 0x1)<<3)		|		// run trigger unit
-	((startSampling & 0x1)<<2)		|		// run filter unit
-	((startSampling & 0x1)<<1)      |		// start ADC sampling
-	 (startSampling & 0x1);					// store data in QDRII RAM
-	
+	unsigned long aValue = ((hitRateLength-1) & 0xf) << 16;
 	[self writeReg:kFLTV4RunControlReg value:aValue];					
 }
 
@@ -2800,7 +2804,7 @@ exit(66);
     int fiber = [self fiberSelectForBBAccess];
 
         //DEBUG OUTPUT:           NSLog(@"%@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
-        NSLog(@"  read from fiber in #%i\n",fiberSelectForBBAccess);//TODO : DEBUG testing ...-tb-
+        NSLog(@"  Read BB status bits from FLT %i, fiber in #%i\n",[self stationNumber],fiberSelectForBBAccess);//TODO : DEBUG testing ...-tb-
         
         //uint32_t BBStatus32[30];
         //uint16_t *BBStatus16 = (uint16_t *)BBStatus32;
@@ -3162,30 +3166,62 @@ for(chan=0; chan<6;chan++)
 	//[self writeReg:kFLTV4PixelSettings2Reg value: mask];
 }
 
+- (void) pollBBStatus
+{
+        //DEBUG OUTPUT:                   NSLog(@"%@::%@:  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollBBStatus) object:nil];
+    if(pollBBStatusIntervall==0) return;
+    
+	@try {
+        //DEBUG OUTPUT:                   NSLog(@"%@::%@: reading BB status bits.\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
+        [self readBBStatusForBBAccess];
+	}
+	@catch(NSException* localException) {
+        //DEBUG OUTPUT: 
+                  NSLog(@"%@::%@: reading BB status failed! (Crate not connected?)\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
+        //[self setPollBBStatusIntervall:0];
+	}
+	
+    int delay=0;
+    switch(pollBBStatusIntervall){
+    case 0: delay=0; break;//never
+    case 1: delay=1; break;
+    case 2: delay=2; break;
+    case 3: delay=5; break;
+    case 4: delay=10; break;
+    case 5: delay=60; break;
+    default: delay=60; break;
+    }
+    if(delay>0)[self performSelector:@selector(pollBBStatus) withObject:nil afterDelay:delay];
+}
+
+
 - (void) readHitRates
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHitRates) object:nil];
+
+        //DEBUG OUTPUT:                 NSLog(@"%@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
 	
 //TODO: readHitRates UNDER CONSTRUCTION -tb- 2012-07-19
 //TODO: readHitRates UNDER CONSTRUCTION -tb- 2012-07-19
-#if 0
 	@try {
 		
 		BOOL oneChanged = NO;
 		float newTotal = 0;
 		int chan;
-        int hitRateLengthSec = 1<<hitRateLength;
+        int hitRateLengthSec = hitRateLength;
 		float freq = 1.0/((double)hitRateLengthSec);
 				
-		unsigned long location = (([self crateNumber]&0xf)<<21) | ([self stationNumber]& 0x0000001f)<<16;
-		unsigned long data[5 + kNumV4FLTChannels];
+//		unsigned long location = (([self crateNumber]&0xf)<<21) | ([self stationNumber]& 0x0000001f)<<16;
+//		unsigned long data[5 + kNumEWFLTHeatIonChannels];
 		
 		//combine all the hitrate read commands into one command packet
 		ORCommandList* aList = [ORCommandList commandList];
-		for(chan=0;chan<kNumV4FLTChannels;chan++){
+		for(chan=0;chan<kNumEWFLTHeatIonChannels;chan++){
 			if(hitRateEnabledMask & (1L<<chan)){
 				[aList addCommand: [self readRegCmd:kFLTV4HitRateReg channel:chan]];
 			}
+        //DEBUG OUTPUT:                 NSLog(@"%@::%@: HR command for chan %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),chan);//TODO : DEBUG testing ...-tb-
 		}
 		
 		[self executeCommandList:aList];
@@ -3193,7 +3229,7 @@ for(chan=0; chan<6;chan++)
 		//put the synchronized around this code to test if access to the hitrates is thread safe
 		//pull out the result
 		int dataIndex = 0;
-		for(chan=0;chan<kNumV4FLTChannels;chan++){
+		for(chan=0;chan<kNumEWFLTHeatIonChannels;chan++){
 			if(hitRateEnabledMask & (1L<<chan)){
 				unsigned long aValue = [aList longValueForCmd:dataIndex];
 				BOOL overflow = (aValue >> 31) & 0x1;
@@ -3202,6 +3238,7 @@ for(chan=0; chan<6;chan++)
 					if (hitRateLengthSec!=0)	hitRate[chan] = aValue * freq;
 					//if (hitRateLengthSec!=0)	hitRate[chan] = aValue; 
 					else					    hitRate[chan] = 0;
+        //DEBUG OUTPUT:                 NSLog(@"%@::%@: HR  for chan %i was 0x%08x (%i)  -> %f\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),chan,aValue,aValue,hitRate[chan]);//TODO : DEBUG testing ...-tb-
 					
 					if(hitRateOverFlow[chan])hitRate[chan] = 0;
 					hitRateOverFlow[chan] = overflow;
@@ -3211,10 +3248,11 @@ for(chan=0; chan<6;chan++)
 				if(!hitRateOverFlow[chan]){
 					newTotal += hitRate[chan];
 				}
-				data[dataIndex + 5] = ((chan&0xff)<<20) | ((overflow&0x1)<<16) | aValue;// the hitrate may have more than 16 bit in the future -tb-
+//				data[dataIndex + 5] = ((chan&0xff)<<20) | ((overflow&0x1)<<16) | aValue;// the hitrate may have more than 16 bit in the future -tb-
 				dataIndex++;
 			}
 		}
+#if 0
 		
 		if(dataIndex>0){
 			time_t	ut_time;
@@ -3229,6 +3267,7 @@ for(chan=0; chan<6;chan++)
 																object:[NSData dataWithBytes:data length:sizeof(long)*(dataIndex + 5)]];
 			
 		}
+#endif
 		
 		[self setHitRateTotal:newTotal];
 		
@@ -3239,10 +3278,9 @@ for(chan=0; chan<6;chan++)
 	@catch(NSException* localException) {
 	}
 	
-	[self performSelector:@selector(readHitRates) withObject:nil afterDelay:(1<<[self hitRateLength])];
 
 
-#endif
+	[self performSelector:@selector(readHitRates) withObject:nil afterDelay:[self hitRateLength]];
 }
 
 
@@ -3295,6 +3333,7 @@ for(chan=0; chan<6;chan++)
 	
     [[self undoManager] disableUndoRegistration];
     
+    [self setPollBBStatusIntervall:[decoder decodeIntForKey:@"pollBBStatusIntervall"]];
     [self setChargeBBFile:[decoder decodeObjectForKey:@"chargeBBFileForFiber0"] forFiber:0 ];
     [self setChargeBBFile:[decoder decodeObjectForKey:@"chargeBBFileForFiber1"] forFiber:1 ];
     [self setChargeBBFile:[decoder decodeObjectForKey:@"chargeBBFileForFiber2"] forFiber:2 ];
@@ -3413,6 +3452,7 @@ for(chan=0; chan<6;chan++)
 {
     [super encodeWithCoder:encoder];
 	
+    [encoder encodeInt:pollBBStatusIntervall forKey:@"pollBBStatusIntervall"];
     [encoder encodeObject:chargeBBFileForFiber[0] forKey:@"chargeBBFileForFiber0"];
     [encoder encodeObject:chargeBBFileForFiber[1] forKey:@"chargeBBFileForFiber1"];
     [encoder encodeObject:chargeBBFileForFiber[2] forKey:@"chargeBBFileForFiber2"];
@@ -3673,9 +3713,9 @@ for(chan=0; chan<6;chan++)
 
 	//check which mode to use
 	BOOL ratesEnabled = NO;
-#if 0	
+#if 1	
 	int i;
-	for(i=0;i<kNumV4FLTChannels;i++){
+	for(i=0;i<kNumEWFLTHeatIonChannels;i++){
 		if([self hitRateEnabled:i]){
 			ratesEnabled = YES;
 			break;
@@ -3686,16 +3726,16 @@ for(chan=0; chan<6;chan++)
     if([[userInfo objectForKey:@"doinit"]intValue]){
 //TODO: remove the obsolete commands -tb-    
 	//[self setLedOff:NO];
-	//[self writeRunControl:YES]; // writes to run control register (was NO, but this causes the first few noise events -tb-)
-	//[self reset];               // Write 1 to all reset/clear flags of the FLTv4 command register.
+	  //[self writeRunControl];     // writes theHitRatePeriod - moved to initBoard -tb- 2013-09
+      //[self reset];               // Write 1 to all reset/clear flags of the FLTv4 command register.
 	  [self initBoard];           // writes control reg + hr control reg + PostTrigg + thresh+gains + offset + triggControl + hr mask + enab.statistics
 	}
 	
 	
-	if(0 & ratesEnabled){//TODO: disabled ... -tb-
+	if(ratesEnabled){//TODO: disabled ... -tb-
 		[self performSelector:@selector(readHitRates) 
 				   withObject:nil
-				   afterDelay: (1<<[self hitRateLength])];		//start reading out the rates
+				   afterDelay: [self hitRateLength]];		//start reading out the rates
 	}
 		
 	if(runMode == kIpeFltV4_MonitoringDaqMode ){ ///obsolete ... kIpeFltV4_Histogram_DaqMode){
@@ -3731,7 +3771,6 @@ for(chan=0; chan<6;chan++)
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-	//[self writeRunControl:NO];// let it run, see runTaskStarted ... -tb-
 	[self setLedOff:YES];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHitRates) object:nil];
 //	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHistogrammingStatus) object:nil];
@@ -3852,7 +3891,7 @@ for(chan=0; chan<6;chan++)
 #endif	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Post Trigger Delay"];
-    [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:2047 units:@"x50ns"];
+    [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:2047 units:@"x10usec"];
     [p setSetMethod:@selector(setPostTriggerTime:) getMethod:@selector(postTriggerTime)];
     [a addObject:p];
 	

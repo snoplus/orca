@@ -23,6 +23,8 @@
 #define kSLTv4EW    1
 #define kFLTv4EW    2
 
+//#define kNumEWTriggFLTChannels 18  //use kNumEWFLTHeatIonChannels
+
 
 #define kReadWaveForms	0x1 << 0
 

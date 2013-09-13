@@ -32,6 +32,9 @@
 #import "ORValueBarGroupView.h"
 #import "ORCompositePlotView.h"
 
+#import "ipe4structure.h"
+
+
 @implementation OREdelweissFLTController
 
 #pragma mark •••Initialization
@@ -495,9 +498,24 @@
                          name : OREdelweissFLTModelProgressOfChargeBBChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(pollBBStatusIntervallChanged:)
+                         name : OREdelweissFLTModelPollBBStatusIntervallChanged
+						object: model];
+
 }
 
 #pragma mark •••Interface Management
+
+- (void) pollBBStatusIntervallChanged:(NSNotification*)aNote
+{
+	//[pollBBStatusIntervallPU setIntValue: [model pollBBStatusIntervall]];
+	[pollBBStatusIntervallPU selectItemAtIndex: [model pollBBStatusIntervall]];
+    if([model pollBBStatusIntervall]==0)
+        [pollBBStatusIntervallIndicator stopAnimation:nil];
+    else
+        [pollBBStatusIntervallIndicator startAnimation:nil];
+}
 
 - (void) progressOfChargeBBChanged:(NSNotification*)aNote
 {
@@ -847,6 +865,8 @@
     [self temperatureChanged:nil];
     
     [self chargeBBFileForFiberChanged:nil];
+    
+    [statusAlimBBTextField setIntValue: [model statusBB16forFiber: fiber atIndex:kBBstatusAlim] ];
 
 
 }
@@ -1296,6 +1316,7 @@
 	[self BB0x0ACmdMaskChanged:nil];
 	[self chargeBBFileForFiberChanged:nil];
 	[self progressOfChargeBBChanged:nil];
+	[self pollBBStatusIntervallChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -1344,6 +1365,7 @@
 	[statusButton setEnabled:!runInProgress];
 	
     [hitRateLengthPU setEnabled:!lockedOrRunningMaintenance];
+    [hitRateLengthTextField setEnabled:!lockedOrRunningMaintenance];
     [hitRateAllButton setEnabled:!lockedOrRunningMaintenance];
     [hitRateNoneButton setEnabled:!lockedOrRunningMaintenance];
 		
@@ -1576,6 +1598,8 @@
 
 - (void) hitRateLengthChanged:(NSNotification*)aNote
 {
+
+	[hitRateLengthTextField setIntValue:[model hitRateLength]];
 	[hitRateLengthPU selectItemWithTag:[model hitRateLength]];
 }
 
@@ -1663,6 +1687,12 @@
 }
 
 #pragma mark •••Actions
+
+- (void) pollBBStatusIntervallPUAction:(id)sender
+{
+	//[model setPollBBStatusIntervall:[sender intValue]];	
+	[model setPollBBStatusIntervall:[sender indexOfSelectedItem]];	
+}
 
 - (IBAction) devTabButtonAction:(id) sender
 {  [model devTabButtonAction]; }
@@ -2085,8 +2115,7 @@
 - (void) idBBforBBAccessTextFieldAction:(id)sender
 {
 
-    //DEBUG 	
-    NSLog(@"%@::%@ - sender intVal: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[sender intValue]);//TODO: DEBUG testing ...-tb-
+    //DEBUG 	    NSLog(@"%@::%@ - sender intVal: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[sender intValue]);//TODO: DEBUG testing ...-tb-
     int fiber = [model fiberSelectForBBAccess];
 	[model setIdBBforBBAccessForFiber:fiber to:[sender intValue]];	
 }
@@ -3131,9 +3160,22 @@
 - (IBAction) hitRateLengthAction: (id) sender
 {
 	if([sender indexOfSelectedItem] != [model hitRateLength]){
+        [self endEditing];
 		[[self undoManager] setActionName: @"Set Hit Rate Length"]; 
 		[model setHitRateLength:[[sender selectedItem] tag]];
 	}
+}
+
+- (IBAction) hitRateLengthTextFieldAction: (id) sender
+{
+    [self endEditing];
+    [model setHitRateLength:[sender intValue]];
+}
+
+- (IBAction) writeHitRateLengthButtonAction: (id) sender
+{
+    [self endEditing];
+    [model writeRunControl];
 }
 
 - (IBAction) hitRateAllAction: (id) sender
