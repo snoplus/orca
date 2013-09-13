@@ -2523,7 +2523,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (void) writeRunControl
 {
-	unsigned long aValue = ((hitRateLength-1) & 0xf) << 16;
+	unsigned long aValue = ((hitRateLength-1) & 0xf) << 16 ;
+	aValue |= 0x80000000;//activate flag
 	[self writeReg:kFLTV4RunControlReg value:aValue];					
 }
 

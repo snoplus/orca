@@ -426,13 +426,13 @@ if((eventFlags4bit == 0x1) || (eventFlags4bit == 0x3)){//raw UDP packet
             if(shapingLength>0) energy=energy/shapingLength;
 	        [aDataSet histogram:energy 
 				        numBins:kPageLength sender:self  
-			           withKeys:@"IPE-SLT-EW", @"FLT-Event", @"Energy (neg)" , crateKey,stationKey,trigChannelKey,nil];
+			           withKeys:@"IPE-SLT-EW-Energy", @"FLT-Energy (neg)" , crateKey,stationKey,trigChannelKey,nil];
         }else{//energy is positive
 	        //channel by channel histograms
             if(shapingLength>0) energy=energy/shapingLength;
 	        [aDataSet histogram:energy 
 				        numBins:kPageLength sender:self  
-			           withKeys:@"IPE-SLT-EW", @"FLT-Event", @"Energy (pos)" , crateKey,stationKey,trigChannelKey,nil];
+			           withKeys:@"IPE-SLT-EW-Energy", @"FLT-Energy (pos)" , crateKey,stationKey,trigChannelKey,nil];
         }
     }
 
