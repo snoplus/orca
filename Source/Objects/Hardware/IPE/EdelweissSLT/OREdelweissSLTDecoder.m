@@ -419,20 +419,20 @@ if((eventFlags4bit == 0x1) || (eventFlags4bit == 0x3)){//raw UDP packet
     if(eventFlags4bit == 0x2){//FLT event
         uint32_t energy         = ptr[6] & 0x00ffffff;
         uint32_t shapingLength  = ptr[8] & 0x000000ff;
-        printf("energy:0x%08x sL:%i\n",energy,shapingLength);
+        printf("energy:0x%08x sL:%i flt:%i chan:%i\n",energy,shapingLength,card,trigChan);
         if(energy && 0x00800000){//energy is negative
             energy = ~(energy | 0xff000000);
 	        //channel by channel histograms
             if(shapingLength>0) energy=energy/shapingLength;
 	        [aDataSet histogram:energy 
 				        numBins:kPageLength sender:self  
-			           withKeys:@"IPE-SLT-EW", @"FLT-Event", @"Energy (neg)" , crateKey,stationKey,channelKey,nil];
+			           withKeys:@"IPE-SLT-EW", @"FLT-Event", @"Energy (neg)" , crateKey,stationKey,trigChannelKey,nil];
         }else{//energy is positive
 	        //channel by channel histograms
             if(shapingLength>0) energy=energy/shapingLength;
 	        [aDataSet histogram:energy 
 				        numBins:kPageLength sender:self  
-			           withKeys:@"IPE-SLT-EW", @"FLT-Event", @"Energy (pos)" , crateKey,stationKey,channelKey,nil];
+			           withKeys:@"IPE-SLT-EW", @"FLT-Event", @"Energy (pos)" , crateKey,stationKey,trigChannelKey,nil];
         }
     }
 
