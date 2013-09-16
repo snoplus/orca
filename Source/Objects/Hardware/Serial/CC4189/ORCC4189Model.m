@@ -429,11 +429,8 @@ NSString* ORCC4189Lock = @"ORCC4189Lock";
     if(abs(lastTimePosted-timeMeasured) > 10){
         lastTimePosted = timeMeasured;
         NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
-
                                 [NSNumber numberWithFloat:    temperature], @"temperature",
                                 [NSNumber numberWithFloat:    humidity],    @"humidity",
-                                [NSNumber numberWithUnsignedLong:    timeMeasured], @"timeMeasured",
-                                [NSNumber numberWithInt:    10],    @"pollTime",
                                 nil];
         [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
     }
