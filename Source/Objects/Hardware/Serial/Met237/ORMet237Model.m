@@ -56,6 +56,7 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 - (void) startDataArrivalTimeout;
 - (void) cancelDataArrivalTimeout;
 - (void) doCycleKick;
+- (void) postCouchDBRecord;
 @end
 
 @implementation ORMet237Model
@@ -582,6 +583,19 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 @end
 
 @implementation ORMet237Model (private)
+
+- (void) postCouchDBRecord
+{
+    NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
+                            [NSArray arrayWithObjects:
+                             [NSNumber numberWithInt:count1],
+                             [NSNumber numberWithInt:count2],
+                              nil], @"counts",
+                            [NSNumber numberWithInt:    cycleDuration],    @"pollTime",
+                            nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
+}
+
 - (void) checkCycle
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(checkCycle) object:nil];
@@ -719,6 +733,8 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 				recordComingIn = NO;
 				[self setMissedCycleCount:0];
 				[self startDataArrivalTimeout];
+                
+                [self postCouchDBRecord];
 			}
 		}
 	}

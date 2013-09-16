@@ -63,7 +63,7 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 - (void) startDataArrivalTimeout;
 - (void) cancelDataArrivalTimeout;
 - (void) doCycleKick;
-
+- (void) postCouchDBRecord;
 @end
 
 @implementation ORMet637Model
@@ -799,6 +799,27 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 @end
 
 @implementation ORMet637Model (private)
+
+- (void) postCouchDBRecord
+{    
+    NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
+                            [NSArray arrayWithObjects:
+                                [NSNumber numberWithInt:count[0]],
+                                [NSNumber numberWithInt:count[1]],
+                                [NSNumber numberWithInt:count[2]],
+                                [NSNumber numberWithInt:count[3]],
+                                [NSNumber numberWithInt:count[4]],
+                                [NSNumber numberWithInt:count[5]],
+                                 nil], @"counts",
+                            [NSNumber numberWithFloat:  temperature],      @"temperature",
+                            [NSNumber numberWithFloat:  humidity],         @"humidity",
+                            [NSNumber numberWithInt:    actualDuration],   @"actualDuration",
+                            [NSNumber numberWithInt:    statusBits],       @"statusBits",
+                            [NSNumber numberWithInt:    cycleDuration],    @"pollTime",
+                            nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
+}
+
 - (void) checkCycle
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(checkCycle) object:nil];
@@ -882,6 +903,8 @@ NSString* ORMet637Lock = @"ORMet637Lock";
             
             [self setMissedCycleCount:0];
             [self cancelDataArrivalTimeout];
+        
+            [self postCouchDBRecord];
             
             if(countingMode == kMet637Manual){
                 [self stopCycle];
