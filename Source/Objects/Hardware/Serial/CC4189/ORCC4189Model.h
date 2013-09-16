@@ -39,6 +39,7 @@
 		double			lowLimit1;
 		double			highLimit0;
 		double			highLimit1;
+        unsigned long	lastTimePosted;
 }
 
 #pragma mark ***Initialization
@@ -79,6 +80,7 @@
 
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
+- (void) postCouchDBRecord;
 
 #pragma mark •••Adc Processing Protocol
 - (void)processIsStarting;

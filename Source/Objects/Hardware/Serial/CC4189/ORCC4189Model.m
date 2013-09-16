@@ -82,7 +82,7 @@ NSString* ORCC4189Lock = @"ORCC4189Lock";
         NSString* theString = [[[[NSString alloc] initWithData:[[note userInfo] objectForKey:@"data"] 
 												      encoding:NSASCIIStringEncoding] autorelease] uppercaseString];
         if(!buffer)buffer = [[NSMutableString string] retain];
-        [buffer appendString:theString];					
+        [buffer appendString:theString];
 		
         do {
             NSRange lineRange = [buffer rangeOfString:@"\r"];
@@ -106,8 +106,10 @@ NSString* ORCC4189Lock = @"ORCC4189Lock";
 				}
             }
         } while([buffer rangeOfString:@"\r"].location!= NSNotFound);
-		
 		if(temperature!=0 && humidity!=0) readOnce = YES;
+        
+        [self postCouchDBRecord];
+
 	}
 }
 
@@ -421,4 +423,20 @@ NSString* ORCC4189Lock = @"ORCC4189Lock";
 {
     return [NSString stringWithFormat:@"CC4189 %lu",[self uniqueIdNumber]];
 }
+
+- (void) postCouchDBRecord
+{
+    if(abs(lastTimePosted-timeMeasured) > 10){
+        lastTimePosted = timeMeasured;
+        NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
+
+                                [NSNumber numberWithFloat:    temperature], @"temperature",
+                                [NSNumber numberWithFloat:    humidity],    @"humidity",
+                                [NSNumber numberWithUnsignedLong:    timeMeasured], @"timeMeasured",
+                                [NSNumber numberWithInt:    10],    @"pollTime",
+                                nil];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
+    }
+}
+
 @end
