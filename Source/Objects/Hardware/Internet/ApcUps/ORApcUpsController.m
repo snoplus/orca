@@ -260,12 +260,12 @@
 
 - (void) passwordChanged:(NSNotification*)aNote
 {
-	[passwordField setStringValue: [model password]];
+	if([model password]!=nil)[passwordField setStringValue: [model password]];
 }
 
 - (void) usernameChanged:(NSNotification*)aNote
 {
-	[usernameField setStringValue: [model username]];
+    if([model username]!=nil) [usernameField setStringValue: [model username]];
 }
 
 - (void) isConnectedChanged:(NSNotification*)aNote

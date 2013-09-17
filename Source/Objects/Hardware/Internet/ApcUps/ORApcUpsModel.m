@@ -44,6 +44,7 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
 - (void) startTimeout;
 - (void) cancelTimeout;
 - (void) timeout;
+- (void) postCouchDBRecord;
 @end
 
 
@@ -125,7 +126,8 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
 
 - (NSString*) ipAddress
 {
-    return ipAddress;
+    if([ipAddress length]==0)return @"";
+    else return ipAddress;
 }
 
 - (void) setIpAddress:(NSString*)aIpAddress
@@ -233,6 +235,7 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
         [self performSelector:@selector(pollHardware) withObject:nil afterDelay:30];
         [self setNextPollScheduled:[NSDate dateWithTimeIntervalSinceNow:30]];
         [self performSelector:@selector(disconnect) withObject:nil afterDelay:5];
+        [self postCouchDBRecord];
     }
     else [self setDataValid:NO];
 }
@@ -596,6 +599,14 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
 @end
 
 @implementation ORApcUpsModel (private)
+- (void) postCouchDBRecord
+{
+    NSMutableDictionary* values = [NSMutableDictionary dictionaryWithDictionary:phaseDictionary];
+    [values addEntriesFromDictionary:singleValueDictionary];
+    [values setObject:[NSNumber numberWithInt:30] forKey:@"pollTime"];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
+}
 
 - (void) clearInputBuffer
 {

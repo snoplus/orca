@@ -430,7 +430,7 @@ NSString* ORCC4189Lock = @"ORCC4189Lock";
         lastTimePosted = timeMeasured;
         NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
                                 [NSNumber numberWithFloat:    temperature], @"temperature",
-                                [NSNumber numberWithFloat:    humidity],    @"humidity",
+                                [NSNumber numberWithFloat:    humidity],    @"humidity",                                [NSNumber numberWithInt:   10],    @"humidity",
                                 nil];
         [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
     }
