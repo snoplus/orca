@@ -84,6 +84,7 @@
 
 - (id) phaseKey:(NSString*)aPhaseKey valueKey:(NSString*)aValueKey;
 - (id) valueForKeyInSingleValueDictionary:(NSString*)aKey;
+- (void) checkAlarms;
 
 #pragma mark •••Process Limits
 - (float) lowLimit:(int)i;

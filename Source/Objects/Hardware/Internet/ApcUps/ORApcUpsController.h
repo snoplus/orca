@@ -51,6 +51,11 @@
 - (void) usernameChanged:(NSNotification*)aNote;
 - (void) passwordChanged:(NSNotification*)aNote;
 - (void) refreshProcessTable:(NSNotification*)aNote;
+- (void) settingsLockChanged:(NSNotification*)aNote;
+- (void) updateTimePlot:(NSNotification*)aNote;
+- (void) timedOut:(NSNotification*)aNote;
+- (void) scaleAction:(NSNotification*)aNote;
+- (void) miscAttributesChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) ipAddressAction:(id)sender;

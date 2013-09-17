@@ -122,6 +122,7 @@
 - (ORCouchDB*) remoteHistoryDBRef;
 - (ORCouchDB*) remoteHistoryDBRef:(NSString*)aDatabaseName;
 - (void) createDatabase;
+- (void) createDatabase:(ORCouchDB*)aDBRef;
 - (void) createHistoryDatabase:(ORCouchDB*)aDBRef;
 - (void) createHistoryDatabase;
 - (void) createRemoteDataBases;
