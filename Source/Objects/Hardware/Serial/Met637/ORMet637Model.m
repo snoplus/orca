@@ -91,7 +91,7 @@ NSString* ORMet637Lock = @"ORMet637Lock";
     [buffer release];
 	
 	int i;
-	for(i=0;i<6;i++){
+	for(i=0;i<8;i++){
 		[timeRates[i] release];
 	}	
 	
@@ -810,8 +810,16 @@ NSString* ORMet637Lock = @"ORMet637Lock";
                                 [NSNumber numberWithInt:count[3]],
                                 [NSNumber numberWithInt:count[4]],
                                 [NSNumber numberWithInt:count[5]],
-                                 nil], @"counts",
-                            [NSNumber numberWithFloat:  temperature],      @"temperature",
+                                nil], @"counts",
+                            [NSArray arrayWithObjects:
+                                 [NSNumber numberWithInt:countAlarmLimit[0]],
+                                 [NSNumber numberWithInt:countAlarmLimit[1]],
+                                 [NSNumber numberWithInt:countAlarmLimit[2]],
+                                 [NSNumber numberWithInt:countAlarmLimit[3]],
+                                 [NSNumber numberWithInt:countAlarmLimit[4]],
+                                 [NSNumber numberWithInt:countAlarmLimit[5]],
+                                 nil], @"countLimits",
+                            [NSNumber numberWithFloat:  temperature],       @"temperature",
                             [NSNumber numberWithFloat:  humidity],         @"humidity",
                             [NSNumber numberWithInt:    actualDuration],   @"actualDuration",
                             [NSNumber numberWithInt:    statusBits],       @"statusBits",
