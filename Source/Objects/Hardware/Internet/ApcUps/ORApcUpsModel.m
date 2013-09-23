@@ -199,11 +199,13 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
         }
     }
     else {
-        if(!dataInValidAlarm){
-            dataInValidAlarm = [[ORAlarm alloc] initWithName:@"UPS Data Invalid" severity:kHardwareAlarm];
-            [dataInValidAlarm setSticky:YES];
+        if([ipAddress length]!=0 && [password length]!=0 && [username length]!=0){
+            if(!dataInValidAlarm){
+                dataInValidAlarm = [[ORAlarm alloc] initWithName:@"UPS Data Invalid" severity:kHardwareAlarm];
+                [dataInValidAlarm setSticky:YES];
+            }
+            [dataInValidAlarm postAlarm];
         }
-        [dataInValidAlarm postAlarm];
     }
 }
 
