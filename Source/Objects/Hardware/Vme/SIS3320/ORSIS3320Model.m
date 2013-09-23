@@ -1065,6 +1065,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 - (void) setAccGate1StartIndex:(int)anIndex withValue:(unsigned long)aValue
 {
     if(anIndex>=0 && anIndex<8){
+        aValue &= 0x3ff;
         [[[self undoManager] prepareWithInvocationTarget:self] setAccGate1StartIndex:anIndex withValue:accGate1StartIndex[anIndex]];
         accGate1StartIndex[anIndex] = aValue;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3320ModelAccGate1StartIndexChanged object:self];
@@ -1097,6 +1098,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 - (void) setAccGate2StartIndex:(int)anIndex withValue:(unsigned long)aValue
 {
     if(anIndex>=0 && anIndex<8){
+        aValue &= 0x3ff;
         [[[self undoManager] prepareWithInvocationTarget:self] setAccGate2StartIndex:anIndex withValue:accGate2StartIndex[anIndex]];
         accGate2StartIndex[anIndex] = aValue;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3320ModelAccGate2StartIndexChanged object:self];
@@ -1130,6 +1132,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 - (void) setAccGate3StartIndex:(int)anIndex withValue:(unsigned long)aValue
 {
     if(anIndex>=0 && anIndex<8){
+        aValue &= 0x3ff;
         [[[self undoManager] prepareWithInvocationTarget:self] setAccGate3StartIndex:anIndex withValue:accGate3StartIndex[anIndex]];
         accGate3StartIndex[anIndex] = aValue;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3320ModelAccGate3StartIndexChanged object:self];
@@ -1162,6 +1165,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 - (void) setAccGate4StartIndex:(int)anIndex withValue:(unsigned long)aValue
 {
     if(anIndex>=0 && anIndex<8){
+        aValue &= 0x3ff;
         [[[self undoManager] prepareWithInvocationTarget:self] setAccGate4StartIndex:anIndex withValue:accGate4StartIndex[anIndex]];
         accGate4StartIndex[anIndex] = aValue;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3320ModelAccGate4StartIndexChanged object:self];
@@ -1194,6 +1198,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 - (void) setAccGate5StartIndex:(int)anIndex withValue:(unsigned long)aValue
 {
     if(anIndex>=0 && anIndex<8){
+        aValue &= 0x3ff;
         [[[self undoManager] prepareWithInvocationTarget:self] setAccGate5StartIndex:anIndex withValue:accGate5StartIndex[anIndex]];
         accGate5StartIndex[anIndex] = aValue;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3320ModelAccGate5StartIndexChanged object:self];
@@ -1226,6 +1231,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 - (void) setAccGate6StartIndex:(int)anIndex withValue:(unsigned long)aValue
 {
     if(anIndex>=0 && anIndex<8){
+        aValue &= 0x3ff;
         [[[self undoManager] prepareWithInvocationTarget:self] setAccGate6StartIndex:anIndex withValue:accGate6StartIndex[anIndex]];
         accGate6StartIndex[anIndex] = aValue;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3320ModelAccGate6StartIndexChanged object:self];
@@ -1258,6 +1264,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 - (void) setAccGate7StartIndex:(int)anIndex withValue:(unsigned long)aValue
 {
     if(anIndex>=0 && anIndex<8){
+        aValue &= 0x3ff;
         [[[self undoManager] prepareWithInvocationTarget:self] setAccGate7StartIndex:anIndex withValue:accGate7StartIndex[anIndex]];
         accGate7StartIndex[anIndex] = aValue;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3320ModelAccGate7StartIndexChanged object:self];
@@ -1274,6 +1281,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 - (void) setAccGate8Length:(int)anIndex withValue:(unsigned long)aValue
 {
     if(anIndex>=0 && anIndex<8){
+        aValue &= 0xf;
         [[[self undoManager] prepareWithInvocationTarget:self] setAccGate8Length:anIndex withValue:accGate8Length[anIndex]];
         accGate8Length[anIndex] = aValue;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3320ModelAccGate8LengthChanged object:self];
@@ -1289,7 +1297,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 - (void) setAccGate8StartIndex:(int)anIndex withValue:(unsigned long)aValue
 {
     if(anIndex>=0 && anIndex<8){
-        aValue &= 0xf;
+        aValue &= 0x3ff;
         [[[self undoManager] prepareWithInvocationTarget:self] setAccGate8StartIndex:anIndex withValue:accGate8StartIndex[anIndex]];
         accGate8StartIndex[anIndex] = aValue;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3320ModelAccGate8StartIndexChanged object:self];
