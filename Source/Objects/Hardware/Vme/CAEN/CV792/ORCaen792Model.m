@@ -20,7 +20,7 @@
 
 // Address information for this unit.
 #define k792DefaultBaseAddress 		0xa00000
-#define k792DefaultAddressModifier 	0x39
+#define k792DefaultAddressModifier 	0x9
 
 //NSString* OR792SelectedRegIndexChanged 	= @"792 Selected Register Index Changed";
 //NSString* OR792SelectedChannelChanged 	= @"792 Selected Channel Changed";
