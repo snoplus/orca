@@ -84,6 +84,7 @@ NSString* ORCV977ModelInputMaskChanged = @"ORCV977ModelInputMaskChanged";
 {
 	return NSMakeSize(610,200);
 }
+- (short)		getAccessSize:(short) anIndex 		{ return kD16; }
 
 #pragma mark ***Accessors
 - (unsigned long)inputSet {
