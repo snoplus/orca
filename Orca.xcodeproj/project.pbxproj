@@ -2396,6 +2396,12 @@
 		84BAA2AA0E92A81A00E19946 /* SIS3300Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84BAA2A20E92A81A00E19946 /* SIS3300Card.gif */; };
 		84BAA72C0E964ED900E19946 /* ORSelectorSequence.h in Headers */ = {isa = PBXBuildFile; fileRef = 84BAA72A0E964ED900E19946 /* ORSelectorSequence.h */; };
 		84BAA72D0E964ED900E19946 /* ORSelectorSequence.m in Sources */ = {isa = PBXBuildFile; fileRef = 84BAA72B0E964ED900E19946 /* ORSelectorSequence.m */; };
+		84BAC04617F4A72100695DA8 /* C977.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84BAC03E17F4A72100695DA8 /* C977.gif */; };
+		84BAC04717F4A72100695DA8 /* CV977.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84BAC03F17F4A72100695DA8 /* CV977.nib */; };
+		84BAC04817F4A72100695DA8 /* ORCV977Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84BAC04017F4A72100695DA8 /* ORCV977Controller.h */; };
+		84BAC04917F4A72100695DA8 /* ORCV977Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84BAC04117F4A72100695DA8 /* ORCV977Controller.m */; };
+		84BAC04C17F4A72100695DA8 /* ORCV977Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84BAC04417F4A72100695DA8 /* ORCV977Model.h */; };
+		84BAC04D17F4A72100695DA8 /* ORCV977Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84BAC04517F4A72100695DA8 /* ORCV977Model.m */; };
 		84BB920407E210090092B367 /* ORMotorSweeper.h in Headers */ = {isa = PBXBuildFile; fileRef = 84BB920207E210090092B367 /* ORMotorSweeper.h */; };
 		84BB920507E210090092B367 /* ORMotorSweeper.m in Sources */ = {isa = PBXBuildFile; fileRef = 84BB920307E210090092B367 /* ORMotorSweeper.m */; };
 		84BB97FB07E613B50092B367 /* ORMotorPattern.m in Sources */ = {isa = PBXBuildFile; fileRef = 84BB97F907E613B50092B367 /* ORMotorPattern.m */; };
@@ -5473,6 +5479,12 @@
 		84BAA895055AD4C60005F507 /* ORCommandCenterController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORCommandCenterController.h; sourceTree = "<group>"; };
 		84BAA896055AD4C60005F507 /* ORCommandCenterController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORCommandCenterController.m; sourceTree = "<group>"; };
 		84BAA911055AE0410005F507 /* CommandCenter.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = CommandCenter.nib; sourceTree = "<group>"; };
+		84BAC03E17F4A72100695DA8 /* C977.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = C977.gif; sourceTree = "<group>"; };
+		84BAC03F17F4A72100695DA8 /* CV977.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = CV977.nib; sourceTree = "<group>"; };
+		84BAC04017F4A72100695DA8 /* ORCV977Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORCV977Controller.h; sourceTree = "<group>"; };
+		84BAC04117F4A72100695DA8 /* ORCV977Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORCV977Controller.m; sourceTree = "<group>"; };
+		84BAC04417F4A72100695DA8 /* ORCV977Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORCV977Model.h; sourceTree = "<group>"; };
+		84BAC04517F4A72100695DA8 /* ORCV977Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORCV977Model.m; sourceTree = "<group>"; };
 		84BB920207E210090092B367 /* ORMotorSweeper.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORMotorSweeper.h; sourceTree = "<group>"; };
 		84BB920307E210090092B367 /* ORMotorSweeper.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORMotorSweeper.m; sourceTree = "<group>"; };
 		84BB97F907E613B50092B367 /* ORMotorPattern.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORMotorPattern.m; path = "Source/Objects/Misc Objects/Workers/MotorWorker/ORMotorPattern.m"; sourceTree = SOURCE_ROOT; };
@@ -11190,6 +11202,19 @@
 			path = "Source/Main Dialogs/CommandCenter";
 			sourceTree = SOURCE_ROOT;
 		};
+		84BAC03D17F4A72000695DA8 /* CV977 */ = {
+			isa = PBXGroup;
+			children = (
+				84BAC03E17F4A72100695DA8 /* C977.gif */,
+				84BAC03F17F4A72100695DA8 /* CV977.nib */,
+				84BAC04017F4A72100695DA8 /* ORCV977Controller.h */,
+				84BAC04117F4A72100695DA8 /* ORCV977Controller.m */,
+				84BAC04417F4A72100695DA8 /* ORCV977Model.h */,
+				84BAC04517F4A72100695DA8 /* ORCV977Model.m */,
+			);
+			path = CV977;
+			sourceTree = "<group>";
+		};
 		84BB920107E210090092B367 /* MotorWorker */ = {
 			isa = PBXGroup;
 			children = (
@@ -13087,6 +13112,7 @@
 			isa = PBXGroup;
 			children = (
 				F5B1802103B297FD015F64B1 /* Base */,
+				84BAC03D17F4A72000695DA8 /* CV977 */,
 				84184814157FA478004EC81F /* CV830 */,
 				84BF43C3118793FA00F55216 /* CV1785 */,
 				84EBBEDE0F52D9A700F57BDD /* CV419 */,
@@ -14226,6 +14252,8 @@
 				846F314017E8819000A5F1DA /* ORApcUpsModel.h in Headers */,
 				841E0A4217F46296009E4190 /* ORCaen792Decoders.h in Headers */,
 				841E0A4717F46468009E4190 /* ORCAEN792Readout.hh in Headers */,
+				84BAC04817F4A72100695DA8 /* ORCV977Controller.h in Headers */,
+				84BAC04C17F4A72100695DA8 /* ORCV977Model.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -15131,6 +15159,8 @@
 				432D17F217820D0700557918 /* ZComponent.obj in Resources */,
 				846F313C17E8819000A5F1DA /* ApcUps.nib in Resources */,
 				846F313D17E8819000A5F1DA /* ApcUpsIcon.tif in Resources */,
+				84BAC04617F4A72100695DA8 /* C977.gif in Resources */,
+				84BAC04717F4A72100695DA8 /* CV977.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -16145,6 +16175,8 @@
 				846F313F17E8819000A5F1DA /* ORApcUpsController.m in Sources */,
 				846F314117E8819000A5F1DA /* ORApcUpsModel.m in Sources */,
 				841E0A4317F46296009E4190 /* ORCaen792Decoders.m in Sources */,
+				84BAC04917F4A72100695DA8 /* ORCV977Controller.m in Sources */,
+				84BAC04D17F4A72100695DA8 /* ORCV977Model.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
