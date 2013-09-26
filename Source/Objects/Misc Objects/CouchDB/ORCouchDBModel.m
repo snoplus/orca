@@ -1313,11 +1313,22 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 		if(!sweepInProgress){
 			NSUInteger n = [ORCouchDBQueue operationCount];
 			if(n<10){
-					
+                NSMutableArray* dataSetNames = [NSMutableArray array];
 				for(id aMonitor in dataMonitors){
 					NSArray* objs1d = [[aMonitor  collectObjectsOfClass:[OR1DHisto class]] retain];
                     NSString* baseMonitorName = [NSString stringWithFormat:@"Monitor%lu",[aMonitor uniqueIdNumber]];
 					@try {
+                        
+                        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+                        dateFormatter.dateFormat = @"yyyy/MM/dd HH:mm:ss";
+                        
+                        NSTimeZone* gmt = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];
+                        [dateFormatter setTimeZone:gmt];
+                        NSString*   lastTimeStamp       = [dateFormatter stringFromDate:[NSDate date]];
+                        NSDate*     gmtTime             = [dateFormatter dateFromString:lastTimeStamp];
+                        unsigned long secondsSince1970  = [gmtTime timeIntervalSince1970];
+                        [dateFormatter release];
+
 						for(OR1DHisto* aDataSet in objs1d){
 							unsigned long start,end;
 							NSString* s = [aDataSet getnonZeroDataAsStringWithStart:&start end:&end];
@@ -1325,16 +1336,37 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 							NSDictionary* dataInfo = [NSDictionary dictionaryWithObjectsAndKeys:
                                                         dataSetName,                                                @"name",
 														[NSNumber numberWithUnsignedLong:[aDataSet totalCounts]],	@"counts",
-														[NSNumber numberWithUnsignedLong:start],					@"start",
+                                                        [NSNumber numberWithUnsignedLong:start],					@"start",
+                                                        [NSNumber numberWithUnsignedLong:end],                      @"end",
 														[NSNumber numberWithUnsignedLong:[aDataSet numberBins]],	@"length",
 														s,															@"PlotData",
+                                                        lastTimeStamp,                                              @"timestamp",
+                                                        [NSNumber numberWithUnsignedLong: secondsSince1970],		@"time",
+
 														@"Histogram1D",												@"type",
 														 nil];
 							NSString* dataName = [[dataSetName lowercaseString] stringByReplacingOccurrencesOfString:@" " withString:@""];
+                            [dataSetNames addObject:dataName];
 
 							[[self statusDBRef] updateDocument:dataInfo documentId:dataName tag:kDocumentAdded];
 							
 						}
+                        
+                        if([dataSetNames count]){
+  							NSDictionary* dataInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                                                      @"HistogramCatalog",              @"name",
+                                                      dataSetNames,                     @"list",
+                                                      lastTimeStamp,                                            @"timestamp",
+                                                      [NSNumber numberWithUnsignedLong: secondsSince1970],		@"time",
+                                                      nil];
+                            
+							[[self statusDBRef] updateDocument:dataInfo documentId:@"HistogramCatalog" tag:kDocumentAdded];
+                          
+                        }
+                        else {
+                            [[self statusDBRef] deleteDocumentId:@"HistogramCatalog" tag:kDocumentDeleted];
+                        }
+                        
 					}
 					@catch(NSException* e){
 					}
