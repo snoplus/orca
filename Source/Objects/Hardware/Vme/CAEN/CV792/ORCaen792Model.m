@@ -17,29 +17,27 @@
 //-------------------------------------------------------------
 #import "ORCaen792Model.h"
 
-
-// Address information for this unit.
 #define k792DefaultBaseAddress 		0xa00000
 #define k792DefaultAddressModifier 	0x9
 
 //NSString* OR792SelectedRegIndexChanged 	= @"792 Selected Register Index Changed";
 //NSString* OR792SelectedChannelChanged 	= @"792 Selected Channel Changed";
-//NSString* OR792WriteValueChanged 		= @"792 Write Value Changed";
+//NSString* OR792WriteValueChanged          = @"792 Write Value Changed";
 
 // Define all the registers available to this unit.
 static RegisterNamesStruct reg[kNumRegisters] = {
 	{@"Output Buffer",      true,	true, 	true,	0x0000,		kReadOnly,	kD32},
 	{@"FirmWare Revision",	false,  false, 	false,	0x1000,		kReadOnly,	kD16},
-	{@"Geo Address",	false,	false, 	false,	0x1002,		kReadWrite,	kD16},
+	{@"Geo Address",        false,	false, 	false,	0x1002,		kReadWrite,	kD16},
 	{@"MCST CBLT Address",	false,	false, 	true,	0x1004,		kReadWrite,	kD16},
-	{@"Bit Set 1",		false,	true, 	true,	0x1006,		kReadWrite,	kD16},
-	{@"Bit Clear 1",	false,	true, 	true,	0x1008,		kReadWrite,	kD16},
+	{@"Bit Set 1",          false,	true, 	true,	0x1006,		kReadWrite,	kD16},
+	{@"Bit Clear 1",        false,	true, 	true,	0x1008,		kReadWrite,	kD16},
 	{@"Interrup Level",     false,	true, 	true,	0x100A,		kReadWrite,	kD16},
 	{@"Interrup Vector",	false,	true, 	true,	0x100C,		kReadWrite,	kD16},
 	{@"Status Register 1",	false,	true, 	true,	0x100E,		kReadOnly,	kD16},
 	{@"Control Register 1",	false,	true, 	true,	0x1010,		kReadWrite,	kD16},
-	{@"ADER High",		false,	false, 	true,	0x1012,		kReadWrite,	kD16},
-	{@"ADER Low",		false,	false, 	true,	0x1014,		kReadWrite,	kD16},
+	{@"ADER High",          false,	false, 	true,	0x1012,		kReadWrite,	kD16},
+	{@"ADER Low",           false,	false, 	true,	0x1014,		kReadWrite,	kD16},
 	{@"Single Shot Reset",	false,	false, 	false,	0x1016,		kWriteOnly,	kD16},
 	{@"MCST CBLT Ctrl",     false,	false, 	true,	0x101A,		kReadWrite,	kD16},
 	{@"Event Trigger Reg",	false,	true, 	true,	0x1020,		kReadWrite,	kD16},
@@ -49,34 +47,30 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 	{@"Increment Event",	false,	false, 	false,	0x1028,		kWriteOnly,	kD16},
 	{@"Increment Offset",	false,	false, 	false,	0x102A,		kWriteOnly,	kD16},
 	{@"Load Test Register",	false,	false, 	false,	0x102C,		kReadWrite,	kD16},
-	{@"FCLR Window",	false,	true, 	true,	0x102E,		kReadWrite,	kD16},
-	{@"Bit Set 2",		false,	true, 	true,	0x1032,		kReadWrite,	kD16},
-	{@"Bit Clear 2",	false,	true, 	true,	0x1034,		kWriteOnly,	kD16},
+	{@"FCLR Window",        false,	true, 	true,	0x102E,		kReadWrite,	kD16},
+	{@"Bit Set 2",          false,	true, 	true,	0x1032,		kReadWrite,	kD16},
+	{@"Bit Clear 2",        false,	true, 	true,	0x1034,		kWriteOnly,	kD16},
 	{@"W Mem Test Address",	false,	true, 	true,	0x1036,		kWriteOnly,	kD16},
 	{@"Mem Test Word High",	false,	true, 	true,	0x1038,		kWriteOnly,	kD16},
 	{@"Mem Test Word Low",	false,	false, 	false,	0x103A,		kWriteOnly,	kD16},
 	{@"Crate Select",       false,	true, 	true,	0x103C,		kReadWrite,	kD16},
 	{@"Test Event Write",	false,	false, 	false,	0x103E,		kWriteOnly,	kD16},
 	{@"Event Counter Reset",false,	false, 	false,	0x1040,		kWriteOnly,	kD16},
-	{@"I current pedestal", true, true, true, 0x1060, kReadWrite, kD16},
+	{@"I current pedestal", true,   true,   true,   0x1060,     kReadWrite, kD16},
 	{@"R Test Address",     false,	true, 	true,	0x1064,		kWriteOnly,	kD16},
-	{@"SW Comm",		false,	false, 	false,	0x1068,		kWriteOnly,	kD16},
-	{@"Slide Cons Reg",     false,	true,	true,	0x106A,		kReadWrite,     kD16},
-	{@"ADD",		false,	false, 	false,	0x1070,		kReadOnly,	kD16},
-	{@"BADD",		false,	false, 	false,	0x1072,		kReadOnly,	kD16},
-	{@"Thresholds",		false,	false, 	false,	0x1080,		kReadWrite,	kD16},
+	{@"SW Comm",            false,	false, 	false,	0x1068,		kWriteOnly,	kD16},
+	{@"Slide Cons Reg",     false,	true,	true,	0x106A,		kReadWrite, kD16},
+	{@"ADD",                false,	false, 	false,	0x1070,		kReadOnly,	kD16},
+	{@"BADD",               false,	false, 	false,	0x1072,		kReadOnly,	kD16},
+	{@"Thresholds",         false,	false, 	false,	0x1080,		kReadWrite,	kD16},
 };
+
+NSString* ORCaen792ModelModelTypeChanged  = @"ORCaen792ModelModelTypeChanged";
+NSString* ORCaen792ModelOnlineMaskChanged = @"ORCaen792ModelOnlineMaskChanged";
 
 @implementation ORCaen792Model
 
 #pragma mark ***Initialization
-//--------------------------------------------------------------------------------
-/*!\method  init
- * \brief	Called first time class is initialized.  Used to set basic
- *			default values first time object is created.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (id) init //designated initializer
 {
     self = [super init];
@@ -84,30 +78,18 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 	
     [self setBaseAddress:k792DefaultBaseAddress];
     [self setAddressModifier:k792DefaultAddressModifier];
+	[self setOnlineMask:0];
 	
     [[self undoManager] enableUndoRegistration];
    
     return self;
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  setUpImage
- * \brief	Sets the image used by this device in the catalog window.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (void) setUpImage
 {
     [self setImage:[NSImage imageNamed:@"C792"]];
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  makeMainController
- * \brief	Makes the controller object that interfaces between the GUI and
- *			this model.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (void) makeMainController
 {
     [self linkToController:@"ORCaen792Controller"];
@@ -122,91 +104,84 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 {
 	return NSMakeRange(baseAddress,0x10BF);
 }
+#pragma mark ***Accessors
+- (int) modelType
+{
+    return modelType;
+}
+
+- (void) setModelType:(int)aModelType
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setModelType:modelType];
+    
+    modelType = aModelType;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen792ModelModelTypeChanged object:self];
+}
+- (unsigned long)onlineMask {
+	
+    return onlineMask;
+}
+
+- (void)setOnlineMask:(unsigned long)anOnlineMask
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setOnlineMask:[self onlineMask]];
+    onlineMask = anOnlineMask;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen792ModelOnlineMaskChanged object:self];
+}
+
+- (BOOL)onlineMaskBit:(int)bit
+{
+	return onlineMask&(1<<bit);
+}
+
+- (void) setOnlineMaskBit:(int)bit withValue:(BOOL)aValue
+{
+	unsigned long aMask = onlineMask;
+	if(aValue)aMask |= (1<<bit);
+	else      aMask &= ~(1<<bit);
+	[self setOnlineMask:aMask];
+}
 
 #pragma mark ***Register - General routines
-//--------------------------------------------------------------------------------
-/*!\method  getNumberRegisters
- * \brief	Get the number of registers used by this module.
- * \return	The number of registers.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (short) getNumberRegisters
 {
     return kNumRegisters;
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  getBufferOffset
- * \brief	Get the output buffer offset relative to the module's base address.
- * \return	The output buffer offset.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (unsigned long) getBufferOffset
 {
     return reg[kOutputBuffer].addressOffset;
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  getDataBufferSize
- * \brief	Get size of class data buffer.
- * \return	The size of the data buffer.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (unsigned short) getDataBufferSize
 {
     return kADCOutputBufferSize;
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  getThresholdOffset
- * \brief	Get the offset relative to the module's base address for the threshold
- *			registers.
- * \return	The threshold offset.
- * \note	
- */
-//--------------------------------------------------------------------------------
-- (unsigned long) getThresholdOffset
+- (int) numberOfChannels
 {
-    return reg[kThresholds].addressOffset;
+	if([self modelType] == kModel792) return 16;
+	else							  return 32;
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  getStatusRegisterIndex
- * \brief	Get the offset relative to the module's base address for
- *			either status register 1 or 2.
- * \param	aRegister			- Either 1 or 2 for status register 1 or 2.
- * \return	The offset
- * \note	
- */
-//--------------------------------------------------------------------------------
+- (unsigned long) getThresholdOffset:(int)aChan
+{
+	if(modelType==kModel792)return reg[kThresholds].addressOffset + (aChan * 2);
+	else					return reg[kThresholds].addressOffset + (aChan * 4);
+}
+
 - (short) getStatusRegisterIndex:(short) aRegister
 {
     if (aRegister == 1) return kStatusRegister1;
     else		return kStatusRegister2;
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  getThresholdIndex
- * \brief	Get the index number within mreg for the thresholds. 
- * \return	The index
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (short) getThresholdIndex
 {
     return(kThresholds);
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  getOutputBufferIndex
- * \brief	Get the index number within mreg for the output buffer. 
- * \return	The index
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (short) getOutputBufferIndex
 {
     return(kOutputBuffer);
@@ -214,109 +189,77 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 
 
 #pragma mark ***Register - Register specific routines
-//--------------------------------------------------------------------------------
-/*!\method  getRegisterName
- * \brief	Get the name of the register at index anIndex.
- * \param	anIndex			- Register index.
- * \return	The name of the register.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (NSString*) getRegisterName:(short) anIndex
 {
     return reg[anIndex].regName;
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  getAddressOffset
- * \brief	Get the address offset for the specific register.
- * \param	anIndex			- Register index.
- * \return	The offset to the register.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (unsigned long) getAddressOffset:(short) anIndex
 {
     return(reg[anIndex].addressOffset);
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  getAccessType
- * \brief	Get the access type, either read, write or readWrite for the
- *			register at index anIndex.
- * \param	anIndex			- Register index.
- * \return	The access type.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (short) getAccessType:(short) anIndex
 {
     return reg[anIndex].accessType;
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  getAccessSize
- * \brief	Get the access size, either 32 or 16 bit for the
- *			register at index anIndex.
- * \param	anIndex			- Register index.
- * \return	The access type.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (short) getAccessSize:(short) anIndex
 {
     return reg[anIndex].size;
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  dataReset
- * \brief	Get the data reset flag for register at index anIndex.
- * \param	anIndex			- Index of the register.
- * \return	The data reset flag either true of false.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (BOOL) dataReset:(short) anIndex
 {
     return reg[anIndex].dataReset;
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  swReset
- * \brief	Get the software reset flag for register at index anIndex.
- * \param	anIndex			- Register index.
- * \return	The software reset flag.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (BOOL) swReset:(short) anIndex
 {
     return reg[anIndex].softwareReset;
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  hwReset
- * \brief	Get the hardware reset flag for register at index anIndex.
- * \param	anIndex			- Register index.
- * \return	The hardware reset flag.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (BOOL) hwReset:(short) anIndex
 {
     return reg[anIndex].hwReset;
 }
 
+- (void) writeThresholds
+{
+	int i;
+	int n = (modelType==kModel792?16:32);
+	for(i=0;i<n;i++){
+		int kill = ((onlineMask & (1<<i))!=0)?0x0:0x100;
+		unsigned short aValue = [self threshold:i] | kill;
+		[[self adapter] writeWordBlock:&aValue
+							 atAddress:[self baseAddress] + [self getThresholdOffset:i]
+							numToWrite:1
+							withAddMod:[self addressModifier]
+						 usingAddSpace:0x01];
+	}
+}
+
 
 #pragma mark ***DataTaker
-//--------------------------------------------------------------------------------
-/*!\method  runTaskStarted
- * \brief	Beginning of run.  Prepare this object to take data.  Write out hardware settings
- *			to data stream.
- * \param	aDataPacket				- Object where data is written.
- * \note	
- */
-//--------------------------------------------------------------------------------
+- (void) setDataIds:(id)assigner
+{
+    dataId  = [assigner assignDataIds:kLongForm];
+    dataIdN = [assigner assignDataIds:kLongForm];
+}
+
+- (void) syncDataIdsWith:(id)anotherObj
+{
+    [self setDataId:[anotherObj dataId]];
+    [self setDataIdN:[anotherObj dataIdN]];
+}
+
+- (unsigned long) dataIdN { return dataIdN; }
+- (void) setDataIdN: (unsigned long) DataId
+{
+    dataIdN = DataId;
+}
+
+
 - (void) runTaskStarted:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
 {
     [super runTaskStarted:aDataPacket userInfo:userInfo];
@@ -327,20 +270,98 @@ static RegisterNamesStruct reg[kNumRegisters] = {
     [self write:kEventCounterReset sendValue:0x0000];	// Clear event counter
 
     // Set options
+ 	location =  (([self crateNumber]&0xf)<<21) | (([self slot]& 0x0000001f)<<16); //doesn't change so do it here.
 
     // Set thresholds in unit
     [self writeThresholds];
     
 }
 
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+{
+    
+    unsigned short 	theStatus1;
+    
+    @try {
+        
+        //first read the status resisters to see if there is anything to read.
+        [self read:[self getStatusRegisterIndex:1] returnValue:&theStatus1];
+        
+        // Get some values from the status register using the decoder.
+        BOOL dataIsReady 		= [dataDecoder isDataReady:theStatus1];
+        unsigned long bufferAddress = [self baseAddress] + [self getBufferOffset];
+        
+        // Read the buffer.
+        if (dataIsReady) {
+			
+			//OK, at least one data value is ready
+			unsigned long dataValue;
+			[controller readLongBlock:&dataValue
+							atAddress:bufferAddress
+							numToRead:1
+						   withAddMod:[self addressModifier]
+						usingAddSpace:0x01];
+			
+			//if this is a header, must be valid data.
+			BOOL validData = YES; //assume OK until shown otherwise
+			if(ShiftAndExtract(dataValue,24,0x7) == 0x2){
+				//get the number of memorized channels
+				int numMemorizedChannels = ShiftAndExtract(dataValue,8,0x3f);
+				int i;
+				if((numMemorizedChannels>0)){
+					unsigned long dataRecord[0xffff];
+					//we fill in dataRecord[0] below once we know the final size
+					dataRecord[1] = location;
+					int index = 2;
+					for(i=0;i<numMemorizedChannels;i++){
+						[controller readLongBlock:&dataValue
+										atAddress:bufferAddress
+										numToRead:1
+									   withAddMod:[self addressModifier]
+									usingAddSpace:0x01];
+						int dataType = ShiftAndExtract(dataValue,24,0x7);
+						if(dataType == 0x000){
+							dataRecord[index] = dataValue;
+							index++;
+						}
+						else {
+							validData = NO;
+							break;
+						}
+					}
+					if(validData){
+						//OK we read the data, get the end of block
+						[controller readLongBlock:&dataValue
+										atAddress:bufferAddress
+										numToRead:1
+									   withAddMod:[self addressModifier]
+									usingAddSpace:0x01];
+						//make sure it really is an end of block
+						int dataType = ShiftAndExtract(dataValue,24,0x7);
+						if(dataType == 0x4){
+							dataRecord[index] = dataValue; //we don't ship the end of block for now
+							index++;
+							//got a end of block fill in the ORCA header and ship the data
+							if(modelType == kModel792) dataRecord[0] = dataId  | index; //see.... filled it in here....
+							else					   dataRecord[0] = dataIdN | index; //see.... filled it in here....
+							[aDataPacket addLongsToFrameBuffer:dataRecord length:index];
+						}
+						else {
+							validData = NO;
+						}
+					}
+				}
+			}
+			if(!validData){
+				[self flushBuffer];
+			}
+		}
+	}
+	@catch(NSException* localException) {
+		errorCount++;
+	}
+}
 
-//--------------------------------------------------------------------------------
-/*!\method  runTaskStopped
- * \brief	Resets the oscilloscope so that it is in continuous acquisition mode.
- * \param	aDataPacket			- Data from most recent event.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (void) runTaskStopped:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
 {
     [super runTaskStopped:aDataPacket userInfo:userInfo];
@@ -351,44 +372,69 @@ static RegisterNamesStruct reg[kNumRegisters] = {
     return [NSString stringWithFormat:@"CAEN 792 (Slot %d) ",[self slot]];
 }
 
+- (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
+{
+	configStruct->total_cards++;
+	configStruct->card_info[index].hw_type_id = kCaen792; //should be unique
+	if(modelType == kModel792)	configStruct->card_info[index].hw_mask[0] 	 = dataId; //better be unique
+	else						configStruct->card_info[index].hw_mask[0] 	 = dataIdN;
+	configStruct->card_info[index].slot 	 = [self slot];
+	configStruct->card_info[index].crate 	 = [self crateNumber];
+	configStruct->card_info[index].add_mod 	 = [self addressModifier];
+	configStruct->card_info[index].base_add  = [self baseAddress];
+	configStruct->card_info[index].deviceSpecificData[0] = reg[kStatusRegister1].addressOffset;
+	configStruct->card_info[index].deviceSpecificData[1] = reg[kOutputBuffer].addressOffset;
+	configStruct->card_info[index].deviceSpecificData[2] = reg[kStatusRegister2].addressOffset;
+	configStruct->card_info[index].deviceSpecificData[3] = [self getDataBufferSize]/sizeof(long);
+	configStruct->card_info[index].num_Trigger_Indexes = 0;
+	
+	configStruct->card_info[index].next_Card_Index 	= index+1;
+	
+	return index+1;
+}
+
+- (NSDictionary*) dataRecordDescription
+{
+    NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
+	NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+								 @"ORCAEN792DecoderForQdc",					@"decoder",
+								 [NSNumber numberWithLong:dataId],          @"dataId",
+								 [NSNumber numberWithBool:YES],             @"variable",
+								 [NSNumber numberWithLong:-1],              @"length",
+								 nil];
+	[dataDictionary setObject:aDictionary forKey:@"Qdc"];
+    
+	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+                   @"ORCAEN792NDecoderForTdc",                  @"decoder",
+                   [NSNumber numberWithLong:dataIdN],           @"dataId",
+                   [NSNumber numberWithBool:YES],               @"variable",
+                   [NSNumber numberWithLong:-1],				@"length",
+                   nil];
+	[dataDictionary setObject:aDictionary forKey:@"QdcN"];
+    
+    return dataDictionary;
+}
+
+
 #pragma mark ***Archival
-//--------------------------------------------------------------------------------
-/*!\method  initWithCoder  
- * \brief	Initialize object using archived settings.
- * \param	aDecoder			- Object used for getting archived internal parameters.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (id) initWithCoder:(NSCoder*) aDecoder
 {
     self = [super initWithCoder:aDecoder];
 
     [[self undoManager] disableUndoRegistration];
+    [self setModelType:			[aDecoder decodeIntForKey:@"modelType"]];
+   	[self setOnlineMask:		[aDecoder decodeInt32ForKey:@"onlineMask"]];
 
     
     [[self undoManager] enableUndoRegistration];
     return self;
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  encodeWithCoder  
- * \brief	Save the internal settings to the archive.  OscBase saves most
- *			of the settings.
- * \param	anEncoder			- Object used for encoding.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (void) encodeWithCoder:(NSCoder*) anEncoder
 {
     [super encodeWithCoder:anEncoder];
-}
-
-@end
-
-@implementation ORCaen792DecoderForCAEN : ORCaenDataDecoder
-- (NSString*) identifier
-{
-    return @"CAEN 792 ADC";
+	[anEncoder encodeInt:modelType			forKey:@"modelType"];
+	[anEncoder encodeInt32:onlineMask		forKey:@"onlineMask"];
 }
 @end
 

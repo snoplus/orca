@@ -35,6 +35,17 @@
     return self;
 }
 
+- (void) awakeFromNib
+{
+	int i;
+	for(i=0;i<16;i++){
+		[[onlineMaskMatrixA cellAtRow:i column:0] setTag:i];
+		[[onlineMaskMatrixB cellAtRow:i column:0] setTag:i+16];
+		[[thresholdA cellAtRow:i column:0] setTag:i];
+		[[thresholdB cellAtRow:i column:0] setTag:i+16];
+	}
+	[super awakeFromNib];
+}
 
 
 #pragma mark ¥¥¥Notifications
@@ -47,6 +58,16 @@
 - (void) registerNotificationObservers
 {
     [ super registerNotificationObservers ];
+	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+    [notifyCenter addObserver : self
+                     selector : @selector(modelTypeChanged:)
+                         name : ORCaen792ModelModelTypeChanged
+						object: model];
+
+	[notifyCenter addObserver : self
+					 selector : @selector(onlineMaskChanged:)
+						 name : ORCaen792ModelOnlineMaskChanged
+					   object : model];
 }
 
 #pragma mark ***Interface Management
@@ -59,11 +80,82 @@
 - (void) updateWindow
 {
    [ super updateWindow ];
+	[self modelTypeChanged:nil];
+	[self onlineMaskChanged:nil];
 }
 
 #pragma mark ***Interface Management - Module specific
 - (NSString*) thresholdLockName {return @"ORCaen792ThresholdLock";}
 - (NSString*) basicLockName     {return @"ORCaen792BasicLock";}
 
+- (NSSize) thresholdDialogSize
+{
+	return NSMakeSize(310,640);
+}
+
+- (void) modelTypeChanged:(NSNotification*)aNote
+{
+	[modelTypePU selectItemAtIndex: [model modelType]];
+	if([model modelType] == kModel792){
+		[thresholdB setEnabled:YES];
+		[stepperB setEnabled:YES];
+		[onlineMaskMatrixB setEnabled:YES];
+	}
+	else {
+		[thresholdB setEnabled:NO];
+		[stepperB setEnabled:NO];
+		[onlineMaskMatrixB setEnabled:NO];
+	}
+	[[self window] setTitle:[NSString stringWithFormat:@"%@",[model identifier]]];
+}
+- (void) thresholdLockChanged:(NSNotification*)aNotification
+{
+    BOOL runInProgress = [gOrcaGlobals runInProgress];
+    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:[self thresholdLockName]];
+    BOOL locked = [gSecurity isLocked:[self thresholdLockName]];
+    
+	[modelTypePU setEnabled:!runInProgress];
+    [thresholdLockButton setState: locked];
+    
+	if([model modelType] == kModel792){
+		[onlineMaskMatrixB setEnabled:!lockedOrRunningMaintenance];
+		[thresholdB setEnabled:!lockedOrRunningMaintenance];
+	}
+	else {
+		[onlineMaskMatrixB setEnabled:NO];
+		[thresholdB setEnabled:NO];
+	}
+	[onlineMaskMatrixA setEnabled:!lockedOrRunningMaintenance];
+	[thresholdA setEnabled:!lockedOrRunningMaintenance];
+	[stepperA setEnabled:!lockedOrRunningMaintenance];
+	
+    [thresholdWriteButton setEnabled:!lockedOrRunningMaintenance];
+    [thresholdReadButton setEnabled:!lockedOrRunningMaintenance];
+	
+    NSString* s = @"";
+    if(lockedOrRunningMaintenance){
+		if(runInProgress && ![gSecurity isLocked:[self thresholdLockName]])s = @"Not in Maintenance Run.";
+    }
+    [thresholdLockDocField setStringValue:s];
+}
+- (void) onlineMaskChanged:(NSNotification*)aNotification
+{
+	short i;
+	unsigned long theMask = [model onlineMask];
+	for(i=0;i<16;i++){
+		[[onlineMaskMatrixA cellWithTag:i] setIntValue:(theMask&(1<<i))!=0];
+		[[onlineMaskMatrixB cellWithTag:i+16] setIntValue:(theMask&(1<<(i+16)))!=0];
+	}
+}
+
 #pragma mark ¥¥¥Actions
+- (void) modelTypePUAction:(id)sender
+{
+	[model setModelType:[sender indexOfSelectedItem]];
+}
+- (IBAction) onlineAction:(id)sender
+{
+	[model setOnlineMaskBit:[[sender selectedCell] tag] withValue:[sender intValue]];
+}
+
 @end
