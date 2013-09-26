@@ -405,7 +405,7 @@ NSString* ORCaen792ModelOnlineMaskChanged = @"ORCaen792ModelOnlineMaskChanged";
 	[dataDictionary setObject:aDictionary forKey:@"Qdc"];
     
 	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-                   @"ORCAEN792NDecoderForTdc",                  @"decoder",
+                   @"ORCAEN792NDecoderForQdc",                  @"decoder",
                    [NSNumber numberWithLong:dataIdN],           @"dataId",
                    [NSNumber numberWithBool:YES],               @"variable",
                    [NSNumber numberWithLong:-1],				@"length",

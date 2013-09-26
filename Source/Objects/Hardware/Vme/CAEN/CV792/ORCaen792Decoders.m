@@ -70,7 +70,7 @@
 }
 - (NSString*) identifier
 {
-    return @"CAEN 792";
+    return @"CAEN 792 QDC";
 }
 
 @end
@@ -80,6 +80,10 @@
 - (unsigned short) channel: (unsigned long) pDataValue
 {
     return	ShiftAndExtract(pDataValue,17,0xF);
+}
+- (NSString*) identifier
+{
+    return @"CAEN 792N QDC";
 }
 
 @end
