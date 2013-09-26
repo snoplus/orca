@@ -632,8 +632,6 @@
 		841E0A4217F46296009E4190 /* ORCaen792Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 841E0A4017F46295009E4190 /* ORCaen792Decoders.h */; };
 		841E0A4317F46296009E4190 /* ORCaen792Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 841E0A4117F46295009E4190 /* ORCaen792Decoders.m */; };
 		841E0A4717F46468009E4190 /* ORCAEN792Readout.hh in Headers */ = {isa = PBXBuildFile; fileRef = 841E0A4517F46468009E4190 /* ORCAEN792Readout.hh */; };
-		841E0A4A17F464C0009E4190 /* ORCAEN792Readout.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 841E0A4817F464C0009E4190 /* ORCAEN792Readout.cc */; };
-		841E0A4B17F464C0009E4190 /* ORCAEN792Readout.hh in VME_Copy */ = {isa = PBXBuildFile; fileRef = 841E0A4917F464C0009E4190 /* ORCAEN792Readout.hh */; };
 		84200CA206764C120048DFB4 /* ORSubPlotController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84200CA006764C120048DFB4 /* ORSubPlotController.h */; };
 		84200CA306764C120048DFB4 /* ORSubPlotController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84200CA106764C120048DFB4 /* ORSubPlotController.m */; };
 		842042070F0C082D00720846 /* Continue.tif in Resources */ = {isa = PBXBuildFile; fileRef = 842042060F0C082D00720846 /* Continue.tif */; };
@@ -3216,8 +3214,6 @@
 				43ADFED410B6E2090044617C /* ORVMETrigger32Readout.hh in VME_Copy */,
 				84AFEC4516B1707000EC343C /* ORCAEN1721Readout.cc in VME_Copy */,
 				84AFEC4616B1707000EC343C /* ORCAEN1721Readout.hh in VME_Copy */,
-				841E0A4A17F464C0009E4190 /* ORCAEN792Readout.cc in VME_Copy */,
-				841E0A4B17F464C0009E4190 /* ORCAEN792Readout.hh in VME_Copy */,
 				84E703FC1726E60200F6DADB /* ORSIS3320Readout.cc in VME_Copy */,
 				84E703FD1726E60700F6DADB /* ORSIS3320Readout.hh in VME_Copy */,
 				84997879174A6DA500BFEE3E /* ORPollingTimeStampReadout.cc in VME_Copy */,
@@ -3905,8 +3901,6 @@
 		841E0A4117F46295009E4190 /* ORCaen792Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORCaen792Decoders.m; sourceTree = "<group>"; };
 		841E0A4417F46468009E4190 /* ORCAEN792Readout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ORCAEN792Readout.cc; sourceTree = "<group>"; };
 		841E0A4517F46468009E4190 /* ORCAEN792Readout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ORCAEN792Readout.hh; sourceTree = "<group>"; };
-		841E0A4817F464C0009E4190 /* ORCAEN792Readout.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = ORCAEN792Readout.cc; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAEN792Readout.cc; sourceTree = "<group>"; };
-		841E0A4917F464C0009E4190 /* ORCAEN792Readout.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = ORCAEN792Readout.hh; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAEN792Readout.hh; sourceTree = "<group>"; };
 		84200CA006764C120048DFB4 /* ORSubPlotController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORSubPlotController.h; path = "Source/Objects/Data Processing/Data Objects/ORSubPlotController.h"; sourceTree = SOURCE_ROOT; };
 		84200CA106764C120048DFB4 /* ORSubPlotController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORSubPlotController.m; path = "Source/Objects/Data Processing/Data Objects/ORSubPlotController.m"; sourceTree = SOURCE_ROOT; };
 		842042060F0C082D00720846 /* Continue.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Continue.tif; path = "Source/Objects/Misc Objects/Views/ScriptView/Continue.tif"; sourceTree = SOURCE_ROOT; };
@@ -6396,8 +6390,6 @@
 		2A37F4AAFDCFA73011CA2CEA /* Orca */ = {
 			isa = PBXGroup;
 			children = (
-				841E0A4817F464C0009E4190 /* ORCAEN792Readout.cc */,
-				841E0A4917F464C0009E4190 /* ORCAEN792Readout.hh */,
 				CE68866C0D0CE0E400FA4158 /* PlugIns */,
 				F5AD34B203A7AEB8015F64B1 /* Readme */,
 				F51E693F03AE4775015F64B1 /* Source */,
