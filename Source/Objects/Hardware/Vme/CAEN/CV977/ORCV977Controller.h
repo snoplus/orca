@@ -20,8 +20,8 @@
 
 // Definition of class.
 @interface ORCV977Controller : ORCaenCardController {
-    IBOutlet NSMatrix*	onlineMaskMatrixA;
-    IBOutlet NSMatrix*	onlineMaskMatrixB;
+    IBOutlet NSTextField*	inputSetField;
+    IBOutlet NSMatrix*      inputSetMatrix;
 }
 
 #pragma mark ***Initialization
@@ -33,10 +33,9 @@
 #pragma mark ***Interface Management
 - (NSSize) thresholdDialogSize;
 - (void) updateWindow;
-- (void) onlineMaskChanged:(NSNotification*)aNote;
-
+- (void) inputSetChanged:(NSNotification*)aNote;
 
 #pragma mark ***Actions
-- (IBAction) onlineAction:(id)sender;
+- (IBAction) inputSetAction:(id)sender;
 
 @end

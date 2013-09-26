@@ -45,7 +45,8 @@ static V977NamesStruct reg[kNumRegisters] = {
 	{@"Software Reset",         0x002E,		kWriteOnly},
 };
 
-NSString* ORCV977ModelOnlineMaskChanged = @"ORCV977ModelOnlineMaskChanged";
+NSString* ORCV977ModelInputSetChanged  = @"ORCV977ModelInputSetChanged";
+NSString* ORCV977ModelInputMaskChanged = @"ORCV977ModelInputMaskChanged";
 
 @implementation ORCV977Model
 
@@ -57,7 +58,6 @@ NSString* ORCV977ModelOnlineMaskChanged = @"ORCV977ModelOnlineMaskChanged";
 	
     [self setBaseAddress:k792DefaultBaseAddress];
     [self setAddressModifier:k792DefaultAddressModifier];
-	[self setOnlineMask:0];
 	
     [[self undoManager] enableUndoRegistration];
    
@@ -80,30 +80,35 @@ NSString* ORCV977ModelOnlineMaskChanged = @"ORCV977ModelOnlineMaskChanged";
 	return NSMakeRange(baseAddress,0x2F);
 }
 
+- (NSSize) thresholdDialogSize //inherited
+{
+	return NSMakeSize(610,200);
+}
+
 #pragma mark ***Accessors
-- (unsigned long)onlineMask {
+- (unsigned long)inputSet {
 	
-    return onlineMask;
+    return inputSet;
 }
 
-- (void)setOnlineMask:(unsigned long)anOnlineMask
+- (void)setInputSet:(unsigned long)anInputSet
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setOnlineMask:[self onlineMask]];
-    onlineMask = anOnlineMask;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCV977ModelOnlineMaskChanged object:self];
+    [[[self undoManager] prepareWithInvocationTarget:self] setInputSet:[self inputSet]];
+    inputSet = anInputSet;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCV977ModelInputSetChanged object:self];
 }
 
-- (BOOL)onlineMaskBit:(int)bit
+- (BOOL)inputSetBit:(int)bit
 {
-	return onlineMask&(1<<bit);
+	return inputSet&(1<<bit);
 }
 
-- (void) setOnlineMaskBit:(int)bit withValue:(BOOL)aValue
+- (void) setInputSetBit:(int)bit withValue:(BOOL)aValue
 {
-	unsigned long aMask = onlineMask;
+	unsigned long aMask = inputSet;
 	if(aValue)aMask |= (1<<bit);
 	else      aMask &= ~(1<<bit);
-	[self setOnlineMask:aMask];
+	[self setInputSet:aMask];
 }
 
 #pragma mark ***Register - General routines
@@ -142,7 +147,7 @@ NSString* ORCV977ModelOnlineMaskChanged = @"ORCV977ModelOnlineMaskChanged";
     self = [super initWithCoder:aDecoder];
 
     [[self undoManager] disableUndoRegistration];
-   	[self setOnlineMask:		[aDecoder decodeInt32ForKey:@"onlineMask"]];
+   	[self setInputSet:		[aDecoder decodeInt32ForKey:@"inputSet"]];
 
     
     [[self undoManager] enableUndoRegistration];
@@ -152,7 +157,7 @@ NSString* ORCV977ModelOnlineMaskChanged = @"ORCV977ModelOnlineMaskChanged";
 - (void) encodeWithCoder:(NSCoder*) anEncoder
 {
     [super encodeWithCoder:anEncoder];
-	[anEncoder encodeInt32:onlineMask		forKey:@"onlineMask"];
+	[anEncoder encodeInt32:inputSet		forKey:@"inputSet"];
 }
 @end
 

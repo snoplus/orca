@@ -49,14 +49,19 @@ typedef struct V977NamesStruct {
 // Class definition
 @interface ORCV977Model : ORCaenCardModel
 {
-	unsigned long onlineMask;
+	unsigned long inputSet;
 }
 
 #pragma mark ***Accessors
-- (unsigned long)   onlineMask;
-- (void)			setOnlineMask:(unsigned long)anOnlineMask;
-- (BOOL)			onlineMaskBit:(int)bit;
-- (void)			setOnlineMaskBit:(int)bit withValue:(BOOL)aValue;
+- (unsigned long)   inputSet;
+- (void)			setInputSet:(unsigned long)anInputSet;
+- (BOOL)			inputSetBit:(int)bit;
+- (void)			setInputSetBit:(int)bit withValue:(BOOL)aValue;
+
+- (unsigned long)   inputMask;
+- (void)			setInputMask:(unsigned long)anInputSet;
+- (BOOL)			inputMaskBit:(int)bit;
+- (void)			setInputMaskBit:(int)bit withValue:(BOOL)aValue;
 
 #pragma mark ***Register - General routines
 - (short)           getNumberRegisters;
@@ -69,4 +74,5 @@ typedef struct V977NamesStruct {
 
 @end
 
-extern NSString* ORCV977ModelOnlineMaskChanged;
+extern NSString* ORCV977ModelInputSetChanged;
+extern NSString* ORCV977ModelInputMaskChanged;

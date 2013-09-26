@@ -30,10 +30,7 @@
 {
 	int i;
 	for(i=0;i<16;i++){
-		[[onlineMaskMatrixA cellAtRow:i column:0] setTag:i];
-		[[onlineMaskMatrixB cellAtRow:i column:0] setTag:i+16];
-		[[thresholdA cellAtRow:i column:0] setTag:i];
-		[[thresholdB cellAtRow:i column:0] setTag:i+16];
+		[[inputSetMatrix cellAtRow:0 column:i] setTag:15-i];
 	}
 	[super awakeFromNib];
 }
@@ -46,41 +43,41 @@
 	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
 
 	[notifyCenter addObserver : self
-					 selector : @selector(onlineMaskChanged:)
-						 name : ORCV977ModelOnlineMaskChanged
+					 selector : @selector(inputSetChanged:)
+						 name : ORCV977ModelInputSetChanged
 					   object : model];
 }
 
 #pragma mark ***Interface Management
 - (void) updateWindow
 {
-   [ super updateWindow ];
-	[self onlineMaskChanged:nil];
+    [super updateWindow ];
+	[self inputSetChanged:nil];
 }
 
 #pragma mark ***Interface Management - Module specific
-- (NSString*) thresholdLockName {return @"ORCV977ThresholdLock";}
-- (NSString*) basicLockName     {return @"ORCV977BasicLock";}
+- (NSString*) thresholdLockName  {return @"ORCV977SettingsLock";}
+- (NSString*) basicLockName      {return @"ORCV977BasicLock";}
 
 - (NSSize) thresholdDialogSize
 {
-	return NSMakeSize(310,640);
+	return NSMakeSize(610,200);
 }
 
-- (void) onlineMaskChanged:(NSNotification*)aNotification
+- (void) inputSetChanged:(NSNotification*)aNotification
 {
 	short i;
-	unsigned long theMask = [model onlineMask];
+	unsigned long theMask = [model inputSet];
 	for(i=0;i<16;i++){
-		[[onlineMaskMatrixA cellWithTag:i] setIntValue:(theMask&(1<<i))!=0];
-		[[onlineMaskMatrixB cellWithTag:i+16] setIntValue:(theMask&(1<<(i+16)))!=0];
+		[[inputSetMatrix cellWithTag:i] setIntValue:(theMask&(1<<i))!=0];
 	}
+    [inputSetField setIntValue:theMask];
 }
 
 #pragma mark •••Actions
-- (IBAction) onlineAction:(id)sender
+- (IBAction) inputSetAction:(id)sender
 {
-	[model setOnlineMaskBit:[[sender selectedCell] tag] withValue:[sender intValue]];
+	[model setInputSetBit:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
 @end
