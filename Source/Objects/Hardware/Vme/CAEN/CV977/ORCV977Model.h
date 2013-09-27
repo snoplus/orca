@@ -45,23 +45,74 @@ typedef struct V977NamesStruct {
 	short           accessType;
 } V977NamesStruct;
 
-
-// Class definition
-@interface ORCV977Model : ORCaenCardModel
+@interface ORCV977Model : ORVmeIOCard
 {
-	unsigned long inputSet;
+    unsigned short  selectedRegIndex;
+    unsigned short  selectedChannel;
+    unsigned long   writeValue;
+	unsigned long   inputSet;
+	unsigned long   inputMask;
+	unsigned long   outputSet;
+	unsigned long   outputMask;
+	unsigned long   interruptMask;
+    BOOL            patternBit;
+    BOOL            gateMaskBit;
+    BOOL            orMaskBit;
 }
 
+- (void) registerNotificationObservers;
+- (void) runAboutToStart:(NSNotification*)aNote;
+
 #pragma mark ***Accessors
+- (BOOL)            orMaskBit;
+- (void)            setOrMaskBit:(BOOL)aOrMaskBit;
+- (BOOL)            gateMaskBit;
+- (void)            setGateMaskBit:(BOOL)aGateMaskBit;
+- (BOOL)            patternBit;
+- (void)            setPatternBit:(BOOL)aPatternBit;
 - (unsigned long)   inputSet;
-- (void)			setInputSet:(unsigned long)anInputSet;
+- (void)			setInputSet:(unsigned long)aValue;
 - (BOOL)			inputSetBit:(int)bit;
 - (void)			setInputSetBit:(int)bit withValue:(BOOL)aValue;
 
 - (unsigned long)   inputMask;
-- (void)			setInputMask:(unsigned long)anInputSet;
+- (void)			setInputMask:(unsigned long)aValue;
 - (BOOL)			inputMaskBit:(int)bit;
 - (void)			setInputMaskBit:(int)bit withValue:(BOOL)aValue;
+
+- (unsigned long)   outputSet;
+- (void)			setOutputSet:(unsigned long)aValue;
+- (BOOL)			outputSetBit:(int)bit;
+- (void)			setOutputSetBit:(int)bit withValue:(BOOL)aValue;
+
+- (unsigned long)   outputMask;
+- (void)			setOutputMask:(unsigned long)aValue;
+- (BOOL)			outputMaskBit:(int)bit;
+- (void)			setOutputMaskBit:(int)bit withValue:(BOOL)aValue;
+
+- (unsigned long)   interruptMask;
+- (void)			setInterruptMask:(unsigned long)aValue;
+- (BOOL)			interruptMaskBit:(int)bit;
+- (void)			setInterruptMaskBit:(int)bit withValue:(BOOL)aValue;
+
+
+#pragma mark *** Hardware Access
+- (void)    read;
+- (void)    write;
+- (void)    read: (unsigned short) pReg returnValue: (void*) pValue;
+- (void)    write: (unsigned short) pReg sendValue: (unsigned long) pValue;
+- (void)    clearOutputRegister;
+- (void)    clearSingleHitRegister;
+- (void)    clearMultiHitRegister;
+- (void)    readVersion;
+- (void)    writeControlReg;
+- (void)    writeInputSetReg;
+- (void)    writeInputMaskReg;
+- (void)    writeOutputSetReg;
+- (void)    writeOutputMaskReg;
+- (void)    writeInterruptMaskReg;
+- (void)    reset;
+- (void)    initBoard;
 
 #pragma mark ***Register - General routines
 - (short)           getNumberRegisters;
@@ -70,9 +121,25 @@ typedef struct V977NamesStruct {
 - (NSString*) 		getRegisterName: (short) anIndex;
 - (unsigned long) 	getAddressOffset: (short) anIndex;
 
-#pragma mark ***Hardware Access
+#pragma mark ***Archival
+- (id)   initWithCoder:(NSCoder*)decoder;
+- (void) encodeWithCoder:(NSCoder*)encoder;
 
 @end
 
+
+#pragma mark •••External String Definitions
+extern NSString* ORCV977ModelOrMaskBitChanged;
+extern NSString* ORCV977ModelGateMaskBitChanged;
+extern NSString* ORCV977ModelPatternBitChanged;
+extern NSString* ORCV977ModelSelectedRegIndexChanged;
+extern NSString* ORCV977ModelWriteValueChanged;
 extern NSString* ORCV977ModelInputSetChanged;
 extern NSString* ORCV977ModelInputMaskChanged;
+extern NSString* ORCV977ModelOutputSetChanged;
+extern NSString* ORCV977ModelOutputMaskChanged;
+extern NSString* ORCV977ModelInterruptMaskChanged;
+
+extern NSString* ORCV977BasicOpsLock;
+extern NSString* ORCV977LowLevelOpsLock;
+

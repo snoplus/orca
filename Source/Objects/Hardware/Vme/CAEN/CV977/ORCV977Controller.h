@@ -19,23 +19,99 @@
 
 
 // Definition of class.
-@interface ORCV977Controller : ORCaenCardController {
+@interface ORCV977Controller : OrcaObjectController {
+    IBOutlet NSTabView* 	tabView;
+	IBOutlet NSPopUpButton* orMaskBitPU;
+	IBOutlet NSPopUpButton* gateMaskBitPU;
+	IBOutlet NSPopUpButton* patternBitPU;
+    IBOutlet NSTextField*   slotField;
     IBOutlet NSTextField*	inputSetField;
     IBOutlet NSMatrix*      inputSetMatrix;
+    IBOutlet NSTextField*	inputMaskField;
+    IBOutlet NSMatrix*      inputMaskMatrix;
+    IBOutlet NSTextField*	outputSetField;
+    IBOutlet NSMatrix*      outputSetMatrix;
+    IBOutlet NSTextField*	outputMaskField;
+    IBOutlet NSMatrix*      outputMaskMatrix;
+    IBOutlet NSTextField*	interruptMaskField;
+    IBOutlet NSMatrix*      interruptMaskMatrix;
+    IBOutlet NSButton*		clearOutputRegButton;
+    IBOutlet NSButton*		clearSingleHitRegButton;
+    IBOutlet NSButton*		clearMultiHitRegButton;
+
+    IBOutlet NSTextField* 	addressTextField;
+    IBOutlet NSTextField* 	writeValueTextField;
+    IBOutlet NSPopUpButton*	registerAddressPopUp;
+    IBOutlet NSButton*		basicWriteButton;
+    IBOutlet NSButton*		basicReadButton;
+    IBOutlet NSButton*		basicOpsLockButton;
+    IBOutlet NSButton*		lowLevelOpsLockButton;
+    IBOutlet NSButton*		initBoardButton;
+    IBOutlet NSButton*		resetButton;
+    
+    // Results box
+    IBOutlet NSTextField*	regNameField;
+    IBOutlet NSTextField*	registerOffsetTextField;
+    IBOutlet NSTextField*	registerReadWriteTextField;
+
+    NSView* blankView;
+    NSSize lowLevelOpsSize;
+    NSSize basicOpsSize;
 }
 
-#pragma mark ***Initialization
-- (id)		init;
- 	
+- (id) init;
+- (void) dealloc;
+- (void) awakeFromNib;
+
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
 
 #pragma mark ***Interface Management
-- (NSSize) thresholdDialogSize;
+- (void) orMaskBitChanged:(NSNotification*)aNote;
+- (void) gateMaskBitChanged:(NSNotification*)aNote;
+- (void) patternBitChanged:(NSNotification*)aNote;
 - (void) updateWindow;
-- (void) inputSetChanged:(NSNotification*)aNote;
+- (void) checkGlobalSecurity;
 
-#pragma mark ***Actions
+#pragma mark ***Interface Management - Module specific
+- (void) slotChanged:(NSNotification*)aNotification;
+- (void) setModel:(id)aModel;
+- (void) inputSetChanged:(NSNotification*)aNotification;
+- (void) inputMaskChanged:(NSNotification*)aNotification;
+- (void) outputSetChanged:(NSNotification*)aNotification;
+- (void) outputMaskChanged:(NSNotification*)aNotification;
+- (void) interruptMaskChanged:(NSNotification*)aNotification;
+- (void) lowLevelLockChanged:(NSNotification*)aNotification;
+- (void) basicOpsLockChanged:(NSNotification*)aNotification;
+- (void) baseAddressChanged:(NSNotification*) aNotification;
+- (void) writeValueChanged:(NSNotification*) aNotification;
+- (void) selectedRegIndexChanged:(NSNotification*) aNotification;
+
+#pragma mark •••Actions
+- (IBAction) orMaskBitAction:(id)sender;
+- (IBAction) gateMaskBitAction:(id)sender;
+- (IBAction) patternBitAction:(id)sender;
+- (IBAction) baseAddressAction:(id) aSender;
+- (IBAction) writeValueAction:(id) aSender;
+- (IBAction) selectRegisterAction:(id) aSender;
+- (IBAction) read:(id) pSender;
+- (IBAction) write:(id) pSender;
+- (IBAction) settingsLockAction:(id)sender;
+- (IBAction) lowLevelLockAction:(id)sender;
 - (IBAction) inputSetAction:(id)sender;
+- (IBAction) inputMaskAction:(id)sender;
+- (IBAction) outputSetAction:(id)sender;
+- (IBAction) outputMaskAction:(id)sender;
+- (IBAction) interruptMaskAction:(id)sender;
+- (IBAction) clearOutputRegisterAction:(id)sender;
+- (IBAction) clearSingleHitRegisterAction:(id)sender;
+- (IBAction) clearMultiHitRegisterAction:(id)sender;
+- (IBAction) initBoardAction:(id)sender;
+- (IBAction) resetAction:(id)sender;
+
+#pragma mark •••Helpers
+- (void) populatePullDown;
+- (void) updateRegisterDescription:(short) aRegisterIndex;
+- (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;
 
 @end
