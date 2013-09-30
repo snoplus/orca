@@ -47,6 +47,7 @@
     IBOutlet NSMatrix*      conversionMatrix;
     IBOutlet NSMatrix*      speedMatrix;
     IBOutlet NSMatrix*      motorEnabledMatrix;
+    IBOutlet NSMatrix*      motorTypeMatrix;
     IBOutlet NSMatrix*		positionMatrix;
     IBOutlet NSMatrix*		targetMatrix;
     IBOutlet NSMatrix*		addButtonMatrix;
@@ -133,6 +134,7 @@
 - (IBAction) delete:(id)sender;
 - (IBAction) cut:(id)sender;
 - (IBAction) sendGoAction:(id)sender;
+- (IBAction) motorTypeAction:(id)sender;
 
 #pragma mark •••Table Data Source
 - (int)numberOfRowsInTableView:(NSTableView *)aTableView;

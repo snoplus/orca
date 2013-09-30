@@ -39,6 +39,7 @@
         int				motorSpeed;
 		BOOL			motorEnabled;
 		BOOL			absoluteMotion;
+        int             motorType;
         NSString*       axis;
 }
 
@@ -60,6 +61,8 @@
 - (void) setMotorPosition:(int)aPosition;
 - (int) motorSpeed;
 - (void) setMotorSpeed:(int)aSpeed;
+- (int) motorType;
+- (void) setMotorType:(int)aType;
 - (BOOL) hasMoved;
 - (int) targetPosition;
 - (void) setTargetPosition:(int)aPosition;
@@ -75,3 +78,4 @@ extern NSString* ORVXMMotorConversionChanged;
 extern NSString* ORVXMMotorFullScaleChanged;
 extern NSString* ORVXMMotorPositionChanged;
 extern NSString* ORVXMMotorTargetChanged;
+extern NSString* ORVXMMotorTypeChanged;

@@ -122,6 +122,7 @@
 - (void) addHomeMinusCmdFor:(int)aMotorIndex;
 - (void) addCustomCmd;
 - (void) sendGo;
+- (void) sendMotorType:(int)motorIndex;
 - (unsigned)  cmdQueueCount;
 - (NSString*) cmdQueueCommand:(int)index;
 - (NSString*) cmdQueueDescription:(int)index;

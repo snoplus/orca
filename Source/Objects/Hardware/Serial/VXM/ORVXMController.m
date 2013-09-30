@@ -130,6 +130,12 @@
                          name : ORVXMMotorSpeedChanged
                        object : model];      
 
+    [notifyCenter addObserver : self
+                     selector : @selector(motorTypeChanged:)
+                         name : ORVXMMotorTypeChanged
+                       object : model];
+
+    
 	[notifyCenter addObserver : self
                      selector : @selector(targetChanged:)
                          name : ORVXMMotorTargetChanged
@@ -228,6 +234,7 @@
 	[self conversionChanged:nil];
     [self motorEnabledChanged:nil];
     [self speedChanged:nil];
+    [self motorTypeChanged:nil];
     [self targetChanged:nil];
     [self updateCmdTable:nil];
 	[self displayRawChanged:nil];
@@ -364,6 +371,21 @@
 	}
 }
 
+- (void) motorTypeChanged:(NSNotification*)aNotification
+{
+	if(aNotification){
+		ORVXMMotor* aMotor = [[aNotification userInfo] objectForKey:@"VMXMotor"];
+        [[motorTypeMatrix cellAtRow:[aMotor motorId] column:0] selectItemAtIndex:[aMotor motorType]];
+
+        
+	}
+	else {
+		for(id aMotor in [model motors]){
+            [[motorTypeMatrix cellAtRow:[aMotor motorId] column:0] selectItemAtIndex:[aMotor motorType]];
+		}
+	}
+}
+
 - (void) positionChanged:(NSNotification*)aNotification
 {
 	if(aNotification){
@@ -433,6 +455,8 @@
 	[numTimesToRepeatField setEnabled:!locked && [model repeatCmds] && !cmdExecuting && useCmdQueue];
 	[stopGoNextCmdButton setEnabled: cmdExecuting && useCmdQueue];
 	
+    [motorTypeMatrix setEnabled: !locked && !cmdExecuting];
+
 	[addCustomCmdButton setEnabled: !cmdExecuting];
 	[addCustomCmdButton setTitle:[model useCmdQueue]?@"Add Custom Cmd": @"Execute Cmd"];
 	[zeroCounterButton setEnabled:!locked && !cmdExecuting];
@@ -565,6 +589,12 @@
 - (IBAction) shipRecordsAction:(id)sender
 {
 	[model setShipRecords:[sender intValue]];	
+}
+
+- (IBAction) motorTypeAction:(id)sender
+{
+    ORVXMMotor* aMotor = [model motor:[sender selectedRow]];
+    [aMotor setMotorType:[[sender selectedCell] indexOfSelectedItem]];
 }
 
 - (IBAction) manualStateAction:(id)sender

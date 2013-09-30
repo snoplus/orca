@@ -30,6 +30,7 @@ NSString* ORVXMMotorSpeedChanged		= @"ORVXMMotorSpeedChanged";
 NSString* ORVXMMotorPositionChanged		= @"ORVXMMotorPositionChanged";
 NSString* ORVXMMotorTargetChanged		= @"ORVXMMotorTargetChanged";
 NSString* ORVXMMotorAbsMotionChanged	= @"ORVXMMotorAbsMotionChanged";
+NSString* ORVXMMotorTypeChanged         = @"ORVXMMotorTypeChanged";
 
 
 @implementation ORVXMMotor
@@ -110,6 +111,22 @@ NSString* ORVXMMotorAbsMotionChanged	= @"ORVXMMotorAbsMotionChanged";
 	
 	NSMutableDictionary* userInfo = [NSMutableDictionary dictionaryWithObject:self forKey:@"VMXMotor"];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORVXMMotorFullScaleChanged object:owner userInfo:userInfo];
+}
+
+- (int) motorType
+{
+    return motorType;
+}
+
+- (void) setMotorType:(int)aType
+{
+    if(aType<0)aType = 0;
+    else if(aType>6)aType = 6;
+    [[[owner undoManager] prepareWithInvocationTarget:self] setMotorType:motorType];
+    motorType = aType;
+    
+	NSMutableDictionary* userInfo = [NSMutableDictionary dictionaryWithObject:self forKey:@"VMXMotor"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORVXMMotorTypeChanged object:owner userInfo:userInfo];
 }
 
 - (int) motorSpeed
@@ -198,6 +215,7 @@ NSString* ORVXMMotorAbsMotionChanged	= @"ORVXMMotorAbsMotionChanged";
 	[self setFullScale:		[decoder decodeIntForKey:  @"fullScaleInt"]];
 	[self setMotorSpeed:	[decoder decodeIntForKey:  @"motorSpeedInt"]];
 	[self setTargetPosition:[decoder decodeIntForKey:  @"targetPosition"]];
+	[self setMotorType:     [decoder decodeIntForKey:  @"motorType"]];
 	
 	[[owner undoManager] enableUndoRegistration];
 		
@@ -212,6 +230,7 @@ NSString* ORVXMMotorAbsMotionChanged	= @"ORVXMMotorAbsMotionChanged";
     [encoder encodeInt:		fullScale		forKey:@"fullScaleInt"];
     [encoder encodeInt:		motorSpeed		forKey:@"motorSpeedInt"];
     [encoder encodeInt:		targetPosition	forKey:@"targetPosition"];
+    [encoder encodeInt:		motorType       forKey:@"motorType"];
 }
 
 @end
