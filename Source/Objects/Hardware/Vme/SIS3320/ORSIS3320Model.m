@@ -4,16 +4,16 @@
 //  Created by Mark A. Howe on Thursday 8/6/09
 //  Copyright (c) 2009 Universiy of North Carolina. All rights reserved.
 //-----------------------------------------------------------
-//This program was prepared for the Regents of the University of 
-//Washington at the Center for Experimental Nuclear Physics and 
-//Astrophysics (CENPA) sponsored in part by the United States 
-//Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
-//The University has certain rights in the program pursuant to 
-//the contract and the program should not be copied or distributed 
-//outside your organization.  The DOE and the University of 
+//This program was prepared for the Regents of the University of
+//Washington at the Center for Experimental Nuclear Physics and
+//Astrophysics (CENPA) sponsored in part by the United States
+//Department of Energy (DOE) under Grant #DE-FG02-97ER41020.
+//The University has certain rights in the program pursuant to
+//the contract and the program should not be copied or distributed
+//outside your organization.  The DOE and the University of
 //Washington reserve all rights in the program. Neither the authors,
-//University of Washington, or U.S. Government make any warranty, 
-//express or implied, or assume any liability or responsibility 
+//University of Washington, or U.S. Government make any warranty,
+//express or implied, or assume any liability or responsibility
 //for the use of this software.
 //-------------------------------------------------------------
 
@@ -141,7 +141,7 @@ NSString* ORSIS3320ModelEndAddressThresholdChanged		= @"ORSIS3320ModelEndAddress
 #define kAccumGate8Adc12                    0x0200005c /*read only*/
 #define kAdcSPIReg12                        0x02000060 //rw
 
-//ADC Group 2 
+//ADC Group 2
 #define kEventConfigAdc34					0x02800000 /*read/write*/
 #define kEndAddressThreshold34              0x02800004 /*read/write*/
 #define kPreTriggerDelayTriggerGateLength34 0x02800008 /*read/write*/
@@ -475,7 +475,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 @implementation ORSIS3320Model
 
 #pragma mark ***Initialization
-- (id) init 
+- (id) init
 {
     self = [super init];
     [[self undoManager] disableUndoRegistration];
@@ -486,7 +486,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
     return self;
 }
 
-- (void) dealloc 
+- (void) dealloc
 {
     [dacValues release];
 	[preTriggerDelays release];
@@ -503,7 +503,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 
 - (void) setUpImage
 {
-    [self setImage:[NSImage imageNamed:@"SIS3320Card"]];	
+    [self setImage:[NSImage imageNamed:@"SIS3320Card"]];
 }
 
 - (void) makeMainController
@@ -537,7 +537,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
     [[[self undoManager] prepareWithInvocationTarget:self] setOnlineMask:[self onlineMask]];
 	
     onlineMask = anOnlineMask;
-	    
+    
     [[NSNotificationCenter defaultCenter]
 	 postNotificationName:ORSIS3320ModelOnlineChanged
 	 object:self];
@@ -570,10 +570,16 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
         [[[self undoManager] prepareWithInvocationTarget:self] setBufferStart:aGroup withValue:bufferStart[aGroup]];
         
         bufferStart[aGroup] = aBufferStart;
-
+        
         [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3320ModelBufferStartChanged object:self];
     }
 }
+
+
+// --- bufferLength appears to be the number of waveform samples in an event
+// --- this should be determined by raw_data_buffer_config registers
+// --- for ADC12, this address is 0x0200000C for ADC34, it is 0x0280000C, then 30.., 38..
+// --- these registers contain buffer sample lengths and buffer start offsets
 
 - (unsigned long) bufferLength:(int)aGroup
 {
@@ -588,7 +594,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
     aBufferLength = aBufferLength/2 * 2;
     
     bufferLength[aGroup] = aBufferLength;
-
+    
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3320ModelBufferLengthChanged object:self];
 }
 
@@ -789,7 +795,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 - (void) setEnableErrorCorrection:(int)aGroup withValue:(BOOL)aEnableErrorCorrection
 {
     if(aGroup>=0 && aGroup<2){
-            
+        
         [[[self undoManager] prepareWithInvocationTarget:self] setEnableErrorCorrection:aGroup withValue:enableErrorCorrection[aGroup]];
         
         enableErrorCorrection[aGroup] = aEnableErrorCorrection;
@@ -809,7 +815,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
     if(aGroup>=0 && aGroup<kNumSIS3320Groups){
         [[[self undoManager] prepareWithInvocationTarget:self] setPreTriggerDelay:aGroup withValue:[self preTriggerDelay:aGroup]];
         int preTriggerDelay = [self limitIntValue:aPreTriggerDelay min:1 max:1023];
-            
+        
         [preTriggerDelays replaceObjectAtIndex:aGroup withObject:[NSNumber numberWithInt:preTriggerDelay]];
         
         [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3320ModelPreTriggerDelayChanged object:self];
@@ -962,15 +968,15 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 	}
 }
 
-- (unsigned char) gtMask 
+- (unsigned char) gtMask
 {
     return gtMask;
 }
 
-- (void) setGtMask:(unsigned char)aMask 
+- (void) setGtMask:(unsigned char)aMask
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setGtMask:[self gtMask]];
-    gtMask = aMask;	    
+    gtMask = aMask;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3320ModelGtMaskChanged object:self];
 }
 
@@ -995,7 +1001,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 - (void) setTriggerOutMask:(unsigned char)aMask
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setTriggerOutMask:[self triggerOutMask]];
-    triggerOutMask = aMask;	    
+    triggerOutMask = aMask;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3320ModelTriggerOutMaskChanged object:self];
 }
 
@@ -1313,7 +1319,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 	if(groupTag == 0){
 		if(counterTag>=0 && counterTag<kNumSIS3320Channels){
 			return waveFormCount[counterTag];
-		}	
+		}
 		else return 0;
 	}
 	else return 0;
@@ -1415,7 +1421,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 
 
 - (void) initBoard
-{  
+{
 	[self writeDacOffsets];
 	[self writePageRegister:0];
 	[self writeEventConfiguration];
@@ -1443,7 +1449,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 }
 
 - (void) readModuleID:(BOOL)verbose
-{	
+{
 	unsigned long result = 0;
 	[[self adapter] readLongBlock:&result
 						atAddress:[self baseAddress] + kModuleIDReg
@@ -1479,7 +1485,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
                    numToRead:1
                   withAddMod:0x29
                usingAddSpace:0x01];
-   
+    
     [myAdapter readLongBlock:&theValue3
                    atAddress:0x8610
                    numToRead:1
@@ -1548,7 +1554,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 
 - (void) writeAcquisitionRegister
 {
-	// The register is set up as a J/K flip/flop -- 1 bit to set a function and 1 bit 16 bits higher to disable.	
+	// The register is set up as a J/K flip/flop -- 1 bit to set a function and 1 bit 16 bits higher to disable.
 	unsigned long aMask = (clockSource & 0x7) << kAcqClockBitOffset;
 	
 	if(internalTriggerEnabled)	aMask |= kInternalTriggerBit;
@@ -1556,7 +1562,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 	if(lemoTimeStampClrEnabled)	aMask |= kEnableLemoTimeStampClrBit;
 	
 	aMask = ((~aMask & 0x0000ffff)<<16) | aMask;    //put the inverse in the top bits
-
+    
 	[[self adapter] writeLongBlock:&aMask
                          atAddress:baseAddress + kAcquisitionControlReg
                         numToWrite:1
@@ -1589,10 +1595,10 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 {
 	unsigned long aValue = 0;
 	[[self adapter] readLongBlock:&aValue
-						 atAddress:baseAddress + kAdcMemoryPageReg
+                        atAddress:baseAddress + kAdcMemoryPageReg
 						numToRead:1
-						withAddMod:addressModifier
-					 usingAddSpace:0x01];
+                       withAddMod:addressModifier
+                    usingAddSpace:0x01];
 	return aValue;
 }
 
@@ -1645,7 +1651,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 	unsigned long max_timeout, timeout_cnt;
 	
 	int i;
-	for (i=0;i<kNumSIS3320Channels;i++) {	
+	for (i=0;i<kNumSIS3320Channels;i++) {
 		
         if( onlineMask & ( 0x1 << i ) )
             dataWord =  [self dacValue:i];
@@ -1678,11 +1684,11 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 		} while ( ((dataWord & 0x8000) == 0x8000) && (timeout_cnt <  max_timeout) )    ;
 		
 		if (timeout_cnt >=  max_timeout) {
-			NSLog(@"%@ Failed programing the DAC offset for channel %d\n",[self fullID],i); 
+			NSLog(@"%@ Failed programing the DAC offset for channel %d\n",[self fullID],i);
 			continue;
 		}
 		
-		dataWord =  0x2 | (i<<4); // Load DACs 
+		dataWord =  0x2 | (i<<4); // Load DACs
 		[[self adapter] writeLongBlock:&dataWord
 							 atAddress:baseAddress + kDacStatusReg
 							numToWrite:1
@@ -1700,7 +1706,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 		} while ( ((dataWord & 0x8000) == 0x8000) && (timeout_cnt <  max_timeout) )    ;
 		
 		if (timeout_cnt >=  max_timeout) {
-			NSLog(@"%@ Failed programing the DAC offset for channel %d\n",[self fullID],i); 
+			NSLog(@"%@ Failed programing the DAC offset for channel %d\n",[self fullID],i);
 			continue;
 		}
 	}
@@ -1711,7 +1717,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 - (void) writeEventConfiguration
 {
     
-
+    
 	unsigned long aMask = ((triggerMode[0] & 0x3)<<2) | ((triggerMode[1] & 0x3)<<10);
 	if(invertInput[0])             aMask |= kInvertInputMask0;
 	if(enableErrorCorrection[0])   aMask |= kErrorCorrectionMask0;
@@ -1739,10 +1745,10 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 	//all have to be the same so just read group1
 	unsigned long aValue = 0x0;
 	[[self adapter] readLongBlock:&aValue
-                         atAddress:baseAddress + kEventConfigAdc12
+                        atAddress:baseAddress + kEventConfigAdc12
                         numToRead:1
-                        withAddMod:addressModifier
-                     usingAddSpace:0x01];
+                       withAddMod:addressModifier
+                    usingAddSpace:0x01];
 	return aValue;
 }
 
@@ -1772,8 +1778,20 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 		int sampleLength = [self bufferLength:i];
 		int sampleStart  = [self bufferStart:i];
 		
-        if(sampleLength == 1024)sampleLength = 0;
-        else sampleLength &= 0x3Fc;
+        /*        if(sampleLength > 1022) {
+         sampleLength = 1022;
+         // previously checked for sampleLength == 1024, and if true, set sampleLength to 0
+         // this doesn't make sense... changed 9/27/13, GCR
+         }
+         else {
+         // previously was masked with 0x3fc, making max value 1020
+         // value adjusted to appropriate one, corresponding to 1022
+         // updated 9/27/13, GCR
+         sampleLength &= 0x3FE;
+         }*/
+        // whole block above is handled by this mask..
+        // enforces max length of 1022 (9/27/13)
+        sampleLength &= 0x3FE;
         
 		unsigned long aValue = ((sampleLength&0x3ff)<<16) | (sampleStart&0x3ff);
 		[[self adapter] writeLongBlock:&aValue
@@ -1815,7 +1833,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 		[self writeTriggerSetupRegister:i];
 	}
 }
-		
+
 - (void) writeTriggerSetupRegister:(int)aChannel
 {
 	unsigned long aMask = 0x0;
@@ -1855,9 +1873,9 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
     }
     
 	unsigned long writeValue =	(extendedTrigMode << 24) |
-								(gt << 25)               | 
-								(disableTrigOut << 26)          |
-								theThresholdValue ;
+    (gt << 25)               |
+    (disableTrigOut << 26)          |
+    theThresholdValue ;
 	
 	[[self adapter] writeLongBlock:&writeValue
 						 atAddress:baseAddress + triggerThresholdAddress[aChannel]
@@ -1868,69 +1886,76 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 
 - (void) writeAccumulators
 {
+    
+    // from manual..
+    // bits 0-9 of the word define the start index (appropriate mask: 0x3ff)
+    // bits 16-24 define length
+    // --- this is 9 bits, so appropriate mask is 0x1ff
+    // for accumulators 5-8, bits 16-19 define length
+    // --- in this case, mask should be 0xff
     unsigned long aValue;
     int i;
     for(i=0;i<kNumSIS3320Groups;i++){
         //acc 1
-        aValue =  (accGate1Length[i]<<16) | (accGate1StartIndex[i] & 0x1ff);
+        aValue =  ( (accGate1Length[i] & 0x1ff )<<16) | (accGate1StartIndex[i] & 0x3ff);
         [[self adapter] writeLongBlock:&aValue
                              atAddress:baseAddress + accumGate1Address[i]
                             numToWrite:1
                             withAddMod:addressModifier
                          usingAddSpace:0x01];
-
+        
         //acc 2
-        aValue =  (accGate2Length[i]<<16) | (accGate2StartIndex[i] & 0x1ff);
+        aValue =  ( (accGate2Length[i] & 0x1ff )<<16) | (accGate2StartIndex[i] & 0x3ff);
         [[self adapter] writeLongBlock:&aValue
                              atAddress:baseAddress + accumGate2Address[i]
                             numToWrite:1
                             withAddMod:addressModifier
                          usingAddSpace:0x01];
-
+        
         //acc 3
-        aValue =  (accGate3Length[i]<<16) | (accGate3StartIndex[i] & 0x1ff);
+        aValue =  ( ( accGate3Length[i] & 0x1ff )<<16) | (accGate3StartIndex[i] & 0x3ff);
         [[self adapter] writeLongBlock:&aValue
                              atAddress:baseAddress + accumGate3Address[i]
                             numToWrite:1
                             withAddMod:addressModifier
                          usingAddSpace:0x01];
-
+        
         //acc 4
-        aValue =  (accGate4Length[i]<<16) | (accGate4StartIndex[i] & 0x1ff);
+        aValue =  ( (accGate4Length[i] & 0x1ff )<<16) | (accGate4StartIndex[i] & 0x3ff);
         [[self adapter] writeLongBlock:&aValue
                              atAddress:baseAddress + accumGate4Address[i]
                             numToWrite:1
                             withAddMod:addressModifier
                          usingAddSpace:0x01];
- 
+        
         //acc 5
-        aValue =  (accGate5Length[i]<<16) | (accGate5StartIndex[i] & 0x1ff);
+        aValue =  ( ( accGate5Length[i] & 0xf )<<16) | (accGate5StartIndex[i] & 0x3ff);
         [[self adapter] writeLongBlock:&aValue
                              atAddress:baseAddress + accumGate5Address[i]
                             numToWrite:1
                             withAddMod:addressModifier
                          usingAddSpace:0x01];
-
+        
         //acc 6
-        aValue =  (accGate6Length[i]<<16) | (accGate6StartIndex[i] & 0x1ff);
+        aValue =  ( (accGate6Length[i] & 0xf )<<16) | (accGate6StartIndex[i] & 0x3ff);
         [[self adapter] writeLongBlock:&aValue
                              atAddress:baseAddress + accumGate6Address[i]
                             numToWrite:1
                             withAddMod:addressModifier
                          usingAddSpace:0x01];
-
+        
         
         //acc 7
-        aValue =  (accGate7Length[i]<<16) | (accGate7StartIndex[i] & 0x1ff);
+        aValue =  ( (accGate7Length[i] & 0xf )<<16) | (accGate7StartIndex[i] & 0x3ff);
         [[self adapter] writeLongBlock:&aValue
                              atAddress:baseAddress + accumGate7Address[i]
                             numToWrite:1
                             withAddMod:addressModifier
                          usingAddSpace:0x01];
-
+        
         
         //acc 8
-        aValue =  (accGate8Length[i]<<16) | (accGate8StartIndex[i] & 0x1ff);
+        aValue =  ( ( accGate8Length[i] & 0xf )<<16) | (accGate8StartIndex[i] & 0x3ff);
         [[self adapter] writeLongBlock:&aValue
                              atAddress:baseAddress + accumGate8Address[i]
                             numToWrite:1
@@ -2001,7 +2026,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 
 
 - (void) printReport
-{   
+{
 	NSFont* font = [NSFont fontWithName:@"Monaco" size:12];
 	NSLogFont(font,@"%@:\n",[self fullID]);
 	NSLogFont(font,@"-------------------------------------------\n");
@@ -2015,8 +2040,8 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
                                                            usingAddSpace: 0x01]];
     }
     [self executeCommandList:aList];
-
-		
+    
+    
     aList = [ORCommandList commandList];
     for(i=0;i<kNumSIS3320Channels;i++){
 		unsigned long aValue = [aList longValueForCmd:i];
@@ -2029,7 +2054,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 	NSLogFont(font,@"-------------------------------------------\n");
 	NSLogFont(font,@"Chan   PulseLen  SumGap  PeakTime\n");
 	for(i =0; i < kNumSIS3320Channels; i++) {
-
+        
         [aList addCommand: [ORVmeReadWriteCommand readLongBlockAtAddress: [self baseAddress] + triggerSetupAddress[i]
                                                                numToRead: 1
                                                               withAddMod: [self addressModifier]
@@ -2102,13 +2127,13 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
     [p setSetMethod:@selector(setOnlineMaskBit:withValue:) getMethod:@selector(onlineMaskBit:)];
     [p setActionMask:kAction_Set_Mask|kAction_Restore_Mask];
     [a addObject:p];
-
+    
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Clock Source"];
     [p setFormat:@"##0" upperLimit:3 lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setClockSource:) getMethod:@selector(clockSource)];
     [a addObject:p];
-				
+    
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Threshold"];
     [p setFormat:@"##0" upperLimit:0x3fff lowerLimit:0 stepSize:1 units:@""];
@@ -2155,7 +2180,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
     [p setSetMethod:@selector(setPeakingTime:withValue:) getMethod:@selector(peakingTime:)];
 	[p setCanBeRamped:YES];
     [a addObject:p];
-
+    
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setUseValue:NO];
     [p setName:@"Init"];
@@ -2205,7 +2230,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
     
     // first add our description to the data description
     [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORSIS3320Model"];
-        
+    
     [self startRates];
 	//cache some stuff
     location        = (([self crateNumber]&0x0000000f)<<21) | (([self slot]& 0x0000001f)<<16);
@@ -2217,7 +2242,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 	[self armBank1];
     unsigned long status = [self readAcqRegister] & 0xc0000;
     NSLog(@"status word: 0x%0x\n",status);
-
+    
 	isRunning		= NO;
 }
 
@@ -2227,18 +2252,18 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 		isRunning		= YES;
 		unsigned long status = [self readAcqRegister];
 		if(!dataRateAlarm && ((status & kEndAddressThresholdFlag) == kEndAddressThresholdFlag)){
-                
+            
             if(bank1Armed)  [self armBank2];
             else            [self armBank1];
-
+                        
             int i;
 			for (i=0;i<8;i++) {
                 
-
+                
                 if( !(onlineMask & ( 0x1 << i )) ) continue;
-                                
+                
                 unsigned long endSampleAddressPrevBank = [self readPreviousAdcAddress:i];
-
+                
                 if( endSampleAddressPrevBank != 0 ) {
                     unsigned long numLongsToRead = endSampleAddressPrevBank;
                     if(numLongsToRead+2 > 0x3FFFF){ //can't have a record larger than the max ORCA record size.
@@ -2250,7 +2275,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
                         [dataRateAlarm postAlarm];
                         break;
                     }
-                    unsigned long data[ numLongsToRead + 10 + 2 ]; //max length plus Orca header
+                    unsigned long data[ numLongsToRead + 2 ]; //max length plus Orca header
                     // --- in theory, this should perhaps be .. 8 MB, if size is fixed
                     // --- NOTE THIS NOW WILL HOLD MORE THAN A SINGLE EVENT
                     
@@ -2259,7 +2284,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
                     // --- this assumes that all events are of equal length (i.e., ALL or NO events record waveforms, options for 'if pileup' or 'first event of buffer' are not selected)
                     unsigned int nEventsInTransferredData = ceil(numLongsToRead / (float)nWordsPerEvent);
                     waveFormCount[i] += nEventsInTransferredData;
-                   
+                     
                     data[0] = dataId | (2 + numLongsToRead);
                     data[1] = location | (i<<8);
                     [[self adapter] readLongBlock:&data[2]
@@ -2270,7 +2295,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
                     [aDataPacket addLongsToFrameBuffer:data length:2 + numLongsToRead];
                     
 				}
-			}        
+			}
 		}
 	}
     
@@ -2312,10 +2337,10 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
         configStruct->card_info[index].deviceSpecificData[i]	= [self endAddressThreshold:i];
     }
     configStruct->card_info[index].deviceSpecificData[kNumSIS3320Groups] = onlineMask;
-
+    
 	configStruct->card_info[index].num_Trigger_Indexes		= 0;
 	
-	configStruct->card_info[index].next_Card_Index 	= index+1;	
+	configStruct->card_info[index].next_Card_Index 	= index+1;
 	
 	return index+1;
 }
@@ -2372,12 +2397,12 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
     [self setTriggerOutMask:            [decoder decodeIntForKey:  @"triggerOutMask"]];
     [self setExtendedTriggerMask:       [decoder decodeIntForKey:  @"extendedTriggerMask"]];
     [self setClockSource:               [decoder decodeIntForKey:  @"clockSource"]];
-
+    
     [self setOnlineMask:                [decoder decodeIntForKey:  @"onlineMask"]];
-
+    
     int i;
     for(i=0;i<4;i++){
-          [self setBufferStart:i      withValue: [decoder decodeInt32ForKey:[NSString stringWithFormat:@"bufferStart%d",i]]];
+        [self setBufferStart:i      withValue: [decoder decodeInt32ForKey:[NSString stringWithFormat:@"bufferStart%d",i]]];
         [self setBufferLength:i     withValue: [decoder decodeInt32ForKey:[NSString stringWithFormat:@"bufferLength%d",i]]];
         [self setAccGate1Length:i     withValue: [decoder decodeInt32ForKey:[NSString stringWithFormat:@"accGate1Length%d",i]]];
         [self setAccGate1StartIndex:i withValue: [decoder decodeInt32ForKey:[NSString stringWithFormat:@"accGate1StartIndex%d",i]]];
@@ -2395,7 +2420,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
         [self setAccGate7StartIndex:i withValue: [decoder decodeInt32ForKey:[NSString stringWithFormat:@"accGate7StartIndex%d",i]]];
         [self setAccGate8Length:i     withValue: [decoder decodeInt32ForKey:[NSString stringWithFormat:@"accGate8Length%d",i]]];
         [self setAccGate8StartIndex:i withValue: [decoder decodeInt32ForKey:[NSString stringWithFormat:@"accGate8StartIndex%d",i]]];
-   }
+    }
     for(i=0;i<2;i++){
         [self setTriggerMode:i      withValue: [decoder decodeBoolForKey:[NSString stringWithFormat:@"triggerMode%d",i]]];
         [self setInvertInput:i      withValue: [decoder decodeBoolForKey:[NSString stringWithFormat:@"invertInput%d",i]]];
@@ -2414,9 +2439,9 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
     preTriggerDelays= [[decoder decodeObjectForKey: @"preTriggerDelays"] retain];
     triggerGateLengths= [[decoder decodeObjectForKey:@"triggerGateLengths"] retain];
     endAddressThresholds= [[decoder decodeObjectForKey:@"endAddressThresholds"] retain];
-
+    
     [self setUpArrays];
-
+    
 	
     [self setWaveFormRateGroup:[decoder decodeObjectForKey:@"waveFormRateGroup"]];
     if(!waveFormRateGroup){
@@ -2443,9 +2468,9 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
     [encoder encodeInt:extendedTriggerMask      forKey:@"extendedTriggerMask"];
     [encoder encodeInt:clockSource				forKey:@"clockSource"];
     [encoder encodeInt:onlineMask               forKey:@"onlineMask"];
-
+    
     int i;
-
+    
     for(i=0;i<kNumSIS3320Groups;i++){
         [encoder encodeInt32:bufferStart[i]             forKey:[NSString stringWithFormat:@"bufferStart%d",i]];
         [encoder encodeInt32:bufferLength[i]            forKey:[NSString stringWithFormat:@"bufferLength%d",i]];
@@ -2488,16 +2513,16 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 	if(endAddressThresholds)	[encoder encodeObject:endAddressThresholds         forKey:@"endAddressThresholds"];
 	
 	[encoder encodeObject:waveFormRateGroup		forKey:@"waveFormRateGroup"];
-
+    
 }
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
-    if(thresholds)		[objDictionary setObject:thresholds						forKey:@"thresholds"];	
-    if(dacValues)		[objDictionary setObject:dacValues						forKey:@"dacValues"];	
-    if(trigPulseLens)	[objDictionary setObject:trigPulseLens					forKey:@"trigPulseLens"];	
-    if(peakingTimes)	[objDictionary setObject:peakingTimes					forKey:@"peakingTimes"];	
+    if(thresholds)		[objDictionary setObject:thresholds						forKey:@"thresholds"];
+    if(dacValues)		[objDictionary setObject:dacValues						forKey:@"dacValues"];
+    if(trigPulseLens)	[objDictionary setObject:trigPulseLens					forKey:@"trigPulseLens"];
+    if(peakingTimes)	[objDictionary setObject:peakingTimes					forKey:@"peakingTimes"];
     if(sumGs)			[objDictionary setObject:sumGs							forKey:@"sumGs"];
     
     [objDictionary setObject:[NSNumber numberWithLong:clockSource]				forKey:@"clockSource"];
@@ -2505,20 +2530,20 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
     [objDictionary setObject:[NSNumber numberWithInt:onlineMask] forKey:@"onlineMask"];
     [objDictionary setObject: preTriggerDelays		    forKey:@"preTriggerDelays"];
     [objDictionary setObject: triggerGateLengths		forKey:@"triggerGateLengths"];
-
+    
 	return objDictionary;
 }
 
 #pragma mark •••AutoTesting
-- (NSArray*) autoTests 
+- (NSArray*) autoTests
 {
 	NSMutableArray* myTests = [NSMutableArray array];
 	[myTests addObject:[ORVmeReadOnlyTest test:kControlStatus wordSize:4 name:@"Control Status"]];
 	[myTests addObject:[ORVmeReadOnlyTest test:kModuleIDReg wordSize:4 name:@"Module ID"]];
 	[myTests addObject:[ORVmeReadWriteTest test:kAdcMemoryPageReg wordSize:4 validMask:0x0000000f name:@"Page Reg"]];
-
+    
 	[myTests addObject:[ORVmeReadOnlyTest test:kAcquisitionControlReg wordSize:4 name:@"Acquisition Control"]];
-
+    
 	int i;
 	for(i=0;i<kNumSIS3320Channels;i++){
 		[myTests addObject:[ORVmeReadWriteTest test:triggerThresholdAddress[i] wordSize:4 validMask:0xffff name:[NSString stringWithFormat:@"ADC%d",i]]];
