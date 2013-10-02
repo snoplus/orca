@@ -1994,7 +1994,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 				
 		unsigned long location = (([self crateNumber]&0xf)<<21) | ([self stationNumber]& 0x0000001f)<<16;
 		//unsigned long data[5 + kNumV4FLTChannels];
-		unsigned long data[5 + kNumV4FLTChannels];//2013-04-24 changed to ship full 32 bit counter; data format changed! see decoder -tb-
+		unsigned long data[5 + kNumV4FLTChannels + kNumV4FLTChannels];//2013-04-24 changed to ship full 32 bit counter; data format changed! see decoder -tb-
 		
 		//combine all the hitrate read commands into one command packet
 		ORCommandList* aList = [ORCommandList commandList];
@@ -2022,9 +2022,9 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 				unsigned long aValue32 = [aList longValueForCmd:dataIndex];
 				data[5 + countHREnabledChans + dataIndex] =  aValue32;// the hitrate may have more than 16 bit in the future -tb-
 				//BOOL overflow = (aValue >> 31) & 0x1;
-				BOOL overflow = 0;//2013-04-24 for legacy data we 'simulate' a 16 bit counter -> simulate a 16 bit overflow flag -tb-
+				unsigned long overflow = 0;//2013-04-24 for legacy data we 'simulate' a 16 bit counter -> simulate a 16 bit overflow flag -tb-
 				if(aValue32 & 0xffff0000) overflow =  0x1;//2013-04-24 for legacy data we 'simulate' a 16 bit counter -> simulate a 16 bit overflow flag -tb-
-				BOOL overflow32 = (aValue32 >>31) & 0x1;//2013-04-24 for legacy data we 'simulate' a 16 bit counter -> simulate a 16 bit overflow flag -tb-
+				unsigned long overflow32 = (aValue32 >>31) & 0x1;//2013-04-24 for legacy data we 'simulate' a 16 bit counter -> simulate a 16 bit overflow flag -tb-
 				unsigned long aValue16 = aValue32 & 0xffff;
                 aValue32 = aValue32 & 0x7fffffff;
 				if(aValue32 != hitRate[chan] || overflow32 != hitRateOverFlow[chan]){

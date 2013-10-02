@@ -80,7 +80,7 @@
 	unsigned long	histogramId;
 	unsigned short	hitRateLength;		//!< Sampling time of the hitrate measurement (1..32 seconds)
 	float			hitRate[kNumV4FLTChannels];	//!< Actual value of the trigger rate measurement
-	BOOL			hitRateOverFlow[kNumV4FLTChannels];	//!< Overflow of hardware trigger rate register
+	unsigned long	hitRateOverFlow[kNumV4FLTChannels];	//!< Overflow of hardware trigger rate register
 	float			hitRateTotal;	//!< Sum trigger rate of all channels 
 	
 	BOOL			firstTime;		//!< Event loop: Flag to identify the first readout loop for initialization purpose
