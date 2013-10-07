@@ -1632,6 +1632,12 @@
 		847CCA68058E8C75003522C8 /* ORQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 847CCA62058E8C75003522C8 /* ORQueue.h */; };
 		847CCA69058E8C75003522C8 /* ORQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 847CCA63058E8C75003522C8 /* ORQueue.m */; };
 		847CCA6B058E8C75003522C8 /* ORLinkedList.m in Sources */ = {isa = PBXBuildFile; fileRef = 847CCA65058E8C75003522C8 /* ORLinkedList.m */; };
+		847D308B17FF0B3000D2D8BC /* NMon5085.nib in Resources */ = {isa = PBXBuildFile; fileRef = 847D308517FF0B3000D2D8BC /* NMon5085.nib */; };
+		847D308C17FF0B3000D2D8BC /* NMon5085.tif in Resources */ = {isa = PBXBuildFile; fileRef = 847D308617FF0B3000D2D8BC /* NMon5085.tif */; };
+		847D308D17FF0B3000D2D8BC /* ORNMon5085Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 847D308717FF0B3000D2D8BC /* ORNMon5085Controller.h */; };
+		847D308E17FF0B3000D2D8BC /* ORNMon5085Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 847D308817FF0B3000D2D8BC /* ORNMon5085Controller.m */; };
+		847D308F17FF0B3000D2D8BC /* ORNMon5085Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 847D308917FF0B3000D2D8BC /* ORNMon5085Model.h */; };
+		847D309017FF0B3000D2D8BC /* ORNMon5085Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 847D308A17FF0B3000D2D8BC /* ORNMon5085Model.m */; };
 		847D76FB10B795DE00893F3A /* killScript in Resources */ = {isa = PBXBuildFile; fileRef = 847D76F810B795DE00893F3A /* killScript */; };
 		847D76FE10B7963D00893F3A /* makeScript in Resources */ = {isa = PBXBuildFile; fileRef = 847D76FD10B7963D00893F3A /* makeScript */; };
 		847D771210B7977700893F3A /* killScript in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = 847D76F810B795DE00893F3A /* killScript */; };
@@ -4674,6 +4680,12 @@
 		847CCA62058E8C75003522C8 /* ORQueue.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORQueue.h; path = "Source/Objects/Misc Objects/DataStructures/ORQueue.h"; sourceTree = SOURCE_ROOT; };
 		847CCA63058E8C75003522C8 /* ORQueue.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORQueue.m; path = "Source/Objects/Misc Objects/DataStructures/ORQueue.m"; sourceTree = SOURCE_ROOT; };
 		847CCA65058E8C75003522C8 /* ORLinkedList.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORLinkedList.m; path = "Source/Objects/Misc Objects/DataStructures/ORLinkedList.m"; sourceTree = SOURCE_ROOT; };
+		847D308517FF0B3000D2D8BC /* NMon5085.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = NMon5085.nib; sourceTree = "<group>"; };
+		847D308617FF0B3000D2D8BC /* NMon5085.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = NMon5085.tif; sourceTree = "<group>"; };
+		847D308717FF0B3000D2D8BC /* ORNMon5085Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORNMon5085Controller.h; sourceTree = "<group>"; };
+		847D308817FF0B3000D2D8BC /* ORNMon5085Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORNMon5085Controller.m; sourceTree = "<group>"; };
+		847D308917FF0B3000D2D8BC /* ORNMon5085Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORNMon5085Model.h; sourceTree = "<group>"; };
+		847D308A17FF0B3000D2D8BC /* ORNMon5085Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORNMon5085Model.m; sourceTree = "<group>"; };
 		847D76F810B795DE00893F3A /* killScript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = killScript; path = Source/Objects/Hardware/SBC/SBC_Code/killScript; sourceTree = SOURCE_ROOT; };
 		847D76F910B795DE00893F3A /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = Source/Objects/Hardware/SBC/SBC_Code/Makefile; sourceTree = SOURCE_ROOT; };
 		847D76FD10B7963D00893F3A /* makeScript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = makeScript; path = Source/Objects/Hardware/SBC/SBC_Code/makeScript; sourceTree = SOURCE_ROOT; };
@@ -8407,6 +8419,7 @@
 			isa = PBXGroup;
 			children = (
 				84DEEBBA149916AD0092DB6C /* Serial Base Classes */,
+				847D308417FF0B3000D2D8BC /* NeutonMonitor5085 */,
 				84DF4C96162F1B2100261144 /* Arduino */,
 				84FEAD1515939393005D798C /* ProXR16SSR */,
 				84183011156153D2004EC81F /* TM700 */,
@@ -9314,6 +9327,19 @@
 			name = DataStructures;
 			path = "Source/Objects/Misc Objects/DataStructures";
 			sourceTree = SOURCE_ROOT;
+		};
+		847D308417FF0B3000D2D8BC /* NeutonMonitor5085 */ = {
+			isa = PBXGroup;
+			children = (
+				847D308517FF0B3000D2D8BC /* NMon5085.nib */,
+				847D308617FF0B3000D2D8BC /* NMon5085.tif */,
+				847D308717FF0B3000D2D8BC /* ORNMon5085Controller.h */,
+				847D308817FF0B3000D2D8BC /* ORNMon5085Controller.m */,
+				847D308917FF0B3000D2D8BC /* ORNMon5085Model.h */,
+				847D308A17FF0B3000D2D8BC /* ORNMon5085Model.m */,
+			);
+			path = NeutonMonitor5085;
+			sourceTree = "<group>";
 		};
 		847D7A7104701EB6005F64B1 /* HPPulser */ = {
 			isa = PBXGroup;
@@ -14254,6 +14280,8 @@
 				841E0A4717F46468009E4190 /* ORCAEN792Readout.hh in Headers */,
 				84BAC04817F4A72100695DA8 /* ORCV977Controller.h in Headers */,
 				84BAC04C17F4A72100695DA8 /* ORCV977Model.h in Headers */,
+				847D308D17FF0B3000D2D8BC /* ORNMon5085Controller.h in Headers */,
+				847D308F17FF0B3000D2D8BC /* ORNMon5085Model.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -15161,6 +15189,8 @@
 				846F313D17E8819000A5F1DA /* ApcUpsIcon.tif in Resources */,
 				84BAC04617F4A72100695DA8 /* C977.gif in Resources */,
 				84BAC04717F4A72100695DA8 /* CV977.nib in Resources */,
+				847D308B17FF0B3000D2D8BC /* NMon5085.nib in Resources */,
+				847D308C17FF0B3000D2D8BC /* NMon5085.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -16177,6 +16207,8 @@
 				841E0A4317F46296009E4190 /* ORCaen792Decoders.m in Sources */,
 				84BAC04917F4A72100695DA8 /* ORCV977Controller.m in Sources */,
 				84BAC04D17F4A72100695DA8 /* ORCV977Model.m in Sources */,
+				847D308E17FF0B3000D2D8BC /* ORNMon5085Controller.m in Sources */,
+				847D309017FF0B3000D2D8BC /* ORNMon5085Model.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
