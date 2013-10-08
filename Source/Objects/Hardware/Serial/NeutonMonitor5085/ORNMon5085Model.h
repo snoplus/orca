@@ -44,23 +44,29 @@
         int             discriminator;
         NSString*       actualMode;
         int             deadtime;
-    int highVoltage;
+        int             highVoltage;
+        NSDate*         dateOfMaxRadValue;
+        float           maxRadValue;
 }
 
 #pragma mark •••Initialization
 - (void) dealloc;
 
 #pragma mark •••Accessors
-- (int) highVoltage;
-- (void) setHighVoltage:(int)aHighVoltage;
-- (int) deadtime;
-- (void) setDeadtime:(int)aDeadtime;
+- (float)   maxRadValue;
+- (void)    setMaxRadValue:(float)aMaxRadValue;
+- (NSDate*) dateOfMaxRadValue;
+- (void)    setDateOfMaxRadValue:(NSDate*)aDateOfMaxRadValue;
+- (int)     highVoltage;
+- (void)    setHighVoltage:(int)aHighVoltage;
+- (int)     deadtime;
+- (void)    setDeadtime:(int)aDeadtime;
 - (NSString*) actualMode;
-- (void) setActualMode:(NSString*)aActualMode;
-- (int) discriminator;
-- (void) setDiscriminator:(int)aDiscriminator;
-- (float) calibrationValue;
-- (void) setCalibrationValue:(float)aCalibrationValue;
+- (void)    setActualMode:(NSString*)aActualMode;
+- (int)     discriminator;
+- (void)    setDiscriminator:(int)aDiscriminator;
+- (float)   calibrationValue;
+- (void)    setCalibrationValue:(float)aCalibrationValue;
 - (int)     timeUtilStop;
 - (void)    setTimeUtilStop:(int)aTimeUtilStop;
 - (NSDate*) dateMeasured;
@@ -83,15 +89,16 @@
 
 #pragma mark •••Commands
 - (void) initHW;
-- (void) sendNextCmd;
 - (void) toggleRun;
-- (void) pollHW;
+- (void) sendSorQCommand;
 
 #pragma mark •••Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 @end
 
+extern NSString* ORNMon5085ModelMaxRadValueChanged;
+extern NSString* ORNMon5085ModelDateOfMaxRadValueChanged;
 extern NSString* ORNMon5085ModelHighVoltageChanged;
 extern NSString* ORNMon5085ModelDeadtimeChanged;
 extern NSString* ORNMon5085ModelActualModeChanged;

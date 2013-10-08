@@ -25,6 +25,8 @@
 {
 	
     IBOutlet NSButton*               lockButton;
+	IBOutlet NSTextField*            maxRadValueField;
+	IBOutlet NSTextField*           dateOfMaxRadValueField;
 	IBOutlet NSTextField*            highVoltageField;
 	IBOutlet NSTextField*            deadtimeField;
 	IBOutlet NSTextField*            actualModeField;
@@ -34,6 +36,7 @@
 	IBOutlet NSTextField*            isRunningField;
 	IBOutlet NSTextField*            timeMeasuredField;
 	IBOutlet NSTextField*            unitsField;
+	IBOutlet NSTextField*            units1Field;
 	IBOutlet NSTextField*            radValueField;
 	IBOutlet NSTextField*            modeTimeField;
 	IBOutlet NSTextField*            hhmmssField;
@@ -57,6 +60,8 @@
 - (void) updateButtons;
 
 #pragma mark •••Interface Management
+- (void) maxRadValueChanged:(NSNotification*)aNote;
+- (void) dateOfMaxRadValueChanged:(NSNotification*)aNote;
 - (void) highVoltageChanged:(NSNotification*)aNote;
 - (void) deadtimeChanged:(NSNotification*)aNote;
 - (void) actualModeChanged:(NSNotification*)aNote;

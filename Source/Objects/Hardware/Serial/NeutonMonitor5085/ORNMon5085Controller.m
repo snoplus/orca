@@ -152,6 +152,16 @@
                          name : ORNMon5085ModelHighVoltageChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(dateOfMaxRadValueChanged:)
+                         name : ORNMon5085ModelDateOfMaxRadValueChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(maxRadValueChanged:)
+                         name : ORNMon5085ModelMaxRadValueChanged
+						object: model];
+
 }
 
 - (void) setModel:(id)aModel
@@ -180,6 +190,18 @@
 	[self actualModeChanged:nil];
 	[self deadtimeChanged:nil];
 	[self highVoltageChanged:nil];
+	[self dateOfMaxRadValueChanged:nil];
+	[self maxRadValueChanged:nil];
+}
+
+- (void) maxRadValueChanged:(NSNotification*)aNote
+{
+	[maxRadValueField setFloatValue: [model maxRadValue]];
+}
+
+- (void) dateOfMaxRadValueChanged:(NSNotification*)aNote
+{
+	[dateOfMaxRadValueField setObjectValue: [model dateOfMaxRadValue]];
 }
 
 - (void) highVoltageChanged:(NSNotification*)aNote
@@ -238,6 +260,7 @@
 - (void) unitsChanged:(NSNotification*)aNote
 {
 	[unitsField setStringValue: [model units]];
+	[units1Field setStringValue: [model units]];
 	[plotter setYLabel:[model units]];
 }
 

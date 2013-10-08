@@ -25,6 +25,8 @@
 
 #pragma mark •••External Strings
 
+NSString* ORNMon5085ModelMaxRadValueChanged = @"ORNMon5085ModelMaxRadValueChanged";
+NSString* ORNMon5085ModelDateOfMaxRadValueChanged = @"ORNMon5085ModelDateOfMaxRadValueChanged";
 NSString* ORNMon5085ModelHighVoltageChanged = @"ORNMon5085ModelHighVoltageChanged";
 NSString* ORNMon5085ModelDeadtimeChanged = @"ORNMon5085ModelDeadtimeChanged";
 NSString* ORNMon5085ModelActualModeChanged = @"ORNMon5085ModelActualModeChanged";
@@ -41,7 +43,10 @@ NSString* ORNMon5085IsLogChanged            = @"ORNMon5085IsLogChanged";
 
 @interface ORNMon5085Model (private)
 - (void) send:(NSString*)aCmd;
+- (void) saveMaxRadValue;
 - (void) processReceivedString:(NSString*)aString;
+- (void) sendNextCmd;
+- (void) pollHW;
 @end
 
 #define kHWPollTime 5
@@ -49,12 +54,14 @@ NSString* ORNMon5085IsLogChanged            = @"ORNMon5085IsLogChanged";
 @implementation ORNMon5085Model
 - (void) dealloc
 {
+    [dateOfMaxRadValue release];
     [timeRate release];
     [actualMode release];
     [dateMeasured release];
     [units release];
-	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[inComingData release];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+
 	[super dealloc];
 }
 
@@ -75,6 +82,32 @@ NSString* ORNMon5085IsLogChanged            = @"ORNMon5085IsLogChanged";
 }
 
 #pragma mark •••Accessors
+
+- (float) maxRadValue
+{
+    return maxRadValue;
+}
+
+- (void) setMaxRadValue:(float)aMaxRadValue
+{
+    maxRadValue = aMaxRadValue;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORNMon5085ModelMaxRadValueChanged object:self];
+}
+
+- (NSDate*) dateOfMaxRadValue
+{
+    return dateOfMaxRadValue;
+}
+
+- (void) setDateOfMaxRadValue:(NSDate*)aDateOfMaxRadValue
+{
+    [aDateOfMaxRadValue retain];
+    [dateOfMaxRadValue release];
+    dateOfMaxRadValue = aDateOfMaxRadValue;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORNMon5085ModelDateOfMaxRadValueChanged object:self];
+}
 
 - (int) highVoltage
 {
@@ -223,6 +256,17 @@ NSString* ORNMon5085IsLogChanged            = @"ORNMon5085IsLogChanged";
     timeMeasured = ut_Time;
     
     radValue = aRadValue;
+    
+    NSDate* now = [NSDate date];
+    if(!dateOfMaxRadValue){
+        [self setDateOfMaxRadValue:now];
+        [self setMaxRadValue:radValue];
+    }
+    if((radValue>maxRadValue) || [now timeIntervalSinceDate:dateOfMaxRadValue]>=60){
+        [self setMaxRadValue:radValue];
+        [self setDateOfMaxRadValue:now];
+        [self saveMaxRadValue];
+    }
     
     if(timeRate == nil) timeRate = [[ORTimeRate alloc] init];
     [timeRate addDataToTimeAverage:radValue];
@@ -458,5 +502,22 @@ NSString* ORNMon5085IsLogChanged            = @"ORNMon5085IsLogChanged";
         [[timeParts objectAtIndex:2] intValue];
     }
     return timeLeft;
+}
+- (void) saveMaxRadValue
+{
+#define kDefaultMaxRecordFile @"~/Desktop/NMonRecord"
+    
+    NSFileManager* fm = [NSFileManager defaultManager];
+    NSString* filePath = [NSString stringWithFormat:@"%@%ld.txt",kDefaultMaxRecordFile,[self uniqueIdNumber]];
+    filePath = [filePath stringByExpandingTildeInPath];
+    if(![fm fileExistsAtPath:filePath]){
+        [fm createFileAtPath:filePath contents:nil attributes:nil];
+    }
+    NSFileHandle* fp = [NSFileHandle fileHandleForUpdatingAtPath:filePath];
+    NSString* stringToAdd = [NSString stringWithFormat:@"%@,%f,%3.3f",dateOfMaxRadValue,[dateOfMaxRadValue timeIntervalSince1970],maxRadValue];
+    [fp seekToEndOfFile];
+    NSData* theData = [stringToAdd dataUsingEncoding:NSASCIIStringEncoding]; 
+    [fp writeData:theData];
+    [fp closeFile];
 }
 @end
