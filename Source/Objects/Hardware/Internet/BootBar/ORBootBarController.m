@@ -131,11 +131,11 @@
 		[[stateMatrix cellWithTag:i+1] setStringValue:theState?@" ON":@"OFF"];
 		if(theState){
 			[[stateMatrix cellWithTag:i+1] setTextColor:[NSColor colorWithCalibratedRed:0. green:.7 blue:0. alpha:1.0]];
-			[[turnOnOffMatrix cellWithTag:i+1] setTitle:[NSString stringWithFormat:@"Turn %d OFF",i+1]];
+			[[turnOnOffMatrix cellWithTag:i+1] setTitle:[NSString stringWithFormat:@"Turn %d OFF...",i+1]];
 		}
 		else {
 			[[stateMatrix cellWithTag:i+1] setTextColor:[NSColor colorWithCalibratedRed:.7 green:0. blue:0. alpha:1.0]];
-			[[turnOnOffMatrix cellWithTag:i+1] setTitle:[NSString stringWithFormat:@"Turn %d ON",i+1]];
+			[[turnOnOffMatrix cellWithTag:i+1] setTitle:[NSString stringWithFormat:@"Turn %d ON...",i+1]];
 		}
 		
 	}
@@ -195,12 +195,37 @@
 
 - (IBAction) turnOnOffAction:(id)sender
 {
-	int chan = [[turnOnOffMatrix selectedCell] tag];
+    [self endEditing];
+    int chan  = [[turnOnOffMatrix selectedCell] tag];
 	int state = [model outletStatus:chan];
-	if(state)[model turnOffOutlet:chan];
-	else [model turnOnOutlet:chan];
+    NSString* s1 = [NSString stringWithFormat:@"Really turn %@ Outlet #%d?",state?@"OFF":@"ON",chan];
+    NSString* name = [model outletName:chan];
+    if([name length]!=0)s1 = [s1 stringByAppendingFormat:@"\n\n(Description: %@)",name];
+    
+    NSDictionary* context = [[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:chan],@"chan", nil] retain]; //release in confirmDidFinish()
+    
+    NSBeginAlertSheet(s1,
+                      [NSString stringWithFormat:@"YES/Turn %@ #%d",state?@"OFF":@"ON",chan],
+					  @"Cancel",
+					  nil,[self window],
+					  self,
+					  @selector(confirmDidFinish:returnCode:contextInfo:),
+					  nil,
+					  context,
+					  @"");
 }
+    
 
+- (void) confirmDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+    int chan  = [userInfo objectForKey:@"chan"];
+    int state = [model outletStatus:chan];
+	if(returnCode == NSAlertDefaultReturn){
+        if(state)[model turnOffOutlet:chan];
+        else [model turnOnOutlet:chan];
+    }
+    [userInfo release];
+}
 
 #pragma mark •••Data Source
 - (NSInteger ) numberOfItemsInComboBox:(NSComboBox *)aComboBox
