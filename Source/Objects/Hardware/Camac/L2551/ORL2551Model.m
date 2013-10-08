@@ -445,7 +445,9 @@ NSString* ORL2551PollWhenRunningChangedNotification = @"ORL2551PollWhenRunningCh
 - (void) readReset
 {
     [self readAllScalers];
-    [[self adapter] camacLongNAF:[self stationNumber] a:11 f:2 data:nil]; //force reset
+    unsigned long theValue;
+
+    [[self adapter] camacLongNAF:[self stationNumber] a:11 f:2 data:&theValue]; //force reset
 }
 
 - (void) testLAM;
