@@ -37,9 +37,7 @@
         ORTimeRate*		timeRate;
         BOOL			isLog;
         BOOL            isRunning;
-        BOOL            runHeartBeat;
         int             timeUtilStop;
-        BOOL            manualOp;
         float           calibrationValue;
         int             discriminator;
         NSString*       actualMode;
