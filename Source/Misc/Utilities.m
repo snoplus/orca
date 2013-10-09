@@ -335,7 +335,7 @@ NSString* commonScriptMethodsByObj(id anObj,BOOL includeSuperClass)
 {
 	NSMutableString* resultString = [NSMutableString stringWithString:@""];
 	if([anObj respondsToSelector:@selector(commonScriptMethods)]){
-		NSString* list = [[[anObj commonScriptMethods] mutableCopy] autorelease];
+		NSString* list = [[[anObj commonScriptMethods] copy] autorelease];
 		[resultString appendString:list];
 	}
 	else [resultString appendString:@"No common methods defined\n"];
