@@ -1282,13 +1282,13 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateStatus) object:nil];
 	statusUpdateScheduled = NO;
-	NSString* s = [[ORStatusController sharedStatusController] contents];
+	NSString* s = [[ORStatusController sharedStatusController] contentsTail:24*60*60 includeDurationHeader:NO];
 	NSDictionary* dataInfo = [NSDictionary dictionaryWithObjectsAndKeys:
 							  s,				@"statuslog",
 							  @"StatusLog",		@"type",
 							  nil];
 	
-	[[self statusDBRef] updateDocument:dataInfo documentId:@"statuslog" tag:kDocumentAdded];
+	[[self statusDBRef] updateDocument:dataInfo documentId:@"statuslog" tag:kDocumentUpdated];
 	
 }
 
@@ -1302,7 +1302,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 			for(id anAlarm in theAlarms)[arrayForDoc addObject:[anAlarm alarmInfo]];
 		}
 		NSDictionary* alarmInfo  = [NSDictionary dictionaryWithObjectsAndKeys:@"alarms",@"name",arrayForDoc,@"alarmlist",@"alarms",@"type",nil];
-		[[self statusDBRef] updateDocument:alarmInfo documentId:@"alarms" tag:kDocumentAdded];
+		[[self statusDBRef] updateDocument:alarmInfo documentId:@"alarms" tag:kDocumentUpdated];
 	}
 }
 
@@ -1346,9 +1346,11 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 														@"Histogram1D",												@"type",
 														 nil];
 							NSString* dataName = [[dataSetName lowercaseString] stringByReplacingOccurrencesOfString:@" " withString:@""];
-                            [dataSetNames addObject:dataName];
+                            [dataSetNames addObject:
+                                [NSDictionary dictionaryWithObjectsAndKeys:dataName,@"name",[NSNumber numberWithUnsignedLong:[aDataSet totalCounts]],@"counts",nil]
+                             ];
 
-							[[self statusDBRef] updateDocument:dataInfo documentId:dataName tag:kDocumentAdded];
+							[[self statusDBRef] updateDocument:dataInfo documentId:dataName tag:kDocumentUpdated];
 							
 						}
                         
@@ -1360,7 +1362,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
                                                       [NSNumber numberWithUnsignedLong: secondsSince1970],		@"time",
                                                       nil];
                             
-							[[self statusDBRef] updateDocument:dataInfo documentId:@"HistogramCatalog" tag:kDocumentAdded];
+							[[self statusDBRef] updateDocument:dataInfo documentId:@"HistogramCatalog" tag:kDocumentUpdated];
                           
                         }
                         else {
