@@ -69,16 +69,6 @@ NSString* ORVXMLock							= @"ORVXMLock";
 @end
 
 @implementation ORVXMModel
-- (id) init
-{
-	self = [super init];
-	[[self undoManager] disableUndoRegistration];
-    [self makeMotors];
-    [[self undoManager] enableUndoRegistration];
-	
-	return self;
-}
-
 - (void) dealloc
 {
 	for(id aMotor in motors)[aMotor setOwner:nil];

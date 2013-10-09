@@ -55,7 +55,6 @@
 }
 
 #pragma mark ***Initialization
-- (id)   init;
 - (void) dealloc;
 
 #pragma mark ***Notifications
