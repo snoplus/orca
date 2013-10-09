@@ -211,14 +211,14 @@
 					  self,
 					  @selector(confirmDidFinish:returnCode:contextInfo:),
 					  nil,
-					  context,
+					  context, 
 					  @"");
 }
     
 
 - (void) confirmDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
-    int chan  = [userInfo objectForKey:@"chan"];
+    int chan  = [[userInfo objectForKey:@"chan"] intValue];
     int state = [model outletStatus:chan];
 	if(returnCode == NSAlertDefaultReturn){
         if(state)[model turnOffOutlet:chan];

@@ -59,7 +59,7 @@
 - (IBAction) clearHistoryAction:(id)sender;
 - (IBAction) outletNameAction:(id)sender;
 - (IBAction) turnOnOffAction:(id)sender;
-
+- (void) confirmDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 @end
 
 
