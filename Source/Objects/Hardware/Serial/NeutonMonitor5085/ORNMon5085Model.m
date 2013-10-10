@@ -262,10 +262,16 @@ NSString* ORNMon5085IsLogChanged            = @"ORNMon5085IsLogChanged";
         [self setDateOfMaxRadValue:now];
         [self setMaxRadValue:radValue];
     }
-    if((radValue>maxRadValue) || [now timeIntervalSinceDate:dateOfMaxRadValue]>=60){
+    
+    if(radValue>maxRadValue){
         [self setMaxRadValue:radValue];
         [self setDateOfMaxRadValue:now];
-        [self saveMaxRadValue];
+    }
+    
+    if([now timeIntervalSinceDate:dateOfMaxRadValue]>=60){
+        if(radValue>0)[self saveMaxRadValue];
+        radValue = 0;
+        [self setDateOfMaxRadValue:now];
     }
     
     if(timeRate == nil) timeRate = [[ORTimeRate alloc] init];
@@ -513,8 +519,14 @@ NSString* ORNMon5085IsLogChanged            = @"ORNMon5085IsLogChanged";
     if(![fm fileExistsAtPath:filePath]){
         [fm createFileAtPath:filePath contents:nil attributes:nil];
     }
+    
+ 	NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] initWithDateFormat:@"%H:%M:%S" allowNaturalLanguage:NO];
+	NSString* dateString = [dateFormatter stringFromDate:dateOfMaxRadValue];
+    [dateFormatter release];
+
+    
     NSFileHandle* fp = [NSFileHandle fileHandleForUpdatingAtPath:filePath];
-    NSString* stringToAdd = [NSString stringWithFormat:@"%@,%f,%3.3f",dateOfMaxRadValue,[dateOfMaxRadValue timeIntervalSince1970],maxRadValue];
+    NSString* stringToAdd = [NSString stringWithFormat:@"%@,%lu,%3.3f",dateString,(unsigned long)[dateOfMaxRadValue timeIntervalSince1970],maxRadValue];
     [fp seekToEndOfFile];
     NSData* theData = [stringToAdd dataUsingEncoding:NSASCIIStringEncoding]; 
     [fp writeData:theData];
