@@ -60,6 +60,7 @@
 - (void) updateButtons;
 
 #pragma mark •••Interface Management
+- (void) updateTimePlot:(NSNotification*)aNote;
 - (void) maxRadValueChanged:(NSNotification*)aNote;
 - (void) dateOfMaxRadValueChanged:(NSNotification*)aNote;
 - (void) highVoltageChanged:(NSNotification*)aNote;

@@ -102,6 +102,7 @@
 - (void) absoluteMotionChanged:(NSNotification*)aNote;
 - (void) itemsAdded:(NSNotification*)aNote;
 - (void) itemsRemoved:(NSNotification*)aNote;
+- (void) motorTypeChanged:(NSNotification*)aNotification;
 
 #pragma mark ***Actions
 - (IBAction) useCmdQueueAction:(id)sender;

@@ -84,6 +84,7 @@
 - (void)    setIsLog:(BOOL)aIsLog;
 - (ORTimeRate*)timeRate;
 - (void)    runTimeOut;
+- (int) processHHMMSS:(NSString*)aString;
 
 #pragma mark •••Commands
 - (void) initHW;
