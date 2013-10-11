@@ -37,6 +37,7 @@ NSString* ORBootBarModelOutletNameChanged	 = @"ORBootBarModelOutletNameChanged";
 - (void) setPendingCmd:(NSString*)aCmd;
 - (void) timeout;
 - (void) setupOutletNames;
+- (void) postCouchDBRecord;
 @end
 
 @implementation ORBootBarModel
@@ -135,6 +136,7 @@ NSString* ORBootBarModelOutletNameChanged	 = @"ORBootBarModelOutletNameChanged";
 - (void) setOutlet:(int)index name:(NSString*)aName
 {
 	if(!outletNames)[self setupOutletNames];
+    if([aName length]==0)aName = [NSString stringWithFormat:@"Outlet %d",index];
 	[[[self undoManager] prepareWithInvocationTarget:self] setOutlet:index name:[self outletName:index]];
 	[outletNames replaceObjectAtIndex:index withObject:aName];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORBootBarModelOutletNameChanged object:self];
@@ -214,6 +216,7 @@ NSString* ORBootBarModelOutletNameChanged	 = @"ORBootBarModelOutletNameChanged";
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
 	if(![self isBusy])[self getStatus];
 	[self performSelector:@selector(pollHardware) withObject:nil afterDelay:30];
+    [self postCouchDBRecord];
 }
 
 - (NetSocket*) socket
@@ -389,12 +392,33 @@ NSString* ORBootBarModelOutletNameChanged	 = @"ORBootBarModelOutletNameChanged";
 @end
 
 @implementation ORBootBarModel (private)
+- (void) postCouchDBRecord
+{
+    if([IPNumber length] && [password length]){
+        NSMutableDictionary* values = [NSMutableDictionary dictionary];
+        NSMutableArray* statesAndNames = [NSMutableArray array];
+        int i;
+        for(i=0;i<9;i++){
+            [statesAndNames addObject:
+                [NSDictionary dictionaryWithObjectsAndKeys:
+                    [NSNumber numberWithInt:i],@"index",
+                    [outletNames objectAtIndex:i],@"name",
+                    [NSNumber numberWithBool:outletStatus[i]],@"state",
+                     nil]];
+        }
+        [values setObject:statesAndNames forKey:@"states"];
+        [values setObject:IPNumber forKey:@"ipNumber"];
+        [values setObject:[NSNumber numberWithInt:30] forKey:@"pollTime"];
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
+    }
+}
 - (void) sendCmd
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
 	const char* bytes = [pendingCmd cStringUsingEncoding:NSASCIIStringEncoding];
 	[socket write:bytes length:[pendingCmd length]];
-	[self performSelector:@selector(timeout) withObject:nil afterDelay:3];	
+	[self performSelector:@selector(timeout) withObject:nil afterDelay:3];
 }
 		 
 - (void) timeout
