@@ -1913,6 +1913,27 @@
 		84978A2A0701F02000B7887E /* ORDataGenDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84978A280701F02000B7887E /* ORDataGenDecoders.m */; };
 		84978B4C0702190100B7887E /* ORDataTypeAssigner.h in Headers */ = {isa = PBXBuildFile; fileRef = 84978B4A0702190100B7887E /* ORDataTypeAssigner.h */; };
 		84978B4D0702190100B7887E /* ORDataTypeAssigner.m in Sources */ = {isa = PBXBuildFile; fileRef = 84978B4B0702190100B7887E /* ORDataTypeAssigner.m */; };
+		8497E5F21808605F00CE974A /* GT521.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8497E5EC1808605F00CE974A /* GT521.nib */; };
+		8497E5F31808605F00CE974A /* GT521.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8497E5ED1808605F00CE974A /* GT521.tif */; };
+		8497E5F41808605F00CE974A /* ORGT521Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 8497E5EE1808605F00CE974A /* ORGT521Controller.h */; };
+		8497E5F51808605F00CE974A /* ORGT521Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 8497E5EF1808605F00CE974A /* ORGT521Controller.m */; };
+		8497E5F61808605F00CE974A /* ORGT521Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 8497E5F01808605F00CE974A /* ORGT521Model.h */; };
+		8497E5F71808605F00CE974A /* ORGT521Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 8497E5F11808605F00CE974A /* ORGT521Model.m */; };
+		8497E602180C5A1E00CE974A /* A3818.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8497E5F9180C5A1E00CE974A /* A3818.nib */; };
+		8497E603180C5A1E00CE974A /* A3818Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8497E5FA180C5A1E00CE974A /* A3818Card.gif */; };
+		8497E604180C5A1E00CE974A /* ORA3818Commands.h in Headers */ = {isa = PBXBuildFile; fileRef = 8497E5FB180C5A1E00CE974A /* ORA3818Commands.h */; };
+		8497E605180C5A1E00CE974A /* ORA3818Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 8497E5FC180C5A1E00CE974A /* ORA3818Controller.h */; };
+		8497E606180C5A1E00CE974A /* ORA3818Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 8497E5FD180C5A1E00CE974A /* ORA3818Controller.m */; };
+		8497E607180C5A1E00CE974A /* ORA3818Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 8497E5FE180C5A1E00CE974A /* ORA3818Model.h */; };
+		8497E608180C5A1E00CE974A /* ORA3818Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 8497E5FF180C5A1E00CE974A /* ORA3818Model.m */; };
+		8497E609180C5A1E00CE974A /* ORA3818View.h in Headers */ = {isa = PBXBuildFile; fileRef = 8497E600180C5A1E00CE974A /* ORA3818View.h */; };
+		8497E60A180C5A1E00CE974A /* ORA3818View.m in Sources */ = {isa = PBXBuildFile; fileRef = 8497E601180C5A1E00CE974A /* ORA3818View.m */; };
+		8497E612180C640D00CE974A /* ORV2718Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 8497E60C180C640D00CE974A /* ORV2718Controller.h */; };
+		8497E613180C640D00CE974A /* ORV2718Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 8497E60D180C640D00CE974A /* ORV2718Controller.m */; };
+		8497E614180C640D00CE974A /* ORV2718Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 8497E60E180C640D00CE974A /* ORV2718Model.h */; };
+		8497E615180C640D00CE974A /* ORV2718Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 8497E60F180C640D00CE974A /* ORV2718Model.m */; };
+		8497E616180C640D00CE974A /* V2718.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8497E610180C640D00CE974A /* V2718.nib */; };
+		8497E617180C640D00CE974A /* V2718Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8497E611180C640D00CE974A /* V2718Card.gif */; };
 		8498069D09A6584200086E71 /* ORSocketThreadedClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 8498069B09A6584200086E71 /* ORSocketThreadedClient.h */; };
 		8498069E09A6584200086E71 /* ORSocketThreadedClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 8498069C09A6584200086E71 /* ORSocketThreadedClient.m */; };
 		849901930DC91C5A00E82DB4 /* SNOCrate.gif in Resources */ = {isa = PBXBuildFile; fileRef = 849901920DC91C5A00E82DB4 /* SNOCrate.gif */; };
@@ -4964,6 +4985,27 @@
 		84978A280701F02000B7887E /* ORDataGenDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORDataGenDecoders.m; sourceTree = "<group>"; };
 		84978B4A0702190100B7887E /* ORDataTypeAssigner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORDataTypeAssigner.h; sourceTree = "<group>"; };
 		84978B4B0702190100B7887E /* ORDataTypeAssigner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORDataTypeAssigner.m; sourceTree = "<group>"; };
+		8497E5EC1808605F00CE974A /* GT521.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = GT521.nib; sourceTree = "<group>"; };
+		8497E5ED1808605F00CE974A /* GT521.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = GT521.tif; sourceTree = "<group>"; };
+		8497E5EE1808605F00CE974A /* ORGT521Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORGT521Controller.h; sourceTree = "<group>"; };
+		8497E5EF1808605F00CE974A /* ORGT521Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORGT521Controller.m; sourceTree = "<group>"; };
+		8497E5F01808605F00CE974A /* ORGT521Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORGT521Model.h; sourceTree = "<group>"; };
+		8497E5F11808605F00CE974A /* ORGT521Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORGT521Model.m; sourceTree = "<group>"; };
+		8497E5F9180C5A1E00CE974A /* A3818.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = A3818.nib; sourceTree = "<group>"; };
+		8497E5FA180C5A1E00CE974A /* A3818Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = A3818Card.gif; sourceTree = "<group>"; };
+		8497E5FB180C5A1E00CE974A /* ORA3818Commands.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORA3818Commands.h; sourceTree = "<group>"; };
+		8497E5FC180C5A1E00CE974A /* ORA3818Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORA3818Controller.h; sourceTree = "<group>"; };
+		8497E5FD180C5A1E00CE974A /* ORA3818Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORA3818Controller.m; sourceTree = "<group>"; };
+		8497E5FE180C5A1E00CE974A /* ORA3818Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORA3818Model.h; sourceTree = "<group>"; };
+		8497E5FF180C5A1E00CE974A /* ORA3818Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORA3818Model.m; sourceTree = "<group>"; };
+		8497E600180C5A1E00CE974A /* ORA3818View.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORA3818View.h; sourceTree = "<group>"; };
+		8497E601180C5A1E00CE974A /* ORA3818View.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORA3818View.m; sourceTree = "<group>"; };
+		8497E60C180C640D00CE974A /* ORV2718Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORV2718Controller.h; sourceTree = "<group>"; };
+		8497E60D180C640D00CE974A /* ORV2718Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORV2718Controller.m; sourceTree = "<group>"; };
+		8497E60E180C640D00CE974A /* ORV2718Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORV2718Model.h; sourceTree = "<group>"; };
+		8497E60F180C640D00CE974A /* ORV2718Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORV2718Model.m; sourceTree = "<group>"; };
+		8497E610180C640D00CE974A /* V2718.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = V2718.nib; sourceTree = "<group>"; };
+		8497E611180C640D00CE974A /* V2718Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = V2718Card.gif; sourceTree = "<group>"; };
 		8498069B09A6584200086E71 /* ORSocketThreadedClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSocketThreadedClient.h; sourceTree = "<group>"; };
 		8498069C09A6584200086E71 /* ORSocketThreadedClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORSocketThreadedClient.m; sourceTree = "<group>"; };
 		849901920DC91C5A00E82DB4 /* SNOCrate.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = SNOCrate.gif; path = "Source/Objects/Custom Hardware/SNO+/SNOCrate/SNOCrate.gif"; sourceTree = SOURCE_ROOT; };
@@ -8429,6 +8471,7 @@
 				84B6CD3B14B37E9700386BE1 /* RGA300 */,
 				8407397914CDD91F00BAD105 /* Met637 */,
 				841C4DEE141FA72800F95B50 /* Met237 */,
+				8497E5EB1808605F00CE974A /* GT521 */,
 				847F947213D4AA31006B06B4 /* Rad7 */,
 				8435AAC110C6D0EF00E03F7F /* VarianTPS */,
 				84B28CEF0F4C5DBB00E2B056 /* Ami286 */,
@@ -9996,6 +10039,48 @@
 			name = Mks651c;
 			path = Source/Objects/Hardware/Serial/Mks651c;
 			sourceTree = SOURCE_ROOT;
+		};
+		8497E5EB1808605F00CE974A /* GT521 */ = {
+			isa = PBXGroup;
+			children = (
+				8497E5EC1808605F00CE974A /* GT521.nib */,
+				8497E5ED1808605F00CE974A /* GT521.tif */,
+				8497E5EE1808605F00CE974A /* ORGT521Controller.h */,
+				8497E5EF1808605F00CE974A /* ORGT521Controller.m */,
+				8497E5F01808605F00CE974A /* ORGT521Model.h */,
+				8497E5F11808605F00CE974A /* ORGT521Model.m */,
+			);
+			path = GT521;
+			sourceTree = "<group>";
+		};
+		8497E5F8180C5A1E00CE974A /* A3818 */ = {
+			isa = PBXGroup;
+			children = (
+				8497E5F9180C5A1E00CE974A /* A3818.nib */,
+				8497E5FA180C5A1E00CE974A /* A3818Card.gif */,
+				8497E5FB180C5A1E00CE974A /* ORA3818Commands.h */,
+				8497E5FC180C5A1E00CE974A /* ORA3818Controller.h */,
+				8497E5FD180C5A1E00CE974A /* ORA3818Controller.m */,
+				8497E5FE180C5A1E00CE974A /* ORA3818Model.h */,
+				8497E5FF180C5A1E00CE974A /* ORA3818Model.m */,
+				8497E600180C5A1E00CE974A /* ORA3818View.h */,
+				8497E601180C5A1E00CE974A /* ORA3818View.m */,
+			);
+			path = A3818;
+			sourceTree = "<group>";
+		};
+		8497E60B180C640D00CE974A /* V2718 */ = {
+			isa = PBXGroup;
+			children = (
+				8497E60C180C640D00CE974A /* ORV2718Controller.h */,
+				8497E60D180C640D00CE974A /* ORV2718Controller.m */,
+				8497E60E180C640D00CE974A /* ORV2718Model.h */,
+				8497E60F180C640D00CE974A /* ORV2718Model.m */,
+				8497E610180C640D00CE974A /* V2718.nib */,
+				8497E611180C640D00CE974A /* V2718Card.gif */,
+			);
+			path = V2718;
+			sourceTree = "<group>";
 		};
 		8499148404BB3E05005F64B1 /* Dispatcher */ = {
 			isa = PBXGroup;
@@ -12833,6 +12918,7 @@
 		F51E695A03AE4775015F64B1 /* Main Dialogs */ = {
 			isa = PBXGroup;
 			children = (
+				F51E696303AE4775015F64B1 /* Catalog */,
 				CE7328A81466EEDC00A50AE9 /* HardwareFinder */,
 				84EBBE631282E2B700234313 /* Archive */,
 				84D8CB4410447492005585C5 /* AutoTester */,
@@ -12843,7 +12929,6 @@
 				840B4BAB03D8754D005F64B1 /* Alarms */,
 				84799A3808DF5C6400D848FB /* SplashScreen */,
 				F51E695B03AE4775015F64B1 /* About Box */,
-				F51E696303AE4775015F64B1 /* Catalog */,
 				840B7DA0094DFAC200B1B135 /* ProcessCenter */,
 				F51E696903AE4775015F64B1 /* StatusWindow */,
 				840DEA21115D7981006AF231 /* WindowSaveSet */,
@@ -12969,6 +13054,7 @@
 			children = (
 				F51E6AAA03AE4C3D015F64B1 /* Pci Base Classes */,
 				849DE72608F6F1FA0052AFC6 /* Mac */,
+				8497E5F8180C5A1E00CE974A /* A3818 */,
 				84065D8B1226B600004E8970 /* Pxi8336Mac */,
 				847946C307330E5200C5E1FA /* Bit3 */,
 				84B180F7044C7AAC005F64B1 /* 620 */,
@@ -12985,6 +13071,7 @@
 				B38DEE4114E02B40003914FF /* Advanet */,
 				F51E69E003AE4776015F64B1 /* Vme Base Classes */,
 				8493CC790C99FA4B00B46CD4 /* VMEcpu */,
+				8497E60B180C640D00CE974A /* V2718 */,
 				8402796907397B8700972B07 /* Bit3 Adaptor */,
 				848F6CA314C75F690093E502 /* SIS3150 Adapter */,
 				F5B1801F03B297FC015F64B1 /* CAEN */,
@@ -14282,6 +14369,14 @@
 				84BAC04C17F4A72100695DA8 /* ORCV977Model.h in Headers */,
 				847D308D17FF0B3000D2D8BC /* ORNMon5085Controller.h in Headers */,
 				847D308F17FF0B3000D2D8BC /* ORNMon5085Model.h in Headers */,
+				8497E5F41808605F00CE974A /* ORGT521Controller.h in Headers */,
+				8497E5F61808605F00CE974A /* ORGT521Model.h in Headers */,
+				8497E604180C5A1E00CE974A /* ORA3818Commands.h in Headers */,
+				8497E605180C5A1E00CE974A /* ORA3818Controller.h in Headers */,
+				8497E607180C5A1E00CE974A /* ORA3818Model.h in Headers */,
+				8497E609180C5A1E00CE974A /* ORA3818View.h in Headers */,
+				8497E612180C640D00CE974A /* ORV2718Controller.h in Headers */,
+				8497E614180C640D00CE974A /* ORV2718Model.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -15191,6 +15286,12 @@
 				84BAC04717F4A72100695DA8 /* CV977.nib in Resources */,
 				847D308B17FF0B3000D2D8BC /* NMon5085.nib in Resources */,
 				847D308C17FF0B3000D2D8BC /* NMon5085.tif in Resources */,
+				8497E5F21808605F00CE974A /* GT521.nib in Resources */,
+				8497E5F31808605F00CE974A /* GT521.tif in Resources */,
+				8497E602180C5A1E00CE974A /* A3818.nib in Resources */,
+				8497E603180C5A1E00CE974A /* A3818Card.gif in Resources */,
+				8497E616180C640D00CE974A /* V2718.nib in Resources */,
+				8497E617180C640D00CE974A /* V2718Card.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -16209,6 +16310,13 @@
 				84BAC04D17F4A72100695DA8 /* ORCV977Model.m in Sources */,
 				847D308E17FF0B3000D2D8BC /* ORNMon5085Controller.m in Sources */,
 				847D309017FF0B3000D2D8BC /* ORNMon5085Model.m in Sources */,
+				8497E5F51808605F00CE974A /* ORGT521Controller.m in Sources */,
+				8497E5F71808605F00CE974A /* ORGT521Model.m in Sources */,
+				8497E606180C5A1E00CE974A /* ORA3818Controller.m in Sources */,
+				8497E608180C5A1E00CE974A /* ORA3818Model.m in Sources */,
+				8497E60A180C5A1E00CE974A /* ORA3818View.m in Sources */,
+				8497E613180C640D00CE974A /* ORV2718Controller.m in Sources */,
+				8497E615180C640D00CE974A /* ORV2718Model.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
