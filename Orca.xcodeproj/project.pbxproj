@@ -1620,6 +1620,8 @@
 		847A48550D9C5D30002125DE /* ORFilterPluginBaseClass.h in Headers */ = {isa = PBXBuildFile; fileRef = 847A48530D9C5D30002125DE /* ORFilterPluginBaseClass.h */; };
 		847A5AFF1190D88D00094181 /* ORWaveformSpecialBitsController.h in Headers */ = {isa = PBXBuildFile; fileRef = 847A5AFD1190D88D00094181 /* ORWaveformSpecialBitsController.h */; };
 		847A5B001190D88D00094181 /* ORWaveformSpecialBitsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 847A5AFE1190D88D00094181 /* ORWaveformSpecialBitsController.m */; };
+		847B6A17180DA31800063E11 /* ORCAEN792Readout.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 841E0A4417F46468009E4190 /* ORCAEN792Readout.cc */; };
+		847B6A19180DA33000063E11 /* ORCAEN792Readout.hh in VME_Copy */ = {isa = PBXBuildFile; fileRef = 841E0A4517F46468009E4190 /* ORCAEN792Readout.hh */; };
 		847BC83205E293E80054841E /* Unlocked.tif in Resources */ = {isa = PBXBuildFile; fileRef = 847BC82E05E293E80054841E /* Unlocked.tif */; };
 		847BC83305E293E80054841E /* Locked.tif in Resources */ = {isa = PBXBuildFile; fileRef = 847BC83005E293E80054841E /* Locked.tif */; };
 		847BC83805E2940D0054841E /* ORHWUndoSet.h in Headers */ = {isa = PBXBuildFile; fileRef = 847BC83405E2940D0054841E /* ORHWUndoSet.h */; };
@@ -3207,6 +3209,8 @@
 				43ADFEBA10B6E2090044617C /* HWMakefile.mk in VME_Copy */,
 				8471C30F1250D456003A8DFB /* ORCAEN260Readout.cc in VME_Copy */,
 				8471C3101250D456003A8DFB /* ORCAEN260Readout.hh in VME_Copy */,
+				847B6A17180DA31800063E11 /* ORCAEN792Readout.cc in VME_Copy */,
+				847B6A19180DA33000063E11 /* ORCAEN792Readout.hh in VME_Copy */,
 				84AF17521188C88500449ACE /* ORCAEN1785Readout.cc in VME_Copy */,
 				84AF17531188C88500449ACE /* ORCAEN1785Readout.hh in VME_Copy */,
 				84550CB210D03476008A019C /* ORCAEN965Readout.cc in VME_Copy */,
