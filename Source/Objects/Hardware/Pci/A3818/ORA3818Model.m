@@ -294,13 +294,13 @@ NSString* ORA3818Lock										= @"ORA3818Lock";
 - (const char*) serviceClassName
 {
 	//subclasses will have different sevices to match against.
-	return "edu_washington_npl_driver_PCIA3818Driver";
+	return "edu_washington_npl_driver_A3818Driver";
 }
 
 - (NSString*) driverPath
 {
 	//subclasses will have different drivers.
-	return @"/System/Library/Extensions/PCIA3818Driver.kext";
+	return @"/System/Library/Extensions/A3818Driver.kext";
 }
 
 - (void) registerNotificationObservers
