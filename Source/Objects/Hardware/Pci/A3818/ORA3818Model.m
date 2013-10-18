@@ -545,6 +545,20 @@ NSString* ORA3818Lock										= @"ORA3818Lock";
 }
 
 
+/*
+ kern_return_t  IOConnectCallMethod(
+     mach_port_t        connection,		 // In
+     uint32_t           selector,		 // In
+     const uint64_t*    input,			 // In
+     uint32_t           inputCnt,		 // In
+     const void*        inputStruct,	 // In
+     size_t             inputStructCnt,	 // In
+     uint64_t*          output,          // Out
+     uint32_t*          outputCnt,		 // In/Out
+     void*              outputStruct,	 // Out
+     size_t*            outputStructCnt) // In/Out
+ */
+
 // get A3818 PCI Configuration Data
 - (kern_return_t) getPCIConfigurationData:(unsigned int) maxAddress
                               withDataPtr:(A3818ConfigStructUser *)pciData
@@ -556,16 +570,16 @@ NSString* ORA3818Lock										= @"ORA3818Lock";
     if(hardwareExists){
 
 		uint64_t scalarI = maxAddress;
-		result = IOConnectCallMethod(  dataPort,					// connection
-									 kA3818GetPCIConfig,			// selector
+		result = IOConnectCallMethod(  dataPort,                // connection
+									 kA3818GetPCIConfig,		// selector
 									 &scalarI,					// input values
 									 1,							// number of scalar input values
 									 NULL,						// Pointer to input struct
 									 0,							// Size of input struct
 									 NULL,						// output scalar array
 									 NULL,						// pointer to number of scalar output
-									 pciData,						// pointer to struct output
-									 &pciDataSize					// pointer to size of struct output
+									 pciData,					// pointer to struct output
+									 &pciDataSize				// pointer to size of struct output
 									 );
     }
     [theHWLock unlock];   //-----end critical section
