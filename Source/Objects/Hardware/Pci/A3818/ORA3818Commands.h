@@ -65,6 +65,7 @@ enum A3818UserClientCommandCodes {
     kA3818GetPCIBusNumber,		// kIOUCScalarIScalarO,  0, 1
     kA3818GetPCIDeviceNumber,	// kIOUCScalarIScalarO,  0, 1
     kA3818GetPCIFunctionNumber,	// kIOUCScalarIScalarO,  0, 1
+    kA3818VmeIOCtrl,            // kIOUCScalarIScalarO,  0, 1
     kA3818NumCommands
 };
 

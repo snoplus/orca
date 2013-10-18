@@ -45,6 +45,18 @@ NSString* ORA3818Lock										= @"ORA3818Lock";
 (((x) & 0x00FF0000) >>  8) |	\
 (((x) & 0xFF000000) >> 24)
 
+#define NULLCYC     0x00
+#define SINGLERW    0x01
+#define RMW         0x02
+#define BLT         0x04
+#define PBLT        0x07
+#define MD32        0x0C
+#define INTACK      0x08
+#define ADO         0x05
+#define ADOH        0x03
+#define FBLT        0x0C    // Ver. 2.3
+#define FPBLT       0x0F    // Ver. 2.3
+
 #pragma mark •••Private Methods
 @interface ORA3818Model (ORA3818Private)
 
@@ -919,7 +931,13 @@ NSString* ORA3818Lock										= @"ORA3818Lock";
 	}	
 }
 
-
+typedef struct a3818_comm {
+    const char *out_buf;
+    int         out_count;
+    char       *in_buf;
+    int         in_count;
+    int        *status;
+} a3818_comm_t;
 
 // read a byte block from vme
 - (void) readByteBlock:(unsigned char *) readAddress
@@ -931,19 +949,41 @@ NSString* ORA3818Lock										= @"ORA3818Lock";
     @try {
         [theHWLock lock];   //-----begin critical section
         if(hardwareExists){
-            [self  _setupMapping_Byte: vmeAddress
-                             numBytes: numberBytes
-                               addMod: addModifier
-                             addSpace: addressSpace];
+
+            unsigned char outbuf[64];
+            unsigned char inbuf[64];
             
-			//if(*fVStatusReg & STATUS_PROBLEM)[self checkStatusWord:*fVStatusReg];
-			// transfer data
-			unsigned char *pulr = (unsigned char *)( ( vmeAddress & 0x00000fff ) +
-													(unsigned long)remMemRegisterAddress );
-			unsigned char *pulb = (unsigned char *)readAddress;
-			unsigned int n = numberBytes;
-			for(;n--;)*pulb++ = *pulr++;
-			if(*fVStatusReg & STATUS_PROBLEM)[self checkStatusWord:*fVStatusReg];
+            int dsize = 0; //byte
+            int count=0;
+            // build and write the opcode
+            //opcode = 0xC000 | (addModifier << 8) | (3 << 6) | (dsize << 4) | SINGLERW; //byte swap enabled
+            int opcode = 0xC000 | (addModifier << 8) | (2 << 6) | (dsize << 4) | SINGLERW;
+            
+            outbuf[count++] =  opcode       & 0xFF;
+            outbuf[count++] = (opcode >> 8) & 0xFF;
+            
+            //address
+            outbuf[count++] = (char) (vmeAddress        & 0xFF);
+            outbuf[count++] = (char)((vmeAddress >> 8)  & 0xFF);
+            outbuf[count++] = (char)((vmeAddress >> 16) & 0xFF);
+            outbuf[count++] = (char)((vmeAddress >> 24) & 0xFF);
+            
+            size_t inbufSize = 64;
+
+            kern_return_t result = IOConnectCallMethod(  dataPort,   // connection
+                                         kA3818GetPCIConfig,		// selector
+                                         NULL,                      // input values
+                                         NULL,							// number of scalar input values
+                                         outbuf,						// Pointer to input struct
+                                         count,							// Size of input struct
+                                         NULL,						// output scalar array
+                                         NULL,						// pointer to number of scalar output
+                                         inbuf,                     // pointer to struct output
+                                         &inbufSize                 // pointer to size of struct output
+                                         );
+
+            
+			//????if(*fVStatusReg & STATUS_PROBLEM)[self checkStatusWord:*fVStatusReg];
             
         }
 		else *readAddress = 0;
@@ -1224,6 +1264,10 @@ NSString* ORA3818Lock										= @"ORA3818Lock";
     data = LOCAL_CMD_CLRST | LOCAL_CMD_IE;
     [self writeCSRRegister:A3818_CSR_LOCAL_COMMAND_OFFSET withData:data];
 }
+
+
+
+
 
 // setup A3818 mapping registers
 - (void) _setupMapping: (unsigned long)remoteAddress
