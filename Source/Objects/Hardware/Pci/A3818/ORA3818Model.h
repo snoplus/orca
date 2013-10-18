@@ -1,47 +1,7 @@
-/*
 
-File:       ORA3818Model.h
-
-Usage:		Class Definition for the A3818 A3818 PCI VME
-I/O Kit Kernel Extension (KEXT) Functions
-
- Author:		Mark A. Howe
- Copyright:		Copyright 3818.  All rights reserved
-
- 
-Change History:	1/22/02, 2/2/02, 2/12/02,
-3/1/02  - number of transfers <= 4096 bytes
-3/4/02 - transfers > 4096 bytes done in chunks
-
-According to Apple, currently the IOKit and IOUserClient
-(IOConnectMethodxx) do not support the transfer of single
-blocks larger than 4096 bytes (a memory page) between user
-space and kernel space.  Thus any larger block must be
-transferred in chunks of 4096 bytes or less.
-
-5/21/02 - IOServiceClose added in destructor to match
-IOServiceOpen
-
-5/22/02 - Open/Close calls to User Client methods added
-5/29/02 - direct mapping of A3818 address spaces from user
-space added, single transfers up to 64768 32 bit
-items allowed
-6/5/02 - added comments and some cleanup
-8/7/02 - additional cleanup
-11/20/02 - added error returns to selected functions
-11/3/04  - MAH CENPA. converted to generic A3818 controller
-
-
-Notes:		A3818 PCI Matching is done with
-Vendor ID 0x108a and Device IDs of the A3818 cards.
-
-This task would have be much easier had there been an
-IOKit PCI family library available from Apple.  Since
-one cannot inherit from an IOKit provided family for
-PCI, one must write the required methods using the raw
-tools that IOKit provide.  Hopefully, at some point
-this situation will improve.
-*/
+// File:       ORA3818Model.h
+// Author:		Mark A. Howe
+// Copyright:	Copyright 2013.  All rights reserved
 
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of
@@ -89,7 +49,7 @@ typedef struct MapRegisterStructUser
     UInt8 accessWidth;
 } MapRegisterStructUser;
 
-
+/*
 enum {
     kIOPCIConfigVendorID			= 0x00,
     kIOPCIConfigDeviceID			= 0x02,
@@ -117,19 +77,12 @@ enum {
     kIOPCIConfigMinimumGrant		= 0x3E,
     kIOPCIConfigMaximumLatency		= 0x3F
 };
-
-enum {
-    kByteRetryIndex,
-    kWordRetryIndex,
-    kLongRetryIndex,
-    kNumRetryIndexes
-};
-
+*/
 // dma mapping register offset	
 #define	DMA_MAPPING_REGISTER_OFFSET		0x0000c000
-#define	ACCESS_REMOTE_IO		0x01
-#define	ACCESS_REMOTE_RAM		0x02
-#define	ACCESS_REMOTE_DPRAM		0x03
+#define	ACCESS_REMOTE_IO                0x01
+#define	ACCESS_REMOTE_RAM               0x02
+#define	ACCESS_REMOTE_DPRAM             0x03
 
 #pragma mark •••Exceptions
 #define OExceptionNoA3818Driver			@"No A3818 Driver"
@@ -175,12 +128,6 @@ enum {
         ORAlarm*    noDriverAlarm;
         int		errorCount;
 
-        
-        NSDictionary* errorRateXAttributes;
-        NSDictionary* errorRateYAttributes;
-        ORRateGroup*    errorRateGroup;
-        unsigned long   retryCount[3];
-        unsigned long   retryFailedCount[3];
         int totalDevicesFound;
 		unsigned timeOutErrors;
 		unsigned remoteBusErrors;
@@ -222,14 +169,6 @@ enum {
 
 - (void) setDualPortRamSize:(unsigned int) theSize;
 - (unsigned int) dualPortRamSize;
-
-- (ORRateGroup*)    errorRateGroup;
-- (void)	    setErrorRateGroup:(ORRateGroup*)newErrorRateGroup;
-- (void) setIntegrationTime:(double)newIntegrationTime;
-- (NSDictionary*) errorRateXAttributes;
-- (void) setErrorRateXAttributes:(NSDictionary*)newErrorRateXAttributes;
-- (NSDictionary*) errorRateYAttributes;
-- (void) setErrorRateYAttributes:(NSDictionary*)newErrorRateYAttributes;
 
 #pragma mark •••Hardware Access
 - (void)  checkCratePower;
@@ -306,7 +245,6 @@ enum {
 
 - (void) executeCommandList:(ORCommandList*)aList;
 
-- (unsigned long) getCounter:(int)counterTag forGroup:(int)groupTag;
 - (void) printErrorSummary;
 - (void) printConfigurationData;
 - (void) printStatus;

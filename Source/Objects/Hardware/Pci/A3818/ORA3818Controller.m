@@ -59,18 +59,9 @@
 
 - (void) awakeFromNib
 {
-    [[errorRatePlot yAxis] setLog:YES];
     [addressStepper setMaxValue:(double)0x7fffffff];
 	[groupView setGroup:model];
  
-	int i;
-	for(i=0;i<4;i++){
-		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:0 andDataSource:self];
-		[aPlot setLineColor:[self colorForDataSet:i]];
-		[errorRatePlot addPlot: aPlot];
-		[(ORTimeAxis*)[errorRatePlot xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
-		[aPlot release]; 
-	}
 	[super awakeFromNib];
 }
 
@@ -112,23 +103,7 @@
                      selector : @selector(readWriteTypeChanged:)
                          name : ORA3818RWTypeChangedNotification
                        object : model];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(errorRateXAttributesChanged:)
-                         name : ORAxisRangeChangedNotification
-                       object : [errorRatePlot xAxis]];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(errorRateYAttributesChanged:)
-                         name : ORAxisRangeChangedNotification
-                       object : [errorRatePlot yAxis]];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(updateErrorPlot:)
-                         name : ORRateAverageChangedNotification
-                       object : [[model errorRateGroup]timeRate]];
-    
-    
+        
     [notifyCenter addObserver : self
                      selector : @selector(lockChanged:)
                          name : ORRunStatusChangedNotification
@@ -140,18 +115,6 @@
                         object: nil];
     
     [notifyCenter addObserver : self
-                     selector : @selector(integrationChanged:)
-                         name : ORRateGroupIntegrationChangedNotification
-                       object : nil];
-    
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(rateGroupChanged:)
-                         name : ORA3818RateGroupChangedNotification
-                       object : model];
-    
-    
-    [notifyCenter addObserver : self
                      selector : @selector(deviceNameChanged:)
                          name : ORA3818DeviceNameChangedNotification
                        object : model];
@@ -161,9 +124,7 @@
                      selector : @selector(slotChanged:)
                          name : ORDualPortLAMSlotChangedNotification
                         object: nil];
-	
-    [self registerRates];
-    
+	    
     [notifyCenter addObserver : self
                      selector : @selector(doRangeChanged:)
                          name : ORA3818ModelDoRangeChanged
@@ -175,24 +136,6 @@
 						object: model];
 	
 }
-
-- (void) registerRates
-{
-    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-    
-    [notifyCenter removeObserver:self name:ORRateChangedNotification object:nil];
-    
-    NSEnumerator* e = [[[model errorRateGroup] rates] objectEnumerator];
-    id obj;
-    while(obj = [e nextObject]){
-        [notifyCenter addObserver : self
-                         selector : @selector(updateErrorPlot:)
-                             name : ORRateAverageChangedNotification
-                           object : [obj timeRate]];
-    }
-}
-
-
 #pragma mark •••Interface Management
 - (void) rangeChanged:(NSNotification*)aNote
 {
@@ -216,12 +159,7 @@
     [self readWriteTypeChanged:nil];
     [self readWriteIOSpaceChanged:nil];
     [self readWriteAddressModifierChanged:nil];
-    [self rateGroupChanged:nil];
     
-    [self integrationChanged:nil];
-    [self errorRateXAttributesChanged:nil];
-    [self errorRateYAttributesChanged:nil];
-    [self updateErrorPlot:nil];
     [self deviceNameChanged:nil];
     [self slotChanged:nil];
     
@@ -267,21 +205,6 @@
 	[[self window]setTitle:[model deviceName]];;
 }
 
-- (void) rateGroupChanged:(NSNotification*)aNotification
-{
-	[self registerRates];
-}
-
-- (void) integrationChanged:(NSNotification*)aNotification
-{
-    ORRateGroup* theRateGroup = [aNotification object];
-    if(aNotification == nil || [model errorRateGroup] == theRateGroup ){
-        double dValue = [[model errorRateGroup] integrationTime];
-        [integrationStepper setDoubleValue:dValue];
-        [integrationText setDoubleValue: dValue];
-    }
-}
-
 - (void) rwAddressTextChanged:(NSNotification*)aNotification
 {
 	[self updateIntText:addressValueField setting:[model rwAddress]];
@@ -313,31 +236,6 @@
 - (void) readWriteAddressModifierChanged:(NSNotification*)aNotification
 {
 	[readWriteAddressModifierPopUp selectItemAtIndex:[model rwAddressModifier]];
-}
-
-- (void) errorRateXAttributesChanged:(NSNotification*)aNote
-{
-	[model setErrorRateXAttributes:[(ORAxis*)[errorRatePlot xAxis] attributes]];
-}
-
-
-
-- (void) errorRateYAttributesChanged:(NSNotification*)aNote
-{
-	BOOL isLog = [[errorRatePlot yAxis] isLog];
-	[errorRateLogCB setState:isLog];
-	[model setErrorRateYAttributes:[(ORAxis*)[errorRatePlot yAxis] attributes]];
-}
-
-
-- (void) updateErrorPlot:(NSNotification*)aNote
-{
-	if(!aNote || 
-       ([aNote object] == [[[model errorRateGroup]rateObject:0]timeRate]) ||
-       ([aNote object] == [[[model errorRateGroup]rateObject:1]timeRate]) ||
-       ([aNote object] == [[[model errorRateGroup]rateObject:2]timeRate])){
-		[errorRatePlot setNeedsDisplay:YES];
-	}
 }
 
 - (void) slotChanged:(NSNotification*)aNote
@@ -625,7 +523,7 @@
 // start tests
 -(IBAction)doTests:(id)sender
 {
-    unsigned char cdata;
+    //unsigned char cdata;
     
     NSLog(@"Starting %@ Driver Tests.\n",[model objectName]);
 	[[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
@@ -638,7 +536,7 @@
         
         //NSLog(@"No errors.\n");
         [model printConfigurationData];
-        
+        /*
         NSLog(@"Checking for Hardware errors.\n");
 		[[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
 								 beforeDate:[NSDate dateWithTimeIntervalSinceNow:.01]];
@@ -669,7 +567,7 @@
         
         [self dpmTest];
         NSLog(@"All %@ Tests Complete.\n",[model objectName]);
-        
+        */
     }
 	@catch(NSException* localException) {
         NSRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
@@ -801,28 +699,6 @@
     }
 }
 
-- (int) numberPointsInPlot:(id)aPlotter
-{
-	int set = [aPlotter tag];
-    return [[[[model errorRateGroup]rateObject:set]timeRate] count];
-}
-
-- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
-{
-	int set = [aPlotter tag];
-	int count = [[[[model errorRateGroup] rateObject:set] timeRate] count];
-	int index = count-i-1;
-	*yValue =  [[[[model errorRateGroup]rateObject:set] timeRate] valueAtIndex:index];
-	*xValue =  [[[[model errorRateGroup]rateObject:set] timeRate] timeSampledAtIndex:index];
-}
-
-- (NSColor*) colorForDataSet:(int)set
-{
-    if(set==kByteRetryIndex)return [NSColor redColor];
-    else if(set==kWordRetryIndex)return [NSColor greenColor];
-    else if(set==kLongRetryIndex)return [NSColor blueColor];
-    return [NSColor redColor];
-}
 
 
 @end

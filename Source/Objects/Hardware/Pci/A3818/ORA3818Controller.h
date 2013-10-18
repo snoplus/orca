@@ -24,7 +24,6 @@
 #pragma mark •••Imported Files
 #import "ORA3818Model.h"
 
-@class ORCompositeTimeLineView;
 @class ORGroupView;
  
 @interface ORA3818Controller : OrcaObjectController {
@@ -45,15 +44,10 @@
 	IBOutlet NSPopUpButton* readWriteIOSpacePopUp;
 	IBOutlet NSPopUpButton* readWriteAddressModifierPopUp;	
 	IBOutlet NSButton*      lockButton;
-	IBOutlet ORCompositeTimeLineView*	errorRatePlot;
-	IBOutlet NSButton*      errorRateLogCB;
-	IBOutlet NSStepper* 	integrationStepper;
-	IBOutlet NSTextField* 	integrationText;
     IBOutlet ORGroupView*	groupView;
 };
 
 - (void) registerNotificationObservers;
-- (void) registerRates;
 
 #pragma mark •••Interface Management
 - (void) rangeChanged:(NSNotification*)aNote;
@@ -65,13 +59,6 @@
 - (void) readWriteAddressModifierChanged:(NSNotification*)aNotification;
 - (void) lockChanged:(NSNotification*)aNotification;
 - (void) deviceNameChanged:(NSNotification*)aNotification;
-
-- (void) integrationChanged:(NSNotification*)aNotification;
-- (void) rateGroupChanged:(NSNotification*)aNotification;
-
-- (void) errorRateXAttributesChanged:(NSNotification*)aNote;
-- (void) errorRateYAttributesChanged:(NSNotification*)aNote;
-- (void) updateErrorPlot:(NSNotification*)aNote;
 - (void) slotChanged:(NSNotification*)aNote;
 
 - (void) clearError_Bits;
@@ -92,12 +79,5 @@
 - (IBAction) doTests:(id)sender;
 - (IBAction) read:(id)sender;
 - (IBAction) write:(id)sender;
-
-- (IBAction) integrationAction:(id)sender;
-
-- (int) numberPointsInPlot:(id)aPlotter;
-- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
-- (NSColor*) colorForDataSet:(int)set;
-
 
 @end

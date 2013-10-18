@@ -59,7 +59,7 @@
 enum A3818UserClientCommandCodes {
     kA3818UserClientOpen,		// kIOUCScalarIScalarO,  0, 0
     kA3818UserClientClose,		// kIOUCScalarIScalarO,  0, 0
-    kA3818ReadPCIConfig,			// kIOUCScalarIScalarO,  1, 1
+    kA3818ReadPCIConfig,        // kIOUCScalarIScalarO,  1, 1
     kA3818WritePCIConfig,		// kIOUCScalarIScalarO,  2, 0
     kA3818GetPCIConfig,			// kIOUCScalarIStructO,	 1, 1
     kA3818GetPCIBusNumber,		// kIOUCScalarIScalarO,  0, 1

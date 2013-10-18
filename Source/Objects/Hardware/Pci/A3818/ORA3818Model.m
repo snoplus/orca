@@ -1,46 +1,6 @@
 /*
- 
- File:		CVmeContrl620.cpp
- 
- Usage:		Implementation for the A3818 620 PCI VME
- I/O Kit Kernel Extension (KEXT) Functions
- Author:		Mark A. Howe
- Copyright:		Copyright 3818.  All rights reserved
- 
- Change History:	1/22/02, 2/2/02, 2/12/02,
- 3/1/02  - number of transfers <= 4096 bytes
- 3/4/02 - transfers > 4096 bytes done in chunks
- 
- According to Apple, currently the IOKit and IOUserClient
- (IOConnectMethodxx) do not support the transfer of single
- blocks larger than 4096 bytes (a memory page) between user
- space and kernel space.  Thus any larger block must be
- transferred in chunks of 4096 bytes or less.
- 
- 5/21/02 - IOServiceClose() added in destructor to match
- IOServiceOpen()
- 
- 5/22/02 - Open/Close calls to User Client methods added
- 5/29/02 - direct mapping of 620 address spaces from user
- space added, single transfers up to 64768 32 bit
- items allowed
- 6/5/02 - added comments and some cleanup
- 8/7/02 - additional cleanup
- 11/20/02 - added error returns to selected functions
- 11/20/02 - MAH CENPA. converted to Obj-C 
- 11/03/04  - MAH CENPA. converted to generic A3818 Model
- 
- 
- Notes:		620 PCI Matching is done with
- Vendor ID 0x108a and Device IDs of the A3818 devices.
- 
- This task would have be much easier had there been an
- IOKit PCI family library available from Apple.  Since
- one cannot inherit from an IOKit provided family for
- PCI, one must write the required methods using the raw
- tools that IOKit provide.  Hopefully, at some point
- this situation will improve.
- */
+ Vendor ID 0x10ee and Device ID 0x1015.
+  */
  //-----------------------------------------------------------
  //This program was prepared for the Regents of the University of
  //North Carolina sponsored in part by the United States
@@ -57,26 +17,21 @@
 
 #pragma mark •••Imported Files
 #import "ORA3818Model.h"
-#import "ORRateGroup.h"
-#import "ORAxis.h"
 #import "ORA3818Commands.h"
 #import "ORCommandList.h"
 #import "ORVmeReadWriteCommand.h"
 
 #pragma mark •••Notification Strings
-NSString* ORA3818ModelRangeChanged						= @"ORA3818ModelRangeChanged";
+NSString* ORA3818ModelRangeChanged                          = @"ORA3818ModelRangeChanged";
 NSString* ORA3818ModelDoRangeChanged						= @"ORA3818ModelDoRangeChanged";
-NSString* ORA3818DualPortAddresChangedNotification        = @"ORA3818DualPortAddresChangedNotification";
-NSString* ORA3818DualPortRamSizeChangedNotification       = @"ORA3818DualPortRamSizeChangedNotification";
-NSString* ORA3818RWAddressChangedNotification             = @"ORA3818RWAddressChangedNotification";
-NSString* ORA3818WriteValueChangedNotification            = @"ORA3818WriteValueChangedNotification";
-NSString* ORA3818RWAddressModifierChangedNotification     = @"ORA3818RWAddressModifierChangedNotification";
-NSString* ORA3818RWIOSpaceChangedNotification             = @"ORA3818RWIOSpaceChangedNotification";
-NSString* ORA3818RWTypeChangedNotification                = @"ORA3818RWTypeChangedNotification";
-NSString* ORA3818RateGroupChangedNotification             = @"ORA3818RateGroupChangedNotification";
-NSString* ORA3818ErrorRateXChangedNotification            = @"ORA3818ErrorRateXChangedNotification";
-NSString* ORA3818ErrorRateYChangedNotification			= @"ORA3818ErrorRateYChangedNotification";
-NSString* ORA3818DeviceNameChangedNotification            = @"ORA3818DeviceNameChangedNotification";
+NSString* ORA3818DualPortAddresChangedNotification          = @"ORA3818DualPortAddresChangedNotification";
+NSString* ORA3818DualPortRamSizeChangedNotification         = @"ORA3818DualPortRamSizeChangedNotification";
+NSString* ORA3818RWAddressChangedNotification               = @"ORA3818RWAddressChangedNotification";
+NSString* ORA3818WriteValueChangedNotification              = @"ORA3818WriteValueChangedNotification";
+NSString* ORA3818RWAddressModifierChangedNotification       = @"ORA3818RWAddressModifierChangedNotification";
+NSString* ORA3818RWIOSpaceChangedNotification               = @"ORA3818RWIOSpaceChangedNotification";
+NSString* ORA3818RWTypeChangedNotification                  = @"ORA3818RWTypeChangedNotification";
+NSString* ORA3818DeviceNameChangedNotification              = @"ORA3818DeviceNameChangedNotification";
 
 NSString* ORA3818Lock										= @"ORA3818Lock";
 
@@ -124,8 +79,6 @@ NSString* ORA3818Lock										= @"ORA3818Lock";
     
     [self setDualPortAddress:kDualPortAddress];
     [self setDualPortRamSize:kDualPortSize];
-    [self setErrorRateGroup:[[[ORRateGroup alloc] initGroup:3 groupTag:0] autorelease]];
-    [errorRateGroup setIntegrationTime:5];
     
     
     masterPort 	 = 0;
@@ -138,8 +91,6 @@ NSString* ORA3818Lock										= @"ORA3818Lock";
 - (void) dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [errorRateGroup quit];
-    [errorRateGroup release];
     [theHWLock release];
     [noHardwareAlarm clearAlarm];
     [noHardwareAlarm release];
@@ -316,11 +267,6 @@ NSString* ORA3818Lock										= @"ORA3818Lock";
 {
     if(guardian!=nil){
         [self printErrorSummary];
-        int i;
-        for(i=0;i<kNumRetryIndexes;i++){
-            retryCount[i]       =   0;
-            retryFailedCount[i] =   0;
-        }
     }
 	timeOutErrors = 0;
 	remoteBusErrors = 0;
@@ -493,48 +439,12 @@ NSString* ORA3818Lock										= @"ORA3818Lock";
     return dualPortRamSize;
 }
 
-- (ORRateGroup*) errorRateGroup
-{
-	return errorRateGroup;
-}
-- (void) setErrorRateGroup:(ORRateGroup*)newErrorRateGroup
-{
-	[newErrorRateGroup retain];
-	[errorRateGroup release];
-	errorRateGroup = newErrorRateGroup;
-	
-    [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORA3818RateGroupChangedNotification
-	 object:self];    
-}
 
 - (void) setIntegrationTime:(double)newIntegrationTime
 {
     if(newIntegrationTime<1)newIntegrationTime=1;
     else if(newIntegrationTime>60)newIntegrationTime=60;
 	//we this here so we have undo/redo on the rate object.
-    [[[self undoManager] prepareWithInvocationTarget:self] setIntegrationTime:[errorRateGroup integrationTime]];
-    [errorRateGroup setIntegrationTime:newIntegrationTime];
-}
-
-- (NSDictionary*) errorRateXAttributes
-{
-	return errorRateXAttributes;
-}
-- (void) setErrorRateXAttributes:(NSDictionary*)newErrorRateXAttributes
-{
-    [errorRateXAttributes release];
-    errorRateXAttributes = [newErrorRateXAttributes copy];
-}
-
-- (NSDictionary*) errorRateYAttributes
-{
-	return errorRateYAttributes;
-}
-- (void) setErrorRateYAttributes:(NSDictionary*)newErrorRateYAttributes
-{
-    [errorRateYAttributes release];
-    errorRateYAttributes = [newErrorRateYAttributes copy];
 }
 
 
@@ -545,16 +455,7 @@ NSString* ORA3818Lock										= @"ORA3818Lock";
     kern_return_t result = 0;
     [theHWLock lock];   //-----begin critical section
     if(hardwareExists){
-#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
-		//10.4
-		result = IOConnectMethodScalarIScalarO(dataPort,		// service
-                                               kA3818GetPCIBusNumber,	// method index
-                                               0,			// number of scalar input values
-                                               1,			// number of scalar output values
-                                               data		// scalar output value
-                                               );
-#else
-		//10.5
+
 		uint64_t output_64;
 		uint32_t outputCount = 1;
 		result = IOConnectCallScalarMethod(dataPort,				// connection
@@ -566,7 +467,6 @@ NSString* ORA3818Lock										= @"ORA3818Lock";
 										   );
 		*data = (char) output_64;
 		
-#endif
     }
     [theHWLock unlock];   //-----end critical section
     return result;
@@ -579,16 +479,7 @@ NSString* ORA3818Lock										= @"ORA3818Lock";
     kern_return_t result = 0;
     [theHWLock lock];   //-----begin critical section
     if(hardwareExists){
-#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
-		//10.4
-		result =  IOConnectMethodScalarIScalarO(dataPort,		// service
-												kA3818GetPCIDeviceNumber,	// method index
-												0,			// number of scalar input values
-												1,			// number of scalar output values
-												data		// scalar output value
-												);
-#else
-		//10.5
+
 		uint64_t output_64;
 		uint32_t outputCount = 1;
 		result = IOConnectCallScalarMethod(dataPort,					// connection
@@ -599,7 +490,6 @@ NSString* ORA3818Lock										= @"ORA3818Lock";
 										   &outputCount					// number of scalar output values
 										   );
 		*data = (char) output_64;
-#endif
     }
     [theHWLock unlock];   //-----end critical section
     return result;
@@ -612,16 +502,7 @@ NSString* ORA3818Lock										= @"ORA3818Lock";
     kern_return_t result = 0;
     [theHWLock lock];   //-----begin critical section
     if(hardwareExists){
-#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
-		//10.4
-		result =   IOConnectMethodScalarIScalarO(dataPort,		// service
-												 kA3818GetPCIFunctionNumber,	// method index
-												 0,			// number of scalar input values
-												 1,			// number of scalar output values
-												 data		// scalar output value
-												 );
-#else
-		//10.5
+
 		uint64_t output_64;
 		uint32_t outputCount = 1;
 		result = IOConnectCallScalarMethod(dataPort,					// connection
@@ -633,7 +514,6 @@ NSString* ORA3818Lock										= @"ORA3818Lock";
 										   );
 		*data = (char) output_64;
 		
-#endif
     }
     [theHWLock unlock];   //-----end critical section
     return result;
@@ -646,17 +526,7 @@ NSString* ORA3818Lock										= @"ORA3818Lock";
     kern_return_t result = 0;
     [theHWLock lock];   //-----begin critical section
     if(hardwareExists){
-#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
-		//10.4
-		result =  IOConnectMethodScalarIScalarO(dataPort,		// service
-												kA3818ReadPCIConfig,	// method index
-												1,			// number of scalar input values
-												1,			// number of scalar output values
-												address,		// scalar input value
-												data		// scalar output value
-												);
-#else
-		//10.5
+
 		uint64_t input = address;
 		uint64_t output_64;
 		uint32_t outputCount = 1;
@@ -669,7 +539,6 @@ NSString* ORA3818Lock										= @"ORA3818Lock";
 										   &outputCount				// number of scalar output values
 										   );
 		*data = (uint32_t) output_64;
-#endif
     }
     [theHWLock unlock];   //-----end critical section
     return result;
@@ -685,18 +554,7 @@ NSString* ORA3818Lock										= @"ORA3818Lock";
 	
     [theHWLock lock];   //-----begin critical section
     if(hardwareExists){
-#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
-		//10.4
-		result = IOConnectMethodScalarIStructureO(
-												  dataPort,		// service
-												  kA3818GetPCIConfig,	// method index
-												  1,			// number of scalar input values
-												  &pciDataSize,		// byte size of output structure
-												  maxAddress,		// scalar input values
-												  pciData			// output structure
-												  );
-#else
-		//10.5
+
 		uint64_t scalarI = maxAddress;
 		result = IOConnectCallMethod(  dataPort,					// connection
 									 kA3818GetPCIConfig,			// selector
@@ -709,7 +567,6 @@ NSString* ORA3818Lock										= @"ORA3818Lock";
 									 pciData,						// pointer to struct output
 									 &pciDataSize					// pointer to size of struct output
 									 );
-#endif
     }
     [theHWLock unlock];   //-----end critical section
     return result;
@@ -966,21 +823,8 @@ NSString* ORA3818Lock										= @"ORA3818Lock";
 	@catch(NSException* localException) {
         [theHWLock unlock];   //-----end critical section
         [self _resetNoRaise];
-        errorCount++;
-        retryCount[kLongRetryIndex]++;
-        if(errorCount<2){
-            [self readLongBlock:readAddress atAddress:vmeAddress
-                      numToRead:numberLongs withAddMod:addModifier
-                  usingAddSpace:addressSpace];
-        }
-        else {
-            errorCount = 0;
-            retryFailedCount[kLongRetryIndex]++;
-            [localException raise]; //rethrown the exception
-        }
-	}
-	errorCount = 0;
-	
+        [localException raise]; //rethrown the exception
+	}	
 }
 
 //a special read for reading fifos that reads one address multiple times
@@ -1058,21 +902,8 @@ NSString* ORA3818Lock										= @"ORA3818Lock";
 	@catch(NSException* localException) {
         [theHWLock unlock];   //-----end critical section
         [self _resetNoRaise];
-        errorCount++;
-        retryCount[kLongRetryIndex]++;
-        if(errorCount<2){
-            [self writeLongBlock:writeAddress atAddress:vmeAddress
-                      numToWrite:numberLongs withAddMod:addModifier
-                   usingAddSpace:addressSpace];
-        }
-        else {
-            retryFailedCount[kLongRetryIndex]++;
-            errorCount = 0;
-            [localException raise]; //rethrown the exception
-        }
-	}
-	errorCount = 0;
-	
+        [localException raise]; //rethrown the exception
+	}	
 }
 
 
@@ -1110,21 +941,8 @@ NSString* ORA3818Lock										= @"ORA3818Lock";
 	@catch(NSException* localException) {
         [theHWLock unlock];   //-----end critical section
         [self _resetNoRaise];
-        errorCount++;
-        retryCount[kByteRetryIndex]++;
-        if(errorCount<2){
-            [self readByteBlock:readAddress atAddress:vmeAddress
-                      numToRead:numberBytes withAddMod:addModifier
-                  usingAddSpace:addressSpace];
-        }
-        else {
-            retryFailedCount[kByteRetryIndex]++;
-            errorCount = 0;
-            [localException raise]; //rethrown the exception
-        }
-	}
-	errorCount = 0;
-	
+        [localException raise]; //rethrown the exception
+	}	
 }
 
 
@@ -1160,20 +978,8 @@ NSString* ORA3818Lock										= @"ORA3818Lock";
 	@catch(NSException* localException) {
         [theHWLock unlock];   //-----end critical section
         [self _resetNoRaise];
-        errorCount++;
-        retryCount[kByteRetryIndex]++;
-        if(errorCount<2){
-            [self writeByteBlock:writeAddress atAddress:vmeAddress
-                      numToWrite:numberBytes withAddMod:addModifier
-                   usingAddSpace:addressSpace];
-        }
-        else {
-            retryFailedCount[kByteRetryIndex]++;
-            errorCount = 0;
-            [localException raise]; //rethrown the exception
-        }
+        [localException raise]; //rethrown the exception
 	}
-	errorCount = 0;
 }
 
 
@@ -1211,20 +1017,8 @@ NSString* ORA3818Lock										= @"ORA3818Lock";
 	@catch(NSException* localException) {
         [theHWLock unlock];   //-----end critical section
         [self _resetNoRaise];
-        errorCount++;
-        retryCount[kWordRetryIndex]++;
-        if(errorCount<2){
-            [self readWordBlock:readAddress atAddress:vmeAddress
-                      numToRead:numberWords withAddMod:addModifier
-                  usingAddSpace:addressSpace];
-        }
-        else {
-            retryFailedCount[kWordRetryIndex]++;
-            errorCount = 0;
-            [localException raise]; //rethrown the exception
-        }
+        [localException raise]; //rethrown the exception
 	}
-	errorCount = 0;
 }
 
 
@@ -1261,20 +1055,8 @@ NSString* ORA3818Lock										= @"ORA3818Lock";
 	@catch(NSException* localException) {
         [theHWLock unlock];   //-----end critical section
         [self _resetNoRaise];
-        errorCount++;
-        retryCount[kWordRetryIndex]++;
-        if(errorCount<2){
-            [self writeWordBlock:writeAddress atAddress:vmeAddress
-                      numToWrite:numberWords withAddMod:addModifier
-                   usingAddSpace:addressSpace];
-        }
-        else {
-            retryFailedCount[kWordRetryIndex]++;
-            errorCount = 0;
-            [localException raise]; //rethrown the exception
-        }
+        [localException raise]; //rethrown the exception
 	}
-	errorCount = 0;
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -1287,15 +1069,7 @@ NSString* ORA3818Lock										= @"ORA3818Lock";
 	
 	kern_return_t kernResult;
 	
-#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
-	//10.4
-	kernResult = IOConnectMethodScalarIScalarO(aDataPort,		// service
-											   kA3818UserClientOpen,	// method index
-											   0,			// number of scalar input values
-											   0			// number of scalar output values
-											   );
-#else
-	//10.5
+
 	kernResult= IOConnectCallScalarMethod(aDataPort,		// connection
 										  kA3818UserClientOpen,	// selector
 										  0,			// input values
@@ -1303,7 +1077,6 @@ NSString* ORA3818Lock										= @"ORA3818Lock";
 										  0,			// output values
 										  0			// number of scalar output values
 										  );
-#endif
 	return kernResult;
 }
 
@@ -1313,15 +1086,6 @@ NSString* ORA3818Lock										= @"ORA3818Lock";
 {
 	kern_return_t kernResult;
 	
-#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
-	//10.4
-	kernResult = IOConnectMethodScalarIScalarO(aDataPort,		// service
-											   kA3818UserClientClose,	// method index
-											   0,			// number of scalar input values
-											   0			// number of scalar output values
-											   );
-#else
-	//10.5
 	kernResult =  IOConnectCallScalarMethod( aDataPort,		// connection
 											kA3818UserClientClose,	// selector
 											0,			// input values
@@ -1329,7 +1093,6 @@ NSString* ORA3818Lock										= @"ORA3818Lock";
 											0,			// output values
 											0			// number of scalar output values
 											);
-#endif
 	return kernResult;
 }
 
@@ -2031,19 +1794,6 @@ physicalBufferAddress:(unsigned long) physicalBufferAddress
 	}
 }
 
-
-#pragma mark •••Rates
-- (unsigned long) getCounter:(int)counterTag forGroup:(int)groupTag
-{
-    if(groupTag == 0){
-        if(counterTag>=0 && counterTag<kNumRetryIndexes){
-            return retryCount[counterTag];
-        }	
-        else return 0;
-    }
-    else return 0;
-}
-
 #pragma mark •••Archival
 static NSString *ORA3818DualPortAddress		= @"A3818 Dual Port Address";
 static NSString *ORA3818DualPortRamSize		= @"A3818 Dual Port Ram Size";
@@ -2052,9 +1802,6 @@ static NSString *ORA3818WriteValue			= @"A3818 Write Value";
 static NSString *ORA3818ReadWriteType			= @"A3818 Read/Write Type";
 static NSString *ORA3818ReadWriteAddMod		= @"A3818 Read/Write Address Modifier";
 static NSString *ORA3818ReadWriteAddSpace		= @"A3818 Read/Write Address Space";
-static NSString *ORA3818ErrorRateGroup		= @"A3818 Error Rate Group";
-static NSString *ORA3818ErrorRateXAttributes  = @"A3818 ErrorRateXAttributes";
-static NSString *ORA3818ErrorRateYAttributes  = @"A3818 ErrorRateYAttributes";
 
 - (id)initWithCoder:(NSCoder*)decoder
 {
@@ -2073,19 +1820,6 @@ static NSString *ORA3818ErrorRateYAttributes  = @"A3818 ErrorRateYAttributes";
     [self setRwAddressModifier:[decoder decodeIntForKey:ORA3818ReadWriteAddMod]];
     [self setReadWriteIOSpace:[decoder decodeIntForKey:ORA3818ReadWriteAddSpace]];
     [self setReadWriteType:[decoder decodeIntForKey:ORA3818ReadWriteType]];	
-    [self setErrorRateGroup:[decoder decodeObjectForKey:ORA3818ErrorRateGroup]];
-    [self setErrorRateXAttributes:[decoder decodeObjectForKey:ORA3818ErrorRateXAttributes]];
-    [self setErrorRateYAttributes:[decoder decodeObjectForKey:ORA3818ErrorRateXAttributes]];
-    
-    
-    if(!errorRateGroup){
-	    [self setErrorRateGroup:[[[ORRateGroup alloc] initGroup:3 groupTag:0] autorelease]];
-	    [errorRateGroup setIntegrationTime:5];
-    }
-    [errorRateGroup start:self];
-    [errorRateGroup resetRates];
-    [errorRateGroup calcRates];
-    
     
     [[self undoManager] enableUndoRegistration];
     
@@ -2105,10 +1839,7 @@ static NSString *ORA3818ErrorRateYAttributes  = @"A3818 ErrorRateYAttributes";
     [encoder encodeInt:rwAddressModifier forKey:ORA3818ReadWriteAddMod];
     [encoder encodeInt:readWriteIOSpace forKey:ORA3818ReadWriteAddSpace];
     [encoder encodeInt:readWriteType forKey:ORA3818ReadWriteType];
-    [encoder encodeObject:errorRateGroup forKey:ORA3818ErrorRateGroup];
     
-    [encoder encodeObject:errorRateXAttributes forKey:ORA3818ErrorRateYAttributes];
-    [encoder encodeObject:errorRateYAttributes forKey:ORA3818ErrorRateXAttributes];
 }
 
 - (void) printErrorSummary
@@ -2117,18 +1848,6 @@ static NSString *ORA3818ErrorRateYAttributes  = @"A3818 ErrorRateYAttributes";
 	NSLog(@"Remote Bus Errors: %d\n",remoteBusErrors);
 	NSLog(@"Time Out Erros   : %d\n",timeOutErrors);
 	
-	if(retryCount[0] || retryCount[1] || retryCount[2] ||
-       retryFailedCount[0] || retryFailedCount[1] || retryFailedCount[2]){
-		NSLog(@"%@ retry error summary\n",deviceName);
-		NSLog(@"Byte access retry count: %d\n",retryCount[0]);
-		NSLog(@"Word access retry count: %d\n",retryCount[1]);
-		NSLog(@"Long access retry count: %d\n",retryCount[2]);
-		NSLog(@"\n");
-		NSLog(@"%@ retry failed error summary\n",deviceName);
-		NSLog(@"Byte access retry failed count: %d\n",retryFailedCount[0]);
-		NSLog(@"Word access retry failed count: %d\n",retryFailedCount[1]);
-		NSLog(@"Long access retry failed count: %d\n",retryFailedCount[2]);
-	}
 }
 
 -(void)printConfigurationData
@@ -2144,6 +1863,7 @@ static NSString *ORA3818ErrorRateYAttributes  = @"A3818 ErrorRateYAttributes";
     NSLog(@"PCI Configuration - Vendor ID: 0x%04x\n", vendorID);
     unsigned short deviceID = (unsigned short)Swap16Bits(pciData.int32[0]);
     NSLog(@"PCI Configuration - Device ID: 0x%04x\n",deviceID);
+    /*
     NSLog(@"PCI Configuration - Command Register: 0x%04x\n",
           0x0000ffff&(unsigned short)pciData.int32[kIOPCIConfigCommand/4]);
     NSLog(@"PCI Configuration - Status Register: 0x%04x\n",
@@ -2160,7 +1880,7 @@ static NSString *ORA3818ErrorRateYAttributes  = @"A3818 ErrorRateYAttributes";
           (unsigned char)pciData.int32[kIOPCIConfigInterruptLine/4]);
     NSLog(@"PCI Configuration - Interrupt Pin: 0x%02x\n",
           (unsigned char)( pciData.int32[kIOPCIConfigInterruptLine/4] >> 8 ));
-    
+    */
     // make sure have a A3818 by checking Vendor & Device IDs
     if( vendorID != [self vendorID] ) {
         NSLog(@"*** Invalid Vendor ID, Got: 0x%04x ***\n",vendorID);
