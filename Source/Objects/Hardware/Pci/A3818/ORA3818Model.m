@@ -238,8 +238,7 @@ NSString* ORA3818Lock										= @"ORA3818Lock";
 
 - (unsigned short) vendorID
 {
-	//should be the same for all SBS PCI boards, but subclasses can override if needed.
-	return 0x108a;
+	return 0x10ee;
 }
 
 - (const char*) serviceClassName
@@ -461,7 +460,7 @@ NSString* ORA3818Lock										= @"ORA3818Lock";
 		result = IOConnectCallScalarMethod(dataPort,				// connection
 										   kA3818GetPCIBusNumber,	// selector
 										   NULL,					// input values
-										   0,						// number of scalar input values														
+										   0,						// number of scalar input values		
 										   &output_64,				// output values
 										   &outputCount				// number of scalar output values
 										   );
@@ -1202,6 +1201,19 @@ NSString* ORA3818Lock										= @"ORA3818Lock";
     return YES;
 }
 
+
+/*
+ kern_return_t
+ IOConnectMapMemory(
+    io_connect_t	connect,
+    uint32_t        memoryType,
+    task_port_t     intoTask,
+    vm_address_t	*atAddress,
+    vm_size_t       *ofSize,
+    IOOptionBits	 options );
+*/
+
+
 - (void) _resetNoRaise
 {
     unsigned char data;
@@ -1877,7 +1889,7 @@ static NSString *ORA3818ReadWriteAddSpace		= @"A3818 Read/Write Address Space";
     NSLog(@"PCI Configuration - Vendor ID: 0x%04x\n", vendorID);
     unsigned short deviceID = (unsigned short)Swap16Bits(pciData.int32[0]);
     NSLog(@"PCI Configuration - Device ID: 0x%04x\n",deviceID);
-    /*
+    
     NSLog(@"PCI Configuration - Command Register: 0x%04x\n",
           0x0000ffff&(unsigned short)pciData.int32[kIOPCIConfigCommand/4]);
     NSLog(@"PCI Configuration - Status Register: 0x%04x\n",
@@ -1894,12 +1906,12 @@ static NSString *ORA3818ReadWriteAddSpace		= @"A3818 Read/Write Address Space";
           (unsigned char)pciData.int32[kIOPCIConfigInterruptLine/4]);
     NSLog(@"PCI Configuration - Interrupt Pin: 0x%02x\n",
           (unsigned char)( pciData.int32[kIOPCIConfigInterruptLine/4] >> 8 ));
-    */
+    
     // make sure have a A3818 by checking Vendor & Device IDs
     if( vendorID != [self vendorID] ) {
         NSLog(@"*** Invalid Vendor ID, Got: 0x%04x ***\n",vendorID);
     }
-    else NSLog(@"Device is %@\n",[self decodeDeviceName:deviceID]);
+    else NSLog(@"Device ID is 0x%04x\n",deviceID);
     
     // get PCI assigned values
     NSLog(@"Getting PCI Assigned Values\n");

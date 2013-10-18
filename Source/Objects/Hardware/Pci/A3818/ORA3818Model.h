@@ -49,7 +49,7 @@ typedef struct MapRegisterStructUser
     UInt8 accessWidth;
 } MapRegisterStructUser;
 
-/*
+
 enum {
     kIOPCIConfigVendorID			= 0x00,
     kIOPCIConfigDeviceID			= 0x02,
@@ -77,7 +77,7 @@ enum {
     kIOPCIConfigMinimumGrant		= 0x3E,
     kIOPCIConfigMaximumLatency		= 0x3F
 };
-*/
+
 // dma mapping register offset	
 #define	DMA_MAPPING_REGISTER_OFFSET		0x0000c000
 #define	ACCESS_REMOTE_IO                0x01
