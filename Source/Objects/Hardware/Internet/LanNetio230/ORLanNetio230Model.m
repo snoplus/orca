@@ -96,7 +96,7 @@ NSString* ORLanNetio230ModelOutletNameChanged	 = @"ORLanNetio230ModelOutletNameC
 {
     if([self aWake])return;
     [super wakeUp];
-	[self performSelector:@selector(pollHardware) withObject:nil afterDelay:5];
+	//start polling manually ... [self performSelector:@selector(pollHardware) withObject:nil afterDelay:5];
 }
 
 - (void) sleep
@@ -285,8 +285,7 @@ NSString* ORLanNetio230ModelOutletNameChanged	 = @"ORLanNetio230ModelOutletNameC
 
 - (void) connect
 {
-    //DEBUG OUTPUT:  	
-    NSLog(@"%@::%@: UNDER CONSTRUCTION!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+    //DEBUG OUTPUT:  	    NSLog(@"%@::%@: UNDER CONSTRUCTION!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
 
 
 
@@ -790,7 +789,7 @@ return;
         NSMutableDictionary* values = [NSMutableDictionary dictionary];
         NSMutableArray* statesAndNames = [NSMutableArray array];
         int i;
-        for(i=0;i<9;i++){
+        for(i=0;i<4;i++){
             [statesAndNames addObject:
                 [NSDictionary dictionaryWithObjectsAndKeys:
                     [NSNumber numberWithInt:i],@"index",
@@ -811,8 +810,7 @@ return;
 	//const char* bytes = [pendingCmd cStringUsingEncoding:NSASCIIStringEncoding];
     
     
-    //DEBUG OUTPUT:  	
-    NSLog(@"%@::%@: UNDER CONSTRUCTION! pendingCmd:%@ \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),pendingCmd);//TODO: DEBUG testing ...-tb-
+    //DEBUG OUTPUT:  	    NSLog(@"%@::%@: UNDER CONSTRUCTION! pendingCmd:%@ \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),pendingCmd);//TODO: DEBUG testing ...-tb-
     
     
     //TODO: dev - send http request from here ... -tb-
@@ -823,8 +821,7 @@ return;
 		 
 - (void) timeout
 {
-    //DEBUG OUTPUT:  	
-    NSLog(@"%@::%@: UNDER CONSTRUCTION!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+    //DEBUG OUTPUT:  	    NSLog(@"%@::%@: UNDER CONSTRUCTION!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
 
 
 
@@ -844,8 +841,7 @@ return;
 		 
 - (void) setPendingCmd:(NSString*)aCmd
 {
-    //DEBUG OUTPUT:  	
-    NSLog(@"%@::%@: UNDER CONSTRUCTION! aCmd:%@ \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),aCmd);//TODO: DEBUG testing ...-tb-
+    //DEBUG OUTPUT:  	    NSLog(@"%@::%@: UNDER CONSTRUCTION! aCmd:%@ \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),aCmd);//TODO: DEBUG testing ...-tb-
 
 
 	if(!aCmd){
@@ -865,7 +861,7 @@ return;
 {
 	outletNames = [[NSMutableArray array] retain];
 	int i;
-	for(i=0;i<kLanNetio230OutletNum;i++)[outletNames addObject:[NSString stringWithFormat:@"Outlet %d",i]];	
+	for(i=0;i<kLanNetio230OutletNum+2;i++)[outletNames addObject:[NSString stringWithFormat:@"Outlet %d",i]];	
 }
 
 

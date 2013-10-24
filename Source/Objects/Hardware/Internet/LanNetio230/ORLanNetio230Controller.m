@@ -97,8 +97,8 @@
 - (void) outletNameChanged:(NSNotification*)aNotification
 {
 	short i;
-	for(i=0;i<=kLanNetio230OutletNum;i++){
-		[[outletNameMatrix cellWithTag:i] setStringValue: [model outletName:i]];
+	for(i=0;i<kLanNetio230OutletNum;i++){
+		[[outletNameMatrix cellWithTag:i+1] setStringValue: [model outletName:i+1]];
 	}	
 }
 
