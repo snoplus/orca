@@ -61,6 +61,7 @@
     triggerSize			= NSMakeSize(670,790);
     rateSize			= NSMakeSize(670,790);
     BBAccessSize		= NSMakeSize(670,790);
+    ficSize             = NSMakeSize(670,790);
     testSize			= NSMakeSize(450,420);
     lowlevelSize		= NSMakeSize(450,420);
 	
@@ -503,9 +504,64 @@
                          name : OREdelweissFLTModelPollBBStatusIntervallChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(ficCardCtrlReg1Changed:)
+                         name : OREdelweissFLTModelFicCardCtrlReg1Changed
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(ficCardCtrlReg2Changed:)
+                         name : OREdelweissFLTModelFicCardCtrlReg2Changed
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(ficCardADC01CtrlRegChanged:)
+                         name : OREdelweissFLTModelFicCardADC01CtrlRegChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(ficCardADC23CtrlRegChanged:)
+                         name : OREdelweissFLTModelFicCardADC23CtrlRegChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(ficCardTriggerCmdChanged:)
+                         name : OREdelweissFLTModelFicCardTriggerCmdChanged
+						object: model];
+
 }
 
 #pragma mark •••Interface Management
+
+- (void) ficCardTriggerCmdChanged:(NSNotification*)aNote
+{
+    int fiber = [model fiberSelectForBBAccess];
+	[ficCardTriggerCmdTextField setIntValue: [model ficCardTriggerCmdForFiber:fiber]];
+}
+
+- (void) ficCardADC23CtrlRegChanged:(NSNotification*)aNote
+{
+    int fiber = [model fiberSelectForBBAccess];
+	[ficCardADC23CtrlRegTextField setIntValue: [model ficCardADC23CtrlRegForFiber:fiber]];
+}
+
+- (void) ficCardADC01CtrlRegChanged:(NSNotification*)aNote
+{
+    int fiber = [model fiberSelectForBBAccess];
+	[ficCardADC01CtrlRegTextField setIntValue: [model ficCardADC01CtrlRegForFiber:fiber]];
+}
+
+- (void) ficCardCtrlReg2Changed:(NSNotification*)aNote
+{
+    int fiber = [model fiberSelectForBBAccess];
+	[ficCardCtrlReg2TextField setIntValue: [model ficCardCtrlReg2ForFiber:fiber]];
+}
+
+- (void) ficCardCtrlReg1Changed:(NSNotification*)aNote
+{
+    int fiber = [model fiberSelectForBBAccess];
+	[ficCardCtrlReg1TextField setIntValue: [model ficCardCtrlReg1ForFiber:fiber]];
+}
 
 - (void) pollBBStatusIntervallChanged:(NSNotification*)aNote
 {
@@ -683,7 +739,16 @@
     int fiber = [model fiberSelectForBBAccess];
       //not set ...int fiber = [[[aNote userInfo] objectForKey:OREdelweissFLTFiber] intValue];
     int index = [[[aNote userInfo] objectForKey:OREdelweissFLTIndex] intValue];
-	[[adcValueForBBAccessMatrix cellWithTag:index] setIntValue: [model adcValueForBBAccessForFiber: fiber atIndex:index]];
+    int adcValue = [model adcValueForBBAccessForFiber: fiber atIndex:index];
+	[[adcValueForBBAccessMatrix cellWithTag:index] setIntValue: adcValue];
+    if(adcValue<-31000 || adcValue>30000){
+        //DEBUG 	
+        NSLog(@"%@::%@ - adcValue out of range: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),adcValue);//TODO: DEBUG testing ...-tb-
+	    //[[adcValueForBBAccessMatrix cellWithTag:index] setBackgroundColor: [NSColor redColor]];
+	    [[adcValueForBBAccessMatrix cellWithTag:index] setBackgroundColor: [NSColor colorWithCalibratedRed:1.0 green:0.8 blue:0.7 alpha:0.9]];
+    }else{
+	    [[adcValueForBBAccessMatrix cellWithTag:index] setBackgroundColor: [NSColor textBackgroundColor]];
+    }
 }
 
 - (void) adcMultForBBAccessChanged:(NSNotification*)aNote
@@ -868,7 +933,10 @@
     
     [statusAlimBBTextField setIntValue: [model statusBB16forFiber: fiber atIndex:kBBstatusAlim] ];
 
-
+    //we need to update the FIC section, too -tb-
+	[fiberSelectForFICCardPU selectItemAtIndex: fiber];
+    [self ficCardTriggerCmdChanged:nil];
+    [self ficCardCtrlReg1Changed:nil];
 }
 
 - (void) relaisStatesBBChanged:(NSNotification*)aNote
@@ -1317,6 +1385,11 @@
 	[self chargeBBFileForFiberChanged:nil];
 	[self progressOfChargeBBChanged:nil];
 	[self pollBBStatusIntervallChanged:nil];
+	[self ficCardCtrlReg1Changed:nil];
+	[self ficCardCtrlReg2Changed:nil];
+	[self ficCardADC01CtrlRegChanged:nil];
+	[self ficCardADC23CtrlRegChanged:nil];
+	[self ficCardTriggerCmdChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -1674,8 +1747,9 @@
 		case  1: [self resizeWindowToSize:triggerSize];	    break;
 		case  2: [self resizeWindowToSize:rateSize];	    break;
 		case  3: [self resizeWindowToSize:BBAccessSize];	break;
-		case  4: [self resizeWindowToSize:testSize];        break;
-		case  5: [self resizeWindowToSize:lowlevelSize];	break;
+		case  4: [self resizeWindowToSize:ficSize];	break;
+		case  5: [self resizeWindowToSize:testSize];        break;
+		case  6: [self resizeWindowToSize:lowlevelSize];	break;
 		default: [self resizeWindowToSize:testSize];	    break;
     }
     [[self window] setContentView:totalView];
@@ -1687,6 +1761,36 @@
 }
 
 #pragma mark •••Actions
+
+- (void) ficCardTriggerCmdTextFieldAction:(id)sender
+{
+    int fiber = [model fiberSelectForBBAccess];
+	[model setFicCardTriggerCmd:[sender intValue] forFiber:fiber];	
+}
+
+- (void) ficCardADC23CtrlRegTextFieldAction:(id)sender
+{
+    int fiber = [model fiberSelectForBBAccess];
+	[model setFicCardADC23CtrlReg:[sender intValue] forFiber:fiber];	
+}
+
+- (void) ficCardADC01CtrlRegTextFieldAction:(id)sender
+{
+    int fiber = [model fiberSelectForBBAccess];
+	[model setFicCardADC01CtrlReg:[sender intValue] forFiber:fiber];	
+}
+
+- (void) ficCardCtrlReg2TextFieldAction:(id)sender
+{
+    int fiber = [model fiberSelectForBBAccess];
+	[model setFicCardCtrlReg2:[sender intValue] forFiber:fiber];	
+}
+
+- (void) ficCardCtrlReg1TextFieldAction:(id)sender
+{
+    int fiber = [model fiberSelectForBBAccess];
+	[model setFicCardCtrlReg1:[sender intValue] forFiber:fiber];	
+}
 
 - (void) pollBBStatusIntervallPUAction:(id)sender
 {
@@ -1816,8 +1920,7 @@
 
 - (IBAction) BB0x0ACmdMaskMatrixAction:(id)sender
 {
-	//debug 
-    NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+	//debug     NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
 	int i,val=0;
 	for(i=0;i<8;i++){
         //NSLog(@"Called %@::%@   cell with tag %i, id:%p intVal:%i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),i,[sender cellWithTag:i],[[sender cellWithTag:i] intValue]);//TODO: DEBUG -tb-
@@ -1827,12 +1930,12 @@
 	[model setBB0x0ACmdMask:val];
 }
 
-- (IBAction) chargeBBFileCommandSendButtonAction:(id)sender;
+- (IBAction) chargeBBFileCommandSendButtonAction:(id)sender;//this is obsolete 2013-10 -tb- (still works, requires path on crate PC, usually produces IP timeout, requires SLT reconnect)
 {
 	[model chargeBBWithFile: [model chargeBBFile]];	
 }
 
-- (void) chargeBBFileTextFieldAction:(id)sender
+- (void) chargeBBFileTextFieldAction:(id)sender//this is obsolete 2013-10 -tb- (still works, requires path on crate PC, usually produces IP timeout, requires SLT reconnect)
 {
 	[model setChargeBBFile:[sender stringValue]];	
 }
@@ -1853,6 +1956,40 @@
 {
 	[model setWriteToBBMode:[sender intValue]];	
 }
+
+- (IBAction) writeAllToBBButtonAction:(id)sender
+{
+    //DEBUG    
+    NSLog(@"%@::%@  \n", NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG testing ...-tb-
+    int fiber = [model fiberSelectForBBAccess];
+    [model writeAllToBB: fiber];
+}
+
+- (IBAction) setDefaultsToBBButtonAction:(id)sender
+{
+    //DEBUG    
+    NSLog(@"%@::%@  \n", NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG testing ...-tb-
+    int fiber = [model fiberSelectForBBAccess];
+    [[ self undoManager ] setActionName: @"Set BB Defaults" ]; 			// set name of undo
+    [model setDefaultsToBB: fiber];
+}
+
+- (IBAction) setAndWriteDefaultsToBBButtonAction:(id)sender
+{
+    //DEBUG    
+    NSLog(@"%@::%@  sender.selectedSegment: %i\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd) , [sender selectedSegment]);//TODO: DEBUG testing ...-tb-
+    
+    //if([sender selectedSegment]==0){//set 
+        //always set
+        [self setDefaultsToBBButtonAction:sender];
+    //}
+    if([sender selectedSegment]==1){//set and write
+        int fiber = [model fiberSelectForBBAccess];
+        [model writeDefaultsToBB: fiber];
+    }
+    
+}
+
 
 - (void) wCmdArg2TextFieldAction:(id)sender
 {
@@ -1909,6 +2046,7 @@
 
 - (void) D2TextFieldAction:(id)sender
 {
+    [self endEditing];
     //DEBUG 	    NSLog(@"%@::%@ intVal %i\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),[sender intValue]);//TODO: DEBUG testing ...-tb-
     int fiber = [model fiberSelectForBBAccess];
 	[model setD2ForFiber:fiber to:[sender intValue]];	
@@ -1918,6 +2056,7 @@
 
 - (void) D3TextFieldAction:(id)sender
 {
+    [self endEditing];
     //DEBUG 	    NSLog(@"%@::%@ intVal %i\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),[sender intValue]);//TODO: DEBUG testing ...-tb-
     int fiber = [model fiberSelectForBBAccess];
 	[model setD3ForFiber:fiber to:[sender intValue]];	
@@ -2067,7 +2206,7 @@
 
 - (void) polarDacMatrixAction:(id)sender
 {
-
+    [self endEditing];
 //	[model setAdcFreqkHzForBBAccess:[sender intValue]];	
     int fiber = [model fiberSelectForBBAccess];
     int index = [[sender selectedCell] tag];
@@ -2209,7 +2348,10 @@
 
 - (void) fiberSelectForBBStatusBitsPUAction:(id)sender
 {
-	[model setFiberSelectForBBStatusBits:[fiberSelectForBBStatusBitsPU indexOfSelectedItem]];	
+    if(sender==fiberSelectForBBStatusBitsPU)
+    	[model setFiberSelectForBBStatusBits:[fiberSelectForBBStatusBitsPU indexOfSelectedItem]];	
+    if(sender==fiberSelectForFICCardPU)
+    	[model setFiberSelectForBBStatusBits:[fiberSelectForFICCardPU indexOfSelectedItem]];	
 }
 
 

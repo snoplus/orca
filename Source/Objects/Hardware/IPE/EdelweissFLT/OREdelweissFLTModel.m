@@ -36,6 +36,11 @@
 
 //#import "ipe4tbtools.cpp"
 
+NSString* OREdelweissFLTModelFicCardTriggerCmdChanged = @"OREdelweissFLTModelFicCardTriggerCmdChanged";
+NSString* OREdelweissFLTModelFicCardADC23CtrlRegChanged = @"OREdelweissFLTModelFicCardADC23CtrlRegChanged";
+NSString* OREdelweissFLTModelFicCardADC01CtrlRegChanged = @"OREdelweissFLTModelFicCardADC01CtrlRegChanged";
+NSString* OREdelweissFLTModelFicCardCtrlReg2Changed = @"OREdelweissFLTModelFicCardCtrlReg2Changed";
+NSString* OREdelweissFLTModelFicCardCtrlReg1Changed = @"OREdelweissFLTModelFicCardCtrlReg1Changed";
 NSString* OREdelweissFLTModelPollBBStatusIntervallChanged = @"OREdelweissFLTModelPollBBStatusIntervallChanged";
 NSString* OREdelweissFLTModelProgressOfChargeBBChanged = @"OREdelweissFLTModelProgressOfChargeBBChanged";
 NSString* OREdelweissFLTModelChargeBBFileForFiberChanged = @"OREdelweissFLTModelChargeBBFileForFiberChanged";
@@ -335,6 +340,76 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
 
+- (uint32_t) ficCardTriggerCmdForFiber:(int)aFiber
+{
+    return ficCardTriggerCmd[aFiber];
+}
+
+- (void) setFicCardTriggerCmd:(uint32_t)aFicCardTriggerCmd  forFiber:(int)aFiber
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setFicCardTriggerCmd:ficCardTriggerCmd[aFiber] forFiber:aFiber];
+    
+    ficCardTriggerCmd[aFiber] = aFicCardTriggerCmd;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelFicCardTriggerCmdChanged object:self];
+}
+
+- (uint32_t) ficCardADC23CtrlRegForFiber:(int)aFiber
+{
+    return ficCardADC23CtrlReg[aFiber];
+}
+
+- (void) setFicCardADC23CtrlReg:(uint32_t)aFicCardADC23CtrlReg forFiber:(int)aFiber
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setFicCardADC23CtrlReg:ficCardADC23CtrlReg[aFiber] forFiber:aFiber];
+    
+    ficCardADC23CtrlReg[aFiber] = aFicCardADC23CtrlReg;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelFicCardADC23CtrlRegChanged object:self];
+}
+
+- (uint32_t) ficCardADC01CtrlRegForFiber:(int)aFiber
+{
+    return ficCardADC01CtrlReg[aFiber];
+}
+
+- (void) setFicCardADC01CtrlReg:(uint32_t)aFicCardADC01CtrlReg forFiber:(int)aFiber
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setFicCardADC01CtrlReg:ficCardADC01CtrlReg[aFiber] forFiber:aFiber];
+    
+    ficCardADC01CtrlReg[aFiber] = aFicCardADC01CtrlReg;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelFicCardADC01CtrlRegChanged object:self];
+}
+
+- (uint32_t) ficCardCtrlReg2ForFiber:(int)aFiber
+{
+    return ficCardCtrlReg2[aFiber];
+}
+
+- (void) setFicCardCtrlReg2:(uint32_t)aFicCardCtrlReg2 forFiber:(int)aFiber
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setFicCardCtrlReg2:ficCardCtrlReg2[aFiber] forFiber:aFiber];
+    
+    ficCardCtrlReg2[aFiber] = aFicCardCtrlReg2;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelFicCardCtrlReg2Changed object:self];
+}
+
+- (uint32_t) ficCardCtrlReg1ForFiber:(int)aFiber
+{
+    return ficCardCtrlReg1[aFiber];
+}
+
+- (void) setFicCardCtrlReg1:(uint32_t)aFicCardCtrlReg1 forFiber:(int)aFiber
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setFicCardCtrlReg1:ficCardCtrlReg1[aFiber] forFiber:aFiber];
+    
+    ficCardCtrlReg1[aFiber] = aFicCardCtrlReg1;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelFicCardCtrlReg1Changed object:self];
+}
+
 - (int) pollBBStatusIntervall
 {
     return pollBBStatusIntervall;
@@ -480,6 +555,82 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelWriteToBBModeChanged object:self];
 }
 
+- (void) setDefaultsToBB:(int)fiber
+{
+    int i;
+    int defaultTriRect=0;
+    for(i=0; i<6; i++){
+        //[[ self undoManager ] setActionName: @"Set BB Defaults Tri+Rect" ]; 			// set name of undo
+        [self setTriDacForFiber: fiber atIndex:i to:defaultTriRect];
+        [self setRectDacForFiber: fiber atIndex:i to:defaultTriRect];
+    }
+    int defaultPolar=0;
+    for(i=0; i<11; i++){
+        [self setPolarDacForFiber: fiber atIndex:i to:defaultPolar];
+    }
+    
+    [self setDacaForFiber:fiber atIndex:0 to:1];
+    [self setDacaForFiber:fiber atIndex:1 to:3];
+    [self setDacaForFiber:fiber atIndex:2 to:5];
+    [self setDacaForFiber:fiber atIndex:3 to:7];
+    
+    [self setD2ForFiber:fiber to:200];
+    [self setD3ForFiber:fiber to:500];
+    
+	[self setAdcOnOffForBBAccessForFiber:fiber to:0xf];
+	[self setRefForBBAccessForFiber:fiber to:0x1];
+
+}
+
+- (void) writeDefaultsToBB:(int)fiber
+{
+    //DEBUG    
+    NSLog(@"%@::%@  \n", NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG testing ...-tb-
+
+    int i;
+    for(i=0; i<6; i++){
+        //[[ self undoManager ] setActionName: @"Set BB Defaults Tri+Rect" ]; 			// set name of undo
+        [self writeTriDacForFiber: fiber atIndex:i];
+        [self writeRectDacForFiber: fiber atIndex:i];
+    }
+
+    for(i=0; i<11; i++){
+        [self writePolarDacForFiber: fiber atIndex:i];
+    }
+    
+    [self writeAdcRgForBBAccessForFiber:fiber atIndex:0];//writes: daca, signa, dacb,signb, Rg
+    [self writeAdcRgForBBAccessForFiber:fiber atIndex:1];//writes: daca, signa, dacb,signb, Rg
+    [self writeAdcRgForBBAccessForFiber:fiber atIndex:2];//writes: daca, signa, dacb,signb, Rg
+    [self writeAdcRgForBBAccessForFiber:fiber atIndex:3];//writes: daca, signa, dacb,signb, Rg
+    
+    [self writeD2ForBBAccessForFiber:fiber];
+    [self writeD3ForBBAccessForFiber:fiber];
+    
+	[self writeRelaisStatesForBBAccessForFiber:fiber];//writes Ref, ADCSon/off,relais1+2,mez
+
+
+}
+
+- (void) writeAllToBB:(int)fiber
+{
+    //DEBUG    
+    NSLog(@"%@::%@  \n", NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG testing ...-tb-
+    [self writeDefaultsToBB:fiber];
+
+    [self writeAdcRgForBBAccessForFiber: fiber atIndex:4];//writes: daca, signa, dacb,signb, Rg
+    [self writeAdcRgForBBAccessForFiber: fiber atIndex:5];//writes: daca, signa, dacb,signb, Rg
+        
+    int i;
+    for(i=0; i<6; i++){
+        [self writeAdcFilterForBBAccessForFiber: fiber atIndex:i];//writes: freq, gain
+    }
+
+    [self writeRgRtForBBAccessForFiber: fiber];
+    [self writePolarDacForFiber: fiber atIndex:11];
+
+}
+
+
 - (unsigned int) wCmdArg2
 {
     return wCmdArg2;
@@ -611,7 +762,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (void) setDacaForFiber:(int)aFiber atIndex:(int)aIndex to:(int)aDaca
 {
     //undo
-    int oldVal = [self signaForFiber:aFiber atIndex:aIndex];
+    int oldVal = [self dacaForFiber:aFiber atIndex:aIndex];
     [[[self undoManager] prepareWithInvocationTarget:self] setDacaForFiber: aFiber atIndex:aIndex to: oldVal];
     
     int off = kBBstatusRg;
@@ -694,6 +845,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 }
 
 //dont confuse adcRg with Rg! -tb-
+//writeAdcRg writes: daca, signa, dacb,signb, Rg
 - (void) writeAdcRgForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex//HW access
 {
     uint16_t val = [self statusBB16forFiber: aFiber atIndex: (kBBstatusRg + aIndex)];
@@ -792,7 +944,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (void) setD2ForFiber:(int)aFiber to:(int)aValue
 {
     //undo
-    int oldVal = [self relaisStatesBBForFiber:aFiber];
+    int oldVal = [self D2ForFiber:aFiber];
     [[[self undoManager] prepareWithInvocationTarget:self] setD2ForFiber: aFiber to: oldVal];
     
     int off = kBBstatusD2;
@@ -836,7 +988,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (void) setD3ForFiber:(int)aFiber to:(int)aValue
 {
     //undo
-    int oldVal = [self relaisStatesBBForFiber:aFiber];
+    int oldVal = [self D3ForFiber:aFiber];
     [[[self undoManager] prepareWithInvocationTarget:self] setD3ForFiber: aFiber to: oldVal];
     
     int off = kBBstatusD3;
@@ -906,7 +1058,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 */
 }
 
-
+//Gain
 - (int) adcMultForBBAccessForFiber:(int)aFiber atIndex:(int)aIndex
 {
     //return adcMultForBBAccess;
@@ -1016,7 +1168,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (void) setIdBBforBBAccessForFiber:(int)aFiber to:(int)aIdBBforBBAccess
 {
     //undo
-    int oldVal = [self relaisStatesBBForFiber:aFiber];
+    int oldVal = [self idBBforBBAccessForFiber:aFiber];
     [[[self undoManager] prepareWithInvocationTarget:self] setIdBBforBBAccessForFiber: aFiber to: oldVal];
     
     int off = kBBstatusSerNum;
@@ -1096,9 +1248,13 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (void) setRefForBBAccessForFiber:(int)aFiber to:(int)aValue
 {
+    int oldVal = [self refForBBAccessForFiber:aFiber];
+    [[[self undoManager] prepareWithInvocationTarget:self] setRefForBBAccessForFiber: aFiber to: oldVal];
+    
     int off = kBBstatusRelais;
     uint16_t mask = kBBRefMask;
     int shift = kBBRefShift;
+    
     //set new value
     [self setStatusBB16forFiber:aFiber atOffset:off index:0 mask:mask shift:shift to:aValue];
     
@@ -1122,6 +1278,9 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (void) setAdcOnOffForBBAccessForFiber:(int)aFiber to:(int)aValue
 {
+    int oldVal = [self adcOnOffForBBAccessForFiber:aFiber];
+    [[[self undoManager] prepareWithInvocationTarget:self] setAdcOnOffForBBAccessForFiber: aFiber to: oldVal];
+    
     int off = kBBstatusRelais;
     uint16_t mask = kBBADCMask;
     int shift = kBBADCShift;
@@ -1142,6 +1301,9 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (void) setRelais1ForBBAccessForFiber:(int)aFiber to:(int)aValue
 {
+    int oldVal = [self relais1ForBBAccessForFiber:aFiber];
+    [[[self undoManager] prepareWithInvocationTarget:self] setRelais1ForBBAccessForFiber: aFiber to: oldVal];
+
     int off = kBBstatusRelais;
     uint16_t mask = kBBRelais1Mask;
     int shift = kBBRelais1Shift;
@@ -1161,6 +1323,9 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (void) setRelais2ForBBAccessForFiber:(int)aFiber to:(int)aValue
 {
+    int oldVal = [self relais2ForBBAccessForFiber:aFiber];
+    [[[self undoManager] prepareWithInvocationTarget:self] setRelais2ForBBAccessForFiber: aFiber to: oldVal];
+
     int off = kBBstatusRelais;
     uint16_t mask = kBBRelais2Mask;
     int shift = kBBRelais2Shift;
@@ -1180,6 +1345,9 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (void) setMezForBBAccessForFiber:(int)aFiber to:(int)aValue
 {
+    int oldVal = [self mezForBBAccessForFiber:aFiber];
+    [[[self undoManager] prepareWithInvocationTarget:self] setMezForBBAccessForFiber: aFiber to: oldVal];
+
     int off = kBBstatusRelais;
     uint16_t mask = kBBMezMask;
     int shift = kBBMezShift;
@@ -1201,7 +1369,11 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 {
     //return adcValueForBBAccess;
     int currVal = [self statusBB16forFiber: aFiber atIndex: (kBBstatusDAC + aIndex)];
-    currVal -= 0x8000; //Edelweiss 16 bit mapping: mapping reg. value 0x0000...0xffff to phys. value -0x8000...0x7fff(=-32768...32767)
+    if(aIndex<=7 || aIndex>=11){
+        currVal -= 0x8000; //Edelweiss 16 bit mapping: mapping reg. value 0x0000...0xffff to phys. value -0x8000...0x7fff(=-32768...32767)
+    }else{
+        //DAC # 9,10,11: 0... 65537
+    }
     return currVal;
 }
 
@@ -1210,9 +1382,15 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     int oldVal = [self polarDacForFiber:aFiber atIndex:aIndex];
     [[[self undoManager] prepareWithInvocationTarget:self] setPolarDacForFiber: aFiber atIndex:aIndex to: oldVal];
     
-    aDacValue=[self restrictIntValue:   aDacValue   min:-0x8000 max:0x7fff];
-    [self setStatusBB16forFiber:aFiber atIndex:(kBBstatusDAC + aIndex) to: aDacValue+0x8000];
-
+    if(aIndex<=7 || aIndex>=11){
+        aDacValue=[self restrictIntValue:   aDacValue   min:-0x8000 max:0x7fff];
+        [self setStatusBB16forFiber:aFiber atIndex:(kBBstatusDAC + aIndex) to: aDacValue+0x8000];
+    }else{
+        //DAC # 9,10,11: 0... 65537
+        aDacValue=[self restrictIntValue:   aDacValue   min:0 max:65535];
+        [self setStatusBB16forFiber:aFiber atIndex:(kBBstatusDAC + aIndex) to: aDacValue];
+    }
+    
     NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
     [userInfo setObject:[NSNumber numberWithInt:aIndex] forKey: OREdelweissFLTIndex];
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelPolarDacChanged  object:self userInfo: userInfo];
@@ -3334,6 +3512,14 @@ for(chan=0; chan<6;chan++)
 	
     [[self undoManager] disableUndoRegistration];
     
+    int i;
+    for(i=0; i<kNumEWFLTFibers; i++){
+        [self setFicCardTriggerCmd:[decoder decodeIntForKey: [NSString stringWithFormat: @"ficCardTriggerCmd%i",i]] forFiber:i];
+        [self setFicCardADC23CtrlReg:[decoder decodeIntForKey: [NSString stringWithFormat: @"ficCardADC23CtrlReg%i",i]] forFiber:i]; 
+        [self setFicCardADC01CtrlReg:[decoder decodeIntForKey: [NSString stringWithFormat: @"ficCardADC01CtrlReg%i",i]] forFiber:i];  
+        [self setFicCardCtrlReg2:[decoder decodeIntForKey: [NSString stringWithFormat: @"ficCardCtrlReg2%i",i]] forFiber:i]; 
+        [self setFicCardCtrlReg1:[decoder decodeIntForKey: [NSString stringWithFormat: @"ficCardCtrlReg1%i",i]] forFiber:i];
+    }
     [self setPollBBStatusIntervall:[decoder decodeIntForKey:@"pollBBStatusIntervall"]];
     [self setChargeBBFile:[decoder decodeObjectForKey:@"chargeBBFileForFiber0"] forFiber:0 ];
     [self setChargeBBFile:[decoder decodeObjectForKey:@"chargeBBFileForFiber1"] forFiber:1 ];
@@ -3406,7 +3592,7 @@ for(chan=0; chan<6;chan++)
     [self setSelectedRegIndex:  [decoder decodeIntForKey:@"selectedRegIndex"]];
     [self setSelectedChannelValue:  [decoder decodeIntForKey:@"selectedChannelValue"]];
 	
-	int i;
+	//int i;
 	if(!thresholds){
 		[self setThresholds: [NSMutableArray array]];
 		for(i=0;i<kNumEWFLTHeatIonChannels;i++) [thresholds addObject:[NSNumber numberWithInt:50]];
@@ -3453,6 +3639,14 @@ for(chan=0; chan<6;chan++)
 {
     [super encodeWithCoder:encoder];
 	
+    int i;
+    for(i=0; i<kNumEWFLTFibers; i++){
+        [encoder encodeInt:ficCardTriggerCmd[i] forKey: [NSString stringWithFormat: @"ficCardTriggerCmd%i",i]];
+        [encoder encodeInt:ficCardADC23CtrlReg[i] forKey: [NSString stringWithFormat: @"ficCardADC23CtrlReg%i",i]];
+        [encoder encodeInt:ficCardADC01CtrlReg[i] forKey: [NSString stringWithFormat: @"ficCardADC01CtrlReg%i",i]]; 
+        [encoder encodeInt:ficCardCtrlReg2[i] forKey: [NSString stringWithFormat: @"ficCardCtrlReg2%i",i]]; 
+        [encoder encodeInt:ficCardCtrlReg1[i] forKey: [NSString stringWithFormat: @"ficCardCtrlReg1%i",i]];
+    }
     [encoder encodeInt:pollBBStatusIntervall forKey:@"pollBBStatusIntervall"];
     [encoder encodeObject:chargeBBFileForFiber[0] forKey:@"chargeBBFileForFiber0"];
     [encoder encodeObject:chargeBBFileForFiber[1] forKey:@"chargeBBFileForFiber1"];
@@ -3523,7 +3717,7 @@ for(chan=0; chan<6;chan++)
     [encoder encodeInt:hitRateEnabledMask	forKey:@"hitRateEnabledMask"];
     [encoder encodeObject:gains				forKey:@"gains"];
     [encoder encodeObject:thresholds		forKey:@"thresholds"];
-    int i;
+    //int i;
 	for(i=0;i<kNumEWFLTHeatIonChannels;i++)    [triggerParameter replaceObjectAtIndex:i withObject:[NSNumber numberWithUnsignedInt:triggerPar[i]]];
     [encoder encodeObject:triggerParameter	forKey:@"triggerParameter"];
     [encoder encodeObject:totalRate			forKey:@"totalRate"];

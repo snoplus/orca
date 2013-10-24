@@ -175,9 +175,15 @@
     int ionToHeatDelay;
     NSString* chargeBBFile;
     uint32_t BB0x0ACmdMask;
-    NSString* chargeBBFileForFiber[6];
+    NSString* chargeBBFileForFiber[kNumEWFLTFibers];
     int progressOfChargeBB;
     int pollBBStatusIntervall;
+    
+    uint32_t ficCardCtrlReg1[kNumEWFLTFibers];
+    uint32_t ficCardCtrlReg2[kNumEWFLTFibers];
+    uint32_t ficCardADC01CtrlReg[kNumEWFLTFibers];
+    uint32_t ficCardADC23CtrlReg[kNumEWFLTFibers];
+    uint32_t ficCardTriggerCmd[kNumEWFLTFibers];
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
@@ -188,6 +194,16 @@
 - (short) getNumberRegisters;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+- (uint32_t) ficCardTriggerCmdForFiber:(int)aFiber;
+- (void) setFicCardTriggerCmd:(uint32_t)aFicCardTriggerCmd forFiber:(int)aFiber;
+- (uint32_t) ficCardADC23CtrlRegForFiber:(int)aFiber;
+- (void) setFicCardADC23CtrlReg:(uint32_t)aFicCardADC23CtrlReg forFiber:(int)aFiber;
+- (uint32_t) ficCardADC01CtrlRegForFiber:(int)aFiber;
+- (void) setFicCardADC01CtrlReg:(uint32_t)aFicCardADC01CtrlReg forFiber:(int)aFiber;
+- (uint32_t) ficCardCtrlReg2ForFiber:(int)aFiber;
+- (void) setFicCardCtrlReg2:(uint32_t)aFicCardCtrlReg2 forFiber:(int)aFiber;
+- (uint32_t) ficCardCtrlReg1ForFiber:(int)aFiber;
+- (void) setFicCardCtrlReg1:(uint32_t)aFicCardCtrlReg1 forFiber:(int)aFiber;
 - (int) pollBBStatusIntervall;
 - (void) setPollBBStatusIntervall:(int)aPollBBStatusIntervall;
 - (int) progressOfChargeBB;
@@ -205,6 +221,10 @@
 - (void) setLowLevelRegInHex:(int)aLowLevelRegInHex;
 - (int) writeToBBMode;
 - (void) setWriteToBBMode:(int)aWriteToBBMode;
+- (void) setDefaultsToBB:(int)aFiber;
+- (void) writeDefaultsToBB:(int)aFiber;
+- (void) writeAllToBB:(int)aFiber;
+
 - (unsigned int) wCmdArg2;
 - (void) setWCmdArg2:(unsigned int)aWCmdArg2;
 - (unsigned int) wCmdArg1;
@@ -593,6 +613,11 @@
 				  n:(int) n;
 @end
 
+extern NSString* OREdelweissFLTModelFicCardTriggerCmdChanged;
+extern NSString* OREdelweissFLTModelFicCardADC23CtrlRegChanged;
+extern NSString* OREdelweissFLTModelFicCardADC01CtrlRegChanged;
+extern NSString* OREdelweissFLTModelFicCardCtrlReg2Changed;
+extern NSString* OREdelweissFLTModelFicCardCtrlReg1Changed;
 extern NSString* OREdelweissFLTModelPollBBStatusIntervallChanged;
 extern NSString* OREdelweissFLTModelProgressOfChargeBBChanged;
 extern NSString* OREdelweissFLTModelChargeBBFileForFiberChanged;

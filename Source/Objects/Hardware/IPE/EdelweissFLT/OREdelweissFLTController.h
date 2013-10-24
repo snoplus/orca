@@ -39,6 +39,14 @@
 	IBOutlet   NSTextField* wCmdArg1TextField;
 	IBOutlet   NSTextField* wCmdCodeTextField;
     
+    //FIC Tab
+	IBOutlet   NSTextField* ficCardTriggerCmdTextField;
+	IBOutlet   NSTextField* ficCardADC23CtrlRegTextField;
+	IBOutlet   NSTextField* ficCardADC01CtrlRegTextField;
+	IBOutlet   NSTextField* ficCardCtrlReg2TextField;
+	IBOutlet   NSTextField* ficCardCtrlReg1TextField;
+    IBOutlet   NSPopUpButton* fiberSelectForFICCardPU;
+    
     //Trigger Tab
 	IBOutlet   NSTextField* heatChannelsTextField;
 	IBOutlet   NSTextField* ionChannelsTextField;
@@ -81,6 +89,8 @@
     IBOutlet   NSProgressIndicator*	pollBBStatusIntervallIndicator;
 	IBOutlet   NSButton*    writeToBBModeCB;
     IBOutlet   NSProgressIndicator*	writeToBBModeIndicator;
+    IBOutlet   NSSegmentedControl*	setWriteToBBSegControl;
+    
 	IBOutlet   NSMatrix* adcValueForBBAccessMatrix;
 	IBOutlet   NSMatrix* adcMultForBBAccessMatrix;
 	IBOutlet   NSMatrix* adcFreqkHzForBBAccessMatrix;
@@ -177,6 +187,7 @@
 		NSSize					triggerSize;
 		NSSize					rateSize;
 		NSSize					BBAccessSize;
+		NSSize					ficSize;
 		NSSize					testSize;
 		NSSize					lowlevelSize;
 		NSView*					blankView;
@@ -213,6 +224,11 @@
 - (void) updateButtons;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+- (void) ficCardTriggerCmdChanged:(NSNotification*)aNote;
+- (void) ficCardADC23CtrlRegChanged:(NSNotification*)aNote;
+- (void) ficCardADC01CtrlRegChanged:(NSNotification*)aNote;
+- (void) ficCardCtrlReg2Changed:(NSNotification*)aNote;
+- (void) ficCardCtrlReg1Changed:(NSNotification*)aNote;
 - (void) pollBBStatusIntervallChanged:(NSNotification*)aNote;
 - (void) progressOfChargeBBChanged:(NSNotification*)aNote;
 - (void) chargeBBFileForFiberChanged:(NSNotification*)aNote;
@@ -303,6 +319,11 @@
 - (void) selectedChannelValueChanged:(NSNotification*) aNote;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+- (IBAction) ficCardTriggerCmdTextFieldAction:(id)sender;
+- (IBAction) ficCardADC23CtrlRegTextFieldAction:(id)sender;
+- (IBAction) ficCardADC01CtrlRegTextFieldAction:(id)sender;
+- (IBAction) ficCardCtrlReg2TextFieldAction:(id)sender;
+- (IBAction) ficCardCtrlReg1TextFieldAction:(id)sender;
 - (IBAction) pollBBStatusIntervallPUAction:(id)sender;
 - (IBAction) devTabButtonAction:(id) sender;
 - (IBAction) killChargeBBJobButtonAction:(id) sender;
@@ -322,6 +343,9 @@
 - (IBAction) ionTriggerMaskTextFieldAction:(id)sender;
 - (IBAction) lowLevelRegInHexPUAction:(id)sender;
 - (IBAction) writeToBBModeCBAction:(id)sender;
+- (IBAction) writeAllToBBButtonAction:(id)sender;
+- (IBAction) setDefaultsToBBButtonAction:(id)sender;
+- (IBAction) setAndWriteDefaultsToBBButtonAction:(id)sender;
 - (IBAction) wCmdArg2TextFieldAction:(id)sender;
 - (IBAction) wCmdArg1TextFieldAction:(id)sender;
 - (IBAction) wCmdCodeTextFieldAction:(id)sender;
