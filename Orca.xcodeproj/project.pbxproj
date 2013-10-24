@@ -148,6 +148,13 @@
 		2D51C61115B5A115000F0ACD /* OREdelweissFLTModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D51C60815B5A115000F0ACD /* OREdelweissFLTModel.h */; };
 		2D51C61215B5A115000F0ACD /* OREdelweissFLTModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D51C60915B5A115000F0ACD /* OREdelweissFLTModel.m */; };
 		2D556352109F4CBE00A65E6C /* Needle in Resources */ = {isa = PBXBuildFile; fileRef = 2D556351109F4CBE00A65E6C /* Needle */; };
+		2D7731A2181188F400070A4A /* LanNetio230.nib in Resources */ = {isa = PBXBuildFile; fileRef = 2D77319B181188F400070A4A /* LanNetio230.nib */; };
+		2D7731A3181188F400070A4A /* LanNetio230.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2D77319C181188F400070A4A /* LanNetio230.tif */; };
+		2D7731A4181188F400070A4A /* LanNetio230Big.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2D77319D181188F400070A4A /* LanNetio230Big.tif */; };
+		2D7731A5181188F400070A4A /* ORLanNetio230Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D77319E181188F400070A4A /* ORLanNetio230Controller.h */; };
+		2D7731A6181188F400070A4A /* ORLanNetio230Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D77319F181188F400070A4A /* ORLanNetio230Controller.m */; };
+		2D7731A7181188F400070A4A /* ORLanNetio230Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D7731A0181188F400070A4A /* ORLanNetio230Model.h */; };
+		2D7731A8181188F400070A4A /* ORLanNetio230Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D7731A1181188F400070A4A /* ORLanNetio230Model.m */; };
 		2DAB012115EF988C00BC2540 /* EdelweissLogo.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2DAB011F15EF988C00BC2540 /* EdelweissLogo.tif */; };
 		2DAB012215EF988C00BC2540 /* KITLogo.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2DAB012015EF988C00BC2540 /* KITLogo.tif */; };
 		2DC1EE800F33724E00E93C75 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2DC1EE7F0F33724E00E93C75 /* WebKit.framework */; };
@@ -3454,6 +3461,13 @@
 		2D51C60815B5A115000F0ACD /* OREdelweissFLTModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OREdelweissFLTModel.h; path = EdelweissFLT/OREdelweissFLTModel.h; sourceTree = "<group>"; };
 		2D51C60915B5A115000F0ACD /* OREdelweissFLTModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OREdelweissFLTModel.m; path = EdelweissFLT/OREdelweissFLTModel.m; sourceTree = "<group>"; };
 		2D556351109F4CBE00A65E6C /* Needle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Needle; sourceTree = "<group>"; };
+		2D77319B181188F400070A4A /* LanNetio230.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = LanNetio230.nib; sourceTree = "<group>"; };
+		2D77319C181188F400070A4A /* LanNetio230.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = LanNetio230.tif; sourceTree = "<group>"; };
+		2D77319D181188F400070A4A /* LanNetio230Big.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = LanNetio230Big.tif; sourceTree = "<group>"; };
+		2D77319E181188F400070A4A /* ORLanNetio230Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORLanNetio230Controller.h; sourceTree = "<group>"; };
+		2D77319F181188F400070A4A /* ORLanNetio230Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORLanNetio230Controller.m; sourceTree = "<group>"; };
+		2D7731A0181188F400070A4A /* ORLanNetio230Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORLanNetio230Model.h; sourceTree = "<group>"; };
+		2D7731A1181188F400070A4A /* ORLanNetio230Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORLanNetio230Model.m; sourceTree = "<group>"; };
 		2DAB011F15EF988C00BC2540 /* EdelweissLogo.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = EdelweissLogo.tif; path = EdelweissFLT/EdelweissLogo.tif; sourceTree = "<group>"; };
 		2DAB012015EF988C00BC2540 /* KITLogo.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = KITLogo.tif; path = EdelweissFLT/KITLogo.tif; sourceTree = "<group>"; };
 		2DC1EE7F0F33724E00E93C75 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
@@ -6692,6 +6706,20 @@
 				2D51C60915B5A115000F0ACD /* OREdelweissFLTModel.m */,
 			);
 			name = EdelweissFLT;
+			sourceTree = "<group>";
+		};
+		2D77319A181188F400070A4A /* LanNetio230 */ = {
+			isa = PBXGroup;
+			children = (
+				2D77319B181188F400070A4A /* LanNetio230.nib */,
+				2D77319C181188F400070A4A /* LanNetio230.tif */,
+				2D77319D181188F400070A4A /* LanNetio230Big.tif */,
+				2D77319E181188F400070A4A /* ORLanNetio230Controller.h */,
+				2D77319F181188F400070A4A /* ORLanNetio230Controller.m */,
+				2D7731A0181188F400070A4A /* ORLanNetio230Model.h */,
+				2D7731A1181188F400070A4A /* ORLanNetio230Model.m */,
+			);
+			path = LanNetio230;
 			sourceTree = "<group>";
 		};
 		546D9DA60874BDD60072A274 /* TDC2228A */ = {
@@ -10834,6 +10862,7 @@
 				848E59101472B34400A70AB4 /* TTCPX400DP */,
 				8494C01C1316CEBA00151E7B /* BootBar */,
 				84BA5F240F70388C00CF92D6 /* ZupSupply */,
+				2D77319A181188F400070A4A /* LanNetio230 */,
 				84B28D600F4C658400E2B056 /* NplPicoCoulombMeter */,
 				EFEBD88B1327588F00C96C86 /* SymmetricomXLGPS */,
 			);
@@ -14381,6 +14410,8 @@
 				8497E609180C5A1E00CE974A /* ORA3818View.h in Headers */,
 				8497E612180C640D00CE974A /* ORV2718Controller.h in Headers */,
 				8497E614180C640D00CE974A /* ORV2718Model.h in Headers */,
+				2D7731A5181188F400070A4A /* ORLanNetio230Controller.h in Headers */,
+				2D7731A7181188F400070A4A /* ORLanNetio230Model.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -15296,6 +15327,9 @@
 				8497E603180C5A1E00CE974A /* A3818Card.gif in Resources */,
 				8497E616180C640D00CE974A /* V2718.nib in Resources */,
 				8497E617180C640D00CE974A /* V2718Card.gif in Resources */,
+				2D7731A2181188F400070A4A /* LanNetio230.nib in Resources */,
+				2D7731A3181188F400070A4A /* LanNetio230.tif in Resources */,
+				2D7731A4181188F400070A4A /* LanNetio230Big.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -16321,6 +16355,8 @@
 				8497E60A180C5A1E00CE974A /* ORA3818View.m in Sources */,
 				8497E613180C640D00CE974A /* ORV2718Controller.m in Sources */,
 				8497E615180C640D00CE974A /* ORV2718Model.m in Sources */,
+				2D7731A6181188F400070A4A /* ORLanNetio230Controller.m in Sources */,
+				2D7731A8181188F400070A4A /* ORLanNetio230Model.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
