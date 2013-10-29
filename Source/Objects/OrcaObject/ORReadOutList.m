@@ -62,7 +62,7 @@ NSString* NSReadOutListChangedNotification = @"NSReadOutListChangedNotification"
 
 - (NSMutableArray*) children
 {
-	return [NSArray arrayWithObject:object];
+	return [NSMutableArray arrayWithObject:object];
 }
 
 - (void) removeFromOwner

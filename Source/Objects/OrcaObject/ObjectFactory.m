@@ -99,7 +99,7 @@
 - (void)pasteboard:(NSPasteboard *)sender provideDataForType:(NSString *)type
 {
 	//load the saved objects pointers into the paste board.
-    NSMutableArray* pointerArray = [NSArray arrayWithObject:[NSNumber numberWithLong:(unsigned long)object]];
+    NSArray* pointerArray = [NSArray arrayWithObject:[NSNumber numberWithLong:(unsigned long)object]];
     
     NSMutableData *itemData = [NSMutableData data];
     NSKeyedArchiver* archiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:itemData];
