@@ -425,7 +425,7 @@ NSString* plotButtonDisabled                 = @"plotButtonDisabled";
             [selectionString appendString:[self getCurrentDisplayValue]];
             [[NSNotificationCenter defaultCenter] postNotificationName:selectionStringChanged object:self userInfo:nil];
 		}else{
-			selectionString = [NSString stringWithFormat:@"No hardware selected\n"];
+			selectionString = [NSMutableString stringWithFormat:@"No hardware selected\n"];
 			[[NSNotificationCenter defaultCenter] postNotificationName:selectionStringChanged object:self userInfo:nil];
 		}
 
@@ -560,7 +560,7 @@ NSString* plotButtonDisabled                 = @"plotButtonDisabled";
                 [selectionString appendString:[self getCurrentDisplayValue]];
                 [[NSNotificationCenter defaultCenter] postNotificationName:selectionStringChanged object:self userInfo:nil];
             }else{
-                selectionString = [NSString stringWithFormat:@"No hardware selected\n"];
+                selectionString = [NSMutableString stringWithFormat:@"No hardware selected\n"];
                 [[NSNotificationCenter defaultCenter] postNotificationName:selectionStringChanged object:self userInfo:nil];
             }
 		
