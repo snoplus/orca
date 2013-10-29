@@ -203,7 +203,8 @@
 
 - (IBAction) portSet:(id)sender
 {
-    [model setPort:(NSUInteger)[portField integerValue]];
+    //MAH. Added cast to clear 10.9 compiler warning about other setPort methods
+    [(ORCouchDBListenerModel*)model setPort:(NSUInteger)[portField integerValue]];
 }
 
 - (IBAction) userNameSet:(id)Sender
