@@ -231,8 +231,8 @@
 		case typeOpr:
 			switch(p->opr.oper) {
 				case kMakeArgList:	
-					ptr = [self loadArray:ptr++ nodeType:p->opr.op[0]];
-					if(p->opr.nops == 2)ptr = [self loadArray:ptr++ nodeType:p->opr.op[1]];
+					ptr = [self loadArray:ptr nodeType:p->opr.op[0]];
+					if(p->opr.nops == 2)ptr = [self loadArray:ptr nodeType:p->opr.op[1]];
 					break;
 				default: break;
 			}
