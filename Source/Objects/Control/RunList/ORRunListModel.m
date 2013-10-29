@@ -370,7 +370,7 @@ static NSString* ORRunListDataOut	= @"ORRunListDataOut";
 			[tempArray removeObjectAtIndex:randomIndex];
 		} while([tempArray count]);
 	}
-	else orderArray = [[NSArray arrayWithArray:tempArray] retain];
+	else orderArray = [[NSMutableArray arrayWithArray:tempArray] retain];
 }
 
 - (id) objectAtWorkingIndex
