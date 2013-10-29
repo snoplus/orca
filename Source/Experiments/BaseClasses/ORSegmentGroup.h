@@ -73,8 +73,8 @@
 - (NSMutableArray*) segments;
 - (BOOL) hwPresent:(int)aChannel;
 - (BOOL) online:(int)aChannel;
-- (NSMutableDictionary*) colorAxisAttributes;
-- (void) setColorAxisAttributes:(NSMutableDictionary*)newcolorAxisAttributes;
+- (NSDictionary*) colorAxisAttributes;
+- (void) setColorAxisAttributes:(NSDictionary*)newcolorAxisAttributes;
 - (float) rate;
 - (float) getThreshold:(int) index;
 - (float) getRate:(int) index;

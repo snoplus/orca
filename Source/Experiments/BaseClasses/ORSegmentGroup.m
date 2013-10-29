@@ -265,12 +265,12 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 	return segments;
 }
 
-- (NSMutableDictionary*) colorAxisAttributes
+- (NSDictionary*) colorAxisAttributes
 {
     return colorAxisAttributes;
 }
 
-- (void) setColorAxisAttributes:(NSMutableDictionary*)newColorAxisAttributes
+- (void) setColorAxisAttributes:(NSDictionary*)newColorAxisAttributes
 {
 	[colorAxisAttributes release];
     colorAxisAttributes = [newColorAxisAttributes copy];
