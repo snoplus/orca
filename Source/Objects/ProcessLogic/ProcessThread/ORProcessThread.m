@@ -290,7 +290,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessThread);
     while([self isRunning]){
 		[self markAsCanceled];
 		
-		[NSThread sleepUntilDate:[[NSDate date] addTimeInterval:.05]];
+		[NSThread sleepUntilDate:[[NSDate date] dateByAddingTimeInterval:.05]];
 		totalTime += .05;
 		if(totalTime > 20){
 			NSLogColor([NSColor redColor], @"Process Failed to stop.....You should stop and restart ORCA!\n");

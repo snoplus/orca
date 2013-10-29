@@ -1621,7 +1621,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 				[client takeData:dataPacket userInfo:nil];
 			}
 			else {
-				[NSThread sleepUntilDate:[[NSDate date] addTimeInterval:.05]];
+				[NSThread sleepUntilDate:[[NSDate date] dateByAddingTimeInterval:.05]];
 			}
 		}
 		@catch(NSException* localException) {
