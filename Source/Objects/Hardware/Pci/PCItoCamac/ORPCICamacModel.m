@@ -851,7 +851,7 @@ static UInt32 *fVPCICamacMem;
 
 - (void) delay:(float)delayValue
 {
-    [NSThread sleepUntilDate:[[NSDate date] addTimeInterval:delayValue]];
+    [NSThread sleepUntilDate:[[NSDate date] dateByAddingTimeInterval:delayValue]];
 }
 
 // check status errors.

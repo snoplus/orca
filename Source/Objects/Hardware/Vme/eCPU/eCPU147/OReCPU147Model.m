@@ -356,7 +356,7 @@ const struct {
                                 withAddMod:0x39
                              usingAddSpace:kAccessRemoteRAM];
             
-			[NSThread sleepUntilDate:[[NSDate date] addTimeInterval:.1]];
+			[NSThread sleepUntilDate:[[NSDate date] dateByAddingTimeInterval:.1]];
 			[[self adapter] readLongBlock:(unsigned long*)&communicationBlock
                                 atAddress:MAC_DPM(COMM_ADDRESS_START)
                                 numToRead:sizeof(eCPU_MAC_DualPortComm)/4
@@ -365,7 +365,7 @@ const struct {
             
 			heartBeat = communicationBlock.heartbeat;
 			
-			[NSThread sleepUntilDate:[[NSDate date] addTimeInterval:.1]];
+			[NSThread sleepUntilDate:[[NSDate date] dateByAddingTimeInterval:.1]];
 			
 			[[self adapter] readLongBlock:(unsigned long*)&communicationBlock
                                 atAddress:MAC_DPM(COMM_ADDRESS_START)
