@@ -1259,7 +1259,7 @@ NSString* ORTek220GpibLock  = @"ORTek220GpibLock";
                 
                 // Oscilloscope was busy - Loop for a short while and then try again.
                 else {
-					[NSThread sleepUntilDate:[[NSDate date] addTimeInterval:.01]];
+					[NSThread sleepUntilDate:[[NSDate date] dateByAddingTimeInterval:.01]];
                     //NSTimeInterval t1 = [NSDate timeIntervalSinceReferenceDate];
                     //while([NSDate timeIntervalSinceReferenceDate] - t1 < .01 );
                 }

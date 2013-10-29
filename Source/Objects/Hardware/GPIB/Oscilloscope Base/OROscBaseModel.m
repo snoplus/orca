@@ -1065,7 +1065,7 @@ NSString*	OROscChnl								= @"Osc Chnl";
 		[ self markAsCancelled ];
 		//[[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
         //                     beforeDate:[NSDate dateWithTimeIntervalSinceNow:.01]];
-		[NSThread sleepUntilDate:[[NSDate date] addTimeInterval:.1]];
+		[NSThread sleepUntilDate:[[NSDate date] dateByAddingTimeInterval:.1]];
 		timeCount++;
 		if(timeCount >= 100){
             NSLog( @"time out waiting for scope thread to exit\n" );
