@@ -686,7 +686,7 @@ enum {
 		
 		[[self detector] setMuxEfficiency:currentMuxEfficiency];
 		[self setRunningAtReducedEfficiency:YES];
-		[self setReducedEfficiencyDate:[NSDate date]];
+		[self setReducedEfficiencyDate:[NSCalendarDate date]];
 		NSLog(@"Running Mux efficiency at %0.f%%\n",currentMuxEfficiency);
 	}
 }
