@@ -691,10 +691,11 @@
 	BOOL testsAreRunning  = [model testsRunning];
 	BOOL testingOrRunning = testsAreRunning | runInProgress;
     
-	if([model runMode] < 3 || [model runMode] > 6)	[modeTabView selectTabViewItemAtIndex:0];
+    //MAH. put in casts below to clear warning from XCode 5
+	if([(ORKatrinV4FLTModel*)model runMode] < 3 || [(ORKatrinV4FLTModel*)model runMode] > 6)	[modeTabView selectTabViewItemAtIndex:0];
 	else											[modeTabView selectTabViewItemAtIndex:1];
 	
-	[gapLengthPU setEnabled:!lockedOrRunningMaintenance && (([model runMode]<3) || ([model runMode]>6))];
+	[gapLengthPU setEnabled:!lockedOrRunningMaintenance && (([(ORKatrinV4FLTModel*)model runMode]<3) || ([(ORKatrinV4FLTModel*)model runMode]>6))];
 	[filterShapingLengthPU setEnabled:!lockedOrRunningMaintenance];
 	bool useBoxcar=([model filterShapingLength]==0);
 	[boxcarLengthPU setEnabled:!lockedOrRunningMaintenance && useBoxcar];
