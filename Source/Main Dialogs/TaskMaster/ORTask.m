@@ -320,7 +320,7 @@ NSString* ORTaskDidFinishNotification   = @"ORTaskDidFinishNotification";
 			[NSObject cancelPreviousPerformRequestsWithTarget:self];
 			[self performSelector:@selector(startTask) withObject:nil afterDelay:startIsDelayed?timeDelay:0.0];
 			if(startIsDelayed){
-				[nextRunTimeField setObjectValue:[[NSDate date] addTimeInterval:timeDelay]];
+				[nextRunTimeField setObjectValue:[[NSDate date] dateByAddingTimeInterval:timeDelay]];
                 [self setMessage:@"Delaying"];
 			}
 			else {
@@ -369,7 +369,7 @@ NSString* ORTaskDidFinishNotification   = @"ORTaskDidFinishNotification";
             [self setTaskState:eTaskWaiting];
             [NSObject cancelPreviousPerformRequestsWithTarget:self];
             [self performSelector:@selector(continueTask) withObject:nil afterDelay:timeInterval];
-            [nextRunTimeField setObjectValue:[[NSDate date] addTimeInterval:timeInterval]];
+            [nextRunTimeField setObjectValue:[[NSDate date] dateByAddingTimeInterval:timeInterval]];
             [self setMessage:@"Waiting"];
             [self cleanUp];
             NSLog(@"Task Finished: %@\n",[titleField stringValue]);
