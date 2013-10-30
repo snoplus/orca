@@ -640,8 +640,6 @@ NSString* ORGT521Lock = @"ORGT521Lock";
 
 - (void) timeout
 {
-	recordComingIn = NO;
-	statusComingIn = NO;
 	[super timeout];
 }
 
@@ -726,17 +724,17 @@ NSString* ORGT521Lock = @"ORGT521Lock";
             [self setSize2: [size2Part floatValue]];
             [self setCount2: [count2Part intValue]];
                             
-            recordComingIn = NO;
             [self setMissedCycleCount:0];
             [self startDataArrivalTimeout];
             
             [self postCouchDBRecord];
 		}
-
-        if(gotResponse){
-            [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-            [self performSelector:@selector(goToNextCommand) withObject:nil afterDelay:1];
-        }
+    }
+    if(gotResponse){
+        [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+        [self performSelector:@selector(goToNextCommand) withObject:nil afterDelay:1];
+    }
+    
 }
 
 - (void) processStatus:(NSString*)aString
@@ -745,7 +743,6 @@ NSString* ORGT521Lock = @"ORGT521Lock";
 	if([s isEqualToString:@"C"])	  [self setCountingMode:kGT521Counting];
 	else if([s isEqualToString:@"H"]) [self setCountingMode:kGT521Holding];
 	else if([s isEqualToString:@"S"]) [self setCountingMode:kGT521Stopped];
-	statusComingIn = NO;
 }
 
 - (void) startTimeOut
