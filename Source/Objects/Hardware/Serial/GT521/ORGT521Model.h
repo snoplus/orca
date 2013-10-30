@@ -28,7 +28,7 @@
 #define kGT521Holding   1
 #define kGT521Stopped   2
 
-#define kGT521DelayTime  0.1
+#define kGT521DelayTime  0.3
 
 @interface ORGT521Model : ORSerialPortWithQueueModel <ORAdcProcessing>
 {
@@ -116,7 +116,7 @@
 - (void) getFirmwareVersion;
 - (void) getLastRecord;					
 - (void) selectUnit;
-
+- (void) setSampleTime;
 #pragma mark •••Adc Processing Protocol
 - (void)processIsStarting;
 - (void)processIsStopping;

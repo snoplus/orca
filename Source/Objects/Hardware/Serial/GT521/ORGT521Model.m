@@ -78,7 +78,6 @@ NSString* ORGT521Lock = @"ORGT521Lock";
     [cycleStarted release];
     [measurementDate release];
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
-    [buffer release];
 	[missingCyclesAlarm release];
 	[missingCyclesAlarm clearAlarm];
 	
@@ -295,9 +294,7 @@ NSString* ORGT521Lock = @"ORGT521Lock";
 
 - (void) setCount2:(int)aCount2
 {
-	//normalize to counts/ft^3
-	//flow for this model is .1 ft^3/min
-    count2 = aCount2*10/(float)cycleDuration;;
+    count2 = aCount2;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGT521ModelCount2Changed object:self];
 	if(timeRates[1] == nil) timeRates[1] = [[ORTimeRate alloc] init];
 	[timeRates[1] addDataToTimeAverage:count2];
@@ -310,9 +307,7 @@ NSString* ORGT521Lock = @"ORGT521Lock";
 
 - (void) setCount1:(int)aCount1
 {
-	//normalize to counts/ft^3
-	//flow for this model is .1 ft^3/min
-    count1 = aCount1*10/(float)cycleDuration;
+    count1 = aCount1;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGT521ModelCount1Changed object:self];
 	if(timeRates[0] == nil) timeRates[0] = [[ORTimeRate alloc] init];
 	[timeRates[0] addDataToTimeAverage:count1];
@@ -435,6 +430,7 @@ NSString* ORGT521Lock = @"ORGT521Lock";
 - (void) getFirmwareVersion			{ [self addCmdToQueue:@"Q"]; }
 - (void) getLastRecord				{ [self addCmdToQueue:@"L"]; }
 - (void) selectUnit                 { [self addCmdToQueue:[NSString stringWithFormat:@"U%d",location]]; }
+- (void) setSampleTime              { [self addCmdToQueue:[NSString stringWithFormat:@"T%d",cycleDuration*60]]; }
 
 #pragma mark ***Polling and Cycles
 - (void) startCycle
@@ -451,6 +447,7 @@ NSString* ORGT521Lock = @"ORGT521Lock";
         NSDate* endTime = [now dateByAddingTimeInterval:[self cycleDuration]*60];
 		[self setCycleWillEnd:endTime]; 
 		[self clearBuffer];
+        [self setSampleTime];
 		[self startCounting];
 		[self checkCycle];
         [self startDataArrivalTimeout];
@@ -599,7 +596,6 @@ NSString* ORGT521Lock = @"ORGT521Lock";
 		NSDate* now = [NSDate date];
 		if([cycleWillEnd timeIntervalSinceDate:now] >= 0){
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORGT521ModelCycleWillEndChanged object:self];
-			//[self getMode];
 			[self performSelector:@selector(checkCycle) withObject:nil afterDelay:2];
 		}
 		else {
@@ -686,55 +682,46 @@ NSString* ORGT521Lock = @"ORGT521Lock";
 {
     theResponse = [theResponse removeNLandCRs];
 	//NSLog(@"response: %@\n",theResponse);
-    BOOL gotResponse = NO;
-    if([theResponse hasPrefix:@"UNIT"] || [theResponse hasPrefix:@"unit"]){
-        gotResponse = YES;
-    }
-    else if([theResponse hasPrefix:@"COUNT"] || [theResponse hasPrefix:@"count"]){
-        gotResponse = YES;
-    }
-	else {
 
-        [buffer appendString:theResponse];
-        [buffer autorelease];
-        buffer = [[[buffer componentsSeparatedByString:@"  "]componentsJoinedByString:@" "] mutableCopy] ;
+    buffer = [NSMutableString string];
+    [buffer appendString:theResponse];
+    buffer = [[[buffer componentsSeparatedByString:@"  "]componentsJoinedByString:@" "] mutableCopy] ;
 
-        NSArray* parts = [buffer componentsSeparatedByString:@","];
-        if([parts count] >= 10){
-            NSString* datePart		= [parts objectAtIndex:0];
-            NSString* timePart		= [parts objectAtIndex:1];
-            //id is part 2
-            NSString* size1Part		= [parts objectAtIndex:3];
-            NSString* count1Part	= [parts objectAtIndex:4];
-            NSString* size2Part		= [parts objectAtIndex:5];
-            NSString* count2Part	= [parts objectAtIndex:6];
-            if([datePart length] >= 6 && [timePart length] >= 6){
-                [self setMeasurementDate: [NSString stringWithFormat:@"%02d/%02d/%02d %02d:%02d:%02d",
-                                           [[datePart substringWithRange:NSMakeRange(0,2)]intValue],
-                                           [[datePart substringWithRange:NSMakeRange(2,2)]intValue],
-                                           [[datePart substringWithRange:NSMakeRange(4,2)]intValue],
-                                           [[timePart substringWithRange:NSMakeRange(0,2)]intValue],
-                                           [[timePart substringWithRange:NSMakeRange(2,2)]intValue],
-                                           [[timePart substringWithRange:NSMakeRange(4,2)]intValue]
-                                           ]];
-            }
-            
-            [self setSize1: [size1Part floatValue]];
-            [self setCount1: [count1Part intValue]];
-            [self setSize2: [size2Part floatValue]];
-            [self setCount2: [count2Part intValue]];
-                            
-            [self setMissedCycleCount:0];
-            [self startDataArrivalTimeout];
-            
-            [self postCouchDBRecord];
-            dataValid = YES;
-		}
+    NSArray* parts = [buffer componentsSeparatedByString:@","];
+    if([parts count] >= 10){
+        NSString* datePart		= [parts objectAtIndex:0];
+        NSString* timePart		= [parts objectAtIndex:1];
+        //id is part 2
+        NSString* size1Part		= [parts objectAtIndex:3];
+        NSString* count1Part	= [parts objectAtIndex:4];
+        NSString* size2Part		= [parts objectAtIndex:5];
+        NSString* count2Part	= [parts objectAtIndex:6];
+        if([datePart length] >= 6 && [timePart length] >= 6){
+            [self setMeasurementDate: [NSString stringWithFormat:@"%02d/%02d/%02d %02d:%02d:%02d",
+                                       [[datePart substringWithRange:NSMakeRange(0,2)]intValue],
+                                       [[datePart substringWithRange:NSMakeRange(2,2)]intValue],
+                                       [[datePart substringWithRange:NSMakeRange(4,2)]intValue],
+                                       [[timePart substringWithRange:NSMakeRange(0,2)]intValue],
+                                       [[timePart substringWithRange:NSMakeRange(2,2)]intValue],
+                                       [[timePart substringWithRange:NSMakeRange(4,2)]intValue]
+                                       ]];
+        }
+        
+        [self setSize1: [size1Part floatValue]];
+        [self setCount1: [count1Part intValue]];
+        [self setSize2: [size2Part floatValue]];
+        [self setCount2: [count2Part intValue]];
+                        
+        [self setMissedCycleCount:0];
+        [self startDataArrivalTimeout];
+        
+        [self postCouchDBRecord];
+        dataValid = YES;
     }
-    if(gotResponse){
-        [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-        [self performSelector:@selector(goToNextCommand) withObject:nil afterDelay:1];
-    }
+    
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+    [self performSelector:@selector(goToNextCommand) withObject:nil afterDelay:1];
+    
     
 }
 

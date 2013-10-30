@@ -61,10 +61,10 @@
 	aPlot = [[ORTimeLinePlot alloc] initWithTag:1 andDataSource:self];
 	[plotter0 addPlot: aPlot];
 	[aPlot setLineColor:[NSColor blueColor]];
-	[aPlot setName:@"5 ¬µm"];
+	[aPlot setName:@"5.0 ¬µm"];
 	[aPlot release];
 	
-	[plotter0 setYLabel:@"Counts/Ft^3/Min"];
+	[plotter0 setYLabel:@"Counts/Ft^3"];
 	[plotter0 setShowLegend:YES];
 
 	[(ORTimeAxis*)[plotter0 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
