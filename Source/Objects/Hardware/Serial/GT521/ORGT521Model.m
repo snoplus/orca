@@ -431,7 +431,7 @@ NSString* ORGT521Lock = @"ORGT521Lock";
 
 - (void) startCounting				{ [self addCmdToQueue:@"S"]; }
 - (void) stopCounting				{ [self addCmdToQueue:@"E"]; }
-- (void) clearBuffer				{ [self addCmdToQueue:@"B"]; }
+- (void) clearBuffer				{ [self addCmdToQueue:@"BY"]; }
 - (void) getFirmwareVersion			{ [self addCmdToQueue:@"Q"]; }
 - (void) getLastRecord				{ [self addCmdToQueue:@"L"]; }
 - (void) selectUnit                 { [self addCmdToQueue:[NSString stringWithFormat:@"U%d",location]]; }
