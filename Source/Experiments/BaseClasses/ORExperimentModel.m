@@ -48,6 +48,7 @@ NSString* ExperimentModelCustomColor2Changed             = @"ExperimentModelCust
 @interface ORExperimentModel (private)
 - (void) checkCardOld:(NSDictionary*)oldCardRecord new:(NSDictionary*)newCardRecord  check:(SEL)checkSelector exclude:(NSSet*)exclusionSet;
 - (void) delayedHistogram;
+- (void) postCouchDBRecord;
 @end
 
 @implementation ORExperimentModel
@@ -293,6 +294,12 @@ NSString* ExperimentModelCustomColor2Changed             = @"ExperimentModelCust
 
 	}
 	[self performSelector:@selector(collectRates) withObject:nil afterDelay:1.0];
+    
+    if(rateCounter%10 == 0){
+        [self postCouchDBRecord];
+    }
+    
+    rateCounter++;
 }
 
 #pragma mark •••Specific Dialog Lock Methods
@@ -889,6 +896,22 @@ NSString* ExperimentModelCustomColor2Changed             = @"ExperimentModelCust
 @end
 
 @implementation ORExperimentModel (private)
+- (void) postCouchDBRecord
+{
+  
+    NSMutableDictionary* objDictionary = [NSMutableDictionary dictionary];
+	id aSegmentGroup;
+	NSEnumerator* e = [segmentGroups objectEnumerator];
+    int groupIndex = 0;
+	while(aSegmentGroup = [e nextObject]){
+		NSArray* mapEntries = [[aSegmentGroup paramsAsString] componentsSeparatedByString:@"\n"];
+        [objDictionary setObject:mapEntries forKey:[NSString stringWithFormat:@"geometry%d",groupIndex]];
+        groupIndex++;
+	}
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:objDictionary];
+
+}
+
 - (void) checkCardOld:(NSDictionary*)oldRecord new:(NSDictionary*)newRecord  check:(SEL)checkSelector exclude:(NSSet*)exclusionSet
 {
     NSEnumerator* e = [oldRecord keyEnumerator];

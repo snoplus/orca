@@ -89,6 +89,7 @@
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary useName:(NSString*)aName;
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary useName:(NSString*)aName addInGroupName:(BOOL)addInGroupName;
 - (void) clearTotalCounts;
+- (NSString*) paramsAsString;
 
 #pragma mark •••Work Methods
 - (void) histogram;

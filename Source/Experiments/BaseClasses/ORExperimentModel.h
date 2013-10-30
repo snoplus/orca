@@ -39,6 +39,7 @@
     int             colorScaleType;
     NSColor*        customColor1;
     NSColor*        customColor2;
+    unsigned long   rateCounter;
 }
 
 - (id) init;

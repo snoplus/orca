@@ -470,17 +470,7 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 }
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary useName:(NSString*)aName addInGroupName:(BOOL)addInGroupName
 {
-    NSMutableString* theContents = [NSMutableString string];
-
-	BOOL putInHeader = NO;
-    for(id segment in segments){
-		if(!putInHeader){
-			[theContents appendString:[segment paramHeader]];
-			putInHeader = YES;
-		}
-        [theContents appendString:[segment paramsAsString]];
-        [theContents appendString:@"\n"];
-    }
+    NSString* theContents = [self paramsAsString];
 	if(addInGroupName){
 		NSMutableDictionary* mapDictionary = [NSMutableDictionary dictionary];
 		
@@ -494,6 +484,22 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 		else					 [dictionary setObject:@"NONE" forKey:aName];
 	}
     return dictionary;
+}
+
+- (NSString*) paramsAsString
+{
+    NSMutableString* theContents = [NSMutableString string];
+
+    BOOL putInHeader = NO;
+    for(id segment in segments){
+        if(!putInHeader){
+            [theContents appendString:[segment paramHeader]];
+            putInHeader = YES;
+        }
+        [theContents appendString:[segment paramsAsString]];
+        [theContents appendString:@"\n"];
+    }
+    return theContents;
 }
 
 #pragma mark •••Archival
