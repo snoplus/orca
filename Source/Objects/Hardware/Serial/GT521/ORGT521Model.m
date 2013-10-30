@@ -80,6 +80,7 @@ NSString* ORGT521Lock = @"ORGT521Lock";
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[missingCyclesAlarm release];
 	[missingCyclesAlarm clearAlarm];
+    [buffer release];
 	
 	int i;
 	for(i=0;i<2;i++){
@@ -683,40 +684,45 @@ NSString* ORGT521Lock = @"ORGT521Lock";
     theResponse = [theResponse removeNLandCRs];
 	//NSLog(@"response: %@\n",theResponse);
 
-    buffer = [NSMutableString string];
+    if(!buffer)buffer = [[NSMutableString string] retain];
     [buffer appendString:theResponse];
-    buffer = [[[buffer componentsSeparatedByString:@"  "]componentsJoinedByString:@" "] mutableCopy] ;
-
-    NSArray* parts = [buffer componentsSeparatedByString:@","];
-    if([parts count] >= 10){
-        NSString* datePart		= [parts objectAtIndex:0];
-        NSString* timePart		= [parts objectAtIndex:1];
-        //id is part 2
-        NSString* size1Part		= [parts objectAtIndex:3];
-        NSString* count1Part	= [parts objectAtIndex:4];
-        NSString* size2Part		= [parts objectAtIndex:5];
-        NSString* count2Part	= [parts objectAtIndex:6];
-        if([datePart length] >= 6 && [timePart length] >= 6){
-            [self setMeasurementDate: [NSString stringWithFormat:@"%02d/%02d/%02d %02d:%02d:%02d",
-                                       [[datePart substringWithRange:NSMakeRange(0,2)]intValue],
-                                       [[datePart substringWithRange:NSMakeRange(2,2)]intValue],
-                                       [[datePart substringWithRange:NSMakeRange(4,2)]intValue],
-                                       [[timePart substringWithRange:NSMakeRange(0,2)]intValue],
-                                       [[timePart substringWithRange:NSMakeRange(2,2)]intValue],
-                                       [[timePart substringWithRange:NSMakeRange(4,2)]intValue]
-                                       ]];
+    while([buffer rangeOfString:@"\r\n"].location!=NSNotFound){
+        NSRange r = [buffer rangeOfString:@"\r\n"];
+        NSString* line = [buffer substringToIndex:r.length+2];
+        [buffer replaceCharactersInRange:NSMakeRange(r.location,r.length+2) withString:@""];
+        if([line length]>2){
+            NSArray* parts = [line componentsSeparatedByString:@","];
+            if([parts count] >= 10){
+                NSString* datePart		= [parts objectAtIndex:0];
+                NSString* timePart		= [parts objectAtIndex:1];
+                //id is part 2
+                NSString* size1Part		= [parts objectAtIndex:3];
+                NSString* count1Part	= [parts objectAtIndex:4];
+                NSString* size2Part		= [parts objectAtIndex:5];
+                NSString* count2Part	= [parts objectAtIndex:6];
+                if([datePart length] >= 6 && [timePart length] >= 6){
+                    [self setMeasurementDate: [NSString stringWithFormat:@"%02d/%02d/%02d %02d:%02d:%02d",
+                                               [[datePart substringWithRange:NSMakeRange(0,2)]intValue],
+                                               [[datePart substringWithRange:NSMakeRange(2,2)]intValue],
+                                               [[datePart substringWithRange:NSMakeRange(4,2)]intValue],
+                                               [[timePart substringWithRange:NSMakeRange(0,2)]intValue],
+                                               [[timePart substringWithRange:NSMakeRange(2,2)]intValue],
+                                               [[timePart substringWithRange:NSMakeRange(4,2)]intValue]
+                                               ]];
+                }
+                
+                [self setSize1: [size1Part floatValue]];
+                [self setCount1: [count1Part intValue]];
+                [self setSize2: [size2Part floatValue]];
+                [self setCount2: [count2Part intValue]];
+                                
+                [self setMissedCycleCount:0];
+                [self startDataArrivalTimeout];
+                
+                [self postCouchDBRecord];
+                dataValid = YES;
+            }
         }
-        
-        [self setSize1: [size1Part floatValue]];
-        [self setCount1: [count1Part intValue]];
-        [self setSize2: [size2Part floatValue]];
-        [self setCount2: [count2Part intValue]];
-                        
-        [self setMissedCycleCount:0];
-        [self startDataArrivalTimeout];
-        
-        [self postCouchDBRecord];
-        dataValid = YES;
     }
     
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
