@@ -394,8 +394,10 @@ NSString* ORGT521Lock = @"ORGT521Lock";
 	[self setCycleDuration:		[decoder decodeIntForKey:@"cycleDuration"]];
 	[self setCountAlarmLimit:	[decoder decodeFloatForKey:@"countAlarmLimit"]];
 	[self setMaxCounts:			[decoder decodeFloatForKey:@"maxCounts"]];
+    if(location<=0)location = 1;
+    
 	[[self undoManager] enableUndoRegistration];
-
+    
 	int i; 
 	for(i=0;i<2;i++){
 		timeRates[i] = [[ORTimeRate alloc] init];
