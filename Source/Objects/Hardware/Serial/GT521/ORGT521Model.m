@@ -695,13 +695,14 @@ NSString* ORGT521Lock = @"ORGT521Lock";
 			buffer = [[[buffer componentsSeparatedByString:@"  "]componentsJoinedByString:@" "] mutableCopy] ;
 
 			NSArray* parts = [buffer componentsSeparatedByString:@" "];
-			if([parts count] >= 12){
-				NSString* datePart		= [parts objectAtIndex:1];
-				NSString* timePart		= [parts objectAtIndex:2];
-				NSString* size1Part		= [parts objectAtIndex:4];
-				NSString* count1Part	= [parts objectAtIndex:5];
-				NSString* size2Part		= [parts objectAtIndex:6];
-				NSString* count2Part	= [parts objectAtIndex:7];
+			if([parts count] >= 10){
+				NSString* datePart		= [parts objectAtIndex:0];
+				NSString* timePart		= [parts objectAtIndex:1];
+                //id is part 2
+				NSString* size1Part		= [parts objectAtIndex:3];
+				NSString* count1Part	= [parts objectAtIndex:4];
+				NSString* size2Part		= [parts objectAtIndex:5];
+				NSString* count2Part	= [parts objectAtIndex:6];
 				if([datePart length] >= 6 && [timePart length] >= 6){
 					[self setMeasurementDate: [NSString stringWithFormat:@"%02d/%02d/%02d %02d:%02d:%02d",
 											   [[datePart substringWithRange:NSMakeRange(0,2)]intValue],
