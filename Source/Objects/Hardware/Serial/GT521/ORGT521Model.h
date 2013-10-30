@@ -47,8 +47,6 @@
 		NSDate*		cycleStarted;
 		NSDate*		cycleWillEnd;
 		int			cycleNumber;
-		BOOL		recordComingIn;
-		BOOL		statusComingIn;
 		ORTimeRate*	timeRates[2];
 		BOOL		wasRunning;
 		float		maxCounts;

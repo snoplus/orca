@@ -409,7 +409,7 @@ NSString* ORGT521Lock = @"ORGT521Lock";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt:     location forKey:@"location"];
+    [encoder encodeInt:     location        forKey:@"location"];
     [encoder encodeFloat:	countAlarmLimit forKey:@"countAlarmLimit"];
     [encoder encodeFloat:	maxCounts		forKey:@"maxCounts"];
     [encoder encodeInt:		cycleDuration	forKey:@"cycleDuration"];
@@ -419,7 +419,8 @@ NSString* ORGT521Lock = @"ORGT521Lock";
 #pragma mark *** Commands
 - (void) addCmdToQueue:(NSString*)aCmd
 {
-   if([serialPort isOpen]){ 
+   if([serialPort isOpen]){
+       if(![aCmd hasSuffix:@"\r\n"]) aCmd = [aCmd stringByAppendingFormat:@"\r\n"];
 	   [self enqueueCmd:aCmd];
 	   [self enqueueCmd:@"++Delay"];
 		if(!lastRequest){
@@ -674,6 +675,7 @@ NSString* ORGT521Lock = @"ORGT521Lock";
 		else {
 			[self setLastRequest:aCmd];
 			[self startTimeOut];
+			[serialPort writeString:[NSString stringWithFormat:@"U%d\r\n",location]];
 			[serialPort writeString:aCmd];
 		}
 	}
@@ -685,118 +687,56 @@ NSString* ORGT521Lock = @"ORGT521Lock";
 - (void) process_response:(NSString*)theResponse
 {
 	//NSLog(@"response: %@\n",theResponse);
-    dataValid = YES;
+    BOOL gotResponse = NO;
+    if([theResponse hasPrefix:@"unit"]){
+        gotResponse = YES;
+    }
+    else if([theResponse hasPrefix:@"counting"]){
+        gotResponse = YES;
+    }
+	else {
+        dataValid = YES;
 
-	if (recordComingIn){
-		if([theResponse rangeOfString:@"#"].location != NSNotFound){	//no records
-			recordComingIn = NO;
-		}
-		else {
-			[buffer appendString:theResponse];
-			[buffer autorelease];
-			buffer = [[[buffer componentsSeparatedByString:@"  "]componentsJoinedByString:@" "] mutableCopy] ;
+        [buffer appendString:theResponse];
+        [buffer autorelease];
+        buffer = [[[buffer componentsSeparatedByString:@"  "]componentsJoinedByString:@" "] mutableCopy] ;
 
-			NSArray* parts = [buffer componentsSeparatedByString:@" "];
-			if([parts count] >= 10){
-				NSString* datePart		= [parts objectAtIndex:0];
-				NSString* timePart		= [parts objectAtIndex:1];
-                //id is part 2
-				NSString* size1Part		= [parts objectAtIndex:3];
-				NSString* count1Part	= [parts objectAtIndex:4];
-				NSString* size2Part		= [parts objectAtIndex:5];
-				NSString* count2Part	= [parts objectAtIndex:6];
-				if([datePart length] >= 6 && [timePart length] >= 6){
-					[self setMeasurementDate: [NSString stringWithFormat:@"%02d/%02d/%02d %02d:%02d:%02d",
-											   [[datePart substringWithRange:NSMakeRange(0,2)]intValue],
-											   [[datePart substringWithRange:NSMakeRange(2,2)]intValue],
-											   [[datePart substringWithRange:NSMakeRange(4,2)]intValue],
-											   [[timePart substringWithRange:NSMakeRange(0,2)]intValue],
-											   [[timePart substringWithRange:NSMakeRange(2,2)]intValue],
-											   [[timePart substringWithRange:NSMakeRange(4,2)]intValue]
-											   ]];
-				}
-				
-				[self setSize1: [size1Part floatValue]];
-				[self setCount1: [count1Part intValue]];
-				[self setSize2: [size2Part floatValue]];
-				[self setCount2: [count2Part intValue]];
-								
-				recordComingIn = NO;
-				[self setMissedCycleCount:0];
-				[self startDataArrivalTimeout];
-                
-                [self postCouchDBRecord];
-			}
+        NSArray* parts = [buffer componentsSeparatedByString:@","];
+        if([parts count] >= 10){
+            NSString* datePart		= [parts objectAtIndex:0];
+            NSString* timePart		= [parts objectAtIndex:1];
+            //id is part 2
+            NSString* size1Part		= [parts objectAtIndex:3];
+            NSString* count1Part	= [parts objectAtIndex:4];
+            NSString* size2Part		= [parts objectAtIndex:5];
+            NSString* count2Part	= [parts objectAtIndex:6];
+            if([datePart length] >= 6 && [timePart length] >= 6){
+                [self setMeasurementDate: [NSString stringWithFormat:@"%02d/%02d/%02d %02d:%02d:%02d",
+                                           [[datePart substringWithRange:NSMakeRange(0,2)]intValue],
+                                           [[datePart substringWithRange:NSMakeRange(2,2)]intValue],
+                                           [[datePart substringWithRange:NSMakeRange(4,2)]intValue],
+                                           [[timePart substringWithRange:NSMakeRange(0,2)]intValue],
+                                           [[timePart substringWithRange:NSMakeRange(2,2)]intValue],
+                                           [[timePart substringWithRange:NSMakeRange(4,2)]intValue]
+                                           ]];
+            }
+            
+            [self setSize1: [size1Part floatValue]];
+            [self setCount1: [count1Part intValue]];
+            [self setSize2: [size2Part floatValue]];
+            [self setCount2: [count2Part intValue]];
+                            
+            recordComingIn = NO;
+            [self setMissedCycleCount:0];
+            [self startDataArrivalTimeout];
+            
+            [self postCouchDBRecord];
 		}
-	}
-	else if(statusComingIn){
-		[buffer appendString:theResponse];
-		if([buffer length] == 2){
-			[self processStatus:buffer];
-		}
-	}
 
-	else if([theResponse hasPrefix:@"a"]){	//Auto Mode
-	}
-	
-	else if([theResponse hasPrefix:@"b"]){	//Manual Mode
-	}
-	
-	else if([theResponse hasPrefix:@"c"]){	//Computer Controlled Start count
-	}
-	
-	else if([theResponse hasPrefix:@"d"]){	//Counter Controlled Start count
-	}
-	
-	else if([theResponse hasPrefix:@"C"]){	//Clear Buffer
-	}
-	
-	else if([theResponse hasPrefix:@"D"]){	//Number of Records
-	}
-	
-	else if([theResponse hasPrefix:@"E"]){	//EProm Version
-	}
-	
-	else if([theResponse hasPrefix:@"M"]){	//Mode Request
-		if([theResponse length]<2){
-			statusComingIn = YES;
-			[buffer release];
-			buffer = [[NSMutableString string] retain];
-			[buffer appendString:theResponse];	
-		}
-		else [self processStatus:theResponse];
-	}
-		
-	else if([theResponse hasPrefix:@"A"] | [theResponse hasPrefix:@"R"]){	//Send record
-		recordComingIn = YES;
-		[buffer release];
-		buffer = [[NSMutableString string] retain];
-		[buffer appendString:theResponse];	
-	}
-	
-			 
-	else if([theResponse hasPrefix:@"R"]){	//resend record
-	}
-			 
-	else if([theResponse hasPrefix:@"h"]){	//standby Mode
-	}
-			 
-	else if([theResponse hasPrefix:@"g"]){	//active Mode
-	}
-			 
-	else if([theResponse hasPrefix:@"l"]){	//active Mode
-	}
-			 
-	else if([theResponse hasPrefix:@"U"]){		//Universal Select
-												//do nothing
-	}
-	
-	if(!recordComingIn && !statusComingIn){
-		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-		[self performSelector:@selector(goToNextCommand) withObject:nil afterDelay:1];
-	}
-
-	//NSLog(@"%@\n",theResponse);
+        if(gotResponse){
+            [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+            [self performSelector:@selector(goToNextCommand) withObject:nil afterDelay:1];
+        }
 }
 
 - (void) processStatus:(NSString*)aString
