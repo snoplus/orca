@@ -87,7 +87,6 @@
 - (IBAction) lockAction:(id) sender;
 - (IBAction) readRecordAction:(id)sender;
 - (IBAction) clearBufferAction:(id)sender;
-- (IBAction) getNumberRecordsAction:(id)sender;
 - (IBAction) cycleDurationAction:(id)sender;
 - (IBAction) startCycleAction:(id)sender;
 - (IBAction) stopCycleAction:(id)sender;

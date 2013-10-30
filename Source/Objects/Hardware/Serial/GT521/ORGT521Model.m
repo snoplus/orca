@@ -407,7 +407,7 @@ NSString* ORGT521Lock = @"ORGT521Lock";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt:location forKey:@"location"];
+    [encoder encodeInt:     location forKey:@"location"];
     [encoder encodeFloat:	countAlarmLimit forKey:@"countAlarmLimit"];
     [encoder encodeFloat:	maxCounts		forKey:@"maxCounts"];
     [encoder encodeInt:		cycleDuration	forKey:@"cycleDuration"];
@@ -426,25 +426,12 @@ NSString* ORGT521Lock = @"ORGT521Lock";
 	}
 }
 
-- (void) sendAuto					{ [self addCmdToQueue:@"a"]; }
-- (void) sendManual					{ [self addCmdToQueue:@"b"]; }
-- (void) startCountingByComputer	{ [self addCmdToQueue:@"c"]; }
-- (void) startCountingByCounter		{ [self addCmdToQueue:@"d"]; }
-- (void) clearBuffer				{ [self addCmdToQueue:@"C"]; }
-- (void) getNumberRecords			{ [self addCmdToQueue:@"D"]; }
-- (void) getRevision				{ [self addCmdToQueue:@"E"]; }
-- (void) getMode					{ [self addCmdToQueue:@"M"]; }
-- (void) getModel					{ [self addCmdToQueue:@"T"]; }
-- (void) getRecord					{ [self addCmdToQueue:@"A"]; }
-- (void) resendRecord				{ [self addCmdToQueue:@"R"]; }
-- (void) goToStandbyMode			{ [self addCmdToQueue:@"h"]; }
-- (void) getToActiveMode			{ [self addCmdToQueue:@"g"]; }
-- (void) goToLocalMode				{ [self addCmdToQueue:@"l"]; }
-- (void) selectUnit                 { [self addCmdToQueue:[NSString stringWithFormat:@"U%d",location]]; }
-
 - (void) startCounting				{ [self addCmdToQueue:@"S"]; }
 - (void) stopCounting				{ [self addCmdToQueue:@"E"]; }
-
+- (void) clearBuffer				{ [self addCmdToQueue:@"B"]; }
+- (void) getFirmwareVersion			{ [self addCmdToQueue:@"Q"]; }
+- (void) getLastRecord				{ [self addCmdToQueue:@"L"]; }
+- (void) selectUnit                 { [self addCmdToQueue:[NSString stringWithFormat:@"U%d",location]]; }
 
 #pragma mark ***Polling and Cycles
 - (void) startCycle
@@ -461,9 +448,8 @@ NSString* ORGT521Lock = @"ORGT521Lock";
         NSDate* endTime = [now dateByAddingTimeInterval:[self cycleDuration]*60];
 		[self setCycleWillEnd:endTime]; 
 		[self clearBuffer];
-		[self startCountingByComputer];
+		[self startCounting];
 		[self checkCycle];
-		[self getMode];
         [self startDataArrivalTimeout];
 		NSLog(@"GT521(%d) Starting particle counter\n",[self uniqueIdNumber]);
 	}
@@ -476,8 +462,7 @@ NSString* ORGT521Lock = @"ORGT521Lock";
 		[self setRunning:NO];
 		[self setCycleNumber:0];
 		[self stopCounting];
-		[self getMode];
-		[self getRecord];
+		[self getLastRecord];
         [self cancelDataArrivalTimeout];
 		NSLog(@"GT521(%d) Stopping particle counter\n",[self uniqueIdNumber]);
 	}
@@ -617,13 +602,13 @@ NSString* ORGT521Lock = @"ORGT521Lock";
 		else {
 			//time to end this cycle
 			[self stopCounting];
-			[self getRecord];
+			[self getLastRecord];
 
 			NSDate* endTime = [now dateByAddingTimeInterval:[self cycleDuration]*60];
 			
 			[self setCycleStarted:now];
 			[self setCycleWillEnd:endTime]; 
-			[self startCountingByComputer];
+			[self startCounting];
 			int theCount = [self cycleNumber];
 			[self setCycleNumber:theCount+1];
 			[self performSelector:@selector(checkCycle) withObject:nil afterDelay:1];

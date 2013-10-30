@@ -212,7 +212,7 @@
 
 - (void) locationChanged:(NSNotification*)aNote
 {
-	[locationField setIntValue: [model location]];
+	[locationField setIntValue: [(ORGT521Model*)model location]];
 }
 
 - (void) countAlarmLimitChanged:(NSNotification*)aNote
@@ -412,19 +412,14 @@
     [gSecurity tryToSetLock:ORGT521Lock to:[sender intValue] forWindow:[self window]];
 }
 
-
-- (IBAction) getNumberRecordsAction:(id)sender
-{
-	[model getNumberRecords];
-}
-
 - (IBAction) readRecordAction:(id)sender
 {
-	[model getRecord];
+	[model getLastRecord];
 }
 
 - (IBAction) clearBufferAction:(id)sender
 {
+    [model clearBuffer];
 }
 
 #pragma mark •••Data Source

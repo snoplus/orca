@@ -112,21 +112,11 @@
 - (void) addCmdToQueue:(NSString*)aCmd;
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
-- (void) sendAuto;				
-- (void) sendManual;					
-- (void) startCountingByComputer;	
-- (void) startCountingByCounter;	
+- (void) startCounting;	
 - (void) stopCounting;	
 - (void) clearBuffer;				
-- (void) getNumberRecords;			
-- (void) getRevision;				
-- (void) getMode;					
-- (void) getModel;					
-- (void) getRecord;					
-- (void) resendRecord;				
-- (void) goToStandbyMode;			
-- (void) getToActiveMode;			
-- (void) goToLocalMode;				
+- (void) getFirmwareVersion;
+- (void) getLastRecord;					
 - (void) selectUnit;
 
 #pragma mark •••Adc Processing Protocol
