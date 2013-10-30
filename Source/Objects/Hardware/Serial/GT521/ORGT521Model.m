@@ -684,16 +684,16 @@ NSString* ORGT521Lock = @"ORGT521Lock";
 
 - (void) process_response:(NSString*)theResponse
 {
+    theResponse = [theResponse removeNLandCRs];
 	//NSLog(@"response: %@\n",theResponse);
     BOOL gotResponse = NO;
-    if([theResponse hasPrefix:@"UNIT"]){
+    if([theResponse hasPrefix:@"UNIT"] || [theResponse hasPrefix:@"unit"]){
         gotResponse = YES;
     }
-    else if([theResponse hasPrefix:@"COUNT"]){
+    else if([theResponse hasPrefix:@"COUNT"] || [theResponse hasPrefix:@"count"]){
         gotResponse = YES;
     }
 	else {
-        dataValid = YES;
 
         [buffer appendString:theResponse];
         [buffer autorelease];
@@ -728,6 +728,7 @@ NSString* ORGT521Lock = @"ORGT521Lock";
             [self startDataArrivalTimeout];
             
             [self postCouchDBRecord];
+            dataValid = YES;
 		}
     }
     if(gotResponse){
