@@ -686,10 +686,10 @@ NSString* ORGT521Lock = @"ORGT521Lock";
 {
 	//NSLog(@"response: %@\n",theResponse);
     BOOL gotResponse = NO;
-    if([theResponse hasPrefix:@"unit"]){
+    if([theResponse hasPrefix:@"UNIT"]){
         gotResponse = YES;
     }
-    else if([theResponse hasPrefix:@"counting"]){
+    else if([theResponse hasPrefix:@"COUNT"]){
         gotResponse = YES;
     }
 	else {
