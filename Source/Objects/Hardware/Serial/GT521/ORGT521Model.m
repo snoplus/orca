@@ -601,9 +601,6 @@ NSString* ORGT521Lock = @"ORGT521Lock";
 		}
 		else {
 			//time to end this cycle
-			[self stopCounting];
-			[self getLastRecord];
-
 			NSDate* endTime = [now dateByAddingTimeInterval:[self cycleDuration]*60];
 			
 			[self setCycleStarted:now];
@@ -681,15 +678,14 @@ NSString* ORGT521Lock = @"ORGT521Lock";
 
 - (void) process_response:(NSString*)theResponse
 {
-    theResponse = [theResponse removeNLandCRs];
 	//NSLog(@"response: %@\n",theResponse);
 
     if(!buffer)buffer = [[NSMutableString string] retain];
     [buffer appendString:theResponse];
     while([buffer rangeOfString:@"\r\n"].location!=NSNotFound){
         NSRange r = [buffer rangeOfString:@"\r\n"];
-        NSString* line = [buffer substringToIndex:r.length+2];
-        [buffer replaceCharactersInRange:NSMakeRange(r.location,r.length+2) withString:@""];
+        NSString* line = [buffer substringToIndex:r.location];
+        [buffer deleteCharactersInRange:NSMakeRange(0,r.location+r.length)];
         if([line length]>2){
             NSArray* parts = [line componentsSeparatedByString:@","];
             if([parts count] >= 10){
@@ -703,11 +699,11 @@ NSString* ORGT521Lock = @"ORGT521Lock";
                 if([datePart length] >= 6 && [timePart length] >= 6){
                     [self setMeasurementDate: [NSString stringWithFormat:@"%02d/%02d/%02d %02d:%02d:%02d",
                                                [[datePart substringWithRange:NSMakeRange(0,2)]intValue],
-                                               [[datePart substringWithRange:NSMakeRange(2,2)]intValue],
-                                               [[datePart substringWithRange:NSMakeRange(4,2)]intValue],
+                                               [[datePart substringWithRange:NSMakeRange(3,2)]intValue],
+                                               [[datePart substringWithRange:NSMakeRange(6,4)]intValue],
                                                [[timePart substringWithRange:NSMakeRange(0,2)]intValue],
-                                               [[timePart substringWithRange:NSMakeRange(2,2)]intValue],
-                                               [[timePart substringWithRange:NSMakeRange(4,2)]intValue]
+                                               [[timePart substringWithRange:NSMakeRange(3,2)]intValue],
+                                               [[timePart substringWithRange:NSMakeRange(6,2)]intValue]
                                                ]];
                 }
                 

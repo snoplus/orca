@@ -255,7 +255,7 @@
 										<object class="NSTextField" id="479884682">
 											<reference key="NSNextResponder" ref="296039283"/>
 											<int key="NSvFlags">268</int>
-											<string key="NSFrame">{{20, 45}, {33, 14}}</string>
+											<string key="NSFrame">{{25, 45}, {33, 14}}</string>
 											<reference key="NSSuperview" ref="296039283"/>
 											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="12352802"/>
@@ -336,7 +336,7 @@
 										<object class="NSTextField" id="12352802">
 											<reference key="NSNextResponder" ref="296039283"/>
 											<int key="NSvFlags">268</int>
-											<string key="NSFrame">{{55, 45}, {97, 14}}</string>
+											<string key="NSFrame">{{60, 45}, {97, 14}}</string>
 											<reference key="NSSuperview" ref="296039283"/>
 											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="785722513"/>
@@ -354,7 +354,7 @@
 										<object class="NSTextField" id="680216064">
 											<reference key="NSNextResponder" ref="296039283"/>
 											<int key="NSvFlags">268</int>
-											<string key="NSFrame">{{55, 23}, {97, 14}}</string>
+											<string key="NSFrame">{{60, 23}, {97, 14}}</string>
 											<reference key="NSSuperview" ref="296039283"/>
 											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="885819985"/>
@@ -372,7 +372,7 @@
 										<object class="NSTextField" id="203481912">
 											<reference key="NSNextResponder" ref="296039283"/>
 											<int key="NSvFlags">268</int>
-											<string key="NSFrame">{{66, 67}, {72, 14}}</string>
+											<string key="NSFrame">{{71, 67}, {72, 14}}</string>
 											<reference key="NSSuperview" ref="296039283"/>
 											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="479884682"/>
@@ -390,7 +390,7 @@
 										<object class="NSTextField" id="190587984">
 											<reference key="NSNextResponder" ref="296039283"/>
 											<int key="NSvFlags">268</int>
-											<string key="NSFrame">{{15, 67}, {33, 14}}</string>
+											<string key="NSFrame">{{16, 67}, {33, 14}}</string>
 											<reference key="NSSuperview" ref="296039283"/>
 											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="203481912"/>
@@ -408,7 +408,7 @@
 										<object class="NSTextField" id="906485099">
 											<reference key="NSNextResponder" ref="296039283"/>
 											<int key="NSvFlags">268</int>
-											<string key="NSFrame">{{11, 89}, {33, 14}}</string>
+											<string key="NSFrame">{{7, 89}, {33, 14}}</string>
 											<reference key="NSSuperview" ref="296039283"/>
 											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="661272871"/>
@@ -426,7 +426,7 @@
 										<object class="NSTextField" id="661272871">
 											<reference key="NSNextResponder" ref="296039283"/>
 											<int key="NSvFlags">268</int>
-											<string key="NSFrame">{{45, 89}, {116, 14}}</string>
+											<string key="NSFrame">{{42, 89}, {130, 14}}</string>
 											<reference key="NSSuperview" ref="296039283"/>
 											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="1032779026"/>
@@ -444,7 +444,7 @@
 										<object class="NSTextField" id="785722513">
 											<reference key="NSNextResponder" ref="296039283"/>
 											<int key="NSvFlags">268</int>
-											<string key="NSFrame">{{20, 23}, {33, 14}}</string>
+											<string key="NSFrame">{{25, 23}, {33, 14}}</string>
 											<reference key="NSSuperview" ref="296039283"/>
 											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="680216064"/>
@@ -510,7 +510,7 @@
 										<object class="NSBox" id="1032779026">
 											<reference key="NSNextResponder" ref="296039283"/>
 											<int key="NSvFlags">12</int>
-											<string key="NSFrame">{{14, 65}, {137, 5}}</string>
+											<string key="NSFrame">{{10, 65}, {146, 5}}</string>
 											<reference key="NSSuperview" ref="296039283"/>
 											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="190587984"/>
@@ -532,13 +532,13 @@
 											<bool key="NSTransparent">NO</bool>
 										</object>
 									</object>
-									<string key="NSFrame">{{1, 1}, {172, 113}}</string>
+									<string key="NSFrame">{{1, 1}, {177, 113}}</string>
 									<reference key="NSSuperview" ref="143018079"/>
 									<reference key="NSWindow"/>
 									<reference key="NSNextKeyView" ref="906485099"/>
 								</object>
 							</object>
-							<string key="NSFrame">{{229, 277}, {174, 129}}</string>
+							<string key="NSFrame">{{224, 277}, {179, 129}}</string>
 							<reference key="NSSuperview" ref="18859626"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="296039283"/>
@@ -2381,23 +2381,15 @@
 							<string>clearBufferAction:</string>
 							<string>countAlarmLimitTextFieldAction:</string>
 							<string>cycleDurationAction:</string>
-							<string>getNumberRecordsAction:</string>
-							<string>initAction:</string>
 							<string>locationAction:</string>
 							<string>lockAction:</string>
 							<string>maxCountsTextFieldAction:</string>
 							<string>readRecordAction:</string>
-							<string>startCountingAction:</string>
 							<string>startCycleAction:</string>
-							<string>stopCountingAction:</string>
 							<string>stopCycleAction:</string>
 						</object>
 						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -2416,15 +2408,11 @@
 							<string>clearBufferAction:</string>
 							<string>countAlarmLimitTextFieldAction:</string>
 							<string>cycleDurationAction:</string>
-							<string>getNumberRecordsAction:</string>
-							<string>initAction:</string>
 							<string>locationAction:</string>
 							<string>lockAction:</string>
 							<string>maxCountsTextFieldAction:</string>
 							<string>readRecordAction:</string>
-							<string>startCountingAction:</string>
 							<string>startCycleAction:</string>
-							<string>stopCountingAction:</string>
 							<string>stopCycleAction:</string>
 						</object>
 						<object class="NSArray" key="dict.values">
@@ -2439,14 +2427,6 @@
 							</object>
 							<object class="IBActionInfo">
 								<string key="name">cycleDurationAction:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">getNumberRecordsAction:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">initAction:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
@@ -2466,15 +2446,7 @@
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
-								<string key="name">startCountingAction:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
 								<string key="name">startCycleAction:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">stopCountingAction:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
@@ -2494,8 +2466,6 @@
 							<string>cycleDurationPU</string>
 							<string>cycleNumberField</string>
 							<string>cycleStartedField</string>
-							<string>cycleWillEndField</string>
-							<string>initHWButton</string>
 							<string>locationField</string>
 							<string>lockButton</string>
 							<string>lockDocField</string>
@@ -2523,8 +2493,6 @@
 							<string>NSTextField</string>
 							<string>NSButton</string>
 							<string>NSTextField</string>
-							<string>NSButton</string>
-							<string>NSTextField</string>
 							<string>NSTextField</string>
 							<string>NSTextField</string>
 							<string>ORCompositeTimeLineView</string>
@@ -2549,8 +2517,6 @@
 							<string>cycleDurationPU</string>
 							<string>cycleNumberField</string>
 							<string>cycleStartedField</string>
-							<string>cycleWillEndField</string>
-							<string>initHWButton</string>
 							<string>locationField</string>
 							<string>lockButton</string>
 							<string>lockDocField</string>
@@ -2595,14 +2561,6 @@
 							<object class="IBToOneOutletInfo">
 								<string key="name">cycleStartedField</string>
 								<string key="candidateClassName">NSTextField</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">cycleWillEndField</string>
-								<string key="candidateClassName">NSTextField</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">initHWButton</string>
-								<string key="candidateClassName">NSButton</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">locationField</string>
