@@ -57,12 +57,9 @@
 		int         missedCycleCount;
 		ORAlarm*	missingCyclesAlarm;
         int         location;
-<<<<<<< .mine
         float       humidity;
         float       temperature;
-=======
         BOOL        restart;
->>>>>>> .r8680
 }
 
 #pragma mark ***Initialization

@@ -55,13 +55,13 @@
 	ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:0 andDataSource:self];
 	[plotter0 addPlot: aPlot];
 	[aPlot setLineColor:[NSColor redColor]];
-	[aPlot setName:@"0.5 ¬µm"];
+	[aPlot setName:@"0.5 µm"];
 	[aPlot release];
 
 	aPlot = [[ORTimeLinePlot alloc] initWithTag:1 andDataSource:self];
 	[plotter0 addPlot: aPlot];
 	[aPlot setLineColor:[NSColor blueColor]];
-	[aPlot setName:@"5.0 ¬µm"];
+	[aPlot setName:@"5.0 µm"];
 	[aPlot release];
 
     aPlot = [[ORTimeLinePlot alloc] initWithTag:2 andDataSource:self];
