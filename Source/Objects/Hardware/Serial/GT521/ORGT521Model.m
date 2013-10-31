@@ -641,7 +641,7 @@ NSString* ORGT521Lock = @"ORGT521Lock";
 
 - (double) maxValueForChan:(int)aChan
 {
-	double theValue;
+	double theValue = 0;
 	@synchronized(self){
         if(aChan>=0 && aChan<4){
             theValue = (double)[self maxValue:aChan];

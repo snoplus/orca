@@ -27,7 +27,6 @@
 	IBOutlet NSTextField* probeAttachedTextField;
 	IBOutlet NSTextField* correctionTypeTextField;
 	IBOutlet NSTextField* usingCentigradeTextField;
-	IBOutlet NSTextField* autoCountTextField;
 	IBOutlet NSTextField* temperatureTextField;
 	IBOutlet NSTextField* humidityTextField;
 	IBOutlet NSTextField* locationField;
@@ -37,8 +36,9 @@
 	IBOutlet NSTextField* size2TextField;
 	IBOutlet NSTextField* size1TextField;
 	IBOutlet NSTextField* measurementDateTextField;
-	IBOutlet NSMatrix* valueAlarmLimitMatrix;
-	IBOutlet NSMatrix* maxValueMatrix;
+	IBOutlet NSTextField* measurementTitleField;
+	IBOutlet NSMatrix*    valueAlarmLimitMatrix;
+	IBOutlet NSMatrix*    maxValueMatrix;
 
     IBOutlet NSButton*      lockButton;
 
@@ -66,7 +66,6 @@
 - (void) probeAttachedChanged:(NSNotification*)aNote;
 - (void) correctionTypeChanged:(NSNotification*)aNote;
 - (void) usingCentigradeChanged:(NSNotification*)aNote;
-- (void) autoCountChanged:(NSNotification*)aNote;
 - (void) temperatureChanged:(NSNotification*)aNote;
 - (void) humidityChanged:(NSNotification*)aNote;
 - (void) locationChanged:(NSNotification*)aNote;

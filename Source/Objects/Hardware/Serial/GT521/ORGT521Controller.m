@@ -210,10 +210,6 @@
                          name : ORGT521ModelTemperatureChanged
 						object: model];
 
-    [notifyCenter addObserver : self
-                     selector : @selector(autoCountChanged:)
-                         name : ORGT521ModelAutoCountChanged
-						object: model];
 
     [notifyCenter addObserver : self
                      selector : @selector(usingCentigradeChanged:)
@@ -255,7 +251,6 @@
 	[self locationChanged:nil];
 	[self humidityChanged:nil];
 	[self temperatureChanged:nil];
-	[self autoCountChanged:nil];
 	[self usingCentigradeChanged:nil];
 	[self correctionTypeChanged:nil];
 	[self probeAttachedChanged:nil];
@@ -263,23 +258,23 @@
 
 - (void) probeAttachedChanged:(NSNotification*)aNote
 {
-	[probeAttachedTextField setObjectValue: [model probeAttached]];
+	[probeAttachedTextField setStringValue: [model probeAttached]?@"YES":@"NO"];
 }
 
 - (void) correctionTypeChanged:(NSNotification*)aNote
 {
-	[correctionTypeTextField setIntValue: [model correctionType]];
+    if([model countingMode] == kGT521Uncorrected)[measurementTitleField setStringValue:@"Counts"];
+    else {
+        if([model correctionType]      == kGT521CubicFoot)       [measurementTitleField setStringValue:@"Counts/Ft^3"];
+        else if([model correctionType] == kGT521CubicLiter) [measurementTitleField setStringValue:@"Counts/Liter"];
+    }
 }
 
 - (void) usingCentigradeChanged:(NSNotification*)aNote
 {
-	[usingCentigradeTextField setObjectValue: [model usingCentigrade]];
+	[usingCentigradeTextField setStringValue: [model usingCentigrade]?@"C":@"F"];
 }
 
-- (void) autoCountChanged:(NSNotification*)aNote
-{
-	[autoCountTextField setObjectValue: [model autoCount]];
-}
 
 - (void) temperatureChanged:(NSNotification*)aNote
 {
