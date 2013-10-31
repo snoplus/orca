@@ -63,8 +63,20 @@
 	[aPlot setLineColor:[NSColor blueColor]];
 	[aPlot setName:@"5.0 ¬µm"];
 	[aPlot release];
-	
-	[plotter0 setYLabel:@"Counts/Ft^3"];
+
+    aPlot = [[ORTimeLinePlot alloc] initWithTag:2 andDataSource:self];
+	[plotter0 addPlot: aPlot];
+	[aPlot setLineColor:[NSColor orangeColor]];
+	[aPlot setName:@"Humidity"];
+	[aPlot release];
+    
+    aPlot = [[ORTimeLinePlot alloc] initWithTag:3 andDataSource:self];
+	[plotter0 addPlot: aPlot];
+	[aPlot setLineColor:[NSColor blackColor]];
+	[aPlot setName:@"Temp"];
+	[aPlot release];
+
+    
 	[plotter0 setShowLegend:YES];
 
 	[(ORTimeAxis*)[plotter0 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
@@ -185,6 +197,16 @@
                          name : ORGT521ModelLocationChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(humidityChanged:)
+                         name : ORGT521ModelHumidityChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(temperatureChanged:)
+                         name : ORGT521ModelTemperatureChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -208,6 +230,18 @@
 	[self countAlarmLimitChanged:nil];
 	[serialPortController updateWindow];
 	[self locationChanged:nil];
+	[self humidityChanged:nil];
+	[self temperatureChanged:nil];
+}
+
+- (void) temperatureChanged:(NSNotification*)aNote
+{
+	[temperatureTextField setFloatValue: [model temperature]];
+}
+
+- (void) humidityChanged:(NSNotification*)aNote
+{
+	[humidityTextField setFloatValue: [model humidity]];
 }
 
 - (void) locationChanged:(NSNotification*)aNote

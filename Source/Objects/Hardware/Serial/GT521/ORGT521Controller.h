@@ -25,6 +25,8 @@
 @interface ORGT521Controller : OrcaObjectController
 {
     IBOutlet NSTextField* lockDocField;
+	IBOutlet   NSTextField* temperatureTextField;
+	IBOutlet   NSTextField* humidityTextField;
 	IBOutlet NSTextField* locationField;
 	IBOutlet NSTextField* countAlarmLimitTextField;
 	IBOutlet NSTextField* maxCountsTextField;
@@ -60,6 +62,8 @@
 - (void) updateWindow;
 
 #pragma mark ***Interface Management
+- (void) temperatureChanged:(NSNotification*)aNote;
+- (void) humidityChanged:(NSNotification*)aNote;
 - (void) locationChanged:(NSNotification*)aNote;
 - (void) countAlarmLimitChanged:(NSNotification*)aNote;
 - (void) maxCountsChanged:(NSNotification*)aNote;

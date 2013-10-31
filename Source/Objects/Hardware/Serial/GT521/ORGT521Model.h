@@ -47,7 +47,7 @@
 		NSDate*		cycleStarted;
 		NSDate*		cycleWillEnd;
 		int			cycleNumber;
-		ORTimeRate*	timeRates[2];
+		ORTimeRate*	timeRates[4];
 		BOOL		wasRunning;
 		float		maxCounts;
 		float		countAlarmLimit;
@@ -57,7 +57,12 @@
 		int         missedCycleCount;
 		ORAlarm*	missingCyclesAlarm;
         int         location;
+<<<<<<< .mine
+        float       humidity;
+        float       temperature;
+=======
         BOOL        restart;
+>>>>>>> .r8680
 }
 
 #pragma mark ***Initialization
@@ -67,6 +72,10 @@
 - (BOOL) dataForChannelValid:(int)aChannel;
 
 #pragma mark ***Accessors
+- (float) temperature;
+- (void) setTemperature:(float)aTemperature;
+- (float) humidity;
+- (void) setHumidity:(float)aHumidity;
 - (int) location;
 - (void) setLocation:(int)aLocation;
 - (float) countAlarmLimit;
@@ -132,6 +141,8 @@
 
 @end
 
+extern NSString* ORGT521ModelTemperatureChanged;
+extern NSString* ORGT521ModelHumidityChanged;
 extern NSString* ORGT521ModelLocationChanged;
 extern NSString* ORGT521ModelCountAlarmLimitChanged;
 extern NSString* ORGT521ModelMaxCountsChanged;

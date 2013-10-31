@@ -27,17 +27,19 @@
 #import "ORAlarm.h"
 
 #pragma mark ***External Strings
-NSString* ORGT521ModelLocationChanged = @"ORGT521ModelLocationChanged";
+NSString* ORGT521ModelTemperatureChanged    = @"ORGT521ModelTemperatureChanged";
+NSString* ORGT521ModelHumidityChanged       = @"ORGT521ModelHumidityChanged";
+NSString* ORGT521ModelLocationChanged       = @"ORGT521ModelLocationChanged";
 NSString* ORGT521ModelCountAlarmLimitChanged = @"ORGT521ModelCountAlarmLimitChanged";
-NSString* ORGT521ModelMaxCountsChanged = @"ORGT521ModelMaxCountsChanged";
+NSString* ORGT521ModelMaxCountsChanged      = @"ORGT521ModelMaxCountsChanged";
 NSString* ORGT521ModelCycleNumberChanged	= @"ORGT521ModelCycleNumberChanged";
 NSString* ORGT521ModelCycleWillEndChanged	= @"ORGT521ModelCycleWillEndChanged";
 NSString* ORGT521ModelCycleStartedChanged	= @"ORGT521ModelCycleStartedChanged";
 NSString* ORGT521ModelRunningChanged		= @"ORGT521ModelRunningChanged";
-NSString* ORGT521ModelCycleDurationChanged = @"ORGT521ModelCycleDurationChanged";
+NSString* ORGT521ModelCycleDurationChanged  = @"ORGT521ModelCycleDurationChanged";
 NSString* ORGT521ModelCountingModeChanged	= @"ORGT521ModelCountingModeChanged";
-NSString* ORGT521ModelCount2Changed		= @"ORGT521ModelCount2Changed";
-NSString* ORGT521ModelCount1Changed		= @"ORGT521ModelCount1Changed";
+NSString* ORGT521ModelCount2Changed         = @"ORGT521ModelCount2Changed";
+NSString* ORGT521ModelCount1Changed         = @"ORGT521ModelCount1Changed";
 NSString* ORGT521ModelSize2Changed			= @"ORGT521ModelSize2Changed";
 NSString* ORGT521ModelSize1Changed			= @"ORGT521ModelSize1Changed";
 NSString* ORGT521ModelMeasurementDateChanged = @"ORGT521ModelMeasurementDateChanged";
@@ -85,7 +87,7 @@ NSString* ORGT521Lock = @"ORGT521Lock";
     [buffer release];
 	
 	int i;
-	for(i=0;i<2;i++){
+	for(i=0;i<4;i++){
 		[timeRates[i] release];
 	}	
 	[super dealloc];
@@ -125,6 +127,36 @@ NSString* ORGT521Lock = @"ORGT521Lock";
 }
 
 #pragma mark ***Accessors
+
+- (float) temperature
+{
+    return temperature;
+}
+
+- (void) setTemperature:(float)aTemperature
+{
+    temperature = aTemperature;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGT521ModelTemperatureChanged object:self];
+	if(timeRates[3] == nil) timeRates[3] = [[ORTimeRate alloc] init];
+	[timeRates[3] addDataToTimeAverage:humidity];
+}
+
+- (float) humidity
+{
+    return humidity;
+}
+
+- (void) setHumidity:(float)aHumidity
+{
+    humidity = aHumidity;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGT521ModelHumidityChanged object:self];
+
+	if(timeRates[2] == nil) timeRates[2] = [[ORTimeRate alloc] init];
+	[timeRates[2] addDataToTimeAverage:humidity];
+
+}
 
 - (int) location
 {
@@ -695,6 +727,8 @@ NSString* ORGT521Lock = @"ORGT521Lock";
                 NSString* count1Part	= [parts objectAtIndex:4];
                 NSString* size2Part		= [parts objectAtIndex:5];
                 NSString* count2Part	= [parts objectAtIndex:6];
+                NSString* humidityPart	= [parts objectAtIndex:7];
+                NSString* tempPart      = [parts objectAtIndex:8];
                 if([datePart length] >= 6 && [timePart length] >= 6){
                     [self setMeasurementDate: [NSString stringWithFormat:@"%02d/%02d/%02d %02d:%02d:%02d",
                                                [[datePart substringWithRange:NSMakeRange(0,2)]intValue],
@@ -706,11 +740,13 @@ NSString* ORGT521Lock = @"ORGT521Lock";
                                                ]];
                 }
                 
-                [self setSize1: [size1Part floatValue]];
-                [self setCount1: [count1Part intValue]];
-                [self setSize2: [size2Part floatValue]];
-                [self setCount2: [count2Part intValue]];
-                                
+                [self setSize1:      [size1Part floatValue]];
+                [self setCount1:     [count1Part intValue]];
+                [self setSize2:      [size2Part floatValue]];
+                [self setCount2:     [count2Part intValue]];
+                [self setHumidity:   [humidityPart floatValue]];
+                [self setTemperature:[tempPart floatValue]];
+                
                 [self setMissedCycleCount:0];
                 [self startDataArrivalTimeout];
                 
@@ -727,8 +763,6 @@ NSString* ORGT521Lock = @"ORGT521Lock";
     
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
     [self performSelector:@selector(goToNextCommand) withObject:nil afterDelay:1];
-    
-    
 }
 
 - (void) processStatus:(NSString*)aString
