@@ -57,6 +57,7 @@
 		int         missedCycleCount;
 		ORAlarm*	missingCyclesAlarm;
         int         location;
+        BOOL        restart;
 }
 
 #pragma mark ***Initialization

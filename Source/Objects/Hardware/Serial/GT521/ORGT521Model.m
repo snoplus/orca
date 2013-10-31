@@ -58,6 +58,8 @@ NSString* ORGT521Lock = @"ORGT521Lock";
 - (void) cancelDataArrivalTimeout;
 - (void) doCycleKick;
 - (void) postCouchDBRecord;
+- (void) doStartUpCommands;
+
 @end
 
 @implementation ORGT521Model
@@ -427,7 +429,7 @@ NSString* ORGT521Lock = @"ORGT521Lock";
 
 - (void) startCounting				{ [self addCmdToQueue:@"S"]; }
 - (void) stopCounting				{ [self addCmdToQueue:@"E"]; }
-- (void) clearBuffer				{ [self addCmdToQueue:@"BY"]; }
+- (void) clearBuffer				{ [self addCmdToQueue:@"B\r\nY"];}
 - (void) getFirmwareVersion			{ [self addCmdToQueue:@"Q"]; }
 - (void) getLastRecord				{ [self addCmdToQueue:@"L"]; }
 - (void) selectUnit                 { [self addCmdToQueue:[NSString stringWithFormat:@"U%d",location]]; }
@@ -442,16 +444,9 @@ NSString* ORGT521Lock = @"ORGT521Lock";
 {
 	if((![self running] || force) && [serialPort isOpen]){
 		[self setRunning:YES];
-		[self setCycleNumber:1];
-		NSDate* now = [NSDate date];
-		[self setCycleStarted:now];
-        NSDate* endTime = [now dateByAddingTimeInterval:[self cycleDuration]*60];
-		[self setCycleWillEnd:endTime]; 
-		[self clearBuffer];
-        [self setSampleTime];
-		[self startCounting];
-		[self checkCycle];
-        [self startDataArrivalTimeout];
+        restart = YES;
+		[self setCycleNumber:0];
+        [self doStartUpCommands];
 		NSLog(@"GT521(%d) Starting particle counter\n",[self uniqueIdNumber]);
 	}
 }
@@ -459,6 +454,7 @@ NSString* ORGT521Lock = @"ORGT521Lock";
 - (void) stopCycle
 {
 	if([self running] && [serialPort isOpen]){
+        restart = NO;
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(checkCycle) object:nil];
 		[self setRunning:NO];
 		[self setCycleNumber:0];
@@ -577,6 +573,19 @@ NSString* ORGT521Lock = @"ORGT521Lock";
 @end
 
 @implementation ORGT521Model (private)
+- (void) doStartUpCommands
+{
+    NSDate* now = [NSDate date];
+    [self setCycleStarted:now];
+    NSDate* endTime = [now dateByAddingTimeInterval:[self cycleDuration]*60];
+    [self setCycleWillEnd:endTime];
+    [self clearBuffer];
+    [self setSampleTime];
+    [self startCounting];
+    [self checkCycle];
+    [self setCycleNumber:cycleNumber+1];
+    [self startDataArrivalTimeout];
+}
 
 - (void) postCouchDBRecord
 {
@@ -599,19 +608,9 @@ NSString* ORGT521Lock = @"ORGT521Lock";
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORGT521ModelCycleWillEndChanged object:self];
 			[self performSelector:@selector(checkCycle) withObject:nil afterDelay:2];
 		}
-		else {
-			//time to end this cycle
-			NSDate* endTime = [now dateByAddingTimeInterval:[self cycleDuration]*60];
-			
-			[self setCycleStarted:now];
-			[self setCycleWillEnd:endTime]; 
-			[self startCounting];
-			int theCount = [self cycleNumber];
-			[self setCycleNumber:theCount+1];
-			[self performSelector:@selector(checkCycle) withObject:nil afterDelay:1];
-		}
 	}
 }
+
 - (void) startDataArrivalTimeout
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(doCycleKick) object:nil];
@@ -717,6 +716,11 @@ NSString* ORGT521Lock = @"ORGT521Lock";
                 
                 [self postCouchDBRecord];
                 dataValid = YES;
+                
+                if(restart){
+                    [self doStartUpCommands];
+                }
+
             }
         }
     }
