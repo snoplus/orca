@@ -30,7 +30,6 @@
     @private 
         BOOL getRatesFromDecodeStage;
         NSMutableDictionary* actualCards;
-        time_t lastTime;
 }
 
 @end
