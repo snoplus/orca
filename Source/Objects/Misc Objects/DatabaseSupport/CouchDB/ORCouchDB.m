@@ -789,7 +789,7 @@
             NSArray* newArray = [[result objectForKey:@"events"] arrayByAddingObject:[NSDictionary dictionaryWithObject:[document objectForKey:@"time"] forKey:eventNameForCatalog]];
             [newDocument setObject:newArray forKey:@"events"];
             [newDocument setObject:rev forKey:@"_rev"];
-            result = [self send:httpString type:@"PUT" body:newDocument];
+            [self send:httpString type:@"PUT" body:newDocument];
 		}
 	}
     
