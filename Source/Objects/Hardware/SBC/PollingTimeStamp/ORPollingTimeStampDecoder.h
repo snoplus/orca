@@ -24,9 +24,6 @@
 @class ORDataSet;
 
 @interface ORPollingTimeStampDecoder : ORVmeCardDecoder {
-    @private 
-        BOOL getRatesFromDecodeStage;
-        NSMutableDictionary* actualPollingTimeStamps;
 }
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
