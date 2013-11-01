@@ -970,7 +970,7 @@ typedef struct a3818_comm {
             
             size_t inbufSize = 64;
 
-            kern_return_t result = IOConnectCallMethod(  dataPort,   // connection
+            /*kern_return_t result = */IOConnectCallMethod(  dataPort,   // connection
                                          kA3818GetPCIConfig,		// selector
                                          NULL,                      // input values
                                          NULL,							// number of scalar input values

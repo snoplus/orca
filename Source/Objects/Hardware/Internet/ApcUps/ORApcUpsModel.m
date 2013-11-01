@@ -383,7 +383,7 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
 {
     if(!nameFromChannelTable){
         //order must be the same in these tables
-        channelFromNameTable = [[NSDictionary dictionaryWithObjectsAndKeys:
+        channelFromNameTable = [[NSMutableDictionary dictionaryWithObjectsAndKeys:
                                  [NSNumber numberWithInt:0], @"RUNTIME REMAINING",
                                  [NSNumber numberWithInt:1], @"BATTERY CURRENT",
                                  [NSNumber numberWithInt:2], @"INPUT VOLTAGE L1",
@@ -394,7 +394,7 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
                                  [NSNumber numberWithInt:7], @"OUTPUT CURRENT L3",
                                  nil] retain];
         
-        nameFromChannelTable = [[NSDictionary dictionaryWithObjectsAndKeys:
+        nameFromChannelTable = [[NSMutableDictionary dictionaryWithObjectsAndKeys:
                                  @"RUNTIME REMAINING",  [NSNumber numberWithInt:0], 
                                  @"BATTERY CURRENT",    [NSNumber numberWithInt:1], 
                                  @"INPUT VOLTAGE L1",   [NSNumber numberWithInt:2], 
