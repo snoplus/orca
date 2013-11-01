@@ -450,15 +450,6 @@ NSString* ORA3818Lock										= @"ORA3818Lock";
     return dualPortRamSize;
 }
 
-
-- (void) setIntegrationTime:(double)newIntegrationTime
-{
-    if(newIntegrationTime<1)newIntegrationTime=1;
-    else if(newIntegrationTime>60)newIntegrationTime=60;
-	//we this here so we have undo/redo on the rate object.
-}
-
-
 #pragma mark •••Hardware Access
 // return system assigned PCI bus number
 - (kern_return_t) getPCIBusNumber:(unsigned char *) data

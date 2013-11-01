@@ -126,7 +126,6 @@ enum {
         
         ORAlarm*	noHardwareAlarm;
         ORAlarm*    noDriverAlarm;
-        int		errorCount;
 
         int totalDevicesFound;
 		unsigned timeOutErrors;
