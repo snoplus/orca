@@ -2290,7 +2290,7 @@ void parse_sendBBCmd_string(char *buffer, unsigned char* cmdbuf, int* lencmdbuf,
               }
 	          else 
 	          if(  (foundPos=strstr(buffer,"stopFIFO"))  ){
-	              printf("handleKCommand: KWC >%s< command 11!\n",foundPos);//DEBUG
+	              printf("handleKCommand: KWC >%s< command 12!\n",foundPos);//DEBUG
                   if(len > strlen("KWC_stopFIFO_")){//must have at least one character as argument
                       printf("   messg: KWC >%s< command - length OK (strlen:%i should be >=14)!\n",buffer,strlen(buffer));//DEBUG
                       char *startptr, *endptr;
@@ -5052,14 +5052,17 @@ int32_t main(int32_t argc, char *argv[])
 			}
         }
         //listen for UDP packets (commands) on server socket
-	    for(iFifo=0; iFifo<FIFOREADER::availableNumFIFO; iFifo++) if(FIFOREADER::FifoReader[iFifo].readfifo){
-		    FIFOREADER &fr=FIFOREADER::FifoReader[iFifo];
-			int numRead=0;
-			while( (   numRead = fr.recvfromServer(UInBuffer,sizeof(UInBuffer)) ) >0 ){
-				fprintf(stderr,"main: recvfromServer(...), received UDP command packet (%i bytes)\n", numRead );
-				handleUDPCommandPacket(UInBuffer, numRead, iFifo);
-			}
-			//TODO: DEBUG fprintf(stderr,"CALLED: recvfromServer(...), received no data (%i bytes)\n", numRead );
+	    for(iFifo=0; iFifo<FIFOREADER::availableNumFIFO; iFifo++){
+            //whe want to listen on all sockets ... if(FIFOREADER::FifoReader[iFifo].readfifo)
+            {
+                FIFOREADER &fr=FIFOREADER::FifoReader[iFifo];
+                int numRead=0;
+                while( (   numRead = fr.recvfromServer(UInBuffer,sizeof(UInBuffer)) ) >0 ){
+                    fprintf(stderr,"main: recvfromServer(...), received UDP command packet (%i bytes)\n", numRead );
+                    handleUDPCommandPacket(UInBuffer, numRead, iFifo);
+                }
+                //TODO: DEBUG fprintf(stderr,"CALLED: recvfromServer(...), received no data (%i bytes)\n", numRead );
+            }
         }
 
 

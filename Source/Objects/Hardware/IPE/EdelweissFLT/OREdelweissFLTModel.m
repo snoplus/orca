@@ -31,6 +31,9 @@
 #import "EdelweissSLTv4_HW_Definitions.h"
 #import "ORCommandList.h"
 
+#import "ORSNMP.h"
+
+
 #import "ipe4structure.h"
 #import "ipe4tbtools.h"
 
@@ -2881,10 +2884,71 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 {	[self writeReg: kFLTV4CommandReg value:kIpeFlt_Cmd_SWTrig];   }
 
 
+
 - (void) devTabButtonAction
 {
     //DEBUG 	    
     NSLog(@"%@::%@  THIS IS A TEST BUTTON  \n", NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+    
+	ORSNMP* ss = [[ORSNMP alloc] initWithMib: @"GUDEADS-EPC1200-MIB"];
+	[ss openPublicSession:@"192.168.1.104"];
+    //NSString *valueName= [NSString stringWithString:@"epc1200PortState.1"];
+    //NSLog(@"Request value: %@\n",valueName);
+	//NSArray* response = [ss readValue: valueName];
+    
+
+    NSArray *valueNames= [NSArray arrayWithObjects: @"epc1200PortState.1", @"epc1200PortState.2", nil];
+    //NSString *valueName= [NSString stringWithString:@"epc1200PortState.1"];
+    NSLog(@"Request values: %@\n",valueNames);
+	NSArray* response = [ss readValues: valueNames];
+	//if(verbose)
+    for(id anEntry in response) NSLog(@"Reponse: %@\n",anEntry);
+	[ss release];
+	//[ORTimer delay:.05];
+    
+    
+/* response of
+    NSArray *valueNames= [NSArray arrayWithObjects: @"epc1200PortState.1", @"epc1200PortState.2", nil];
+    NSString *valueName= [NSString stringWithString:@"epc1200PortState.1"];
+    NSLog(@"Request values: %@\n",valueNames);
+	NSArray* response = [ss readValues: valueNames];
+
+
+
+
+    
+    102813 16:54:25 Request values: (
+    "epc1200PortState.1",
+    "epc1200PortState.2"
+)
+102813 16:54:25 Reponse: {
+    Mib = "GUDEADS-EPC1200-MIB";
+    Name = epc1200PortState;
+    SystemIndex = 0;
+    Type = INTEGER;
+    Value = 1;
+}
+102813 16:54:25 Reponse: {
+    Mib = "GUDEADS-EPC1200-MIB";
+    Name = epc1200PortState;
+    SystemIndex = 0;
+    Type = INTEGER;
+    Value = 0;
+}
+*/
+
+    {
+	ORSNMP*  ss = [[ORSNMP alloc] initWithMib: @"GUDEADS-EPC1200-MIB"];
+	[ss openSession:@"192.168.1.104"  community:@"private"];// I cannot use ORSNMPWriteOperation as I need community "private" (ORSNMPWriteOperation uses "guru") -tb- 2013
+    NSString *valueName= [NSString stringWithString:@"epc1200PortState.1 i 0"];
+	NSArray* response = [ss writeValue: valueName];
+    for(id anEntry in response) NSLog(@"Reponse: %@\n",anEntry);
+	[ss release];
+    }
+
+
+
+
 }
 
 - (void) killChargeBBJobButtonAction
