@@ -1119,7 +1119,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CouchDBQueue);
 {
     self = [super init];
 	queue = [[NSOperationQueue alloc] init];
-	[queue setMaxConcurrentOperationCount:4];
+	[queue setMaxConcurrentOperationCount:1];
     return self;
 }
 
