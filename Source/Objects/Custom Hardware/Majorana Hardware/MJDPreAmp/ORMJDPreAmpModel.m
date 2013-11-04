@@ -1063,7 +1063,7 @@ struct {
 #pragma mark ¥¥¥Alarms
 - (void) checkTempIsWithinLimits
 {
-    float maxAllowedTemperature = 50; //<<-Niko, set this or make a dialog field for it
+    float maxAllowedTemperature = 500; //temporarily set high because the temp readout isn't working right
     int aChip;
     float aTemperature;
     for(aChip=0;aChip<2;aChip++){
@@ -1074,8 +1074,8 @@ struct {
 				temperatureAlarm[aChip] = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Preamp %lu Temperature",[self uniqueIdNumber]] severity:kRangeAlarm];
                 [temperatureAlarm[aChip] setHelpString:[NSString stringWithFormat:@"Preamp %lu has exceeded %.1f C. This alarm will be in effect until the temperature returns to normal limits. It can be silenced by acknowledging it.",[self uniqueIdNumber],maxAllowedTemperature]];
 				[temperatureAlarm[aChip] setSticky:YES];
+                [temperatureAlarm[aChip] postAlarm];
 			}
-			[temperatureAlarm[aChip] postAlarm];
         }
         else {
             [temperatureAlarm[aChip] clearAlarm];
@@ -1113,28 +1113,28 @@ struct {
     NSString* alarmName;
     switch(anIndex){
         case 5:
-            if(fabs(aValue - 12) >= 0.5){  
+            if(fabs(aValue - 12) >= 1.0){
                 alarmName  = [NSString stringWithFormat:@"Preamp %lu +12V Supply",[self uniqueIdNumber]];
                 postAlarm  = YES;
             }
         break;
             
         case 6:
-            if(fabs(aValue + 12) >= 0.5){ 
+            if(fabs(aValue + 12) >= 1.0){
                 alarmName = [NSString stringWithFormat:@"Preamp %lu -12V Supply",[self uniqueIdNumber]];
                 postAlarm  = YES;
             }
         break;
             
         case 13:
-            if(fabs(aValue - 24) >= 0.5){
+            if(fabs(aValue - 24) >= 1.0){
                 alarmName = [NSString stringWithFormat:@"Preamp %lu +24V Supply",[self uniqueIdNumber]];
                 postAlarm  = YES;
             }
         break;
             
         case 14:
-            if(fabs(aValue + 24) >= 0.5){
+            if(fabs(aValue + 24) >= 1.0){
                 alarmName = [NSString stringWithFormat:@"Preamp %lu -24V Supply",[self uniqueIdNumber]];
                 postAlarm  = YES;
             }
@@ -1146,8 +1146,8 @@ struct {
             adcAlarm[anIndex] = [[ORAlarm alloc] initWithName:alarmName severity:kRangeAlarm];
             [adcAlarm[anIndex] setHelpString:[NSString stringWithFormat:@"Preamp %lu adc value exceeded limits (was at %.2f). This alarm will be in effect until the adc value returns to normal limits. It can be silenced by acknowledging it.",[self uniqueIdNumber],aValue]];
             [adcAlarm[anIndex] setSticky:YES];
+            [adcAlarm[anIndex] postAlarm];
         }
-        [adcAlarm[anIndex] postAlarm];
     }
     else {
         [adcAlarm[anIndex] clearAlarm];
