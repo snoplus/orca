@@ -42,6 +42,8 @@ static NSString* ORHVRampConnector				= @"HV Ramp Connector";
 - (void) _setUpPolling;
 - (void) _doRamp;
 - (void) addCurrentToTrend:(ORHVSupply*)aSupply;
+- (void) slowPoll;
+- (void) postCouchDBRecord;
 @end
 
 #define kDeltaTime 0.5
@@ -135,6 +137,7 @@ static NSString* ORHVRampConnector				= @"HV Ramp Connector";
 {
 	[self _setUpPolling];
 	[super wakeUp];
+    [self slowPoll];
 }
 
 - (void) sleep
@@ -932,6 +935,39 @@ static NSString *ORHVDirName 		= @"ORHVDirName";
 {
     [self setStates:kHVRampPanic onlyControlled:NO];
     [self startRamping];
+}
+
+- (void) slowPoll
+{
+    [self postCouchDBRecord];
+    [self performSelector:@selector(slowPoll) withObject:nil afterDelay:30.0];
+}
+
+- (void) postCouchDBRecord
+{
+    NSEnumerator* e = [supplies objectEnumerator];
+    ORHVSupply* aSupply;
+    NSMutableArray* theSupplies = [NSMutableArray array];
+    
+    while(aSupply = [e nextObject]){
+        [theSupplies addObject:
+         [NSDictionary dictionaryWithObjectsAndKeys:
+          [NSNumber numberWithInteger:[aSupply actualRelay]],@"relayState",
+          [NSNumber numberWithInteger:[aSupply rampState]],@"rampState",
+          [NSNumber numberWithInteger:[aSupply rampTime]],@"rampTime",
+          [NSNumber numberWithInteger:[aSupply targetVoltage]],@"targetVoltage",
+          [NSNumber numberWithInteger:[aSupply dacValue]],@"daqValue",
+          [NSNumber numberWithInteger:[aSupply adcVoltage]],@"adcVoltage",
+          [NSNumber numberWithInteger:[aSupply current]],@"current",
+        nil]];
+    }
+    
+    NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
+                            theSupplies, @"supplies",
+                            [NSNumber numberWithBool:[self anyVoltageOn]],@"HvStatus",
+                            nil];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
 }
 
 @end
