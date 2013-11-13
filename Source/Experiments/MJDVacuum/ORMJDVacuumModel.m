@@ -1474,7 +1474,8 @@ NSString* ORMJDVacuumModelConstraintsChanged		= @"ORMJDVacuumModelConstraintsCha
 	else cryoIsOn = [cryopump pumpStatus];
 	
 	ORVacuumStatusLabel* cryoRegionObj = [statusDictionary objectForKey:[NSNumber numberWithInt:kRegionCryoPump]];
-	BOOL  cryoPressureIsHigh = [self region:kRegionCryoPump valueHigherThan:2.0E0];
+	//BOOL  cryoPressureIsHigh = [self region:kRegionCryoPump valueHigherThan:2.0E0];
+	BOOL  cryoPressureIsHigh = [self region:kRegionCryoPump valueHigherThan:5.0E0];
 	
 	//---------------------------------------------------------------------------
 	//Turning Cryopump ON could cause excessive gas condensation on cryo pump
