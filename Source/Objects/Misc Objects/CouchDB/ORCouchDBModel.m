@@ -77,6 +77,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 
 @interface ORCouchDBModel (private)
 - (void) updateProcesses;
+- (void) updateExperiment;
 - (void) updateHistory;
 - (void) updateMachineRecord;
 - (void) postRunState:(NSNotification*)aNote;
@@ -114,6 +115,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 {
     if(![self aWake]){
 		[self performSelector:@selector(updateMachineRecord) withObject:nil afterDelay:2];
+		[self performSelector:@selector(updateExperiment) withObject:nil afterDelay:3];
 		[self performSelector:@selector(updateRunInfo) withObject:nil afterDelay:3];
 		[self performSelector:@selector(updateDatabaseStats) withObject:nil afterDelay:4];
 		[self performSelector:@selector(periodicCompact) withObject:nil afterDelay:60];
@@ -242,6 +244,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 	[self updateRunInfo];
 	[self alarmsChanged:nil];
 	[self statusLogChanged:nil];
+	[self updateExperiment];
     [self recordEvent:@"Restart" symbol:@"O" comment:@"ORCA restarted"];
 }
 
@@ -1275,6 +1278,16 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 			[self performSelector:@selector(updateStatus) withObject:nil afterDelay:10];
 			statusUpdateScheduled = YES;
 		}
+	}
+}
+
+- (void) updateExperiment
+{
+	if(!stealthMode){
+        [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateExperiment) object:nil];
+        id experiment = [self objectConnectedTo:ORCouchDBModelInConnector];
+        [experiment postCouchDBRecord];
+        [self performSelector:@selector(updateExperiment) withObject:nil afterDelay:30];
 	}
 }
 
