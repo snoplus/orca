@@ -46,8 +46,8 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 	for(i=0;i<numSegments;i++){
 		ORDetectorSegment* aSegment = [[ORDetectorSegment alloc] init];
 		[segments addObject:aSegment];
-		[aSegment setSegmentNumber:i];
 		[aSegment setMapEntries:someMapEntries];
+		[aSegment setSegmentNumber:i];
 		[aSegment release];
 	}
 	
@@ -85,7 +85,15 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 {
     for(id aSegment in segments)[aSegment setCrateIndex:aValue];
 }
+- (void) setCardIndex:(int)aValue;
+{
+    for(id aSegment in segments)[aSegment setCardIndex:aValue];
+}
 
+- (void) setChannelIndex:(int)aValue;
+{
+    for(id aSegment in segments)[aSegment setChannelIndex:aValue];
+}
 - (NSUndoManager*) undoManager
 {
 	return [[NSApp delegate] undoManager];
@@ -491,13 +499,14 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
     NSMutableString* theContents = [NSMutableString string];
 
     BOOL putInHeader = NO;
+    id lastObj = [segments lastObject];
     for(id segment in segments){
         if(!putInHeader){
             [theContents appendString:[segment paramHeader]];
             putInHeader = YES;
         }
         [theContents appendString:[segment paramsAsString]];
-        [theContents appendString:@"\n"];
+        if(segment != lastObj)[theContents appendString:@"\n"];
     }
     return theContents;
 }

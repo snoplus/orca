@@ -33,6 +33,14 @@ NSString* KSegmentChangedNotification	  =	@"KSegmentChangedNotification";
 
 #pragma mark ¥¥¥Initialization
 
+- (id) init {
+    self = [super init];
+    crateIndex      = -1; //default is none
+    cardIndex       = kCardSlot;
+    channelIndex    = kChannel;
+    return self;
+}
+
 - (void) dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -100,16 +108,39 @@ NSString* KSegmentChangedNotification	  =	@"KSegmentChangedNotification";
 {
     crateIndex = aValue;
 }
+
 - (int) crateIndex
 {
     return crateIndex;
 }
+
+- (void) setCardIndex:(int)aValue
+{
+    cardIndex = aValue;
+}
+
+- (int) cardIndex
+{
+    return cardIndex;
+}
+
+- (void) setChannelIndex:(int)aValue
+{
+    channelIndex = aValue;
+}
+
+- (int) channelIndex
+{
+    return channelIndex;
+}
+
 - (unsigned long) threshold
 {
-	int channel = [[params objectForKey:mapKey(kChannel)] intValue];
+	int channel = [[params objectForKey:mapKey(channelIndex)] intValue];
 	if(channel>=0) return [hardwareCard thresholdForDisplay:channel];
 	else return 0;
 }
+
 - (void) setThreshold:(id)aValue
 {
 	if(!hardwareCard)return;
@@ -125,7 +156,7 @@ NSString* KSegmentChangedNotification	  =	@"KSegmentChangedNotification";
 
 - (short) gain
 {
-	int channel = [[params objectForKey:mapKey(kChannel)] intValue];
+	int channel = [[params objectForKey:mapKey(channelIndex)] intValue];
 	if(channel>=0)return [hardwareCard gainForDisplay:channel];
 	else return 0;
 }
@@ -144,14 +175,14 @@ NSString* KSegmentChangedNotification	  =	@"KSegmentChangedNotification";
 
 - (BOOL) partOfEvent
 {
-	int channel = [[params objectForKey:mapKey(kChannel)] intValue];
+	int channel = [[params objectForKey:mapKey(channelIndex)] intValue];
 	if(channel>=0)return [hardwareCard partOfEvent:channel];
 	else return 0;
 }
 
 - (float) totalCounts
 {
-	int channel = [[params objectForKey:mapKey(kChannel)] intValue];
+	int channel = [[params objectForKey:mapKey(channelIndex)] intValue];
 	if(channel>=0){
 		return (float)[hardwareCard eventCount:channel];
 	}
@@ -262,7 +293,8 @@ NSString* KSegmentChangedNotification	  =	@"KSegmentChangedNotification";
 	NSString* result = [NSString string];
 	int i;
 	for(i=0;i<[mapEntries count];i++){
-		id aParam = [params objectForKey:mapKey(i)];
+        id aKey = mapKey(i);
+		id aParam = [params objectForKey:aKey];
 		if(aParam) result = [result stringByAppendingFormat:@"%@",aParam];
 		else result = [result stringByAppendingString:@"--"];
 		if(i<[mapEntries count]-1)result = [result stringByAppendingString:@","];
@@ -299,14 +331,14 @@ NSString* KSegmentChangedNotification	  =	@"KSegmentChangedNotification";
 
 - (int) cardSlot
 {
-	NSNumber* num = [self objectForKey:mapKey(kCardSlot)];
+	NSNumber* num = [self objectForKey:mapKey(cardIndex)];
 	if(!num)return -1;
 	else return [num intValue];
 }
 
 - (int) channel
 {
-	NSString* s = [self objectForKey:mapKey(kChannel)];
+	NSString* s = [self objectForKey:mapKey(channelIndex)];
 	if([s isEqualToString:@"--"])return -1;
 	else if(!s)return -1;
 	else return [s intValue];
@@ -344,6 +376,7 @@ NSString* KSegmentChangedNotification	  =	@"KSegmentChangedNotification";
 
 - (void) setSegmentNumber:(unsigned)index
 {
+	if(!params)[self setParams:[NSMutableDictionary dictionary]];
 	[params setObject:[NSNumber numberWithInt:index] forKey:@"kSegmentNumber"];
 }
 
@@ -372,11 +405,11 @@ NSString* KSegmentChangedNotification	  =	@"KSegmentChangedNotification";
     NSEnumerator* e = [rateProviders objectEnumerator];
     ORCard* aCard;
     while(aCard = [e nextObject]){
-		int theSlot = [[params objectForKey: mapKey(kCardSlot)]intValue];
+		int theSlot = [[params objectForKey: mapKey(cardIndex)]intValue];
 		if(theSlot >=0){
 			if( theSlot == [aCard displayedSlotNumber]){
 				
-				id rateObj = [aCard rateObject:[[params objectForKey: mapKey(kChannel)]intValue]];
+				id rateObj = [aCard rateObject:[[params objectForKey: mapKey(channelIndex)]intValue]];
 				if(rateObj)[notifyCenter addObserver : self
 								 selector : @selector(rateChanged:)
 									 name : [rateObj rateNotification]
@@ -399,14 +432,14 @@ NSString* KSegmentChangedNotification	  =	@"KSegmentChangedNotification";
 	for(card = 0;card<[adcCards count];card++){
 		id aCard = [adcCards objectAtIndex:card];
 		if(!aCard)break;
-		int theSlot = [[params objectForKey: mapKey(kCardSlot)]intValue];
+		int theSlot = [[params objectForKey: mapKey(cardIndex)]intValue];
         int theCrate;
         if(crateIndex>0)theCrate = [[params objectForKey: mapKey(crateIndex)]intValue];
         else theCrate = 0;
 		if(theSlot>=0){
 			if([aCard displayedSlotNumber] == theSlot && [aCard crateNumber] == theCrate){
 				hwPresent = YES;
-				int chan = [[params objectForKey: mapKey(kChannel)]intValue];
+				int chan = [[params objectForKey: mapKey(channelIndex)]intValue];
 				if([aCard onlineMaskBit:chan])online = YES;
 				hardwareCard = aCard;
 				break;
@@ -428,7 +461,6 @@ NSString* KSegmentChangedNotification	  =	@"KSegmentChangedNotification";
 	if([theModel hasSuffix:@"Model"])theModel = [theModel substringToIndex:[theModel length]-[@"Model"length]];
 	string = [string stringByAppendingFormat:     @"     Adc Class: %@\n",theModel];
 	string = [string stringByAppendingFormat:     @"     Threshold: %lu\n",[self threshold]];
-	string = [string stringByAppendingFormat:     @"          Gain: %d\n",[self gain]];
 	for(id aKey in params){
 		const char *theKeyAsCString = [[aKey substringFromIndex:1] cStringUsingEncoding:NSASCIIStringEncoding];
 		NSString* p = [NSString stringWithFormat:   @"%15s: %@\n",theKeyAsCString,[params objectForKey:aKey]];

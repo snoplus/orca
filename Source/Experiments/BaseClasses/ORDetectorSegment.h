@@ -41,6 +41,8 @@
 	NSArray*				mapEntries;
     NSString*               identifier;
     int                     crateIndex;
+    int                     cardIndex;
+    int                     channelIndex;
 }
 
 #pragma mark ¥¥¥Initialization
@@ -49,6 +51,10 @@
 #pragma mark ¥¥¥Accessors
 - (void) setCrateIndex:(int)aValue;
 - (int) crateIndex;
+- (void) setCardIndex:(int)aValue;
+- (int) cardIndex;
+- (void) setChannelIndex:(int)aValue;
+- (int) channelIndex;
 - (void) setIdentifier:(NSString*)newIdentifier;
 - (NSString*) identifier;
 - (void) setMapEntries:(NSArray*)someMapEntries;

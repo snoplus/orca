@@ -44,6 +44,8 @@
 - (void) dealloc;
 - (NSUndoManager*) undoManager;
 - (void) setCrateIndex:(int)aValue;
+- (void) setCardIndex:(int)aValue;
+- (void) setChannelIndex:(int)aValue;
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
